@@ -57,13 +57,21 @@
 
 enum TIFF_IMAGE_TYPE {
 	TIFF_BILEVEL = 1,
+	TIFF_PALETTE,
 	TIFF_RGB,
 	TIFF_CMYK
 };
 
-// structure for storing only the TIFF fields
+// class for storing only the TIFF fields
 // that are of interest to the TIFFTranslator
-struct TiffDetails {
+//
+// The class is very minimal so that it is
+// convenient to use, but cleans up after itself
+class TiffDetails {
+public:
+	TiffDetails();
+	~TiffDetails();
+	
 	uint32 width;
 	uint32 height;
 	uint32 compression;
