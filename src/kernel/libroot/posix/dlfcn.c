@@ -1,43 +1,52 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2002, Manuel J. Petit. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
 
 
+#include <libroot_private.h>
+#include <user_runtime.h>
+
 #include <dlfcn.h>
 #include <string.h>
-#include "user_runtime.h"
 
 
-void __init__dlfcn(struct uspace_program_args const *);
-
-static struct rld_export const *gRuntimeLinker;
-static status_t gStatus;
+static struct rld_export const *sRuntimeLinker;
+static status_t sStatus;
 	// Note, this is not thread-safe
 
 
 void *
 dlopen(char const *name, int mode)
 {
+	status_t status;
+
 	if (name == NULL)
 		name = MAGIC_APP_NAME;
 
-	gStatus = gRuntimeLinker->load_add_on(name, mode);
-	if (gStatus < B_OK)
+	status = sRuntimeLinker->load_add_on(name, mode);
+	sStatus = status;
+
+	if (status < B_OK)
 		return NULL;
 
-	return (void *)gStatus;
+	return (void *)status;
 }
 
 
 void *
 dlsym(void *handle, char const *name)
 {
+	status_t status;
 	void *location;
 
-	gStatus = gRuntimeLinker->get_image_symbol((image_id)handle, name, B_SYMBOL_TYPE_ANY, &location);
-	if (gStatus < B_OK)
+	status = sRuntimeLinker->get_image_symbol((image_id)handle, name, B_SYMBOL_TYPE_ANY, &location);
+	sStatus = status;
+
+	if (status < B_OK)
 		return NULL;
 
 	return location;
@@ -47,22 +56,22 @@ dlsym(void *handle, char const *name)
 int
 dlclose(void *handle)
 {
-	return gRuntimeLinker->unload_add_on((image_id)handle);
+	return sRuntimeLinker->unload_add_on((image_id)handle);
 }
 
 
 char *
 dlerror(void)
 {
-	if (gStatus < B_OK)
-		return strerror(gStatus);
+	if (sStatus < B_OK)
+		return strerror(sStatus);
 
 	return NULL;
 }
 
 
 void
-__init__dlfcn(struct uspace_program_args const *args)
+__init_dlfcn(const struct uspace_program_args *args)
 {
-	gRuntimeLinker = args->rld_export;
+	sRuntimeLinker = args->rld_export;
 }
