@@ -17,6 +17,10 @@ struct quehead {
 	struct quehead *prev;
 };
 
+/* You can use this macro to iterate through the queue. */
+#define kqueue_foreach(head, element) \
+	for ((element) = (void *)(head)->next; (element) != (void *)(head); (element) = (void *)((struct quehead *)(element))->next)
+
 
 /** Initializes a queue to be used */
 
