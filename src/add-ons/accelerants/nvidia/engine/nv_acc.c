@@ -165,59 +165,59 @@ status_t nv_acc_init()
 	 * (CTX registers are actually a sort of RAM space.) */
 	/* (first set) */
 	//fixme: for NV40 and above the handle values need to be different..
-	ACCW(HT_HANDL_00, NV1_IMAGE_FROM_CPU); /* 32bit handle (not used?) */
+	ACCW(HT_HANDL_00, (0x80000000 | NV1_IMAGE_FROM_CPU)); /* 32bit handle (not used?) */
 	ACCW(HT_VALUE_00, 0x80011145); /* instance $1145, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_01, NV_IMAGE_BLIT); /* 32bit handle */
+	ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
 	ACCW(HT_VALUE_01, 0x80011146); /* instance $1146, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_02, NV3_GDI_RECTANGLE_TEXT); /* 32bit handle */
+	ACCW(HT_HANDL_02, (0x80000000 | NV3_GDI_RECTANGLE_TEXT)); /* 32bit handle */
 	ACCW(HT_VALUE_02, 0x80011147); /* instance $1147, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_03, NV_RENDER_D3D0_TRIANGLE_ZETA); /* 32bit handle (not used?) */
+	ACCW(HT_HANDL_03, (0x80000000 | NV_RENDER_D3D0_TRIANGLE_ZETA)); /* 32bit handle (not used?) */
 	ACCW(HT_VALUE_03, 0x80011148); /* instance $1148, engine = acc engine, CHID = $00 */
 
 	/* NV4_ and NV10_DX5_TEXTURE_TRIANGLE should be identical */
-	ACCW(HT_HANDL_04, NV4_DX5_TEXTURE_TRIANGLE); /* 32bit handle */
+	ACCW(HT_HANDL_04, (0x80000000 | NV4_DX5_TEXTURE_TRIANGLE)); /* 32bit handle */
 	ACCW(HT_VALUE_04, 0x80011149); /* instance $1149, engine = acc engine, CHID = $00 */
 
 	/* NV4_ and NV10_DX6_MULTI_TEXTURE_TRIANGLE should be identical */
-	ACCW(HT_HANDL_05, NV4_DX6_MULTI_TEXTURE_TRIANGLE); /* 32bit handle (not used) */
+	ACCW(HT_HANDL_05, (0x80000000 | NV4_DX6_MULTI_TEXTURE_TRIANGLE)); /* 32bit handle (not used) */
 	ACCW(HT_VALUE_05, 0x8001114a); /* instance $114a, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_06, NV1_RENDER_SOLID_LIN); /* 32bit handle (not used) */
+	ACCW(HT_HANDL_06, (0x80000000 | NV1_RENDER_SOLID_LIN)); /* 32bit handle (not used) */
 	if (si->ps.card_arch != NV04A)
 		ACCW(HT_VALUE_06, 0x80011150); /* instance $1150, engine = acc engine, CHID = $00 */
 	else
 		ACCW(HT_VALUE_06, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 
 	/* (second set) */
-	ACCW(HT_HANDL_10, NV_ROP5_SOLID); /* 32bit handle */
+	ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
 	ACCW(HT_VALUE_10, 0x80011142); /* instance $1142, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_11, NV_IMAGE_BLACK_RECTANGLE); /* 32bit handle */
+	ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
 	ACCW(HT_VALUE_11, 0x80011143); /* instance $1143, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_12, NV_IMAGE_PATTERN); /* 32bit handle */
+	ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
 	ACCW(HT_VALUE_12, 0x80011144); /* instance $1144, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_13, NV3_SURFACE_0); /* 32bit handle (not used) */
+	ACCW(HT_HANDL_13, (0x80000000 | NV3_SURFACE_0)); /* 32bit handle (not used) */
 	ACCW(HT_VALUE_13, 0x8001114b); /* instance $114b, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_14, NV3_SURFACE_1); /* 32bit handle (not used) */
+	ACCW(HT_HANDL_14, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (not used) */
 	ACCW(HT_VALUE_14, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_15, NV3_SURFACE_2); /* 32bit handle (not used) */
+	ACCW(HT_HANDL_15, (0x80000000 | NV3_SURFACE_2)); /* 32bit handle (not used) */
 	ACCW(HT_VALUE_15, 0x8001114d); /* instance $114d, engine = acc engine, CHID = $00 */
 
-	ACCW(HT_HANDL_16, NV3_SURFACE_3); /* 32bit handle (not used) */
+	ACCW(HT_HANDL_16, (0x80000000 | NV3_SURFACE_3)); /* 32bit handle (not used) */
 	ACCW(HT_VALUE_16, 0x8001114e); /* instance $114e, engine = acc engine, CHID = $00 */
 
 	/* fixme note:
 	 * why not setup NV4_CONTEXT_SURFACES_ARGB_ZS as well?? (they are compatible..) */
 	if (si->ps.card_arch != NV04A)
 	{
-		ACCW(HT_HANDL_17, NV10_CONTEXT_SURFACES_ARGB_ZS); /* 32bit handle (3D only) */
+		ACCW(HT_HANDL_17, (0x80000000 | NV10_CONTEXT_SURFACES_ARGB_ZS)); /* 32bit handle (3D only) */
 		ACCW(HT_VALUE_17, 0x8001114f); /* instance $114f, engine = acc engine, CHID = $00 */
 	}
 
@@ -930,18 +930,18 @@ status_t nv_acc_init()
 	/* set handle's pointers to their assigned FIFO channels */
 	for (cnt = 0; cnt < 0x08; cnt++)
 	{
-		si->engine.fifo.ch_ptr[((si->engine.fifo.handle[cnt]) & 0x0000001f)] =
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] =
 			(NVACC_FIFO + (cnt * 0x00002000));
 	}
 	/* program FIFO assignments */
-	ACCW(FIFO_CH0, si->engine.fifo.handle[0]); /* Raster OPeration */
-	ACCW(FIFO_CH1, si->engine.fifo.handle[1]); /* Clip */
-	ACCW(FIFO_CH2, si->engine.fifo.handle[2]); /* Pattern */
-	ACCW(FIFO_CH3, si->engine.fifo.handle[3]); /* Pixmap (not used or 3D only?) */
-	ACCW(FIFO_CH4, si->engine.fifo.handle[4]); /* Blit */
-	ACCW(FIFO_CH5, si->engine.fifo.handle[5]); /* Bitmap */
-	ACCW(FIFO_CH6, si->engine.fifo.handle[6]); /* Line (not used or 3D only?) */
-	ACCW(FIFO_CH7, si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
+	ACCW(FIFO_CH0, (0x80000000 | si->engine.fifo.handle[0])); /* Raster OPeration */
+	ACCW(FIFO_CH1, (0x80000000 | si->engine.fifo.handle[1])); /* Clip */
+	ACCW(FIFO_CH2, (0x80000000 | si->engine.fifo.handle[2])); /* Pattern */
+	ACCW(FIFO_CH3, (0x80000000 | si->engine.fifo.handle[3])); /* Pixmap (not used or 3D only?) */
+	ACCW(FIFO_CH4, (0x80000000 | si->engine.fifo.handle[4])); /* Blit */
+	ACCW(FIFO_CH5, (0x80000000 | si->engine.fifo.handle[5])); /* Bitmap */
+	ACCW(FIFO_CH6, (0x80000000 | si->engine.fifo.handle[6])); /* Line (not used or 3D only?) */
+	ACCW(FIFO_CH7, (0x80000000 | si->engine.fifo.handle[7])); /* Textured Triangle (3D only) */
 
 	/* initialize our local pointers */
 	nv_acc_assert_fifo();
@@ -1215,11 +1215,11 @@ void nv_acc_assert_fifo(void)
 {
 	/* does every engine cmd this accelerant needs have a FIFO channel? */
 	//fixme: can probably be optimized for both speed and channel selection...
-	if (!si->engine.fifo.ch_ptr[(NV_ROP5_SOLID & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV_IMAGE_BLACK_RECTANGLE & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV_IMAGE_PATTERN & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV_IMAGE_BLIT & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV3_GDI_RECTANGLE_TEXT & 0x0000001f)])
+	if (!si->engine.fifo.ch_ptr[NV_ROP5_SOLID] ||
+		!si->engine.fifo.ch_ptr[NV_IMAGE_BLACK_RECTANGLE] ||
+		!si->engine.fifo.ch_ptr[NV_IMAGE_PATTERN] ||
+		!si->engine.fifo.ch_ptr[NV_IMAGE_BLIT] ||
+		!si->engine.fifo.ch_ptr[NV3_GDI_RECTANGLE_TEXT])
 	{
 		uint16 cnt;
 
@@ -1227,11 +1227,11 @@ void nv_acc_assert_fifo(void)
 		nv_acc_wait_idle();
 
 		/* free the FIFO channels we want from the currently assigned cmd's */
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[0] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[1] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[2] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[4] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[5] & 0x0000001f)] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[0]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[1]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[2]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[4]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[5]] = 0;
 
 		/* set new object handles */
 		si->engine.fifo.handle[0] = NV_ROP5_SOLID;
@@ -1243,33 +1243,33 @@ void nv_acc_assert_fifo(void)
 		/* set handle's pointers to their assigned FIFO channels */
 		for (cnt = 0; cnt < 0x08; cnt++)
 		{
-			si->engine.fifo.ch_ptr[((si->engine.fifo.handle[cnt]) & 0x0000001f)] =
+			si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] =
 				(NVACC_FIFO + (cnt * 0x00002000));
 		}
 
 		/* program new FIFO assignments */
-		ACCW(FIFO_CH0, si->engine.fifo.handle[0]); /* Raster OPeration */
-		ACCW(FIFO_CH1, si->engine.fifo.handle[1]); /* Clip */
-		ACCW(FIFO_CH2, si->engine.fifo.handle[2]); /* Pattern */
-		ACCW(FIFO_CH4, si->engine.fifo.handle[4]); /* Blit */
-		ACCW(FIFO_CH5, si->engine.fifo.handle[5]); /* Bitmap */
+		ACCW(FIFO_CH0, (0x80000000 | si->engine.fifo.handle[0])); /* Raster OPeration */
+		ACCW(FIFO_CH1, (0x80000000 | si->engine.fifo.handle[1])); /* Clip */
+		ACCW(FIFO_CH2, (0x80000000 | si->engine.fifo.handle[2])); /* Pattern */
+		ACCW(FIFO_CH4, (0x80000000 | si->engine.fifo.handle[4])); /* Blit */
+		ACCW(FIFO_CH5, (0x80000000 | si->engine.fifo.handle[5])); /* Bitmap */
 	}
 
 	/* update our local pointers */
 	nv_rop5_solid_ptr = (cmd_nv_rop5_solid*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_ROP5_SOLID & 0x0000001f)]) >> 2]);
+		&(regs[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID]) >> 2]);
 
 	nv_image_black_rectangle_ptr = (cmd_nv_image_black_rectangle*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_BLACK_RECTANGLE & 0x0000001f)]) >> 2]);
+		&(regs[(si->engine.fifo.ch_ptr[NV_IMAGE_BLACK_RECTANGLE]) >> 2]);
 
 	nv_image_pattern_ptr = (cmd_nv_image_pattern*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_PATTERN & 0x0000001f)]) >> 2]);
+		&(regs[(si->engine.fifo.ch_ptr[NV_IMAGE_PATTERN]) >> 2]);
 
 	nv_image_blit_ptr = (cmd_nv_image_blit*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_BLIT & 0x0000001f)]) >> 2]);
+		&(regs[(si->engine.fifo.ch_ptr[NV_IMAGE_BLIT]) >> 2]);
 
 	nv3_gdi_rectangle_text_ptr = (cmd_nv3_gdi_rectangle_text*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV3_GDI_RECTANGLE_TEXT & 0x0000001f)]) >> 2]);
+		&(regs[(si->engine.fifo.ch_ptr[NV3_GDI_RECTANGLE_TEXT]) >> 2]);
 }
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */

@@ -29,17 +29,8 @@ blit
 */
 
 static void nv_start_dma(void);
+static status_t nv_acc_fifofree_dma(uint16 cmd_size);
 static void nv_acc_assert_fifo_dma(void);
-
-/* FIFO channel pointers */
-/* note:
- * every instance of the accelerant needs to have it's own pointers, as the registers
- * are cloned to different adress ranges for each one */
-static cmd_nv_rop5_solid* nv_rop5_solid_ptr;
-static cmd_nv_image_black_rectangle* nv_image_black_rectangle_ptr;
-static cmd_nv_image_pattern* nv_image_pattern_ptr;
-static cmd_nv_image_blit* nv_image_blit_ptr;
-static cmd_nv3_gdi_rectangle_text* nv3_gdi_rectangle_text_ptr;
 
 status_t nv_acc_wait_idle_dma()
 {
@@ -61,7 +52,6 @@ status_t nv_acc_init_dma()
 	uint16 cnt;
 	//fixme: move to shared info:
 	uint32 max;
-	uint32 free;
 
 //chk power-up cycle if probs
 
@@ -115,45 +105,45 @@ status_t nv_acc_init_dma()
 	if (si->ps.card_arch >= NV40A)
 	{
 		/* (first set) */
-		ACCW(HT_HANDL_00, NV3_SURFACE_1); /* 32bit handle (not used) */
+		ACCW(HT_HANDL_00, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (not used) */
 		ACCW(HT_VALUE_00, 0x0010114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_01, NV_IMAGE_BLIT); /* 32bit handle */
+		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
 		ACCW(HT_VALUE_01, 0x00101148); /* instance $1146, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_02, NV3_GDI_RECTANGLE_TEXT); /* 32bit handle */
+		ACCW(HT_HANDL_02, (0x80000000 | NV3_GDI_RECTANGLE_TEXT)); /* 32bit handle */
 		ACCW(HT_VALUE_02, 0x0010114a); /* instance $1147, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
-		ACCW(HT_HANDL_10, NV_ROP5_SOLID); /* 32bit handle */
+		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
 		ACCW(HT_VALUE_10, 0x00101142); /* instance $1142, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_11, NV_IMAGE_BLACK_RECTANGLE); /* 32bit handle */
+		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
 		ACCW(HT_VALUE_11, 0x00101144); /* instance $1143, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_12, NV_IMAGE_PATTERN); /* 32bit handle */
+		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
 		ACCW(HT_VALUE_12, 0x00101146); /* instance $1144, engine = acc engine, CHID = $00 */
 	}
 	else
 	{
 		/* (first set) */
-		ACCW(HT_HANDL_00, NV3_SURFACE_1); /* 32bit handle (not used) */
+		ACCW(HT_HANDL_00, (0x80000000 | NV3_SURFACE_1)); /* 32bit handle (not used) */
 		ACCW(HT_VALUE_00, 0x8001114c); /* instance $114c, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_01, NV_IMAGE_BLIT); /* 32bit handle */
+		ACCW(HT_HANDL_01, (0x80000000 | NV_IMAGE_BLIT)); /* 32bit handle */
 		ACCW(HT_VALUE_01, 0x80011148); /* instance $1146, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_02, NV3_GDI_RECTANGLE_TEXT); /* 32bit handle */
+		ACCW(HT_HANDL_02, (0x80000000 | NV3_GDI_RECTANGLE_TEXT)); /* 32bit handle */
 		ACCW(HT_VALUE_02, 0x8001114a); /* instance $1147, engine = acc engine, CHID = $00 */
 
 		/* (second set) */
-		ACCW(HT_HANDL_10, NV_ROP5_SOLID); /* 32bit handle */
+		ACCW(HT_HANDL_10, (0x80000000 | NV_ROP5_SOLID)); /* 32bit handle */
 		ACCW(HT_VALUE_10, 0x80011142); /* instance $1142, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_11, NV_IMAGE_BLACK_RECTANGLE); /* 32bit handle */
+		ACCW(HT_HANDL_11, (0x80000000 | NV_IMAGE_BLACK_RECTANGLE)); /* 32bit handle */
 		ACCW(HT_VALUE_11, 0x80011144); /* instance $1143, engine = acc engine, CHID = $00 */
 
-		ACCW(HT_HANDL_12, NV_IMAGE_PATTERN); /* 32bit handle */
+		ACCW(HT_HANDL_12, (0x80000000 | NV_IMAGE_PATTERN)); /* 32bit handle */
 		ACCW(HT_VALUE_12, 0x80011146); /* instance $1144, engine = acc engine, CHID = $00 */
 	}
 
@@ -575,10 +565,7 @@ status_t nv_acc_init_dma()
 	}
 	/* set handle's pointers to their assigned FIFO channels */
 	for (cnt = 0; cnt < 0x08; cnt++)
-	{
-		si->engine.fifo.ch_ptr[((si->engine.fifo.handle[cnt]) & 0x0000001f)] =
-			(NVACC_FIFO + (cnt * 0x00002000));
-	}
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] = (cnt * 0x00002000);
 
 	/* init DMA command buffer pointer */
 	si->engine.dma.cmdbuffer = (uint32 *)((char *)si->framebuffer +
@@ -601,35 +588,46 @@ status_t nv_acc_init_dma()
 	 * to set new adresses if jumps are needed. */
 	si->engine.dma.cmdbuffer[0x00] = (1 << 18) | 0x00000;
 	/* send actual cmd word */
-	si->engine.dma.cmdbuffer[0x01] = si->engine.fifo.handle[0]; /* Raster OPeration */
+	si->engine.dma.cmdbuffer[0x01] =
+		(0x80000000 | si->engine.fifo.handle[0]); /* Raster OPeration */
 
 	/* etc.. */
 	si->engine.dma.cmdbuffer[0x02] = (1 << 18) | 0x02000;
-	si->engine.dma.cmdbuffer[0x03] = si->engine.fifo.handle[1]; /* Clip */
+	si->engine.dma.cmdbuffer[0x03] =
+		(0x80000000 | si->engine.fifo.handle[1]); /* Clip */
 
 	si->engine.dma.cmdbuffer[0x04] = (1 << 18) | 0x04000;
-	si->engine.dma.cmdbuffer[0x05] = si->engine.fifo.handle[2]; /* Pattern */
+	si->engine.dma.cmdbuffer[0x05] =
+		(0x80000000 | si->engine.fifo.handle[2]); /* Pattern */
 
 	si->engine.dma.cmdbuffer[0x06] = (1 << 18) | 0x06000;
-//	si->engine.dma.cmdbuffer[0x07] = si->engine.fifo.handle[3]; /* Pixmap (not used or 3D only?) */
+//	si->engine.dma.cmdbuffer[0x07] =
+//		(0x80000000 | si->engine.fifo.handle[3]); /* Pixmap (not used or 3D only?) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-	si->engine.dma.cmdbuffer[0x07] = si->engine.fifo.handle[0];
+	si->engine.dma.cmdbuffer[0x07] =
+		(0x80000000 | si->engine.fifo.handle[0]);
 
 	si->engine.dma.cmdbuffer[0x08] = (1 << 18) | 0x08000;
-	si->engine.dma.cmdbuffer[0x09] = si->engine.fifo.handle[4]; /* Blit */
+	si->engine.dma.cmdbuffer[0x09] =
+		(0x80000000 | si->engine.fifo.handle[4]); /* Blit */
 
 	si->engine.dma.cmdbuffer[0x0a] = (1 << 18) | 0x0a000;
-	si->engine.dma.cmdbuffer[0x0b] = si->engine.fifo.handle[5]; /* Bitmap */
+	si->engine.dma.cmdbuffer[0x0b] =
+		(0x80000000 | si->engine.fifo.handle[5]); /* Bitmap */
 
 	si->engine.dma.cmdbuffer[0x0c] = (1 << 18) | 0x0c000;
-//	si->engine.dma.cmdbuffer[0x0d] = si->engine.fifo.handle[6]; /* Line (not used or 3D only?) */
+//	si->engine.dma.cmdbuffer[0x0d] =
+//		(0x80000000 | si->engine.fifo.handle[6]); /* Line (not used or 3D only?) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-	si->engine.dma.cmdbuffer[0x0d] = si->engine.fifo.handle[0];
+	si->engine.dma.cmdbuffer[0x0d] =
+		(0x80000000 | si->engine.fifo.handle[0]);
 
 	si->engine.dma.cmdbuffer[0x0e] = (1 << 18) | 0x0e000;
-//	si->engine.dma.cmdbuffer[0x0f] = si->engine.fifo.handle[7]; /* Textured Triangle (3D only) */
+//	si->engine.dma.cmdbuffer[0x0f] =
+//		(0x80000000 | si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-	si->engine.dma.cmdbuffer[0x0f] = si->engine.fifo.handle[0];
+	si->engine.dma.cmdbuffer[0x0f] =
+		(0x80000000 | si->engine.fifo.handle[0]);
 
 	/* initialize our local pointers */
 	nv_acc_assert_fifo_dma();
@@ -645,7 +643,7 @@ status_t nv_acc_init_dma()
 	 * (DMA opcode 'noninc method': issue word $20000000.) */
 	/*si->dma.*/max = 8191;
 	/* note the current free space we have left in the DMA buffer */
-	/*si->dma.*/free = /*si->dma.*/max - si->engine.dma.current + 1;
+	si->engine.dma.free = /*si->dma.*/max - si->engine.dma.current /*+ 1*/;
 
 	//fixme: add colorspace and buffer config cmd's or predefine in the non-DMA way.
 	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
@@ -671,9 +669,33 @@ static void nv_start_dma(void)
 		/* actually start DMA to execute all commands now in buffer */
 		/* note:
 		 * the actual FIFO channel that gets activated does not really matter:
-		 * all FIFO fill-level info actually points at the same registers. (?) */
-		nv_rop5_solid_ptr->DMAPut = (si->engine.dma.put << 2);
+		 * all FIFO fill-level info actually points at the same registers. */
+		NV_REG32(NVACC_FIFO + NV_GENERAL_DMAPUT +
+			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])]) =
+			(si->engine.dma.put << 2);
 	}
+//test:
+for (dummy = 0; dummy < 10; dummy++)
+{
+	LOG(4,("ACC_DMA: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
+		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
+	LOG(4,("ACC_DMA: put $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAPUT +
+		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
+}
+}
+
+static status_t nv_acc_fifofree_dma(uint16 cmd_size)
+{
+//	if (si->dma.free >= cmd_size) return B_OK;
+	if ((si->engine.dma.current + cmd_size) < 8191) return B_OK;
+
+	return B_ERROR;
+}
+
+static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
+{
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((size << 18) |
+		(si->engine.fifo.ch_ptr[cmd] + offset));
 }
 
 /* fixme? (check this out..)
@@ -687,11 +709,11 @@ static void nv_acc_assert_fifo_dma(void)
 {
 	/* does every engine cmd this accelerant needs have a FIFO channel? */
 	//fixme: can probably be optimized for both speed and channel selection...
-	if (!si->engine.fifo.ch_ptr[(NV_ROP5_SOLID & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV_IMAGE_BLACK_RECTANGLE & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV_IMAGE_PATTERN & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV_IMAGE_BLIT & 0x0000001f)] ||
-		!si->engine.fifo.ch_ptr[(NV3_GDI_RECTANGLE_TEXT & 0x0000001f)])
+	if (!si->engine.fifo.ch_ptr[NV_ROP5_SOLID] ||
+		!si->engine.fifo.ch_ptr[NV_IMAGE_BLACK_RECTANGLE] ||
+		!si->engine.fifo.ch_ptr[NV_IMAGE_PATTERN] ||
+		!si->engine.fifo.ch_ptr[NV_IMAGE_BLIT] ||
+		!si->engine.fifo.ch_ptr[NV3_GDI_RECTANGLE_TEXT])
 	{
 		uint16 cnt;
 
@@ -699,11 +721,11 @@ static void nv_acc_assert_fifo_dma(void)
 		nv_acc_wait_idle_dma();
 
 		/* free the FIFO channels we want from the currently assigned cmd's */
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[0] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[1] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[2] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[4] & 0x0000001f)] = 0;
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[5] & 0x0000001f)] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[0]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[1]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[2]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[4]] = 0;
+		si->engine.fifo.ch_ptr[si->engine.fifo.handle[5]] = 0;
 
 		/* set new object handles */
 		si->engine.fifo.handle[0] = NV_ROP5_SOLID;
@@ -715,49 +737,64 @@ static void nv_acc_assert_fifo_dma(void)
 		/* set handle's pointers to their assigned FIFO channels */
 		for (cnt = 0; cnt < 0x08; cnt++)
 		{
-			si->engine.fifo.ch_ptr[((si->engine.fifo.handle[cnt]) & 0x0000001f)] =
-				(NVACC_FIFO + (cnt * 0x00002000));
+			si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] =
+				(cnt * 0x00002000);
 		}
 
 		/* program new FIFO assignments */
 		//fixme: should be done via DMA cmd buffer...
-		//ACCW(FIFO_CH0, si->engine.fifo.handle[0]); /* Raster OPeration */
-		//ACCW(FIFO_CH1, si->engine.fifo.handle[1]); /* Clip */
-		//ACCW(FIFO_CH2, si->engine.fifo.handle[2]); /* Pattern */
-		//ACCW(FIFO_CH4, si->engine.fifo.handle[4]); /* Blit */
-		//ACCW(FIFO_CH5, si->engine.fifo.handle[5]); /* Bitmap */
+		//ACCW(FIFO_CH0, (0x80000000 | si->engine.fifo.handle[0])); /* Raster OPeration */
+		//ACCW(FIFO_CH1, (0x80000000 | si->engine.fifo.handle[1])); /* Clip */
+		//ACCW(FIFO_CH2, (0x80000000 | si->engine.fifo.handle[2])); /* Pattern */
+		//ACCW(FIFO_CH4, (0x80000000 | si->engine.fifo.handle[4])); /* Blit */
+		//ACCW(FIFO_CH5, (0x80000000 | si->engine.fifo.handle[5])); /* Bitmap */
 	}
-
-	/* update our local pointers */
-	nv_rop5_solid_ptr = (cmd_nv_rop5_solid*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_ROP5_SOLID & 0x0000001f)]) >> 2]);
-
-	nv_image_black_rectangle_ptr = (cmd_nv_image_black_rectangle*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_BLACK_RECTANGLE & 0x0000001f)]) >> 2]);
-
-	nv_image_pattern_ptr = (cmd_nv_image_pattern*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_PATTERN & 0x0000001f)]) >> 2]);
-
-	nv_image_blit_ptr = (cmd_nv_image_blit*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_BLIT & 0x0000001f)]) >> 2]);
-
-	nv3_gdi_rectangle_text_ptr = (cmd_nv3_gdi_rectangle_text*)
-		&(regs[(si->engine.fifo.ch_ptr[(NV3_GDI_RECTANGLE_TEXT & 0x0000001f)]) >> 2]);
 }
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */
 status_t nv_acc_setup_blit_dma()
 {
-	//fixme: implement.
+	/* setup solid pattern:
+	 * wait for room in fifo for pattern cmd if needed. */
+	//fixme: testing..
+	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
 
-	return B_ERROR;
+	/* now setup pattern (writing 7 32bit words) */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
+	/* ROP registers (Raster OPeration):
+	 * wait for room in fifo for ROP cmd if needed. */
+	//fixme: testing..
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+
+	/* now setup ROP (writing 2 32bit words) */
+	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
+
+	return B_OK;
 }
 
 status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 {
-	//fixme: implement.
+	/* Note: blit-copy direction is determined inside riva hardware: no setup needed */
 
-	return B_ERROR;
+	/* instruct engine what to blit:
+	 * wait for room in fifo for blit cmd if needed. */
+	//fixme: testing..
+	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+
+	/* now setup blit (writing 4 32bit words) */
+	nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((ys << 16) | xs); /* SourceOrg */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((yd << 16) | xd); /* DestOrg */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = (((h + 1) << 16) | (w + 1)); /* HeightWidth */
+
+	return B_OK;
 }
 
 /* rectangle fill - i.e. workspace and window background color */
