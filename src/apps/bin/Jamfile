@@ -82,7 +82,7 @@ StdBinCommands
 # standard commands that need libbe.so, libmail.so
 StdBinCommands
 	mail.cpp
-	: be /boot/beos/system/lib/libmail.so
+	: be libmail.so
 	;
 
 SubInclude OBOS_TOP src apps bin addattr ;
