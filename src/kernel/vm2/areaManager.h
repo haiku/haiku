@@ -13,7 +13,7 @@ class areaManager // One of these per process
 		areaManager ();
 		void addArea(area *newArea) {areas.add(newArea);}
 		void removeArea(area *oldArea) {areas.remove(oldArea); }
-		void freeArea(area_id area);
+		status_t freeArea(area_id area);
 		int createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) ;
 		int cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable);
 

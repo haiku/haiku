@@ -2,7 +2,7 @@
 #define _AREA_H
 #include "OS.h"
 #include "vm.h"
-#include "list.h"
+#include "lockedList.h"
 #include "hashTable.h"
 
 class areaManager;
@@ -51,6 +51,7 @@ class area : public node
 		areaManager *getAreaManager(void) {return manager;}
 		unsigned long getEndAddress(void) {return end_address;}
 		unsigned long getStartAddress(void) {return start_address;}
+		const char *getName(void) {return name;}
 
 		// Debugging
 		void dump(void);

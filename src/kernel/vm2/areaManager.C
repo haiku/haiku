@@ -39,8 +39,9 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start) {
 }
 
 // Remove the area from our list, put it on the area pool and move on
-void areaManager::freeArea(area_id areaID) {
+status_t areaManager::freeArea(area_id areaID) {
 	//error ("areaManager::freeArea: begin\n");
+	status_t retVal=B_OK;
 	lock();
 	area *oldArea=findArea(areaID);	
 	//error ("areaManager::freeArea: found area %x\n",oldArea);
@@ -55,9 +56,13 @@ void areaManager::freeArea(area_id areaID) {
 //		error ("areaManager::freeArea: freeArea complete \n");
 		vmBlock->areaPool->put(oldArea);
 		}
-	else
+	else {
+		retVal=B_ERROR;
 		error ("areaManager::freeArea: unable to find requested area\n");
+		}
 	unlock();
+//	error ("areaManager::freeArea: final unlock complete\n");
+	return retVal;
 }
 
 area *areaManager::findAreaLock(void *address) {
@@ -93,7 +98,7 @@ area *areaManager::findArea(const void *address) {
 		if (myArea->contains(address))
 				return myArea;
 		}
-	error ("areaManager::findArea is giving up\n");
+//	error ("areaManager::findArea is giving up\n");
 	return NULL;
 }
 
@@ -137,14 +142,14 @@ long areaManager::nextAreaID=0;
 
 // Create an area; get a new structure, call setup, create the guts, set its ID, add it to our list 
 int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) {
-	error ("areaManager::createArea - Creating an area\n");
+//	error ("areaManager::createArea - Creating an area\n");
 	lock();
     area *newArea = new (vmBlock->areaPool->get()) area;
-    error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
+//	error ("areaManager::createArea - got a new area (%p) from the areaPool\n",newArea);
     newArea->setup(this);
-    error ("areaManager::createArea - setup complete\n");
+//	error ("areaManager::createArea - setup complete\n");
     int retVal = newArea->createArea(AreaName,pageCount,address,addType,state,protect);
-    error ("areaManager::createArea - new area's createArea called\n");
+//	error ("areaManager::createArea - new area's createArea called\n");
 	if (retVal==B_OK) {
 	 	atomic_add(&nextAreaID,1);
    	 	newArea->setAreaID(nextAreaID);
@@ -152,6 +157,7 @@ int areaManager::createArea(char *AreaName,int pageCount,void **address, address
     	addArea(newArea);
     	//error ("areaManager::createArea - new area added to list\n");
 		retVal=newArea->getAreaID();  
+//		error ("areaManager::createArea - getAreaID=%d\n",retVal);
     //error ("areaManager::createArea - new area id found\n");
 	}
 	unlock();
@@ -243,16 +249,21 @@ void areaManager::setByte(unsigned long address,char value) {
 }
 
 void areaManager::setInt(unsigned long address,int value) {
+	error ("areaManager::setInt starting to set on address %lx, value = %d\n",address,value);
 	area *myArea;
 	lock();
+	error ("areaManager::setInt locked\n");
 	myArea=findArea((void *)address);
+	error ("areaManager::setInt area %s found\n",((myArea)?"":" not "));
 	if (myArea)
 		myArea->setInt(address,value);	
 	else {
 		char temp[1000];
 		sprintf (temp,"Unable to find an area for address %d\n",address);
+		unlock();
 		throw (temp);
 		}
+	error ("areaManager::setInt unlocking\n");
 	unlock();
 }
 

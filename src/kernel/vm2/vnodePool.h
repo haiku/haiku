@@ -1,5 +1,5 @@
 #include <OS.h>
-#include "list.h"
+#include "lockedList.h"
 class area;
 class vnode;
 class poolvnode

@@ -21,9 +21,6 @@ void pageManager::setup(void *area,int pages) {
 		unused.add(newPage);
 		}
 
-	cleanLock=create_sem (1,"clean_lock");
-	unusedLock=create_sem (1,"unused_lock");
-	inUseLock=create_sem (1,"inuse_lock");
 	totalPages=pages;
 	//error ("pageManager::setup - %d pages ready to rock and roll\n",unused.count());
 	}
@@ -34,22 +31,16 @@ page *pageManager::getPage(void) {
 	while (!ret)
 		{
 		if (clean.count()) {
-			acquire_sem(cleanLock);
 			ret=(page *)clean.next();
-			release_sem(cleanLock);
 			} // This could fail if someone swooped in and stole our page.
 		if (!ret && unused.count()) {
-			acquire_sem(unusedLock);
 			ret=(page *)unused.next();
-			release_sem(unusedLock);
 			if (ret)
 				ret->zero();
 			} // This could fail if someone swooped in and stole our page.
 		}
 	//error ("pageManager::getPage - returning page %x, clean = %d, unused = %d, inuse = %x\n",ret,clean.count(),unused.count(),inUse.count());
-	acquire_sem(inUseLock);
 	inUse.add(ret);
-	release_sem(inUseLock);
 	ret->count++;
 	if (!ret)
 		throw ("Out of physical pages!");
@@ -60,15 +51,11 @@ page *pageManager::getPage(void) {
 void pageManager::freePage(page *toFree) {
 	//error ("pageManager::freePage; count = %d, address = %p\n",toFree->count,toFree);
 	if (atomic_add(&(toFree->count),-1)==1) { // atomic_add returns the *PREVIOUS* value. So we need to check to see if the one we are wasting was the last one.
-		acquire_sem(inUseLock);
 		inUse.remove(toFree);
 //		inUse.dump();
-		release_sem(inUseLock);
 
-		acquire_sem(unusedLock);
 		unused.add(toFree);
 //		unused.dump();
-		release_sem(unusedLock);
 		}
 	}
 
@@ -83,14 +70,10 @@ void pageManager::cleaner(void) {
 // Find a page that needs cleaning. Take it from the "unused" list, clean it and put it on the clean list.
 void pageManager::cleanOnePage(void) {
 	if (unused.count()) {
-		acquire_sem(unusedLock);
 		page *first=(page *)unused.next();   
-		release_sem(unusedLock);
 		if (first) {
 			first->zero();
-			acquire_sem(cleanLock);
 			clean.add(first);
-			release_sem(cleanLock);
 			}
 		}
 	}
@@ -104,27 +87,27 @@ int pageManager::desperation(void) { // Formula to determine how desperate syste
 
 void pageManager::dump(void) {
 	error ("Dumping the unused list (%d entries)\n",getUnusedCount());
-	acquire_sem(unusedLock);
+	unused.lock();
 	for (struct node *cur=unused.rock;cur;) {
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
 		}
-	release_sem(unusedLock);
+	unused.unlock();
 	error ("Dumping the clean list (%d entries)\n",getCleanCount());
-	acquire_sem(cleanLock);
+	clean.lock();
 	for (struct node *cur=clean.rock;cur;) {
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
 		}
 	error ("Dumping the inuse list (%d entries)\n",getInUseCount());
-	release_sem(cleanLock);
-	acquire_sem(inUseLock);
+	clean.unlock();
+	inUse.lock();
 	for (struct node *cur=inUse.rock;cur;) {
 		page *thisPage=(page *)cur;
 		thisPage->dump();
 		cur=cur->next;
 		}
-	release_sem(inUseLock);
+	inUse.unlock();
 }

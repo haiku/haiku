@@ -1,7 +1,7 @@
 #ifndef _PAGE_MANAGER_H
 #define _PAGE_MANAGER_H
 #include "/boot/develop/headers/be/kernel/OS.h"
-#include "list.h"
+#include "lockedList.h"
 #include "page.h"
 
 class pageManager {
@@ -28,8 +28,7 @@ class pageManager {
 		int getUnusedCount(void) {return unused.count();}
 		int getInUseCount(void) {return inUse.count();}
 	private:
-		list clean,unused,inUse;
-		sem_id cleanLock,unusedLock,inUseLock;
+		lockedList clean,unused,inUse;
 		int totalPages;
 };
 #endif

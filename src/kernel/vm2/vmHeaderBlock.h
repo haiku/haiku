@@ -10,7 +10,7 @@ class pageManager;
 class swapFileManager;
 class cacheManager;
 class vnodeManager;
-class list;
+class lockedList;
 #endif
 
 struct vmHeaderBlock
@@ -22,7 +22,7 @@ struct vmHeaderBlock
 	swapFileManager *swapMan;
 	cacheManager *cacheMan;
 	vnodeManager *vnodeMan;
-	list areas;
+	lockedList areas;
 };
 
 #endif

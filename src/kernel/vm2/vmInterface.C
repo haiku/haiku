@@ -1,5 +1,6 @@
 #include <new.h>
 #include "mman.h"
+#include "lockedList.h"
 #include "area.h"
 #include "areaPool.h"
 #include "vpagePool.h"
@@ -145,7 +146,7 @@ status_t vmInterface::resizeArea(int Area,size_t size)
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
 	int retVal;
-	error ("vmInterface::createArea: Creating an area!\n");
+//	error ("vmInterface::createArea: Creating an area!\n");
 	if (!AreaName)
 		return B_BAD_ADDRESS;
 	if (!address)
@@ -161,19 +162,20 @@ int vmInterface::createArea(char *AreaName,int pageCount,void **address, address
 	if (protect>copyOnWrite || protect < none)
 		return B_BAD_VALUE;
 	retVal = getAM()->createArea(AreaName,pageCount,address,addType,state,protect);
-	//error ("vmInterface::createArea: Done creating an area!\n");
+//	error ("vmInterface::createArea: Done creating an area! ID = %d\n",retVal);
 	return retVal;
 	}
 
-void vmInterface::freeArea(int area)
+status_t vmInterface::delete_area(int area)
 	{
-	getAM()->freeArea(area);
+	return getAM()->freeArea(area);
 	}
 
 status_t vmInterface::getAreaInfo(int Area,area_info *dest)
 	{
 	status_t retVal;
 	//error ("vmInterface::getAreaInfo: Getting info about an area!\n");
+	if (!dest) return B_ERROR;
 	retVal = getAM()->getAreaInfo(Area,dest);
 	//error ("vmInterface::getAreaInfo: Done getting info about an area!\n");
 	return retVal;
@@ -189,8 +191,15 @@ status_t vmInterface::getNextAreaInfo(int  process,int32 *cookie,area_info *dest
 
 int vmInterface::getAreaByName(char *name)
 	{
-	int retVal;
-	retVal = getAM()->getAreaByName(name);
+	int retVal=B_NAME_NOT_FOUND;
+	vmBlock->areas.lock();
+	for (struct node *cur=vmBlock->areas.rock;cur && retVal==B_NAME_NOT_FOUND;cur=cur->next) {
+		area *myArea=(area *)cur;
+		error ("vmInterface::getAreaByName comapring %s to passed in %s\n",myArea->getName(),name);
+		if (myArea->nameMatch(name))	
+			retVal=myArea->getAreaID();
+		}
+	vmBlock->areas.unlock();
 	return retVal;
 	}
 

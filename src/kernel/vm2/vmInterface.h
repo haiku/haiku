@@ -11,7 +11,7 @@ class vmInterface // This is the class that "owns" all of the managers.
 		int createArea(char *AreaName,int pageCount,void **address,
 							addressSpec addType=ANY,	
 							pageState state=NO_LOCK,protectType protect=writable);
-		void freeArea(int Area);
+		status_t delete_area(int Area);
 		status_t getAreaInfo(int Area,area_info *dest);
 		status_t getNextAreaInfo(int  process,int32 *cookie,area_info *dest);
 		int getAreaByName(char *name);
@@ -40,6 +40,6 @@ class vmInterface // This is the class that "owns" all of the managers.
 		char getByte(unsigned long offset) {return getAM()->getByte(offset);} // This is for testing only
 		void setByte(unsigned long offset,char value) {getAM()->setByte(offset,value);} // This is for testing only
 		int getInt(unsigned long offset) {return getAM()->getInt(offset);} // This is for testing only
-		void setInt(unsigned long offset,int value) {getAM()->setByte(offset,value);} // This is for testing only
+		void setInt(unsigned long offset,int value) {getAM()->setInt(offset,value);} // This is for testing only
 		thread_id tid_cleaner,tid_saver,tid_pager;
 }; 

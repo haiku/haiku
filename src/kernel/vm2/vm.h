@@ -1,4 +1,4 @@
-#include "list.h"
+#include "lockedList.h"
 
 #ifndef _VM_TYPES
 #define _VM_TYPES

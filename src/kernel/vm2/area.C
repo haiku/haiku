@@ -180,49 +180,44 @@ status_t area::getInfo(area_info *dest) {
 
 bool area::contains(const void *address) {
 	unsigned long base=(unsigned long)(address); 
-//	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
+	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
 					
 	return ((start_address<=base) && (base<=end_address));
 	}
 
 // Resize an area. 
 status_t area::resize(size_t newSize) {
-	size_t oldSize =end_address-start_address;
+	size_t oldSize =end_address-start_address+1;
 	// Duh. Nothing to do.
 	if (newSize==oldSize)
 		return B_OK;
 	// Grow the area. Figure out how many pages, allocate them and set them up
 	if (newSize>oldSize) {
 		int pageCount = (newSize - oldSize + PAGE_SIZE - 1) / PAGE_SIZE;
+		error ("Old size = %d, new size = %d, pageCount = %d\n",oldSize,newSize,pageCount);
 		vpage *newPage;
 		for (int i=0;i<pageCount;i++) {
 			newPage=new (vmBlock->vpagePool->get()) vpage;
 			newPage->setup(end_address+PAGE_SIZE*i-1,NULL,NULL,protection,state);
 			vpages.add(newPage);
 			}
-		end_address+=start_address+newSize;
+		dump();
 		}
 	else { // Ewww. Shrinking. This is ugly right now. 
-		int pageCount = (oldSize - newSize + PAGE_SIZE - 1) / PAGE_SIZE;
+		size_t newFinalAddress=start_address+newSize;
 		vpage *oldPage;
-		struct node *cur;
-		for (int i=0;i<pageCount;i++) { // This is probably really slow. OTOH, how often do people shrink their allocations?
-			node *max;
-			void *maxAddress=NULL,*curAddress;
-			for (hashIterate hi(vpages);node *cur=hi.get();) 
-				if ((curAddress=(reinterpret_cast<vpage *>(cur))->getStartAddress()) > maxAddress) {
-					maxAddress=curAddress;
-					max=cur;
-					}
-			// Found the right one to removei; waste it, pool it, and move on
-			oldPage=reinterpret_cast<vpage *>(max);
-			vpages.remove(cur);
-			if (finalWrite) 
-				oldPage->flush(); 
-			oldPage->cleanup();
-			vmBlock->vpagePool->put(oldPage);
+		for (hashIterate hi(vpages);node *cur=hi.get();)  {
+			oldPage=reinterpret_cast<vpage *>(cur);
+			if (oldPage->getStartAddress() > (reinterpret_cast<void *> (newFinalAddress))) {
+				vpages.remove(cur);
+				if (finalWrite) 
+					oldPage->flush(); 
+				oldPage->cleanup();
+				vmBlock->vpagePool->put(oldPage);
+				}
 			}
 		}
+	end_address=start_address+newSize;
 	return B_OK;
 	}
 
@@ -238,6 +233,7 @@ status_t area::setProtection(protectType prot) {
 
 vpage *area::findVPage(unsigned long address) {
 	vpage findMe(address);
+//	error ("area::findVPage: finding %ld\n",address);
 	return reinterpret_cast <vpage *>(vpages.find(&findMe));
 	}
 
@@ -273,9 +269,12 @@ int area::getInt(unsigned long address) { // This is for testing only
 	}
 
 void area::setInt(unsigned long address,int value) { // This is for testing only
+//	error ("area::setInt - start\n");
 	vpage *page=findVPage(address);
+//	error ("area::setInt - page = %x\n",page);
 	if (page)
 		page->setInt(address,value,manager);
+//	error ("area::setInt - done\n");
 	}
 
 // For every one of our vpages, call the vpage's pager

@@ -1,7 +1,7 @@
 #ifndef _PAGE_H
 #define _PAGE_H
 #include "vm.h"
-#include "list.h"
+#include "lockedList.h"
 class page : public node {
 		private:
 		void *cpuSpecific;

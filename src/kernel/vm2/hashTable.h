@@ -1,6 +1,6 @@
 #ifndef _HASH_H
 #define _HASH_H
-#include "list.h"
+#include "lockedList.h"
 #include "vm.h"
 #include "page.h"
 #include "pageManager.h"
