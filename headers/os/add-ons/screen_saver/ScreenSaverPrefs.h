@@ -1,8 +1,9 @@
 #ifndef SCREEN_SAVER_PREFS_H
 #define SCREEN_SAVER_PREFS_H
 #include "Message.h"
+#include <string.h>
 
-enum arrowDirection {UPLEFT,UPRIGHT,DOWNLEFT,DOWNRIGHT,NONE};
+enum arrowDirection {NONE=-1,UPLEFT,UPRIGHT,DOWNRIGHT,DOWNLEFT};
 
 class ScreenSaverPrefs 
 {
@@ -29,17 +30,17 @@ public:
 	void SetWindowFrame(const BRect &fr) {windowFrame=fr;}
 	void SetWindowTab(int tab) {windowTab=tab;}
 	void SetTimeFlags(int tf) {timeFlags=tf;}
-	void SetBlankTime(int );
+	void SetBlankTime(int bt) {blankTime=bt;}
 	void SetStandbyTime(int time) {standbyTime=time;}
 	void SetSuspendTime(int time) {suspendTime=time;}
 	void SetOffTime(int intime) {offTime=intime;}
 	void SetBlankCorner(arrowDirection in) {blank=in;}
 	void SetNeverBlankCorner(arrowDirection in){neverBlank=in;}
 	void SetLockEnable(bool en) {lockenable=en;}
-	void SetPasswordTime(int );
-	void SetPassword(char *);
+	void SetPasswordTime(int pt) {passwordTime=pt;}
+	void SetPassword(char *pw){strncpy(password,pw,B_PATH_NAME_LENGTH-1);}
 	void SetNetworkPassword(bool np) {isNetworkPWD=np;}
-	void SetModuleName(const char *);
+	void SetModuleName(const char *mn) {strncpy(moduleName,mn,B_PATH_NAME_LENGTH-1);}
 	void SetState(BMessage *);
 	void SaveSettings (void);
 private:
