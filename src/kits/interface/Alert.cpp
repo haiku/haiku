@@ -416,14 +416,9 @@ BPoint BAlert::AlertPosition(float width, float height)
 		dynamic_cast<BWindow*>(BLooper::LooperForThread(find_thread(NULL)));
 
 	BScreen Screen(Window);
-	if (!Screen.IsValid())
-	{
-		// We should never be here because a BScreen object will return
-		// a valid screen. 
-		debugger("Couldn't find the screen!");
-	}
-
-	BRect screenRect = Screen.Frame();
+ 	BRect screenRect(0, 0, 640, 480);
+ 	if (Screen.IsValid())
+ 		screenRect = Screen.Frame();
 
 	// Horizontally, we're smack in the middle
 	result.x = (screenRect.Width() / 2.0) - (width / 2.0);
@@ -474,7 +469,6 @@ void BAlert::InitObject(const char* text, const char* button0,
 		// Set up the "_master_" view
 		TAlertView* MasterView = new TAlertView(Bounds());
 		MasterView->SetBitmap(InitIcon());
-		AddChild(MasterView);
 	
 		// Set up the buttons
 		int buttonCount = 0;
@@ -621,6 +615,9 @@ void BAlert::InitObject(const char* text, const char* button0,
 		fTextView = new BTextView(TextViewRect, "_tv_",
 								  TextViewRect,
 								  B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+ 		AddChild(MasterView);
+ 		MasterView->AddChild(fTextView);
+		
 		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fTextView->SetText(text, strlen(text));
 		fTextView->MakeEditable(false);
@@ -635,8 +632,6 @@ void BAlert::InitObject(const char* text, const char* button0,
 		fTextView->ResizeBy(0, textHeight);
 		TextViewRect.bottom += textHeight;
 		fTextView->SetTextRect(TextViewRect);
-	
-		MasterView->AddChild(fTextView);
 	
 		AddCommonFilter(new _BAlertFilter_(this));
 

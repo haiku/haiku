@@ -33,6 +33,7 @@
 #include <PropertyInfo.h>
 #include <Window.h>
 #include <Errors.h>
+#include <Debug.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -180,7 +181,7 @@ void BControl::WindowActivated(bool active)
 	BView::WindowActivated(active);
 
 	if (IsFocus())
-		Draw(Bounds());
+		Invalidate(Bounds());
 }
 //------------------------------------------------------------------------------
 void BControl::AttachedToWindow()
@@ -290,7 +291,7 @@ void BControl::MakeFocus(bool focused)
  	if(Window())
 	{
 		fFocusChanging = true;
-		Draw(Bounds());
+		Invalidate(Bounds());
 		Flush();
 		fFocusChanging = false;
 	}
@@ -345,7 +346,7 @@ void BControl::SetLabel(const char *string)
 	if (string)
 		fLabel = strdup(string);
 	else
-		fLabel = NULL;
+		fLabel = strdup(B_EMPTY_STRING);
 
 	Invalidate();
 }
@@ -364,7 +365,7 @@ void BControl::SetValue(int32 value)
 
  	if (Window())
 	{
-		Draw(Bounds());
+		Invalidate(Bounds());
 		Flush();
 	}
 }
@@ -388,7 +389,7 @@ void BControl::SetEnabled(bool enabled)
 
 	if (Window())
 	{
-		Draw(Bounds());
+		Invalidate(Bounds());
 		Flush();
 	}
 }
@@ -435,8 +436,8 @@ status_t BControl::Invoke(BMessage *message)
 	if (message)
 		err = BInvoker::Invoke(&clone);
 
-//	TODO: assynchronous messaging
-//	SendNotices(kind, &clone);
+	// TODO: asynchronous messaging
+	SendNotices(kind, &clone);
 
 	return err;
 }
@@ -513,6 +514,7 @@ BControl &BControl::operator=(const BControl &)
 void BControl::InitData(BMessage *data)
 {
 	fLabel = NULL;
+	SetLabel(B_EMPTY_STRING);
 	fValue = B_CONTROL_OFF;
 	fEnabled = true;
 	fFocusChanging = false;
@@ -523,10 +525,3 @@ void BControl::InitData(BMessage *data)
 		SetFont(be_plain_font, B_FONT_FAMILY_AND_STYLE);
 }
 //------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */

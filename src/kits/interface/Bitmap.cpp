@@ -39,11 +39,10 @@
 // Includes to be able to talk to the app_server
 #include <Application.h>
 #include <ServerProtocol.h>
-#include <PortMessage.h>
 #include <AppServerLink.h>
 
 enum {
-	NOT_IMPLEMENTED	= B_ERROR,
+	NOT_IMPLEMENTED	= B_ERROR
 };
 
 // TODO: system palette -- hard-coded for now, when the app server is ready
@@ -2140,7 +2139,7 @@ BBitmap::get_shared_pointer() const
 int32
 BBitmap::get_server_token() const
 {
-	return -1;	// not implemented
+	return fServerToken;
 }
 
 // InitObject
@@ -2159,8 +2158,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 {
 	status_t error = B_OK;
 
-	PortMessage pmsg;
-	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
+	BPrivate::BAppServerLink link;
 
 	// clean up
 	if (fBasePtr) {
@@ -2176,10 +2174,11 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// Reply Data:
 		//		none
 //		status_t freestat;
-		link->SetOpCode(AS_DELETE_BITMAP);
-		link->Attach<int32>(fServerToken);
-		error=link->FlushWithReply(&pmsg);
-		if(pmsg.Code()==SERVER_FALSE)
+		int32 code = SERVER_FALSE;
+		link.StartMessage(AS_DELETE_BITMAP);
+		link.Attach<int32>(fServerToken);
+		error=link.FlushWithReply(&code);
+		if(code==SERVER_FALSE)
 			error=B_NO_MEMORY;
 		fBasePtr=NULL;
 		fArea=-1;
@@ -2208,12 +2207,12 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// 3) int32 bitmap_flags
 		// 4) int32 bytes_per_row
 		// 5) int32 screen_id::id
-		link->SetOpCode(AS_CREATE_BITMAP);
-		link->Attach<BRect>(bounds);
-		link->Attach(&colorSpace, sizeof(color_space));
-		link->Attach<int32>((int32)flags);
-		link->Attach<int32>(bytesPerRow);
-		link->Attach<int32>(screenID.id);
+		link.StartMessage(AS_CREATE_BITMAP);
+		link.Attach<BRect>(bounds);
+		link.Attach<color_space>(colorSpace);
+		link.Attach<int32>((int32)flags);
+		link.Attach<int32>(bytesPerRow);
+		link.Attach<int32>(screenID.id);
 		
 		// Reply Code: SERVER_TRUE
 		// Reply Data:
@@ -2225,21 +2224,22 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		// Reply Code: SERVER_FALSE
 		// Reply Data:
 		//		None
-		error=link->FlushWithReply(&pmsg);
+		int32 code = SERVER_FALSE;
+		error=link.FlushWithReply(&code);
 		
 		// We shouldn't ever have to execute this block, but just in case...
 		if(error!=B_OK)
 			fBasePtr=NULL;
 
-		if(pmsg.Code()==SERVER_TRUE)
+		if(code==SERVER_TRUE)
 		{
 			// Get token
 			area_id bmparea;
 			int32 areaoffset;
 			
-			pmsg.Read<int32>(&fServerToken);
-			pmsg.Read<area_id>(&bmparea);
-			pmsg.Read<int32>(&areaoffset);
+			link.Read<int32>(&fServerToken);
+			link.Read<area_id>(&bmparea);
+			link.Read<int32>(&areaoffset);
 			
 			// Get the area in which the data resides
 			fArea=clone_area("shared bitmap area",(void**)&fBasePtr,B_ANY_ADDRESS,
@@ -2266,7 +2266,6 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		fToken = -1;
 		fOrigArea = -1;
 	}
-	delete link;
 	fInitError = error;
 }
 

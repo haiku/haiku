@@ -41,10 +41,9 @@
 #include <WidthBuffer.h>
 
 // Private definitions not placed in public headers
-#include <input_globals.h>
-
 extern "C" void _init_global_fonts();
 extern "C" status_t _fini_interface_kit_();
+extern status_t _control_input_server_(BMessage *command, BMessage *reply);
 
 using namespace BPrivate;
 
@@ -61,14 +60,15 @@ _IMPEXP_BE status_t
 set_screen_space(int32 index, uint32 res, bool stick)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_SCREEN_MODE);
+	int32 code = SERVER_FALSE;
+	
+	link.StartMessage(AS_SET_SCREEN_MODE);
 	link.Attach<int32>(index);
 	link.Attach<int32>((int32)res);
 	link.Attach<bool>(stick);
-	link.Flush();
+	link.FlushWithReply(&code);
 
-	//TODO: Read back the status from the app_server's reply
-	return B_OK;
+	return ((code==SERVER_TRUE)?B_OK:B_ERROR);
 }
 
 
@@ -79,14 +79,13 @@ get_scroll_bar_info(scroll_bar_info *info)
 		return B_BAD_VALUE;
 
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_GET_SCROLLBAR_INFO);
-	link.FlushWithReply(&msg);
-	msg.Read<scroll_bar_info>(info);
+	int32 code;
+	link.StartMessage(AS_GET_SCROLLBAR_INFO);
+	link.FlushWithReply(&code);
+	link.Read<scroll_bar_info>(info);
 	
 	return B_OK;
 }
-
 
 _IMPEXP_BE status_t
 set_scroll_bar_info(scroll_bar_info *info)
@@ -95,11 +94,11 @@ set_scroll_bar_info(scroll_bar_info *info)
 		return B_BAD_VALUE;
 
 	BAppServerLink link;
-	PortMessage msg;
+	int32 code;
 	
-	link.SetOpCode(AS_SET_SCROLLBAR_INFO);
+	link.StartMessage(AS_SET_SCROLLBAR_INFO);
 	link.Attach<scroll_bar_info>(*info);
-	link.FlushWithReply(&msg);
+	link.FlushWithReply(&code);
 	return B_OK;
 }
 
@@ -406,10 +405,10 @@ count_workspaces()
 	int32 count;
 	
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_COUNT_WORKSPACES);
-	link.FlushWithReply(&msg);
-	msg.Read<int32>(&count);
+	int32 code;
+	link.StartMessage(AS_COUNT_WORKSPACES);
+	link.FlushWithReply(&code);
+	link.Read<int32>(&count);
 	return count;
 }
 
@@ -418,7 +417,7 @@ _IMPEXP_BE void
 set_workspace_count(int32 count)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_WORKSPACE_COUNT);
+	link.StartMessage(AS_SET_WORKSPACE_COUNT);
 	link.Attach<int32>(count);
 	link.Flush();
 }
@@ -430,10 +429,10 @@ current_workspace()
 	int32 index;
 	
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_CURRENT_WORKSPACE);
-	link.FlushWithReply(&msg);
-	msg.Read<int32>(&index);
+	int32 code;
+	link.StartMessage(AS_CURRENT_WORKSPACE);
+	link.FlushWithReply(&code);
+	link.Read<int32>(&index);
 	
 	return index;
 }
@@ -443,7 +442,7 @@ _IMPEXP_BE void
 activate_workspace(int32 workspace)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_ACTIVATE_WORKSPACE);
+	link.StartMessage(AS_ACTIVATE_WORKSPACE);
 	link.Attach<int32>(workspace);
 	link.Flush();
 }
@@ -455,10 +454,10 @@ idle_time()
 	bigtime_t idletime;
 	
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_IDLE_TIME);
-	link.FlushWithReply(&msg);
-	msg.Read<int64>(&idletime);
+	int32 code;
+	link.StartMessage(AS_IDLE_TIME);
+	link.FlushWithReply(&code);
+	link.Read<int64>(&idletime);
 	
 	return idletime;
 }
@@ -493,7 +492,7 @@ _IMPEXP_BE void
 set_focus_follows_mouse(bool follow)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_FOCUS_FOLLOWS_MOUSE);
+	link.StartMessage(AS_SET_FOCUS_FOLLOWS_MOUSE);
 	link.Attach<bool>(follow);
 	link.Flush();
 }
@@ -505,10 +504,10 @@ focus_follows_mouse()
 	bool ffm;
 	
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
-	link.FlushWithReply(&msg);
-	msg.Read<bool>(&ffm);
+	int32 code;
+	link.StartMessage(AS_FOCUS_FOLLOWS_MOUSE);
+	link.FlushWithReply(&code);
+	link.Read<bool>(&ffm);
 	return ffm;
 }
 
@@ -517,7 +516,7 @@ _IMPEXP_BE void
 set_mouse_mode(mode_mouse mode)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_SET_MOUSE_MODE);
+	link.StartMessage(AS_SET_MOUSE_MODE);
 	link.Attach<mode_mouse>(mode);
 	link.Flush();
 }
@@ -529,10 +528,10 @@ mouse_mode()
 	mode_mouse mode;
 	
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_GET_MOUSE_MODE);
-	link.FlushWithReply(&msg);
-	msg.Read<mode_mouse>(&mode);
+	int32 code;
+	link.StartMessage(AS_GET_MOUSE_MODE);
+	link.FlushWithReply(&code);
+	link.Read<mode_mouse>(&mode);
 	return mode;
 }
 
@@ -543,11 +542,12 @@ ui_color(color_which which)
 	rgb_color color;
 	
 	BAppServerLink link;
-	PortMessage msg;
-	link.SetOpCode(AS_GET_UI_COLOR);
+	int32 code;
+	link.StartMessage(AS_GET_UI_COLOR);
 	link.Attach<color_which>(which);
-	link.FlushWithReply(&msg);
-	msg.Read<rgb_color>(&color);
+	link.FlushWithReply(&code);
+	if(code==SERVER_TRUE)
+		link.Read<rgb_color>(&color);
 	return color;
 }
 
@@ -630,7 +630,7 @@ _init_global_fonts()
 void __set_window_decor(int32 theme)
 {
 	BAppServerLink link;
-	link.SetOpCode(AS_R5_SET_DECORATOR);
+	link.StartMessage(AS_R5_SET_DECORATOR);
 	link.Attach<int32>(theme);
 	link.Flush();
 }

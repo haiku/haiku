@@ -118,11 +118,11 @@ int _init_message_()
 int _delete_message_()
 {
 	delete_port(BMessage::sReplyPorts[0]);
-	BMessage::sReplyPorts[0] = NULL;
+	BMessage::sReplyPorts[0] = -1;
 	delete_port(BMessage::sReplyPorts[1]);
-	BMessage::sReplyPorts[1] = NULL;
+	BMessage::sReplyPorts[1] = -1;
 	delete_port(BMessage::sReplyPorts[2]);
-	BMessage::sReplyPorts[2] = NULL;
+	BMessage::sReplyPorts[2] = -1;
 	return 0;
 }
 }	// extern "C"
@@ -698,7 +698,7 @@ status_t BMessage::Unflatten(BDataIO* stream)
 				}
 
 				// Add each data field to the message
-				uint32 itemSize;
+				uint32 itemSize=0;
 				if (flags & MSG_FLAG_FIXED_SIZE)
 				{
 					itemSize = dataLen / count;

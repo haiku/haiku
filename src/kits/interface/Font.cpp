@@ -158,17 +158,18 @@ status_t set_font_cache_info(uint32 id, void *set)
 //		BFont Class Definition
 //----------------------------------------------------------------------------------------
 
-BFont::BFont(void)
+BFont::BFont(void) 
+	//initialise for be_plain_font (avoid circular definition)
+ : 	fFamilyID(0), fStyleID(0), fSize(10.0), fShear(0.0), fRotation(0.0),
+	fSpacing(0), fEncoding(0), fFace(0), fFlags(0)
 {
+	fHeight.ascent = 7.0;
+	fHeight.descent = 2.0;
+	fHeight.leading = 13.0;
+ 	
 	fFamilyID=be_plain_font->fFamilyID;
 	fStyleID=be_plain_font->fStyleID;
 	fSize=be_plain_font->fSize;
-	fShear=be_plain_font->fShear;
-	fRotation=be_plain_font->fRotation;
-	fSpacing=be_plain_font->fSpacing;
-	fEncoding=be_plain_font->fEncoding;
-	fFace=be_plain_font->fFace;
-	fHeight=be_plain_font->fHeight;
 }
 
 BFont::BFont(const BFont &font)
@@ -422,13 +423,17 @@ void BFont::GetTruncatedStrings(const char *stringArray[], int32 numStrings,
 float BFont::StringWidth(const char *string) const
 {
 	// TODO: implement
-	return 0.0;
+
+ 	// an estimate
+ 	return (fHeight.ascent - fHeight.descent) * strlen(string);
 }
 
 float BFont::StringWidth(const char *string, int32 length) const
 {
 	// TODO: implement
-	return 0.0;
+
+ 	// an estimate
+ 	return (fHeight.ascent - fHeight.descent) * length;
 }
 
 void BFont::GetStringWidths(const char *stringArray[], const int32 lengthArray[], 

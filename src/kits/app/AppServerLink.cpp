@@ -44,11 +44,16 @@
 namespace BPrivate {
 
 BAppServerLink::BAppServerLink(void)
- : PortLink(0L)
+ : BPortLink()
 {
-	be_app->Lock();
+	if (be_app)
+	{
+		be_app->Lock();
+		SetSendPort(be_app->fServerTo);
+	}
 	receiver=create_port(100,"AppServerLink reply port");
-	SetPort(be_app->fServerFrom);
+	SetReplyPort(receiver);
+
 }
 
 //------------------------------------------------------------------------------
@@ -56,7 +61,25 @@ BAppServerLink::BAppServerLink(void)
 BAppServerLink::~BAppServerLink()
 {
 	delete_port(receiver);
-	be_app->Unlock();
+	if (be_app)
+		be_app->Unlock();
+}
+
+//------------------------------------------------------------------------------
+
+status_t BAppServerLink::FlushWithReply(int32 *code)
+{
+	status_t err;
+	
+	err = Attach<port_id>(receiver);
+	if (err < B_OK)
+		return err;
+
+	err = Flush();
+	if (err < B_OK)
+		return err;
+
+	return GetNextReply(code);
 }
 
 }	// namespace BPrivate

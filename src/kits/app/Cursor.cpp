@@ -35,7 +35,6 @@
 #include <AppDefs.h>
 #include <Cursor.h>
 #include <PortLink.h>
-#include <PortMessage.h>
 #include <AppServerLink.h>
 
 // Project Includes ------------------------------------------------------------
@@ -60,13 +59,13 @@ BCursor::BCursor(const void *cursorData)
 
 	// Send data directly to server
 	BPrivate::BAppServerLink serverlink;
-	PortMessage msg;
+	int32 code=SERVER_FALSE;
 
-	serverlink.SetOpCode(AS_CREATE_BCURSOR);
+	serverlink.StartMessage(AS_CREATE_BCURSOR);
 	serverlink.Attach(cursorData, 68);
-	serverlink.FlushWithReply(&msg);
-
-	msg.Read<int32>(&m_serverToken);
+	serverlink.FlushWithReply(&code);
+	if(code==SERVER_TRUE)
+		serverlink.Read<int32>(&m_serverToken);
 }
 
 
@@ -82,7 +81,7 @@ BCursor::~BCursor()
 {
 	// Notify server to deallocate server-side objects for this cursor
 	BPrivate::BAppServerLink serverlink;
-	serverlink.SetOpCode(AS_DELETE_BCURSOR);
+	serverlink.StartMessage(AS_DELETE_BCURSOR);
 	serverlink.Attach<int32>(m_serverToken);
 	serverlink.Flush();
 }

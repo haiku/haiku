@@ -34,11 +34,15 @@
 #include <String.h>
 
 #include <PortLink.h>
-#include <PortMessage.h>
 #include <ServerProtocol.h>
 #include <ServerConfig.h>
 
 //#define DEBUG_CLIENT_FONT_LIST
+#ifdef DEBUG_CLIENT_FONT_LIST
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
 
 class FontListFamily
 {
@@ -70,18 +74,15 @@ FontListFamily::~FontListFamily(void)
 
 ClientFontList::ClientFontList(void)
 {
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("ClientFontList()\n");
-#endif
+	STRACE(("ClientFontList()\n"));
 	familylist=new BList(0);
 	fontlock=create_sem(1,"fontlist_sem");
 }
 
 ClientFontList::~ClientFontList(void)
 {
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("~ClientFontList()\n");
-#endif
+	STRACE(("~ClientFontList()\n"));
+	
 	acquire_sem(fontlock);
 
 	font_family *fam;
@@ -97,9 +98,8 @@ printf("~ClientFontList()\n");
 
 bool ClientFontList::Update(bool check_only)
 {
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("ClientFontList::Update(%s) - %s\n", (check_only)?"true":"false",SERVER_FONT_LIST);
-#endif
+	STRACE(("ClientFontList::Update(%s) - %s\n", (check_only)?"true":"false",SERVER_FONT_LIST));
+	
 	// Open the font list kept in font list
 	acquire_sem(fontlock);
 
@@ -108,29 +108,27 @@ printf("ClientFontList::Update(%s) - %s\n", (check_only)?"true":"false",SERVER_F
 	serverport=find_port(SERVER_PORT_NAME);
 	
 	bool needs_update=true;
-	PortLink *serverlink=new PortLink(serverport);
+	BPortLink serverlink(serverport);
 
 	if(serverport!=B_NAME_NOT_FOUND)
 	{
-		PortMessage pmsg;
-		serverlink->SetOpCode(AS_QUERY_FONTS_CHANGED);
-		serverlink->FlushWithReply(&pmsg);
+		int32 code=SERVER_FALSE;
+		serverlink.StartMessage(AS_QUERY_FONTS_CHANGED);
+		serverlink.Flush();
+		serverlink.GetNextReply(&code);
 	
 		// Attached Data: none
 		// Reply: SERVER_TRUE if fonts have changed, SERVER_FALSE if not
 		
-		needs_update=(pmsg.Code()==SERVER_TRUE)?true:false;
+		needs_update=(code==SERVER_TRUE)?true:false;
 	}
-#ifdef DEBUG_CLIENT_FONT_LIST
 	else
 	{
-		printf("ClientFontList::Update(): Couldn't find app_server port\n");
+		STRACE(("ClientFontList::Update(): Couldn't find app_server port\n"));
 	}
-#endif
 
 	if(check_only)
 	{
-		delete serverlink;
 		release_sem(fontlock);
 		return needs_update;
 	}
@@ -145,10 +143,11 @@ printf("ClientFontList::Update(%s) - %s\n", (check_only)?"true":"false",SERVER_F
 		{
 			if(fontmsg.Unflatten(&file)==B_OK)
 			{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("Font message contents:\n");
-fontmsg.PrintToStream();
-#endif
+				#ifdef DEBUG_CLIENT_FONT_LIST
+				printf("Font message contents:\n");
+				fontmsg.PrintToStream();
+				#endif
+
 				// Empty the font list
 				FontListFamily *flf=(FontListFamily*)familylist->RemoveItem(0L);
 				BString sty, extra;
@@ -157,15 +156,11 @@ fontmsg.PrintToStream();
 				
 				while(flf)
 				{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("Removing %s from list\n",flf->name.String());
-#endif
+					STRACE(("Removing %s from list\n",flf->name.String()));
 					delete flf;
 					flf=(FontListFamily*)familylist->RemoveItem(0L);
 				}
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("\n");
-#endif
+				STRACE(("\n"));
 	
 				famindex=0;
 				
@@ -178,44 +173,35 @@ printf("\n");
 					familylist->AddItem(flf);
 					familymsg.FindString("name",&(flf->name));
 
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("Adding %s to list\n",flf->name.String());
-#endif
+					STRACE(("Adding %s to list\n",flf->name.String()));
 					styindex=0;
 
 					// populate family with styles
 					while(familymsg.FindString("styles",styindex,&sty)==B_OK)
 					{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("\tAdding %s\n",sty.String());
-#endif
+						STRACE(("\tAdding %s\n",sty.String()));
 						styindex++;
 						flf->styles->AddItem(new BString(sty));
 					}
 					
 					if(familymsg.FindBool("tuned",&tempbool)==B_OK)
 					{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("Family %s has tuned fonts\n", flf->name.String());
-#endif
+						STRACE(("Family %s has tuned fonts\n", flf->name.String()));
 						flf->flags|=B_HAS_TUNED_FONT;
 					}
 						
 					if(familymsg.FindBool("fixed",&tempbool)==B_OK)
 					{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("Family %s is fixed-width\n", flf->name.String());
-#endif
+						STRACE(("Family %s is fixed-width\n", flf->name.String()));
 						flf->flags|=B_IS_FIXED;
 					}
 					familymsg.MakeEmpty();
 					
 				}
 
-				serverlink->SetOpCode(AS_UPDATED_CLIENT_FONTLIST);
-				serverlink->Flush();
+				serverlink.StartMessage(AS_UPDATED_CLIENT_FONTLIST);
+				serverlink.Flush();
 					
-				delete serverlink;
 				release_sem(fontlock);
 				return false;
 
@@ -223,16 +209,13 @@ printf("Family %s is fixed-width\n", flf->name.String());
 		}	// end if InitCheck==B_OK
 	} // end if needs_update
 	
-	delete serverlink;
 	release_sem(fontlock);
 	return false;
 }
 
 int32 ClientFontList::CountFamilies(void)
 {
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("ClientFontList::CountFamilies\n");
-#endif
+STRACE(("ClientFontList::CountFamilies\n"));
 	acquire_sem(fontlock);
 	int32 count=familylist->CountItems();
 	release_sem(fontlock);
@@ -241,14 +224,10 @@ printf("ClientFontList::CountFamilies\n");
 
 status_t ClientFontList::GetFamily(int32 index, font_family *name, uint32 *flags)
 {
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("ClientFontList::GetFamily(%ld)\n",index);
-#endif
+	STRACE(("ClientFontList::GetFamily(%ld)\n",index));
 	if(!name)
 	{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("ClientFontList::GetFamily: NULL font_family parameter\n");
-#endif
+		STRACE(("ClientFontList::GetFamily: NULL font_family parameter\n"));
 		return B_ERROR;
 	}
 	
@@ -256,9 +235,7 @@ printf("ClientFontList::GetFamily: NULL font_family parameter\n");
 	FontListFamily *flf=(FontListFamily*)familylist->ItemAt(index);
 	if(!flf)
 	{
-#ifdef DEBUG_CLIENT_FONT_LIST
-printf("ClientFontList::GetFamily: index not found\n");
-#endif
+		STRACE(("ClientFontList::GetFamily: index not found\n"));
 		return B_ERROR;
 	}
 	strcpy(*name,flf->name.String());
@@ -347,39 +324,29 @@ status_t ClientFontList::GetStyle(font_family family, int32 index, font_style *n
 			style->ICompare("Plain")==0) 
 		{
 			*face|=B_REGULAR_FACE;
-#ifdef DEBUG_FONTSERVER
-printf("GetStyle: %s Roman face\n", style->String());
-#endif
+			STRACE(("GetStyle: %s Roman face\n", style->String()));
 		}
 		else
 			if(style->ICompare("Bold")==0)
 			{
 				*face|=B_BOLD_FACE;
-#ifdef DEBUG_FONTSERVER
-printf("GetStyle: %s Bold face\n");
-#endif
+				STRACE(("GetStyle: %s Bold face\n"));
 			}
 			else
 				if(style->ICompare("Italic")==0)
 				{
 					*face|=B_ITALIC_FACE;
-#ifdef DEBUG_FONTSERVER
-printf("GetStyle: %s Italic face\n");
-#endif
+					STRACE(("GetStyle: %s Italic face\n"));
 				}
 				else
 					if(style->ICompare("Bold Italic")==0)
 					{
 						*face|=B_ITALIC_FACE | B_BOLD_FACE;
-#ifdef DEBUG_FONTSERVER
-printf("GetStyle: %s Bold Italic face\n");
-#endif
+						STRACE(("GetStyle: %s Bold Italic face\n"));
 					}
 					else
 					{
-#ifdef DEBUG_FONTSERVER
-printf("GetStyle: %s Unknown face %s\n", style->String());
-#endif
+						STRACE(("GetStyle: %s Unknown face %s\n", style->String()));
 					}
 	}	
 	

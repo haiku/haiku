@@ -42,7 +42,7 @@
 //------------------------------------------------------------------------------
 BButton::BButton(BRect frame, const char *name, const char *label, BMessage *message,
 				  uint32 resizingMode, uint32 flags)
-	:	BControl(frame, name, label, message, resizingMode, flags),
+	:	BControl(frame, name, label, message, resizingMode, flags |= B_WILL_DRAW),
 		fDrawAsDefault(false)
 {
 	// Resize to minimum height if needed
@@ -95,7 +95,7 @@ void BButton::Draw(BRect updateRect)
 	// If the focus is changing, just redraw the focus indicator
 	if (IsFocusChanging())
 	{
-		float x = bounds.right / 2 - StringWidth(Label()) / 2.0f;
+		float x = (bounds.right - StringWidth(Label())) / 2.0f;
 		float y = bounds.bottom - fh.descent - (IsDefault() ? 6.0f : 3.0f);
 
 		if (IsFocus())
@@ -185,7 +185,7 @@ void BButton::Draw(BRect updateRect)
 		}
 
 		// Label
-		float x = bounds.right / 2 - StringWidth(Label()) / 2.0f;
+		float x = (bounds.right - StringWidth(Label())) / 2.0f;
 		float y = bounds.bottom - fh.descent - (IsDefault() ? 8.0f : 5.0f);
 
 		if (Value())
@@ -260,7 +260,7 @@ void BButton::Draw(BRect updateRect)
 		FillRect(rect);
 
 		// Label
-		float x = bounds.right / 2 - StringWidth(Label()) / 2.0f;
+		float x = (bounds.right - StringWidth(Label())) / 2.0f;
 		float y = bounds.bottom - fh.descent - 5.0f;
 
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
@@ -278,16 +278,23 @@ void BButton::MouseDown(BPoint point)
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS)
 	{
+ 		SetTracking(true);
+ 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+ 	}
+ 	else
+ 	{
 		BRect bounds = Bounds();
 		uint32 buttons;
 
 		do
 		{
+			Window()->UpdateIfNeeded();
+			
 			snooze(40000);
 
 			GetMouse(&point, &buttons, true);
 
-			bool inside = bounds.Contains(point);
+ 			bool inside = bounds.Contains(ConvertFromScreen(point));
 
 			if ((Value() == B_CONTROL_ON) != inside)
 				SetValue(inside ? B_CONTROL_ON : B_CONTROL_OFF);
@@ -295,11 +302,6 @@ void BButton::MouseDown(BPoint point)
 
 		if (Value() == B_CONTROL_ON)
 			Invoke();
-	}
-	else
-	{
-		SetTracking(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
 	}
 }
 //------------------------------------------------------------------------------

@@ -22,13 +22,10 @@ APP_KIT_SOURCE =
 	MessageUtils.cpp
 	PropertyInfo.cpp
 	PortLink.cpp
-	PortMessage.cpp
-	PortQueue.cpp
 	RegistrarDefs.cpp
 	RegistrarThread.cpp
 	RegistrarThreadManager.cpp
 	Roster.cpp
 	RosterPrivate.cpp
-	Session.cpp
 	TokenSpace.cpp
 ;

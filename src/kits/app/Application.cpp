@@ -56,9 +56,7 @@
 #include <AppServerLink.h>
 #include <ServerProtocol.h>
 #include <PortLink.h>
-#include <PortMessage.h>
-
-#include "PrivateScreen.h"
+#include <PrivateScreen.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -172,9 +170,6 @@ property_info gApplicationPropInfo[] =
 extern const int __libc_argc;
 extern const char * const *__libc_argv;
 
-// TODO: We have a more or less complete BMenuWindow class in Menu.cpp.
-// If this file needs to include its interface, we'd better move it to
-// some private header.
 class BMenuWindow : public BWindow
 {
 };
@@ -186,7 +181,7 @@ class BMenuWindow : public BWindow
 #define OUT	printf
 
 enum {
-	NOT_IMPLEMENTED	= B_ERROR,
+	NOT_IMPLEMENTED	= B_ERROR
 };
 
 // prototypes of helper functions
@@ -228,7 +223,8 @@ BApplication::BApplication(const char* signature, status_t* error)
 //------------------------------------------------------------------------------
 BApplication::~BApplication()
 {
-	// tell all loopers(usualy windows) to quit. Also, wait for them.
+	// tell all loopers(usually windows) to quit. Also, wait for them.
+	
 	// TODO: As Axel suggested, this functionality should probably be moved
 	// to quit_all_windows(), and that function should be called from both 
 	// here and QuitRequested().
@@ -255,13 +251,14 @@ BApplication::~BApplication()
 	// unregister from the roster
 	BRoster::Private().RemoveApp(Team());
 
-	// tell app_server we're quiting...
-	PortLink		link(fServerFrom);
-	link.SetOpCode(B_QUIT_REQUESTED);
+	// tell app_server we're quitting...
+	BPortLink link(fServerFrom);
+	link.StartMessage(B_QUIT_REQUESTED);
 	link.Flush();
 
 	// uninitialize be_app and be_app_messenger
 	be_app = NULL;
+	
 	// R5 doesn't uninitialize be_app_messenger.
 	//be_app_messenger = BMessenger();
 }
@@ -422,38 +419,37 @@ BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
 										 BMessage* specifier, int32 form,
 										 const char* property)
 {
-	return NULL; // TODO: implement
+	return NULL; // TODO: implement? not implemented?
 }
 //------------------------------------------------------------------------------
 void BApplication::ShowCursor()
 {
-	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
-	int32 foo=AS_SHOW_CURSOR;
-	write_port(fServerTo,AS_SHOW_CURSOR,&foo,sizeof(int32));
+	BPrivate::BAppServerLink link;
+	link.StartMessage(AS_SHOW_CURSOR);
+	link.Flush();
 }
 //------------------------------------------------------------------------------
 void BApplication::HideCursor()
 {
-	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
-	int32 foo=AS_HIDE_CURSOR;
-	write_port(fServerTo,AS_HIDE_CURSOR,&foo,sizeof(int32));
+	BPrivate::BAppServerLink link;
+	link.StartMessage(AS_HIDE_CURSOR);
+	link.Flush();
 }
 //------------------------------------------------------------------------------
 void BApplication::ObscureCursor()
 {
-	// Because we're just sending an opcode, we can skip the BSession and fake the protocol
-	int32 foo=AS_OBSCURE_CURSOR;
-	write_port(fServerTo,AS_OBSCURE_CURSOR,&foo,sizeof(int32));
+	BPrivate::BAppServerLink link;
+	link.StartMessage(AS_OBSCURE_CURSOR);
+	link.Flush();
 }
 //------------------------------------------------------------------------------
 bool BApplication::IsCursorHidden() const
 {
-	PortMessage msg;
-	
 	BPrivate::BAppServerLink link;
-	link.SetOpCode(AS_QUERY_CURSOR_HIDDEN);
-	link.FlushWithReply(&msg);
-	return (msg.Code()==SERVER_TRUE)?true:false;
+	int32 code = SERVER_FALSE;
+	link.StartMessage(AS_QUERY_CURSOR_HIDDEN);
+	link.FlushWithReply(&code);
+	return (code==SERVER_TRUE)?true:false;
 }
 //------------------------------------------------------------------------------
 void BApplication::SetCursor(const void* cursor)
@@ -468,13 +464,13 @@ void BApplication::SetCursor(const void* cursor)
 void BApplication::SetCursor(const BCursor* cursor, bool sync)
 {
 	BPrivate::BAppServerLink link;
-	PortMessage msg;
+	int32 code=SERVER_FALSE;
 	
-	link.SetOpCode(AS_SET_CURSOR_BCURSOR);
+	link.StartMessage(AS_SET_CURSOR_BCURSOR);
 	link.Attach<bool>(sync);
 	link.Attach<int32>(cursor->m_serverToken);
 	if(sync)
-		link.FlushWithReply(&msg);
+		link.FlushWithReply(&code);
 	else
 		link.Flush();
 }
@@ -728,7 +724,7 @@ void BApplication::_ReservedApplication8()
 //------------------------------------------------------------------------------
 bool BApplication::ScriptReceived(BMessage* msg, int32 index, BMessage* specifier, int32 form, const char* property)
 {
-	return false; // TODO: Implement
+	return false; // TODO: Implement? Not implemented?
 }
 //------------------------------------------------------------------------------
 void BApplication::run_task()
@@ -835,6 +831,9 @@ void BApplication::InitData(const char* signature, status_t* error)
 			// Do that even, if we are B_ARGV_ONLY.
 			// TODO: When BLooper::AddMessage() is done, use that instead of
 			// PostMessage().
+			
+			DBG(OUT("info: BApplication sucessfully registered.\n"));
+			
 			if (__libc_argc > 1) {
 				BMessage argvMessage(B_ARGV_RECEIVED);
 				do_argv(&argvMessage);
@@ -896,7 +895,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 void BApplication::BeginRectTracking(BRect r, bool trackWhole)
 {
 	BPrivate::BAppServerLink link;
-	link.Attach<int32>(AS_BEGIN_RECT_TRACKING);
+	link.StartMessage(AS_BEGIN_RECT_TRACKING);
 	link.Attach<BRect>(r);
 	link.Attach<int32>(trackWhole);
 	link.Flush();
@@ -904,8 +903,9 @@ void BApplication::BeginRectTracking(BRect r, bool trackWhole)
 //------------------------------------------------------------------------------
 void BApplication::EndRectTracking()
 {
-	int32 foo=AS_END_RECT_TRACKING;
-	write_port(fServerTo,AS_END_RECT_TRACKING,&foo,sizeof(int32));
+	BPrivate::BAppServerLink link;
+	link.StartMessage(AS_END_RECT_TRACKING);
+	link.Flush();
 }
 //------------------------------------------------------------------------------
 void BApplication::get_scs()
@@ -915,7 +915,12 @@ void BApplication::get_scs()
 //------------------------------------------------------------------------------
 void BApplication::setup_server_heaps()
 {
-	// TODO: implement
+	// TODO: implement?
+
+	// We may not need to implement this function or the XX_offs_to_ptr functions.
+	// R5 sets up a couple of areas for various tasks having to do with the
+	// app_server. Currently (7/29/04), the R1 app_server does not do this and
+	// may never do this unless a significant need is found for it. --DW
 }
 //------------------------------------------------------------------------------
 void* BApplication::rw_offs_to_ptr(uint32 offset)
@@ -940,6 +945,9 @@ void BApplication::connect_to_app_server()
 		// Create the port so that the app_server knows where to send messages
 		fServerTo = create_port(100, "a<fServerTo");
 		if (fServerTo >= 0) {
+			
+			//We can't use BAppServerLink because be_app == NULL
+			
 			// AS_CREATE_APP:
 	
 			// Attach data:
@@ -948,21 +956,23 @@ void BApplication::connect_to_app_server()
 			// 3) team_id - team identification field
 			// 4) int32 - handler ID token of the app
 			// 5) char * - signature of the regular app
-			PortLink link(fServerFrom);
-			PortMessage pmsg;
+			BPortLink link(fServerFrom);
+			int32 code=SERVER_FALSE;
 			
-			link.SetOpCode(AS_CREATE_APP);
+			link.StartMessage(AS_CREATE_APP);
 			link.Attach<port_id>(fServerTo);
 			link.Attach<port_id>(_get_looper_port_(this));
 			link.Attach<team_id>(Team());
 			link.Attach<int32>(_get_object_token_(this));
 			link.AttachString(fAppName);
-			link.FlushWithReply(&pmsg);
+			link.Flush();
+			link.GetNextReply(&code);
 
 			// Reply code: AS_CREATE_APP
 			// Reply data:
 			//	1) port_id server-side application port (fServerFrom value)
-			pmsg.Read<port_id>(&fServerFrom);
+			if(code==AS_CREATE_APP)
+				link.Read<port_id>(&fServerFrom);
 		
 		} else
 			fInitError = fServerTo;
@@ -987,7 +997,7 @@ void BApplication::write_drag(_BSession_* session, BMessage* a_message)
 //------------------------------------------------------------------------------
 bool BApplication::quit_all_windows(bool force)
 {
-	return false;	// TODO: implement
+	return false;	// TODO: implement?
 }
 //------------------------------------------------------------------------------
 bool BApplication::window_quit_loop(bool, bool)
@@ -1087,7 +1097,7 @@ status_t BApplication::get_window_list(BList* list, bool incl_menus) const
 //------------------------------------------------------------------------------
 int32 BApplication::async_quit_entry(void* data)
 {
-	return 0;	// TODO: implement ?
+	return 0;	// TODO: implement? not implemented?
 }
 //------------------------------------------------------------------------------
 
