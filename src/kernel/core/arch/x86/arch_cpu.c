@@ -240,7 +240,12 @@ error:
 status_t
 arch_cpu_shutdown(bool _reboot)
 {
-	// we can't do anything else, yet
+	// ToDo: support real shutdown
+
+	// try to reset the system using the keyboard controller
+	out8(0xfe, 0x64);
+
+	// if that didn't help, try it this way
 	reboot();
 	return B_OK;
 }
