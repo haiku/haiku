@@ -39,29 +39,31 @@ extern const char *kRAppLooperPortName;
 // message constants
 enum {
 	// replies
-	B_REG_SUCCESS					= 'rgsu',
-	B_REG_ERROR						= 'rger',
-	B_REG_RESULT					= 'rgrz',
+	B_REG_SUCCESS						= 'rgsu',
+	B_REG_ERROR							= 'rger',
+	B_REG_RESULT						= 'rgrz',
 	// general requests
-	B_REG_GET_MIME_MESSENGER		= 'rgmm',
-	B_REG_GET_CLIPBOARD_MESSENGER	= 'rgcm',
+	B_REG_GET_MIME_MESSENGER			= 'rgmm',
+	B_REG_GET_CLIPBOARD_MESSENGER		= 'rgcm',
 	// roster requests
-	B_REG_ADD_APP					= 'rgaa',
-	B_REG_COMPLETE_REGISTRATION		= 'rgcr',
-	B_REG_IS_APP_PRE_REGISTERED		= 'rgip',
-	B_REG_REMOVE_PRE_REGISTERED_APP	= 'rgrp',
-	B_REG_REMOVE_APP				= 'rgra',
-	B_REG_SET_THREAD_AND_TEAM		= 'rgtt',
-	B_REG_GET_APP_INFO				= 'rgai',
-	B_REG_GET_APP_LIST				= 'rgal',
-	B_REG_ACTIVATE_APP				= 'rgac',
+	B_REG_ADD_APP						= 'rgaa',
+	B_REG_COMPLETE_REGISTRATION			= 'rgcr',
+	B_REG_IS_APP_PRE_REGISTERED			= 'rgip',
+	B_REG_REMOVE_PRE_REGISTERED_APP		= 'rgrp',
+	B_REG_REMOVE_APP					= 'rgra',
+	B_REG_SET_THREAD_AND_TEAM			= 'rgtt',
+	B_REG_GET_APP_INFO					= 'rgai',
+	B_REG_GET_APP_LIST					= 'rgal',
+	B_REG_ACTIVATE_APP					= 'rgac',
 	// MIME requests
-	B_REG_MIME_SET_PARAM			= 'rgsp',
-	B_REG_MIME_DELETE_PARAM			= 'rgdp',
-	B_REG_MIME_START_WATCHING		= 'rgwb',
-	B_REG_MIME_STOP_WATCHING		= 'rgwe',
-	B_REG_MIME_INSTALL				= 'rgin',
-	B_REG_MIME_DELETE				= 'rgdl',
+	B_REG_MIME_SET_PARAM				= 'rgsp',
+	B_REG_MIME_DELETE_PARAM				= 'rgdp',
+	B_REG_MIME_START_WATCHING			= 'rgwb',
+	B_REG_MIME_STOP_WATCHING			= 'rgwe',
+	B_REG_MIME_INSTALL					= 'rgin',
+	B_REG_MIME_DELETE					= 'rgdl',
+	B_REG_MIME_GET_INSTALLED_TYPES		= 'rgit',
+	B_REG_MIME_GET_INSTALLED_SUPERTYPES	= 'rgis',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
