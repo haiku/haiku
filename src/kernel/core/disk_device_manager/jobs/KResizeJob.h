@@ -10,10 +10,14 @@ namespace DiskDevice {
 
 class KResizeJob : public KDiskDeviceJob {
 public:
-	KResizeJob(partition_id parent, partition_id partition, off_t size);
+	KResizeJob(partition_id parentID, partition_id partitionID, off_t size,
+			   bool resizeContents);
 	virtual ~KResizeJob();
 
 	virtual status_t Do();
+
+private:
+	bool	fResizeContents;
 };
 
 } // namespace DiskDevice
