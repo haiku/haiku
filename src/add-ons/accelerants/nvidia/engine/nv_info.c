@@ -271,7 +271,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 			if (exec_type1_script(rom, init2, &size, ram_tab) != B_OK) result = B_ERROR;
 
 		/* now enable ROM shadow or the card will remain shut-off! */
-		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
+		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
 
 		//temporary: should be called from setmode probably..
 		nv_crtc_setup_fifo();
@@ -353,7 +353,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 		}
 
 		/* now enable ROM shadow or the card will remain shut-off! */
-		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
+		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
 
 		//temporary: should be called from setmode probably..
 		nv_crtc_setup_fifo();
@@ -480,13 +480,12 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
-			/* (alternate NV-specific access to PCI config space registers:) */
-			safe32 = NV_REG32(0x00001800 + NVCFG_AGPCMD);
-			NV_REG32(0x00001800 + NVCFG_AGPCMD) = 0x00000000;
+			safe32 = CFGR(AGPCMD);
+			CFGW(AGPCMD, 0x00000000);
 			NV_REG32(reg) = data;
 			NV_REG32(reg) = data2;
-			NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
-			NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
+			CFGW(AGPCMD, safe32);
+			CFGW(ROMSHADOW, (CFGR(ROMSHADOW) & 0xfffffffe));
 			break;
 		case 0x69:
 			*size -= 5;
@@ -1199,13 +1198,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
-			/* (alternate NV-specific access to PCI config space registers:) */
-			safe32 = NV_REG32(0x00001800 + NVCFG_AGPCMD);
-			NV_REG32(0x00001800 + NVCFG_AGPCMD) = 0x00000000;
+			safe32 = CFGR(AGPCMD);
+			CFGW(AGPCMD, 0x00000000);
 			NV_REG32(reg) = data;
 			NV_REG32(reg) = data2;
-			NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
-			NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
+			CFGW(AGPCMD, safe32);
+			CFGW(ROMSHADOW, (CFGR(ROMSHADOW) & 0xfffffffe));
 			break;
 		case 0x69: /* identical to type1 */
 			*size -= 5;
