@@ -30,4 +30,8 @@ KernelLd pci :
 	addons/kernel/pci
 	;
 
+# pci_info.cpp currently needs pcihdr.h so we make its path available
+ObjectHdrs [ FGristFiles pci_info$(SUFOBJ) ]
+	: [ FDirName $(OBOS_TOP) src prefs devices ] ;
+
 SubInclude OBOS_TOP src add-ons kernel bus_managers pci arch $(OBOS_ARCH) ;
