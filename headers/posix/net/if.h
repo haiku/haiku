@@ -5,7 +5,6 @@
 #ifndef _NET_IF_H
 #define _NET_IF_H
 
-#include <OS.h>
 #include <Drivers.h>
 #include <sys/socketvar.h>
 #include <net/if_types.h>
