@@ -55,7 +55,7 @@ StringSearchTest::PerformTest(void)
 	//NextSubTest();
 	//string1 = new BString("string");
 	//i = string1->FindFirst((char*)NULL);
-	//CPPUNIT_ASSERT(i == 0);
+	//CPPUNIT_ASSERT(i == B_BAD_VALUE);
 	//delete string1;
 
 	//FindFirst(BString&, int32)
@@ -106,7 +106,7 @@ StringSearchTest::PerformTest(void)
 	//NextSubTest();
 	//string1 = new BString("abc abc abc");
 	//i = string1->FindFirst((char*)NULL, 3);
-	//CPPUNIT_ASSERT(i == 0);
+	//CPPUNIT_ASSERT(i == B_BAD_VALUE);
 	//delete string1;
 
 	//FindFirst(char)
@@ -175,7 +175,7 @@ StringSearchTest::PerformTest(void)
 	//NextSubTest();
 	//string1 = new BString("string");
 	//i = string1->FindLast((char*)NULL);
-	//CPPUNIT_ASSERT(i == 0);
+	//CPPUNIT_ASSERT(i == B_BAD_VALUE);
 	//delete string1;
 
 	//FindLast(BString&, int32)
@@ -212,7 +212,7 @@ StringSearchTest::PerformTest(void)
 	//NextSubTest();
 	//string1 = new BString("abc abc abc");
 	//i = string1->FindLast((char*)NULL, 3);
-	//CPPUNIT_ASSERT(i == 0);
+	//CPPUNIT_ASSERT(i == B_BAD_VALUE);
 	//delete string1;
 
 	//FindLast(char)
@@ -247,7 +247,217 @@ StringSearchTest::PerformTest(void)
 	CPPUNIT_ASSERT(i == B_ERROR);
 	delete string1;
 
+	//IFindFirst(BString&)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("st");
+	i = string1->IFindFirst(*string2);
+	CPPUNIT_ASSERT(i == 2);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("ST");
+	i = string1->IFindFirst(*string2);
+	CPPUNIT_ASSERT(i == 2);
+	delete string1;
+	delete string2;
 
+	NextSubTest();
+	string1 = new BString;
+	string2 = new BString("some text");
+	i = string1->IFindFirst(*string2);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("string");
+	string2 = new BString;
+	i = string1->IFindFirst(*string2);
+	CPPUNIT_ASSERT(i == 0);
+	delete string1;
+	delete string2;
+	
+	//IFindFirst(const char*)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = string1->IFindFirst("st");
+	CPPUNIT_ASSERT(i == 2);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("LAST BUT NOT least");
+	i = string1->IFindFirst("st");
+	CPPUNIT_ASSERT(i == 2);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString;
+	i = string1->IFindFirst("some text");
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	
+	//Commented, since crashes R5
+	//NextSubTest();
+	//string1 = new BString("string");
+	//i = string1->IFindFirst((char*)NULL);
+	//CPPUNIT_ASSERT(i == B_BAD_VALUE);
+	//delete string1;
+
+	//IFindFirst(BString&, int32)
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	string2 = new BString("abc");
+	i = string1->IFindFirst(*string2, 5);
+	CPPUNIT_ASSERT(i == 8);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	string2 = new BString("AbC");
+	i = string1->IFindFirst(*string2, 5);
+	CPPUNIT_ASSERT(i == 8);
+	delete string1;
+	delete string2;
+
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	string2 = new BString("abc");
+	i = string1->IFindFirst(*string2, 200);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	delete string2;
+
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	string2 = new BString("abc");
+	i = string1->IFindFirst(*string2, -10);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	delete string2;
+
+	//IFindFirst(const char*, int32)
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	i = string1->IFindFirst("abc", 2);
+	CPPUNIT_ASSERT(i == 4);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("AbC ABC abC");
+	i = string1->IFindFirst("abc", 2);
+	CPPUNIT_ASSERT(i == 4);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	i = string1->IFindFirst("abc", 200);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	i = string1->IFindFirst("abc", -10);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	
+	//IFindLast(BString&)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("st");
+	i = string1->IFindLast(*string2);
+	CPPUNIT_ASSERT(i == 16);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	string2 = new BString("sT");
+	i = string1->IFindLast(*string2);
+	CPPUNIT_ASSERT(i == 16);
+	delete string1;
+	delete string2;
+
+	NextSubTest();
+	string1 = new BString;
+	string2 = new BString("some text");
+	i = string1->IFindLast(*string2);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	delete string2;
+
+	//IFindLast(const char*)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = string1->IFindLast("st");
+	CPPUNIT_ASSERT(i == 16);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	i = string1->IFindLast("ST");
+	CPPUNIT_ASSERT(i == 16);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString;
+	i = string1->IFindLast("some text");
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	
+	//Commented since crashes R5
+	//NextSubTest();
+	//string1 = new BString("string");
+	//i = string1->IFindLast((char*)NULL);
+	//CPPUNIT_ASSERT(i == B_BAD_VALUE);
+	//delete string1;
+
+	//FindLast(BString&, int32)
+	NextSubTest();
+	string1 = new BString("abcabcabc");
+	string2 = new BString("abc");
+	i = string1->IFindLast(*string2, 7);
+	CPPUNIT_ASSERT(i == 3);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("abcabcabc");
+	string2 = new BString("AbC");
+	i = string1->IFindLast(*string2, 7);
+	CPPUNIT_ASSERT(i == 3);
+	delete string1;
+	delete string2;
+	
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	string2 = new BString("abc");
+	i = string1->IFindLast(*string2, -10);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
+	delete string2;
+
+	//IFindLast(const char*, int32)
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	i = string1->IFindLast("abc", 9);
+	CPPUNIT_ASSERT(i == 4);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("ABc abC aBC");
+	i = string1->IFindLast("aBc", 9);
+	CPPUNIT_ASSERT(i == 4);
+	delete string1;
+	
+	NextSubTest();
+	string1 = new BString("abc abc abc");
+	i = string1->IFindLast("abc", -10);
+	CPPUNIT_ASSERT(i == B_ERROR);
+	delete string1;
 }
 
 
