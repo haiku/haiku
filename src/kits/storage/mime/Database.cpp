@@ -375,6 +375,17 @@ Database::SetSupportedTypes(const char *type, const BMessage *types, bool fullSy
 	DBG(OUT("Database::SetSupportedTypes()\n"));	
 	bool didCreate = false;
 	status_t err = (type && types) ? B_OK : B_BAD_VALUE;
+	// Install the types
+	if (!err) {
+		const char *supportedType;
+		for (int32 i = 0;
+			 err == B_OK
+			 && types->FindString("types", i, &supportedType) == B_OK;
+			 i++) {
+			if (!is_installed(supportedType))
+				err = Install(supportedType);
+		}
+	}
 	// Write the attr
 	if (!err)
 		err = write_mime_attr_message(type, kSupportedTypesAttr, types, &didCreate);
@@ -604,6 +615,7 @@ Database::DeletePreferredApp(const char *type, app_verb verb = B_OPEN)
 	*/
 	if (!err)
 		err = SendMonitorUpdate(B_PREFERRED_APP_CHANGED, type, B_META_MIME_DELETED);
+	return err;
 }
 
 status_t
