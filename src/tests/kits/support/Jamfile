@@ -54,7 +54,11 @@ CommonTestLib libsupporttest.so
 		StringTest.cpp
 		StringConstructionTest.cpp
 		StringCountCharTest.cpp
-		StringOperatorsTest.cpp
+		StringAssignTest.cpp
+		StringAppendTest.cpp
+		StringSubCopyTest.cpp
+		StringPrependTest.cpp
+		StringCaseTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
