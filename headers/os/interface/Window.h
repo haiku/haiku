@@ -132,7 +132,7 @@ class BView;
 
 struct message;
 struct _cmd_key_;
-struct _view_attr_;
+class ViewAttr;
 
 // BWindow class ---------------------------------------------------------------
 class BWindow : public BLooper {
