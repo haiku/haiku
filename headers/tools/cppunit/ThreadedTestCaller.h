@@ -5,6 +5,7 @@
 #include <cppunit/TestCase.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestCaller.h>
+#include <TestShell.h>
 #include <ThreadManager.h>
 #include <map>
 
@@ -152,14 +153,18 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 				// Try to acquire the semaphore
 				err = acquire_sem_etc(fThreadSem, fThreads.size(), B_RELATIVE_TIMEOUT,	500000);
 				
+				BTestShell *shell = BTestShell::Shell();
+				
 				// Empty the UpdateList				
 				std::vector<std::string> &list = fObject->AcquireUpdateList();
 				for (std::vector<std::string>::iterator i = list.begin();
 					   i != list.end();
 					     i++)
 				{
-					printf("%s", (*i).c_str());
-					fflush(stdout);
+					if (shell && shell->BeVerbose()) {					
+						printf("%s", (*i).c_str());
+						fflush(stdout);
+					}
 				}
 				list.clear();
 				fObject->ReleaseUpdateList();				
