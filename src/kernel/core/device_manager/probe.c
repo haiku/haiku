@@ -55,8 +55,8 @@ static const char *modules_dirs[2] = {
  *	(moved to end of file to avoid inlining)
  */
 
-static
-status_t notify_probe_by_file(pnp_node_info *node, const char *consumer_name)
+static status_t
+notify_probe_by_file(pnp_node_info *node, const char *consumer_name)
 {
 	char *type;
 	char *resolved_path;
@@ -308,56 +308,6 @@ find_normal_consumer(pnp_node_info *node, const char *dir,
 }
 
 
-/**	Notify fixed consumers that device was added; in contrast to dynamic
- *	consumers, errors reported by fixed consumers are not ignored but
- *	returned.
- */
-
-status_t
-pnp_notify_fixed_consumers(pnp_node_info *node)
-{
-	int i;
-	char *buffer;
-
-	TRACE(("pnp_notify_fixed_consumers()\n"));
-
-	buffer = malloc(PATH_MAX + 1);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	// first, append nothing, then "/0", "/1" etc.
-	for (i = -1; ; ++i) {
-		char *consumer;
-
-		strcpy(buffer, PNP_DRIVER_FIXED_CONSUMER);
-		if (i >= 0)
-			sprintf(buffer + strlen(buffer), "/%d", i);
-
-		// if no more fixed consumers, cancel loop silently
-		if (pnp_get_attr_string( node, buffer, &consumer, false) != B_OK)
-			break;
-
-		TRACE(("Consumer %d: %s\n", i, consumer));
-
-		if (pnp_notify_probe_by_module(node, consumer) != B_OK) {
-			dprintf("Cannot notify fixed consumer %s\n", consumer);
-
-			// report error if fixed consumers couldn't be loaded
-			// as they are obviously crucial (else they wouldn't be fixed)
-			free(consumer);
-			free(buffer);
-
-			return B_NAME_NOT_FOUND;
-		}
-
-		free(consumer);
-	}
-
-	free(buffer);
-	return B_OK;
-}
-
-
 /**	pre-process dynamic consumer name pattern.
  *	split into directory and pattern and count split positions;
  *	further, remove quotes from directory
@@ -508,6 +458,10 @@ err:
 }
 
 
+//	#pragma mark -
+//	device manager private API
+
+
 /** find and notify dynamic consumers that device was added
  *	errors returned by consumers aren't reported, only problems
  *	like malformed consumer patterns
@@ -569,5 +523,55 @@ err:
 	//pnp_unload_boot_links();
 
 	return res;
+}
+
+
+/**	Notify fixed consumers that device was added; in contrast to dynamic
+ *	consumers, errors reported by fixed consumers are not ignored but
+ *	returned.
+ */
+
+status_t
+pnp_notify_fixed_consumers(pnp_node_info *node)
+{
+	int i;
+	char *buffer;
+
+	TRACE(("pnp_notify_fixed_consumers()\n"));
+
+	buffer = malloc(PATH_MAX + 1);
+	if (buffer == NULL)
+		return B_NO_MEMORY;
+
+	// first, append nothing, then "/0", "/1" etc.
+	for (i = -1; ; ++i) {
+		char *consumer;
+
+		strcpy(buffer, PNP_DRIVER_FIXED_CONSUMER);
+		if (i >= 0)
+			sprintf(buffer + strlen(buffer), "/%d", i);
+
+		// if no more fixed consumers, cancel loop silently
+		if (pnp_get_attr_string( node, buffer, &consumer, false) != B_OK)
+			break;
+
+		TRACE(("Consumer %d: %s\n", i, consumer));
+
+		if (pnp_notify_probe_by_module(node, consumer) != B_OK) {
+			dprintf("Cannot notify fixed consumer %s\n", consumer);
+
+			// report error if fixed consumers couldn't be loaded
+			// as they are obviously crucial (else they wouldn't be fixed)
+			free(consumer);
+			free(buffer);
+
+			return B_NAME_NOT_FOUND;
+		}
+
+		free(consumer);
+	}
+
+	free(buffer);
+	return B_OK;
 }
 
