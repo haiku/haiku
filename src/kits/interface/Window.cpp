@@ -43,11 +43,13 @@
 #include <Window.h>
 #include <Screen.h>
 #include <Button.h>
+#include <PortLink.h>
+#include <ServerProtocol.h>
+#include <AppServerLink.h>
+#include <MessageQueue.h>
 
 // Local Includes --------------------------------------------------------------
-#include <PortLink.h>
 #include "WindowAux.h"
-#include "ServerProtocol.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -151,17 +153,18 @@ BWindow::BWindow(BRect frame,
 	
 
 		// let app_server to know that a window has been created.
-	serverLink = new PortLink(be_app->fServerTo);
-	serverLink->SetOpCode(AS_CREATE_WINDOW);
-	serverLink->Attach(fFrame);
-	serverLink->Attach((int32)WindowLookToInteger(fLook));
-	serverLink->Attach((int32)WindowFeelToInteger(fFeel));
-	serverLink->Attach((int32)fFlags);
-	serverLink->Attach((int32)workspace);	
-	serverLink->Attach(_get_object_token_(this));
-	serverLink->Attach(&receive_port,sizeof(port_id));
+	BPrivate::BAppServerLink *baslink=new BPrivate::BAppServerLink;
+	baslink->Init();
+	baslink->portlink->SetOpCode(AS_CREATE_WINDOW);
+	baslink->portlink->Attach(fFrame);
+	baslink->portlink->Attach((int32)WindowLookToInteger(fLook));
+	baslink->portlink->Attach((int32)WindowFeelToInteger(fFeel));
+	baslink->portlink->Attach((int32)fFlags);
+	baslink->portlink->Attach((int32)workspace);	
+	baslink->portlink->Attach(_get_object_token_(this));
+	baslink->portlink->Attach(&receive_port,sizeof(port_id));
 		// We add one so that the string will end up NULL-terminated.
-	serverLink->Attach( (char*)title, strlen(title)+1 );
+	baslink->portlink->Attach( (char*)title, strlen(title)+1 );
 	
 		// Send and wait for ServerWindow port. Necessary here so we can respond to
 		// messages as soon as Show() is called.
@@ -172,11 +175,12 @@ BWindow::BWindow(BRect frame,
 		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
 	be_app->Lock();
 	
-	replyStat		= serverLink->FlushWithReply( &replyData );
+	replyStat		= baslink->portlink->FlushWithReply( &replyData );
 	if ( replyStat != B_OK ){
 		//debugger("First reply from app_server was not received.");
 		return;
 	}
+	delete baslink;
 	
 		// unlock, so other threads can do their job.
 	be_app->Unlock();
@@ -184,13 +188,11 @@ BWindow::BWindow(BRect frame,
 	send_port		= *((port_id*)replyData.buffer);
 
 		// Set the port on witch app_server will listen for us	
-	serverLink->SetPort(send_port);
+	serverLink = new PortLink(send_port);
 		// Initialize a PortLink object for use with graphic calls.
 		// They need to be sent separately because of the speed reasons.
 	srvGfxLink		= new PortLink( send_port );	
 	
-	delete replyData.buffer;
-
 		// Create and attach the top view
 	top_view			= buildTopView();
 		// Here we will register the top view with app_server
@@ -1881,8 +1883,124 @@ void BWindow::InitData(	BRect frame,
 //------------------------------------------------------------------------------
 
 void BWindow::task_looper(){
+// Code more or less pasted from BLooper's task_looper so that I can debug the app_server.
+// Otherwise, when run, Show() causes a crash. --DW
 
-// TODO: Implement for REAL
+	//	Check that looper is locked (should be)
+	AssertLocked();
+	//	Unlock the looper
+	Unlock();
+
+	//	loop: As long as we are not terminating.
+	while (!fTerminating)
+	{
+		// TODO: timeout determination algo
+		//	Read from message port (how do we determine what the timeout is?)
+		BMessage* msg = MessageFromPort();
+
+		//	Did we get a message?
+		if (msg)
+		{
+			//	Add to queue
+			fQueue->AddMessage(msg);
+		}
+		//	Get message count from port
+		int32 msgCount = port_count(fMsgPort);
+		for (int32 i = 0; i < msgCount; ++i)
+		{
+			//	Read 'count' messages from port (so we will not block)
+			//	We use zero as our timeout since we know there is stuff there
+			msg = MessageFromPort(0);
+			//	Add messages to queue
+			if (msg)
+			{
+				fQueue->AddMessage(msg);
+			}
+		}
+
+		//	loop: As long as there are messages in the queue and the port is
+		//		  empty... and we are not terminating, of course.
+		bool dispatchNextMessage = true;
+		while (!fTerminating && dispatchNextMessage)
+		{
+			//	Get next message from queue (assign to fLastMessage)
+			fLastMessage = fQueue->NextMessage();
+
+			//	Lock the looper
+			Lock();
+			if (!fLastMessage)
+			{
+				// No more messages: Unlock the looper and terminate the
+				// dispatch loop.
+				dispatchNextMessage = false;
+			}
+			else
+			{
+				//	Get the target handler
+				//	Use BMessage friend functions to determine if we are using the
+				//	preferred handler, or if a target has been specified
+				BHandler* handler;
+				if (_use_preferred_target_(fLastMessage))
+				{
+					handler = fPreferred;
+				}
+				else
+				{
+					/**
+						@note	Here is where all the token stuff starts to
+								make sense.  How, exactly, do we determine
+								what the target BHandler is?  If we look at
+								BMessage, we see an int32 field, fTarget.
+								Amazingly, we happen to have a global mapping
+								of BHandler pointers to int32s!
+					 */
+				}
+
+				if (!handler)
+				{
+					handler = this;
+				}
+
+				//	Is this a scripting message? (BMessage::HasSpecifiers())
+				if (fLastMessage->HasSpecifiers())
+				{
+					int32 index = 0;
+					// Make sure the current specifier is kosher
+					if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
+					{
+						handler = resolve_specifier(handler, fLastMessage);
+					}
+				}
+
+				if (handler)
+				{
+					//	Do filtering
+					handler = top_level_filter(fLastMessage, handler);
+					if (handler && handler->Looper() == this)
+					{
+						DispatchMessage(fLastMessage, handler);
+					}
+				}
+			}
+
+			//	Unlock the looper
+			Unlock();
+
+			//	Delete the current message (fLastMessage)
+			if (fLastMessage)
+			{
+				delete fLastMessage;
+				fLastMessage = NULL;
+			}
+
+			//	Are any messages on the port?
+			if (port_count(fMsgPort) > 0)
+			{
+				//	Do outer loop
+				dispatchNextMessage = false;
+			}
+		}
+	}
 }
 
 //------------------------------------------------------------------------------
