@@ -5,14 +5,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) libjpeg ] ;
 
 SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
 
-Translator JPEGTranslator :
-
-	# JPEGTranslator
-	be_jdatadst.cpp
-	be_jdatasrc.cpp
-	be_jerror.cpp
-	JPEGTranslator.cpp
-
+local jpeg_files = 
 	# libjpeg
 	jcapimin.c
 	jcapistd.c
@@ -75,6 +68,19 @@ Translator JPEGTranslator :
 	jquant1.c
 	jquant2.c
 	jutils.c
+	;
+
+ObjectCcFlags [ FGristFiles $(jpeg_files:S=$(SUFOBJ)) ] : -w ;
+
+Translator JPEGTranslator :
+
+	# JPEGTranslator
+	be_jdatadst.cpp
+	be_jdatasrc.cpp
+	be_jerror.cpp
+	JPEGTranslator.cpp
+
+	$(jpeg_files)
 	;
 
 LinkSharedOSLibs JPEGTranslator : be translation ;

@@ -13,11 +13,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) libjasper ] ;
 
 SubDirC++Flags [ FDefines BEOS_R5_COMPATIBLE ] ;
 
-Translator JPEG2000Translator :
-
-	# JPEG2000Translator
-	JPEG2000Translator.cpp
-
+local jasper_files = 
 	# libjasper (Base)
 	jas_debug.c
 	jas_getopt.c
@@ -55,6 +51,16 @@ Translator JPEG2000Translator :
 	jpc_tagtree.c
 	jpc_tsfb.c
 	jpc_util.c
+	;
+
+ObjectCcFlags [ FGristFiles $(jasper_files:S=$(SUFOBJ)) ] : -w ;
+
+Translator JPEG2000Translator :
+
+	# JPEG2000Translator
+	JPEG2000Translator.cpp
+
+	$(jasper_files)
 	;
 
 LinkSharedOSLibs JPEG2000Translator : be translation ;
