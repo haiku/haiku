@@ -1,33 +1,43 @@
 #include <TestCase.h>
 #include <unistd.h>
+#include <stdio.h>
 
-TestCase::TestCase()
-	: CppUnit::TestCase()
-	, fValidCWD(false)
-{
-}
-
-TestCase::TestCase(std::string name)
+BTestCase::BTestCase(std::string name)
 	: CppUnit::TestCase(name)
 	, fValidCWD(false)
+	, fSubTestNum(0)
 {
 }
 
-// Saves the location of the current working directory. To return to the
-// last saved working directory, all \ref RestorCWD().
 void
-TestCase::SaveCWD() {
+BTestCase::tearDown() {
+	NextSubTestBlock();
+}
+
+void
+BTestCase::NextSubTest() {
+	printf("[%ld]", fSubTestNum++);
+	fflush(stdout);
+}
+
+void
+BTestCase::NextSubTestBlock() {
+//	printf("\n");
+}
+
+/*! To return to the last saved working directory, call RestoreCWD(). */
+void
+BTestCase::SaveCWD() {
 	fValidCWD = getcwd(fCurrentWorkingDir, B_PATH_NAME_LENGTH);
 }
 
-/*	Restores the current working directory to last directory saved by a
-	call to SaveCWD(). If SaveCWD() has not been called and an alternate
+/*	If SaveCWD() has not been called and an alternate
 	directory is specified by alternate, the current working directory is
 	changed to alternate. If alternate is null, the current working directory
 	is not modified.
 */
 void
-TestCase::RestoreCWD(const char *alternate) {
+BTestCase::RestoreCWD(const char *alternate) {
 	if (fValidCWD)
 		chdir(fCurrentWorkingDir);
 	else if (alternate != NULL)
