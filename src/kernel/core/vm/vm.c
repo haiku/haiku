@@ -24,7 +24,6 @@
 #include <lock.h>
 #include <khash.h>
 #include <thread.h>
-#include <atomic.h>
 
 #include <boot/stage2.h>
 

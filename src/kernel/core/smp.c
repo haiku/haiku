@@ -14,7 +14,6 @@
 #include <smp.h>
 #include <malloc.h>
 #include <Errors.h>
-#include <atomic.h>
 
 #include <cpu.h>
 #include <arch/cpu.h>

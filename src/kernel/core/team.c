@@ -20,7 +20,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <elf.h>
-#include <atomic.h>
 #include <syscalls.h>
 #include <tls.h>
 

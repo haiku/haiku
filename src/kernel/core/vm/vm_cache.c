@@ -17,7 +17,6 @@
 #include <smp.h>
 #include <arch/cpu.h>
 #include <Errors.h>
-#include <atomic.h>
 
 /* hash table of pages keyed by cache they're in and offset */
 #define PAGE_TABLE_SIZE 1024 /* make this dynamic */

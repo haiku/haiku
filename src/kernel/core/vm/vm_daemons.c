@@ -12,7 +12,6 @@
 #include <vm_priv.h>
 #include <vm_cache.h>
 #include <vm_page.h>
-#include <atomic.h>
 
 bool trimming_cycle;
 static addr free_memory_low_water;

@@ -7,7 +7,6 @@
 #include <arch/cpu.h>
 #include <smp.h>
 #include <int.h>
-#include <atomic.h>
 
 #include <arch/x86/selector.h>
 

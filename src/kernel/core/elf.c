@@ -14,7 +14,6 @@
 #include <thread.h>
 #include <debug.h>
 #include <malloc.h>
-#include <atomic.h>
 #include <stdlib.h>
 
 #include <arch/cpu.h>

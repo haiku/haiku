@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <resource.h>
-#include <atomic.h>
 #include <kerrors.h>
 #include <syscalls.h>
 #include <ksignal.h>

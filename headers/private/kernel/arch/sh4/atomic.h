@@ -24,38 +24,6 @@ extern "C" {
  */
 
 /**
- * Perform an atomic addition.
- * @param val Pointer to an integer
- * @param incr The increment to add (may be -ve)
- * @note Returns value of val before addition
- */
-int32 atomic_add(vint32 *val, int32 incr);
-
-/**
- * Atomic and operation
- * @param val Pointer to an integer
- * @param incr The increment to add (may be -ve)
- * @note Returns value of val before addition
- */
-int32 atomic_and(vint32 *val, int32 incr);
-
-/**
- * Atomic or operation
- * @param val Pointer to an integer
- * @param incr The increment to add (may be -ve)
- * @note Returns value of val before addition
- */
-int32 atomic_or(vint32 *val, int32 incr);
-
-int32 atomic_set(vint32 *val, int32 set_to);
-
-/* Compare the value of val with test_val. If they
- * are equal then set the value of 'val' to
- * 'set_to'
- */
-int32 test_and_set(vint32 *val, int32 set_to, int32 test_val);
-
-/**
  * Atomic add (user version)
  * @param val Pointer to an integer
  * @param incr The increment to add (may be -ve)
@@ -87,7 +55,7 @@ int32 user_atomic_set(vint32 *val, int32 set_to);
  * @note This is the user version and should not be used within
  *       the kernel.
  */
-int32 user_test_and_set(vint32 *val, int32 set_to, int32 test_val);
+int32 user_atomic_test_and_set(vint32 *val, int32 set_to, int32 test_val);
 
 #ifdef __cplusplus
 }

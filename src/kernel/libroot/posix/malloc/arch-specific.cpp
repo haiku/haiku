@@ -33,7 +33,6 @@ extern "C" {
 
 #include <stdio.h>
 #include <syscalls.h>
-#include <atomic.h>
 
 sem_id create_sem(int32 count, const char *name);
 status_t delete_sem(sem_id id);
