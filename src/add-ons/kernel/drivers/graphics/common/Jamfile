@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src add-ons kernel drivers graphics common ;
+
+SubDirCcFlags -DENABLE_LOGGING -DLOG_INCLUDE_STARTUP ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics radeon ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+StaticLibrary graphicscommon :
+	log_coll.c
+	log_dump.c
+	memmgr.c
+;
