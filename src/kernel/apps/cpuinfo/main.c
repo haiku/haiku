@@ -383,9 +383,9 @@ Intel_TLB_cache(cpuid_info *info)
 	// a particular cache type will display together.
 	//
 	// After the pass loop is finished, the slot array contains the indexes of all the
-	// table entries that apply to the host processor. Displaying the info merely a matter
-	// of spinning thru the slot array and printing the text. The output is organized by
-	// the cache types -- this technique *only* works because the TLB/Cache table has been
+	// table entries that apply to the host processor. Displaying the info is merely a matter
+	// of spinning thru the slot array and printing the text. The output, however, is organized
+	// by the cache types -- this technique *only* works because the TLB/Cache table has been
 	// carefully arranged in that order.
 	
 	#define BIT_31_MASK (1 << 31)
@@ -407,7 +407,7 @@ Intel_TLB_cache(cpuid_info *info)
 		indexOf[tab[n++].descriptor] = i++;
 
 	
-	// pass loop: insert relevant table indexes into the slots array
+	// pass loop: insert relevant table indexes into the slot array
 	i = 0;
 	for (pass = 0; ; ++pass) {
 		get_cpuid(info, 2, 0);
@@ -418,27 +418,27 @@ Intel_TLB_cache(cpuid_info *info)
 			break;
 		
 		reg >>= 8; // skip low byte
-		while ((db = (reg & 0xff)))
-			insert(slot, indexOf[db], i++),
-			reg >>= 8;
+		for (; reg; reg >>= 8)
+			if ((db = (reg & 0xff)))
+				insert(slot, indexOf[db], i++);
 		
 		reg = info->regs.ebx;  // ebx
 		if ((reg & BIT_31_MASK) == 0)
-			while ((db = (reg & 0xff)))
-				insert(slot, indexOf[db], i++),
-				reg >>= 8;
+			for (; reg; reg >>= 8)
+				if ((db = (reg & 0xff)))
+					insert(slot, indexOf[db], i++);
 
 		reg = info->regs.ecx;  // ecx
 		if ((reg & BIT_31_MASK) == 0)
-			while ((db = (reg & 0xff)))
-				insert(slot, indexOf[db], i++),
-				reg >>= 8;
+			for (; reg; reg >>= 8)
+				if ((db = (reg & 0xff)))
+					insert(slot, indexOf[db], i++);
 
 		reg = info->regs.edx;  // edx
 		if ((reg & BIT_31_MASK) == 0)
-			while ((db = (reg & 0xff)))
-				insert(slot, indexOf[db], i++),
-				reg >>= 8;
+			for (; reg; reg >>= 8)
+				if ((db = (reg & 0xff)))
+					insert(slot, indexOf[db], i++);
 	}
 
 
