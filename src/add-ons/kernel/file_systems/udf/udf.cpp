@@ -309,7 +309,7 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 	
 	// Create and mount the volume
 	if (!error) {
-		volume = new Udf::Volume(nsid);
+		volume = new(nothrow) Udf::Volume(nsid);
 		error = volume ? B_OK : B_NO_MEMORY;
 	}
 	if (!error) {
@@ -404,7 +404,7 @@ udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 	
 	// Convert the given vnode id to an address, and create
 	// and return a corresponding Icb object for it.
-	Udf::Icb *icb = new Udf::Icb(volume, Udf::to_long_address(id, volume->BlockSize()));
+	Udf::Icb *icb = new(nothrow) Udf::Icb(volume, Udf::to_long_address(id, volume->BlockSize()));
 	status_t error = icb ? B_OK : B_NO_MEMORY;
 	if (!error) {
 		error = icb->InitCheck();

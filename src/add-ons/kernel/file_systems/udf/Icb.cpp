@@ -123,7 +123,7 @@ Icb::GetDirectoryIterator(DirectoryIterator **iterator)
 	status_t error = iterator ? B_OK : B_BAD_VALUE;
 
 	if (!error) {
-		*iterator = new DirectoryIterator(this);
+		*iterator = new(nothrow) DirectoryIterator(this);
 		if (*iterator) {
 			error = fIteratorList.PushBack(*iterator);
 		} else {

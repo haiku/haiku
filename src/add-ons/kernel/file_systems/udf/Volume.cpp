@@ -121,7 +121,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 				}
 				// Create and add the partition
 				if (descriptor) {
-					PhysicalPartition *partition = new PhysicalPartition(
+					PhysicalPartition *partition = new(nothrow) PhysicalPartition(
 					                               map->partition_number(),
 					                               descriptor->start(),
 					                               descriptor->length());
@@ -238,7 +238,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 					        logicalVolumeDescriptor.file_set_address().block());
 				if (!error) {
 					PDUMP(fileSet);
-					fRootIcb = new Icb(this, fileSet->root_directory_icb());
+					fRootIcb = new(nothrow) Icb(this, fileSet->root_directory_icb());
 					error = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
 				}
 				if (!error) {

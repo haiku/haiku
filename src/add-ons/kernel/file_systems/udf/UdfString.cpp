@@ -140,7 +140,7 @@ String::SetTo(const char *utf8)
 	}		
 	uint32 length = strlen(utf8);
 	// First copy the utf8 string
-	fUtf8String = new char[length+1];
+	fUtf8String = new(nothrow) char[length+1];
 	if (!fUtf8String){
 		PRINT(("new fUtf8String[%ld] allocation failed\n", length+1));
 		return;
@@ -149,7 +149,7 @@ String::SetTo(const char *utf8)
 	// analysis to figure out if we have any invalid characters,
 	// and whether we can get away with compressed 8-bit unicode,
 	// or have to use burly 16-bit unicode.
-	uint32 *raw = new uint32[length];
+	uint32 *raw = new(nothrow) uint32[length];
 	if (!raw) {
 		PRINT(("new uint32 raw[%ld] temporary string allocation failed\n", length));
 		_Clear();
@@ -182,7 +182,7 @@ String::SetTo(const char *utf8)
 	// Build our cs0 string
 	if (canUse8bit) {
 		fCs0Length = rawLength+1;
-		fCs0String = new char[fCs0Length];
+		fCs0String = new(nothrow) char[fCs0Length];
 		if (fCs0String) {
 			fCs0String[0] = '\x08';	// 8-bit compressed unicode
 			for (uint32 i = 0; i < rawLength; i++)
@@ -194,7 +194,7 @@ String::SetTo(const char *utf8)
 		}
 	} else {
 		fCs0Length = rawLength*2+1;	
-		fCs0String = new char[fCs0Length];
+		fCs0String = new(nothrow) char[fCs0Length];
 		if (fCs0String) {
 			uint32 pos = 0;
 			fCs0String[pos++] = '\x10';	// 16-bit unicode
@@ -231,7 +231,7 @@ String::SetTo(const char *cs0, uint32 length)
 	}		
 	
 	// First copy the Cs0 string and length
-	fCs0String = new char[length];
+	fCs0String = new(nothrow) char[length];
 	if (fCs0String) {
 		memcpy(fCs0String, cs0, length);
 	} else {
@@ -254,7 +254,7 @@ String::SetTo(const char *cs0, uint32 length)
 			const uint8 *inputString = reinterpret_cast<const uint8*>(&(cs0[1]));
 			int32 maxLength = length-1;				// Max length of input string in uint8 characters
 			int32 allocationLength = maxLength*2+1;	// Need at most 2 utf8 chars per uint8 char
-			fUtf8String = new char[allocationLength];	
+			fUtf8String = new(nothrow) char[allocationLength];	
 			if (fUtf8String) {
 				char *outputString = fUtf8String;
 	
@@ -275,7 +275,7 @@ String::SetTo(const char *cs0, uint32 length)
 			const uint16 *inputString = reinterpret_cast<const uint16*>(&(cs0[1]));
 			int32 maxLength = (length-1) / 2;		// Max length of input string in uint16 characters
 			int32 allocationLength = maxLength*3+1;	// Need at most 3 utf8 chars per uint16 char
-			fUtf8String = new char[allocationLength];
+			fUtf8String = new(nothrow) char[allocationLength];
 			if (fUtf8String) {
 				char *outputString = fUtf8String;
 

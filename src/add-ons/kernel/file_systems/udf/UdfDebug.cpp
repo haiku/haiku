@@ -283,11 +283,11 @@ void initialize_debugger(const char *filename)
 {
 #if DEBUG_TO_FILE
 	if (!out) {
-		out = new DebugOutputFile(filename);
+		out = new(nothrow) DebugOutputFile(filename);
 		dbg_printf("out was NULL!\n");
 	} else {
 		DebugOutputFile *temp = out;
-		out = new DebugOutputFile(filename);
+		out = new(nothrow) DebugOutputFile(filename);
 		dbg_printf("out was %p!\n", temp);
 	}
 #endif
