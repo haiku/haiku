@@ -1794,9 +1794,10 @@ void BWindow::Show(){
 	if (fShowLevel == 0){
 		STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name() ));
 		if ( !isLocked ) Lock();
+		top_view->Show();
 		session->WriteInt32( AS_SHOW_WINDOW );
-		session->Sync( );
-		if ( !isLocked) Unlock();
+		session->Sync();
+		if ( !isLocked ) Unlock();
 	}
 
 		// if it's the fist time Show() is called... start the Looper thread.
@@ -1814,6 +1815,7 @@ void BWindow::Show(){
 void BWindow::Hide(){
 	if (fShowLevel == 0){
 		Lock();
+		top_view->Hide();
 		session->WriteInt32( AS_HIDE_WINDOW );
 		session->Sync();
 		Unlock();
@@ -2272,7 +2274,7 @@ void BWindow::decomposeType(window_type type,
 
 void BWindow::BuildTopView(){
 
-	top_view		= new BView( fFrame.OffsetToCopy(0,0), "top_view",
+	top_view		= new BView( fFrame, "top_view",
 								 B_FOLLOW_ALL, B_WILL_DRAW);
 	top_view->top_level_view	= true;
 	top_view->fShowLevel		= 1;
@@ -2283,15 +2285,10 @@ void BWindow::BuildTopView(){
 
 		// send top_view's information to app_server
 	session->WriteInt32( AS_LAYER_CREATE_ROOT );
-	session->WriteInt32( _get_object_token_( top_view ) );
-	session->WriteRect( fFrame );//top_view->Frame() );
-	session->WriteInt32( top_view->ResizingMode() );
-	session->WriteInt32( top_view->Flags() );
-	session->WriteString( top_view->Name() );
-		// we DO NOT send our current state; the server knows the default values!
-	session->Sync();
-
 	fLastViewToken		= _get_object_token_( top_view );
+
+	top_view->attachView(top_view);
+
 STRACE(("BuildTopView ended\n"));
 }
 
