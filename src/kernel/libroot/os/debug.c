@@ -13,38 +13,45 @@
 #include <string.h>
 
 
-static const char *const sDebugWhyStrings[] = {
-	"Thread not running",		// B_THREAD_NOT_RUNNING
-	"Signal received",			// B_SIGNAL_RECEIVED
-	"Team created",				// B_TEAM_CREATED
-	"Thread created",			// B_THREAD_CREATED
-	"Image created",			// B_IMAGE_CREATED
-	"Image deleted",			// B_IMAGE_DELETED
-	"Debugger call",			// B_DEBUGGER_CALL
-	"Breakpoint hit",			// B_BREAKPOINT_HIT
-	"watchpoint hit",			// B_WATCHPOINT_HIT
-	"Before syscall",			// B_PRE_SYSCALL_HIT
-	"After syscall",			// B_POST_SYSCALL_HIT
-	"Single step",				// B_SINGLE_STEP
-};
-static const int32 sDebugWhyStringCount = B_SINGLE_STEP + 1;
+typedef struct debug_string_entry {
+	const char	*string;
+	uint32		code;
+} debug_string_entry;
 
-static const char *const sDebugExceptionTypeStrings[] = {
-	"Non-maskable interrupt",	// B_NMI
-	"Machine check exception",	// B_MACHINE_CHECK_EXCEPTION
-	"Segment violation",		// B_SEGMENT_VIOLATION
-	"Alignment exception",		// B_ALIGNMENT_EXCEPTION
-	"Divide error",				// B_DIVIDE_ERROR
-	"Overflow exception",		// B_OVERFLOW_EXCEPTION
-	"Bounds check exception",	// B_BOUNDS_CHECK_EXCEPTION
-	"Invalid opcode exception",	// B_INVALID_OPCODE_EXCEPTION
-	"Segment not present",		// B_SEGMENT_NOT_PRESENT
-	"Stack fault",				// B_STACK_FAULT
-	"General protection fault",	// B_GENERAL_PROTECTION_FAULT
-	"Floating point exception",	// B_FLOATING_POINT_EXCEPTION
+static const debug_string_entry sDebugMessageStrings[] = {
+	{ "Thread not running",	B_DEBUGGER_MESSAGE_THREAD_DEBUGGED },
+	{ "Debugger call",		B_DEBUGGER_MESSAGE_DEBUGGER_CALL },
+	{ "Breakpoint hit",		B_DEBUGGER_MESSAGE_BREAKPOINT_HIT },
+	{ "Watchpoint hit",		B_DEBUGGER_MESSAGE_WATCHPOINT_HIT },
+	{ "Single step",		B_DEBUGGER_MESSAGE_SINGLE_STEP },
+	{ "Before syscall",		B_DEBUGGER_MESSAGE_PRE_SYSCALL },
+	{ "After syscall",		B_DEBUGGER_MESSAGE_POST_SYSCALL },
+	{ "Signal received",	B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED },
+	{ "Exception occurred",	B_DEBUGGER_MESSAGE_EXCEPTION_OCCURRED },
+	{ "Team created",		B_DEBUGGER_MESSAGE_TEAM_CREATED },
+	{ "Team deleted",		B_DEBUGGER_MESSAGE_TEAM_DELETED },
+	{ "Thread created",		B_DEBUGGER_MESSAGE_THREAD_CREATED },
+	{ "Thread created",		B_DEBUGGER_MESSAGE_THREAD_DELETED },
+	{ "Image created",		B_DEBUGGER_MESSAGE_IMAGE_CREATED },
+	{ "Image deleted",		B_DEBUGGER_MESSAGE_IMAGE_DELETED },
+	{ NULL, 0 }
 };
-static const int32 sDebugExceptionTypeStringCount
-	= B_FLOATING_POINT_EXCEPTION + 1;
+
+static const debug_string_entry sDebugExceptionTypeStrings[] = {
+	{ "Non-maskable interrupt",		B_NON_MASKABLE_INTERRUPT },
+	{ "Machine check exception",	B_MACHINE_CHECK_EXCEPTION },
+	{ "Segment violation",			B_SEGMENT_VIOLATION },
+	{ "Alignment exception",		B_ALIGNMENT_EXCEPTION },
+	{ "Divide error",				B_DIVIDE_ERROR },
+	{ "Overflow exception",			B_OVERFLOW_EXCEPTION },
+	{ "Bounds check exception",		B_BOUNDS_CHECK_EXCEPTION },
+	{ "Invalid opcode exception",	B_INVALID_OPCODE_EXCEPTION },
+	{ "Segment not present",		B_SEGMENT_NOT_PRESENT },
+	{ "Stack fault",				B_STACK_FAULT },
+	{ "General protection fault",	B_GENERAL_PROTECTION_FAULT },
+	{ "Floating point exception",	B_FLOATING_POINT_EXCEPTION },
+	{ NULL, 0 }
+};
 
 
 void
@@ -105,33 +112,39 @@ wait_for_debugger(void)
 
 
 static void
-get_debug_string(const char *const *strings, int32 stringCount,
-	const char *defaultString, int32 index, char *buffer, int32 bufferSize)
+get_debug_string(const debug_string_entry *stringEntries,
+	const char *defaultString, uint32 code, char *buffer, int32 bufferSize)
 {
+	int i;
+
 	if (!buffer || bufferSize <= 0)
 		return;
 
-	if ((int32)index >= 0 && (int32)index < stringCount)
-		strlcpy(buffer, strings[index], bufferSize);
-	else
-		snprintf(buffer, bufferSize, defaultString, index);
+	for (i = 0; stringEntries[i].string; i++) {
+		if (stringEntries[i].code == code) {
+			strlcpy(buffer, stringEntries[i].string, bufferSize);
+			return;
+		}
+	}
+
+	snprintf(buffer, bufferSize, defaultString, code);
 }
 
 
 void
-get_debug_why_stopped_string(debug_why_stopped whyStopped, char *buffer,
+get_debug_message_string(debug_debugger_message message, char *buffer,
 	int32 bufferSize)
 {
-	get_debug_string(sDebugWhyStrings, sDebugWhyStringCount,
-		"Unknown reason %ld", (int32)whyStopped, buffer, bufferSize);
+	get_debug_string(sDebugMessageStrings, "Unknown message %lu",
+		(uint32)message, buffer, bufferSize);
 }
 
 void
 get_debug_exception_string(debug_exception_type exception, char *buffer,
 	int32 bufferSize)
 {
-	get_debug_string(sDebugExceptionTypeStrings, sDebugExceptionTypeStringCount,
-		"Unknown exception %ld", (int32)exception, buffer, bufferSize);
+	get_debug_string(sDebugExceptionTypeStrings, "Unknown exception %lu",
+		(uint32)exception, buffer, bufferSize);
 }
 
 
