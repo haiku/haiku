@@ -1,0 +1,21 @@
+SubDir OBOS_TOP src apps bin pppconfig ;
+
+UsePrivateHeaders net ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp headers ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
+
+BinCommand pppconfig :
+	driver_settings.c
+	pppconfig.cpp
+	
+	: be
+;
+
+SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
+
+LinkSharedOSLibs pppconfig : be libppp.a ;
+
+# Installation -- in the test directory for the time being
+OBOSInstall install-networking
+	: [ FDirName $(OBOS_TEST_DIR) kits net ]
+	: pppconfig ;
