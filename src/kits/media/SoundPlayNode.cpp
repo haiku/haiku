@@ -31,7 +31,8 @@ _SoundPlayNode::_SoundPlayNode(const char *name, const media_multi_audio_format 
 	mInitCheckStatus(B_OK),
 	mOutputEnabled(true),
 	mBufferGroup(NULL),	
-	mFramesSent(0)
+	mFramesSent(0),
+	mTooEarlyCount(0)
 {
 	CALLED();
 	mPreferredFormat.type = B_MEDIA_RAW_AUDIO;
@@ -369,7 +370,7 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	FindLatencyFor(mOutput.destination, &mLatency, &id);
 	fprintf(stderr, "\tdownstream latency = %Ld\n", mLatency);
 
-	mInternalLatency = 10LL;
+	mInternalLatency = 5000LL;
 	fprintf(stderr, "\tbuffer-filling took %Ld usec on this machine\n", mInternalLatency);
 	SetEventLatency(mLatency + mInternalLatency);
 
@@ -421,6 +422,8 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 {
 	CALLED();
 	
+	printf("_SoundPlayNode::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
+	
 	// is this our output?
 	if (what != mOutput.source)
 	{
@@ -430,6 +433,7 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 
 	// If we're late, we need to catch up.  Respond in a manner appropriate to our
 	// current run mode.
+/*
 	if (RunMode() == B_RECORDING)
 	{
 		// A hardware capture node can't adjust; it simply emits buffers at
@@ -438,13 +442,16 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 		// can't choose to capture "sooner"....
 	}
 	else if (RunMode() == B_INCREASE_LATENCY)
+*/
+	if (RunMode() != B_DROP_DATA)
 	{
 		// We're late, and our run mode dictates that we try to produce buffers
 		// earlier in order to catch up.  This argues that the downstream nodes are
 		// not properly reporting their latency, but there's not much we can do about
 		// that at the moment, so we try to start producing buffers earlier to
 		// compensate.
-		mInternalLatency += how_much;
+//		mInternalLatency += how_much;
+		mLatency += 1000;
 		SetEventLatency(mLatency + mInternalLatency);
 
 		fprintf(stderr, "\tincreasing latency to %Ld\n", mLatency + mInternalLatency);
@@ -552,39 +559,70 @@ status_t
 _SoundPlayNode::HandleBuffer(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	CALLED();
 		
 	// make sure we're both started *and* connected before delivering a buffer
-	if ((RunState() == BMediaEventLooper::B_STARTED) && (mOutput.destination != media_destination::null))
-	{
+	if ((RunState() != BMediaEventLooper::B_STARTED) || (mOutput.destination == media_destination::null))
+		return B_OK;
+		
+	// The event->event_time is the time at which the buffer we are preparing here should
+	// arrive at it's destination. The MediaEventLooper should have scheduled us early enough
+	// (based on EventLatency() and the SchedulingLatency()) to make this possible.
+
+	bigtime_t scheduling_latency = SchedulingLatency();
+
+	if (lateness > 0) {
+		printf("_SoundPlayNode::HandleBuffer, event sheduled too late, lateness is %Ld\n", lateness);
+		mInternalLatency += 1000;
+		SetEventLatency(mLatency + mInternalLatency);
+	}
+
+	// skip buffer creation if output not enabled	
+	if (mOutputEnabled) {
+
 		// Get the next buffer of data
 		BBuffer* buffer = FillNextBuffer(event->event_time);
-		if (buffer)
-		{
+
+		if (buffer) {
+
+			// If we are ready way too early, decrase internal latency
+			bigtime_t how_early = event->event_time - TimeSource()->Now() - mLatency;
+			if (how_early > (3 * scheduling_latency)) {
+
+				printf("_SoundPlayNode::HandleBuffer, event scheduled too early, how_early is %Ld\n", how_early);
+
+				if (mTooEarlyCount++ == 5) {
+					mInternalLatency -= how_early;
+					if (mInternalLatency < 500)
+						mInternalLatency = 500;
+					printf("_SoundPlayNode::HandleBuffer setting internal latency to %Ld\n", mInternalLatency);
+					SetEventLatency(mLatency + mInternalLatency);
+					mTooEarlyCount = 0;
+				}
+			}
+
 			// send the buffer downstream if and only if output is enabled
-			status_t err = B_ERROR;
-			if (mOutputEnabled) err = SendBuffer(buffer, mOutput.destination);
-			if (err)
-			{
-				// we need to recycle the buffer ourselves if output is disabled or
+			if (B_OK != SendBuffer(buffer, mOutput.destination)) {
+				// we need to recycle the buffer
 				// if the call to SendBuffer() fails
 				buffer->Recycle();
 			}
 		}
-
-		// track how much media we've delivered so far
-		size_t nFrames = mOutput.format.u.raw_audio.buffer_size
-			/ (mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			/ mOutput.format.u.raw_audio.channel_count;
-		mFramesSent += nFrames;
-
-		// The buffer is on its way; now schedule the next one to go
-		bigtime_t nextEvent = mStartTime + bigtime_t(double(mFramesSent) / double(mOutput.format.u.raw_audio.frame_rate) * 1000000.0);
-		media_timed_event nextBufferEvent(nextEvent, BTimedEventQueue::B_HANDLE_BUFFER);
-		EventQueue()->AddEvent(nextBufferEvent);
 	}
+
+	// track how much media we've delivered so far
+	size_t nFrames = mOutput.format.u.raw_audio.buffer_size
+		/ (mOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
+		/ mOutput.format.u.raw_audio.channel_count;
+	mFramesSent += nFrames;
+
+	// The buffer is on its way; now schedule the next one to go
+	// nextEvent is the time at which the buffer should arrive at it's destination
+	bigtime_t nextEvent = mStartTime + bigtime_t(double(mFramesSent) / double(mOutput.format.u.raw_audio.frame_rate) * 1000000.0);
+	media_timed_event nextBufferEvent(nextEvent, BTimedEventQueue::B_HANDLE_BUFFER);
+	EventQueue()->AddEvent(nextBufferEvent);
 	
 	return B_OK;
 }
@@ -690,6 +728,10 @@ _SoundPlayNode::AllocateBuffers()
 
 	DPRINTF("\tlatency = %Ld, buffer duration = %Ld\n", mLatency, BufferDuration());
 	DPRINTF("\tcreating group of %ld buffers, size = %lu\n", count, size);
+	
+	if (count < 2)
+		count == 2;
+	
 	mBufferGroup = new BBufferGroup(size, count);
 }
 
@@ -719,26 +761,8 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 	hdr->type = B_MEDIA_RAW_AUDIO;
 	hdr->size_used = mOutput.format.u.raw_audio.buffer_size;
 	hdr->time_source = TimeSource()->ID();
+	hdr->start_time = event_time;
 
-	bigtime_t stamp;
-	if (RunMode() == B_RECORDING)
-	{
-		// In B_RECORDING mode, we stamp with the capture time.  We're not
-		// really a hardware capture node, but we simulate it by using the (precalculated)
-		// time at which this buffer "should" have been created.
-		stamp = event_time;
-	}
-	else
-	{
-		// okay, we're in one of the "live" performance run modes.  in these modes, we
-		// stamp the buffer with the time at which the buffer should be rendered to the
-		// output, not with the capture time.  mStartTime is the cached value of the
-		// first buffer's performance time; we calculate this buffer's performance time as
-		// an offset from that time, based on the amount of media we've created so far.
-		// Recalculating every buffer like this avoids accumulation of error.
-		stamp = mStartTime + bigtime_t(double(mFramesSent) / double(mOutput.format.u.raw_audio.frame_rate) * 1000000.0);
-	}
-	hdr->start_time = stamp;
 	DPRINTF("TimeSource()->Now() : %li\n", TimeSource()->Now());
 	DPRINTF("hdr->start_time : %li\n", hdr->start_time);
 	DPRINTF("mFramesSent : %li\n", mFramesSent);

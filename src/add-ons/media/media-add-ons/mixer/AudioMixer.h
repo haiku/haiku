@@ -47,6 +47,9 @@ class AudioMixer :
 		
 		void 				AllocateBuffers();
 		status_t			FillMixBuffer(void *outbuffer, size_t size);
+		
+		void				SendNewBuffer(bigtime_t event_time);
+		void				HandleInputBuffer(BBuffer *buffer);
 					
 	// BMediaNode methods
 
@@ -200,8 +203,8 @@ class AudioMixer :
 		BMediaAddOn		*	fAddOn;
 		BParameterWeb	*	fWeb; // local pointer to parameterweb
 
-		bigtime_t 			fLatency, fInternalLatency; // latency (total and internal)
-		bigtime_t			fStartTime, fNextEventTime; // time node started, time of next (output) event
+		bigtime_t 			fLatency, fInternalLatency; // latency (downstream and internal)
+		bigtime_t			fStartTime; // time node started
 		uint64 				fFramesSent; // audio frames sent
 		bool				fOutputEnabled;
 		

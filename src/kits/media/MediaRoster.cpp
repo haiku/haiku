@@ -2109,6 +2109,8 @@ BMediaRosterEx::GetDormantFlavorInfo(media_addon_id addonid,
 									  dormant_flavor_info * out_flavor)
 {
 	CALLED();
+	if (out_flavor == NULL)
+		return B_BAD_VALUE;
 	
 	xfer_server_get_dormant_flavor_info msg;
 	xfer_server_get_dormant_flavor_info_reply *reply;
@@ -2300,8 +2302,27 @@ BMediaRoster::GetFormatFor(const media_output & output,
 						   media_format * io_format,
 						   uint32 flags)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (io_format == NULL)
+		return B_BAD_VALUE;
+	if ((output.node.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	if (IS_INVALID_SOURCE(output.source))
+		return B_MEDIA_BAD_SOURCE;
+		
+	producer_format_suggestion_requested_request request;
+	producer_format_suggestion_requested_reply reply;
+	status_t rv;
+	
+	request.type = B_MEDIA_UNKNOWN_TYPE;
+	request.quality = 0; // XXX what should this be?
+		
+	rv = QueryPort(output.source.port, PRODUCER_FORMAT_SUGGESTION_REQUESTED, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+
+	*io_format = reply.format;
+	return B_OK;
 }
 
 						   
@@ -2310,8 +2331,27 @@ BMediaRoster::GetFormatFor(const media_input & input,
 						   media_format * io_format,
 						   uint32 flags)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (io_format == NULL)
+		return B_BAD_VALUE;
+	if ((input.node.kind & B_BUFFER_CONSUMER) == 0)
+		return B_MEDIA_BAD_NODE;
+	if (IS_INVALID_DESTINATION(input.destination))
+		return B_MEDIA_BAD_DESTINATION;
+		
+	consumer_accept_format_request request;
+	consumer_accept_format_reply reply;
+	status_t rv;
+	
+	request.dest = input.destination;
+	memset(&request.format, 0, sizeof(request.format)); // wildcard
+
+	rv = QueryPort(input.destination.port, CONSUMER_ACCEPT_FORMAT, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+
+	*io_format = reply.format;
+	return B_OK;
 }
 
 
@@ -2321,6 +2361,14 @@ BMediaRoster::GetFormatFor(const media_node & node,
 						   float quality)
 {
 	UNIMPLEMENTED();
+	if (io_format == NULL)
+		return B_BAD_VALUE;
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+	if ((node.kind & (B_BUFFER_CONSUMER | B_BUFFER_PRODUCER)) == 0)
+		return B_MEDIA_BAD_NODE;
+
+
 	return B_ERROR;
 }
 

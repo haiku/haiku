@@ -33,6 +33,7 @@ static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@O
 #include <MediaEventLooper.h>
 #include <TimeSource.h>
 #include <scheduler.h>
+#include <Buffer.h>
 #include "debug.h"
 
 // XXX The bebook says that the latency is always calculated in realtime
@@ -177,6 +178,7 @@ BMediaEventLooper::SetRunMode(run_mode mode)
 		if(fControlThread > 0) {
 			set_thread_priority(fControlThread, fCurrentPriority);
 			fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
+			printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
 		}
 	}
 
@@ -221,7 +223,6 @@ BMediaEventLooper::ControlLoop()
 			// BMediaEventLooper compensates your performance time by adding the event latency
 			// (see SetEventLatency()) and the scheduling latency (or, for real-time events, 
 			// only the scheduling latency). 
-			// latency = fOut.downstream_latency + fOut.processing_latency + fSchedulingLatency;
 			// XXX well, fix this later
 			latency = fEventLatency + fSchedulingLatency; 
 			
@@ -261,10 +262,10 @@ BMediaEventLooper::ControlLoop()
 		if (err == B_OK) {
 			bigtime_t lateness;
 			if (is_realtime)
-				lateness = TimeSource()->RealTime() - event.event_time;
+				lateness = TimeSource()->RealTime() - event.event_time - fEventLatency;
 			else
-				lateness = TimeSource()->Now() - event.event_time;
-			DispatchEvent(&event,lateness,is_realtime);
+				lateness = TimeSource()->Now() - event.event_time - fEventLatency;
+			DispatchEvent(&event, lateness, is_realtime);
 		}
 	}
 }
@@ -356,6 +357,7 @@ BMediaEventLooper::SetPriority(int32 priority)
 	if(fControlThread > 0) {
 		set_thread_priority(fControlThread, fCurrentPriority);
 		fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
+		printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
 	}
 
 	return B_OK;
@@ -419,6 +421,7 @@ BMediaEventLooper::Run()
 
 	// get latency information
 	fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
+	printf("BMediaEventLooper: SchedulingLatency is %Ld\n", fSchedulingLatency);
 }
 
 
@@ -471,7 +474,8 @@ BMediaEventLooper::DispatchEvent(const media_timed_event *event,
 		default:
 			break;
 	}
-
+	
+	_DispatchCleanUp(event);
 }
 
 /*************************************************************

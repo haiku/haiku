@@ -169,6 +169,7 @@ private:
 	bigtime_t 			mInternalLatency;
 	bigtime_t 			mStartTime;
 	uint64 				mFramesSent;
+	int32				mTooEarlyCount;
 };
 
 #endif

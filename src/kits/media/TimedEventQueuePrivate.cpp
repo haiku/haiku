@@ -155,11 +155,13 @@ _event_queue_imp::RemoveFirstEvent(media_timed_event * outEvent)
 	if (fFirstEntry == 0)
 		return B_ERROR;
 	
-	if (outEvent != 0)
+	if (outEvent != 0) {
+		// No cleanup here
 		*outEvent = fFirstEntry->event;
-	else
+	} else {
 		CleanupEvent(&fFirstEntry->event);
-		
+	}
+
 	RemoveEntry(fFirstEntry);
 
 	return B_OK;
@@ -560,6 +562,7 @@ _event_queue_imp::CleanupEvent(media_timed_event *event)
 		// do nothing
 	} else if (event->type == BTimedEventQueue::B_HANDLE_BUFFER && event->cleanup == BTimedEventQueue::B_RECYCLE_BUFFER) {
 		((BBuffer *)event->pointer)->Recycle();
+		DEBUG_ONLY(*const_cast<void **>(&event->pointer) = NULL);
 	} else if (event->cleanup == BTimedEventQueue::B_EXPIRE_TIMER) {
 		// call TimerExpired() on the event->data
 		debugger("BTimedEventQueue cleanup: calling TimerExpired() should be implemented here\n");

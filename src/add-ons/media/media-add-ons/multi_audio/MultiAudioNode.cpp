@@ -130,6 +130,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 	AddNodeKind( B_PHYSICAL_INPUT );
 		
 	// initialize our preferred format object
+	memset(&fPreferredFormat, 0, sizeof(fPreferredFormat)); // set everything to wildcard first
 	fPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	fPreferredFormat.u.raw_audio.format = MultiAudioDevice::convert_multiaudio_format_to_media_format(fDevice->MFI.output.format);
 	fPreferredFormat.u.raw_audio.channel_count = 2;

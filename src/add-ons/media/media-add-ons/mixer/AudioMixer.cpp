@@ -21,6 +21,8 @@
 
 //
 
+#define SEND_NEW_BUFFER_EVENT 	(BTimedEventQueue::B_USER_EVENT + 1)
+
 mixer_input::mixer_input(media_input &input)
 {
 
@@ -225,7 +227,7 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 			fWeb(NULL),
 			fLatency(1),
 			fInternalLatency(1),
-			fStartTime(0), fNextEventTime(0),
+			fStartTime(0),
 			fFramesSent(0),
 			fOutputEnabled(true),
 			fBufferGroup(NULL),
@@ -236,27 +238,21 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn)
 
 	BMediaNode::AddNodeKind(B_SYSTEM_MIXER);
 	
-	// set up the preferred output format
-	
+	// set up the preferred output format (although we will accept any format)
+	memset(&fPrefOutputFormat, 0, sizeof(fPrefOutputFormat)); // set everything to wildcard first
 	fPrefOutputFormat.type = B_MEDIA_RAW_AUDIO;
+	fPrefOutputFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
+	fPrefOutputFormat.u.raw_audio.channel_count = 2;
 	
-	fPrefOutputFormat.u.raw_audio.format = media_raw_audio_format::wildcard.format; // B_AUDIO_FLOAT
-	fPrefOutputFormat.u.raw_audio.frame_rate = media_raw_audio_format::wildcard.frame_rate; 
-	fPrefOutputFormat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
-
-	fPrefOutputFormat.u.raw_audio.buffer_size = media_raw_audio_format::wildcard.buffer_size; //2048
-	fPrefOutputFormat.u.raw_audio.channel_count = 2; //media_raw_audio_format::wildcard.channel_count;
-	
-	// set up the preferred input format
-	
+	// set up the preferred input format (although we will accept any format)
+	memset(&fPrefInputFormat, 0, sizeof(fPrefInputFormat)); // set everything to wildcard first
 	fPrefInputFormat.type = B_MEDIA_RAW_AUDIO;
-	
 	fPrefInputFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
 	fPrefInputFormat.u.raw_audio.frame_rate = 96000; //wildcard?
-	fPrefInputFormat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
+	fPrefInputFormat.u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
 	fPrefInputFormat.u.raw_audio.buffer_size = 1024;
-	fPrefInputFormat.u.raw_audio.channel_count = 2; //media_raw_audio_format::wildcard.channel_count;
+	fPrefInputFormat.u.raw_audio.channel_count = 2;
 
 	//fInput.source = media_source::null;
 
@@ -489,19 +485,16 @@ AudioMixer::HandleMessage( int32 message, const void *data, size_t size)
 status_t
 AudioMixer::AcceptFormat(const media_destination &dest, media_format *format)
 {
+	// check that the specified format is reasonable for the specified destination, and
+	// fill in any wildcard fields for which our BBufferConsumer has specific requirements. 
 
-	// we accept any raw audio 
-
-	if (IsValidDest(dest))
-	{	
-		if ((format->type != B_MEDIA_UNKNOWN_TYPE) && (format->type != B_MEDIA_RAW_AUDIO))
-			return B_MEDIA_BAD_FORMAT;
-		else
-			return B_OK;
-	}
-	else
+	if (!IsValidDest(dest))
 		return B_MEDIA_BAD_DESTINATION;	
-	
+
+	if ((format->type != B_MEDIA_UNKNOWN_TYPE) && (format->type != B_MEDIA_RAW_AUDIO))
+		return B_MEDIA_BAD_FORMAT;
+	else
+		return B_OK;
 }
 
 status_t
@@ -523,93 +516,115 @@ AudioMixer::GetNextInput(int32 *cookie, media_input *out_input)
 void
 AudioMixer::DisposeInputCookie(int32 cookie)
 {
-
 	// nothing yet
-
 }
 
 void
 AudioMixer::BufferReceived(BBuffer *buffer)
 {
-
-	if (buffer)
-	{
-		if (buffer->Header()->type == B_MEDIA_PARAMETERS) 
-		{
-			printf("Control Buffer Received\n");
-			ApplyParameterData(buffer->Data(), buffer->SizeUsed());
-		}
-		else 
-		{
-		
-			media_header *hdr = buffer->Header();
-					
-			// check input
-			
-			mixer_input *channel;
-			
-			int inputcount = fMixerInputs.CountItems();
-			
-			for (int i = 0; i < inputcount; i++)
-			{
-			
-				channel = (mixer_input *)fMixerInputs.ItemAt(i);
-				
-				if (channel->fInput.destination.id == hdr->destination)
-				{
-				
-					i = inputcount;
-							
-					bigtime_t now = TimeSource()->Now();
-					bigtime_t perf_time = hdr->start_time;				
-					bigtime_t how_early = perf_time - fLatency - now;
-		
-					if ((RunMode() != B_OFFLINE) && 
-					(RunMode() != B_RECORDING) &&
-					(how_early < 0))
-					{
-						printf("Received buffer %d usecs late from %s\n", -how_early, channel->fInput.name);
-						NotifyLateProducer(channel->fInput.source, -how_early, perf_time);
-					}
-					else
-					{
-					
-						size_t sample_size = channel->fInput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
-		
-						// calculate total byte offset for writing to the ringbuffer
-						// this takes account of the Event offset, as well as the buffer's start time			
-		
-						size_t total_offset = int(channel->fEventOffset + ((((perf_time - fNextEventTime) / 1000000) * 
-							channel->fInput.format.u.raw_audio.frame_rate) * 
-							sample_size * channel->fInput.format.u.raw_audio.channel_count)) % int(channel->fDataSize);
-		
-						char *indata = (char *)buffer->Data();
-														
-						if (buffer->SizeUsed() > (channel->fDataSize - total_offset))
-						{
-							memcpy(channel->fData + total_offset, indata, channel->fDataSize - total_offset);
-							memcpy(channel->fData, indata + (channel->fDataSize - total_offset), buffer->SizeUsed() - (channel->fDataSize - total_offset));	
-						} 
-						else
-							memcpy(channel->fData + total_offset, indata, buffer->SizeUsed());
-												
-					}
-				
-				}	
-			
-			if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
-			{
-				RequestAdditionalBuffer(channel->fInput.source, buffer);
-			}
-			
-		}
-				
+	if (buffer->Header()->type == B_MEDIA_PARAMETERS) {
+		printf("Control Buffer Received\n");
+		ApplyParameterData(buffer->Data(), buffer->SizeUsed());
+		buffer->Recycle();
+		return;
 	}
 	
-	buffer->Recycle();
+	// to receive the buffer at the right time,
+	// push it through the event looper
+	media_timed_event event(buffer->Header()->start_time,
+							BTimedEventQueue::B_HANDLE_BUFFER,
+							buffer,
+							BTimedEventQueue::B_RECYCLE_BUFFER);
+	EventQueue()->AddEvent(event);
+}
+
+
+void
+AudioMixer::HandleInputBuffer(BBuffer *buffer)
+{
+	media_header *hdr = buffer->Header();
+
+	// check input
+	int inputcount = fMixerInputs.CountItems();
 	
+	for (int i = 0; i < inputcount; i++) {
+	
+		mixer_input *channel = (mixer_input *)fMixerInputs.ItemAt(i);
+				
+		if (channel->fInput.destination.id != hdr->destination)
+			continue;
+
+		bigtime_t now = TimeSource()->Now();
+		bigtime_t perf_time = hdr->start_time;				
+		bigtime_t how_late = now - perf_time;
+		bigtime_t event_latency = EventLatency();
+		
+		if (how_late > (event_latency + 2000)) {
+			how_late -= event_latency;
+			printf("Received buffer %Ld usecs late from %s\n", how_late, channel->fInput.name);
+			if (RunMode() != B_OFFLINE && RunMode() != B_RECORDING) {
+				printf("sending notify\n");
+				NotifyLateProducer(channel->fInput.source, max_c(500, how_late), perf_time);
+			} else if (RunMode() == B_DROP_DATA) {
+				printf("dropping buffer\n");
+				return;
+			}
+		}
+	
+		size_t sample_size = channel->fInput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
+	
+		// calculate total byte offset for writing to the ringbuffer
+		// this takes account of the Event offset, as well as the buffer's start time			
+/*		
+		size_t total_offset = int(channel->fEventOffset + ((((perf_time - fNextEventTime) / 1000000) * 
+				channel->fInput.format.u.raw_audio.frame_rate) * 
+				sample_size * channel->fInput.format.u.raw_audio.channel_count)) % int(channel->fDataSize);
+*/
+		size_t total_offset = int(channel->fEventOffset + channel->fInput.format.u.raw_audio.buffer_size)  % int(channel->fDataSize);
+		
+		char *indata = (char *)buffer->Data();
+														
+		if (buffer->SizeUsed() > (channel->fDataSize - total_offset))
+		{
+			memcpy(channel->fData + total_offset, indata, channel->fDataSize - total_offset);
+			memcpy(channel->fData, indata + (channel->fDataSize - total_offset), buffer->SizeUsed() - (channel->fDataSize - total_offset));	
+		} 
+		else
+			memcpy(channel->fData + total_offset, indata, buffer->SizeUsed());
+
+		if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
+		{
+			RequestAdditionalBuffer(channel->fInput.source, buffer);
+		}
+		
+		break;
 	}
 }
+
+void
+AudioMixer::SendNewBuffer(bigtime_t event_time)
+{
+
+	BBuffer *outbuffer = fBufferGroup->RequestBuffer(fOutput.format.u.raw_audio.buffer_size, BufferDuration());
+	if (!outbuffer) {
+		printf("Could not allocate buffer\n");
+		return;
+	}
+				
+	FillMixBuffer(outbuffer->Data(), outbuffer->SizeAvailable());
+					
+	media_header *outheader = outbuffer->Header();
+	outheader->type = B_MEDIA_RAW_AUDIO;
+	outheader->size_used = fOutput.format.u.raw_audio.buffer_size;
+	outheader->time_source = TimeSource()->ID();
+	outheader->start_time = event_time;
+	
+	if (B_OK != SendBuffer(outbuffer, fOutput.destination)) {
+		printf("Could not send buffer to output : %s\n", fOutput.name);
+		outbuffer->Recycle();
+	}
+}	
+
 
 void
 AudioMixer::ProducerDataStatus( const media_destination &for_whom, 
@@ -651,8 +666,14 @@ status_t
 AudioMixer::Connected( const media_source &producer, const media_destination &where,
 						const media_format &with_format, media_input *out_input)
 {
-	if (! IsValidDest(where))
+	if (!IsValidDest(where))
 		return B_MEDIA_BAD_DESTINATION;
+		
+	// We need to make sure that the outInput's name field contains a valid name,
+	// the name given the connection by the producer may still be an empty string.
+
+	// If we want the producer to use a specific BBufferGroup, we now need to call
+	// BMediaRoster::SetOutputBuffersFor() here to set the producer's buffer group
 	
 	char *name = out_input->name;
 	mixer_input *mixerInput;
@@ -997,7 +1018,7 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 		format->u.raw_audio.channel_count = 2;
 
 	if(format->u.raw_audio.byte_order == media_raw_audio_format::wildcard.byte_order)
-		format->u.raw_audio.byte_order = fPrefOutputFormat.u.raw_audio.byte_order;
+		format->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN;
 
 	if (format->u.raw_audio.buffer_size == media_raw_audio_format::wildcard.buffer_size)
 		format->u.raw_audio.buffer_size = 1024;		// pick something comfortable to suggest
@@ -1038,6 +1059,7 @@ AudioMixer::Connect( status_t error, const media_source &source, const media_des
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(fOutput.destination, &fLatency, &id);
+	printf("Downstream Latency is %Ld usecs\n", fLatency);
 
 	// we need at least the length of a full output buffer's latency (I think?)
 
@@ -1054,30 +1076,27 @@ AudioMixer::Connect( status_t error, const media_source &source, const media_des
 	bigtime_t latency_end = TimeSource()->RealTime();
 	
 	fInternalLatency = latency_end - latency_start;
-	printf("Latency set at %d usecs\n", fInternalLatency);
+	printf("Internal latency is %Ld usecs\n", fInternalLatency);
 	
 	delete mouse;
 	
-
 	// might need to tweak the latency
-
 	SetEventLatency(fLatency + fInternalLatency);
 
-	// reset our buffer duration, etc. to avoid later calculations
-	// crashes w/ divide-by-zero when connecting to a variety of nodes... 
-//	if (fOutput.format.u.raw_audio.frame_rate == media_raw_audio_format::wildcard.frame_rate)
-//	{
-//		fOutput.format.u.raw_audio.frame_rate = 44100;
-//	}
-	
-	bigtime_t duration = bigtime_t(1000000) * framesPerBuffer / bigtime_t(fOutput.format.u.raw_audio.frame_rate);
-	SetBufferDuration(duration);
+	// calculate buffer duration and set it	
+	if (fOutput.format.u.raw_audio.frame_rate == 0) {
+		// XXX must be adjusted later when the format is known
+		SetBufferDuration((framesPerBuffer * 1000000LL) / 44100);
+	} else {
+		SetBufferDuration((framesPerBuffer * 1000000LL) / fOutput.format.u.raw_audio.frame_rate);
+	}
 
 	// Set up the buffer group for our connection, as long as nobody handed us a
 	// buffer group (via SetBufferGroup()) prior to this.  That can happen, for example,
 	// if the consumer calls SetOutputBuffersFor() on us from within its Connected()
 	// method.
-	if (!fBufferGroup) AllocateBuffers();
+	if (!fBufferGroup)
+		AllocateBuffers();
 }
 
 
@@ -1101,19 +1120,19 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 void 
 AudioMixer::LateNoticeReceived(const media_source &what, bigtime_t how_much, bigtime_t performance_time)
 {
-
 	// We've produced some late buffers... Increase Latency 
 	// is the only runmode in which we can do anything about this
+
+	printf("AudioMixer::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
 	
-	if (what == fOutput.source)
-		if (RunMode() == B_INCREASE_LATENCY)
-		{
+	if (what == fOutput.source) {
+		if (RunMode() == B_INCREASE_LATENCY) {
 			fInternalLatency += how_much;
+			
+			printf("AudioMixer: increasing internal latency to %Ld usec\n", fInternalLatency);
 			SetEventLatency(fLatency + fInternalLatency);
 		}
-		
-	printf("Late notice received. Buffer was %d usecs late\n", how_much);
-
+	}
 }
 
 
@@ -1172,91 +1191,42 @@ AudioMixer::NodeRegistered()
 
 
 void 
-AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, 
-								bool realTimeEvent = false)
+AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness, bool realTimeEvent)
 {
-
 	switch (event->type)
 	{
 	
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 		{
+			HandleInputBuffer((BBuffer *)event->pointer);
+			((BBuffer *)event->pointer)->Recycle();
+			break;
+		}
 
-			// check output
-			if (fOutput.destination != media_destination::null && fOutputEnabled) // this is in the wrong order too
-			{
-					
-				BBuffer *outbuffer = fBufferGroup->RequestBuffer(fOutput.format.u.raw_audio.buffer_size, BufferDuration());
-				
-				if (outbuffer)
-				{
+		case SEND_NEW_BUFFER_EVENT:
+		{
 
-					FillMixBuffer(outbuffer->Data(), outbuffer->SizeAvailable());
-					
-					media_header *outheader = outbuffer->Header();
-					outheader->type = B_MEDIA_RAW_AUDIO;
-					outheader->size_used = fOutput.format.u.raw_audio.buffer_size;
-					outheader->time_source = TimeSource()->ID();
-					
-					// if this is the first buffer, mark with the start time
-					// we need this to calculate the other buffer times
-					
-					if (fStartTime == 0) {
-						fStartTime = event->event_time;
-						fNextEventTime = fStartTime;
-					}
-
-					bigtime_t stamp;
-					if (RunMode() == B_RECORDING)
-						stamp = event->event_time; // this is actually the same as the other modes, since we're using 
-					else							// a timedevent queue and adding events at fNextEventTime
-					{
-						
-						// we're in a live performance mode
-						// use the start time we calculate at the end of the the mix loop
-						// this time is based on the offset of all media produced so far, 
-						// plus fStartTime, which is the recorded time of our first event
-
-						stamp = fNextEventTime;
-
-					}
-								
-					outheader->start_time = stamp;
-
-					status_t err = SendBuffer(outbuffer, fOutput.destination);
-												
-					if(err != B_OK)
-					{
-						outbuffer->Recycle();
-						printf("Could not send buffer to output : %s\n", fOutput.name);
-					}
-						
-					}
-				
-				else
-					printf("Failed to allocate a buffer\n");
-					
-				// even if we didn't get a buffer allocated, we still need to send the next event
-				
-				size_t sample_size = fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
-	
-				int framesperbuffer = (fOutput.format.u.raw_audio.buffer_size / (sample_size * fOutput.format.u.raw_audio.channel_count));
-					
-				fFramesSent += (framesperbuffer);
-					
-				// calculate the start time for the next event
-					
-				fNextEventTime = bigtime_t(fStartTime + double(fFramesSent / fOutput.format.u.raw_audio.frame_rate) * 1000000.0);
-					
-				media_timed_event nextBufferEvent(fNextEventTime, BTimedEventQueue::B_HANDLE_BUFFER);
-				EventQueue()->AddEvent(nextBufferEvent);
-
-			}
-
-		
-		break;
+			if (fOutputEnabled && fOutput.destination != media_destination::null)
+				SendNewBuffer(event->event_time);
 			
-		}	
+			// if this is the first buffer, mark with the start time
+			// we need this to calculate the other buffer times
+			if (fStartTime == 0) {
+				fStartTime = event->event_time;
+			}
+			
+			// count frames that have been played
+			size_t sample_size = fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
+			int framesperbuffer = (fOutput.format.u.raw_audio.buffer_size / (sample_size * fOutput.format.u.raw_audio.channel_count));
+
+			fFramesSent += framesperbuffer;
+			
+			// calculate the start time for the next event and add the event
+			bigtime_t nextevent = bigtime_t(fStartTime + double(fFramesSent / fOutput.format.u.raw_audio.frame_rate) * 1000000.0);
+			media_timed_event nextBufferEvent(nextevent, SEND_NEW_BUFFER_EVENT);
+			EventQueue()->AddEvent(nextBufferEvent);
+			break;
+		}
 		
 		case BTimedEventQueue::B_START:
 
@@ -1269,7 +1239,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 				
 				//fThread = spawn_thread(_mix_thread_, "audio mixer thread", B_REAL_TIME_PRIORITY, this);
 				
-				media_timed_event firstBufferEvent(event->event_time, BTimedEventQueue::B_HANDLE_BUFFER);
+				media_timed_event firstBufferEvent(event->event_time, SEND_NEW_BUFFER_EVENT);
 
 				// Alternatively, we could call HandleEvent() directly with this event, to avoid a trip through
 				// the event queue, like this:
@@ -1289,6 +1259,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 			// stopped - don't process any more buffers, flush all buffers from eventqueue
 
 			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, BTimedEventQueue::B_HANDLE_BUFFER);
+			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true, SEND_NEW_BUFFER_EVENT);
 			break;
 		}
 
@@ -1344,9 +1315,14 @@ AudioMixer::AllocateBuffers()
 	// allocate enough buffers to span our downstream latency, plus one
 	size_t size = fOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32((fLatency / (BufferDuration() + 1)) + 1);
-
-	fBufferGroup = new BBufferGroup(size, count);
 	
+	if (count < 2) {
+		printf("AudioMixer: calculated only %ld buffers, that's not enough\n", count);
+		count = 2;
+	}
+	
+	printf("AudioMixer: allocating %ld buffers\n", count);
+	fBufferGroup = new BBufferGroup(size, count);
 }
 
 // use this later for separate threads

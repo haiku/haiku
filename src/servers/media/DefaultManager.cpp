@@ -13,6 +13,9 @@
 /* no locking used in this file, we assume that the caller (NodeManager) does it.
  */
 
+
+#define MAX_NODE_INFOS 10
+
 DefaultManager::DefaultManager()
  :	fMixerConnected(false),
  	fPhysicalVideoOut(-1),
@@ -230,14 +233,14 @@ DefaultManager::FindPhysicalVideoIn()
 void
 DefaultManager::FindPhysicalAudioOut()
 {
-	live_node_info info[2];
+	live_node_info info[MAX_NODE_INFOS];
 	media_format input; /* a physical audio output has a logical data input */
 	int32 count;
 	status_t rv;
 
 	memset(&input, 0, sizeof(input));
 	input.type = B_MEDIA_RAW_AUDIO;
-	count = 2;
+	count = MAX_NODE_INFOS;
 	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
 	if (rv != B_OK || count < 1) {
 		printf("Couldn't find physical audio output node\n");
@@ -249,7 +252,7 @@ DefaultManager::FindPhysicalAudioOut()
 	for (int i = 0; i < count; i++) {
 		if (0 == strcmp(info[i].name, "None Out")) // skip the Null audio driver
 			continue;
-		printf("Default physical audio output created!\n");
+		printf("Default physical audio output \"%s\" created!\n", info[i].name);
 		fPhysicalAudioOut = info[i].node.node;
 		return;
 	}
@@ -258,14 +261,14 @@ DefaultManager::FindPhysicalAudioOut()
 void
 DefaultManager::FindPhysicalAudioIn()
 {
-	live_node_info info[2];
+	live_node_info info[MAX_NODE_INFOS];
 	media_format output; /* a physical audio input has a logical data output */
 	int32 count;
 	status_t rv;
 
 	memset(&output, 0, sizeof(output));
 	output.type = B_MEDIA_RAW_AUDIO;
-	count = 2;
+	count = MAX_NODE_INFOS;
 	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 	if (rv != B_OK || count < 1) {
 		printf("Couldn't find physical audio input node\n");
@@ -277,7 +280,7 @@ DefaultManager::FindPhysicalAudioIn()
 	for (int i = 0; i < count; i++) {
 		if (0 == strcmp(info[i].name, "None In")) // skip the Null audio driver
 			continue;
-		printf("Default physical audio input created!\n");
+		printf("Default physical audio input \"%s\" created!\n", info[i].name);
 		fPhysicalAudioIn = info[i].node.node;
 		return;
 	}
@@ -286,26 +289,54 @@ DefaultManager::FindPhysicalAudioIn()
 void
 DefaultManager::FindTimeSource()
 {
-	live_node_info info;
+	live_node_info info[MAX_NODE_INFOS];
 	media_format input; /* a physical audio output has a logical data input (DAC)*/
 	int32 count;
 	status_t rv;
 	
-	/* We try to use the default physical audio out node,
-	 * as it most likely is a timesource.
-	 * XXX if that fails, we might use other audio or video clock timesources
+	/* First try to use the current default physical audio out
 	 */
-
+	if (fPhysicalAudioOut != -1) {
+		media_node clone;
+		if (B_OK == BMediaRoster::Roster()->GetNodeFor(fPhysicalAudioOut, &clone)) {
+			if (clone.kind & B_TIME_SOURCE) {
+				fTimeSource = clone.node;
+				BMediaRoster::Roster()->ReleaseNode(clone);
+				printf("Default DAC timesource created!\n");
+				return;
+			}
+			BMediaRoster::Roster()->ReleaseNode(clone);
+		} else {
+			printf("Default DAC is not a timesource!\n");
+		}
+	} else {
+		printf("Default DAC node does not exist!\n");
+	}
+	
+	/* Now try to find another physical audio out node
+	 */
 	memset(&input, 0, sizeof(input));
 	input.type = B_MEDIA_RAW_AUDIO;
-	count = 1;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, &input, NULL, NULL, B_TIME_SOURCE | B_PHYSICAL_OUTPUT);
-	if (rv != B_OK || count != 1) {
+	count = MAX_NODE_INFOS;
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, &input, NULL, NULL, B_TIME_SOURCE | B_PHYSICAL_OUTPUT);
+	if (rv == B_OK && count >= 1) {
+		for (int i = 0; i < count; i++)
+			printf("info[%d].name %s\n", i, info[i].name);
+	
+		for (int i = 0; i < count; i++) {
+			// The BeOS R5 None Out node pretend to be a physical time source, that is pretty dumb
+			if (0 == strcmp(info[i].name, "None Out")) // skip the Null audio driver
+				continue;
+			printf("Default DAC timesource \"%s\" created!\n", info[i].name);
+			fTimeSource = info[i].node.node;
+			return;
+		}
+	} else {
 		printf("Couldn't find DAC timesource node\n");
-		return;
-	}
-	fTimeSource = info.node.node;
-	printf("Default DAC timesource created!\n");
+	}	
+	
+	/* XXX we might use other audio or video clock timesources
+	 */
 }
 
 void
@@ -334,6 +365,8 @@ DefaultManager::ConnectMixerToOutput()
 	media_node 			soundcard;
 	media_input 		input;
 	media_output 		output;
+	media_input 		newinput;
+	media_output 		newoutput;
 	media_format 		format;
 	BTimeSource * 		ts;
 	bigtime_t 			start_at;
@@ -372,20 +405,58 @@ DefaultManager::ConnectMixerToOutput()
 		rv = B_ERROR;
 		goto finish;
 	}
-
-	memset(&format, 0, sizeof(format));
-	format.type = B_MEDIA_RAW_AUDIO;
-	format.u.raw_audio.frame_rate = 44100;
-	format.u.raw_audio.channel_count = 2;
-	format.u.raw_audio.format = 0x2;
-
-	//roster->GetFormatFor(input, &format);
-
-	rv = roster->Connect(output.source, input.destination, &format, &output, &input);
-	if (rv != B_OK) {
-		printf("DefaultManager: connect failed\n");
-	}
 	
+	for (int i = 0; i < 5; i++) {
+		switch (i) {
+			case 0:
+				printf("DefaultManager: Trying connect in native format\n");
+				if (B_OK != roster->GetFormatFor(input, &format)) {
+					FATAL("DefaultManager: GetFormatFor failed\n");
+					continue;
+				}
+				break;
+			
+			case 1:
+				printf("DefaultManager: Trying connect in format 1\n");
+				memset(&format, 0, sizeof(format));
+				format.type = B_MEDIA_RAW_AUDIO;
+				format.u.raw_audio.frame_rate = 44100;
+				format.u.raw_audio.channel_count = 2;
+				format.u.raw_audio.format = 0x2;
+				break;
+
+			case 2:
+				printf("DefaultManager: Trying connect in format 2\n");
+				memset(&format, 0, sizeof(format));
+				format.type = B_MEDIA_RAW_AUDIO;
+				format.u.raw_audio.frame_rate = 48000;
+				format.u.raw_audio.channel_count = 2;
+				format.u.raw_audio.format = 0x2;
+				break;
+
+			case 3:
+				printf("DefaultManager: Trying connect in format 3\n");
+				memset(&format, 0, sizeof(format));
+				format.type = B_MEDIA_RAW_AUDIO;
+				break;
+
+			case 4:
+				printf("DefaultManager: Trying connect in format 4\n");
+				memset(&format, 0, sizeof(format));
+				break;
+		}
+		rv = roster->Connect(output.source, input.destination, &format, &newoutput, &newinput);
+		if (rv == B_OK)
+			break;
+	}
+	if (rv != B_OK) {
+		FATAL("DefaultManager: connect failed\n");
+		goto finish;
+	}
+
+	roster->SetRunModeNode(mixer, BMediaNode::B_INCREASE_LATENCY);
+	roster->SetRunModeNode(soundcard, BMediaNode::B_RECORDING);
+
 	roster->GetTimeSource(&timesource);
 	roster->SetTimeSourceFor(mixer.node, timesource.node);
 	roster->SetTimeSourceFor(soundcard.node, timesource.node);

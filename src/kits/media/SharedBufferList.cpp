@@ -269,6 +269,7 @@ _shared_buffer_list::RecycleBuffer(BBuffer *buffer)
 			reclaimed_count++;
 			if (info[i].reclaimed) {
 				FATAL("_shared_buffer_list: Error, BBuffer %p, id = %ld already reclaimed\n", buffer, id);
+				DEBUG_ONLY(debugger("buffer already reclaimed"));
 				continue;
 			}
 			info[i].reclaimed = true;

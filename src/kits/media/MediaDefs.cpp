@@ -176,9 +176,9 @@ media_multistream_format media_multistream_format::wildcard = {0};
  *************************************************************/
 
 bool
-media_format::Matches(const media_format *otherFormat) const
+media_format::Matches(const media_format *other) const
 {
-	return format_is_compatible(*this, *otherFormat);
+	return type == other->type; // XXX fixthis
 }
 
 
@@ -412,10 +412,7 @@ bool operator==(const media_format & a, const media_format & b)
 /* return true if a and b are compatible (accounting for wildcards) */
 bool format_is_compatible(const media_format & a, const media_format & b)	/* a is the format you want to feed to something accepting b */
 {
-	UNIMPLEMENTED();
-	if (a.type == b.type)
-		return true;
-	return false;
+	return a.Matches(&b);
 }
 
 bool string_for_format(const media_format & f, char * buf, size_t size)
