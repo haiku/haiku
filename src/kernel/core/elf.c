@@ -1070,18 +1070,18 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 		char *regionAddress;
 		region_id id;
 
-		sprintf(regionName, "%s_seg%d", baseName, i);
-
 		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
 		if (pheaders[i].p_flags & PF_WRITE) {
 			/*
-			 * rw segment
+			 * rw/data segment
 			 */
 			uint32 memUpperBound = (pheaders[i].p_vaddr % PAGE_SIZE) + pheaders[i].p_memsz;
 			uint32 fileUpperBound = (pheaders[i].p_vaddr % PAGE_SIZE) + pheaders[i].p_filesz;
 
 			memUpperBound = ROUNDUP(memUpperBound, PAGE_SIZE);
 			fileUpperBound = ROUNDUP(fileUpperBound, PAGE_SIZE);
+
+			sprintf(regionName, "%s_seg%ldrw", baseName, i);
 
 			id = vm_map_file(p->_aspace_id, regionName,
 				(void **)&regionAddress,
@@ -1113,7 +1113,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			if (memUpperBound != fileUpperBound) {
 				size_t bss_size = memUpperBound - fileUpperBound;
 
-				sprintf(regionName, "%s_bss%d", baseName, 'X');
+				sprintf(regionName, "%s_bss%d", baseName, i);
 
 				regionAddress += fileUpperBound;
 				id = create_area_etc(p, regionName, (void **)&regionAddress,
@@ -1126,8 +1126,10 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			}
 		} else {
 			/*
-			 * assume rx segment
+			 * assume ro/text segment
 			 */
+			sprintf(regionName, "%s_seg%ldro", baseName, i);
+
 			id = vm_map_file(p->_aspace_id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
@@ -1270,7 +1272,7 @@ load_kernel_add_on(const char *path)
 			rw_segment_handled = true;
 			image_region = 1;
 			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
-			sprintf(region_name, "%s_rw", path);
+			sprintf(region_name, "%s_data", path);
 		} else if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_EXECUTE)) {
 			// this is the non-writable segment
 			if (ro_segment_handled) {
@@ -1284,7 +1286,7 @@ load_kernel_add_on(const char *path)
 				// so it has to be writeable at this point;
 				// ToDo: we should change the area protection later.
 
-			sprintf(region_name, "%s_ro", path);
+			sprintf(region_name, "%s_text", path);
 		} else {
 			dprintf("weird program header flags 0x%lx\n", pheaders[i].p_flags);
 			continue;
