@@ -15,7 +15,7 @@
 
 PPPDevice::PPPDevice(const char *name, PPPInterface& interface,
 		driver_parameter *settings)
-	: fInterface(interface), fSettings(settings), fMTU(1500)
+	: fMTU(1500), fIsUp(false), fInterface(interface), fSettings(settings)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);

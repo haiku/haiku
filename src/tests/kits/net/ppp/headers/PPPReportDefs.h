@@ -18,7 +18,6 @@
 
 // report flags
 enum PPP_REPORT_FLAGS {
-	PPP_NO_REPORT_FLAGS = 0,
 	PPP_WAIT_FOR_REPLY = 0x1,
 	PPP_REMOVE_AFTER_REPORT = 0x2,
 	PPP_NO_REPLY_TIMEOUT = 0x4
@@ -27,8 +26,11 @@ enum PPP_REPORT_FLAGS {
 // report types
 // the first 16 report types are reserved for the interface manager
 enum PPP_REPORT_TYPE {
+	PPP_ALL_REPORTS = -1,
+		// used only when disabling reports
 	PPP_DESTRUCTION_REPORT = 16,
 		// the interface is being destroyed (no code is needed)
+		// this report is sent even if it was not requested
 	PPP_CONNECTION_REPORT = 17
 };
 
@@ -52,6 +54,13 @@ typedef struct ppp_report_packet {
 	uint8 length;
 	char data[PPP_REPORT_DATA_LIMIT];
 } ppp_report_packet;
+
+
+typedef struct ppp_report_request {
+	PPP_REPORT_TYPE type;
+	thread_id thread;
+	int32 flags;
+} ppp_report_request;
 
 
 #endif

@@ -10,7 +10,8 @@
 
 #include <OS.h>
 
-#include <KPPPReportDefs.h>
+#include <KPPPDefs.h>
+#include <PPPReportDefs.h>
 
 #include <List.h>
 
@@ -23,7 +24,7 @@ class PPPReportManager {
 		~PPPReportManager();
 		
 		void EnableReports(PPP_REPORT_TYPE type, thread_id thread,
-				int32 flags = PPP_NO_REPORT_FLAGS);
+				int32 flags = PPP_NO_FLAGS);
 		void DisableReports(PPP_REPORT_TYPE type, thread_id thread);
 		bool DoesReport(PPP_REPORT_TYPE type, thread_id thread);
 		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length);

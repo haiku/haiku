@@ -8,11 +8,7 @@
 #ifndef _K_PPP_ENCAPSULATOR__H
 #define _K_PPP_ENCAPSULATOR__H
 
-#include <driver_settings.h>
-
 #include <KPPPDefs.h>
-
-class PPPInterface;
 
 #ifndef _K_PPP_INTERFACE__H
 #include <KPPPInterface.h>

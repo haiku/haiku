@@ -8,7 +8,7 @@
 #ifndef _PPP_DEFS__H
 #define _PPP_DEFS__H
 
-#include <Errors.h>
+#include <SupportDefs.h>
 
 
 // various constants

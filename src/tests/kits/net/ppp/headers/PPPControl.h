@@ -22,7 +22,6 @@
 #define PPP_OPTION_HANDLER_OPS_START		PPP_OPS_START + 5 * PPP_RESERVE_OPS_COUNT
 #define PPP_LCP_EXTENSION_OPS_START			PPP_OPS_START + 6 * PPP_RESERVE_OPS_COUNT
 #define PPP_COMMON_OPS_START				PPP_OPS_START + 10 * PPP_RESERVE_OPS_COUNT
-#define PPP_COMMON_PROTO_ENCAPS_OPS_START	PPP_OPS_START + 11 * PPP_RESERVE_OPS_COUNT
 #define PPP_USER_OPS_START					PPP_OPS_START + 32 * PPP_RESERVE_OPS_COUNT
 
 
@@ -33,6 +32,11 @@ enum PPP_CONTROL_OPS {
 	PPPC_SET_MRU,
 	PPPC_SET_DIAL_ON_DEMAND,
 	PPPC_SET_AUTO_REDIAL,
+	
+	// these control ops use the ppp_report_request structure
+	PPPC_ENABLE_INTERFACE_REPORTS,
+	PPPC_DISABLE_INTERFACE_REPORTS,
+		// flags are not used for this control op
 	
 	// handler access
 	PPPC_CONTROL_DEVICE,
@@ -50,30 +54,12 @@ enum PPP_CONTROL_OPS {
 	// -----------------------------------------------------
 	
 	// -----------------------------------------------------
-	// PPPProtocol
-	// -----------------------------------------------------
-	
-	// -----------------------------------------------------
-	// PPPEncapsulator
-	// -----------------------------------------------------
-	
-	// -----------------------------------------------------
-	// PPPOptionHandler
-	PPPC_GET_OPTION_HANDLER_INFO = PPP_OPTION_HANDLER_OPS_START,
-	// -----------------------------------------------------
-	
-	// -----------------------------------------------------
-	// PPPLCPExtension
-	// -----------------------------------------------------
-	
-	// -----------------------------------------------------
 	// Common/mixed ops
 	PPPC_GET_HANDLER_INFO = PPP_COMMON_OPS_START,
+		// PPPProtocol and PPPEncapsulator
 	PPPC_SET_ENABLED,
-	// -----------------------------------------------------
-	
-	// -----------------------------------------------------
-	// PPPProtocol and PPPEncapsulator
+	PPPC_GET_SIMPLE_HANDLER_INFO,
+		// PPPOptionHandler and PPPLCPExtension
 	// -----------------------------------------------------
 	
 	PPP_CONTROL_OPS_END = B_DEVICE_OP_CODES_END + 0xFFFF
@@ -166,17 +152,19 @@ typedef struct ppp_handler_info_t {
 } ppp_handler_info_t;
 
 
-typedef struct ppp_option_handler_info {
+typedef struct ppp_simple_handler_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
 	const driver_parameter *settings;
-	
 	bool isEnabled;
-} ppp_option_handler_info;
-typedef struct ppp_option_handler_info_t {
-	ppp_option_handler_info info;
-	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_option_handler_info)];
-} ppp_option_handler_info_t;
+	
+	uint8 code;
+		// only PPPLCPExtension
+} ppp_simple_handler_info;
+typedef struct ppp_simple_handler_info_t {
+	ppp_simple_handler_info info;
+	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_simple_handler_info)];
+} ppp_simple_handler_info_t;
 
 
 #endif

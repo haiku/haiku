@@ -11,6 +11,7 @@
 #include <KPPPConfigurePacket.h>
 #include <KPPPDevice.h>
 #include <KPPPEncapsulator.h>
+#include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 
 #include <net/if.h>
@@ -701,16 +702,19 @@ PPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
 			IllegalEvent(PPP_RCR_GOOD_EVENT);
+			m_freem(packet);
 		break;
 		
 		case PPP_CLOSED_STATE:
 			locker.UnlockNow();
-			SendTerminateAck(packet);
+			SendTerminateAck();
+			m_freem(packet);
 		break;
 		
 		case PPP_STOPPED_STATE:
 			// irc,scr,sca/8
 			// XXX: should we do nothing and wait for DownEvent()?
+			m_freem(packet);
 		break;
 		
 		case PPP_REQ_SENT_STATE:
@@ -740,7 +744,7 @@ PPPStateMachine::RCRGoodEvent(struct mbuf *packet)
 		break;
 		
 		default:
-			;
+			m_freem(packet);
 	}
 }
 
@@ -759,7 +763,7 @@ PPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 		
 		case PPP_CLOSED_STATE:
 			locker.UnlockNow();
-			SendTerminateAck(NULL);
+			SendTerminateAck();
 		break;
 		
 		case PPP_STOPPED_STATE:
@@ -787,11 +791,17 @@ PPPStateMachine::RCRBadEvent(struct mbuf *nak, struct mbuf *reject)
 				SendConfigureNak(nak);
 			else if(reject && ntohs(mtod(reject, ppp_lcp_packet*)->length) > 3)
 				SendConfigureNak(reject);
-		break;
+		return;
+			// prevents the nak/reject from being m_freem()'d
 		
 		default:
 			;
 	}
+	
+	if(nak)
+		m_freem(nak);
+	if(reject)
+		m_freem(reject);
 }
 
 
@@ -806,12 +816,13 @@ PPPStateMachine::RCAEvent(struct mbuf *packet)
 		
 		// TODO:
 		// log this event
+		m_freem(packet);
 		return;
 	}
 	
-	PPPOptionHandler *handler;
+	// let the option handlers parse this ack
 	PPPConfigurePacket ack(packet);
-	
+	PPPOptionHandler *handler;
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
 		handler = LCP().OptionHandlerAt(index);
 		handler->ParseAck(&ack);
@@ -826,7 +837,7 @@ PPPStateMachine::RCAEvent(struct mbuf *packet)
 		case PPP_CLOSED_STATE:
 		case PPP_STOPPED_STATE:
 			locker.UnlockNow();
-			SendTerminateAck(NULL);
+			SendTerminateAck();
 		break;
 		
 		case PPP_REQ_SENT_STATE:
@@ -859,6 +870,8 @@ PPPStateMachine::RCAEvent(struct mbuf *packet)
 		default:
 			;
 	}
+	
+	m_freem(packet);
 }
 
 
@@ -873,12 +886,13 @@ PPPStateMachine::RCNEvent(struct mbuf *packet)
 		
 		// TODO:
 		// log this event
+		m_freem(packet);
 		return;
 	}
 	
-	PPPOptionHandler *handler;
+	// let the option handlers parse this nak/reject
 	PPPConfigurePacket nak_reject(packet);
-	
+	PPPOptionHandler *handler;
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++) {
 		handler = LCP().OptionHandlerAt(index);
 		
@@ -897,7 +911,7 @@ PPPStateMachine::RCNEvent(struct mbuf *packet)
 		case PPP_CLOSED_STATE:
 		case PPP_STOPPED_STATE:
 			locker.UnlockNow();
-			SendTerminateAck(packet);
+			SendTerminateAck();
 		break;
 		
 		case PPP_REQ_SENT_STATE:
@@ -923,6 +937,8 @@ PPPStateMachine::RCNEvent(struct mbuf *packet)
 		default:
 			;
 	}
+	
+	m_freem(packet);
 }
 
 
@@ -943,6 +959,7 @@ PPPStateMachine::RTREvent(struct mbuf *packet)
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
 			IllegalEvent(PPP_RTR_EVENT);
+			m_freem(packet);
 		break;
 		
 		case PPP_ACK_RCVD_STATE:
@@ -984,6 +1001,7 @@ PPPStateMachine::RTAEvent(struct mbuf *packet)
 		
 		// TODO:
 		// log this event
+		m_freem(packet);
 		return;
 	}
 	
@@ -1019,12 +1037,15 @@ PPPStateMachine::RTAEvent(struct mbuf *packet)
 		default:
 			;
 	}
+	
+	m_freem(packet);
 }
 
 
 // receive unknown code
 void
-PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocol, uint8 type = PPP_PROTOCOL_REJECT)
+PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocol,
+	uint8 code = PPP_PROTOCOL_REJECT)
 {
 	LockerHelper locker(fLock);
 	
@@ -1032,11 +1053,12 @@ PPPStateMachine::RUCEvent(struct mbuf *packet, uint16 protocol, uint8 type = PPP
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
 			IllegalEvent(PPP_RUC_EVENT);
+			m_freem(packet);
 		break;
 		
 		default:
 			locker.UnlockNow();
-			SendCodeReject(packet, protocol, type);
+			SendCodeReject(packet, protocol, code);
 	}
 }
 
@@ -1102,6 +1124,8 @@ PPPStateMachine::RXJBadEvent(struct mbuf *packet)
 			SendTerminateRequest();
 		break;
 	}
+	
+	m_freem(packet);
 }
 
 
@@ -1120,11 +1144,13 @@ PPPStateMachine::RXREvent(struct mbuf *packet)
 		case PPP_OPENED_STATE:
 			if(echo->code == PPP_ECHO_REQUEST)
 				SendEchoReply(packet);
-		break;
+		return;
 		
 		default:
 			;
 	}
+	
+	m_freem(packet);
 }
 
 
@@ -1199,6 +1225,7 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 			else if(error == B_ERROR) {
 				// the request contains a value that has been sent more than
 				// once or the value is corrupted
+				m_freem(packet);
 				CloseEvent();
 				return;
 			} else if(error == B_OK)
@@ -1226,14 +1253,34 @@ PPPStateMachine::RCREvent(struct mbuf *packet)
 void
 PPPStateMachine::RXJEvent(struct mbuf *packet)
 {
-	ppp_lcp_packet *reject mtod(packet, ppp_lcp_packet*);
+	ppp_lcp_packet *reject = mtod(packet, ppp_lcp_packet*);
 	
 	if(reject->code == PPP_CODE_REJECT) {
-		// we only have basic codes, so there must be something wrong
-		if(Interface()->IsMultilink() && !Interface()->Parent())
-			CloseEvent();
-		else
-			RXJBadEvent(packet);
+		uint8 rejectedCode = reject->data[0];
+		
+		// test if the rejected code belongs to the minimum LCP requirements
+		if(rejectedCode >= PPP_MIN_LCP_CODE && rejectedCode <= PPP_MAX_LCP_CODE) {
+			if(Interface()->IsMultilink() && !Interface()->Parent()) {
+				// Main interfaces do not have states between STARTING and OPENED.
+				// An RXJBadEvent() would enter one of those states which is bad.
+				m_freem(packet);
+				CloseEvent();
+			} else
+				RXJBadEvent(packet);
+			
+			return;
+		}
+		
+		// find the LCP extension and disable it
+		PPPLCPExtension *extension;
+		for(int32 index = 0; index < LCP().CountLCPExtensions(); index++) {
+			extension = LCP().LCPExtensionAt(index);
+			
+			if(extension->Code() == rejectedCode)
+				extension->SetEnabled(false);
+		}
+		
+		m_freem(packet);
 	} else if(reject->code == PPP_PROTOCOL_REJECT) {
 		// disable all handlers for rejected protocol type
 		uint16 rejected = *((uint16*) reject->data);
@@ -1245,6 +1292,7 @@ PPPStateMachine::RXJEvent(struct mbuf *packet)
 			return;
 		}
 		
+		// disable protocols and encapsulators with the rejected protocl number
 		int32 index;
 		PPPProtocol *protocol_handler;
 		PPPEncapsulator *encapsulator_handler = Interface()->FirstEncapsulator();
@@ -1264,10 +1312,13 @@ PPPStateMachine::RXJEvent(struct mbuf *packet)
 		}
 		
 		RXJGoodEvent(packet);
+			// this event handler does not m_freem(packet)!!!
 		
 		// notify parent, too
 		if(Interface()->Parent())
 			Interface()->Parent()->StateMachine().RXJEvent(packet);
+		else
+			m_freem(packet);
 	}
 }
 
@@ -1374,9 +1425,13 @@ PPPStateMachine::SendConfigureRequest()
 void
 PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 {
+	if(!packet)
+		return;
+	
 	mtod(packet, ppp_lcp_packet*)->code = PPP_CONFIGURE_ACK;
 	PPPConfigurePacket ack(packet);
 	
+	// notify all option handlers that we are sending an ack for each value
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++)
 		LCP().OptionHandlerAt(index)->SendingAck(&ack);
 	
@@ -1387,6 +1442,9 @@ PPPStateMachine::SendConfigureAck(struct mbuf *packet)
 void
 PPPStateMachine::SendConfigureNak(struct mbuf *packet)
 {
+	if(!packet)
+		return;
+	
 	ppp_lcp_packet *nak = mtod(packet, ppp_lcp_packet*);
 	if(nak->code == PPP_CONFIGURE_NAK) {
 		if(fNakCounter == 0) {
@@ -1424,7 +1482,7 @@ PPPStateMachine::SendTerminateRequest()
 
 
 void
-PPPStateMachine::SendTerminateAck(struct mbuf *request)
+PPPStateMachine::SendTerminateAck(struct mbuf *request = NULL)
 {
 	struct mbuf *reply = request;
 	
@@ -1440,25 +1498,31 @@ PPPStateMachine::SendTerminateAck(struct mbuf *request)
 		
 		ack = mtod(reply, ppp_lcp_packet*);
 		ack->id = NextID();
-		ack->length = 4;
 	}
 	
 	ack = mtod(reply, ppp_lcp_packet*);
 	ack->code = PPP_TERMINATE_ACK;
+	ack->length = 4;
 	
 	LCP().Send(reply);
 }
 
 
 void
-PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type)
+PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code)
 {
+	if(!packet)
+		return;
+	
 	int32 length;
 		// additional space needed for this reject
-	if(type == PPP_PROTOCOL_REJECT)
+	if(code == PPP_PROTOCOL_REJECT)
 		length = 6;
 	else
 		length = 4;
+	
+	M_PREPEND(packet, length);
+		// add some space for the header
 	
 	int32 adjust = 0;
 		// adjust packet size by this value if packet is too big
@@ -1472,7 +1536,7 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type
 		m_adj(packet, adjust);
 	
 	ppp_lcp_packet *reject = mtod(packet, ppp_lcp_packet*);
-	reject->code = type;
+	reject->code = code;
 	reject->id = NextID();
 	if(packet->m_flags & M_PKTHDR)
 		reject->length = htons(packet->m_pkthdr.len);
@@ -1480,7 +1544,7 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type
 		reject->length = htons(packet->m_len);
 	
 	protocol = htons(protocol);
-	if(type == PPP_PROTOCOL_REJECT)
+	if(code == PPP_PROTOCOL_REJECT)
 		memcpy(&reject->data, &protocol, sizeof(protocol));
 	
 	LCP().Send(packet);
@@ -1490,6 +1554,9 @@ PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type
 void
 PPPStateMachine::SendEchoReply(struct mbuf *request)
 {
+	if(!request)
+		return;
+	
 	ppp_lcp_packet *reply = mtod(request, ppp_lcp_packet*);
 	reply->code = PPP_ECHO_REPLY;
 		// the request becomes a reply
@@ -1589,4 +1656,7 @@ PPPStateMachine::ResetOptionHandlers()
 {
 	for(int32 index = 0; index < LCP().CountOptionHandlers(); index++)
 		LCP().OptionHandlerAt(index)->Reset();
+	
+	for(int32 index = 0; index < LCP().CountLCPExtensions(); index++)
+		LCP().LCPExtensionAt(index)->Reset();
 }

@@ -28,7 +28,7 @@ PPPReportManager::~PPPReportManager()
 
 void
 PPPReportManager::EnableReports(PPP_REPORT_TYPE type, thread_id thread,
-	int32 flags = PPP_NO_REPORT_FLAGS)
+	int32 flags = PPP_NO_FLAGS)
 {
 	LockerHelper locker(fLock);
 	
@@ -54,7 +54,7 @@ PPPReportManager::DisableReports(PPP_REPORT_TYPE type, thread_id thread)
 		if(request->thread != thread)
 			continue;
 		
-		if(request->type == type)
+		if(request->type == type || request->type == PPP_ALL_REPORTS)
 			fReportRequests.RemoveItem(request);
 	}
 }

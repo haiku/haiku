@@ -8,8 +8,6 @@
 #ifndef _K_PPP_OPTION_HANDLER__H
 #define _K_PPP_OPTION_HANDLER__H
 
-#include <driver_settings.h>
-
 #include <KPPPDefs.h>
 
 #ifndef _K_PPP_INTERFACE__H
@@ -35,7 +33,8 @@ class PPPOptionHandler {
 		driver_parameter *Settings() const
 			{ return fSettings; }
 		
-		void SetEnabled(bool enabled = true);
+		void SetEnabled(bool enabled = true)
+			{ fEnabled = enabled; }
 		bool IsEnabled() const
 			{ return fEnabled; }
 		

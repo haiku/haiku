@@ -283,6 +283,23 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 			SetAutoRedial(*((uint32*)data));
 		break;
 		
+		case PPPC_ENABLE_INTERFACE_REPORTS: {
+			if(length < sizeof(ppp_report_request) || !data)
+				return B_ERROR;
+			
+			ppp_report_request *request = (ppp_report_request*) data;
+			ReportManager().EnableReports(request->type, request->thread,
+				request->flags);
+		} break;
+		
+		case PPPC_DISABLE_INTERFACE_REPORTS: {
+			if(length < sizeof(ppp_report_request) || !data)
+				return B_ERROR;
+			
+			ppp_report_request *request = (ppp_report_request*) data;
+			ReportManager().DisableReports(request->type, request->thread);
+		} break;
+		
 		case PPPC_CONTROL_DEVICE: {
 			if(length < sizeof(ppp_control_info) || !data)
 				return B_ERROR;

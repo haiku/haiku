@@ -8,8 +8,6 @@
 #ifndef _K_PPP_DEVICE__H
 #define _K_PPP_DEVICE__H
 
-#include <driver_settings.h>
-
 #include <KPPPDefs.h>
 
 #ifndef _K_PPP_INTERFACE__H
@@ -78,14 +76,13 @@ class PPPDevice {
 		void DownEvent();
 
 	protected:
+		uint32 fMTU;
 		bool fIsUp;
 
 	private:
 		char fName[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 		PPPInterface& fInterface;
 		driver_parameter *fSettings;
-		
-		uint32 fMTU;
 };
 
 

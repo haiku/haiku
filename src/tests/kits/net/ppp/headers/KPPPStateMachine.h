@@ -11,7 +11,6 @@
 #include <KPPPDefs.h>
 
 class PPPEncapsulator;
-class PPPInterface;
 class PPPProtocol;
 
 #ifndef _K_PPP_INTERFACE__H
@@ -106,7 +105,8 @@ class PPPStateMachine {
 		void RCNEvent(struct mbuf *packet);
 		void RTREvent(struct mbuf *packet);
 		void RTAEvent(struct mbuf *packet);
-		void RUCEvent(struct mbuf *packet, uint16 protocol, uint8 type = PPP_PROTOCOL_REJECT);
+		void RUCEvent(struct mbuf *packet, uint16 protocol,
+			uint8 code = PPP_PROTOCOL_REJECT);
 		void RXJGoodEvent(struct mbuf *packet);
 		void RXJBadEvent(struct mbuf *packet);
 		void RXREvent(struct mbuf *packet);
@@ -128,8 +128,8 @@ class PPPStateMachine {
 		void SendConfigureAck(struct mbuf *packet);
 		void SendConfigureNak(struct mbuf *packet);
 		void SendTerminateRequest();
-		void SendTerminateAck(struct mbuf *request);
-		void SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 type);
+		void SendTerminateAck(struct mbuf *request = NULL);
+		void SendCodeReject(struct mbuf *packet, uint16 protocol, uint8 code);
 		void SendEchoReply(struct mbuf *request);
 		
 		void BringHandlersUp();

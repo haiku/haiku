@@ -5,14 +5,14 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include <KPPPOptionHandler.h>
+#include <KPPPLCPExtension.h>
 
 #include <PPPControl.h>
 
 
-PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface& interface,
+PPPLCPExtension::PPPLCPExtension(const char *name, uint8 code, PPPInterface& interface,
 		driver_parameter *settings)
-	: fInterface(interface), fSettings(settings), fEnabled(true)
+	: fInterface(interface), fSettings(settings), fCode(code), fEnabled(true)
 {
 	if(name) {
 		strncpy(fName, name, PPP_HANDLER_NAME_LENGTH_LIMIT);
@@ -20,18 +20,18 @@ PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface& interface,
 	} else
 		strcpy(fName, "???");
 	
-	interface.LCP().AddOptionHandler(this);
+	interface.LCP().AddLCPExtension(this);
 }
 
 
-PPPOptionHandler::~PPPOptionHandler()
+PPPLCPExtension::~PPPLCPExtension()
 {
-	Interface().LCP().RemoveOptionHandler(this);
+	Interface().LCP().RemoveLCPExtension(this);
 }
 
 
 status_t
-PPPOptionHandler::InitCheck() const
+PPPLCPExtension::InitCheck() const
 {
 	if(!Settings())
 		return B_ERROR;
@@ -41,7 +41,7 @@ PPPOptionHandler::InitCheck() const
 
 
 status_t
-PPPOptionHandler::Control(uint32 op, void *data, size_t length)
+PPPLCPExtension::Control(uint32 op, void *data, size_t length)
 {
 	switch(op) {
 		case PPPC_GET_SIMPLE_HANDLER_INFO: {
@@ -67,4 +67,18 @@ PPPOptionHandler::Control(uint32 op, void *data, size_t length)
 	}
 	
 	return B_OK;
+}
+
+
+void
+PPPLCPExtension::Reset()
+{
+	// do nothing by default
+}
+
+
+void
+PPPLCPExtension::Pulse()
+{
+	// do nothing by default
 }

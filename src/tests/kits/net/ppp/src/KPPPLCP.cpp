@@ -8,6 +8,7 @@
 #include <KPPPInterface.h>
 #include <KPPPDevice.h>
 #include <KPPPEncapsulator.h>
+#include <KPPPLCPExtension.h>
 #include <KPPPOptionHandler.h>
 
 #include <LockerHelper.h>
@@ -18,9 +19,6 @@
 
 
 #define PPP_PROTOCOL_OVERHEAD				2
-
-// TODO:
-// - add LCP extension handlers
 
 
 PPPLCP::PPPLCP(PPPInterface& interface)
@@ -79,6 +77,48 @@ PPPLCP::OptionHandlerAt(int32 index) const
 	
 	return handler;
 }
+
+
+bool
+PPPLCP::AddLCPExtension(PPPLCPExtension *extension)
+{
+	if(!extension)
+		return false;
+	
+	LockerHelper locker(StateMachine().Locker());
+	
+	if(Phase() != PPP_DOWN_PHASE)
+		return false;
+			// a running connection may not change
+	
+	return fLCPExtensions.AddItem(extension);
+}
+
+
+bool
+PPPLCP::RemoveLCPExtension(PPPLCPExtension *extension)
+{
+	LockerHelper locker(StateMachine().Locker());
+	
+	if(Phase() != PPP_DOWN_PHASE)
+		return false;
+			// a running connection may not change
+	
+	return fLCPExtensions.RemoveItem(extension);
+}
+
+
+PPPLCPExtension*
+PPPLCP::LCPExtensionAt(int32 index) const
+{
+	PPPLCPExtension *extension = fLCPExtensions.ItemAt(index);
+	
+	if(extension == fLCPExtensions.GetDefaultItem())
+		return NULL;
+	
+	return extension;
+}
+
 
 uint32
 PPPLCP::AdditionalOverhead() const
@@ -163,11 +203,28 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocol)
 		
 		case PPP_ECHO_REPLY:
 		case PPP_DISCARD_REQUEST:
+			m_freem(packet);
 			// do nothing
 		break;
 		
-		default:
-			StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
+		default: {
+			status_t result = PPP_UNHANDLED;
+			
+			// try to find LCP extensions that can handle this code
+			PPPLCPExtension *extension;
+			for(int32 index = 0; index < CountLCPExtensions(); index++) {
+				extension = LCPExtensionAt(index);
+				if(extension->IsEnabled() && extension->Code() == data->code)
+					result = extension->Receive(packet, data->code);
+			}
+			
+			if(result == PPP_UNHANDLED) {
+				StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
+				return PPP_REJECTED;
+			}
+			
+			return result;
+		}
 	}
 	
 	return B_OK;
@@ -178,4 +235,7 @@ void
 PPPLCP::Pulse()
 {
 	StateMachine().TimerEvent();
+	
+	for(int32 index = 0; index < CountLCPExtensions(); index++)
+		LCPExtensionAt(index)->Pulse();
 }

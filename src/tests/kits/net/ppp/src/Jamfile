@@ -13,6 +13,7 @@ R5KernelStaticLibrary kernelppp :
 	KPPPEncapsulator.cpp
 	KPPPInterface.cpp
 	KPPPLCP.cpp
+	KPPPLCPExtension.cpp
 	KPPPOptionHandler.cpp
 	KPPPProtocol.cpp
 	KPPPReportManager.cpp

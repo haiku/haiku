@@ -49,9 +49,9 @@ enum PPP_EVENT {
 	PPP_RXR_EVENT
 };
 
-// LCP protocol types as defined in RFC 1661
+// LCP protocol codes as defined in RFC 1661
 // ToDo: add LCP extensions
-enum PPP_LCP_TYPE {
+enum PPP_LCP_CODE {
 	PPP_CONFIGURE_REQUEST = 1,
 	PPP_CONFIGURE_ACK = 2,
 	PPP_CONFIGURE_NAK = 3,

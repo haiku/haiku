@@ -23,6 +23,7 @@
 #endif
 
 class PPPEncapsulator;
+class PPPLCPExtension;
 class PPPOptionHandler;
 
 
@@ -30,7 +31,7 @@ typedef struct ppp_lcp_packet {
 	uint8 code;
 	uint8 id;
 	uint16 length;
-	int8 data[0];
+	uint8 data[0];
 } ppp_lcp_packet;
 
 
@@ -56,6 +57,12 @@ class PPPLCP : public PPPProtocol {
 			{ return fOptionHandlers.CountItems(); }
 		PPPOptionHandler *OptionHandlerAt(int32 index) const;
 		
+		bool AddLCPExtension(PPPLCPExtension *extension);
+		bool RemoveLCPExtension(PPPLCPExtension *extension);
+		int32 CountLCPExtensions() const
+			{ return fLCPExtensions.CountItems(); }
+		PPPLCPExtension *LCPExtensionAt(int32 index) const;
+		
 		PPPEncapsulator *Target() const
 			{ return fTarget; }
 		void SetTarget(PPPEncapsulator *target)
@@ -78,6 +85,7 @@ class PPPLCP : public PPPProtocol {
 		PPPStateMachine& fStateMachine;
 		
 		List<PPPOptionHandler*> fOptionHandlers;
+		List<PPPLCPExtension*> fLCPExtensions;
 		
 		PPPEncapsulator *fTarget;
 };
