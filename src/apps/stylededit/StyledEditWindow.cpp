@@ -179,60 +179,53 @@ StyledEditWindow::InitWindow()
 	
 	//Add the "Font"-menu:
 	BMessage		*fontMessage;
-	menu= new BMenu("Font");
-	fMenuBar->AddItem(menu);
+	fFontMenu = new BMenu("Font");
+	fMenuBar->AddItem(fFontMenu);
 	
 	//"Size"-subMenu
-	subMenu=new BMenu("Size");
-	subMenu->SetRadioMode(true);
-	menu->AddItem(subMenu);
+	fFontSizeMenu=new BMenu("Size");
+	fFontSizeMenu->SetRadioMode(true);
+	fFontMenu->AddItem(fFontSizeMenu);
 	
-	subMenu->AddItem(menuItem= new BMenuItem("9", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("9", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size", 9.0);
 	
-	subMenu->AddItem(menuItem= new BMenuItem("10", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("10", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",10.0);
 	menuItem->SetMarked(true);
 	
-	subMenu->AddItem(menuItem= new BMenuItem("12", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("12", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",12.0);
-	subMenu->AddItem(menuItem= new BMenuItem("14", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("14", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",14.0);
-	subMenu->AddItem(menuItem= new BMenuItem("18", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("18", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",18.0);
 	
-	subMenu->AddItem(menuItem= new BMenuItem("24", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("24", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",24.0);
-	subMenu->AddItem(menuItem= new BMenuItem("36", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("36", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",36.0);
-	subMenu->AddItem(menuItem= new BMenuItem("48", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("48", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",48.0);
-	subMenu->AddItem(menuItem= new BMenuItem("72", fontMessage= new BMessage(FONT_SIZE)));
+	fFontSizeMenu->AddItem(menuItem= new BMenuItem("72", fontMessage= new BMessage(FONT_SIZE)));
 	fontMessage->AddFloat("size",72.0);
 	
 	//"Color"-subMenu
-	subMenu= new BMenu("Color");
-	subMenu->SetRadioMode(true);
-	menu->AddItem(subMenu);
+	fFontColorMenu= new BMenu("Color");
+	fFontColorMenu->SetRadioMode(true);
+	fFontMenu->AddItem(fFontColorMenu);
 	
 	ColorMenuItem *ColorItem; 
 	
-	subMenu->AddItem(menuItem= new BMenuItem("Black", fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour",&BLACK);
-	menuItem->SetMarked(true); 
-	subMenu->AddItem(ColorItem= new ColorMenuItem("Red", RED, fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour", &RED);
-	subMenu->AddItem(ColorItem= new ColorMenuItem("Green", GREEN, fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour", &GREEN);
-	subMenu->AddItem(ColorItem= new ColorMenuItem("Blue", BLUE, fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour", &BLUE);
-	subMenu->AddItem(ColorItem= new ColorMenuItem("Cyan", CYAN, fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour",&CYAN);
-	subMenu->AddItem(ColorItem= new ColorMenuItem("Magenta", MAGENTA, fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour", &MAGENTA);
-	subMenu->AddItem(ColorItem= new ColorMenuItem("Yellow", YELLOW, fontMessage= new BMessage(FONT_COLOR)));
-	fontMessage->AddPointer("colour", &YELLOW);
-	menu->AddSeparatorItem();
+	fFontColorMenu->AddItem(fBlackItem= new BMenuItem("Black", new BMessage(FONT_COLOR)));
+	fBlackItem->SetMarked(true); 
+	fFontColorMenu->AddItem(fRedItem= new ColorMenuItem("Red", RED, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fGreenItem= new ColorMenuItem("Green", GREEN, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fBlueItem= new ColorMenuItem("Blue", BLUE, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fCyanItem= new ColorMenuItem("Cyan", CYAN, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fMagentaItem= new ColorMenuItem("Magenta", MAGENTA, new BMessage(FONT_COLOR)));
+	fFontColorMenu->AddItem(fYellowItem= new ColorMenuItem("Yellow", YELLOW, new BMessage(FONT_COLOR)));
+	fFontMenu->AddSeparatorItem();
 
 	//Available fonts
 	font_family plain_family;
@@ -245,9 +238,10 @@ StyledEditWindow::InitWindow()
 		if ( get_font_family ( i, &localfamily ) == B_OK ) {
 			subMenu=new BMenu(localfamily);
 			subMenu->SetRadioMode(true);
-			menu->AddItem(menuItem = new BMenuItem(subMenu, new BMessage(FONT_FAMILY)));
+			fFontMenu->AddItem(menuItem = new BMenuItem(subMenu, new BMessage(FONT_FAMILY)));
 			if (!strcmp(plain_family,localfamily)) {
 				menuItem->SetMarked(true);
+				fCurrentFontItem = menuItem;
 			}
 			int32 numStyles=count_font_styles(localfamily);
 			for(int32 j = 0;j<numStyles;j++){
@@ -460,12 +454,31 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		break;
 		case FONT_COLOR:
 		{
-			void		*v; 
-			rgb_color 	*color;
+			void * ptr;
+			if (message->FindPointer("source",&ptr) == B_OK) {
+				if (ptr == fBlackItem) {
+					SetFontColor(&BLACK);
+				} else if (ptr == fRedItem) {
+					SetFontColor(&RED);
+				} else if (ptr == fGreenItem) {
+					SetFontColor(&GREEN);
+				} else if (ptr == fBlueItem) {
+					SetFontColor(&BLUE);
+				} else if (ptr == fCyanItem) {
+					SetFontColor(&CYAN);
+				} else if (ptr == fMagentaItem) {
+					SetFontColor(&MAGENTA);
+				} else if (ptr == fYellowItem) {
+					SetFontColor(&YELLOW);
+				}
+			}
 			
-			message->FindPointer("colour",&v); 
-			color= (rgb_color *) v; 
-			SetFontColor(color);
+//			void		*v; 
+//			rgb_color 	*color;
+//			
+//			message->FindPointer("colour",&v); 
+//			color= (rgb_color *) v; 
+//			SetFontColor(color);
 		}
 		break;
 /*********"Document"-menu*************/
@@ -605,8 +618,10 @@ StyledEditWindow::MessageReceived(BMessage *message)
 void
 StyledEditWindow::MenusBeginning()
 {
+	// set up the recent documents menu
 	BMessage documents;
 	be_roster->GetRecentDocuments(&documents,9,NULL,APP_SIGNATURE);
+	
 	// delete old items.. 
 	//    shatty: it would be preferable to keep the old
 	//            menu around instead of continuously thrashing
@@ -626,6 +641,56 @@ StyledEditWindow::MenusBeginning()
 		item->SetTarget(be_app);
 		fRecentMenu->AddItem(item);
 	}
+	
+	// update the font menu be/interface/GraphicsDefs.h
+	// unselect the old values
+	fCurrentFontItem->SetMarked(false);
+	BMenuItem * oldColorItem = fFontColorMenu->FindMarked();
+	if (oldColorItem != 0) {
+		oldColorItem->SetMarked(false);
+	}
+	BMenuItem * oldSizeItem = fFontSizeMenu->FindMarked();
+	if (oldSizeItem != 0) {
+		oldSizeItem->SetMarked(false);
+	}
+	// find the current font, color, size	
+	BFont font;
+	uint32 sameProperties;
+	rgb_color color = BLACK;
+	bool sameColor;
+	fTextView->GetFontAndColor(&font,&sameProperties,&color,&sameColor);
+	
+	if (sameColor && (color.alpha == 255)) {
+		if (color.red == 0) {
+			if (color.green == 0) {
+				if (color.blue == 0) {
+					fBlackItem->SetMarked(true);
+				} else if (color.blue == 255) {
+					fBlueItem->SetMarked(true);
+				}
+			} else if (color.green == 255) {
+				if (color.blue == 0) {
+					fGreenItem->SetMarked(true);
+				} else if (color.blue == 255) {
+					fCyanItem->SetMarked(true);
+				}
+			}
+		} else if (color.red == 255) {
+			if (color.green == 0) {
+				if (color.blue == 0) {
+					fRedItem->SetMarked(true);
+				} else if (color.blue == 255) {
+					fMagentaItem->SetMarked(true);
+				}
+			} else if (color.green == 255) {
+				if (color.blue == 0) {
+					fYellowItem->SetMarked(true);
+				}
+			}
+		} 
+	}
+	
+	// TODO: select current font & size
 }
 
 void
@@ -1121,7 +1186,7 @@ StyledEditWindow::SetFontSize(float fontSize)
 }/***StyledEditWindow::SetFontSize()***/
 
 void
-StyledEditWindow::SetFontColor(rgb_color *color)
+StyledEditWindow::SetFontColor(const rgb_color *color)
 {
 	uint32 sameProperties;
 	BFont font;

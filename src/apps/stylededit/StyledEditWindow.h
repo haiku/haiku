@@ -38,7 +38,7 @@ private:
 	bool			Replace(BString findthis, BString replacewith, bool casesens, bool wrap, bool backsearch);
 	void			ReplaceAll(BString find, BString replace, bool casesens);
 	void			SetFontSize(float fontSize);
-	void			SetFontColor(rgb_color *color);
+	void			SetFontColor(const rgb_color *color);
 	void			SetFontStyle(const char *fontFamily, const char *fontStyle);
 	void			RevertToSaved();
 	
@@ -46,16 +46,33 @@ private:
 	BMessage		*fPrintSettings;
 	BMessage		*fSaveMessage; 
 	BMenu			*fRecentMenu;
+	
+	BMenu			*fFontMenu;
+	BMenu			*fFontSizeMenu;
+	BMenu			*fFontColorMenu;
+	BMenuItem		*fCurrentFontItem;
+	
 	BMenuItem		*fSaveItem;
 	BMenuItem		*fRevertItem;
+	
 	BMenuItem		*fUndoItem;
 	BMenuItem		*fCutItem;
 	BMenuItem		*fCopyItem;
 	BMenuItem		*fClearItem;
+	
+	BMenuItem		*fBlackItem;
+	BMenuItem		*fRedItem;
+	BMenuItem		*fGreenItem;
+	BMenuItem		*fBlueItem;
+	BMenuItem		*fCyanItem;
+	BMenuItem		*fMagentaItem;
+	BMenuItem		*fYellowItem;
+	
 	BMenuItem		*fWrapItem;
 	BMenuItem		*fAlignLeft;
 	BMenuItem		*fAlignCenter;
 	BMenuItem		*fAlignRight;
+	
 	BString         fStringToFind;
 	BString			fReplaceString;
 	
