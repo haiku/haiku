@@ -5,7 +5,11 @@
 
 //#include <ByteOrder.h> /* for htonl */
 
+#include <sys/types.h>
 #include <net/if.h>
+
+typedef uint16 in_port_t;
+typedef uint32 in_addr_t;
 
 /* Protocol definitions - add to as required... */
 

@@ -92,10 +92,10 @@
 #ifndef _RESOLV_H_
 #define	_RESOLV_H_
 
-#include <kernel/OS.h>
+/* #include <kernel/OS.h> */
 #include <sys/param.h>
 #include <sys/types.h>
-#include "sys/socket.h"
+#include <sys/socket.h>
 #include <stdio.h>
 
 /*

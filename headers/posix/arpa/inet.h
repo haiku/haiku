@@ -7,6 +7,8 @@
 
 #include <sys/param.h>
 #include <sys/types.h>
+#include <netinet/in.h>
+#include <ByteOrder.h> /* htonl, htons, ntohl, ntohs */
 
 in_addr_t        inet_addr (const char *);
 int              inet_aton (const char *, struct in_addr *);

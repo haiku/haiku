@@ -37,7 +37,7 @@
 #ifndef _NET_RADIX_H_
 #define	_NET_RADIX_H_
 
-#include <memheap.h>
+//#include <memheap.h>
 
 /*
  * Radix search tree node layout.

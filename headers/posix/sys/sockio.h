@@ -1,29 +1,9 @@
-/* net_ioctl.h */
+#ifndef _SYS_SOCKIO_H
+#define _SYS_SOCKIO_H
 
-#ifndef SYS_NET_IOCTL_H
-#define SYS_NET_IOCTL_H
+#include <sys/ioccom.h>
 
-#define IOCPARM_MASK    0x1fff          /* parameter length, at most 13 bits */
-
-#define IOC_OUT         (unsigned long)0x40000000
-                                /* copy parameters in */
-#define IOC_IN          (unsigned long)0x80000000
-                                /* copy paramters in and out */
-#define IOC_INOUT       (IOC_IN|IOC_OUT)
-                                /* mask for IN/OUT/VOID */
-
-#define _IOC(inout,group,num,len) \
-        (inout | ((len & IOCPARM_MASK) << 16) | ((group) << 8) | (num))
-
-#define IOCGROUP(x)     (((x) >> 8) & 0xff)
-
-#define _IOR(g,n,t)	_IOC(IOC_OUT,   (g), (n), sizeof(t))
-#define _IOW(g,n,t)	_IOC(IOC_IN,    (g), (n), sizeof(t))
-#define _IOWR(g,n,t)	_IOC(IOC_INOUT, (g), (n), sizeof(t))
-
-#define FIONBIO		_IOW('f', 126, int)		/* set/clear non-blocking i/o */
-#define FIONREAD	_IOR('f', 127, int)		/* get # bytes to read */
-
+/* Socket ioctl's. */ 
 #define SIOCSHIWAT      _IOW('s',  0, int)             /* set high watermark */
 #define SIOCGHIWAT      _IOR('s',  1, int)             /* get high watermark */
 #define SIOCSLOWAT      _IOW('s',  2, int)             /* set low watermark */

@@ -4,9 +4,11 @@
 #ifndef _SYS_SOCKET_H
 #define _SYS_SOCKET_H
 
-#include <OS.h>
+#include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/ioctl.h>
+
+typedef uint32 socklen_t;
 
 /* These are the address/protocol families we'll be using... */
 /* NB these should be added to as required... */
@@ -189,6 +191,7 @@ struct cmsghdr {
 	/* there now follows uchar[] cmsg_data */
 };
 
+#if 0
 #define SIOCSHIWAT      _IOW('s',  0, int)              /* set high watermark */
 #define SIOCGHIWAT      _IOR('s',  1, int)              /* get high watermark */
 #define SIOCSLOWAT      _IOW('s',  2, int)              /* set low watermark */
@@ -225,6 +228,8 @@ struct cmsghdr {
 
 #define SIOCADDMULTI    _IOW('i', 49, struct ifreq)     /* add m'cast addr */
 #define SIOCDELMULTI    _IOW('i', 50, struct ifreq)     /* del m'cast addr */
+#endif
+
 
 #ifndef _KERNEL_MODE
 /* Function declarations */
