@@ -44,12 +44,15 @@
  #define B_CMYK32 ((color_space)0xC003) /* C[7:0]  M[7:0]  Y[7:0]  K[7:0]                                       */
 #endif
 
-#define PPM_TRANSLATOR_VERSION 100
+#define PPM_TRANSLATOR_VERSION 0x100
 
 /* These three data items are exported by every translator. */
 char translatorName[] = "PPM Images";
 char translatorInfo[] = "PPM image translator v1.0.0, " __DATE__;
-int32 translatorVersion = PPM_TRANSLATOR_VERSION; /* format is revision+minor*10+major*100 */
+int32 translatorVersion = PPM_TRANSLATOR_VERSION;
+	// Revision: lowest 4 bits
+	// Minor: next 4 bits
+	// Major: highest 24 bits
 
 /*	Be reserves all codes with non-lowecase letters in them.	*/
 /*	Luckily, there is already a reserved code for PPM. If you	*/
@@ -195,7 +198,10 @@ public:
 					path.Append("PPMTranslator_Settings");
 					FILE * f = fopen(path.Path(), "w");
 					if (f) {
-						fprintf(f, "# PPMTranslator settings version %.2f\n", (float)translatorVersion/100.0);
+						fprintf(f, "# PPMTranslator settings version %d.%d.%d\n",
+							static_cast<int>(translatorVersion >> 8),
+							static_cast<int>((translatorVersion >> 4) & 0xf),
+							static_cast<int>(translatorVersion & 0xf));
 						fprintf(f, "color_space = %d\n", g_settings.out_space);
 						fprintf(f, "window_pos = %g,%g\n", g_settings.window_pos.x, g_settings.window_pos.y);
 						fprintf(f, "write_ascii = %d\n", g_settings.write_ascii ? 1 : 0);
@@ -494,8 +500,8 @@ virtual	void Draw(
 	
 				char detail[100];
 				int ver = static_cast<int>(translatorVersion);
-				sprintf(detail, "Version %d.%d.%d %s", ver / 100, (ver / 10) % 10,
-					ver % 10, __DATE__);
+				sprintf(detail, "Version %d.%d.%d %s", ver >> 8, ((ver >> 4) & 0xf),
+					(ver & 0xf), __DATE__);
 				DrawString(detail, BPoint(xbold, yplain + ybold));
 
 				DrawString("Based on PPMTranslator sample code",
