@@ -7,6 +7,7 @@
 #include "SSAwindow.h"
 #include "ScreenSaverPrefs.h"
 #include "ScreenSaverThread.h"
+#include "pwWindow.h"
 
 class ScreenSaverApp : public BApplication 
 {
@@ -15,14 +16,18 @@ public:
 	bool LoadAddOn(void);
 	void ReadyToRun(void);
 	bool QuitRequested(void);
+	virtual void MessageReceived(BMessage *message);
+	void ShowPW(void);
 private:
 	ScreenSaverPrefs pref;
 	image_id addon_image;
 	SSAwindow *win;
 	BScreenSaver *saver;
 	ScreenSaverThread *thrd;
+	pwWindow *pww;
 
 	thread_id threadID;
+	uint32 blankTime;
 
 };
 

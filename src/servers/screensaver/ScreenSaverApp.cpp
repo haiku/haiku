@@ -10,7 +10,7 @@
 #include "File.h"
 #include "Path.h"
 #include "string.h"
-#include "Alert.h"
+#include "Beep.h"
 
 
 // Start the server application. Set pulse to fire once per second.
@@ -23,6 +23,7 @@ int main(int, char**) {
 
 // Construct the server app. Doesn't do much, at this point.
 ScreenSaverApp::ScreenSaverApp() : BApplication("application/x-vnd.OBOS-ScreenSaverApp"),addon_image(0),win(NULL) {
+	blankTime=real_time_clock();
 }
 
 void ScreenSaverApp::ReadyToRun(void) {
@@ -31,6 +32,10 @@ void ScreenSaverApp::ReadyToRun(void) {
 	else {	// If everything works OK, create a BDirectWindow and start the render thread.
 		BScreen theScreen(B_MAIN_SCREEN_ID);
 		win=new SSAwindow(theScreen.Frame(),saver);
+		if (B_OK!=win->SetFullScreen(true)) {
+			exit(1);
+		}
+		pww=new pwWindow();
 		thrd=new ScreenSaverThread(saver,win,win->view,&pref);
 		threadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,thrd);
 		resume_thread(threadID);
@@ -38,6 +43,45 @@ void ScreenSaverApp::ReadyToRun(void) {
 		}
 }
 
+void ScreenSaverApp::ShowPW(void) {
+		win->Lock();
+		suspend_thread(threadID);
+		if (B_OK==win->SetFullScreen(false)) {
+			win->Sync();
+			ShowCursor();
+			pww->Show();
+			pww->Sync();
+			}
+		win->Unlock();
+		pww->Lock();
+		pww->Unlock();
+}
+
+void ScreenSaverApp::MessageReceived(BMessage *message) {
+  switch(message->what) {
+    case 'DONE':
+		if (strcmp(pww->GetPassword(),pref.Password())) {
+			beep();
+			pww->Hide();
+			win->SetFullScreen(true);
+			resume_thread(threadID);
+			}
+			else  {
+				printf ("Quitting!\n");
+				Quit();
+			}
+		break;
+    case 'MOO1':
+		if (real_time_clock()-blankTime>pref.PasswordTime())
+			ShowPW();
+		else 
+			Quit();
+		break;
+    default:
+      	BApplication::MessageReceived(message);
+      	break;
+  }
+}
 bool ScreenSaverApp::QuitRequested(void) {
 	kill_thread(threadID);
 	delete thrd;

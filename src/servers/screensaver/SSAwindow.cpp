@@ -25,14 +25,16 @@ bool SSAwindow::QuitRequested(void) {
 	}
 
 void SSAwindow::DirectConnected(direct_buffer_info *info) {
-	/*
 	int i=info->buffer_state;
+	/*
 	printf ("direct connected; bufState=%d; bits = %x, bpr=%d, bottom=%d\n",i,info->bits,info->bytes_per_row,info->window_bounds.bottom);
 	if (!(i&B_DIRECT_STOP))  {
 		printf ("ready to clear; bits = %x, bpr=%d, bottom=%d\n",info->bits,info->bytes_per_row,info->window_bounds.bottom);
 		memset(info->bits,0,info->bytes_per_row*info->window_bounds.bottom);
 		}
 	*/
+//	printf ("direct connected; bufState=%d; bits = %x, bpr=%d, bottom=%d\n",i,info->bits,info->bytes_per_row,info->window_bounds.bottom);
 	if (saver)
 		saver->DirectConnected(info);
+//	printf ("direct connected ending!\n");
 	}
