@@ -117,7 +117,7 @@ void FillWithMimeTypes(ContainerAdapter &container, BMessage &typeMessage, const
 // before running all the BMimeType tests
 class MimeTypeTestSuite : public CppUnit::TestSuite {
 public:
-	MimeTypeTestSuite() : CppUnit::TestSuite() {}
+	MimeTypeTestSuite() : CppUnit::TestSuite(), fMimeDirExisted(false) {}
 	virtual void setUp()
 	{
 		// If we're using a directory other than the R5 MIME database directory, make
@@ -132,6 +132,7 @@ public:
 					+ " " + mimeDatabaseDir;
 				ExecCommand(cmd.c_str()); 
 			} else {
+				fMimeDirExisted = true;
 				if (BTestShell::GlobalBeVerbose())
 					cout << "(Using existing copy of MIME database in '" + mimeDatabaseDir + "')" << endl;
 			}
@@ -140,7 +141,7 @@ public:
 
 	virtual void tearDown()
 	{
-		if (mimeDatabaseDir != R5DatabaseDir) {
+		if (mimeDatabaseDir != R5DatabaseDir && !fMimeDirExisted) {
 			if (BTestShell::GlobalBeVerbose())
 				cout << "(Removing copy of MIME database in '" + mimeDatabaseDir + "')" << endl;
 			std::string cmd = std::string("rm -rf ") + mimeDatabaseDir;
@@ -153,7 +154,9 @@ public:
 		setUp();
 		CppUnit::TestSuite::run(result);
 		tearDown();	
-	}	
+	}
+private:
+	bool fMimeDirExisted;
 };
 
 // Suite
