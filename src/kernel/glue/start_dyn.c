@@ -34,7 +34,6 @@ _start(int argc, char **argv, char **_environ, struct uspace_program_args *args)
 
 	argv_save = args->argv;
 	__main_thread_id = find_thread(NULL);
-	environ = args->envp;
 
 	returnCode = main(args->argc, args->argv);
 
