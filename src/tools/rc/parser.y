@@ -100,7 +100,7 @@ static void add_resource(id_t, type_code, data_t);
 //------------------------------------------------------------------------------
 %}
 
-%expect 7
+%expect 15
 
 %union
 {
@@ -398,7 +398,7 @@ type
 			list_t list; list.count = 0; list.items = NULL;
 			$$ = make_type($1, list);
 		}
-	| IDENT data
+	| IDENT expr
 		{
 			$$ = make_type($1, make_data_list($2));
 		} 

@@ -283,6 +283,8 @@ resource mytype 123;</PRE></BLOCKQUOTE>
 
 <P>The unary minus operator is not part of the "expr" (or "data") rules, but of "integer" and "float". This also causes a shift/reduce warning.</P>
 
+<P>And finally, "type" is a member of "data" which is called by "expr". One of the rules of "type" refers back to "expr". This introduces a recursive dependency and a whole bunch of shift/reduce conflicts. Fortunately, it seems to have no bad side effects. Yay!</P>
+
 <H3>Symbol table</H3>
 
 <P>The compiler uses two symbol tables: one for the enum symbols, and one with the data type definitions. We need those tables to find the numeric ID/type definition that corresponds with an identifier, and to make sure that there are no duplicate or missing identifiers. These two symbol tables are independent, so you may use the same identifier both as an enum symbol and a type name.</P>

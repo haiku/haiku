@@ -60,3 +60,5 @@ resource(10081) my_int32 my_int32 my_int32;  // and so on
 resource(10100) B_SINGLE_LAUNCH;
 resource(10101) (int8) B_EXCLUSIVE_LAUNCH;
 resource(10102) B_MULTIPLE_LAUNCH | B_BACKGROUND_APP | B_ARGV_ONLY;
+
+//resource app_flags B_MULTIPLE_LAUNCH | B_BACKGROUND_APP;
