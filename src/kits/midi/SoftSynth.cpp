@@ -22,6 +22,7 @@
  */
 
 #include <FindDirectory.h>
+#include <Path.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -74,14 +75,11 @@ bool BSoftSynth::IsLoaded(void) const
 
 status_t BSoftSynth::SetDefaultInstrumentsFile()
 {
-	char buf[B_PATH_NAME_LENGTH + 1];
-
-	if (B_OK == find_directory(
-			B_SYNTH_DIRECTORY, NULL, false, buf, B_PATH_NAME_LENGTH))
+	BPath path;
+	if (B_OK == find_directory(B_SYNTH_DIRECTORY, &path, false, NULL))
 	{
-		strcat(buf, "/");
-		strcat(buf, B_BIG_SYNTH_FILE);
-		return SetInstrumentsFile(buf);
+		path.Append(B_BIG_SYNTH_FILE);
+		return SetInstrumentsFile(path.Path());
 	}
 	
 	return B_ERROR;
