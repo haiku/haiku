@@ -13,5 +13,8 @@ LinkSharedOSLibs libtranslation.so :
 ;
 
 Package openbeos-translationkit-cvs :
+	README.html ;
+
+Package openbeos-translationkit-cvs :
 	libtranslation.so :
 	boot home config lib ;
