@@ -22,6 +22,7 @@
 // Local Includes --------------------------------------------------------------
 #include "Helpers.h"
 #include "LockTargetTester.h"
+#include "SMTarget.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -206,7 +207,9 @@ void LockTargetTester::LockTargetTest5B()
  */
 void LockTargetTester::LockTargetTest6()
 {
-	// TODO: Implement!
+	RemoteSMTarget target(true);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.LockTarget() == false);
 }
 
 /*
@@ -217,7 +220,9 @@ void LockTargetTester::LockTargetTest6()
  */
 void LockTargetTester::LockTargetTest7()
 {
-	// TODO: Implement!
+	RemoteSMTarget target(false);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.LockTarget() == false);
 }
 
 

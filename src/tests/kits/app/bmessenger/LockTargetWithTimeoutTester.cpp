@@ -22,6 +22,7 @@
 // Local Includes --------------------------------------------------------------
 #include "Helpers.h"
 #include "LockTargetWithTimeoutTester.h"
+#include "SMTarget.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -284,7 +285,9 @@ void LockTargetWithTimeoutTester::LockTargetWithTimeoutTest7B()
  */
 void LockTargetWithTimeoutTester::LockTargetWithTimeoutTest8()
 {
-	// TODO: Implement!
+	RemoteSMTarget target(true);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.LockTargetWithTimeout(10000) == B_BAD_VALUE);
 }
 
 /*
@@ -295,7 +298,9 @@ void LockTargetWithTimeoutTester::LockTargetWithTimeoutTest8()
  */
 void LockTargetWithTimeoutTester::LockTargetWithTimeoutTest9()
 {
-	// TODO: Implement!
+	RemoteSMTarget target(false);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.LockTargetWithTimeout(10000) == B_BAD_VALUE);
 }
 
 

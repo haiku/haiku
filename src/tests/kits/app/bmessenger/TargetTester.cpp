@@ -20,6 +20,7 @@
 
 // Local Includes --------------------------------------------------------------
 #include "Helpers.h"
+#include "SMTarget.h"
 #include "TargetTester.h"
 
 // Local Defines ---------------------------------------------------------------
@@ -83,7 +84,9 @@ void TargetTester::IsTargetLocalTest3()
  */
 void TargetTester::IsTargetLocalTest4()
 {
-	// TODO: Implement.
+	RemoteSMTarget target(true);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.IsTargetLocal() == false);
 }
 
 /*
@@ -93,7 +96,9 @@ void TargetTester::IsTargetLocalTest4()
  */
 void TargetTester::IsTargetLocalTest5()
 {
-	// TODO: Implement.
+	RemoteSMTarget target(false);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.IsTargetLocal() == false);
 }
 
 /*
@@ -154,7 +159,9 @@ void TargetTester::TargetTest3()
  */
 void TargetTester::TargetTest4()
 {
-	// TODO: Implement.
+	RemoteSMTarget target(true);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.Target(NULL) == NULL);
 }
 
 /*
@@ -165,7 +172,9 @@ void TargetTester::TargetTest4()
  */
 void TargetTester::TargetTest5()
 {
-	// TODO: Implement.
+	RemoteSMTarget target(false);
+	BMessenger messenger(target.Messenger());
+	CHK(messenger.Target(NULL) == NULL);
 }
 
 

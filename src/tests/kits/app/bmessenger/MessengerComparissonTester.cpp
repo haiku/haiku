@@ -22,6 +22,7 @@
 // Local Includes --------------------------------------------------------------
 #include "Helpers.h"
 #include "MessengerComparissonTester.h"
+#include "SMTarget.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -101,11 +102,10 @@ MessengerComparissonTester::~MessengerComparissonTester()
 }
 
 /*
-	BMessenger &operator=(const BMessenger &from)
-	@case 1			from is uninitialized
-	@results		IsValid() and IsTargetLocal() should return false
-					Target() should return NULL and NULL for looper.
-					Team() should return -1.
+	bool operator==(const BMessenger &other) const
+	bool operator!=(const BMessenger &a, const BMessenger &b)
+	@case 1			this (a) and other (b) are uninitialized
+	@results		should return true/false.
  */
 void MessengerComparissonTester::ComparissonTest1()
 {
@@ -118,12 +118,11 @@ void MessengerComparissonTester::ComparissonTest1()
 }
 
 /*
-	BMessenger &operator=(const BMessenger &from)
-	@case 2			from is properly initialized to a local target
-					(preferred handler)
-	@results		IsValid() and IsTargetLocal() should return true
-					Target() should return the same values as for from.
-					Team() should return this team.
+	bool operator==(const BMessenger &other) const
+	bool operator!=(const BMessenger &a, const BMessenger &b)
+	@case 1			this (a) is initialized, other (b) is uninitialized,
+					and vice versa
+	@results		should return false/true.
  */
 void MessengerComparissonTester::ComparissonTest2()
 {
@@ -141,12 +140,19 @@ void MessengerComparissonTester::ComparissonTest2()
 }
 
 /*
-	BMessenger &operator=(const BMessenger &from)
-	@case 3			from is properly initialized to a local target
-					(specific handler)
-	@results		IsValid() and IsTargetLocal() should return true
-					Target() should return the same values as for from.
-					Team() should return this team.
+	bool operator==(const BMessenger &other) const
+	bool operator!=(const BMessenger &a, const BMessenger &b)
+	bool operator<(const BMessenger &a, const BMessenger &b)
+	@case 3			this and other are initialized, different cases:
+					- same object => true
+					- different objects same target => true
+					- looper preferred handler vs. same looper but the looper
+					  itself as handler => false
+					- looper preferred handler vs. other looper preferred
+					  handler => false
+					- looper preferred handler vs. other looper specific
+					  handler => false
+					- local looper vs. remote looper => false
  */
 void MessengerComparissonTester::ComparissonTest3()
 {
@@ -178,8 +184,13 @@ void MessengerComparissonTester::ComparissonTest3()
 	// messenger4: looper (2)
 	BMessenger messenger4(NULL, looper2);
 	BMessenger messenger4a(NULL, looper2);
-	// TODO: remote targets
-	// ...
+	// remote targets
+	RemoteSMTarget remoteTarget1(false);
+	RemoteSMTarget remoteTarget2(true);
+	BMessenger messenger5(remoteTarget1.Messenger());
+	BMessenger messenger5a(remoteTarget1.Messenger());
+	BMessenger messenger6(remoteTarget2.Messenger());
+	BMessenger messenger6a(remoteTarget2.Messenger());
 
 	// targets -- test data
 	struct target {
@@ -194,6 +205,10 @@ void MessengerComparissonTester::ComparissonTest3()
 		{ messenger3a,	3 },
 		{ messenger4,	4 },
 		{ messenger4a,	4 },
+		{ messenger5,	5 },
+		{ messenger5a,	5 },
+		{ messenger6,	6 },
+		{ messenger6a,	6 },
 	};
 	int32 targetCount = sizeof(targets) / sizeof(target);
 
