@@ -169,9 +169,13 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 			void *chunkBuffer;
 			int32 chunkSize;
 			media_header mh;
-			if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, &mh)) {
+			status_t status = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
+			if (status == B_LAST_BUFFER_ERROR) {
+				goto done;
+			}			
+			if (status != B_OK) {
 				TRACE("vorbisDecoder::Decode: GetNextChunk failed\n");
-				return B_ERROR;
+				return status;
 			}
 			if (chunkSize != sizeof(ogg_packet)) {
 				TRACE("vorbisDecoder::Decode: chunk not ogg_packet-sized\n");
@@ -197,10 +201,14 @@ vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		fStartTime += (1000000LL * samples) / fInfo.rate;
 		//TRACE("vorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	}
+	
+done:
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 
-	// XXX this doesn't guarantee that we always return B_LAST_BUFFER_ERROR bofore returning B_ERROR
-	return (out_bytes_needed == 0) ? B_OK : (out_bytes_needed == fOutputBufferSize) ? B_ERROR : B_LAST_BUFFER_ERROR;
+	if (out_buffer != buffer) {
+		return B_OK;
+	}
+	return B_LAST_BUFFER_ERROR;
 }
 
 Decoder *
