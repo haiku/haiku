@@ -35,25 +35,6 @@ DataTranslationsApplication::DataTranslationsApplication()
 
 }
 
-
-/* Unused.
-void
-DataTranslationsApplication::MessageReceived(BMessage *message)
-{
-	switch(message->what) {
-		case ERROR_DETECTED:
-			{
-				BAlert *errorAlert = new BAlert("Error", "Unknown Error occured","OK",NULL,NULL,B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
-				errorAlert->Go();
-				be_app->PostMessage(B_QUIT_REQUESTED);
-			}
-			break;			
-		default:
-			BApplication::MessageReceived(message);
-			break;
-	}
-}
-*/
 void
 DataTranslationsApplication::SetWindowCorner(BPoint corner)
 {
@@ -74,9 +55,10 @@ DataTranslationsApplication::~DataTranslationsApplication()
 
 void DataTranslationsApplication::Install_Done()
 {
-	(new BAlert("", "You have to quit and restart running applications\nfor the installed Translators to be available in them.", "OK"))->Go();
-	// aWindow->Install_Done  = true;
-	return;
+	(new BAlert("",
+		"You have to quit and restart running applications\n" \
+		"for the installed Translators to be available in them.",
+		"OK"))->Go();
 }
 
 void DataTranslationsApplication::RefsReceived(BMessage *message)

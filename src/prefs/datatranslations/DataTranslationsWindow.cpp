@@ -52,7 +52,7 @@ int DataTranslationsWindow::WriteTrans()
 	for (i=0;i<num_translators;i++) {
 	    // Getting the first three Infos: Name, Info & Version
 		roster->GetTranslatorInfo(translators[i], &tname,&tinfo, &tversion);
-		liste->AddItem(new BStringItem(tname));
+		fTranListView->AddItem(new BStringItem(tname));
 	} 
 	
 	delete [] translators; // Garbage collection
@@ -74,7 +74,7 @@ void DataTranslationsWindow::Trans_by_ID(int32 id)
 
 	// Getting the first three Infos: Name, Info & Version
 	roster->GetTranslatorInfo(translators[id], &translator_name,&translator_info, &translator_version);
-	roster->Archive(&archiv, true);
+	roster->Archive(&fRosterArchive, true);
 	
 	rBox->RemoveChild(Konf);
 	if (roster->MakeConfigurationView( translators[id], new BMessage() , &Konf, new BRect( 0, 0, 200, 233)) != B_OK )
@@ -110,9 +110,6 @@ void DataTranslationsWindow::Trans_by_ID(int32 id)
 
 void DataTranslationsWindow::BuildView()
 {
-	newIcon = false;
-	Install_Done = false;
-	
 	BRect all(0, 0, 400, 300);       		// Fenster-Groesse
 	fBox = new BBox(all, "All_Window", B_FOLLOW_ALL_SIDES,
 						B_WILL_DRAW | B_FRAME_EVENTS,
@@ -128,14 +125,15 @@ void DataTranslationsWindow::BuildView()
 
 	BRect iconRect(0,0,31,31);
 	iconRect.OffsetTo(innerRect.left,innerRect.bottom-iconRect.Height());
-	Icon = new BView(iconRect, "Ikon", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+	fIconView = new IconView(iconRect, "Ikon", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
                      B_WILL_DRAW | B_FRAME_EVENTS);
-	Icon->SetDrawingMode(B_OP_OVER);
-	//Icon->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-	Icon->SetHighColor(217,217,217);
-	rBox->AddChild(Icon);
-
-	Icon_bit = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8, true);
+	//fIconView->SetDrawingMode(B_OP_OVER);
+		// to preserve transparent areas of the icon
+	//fIconView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	
+	//fIconView->SetViewColor(0, 255, 0);
+	//fIconView->SetHighColor(0, 0, 255);
+	rBox->AddChild(fIconView);
 	
 	BRect infoRect(0,0,80,20);
 	infoRect.OffsetTo(innerRect.right-infoRect.Width(),innerRect.bottom-10-infoRect.Height());
@@ -158,23 +156,24 @@ void DataTranslationsWindow::BuildView()
 	rBox->AddChild(Konf);
 
     BRect listRect(10, 10, 120, 288);  // List View
-	liste = new DataTranslationsView(listRect, "Transen", B_SINGLE_SELECTION_LIST); 
-	liste->SetSelectionMessage(new BMessage(SEL_CHANGE));
+	fTranListView = new DataTranslationsView(listRect, "Transen", B_SINGLE_SELECTION_LIST); 
+	fTranListView->SetSelectionMessage(new BMessage(SEL_CHANGE));
 
 	// Put list into a BScrollView, to get that nice srcollbar  
-    tListe = new BScrollView("scroll_trans", liste, B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
-                             B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
-	fBox->AddChild(tListe);
+    BScrollView *scrollView = new BScrollView("scroll_trans", fTranListView,
+    	B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW | B_FRAME_EVENTS,
+    	false, true, B_FANCY_BORDER);
+	fBox->AddChild(scrollView);
 
     // Here we add the names of all installed translators    
     WriteTrans(); 
     
 	// Set the focus
-	liste->MakeFocus();
+	fTranListView->MakeFocus();
 	
 	// Select the first Translator in list
-    liste->Select(0, false);
-    showInfo = true;
+    fTranListView->Select(0, false);
+    fTranSelected = true;
     
 }
 
@@ -195,10 +194,10 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 	
 	switch(message->what) {
 		case BUTTON_MSG:
-			selected=liste->CurrentSelection(0);
+			selected=fTranListView->CurrentSelection(0);
 			
 			// Should we show translator info? 
-			if (!showInfo)
+			if (!fTranSelected)
 			{
 				// No => Show standard box
 				(new BAlert("yo!", "Translation Settings\n\nUse this control panel to set values that various\ntranslators use when no other settings are specified\nin the application.", "OK"))->Go();
@@ -206,37 +205,39 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			}
 			// Yes => Show Translator info.
 			Trans_by_ID(selected);
-			archiv.FindString("be:translator_path", selected, &pfad);
+			fRosterArchive.FindString("be:translator_path", selected, &pfad);
 			tex << "Name :" << translator_name << "\nVersion: " << (int32)translator_version << "\nInfo: " << translator_info << "\nPath: " << pfad << "\n"; 
 			(new BAlert("yo!", tex.String(), "OK"))->Go();
 			tex.SetTo("");
-			DrawIcon();
 			break;
 
 		case SEL_CHANGE:
 			// Now we have to update Filename and Icon
 			// First we find the selected Translator
-			selected=liste->CurrentSelection(0);
+			selected=fTranListView->CurrentSelection(0);
 			
 			// If none selected, clear the old one
 			if (selected < 0) 
 			{
-				Icon->FillRect(BRect(0, 0, 31, 31));
+				fIconView->DrawIcon(false);
 				DTN->SetText("");
-				showInfo = false;
+				fTranSelected = false;
 				rBox->RemoveChild(Konf);
 				break;
 			}
 			
-			newIcon = true;			
-			showInfo = true;
+			fTranSelected = true;
 			Trans_by_ID(selected);
 			// Now we find the path, and update filename
-			archiv.FindString("be:translator_path", selected, &pfad);
+			fRosterArchive.FindString("be:translator_path", selected, &pfad);
 			tex.SetTo(pfad);
 			tex.Remove(0,tex.FindLast("/")+1);	
 			DTN->SetText(tex.String());
-			DrawIcon();
+			
+			entry.SetTo(pfad);
+			node.SetTo(&entry);
+			info.SetTo(&node);
+			fIconView->SetIconFromNodeInfo(info);
 			break;
 
 		
@@ -245,39 +246,6 @@ DataTranslationsWindow::MessageReceived(BMessage *message)
 			break;
 	}
 	
-}
-
-void DataTranslationsWindow::DrawIcon()
-{
-	if (newIcon) 
-	{	
-		entry.SetTo(pfad);
-		node.SetTo(&entry);
-		info.SetTo(&node);
-		Icon->FillRect(BRect(0, 0, 31, 31));
-		newIcon = false;
-	}
-	if (info.GetTrackerIcon(Icon_bit) != B_OK) QuitRequested();
-	Icon->DrawBitmap(Icon_bit);
-	
-	if (Install_Done) 
-	{
-		liste->RemoveItems(0, liste->CountItems());
-		WriteTrans();
-		liste->Select(0, false);
-		Install_Done = false;
-	}
-	
-}
-
-void DataTranslationsWindow::WindowActivated(bool state)
-{
-	if (showInfo) DrawIcon();	
-}
-
-void DataTranslationsWindow::FrameMoved(BPoint origin)
-{
-	if (showInfo) DrawIcon();
 }
 
 DataTranslationsWindow::~DataTranslationsWindow()

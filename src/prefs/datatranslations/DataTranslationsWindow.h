@@ -23,6 +23,7 @@
 
 #include "DataTranslationsSettings.h"
 #include "DataTranslationsView.h"
+#include "IconView.h"
 
 class DataTranslationsWindow : public BWindow 
 {
@@ -32,34 +33,29 @@ public:
 	
 virtual	bool	QuitRequested();
 virtual void    MessageReceived(BMessage* message);
-virtual void    WindowActivated(bool state);
-virtual void 	FrameMoved(BPoint origin);
-		// void    WindowActivated(bool state);
-		// void 	FrameMoved(BPoint origin);
-		void	DrawIcon();
-		bool	Install_Done; // True if an install just finished, but no List-Update done yet.
-
 	
 private:
 		const char 		*translator_name, *translator_info;
 		int32 			translator_version;
 		const char* 	pfad;
 		BString 		tex;
-		bool			showInfo;
-		bool			newIcon;
-
+		bool fTranSelected;
+			// Indicates whether or not a translator is selected
+			// in the fTranListView
 				
 		BButton*		dButton;     // Default-Button    
 		BBox*           fBox;        // Full-Window Box 
-		BScrollView*    tListe;      // To get that fancy scrollbar
 		BBox*			rBox;		 // Box hosting Config View
 				
-		DataTranslationsView*	liste; // Improved list of Translators
+		DataTranslationsView *fTranListView;
+			// List of Translators (left pane of window)
 		
 		BStringView*	DTN; 		 // Display the DataTranslatorName
-		BMessage 		archiv;		 // My Message
-		BView*			Icon;		 // The Icon and Config - Views
-		BBitmap*        Icon_bit;
+		BMessage fRosterArchive;
+			// Archive of the current BTranslatorRoster
+
+		IconView *fIconView;
+		
 		BView*			Konf;	
 		
 		BEntry     		entry; 
