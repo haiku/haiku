@@ -229,6 +229,10 @@ typedef struct vnode_ops {
 	op_suspend_vnode		(*suspend_vnode);
 } vnode_ops;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern _IMPEXP_KERNEL int	new_path(const char *path, char **copy);
 extern _IMPEXP_KERNEL void	free_path(char *p);
 
@@ -248,6 +252,9 @@ extern _IMPEXP_KERNEL int	remove_vnode(nspace_id nsid, vnode_id vnid);
 extern _IMPEXP_KERNEL int	unremove_vnode(nspace_id nsid, vnode_id vnid);
 extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
 
+#ifdef __cplusplus
+}
+#endif
 
 extern _EXPORT vnode_ops	fs_entry;
 extern _EXPORT int32		api_version;
