@@ -51,6 +51,8 @@ struct thread_debug_info {
 		// won't go).
 	port_id		debug_port;
 		// the port the thread is waiting on for commands from the nub thread
+
+	struct arch_thread_debug_info	arch_info;
 };
 
 #define GRAB_TEAM_DEBUG_INFO_LOCK(info)		acquire_spinlock(&(info).lock)
@@ -131,6 +133,8 @@ void user_debug_thread_created(thread_id threadID);
 void user_debug_thread_deleted(team_id teamID, thread_id threadID);
 void user_debug_image_created(const image_info *imageInfo);
 void user_debug_image_deleted(const image_info *imageInfo);
+void user_debug_break_or_watchpoint_hit(bool watchpoint);
+void user_debug_single_stepped();
 
 
 // syscalls

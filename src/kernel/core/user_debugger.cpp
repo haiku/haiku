@@ -116,6 +116,7 @@ void
 clear_thread_debug_info(struct thread_debug_info *info, bool dying)
 {
 	if (info) {
+		arch_clear_thread_debug_info(&info->arch_info);
 		atomic_set(&info->flags,
 			B_THREAD_DEBUG_DEFAULT_FLAGS | (dying ? B_THREAD_DEBUG_DYING : 0));
 		info->debug_port = -1;
@@ -127,6 +128,8 @@ void
 destroy_thread_debug_info(struct thread_debug_info *info)
 {
 	if (info) {
+		arch_destroy_thread_debug_info(&info->arch_info);
+
 		if (info->debug_port >= 0) {
 			delete_port(info->debug_port);
 			info->debug_port = -1;
@@ -647,6 +650,20 @@ user_debug_image_deleted(const image_info *imageInfo)
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
 		sizeof(message), B_IMAGE_DELETED, NULL);
+}
+
+
+void
+user_debug_break_or_watchpoint_hit(bool watchpoint)
+{
+	stop_thread((watchpoint ? B_WATCHPOINT_HIT : B_BREAKPOINT_HIT), NULL);
+}
+
+
+void
+user_debug_single_stepped()
+{
+	stop_thread(B_SINGLE_STEP, NULL);
 }
 
 
