@@ -1314,12 +1314,11 @@ PPPInterface::ReceiveFromDevice(struct mbuf *packet)
 	
 	// decode ppp frame and recognize PFC
 	uint16 protocolNumber = *mtod(packet, uint8*);
-	if(protocolNumber & 0x80 || protocolNumber == 0) {
+	if(protocolNumber & 1) {
+		m_adj(packet, 1);
+	} else {
 		protocolNumber = ntohs(*mtod(packet, uint16*));
 		m_adj(packet, 2);
-	} else {
-		m_adj(packet, 1);
-		protocolNumber = *mtod(packet, uint8*);
 	}
 	
 	return Receive(packet, protocolNumber);
