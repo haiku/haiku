@@ -2,6 +2,7 @@ SubDir OBOS_TOP src add-ons media plugins vorbis ;
 
 UsePrivateHeaders media ;
 
+SubDirHdrs $(SUBDIR) .. ogg ;
 SubDirHdrs $(SUBDIR) .. ogg libogg ;
 SubDirHdrs $(SUBDIR) libvorbis vorbis ;
 

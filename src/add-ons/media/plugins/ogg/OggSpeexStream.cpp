@@ -1,3 +1,4 @@
+#include "OggSpeexFormats.h"
 #include "OggSpeexStream.h"
 #include <stdio.h>
 
@@ -89,10 +90,7 @@ OggSpeexStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	SpeexHeader * header = (SpeexHeader *)data;
 
 	// get the format for the description
-	media_format_description description;
-	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'OggS';
-	description.u.misc.codec = 'Spee';
+	media_format_description description = speex_description();
 	BMediaFormats formats;
 	result = formats.InitCheck();
 	if (result != B_OK) {
@@ -104,7 +102,8 @@ OggSpeexStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	result = formats.GetFormatFor(description, format);
 	formats.Unlock();
 	if (result != B_OK) {
-		return result;
+		*format = speex_encoded_media_format();
+		// ignore error, allow user to use ReadChunk interface
 	}
 
 	// fill out format from header packet

@@ -1,3 +1,4 @@
+#include "OggVorbisFormats.h"
 #include "OggVorbisStream.h"
 #include <stdio.h>
 
@@ -132,10 +133,7 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	// get the format for the description
-	media_format_description description;
-	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'OggS';
-	description.u.misc.codec = 'vorb';
+	media_format_description description = vorbis_description();
 	BMediaFormats formats;
 	result = formats.InitCheck();
 	if (result != B_OK) {
@@ -147,7 +145,8 @@ OggVorbisStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	result = formats.GetFormatFor(description, format);
 	formats.Unlock();
 	if (result != B_OK) {
-		return result;
+		*format = vorbis_encoded_media_format();
+		// ignore error, allow user to use ReadChunk interface
 	}
 
 	// fill out format from header packet

@@ -1,3 +1,4 @@
+#include "OggTobiasFormats.h"
 #include "OggTobiasStream.h"
 #include <stdio.h>
 
@@ -104,8 +105,7 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	tobias_stream_header * header = (tobias_stream_header *)data;
 
 	// get the format for the description
-	media_format_description description;
-	description.family = B_AVI_FORMAT_FAMILY;
+	media_format_description description = tobias_description();
 	description.u.avi.codec = header->subtype[0] << 24 | header->subtype[1] << 16 
 	                        | header->subtype[2] <<  8 | header->subtype[3];
 	BMediaFormats formats;
@@ -119,11 +119,11 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	result = formats.GetFormatFor(description, format);
 	formats.Unlock();
 	if (result != B_OK) {
-		return result;
+		*format = tobias_encoded_media_format();
+		// ignore error, allow user to use ReadChunk interface
 	}
 
 	// fill out format from header packet
-	format->type = B_MEDIA_ENCODED_VIDEO;
 	format->user_data_type = B_CODEC_TYPE_INFO;
 	strncpy((char*)format->user_data, header->subtype, 4);
 	format->u.encoded_video.frame_size
