@@ -19,6 +19,7 @@
 #include <Drivers.h>		// B_GET_ICON, device_icon
 #include <Message.h>
 #include <Mime.h>
+#include <MimeDatabase.h>
 #include <MimeTypeTest.h>
 #include <Path.h>			// Only needed for entry_ref dumps
 #include <StorageKit.h>
@@ -31,7 +32,12 @@
 
 // MIME database directories
 static const char *testDir				= "/tmp/mimeTestDir";
-static const char *mimeDatabaseDir		= "/boot/home/config/settings/beos_mime";
+static const char *R5DatabaseDir		= "/boot/home/config/settings/beos_mime";
+#if TEST_R5
+static std::string mimeDatabaseDir		= R5DatabaseDir;
+#else
+static std::string mimeDatabaseDir		= BPrivate::MimeDatabase::kDefaultDatabaseDir;
+#endif
 
 // MIME Test Types
 // testType and testTypeApp are Delete()d after each test.
@@ -98,8 +104,8 @@ static void fill_bitmap(BBitmap &bmp, char value);
 //static void dump_ref(entry_ref *ref, char* name = "ref");
 static void to_lower(const char *str, std::string &result);
 static std::string to_lower(const char *str);
-static void remove_type(const char *type, const char *databaseDir = mimeDatabaseDir);
-static bool type_exists(const char *type, const char *databaseDir = mimeDatabaseDir);
+static void remove_type(const char *type, const char *databaseDir = mimeDatabaseDir.c_str());
+static bool type_exists(const char *type, const char *databaseDir = mimeDatabaseDir.c_str());
 class ContainerAdapter;
 class SetAdapter;
 class QueueAdapter;
@@ -107,10 +113,53 @@ void FillWithMimeTypes(ContainerAdapter &container, BMessage &typeMessage, const
 	// Used to add all the types in a BMessage from GetInstalled*Types() to some
 	// sort of container object (via an adapter to support differing interfaces).
 
+// Custom TestSuite class to allow us to make a copy of the MIME database directory
+// before running all the BMimeType tests
+class MimeTypeTestSuite : public CppUnit::TestSuite {
+public:
+	MimeTypeTestSuite() : CppUnit::TestSuite() {}
+	virtual void setUp()
+	{
+		// If we're using a directory other than the R5 MIME database directory, make
+		// sure that directory exists. If not, make a complete copy of the R5 database
+		// directory.
+		if (mimeDatabaseDir != R5DatabaseDir) {
+			BEntry dir(mimeDatabaseDir.c_str());
+			if (dir.InitCheck() != B_OK || !dir.Exists()) {
+				if (BTestShell::GlobalBeVerbose())
+					cout << "(Making a copy of your MIME database at '" + mimeDatabaseDir + "')" << endl;
+				std::string cmd = std::string("copyattr -d -r -- ") + R5DatabaseDir
+					+ " " + mimeDatabaseDir;
+				ExecCommand(cmd.c_str()); 
+			} else {
+				if (BTestShell::GlobalBeVerbose())
+					cout << "(Using existing copy of MIME database in '" + mimeDatabaseDir + "')" << endl;
+			}
+		}	
+	}
+
+	virtual void tearDown()
+	{
+		if (mimeDatabaseDir != R5DatabaseDir) {
+			if (BTestShell::GlobalBeVerbose())
+				cout << "(Removing copy of MIME database in '" + mimeDatabaseDir + "')" << endl;
+			std::string cmd = std::string("rm -rf ") + mimeDatabaseDir;
+			ExecCommand(cmd.c_str()); 
+		}
+	}
+
+	virtual void run( CppUnit::TestResult *result )
+	{
+		setUp();
+		CppUnit::TestSuite::run(result);
+		tearDown();	
+	}	
+};
+
 // Suite
 CppUnit::Test*
 MimeTypeTest::Suite() {
-	CppUnit::TestSuite *suite = new CppUnit::TestSuite();
+	MimeTypeTestSuite *suite = new MimeTypeTestSuite();
 	typedef CppUnit::TestCaller<MimeTypeTest> TC;
 		
 	// Tyler
@@ -1424,7 +1473,7 @@ MimeTypeTest::InstalledTypesTest() {
 		// and the types present in the database are exactly the same (ignoring
 		// any files with names made of invalid characters, in case some bozo
 		// manually added such a file :-)
-		BDirectory rootDir(mimeDatabaseDir);
+		BDirectory rootDir(mimeDatabaseDir.c_str());
 		BEntry superEntry;		
 		CHK(rootDir.InitCheck() == B_OK);
 		rootDir.Rewind();
@@ -1503,7 +1552,7 @@ MimeTypeTest::InstalledTypesTest() {
 		// and the types present in the database are exactly the same (ignoring
 		// any files with names made of invalid characters, in case some bozo
 		// manually added such a file :-)
-		BDirectory rootDir(mimeDatabaseDir);
+		BDirectory rootDir(mimeDatabaseDir.c_str());
 		BEntry superEntry;		
 		CHK(rootDir.InitCheck() == B_OK);
 		rootDir.Rewind();
@@ -1631,15 +1680,10 @@ MimeTypeTest::DescriptionTest(GetDescriptionFunc getDescr, SetDescriptionFunc se
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		CHK((mime.*getDescr)(NULL) != B_OK);		// R5 == B_BAD_ADDRESS
+		CHK((mime.*getDescr)(NULL) == B_BAD_VALUE);	
 		CHK(!mime.IsInstalled());
-		CHK((mime.*setDescr)(NULL) != B_OK);		// R5 == Installs (but doesn't set), B_ENTRY_NOT_FOUND
-			// Note that a subsequent uninstall followed by a SetShortDescription() call with a
-			// valid description succeeds and installs, but DOES NOT actually set.
-			// I don't know why, but I'd just suggest not passing NULLs to the
-			// R5 versions.
-		CHK(mime.IsInstalled());
-		CHK((mime.*getDescr)(str) == B_ENTRY_NOT_FOUND);
+		CHK((mime.*setDescr)(NULL) == B_BAD_VALUE);
+		CHK(!mime.IsInstalled());
 #endif
 	}
 	// Installed type
@@ -1874,8 +1918,8 @@ MimeTypeTest::InstallDeleteTest() {
 		remove_type(testType);
 		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
-		CHK(mime.IsInstalled() != true);
-		CHK(mime.Delete() != B_OK);	// R5 == B_ENTRY_NOT_FOUND
+		CHK(!mime.IsInstalled());
+		CHK(mime.Delete() != B_OK);	// R5 == B_ENTRY_NOT_FOUND, OBOS == B_ENTRY_NOT_FOUND
 		CHK(!type_exists(testType));
 		CHK(mime.Install() == B_OK);
 		CHK(type_exists(testType));
