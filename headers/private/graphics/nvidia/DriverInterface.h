@@ -116,6 +116,7 @@ typedef struct { // apsed, see comments in nv.settings
 	bool   force_pci;
 	bool   unhide_fw;
 	bool   pgm_panel;
+	bool   dma_acc;
 } nv_settings;
 
 /*shared info*/
