@@ -42,6 +42,7 @@ public:
 private:
 	class Message;
 	class TargetMessage;
+	class TargetMessageHandle;
 	class TargetPort;
 	struct TargetPortMap;
 
