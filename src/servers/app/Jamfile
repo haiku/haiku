@@ -16,15 +16,15 @@ SharedLibrary appserver :
 	CursorData.cpp
 	CursorHandler.cpp
 	Decorator.cpp
-	DisplayDriver.cpp
-	DisplayDriverImpl.cpp
-	DisplaySupport.cpp
+	drawing/DisplayDriver.cpp
+	drawing/DisplayDriverImpl.cpp
+	drawing/DisplaySupport.cpp
 	FontFamily.cpp
 	GraphicsBuffer.cpp
 	IPoint.cpp
 	LayerData.cpp
-	PatternHandler.cpp
-	PixelRenderer.cpp
+	drawing/PatternHandler.cpp
+	drawing/PixelRenderer.cpp
 	RectUtils.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp
@@ -50,20 +50,20 @@ Server app_server :
 
 	# Manager Classes
 	AppServer.cpp
-	BitmapDriver.cpp
 	CursorManager.cpp
 	Desktop.cpp
 	ServerApp.cpp
 	ServerWindow.cpp
 
-	# Display Classes
+	# DisplayDriver Classes
 	# Clipper.cpp
-	AccelerantDriver.cpp
-
+	drawing/AccelerantDriver.cpp
+	drawing/BitmapDriver.cpp
+	drawing/ViewDriver.cpp
+	drawing/DirectDriver.cpp
 	# We'll just remove this from the build for a little while...
-	#ScreenDriver.cpp
-	ViewDriver.cpp
-	DirectDriver.cpp
+	#drawing/ScreenDriver.cpp
+
 	DefaultDecorator.cpp
 	Layer.cpp
 	RootLayer.cpp
