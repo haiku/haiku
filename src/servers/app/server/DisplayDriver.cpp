@@ -316,6 +316,132 @@ void DisplayDriver::DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect 
 {
 }
 
+void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BRegion* clipReg)
+{
+	Lock();
+
+	FBBitmap		frameBuffer;
+	FBBitmap		*bmp = &frameBuffer;
+	
+	if(!AcquireBuffer(&frameBuffer))
+	{
+		debugger("ERROR: Couldn't acquire framebuffer in CopyRegionList()\n");
+		return;
+	}
+	
+
+	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Bounds().IntegerWidth();
+	BList		rectList;
+	int32		i, k;
+	uint8		*bitmapBits = (uint8*)bmp->Bits();
+	int32		Bwidth		= bmp->Bounds().IntegerWidth() + 1;
+	int32		Bheight		= bmp->Bounds().IntegerHeight() + 1;
+
+  for(k=0; k < rCount; k++)
+  {
+	BRegion		*reg = (BRegion*)list->ItemAt(k);
+
+	int32		rectCount = reg->CountRects();
+	for(i=0; i < rectCount; i++){
+		BRect		r		= reg->RectAt(i);
+		uint8		*rectCopy;
+		uint8		*srcAddress;
+		uint8		*destAddress;
+		int32		firstRow, lastRow;
+		int32		firstCol, lastCol;
+		int32		copyLength;
+		int32		copyRows;
+
+		firstRow	= (int32)(r.top < 0? 0: r.top);
+		lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+		firstCol	= (int32)(r.left < 0? 0: r.left);
+		lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+		copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+		copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+
+		rectCopy	= (uint8*)malloc(copyLength * copyRows * bytesPerPixel);
+
+		srcAddress	= bitmapBits
+							+ (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
+		destAddress	= rectCopy;
+
+		for (int32 j = 0; j < copyRows; j++){
+			uint8		*destRowAddress	= destAddress + (j * copyLength * bytesPerPixel);
+			uint8		*srcRowAddress	= srcAddress + (j * Bwidth * bytesPerPixel);
+			memcpy(destRowAddress, srcRowAddress, copyLength * bytesPerPixel );
+		}
+
+		rectList.AddItem(rectCopy);
+	}
+  }
+
+	int32		item = 0;
+  for(k=0; k < rCount; k++)
+  {
+	BRegion		*reg = (BRegion*)list->ItemAt(k);
+
+	int32		rectCount = reg->CountRects();
+	for(i=0; i < rectCount; i++){
+		BRect		r		= reg->RectAt(i);
+		uint8		*rectCopy;
+		uint8		*srcAddress;
+		uint8		*destAddress;
+		int32		firstRow, lastRow;
+		int32		firstCol, lastCol;
+		int32		copyLength, copyLength2;
+		int32		copyRows, copyRows2;
+
+		firstRow	= (int32)(r.top < 0? 0: r.top);
+		lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+		firstCol	= (int32)(r.left < 0? 0: r.left);
+		lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+		copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+		copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+
+		rectCopy	= (uint8*)rectList.ItemAt(item++);
+
+		srcAddress	= rectCopy;
+
+		r.Set(firstCol, firstRow, lastCol, lastRow);
+		r.OffsetBy( *((BPoint*)pList->ItemAt(k%rCount)) );
+		firstRow	= (int32)(r.top < 0? 0: r.top);
+		lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+		firstCol	= (int32)(r.left < 0? 0: r.left);
+		lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+		copyLength2	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+		copyRows2	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+
+		destAddress	= bitmapBits
+							+ (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
+
+		int32		minLength	= copyLength < copyLength2? copyLength: copyLength2;
+		int32		minRows		= copyRows < copyRows2? copyRows: copyRows2;
+
+		for (int32 j = 0; j < minRows; j++){
+			uint8		*destRowAddress	= destAddress + (j * Bwidth * bytesPerPixel);
+			uint8		*srcRowAddress	= srcAddress + (j * copyLength * bytesPerPixel);
+			memcpy(destRowAddress, srcRowAddress, minLength * bytesPerPixel );
+		}
+	}
+  }
+
+	for(i=0; i < rectList.CountItems(); i++){
+		void		*rectCopy;
+		rectCopy	= rectList.ItemAt(i);
+		if (rectCopy)
+			free(rectCopy);
+	}
+	rectList.MakeEmpty();
+
+	BRect		inval(bmp->Bounds());
+	ReleaseBuffer();
+	Unlock();
+
+//	ConstrainClippingRegion(clipReg);
+	Invalidate(inval);
+//	ConstrainClippingRegion(NULL);
+}
+
 void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, RGBColor &color, escapement_delta *delta)
 {
 	DrawData d;

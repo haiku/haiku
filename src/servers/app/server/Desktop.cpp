@@ -144,7 +144,7 @@ void Desktop::InitMode(void)
 		Screen		*screens[1];		
 		screens[0]	= (Screen*)fScreenList.ItemAt(i);
 		
-		RootLayer	*rl = new RootLayer(name, 4, this);
+		RootLayer	*rl = new RootLayer(name, 4, this, GetDisplayDriver());
 		rl->SetScreens(screens, 1, 1);
 		
 		fRootLayerList.AddItem(rl);
@@ -229,6 +229,7 @@ int32 Desktop::CountRootLayers() const
 
 DisplayDriver* Desktop::GetDisplayDriver() const
 {
+// TODO: implement!
 	return ScreenAt(0)->DDriver();
 }
 
@@ -308,7 +309,7 @@ void Desktop::SetFocusWinBorder(WinBorder* winBorder)
 	WinBorder	*newFocus = NULL;
 
 	if(fFocusWinBorder)
-		fFocusWinBorder->SetFocus(false);
+		fFocusWinBorder->HighlightDecorator(false);
 	
 	if(winBorder)
 	{
@@ -329,7 +330,7 @@ void Desktop::SetFocusWinBorder(WinBorder* winBorder)
 		//why do put this line? Eh... I will remove it later...
 		newFocus = aws->FocusLayer();
 
-		aws->FocusLayer()->SetFocus(true);
+		aws->FocusLayer()->HighlightDecorator(true);
 		
 		aws->Invalidate();
 	}
@@ -382,7 +383,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			Workspace	*ws;
 			rl			= ActiveRootLayer();
 			ws			= rl->ActiveWorkspace();
-			target		= ws->SearchLayerUnderPoint(pt);
+			target		= ws->SearchWinBorder(pt);
 			if (target){
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
@@ -414,7 +415,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			msg->Read<float>(&pt.y);
 			msg->Read<int32>(&mod);
 			
-			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchLayerUnderPoint(pt);
+			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
 			if(target)
 				target->MouseUp(pt,mod);
 			
@@ -443,7 +444,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
 			
 			BPoint pt;
-			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchLayerUnderPoint(pt);
+			WinBorder *target=ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
 			if(target)
 				target->MouseMoved(pt,buttons);
 			break;
