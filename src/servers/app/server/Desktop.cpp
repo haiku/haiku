@@ -63,7 +63,8 @@ namespace desktop_private {
 	Screen *activescreen=NULL;
 	scroll_bar_info scrollbarinfo;
 	menu_info menuinfo;
-	int16 ffm;
+	mode_mouse ffm_mode;
+	bool ffm;
 }
 
 //! locks layer access
@@ -650,12 +651,12 @@ void SetMenuInfo(const menu_info &info)
 }
 
 /*!
-	\brief Thread-safe way of obtaining the current focus-follows-mouse behavior
-	\return Current menu behavior data
+	\brief See if the the system is in focus-follows-mouse mode
+	\return True if enabled, false if disabled
 */
-int16 GetFFMouse(void)
+bool GetFFMouse(void)
 {
-	int16 value;
+	bool value;
 	desktop_private::optlock.Lock();
 	value=desktop_private::ffm;
 	desktop_private::optlock.Unlock();
@@ -663,13 +664,37 @@ int16 GetFFMouse(void)
 }
 
 /*!
-	\brief Thread-safe way of setting the current focus-follows-mouse behavior
-	\param info Behavior data structure
+	\brief Enable or disable focus-follows-mouse for system
+	\param info Enable/Disable flag
 */
-void SetFFMouse(const int16 &value)
+void SetFFMouse(const bool &value)
 {
 	desktop_private::optlock.Lock();
 	desktop_private::ffm=value;
+	desktop_private::optlock.Unlock();
+}
+
+/*!
+	\brief Obtain the current focus-follows-mouse behavior
+	\return Current menu behavior data
+*/
+mode_mouse GetFFMouseMode(void)
+{
+	mode_mouse value;
+	desktop_private::optlock.Lock();
+	value=desktop_private::ffm_mode;
+	desktop_private::optlock.Unlock();
+	return value;
+}
+
+/*!
+	\brief Set the focus-follows-mouse behavior
+	\param info Behavior data structure
+*/
+void SetFFMouseMode(const mode_mouse &value)
+{
+	desktop_private::optlock.Lock();
+	desktop_private::ffm_mode=value;
 	desktop_private::optlock.Unlock();
 }
 

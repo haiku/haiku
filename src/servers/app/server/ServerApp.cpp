@@ -30,6 +30,7 @@
 #include <PortLink.h>
 #include <stdio.h>
 #include <string.h>
+#include <ScrollBar.h>
 #include <ServerProtocol.h>
 
 #include "BitmapManager.h"
@@ -50,10 +51,8 @@
 
 /*!
 	\brief Constructor
-	\param sendport port ID for the BApplication which will receive the
-	ServerApp's messages
-	\param rcvport port by which the ServerApp will receive messages from its
-	BApplication.
+	\param sendport port ID for the BApplication which will receive the ServerApp's messages
+	\param rcvport port by which the ServerApp will receive messages from its BApplication.
 	\param _signature NULL-terminated string which contains the BApplication's
 	MIME _signature.
 */
@@ -61,7 +60,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 {
 	// need to copy the _signature because the message buffer
 	// owns the copy which we are passed as a parameter.
-	_signature=(signature)?signature:"application/x-vnd.unknown-application";
+	_signature=(signature)?signature:"application/x-vnd.unregistered-application";
 	
 	// token ID of the BApplication's BHandler object. Used for BMessage target specification
 	_handlertoken=handlerID;
@@ -92,19 +91,19 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_driver=GetGfxDriver(ActiveScreen());
 	_cursorhidden=false;
 
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s:\n",_signature.String());
-printf("\tBApp port: %ld\n",_sender);
-printf("\tReceiver port: %ld\n",_receiver);
-#endif
+	#ifdef DEBUG_SERVERAPP
+		printf("ServerApp %s:\n",_signature.String());
+		printf("\tBApp port: %ld\n",_sender);
+		printf("\tReceiver port: %ld\n",_receiver);
+	#endif
 }
 
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s:~ServerApp()\n",_signature.String());
-#endif
+	#ifdef DEBUG_SERVERAPP
+		printf("ServerApp %s:~ServerApp()\n",_signature.String());
+	#endif
 	int32 i;
 	
 	ServerWindow *tempwin;
@@ -157,9 +156,6 @@ printf("ServerApp %s:~ServerApp()\n",_signature.String());
 */
 bool ServerApp::Run(void)
 {
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s:Run()\n",_signature.String());
-#endif
 	// Unlike a BApplication, a ServerApp is *supposed* to return immediately
 	// when its Run() function is called.
 	_monitor_thread=spawn_thread(MonitorApp,_signature.String(),B_NORMAL_PRIORITY,this);
@@ -243,12 +239,11 @@ int32 ServerApp::MonitorApp(void *data)
 		{
 			switch(msgcode)
 			{
-// -------------- Messages received from the Server ------------------------
 				case AS_QUIT_APP:
 				{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s:Server shutdown notification received\n",app->_signature.String());
-#endif
+					#ifdef DEBUG_SERVERAPP
+						printf("ServerApp %s:Server shutdown notification received\n",app->_signature.String());
+					#endif
 					// If we are using the real, accelerated version of the
 					// DisplayDriver, we do NOT want the user to be able shut down
 					// the server. The results would NOT be pretty
@@ -270,13 +265,10 @@ printf("ServerApp %s:Server shutdown notification received\n",app->_signature.St
 						get_port_info(app->_sender,&pi);
 						kill_team(pi.team);
 						app->PostMessage(B_QUIT_REQUESTED);
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s:Sent server shutdown message to BApp\n",app->_signature.String());
-#endif
 					}
 					break;
 				}
-// -------------- Messages received from the Application ------------------
+
 				case B_QUIT_REQUESTED:
 				{
 					// Our BApplication sent us this message when it quit.
@@ -331,9 +323,6 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 	{
 		case AS_UPDATED_CLIENT_FONTLIST:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Client font list update confirmed\n",_signature.String());
-#endif
 			// received when the client-side global font list has been
 			// refreshed
 			fontserver->Lock();
@@ -370,11 +359,12 @@ printf("ServerApp %s: Client font list update confirmed\n",_signature.String());
 			ServerWindow *newwin=new ServerWindow(rect,(const char *)index,
 				winlook, winfeel, winflags,this,win_port,workspace,htoken);
 			_winlist->AddItem(newwin);
+			AddWindowToDesktop(newwin,workspace,ActiveScreen());
 
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-	_signature.String(),(const char *)index,rect.left,rect.top,rect.right,rect.bottom);
-#endif
+			#ifdef DEBUG_SERVERAPP
+				printf("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+					_signature.String(),(const char *)index,rect.left,rect.top,rect.right,rect.bottom);
+			#endif
 
 			// Window looper is waiting for our reply. Send back the
 			// ServerWindow's message port
@@ -401,9 +391,9 @@ printf("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 				w=(ServerWindow*)_winlist->ItemAt(i);
 				if(w->_token==winid)
 				{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title());
-#endif
+					#ifdef DEBUG_SERVERAPP
+						printf("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title());
+					#endif
 					_winlist->RemoveItem(w);
 					delete w;
 					break;
@@ -440,10 +430,10 @@ printf("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title());
 			s.id=*((int32*)index);
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
-		_signature.String(),r.left,r.top,r.right,r.bottom);
-#endif
+			#ifdef DEBUG_SERVERAPP
+				printf("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
+						_signature.String(),r.left,r.top,r.right,r.bottom);
+			#endif
 			if(sbmp)
 			{
 				// list for doing faster lookups for a bitmap than what the BitmapManager
@@ -478,9 +468,9 @@ printf("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
 			ServerBitmap *sbmp=_FindBitmap(*((int32*)index));
 			if(sbmp)
 			{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),*((int32*)index));
-#endif
+				#ifdef DEBUG_SERVERAPP
+					printf("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),*((int32*)index));
+				#endif
 				_bmplist->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
 				write_port(replyport,SERVER_TRUE,NULL,0);
@@ -531,9 +521,6 @@ printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
 			int32 workspace=*((int32*)index); index+=sizeof(int32);
 			uint32 mode=*((uint32*)index); index+=sizeof(uint32);
 
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: SetScreenMode: workspace %ld, mode %lu\n",_signature.String(), workspace, mode);
-#endif
 			SetSpace(workspace,mode,ActiveScreen(),*((bool*)index));
 
 			break;
@@ -552,35 +539,23 @@ printf("ServerApp %s: SetScreenMode: workspace %ld, mode %lu\n",_signature.Strin
 		// call the CursorManager's version to allow for future expansion
 		case AS_SHOW_CURSOR:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Show Cursor\n",_signature.String());
-#endif
 			cursormanager->ShowCursor();
 			_cursorhidden=false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Hide Cursor\n",_signature.String());
-#endif
 			cursormanager->HideCursor();
 			_cursorhidden=true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Obscure Cursor\n",_signature.String());
-#endif
 			cursormanager->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: Query Cursor Hidden\n",_signature.String());
-#endif
 			// Attached data
 			// 1) int32 port to reply to
 			write_port(*((port_id*)index),(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
@@ -588,9 +563,6 @@ printf("ServerApp %s: Query Cursor Hidden\n",_signature.String());
 		}
 		case AS_SET_CURSOR_DATA:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: SetCursor(cursor data *)\n",_signature.String());
-#endif
 			// Attached data: 68 bytes of _appcursor data
 			
 			int8 cdata[68];
@@ -611,9 +583,6 @@ printf("ServerApp %s: SetCursor(cursor data *)\n",_signature.String());
 		}
 		case AS_SET_CURSOR_BCURSOR:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s: SetCursor(BCursor)\n",_signature.String());
-#endif
 			// Attached data:
 			// 1) port_id reply port
 			// 2) 68 bytes of _appcursor data
@@ -636,11 +605,72 @@ printf("ServerApp %s: SetCursor(BCursor)\n",_signature.String());
 			replylink.Flush();
 			break;
 		}
+		case AS_GET_SCROLLBAR_INFO:
+		{
+			// Attached data:
+			// 1) port_id reply port - synchronous message
+
+			PortLink replylink( *((port_id*)index) );
+
+			scroll_bar_info sbi=GetScrollBarInfo();
+			
+			replylink.SetOpCode(AS_GET_SCROLLBAR_INFO);
+			replylink.Attach(&sbi,sizeof(scroll_bar_info));
+			replylink.Flush();
+			
+			break;
+		}
+		case AS_SET_SCROLLBAR_INFO:
+		{
+			// Attached Data:
+			// 1) scroll_bar_info scroll bar info structure
+			SetScrollBarInfo(*((scroll_bar_info*)index));
+			break;
+		}
+		case AS_FOCUS_FOLLOWS_MOUSE:
+		{
+			// Attached data:
+			// 1) port_id reply port - synchronous message
+
+			PortLink replylink( *((port_id*)index) );
+			
+			replylink.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
+			replylink.Attach(GetFFMouse());
+			replylink.Flush();
+			break;
+		}
+		case AS_SET_FOCUS_FOLLOWS_MOUSE:
+		{
+			// Attached Data:
+			// 1) scroll_bar_info scroll bar info structure
+			SetScrollBarInfo(*((scroll_bar_info*)index));
+			break;
+		}
+		case AS_SET_MOUSE_MODE:
+		{
+			// Attached Data:
+			// 1) enum mode_mouse FFM mouse mode
+			SetFFMouseMode(*((mode_mouse*)index));
+			break;
+		}
+		case AS_GET_MOUSE_MODE:
+		{
+			// Attached data:
+			// 1) port_id reply port - synchronous message
+
+			PortLink replylink( *((port_id*)index) );
+			
+			replylink.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
+			mode_mouse mode=GetFFMouseMode();
+			replylink.Attach(&mode,sizeof(mode_mouse));
+			replylink.Flush();
+			break;
+		}
 		default:
 		{
-#ifdef DEBUG_SERVERAPP
-printf("ServerApp %s received unhandled message code %lx\n",_signature.String(),code);
-#endif
+			#ifdef DEBUG_SERVERAPP
+				printf("ServerApp %s received unhandled message code %lx\n",_signature.String(),code);
+			#endif
 			break;
 		}
 	}

@@ -31,6 +31,7 @@
 #include <ScrollBar.h>
 #include <Menu.h>
 #include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
 
 class ServerWindow;
 class Screen;
@@ -70,8 +71,10 @@ void SetScrollBarInfo(const scroll_bar_info &info);
 menu_info GetMenuInfo(void);
 void SetMenuInfo(const menu_info &info);
 
-int16 GetFFMouse(void);
-void SetFFMouse(const int16 &value);
+bool GetFFMouse(void);
+void SetFFMouse(const bool &value);
+mode_mouse GetFFMouseMode(void);
+void SetFFMouseMode(const mode_mouse &value);
 
 void lock_layers(void);
 void unlock_layers(void);
