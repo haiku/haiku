@@ -714,14 +714,17 @@ ShowImageView::CopySelection(uchar alpha)
 	
 	if (!HasSelection()) return NULL;
 	
-	BRect rect(0, 0, fCopyFromRect.IntegerWidth(), fCopyFromRect.IntegerHeight());
+	BRect rect(0, 0, fSelectionRect.Width(), fSelectionRect.Height());
 	BView view(rect, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
 	BBitmap *bitmap = new BBitmap(rect, hasAlpha ? B_RGBA32 : fBitmap->ColorSpace(), true);
 	if (bitmap == NULL) return NULL;
 	
 	if (bitmap->Lock()) {
 		bitmap->AddChild(&view);
-		view.DrawBitmap(fBitmap, fCopyFromRect, rect);
+		if (fSelBitmap)
+			view.DrawBitmap(fSelBitmap, fSelBitmap->Bounds(), rect);
+		else
+			view.DrawBitmap(fBitmap, fCopyFromRect, rect);
 		if (hasAlpha) {
 			view.SetDrawingMode(B_OP_SUBTRACT);
 			view.SetHighColor(0, 0, 0, 255-alpha);
@@ -1026,10 +1029,9 @@ ShowImageView::MouseDown(BPoint position)
 		AnimateSelection(true);
 		
 	} else if (buttons == B_PRIMARY_MOUSE_BUTTON) {
-		if (HasSelection())
+		MergeSelection();
 			// If there is an existing selection, 
 			// Make it part of the background image
-			MergeSelection();
 	
 		// begin new selection
 		SetHasSelection(true);
@@ -1312,6 +1314,44 @@ int32
 ShowImageView::PageCount()
 {
 	return fDocumentCount;
+}
+
+void
+ShowImageView::Cut()
+{
+	CopySelectionToClipboard();
+	ClearSelection();
+}
+
+void
+ShowImageView::Paste()
+{	
+	if (be_clipboard->Lock()) {	
+		BMessage *pclip;
+		if ((pclip = be_clipboard->Data()) != NULL) {
+			BBitmap *pbits = dynamic_cast<BBitmap *>(BBitmap::Instantiate(pclip));
+			if (pbits) {
+				MergeSelection();
+				
+				SetHasSelection(true);
+				fSelBitmap = pbits;
+				fCopyFromRect = BRect();
+				fSelectionRect = pbits->Bounds();
+				
+				BPoint point;
+				if (pclip->FindPoint("be:location", &point) == B_OK &&
+					fBitmap->Bounds().Contains(point))
+					// Set the selection rectangle to the same location it was
+					// copied from, but only if the background bitmap is large enough
+					// to contain that point
+					fSelectionRect.OffsetBy(point);
+				
+				Invalidate();
+			}
+		}
+		
+		be_clipboard->Unlock(); 
+	}
 }
 
 void

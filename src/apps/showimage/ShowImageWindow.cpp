@@ -554,11 +554,13 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case B_UNDO:
 			break;
 		case B_CUT:
+			fpImageView->Cut();
 			break;
 		case B_COPY:
 			fpImageView->CopySelectionToClipboard();
 			break;
 		case B_PASTE:
+			fpImageView->Paste();
 			break;
 		case MSG_CLEAR_SELECT:
 			fpImageView->ClearSelection();

@@ -77,6 +77,8 @@ public:
 	int32 CurrentPage();
 	int32 PageCount();
 	
+	void Cut();
+	void Paste();
 	void SelectAll();
 	void ClearSelection();
 	
