@@ -12,7 +12,7 @@
 
 typedef struct loopback_interface {
 	ifnet_t ifnet;
-	net_data_queue *queue;
+	net_buffer_queue *queue;
 } loopback_interface;
 
 
@@ -32,12 +32,12 @@ status_t init(void * params)
 		return B_NO_MEMORY;		
 
 	// create loopback fifo queue, to keep packets *sent*
-	li->queue = g_stack->new_data_queue(64*LOOPBACK_MTU);
+	li->queue = g_stack->new_buffer_queue(64*LOOPBACK_MTU);
 
 
 	iface = &li->ifnet;
 	iface->if_name 	= "loopback";
-	iface->if_flags = (IFF_LOOPBACK | IFF_MULTICAST);
+	iface->if_flags = (IFF_LOOPBACK | IFF_NOARP);
 	iface->if_type 	= 0x10; //IFT_LOOP
 	iface->if_mtu 	= LOOPBACK_MTU;
 			
@@ -52,7 +52,7 @@ status_t uninit(ifnet_t *iface)
 	loopback_interface *li = (loopback_interface *) iface;
 
 	printf("loopback: uniniting %s interface\n", iface->if_name);
-	return g_stack->delete_data_queue(li->queue);
+	return g_stack->delete_buffer_queue(li->queue);
 }
 
 status_t up(ifnet_t *iface)
@@ -67,22 +67,22 @@ status_t down(ifnet_t *iface)
 }
 
 
-status_t send(ifnet_t *iface, net_data *data)
+status_t send(ifnet_t *iface, net_buffer *buffer)
 {
 	loopback_interface *li = (loopback_interface *) iface;
 
-	if (!data)
+	if (!buffer)
 		return B_ERROR;
 
-	return g_stack->enqueue_data(li->queue, data);
+	return g_stack->enqueue_buffer(li->queue, buffer);
 }
 
 
-status_t receive(ifnet_t *iface, net_data **data)
+status_t receive(ifnet_t *iface, net_buffer **buffer)
 {
 	loopback_interface *li = (loopback_interface *) iface;
 	
-	return g_stack->dequeue_data(li->queue, data, B_INFINITE_TIMEOUT, false);
+	return g_stack->dequeue_buffer(li->queue, buffer, B_INFINITE_TIMEOUT, false);
 }
 
 	

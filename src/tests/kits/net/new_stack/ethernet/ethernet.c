@@ -84,9 +84,9 @@ status_t down(ifnet_t *iface)
 }
 
 
-status_t send(ifnet_t *iface, net_data *data)
+status_t send(ifnet_t *iface, net_buffer *buffer)
 {
-	if (!data)
+	if (!buffer)
 		return B_ERROR;
 
 	// TODO!
@@ -94,10 +94,10 @@ status_t send(ifnet_t *iface, net_data *data)
 }
 
 
-status_t receive(ifnet_t *iface, net_data **data)
+status_t receive(ifnet_t *iface, net_buffer **received_buffer)
 {
 	ethernet_interface *ei = (ethernet_interface *) iface;
-	net_data *nd;
+	net_buffer *buffer;
 	void *frame;
 	size_t len;
 	ssize_t sz;
@@ -107,21 +107,21 @@ status_t receive(ifnet_t *iface, net_data **data)
 	if (!frame)
 		return B_NO_MEMORY;
 
-	nd = g_stack->new_data();
-	if (!nd) {
+	buffer = g_stack->new_buffer();
+	if (!buffer) {
 		free(frame);
 		return B_NO_MEMORY;
 	};
 		
 	sz = read(ei->fd, frame, len);
 	if (sz >= B_OK) {
-		g_stack->append_data(nd, frame, sz, (data_node_free_func) free);
-		*data = nd;
+		g_stack->add_to_buffer(buffer, 0, frame, sz, (buffer_chunk_free_func) free);
+		*received_buffer = buffer;
 		return sz;
 	};
 	
 	free(frame);
-	g_stack->delete_data(nd, false);
+	g_stack->delete_buffer(buffer, false);
 	return sz;
 }
 	
