@@ -49,3 +49,4 @@ void path_build( PATHNAME *f, char *file, int binding );
 void path_parse( const char *file, PATHNAME *f );
 void path_parent( PATHNAME *f );
 
+char *normalize_path(const char *path, char *buffer, size_t bufferSize);

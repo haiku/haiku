@@ -232,4 +232,96 @@ path_parent( PATHNAME *f )
 	f->f_member.len = 0;
 }
 
+/*
+ *	normalize_path() - normalize a path
+ *
+ *	It doesn't really generate a unique representation of a path to an entry,
+ *	but at least reduces the number of categories that represent the same
+ *	entry. On error, or if the supplied buffer is too small, NULL is returned.
+ */
+
+char *
+normalize_path(const char *path, char *buffer, size_t bufferSize)
+{
+	// init cwd
+	static char _cwd[PATH_MAX];
+	static char *cwd = 0;
+	static size_t cwdLen = 0;
+	int pathLen = (path ? strlen(path) : 0);
+	int resultLen = 0;
+	int resolveDotDot = !0;
+	// init cwd
+	if (!cwd) {
+		cwd = getcwd(_cwd, PATH_MAX);
+		if (cwd)
+			cwdLen = strlen(cwd);
+		else
+			return 0;
+	}
+	// check length
+	if (cwdLen + pathLen + 2 > bufferSize)
+		return 0;
+	// construct result
+	if (pathLen > 0 && path[0] == PATH_DELIM) {
+		// absolute path: ignore cwd
+		buffer[0] = PATH_DELIM;
+		buffer[1] = '\0';
+		resultLen = 1;
+		path++;
+		pathLen--;
+	} else {
+		// relative path: copy cwd into result
+		memcpy(buffer, cwd, cwdLen + 1);
+		resultLen = cwdLen;
+	}
+	// append path componentwise to the result, skipping "." and empty
+	// components, and chopping off a component per ".."
+	while (pathLen > 0) {
+		// find component
+		char *separator = strchr(path, PATH_DELIM);
+		const char *component = path;
+		int componentLen = 0;
+		if (separator) {
+			componentLen = separator - path;
+			pathLen -= componentLen + 1;
+			path = separator + 1;
+		} else {
+			componentLen = pathLen;
+			path += componentLen;
+			pathLen = 0;
+		}
+		// handle found component
+		if (componentLen > 0) {
+			if (componentLen == 1 && component[0] == '.') {
+				// component is ".": skip
+			} else if (resolveDotDot && componentLen == 2 && component[0] == '.'
+					   && component[1] == '.') {
+				// component is "..": eat the last component of the result
+				char *lastSeparator = strrchr(buffer, PATH_DELIM);
+				if (lastSeparator) {
+					resultLen = lastSeparator - buffer;
+					if (resultLen == 0) {
+						// always leave at least the root
+						buffer[0] = PATH_DELIM;
+						resultLen = 1;
+					}
+					buffer[resultLen] = '\0';
+				} // else: not good
+			} else {
+				// normal component: append
+				if (resultLen < 1 || buffer[resultLen - 1] != PATH_DELIM)
+					buffer[resultLen++] = PATH_DELIM;
+				memcpy(buffer + resultLen, component, componentLen);
+				resultLen += componentLen;
+				buffer[resultLen] = '\0';
+				// After we found the first real path component, we don't
+				// resolve ".." anymore, as it could be a (sym)link, which
+				// could break the algorithm.
+				resolveDotDot = 0;
+			}
+		}
+	}
+	return buffer;
+}
+
 # endif /* unix, NT, OS/2, AmigaOS */
