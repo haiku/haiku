@@ -1599,11 +1599,10 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 
 	int32 width = src.IntegerWidth() + 1;
 	int32 height = src.IntegerHeight() + 1;
-	int length;
-	int bpc;
+	int length = 0;
+	int bpc = 0;
 	
-	
-	
+		
 	if (HasAlphaChannel(pixelFormat)) {
 		if (NeedsBPC1Mask(pixelFormat) || !SupportsSoftMask()) {
 			int32 w = (width+7)/8;

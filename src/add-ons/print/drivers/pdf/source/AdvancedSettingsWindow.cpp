@@ -54,7 +54,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	BRect		r;
 	BBox		*panel;
 	BButton		*button;
-	BCheckBox   *cb;
+	// BCheckBox   *cb;
 	BMenuField  *mf;
 	float		x, y, w, h;
 	fSettings = settings;

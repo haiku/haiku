@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src add-ons print drivers pdf encoding ;
+
+Package openbeos-pdf_writer-cvs :
+	t1enc0.enc t1enc1.enc t1enc2.enc t1enc3.enc t1enc4.enc 
+	ttenc0.cpg ttenc1.cpg ttenc2.cpg ttenc3.cpg ttenc4.cpg :
+	boot home config settings PDF_Writer encoding ;

@@ -1,7 +1,6 @@
 SubDir OBOS_TOP src add-ons print drivers pdf source ;
 
 AddResources PDF\ Writer : 
-	# PDFWriter.rsrc 
 	PDFWriter.rdef
 ;
 
@@ -55,3 +54,8 @@ LinkSharedOSLibs
 	;
 
 # 	/boot/home/config/lib/libpdf.so  
+
+Package openbeos-pdf_writer-cvs :
+	PDF\ Writer :
+	boot home config add-ons Print ;
+

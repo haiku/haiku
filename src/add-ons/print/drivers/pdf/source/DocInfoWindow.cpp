@@ -87,7 +87,7 @@ DocInfoWindow::DocInfoWindow(BMessage *doc_info)
 {
 	// ---- Ok, build a default page setup user interface
 	BRect		r;
-	BBox		*panel;
+	// BBox		*panel;
 	BTabView    *tabView;
 	BString     permissions;
 	fDocInfo = doc_info;
@@ -161,8 +161,8 @@ DocInfoWindow::SetupButtons(BBox* panel) {
 
 void
 DocInfoWindow::SetupDocInfoView(BBox* panel) {
-	BButton		*button;
-	float		x, y, w, h;
+	// BButton		*button;
+	// float		x, y, w, h;
 
 	BRect r(panel->Bounds());
 	

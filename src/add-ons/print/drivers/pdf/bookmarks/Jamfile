@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src add-ons print drivers pdf bookmarks ;
+
+Package openbeos-pdf_writer-cvs :
+	Sample :
+	boot home config settings PDF_Writer bookmarks ;

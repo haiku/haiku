@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src add-ons print drivers pdf xrefs ;
+
+Package openbeos-pdf_writer-cvs :
+	English Deutsch :
+	boot home config settings PDF_Writer xrefs ;
