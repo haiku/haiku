@@ -16,7 +16,7 @@
 #include <string.h>
 
 /* define this only if not used as compile parameter
- * setting it to one will disable serial debug and
+ * setting it to 1 will disable serial debug and
  * redirect it to Bochs
  */
 // #define BOCHS_DEBUG_HACK 0
