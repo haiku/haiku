@@ -1349,6 +1349,18 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 	if (_ns == NULL || _node == NULL || _cookie == NULL)
 		return B_BAD_VALUE;
 
+	return B_OK;
+}
+
+
+static int
+bfs_free_cookie(void *_ns, void *_node, void *_cookie)
+{
+	FUNCTION();
+
+	if (_ns == NULL || _node == NULL || _cookie == NULL)
+		return B_BAD_VALUE;
+
 	file_cookie *cookie = (file_cookie *)_cookie;
 
 	Volume *volume = (Volume *)_ns;
@@ -1391,26 +1403,6 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
 	}
 
-	return B_OK;
-}
-
-
-static int
-bfs_free_cookie(void *_ns, void *_node, void *_cookie)
-{
-	FUNCTION();
-
-	if (_ns == NULL || _node == NULL || _cookie == NULL)
-		return B_BAD_VALUE;
-
-	file_cookie *cookie = (file_cookie *)_cookie;
-
-	Volume *volume = (Volume *)_ns;
-	Inode *inode = (Inode *)_node;
-
-	if (cookie != NULL)
-		free(cookie);
-
 	if (inode->Flags() & INODE_NO_CACHE) {
 		volume->Pool().ReleaseBuffers();
 		inode->Node()->flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_NO_CACHE);
@@ -1418,6 +1410,7 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 			// non-permanent flag which will be removed when the inode is loaded
 			// into memory.
 	}
+
 	if (inode->Flags() & INODE_CHKBFS_RUNNING) {
 		// "chkbfs" exited abnormally, so we have to stop it here...
 		FATAL(("check process was aborted!\n"));
