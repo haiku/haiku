@@ -61,9 +61,12 @@ floppy_start:
 	mov		$0x200, %bx		// to 0x1000:0x0200
 	call	load_sectors
 
+	// ToDo: this seems to be problematic, at least under Bochs (reboot will fail)
+#if 0
 	or		%dl, %dl		// if it's a floppy, turn off its motor
 	jnz		start_loader
 	call	disable_floppy_motor
+#endif
 
 start_loader:
 	// set our environment and jump to the standard BFS boot block entry point
