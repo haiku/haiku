@@ -5,7 +5,7 @@ AddResources PDF\ Writer : PDFWriter.rsrc ;
 Addon 
 	PDF\ Writer
 	:
-	Print
+	print
 	:
 	AdvancedSettingsWindow.cpp
 	Bezier.cpp

@@ -3,7 +3,7 @@ SubDir OBOS_TOP src add-ons print transports print_to_file ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
 Addon Print\ To\ File
-	: Print
+	: print transport
 	: print_transport.cpp
 	  FileSelector.cpp
 ;
