@@ -73,7 +73,7 @@ static struct {
 
 struct vnode {
 	struct vnode	*next;
-	struct vm_cache	*cache;
+	vm_cache_ref	*cache;
 	mount_id		device;
 	list_link		mount_link;
 	list_link		unused_link;
@@ -1529,7 +1529,8 @@ fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_
 
 
 static int
-get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool kernel)
+get_new_fd(int type, struct fs_mount *mount, struct vnode *vnode,
+	fs_cookie cookie, int openMode, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	int fd;
@@ -1538,8 +1539,12 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 	if (!descriptor)
 		return B_NO_MEMORY;
 
-	descriptor->u.vnode = vnode;
+	if (vnode)
+		descriptor->u.vnode = vnode;
+	else
+		descriptor->u.mount = mount;
 	descriptor->cookie = cookie;
+
 	switch (type) {
 		case FDTYPE_FILE:
 			descriptor->ops = &sFileOps;
@@ -1573,7 +1578,7 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 	}
 
 	// index directories and queries don't have a vnode but a mount structure attached
-	if (type != FDTYPE_INDEX_DIR && type != FDTYPE_QUERY)
+	if (vnode != NULL)
 		cache_node_opened(vnode->cache, vnode->device, vnode->id);
 
 	return fd;
@@ -1620,8 +1625,8 @@ get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
 {
 	struct vnode *vnode;
 
-	int status = get_vnode(mountID, vnodeID, &vnode, true);
-	if (status < 0)
+	status_t status = get_vnode(mountID, vnodeID, &vnode, true);
+	if (status < B_OK)
 		return status;
 
 	*_fsNode = vnode->private_node;
@@ -1753,6 +1758,20 @@ vfs_get_vnode_from_path(const char *path, bool kernel, void **_vnode)
 
 extern "C" status_t
 vfs_get_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
+{
+	struct vnode *vnode;
+
+	status_t status = get_vnode(mountID, vnodeID, &vnode, false);
+	if (status < B_OK)
+		return status;
+
+	*_vnode = vnode;
+	return B_OK;
+}
+
+
+extern "C" status_t
+vfs_lookup_vnode(mount_id mountID, vnode_id vnodeID, void **_vnode)
 {
 	// ToDo: this currently doesn't use the sVnodeMutex lock - that's
 	//	because it's only called from file_cache_create() with that
@@ -1997,7 +2016,7 @@ vfs_write_pages(void *_vnode, void *cookie, off_t pos, const iovec *vecs, size_t
 
 
 extern "C" status_t
-vfs_get_vnode_cache(void *_vnode, void **_cache)
+vfs_get_vnode_cache(void *_vnode, vm_cache_ref **_cache)
 {
 	struct vnode *vnode = (struct vnode *)_vnode;
 
@@ -2011,7 +2030,7 @@ vfs_get_vnode_cache(void *_vnode, void **_cache)
 	status_t status = B_OK;
 	// The cache could have been created in the meantime
 	if (vnode->cache == NULL)
-		status = vm_create_vnode_cache(vnode, (void **)&vnode->cache);
+		status = vm_create_vnode_cache(vnode, &vnode->cache);
 
 	if (status == B_OK)
 		*_cache = vnode->cache;
@@ -2449,7 +2468,7 @@ create_vnode(struct vnode *directory, const char *name, int openMode, int perms,
 		return EINVAL;
 	}
 
-	if ((status = get_new_fd(FDTYPE_FILE, vnode, cookie, openMode, kernel)) >= 0)
+	if ((status = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
 	// something went wrong, clean up
@@ -2478,7 +2497,7 @@ open_vnode(struct vnode *vnode, int omode, bool kernel)
 	if (status < 0)
 		return status;
 
-	status = get_new_fd(FDTYPE_FILE, vnode, cookie, omode, kernel);
+	status = get_new_fd(FDTYPE_FILE, NULL, vnode, cookie, omode, kernel);
 	if (status < 0) {
 		FS_CALL(vnode, close)(vnode->mount->cookie, vnode->private_node, cookie);
 		FS_CALL(vnode, free_cookie)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -2502,7 +2521,7 @@ open_dir_vnode(struct vnode *vnode, bool kernel)
 		return status;
 
 	// file is opened, create a fd
-	status = get_new_fd(FDTYPE_DIR, vnode, cookie, 0, kernel);
+	status = get_new_fd(FDTYPE_DIR, NULL, vnode, cookie, 0, kernel);
 	if (status >= 0)
 		return status;
 
@@ -2532,7 +2551,7 @@ open_attr_dir_vnode(struct vnode *vnode, bool kernel)
 		return status;
 
 	// file is opened, create a fd
-	status = get_new_fd(FDTYPE_ATTR_DIR, vnode, cookie, 0, kernel);
+	status = get_new_fd(FDTYPE_ATTR_DIR, NULL, vnode, cookie, 0, kernel);
 	if (status >= 0)
 		return status;
 
@@ -2754,7 +2773,7 @@ dir_create_entry_ref(mount_id mountID, vnode_id parentID, const char *name, int 
 static status_t
 dir_create(int fd, char *path, int perms, bool kernel)
 {
-	char filename[SYS_MAX_NAME_LEN];
+	char filename[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
 	vnode_id newID;
 	status_t status;
@@ -3184,7 +3203,7 @@ err:
 static status_t
 common_unlink(int fd, char *path, bool kernel)
 {
-	char filename[SYS_MAX_NAME_LEN];
+	char filename[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
 	int status;
 
@@ -3230,8 +3249,8 @@ static status_t
 common_rename(int fd, char *path, int newFD, char *newPath, bool kernel)
 {
 	struct vnode *fromVnode, *toVnode;
-	char fromName[SYS_MAX_NAME_LEN];
-	char toName[SYS_MAX_NAME_LEN];
+	char fromName[B_FILE_NAME_LENGTH];
+	char toName[B_FILE_NAME_LENGTH];
 	int status;
 
 	FUNCTION(("common_rename(fd = %d, path = %s, newFD = %d, newPath = %s, kernel = %d)\n", fd, path, newFD, newPath, kernel));
@@ -3442,7 +3461,7 @@ attr_create(int fd, const char *name, uint32 type, int openMode, bool kernel)
 	if (status < B_OK)
 		goto err;
 
-	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
+	if ((status = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
 	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -3481,7 +3500,7 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 		goto err;
 
 	// now we only need a file descriptor for this attribute and we're done
-	if ((status = get_new_fd(FDTYPE_ATTR, vnode, cookie, openMode, kernel)) >= 0)
+	if ((status = get_new_fd(FDTYPE_ATTR, NULL, vnode, cookie, openMode, kernel)) >= 0)
 		return status;
 
 	FS_CALL(vnode, close_attr)(vnode->mount->cookie, vnode->private_node, cookie);
@@ -3710,7 +3729,7 @@ index_dir_open(mount_id mountID, bool kernel)
 		goto out;
 
 	// get fd for the index directory
-	status = get_new_fd(FDTYPE_INDEX_DIR, (struct vnode *)mount, cookie, 0, kernel);
+	status = get_new_fd(FDTYPE_INDEX_DIR, mount, NULL, cookie, 0, kernel);
 	if (status >= 0)
 		goto out;
 
@@ -3909,7 +3928,7 @@ query_open(dev_t device, const char *query, uint32 flags,
 		goto out;
 
 	// get fd for the index directory
-	status = get_new_fd(FDTYPE_QUERY, (struct vnode *)mount, cookie, 0, kernel);
+	status = get_new_fd(FDTYPE_QUERY, mount, NULL, cookie, 0, kernel);
 	if (status >= 0)
 		goto out;
 
