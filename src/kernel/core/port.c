@@ -510,12 +510,12 @@ delete_port(port_id id)
 	}
 
 	/* mark port as invalid */
-	sPorts[slot].id	 = -1;
+	sPorts[slot].id	= -1;
 	name = sPorts[slot].name;
-	list = sPorts[slot].msg_queue;
 	readSem = sPorts[slot].read_sem;
 	writeSem = sPorts[slot].write_sem;
 	sPorts[slot].name = NULL;
+	list_move_to_list(&sPorts[slot].msg_queue, &list);
 
 	RELEASE_PORT_LOCK(sPorts[slot]);
 	restore_interrupts(state);
