@@ -90,9 +90,9 @@ MiniView::Start()
 	setsid();
 	
 	// move our stdin and stdout to the console
-	dup2(fSlaveFD, 0);
+	/*dup2(fSlaveFD, 0);
 	dup2(fSlaveFD, 1);
-	dup2(fSlaveFD, 2);
+	dup2(fSlaveFD, 2);*/
 	
 	if (SpawnThreads() != B_OK)
 		TRACE(("error in SpawnThreads\n"));

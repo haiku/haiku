@@ -7,7 +7,7 @@ class MiniWin;
 
 class MiniApp : public BApplication {
 public:
-							MiniApp();
+							MiniApp(BRect bounds);
 virtual						~MiniApp();
 
 virtual	void				ReadyToRun();
