@@ -105,9 +105,19 @@ status_t nm_acc_init()
 	 * workaround: place cursor bitmap at _end_ of cardRAM instead of in _beginning_. */
 
 	/* setup clipping */
-	si->engine.control |= (1 << 26);
-	ACCW(CLIPLT, 0);
-	ACCW(CLIPRB, ((si->dm.virtual_height << 16) | (si->dm.virtual_width & 0x0000ffff)));
+	/* note:
+	 * on NM2160 the max acc engine width of 1600 pixels can be programmed, but
+	 * the max. height is only 1023 pixels (height register holds just 10 bits)! 
+	 * note also:
+	 * while the vertical clipping feature can do upto and including 1023 pixels,
+	 * the engine itself can do upto and including 1024 pixels vertically.
+	 * So:
+	 * Don't use the engine's clipping feature as we want to get the max out of the
+	 * engine. We won't export the acc hooks for modes beyond the acc engine's
+	 * capabilities. */
+//	si->engine.control |= (1 << 26);
+//	ACCW(CLIPLT, 0);
+//	ACCW(CLIPRB, ((si->dm.virtual_height << 16) | (si->dm.virtual_width & 0x0000ffff)));
 
 	return B_OK;
 }

@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-5 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-6 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -415,7 +415,16 @@ status_t nm_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	if (target->virtual_width > 1600) *acc_mode = false;
 
 	/* virtual_height */
-	if (target->virtual_height > 2048) *acc_mode = false;
+	if (si->ps.card_type < NM2200)
+	{
+		/* confirmed NM2097 and NM2160 */
+		if (target->virtual_height > 1024) *acc_mode = false;
+	}
+	else
+	{
+		/* fixme: needs confirmation, assuming this height will still work.. */
+		if (target->virtual_height > 2048) *acc_mode = false;
+	}
 
 	/* now check virtual_size based on CRTC constraints and modify if needed */
 //fixme: checkout cardspecs here!! (NM2160 can do 8192 _bytes_ at least (in theory))
