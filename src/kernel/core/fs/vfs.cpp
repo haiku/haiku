@@ -1143,6 +1143,9 @@ get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
 		return NULL;
 	}
 
+	// ToDo: when we can close a file descriptor at any point, investigate
+	//	if this is still valid to do (accessing the vnode without ref_count
+	//	or locking)
 	*_vnode = descriptor->u.vnode;
 	return descriptor;
 }
@@ -2886,7 +2889,7 @@ attr_remove(int fd, const char *name, bool kernel)
 	else
 		status = EROFS;
 
-	put_vnode(vnode);
+	put_fd(fd);
 
 	return status;
 }
@@ -2926,9 +2929,9 @@ attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool
 		status = EROFS;
 
 err1:
-	put_vnode(toVnode);
+	put_fd(tofd);
 err:
-	put_vnode(fromVnode);
+	put_fd(fromfd);
 
 	return status;
 }
