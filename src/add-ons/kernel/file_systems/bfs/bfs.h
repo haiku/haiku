@@ -26,9 +26,10 @@ struct block_run
 	inline bool operator==(const block_run &run) const;
 	inline bool operator!=(const block_run &run) const;
 	inline bool IsZero();
-	inline void SetTo(int32 group,uint16 start,uint16 length = 1);
+	inline void SetTo(int32 group, uint16 start, uint16 length = 1);
 
-	inline static block_run Run(int32 group,uint16 start,uint16 length = 1);
+	inline static block_run Run(int32 group, uint16 start, uint16 length = 1);
+		// can't have a constructor because it's used in a union
 };
 
 typedef block_run inode_addr;

@@ -16,6 +16,18 @@
 #	define __out dprintf
 #endif
 
+// Which debugger should be used when?
+// The DEBUGGER() macro actually has no effect if DEBUG is not defined... 
+#ifdef DEBUG
+#	ifdef USER
+#		define DEBUGGER(x) debugger x
+#	else
+#		define DEBUGGER(x) kernel_debugger x
+#	endif
+#else
+#	define DEBUGGER(x) ;
+#endif
+
 // Short overview over the debug output macros:
 //	PRINT()
 //		is for general messages that very unlikely should appear in a release build
