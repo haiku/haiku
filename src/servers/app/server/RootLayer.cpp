@@ -32,8 +32,11 @@
 #include "Desktop.h"
 #include "PatternHandler.h" // for pattern_union
 #include "ServerConfig.h"
-
+#include "TokenHandler.h"
 #include <stdio.h>
+
+//! TokenHandler object used to provide IDs for RootLayers(WorkSpaces)
+TokenHandler rlayer_token_handler;
 
 //#define DISPLAYDRIVER_TEST_HACK
 //#define DEBUG_ROOTLAYER
@@ -45,13 +48,15 @@
 	\param gfxdriver Pointer to the related graphics driver
 */
 RootLayer::RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver)
-	: Layer(rect,layername,B_FOLLOW_NONE,0, NULL)
+	: Layer(rect, layername, B_NULL_TOKEN, B_FOLLOW_NONE, 0, NULL)
 {
-	_driver=gfxdriver;
+	_view_token		= rlayer_token_handler.GetToken();
+	
+	_driver			= gfxdriver;
+	_is_dirty		= true;
+	_bgcolor		= new RGBColor();
 	_invalid->MakeEmpty();
 	_invalid->Include(Bounds());
-	_is_dirty=true;
-	_bgcolor=new RGBColor();
 }
 
 //! Frees all allocated heap memory (which happens to be none) ;)
@@ -86,7 +91,6 @@ void RootLayer::RequestDraw(void)
 		_invalid->PrintToStream();
 		printf("===========\n");
 		#endif
-		
 		for(int32 i=0; _invalid->CountRects();i++)
 		{
 			if(_invalid->RectAt(i).IsValid())
