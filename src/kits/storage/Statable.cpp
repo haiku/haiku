@@ -1,15 +1,15 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 /*!
 	\file Statable.cpp
 	BStatable implementation.
 */
 
-#include <fs_interface.h>
 #include <Statable.h>
 #include <Node.h>
+#include <NodeMonitor.h>
 #include <Volume.h>
 
 #include <sys/stat.h>
@@ -32,7 +32,7 @@ bool
 BStatable::IsFile() const
 {
 	struct stat statData;
-	if ( GetStat(&statData) == B_OK )
+	if (GetStat(&statData) == B_OK)
 		return S_ISREG(statData.st_mode);
 	else 
 		return false;
@@ -46,7 +46,7 @@ bool
 BStatable::IsDirectory() const
 {
 	struct stat statData;
-	if ( GetStat(&statData) == B_OK )
+	if (GetStat(&statData) == B_OK)
 		return S_ISDIR(statData.st_mode);
 	else 
 		return false;
@@ -60,7 +60,7 @@ bool
 BStatable::IsSymLink() const
 {
 	struct stat statData;
-	if ( GetStat(&statData) == B_OK )
+	if (GetStat(&statData) == B_OK)
 		return S_ISLNK(statData.st_mode);
 	else 
 		return false;
@@ -109,7 +109,7 @@ BStatable::SetOwner(uid_t owner)
 {
 	struct stat statData;
 	statData.st_uid = owner;
-	return set_stat(statData, FS_WRITE_STAT_UID);
+	return set_stat(statData, B_STAT_UID);
 }
 	
 /*!	\brief Returns the group owner of the node.
@@ -137,7 +137,7 @@ BStatable::SetGroup(gid_t group)
 {
 	struct stat statData;
 	statData.st_gid = group;
-	return set_stat(statData, FS_WRITE_STAT_GID);
+	return set_stat(statData, B_STAT_GID);
 }
 	
 /*!	\brief Returns the permissions of the node.
@@ -167,7 +167,7 @@ BStatable::SetPermissions(mode_t perms)
 	// the FS should do the correct masking -- only the S_IUMSK part is
 	// modifiable
 	statData.st_mode = perms;
-	return set_stat(statData, FS_WRITE_STAT_MODE);
+	return set_stat(statData, B_STAT_MODE);
 }
 
 /*!	\brief Get the size of the node's data (not counting attributes).
@@ -211,7 +211,7 @@ BStatable::SetModificationTime(time_t mtime)
 {
 	struct stat statData;
 	statData.st_mtime = mtime;
-	return set_stat(statData, FS_WRITE_STAT_MTIME);
+	return set_stat(statData, B_STAT_MODIFICATION_TIME);
 }
 
 /*!	\brief Returns the time the node was created.
@@ -239,7 +239,7 @@ BStatable::SetCreationTime(time_t ctime)
 {
 	struct stat statData;
 	statData.st_crtime = ctime;
-	return set_stat(statData, FS_WRITE_STAT_CRTIME);
+	return set_stat(statData, B_STAT_CREATION_TIME);
 }
 
 /*!	\brief Returns the time the node was accessed.
@@ -269,7 +269,7 @@ BStatable::SetAccessTime(time_t atime)
 {
 	struct stat statData;
 	statData.st_atime = atime;
-	return set_stat(statData, FS_WRITE_STAT_ATIME);
+	return set_stat(statData, B_STAT_ACCESS_TIME);
 }
 
 /*!	\brief Returns the volume the node lives on.

@@ -12,7 +12,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-#include <fs_interface.h>
+#include <NodeMonitor.h>
 
 #include <syscalls.h>
 
@@ -456,7 +456,7 @@ BFile::SetSize(off_t size)
 		return B_BAD_VALUE;
 	struct stat statData;
 	statData.st_size = size;
-	return set_stat(statData, FS_WRITE_STAT_SIZE);
+	return set_stat(statData, B_STAT_SIZE);
 }
 
 // =
