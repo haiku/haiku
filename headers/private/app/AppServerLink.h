@@ -35,6 +35,7 @@
 // System Includes -------------------------------------------------------------
 
 // Project Includes ------------------------------------------------------------
+#include <PortLink.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -42,18 +43,15 @@
 
 // Globals ---------------------------------------------------------------------
 
-class PortLink;
+//class PortLink;
 
 namespace BPrivate {
 
-struct BAppServerLink
+class BAppServerLink : public PortLink
 {
-	BAppServerLink();
-	~BAppServerLink();
-
-	void Init();
-
-	PortLink*	portlink;
+public:
+	BAppServerLink(void);
+	~BAppServerLink(void);
 };
 
 }	// namespace BPrivate
