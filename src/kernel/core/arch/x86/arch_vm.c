@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <KernelExport.h>
@@ -17,6 +17,8 @@
 #include <arch/cpu.h>
 
 #include <arch/x86/interrupts.h>
+#include <arch/x86/bios.h>
+
 
 //#define TRACE_ARCH_VM
 #ifdef TRACE_ARCH_VM
@@ -53,7 +55,7 @@ arch_vm_init_post_area(kernel_args *args)
 		return B_NO_MEMORY;
 	}
 
-	return B_OK;
+	return bios_init();
 }
 
 
