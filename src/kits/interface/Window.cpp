@@ -788,13 +788,10 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			uint32			modifiers;
 			int32			raw_char;
 			const char		*string=NULL;
-			int32			viewToken;
 
 			msg->FindInt32( "modifiers", (int32*)&modifiers );
 			msg->FindInt32( "raw_char", &raw_char );
 			msg->FindString( "bytes", &string );
-			msg->FindInt32( "haiku:token", &viewToken );
-			msg->RemoveName("haiku:token");
 
 			if ( !handleKeyDown( string[0], (uint32)modifiers) )
 			{
@@ -808,11 +805,8 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		case B_KEY_UP:
 		{
 			const char		*string=NULL;
-			int32			viewToken;
 	
 			msg->FindString( "bytes", &string );
-			msg->FindInt32( "haiku:token", &viewToken );
-			msg->RemoveName("haiku:token");
 
 			if(fFocus)
 				fFocus->KeyUp( string, strlen(string)-1 );
@@ -857,21 +851,16 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			uint32			modifiers;
 			uint32			buttons;
 			int32			clicks;
-			int32			viewToken;
-			BView			*targetView;
 			
 			msg->FindPoint( "where", &where );
 			msg->FindInt32( "modifiers", (int32*)&modifiers );
 			msg->FindInt32( "buttons", (int32*)&buttons );
 			msg->FindInt32( "clicks", &clicks );
-			msg->FindInt32( "haiku:token", &viewToken );
-			msg->RemoveName("haiku:token");
 
-			targetView = findView(top_view, viewToken);
-			if (viewToken != B_NULL_TOKEN && targetView)
+			if (target && target != this && target != top_view)
 			{
-				targetView->ConvertFromScreen(&where);
-				targetView->MouseDown(where);
+				((BView*)target)->ConvertFromScreen(&where);
+				((BView*)target)->MouseDown(where);
 			}
 
 // TODO: use the following line later, instead of the above.
@@ -882,19 +871,14 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		{
 			BPoint			where;
 			uint32			modifiers;
-			int32			viewToken;
-			BView			*targetView;
 
 			msg->FindPoint( "where", &where );
 			msg->FindInt32( "modifiers", (int32*)&modifiers );
-			msg->FindInt32( "haiku:token", &viewToken );
-			msg->RemoveName("haiku:token");
 
-			targetView = findView(top_view, viewToken);
-			if (viewToken != B_NULL_TOKEN && targetView)
+			if (target && target != this && target != top_view)
 			{
-				targetView->ConvertFromScreen(&where);
-				targetView->MouseUp(where);
+				((BView*)target)->ConvertFromScreen(&where);
+				((BView*)target)->MouseUp(where);
 			}
 
 // TODO: use the following line later, instead of the above.
@@ -2272,7 +2256,9 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
 void BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
-	
+	BLooper::task_looper();
+}
+/*	
 	//	Check that looper is locked (should be)
 	AssertLocked();
 
@@ -2391,7 +2377,7 @@ void BWindow::task_looper()
 	}
 
 }
-
+*/
 //------------------------------------------------------------------------------
 
 window_type BWindow::composeType(window_look look,	
