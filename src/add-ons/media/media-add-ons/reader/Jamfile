@@ -8,6 +8,7 @@ Addon reader.media_addon : media :
 	MediaReader.cpp
 	MediaReaderAddOn.cpp
 	misc.cpp
+	: true
 ;
 
 LinkSharedOSLibs reader.media_addon : be media ;

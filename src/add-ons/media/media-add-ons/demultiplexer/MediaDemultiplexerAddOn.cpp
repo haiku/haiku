@@ -135,9 +135,10 @@ status_t MediaDemultiplexerAddOn::AutoStart(
 // main
 // -------------------------------------------------------- //
 
-// int main(int argc, char *argv[])
-//{
-//}
+int main(int argc, char *argv[])
+{
+	fprintf(stderr,"main called for MediaDemultiplexerAddOn\n");
+}
 
 // -------------------------------------------------------- //
 // stuffing

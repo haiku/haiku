@@ -171,12 +171,12 @@ status_t MediaReaderAddOn::SniffTypeKind(
 }
 
 // -------------------------------------------------------- //
-// stuffing
+// main
 // -------------------------------------------------------- //
 
 int main(int argc, char *argv[])
 {
-
+	fprintf(stderr,"main called for MediaReaderAddOn\n");
 }
 
 // -------------------------------------------------------- //

@@ -8,6 +8,7 @@ Addon writer.media_addon : media :
 	MediaWriter.cpp
 	MediaWriterAddOn.cpp
 	misc.cpp
+	: true
 ;
 
 LinkSharedOSLibs writer.media_addon : be media ;

@@ -162,7 +162,7 @@ status_t MediaWriterAddOn::SniffTypeKind(
 				int32 * out_internal_id,
 				void * _reserved)
 {
-	fprintf(stderr,"MediaReaderAddOn::SniffTypeKind\n");
+	fprintf(stderr,"MediaWriterAddOn::SniffTypeKind\n");
 	return AbstractFileInterfaceAddOn::SniffTypeKind(type,in_kinds,
 													 B_BUFFER_CONSUMER,
 													 out_quality,out_internal_id,
@@ -170,12 +170,12 @@ status_t MediaWriterAddOn::SniffTypeKind(
 }
 
 // -------------------------------------------------------- //
-// stuffing
+// main
 // -------------------------------------------------------- //
 
 int main(int argc, char *argv[])
 {
-
+	fprintf(stderr,"main called for MediaWriterAddOn\n");
 }
 
 // -------------------------------------------------------- //
