@@ -1,8 +1,11 @@
 SubDir OBOS_TOP src kernel libroot posix ;
 
 KernelObjects 
- 	<$(SOURCE_GRIST)>errno.c
  	<$(SOURCE_GRIST)>dlfcn.c
+ 	<$(SOURCE_GRIST)>errno.c
+ 	<$(SOURCE_GRIST)>fnmatch.c
+ 	<$(SOURCE_GRIST)>glob.c
+ 	<$(SOURCE_GRIST)>pwd.c
  	<$(SOURCE_GRIST)>rlimit.c
  	:
 	-fPIC -DPIC
