@@ -15,7 +15,7 @@
 #include <OS.h>
 #include <queue.h>
 #include <string.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <Errors.h>
 #include <kerrors.h>
 

@@ -14,7 +14,7 @@
 #include <kerrors.h>
 #include <tls.h>
 
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 #include <stdio.h>

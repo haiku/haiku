@@ -11,7 +11,7 @@
 #include <arch/cpu.h>
 #include <arch/dbg_console.h>
 
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 

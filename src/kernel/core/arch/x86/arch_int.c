@@ -26,7 +26,7 @@
 #include <arch/x86/faults.h>
 #include <arch/x86/descriptors.h>
 
-#include <stage2.h>
+#include <boot/stage2.h>
 
 #include <string.h>
 

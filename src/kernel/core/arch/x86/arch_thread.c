@@ -4,7 +4,7 @@
 */
 
 #include <kernel.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <debug.h>
 #include <vm.h>
 #include <memheap.h>

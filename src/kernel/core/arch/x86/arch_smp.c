@@ -3,7 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>

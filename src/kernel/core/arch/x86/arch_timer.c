@@ -3,7 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <kernel.h>
 
 #include <arch/int.h>
@@ -23,7 +23,9 @@
 #define pit_clock_rate 1193180
 #define pit_max_timer_interval ((long long)0xffff * 1000000 / pit_clock_rate)
 
-static void set_isa_hardware_timer(long long relative_timeout)
+
+static void
+set_isa_hardware_timer(long long relative_timeout)
 {
 	unsigned short next_event_clocks;
 
@@ -39,37 +41,47 @@ static void set_isa_hardware_timer(long long relative_timeout)
 	out8((next_event_clocks >> 8) & 0xff, 0x40);
 }
 
-static void clear_isa_hardware_timer()
+
+static void
+clear_isa_hardware_timer(void)
 {
 	// XXX do something here
 }
 
-static int32 isa_timer_interrupt(void* data)
+
+static int32
+isa_timer_interrupt(void *data)
 {
 	return timer_interrupt();
 }
 
-int apic_timer_interrupt()
+
+int
+apic_timer_interrupt(void)
 {
 	return timer_interrupt();
 }
 
-void arch_timer_set_hardware_timer(bigtime_t timeout)
+
+void
+arch_timer_set_hardware_timer(bigtime_t timeout)
 {
 	// try the apic timer first
-	if(arch_smp_set_apic_timer(timeout) < 0) {
+	if (arch_smp_set_apic_timer(timeout) < 0)
 		set_isa_hardware_timer(timeout);
-	}
 }
 
-void arch_timer_clear_hardware_timer()
+
+void
+arch_timer_clear_hardware_timer(void)
 {
-	if(arch_smp_clear_apic_timer() < 0) {
+	if (arch_smp_clear_apic_timer() < 0)
 		clear_isa_hardware_timer();
-	}
 }
 
-int arch_init_timer(kernel_args *ka)
+
+int
+arch_init_timer(kernel_args *ka)
 {
 	dprintf("arch_init_timer: entry\n");
 	
@@ -78,3 +90,4 @@ int arch_init_timer(kernel_args *ka)
 
 	return 0;
 }
+
