@@ -344,7 +344,7 @@ intel_identify(int deviceFD, const session_info *sessionInfo,
 	bool result = true;
 	int32 blockSize = sessionInfo->logical_block_size;
 	TRACE(("intel: identify(%d, %lld, %lld, %p, %ld)\n", deviceFD,
-		   sessionOffset, sessionSize, block, blockSize));
+		   sessionInfo->offset, sessionInfo->size, block, blockSize));
 	// check block size
 	if (result) {
 		result = ((uint32)blockSize >= sizeof(partition_table_sector));
