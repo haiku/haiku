@@ -18,6 +18,17 @@
 class KeymapListItem;
 class KeymapApplication;
 
+class MapView : public BView
+{
+public:
+	MapView(BRect rect, const char *name);
+	void Draw(BRect rect);
+	void DrawKey(BRect rect, bool pressed, bool vertical = false);
+	void DrawBorder(BRect borderRect);
+
+};
+
+
 class KeymapWindow : public BWindow {
 public:
 			KeymapWindow( BRect frame );
@@ -34,6 +45,8 @@ protected:
 	BButton				*fUseButton;
 	BButton				*fRevertButton;
 	const char			*title;
+	
+	MapView				*fMapView;
 
 	BMenuBar		*AddMenuBar();
 	void			AddMaps();
