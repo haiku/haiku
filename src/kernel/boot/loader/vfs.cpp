@@ -313,7 +313,7 @@ mount_boot_file_systems()
 
 		status_t status = add_partitions_for(fd);
 		if (status < B_OK)
-			printf("add_partitions_for(%d) failed: %s\n", fd, strerror(status));
+			printf("add_partitions_for(%d) failed: %ld\n", fd, status);
 
 		close(fd);
 
