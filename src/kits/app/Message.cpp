@@ -77,7 +77,9 @@
 #ifdef USING_TEMPLATE_MADNESS
 using BPrivate::BDataBuffer;
 #endif	// USING_TEMPLATE_MADNESS
-
+const char* B_SPECIFIER_ENTRY = "specifiers";
+const char* B_PROPERTY_ENTRY = "property";
+const char* B_PROPERTY_NAME_ENTRY = "name";
 
 //------------------------------------------------------------------------------
 void _msg_cache_cleanup_()
@@ -87,42 +89,6 @@ void _msg_cache_cleanup_()
 BMessage *_reconstruct_msg_(uint32,uint32,uint32)
 {
 	return NULL;
-}
-//------------------------------------------------------------------------------
-void _set_message_target_(BMessage *msg, int32 target, bool preferred)
-{
-	if (preferred)
-	{
-		msg->fTarget = -1;
-		msg->fPreferred = true;
-	}
-	else
-	{
-		msg->fTarget = target;
-		msg->fPreferred = false;
-	}
-}
-//------------------------------------------------------------------------------
-void _set_message_reply_(BMessage *msg, BMessenger messenger)
-{
-	msg->fReplyTo.port = messenger.fPort;
-	msg->fReplyTo.target = messenger.fHandlerToken;
-	msg->fReplyTo.team = messenger.fTeam;
-	msg->fReplyTo.preferred = messenger.fPreferredTarget;
-	msg->fReplyRequired = true;
-}
-//------------------------------------------------------------------------------
-int32 _get_message_target_(BMessage *msg)
-{
-	if (msg->fPreferred)
-		return -1;
-	else
-		return msg->fTarget;
-}
-//------------------------------------------------------------------------------
-bool _use_preferred_target_(BMessage *msg)
-{
-	return msg->fPreferred;
 }
 //------------------------------------------------------------------------------
 
@@ -340,7 +306,8 @@ BPoint BMessage::DropPoint(BPoint* offset) const
 //------------------------------------------------------------------------------
 status_t BMessage::SendReply(uint32 command, BHandler* reply_to)
 {
-	// TODO: implement
+	BMessage msg(command);
+	return SendReply(&msg, reply_to);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::SendReply(BMessage* the_reply, BHandler* reply_to,
@@ -357,7 +324,8 @@ status_t BMessage::SendReply(BMessage* the_reply, BMessenger reply_to,
 //------------------------------------------------------------------------------
 status_t BMessage::SendReply(uint32 command, BMessage* reply_to_reply)
 {
-	// TODO: implement
+	BMessage msg(command);
+	return SendReply(&msg, reply_to_reply);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
@@ -553,60 +521,87 @@ status_t BMessage::Unflatten(BDataIO* stream)
 status_t BMessage::AddSpecifier(const char* property)
 {
 	BMessage message(B_DIRECT_SPECIFIER);
-	message.AddString("property", property);
+	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
+	if (err)
+		return err;
 
-	fCurSpecifier ++;
-	fHasSpecifiers = true;
-	
 	return AddSpecifier(&message);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddSpecifier(const char* property, int32 index)
 {
 	BMessage message(B_INDEX_SPECIFIER);
-	message.AddString("property", property);
-	message.AddInt32("index", index);
+	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
+	if (err)
+		return err;
 
-	fCurSpecifier++;
-	fHasSpecifiers = true;
-	
+	err = message.AddInt32("index", index);
+	if (err)
+		return err;
+
 	return AddSpecifier(&message);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddSpecifier(const char* property, int32 index, int32 range)
 {
-	BMessage message(B_RANGE_SPECIFIER);	
-	message.AddString("property", property);
-	message.AddInt32("index", index);
-	message.AddInt32("range", range);
+	if (range < 0)
+		return B_BAD_VALUE;
 
-	fCurSpecifier ++;
-	fHasSpecifiers = true;
-	
+	BMessage message(B_RANGE_SPECIFIER);	
+	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
+	if (err)
+		return err;
+
+	err = message.AddInt32("index", index);
+	if (err)
+		return err;
+
+	err = message.AddInt32("range", range);
+	if (err)
+		return err;
+
 	return AddSpecifier(&message);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddSpecifier(const char* property, const char* name)
 {
 	BMessage message(B_NAME_SPECIFIER);
-	message.AddString("property", property);
-	message.AddString("name", name);
+	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
+	if (err)
+		return err;
 
-	fCurSpecifier ++;
-	fHasSpecifiers = true;
+	err = message.AddString(B_PROPERTY_NAME_ENTRY, name);
+	if (err)
+		return err;
 
 	return AddSpecifier(&message);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddSpecifier(const BMessage* specifier)
 {
-	return AddMessage("specifiers", specifier);
+	status_t err = AddMessage(B_SPECIFIER_ENTRY, specifier);
+	if (!err)
+	{
+		++fCurSpecifier;
+		fHasSpecifiers = true;
+	}
+	return err;
 }
 //------------------------------------------------------------------------------
 status_t SetCurrentSpecifier(int32 index)
 {
-	// TODO: implement
-	return B_ERROR;
+	type_code	type;
+	int32		count;
+	status_t	err = GetInfo(B_SPECIFIER_ENTRY, &type, &count);
+	if (err)
+		return err;
+
+	if (index < 0 || index >= count)
+		return B_BAD_INDEX;
+
+	fCurSpecifier = index;
+	
+	return B_OK;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::GetCurrentSpecifier(int32* index, BMessage* specifier,
@@ -620,13 +615,17 @@ status_t BMessage::GetCurrentSpecifier(int32* index, BMessage* specifier,
 
 	if (specifier)
 	{
-		FindMessage("specifiers", fCurSpecifier, specifier);
+		if (FindMessage(B_SPECIFIER_ENTRY, fCurSpecifier, specifier))
+			return B_BAD_SCRIPT_SYNTAX;
 
 		if (what)
 			*what = specifier->what;
 
 		if (property)
-			specifier->FindString("property", property);
+		{
+			if (specifier->FindString(B_PROPERTY_ENTRY, property))
+				return B_BAD_SCRIPT_SYNTAX;
+		}
 	}
 
 	return B_OK;
@@ -639,13 +638,13 @@ bool BMessage::HasSpecifiers() const
 //------------------------------------------------------------------------------
 status_t BMessage::PopSpecifier()
 {
-	if (fCurSpecifier && WasDelivered())
+	if (fCurSpecifier < 0 || !WasDelivered())
 	{
-		fCurSpecifier--;
-		return B_OK;
-	}
-	else
 		return B_BAD_VALUE;
+	}
+
+	--fCurSpecifier;
+	return B_OK;
 }
 //------------------------------------------------------------------------------
 //	return fBody->AddData<TYPE>(name, val, TYPESPEC);
@@ -776,7 +775,7 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 			gives us no real advantage.
  */
 
-	// TODO: test & implement
+	// TODO: test
 	// In particular, we want to see what happens if is_fixed_size == true and
 	// the user attempts to add something bigger or smaller.  We may need to
 	// enforce the size thing.
@@ -847,7 +846,7 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 			err = AddString(name, (const char*)data);
 			break;
 		default:
-			// TODO: implement
+			// TODO: test
 			// Using the mythical BDataBuffer
 			BDataBuffer DB((void*)data, numBytes);
 			err = fBody->AddData<BDataBuffer>(name, DB, type);
@@ -1028,7 +1027,7 @@ status_t BMessage::ReplaceRef(const char* name, const entry_ref* ref)
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceRef(const char* name, int32 index, const entry_ref* ref)
 {
-	// TODO: redo
+	// TODO: test
 	// Use voidref's theoretical BDataBuffer
 	return fBody->ReplaceData<entry_ref>(name, index, *ref, B_REF_TYPE);
 }
@@ -1051,7 +1050,7 @@ status_t BMessage::ReplaceFlat(const char* name, BFlattenable* obj)
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceFlat(const char* name, int32 index, BFlattenable* obj)
 {
-	// TODO: implement
+	// TODO: test
 	status_t err = B_OK;
 	ssize_t size = obj->FlattenedSize();
 	char* buffer = new(nothrow) char[size];
@@ -1121,7 +1120,7 @@ status_t BMessage::ReplaceData(const char* name, type_code type, int32 index,
 			err = ReplacePointer(name, index, (void**)data);
 			break;
 		default:
-			// TODO: implement
+			// TODO: test
 			// Using the mythical BDataBuffer
 			BDataBuffer DB((void*)data, data_size);
 			err = fBody->ReplaceData<BDataBuffer>(name, index, DB, type);
@@ -1280,7 +1279,6 @@ status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
 
 	// Get the message version
 	read_helper(data);
-	// TODO: Check whether we need to do byte-swapping
 	if (data == '1BOF')
 	{
 		swap = true;
@@ -1309,6 +1307,7 @@ status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
 	if (flags & MSG_FLAG_BIG_ENDIAN)
 	{
 		// TODO: ???
+		// Isn't this already indicated by the byte order of the message version?
 	}		
 	if (flags & MSG_FLAG_INCL_TARGET)
 	{
@@ -2558,6 +2557,9 @@ void BMessage::init_data()
 	fHasSpecifiers = false;
 }
 //------------------------------------------------------------------------------
+//	These are not declared in the header anymore and aren't actually used by the
+//	"old" implementation.
+#if 0
 int32 BMessage::flatten_hdr(uchar *result, ssize_t size, uchar flags) const
 {
 	return -1;
@@ -2573,6 +2575,7 @@ status_t BMessage::real_flatten(BDataIO *stream, ssize_t size,
 {
 	return B_ERROR;
 }
+#endif
 //------------------------------------------------------------------------------
 char *BMessage::stack_flatten(char *stack_ptr, ssize_t stack_size,
 							  bool incl_reply, ssize_t *size) const
