@@ -15,23 +15,31 @@
 #ifndef MOUSE_WINDOW_H
 #define MOUSE_WINDOW_H
 
+
 #include <Window.h>
+#include <Button.h>
 
 #include "MouseSettings.h"
-#include "MouseView.h"
+
+class MouseView;
 
 
 class MouseWindow : public BWindow {
 	public:
 		MouseWindow(BRect rect);
 
-		bool QuitRequested();
-		void MessageReceived(BMessage *message);
+		virtual bool QuitRequested();
+		virtual void MessageReceived(BMessage *message);
 
-		MouseSettings	fSettings;
+		void SetRevertable(bool revertable);
 
 	private:
+		MouseSettings	fSettings;
+		BButton			*fRevertButton;
 		MouseView		*fView;
 };
 
-#endif
+#define kBorderSpace	10
+#define	kItemSpace		7
+
+#endif	/* MOUSE_WINDOW_H */

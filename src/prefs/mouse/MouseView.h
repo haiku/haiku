@@ -23,16 +23,16 @@
 #include <PopUpMenu.h>
 
 
-class MouseView : public BView {
+class MouseView : public BBox {
 	public:
 		MouseView(BRect frame);
 
 		virtual void AttachedToWindow();
+		virtual void MouseDown(BPoint where);
 		virtual void Draw(BRect frame);
 		virtual void Pulse();
 
 		void Init();
-		void SetRevertable(bool revertable);
 
 		BSlider		*dcSpeedSlider, *mouseSpeedSlider, *mouseAccSlider;
 		BPopUpMenu	*mouseTypeMenu, *focusMenu, *mouseMapMenu;
@@ -48,23 +48,10 @@ class MouseView : public BView {
 		uint32		fOldButtons;
 				
 	private:
-		typedef BView inherited;
-
-		BBox		*fBox;
+		typedef BBox inherited;
 					
 		BBitmap 	*fDoubleClickBitmap, *fSpeedBitmap, *fAccelerationBitmap;
 		BBitmap		*fMouseBitmap, *fMouseDownBitmap;
-		
-		BButton		*defaultButton, *revertButton;
 };
 
-class BoxView : public BBox {
-	public:
-		BoxView(BRect frame, MouseView *mouseView);
-		void MouseDown(BPoint where);
-
-	private:
-		MouseView 	*fMouseView;
-};
-
-#endif
+#endif	/* MOUSE_VIEW_H */

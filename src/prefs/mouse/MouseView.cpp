@@ -31,60 +31,18 @@
 #include "MouseBitmap.h"
 
 
-BoxView::BoxView(BRect rect, MouseView *mouseView)
-	: BBox(rect, "mouse_box"),
-	fMouseView(mouseView)
-{
-}
-
-
-void
-BoxView::MouseDown(BPoint where)
-{
-	int32 index = fMouseView->mouseTypeMenu->IndexOf(fMouseView->mouseTypeMenu->FindMarked());
-
-	fMouseView->fCurrentButton = -1;
-	if ((index == 0) && BRect(50,41,105,73).Contains(where))
-		fMouseView->fCurrentButton = 0;
-	else if (index == 1) {
-		if(BRect(50,41,77,73).Contains(where))
-			fMouseView->fCurrentButton = 0;
-		else if (BRect(77,41,105,73).Contains(where))
-			fMouseView->fCurrentButton = 1;
-	} else {
-		if(BRect(50,41,68,73).Contains(where))
-			fMouseView->fCurrentButton = 0;
-		else if (BRect(86,41,105,73).Contains(where))
-			fMouseView->fCurrentButton = 1;
-		else if (BRect(68,41,86,73).Contains(where))
-			fMouseView->fCurrentButton = 2;
-	}
-
-	if (fMouseView->fCurrentButton >= 0) {
-		int32 number = 0;
-		switch (fMouseView->fCurrentMouseMap.button[fMouseView->fCurrentButton]) {
-			case B_PRIMARY_MOUSE_BUTTON: number = 0; break;
-			case B_SECONDARY_MOUSE_BUTTON: number = 1; break;
-			case B_TERTIARY_MOUSE_BUTTON: number = 2; break;
-		}
-		fMouseView->mouseMapMenu->ItemAt(number)->SetMarked(true);
-		ConvertToScreen(&where);
-		fMouseView->mouseMapMenu->Go(where, true);
-	}
-}
-
-
 MouseView::MouseView(BRect rect)
-	: BView(rect, "mouse_view", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED),
+	: BBox(rect, "main_view"),
 	fCurrentButton(-1),
 	fButtons(0),
 	fOldButtons(0)
 {
+	ResizeTo(397 - 22, 293 - 55);
+		// ToDo: fixed values for now
+
 	BTextControl *textcontrol;
 	BMenuField *menufield;
 	BRect frame;
-
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fDoubleClickBitmap = BTranslationUtils::GetBitmap("double_click_bmap");
 	if (!fDoubleClickBitmap) {
@@ -113,25 +71,14 @@ MouseView::MouseView(BRect rect)
   	fMouseDownBitmap = new BBitmap(mouseDownRect, B_CMAP8);
   	fMouseDownBitmap->SetBits(kMouseDownBits, kMouseDownWidth*kMouseDownHeight + 30, 0, kMouseDownColorSpace);
 
-	// Add the "Default" button..	
-	frame.Set(10,259,85,279);
-	defaultButton = new BButton(frame,"mouse_defaults","Defaults", new BMessage(BUTTON_DEFAULTS));
-	AddChild(defaultButton);
-
-	// Add the "Revert" button...
-	frame.Set(92,259,167,279);
-	revertButton = new BButton(frame,"mouse_revert","Revert", new BMessage(BUTTON_REVERT));
-	revertButton->SetEnabled(false);
-	AddChild(revertButton);
-
-	// Create the main box for the controls...
+/*	// Create the main box for the controls...
 	frame = Bounds();
 	frame.left = frame.left+11;
 	frame.top = frame.top+11;
 	frame.right = frame.right-11;
 	frame.bottom = frame.bottom-44;
 	fBox = new BoxView(frame, this);	
-
+*/
 	// Add the "Mouse Type" pop up menu
 	mouseTypeMenu = new BPopUpMenu("Mouse Type Menu");
 	mouseTypeMenu->AddItem(new BMenuItem("1-Button", new BMessage(POPUP_MOUSE_TYPE)));
@@ -142,7 +89,7 @@ MouseView::MouseView(BRect rect)
 	menufield = new BMenuField(frame, "mouse_type", "Mouse type", mouseTypeMenu);
 	menufield->SetDivider(menufield->Divider() - 29);
 	menufield->SetAlignment(B_ALIGN_RIGHT);
-	fBox->AddChild(menufield);
+	AddChild(menufield);
 
 	// Add the "Focus follows mouse" pop up menu
 	focusMenu = new BPopUpMenu("Focus Follows Mouse Menu");
@@ -155,7 +102,7 @@ MouseView::MouseView(BRect rect)
 	menufield = new BMenuField(frame, "Focus follows mouse", "Focus follows mouse", focusMenu);
 	menufield->SetDivider(menufield->Divider() - 18);
 	menufield->SetAlignment(B_ALIGN_RIGHT);
-	fBox->AddChild(menufield);
+	AddChild(menufield);
 
 	// Create the "Double-click speed slider...
 	frame.Set(166, 11, 328, 50);
@@ -164,7 +111,7 @@ MouseView::MouseView(BRect rect)
 	dcSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	dcSpeedSlider->SetHashMarkCount(5);
 	dcSpeedSlider->SetLimitLabels("Slow","Fast");
-	fBox->AddChild(dcSpeedSlider);
+	AddChild(dcSpeedSlider);
 
 	// Create the "Mouse Speed" slider...
 	frame.Set(166,76,328,125);
@@ -173,7 +120,7 @@ MouseView::MouseView(BRect rect)
 	mouseSpeedSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	mouseSpeedSlider->SetHashMarkCount(7);
 	mouseSpeedSlider->SetLimitLabels("Slow","Fast");
-	fBox->AddChild(mouseSpeedSlider);
+	AddChild(mouseSpeedSlider);
 
 	// Create the "Mouse Acceleration" slider...
 	frame.Set(166,141,328,190);
@@ -182,24 +129,57 @@ MouseView::MouseView(BRect rect)
 	mouseAccSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	mouseAccSlider->SetHashMarkCount(5);
 	mouseAccSlider->SetLimitLabels("Slow","Fast");
-	fBox->AddChild(mouseAccSlider);
+	AddChild(mouseAccSlider);
 
 	// Create the "Double-click test area" text box...
-	frame=fBox->Bounds();
+	frame=Bounds();
 	frame.left=frame.left+9;
 	frame.right=frame.right-230;
 	frame.top=frame.bottom-30;
 	textcontrol = new BTextControl(frame,"double_click_test_area",NULL,"Double-click test area", new BMessage(DOUBLE_CLICK_TEST_AREA),B_FOLLOW_LEFT,B_WILL_DRAW);
 	textcontrol->SetAlignment(B_ALIGN_LEFT,B_ALIGN_CENTER);
-	fBox->AddChild(textcontrol);
-
-	AddChild(fBox);
+	AddChild(textcontrol);
 
 	mouseMapMenu = new BPopUpMenu("Mouse Map Menu", true, true);
 	mouseMapMenu->AddItem(new BMenuItem("1", new BMessage(POPUP_MOUSE_MAP)));
 	mouseMapMenu->AddItem(new BMenuItem("2", new BMessage(POPUP_MOUSE_MAP)));
 	mouseMapMenu->AddItem(new BMenuItem("3", new BMessage(POPUP_MOUSE_MAP)));
-	
+}
+
+
+void
+MouseView::MouseDown(BPoint where)
+{
+	int32 index = mouseTypeMenu->IndexOf(mouseTypeMenu->FindMarked());
+
+	fCurrentButton = -1;
+	if ((index == 0) && BRect(50,41,105,73).Contains(where))
+		fCurrentButton = 0;
+	else if (index == 1) {
+		if(BRect(50,41,77,73).Contains(where))
+			fCurrentButton = 0;
+		else if (BRect(77,41,105,73).Contains(where))
+			fCurrentButton = 1;
+	} else {
+		if(BRect(50,41,68,73).Contains(where))
+			fCurrentButton = 0;
+		else if (BRect(86,41,105,73).Contains(where))
+			fCurrentButton = 1;
+		else if (BRect(68,41,86,73).Contains(where))
+			fCurrentButton = 2;
+	}
+
+	if (fCurrentButton >= 0) {
+		int32 number = 0;
+		switch (fCurrentMouseMap.button[fCurrentButton]) {
+			case B_PRIMARY_MOUSE_BUTTON: number = 0; break;
+			case B_SECONDARY_MOUSE_BUTTON: number = 1; break;
+			case B_TERTIARY_MOUSE_BUTTON: number = 2; break;
+		}
+		mouseMapMenu->ItemAt(number)->SetMarked(true);
+		ConvertToScreen(&where);
+		mouseMapMenu->Go(where, true);
+	}
 }
 
 
@@ -238,105 +218,104 @@ MouseView::Draw(BRect updateFrame)
 {
 	inherited::Draw(updateFrame);
 
-	fBox->SetHighColor(120,120,120);
-	fBox->SetLowColor(255,255,255);
+	SetHighColor(120,120,120);
+	SetLowColor(255,255,255);
 	// Line above the test area
-	fBox->StrokeLine(BPoint(8,198),BPoint(149,198),B_SOLID_HIGH);
-	fBox->StrokeLine(BPoint(8,199),BPoint(149,199),B_SOLID_LOW);
+	StrokeLine(BPoint(8,198),BPoint(149,198),B_SOLID_HIGH);
+	StrokeLine(BPoint(8,199),BPoint(149,199),B_SOLID_LOW);
 	// Line above focus follows mouse
-	fBox->StrokeLine(BPoint(164,198),BPoint(367,198),B_SOLID_HIGH);
-	fBox->StrokeLine(BPoint(164,199),BPoint(367,199),B_SOLID_LOW);
+	StrokeLine(BPoint(164,198),BPoint(367,198),B_SOLID_HIGH);
+	StrokeLine(BPoint(164,199),BPoint(367,199),B_SOLID_LOW);
 	// Line in the middle
-	fBox->StrokeLine(BPoint(156,10),BPoint(156,230),B_SOLID_HIGH);
-	fBox->StrokeLine(BPoint(157,11),BPoint(157,230),B_SOLID_LOW);
+	StrokeLine(BPoint(156,10),BPoint(156,230),B_SOLID_HIGH);
+	StrokeLine(BPoint(157,11),BPoint(157,230),B_SOLID_LOW);
 
 	// Draw the icons
-	if(updateFrame.Intersects(	// i have to add 10 pixels width and height, so weird
+	if (updateFrame.Intersects(	// i have to add 10 pixels width and height, so weird
 			BRect(333,16,354+fDoubleClickBitmap->Bounds().Width(),
 			165+fAccelerationBitmap->Bounds().Height()))) {
-		fBox->DrawBitmapAsync(fDoubleClickBitmap,BPoint(344,16));
-		fBox->DrawBitmapAsync(fSpeedBitmap,BPoint(333,90));	
-		fBox->DrawBitmapAsync(fAccelerationBitmap,BPoint(333,155));
+		DrawBitmapAsync(fDoubleClickBitmap,BPoint(344,16));
+		DrawBitmapAsync(fSpeedBitmap,BPoint(333,90));	
+		DrawBitmapAsync(fAccelerationBitmap,BPoint(333,155));
 	}
-	
+
 	// Draw the mouse 
 	// i have to add 10 pixels width and height, so weird
-	if(updateFrame.Intersects(BRect(50,41,60+kMouseWidth,51+kMouseHeight))) {
-		fBox->SetDrawingMode(B_OP_OVER);
+	if (updateFrame.Intersects(BRect(50,41,60+kMouseWidth,51+kMouseHeight))) {
+		SetDrawingMode(B_OP_OVER);
 	
 		// Draw the mouse top
-		fBox->DrawBitmapAsync(fMouseBitmap,BPoint(50, 41));
+		DrawBitmapAsync(fMouseBitmap,BPoint(50, 41));
 		int32 index = mouseTypeMenu->IndexOf(mouseTypeMenu->FindMarked());
 		if (index == 0)	{	// 1 button
 			if (fButtons & fCurrentMouseMap.button[0]) {
-				fBox->DrawBitmapAsync(fMouseDownBitmap,BPoint(50, 47));
-				fBox->SetHighColor(64,64,64);
+				DrawBitmapAsync(fMouseDownBitmap,BPoint(50, 47));
+				SetHighColor(64,64,64);
 			}
 		} else if (index == 1) { 	// 2 button
 			if ( fButtons & fCurrentMouseMap.button[0]) {
-				fBox->DrawBitmapAsync(fMouseDownBitmap, BRect(0,0,27,28), BRect(50,47,77,75));
-				fBox->SetHighColor(120,120,120);
+				DrawBitmapAsync(fMouseDownBitmap, BRect(0,0,27,28), BRect(50,47,77,75));
+				SetHighColor(120,120,120);
 			} else
-				fBox->SetHighColor(184,184,184);
-			fBox->StrokeLine(BPoint(76,49),BPoint(76,71),B_SOLID_HIGH);
+				SetHighColor(184,184,184);
+			StrokeLine(BPoint(76,49),BPoint(76,71),B_SOLID_HIGH);
 					
 			if (fButtons & fCurrentMouseMap.button[1]) {
-				fBox->SetHighColor(120,120,120);
-				fBox->DrawBitmapAsync(fMouseDownBitmap, BRect(27,0,54,28), BRect(77,47,104,75));
+				SetHighColor(120,120,120);
+				DrawBitmapAsync(fMouseDownBitmap, BRect(27,0,54,28), BRect(77,47,104,75));
 			} else
-				fBox->SetHighColor(255,255,255);
-			fBox->StrokeLine(BPoint(78,49),BPoint(78,71),B_SOLID_HIGH);
+				SetHighColor(255,255,255);
+			StrokeLine(BPoint(78,49),BPoint(78,71),B_SOLID_HIGH);
 			
 			if ((fButtons & fCurrentMouseMap.button[0]) || (fButtons & fCurrentMouseMap.button[1]))
-				fBox->SetHighColor(48,48,48);
+				SetHighColor(48,48,48);
 			else
-				fBox->SetHighColor(88,88,88);
-			fBox->StrokeLine(BPoint(77,48),BPoint(77,72),B_SOLID_HIGH);
+				SetHighColor(88,88,88);
+			StrokeLine(BPoint(77,48),BPoint(77,72),B_SOLID_HIGH);
 			
 		} else {	// 3 button
-			if ( fButtons & fCurrentMouseMap.button[0]) {
-				fBox->DrawBitmapAsync(fMouseDownBitmap, BRect(0,0,18,28), BRect(50,47,68,75));
-				fBox->SetHighColor(120,120,120);
+			if (fButtons & fCurrentMouseMap.button[0]) {
+				DrawBitmapAsync(fMouseDownBitmap, BRect(0,0,18,28), BRect(50,47,68,75));
+				SetHighColor(120,120,120);
 			} else
-				fBox->SetHighColor(184,184,184);
-			fBox->StrokeLine(BPoint(67,49),BPoint(67,71),B_SOLID_HIGH);
+				SetHighColor(184,184,184);
+			StrokeLine(BPoint(67,49),BPoint(67,71),B_SOLID_HIGH);
 			
 			if (fButtons & fCurrentMouseMap.button[2]) {
-				fBox->DrawBitmapAsync(fMouseDownBitmap, BRect(18,0,36,28), BRect(68,47,86,75));
-				fBox->SetHighColor(120,120,120);
+				DrawBitmapAsync(fMouseDownBitmap, BRect(18,0,36,28), BRect(68,47,86,75));
+				SetHighColor(120,120,120);
 			} else
-				fBox->SetHighColor(184,184,184);
-			fBox->StrokeLine(BPoint(85,49),BPoint(85,71),B_SOLID_HIGH);
+				SetHighColor(184,184,184);
+			StrokeLine(BPoint(85,49),BPoint(85,71),B_SOLID_HIGH);
 					
 			if (fButtons & fCurrentMouseMap.button[2]) 
-				fBox->SetHighColor(120,120,120);
+				SetHighColor(120,120,120);
 			else
-				fBox->SetHighColor(255,255,255);
-			fBox->StrokeLine(BPoint(69,49),BPoint(69,71),B_SOLID_HIGH);
+				SetHighColor(255,255,255);
+			StrokeLine(BPoint(69,49),BPoint(69,71),B_SOLID_HIGH);
 					
 			if (fButtons & fCurrentMouseMap.button[1]) {
-				fBox->DrawBitmapAsync(fMouseDownBitmap, BRect(36,0,54,28), BRect(86,47,104,75));
-				fBox->SetHighColor(120,120,120);
+				DrawBitmapAsync(fMouseDownBitmap, BRect(36,0,54,28), BRect(86,47,104,75));
+				SetHighColor(120,120,120);
 			} else
-				fBox->SetHighColor(255,255,255);
-			fBox->StrokeLine(BPoint(87,49),BPoint(87,71),B_SOLID_HIGH);
+				SetHighColor(255,255,255);
+			StrokeLine(BPoint(87,49),BPoint(87,71),B_SOLID_HIGH);
 			
 			if ((fButtons & fCurrentMouseMap.button[0]) || (fButtons & fCurrentMouseMap.button[2]))
-				fBox->SetHighColor(48,48,48);
+				SetHighColor(48,48,48);
 			else
-				fBox->SetHighColor(88,88,88);
-			fBox->StrokeLine(BPoint(68,48),BPoint(68,72),B_SOLID_HIGH);
+				SetHighColor(88,88,88);
+			StrokeLine(BPoint(68,48),BPoint(68,72),B_SOLID_HIGH);
 			
 			if ((fButtons & fCurrentMouseMap.button[2]) || (fButtons & fCurrentMouseMap.button[1]))
-				fBox->SetHighColor(48,48,48);
+				SetHighColor(48,48,48);
 			else
-				fBox->SetHighColor(88,88,88);
-			fBox->StrokeLine(BPoint(86,48),BPoint(86,72),B_SOLID_HIGH);
-			
+				SetHighColor(88,88,88);
+			StrokeLine(BPoint(86,48),BPoint(86,72),B_SOLID_HIGH);
 		}
 		
-		fBox->SetHighColor(32,32,32);
-		fBox->SetFont(be_plain_font);
+		SetHighColor(32,32,32);
+		SetFont(be_plain_font);
 		for(int32 i=0; i<index+1; i++) {
 			char number[2] = "1";
 			switch (fCurrentMouseMap.button[i]) {
@@ -347,14 +326,14 @@ MouseView::Draw(BRect updateFrame)
 			int32 offsets[][3] = { 	{75},
 							{61, 88},
 							{57, 92, 74} }; 
-			fBox->MovePenTo(offsets[index][i], 65);
-			fBox->DrawString(number);
+			MovePenTo(offsets[index][i], 65);
+			DrawString(number);
 		}
 	}
 	
-	fBox->Sync();
+	Sync();
 	
-	fBox->SetDrawingMode(B_OP_COPY);
+	SetDrawingMode(B_OP_COPY);
 }
 
 
@@ -404,10 +383,4 @@ MouseView::Init()
 		fClickSpeed, fMouseSpeed, fMouseAcc, fMouseType);
 }
 
-
-void 
-MouseView::SetRevertable(bool revertable)
-{
-	revertButton->SetEnabled(revertable);
-}
 

@@ -34,9 +34,35 @@ MouseWindow::MouseWindow(BRect rect)
 	: BWindow(rect, "Mouse", B_TITLED_WINDOW,
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-	AddChild(fView = new MouseView(Bounds()));
+	BView *view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);
+	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(view);
+
+	// Add the main settings view
+	fView = new MouseView(Bounds().InsetBySelf(kBorderSpace + 1, kBorderSpace + 1));
+	view->AddChild(fView);
+
+	// Add the "Default" button
+//	(10,259,85,279);
+	BRect rect(kBorderSpace, fView->Frame().bottom + kItemSpace + 2,
+		kBorderSpace + 75, fView->Frame().bottom + 20);
+	BButton *button = new BButton(rect, "defaults", "Defaults", new BMessage(BUTTON_DEFAULTS));
+	button->ResizeToPreferred();
+	view->AddChild(button);
+
+	// Add the "Revert" button
+	//frame.Set(92,259,167,279);
+	rect.OffsetBy(button->Bounds().Width() + kItemSpace, 0);
+	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(BUTTON_REVERT));
+	fRevertButton->SetEnabled(false);
+	view->AddChild(fRevertButton);
 
 	SetPulseRate(100000);
+		// we are using the pulse rate to scan pressed mouse
+		// buttons and draw the selected imagery
+
+	ResizeTo(fView->Frame().right + kBorderSpace, button->Frame().bottom + kBorderSpace - 1);
+	MoveTo(fSettings.WindowPosition());
 }
 
 
@@ -71,7 +97,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			fView->fCurrentMouseMap.button[2] = B_TERTIARY_MOUSE_BUTTON;
 			set_mouse_map(&fView->fCurrentMouseMap);
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -86,7 +112,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			set_mouse_map(&fView->fMouseMap);
 			get_mouse_map(&fView->fCurrentMouseMap);
 
-			fView->SetRevertable(false);
+			SetRevertable(false);
 			break;
 		}
 
@@ -95,7 +121,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (err < B_OK)
 				printf("error while setting mouse type : %s\n", strerror(err));
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -109,7 +135,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			}
 			set_mouse_mode(mouse_mode);
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -121,7 +147,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (err < B_OK)
 				printf("error while setting click speed : %s\n", strerror(err));
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -133,7 +159,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (err < B_OK)
 				printf("error while setting mouse speed : %s\n", strerror(err));
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -145,7 +171,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (err < B_OK)
 				printf("error while setting mouse acceleration : %s\n", strerror(err));
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -163,7 +189,7 @@ MouseWindow::MessageReceived(BMessage *message)
 			if (err < B_OK)
 				printf("error while setting mouse map : %s\n", strerror(err));
 
-			fView->SetRevertable(true);
+			SetRevertable(true);
 			break;
 		}
 
@@ -179,3 +205,11 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 	}
 }
+
+
+void 
+MouseWindow::SetRevertable(bool revertable)
+{
+	fRevertButton->SetEnabled(revertable);
+}
+
