@@ -204,7 +204,7 @@ static status_t control_hook( void *dev, uint32 msg, void *buf, size_t len )
 		// needed by app_server to load accelerant
 		case B_GET_ACCELERANT_SIGNATURE: {
 			char *sig = (char *)buf;
-			strcpy(sig, "radeon2.accelerant");
+			strcpy(sig, "radeon.accelerant");
 			result = B_OK;
 		} break;
 
