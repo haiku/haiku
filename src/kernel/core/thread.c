@@ -1096,6 +1096,7 @@ struct thread_exit_args {
 	region_id old_kernel_stack;
 	int int_state;
 	unsigned int death_stack;
+	sem_id death_sem;
 };
 
 static void thread_exit2(void *_args)
@@ -1128,6 +1129,9 @@ static void thread_exit2(void *_args)
 
 //	dprintf("thread_exit2: done removing thread from lists\n");
 
+	if (args.death_sem >= 0)
+		release_sem_etc(args.death_sem, 1, B_DO_NOT_RESCHEDULE);	
+
 	// set the next state to be gone. Will return the thread structure to a ready pool upon reschedule
 	args.t->next_state = THREAD_STATE_FREE_ON_RESCHED;
 
@@ -1144,6 +1148,7 @@ void thread_exit(int retcode)
 	struct proc *p = t->proc;
 	bool delete_proc = false;
 	unsigned int death_stack;
+	sem_id cached_death_sem;
 
 	dprintf("thread 0x%x exiting w/return code 0x%x\n", t->id, retcode);
 
@@ -1177,6 +1182,8 @@ void thread_exit(int retcode)
 
 //		dprintf("thread_exit: thread 0x%x now a kernel thread!\n", t->id);
 	}
+	
+	cached_death_sem = p->death_sem;
 
 	// delete the process
 	if(delete_proc) {
@@ -1185,7 +1192,13 @@ void thread_exit(int retcode)
 			// cycle through and signal kill on each of the threads
 			// XXX this can be optimized. There's got to be a better solution.
 			struct thread *temp_thread;
+			char death_sem_name[SYS_MAX_OS_NAME_LEN];
 
+			sprintf(death_sem_name, "team %d death sem", p->id);
+			p->death_sem = create_sem(0, death_sem_name);
+			if (p->death_sem < 0)
+				panic("thread_exit: cannot init death sem for team %d\n", p->id);
+			
 			state = disable_interrupts();
 			GRAB_PROC_LOCK();
 			// we can safely walk the list because of the lock. no new threads can be created
@@ -1198,13 +1211,17 @@ void thread_exit(int retcode)
 			}
 			RELEASE_PROC_LOCK();
 			restore_interrupts(state);
-
+#if 0
 			// Now wait for all of the threads to die
 			// XXX block on a semaphore
 			while((volatile int)p->num_threads > 0) {
 				thread_snooze(10000); // 10 ms
 			}
+#endif
+			acquire_sem_etc(p->death_sem, p->num_threads, 0, 0);
+			delete_sem(p->death_sem);
 		}
+		cached_death_sem = -1;
 		vm_put_aspace(p->aspace);
 		vm_delete_aspace(p->_aspace_id);
 		delete_owned_ports(p->id);
@@ -1228,6 +1245,7 @@ void thread_exit(int retcode)
 		args.t = t;
 		args.old_kernel_stack = t->kernel_stack_region_id;
 		args.death_stack = death_stack;
+		args.death_sem = cached_death_sem;
 
 		// disable the interrupts. Must remain disabled until the kernel stack pointer can be officially switched
 		args.int_state = disable_interrupts();
@@ -1548,7 +1566,20 @@ void thread_resched(void)
 found_thread:
 	next_thread->state = THREAD_STATE_RUNNING;
 	next_thread->next_state = THREAD_STATE_READY;
+	
+	if ((next_thread != old_thread) || (old_thread->cpu->info.preempted)) {
+		// XXX calculate quantum
+		quantum = 3000;
+		quantum_timer = &old_thread->cpu->info.quantum_timer;
+		if (!old_thread->cpu->info.preempted)
+			_local_timer_cancel_event(old_thread->cpu->info.cpu_num, quantum_timer);
+		old_thread->cpu->info.preempted = 0;
+		add_timer(quantum_timer, &reschedule_event, quantum, B_ONE_SHOT_RELATIVE_TIMER);
+		if (next_thread != old_thread)
+			thread_context_switch(old_thread, next_thread);
+	}
 
+#if 0
 	// XXX should only reset the quantum timer if we are switching to a new thread,
 	// or we got here as a result of a quantum expire.
 
@@ -1568,6 +1599,7 @@ found_thread:
 //			smp_get_current_cpu(), old_thread->id, next_thread->id);
 		thread_context_switch(old_thread, next_thread);
 	}
+#endif
 }
 
 static int proc_struct_compare(void *_p, const void *_key)
@@ -1629,6 +1661,7 @@ static struct proc *create_proc_struct(const char *name, bool kernel)
 	p->main_thread = NULL;
 	p->state = PROC_STATE_BIRTH;
 	p->pending_signals = SIG_NONE;
+	p->death_sem = -1;
 	p->user_env_base = NULL;
 
 	if(arch_proc_init_proc_struct(p, kernel) < 0)

@@ -92,6 +92,8 @@ struct proc {
 	void        *ioctx;
 	/** Path ??? */
 	char         path[SYS_MAX_PATH_LEN];
+	/** Semaphore to wait on for dying threads */
+	sem_id       death_sem;
 	/** Our address space pointer */
 	aspace_id    _aspace_id;
 	vm_address_space *aspace;
