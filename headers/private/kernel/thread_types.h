@@ -96,9 +96,9 @@ struct thread {
 	timer			alarm;
 	thread_id		id;
 	char			name[B_OS_NAME_LENGTH];
-	int				priority;
-	int				state;
-	int				next_state;
+	int32			priority;
+	int32			state;
+	int32			next_state;
 	union cpu_ent	*cpu;
 
 	sigset_t		sig_pending;
@@ -107,11 +107,13 @@ struct thread {
 
 	bool			in_kernel;
 
-	sem_id			sem_blocking;
-	int				sem_count;
-	int				sem_acquire_count;
-	int				sem_errcode;
-	int				sem_flags;
+	struct {
+		sem_id		blocking;
+		int32		count;
+		int32		acquire_count;
+		status_t	acquire_status;
+		int32		flags;
+	} sem;
 
 	struct {
 		sem_id		write_sem;
@@ -152,7 +154,7 @@ struct thread {
 	bigtime_t		user_time;
 	bigtime_t		kernel_time;
 	bigtime_t		last_time;
-	int				last_time_type;	// KERNEL_TIME or USER_TIME
+	int32			last_time_type;	// KERNEL_TIME or USER_TIME
 
 	// architecture dependant section
 	struct arch_thread arch_info;
