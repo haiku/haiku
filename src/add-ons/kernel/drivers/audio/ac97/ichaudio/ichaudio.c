@@ -45,9 +45,6 @@ ichaudio_attach(drv_t *drv, void *_cookie)
 	dprintf("ichaudio_attach\n");
 
 	return B_OK;
-err:
-	free(cookie);
-	return B_OK;
 }
 
 
@@ -58,7 +55,6 @@ ichaudio_detach(drv_t *drv, void *_cookie)
 
 	dprintf("ichaudio_detach\n");
 
-	free(cookie);
 	return B_OK;
 }
 
