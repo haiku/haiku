@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-8/2004.
+	Rudolf Cornelissen 3/2002-9/2004.
 */
 
 /* standard kernel driver stuff */
@@ -483,7 +483,7 @@ static status_t map_device(device_info *di)
 //	#define G400_DMA_BUFFER_SIZE 1024*1024
 
 	/* variables for making copy of ROM */
-	char * rom_temp;
+	uint8* rom_temp;
 	area_id rom_area;
 
 	/* Nvidia cards have registers in [0] and framebuffer in [1] */
@@ -560,8 +560,19 @@ static status_t map_device(device_info *di)
 			B_READ_AREA,
 			(void **)&(rom_temp)
 		);
+
+		/* check if we got the BIOS signature (might fail on laptops..) */
+		if (rom_temp[0]!=0x55 || rom_temp[1]!=0xaa)
+		{
+			/* apparantly no ROM is mapped here */
+			delete_area(rom_area);
+			rom_area = -1;
+			/* force using ISA legacy map as fall-back */
+			tmpUlong = 0x00000000;
+		}
 	}
-	else
+
+	if (!tmpUlong)
 	{
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
 		rom_area = map_physical_memory(
