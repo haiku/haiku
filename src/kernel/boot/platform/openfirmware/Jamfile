@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src kernel boot platform openfirmware ;
 
-SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
-
 KernelMergeObject boot_platform_openfirmware.o :
 #	crt0.S
 	<$(SOURCE_GRIST)>start.c
@@ -17,4 +15,5 @@ KernelMergeObject boot_platform_openfirmware.o :
 
 SEARCH on [ FGristFiles crt0.S ]
     = [ FDirName $(OBOS_TOP) src kernel boot arch $(OBOS_ARCH) ] ;
-	
+
+SubInclude OBOS_TOP src kernel boot platform openfirmware arch ;

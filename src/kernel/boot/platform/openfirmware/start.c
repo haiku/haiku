@@ -4,7 +4,7 @@
 */
 
 
-#include <SupportDefs.h>
+#include <OS.h>
 #include <boot/stage2.h>
 #include <boot/heap.h>
 #include <platform_arch.h>
@@ -69,7 +69,8 @@ start(void *openFirmwareEntry)
 
 	of_init(openFirmwareEntry);
 	console_init();
-	//arch_mmu_init();
+	arch_mmu_init();
+	printf("testing mmu allocation: %p\n", arch_mmu_alloc(128 * 1024, B_READ_AREA));
 
 	main(&args);
 		// if everything wents fine, main() never returns
