@@ -51,10 +51,7 @@ class MimeTypeEditor : public BView {
 		void UpdateText();
 
 	private:
-		void AddMimeTypesToMenu();
-
 		DataEditor		&fEditor;
-		BMenu			*fMimeTypeMenu;
 		BTextControl	*fTextControl;
 		BString			fPreviousText;
 };
@@ -195,28 +192,20 @@ StringEditor::MessageReceived(BMessage *message)
 
 
 MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor &editor)
-	: BView(rect, "MIME Type Editor", B_FOLLOW_NONE, 0),
+	: BView(rect, "MIME Type Editor", B_FOLLOW_LEFT_RIGHT, 0),
 	fEditor(editor)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	rect.right -= 100;
 	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING, "MIME Type:", NULL,
 							new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
 	fTextControl->SetDivider(StringWidth(fTextControl->Label()) + 8);
 
-	fMimeTypeMenu = new BMenu(B_EMPTY_STRING);
-	rect = fTextControl->Frame();
-	rect.left = rect.right + 5;
-	rect.right = Bounds().right;
-	//rect.top++;
-	BMenuField *menuField = new BMenuField(rect, NULL, NULL, fMimeTypeMenu);
-	menuField->SetDivider(0);
-	menuField->ResizeToPreferred();
-	AddChild(menuField);
+	float width, height;
+	fTextControl->GetPreferredSize(&width, &height);
+	fTextControl->ResizeTo(rect.Width() - 10, height);
 
-	ResizeTo(fTextControl->Bounds().Width() + menuField->Bounds().Width() + 10,
-		menuField->Bounds().Height() + 10);
+	ResizeTo(rect.Width(), height + 10);
 
 	AddChild(fTextControl);
 }
@@ -243,7 +232,6 @@ MimeTypeEditor::AttachedToWindow()
 	fTextControl->SetTarget(this);
 	fEditor.StartWatching(this);
 
-	AddMimeTypesToMenu();
 	UpdateText();
 }
 
@@ -275,48 +263,6 @@ MimeTypeEditor::MessageReceived(BMessage *message)
 
 		default:
 			BView::MessageReceived(message);
-	}
-}
-
-
-void
-MimeTypeEditor::AddMimeTypesToMenu()
-{
-	// add MIME type tree list
-
-	BMessage types;
-	if (BMimeType::GetInstalledSupertypes(&types) == B_OK) {
-		const char *superType;
-		int32 index = 0;
-
-		while (types.FindString("super_types", index++, &superType) == B_OK) {
-			BMenu *superMenu = new BMenu(superType);
-
-			// ToDo: there are way too many "application" types... (need to lay off to another thread)
-			if (!strcmp(superType, "application"))
-				continue;
-
-			BMessage subTypes;
-			if (BMimeType::GetInstalledTypes(superType, &subTypes) == B_OK) {
-				const char *type;
-				int32 subIndex = 0;
-				while (subTypes.FindString("types", subIndex++, &type) == B_OK) {
-					BMessage *message = new BMessage(kMimeTypeItem);
-					message->AddString("super_type", superType);
-					message->AddString("mime_type", type);
-					superMenu->AddItem(new BMenuItem(strchr(type, '/') + 1, message));
-				}
-		 	}
-		 	if (superMenu->CountItems() != 0) {
-				fMimeTypeMenu->AddItem(new BMenuItem(superMenu));
-
-				// the MimeTypeMenu's font is not correct at this time
-				superMenu->SetFont(be_plain_font);
-				superMenu->SetTargetForItems(this);
-			} else
-				delete superMenu;
-
-		}
 	}
 }
 
