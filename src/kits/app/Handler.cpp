@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -110,6 +110,7 @@
 			Obviously, I can't be entirely sure this is how R5 does it, but it
 			seems like a reasonable design to follow for our purposes.
  */
+
 /**
 	@note	Thought on "pseudo-atomic" operations in Lock(), LockWithTimeout(),
 			and Unlock().  Seems like avoiding the possibility of a looper
@@ -138,61 +139,40 @@
 // Project Includes ------------------------------------------------------------
 #include <TokenSpace.h>
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-
-// Globals ---------------------------------------------------------------------
-
 using std::map;
 using std::vector;
 using BPrivate::gDefaultTokens;
 
-const char*	gArchiveNameField = "_name";
-static property_info gHandlerPropInfo[] =
-{
+
+static const char *sArchiveNameField = "_name";
+
+static property_info sHandlerPropInfo[] = {
 	{
-		// name
-		"Suites",
-		// commands
-		{ B_GET_PROPERTY },
-		// specifiers
-		{ B_DIRECT_SPECIFIER },
-		// usage
-		NULL,
-		// extra data
-		0,
-		// types
-		{ 0 },
-		// ctypes (compound_type)
-		{
-			// ctypes[0]
-			{
-				// pairs[0]
-				{
+		"Suites",					// name
+		{ B_GET_PROPERTY },			// commands
+		{ B_DIRECT_SPECIFIER },		// specifiers
+		NULL,						// usage
+		0,							// extra data
+		{ 0 },						// types
+		{							// ctypes (compound_type)
+			{						// ctypes[0]
+				{					// pairs[0]
 					{
-						// name
-						"suites",
-						// type
-						B_STRING_TYPE
+						"suites",		// name
+						B_STRING_TYPE	// type
 					} 
 				}
 			},
-			// ctypes[1]
-			{
-				// pairs[1]
-				{
+			{						// ctypes[1]
+				{					// pairs[0]
 					{
-						// name
 						"messages",
-						// type
 						B_PROPERTY_INFO_TYPE
 					}
 				}
 			}
 		},
-		// reserved
-		{ 0 }
+		{}		// reserved
 	},
 	{
 		"Messenger",
@@ -200,8 +180,8 @@ static property_info gHandlerPropInfo[] =
 			{ B_DIRECT_SPECIFIER },
 			NULL, 0,
 			{ B_MESSENGER_TYPE },
-			{ 0 },
-			{ 0 }
+			{},
+			{}
 	},
 	{
 		"InternalName",
@@ -209,20 +189,20 @@ static property_info gHandlerPropInfo[] =
 			{ B_DIRECT_SPECIFIER },
 			NULL, 0,
 			{ B_STRING_TYPE },
-			{ 0 },
-			{ 0 }
+			{},
+			{}
 	},
-	{ 0 }
+	{}
 };
 
-bool FilterDeleter(void* filter);
+bool FilterDeleter(void *filter);
 
-typedef map<unsigned long, vector<BHandler*> >	THandlerObserverMap;
+typedef map<unsigned long, vector<BHandler *> >	THandlerObserverMap;
 typedef map<unsigned long, vector<BMessenger> >	TMessengerObserverMap;
+
 //------------------------------------------------------------------------------
 // TODO: Change to BPrivate::BObserverList if possible
-class _ObserverList
-{
+class _ObserverList {
 	public:
 		_ObserverList(void);
 		~_ObserverList(void);
@@ -237,61 +217,59 @@ class _ObserverList
 		THandlerObserverMap		fHandlerMap;
 		TMessengerObserverMap	fMessengerMap;
 };
-//------------------------------------------------------------------------------
 
 
-//------------------------------------------------------------------------------
-BHandler::BHandler(const char* name)
-	:	BArchivable(), fName(NULL)
+BHandler::BHandler(const char *name)
+	: BArchivable(),
+	fName(NULL)
 {
 	InitData(name);
 }
-//------------------------------------------------------------------------------
+
+
 BHandler::~BHandler()
 {
-	if (fName)
-	{
-		free(fName);
-	}
-
+	free(fName);
 	gDefaultTokens.RemoveToken(fToken);
 }
-//------------------------------------------------------------------------------
-BHandler::BHandler(BMessage* data)
-	:	BArchivable(data), fName(NULL)
+
+
+BHandler::BHandler(BMessage *data)
+	: BArchivable(data),
+	fName(NULL)
 {
-	const char* name = NULL;
+	const char *name = NULL;
 
 	if (data)
-	{
-		data->FindString(gArchiveNameField, &name);
-	}
+		data->FindString(sArchiveNameField, &name);
 
 	InitData(name);
 }
-//------------------------------------------------------------------------------
-BArchivable* BHandler::Instantiate(BMessage* data)
+
+
+BArchivable *
+BHandler::Instantiate(BMessage *data)
 {
 	if (!validate_instantiation(data, "BHandler"))
-	{
 		return NULL;
-	}
 
 	return new BHandler(data);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::Archive(BMessage* data, bool deep) const
-{
-	status_t err = BArchivable::Archive(data, deep);
-	if (!err)
-	{
-		err = data->AddString(gArchiveNameField, fName);
-	}
 
-	return err;
+
+status_t
+BHandler::Archive(BMessage *data, bool deep) const
+{
+	status_t status = BArchivable::Archive(data, deep);
+	if (status < B_OK)
+		return status;
+
+	return data->AddString(sArchiveNameField, fName);
 }
-//------------------------------------------------------------------------------
-void BHandler::MessageReceived(BMessage* message)
+
+
+void
+BHandler::MessageReceived(BMessage *message)
 {
 	BMessage reply(B_REPLY);
 
@@ -302,41 +280,36 @@ void BHandler::MessageReceived(BMessage* message)
 			BMessage specifier;
 			int32 form;
 			const char *prop;
-			
+
 			status_t err = message->GetCurrentSpecifier(&cur, &specifier, &form, &prop);
 			if (err == B_OK) {
 				if (strcmp(prop, "Suites") == 0) {
 					if (GetSupportedSuites(&reply) == B_OK
 							&& reply.AddInt32("error", B_OK) == B_OK)
 						message->SendReply(&reply);
-				
 				} else if (strcmp(prop, "Messenger") == 0) {
 					if (reply.AddMessenger("result", this) == B_OK
 							&& reply.AddInt32("error", B_OK) == B_OK)
 						message->SendReply(&reply);
-				
 				} else if (strcmp(prop, "InternalName") == 0) {
 					if (reply.AddString("result", Name()) == B_OK
 							&& reply.AddInt32("error", B_OK) == B_OK)
-
 					message->SendReply(&reply);
-				
 				} else {
 					// Should never be here
 					debugger("BHandler::MessageReceived(): We are *not* supposed to be here");
 				}
 			}
-
 			break;
 		}
-		
+
 		case B_GET_SUPPORTED_SUITES:
 		{
 			reply.AddInt32("error", GetSupportedSuites(&reply));
 			message->SendReply(&reply);
 			break;
 		}
-		
+
 		default:
 			if (fNextHandler)
 				fNextHandler->MessageReceived(message);
@@ -348,64 +321,70 @@ void BHandler::MessageReceived(BMessage* message)
 			break;
 	}
 }
-//------------------------------------------------------------------------------
-BLooper* BHandler::Looper() const
+
+
+BLooper *
+BHandler::Looper() const
 {
 	return fLooper;
 }
-//------------------------------------------------------------------------------
-void BHandler::SetName(const char* name)
+
+
+void
+BHandler::SetName(const char *name)
 {
-	if (fName)
-	{
+	if (fName != NULL) {
 		free(fName);
 		fName = NULL;
 	}
 
-	if (name)
-	{
+	if (name != NULL)
 		fName = strdup(name);
-	}
 }
-//------------------------------------------------------------------------------
-const char* BHandler::Name() const
+
+
+const char *
+BHandler::Name() const
 {
 	return fName;
 }
-//------------------------------------------------------------------------------
-void BHandler::SetNextHandler(BHandler* handler)
+
+
+void
+BHandler::SetNextHandler(BHandler *handler)
 {
-	if (!fLooper)
-	{
+	if (!fLooper) {
 		debugger("handler must belong to looper before setting NextHandler");
 		fNextHandler = NULL;
 		return;
 	}
 
-	if (!fLooper->IsLocked())
-	{
+	if (!fLooper->IsLocked()) {
 		debugger("The handler's looper must be locked before setting NextHandler");
 		return;
 	}
 
-	if (handler && fLooper != handler->Looper())
-	{
+	if (handler && fLooper != handler->Looper()) {
 		debugger("The handler and its NextHandler must have the same looper");
 		return;
 	}
 
-	// NOTE:  I'm sure some sort of threading protection should happen here,
+	// NOTE: I'm sure some sort of threading protection should happen here,
 	// hopefully the spec-mandated BLooper lock is sufficient.
 	// TODO: implement correctly
 	fNextHandler = handler;
 }
-//------------------------------------------------------------------------------
-BHandler* BHandler::NextHandler() const
+
+
+BHandler *
+BHandler::NextHandler() const
 {
 	return fNextHandler;
 }
-//------------------------------------------------------------------------------
-void BHandler::AddFilter(BMessageFilter* filter)
+
+
+void
+BHandler::AddFilter(BMessageFilter *filter)
 {
 	// NOTE:  Although the documentation states that the handler must belong to
 	// a looper and the looper must be locked in order to use this method,
@@ -428,14 +407,14 @@ void BHandler::AddFilter(BMessageFilter* filter)
 #endif
 
 	if (!fFilters)
-	{
 		fFilters = new BList;
-	}
 
 	fFilters->AddItem(filter);
 }
-//------------------------------------------------------------------------------
-bool BHandler::RemoveFilter(BMessageFilter* filter)
+
+
+bool
+BHandler::RemoveFilter(BMessageFilter *filter)
 {
 	// NOTE:  Although the documentation states that the handler must belong to
 	// a looper and the looper must be locked in order to use this method,
@@ -457,25 +436,24 @@ bool BHandler::RemoveFilter(BMessageFilter* filter)
 	}
 #endif
 
-	if (fFilters)
-	{
-		if (fFilters->RemoveItem((void*)filter))
-		{
-			filter->SetLooper(NULL);
-			return true;
-		}
+	if (fFilters != NULL && fFilters->RemoveItem((void *)filter)) {
+		filter->SetLooper(NULL);
+		return true;
 	}
 
 	return false;
 }
-//------------------------------------------------------------------------------
-void BHandler::SetFilterList(BList* filters)
+
+
+void
+BHandler::SetFilterList(BList* filters)
 {
-/**
-	@note	Although the documentation states that the handler must belong to
-			a looper and the looper must be locked in order to use this method,
-			testing shows that this is not the case in the original implementation.
- */
+	/**
+		@note	Although the documentation states that the handler must belong to
+				a looper and the looper must be locked in order to use this method,
+				testing shows that this is not the case in the original implementation.
+	 */
+
 #if 0
 	if (!fLooper)
 	{
@@ -484,160 +462,156 @@ void BHandler::SetFilterList(BList* filters)
 	}
 #endif
 
-	if (fLooper && !fLooper->IsLocked())
-	{
+	if (fLooper && !fLooper->IsLocked()) {
 		debugger("Owning Looper must be locked before calling SetFilterList");
 		return;
 	}
 
-/**
-	@note	I would like to use BObjectList internally, but this function is
-			spec'd such that fFilters would get deleted and then assigned
-			'filters', which would obviously mess this up.  Wondering if
-			anyone ever assigns a list of filters and then checks against
-			FilterList() to see if they are the same.
- */
+	/**
+		@note	I would like to use BObjectList internally, but this function is
+				spec'd such that fFilters would get deleted and then assigned
+				'filters', which would obviously mess this up.  Wondering if
+				anyone ever assigns a list of filters and then checks against
+				FilterList() to see if they are the same.
+	 */
+
 	// TODO: Explore issues with using BObjectList
-	if (fFilters)
-	{
+	if (fFilters) {
 		fFilters->DoForEach(FilterDeleter);
 		delete fFilters;
 	}
 
 	fFilters = filters;
-	if (fFilters)
-	{
-		for (int32 i = 0; i < fFilters->CountItems(); ++i)
-		{
-			BMessageFilter* Filter =
-				static_cast<BMessageFilter*>(fFilters->ItemAt(i));
-			if (Filter)
-			{
-				Filter->SetLooper(fLooper);
-			}
+	if (fFilters) {
+		for (int32 i = 0; i < fFilters->CountItems(); ++i) {
+			BMessageFilter *filter =
+				static_cast<BMessageFilter *>(fFilters->ItemAt(i));
+			if (filter != NULL)
+				filter->SetLooper(fLooper);
 		}
 	}
 }
-//------------------------------------------------------------------------------
-BList* BHandler::FilterList()
+
+
+BList *
+BHandler::FilterList()
 {
 	return fFilters;
 }
-//------------------------------------------------------------------------------
-bool BHandler::LockLooper()
-{
-/**
-	@note	BeBook says that this function "retrieves the handler's looper and
-			unlocks it in a pseudo-atomic operation, thus avoiding a race
-			condition."  How "pseudo-atomic" would look completely escapes me,
-			so we'll go with the dumb version for now.  Maybe I should use a
-			benaphore?
 
-			BeBook mentions handling the case where the handler's looper
-			changes during this call.  I've attempted a "pseudo-atomic"
-			operation to check that.
- */
-	BLooper* Looper = fLooper;
-	if (Looper)
-	{
-		bool result = Looper->Lock();
+
+bool
+BHandler::LockLooper()
+{
+	/**
+		@note	BeBook says that this function "retrieves the handler's looper and
+				unlocks it in a pseudo-atomic operation, thus avoiding a race
+				condition."  How "pseudo-atomic" would look completely escapes me,
+				so we'll go with the dumb version for now.  Maybe I should use a
+				benaphore?
+
+				BeBook mentions handling the case where the handler's looper
+				changes during this call.  I've attempted a "pseudo-atomic"
+				operation to check that.
+	 */
+
+	BLooper *looper = fLooper;
+	if (looper) {
+		bool result = looper->Lock();
 
 		// Are we still assigned to the same looper?
-		if (fLooper == Looper)
-		{
+		if (fLooper == looper)
 			return result;
-		}
-		else if (result)
-		{
+
+		if (result) {
 			// Our looper is different, and the lock was successful on the old
 			// one; undo the lock
-			Looper->Unlock();
+			looper->Unlock();
 		}
 	}
 
 	return false;
 }
-//------------------------------------------------------------------------------
-status_t BHandler::LockLooperWithTimeout(bigtime_t timeout)
-{
-/**
-	@note	BeBook says that this function "retrieves the handler's looper and
-			unlocks it in a pseudo-atomic operation, thus avoiding a race
-			condition."  How "pseudo-atomic" would look completely escapes me,
-			so we'll go with the dumb version for now.  Maybe I should use a
-			benaphore?
 
-			BeBook mentions handling the case where the handler's looper
-			changes during this call.  I've attempted a "pseudo-atomic"
-			operation to check for that.
- */
-	BLooper* Looper = fLooper;
-	if (Looper)
-	{
-		status_t result = Looper->LockWithTimeout(timeout);
+
+status_t
+BHandler::LockLooperWithTimeout(bigtime_t timeout)
+{
+	/**
+		@note	BeBook says that this function "retrieves the handler's looper and
+				unlocks it in a pseudo-atomic operation, thus avoiding a race
+				condition."  How "pseudo-atomic" would look completely escapes me,
+				so we'll go with the dumb version for now.  Maybe I should use a
+				benaphore?
+
+				BeBook mentions handling the case where the handler's looper
+				changes during this call.  I've attempted a "pseudo-atomic"
+				operation to check for that.
+	 */
+
+	BLooper *looper = fLooper;
+	if (looper) {
+		status_t result = looper->LockWithTimeout(timeout);
 
 		// Are we still assigned to the same looper?
-		if (fLooper == Looper)
-		{
+		if (fLooper == looper)
 			return result;
-		}
-		else
-		{
-			// Our looper changed during the lock attempt
-			if (result == B_OK)
-			{
-				// The lock was successful on the old looper; undo the lock
-				Looper->Unlock();
-			}
 
-			return B_MISMATCHED_VALUES;
+		// Our looper changed during the lock attempt
+		if (result == B_OK) {
+			// The lock was successful on the old looper; undo the lock
+			looper->Unlock();
 		}
+
+		return B_MISMATCHED_VALUES;
 	}
 
 	return B_BAD_VALUE;
 }
-//------------------------------------------------------------------------------
-void BHandler::UnlockLooper()
-{
-/**
-	@note	BeBook says that this function "retrieves the handler's looper and
-			unlocks it in a pseudo-atomic operation, thus avoiding a race
-			condition."  How "pseudo-atomic" would look completely escapes me,
-			so we'll go with the dumb version for now.  Maybe I should use a
-			benaphore?
 
-			The solution I used for Lock() and LockWithTimeout() seems out of
-			place here; if our looper does change while attempting to unlock it,
-			re-Lock()ing the original looper just doesn't seem right.
- */
+
+void
+BHandler::UnlockLooper()
+{
+	/**
+		@note	BeBook says that this function "retrieves the handler's looper and
+				unlocks it in a pseudo-atomic operation, thus avoiding a race
+				condition."  How "pseudo-atomic" would look completely escapes me,
+				so we'll go with the dumb version for now.  Maybe I should use a
+				benaphore?
+
+				The solution I used for Lock() and LockWithTimeout() seems out of
+				place here; if our looper does change while attempting to unlock it,
+				re-Lock()ing the original looper just doesn't seem right.
+	 */
+
 	// TODO: implement correctly
-	BLooper* Looper = fLooper;
-	if (Looper)
-	{
-		Looper->Unlock();
-	}
+	BLooper *looper = fLooper;
+	if (looper)
+		looper->Unlock();
 }
-//------------------------------------------------------------------------------
-BHandler* BHandler::ResolveSpecifier(BMessage* msg, int32 index,
-									 BMessage* specifier, int32 form,
-									 const char* property)
+
+
+BHandler *
+BHandler::ResolveSpecifier(BMessage *msg, int32 index,
+	BMessage *specifier, int32 form, const char *property)
 {
 	// Straight from the BeBook
-	BPropertyInfo PropertyInfo(gHandlerPropInfo);
-	if (PropertyInfo.FindMatch(msg, index, specifier, form, property) >= 0)
-	{
+	BPropertyInfo propertyInfo(sHandlerPropInfo);
+	if (propertyInfo.FindMatch(msg, index, specifier, form, property) >= 0)
 		return this;
-	}
 
-	BMessage Reply(B_MESSAGE_NOT_UNDERSTOOD);
-	Reply.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
-	Reply.AddString("message", "Didn't understand the specifier(s)");
-	msg->SendReply(&Reply);
+	BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
+	reply.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
+	reply.AddString("message", "Didn't understand the specifier(s)");
+	msg->SendReply(&reply);
 
 	return NULL;
 }
-//------------------------------------------------------------------------------
-status_t BHandler::GetSupportedSuites(BMessage* data)
+
+
+status_t
+BHandler::GetSupportedSuites(BMessage *data)
 {
 /**
 	@note	This is the output from the original implementation (calling
@@ -663,293 +637,293 @@ BMessage: what =  (0x0, or 0)
 			scripting docs are so bloody horrible.  The corresponding
 			property_info array is declared in the globals section.
  */
+
 	status_t err = B_OK;
 	if (!data)
-	{
 		err = B_BAD_VALUE;
-	}
 
-	if (!err)
-	{
+	if (!err) {
 		err = data->AddString("suites", "suite/vnd.Be-handler");
-		if (!err)
-		{
-			BPropertyInfo PropertyInfo(gHandlerPropInfo);
-			err = data->AddFlat("message", &PropertyInfo);
+		if (!err) {
+			BPropertyInfo propertyInfo(sHandlerPropInfo);
+			err = data->AddFlat("message", &propertyInfo);
 		}
 	}
 
 	return err;
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StartWatching(BMessenger Messenger, uint32 what)
+
+
+status_t
+BHandler::StartWatching(BMessenger messenger, uint32 what)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(Messenger, what);
+	return fObserverList->StartObserving(messenger, what);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StartWatchingAll(BMessenger Messenger)
+
+
+status_t
+BHandler::StartWatchingAll(BMessenger messenger)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(Messenger, B_OBSERVER_OBSERVE_ALL);
+	return fObserverList->StartObserving(messenger, B_OBSERVER_OBSERVE_ALL);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StopWatching(BMessenger Messenger, uint32 what)
+
+
+status_t
+BHandler::StopWatching(BMessenger messenger, uint32 what)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(Messenger, what);
+	return fObserverList->StopObserving(messenger, what);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StopWatchingAll(BMessenger Messenger)
+
+
+status_t
+BHandler::StopWatchingAll(BMessenger messenger)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(Messenger, B_OBSERVER_OBSERVE_ALL);
+	return fObserverList->StopObserving(messenger, B_OBSERVER_OBSERVE_ALL);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StartWatching(BHandler* Handler, uint32 what)
+
+
+status_t
+BHandler::StartWatching(BHandler *handler, uint32 what)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(Handler, what);
+	return fObserverList->StartObserving(handler, what);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StartWatchingAll(BHandler* Handler)
+
+
+status_t
+BHandler::StartWatchingAll(BHandler *handler)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StartObserving(Handler, B_OBSERVER_OBSERVE_ALL);
+	return fObserverList->StartObserving(handler, B_OBSERVER_OBSERVE_ALL);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StopWatching(BHandler* Handler, uint32 what)
+
+
+status_t
+BHandler::StopWatching(BHandler *handler, uint32 what)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(Handler, what);
+	return fObserverList->StopObserving(handler, what);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::StopWatchingAll(BHandler* Handler)
+
+
+status_t
+BHandler::StopWatchingAll(BHandler *handler)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
-	return fObserverList->StopObserving(Handler, B_OBSERVER_OBSERVE_ALL);
+	return fObserverList->StopObserving(handler, B_OBSERVER_OBSERVE_ALL);
 }
-//------------------------------------------------------------------------------
-status_t BHandler::Perform(perform_code d, void* arg)
+
+
+status_t
+BHandler::Perform(perform_code d, void *arg)
 {
 	return BArchivable::Perform(d, arg);
 }
-//------------------------------------------------------------------------------
-void BHandler::SendNotices(uint32 what, const BMessage* msg)
+
+
+void
+BHandler::SendNotices(uint32 what, const BMessage *msg)
 {
 	fObserverList ? fObserverList : fObserverList = new _ObserverList;
 	fObserverList->SendNotices(what, msg);
 }
-//------------------------------------------------------------------------------
-bool BHandler::IsWatched() const
+
+
+bool
+BHandler::IsWatched() const
 {
 	return fObserverList && !fObserverList->IsEmpty();
 }
-//------------------------------------------------------------------------------
-void BHandler::_ReservedHandler2()
-{
-	// Unused
-	;
-}
-//------------------------------------------------------------------------------
-void BHandler::_ReservedHandler3()
-{
-	// Unused
-	;
-}
-//------------------------------------------------------------------------------
-void BHandler::_ReservedHandler4()
-{
-	// Unused
-	;
-}
-//------------------------------------------------------------------------------
-void BHandler::InitData(const char* name)
+
+
+void BHandler::_ReservedHandler2() {}
+void BHandler::_ReservedHandler3() {}
+void BHandler::_ReservedHandler4() {}
+
+
+void
+BHandler::InitData(const char *name)
 {
 	SetName(name);
 
-	fLooper			= NULL;
-	fNextHandler	= NULL;
-	fFilters		= NULL;
-	fObserverList	= NULL;
+	fLooper = NULL;
+	fNextHandler = NULL;
+	fFilters = NULL;
+	fObserverList = NULL;
 
 	fToken = gDefaultTokens.NewToken(B_HANDLER_TOKEN, this);
 }
-//------------------------------------------------------------------------------
-BHandler::BHandler(const BHandler& )
+
+
+BHandler::BHandler(const BHandler &)
 {
 	// No copy construction allowed.
-	;
 }
-//------------------------------------------------------------------------------
-BHandler& BHandler::operator=(const BHandler& )
+
+
+BHandler &
+BHandler::operator=(const BHandler &)
 {
 	// No assignments allowed.
 	return *this;
 }
-//------------------------------------------------------------------------------
-void BHandler::SetLooper(BLooper* loop)
+
+
+void
+BHandler::SetLooper(BLooper *loop)
 {
 	fLooper = loop;
 }
-//------------------------------------------------------------------------------
 
 
-//------------------------------------------------------------------------------
 //	#pragma mark -
-//	#pragma mark _ObserverList
-//	#pramga mark -
-//------------------------------------------------------------------------------
+
+
 _ObserverList::_ObserverList(void)
 {
 }
-//------------------------------------------------------------------------------
+
+
 _ObserverList::~_ObserverList(void)
 {
 }
-//------------------------------------------------------------------------------
-status_t _ObserverList::SendNotices(unsigned long what, BMessage const* Message)
+
+
+status_t
+_ObserverList::SendNotices(unsigned long what, BMessage const *message)
 {
 	// Having to new a temporary is really irritating ...
-	BMessage* CopyMsg = NULL;
-	if (Message)
-	{
-		CopyMsg = new BMessage(*Message);
-		CopyMsg->what = B_OBSERVER_NOTICE_CHANGE;
-		CopyMsg->AddInt32(B_OBSERVE_ORIGINAL_WHAT, Message->what);
-	}
-	else
-	{
-		CopyMsg = new BMessage(B_OBSERVER_NOTICE_CHANGE);
-	}
+	BMessage *copyMsg = NULL;
+	if (message) {
+		copyMsg = new BMessage(*message);
+		copyMsg->what = B_OBSERVER_NOTICE_CHANGE;
+		copyMsg->AddInt32(B_OBSERVE_ORIGINAL_WHAT, message->what);
+	} else
+		copyMsg = new BMessage(B_OBSERVER_NOTICE_CHANGE);
 
-	CopyMsg->AddInt32(B_OBSERVE_WHAT_CHANGE, what);
+	copyMsg->AddInt32(B_OBSERVE_WHAT_CHANGE, what);
 
-	vector<BHandler*>& Handlers = fHandlerMap[what];
-	for (uint32 i = 0; i < Handlers.size(); ++i)
-	{
-		BMessenger msgr(Handlers[i]);
-		msgr.SendMessage(CopyMsg);
+	vector<BHandler *> &handlers = fHandlerMap[what];
+	for (uint32 i = 0; i < handlers.size(); ++i) {
+		BMessenger msgr(handlers[i]);
+		msgr.SendMessage(copyMsg);
 	}
 
-	vector<BMessenger>& Messengers = fMessengerMap[what];
-	for (uint32 i = 0; i < Messengers.size(); ++i)
-	{
-		Messengers[i].SendMessage(CopyMsg);
+	vector<BMessenger> &messengers = fMessengerMap[what];
+	for (uint32 i = 0; i < messengers.size(); ++i) {
+		messengers[i].SendMessage(copyMsg);
 	}
 
 	// Gotta make sure to clean up the annoying temporary ...
-	delete CopyMsg;
+	delete copyMsg;
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-status_t _ObserverList::StartObserving(BHandler* Handler, unsigned long what)
+
+
+status_t
+_ObserverList::StartObserving(BHandler *handler, unsigned long what)
 {
-	if (!Handler)
-	{
+	if (handler == NULL)
 		return B_BAD_HANDLER;
-	}
 
-	vector<BHandler*>& Handlers = fHandlerMap[what];
+	vector<BHandler*> &handlers = fHandlerMap[what];
+
 	vector<BHandler*>::iterator iter;
-	iter = find(Handlers.begin(), Handlers.end(), Handler);
-	if (iter != Handlers.end())
-	{
+	iter = find(handlers.begin(), handlers.end(), handler);
+	if (iter != handlers.end()) {
 		// TODO: verify
 		return B_OK;
 	}
 
-	Handlers.push_back(Handler);
+	handlers.push_back(handler);
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-status_t _ObserverList::StartObserving(const BMessenger& Messenger,
-									   unsigned long what)
+
+
+status_t
+_ObserverList::StartObserving(const BMessenger &messenger,
+	unsigned long what)
 {
-	vector<BMessenger>& Messengers = fMessengerMap[what];
+	vector<BMessenger> &messengers = fMessengerMap[what];
+
 	vector<BMessenger>::iterator iter;
-	iter = find(Messengers.begin(), Messengers.end(), Messenger);
-	if (iter != Messengers.end())
-	{
+	iter = find(messengers.begin(), messengers.end(), messenger);
+	if (iter != messengers.end()) {
 		// TODO: verify
 		return B_OK;
 	}
 
-	Messengers.push_back(Messenger);
+	messengers.push_back(messenger);
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-status_t _ObserverList::StopObserving(BHandler* Handler, unsigned long what)
+
+
+status_t
+_ObserverList::StopObserving(BHandler *handler, unsigned long what)
 {
-	if (Handler)
-	{
-		vector<BHandler*>& Handlers = fHandlerMap[what];
-		vector<BHandler*>::iterator iter;
-		iter = find(Handlers.begin(), Handlers.end(), Handler);
-		if (iter != Handlers.end())
-		{
-			Handlers.erase(iter);
-			if (Handlers.empty())
-			{
-				fHandlerMap.erase(what);
-			}
-			return B_OK;
-		}
+	if (handler == NULL)
+		return B_BAD_HANDLER;
+
+	vector<BHandler*> &handlers = fHandlerMap[what];
+
+	vector<BHandler*>::iterator iter;
+	iter = find(handlers.begin(), handlers.end(), handler);
+	if (iter != handlers.end()) {
+		handlers.erase(iter);
+		if (handlers.empty())
+			fHandlerMap.erase(what);
+
+		return B_OK;
 	}
 
 	return B_BAD_HANDLER;
 }
-//------------------------------------------------------------------------------
-status_t _ObserverList::StopObserving(const BMessenger& Messenger,
-									  unsigned long what)
+
+
+status_t
+_ObserverList::StopObserving(const BMessenger &messenger,
+	unsigned long what)
 {
 	// ???:	What if you call StartWatching(MyMsngr, aWhat) and then call
 	//		StopWatchingAll(MyMsnger)?  Will MyMsnger be removed from the aWhat
 	//		watcher list?  For now, we'll assume that they're discreet lists
 	//		which do no cross checking; i.e., MyMsnger would *not* be removed in
 	//		this scenario.
-	vector<BMessenger>& Messengers = fMessengerMap[what];
+	vector<BMessenger> &messengers = fMessengerMap[what];
+
 	vector<BMessenger>::iterator iter;
-	iter = find(Messengers.begin(), Messengers.end(), Messenger);
-	if (iter != Messengers.end())
-	{
-		Messengers.erase(iter);
-		if (Messengers.empty())
-		{
+	iter = find(messengers.begin(), messengers.end(), messenger);
+	if (iter != messengers.end()) {
+		messengers.erase(iter);
+		if (messengers.empty())
 			fMessengerMap.erase(what);
-		}
+
 		return B_OK;
 	}
 
 	return B_BAD_HANDLER;
 }
-//------------------------------------------------------------------------------
-bool _ObserverList::IsEmpty()
+
+
+bool
+_ObserverList::IsEmpty()
 {
 	return fHandlerMap.empty() && fMessengerMap.empty();
 }
-//------------------------------------------------------------------------------
 
 
-//------------------------------------------------------------------------------
-bool FilterDeleter(void* filter)
+//	#pragma mark -
+
+
+bool
+FilterDeleter(void *_filter)
 {
-	BMessageFilter* Filter = static_cast<BMessageFilter*>(filter);
-	if (Filter)
-	{
-		delete Filter;
-		Filter = NULL;
-	}
-
+	delete static_cast<BMessageFilter *>(_filter);
 	return false;
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
 
