@@ -22,10 +22,10 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	struct elf_image_info *resolve_image, struct Elf32_Rel *rel, int rel_len)
 {
 	struct Elf32_Sym *sym;
-	addr S;
-	addr A;
-	addr P;
-	addr final_val;
+	addr_t S;
+	addr_t A;
+	addr_t P;
+	addr_t final_val;
 	int i;
 
 	S = A = P = 0;
@@ -60,7 +60,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_RELATIVE:
 			case R_386_GOTOFF:
 			case R_386_GOTPC:
-				A = *(addr *)(image->regions[0].delta + rel[i].r_offset);
+				A = *(addr_t *)(image->regions[0].delta + rel[i].r_offset);
 				TRACE(("A %p\n", (void *)A));
 				break;
 		}
@@ -97,7 +97,7 @@ arch_elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 				dprintf("arch_elf_relocate_rel: unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
 				return EPERM;
 		}
-		*(addr *)(image->regions[0].delta + rel[i].r_offset) = final_val;
+		*(addr_t *)(image->regions[0].delta + rel[i].r_offset) = final_val;
 	}
 
 	return B_NO_ERROR;
