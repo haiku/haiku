@@ -207,6 +207,9 @@ void DevicesWindow::InitWindow(void)
 	ptrDevicesView->AddChild(outlinesv);
 	ptrDevicesView->AddChild(btnConfigure);
 	ptrDevicesView->AddChild(BottomFrame);
+	
+	// Set Window Limits
+	SetSizeLimits(396,396,400,400);
 }
 // ---------------------------------------------------------------------------------------------------------- //
 

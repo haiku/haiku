@@ -7,19 +7,7 @@ Devices by Sikosis
 */
 
 // Includes -------------------------------------------------------------------------------------------------- //
-#include <Alert.h>
 #include <Application.h>
-#include <Button.h>
-#include <Deskbar.h>
-#include <Entry.h>
-#include <File.h>
-#include <FilePanel.h>
-#include <ListView.h>
-#include <Path.h>
-#include <Screen.h>
-#include <ScrollView.h>
-#include <stdio.h>
-#include <string.h>
 #include <Window.h>
 #include <View.h>
 
@@ -31,19 +19,11 @@ Devices by Sikosis
 
 DevicesWindow   *ptrDevicesWindow;
 
+
 // Devices -- constructor 
 Devices::Devices() : BApplication (APP_SIGNATURE)
 {
-	// Default Window Size - even though we centre the form to the current screen size
-	//BRect screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	
-	float FormTopDefault = 0;
-	float FormLeftDefault = 0;
-	float FormWidthDefault = 396;
-	float FormHeightDefault = 400;
-	
-	BRect DevicesWindowRect(FormTopDefault,FormLeftDefault,FormLeftDefault+FormWidthDefault,FormTopDefault+FormHeightDefault);
-
+	BRect DevicesWindowRect(0,0,396,400);
 	ptrDevicesWindow = new DevicesWindow(DevicesWindowRect);
 }
 // ---------------------------------------------------------------------------------------------------------- //
@@ -61,6 +41,7 @@ void Devices::MessageReceived (BMessage *message)
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
+
 // Devices Main
 int main(void)
 {
@@ -69,5 +50,4 @@ int main(void)
    return 0;
 }
 // end ------------------------------------------------------------------------------------------------------ //
-
 
