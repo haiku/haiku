@@ -510,12 +510,13 @@ team_create_team2(void *args)
 
 	// create an initial primary stack region
 
-	// ToDo: make ENV_SIZE variable?
+	// ToDo: make ENV_SIZE variable and put it on the heap?
 	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
 	totalSize = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
 		get_arguments_data_size(teamArgs->args, teamArgs->argc));
 	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - totalSize;
+	t->user_stack_size = MAIN_THREAD_STACK_SIZE;
 		// the exact location at the end of the user stack region
 
 	sprintf(ustack_name, "%s_main_stack", team->name);
@@ -542,7 +543,7 @@ team_create_team2(void *args)
 	}
 	uargs[arg_cnt] = NULL;
 
-	team->user_env_base = t->user_stack_base + STACK_SIZE + TLS_SIZE;
+	team->user_env_base = t->user_stack_base + t->user_stack_size + TLS_SIZE;
 	uenv = (char **)team->user_env_base;
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
 
@@ -954,7 +955,7 @@ sys_setenv(const char *name, const char *value, int overwrite)
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	
+
 	return rc;
 }
 
@@ -970,7 +971,7 @@ sys_getenv(const char *name, char **value)
 	int rc = -1;
 
 	// ToDo: please put me out of the kernel into libroot.so!
-	
+
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
@@ -985,7 +986,7 @@ sys_getenv(const char *name, char **value)
 			}
 		}
 	}
-	
+
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 	

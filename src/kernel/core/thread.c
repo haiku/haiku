@@ -351,11 +351,12 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 		// the stack will be between USER_STACK_REGION and the main thread stack area
 		// (the user stack of the main thread is created in team_create_team())
 		t->user_stack_base = USER_STACK_REGION;
+		t->user_stack_size = STACK_SIZE;
 
 		snprintf(stack_name, B_OS_NAME_LENGTH, "%s_%lx_stack", name, t->id);
 		t->user_stack_region_id = create_area_etc(team, stack_name,
 				(void **)&t->user_stack_base, B_BASE_ADDRESS,
-				STACK_SIZE + TLS_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+				t->user_stack_size + TLS_SIZE, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 		if (t->user_stack_region_id < 0) {
 			// great, we have a fully running thread without a stack
 			dprintf("create_thread: unable to create user stack!\n");
@@ -735,7 +736,7 @@ thread_exit(void)
 
 	// Cancel previously installed alarm timer, if any
 	cancel_timer(&t->alarm);
-	
+
 	// delete the user stack region first
 	if (team->_aspace_id >= 0 && t->user_stack_region_id >= 0) {
 		region_id rid = t->user_stack_region_id;
@@ -815,7 +816,7 @@ static void
 thread_kthread_exit(void)
 {
 	struct thread *t = thread_get_current_thread();
-	
+
 	t->return_flags = THREAD_RETURN_EXIT;
 	thread_exit();
 }

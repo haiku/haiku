@@ -222,7 +222,7 @@ arch_thread_dump_info(void *info)
 void
 arch_thread_enter_uspace(struct thread *t, addr_t entry, void *args1, void *args2)
 {
-	addr_t ustack_top = t->user_stack_base + STACK_SIZE;
+	addr_t ustack_top = t->user_stack_base + t->user_stack_size;
 
 	TRACE(("arch_thread_enter_uspace: entry 0x%lx, args %p %p, ustack_top 0x%lx\n",
 		entry, args1, args2, ustack_top));
