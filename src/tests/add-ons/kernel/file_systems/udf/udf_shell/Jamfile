@@ -4,6 +4,7 @@ SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems udf ;
 
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders [ FDirName kernel ] ;
 
 {
 	local defines = [ FDefines USER ] ; # DEBUG _NO_INLINE_ASM
