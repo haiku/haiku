@@ -66,7 +66,7 @@ class Journal {
 		inline uint32 FreeLogBlocks() const;
 
 	private:
-		friend log_entry;
+		friend struct log_entry;
 
 		static void blockNotify(int32 transactionID, void *arg);
 		status_t TransactionDone(bool success);

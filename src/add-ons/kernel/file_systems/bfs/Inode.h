@@ -291,8 +291,8 @@ class AttributeIterator {
 		void		*fBuffer;
 
 	private:
-		friend Chain<AttributeIterator>;
-		friend Inode;
+		friend class Chain<AttributeIterator>;
+		friend class Inode;
 
 		void Update(uint16 index, int8 change);
 		AttributeIterator *fNext;

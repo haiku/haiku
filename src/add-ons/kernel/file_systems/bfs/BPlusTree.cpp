@@ -1315,7 +1315,7 @@ BPlusTree::RemoveDuplicate(Transaction &transaction, bplustree_node *node, Cache
 	// Remove value from a duplicate node!
 	//
 
-	duplicate_array *array;
+	duplicate_array *array = NULL;
 
 	if (duplicate->LeftLink() != BPLUSTREE_NULL) {
 		FATAL(("invalid duplicate node: first left link points to %Ld!\n", duplicate->LeftLink()));
