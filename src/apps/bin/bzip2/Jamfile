@@ -2,8 +2,11 @@ SubDir OBOS_TOP src apps bin bzip2 ;
 
 # set some additional defines
 {
-	SubDirCcFlags -Wall -Winline -O2 -fomit-frame-pointer -fno-strength-reduce -D_FILE_OFFSET_BITS=64 ;
+	SubDirCcFlags -Wall -Winline -O2 -fomit-frame-pointer -fno-strength-reduce -D_FILE_OFFSET_BITS=64 -w ;
 }
+
+local bzip2_rsrc = [ FGristFiles bzip2.rsrc ] ;
+ResComp $(bzip2_rsrc) : [ FGristFiles bzip2.rdef ] ;
 
 BinCommand bzip2 :
 	blocksort.c
@@ -14,12 +17,12 @@ BinCommand bzip2 :
 	decompress.c
 	bzlib.c
 	bzip2.c
-	: : bzip2.rdef
+	: : $(bzip2_rsrc)
 ;
 
 BinCommand bzip2recover :
 	bzip2recover.c
-	: : bzip2.rdef
+	: : $(bzip2_rsrc)
 ;
 
 {
