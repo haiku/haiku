@@ -7,8 +7,6 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkerne
 BinCommand pppconfig :
 	driver_settings.c
 	pppconfig.cpp
-	
-	: be
 ;
 
 SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
