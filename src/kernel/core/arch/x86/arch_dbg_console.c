@@ -4,6 +4,7 @@
 */
 /*
 ** Modified 2001/09/05 by Rob Judd<judd@ob-wan.com>
+** Modified 2002/09/28 by Marcus Overhagen <marcus@overhagen.de>
 */
 #include <kernel.h>
 #include <int.h>
@@ -15,6 +16,7 @@
 #include <string.h>
 
 //#define BOCHS_E9_HACK 0
+#define BOCHS_INPUT_HACK 0
 
 // Select between COM1 and COM2 for debug output
 #define USE_COM1 1
@@ -42,6 +44,48 @@ int arch_dbg_con_init(kernel_args *ka)
 
 char arch_dbg_con_read(void)
 {
+#if BOCHS_INPUT_HACK
+	// stolen from nujeffos
+	static const char unshifted_keymap[128] = {
+		0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
+		'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
+		'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', '\'', '`', 0, '\\', 'z', 'x', 'c', 'v',
+		'b', 'n', 'm', ',', '.', '/', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		'\\', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};
+	const char shifted_keymap[128] = {
+		0, 27, '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '_', '+', 8, '\t',
+		'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P', '{', '}', '\n', 0, 'A', 'S',
+		'D', 'F', 'G', 'H', 'J', 'K', 'L', ':', '"', '~', 0, '|', 'Z', 'X', 'C', 'V',
+		'B', 'N', 'M', '<', '>', '?', 0, '*', 0, ' ', 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+	};	
+	static bool shift = false;
+	static uint8 last = 0;
+	uint8 key, ascii = 0;
+	do {
+		while ((key = in8(0x60)) == last)
+			;
+		last = key;
+		if (key & 0x80) {
+			if (key == (0x80 + 42) || key == (54 + 0x80))
+				shift = false;
+		} else {
+			if (key == 42 || key == 54)
+				shift = true;
+			else
+				ascii = shift ? shifted_keymap[key] : unshifted_keymap[key];
+		}
+	} while (!ascii);
+	return ascii;
+#endif
+
 #if USE_COM1
 	while ((in8(0x3fd) & 1) == 0)
 		;
