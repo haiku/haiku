@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-1/2004
+   Rudolf Cornelissen 10/2002-2/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-11 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-12 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -891,8 +891,9 @@ status_t nv_general_bios_to_powergraphics()
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */
 	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
-	/* don't doublebuffer CRTC access: set programmed values immediately */
-	CRTCW(BUFFER, 0xff);
+	/* don't doublebuffer CRTC access: set programmed values immediately;
+	 * keep fine pitched CRTC granularity on > NV4 cards (b2 = 0) */
+	CRTCW(BUFFER, 0xfb);
 	/* select VGA mode (old VGA register) */
 	CRTCW(MODECTL, 0xc3);
 	/* select graphics mode (old VGA register) */
@@ -916,8 +917,9 @@ status_t nv_general_bios_to_powergraphics()
 		CRTC2W(OWNER, 0x03);
 		/* select colormode CRTC2 registers base adresses */
 		NV_REG8(NV8_MISCW) = 0xcb;
-		/* don't doublebuffer CRTC2 access: set programmed values immediately */
-		CRTC2W(BUFFER, 0xff);
+		/* don't doublebuffer CRTC2 access: set programmed values immediately;
+		 * keep fine pitched CRTC2 granularity (b2 = 0) */
+		CRTC2W(BUFFER, 0xfb);
 		/* select VGA mode (old VGA register) */
 		CRTC2W(MODECTL, 0xc3);
 		/* select graphics mode (old VGA register) */
@@ -1009,20 +1011,16 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	}
 
 	/* determine pixel multiple based on CRTC memory pitch constraints:
-	 * -> all NV cards have same constraints on CRTC1 and CRTC2;
-	 * -> if CRTC1 and CRTC2 are adressed in combined mode (OWNER = $04),
-	 *    dualhead cards have the same CRTC granularity as singlehead cards;
-	 * -> if CRTC1 and CRTC2 are adressed seperately (OWNER is $00 or $03),
-	 *    dualhead cards have bigger granularity than singlehead cards: this
-	 *    mode is used on dualhead cards with this driver.
+	 * -> all NV cards have same granularity constraints on CRTC1 and CRTC2,
+	 *    provided that the CRTC1 and CRTC2 BUFFER register b2 = 0;
 	 *
 	 * (Note: Don't mix this up with CRTC timing contraints! Those are
 	 *        multiples of 8 for horizontal, 1 for vertical timing.) */
-	if (si->ps.secondary_head)
+	if (0)
 	{
 		/* confirmed for:
-		 * GeForceFX 5200 */
-		// fixme: still confirm for GeForce2 MX400, GeForce4 MX440, GeForceFX 5600...
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
+		 * the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
 		switch (target->space)
 		{
 			case B_CMAP8: crtc_mask = 0x1f; break;
@@ -1035,10 +1033,12 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				return B_ERROR;
 		}
 	}
-	else /* singlehead cards */
+	else
 	{
 		/* confirmed for:
-		 * TNT1, TNT2, TNT2-M64 */
+		 * TNT1 always;
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
+		 * the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
 		switch (target->space)
 		{
 			case B_CMAP8: crtc_mask = 0x07; break;
@@ -1105,11 +1105,11 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	}
 
 	/* set virtual_width limit for unaccelerated modes */
-	if (si->ps.secondary_head)
+	if (0)
 	{
 		/* confirmed for:
-		 * GeForceFX 5200 */
-		// fixme: still confirm for GeForce2 MX400, GeForce4 MX440, GeForceFX 5600...
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
+		 * the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
 		switch(target->space)
 		{
 			case B_CMAP8: max_crtc_width = 16352; break;
@@ -1122,10 +1122,12 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 				return B_ERROR;
 		}
 	}
-	else /* singlehead cards */
+	else
 	{
 		/* confirmed for:
-		 * TNT1, TNT2, TNT2-M64 */
+		 * TNT1 always;
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
+		 * the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
 		switch(target->space)
 		{
 			case B_CMAP8: max_crtc_width = 16376; break;
