@@ -78,8 +78,7 @@ static const display_mode mode_list[] = {
 /* 16:10 panel mode; 655.36k pixels */
 { { 52800, 1024, 1072, 1176, 1328, 640, 641, 644, 663, T_POSITIVE_SYNC}, B_CMAP8, 1024, 640, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1024X640) */
 /* 16:10 panel-TV mode; 983.04k pixels */
-//fixme: tune modeline to VESA asap!
-{ { 83500, 1280, 1344, 1480, 1680, 768, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X768) */
+{ { 80135, 1280, 1344, 1480, 1680, 768, 769, 772, 795, T_POSITIVE_SYNC}, B_CMAP8, 1280, 768, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X768) */
 /* 16:10 panel mode; 1.024M pixels */
 { { 83500, 1280, 1344, 1480, 1680, 800, 801, 804, 828, T_POSITIVE_SYNC}, B_CMAP8, 1280, 800, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(1280X800) */
 /* 16:10 panel mode; 1.296M pixels */
