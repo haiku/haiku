@@ -4,11 +4,13 @@
 #include "MixerInput.h"
 #include "MixerCore.h"
 #include "MixerUtils.h"
+#include "ByteSwap.h"
 #include "debug.h"
 
 MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampleRate, int32 mixFramesCount, bigtime_t mixStartTime)
  :	fCore(core),
  	fInput(input),
+	fInputByteSwap(0),
 	fInputChannelInfo(0),
 	fInputChannelCount(0),
 	fInputChannelMask(0),
@@ -29,6 +31,15 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampl
 	fInputChannelCount = fInput.format.u.raw_audio.channel_count;
 	fInputChannelMask = fInput.format.u.raw_audio.channel_mask;
 	fInputChannelInfo = new input_chan_info[fInputChannelCount];
+	
+	// perhaps we need byte swapping
+	if (fInput.format.u.raw_audio.byte_order != B_MEDIA_HOST_ENDIAN) {
+		if (	fInput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_FLOAT
+			 ||	fInput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_INT
+			 ||	fInput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_SHORT) {
+			fInputByteSwap = new ByteSwap(fInput.format.u.raw_audio.format);
+		}
+	}
 	
 	// initialize fInputChannelInfo
 	for (int i = 0; i < fInputChannelCount; i++) {
@@ -63,9 +74,22 @@ MixerInput::~MixerInput()
 void
 MixerInput::BufferReceived(BBuffer *buffer)
 {
+	void *data;
+	size_t size;
+	bigtime_t start;
+	
 	ASSERT(fMixBuffer);
 	
-	printf("mix buffer start %14Ld, buffer start %14Ld\n", fMixBufferStartTime, buffer->Header()->start_time);
+	data = buffer->Data();
+	size = buffer->SizeUsed();
+	start = buffer->Header()->start_time;
+
+	// swap the byte order of this buffer, if necessary
+	if (fInputByteSwap)
+		fInputByteSwap->Swap(data, size);
+
+	
+	printf("mix buffer start %14Ld, buffer start %14Ld\n", fMixBufferStartTime, start);
 }
 
 media_input &

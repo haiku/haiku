@@ -2,6 +2,7 @@
 #define _MIXER_INPUT_H
 
 class MixerCore;
+class ByteSwap;
 
 class MixerInput
 {
@@ -50,6 +51,7 @@ private:
 private:
 	MixerCore		*fCore;
 	media_input		fInput;
+	ByteSwap		*fInputByteSwap;
 
 	input_chan_info *fInputChannelInfo; // array
 	uint32			fInputChannelCount;
