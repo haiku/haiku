@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kernel libroot posix time ;
 
 KernelMergeObject posix_time.o :
+	<$(SOURCE_GRIST)>asctime.c
 	<$(SOURCE_GRIST)>time.c
 	:
 	-fPIC -DPIC
