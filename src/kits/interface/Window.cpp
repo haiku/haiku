@@ -788,30 +788,34 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			uint32			modifiers;
 			int32			raw_char;
 			const char		*string=NULL;
-			
+			int32			viewToken;
+
 			msg->FindInt32( "modifiers", (int32*)&modifiers );
 			msg->FindInt32( "raw_char", &raw_char );
 			msg->FindString( "bytes", &string );
-			
-			// TODO: it is NOT "bytes" field you should pass to KeyDown(), it is "byte" field.
-			if ( !handleKeyDown( raw_char, (uint32)modifiers) )
+			msg->FindInt32( "haiku:token", &viewToken );
+			msg->RemoveName("haiku:token");
+
+			if ( !handleKeyDown( string[0], (uint32)modifiers) )
 			{
 				if(fFocus)
 					fFocus->KeyDown( string, strlen(string)-1 );
 				else
-					BLooper::DispatchMessage(msg, target);
+					printf("Adi: No Focus\n");
 			}
 			break;
 		}
 		case B_KEY_UP:
 		{
 			const char		*string=NULL;
+			int32			viewToken;
 	
 			msg->FindString( "bytes", &string );
+			msg->FindInt32( "haiku:token", &viewToken );
+			msg->RemoveName("haiku:token");
+
 			if(fFocus)
 				fFocus->KeyUp( string, strlen(string)-1 );
-			else
-				BLooper::DispatchMessage(msg, target);
 
 			break;
 		}
@@ -870,7 +874,7 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 				targetView->MouseDown(where);
 			}
 
-// TODO: use the following line later, instead of the above 2.
+// TODO: use the following line later, instead of the above.
 //			sendMessageUsingEventMask( B_MOUSE_DOWN, where );
 			break;
 		}
@@ -878,11 +882,23 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		{
 			BPoint			where;
 			uint32			modifiers;
-			
+			int32			viewToken;
+			BView			*targetView;
+
 			msg->FindPoint( "where", &where );
 			msg->FindInt32( "modifiers", (int32*)&modifiers );
-					
-			sendMessageUsingEventMask( B_MOUSE_UP, where );
+			msg->FindInt32( "haiku:token", &viewToken );
+			msg->RemoveName("haiku:token");
+
+			targetView = findView(top_view, viewToken);
+			if (viewToken != B_NULL_TOKEN && targetView)
+			{
+				targetView->ConvertFromScreen(&where);
+				targetView->MouseUp(where);
+			}
+
+// TODO: use the following line later, instead of the above.
+//			sendMessageUsingEventMask( B_MOUSE_UP, where );
 			break;
 		}
 		case B_MOUSE_MOVED:
@@ -2606,12 +2622,12 @@ void BWindow::activateView( BView *aView, bool active ){
 
 //------------------------------------------------------------------------------
 
-bool BWindow::handleKeyDown( int32 raw_char, uint32 modifiers){
+bool BWindow::handleKeyDown( const char key, uint32 modifiers){
 
 	// TODO: ask people if using 'raw_char' is OK ?
 
 		// handle BMenuBar key
-	if ( (raw_char == B_ESCAPE) && (modifiers & B_COMMAND_KEY)
+	if ( (key == B_ESCAPE) && (modifiers & B_COMMAND_KEY)
 		&& fKeyMenuBar)
 	{
 
@@ -2623,20 +2639,15 @@ bool BWindow::handleKeyDown( int32 raw_char, uint32 modifiers){
 	}
 
 	// Command+q has been pressed, so, we will quit
-	if ( (raw_char == 'Q' || raw_char == 'q') && modifiers & B_COMMAND_KEY)
+	if ( (key == 'Q' || key == 'q') && modifiers & B_COMMAND_KEY)
 	{
 		be_app->PostMessage(B_QUIT_REQUESTED); 
 		return true;
 	}
 
 	// Keyboard navigation through views!!!!
-	if ( raw_char == B_TAB)
+	if ( key == B_TAB)
 	{
-
-		// even if we have no focus view, we'll say that we will handle TAB key
-		if (!fFocus)
-			return true;
-
 		BView			*nextFocus;
 
 		if (modifiers & B_CONTROL_KEY & B_SHIFT_KEY)
@@ -2656,7 +2667,7 @@ bool BWindow::handleKeyDown( int32 raw_char, uint32 modifiers){
 				else
 					nextFocus		= findNextView( fFocus, B_NAVIGABLE );
 
-		if ( nextFocus )
+		if ( nextFocus && nextFocus != fFocus)
 			setFocus( nextFocus, false );
 
 		return true;
@@ -2664,7 +2675,7 @@ bool BWindow::handleKeyDown( int32 raw_char, uint32 modifiers){
 
 		// Handle shortcuts
 	int			index;
-	if ( (index = findShortcut(raw_char, modifiers)) >=0)
+	if ( (index = findShortcut(key, modifiers)) >=0)
 	{
 		_BCmdKey		*cmdKey;
 
@@ -2706,7 +2717,7 @@ bool BWindow::handleKeyDown( int32 raw_char, uint32 modifiers){
 	}
 
 	// if <ENTER> is pressed and we have a default button
-	if (DefaultButton() && (raw_char == B_ENTER))
+	if (DefaultButton() && (key == B_ENTER))
 	{
 		const char		*chars;		// just to be sure
 		CurrentMessage()->FindString("bytes", &chars);
@@ -2970,11 +2981,11 @@ BView* BWindow::findView(BView* aView, BPoint point) const
 
 BView* BWindow::findNextView( BView *focus, uint32 flags)
 {
-	bool		found;
-	found		= false;
+	if (focus == NULL)
+		focus = top_view;
 
-	BView		*nextFocus;
-	nextFocus	= focus;
+	bool		found = false;
+	BView		*nextFocus = focus;
 
 	// Ufff... this toked me some time... this is the best form I've reached.
 	// This algorithm searches the tree for BViews that accept focus.
