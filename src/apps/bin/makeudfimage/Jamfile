@@ -14,9 +14,12 @@ BinCommand makeudfimage
 	  Allocator.cpp
 	  Attribute.cpp
 	  ConsoleListener.cpp
-	  OutputFile.cpp
+	  EmbeddedStream.cpp
+	  ExtentStream.cpp
+	  FileStream.cpp
 	  PhysicalPartitionAllocator.cpp
 	  Shell.cpp
+	  SimulatedStream.cpp
 	  Statistics.cpp
 	  UdfBuilder.cpp
 
