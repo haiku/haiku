@@ -13,11 +13,6 @@ int bus_man_init(kernel_args *ka);
 
 int bus_register_bus(const char *path);
 
-typedef struct {
-	module_info minfo;
-	status_t (*rescan)(void);
-} bus_manager_info;
-
 typedef struct id_list {
 	uint32 num_ids;
 	uint32 id[0];
