@@ -54,7 +54,7 @@ static uint8 *sBitmap;
 
 
 /* Declarations we need that aren't in header files */
-uint16 ones_sum16(uint32, const void *, int);
+//uint16 ones_sum16(uint32, const void *, int);
 
 
 //	private part of the API implementation
@@ -761,7 +761,7 @@ cbuf_is_contig_region(cbuf *buffer, size_t start, size_t end)
 	return 0;
 }
 
-
+#if 0
 uint16
 cbuf_ones_cksum16(cbuf *buffer, size_t offset, size_t length)
 {
@@ -806,7 +806,7 @@ cbuf_ones_cksum16(cbuf *buffer, size_t offset, size_t length)
 
 	return ~sum;
 }
-
+#endif
 
 /** Truncates the head of the buffer chain about truncBytes.
  */
