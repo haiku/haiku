@@ -25,6 +25,6 @@ Addon <userland>disk_scanner : userland disk_scanner :
 #LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
 LinkSharedOSLibs <userland>disk_scanner : <installed>DiskScannerTest ;
 
-#SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
+SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;
 #SubInclude OBOS_TOP src tests add-ons kernel disk_scanner session ;

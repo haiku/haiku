@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src tests add-ons kernel disk_scanner partition ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner partition ] ;
+
+UsePrivateHeaders $(DOT) ;
+
+{
+	local defines = [ FDefines USERLAND ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+# intel
+
+Addon <userland>intel : userland disk_scanner partition :
+	intel.c
+;
+LinkSharedOSLibs <userland>intel : <installed>DiskScannerTest ;

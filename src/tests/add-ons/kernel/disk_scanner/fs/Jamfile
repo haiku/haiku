@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src tests add-ons kernel disk_scanner fs ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner fs ] ;
+
+UsePrivateHeaders $(DOT) ;
+
+{
+	local defines = [ FDefines USERLAND ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
+# bfs
+
+Addon <userland>bfs : userland disk_scanner fs :
+	bfs.c
+;
+LinkSharedOSLibs <userland>bfs : <installed>DiskScannerTest ;
