@@ -99,6 +99,12 @@ enum {
 	SERVER_RESCAN_DEFAULTS,
 	SERVER_SET_NODE_CREATOR,
 	SERVER_CHANGE_ADDON_FLAVOR_INSTANCES_COUNT,
+	SERVER_REWINDTYPES,
+	SERVER_REWINDREFS,
+	SERVER_GETREFFOR,
+	SERVER_SETREFFOR,
+	SERVER_REMOVEREFFOR,
+	SERVER_REMOVEITEM,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -189,7 +195,8 @@ public:
 		{
 			device = ref.device;
 			directory = ref.directory;
-			strcpy(name, ref.name);
+			if(ref.name)
+				strcpy(name, ref.name);
 		}
 private:
 	dev_t	device;
@@ -801,6 +808,70 @@ struct server_unregister_buffer_command : public command_data
 {
 	team_id team;
 	media_buffer_id bufferid;
+};
+
+struct server_rewindtypes_request : public request_data
+{
+};
+
+struct server_rewindtypes_reply : public reply_data
+{
+	int32 count;
+	area_id area;
+};
+
+struct server_rewindrefs_request : public request_data
+{
+	char type[B_MEDIA_NAME_LENGTH];
+};
+
+struct server_rewindrefs_reply : public reply_data
+{
+	int32 count;
+	area_id area;
+};
+
+struct server_getreffor_request : public request_data
+{
+	char type[B_MEDIA_NAME_LENGTH];
+	char item[B_MEDIA_NAME_LENGTH];
+};
+
+struct server_getreffor_reply : public reply_data
+{
+	xfer_entry_ref	ref; // a ref to the file
+};
+
+struct server_setreffor_request : public request_data
+{
+	char type[B_MEDIA_NAME_LENGTH];
+	char item[B_MEDIA_NAME_LENGTH];
+	xfer_entry_ref	ref; // a ref to the file
+};
+
+struct server_setreffor_reply : public reply_data
+{
+};
+
+struct server_removereffor_request : public request_data
+{
+	char type[B_MEDIA_NAME_LENGTH];
+	char item[B_MEDIA_NAME_LENGTH];
+	xfer_entry_ref	ref; // a ref to the file
+};
+
+struct server_removereffor_reply : public reply_data
+{
+};
+
+struct server_removeitem_request : public request_data
+{
+	char type[B_MEDIA_NAME_LENGTH];
+	char item[B_MEDIA_NAME_LENGTH];
+};
+
+struct server_removeitem_reply : public reply_data
+{
 };
 
 struct node_request_completed_command : public command_data

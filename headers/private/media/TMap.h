@@ -90,7 +90,12 @@ public:
 				return true;
 		return false;
 	}
-
+	
+	int CountItems()
+	{
+		return item_count;
+	}
+	
 	bool IsEmpty()
 	{
 		return item_count == 0;
