@@ -52,9 +52,7 @@ private:
 		BButton*		dButton;     // Default-Button    
 		BBox*           fBox;        // Full-Window Box 
 		BScrollView*    tListe;      // To get that fancy scrollbar
-		BBox*			lBox;		 // Box around list
 		BBox*			rBox;		 // Box hosting Config View
-		BBox*			gBox;		 // Box around Config View, funny border 
 				
 		DataTranslationsView*	liste; // Improved list of Translators
 		

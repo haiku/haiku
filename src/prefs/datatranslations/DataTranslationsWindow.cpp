@@ -16,7 +16,7 @@
 #define DATA_TRANSLATIONS_WINDOW_BOTTOM	300
 
 DataTranslationsWindow::DataTranslationsWindow()
-				: BWindow(BRect(0,0,DATA_TRANSLATIONS_WINDOW_RIGHT,DATA_TRANSLATIONS_WINDOW_BOTTOM), "DataTranslations", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
+				: BWindow(BRect(0,0,DATA_TRANSLATIONS_WINDOW_RIGHT,DATA_TRANSLATIONS_WINDOW_BOTTOM), "DataTranslations", B_TITLED_WINDOW, B_NOT_ZOOMABLE)
 {
 	BScreen screen;
 
@@ -86,8 +86,20 @@ void DataTranslationsWindow::Trans_by_ID(int32 id)
 	// Konf->SetViewColor(ui_color(B_BACKGROUND_COLOR));
 	if (has_view) 
 	{
-		Konf->ResizeTo(230, 233);
-		Konf->SetFlags(B_WILL_DRAW | B_NAVIGABLE);
+		BRect konfRect(rBox->Bounds());
+		konfRect.InsetBy(3,3);
+		konfRect.bottom -= 45;
+		float width = 0, height = 0;
+		Konf->GetPreferredSize(&width,&height);
+		float widen = max_c(0,width-konfRect.Width());
+		float heighten = max_c(0,height-konfRect.Height());
+		if ((widen > 0) || (heighten > 0)) {
+			ResizeBy(widen,heighten);
+			konfRect.right += widen;
+			konfRect.bottom += heighten;
+		}
+		Konf->MoveTo(konfRect.left,konfRect.top);
+		Konf->ResizeTo(konfRect.Width(), konfRect.Height());
 		rBox->AddChild(Konf);
 	}
 	
@@ -101,68 +113,62 @@ void DataTranslationsWindow::BuildView()
 	newIcon = false;
 	Install_Done = false;
 	
-	BRect   r( 300, 250, 380, 270 );   		// Pos: Info-Button
-	BRect all( 0, 0, 400, 300);       		// Fenster-Groesse
-	BRect  cv( 150, 13, 387, 245);     		// ConfigView & hosting Box
-	BRect mau( 146, 8, 390, 290);			// Grenz-Box around ConfView
-	BRect DTN_pos( 195 , 245, 298 , 265);	// Pos: Dateiname
-	BRect ic ( 156 , 245, 188 , 277);		// Pos: TrackerIcon
-	
-	Konf = new BView(cv, "KONF", B_NOT_RESIZABLE, B_WILL_DRAW );
-	// Konf->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-
-	rBox = new BBox(cv, "Right_Side");
-	gBox = new BBox(mau, "Grau");
-	
-	Icon = new BView(ic, "Ikon", B_NOT_RESIZABLE, B_WILL_DRAW | B_PULSE_NEEDED);
-	
-	Icon->SetDrawingMode(B_OP_OVER);
-	//   Icon->SetViewColor(ui_color(B_BACKGROUND_COLOR));
-	Icon->SetHighColor(217,217,217);
-	Icon_bit = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8, true, false);
-	
-	dButton = new BButton(r, "STD", "Info. . .", new BMessage(BUTTON_MSG));
-
+	BRect all(0, 0, 400, 300);       		// Fenster-Groesse
 	fBox = new BBox(all, "All_Window", B_FOLLOW_ALL_SIDES,
-						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+						B_WILL_DRAW | B_FRAME_EVENTS,
 						B_PLAIN_BORDER);
+	AddChild(fBox);
+	
+	BRect  configView( 150, 10, 390, 290);
+	rBox = new BBox(configView, "Right_Side", B_FOLLOW_ALL_SIDES);
+	fBox->AddChild(rBox);
 
-    r.Set( 10, 10, 120, 288);  // List View
-        
-	liste = new DataTranslationsView(r, "Transen", B_SINGLE_SELECTION_LIST); 
-	liste->SetSelectionMessage(new BMessage(SEL_CHANGE));
+	BRect innerRect(rBox->Bounds());
+	innerRect.InsetBy(8,8);
+
+	BRect iconRect(0,0,31,31);
+	iconRect.OffsetTo(innerRect.left,innerRect.bottom-iconRect.Height());
+	Icon = new BView(iconRect, "Ikon", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM,
+                     B_WILL_DRAW | B_FRAME_EVENTS);
+	Icon->SetDrawingMode(B_OP_OVER);
+	//Icon->SetViewColor(ui_color(B_BACKGROUND_COLOR));
+	Icon->SetHighColor(217,217,217);
+	rBox->AddChild(Icon);
+
+	Icon_bit = new BBitmap(BRect(0, 0, 31, 31), B_CMAP8, true);
+	
+	BRect infoRect(0,0,80,20);
+	infoRect.OffsetTo(innerRect.right-infoRect.Width(),innerRect.bottom-10-infoRect.Height());
+	dButton = new BButton(infoRect, "STD", "Info...", new BMessage(BUTTON_MSG),
+	                      B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT,
+                          B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE);
+	rBox->AddChild(dButton);
     
-    DTN = new BStringView(DTN_pos, "DataName", "Test", B_NOT_RESIZABLE);
+	BRect dataNameRect( iconRect.right+5 , iconRect.top,
+                        infoRect.left-5 , iconRect.bottom);
+    DTN = new BStringView(dataNameRect, "DataName", "Test", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
     // DTN->SetViewColor(ui_color(B_BACKGROUND_COLOR));
+	rBox->AddChild(DTN);
     
+	BRect konfRect(innerRect);
+    konfRect.bottom = iconRect.top;
+	Konf = new BView(konfRect, "KONF", B_FOLLOW_ALL_SIDES,
+                     B_WILL_DRAW | B_FRAME_EVENTS );
+	// Konf->SetViewColor(ui_color(B_BACKGROUND_COLOR));
+	rBox->AddChild(Konf);
+
+    BRect listRect(10, 10, 120, 288);  // List View
+	liste = new DataTranslationsView(listRect, "Transen", B_SINGLE_SELECTION_LIST); 
+	liste->SetSelectionMessage(new BMessage(SEL_CHANGE));
+
+	// Put list into a BScrollView, to get that nice srcollbar  
+    tListe = new BScrollView("scroll_trans", liste, B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM,
+                             B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
+	fBox->AddChild(tListe);
+
     // Here we add the names of all installed translators    
     WriteTrans(); 
     
-    // Setting up the Box around my LView
-    r.Set( 8, 8, 123, 288); // Box around the List
-    lBox = new BBox(r, "List-Box");
-    lBox->SetBorder(B_NO_BORDER);
-	lBox->SetViewColor(255,255,255);
-	
-	// Put list into a BScrollView, to get that nice srcollbar  
-    tListe = new BScrollView("scroll_trans", liste, B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true, B_FANCY_BORDER);
-    
-    
-    rBox->SetBorder(B_NO_BORDER);
-	rBox->AddChild(Konf);
-	rBox->SetFlags(B_NAVIGABLE_JUMP);
-	  
-	// Attach Views to my Window
-	AddChild(dButton);
-	AddChild(tListe);
-	AddChild(rBox);
-
-	AddChild(fBox);
-	AddChild(Icon);
-	AddChild(DTN);
-	AddChild(lBox);
-	AddChild(gBox);	
-	
 	// Set the focus
 	liste->MakeFocus();
 	

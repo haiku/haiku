@@ -12,11 +12,10 @@
 
 
 DataTranslationsView::DataTranslationsView(BRect rect, const char *name, list_view_type type = B_SINGLE_SELECTION_LIST) :
-	BListView(rect, name, B_SINGLE_SELECTION_LIST) 
+	BListView(rect, name, B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL_SIDES) 
 {
 	
 	messagerunner = NULL;
-	SetViewColor(217,217,217);
 }
 
 void DataTranslationsView::MessageReceived(BMessage *message) 
