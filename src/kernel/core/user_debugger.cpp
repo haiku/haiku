@@ -10,6 +10,7 @@
 #include <debugger.h>
 #include <kernel.h>
 #include <KernelExport.h>
+#include <ksignal.h>
 #include <ksyscalls.h>
 #include <sem.h>
 #include <team.h>
@@ -31,6 +32,24 @@ static port_id sDefaultDebuggerPort = -1;
 
 
 static status_t ensure_debugger_installed(team_id teamID, port_id *port = NULL);
+
+
+static ssize_t
+kill_interruptable_read_port(port_id port, int32 *code, void *buffer,
+	size_t bufferSize)
+{
+	return read_port_etc(port, code, buffer, bufferSize,
+		B_KILL_CAN_INTERRUPT, 0);
+}
+
+
+static status_t
+kill_interruptable_write_port(port_id port, int32 code, const void *buffer,
+	size_t bufferSize)
+{
+	return write_port_etc(port, code, buffer, bufferSize,
+		B_KILL_CAN_INTERRUPT, 0);
+}
 
 
 /**
@@ -133,8 +152,8 @@ prepare_thread_stopped_message(debug_thread_stopped &message,
 
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = nubPort;
 	message.why = whyStopped;
-	message.nub_port = nubPort;
 	message.data = data;
 	arch_get_debug_cpu_state(&message.cpu_state);
 }
@@ -239,8 +258,8 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 			// read a command from the debug port
 			int32 command;
 			debugged_thread_message_data commandMessage;
-			ssize_t commandMessageSize = read_port(port, &command,
-				&commandMessage, sizeof(commandMessage));
+			ssize_t commandMessageSize = kill_interruptable_read_port(port,
+				&command, &commandMessage, sizeof(commandMessage));
 			if (commandMessageSize < 0) {
 				error = commandMessageSize;
 				TRACE(("thread_hit_debug_event(): thread: %ld, failed to "
@@ -275,10 +294,8 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 						teamDebugInfo.nub_port, additionalData);
 
 					// send it
-					do {
-						error = write_port(debuggerPort, event, &stoppedMessage,
-							sizeof(stoppedMessage));
-					} while (error == B_INTERRUPTED);
+					error = kill_interruptable_write_port(debuggerPort, event,
+						&stoppedMessage, sizeof(stoppedMessage));
 
 					break;
 				}
@@ -322,6 +339,7 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 	debug_pre_syscall message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.syscall = syscall;
 
 	// copy the syscall args
@@ -356,6 +374,7 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 	debug_post_syscall message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.start_time = startTime;
 	message.end_time = system_time();
 	message.return_value = returnValue;
@@ -387,7 +406,7 @@ stop_thread(debug_why_stopped whyStopped, void *additionalData)
 
 	// prepare the message
 	debug_thread_stopped message;
-	prepare_thread_stopped_message(message, B_THREAD_NOT_RUNNING, nubPort,
+	prepare_thread_stopped_message(message, whyStopped, nubPort,
 		additionalData);
 
 	return thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_STOPPED, &message,
@@ -426,6 +445,7 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 	debug_signal_received message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.signal = signal;
 	message.handler = *handler;
 	message.deadly = deadly;
@@ -459,6 +479,7 @@ user_debug_team_created(team_id teamID)
 	debug_team_created message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.new_team = teamID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_CREATED, &message,
@@ -473,6 +494,7 @@ user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 		debug_team_deleted message;
 		message.origin.thread = -1;
 		message.origin.team = teamID;
+		message.origin.nub_port = -1;
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
 			sizeof(message), B_RELATIVE_TIMEOUT, 0);
 			// TODO: Would it be OK to wait here?
@@ -495,6 +517,7 @@ user_debug_thread_created(thread_id threadID)
 	debug_thread_created message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.new_thread = threadID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_CREATED, &message,
@@ -532,6 +555,7 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 		debug_thread_deleted message;
 		message.origin.thread = threadID;
 		message.origin.team = teamID;
+		message.origin.nub_port = -1;
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
 			&message, sizeof(message), B_RELATIVE_TIMEOUT, 0);
 			// TODO: Would it be OK to wait here?
@@ -554,6 +578,7 @@ user_debug_image_created(const image_info *imageInfo)
 	debug_image_created message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
@@ -576,10 +601,36 @@ user_debug_image_deleted(const image_info *imageInfo)
 	debug_image_deleted message;
 	message.origin.thread = thread->id;
 	message.origin.team = thread->team->id;
+	message.origin.nub_port = thread->team->debug_info.nub_port;
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
 		sizeof(message), B_IMAGE_DELETED, NULL);
+}
+
+
+static void
+nub_thread_cleanup(struct thread *nubThread)
+{
+	team_debug_info teamDebugInfo;
+	bool destroyDebugInfo = false;
+
+	cpu_status state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	team_debug_info &info = nubThread->team->debug_info;
+	if (info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED
+		&& info.nub_thread == nubThread->id) {
+		teamDebugInfo = info;
+		clear_team_debug_info(&info);
+		destroyDebugInfo = true;
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	if (destroyDebugInfo)
+		destroy_team_debug_info(&teamDebugInfo);
 }
 
 
@@ -606,22 +657,14 @@ debug_nub_thread(void *)
 	while (true) {
 		int32 command;
 		debug_nub_message_data message;
-		ssize_t messageSize = read_port(port, &command, &message,
-			sizeof(message));
-		if (messageSize < 0) {
-			// The port is not longer valid: If we are still listed in the
-			// team's debug info as nub thread, we need to update that.
-			cpu_status state = disable_interrupts();
-			GRAB_TEAM_LOCK();
+		ssize_t messageSize = kill_interruptable_read_port(port, &command,
+			&message, sizeof(message));
 
-			team_debug_info &info = nubThread->team->debug_info;
-			if (info.flags & B_TEAM_DEBUG_DEBUGGER_INSTALLED
-				&& info.nub_thread == nubThread->id) {
-				clear_team_debug_info(&info);
-			}
-		
-			RELEASE_TEAM_LOCK();
-			restore_interrupts(state);
+		if (messageSize < 0) {
+			// The port is not longer valid or we were interrupted by a kill
+			// signal: If we are still listed in the team's debug info as nub
+			// thread, we need to update that.
+			nub_thread_cleanup(nubThread);
 
 			TRACE(("nub thread %ld: terminating: %lx\n", nubThread->id,
 				messageSize));
@@ -824,8 +867,17 @@ debug_nub_thread(void *)
 		}
 
 		// send the reply, if necessary
-		if (sendReply)
-			write_port(replyPort, command, &reply, replySize);
+		if (sendReply) {
+			status_t error = kill_interruptable_write_port(replyPort, command,
+				&reply, replySize);
+
+			if (error != B_OK) {
+				// The debugger port is either not longer existing or we got
+				// interrupted by a kill signal. In either case we terminate.
+				nub_thread_cleanup(nubThread);
+				return error;
+			}
+		}
 	}
 }
 
@@ -854,6 +906,9 @@ TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
 		: team_get_team_struct_locked(teamID));
 
 	if (team) {
+		// get a real team ID
+		teamID = team->id;
+
 		if (team == team_get_kernel_team()) {
 			// don't allow to debug the kernel
 			error = B_NOT_ALLOWED;
