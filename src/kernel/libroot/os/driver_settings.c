@@ -30,6 +30,8 @@
 #define MAX_SETTINGS_LEVEL	8
 
 #define CONTINUE_PARAMETER	1
+#define NO_PARAMETER 2
+
 
 typedef struct settings_handle {
 	void	*first_buffer;
@@ -107,9 +109,11 @@ get_word(char **_pos, char **_word, bool allowNewLine)
 		pos++;
 	}
 
-	if (pos[0] == '}') {
+	if (pos[0] == '}' || pos[0] == '\0') {
+		// if we just read some white space before an end of a
+		// parameter, this is just no parameter at all
 		*_pos = pos;
-		return B_NO_ERROR;
+		return NO_PARAMETER;
 	}
 
 	// Read in a word - might contain escaped (\) spaces, or it
@@ -227,44 +231,53 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 
 
 static status_t
-parse_parameters(struct driver_parameter **parameters, int *count, char **pos, int32 level)
+parse_parameters(struct driver_parameter **_parameters, int *_count, char **_pos, int32 level)
 {
 	if (level > MAX_SETTINGS_LEVEL)
 		return B_LINK_LIMIT;
 
 	while (true) {
-		struct driver_parameter *newArray, *parameter;
+		struct driver_parameter parameter;
+		struct driver_parameter *newArray;
 		status_t status;
-		newArray = realloc(*parameters, (*count + 1) * sizeof(struct driver_parameter));
-		if (newArray == NULL)
-			return B_NO_MEMORY;
 
-		parameter = &newArray[*count];
-
-		status = parse_parameter(parameter, pos, level);
+		status = parse_parameter(&parameter, _pos, level);
 		if (status < B_OK)
 			return status;
 
-		*parameters = newArray;
-		(*count)++;
+		if (status != NO_PARAMETER) {
+			driver_parameter *newParameter;
 
-		// check for level beginning and end
-		if (**pos == '{') {
-			// if we go a level deeper, just start all over again...
-			(*pos)++;
-			status = parse_parameters(&parameter->parameters, &parameter->parameter_count, pos, level + 1);
-			if (status < B_OK)
-				return status;
+			newArray = realloc(*_parameters, (*_count + 1) * sizeof(struct driver_parameter));
+			if (newArray == NULL)
+				return B_NO_MEMORY;
+	
+			memcpy(&newArray[*_count], &parameter, sizeof(struct driver_parameter));
+			newParameter = &newArray[*_count];
+
+			*_parameters = newArray;
+			(*_count)++;
+
+			// check for level beginning and end
+			if (**_pos == '{') {
+				// if we go a level deeper, just start all over again...
+				(*_pos)++;
+				status = parse_parameters(&newParameter->parameters,
+							&newParameter->parameter_count, _pos, level + 1);
+				if (status < B_OK)
+					return status;
+			}
 		}
-		if ((**pos == '}' && level > 0)
-			|| (**pos == '\0' && level == 0)) {
+
+		if ((**_pos == '}' && level > 0)
+			|| (**_pos == '\0' && level == 0)) {
 			// take the closing bracket from the stack
-			(*pos)++;
+			(*_pos)++;
 			return B_OK;
 		}
 
 		// obviously, something has gone wrong
-		if (**pos == '}' || **pos == '\0')
+		if (**_pos == '}' || **_pos == '\0')
 			return B_ERROR;
 	}
 }
@@ -434,13 +447,14 @@ put_parameter(char **_buffer, size_t *_bufferSize, struct driver_parameter *para
 
 		for (i = 0; i < parameter->parameter_count; i++) {
 			put_parameter(_buffer, _bufferSize, &parameter->parameters[i], level + 1, flat);
+
 			if (parameter->parameters[i].parameter_count == 0)
-				put_char(_buffer, _bufferSize, flat ? ';' : '\n');
+				put_string(_buffer, _bufferSize, flat ? "; " : "\n");
 		}
 
 		if (!flat)
 			put_level_space(_buffer, _bufferSize, level);
-		put_char(_buffer, _bufferSize, '}');
+		put_string(_buffer, _bufferSize, flat ? "}" : "}\n");
 	}
 
 	return *_bufferSize >= 0;
