@@ -413,7 +413,7 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	fCaseCheckBox = new BCheckBox(rect, B_EMPTY_STRING, "Case sensitive",
 							NULL, B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	fCaseCheckBox->ResizeToPreferred();
-	fCaseCheckBox->MoveTo(5, button->Frame().top - 5 - fCaseCheckBox->Bounds().Height());
+	fCaseCheckBox->MoveTo(5, button->Frame().top);
 	bool caseSensitive;
 	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK)
 		caseSensitive = true;
@@ -423,7 +423,7 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	// and now those inbetween
 
 	rect.top = menuField->Frame().bottom + 5;
-	rect.bottom = fCaseCheckBox->Frame().top - 5;
+	rect.bottom = fCaseCheckBox->Frame().top - 8;
 	rect.InsetBy(2, 2);
 	fTextView = new FindTextView(rect, B_EMPTY_STRING,
 						rect.OffsetToCopy(B_ORIGIN).InsetByCopy(3, 3),
@@ -435,7 +435,10 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	BScrollView *scrollView = new BScrollView("scroller", fTextView, B_FOLLOW_ALL, B_WILL_DRAW, false, false);
 	view->AddChild(scrollView);
 
-	ResizeTo(290, button->Frame().Height() * 4 + 30);
+	ResizeTo(290, button->Frame().Height() * 3 + 30);
+
+	SetSizeLimits(fCaseCheckBox->Bounds().Width() + button->Bounds().Width() + 20,
+		32768, button->Frame().Height() * 3 + 10, 32768);
 }
 
 
