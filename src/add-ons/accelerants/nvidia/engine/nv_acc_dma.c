@@ -578,6 +578,8 @@ status_t nv_acc_init_dma()
 
 	/* all cards: */
 	/* setup clipping: rect size is 32768 x 32768, probably max. setting */
+	/* note:
+	 * can also be done via the NV_IMAGE_BLACK_RECTANGLE engine command. */
 	ACCW(ABS_UCLP_XMIN, 0x00000000);
 	ACCW(ABS_UCLP_YMIN, 0x00000000);
 	ACCW(ABS_UCLP_XMAX, 0x00007fff);
@@ -700,8 +702,7 @@ status_t nv_acc_init_dma()
 	 * one word is reserved at the end of the DMA buffer to be able to instruct the
 	 * engine to do a buffer wrap-around!
 	 * (DMA opcode 'noninc method': issue word $20000000.) */
-	//testing:
-	si->engine.dma.max = 2048 - 1;//8192 - 1;
+	si->engine.dma.max = 8192 - 1;
 	/* note the current free space we have left in the DMA buffer */
 	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
@@ -883,15 +884,21 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 
 				/* note the updated current free space we have in the DMA buffer */
 				si->engine.dma.free = dmaget - si->engine.dma.current;
-				/* mind this pittfall (? there might be another reason):
-				 * as the engine is DMA triggered for fetching chunks every 128 bytes,
-				 * we may not touch that much at the end of our free space!
-				 * (confirmed NV11 and NV43 when their buffer is full for a longer
-				 * period of time, tested with BeRoMeter 1.2.6.) */
-				if (si->engine.dma.free < 32)
+				/* mind this pittfall:
+				 * Leave some room between where the engine is fetching and where we
+				 * put new commands. Otherwise the engine will crash on heavy loads.
+				 * A crash can be forced best in 640x480 resolution with BeRoMeter 1.2.6.
+				 * (confirmed on NV11 and NV43 with less than 64 words forced freespace.)
+				 * Note:
+				 * The engine is DMA triggered for fetching chunks every 128 bytes,
+				 * maybe this is the reason for this behaviour.
+				 * Note also:
+				 * it looks like the space that needs to be kept free is coupled
+				 * with the size of the DMA buffer. */
+				if (si->engine.dma.free < 64)
 					si->engine.dma.free = 0;
 				else
-					si->engine.dma.free -= 32;
+					si->engine.dma.free -= 64;
 			}
 		}
 		else
@@ -901,15 +908,21 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 
 			/* note the updated current free space we have in the DMA buffer */
 			si->engine.dma.free = dmaget - si->engine.dma.current;
-			/* mind this pittfall (? there might be another reason):
-			 * as the engine is DMA triggered for fetching chunks every 128 bytes,
-			 * we may not touch that much at the end of our free space!
-			 * (confirmed NV11 and NV43 when their buffer is full for a longer period
-			 * of time, tested with BeRoMeter 1.2.6.) */
-			if (si->engine.dma.free < 32)
+			/* mind this pittfall:
+			 * Leave some room between where the engine is fetching and where we
+			 * put new commands. Otherwise the engine will crash on heavy loads.
+			 * A crash can be forced best in 640x480 resolution with BeRoMeter 1.2.6.
+			 * (confirmed on NV11 and NV43 with less than 64 words forced freespace.)
+			 * Note:
+			 * The engine is DMA triggered for fetching chunks every 128 bytes,
+			 * maybe this is the reason for this behaviour.
+			 * Note also:
+			 * it looks like the space that needs to be kept free is coupled
+			 * with the size of the DMA buffer. */
+			if (si->engine.dma.free < 64)
 				si->engine.dma.free = 0;
 			else
-				si->engine.dma.free -= 32;
+				si->engine.dma.free -= 64;
 		}
 	}
 
