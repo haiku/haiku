@@ -1,4 +1,5 @@
 #include "RegistrarThread.h"
+#include <string.h>
 
 /*!	\class RegistrarThread
 	\brief Base thread class for threads spawned and managed by the registrar

@@ -10,6 +10,7 @@
 #include <FindDirectory.h>
 
 #include <errno.h>
+#include <string.h>
 
 #include <Directory.h>
 #include <Entry.h>

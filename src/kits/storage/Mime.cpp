@@ -21,6 +21,7 @@
 #include <RosterPrivate.h>
 
 #include <unistd.h>
+#include <sys/ioctl.h>
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,

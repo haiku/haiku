@@ -26,6 +26,7 @@
 //------------------------------------------------------------------------------
 #include <Rect.h>
 #include "AreaLink.h"
+#include <string.h>
 
 //#define AL_DEBUG
  

@@ -4,6 +4,7 @@
 #include <Entry.h>
 #include <List.h>
 #include <Path.h>
+#include <string.h>
 
 status_t
 entry_ref_to_path_adapter(dev_t device, ino_t directory, const char *name,

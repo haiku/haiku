@@ -1571,10 +1571,10 @@ uint32	BWindow::Flags() const{
 //------------------------------------------------------------------------------
 
 status_t BWindow::SetWindowAlignment(window_alignment mode,
-											int32 h, int32 hOffset = 0,
-											int32 width = 0, int32 widthOffset = 0,
-											int32 v = 0, int32 vOffset = 0,
-											int32 height = 0, int32 heightOffset = 0)
+											int32 h, int32 hOffset,
+											int32 width, int32 widthOffset,
+											int32 v, int32 vOffset,
+											int32 height, int32 heightOffset)
 {
 	if ( !(	(mode && B_BYTE_ALIGNMENT) ||
 			(mode && B_PIXEL_ALIGNMENT) ) )
@@ -1624,11 +1624,11 @@ status_t BWindow::SetWindowAlignment(window_alignment mode,
 
 //------------------------------------------------------------------------------
 
-status_t BWindow::GetWindowAlignment(window_alignment* mode = NULL,
-											int32* h = NULL, int32* hOffset = NULL,
-											int32* width = NULL, int32* widthOffset = NULL,
-											int32* v = NULL, int32* vOffset = NULL,
-											int32* height = NULL, int32* heightOffset = NULL) const
+status_t BWindow::GetWindowAlignment(window_alignment* mode,
+											int32* h, int32* hOffset,
+											int32* width, int32* widthOffset,
+											int32* v, int32* vOffset,
+											int32* height, int32* heightOffset) const
 {
 	PortLink::ReplyData		replyData;
 	int8					*rb;		// short for: replybuffer

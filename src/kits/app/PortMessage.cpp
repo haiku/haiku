@@ -27,6 +27,7 @@
 #include <Point.h>
 #include <Rect.h>
 #include "PortMessage.h"
+#include <string.h>
 
 PortMessage::PortMessage(const int32 &code, const void *buffer, const ssize_t &buffersize,
 		const bool &copy)
@@ -49,7 +50,7 @@ PortMessage::~PortMessage(void)
 }
 
 
-status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout=B_INFINITE_TIMEOUT)
+status_t PortMessage::ReadFromPort(const port_id &port, const bigtime_t &timeout)
 {
 	if(_buffersize>0 && _buffer!=NULL)
 		delete _buffer;

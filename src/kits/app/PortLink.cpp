@@ -182,7 +182,7 @@ printf("PortLink::GetPort() returned %lu\n",target);
 	return target;
 }
 
-status_t PortLink::Flush(bigtime_t timeout=B_INFINITE_TIMEOUT)
+status_t PortLink::Flush(bigtime_t timeout)
 {
 #ifdef PLDEBUG
 printf("PortLink::Flush()\n");
@@ -228,7 +228,7 @@ printf("\tFlush(): flushing without attachments\n");
 }
 
 
-int8* PortLink::FlushWithReply(int32 *code, status_t *status, ssize_t *buffersize, bigtime_t timeout=B_INFINITE_TIMEOUT)
+int8* PortLink::FlushWithReply(int32 *code, status_t *status, ssize_t *buffersize, bigtime_t timeout)
 {
 	// Deprecated call which functions exactly like PortLink(PortLink::ReplyData *data)
 #ifdef PLDEBUG
@@ -309,7 +309,7 @@ printf("PortLink::FlushWithReply(): bad port\n");
 }
 
 
-status_t PortLink::FlushWithReply(PortLink::ReplyData *data,bigtime_t timeout=B_INFINITE_TIMEOUT)
+status_t PortLink::FlushWithReply(PortLink::ReplyData *data,bigtime_t timeout)
 {
 #ifdef PLDEBUG
 printf("PortLink::FlushWithReply(ReplyData*,bigtime_t)\n");
@@ -396,7 +396,7 @@ printf("\tFlushWithReply(): unable to assign reply port to data\n");
 	return B_OK;
 }
 
-status_t PortLink::FlushWithReply(PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT)
+status_t PortLink::FlushWithReply(PortMessage *msg,bigtime_t timeout)
 {
 #ifdef PLDEBUG
 printf("PortLink::FlushWithReply(PortMessage*,bigtime_t)\n");

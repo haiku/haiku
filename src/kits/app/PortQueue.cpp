@@ -48,7 +48,7 @@ bool PortQueue::SetPort(const port_id &port)
 	return _init;
 }
 
-void PortQueue::GetMessagesFromPort(bool wait_for_messages=false)
+void PortQueue::GetMessagesFromPort(bool wait_for_messages)
 {
 	if(_init)
 	{
