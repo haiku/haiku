@@ -3,35 +3,16 @@
 
 SubDir  OBOS_TOP src libs freetype2 ;
 
-# We need to add "freetype/src" to the current include path in order to
-# compile any part of FreeType 2.
-#
-# SubDirHdrs  [ FT2_SubDir  src ] ;
-
 # The file <freetype/internal/internal.h> is used to define macros that are
 # later used in #include statements.  It needs to be parsed in order to
 # record these definitions.
 #
-# HDRMACRO  [ FT2_SubDir  include internal internal.h ] ;
+# HDRMACRO  [ FT2_SubDir $(FT2_INCLUDE_DIR) internal internal.h ] ;
 
-SubInclude  OBOS_TOP src libs freetype2 autohint ;
-SubInclude  OBOS_TOP src libs freetype2 base ;
-SubInclude  OBOS_TOP src libs freetype2 bdf ;
-SubInclude  OBOS_TOP src libs freetype2 cache ;
-SubInclude  OBOS_TOP src libs freetype2 cff ;
-SubInclude  OBOS_TOP src libs freetype2 cid ;
-SubInclude  OBOS_TOP src libs freetype2 pcf ;
-SubInclude  OBOS_TOP src libs freetype2 pfr ;
-SubInclude  OBOS_TOP src libs freetype2 psaux ;
-SubInclude  OBOS_TOP src libs freetype2 pshinter ;
-SubInclude  OBOS_TOP src libs freetype2 psnames ;
-SubInclude  OBOS_TOP src libs freetype2 raster ;
-SubInclude  OBOS_TOP src libs freetype2 sfnt ;
-SubInclude  OBOS_TOP src libs freetype2 smooth ;
-SubInclude  OBOS_TOP src libs freetype2 truetype ;
-SubInclude  OBOS_TOP src libs freetype2 type1 ;
-SubInclude  OBOS_TOP src libs freetype2 type42 ;
-SubInclude  OBOS_TOP src libs freetype2 winfonts ;
+for xx in $(FT2_COMPONENTS)
+{
+  SubInclude OBOS_TOP src libs freetype2 $(xx) ;
+}
 
 SubDir  OBOS_TOP src libs freetype2 ;
 

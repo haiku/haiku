@@ -1425,6 +1425,27 @@ FT2_SRC     = [ FDirName $(OBOS_TOP) src libs freetype2 ] ;
 
 FT2_LIB     = freetype ;
 
+FT2_COMPONENTS ?= gzip       # support for gzip-compressed files.
+                  autohint   # auto-hinter
+                  base       # base component (public APIs)
+                  bdf        # BDF font driver
+                  cache      # cache sub-system
+                  cff        # CFF/CEF font driver
+                  cid        # Postscript CID-keyed font driver
+                  pcf        # PCF font driver
+                  pfr        # PFR/TrueDoc font driver
+                  psaux      # Common Postscript routines module
+                  pshinter   # Postscript hinter module
+                  psnames    # Postscript names handling
+                  raster     # Monochrome rasterizer
+                  smooth     # Anti-aliased rasterizer
+                  sfnt       # SFNT-based format support routines
+                  truetype   # TrueType font driver
+                  type1      # Postscript Type 1 font driver
+                  type42     # Postscript Type 42 (embedded TrueType) driver
+                  winfonts   # Windows FON/FNT font driver
+                  ;
+
 rule UseFreeTypeHeaders
 {
 	SubDirHdrs $(FT2_INCLUDE) ;

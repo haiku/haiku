@@ -7,7 +7,7 @@ UseFreeTypeHeaders ;
 
 {
   local  _sources ;
-  
+
   if $(FT2_MULTI)
   {
     _sources = psmodule ;

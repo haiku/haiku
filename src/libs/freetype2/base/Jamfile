@@ -24,7 +24,7 @@ UseFreeTypeHeaders ;
 # Add the optional/replaceable files.
 #
 FT2_Library  $(FT2_LIB) : ftsystem.c ftinit.c   ftglyph.c  ftmm.c     ftbdf.c
-                      ftbbox.c   ftdebug.c  ftxf86.c   fttype1.c  ;
+                      ftbbox.c   ftdebug.c  ftxf86.c   fttype1.c  ftpfr.c ;
 
 # Add Macintosh-specific file to the library when necessary.
 #
