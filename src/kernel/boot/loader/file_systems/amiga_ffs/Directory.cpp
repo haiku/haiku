@@ -55,10 +55,16 @@ Directory::InitCheck()
 status_t 
 Directory::Open(void **_cookie, int mode)
 {
-	*_cookie = (void *)new HashIterator(fVolume.Device(), fNode);
-	if (*_cookie == NULL)
+	HashIterator *iterator = new HashIterator(fVolume.Device(), fNode);
+	if (iterator == NULL)
 		return B_NO_MEMORY;
 
+	if (iterator->InitCheck() != B_OK) {
+		delete iterator;
+		return B_NO_MEMORY;
+	}
+
+	*_cookie = (void *)iterator;
 	return B_OK;
 }
 
@@ -74,6 +80,31 @@ Directory::Close(void *cookie)
 Node *
 Directory::Lookup(const char *name, bool traverseLinks)
 {
+	HashIterator iterator(fVolume.Device(), fNode);
+	if (iterator.InitCheck() != B_OK)
+		return NULL;
+
+	if (!strcmp(name, ".")) {
+		Acquire();
+		return this;
+	}
+
+	iterator.Goto(fNode.HashIndexFor(fVolume.Type(), name));
+
+	NodeBlock *node;
+	int32 block;
+	while ((node = iterator.GetNext(block)) != NULL) {
+		char fileName[FFS_NAME_LENGTH];
+		if (node->GetName(fileName, sizeof(fileName)) == B_OK
+			&& !strcmp(name, fileName)) {
+			if (node->IsFile())
+				return new File(fVolume, block);
+			if (node->IsDirectory())
+				return new Directory(fVolume, block);
+
+			return NULL;
+		}
+	}
 	return NULL;
 }
 
