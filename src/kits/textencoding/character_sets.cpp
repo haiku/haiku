@@ -114,6 +114,8 @@ static const char * macintoshAliases[] = {
 	"mac", "csMacintosh",
 	// java aliases
 	"MacRoman",
+	// mail kit aliases
+	"x-mac-roman",
 	NULL
 };
 static const BCharacterSet macintosh(11,2027,"Macintosh Roman","macintosh",NULL,macintoshAliases);
@@ -186,6 +188,8 @@ static const char * IBM866aliases[] = {
 	"cp866", "866", "csIBM866",
 	// java aliases
 	"ibm-866",
+	// mail kit aliases
+	"dos-866",
 	NULL
 };
 static const BCharacterSet IBM866(19,2086,"DOS Cyrillic","IBM866","IBM866",IBM866aliases);
@@ -195,6 +199,8 @@ static const char * IBM437aliases[] = {
 	"cp437", "437", "csPC8CodePage437",
 	// java aliases
 	"ibm-437", "windows-437",
+	// mail kit aliases
+	"dos-437",
 	NULL
 };
 static const BCharacterSet IBM437(20,2011,"DOS Latin-US","IBM437","IBM437",IBM437aliases);
@@ -245,6 +251,9 @@ static const BCharacterSet big5(25,2026,"Chinese Big5","Big5","Big5",big5aliases
 static const char * gb18030aliases[] = {
 	// java aliases
 	"gb18030-2000",
+	// mail kit aliases
+	"gb2312",
+	"gbk",
 	NULL
 };
 static const BCharacterSet gb18030(26,114,"Chinese GB18030","GB18030",NULL,gb18030aliases);
