@@ -652,17 +652,83 @@ BRoster::Broadcast(BMessage *message, BMessenger replyTo) const
 }
 
 // StartWatching
+/*!	\brief Adds a new roster application monitor.
+
+	After StartWatching() event messages will be sent to the supplied target
+	according to the specified flags until a respective StopWatching() call.
+
+	\a eventMask must be a bitwise OR of one or more of the following flags:
+	- \c B_REQUEST_LAUNCHED: A \c B_SOME_APP_LAUNCHED is sent, whenever an
+	  application has been launched.
+	- \c B_REQUEST_QUIT: A \c B_SOME_APP_QUIT is sent, whenever an
+	  application has quit.
+	- \c B_REQUEST_ACTIVATED: A \c B_SOME_APP_ACTIVATED is sent, whenever an
+	  application has been activated.
+
+	All event messages contain the following fields supplying more information
+	about the concerned application:
+	- \c "be:signature", \c B_STRING_TYPE: The signature of the application.
+	- \c "be:team", \c B_INT32_TYPE: The team ID of the application
+	  (\c team_id).
+	- \c "be:thread", \c B_INT32_TYPE: The ID of the application's main thread
+	  (\c thread_id).
+	- \c "be:flags", \c B_INT32_TYPE: The application flags (\c uint32).
+	- \c "be:ref", \c B_REF_TYPE: An entry_ref referring to the application's
+	  executable.
+
+	A second call to StartWatching() with the same \a target simply sets
+	the new \a eventMask. The messages won't be sent twice to the target.
+
+	\param target The target the event messages shall be sent to.
+	\param eventMask Specifies the events the caller is interested in.
+	\return
+	- \c B_OK: Everything went fine.
+	- an error code, if some error occured.
+*/
 status_t
 BRoster::StartWatching(BMessenger target, uint32 eventMask) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_START_WATCHING);
+	if (error == B_OK)
+		error = request.AddMessenger("target", target);
+	if (error == B_OK)
+		error = request.AddInt32("events", (int32)eventMask);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // StopWatching
+/*!	\brief Removes a roster application monitor added with StartWatching().
+	\param target The target that shall not longer receive any event messages.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: No application monitor has been associated with the
+	  specified \a target before.
+*/
 status_t
 BRoster::StopWatching(BMessenger target) const
 {
-	return NOT_IMPLEMENTED; // not implemented
+	status_t error = B_OK;
+	// compose the request message
+	BMessage request(B_REG_STOP_WATCHING);
+	if (error == B_OK)
+		error = request.AddMessenger("target", target);
+	// send the request
+	BMessage reply;
+	if (error == B_OK)
+		error = fMess.SendMessage(&request, &reply);
+	// evaluate the reply
+	if (error == B_OK && reply.what != B_REG_SUCCESS)
+		reply.FindInt32("error", &error);
+	return error;
 }
 
 // ActivateApp
@@ -1014,22 +1080,6 @@ BRoster::AddToRecentFolders(const entry_ref *folder, const char *appSig) const
 
 
 /*----- Private or reserved ------------------------------*/
-
-// _StartWatching
-status_t
-BRoster::_StartWatching(mtarget target, BMessenger *rosterMess, uint32 what,
-						BMessenger notify, uint32 event_mask) const
-{
-	return NOT_IMPLEMENTED; // not implemented
-}
-
-// _StopWatching
-status_t
-BRoster::_StopWatching(mtarget target, BMessenger *rosterMess, uint32 what,
-					   BMessenger notify) const
-{
-	return NOT_IMPLEMENTED; // not implemented
-}
 
 // AddApplication
 /*!	\brief (Pre-)Registers an application with the registrar.
