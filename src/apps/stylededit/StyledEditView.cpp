@@ -58,15 +58,18 @@ StyledEditView::FrameResized(float width, float height)
 	*/
 }				
 
+
+#include <stdio.h>
+
 status_t
 StyledEditView::GetStyledText(BPositionIO * stream)
 {
 	status_t result = B_OK;
-	fSuppressChanges = true;	
-	
+
+	fSuppressChanges = true;
 	result = BTranslationUtils::GetStyledText(stream, this, NULL);
+	fSuppressChanges = false;
 	if (result != B_OK) {
-		fSuppressChanges = false;
 		return result;
 	}
 
@@ -113,7 +116,9 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		int32 length = stream->Seek(0,SEEK_END);
 		text_run_array * run_array = RunArray(0,length);
 		uint32 id = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding)->GetConversionID();
+		fSuppressChanges = true;
 		SetText("");
+		fSuppressChanges = false;
 		char inBuffer[256];
 		off_t location = 0;
 		int32 textOffset = 0;
@@ -125,8 +130,13 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 			int32 textLength = 256;
 			int32 bytes = bytesRead;
 			while (textLength > 0) {
-				convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
+				result = convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
+				if (result != B_OK) {
+					return result;
+				}
+				fSuppressChanges = true;
 				InsertText(textBuffer,textLength,textOffset);
+				fSuppressChanges = false;
 				textOffset += textLength;
 				inPtr += bytes;
 				location += bytes;
@@ -139,7 +149,6 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		}
 		SetRunArray(0,length,run_array);
 	}
-	fSuppressChanges = false;
 	return result;
 }
 
