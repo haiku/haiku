@@ -1,6 +1,6 @@
 /* device.c - device hooks for SiS900 networking
 **
-** Copyright © 2001-2003 pinc Software. All Rights Reserved.
+** Copyright © 2001-2004 pinc Software. All Rights Reserved.
 */
 
 #include <OS.h>
@@ -18,6 +18,7 @@
 #include "driver.h"
 #include "device.h"
 #include "sis900.h"
+#include "interface.h"
 
 
 /* device hooks prototypes */
@@ -387,7 +388,7 @@ device_ioctl(void *data, uint32 msg, void *buffer, size_t bufferLength)
 			break;
 		
 		default:
-			TRACE(("ioctl: unknown message %d (length = %ld)\n", msg, bufferLength));
+			TRACE(("ioctl: unknown message %lu (length = %ld)\n", msg, bufferLength));
 			break;
 	}
 	return B_ERROR;
@@ -428,7 +429,7 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(info->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
-		TRACE(("cannot acquire read sem: %x, %s\n", status, strerror(status)));
+		TRACE(("cannot acquire read sem: %lx, %s\n", status, strerror(status)));
 		atomic_and(&info->rxLock, 0);
 		return status;
 	}
@@ -438,7 +439,7 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	check = info->rxDescriptor[current].status;
 
 	if (!(check & SiS900_DESCR_OWN)) {	// the buffer is still in use!
-		TRACE(("ERROR: read: buffer %d still in use: %x\n", current, status));
+		TRACE(("ERROR: read: buffer %d still in use: %lx\n", current, status));
 		atomic_and(&info->rxLock, 0);
 		return B_BUSY;
 	}
@@ -453,7 +454,7 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 		// copy buffer
 		size = (check & SiS900_DESCR_SIZE_MASK) - CRC_SIZE;
 		if (size > MAX_FRAME_SIZE || size > *_length) {
-			TRACE(("ERROR read: bad frame size %d\n", size));
+			TRACE(("ERROR read: bad frame size %ld\n", size));
 			size = *_length;
 		} else if (size < *_length)
 			*_length = size;
@@ -508,7 +509,7 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 	// block until a free tx descriptor is available
 	if ((status = acquire_sem_etc(info->txSem, 1, B_TIMEOUT, ETHER_TRANSMIT_TIMEOUT)) < B_NO_ERROR) {
 		write32((uint32)info->registers + SiS900_MAC_COMMAND, SiS900_MAC_CMD_Tx_ENABLE);
-		TRACE(("write: acquiring sem failed: %x, %s\n", status, strerror(status)));
+		TRACE(("write: acquiring sem failed: %lx, %s\n", status, strerror(status)));
 		atomic_add(&info->txLock, -1);
 		return status;
 	}
@@ -533,7 +534,7 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 		info->txDescriptor[current].status = SiS900_DESCR_OWN | frameSize;
 		info->txSent++;
 
-#ifdef DEBUG
+#if 0
 		{
 			struct buffer_desc *b = (void *)read32((uint32)info->registers + SiS900_MAC_Tx_DESCR);
 			int16 that;
