@@ -50,10 +50,15 @@ SetupIncludes ;
 		malloc_debug_flags = -fcheck-memory-usage ;
 	}
 
-	# We need to use a wrapper for fstat() on non-BeOS systems.
-	local buildPlatformFstatDefines ;
+	# We need to use a wrapper for some POSIX calls on non-BeOS systems.
+	local buildPlatformDefines ;
 	if $(OS) != BEOS {
-		buildPlatformFstatDefines = build_platform_fstat=fs_shell_fstat ;
+		buildPlatformDefines =
+			open=build_platform_open
+			close=build_platform_close
+			fstat=build_platform_fstat
+			read_pos=build_platform_read_pos
+		;
 	}
 
 	local defines = [ FDefines USER
@@ -62,7 +67,7 @@ SetupIncludes ;
 		UNSAFE_GET_VNODE
 		#BFS_BIG_ENDIAN_ONLY
 		$(malloc_debug_defines)
-		$(buildPlatformFstatDefines)
+		$(buildPlatformDefines)
 	] ;
 	SubDirCcFlags $(defines) $(malloc_debug_flags) ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags)

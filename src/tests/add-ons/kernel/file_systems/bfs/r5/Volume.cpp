@@ -21,13 +21,6 @@
 #include <string.h>
 #include <ctype.h>
 
-// fs_shell support for build platforms whose struct stat is not compatible with ours
-#ifdef build_platform_fstat
-extern "C" int build_platform_fstat(int fd, struct stat *st);
-#else
-#	define build_platform_fstat fstat
-#endif
-
 
 static const int32 kDesiredAllocationGroups = 56;
 	// This is the number of allocation groups that will be tried
@@ -129,7 +122,7 @@ DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
 	if (ioctl(fDevice, B_GET_GEOMETRY, &geometry) < 0) {
 		// maybe it's just a file
 		struct stat stat;
-		if (build_platform_fstat(fDevice, &stat) < 0)
+		if (fstat(fDevice, &stat) < 0)
 			return B_ERROR;
 
 		if (_size)
@@ -295,7 +288,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	// check if it's a regular file, and if so, disable the cache for the
 	// underlaying file system
 	struct stat stat;
-	if (build_platform_fstat(fDevice, &stat) < 0)
+	if (fstat(fDevice, &stat) < 0)
 		RETURN_ERROR(B_ERROR);
 
 #ifndef NO_FILE_UNCACHED_IO
