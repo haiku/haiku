@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-3/2004.
+	Rudolf Cornelissen 10/2002-4/2004.
 */
 
 #define MODULE_BIT 0x00800000
@@ -41,8 +41,27 @@ static status_t init_common(int the_fd) {
 	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d\n",
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios));
 
- 	/*Check for R4.5.0 and if it is running, use work around*/
+	/* clone register area(s) */
+	if (si->ps.card_type < NM2097)
+	{
+		/* we can't clone as no register area exists! */
+		LOG(2,("InitACC: Can't clone register area, integrated in framebuffer!\n"));
+		switch (si->ps.card_type)
+		{
+		case NM2070:
+			regs = (uint32 *)((uint8 *)si->framebuffer + 0x100000);
+			break;
+		case NM2090:
+		case NM2093:
+			regs = (uint32 *)((uint8 *)si->framebuffer + 0x200000);
+			break;
+		}
+		/* not used */
+		regs2 = 0;
+	}
+	else
  	{
+ 		/*Check for R4.5.0 and if it is running, use work around*/
  		if (si->use_clone_bugfix)
  		{
  			/*check for R4.5.0 bug and attempt to work around*/
@@ -89,9 +108,12 @@ error0:
 
 /* Clean up code shared between primary and cloned accelrants */
 static void uninit_common(void) {
-	/* release the memory mapped registers */
-	delete_area(regs2_area);
-	delete_area(regs_area);
+	/* release the memory mapped registers if they exist */
+	if (si->ps.card_type > NM2093)
+	{
+		delete_area(regs2_area);
+		delete_area(regs_area);
+	}
 	/* a little cheap paranoia */
 	regs = 0;
 	regs2 = 0;
