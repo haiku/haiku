@@ -142,8 +142,6 @@ if $(DEBUG) {
 # executable.
 KEEPOBJS = true ;
 
-AR = ar r ;
-
 # under BeOS use copyattr instead of cp
 if $(OS) = BEOS
 {
