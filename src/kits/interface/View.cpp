@@ -159,26 +159,55 @@ bool BView::RemoveChild(BView *child)
 
 int32 BView::CountChildren() const
 {
+	int32 count=0;
+	if(BView *child=first_child)
+	{
+		while (child)
+		{
+			count++;
+			child=child->next_sibling;
+		}
+	}
 }
 
 BView *BView::ChildAt(int32 index) const
 {
+	int32 count=0;
+	if(BView *child=first_child)
+	{
+		while (child)
+		{
+			count++;
+			child=child->next_sibling;
+			if(count==index)
+				return child;
+		}
+	}
+	return NULL;
 }
 
 BView *BView::NextSibling() const
 {
+	return next_sibling;
 }
 
 BView *BView::PreviousSibling() const
 {
+	return prev_sibling;
 }
 
 bool BView::RemoveSelf()
 {
+	if(!parent)
+		return false;
+
+	parent->RemoveChild(this);
+	return true;
 }
 
 BWindow *BView::Window() const
 {
+	return owner;
 }
 
 void BView::Draw(BRect updateRect)
@@ -255,14 +284,19 @@ BView *BView::FindView(const char *name) const
 
 BView *BView::Parent() const
 {
+	return parent;
 }
 
 BRect BView::Bounds() const
 {
+	BRect bounds=fCachedBounds;
+	bounds.OffsetTo(0,0);
+	return bounds;
 }
 
 BRect BView::Frame() const
 {
+	return fCachedBounds;
 }
 
 void BView::ConvertToScreen(BPoint* pt) const
@@ -831,6 +865,7 @@ void BView::Hide()
 
 bool BView::IsHidden() const
 {
+	return (fShowLevel==0)?false:true;
 }
 
 bool BView::IsHidden(const BView* looking_from) const
