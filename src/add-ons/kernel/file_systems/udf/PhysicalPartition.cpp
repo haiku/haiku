@@ -28,9 +28,10 @@ status_t
 PhysicalPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
 	DEBUG_INIT_ETC("PhysicalPartition", ("%ld", logicalBlock));
-	if (logicalBlock >= fLength)
+	if (logicalBlock >= fLength) {
+		PRINT(("invalid logical block: %ld, length: %ld\n", logicalBlock, fLength));
 		return B_BAD_ADDRESS;
-	else {
+	} else {
 		physicalBlock = fStart + logicalBlock;
 		PRINT(("mapped %ld to %Ld\n", logicalBlock, physicalBlock));
 		return B_OK;
