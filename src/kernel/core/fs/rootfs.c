@@ -295,7 +295,8 @@ err:
 
 
 static status_t
-rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *root_vnid)
+rootfs_mount(mount_id id, const char *device, uint32 flags, const char *args,
+	fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct rootfs *fs;
 	struct rootfs_vnode *vnode;

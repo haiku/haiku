@@ -26,7 +26,7 @@
 // ToDo: handles file names suboptimally - it has all file names
 //	in a singly linked list, no hash lookups or whatever.
 
-#define TRACE_PIPEFS
+//#define TRACE_PIPEFS
 #ifdef TRACE_PIPEFS
 #	define TRACE(x) dprintf x
 #else
@@ -858,7 +858,8 @@ ReadRequest::PutBuffer(const void **_buffer, size_t *_bytesLeft)
 
 
 static status_t
-pipefs_mount(mount_id id, const char *device, void *args, fs_volume *_volume, vnode_id *_rootVnodeID)
+pipefs_mount(mount_id id, const char *device, uint32 flags, const char *args,
+	fs_volume *_volume, vnode_id *_rootVnodeID)
 {
 	TRACE(("pipefs_mount: entry\n"));
 

@@ -660,7 +660,8 @@ get_device_name(struct devfs_vnode *vnode, char *buffer, size_t size)
 
 
 static status_t
-devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id *root_vnid)
+devfs_mount(mount_id id, const char *devfs, uint32 flags, const char *args,
+	fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct devfs *fs;
 	struct devfs_vnode *v;

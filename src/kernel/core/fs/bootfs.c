@@ -378,7 +378,8 @@ bootfs_create_vnode_tree(struct bootfs *fs, struct bootfs_vnode *root)
 
 
 static status_t
-bootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *root_vnid)
+bootfs_mount(mount_id id, const char *device, uint32 flags, const char *args,
+	fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct bootfs *fs;
 	struct bootfs_vnode *v;
