@@ -19,5 +19,6 @@ Depends DiskDeviceManagerTest : <boot!home!config!lib>libkernelland_emu.so ;
 # Also build all modules:
 Depends DiskDeviceManagerTest :
 	<boot!home!config!lib>libkernelland_emu.so
+	<file_system>bfs
 	<partitioning_system>intel
 ;
