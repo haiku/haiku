@@ -31,6 +31,8 @@ enum {
 	SJIS_CONVERSION
 };
 
+#define BEGINS_UTF8CHAR(byte) (((byte) & 0xc0) != 0x80)
+
 const uint16 msdostou[] = {
 0x0000, 0x0001, 0x0002, 0x0003, 0x0004, 0x0005, 0x0006, 0x0007, 0x0008, 0x0009, 0x000A, 0x000B, 0x000C, 0x000D, 0x000E, 0x000F,
 0x0010, 0x0011, 0x0012, 0x0013, 0x0014, 0x0015, 0x0016, 0x0017, 0x0018, 0x0019, 0x001A, 0x001B, 0x001C, 0x001D, 0x001E, 0x001F,
@@ -1526,6 +1528,45 @@ status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len)
 
 	return _one_to_utf8(msdostou, (char *)normalized, &pos,
 			(char *)utf8, (int32 *)&utf8len);
+}
+
+bool requires_munged_short_name(const uchar *utf8name, const uchar nshort[11], int encoding)
+{
+	int leading = 0;
+	int trailing = 0;
+	int i, len;
+
+	if (encoding != MS_DOS_CONVERSION) return true;
+	
+	for ( ; *utf8name != 0; utf8name++) {
+		if (!BEGINS_UTF8CHAR(*utf8name)) continue;
+		if (*utf8name == '.') break;
+		leading++;
+		if (leading > 8) return true;
+		if ((nshort[leading - 1] == '_') && (*utf8name != '_')) return true; 
+	}
+	
+	if (*utf8name != 0) {
+		utf8name++;
+	
+		for ( ; *utf8name != 0; utf8name++) {
+			if (!BEGINS_UTF8CHAR(*utf8name)) continue;
+			if (*utf8name == '.') return true;
+			trailing++;
+			if (trailing > 3) return true;
+			if ((nshort[leading + trailing - 1] == '_') && (*utf8name != '_')) return true; 
+		}
+	}
+
+	for (i = 0, len = 0; i < 8; i++)
+		if (nshort[i] != ' ') len++;
+	if (len != leading) return true;
+
+	for (i = 8, len = 0; i < 11; i++)
+		if (nshort[i] != ' ') len++;
+	if (len != trailing) return true;
+	
+	return false;
 }
 
 #ifdef USER

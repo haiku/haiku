@@ -40,6 +40,8 @@ int debug_attr = 0, debug_dir = 0, debug_dlist = 0, debug_dosfs = 0,
 CHECK_MAGIC(vnode,struct vnode,VNODE_MAGIC)
 CHECK_MAGIC(nspace,struct _nspace, NSPACE_MAGIC)
 
+static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated);
+
 #if DEBUG
 
 int32 instances = 0;
@@ -420,7 +422,7 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 	vol->id = nsid;
 	strncpy(vol->device,path,256);
 
-	// XXX: if fsinfo exists, read from there?
+	// this will be updated later if fsinfo exists
 	vol->last_allocated = 2;
 
 	vol->beos_vnid = INVALID_VNID_BITS_MASK;
@@ -453,11 +455,25 @@ static status_t mount_fat_disk(const char *path, nspace_id nsid,
 	if (vol->flags & B_FS_IS_READONLY)
 		vol->free_clusters = 0;
 	else {
-		if ((err = count_free_clusters(vol)) < 0) {
-			dprintf("error counting free clusters (%s)\n", strerror(err));
-			goto error3;
+		uint32 free_count, last_allocated;
+		err = get_fsinfo(vol, &free_count, &last_allocated);
+		if (err >= 0) {
+			if (free_count < vol->total_clusters) 
+				vol->free_clusters = free_count;
+			else {
+				dprintf("free cluster count from fsinfo block invalid %x\n",free_count);
+				err = -1;
+			}
+			if (last_allocated < vol->total_clusters) 
+				vol->last_allocated = last_allocated; //update to a closer match
 		}
-		vol->free_clusters = err;
+		if (err < 0) {
+			if ((err = count_free_clusters(vol)) < 0) {
+				dprintf("error counting free clusters (%s)\n", strerror(err));
+				goto error3;
+			}
+			vol->free_clusters = err;
+		}
 	}
 
 	DPRINTF(0, ("built at %s on %s\n", build_time, build_date));
@@ -626,13 +642,17 @@ static void update_fsinfo(nspace *vol)
 		uchar *buffer;
 		if ((buffer = (uchar *)get_block(vol->fd, vol->fsinfo_sector, vol->bytes_per_sector)) != NULL) {
 			if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
+				//number of free clusters
 				buffer[0x1e8] = (vol->free_clusters & 0xff);
 				buffer[0x1e9] = ((vol->free_clusters >> 8) & 0xff);
 				buffer[0x1ea] = ((vol->free_clusters >> 16) & 0xff);
 				buffer[0x1eb] = ((vol->free_clusters >> 24) & 0xff);
+				//cluster number of most recently allocated cluster 
+				buffer[0x1ec] = (vol->last_allocated & 0xff);
+				buffer[0x1ed] = ((vol->last_allocated >> 8) & 0xff);
+				buffer[0x1ee] = ((vol->last_allocated >> 16) & 0xff);
+				buffer[0x1ef] = ((vol->last_allocated >> 24) & 0xff);
 				mark_blocks_dirty(vol->fd, vol->fsinfo_sector, 1);
-
-				// should also store next free cluster
 			} else {
 				dprintf("update_fsinfo: fsinfo block has invalid magic number\n");
 			}
@@ -641,6 +661,32 @@ static void update_fsinfo(nspace *vol)
 			dprintf("update_fsinfo: error getting fsinfo sector %x\n", vol->fsinfo_sector);
 		}
 	}
+}
+
+static status_t get_fsinfo(nspace *vol, uint32 *free_count, uint32 *last_allocated)
+{
+	uchar *buffer;
+	int32 result;
+
+	if ((vol->fat_bits != 32) || (vol->fsinfo_sector == 0xffff))
+		return B_ERROR;
+		
+	if ((buffer = (uchar *)get_block(vol->fd, vol->fsinfo_sector, vol->bytes_per_sector)) == NULL) {
+		dprintf("get_fsinfo: error getting fsinfo sector %x\n", vol->fsinfo_sector);
+		return EIO;
+	}
+	
+	if ((read32(buffer,0) == 0x41615252) && (read32(buffer,0x1e4) == 0x61417272) && (read16(buffer,0x1fe) == 0xaa55)) {
+		*free_count = read32(buffer,0x1e8);
+		*last_allocated = read32(buffer,0x1ec);
+		result = B_OK;
+	} else {
+		dprintf("get_fsinfo: fsinfo block has invalid magic number\n");
+		result = B_ERROR;
+	}
+
+	release_block(vol->fd, vol->fsinfo_sector);
+	return result;
 }
 
 static int dosfs_unmount(void *_vol)

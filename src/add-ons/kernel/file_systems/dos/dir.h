@@ -2,7 +2,6 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 #ifndef _DOSFS_DIR_H_
 #define _DOSFS_DIR_H_
 

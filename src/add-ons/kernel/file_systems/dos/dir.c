@@ -738,11 +738,20 @@ status_t create_volume_label(nspace *vol, const char name[11], uint32 *index)
 bool is_filename_legal(const char *name)
 {
 	unsigned int i;
+	unsigned int len = strlen(name);
+	
+	if (len <= 0) return false;
+	
+	// names ending with a dot are not allowed
+	if (name[len - 1] == '.') return false;
+	// names ending with a space are not allowed
+	if (name[len - 1] == ' ') return false;
 
 	// XXX illegal character search can be made faster
-	for(i=0; i<strlen(name); i++) {
+	for(i=0; i<len; i++) {
+		if(name[i] & 0x80) continue; //belongs to an utf8 char
 		if(strchr(illegal, name[i])) return false;
-		if(name[i] < 32) return false;
+		if((unsigned char)name[i] < 32) return false;
 	}
 	return true;
 }
@@ -790,18 +799,25 @@ status_t create_dir_entry(nspace *vol, vnode *dir, vnode *node,
 		return error;
 	}
 
-	// if there is a long name, patch short name and check for duplication
+	// if there is a long name, patch short name if necessary and check for duplication
 	if (requires_long_name(name, nlong)) {
 		char tshort[11]; // temporary short name
 		int iter = 1;
 
 		memcpy(tshort, nshort, 11);
 
-		do {
-			memcpy(nshort, tshort, 11);
-			DPRINTF(0, ("trying short name %11.11s\n", nshort));
-			munge_short_name1(nshort, iter, encoding);
-		} while (((error = find_short_name(vol, dir, nshort)) == B_OK) && (++iter < 10));
+		if (requires_munged_short_name((uchar *)name, nshort, encoding))
+			error = B_OK;
+		else
+			error = find_short_name(vol, dir, nshort);
+			
+		if (error == B_OK) {
+			do {
+				memcpy(nshort, tshort, 11);
+				DPRINTF(0, ("trying short name %11.11s\n", nshort));
+				munge_short_name1(nshort, iter, encoding);
+			} while (((error = find_short_name(vol, dir, nshort)) == B_OK) && (++iter < 10));
+		}
 
 		if ((error != B_OK) && (error != ENOENT)) return error;
 

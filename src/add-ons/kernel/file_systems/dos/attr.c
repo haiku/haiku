@@ -2,7 +2,6 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 /* attr.c
  * handles mime type information for dosfs
  * gets/sets mime information in vnode

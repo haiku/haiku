@@ -2,7 +2,6 @@
 	Copyright 1999-2001, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 */
-
 /*
 The FAT file system has no good way of assigning unique persistent values to
 nodes. The only obvious choice, storing the starting cluster number of the
