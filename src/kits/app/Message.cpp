@@ -1785,7 +1785,7 @@ status_t BMessage::_send_(port_id port, int32 token, bool preferred,
 	status_t err;
 	do
 	{
-		err = write_port_etc(port, 'pjpp', pMem, size, 8, timeout);
+		err = write_port_etc(port, 'pjpp', pMem, size, B_RELATIVE_TIMEOUT, timeout);
 	} while (err == B_INTERRUPTED);
 	if (p)
 	{
