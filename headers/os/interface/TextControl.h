@@ -127,7 +127,7 @@ private:
 			uint32			_more_reserved[4];
 #endif
 
-//			bool			fClean;
+			bool			fClean;
 			bool			fSkipSetFlags;		// will use this for SHIFT-TAB
 			bool			fUnusedBool1;
 			bool			fUnusedBool2;
