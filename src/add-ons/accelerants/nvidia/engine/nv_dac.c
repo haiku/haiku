@@ -23,8 +23,8 @@ bool nv_dac_crt_connected(void)
 	/* save DAC state */
 	dac = DACR(TSTCTRL);
 
-	/* shut-off DAC */
-	DACW(TSTCTRL, (DACR(TSTCTRL) | 0x00010000));
+	/* turn on DAC */
+	DACW(TSTCTRL, (DACR(TSTCTRL) & 0xfffeffff));
 	/* select primary head and turn off CRT (and DVI?) outputs */
 	DACW(OUTPUT, (output & 0x0000feee));
 	/* wait for signal lines to stabilize */

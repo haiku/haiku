@@ -21,14 +21,14 @@ bool nv_dac2_crt_connected()
 	/* save DAC state */
 	dac = DAC2R(TSTCTRL);
 
-	/* shut-off DAC */
-	DAC2W(TSTCTRL, (DAC2R(TSTCTRL) | 0x00010000));
+	/* turn on DAC2 */
+	DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeffff));
 	/* select primary head and turn off CRT (and DVI?) outputs */
 	DAC2W(OUTPUT, (output & 0x0000feee));
 	/* wait for signal lines to stabilize */
 	snooze(1000);
 	/* re-enable CRT output */
-	DAC2W(OUTPUT, (DACR(OUTPUT) | 0x00000001));
+	DAC2W(OUTPUT, (DAC2R(OUTPUT) | 0x00000001));
 
 	/* setup RGB test signal levels to approx 30% of DAC range and enable them
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */

@@ -184,13 +184,13 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/*work out where the "right" screen starts*/
 		startadd_right = startadd + (target.timing.h_display * (colour_depth1 >> 3));
 
-		/* fixme: test... */
-		nv_dac_crt_connected();
-		nv_dac2_crt_connected();
-
 		/* set the outputs if possible */
 		if (si->ps.secondary_head)
 		{
+			/* fixme: test... (do also for singlehead modes!) */
+			nv_dac_crt_connected();
+			nv_dac2_crt_connected();
+
 			switch (target.flags & DUALHEAD_BITS)
 			{
 			case DUALHEAD_ON:
