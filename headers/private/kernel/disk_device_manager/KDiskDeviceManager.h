@@ -11,6 +11,7 @@ namespace DiskDevice {
 
 class KDiskDevice;
 class KDiskDeviceJob;
+class KDiskDeviceJobFactory;
 class KDiskDeviceJobQueue;
 class KDiskSystem;
 class KFileDiskDevice;
@@ -74,14 +75,17 @@ public:
 	// Jobs
 
 	// manager must be locked
-	KDiskDeviceJob *JobWithID(disk_job_id id);
+	KDiskDeviceJob *FindJob(disk_job_id id);
 	int32 CountJobs();
-	KDiskDeviceJob *JobAt(int32 index);
+	KDiskDeviceJob *NextJob(int32 *cookie);
 
 	// manager must be locked
-	bool AddJobQueue(KDiskDeviceJobQueue *jobQueue);
+	status_t AddJobQueue(KDiskDeviceJobQueue *jobQueue);
+	status_t RemoveJobQueue(KDiskDeviceJobQueue *jobQueue);
+	status_t DeleteJobQueue(KDiskDeviceJobQueue *jobQueue);
+		// called when the execution is done
 	int32 CountJobQueues();
-	KDiskDeviceJobQueue *JobQueueAt(int32 index);
+	KDiskDeviceJobQueue *NextJobQueue(int32 *cookie);
 
 	// Disk Systems
 
@@ -110,12 +114,15 @@ private:
 	bool _AddDevice(KDiskDevice *device);
 	bool _RemoveDevice(KDiskDevice *device);
 
+	bool _RemoveJobQueue(KDiskDeviceJobQueue *jobQueue);
+
 	status_t _Scan(const char *path);
-	status_t _ScanDevice(KDiskDevice *device);
 	status_t _ScanPartition(KPartition *partition);
 
 	struct DeviceMap;
 	struct DiskSystemMap;
+	struct JobMap;
+	struct JobQueueVector;
 	struct PartitionMap;
 	struct PartitionSet;
 
@@ -124,6 +131,9 @@ private:
 	PartitionMap				*fPartitions;
 	DiskSystemMap				*fDiskSystems;
 	PartitionSet				*fObsoletePartitions;
+	JobMap						*fJobs;
+	JobQueueVector				*fJobQueues;
+	KDiskDeviceJobFactory		*fJobFactory;
 
 	static KDiskDeviceManager	*fDefaultManager;
 };

@@ -12,6 +12,9 @@
 #include <VectorSet.h>
 
 #include "KDiskDevice.h"
+#include "KDiskDeviceJob.h"
+#include "KDiskDeviceJobFactory.h"
+#include "KDiskDeviceJobQueue.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
@@ -49,6 +52,14 @@ struct GetDiskSystemID {
 	}
 };
 
+// GetJobID
+struct GetJobID {
+	inline disk_job_id operator()(const KDiskDeviceJob *job) const
+	{
+		return job->ID();
+	}
+};
+
 // PartitionMap
 struct KDiskDeviceManager::PartitionMap : VectorMap<partition_id, KPartition*,
 	VectorMapEntryStrategy::ImplicitKey<partition_id, KPartition*,
@@ -72,6 +83,15 @@ struct KDiskDeviceManager::DiskSystemMap : VectorMap<disk_system_id,
 struct KDiskDeviceManager::PartitionSet : VectorSet<KPartition*> {
 };
 
+// JobMap
+struct KDiskDeviceManager::JobMap : VectorMap<disk_job_id, KDiskDeviceJob*,
+	VectorMapEntryStrategy::ImplicitKey<disk_job_id, KDiskDeviceJob*,
+		GetJobID> > {
+};
+
+// JobQueueVector
+struct KDiskDeviceManager::JobQueueVector : Vector<KDiskDeviceJobQueue*> {};
+	
 
 // constructor
 KDiskDeviceManager::KDiskDeviceManager()
@@ -79,7 +99,10 @@ KDiskDeviceManager::KDiskDeviceManager()
 	  fDevices(new(nothrow) DeviceMap),
 	  fPartitions(new(nothrow) PartitionMap),
 	  fDiskSystems(new(nothrow) DiskSystemMap),
-	  fObsoletePartitions(new(nothrow) PartitionSet)
+	  fObsoletePartitions(new(nothrow) PartitionSet),
+	  fJobs(new(nothrow) JobMap),
+	  fJobQueues(new(nothrow) JobQueueVector),
+	  fJobFactory(new(nothrow) KDiskDeviceJobFactory)
 {
 	if (InitCheck() != B_OK)
 		return;
@@ -112,6 +135,7 @@ DBG(OUT("number of disk systems: %ld\n", CountDiskSystems()));
 // destructor
 KDiskDeviceManager::~KDiskDeviceManager()
 {
+	// TODO: terminate and remove all jobs
 	// remove all devices
 	for (int32 cookie = 0; KDiskDevice *device = NextDevice(&cookie);) {
 		PartitionRegistrar _(device);
@@ -150,14 +174,19 @@ KDiskDeviceManager::~KDiskDeviceManager()
 	delete fDevices;
 	delete fDiskSystems;
 	delete fObsoletePartitions;
+	delete fJobs;
+	delete fJobQueues;
+	delete fJobFactory;
 }
 
 // InitCheck
 status_t
 KDiskDeviceManager::InitCheck() const
 {
-	if (!fPartitions || !fDevices || !fDiskSystems || !fObsoletePartitions)
+	if (!fPartitions || !fDevices || !fDiskSystems || !fObsoletePartitions
+		|| !fJobs || !fJobQueues || !fJobFactory) {
 		return B_NO_MEMORY;
+	}
 	return (fLock.Sem() >= 0 ? B_OK : fLock.Sem());
 }
 
@@ -454,7 +483,6 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath)
 	if (!filePath)
 		return B_BAD_VALUE;
 	status_t error = B_ERROR;
-	partition_id deviceID = -1;
 	KFileDiskDevice *device = NULL;
 	if (ManagerLocker locker = this) {
 		// check, if the device does already exist
@@ -468,20 +496,15 @@ KDiskDeviceManager::CreateFileDevice(const char *filePath)
 		error = device->SetTo(filePath);
 		if (error == B_OK && !_AddDevice(device))
 			error = B_NO_MEMORY;
-		// set result / cleanup und failure
-		if (error != B_OK) {
-			delete device;
-			return error;
+		// scan device
+		if (error == B_OK) {
+			_ScanPartition(device);
+			return device->ID();
 		}
-		deviceID = device->ID();
-		device->Register();
+		// cleanup on failure
+		delete device;
 	}
-	// scan device
-	if (error == B_OK && device) {
-		_ScanDevice(device);
-		device->Unregister();
-	}
-	return (error == B_OK ? deviceID : error);
+	return error;
 }
 
 // DeleteFileDevice
@@ -572,52 +595,105 @@ KDiskDeviceManager::DeletePartition(KPartition *partition)
 	return false;
 }
 
-// JobWithID
+// FindJob
 KDiskDeviceJob *
-KDiskDeviceManager::JobWithID(disk_job_id id)
+KDiskDeviceManager::FindJob(disk_job_id id)
 {
-	// not implemented
-	return NULL;
+	JobMap::Iterator it = fJobs->Find(id);
+	if (it == fJobs->End())
+		return NULL;
+	return it->Value();
 }
 
 // CountJobs
 int32
 KDiskDeviceManager::CountJobs()
 {
-	// not implemented
-	return 0;
+	return fJobs->Count();
 }
 
-// JobAt
+// NextJob
 KDiskDeviceJob *
-KDiskDeviceManager::JobAt(int32 index)
+KDiskDeviceManager::NextJob(int32 *cookie)
 {
-	// not implemented
+	if (!cookie)
+		return NULL;
+	JobMap::Iterator it = fJobs->FindClose(*cookie, false);
+	if (it != fJobs->End()) {
+		KDiskDeviceJob *job = it->Value();
+		*cookie = job->ID() + 1;
+		return job;
+	}
 	return NULL;
 }
 
 // AddJobQueue
-bool
+status_t
 KDiskDeviceManager::AddJobQueue(KDiskDeviceJobQueue *jobQueue)
 {
-	// not implemented
-	return false;
+	// check the parameter
+	if (!jobQueue)
+		return B_BAD_VALUE;
+	if (jobQueue->InitCheck() != B_OK)
+		return jobQueue->InitCheck();
+	// add the queue
+	status_t error = fJobQueues->PushBack(jobQueue);
+	if (error != B_OK)
+		return error;
+	// add the queue's jobs
+	int32 count = jobQueue->CountJobs();
+	for (int32 i = 0; i < count; i++) {
+		KDiskDeviceJob *job = jobQueue->JobAt(i);
+		error = fJobs->Put(job->ID(), job);
+		if (error != B_OK) {
+			_RemoveJobQueue(jobQueue);
+			return error;
+		}
+	}
+	// start its execution
+	error = jobQueue->Execute();
+	if (error != B_OK)
+		_RemoveJobQueue(jobQueue);
+	return error;
+}
+
+// RemoveJobQueue
+status_t
+KDiskDeviceManager::RemoveJobQueue(KDiskDeviceJobQueue *jobQueue)
+{
+	if (!jobQueue)
+		return B_BAD_VALUE;
+	if (jobQueue->InitCheck() != B_OK)
+		return jobQueue->InitCheck();
+	if (jobQueue->IsExecuting())
+		return B_BAD_VALUE;
+	return (_RemoveJobQueue(jobQueue) ? B_OK : B_ENTRY_NOT_FOUND);
+}
+
+// DeleteJobQueue
+status_t
+KDiskDeviceManager::DeleteJobQueue(KDiskDeviceJobQueue *jobQueue)
+{
+	status_t error = RemoveJobQueue(jobQueue);
+	if (error == B_OK)
+		delete jobQueue;
+	return error;
 }
 
 // CountJobQueues
 int32
 KDiskDeviceManager::CountJobQueues()
 {
-	// not implemented
-	return 0;
+	return fJobQueues->Count();
 }
 
-// JobQueueAt
+// NextJobQueue
 KDiskDeviceJobQueue *
-KDiskDeviceManager::JobQueueAt(int32 index)
+KDiskDeviceManager::NextJobQueue(int32 *cookie)
 {
-	// not implemented
-	return NULL;
+	if (!cookie || *cookie < 0 || *cookie >= CountJobQueues())
+		return NULL;
+	return fJobQueues->ElementAt((*cookie)++);
 }
 
 // FindDiskSystem
@@ -713,15 +789,16 @@ KDiskDeviceManager::InitialDeviceScan()
 {
 	status_t error = B_ERROR;
 	// scan for devices
-	if (ManagerLocker locker = this)
+	if (ManagerLocker locker = this) {
 		error = _Scan("/dev/disk");
-	// scan the devices for partitions
-	// TODO: This is only provisional.
-	if (error == B_OK) {
+		if (error != B_OK)
+			return error;
+		// scan the devices for partitions
 		int32 cookie = 0;
-		while (KDiskDevice *device = RegisterNextDevice(&cookie)) {
-			error = _ScanDevice(device);
-			device->Unregister();
+		while (KDiskDevice *device = NextDevice(&cookie)) {
+			error = _ScanPartition(device);
+			if (error != B_OK)
+				break;
 		}
 	}
 	return error;
@@ -789,6 +866,25 @@ KDiskDeviceManager::_RemoveDevice(KDiskDevice *device)
 			&& PartitionRemoved(device));
 }
 
+// _RemoveJobQueue
+bool
+KDiskDeviceManager::_RemoveJobQueue(KDiskDeviceJobQueue *jobQueue)
+{
+	if (!jobQueue)
+		return false;
+	// find the job queue
+	JobQueueVector::Iterator it = fJobQueues->Find(jobQueue);
+	if (it == fJobQueues->End())
+		return false;
+	// remove the queue's jobs
+	int32 count = jobQueue->CountJobs();
+	for (int32 i = 0; i < count; i++) {
+		KDiskDeviceJob *job = jobQueue->JobAt(i);
+		fJobs->Remove(job->ID());
+	}
+	return true;
+}
+
 // _Scan
 status_t
 KDiskDeviceManager::_Scan(const char *path)
@@ -837,85 +933,32 @@ DBG(OUT("  found device: %s\n", path));
 	return error;
 }
 
-// _ScanDevice
-status_t
-KDiskDeviceManager::_ScanDevice(KDiskDevice *device)
-{
-	status_t error = B_OK;
-	if (device->WriteLock()) {
-		// scan the device
-		if (device->HasMedia()) {
-			error = _ScanPartition(device);
-			if (error != B_OK) {
-				// ...
-				error = B_OK;
-			}
-		}
-		device->WriteUnlock();
-	} else
-		error = B_ERROR;
-	return error;
-}
-
 // _ScanPartition
 status_t
 KDiskDeviceManager::_ScanPartition(KPartition *partition)
 {
-	// the partition's device must be write-locked
 	if (!partition)
 		return B_BAD_VALUE;
-char partitionPath[B_PATH_NAME_LENGTH];
-partition->GetPath(partitionPath);
-DBG(OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath));
-	// publish the partition
-	status_t error = partition->PublishDevice();
+	// create a new job queue for the device
+	KDiskDeviceJobQueue *jobQueue = new(nothrow) KDiskDeviceJobQueue;
+	if (!jobQueue)
+		return B_NO_MEMORY;
+	jobQueue->SetDevice(partition->Device());
+	// create a job for scanning the device and add it to the job queue
+	KDiskDeviceJob *job = fJobFactory->CreateScanPartitionJob(partition->ID());
+	if (!job) {
+		delete jobQueue;
+		return B_NO_MEMORY;
+	}
+	if (!jobQueue->AddJob(job)) {
+		delete jobQueue;
+		delete job;
+		return B_NO_MEMORY;
+	}
+	// add the job queue
+	status_t error = AddJobQueue(jobQueue);
 	if (error != B_OK)
-		return error;
-	// find the disk system that returns the best priority for this partition
-	float bestPriority = -1;
-	KDiskSystem *bestDiskSystem = NULL;
-	void *bestCookie = NULL;
-	int32 itCookie = 0;
-	while (KDiskSystem *diskSystem = LoadNextDiskSystem(&itCookie)) {
-DBG(OUT("  trying: %s\n", diskSystem->Name()));
-		void *cookie = NULL;
-		float priority = diskSystem->Identify(partition, &cookie);
-DBG(OUT("  returned: %f\n", priority));
-		if (priority >= 0 && priority > bestPriority) {
-			// new best disk system
-			if (bestDiskSystem) {
-				bestDiskSystem->FreeIdentifyCookie(partition, bestCookie);
-				bestDiskSystem->Unload();
-			}
-			bestPriority = priority;
-			bestDiskSystem = diskSystem;
-			bestCookie = cookie;
-		} else {
-			// disk system doesn't identify the partition or worse than our
-			// current favorite
-			diskSystem->FreeIdentifyCookie(partition, cookie);
-			diskSystem->Unload();
-		}
-	}
-	// now, if we have found a disk system, let it scan the partition
-	if (bestDiskSystem) {
-DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
-		error = bestDiskSystem->Scan(partition, bestCookie);
-		if (error == B_OK) {
-			partition->SetDiskSystem(bestDiskSystem);
-			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
-				_ScanPartition(child);
-		} else {
-			// TODO: Handle the error.
-DBG(OUT("  scanning failed: %s\n", strerror(error)));
-		}
-		// now we can safely unload the disk system -- it has been loaded by
-		// the partition(s) and thus will not really be unloaded
-		bestDiskSystem->Unload();
-	} else {
-		// contents not recognized
-		// nothing to be done -- partitions are created as unrecognized
-	}
+		delete jobQueue;
 	return error;
 }
 
