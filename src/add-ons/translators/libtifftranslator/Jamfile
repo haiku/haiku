@@ -5,7 +5,7 @@ UseLibraryHeaders zlib ;
 # Include BaseTranslator code from shared directory
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
 
-Translator TIFFTranslator : 
+local tiff_files =
 	# libtiff
 	tif_aux.c
 	tif_close.c
@@ -40,6 +40,13 @@ Translator TIFFTranslator :
 	tif_warning.c
 	tif_write.c
 	tif_zip.c 
+	;
+
+Objects $(tiff_files) ;
+ObjectCcFlags [ FGristFiles $(tiff_files:S=$(SUFOBJ)) ] : -w ;
+
+Translator TIFFTranslator : 
+	[ FGristFiles $(tiff_files:S=$(SUFOBJ)) ]
 
 	# shared classes
 	BaseTranslator.cpp
