@@ -1725,7 +1725,7 @@ file_create_entry_ref(fs_id fsID, vnode_id directoryID, const char *name, int om
 static int
 file_create(char *path, int openMode, int perms, bool kernel)
 {
-	char filename[SYS_MAX_NAME_LEN];
+	char name[B_FILE_NAME_LENGTH];
 	struct vnode *directory, *vnode;
 	fs_cookie cookie;
 	vnode_id newID;
@@ -1734,13 +1734,13 @@ file_create(char *path, int openMode, int perms, bool kernel)
 	FUNCTION(("file_create: path '%s', omode %x, perms %d, kernel %d\n", path, openMode, perms, kernel));
 
 	// get directory to put the new file in	
-	status = path_to_dir_vnode(path, &directory, filename, kernel);
+	status = path_to_dir_vnode(path, &directory, name, kernel);
 	if (status < 0)
 		return status;
 
-	status = create_vnode(directory, filename, openMode, perms, kernel);
-	put_vnode(directory);
+	status = create_vnode(directory, name, openMode, perms, kernel);
 
+	put_vnode(directory);
 	return status;
 }
 
@@ -1750,6 +1750,9 @@ file_open_entry_ref(fs_id fsID, vnode_id directoryID, const char *name, int omod
 {
 	struct vnode *vnode;
 	int status;
+
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
 
 	FUNCTION(("file_open_entry_ref()\n"));
 
@@ -1852,6 +1855,9 @@ dir_create_entry_ref(fs_id fsID, vnode_id parentID, const char *name, int perms,
 	vnode_id newID;
 	int status;
 
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
+
 	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", fsID, parentID, name, perms));
 	
 	status = get_vnode(fsID, parentID, &vnode, kernel);
@@ -1920,6 +1926,9 @@ dir_open_entry_ref(fs_id fsID, vnode_id parentID, const char *name, bool kernel)
 	int status;
 
 	FUNCTION(("dir_open_entry_ref()\n"));
+
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
 
 	// get the vnode matching the entry_ref
 	status = entry_ref_to_vnode(fsID, parentID, name, &vnode);
@@ -2212,36 +2221,36 @@ common_access(char *path, int mode, bool kernel)
 static int
 common_rename(char *path, char *newPath, bool kernel)
 {
-	struct vnode *vnode1, *vnode2;
-	char filename1[SYS_MAX_NAME_LEN];
-	char filename2[SYS_MAX_NAME_LEN];
+	struct vnode *fromVnode, *toVnode;
+	char fromName[SYS_MAX_NAME_LEN];
+	char toName[SYS_MAX_NAME_LEN];
 	int status;
 
 	FUNCTION(("common_rename(path = %s, newPath = %s, kernel = %d)\n", path, newPath, kernel));
 
-	status = path_to_dir_vnode(path, &vnode1, filename1, kernel);
+	status = path_to_dir_vnode(path, &fromVnode, fromName, kernel);
+	if (status < 0)
+		return status;
+
+	status = path_to_dir_vnode(newPath, &toVnode, toName, kernel);
 	if (status < 0)
 		goto err;
 
-	status = path_to_dir_vnode(newPath, &vnode2, filename2, kernel);
-	if (status < 0)
+	if (fromVnode->fs_id != toVnode->fs_id) {
+		status = B_CROSS_DEVICE_LINK;
 		goto err1;
-
-	if (vnode1->fs_id != vnode2->fs_id) {
-		status = ERR_VFS_CROSS_FS_RENAME;
-		goto err2;
 	}
 
-	if (FS_CALL(vnode1, rename) != NULL)
-		status = FS_CALL(vnode1, rename)(vnode1->mount->cookie, vnode1->private_node, filename1, vnode2->private_node, filename2);
+	if (FS_CALL(fromVnode, rename) != NULL)
+		status = FS_CALL(fromVnode, rename)(fromVnode->mount->cookie, fromVnode->private_node, fromName, toVnode->private_node, toName);
 	else
 		status = EROFS;
 
-err2:
-	put_vnode(vnode2);
 err1:
-	put_vnode(vnode1);
+	put_vnode(toVnode);
 err:
+	put_vnode(fromVnode);
+
 	return status;
 }
 
@@ -2286,6 +2295,9 @@ attr_create(int fd, const char *name, uint32 type, int openMode, bool kernel)
 	fs_cookie cookie;
 	int status;
 
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
+
 	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
 	if (vnode == NULL)
 		return B_FILE_ERROR;
@@ -2321,6 +2333,9 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 	struct vnode *vnode;
 	fs_cookie cookie;
 	int status;
+
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
 
 	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
 	if (vnode == NULL)
@@ -2451,6 +2466,75 @@ attr_write_stat(int fd, const struct stat *stat, int statMask, bool kernel)
 }
 
 
+static int
+attr_remove(int fd, const char *name, bool kernel)
+{
+	struct file_descriptor *descriptor;
+	struct vnode *vnode;
+	int status;
+
+	if (name == NULL || *name == '\0')
+		return B_BAD_VALUE;
+
+	FUNCTION(("attr_remove: fd = %d, name = \"%s\", kernel %d\n", fd, name, kernel));
+
+	descriptor = get_fd_and_vnode(fd, &vnode, kernel);
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	if (FS_CALL(vnode, remove_attr))
+		status = FS_CALL(vnode, remove_attr)(vnode->mount->cookie, vnode->private_node, name);
+	else
+		status = EROFS;
+
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
+attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool kernel)
+{
+	struct file_descriptor *fromDescriptor, *toDescriptor;
+	struct vnode *fromVnode, *toVnode;
+	int status;
+
+	if (fromName == NULL || *fromName == '\0' || toName == NULL || *toName == '\0')
+		return B_BAD_VALUE;
+
+	FUNCTION(("attr_rename: from fd = %d, from name = \"%s\", to fd = %d, to name = \"%s\", kernel %d\n", fromfd, fromName, tofd, toName, kernel));
+
+	fromDescriptor = get_fd_and_vnode(fromfd, &fromVnode, kernel);
+	if (fromDescriptor == NULL)
+		return B_FILE_ERROR;
+
+	toDescriptor = get_fd_and_vnode(tofd, &toVnode, kernel);
+	if (toDescriptor == NULL) {
+		status = B_FILE_ERROR;
+		goto err;
+	}
+
+	// are the files on the same volume?
+	if (fromVnode->fs_id != toVnode->fs_id) {
+		status = B_CROSS_DEVICE_LINK;
+		goto err1;
+	}
+
+	if (FS_CALL(fromVnode, rename_attr))
+		status = FS_CALL(fromVnode, rename_attr)(fromVnode->mount->cookie, fromVnode->private_node, fromName, toVnode->private_node, toName);
+	else
+		status = EROFS;
+
+err1:
+	put_vnode(toVnode);
+err:
+	put_vnode(fromVnode);
+
+	return status;
+}
+
+
 //	#pragma mark -
 //	General File System functions
 
@@ -2469,7 +2553,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 
 	mount = (struct fs_mount *)kmalloc(sizeof(struct fs_mount));
 	if (mount == NULL)  {
-		err = ENOMEM;
+		err = B_NO_MEMORY
 		goto err;
 	}
 
@@ -2477,7 +2561,7 @@ fs_mount(char *path, const char *device, const char *fs_name, void *args, bool k
 
 	mount->mount_point = kstrdup(path);
 	if (mount->mount_point == NULL) {
-		err = ENOMEM;
+		err = B_NO_MEMORY;
 		goto err1;
 	}
 
