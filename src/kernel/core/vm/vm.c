@@ -72,6 +72,7 @@ static status_t map_backing_store(vm_address_space *aspace, vm_store *store, voi
 	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name);
 static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
 static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
+static void vm_put_region(vm_region *region);
 
 
 static int
@@ -100,7 +101,7 @@ region_hash(void *_r, const void *key, uint32 range)
 }
 
 
-vm_region *
+static vm_region *
 vm_get_region_by_id(region_id rid)
 {
 	vm_region *region;
@@ -114,37 +115,6 @@ vm_get_region_by_id(region_id rid)
 	release_sem_etc(region_hash_sem, READ_COUNT, 0);
 
 	return region;
-}
-
-
-region_id
-vm_find_region_by_name(aspace_id aid, const char *name)
-{
-	vm_region *region = NULL;
-	vm_address_space *aspace;
-	region_id id = B_NAME_NOT_FOUND;
-
-	aspace = vm_get_aspace_by_id(aid);
-	if(aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
-
-	acquire_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0, 0);
-
-	region = aspace->virtual_map.region_list;
-	for (; region != NULL; region = region->aspace_next) {
-		// ignore reserved space regions
-		if (region->id == RESERVED_REGION_ID)
-			continue;
-
-		if (strcmp(region->name, name) == 0) {
-			id = region->id;
-			break;
-		}
-	}
-
-	release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
-	vm_put_aspace(aspace);
-	return id;
 }
 
 
@@ -1219,7 +1189,7 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 }
 
 
-void
+static void
 vm_put_region(vm_region *region)
 {
 	return _vm_put_region(region, false);
@@ -1621,46 +1591,6 @@ dump_region(int argc, char **argv)
 }
 
 
-// ToDo: fix these and move them to find_area() and area_for()!
-
-static region_id
-find_region_by_address(addr_t address)
-{
-	vm_address_space *aspace;
-	vm_region *region;
-	region_id result = B_ERROR;
-
-	aspace = vm_get_current_user_aspace();
-	for (region = aspace->virtual_map.region_list; region != NULL; region = region->aspace_next) {
-		if (region->id == RESERVED_REGION_ID)
-			continue;
-
-		if (address >= region->base && address <= region->base + region->size) {
-			result = region->id;
-			break;
-		}
-	}
-	vm_put_aspace(aspace);
-	return result;
-}
-
-
-static region_id
-find_region_by_name(const char *name)
-{
-	vm_region *region;
-	struct hash_iterator iter;
-	hash_open(region_table, &iter);
-	while ((region = hash_next(region_table, &iter)) != NULL) 
-		{
-		if (!strcmp(region->name,name))
-			return region->id;
-		}
-	hash_close(region_table, &iter, false);
-	return B_NAME_NOT_FOUND;
-}
-
-
 static int
 dump_region_list(int argc, char **argv)
 {
@@ -1708,6 +1638,38 @@ vm_delete_areas(struct vm_address_space *aspace)
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
 	return B_OK;
+}
+
+
+static area_id
+vm_area_for(aspace_id aid, addr_t address)
+{
+	vm_address_space *addressSpace;
+	area_id id = B_ERROR;
+	vm_region *area;
+
+	addressSpace = vm_get_aspace_by_id(aid);
+	if (addressSpace == NULL)
+		return ERR_VM_INVALID_ASPACE;
+
+	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
+
+	area = addressSpace->virtual_map.region_list;
+	for (; area != NULL; area = area->aspace_next) {
+		// ignore reserved space regions
+		if (area->id == RESERVED_REGION_ID)
+			continue;
+
+		if (address >= area->base && address <= area->base + area->size) {
+			id = area->id;
+			break;
+		}
+	}
+
+	release_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0);
+	vm_put_aspace(addressSpace);
+
+	return id;
 }
 
 
@@ -1950,7 +1912,7 @@ vm_init(kernel_args *args)
 	for (i = 0; i < args->num_cpus; i++) {
 		char name[64];
 
-		sprintf(name, "idle_thread%lu_kstack", i);
+		sprintf(name, "idle thread %lu kstack", i);
 		address = (void *)args->cpu_kstack[i].start;
 		create_area(name, &address, B_EXACT_ADDRESS, args->cpu_kstack[i].size,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
@@ -2574,16 +2536,34 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 area_id
 area_for(void *address)
 {
-	// ToDo: implement area_for()
-	return B_ERROR;
+	return vm_area_for(vm_get_kernel_aspace_id(), (addr_t)address);
 }
 
 
 area_id
 find_area(const char *name)
 {
-	return vm_find_region_by_name(vm_get_kernel_aspace_id(), name);
-		// ToDo: works only for areas created in the kernel
+	struct hash_iterator iterator;
+	vm_region *area;
+	area_id id = B_NAME_NOT_FOUND;
+
+	acquire_sem_etc(region_hash_sem, READ_COUNT, 0, 0);
+	hash_open(region_table, &iterator);
+
+	while ((area = hash_next(region_table, &iterator)) != NULL) {
+		if (area->id == RESERVED_REGION_ID)
+			continue;
+
+		if (!strcmp(area->name, name)) {
+			id = area->id;
+			break;
+		}
+	}
+
+	hash_close(region_table, &iterator, false);
+	release_sem_etc(region_hash_sem, READ_COUNT, 0);
+
+	return id;
 }
 
 
@@ -2789,26 +2769,10 @@ area_id
 create_area(const char *name, void **_address, uint32 addressSpec, size_t size, uint32 lock,
 	uint32 protection)
 {
-	aspace_id addressSpace;
-	bool kernel = false;
-
 	if ((protection & B_KERNEL_PROTECTION) == 0)
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
 
-	switch (addressSpec) {
-		case B_ANY_KERNEL_BLOCK_ADDRESS:
-		case B_ANY_KERNEL_ADDRESS:
-			kernel = true;
-			break;
-		case B_EXACT_ADDRESS:
-			if (IS_KERNEL_ADDRESS(*_address))
-				kernel = true;
-			break;
-	}
-
-	addressSpace = kernel ? vm_get_kernel_aspace_id() : vm_get_current_user_aspace_id();
-
-	return vm_create_anonymous_region(addressSpace, (char *)name, _address, 
+	return vm_create_anonymous_region(vm_get_kernel_aspace_id(), (char *)name, _address, 
 				addressSpec, size, lock, protection);
 }
 
@@ -2833,15 +2797,20 @@ delete_area(area_id area)
 area_id
 _user_area_for(void *address)
 {
-	return (area_id)find_region_by_address((addr_t)address);
+	return vm_area_for(vm_get_current_user_aspace_id(), (addr_t)address);
 }
 
 
 area_id
-_user_find_area(const char *name)
+_user_find_area(const char *userName)
 {
-	return vm_find_region_by_name(vm_get_current_user_aspace_id(), name);
-		// ToDo: works only for areas created in the calling team
+	char name[B_OS_NAME_LENGTH];
+	
+	if (!IS_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return find_area(name);
 }
 
 
@@ -2958,7 +2927,11 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 		&& IS_KERNEL_ADDRESS(address))
 		return B_BAD_VALUE;
 
-	area = create_area(name, &address, addressSpec, size, lock, protection);
+	if ((protection & B_KERNEL_PROTECTION) == 0)
+		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+
+	area = vm_create_anonymous_region(vm_get_current_user_aspace_id(), (char *)name, &address, 
+				addressSpec, size, lock, protection | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
 		delete_area(area);
