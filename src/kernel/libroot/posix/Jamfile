@@ -22,7 +22,7 @@ MergeObjectFromObjects kernel_posix_main.o :
 SubInclude OBOS_TOP src kernel libroot posix locale ;
 SubInclude OBOS_TOP src kernel libroot posix malloc ;
 SubInclude OBOS_TOP src kernel libroot posix math ;
-SubInclude OBOS_TOP src kernel libroot posix signal ;
+#SubInclude OBOS_TOP src kernel libroot posix signal ;
 SubInclude OBOS_TOP src kernel libroot posix stdio ;
 SubInclude OBOS_TOP src kernel libroot posix stdlib ;
 SubInclude OBOS_TOP src kernel libroot posix string ;

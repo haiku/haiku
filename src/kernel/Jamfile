@@ -36,7 +36,7 @@ KernelLd kernel :
 
 	kernel_posix_locale.o
 	kernel_posix_main.o
-	kernel_posix_signal.o
+#	kernel_posix_signal.o
 	kernel_posix_stdio.o
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
@@ -69,7 +69,7 @@ KernelLd kernel.so :
 
 	kernel_posix_locale.o
 	kernel_posix_main.o
-	kernel_posix_signal.o
+#	kernel_posix_signal.o
 	kernel_posix_stdio.o
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
