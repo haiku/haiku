@@ -320,7 +320,8 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				NV_REG32(reg) = data;
 				NV_REG32(reg) = data2;
 				NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
-				NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
+				//don't touch!
+				//NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
 			}
 			break;
 		case 0x66: /* new on NV11 */
