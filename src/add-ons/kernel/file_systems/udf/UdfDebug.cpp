@@ -152,7 +152,7 @@
 
 static void indent(uint8 tabCount);
 static void unindent(uint8 tabCount);
-#ifdef USER
+#if !_KERNEL_MODE
 	static int32 get_tls_handle();
 #endif
 
@@ -181,7 +181,7 @@ int32 tls_handle = 0;
 int32
 _get_debug_indent_level()
 {
-#ifdef USER
+#if !_KERNEL_MODE
 	return (int32)tls_get(get_tls_handle());
 #else
 	return 1;
@@ -198,7 +198,7 @@ _get_debug_indent_level()
 void
 indent(uint8 tabCount)
 {
-#ifdef USER
+#if !_KERNEL_MODE
 	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()+tabCount));
 #endif
 }
@@ -209,12 +209,12 @@ indent(uint8 tabCount)
 void
 unindent(uint8 tabCount)
 {
-#ifdef USER
+#if !_KERNEL_MODE
 	tls_set(get_tls_handle(), (void*)(_get_debug_indent_level()-tabCount));
 #endif
 }
 
-#ifdef USER
+#if !_KERNEL_MODE
 /*! \brief Returns the thread local storage handle used to store
 	indentation information, allocating the handle first if
 	necessary.
@@ -305,7 +305,7 @@ dbg_printf(const char *format,...)
 	va_list args;
 	va_start(args, format);
 	// no vsnprintf() on PPC 
-	#if defined(__INTEL__) && USER
+	#if defined(__INTEL__) && !_KERNEL_MODE
 		vsnprintf(buffer, sizeof(buffer) - 1, format, args);
 	#else
 		vsprintf(buffer, format, args);

@@ -31,7 +31,7 @@ extern "C" {
 	#include <fsproto.h>
 }	// end extern "C"
 
-#ifdef USER
+#if !_KERNEL_MODE
 #	define dprintf printf
 #endif
 

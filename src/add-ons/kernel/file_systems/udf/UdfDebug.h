@@ -35,7 +35,7 @@ extern "C" int 	vsprintf(char *s, const char *format, va_list arg);
 	void dbg_printf(const char *format,...);
 	void initialize_debugger(const char *filename);
 #else
-#	ifdef USER 
+#	if !_KERNEL_MODE 
 //#		include <stdio.h> 
 #		define __out printf 
 #	else 
@@ -83,7 +83,7 @@ private:
 // DEBUG-independent macros
 //----------------------------------------------------------------------
 #define INFORM(x) { __out("udf: "); __out x; }
-#ifdef USER
+#if !_KERNEL_MODE
 #	define DIE(x) debugger x
 #else
 #	define DIE(x) kernel_debugger x
