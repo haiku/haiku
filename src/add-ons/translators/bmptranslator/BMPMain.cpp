@@ -56,40 +56,46 @@ main()
 {
 	BApplication app("application/x-vnd.obos-bmp-translator");
 	BMPTranslator *ptranslator = new BMPTranslator;
-	BView *v = NULL;
-	BRect r(0,0,225,175);
-	if (ptranslator->MakeConfigurationView(NULL, &v, &r)) {
-		BAlert *err = new BAlert("Error", "Something is wrong with the BMPTranslator!", "OK");
+	BView *view = NULL;
+	BRect rect(0, 0, 225, 175);
+	if (ptranslator->MakeConfigurationView(NULL, &view, &rect)) {
+		BAlert *err = new BAlert("Error",
+			"Unable to create the BMPTranslator view.", "OK");
 		err->Go();
 		return 1;
 	}
 	// release the translator even though I never really used it anyway
 	ptranslator->Release();
 	ptranslator = NULL;
-		
-	BMPWindow *w = new BMPWindow(r);
-	v->ResizeTo(r.Width(), r.Height());
-	w->AddChild(v);
-	BPoint o = B_ORIGIN;
+
+	BMPWindow *wnd = new BMPWindow(rect);
+	view->ResizeTo(rect.Width(), rect.Height());
+	wnd->AddChild(view);
+	BPoint wndpt = B_ORIGIN;
 	{
 		BScreen scrn;
-		BRect f = scrn.Frame();
-		f.InsetBy(10,23);
-		/* if not in a good place, start where the cursor is */
-		if (!f.Contains(o)) {
-			uint32 i;
-			v->GetMouse(&o, &i, false);
-			o.x -= r.Width()/2;
-			o.y -= r.Height()/2;
-			/* clamp location to screen */
-			if (o.x < f.left) o.x = f.left;
-			if (o.y < f.top) o.y = f.top;
-			if (o.x > f.right) o.x = f.right;
-			if (o.y > f.bottom) o.y = f.bottom;
+		BRect frame = scrn.Frame();
+		frame.InsetBy(10, 23);
+		// if the point is outside of the screen frame,
+		// use the mouse location to find a better point
+		if (!frame.Contains(wndpt)) {
+			uint32 dummy;
+			view->GetMouse(&wndpt, &dummy, false);
+			wndpt.x -= rect.Width() / 2;
+			wndpt.y -= rect.Height() / 2;
+			// clamp location to screen
+			if (wndpt.x < frame.left)
+				wndpt.x = frame.left;
+			if (wndpt.y < frame.top)
+				wndpt.y = frame.top;
+			if (wndpt.x > frame.right)
+				wndpt.x = frame.right;
+			if (wndpt.y > frame.bottom)
+				wndpt.y = frame.bottom;
 		}
 	}
-	w->MoveTo(o);
-	w->Show();
+	wnd->MoveTo(wndpt);
+	wnd->Show();
 	app.Run();
 
 	return 0;
