@@ -56,7 +56,7 @@ void
 platform_start_kernel(void)
 {
 	mmu_init_for_kernel();
-	printf("kernel args at %p\n", &gKernelArgs);
+	printf("kernel entry at %lx\n", gKernelEntry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
