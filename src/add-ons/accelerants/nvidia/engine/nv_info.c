@@ -174,7 +174,22 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 
 	LOG(8,("INFO: executing coldstart...\n"));
 
-//fixme: unlock regs etc...(!)
+	/* select colormode CRTC registers base adresses */
+	NV_REG8(NV8_MISCW) = 0xcb;
+
+	/* enable access to primary head */
+	set_crtc_owner(0);
+	/* unlock head's registers for R/W access */
+	CRTCW(LOCK, 0x57);
+	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	if (si->ps.secondary_head)
+	{
+		/* enable access to secondary head */
+		set_crtc_owner(1);
+		/* unlock head's registers for R/W access */
+		CRTC2W(LOCK, 0x57);
+		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	}
 
 	/* turn off both displays and the hardcursors (also disables transfers) */
 	nv_crtc_dpms(false, false, false);
@@ -192,6 +207,9 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 			if (exec_type1_script(rom, init1, &size) != B_OK) result = B_ERROR;
 		if (init2 && (result == B_OK))
 			if (exec_type1_script(rom, init2, &size) != B_OK) result = B_ERROR;
+
+		/* now enable ROM shadow or the card will remain shut-off! */
+		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
 	}
 	else
 	{
@@ -320,8 +338,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 				NV_REG32(reg) = data;
 				NV_REG32(reg) = data2;
 				NV_REG32(0x00001800 + NVCFG_AGPCMD) = safe32;
-				//don't touch!
-				//NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
+				NV_REG32(0x00001800 + NVCFG_ROMSHADOW) &= 0xfffffffe;
 			}
 			break;
 		case 0x66: /* new on NV11 */

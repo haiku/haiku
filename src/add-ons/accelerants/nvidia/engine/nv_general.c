@@ -782,7 +782,6 @@ void set_crtc_owner(bool head)
 static status_t nvxx_general_powerup()
 {
 	LOG(4, ("INIT: NV powerup\n"));
-	if (si->settings.logmask & 0x80000000) nv_dump_configuration_space();
 
 	/* fill-in the cardspecs in the shared_info PINS struct */
 	fake_pins();
@@ -802,6 +801,10 @@ static status_t nvxx_general_powerup()
 	{
 		LOG(2, ("INIT: Skipping card coldstart!\n"));
 	}
+
+	/* dump config space as it is after a possible coldstart attempt */
+	if (si->settings.logmask & 0x80000000) nv_dump_configuration_space();
+
 	/* log the final PINS struct settings */
 	dump_pins();
 
