@@ -33,8 +33,8 @@
 #include <stdlib.h>
 
 // System Includes -------------------------------------------------------------
-#include <Debug.h>
 #define DEBUG 1
+#include <Debug.h>
 #include <String.h>
 
 // Temporary Includes
@@ -209,8 +209,9 @@ void
 BString::CopyInto(char *into, int32 fromOffset, int32 length) const
 {
 	if (into) {
-		int32 len = min(Length() - fromOffset , length);
-		strncpy(into, _privateData + fromOffset, len);
+		int32 len = Length() - fromOffset;
+		len = min(len, length);
+		memcpy(into, _privateData + fromOffset, len);
 	}
 }
 
@@ -362,7 +363,7 @@ BString&
 BString::Insert(const BString &string, int32 pos)
 {
 	if (&string != this)
-		Insert(string.String(), pos); 
+		Insert(string.String(), pos); //TODO: Optimize
 	return *this;				  
 }
 
@@ -371,7 +372,7 @@ BString&
 BString::Insert(const BString &string, int32 length, int32 pos)
 {
 	if (&string != this)
-		Insert(string.String(), length, pos);
+		Insert(string.String(), length, pos); //TODO: Optimize
 	return *this;
 }
 
@@ -380,7 +381,7 @@ BString&
 BString::Insert(const BString &string, int32 fromOffset, int32 length, int32 pos)
 {
 	if (&string != this)
-		Insert(string.String(), fromOffset, length, pos);
+		Insert(string.String(), fromOffset, length, pos); //TODO: Optimize
 	return *this;
 }
 
@@ -403,12 +404,10 @@ BString::Truncate(int32 newLength, bool lazy = true)
 		return *this;
 		
 	if (newLength < Length()) {
-#if 0 
-		if (lazy)
-			; //ToDo: Implement?
-		else
-#endif		
-			_privateData = _GrowBy(newLength - Length()); //Negative	
+
+	//TODO: Implement lazy truncate?
+	
+		_privateData = _GrowBy(newLength - Length()); //Negative	
 		_privateData[Length()] = '\0';
 	}
 	return *this;
@@ -418,7 +417,7 @@ BString::Truncate(int32 newLength, bool lazy = true)
 BString&
 BString::Remove(int32 from, int32 length)
 {
-	_privateData = _ShrinkAtBy(from, length);
+	_ShrinkAtBy(from, length);
 	return *this;
 }
 
@@ -452,7 +451,7 @@ BString::RemoveAll(const BString &string)
 {
 	int32 pos = B_ERROR;
 	while ((pos = _FindAfter(string.String(), 0, -1)) >= 0)
-		_privateData = _ShrinkAtBy(pos, string.Length());
+		_ShrinkAtBy(pos, string.Length());
 
 	return *this;
 }
@@ -464,7 +463,7 @@ BString::RemoveFirst(const char *str)
 	if (str) {
 		int32 pos = _FindAfter(str, 0, -1);
 		if (pos >= 0)
-			_privateData = _ShrinkAtBy(pos, strlen(str));
+			_ShrinkAtBy(pos, strlen(str));
 	}
 	return *this;
 }
@@ -477,7 +476,7 @@ BString::RemoveLast(const char *str)
 		int32 len = strlen(str);
 		int32 pos = _FindBefore(str, len, -1);
 		if (pos >= 0)
-			_privateData = _ShrinkAtBy(pos, len);
+			_ShrinkAtBy(pos, len);
 	}
 	return *this;
 }
@@ -487,10 +486,10 @@ BString&
 BString::RemoveAll(const char *str)
 {
 	if (str) {
-		int32 pos = B_ERROR;
+		int32 pos;
 		int32 len = strlen(str);
 		while ((pos = _FindAfter(str, 0, -1)) >= 0)
-			_privateData = _ShrinkAtBy(pos, len);
+			_ShrinkAtBy(pos, len);
 	}
 	return *this;
 }
@@ -1392,11 +1391,12 @@ BString::_OpenAtBy(int32 offset, int32 length)
 
 char*
 BString::_ShrinkAtBy(int32 offset, int32 length)
-{
-	ASSERT(offset + length <= Length());
-	
+{	
 	int32 oldLength = Length();
-	
+
+	if (offset > oldLength || offset + length > oldLength)
+		return _privateData;
+
 	memmove(_privateData + offset, _privateData + offset + length,
 		Length() - offset - length);
 	
@@ -1475,9 +1475,6 @@ BString::_FindBefore(const char *str, int32 offset, int32) const
 		return B_ERROR;
 	
 	int len2 = strlen(str);
-
-	if (len2 == 0)
-		return 0;
 		
 	char *ptr1 = _privateData + offset - len2;
 	
@@ -1501,9 +1498,6 @@ BString::_IFindBefore(const char *str, int32 offset, int32) const
 		return B_ERROR;
 	
 	int len2 = strlen(str);
-
-	if (len2 == 0)
-		return 0;
 		
 	char *ptr1 = _privateData + offset - len2;
 	
