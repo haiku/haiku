@@ -30,7 +30,6 @@
 #include "ethernet_module.h"
 
 #include <KernelExport.h>
-#define spawn_thread spawn_kernel_thread
 #define printf dprintf
 
 /* forward prototypes */
@@ -970,7 +969,7 @@ static int ether_init(void *cpp)
 		core = (struct core_module_info*) cpp;
 	
 	etherq = start_ifq();
-	ether_rxt = spawn_thread(ether_input, "ethernet_input", 50, NULL);
+	ether_rxt = spawn_kernel_thread(ether_input, "ethernet_input", B_REAL_TIME_DISPLAY_PRIORITY, NULL);
 	if (ether_rxt > 0)
 		resume_thread(ether_rxt);
 	

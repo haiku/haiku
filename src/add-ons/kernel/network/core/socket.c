@@ -44,9 +44,6 @@ static benaphore sockets_lock;
 /* OpenBSD sets this at 128??? */
 static int somaxconn = SOMAXCONN;
 
-/* for now - should be moved to be_error.h */
-#define EDESTADDRREQ EINVAL
-
 int sockets_init(void)
 {
 	if (!spool)

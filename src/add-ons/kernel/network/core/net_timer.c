@@ -8,10 +8,7 @@
 
 #include <OS.h>
 #include <malloc.h>
-
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
-#endif
 
 #include "net_timer.h"
 
@@ -57,11 +54,9 @@ net_init_timer(void)
 #ifdef _KERNEL_MODE
 	set_sem_owner(gTimerInfo.ti_lock, B_SYSTEM_TEAM);
 	set_sem_owner(gTimerInfo.ti_wait, B_SYSTEM_TEAM);
-	
-	thread = spawn_kernel_thread(net_timer,"net timer",B_NORMAL_PRIORITY,&gTimerInfo);
-#else
-	thread = spawn_thread(net_timer,"net timer",B_NORMAL_PRIORITY,&gTimerInfo);
-#endif
+#endif	
+
+	thread = spawn_kernel_thread(net_timer, "net timer", B_NORMAL_PRIORITY, &gTimerInfo);
 	if (thread < B_OK)
 		return thread;
 
