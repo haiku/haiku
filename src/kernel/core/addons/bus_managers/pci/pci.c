@@ -1373,7 +1373,7 @@ pci_module_uninit(void)
 }
 
 
-static int
+static int32
 std_ops(int32 op, ...)
 {
 	switch(op) {

@@ -26,7 +26,7 @@ static status_t cfdm_get_next_device_info(bus_type bus, uint64 *cookie,
 }
 	
 /* device_modules */
-static int cfdm_std_ops(int32 op, ...)
+static int32 cfdm_std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
@@ -46,7 +46,7 @@ static int cfdm_std_ops(int32 op, ...)
 }
 
 /* bus_modules */
-static int cfbm_std_ops(int32 op, ...)
+static int32 cfbm_std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:

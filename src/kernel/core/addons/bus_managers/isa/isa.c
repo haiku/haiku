@@ -80,7 +80,7 @@ static long unlock_isa_dma_channel(long channel)
 	return ENOSYS;
 }
 
-static int std_ops(int32 op, ...)
+static int32 std_ops(int32 op, ...)
 {
 	switch(op) {
 		case B_MODULE_INIT:
