@@ -1,0 +1,76 @@
+SubDir OBOS_TOP src apps bin zip ;
+
+BinCommand zip :
+	zip.c
+	zipup.c
+	crypt.c
+	ttyio.c
+	beos.c
+	globals.c
+	deflate.c
+	fileio.c
+	util.c
+	crc32.c
+	zipfile.c
+	trees.c
+	crctab.c
+;
+
+LinkSharedOSLibs zip : be ;
+
+BinCommand zipcloak :
+	zipcloak.c
+	zipup.c
+	crypt.c
+	ttyio.c
+	beos.c
+	globals.c
+	deflate.c
+	fileio.c
+	util.c
+	crc32.c
+	zipfile.c
+	trees.c
+	crctab.c
+	bedefs.c
+;
+
+LinkSharedOSLibs zipcloak : be ;
+
+BinCommand zipnote :
+	zipnote.c
+	zipup.c
+	crypt.c
+	ttyio.c
+	beos.c
+	globals.c
+	deflate.c
+	fileio.c
+	util.c
+	crc32.c
+	zipfile.c
+	trees.c
+	crctab.c
+	bedefs.c
+;
+
+LinkSharedOSLibs zipnote : be ;
+
+BinCommand zipsplit :
+	zipsplit.c
+	zipup.c
+	crypt.c
+	ttyio.c
+	beos.c
+	globals.c
+	deflate.c
+	fileio.c
+	util.c
+	crc32.c
+	zipfile.c
+	trees.c
+	crctab.c
+	bedefs.c
+;
+
+LinkSharedOSLibs zipsplit : be ;
