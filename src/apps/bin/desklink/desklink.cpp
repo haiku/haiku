@@ -43,27 +43,29 @@
 #define TOGGLE_DONT_BEEP 'tdbp'
 #define SET_VOLUME_WHICH 'svwh'
 
+#define VOLUME_CTL_NAME "MediaReplicant" /* R5 name needed, Media prefs manel removes by name */
+
 #define SETTINGS_FILE "x-vnd.OBOS.DeskbarVolumeControlSettings"
 
 const char *app_signature = "application/x-vnd.be.desklink";
 // the application signature used by the replicant to find the supporting
 // code
 
-class _EXPORT VCButton;
+class _EXPORT MediaReplicant;
 	// the dragger part has to be exported
 
-class VCButton : public BView {
+class MediaReplicant : public BView {
 public:
-	VCButton(BRect frame, const char *name,
+	MediaReplicant(BRect frame, const char *name,
 		uint32 resizeMask = B_FOLLOW_ALL, 
 		uint32 flags = B_WILL_DRAW | B_NAVIGABLE | B_PULSE_NEEDED);
 		
-	VCButton(BMessage *);
+	MediaReplicant(BMessage *);
 		// BMessage * based constructor needed to support archiving
-	virtual ~VCButton();
+	virtual ~MediaReplicant();
 
 	// archiving overrides
-	static VCButton *Instantiate(BMessage *data);
+	static MediaReplicant *Instantiate(BMessage *data);
 	virtual	status_t Archive(BMessage *data, bool deep = true) const;
 
 
@@ -92,11 +94,11 @@ extern "C" _EXPORT BView* instantiate_deskbar_item();
 BView *
 instantiate_deskbar_item()
 {
-	return new VCButton(BRect(0, 0, 16, 16), "VCButton");
+	return new MediaReplicant(BRect(0, 0, 16, 16), VOLUME_CTL_NAME);
 }
 
 
-VCButton::VCButton(BRect frame, const char *name,
+MediaReplicant::MediaReplicant(BRect frame, const char *name,
 	uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask, flags)
 {
@@ -117,7 +119,7 @@ VCButton::VCButton(BRect frame, const char *name,
 }
 
 
-VCButton::VCButton(BMessage *message)
+MediaReplicant::MediaReplicant(BMessage *message)
 	:	BView(message),
 		volumeSlider(NULL)
 {
@@ -128,7 +130,7 @@ VCButton::VCButton(BMessage *message)
 }
 
 
-VCButton::~VCButton()
+MediaReplicant::~MediaReplicant()
 {
 	delete segments;
 	SaveSettings();
@@ -136,17 +138,17 @@ VCButton::~VCButton()
 
 
 // archiving overrides
-VCButton *
-VCButton::Instantiate(BMessage *data)
+MediaReplicant *
+MediaReplicant::Instantiate(BMessage *data)
 {
-	if (!validate_instantiation(data, "VCButton"))
+	if (!validate_instantiation(data, VOLUME_CTL_NAME))
 		return NULL;
-	return new VCButton(data);
+	return new MediaReplicant(data);
 }
 
 
 status_t 
-VCButton::Archive(BMessage *data, bool deep) const
+MediaReplicant::Archive(BMessage *data, bool deep) const
 {
 	BView::Archive(data, deep);
 
@@ -156,7 +158,7 @@ VCButton::Archive(BMessage *data, bool deep) const
 
 
 void
-VCButton::MessageReceived(BMessage *message)
+MediaReplicant::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 	case B_ABOUT_REQUESTED:
@@ -190,7 +192,7 @@ VCButton::MessageReceived(BMessage *message)
 
 
 void 
-VCButton::Draw(BRect rect)
+MediaReplicant::Draw(BRect rect)
 {
 	BView::Draw(rect);
 	
@@ -200,7 +202,7 @@ VCButton::Draw(BRect rect)
 
 
 void
-VCButton::MouseDown(BPoint point)
+MediaReplicant::MouseDown(BPoint point)
 {
 	uint32 mouseButtons;
 	BPoint where;
@@ -247,12 +249,12 @@ VCButton::MouseDown(BPoint point)
 
 
 void
-VCButton::MouseUp(BPoint point)
+MediaReplicant::MouseUp(BPoint point)
 {
 	/* don't Quit() ! thanks for FFM users */
 }
 
-void VCButton::LoadSettings()
+void MediaReplicant::LoadSettings()
 {
 	confDontBeep = false;
 	confVolumeWhich = VOLUME_USE_MIXER;
@@ -270,7 +272,7 @@ void VCButton::LoadSettings()
 	msg.FindBool("dontbeep", &confDontBeep);
 }
 
-void VCButton::SaveSettings()
+void MediaReplicant::SaveSettings()
 {
 	BPath p;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &p, false) < B_OK)
