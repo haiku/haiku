@@ -55,7 +55,14 @@ platform_user_menu_requested(void)
 void
 platform_start_kernel(void)
 {
+	struct kernel_args *args = &gKernelArgs;
+		// something goes wrong when we pass &gKernelArgs directly
+		// to the assembler inline below - might be a bug in GCC
+		// or I don't see something important...
+
 	mmu_init_for_kernel();
+	//cpu_boot_other_cpus();
+
 	printf("kernel entry at %lx\n", gKernelEntry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
@@ -66,7 +73,7 @@ platform_start_kernel(void)
 		"pushl 	$0x0;"					// dummy retval for call to main
 		"pushl 	%1;	"					// this is the start address
 		"ret;		"					// jump.
-		: : "g" (&gKernelArgs), "g" (gKernelEntry));
+		: : "g" (args), "g" (gKernelEntry));
 }
 
 
@@ -86,6 +93,7 @@ _start(void)
 	args.heap_size = HEAP_SIZE;
 
 	console_init();
+	//cpu_init();
 	mmu_init();
 
 	main(&args);
