@@ -50,6 +50,7 @@ struct fs_calls {
 	int (*fs_sync)(fs_cookie fs);
 
 	int (*fs_lookup)(fs_cookie fs, fs_vnode dir, const char *name, vnode_id *id);
+	int (*fs_get_vnode_name)(fs_cookie fs, fs_vnode vnode, char *buffer, size_t bufferSize);
 
 	int (*fs_get_vnode)(fs_cookie fs, vnode_id id, fs_vnode *v, bool r);
 	int (*fs_put_vnode)(fs_cookie fs, fs_vnode v, bool r);

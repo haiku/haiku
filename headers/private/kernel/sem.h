@@ -9,6 +9,7 @@
 #ifndef _SEM_H
 #define _SEM_H
 
+#include <OS.h>
 #include <thread.h>
 #include <stage2.h>
 
