@@ -100,7 +100,7 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 
 	memset(&sync, 0, sizeof(select_sync));
 
-	sync.sem = create_sem(1, "select");
+	sync.sem = create_sem(0, "select");
 	if (sync.sem < B_OK)
 		return sync.sem;
 
@@ -138,10 +138,28 @@ common_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 	status = acquire_sem_etc(sync.sem, 1,
 		B_CAN_INTERRUPT | (timeout != -1 ? B_RELATIVE_TIMEOUT : 0), timeout);
 
+	PRINT(("common_select(): acquire_sem_etc() returned: %lx\n", status));
+
 	// deselect file descriptors
 
 	for (fd = 0; fd < numfds; fd++)
 		deselect_events(&sync, fd, sync.set[fd].selected_events, kernel);
+		// ToDo: Since we're using FD indices instead of FDs (file_descriptors),
+		// it can happen that the FD index (even the FD) on which we invoked
+		// the select() FS hook is already closed at this point.
+		// This has two main consequences:
+		// 1) deselect() is not invoked, if a currently selected FD index is
+		//    closed. Thus on close of a FD the FS would need to cleanup the
+		//    select resources it had acquired. Harmless.
+		// 2) Caused by 1): If the FS close hook invokes notify_select_event()
+		//    (which is a nice gesture, though actually undefined by the
+		//    POSIX standard), it has no means of synchronization with the
+		//    pending select() (since deselect() won't be invoked), i.e. a
+		//    second call to notify_select_event() might be too late, since
+		//    select() might already be finished. Dangerous!
+		//    notify_select_event() would operate on already free()d memory!
+
+	PRINT(("common_select(): events deselected\n"));
 
 	// collect the events that are happened in the meantime
 
@@ -197,7 +215,7 @@ common_poll(struct pollfd *fds, nfds_t numfds, bigtime_t timeout, bool kernel)
 	select_sync sync;
 	memset(&sync, 0, sizeof(select_sync));
 
-	sync.sem = create_sem(1, "poll");
+	sync.sem = create_sem(0, "poll");
 	if (sync.sem < B_OK)
 		return sync.sem;
 
@@ -334,6 +352,8 @@ add_select_sync_pool_entry(select_sync_pool *pool, selectsync *sync,
 		entry->sync = sync;
 		entry->ref = ref;
 		entry->events = 0;
+
+		pool->entries.Add(entry);
 	}
 
 	entry->events |= SELECT_FLAG(event);
@@ -408,10 +428,27 @@ remove_select_sync_pool_entry(select_sync_pool **_pool, selectsync *sync,
 
 
 void
+delete_select_sync_pool(select_sync_pool *pool)
+{
+	if (!pool)
+		return;
+
+	while (select_sync_pool_entry *entry = pool->entries.Head()) {
+		pool->entries.Remove(entry);
+		delete entry;
+	}
+
+	delete pool;
+}
+
+
+void
 notify_select_event_pool(select_sync_pool *pool, uint8 event)
 {
 	if (!pool)
 		return;
+
+	FUNCTION(("notify_select_event_pool(%p, %u)\n", pool, event));
 
 	for (SelectSyncPoolEntryList::Iterator it = pool->entries.GetIterator();
 		 it.HasNext();) {
