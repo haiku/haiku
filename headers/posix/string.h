@@ -1,10 +1,13 @@
+/*
+ * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _STRING_H_
 #define _STRING_H_
-/* 
-** Distributed under the terms of the OpenBeOS License.
-*/
+
 
 #include <sys/types.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -47,21 +50,9 @@ extern size_t	strxfrm(char *string1, const char *string2, size_t length);
 extern char		*strerror(int errorCode);
 extern int		strerror_r(int errorCode, char *buffer, size_t bufferSize);
 
-// ToDo: remove bzero(), bcopy() from here - we don't need those
-//	implementations anyway, since BeOS defines them as macros
-//	Of course, we could also just keep them (and bcmp() is missing)
-//extern void  *bcopy(void const *source, void *dest, size_t length);
-//extern void   bzero(void *buffer, size_t length);
-#define bcopy(source, dest, length) memcpy(dest, source, length)
-#define bzero(buffer, length) memset(buffer, 0, length)
-
 /* non-standard string functions */
 extern int		strcasecmp(const char *string1, const char *string2);
 extern int		strncasecmp(const char *string1, const char *string2, size_t length);
-#define	stricmp(a, b)	strcasecmp(a, b)
-//#define strnicmp(a, b, length) strncasecmp(a, b, length)
-// ToDo: remove the function, and only have the macro
-extern int		strnicmp(const char *string1, const char *string2, size_t length);
 
 extern char		*strcasestr(const char *string, const char *searchString);
 
@@ -80,6 +71,11 @@ extern size_t	strnlen(const char *string, size_t count);
 //extern char		*strsep(char **stringPointer, const char *delimiter);
 
 extern const char	*strsignal(int signal);
+
+/* legacy compatibility -- might be removed one day */
+#define bcmp(a, b, length) memcmp((a), (b), (length))
+#define bcopy(source, dest, length) memcpy((dest), (source), (length))
+#define bzero(buffer, length) memset((buffer), 0, (length))
 
 #ifdef __cplusplus
 }
