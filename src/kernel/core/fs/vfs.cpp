@@ -4631,13 +4631,6 @@ _kern_next_device(int32 *_cookie)
 }
 
 
-dev_t
-next_dev(int32 *_cookie)
-{
-	return fs_next_device(_cookie);
-}
-
-
 int
 _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 {
@@ -4649,19 +4642,20 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 
 
 /**	\brief Opens a node specified by a FD + path pair.
+ *
+ *	At least one of \a fd and \a path must be specified.
+ *	If only \a fd is given, the function opens the node identified by this
+ *	FD. If only a path is given, this path is opened. If both are given and
+ *	the path is absolute, \a fd is ignored; a relative path is reckoned off
+ *	of the directory (!) identified by \a fd.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. May be \c NULL.
+ *	\param omode The open mode.
+ *	\return A FD referring to the newly opened node, or an error code,
+ *			if an error occurs.
+ */
 
-	At least one of \a fd and \a path must be specified.
-	If only \a fd is given, the function opens the node identified by this
-	FD. If only a path is given, this path is opened. If both are given and
-	the path is absolute, \a fd is ignored; a relative path is reckoned off
-	of the directory (!) identified by \a fd.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. May be \c NULL.
-	\param omode The open mode.
-	\return A FD referring to the newly opened node, or an error code,
-			if an error occurs.
-*/
 int
 _kern_open(int fd, const char *path, int omode)
 {
@@ -4673,23 +4667,24 @@ _kern_open(int fd, const char *path, int omode)
 
 
 /**	\brief Opens a directory specified by entry_ref or node_ref.
+ *
+ *	The supplied name may be \c NULL, in which case directory identified
+ *	by \a device and \a inode will be opened. Otherwise \a device and
+ *	\a inode identify the parent directory of the directory to be opened
+ *	and \a name its entry name.
+ *
+ *	\param device If \a name is specified the ID of the device the parent
+ *		   directory of the directory to be opened resides on, otherwise
+ *		   the device of the directory itself.
+ *	\param inode If \a name is specified the node ID of the parent
+ *		   directory of the directory to be opened, otherwise node ID of the
+ *		   directory itself.
+ *	\param name The entry name of the directory to be opened. If \c NULL,
+ *		   the \a device + \a inode pair identify the node to be opened.
+ *	\return The FD of the newly opened directory or an error code, if
+ *			something went wrong.
+ */
 
-	The supplied name may be \c NULL, in which case directory identified
-	by \a device and \a inode will be opened. Otherwise \a device and
-	\a inode identify the parent directory of the directory to be opened
-	and \a name its entry name.
-
-	\param device If \a name is specified the ID of the device the parent
-		   directory of the directory to be opened resides on, otherwise
-		   the device of the directory itself.
-	\param inode If \a name is specified the node ID of the parent
-		   directory of the directory to be opened, otherwise node ID of the
-		   directory itself.
-	\param name The entry name of the directory to be opened. If \c NULL,
-		   the \a device + \a inode pair identify the node to be opened.
-	\return The FD of the newly opened directory or an error code, if
-			something went wrong.
-*/
 int
 _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 {
@@ -4698,18 +4693,19 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 
 
 /**	\brief Opens a directory specified by a FD + path pair.
+ *
+ *	At least one of \a fd and \a path must be specified.
+ *	If only \a fd is given, the function opens the directory identified by this
+ *	FD. If only a path is given, this path is opened. If both are given and
+ *	the path is absolute, \a fd is ignored; a relative path is reckoned off
+ *	of the directory (!) identified by \a fd.
+ *
+ *	\param fd The FD. May be < 0.
+ *	\param path The absolute or relative path. May be \c NULL.
+ *	\return A FD referring to the newly opened directory, or an error code,
+ *			if an error occurs.
+ */
 
-	At least one of \a fd and \a path must be specified.
-	If only \a fd is given, the function opens the directory identified by this
-	FD. If only a path is given, this path is opened. If both are given and
-	the path is absolute, \a fd is ignored; a relative path is reckoned off
-	of the directory (!) identified by \a fd.
-
-	\param fd The FD. May be < 0.
-	\param path The absolute or relative path. May be \c NULL.
-	\return A FD referring to the newly opened directory, or an error code,
-			if an error occurs.
-*/
 int
 _kern_open_dir(int fd, const char *path)
 {
