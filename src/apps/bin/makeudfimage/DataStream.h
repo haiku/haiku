@@ -15,6 +15,8 @@
 
 class DataStream : public BPositionIO {
 public:
+	virtual status_t InitCheck() const = 0;
+
 	virtual ssize_t Read(void *buffer, size_t size) = 0;
 	virtual	ssize_t ReadAt(off_t pos, void *buffer, size_t size) = 0;
 
