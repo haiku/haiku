@@ -204,23 +204,120 @@ do_make(int argc, char **argv)
 }
 
 
+static status_t
+create_dir(const char *path, bool createParents)
+{
+	// stat the entry
+	struct my_stat st;
+	status_t error = sys_rstat(true, -1, path, &st, false);
+	if (error == FS_OK) {
+		if (createParents && MY_S_ISDIR(st.mode))
+			return FS_OK;
+
+		fprintf(stderr, "Cannot make dir, entry `%s' is in the way.\n", path);
+		return FS_FILE_EXISTS;
+	}
+
+	// the dir doesn't exist yet
+	// if we shall create all parents, do that first
+	if (createParents) {
+		// create the parent dir path
+		// eat the trailing '/'s
+		int len = strlen(path);
+		while (len > 0 && path[len - 1] == '/')
+			len--;
+
+		// eat the last path component
+		while (len > 0 && path[len - 1] != '/')
+			len--;
+
+		// eat the trailing '/'s
+		while (len > 0 && path[len - 1] == '/')
+			len--;
+
+		// Now either nothing remains, which means we had a single component,
+		// a root subdir -- in those cases we can just fall through (we should
+		// actually never be here in case of the root dir, but anyway) -- or
+		// there is something left, which we can call a parent directory and
+		// try to create it.
+		if (len > 0) {
+			char *parentPath = (char*)malloc(len + 1);
+			if (!parentPath) {
+				fprintf(stderr, "Failed to allocate memory for parent path.\n");
+				return FS_NO_MEMORY;
+			}
+			memcpy(parentPath, path, len);
+			parentPath[len] = '\0';
+
+			error = create_dir(parentPath, createParents);
+
+			free(parentPath);
+
+			if (error != FS_OK)
+				return error;
+		}
+	}
+
+	// make the directory
+	error = sys_mkdir(true, -1, path, MY_S_IRWXU);
+	if (error != FS_OK) {
+		fprintf(stderr, "Failed to make directory `%s': %s\n", path,
+			fs_strerror(error));
+		return error;
+	}
+
+	return FS_OK;
+}
+
 
 static int
 do_mkdir(int argc, char **argv)
 {
-    int err;
-    char name[64];
+	bool createParents = false;
 
-    if (argc < 2) 
-        make_random_name(name, sizeof(name));
-    else
-        sprintf(name, "/myfs/%s", &argv[1][0]);
+	// parse parameters
+	int argi = 1;
+	for (argi = 1; argi < argc; argi++) {
+		const char *arg = argv[argi];
+		if (arg[0] != '-')
+			break;
 
-    err = sys_mkdir(1, -1, name, MY_S_IRWXU);
-    if (err)
-        printf("mkdir of %s returned: %s (%d)\n", name, fs_strerror(err), err);
+		if (arg[1] == '\0') {
+			fprintf(stderr, "Invalid option `-'\n");
+			return FS_EINVAL;
+		}
 
-	return err;
+		for (int i = 1; arg[i]; i++) {
+			switch (arg[i]) {
+				case 'p':
+					createParents = true;
+					break;
+				default:
+					fprintf(stderr, "Unknown option `-%c'\n", arg[i]);
+					return FS_EINVAL;
+			}
+		}
+	}
+
+	if (argi >= argc) {
+		printf("usage: %s [ -p ] <dir>...\n", argv[0]);
+		return FS_EINVAL;
+	}
+
+	// create loop
+	for (; argi < argc; argi++) {
+		const char *dir = argv[argi];
+		if (strlen(dir) == 0) {
+			fprintf(stderr, "An empty path is not a valid argument!\n");
+			return FS_EINVAL;
+		}
+
+		status_t error = create_dir(dir, createParents);
+		if (error != FS_OK)
+			return error;
+	}
+
+	return FS_OK;
 }
 
 
