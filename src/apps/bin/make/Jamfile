@@ -29,6 +29,6 @@ BinCommand make :
 	variable.c
 	version.c
 	vpath.c
-: libglob.a ;
+: libglob.a : make.rdef ;
 
 SubInclude OBOS_TOP src apps bin make glob ;
