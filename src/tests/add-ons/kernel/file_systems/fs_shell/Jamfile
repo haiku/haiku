@@ -10,6 +10,8 @@ include [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell
 
 SetupFSShellIncludes ;
 
+UsePrivateHeaders shared ;
+
 rule BuildLibFSShell
 {
 	SetupObjectsDir ;
@@ -39,7 +41,8 @@ rule BuildLibFSShell
 BuildLibFSShell libfs_shell.a
 	:
 	fsh.cpp rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
-	stub.c tracker.cpp sysdep.c hexdump.c argv.c errors.cpp
+	stub.c tracker.cpp sysdep.c hexdump.c argv.c errors.cpp xcp.cpp
+	path_util.cpp stat_util.cpp
 ;
 
 
