@@ -19,39 +19,34 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Registrar.h
+//	File Name:		Event.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	Registrar application.
+//					YellowBites (http://www.yellowbites.com)
+//	Description:	Base class for events as handled by EventQueue.
 //------------------------------------------------------------------------------
-#ifndef REGISTRAR_H
-#define REGISTRAR_H
 
-#include <Application.h>
+#ifndef EVENT_H
+#define EVENT_H
 
-class ClipboardHandler;
-class EventQueue;
-class MessageRunnerManager;
-class MIMEManager;
+#include <OS.h>
 
-namespace BPrivate {
-	class TRoster;
-};
-
-class Registrar : public BApplication {
+class Event {
 public:
-	Registrar();
-	virtual ~Registrar();
+	Event(bool autoDelete = true);
+	Event(bigtime_t time, bool autoDelete = true);
+	virtual ~Event();
 
-	virtual void MessageReceived(BMessage *message);
-	virtual void ReadyToRun();
-	virtual bool QuitRequested();
+	void SetTime(bigtime_t time);
+	bigtime_t Time() const;
 
-private:
-	BPrivate::TRoster		*fRoster;
-	ClipboardHandler		*fClipboardHandler;
-	MIMEManager				*fMIMEManager;
-	EventQueue				*fEventQueue;
-	MessageRunnerManager	*fMessageRunnerManager;
+	void SetAutoDelete(bool autoDelete);
+	bool IsAutoDelete() const;
+
+	virtual	bool Do();
+
+ private:
+	bigtime_t		fTime;
+	bool			fAutoDelete;
 };
 
-#endif	// REGISTRAR_H
+#endif	// EVENT_H

@@ -19,39 +19,65 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Registrar.h
+//	File Name:		MessageRunnerManager.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	Registrar application.
+//	Description:	Manages the registrar side "shadows" of BMessageRunners.
 //------------------------------------------------------------------------------
-#ifndef REGISTRAR_H
-#define REGISTRAR_H
 
-#include <Application.h>
+#ifndef MESSAGE_RUNNER_MANAGER_H
+#define MESSAGE_RUNNER_MANAGER_H
 
-class ClipboardHandler;
+#include <List.h>
+#include <Locker.h>
+
+class BMessage;
 class EventQueue;
-class MessageRunnerManager;
-class MIMEManager;
 
-namespace BPrivate {
-	class TRoster;
-};
-
-class Registrar : public BApplication {
+class MessageRunnerManager {
 public:
-	Registrar();
-	virtual ~Registrar();
+	MessageRunnerManager(EventQueue *eventQueue);
+	virtual ~MessageRunnerManager();
 
-	virtual void MessageReceived(BMessage *message);
-	virtual void ReadyToRun();
-	virtual bool QuitRequested();
+	void HandleRegisterRunner(BMessage *request);
+	void HandleUnregisterRunner(BMessage *request);
+	void HandleSetRunnerParams(BMessage *request);
+	void HandleGetRunnerInfo(BMessage *request);
+
+	bool Lock();
+	void Unlock();
 
 private:
-	BPrivate::TRoster		*fRoster;
-	ClipboardHandler		*fClipboardHandler;
-	MIMEManager				*fMIMEManager;
-	EventQueue				*fEventQueue;
-	MessageRunnerManager	*fMessageRunnerManager;
+	class RunnerEvent;
+	struct RunnerInfo;
+	friend class RunnerEvent;
+
+private:
+	bool _AddInfo(RunnerInfo *info);
+	bool _RemoveInfo(RunnerInfo *info);
+	RunnerInfo *_RemoveInfo(int32 index);
+	RunnerInfo *_RemoveInfoWithToken(int32 token);
+	bool _DeleteInfo(RunnerInfo *info, bool eventRemoved);
+
+	int32 _CountInfos() const;
+
+	RunnerInfo *_InfoAt(int32 index) const;
+	RunnerInfo *_InfoForToken(int32 token) const;
+
+	bool _HasInfo(RunnerInfo *info) const;
+
+	int32 _IndexOf(RunnerInfo *info) const;
+	int32 _IndexOfToken(int32 token) const;
+
+	bool _DoEvent(RunnerInfo *info);
+	bool _ScheduleEvent(RunnerInfo *info);
+
+	int32 _NextToken();
+
+private:
+	BList		fRunnerInfos;
+	BLocker		fLock;
+	EventQueue	*fEventQueue;
+	int32		fNextToken;
 };
 
-#endif	// REGISTRAR_H
+#endif	// MESSAGE_RUNNER_MANAGER_H

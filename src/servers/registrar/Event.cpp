@@ -19,39 +19,65 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Registrar.h
+//	File Name:		Event.cpp
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	Registrar application.
+//					YellowBites (http://www.yellowbites.com)
+//	Description:	Base class for events as handled by EventQueue.
 //------------------------------------------------------------------------------
-#ifndef REGISTRAR_H
-#define REGISTRAR_H
 
-#include <Application.h>
+#include "Event.h"
 
-class ClipboardHandler;
-class EventQueue;
-class MessageRunnerManager;
-class MIMEManager;
+// constructor
+Event::Event(bool autoDelete)
+	: fTime(0),
+	  fAutoDelete(autoDelete)
+{
+}
 
-namespace BPrivate {
-	class TRoster;
-};
+// constructor
+Event::Event(bigtime_t time, bool autoDelete)
+	: fTime(time),
+	  fAutoDelete(autoDelete)
+{
+}
 
-class Registrar : public BApplication {
-public:
-	Registrar();
-	virtual ~Registrar();
+// destructor
+Event::~Event()
+{
+}
 
-	virtual void MessageReceived(BMessage *message);
-	virtual void ReadyToRun();
-	virtual bool QuitRequested();
+// SetTime
+void
+Event::SetTime(bigtime_t time)
+{
+	fTime = time;
+}
 
-private:
-	BPrivate::TRoster		*fRoster;
-	ClipboardHandler		*fClipboardHandler;
-	MIMEManager				*fMIMEManager;
-	EventQueue				*fEventQueue;
-	MessageRunnerManager	*fMessageRunnerManager;
-};
+// Time
+bigtime_t
+Event::Time() const
+{
+	return fTime;
+}
 
-#endif	// REGISTRAR_H
+// SetAutoDelete
+void
+Event::SetAutoDelete(bool autoDelete)
+{
+	fAutoDelete = autoDelete;
+}
+
+// IsAutoDelete
+bool
+Event::IsAutoDelete() const
+{
+	return fAutoDelete;
+}
+
+// Do
+bool
+Event::Do()
+{
+	return fAutoDelete;
+}
+

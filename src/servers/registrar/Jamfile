@@ -7,6 +7,9 @@ UsePrivateHeaders storage ;
 Server obos_registrar :
 	AppInfoList.cpp
 	ClipboardHandler.cpp
+	Event.cpp
+	EventQueue.cpp
+	MessageRunnerManager.cpp
 	MIMEManager.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp

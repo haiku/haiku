@@ -8,9 +8,13 @@
 #include <RegistrarDefs.h>
 
 #include "ClipboardHandler.h"
+#include "EventQueue.h"
+#include "MessageRunnerManager.h"
 #include "MIMEManager.h"
 #include "Registrar.h"
 #include "TRoster.h"
+
+static const char *kEventQueueName = "timer_thread";
 
 /*!
 	\class Registrar
@@ -26,7 +30,9 @@ Registrar::Registrar()
 		 : BApplication(kRegistrarSignature),
 		   fRoster(NULL),
 		   fClipboardHandler(NULL),
-		   fMIMEManager(NULL)
+		   fMIMEManager(NULL),
+		   fEventQueue(NULL),
+		   fMessageRunnerManager(NULL)
 {
 	FUNCTION_START();
 }
@@ -41,6 +47,9 @@ Registrar::~Registrar()
 {
 	FUNCTION_START();
 	Lock();
+	fEventQueue->Die();
+	delete fMessageRunnerManager;
+	delete fEventQueue;
 	fMIMEManager->Lock();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
@@ -59,6 +68,7 @@ Registrar::MessageReceived(BMessage *message)
 {
 	FUNCTION_START();
 	switch (message->what) {
+		// general requests
 		case B_REG_GET_MIME_MESSENGER:
 		{
 			PRINT(("B_REG_GET_MIME_MESSENGER\n"));
@@ -77,6 +87,7 @@ Registrar::MessageReceived(BMessage *message)
 			message->SendReply(&reply);
 			break;
 		}
+		// roster requests
 		case B_REG_ADD_APP:
 			fRoster->HandleAddApplication(message);
 			break;
@@ -107,6 +118,19 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_ACTIVATE_APP:
 			fRoster->HandleActivateApp(message);
 			break;
+		// message runner requests
+		case B_REG_REGISTER_MESSAGE_RUNNER:
+			fMessageRunnerManager->HandleRegisterRunner(message);
+			break;
+		case B_REG_UNREGISTER_MESSAGE_RUNNER:
+			fMessageRunnerManager->HandleUnregisterRunner(message);
+			break;
+		case B_REG_SET_MESSAGE_RUNNER_PARAMS:
+			fMessageRunnerManager->HandleSetRunnerParams(message);
+			break;
+		case B_REG_GET_MESSAGE_RUNNER_INFO:
+			fMessageRunnerManager->HandleGetRunnerInfo(message);
+			break;
 		default:
 			BApplication::MessageReceived(message);
 			break;
@@ -131,6 +155,9 @@ Registrar::ReadyToRun()
 	// create MIME manager
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
+	// create message runner manager
+	fEventQueue = new EventQueue(kEventQueueName);
+	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);
 	// init the global be_roster
 	BPrivate::init_registrar_roster(be_app_messenger,
 									BMessenger(NULL, fMIMEManager));

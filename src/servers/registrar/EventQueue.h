@@ -19,39 +19,48 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Registrar.h
+//	File Name:		EventQueue.h
 //	Author:			Ingo Weinhold (bonefish@users.sf.net)
-//	Description:	Registrar application.
+//					YellowBites (http://www.yellowbites.com)
+//	Description:	A class featuring providing a mechanism to do events at
+//					specified times.
 //------------------------------------------------------------------------------
-#ifndef REGISTRAR_H
-#define REGISTRAR_H
 
-#include <Application.h>
+#ifndef EVENT_QUEUE_H
+#define EVENT_QUEUE_H
 
-class ClipboardHandler;
-class EventQueue;
-class MessageRunnerManager;
-class MIMEManager;
+#include <List.h>
+#include <Locker.h>
+#include <OS.h>
 
-namespace BPrivate {
-	class TRoster;
-};
+class Event;
 
-class Registrar : public BApplication {
+class EventQueue : public BLocker {
 public:
-	Registrar();
-	virtual ~Registrar();
+	EventQueue(const char *name = NULL);
+	virtual ~EventQueue();
 
-	virtual void MessageReceived(BMessage *message);
-	virtual void ReadyToRun();
-	virtual bool QuitRequested();
+	status_t InitCheck();
 
-private:
-	BPrivate::TRoster		*fRoster;
-	ClipboardHandler		*fClipboardHandler;
-	MIMEManager				*fMIMEManager;
-	EventQueue				*fEventQueue;
-	MessageRunnerManager	*fMessageRunnerManager;
+	void Die();
+
+	bool AddEvent(Event *event);
+	bool RemoveEvent(Event *event);
+	void ModifyEvent(Event *event, bigtime_t newTime);
+
+ private:
+	bool _AddEvent(Event *event);
+	Event *_EventAt(int32 index) const;
+
+	static	int32 _EventLooperEntry(void *data);
+	int32 _EventLooper();
+	void _Reschedule();
+
+	BList				fEvents;
+	thread_id			fEventLooper;
+	sem_id				fLooperControl;
+	volatile bigtime_t	fNextEventTime;
+	status_t			fStatus;
 };
 
-#endif	// REGISTRAR_H
+#endif	// EVENT_QUEUE_H
