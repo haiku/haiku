@@ -1,12 +1,12 @@
-/* This is main - initializes processors and starts init */
-
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+/* This is main - initializes processors and starts init */
 
 #include <OS.h>
 
@@ -106,7 +106,7 @@ _start(kernel_args *oldka, int cpu_num)
 		TRACE(("##################################################################\n"));
 
 		// now we can create and use semaphores
-		vm_init_postsem(&ka);
+		vm_init_post_sem(&ka);
 		cbuf_init();
 		vfs_init(&ka);
 		team_init(&ka);
@@ -114,7 +114,7 @@ _start(kernel_args *oldka, int cpu_num)
 		port_init(&ka);
 		kernel_daemon_init();
 
-		vm_init_postthread(&ka);
+		vm_init_post_thread(&ka);
 		elf_init(&ka);
 
 		// start a thread to finish initializing the rest of the system
