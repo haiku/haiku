@@ -18,16 +18,11 @@ public:
 	~TimeSourceObjectManager();
 
 	BTimeSource *GetTimeSource(const media_node &node);
-	BTimeSource *GetSystemTimeSource();
 	void ObjectDeleted(BTimeSource *timesource);
-
-private:
-	void InitSystemTimeSource();
 
 private:
 	Map<media_node_id,BTimeSource *> *fMap;
 	BLocker *fLock;
-	BTimeSource *fSystemTimeSource;
 };
 
 }; // namespace media

@@ -405,7 +405,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 	registered_node *rn;
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->nodeid == node.node) {
-			if (rn->addon_id == -1) { // This function must return an error if the node is application owned
+			if (rn->addon_id == -1 && node.node != NODE_SYSTEM_TIMESOURCE_ID) { // This function must return an error if the node is application owned
 				TRACE("NodeManager::GetDormantNodeInfo NODE IS APPLICATION OWNED! node %ld, addon_id %ld, addon_flavor_id %ld, name \"%s\"\n", node.node, rn->addon_id, rn->addon_flavor_id, rn->name);
 				return B_ERROR;
 			}

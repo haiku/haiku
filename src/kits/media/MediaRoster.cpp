@@ -637,7 +637,7 @@ BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 
 	CALLED();
 	
-	if ((for_node.node == NODE_SYSTEM_TIMESOURCE_ID) && (for_node.kind & B_TIME_SOURCE)) {
+	if (IS_SYSTEM_TIMESOURCE(for_node)) {
 		// special handling for the system time source
 		TRACE("BMediaRoster::MakeTimeSourceFor, asked for system time source\n");
 		return MediaRosterEx(this)->MakeTimeSourceObject(NODE_SYSTEM_TIMESOURCE_ID);
@@ -655,6 +655,7 @@ BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 	BTimeSource *source;
 	status_t rv;
 	
+	// ask the node to get it's current timesource id
 	rv = QueryPort(for_node.port, NODE_GET_TIMESOURCE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
 		ERROR("BMediaRoster::MakeTimeSourceFor: request failed\n");
@@ -687,7 +688,8 @@ BMediaRosterEx::MakeTimeSourceObject(media_node_id timesource_id)
 		return NULL;
 	}
 
-	//ReleaseNode(clone);
+	// XXX release?
+	ReleaseNode(clone);
 
 	return source;
 }
@@ -999,11 +1001,11 @@ BMediaRoster::StartTimeSource(const media_node & node,
 		//ERROR("BMediaRoster::StartTimeSource node %ld is system timesource\n", node.node);
 		return B_OK;
 	}
-	if (IS_SHADOW_TIMESOURCE(node)) {
-		// XXX debug this
-		ERROR("BMediaRoster::StartTimeSource node %ld is shadow timesource\n", node.node);
-		return B_OK;
-	}
+//	if (IS_SHADOW_TIMESOURCE(node)) {
+//		// XXX debug this
+//		ERROR("BMediaRoster::StartTimeSource node %ld is shadow timesource\n", node.node);
+//		return B_OK;
+//	}
 	if (IS_INVALID_NODE(node)) {
 		ERROR("BMediaRoster::StartTimeSource node %ld invalid\n", node.node);
 		return B_MEDIA_BAD_NODE;
@@ -1034,11 +1036,11 @@ BMediaRoster::StopTimeSource(const media_node & node,
 		//ERROR("BMediaRoster::StopTimeSource node %ld is system timesource\n", node.node);
 		return B_OK;
 	}
-	if (IS_SHADOW_TIMESOURCE(node)) {
-		// XXX debug this
-		ERROR("BMediaRoster::StopTimeSource node %ld is shadow timesource\n", node.node);
-		return B_OK;
-	}
+//	if (IS_SHADOW_TIMESOURCE(node)) {
+//		// XXX debug this
+//		ERROR("BMediaRoster::StopTimeSource node %ld is shadow timesource\n", node.node);
+//		return B_OK;
+//	}
 	if (IS_INVALID_NODE(node)) {
 		ERROR("BMediaRoster::StopTimeSource node %ld invalid\n", node.node);
 		return B_MEDIA_BAD_NODE;
@@ -1071,11 +1073,11 @@ BMediaRoster::SeekTimeSource(const media_node & node,
 		// returning B_ERROR would break StampTV
 		return B_OK;
 	}
-	if (IS_SHADOW_TIMESOURCE(node)) {
-		// XXX debug this
-		ERROR("BMediaRoster::SeekTimeSource node %ld is shadow timesource\n", node.node);
-		return B_OK;
-	}
+//	if (IS_SHADOW_TIMESOURCE(node)) {
+//		// XXX debug this
+//		ERROR("BMediaRoster::SeekTimeSource node %ld is shadow timesource\n", node.node);
+//		return B_OK;
+//	}
 	if (IS_INVALID_NODE(node)) {
 		ERROR("BMediaRoster::SeekTimeSource node %ld invalid\n", node.node);
 		return B_MEDIA_BAD_NODE;

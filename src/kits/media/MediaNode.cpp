@@ -144,6 +144,8 @@ BMediaNode::~BMediaNode()
 	
 		if (fControlPort > 0)
 			delete_port(fControlPort);
+	} else {
+		TRACE("BMediaNode::~BMediaNode: shadow timesource, not unregistering\n");
 	}
 }
 
@@ -238,11 +240,11 @@ BMediaNode::TimeSource() const
 	// can use GetSystemTimeSource
 
 	BMediaNode *self = const_cast<BMediaNode *>(this);
-	if (fTimeSourceID == NODE_SYSTEM_TIMESOURCE_ID) {
-		self->fTimeSource = _TimeSourceObjectManager->GetSystemTimeSource();
-	} else {
+//	if (fTimeSourceID == NODE_SYSTEM_TIMESOURCE_ID) {
+//		self->fTimeSource = _TimeSourceObjectManager->GetSystemTimeSource();
+//	} else {
 		self->fTimeSource = MediaRosterEx(BMediaRoster::Roster())->MakeTimeSourceObject(fTimeSourceID);
-	}
+//	}
 	ASSERT(fTimeSource == self->fTimeSource);
 
 	if (fTimeSource == 0) {

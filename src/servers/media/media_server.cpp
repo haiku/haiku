@@ -76,7 +76,7 @@ public:
 	void HandleMessage(int32 code, void *data, size_t size);
 	void ArgvReceived(int32 argc, char **argv);
 	static int32 controlthread(void *arg);
-	void StartSystemTimeSource();
+//	void StartSystemTimeSource();
 
 /* functionality not yet implemented
 00014a00 T _ServerApp::_ServerApp(void)
@@ -123,7 +123,7 @@ ServerApp::ServerApp()
 	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
 	resume_thread(control_thread);
 
-	StartSystemTimeSource();
+//	StartSystemTimeSource();
 	gNodeManager->LoadState();
 	gAppManager->StartAddonServer();
 }
@@ -171,6 +171,7 @@ ServerApp::QuitRequested()
 	return true;
 }
 
+/*
 void
 ServerApp::StartSystemTimeSource()
 {
@@ -193,6 +194,7 @@ ServerApp::StartSystemTimeSource()
 	
 	TRACE("StartSystemTimeSource leave\n");
 }
+*/
 
 void 
 ServerApp::HandleMessage(int32 code, void *data, size_t size)

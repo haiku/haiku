@@ -24,11 +24,11 @@ namespace BPrivate {
 namespace media {
 
 TimeSourceObjectManager::TimeSourceObjectManager()
- :	fSystemTimeSource(0)
+// :	fSystemTimeSource(0)
 {
 	CALLED();
 	fLock = new BLocker("timesource object manager locker");
-	fMap = new Map<media_node_id,BTimeSource *>;
+	fMap = new Map<media_node_id, BTimeSource *>;
 }
 
 
@@ -50,40 +50,6 @@ TimeSourceObjectManager::~TimeSourceObjectManager()
 	delete fMap;
 }
 
-void
-TimeSourceObjectManager::InitSystemTimeSource()
-{
-	CALLED();
-	BAutolock lock(fLock);
-
-	if (fSystemTimeSource != 0)
-		return;
-
-	TRACE("TimeSourceObjectManager::InitSystemTimeSource enter\n");
-	
-	media_node node;
-	node.node = NODE_SYSTEM_TIMESOURCE_ID;
-	node.port = SYSTEM_TIMESOURCE_CONTROL_PORT;
-	node.kind = B_TIME_SOURCE;
-	
-	fSystemTimeSource = new SystemTimeSourceObject(node);
-
-	TRACE("TimeSourceObjectManager::InitSystemTimeSource leave\n");
-}
-
-
-BTimeSource *
-TimeSourceObjectManager::GetSystemTimeSource()
-{
-	CALLED();
-	BAutolock lock(fLock);
-
-	if (fSystemTimeSource == 0)
-		InitSystemTimeSource();
-
-	return dynamic_cast<BTimeSource *>(fSystemTimeSource->Acquire());
-}
-
 /* BMediaRoster::MakeTimeSourceFor does use this function to request
  * a time source object. If it is already in memory, it will be
  * Acquired(), if not, a new TimeSourceObject will be created.
@@ -95,32 +61,11 @@ TimeSourceObjectManager::GetTimeSource(const media_node &node)
 	BAutolock lock(fLock);
 
 //	printf("TimeSourceObjectManager::GetTimeSource, node id %ld\n", node.node);
-	
-	if (fSystemTimeSource == 0)
-		InitSystemTimeSource();
-	
-	if (NODE_SYSTEM_TIMESOURCE_ID == node.node)
-		return dynamic_cast<BTimeSource *>(fSystemTimeSource->Acquire());
-	
+
 	BTimeSource **pts;
 	if (fMap->Get(node.node, &pts))
 		return dynamic_cast<BTimeSource *>((*pts)->Acquire());
 
-/*		
-	media_node clone;
-	status_t rv;
-	
-	rv = BMediaRoster::Roster()->GetNodeFor(node.node, &clone);
-	if (rv != B_OK) {
-		ERROR("TimeSourceObjectManager::GetTimeSource, GetNodeFor %ld failed\n", node.node);
-		return NULL;
-	}
-		
-	BTimeSource *ts;
-	ts = new TimeSourceObject(clone);
-	fMap->Insert(clone.node, ts);
-	return ts;
-*/
 	// time sources are not accounted in node reference counting
 	BTimeSource *ts;
 	ts = new TimeSourceObject(node);

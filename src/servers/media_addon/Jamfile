@@ -8,5 +8,6 @@ SubDirHdrs [ FDirName $(OBOS_TOP) src servers media ] ;
 
 Server media_addon_server :
 	main.cpp
+	SystemTimeSource.cpp
 ;
 LinkSharedOSLibs media_addon_server : be libmedia.so root ;

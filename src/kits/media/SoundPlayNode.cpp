@@ -127,7 +127,7 @@ void _SoundPlayNode::NodeRegistered(void)
 	mOutput.source.port = ControlPort();
 	mOutput.source.id = 1;
 	mOutput.node = Node();
-	sprintf(mOutput.name, "output %ld", mOutput.source.id);
+	strcpy(mOutput.name, Name());
 	
 	Run();	
 }
@@ -326,7 +326,7 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	mOutput.destination = where;
 	mOutput.format = *format;
 	*out_source = mOutput.source;
-	strncpy(out_name, mOutput.name, B_MEDIA_NAME_LENGTH);
+	strcpy(out_name, Name());
 	return B_OK;
 }
 
@@ -356,8 +356,7 @@ _SoundPlayNode::Connect(status_t error, const media_source& source, const media_
 	// that we agreed on, and report our connection name again.
 	mOutput.destination = destination;
 	mOutput.format = format;
-	strncpy(io_name, mOutput.name, B_MEDIA_NAME_LENGTH);
-	io_name[B_MEDIA_NAME_LENGTH -1] = 0;
+	strcpy(io_name, Name());
 
 	// Now that we're connected, we can determine our downstream latency.
 	// Do so, then make sure we get our events early enough.

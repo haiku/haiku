@@ -21,13 +21,17 @@ TimeSourceObject::TimeSourceObject(const media_node &node)
 	TRACE("TimeSourceObject::TimeSourceObject enter, id = %ld\n", node.node);
 	if (fControlPort > 0)
 		delete_port(fControlPort);
+		
+	// we use the control port of the real time source object.
+	// this way, all messages are send to the real time source,
+	// and this shadow object won't receive any.
 	fControlPort = node.port;
 	ASSERT(fNodeID == node.node);
 	ASSERT(fKinds == node.kind);
 
-
 	if (node.node == NODE_SYSTEM_TIMESOURCE_ID) {
 		strcpy(fName, "System Clock");
+		fIsRealtime = true;
 	} else {
 		live_node_info lni;
 		if (B_OK == BMediaRoster::Roster()->GetLiveNodeInfo(node, &lni)) {
@@ -39,7 +43,6 @@ TimeSourceObject::TimeSourceObject(const media_node &node)
 
 	AddNodeKind(NODE_KIND_SHADOW_TIMESOURCE);
 	AddNodeKind(NODE_KIND_NO_REFCOUNTING);
-	fControlPort = SHADOW_TIMESOURCE_CONTROL_PORT; // XXX if we don't do this, we get a infinite loop somewhere. This needs to be debugged
 	
 	TRACE("TimeSourceObject::TimeSourceObject leave, node id %ld\n", fNodeID);
 }
@@ -49,6 +52,7 @@ TimeSourceObject::TimeSourceOp(
 				const time_source_op_info & op,
 				void * _reserved)
 {
+	// we don't get anything here
 	return B_OK;
 }
 
@@ -64,27 +68,14 @@ TimeSourceObject::AddOn(int32 *internal_id) const
 TimeSourceObject::DeleteHook(BMediaNode *node)
 {
 	status_t status;
-//	printf("TimeSourceObject::DeleteHook enter\n");
+//	if (fIsRealtime) {
+//		ERROR("TimeSourceObject::DeleteHook: system time source clone delete hook called\n");
+//		return B_ERROR;
+//	}
+	printf("TimeSourceObject::DeleteHook enter\n");
 	_TimeSourceObjectManager->ObjectDeleted(this);
 	status = BTimeSource::DeleteHook(node);
-//	printf("TimeSourceObject::DeleteHook leave\n");
+	printf("TimeSourceObject::DeleteHook leave\n");
 	return status;
 }
 
-SystemTimeSourceObject::SystemTimeSourceObject(const media_node &node)
- : 	BMediaNode("System Clock",  node.node,  node.kind),
-	TimeSourceObject(node)
-{
-//	printf("SystemTimeSourceObject::SystemTimeSourceObject enter, id = %ld\n", id);
-	fIsRealtime = true;
-	AddNodeKind(NODE_KIND_SYSTEM_TIMESOURCE);
-	AddNodeKind(NODE_KIND_NO_REFCOUNTING);
-//	printf("SystemTimeSourceObject::SystemTimeSourceObject leave, node id %ld\n", ID());
-}
-
-/* virtual */ status_t
-SystemTimeSourceObject::DeleteHook(BMediaNode * node)
-{
-	ERROR("SystemTimeSourceObject::DeleteHook called\n");
-	return B_ERROR;
-}

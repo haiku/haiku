@@ -50,6 +50,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 Marcus Ov
 #include "Notifications.h"
 #include "MediaMisc.h"
 #include "MediaRosterEx.h"
+#include "SystemTimeSource.h"
 
 //#define USER_ADDON_PATH "../add-ons/media"
 
@@ -120,6 +121,9 @@ MediaAddonServer::~MediaAddonServer()
 	media_addon_id *id;
 	for (filemap->Rewind(); filemap->GetNext(&id); )
 		_DormantNodeManager->UnregisterAddon(*id);
+	
+	
+	// XXX unregister system time source
 	
 	delete filemap;
 	delete infomap;
@@ -193,6 +197,19 @@ MediaAddonServer::ReadyToRun()
 	}
 
 	ASSERT(fStartup == true);
+	
+	// The very first thing to do is to create the system time source,
+	// register it with the server, and make it the default SYSTEM_TIME_SOURCE
+	BMediaNode *ts = new SystemTimeSource;
+	result = mediaroster->RegisterNode(ts);
+	if (result != B_OK)
+		debugger("Can't register system time source");
+	if (ts->ID() != NODE_SYSTEM_TIMESOURCE_ID)
+		debugger("System time source got wrong node ID");
+	media_node node = ts->Node();
+	result = MediaRosterEx(mediaroster)->SetNode(SYSTEM_TIME_SOURCE, &node);
+	if (result != B_OK)
+		debugger("Can't setup system time source as default");
 
 	// During startup, first all add-ons are loaded, then all
 	// nodes (flavors) representing physical inputs and outputs

@@ -31,17 +31,6 @@ protected:
 	virtual status_t DeleteHook(BMediaNode * node);
 };
 
-class SystemTimeSourceObject : public TimeSourceObject
-{
-public:
-	SystemTimeSourceObject(const media_node &node);
-
-protected:
-	// override from BMediaNode				
-	virtual status_t DeleteHook(BMediaNode * node);
-
-};
-
 } } using namespace BPrivate::media;
 
 #endif
