@@ -414,15 +414,16 @@ flo_read(floppy_cookie *cookie, off_t position, void *data, size_t *numbytes)
 			*numbytes = 0;
 			return err;
 		}
-		toread = MIN(len, sectsize);
+		toread = MIN(len, (size_t)sectsize);
 		toread = MIN(toread, sectsize - (position % sectsize));
 		memcpy(data, cookie->flp->master->buffer + position % cylsize/*(sectsize * ) + (position % sectsize)*/, toread);
 		len -= toread;
 		bytes_read += toread;
 		position += toread;
 	}
+
 	// read the middle blocks
-	while (len >= sectsize) {
+	while (len >= (size_t)sectsize) {
 		TRACE("read: middle %Ld, %ld, %ld\n", position, bytes_read, len);
 
 		// try to read as many sectors as we can
