@@ -128,6 +128,8 @@ class PPPInterface {
 		
 		void CalculateMRU();
 		
+		void Redial();
+		
 		// multilink methods
 		void SetParent(PPPInterface *parent)
 			{ fParent = parent; }
@@ -139,9 +141,8 @@ class PPPInterface {
 		PPPReportManager fReportManager;
 		ifnet *fIfnet;
 		
-		thread_id fUpThread;
-		uint32 fRetry;
-		int32 fMaxRetries;
+		thread_id fUpThread, fRedialThread;
+		uint32 fDialRetry, fDialRetriesLimit;
 		
 		ppp_manager_info *fManager;
 		

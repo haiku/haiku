@@ -13,6 +13,7 @@
 #include "settings_tools.h"
 
 #include <cstring>
+#include <new.h>
 
 
 // TODO:
@@ -23,12 +24,22 @@
 // - maybe some protocols must go down instead of being reset -> add flag for this
 
 
+// needed for redial:
+typedef struct redial_info {
+	PPPInterface *interface;
+	thread_id *thread;
+} redial_info;
+
+status_t redial_func(void *data);
+
+
+
 PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
 	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
-	fIfnet(NULL), fUpThread(-1), fRetry(0), fMaxRetries(0), fLinkMTU(1500),
-	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
-	fLock(StateMachine().Locker())
+	fIfnet(NULL), fUpThread(-1), fRedialThread(-1), fDialRetry(0),
+	fDialRetriesLimit(0), fLinkMTU(1500), fAccessing(0), fChildrenCount(0),
+	fDevice(NULL), fFirstEncapsulator(NULL), fLock(StateMachine().Locker())
 {
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
@@ -80,6 +91,7 @@ PPPInterface::~PPPInterface()
 		// tell all listeners that we are being destroyed
 	
 	// TODO:
+	// kill (or wait for) fRedialThread
 	// remove our iface, so that nobody will access it:
 	//  go down if up
 	//  unregister from ppp_manager
@@ -345,7 +357,7 @@ PPPInterface::EncapsulatorFor(uint16 protocol,
 bool
 PPPInterface::AddChild(PPPInterface *child)
 {
-	if(!child || child->Mode() != Mode())
+	if(!child)
 		return false;
 	
 	LockerHelper locker(fLock);
@@ -354,8 +366,6 @@ PPPInterface::AddChild(PPPInterface *child)
 		return false;
 	
 	child->SetParent(this);
-	
-	CalculateMRU();
 	
 	return true;
 }
@@ -433,47 +443,54 @@ PPPInterface::Up()
 	fReportManager.EnableReports(PPP_CONNECTION_REPORT, me, PPP_WAIT_FOR_REPLY);
 	fLock.Unlock();
 	
-	if(me != fUpThread) {
-		// I am an observer
-		while(true) {
-			if(IsUp()) {
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-				return true;
-			}
-			
-			if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE) {
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-				return true;
-			}
-			
-			if(IsUp()) {
-				PPP_REPLY(sender, B_OK);
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-				return true;
-			}
-			
-			if(report.type != PPP_CONNECTION_REPORT) {
-				PPP_REPLY(sender, B_OK);
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-			}
-			
-			if(report.code == PPP_REPORT_GOING_UP) {
-				PPP_REPLY(sender, B_OK);
-				continue;
-			} else if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
-				PPP_REPLY(sender, B_OK);
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-				return true;
-			} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
-					|| report.code == PPP_REPORT_UP_ABORTED
-					|| report.code == PPP_REPORT_AUTHENTICATION_FAILED) {
-				PPP_REPLY(sender, B_OK);
-				fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
-				return false;
-			} else if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
-				// TODO:
-				// !!! check code (after vacation you sometimes forget things ;) !!!
-				if(fRetry >= fMaxRetries || fUpThread == -1) {
+	// fUpThread tells the state machine to go up
+	if(me == fUpThread)
+		StateMachine().OpenEvent();
+	
+	while(true) {
+		if(IsUp()) {
+			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			return true;
+		}
+		
+		if(receive_data(&sender, &report, sizeof(report)) != PPP_REPORT_CODE)
+			continue;
+		
+		if(IsUp()) {
+			PPP_REPLY(sender, B_OK);
+			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			return true;
+		}
+		
+		
+		if(report.type == PPP_DESTRUCTION_REPORT) {
+			PPP_REPLY(sender, B_OK);
+			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			return false;
+		} else if(report.type != PPP_CONNECTION_REPORT) {
+			PPP_REPLY(sender, B_OK);
+			continue;
+		}
+		
+		if(report.code == PPP_REPORT_GOING_UP) {
+			PPP_REPLY(sender, B_OK);
+			continue;
+		} else if(report.code == PPP_REPORT_UP_SUCCESSFUL) {
+			PPP_REPLY(sender, B_OK);
+			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			return true;
+		} else if(report.code == PPP_REPORT_DOWN_SUCCESSFUL
+				|| report.code == PPP_REPORT_UP_ABORTED
+				|| report.code == PPP_REPORT_AUTHENTICATION_FAILED) {
+			PPP_REPLY(sender, B_OK);
+			fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+			return false;
+		}
+		
+		if(me != fUpThread) {
+			// I am an observer
+			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
+				if(fDialRetry >= fDialRetriesLimit || fUpThread == -1) {
 					PPP_REPLY(sender, B_OK);
 					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
 					return false;
@@ -482,8 +499,6 @@ PPPInterface::Up()
 					continue;
 				}
 			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
-				// TODO:
-				// !!! check code (after vacation you sometimes forget things ;) !!!
 				if(DoesAutoRedial()) {
 					PPP_REPLY(sender, B_OK);
 					continue;
@@ -493,11 +508,37 @@ PPPInterface::Up()
 					return false;
 				}
 			}
-		}
-	} else {
-		// I am the thread for the real task
-		while(true) {
-			
+		} else {
+			// I am the thread for the real task
+			if(report.code == PPP_REPORT_DEVICE_UP_FAILED) {
+				if(fDialRetry >= fDialRetriesLimit) {
+					fDialRetry = 0;
+					fUpThread = -1;
+					PPP_REPLY(sender, B_OK);
+					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					return false;
+				} else {
+					++fDialRetry;
+					PPP_REPLY(sender, B_OK);
+					StateMachine().OpenEvent();
+					continue;
+				}
+			} else if(report.code == PPP_REPORT_CONNECTION_LOST) {
+				// the state machine knows that we are going up and leaves
+				// the redial task to us
+				if(DoesAutoRedial() && fDialRetry < fDialRetriesLimit) {
+					++fDialRetry;
+					PPP_REPLY(sender, B_OK);
+					StateMachine().OpenEvent();
+					continue;
+				} else {
+					fDialRetry = 0;
+					fUpThread = -1;
+					PPP_REPLY(sender, B_OK);
+					fReportManager.DisableReports(PPP_CONNECTION_REPORT, me);
+					return false;
+				}
+			}
 		}
 	}
 	
@@ -925,4 +966,32 @@ PPPInterface::CalculateMRU()
 	
 	if(Parent())
 		Parent()->CalculateMRU();
+}
+
+
+void
+PPPInterface::Redial()
+{
+	if(fRedialThread != -1)
+		return;
+	
+	// start a new thread that calls our Up() method
+	redial_info *info = new redial_info;
+	info.interface = this;
+	info.thread = &fRedialThread;
+	
+	fRedialThread = spawn_thread(redial_func, "PPPInterface: redial_thread",
+		B_NORMAL_PRIORITY, info);
+}
+
+
+status_t
+redial_func(void *data)
+{
+	redial_info *info = (redial_info*) data;
+	
+	info->interface->Up();
+	*info->thread = -1;
+	
+	delete info;
 }

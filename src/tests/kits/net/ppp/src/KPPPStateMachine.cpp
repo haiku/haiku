@@ -427,15 +427,23 @@ PPPStateMachine::DownEvent()
 	
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
+		bool needsRedial = false;
+		
 		if(fAuthentiactionStatus == PPP_AUTHENTICATION_FAILED
 				|| fAuthenticationStatus == PPP_AUTHENTICATING
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATION_FAILED
 				|| fPeerAuthenticationStatus == PPP_AUTHENTICATING)
 			Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_AUTHENTICATION_FAILED,
 				NULL, 0);
-		else
+		else {
+			// if we are going up and lost connection the redial attempt becomes
+			// a dial retry which is managed by the main thread in Interface::Up()
+			if(Interface()->fUpThread == -1)
+				needsRedial = true;
+			
 			Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_CONNECTION_LOST,
 				NULL, 0);
+		}
 		
 		if(Interface()->Parent())
 			Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
@@ -444,10 +452,9 @@ PPPStateMachine::DownEvent()
 		
 		if(Interface()->DoesAutoRedial()) {
 			// TODO:
-			// redial if we have been connected
-			// problem: if we are reconfiguring we should redial, too
-//			if(oldState == PPP_OPENED_STATE)
-//				Interface()->Redial();
+			// if we are reconfiguring we should redial, too
+			if(needsRedial)
+				Interface()->Redial();
 		} else if(!Interface()->DoesDialOnDemand())
 			Interface()->Delete();
 	} else {
@@ -481,7 +488,8 @@ PPPStateMachine::OpenEvent()
 			if(Interface()->IsMultilink() && !Interface()->Parent()) {
 				NewPhase(PPP_ESTABLISHMENT_PHASE);
 				for(int32 i = 0; i < Interface()->CountChildren(); i++)
-					Interface()->ChildAt(i)->StateMachine().OpenEvent();
+					if(Interface()->ChildAt(i)->Mode() == Interface()->Mode())
+						Interface()->ChildAt(i)->StateMachine().OpenEvent();
 			} else {
 				locker.UnlockNow();
 				ThisLayerStarted();
