@@ -25,7 +25,12 @@
  *	modules that can't be loaded from disk.
  */
 
+extern module_info gDeviceManagerModule;
+extern module_info gDeviceRootModule;
+
 static module_info *sBuiltInModules[] = {
+	&gDeviceManagerModule,
+	&gDeviceRootModule,
 	NULL
 };
 
