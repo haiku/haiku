@@ -13,6 +13,7 @@
 #include "StringRemoveTest.h"
 #include "StringCompareTest.h"
 #include "StringFormatAppendTest.h"
+#include "StringCharAccessTest.h"
 
 CppUnit::Test *StringTestSuite()
 {
@@ -30,6 +31,7 @@ CppUnit::Test *StringTestSuite()
 	testSuite->addTest(StringRemoveTest::suite());
 	testSuite->addTest(StringCompareTest::suite());
 	testSuite->addTest(StringFormatAppendTest::suite());
+	testSuite->addTest(StringCharAccessTest::suite());
 	
 	return(testSuite);
 }
