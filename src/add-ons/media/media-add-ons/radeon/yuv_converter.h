@@ -172,6 +172,6 @@
 		"jg			2b\n"
 		"emms\n"
 		:
-		: "r" (convert_buffer), "r" (bits), "m" (c_offs), "m" (y_offs), 
-		  "m" (masks), "m" (scale), "m" (masks_8bit),
-		  "r" (bytesPerRow), "m" (bitsLength), "m" (bytesPerRow));
+		: "a" (convert_buffer), "d" (bits),
+		  "g" (c_offs), "g" (y_offs), "g" (masks), "g" (scale), "g" (masks_8bit),
+		  "c" (bytesPerRow), "S" (bitsLength), "D" (bytesPerRow));
