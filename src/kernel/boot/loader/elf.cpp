@@ -198,6 +198,6 @@ elf_load_image(Directory *directory, const char *path)
 		kernel_args_free(image);
 
 	close(fd);
-	return B_OK;
+	return status;
 }
 
