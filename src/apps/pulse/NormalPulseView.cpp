@@ -8,16 +8,26 @@
 //
 //****************************************************************************************
 
+
 #include "NormalPulseView.h"
 #include "Common.h"
 #include "Pictures"
-#include <interface/Bitmap.h>
-#include <interface/Dragger.h>
+
+#include <Bitmap.h>
+#include <Dragger.h>
 #include <Window.h>
+
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
-NormalPulseView::NormalPulseView(BRect rect) : PulseView(rect, "NormalPulseView") {
+#include <cpu_type.h>
+
+
+NormalPulseView::NormalPulseView(BRect rect)
+	: PulseView(rect, "NormalPulseView"),
+	fHasBrandLogo(false)
+{
 	rgb_color color = { 168, 168, 168, 0xff };
 	SetViewColor(color);
 	SetLowColor(color);
@@ -32,24 +42,24 @@ NormalPulseView::NormalPulseView(BRect rect) : PulseView(rect, "NormalPulseView"
 	// Allocate progress bars and button pointers
 	system_info sys_info;
 	get_system_info(&sys_info);
-	progress_bars = new ProgressBar *[sys_info.cpu_count];
-	cpu_buttons = new CPUButton *[sys_info.cpu_count];
+	fProgressBars = new ProgressBar *[sys_info.cpu_count];
+	fCpuButtons = new CPUButton *[sys_info.cpu_count];
 	
 	// Set up the CPU activity bars and buttons
 	for (int x = 0; x < sys_info.cpu_count; x++) {
 		BRect r(PROGRESS_MLEFT, PROGRESS_MTOP + ITEM_OFFSET * x,
 			PROGRESS_MLEFT + ProgressBar::PROGRESS_WIDTH,
 			PROGRESS_MTOP + ITEM_OFFSET * x + ProgressBar::PROGRESS_HEIGHT);
-		progress_bars[x] = new ProgressBar(r, "CPU Progress Bar");
-		AddChild(progress_bars[x]);
+		fProgressBars[x] = new ProgressBar(r, "CPU Progress Bar");
+		AddChild(fProgressBars[x]);
 		
 		r.Set(CPUBUTTON_MLEFT, CPUBUTTON_MTOP + ITEM_OFFSET * x,
 			CPUBUTTON_MLEFT + CPUBUTTON_WIDTH,
 			CPUBUTTON_MTOP + ITEM_OFFSET * x + CPUBUTTON_HEIGHT);
 		char temp[4];
 		sprintf(temp, "%d", x + 1);
-		cpu_buttons[x] = new CPUButton(r, "CPUButton", temp, NULL);
-		AddChild(cpu_buttons[x]);
+		fCpuButtons[x] = new CPUButton(r, "CPUButton", temp, NULL);
+		AddChild(fCpuButtons[x]);
 		
 		//	If there is only 1 cpu it will be hidden below
 		//	thus, no need to add the dragger as it will still
@@ -62,18 +72,21 @@ NormalPulseView::NormalPulseView(BRect rect) : PulseView(rect, "NormalPulseView"
 			dragger_rect.bottom += 7;
 			dragger_rect.right += 7;
 			dragger_rect.OffsetBy(-1, -1);
-			BDragger *dragger = new BDragger(dragger_rect, cpu_buttons[x], 0);
+			BDragger *dragger = new BDragger(dragger_rect, fCpuButtons[x], 0);
 			AddChild(dragger);
 		}
 	}
 	
 	if (sys_info.cpu_count == 1) {
-		progress_bars[0]->MoveBy(-3, 12);
-		cpu_buttons[0]->Hide();
+		fProgressBars[0]->MoveBy(-3, 12);
+		fCpuButtons[0]->Hide();
 	}
 }
 
-int NormalPulseView::CalculateCPUSpeed() {
+
+int
+NormalPulseView::CalculateCPUSpeed()
+{
 	system_info sys_info;
 	get_system_info(&sys_info);
 
@@ -93,187 +106,34 @@ int NormalPulseView::CalculateCPUSpeed() {
 	return target + delta;
 }
 
-void NormalPulseView::DetermineVendorAndProcessor() {
+
+void
+NormalPulseView::DetermineVendorAndProcessor()
+{
 	system_info sys_info;
 	get_system_info(&sys_info);
 
 	// Initialize logos
 	BRect r(0, 0, 63, 62);
-	cpu_logo = new BBitmap(r, B_COLOR_8_BIT);
+	fCpuLogo = new BBitmap(r, B_COLOR_8_BIT);
 #if __POWERPC__
-	cpu_logo->SetBits(Anim1, 11718, 0, B_COLOR_8_BIT);
+	fCpuLogo->SetBits(Anim1, 11718, 0, B_COLOR_8_BIT);
 #endif
 #if __INTEL__
-	if (sys_info.cpu_type < B_CPU_AMD_X86) {
-		cpu_logo->SetBits(IntelLogo, 11718, 0, B_COLOR_8_BIT);
-	} else {
-		cpu_logo->SetBits(BlankLogo, 11718, 0, B_COLOR_8_BIT);
-	}
-#endif
-	
-#if __INTEL__
-	// Determine x86 vendor name - Intel just set for completeness
-	switch (sys_info.cpu_type & B_CPU_X86_VENDOR_MASK) {
-		case B_CPU_INTEL_X86:
-			strcpy(vendor, "Intel");
-			break;
-		case B_CPU_AMD_X86:
-			strcpy(vendor, "AMD");
-			break;
-		case B_CPU_CYRIX_X86:
-			strcpy(vendor, "CYRIX");
-			break;
-		case B_CPU_IDT_X86:
-			strcpy(vendor, "IDT");
-			break;
-		case B_CPU_RISE_X86:
-			strcpy(vendor, "RISE");
-			break;
-		default:
-			strcpy(vendor, "Unknown");
-			break;
-	}
+	if ((sys_info.cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_INTEL_x86) {
+		fCpuLogo->SetBits(IntelLogo, 11718, 0, B_COLOR_8_BIT);
+		fHasBrandLogo = true;
+	} else
+		fCpuLogo->SetBits(BlankLogo, 11718, 0, B_COLOR_8_BIT);
 #endif
 
-	// Determine CPU type
-	switch(sys_info.cpu_type) {
-#if __POWERPC__
-		case B_CPU_PPC_603:
-			strcpy(processor, "603");
-			break;
-		case B_CPU_PPC_603e:
-			strcpy(processor, "603e");
-			break;
-		case B_CPU_PPC_750:
-			strcpy(processor, "750");
-			break;
-		case B_CPU_PPC_604:
-			strcpy(processor, "604");
-			break;
-		case B_CPU_PPC_604e:
-			strcpy(processor, "604e");
-			break;
-#endif
-
-#if __INTEL__
-		case B_CPU_X86:
-			strcpy(processor, "Unknown x86");
-			break;
-		case B_CPU_INTEL_PENTIUM:
-		case B_CPU_INTEL_PENTIUM75:
-			strcpy(processor, "Pentium");
-			break;
-		case B_CPU_INTEL_PENTIUM_486_OVERDRIVE:
-		case B_CPU_INTEL_PENTIUM75_486_OVERDRIVE:
-			strcpy(processor, "Pentium OD");
-			break;
-		case B_CPU_INTEL_PENTIUM_MMX:
-		case B_CPU_INTEL_PENTIUM_MMX_MODEL_8:
-			strcpy(processor, "Pentium MMX");
-			break;
-		case B_CPU_INTEL_PENTIUM_PRO:
-			strcpy(processor, "Pentium Pro");
-			break;
-		case B_CPU_INTEL_PENTIUM_II_MODEL_3:
-		case B_CPU_INTEL_PENTIUM_II_MODEL_5:
-			strcpy(processor, "Pentium II");
-			break;
-		case B_CPU_INTEL_CELERON:
-			strcpy(processor, "Celeron");
-			break;
-		case B_CPU_INTEL_PENTIUM_III:
-		case B_CPU_INTEL_PENTIUM_III_MODEL_8:
-#ifdef OBOS_CPU_TYPES
-		case B_CPU_INTEL_PENTIUM_III_MODEL_11:
-#endif
-			strcpy(processor, "Pentium III");
-			break;
-#ifdef OBOS_CPU_TYPES
-		case B_CPU_INTEL_PENTIUM_M:
-			strcpy(processor, "Pentium M");
-			break;
-		case B_CPU_INTEL_PENTIUM_IV:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL1:
-		case B_CPU_INTEL_PENTIUM_IV_MODEL2:
-		case B_CPU_INTEL_PENTIUM_IV_XEON:
-			strcpy(processor, "Pentium IV");
-			break;
-#endif
-		case B_CPU_AMD_K5_MODEL0:
-		case B_CPU_AMD_K5_MODEL1:
-		case B_CPU_AMD_K5_MODEL2:
-		case B_CPU_AMD_K5_MODEL3:
-			strcpy(processor, "K5");
-			break;
-		case B_CPU_AMD_K6_MODEL6:
-		case B_CPU_AMD_K6_MODEL7:
-			strcpy(processor, "K6");
-			break;
-		case B_CPU_AMD_K6_2:
-			strcpy(processor, "K6-2");
-			break;
-		case B_CPU_AMD_K6_III:
-#ifdef OBOS_CPU_TYPES
-		case B_CPU_AMD_K6_III_MODEL2:
-#endif
-			strcpy(processor, "K6-III");
-			break;
-		case B_CPU_AMD_ATHLON_MODEL1:
-#ifdef OBOS_CPU_TYPES
-		case B_CPU_AMD_ATHLON_MODEL2:
-		case B_CPU_AMD_ATHLON_THUNDERBIRD:
-			strcpy(processor, "Athlon");
-			break;
-		case B_CPU_AMD_ATHLON_XP:
-		case B_CPU_AMD_ATHLON_XP_MODEL2:
-		case B_CPU_AMD_ATHLON_XP_MODEL3:
-		case B_CPU_AMD_ATHLON_XP_MODEL_BARTON:
-			strcpy(processor, "Athlon XP");
-			break;
-		case B_CPU_AMD_DURON:
-			strcpy(processor, "Duron");
-			break;
-		case B_CPU_AMD_ATHLON_64:
-		case B_CPU_AMD_ATHLON_64_MODEL2:
-		case B_CPU_AMD_ATHLON_64_MODEL3:
-		case B_CPU_AMD_ATHLON_64_MODEL4:
-		case B_CPU_AMD_ATHLON_64_MODEL5:
-		case B_CPU_AMD_ATHLON_64_MODEL6:
-		case B_CPU_AMD_ATHLON_64_MODEL7:
-			strcpy(processor, "Athlon 64");
-			break;
-		case B_CPU_AMD_OPTERON:
-			strcpy(processor, "Opteron");
-			break;
-#endif
-		case B_CPU_CYRIX_GXm:
-			strcpy(processor, "GXm");
-			break;
-		case B_CPU_CYRIX_6x86MX:
-			strcpy(processor, "6x86MX");
-			break;
-		case B_CPU_IDT_WINCHIP_C6:
-			strcpy(processor, "WinChip C6");
-			break;
-		case B_CPU_IDT_WINCHIP_2:
-			strcpy(processor, "WinChip 2");
-			break;
-		case B_CPU_RISE_mP6:
-			strcpy(processor, "mP6");
-			break;
-#ifdef OBOS_CPU_TYPES
-		case B_CPU_NATIONAL_GEODE_GX1:
-			strcpy(processor, "Geode GX1");
-			break;
-#endif
-#endif
-		default:
-			strcpy(processor, "Unknown");
-			break;
-	}
+	get_cpu_type(fVendor, sizeof(fVendor), fProcessor, sizeof(fProcessor));
 }
 
-void NormalPulseView::Draw(BRect rect) {
+
+void
+NormalPulseView::Draw(BRect rect)
+{
 	PushState();
 
 	// Black frame
@@ -298,17 +158,17 @@ void NormalPulseView::Draw(BRect rect) {
 	StrokeLine(BPoint(1, frame.bottom + 2), BPoint(frame.right, frame.bottom + 2));
 	
 	// Processor picture
-	DrawBitmap(cpu_logo, BPoint(10, 10));
+	DrawBitmap(fCpuLogo, BPoint(10, 10));
 	
 #if __INTEL__
 	// Do nothing in the case of Intel CPUs - they already have a logo
-	if (strcmp(vendor, "Intel") != 0) {
+	if (!fHasBrandLogo) {
 		SetDrawingMode(B_OP_OVER);
 		SetHighColor(240,240,240);
 	
-		float width = StringWidth(vendor);
+		float width = StringWidth(fVendor);
 		MovePenTo(10 + (32 - width / 2), 30);
-		DrawString(vendor);
+		DrawString(fVendor);
 	}
 #endif
 
@@ -318,9 +178,9 @@ void NormalPulseView::Draw(BRect rect) {
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(240, 240, 240);
 
-	float width = StringWidth(processor);
+	float width = StringWidth(fProcessor);
 	MovePenTo(10 + (32 - width / 2), 48);
-	DrawString(processor);
+	DrawString(fProcessor);
 
 	width = StringWidth(buf);
 	MovePenTo(10 + (32 - width / 2), 60);
@@ -329,7 +189,10 @@ void NormalPulseView::Draw(BRect rect) {
 	PopState();
 }
 
-void NormalPulseView::Pulse() {
+
+void
+NormalPulseView::Pulse()
+{
 	// Don't recalculate and redraw if this view is hidden
 	if (!IsHidden()) {
 		Update();
@@ -339,7 +202,7 @@ void NormalPulseView::Pulse() {
 		
 			// Set the value of each CPU bar
 			for (int x = 0; x < sys_info.cpu_count; x++) {
-				progress_bars[x]->Set(max_c(0, cpu_times[x] * 100));
+				fProgressBars[x]->Set(max_c(0, cpu_times[x] * 100));
 			}
 			
 			Sync();
@@ -348,7 +211,10 @@ void NormalPulseView::Pulse() {
 	}
 }
 
-void NormalPulseView::AttachedToWindow() {
+
+void
+NormalPulseView::AttachedToWindow()
+{
 	// Use a smaller font on x86 to accomodate longer processor names
 	SetFont(be_bold_font);
 #if __INTEL__
@@ -356,7 +222,7 @@ void NormalPulseView::AttachedToWindow() {
 #else
 	SetFontSize(9);
 #endif
-	prev_time = system_time();
+	fPreviousTime = system_time();
 	
 	BMessenger messenger(Window());
 	mode1->SetTarget(messenger);
@@ -373,20 +239,25 @@ void NormalPulseView::AttachedToWindow() {
 	}
 }
 
-void NormalPulseView::UpdateColors(BMessage *message) {
+
+void
+NormalPulseView::UpdateColors(BMessage *message)
+{
 	int32 color = message->FindInt32("color");
 	bool fade = message->FindBool("fade");
 	system_info sys_info;
 	get_system_info(&sys_info);
 	
 	for (int x = 0; x < sys_info.cpu_count; x++) {
-		progress_bars[x]->UpdateColors(color, fade);
-		cpu_buttons[x]->UpdateColors(color);
+		fProgressBars[x]->UpdateColors(color, fade);
+		fCpuButtons[x]->UpdateColors(color);
 	}
 }
 
-NormalPulseView::~NormalPulseView() {
-	delete cpu_logo;
-	delete cpu_buttons;
-	delete progress_bars;
+
+NormalPulseView::~NormalPulseView()
+{
+	delete fCpuLogo;
+	delete fCpuButtons;
+	delete fProgressBars;
 }

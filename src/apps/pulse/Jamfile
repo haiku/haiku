@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src apps pulse ;
 
+UsePrivateHeaders shared ;
+
 AddResources Pulse : Pulse.rsrc ;
 
 App Pulse : BottomPrefsView.cpp
