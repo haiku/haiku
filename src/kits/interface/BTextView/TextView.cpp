@@ -1304,7 +1304,7 @@ BTextView::GoToLine(int32 index)
 {
 	CALLED();
 	CancelInputMethod();
-	fSelStart = fSelEnd = OffsetAt(index);
+	fSelStart = fSelEnd = fClickOffset = OffsetAt(index);
 }
 
 
@@ -2788,7 +2788,7 @@ BTextView::HandleBackspace()
 		Highlight(fSelStart, fSelEnd);
 	
 	DeleteText(fSelStart, fSelEnd);
-	fSelEnd = fSelStart;
+	fClickOffset = fSelEnd = fSelStart;
 	
 	Refresh(fSelStart, fSelEnd, true, false);
 }
@@ -2807,47 +2807,55 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 			
 	int32 selStart = fSelStart;
 	int32 selEnd = fSelEnd;
-	//int32	delta = 0;
+	
 	int32 scrollToOffset = 0;
 	bool shiftDown = modifiers() & B_SHIFT_KEY;
 
 	switch (inArrowKey) {
 		case B_LEFT_ARROW:
+			if (fClickOffset > 0)
+				fClickOffset = PreviousInitialByte(fClickOffset);
+			
 			if (shiftDown) {
-				if (selStart > 0)
-					selStart = PreviousInitialByte(selStart);
-			} else {
-				if (selStart == selEnd) {
-					if (selStart > 0) 
-						selEnd = selStart = PreviousInitialByte(selStart);
-				} else
-					selEnd = selStart;
-			}
+				if (fClickOffset > fSelStart)
+					selEnd = fClickOffset;
+				else
+					selStart = fClickOffset;
+			} else
+				selStart = selEnd = fClickOffset;
+	
 			scrollToOffset = selStart;
 			break;
 			
 		case B_RIGHT_ARROW:
+			if (fClickOffset < fText->Length())
+				fClickOffset = NextInitialByte(fClickOffset);
+			
 			if (shiftDown) {
-				if (selEnd < fText->Length())
-					selEnd = NextInitialByte(selEnd);
-			} else {
-				if (selStart == selEnd) {
-					if (selStart < fText->Length())
-						selStart = selEnd = NextInitialByte(selEnd);
-				}
+				if (fClickOffset < fSelEnd)
+					selStart = fClickOffset;
 				else
-					selStart = selEnd;
-			}
+					selEnd = fClickOffset;
+			} else
+				selStart = selEnd = fClickOffset;
+			
 			scrollToOffset = selEnd;
 			break;
 			
 		case B_UP_ARROW:
 		{
-			BPoint point = PointAt(selStart);
-			point.y--;
-			selStart = OffsetAt(point);
-			if (!shiftDown)
-				selEnd = selStart;
+			float height;
+			BPoint point = PointAt(fClickOffset, &height);
+			point.y -= height;
+			fClickOffset = OffsetAt(point);
+			if (shiftDown) {
+				if (fClickOffset > fSelStart)
+					selEnd = fClickOffset;
+				else
+					selStart = fClickOffset;
+			} else
+				selStart = selEnd = fClickOffset;
+
 			scrollToOffset = selStart;
 			break;
 		}
@@ -2855,11 +2863,17 @@ BTextView::HandleArrowKey(uint32 inArrowKey)
 		case B_DOWN_ARROW:
 		{
 			float height;
-			BPoint point = PointAt(selEnd, &height);
+			BPoint point = PointAt(fClickOffset, &height);
 			point.y += height;
-			selEnd = OffsetAt(point);
-			if (!shiftDown)
-				selStart = selEnd;
+			fClickOffset = OffsetAt(point);
+			if (shiftDown) {
+				if (fClickOffset < fSelEnd)
+					selStart = fClickOffset;
+				else
+					selEnd = fClickOffset;
+			} else
+				selStart = selEnd = fClickOffset;
+			
 			scrollToOffset = selEnd;
 			break;
 		}
@@ -2900,7 +2914,7 @@ BTextView::HandleDelete()
 	
 	DeleteText(fSelStart, fSelEnd);
 	
-	fSelEnd = fSelStart;
+	fClickOffset = fSelEnd = fSelStart;
 	
 	Refresh(fSelStart, fSelEnd, true, true);
 }
@@ -2910,26 +2924,28 @@ BTextView::HandlePageKey(uint32 inPageKey)
 {
 	CALLED();
 	
-	int32 modifiers = 0;
-	BMessage *currentMessage = Window()->CurrentMessage();
+	int32 mods = 0;
+	/*BMessage *currentMessage = Window()->CurrentMessage();
 	if (currentMessage)
-		currentMessage->FindInt32("modifiers", &modifiers);
-
-	bool shiftDown = modifiers & B_SHIFT_KEY;
-
-	int32 newOffset;
+		currentMessage->FindInt32("modifiers", &mods);
+*/
+	mods = modifiers();
+	bool shiftDown = mods & B_SHIFT_KEY;
 	
 	STELinePtr line = NULL; 
 
 	switch (inPageKey) {
 		case B_HOME:
 			line = (*fLines)[CurrentLine()];
-			newOffset = line->offset;
-			ScrollToOffset(newOffset);
-			if (shiftDown)
-				Select(newOffset, fSelStart);
-			else
-				Select(newOffset, newOffset);
+			fClickOffset = line->offset;
+			ScrollToOffset(fClickOffset);
+			if (shiftDown) {
+				if (fClickOffset <= fSelStart)
+					Select(fClickOffset, fSelEnd);
+				else
+					Select(fSelStart, fClickOffset);
+			} else
+				Select(fClickOffset, fClickOffset);
 			break;
 
 		case B_END:
@@ -2938,15 +2954,18 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			// offset of the next line, and go to the previous charachter
 			if (CurrentLine() + 1 < fLines->NumLines()) {
 				line = (*fLines)[CurrentLine() + 1];
-				newOffset = PreviousInitialByte(line->offset);
+				fClickOffset = PreviousInitialByte(line->offset);
 			} else
-				newOffset = fText->Length();
+				fClickOffset = fText->Length();
 
-			ScrollToOffset(newOffset);
-			if (shiftDown)
-				Select(fSelEnd, newOffset);
-			else
-				Select(newOffset, newOffset);
+			ScrollToOffset(fClickOffset);
+			if (shiftDown) {
+				if (fClickOffset >= fSelEnd)
+					Select(fSelStart, fClickOffset);
+				else
+					Select(fClickOffset, fSelEnd);
+			} else
+				Select(fClickOffset, fClickOffset);
 			break;
 			
 		case B_PAGE_UP: 
@@ -3002,7 +3021,7 @@ BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 	else*/
 		InsertText(bytes, numBytes, fSelStart, NULL);
 	
-	fSelEnd = fSelStart = fSelStart + numBytes;
+	fClickOffset = fSelEnd = fSelStart = fSelStart + numBytes;
 
 	Refresh(fSelStart, fSelEnd, refresh, true);
 }
@@ -3054,7 +3073,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 	toLine = min_c(toLine, toVisible);
 
 	int32 drawOffset = fromOffset;
-	if ( LineHeight(fromLine) != saveLineHeight || 
+	if (LineHeight(fromLine) != saveLineHeight || 
 		 newHeight < saveHeight || fromLine < saveFromLine )
 		drawOffset = (*fLines)[fromLine]->offset;
 	
@@ -4090,7 +4109,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	if (fInline->IsActive()) {
 		int32 oldOffset = fInline->Offset();
 		DeleteText(oldOffset, oldOffset + fInline->Length());
-		Select(oldOffset, oldOffset);
+		fSelStart = fSelEnd = oldOffset;
 	}
 	
 	int32 stringLen = strlen(string);
@@ -4100,8 +4119,9 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	
 	// Insert the new text
 	InsertText(string, stringLen, fSelStart, NULL);
-	Select(fSelStart + stringLen, fSelStart + stringLen);
-	
+	fSelStart += stringLen;
+	fClickOffset = fSelEnd = fSelStart;
+
 	Refresh(0, fLines->NumLines(), true, false);
 	
 	// If we find the "be:confirmed" boolean (and the boolean is true),
