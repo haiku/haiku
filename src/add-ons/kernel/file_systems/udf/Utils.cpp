@@ -128,4 +128,26 @@ Udf::get_block_shift(uint32 blockSize, uint32 &blockShift)
 	return B_OK;
 }	
 
+/*! \brief Returns "true" if \a value is true, "false" otherwise.
+*/
+const char*
+Udf::bool_to_string(bool value)
+{
+	return value ? "true" : "false";
+}
+
+/*! \brief Takes an overloaded ssize_t return value like those returned
+	by BFile::Read() and friends, as well as an expected number of bytes,
+	and returns B_OK if the byte counts match, or the appropriate error
+	code otherwise.
+*/
+status_t
+Udf::check_size_error(ssize_t bytesReturned, ssize_t bytesExpected)
+{
+	return bytesReturned == bytesExpected
+	       ? B_OK
+	       : (bytesReturned >= 0 ? B_ERROR : status_t(bytesReturned));
+}
+
 } // namespace Udf
+
