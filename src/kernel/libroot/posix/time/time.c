@@ -1,21 +1,21 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include <time.h>
-#include <syscalls.h>
+#include <OS.h>
 
 
 time_t
 time(time_t *timer)
 {
-	// ToDo: implement time()
+	time_t secs = real_time_clock();
 
 	if (timer)
-		*timer = 0;
+		*timer = secs;
 
-	return 0;
+	return secs;
 }
 
