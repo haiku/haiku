@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include <Directory.h>
 #include <Entry.h>
@@ -15,6 +16,8 @@
 #include <Path.h>
 
 #include <syscalls.h>
+
+mode_t __gUmask = S_IUMSK;
 
 enum {
 	FD_TYPE_UNKNOWN,
@@ -176,8 +179,9 @@ get_path(int fd, const char *relPath, BPath &path)
 }
 
 // _kern_open
+extern "C"
 int
-_kern_open(int fd, const char *path, int omode)
+_kern_open(int fd, const char *path, int omode, int permissions)
 {
 	status_t error;
 	BPath fullPath;
@@ -191,7 +195,7 @@ _kern_open(int fd, const char *path, int omode)
 		path = fullPath.Path();
 	}
 	// open the file
-	int result = open(path, omode);
+	int result = open(path, omode, permissions);
 	if (result < 0)
 		return errno;
 	return result;
@@ -201,7 +205,8 @@ _kern_open(int fd, const char *path, int omode)
 // _kern_open_entry_ref
 extern "C"
 int
-_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
+_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode,
+	int permissions)
 {
 	BPath fullPath;
 	node_ref ref;
@@ -216,7 +221,7 @@ _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 	if (error != B_OK)
 		return error;
 	// open the file
-	int fd = open(fullPath.Path(), omode);
+	int fd = open(fullPath.Path(), omode, permissions);
 	if (fd < 0)
 		return errno;
 	return fd;
