@@ -42,6 +42,6 @@ ppc_get_page_table(page_table_entry_group **_pageTable, size_t *_size)
 void 
 ppc_set_page_table(page_table_entry_group *pageTable, size_t size)
 {
-	set_sdr1(((uint32)pageTable & 0xffff0000) | (((size >> 16) - 1 ) & 0x1ff));
+	set_sdr1(((uint32)pageTable & 0xffff0000) | (((size -1) >> 16) & 0x1ff));
 }
 
