@@ -143,15 +143,15 @@ _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
 	if (in_vesa) {
 		struct VBEModeInfoBlock *mode_info = (struct VBEModeInfoBlock *)(vesa_ptr + 0x200);
 
-		ka->fb.enabled = 1;
-		ka->fb.x_size = mode_info->x_resolution;
-		ka->fb.y_size = mode_info->y_resolution;
-		ka->fb.bit_depth = mode_info->bits_per_pixel;
-		ka->fb.mapping.start = mode_info->phys_base_ptr;
-		ka->fb.mapping.size = ka->fb.x_size * ka->fb.y_size * (ka->fb.bit_depth/8);
-		ka->fb.already_mapped = 0;
+		ka->frame_buffer.enabled = 1;
+		ka->frame_buffer.width = mode_info->x_resolution;
+		ka->frame_buffer.height = mode_info->y_resolution;
+		ka->frame_buffer.depth = mode_info->bits_per_pixel;
+		ka->frame_buffer.physical_buffer.start = mode_info->phys_base_ptr;
+		ka->frame_buffer.physical_buffer.size = ka->frame_buffer.width
+			* ka->frame_buffer.height * (ka->frame_buffer.depth / 8);
 	} else
-		ka->fb.enabled = 0;
+		ka->frame_buffer.enabled = 0;
 
 	mmu_init(ka, &next_paddr);
 
@@ -352,8 +352,8 @@ _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
 	ka->kernel_args_size = sizeof(kernel_args);
 	ka->version = CURRENT_KERNEL_ARGS_VERSION;
 	ka->arch_args.system_time_cv_factor = cv_factor;
-	ka->str = NULL;
 	ka->arch_args.page_hole = 0xffc00000;
+	ka->num_kernel_args_ranges = 0;
 	ka->num_cpus = 1;
 #if 0
 	dprintf("kernel args at 0x%x\n", ka);
