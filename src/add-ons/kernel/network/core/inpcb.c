@@ -248,7 +248,8 @@ int in_pcbconnect(struct inpcb *inp, struct mbuf *nam)
 	struct sockaddr_in *sin = mtod(nam, struct sockaddr_in *);
 	
 	if (nam->m_len != sizeof(*sin)) {
-		printf("in_pcbconnect: EINVAL\n");
+		printf("in_pcbconnect: EINVAL: is %ld should be %ld\n", nam->m_len,
+			sizeof(*sin));
 		return EINVAL;
 	}
 	if (sin->sin_family != AF_INET) {
