@@ -2,4 +2,5 @@ distro
 floppy.x86
 kernel.x86
 objects
+packages
 tests
