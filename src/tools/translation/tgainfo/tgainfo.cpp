@@ -91,6 +91,8 @@ struct TGAImageSpec {
 
 #define TGA_HEADERS_SIZE 18
 #define TGA_FTR_LEN 26
+#define TGA_EXT_LEN 495
+#define LINE_LEN 82
 
 const char *
 colormaptype(uint8 n)
@@ -115,6 +117,18 @@ imagetype(uint8 n)
 		case 11: return "RLE grayscale";
 	}
 	return "unknown";
+}
+
+uint16
+tga_uint16(char *buffer, int32 offset)
+{
+	return B_LENDIAN_TO_HOST_INT16(*(reinterpret_cast<uint16 *>(buffer + offset)));
+}
+
+uint32
+tga_uint32(char *buffer, int32 offset)
+{
+	return B_LENDIAN_TO_HOST_INT32(*(reinterpret_cast<uint32 *>(buffer + offset)));
 }
 
 void
@@ -145,10 +159,8 @@ print_tga_info(BFile &file)
 	
 	// TGA color map spec
 	TGAColorMapSpec mapspec;
-	memcpy(&mapspec.firstentry, buf + 3, 2);
-	mapspec.firstentry = B_LENDIAN_TO_HOST_INT16(mapspec.firstentry);
-	memcpy(&mapspec.length, buf + 5, 2);
-	mapspec.length = B_LENDIAN_TO_HOST_INT16(mapspec.length);
+	mapspec.firstentry = tga_uint16(reinterpret_cast<char *>(buf), 3);
+	mapspec.length = tga_uint16(reinterpret_cast<char *>(buf), 5);
 	mapspec.entrysize = buf[7];
 	
 	printf("\nColormap Spec:\n");
@@ -159,18 +171,10 @@ print_tga_info(BFile &file)
 	
 	// TGA image spec
 	TGAImageSpec imagespec;
-	memcpy(&imagespec.xorigin, buf + 8, 2);
-	imagespec.xorigin = B_LENDIAN_TO_HOST_INT16(imagespec.xorigin);
-	
-	memcpy(&imagespec.yorigin, buf + 10, 2);
-	imagespec.yorigin = B_LENDIAN_TO_HOST_INT16(imagespec.yorigin);
-	
-	memcpy(&imagespec.width, buf + 12, 2);
-	imagespec.width = B_LENDIAN_TO_HOST_INT16(imagespec.width);
-
-	memcpy(&imagespec.height, buf + 14, 2);
-	imagespec.height = B_LENDIAN_TO_HOST_INT16(imagespec.height);
-	
+	imagespec.xorigin = tga_uint16(reinterpret_cast<char *>(buf), 8);
+	imagespec.yorigin = tga_uint16(reinterpret_cast<char *>(buf), 10);
+	imagespec.width = tga_uint16(reinterpret_cast<char *>(buf), 12);
+	imagespec.height = tga_uint16(reinterpret_cast<char *>(buf), 14);
 	imagespec.depth = buf[16];
 	imagespec.descriptor = buf[17];
 	
@@ -200,15 +204,101 @@ print_tga_info(BFile &file)
 			if (strcmp(tgafooter + 8, "TRUEVISION-XFILE.") == 0) {
 			
 				uint32 extoffset = 0, devoffset = 0;
-				memcpy(&extoffset, tgafooter, 4);
-				memcpy(&devoffset, tgafooter + 4, 4);
-				extoffset = B_LENDIAN_TO_HOST_INT32(extoffset);
-				devoffset = B_LENDIAN_TO_HOST_INT32(devoffset);
+				extoffset = tga_uint32(tgafooter, 0);
+				devoffset = tga_uint32(tgafooter, 4);
 			
 				printf("\nTGA Footer:\n");
 				printf("extension offset: 0x%.8lx (%d)\n", extoffset, extoffset);
 				printf("developer offset: 0x%.8lx (%d)\n", devoffset, devoffset);
 				printf("signature: %s\n", tgafooter + 8);
+				
+				if (extoffset) {
+					char extbuf[TGA_EXT_LEN];
+					if (file.ReadAt(extoffset, extbuf, TGA_EXT_LEN) == TGA_EXT_LEN) {
+					
+						printf("\nExtension Area:\n");
+						
+						char strbuffer[LINE_LEN];
+						
+						uint16 extsize = tga_uint16(extbuf, 0);
+						if (extsize < TGA_EXT_LEN) {
+							printf("\nError: extension area is too small (%d)\n", extsize);
+							return;
+						}
+						printf("size: %d\n", extsize);
+						
+						memset(strbuffer, 0, LINE_LEN);
+						strncpy(strbuffer, extbuf + 2, 41);
+						printf("author: \"%s\"\n", strbuffer);
+						
+						printf("comments:\n");
+						for (int32 i = 0; i < 4; i++) {
+							memset(strbuffer, 0, LINE_LEN);
+							strcpy(strbuffer, extbuf + 43 + (i * 81));
+							printf("\tline %d: \"%s\"\n", i + 1, strbuffer);
+						}
+
+						printf("date/time (yyyy-mm-dd hh:mm:ss): %.4d-%.2d-%.2d %.2d:%.2d:%.2d\n",
+							tga_uint16(extbuf, 367), tga_uint16(extbuf, 369),
+							tga_uint16(extbuf, 371), tga_uint16(extbuf, 373),
+							tga_uint16(extbuf, 375), tga_uint16(extbuf, 377));
+							
+						memset(strbuffer, 0, LINE_LEN);
+						strncpy(strbuffer, extbuf + 379, 41);
+						printf("job name: \"%s\"\n", strbuffer);
+
+						printf("job time (hh:mm:ss): %.2d:%.2d:%.2d\n",
+							tga_uint16(extbuf, 420), tga_uint16(extbuf, 422),
+							tga_uint16(extbuf, 424));
+							
+						memset(strbuffer, 0, LINE_LEN);
+						strncpy(strbuffer, extbuf + 426, 41);
+						printf("software id: \"%s\"\n", strbuffer);
+						
+						char strver[] = "[null]";
+						if (extbuf[469] != '\0') {
+							strver[0] = extbuf[469];
+							strver[1] = '\0';
+						}
+						printf("software version, letter: %d, %s\n",
+							tga_uint16(extbuf, 467), strver);
+						
+						printf("key color (A,R,G,B): %d, %d, %d, %d\n",
+							extbuf[470], extbuf[471], extbuf[472], extbuf[473]);
+						
+						printf("pixel aspect ratio: %d / %d\n",
+							tga_uint16(extbuf, 474), tga_uint16(extbuf, 476));
+
+						printf("gamma value: %d / %d\n",
+							tga_uint16(extbuf, 478), tga_uint16(extbuf, 480));
+						
+						printf("color correction offset: 0x%.8lx (%d)\n",
+							tga_uint32(extbuf, 482), tga_uint32(extbuf, 482));
+						printf("postage stamp offset: 0x%.8lx (%d)\n",
+							tga_uint32(extbuf, 486), tga_uint32(extbuf, 486));
+						printf("scan line offset: 0x%.8lx (%d)\n",
+							tga_uint32(extbuf, 490), tga_uint32(extbuf, 490));
+						
+						const char *strattrtype = NULL;
+						uint8 attrtype = extbuf[494];
+						switch (attrtype) {
+							case 0: strattrtype = "no alpha"; break;
+							case 1: strattrtype = "undefined, ignore"; break;
+							case 2: strattrtype = "undefined, retain"; break;
+							case 3: strattrtype = "alpha"; break;
+							case 4: strattrtype = "pre-multiplied alpha"; break;
+							default:
+								if (attrtype > 4 && attrtype < 128)
+									strattrtype = "reserved";
+								else
+									strattrtype = "unassigned";
+								break;
+						}
+						printf("attributes type: %d (%s)\n", attrtype, strattrtype);
+						
+					} else
+						printf("\nError: Unable to read entire extension area\n");
+				}
 				
 			} else
 				printf("\nTGA footer not found\n");
@@ -225,19 +315,23 @@ main(int argc, char **argv)
 {
 	printf("\n");
 	
-	if (argc == 2) {
-		BFile file(argv[1], B_READ_ONLY);
-		if (file.InitCheck() != B_OK)
-			printf("Error opening %s\n", argv[1]);
-		else {
-			printf("TGA image information for: %s\n", argv[1]);
-			print_tga_info(file);
-		}
-	}
-	else {
+	if (argc == 1) {
 		printf("tgainfo - reports information about a TGA image file\n");
 		printf("\nUsage:\n");
 		printf("tgainfo filename.tga\n");	
+	}
+	else {
+		BFile file;
+		
+		for (int32 i = 1; i < argc; i++) {
+			if (file.SetTo(argv[i], B_READ_ONLY) != B_OK)
+				printf("\nError opening %s\n", argv[i]);
+			else {
+				printf("\nTGA image information for: %s\n", argv[i]);
+				print_tga_info(file);
+			}
+		}
+
 	}
 	
 	printf("\n");
