@@ -1161,6 +1161,23 @@ ProbeView::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case B_NODE_MONITOR:
+		{
+			switch (message->FindInt32("opcode")) {
+				case B_ATTR_CHANGED:
+				{
+					BMenuBar *bar = Window()->KeyMenuBar();
+					if (bar != NULL) {
+						BMenuItem *item = bar->FindItem("Attributes");
+						if (item != NULL && item->Submenu() != NULL)
+							UpdateAttributesMenu(item->Submenu());
+					}
+					break;
+				}
+			}
+			break;
+		}
+
 		case B_CLIPBOARD_CHANGED:
 			CheckClipboard();
 			break;
