@@ -9,7 +9,7 @@
 // read from a BPositionIO object.
 //
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2003 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -30,6 +30,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include <stdio.h>
 #include <string.h>
 #include "StreamBuffer.h"
 
@@ -55,7 +56,8 @@
 //
 // Returns:
 // ---------------------------------------------------------------
-StreamBuffer::StreamBuffer(BPositionIO *pstream, size_t nbuffersize)
+StreamBuffer::StreamBuffer(BPositionIO *pstream, size_t nbuffersize,
+	bool binitialread)
 {
 	fpStream = pstream;
 	fpBuffer = NULL;
@@ -68,7 +70,7 @@ StreamBuffer::StreamBuffer(BPositionIO *pstream, size_t nbuffersize)
 
 	fnBufferSize = max(nbuffersize, MIN_BUFFER_SIZE);
 	fpBuffer = new uint8[fnBufferSize];
-	if (fpBuffer)
+	if (fpBuffer && binitialread)
 		ReadStream();
 			// Fill the buffer with data so that
 			// object is prepared for first call to
@@ -113,7 +115,8 @@ StreamBuffer::~StreamBuffer()
 // Returns: B_OK if object has been initialized successfully,
 // B_ERROR if not
 // ---------------------------------------------------------------
-status_t StreamBuffer::InitCheck()
+status_t
+StreamBuffer::InitCheck()
 {
 	if (fpStream && fpBuffer)
 		return B_OK;
@@ -138,7 +141,8 @@ status_t StreamBuffer::InitCheck()
 // Returns: the number of bytes successfully read or an
 // error code returned by BPositionIO::Read()
 // ---------------------------------------------------------------
-ssize_t StreamBuffer::Read(uint8 *pinto, size_t nbytes)
+ssize_t
+StreamBuffer::Read(uint8 *pinto, size_t nbytes)
 {
 	ssize_t result = B_ERROR;
 	size_t rd1 = 0, rd2 = 0;
@@ -163,6 +167,37 @@ ssize_t StreamBuffer::Read(uint8 *pinto, size_t nbytes)
 }
 
 // ---------------------------------------------------------------
+// Seek
+//
+// Seeks the stream to the given position and refreshes the
+// read buffer.  If the seek operation fails, the read buffer
+// will be reset.
+//
+// Preconditions: fpBuffer must be allocated and fnBufferSize
+// must be valid
+//
+// Parameters:	
+//
+// Postconditions:
+//
+// Returns: true if the seek was successful,
+// false if the seek operation failed
+// ---------------------------------------------------------------
+bool
+StreamBuffer::Seek(off_t position)
+{
+	fnLen = 0;
+	fnPos = 0;
+	
+	if (fpStream->Seek(position, SEEK_SET) == position) {
+		ReadStream();
+		return true;
+	}
+	
+	return false;
+}
+
+// ---------------------------------------------------------------
 // ReadStream
 //
 // Fills the stream buffer with data read in from the stream
@@ -177,7 +212,8 @@ ssize_t StreamBuffer::Read(uint8 *pinto, size_t nbytes)
 // Returns: the number of bytes successfully read or an
 // error code returned by BPositionIO::Read()
 // ---------------------------------------------------------------
-ssize_t StreamBuffer::ReadStream()
+ssize_t
+StreamBuffer::ReadStream()
 {
 	ssize_t rd;
 	rd = fpStream->Read(fpBuffer, fnBufferSize);
@@ -187,5 +223,3 @@ ssize_t StreamBuffer::ReadStream()
 	}
 	return rd;
 }
-
-

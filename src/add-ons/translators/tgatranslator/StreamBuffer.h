@@ -9,7 +9,7 @@
 // read from a BPositionIO object.
 //
 //
-// Copyright (c) 2002 OpenBeOS Project
+// Copyright (c) 2003 OpenBeOS Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
@@ -39,7 +39,7 @@
 
 class StreamBuffer {
 public:
-	StreamBuffer(BPositionIO *pstream, size_t nbuffersize);
+	StreamBuffer(BPositionIO *pstream, size_t nbuffersize, bool binitialread);
 	~StreamBuffer();
 	
 	status_t InitCheck();
@@ -47,6 +47,9 @@ public:
 	
 	ssize_t Read(uint8 *pinto, size_t nbytes);
 		// copy nbytes from the stream into pinto
+		
+	bool Seek(off_t position);
+		// seek the stream to the given position
 	
 private:
 	ssize_t ReadStream();
