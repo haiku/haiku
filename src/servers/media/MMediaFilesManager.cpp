@@ -27,7 +27,6 @@ MMediaFilesManager::~MMediaFilesManager()
 {
 	CALLED();
 	delete fRunner;
-	SaveState();
 	delete fRegistryMap;
 	delete fLocker;
 }
@@ -144,6 +143,7 @@ MMediaFilesManager::LoadState()
 status_t
 MMediaFilesManager::SaveState()
 {
+	CALLED();
 	status_t err = B_OK;
 	BPath path;
 	if((err = find_directory(B_USER_SETTINGS_DIRECTORY, &path))!=B_OK)
@@ -181,7 +181,9 @@ MMediaFilesManager::SaveState()
 		file.Write(&zero, sizeof(uint32));
 	}
 	file.Write(&zero, sizeof(uint32));
-			
+	
+	printf("save state ok\n");
+	
 	return B_OK;
 }
 

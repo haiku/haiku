@@ -107,7 +107,7 @@ private:
 
 	BLocker *fLocker;
 	
-	void MessageReceived(BMessage *msg);
+	virtual void MessageReceived(BMessage *msg);
 	typedef BApplication inherited;
 };
 
@@ -171,6 +171,7 @@ bool
 ServerApp::QuitRequested()
 {
 	TRACE("ServerApp::QuitRequested()\n");
+	gMMediaFilesManager->SaveState();
 	gNodeManager->SaveState();
 	gAppManager->TerminateAddonServer();
 	return true;
@@ -691,7 +692,8 @@ ServerApp::controlthread(void *arg)
 	return 0;
 }
 
-void ServerApp::MessageReceived(BMessage *msg)
+void 
+ServerApp::MessageReceived(BMessage *msg)
 {
 	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
 	switch (msg->what) {
@@ -699,9 +701,9 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_SEND_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MMEDIAFILESMANAGER_SAVE_TIMER:	gMMediaFilesManager->TimerMessage(); break;		
-		default:
-			printf("\nnew media server: unknown message received\n");
-			msg->PrintToStream();
+		default: inherited::MessageReceived(msg); break;
+			//printf("\nnew media server: unknown message received\n");
+			//msg->PrintToStream();
 	}
 	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);
 }
