@@ -140,7 +140,7 @@ speexDecoder::Setup(media_format *inputFormat,
 		speex_decoder_ctl(fDecoderState, SPEEX_SET_ENH, &enabled);
 	}
 	speex_decoder_ctl(fDecoderState, SPEEX_GET_FRAME_SIZE, &fHeader->frame_size);
-	fSpeexOutputLength = fHeader->frame_size * sizeof(float);
+	fSpeexOutputLength = fHeader->frame_size * sizeof(float) * fHeader->nb_channels;
 	if (fHeader->nb_channels == 2) {
 		SpeexCallback callback;
 		SpeexStereoState stereo = SPEEX_STEREO_STATE_INIT;
