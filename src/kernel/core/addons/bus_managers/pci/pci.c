@@ -37,9 +37,9 @@
 typedef struct pci_device pci_device;
 
 struct pci_device {
-	pci_info   *info;
-	int        type;
 	pci_device *next;
+	int        type;
+	pci_info   *info;
 };
 
 
@@ -49,8 +49,8 @@ struct pci_device {
 typedef struct pci_bus pci_bus;
 
 struct pci_bus {
-	pci_info *info;
 	pci_bus  *next;
+	pci_info *info;
 };
 
 
@@ -109,7 +109,6 @@ static addr       gPCI_BIOS_Address = 0; /* virtual address of memory we map */
 #define PCI_PRODUCT_INTEL_82443BX        0x7190
 #define PCI_PRODUCT_INTEL_82443BX_AGP    0x7191
 #define PCI_PRODUCT_INTEL_82443BX_NOAGP  0x7192
-#define PCI_PRODUCT_INTEL_82845_AGP      0x1a31
 
 /* Config space locking!
  * We need to make sure we only have one access at a time into the config space,
