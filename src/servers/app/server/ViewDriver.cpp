@@ -72,6 +72,8 @@ VDWIN_SETCURSOR,
 
 extern RGBColor workspace_default_color;
 
+bool is_initialized=false;
+
 
 VDView::VDView(BRect bounds)
 	: BView(bounds,"viewdriver_view",B_FOLLOW_ALL, B_WILL_DRAW)
@@ -499,7 +501,13 @@ bool VDWindow::QuitRequested(void)
 	{
 		write_port(serverport,B_QUIT_REQUESTED,NULL,0);
 	}
-
+	
+	// We actually have to perform the internal equivalent of calling Shutdown
+	// to eliminate a race condition. If a ServerWindow attempts to call a driver
+	// function after the window has closed but before the AppServer instance
+	// has called Shutdown, we end up with a crash inside one of the graphics
+	// methods
+	is_initialized=false;
 	return true;
 }
 
@@ -596,6 +604,7 @@ void ViewDriver::SetMode(const display_mode &mode)
 	
 	if(!tempbmp->IsValid())
 	{
+		screenwin->Unlock();
 		delete tempbmp;
 		return;
 	}
@@ -1709,7 +1718,10 @@ float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 
 	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
 	if(error)
+	{
+		screenwin->Unlock();
 		return 0.0;
+	}
 
 	slot=face->glyph;
 
@@ -1717,7 +1729,10 @@ float ViewDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
+	{
+		screenwin->Unlock();
 		return 0.0;
+	}
 
 	// set the pen position in 26.6 cartesian space coordinates
 	pen.x=0;
@@ -1761,7 +1776,10 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	FontStyle *style=font->Style();
 
 	if(!style)
+	{
+		screenwin->Unlock();
 		return 0.0;
+	}
 
 	FT_Face face;
 	FT_GlyphSlot slot;
@@ -1777,7 +1795,10 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
+	{
+		screenwin->Unlock();
 		return 0.0;
+	}
 
 	slot=face->glyph;
 	

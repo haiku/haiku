@@ -194,7 +194,6 @@ protected:
 //	drawing_mode drawmode;
 	
 	rgb_color highcolor,lowcolor;
-	bool is_initialized;
 };
 
 #endif
