@@ -144,11 +144,30 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 							PartitionUnmounted(message);
 							break;
 						case B_DEVICE_PARTITION_CHANGED:
+							PartitionChanged(message);
+							break;
 						case B_DEVICE_PARTITION_ADDED:
+							PartitionAdded(message);
+							break;
 						case B_DEVICE_PARTITION_REMOVED:
+							PartitionRemoved(message);
+							break;
+						case B_DEVICE_SESSION_ADDED:
+							SessionAdded(message);
+							break;
+						case B_DEVICE_SESSION_REMOVED:
+							SessionRemoved(message);
+							break;
 						case B_DEVICE_MEDIA_CHANGED:
+							MediaChanged(message);
+							break;
 						case B_DEVICE_ADDED:
+							DeviceAdded(message);
+							break;
 						case B_DEVICE_REMOVED:
+							DeviceRemoved(message);
+							break;
+						default:
 							printf("unhandled event\n");
 							message->PrintToStream();
 							break;
@@ -191,6 +210,63 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 		PrintPartitionInfo(message);
 	}
 
+	// PartitionChanged
+	void PartitionChanged(BMessage *message)
+	{
+		printf("TestApp::PartitionUnmounted()\n");
+		PrintPartitionInfo(message);
+	}
+
+	// PartitionAdded
+	void PartitionAdded(BMessage *message)
+	{
+		printf("TestApp::PartitionAdded()\n");
+		PrintPartitionInfo(message);
+	}
+
+	// PartitionRemoved
+	void PartitionRemoved(BMessage *message)
+	{
+		printf("TestApp::PartitionRemoved()\n");
+		PrintPartitionInfo(message);
+	}
+
+	// SessionAdded
+	void SessionAdded(BMessage *message)
+	{
+		printf("TestApp::SessionAdded()\n");
+		PrintSessionInfo(message);
+	}
+
+	// SessionRemoved
+	void SessionRemoved(BMessage *message)
+	{
+		printf("TestApp::SessionRemoved()\n");
+		PrintSessionInfo(message);
+	}
+
+	// MediaChanged
+	void MediaChanged(BMessage *message)
+	{
+		printf("TestApp::MediaChanged()\n");
+		PrintDeviceInfo(message);
+	}
+
+	// DeviceAdded
+	void DeviceAdded(BMessage *message)
+	{
+		printf("TestApp::DeviceAdded()\n");
+		PrintDeviceInfo(message);
+	}
+
+	// DeviceRemoved
+	void DeviceRemoved(BMessage *message)
+	{
+		printf("TestApp::DeviceRemoved()\n");
+		PrintDeviceInfo(message);
+	}
+
+	// PrintPartitionInfo
 	void PrintPartitionInfo(BMessage *message)
 	{
 		int32 deviceID;
@@ -206,6 +282,35 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 				== B_OK) {
 				DumpVisitor().Visit(partition);
 			}
+		}
+	}
+
+	// PrintSessionInfo
+	void PrintSessionInfo(BMessage *message)
+	{
+		int32 deviceID;
+		int32 sessionID;
+		if (message->FindInt32("device_id", &deviceID) == B_OK
+			&& message->FindInt32("session_id", &sessionID) == B_OK) {
+			BDiskDeviceRoster roster;
+			BDiskDevice device;
+			BSession *session;
+			if (roster.GetSessionWithID(sessionID, &device, &session)
+				== B_OK) {
+				DumpVisitor().Visit(session);
+			}
+		}
+	}
+
+	// PrintDeviceInfo
+	void PrintDeviceInfo(BMessage *message)
+	{
+		int32 deviceID;
+		if (message->FindInt32("device_id", &deviceID) == B_OK) {
+			BDiskDeviceRoster roster;
+			BDiskDevice device;
+			if (roster.GetDeviceWithID(deviceID, &device) == B_OK)
+				DumpVisitor().Visit(&device);
 		}
 	}
 
