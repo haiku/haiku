@@ -32,6 +32,7 @@
 // Standard Includes -----------------------------------------------------------
 #include <new>
 #include <stdio.h>
+#include <string.h>
 
 // System Includes -------------------------------------------------------------
 #include <Application.h>
@@ -585,28 +586,27 @@ void
 BMessenger::InitData(const char *signature, team_id team, status_t *result)
 {
 	status_t error = B_OK;
-	// if no team ID is given, get one using the signature
+	// get an app_info
+	app_info info;
 	if (team < 0) {
+		// no team ID given
 		if (signature) {
-			team = be_roster->TeamFor(signature);
-			if (team < 0) {
-				error = team;
-				// B_ERROR means that no application with the given signature
-				// is running. But we are supposed to return B_BAD_VALUE.
-				if (error == B_ERROR)
-					error = B_BAD_VALUE;
-			}
+			error = be_roster->GetAppInfo(signature, &info);
+			team = info.team;
+			// B_ERROR means that no application with the given signature
+			// is running. But we are supposed to return B_BAD_VALUE.
+			if (error == B_ERROR)
+				error = B_BAD_VALUE;
 		} else
 			error = B_BAD_TYPE;
-	}
-	// get the app_info of the team
-	app_info info;
-	if (error == B_OK)
+	} else {
+		// a team ID is given
 		error = be_roster->GetRunningAppInfo(team, &info);
-	// check, whether the signature is correct
-	if (error == B_OK && signature && strcmp(signature, info.signature) != 0)
-		error = B_MISMATCHED_VALUES;
-	// check whether it the app flags say B_ARGV_ONLY
+		// Compare the returned signature with the supplied one.
+		if (error == B_OK && signature && strcmp(signature, info.signature))
+			error = B_MISMATCHED_VALUES;
+	}
+	// check whether the app flags say B_ARGV_ONLY
 	if (error == B_OK && (info.flags & B_ARGV_ONLY)) {
 		error = B_BAD_TYPE;
 		// Set the team ID nevertheless -- that's what Be's implementation
