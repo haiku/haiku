@@ -43,7 +43,7 @@ class Volume {
 		bool				IsValidSuperBlock();
 		bool				IsReadOnly() const;
 		void				Panic();
-		Benaphore			&Lock();
+		Semaphore			&Lock();
 
 		block_run			Root() const { return fSuperBlock.root_dir; }
 		Inode				*RootNode() const { return fRootNode; }
@@ -114,7 +114,7 @@ class Volume {
 		int					fDevice;
 		disk_super_block	fSuperBlock;
 		BlockAllocator		fBlockAllocator;
-		Benaphore			fLock;
+		Semaphore			fLock;
 		Journal				*fJournal;
 		vint32				fLogStart, fLogEnd;
 
@@ -142,7 +142,7 @@ Volume::IsReadOnly() const
 }
 
 
-inline Benaphore &
+inline Semaphore &
 Volume::Lock()
 {
 	 return fLock;

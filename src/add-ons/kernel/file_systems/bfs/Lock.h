@@ -1,6 +1,6 @@
 #ifndef LOCK_H
 #define LOCK_H
-/* Lock - benaphores, read/write lock implementation
+/* Lock - simple semaphores, read/write lock implementation
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** Roughly based on a Be sample code written by Nathan Schrenk.
@@ -12,16 +12,27 @@
 #include <KernelExport.h>
 
 
-class Benaphore {
+// configure here if and when real benaphores should be used
+#ifdef USER
+#	define USE_BENAPHORE 1
+#endif
+
+
+class Semaphore {
 	public:
-		Benaphore(const char *name = "bfs benaphore")
+		Semaphore(const char *name = "bfs sem")
 			:
-			fSemaphore(create_sem(0, name)),
-			fCount(1)
+			fSemaphore(create_sem(0, name))
+#ifdef USE_BENAPHORE
+			, fCount(1)
+#endif
 		{
+#ifndef USER
+			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
+#endif
 		}
 
-		~Benaphore()
+		~Semaphore()
 		{
 			delete_sem(fSemaphore);
 		}
@@ -36,28 +47,38 @@ class Benaphore {
 
 		status_t Lock()
 		{
+#ifdef USE_BENAPHORE
 			if (atomic_add(&fCount, -1) <= 0)
+#endif
 				return acquire_sem(fSemaphore);
-
+#ifdef USE_BENAPHORE
 			return B_OK;
+#endif
 		}
 	
-		void Unlock()
+		status_t Unlock()
 		{
+#ifdef USE_BENAPHORE
 			if (atomic_add(&fCount, 1) < 0)
-				release_sem(fSemaphore);
+#endif
+				return release_sem(fSemaphore);
+#ifdef USE_BENAPHORE
+			return B_OK;
+#endif
 		}
 
 	private:
 		sem_id	fSemaphore;
+#ifdef USE_BENAPHORE
 		vint32	fCount;
+#endif
 };
 
 // a convenience class to lock the benaphore
 
 class Locker {
 	public:
-		Locker(Benaphore &lock)
+		Locker(Semaphore &lock)
 			: fLock(lock)
 		{
 			fStatus = lock.Lock();
@@ -68,9 +89,14 @@ class Locker {
 			if (fStatus == B_OK)
 				fLock.Unlock();
 		}
-	
+
+		status_t Status() const
+		{
+			return fStatus;
+		}
+
 	private:
-		Benaphore	&fLock;
+		Semaphore	&fLock;
 		status_t	fStatus;
 };
 
@@ -118,6 +144,9 @@ class ReadWriteLock {
 			fCount(MAX_READERS),
 			fWriteLock()
 		{
+#ifndef USER
+			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
+#endif
 		}
 
 		~ReadWriteLock()
@@ -181,7 +210,7 @@ class ReadWriteLock {
 
 		sem_id		fSemaphore;
 		vint32		fCount;
-		Benaphore	fWriteLock;
+		Semaphore	fWriteLock;
 };
 #else	// FAST_LOCK
 class ReadWriteLock {
@@ -190,6 +219,9 @@ class ReadWriteLock {
 			:
 			fSemaphore(create_sem(MAX_READERS, name))
 		{
+#ifndef USER
+			set_sem_owner(fSemaphore, B_SYSTEM_TEAM);
+#endif
 		}
 
 		~ReadWriteLock()

@@ -69,7 +69,7 @@ class Journal {
 		status_t TransactionDone(bool success);
 
 		Volume		*fVolume;
-		Benaphore	fLock;
+		Semaphore	fLock;
 		Transaction *fOwner;
 		thread_id	fOwningThread;
 		BlockArray	fArray;

@@ -20,6 +20,11 @@ BufferPool::BufferPool()
 {
 	fLock = create_sem(1, "buffer lock");
 	fFreeBuffers = create_sem(0, "free buffers");
+
+#ifndef USER
+	set_sem_owner(fLock, B_SYSTEM_TEAM);
+	set_sem_owner(fFreeBuffers, B_SYSTEM_TEAM);
+#endif
 }
 
 

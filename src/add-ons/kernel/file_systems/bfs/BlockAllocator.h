@@ -47,7 +47,7 @@ class BlockAllocator {
 		static status_t initialize(BlockAllocator *);
 
 		Volume			*fVolume;
-		Benaphore		fLock;
+		Semaphore		fLock;
 		AllocationGroup	*fGroups;
 		int32			fNumGroups, fBlocksPerGroup;
 		uint32			*fCheckBitmap;
