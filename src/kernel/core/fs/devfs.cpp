@@ -91,7 +91,6 @@ struct devfs {
 };
 
 struct devfs_cookie {
-	struct devfs_stream *stream;
 	int oflags;
 	union {
 		struct cookie_dir {
@@ -811,14 +810,16 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 	if (cookie == NULL)
 		return B_NO_MEMORY;
 
-	if (vnode->stream.type != STREAM_TYPE_DEVICE)
-		return B_BAD_VALUE;
-
-	if (vnode->stream.u.dev.node != NULL) {
-		status = vnode->stream.u.dev.info->open(vnode->stream.u.dev.node->parent->cookie,
-					openMode, &cookie->u.dev.dcookie);
-	} else
-		status = vnode->stream.u.dev.ops->open(vnode->name, openMode, &cookie->u.dev.dcookie);
+	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
+		if (vnode->stream.u.dev.node != NULL) {
+			status = vnode->stream.u.dev.info->open(
+				vnode->stream.u.dev.node->parent->cookie, openMode,
+				&cookie->u.dev.dcookie);
+		} else {
+			status = vnode->stream.u.dev.ops->open(vnode->name, openMode,
+				&cookie->u.dev.dcookie);
+		}
+	}
 
 	*_cookie = cookie;
 
@@ -877,13 +878,8 @@ devfs_read(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, off_t pos,
 
 	TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n", vnode, cookie, pos, _length));
 
-	// Whoa! If the next to lines are uncommented, our kernel crashes at some point
-	// I haven't yet found the time to investigate, but I'll doubtlessly have to do
-	// that at some point -- axeld.
-	//if (cookie->stream->type != STREAM_TYPE_DEVICE)
-	//	return EINVAL;
-	//if (vnode->stream.type != STREAM_TYPE_DEVICE)
-	//	return B_BAD_VALUE;
+	if (vnode->stream.type != STREAM_TYPE_DEVICE)
+		return B_BAD_VALUE;
 
 	if (vnode->stream.u.dev.part_map)
 		translate_partition_access(vnode->stream.u.dev.part_map, pos, *_length);
@@ -964,7 +960,6 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 
 	mutex_lock(&fs->lock);
 
-	cookie->stream = &vnode->stream;
 	cookie->u.dir.ptr = vnode->stream.u.dir.dir_head;
 	*_cookie = cookie;
 
@@ -976,13 +971,14 @@ devfs_open_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie *_cookie)
 static status_t
 devfs_read_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 	struct devfs *fs = (struct devfs *)_fs;
 	status_t status = B_OK;
 
 	TRACE(("devfs_read_dir: vnode %p, cookie %p, buffer %p, size %ld\n", _vnode, cookie, dirent, bufferSize));
 
-	if (cookie->stream->type != STREAM_TYPE_DIR)
+	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return EINVAL;
 
 	mutex_lock(&fs->lock);
@@ -1018,17 +1014,18 @@ err:
 static status_t
 devfs_rewind_dir(fs_volume _fs, fs_vnode _vnode, fs_cookie _cookie)
 {
+	struct devfs_vnode *vnode = (struct devfs_vnode *)_vnode;
 	struct devfs_cookie *cookie = (struct devfs_cookie *)_cookie;
 	struct devfs *fs = (struct devfs *)_fs;
 
 	TRACE(("devfs_rewind_dir: vnode %p, cookie %p\n", _vnode, _cookie));
 
-	if (cookie->stream->type != STREAM_TYPE_DIR)
+	if (vnode->stream.type != STREAM_TYPE_DIR)
 		return EINVAL;
 	
 	mutex_lock(&fs->lock);
 
-	cookie->u.dir.ptr = cookie->stream->u.dir.dir_head;
+	cookie->u.dir.ptr = vnode->stream.u.dir.dir_head;
 
 	mutex_unlock(&fs->lock);
 	return B_OK;
