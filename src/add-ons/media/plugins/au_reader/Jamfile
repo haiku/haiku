@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src add-ons media plugins au_reader ;
+
+UsePrivateHeaders media ;
+
+Addon au_reader : media plugins :
+	au_reader.cpp
+;
+
+LinkSharedOSLibs au_reader : be libmedia.so ;
