@@ -72,8 +72,8 @@ status_t nm_acc_init()
 		/* b8-9 determine engine colordepth */
 		si->engine.control = (3 << 8);
 		si->engine.depth = 3;
-		/* no acceleration supported on NM2070 - NM2200: let them fallthrough... */
-		if (si->ps.card_type >= NM2230) break;
+		/* no acceleration supported on NM2070 - NM2160: let them fallthrough... */
+		if (si->ps.card_type >= NM2200) break;
 	default:
 		LOG(8,("ACC: init, invalid bit depth\n"));
 		return B_ERROR;
