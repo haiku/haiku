@@ -58,6 +58,8 @@ private:
 	
 	BList		*fInputs;
 	MixerOutput	*fOutput;
+	int32		fNextInputID;
+	bool		fRunning;
 };
 
 

@@ -6,7 +6,7 @@ class MixerCore;
 class MixerOutput
 {
 public:
-	MixerOutput(MixerCore *core);
+	MixerOutput(MixerCore *core, const media_output &output);
 	~MixerOutput();
 	
 	media_output & MediaOutput();

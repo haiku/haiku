@@ -18,6 +18,12 @@
 #include "MixerOutput.h"
 #include "debug.h"
 
+#define USE_MEDIA_FORMAT_WORKAROUND 1
+
+#if USE_MEDIA_FORMAT_WORKAROUND
+static void multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other);
+#endif
+
 AudioMixer::AudioMixer(BMediaAddOn *addOn)
 		:	BMediaNode("Audio Mixer"),
 			BBufferConsumer(B_MEDIA_RAW_AUDIO),
@@ -208,8 +214,10 @@ AudioMixer::HandleInputBuffer(BBuffer *buffer, bigtime_t lateness)
 		}
 	}
 */
-
+	
+	fCore->Lock();
 	fCore->BufferReceived(buffer, lateness);
+	fCore->Unlock();
 
 /*
 		if ((B_OFFLINE == RunMode()) && (B_DATA_AVAILABLE == channel->fProducerDataStatus))
@@ -242,8 +250,6 @@ AudioMixer::GetLatencyFor(const media_destination &for_whom,
 						  bigtime_t *out_latency,
 						  media_node_id *out_timesource)
 {
-	printf("AudioMixer::GetLatencyFor\n");
-
 	// we have multiple inputs with different IDs, but
 	// the port number must match our ControlPort()
 	if (for_whom.port != ControlPort())
@@ -254,7 +260,7 @@ AudioMixer::GetLatencyFor(const media_destination &for_whom,
 	*out_latency = EventLatency();
 	*out_timesource = TimeSource()->ID();
 
-	printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n", *out_latency, *out_timesource);
+	//printf("AudioMixer::GetLatencyFor %Ld, timesource is %ld\n", *out_latency, *out_timesource);
 
 	return B_OK;
 
@@ -360,6 +366,8 @@ AudioMixer::FormatProposal(const media_source &output, media_format *ioFormat)
 	// proposed media_format is suitable for the specified output. If any fields
 	// in the format are wildcards, and we have a specific requirement, adjust
 	// those fields to match our requirements before returning.
+
+	printf("AudioMixer::FormatProposal\n");
 	
 	// we only have one output (id=0, port=ControlPort())
 	if (output.id != 0 || output.port != ControlPort())
@@ -372,6 +380,8 @@ AudioMixer::FormatProposal(const media_source &output, media_format *ioFormat)
 	// we require a raw audio format
 	if (ioFormat->type != B_MEDIA_RAW_AUDIO)
 		return B_MEDIA_BAD_FORMAT;
+		
+	return B_OK;
 }
 
 status_t
@@ -385,24 +395,28 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	fCore->Lock();
 	MixerOutput *output = fCore->Output();
 	if (!output) {
-		FATAL("AudioMixer::FormatChangeRequested: no output\n");
+		ERROR("AudioMixer::FormatChangeRequested: no output\n");
 		goto err;
 	}
 	if (source != output->MediaOutput().source) {
-		FATAL("AudioMixer::FormatChangeRequested: wrong output source\n");
+		ERROR("AudioMixer::FormatChangeRequested: wrong output source\n");
 		goto err;
 	}
 	if (destination != output->MediaOutput().destination) {
-		FATAL("AudioMixer::FormatChangeRequested: wrong output destination\n");
+		ERROR("AudioMixer::FormatChangeRequested: wrong output destination\n");
 		goto err;
 	}
 	if (io_format->type != B_MEDIA_RAW_AUDIO && io_format->type != B_MEDIA_UNKNOWN_TYPE) {
-		FATAL("AudioMixer::FormatChangeRequested: wrong format type\n");
+		ERROR("AudioMixer::FormatChangeRequested: wrong format type\n");
 		goto err;
 	}
 	
 	/* remove wildcards */
-	io_format->SpecializeTo(&fDefaultFormat);
+	#if USE_MEDIA_FORMAT_WORKAROUND
+		multi_audio_format_specialize(&io_format->u.raw_audio, &fDefaultFormat.u.raw_audio);
+	#else 
+		io_format->SpecializeTo(&fDefaultFormat);
+	#endif
 	
 	// apply format change
 	fCore->Lock();
@@ -427,11 +441,12 @@ AudioMixer::GetNextOutput(int32 *cookie, media_output *out_output)
 	if (output) {
 		*out_output = output->MediaOutput();
 	} else {
+		out_output->node = Node();
 		out_output->source.port = ControlPort();
 		out_output->source.id = 0;
 		out_output->destination = media_destination::null;
+		memset(&out_output->format, 0, sizeof(out_output->format));
 		out_output->format.type = B_MEDIA_RAW_AUDIO;
-		out_output->format.u.raw_audio = media_multi_audio_format::wildcard;
 		strcpy(out_output->name, "Mixer Output");
 	}
 	fCore->Unlock();
@@ -491,19 +506,24 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	// *must* fully specialize the format before returning!
 	// we also create the new output connection and return it in out_source.
 
+	PRINT_FORMAT("AudioMixer::PrepareToConnect: suggested format", *format);
+	
 	// is the source valid?
 	if (what.port != ControlPort() || what.id != 0)
 		return B_MEDIA_BAD_SOURCE;
 
 	// is the format acceptable?
-	if (format->type != B_MEDIA_RAW_AUDIO && format->type != B_MEDIA_UNKNOWN_TYPE)
+	if (format->type != B_MEDIA_RAW_AUDIO && format->type != B_MEDIA_UNKNOWN_TYPE) {
+		PRINT_FORMAT("AudioMixer::PrepareToConnect: bad format", *format);
 		return B_MEDIA_BAD_FORMAT;
+	}
 
 	fCore->Lock();
 
 	// are we already connected?
 	if (fCore->Output() != 0) {
 		fCore->Unlock();
+		ERROR("AudioMixer::PrepareToConnect: already connected\n");
 		return B_MEDIA_ALREADY_CONNECTED;
 	}
 
@@ -512,7 +532,13 @@ AudioMixer::PrepareToConnect(const media_source &what, const media_destination &
 	strcpy(out_name, "Mixer Output");
 
 	/* remove wildcards */
-	format->SpecializeTo(&fDefaultFormat);
+	#if USE_MEDIA_FORMAT_WORKAROUND
+		multi_audio_format_specialize(&format->u.raw_audio, &fDefaultFormat.u.raw_audio);
+	#else 
+		format->SpecializeTo(&fDefaultFormat);
+	#endif
+
+	PRINT_FORMAT("AudioMixer::PrepareToConnect: final format", *format);
 
 	/* add output to core */	
 	media_output output;
@@ -539,7 +565,7 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 
 	if (error != B_OK) {
 		// if an error occured, remove output from core
-		printf("AudioMixer::Connect failed, removing connction\n");
+		printf("AudioMixer::Connect failed with error 0x%08lX, removing connction\n", error);
 		fCore->Lock();
 		fCore->RemoveOutput();
 		fCore->Unlock();
@@ -577,10 +603,19 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	if (!fBufferGroup)
 		fBufferGroup = CreateBufferGroup();
 
-	ASSERT(fCore->Output() != 0);
-	ASSERT(fCore->Output()->MediaOutput().format == format);
-
 	fCore->Lock();
+
+	ASSERT(fCore->Output() != 0);
+	
+	// our source should still be valid, too
+	ASSERT(fCore->Output()->MediaOutput().source.id == 0);
+	ASSERT(fCore->Output()->MediaOutput().source.port == ControlPort());
+	
+	// BBufferConsumer::Connected() may return a different input for the
+	// newly created connection. The destination can have changed since
+	// AudioMixer::PrepareToConnect() and we need to update it.
+	fCore->Output()->MediaOutput().destination = dest;
+
 	fCore->EnableOutput(true);
 	fCore->SetTimeSource(TimeSource()->ID());
 	fCore->SetOutputBufferGroup(fBufferGroup);
@@ -599,7 +634,7 @@ AudioMixer::Disconnect(const media_source &what, const media_destination &where)
 	// Make sure that our connection is the one being disconnected
 	MixerOutput * output = fCore->Output();
 	if (!output || output->MediaOutput().node != Node() || output->MediaOutput().source != what || output->MediaOutput().destination != where) {
-		FATAL("AudioMixer::Disconnect can't disconnect (wrong connection)\n");
+		ERROR("AudioMixer::Disconnect can't disconnect (wrong connection)\n");
 		fCore->Unlock();
 		return;
 	}
@@ -741,3 +776,40 @@ AudioMixer::CreateBufferGroup()
 	printf("AudioMixer: allocating %ld buffers of %ld bytes each\n", count, size);
 	return new BBufferGroup(size, count);
 }
+
+#if USE_MEDIA_FORMAT_WORKAROUND
+static void
+raw_audio_format_specialize(media_raw_audio_format *format, const media_raw_audio_format *other)
+{
+	if (format->frame_rate == 0)
+		format->frame_rate = other->frame_rate;
+	if (format->channel_count == 0)
+		format->channel_count = other->channel_count;
+	if (format->format == 0)
+		format->format = other->format;
+	if (format->byte_order == 0)
+		format->byte_order = other->byte_order;
+	if (format->buffer_size == 0)
+		format->buffer_size = other->buffer_size;
+	if (format->frame_rate == 0)
+		format->frame_rate = other->frame_rate;
+}
+
+static void
+multi_audio_info_specialize(media_multi_audio_info *format, const media_multi_audio_info *other)
+{
+	if (format->channel_mask == 0)
+		format->channel_mask = other->channel_mask;
+	if (format->valid_bits == 0)
+		format->valid_bits = other->valid_bits;
+	if (format->matrix_mask == 0)
+		format->matrix_mask = other->matrix_mask;
+}
+
+static void
+multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other)
+{
+	raw_audio_format_specialize(format, other);
+	multi_audio_info_specialize(format, other);
+}
+#endif

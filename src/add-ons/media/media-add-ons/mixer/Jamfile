@@ -8,6 +8,7 @@ Addon mixer.media_addon : media :
 	MixerCore.cpp
 	MixerInput.cpp
 	MixerOutput.cpp
+	MixerUtils.cpp
 	Resampler.cpp
 ;
 

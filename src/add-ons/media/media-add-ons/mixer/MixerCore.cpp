@@ -2,116 +2,161 @@
 #include "MixerCore.h"
 #include "MixerInput.h"
 #include "MixerOutput.h"
+#include "Debug.h"
 
 #define MAX_OUTPUT_BUFFER_LENGTH	50000LL /* 50 ms */
 
+#define ASSERT_LOCKED()		if (fLocker->IsLocked()) {} else debugger("core not locked, meltdown occurred")
 
 MixerCore::MixerCore()
  :	fLocker(new BLocker),
 	fOutputBufferLength(MAX_OUTPUT_BUFFER_LENGTH),
 	fInputBufferLength(3 * MAX_OUTPUT_BUFFER_LENGTH),
-	fOutput(0)
-	
+	fInputs(new BList),
+	fOutput(0),
+	fNextInputID(1),
+	fRunning(false)
 {
 }
 
 MixerCore::~MixerCore()
 {
 	delete fLocker;
+	delete fInputs;
 }
 	
 bool
 MixerCore::AddInput(const media_input &input)
 {
+	ASSERT_LOCKED();
+	fInputs->AddItem(new MixerInput(this, input));
 	return true;
 }
 
 bool
 MixerCore::AddOutput(const media_output &output)
 {
-	return true;
+	ASSERT_LOCKED();
+	if (fOutput)
+		return false;
+	fOutput = new MixerOutput(this, output);
 }
 
 bool
 MixerCore::RemoveInput(int32 inputID)
 {
-	return true;
+	ASSERT_LOCKED();
+	MixerInput *input;
+	for (int i = 0; (input = (MixerInput *)fInputs->ItemAt(i)) != 0; i++) {
+		if (input->ID() == inputID) {
+			fInputs->RemoveItem(i);
+			delete input;
+			return true;
+		}
+	}
+	return false;
 }
 
 bool
 MixerCore::RemoveOutput()
 {
+	ASSERT_LOCKED();
+	if (!fOutput)
+		return false;
+	delete fOutput;
+	fOutput = 0;
 	return true;
 }
 
 int32
 MixerCore::CreateInputID()
 {
-	return 1;
+	ASSERT_LOCKED();
+	return fNextInputID++;
 }
 
 MixerInput *
 MixerCore::Input(int i)
 {
+	ASSERT_LOCKED();
 	return (MixerInput *)fInputs->ItemAt(i);
 }
 
 MixerOutput *
 MixerCore::Output()
 {
+	ASSERT_LOCKED();
 	return fOutput;
 }
 
 void
 MixerCore::BufferReceived(BBuffer *buffer, bigtime_t lateness)
 {
+	ASSERT_LOCKED();
 }
 	
 void
 MixerCore::InputFormatChanged(int32 inputID, const media_format *format)
 {
+	ASSERT_LOCKED();
 }
 
 void
 MixerCore::OutputFormatChanged(const media_format *format)
 {
+	ASSERT_LOCKED();
 }
 
 void
 MixerCore::SetOutputBufferGroup(BBufferGroup *group)
 {
+	ASSERT_LOCKED();
 }
 
 void
 MixerCore::SetTimeSource(media_node_id id)
 {
+	ASSERT_LOCKED();
 }
 
 void
 MixerCore::EnableOutput(bool enabled)
 {
+	ASSERT_LOCKED();
 }
 
 void
 MixerCore::Start(bigtime_t time)
 {
+	ASSERT_LOCKED();
+	if (fRunning)
+		return;
+		
+	fRunning = true;
 }
 
 void
 MixerCore::Stop()
 {
+	ASSERT_LOCKED();
+	if (!fRunning)
+		return;
+		
+	fRunning = false;
 }
 
 uint32
 MixerCore::OutputBufferSize()
 {
+	ASSERT_LOCKED();
 	return 1;
 }
 
 bool
 MixerCore::IsStarted()
 {
-	return false;
+	ASSERT_LOCKED();
+	return fRunning;
 }
 
 void

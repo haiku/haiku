@@ -34,7 +34,7 @@ Resampler::Resampler(uint32 src_format, uint32 dst_format)
 				fFunc = &Resampler::uint8_to_float;
 				return;
 			default:
-				FATAL("Resampler::Resampler: unknown source format 0x%x\n", src_format);
+				ERROR("Resampler::Resampler: unknown source format 0x%x\n", src_format);
 				return;
 		}
 	}
@@ -55,12 +55,12 @@ Resampler::Resampler(uint32 src_format, uint32 dst_format)
 				fFunc = &Resampler::float_to_uint8;
 				return;
 			default:
-				FATAL("Resampler::Resampler: unknown destination format 0x%x\n", dst_format);
+				ERROR("Resampler::Resampler: unknown destination format 0x%x\n", dst_format);
 				return;
 		}
 	}
 
-	FATAL("Resampler::Resampler: source or destination format must be B_AUDIO_FLOAT\n");
+	ERROR("Resampler::Resampler: source or destination format must be B_AUDIO_FLOAT\n");
 }
 
 Resampler::~Resampler()

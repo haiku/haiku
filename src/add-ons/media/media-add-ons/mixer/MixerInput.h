@@ -6,8 +6,10 @@ class MixerCore;
 class MixerInput
 {
 public:
-	MixerInput(MixerCore *core);
+	MixerInput(MixerCore *core, const media_input &input);
 	~MixerInput();
+	
+	int32 ID();
 	
 	void BufferReceived(BBuffer *buffer);
 	
