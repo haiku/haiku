@@ -241,10 +241,9 @@ FindTextView::GetHexFromData(const uint8 *in, size_t inSize, char **_hex, size_t
 	if (hex == NULL)
 		return B_NO_MEMORY;
 
-	const char *text = Text();
 	char *out = hex;
 	for (uint32 i = 0; i < inSize; i++) {
-		out += sprintf(out, "%02x", *(unsigned char *)(text + i));
+		out += sprintf(out, "%02x", *(unsigned char *)(in + i));
 	}
 	out[0] = '\0';
 	
@@ -331,7 +330,7 @@ FindTextView::SetMode(find_mode mode)
 void
 FindTextView::SetData(BMessage &message)
 {
-	uint8 *data;
+	const uint8 *data;
 	ssize_t dataSize;
 	if (message.FindData("data", B_RAW_TYPE, (const void **)&data, &dataSize) != B_OK)
 		return;
@@ -339,7 +338,7 @@ FindTextView::SetData(BMessage &message)
 	if (fMode == kHexMode) {
 		char *hex;
 		size_t hexSize;
-		if (GetHexFromData((const uint8 *)Text(), TextLength(), &hex, &hexSize) < B_OK)
+		if (GetHexFromData(data, dataSize, &hex, &hexSize) < B_OK)
 			return;
 
 		SetText(hex, hexSize);
@@ -377,16 +376,22 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	AddChild(view);
 
+	int8 mode = kAsciiMode;
+	previous.FindInt8("find_mode", &mode);
+
 	// add the top widgets
 
 	fMenu = new BPopUpMenu("mode");
 	BMessage *message;
 	BMenuItem *item;
 	fMenu->AddItem(item = new BMenuItem("Text", message = new BMessage(kMsgFindMode)));
-	item->SetMarked(true);
 	message->AddInt8("mode", kAsciiMode);
+	if (mode == kAsciiMode)
+		item->SetMarked(true);
 	fMenu->AddItem(item = new BMenuItem("Hexadecimal", message = new BMessage(kMsgFindMode)));
 	message->AddInt8("mode", kHexMode);
+	if (mode == kHexMode)
+		item->SetMarked(true);
 
 	BRect rect = Bounds().InsetByCopy(5, 5);
 	BMenuField *menuField = new BMenuField(rect, B_EMPTY_STRING,
@@ -410,6 +415,7 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	fCaseCheckBox->ResizeToPreferred();
 	fCaseCheckBox->MoveTo(5, button->Frame().top - 5 - fCaseCheckBox->Bounds().Height());
 	fCaseCheckBox->SetValue(previous.FindBool("case_sensitive"));
+	fCaseCheckBox->SetEnabled(mode == kAsciiMode);
 	view->AddChild(fCaseCheckBox);
 
 	// and now those inbetween
@@ -421,6 +427,7 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 						rect.OffsetToCopy(B_ORIGIN).InsetByCopy(3, 3),
 						B_FOLLOW_ALL);
 	fTextView->SetWordWrap(true);
+	fTextView->SetMode((find_mode)mode);
 	fTextView->SetData(previous);
 
 	BScrollView *scrollView = new BScrollView("scroller", fTextView, B_FOLLOW_ALL, B_WILL_DRAW, false, false);
