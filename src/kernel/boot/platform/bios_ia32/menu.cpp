@@ -25,7 +25,7 @@ static const console_color kItemColor = SILVER;
 static const console_color kSelectedItemColor = WHITE;
 static const console_color kBackgroundColor = BLACK;
 static const console_color kSelectedBackgroundColor = SILVER;
-
+static const console_color kDisabledColor = GREY;
 
 static int32 sMenuOffset = 0;
 
@@ -67,6 +67,9 @@ print_item_at(int32 line, MenuItem *item, bool clearHelp = true)
 
 	console_color background = selected ? kSelectedBackgroundColor : kBackgroundColor;
 	console_color foreground = selected ? kSelectedItemColor : kItemColor;
+
+	if (!item->IsEnabled())
+		foreground = kDisabledColor;
 
 	console_set_cursor(kOffsetX, line + kFirstLine);
 	console_set_color(foreground, background);
@@ -276,7 +279,7 @@ run_menu(Menu *menu)
 			switch (key.code.bios) {
 				case BIOS_KEY_UP:
 					while ((item = menu->ItemAt(--selected)) != NULL) {
-						if (item->Type() != MENU_ITEM_SEPARATOR)
+						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
 							break;
 					}
 					if (selected < 0)
@@ -284,7 +287,7 @@ run_menu(Menu *menu)
 					break;
 				case BIOS_KEY_DOWN:
 					while ((item = menu->ItemAt(++selected)) != NULL) {
-						if (item->Type() != MENU_ITEM_SEPARATOR)
+						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
 							break;
 					}
 					if (selected >= menu->CountItems())
@@ -294,7 +297,7 @@ run_menu(Menu *menu)
 					selected -= menu_height() - 1;
 
 					while ((item = menu->ItemAt(selected)) != NULL) {
-						if (item->Type() != MENU_ITEM_SEPARATOR)
+						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
 							break;
 
 						selected--;
@@ -307,7 +310,7 @@ run_menu(Menu *menu)
 					selected += menu_height() - 1;
 
 					while ((item = menu->ItemAt(selected)) != NULL) {
-						if (item->Type() != MENU_ITEM_SEPARATOR)
+						if (item->IsEnabled() && item->Type() != MENU_ITEM_SEPARATOR)
 							break;
 
 						selected++;
@@ -359,6 +362,9 @@ run_menu(Menu *menu)
 				// toggle state
 				item->SetMarked(!item->IsMarked());
 				print_item_at(selected, item);
+
+				if (item->Target() != NULL)
+					(*item->Target())(menu, item);
 			} else if (key.code.ascii == 0xd) {
 				// the space key does not exit the menu
 
@@ -366,6 +372,10 @@ run_menu(Menu *menu)
 					&& item->Type() != MENU_ITEM_NO_CHOICE
 					&& item->Type() != MENU_ITEM_TITLE)
 					item->SetMarked(true);
+
+				if (item->Target() != NULL)
+					(*item->Target())(menu, item);
+
 				break;
 			}
 		} else if (key.code.ascii == 0x1b && menu->Type() != MAIN_MENU)
