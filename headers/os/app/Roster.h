@@ -162,6 +162,8 @@ private:
 	friend status_t BClipboard::StopWatching(BMessenger);
 	friend void BPrivate::init_registrar_roster(BMessenger, BMessenger);
 
+	class ArgVector;
+
 	enum mtarget {
 		MAIN_MESSENGER,
 		MIME_MESSENGER,
@@ -188,8 +190,9 @@ private:
 	status_t RemovePreRegApp(uint32 entryToken) const;
 	status_t RemoveApp(team_id team) const;
 
-	status_t xLaunchAppPrivate(const char *mimeSig, const entry_ref *ref,
-							   BList* msgList, int cargs, char **args,
+	status_t xLaunchAppPrivate(const char *mimeType, const entry_ref *ref,
+							   const BList *messageList, int argc,
+							   const char *const* args,
 							   team_id *appTeam) const;
 	bool UpdateActiveApp(team_id team) const;
 	void SetAppFlags(team_id team, uint32 flags) const;
@@ -204,16 +207,9 @@ private:
 							entry_ref *appRef, BFile *appFile) const;
 	status_t sniff_file(const entry_ref *file, BNodeInfo *nodeInfo,
 						char *mimeType) const;
-	bool is_wildcard(const char *sig) const;
-	status_t get_unique_supporting_app(const BMessage *apps,
-									   char *outSig) const;
-	status_t get_random_supporting_app(const BMessage *apps,
-									   char *outSig) const;
-	char **build_arg_vector(char **args, int *pargs, const entry_ref *appRef,
-							const entry_ref *docRef) const;
-	status_t send_to_running(team_id team, const entry_ref *appRef,
-							 int cargs, char **args, const BList *msgList,
-							 const entry_ref *ref) const;
+	status_t send_to_running(team_id team, int argc, const char *const *args,
+							 const BList *messageList, const entry_ref *ref,
+							 bool readyToRun) const;
 	void InitMessengers();
 
 	BMessenger	fMess;
