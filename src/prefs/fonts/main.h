@@ -13,6 +13,8 @@
 		
 	#endif
 	
+	class FontsSettings;
+	class MainWindow;
 	/**
 	 * Main class.
 	 *
@@ -26,7 +28,12 @@
 			 * Constructor.
 			 */
 			Font_pref();
-			
+			~Font_pref();
+			void ReadyToRun();
+			bool QuitRequested();
+		private:
+			FontsSettings *f_settings;
+			MainWindow *window;
 	};
 	
 #endif

@@ -28,8 +28,8 @@
 	class FontView : public BView{
 	
 		public:
-			
 			FontView(BRect frame); 
+			void AttachedToWindow(void);
 			FontSelectionView *plainSelectionView;
 			FontSelectionView *boldSelectionView;
 			FontSelectionView *fixedSelectionView;
@@ -37,7 +37,6 @@
 			void emptyMenus();
 			void resetToDefaults();
 			void revertToOriginal();
-			
 	};
 	
 #endif

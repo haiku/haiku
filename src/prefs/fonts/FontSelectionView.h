@@ -116,7 +116,6 @@
 			void emptyMenus();
 			void resetToDefaults();
 			void revertToOriginal();
-			
 		private:
 		
 			/**

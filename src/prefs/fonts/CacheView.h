@@ -42,11 +42,6 @@
 		#include <Slider.h>
 	 
 	#endif
-	#ifndef _STDIO_H
-	
-		#include <stdio.h>
-		
-	#endif
 	#ifndef _BUTTON_H
 	
 		#include <Button.h>
@@ -64,7 +59,6 @@
 			int getScreenFCSValue();
 			void revertToOriginal();
 			void resetToDefaults();
-			
 		private:
 		
 			/**

@@ -21,11 +21,7 @@
 	 */
 	#define REVERT_MSG 'rvrt'
 	
-	#ifndef _VIEW_H
-		
-		#include <View.h>
-	
-	#endif
+	#include <View.h>
 	
 	#ifndef _BUTTON_H
 	
@@ -33,14 +29,14 @@
 		
 	#endif
 	
-	class ButtonView : public BView{
+	class ButtonView : public BView {
 	
 		public:
 			
 			ButtonView(BRect frame);
 			bool RevertState();
 			void SetRevertState(bool b);
-			
+			void Draw(BRect);
 		private:
 		
 			/**

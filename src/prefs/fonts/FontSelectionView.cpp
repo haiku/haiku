@@ -9,6 +9,18 @@
 
 #endif
 
+#include "Pref_Utils.h"
+
+// should be changed to allow larger and smaller
+#define minSizeIndex 7
+#define maxSizeIndex 12
+
+// constants for labels
+const char *kPlainFont = "Plain font:";
+const char *kBoldFont = "Bold font:";
+const char *kFixedFont = "Fixed font:";
+const char *kSize = "Size: ";
+
 /**
  * Constructor
  * @param rect The size of the view.
@@ -19,24 +31,11 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 	   	   : BView(rect, name, B_FOLLOW_ALL, B_WILL_DRAW)
 {
 	
-	BBox *testTextBox;
-	float x;
-	float y;
-	BRect viewSize = Bounds();
-	BMenuField *fontListField;
-	BMenuField *sizeListField;
-	
-	x = viewSize.Width() / 37;
-	y = viewSize.Height() / 8;
-	
-	minSizeIndex = 9;
-	maxSizeIndex = 12;
-	
 	switch(type){
 	
 		case PLAIN_FONT_SELECTION_VIEW:
 		
-			sprintf(typeLabel, "Plain font");
+			sprintf(typeLabel, kPlainFont);
 			origFont = be_plain_font;
 			workingFont = be_plain_font;
 			setSizeChangedMessage = PLAIN_SIZE_CHANGED_MSG;
@@ -51,7 +50,7 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 			
 		case BOLD_FONT_SELECTION_VIEW:
 		
-			sprintf(typeLabel, "Bold font");
+			sprintf(typeLabel, kBoldFont);
 			origFont = be_bold_font;
 			workingFont = be_bold_font;
 			setSizeChangedMessage = BOLD_SIZE_CHANGED_MSG;
@@ -66,7 +65,7 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 			
 		case FIXED_FONT_SELECTION_VIEW:
 		
-			sprintf(typeLabel, "Fixed font");
+			sprintf(typeLabel, kFixedFont);
 			origFont = be_fixed_font;
 			workingFont = be_fixed_font;
 			setSizeChangedMessage = FIXED_SIZE_CHANGED_MSG;
@@ -80,23 +79,42 @@ FontSelectionView::FontSelectionView(BRect rect, const char *name, int type)
 			break;
 			
 	}//switch
-	
+
+	float fontheight = FontHeight(false);
+	float divider = StringWidth(kFixedFont);
+
 	sizeList = new BPopUpMenu("sizeList", true, true, B_ITEMS_IN_COLUMN);
 	fontList = new BPopUpMenu("fontList", true, true, B_ITEMS_IN_COLUMN);
-	fontListField = new BMenuField(*(new BRect(x, y, (25 * x), (3 * y))), "fontField", typeLabel, fontList);
-	fontListField->SetDivider(7 * x);
-	sizeListField = new BMenuField(*(new BRect((27 * x), y, (36 * x), (3 * y))), "fontField", "Size", sizeList);
-	sizeListField->SetDivider(31 * x);
-
-	testTextBox = new BBox(*(new BRect((8 * x), (5 * y), (36 * x), (8 * y))), "TestTextBox", B_FOLLOW_ALL, B_WILL_DRAW, B_FANCY_BORDER);
+	
+	// create menus
+		// size box
+	rect = Bounds();
+	float x = StringWidth("999") +16;
+	rect.left = rect.right -(x +StringWidth(kSize)+8.0);
+	rect.bottom = fontheight +5;
+	BMenuField *sizeListField = new BMenuField(rect, "fontField", kSize, sizeList, true);
+	sizeListField->SetDivider(StringWidth(kSize)+5.0);
+	sizeListField->SetAlignment(B_ALIGN_RIGHT);
+		// font menu
+	rect.right = rect.left;
+	rect.left = 1;
+	rect.bottom = fontheight *1.5;
+	BMenuField *fontListField = new BMenuField(rect, "fontField", typeLabel, fontList, false);
+	fontListField->SetDivider(divider +6.0);
+	fontListField->SetAlignment(B_ALIGN_RIGHT);
+	
+	rect = Bounds();
+	rect.left = divider +8.0;
+	rect.top = fontheight *1.5 +4;
+	rect.InsetBy(1, 1);
+	BBox *testTextBox = new BBox(rect, "TestTextBox", B_FOLLOW_ALL, B_WILL_DRAW, B_FANCY_BORDER);
 
 	// Place the text slightly inside the entire box area, so it doesn't overlap the box outline.
-	BRect testTextRect(testTextBox->Bounds());
-	testTextRect.top = 2;
-	testTextRect.left = 4;
-	testTextRect.bottom = testTextRect.bottom - 2;
-	testTextRect.right = testTextRect.right - 4;
-	testText = new BStringView(testTextRect, "testText", "The quick brown fox jumped over the lazy dog.", B_FOLLOW_ALL, B_WILL_DRAW);
+	rect = testTextBox->Bounds().InsetByCopy(2, 2);
+	rect.right -= 2;
+	BRect testTextRect(rect);
+	testText = new BStringView(testTextRect, "testText", "The quick brown fox jumps over the lazy dog.", 
+		B_FOLLOW_ALL, B_WILL_DRAW);
 	testText->SetFont(&workingFont);
 	
 	fontList->SetLabelFromMarked(true);
@@ -461,7 +479,7 @@ void FontSelectionView::UpdateFontSelection(BFont *fnt){
 		if(strcmp(sizeList->ItemAt(i)->Label(), size) == 0){
 		
 			sizeList->ItemAt(i)->SetMarked(true);
-		
+			break;		
 		}//if
 	
 	}//for

@@ -16,27 +16,28 @@
  * @param frame The size to make the window.
  */
 MainWindow::MainWindow(BRect frame)
-				: BWindow(frame, "Fonts", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE ){
+	:BWindow(frame, "Fonts", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE ){
 				
 	BRect r; 
 	BTabView *tabView; 
 	BTab *tab; 
 	BBox *topLevelView;
-	double buttonViewHeight = 38.0;
+	double buttonViewHeight = 43.0;
 	
 	r = Bounds(); 
-	r.InsetBy(0, 10); 
-	r.bottom -= buttonViewHeight;
+	r.top += 10;
+	r.bottom -= buttonViewHeight+1;
 	
-	tabView = new BTabView(r, "tab_view", B_WIDTH_FROM_WIDEST); 
+	tabView = new BTabView(r, "tab_view", B_WIDTH_FROM_LABEL); 
 	tabView->SetViewColor(216,216,216,0); 
 	
 	r = tabView->Bounds(); 
-	r.InsetBy(5,5); 
-	r.bottom -= tabView->TabHeight(); 
+	r.InsetBy(5, 5); 
+	r.bottom -= tabView->TabHeight();
+	r.right -=2;
 	tab = new BTab(); 
 	tabView->AddTab(fontPanel = new FontView(r), tab); 
-	tab->SetLabel("Fonts"); 
+	tab->SetLabel(" Fonts "); 
 	tab = new BTab(); 
 	tabView->AddTab(cachePanel = new CacheView(r, 64, 4096, (int32) 256, (int32) 256), tab); 
 	tab->SetLabel("Cache");
@@ -59,8 +60,10 @@ MainWindow::MainWindow(BRect frame)
  */
 bool MainWindow::QuitRequested()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
-	return(true);
+	BMessage *message = new BMessage(B_QUIT_REQUESTED);
+	message->AddPoint("corner", Frame().LeftTop());
+	be_app->PostMessage(message);
+	return true;
 }
 
 /**

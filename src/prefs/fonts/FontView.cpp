@@ -9,32 +9,41 @@
 
 #endif
 
+#include "Pref_Utils.h"
+
 /**
  * Constructor.
  * @param rect The size of the view.
  */
 FontView::FontView(BRect rect)
-	   	   : BView(rect, "FontView", B_FOLLOW_ALL, B_WILL_DRAW)
+	:BView(rect, "FontView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	
-	float x;
-	float y;
-	BRect viewSize = Bounds();
-	
-	SetViewColor(216, 216, 216, 0);
-	
-	x = viewSize.Width() / 39;
-	y = viewSize.Height() / 25;
-	
-	plainSelectionView = new FontSelectionView(*(new BRect(x, y, (38.0 * x), (8.0 * y))), "Plain", PLAIN_FONT_SELECTION_VIEW);
-	boldSelectionView = new FontSelectionView(*(new BRect(x, (9.0 * y), (38.0 * x), (16.0 * y))), "Bold", BOLD_FONT_SELECTION_VIEW);
-	fixedSelectionView = new FontSelectionView(*(new BRect(x, (17.0 * y), (38.0 * x), (24.0 * y))), "Fixed", FIXED_FONT_SELECTION_VIEW);
+	BRect bounds(Bounds().InsetByCopy(5, 5));
+
+	BRect rect(bounds);
+	rect.bottom = rect.top +FontHeight(true) *3.5;
+	plainSelectionView = new FontSelectionView(rect, "Plain", PLAIN_FONT_SELECTION_VIEW);
+	rect.OffsetBy(0, rect.Height()+4);
+	boldSelectionView = new FontSelectionView(rect, "Bold", BOLD_FONT_SELECTION_VIEW);
+	rect.OffsetBy(0, rect.Height()+4);
+	fixedSelectionView = new FontSelectionView(rect, "Fixed", FIXED_FONT_SELECTION_VIEW);
 
 	AddChild(plainSelectionView);
 	AddChild(boldSelectionView);
 	AddChild(fixedSelectionView);
 	
 }
+
+
+void
+FontView::AttachedToWindow(void)
+{
+	if (Parent() != NULL)
+		SetViewColor(Parent()->ViewColor());
+	else
+		SetViewColor(219, 219, 219, 255);
+}
+
 
 /**
  * Calls each FontSelectionView's buildMenus() function to build the

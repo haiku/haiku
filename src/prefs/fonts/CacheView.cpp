@@ -6,6 +6,10 @@
 	#include "CacheView.h"
 
 #endif
+#include <String.h>
+#include "Pref_Utils.h"
+
+const char *kLabel = "font cache size: ";
 
 /**
  * Constructor
@@ -16,75 +20,66 @@
  * @param screenCurrVal The starting value of the screen slider.
  */
 CacheView::CacheView(BRect rect, int minVal, int maxVal, int32 printCurrVal, int32 screenCurrVal)
-	   	   : BView(rect, "CacheView", B_FOLLOW_ALL, B_WILL_DRAW)
+	:BView(rect, "CacheView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	
-	BRect viewSize = Bounds();
-	char sliderMinLabel[10];
-	char sliderMaxLabel[10];
-	char msg[100];
+	SetViewColor(216, 216, 216, 0);
 	
 	origPrintVal = printCurrVal;
 	origScreenVal = screenCurrVal;
-	SetViewColor(216, 216, 216, 0);
 	
 	rgb_color fillColor;
-	fillColor.red = 0;
-	fillColor.blue = 152;
-	fillColor.green = 102;
+	fillColor.red = 102;
+	fillColor.blue = 203;
+	fillColor.green = 152;
 	
-	viewSize.InsetBy(15, 10);
-	
-	sprintf(msg, "Screen font cache size : %d kB", static_cast<int>(screenCurrVal));
-	
-	screenFCS = new BSlider(*(new BRect(viewSize.left, viewSize.top, viewSize.right, viewSize.top + 25.0)),
-							"screenFontCache",
-							msg,
-							new BMessage(SCREEN_FCS_UPDATE_MSG),
-							minVal,
-							maxVal,
-							B_TRIANGLE_THUMB
-						   );
+	float fontheight = FontHeight(true);
+	BRect rect(Bounds());
+	rect.InsetBy(5.0, 3.0);
+	rect.top += fontheight;
+	rect.bottom = rect.top +(fontheight *2.0);
+	BString labels(B_EMPTY_STRING);
+	labels << "Screen" << kLabel << screenCurrVal << " kB";
+	screenFCS = new BSlider(rect,
+			"screenFontCache", labels.String(),
+			new BMessage(SCREEN_FCS_UPDATE_MSG),
+			minVal, maxVal,	B_TRIANGLE_THUMB);
+			
 	screenFCS->SetModificationMessage(new BMessage(SCREEN_FCS_MODIFICATION_MSG));
-	
-	sprintf(sliderMinLabel, "%d kB", minVal);
-	sprintf(sliderMaxLabel, "%d kB", maxVal);
-	screenFCS->SetLimitLabels(sliderMinLabel, sliderMaxLabel);
+
+	BString minLabel(B_EMPTY_STRING);
+	BString maxLabel(B_EMPTY_STRING);
+	minLabel << minVal << " kB";
+	maxLabel << maxVal << " kB";
+	screenFCS->SetLimitLabels(minLabel.String(), maxLabel.String());
 	screenFCS->UseFillColor(TRUE, &fillColor);
 	screenFCS->SetValue(screenCurrVal);
 	
-	viewSize.top = viewSize.top + 65.0;
+	rect.OffsetTo(rect.left, rect.bottom +(fontheight *2.5));
 	
-	sprintf(msg, "Printing font cache size : %d kB", static_cast<int>(printCurrVal));
+	labels = ""; 
+	labels << "Printing " << kLabel << printCurrVal << " kB";
 	
-	printFCS = new BSlider(*(new BRect(viewSize.left, viewSize.top, viewSize.right, viewSize.top + 25.0)),
-							"printFontCache",
-							msg,
-							new BMessage(PRINT_FCS_UPDATE_MSG),
-							minVal,
-							maxVal,
-							B_TRIANGLE_THUMB
-						   );
+	printFCS = new BSlider(rect, "printFontCache", labels.String(),
+				new BMessage(PRINT_FCS_UPDATE_MSG),
+				minVal, maxVal, B_TRIANGLE_THUMB);
+				
 	printFCS->SetModificationMessage(new BMessage(PRINT_FCS_MODIFICATION_MSG));
 	
-	printFCS->SetLimitLabels(sliderMinLabel, sliderMaxLabel);
+	printFCS->SetLimitLabels(minLabel.String(), maxLabel.String());
 	printFCS->UseFillColor(TRUE, &fillColor);
 	printFCS->SetValue(printCurrVal);
 	
-	viewSize.top = viewSize.top + 70.0;
+	rect.OffsetTo(rect.left -1.0, rect.bottom +(fontheight *2.0));
+	rect.right = rect.left +86.0;
+	rect.bottom = rect.top +24.0;
 	
-	BButton *saveCache = new BButton(*(new BRect(viewSize.left, viewSize.top, 100.0, 20.0)),
-							   "saveCache",
-							   "Save Cache",
-							   NULL,
-							   B_FOLLOW_LEFT,
-							   B_WILL_DRAW
-							  );
+	BButton *saveCache = new BButton(rect,
+				"saveCache", "Save Cache",
+				NULL, B_FOLLOW_LEFT, B_WILL_DRAW);
 	
 	AddChild(screenFCS);
 	AddChild(printFCS);
-	AddChild(saveCache);  
-	
+	AddChild(saveCache);  	
 }
 
 /**
@@ -129,16 +124,14 @@ int CacheView::getScreenFCSValue(){
  * Sets the sliders to their original values.
  */
 void CacheView::revertToOriginal(){
+	
+	BString label;
+	label << "Screen " << kLabel << getScreenFCSValue();
+	updateScreenFCS(label.String());
 
-	char msg[100];
-	
-	screenFCS->SetValue(origScreenVal);
-	sprintf(msg, "Screen font cache size : %d kB", getScreenFCSValue());
-	updateScreenFCS(msg);
-	
-	printFCS->SetValue(origPrintVal);
-	sprintf(msg, "Printing font cache size : %d kB", getPrintFCSValue());
-	updatePrintFCS(msg);
+	label = "Printing ";
+	label << kLabel << getPrintFCSValue();
+	updatePrintFCS(label.String());	
 
 }//revertToOriginal
 
@@ -146,16 +139,13 @@ void CacheView::revertToOriginal(){
  * Sets the sliders to their default values.
  */
 void CacheView::resetToDefaults(){
-
-	char msg[100];
+	BString label;
+	label << "Screen " << kLabel << getScreenFCSValue() << " kB";
+	updateScreenFCS(label.String());
 	
-	screenFCS->SetValue((int32) 256);
-	sprintf(msg, "Screen font cache size : %d kB", getScreenFCSValue());
-	updateScreenFCS(msg);
-	
-	printFCS->SetValue((int32) 256);
-	sprintf(msg, "Printing font cache size : %d kB", getPrintFCSValue());
-	updatePrintFCS(msg);
+	label = "Printing ";
+	label << kLabel << getPrintFCSValue() << " kB";
+	updatePrintFCS(label.String());
 
 }//revertToOriginal
 

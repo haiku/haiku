@@ -14,6 +14,8 @@
 	
 #endif
 
+#include "FontsSettings.h"
+
 /**
  * Main method.
  * 
@@ -38,22 +40,36 @@ int main(int, char**){
  * Provides a contstructor for the application.
  */
 Font_pref::Font_pref()
-			:BApplication("application/x-vnd.MSM-FontPrefPanel"){
+	:BApplication("application/x-vnd.Haiku-FNPL") {
 	
-	/*
-	 * The main interface window.
-	 */		
-	MainWindow *Main;
-	
-	/*
-	 * Sets the size for the main window.
-	 */
+	f_settings = new FontsSettings();
 	BRect MainWindowRect;
-	
-	MainWindowRect.Set(100, 80, 450, 350);
-	Main = new MainWindow(MainWindowRect);
-	
-	Main->Show();
-
+	MainWindowRect.Set(100, 80, 445, 343);
+	window = new MainWindow(MainWindowRect);
+	window->MoveTo(f_settings->WindowCorner());
 }
 
+Font_pref::~Font_pref()
+{
+	delete f_settings;
+}
+
+
+bool
+Font_pref::QuitRequested()
+{
+	BMessage *message = CurrentMessage();
+	BPoint point;
+	if (message->FindPoint("corner", &point) == B_OK) {
+		f_settings->SetWindowCorner(point);
+	}
+	
+	return BApplication::QuitRequested();
+}
+
+
+void
+Font_pref::ReadyToRun()
+{
+	window->Show();
+}
