@@ -1,5 +1,0 @@
-SubDir OBOS_TOP src kernel drivers fb_console ;
-
-KernelStaticLibrary fb_console :
-	fb_console.c
-	: -fno-pic ;

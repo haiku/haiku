@@ -454,6 +454,5 @@ NotFile bootfloppy ;
 SubInclude OBOS_TOP src kernel apps ;
 SubInclude OBOS_TOP src kernel boot ;
 SubInclude OBOS_TOP src kernel core ;
-SubInclude OBOS_TOP src kernel drivers ;
 SubInclude OBOS_TOP src kernel glue ;
 SubInclude OBOS_TOP src kernel libroot ;

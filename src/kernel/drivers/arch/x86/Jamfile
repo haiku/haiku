@@ -1,3 +1,0 @@
-SubDir OBOS_TOP src kernel drivers arch x86 ;
-
-SubInclude OBOS_TOP src kernel drivers arch x86 console ;
