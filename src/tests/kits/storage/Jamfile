@@ -20,7 +20,7 @@ CommonTestLib libstoragetest.so
 		PathTest.cpp
 		StatableTest.cpp
 		TestUtils.cpp
-	: libstorage.so be stdc++.r4
+	: <$(SOURCE_GRIST)>libstorage.so be stdc++.r4
 	: be stdc++.r4
 	: storage
 ;
@@ -32,8 +32,8 @@ CommonTestLib libstoragetest.so
 	MakeLocate <$(SOURCE_GRIST)>libbeadapter.so : $(libdir) ;
 	RelSymLink <$(SOURCE_GRIST)>libstorage.so : libstorage.so ;
 	RelSymLink <$(SOURCE_GRIST)>libbeadapter.so : libbeadapter.so ;
-	DEPENDS libstoragetest.so 
-		: <$(SOURCE_GRIST)>libstorage.so <$(SOURCE_GRIST)>libbeadapter.so ;
+	Includes <$(SOURCE_GRIST)>libstorage.so
+		: <$(SOURCE_GRIST)>libbeadapter.so ;
 }
 
 # To run the tests some test files must be around.
