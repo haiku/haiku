@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <libroot_private.h>
@@ -73,6 +73,16 @@ _get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t infoS
 {
 	return _kern_get_next_image_info(team, cookie, info, infoSize);
 }
+
+
+void
+clear_caches(void *address, size_t length, uint32 flags)
+{
+	_kern_clear_caches(address, length, flags);
+}
+
+
+//	#pragma mark -
 
 
 void
