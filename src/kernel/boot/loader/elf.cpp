@@ -37,6 +37,106 @@ verify_elf_header(struct Elf32_Ehdr &header)
 }
 
 
+static status_t
+load_elf_symbol_table(int fd, preloaded_image *image)
+{
+	struct Elf32_Ehdr &elfHeader = image->elf_header;
+	Elf32_Sym *symbolTable = NULL;
+	Elf32_Shdr *stringHeader = NULL;
+	uint32 numSymbols = 0;
+	char *stringTable;
+	status_t status;
+
+	// get section headers
+
+	ssize_t size = elfHeader.e_shnum * elfHeader.e_shentsize;
+	Elf32_Shdr *sectionHeaders = (struct Elf32_Shdr *)malloc(size);
+	if (sectionHeaders == NULL) {
+		dprintf("error allocating space for section headers\n");
+		return B_NO_MEMORY;
+	}
+
+	ssize_t length = read_pos(fd, elfHeader.e_shoff, sectionHeaders, size);
+	if (length < size) {
+		TRACE(("error reading in program headers\n"));
+		status = B_ERROR;
+		goto error1;
+	}
+	
+	// find symbol table in section headers
+	
+	for (int32 i = 0; i < elfHeader.e_shnum; i++) {
+		if (sectionHeaders[i].sh_type == SHT_SYMTAB) {
+			stringHeader = &sectionHeaders[sectionHeaders[i].sh_link];
+
+			if (stringHeader->sh_type != SHT_STRTAB) {
+				TRACE(("doesn't link to string table\n"));
+				status = B_BAD_DATA;
+				goto error1;
+			}
+
+			// read in symbol table
+			symbolTable = (Elf32_Sym *)kernel_args_malloc(size = sectionHeaders[i].sh_size);
+			if (symbolTable == NULL) {
+				status = B_NO_MEMORY;
+				goto error1;
+			}
+
+			length = read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, size);
+			if (length < size) {
+				TRACE(("error reading in symbol table\n"));
+				status = B_ERROR;
+				goto error1;
+			}
+
+			numSymbols = size / sizeof(Elf32_Sym);
+			break;
+		}
+	}
+
+	if (symbolTable == NULL) {
+		TRACE(("no symbol table\n"));
+		status = B_BAD_VALUE;
+		goto error1;
+	}
+
+	// read in string table
+
+	stringTable = (char *)kernel_args_malloc(size = stringHeader->sh_size);
+	if (stringTable == NULL) {
+		status = B_NO_MEMORY;
+		goto error2;
+	}
+
+	length = read_pos(fd, stringHeader->sh_offset, stringTable, size);
+	if (length < size) {
+		TRACE(("error reading in string table\n"));
+		status = B_ERROR;
+		goto error3;
+	}
+
+	TRACE(("loaded debug %ld symbols\n", numSymbols));
+
+	// insert tables into image
+	image->debug_symbols = symbolTable;
+	image->num_debug_symbols = numSymbols;
+	image->debug_string_table = stringTable;
+	image->debug_string_table_size = size;
+
+	free(sectionHeaders);
+	return B_OK;
+
+error3:
+	kernel_args_free(stringTable);
+error2:
+	kernel_args_free(symbolTable);
+error1:
+	free(sectionHeaders);
+
+	return status;
+}
+
+
 status_t
 elf_load_image(int fd, preloaded_image *image)
 {
@@ -74,7 +174,7 @@ elf_load_image(int fd, preloaded_image *image)
 	image->data_region.size = 0;
 	image->text_region.size = 0;
 
-	for (int i = 0; i < elfHeader.e_phnum; i++) {
+	for (int32 i = 0; i < elfHeader.e_phnum; i++) {
 		switch (programHeaders[i].p_type) {
 			case PT_LOAD:
 				break;
@@ -141,7 +241,7 @@ elf_load_image(int fd, preloaded_image *image)
 		else
 			continue;
 
-		TRACE(("load segment %d...\n", i));
+		TRACE(("load segment %d (%ld bytes)...\n", i, programHeaders[i].p_filesz));
 
 		length = read_pos(fd, programHeaders[i].p_offset,
 			(void *)(region->start + (programHeaders[i].p_vaddr % B_PAGE_SIZE)),
@@ -155,6 +255,14 @@ elf_load_image(int fd, preloaded_image *image)
 
 	// modify the dynamic section by the delta of the regions
 	image->dynamic_section.start += image->text_region.delta;
+
+	image->num_debug_symbols = 0;
+	image->debug_symbols = NULL;
+	image->debug_string_table = NULL;
+
+	// ToDo: this should be enabled by kernel settings!
+	if (1)
+		load_elf_symbol_table(fd, image);
 
 	free(programHeaders);
 

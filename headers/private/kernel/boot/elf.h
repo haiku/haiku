@@ -18,6 +18,10 @@ struct preloaded_image {
 	addr_range	dynamic_section;
 	struct Elf32_Ehdr elf_header;
 
+	struct Elf32_Sym *debug_symbols;
+	const char	*debug_string_table;
+	uint32		num_debug_symbols, debug_string_table_size;
+
 	image_id	id;
 		// the ID field will be filled out in the kernel
 };
