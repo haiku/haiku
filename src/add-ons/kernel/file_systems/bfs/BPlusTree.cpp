@@ -529,8 +529,7 @@ status_t
 BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uint16 *index,
 	off_t *next)
 {
-	if (node->all_key_count == 0)
-	{
+	if (node->all_key_count == 0) {
 		if (index)
 			*index = 0;
 		if (next)
@@ -539,11 +538,10 @@ BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uin
 	}
 
 	off_t *values = node->Values();
-	int16 saveIndex;
+	int16 saveIndex = -1;
 
 	// binary search in the key array
-	for (int16 first = 0,last = node->all_key_count - 1;first <= last;)
-	{
+	for (int16 first = 0, last = node->all_key_count - 1; first <= last;) {
 		uint16 i = (first + last) >> 1;
 
 		uint16 searchLength;
@@ -555,17 +553,12 @@ BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uin
 		}
 
 		int32 cmp = CompareKeys(key, keyLength, searchKey, searchLength);
-		if (cmp < 0)
-		{
+		if (cmp < 0) {
 			last = i - 1;
 			saveIndex = i;
-		}
-		else if (cmp > 0)
-		{
+		} else if (cmp > 0) {
 			saveIndex = first = i + 1;
-		}
-		else
-		{
+		} else {
 			if (index)
 				*index = i;
 			if (next)
@@ -576,8 +569,7 @@ BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uin
 
 	if (index)
 		*index = saveIndex;
-	if (next)
-	{
+	if (next) {
 		if (saveIndex == node->all_key_count)
 			*next = node->overflow_link;
 		else
@@ -2020,7 +2012,7 @@ int32
 bplustree_node::FragmentsUsed(uint32 nodeSize)
 {
 	uint32 used = 0;
-	for (int32 i = 0;i < nodeSize / ((NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));i++) {
+	for (uint32 i = 0; i < nodeSize / ((NUM_FRAGMENT_VALUES + 1) * sizeof(off_t)); i++) {
 		duplicate_array *array = FragmentAt(i);
 		if (array->count > 0 && ++used > 1)
 			return used;
