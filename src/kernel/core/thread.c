@@ -1370,6 +1370,18 @@ err:
 }
 
 
+thread_id
+find_thread(const char *name)
+{
+	if (name == NULL)
+		return thread_get_current_thread_id();
+
+	// ToDo: implement me!
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 status_t
 set_thread_priority(thread_id id, int32 priority)
 {
@@ -1648,6 +1660,19 @@ user_get_next_thread_info(team_id team, int32 *userCookie, thread_info *userInfo
 		return B_BAD_ADDRESS;
 
 	return status;
+}
+
+
+thread_id
+_user_find_thread(const char *userName)
+{
+	char name[B_OS_NAME_LENGTH];
+	
+	if (!IS_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, sizeof(name)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return find_thread(name);
 }
 
 
