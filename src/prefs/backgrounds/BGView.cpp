@@ -95,6 +95,7 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	:BBox(frame, name, resize, flags | B_WILL_DRAW | B_FRAME_EVENTS, B_PLAIN_BORDER),
 		fCurrent(NULL),
 		fCurrentInfo(NULL),
+		fLastImageIndex(-1),
 		fPathList(1, true),
 		fImageList(1, true)
 {
