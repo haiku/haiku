@@ -111,7 +111,8 @@ typedef struct {
   int32 	clicks;
   int32 	modifiers;
   bigtime_t timestamp;
-  int32 	wheel_delta;
+  int32 	wheel_ydelta;
+  int32		wheel_xdelta;
 } mouse_movement;
 
 

@@ -512,7 +512,7 @@ interpret_ms_buffer(my_device_info *my_dev)
 					info.ydelta = -value;
 					break;
 				case USAGE_ID_WHEEL:
-					info.wheel_delta = -value;
+					info.wheel_ydelta = -value;
 					break;
 			}
 		}

@@ -371,6 +371,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	BMessage *message;
 	char log[128];
 	while (dev->active) {
+		memset(&movements, 0, sizeof(movements));
 		if (ioctl(dev->driver_fd, kGetMouseMovements, &movements) < B_OK)
 			continue;
 		
@@ -418,12 +419,12 @@ MouseInputDevice::DeviceWatcher(void *arg)
 			}
 		}
 		
-		if (movements.wheel_delta != 0) {
+		if ((movements.wheel_ydelta != 0) || (movements.wheel_xdelta != 0)) {
 			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
 			if (message) {
 				message->AddInt64("when", movements.timestamp);
-				message->AddFloat("be:wheel_delta_x", 0.0);
-				message->AddFloat("be:wheel_delta_y", movements.wheel_delta);
+				message->AddFloat("be:wheel_delta_x", movements.wheel_xdelta);
+				message->AddFloat("be:wheel_delta_y", movements.wheel_ydelta);
 				
 				sSingletonMouseDevice->EnqueueMessage(message);
 			}	
