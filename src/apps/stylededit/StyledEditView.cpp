@@ -5,12 +5,13 @@
 #include <TranslationUtils.h>
 #include <Node.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <UTF8.h>
 
-#include <StyledEditView.h>
-#include <Constants.h>
+#include "StyledEditView.h"
+#include "Constants.h"
 
 using namespace BPrivate;
 
@@ -112,6 +113,8 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 	}
 	if (fEncoding != 0) {
 		int32 length = stream->Seek(0,SEEK_END);
+
+		// Here we save the run_array before it gets overwritten...
 		text_run_array * run_array = RunArray(0,length);
 		uint32 id = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding)->GetConversionID();
 		fSuppressChanges = true;
@@ -145,7 +148,10 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 				}
 			}
 		}
+
+		// ... and here we restore it
 		SetRunArray(0,length,run_array);
+		free(run_array);
 	}
 	return result;
 }
