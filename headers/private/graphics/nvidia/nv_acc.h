@@ -115,7 +115,7 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bc];	/* fixme? there's more here that's not used apparantly */
+	uint32 reserved01[0x00bc];
 	uint32 Color;				/* b0-31 is color */
 	uint32 reserved02[0x003e];
 	struct {
@@ -150,7 +150,7 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bc];	/* fixme? there's more here that's not used apparantly */
+	uint32 reserved01[0x00bc];
 	uint32 Color;				/* b0-31 is color */
 	uint32 reserved02[0x003e];
 	struct {
