@@ -56,6 +56,13 @@ class IMAP4Client : public BRemoteMailStorageProtocol {
 		
 		virtual status_t CreateMailbox(const char *mailbox);
 		virtual status_t DeleteMailbox(const char *mailbox);
+
+		virtual status_t GetMessage(
+			const char* uid,
+			BPositionIO** out_file, BMessage* out_headers,
+			BPath* out_folder_location) { return BRemoteMailStorageProtocol::GetMessage(uid, out_file, out_headers, out_folder_location); }
+
+		virtual status_t DeleteMessage(const char* uid) { return BRemoteMailStorageProtocol::DeleteMessage(uid); }
 		
 		void GetUniqueIDs();
 		
@@ -785,7 +792,7 @@ class IMAP4PartialReader : public BPositionIO {
 		}
 		ssize_t	ReadAt(off_t pos, void *buffer, size_t amountToWrite) {
 			ssize_t bytes;
-			while ((bytes = slave->ReadAt(pos,buffer,amountToWrite)) < amountToWrite && !done) {
+			while ((unsigned)(bytes = slave->ReadAt(pos,buffer,amountToWrite)) < amountToWrite && !done) {
 					slave->Seek(0,SEEK_END);
 					FetchMessage("RFC822.TEXT");
 					done = true;
