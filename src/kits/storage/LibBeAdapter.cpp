@@ -94,6 +94,8 @@ extern "C" status_t _kstop_watching_vnode_(dev_t device, ino_t node,
 
 extern "C" status_t _kstop_notifying_(port_id port, int32 handlerToken);
 
+extern "C" status_t _kget_safemode_option_(const char *parameter, char *buffer, size_t *_bufferSize);
+
 
 status_t
 _kern_write_fs_info(dev_t device, const struct fs_info *info, int mask)
@@ -700,5 +702,12 @@ _kern_rename_attr(int fromFile, const char *fromName, int toFile,
 	if (error == B_OK)
 		error = _kern_remove_attr(fromFile, fromName);
 	return error;
+}
+
+
+extern "C" status_t
+_kern_get_safemode_option(const char *parameter, char *buffer, size_t *_bufferSize)
+{
+	return _kget_safemode_option_(parameter, buffer, _bufferSize);
 }
 
