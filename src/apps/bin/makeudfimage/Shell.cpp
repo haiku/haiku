@@ -160,7 +160,7 @@ Shell::_PrintHelp() {
 	printf("\n");
 }
 
-#define MAKEUDFIMAGE_VERSION "1.0.0 beta 2"
+#define MAKEUDFIMAGE_VERSION "1.0.0"
 #ifndef MAKEUDFIMAGE_VERSION
 #	define MAKEUDFIMAGE_VERSION ("development version " __DATE__ ", " __TIME__)
 #endif
