@@ -29,8 +29,7 @@
 
 #include <Rect.h>
 #include <Font.h>
-
-class FontStyle;
+#include "FontFamily.h"
 
 class ServerFont
 {
@@ -52,7 +51,6 @@ public:
 	uint32 CountGlyphs(void);
 	int32 CountTuned(void);
 	font_file_format FileFormat(void);
-	FontStyle *Style(void) const { return fstyle; }
 
 	void SetDirection(const font_direction &dir) { fdirection=dir; }
 	void SetEdges(const edge_info &info) { fedges=info; }
@@ -64,6 +62,18 @@ public:
 	void SetRotation(const float &value) { frotation=value; }
 	void SetFace(const uint32 &value) { fface=value; }
 	
+	bool IsFixedWidth(void) { return fstyle->IsFixedWidth(); }
+	bool IsScalable(void) { return fstyle->IsScalable(); }
+	bool HasKerning(void) { return fstyle->HasKerning(); }
+	bool HasTuned(void) { return fstyle->HasTuned(); }
+	int32 TunedCount(void) { return fstyle->TunedCount(); }
+	uint16 GlyphCount(void) { return fstyle->GlyphCount(); }
+	uint16 CharMapCount(void) { return fstyle->CharMapCount(); }
+	
+	const char *GetStyle(void) const;
+	const char *GetFamily(void) const;
+	const char *GetPath(void) const { return fstyle->GetPath(); }
+
 	BRect BoundingBox(void);
 	void Height(font_height *fh);
 

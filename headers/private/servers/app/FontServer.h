@@ -61,20 +61,32 @@ public:
 	void RemoveFamily(const char *family);
 	status_t ScanDirectory(const char *path);
 	void SaveList(void);
-	FontStyle *GetStyle(font_family family, font_style face);
+	
+	const char *GetFamilyName(uint16 id) const;
+	const char *GetStyleName(const char *family, uint16 id) const;
+	
+	FontStyle *GetStyle(const char *family, const char *face);
+	FontStyle *GetStyle(const char *family, uint16 id) const;
+	FontStyle *GetStyle(const uint16 &familyid, const uint16 &styleid);
+	FontFamily *GetFamily(const uint16 &familyid);
+	
 	ServerFont *GetSystemPlain(void);
 	ServerFont *GetSystemBold(void);
 	ServerFont *GetSystemFixed(void);
+	
 	bool SetSystemPlain(const char *family, const char *style, float size);
 	bool SetSystemBold(const char *family, const char *style, float size);
 	bool SetSystemFixed(const char *family, const char *style, float size);
+	
 	bool FontsNeedUpdated(void) { return need_update; }
 	/*!
 		\brief Called when the fonts list has been updated
 	*/
 	void FontsUpdated(void) { need_update=false; }
 protected:
-	FontFamily *_FindFamily(const char *name);
+	FontFamily *_FindFamily(const char *name) const;
+	uint16 TranslateStyleToFace(const char *name) const;
+	
 	FT_CharMap _GetSupportedCharmap(const FT_Face &face);
 	bool init;
 	sem_id lock;

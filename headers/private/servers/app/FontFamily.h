@@ -73,70 +73,75 @@ class FontStyle : public SharedObject
 public:
 	FontStyle(const char *filepath, FT_Face face);
 	~FontStyle(void);
-	ServerFont *Instantiate(float size, float rotation=0.0, float shear=90.0);
 
 /*!
 	\fn bool FontStyle::IsFixedWidth(void)
 	\brief Determines whether the font's character width is fixed
 	\return true if fixed, false if not
 */
-	bool IsFixedWidth(void) { return is_fixedwidth; }
+	bool IsFixedWidth(void) const { return is_fixedwidth; }
 /*!
 	\fn bool FontStyle::IsScalable(void)
 	\brief Determines whether the font can be scaled to any size
 	\return true if scalable, false if not
 */
-	bool IsScalable(void) { return is_scalable; }
+	bool IsScalable(void) const { return is_scalable; }
 /*!
 	\fn bool FontStyle::HasKerning(void)
 	\brief Determines whether the font has kerning information
 	\return true if kerning info is available, false if not
 */
-	bool HasKerning(void) { return has_kerning; }
+	bool HasKerning(void) const { return has_kerning; }
 /*!
 	\fn bool FontStyle::HasTuned(void)
 	\brief Determines whether the font contains strikes
 	\return true if it has strikes included, false if not
 */
-	bool HasTuned(void) { return has_bitmaps; }
+	bool HasTuned(void) const { return has_bitmaps; }
 /*!
 	\fn bool FontStyle::TunedCount(void)
 	\brief Returns the number of strikes the style contains
 	\return The number of strikes the style contains
 */
-	int32 TunedCount(void) { return tunedcount; }
+	int32 TunedCount(void) const { return tunedcount; }
 /*!
 	\fn bool FontStyle::GlyphCount(void)
 	\brief Returns the number of glyphs in the style
 	\return The number of glyphs the style contains
 */
-	uint16 GlyphCount(void) { return glyphcount; }
+	uint16 GlyphCount(void) const { return glyphcount; }
 /*!
 	\fn bool FontStyle::CharMapCount(void)
 	\brief Returns the number of character maps the style contains
 	\return The number of character maps the style contains
 */
-	uint16 CharMapCount(void) { return charmapcount; }
-	const char *Name(void);
-	FontFamily *Family(void) { return family; }
+	uint16 CharMapCount(void) const { return charmapcount; }
+	const char *Name(void) const;
+	FontFamily *Family(void) const { return family; }
+	uint16 GetID(void) const { return fID; }
+	int32 GetFlags(void) const;
 
-	FT_Face GetFace(void);
+	uint16 GetFace(void) const { return fFace; }
 
 	const char *GetPath(void);
 
-	int16 ConvertToUnicode(uint16 c);
-
+	// TODO: Re-enable when I understand how the FT2 Cache system changed from
+	// 2.1.4 to 2.1.8
+//	int16 ConvertToUnicode(uint16 c);
 protected:
+	uint16 TranslateStyleToFace(const char *name) const;
+	
 	friend class FontFamily;
 	FontFamily *family;
 	uint16 glyphcount, charmapcount;
-	BString *name, *path;
-	BList *instances;
+	BString fName, fPath;
 	bool is_fixedwidth, is_scalable, has_kerning, has_bitmaps;
 	int32 tunedcount;
 	CachedFace cachedface;
 	uint8 format;
 	BRect fbounds;
+	uint16 fID;
+	uint16 fFace;
 };
 
 /*!
@@ -149,18 +154,28 @@ protected:
 class FontFamily : public SharedObject
 {
 public:
-	FontFamily(const char *namestr);
+	FontFamily(const char *namestr, const uint16 &index);
 	~FontFamily(void);
 	const char *Name(void);
-	void AddStyle(const char *path, FT_Face face);
+	
+	bool AddStyle(FontStyle *style);
 	void RemoveStyle(const char *style);
+	void RemoveStyle(FontStyle *style);
+	
+	FontStyle *GetStyle(int32 index);
+	FontStyle *GetStyle(const char *style);
+	
+	uint16 GetID(void) const { return fID; }
+	
 	bool HasStyle(const char *style);
 	int32 CountStyles(void);
-	const char *GetStyle(int32 index);
-	FontStyle *GetStyle(const char *style);
+	int32 GetFlags(void);
+	
 protected:
-	BString *name;
-	BList *styles;
+	BString fName;
+	BList fStyles;
+	uint16 fID;
+	int32 fFlags;
 };
 
 #endif
