@@ -78,7 +78,7 @@ extern size_t	strnlen(const char *string, size_t count);
 
 //extern char		*strsep(char **stringPointer, const char *delimiter);
 
-//extern const char	*strsignal(int signal);
+extern const char	*strsignal(int signal);
 
 #ifdef __cplusplus
 }
