@@ -406,6 +406,31 @@ ShowImageView::SetImage(const entry_ref *pref)
 	return B_OK;
 }
 
+status_t
+ShowImageView::SetSelection(const entry_ref *pref, BPoint point)
+{
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	if (!proster)
+		return B_ERROR;
+	BFile file(pref, B_READ_ONLY);
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
+	if (proster->Identify(&file, NULL, &info, 0, NULL,
+		B_TRANSLATOR_BITMAP) != B_OK)
+		return B_ERROR;
+	
+	// Translate image data and create a new ShowImage window
+	BBitmapStream outstream;
+	if (proster->Translate(&file, &info, NULL, &outstream,
+		B_TRANSLATOR_BITMAP) != B_OK)
+		return B_ERROR;
+	BBitmap *newBitmap = NULL;
+	if (outstream.DetachBitmap(&newBitmap) != B_OK)
+		return B_ERROR;
+		
+	return PasteBitmap(newBitmap, point);
+}
+
 void
 ShowImageView::SetDither(bool dither)
 {
@@ -1449,33 +1474,46 @@ ShowImageView::MessageReceived(BMessage *pmsg)
 		}
 			
 		case B_SIMPLE_DATA:
-			// If a user drags a clip from another ShowImage window,
-			// request a BBitmap pointer to that clip, allocated by the
-			// other view, for use solely by this view, so that it can
-			// be dropped/pasted onto this view.
 			if (pmsg->WasDropped()) {
-				BMessenger retMsgr, localMsgr(this);
-				retMsgr = pmsg->ReturnAddress();
-				if (retMsgr != localMsgr) {
-					BMessage msgReply;
-					retMsgr.SendMessage(MSG_SELECTION_BITMAP, &msgReply);
-					BBitmap *bitmap = NULL;
-					if (msgReply.FindPointer("be:_bitmap_ptr",
-						reinterpret_cast<void **>(&bitmap)) == B_OK) {
-						BRect sourceRect;
-						BPoint point, sourcePoint;
-						pmsg->FindPoint("be:_source_point", &sourcePoint);
-						pmsg->FindRect("be:_frame", &sourceRect);
-						point = pmsg->DropPoint();
-						point.Set(point.x - (sourcePoint.x - sourceRect.left),
-							point.y - (sourcePoint.y - sourceRect.top));
-							// adjust drop point before scaling is factored in
+				uint32 type;
+				int32 count;
+				status_t ret = pmsg->GetInfo("refs", &type, &count);
+				if (ret == B_OK && type == B_REF_TYPE) {
+					// If file was dropped, open it as the selection
+					entry_ref ref;
+					if (pmsg->FindRef("refs", 0, &ref) == B_OK) {
+						BPoint point = pmsg->DropPoint();
 						point = ConvertFromScreen(point);
 						point = ViewToImage(point);
-						
-						PasteBitmap(bitmap, point);
+						SetSelection(&ref, point);
 					}
-					
+				} else {
+					// If a user drags a clip from another ShowImage window,
+					// request a BBitmap pointer to that clip, allocated by the
+					// other view, for use solely by this view, so that it can
+					// be dropped/pasted onto this view.
+					BMessenger retMsgr, localMsgr(this);
+					retMsgr = pmsg->ReturnAddress();
+					if (retMsgr != localMsgr) {
+						BMessage msgReply;
+						retMsgr.SendMessage(MSG_SELECTION_BITMAP, &msgReply);
+						BBitmap *bitmap = NULL;
+						if (msgReply.FindPointer("be:_bitmap_ptr",
+							reinterpret_cast<void **>(&bitmap)) == B_OK) {
+							BRect sourceRect;
+							BPoint point, sourcePoint;
+							pmsg->FindPoint("be:_source_point", &sourcePoint);
+							pmsg->FindRect("be:_frame", &sourceRect);
+							point = pmsg->DropPoint();
+							point.Set(point.x - (sourcePoint.x - sourceRect.left),
+								point.y - (sourcePoint.y - sourceRect.top));
+								// adjust drop point before scaling is factored in
+							point = ConvertFromScreen(point);
+							point = ViewToImage(point);
+							
+							PasteBitmap(bitmap, point);
+						}
+					}
 				}
 			}
 			break;
@@ -1646,7 +1684,7 @@ ShowImageView::Cut()
 	RemoveSelection(true);
 }
 
-void
+status_t
 ShowImageView::PasteBitmap(BBitmap *bitmap, BPoint point)
 {
 	if (bitmap && bitmap->IsValid()) {
@@ -1666,7 +1704,11 @@ ShowImageView::PasteBitmap(BBitmap *bitmap, BPoint point)
 			fSelectionRect = offsetRect;
 		
 		Invalidate();
+		
+		return B_OK;
 	}
+	
+	return B_ERROR;
 }
 
 void

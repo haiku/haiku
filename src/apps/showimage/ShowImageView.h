@@ -138,7 +138,8 @@ private:
 	void AddWhiteRect(BRect &rect);
 	void GetMergeRects(BBitmap *merge, BRect selection, BRect &srcBits, BRect &destRect);
 	void GetSelMergeRects(BRect &srcBits, BRect &destRect);
-	void PasteBitmap(BBitmap *bitmap, BPoint point);
+	status_t SetSelection(const entry_ref *pref, BPoint point);
+	status_t PasteBitmap(BBitmap *bitmap, BPoint point);
 	void MergeWithBitmap(BBitmap *merge, BRect selection);
 	void MergeSelection();
 	void DeleteScaler();
