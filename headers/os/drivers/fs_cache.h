@@ -1,7 +1,8 @@
 /* File System File and Block Caches
-** 
-** Distributed under the terms of the Haiku License.
-*/
+ *
+ * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _FS_CACHE_H
 #define _FS_CACHE_H
 
@@ -9,28 +10,33 @@
 #include <fs_interface.h>
 
 
-typedef void (*transaction_notification_hook)(int32);
+typedef void (*transaction_notification_hook)(int32 id, void *data);
 
 #ifdef __cplusplus
 extern "C" {
 #endif 
 
 /* transactions */
-extern int32 cache_transaction_start(void *_cache, transaction_notification_hook hook);
+extern int32 cache_transaction_start(void *_cache, transaction_notification_hook hook, void *data);
 extern status_t cache_transaction_sync(void *_cache, int32 id);
 extern status_t cache_transaction_end(void *_cache, int32 id);
 extern status_t cache_transaction_abort(void *_cache, int32 id);
+extern status_t cache_transaction_next_block(void *_cache, int32 id, uint32 *_cookie,
+					off_t *_blockNumber, void **_data, void **_unchangedData);
 
 /* block cache */
 extern void block_cache_delete(void *_cache, bool allowWrites);
 extern void *block_cache_create(int fd, off_t numBlocks, size_t blockSize);
 extern status_t block_cache_sync(void *_cache);
 
-extern void *block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base, off_t length, int32 transaction);
+extern status_t block_cache_make_writable(void *_cache, off_t blockNumber, int32 transaction);
+extern void *block_cache_get_writable_etc(void *_cache, off_t blockNumber, off_t base,
+					off_t length, int32 transaction);
 extern void *block_cache_get_writable(void *_cache, off_t blockNumber, int32 transaction);
 extern void *block_cache_get_empty(void *_cache, off_t blockNumber, int32 transaction);
 extern const void *block_cache_get_etc(void *_cache, off_t blockNumber, off_t base, off_t length);
 extern const void *block_cache_get(void *_cache, off_t blockNumber);
+extern status_t block_cache_set_dirty(void *_cache, off_t blockNumber, bool isDirty, int32 transaction);
 extern void block_cache_put(void *_cache, off_t blockNumber);
 
 /* file cache */
