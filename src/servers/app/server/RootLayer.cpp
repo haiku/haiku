@@ -253,6 +253,15 @@ int32 RootLayer::WorkingThread(void *data)
 				layer->resize_layer(x, y);
 				break;
 			}
+			case AS_ROOTLAYER_ADD_TO_SUBSET:
+			{
+				WinBorder	*winBorder = NULL;
+				WinBorder	*toWinBorder = NULL;
+				messageQueue.Read<WinBorder*>(&winBorder);
+				messageQueue.Read<WinBorder*>(&toWinBorder);
+				desktop->AddWinBorderToSubset(winBorder, toWinBorder);
+				break;
+			}
 			default:
 				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), code));
 				break;
@@ -389,21 +398,26 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 		debugger("RootLayer::RemoveWinBorder - winBorder must be hidden\n");
 		return;
 	}
-//printf("Adi: AddWinBorder(%p)\n", winBorder);
-	uint32		wks = winBorder->Window()->Workspaces();
 
-	// add to current workspace
-	if (wks == 0)
+	// Subset modals also need to have a main window before appearing in workspace list.
+	int32 feel = winBorder->Window()->Feel();
+	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL)
 	{
-		fWorkspace[fActiveWksIndex]->AddWinBorder(winBorder);
-	}
-	// add to desired workspaces
-	else
-	{
-		for (int32 i = 0; i < fWsCount; i++)
+		uint32		wks = winBorder->Window()->Workspaces();
+
+		// add to current workspace
+		if (wks == 0)
 		{
-			if (fWorkspace[i] && (wks & (0x00000001UL << i)))
-				fWorkspace[i]->AddWinBorder(winBorder);
+			fWorkspace[fActiveWksIndex]->AddWinBorder(winBorder);
+		}
+		// add to desired workspaces
+		else
+		{
+			for (int32 i = 0; i < fWsCount; i++)
+			{
+				if (fWorkspace[i] && (wks & (0x00000001UL << i)))
+					fWorkspace[i]->AddWinBorder(winBorder);
+			}
 		}
 	}
 
@@ -454,8 +468,9 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 		return;
 	}
 
-	bool	invalidate	= false;
-	bool	invalid;
+	bool		invalidate	= false;
+	bool		invalid;
+	WinBorder	*exFocus = FocusWinBorder();
 
 	// we try to add WinBorders to all workspaces. If they are not needed, nothing will be done.
 	// If they are needed, Workspace automaticaly allocates space and inserts them.
@@ -472,7 +487,13 @@ void RootLayer::AddSubsetWinBorder(WinBorder *winBorder, WinBorder *toWinBorder)
 
 	if (invalidate)
 	{
-		// RootLayer::Invalidate(&winborder's full)
+		get_workspace_windows();
+
+		// TODO: should it be improved by calling with region of hidden windows
+		//       plus the full regions of new windows???
+		invalidate_layer(this, fFull);
+
+		draw_window_tab(exFocus, FocusWinBorder());
 	}
 }
 
@@ -485,8 +506,9 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 		return;
 	}
 
-	bool	invalidate	= false;
-	bool	invalid;
+	bool		invalidate	= false;
+	bool		invalid;
+	WinBorder	*exFocus = FocusWinBorder();
 
 	// we try to remove from all workspaces. If winBorder is not in there, nothing will be done.
 	for (int32 i = 0; i < fWsCount; i++)
@@ -502,7 +524,13 @@ void RootLayer::RemoveSubsetWinBorder(WinBorder *winBorder, WinBorder *fromWinBo
 
 	if (invalidate)
 	{
-		// RootLayer::Invalidate(&winBorder's visible);
+		get_workspace_windows();
+
+		// TODO: should it be improved by calling with region of hidden windows
+		//       plus the full regions of new windows???
+		invalidate_layer(this, fFull);
+
+		draw_window_tab(exFocus, FocusWinBorder());
 	}
 }
 
@@ -1559,16 +1587,16 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 			invalidate = invalid;
 	}
 
-	get_workspace_windows();
-
 	if (invalidate)
 	{
+		get_workspace_windows();
+
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???
 		invalidate_layer(this, fFull);
-	}
 
-	draw_window_tab(exFocus, FocusWinBorder());
+		draw_window_tab(exFocus, FocusWinBorder());
+	}
 }
 
 void RootLayer::hide_winBorder(WinBorder *winBorder)
@@ -1590,16 +1618,16 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 			invalidate = invalid;
 	}
 
-	get_workspace_windows();
-
 	if (invalidate)
 	{
+		get_workspace_windows();
+
 		// TODO: should it be improved by calling with region of hidden windows
 		//       plus the full regions of new windows???
 		invalidate_layer(this, fFull);
-	}
 
-	draw_window_tab(exFocus, FocusWinBorder());
+		draw_window_tab(exFocus, FocusWinBorder());
+	}
 }
 
 void RootLayer::get_workspace_windows()

@@ -291,13 +291,8 @@ void Desktop::AddWinBorder(WinBorder *winBorder)
 	// R2: how to determine the RootLayer to which this window should be added???
 	// for now, use ActiveRootLayer() because we only have one instance.
 
-	// these are added to windows's FMWList and Workspaces when
-	// BWindow::AddToSubset() is called. not now.
-	if (feel != B_FLOATING_SUBSET_WINDOW_FEEL && feel != B_MODAL_SUBSET_WINDOW_FEEL)
-	{
-		// send WinBorder to be added to workspaces
-		ActiveRootLayer()->AddWinBorder(winBorder);
-	}
+	// send WinBorder to be added to workspaces
+	ActiveRootLayer()->AddWinBorder(winBorder);
 }
 
 void Desktop::RemoveWinBorder(WinBorder *winBorder)
