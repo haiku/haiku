@@ -543,7 +543,7 @@ void
 QueryTest::setUp()
 {
 	BasicTest::setUp();
-	fApplication = new TestApp("application/x-vnd.obos.query-test");
+	fApplication = new BTestApp("application/x-vnd.obos.query-test");
 	if (fApplication->Init() != B_OK) {
 		fprintf(stderr, "Failed to initialize application.\n");
 		delete fApplication;

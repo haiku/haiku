@@ -8,7 +8,7 @@
 
 // TestHandler
 
-class TestHandler : public BHandler {
+class BTestHandler : public BHandler {
 public:
 	virtual void MessageReceived(BMessage *message);
 	BMessageQueue &Queue();
@@ -20,23 +20,23 @@ private:
 
 // TestApp
 
-class TestApp : public BApplication {
+class BTestApp : public BApplication {
 public:
-	TestApp(const char *signature);
+	BTestApp(const char *signature);
 
 	status_t Init();
 	void Terminate();
 
 	virtual void ReadyToRun();
 
-	TestHandler &Handler();
+	BTestHandler &Handler();
 
 private:
 	static int32 _AppThreadStart(void *data);
 
 private:
 	thread_id		fAppThread;
-	TestHandler	fHandler;
+	BTestHandler	fHandler;
 };
 
 #endif	// _beos_test_app_h_

@@ -6,7 +6,7 @@
 
 // MessageReceived
 void
-TestHandler::MessageReceived(BMessage *message)
+BTestHandler::MessageReceived(BMessage *message)
 {
 	// clone and push it
 	BMessage *clone = new BMessage(*message);
@@ -17,7 +17,7 @@ TestHandler::MessageReceived(BMessage *message)
 
 // Queue
 BMessageQueue &
-TestHandler::Queue()
+BTestHandler::Queue()
 {
 	return fQueue;
 }
@@ -26,7 +26,7 @@ TestHandler::Queue()
 // TestApp
 
 // constructor
-TestApp::TestApp(const char *signature)
+BTestApp::BTestApp(const char *signature)
 	   : BApplication(signature),
 		 fAppThread(B_ERROR),
 		 fHandler()
@@ -37,7 +37,7 @@ TestApp::TestApp(const char *signature)
 
 // Init
 status_t
-TestApp::Init()
+BTestApp::Init()
 {
 	status_t error = B_OK;
 	fAppThread = spawn_thread(&_AppThreadStart, "query app",
@@ -56,7 +56,7 @@ TestApp::Init()
 
 // Terminate
 void
-TestApp::Terminate()
+BTestApp::Terminate()
 {
 	PostMessage(B_QUIT_REQUESTED, this);
 	int32 result;
@@ -65,22 +65,22 @@ TestApp::Terminate()
 
 // ReadyToRun
 void
-TestApp::ReadyToRun()
+BTestApp::ReadyToRun()
 {
 }
 
 // Handler
-TestHandler &
-TestApp::Handler()
+BTestHandler &
+BTestApp::Handler()
 {
 	return fHandler;
 }
 
 // _AppThreadStart
 int32
-TestApp::_AppThreadStart(void *data)
+BTestApp::_AppThreadStart(void *data)
 {
-	if (TestApp *app = (TestApp*)data) {
+	if (BTestApp *app = (BTestApp*)data) {
 		app->Lock();
 		app->Run();
 	}

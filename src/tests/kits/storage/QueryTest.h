@@ -12,7 +12,7 @@
 #include "BasicTest.h"
 
 class QueryTestEntry;
-class TestApp;
+class BTestApp;
 
 class QueryTest : public BasicTest
 {
@@ -41,7 +41,7 @@ public:
 	void LiveTest();
 
 private:
-	TestApp		*fApplication;
+	BTestApp	*fApplication;
 	bool		fVolumeCreated;
 };
 

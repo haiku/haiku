@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src tests kits storage ;
 
+UsePrivateHeaders storage ;
 
 CommonTestLib libstoragetest.so
 	: StorageKitTestAddon.cpp
