@@ -444,13 +444,14 @@ ImageView::SetImage(BMessage *pmsg)
 			B_TRANSLATOR_BITMAP);
 		BBitmap *pbitmap = NULL;
 		chk = outstream.DetachBitmap(&pbitmap);
+		delete fpbitmap;
 		fpbitmap = pbitmap;
 		pbitmap = NULL;
 		fcurrentRef = ref;
-			// need to keep the ref around if user was to switch pages
+			// need to keep the ref around if user wants to switch pages
 		int32 documentCount = 0;
-		if (ioExtension.FindInt32("/documentCount", &documentCount) ==
-			B_OK && documentCount > 0)
+		if (ioExtension.FindInt32("/documentCount", &documentCount) == B_OK &&
+			documentCount > 0)
 			fdocumentCount = documentCount;
 		else
 			fdocumentCount = 1;
