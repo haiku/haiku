@@ -69,7 +69,7 @@ class List {
 
 		IteratorType Iterator()
 		{
-			return IteratorType(this);
+			return IteratorType(*this);
 		}
 
 		bool IsEmpty()
@@ -81,7 +81,6 @@ class List {
 		{
 			return fLink.next;
 		}
-
 
 		static inline size_t Offset()
 		{
@@ -104,11 +103,11 @@ class Iterator {
 		typedef List<Item, LinkMember> ListType;
 
 		Iterator() : fCurrent(NULL) {}
-		Iterator(ListType &list) : fList(list), fCurrent(list.Head()) {}
+		Iterator(ListType &list) : fList(&list), fCurrent(list.Head()) {}
 
 		Item *Next()
 		{
-			if (fCurrent == &fList.fLink)
+			if (fCurrent == &fList->fLink)
 				return NULL;
 
 			Link *current = fCurrent;
@@ -118,7 +117,7 @@ class Iterator {
 		}
 
 	private:
-		ListType	&fList;
+		ListType	*fList;
 		Link		*fCurrent;
 };
 
