@@ -36,7 +36,7 @@ KernelLd kernel :
 
 	kernel_posix_locale.o
 	kernel_posix_main.o
-#	kernel_posix_signal.o
+	kernel_posix_signal.o
 	kernel_posix_stdio.o
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
@@ -69,7 +69,7 @@ KernelLd kernel.so :
 
 	kernel_posix_locale.o
 	kernel_posix_main.o
-#	kernel_posix_signal.o
+	kernel_posix_signal.o
 	kernel_posix_stdio.o
 	kernel_posix_stdlib.o
 	kernel_posix_sys.o
@@ -104,7 +104,8 @@ KernelLd libroot.so :
 	posix_malloc.o
 	posix_math.o
 	posix_math_arch_$(OBOS_ARCH).o
-	posix_stdio.o
+	posix_signal.o
+	posix_stdio.o	
 	posix_stdlib.o
 	posix_string.o
 	posix_sys.o
