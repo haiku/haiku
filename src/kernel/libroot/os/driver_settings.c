@@ -8,12 +8,6 @@
 #include <OS.h>
 #include <driver_settings.h>
 
-// this definition is currently missing from the headers above...
-// just a small to let it compile fine in the OpenBeOS tree
-#ifndef B_FILE_NAME_LENGTH
-#	define B_FILE_NAME_LENGTH 256
-#endif
-
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -386,14 +380,14 @@ load_driver_settings_from_file(int file)
 static bool
 put_string(char **_buffer, size_t *_bufferSize, char *string)
 {
-	size_t length, reserved, quotes, sizeNeeded;
+	size_t length, reserved, quotes;
 	char *buffer = *_buffer, c;
 	bool quoted;
 
 	if (string == NULL)
 		return true;
 
-	for (length = reserved = quotes = 0; c = string[length]; length++) {
+	for (length = reserved = quotes = 0; (c = string[length]) != '\0'; length++) {
 		if (c == '"')
 			quotes++;
 		else if (is_word_break(c))
@@ -412,7 +406,7 @@ put_string(char **_buffer, size_t *_bufferSize, char *string)
 	if (quoted)
 		*(buffer++) = '"';
 
-	for (;c = string[0]; string++) {
+	for (;(c = string[0]) != '\0'; string++) {
 		if (c == '"')
 			*(buffer++) = '\\';
 
