@@ -97,6 +97,7 @@ static void fill_bitmap(BBitmap &bmp, char value);
 //static void dump_bitmap(BBitmap &bmp, char *name = "bmp");
 //static void dump_ref(entry_ref *ref, char* name = "ref");
 static void to_lower(const char *str, std::string &result);
+static std::string to_lower(const char *str);
 static void remove_type(const char *type, const char *databaseDir = mimeDatabaseDir);
 static bool type_exists(const char *type, const char *databaseDir = mimeDatabaseDir);
 class ContainerAdapter;
@@ -1803,6 +1804,14 @@ to_lower(const char *str, std::string &result) {
 		result += tolower(str[i]);
 }
 
+std::string
+to_lower(const char *str) {
+	std::string result;
+	to_lower(str, result);
+	return result;
+}
+
+
 // Manually removes the file in the MIME database corresponding to
 // the given MIME type
 void
@@ -1937,17 +1946,17 @@ MimeTypeTest::SupportingAppsTest() {
 		msg.PrintToStream();
 	} */
 	NextSubTest();
-	if (false)	// Doesn't quite work right yet.
+	if (true)	// Doesn't quite work right yet.
 	{
-		std::queue<std::string> typeList;							// Stores all installed MIME types
-		std::queue<std::string> appList;							// Stores all installed application subtypes
+		std::set<std::string> typeList;							// Stores all installed MIME types
+		std::set<std::string> appList;							// Stores all installed application subtypes
 		std::map< std::string, std::set<std::string> > typeAppMap;	// Stores mapping of types to apps that support them
 		
 		// Get a list of all the types in the database
 		{
 			BMessage msg;
 			CHK(BMimeType::GetInstalledTypes(&msg) == B_OK);
-			QueueAdapter typeAdapter(typeList);
+			SetAdapter typeAdapter(typeList);
 			FillWithMimeTypes(typeAdapter, msg, "types");
 		}
 
@@ -1955,7 +1964,7 @@ MimeTypeTest::SupportingAppsTest() {
 		{
 			BMessage msg;
 			CHK(BMimeType::GetInstalledTypes(applicationSupertype, &msg) == B_OK);
-			QueueAdapter appAdapter(appList);
+			SetAdapter appAdapter(appList);
 			FillWithMimeTypes(appAdapter, msg, "types");
 		}
 		
@@ -1963,10 +1972,10 @@ MimeTypeTest::SupportingAppsTest() {
 		// it supports by reading its META:FILE_TYPES attribute from the database,
 		// and add the app to the type->app map for each such type
 		{
-			while (!appList.empty()) {
+			std::set<std::string>::iterator i;
+			for (i = appList.begin(); i != appList.end(); i++) {
 				// Grab the next application
-				std::string app = appList.front();
-				appList.pop();
+				std::string app = *i;
 				
 				// The leaf is all we're interested in -- it's the subtype
 //				CHK(StorageKit::split_path(app.c_str(), dir, leaf) == B_OK);
@@ -1988,17 +1997,18 @@ MimeTypeTest::SupportingAppsTest() {
 //						msg.PrintToStream();
 						
 						// Fill up a list with all the supported types
-						std::queue<std::string> supportList;
-						QueueAdapter supportAdapter(supportList);
+						std::set<std::string> supportList;
+						SetAdapter supportAdapter(supportList);
 						FillWithMimeTypes(supportAdapter, msg, "types");
 						
 						// For each type, add the current application as a supporting
-						// app in our type->apps map						
-						while (!supportList.empty()) {
+						// app in our type->apps map
+						for (std::set<std::string>::iterator type = supportList.begin();
+								type != supportList.end();
+									type++)
+						{
 							NextSubTest();
-							std::string type = supportList.front();
-							supportList.pop();							
-							typeAppMap[type].insert(app);					
+							typeAppMap[*type].insert(app);					
 						}
 					} else {
 						// Just in case some bozo writes something other than a flattened
@@ -2014,18 +2024,46 @@ MimeTypeTest::SupportingAppsTest() {
 			}
 		}
 		
+		// Now, add in all the types listed in MIME_DB_DIR/__mime_table
+		{
+			BEntry entry((std::string(mimeDatabaseDir) + "/__mime_table").c_str());
+			CHK(entry.InitCheck() == B_OK);
+			if (entry.Exists()) {
+				BFile file(&entry, B_READ_ONLY);
+				CHK(file.InitCheck() == B_OK);
+				BMessage msg;
+				CHK(msg.Unflatten(&file) == B_OK);
+
+//				msg.PrintToStream();
+				
+				char *type; 
+				uint32 typeVal; 
+				int32 count;
+				for (int i = 0; msg.GetInfo(B_STRING_TYPE, i, &type, &typeVal, &count) == B_OK; i++ ) {
+					// Add all the associated applications. Interestingly (or maybe not),
+					// any types appearing ONLY in the __mime_table and not in the mime
+					// database fail when GetSupportingApps is called on them. Thus, we
+					// add them to the type->app map, but not to the list of types.
+					const char *app;
+					for (int j = 0; j < count; j++) {
+						CHK(msg.FindString(type, j, &app) == B_OK);
+						typeAppMap[type].insert(to_lower(app));
+					}					
+				}
+			}
+		}
+		
 		// For each installed type, get a list of the supported apps, and
 		// verify that the list matches the list we generated. Also check
 		// that the list of apps for the type's supertype (if it exists)
 		// is a subset of the list we generated for said supertype.
-		while (!typeList.empty()) {
+		for (std::set<std::string>::iterator i = typeList.begin(); i != typeList.end(); i++) {
 			// Get the current type
-			std::string type = typeList.front();
-			typeList.pop();			
+			std::string type = *i;
 			BMimeType mime(type.c_str());
 			CHK(mime.InitCheck() == B_OK);
-			printf("------------------------------------------------------------\n");
-			printf("%s\n", type.c_str());
+//			printf("------------------------------------------------------------\n");
+//			printf("%s\n", type.c_str());
 			
 			// Get the set of supporting apps for this type (and its supertype, if
 			// it's not a supertype itself) that we discovered by manually culling
@@ -2035,7 +2073,7 @@ MimeTypeTest::SupportingAppsTest() {
 			BMimeType superType;
 			if (mime.GetSupertype(&superType) == B_OK)
 				appSetSuper = typeAppMap[superType.Type()];		// Copy the supertype
-				
+/*				
 			printf("sub.size == %ld\n", appSet.size());
 			std::set<std::string>::iterator i;
 			for (i = appSet.begin(); i != appSet.end(); i++) {
@@ -2050,8 +2088,7 @@ MimeTypeTest::SupportingAppsTest() {
 				printf("preferred app:\n");
 				printf("  %s\n", str);
 			}
-
-
+*/
 			// Get the set of supporting apps via GetSupportingApps(), then
 			// add them to a list.
 			BMessage msg;
@@ -2060,8 +2097,7 @@ MimeTypeTest::SupportingAppsTest() {
 			QueueAdapter appAdapter(appList);
 			FillWithMimeTypes(appAdapter, msg, "applications");
 						
-			// 
-			msg.PrintToStream();
+//			msg.PrintToStream();
 						
 			
 		}
