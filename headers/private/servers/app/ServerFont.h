@@ -40,19 +40,19 @@ public:
 			uint16 flags=0, uint8 spacing=B_CHAR_SPACING);
 	ServerFont(const ServerFont &font);
 	~ServerFont(void);
-	font_direction Direction(void) { return fdirection; }
-	uint32 Encoding(void) { return fencoding; }
-	edge_info Edges(void) { return fedges; }
-	uint32 Flags(void) { return fflags; }
-	uint32 Spacing(void) { return fspacing; }
-	float Shear(void) { return fshear; }
-	float Rotation(void) { return frotation; }
-	float Size(void) { return fsize; }
-	uint32 Face(void) { return fface; }
+	font_direction Direction(void) const { return fdirection; }
+	uint32 Encoding(void) const { return fencoding; }
+	edge_info Edges(void) const { return fedges; }
+	uint32 Flags(void) const { return fflags; }
+	uint32 Spacing(void) const { return fspacing; }
+	float Shear(void) const { return fshear; }
+	float Rotation(void) const { return frotation; }
+	float Size(void) const { return fsize; }
+	uint32 Face(void) const { return fface; }
 	uint32 CountGlyphs(void);
 	int32 CountTuned(void);
 	font_file_format FileFormat(void);
-	FontStyle *Style(void) { return fstyle; }
+	FontStyle *Style(void) const { return fstyle; }
 
 	void SetDirection(const font_direction &dir) { fdirection=dir; }
 	void SetEdges(const edge_info &info) { fedges=info; }
@@ -67,7 +67,8 @@ public:
 	BRect BoundingBox(void);
 	void Height(font_height *fh);
 
-		ServerFont&			operator=(const ServerFont& font);
+	ServerFont &operator=(const ServerFont& font);
+	
 protected:
 	friend class FontStyle;
 	FontStyle *fstyle;

@@ -42,9 +42,11 @@
 #include <Region.h>
 #include "PatternHandler.h"
 #include "LayerData.h"
+#include "ServerBitmap.h"
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 class ServerCursor;
-class ServerBitmap;
 
 #ifndef ROUND
 	#define ROUND(a)	( (long)(a+.5) )
@@ -114,6 +116,22 @@ private:
 	float miny;
 	float maxx;
 	float maxy;
+};
+
+/*!
+	\class FBBitmap DisplayDriver.h
+	\brief Class used for easily passing around information about the framebuffer
+*/
+class FBBitmap : public ServerBitmap
+{
+public:
+	FBBitmap(void) : ServerBitmap(BRect(0,0,0,0),B_NO_COLOR_SPACE,0) { }
+	~FBBitmap(void) { }
+	void SetBytesPerRow(const int32 &bpr) { _bytesperrow=bpr; }
+	void SetSpace(const color_space &space) { _space=space; }
+	void SetSize(const int32 &w, const int32 &h) { _width=w; _height=h; }
+	void SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
+	void SetBitsPerPixel(color_space space,int32 bytesperline) { _HandleSpace(space,bytesperline); }
 };
 
 /*!
@@ -247,6 +265,16 @@ protected:
 //	virtual void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
 //	virtual void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
 	virtual void SetThickPatternPixel(int x, int y);
+	
+	// Blit functions specific to FreeType2 glyph copying. These probably could be replaced with
+	// more generic functions, but these are written and can be replaced later.
+	void BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d);
+	void BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawData *d);
+	
+	// Two functions for gaining direct access to the framebuffer of a child class. This removes the need
+	// for a set of glyph-blitting virtual functions for each driver.
+	virtual bool AcquireBuffer(FBBitmap *bmp);
+	virtual void ReleaseBuffer(void);
 	
 	void FillArc(const BRect &r, const float &angle, const float &span, DisplayDriver*, SetHorizontalLineFuncType setLine);
 	void FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);
