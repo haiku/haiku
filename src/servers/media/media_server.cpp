@@ -169,6 +169,24 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			break;
 		}
 
+		case SERVER_PUBLISH_INPUTS:
+		{
+			server_publish_inputs_request *request = (server_publish_inputs_request *)data;
+			server_publish_inputs_reply reply;
+			// XXX do something here
+			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_PUBLISH_OUTPUTS:
+		{
+			server_publish_outputs_request *request = (server_publish_outputs_request *)data;
+			server_publish_outputs_reply reply;
+			// XXX do something here
+			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			break;
+		}
+
 		case SERVER_GET_NODE:
 		{
 			server_get_node_request *request = (server_get_node_request *)data;

@@ -14,17 +14,18 @@
 #undef 	DEBUG
 #define	DEBUG 3
 #include "debug.h"
+#include "TStack.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
 #include "DataExchange.h"
 #include "DormantNodeManager.h"
 #include "Notifications.h"
 
-using namespace BPrivate::media;
-
 namespace BPrivate { namespace media {
 	extern team_id team;
-}; };
+} } // BPrivate::media
+
+using namespace BPrivate::media;
 
 // the BMediaRoster destructor is private,
 // but _DefaultDeleter is a friend class of
@@ -37,14 +38,17 @@ public:
 
 _DefaultDeleter _deleter;
 
-namespace MediaKitPrivate 
-{
-
+namespace BPrivate { namespace media { namespace mediaroster {
 
 status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id = NULL, BString * out_input_name = NULL);
 status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info = NULL, const media_input *input = NULL);
+status_t GetAllOutputs(const media_node & node, Stack<media_output> *stack);
+status_t GetAllInputs(const media_node & node, Stack<media_input> *stack);
+status_t PublishOutputs(const media_node & node, Stack<media_output> *stack);
+status_t PublishInputs(const media_node & node, Stack<media_input> *stack);
 
-status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
+status_t
+GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
 {
 	if (out_node == NULL)
 		return B_BAD_VALUE;
@@ -66,7 +70,8 @@ status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id, BS
 	return rv;
 }
 
-status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
+status_t
+SetNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
 {
 	server_set_node_request request;
 	server_set_node_reply reply;
@@ -85,7 +90,145 @@ status_t SetNode(node_type type, const media_node *node, const dormant_node_info
 	return QueryServer(SERVER_SET_NODE, &request, sizeof(request), &reply, sizeof(reply));
 }
 
-};
+status_t
+GetAllOutputs(const media_node & node, Stack<media_output> *stack)
+{
+	int32 cookie;
+	status_t rv;
+	status_t result;
+	
+	result = B_OK;
+	cookie = 0;
+	for (;;) {
+		producer_get_next_output_request request;
+		producer_get_next_output_reply reply;
+		request.cookie = cookie;
+		rv = QueryServer(PRODUCER_GET_NEXT_OUTPUT, &request, sizeof(request), &reply, sizeof(reply));
+		if (rv != B_OK)
+			break;
+		cookie = reply.cookie;
+		if (!stack->Push(reply.output)) {
+			TRACE("GetAllOutputs: stack->Push failed\n");
+			result = B_ERROR;
+		}
+	}
+
+	producer_dispose_output_cookie_request request;
+	producer_dispose_output_cookie_reply reply;
+	QueryServer(PRODUCER_DISPOSE_OUTPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
+	
+	return result;
+}
+
+status_t
+GetAllInputs(const media_node & node, Stack<media_input> *stack)
+{
+	int32 cookie;
+	status_t rv;
+	status_t result;
+	
+	result = B_OK;
+	cookie = 0;
+	for (;;) {
+		consumer_get_next_input_request request;
+		consumer_get_next_input_reply reply;
+		request.cookie = cookie;
+		rv = QueryServer(CONSUMER_GET_NEXT_INPUT, &request, sizeof(request), &reply, sizeof(reply));
+		if (rv != B_OK)
+			break;
+		cookie = reply.cookie;
+		if (!stack->Push(reply.input)) {
+			TRACE("GetAllInputs: stack->Push failed\n");
+			result = B_ERROR;
+		}
+	}
+
+	consumer_dispose_input_cookie_request request;
+	consumer_dispose_input_cookie_reply reply;
+	QueryServer(CONSUMER_DISPOSE_INPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
+	
+	return result;
+}
+
+status_t
+PublishOutputs(const media_node & node, Stack<media_output> *stack)
+{
+	server_publish_outputs_request request;
+	server_publish_outputs_reply reply;
+	media_output *output;
+	media_output *outputs;
+	int32 count;
+	
+	count = stack->CountItems();
+	TRACE("PublishOutputs: publishing %ld\n", count);
+	
+	request.node = node;
+	request.count = count;
+	if (count > MAX_OUTPUTS) {
+		void *start_addr;
+		size_t size;
+		size = ((count * sizeof(media_output)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+		request.area = create_area("publish outputs", &start_addr, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (request.area < B_OK) {
+			TRACE("PublishOutputs: failed to create area, %#lx\n", request.area);
+			return (status_t)request.area;
+		}
+		outputs = static_cast<media_output *>(start_addr);
+	} else {
+		request.area = -1;
+		outputs = request.outputs;
+	}
+	TRACE("PublishOutputs: area %#lx\n", request.area);
+	
+	for (int32 i = 0; i != count; i++) {
+		stack->GetPointerAt(i, &output);
+		outputs[i] = *output;
+	}
+	
+	return QueryServer(SERVER_PUBLISH_OUTPUTS, &request, sizeof(request), &reply, sizeof(reply));
+}
+
+status_t
+PublishInputs(const media_node & node, Stack<media_input> *stack)
+{
+	server_publish_inputs_request request;
+	server_publish_inputs_reply reply;
+	media_input *input;
+	media_input *inputs;
+	int32 count;
+	
+	count = stack->CountItems();
+	TRACE("PublishInputs: publishing %ld\n", count);
+	
+	request.node = node;
+	request.count = count;
+	if (count > MAX_INPUTS) {
+		void *start_addr;
+		size_t size;
+		size = ((count * sizeof(media_input)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+		request.area = create_area("publish inputs", &start_addr, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (request.area < B_OK) {
+			TRACE("PublishInputs: failed to create area, %#lx\n", request.area);
+			return (status_t)request.area;
+		}
+		inputs = static_cast<media_input *>(start_addr);
+	} else {
+		request.area = -1;
+		inputs = request.inputs;
+	}
+	TRACE("PublishInputs: area %#lx\n", request.area);
+	
+	for (int32 i = 0; i != count; i++) {
+		stack->GetPointerAt(i, &input);
+		inputs[i] = *input;
+	}
+	
+	return QueryServer(SERVER_PUBLISH_INPUTS, &request, sizeof(request), &reply, sizeof(reply));
+}
+
+} } } // namespace BPrivate::media::mediaroster
+
+using namespace BPrivate::media::mediaroster;
 
 /*************************************************************
  * public BMediaRoster
@@ -95,7 +238,7 @@ status_t
 BMediaRoster::GetVideoInput(media_node * out_node)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(VIDEO_INPUT, out_node);
+	return GetNode(VIDEO_INPUT, out_node);
 }
 
 
@@ -103,7 +246,7 @@ status_t
 BMediaRoster::GetAudioInput(media_node * out_node)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(AUDIO_INPUT, out_node);
+	return GetNode(AUDIO_INPUT, out_node);
 }
 
 
@@ -111,7 +254,7 @@ status_t
 BMediaRoster::GetVideoOutput(media_node * out_node)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(VIDEO_OUTPUT, out_node);
+	return GetNode(VIDEO_OUTPUT, out_node);
 }
 
 
@@ -119,7 +262,7 @@ status_t
 BMediaRoster::GetAudioMixer(media_node * out_node)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(AUDIO_MIXER, out_node);
+	return GetNode(AUDIO_MIXER, out_node);
 }
 
 
@@ -127,7 +270,7 @@ status_t
 BMediaRoster::GetAudioOutput(media_node * out_node)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(AUDIO_OUTPUT, out_node);
+	return GetNode(AUDIO_OUTPUT, out_node);
 }
 
 
@@ -137,7 +280,7 @@ BMediaRoster::GetAudioOutput(media_node * out_node,
 							 BString * out_input_name)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(AUDIO_OUTPUT_EX, out_node, out_input_id, out_input_name);
+	return GetNode(AUDIO_OUTPUT_EX, out_node, out_input_id, out_input_name);
 }
 
 							 
@@ -145,7 +288,7 @@ status_t
 BMediaRoster::GetTimeSource(media_node * out_node)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(TIME_SOURCE, out_node);
+	return GetNode(TIME_SOURCE, out_node);
 }
 
 
@@ -153,7 +296,7 @@ status_t
 BMediaRoster::SetVideoInput(const media_node & producer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(VIDEO_INPUT, &producer);
+	return SetNode(VIDEO_INPUT, &producer);
 }
 
 
@@ -161,7 +304,7 @@ status_t
 BMediaRoster::SetVideoInput(const dormant_node_info & producer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(VIDEO_INPUT, NULL, &producer);
+	return SetNode(VIDEO_INPUT, NULL, &producer);
 }
 
 
@@ -169,7 +312,7 @@ status_t
 BMediaRoster::SetAudioInput(const media_node & producer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(AUDIO_INPUT, &producer);
+	return SetNode(AUDIO_INPUT, &producer);
 }
 
 
@@ -177,7 +320,7 @@ status_t
 BMediaRoster::SetAudioInput(const dormant_node_info & producer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(AUDIO_INPUT, NULL, &producer);
+	return SetNode(AUDIO_INPUT, NULL, &producer);
 }
 
 
@@ -185,7 +328,7 @@ status_t
 BMediaRoster::SetVideoOutput(const media_node & consumer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(VIDEO_OUTPUT, &consumer);
+	return SetNode(VIDEO_OUTPUT, &consumer);
 }
 
 
@@ -193,7 +336,7 @@ status_t
 BMediaRoster::SetVideoOutput(const dormant_node_info & consumer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(VIDEO_OUTPUT, NULL, &consumer);
+	return SetNode(VIDEO_OUTPUT, NULL, &consumer);
 }
 
 
@@ -201,7 +344,7 @@ status_t
 BMediaRoster::SetAudioOutput(const media_node & consumer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(AUDIO_OUTPUT, &consumer);
+	return SetNode(AUDIO_OUTPUT, &consumer);
 }
 
 
@@ -209,7 +352,7 @@ status_t
 BMediaRoster::SetAudioOutput(const media_input & input_to_output)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(AUDIO_OUTPUT, NULL, NULL, &input_to_output);
+	return SetNode(AUDIO_OUTPUT, NULL, NULL, &input_to_output);
 }
 
 
@@ -217,7 +360,7 @@ status_t
 BMediaRoster::SetAudioOutput(const dormant_node_info & consumer)
 {
 	CALLED();
-	return MediaKitPrivate::SetNode(AUDIO_OUTPUT, NULL, &consumer);
+	return SetNode(AUDIO_OUTPUT, NULL, &consumer);
 }
 
 
@@ -234,7 +377,7 @@ status_t
 BMediaRoster::GetSystemTimeSource(media_node * clone)
 {
 	CALLED();
-	return MediaKitPrivate::GetNode(SYSTEM_TIME_SOURCE, clone);
+	return GetNode(SYSTEM_TIME_SOURCE, clone);
 }
 
 
@@ -629,22 +772,74 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 							   int32 * out_total_count,
 							   media_type filter_type)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	if (out_free_inputs == NULL || out_total_count == NULL)
+		return B_BAD_VALUE;
+		
+	Stack<media_input> stack;
+	media_input *input;
+	status_t rv;
+
+	rv = GetAllInputs(node, &stack);
+	if (B_OK != rv)
+		return rv;
+
+	*out_total_count = 0;
+	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
+		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != input->format.type)
+			continue; // media_type used, but doesn't match
+		if (input->source != media_source::null)
+			continue; // consumer source already connected
+		out_free_inputs[i] = *input;
+		*out_total_count += 1;
+		buf_num_inputs -= 1;
+		if (buf_num_inputs == 0)
+			break;
+	}
+	
+	PublishInputs(node, &stack);
+	return B_OK;
 }
 
-							   
+
 status_t 
 BMediaRoster::GetConnectedInputsFor(const media_node & node,
 									media_input * out_active_inputs,
 									int32 buf_num_inputs,
 									int32 * out_total_count)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	if (out_active_inputs == NULL || out_total_count == NULL)
+		return B_BAD_VALUE;
+		
+	Stack<media_input> stack;
+	media_input *input;
+	status_t rv;
+
+	rv = GetAllInputs(node, &stack);
+	if (B_OK != rv)
+		return rv;
+
+	*out_total_count = 0;
+	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
+		if (input->source == media_source::null)
+			continue; // consumer source not connected
+		out_active_inputs[i] = *input;
+		*out_total_count += 1;
+		buf_num_inputs -= 1;
+		if (buf_num_inputs == 0)
+			break;
+	}
+	
+	PublishInputs(node, &stack);
+	return B_OK;
 }
 
-									
+
 status_t 
 BMediaRoster::GetAllInputsFor(const media_node & node,
 							  media_input * out_inputs,
@@ -657,41 +852,28 @@ BMediaRoster::GetAllInputsFor(const media_node & node,
 	if (out_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
 		
+	Stack<media_input> stack;
+	media_input *input;
 	status_t rv;
-	status_t rv2;
-	port_id port;
-	int32 code;
-	int32 cookie;
-		
-	port = _PortPool->GetPort();
-	*out_total_count = 0;
-	cookie = 0;
-	rv = B_OK;
-	for (int32 i = 0; i < buf_num_inputs; i++) {
-		xfer_consumer_get_next_input msg;		
-		xfer_consumer_get_next_input_reply reply;
-		msg.cookie = cookie;
-		msg.reply_port = port;
-		rv = write_port(node.port, CONSUMER_GET_NEXT_INPUT, &msg, sizeof(msg));
-		if (rv != B_OK)
-			break;
-		rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-		if (rv < B_OK || reply.result != B_OK)
-			break;
-		*out_total_count += 1;
-		out_inputs[i] = reply.input;
-		cookie = reply.cookie;
-	}
-	_PortPool->PutPort(port);
-	
-	xfer_consumer_dispose_input_cookie msg2;
-	msg2.cookie = cookie;
-	rv2 = write_port(node.port, CONSUMER_DISPOSE_INPUT_COOKIE, &msg2, sizeof(msg2));
 
-	return (rv < B_OK) ? rv : rv2;
+	rv = GetAllInputs(node, &stack);
+	if (B_OK != rv)
+		return rv;
+
+	*out_total_count = 0;
+	for (int32 i = 0; stack.GetPointerAt(i, &input); i++) {
+		out_inputs[i] = *input;
+		*out_total_count += 1;
+		buf_num_inputs -= 1;
+		if (buf_num_inputs == 0)
+			break;
+	}
+	
+	PublishInputs(node, &stack);
+	return B_OK;
 }
 
-							  
+
 status_t 
 BMediaRoster::GetFreeOutputsFor(const media_node & node,
 								media_output * out_free_outputs,
@@ -699,8 +881,35 @@ BMediaRoster::GetFreeOutputsFor(const media_node & node,
 								int32 * out_total_count,
 								media_type filter_type)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	if (out_free_outputs == NULL || out_total_count == NULL)
+		return B_BAD_VALUE;
+		
+	Stack<media_output> stack;
+	media_output *output;
+	status_t rv;
+
+	rv = GetAllOutputs(node, &stack);
+	if (B_OK != rv)
+		return rv;
+
+	*out_total_count = 0;
+	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
+		if (filter_type != B_MEDIA_UNKNOWN_TYPE && filter_type != output->format.type)
+			continue; // media_type used, but doesn't match
+		if (output->destination != media_destination::null)
+			continue; // producer destination already connected
+		out_free_outputs[i] = *output;
+		*out_total_count += 1;
+		buf_num_outputs -= 1;
+		if (buf_num_outputs == 0)
+			break;
+	}
+	
+	PublishOutputs(node, &stack);
+	return B_OK;
 }
 
 								
@@ -710,8 +919,33 @@ BMediaRoster::GetConnectedOutputsFor(const media_node & node,
 									 int32 buf_num_outputs,
 									 int32 * out_total_count)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+		return B_MEDIA_BAD_NODE;
+	if (out_active_outputs == NULL || out_total_count == NULL)
+		return B_BAD_VALUE;
+		
+	Stack<media_output> stack;
+	media_output *output;
+	status_t rv;
+
+	rv = GetAllOutputs(node, &stack);
+	if (B_OK != rv)
+		return rv;
+
+	*out_total_count = 0;
+	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
+		if (output->destination == media_destination::null)
+			continue; // producer destination not connected
+		out_active_outputs[i] = *output;
+		*out_total_count += 1;
+		buf_num_outputs -= 1;
+		if (buf_num_outputs == 0)
+			break;
+	}
+	
+	PublishOutputs(node, &stack);
+	return B_OK;
 }
 
 
@@ -726,39 +960,26 @@ BMediaRoster::GetAllOutputsFor(const media_node & node,
 		return B_MEDIA_BAD_NODE;
 	if (out_outputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
-
-	status_t rv;
-	status_t rv2;
-	port_id port;
-	int32 code;
-	int32 cookie;
 		
-	port = _PortPool->GetPort();
-	*out_total_count = 0;
-	cookie = 0;
-	rv = B_OK;
-	for (int32 i = 0; i < buf_num_outputs; i++) {
-		xfer_producer_get_next_output msg;		
-		xfer_producer_get_next_output_reply reply;
-		msg.cookie = cookie;
-		msg.reply_port = port;
-		rv = write_port(node.port, PRODUCER_GET_NEXT_OUTPUT, &msg, sizeof(msg));
-		if (rv != B_OK)
-			break;
-		rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-		if (rv < B_OK || reply.result != B_OK)
-			break;
-		*out_total_count += 1;
-		out_outputs[i] = reply.output;
-		cookie = reply.cookie;
-	}
-	_PortPool->PutPort(port);
-	
-	xfer_producer_dispose_output_cookie msg2;
-	msg2.cookie = cookie;
-	rv2 = write_port(node.port, PRODUCER_DISPOSE_OUTPUT_COOKIE, &msg2, sizeof(msg2));
+	Stack<media_output> stack;
+	media_output *output;
+	status_t rv;
 
-	return (rv < B_OK) ? rv : rv2;
+	rv = GetAllOutputs(node, &stack);
+	if (B_OK != rv)
+		return rv;
+
+	*out_total_count = 0;
+	for (int32 i = 0; stack.GetPointerAt(i, &output); i++) {
+		out_outputs[i] = *output;
+		*out_total_count += 1;
+		buf_num_outputs -= 1;
+		if (buf_num_outputs == 0)
+			break;
+	}
+	
+	PublishOutputs(node, &stack);
+	return B_OK;
 }
 
 
@@ -861,11 +1082,29 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 	CALLED();
 	if (node == NULL)
 		return B_BAD_VALUE;
+		
+	status_t rv;
 
+	// XXX fix node registration
 	xfer_node_registered msg;
 	msg.node_id = 1;
+	
+	rv = node->HandleMessage(NODE_REGISTERED,&msg,sizeof(msg));
+	
+	// register existing inputs and outputs with the
+	// media_server, this allows GetLiveNodes() to work
+	// with created, but unconnected nodes.
+	if (node->Kinds() & B_BUFFER_PRODUCER) {
+		Stack<media_output> stack;
+		if (B_OK == GetAllOutputs(node->Node(), &stack))
+			PublishOutputs(node->Node(), &stack);
+	} else if (node->Kinds() & B_BUFFER_CONSUMER) {
+		Stack<media_input> stack;
+		if (B_OK == GetAllInputs(node->Node(), &stack))
+			PublishInputs(node->Node(), &stack);
+	}
 
-	return node->HandleMessage(NODE_REGISTERED,&msg,sizeof(msg));
+	return rv;
 }
 
 

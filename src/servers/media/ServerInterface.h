@@ -62,8 +62,6 @@ enum {
 	NODE_REGISTERED,
 	NODE_SET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
-	CONSUMER_GET_NEXT_INPUT,
-	CONSUMER_DISPOSE_INPUT_COOKIE,
 	CONSUMER_BUFFER_RECEIVED,
 	CONSUMER_PRODUCER_DATA_STATUS,
 	CONSUMER_GET_LATENCY_FOR,
@@ -77,8 +75,6 @@ enum {
 	PRODUCER_FORMAT_CHANGE_REQUESTED,
 	PRODUCER_SET_BUFFER_GROUP,
 	PRODUCER_GET_LATENCY,
-	PRODUCER_GET_NEXT_OUTPUT,
-	PRODUCER_DISPOSE_OUTPUT_COOKIE,
 	PRODUCER_GET_INITIAL_LATENCY,
 	PRODUCER_FORMAT_SUGGESTION_REQUESTED,
 	PRODUCER_DISCONNECT,
@@ -257,24 +253,6 @@ struct xfer_producer_get_latency_reply
 	status_t result;
 };
 
-struct xfer_producer_get_next_output
-{
-	int32 cookie;
-	port_id reply_port;
-};
-
-struct xfer_producer_get_next_output_reply
-{
-	int32 cookie;
-	media_output output;
-	status_t result;
-};
-
-struct xfer_producer_dispose_output_cookie
-{
-	int32 cookie;
-};
-
 struct xfer_producer_set_buffer_group
 {
 	media_source source;
@@ -379,24 +357,6 @@ struct xfer_node_registered
 struct xfer_node_set_timesource
 {
 	media_node_id timesource_id;
-};
-
-struct xfer_consumer_get_next_input
-{
-	int32 cookie;
-	port_id reply_port;
-};
-
-struct xfer_consumer_get_next_input_reply
-{
-	int32 cookie;
-	media_input input;
-	status_t result;
-};
-
-struct xfer_consumer_dispose_input_cookie
-{
-	int32 cookie;
 };
 
 struct xfer_consumer_buffer_received

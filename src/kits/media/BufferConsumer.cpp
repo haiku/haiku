@@ -341,18 +341,20 @@ BBufferConsumer::HandleMessage(int32 message,
 
 		case CONSUMER_GET_NEXT_INPUT:
 		{
-			const xfer_consumer_get_next_input *request = (const xfer_consumer_get_next_input *)rawdata;
-			xfer_consumer_get_next_input_reply reply;
+			const consumer_get_next_input_request *request = (const consumer_get_next_input_request *)rawdata;
+			consumer_get_next_input_reply reply;
 			reply.cookie = request->cookie;
-			reply.result = GetNextInput(&reply.cookie, &reply.input);
-			write_port(request->reply_port, 0, &reply, sizeof(reply));
+			rv = GetNextInput(&reply.cookie, &reply.input);
+			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case CONSUMER_DISPOSE_INPUT_COOKIE:
 		{
-			const xfer_consumer_dispose_input_cookie *request = (const xfer_consumer_dispose_input_cookie *)rawdata;
+			const consumer_dispose_input_cookie_request *request = (const consumer_dispose_input_cookie_request *)rawdata;
+			consumer_dispose_input_cookie_reply reply;
 			DisposeInputCookie(request->cookie);
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			return B_OK;
 		}
 

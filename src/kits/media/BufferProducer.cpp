@@ -184,18 +184,20 @@ BBufferProducer::HandleMessage(int32 message,
 
 		case PRODUCER_GET_NEXT_OUTPUT:
 		{
-			const xfer_producer_get_next_output *request = (const xfer_producer_get_next_output *)rawdata;
-			xfer_producer_get_next_output_reply reply;
+			const producer_get_next_output_request *request = (const producer_get_next_output_request *)rawdata;
+			producer_get_next_output_reply reply;
 			reply.cookie = request->cookie;
-			reply.result = GetNextOutput(&reply.cookie, &reply.output);
-			write_port(request->reply_port, 0, &reply, sizeof(reply));
+			rv = GetNextOutput(&reply.cookie, &reply.output);
+			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_DISPOSE_OUTPUT_COOKIE:
 		{
-			const xfer_producer_dispose_output_cookie *request = (const xfer_producer_dispose_output_cookie *)rawdata;
+			const producer_dispose_output_cookie_request *request = (const producer_dispose_output_cookie_request *)rawdata;
+			producer_dispose_output_cookie_reply reply;
 			DisposeOutputCookie(request->cookie);
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			return B_OK;
 		}
 

@@ -13,6 +13,7 @@
 #include <string.h>
 #include "SystemTimeSource.h"
 #include "debug.h"
+#include "DataExchange.h"
 #include "ServerInterface.h"
 #include "Notifications.h"
 
@@ -501,6 +502,31 @@ BMediaNode::HandleBadMessage(int32 code,
 							 size_t size)
 {
 	CALLED();
+
+	TRACE("BMediaNode::HandleBadMessage: code %#08lx, buffer %p, size %ld\n", code, buffer, size);
+	switch (code) {
+		default:
+		{
+			TRACE("BMediaNode::HandleBadMessage: unknown code!\n");
+			break;
+		}
+		
+		/* All messages targeted to nodes should be handled here,
+		 * messages targetted to the wrong node should be handled
+		 * by returning an error, not by stalling the sender.
+		 */
+		case CONSUMER_ACCEPT_FORMAT:
+		case CONSUMER_CONNECTED:
+		case PRODUCER_FORMAT_PROPOSAL:
+		case PRODUCER_PREPARE_TO_CONNECT:
+		case PRODUCER_CONNECT:
+		{
+			const request_data *request = static_cast<const request_data *>(buffer);
+			reply_data reply;
+			request->SendReply(B_ERROR, &reply, sizeof(reply));
+			break;
+		}
+	}
 }
 
 

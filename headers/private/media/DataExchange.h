@@ -69,8 +69,14 @@ enum {
 enum {
 	SERVER_GET_NODE = 1000,
 	SERVER_SET_NODE,
+	SERVER_PUBLISH_INPUTS,
+	SERVER_PUBLISH_OUTPUTS,
+	CONSUMER_GET_NEXT_INPUT,
+	CONSUMER_DISPOSE_INPUT_COOKIE,
 	CONSUMER_ACCEPT_FORMAT,
 	CONSUMER_CONNECTED,
+	PRODUCER_GET_NEXT_OUTPUT,
+	PRODUCER_DISPOSE_OUTPUT_COOKIE,
 	PRODUCER_FORMAT_PROPOSAL,
 	PRODUCER_PREPARE_TO_CONNECT,
 	PRODUCER_CONNECT,
@@ -89,6 +95,12 @@ enum node_type
 	SYSTEM_TIME_SOURCE 
 };
 
+// used by SERVER_PUBLISH_INPUTS and SERVER_PUBLISH_OUTPUTS
+enum
+{
+	MAX_OUTPUTS = 48,
+	MAX_INPUTS = 48,
+};
 
 struct addonserver_instantiate_dormant_node_request : public request_data
 {
@@ -190,6 +202,70 @@ struct consumer_connected_request : public request_data
 struct consumer_connected_reply : public reply_data
 {
 	media_input input;
+};
+
+struct server_publish_inputs_request : public request_data
+{
+	media_node node;
+	int32 count;
+	area_id area; // if count > MAX_INPUTS, inputs are in the area
+	media_input inputs[MAX_INPUTS];
+};
+
+struct server_publish_inputs_reply : public reply_data
+{
+};
+
+struct server_publish_outputs_request : public request_data
+{
+	media_node node;
+	int32 count;
+	area_id area; // if count > MAX_OUTPUTS, outputs are in the area
+	media_output outputs[MAX_OUTPUTS];
+};
+
+struct server_publish_outputs_reply : public reply_data
+{
+};
+
+struct producer_get_next_output_request : public request_data
+{
+	int32 cookie;
+};
+
+struct producer_get_next_output_reply : public reply_data
+{
+	int32 cookie;
+	media_output output;
+};
+
+struct producer_dispose_output_cookie_request : public request_data
+{
+	int32 cookie;
+};
+
+struct producer_dispose_output_cookie_reply : public reply_data
+{
+};
+
+struct consumer_get_next_input_request : public request_data
+{
+	int32 cookie;
+};
+
+struct consumer_get_next_input_reply : public reply_data
+{
+	int32 cookie;
+	media_input input;
+};
+
+struct consumer_dispose_input_cookie_request : public request_data
+{
+	int32 cookie;
+};
+
+struct consumer_dispose_input_cookie_reply : public reply_data
+{
 };
 
 #endif // _DATA_EXCHANGE_H
