@@ -130,7 +130,7 @@ static void attach_device(int devid, char *driver, char *devno)
 	status_t status;
 	int fsz = 0;
 		
-	ed = malloc(sizeof(struct ether_device));
+	ed = (struct ether_device*) malloc(sizeof(struct ether_device));
 	if (!ed)
 		return;	
 	memset(ed, 0, sizeof(*ed));
@@ -423,7 +423,7 @@ lookup:
          (m)->m_flags & M_PKTHDR ? (m)->m_data - (m)->m_pktdat : \
          (m)->m_data - (m)->m_dat)
 
-        if (M_LEADINGSPACE(buf) >= sizeof(struct ether_header)) {
+        if (M_LEADINGSPACE(buf) >= (int32) sizeof(struct ether_header)) {
                 buf->m_data -= sizeof(struct ether_header);
                 buf->m_len += sizeof(struct ether_header);
         } else 
@@ -777,7 +777,7 @@ out:
 	return;
 }
 
-void arp_init(void)
+static void arp_init()
 {
 	llinfo_arp.la_next = llinfo_arp.la_prev = &llinfo_arp;
 	
@@ -866,7 +866,7 @@ int ether_dev_stop(ifnet *dev)
 static int ether_init(void *cpp)
 {
 	if (cpp)
-		core = cpp;
+		core = (struct core_module_info*) cpp;
 
 	etherq = start_ifq();
 	ether_rxt = spawn_thread(ether_input, "ethernet_input", 50, NULL);
