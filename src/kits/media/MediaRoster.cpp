@@ -11,7 +11,6 @@
 #include <OS.h>
 #include <String.h>
 #include <TimeSource.h>
-#undef 	DEBUG
 #define	DEBUG 3
 #include <Debug.h>
 #include "debug.h"
@@ -1305,13 +1304,10 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 	ASSERT(reply.nodeid == node->Node().node);
 	ASSERT(reply.nodeid == node->ID());
 
-	TRACE("BMediaRoster::RegisterNode: before callback: port %ld, name '%s'\n", node->ControlPort(), node->Name());
-
 	// call the callback
 	node->NodeRegistered();
 
-	TRACE("BMediaRoster::RegisterNode: after callback: port %ld, name '%s'\n", node->ControlPort(), node->Name());
-
+/*
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
 	// with created, but unconnected nodes.
@@ -1324,10 +1320,18 @@ BMediaRoster::RegisterNode(BMediaNode * node)
 		if (B_OK == GetAllInputs(node->Node(), &stack))
 			PublishInputs(node->Node(), &stack);
 	}
+*/
+
 	BPrivate::media::notifications::NodesCreated(&reply.nodeid, 1);
-
-
-	TRACE("BMediaRoster::RegisterNode: registered node %s, id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
+/*
+	TRACE("BMediaRoster::RegisterNode: registered node name '%s', id %ld, addon %ld, flavor %ld\n", node->Name(), node->ID(), addon_id, addon_flavor_id);
+	TRACE("BMediaRoster::RegisterNode: node this               %p\n", node);
+	TRACE("BMediaRoster::RegisterNode: node fConsumerThis      %p\n", node->fConsumerThis);
+	TRACE("BMediaRoster::RegisterNode: node fProducerThis      %p\n", node->fProducerThis);
+	TRACE("BMediaRoster::RegisterNode: node fFileInterfaceThis %p\n", node->fFileInterfaceThis);
+	TRACE("BMediaRoster::RegisterNode: node fControllableThis  %p\n", node->fControllableThis);
+	TRACE("BMediaRoster::RegisterNode: node fTimeSourceThis    %p\n", node->fTimeSourceThis);
+*/	
 
 	return B_OK;
 }
@@ -1341,11 +1345,11 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 		return B_BAD_VALUE;
 	
 	if (node->fRefCount != 0) {
-		TRACE("BMediaRoster::UnregisterNode: Warning node %s has local reference count of %ld\n", node->Name(), node->fRefCount);
+		TRACE("BMediaRoster::UnregisterNode: Warning node name '%s' has local reference count of %ld\n", node->Name(), node->fRefCount);
 		// no return here, we continue and unregister!
 	}
 	if (node->ID() == -2) {
-		TRACE("BMediaRoster::UnregisterNode: Warning node %s already unregistered\n", node->Name());
+		TRACE("BMediaRoster::UnregisterNode: Warning node name '%s' already unregistered\n", node->Name());
 		return B_OK;
 	}
 		
@@ -1361,7 +1365,7 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 
 	rv = QueryServer(SERVER_UNREGISTER_NODE, &request, sizeof(request), &reply, sizeof(reply));
 	if (rv != B_OK) {
-		TRACE("BMediaRoster::UnregisterNode: failed to unregister node %s (error %#lx)\n", node->Name(), rv);
+		TRACE("BMediaRoster::UnregisterNode: failed to unregister node name '%s' (error %#lx)\n", node->Name(), rv);
 		return rv;
 	}
 	
@@ -1379,7 +1383,6 @@ BMediaRoster::UnregisterNode(BMediaNode * node)
 /* static */ BMediaRoster * 
 BMediaRoster::Roster(status_t* out_error)
 {
-	CALLED();
 	static BLocker locker("BMediaRoster::Roster locker");
 	locker.Lock();
 	if (_sDefault == NULL) {
@@ -1400,7 +1403,6 @@ BMediaRoster::Roster(status_t* out_error)
 /* static */ BMediaRoster * 
 BMediaRoster::CurrentRoster()			
 {
-	CALLED();
 	return _sDefault;
 }
 

@@ -3,6 +3,7 @@
  *   FILE: Controllable.cpp
  *  DESCR: 
  ***********************************************************************/
+#include <OS.h>
 #include <Controllable.h>
 #include "debug.h"
 #include "Notifications.h"
@@ -13,7 +14,9 @@
 
 BControllable::~BControllable()
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (fSem > 0)
+		delete_sem(fSem);
 }
 
 /*************************************************************
@@ -23,17 +26,28 @@ BControllable::~BControllable()
 BParameterWeb *
 BControllable::Web()
 {
-	UNIMPLEMENTED();
-	return NULL;
+	CALLED();
+	BParameterWeb *temp;
+	LockParameterWeb();
+	temp = fWeb;
+	UnlockParameterWeb();
+	return temp;
 }
 
 
 bool
 BControllable::LockParameterWeb()
 {
-	UNIMPLEMENTED();
-
-	return false;
+	CALLED();
+	status_t rv;
+	if (fSem <= 0)
+		return false;
+	if (atomic_add(&fBen, 1) > 0) {
+		while (B_INTERRUPTED == (rv = acquire_sem(fSem)))
+			;
+		return rv == B_OK;
+	}
+	return true;
 }
 
 /*************************************************************
@@ -43,14 +57,21 @@ BControllable::LockParameterWeb()
 void
 BControllable::UnlockParameterWeb()
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (fSem <= 0)
+		return;
+	if (atomic_add(&fBen, -1) > 1)
+		release_sem(fSem);
 }
 
 
-BControllable::BControllable()
-	: BMediaNode("XXX fixme")
+BControllable::BControllable() :
+	BMediaNode("XXX fixme"),
+	fWeb(0),
+	fSem(create_sem(0, "BControllable lock")),
+	fBen(0)
 {
-	UNIMPLEMENTED();
+	CALLED();
 
 	AddNodeKind(B_CONTROLLABLE);
 }
@@ -59,11 +80,16 @@ BControllable::BControllable()
 status_t
 BControllable::SetParameterWeb(BParameterWeb *web)
 {
-	UNIMPLEMENTED();
-	
-	BPrivate::media::notifications::WebChanged(Node());
+	CALLED();
+	BParameterWeb *old;
+	LockParameterWeb();
+	old = fWeb;
+	fWeb = web;
+	UnlockParameterWeb();
+	if (old != web && web != 0)
+		BPrivate::media::notifications::WebChanged(Node());
 
-	return B_ERROR;
+	return B_OK;
 }
 
 
@@ -72,7 +98,7 @@ BControllable::HandleMessage(int32 message,
 							 const void *data,
 							 size_t size)
 {
-	UNIMPLEMENTED();
+	TRACE("BControllable::HandleMessage %#lx, node %ld\n", message, ID());
 
 	return B_ERROR;
 }

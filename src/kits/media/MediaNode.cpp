@@ -11,9 +11,11 @@
 #include <Controllable.h>
 #include <FileInterface.h>
 #include <string.h>
-#include "SystemTimeSource.h"
+#define DEBUG 3
+#include <Debug.h>
 #include "debug.h"
 #include "DataExchange.h"
+#include "SystemTimeSource.h"
 #include "ServerInterface.h"
 #include "Notifications.h"
 
@@ -30,13 +32,11 @@ media_node::media_node()
 	port(-1),
 	kind(0)
 {
-	CALLED();
 }
 
 // final & verified
 media_node::~media_node()
 {
-	CALLED();
 }
 
 /*************************************************************
@@ -53,14 +53,12 @@ media_node media_node::null;
 // final
 media_input::media_input()
 {
-	CALLED();
 	name[0] = '\0';
 }
 
 // final
 media_input::~media_input()
 {
-	CALLED();
 }
 
 /*************************************************************
@@ -70,14 +68,12 @@ media_input::~media_input()
 // final
 media_output::media_output()
 {
-	CALLED();
 	name[0] = '\0';
 }
 
 // final
 media_output::~media_output()
 {
-	CALLED();
 }
 
 /*************************************************************
@@ -88,14 +84,12 @@ media_output::~media_output()
 live_node_info::live_node_info()
 	: hint_point(0.0f,0.0f)
 {
-	CALLED();
 	name[0] = '\0';
 }
 
 // final & verified
 live_node_info::~live_node_info()
 {
-	CALLED();
 }
 
 /*************************************************************
@@ -194,6 +188,8 @@ BTimeSource *
 BMediaNode::TimeSource() const
 {
 	CALLED();
+	if (fTimeSource == 0)
+		const_cast<BMediaNode *>(this)->fTimeSource = new _SysTimeSource;
 	return fTimeSource;
 }
 
@@ -269,15 +265,11 @@ BMediaNode::TimerExpired(bigtime_t notifyPoint,
 }
 
 
-// terrible hack to call the other constructor
-// BMediaNode::BMediaNode(const char *name, media_node_id id, uint32 kinds)
-extern "C" void __10BMediaNodePCclUl(BMediaNode *self, const char *name, media_node_id id, uint32 kinds);
-
 /* explicit */
 BMediaNode::BMediaNode(const char *name)
 {
-	CALLED();
-	__10BMediaNodePCclUl(this,name,-1,0);
+	TRACE("BMediaNode::BMediaNode: name '%s'\n", name);
+	_InitObject(name, -1, 0);
 }
 
 
@@ -287,6 +279,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 						   void *_reserved_)
 {
 	CALLED();
+	ASSERT(this != 0);
 	// This function waits until either real time specified by 
 	// waitUntil or a message is received on the control port.
 	// The flags are currently unused and should be 0. 
@@ -298,10 +291,59 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 	size = read_port_etc(fControlPort, &message, data, sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);
 	if (size <= 0) {
 		if (size != B_TIMED_OUT)
-			TRACE("read_port_etc error 0x%08lx\n",size);
+			TRACE("BMediaNode::WaitForMessage: read_port_etc error 0x%08lx\n",size);
 		return size; // returns the error code
 	}
 
+	TRACE("BMediaNode::WaitForMessage %#lx, node %ld, this %p\n", message, fNodeID, this);
+
+	if (message > NODE_MESSAGE_START && message < NODE_MESSAGE_END) {
+		TRACE("BMediaNode::WaitForMessage calling BMediaNode\n");
+		if (B_OK == BMediaNode::HandleMessage(message, data, size))
+			return B_OK;
+	}
+	
+	if (message > PRODUCER_MESSAGE_START && message < PRODUCER_MESSAGE_END) {
+		if (!fProducerThis)
+			fProducerThis = dynamic_cast<BBufferProducer *>(this);
+		TRACE("BMediaNode::WaitForMessage calling BBufferProducer %p\n", fProducerThis);
+		if (fProducerThis && B_OK == fProducerThis->BBufferProducer::HandleMessage(message, data, size))
+			return B_OK;
+	}
+
+	if (message > CONSUMER_MESSAGE_START && message < CONSUMER_MESSAGE_END) {
+		if (!fConsumerThis)
+			fConsumerThis = dynamic_cast<BBufferConsumer *>(this);
+		TRACE("BMediaNode::WaitForMessage calling BBufferConsumer %p\n", fConsumerThis);
+		if (fConsumerThis && B_OK == fConsumerThis->BBufferConsumer::HandleMessage(message, data, size))
+			return B_OK;
+	}
+
+	if (message > FILEINTERFACE_MESSAGE_START && message < FILEINTERFACE_MESSAGE_END) {
+		if (!fFileInterfaceThis)
+			fFileInterfaceThis = dynamic_cast<BFileInterface *>(this);
+		TRACE("BMediaNode::WaitForMessage calling BFileInterface %p\n", fFileInterfaceThis);
+		if (fFileInterfaceThis && B_OK == fFileInterfaceThis->BFileInterface::HandleMessage(message, data, size))
+			return B_OK;
+	}
+
+	if (fControllableThis && message > CONTROLLABLE_MESSAGE_START && message < CONTROLLABLE_MESSAGE_END) {
+		if (!fControllableThis)
+			fControllableThis = dynamic_cast<BControllable *>(this);
+		TRACE("BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
+		if (fControllableThis && B_OK == fControllableThis->BControllable::HandleMessage(message, data, size))
+			return B_OK;
+	}
+
+	if (fTimeSourceThis && message > TIMESOURECE_MESSAGE_START && message < TIMESOURECE_MESSAGE_END) {
+		if (!fTimeSourceThis)
+			fTimeSourceThis = dynamic_cast<BTimeSource *>(this);
+		TRACE("BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
+		if (fTimeSourceThis && B_OK == fTimeSourceThis->BTimeSource::HandleMessage(message, data, size))
+			return B_OK;
+	}
+
+	TRACE("BMediaNode::WaitForMessage calling default\n");
 	if (B_OK == HandleMessage(message, data, size))
 		return B_OK;
 
@@ -392,6 +434,7 @@ BMediaNode::Preroll()
 BMediaNode::SetTimeSource(BTimeSource *time_source)
 {
 	CALLED();
+	return;// XXX
 	
 	// this is a hook function, and 
 	// may be overriden by derived classes.
@@ -418,7 +461,8 @@ BMediaNode::HandleMessage(int32 message,
 						  const void *data,
 						  size_t size)
 {
-	CALLED();
+//	CALLED();
+	TRACE("BMediaNode::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	switch (message) {
 		case NODE_START:
 		{
@@ -496,7 +540,7 @@ BMediaNode::HandleBadMessage(int32 code,
 	CALLED();
 
 	TRACE("BMediaNode::HandleBadMessage: code %#08lx, buffer %p, size %ld\n", code, buffer, size);
-	if (code < 0x1000) {
+	if (code < NODE_MESSAGE_START || code > TIMESOURECE_MESSAGE_END) {
 		TRACE("BMediaNode::HandleBadMessage: unknown code!\n");
 	} else {
 		/* All messages targeted to nodes should be handled here,
@@ -513,7 +557,7 @@ BMediaNode::HandleBadMessage(int32 code,
 void
 BMediaNode::AddNodeKind(uint64 kind)
 {
-	CALLED();
+	TRACE("BMediaNode::AddNodeKind: node %ld, this %p\n", fNodeID, this);
 
 	fKinds |= kind;
 }
@@ -691,29 +735,41 @@ BMediaNode::BMediaNode(const BMediaNode &clone)
 BMediaNode &BMediaNode::operator=(const BMediaNode &clone)
 */
 
-BMediaNode::BMediaNode(const char *name,
-					   media_node_id id,
-					   uint32 kinds) :
-	fNodeID(id),
-	fTimeSource(0),
-	fRefCount(1),
-	fRunMode(B_INCREASE_LATENCY),
-	fKinds(kinds),
-	fTimeSourceID(0),
-	fControlPort(-1)
+void
+BMediaNode::_InitObject(const char *name, media_node_id id, uint64 kinds)
 {
-	CALLED();
-	
-	// initialize node name
+	TRACE("BMediaNode::_InitObject: nodeid %ld, this %p\n", id, this);
+
+	fNodeID = id;
+	fTimeSource = 0;
+	fRefCount = 1;
 	fName[0] = 0;
 	if (name) {
-		strncpy(fName,name,B_MEDIA_NAME_LENGTH - 1);
+		strncpy(fName, name, B_MEDIA_NAME_LENGTH - 1);
 		fName[B_MEDIA_NAME_LENGTH - 1] = 0;
 	}
-	TRACE("BMediaNode::BMediaNode: node name is: %s\n",fName);
+	fRunMode = B_INCREASE_LATENCY;
+	_mChangeCount = 0;			//	deprecated
+	_mChangeCountReserved = 0;	//	deprecated
+	fKinds = kinds;
+	fTimeSourceID = -1;
+	fProducerThis = 0;
+	fConsumerThis = 0;
+	fFileInterfaceThis = 0;
+	fControllableThis = 0;
+	fTimeSourceThis = 0;
 
 	// create control port
 	fControlPort = create_port(64,fName);
+}
+
+
+BMediaNode::BMediaNode(const char *name,
+					   media_node_id id,
+					   uint32 kinds)
+{
+	TRACE("BMediaNode::BMediaNode: name '%s', nodeid %ld, kinds %#lx\n", name, id, kinds);
+	_InitObject(name, id, kinds);
 }
 
 

@@ -6,6 +6,7 @@
 #include <MediaAddOn.h>
 #include <string.h>
 #include <malloc.h>
+#define DEBUG 3
 #include "debug.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
@@ -37,14 +38,12 @@ dormant_node_info::dormant_node_info()
 	: addon(-1),
 	flavor_id(-1)
 {
-	CALLED();
 	name[0] = '\0';
 }
 
 // final
 dormant_node_info::~dormant_node_info()
 {
-	CALLED();
 }
 
 /*************************************************************
@@ -63,7 +62,6 @@ flavor_info &flavor_info::operator=(const flavor_info &other)
 // final & verified
 dormant_flavor_info::dormant_flavor_info()
 {
-	CALLED();
 	name = 0;
 	info = 0;
 	kinds = 0;
@@ -82,7 +80,6 @@ dormant_flavor_info::dormant_flavor_info()
 /* virtual */ 
 dormant_flavor_info::~dormant_flavor_info()
 {
-	CALLED();
 	delete [] name;
 	delete [] info;
 	delete [] in_formats;
@@ -99,7 +96,6 @@ dormant_flavor_info::dormant_flavor_info(const dormant_flavor_info &clone)
 dormant_flavor_info &
 dormant_flavor_info::operator=(const dormant_flavor_info &clone)
 {
-	CALLED();
 	// call operator=(const flavor_info &clone) to copy the flavor_info base class
 	*this = static_cast<const flavor_info>(clone);
 	// copy the dormant_node_info member variable
@@ -111,7 +107,6 @@ dormant_flavor_info::operator=(const dormant_flavor_info &clone)
 dormant_flavor_info &
 dormant_flavor_info::operator=(const flavor_info &clone)
 {
-	CALLED();
 	delete [] name;
 	delete [] info;
 	delete [] in_formats;
@@ -161,7 +156,6 @@ dormant_flavor_info::operator=(const flavor_info &clone)
 void
 dormant_flavor_info::set_name(const char *in_name)
 {
-	CALLED();
 	delete [] name;
 	name = newstrdup(in_name);
 }
@@ -170,7 +164,6 @@ dormant_flavor_info::set_name(const char *in_name)
 void
 dormant_flavor_info::set_info(const char *in_info)
 {
-	CALLED();
 	delete [] info;
 	info = newstrdup(in_info);
 }
@@ -179,7 +172,6 @@ dormant_flavor_info::set_info(const char *in_info)
 void
 dormant_flavor_info::add_in_format(const media_format &in_format)
 {
-	CALLED();
 	media_format *temp;
 	temp = new media_format[in_format_count + 1];
 	for (int i = 0; i < in_format_count; i++)
@@ -194,7 +186,6 @@ dormant_flavor_info::add_in_format(const media_format &in_format)
 void
 dormant_flavor_info::add_out_format(const media_format &out_format)
 {
-	CALLED();
 	media_format *temp;
 	temp = new media_format[out_format_count + 1];
 	for (int i = 0; i < out_format_count; i++)
@@ -209,7 +200,6 @@ dormant_flavor_info::add_out_format(const media_format &out_format)
 /* virtual */ bool
 dormant_flavor_info::IsFixedSize() const
 {
-	CALLED();
 	return false;
 }
 
@@ -217,7 +207,6 @@ dormant_flavor_info::IsFixedSize() const
 /* virtual */ type_code
 dormant_flavor_info::TypeCode() const
 {
-	CALLED();
 	return FLATTEN_TYPECODE;
 }
 
@@ -254,7 +243,6 @@ dormant_flavor_info::FlattenedSize() const
 dormant_flavor_info::Flatten(void *buffer,
 							 ssize_t size) const
 {
-	CALLED();
 	if (size < FlattenedSize())
 		return B_ERROR;
 
@@ -307,7 +295,6 @@ dormant_flavor_info::Unflatten(type_code c,
 							   const void *buffer,
 							   ssize_t size)
 {
-	CALLED();
 	if (c != FLATTEN_TYPECODE)
 		return B_ERROR;
 	if (size < 8)

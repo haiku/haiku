@@ -5,6 +5,7 @@
  ***********************************************************************/
 #include <TimeSource.h>
 #include "debug.h"
+#include "DataExchange.h"
 #include "ServerInterface.h"
 
 // XXX This BTimeSource only works for realtime, nothing else is implemented
@@ -125,7 +126,8 @@ BTimeSource::HandleMessage(int32 message,
 						   const void *rawdata,
 						   size_t size)
 {
-	CALLED();
+	TRACE("BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
+	
 	switch (message) {
 		case TIMESOURCE_OP:
 		{
@@ -144,7 +146,7 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 						 bigtime_t real_time,
 						 float drift)
 {
-	UNIMPLEMENTED();
+//	UNIMPLEMENTED(); //XXX
 }
 
 

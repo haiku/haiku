@@ -128,9 +128,9 @@ virtual		status_t _Reserved_Controllable_13(void *);
 virtual		status_t _Reserved_Controllable_14(void *);
 virtual		status_t _Reserved_Controllable_15(void *);
 
-		BParameterWeb * _mWeb;
-		sem_id _m_webSem;
-		int32 _m_webBen;
+		BParameterWeb * fWeb;
+		sem_id fSem;
+		int32 fBen;
 		uint32 _reserved_controllable_[14];
 };
 

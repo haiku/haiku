@@ -8,7 +8,7 @@
 #include <Messenger.h>
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
-#define DEBUG 1
+#define DEBUG 3
 #include <Debug.h>
 #include "debug.h"
 #include "NodeManager.h"
@@ -172,6 +172,7 @@ status_t
 NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team)
 {
 	TRACE("!!! NodeManager::GetClone not implemented\n");
+	*node = media_node::null;
 	return B_ERROR;
 }
 

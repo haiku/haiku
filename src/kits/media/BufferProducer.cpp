@@ -6,8 +6,9 @@
 #include <BufferProducer.h>
 #include <BufferGroup.h>
 #include <Buffer.h>
-#include "PortPool.h"
+#define DEBUG 3
 #include "debug.h"
+#include "PortPool.h"
 #include "DataExchange.h"
 #include "ServerInterface.h"
 
@@ -103,7 +104,8 @@ BBufferProducer::HandleMessage(int32 message,
 							   const void *rawdata,
 							   size_t size)
 {
-	CALLED();
+//	CALLED();
+	TRACE("BBufferProducer::HandleMessage %#lx, node %ld\n", message, fNodeID);
 	status_t rv;
 	switch (message) {
 

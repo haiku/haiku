@@ -307,6 +307,8 @@ virtual		status_t _Reserved_MediaNode_15(void *);
 				const char * name,
 				media_node_id id,
 				uint32 kinds);
+				
+		void _InitObject(const char *, media_node_id, uint64);
 
 		media_node_id fNodeID;
 		BTimeSource * fTimeSource;
@@ -317,11 +319,18 @@ virtual		status_t _Reserved_MediaNode_15(void *);
 		int32 _mChangeCountReserved;	//	deprecated
 		uint64 fKinds;
 		media_node_id fTimeSourceID;
+
+		BBufferProducer * fProducerThis;
+		BBufferConsumer * fConsumerThis;
+		BFileInterface * fFileInterfaceThis;
+		BControllable * fControllableThis;
+		BTimeSource * fTimeSourceThis;
+
 		bool _mReservedBool[4];
 
 mutable	port_id fControlPort;
 
-	uint32 _reserved_media_node_[13];
+	uint32 _reserved_media_node_[8];
 
 
 

@@ -11,7 +11,7 @@
 #include "DataExchange.h"
 #include "ServerInterface.h" // NEW_MEDIA_SERVER_SIGNATURE
 
-#define TIMEOUT 100000
+#define TIMEOUT 2000000
 
 namespace BPrivate {
 namespace media {
@@ -103,9 +103,9 @@ status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize,
 status_t SendToPort(port_id sendport, int32 msgcode, void *msg, int size)
 {
 	status_t rv;
-	rv = write_port(sendport, msgcode, msg, size);
+	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK)
-		TRACE("SendToPort: write_port failed, port %#lx, error %#lx (%s)\n", sendport, rv, strerror(rv));
+		TRACE("SendToPort: write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
 	return B_OK;
 }
 
@@ -117,18 +117,18 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 
 	request->reply_port = _PortPool->GetPort();
 
-	rv = write_port(requestport, msgcode, request, requestsize);
+	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK) {
-		TRACE("QueryPort: write_port failed, port %#lx, error %#lx (%s)\n", requestport, rv, strerror(rv));
+		TRACE("QueryPort: write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
 		_PortPool->PutPort(request->reply_port);
 		return rv;
 	}
 
-	rv = read_port(request->reply_port, &code, reply, replysize);
+	rv = read_port_etc(request->reply_port, &code, reply, replysize, B_RELATIVE_TIMEOUT, TIMEOUT);
 	_PortPool->PutPort(request->reply_port);
 
 	if (rv < B_OK)
-		TRACE("QueryPort: read_port failed, port %#lx, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
+		TRACE("QueryPort: read_port failed, port %ld, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
 	
 	return (rv < B_OK) ? rv : reply->result;
 }
