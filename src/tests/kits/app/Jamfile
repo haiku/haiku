@@ -13,6 +13,9 @@ CommonTestLib libapptest.so
 		MessengerTest.cpp
 		BMessengerTester.cpp
 		LockTargetTester.cpp
+		LockTargetWithTimeoutTester.cpp
+		MessengerAssignmentTester.cpp
+		MessengerComparissonTester.cpp
 		TargetTester.cpp
 		
 	: <boot!home!config!lib>libopenbeos.so

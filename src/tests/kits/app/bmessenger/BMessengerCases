@@ -86,7 +86,7 @@ case 4:	this is initialized to remote target with preferred handler,
 case 5:	this is initialized to remote target with specific handler,
 		looper is NULL =>
 		should return NULL.
-other cases in included in BMessenger(...)
+other cases included in BMessenger(...) cases
 
 bool LockTarget() const
 case 1:	this is uninitialized =>
@@ -111,3 +111,74 @@ case 7:	this is initialized to remote target with specific handler,
 		should not lock the looper and return false.
 
 status_t LockTargetWithTimeout(bigtime_t timeout) const
+case 1:	this is uninitialized =>
+		should return B_BAD_VALUE.
+case 2:	this is initialized to local target with preferred handler,
+		looper is not locked =>
+		should lock the looper and return B_OK.
+case 3:	this is initialized to local target with specific handler,
+		looper is not locked =>
+		should lock the looper and return B_OK.
+case 4:	this is initialized to local target with preferred handler,
+		looper is locked by another thread, timeout is 100ms =>
+		should block until the looper is unlocked (after 50ms), lock it
+		and return B_OK.
+case 5:	this is initialized to local target with preferred handler,
+		looper is locked by another thread, timeout is 25ms =>
+		should block for 25ms, not until the looper is unlocked (after 50ms),
+		should return B_TIMED_OUT.
+case 6:	this is initialized to local target with specific handler,
+		looper is locked by another thread, timeout is 100ms =>
+		should block until the looper is unlocked (after 50ms), lock it
+		and return B_OK.
+case 7:	this is initialized to local target with specific handler,
+		looper is locked by another thread, timeout is 25ms =>
+		should block for 25ms, not until the looper is unlocked (after 50ms),
+		should return B_TIMED_OUT.
+case 8:	this is initialized to remote target with preferred handler,
+		looper is not locked =>
+		should not lock the looper and return B_BAD_VALUE.
+case 9:	this is initialized to remote target with specific handler,
+		looper is not locked =>
+		should not lock the looper and return B_BAD_VALUE.
+
+bool IsValid() const
+included in BMessenger(...) cases
+
+team_id Team() const
+included in BMessenger(...) cases
+
+BMessenger &operator=(const BMessenger &from)
+case 1:	from is uninitialized =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+case 2:	from is properly initialized to a local target (preferred handler) =>
+		IsValid() and IsTargetLocal() should return true
+		Target() should return the same values as for from.
+		Team() should return this team.
+case 3:	from is properly initialized to a local target (specific handler) =>
+		IsValid() and IsTargetLocal() should return true
+		Target() should return the same values as for from.
+		Team() should return this team.
+
+bool operator==(const BMessenger &other) const
+case 1:	this and other are uninitialized =>
+		should return true.
+case 2:	this is initialized, other is uninitialized, and vice versa =>
+		should return false.
+case 3:	this and other are initialized, different cases:
+		- same object => true
+		- different objects same target => true
+		- looper preferred handler vs. same looper but the looper itself as
+		  handler => false
+		- looper preferred handler vs. other looper preferred handler => false
+		- looper preferred handler vs. other looper specific handler => false
+		- local looper vs. remote looper => false
+
+bool operator!=(const BMessenger &a, const BMessenger &b)
+included in == cases
+
+bool operator<(const BMessenger &a, const BMessenger &b)
+TODO
+
