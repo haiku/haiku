@@ -11,15 +11,12 @@
 namespace BPrivate {
 namespace DiskDevice {
 
-class KFileSystem {
+class KFileSystem : public KDiskSystem {
+public:
 	KFileSystem(const char *name);
 	virtual ~KFileSystem();
 
 	virtual bool IsFileSystem() const;
-
-	virtual status_t Load();		// load/unload -- can be nested
-	virtual status_t Unload();		//
-	virtual bool IsLoaded() const;
 
 	// Scanning
 
@@ -60,6 +57,9 @@ class KFileSystem {
 										  const char *parameters,
 										  KDiskDeviceJob *job);
 
+protected:
+	virtual status_t LoadModule();
+	virtual void UnloadModule();
 };
 
 } // namespace DiskDevice
