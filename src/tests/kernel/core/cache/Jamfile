@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src tests kernel core cache ;
 
 SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core cache ] ;
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 UsePrivateHeaders kernel ;
 UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;

@@ -15,7 +15,7 @@
 #include <Path.h>
 #include <String.h>
 
-#include <devfs.h>
+#include <fs/devfs.h>
 
 #ifdef TRACE
 #undef TRACE

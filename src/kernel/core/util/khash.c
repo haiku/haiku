@@ -9,7 +9,7 @@
 #include <debug.h>
 #include <Errors.h>
 #include <string.h>
-#include <khash.h>
+#include <util/khash.h>
 
 #define TRACE_HASH 0
 #if TRACE_HASH
