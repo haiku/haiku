@@ -25,7 +25,7 @@ public:
 	void LoadCurrent();
 	status_t Load(entry_ref &ref);
 	status_t Save(entry_ref &ref);
-	//status_t LoadSource(entry_ref &ref);
+	status_t LoadSource(entry_ref &ref);
 	void Dump();
 	bool IsModifierKey(uint32 keyCode);
 	uint8 IsDeadKey(uint32 keyCode, uint32 modifiers);
@@ -34,6 +34,8 @@ public:
 	void RestoreSystemDefault();
 	static void GetKey( char *chars, int32 offset, char* string);
 private:
+	void ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset);
+
 	char *fChars;
 	key_map fKeys;
 	uint32 fCharsSize;

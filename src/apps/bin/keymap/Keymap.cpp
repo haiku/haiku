@@ -15,11 +15,14 @@
 
 #include "Keymap.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <regex.h>
 #include <ByteOrder.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <Path.h>
+#include <String.h>
 
 void 
 Keymap::GetKey( char *chars, int32 offset, char* string) 
@@ -263,8 +266,274 @@ Keymap::Load(entry_ref &ref)
 	return B_OK;
 }
 
+const char versionPattern[] = "Version[[:space:]]+=[[:space:]]+\\([[:digit:]]+\\)";
+const char capslockPattern[] = "CapsLock[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char scrolllockPattern[] = "ScrollLock[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char numlockPattern[] = "NumLock[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char lshiftPattern[] = "LShift[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char rshiftPattern[] = "RShift[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char lcommandPattern[] = "LCommand[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char rcommandPattern[] = "RCommand[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char lcontrolPattern[] = "LControl[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char rcontrolPattern[] = "RControl[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char loptionPattern[] = "LOption[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char roptionPattern[] = "ROption[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char menuPattern[] = "Menu[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
+const char locksettingsPattern[] = "LockSettings[[:space:]]+=[[:space:]]+\\([[:alnum:]]*\\)"
+						"[[:space:]]*\\([[:alnum:]]*\\)"
+						"[[:space:]]*\\([[:alnum:]]*\\)[[:space:]]*";
+const char keyPattern[] = "Key[[:space:]]+\\([[:alnum:]]+\\)[[:space:]]+="
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)"
+						"[[:space:]]+";
 
-// we save a map from a file
+
+const char acutePattern[] = "Acute[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
+const char gravePattern[] = "Grave[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
+const char circumflexPattern[] = "Circumflex[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
+const char diaeresisPattern[] = "Diaeresis[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
+const char tildePattern[] = "Tilde[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
+
+void
+Keymap::ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset)
+{
+	char *current = &fChars[offset+1];
+	char hexChars[12];
+	uint32 length = 0;
+	if (strncmp(buffer + regs.start[i], "''", regs.end[i] - regs.start[i]) == 0)
+		length = 0;
+	else if (sscanf(buffer + regs.start[i], "'%s'", current) > 0) {
+		if (current[0] == '\\')
+			current[0] = current[1];
+		else if (current[0] == '\'')
+			current[0] = ' ';
+		length = 1;
+	} else if (sscanf(buffer + regs.start[i], "0x%s", hexChars) > 0) {
+		length = strlen(hexChars) / 2;
+		for (uint32 j=0; j<length; j++)
+			sscanf(hexChars + 2*j, "%02x", (uint8*)(current + j));
+	}
+	fChars[offset] = length;
+	offset += length + 1;
+}
+
+status_t 
+Keymap::LoadSource(entry_ref &ref)
+{
+	status_t err;
+	
+	BFile file(&ref, B_READ_ONLY);
+	if ((err = file.InitCheck()) != B_OK) {
+		printf("error %s\n", strerror(err));
+		return err;
+	}
+	
+	reg_syntax_t syntax = RE_CHAR_CLASSES;
+	re_set_syntax(syntax);
+		
+	struct re_pattern_buffer versionBuf;
+	struct re_pattern_buffer capslockBuf;
+	struct re_pattern_buffer scrolllockBuf;
+	struct re_pattern_buffer numlockBuf;
+	struct re_pattern_buffer lshiftBuf;
+	struct re_pattern_buffer rshiftBuf;
+	struct re_pattern_buffer lcommandBuf;
+	struct re_pattern_buffer rcommandBuf;
+	struct re_pattern_buffer lcontrolBuf;
+	struct re_pattern_buffer rcontrolBuf;
+	struct re_pattern_buffer loptionBuf;
+	struct re_pattern_buffer roptionBuf;
+	struct re_pattern_buffer menuBuf;
+	struct re_pattern_buffer locksettingsBuf;
+	struct re_pattern_buffer keyBuf;
+	struct re_pattern_buffer acuteBuf;
+	struct re_pattern_buffer graveBuf;
+	struct re_pattern_buffer circumflexBuf;
+	struct re_pattern_buffer diaeresisBuf;
+	struct re_pattern_buffer tildeBuf;
+	
+	const char* error; 
+	error = re_compile_pattern(versionPattern, strlen(versionPattern), &versionBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(capslockPattern, strlen(capslockPattern), &capslockBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(scrolllockPattern, strlen(scrolllockPattern), &scrolllockBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(numlockPattern, strlen(numlockPattern), &numlockBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(lshiftPattern, strlen(lshiftPattern), &lshiftBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(rshiftPattern, strlen(rshiftPattern), &rshiftBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(lcommandPattern, strlen(lcommandPattern), &lcommandBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(rcommandPattern, strlen(rcommandPattern), &rcommandBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(lcontrolPattern, strlen(lcontrolPattern), &lcontrolBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(rcontrolPattern, strlen(rcontrolPattern), &rcontrolBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(loptionPattern, strlen(loptionPattern), &loptionBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(roptionPattern, strlen(roptionPattern), &roptionBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(menuPattern, strlen(menuPattern), &menuBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(locksettingsPattern, strlen(locksettingsPattern), &locksettingsBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(keyPattern, strlen(keyPattern), &keyBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(acutePattern, strlen(acutePattern), &acuteBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(gravePattern, strlen(gravePattern), &graveBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(circumflexPattern, strlen(circumflexPattern), &circumflexBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(diaeresisPattern, strlen(diaeresisPattern), &diaeresisBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(tildePattern, strlen(tildePattern), &tildeBuf);
+	if (error)
+		fprintf(stderr, error);
+	
+	int fd = file.Dup();
+	FILE * f = fdopen(fd, "r");
+	
+	char buffer[1024];
+	BString strings[4];
+	
+	fChars = new char[4096];
+	fCharsSize = 4096;
+	int offset = 0;
+	int acuteOffset = 0;
+	int graveOffset = 0;
+	int circumflexOffset = 0;
+	int diaeresisOffset = 0;
+	int tildeOffset = 0;
+		
+	int32 *maps[] = {
+		fKeys.normal_map,
+		fKeys.shift_map,
+		fKeys.control_map,
+		fKeys.option_map,
+		fKeys.option_shift_map,
+		fKeys.caps_map,
+		fKeys.caps_shift_map,
+		fKeys.option_caps_map,
+		fKeys.option_caps_shift_map
+	};
+	
+	while (fgets(buffer, 1024-1, f)!=NULL) {
+		if (buffer[0]== '#' || buffer[0]== '\n')
+			continue;
+		struct re_registers regs;
+		if (re_search(&versionBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "%ld", &fKeys.version);
+		} else if (re_search(&capslockBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.caps_key);
+		} else if (re_search(&scrolllockBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.scroll_key);
+		} else if (re_search(&numlockBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.num_key);
+		} else if (re_search(&lshiftBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_shift_key);
+		} else if (re_search(&rshiftBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_shift_key);
+		} else if (re_search(&lcommandBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_command_key);
+		} else if (re_search(&rcommandBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_command_key);
+		} else if (re_search(&lcontrolBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_control_key);
+		} else if (re_search(&rcontrolBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_control_key);
+		} else if (re_search(&loptionBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.left_option_key);
+		} else if (re_search(&roptionBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.right_option_key);
+		} else if (re_search(&menuBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.menu_key);
+		} else if (re_search(&locksettingsBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			for (int32 i=1; i<=3; i++) {
+				if (strncmp(buffer + regs.start[i], "CapsLock", regs.end[i] - regs.start[i]) == 0)
+					fKeys.lock_settings |= B_CAPS_LOCK;
+				else if (strncmp(buffer + regs.start[i], "NumLock", regs.end[i] - regs.start[i]) == 0)
+					fKeys.lock_settings |= B_NUM_LOCK;
+				else if (strncmp(buffer + regs.start[i], "ScrollLock", regs.end[i] - regs.start[i]) == 0)
+					fKeys.lock_settings |= B_SCROLL_LOCK;
+			}
+		} else if (re_search(&keyBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			uint32 keyCode; 
+			if (sscanf(buffer + regs.start[1], "0x%lx", &keyCode) > 0) {
+				
+				for (int i=2; i<=10; i++) {
+					maps[i-2][keyCode] = offset;
+					ComputeChars(buffer, regs, i, offset);
+				}
+			}
+		} else if (re_search(&acuteBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			for (int i=1; i<=2; i++) {
+				fKeys.acute_dead_key[acuteOffset++] = offset;		
+				ComputeChars(buffer, regs, i, offset);
+			}			
+		} else if (re_search(&graveBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			for (int i=1; i<=2; i++) {
+				fKeys.grave_dead_key[graveOffset++] = offset;		
+				ComputeChars(buffer, regs, i, offset);
+			}			
+		} else if (re_search(&circumflexBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			for (int i=1; i<=2; i++) {
+				fKeys.circumflex_dead_key[circumflexOffset++] = offset;		
+				ComputeChars(buffer, regs, i, offset);
+			}			
+		} else if (re_search(&diaeresisBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			for (int i=1; i<=2; i++) {
+				fKeys.dieresis_dead_key[diaeresisOffset++] = offset;		
+				ComputeChars(buffer, regs, i, offset);
+			}			
+		} else if (re_search(&tildeBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			for (int i=1; i<=2; i++) {
+				fKeys.tilde_dead_key[tildeOffset++] = offset;		
+				ComputeChars(buffer, regs, i, offset);
+			}			
+		}
+	}
+	/*
+	for (uint32 i=1; i < 3; i++) {
+				printf("%.*s\n", regs.end[i] - regs.start[i], buffer + regs.start[i]);
+			}
+			*/
+
+	return B_OK;
+}
+	
+
+// we save a map to a file
 status_t 
 Keymap::Save(entry_ref &ref)
 {

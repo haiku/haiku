@@ -48,8 +48,16 @@ int main(int argc, char **argv)
 				keymap.RestoreSystemDefault();
 				return 0;
 			}
+			
 		} else {
 			if (operation == 'o') {
+				return 0;
+			} if (operation == 'l') {
+				entry_ref ref;
+				get_ref_for_path(argv[i], &ref);
+				Keymap keymap;
+				keymap.LoadSource(ref);
+				keymap.Dump();
 				return 0;
 			} else 
 				break;
