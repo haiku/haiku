@@ -2064,38 +2064,35 @@ compareKeys(type_code type,const void *key1, int keyLength1, const void *key2, i
 			return result;
 		}
 
+		case B_SSIZE_T_TYPE:
 		case B_INT32_TYPE:
 			return *(int32 *)key1 - *(int32 *)key2;
-			
+
+		case B_SIZE_T_TYPE:
 		case B_UINT32_TYPE:
-		{
 			if (*(uint32 *)key1 == *(uint32 *)key2)
 				return 0;
 			else if (*(uint32 *)key1 > *(uint32 *)key2)
 				return 1;
 
 			return -1;
-		}
-			
+
+		case B_OFF_T_TYPE:
 		case B_INT64_TYPE:
-		{
 			if (*(int64 *)key1 == *(int64 *)key2)
 				return 0;
 			else if (*(int64 *)key1 > *(int64 *)key2)
 				return 1;
 
 			return -1;
-		}
 
 		case B_UINT64_TYPE:
-		{
 			if (*(uint64 *)key1 == *(uint64 *)key2)
 				return 0;
 			else if (*(uint64 *)key1 > *(uint64 *)key2)
 				return 1;
 
 			return -1;
-		}
 
 		case B_FLOAT_TYPE:
 		{
