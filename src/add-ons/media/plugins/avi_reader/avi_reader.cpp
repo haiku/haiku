@@ -8,8 +8,7 @@
 #include "RawFormats.h"
 #include "avi_reader.h"
 
-#define TRACE_THIS 1
-#if TRACE_THIS
+#if 0
   #define TRACE printf
 #else
   #define TRACE(a...)
@@ -267,12 +266,15 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
 
 		description.family = B_AVI_FORMAT_FAMILY;
-		description.u.avi.codec = stream_header->fourcc_handler;
+		if (stream_header->fourcc_handler == 'ekaf' || stream_header->fourcc_handler == 0) // 'fake' or 0 fourcc => used compression id
+			description.u.avi.codec = video_format->compression;
+		else
+			description.u.avi.codec = stream_header->fourcc_handler;
 		if (B_OK != formats.GetFormatFor(description, format)) 
 			format->type = B_MEDIA_ENCODED_VIDEO;
 			
 		format->user_data_type = B_CODEC_TYPE_INFO;
-		*(uint32 *)format->user_data = stream_header->fourcc_handler; format->user_data[4] = 0;
+		*(uint32 *)format->user_data = description.u.avi.codec; format->user_data[4] = 0;
 		format->u.encoded_video.max_bit_rate = 8 * fFile->AviMainHeader()->max_bytes_per_sec;
 		format->u.encoded_video.avg_bit_rate = format->u.encoded_video.max_bit_rate / 2; // XXX fix this
 		format->u.encoded_video.output.field_rate = cookie->frames_per_sec_rate / (float)cookie->frames_per_sec_scale;
