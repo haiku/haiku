@@ -7,6 +7,12 @@
 #include <MediaTrack.h>
 #include "debug.h"
 
+// SoundPlay 4.8 is evil, uses undocumented media kit API
+extern "C" void *__get_decoder_manager__Fv(void);
+void *__get_decoder_manager__Fv(void) { return 0; }
+extern "C" void ScanDirs__Q28BPrivate13_AddonManager(void *);
+void ScanDirs__Q28BPrivate13_AddonManager(void *) { }
+
 /* According to the normal headers, these symbols should neither be
  * included in libmedia.so, nor used by anything.
  * But BeOS R5 has them, and they are required to load the BeOS R5
