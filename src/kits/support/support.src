@@ -5,7 +5,6 @@ SUPPORT_KIT_SOURCE =
 	Flattenable.cpp
 	List.cpp
 	Locker.cpp
-	MallocIO.cpp
 	StopWatch.cpp
 	String.cpp
 ;
