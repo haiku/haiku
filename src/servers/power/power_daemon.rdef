@@ -1,0 +1,22 @@
+
+resource(1, "BEOS:FILE_TYPES") message;
+
+resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.Haiku-powermanagement";
+
+resource app_version
+{
+	major  = 0, 
+	middle = 0,
+	minor  = 1,
+
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 0,
+
+	internal = 0,
+
+	short_info = "Power Management 0.01",
+	long_info = "Haiku Power Management Daemon 0.01 Development"
+};
+
+resource(1, "BEOS:APP_FLAGS") #'APPF' $"04000000";
