@@ -32,8 +32,6 @@ main(stage2_args *args)
 	if (heap_init(args) < B_OK)
 		panic("Could not initialize heap!\n");
 
-	platform_switch_to_logo();
-
 	TRACE(("boot(): heap initialized...\n"));
 
 	// the main platform dependent initialisation
@@ -42,13 +40,16 @@ main(stage2_args *args)
 	if (vfs_init(args) < B_OK)
 		panic("Could not initialize VFS!\n");
 
+	if ((platform_boot_options() & BOOT_OPTION_DEBUG_OUTPUT) == 0)
+		platform_switch_to_logo();
+
 	puts("Welcome to the OpenBeOS boot loader!");
 
 	bool mountedAllVolumes = false;
 
 	Directory *volume = get_boot_file_system(args);
 
-	if (volume == NULL || platform_user_menu_requested()) {
+	if (volume == NULL || (platform_boot_options() & BOOT_OPTION_MENU) != 0) {
 		if (volume == NULL)
 			puts("\tno boot path found, scan for all partitions...\n");
 
