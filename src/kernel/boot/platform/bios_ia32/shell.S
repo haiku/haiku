@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 /**	This file contains the boot floppy and BFS boot block entry points for
@@ -275,10 +275,23 @@ _protected_code_segment:
 /** Enables the a20 gate. It will first try to enable it through
  *	the BIOS, and, if that fails, will use the old style AT mechanism
  *	using the keyboard port.
+ *	ToDo: it no longer does this! Now, it just uses the "fast A20"
+ *		mechanism using port 0x92. This does work on all systems
+ *		I have access to.
  */
 
 enable_a20:
-	movw	$0x2402, %ax		// first, query the a20 status
+	inb		$0x92, %al
+	testb	$0x02, %al
+	jnz		_a20_out
+	orb		$0x02, %al
+	andb	$0xfe, %al
+	outb	%al, $0x92
+_a20_out:
+	ret
+
+// ToDo: the code below didn't seem to work properly on all machines
+/*	movw	$0x2402, %ax		// first, query the a20 status
 	int		$0x15
 	jc		_a20_old_method		// if that fails, use the old AT method
 	test	$0x1, %al
@@ -303,6 +316,7 @@ _a20_loop2:
 	loopne	_a20_loop2
 _a20_done:
 	ret
+*/
 
 //--------------------------------------------------------------
 
