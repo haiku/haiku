@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -25,7 +25,8 @@ chown(const char *path, uid_t owner, gid_t group)
 
 	stat.st_uid = owner;
 	stat.st_gid = group;
-	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
+	status = _kern_write_path_stat(path, true, &stat, sizeof(struct stat),
+		FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -39,7 +40,8 @@ lchown(const char *path, uid_t owner, gid_t group)
 
 	stat.st_uid = owner;
 	stat.st_gid = group;
-	status = sys_write_path_stat(path, false, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
+	status = _kern_write_path_stat(path, false, &stat, sizeof(struct stat),
+		FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -53,7 +55,8 @@ fchown(int fd, uid_t owner, gid_t group)
 
 	stat.st_uid = owner;
 	stat.st_gid = group;
-	status = sys_write_stat(fd, &stat, FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
+	status = _kern_write_stat(fd, &stat, sizeof(struct stat),
+		FS_WRITE_STAT_UID | FS_WRITE_STAT_GID);
 
 	RETURN_AND_SET_ERRNO(status);
 }

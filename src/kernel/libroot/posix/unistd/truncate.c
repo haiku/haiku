@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -24,7 +24,7 @@ truncate(const char *path, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_SIZE);
+	status = _kern_write_path_stat(path, true, &stat, sizeof(struct stat), FS_WRITE_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);
 }
@@ -37,7 +37,7 @@ ftruncate(int fd, off_t newSize)
 	status_t status;
 
 	stat.st_size = newSize;
-	status = sys_write_stat(fd, &stat, FS_WRITE_STAT_SIZE);
+	status = _kern_write_stat(fd, &stat, sizeof(struct stat), FS_WRITE_STAT_SIZE);
 
 	RETURN_AND_SET_ERRNO(status);
 }

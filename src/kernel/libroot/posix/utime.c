@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -30,7 +30,8 @@ utime(const char *path, const struct utimbuf *times)
 	} else
 		stat.st_atime = stat.st_mtime = time(NULL);
 
-	status = sys_write_path_stat(path, true, &stat, FS_WRITE_STAT_MTIME | FS_WRITE_STAT_ATIME);
+	status = _kern_write_path_stat(path, true, &stat, sizeof(struct stat),
+		FS_WRITE_STAT_MTIME | FS_WRITE_STAT_ATIME);
 
 	RETURN_AND_SET_ERRNO(status);
 }
