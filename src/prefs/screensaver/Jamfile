@@ -12,7 +12,7 @@ local sources =
 
 Preference ScreenSaver : $(sources) ;
 
-LinkSharedOSLibs ScreenSaver : libscreensaver.so be stdc++.r4 ;
+LinkSharedOSLibs ScreenSaver : tracker libscreensaver.so be stdc++.r4 ;
 
 # Ugly hack: Prepend the dir containing Be's ScreenSaver.h to the list of
 # include search dirs. Otherwise it won't be found.

@@ -29,6 +29,8 @@ PreviewView::PreviewView(BRect frame, const char *name,ScreenSaverPrefs *prefp)
 } 
 
 PreviewView::~PreviewView() {
+	if (threadID)
+		kill_thread(threadID);
 } 
 
 void PreviewView::SetScreenSaver(BString name) {
@@ -47,8 +49,10 @@ void PreviewView::SetScreenSaver(BString name) {
 
 	sst=new ScreenSaverThread(Window(),configView,prefPtr);
 	saver=sst->LoadAddOn();
-	threadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,sst);
-	resume_thread(threadID); 
+	if (saver) {
+		threadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,sst);
+		resume_thread(threadID); 
+	}
 }
 
 void PreviewView::Draw(BRect update) {

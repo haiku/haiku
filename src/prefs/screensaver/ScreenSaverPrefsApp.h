@@ -11,6 +11,7 @@ public:
   ScreenSaverPrefsApp(void);
   virtual ~ScreenSaverPrefsApp(void);
   virtual void MessageReceived(BMessage *);
+  virtual void RefsReceived(BMessage *);
 
 };
 

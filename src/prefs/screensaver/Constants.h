@@ -33,6 +33,9 @@ const int SHOW           ='SHOW';
 const int POPULATE       ='POPU';
 const int UTILIZE        ='UTIL';
 const int SAVER_SEL      ='SSEL';
+const int TEST_BTN       ='TEST';
+const int ADD_BTN        ='ADD ';
+const int UPDATELIST     ='UPDL';
 
 const rgb_color black      = {0,0,0,0};
 const rgb_color darkGrey   = {150,150,150,0};
