@@ -125,6 +125,8 @@ static const char * shiftJISaliases[] = {
 	"MS_Kanji", "csShiftJIS",
 	// java aliases
 	"sjis", "shift_jis", "shift-jis", "x-sjis",
+	// mail kit aliases
+	"shift_jisx0213",
 	NULL
 };
 static const BCharacterSet shiftJIS(12,17,"Japanese Shift JIS","Shift_JIS","Shift_JIS",shiftJISaliases);
@@ -134,6 +136,8 @@ static const char * EUCPackedJapaneseAliases[] = {
 	"EUC-JP", "csEUCPkdFmtJapanese",
 	// java aliases
 	"eucjis", "eucjp", "x-euc-jp", "x-eucjp",
+	// mail kit aliases
+	"euc-jisx0213",
 	NULL
 };
 static const BCharacterSet packedJapanese(13,18,"Japanese EUC",
