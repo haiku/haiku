@@ -1,0 +1,341 @@
+<HTML>
+<!-- $Id: BDeskbarUseCases.html,v 1.1 2002/09/26 02:21:31 jrand Exp $ -->
+<HEAD>
+<TITLE>BDeskbar Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BDeskbar Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BDeskbar interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BDeskbar Interface</A></LI>
+<LI><A HREF="#usecases">BDeskbar Use Cases</A></LI>
+<LI><A HREF="#implement">BDeskbar Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BDeskbar Interface:</H2>
+
+<P>The BDeskbar class is a simple class for getting information from the deskbar and for modifying
+it from your application.  The best source of source of information for the BDeskbar interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/Deskbar/Deskbar.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BDeskbar Use Cases:</H2>
+
+<P>The following use cases cover the BDeskbar functionality:</P>
+
+<OL>
+<LI><P><B>Construction:</B> A BDeskbar does not take any arguments when it is constructed.  The
+BDeskbar instance creates a connection to the deskbar in order to get and change its state.</P></LI>
+
+<LI><P><B>Destruction:</B> When a BDeskbar is deconstructed, the application's connection to the
+deskbar is closed.  However any change to the deskbar's state made through the BDeskbar instance
+persists.</P></LI>
+
+<LI><P><B>Add Item 1:</B> The AddItem() member function can be used to take a passed in pointer to
+a BView and send it to the deskbar for inclusion in its shelf.  This BView must be archivable
+and must be exported by the application (for details on how to do this, 
+<A HREF="http://bedriven.be-in.org/articles/replicant/III_027-stepping%20up%20to%20the%20deskbar.html">this article</A>
+may help).  The item will be added and the id of the new item will be passed back to the caller
+through a pointer to an int32.</P></LI>
+
+<LI><P><B>Add Item 2:</B> The AddItem() member function can be used to add an item to the deskbar
+shelf by passing a pointer to an entry_ref.  The file pointed to by this entry_ref should be
+an addon that exports the symbol "BView *instantiate_deskbar_item()".  This entry point is used to
+get a BView which it can display in the shelf.  More information on this mechanism can be found in
+the <A HREF="file:///boot/beos/documentation/Be%20Book/Release%20Notes/Deskbar.html">Deskbar Release Notes</A>
+but not in the Be Book proper.  The item id of the added item is passed back in an int32 pointer
+provided by the caller.  NOTE: The source code for the deskbar found in 
+<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/StatusView.cpp?rev=1.5&content-type=text/vnd.viewcvs-markup">TReplicantTray::LoadAddon()</A>
+indicates that it also looks for a symbol called "BView *instantiate_deskbar_entry(image_id, entry_ref *)"
+first, but there is no documentation on this.</P></LI>
+
+<LI><P><B>Remove Item 1:</B> The RemoveItem() member function takes an integer id and removes it
+from the deskbar shelf if it exists.  The member returns B_OK at all times (unless the deskbar is
+not running or some communication failure occurs).  A B_OK result does not mean that an item was
+actually removed.</P></LI>
+
+<LI><P><B>Remove Item 2:</B> The RemoveItem() member function also takes a string name and removes
+it from the deskbar shelf if it exists.  The member returns B_OK at all times (unless the deskbar is
+not running or some communication failure occurs).  A B_OK result does not mean that an item was
+actually removed.</P></LI>
+
+<LI><P><B>Count Items:</B> The CountItems() member function takes no arguments.  It returns the
+number of "items" in the deskbar shelf.  For example, the small email icon often found in the
+deskbar is one such item.</P></LI>
+
+<LI><P><B>Has Item 1:</B> The HasItem() member function takes a integer id and returns a true or
+false value which indicates whether or not an item exists in the deskbar shelf on that id.  For
+example, the small email icon often found in the deskbar is one such item.</P></LI>
+
+<LI><P><B>Has Item 2:</B> The HasItem() member function also takes a string name parameter and
+returns a true or false value which indicates whether or not an item by than name exists in
+the deskbar shelf.  For example, the small email icon often found in the deskbar is named 
+"mail".</P></LI>
+
+<LI><P><B>Get Item Info 1:</B> The GetItemInfo() member function takes an integer id and a pointer
+to a const char * (ie a string).  It checks to see if the id passed in exists in the deskbar and
+sets the value of the const char * to point to a allocated buffer which contains the name of the 
+item which corresponds to this id and the function returns B_OK.  Ownership of this allocated
+buffer is assigned to the caller of this member function so it is up to the caller to free the
+memory.  If the id doesn't exist, then it still returns B_OK but the pointer to the string is set
+to NULL.  If the pointer to the string passed in is NULL, the function returns B_BAD_VALUE.</P></LI>
+
+<LI><P><B>Get Item Info 2:</B> The GetItemInfo() member also takes a string (const char *) name
+and a pointer to an int.  If the name matches an item in the deskbar shelf, the id of this
+item is returned at the location pointed to by the integer pointer and the member returns B_OK.
+If the name doesn't match an item in the deskbar shelf, the id is set to -1.  If the pointer
+passed in is NULL, the function returns B_BAD_VALUE.</P></LI>
+
+<LI><P><B>Frame:</B> The Frame() member function returns a BRect which describes the location and
+size of the deskbar on the screen.</P></LI>
+
+<LI><P><B>Location:</B> The Location() member function returns one of B_DESKBAR_TOP,
+B_DESKBAR_BOTTOM, B_DESKBAR_LEFT_BOTTOM, B_DESKBAR_RIGHT_BOTTOM, B_DESKBAR_LEFT_TOP or
+B_DESKBAR_RIGHT_TOP.  The return value describes where the deskbar currently is located.  Also,
+the Location() member function takes an optional argument which is a pointer to a boolean.
+If supplied, the boolean which is pointed to is set to true if the deskbar is expanded and false
+otherwise.  A deskbar can only be contracted (ie not expanded) when in the left or right top
+position.</P></LI>
+
+<LI><P><B>Is Expanded:</B> The IsExpanded() member function returns true if the deskbar is
+expanded and false if it is contracted.  Note, the deskbar can only be contracted when in
+left or right top position.</P></LI>
+
+<LI><P><B>Set Location:</B> The SetLocation() member function takes the same values returned
+by the Location() member.  The value passed in the first argument sets the position of the deskbar.
+If the optional second argument is supplied, it is a boolean which indicates whether or not the
+deskbar is expanded (true) or contracted (false).  Note, the deskbar can only be contracted when in
+left or right top position.</P></LI>
+
+<LI><P><B>Expand:</B> The Expand() member function takes a single boolean argument which sets the
+deskbar to expanded (true) or contracted (false) mode.  Note, the deskbar can only be contracted
+when in left or right top position.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BDeskbar Implementation:</H2>
+
+<P>Internally, the BDeskbar uses a BMessenger to communicate with the deskbar itself.  
+The source code from the OpenTracker project will be used as a reference for this effort.
+You can find the deskbar source code here:</P>
+
+<BLOCKQUOTE>
+<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/">http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/</A>
+</BLOCKQUOTE>
+
+<P>Specifically, the code which handles communicating with the BDeskbar class can be found
+here:</P>
+
+<BLOCKQUOTE>
+<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&amp;content-type=text/vnd.viewcvs-markup</A>
+</BLOCKQUOTE>
+
+<P>The following describes the messages used to communicate between BDeskbar and the deskbar 
+itself.</P>
+
+
+<H3>AddItem:</H3>
+
+<P>The AddItem() member sends the following message to the deskbar to add an item from an
+archived BView:</P>
+
+<PRE>
+BMessage theMsg;
+BMessage viewMsg;
+theView.Archive(&amp;viewMsg);              // This takes the target BView to place in the shelf and archives it into viewMsg
+theMsg.what = 'icon'
+theMsg.AddMessage("view", &amp;viewMsg);    // This puts the archived view in the viewMsg and puts it in the message to the deskbar
+</PRE>
+
+<P>Or, the AddItem() member sends the following message to the deskbar to add an item from a file
+that exports the "BView *instantiate_deskbar_item(void)" function:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'adon'
+theMsg.AddRef("addon", &amp;theAddonRef);    // This is the addon which contains the hook function to get the view to add
+</PRE>
+
+<P>The /boot/app/Pulse application exports the necessary symbol for this mechanism to work and
+is a good candidate to test with.</P>
+
+<P>In either case, the deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.AddInt32("id", theID);         // This is the id of the new item
+</PRE>
+
+<P>Note that in both cases, the deskbar does not set the what code of the reply.  Checking the
+source code for 
+<A href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">TBarWindow::AddItem()</A>
+confirms this.  
+
+
+<H3>HasItem:</H3>
+
+<P>The HasItem() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'exst'
+theMsg.AddInt32("id", theID);         // This is the id to check for
+   // OR, only one of id or name should be in the message
+theMsg.AddString("name", theName);    // This is the name to check for
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.AddBool("exists", IDorNameExists());    // This is a true/false value which indicates whether or not the name/id exists in the shelf
+</PRE>
+
+<P>Note that the deskbar does not set the what code of the reply.  Checking the source code
+for 
+<A href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">TBarWindow::ItemExists()</A>
+confirms this.</P>
+
+
+<H3>GetItemInfo:</H3>
+
+<P>The GetItemInfo() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'info'
+theMsg.AddInt32("id", theID);         // This is the id to check for
+   // OR, only one of id or name should be in the message
+theMsg.AddString("name", theName);    // This is the name to check for
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.AddString("name", theName);    // This is the name corresponding to the id of the original request
+   // OR, only one of id or name should be in the response message depending on the request sent
+theMsg.AddInt32("id", theID);         // This is the id corresponding to the name of the original request
+</PRE>
+
+<P>Note that the deskbar does not set the what code of the reply.  Checking the source code
+for 
+<A href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">TBarWindow::ItemInfo()</A>
+confirms this.</P>
+
+
+<H3>CountItems:</H3>
+
+<P>The CountItems() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'cwnt'
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'rply';                     // This means reply
+theMsg.AddInt32("count", ItemCount());    // This is the number of items in the deskbar shelf
+</PRE>
+
+
+<H3>RemoveItem:</H3>
+
+<P>The RemoveItem() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'remv'
+theMsg.AddInt32("id", theID);         // This is the id to remove
+   // OR, only one of id or name should be in the message
+theMsg.AddString("name", theName);    // This is the name to remove
+</PRE>
+
+<P>The deskbar does not send a response.</P>
+
+
+<H3>Frame:</H3>
+
+<P>The Frame() member sends a standard scripting message to get the frame from the deskbar.  It
+sends a B_GET_PROPERTY message to the deskbar asking for the "Frame" property specifying the
+window by name.  The window name is "Deskbar".</P>
+
+<P>The response from deskbar has a what code of B_REPLY and a BRect describing the frame in a
+value called "result".  This is standard BeOS scripting.</P>
+
+
+<H3>Location:</H3>
+
+<P>The Location() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'gloc';    // This means get location
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'rply';                              // This means reply
+theMsg.AddInt32("location", DeskbarLocation());    // This is the number which represents the location of the deskbar
+theMsg.AddBool("expanded", Expanded());            // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+
+<H3>IsExpanded:</H3>
+
+<P>The IsExpanded() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'gexp';    // This means get expanded state
+</PRE>
+
+<P>The deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'rply';                      // This means reply
+theMsg.AddBool("expanded", Expanded());    // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+
+<H3>SetLocation:</H3>
+
+<P>The SetLocation() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'sloc';                        // This means set location
+theMsg.AddInt32("location", newLocation);    // This is the number which represents the location of the deskbar
+theMsg.AddBool("expand", isExpanded);        // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+<P>The deskbar does not send a reply to this message.</P>
+
+
+<H3>Expand:</H3>
+
+<P>The Expand() member sends the following message to the deskbar:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'sexp';                     // This means set expanded state
+theMsg.AddBool("expand", isExpanded);     // This is true if the deskbar is expanded, false otherwise
+</PRE>
+
+<P>The deskbar does not send a reply to this message.</P>
+
+</BODY>
+</HTML>
