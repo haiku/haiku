@@ -25,6 +25,7 @@ Shell::Shell()
 	, fBlockSize(2048)
 	, fDoUdf(true)
 	, fDoIso(true)
+	, fOutputFile("")
 {
 }
 
@@ -35,7 +36,7 @@ Shell::Run(int argc, char *argv[])
 	status_t error = _ProcessArguments(argc, argv);
 	if (!error) {
 		ConsoleListener listener(fVerbosityLevel);
-		UdfBuilder builder("./output.img", fBlockSize, fDoUdf, fDoIso,
+		UdfBuilder builder(fOutputFile.c_str(), fBlockSize, fDoUdf, fDoIso,
 		                   "(Unnamed UDF volume)", "ISO_VOLUME",
 		                   "/boot/home/Desktop/udftest", listener);
 		error = builder.InitCheck();
@@ -53,48 +54,58 @@ status_t
 Shell::_ProcessArguments(int argc, char *argv[]) {
 	DEBUG_INIT_ETC("Shell", ("argc: %d", argc));
 	
-	// If we're given no parameters, the default settings
-	// will do just fine
-	if (argc < 2)
-		RETURN(B_OK);
+	// Throw all the arguments into a handy list
+	std::list<std::string> argumentList;
+	for (int i = 1; i < argc; i++) 
+		argumentList.push_back(std::string(argv[i]));
 
-	// Handle each command line argument (skipping the first
-	// which is just the app name)
-	for (int i = 1; i < argc; i++) {
-		std::string str(argv[i]);
+	bool foundOutputFile = false;
 		
-		status_t error = _ProcessArgument(str, argc, argv);
-		if (error)
-			RETURN(error);		
+	// Now bust out some processing
+	int argumentCount = argumentList.size();
+	int index = 0;
+	for(std::list<std::string>::iterator i = argumentList.begin();
+	      i != argumentList.end();
+	      	)
+	{
+		std::string &arg = *i;
+		if (arg == "--help") {
+			RETURN(B_ERROR);
+		} else if (arg == "-v0") {
+			fVerbosityLevel = VERBOSITY_NONE;
+		} else if (arg == "-v1") {
+			fVerbosityLevel = VERBOSITY_LOW;
+		} else if (arg == "-v2") {
+			fVerbosityLevel = VERBOSITY_MEDIUM;
+		} else if (arg == "-v3") {
+			fVerbosityLevel = VERBOSITY_HIGH;
+		} else {
+			if (index == argumentCount-1) {
+				// Take this argument as the output filename
+				fOutputFile = arg;
+				foundOutputFile = true;
+			} else {
+				printf("ERROR: invalid argument `%s'\n", arg.c_str());
+				printf("\n");
+				RETURN(B_ERROR);
+			}
+		}
+		i++;
+		index++;
 	}
+	
+	if (!foundOutputFile) {
+		printf("ERROR: no output file specified\n");
+		printf("\n");
+		RETURN(B_ERROR);
+	}	
 	
 	RETURN(B_OK);
 }
 
-status_t
-Shell::_ProcessArgument(std::string arg, int argc, char *argv[]) {
-	DEBUG_INIT_ETC("Shell", ("arg: `%s'", arg.c_str()));
-	if (arg == "--help") {
-		RETURN(B_ERROR);
-	} else if (arg == "-v0") {
-		fVerbosityLevel = VERBOSITY_NONE;
-	} else if (arg == "-v1") {
-		fVerbosityLevel = VERBOSITY_LOW;
-	} else if (arg == "-v2") {
-		fVerbosityLevel = VERBOSITY_MEDIUM;
-	} else if (arg == "-v3") {
-		fVerbosityLevel = VERBOSITY_HIGH;
-	} else {
-		printf("ERROR: invalid argument `%s'\n", arg.c_str());
-		printf("\n");
-		RETURN(B_ERROR);
-	}
-	RETURN(B_OK);
-}			
-
 void
 Shell::_PrintHelp() {
-	printf("usage: makeudfimage [options]\n");
+	printf("usage: makeudfimage [options] <output-filename>\n");
 	printf("\n");
 	printf("VALID ARGUMENTS:\n");
 	printf("  --help:   Displays this help text\n");

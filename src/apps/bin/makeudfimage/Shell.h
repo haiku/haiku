@@ -23,13 +23,13 @@ public:
 	
 private:
 	status_t _ProcessArguments(int argc, char *argv[]);
-	status_t _ProcessArgument(std::string arg, int argc, char *argv[]);
 	void _PrintHelp();
 	
 	VerbosityLevel fVerbosityLevel;
 	uint32 fBlockSize;
 	bool fDoUdf;
 	bool fDoIso;
+	std::string fOutputFile;
 };
 
 
