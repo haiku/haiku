@@ -234,10 +234,12 @@ TGATranslator::TranslatorVersion() const
 const translation_format *
 TGATranslator::InputFormats(int32 *out_count) const
 {
-	if (out_count)
-		*out_count = 2;
-
-	return gInputFormats;
+	if (out_count) {
+		*out_count = sizeof(gInputFormats) /
+			sizeof(translation_format);
+		return gInputFormats;
+	} else
+		return NULL;
 }
 
 // ---------------------------------------------------------------
@@ -258,10 +260,12 @@ TGATranslator::InputFormats(int32 *out_count) const
 const translation_format *
 TGATranslator::OutputFormats(int32 *out_count) const
 {
-	if (out_count)
-		*out_count = 2;
-
-	return gOutputFormats;
+	if (out_count) {
+		*out_count = sizeof(gOutputFormats) /
+			sizeof(translation_format);
+		return gOutputFormats;
+	} else
+		return NULL;
 }
 
 // ---------------------------------------------------------------
