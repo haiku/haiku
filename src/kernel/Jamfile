@@ -710,18 +710,6 @@ KernelLd loop :
 	addons/network/interface/loop
 	;
 
-KernelLd digit :
-        <$(SOURCE_GRIST)!drivers!common>digit.o
-        kernel.so
-        :
-        $(SUBDIR)/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
-        :
-        -Bdynamic -shared
-        :
-        :
-        addons/drivers/dev/misc/digit
-        ; 
-
 if $(OS) = "BEOS" 
 {
 	KernelConfigSection addons/drivers/dev/misc/speaker 
