@@ -233,6 +233,30 @@ error reply fields:
 
 -----------------------------------------------------------------------
 
+app registration, change app signature (BRoster::SetSignature())
+
+target:		roster
+message:	B_REG_SET_SIGNATURE
+			"team":			B_INT32_TYPE
+			"signature":	B_STRING_TYPE
+reply:		standard success
+on error:	- B_NO_REPLY (fatal)
+			- standard error
+
+message fields:
+- "team": The application team (team_id).
+- "signature": The application's new signature.
+
+error reply fields:
+- "error":
+  - B_BAD_VALUE: A request message field is missing or contains an
+    invalid value.
+  - B_REG_APP_NOT_REGISTERED: The team does not identify a registered
+    application.
+  - ...
+
+-----------------------------------------------------------------------
+
 get an app info (BRoster::Get{Running,Active,}AppInfo())
 
 target:		roster
