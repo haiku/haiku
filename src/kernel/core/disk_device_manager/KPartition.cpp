@@ -16,6 +16,7 @@
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
 #include "KPartition.h"
+#include "KPartitionVisitor.h"
 #include "UserDataWriter.h"
 
 using namespace std;
@@ -46,7 +47,7 @@ KPartition::KPartition(partition_id id)
 	fPartitionData.child_count = 0;
 	fPartitionData.index = -1;
 	fPartitionData.status = B_PARTITION_UNRECOGNIZED;
-	fPartitionData.flags = 0;
+	fPartitionData.flags = B_PARTITION_BUSY | B_PARTITION_DESCENDANT_BUSY;
 	fPartitionData.volume = -1;
 	fPartitionData.name = NULL;
 	fPartitionData.content_name = NULL;
@@ -199,9 +200,9 @@ void
 KPartition::SetBusy(bool busy)
 {
 	if (busy)
-		fPartitionData.flags |= B_PARTITION_BUSY;
+		SetFlags(B_PARTITION_BUSY);
 	else
-		fPartitionData.flags &= ~(uint32)B_PARTITION_BUSY;
+		ClearFlags(B_PARTITION_BUSY);
 }
 
 // IsBusy
@@ -216,9 +217,9 @@ void
 KPartition::SetDescendantBusy(bool busy)
 {
 	if (busy)
-		fPartitionData.flags |= B_PARTITION_DESCENDANT_BUSY;
+		SetFlags(B_PARTITION_DESCENDANT_BUSY);
 	else
-		fPartitionData.flags &= ~(uint32)B_PARTITION_DESCENDANT_BUSY;
+		ClearFlags(B_PARTITION_DESCENDANT_BUSY);
 }
 
 // IsDescendantBusy
@@ -317,6 +318,20 @@ void
 KPartition::SetFlags(uint32 flags)
 {
 	fPartitionData.flags = flags;
+}
+
+// AddFlags
+void
+KPartition::AddFlags(uint32 flags)
+{
+	fPartitionData.flags |= flags;
+}
+
+// ClearFlags
+void
+KPartition::ClearFlags(uint32 flags)
+{
+	fPartitionData.flags &= ~flags;
 }
 
 // Flags
@@ -476,9 +491,9 @@ KPartition::SetVolumeID(dev_t volumeID)
 {
 	fPartitionData.volume = volumeID;
 	if (VolumeID() >= 0)
-		SetFlags(Flags() | B_PARTITION_MOUNTED);
+		AddFlags(B_PARTITION_MOUNTED);
 	else
-		SetFlags(Flags() & ~(uint32)B_PARTITION_MOUNTED);
+		ClearFlags(B_PARTITION_MOUNTED);
 }
 
 // VolumeID
@@ -538,7 +553,7 @@ KPartition::SetDevice(KDiskDevice *device)
 {
 	fDevice = device;
 	if (fDevice && fDevice->IsReadOnlyMedia())
-		SetFlags(Flags() | B_PARTITION_READ_ONLY);
+		AddFlags(B_PARTITION_READ_ONLY);
 }
 
 // Device
@@ -666,6 +681,23 @@ KPartition::CountDescendants() const
 	return count;
 }
 
+// VisitEachDescendant
+KPartition *
+KPartition::VisitEachDescendant(KPartitionVisitor *visitor)
+{
+	if (!visitor)
+		return NULL;
+	if (visitor->VisitPre(this))
+		return this;
+	for (int32 i = 0; KPartition *child = ChildAt(i); i++) {
+		if (KPartition *result = child->VisitEachDescendant(visitor))
+			return result;
+	}
+	if (visitor->VisitPost(this))
+		return this;
+	return NULL;	
+}
+
 // CreateShadowPartition
 status_t
 KPartition::CreateShadowPartition()
@@ -699,9 +731,9 @@ KPartition::SetDiskSystem(KDiskSystem *diskSystem)
 	if (fDiskSystem) {
 		fPartitionData.content_type = fDiskSystem->PrettyName();
 		if (fDiskSystem->IsFileSystem())
-			SetFlags(Flags() | B_PARTITION_FILE_SYSTEM);
+			AddFlags(B_PARTITION_FILE_SYSTEM);
 		else
-			SetFlags(Flags() | B_PARTITION_PARTITIONING_SYSTEM);
+			AddFlags(B_PARTITION_PARTITIONING_SYSTEM);
 	}
 }
 
@@ -826,10 +858,9 @@ KPartition::UninitializeContents(bool logChanges)
 		// status
 		SetStatus(B_PARTITION_UNINITIALIZED);
 		// flags
-		SetFlags(Flags() & ~uint32(B_PARTITION_FILE_SYSTEM
-								   | B_PARTITION_PARTITIONING_SYSTEM));
+		ClearFlags(B_PARTITION_FILE_SYSTEM | B_PARTITION_PARTITIONING_SYSTEM);
 		if (!Device()->IsReadOnlyMedia())
-			SetFlags(Flags() & ~(uint32)B_PARTITION_READ_ONLY);
+			ClearFlags(B_PARTITION_READ_ONLY);
 		// log changes
 		if (logChanges) {
 			Changed(flags, B_PARTITION_CHANGED_DEFRAGMENTATION

@@ -16,6 +16,7 @@ class UserDataWriter;
 
 class KDiskDevice;
 class KDiskSystem;
+class KPartitionVisitor;
 class KPhysicalPartition;
 class KShadowPartition;
 
@@ -70,6 +71,8 @@ public:
 	uint32 Status() const;
 	
 	void SetFlags(uint32 flags);	// comprises the ones below
+	void AddFlags(uint32 flags);
+	void ClearFlags(uint32 flags);
 	uint32 Flags() const;
 	bool ContainsFileSystem() const;
 	bool ContainsPartitioningSystem() const;
@@ -131,6 +134,8 @@ public:
 	KPartition *ChildAt(int32 index) const;
 	int32 CountChildren() const;
 	int32 CountDescendants() const;
+
+	KPartition *VisitEachDescendant(KPartitionVisitor *visitor);
 
 	// Shadow Partition
 
