@@ -86,7 +86,7 @@ void
 mp3Decoder::GetCodecInfo(media_codec_info &info)
 {
 	strcpy(info.short_name, "mp3");
-	strcpy(info.pretty_name, "MPEG 1/2.5 audio layer 1/2/3 decoder, based on mpeg123 mpglib");
+	strcpy(info.pretty_name, "MPEG 1/2/2.5 audio layer 1/2/3 decoder, based on mpeg123 mpglib");
 		// ToDo: could alter the above string depending on the real format
 }
 
@@ -356,14 +356,18 @@ mp3DecoderPlugin::RegisterDecoder()
 		B_MPEG_2_5_AUDIO_LAYER_2,
 		B_MPEG_2_5_AUDIO_LAYER_3,
 	};
-	const size_t numIDs = sizeof(ids) / sizeof(mpeg_id);
+	const size_t numIDs = 2 + sizeof(ids) / sizeof(mpeg_id);
 
 	media_format_description descriptions[numIDs];
-	for (size_t i = 0; i < numIDs; i++) {
+	descriptions[0].family = B_WAV_FORMAT_FAMILY;
+	descriptions[0].u.wav.codec = 0x0050;
+	descriptions[1].family = B_WAV_FORMAT_FAMILY;
+	descriptions[1].u.wav.codec = 0x0055;
+	for (size_t i = 2; i < numIDs; i++) {
 		descriptions[i].family = B_MPEG_FORMAT_FAMILY;
 		descriptions[i].u.mpeg.id = ids[i];
 	}
-
+ 
 	media_format format;
 	format.type = B_MEDIA_ENCODED_AUDIO;
 	format.u.encoded_audio = media_encoded_audio_format::wildcard;
