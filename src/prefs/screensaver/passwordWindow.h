@@ -15,12 +15,12 @@ class pwWindow : public BWindow
 		virtual void MessageReceived(BMessage *message);
 
 	private:
-		BRadioButton *useNetwork,*useCustom;
-		BBox *customBox;
-		BTextControl *password,*confirm;
-		BButton *cancel,*done;
-		BString thePassword; 
-		bool useNetPassword;
+		BRadioButton *fUseNetwork,*fUseCustom;
+		BBox *fCustomBox;
+		BTextControl *fPassword,*fConfirm;
+		BButton *fCancel,*fDone;
+		BString fThePassword; 
+		bool fUseNetPassword;
 
 };
 

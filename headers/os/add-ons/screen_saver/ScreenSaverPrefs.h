@@ -41,7 +41,8 @@ public:
 	void SetPassword(char *pw){strncpy(password,pw,B_PATH_NAME_LENGTH-1);}
 	void SetNetworkPassword(bool np) {isNetworkPWD=np;}
 	void SetModuleName(const char *mn) {strncpy(moduleName,mn,B_PATH_NAME_LENGTH-1);}
-	void SetState(BMessage *);
+	void SetState(BMessage *in) {stateMsg=*in;}
+	BMessage *GetSettings(void);
 	void SaveSettings (void);
 private:
 	bool parseSettings(BMessage *newSSMessage);
@@ -60,7 +61,7 @@ private:
 	bool isNetworkPWD;
 
 	char moduleName[B_PATH_NAME_LENGTH];
-	BMessage stateMsg;
+	BMessage stateMsg, msg;
 };
 
 

@@ -69,8 +69,6 @@ filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
 	lastEventTime=real_time_clock();
 	if (msg->what==B_SCREEN_CHANGED)
 		UpdateRectangles();
-	else if (enabled)
-			Banish();
 	else if (msg->what==B_MOUSE_MOVED) {
 		BPoint pos;
 		msg->FindPoint("where",&pos);
@@ -82,9 +80,13 @@ filter_result SSISFilter::Filter(BMessage *msg,BList *outList) {
 			Cornered(DOWNLEFT);
 		else if (bottomRight.Contains(pos)) 
 			Cornered(DOWNRIGHT);
-		else
+		else {
 			Cornered(NONE);
+			Banish();
+			}
 		}
+	else
+		Banish();
 }
 
 SSISFilter::~SSISFilter() {

@@ -15,59 +15,70 @@
 
 // Start the server application. Set pulse to fire once per second.
 // Run until the application quits.
-int main(int, char**) {	
+int main(int, char**) 
+{	
 	ScreenSaverApp myApplication;
 	myApplication.Run();
 	return(0);
 }
 
 // Construct the server app. Doesn't do much, at this point.
-ScreenSaverApp::ScreenSaverApp() : BApplication("application/x-vnd.OBOS-ScreenSaverApp"),win(NULL) {
-	blankTime=real_time_clock();
+ScreenSaverApp::ScreenSaverApp() : BApplication("application/x-vnd.OBOS-ScreenSaverApp"),fWin(NULL) 
+{
+	fBlankTime=real_time_clock();
 }
 
-void ScreenSaverApp::ReadyToRun(void) {
-	if (!pref.LoadSettings()) 
+
+void 
+ScreenSaverApp::ReadyToRun(void) 
+{
+	if (!fPref.LoadSettings()) 
 		exit(1);
 	else {	// If everything works OK, create a BDirectWindow and start the render thread.
 		BScreen theScreen(B_MAIN_SCREEN_ID);
-		win=new SSAwindow(theScreen.Frame());
-		pww=new pwWindow();
-		thrd=new ScreenSaverThread(win,win->view,&pref);
+		fWin=new SSAwindow(theScreen.Frame());
+		fPww=new pwWindow();
+		fThrd=new ScreenSaverThread(fWin,fWin->fView,&fPref);
 
-		saver=thrd->LoadAddOn();
-		if (!saver)
+		fSaver=fThrd->LoadAddOn();
+		if (!fSaver)
 			exit(1);
-		win->SetSaver(saver);
-		win->SetFullScreen(true);
-		win->Show();
-		threadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,thrd);
-		resume_thread(threadID);
+		fWin->SetSaver(fSaver);
+		fWin->SetFullScreen(true);
+		fWin->Show();
+		fThreadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,fThrd);
+		resume_thread(fThreadID);
 		HideCursor();
 		}
 }
 
-void ScreenSaverApp::ShowPW(void) {
-		win->Lock();
-		suspend_thread(threadID);
-		if (B_OK==win->SetFullScreen(false)) {
-			win->Sync();
+
+void 
+ScreenSaverApp::ShowPW(void) 
+{
+		fWin->Lock();
+		suspend_thread(fThreadID);
+		if (B_OK==fWin->SetFullScreen(false)) {
+			fWin->Sync();
 			ShowCursor();
-			pww->Show();
-			pww->Sync();
+			fPww->Show();
+			fPww->Sync();
 			}
-		win->Unlock();
+		fWin->Unlock();
 }
 
-void ScreenSaverApp::MessageReceived(BMessage *message) {
+
+void 
+ScreenSaverApp::MessageReceived(BMessage *message) 
+{
   switch(message->what) {
     case 'DONE':
-		if (strcmp(pww->GetPassword(),pref.Password())) {
+		if (strcmp(fPww->GetPassword(),fPref.Password())) {
 			beep();
-			pww->Hide();
-			win->SetFullScreen(true);
-			if (threadID)
-				resume_thread(threadID);
+			fPww->Hide();
+			fWin->SetFullScreen(true);
+			if (fThreadID)
+				resume_thread(fThreadID);
 			}
 			else  {
 				printf ("Quitting!\n");
@@ -75,7 +86,7 @@ void ScreenSaverApp::MessageReceived(BMessage *message) {
 			}
 		break;
     case 'MOO1':
-		if (real_time_clock()-blankTime>pref.PasswordTime())
+		if (real_time_clock()-fBlankTime>fPref.PasswordTime())
 			ShowPW();
 		else 
 			Quit();
@@ -85,11 +96,14 @@ void ScreenSaverApp::MessageReceived(BMessage *message) {
       	break;
   }
 }
-bool ScreenSaverApp::QuitRequested(void) {
-	if (threadID)
-		kill_thread(threadID);
-	if (thrd)
-		delete thrd;
+
+
+bool 
+ScreenSaverApp::QuitRequested(void) 
+{
+	if (fThreadID)
+		kill_thread(fThreadID);
+	if (fThrd)
+		delete fThrd;
 	return true;
 }
-

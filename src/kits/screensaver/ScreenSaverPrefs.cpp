@@ -7,11 +7,14 @@
 #include "String.h" // BString def
 #include <stdio.h>
 
-ScreenSaverPrefs::ScreenSaverPrefs(void)  {
+ScreenSaverPrefs::ScreenSaverPrefs(void)  
+{
 }
 
 // Load the flattened settings BMessage from disk and parse it.
-bool ScreenSaverPrefs::LoadSettings(void) {
+bool 
+ScreenSaverPrefs::LoadSettings(void) 
+{
 	bool ok;
 	char pathAndFile[B_PATH_NAME_LENGTH]; 
 	BPath path;
@@ -21,8 +24,7 @@ bool ScreenSaverPrefs::LoadSettings(void) {
 		strncpy(pathAndFile,path.Path(),B_PATH_NAME_LENGTH-1);
 		strncat(pathAndFile,"/ScreenSaver_settings",B_PATH_NAME_LENGTH-1);
 		BFile ssSettings(pathAndFile,B_READ_ONLY);
-		if (B_OK==ssSettings.InitCheck())
-			{ // File exists. Unflatten the message and call the settings parser.
+		if (B_OK==ssSettings.InitCheck()) { // File exists. Unflatten the message and call the settings parser.
 			BMessage settings;
 			settings.Unflatten(&ssSettings);
 			ok=parseSettings (&settings);
@@ -31,13 +33,19 @@ bool ScreenSaverPrefs::LoadSettings(void) {
 	return ok;		
 }
 
-void setOnValue(BMessage *msg, char *name, int &result) {
+
+void 
+setOnValue(BMessage *msg, char *name, int &result) 
+{
 	int32 value;
 	if (B_OK == msg->FindInt32(name,&value)) // If screen saving is even enabled
 		result=value;
 }
 
-bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
+
+bool 
+ScreenSaverPrefs::parseSettings (BMessage *msg) 
+{
 	int temp;
 	const char *strPtr;
 	char pathAndFile[B_PATH_NAME_LENGTH]; 
@@ -77,12 +85,11 @@ bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
 						if ((start=strstr(buffer,"PASSWORD =")))
 							strncpy(password, start+10,strlen(start-11));
 				}
-			}
-		else {
+		} else {
 			msg->FindString("lockpassword",&strPtr);
 			if (strPtr)
 				strncpy(password,strPtr,B_PATH_NAME_LENGTH-1);
-			}
+		}
 	} else 
 		password[0]='\0';
 	if (B_OK != msg->FindString("modulename",&strPtr)) 
@@ -94,11 +101,13 @@ bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
 	BString stateMsgName("modulesettings_");
 	stateMsgName+=moduleName;
 	msg->FindMessage(stateMsgName.String(),&stateMsg); // Doesn't matter if it fails - stateMsg would just continue to be empty
-
 	return true;
 }
 
-BMessage *ScreenSaverPrefs::GetSettings (void) {
+
+BMessage *
+ScreenSaverPrefs::GetSettings (void) 
+{
 	msg.MakeEmpty();
 	msg.AddRect("windowframe",windowFrame);
 	msg.AddInt32("windowtab",windowTab);
@@ -118,7 +127,10 @@ BMessage *ScreenSaverPrefs::GetSettings (void) {
 	return &msg;
 }
 
-void ScreenSaverPrefs::SaveSettings (void) {
+
+void 
+ScreenSaverPrefs::SaveSettings (void) 
+{
 	GetSettings();
   	BPath path;
   	find_directory(B_USER_SETTINGS_DIRECTORY,&path);

@@ -7,8 +7,9 @@ public:
 	~SSAwindow();
 	virtual bool QuitRequested();
 	virtual void DirectConnected(direct_buffer_info *info);
-	BView *view;
-	void SetSaver(BScreenSaver *s) {saver=s;}
+	void SetSaver(BScreenSaver *s) {fSaver=s;}
+
+	BView *fView;
 private:
-	BScreenSaver *saver;
+	BScreenSaver *fSaver;
 };

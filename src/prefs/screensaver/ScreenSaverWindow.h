@@ -12,27 +12,27 @@ class PreviewView;
 class ScreenSaverWin: public BWindow {
 public:
 	ScreenSaverWin(void) : BWindow(BRect(50,50,500,385),"OBOS Screen Saver Preferences",B_TITLED_WINDOW,B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE) , 
-	fadeState(0),noFadeState(0), 
-	sampleView(NULL), 
-	tab1(NULL),tab2(NULL), 
-		tabView(NULL), ModuleSettingsBox(NULL),
-		previewDisplay(NULL), ListView1(NULL), 
-		AddonList(NULL), SelectedAddonFileName(NULL), 
-		currentAddon(NULL), TestButton(NULL), 
-		AddButton(NULL), EnableScreenSaverBox(NULL), 
-		PasswordSlider(NULL), TurnOffSlider(NULL),
-		RunSlider(NULL), StringView1(NULL), 
-		EnableCheckbox(NULL), PasswordCheckbox(NULL), 
-		TurnOffScreenCheckBox(NULL),
-		TurnOffMinutes(NULL), RunMinutes(NULL), 
-		PasswordMinutes(NULL), PasswordButton(NULL), 
-		FadeNowString(NULL),
-		FadeNowString2(NULL), 
-		DontFadeString(NULL), DontFadeString2(NULL), 
-		fadeNow(NULL),fadeNever(NULL),
-		pwWin(NULL), 
-		pwMessenger(NULL), filePanel(NULL) ,
-		settingsArea(NULL) {
+	fFadeState(0),fNoFadeState(0), 
+	fSampleView(NULL), 
+	fTab1(NULL),fTab2(NULL), 
+		fTabView(NULL), fModuleSettingsBox(NULL),
+		fPreviewDisplay(NULL), fListView1(NULL), 
+		fAddonList(NULL), fSelectedAddonFileName(NULL), 
+		fCurrentAddon(NULL), fTestButton(NULL), 
+		fAddButton(NULL), fEnableScreenSaverBox(NULL), 
+		fPasswordSlider(NULL), fTurnOffSlider(NULL),
+		fRunSlider(NULL), fStringView1(NULL), 
+		fEnableCheckbox(NULL), fPasswordCheckbox(NULL), 
+		fTurnOffScreenCheckBox(NULL),
+		fTurnOffMinutes(NULL), fRunMinutes(NULL), 
+		fPasswordMinutes(NULL), fPasswordButton(NULL), 
+		fFadeNowString(NULL),
+		fFadeNowString2(NULL), 
+		fDontFadeString(NULL), fDontFadeString2(NULL), 
+		fFadeNow(NULL),fFadeNever(NULL),
+		fPwWin(NULL), 
+		fPwMessenger(NULL), fFilePanel(NULL) ,
+		fSettingsArea(NULL) {
 	SetupForm();
 	}
 	virtual void MessageReceived(BMessage *message);
@@ -48,46 +48,46 @@ private:
 	void updateStatus(void);
 	void SaverSelected(void);
 
-	ScreenSaverPrefs prefs;
-	int fadeState,noFadeState;
-	BView *sampleView;
+	ScreenSaverPrefs fPrefs;
+	int fFadeState,fNoFadeState;
+	BView *fSampleView;
   
-	BView *tab1,*tab2;
-	BTabView *tabView;
-	BBox *ModuleSettingsBox;
+	BView *fTab1,*fTab2;
+	BTabView *fTabView;
+	BBox *fModuleSettingsBox;
 
-	PreviewView *previewDisplay;
-	BListView *ListView1;
-	BList *AddonList;
-	BString SelectedAddonFileName;
-	image_id currentAddon;
+	PreviewView *fPreviewDisplay;
+	BListView *fListView1;
+	BList *fAddonList;
+	BString fSelectedAddonFileName;
+	image_id fCurrentAddon;
   
-	BButton *TestButton;
-	BButton *AddButton;
-	BBox *EnableScreenSaverBox;
-	BSlider *PasswordSlider;
-	BSlider *TurnOffSlider;
-	BSlider *RunSlider;
-	BStringView *StringView1;
-	BCheckBox *EnableCheckbox;
-	BCheckBox *PasswordCheckbox;
-	BCheckBox *TurnOffScreenCheckBox;
-	BStringView *TurnOffMinutes;
-	BStringView *RunMinutes;
-	BStringView *PasswordMinutes;
-	BButton *PasswordButton;
-	BStringView *FadeNowString;
-	BStringView *FadeNowString2;
-	BStringView *DontFadeString;
-	BStringView *DontFadeString2;
-	BPicture samplePicture;
-	MouseAreaView *fadeNow,*fadeNever;
-	pwWindow *pwWin;
-	BMessenger *pwMessenger;
+	BButton *fTestButton;
+	BButton *fAddButton;
+	BBox *fEnableScreenSaverBox;
+	BSlider *fPasswordSlider;
+	BSlider *fTurnOffSlider;
+	BSlider *fRunSlider;
+	BStringView *fStringView1;
+	BCheckBox *fEnableCheckbox;
+	BCheckBox *fPasswordCheckbox;
+	BCheckBox *fTurnOffScreenCheckBox;
+	BStringView *fTurnOffMinutes;
+	BStringView *fRunMinutes;
+	BStringView *fPasswordMinutes;
+	BButton *fPasswordButton;
+	BStringView *fFadeNowString;
+	BStringView *fFadeNowString2;
+	BStringView *fDontFadeString;
+	BStringView *fDontFadeString2;
+	BPicture fSamplePicture;
+	MouseAreaView *fFadeNow,*fFadeNever;
+	pwWindow *fPwWin;
+	BMessenger *fPwMessenger;
   
-	BMessage settings;
-	BFilePanel *filePanel;
-	BView *settingsArea;
+	BMessage fSettings;
+	BFilePanel *fFilePanel;
+	BView *fSettingsArea;
 };
 
 #endif // _ScreenSaver_H

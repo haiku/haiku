@@ -12,13 +12,13 @@ public:
 	~PreviewView();
 	void Draw(BRect update); 
 	void SetScreenSaver(BString name);
-	BScreenSaver *ScreenSaver(void) {return saver;}	
+	BScreenSaver *ScreenSaver(void) {return fSaver;}	
 private:	
-	BScreenSaver* saver;
-	BView *configView;
-	ScreenSaverThread *sst;
-	thread_id threadID;
-	ScreenSaverPrefs *prefPtr;
+	BScreenSaver* fSaver;
+	BView *fConfigView;
+	ScreenSaverThread *fSst;
+	thread_id fThreadID;
+	ScreenSaverPrefs *fPrefPtr;
 	
 }; // end class PreviewView
 

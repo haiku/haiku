@@ -9,53 +9,67 @@
 #include <Screen.h>
 #include <String.h>
 
-inline BPoint scaleDirect(float x, float y,BRect area) {
-	return BPoint(area.Width()*x+area.left,area.Height()*y+area.top);
+static float sampleX[]= {0,.05,.15,.7,.725,.8,.825,.85,.950,1.0};
+static float sampleY[]= {0,.05,.90,.95,.966,.975,1.0};
+inline BPoint 
+scale2(int x, int y,BRect area) 
+{ 
+	return scaleDirect(sampleX[x],sampleY[y],area); 
 }
 
-inline BRect scaleDirect (float x1,float x2,float y1,float y2,BRect area) {
-	return BRect(area.Width()*x1+area.left,area.Height()*y1+area.top, area.Width()*x2+area.left,area.Height()*y2+area.top);
+
+inline BRect 
+scale2(int x1, int x2, int y1, int y2,BRect area) 
+{ 
+	return scaleDirect(sampleX[x1],sampleX[x2],sampleY[y1],sampleY[y2],area); 
 }
 
-float sampleX[]= {0,.05,.15,.7,.725,.8,.825,.85,.950,1.0};
-float sampleY[]= {0,.05,.90,.95,.966,.975,1.0};
-inline BPoint scale2(int x, int y,BRect area) { return scaleDirect(sampleX[x],sampleY[y],area); }
-inline BRect scale2(int x1, int x2, int y1, int y2,BRect area) { return scaleDirect(sampleX[x1],sampleX[x2],sampleY[y1],sampleY[y2],area); }
 
 PreviewView::PreviewView(BRect frame, const char *name,ScreenSaverPrefs *prefp)
 : BView (frame,name,B_FOLLOW_NONE,B_WILL_DRAW),
-  saver (NULL),configView(NULL),sst(NULL),threadID(0),prefPtr(prefp) {
+  fSaver (NULL),fConfigView(NULL),fSst(NULL),fThreadID(-1),fPrefPtr(prefp) 
+{
 	SetViewColor(216,216,216);
 } 
 
-PreviewView::~PreviewView() {
-	if (threadID)
-		kill_thread(threadID);
+
+PreviewView::~PreviewView() 
+{
+	if (fThreadID>=0)
+		kill_thread(fThreadID);
 } 
 
-void PreviewView::SetScreenSaver(BString name) {
-	if (threadID)
-		kill_thread(threadID);
-	if (sst)
-		delete sst;
-	if (configView) {
-		RemoveChild(configView);
-		delete configView;
-		}
 
-	configView=new BView(scale2(1,8,1,2,Bounds()),"previewArea",B_FOLLOW_NONE,B_WILL_DRAW);
-	configView->SetViewColor(0,0,0);
-	AddChild(configView);
-
-	sst=new ScreenSaverThread(Window(),configView,prefPtr);
-	saver=sst->LoadAddOn();
-	if (saver) {
-		threadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,sst);
-		resume_thread(threadID); 
+void 
+PreviewView::SetScreenSaver(BString name) 
+{
+	if (fThreadID>=0) {
+		kill_thread(fThreadID);
+		fThreadID=-1;
 	}
+	if (fSst)
+		delete fSst;
+	if (fConfigView) {
+		RemoveChild(fConfigView);
+		delete fConfigView;
+	}
+
+	fConfigView=new BView(scale2(1,8,1,2,Bounds()),"previewArea",B_FOLLOW_NONE,B_WILL_DRAW);
+	fConfigView->SetViewColor(0,0,0);
+	AddChild(fConfigView);
+
+	fSst=new ScreenSaverThread(Window(),fConfigView,fPrefPtr);
+	fSaver=fSst->LoadAddOn();
+	if (fSaver) {
+		fThreadID=spawn_thread(threadFunc,"ScreenSaverRenderer",0,fSst);
+		resume_thread(fThreadID); 
+	}
+	
 }
 
-void PreviewView::Draw(BRect update) {
+void 
+PreviewView::Draw(BRect update) 
+{
 	SetViewColor(216,216,216);
 
 	SetHighColor(184,184,184);
@@ -65,8 +79,7 @@ void PreviewView::Draw(BRect update) {
 	SetHighColor(96,96,96);
 	StrokeRoundRect(scale2(2,7,3,6,Bounds()),2,2);// control console outline
 	StrokeRoundRect(scale2(0,9,0,3,Bounds()),4,4); // Outline outer shape
-	SetHighColor(black);
-//	FillRoundRect(scale2(1,8,1,2,Bounds()),4,4);// Screen itself
+	SetHighColor(kBlack);
 
 	SetHighColor(184,184,184);
 	BRect outerShape=scale2(2,7,2,6,Bounds());

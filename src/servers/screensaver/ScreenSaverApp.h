@@ -19,14 +19,14 @@ public:
 	virtual void MessageReceived(BMessage *message);
 	void ShowPW(void);
 private:
-	ScreenSaverPrefs pref;
-	SSAwindow *win;
-	BScreenSaver *saver;
-	ScreenSaverThread *thrd;
-	pwWindow *pww;
+	ScreenSaverPrefs fPref;
+	SSAwindow *fWin;
+	BScreenSaver *fSaver;
+	ScreenSaverThread *fThrd;
+	pwWindow *fPww;
 
-	thread_id threadID;
-	uint32 blankTime;
+	thread_id fThreadID;
+	uint32 fBlankTime;
 
 };
 
