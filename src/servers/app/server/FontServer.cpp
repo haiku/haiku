@@ -452,6 +452,14 @@ bool FontServer::SetSystemPlain(const char *family, const char *style, float siz
 	return true;
 }
 
+/*!
+	\brief Sets the system's bold font to the specified family and style
+	\param family Name of the font's family
+	\param style Name of the style desired
+	\param size Size desired
+	\return true if successful, false if not.
+	
+*/
 bool FontServer::SetSystemBold(const char *family, const char *style, float size)
 {
 	FontFamily *fam=_FindFamily(family);
@@ -467,6 +475,14 @@ bool FontServer::SetSystemBold(const char *family, const char *style, float size
 	return true;
 }
 
+/*!
+	\brief Sets the system's fixed font to the specified family and style
+	\param family Name of the font's family
+	\param style Name of the style desired
+	\param size Size desired
+	\return true if successful, false if not.
+	
+*/
 bool FontServer::SetSystemFixed(const char *family, const char *style, float size)
 {
 	FontFamily *fam=_FindFamily(family);
