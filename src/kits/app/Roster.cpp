@@ -26,6 +26,7 @@
 //					Global be_roster represents the default BRoster.
 //					app_info structure provides info for a running app.
 //------------------------------------------------------------------------------
+#include <new.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -43,12 +44,22 @@ enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
+//static char _GlobalRoster[sizeof(BRoster)];
+
 // _init_roster_
 int
 _init_roster_()
 {
-	// TODO: What is this function supposed to do?
-	return 0; // not implemented
+	be_roster = new BRoster;
+	return 0;
+}
+
+// _delete_roster_
+int
+_delete_roster_()
+{
+	delete be_roster;
+	return 0;
 }
 
 // constructor
@@ -480,8 +491,5 @@ DBG(OUT("BRoster::InitMessengers() done\n"));
 /*-----------------------------------------------------*/
 /*----- Global be_roster ------------------------------*/
 
-// TODO: Rethink this strategy. BRoster::InitMessengers() relies on BMessage,
-// more precisely the reply ports being initialized.
-static const BRoster _GlobalRoster;
-const BRoster *be_roster = &_GlobalRoster;
+const BRoster *be_roster;
 

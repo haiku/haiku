@@ -40,6 +40,7 @@ class BMessage;
 class BNodeInfo;
 
 extern "C" int	_init_roster_();
+extern "C" int	_delete_roster_();
 
 /*-------------------------------------------------------------*/
 /* --------- app_info Struct and Values ------------------------ */
