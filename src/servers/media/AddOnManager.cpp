@@ -103,8 +103,14 @@ AddOnManager::GetDecoderForFormat(xfer_entry_ref *_decoderRef,
 		|| format.type == B_MEDIA_MULTISTREAM)
 		&& format.Encoding() == 0)
 		return B_MEDIA_BAD_FORMAT;
+	if (format.type == B_MEDIA_NO_TYPE
+		|| format.type == B_MEDIA_UNKNOWN_TYPE)
+		return B_MEDIA_BAD_FORMAT;
+
 
 	BAutolock locker(fLock);
+
+	printf("AddOnManager::GetDecoderForFormat: searching decoder for encoding %ld\n", format.Encoding());
 
 	decoder_info *info;
 	for (fDecoderList.Rewind(); fDecoderList.GetNext(&info);) {
