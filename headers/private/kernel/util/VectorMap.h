@@ -28,12 +28,12 @@
 #ifndef _VECTOR_MAP_H
 #define _VECTOR_MAP_H
 
-#include <new>
 #include <stdlib.h>
 #include <string.h>
 
 #include <SupportDefs.h>
 
+#include <util/kernel_cpp.h>
 #include <KernelUtilsOrder.h>
 #include <Vector.h>
 

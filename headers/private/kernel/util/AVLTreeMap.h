@@ -28,9 +28,9 @@
 #ifndef _AVL_TREE_MAP_H
 #define _AVL_TREE_MAP_H
 
-#include <new>
 
 #include <OS.h>
+#include <util/kernel_cpp.h>
 
 #include "MallocFreeAllocator.h"
 

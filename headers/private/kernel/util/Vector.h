@@ -28,11 +28,11 @@
 #ifndef _VECTOR_H
 #define _VECTOR_H
 
-#include <new>
 #include <stdlib.h>
 #include <string.h>
 
 #include <SupportDefs.h>
+#include <util/kernel_cpp.h>
 
 template<typename Value> class VectorIterator;
 

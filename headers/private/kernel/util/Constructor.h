@@ -1,7 +1,7 @@
 #ifndef _CONSTRUCTOR_H_
 #define _CONSTRUCTOR_H_
 
-#include <new>
+#include <util/kernel_cpp.h>
 
 template <class DataType>
 class Constructor {
