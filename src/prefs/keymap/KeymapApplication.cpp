@@ -4,7 +4,7 @@
 #include <storage/Directory.h>
 #if DEBUG
 	#include <interface/Input.h>
-	#include <iostream.h>
+	#include <stdio.h>
 #endif //DEBUG
 #include "KeymapWindow.h"
 #include "KeymapApplication.h"
@@ -65,7 +65,7 @@ BList*	KeymapApplication::EntryList( char *directoryPath )
 			#if DEBUG
 				char	name[B_FILE_NAME_LENGTH];
 				currentEntry->GetName( name );
-				cout << "Found: " << name << endl;
+				printf("Found: %s\n",name);
 			#endif //DEBUG
 		}
 	else {

@@ -8,14 +8,12 @@
 #include <interface/Alert.h>
 #include <interface/Box.h>
 #ifdef DEBUG
-	#include <iostream.h>
+	#include <stdio.h>
 #endif //DEBUG
 #include "KeymapWindow.h"
 #include "KeymapListItem.h"
 #include "KeymapApplication.h"
 #include "messages.h"
-
-#include <iostream.h>
 
 KeymapWindow::KeymapWindow( BRect frame )
 	:	BWindow( frame, WINDOW_TITLE, B_TITLED_WINDOW,
@@ -228,7 +226,7 @@ BList* KeymapWindow::ListItemsFromEntryList( BList * entryList)
 		
 		#ifdef DEBUG
 			currentEntry->GetName( name );
-			cout << "New list item: " << name << endl;
+			printf("New list item: %s\n",name);
 		#endif //DEBUG
 	}
 
@@ -297,7 +295,7 @@ void KeymapWindow::MessageReceived( BMessage* message )
 void KeymapWindow::HandleSystemMapSelected( BMessage *selectionMessage )
 {
 	#if DEBUG
-		cout << "System map selected" << endl;
+		printf("System map selected\n");
 	#endif //DEBUG
 	HandleMapSelected( selectionMessage, fSystemListView, fUserListView );
 }
@@ -305,7 +303,7 @@ void KeymapWindow::HandleSystemMapSelected( BMessage *selectionMessage )
 void KeymapWindow::HandleUserMapSelected( BMessage *selectionMessage )
 {
 	#if DEBUG
-		cout << "User map selected" << endl;
+		printf("User map selected\n");
 	#endif //DEBUG
 	HandleMapSelected( selectionMessage, fUserListView, fSystemListView );
 }
@@ -320,7 +318,7 @@ void KeymapWindow::HandleMapSelected( BMessage *selectionMessage,
 	index = selectedView->CurrentSelection( 0 );
 	if( index < 0 ) {
 		#if DEBUG
-			cout << "index<0; HandleMapSelected ends here." << endl;
+			printf("index<0; HandleMapSelected ends here.\n");
 	
 		#endif //DEBUG
 		return;
@@ -334,7 +332,7 @@ void KeymapWindow::HandleMapSelected( BMessage *selectionMessage,
 	#if DEBUG
 		char	name[B_FILE_NAME_LENGTH];
 		fSelectedMap->GetName( name );
-		cout << "fSelectedMap has been set to " << name << endl;
+		printf("fSelectedMap has been set to %s\n",name);
 	#endif //DEBUG
 
 	// Deselect item in other BListView
