@@ -1,3 +1,6 @@
 SubDir OBOS_TOP ;
 
+InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
+
 SubInclude OBOS_TOP src ;
+
