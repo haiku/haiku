@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -8,8 +8,18 @@
 #include "syscalls.h"
 
 
+// this call does not exist in BeOS R5
+#if 0
 status_t
-_get_team_usage_info(team_id tmid, int32 who, team_usage_info *ti, size_t size)
+wait_for_team(team_id team, status_t *_returnCode)
+{
+	return _kern_wait_for_team(team, _returnCode);
+}
+#endif
+
+
+status_t
+_get_team_usage_info(team_id team, int32 who, team_usage_info *ti, size_t size)
 {
 	// size is not yet used, but may if team_usage_info changes
 	(void)size;
@@ -20,28 +30,28 @@ _get_team_usage_info(team_id tmid, int32 who, team_usage_info *ti, size_t size)
 
 
 status_t
-kill_team(team_id team)  
+kill_team(team_id team)
 {
-	return sys_kill_team(team);
+	return _kern_kill_team(team);
 }
 
 
 status_t
 _get_team_info(team_id team, team_info *info, size_t size)
 {
-	// size is not yet used, but may if team_info changes
-	(void)size;
+	if (info == NULL || size != sizeof(team_info))
+		return B_BAD_VALUE;
 
-	return sys_get_team_info(team, info);
+	return _kern_get_team_info(team, info);
 }
 
 
 status_t
 _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 {
-	// size is not yet used, but may if team_info changes
-	(void)size;
+	if (info == NULL || size != sizeof(team_info))
+		return B_BAD_VALUE;
 
-	return sys_get_next_team_info(cookie, info);
+	return _kern_get_next_team_info(cookie, info);
 }
 
