@@ -53,6 +53,8 @@
 #endif
 #include <fs_info.h>
 
+#define MAX_SYM_LINKS 16
+
 // Passed in buffers from user-space shouldn't be in the kernel
 #define CHECK_USER_ADDRESS(x) \
 	((addr)(x) < KERNEL_BASE || (addr)(x) > KERNEL_TOP)
@@ -560,30 +562,14 @@ entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode
 
 
 static int
-path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
+vnode_path_to_vnode(struct vnode *vnode, char *path, struct vnode **_vnode, int count)
 {
-	struct vnode *vnode;
-	int err = 0;
+	int status = 0;
 
 	if (!path)
 		return EINVAL;
 
-	// figure out if we need to start at root or at cwd
-	if (*path == '/') {
-		while (*++path == '/')
-			;
-		vnode = root_vnode;
-		inc_vnode_ref_count(vnode);
-	} else {
-		struct io_context *context = get_current_io_context(kernel);
-
-		mutex_lock(&context->io_mutex);
-		vnode = context->cwd;
-		inc_vnode_ref_count(vnode);
-		mutex_unlock(&context->io_mutex);
-	}
-
-	for (;;) {
+	while (true) {
 		struct vnode *nextVnode;
 		vnode_id vnodeID;
 		char *nextPath;
@@ -592,10 +578,8 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 		PRINT(("path_to_vnode: top of loop. p = %p, *p = %c, p = '%s'\n", path, *path, path));
 
 		// done?
-		if (*path == '\0') {
-			err = 0;
+		if (*path == '\0')
 			break;
-		}
 
 		// walk to find the next path component ("path" will point to a single
 		// path component), and filter out multiple slashes
@@ -620,30 +604,24 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 		}
 
 		// tell the filesystem to get the vnode of this path component
-		err = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
-		if (err < 0) {
+		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
+		if (status < 0) {
 			put_vnode(vnode);
-			goto out;
+			return status;
 		}
 
-		if (S_ISLNK(type)) {
-			// ToDo: we have to resolve the link here
-			nextVnode = NULL;
-		} else {
-			// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
-			// from inside the filesystem, thus the vnode would have to be in the list and it's
-			// ref count incremented at this point
-			mutex_lock(&vfs_vnode_mutex);
-			nextVnode = lookup_vnode(vnode->fs_id, vnodeID);
-			mutex_unlock(&vfs_vnode_mutex);
-		}
+		// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
+		// from inside the filesystem, thus the vnode would have to be in the list and it's
+		// ref count incremented at this point
+		mutex_lock(&vfs_vnode_mutex);
+		nextVnode = lookup_vnode(vnode->fs_id, vnodeID);
+		mutex_unlock(&vfs_vnode_mutex);
 
 		if (!nextVnode) {
 			// pretty screwed up here
 			panic("path_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, vnodeID);
-			err = ERR_VFS_PATH_NOT_FOUND;
 			put_vnode(vnode);
-			goto out;
+			return ERR_VFS_PATH_NOT_FOUND;
 		}
 
 		// decrease the ref count on the old dir we just looked up into
@@ -651,6 +629,39 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 
 		path = nextPath;
 		vnode = nextVnode;
+
+		// If the new node is a symbolic link, resolve it
+		if (S_ISLNK(type)) {
+			char *buffer;
+
+			if (count + 1 > MAX_SYM_LINKS) {
+				put_vnode(vnode);
+				return B_LINK_LIMIT;
+			}
+
+			buffer = kmalloc(SYS_MAX_PATH_LEN);
+			if (buffer == NULL) {
+				put_vnode(vnode);
+				return B_NO_MEMORY;
+			}
+			
+			status = FS_CALL(vnode,fs_read_link)(vnode->mount->cookie, vnode->private_node, buffer, SYS_MAX_PATH_LEN);
+			if (status < B_OK) {
+				put_vnode(vnode);
+				kfree(buffer);
+				return status;
+			}
+			
+			status = vnode_path_to_vnode(vnode, buffer, &nextVnode, count + 1);
+
+			put_vnode(vnode);
+			kfree(buffer);
+			
+			if (status < B_OK)
+				return status;
+
+			vnode = nextVnode;
+		}
 
 		// see if we hit a mount point
 		if (vnode->covered_by) {
@@ -662,9 +673,36 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 	}
 
 	*_vnode = vnode;
+	return B_OK;
+}
 
-out:
-	return err;
+
+static int
+path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
+{
+	struct vnode *start;
+	int linkCount = 0;
+	int status = 0;
+
+	if (!path)
+		return EINVAL;
+
+	// figure out if we need to start at root or at cwd
+	if (*path == '/') {
+		while (*++path == '/')
+			;
+		start = root_vnode;
+		inc_vnode_ref_count(start);
+	} else {
+		struct io_context *context = get_current_io_context(kernel);
+
+		mutex_lock(&context->io_mutex);
+		start = context->cwd;
+		inc_vnode_ref_count(start);
+		mutex_unlock(&context->io_mutex);
+	}
+
+	return vnode_path_to_vnode(start, path, _vnode, 0);
 }
 
 
@@ -1756,7 +1794,7 @@ dir_create_entry_ref(fs_id fsID, vnode_id parentID, const char *name, int perms,
 	vnode_id newID;
 	int status;
 
-	FUNCTION(("dir_create_entry_ref(dev = %ld, ino = %Ld, name = '%s', perms = %d)\n", fdID, parentID, name, perms));
+	FUNCTION(("dir_create_entry_ref(dev = %d, ino = %Ld, name = '%s', perms = %d)\n", fsID, parentID, name, perms));
 	
 	status = get_vnode(fsID, parentID, &vnode, kernel);
 	if (status < B_OK)
