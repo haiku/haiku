@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kernel boot loader ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ;
+# SubDirHdrs $(OBOS_TOP) src add-ons kernel partitioning_systems amiga ;
 UsePrivateHeaders [ FDirName kernel boot platform $(OBOS_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName storage ] ;
@@ -11,6 +11,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 		BOOT_SUPPORT_PARTITION_AMIGA
 		BOOT_SUPPORT_PARTITION_APPLE
 		BOOT_SUPPORT_PARTITION_INTEL
+
+		BOOT_SUPPORT_FILE_SYSTEM_BFS
 		;
 
 	defines = [ FDefines $(defines) ] ;
@@ -21,15 +23,10 @@ UsePrivateHeaders [ FDirName storage ] ;
 KernelStaticLibrary boot_loader :
 	main.cpp
 	vfs.cpp
+	RootFileSystem.cpp
 	partitions.cpp
 	heap.cpp
 	stdio.cpp
-
-	# partition modules
-	amiga_rdb.cpp
-	apple.cpp
-	intel.cpp
-	PartitionMap.cpp
 
 	# utils
 	list.c
@@ -38,18 +35,16 @@ KernelStaticLibrary boot_loader :
 	-fno-builtin
 	;
 
-# The following is a try to make the actual partition support
-# really configurable somewhere and let the build independent
-# from it:
+# The partition support is built in an extra static library
+# so that only the ones that are used will be included.
 
-#local boot_partition_support =
-#	amiga_rdb.cpp
-#	;
-#
-#KernelStaticLibrary boot_loader_partition :
-#	$(boot_partition_support)
-#	:
-#	;
+KernelStaticLibrary boot_partitions :
+	amiga_rdb.cpp
+	apple.cpp
+	intel.cpp
+	PartitionMap.cpp
+	:
+	;
 
 # Tell Jam where to find the utility sources
 SEARCH on [ FGristFiles kernel_cpp.cpp list.c ]
@@ -67,5 +62,5 @@ SEARCH on [ FGristFiles intel.cpp PartitionMap.cpp ]
 SEARCH on [ FGristFiles stage2_crt0.S ]
     = [ FDirName $(OBOS_TOP) src kernel boot arch $(OBOS_ARCH) ] ;
 
-# SubInclude OBOS_TOP src kernel boot loader partition ;
 
+SubInclude OBOS_TOP src kernel boot loader file_systems ;
