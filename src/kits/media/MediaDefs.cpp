@@ -173,20 +173,451 @@ media_encoded_video_format media_encoded_video_format::wildcard = {{0}};
 media_multistream_format media_multistream_format::wildcard = {0};
 
 /*************************************************************
+ * helper functions for media_format::Matches()
+ *************************************************************/
+
+static bool raw_audio_format_matches(const media_raw_audio_format &a, const media_raw_audio_format &b);
+static bool multi_audio_info_matches(const media_multi_audio_info &a, const media_multi_audio_info &b);
+static bool multi_audio_format_matches(const media_multi_audio_format &a, const media_multi_audio_format &b);
+static bool raw_video_format_matches(const media_raw_video_format &a, const media_raw_video_format &b);
+static bool multistream_format_matches(const media_multistream_format &a, const media_multistream_format &b);
+static bool encoded_audio_format_matches(const media_encoded_audio_format &a, const media_encoded_audio_format &b);
+static bool encoded_video_format_matches(const media_encoded_video_format &a, const media_encoded_video_format &b);
+
+static bool
+raw_audio_format_matches(const media_raw_audio_format &a, const media_raw_audio_format &b)
+{
+	if (a.frame_rate != 0 && b.frame_rate != 0 && a.frame_rate != b.frame_rate)
+		return false;
+	if (a.channel_count != 0 && b.channel_count != 0 && a.channel_count != b.channel_count)
+		return false;
+	if (a.format != 0 && b.format != 0 && a.format != b.format)
+		return false;
+	if (a.byte_order != 0 && b.byte_order != 0 && a.byte_order != b.byte_order)
+		return false;
+	if (a.buffer_size != 0 && b.buffer_size != 0 && a.buffer_size != b.buffer_size)
+		return false;
+	if (a.frame_rate != 0 && b.frame_rate != 0 && a.frame_rate != b.frame_rate)
+		return false;
+	return true;
+}
+
+static bool
+multi_audio_info_matches(const media_multi_audio_info &a, const media_multi_audio_info &b)
+{
+	if (a.channel_mask != 0 && b.channel_mask != 0 && a.channel_mask != b.channel_mask)
+		return false;
+	if (a.valid_bits != 0 && b.valid_bits != 0 && a.valid_bits != b.valid_bits)
+		return false;
+	if (a.matrix_mask != 0 && b.matrix_mask != 0 && a.matrix_mask != b.matrix_mask)
+		return false;
+	return true;
+}
+
+static bool
+multi_audio_format_matches(const media_multi_audio_format &a, const media_multi_audio_format &b)
+{
+	return raw_audio_format_matches(a, b) && multi_audio_info_matches(a, b);
+}
+
+static bool
+raw_video_format_matches(const media_raw_video_format &a, const media_raw_video_format &b)
+{
+	if (a.field_rate != 0 && b.field_rate != 0 && a.field_rate != b.field_rate)
+		return false;
+	if (a.interlace != 0 && b.interlace != 0 && a.interlace != b.interlace)
+		return false;
+	if (a.first_active != 0 && b.first_active != 0 && a.first_active != b.first_active)
+		return false;
+	if (a.last_active != 0 && b.last_active != 0 && a.last_active != b.last_active)
+		return false;
+	if (a.orientation != 0 && b.orientation != 0 && a.orientation != b.orientation)
+		return false;
+	if (a.pixel_width_aspect != 0 && b.pixel_width_aspect != 0 && a.pixel_width_aspect != b.pixel_width_aspect)
+		return false;
+	if (a.pixel_height_aspect != 0 && b.pixel_height_aspect != 0 && a.pixel_height_aspect != b.pixel_height_aspect)
+		return false;
+	if (a.display.format != 0 && b.display.format != 0 && a.display.format != b.display.format)
+		return false;
+	if (a.display.line_width != 0 && b.display.line_width != 0 && a.display.line_width != b.display.line_width)
+		return false;
+	if (a.display.line_count != 0 && b.display.line_count != 0 && a.display.line_count != b.display.line_count)
+		return false;
+	if (a.display.bytes_per_row != 0 && b.display.bytes_per_row != 0 && a.display.bytes_per_row != b.display.bytes_per_row)
+		return false;
+	if (a.display.pixel_offset != 0 && b.display.pixel_offset != 0 && a.display.pixel_offset != b.display.pixel_offset)
+		return false;
+	if (a.display.line_offset != 0 && b.display.line_offset != 0 && a.display.line_offset != b.display.line_offset)
+		return false;
+	if (a.display.flags != 0 && b.display.flags != 0 && a.display.flags != b.display.flags)
+		return false;
+	return true;
+}
+
+static bool
+multistream_format_matches(const media_multistream_format &a, const media_multistream_format &b)
+{
+	if (a.avg_bit_rate != 0 && b.avg_bit_rate != 0 && a.avg_bit_rate != b.avg_bit_rate)
+		return false;
+	if (a.max_bit_rate != 0 && b.max_bit_rate != 0 && a.max_bit_rate != b.max_bit_rate)
+		return false;
+	if (a.avg_chunk_size != 0 && b.avg_chunk_size != 0 && a.avg_chunk_size != b.avg_chunk_size)
+		return false;
+	if (a.max_chunk_size != 0 && b.max_chunk_size != 0 && a.max_chunk_size != b.max_chunk_size)
+		return false;
+	if (a.flags != 0 && b.flags != 0 && a.flags != b.flags)
+		return false;
+	if (a.format != 0 && b.format != 0 && a.format != b.format)
+		return false;
+
+	if (a.format == 0 && b.format == 0)
+		return true; // XXX how do we compare two formats with no type?
+
+	switch ((a.format != 0) ? a.format : b.format) {
+		default:
+			return true; // XXX really?
+					
+		case media_multistream_format::B_VID:
+			if (a.u.vid.frame_rate != 0 && b.u.vid.frame_rate != 0 && a.u.vid.frame_rate != b.u.vid.frame_rate)
+				return false;
+			if (a.u.vid.width != 0 && b.u.vid.width != 0 && a.u.vid.width != b.u.vid.width)
+				return false;
+			if (a.u.vid.height != 0 && b.u.vid.height != 0 && a.u.vid.height != b.u.vid.height)
+				return false;
+			if (a.u.vid.space != 0 && b.u.vid.space != 0 && a.u.vid.space != b.u.vid.space)
+				return false;
+			if (a.u.vid.sampling_rate != 0 && b.u.vid.sampling_rate != 0 && a.u.vid.sampling_rate != b.u.vid.sampling_rate)
+				return false;
+			if (a.u.vid.sample_format != 0 && b.u.vid.sample_format != 0 && a.u.vid.sample_format != b.u.vid.sample_format)
+				return false;
+			if (a.u.vid.byte_order != 0 && b.u.vid.byte_order != 0 && a.u.vid.byte_order != b.u.vid.byte_order)
+				return false;
+			if (a.u.vid.channel_count != 0 && b.u.vid.channel_count != 0 && a.u.vid.channel_count != b.u.vid.channel_count)
+				return false;
+			return true;
+					
+		case media_multistream_format::B_AVI:
+			if (a.u.avi.us_per_frame != 0 && b.u.avi.us_per_frame != 0 && a.u.avi.us_per_frame != b.u.avi.us_per_frame)
+				return false;
+			if (a.u.avi.width != 0 && b.u.avi.width != 0 && a.u.avi.width != b.u.avi.width)
+				return false;
+			if (a.u.avi.height != 0 && b.u.avi.height != 0 && a.u.avi.height != b.u.avi.height)
+				return false;
+			if (a.u.avi.type_count != 0 && b.u.avi.type_count != 0 && a.u.avi.type_count != b.u.avi.type_count)
+				return false;
+			if (a.u.avi.types[0] != 0 && b.u.avi.types[0] != 0 && a.u.avi.types[0] != b.u.avi.types[0])
+				return false;
+			if (a.u.avi.types[1] != 0 && b.u.avi.types[1] != 0 && a.u.avi.types[1] != b.u.avi.types[1])
+				return false;
+			if (a.u.avi.types[2] != 0 && b.u.avi.types[2] != 0 && a.u.avi.types[2] != b.u.avi.types[2])
+				return false;
+			if (a.u.avi.types[3] != 0 && b.u.avi.types[3] != 0 && a.u.avi.types[3] != b.u.avi.types[3])
+				return false;
+			if (a.u.avi.types[4] != 0 && b.u.avi.types[4] != 0 && a.u.avi.types[4] != b.u.avi.types[4])
+				return false;
+			return true;
+	}
+}
+
+static bool
+encoded_audio_format_matches(const media_encoded_audio_format &a, const media_encoded_audio_format &b)
+{
+	if (!raw_audio_format_matches(a.output, b.output))
+		return false;
+	if (a.encoding != 0 && b.encoding != 0 && a.encoding != b.encoding)
+		return false;
+	if (a.bit_rate != 0 && b.bit_rate != 0 && a.bit_rate != b.bit_rate)
+		return false;
+	if (a.frame_size != 0 && b.frame_size != 0 && a.frame_size != b.frame_size)
+		return false;
+	if (!multi_audio_info_matches(a.multi_info, b.multi_info))
+		return false;
+		
+	if (a.encoding == 0 && b.encoding == 0)
+		return true; // can't compare
+		
+	switch((a.encoding != 0) ? a.encoding : b.encoding) {
+		case media_encoded_audio_format::B_ANY:
+		default:
+			return true;
+	}
+}
+
+static bool
+encoded_video_format_matches(const media_encoded_video_format &a, const media_encoded_video_format &b)
+{
+	if (!raw_video_format_matches(a.output, b.output))
+		return false;
+	if (a.encoding != 0 && b.encoding != 0 && a.encoding != b.encoding)
+		return false;
+
+	if (a.avg_bit_rate != 0 && b.avg_bit_rate != 0 && a.avg_bit_rate != b.avg_bit_rate)
+		return false;
+	if (a.max_bit_rate != 0 && b.max_bit_rate != 0 && a.max_bit_rate != b.max_bit_rate)
+		return false;
+	if (a.frame_size != 0 && b.frame_size != 0 && a.frame_size != b.frame_size)
+		return false;
+	if (a.forward_history != 0 && b.forward_history != 0 && a.forward_history != b.forward_history)
+		return false;
+	if (a.backward_history != 0 && b.backward_history != 0 && a.backward_history != b.backward_history)
+		return false;
+
+	if (a.encoding == 0 && b.encoding == 0)
+		return true; // can't compare
+		
+	switch((a.encoding != 0) ? a.encoding : b.encoding) {
+		case media_encoded_video_format::B_ANY:
+		default:
+			return true;
+	}
+}
+
+/*************************************************************
+ * helper functions for media_format::SpecializeTo()
+ *************************************************************/
+
+static void raw_audio_format_specialize(media_raw_audio_format *format, const media_raw_audio_format *other);
+static void multi_audio_info_specialize(media_multi_audio_info *format, const media_multi_audio_info *other);
+static void multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other);
+static void raw_video_format_specialize(media_raw_video_format *format, const media_raw_video_format *other);
+static void multistream_format_specialize(media_multistream_format *format, const media_multistream_format *other);
+static void encoded_audio_format_specialize(media_encoded_audio_format *format, const media_encoded_audio_format *other);
+static void encoded_video_format_specialize(media_encoded_video_format *format, const media_encoded_video_format *other);
+
+
+static void
+raw_audio_format_specialize(media_raw_audio_format *format, const media_raw_audio_format *other)
+{
+	if (format->frame_rate == 0)
+		format->frame_rate = other->frame_rate;
+	if (format->channel_count == 0)
+		format->channel_count = other->channel_count;
+	if (format->format == 0)
+		format->format = other->format;
+	if (format->byte_order == 0)
+		format->byte_order = other->byte_order;
+	if (format->buffer_size == 0)
+		format->buffer_size = other->buffer_size;
+	if (format->frame_rate == 0)
+		format->frame_rate = other->frame_rate;
+}
+
+static void
+multi_audio_info_specialize(media_multi_audio_info *format, const media_multi_audio_info *other)
+{
+	if (format->channel_mask == 0)
+		format->channel_mask = other->channel_mask;
+	if (format->valid_bits == 0)
+		format->valid_bits = other->valid_bits;
+	if (format->matrix_mask == 0)
+		format->matrix_mask = other->matrix_mask;
+}
+
+static void
+multi_audio_format_specialize(media_multi_audio_format *format, const media_multi_audio_format *other)
+{
+	raw_audio_format_specialize(format, other);
+	multi_audio_info_specialize(format, other);
+}
+
+static void
+raw_video_format_specialize(media_raw_video_format *format, const media_raw_video_format *other)
+{
+	if (format->field_rate == 0)
+		format->field_rate = other->field_rate;
+	if (format->interlace == 0)
+		format->interlace = other->interlace;
+	if (format->first_active == 0)
+		format->first_active = other->first_active;
+	if (format->last_active == 0)
+		format->last_active = other->last_active;
+	if (format->orientation == 0)
+		format->orientation = other->orientation;
+	if (format->pixel_width_aspect == 0)
+		format->pixel_width_aspect = other->pixel_width_aspect;
+	if (format->pixel_height_aspect == 0)
+		format->pixel_height_aspect = other->pixel_height_aspect;
+	if (format->display.format == 0)
+		format->display.format = other->display.format;
+	if (format->display.line_width == 0)
+		format->display.line_width = other->display.line_width;
+	if (format->display.line_count == 0)
+		format->display.line_count = other->display.line_count;
+	if (format->display.bytes_per_row == 0)
+		format->display.bytes_per_row = other->display.bytes_per_row;
+	if (format->display.pixel_offset == 0)
+		format->display.pixel_offset = other->display.pixel_offset;
+	if (format->display.line_offset == 0)
+		format->display.line_offset = other->display.line_offset;
+	if (format->display.flags == 0)
+		format->display.flags = other->display.flags;
+}
+
+static void
+multistream_format_specialize(media_multistream_format *format, const media_multistream_format *other)
+{
+	if (format->avg_bit_rate == 0)
+		format->avg_bit_rate = other->avg_bit_rate;
+	if (format->max_bit_rate == 0)
+		format->max_bit_rate = other->max_bit_rate;
+	if (format->avg_chunk_size == 0)
+		format->avg_chunk_size = other->avg_chunk_size;
+	if (format->max_chunk_size == 0)
+		format->max_chunk_size = other->max_chunk_size;
+	if (format->flags == 0)
+		format->flags = other->flags;
+	if (format->format == 0)
+		format->format = other->format;
+		
+	switch (format->format) {
+		case media_multistream_format::B_VID:
+			if (format->u.vid.frame_rate == 0)
+				format->u.vid.frame_rate = other->u.vid.frame_rate;
+			if (format->u.vid.width == 0)
+				format->u.vid.width = other->u.vid.width;
+			if (format->u.vid.height == 0)
+				format->u.vid.height = other->u.vid.height;
+			if (format->u.vid.space == 0)
+				format->u.vid.space = other->u.vid.space;
+			if (format->u.vid.sampling_rate == 0)
+				format->u.vid.sampling_rate = other->u.vid.sampling_rate;
+			if (format->u.vid.sample_format == 0)
+				format->u.vid.sample_format = other->u.vid.sample_format;
+			if (format->u.vid.byte_order == 0)
+				format->u.vid.byte_order = other->u.vid.byte_order;
+			if (format->u.vid.channel_count == 0)
+				format->u.vid.channel_count = other->u.vid.channel_count;
+			break;
+
+		case media_multistream_format::B_AVI:
+			if (format->u.avi.us_per_frame == 0)
+				format->u.avi.us_per_frame = other->u.avi.us_per_frame;
+			if (format->u.avi.width == 0)
+				format->u.avi.width = other->u.avi.width;
+			if (format->u.avi.height == 0)
+				format->u.avi.height = other->u.avi.height;
+			if (format->u.avi.type_count == 0)
+				format->u.avi.type_count = other->u.avi.type_count;
+			if (format->u.avi.types[0] == 0)
+				format->u.avi.types[0] = other->u.avi.types[0];
+			if (format->u.avi.types[1] == 0)
+				format->u.avi.types[1] = other->u.avi.types[1];
+			if (format->u.avi.types[2] == 0)
+				format->u.avi.types[2] = other->u.avi.types[2];
+			if (format->u.avi.types[3] == 0)
+				format->u.avi.types[3] = other->u.avi.types[3];
+			if (format->u.avi.types[4] == 0)
+				format->u.avi.types[4] = other->u.avi.types[4];
+			break;
+
+		default:
+			FATAL("media_format::SpecializeTo can't specialize media_multistream_format of format %d\n", format->format);
+	}
+}
+
+static void
+encoded_audio_format_specialize(media_encoded_audio_format *format, const media_encoded_audio_format *other)
+{
+	raw_audio_format_specialize(&format->output, &other->output);
+	if (format->encoding == 0)
+		format->encoding = other->encoding;
+	if (format->bit_rate == 0)
+		format->bit_rate = other->bit_rate;
+	if (format->frame_size == 0)
+		format->frame_size = other->frame_size;
+	multi_audio_info_specialize(&format->multi_info, &other->multi_info);
+}
+
+static void
+encoded_video_format_specialize(media_encoded_video_format *format, const media_encoded_video_format *other)
+{
+	raw_video_format_specialize(&format->output, &other->output);
+	if (format->avg_bit_rate == 0)
+		format->avg_bit_rate = other->avg_bit_rate;
+	if (format->max_bit_rate == 0)
+		format->max_bit_rate = other->max_bit_rate;
+	if (format->encoding == 0)
+		format->encoding = other->encoding;
+	if (format->frame_size == 0)
+		format->frame_size = other->frame_size;
+	if (format->forward_history == 0)
+		format->forward_history = other->forward_history;
+	if (format->backward_history == 0)
+		format->backward_history = other->backward_history;
+}
+
+
+/*************************************************************
  * media_format
  *************************************************************/
 
 bool
 media_format::Matches(const media_format *other) const
 {
-	return type == other->type; // XXX fixthis
-}
+	CALLED();
+	if (type == 0 && other->type == 0)
+		return true; // XXX how do we compare two formats with no type?
+		
+	if (type != 0 && other->type != 0 && type != other->type)
+		return false;
+	
+	switch ((type != 0) ? type : other->type) {
+		case B_MEDIA_RAW_AUDIO:
+			return multi_audio_format_matches(u.raw_audio, other->u.raw_audio);
+			
+		case B_MEDIA_RAW_VIDEO:
+			return raw_video_format_matches(u.raw_video, other->u.raw_video);
 
+		case B_MEDIA_MULTISTREAM:
+			return multistream_format_matches(u.multistream, other->u.multistream);
+				
+		case B_MEDIA_ENCODED_AUDIO:
+			return encoded_audio_format_matches(u.encoded_audio, other->u.encoded_audio);
+
+		case B_MEDIA_ENCODED_VIDEO:
+			return encoded_video_format_matches(u.encoded_video, other->u.encoded_video);
+		
+		default:
+			return true; // XXX really?
+	}
+}
 
 void
 media_format::SpecializeTo(const media_format *otherFormat)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (type == 0 && otherFormat->type == 0) {
+		FATAL("media_format::SpecializeTo can't specialize wildcard to other wildcard format\n");
+		return;
+	}
+		
+	if (type == 0)
+		type = otherFormat->type;
+	
+	switch (type) {
+		case B_MEDIA_RAW_AUDIO:
+			multi_audio_format_specialize(&u.raw_audio, &otherFormat->u.raw_audio);
+			return;
+			
+		case B_MEDIA_RAW_VIDEO:
+			raw_video_format_specialize(&u.raw_video, &otherFormat->u.raw_video);
+			return;
+
+		case B_MEDIA_MULTISTREAM:
+			multistream_format_specialize(&u.multistream, &otherFormat->u.multistream);
+			return;
+	
+		case B_MEDIA_ENCODED_AUDIO:
+			encoded_audio_format_specialize(&u.encoded_audio, &otherFormat->u.encoded_audio);
+			return;
+
+		case B_MEDIA_ENCODED_VIDEO:
+			encoded_video_format_specialize(&u.encoded_video, &otherFormat->u.encoded_video);
+			return;
+		
+		default:
+			FATAL("media_format::SpecializeTo can't specialize format type %d\n", type);
+	}
 }
 
 
@@ -546,6 +977,8 @@ status_t get_next_file_format(int32 *cookie, media_file_format *mfi)
 
 // final & verified
 const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.Be.media-server";
+
+const type_code B_CODEC_TYPE_INFO = 0x12345678; // XXX fixme
 
 /*************************************************************
  * 
