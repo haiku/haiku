@@ -1,0 +1,38 @@
+SubDir OBOS_TOP src bin gdb opcodes ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) include ] ;
+SubDirHdrs [ FDirName [ FCurrentObjectsDir ] $(DOTDOT) bfd ] ;
+	# generated bfd headers
+SubDirHdrs [ FDirName $(OBOS_TOP) src bin gawk intl ] ;
+	# Use gawk's libintl for the time being.
+	# TODO: Put a current version of intl ot src/libs and build a static lib
+	# all interested apps can link against.
+
+SubDirCcFlags -DHAVE_CONFIG_H -D_GNU_SOURCE ;
+
+# architecture specific sources
+local opcodesArchSources ;
+if $(OBOS_ARCH) = x86 {
+	opcodesArchSources = i386-dis.c ;
+} else if $(OBOS_ARCH) = ppc {
+	opcodesArchSources = ppc-dis.c ;
+		# TODO: Check, if this is correct (probably is).
+} # else: architecture not supported by Haiku
+
+local opcodesAllSources = 
+	dis-buf.c
+	disassemble.c
+	dis-init.c
+	$(opcodesArchSources)
+;
+
+StaticLibrary <gdb>opcodes :
+	$(opcodesAllSources)
+
+	: [ FCurrentObjectsDir ]
+;
+
+# Make all objects depend on the generated bfd headers (otherwise they will
+# not be generated in the first place).
+Depends [ FGristFiles $(opcodesAllSources:S=$(SUFOBJ)) ]
+	 : gdb-bfd-generated-headers ;
