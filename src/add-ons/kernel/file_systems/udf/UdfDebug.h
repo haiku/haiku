@@ -22,7 +22,7 @@
 #endif
 #include <unistd.h>
 
-#define DEBUG_TO_FILE 0
+#define DEBUG_TO_FILE 1
 
 #if DEBUG_TO_FILE
 #	include <stdio.h>
@@ -61,12 +61,17 @@ enum _DebugCategoryFlags {
 	CF_ATTRIBUTE_OPS	= 0x00000040,
 	CF_INDEX_OPS		= 0x00000080,
 	CF_QUERY_OPS		= 0x00000100,
+
 	
 	// Misc categories
 	CF_HIGH_VOLUME		= 0x00000200,	//!< often-called functions
 	CF_HELPER			= 0x00000400,	//!< helper functions and classes (i.e. Array, CS0String, etc.)
 	CF_DEBUGGING		= 0x00000800,	//!< internal debugging functions
 	CF_DUMP				= 0x00001000,	//!< dump() functions
+
+	// Specific entry functions
+	CF_UDF_READ_FS_STAT = 0x00002000,
+	CF_UDF_READ			= 0x00004000,
 	
 	//-------------------------------
 	
@@ -83,6 +88,8 @@ enum _DebugCategoryFlags {
 	\brief Bitmask of currently enabled debugging categories.
 */
 #define CATEGORY_FILTER	CF_ALL
+//#define CATEGORY_FILTER ~CF_DIRECTORY_OPS & ~CF_HIGH_VOLUME & ~CF_HELPER
+//#define CATEGORY_FILTER CF_UDF_READ
 //#define CATEGORY_FILTER	~CF_DUMP
 //#define CATEGORY_FILTER	~CF_DUMP & ~CF_HIGH_VOLUME
 //#define CATEGORY_FILTER	CF_ALL_STANDARD

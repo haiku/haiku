@@ -304,7 +304,7 @@ private:
 	int fFile;
 };
 
-DebugOutputFile out;
+DebugOutputFile *out = NULL;
 
 /*!	\brief It doesn't appear that the constructor for the global
 	\c out variable is called when built as an R5 filesystem add-on,
@@ -313,7 +313,16 @@ DebugOutputFile out;
 */
 void initialize_debugger(const char *filename)
 {
-	out.Init(filename);
+#if DEBUG_TO_FILE
+	if (!out) {
+		out = new DebugOutputFile(filename);
+		dbg_printf("out was NULL!\n");
+	} else {
+		DebugOutputFile *temp = out;
+		out = new DebugOutputFile(filename);
+		dbg_printf("out was %p!\n", temp);
+	}
+#endif
 }
 
 // dbg_printf, stolen from Ingo's ReiserFS::Debug.cpp.
@@ -321,6 +330,9 @@ void
 dbg_printf(const char *format,...)
 {
 #if DEBUG_TO_FILE
+	if (!out)
+		return;
+
 	char buffer[1024];
 	va_list args;
 	va_start(args, format);
@@ -332,7 +344,7 @@ dbg_printf(const char *format,...)
 	#endif
 	va_end(args);
 	buffer[sizeof(buffer) - 1] = '\0';
-	write(out.File(), buffer, strlen(buffer));
+	write(out->File(), buffer, strlen(buffer));
 #endif
 }
 
