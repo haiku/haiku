@@ -138,24 +138,27 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	
 	CheckUpdateDisplayModes();
 	
-	BRect controlMenuRect(33.0, 30.0, 171.0, 48.0);	
-	fResolutionField = new BMenuField(controlMenuRect, "ResolutionMenu", "Resolution:", fResolutionMenu, true);
+	const char * resolutionLabel = "Resolution: ";
+	float resolutionWidth = controlsBox->StringWidth(resolutionLabel);
+	BRect controlMenuRect(88.0-resolutionWidth, 30.0, 171.0, 48.0);	
+	fResolutionField = new BMenuField(controlMenuRect, "ResolutionMenu", resolutionLabel, fResolutionMenu, true);
 	
 	marked = fResolutionMenu->ItemAt(0);
 	marked->SetMarked(true);
 	
-	fResolutionField->SetDivider(55.0);
+	fResolutionField->SetDivider(resolutionWidth);
 	
 	controlsBox->AddChild(fResolutionField);
 	
-	controlMenuRect.Set(50.0, 58.0, 171.0, 76.0);
-	
-	fColorsField = new BMenuField(controlMenuRect, "ColorsMenu", "Colors:", fColorsMenu, true);
+	const char * colorsLabel = "Colors: ";
+	float colorsWidth = controlsBox->StringWidth(colorsLabel);
+	controlMenuRect.Set(88.0-colorsWidth, 58.0, 171.0, 76.0);
+	fColorsField = new BMenuField(controlMenuRect, "ColorsMenu", colorsLabel, fColorsMenu, true);
 	
 	marked = fColorsMenu->ItemAt(0);
 	marked->SetMarked(true);
 	
-	fColorsField->SetDivider(38.0);
+	fColorsField->SetDivider(colorsWidth);
 	
 	controlsBox->AddChild(fColorsField);	
 	
@@ -173,14 +176,15 @@ ScreenWindow::ScreenWindow(ScreenSettings *Settings)
 	fRefreshMenu->AddItem(new BMenuItem("Other...", new BMessage(POP_OTHER_REFRESH_MSG)));
 	
 		
-	controlMenuRect.Set(19.0, 86.0, 171.0, 104.0);
-	
-	fRefreshField = new BMenuField(controlMenuRect, "RefreshMenu", "Refresh Rate:", fRefreshMenu, true);
+	const char * refreshLabel = "Refresh Rate: ";
+	float refreshWidth = controlsBox->StringWidth(refreshLabel);
+	controlMenuRect.Set(88.0-refreshWidth, 86.0, 171.0, 104.0);
+	fRefreshField = new BMenuField(controlMenuRect, "RefreshMenu", refreshLabel, fRefreshMenu, true);
 	
 	marked = fRefreshMenu->FindItem("60 Hz");
 	marked->SetMarked(true);
 	
-	fRefreshField->SetDivider(69.0);
+	fRefreshField->SetDivider(refreshWidth);
 	
 	controlsBox->AddChild(fRefreshField);
 	
