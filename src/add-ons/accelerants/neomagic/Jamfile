@@ -13,7 +13,6 @@ Addon nm.accelerant : accelerants :
 	GetDeviceInfo.c
 	GetModeInfo.c
 	GetTimingConstraints.c
-	GlobalData.c
 	InitAccelerant.c
 	Overlay.c
 	ProposeDisplayMode.c

@@ -10,6 +10,7 @@ StaticLibrary neomagic_engine :
 	nm_crtc.c
 	nm_dac.c
 	nm_general.c
+	nm_globals.c
 	nm_info.c
 	nm_support.c
 	;

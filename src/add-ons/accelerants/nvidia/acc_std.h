@@ -9,7 +9,7 @@
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include "DriverInterface.h"
-#include "global.h"
+#include "nv_globals.h"
 //apsed #include "nv_extern.h"
 #include "nv_proto.h"
 #include "be_driver_proto.h"

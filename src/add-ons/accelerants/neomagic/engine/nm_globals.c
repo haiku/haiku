@@ -7,7 +7,7 @@
 	Rudolf Cornelissen 4/2003-
 */
 
-#include "acc_std.h"
+#include "nm_std.h"
 
 int fd;
 shared_info *si;

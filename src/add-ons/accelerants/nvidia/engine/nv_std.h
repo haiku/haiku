@@ -3,7 +3,7 @@
 #include <math.h>
 #include <OS.h>
 #include "DriverInterface.h"
-#include "global.h"
+#include "nv_globals.h"
 //apsed #include "nv_extern.h"
 #include "nv_proto.h"
 #include "nv_macros.h"
