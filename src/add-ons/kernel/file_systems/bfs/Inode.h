@@ -255,14 +255,14 @@ class Inode : public CachedBlock {
 
 class Vnode {
 	public:
-		Vnode(Volume *volume,vnode_id id)
+		Vnode(Volume *volume, vnode_id id)
 			:
 			fVolume(volume),
 			fID(id)
 		{
 		}
 
-		Vnode(Volume *volume,block_run run)
+		Vnode(Volume *volume, block_run run)
 			:
 			fVolume(volume),
 			fID(volume->ToVnode(run))
@@ -275,15 +275,15 @@ class Vnode {
 		}
 
 		status_t Get(Inode **inode)
-		{
+		{ 
 			// should we check inode against NULL here? it should not be necessary
-			return get_vnode(fVolume->ID(),fID,(void **)inode);
+			return get_vnode(fVolume->ID(), fID, (void **)inode);
 		}
 
 		void Put()
 		{
 			if (fVolume)
-				put_vnode(fVolume->ID(),fID);
+				put_vnode(fVolume->ID(), fID);
 			fVolume = NULL;
 		}
 
@@ -304,7 +304,7 @@ class AttributeIterator {
 		~AttributeIterator();
 		
 		status_t Rewind();
-		status_t GetNext(char *name,size_t *length,uint32 *type,vnode_id *id);
+		status_t GetNext(char *name, size_t *length, uint32 *type, vnode_id *id);
 
 	private:
 		int32		fCurrentSmallData;
@@ -316,7 +316,7 @@ class AttributeIterator {
 		friend Chain<AttributeIterator>;
 		friend Inode;
 
-		void Update(uint16 index,int8 change);
+		void Update(uint16 index, int8 change);
 		AttributeIterator *fNext;
 };
 
@@ -326,7 +326,8 @@ class AttributeIterator {
  *	file, it will be converted to R_OK.
  */
 
-inline int oModeToAccess(int omode)
+inline int
+oModeToAccess(int omode)
 {
 	omode &= O_RWMASK;
 	if (omode == O_RDONLY)
