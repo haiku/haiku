@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-9/2004.
+	Rudolf Cornelissen 10/2002-12/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -71,6 +71,26 @@ enum {
 	NV_ISA_OUT,
 	NV_ISA_IN
 };
+
+/* handles to pre-defined engine commands */
+#define NV_ROP5_SOLID					0x80000000
+#define NV_IMAGE_BLACK_RECTANGLE		0x80000001
+#define NV_IMAGE_PATTERN				0x80000002
+#define NV3_SURFACE_0					0x80000003
+#define NV3_SURFACE_1					0x80000004
+#define NV3_SURFACE_2					0x80000005
+#define NV3_SURFACE_3					0x80000006
+//#define NV4_CONTEXT_SURFACES_ARGB_ZS	0x80000007
+#define NV10_CONTEXT_SURFACES_ARGB_ZS	0x80000007
+#define NV1_IMAGE_FROM_CPU				0x80000010
+#define NV_IMAGE_BLIT					0x80000011
+#define NV3_GDI_RECTANGLE_TEXT			0x80000012
+#define NV_RENDER_D3D0_TRIANGLE_ZETA	0x80000013
+#define NV4_DX5_TEXTURE_TRIANGLE		0x80000014
+#define NV10_DX5_TEXTURE_TRIANGLE		0x80000014
+#define NV4_DX6_MULTI_TEXTURE_TRIANGLE	0x80000015
+#define NV10_DX6_MULTI_TEXTURE_TRIANGLE	0x80000015
+#define NV1_RENDER_SOLID_LIN			0x80000016
 
 /* max. number of overlay buffers */
 #define MAXBUFFERS 3
@@ -155,21 +175,33 @@ typedef struct {
 
   /*more display mode stuff*/
 	display_mode dm;		/* current display mode configuration: head1 */
-	display_mode dm2;		/* current display mode configuration: head2 */
 	bool acc_mode;			/* signals (non)accelerated mode */
 	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
 	bool crtc_switch_mode;	/* signals dualhead switch mode if panels are used */
 
   /*frame buffer config - for BDirectScreen*/
 	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer: head1 */
-	frame_buffer_config fbc2;	/* bytes_per_row and start of frame buffer: head2 */
 
   /*acceleration engine*/
 	struct {
 		uint32		count;		/* last dwgsync slot used */
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
 		benaphore	lock;		/* for serializing access to the acceleration engine */
+		struct {
+			uint32		ch0;	/* handles to engine commands active in FIFO channels */
+			uint32		ch1;
+			uint32		ch2;
+			uint32		ch3;
+			uint32		ch4;
+			uint32		ch5;
+			uint32		ch6;
+			uint32		ch7;
+		} fifo;
 	} engine;
+
+	/* pointers to first and last free memory adress for 3D use: cardmem local offsets */
+	uint32 mem_low;
+	uint32 mem_high;
 
   /* card info - information gathered from PINS (and other sources) */
 	enum
