@@ -71,11 +71,12 @@ SharedLibrary media :
 	OldSubscriber.cpp
 	
 	# Codec Plugin API
-	MediaPlugin.cpp
-	ReaderPlugin.cpp
+	ChunkCache.cpp
 	DecoderPlugin.cpp
 	MediaExtractor.cpp
+	MediaPlugin.cpp
 	PluginManager.cpp
+	ReaderPlugin.cpp
 ;
 
 LinkSharedOSLibs libmedia.so :
