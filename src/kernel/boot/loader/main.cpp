@@ -32,6 +32,8 @@ main(stage2_args *args)
 	if (heap_init(args) < B_OK)
 		panic("Could not initialize heap!\n");
 
+	platform_switch_to_logo();
+
 	TRACE(("boot(): heap initialized...\n"));
 
 	// the main platform dependent initialisation

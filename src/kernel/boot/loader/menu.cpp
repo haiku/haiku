@@ -19,6 +19,8 @@
 status_t
 user_menu(Directory **_bootVolume)
 {
+	platform_switch_to_text_mode();
+
 	int32 index = 1;
 	void *cookie;
 
@@ -41,6 +43,7 @@ user_menu(Directory **_bootVolume)
 	}
 	puts("(it always tries to boot from the first for now...)");
 
+	platform_switch_to_logo();
 	return B_OK;
 }
 
