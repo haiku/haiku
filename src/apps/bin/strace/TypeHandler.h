@@ -27,98 +27,34 @@ public:
 		MemoryReader &reader) = 0;
 };
 
-// TypeHandlerImpl
+// templatized TypeHandler factory class
+// (I tried a simple function first, but then the compiler complains for
+// the partial instantiation. Not sure, if I'm missing something or this is
+// a compiler bug).
 template<typename Type>
-class TypeHandlerImpl : public TypeHandler {
-public:
-	virtual string GetParameterValue(const void *address, bool getContents,
-		MemoryReader &reader);
-
-	virtual string GetReturnValue(uint64 value, bool getContents,
-		MemoryReader &reader);
+struct TypeHandlerFactory {
+	static TypeHandler *Create();
 };
 
+extern TypeHandler *create_pointer_type_handler();
+extern TypeHandler *create_string_type_handler();
 
-// TypeHandlerImpl
-template<typename Type>
-class TypeHandlerImpl<Type*> : public TypeHandler {
-public:
-	virtual string GetParameterValue(const void *address, bool getContents,
-		MemoryReader &reader);
-
-	virtual string GetReturnValue(uint64 value, bool getContents,
-		MemoryReader &reader);
+// specialization for "const char*"
+template<>
+struct TypeHandlerFactory<const char*> {
+	static inline TypeHandler *Create()
+	{
+		return create_string_type_handler();
+	}
 };
 
-//// TypeHandlerImpl
-//template<>
-//class TypeHandlerImpl<const char*> : public TypeHandler {
-//public:
-//	virtual string GetParameterValue(const void *address, bool getContents,
-//		MemoryReader &reader);
-//
-//	virtual string GetReturnValue(uint64 value, bool getContents,
-//		MemoryReader &reader);
-//};
-
-// get_number_value
-template<typename value_t>
-static inline
-string
-get_number_value(const void *address, const char *format)
-{
-	if (sizeof(align_t) > sizeof(value_t))
-		return get_number_value<value_t>(value_t(*(align_t*)address), format);
-	else
-		return get_number_value<value_t>(*(value_t*)address, format);
-}
-
-// get_number_value
-template<typename value_t>
-static inline
-string
-get_number_value(value_t value, const char *format)
-{
-	char buffer[32];
-	sprintf(buffer, format, value);
-	return buffer;
-}
-
-// get_pointer_value
-static inline
-string
-get_pointer_value(const void *address)
-{
-	char buffer[32];
-	sprintf(buffer, "%p", *(void **)address);
-	return buffer;
-}
-
-// get_pointer_value
-static inline
-string
-get_pointer_value(uint64 value)
-{
-	char buffer[32];
-	sprintf(buffer, "%p", (void*)value);
-	return buffer;
-}
-
-// generic pointer
+// partial specialization for generic pointers
 template<typename Type>
-string
-TypeHandlerImpl<Type*>::GetParameterValue(const void *address, bool getContents,
-		MemoryReader &reader)
-{
-	return get_pointer_value(address);
-}
-
-template<typename Type>
-string
-TypeHandlerImpl<Type*>::GetReturnValue(uint64 value, bool getContents,
-	MemoryReader &reader)
-{
-	return get_pointer_value(value);
-}
+struct TypeHandlerFactory<Type*> {
+	static inline TypeHandler *Create()
+	{
+		return create_pointer_type_handler();
+	}
+};
 
 #endif	// STRACE_TYPE_HANDLER_H
