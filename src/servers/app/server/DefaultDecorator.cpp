@@ -30,6 +30,7 @@
 #include "LayerData.h"
 #include "ColorUtils.h"
 #include "DefaultDecorator.h"
+#include "PatternHandler.h"
 #include "RGBColor.h"
 #include "RectUtils.h"
 #include <stdio.h>
@@ -180,17 +181,22 @@ printf("DefaultDecorator: Do Layout\n");
 	_resizerect=_frame;
 	_borderrect=_frame;
 	_closerect=_frame;
+
 	
 	switch(GetLook())
 	{
+		case B_FLOATING_WINDOW_LOOK:
+		case B_MODAL_WINDOW_LOOK:
+		
+		// We're going to make the frame 5 pixels wide, no matter what. R5's decorator frame
+		// requires the skills of a gaming master to click on the tiny frame if resizing is necessary,
+		// and there *are* apps which do this
+//			borderwidth=3;
+//			break;
 		case B_BORDERED_WINDOW_LOOK:
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
 			borderwidth=5;
-			break;
-		case B_FLOATING_WINDOW_LOOK:
-		case B_MODAL_WINDOW_LOOK:
-			borderwidth=3;
 			break;
 		default:
 			borderwidth=0;
@@ -336,6 +342,7 @@ printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,up
 		_driver->FillRect(_borderrect & update,&_layerdata,(int8*)&solidhigh);
 	
 	_DrawFrame(update);
+
 }
 
 void DefaultDecorator::Draw(void)
@@ -347,10 +354,10 @@ void DefaultDecorator::Draw(void)
 //	_layerdata.highcolor=_colors->document_background;
 
 //	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+
 	DrawFrame();
 
 	DrawTab();
-
 }
 
 void DefaultDecorator::_DrawZoom(BRect r)
@@ -455,6 +462,7 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 
 void DefaultDecorator::_DrawFrame(BRect invalid)
 {
+
 	// We need to test each side to determine whether or not it needs drawn. Additionally,
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
@@ -494,6 +502,17 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	else
 	{
 		// TODO: figure out border colors for floating window look
+		leftindices[0]=2;
+		leftindices[1]=2;
+		leftindices[2]=1;
+		leftindices[3]=1;
+		leftindices[4]=4;
+
+		rightindices[0]=2;
+		rightindices[1]=2;
+		rightindices[2]=1;
+		rightindices[3]=1;
+		rightindices[4]=4;
 	}
 	
 	// Variables used in each calculation
@@ -722,16 +741,42 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	delete rightindices;
 	delete leftindices;
 	
-/*	// Draw the resize thumb if we're supposed to
+	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
+		pattern_union highcolor;
+		highcolor.type64=0xffffffffffffffffLL;
 		r=_resizerect;
 
-		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
+//		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
 		
 		// This code is strictly for B_DOCUMENT_WINDOW looks
 		if(_look==B_DOCUMENT_WINDOW_LOOK)
 		{
+			r.right-=4;
+			r.bottom-=4;
+			_layerdata.highcolor=framecolors[2];
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,highcolor.type8);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,highcolor.type8);
+
+			r.OffsetBy(1,1);
+			_layerdata.highcolor=framecolors[0];
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,highcolor.type8);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,highcolor.type8);
+			
+			r.OffsetBy(1,1);
+			_layerdata.highcolor=framecolors[1];
+			_driver->FillRect(r,&_layerdata,highcolor.type8);
+			
+/*			r.left+=2;
+			r.top+=2;
+			r.right-=3;
+			r.bottom-=3;
+*/
+			r.right-=2;
+			r.bottom-=2;
+			int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
+		
 			rgb_color halfcol, startcol, endcol;
 			float rstep,gstep,bstep,i;
 			
@@ -745,7 +790,11 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 			rstep=(startcol.red-halfcol.red)/steps;
 			gstep=(startcol.green-halfcol.green)/steps;
 			bstep=(startcol.blue-halfcol.blue)/steps;
-
+			
+			// Explicitly locking the driver is normally unnecessary. However, we need to do
+			// this because we are rapidly drawing a series of calls which would not necessarily
+			// draw correctly if we didn't do so.
+			_driver->Lock();
 			for(i=0;i<=steps; i++)
 			{
 				_layerdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
@@ -761,8 +810,9 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
 					BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);			
 			}
-			_layerdata.highcolor=framecolors[4];
-			_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+			_driver->Unlock();
+//			_layerdata.highcolor=framecolors[4];
+//			_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
 		}
 		else
 		{
@@ -773,6 +823,6 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 				&_layerdata,(int8*)&solidhigh);
 		}
 	}
-*/
+
 	
 }

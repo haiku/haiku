@@ -148,7 +148,7 @@ void BitmapDriver::Shutdown(void)
 
 void BitmapDriver::SetTarget(ServerBitmap *target)
 {
-	_Lock();
+	Lock();
 	_target=target;
 	
 	if(target)
@@ -160,7 +160,7 @@ void BitmapDriver::SetTarget(ServerBitmap *target)
 		// Setting mode not necessary. Can get color space stuff via ServerBitmap->ColorSpace
 	}
 	
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -188,10 +188,10 @@ printf("BitmapDriver::CopyBits unimplemented\n");
 */
 void BitmapDriver::DrawBitmap(ServerBitmap *bitmap, BRect source, BRect dest, LayerData *d)
 {
-	_Lock();
+	Lock();
 
 //TODO: Implement
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -328,7 +328,7 @@ void BitmapDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 */
 void BitmapDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
-	_Lock();
+	Lock();
 	if(_target)
 	{
 	//	int32 width=rect.IntegerWidth();
@@ -336,7 +336,7 @@ void BitmapDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	//		HLine(fbuffer->gcinfo,(int32)rect.left,i,width,col);
 			Line(BPoint(r.left,i),BPoint(r.right,i),d,pat);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -372,7 +372,7 @@ void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 	if(!pts || !d || !pat)
 		return;
 
-	_Lock();
+	Lock();
 	if(_target)
 	{
 		BPoint first, second, third;
@@ -417,7 +417,7 @@ void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 			start.x=MIN(first.x,MIN(second.x,third.x));
 			end.x=MAX(first.x,MAX(second.x,third.x));
 			Line(start,end, d, pat);
-			_Unlock();
+			Unlock();
 			return;
 		}
 
@@ -432,7 +432,7 @@ void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 			Line(first, second,d,pat);
 			for(i=int32(first.y+1);i<third.y;i++)
 				Line( BPoint(lineA.GetX(i),i), BPoint(lineB.GetX(i),i),d,pat);
-			_Unlock();
+			Unlock();
 			return;
 		}
 		
@@ -445,7 +445,7 @@ void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 			Line(second, third,d,pat);
 			for(i=int32(first.y+1);i<third.y;i++)
 				Line( BPoint(lineA.GetX(i),i), BPoint(lineB.GetX(i),i),d,pat);
-			_Unlock();
+			Unlock();
 			return;
 		}
 		
@@ -468,7 +468,7 @@ void BitmapDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 			Line( BPoint(lineC.GetX(i),i), BPoint(lineB.GetX(i),i),d,pat);
 		
 	}
-	_Unlock();
+	Unlock();
 }
 
 void BitmapDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
@@ -953,7 +953,7 @@ void BitmapDriver::StrokeEllipse(BRect r, LayerData *ldata, int8 *pat)
 */
 void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
-	_Lock();
+	Lock();
 	if(_target)
 	{
 		// Courtesy YNOP's SecondDriver with minor changes by DW
@@ -994,7 +994,7 @@ void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 			}
 		}
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1010,7 +1010,7 @@ void BitmapDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 */
 void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
-	_Lock();
+	Lock();
 	if(_target)
 	{
 		for(int32 i=0; i<(numpts-1); i++)
@@ -1019,7 +1019,7 @@ void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Layer
 		if(is_closed)
 			Line(ptlist[numpts-1],ptlist[0],d,pat);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1031,7 +1031,7 @@ void BitmapDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Layer
 */
 void BitmapDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
-	_Lock();
+	Lock();
 	if(_target)
 	{
 		Line(r.LeftTop(),r.RightTop(),d,pat);
@@ -1039,7 +1039,7 @@ void BitmapDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 		Line(r.RightBottom(),r.LeftBottom(),d,pat);
 		Line(r.LeftTop(),r.LeftBottom(),d,pat);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1058,7 +1058,7 @@ void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d
 	float hLeft, hRight;
 	float vTop, vBottom;
 	float bLeft, bRight, bTop, bBottom;
-	_Lock();
+	Lock();
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
@@ -1081,7 +1081,7 @@ void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
 	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1097,14 +1097,14 @@ void BitmapDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d
 */
 void BitmapDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
-	_Lock();
+	Lock();
 	if(_target)
 	{
 		Line(pts[0],pts[1],d,pat);
 		Line(pts[1],pts[2],d,pat);
 		Line(pts[2],pts[0],d,pat);
 	}
-	_Unlock();
+	Unlock();
 }
 
 void BitmapDriver::SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex)
@@ -1451,13 +1451,13 @@ void BitmapDriver::ExtractToBitmap(ServerBitmap *destbmp,BRect destrect, BRect s
 
 void BitmapDriver::InvertRect(BRect r)
 {
-	_Lock();
+	Lock();
 	if(_target)
 	{
 		if(r.top<0 || r.left<0 || 
 			r.right>_target->Width()-1 || r.bottom>_target->Height()-1)
 		{
-			_Unlock();
+			Unlock();
 			return;
 		}
 		
@@ -1496,7 +1496,7 @@ void BitmapDriver::InvertRect(BRect r)
 		}
 
 	}
-	_Unlock();
+	Unlock();
 }
 
 
@@ -1504,14 +1504,14 @@ float BitmapDriver::StringWidth(const char *string, int32 length, LayerData *d)
 {
 	if(!string || !d || !d->font)
 		return 0.0;
-	_Lock();
+	Lock();
 
 	ServerFont *font=d->font;
 	FontStyle *style=font->Style();
 
 	if(!style)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -1526,7 +1526,7 @@ float BitmapDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -1537,7 +1537,7 @@ float BitmapDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -1569,7 +1569,7 @@ float BitmapDriver::StringWidth(const char *string, int32 length, LayerData *d)
 	FT_Done_Face(face);
 
 	returnval=pen.x>>6;
-	_Unlock();
+	Unlock();
 	return returnval;
 }
 
@@ -1577,14 +1577,14 @@ float BitmapDriver::StringHeight(const char *string, int32 length, LayerData *d)
 {
 	if(!string || !d || !d->font)
 		return 0.0;
-	_Lock();
+	Lock();
 
 	ServerFont *font=d->font;
 	FontStyle *style=font->Style();
 
 	if(!style)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -1597,7 +1597,7 @@ float BitmapDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -1606,7 +1606,7 @@ float BitmapDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -1624,12 +1624,12 @@ float BitmapDriver::StringHeight(const char *string, int32 length, LayerData *d)
 		else
 			ascent=MAX(slot->bitmap.rows,ascent);
 	}
-	_Unlock();
+	Unlock();
 
 	FT_Done_Face(face);
 
 	returnval=ascent+descent;
-	_Unlock();
+	Unlock();
 	return returnval;
 }
 
@@ -1649,7 +1649,7 @@ void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	if(!string || !d || !d->font)
 		return;
 
-	_Lock();
+	Lock();
 
 	pt.y--;	// because of Be's backward compatibility hack
 
@@ -1658,7 +1658,7 @@ void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 
 	if(!style)
 	{
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -1691,7 +1691,7 @@ void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	if(error)
 	{
 		printf("Couldn't create face object\n");
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -1702,7 +1702,7 @@ void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -1787,7 +1787,7 @@ void BitmapDriver::DrawString(const char *string, int32 length, BPoint pt, Layer
 		previous=glyph_index;
 	}
 	FT_Done_Face(face);
-	_Unlock();
+	Unlock();
 }
 
 void BitmapDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
@@ -2088,6 +2088,6 @@ rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d
 			break;
 		}
 	}
-	_Unlock();
+	Unlock();
 	return returncolor;
 }

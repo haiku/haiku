@@ -541,7 +541,7 @@ ViewDriver::~ViewDriver(void)
 
 bool ViewDriver::Initialize(void)
 {
-	_Lock();
+	Lock();
 	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
 	framebuffer->AddChild(drawview);
 
@@ -553,15 +553,15 @@ bool ViewDriver::Initialize(void)
 	// We can afford to call the above functions without locking
 	// because the window is locked until Show() is first called
 	screenwin->Show();
-	_Unlock();
+	Unlock();
 	return true;
 }
 
 void ViewDriver::Shutdown(void)
 {
-	_Lock();
+	Lock();
 	is_initialized=false;
-	_Unlock();
+	Unlock();
 }
 
 void ViewDriver::SetMode(int32 space)
@@ -655,7 +655,7 @@ void ViewDriver::CopyBits(BRect src, BRect dest)
 void ViewDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
 #ifdef DEBUG_DRIVER_MODULE
-printf("ViewDriver:: CopyRegion unimplemented()\n");
+printf("ViewDriver:: CopyRegion not completely tested\n");
 #endif
 
 	
@@ -781,11 +781,11 @@ printf("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,
 bool ViewDriver::DumpToFile(const char *path)
 {
 	// Dump to PNG
-	_Lock();
+	Lock();
 	SaveToPNG(path,framebuffer->Bounds(),framebuffer->ColorSpace(), 
 			framebuffer->Bits(),framebuffer->BitsLength(),framebuffer->BytesPerRow());
 
-	_Unlock();
+	Unlock();
 	return true;
 }
 
@@ -895,12 +895,12 @@ void ViewDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 void ViewDriver::HideCursor(void)
 {
 	screenwin->Lock();
-	_Lock();
+	Lock();
 
 	hide_cursor++;
 	screenwin->PostMessage(VDWIN_HIDECURSOR);
 
-	_Unlock();
+	Unlock();
 	screenwin->Unlock();
 }
 
@@ -1330,8 +1330,10 @@ void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerDa
 	int32 strlength,i;
 	Angle rotation(font->Rotation()), shear(font->Shear());
 
-	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
-		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
+//	bool antialias=( (font->Size()<18 && font->Flags()& B_DISABLE_ANTIALIASING==0)
+//		|| font->Flags()& B_FORCE_ANTIALIASING)?true:false;
+
+	bool antialias=(font->Flags()& B_DISABLE_ANTIALIASING==1)?false:true;
 
 	// Originally, I thought to do this shear checking here, but it really should be
 	// done in BFont::SetShear()

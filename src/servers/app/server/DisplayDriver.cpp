@@ -216,12 +216,12 @@ void DisplayDriver::FillRegion(BRegion *r, LayerData *d, int8 *pat)
 	if(!r || !d || !pat)
 		return;
 		
-	_locker->Lock();
+	Lock();
 
 	for(int32 i=0; i<r->CountRects();i++)
 		FillRect(r->RectAt(i),d,pat);
 
-	_locker->Unlock();
+	Unlock();
 }
 
 /*!
@@ -278,11 +278,11 @@ void DisplayDriver::HideCursor(void)
 */
 bool DisplayDriver::IsCursorHidden(void)
 {
-	_Lock();
+	Lock();
 
 	bool value=(_is_cursor_hidden || _is_cursor_obscured);
 
-	_Unlock();
+	Unlock();
 
 	return value;
 }
@@ -344,7 +344,7 @@ void DisplayDriver::ObscureCursor(void)
 */
 void DisplayDriver::SetCursor(ServerCursor *cursor)
 {
-	_Lock();
+	Lock();
 
 	bool hidden=_is_cursor_hidden;
 	bool obscured=_is_cursor_obscured;
@@ -355,7 +355,7 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	if(!hidden && !obscured)
 		ShowCursor();
 
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -451,12 +451,12 @@ void DisplayDriver::StrokeRegion(BRegion *r, LayerData *d, int8 *pat)
 	if(!r || !d || !pat)
 		return;
 		
-	_locker->Lock();
+	Lock();
 
 	for(int32 i=0; i<r->CountRects();i++)
 		StrokeRect(r->RectAt(i),d,pat);
 
-	_locker->Unlock();
+	Unlock();
 }
 
 /*!
@@ -738,7 +738,7 @@ bool DisplayDriver::IsCursorObscured(bool state)
 	member function should lock the driver before doing anything else. Functions
 	internal to the driver (protected/private) need not do this.
 */
-bool DisplayDriver::_Lock(bigtime_t timeout)
+bool DisplayDriver::Lock(bigtime_t timeout)
 {
 	if(timeout==B_INFINITE_TIMEOUT)
 		return _locker->Lock();
@@ -749,7 +749,7 @@ bool DisplayDriver::_Lock(bigtime_t timeout)
 /*!
 	\brief Unlocks the driver
 */
-void DisplayDriver::_Unlock(void)
+void DisplayDriver::Unlock(void)
 {
 	_locker->Unlock();
 }

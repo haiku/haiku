@@ -337,7 +337,7 @@ ScreenDriver::~ScreenDriver(void)
 
 bool ScreenDriver::Initialize(void)
 {
-	_Lock();
+	Lock();
 	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
 	framebuffer->AddChild(drawview);
 
@@ -349,16 +349,16 @@ bool ScreenDriver::Initialize(void)
 	// We can afford to call the above functions without locking
 	// because the window is locked until Show() is first called
 	screenwin->Show();
-	_Unlock();
+	Unlock();
 	return true;
 }
 
 void ScreenDriver::Shutdown(void)
 {
-	_Lock();
+	Lock();
 	screenwin->Disconnect();
 	is_initialized=false;
-	_Unlock();
+	Unlock();
 }
 
 void ScreenDriver::SetMode(int32 space)
@@ -508,11 +508,11 @@ printf("ScreenDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.
 bool ScreenDriver::DumpToFile(const char *path)
 {
 	// Dump to PNG
-	_Lock();
+	Lock();
 	SaveToPNG(path,framebuffer->Bounds(),framebuffer->ColorSpace(), 
 			framebuffer->Bits(),framebuffer->BitsLength(),framebuffer->BytesPerRow());
 
-	_Unlock();
+	Unlock();
 	return true;
 }
 
@@ -622,12 +622,12 @@ void ScreenDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 void ScreenDriver::HideCursor(void)
 {
 	screenwin->Lock();
-	_Lock();
+	Lock();
 
 	hide_cursor++;
 	screenwin->PostMessage(SDWIN_HIDECURSOR);
 
-	_Unlock();
+	Unlock();
 	screenwin->Unlock();
 }
 

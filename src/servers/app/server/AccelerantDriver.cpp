@@ -352,7 +352,7 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 	if(!string || !d || !d->font)
 		return;
 
-	_Lock();
+	Lock();
 
 	pt.y--;	// because of Be's backward compatibility hack
 
@@ -361,7 +361,7 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 
 	if(!style)
 	{
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -394,7 +394,7 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 	if(error)
 	{
 		printf("Couldn't create face object\n");
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -405,7 +405,7 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -493,7 +493,7 @@ void AccelerantDriver::DrawString(const char *string, int32 length, BPoint pt, L
 		previous=glyph_index;
 	}
 	FT_Done_Face(face);
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -538,7 +538,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	  return;
 	}
 
-	_Lock();
+	Lock();
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 	oldpensize = d->pensize;
@@ -1035,7 +1035,7 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 		}
 	}
 	d->pensize = oldpensize;
-	_Unlock();
+	Unlock();
 
 }
 
@@ -1063,7 +1063,7 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	float oldpensize;
 	bool steep = false;
 
-	_Lock();
+	Lock();
 	if ( fabs(pts[3].y-pts[0].y) > fabs(pts[3].x-pts[0].x) )
 		steep = true;
 	
@@ -1117,7 +1117,7 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 		ddy += dddy;
 	}
 	d->pensize = oldpensize;
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1145,7 +1145,7 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 	int px = 0;
 	int py = twoRx2 * y;
 
-	_Lock();
+	Lock();
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
@@ -1202,7 +1202,7 @@ void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 		                HLine(ROUND(CLIP_X(xc-x)),ROUND(CLIP_X(xc+x)),ROUND(yc+y),&pattern);
 		}
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1226,10 +1226,10 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 	   horizontal line, second intersection is end of horizontal line.  Continue for
 	   all pairs of intersections.  Watch out for horizontal line segments.
 	*/
-	_Lock();
+	Lock();
 	if ( !ptlist || (numpts < 3) )
 	{
-		_Unlock();
+		Unlock();
 		return;
 	}
 	PatternHandler pattern(pat);
@@ -1339,7 +1339,7 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 		}
 	}
 	delete[] segmentArray;
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1351,7 +1351,7 @@ void AccelerantDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, Lay
 */
 void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
-	_Lock();
+	Lock();
 #ifndef DISABLE_HARDWARE_ACCELERATION
 	if ( accFillRect && AcquireEngine && (((uint8)*pat == 0xFF) || (*pat == 0)) )
 	{
@@ -1425,7 +1425,7 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 			accFillRect(mEngineToken, color, &fillParams, 1);
 			if ( ReleaseEngine )
 				ReleaseEngine(mEngineToken,NULL);
-			_Unlock();
+			Unlock();
 			return;
 		}
 	}
@@ -1490,7 +1490,7 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 			printf("Error: Unknown color space\n");
 	}
 
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1510,7 +1510,7 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	float yrad2 = yrad*yrad;
 	int i;
 
-	_Lock();
+	Lock();
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 	
@@ -1527,7 +1527,7 @@ void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData 
 	FillRect(BRect(CLIP_X(r.left),CLIP_Y(r.top+yrad),
 			CLIP_X(r.right),CLIP_Y(r.bottom-yrad)), d, pat);
 
-	_Unlock();
+	Unlock();
 }
 
 //void AccelerantDriver::FillShape(SShape *sh, LayerData *d, int8 *pat)
@@ -1550,7 +1550,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 	if(!pts || !d || !pat)
 		return;
 
-	_Lock();
+	Lock();
 	BPoint first, second, third;
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
@@ -1599,7 +1599,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		end.x=MAX(first.x,MAX(second.x,third.x));
 		if ( CHECK_Y(start.y) && (CHECK_X(start.x) || CHECK_X(end.x)) )
 			HLine(ROUND(CLIP_X(start.x)), ROUND(CLIP_X(end.x)), ROUND(start.y), &pattern);
-		_Unlock();
+		Unlock();
 		return;
 	}
 
@@ -1616,7 +1616,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		for(i=(int32)first.y+1; i<=third.y; i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
-		_Unlock();
+		Unlock();
 		return;
 	}
 	
@@ -1631,7 +1631,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		for(i=(int32)first.y; i<third.y; i++)
 			if ( CHECK_Y(i) && (CHECK_X(lineA.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 				HLine(ROUND(CLIP_X(lineA.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
-		_Unlock();
+		Unlock();
 		return;
 	}
 	
@@ -1648,7 +1648,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 		if ( CHECK_Y(i) && (CHECK_X(lineC.GetX(i)) || CHECK_X(lineB.GetX(i))) )
 			HLine(ROUND(CLIP_X(lineC.GetX(i))), ROUND(CLIP_X(lineB.GetX(i))), i, &pattern);
 		
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1660,7 +1660,7 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 */
 void AccelerantDriver::HideCursor(void)
 {
-	_Lock();
+	Lock();
 	if(!IsCursorHidden())
 	{
 		if ( accShowCursor )
@@ -1669,7 +1669,7 @@ void AccelerantDriver::HideCursor(void)
 			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 	}
 	DisplayDriver::HideCursor();
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1685,7 +1685,7 @@ void AccelerantDriver::HideCursor(void)
 void AccelerantDriver::MoveCursorTo(float x, float y)
 {
 	/* TODO: Add correct handling of obscured cursors */
-	_Lock();
+	Lock();
 	if ( accMoveCursor )
 	{
 		accMoveCursor((uint16)x,(uint16)y);
@@ -1702,7 +1702,7 @@ void AccelerantDriver::MoveCursorTo(float x, float y)
 			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	}
 	
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1711,7 +1711,7 @@ void AccelerantDriver::MoveCursorTo(float x, float y)
 */
 void AccelerantDriver::InvertRect(BRect r)
 {
-	_Lock();
+	Lock();
 	if ( accInvertRect && AcquireEngine && (AcquireEngine(0,0,NULL,&mEngineToken) == B_OK) )
 	{
 		fill_rect_params fillParams;
@@ -1722,7 +1722,7 @@ void AccelerantDriver::InvertRect(BRect r)
 		accInvertRect(mEngineToken, &fillParams, 1);
 		if ( ReleaseEngine )
 			ReleaseEngine(mEngineToken,NULL);
-		_Unlock();
+		Unlock();
 		return;
 	}
 	switch (mDisplayMode.space)
@@ -1813,7 +1813,7 @@ void AccelerantDriver::InvertRect(BRect r)
 		default:
 		break;
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1825,7 +1825,7 @@ void AccelerantDriver::InvertRect(BRect r)
 */
 void AccelerantDriver::ShowCursor(void)
 {
-	_Lock();
+	Lock();
 	if(IsCursorHidden())
 	{
 		if ( accShowCursor )
@@ -1834,7 +1834,7 @@ void AccelerantDriver::ShowCursor(void)
 			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	}
 	DisplayDriver::ShowCursor();
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1846,7 +1846,7 @@ void AccelerantDriver::ShowCursor(void)
 */
 void AccelerantDriver::ObscureCursor(void)
 {
-	_Lock();
+	Lock();
 	if (!IsCursorHidden() )
 	{
 		if ( accShowCursor )
@@ -1855,7 +1855,7 @@ void AccelerantDriver::ObscureCursor(void)
 			BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 	}
 	DisplayDriver::ObscureCursor();
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1871,7 +1871,7 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 	if(!csr)
 		return;
 		
-	_Lock();
+	Lock();
 	if ( accSetCursorShape && (csr->BitsPerPixel() == 1) )
 	{
 		/* TODO: Need to fix transparency */
@@ -1914,7 +1914,7 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		if(!IsCursorHidden())
 			BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -1955,7 +1955,7 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 	  return;
 	}
 
-	_Lock();
+	Lock();
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
@@ -2082,7 +2082,7 @@ void AccelerantDriver::SetCursor(ServerCursor *csr)
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2105,7 +2105,7 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	double dt2, dt3;
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
 
-	_Lock();
+	Lock();
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
 
@@ -2150,7 +2150,7 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 		dy += ddy;
 		ddy += dddy;
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2179,7 +2179,7 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 	int py = twoRx2 * y;
 	int thick;
 
-	_Lock();
+	Lock();
 	thick = (int)d->pensize;
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
@@ -2230,7 +2230,7 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 		SetThickPixel(ROUND(xc-x),ROUND(yc+y),thick,&pattern);
 		SetThickPixel(ROUND(xc+x),ROUND(yc+y),thick,&pattern);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2258,7 +2258,7 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 	double y = y1;
 	int thick;
 
-	_Lock();
+	Lock();
 	thick = (int)d->pensize;
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
@@ -2278,7 +2278,7 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 		y += yInc;
 		SetThickPixel(ROUND(x),ROUND(y),thick,&pattern);
 	}
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2295,12 +2295,12 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed)
 {
 	/* Bounds checking is handled by StrokeLine and the functions it uses */
-	_Lock();
+	Lock();
 	for(int32 i=0; i<(numpts-1); i++)
 		StrokeLine(ptlist[i],ptlist[i+1],d,pat);
 	if(is_closed)
 		StrokeLine(ptlist[numpts-1],ptlist[0],d,pat);
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2312,7 +2312,7 @@ void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, L
 */
 void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
-	_Lock();
+	Lock();
 	int thick = (int)d->pensize;
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
@@ -2321,7 +2321,7 @@ void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 	StrokeLine(r.RightTop(), r.RightBottom(), d, pat);
 	HLineThick(ROUND(r.right), ROUND(r.left), ROUND(r.bottom), thick, &pattern);
 	StrokeLine(r.LeftTop(), r.LeftBottom(), d, pat);
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2340,7 +2340,7 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 	float hLeft, hRight;
 	float vTop, vBottom;
 	float bLeft, bRight, bTop, bBottom;
-	_Lock();
+	Lock();
 	int thick = (int)d->pensize;
 	PatternHandler pattern(pat);
 	pattern.SetColors(d->highcolor, d->lowcolor);
@@ -2364,7 +2364,7 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
 	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
-	_Unlock();
+	Unlock();
 }
 
 //void AccelerantDriver::StrokeShape(SShape *sh, LayerData *d, int8 *pat)
@@ -2385,11 +2385,11 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
 	/* Bounds checking is handled by StrokeLine and the functions it calls */
-	_Lock();
+	Lock();
 	StrokeLine(pts[0],pts[1],d,pat);
 	StrokeLine(pts[1],pts[2],d,pat);
 	StrokeLine(pts[2],pts[0],d,pat);
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2405,9 +2405,9 @@ void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *
 */
 void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *colors, LayerData *d)
 {
-	_Lock();
+	Lock();
 	
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2424,7 +2424,7 @@ void AccelerantDriver::SetMode(int32 mode)
 	int proposed_width, proposed_height, proposed_depth;
 	int i;
 
-	_Lock();
+	Lock();
 
 	if ( SetDisplayMode )
 	{
@@ -2451,7 +2451,7 @@ void AccelerantDriver::SetMode(int32 mode)
 		}
 	}
 
-	_Unlock();
+	Unlock();
 }
 
 /*!
@@ -2480,14 +2480,14 @@ float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData 
 {
 	if(!string || !d || !d->font)
 		return 0.0;
-	_Lock();
+	Lock();
 
 	ServerFont *font=d->font;
 	FontStyle *style=font->Style();
 
 	if(!style)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -2502,7 +2502,7 @@ float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData 
 	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -2513,7 +2513,7 @@ float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData 
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -2545,7 +2545,7 @@ float AccelerantDriver::StringWidth(const char *string, int32 length, LayerData 
 	FT_Done_Face(face);
 
 	returnval=pen.x>>6;
-	_Unlock();
+	Unlock();
 	return returnval;
 }
 
@@ -2565,14 +2565,14 @@ float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData
 {
 	if(!string || !d || !d->font)
 		return 0.0;
-	_Lock();
+	Lock();
 
 	ServerFont *font=d->font;
 	FontStyle *style=font->Style();
 
 	if(!style)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -2585,7 +2585,7 @@ float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData
 	error=FT_New_Face(ftlib, style->GetPath(), 0, &face);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -2594,7 +2594,7 @@ float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData
 	error=FT_Set_Char_Size(face, 0,int32(font->Size())*64,72,72);
 	if(error)
 	{
-		_Unlock();
+		Unlock();
 		return 0.0;
 	}
 
@@ -2612,12 +2612,12 @@ float AccelerantDriver::StringHeight(const char *string, int32 length, LayerData
 		else
 			ascent=MAX(slot->bitmap.rows,ascent);
 	}
-	_Unlock();
+	Unlock();
 
 	FT_Done_Face(face);
 
 	returnval=ascent+descent;
-	_Unlock();
+	Unlock();
 	return returnval;
 }
 

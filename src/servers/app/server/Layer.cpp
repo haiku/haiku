@@ -35,14 +35,6 @@
 #include "TokenHandler.h"
 #include "RectUtils.h"
 
-//#define DEBUG_LAYER
-//#define DEBUG_REGIONS
-
-#ifdef DEBUG_REGIONS
-#include "Desktop.h"
-#include "DisplayDriver.h"
-#endif
-
 //! TokenHandler object used to provide IDs for all Layers and, thus, BViews
 TokenHandler view_token_handler;
 
@@ -89,19 +81,11 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 
 	_level=0;
 	_layerdata=new LayerData;
-#ifdef DEBUG_LAYER
-printf("Layer: %s\n",name);
-printf("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",frame.left,frame.top,frame.right,frame.bottom);
-printf("\tWindow: %s\n",win?win->Title():"NULL");
-#endif
 }
 
 //! Destructor frees all allocated heap space
 Layer::~Layer(void)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: ~Layer()\n",_name->String());
-#endif
 	if(_visible)
 	{
 		delete _visible;
@@ -137,11 +121,8 @@ printf("Layer: %s: ~Layer()\n",_name->String());
 */
 void Layer::AddChild(Layer *layer, Layer *before, bool rebuild)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Add Child (%s, %s, %s) - Incomplete\n",_name->String(),layer?layer->_name->String():"NULL",
-	before?before->_name->String():"NULL",rebuild?"rebuild":"no rebuild");
-#endif
 	// TODO: Add before support
+printf("Layer::AddChild lacks before support\n");
 
 	if(layer->_parent!=NULL)
 	{
@@ -159,39 +140,21 @@ printf("Layer: %s: Add Child (%s, %s, %s) - Incomplete\n",_name->String(),layer?
 	}
 
 	// we need to change this to a loop for each _lowersibling of the layer
-	if(_topchild!=NULL)
+	if(_bottomchild)
 	{
-		// we're adding to the back side of the stack??
-		layer->_lowersibling=_topchild;
+		// we're adding to the front side of the stack
+		layer->_uppersibling=_bottomchild;
 		
 		// added layer will be at the bottom of the stack
-		_topchild->_uppersibling=layer;
-		for(Layer *lay=layer->_lowersibling; lay!=NULL; lay=lay->_lowersibling)
-		{
-			if(layer->_frame.Intersects(lay->_frame))
-			{
-				if(lay->_visible && lay->_hidecount==0)
-				{
-					// reg is what is _visible in the layer's _parent's coordinate system
-					BRegion *reg=new BRegion(ConvertToParent(layer->_visible));
-					// reg2 is the layer's _visible region in the sibling's coordinate system
-					BRegion *reg2=new BRegion(lay->ConvertFromParent(reg));
-					delete reg;
-	
-	//				layer->_lowersibling->_visible->Exclude(reg2);
-					// lowersiblings occupy screen space _above_ a layer, so the layer itself
-					// must remove from its _visible region 
-					layer->_visible->Exclude(reg2);
-					delete reg2;
-				}
-			}
-		}
+		_bottomchild->_lowersibling=layer;
+
 	}
 	else
-		_bottomchild=layer;
-	_topchild=layer;
+		_topchild=layer;
+
+	_bottomchild=layer;
 	layer->_level=_level+1;
-	
+
 	if(rebuild)
 		RebuildRegions(true);
 }
@@ -203,10 +166,6 @@ printf("Layer: %s: Add Child (%s, %s, %s) - Incomplete\n",_name->String(),layer?
 */
 void Layer::RemoveChild(Layer *layer, bool rebuild)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Remove Child (%s,%s)\n",_name->String(),layer?layer->_name->String():"NULL",
-	rebuild?"rebuild":"no rebuild");
-#endif
 	if(layer->_parent==NULL)
 	{
 		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
@@ -249,9 +208,6 @@ printf("Layer: %s: Remove Child (%s,%s)\n",_name->String(),layer?layer->_name->S
 */
 void Layer::RemoveSelf(bool rebuild)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: RemoveSelf(%s)\n",_name->String(),rebuild?"rebuild":"no rebuild");
-#endif
 	// A Layer removes itself from the tree (duh)
 	if(_parent==NULL)
 	{
@@ -279,9 +235,6 @@ printf("Layer: %s: RemoveSelf(%s)\n",_name->String(),rebuild?"rebuild":"no rebui
 */
 Layer *Layer::GetChildAt(BPoint pt, bool recursive)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Get Child At (%.1f,%.1f)\n",_name->String(),pt.x,pt.y);
-#endif
 	Layer *child;
 	if(recursive)
 	{
@@ -335,9 +288,6 @@ BRect Layer::Frame(void)
 */
 void Layer::PruneTree(void)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Prune Tree\n",_name->String());
-#endif
 	Layer *lay,*nextlay;
 
 	lay=_topchild;
@@ -363,9 +313,6 @@ printf("Layer: %s: Prune Tree\n",_name->String());
 */
 Layer *Layer::FindLayer(int32 token)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Find Layer (%ld)\n",_name->String(),token);
-#endif
 	// recursive search for a layer based on its view token
 	Layer *lay, *trylay;
 
@@ -397,10 +344,6 @@ printf("Layer: %s: Find Layer (%ld)\n",_name->String(),token);
 */
 void Layer::Invalidate(BRegion region)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Invalidate(BRegion)\n",_name->String());
-region.PrintToStream();
-#endif
 	int32 i;
 	BRect r;
 
@@ -447,10 +390,6 @@ region.PrintToStream();
 */
 void Layer::Invalidate(BRect rect)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Invalidate(%.1f,%.1f,%.1f,%.1f)\n",_name->String(),rect.left,rect.top,rect.right,
-	rect.bottom);
-#endif
 	// Make our own section dirty and pass it on to any children, if necessary....
 	// YES, WE ARE SHARING DIRT! Mudpies anyone? :D
 	if(TestRectIntersection(Frame(),rect))
@@ -486,10 +425,9 @@ printf("Layer: %s: Invalidate(%.1f,%.1f,%.1f,%.1f)\n",_name->String(),rect.left,
 */
 void Layer::RequestDraw(const BRect &r)
 {
-#ifdef DEBUG_LAYER
 printf("Layer: %s: RequestDraw(%.1f,%.1f,%.1f,%.1f) - unimplemented\n",
 	_name->String(),r.left,r.top,r.right,r.bottom);
-#endif
+
 	// TODO: Implement and fix
 /*	if(_visible==NULL || _hidecount>0)
 		return;
@@ -532,10 +470,6 @@ bool Layer::IsDirty(void) const
 */
 void Layer::UpdateIfNeeded(bool force_update)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: UpdateIfNeeded(%s)\n",_name->String(),
-		force_update?"force update":"don't force update");
-#endif
 	Layer *child;
 	
 	if(IsHidden())
@@ -565,10 +499,6 @@ printf("Layer: %s: UpdateIfNeeded(%s)\n",_name->String(),
 */
 void Layer::MarkModified(BRect rect)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: MarkModified(%.1f%.1f,%.1f,%.1f)\n",_name->String(),
-		rect.left,rect.top,rect.right,rect.bottom);
-#endif
 	if(TestRectIntersection(Bounds(),rect))
 		_regions_invalid=true;
 	
@@ -583,10 +513,6 @@ printf("Layer: %s: MarkModified(%.1f%.1f,%.1f,%.1f)\n",_name->String(),
 */
 void Layer::UpdateRegions(bool force)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: UpdateRegions(%s)\n",_name->String(),
-		force?"force update":"don't force update");
-#endif
 	if(force)
 	{
 		RebuildRegions(true);
@@ -601,9 +527,6 @@ printf("Layer: %s: UpdateRegions(%s)\n",_name->String(),
 //! Show the layer. Operates just like the BView call with the same name
 void Layer::Show(void)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Show\n",_name->String());
-#endif
 	if(_hidecount==0)
 		return;
 
@@ -628,14 +551,16 @@ printf("Layer: %s: Show\n",_name->String());
 	Layer *child;
 	for(child=_topchild; child!=NULL; child=child->_lowersibling)
 		child->Show();
+
+	if(_parent)
+		_parent->RebuildRegions(true);
+	
+	_parent->UpdateIfNeeded();
 }
 
 //! Hide the layer. Operates just like the BView call with the same name
 void Layer::Hide(void)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Hide\n",_name->String());
-#endif
 	if(_hidecount==0)
 	{
 		BRegion *reg=new BRegion(ConvertToParent(_visible));
@@ -683,9 +608,6 @@ uint32 Layer::CountChildren(void)
 */
 void Layer::MoveBy(float x, float y)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Move By (%.1f,%.1f)\n",_name->String(),x,y);
-#endif
 	BRect oldframe(_frame);
 	_frame.OffsetBy(x,y);
 
@@ -730,9 +652,6 @@ printf("Layer: %s: Move By (%.1f,%.1f)\n",_name->String(),x,y);
 */
 void Layer::ResizeBy(float x, float y)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Rezize By (%.1f,%.1f) - Incomplete\n",_name->String(),x,y);
-#endif
 	// TODO: Implement and test child resizing based on flags
 	
 	BRect oldframe=_frame;
@@ -751,66 +670,62 @@ printf("Layer: %s: Rezize By (%.1f,%.1f) - Incomplete\n",_name->String(),x,y);
 }
 
 /*!
-	\brief Rebuilds visibility regions
+	\brief Rebuilds visibility regions for child layers
 	\param include_children Flag to rebuild all children and subchildren
 */
 void Layer::RebuildRegions(bool include_children)
 {
-#ifdef DEBUG_LAYER
-printf("Layer: %s: Rebuild Regions (%s)\n",_name->String(),include_children?"include children":
-"no child inclusion");
-#endif
-	BRegion *reg,*reg2;
+	// Algorithm:
+	// 1) Reset child visibility regions to completely visible
+	// 2) Clip each child to visible region of this layer
+	// 3) Clip each child to its siblings, going front to back
+	// 4) Remove the visible regions of the children from the current one
+	
+	// Reset visible regions
 	if(_full)
-		_full->Include(Bounds());
+		_full->Include(Frame());
 	else
-		_full=new BRegion(Bounds());
+		_full=new BRegion(Frame());
 
 	if(_visible)
-		_visible->Include(Bounds());
+		_visible->Include(Frame());
 	else
-		_visible=new BRegion(Bounds());
+		_visible=new BRegion(Frame());
 
-	// Remove child footprints from _visible region
+	// Reset children to fully visible and clip to this layer's visible region
 	for(Layer *childlay=_topchild; childlay!=NULL; childlay=childlay->_lowersibling)
 	{
+		childlay->_visible->MakeEmpty();
+		childlay->_visible->Include(childlay->_full);
+
 		if(childlay->_visible && childlay->_hidecount==0)
-		{
-#ifdef DEBUG_REGIONS
-printf("old visible:");_visible->PrintToStream();
-#endif
-			reg=new BRegion(childlay->ConvertToParent(childlay->_visible));
-			_visible->Exclude(reg);
-#ifdef DEBUG_REGIONS
-printf("child visible:");childlay->_visible->PrintToStream();
-printf("converted child visible:");reg->PrintToStream();
-printf("new visible:");_visible->PrintToStream();
-#endif
-			delete reg;
-		}
+			childlay->_visible->IntersectWith(_visible);
+
 	}
 
-	// Remove _lowersibling footprints, which are on top of the layer on screen
-	for(Layer *siblay=_lowersibling; siblay!=NULL; siblay=siblay->_lowersibling)
+	// This region is the common clipping region used when clipping children to their
+	// siblings. We will use this because of efficiency - it is gradually built by
+	// first clipping a child to the region if the region is not empty and then
+	// adding the child's resulting footprint to the clipping region. Once all the
+	// children have been clipped, then the resulting region will allow for one call
+	// to remove the footprints of all the children from the layer's visible region.
+	BRegion clipregion;
+	clipregion.MakeEmpty();
+
+	// Clip children to siblings which are closer to the front
+	for(Layer *siblay=_bottomchild; siblay!=NULL; siblay=siblay->_uppersibling)
 	{
-		if(_frame.Intersects(siblay->_frame))
+		if( clipregion.CountRects()>0 &&
+			TestRectIntersection(siblay->Frame(),clipregion.Frame()) && 
+			siblay->_visible && 
+			siblay->_hidecount==0 )
 		{
-			if(siblay->_visible && siblay->_hidecount==0)
-			{
-				// reg is what is _visible in the layer's _parent's coordinate system
-				reg=new BRegion(ConvertToParent(_visible));
-				// reg2 is the layer's _visible region in the sibling's coordinate system
-				reg2=new BRegion(siblay->ConvertFromParent(reg));
-				delete reg;
-
-				// lowersiblings occupy screen space _above_ a layer, so the layer itself
-				// must remove from its _visible region 
-				_visible->Exclude(reg2);
-				delete reg2;
-			}
+			siblay->_visible->Exclude(&clipregion);
 		}
+		clipregion.Include(siblay->_visible);
 	}
-
+	
+	// Rebuild the regions for subchildren if we're supposed to
 	if(include_children)
 	{
 		for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)

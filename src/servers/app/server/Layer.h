@@ -98,7 +98,7 @@ public:
 	BRect ConvertToTop(BRect rect);
 	BRegion ConvertFromTop(BRegion *reg);
 	BRect ConvertFromTop(BRect rect);
-
+	
 	void PrintToStream(void);
 	void PrintNode(void);
 	void PruneTree(void);
