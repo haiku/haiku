@@ -142,7 +142,7 @@ public:
 							BFont(void);
 							BFont(const BFont &font);
 							BFont(const BFont *font);
-							/* /* XXX TODO: R5 doesn't have a destructor, so we get linking errors when objects compiled with old headers with the new library
+							/* XXX TODO: R5 doesn't have a destructor, so we get linking errors when objects compiled with old headers with the new library
 							~BFont(void);
 							*/
 
