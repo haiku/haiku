@@ -1,7 +1,7 @@
-SubDir OBOS_TOP sources os kits interface prefs screen ;
+SubDir OBOS_TOP src prefs screen ;
+
+AddResources Screen : Screen.rsrc ;
 
 Preference Screen : AlertView.cpp AlertWindow.cpp RefreshSlider.cpp RefreshView.cpp RefreshWindow.cpp Screen.cpp ScreenDrawView.cpp ScreenSettings.cpp ScreenView.cpp ScreenWindow.cpp ;
 
 LinkSharedOSLibs Screen : be root ;
-
-AddResources Screen : Screen.rsrc ;
