@@ -33,14 +33,16 @@
 #include <user_atomic.h>
 #include <safemode.h>
 #include <arch/system_info.h>
+
 #include <malloc.h>
+#include <string.h>
 
 
 typedef struct generic_syscall generic_syscall;
 
 struct generic_syscall {
 	list_link		link;
-	uint32			subsystem;
+	char			subsystem[B_FILE_NAME_LENGTH];
 	syscall_hook	hook;
 	uint32			version;
 	uint32			flags;
@@ -52,14 +54,14 @@ static struct list sGenericSyscalls;
 
 
 static generic_syscall *
-find_generic_syscall(uint32 subsystem)
+find_generic_syscall(const char *subsystem)
 {
 	generic_syscall *syscall = NULL;
 
 	ASSERT_LOCKED_MUTEX(&sGenericSyscallLock);
 
 	while ((syscall = list_get_next_item(&sGenericSyscalls, syscall)) != NULL) {
-		if (syscall->subsystem == subsystem)
+		if (!strcmp(syscall->subsystem, subsystem))
 			return syscall;
 	}
 
@@ -75,12 +77,18 @@ find_generic_syscall(uint32 subsystem)
  */
 
 static inline status_t
-_user_generic_syscall(uint32 subsystem, uint32 function, void *buffer, size_t bufferSize)
+_user_generic_syscall(const char *userSubsystem, uint32 function,
+	void *buffer, size_t bufferSize)
 {
+	char subsystem[B_FILE_NAME_LENGTH];
 	generic_syscall *syscall;
 	status_t status;
 
-	dprintf("generic_syscall(subsystem = %lu, function = %lu)\n", subsystem, function);
+	if (!IS_USER_ADDRESS(userSubsystem)
+		|| user_strlcpy(subsystem, userSubsystem, sizeof(subsystem)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	//dprintf("generic_syscall(subsystem = \"%s\", function = %lu)\n", subsystem, function);
 
 	mutex_lock(&sGenericSyscallLock);
 
@@ -90,7 +98,13 @@ _user_generic_syscall(uint32 subsystem, uint32 function, void *buffer, size_t bu
 		goto out;
 	}
 
-	if (function == B_SYSCALL_INFO) {
+	if (function >= B_RESERVED_SYSCALL_BASE) {
+		if (function != B_SYSCALL_INFO) {
+			// this is all we know
+			status = B_NAME_NOT_FOUND;
+			goto out;
+		}
+
 		// special info syscall
 		if (bufferSize != sizeof(uint32))
 			status = B_BAD_VALUE;
@@ -197,7 +211,7 @@ generic_syscall_init(void)
 
 
 status_t
-register_generic_syscall(uint32 subsystem, syscall_hook hook,
+register_generic_syscall(const char *subsystem, syscall_hook hook,
 	uint32 version, uint32 flags)
 {
 	struct generic_syscall *previous, *syscall;
@@ -227,7 +241,7 @@ register_generic_syscall(uint32 subsystem, syscall_hook hook,
 		goto out;
 	}
 
-	syscall->subsystem = subsystem;
+	strlcpy(syscall->subsystem, subsystem, sizeof(syscall->subsystem));
 	syscall->hook = hook;
 	syscall->version = version;
 	syscall->flags = flags;
@@ -246,7 +260,7 @@ out:
 
 
 status_t
-unregister_generic_syscall(uint32 subsystem, uint32 version)
+unregister_generic_syscall(const char *subsystem, uint32 version)
 {
 	// ToDo: we should only remove the syscall with the matching version
 	generic_syscall *syscall;

@@ -13,10 +13,11 @@
  * should be moved to KernelExport.h
  */
 
-typedef status_t (*syscall_hook)(uint32 subsystem, uint32 function, void *buffer, size_t bufferSize);
+typedef status_t (*syscall_hook)(const char *subsystem, uint32 function, void *buffer, size_t bufferSize);
 
 /* predefined functions */
-#define B_SYSCALL_INFO	~0UL
+#define B_RESERVED_SYSCALL_BASE		0x80000000
+#define B_SYSCALL_INFO				(B_RESERVED_SYSCALL_BASE)
 	// gets a minimum version uint32, and fills it with the current version on return
 
 /* syscall flags */
@@ -28,9 +29,9 @@ typedef status_t (*syscall_hook)(uint32 subsystem, uint32 function, void *buffer
 extern "C" {
 #endif
 
-status_t register_generic_syscall(uint32 subsystem, syscall_hook hook,
+status_t register_generic_syscall(const char *subsystem, syscall_hook hook,
 			uint32 version, uint32 flags);
-status_t unregister_generic_syscall(uint32 subsystem, uint32 version);
+status_t unregister_generic_syscall(const char *subsystem, uint32 version);
 
 #ifdef __cplusplus
 }

@@ -34,7 +34,7 @@ struct dirent;
 #endif
 
 extern int     		_kern_null();
-extern status_t		_kern_generic_syscall(uint32 subsystem, uint32 function,
+extern status_t		_kern_generic_syscall(const char *subsystem, uint32 function,
 						void *buffer, size_t bufferSize);
 
 extern int			_kern_getrlimit(int resource, struct rlimit * rlp);
