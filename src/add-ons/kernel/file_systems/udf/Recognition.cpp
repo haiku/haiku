@@ -61,13 +61,13 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	
 	// Now hunt down a volume descriptor sequence from one of
 	// the anchor volume pointers (if there are any).
-	if (!err)
+	if (!err) {
 		err = walk_anchor_volume_descriptor_sequences(device, offset, length,
 		                                              blockSize, blockShift,
 		                                              logicalVolumeDescriptor,
 		                                              partitionDescriptors,
 		                                              partitionDescriptorCount);
-		
+	}
 	RETURN(err);
 }
 
@@ -174,8 +174,8 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 	const uint8 avds_location_count = 4;
 	const off_t avds_locations[avds_location_count] = {
 														256,
-	                                                    length-256,
-	                                                    length,
+	                                                    length-1-256,
+	                                                    length-1,
 	                                                    512,
 	                                                  };
 	bool found_vds = false;		                                                  
@@ -224,10 +224,10 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			PRINT(("block %Ld: found valid vds\n", avds_locations[i]));
 			found_vds = true;
 			break;
-		} //else {
+		} else {
 			// Both failed, so loop around and try another avds
-//			PRINT(("block %Ld: vds search failed\n", avds_locations[i]));
-//		}
+			PRINT(("block %Ld: vds search failed\n", avds_locations[i]));
+		}
 	}
 	status_t err = found_vds ? B_OK : B_ERROR;
 	RETURN(err);
@@ -244,7 +244,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("descriptorSequence.loc:%ld, descriptorSequence.len:%ld",
 	           descriptorSequence.location(), descriptorSequence.length()));
 	uint32 count = descriptorSequence.length() >> blockShift;
-	
+		
 	bool foundLogicalVolumeDescriptor = false;
 	uint8 uniquePartitions = 0;
 	status_t err = B_OK;
@@ -252,7 +252,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 	for (uint32 i = 0; i < count; i++)
 	{
 		off_t block = descriptorSequence.location()+i;
-		off_t address = block << blockShift; //AddressForRelativeBlock(block);
+		off_t address = block << blockShift; 
 		MemoryChunk chunk(blockSize);
 		udf_tag *tag = NULL;
 
@@ -281,6 +281,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 				{
 					udf_primary_descriptor *primary = reinterpret_cast<udf_primary_descriptor*>(tag);
 					PDUMP(primary);				
+					(void)primary;	// kill the warning		
 					break;
 				}
 				
@@ -294,6 +295,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 				{
 					udf_implementation_use_descriptor *imp_use = reinterpret_cast<udf_implementation_use_descriptor*>(tag);
 					PDUMP(imp_use);				
+					(void)imp_use;	// kill the warning		
 					break;
 				}
 
@@ -306,20 +308,20 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 						// the same number as this partition. If found, keep the one with
 						// the higher vds number.
 						bool foundDuplicate = false;
-						int i;
-						for (i = 0; i < uniquePartitions; i++) {
-							if (partitionDescriptors[i].partition_number()
+						int num;
+						for (num = 0; num < uniquePartitions; num++) {
+							if (partitionDescriptors[num].partition_number()
 							    == partition->partition_number())
 							{
 								foundDuplicate = true;
-								if (partitionDescriptors[i].vds_number()
+								if (partitionDescriptors[num].vds_number()
 								    < partition->vds_number())
 								{
-									partitionDescriptors[i] = *partition;		
+									partitionDescriptors[num] = *partition;		
 									PRINT(("Replacing previous partition #%d (vds_number: %ld) with "
 									       "new partition #%d (vds_number: %ld)\n",
-									       partitionDescriptors[i].partition_number(),
-									       partitionDescriptors[i].vds_number(),
+									       partitionDescriptors[num].partition_number(),
+									       partitionDescriptors[num].vds_number(),
 									       partition->partition_number(),
 									       partition->vds_number()));
 								}
@@ -329,9 +331,9 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 						// If we didn't find a duplicate, see if we have any open descriptor
 						// spaces left.
 						if (!foundDuplicate) {
-							if (i < Udf::kMaxPartitionDescriptors) {
+							if (num < Udf::kMaxPartitionDescriptors) {
 								// At least one more partition descriptor allowed
-								partitionDescriptors[i] = *partition;
+								partitionDescriptors[num] = *partition;
 								uniquePartitions++;
 								PRINT(("Adding partition #%d (vds_number: %ld)\n",
 								       partition->partition_number(),
@@ -383,6 +385,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 					} else {
 						logicalVolumeDescriptor = *logical;
 						foundLogicalVolumeDescriptor = true;
+						DUMP(logicalVolumeDescriptor);
 					}
 					break;
 				}
@@ -391,13 +394,15 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 				{
 					udf_unallocated_space_descriptor *unallocated = reinterpret_cast<udf_unallocated_space_descriptor*>(tag);
 					PDUMP(unallocated);				
+					(void)unallocated;	// kill the warning		
 					break;
 				}
 					
 				case TAGID_TERMINATING_DESCRIPTOR:
 				{
 					udf_terminating_descriptor *terminating = reinterpret_cast<udf_terminating_descriptor*>(tag);
-					PDUMP(terminating);				
+					PDUMP(terminating);
+					(void)terminating;	// kill the warning		
 					break;
 				}
 					
