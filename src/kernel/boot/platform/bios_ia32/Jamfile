@@ -2,6 +2,9 @@ SubDir OBOS_TOP src kernel boot platform bios_ia32 ;
 
 SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName storage ] ;
+
 KernelMergeObject boot_platform_bios_ia32.o :
 	<$(SOURCE_GRIST)>shell.S
 	<$(SOURCE_GRIST)>start.c
