@@ -158,7 +158,7 @@ FileTypeApp::ArgvReceived(int32 argc, const char * argv[], const char * cwd)
 			    (strcmp(argv[i],"-help") == 0) ||
 			    (strcmp(argv[i],"--help") == 0)) {
 				for (int32 i = 0 ; (i < entryList.CountItems()) ; i++) {
-					delete entryList.ItemAt(i);
+					delete static_cast<BEntry*>(entryList.ItemAt(i));
 				}
 				entryList.MakeEmpty();
 				delete entry;
