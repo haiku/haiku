@@ -13,6 +13,7 @@ Media Windows Header by Sikosis
 #include "MediaViews.h"
 
 class MediaView;
+class IconView;
 
 class MediaWindow : public BWindow
 {
@@ -26,6 +27,7 @@ class MediaWindow : public BWindow
 		void InitWindow(void);
 		
 	    MediaView*	 ptrMediaView;
+	    IconView*    ptrIconView;
 };
 
 #endif

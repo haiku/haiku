@@ -2,7 +2,7 @@
 
 MediaViews Header by Sikosis
 
-(C)2002
+(C)2003
 
 */
 
@@ -18,5 +18,13 @@ class MediaView : public BView
     	MediaView(BRect frame);
     	virtual	void	Draw(BRect updateRect);	
 };
+
+class IconView : public BView
+{
+	public:
+    	IconView(BRect frame);
+    	virtual	void	Draw(BRect updateRect);	
+};
+
 
 #endif

@@ -83,6 +83,11 @@ void MediaWindow::InitWindow(void)
 	outline->AddUnder(submenu = new BStringItem("Video Window Consumer"), topmenu);
 	outlinesv = new BScrollView("scroll_audio", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP, 0, false, false, B_FANCY_BORDER);
 	
+	BRect IconRect(0,0,16,16);
+	ptrIconView = new IconView(IconRect);
+	
+	topmenu->DrawItem(ptrIconView,IconRect,false);
+	
 	// Setup the OutlineView 
 	outlinesv->SetBorderHighlighted(true);
 	outline->SetHighColor(0,0,0,0);
