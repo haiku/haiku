@@ -189,7 +189,9 @@ BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	rightbox->AddChild(placementMenuField);
 		
 	cvrect.OffsetBy(0, -25);
-	BMenuField *imageMenuField = new BMenuField(cvrect, "imageMenuField", 
+	BRect imageRect = cvrect;
+	imageRect.right += 40;
+	BMenuField *imageMenuField = new BMenuField(imageRect, "imageMenuField", 
 		"Image:", fImageMenu);
 	imageMenuField->SetDivider(70.0);
 	imageMenuField->SetAlignment(B_ALIGN_RIGHT);
@@ -337,7 +339,7 @@ BGView::MessageReceived(BMessage *msg)
 		}
 		case B_CANCEL:
 		{
-			printf("cancel received\n");
+			PRINT(("cancel received\n"));
 			void* pointer;
 			msg->FindPointer("source", &pointer);
 			if(pointer == fPanel) {
@@ -752,7 +754,7 @@ BGView::LoadSettings(void)
 		BFile file(path.Path(),B_READ_ONLY);
 		if((file.InitCheck()==B_OK)&&(fSettings.Unflatten(&file)==B_OK))
 		{
-			fSettings.PrintToStream();
+			PRINT_OBJECT(fSettings);
 			
 			BPoint point;
 			if(fSettings.FindPoint("pos", &point)==B_OK)
@@ -779,7 +781,7 @@ BGView::LoadSettings(void)
 			}
 			fWorkspaceMenu->SetTargetForItems(this);
 			
-			printf("Settings Loaded\n");
+			PRINT(("Settings Loaded\n"));
 		} else
 		{
 			printf("Error unflattening settings file %s\n",path.Path());

@@ -87,7 +87,7 @@ BackgroundImage::GetBackgroundImage(const BNode *node, bool isDesktop,
 	if (error != B_OK)
 		return NULL;
 
-	container.PrintToStream();
+	PRINT_OBJECT(container);
 
 	uint32 imageSetPeriod = 0;
 	uint32 globalCacheMode = 0;
@@ -420,7 +420,7 @@ BackgroundImage::SetBackgroundImage(BNode *node)
 		}
 	}
 	
-	container.PrintToStream();
+	PRINT_OBJECT(container);
 	
 	char buffer[container.FlattenedSize()];
 	if((err = container.Flatten(buffer, container.FlattenedSize())) != B_OK)
