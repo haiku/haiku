@@ -18,7 +18,7 @@
 #include <OS.h>
 #include "AGP.h"
 
-#define DRIVER_PREFIX "nv" // apsed
+#define DRIVER_PREFIX "skel"
 
 /*
 	Internal driver state (also for sharing info between driver and accelerant)
