@@ -2,16 +2,20 @@
  * Interface definitions for beos
  */
 
-#ifndef OBOS_IF_H
-#define OBOS_IF_H
+#ifndef _NET_IF_H
+#define _NET_IF_H
 
-#include <kernel/OS.h>
-#include <Drivers.h>
-#include "sys/socketvar.h"
-#include "net/if_types.h"
-#include "netinet/in.h"
-#include "net/route.h"
- 
+#include <OS.h>
+//#include <Drivers.h>
+#include <sys/socketvar.h>
+#include <net/if_types.h>
+#include <netinet/in.h>
+#include <net/route.h>
+
+/* XXX - hack to get this file building 
+ *       taken from be/drivers/Drivers.h
+ */
+#define B_DEVICE_OP_CODES_END 9999
 enum {
 	IF_GETADDR = B_DEVICE_OP_CODES_END,
 	IF_INIT,
@@ -146,7 +150,7 @@ struct ifnet {
 	void (*input) (struct mbuf*);
 	int	 (*output)(struct ifnet *, struct mbuf*, 
 			  struct sockaddr*, struct rtentry *); 
-	int	 (*ioctl) (struct ifnet *, int, caddr_t);
+	int	 (*ioctl) (struct ifnet *, ulong, char *);
 };
 #define if_mtu          ifd.ifi_mtu
 #define if_type         ifd.ifi_type
@@ -177,7 +181,7 @@ struct ifreq {
 		struct sockaddr ifru_broadaddr;
 		uint16 ifru_flags;
 		int ifru_metric;
-		caddr_t ifru_data;
+		char * ifru_data;
 	} ifr_ifru;
 };
 #define ifr_addr        ifr_ifru.ifru_addr
@@ -191,7 +195,7 @@ struct ifreq {
 struct ifconf {
 	int ifc_len;	/* length of associated buffer */
 	union {
-		caddr_t ifcu_buf;
+		char * ifcu_buf;
 		struct ifreq *ifcu_req;
 	} ifc_ifcu;
 };
@@ -246,30 +250,28 @@ struct ifa_msghdr {
         int     ifam_metric;    /* value of ifa_metric */
 };
 
-#ifdef _NETWORK_STACK
-
-/* function declaration */
-struct  ifq    *start_ifq(void);
-void            stop_ifq(struct ifq *);
-struct  ifnet  *get_interfaces(void); 
-struct	ifnet  *ifunit(char *name);
-struct	ifaddr *ifa_ifwithaddr(struct sockaddr *);
-struct	ifaddr *ifa_ifwithaf(int);
-struct	ifaddr *ifa_ifwithdstaddr(struct sockaddr *);
-struct	ifaddr *ifa_ifwithnet(struct sockaddr *);
-struct	ifaddr *ifa_ifwithroute(int, struct sockaddr *,
+#ifdef _KERNEL_MODE
+  /* function declaration */
+  struct  ifq    *start_ifq(void);
+  void            stop_ifq(struct ifq *);
+  struct  ifnet  *get_interfaces(void); 
+  struct	ifnet  *ifunit(char *name);
+  struct	ifaddr *ifa_ifwithaddr(struct sockaddr *);
+  struct	ifaddr *ifa_ifwithaf(int);
+  struct	ifaddr *ifa_ifwithdstaddr(struct sockaddr *);
+  struct	ifaddr *ifa_ifwithnet(struct sockaddr *);
+  struct	ifaddr *ifa_ifwithroute(int, struct sockaddr *,
                                 struct sockaddr *);
-struct	ifaddr *ifaof_ifpforaddr(struct sockaddr *, struct ifnet *);
-void	ifafree(struct ifaddr *);
+  struct	ifaddr *ifaof_ifpforaddr(struct sockaddr *, struct ifnet *);
+  void	ifafree(struct ifaddr *);
 
-void    if_attach(struct ifnet *ifp);
-void    if_detach(struct ifnet *ifp);
+  void    if_attach(struct ifnet *ifp);
+  void    if_detach(struct ifnet *ifp);
 
-int     ifioctl(struct socket *so, int cmd, caddr_t data);
-int     ifconf(int cmd, caddr_t data);
-void    if_init(void);
-
+  int     ifioctl(struct socket *so, ulong cmd, char *data);
+  int     ifconf(int cmd, char *data);
+  void    if_init(void);
 #endif
 
-#endif /* OBOS_IF_H */
+#endif /* _NET_IF_H */
 

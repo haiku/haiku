@@ -1,10 +1,10 @@
 /* route.h */
 
-#ifndef NET_ROUTE_H
-#define NET_ROUTE_H
+#ifndef _NET_ROUTE_H
+#define _NET_ROUTE_H
 
-#include "net/radix.h"
-#include "sys/socket.h" /* for AF_MAX */
+#include <net/radix.h>
+#include <sys/socket.h> /* for AF_MAX */
 /*
  * A route consists of a destination address and a reference
  * to a routing entry.  These are often held by protocols
@@ -49,7 +49,7 @@ struct rtentry {
         struct  ifnet  *rt_ifp;         /* the answer: interface to use */
         struct  ifaddr *rt_ifa;         /* the answer: interface to use */
         struct  sockaddr *rt_genmask;   /* for generation of cloned routes */
-        caddr_t rt_llinfo;              /* pointer to link level info cache */
+        char *  rt_llinfo;              /* pointer to link level info cache */
         struct  rt_metrics rt_rmx;      /* metrics used by rx'ing protocols */
         struct  rtentry *rt_gwroute;    /* implied entry for gatewayed routes */
         struct  rtentry *rt_parent;     /* If cloned, parent of this route. */
@@ -163,8 +163,8 @@ struct walkarg {
 	int w_given;
 	int w_needed;
 	int w_tmemsize;
-	caddr_t w_where;
-	caddr_t w_tmem;
+	char * w_where;
+	char * w_tmem;
 };
 
 /*

@@ -34,10 +34,10 @@
  * $FreeBSD: src/sys/net/radix.h,v 1.16.2.1 2000/05/03 19:17:11 wollman Exp $
  */
 
-#ifndef _RADIX_H_
-#define	_RADIX_H_
+#ifndef _NET_RADIX_H_
+#define	_NET_RADIX_H_
 
-#include <malloc.h>
+#include <memheap.h>
 
 /*
  * Radix search tree node layout.
@@ -54,8 +54,8 @@ struct radix_node {
 #define RNF_ACTIVE	4		/* This node is alive (for rtfree) */
 	union {
 		struct {			/* leaf only data: */
-			caddr_t	rn_Key;		/* object of search */
-			caddr_t	rn_Mask;	/* netmask, if present */
+			char *	rn_Key;		/* object of search */
+			char *	rn_Mask;	/* netmask, if present */
 			struct	radix_node *rn_Dupedkey;
 		} rn_leaf;
 		struct {			/* node only data: */
@@ -88,7 +88,7 @@ struct radix_mask {
 	u_char	rm_flags;		/* cf. rn_flags */
 	struct	radix_mask *rm_mklist;	/* more masks to try */
 	union	{
-		caddr_t	rmu_mask;		/* the mask */
+		char *	rmu_mask;		/* the mask */
 		struct	radix_node *rmu_leaf;	/* for normal routes */
 	}	rm_rmu;
 	int	rm_refs;		/* # of references to this struct */
@@ -142,10 +142,10 @@ struct radix_node_head {
 #define Bcopy(a, b, n) memcpy(((char *)(b)), ((char *)(a)), (unsigned)(n))
 #define Bzero(p, n) memset((char *)(p),0, (int)(n));
 #define R_Malloc(p, t, n) do { \
-	(p = (t) malloc((unsigned int)(n))); \
+	(p = (t) kmalloc((unsigned int)(n))); \
 	memset(p, 0, sizeof(*p)); \
 	} while (0)
-#define Free(p) free((char *)p);
+#define Free(p) kfree((char *)p);
 
 void	 rn_init (void);
 int	 rn_inithead (void **, int);
@@ -153,13 +153,13 @@ int	 rn_refines (void *, void *);
 struct radix_node
 	 *rn_addmask (void *, int, int),
 	 *rn_addroute (void *, void *, struct radix_node_head *,
-			struct radix_node [2]),
+                   struct radix_node [2]),
 	 *rn_delete (void *, void *, struct radix_node_head *),
 	 *rn_lookup (void *v_arg, void *m_arg,
-		        struct radix_node_head *head),
+                 struct radix_node_head *head),
 	 *rn_match (void *, struct radix_node_head *);
 
 /* extra fucntion so we don't have to export the mask_rnhead */
 struct radix_node *rn_head_search(void *argv_v);
 
-#endif /* _RADIX_H_ */
+#endif /* _NET_RADIX_H_ */

@@ -120,7 +120,7 @@ struct ifpppcstatsreq {
 #define SIOCGPPPSTATS        _IOWR('i', 123, struct ifpppstatsreq)
 #define SIOCGPPPCSTATS       _IOWR('i', 122, struct ifpppcstatsreq)
 
-#ifdef _KERNEL_
+#ifdef _KERNEL_MODE
 int  pppoutput (struct ifnet *, struct mbuf *, struct sockaddr *,
 		   struct rtentry *);
 void pppinput (struct mbuf *);
