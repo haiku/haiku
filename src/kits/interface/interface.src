@@ -15,4 +15,5 @@ INTERFACE_KIT_SOURCE =
 	StringView.cpp
 	TextControl.cpp
 	TextInput.cpp
+	Window.cpp
 ;
