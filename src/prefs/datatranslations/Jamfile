@@ -6,6 +6,7 @@ Preference DataTranslations :
 	DataTranslations.cpp
 	DataTranslationsWindow.cpp
 	DataTranslationsView.cpp
-	DataTranslationsSettings.cpp ;
+	DataTranslationsSettings.cpp
+	IconView.cpp ;
 
 LinkSharedOSLibs DataTranslations : be translation ;
