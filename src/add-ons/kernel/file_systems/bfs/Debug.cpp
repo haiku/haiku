@@ -260,6 +260,7 @@ dump_bplustree_node(bplustree_node *node,bplustree_header *header,Volume *volume
 //	#pragma mark -
 
 
+#ifndef USER
 //#warn Don't mount more than once... would register twice the debugger commands!
 
 static int
@@ -276,17 +277,22 @@ dbg_inode(int argc, char **argv)
 	return B_OK;
 }
 
+#endif
 
 void
-unregister_debugger_commands()
+remove_debugger_commands()
 {
+#ifndef USER
 	remove_debugger_command("obfsinode", dbg_inode);
+#endif
 }
 
 
 void
-register_debugger_commands()
+add_debugger_commands()
 {
+#ifndef USER
 	add_debugger_command("obfsinode", dbg_inode, "dump an Inode object");
+#endif
 }
 
