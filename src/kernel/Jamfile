@@ -296,6 +296,7 @@ KernelLd libroot.so :
 
 	<$(SOURCE_GRIST)!libroot!os>area.o
 	<$(SOURCE_GRIST)!libroot!os>debug.o
+	<$(SOURCE_GRIST)!libroot!os>fs_attr.o
 	<$(SOURCE_GRIST)!libroot!os>port.o
 	<$(SOURCE_GRIST)!libroot!os>sem.o
 	<$(SOURCE_GRIST)!libroot!os>systeminfo.o

@@ -141,6 +141,24 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_ACCESS:
 			*call_ret = user_access((const char *)arg0, (int)arg1);
 			break;
+		case SYSCALL_OPEN_ATTR_DIR:
+			*call_ret = user_open_attr_dir((int)arg0, (const char *)arg1);
+			break;
+		case SYSCALL_CREATE_ATTR:
+			*call_ret = user_create_attr((int)arg0, (const char *)arg1, (uint32)arg2, (int)arg3);
+			break;
+		case SYSCALL_OPEN_ATTR:
+			*call_ret = user_open_attr((int)arg0, (const char *)arg1, (int)arg2);
+			break;
+		case SYSCALL_WRITE_ATTR_STAT:
+			*call_ret = user_write_attr_stat((int)arg0, (const struct stat *)arg1, (int)arg2);
+			break;
+		case SYSCALL_REMOVE_ATTR:
+			*call_ret = user_remove_attr((int)arg0, (const char *)arg1);
+			break;
+		case SYSCALL_RENAME_ATTR:
+			*call_ret = user_rename_attr((int)arg0, (const char *)arg1, (int)arg2, (const char *)arg3);
+			break;
 		case SYSCALL_SYSTEM_TIME:
 			*call_ret = system_time();
 			break;
