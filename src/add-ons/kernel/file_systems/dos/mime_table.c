@@ -43,6 +43,7 @@ struct ext_mime mimes[] = {
 	{ "mp2", "audio/x-mpeg" }, 
 	{ "mp3", "audio/x-mpeg" }, 
 	{ "ogg", "audio/x-vorbis" }, 
+	{ "mpc", "audio/x-mpc" }, 
 	{ "asf", "application/x-asf" }, 
 	{ "riff", "application/x-riff" }, 
 
@@ -94,6 +95,7 @@ struct ext_mime mimes[] = {
 	{ "mov", "video/quicktime" },
 	{ "mpg", "video/mpeg" },
 	{ "mpeg", "video/mpeg" },
+	{ "ogm", "video/x-ogm" },
 	{ "rm", "application/vnd.rn-realmedia" },
 	{ "rn", "application/vnd.rn-realmedia" },
 
