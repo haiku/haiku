@@ -60,7 +60,6 @@
 #include <PrivateScreen.h>
 #include <ServerProtocol.h>
 
-
 using namespace BPrivate;
 
 // Globals ---------------------------------------------------------------------
@@ -1161,14 +1160,14 @@ bool
 BApplication::window_quit_loop(bool quitFilePanels, bool force)
 {
 	BList looperList;
-	BObjectLocker<BLooperList> listLock(gLooperList);
-	if (listLock.IsLocked())
-		gLooperList.GetLooperList(&looperList);
+	{
+		BObjectLocker<BLooperList> listLock(gLooperList);
+		if (listLock.IsLocked())
+			gLooperList.GetLooperList(&looperList);
+	}
 
 	for (int32 i = looperList.CountItems(); i-- > 0; ) {
 		BWindow *window = dynamic_cast<BWindow *>((BLooper *)looperList.ItemAt(i));
-
-		// ToDo: windows in this list may already have been closed in the mean time?!
 
 		if (window != NULL && window->Lock()) {
 			if ((window->IsFilePanel() && !quitFilePanels)
@@ -1181,7 +1180,6 @@ BApplication::window_quit_loop(bool quitFilePanels, bool force)
 			window->Quit();
 		}
 	}
-
 	return true;
 }
 
