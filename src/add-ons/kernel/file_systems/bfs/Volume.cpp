@@ -363,7 +363,9 @@ Volume::Mount(const char *deviceName, uint32 flags)
 			// volume in bfs_mount(), so bfs_read_vnode() can't get it.
 			// But it's not needed to do that anyway.
 
-			fIndicesNode = new Inode(this, ToVnode(Indices()));
+			if (!Indices().IsZero())
+				fIndicesNode = new Inode(this, ToVnode(Indices()));
+
 			if (fIndicesNode == NULL
 				|| fIndicesNode->InitCheck() < B_OK
 				|| !fIndicesNode->IsContainer()) {
@@ -373,6 +375,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 					// if this is the case, the index root node is gone bad, and
 					// BFS switch to read-only mode
 					fFlags |= VOLUME_READ_ONLY;
+					delete fIndicesNode;
 					fIndicesNode = NULL;
 				}
 			}
