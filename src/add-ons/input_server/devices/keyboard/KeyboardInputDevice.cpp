@@ -34,7 +34,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define DEBUG 1
 #if DEBUG
 	inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
 		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
@@ -419,8 +418,8 @@ KeyboardInputDevice::InitFromSettings(void *cookie, uint32 opcode)
 		|| opcode == B_KEY_MAP_CHANGED 
 		|| opcode == B_KEY_LOCKS_CHANGED) {	
 		fKeymap.LoadCurrent();
-		SetLeds(device);
 		device->modifiers = fKeymap.Locks();
+		SetLeds(device);
 	}
 	
 	return B_OK;
@@ -678,11 +677,15 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 					|| (is_keydown && !(dev->modifiers & modifiers)))
 					dev->modifiers |= modifiers;
 				else
-					dev->modifiers &= !modifiers;
+					dev->modifiers ^= modifiers;
+					
 				msg->AddInt32("modifiers", dev->modifiers);
 				msg->AddData("states", B_UINT8_TYPE, states, 16);
 				if (dev->owner->EnqueueMessage(msg)!=B_OK)
 					delete msg;
+					
+				if (modifiers & (B_CAPS_LOCK | B_NUM_LOCK | B_SCROLL_LOCK))
+					dev->owner->SetLeds(dev);
 			}
 			
 			char *str = NULL, *str2 = NULL;
@@ -798,7 +801,7 @@ KeyboardInputDevice::SetLeds(keyboard_device *device)
 	if (device->fd<0)
 		return;
 	
-	uint32 locks = device->owner->fKeymap.Locks();
+	uint32 locks = device->modifiers;
 	char lock_io[3];
 	memset(lock_io, 0, sizeof(lock_io));
 	if (locks & B_NUM_LOCK)
