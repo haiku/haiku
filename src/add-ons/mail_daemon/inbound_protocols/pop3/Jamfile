@@ -3,15 +3,15 @@ SubDir OBOS_TOP src add-ons mail_daemon inbound_protocols pop3 ;
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-if $(TARGET_PLATFORM) = r5 {
-	SubDirC++Flags -DBUILDING_R5_LIBNET ;
-} else {
-	SubDirC++Flags -DBONE ;
-}
-
 if $(USESSL) {
 	SubDirC++Flags -DUSESSL ;
 	SubDirHdrs [ FDirName / boot home config include ] ;
+}
+
+if $(BONE_COMPATIBLE) {
+	SubDirC++Flags -DBONE ;
+} else {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
 }
 
 Addon POP3 : mail_daemon inbound_protocols :
@@ -20,15 +20,16 @@ Addon POP3 : mail_daemon inbound_protocols :
 	SimpleMailProtocol.cpp
 	md5c.c ;
 
+LinkSharedOSLibs POP3 : be libmail.so ;
+
 if $(USESSL) {
-	LinkSharedOSLibs POP3 :
-		be libmail.so socket bind ssl crypto ;
-} else if $(TARGET_PLATFORM) = r5 {
-	LinkSharedOSLibs POP3 :
-		 be libmail.so net ;
+	LinkSharedOSLibs POP3 : ssl crypto ;
+}
+
+if $(BONE_COMPATIBLE) {
+	LinkSharedOSLibs POP3 : socket bind ;
 } else {
-	LinkSharedOSLibs POP3 :
-		 be libmail.so socket bind ;
+	LinkSharedOSLibs POP3 : net ;
 }
 
 Package haiku-maildaemon-cvs :

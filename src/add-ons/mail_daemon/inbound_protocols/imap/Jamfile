@@ -4,15 +4,15 @@ UsePrivateHeaders mail ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
-if $(TARGET_PLATFORM) = r5 {
-	SubDirC++Flags -DBUILDING_R5_LIBNET ;
-} else {
-	SubDirC++Flags -DBONE ;
-}
-
 if $(USESSL) {
 	SubDirC++Flags -DUSESSL ;
 	SubDirHdrs [ FDirName / boot home config include ] ;
+}
+
+if $(BONE_COMPATIBLE) {
+	SubDirC++Flags -DBONE ;
+} else {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
 }
 
 Addon IMAP : mail_daemon inbound_protocols :
@@ -20,15 +20,16 @@ Addon IMAP : mail_daemon inbound_protocols :
 	imap_config.cpp
 	NestedString.cpp ;
 
+LinkSharedOSLibs IMAP : be libmail.so ;
+
 if $(USESSL) {
-	LinkSharedOSLibs IMAP :
-		be libmail.so socket bind ssl crypto ;
-} else if $(TARGET_PLATFORM) = r5 {
-	LinkSharedOSLibs IMAP :
-		 be libmail.so net ;
+	LinkSharedOSLibs IMAP : ssl crypto ;
+}
+
+if $(BONE_COMPATIBLE) {
+	LinkSharedOSLibs IMAP : socket bind ;
 } else {
-	LinkSharedOSLibs IMAP :
-		 be libmail.so socket bind ;
+	LinkSharedOSLibs IMAP : net ;
 }
 
 Package haiku-maildaemon-cvs :
