@@ -837,20 +837,6 @@ thread_exit(void)
 
 
 int
-thread_kill_thread(thread_id id)
-{
-	status_t status = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
-	if (status < 0)
-		return status;
-
-	if (id != thread_get_current_thread()->id)
-		wait_for_thread(id, NULL);
-
-	return status;
-}
-
-
-int
 thread_kill_thread_nowait(thread_id id)
 {
 	return send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
@@ -1136,6 +1122,20 @@ spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, 
 
 //	#pragma mark -
 //	public kernel exported functions
+
+
+status_t
+kill_thread(thread_id id)
+{
+	status_t status = send_signal_etc(id, SIGKILLTHR, B_DO_NOT_RESCHEDULE);
+	if (status < 0)
+		return status;
+
+	if (id != thread_get_current_thread()->id)
+		wait_for_thread(id, NULL);
+
+	return status;
+}
 
 
 static status_t
@@ -1569,7 +1569,7 @@ setrlimit(int resource, const struct rlimit * rlp)
 
 
 void
-user_exit_thread(status_t return_value)
+_user_exit_thread(status_t return_value)
 {
 	struct thread *thread = thread_get_current_thread();
 
@@ -1581,28 +1581,35 @@ user_exit_thread(status_t return_value)
 
 
 status_t
-user_resume_thread(thread_id thread)
+_user_kill_thread(thread_id thread)
+{
+	return kill_thread(thread);
+}
+
+
+status_t
+_user_resume_thread(thread_id thread)
 {
 	return resume_thread(thread);
 }
 
 
 status_t
-user_suspend_thread(thread_id thread)
+_user_suspend_thread(thread_id thread)
 {
 	return suspend_thread(thread);
 }
 
 
 int32
-user_set_thread_priority(thread_id thread, int32 newPriority)
+_user_set_thread_priority(thread_id thread, int32 newPriority)
 {
 	return set_thread_priority(thread, newPriority);
 }
 
 
 thread_id
-user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *data1, void *data2)
+_user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *data1, void *data2)
 {
 	char name[B_OS_NAME_LENGTH];
 
@@ -1616,14 +1623,14 @@ user_spawn_thread(thread_func entry, const char *userName, int32 priority, void 
 
 
 status_t
-user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
+_user_snooze_etc(bigtime_t timeout, int timebase, uint32 flags)
 {
 	return snooze_etc(timeout, timebase, flags | B_CAN_INTERRUPT);
 }
 
 
 status_t
-user_get_thread_info(thread_id id, thread_info *userInfo)
+_user_get_thread_info(thread_id id, thread_info *userInfo)
 {
 	thread_info info;
 	status_t status;
@@ -1641,7 +1648,7 @@ user_get_thread_info(thread_id id, thread_info *userInfo)
 
 
 status_t
-user_get_next_thread_info(team_id team, int32 *userCookie, thread_info *userInfo)
+_user_get_next_thread_info(team_id team, int32 *userCookie, thread_info *userInfo)
 {
 	status_t status;
 	thread_info info;
@@ -1677,7 +1684,7 @@ _user_find_thread(const char *userName)
 
 
 status_t
-user_wait_for_thread(thread_id id, status_t *userReturnCode)
+_user_wait_for_thread(thread_id id, status_t *userReturnCode)
 {
 	status_t returnCode;
 	status_t status;
@@ -1695,14 +1702,14 @@ user_wait_for_thread(thread_id id, status_t *userReturnCode)
 
 
 bool
-user_has_data(thread_id thread)
+_user_has_data(thread_id thread)
 {
 	return has_data(thread);
 }
 
 
 status_t
-user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
+_user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSize)
 {
 	if (!IS_USER_ADDRESS(buffer))
 		return B_BAD_ADDRESS;
@@ -1713,7 +1720,7 @@ user_send_data(thread_id thread, int32 code, const void *buffer, size_t bufferSi
 
 
 status_t
-user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
+_user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
 {
 	thread_id sender;
 	status_t code;
@@ -1736,7 +1743,7 @@ user_receive_data(thread_id *_userSender, void *buffer, size_t bufferSize)
 
 
 int
-user_getrlimit(int resource, struct rlimit *urlp)
+_user_getrlimit(int resource, struct rlimit *urlp)
 {
 	struct rlimit rl;
 	int ret;
@@ -1762,7 +1769,7 @@ user_getrlimit(int resource, struct rlimit *urlp)
 
 
 int
-user_setrlimit(int resource, const struct rlimit *userResourceLimit)
+_user_setrlimit(int resource, const struct rlimit *userResourceLimit)
 {
 	struct rlimit resourceLimit;
 
