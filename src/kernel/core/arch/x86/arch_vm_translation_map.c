@@ -120,7 +120,7 @@ _update_all_pgdirs(int index, pdentry e)
 static status_t
 lock_tmap(vm_translation_map *map)
 {
-	TRACE(("lock_tmap: map 0x%x\n", map));
+	TRACE(("lock_tmap: map %p\n", map));
 
 	if (recursive_lock_lock(&map->lock) == true) {
 		// we were the first one to grab the lock
@@ -135,7 +135,7 @@ lock_tmap(vm_translation_map *map)
 static status_t
 unlock_tmap(vm_translation_map *map)
 {
-	TRACE(("unlock_tmap: map 0x%x\n", map));
+	TRACE(("unlock_tmap: map %p\n", map));
 
 	if (recursive_lock_get_recursion(&map->lock) == 1) {
 		// we're about to release it for the last time
@@ -242,7 +242,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 	unsigned int index;
 	int err;
 
-	TRACE(("map_tmap: entry pa 0x%x va 0x%x\n", pa, va));
+	TRACE(("map_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
 
 /*
 	dprintf("pgdir at 0x%x\n", pgdir);
@@ -268,7 +268,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 		pgtable = page->ppn * PAGE_SIZE;
 
-		TRACE(("map_tmap: asked for free page for pgtable. 0x%x\n", pgtable));
+		TRACE(("map_tmap: asked for free page for pgtable. 0x%lx\n", pgtable));
 
 		// put it in the pgdir
 		put_pgtable_in_pgdir(&pd[index], pgtable, attributes
@@ -313,7 +313,7 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 	start = ROUNDOWN(start, PAGE_SIZE);
 	end = ROUNDUP(end, PAGE_SIZE);
 
-	TRACE(("unmap_tmap: asked to free pages 0x%x to 0x%x\n", start, end));
+	TRACE(("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end));
 
 restart:
 	if (start >= end)
@@ -336,7 +336,7 @@ restart:
 			continue;
 		}
 
-		TRACE(("unmap_tmap: removing page 0x%x\n", start));
+		TRACE(("unmap_tmap: removing page 0x%lx\n", start));
 
 		pt[index].present = 0;
 		map->map_count--;
@@ -390,7 +390,7 @@ query_tmap(vm_translation_map *map, addr_t va, addr_t *out_physical, uint32 *out
 
 	put_physical_page_tmap((addr_t)pt);
 
-	TRACE(("query_tmap: returning pa 0x%x for va 0x%x\n", *out_physical, va));
+	TRACE(("query_tmap: returning pa 0x%lx for va 0x%lx\n", *out_physical, va));
 
 	return 0;
 }
@@ -450,8 +450,6 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 
 		map->arch_data->num_invalidate_pages++;
 	}
-
-	TRACE(("query_tmap: returning pa 0x%x for va 0x%x\n", *out_physical, va));
 
 	return B_OK;
 }
@@ -825,7 +823,7 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 {
 	int index;
 
-	TRACE(("quick_tmap: entry pa 0x%x va 0x%x\n", pa, va));
+	TRACE(("quick_tmap: entry pa 0x%lx va 0x%lx\n", pa, va));
 
 	// check to see if a page table exists for this range
 	index = VADDR_TO_PDENT(va);
@@ -837,7 +835,7 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 		// pgtable is in pages, convert to physical address
 		pgtable *= PAGE_SIZE;
 
-		TRACE(("quick_map: asked for free page for pgtable. 0x%x\n", pgtable));
+		TRACE(("quick_map: asked for free page for pgtable. 0x%lx\n", pgtable));
 
 		// put it in the pgdir
 		e = &page_hole_pgdir[index];
