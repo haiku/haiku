@@ -20,6 +20,20 @@ class RDiskDevice;
 class RPartition;
 class RSession;
 
+// device list modification causes
+// TODO: to be moved to <DiskDeviceRoster.h>
+enum {
+	// helpful causes
+	B_DEVICE_CAUSE_MEDIA_CHANGED,
+	B_DEVICE_CAUSE_FORMATTED,
+	B_DEVICE_CAUSE_PARTITIONED,
+	B_DEVICE_CAUSE_INITIALIZED,
+	// unknown cause
+	B_DEVICE_CAUSE_UNKNOWN,
+	// for internal use only (e.g.: partition added, because device added)
+	B_DEVICE_CAUSE_PARENT_CHANGED,
+};
+
 class RDiskDeviceList : public MessageHandler, public RVolumeListListener {
 public:
 	RDiskDeviceList(BMessenger target, BLocker &lock, RVolumeList &volumeList);
@@ -27,8 +41,9 @@ public:
 
 	virtual void HandleMessage(BMessage *message);
 
-	void RDiskDeviceList::VolumeMounted(const RVolume *volume);
-	void RDiskDeviceList::VolumeUnmounted(const RVolume *volume);
+	virtual void VolumeMounted(const RVolume *volume);
+	virtual void VolumeUnmounted(const RVolume *volume);
+	virtual void MountPointMoved(const RVolume *volume);
 
 	bool AddDevice(RDiskDevice *device);
 	bool RemoveDevice(int32 index);
@@ -43,7 +58,7 @@ public:
 	RPartition *PartitionAt(int32 index) const
 		{ return fPartitions.ItemAt(index); }
 
-	RDiskDevice *DeviceWithID(int32 id) const;
+	RDiskDevice *DeviceWithID(int32 id, bool exact = true) const;
 	RSession *SessionWithID(int32 id) const;
 	RPartition *PartitionWithID(int32 id) const;
 
@@ -54,12 +69,18 @@ public:
 	bool Lock();
 	void Unlock();
 
-	void DeviceAdded(RDiskDevice *device);
-	void DeviceRemoved(RDiskDevice *device);
-	void SessionAdded(RSession *session);
-	void SessionRemoved(RSession *session);
-	void PartitionAdded(RPartition *partition);
-	void PartitionRemoved(RPartition *partition);
+	void DeviceAdded(RDiskDevice *device,
+					 uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void DeviceRemoved(RDiskDevice *device,
+					   uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void SessionAdded(RSession *session,
+					  uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void SessionRemoved(RSession *session,
+						uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void PartitionAdded(RPartition *partition,
+						uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
+	void PartitionRemoved(RPartition *partition,
+						  uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
 
 	void Dump() const;
 

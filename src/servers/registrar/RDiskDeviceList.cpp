@@ -119,6 +119,13 @@ RDiskDeviceList::VolumeUnmounted(const RVolume *volume)
 	PRINT(("RDiskDeviceList::VolumeUnmounted(%ld)\n", volume->ID()));
 }
 
+// MountPointMoved
+void
+RDiskDeviceList::MountPointMoved(const RVolume *volume)
+{
+	PRINT(("RDiskDeviceList::MountPointMoved(%ld)\n", volume->ID()));
+}
+
 // AddDevice
 bool
 RDiskDeviceList::AddDevice(RDiskDevice *device)
@@ -162,12 +169,12 @@ RDiskDeviceList::RemoveDevice(RDiskDevice *device)
 
 // DeviceWithID
 RDiskDevice *
-RDiskDeviceList::DeviceWithID(int32 id) const
+RDiskDeviceList::DeviceWithID(int32 id, bool exact) const
 {
 	bool inList = false;
 	int32 index = fDevices.FindBinaryInsertionIndex(
 		CompareIDPredicate<RDiskDevice>(id), &inList);
-	return (inList ? DeviceAt(index) : NULL);
+	return (inList || !exact ? DeviceAt(index) : NULL);
 }
 
 // SessionWithID
@@ -242,38 +249,67 @@ RDiskDeviceList::Unlock()
 
 // DeviceAdded
 void
-RDiskDeviceList::DeviceAdded(RDiskDevice *device)
+RDiskDeviceList::DeviceAdded(RDiskDevice *device, uint32 cause)
 {
+	// propagate to sessions
+	for (int32 i = 0; RSession *session = device->SessionAt(i); i++)
+		SessionAdded(session, B_DEVICE_CAUSE_PARENT_CHANGED);
+	// notifications
+	// ...
 }
 
 // DeviceRemoved
 void
-RDiskDeviceList::DeviceRemoved(RDiskDevice *device)
+RDiskDeviceList::DeviceRemoved(RDiskDevice *device, uint32 cause)
 {
+	// propagate to sessions
+	for (int32 i = 0; RSession *session = device->SessionAt(i); i++)
+		SessionRemoved(session, B_DEVICE_CAUSE_PARENT_CHANGED);
+	// notifications
+	// ...
 }
 
 // SessionAdded
 void
-RDiskDeviceList::SessionAdded(RSession *session)
+RDiskDeviceList::SessionAdded(RSession *session, uint32 cause)
 {
+	// propagate to partitions
+	for (int32 i = 0; RPartition *partition = session->PartitionAt(i); i++)
+		PartitionAdded(partition, B_DEVICE_CAUSE_PARENT_CHANGED);
+	// notifications
+	// ...
 }
 
 // SessionRemoved
 void
-RDiskDeviceList::SessionRemoved(RSession *session)
+RDiskDeviceList::SessionRemoved(RSession *session, uint32 cause)
 {
+	// propagate to partitions
+	for (int32 i = 0; RPartition *partition = session->PartitionAt(i); i++)
+		PartitionRemoved(partition, B_DEVICE_CAUSE_PARENT_CHANGED);
+	// notifications
+	// ...
 }
 
 // PartitionAdded
 void
-RDiskDeviceList::PartitionAdded(RPartition *partition)
+RDiskDeviceList::PartitionAdded(RPartition *partition, uint32 cause)
 {
+	// get the corresponding volume, if partition is mounted
+	char path[B_FILE_NAME_LENGTH];
+	partition->GetPath(path);
+	if (const RVolume *volume = fVolumeList.VolumeForDevicePath(path))
+		partition->SetVolume(volume);
+	// notifications
+	// ...
 }
 
 // PartitionRemoved
 void
-RDiskDeviceList::PartitionRemoved(RPartition *partition)
+RDiskDeviceList::PartitionRemoved(RPartition *partition, uint32 cause)
 {
+	// notifications
+	// ...
 }
 
 // Dump

@@ -30,6 +30,9 @@ public:
 		{ ref->device = fID; ref->node = fRootNode; }
 	const char *DevicePath() const { return fDevicePath; }
 
+	status_t StartWatching(BMessenger target) const;
+	status_t StopWatching(BMessenger target) const;
+
 private:
 	dev_t	fID;
 	ino_t	fRootNode;
@@ -44,6 +47,7 @@ public:
 
 	virtual void VolumeMounted(const RVolume *volume);
 	virtual void VolumeUnmounted(const RVolume *volume);
+	virtual void MountPointMoved(const RVolume *volume);
 };
 
 // RVolumeList
@@ -69,6 +73,7 @@ private:
 	RVolume *_AddVolume(dev_t id);
 	void _DeviceMounted(BMessage *message);
 	void _DeviceUnmounted(BMessage *message);
+	void _MountPointMoved(BMessage *message);
 
 private:
 	mutable BLocker			&fLock;

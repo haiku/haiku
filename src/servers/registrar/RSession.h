@@ -28,14 +28,20 @@ public:
 	int32 ID() const { return fID; }
 	int32 ChangeCounter() const { return fChangeCounter; }
 
+	int32 Index() const;
+
 	bool AddPartition(RPartition *partition);
 	bool RemovePartition(int32 index);
 	bool RemovePartition(RPartition *partition);
 	int32 CountPartitions() const { return fPartitions.CountItems(); }
 	RPartition *PartitionAt(int32 index) const
 		{ return fPartitions.ItemAt(index); }
+	int32 IndexOfPartition(const RPartition *partition) const
+		{ return fPartitions.IndexOf(partition); }
 
 	const session_info *Info() const { return &fInfo; }
+
+	status_t Archive(BMessage *archive) const;
 
 	void Dump() const;
 

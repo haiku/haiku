@@ -78,6 +78,15 @@ RSession::DeviceList() const
 	return (fDevice ? fDevice->DeviceList() : NULL);
 }
 
+// Index
+int32
+RSession::Index() const
+{
+	if (fDevice)
+		return fDevice->IndexOfSession(this);
+	return -1;
+}
+
 // AddPartition
 bool
 RSession::AddPartition(RPartition *partition)
@@ -132,6 +141,40 @@ print_session_info(const char *prefix, const session_info &info)
 	printf("%sblock size:    %ld\n", prefix, info.logical_block_size);
 	printf("%sindex:         %ld\n", prefix, info.index);
 	printf("%sflags:         %lx\n", prefix, info.flags);
+}
+
+// Archive
+status_t
+RSession::Archive(BMessage *archive) const
+{
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	// ID, change counter and index
+	if (error == B_OK)
+		error = archive->AddInt32("id", fID);
+	if (error == B_OK)
+		error = archive->AddInt32("change_counter", fChangeCounter);
+	if (error == B_OK)
+		error = archive->AddInt32("index", Index());
+	// fInfo.*
+	if (error == B_OK)
+		error = archive->AddInt64("offset", fInfo.offset);
+	if (error == B_OK)
+		error = archive->AddInt64("size", fInfo.size);
+	if (error == B_OK)
+		error = archive->AddInt32("flags", (int32)fInfo.flags);
+	// other data
+	if (error == B_OK)
+		error = archive->AddString("partitioning", fPartitioningSystem);
+	// partitions
+	for (int32 i = 0; const RPartition *partition = PartitionAt(i); i++) {
+		BMessage partitionArchive;
+		error = partition->Archive(&partitionArchive);
+		if (error == B_OK)
+			error = archive->AddMessage("partitions", &partitionArchive);
+		if (error != B_OK)
+			break;
+	}
+	return error;
 }
 
 // Dump

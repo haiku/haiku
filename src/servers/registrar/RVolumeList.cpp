@@ -79,6 +79,26 @@ RVolume::Unset()
 	fRootNode = -1;
 }
 
+// StartWatching
+status_t
+RVolume::StartWatching(BMessenger target) const
+{
+	node_ref ref;
+	ref.device = fID;
+	ref.node = fRootNode;
+	return watch_node(&ref, B_WATCH_NAME, target);
+}
+
+// StopWatching
+status_t
+RVolume::StopWatching(BMessenger target) const
+{
+	node_ref ref;
+	ref.device = fID;
+	ref.node = fRootNode;
+	return watch_node(&ref, B_STOP_WATCHING, target);
+}
+
 
 // RVolumeListListener
 
@@ -101,6 +121,12 @@ RVolumeListListener::VolumeMounted(const RVolume *volume)
 // VolumeUnmounted
 void
 RVolumeListListener::VolumeUnmounted(const RVolume *volume)
+{
+}
+
+// MountPointMoved
+void
+RVolumeListListener::MountPointMoved(const RVolume *volume)
 {
 }
 
@@ -148,6 +174,9 @@ RVolumeList::HandleMessage(BMessage *message)
 							break;
 						case B_DEVICE_UNMOUNTED:
 							_DeviceUnmounted(message);
+							break;
+						case B_ENTRY_MOVED:
+							_MountPointMoved(message);
 							break;
 					}
 				}
@@ -231,6 +260,7 @@ RVolumeList::_AddVolume(dev_t id)
 		if (error == B_OK) {
 			fVolumes.BinaryInsert(volume,
 				CompareDevicePathPredicate(volume->DevicePath()));
+			volume->StartWatching(fTarget);
 		} else {
 			delete volume;
 			volume = NULL;
@@ -264,10 +294,25 @@ RVolumeList::_DeviceUnmounted(BMessage *message)
 	if (message->FindInt32("device", &device) == B_OK) {
 		PRINT(("RVolumeList::_DeviceUnmounted(%ld)\n", device));
 		if (RVolume *volume = fVolumes.FindIf(CompareIDPredicate(device))) {
+			volume->StopWatching(fTarget);
 			fVolumes.RemoveItem(volume, false);
 			if (fListener)
 				fListener->VolumeUnmounted(volume);
 			delete volume;
+		}
+	}
+}
+
+// _MountPointMoved
+void
+RVolumeList::_MountPointMoved(BMessage *message)
+{
+	dev_t device;
+	if (message->FindInt32("device", &device) == B_OK) {
+		PRINT(("RVolumeList::_MountPointMoved(%ld)\n", device));
+		if (RVolume *volume = fVolumes.FindIf(CompareIDPredicate(device))) {
+			if (fListener)
+				fListener->MountPointMoved(volume);
 		}
 	}
 }

@@ -9,9 +9,12 @@
 #include <disk_scanner.h>
 #include <SupportDefs.h>
 
+class BMessage;
+
 class RDiskDevice;
 class RDiskDeviceList;
 class RSession;
+class RVolume;
 
 class RPartition {
 public:
@@ -29,7 +32,15 @@ public:
 	int32 ID() const { return fID; }
 	int32 ChangeCounter() const { return fChangeCounter; }
 
+	int32 Index() const;
+
 	const extended_partition_info *Info() const { return &fInfo; }
+	void GetPath(char *path) const;
+
+	void SetVolume(const RVolume *volume)	{ fVolume = volume; }
+	const RVolume *Volume() const			{ return fVolume; }
+
+	status_t Archive(BMessage *archive) const;
 
 	void Dump() const;
 
@@ -41,6 +52,7 @@ private:
 	int32					fID;
 	int32					fChangeCounter;
 	extended_partition_info	fInfo;
+	const RVolume			*fVolume;
 
 	static vint32			fNextID;
 };

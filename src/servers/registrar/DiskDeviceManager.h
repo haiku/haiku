@@ -22,6 +22,11 @@ public:
 	virtual void MessageReceived(BMessage *message);
 
 private:
+	// requests
+	void _NextDiskDeviceRequest(BMessage *message);
+	void _GetDiskDeviceRequest(BMessage *message);
+	void _UpdateDiskDeviceRequest(BMessage *message);
+
 	bool _PushMessage(BMessage *message, int32 priority);
 	BMessage *_PopMessage();
 

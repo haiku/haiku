@@ -33,6 +33,9 @@ public:
 	void SetTouched(bool touched) { fTouched = touched; }
 	bool Touched() const { return fTouched; }
 
+	off_t Size() const;
+	int32 BlockSize() const { return fGeometry.bytes_per_sector; }
+
 	const char *Path() const { return fPath.String(); }
 
 	bool AddSession(RSession *session);
@@ -40,8 +43,12 @@ public:
 	bool RemoveSession(RSession *session);
 	int32 CountSessions() const { return fSessions.CountItems(); }
 	RSession *SessionAt(int32 index) const { return fSessions.ItemAt(index); }
+	int32 IndexOfSession(const RSession *session) const
+		{ return fSessions.IndexOf(session); }
 
 	status_t Update();
+
+	status_t Archive(BMessage *archive) const;
 
 	void Dump() const;
 

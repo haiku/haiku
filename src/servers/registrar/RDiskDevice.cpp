@@ -110,6 +110,14 @@ RDiskDevice::Unset()
 	}
 }
 
+// Size
+off_t
+RDiskDevice::Size() const
+{
+	return (off_t)fGeometry.bytes_per_sector * fGeometry.sectors_per_track
+			* fGeometry.cylinder_count * fGeometry.head_count;
+}
+
 // AddSession
 bool
 RDiskDevice::AddSession(RSession *session)
@@ -159,6 +167,46 @@ status_t
 RDiskDevice::Update()
 {
 	return B_ERROR;
+}
+
+// Archive
+status_t
+RDiskDevice::Archive(BMessage *archive) const
+{
+	status_t error = (archive ? B_OK : B_BAD_VALUE);
+	// ID and change counter
+	if (error == B_OK)
+		error = archive->AddInt32("id", fID);
+	if (error == B_OK)
+		error = archive->AddInt32("change_counter", fChangeCounter);
+	// geometry
+	if (error == B_OK)
+		error = archive->AddInt64("size", Size());
+	if (error == B_OK)
+		error = archive->AddInt32("block_size", BlockSize());
+	if (error == B_OK)
+		error = archive->AddInt8("type", (int8)fGeometry.device_type);
+	if (error == B_OK)
+		error = archive->AddBool("removable", fGeometry.removable);
+	if (error == B_OK)
+		error = archive->AddBool("read_only", fGeometry.read_only);
+	if (error == B_OK)
+		error = archive->AddBool("write_once", fGeometry.write_once);
+	// other data
+	if (error == B_OK)
+		error = archive->AddString("path", fPath.String());
+	if (error == B_OK)
+		error = archive->AddInt32("media_status", fMediaStatus);
+	// sessions
+	for (int32 i = 0; const RSession *session = SessionAt(i); i++) {
+		BMessage sessionArchive;
+		error = session->Archive(&sessionArchive);
+		if (error == B_OK)
+			error = archive->AddMessage("sessions", &sessionArchive);
+		if (error != B_OK)
+			break;
+	}
+	return error;
 }
 
 // Dump
