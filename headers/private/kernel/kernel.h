@@ -16,7 +16,10 @@
 #define KSTACK_SIZE	(PAGE_SIZE * 2)
 
 /** Size of the stack given to teams in user space */
-#define STACK_SIZE	(PAGE_SIZE * 16)
+#define MAIN_THREAD_STACK_SIZE	(16 * PAGE_SIZE)	// 64 kB
+	// BeOS: (16 * 1024 * 1024)	// 16 MB
+#define STACK_SIZE				(16 * PAGE_SIZE)
+	// BeOS: (256 * 1024)		// 256 kB
 
 /** Size of the environmental variables space for a process */
 #define ENV_SIZE	(PAGE_SIZE * 8)
