@@ -1,0 +1,95 @@
+This file is shift.def, from which is created shift.c.
+It implements the builtin "shift" in Bash.
+
+Copyright (C) 1987-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES shift.c
+
+#include <config.h>
+
+#if defined (HAVE_UNISTD_H)
+#  ifdef _MINIX
+#    include <sys/types.h>
+#  endif
+#  include <unistd.h>
+#endif
+
+#include "../bashansi.h"
+
+#include "../shell.h"
+#include "common.h"
+
+$BUILTIN shift
+$FUNCTION shift_builtin
+$SHORT_DOC shift [n]
+The positional parameters from $N+1 ... are renamed to $1 ...  If N is
+not given, it is assumed to be 1.
+$END
+
+int print_shift_error;
+
+/* Shift the arguments ``left''.  Shift DOLLAR_VARS down then take one
+   off of REST_OF_ARGS and place it into DOLLAR_VARS[9].  If LIST has
+   anything in it, it is a number which says where to start the
+   shifting.  Return > 0 if `times' > $#, otherwise 0. */
+int
+shift_builtin (list)
+     WORD_LIST *list;
+{
+  intmax_t times;
+  register int count;
+  WORD_LIST *temp;
+
+  times = get_numeric_arg (list, 0);
+
+  if (times == 0)
+    return (EXECUTION_SUCCESS);
+  else if (times < 0)
+    {
+      sh_erange (list->word->word, "shift count");
+      return (EXECUTION_FAILURE);
+    }
+  else if (times > number_of_args ())
+    {
+      if (print_shift_error)
+	sh_erange (list->word->word, "shift count");
+      return (EXECUTION_FAILURE);
+    }
+
+  while (times-- > 0)
+    {
+      if (dollar_vars[1])
+	free (dollar_vars[1]);
+
+      for (count = 1; count < 9; count++)
+	dollar_vars[count] = dollar_vars[count + 1];
+
+      if (rest_of_args)
+	{
+	  temp = rest_of_args;
+	  dollar_vars[9] = savestring (temp->word->word);
+	  rest_of_args = rest_of_args->next;
+	  temp->next = (WORD_LIST *)NULL;
+	  dispose_words (temp);
+	}
+      else
+	dollar_vars[9] = (char *)NULL;
+    }
+  return (EXECUTION_SUCCESS);
+}

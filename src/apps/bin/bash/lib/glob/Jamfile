@@ -1,0 +1,13 @@
+SubDir OBOS_TOP src apps bin bash lib glob ;
+
+SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
+
+StaticLibrary glob : 
+	glob.c 
+	strmatch.c 
+	smatch.c 
+	xmbsrtowcs.c
+;

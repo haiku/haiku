@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src apps bin bash lib tilde ;
+
+SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
+
+StaticLibrary tilde : 
+#	shell.c
+	tilde.c
+;

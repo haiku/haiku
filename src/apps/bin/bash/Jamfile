@@ -1,0 +1,64 @@
+SubDir OBOS_TOP src apps bin bash ;
+
+SubDirCcFlags -DHAVE_CONFIG_H -DPROGRAM='\"sh\"' -DCONF_HOSTTYPE='\"i586\"' -DCONF_OSTYPE='\"beos\"' -DCONF_MACHTYPE='\"i586-pc-beos\"' -DCONF_VENDOR='\"pc\"' -DSHELL ;
+
+SubDirHdrs [ FDirName $(SUBDIR) include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) lib ] ;
+
+BinCommand mksyntax : 
+	mksyntax.c ;
+
+BinCommand mksignames : 
+	mksignames.c ;
+
+SEARCH on [ FGristFiles mksignames.c ] = [ FDirName $(SUBDIR) support ] ;
+
+MakeLocate mksyntax mksignames : $(LOCATE_TARGET) ;
+
+rule MkSyntaxExt
+{
+	SetupObjectsDir ;
+
+	MakeLocate $(<) : $(LOCATE_TARGET) ;
+	Depends $(<) : mksyntax ;
+	MkSyntaxExt1 $(<) : mksyntax ;
+	LocalClean clean : $(<) ;
+}
+
+actions MkSyntaxExt1
+{
+	$(2) -o $(1) ;
+}
+
+MkSyntaxExt <src!apps!bin!bash>syntax.c ;
+
+rule MkSignamesExt
+{
+	SetupObjectsDir ;
+
+	MakeLocate $(<) : $(LOCATE_TARGET) ;
+	Depends $(<) : mksyntax ;
+	MkSignamesExt1 $(<) : mksignames ;
+	LocalClean clean : $(<) ;
+}
+
+actions MkSignamesExt1
+{
+	$(2) $(1) ;
+}
+
+MkSignamesExt <src!apps!bin!bash>signames.h ;
+
+BinCommand sh :
+	parse.y shell.c eval.c general.c make_cmd.c print_cmd.c
+	dispose_cmd.c execute_cmd.c variables.c version.c
+	expr.c copy_cmd.c flags.c subst.c hashcmd.c hashlib.c mailcheck.c
+	trap.c alias.c nojobs.c braces.c
+	input.c bashhist.c array.c arrayfunc.c pathexp.c
+	unwind_prot.c bashline.c bracecomp.c error.c
+	list.c stringlib.c locale.c findcmd.c redir.c
+	pcomplete.c pcomplib.c syntax.c xmalloc.c test.c
+	: libreadline.a libglob.a libbuiltins.a libtilde.a libsh.a /boot/develop/lib/x86/libtermcap.a ;
+
+SubInclude OBOS_TOP src apps bin bash lib ;
+SubInclude OBOS_TOP src apps bin bash builtins ;

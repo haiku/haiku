@@ -1,0 +1,210 @@
+This document details the incompatibilites between this version of bash,
+bash-2.05b, and the previous widely-available version, bash-1.14 (which
+is still the `standard' version for many Linux distributions).  These
+were discovered by users of bash-2.x, so this list is not comprehensive.
+Some of these incompatibilities occur between the current version and
+versions 2.0 and above.
+
+1.  Bash now uses a new quoting syntax, $"...", to do locale-specific
+    string translation.  Users who have relied on the (undocumented)
+    behavior of bash-1.14 will have to change their scripts.  For
+    instance, if you are doing something like this to get the value of
+    a variable whose name is the value of a second variable:
+
+	eval var2=$"$var1"
+
+    you will have to change to a different syntax.
+
+    This capability is directly supported by bash-2.0:
+
+	var2=${!var1}
+
+    This alternate syntax will work portably between bash-1.14 and bash-2.0:
+
+	eval var2=\$${var1}
+
+2.  One of the bugs fixed in the YACC grammar tightens up the rules
+    concerning group commands ( {...} ).  The `list' that composes the
+    body of the group command must be terminated by a newline or
+    semicolon.  That's because the braces are reserved words, and are
+    recognized as such only when a reserved word is legal.  This means
+    that while bash-1.14 accepted shell function definitions like this:
+
+	foo() { : }
+
+    bash-2.0 requires this:
+
+	foo() { :; }
+
+    This is also an issue for commands like this:
+
+	mkdir dir || { echo 'could not mkdir' ; exit 1; }
+
+    The syntax required by bash-2.0 is also accepted by bash-1.14.
+
+3.  The options to `bind' have changed to make them more consistent with
+    the rest of the bash builtins.  If you are using `bind -d' to list
+    the readline key bindings in a form that can be re-read, use `bind -p'
+    instead.  If you were using `bind -v' to list the key bindings, use
+    `bind -P' instead.
+
+4.  The `long' invocation options must now be prefixed by `--' instead
+    of `-'.  (The old form is still accepted, for the time being.)
+
+5.  There was a bug in the version of readline distributed with bash-1.14
+    that caused it to write badly-formatted key bindings when using 
+    `bind -d'.  The only key sequences that were affected are C-\ (which
+    should appear as \C-\\ in a key binding) and C-" (which should appear
+    as \C-\").  If these key sequences appear in your inputrc, as, for
+    example,
+
+	"\C-\": self-insert
+
+    they will need to be changed to something like the following:
+
+	"\C-\\": self-insert
+
+6.  A number of people complained about having to use ESC to terminate an
+    incremental search, and asked for an alternate mechanism.  Bash-2.03
+    uses the value of the settable readline variable `isearch-terminators'
+    to decide which characters should terminate an incremental search.  If
+    that variable has not been set, ESC and Control-J will terminate a
+    search.
+
+7.  Some variables have been removed:  MAIL_WARNING, notify, history_control,
+    command_oriented_history, glob_dot_filenames, allow_null_glob_expansion,
+    nolinks, hostname_completion_file, noclobber, no_exit_on_failed_exec, and
+    cdable_vars.  Most of them are now implemented with the new `shopt'
+    builtin; others were already implemented by `set'.  Here is a list of
+    correspondences:
+
+	MAIL_WARNING			shopt mailwarn
+	notify				set -o notify
+	history_control			HISTCONTROL
+	command_oriented_history	shopt cmdhist
+	glob_dot_filenames		shopt dotglob
+	allow_null_glob_expansion	shopt nullglob
+	nolinks				set -o physical
+	hostname_completion_file	HOSTFILE
+	noclobber			set -o noclobber
+	no_exit_on_failed_exec		shopt execfail
+	cdable_vars			shopt cdable_vars
+
+8. `ulimit' now sets both hard and soft limits and reports the soft limit
+    by default (when neither -H nor -S is specified).  This is compatible
+    with versions of sh and ksh that implement `ulimit'.  The bash-1.14
+    behavior of, for example,
+
+		ulimit -c 0
+
+    can be obtained with
+
+		ulimit -S -c 0
+
+    It may be useful to define an alias:
+
+		alias ulimit="ulimit -S"
+
+9.  Bash-2.01 uses a new quoting syntax, $'...' to do ANSI-C string
+    translation.  Backslash-escaped characters in ... are expanded and
+    replaced as specified by the ANSI C standard.
+
+10. The sourcing of startup files has changed somewhat.  This is explained
+    more completely in the INVOCATION section of the manual page.
+
+    A non-interactive shell not named `sh' and not in posix mode reads
+    and executes commands from the file named by $BASH_ENV.  A
+    non-interactive shell started by `su' and not in posix mode will read
+    startup files.  No other non-interactive shells read any startup files.
+
+    An interactive shell started in posix mode reads and executes commands
+    from the file named by $ENV.
+
+11. The <> redirection operator was changed to conform to the POSIX.2 spec.
+    In the absence of any file descriptor specification preceding the `<>',
+    file descriptor 0 is used.  In bash-1.14, this was the behavior only
+    when in POSIX mode.  The bash-1.14 behavior may be obtained with
+
+	<>filename 1>&0
+
+12. The `alias' builtin now checks for invalid options and takes a `-p'
+    option to display output in POSIX mode.  If you have old aliases beginning
+    with `-' or `+', you will have to add the `--' to the alias command
+    that declares them:
+
+	alias -x='chmod a-x' --> alias -- -x='chmod a-x'
+
+13. The behavior of range specificiers within bracket matching expressions
+    in the pattern matcher (e.g., [A-Z]) depends on the current locale,
+    specifically the value of the LC_COLLATE environment variable.  Setting
+    this variable to C or POSIX will result in the traditional ASCII behavior
+    for range comparisons.  If the locale is set to something else, e.g.,
+    en_US (specified by the LANG or LC_ALL variables), collation order is
+    locale-dependent.  For example, the en_US locale sorts the upper and
+    lower case letters like this:
+
+	AaBb...Zz
+
+    so a range specification like [A-Z] will match every letter except `z'.
+    Other locales collate like
+
+        aAbBcC...zZ
+
+    which means that [A-Z] matches every letter except `a'.
+
+    The portable way to specify upper case letters is [:upper:] instead of
+    A-Z; lower case may be specified as [:lower:] instead of a-z.
+
+    Look at the manual pages for setlocale(3), strcoll(3), and, if it is
+    present, locale(1).
+
+    You can find your current locale information by running locale(1):
+
+	caleb.ins.cwru.edu(2)$ locale
+	LANG=en_US
+	LC_CTYPE="en_US"
+	LC_NUMERIC="en_US"
+	LC_TIME="en_US"
+	LC_COLLATE="en_US"
+	LC_MONETARY="en_US"
+	LC_MESSAGES="en_US"
+	LC_ALL=en_US
+
+    My advice is to put
+
+	export LC_COLLATE=C
+
+    into /etc/profile and inspect any shell scripts run from cron for
+    constructs like [A-Z].  This will prevent things like
+
+	rm [A-Z]*
+
+    from removing every file in the current directory except those beginning
+    with `z' and still allow individual users to change the collation order.
+    Users may put the above command into their own profiles as well, of course.
+
+14.  Bash versions up to 1.14.7 included an undocumented `-l' operator to
+     the `test/[' builtin.  It was a unary operator that expanded to the
+     length of its string argument.  This let you do things like
+
+	test -l $variable -lt 20
+
+     for example.
+
+     This was included for backwards compatibility with old versions of the
+     Bourne shell, which did not provide an easy way to obtain the length of
+     the value of a shell variable.
+
+     This operator is not part of the POSIX standard, because one can (and
+     should) use ${#variable} to get the length of a variable's value.
+     Bash-2.x does not support it.
+
+15.  Bash no longer auto-exports the HOME, PATH, SHELL, TERM, HOSTNAME,
+     HOSTTYPE, MACHTYPE, or OSTYPE variables.
+
+16.  Bash no longer initializes the FUNCNAME, GROUPS, or DIRSTACK variables
+     to have special behavior if they appear in the initial environment.
+
+17.  Bash no longer removes the export attribute from the SSH_CLIENT or
+     SSH2_CLIENT variables, and no longer attempts to discover whether or
+     not it has been invoked by sshd in order to run the startup files.

@@ -1,0 +1,360 @@
+This file is history.def, from which is created history.c.
+It implements the builtin "history" in Bash.
+
+Copyright (C) 1987-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES history.c
+
+$BUILTIN history
+$FUNCTION history_builtin
+$DEPENDS_ON HISTORY
+$SHORT_DOC history [-c] [-d offset] [n] or history -awrn [filename] or history -ps arg [arg...]
+Display the history list with line numbers.  Lines listed with
+with a `*' have been modified.  Argument of N says to list only
+the last N lines.  The `-c' option causes the history list to be
+cleared by deleting all of the entries.  The `-d' option deletes
+the history entry at offset OFFSET.  The `-w' option writes out the
+current history to the history file;  `-r' means to read the file and
+append the contents to the history list instead.  `-a' means
+to append history lines from this session to the history file.
+Argument `-n' means to read all history lines not already read
+from the history file and append them to the history list.  If
+FILENAME is given, then that is used as the history file else
+if $HISTFILE has a value, that is used, else ~/.bash_history.
+If the -s option is supplied, the non-option ARGs are appended to
+the history list as a single entry.  The -p option means to perform
+history expansion on each ARG and display the result, without storing
+anything in the history list.
+$END
+
+#include <config.h>
+
+#if defined (HISTORY)
+#include "../bashtypes.h"
+#ifndef _MINIX
+#  include <sys/file.h>
+#endif
+#include "posixstat.h"
+#include "filecntl.h"
+#include <errno.h>
+#include <stdio.h>
+#if defined (HAVE_UNISTD_H)
+#  include <unistd.h>
+#endif
+
+#include "../bashansi.h"
+
+#include "../shell.h"
+#include "../bashhist.h"
+#include <readline/history.h>
+#include "bashgetopt.h"
+#include "common.h"
+
+#if !defined (errno)
+extern int errno;
+#endif
+
+extern int current_command_line_count;
+
+static void display_history __P((WORD_LIST *));
+static int delete_histent __P((int));
+static int delete_last_history __P((void));
+static void push_history __P((WORD_LIST *));
+static int expand_and_print_history __P((WORD_LIST *));
+
+#define AFLAG	0x01
+#define RFLAG	0x02
+#define WFLAG	0x04
+#define NFLAG	0x08
+#define SFLAG	0x10
+#define PFLAG	0x20
+#define CFLAG	0x40
+#define DFLAG	0x80
+
+int
+history_builtin (list)
+     WORD_LIST *list;
+{
+  int flags, opt, result, old_history_lines;
+  char *filename, *delete_arg;
+  intmax_t delete_offset;
+
+  flags = 0;
+  reset_internal_getopt ();
+  while ((opt = internal_getopt (list, "acd:npsrw")) != -1)
+    {
+      switch (opt)
+	{
+	case 'a':
+	  flags |= AFLAG;
+	  break;
+	case 'c':
+	  flags |= CFLAG;
+	  break;
+	case 'n':
+	  flags |= NFLAG;
+	  break;
+	case 'r':
+	  flags |= RFLAG;
+	  break;
+	case 'w':
+	  flags |= WFLAG;
+	  break;
+	case 's':
+	  flags |= SFLAG;
+	  break;
+	case 'd':
+	  flags |= DFLAG;
+	  delete_arg = list_optarg;
+	  break;
+	case 'p':
+#if defined (BANG_HISTORY)
+	  flags |= PFLAG;
+#endif
+	  break;
+	default:
+	  builtin_usage ();
+	  return (EX_USAGE);
+	}
+    }
+  list = loptend;
+
+  opt = flags & (AFLAG|RFLAG|WFLAG|NFLAG);
+  if (opt && opt != AFLAG && opt != RFLAG && opt != WFLAG && opt != NFLAG)
+    {
+      builtin_error ("cannot use more than one of -anrw");
+      return (EXECUTION_FAILURE);
+    }
+
+  /* clear the history, but allow other arguments to add to it again. */
+  if (flags & CFLAG)
+    {
+      clear_history ();
+      if (list == 0)
+	return (EXECUTION_SUCCESS);
+    }
+
+  if (flags & SFLAG)
+    {
+      if (list)
+	push_history (list);
+      return (EXECUTION_SUCCESS);
+    }
+#if defined (BANG_HISTORY)
+  else if (flags & PFLAG)
+    {
+      if (list)
+	return (expand_and_print_history (list));
+      return (EXECUTION_SUCCESS);
+    }
+#endif
+  else if (flags & DFLAG)
+    {
+      if ((legal_number (delete_arg, &delete_offset) == 0)
+	  || (delete_offset < history_base)
+	  || (delete_offset > (history_base + history_length)))
+	{
+	  sh_erange (delete_arg, "history position");
+	  return (EXECUTION_FAILURE);
+	}
+      opt = delete_offset;
+      result = delete_histent (opt - history_base);
+      /* Since remove_history changes history_length, this can happen if
+	 we delete the last history entry. */
+      if (where_history () > history_length)
+	history_set_pos (history_length);
+      return (result ? EXECUTION_SUCCESS : EXECUTION_FAILURE);
+    }
+  else if ((flags & (AFLAG|RFLAG|NFLAG|WFLAG|CFLAG)) == 0)
+    {
+      display_history (list);
+      return (EXECUTION_SUCCESS);
+    }
+
+  filename = list ? list->word->word : get_string_value ("HISTFILE");
+  result = EXECUTION_SUCCESS;
+
+  if (flags & AFLAG)		/* Append session's history to file. */
+    result = maybe_append_history (filename);
+  else if (flags & WFLAG)	/* Write entire history. */
+    result = write_history (filename);
+  else if (flags & RFLAG)	/* Read entire file. */
+    result = read_history (filename);
+  else if (flags & NFLAG)	/* Read `new' history from file. */
+    {
+      /* Read all of the lines in the file that we haven't already read. */
+      old_history_lines = history_lines_in_file;
+      using_history ();
+      result = read_history_range (filename, history_lines_in_file, -1);
+      using_history ();
+      history_lines_in_file = where_history ();
+      history_lines_this_session += history_lines_in_file - old_history_lines;
+    }
+
+  return (result ? EXECUTION_FAILURE : EXECUTION_SUCCESS);
+}
+
+/* Accessors for HIST_ENTRY lists that are called HLIST. */
+#define histline(i) (hlist[(i)]->line)
+#define histdata(i) (hlist[(i)]->data)
+
+static void
+display_history (list)
+     WORD_LIST *list;
+{
+  register int i;
+  intmax_t limit;
+  HIST_ENTRY **hlist;
+
+  if (list)
+    {
+      limit = get_numeric_arg (list, 0);
+      if (limit < 0)
+	limit = -limit;
+    }
+  else
+    limit = -1;
+
+  hlist = history_list ();
+
+  if (hlist)
+    {
+      for (i = 0;  hlist[i]; i++)
+	;
+
+      if (0 <= limit && limit < i)
+	i -= limit;
+      else
+	i = 0;
+
+      while (hlist[i])
+	{
+	  QUIT;
+	  printf ("%5d%c %s\n", i + history_base,
+		  histdata(i) ? '*' : ' ',
+		  histline(i));
+	  i++;
+	}
+    }
+}
+
+/* Delete and free the history list entry at offset I. */
+static int
+delete_histent (i)
+     int i;
+{
+  HIST_ENTRY *discard;
+
+  discard = remove_history (i);
+  if (discard)
+    {
+      if (discard->line)
+	free (discard->line);
+      free ((char *) discard);
+    }
+  return 1;
+}
+
+static int
+delete_last_history ()
+{
+  register int i;
+  HIST_ENTRY **hlist, *histent;
+
+  hlist = history_list ();
+  if (hlist == NULL)
+    return 0;
+
+  for (i = 0; hlist[i]; i++)
+    ;
+  i--;
+
+  /* History_get () takes a parameter that must be offset by history_base. */
+  histent = history_get (history_base + i);	/* Don't free this */
+  if (histent == NULL)
+    return 0;
+
+  return (delete_histent (i));
+}
+
+/* Remove the last entry in the history list and add each argument in
+   LIST to the history. */
+static void
+push_history (list)
+     WORD_LIST *list;
+{
+  char *s;
+
+  /* Delete the last history entry if it was a single entry added to the
+     history list (generally the `history -s' itself), or if `history -s'
+     is being used in a compound command and the compound command was
+     added to the history as a single element (command-oriented history).
+     If you don't want history -s to remove the compound command from the
+     history, change #if 0 to #if 1 below. */
+#if 0
+  if (hist_last_line_added && delete_last_history () == 0)
+#else
+  if ((hist_last_line_added || (current_command_line_count > 0 && current_command_first_line_saved && command_oriented_history))
+      && delete_last_history () == 0)
+#endif
+      return;
+
+  s = string_list (list);
+  /* Call check_add_history with FORCE set to 1 to skip the check against
+     current_command_line_count.  If history -s is used in a compound
+     command, the above code will delete the compound command's history
+     entry and this call will add the line to the history as a separate
+     entry.  Without FORCE=1, if current_command_line_count were > 1, the
+     line would be appended to the entry before the just-deleted entry. */
+  check_add_history (s, 1);	/* obeys HISTCONTROL, HISTIGNORE */
+  free (s);
+}
+
+#if defined (BANG_HISTORY)
+static int
+expand_and_print_history (list)
+     WORD_LIST *list;
+{
+  char *s;
+  int r, result;
+
+  if (hist_last_line_added && delete_last_history () == 0)
+    return EXECUTION_FAILURE;
+  result = EXECUTION_SUCCESS;
+  while (list)
+    {
+      r = history_expand (list->word->word, &s);
+      if (r < 0)
+	{
+	  builtin_error ("%s: history expansion failed", list->word->word);
+	  result = EXECUTION_FAILURE;
+	}
+      else
+	{
+	  fputs (s, stdout);
+	  putchar ('\n');
+	}
+      FREE (s);
+      list = list->next;
+    }
+  fflush (stdout);
+  return result;
+}
+#endif /* BANG_HISTORY */
+#endif /* HISTORY */

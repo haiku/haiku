@@ -1,0 +1,609 @@
+This file is complete.def, from which is created complete.c.
+It implements the builtins "complete" and "compgen" in Bash.
+
+Copyright (C) 1999-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES complete.c
+
+$BUILTIN complete
+$DEPENDS_ON PROGRAMMABLE_COMPLETION
+$FUNCTION complete_builtin
+$SHORT_DOC complete [-abcdefgjksuv] [-pr] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [name ...]
+For each NAME, specify how arguments are to be completed.
+If the -p option is supplied, or if no options are supplied, existing
+completion specifications are printed in a way that allows them to be
+reused as input.  The -r option removes a completion specification for
+each NAME, or, if no NAMEs are supplied, all completion specifications.
+$END
+
+#include <config.h>
+
+#include <stdio.h>
+
+#include "../bashtypes.h"
+
+#if defined (HAVE_UNISTD_H)
+#  include <unistd.h>
+#endif
+
+#include "../bashansi.h"
+
+#include "../shell.h"
+#include "../builtins.h"
+#include "../pcomplete.h"
+
+#include "common.h"
+#include "bashgetopt.h"
+
+#include <readline/readline.h>
+
+#define STRDUP(x)       ((x) ? savestring (x) : (char *)NULL)
+
+static int find_compact __P((char *));
+static int find_compopt __P((char *));
+
+static int build_actions __P((WORD_LIST *, int *, int *, unsigned long *, unsigned long *));
+
+static int remove_cmd_completions __P((WORD_LIST *));
+
+static int print_one_completion __P((char *, COMPSPEC *));
+static int print_compitem __P((BUCKET_CONTENTS *));
+static void print_all_completions __P((void));
+static int print_cmd_completions __P((WORD_LIST *));
+
+static char *Garg, *Warg, *Parg, *Sarg, *Xarg, *Farg, *Carg;
+
+static struct _compacts {
+  char *actname;
+  int actflag;
+  int actopt;
+} compacts[] = {
+  { "alias",     CA_ALIAS,     'a' },
+  { "arrayvar",  CA_ARRAYVAR,   0 },
+  { "binding",   CA_BINDING,    0 },
+  { "builtin",   CA_BUILTIN,   'b' },
+  { "command",   CA_COMMAND,   'c' },
+  { "directory", CA_DIRECTORY, 'd' },
+  { "disabled",  CA_DISABLED,   0 },
+  { "enabled",   CA_ENABLED,    0 },
+  { "export",    CA_EXPORT,    'e' },
+  { "file",      CA_FILE,      'f' },
+  { "function",  CA_FUNCTION,   0 },
+  { "helptopic", CA_BUILTIN,  0 },	/* for now */
+  { "hostname",  CA_HOSTNAME,   0 },
+  { "group",     CA_GROUP,     'g' },
+  { "job",       CA_JOB,       'j' },
+  { "keyword",   CA_KEYWORD,   'k' },
+  { "running",   CA_RUNNING,    0 },
+  { "service",   CA_SERVICE,   's' },
+  { "setopt",    CA_SETOPT,     0 },
+  { "shopt",     CA_SHOPT,      0 },
+  { "signal",    CA_SIGNAL,     0 },
+  { "stopped",   CA_STOPPED,    0 },
+  { "user",      CA_USER,      'u' },
+  { "variable",  CA_VARIABLE,  'v' },
+  { (char *)NULL, 0, 0 },
+};
+
+/* This should be a STRING_INT_ALIST */
+static struct _compopt {
+  char *optname;
+  int optflag;
+} compopts[] = {
+  { "default",	COPT_DEFAULT },
+  { "dirnames", COPT_DIRNAMES },
+  { "filenames",COPT_FILENAMES},
+  { "nospace",	COPT_NOSPACE },
+  { (char *)NULL, 0 },
+};
+
+static int
+find_compact (name)
+     char *name;
+{
+  register int i;
+
+  for (i = 0; compacts[i].actname; i++)
+    if (STREQ (name, compacts[i].actname))
+      return i;
+  return -1;
+}
+
+static int
+find_compopt (name)
+     char *name;
+{
+  register int i;
+
+  for (i = 0; compopts[i].optname; i++)
+    if (STREQ (name, compopts[i].optname))
+      return i;
+  return -1;
+}
+
+/* Build the actions and compspec options from the options specified in LIST.
+   ACTP is a pointer to an unsigned long in which to place the bitmap of
+   actions.  OPTP is a pointer to an unsigned long in which to place the
+   btmap of compspec options (arguments to `-o').  PP, if non-null, gets 1
+   if -p is supplied; RP, if non-null, gets 1 if -r is supplied.
+   If either is null, the corresponding option generates an error.
+   This also sets variables corresponding to options that take arguments as
+   a side effect; the caller should ensure that those variables are set to
+   NULL before calling build_actions.  Return value:
+   	EX_USAGE = bad option
+   	EXECUTION_SUCCESS = some options supplied
+   	EXECUTION_FAILURE = no options supplied
+*/
+
+static int
+build_actions (list, pp, rp, actp, optp)
+     WORD_LIST *list;
+     int *pp, *rp;
+     unsigned long *actp, *optp;
+{
+  int opt, ind, opt_given;
+  unsigned long acts, copts;
+
+  acts = copts = (unsigned long)0L;
+  opt_given = 0;
+
+  reset_internal_getopt ();
+  while ((opt = internal_getopt (list, "abcdefgjko:prsuvA:G:W:P:S:X:F:C:")) != -1)
+    {
+      opt_given = 1;
+      switch (opt)
+	{
+	case 'r':
+	  if (rp)
+	    {
+	      *rp = 1;
+	      break;
+	    }
+	  else
+	    {
+	      sh_invalidopt ("-r");
+	      builtin_usage ();
+	      return (EX_USAGE);
+	    }
+
+	case 'p':
+	  if (pp)
+	    {
+	      *pp = 1;
+	      break;
+	    }
+	  else
+	    {
+	      sh_invalidopt ("-p");
+	      builtin_usage ();
+	      return (EX_USAGE);
+	    }
+
+	case 'a':
+	  acts |= CA_ALIAS;
+	  break;
+	case 'b':
+	  acts |= CA_BUILTIN;
+	  break;
+	case 'c':
+	  acts |= CA_COMMAND;
+	  break;
+	case 'd':
+	  acts |= CA_DIRECTORY;
+	  break;
+	case 'e':
+	  acts |= CA_EXPORT;
+	  break;
+	case 'f':
+	  acts |= CA_FILE;
+	  break;
+	case 'g':
+	  acts |= CA_GROUP;
+	  break;
+	case 'j':
+	  acts |= CA_JOB;
+	  break;
+	case 'k':
+	  acts |= CA_KEYWORD;
+	  break;
+	case 's':
+	  acts |= CA_SERVICE;
+	  break;
+	case 'u':
+	  acts |= CA_USER;
+	  break;
+	case 'v':
+	  acts |= CA_VARIABLE;
+	  break;
+	case 'o':
+	  ind = find_compopt (list_optarg);
+	  if (ind < 0)
+	    {
+	      sh_invalidoptname (list_optarg);
+	      return (EX_USAGE);
+	    }
+	  copts |= compopts[ind].optflag;
+	  break;
+	case 'A':
+	  ind = find_compact (list_optarg);
+	  if (ind < 0)
+	    {
+	      builtin_error ("%s: invalid action name", list_optarg);
+	      return (EX_USAGE);
+	    }
+	  acts |= compacts[ind].actflag;
+	  break;
+	case 'C':
+	  Carg = list_optarg;
+	  break;
+	case 'F':
+	  Farg = list_optarg;
+	  break;
+	case 'G':
+	  Garg = list_optarg;
+	  break;
+	case 'P':
+	  Parg = list_optarg;
+	  break;
+	case 'S':
+	  Sarg = list_optarg;
+	  break;
+	case 'W':
+	  Warg = list_optarg;
+	  break;
+	case 'X':
+	  Xarg = list_optarg;
+	  break;
+	default:
+	  builtin_usage ();
+	  return (EX_USAGE);
+	}
+    }
+
+  *actp = acts;
+  *optp = copts;
+
+  return (opt_given ? EXECUTION_SUCCESS : EXECUTION_FAILURE);
+}
+
+/* Add, remove, and display completion specifiers. */
+int
+complete_builtin (list)
+     WORD_LIST *list;
+{
+  int opt_given, pflag, rflag, rval;
+  unsigned long acts, copts;
+  COMPSPEC *cs;
+
+  if (list == 0)
+    {
+      print_all_completions ();
+      return (EXECUTION_SUCCESS);
+    }
+
+  opt_given = pflag = rflag = 0;
+  acts = copts = (unsigned long)0L;
+  Garg = Warg = Parg = Sarg = Xarg = Farg = Carg = (char *)NULL;
+  cs = (COMPSPEC *)NULL;
+
+  /* Build the actions from the arguments.  Also sets the [A-Z]arg variables
+     as a side effect if they are supplied as options. */
+  rval = build_actions (list, &pflag, &rflag, &acts, &copts);
+  if (rval == EX_USAGE)
+    return (rval);
+  opt_given = rval != EXECUTION_FAILURE;
+
+  list = loptend;
+
+  /* -p overrides everything else */
+  if (pflag || (list == 0 && opt_given == 0))
+    {
+      if (list == 0)
+	{
+	  print_all_completions ();
+	  return (EXECUTION_SUCCESS);
+	}
+      return (print_cmd_completions (list));
+    }
+
+  /* next, -r overrides everything else. */
+  if (rflag)
+    {
+      if (list == 0)
+	{
+	  progcomp_flush ();
+	  return (EXECUTION_SUCCESS);
+	}
+      return (remove_cmd_completions (list));
+    }
+
+  if (list == 0 && opt_given)
+    {
+      builtin_usage ();
+      return (EX_USAGE);
+    }
+
+  /* If we get here, we need to build a compspec and add it for each
+     remaining argument. */
+  cs = compspec_create ();
+  cs->actions = acts;
+  cs->options = copts;
+
+  cs->globpat = STRDUP (Garg);
+  cs->words = STRDUP (Warg);
+  cs->prefix = STRDUP (Parg);
+  cs->suffix = STRDUP (Sarg);
+  cs->funcname = STRDUP (Farg);
+  cs->command = STRDUP (Carg);
+  cs->filterpat = STRDUP (Xarg);
+
+  for (rval = EXECUTION_SUCCESS ; list; list = list->next)
+    {
+      /* Add CS as the compspec for the specified commands. */
+      if (progcomp_insert (list->word->word, cs) == 0)
+	rval = EXECUTION_FAILURE;
+    }
+
+  return (rval);
+}
+
+static int
+remove_cmd_completions (list)
+     WORD_LIST *list;
+{
+  WORD_LIST *l;
+  int ret;
+
+  for (ret = EXECUTION_SUCCESS, l = list; l; l = l->next)
+    {
+      if (progcomp_remove (l->word->word) == 0)
+	{
+	  builtin_error ("%s: no completion specification", l->word->word);
+	  ret = EXECUTION_FAILURE;
+	}
+    }
+  return ret;
+}
+
+#define SQPRINTARG(a, f) \
+  do { \
+    if (a) \
+      { \
+      	x = sh_single_quote (a); \
+	printf ("%s %s ", f, x); \
+	free (x); \
+      } \
+  } while (0)
+
+#define PRINTARG(a, f) \
+  do { \
+    if (a) \
+      printf ("%s %s ", f, a); \
+  } while (0)
+
+#define PRINTOPT(a, f) \
+  do { \
+    if (acts & a) \
+      printf ("%s ", f); \
+  } while (0)
+
+#define PRINTACT(a, f) \
+  do { \
+    if (acts & a) \
+      printf ("-A %s ", f); \
+  } while (0)
+
+#define PRINTCOMPOPT(a, f) \
+  do { \
+    if (copts & a) \
+      printf ("-o %s ", f); \
+  } while (0)
+
+static int
+print_one_completion (cmd, cs)
+     char *cmd;
+     COMPSPEC *cs;
+{
+  unsigned long acts, copts;
+  char *x;
+
+  printf ("complete ");
+
+  copts = cs->options;
+
+  /* First, print the -o options. */
+  PRINTCOMPOPT (COPT_DEFAULT, "default");
+  PRINTCOMPOPT (COPT_DIRNAMES, "dirnames");
+  PRINTCOMPOPT (COPT_FILENAMES, "filenames");
+  PRINTCOMPOPT (COPT_NOSPACE, "nospace");
+
+  acts = cs->actions;
+
+  /* simple flags next */
+  PRINTOPT (CA_ALIAS, "-a");
+  PRINTOPT (CA_BUILTIN, "-b");
+  PRINTOPT (CA_COMMAND, "-c");
+  PRINTOPT (CA_DIRECTORY, "-d");
+  PRINTOPT (CA_EXPORT, "-e");
+  PRINTOPT (CA_FILE, "-f");
+  PRINTOPT (CA_GROUP, "-g");
+  PRINTOPT (CA_JOB, "-j");
+  PRINTOPT (CA_KEYWORD, "-k");
+  PRINTOPT (CA_SERVICE, "-s");
+  PRINTOPT (CA_USER, "-u");
+  PRINTOPT (CA_VARIABLE, "-v");
+
+  /* now the rest of the actions */
+  PRINTACT (CA_ARRAYVAR, "arrayvar");
+  PRINTACT (CA_BINDING, "binding");
+  PRINTACT (CA_DISABLED, "disabled");
+  PRINTACT (CA_ENABLED, "enabled");
+  PRINTACT (CA_FUNCTION, "function");
+  PRINTACT (CA_HELPTOPIC, "helptopic");
+  PRINTACT (CA_HOSTNAME, "hostname");
+  PRINTACT (CA_RUNNING, "running");
+  PRINTACT (CA_SETOPT, "setopt");
+  PRINTACT (CA_SHOPT, "shopt");
+  PRINTACT (CA_SIGNAL, "signal");
+  PRINTACT (CA_STOPPED, "stopped");
+
+  /* now the rest of the arguments */
+
+  /* arguments that require quoting */
+  SQPRINTARG (cs->globpat, "-G");
+  SQPRINTARG (cs->words, "-W");
+  SQPRINTARG (cs->prefix, "-P");
+  SQPRINTARG (cs->suffix, "-S");
+  SQPRINTARG (cs->filterpat, "-X");
+
+  /* simple arguments that don't require quoting */
+  PRINTARG (cs->funcname, "-F");
+  PRINTARG (cs->command, "-C");
+
+  printf ("%s\n", cmd);
+
+  return (0);
+}
+
+static int
+print_compitem (item)
+     BUCKET_CONTENTS *item;
+{
+  COMPSPEC *cs;
+  char *cmd;
+
+  cmd = item->key;
+  cs = (COMPSPEC *)item->data;
+
+  return (print_one_completion (cmd, cs));
+}
+
+static void
+print_all_completions ()
+{
+  progcomp_walk (print_compitem);
+}
+
+static int
+print_cmd_completions (list)
+     WORD_LIST *list;
+{
+  WORD_LIST *l;
+  COMPSPEC *cs;
+  int ret;
+
+  for (ret = EXECUTION_SUCCESS, l = list; l; l = l->next)
+    {
+      cs = progcomp_search (l->word->word);
+      if (cs)
+	print_one_completion (l->word->word, cs);
+      else
+	{
+	  builtin_error ("%s: no completion specification", l->word->word);
+	  ret = EXECUTION_FAILURE;
+	}
+    }
+  return (ret);
+}
+
+$BUILTIN compgen
+$DEPENDS_ON PROGRAMMABLE_COMPLETION
+$FUNCTION compgen_builtin
+$SHORT_DOC compgen [-abcdefgjksuv] [-o option] [-A action] [-G globpat] [-W wordlist] [-P prefix] [-S suffix] [-X filterpat] [-F function] [-C command] [word]
+Display the possible completions depending on the options.  Intended
+to be used from within a shell function generating possible completions.
+If the optional WORD argument is supplied, matches against WORD are
+generated.
+$END
+
+int
+compgen_builtin (list)
+     WORD_LIST *list;
+{
+  int rval;
+  unsigned long acts, copts;
+  COMPSPEC *cs;
+  STRINGLIST *sl;
+  char *word;
+
+  if (list == 0)
+    return (EXECUTION_SUCCESS);
+
+  acts = copts = (unsigned long)0L;
+  Garg = Warg = Parg = Sarg = Xarg = Farg = Carg = (char *)NULL;
+  cs = (COMPSPEC *)NULL;
+
+  /* Build the actions from the arguments.  Also sets the [A-Z]arg variables
+     as a side effect if they are supplied as options. */
+  rval = build_actions (list, (int *)NULL, (int *)NULL, &acts, &copts);
+  if (rval == EX_USAGE)
+    return (rval);
+  if (rval == EXECUTION_FAILURE)
+    return (EXECUTION_SUCCESS);
+
+  list = loptend;
+
+  word = (list && list->word) ? list->word->word : "";
+
+  if (Farg)
+    internal_warning ("compgen: -F option may not work as you expect");
+  if (Carg)
+    internal_warning ("compgen: -C option may not work as you expect");
+
+  /* If we get here, we need to build a compspec and evaluate it. */
+  cs = compspec_create ();
+  cs->actions = acts;
+  cs->options = copts;
+  cs->refcount = 1;
+
+  cs->globpat = STRDUP (Garg);
+  cs->words = STRDUP (Warg);
+  cs->prefix = STRDUP (Parg);
+  cs->suffix = STRDUP (Sarg);
+  cs->funcname = STRDUP (Farg);
+  cs->command = STRDUP (Carg);
+  cs->filterpat = STRDUP (Xarg);
+
+  rval = EXECUTION_FAILURE;
+  sl = gen_compspec_completions (cs, "compgen", word, 0, 0);
+
+  /* This isn't perfect, but it's the best we can do, given what readline
+     exports from its set of completion utility functions. */
+  if ((sl == 0 || sl->list_len == 0) && (copts & COPT_DEFAULT))
+    {
+      char **matches;
+
+      matches = rl_completion_matches (word, rl_filename_completion_function);
+      sl = completions_to_stringlist (matches);
+      strvec_dispose (matches);
+    }
+
+  if (sl)
+    {
+      if (sl->list && sl->list_len)
+	{
+	  rval = EXECUTION_SUCCESS;
+	  strlist_print (sl, (char *)NULL);
+	}
+      strlist_dispose (sl);
+    }
+
+  compspec_dispose (cs);
+  return (rval);
+}

@@ -1,0 +1,115 @@
+This file is suspend.def, from which is created suspend.c.
+It implements the builtin "suspend" in Bash.
+
+Copyright (C) 1987-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES suspend.c
+
+$BUILTIN suspend
+$DEPENDS_ON JOB_CONTROL
+$FUNCTION suspend_builtin
+$SHORT_DOC suspend [-f]
+Suspend the execution of this shell until it receives a SIGCONT
+signal.  The `-f' if specified says not to complain about this
+being a login shell if it is; just suspend anyway.
+$END
+
+#include <config.h>
+
+#if defined (JOB_CONTROL)
+#if defined (HAVE_UNISTD_H)
+#  ifdef _MINIX
+#    include <sys/types.h>
+#  endif
+#  include <unistd.h>
+#endif
+
+#include "../bashtypes.h"
+#include <signal.h>
+#include "../shell.h"
+#include "../jobs.h"
+#include "common.h"
+#include "bashgetopt.h"
+
+static SigHandler *old_cont;
+#if 0
+static SigHandler *old_stop;
+#endif
+
+/* Continue handler. */
+sighandler
+suspend_continue (sig)
+     int sig;
+{
+  set_signal_handler (SIGCONT, old_cont);
+#if 0
+  set_signal_handler (SIGSTOP, old_stop);
+#endif
+  SIGRETURN (0);
+}
+
+/* Suspending the shell.  If -f is the arg, then do the suspend
+   no matter what.  Otherwise, complain if a login shell. */
+int
+suspend_builtin (list)
+     WORD_LIST *list;
+{
+  int opt, force;
+
+  reset_internal_getopt ();
+  force = 0;
+  while ((opt = internal_getopt (list, "f")) != -1)
+    switch (opt)
+      {
+      case 'f':
+	force++;
+	break;
+      default:
+	builtin_usage ();
+	return (EX_USAGE);
+      }
+      
+  list = loptend;
+
+  if (job_control == 0)
+    {
+      sh_nojobs ("cannot suspend");
+      return (EXECUTION_FAILURE);
+    }
+
+  if (force == 0)  
+    {
+      no_args (list);
+
+      if (login_shell)
+	{
+	  builtin_error ("cannot suspend a login shell");
+	  return (EXECUTION_FAILURE);
+	}
+    }
+
+  old_cont = (SigHandler *)set_signal_handler (SIGCONT, suspend_continue);
+#if 0
+  old_stop = (SigHandler *)set_signal_handler (SIGSTOP, SIG_DFL);
+#endif
+  killpg (shell_pgrp, SIGSTOP);
+  return (EXECUTION_SUCCESS);
+}
+
+#endif /* JOB_CONTROL */

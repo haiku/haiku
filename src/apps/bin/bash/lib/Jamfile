@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src apps bin bash lib ;
+
+SubInclude OBOS_TOP src apps bin bash lib glob ;
+SubInclude OBOS_TOP src apps bin bash lib readline ;
+SubInclude OBOS_TOP src apps bin bash lib sh ;
+SubInclude OBOS_TOP src apps bin bash lib tilde ;

@@ -1,0 +1,897 @@
+This is a terse description of the new features added to bash-2.05b since
+the release of bash-2.05a.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1.  New Features in Bash
+
+a.  If set, TMOUT is the default timeout for the `read' builtin.
+
+b.  `type' has two new options:  `-f' suppresses shell function lookup, and
+    `-P' forces a $PATH search.
+
+c.  New code to handle multibyte characters.
+
+d.  `select' was changed to be more ksh-compatible, in that the menu is
+    reprinted each time through the loop only if REPLY is set to NULL.
+    The previous behavior is available as a compile-time option.
+
+e.  `complete -d' and `complete -o dirnames' now force a slash to be
+    appended to names which are symlinks to directories.
+
+f.  There is now a bindable edit-and-execute-command readline command,
+    like the vi-mode `v' command, bound to C-xC-e in emacs mode.
+
+g.  Added support for ksh93-like [:word:] character class in pattern matching.
+
+h.  The  $'...' quoting construct now expands \cX to Control-X.
+
+i.  A new \D{...} prompt expansion; passes the `...' to strftime and inserts
+    the result into the expanded prompt.
+
+j.  The shell now performs arithmetic in the largest integer size the
+    machine supports (intmax_t), instead of long.
+
+k.  If a numeric argument is supplied to one of the bash globbing completion
+    functions, a `*' is appended to the word before expansion is attempted.
+
+l.  The bash globbing completion functions now allow completions to be listed
+    with double tabs or if `show-all-if-ambiguous' is set.
+
+m.  New `-o nospace' option for `complete' and `compgen' builtins; suppresses
+    readline's appending a space to the completed word.
+
+n.  New `here-string' redirection operator:  <<< word.
+
+o.  When displaying variables, function attributes and definitions are shown
+    separately, allowing them to be re-used as input (attempting to re-use
+    the old output would result in syntax errors).
+
+p.  There is a new configuration option `--enable-mem-scramble', controls
+    bash malloc behavior of writing garbage characters into memory at
+    allocation and free time.
+
+q.  The `complete' and `compgen' builtins now have a new `-s/-A service'
+    option to complete on names from /etc/services.
+
+r.  `read' has a new `-u fd' option to read from a specified file descriptor.
+
+s.  Fix the completion code so that expansion errors in a directory name
+    don't cause a longjmp back to the command loop.
+
+t.  Fixed word completion inside command substitution to work a little more
+    intuitively.
+
+u.  The `printf' %q format specifier now uses $'...' quoting to print the
+    argument if it contains non-printing characters.
+
+v.  The `declare' and `typeset' builtins have a new `-t' option.  When applied
+    to functions, it causes the DEBUG trap to be inherited by the named
+    function.  Currently has no effect on variables.
+
+w.  The DEBUG trap is now run *before* simple commands, ((...)) commands,
+    [[...]] conditional commands, and for ((...)) loops.
+
+x.  The expansion of $LINENO inside a shell function is only relative to the
+    function start if the shell is interactive -- if the shell is running a
+    script, $LINENO expands to the line number in the script.  This is as
+    POSIX-2001 requires.
+
+y.  The bash debugger in examples/bashdb has been modified to work with the
+    new DEBUG trap semantics, the command set has been made more gdb-like,
+    and the changes to $LINENO make debugging functions work better.  Code
+    from Gary Vaughan.
+
+z.  New [n]<&word- and [n]>&word- redirections from ksh93 -- move fds (dup
+    and close).
+
+aa. There is a new `-l' invocation option, equivalent to `--login'.
+
+bb. The `hash' builtin has a new `-l' option to list contents in a reusable
+    format, and a `-d' option to remove a name from the hash table.
+
+cc. There is now support for placing the long help text into separate files 
+    installed into ${datadir}/bash.  Not enabled by default; can be turned  
+    on with `--enable-separate-helpfiles' option to configure.
+    
+dd. All builtins that take operands accept a `--' pseudo-option, except
+    `echo'.
+
+ee. The `echo' builtin now accepts \0xxx (zero to three octal digits following
+    the `0') in addition to \xxx (one to three octal digits) for SUSv3/XPG6/
+    POSIX.1-2001 compliance.
+
+
+2.  New Features in Readline
+
+a.  Support for key `subsequences':  allows, e.g., ESC and ESC-a to both
+    be bound to readline functions.  Now the arrow keys may be used in vi
+    insert mode.
+
+b.  When listing completions, and the number of lines displayed is more than
+    the screen length, readline uses an internal pager to display the results.
+    This is controlled by the `page-completions' variable (default on).
+
+c.  New code to handle editing and displaying multibyte characters.
+
+d.  The behavior introduced in bash-2.05a of deciding whether or not to
+    append a slash to a completed name that is a symlink to a directory has
+    been made optional, controlled by the `mark-symlinked-directories'
+    variable (default is the 2.05a behavior).
+
+e.  The `insert-comment' command now acts as a toggle if given a numeric
+    argument:  if the first characters on the line don't specify a
+    comment, insert one; if they do, delete the comment text
+
+f.  New application-settable completion variable:
+    rl_completion_mark_symlink_dirs, allows an application's completion
+    function to temporarily override the user's preference for appending
+    slashes to names which are symlinks to directories.
+
+g.  New function available to application completion functions:
+    rl_completion_mode, to tell how the completion function was invoked
+    and decide which argument to supply to rl_complete_internal (to list
+    completions, etc.).
+
+h.  Readline now has an overwrite mode, toggled by the `overwrite-mode'
+    bindable command, which could be bound to `Insert'.
+
+i.  New application-settable completion variable:
+    rl_completion_suppress_append, inhibits appending of
+    rl_completion_append_character to completed words.
+
+j.  New key bindings when reading an incremental search string:  ^W yanks
+    the currently-matched word out of the current line into the search
+    string; ^Y yanks the rest of the current line into the search string,
+    DEL or ^H deletes characters from the search string.
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.05a since
+the release of bash-2.05.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1.  New Features in Bash
+
+a.  Added support for DESTDIR installation root prefix, so you can do a
+    `make install DESTDIR=bash-root' and do easier binary packaging.
+
+b.  Added support for builtin printf "'" flag character as per latest POSIX
+    drafts.
+
+c.  Support for POSIX.2 printf(1) length specifiers `j', `t', and `z' (from
+    ISO C99).
+
+d.  New autoconf macro, RL_LIB_READLINE_VERSION, for use by other applications
+    (bash doesn't use very much of what it returns).
+
+e.  `set [-+]o nolog' is recognized as required by the latest POSIX drafts,
+    but ignored.
+
+f.  New read-only `shopt' option:  login_shell.  Set to non-zero value if the
+    shell is a login shell.
+
+g.  New `\A' prompt string escape sequence; expands to time in 24 HH:MM format.
+
+h.  New `-A group/-g' option to complete and compgen; does group name
+    completion.
+
+i.  New `-t' option to `hash' to list hash values for each filename argument.
+
+j.  New [-+]O invocation option to set and unset `shopt' options at startup.
+
+k.  configure's `--with-installed-readline' option now takes an optional
+    `=PATH' suffix to set the root of the tree where readline is installed
+    to PATH.
+
+l.  The ksh-like `ERR' trap has been added.  The `ERR' trap will be run
+    whenever the shell would have exited if the -e option were enabled.
+    It is not inherited by shell functions.
+
+m.  `readonly', `export', and `declare' now print variables which have been
+    given attributes but not set by assigning a value as just a command and
+    a variable name (like `export foo') when listing, as the latest POSIX
+    drafts require.
+
+n.  `bashbug' now requires that the subject be changed from the default.
+
+o.  configure has a new `--enable-largefile' option, like other GNU utilities.
+
+p.  `for' loops now allow empty word lists after `in', like the latest POSIX
+    drafts require.
+
+q.  The builtin `ulimit' now takes two new non-numeric arguments:  `hard',
+    meaning the current hard limit, and `soft', meaning the current soft  
+    limit, in addition to `unlimited'
+    
+r.  `ulimit' now prints the option letter associated with a particular
+    resource when printing more than one limit.
+
+s.  `ulimit' prints `hard' or `soft' when a value is not `unlimited' but is
+    one of RLIM_SAVED_MAX or RLIM_SAVED_CUR, respectively.
+
+t.  The `printf' builtin now handles the %a and %A conversions if they're
+    implemented by printf(3).
+
+u.  The `printf' builtin now handles the %F conversion (just about like %f).
+
+v.  The `printf' builtin now handles the %n conversion like printf(3).  The
+    corresponding argument is the name of a shell variable to which the
+    value is assigned.
+
+2.  New Features in Readline
+
+a.  Added extern declaration for rl_get_termcap to readline.h, making it a
+    public function (it was always there, just not in readline.h).
+
+b.  New #defines in readline.h:  RL_READLINE_VERSION, currently 0x0402,
+    RL_VERSION_MAJOR, currently 4, and RL_VERSION_MINOR, currently 2.
+
+c.  New readline variable:  rl_readline_version, mirrors RL_READLINE_VERSION.
+
+d.  New bindable boolean readline variable:  match-hidden-files.  Controls
+    completion of files beginning with a `.' (on Unix).  Enabled by default.
+
+e.  The history expansion code now allows any character to terminate a
+    `:first-' modifier, like csh.
+
+f.  New bindable variable `history-preserve-point'.  If set, the history
+    code attempts to place the user at the same location on each history
+    line retrived with previous-history or next-history.
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.05 since
+the release of bash-2.04.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1.  New Features in Bash
+
+a.  Added a new `--init-file' invocation argument as a synonym for `--rcfile',
+    per the new GNU coding standards.
+
+b.  The /dev/tcp and /dev/udp redirections now accept service names as well as
+    port numbers.
+
+c.  `complete' and `compgen' now take a `-o value' option, which controls some
+    of the aspects of that compspec.  Valid values are:
+
+        default - perform bash default completion if programmable
+                  completion produces no matches
+        dirnames - perform directory name completion if programmable
+                   completion produces no matches
+        filenames - tell readline that the compspec produces filenames,
+                    so it can do things like append slashes to
+                    directory names and suppress trailing spaces
+
+d.  A new loadable builtin, realpath, which canonicalizes and expands symlinks
+    in pathname arguments.
+    
+e.  When `set' is called without options, it prints function defintions in a
+    way that allows them to be reused as input.  This affects `declare' and 
+    `declare -p' as well.  This only happens when the shell is not in POSIX
+    mode, since POSIX.2 forbids this behavior.
+
+f.  Bash-2.05 once again honors the current locale setting when processing
+    ranges within pattern matching bracket expressions (e.g., [A-Z]).
+
+2.  New Features in Readline
+
+a.  The blink timeout for paren matching is now settable by applications,
+    via the rl_set_paren_blink_timeout() function.
+
+b.  _rl_executing_macro has been renamed to rl_executing_macro, which means
+    it's now part of the public interface.
+
+c.  Readline has a new variable, rl_readline_state, which is a bitmap that
+    encapsulates the current state of the library; intended for use by
+    callbacks and hook functions.
+
+d.  New application-callable function rl_set_prompt(const char *prompt):
+    expands its prompt string argument and sets rl_prompt to the result.
+
+e.  New application-callable function rl_set_screen_size(int rows, int cols):
+    public method for applications to set readline's idea of the screen
+    dimensions.
+
+f.  New function, rl_get_screen_size (int *rows, int *columns), returns
+    readline's idea of the screen dimensions.
+
+g.  The timeout in rl_gather_tyi (readline keyboard input polling function)
+    is now settable via a function (rl_set_keyboard_input_timeout()).
+
+h.  Renamed the max_input_history variable to history_max_entries; the old
+    variable is maintained for backwards compatibility.
+
+i.  The list of characters that separate words for the history tokenizer is
+    now settable with a variable:  history_word_delimiters.  The default
+    value is as before.
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.04 since
+the release of bash-2.03.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1.  New Features in Bash
+
+a.  The history builtin has a `-d offset' option to delete the history entry
+    at position `offset'.
+
+b.  The prompt expansion code has two new escape sequences: \j, the number of
+    active jobs; and \l, the basename of the shell's tty device name.
+
+c.  The `bind' builtin has a new `-x' option to bind key sequences to shell   
+    commands.
+
+d.  There is a new shell option, no_empty_command_completion, which, when
+    enabled, disables command completion when TAB is typed on an empty line.
+
+e.  The `help' builtin has a `-s' option to just print a builtin's usage
+    synopsis.
+
+f.  There are several new arithmetic operators:  id++, id-- (variable
+    post-increment/decrement), ++id, --id (variable pre-increment/decrement),
+    expr1 , expr2 (comma operator).
+
+g.  There is a new ksh-93 style arithmetic for command:
+        for ((expr1 ; expr2; expr3 )); do list; done
+
+h.  The `read' builtin has a number of new options:
+        -t timeout      only wait timeout seconds for input
+        -n nchars       only read nchars from input instead of a full line
+        -d delim        read until delim rather than newline
+        -s              don't echo input chars as they are read
+
+i.  The redirection code now handles several filenames specially:
+    /dev/fd/N, /dev/stdin, /dev/stdout, and /dev/stderr, whether or
+    not they are present in the file system.
+
+j.  The redirection code now recognizes pathnames of the form
+    /dev/tcp/host/port and /dev/udp/host/port, and tries to open a socket
+    of the appropriate type to the specified port on the specified host.
+
+k.  The ksh-93 ${!prefix*} expansion, which expands to the names of all
+    shell variables with prefix PREFIX, has been implemented.
+
+l.  There is a new dynamic variable, FUNCNAME, which expands to the name of
+    a currently-executing function.  Assignments to FUNCNAME have no effect.
+
+m.  The GROUPS variable is no longer readonly; assignments to it are silently
+    discarded.  This means it can be unset.
+
+n.  A new programmable completion facility, with two new builtin commands:
+    complete and compgen.
+
+o.  configure has a new option, `--enable-progcomp', to compile in the
+    programmable completion features (enabled by default).
+
+p.  `shopt' has a new option, `progcomp', to enable and disable programmable
+    completion at runtime.
+
+q.  Unsetting HOSTFILE now clears the list of hostnames used for completion.
+
+r.  configure has a new option, `--enable-bash-malloc', replacing the old
+    `--with-gnu-malloc' (which is still present for backwards compatibility).
+
+s.  There is a new manual page describing rbash, the restricted shell.
+
+t.  `bashbug' has new `--help' and `--version' options.
+
+u.  `shopt' has a new `xpg_echo' option, which controls the behavior of
+    `echo' with respect to backslash-escaped characters at runtime.
+
+v.  If NON_INTERACTIVE_LOGIN_SHELLS is defined, all login shells read the
+    startup files, even if they are not interactive.
+
+w.  The LC_NUMERIC variable is now treated specially, and used to set the
+    LC_NUMERIC locale category for number formatting, e.g., when `printf'
+    displays floating-point numbers.
+
+2.  New features in Readline
+
+a.  Parentheses matching is now always compiled into readline, and enabled
+    or disabled when the value of the `blink-matching-paren' variable is
+    changed.
+
+b.  MS-DOS systems now use ~/_inputrc as the last-ditch inputrc filename.
+
+c.  MS-DOS systems now use ~/_history as the default history file.
+
+d.  history-search-{forward,backward} now leave the point at the end of the
+    line when the string to search for is empty, like
+    {reverse,forward}-search-history.
+
+e.  history-search-{forward,backward} now leave the last history line found
+    in the readline buffer if the second or subsequent search fails.
+
+f.  New function for use by applications:  rl_on_new_line_with_prompt, used
+    when an application displays the prompt itself before calling readline().
+
+g.  New variable for use by applications:  rl_already_prompted.  An application
+    that displays the prompt itself before calling readline() must set this to
+    a non-zero value.
+
+h.  A new variable, rl_gnu_readline_p, always 1.  The intent is that an
+    application can verify whether or not it is linked with the `real'
+    readline library or some substitute.
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.03 since
+the release of bash-2.02.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1.  New Features in Bash
+
+a.  New `shopt' option, `restricted_shell', indicating whether or not the
+    shell was started in restricted mode, for use in startup files.
+
+b.  Filename generation is now performed on the words between ( and ) in
+    array assignments (which it probably should have done all along).
+
+c.  OLDPWD is now auto-exported, as POSIX.2 seems to require.
+
+d.  ENV and BASH_ENV are read-only variables in a restricted shell.
+
+e.  A change was made to the startup file code so that any shell begun with
+    the `--login' option, even non-interactive shells, will source the login
+    shell startup files.
+
+2.  New Features in Readline
+
+a.  Many changes to the signal handling:
+        o Readline now catches SIGQUIT and cleans up the tty before returning;
+        o A new variable, rl_catch_signals, is available to application writers 
+          to indicate to readline whether or not it should install its own
+          signal handlers for SIGINT, SIGTERM, SIGQUIT, SIGALRM, SIGTSTP,
+          SIGTTIN, and SIGTTOU;
+        o A new variable, rl_catch_sigwinch, is available to application
+          writers to indicate to readline whether or not it should install its
+          own signal handler for SIGWINCH, which will chain to the calling
+          applications's SIGWINCH handler, if one is installed;
+        o There is a new function, rl_free_line_state, for application signal
+          handlers to call to free up the state associated with the current
+          line after receiving a signal;
+        o There is a new function, rl_cleanup_after_signal, to clean up the
+          display and terminal state after receiving a signal;
+        o There is a new function, rl_reset_after_signal, to reinitialize the
+          terminal and display state after an application signal handler
+          returns and readline continues
+
+b.  There is a new function, rl_resize_terminal, to reset readline's idea of
+    the screen size after a SIGWINCH.
+
+c.  New public functions: rl_save_prompt and rl_restore_prompt.  These were
+    previously private functions with a `_' prefix.
+
+d.  New function hook: rl_pre_input_hook, called just before readline starts
+    reading input, after initialization.
+
+e.  New function hook: rl_display_matches_hook, called when readline would
+    display the list of completion matches.  The new function
+    rl_display_match_list is what readline uses internally, and is available
+    for use by application functions called via this hook.
+
+f.  New bindable function, delete-char-or-list, like tcsh.
+
+g.  A new variable, rl_erase_empty_line, which, if set by an application using
+    readline, will cause readline to erase, prompt and all, lines on which the
+    only thing typed was a newline.
+
+h.  New bindable variable: `isearch-terminators'.
+
+i.  New bindable function: `forward-backward-delete-char' (unbound by default).
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.02 since
+the release of bash-2.01.1.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1. New Features in Bash
+
+a.  A new version of malloc, based on the older GNU malloc, that has many
+    changes, is more page-based, is more conservative with memory usage,
+    and does not `orphan' large blocks when they are freed.
+
+b.  A new version of gmalloc, based on the old GLIBC malloc, with many
+    changes and range checking included by default.
+
+c.  A new implementation of fnmatch(3) that includes full POSIX.2 Basic
+    Regular Expression matching, including character classes, collating
+    symbols, equivalence classes, and support for case-insensitive pattern
+    matching.
+
+d.  ksh-88 egrep-style extended pattern matching ([@+*?!](patlist)) has been
+    implemented, controlled by a new `shopt' option, `extglob'.  
+    
+e.  There is a new ksh-like `[[' compound command, which implements   
+    extended `test' functionality.
+    
+f.  There is a new `printf' builtin, implemented according to the POSIX.2
+    specification.
+    
+g.  There is a new feature for command substitution: $(< filename) now expands
+    to the contents of `filename', with any trailing newlines removed
+    (equivalent to $(cat filename)).
+
+h.  There are new tilde prefixes which expand to directories from the
+    directory stack.
+
+i.  There is a new `**' arithmetic operator to do exponentiation.
+
+j.  There are new configuration options to control how bash is linked:
+    `--enable-profiling', to allow bash to be profiled with gprof, and
+    `--enable-static-link', to allow bash to be linked statically.
+
+k.  There is a new configuration option, `--enable-cond-command', which
+    controls whether or not the `[[' command is included.  It is on by
+    default. 
+
+l.  There is a new configuration option, `--enable-extended-glob', which
+    controls whether or not the ksh extended globbing feature is included.
+    It is enabled by default.
+
+m.  There is a new configuration #define in config.h.top that, when enabled,
+    will cause all login shells to source /etc/profile and one of the user-
+    specific login shell startup files, whether or not the shell is
+    interactive.  
+    
+n.  There is a new invocation option, `--dump-po-strings', to dump
+    a shell script's translatable strings ($"...") in GNU `po' format. 
+    
+o.  There is a new `shopt' option, `nocaseglob', to enable case-insensitive
+    pattern matching when globbing filenames and using the `case' construct.
+
+p.  There is a new `shopt' option, `huponexit', which, when enabled, causes
+    the shell to send SIGHUP to all jobs when an interactive login shell
+    exits.
+
+q.  `bind' has a new `-u' option, which takes a readline function name as an
+    argument and unbinds all key sequences bound to that function in a
+    specified keymap.
+    
+r.  `disown' now has `-a' and `-r' options, to limit operation to all jobs
+    and running jobs, respectively.
+
+s.  The `shopt' `-p' option now causes output to be displayed in a reusable
+    format.
+    
+t.  `test' has a new `-N' option, which returns true if the filename argument
+    has been modified since it was last accessed.
+
+u.  `umask' now has a `-p' option to print output in a reusable format.
+    
+v.  A new escape sequence, `\xNNN', has been added to the `echo -e' and $'...'
+    translation code.  It expands to the character whose ascii code is NNN
+    in hexadecimal.
+    
+w.  The prompt string expansion code has a new `\r' escape sequence.
+
+x.  The shell may now be cross-compiled for the CYGWIN32 environment on
+    a Unix machine.
+
+2. New Features in Readline
+
+a.  There is now an option for `iterative' yank-last-arg handline, so a user
+    can keep entering `M-.', yanking the last argument of successive history
+    lines.
+
+b.  New variable, `print-completions-horizontally', which causes completion
+    matches to be displayed across the screen (like `ls -x') rather than up
+    and down the screen (like `ls').
+
+c.  New variable, `completion-ignore-case', which causes filename completion
+    and matching to be performed case-insensitively.
+
+d.  There is a new bindable command, `magic-space', which causes history
+    expansion to be performed on the current readline buffer and a space to
+    be inserted into the result.
+
+e.  There is a new bindable command, `menu-complete', which enables tcsh-like
+    menu completion (successive executions of menu-complete insert a single
+    completion match, cycling through the list of possible completions).
+
+f.  There is a new bindable command, `paste-from-clipboard', for use on Win32
+    systems, to insert the text from the Win32 clipboard into the editing
+    buffer.
+
+g.  The key sequence translation code now understands printf-style backslash
+    escape sequences, including \NNN octal escapes.  These escape sequences
+    may be used in key sequence definitions or macro values.
+
+h.  An `$include' inputrc file parser directive has been added.
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.01 since
+the release of bash-2.0.  As always, the manual page (doc/bash.1) is the
+place to look for complete descriptions.
+
+1. New Features in Bash
+
+a.  There is a new builtin array variable: GROUPS, the set of groups to which
+    the user belongs.  This is used by the test suite.
+
+2.  New Features in Readline
+
+a.  If a key sequence bound to `universal-argument' is read while reading a
+    numeric argument started with `universal-argument', it terminates the
+    argument but is otherwise ignored.  This provides a way to insert multiple
+    instances of a digit string, and is how GNU emacs does it.
+
+-------------------------------------------------------------------------------
+This is a terse description of the new features added to bash-2.0 since
+the release of bash-1.14.7.  As always, the manual page (doc/bash.1) is
+the place to look for complete descriptions.
+
+1.  New Features in Bash
+
+a.  There is a new invocation option, -D, that dumps translatable strings
+    in a script.
+
+b.  The `long' invocation options must now be prefixed with `--'.
+
+c.  New long invocation options:  --dump-strings, --help, --verbose
+
+d.  The `nolineediting' invocation option was renamed to `noediting'.
+
+e.  The `nobraceexpansion' and `quiet' long invocation options were removed.
+
+f.  The `--help' and `--version' long options now work as the GNU coding
+    standards specify.
+
+g.  If invoked as `sh', bash now enters posix mode after reading the
+    startup files, and reads and executes commands from the file named
+    by $ENV if interactive (as POSIX.2 specifies).  A login shell invoked
+    as `sh' reads $ENV after /etc/profile and ~/.profile.
+
+h.  There is a new reserved word, `time', for timing pipelines, builtin
+    commands, and shell functions.  It uses the value of the TIMEFORMAT
+    variable as a format string describing how to print the timing
+    statistics.
+
+i.  The $'...' quoting syntax expands ANSI-C escapes in ... and leaves the
+    result single-quoted.
+
+j.  The $"..." quoting syntax performs locale-specific translation of ...
+    and leaves the result double-quoted.
+
+k.  LINENO now works correctly in functions.
+
+l.  New variables: DIRSTACK, PIPESTATUS, BASH_VERSINFO, HOSTNAME, SHELLOPTS,
+    MACHTYPE.  The first three are array variables.
+
+m.  The BASH_VERSION and BASH_VERSINFO variables now include the shell's
+    `release status' (alpha[N], beta[N], release).
+
+n.  Some variables have been removed:  MAIL_WARNING, notify, history_control,
+    command_oriented_history, glob_dot_filenames, allow_null_glob_expansion,
+    nolinks, hostname_completion_file, noclobber, no_exit_on_failed_exec, and
+    cdable_vars.  Most of them are now implemented with the new `shopt'
+    builtin; others were already implemented by `set'.
+
+o.  Bash now uses some new variables:  LC_ALL, LC_MESSAGES, LC_CTYPE,
+    LC_COLLATE, LANG, GLOBIGNORE, HISTIGNORE.
+
+p.  The shell now supports integer-indexed arrays of unlimited length,
+    with a new compound assignment syntax and changes to the appropriate
+    builtin commands (declare/typeset, read, readonly, etc.).  The array
+    index may be an arithmetic expression.
+
+q.  ${!var}: indirect variable expansion, equivalent to eval \${$var}.
+
+r.  ${paramter:offset[:length]}: variable substring extraction.
+
+s.  ${parameter/pattern[/[/]string]}: variable pattern substitution.
+
+t.  The $[...] arithmetic expansion syntax is no longer supported, in
+    favor of $((...)).
+
+u.  Aliases can now be expanded in shell scripts with a shell option
+    (shopt expand_aliases).
+
+v.  History and history expansion can now be used in scripts with
+    set -o history and set -H.
+
+w.  All builtins now return an exit status of 2 for incorrect usage.
+
+x.  Interactive shells resend SIGHUP to all running or stopped children
+    if (and only if) they exit due to a SIGHUP.
+
+y.  New prompting expansions: \a, \e, \H, \T, \@, \v, \V.
+
+z.  Variable expansion in prompt strings is now controllable via a shell
+    option (shopt promptvars).
+
+aa. Bash now defaults to using command-oriented history.
+
+bb. The history file ($HISTFILE) is now truncated to $HISTFILESIZE after
+    being written.
+
+cc. The POSIX.2 conditional arithmetic evaluation syntax (expr ? expr : expr)
+    has been implemented.
+
+dd. Each builtin now accepts `--' to signify the end of the options, except
+    as documented (echo, etc.).
+
+ee. All builtins use -p to display values in a re-readable format where
+    appropriate, except as documented (echo, type, etc.).
+
+ff. The `alias' builtin has a new -p option.
+
+gg. Changes to the `bind' builtin:
+	o has new options: -psPSVr.
+	o the `-d' option was renamed to `-p'
+	o the `-v' option now dumps variables; the old `-v' is now `-P'
+
+hh. The `bye' synonym for `exit' was removed.
+
+ii. The -L and -P options to `cd' and `pwd' have been documented.
+
+jj. The `cd' builtin now does spelling correction on the directory name
+    by default.  This is settable with a shell option (shopt cdspell).
+
+kk. The `declare' builtin has new options: -a, -F, -p.
+
+ll. The `dirs' builtin has new options: -c, -p, -v.
+
+mm. The new `disown' builtin removes jobs from the shell's jobs table
+    or inhibits the resending of SIGHUP when the shell receives a
+    SIGHUP.
+
+nn. The `echo' builtin has a new escape character: \e.
+
+oo. The `enable' builtin can now load new builtins dynamically from shared
+    objects on systems with the dlopen/dlsym interface.  There are a number
+    of examples in the examples/loadables directory.  There are also
+    new options: -d, -f, -s, -p.
+
+pp. The `-all' option to `enable' was removed in favor of `-a'.
+
+qq. The `exec' builtin has new options: -l, -c, -a.
+
+rr. The `hash' builtin has a new option: -p.
+
+ss. The `history' builtin has new options: -c, -p, -s.
+
+tt. The `jobs' builtin has new options: -r, -s.
+
+uu. The `kill' builtin has new options: -n signum, -l signame.
+
+vv. The `pushd' and `popd' builtins have a new option: -n.
+
+ww. The `read' builtin has new options: -p prompt, -e, -a.
+
+xx. The `readonly' builtin has a new -a option, and the -n option was removed.
+
+yy. Changes to the `set' builtin:
+	o new options: -B, -o keyword, -o onecmd, -o history
+	o options removed: -l, -d, -o nohash
+	o options changed: +o, -h, -o hashall
+	o now displays variables in a format that can be re-read as input
+
+zz. The new `shopt' builtin controls shell optional behavior previously
+    done by setting and unsetting certain shell variables.
+
+aaa. The `test' builtin has new operators: -o option, s1 == s2, s1 < s2,
+     and s1 > s2, where s1 and s2 are strings.
+
+bbb. There is a new trap, DEBUG, executed after every simple command.
+
+ccc. The `trap' builtin has a new -p option.
+
+ddd. The `ulimit' builtin has a new -l option on 4.4BSD-based systems.
+
+eee. The PS1, PS2, PATH, and IFS variables may now be unset.
+
+fff. The restricted shell mode has been expanded and is now documented.
+
+ggg. Security improvements:
+	o functions are not imported from the environment if running setuid
+	  or with -p
+	o no startup files are sourced if running setuid or with -p
+
+hhh. The documentation has been overhauled:  the texinfo manual was
+     expanded, and HTML versions of the man page and texinfo manual
+     are included.
+
+iii. Changes to Posix mode:
+	o Command lookup now finds special builtins before shell functions.
+	o Failure of a special builtin causes a non-interactive shell to
+	  exit.  Failures are defined in the POSIX.2 specification.
+	o If the `cd' builtin finds a directory to change to using $CDPATH,
+	  the value assigned to PWD when `cd' completes does not contain
+	  any symbolic links.
+	o A non-interactive shell exits if a variable assignment error
+	  occurs when no command name follows the assignment statements.
+	o A non-interactive shell exits if the interation variable in a
+	  `for' statement or the selection variable in a `select' statement
+	  is read-only or another variable assignment error occurs.
+	o The `<>' redirection operator now opens a file for both stdin and
+	  stdout by default, not just when in posix mode.
+	o Assignment statements preceding special builtins now persist in
+	  the shell's environment when the builtin completes.
+
+     Posix mode is now completely POSIX.2-compliant (modulo bugs).  When
+     invoked as sh, bash should be completely POSIX.2-compliant.
+
+jjj. The default value of PS1 is now "\s-\v\$ ".
+
+kkk. The ksh-like ((...)) arithmetic command syntax has been implemented.
+     This is exactly equivalent to `let "..."'.
+
+lll. Integer constants have been extended to base 64.
+
+mmm. The `ulimit' builtin now sets both hard and soft limits and reports the
+     soft limit by default.
+
+2.  New Features in Readline
+
+a.  New variables:  enable-keypad, input-meta (new name for meta-flag),
+    mark-directories, visible-stats (now documented), disable-completion,
+    comment-begin.
+
+b.  New bindable commands:  kill-region, copy-region-as-kill,
+    copy-backward-word, copy-forward-word, set-mark, exchange-point-and-mark,
+    character-search, character-search-backward, insert-comment,
+    glob-expand-word, glob-list-expansions, dump-variables, dump-macros.
+
+c.  New emacs keybindings:  delete-horizontal-space (M-\),
+    insert-completions (M-*), possible-completions (M-=).
+
+d.  The history-search-backward and history-search-forward commands were
+    modified to be the same as previous-line and next-line if point is at
+    the start of the line.
+
+e.  More file types are available for the visible-stats mode.
+
+3.  Changes of interest in the Bash implementation
+
+a.  There is a new autoconf-based configuration mechanism.
+
+b.  More things have been moved from Posix mode to standard shell behavior.
+
+c.  The trace output (set -x) now inserts quotes where necessary so it can
+    be reused as input.
+
+d.  There is a compile-time option for a system-wide interactive shell
+    startup file (disabled by default).
+
+e.  The YACC grammar is smaller and tighter, and all 66 shift-reduce
+    conflicts are gone.  Several parsing bugs have been fixed.
+
+f.  Builtin option parsing has been regularized (using internal_getopt()),
+    with the exception of `echo', `type', and `set'.
+
+g.  Builtins now return standard usage messages constructed from the
+    `short doc' used by the help builtin.
+
+h.  Completion now quotes using backslashes by default, but honors
+    user-supplied quotes.
+
+i.  The GNU libc malloc is available as a configure-time option.
+
+j.  There are more internationalization features; bash uses gettext if
+    it is available.  The $"..." translation syntax uses the current
+    locale and gettext.
+
+k.  There is better reporting of job termination when the shell is not
+    interactive.
+
+l.  The shell is somewhat more efficient: it uses a little less memory and
+    makes fewer system calls.
+
+4.  Changes of interest in the Readline implementation
+
+a.  There is now support for readline `callback' functions.
+
+b.  There is now support for user-supplied input, redisplay, and terminal
+    preparation functions.
+
+c.  Most of the shell-specific code in readline has been generalized or
+    removed.
+
+d.  Most of the annoying redisplay bugs have been fixed, notably the problems
+    with incremental search and excessive redrawing when special characters
+    appear in the prompt string.
+
+e.  There are new library functions and variables available to application
+    writers, most having to do with completion and quoting.
+
+f.  The NEWLINE character (^J) is now treated as a search terminator by the
+    incremental search functions.

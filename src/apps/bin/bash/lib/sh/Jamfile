@@ -1,0 +1,43 @@
+SubDir OBOS_TOP src apps bin bash lib sh ;
+
+SubDirCcFlags -DHAVE_CONFIG_H -DSHELL ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) include ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+StaticLibrary sh : 
+	clktck.c
+	clock.c
+	getenv.c
+	oslib.c
+	setlinebuf.c
+	itos.c
+	rename.c
+	zread.c
+	zwrite.c
+	shtty.c
+	inet_aton.c
+	netconn.c
+	netopen.c
+	timeval.c
+	makepath.c
+	pathcanon.c
+	pathphys.c
+	tmpfile.c
+	sig.c
+	stringlist.c
+	stringvec.c
+	spell.c
+	shquote.c 
+	strtrans.c 
+	strindex.c 
+	snprintf.c 
+	mailstat.c
+	fmtulong.c 
+	fmtullong.c 
+	fmtumax.c 
+	mktime.c 
+	xstrchr.c 
+	zcatfd.c 
+;

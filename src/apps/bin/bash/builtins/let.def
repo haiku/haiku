@@ -1,0 +1,126 @@
+This file is let.def, from which is created let.c.
+It implements the builtin "let" in Bash.
+
+Copyright (C) 1987-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$BUILTIN let
+$FUNCTION let_builtin
+$PRODUCES let.c
+$SHORT_DOC let arg [arg ...]
+Each ARG is an arithmetic expression to be evaluated.  Evaluation
+is done in fixed-width integers with no check for overflow, though
+division by 0 is trapped and flagged as an error.  The following
+list of operators is grouped into levels of equal-precedence operators.
+The levels are listed in order of decreasing precedence.
+
+	id++, id--	variable post-increment, post-decrement
+	++id, --id	variable pre-increment, pre-decrement
+	-, +		unary minus, plus
+	!, ~		logical and bitwise negation
+	**		exponentiation
+	*, /, %		multiplication, division, remainder
+	+, -		addition, subtraction
+	<<, >>		left and right bitwise shifts
+	<=, >=, <, >	comparison
+	==, !=		equality, inequality
+	&		bitwise AND
+	^		bitwise XOR
+	|		bitwise OR
+	&&		logical AND
+	||		logical OR
+	expr ? expr : expr
+			conditional expression
+	=, *=, /=, %=,
+	+=, -=, <<=, >>=,
+	&=, ^=, |=	assignment
+
+Shell variables are allowed as operands.  The name of the variable
+is replaced by its value (coerced to a fixed-width integer) within
+an expression.  The variable need not have its integer attribute
+turned on to be used in an expression.
+
+Operators are evaluated in order of precedence.  Sub-expressions in
+parentheses are evaluated first and may override the precedence
+rules above.
+
+If the last ARG evaluates to 0, let returns 1; 0 is returned
+otherwise.
+$END
+
+#include <config.h>
+
+#if defined (HAVE_UNISTD_H)
+#  ifdef _MINIX
+#    include <sys/types.h>
+#  endif
+#  include <unistd.h>
+#endif
+
+#include "../shell.h"
+#include "common.h"
+
+/* Arithmetic LET function. */
+int
+let_builtin (list)
+     WORD_LIST *list;
+{
+  intmax_t ret;
+  int expok;
+
+  /* Skip over leading `--' argument. */
+  if (list && list->word && ISOPTION (list->word->word, '-'))
+    list = list->next;
+
+  if (list == 0)
+    {
+      builtin_error ("expression expected");
+      return (EXECUTION_FAILURE);
+    }
+
+  for (; list; list = list->next)
+    {
+      ret = evalexp (list->word->word, &expok);
+      if (expok == 0)
+	return (EXECUTION_FAILURE);
+    }
+
+  return ((ret == 0) ? EXECUTION_FAILURE : EXECUTION_SUCCESS);
+}
+
+#ifdef INCLUDE_UNUSED
+int
+exp_builtin (list)
+     WORD_LIST *list;
+{
+  char *exp;
+  intmax_t ret;
+  int expok;
+
+  if (list == 0)
+    {
+      builtin_error ("expression expected");
+      return (EXECUTION_FAILURE);
+    }
+
+  exp = string_list (list);
+  ret = evalexp (exp, &expok);
+  (void)free (exp);
+  return (((ret == 0) || (expok == 0)) ? EXECUTION_FAILURE : EXECUTION_SUCCESS);
+}
+#endif

@@ -1,0 +1,726 @@
+This file is read.def, from which is created read.c.
+It implements the builtin "read" in Bash.
+
+Copyright (C) 1987-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES read.c
+
+$BUILTIN read
+$FUNCTION read_builtin
+$SHORT_DOC read [-ers] [-u fd] [-t timeout] [-p prompt] [-a array] [-n nchars] [-d delim] [name ...]
+One line is read from the standard input, or from file descriptor FD if the
+-u option is supplied, and the first word is assigned to the first NAME,
+the second word to the second NAME, and so on, with leftover words assigned
+to the last NAME.  Only the characters found in $IFS are recognized as word
+delimiters.  If no NAMEs are supplied, the line read is stored in the REPLY
+variable.  If the -r option is given, this signifies `raw' input, and
+backslash escaping is disabled.  The -d option causes read to continue
+until the first character of DELIM is read, rather than newline.  If the -p
+option is supplied, the string PROMPT is output without a trailing newline
+before attempting to read.  If -a is supplied, the words read are assigned
+to sequential indices of ARRAY, starting at zero.  If -e is supplied and
+the shell is interactive, readline is used to obtain the line.  If -n is
+supplied with a non-zero NCHARS argument, read returns after NCHARS
+characters have been read.  The -s option causes input coming from a
+terminal to not be echoed.
+
+The -t option causes read to time out and return failure if a complete line
+of input is not read within TIMEOUT seconds.  If the TMOUT variable is set,
+its value is the default timeout.  The return code is zero, unless end-of-file
+is encountered, read times out, or an invalid file descriptor is supplied as
+the argument to -u.
+$END
+
+#include <config.h>
+
+#include "bashtypes.h"
+#include "posixstat.h"
+
+#include <stdio.h>
+
+#if defined (HAVE_UNISTD_H)
+#  include <unistd.h>
+#endif
+
+#include <signal.h>
+#include <errno.h>
+
+#ifdef __CYGWIN__
+#  include <fcntl.h>
+#  include <io.h>
+#endif
+
+#include "../shell.h"
+#include "common.h"
+#include "bashgetopt.h"
+
+#include <shtty.h>
+
+#if defined (READLINE)
+#include "../bashline.h"
+#include <readline/readline.h>
+#endif
+
+#if !defined(errno)
+extern int errno;
+#endif
+
+extern int interrupt_immediately;
+
+#if defined (READLINE)
+static char *edit_line __P((char *));
+static void set_eol_delim __P((int));
+static void reset_eol_delim __P((char *));
+#endif
+static SHELL_VAR *bind_read_variable __P((char *, char *));
+
+static sighandler sigalrm __P((int));
+static void reset_alarm __P((void));
+
+static procenv_t alrmbuf;
+static SigHandler *old_alrm;
+static unsigned char delim;
+
+static sighandler
+sigalrm (s)
+     int s;
+{
+  longjmp (alrmbuf, 1);
+}
+
+static void
+reset_alarm ()
+{
+  set_signal_handler (SIGALRM, old_alrm);
+  alarm (0);
+}
+
+/* Read the value of the shell variables whose names follow.
+   The reading is done from the current input stream, whatever
+   that may be.  Successive words of the input line are assigned
+   to the variables mentioned in LIST.  The last variable in LIST
+   gets the remainder of the words on the line.  If no variables
+   are mentioned in LIST, then the default variable is $REPLY. */
+int
+read_builtin (list)
+     WORD_LIST *list;
+{
+  register char *varname;
+  int size, i, pass_next, saw_escape, eof, opt, retval, code;
+  int input_is_tty, input_is_pipe, unbuffered_read;
+  int raw, edit, nchars, silent, have_timeout, fd;
+  unsigned int tmout;
+  intmax_t intval;
+  char c;
+  char *input_string, *orig_input_string, *ifs_chars, *prompt, *arrayname;
+  char *e, *t, *t1;
+  struct stat tsb;
+  SHELL_VAR *var;
+#if defined (ARRAY_VARS)
+  WORD_LIST *alist;
+#endif
+#if defined (READLINE)
+  char *rlbuf;
+  int rlind;
+#endif
+
+  USE_VAR(size);
+  USE_VAR(i);
+  USE_VAR(pass_next);
+  USE_VAR(saw_escape);
+  USE_VAR(input_is_pipe);
+/*  USE_VAR(raw); */
+  USE_VAR(edit);
+  USE_VAR(tmout);
+  USE_VAR(nchars);
+  USE_VAR(silent);
+  USE_VAR(ifs_chars);
+  USE_VAR(prompt);
+  USE_VAR(arrayname);
+#if defined (READLINE)
+  USE_VAR(rlbuf);
+  USE_VAR(rlind);
+#endif
+  USE_VAR(list);
+
+  i = 0;		/* Index into the string that we are reading. */
+  raw = edit = 0;	/* Not reading raw input by default. */
+  silent = 0;
+  arrayname = prompt = (char *)NULL;
+  fd = 0;		/* file descriptor to read from */
+
+#if defined (READLINE)
+  rlbuf = (char *)0;
+  rlind = 0;
+#endif
+
+  tmout = 0;		/* no timeout */
+  nchars = input_is_tty = input_is_pipe = unbuffered_read = have_timeout = 0;
+  delim = '\n';		/* read until newline */
+
+  reset_internal_getopt ();
+  while ((opt = internal_getopt (list, "ersa:d:n:p:t:u:")) != -1)
+    {
+      switch (opt)
+	{
+	case 'r':
+	  raw = 1;
+	  break;
+	case 'p':
+	  prompt = list_optarg;
+	  break;
+	case 's':
+	  silent = 1;
+	  break;
+	case 'e':
+#if defined (READLINE)
+	  edit = 1;
+#endif
+	  break;
+#if defined (ARRAY_VARS)
+	case 'a':
+	  arrayname = list_optarg;
+	  break;
+#endif
+	case 't':
+	  code = legal_number (list_optarg, &intval);
+	  if (code == 0 || intval < 0 || intval != (unsigned int)intval)
+	    {
+	      builtin_error ("%s: invalid timeout specification", list_optarg);
+	      return (EXECUTION_FAILURE);
+	    }
+	  else
+	    {
+	      have_timeout = 1;
+	      tmout = intval;
+	    }
+	  break;
+	case 'n':
+	  code = legal_number (list_optarg, &intval);
+	  if (code == 0 || intval < 0 || intval != (int)intval)
+	    {
+	      sh_invalidnum (list_optarg);
+	      return (EXECUTION_FAILURE);
+	    }
+	  else
+	    nchars = intval;
+	  break;
+	case 'u':
+	  code = legal_number (list_optarg, &intval);
+	  if (code == 0 || intval < 0 || intval != (int)intval)
+	    {
+	      builtin_error ("%s: invalid file descriptor specification", list_optarg);
+	      return (EXECUTION_FAILURE);
+	    }
+	  else
+	    fd = intval;
+	  if (sh_validfd (fd) == 0)
+	    {
+	      builtin_error ("%d: invalid file descriptor: %s", fd, strerror (errno));
+	      return (EXECUTION_FAILURE);
+	    }
+	  break;
+	case 'd':
+	  delim = *list_optarg;
+	  break;
+	default:
+	  builtin_usage ();
+	  return (EX_USAGE);
+	}
+    }
+  list = loptend;
+
+  /* `read -t 0 var' returns failure immediately.  XXX - should it test
+     whether input is available with select/FIONREAD, and fail if those
+     are unavailable? */
+  if (have_timeout && tmout == 0)
+    return (EXECUTION_FAILURE);
+
+  /* IF IFS is unset, we use the default of " \t\n". */
+  ifs_chars = getifs ();
+  if (ifs_chars == 0)		/* XXX - shouldn't happen */
+    ifs_chars = "";
+
+  input_string = (char *)xmalloc (size = 112);	/* XXX was 128 */
+
+  /* $TMOUT, if set, is the default timeout for read. */
+  if (have_timeout == 0 && (e = get_string_value ("TMOUT")))
+    {
+      code = legal_number (e, &intval);
+      if (code == 0 || intval < 0 || intval != (unsigned int)intval)
+	tmout = 0;
+      else
+	tmout = intval;
+    }
+
+  begin_unwind_frame ("read_builtin");
+
+  input_is_tty = isatty (fd);
+  if (input_is_tty == 0)
+#ifndef __CYGWIN__
+    input_is_pipe = (lseek (0, 0L, SEEK_CUR) < 0) && (errno == ESPIPE);
+#else
+    input_is_pipe = 1;
+#endif
+
+  /* If the -p, -e or -s flags were given, but input is not coming from the
+     terminal, turn them off. */
+  if ((prompt || edit || silent) && input_is_tty == 0)
+    {
+      prompt = (char *)NULL;
+      edit = silent = 0;
+    }
+
+#if defined (READLINE)
+  if (edit)
+    add_unwind_protect (xfree, rlbuf);
+#endif
+
+  if (prompt && edit == 0)
+    {
+      fprintf (stderr, "%s", prompt);
+      fflush (stderr);
+    }
+
+  pass_next = 0;	/* Non-zero signifies last char was backslash. */
+  saw_escape = 0;	/* Non-zero signifies that we saw an escape char */
+
+  if (tmout > 0)
+    {
+      /* Turn off the timeout if stdin is a regular file (e.g. from
+	 input redirection). */
+      if ((fstat (fd, &tsb) < 0) || S_ISREG (tsb.st_mode))
+	tmout = 0;
+    }
+
+  if (tmout > 0)
+    {
+      code = setjmp (alrmbuf);
+      if (code)
+	{
+	  run_unwind_frame ("read_builtin");
+	  return (EXECUTION_FAILURE);
+	}
+      old_alrm = set_signal_handler (SIGALRM, sigalrm);
+      add_unwind_protect (reset_alarm, (char *)NULL);
+      alarm (tmout);
+    }
+
+  /* If we've been asked to read only NCHARS chars, or we're using some
+     character other than newline to terminate the line, do the right
+     thing to readline or the tty. */
+  if (nchars > 0 || delim != '\n')
+    {
+#if defined (READLINE)
+      if (edit)
+	{
+	  if (nchars > 0)
+	    {
+	      unwind_protect_int (rl_num_chars_to_read);
+	      rl_num_chars_to_read = nchars;
+	    }
+	  if (delim != '\n')
+	    {
+	      set_eol_delim (delim);
+	      add_unwind_protect (reset_eol_delim, (char *)NULL);
+	    }
+	}
+      else
+#endif
+      if (input_is_tty)
+	{
+	  ttsave ();
+	  if (silent)
+	    ttcbreak ();
+	  else
+	    ttonechar ();
+	  add_unwind_protect ((Function *)ttrestore, (char *)NULL);
+	}
+    }
+  else if (silent)	/* turn off echo but leave term in canonical mode */
+    {
+      ttsave ();
+      ttnoecho ();
+      add_unwind_protect ((Function *)ttrestore, (char *)NULL);
+    }
+
+  /* This *must* be the top unwind-protect on the stack, so the manipulation
+     of the unwind-protect stack after the realloc() works right. */
+  add_unwind_protect (xfree, input_string);
+  interrupt_immediately++;
+
+  unbuffered_read = (nchars > 0) || (delim != '\n') || input_is_pipe;
+
+#if defined (__CYGWIN__) && defined (O_TEXT)
+  setmode (0, O_TEXT);
+#endif
+
+  for (eof = retval = 0;;)
+    {
+#if defined (READLINE)
+      if (edit)
+	{
+	  if (rlbuf && rlbuf[rlind] == '\0')
+	    {
+	      xfree (rlbuf);
+	      rlbuf = (char *)0;
+	    }
+	  if (rlbuf == 0)
+	    {
+	      rlbuf = edit_line (prompt ? prompt : "");
+	      rlind = 0;
+	    }
+	  if (rlbuf == 0)
+	    {
+	      eof = 1;
+	      break;
+	    }
+	  c = rlbuf[rlind++];
+	}
+      else
+	{
+#endif
+
+      if (unbuffered_read)
+	retval = zread (fd, &c, 1);
+      else
+	retval = zreadc (fd, &c);
+
+      if (retval <= 0)
+	{
+	  eof = 1;
+	  break;
+	}
+
+#if defined (READLINE)
+	}
+#endif
+
+      if (i + 2 >= size)
+	{
+	  input_string = (char *)xrealloc (input_string, size += 128);
+	  remove_unwind_protect ();
+	  add_unwind_protect (xfree, input_string);
+	}
+
+      /* If the next character is to be accepted verbatim, a backslash
+	 newline pair still disappears from the input. */
+      if (pass_next)
+	{
+	  if (c == '\n')
+	    i--;		/* back up over the CTLESC */
+	  else
+	    input_string[i++] = c;
+	  pass_next = 0;
+	  continue;
+	}
+
+      if (c == '\\' && raw == 0)
+	{
+	  pass_next++;
+	  saw_escape++;
+	  input_string[i++] = CTLESC;
+	  continue;
+	}
+
+      if ((unsigned char)c == delim)
+	break;
+
+      if (c == CTLESC || c == CTLNUL)
+	{
+	  saw_escape++;
+	  input_string[i++] = CTLESC;
+	}
+
+      input_string[i++] = c;
+
+      if (nchars > 0 && i >= nchars)
+	break;
+    }
+  input_string[i] = '\0';
+
+#if 1
+  if (retval < 0)
+    {
+      builtin_error ("read error: %d: %s", fd, strerror (errno));
+      return (EXECUTION_FAILURE);
+    }
+#endif
+
+  if (tmout > 0)
+    reset_alarm ();
+
+  if (nchars > 0 || delim != '\n')
+    {
+#if defined (READLINE)
+      if (edit)
+	{
+	  if (nchars > 0)
+	    rl_num_chars_to_read = 0;
+	  if (delim != '\n')
+	    reset_eol_delim ((char *)NULL);
+	}
+      else
+#endif
+      if (input_is_tty)
+	ttrestore ();
+    }
+  else if (silent)
+    ttrestore ();
+
+  if (unbuffered_read == 0)
+    zsyncfd (fd);
+
+  interrupt_immediately--;
+  discard_unwind_frame ("read_builtin");
+
+  retval = eof ? EXECUTION_FAILURE : EXECUTION_SUCCESS;
+
+#if defined (ARRAY_VARS)
+  /* If -a was given, take the string read, break it into a list of words,
+     an assign them to `arrayname' in turn. */
+  if (arrayname)
+    {
+      var = find_or_make_array_variable (arrayname, 1);
+      if (var == 0)
+	return EXECUTION_FAILURE;	/* readonly or noassign */
+      array_flush (array_cell (var));
+
+      alist = list_string (input_string, ifs_chars, 0);
+      if (alist)
+	{
+	  assign_array_var_from_word_list (var, alist);
+	  dispose_words (alist);
+	}
+      xfree (input_string);
+      return (retval);
+    }
+#endif /* ARRAY_VARS */ 
+
+  /* If there are no variables, save the text of the line read to the
+     variable $REPLY.  ksh93 strips leading and trailing IFS whitespace,
+     so that `read x ; echo "$x"' and `read ; echo "$REPLY"' behave the
+     same way, but I believe that the difference in behaviors is useful
+     enough to not do it.  Without the bash behavior, there is no way
+     to read a line completely without interpretation or modification
+     unless you mess with $IFS (e.g., setting it to the empty string).
+     If you disagree, change the occurrences of `#if 0' to `#if 1' below. */
+  if (list == 0)
+    {
+#if 0
+      orig_input_string = input_string;
+      for (t = input_string; ifs_chars && *ifs_chars && spctabnl(*t) && isifs(*t); t++)
+	;
+      input_string = t;
+      input_string = strip_trailing_ifs_whitespace (input_string, ifs_chars, saw_escape);
+#endif
+
+      if (saw_escape)
+	{
+	  t = dequote_string (input_string);
+	  var = bind_variable ("REPLY", t);
+	  free (t);
+	}
+      else
+	var = bind_variable ("REPLY", input_string);
+      VUNSETATTR (var, att_invisible);
+
+      free (input_string);
+      return (retval);
+    }
+
+  /* This code implements the Posix.2 spec for splitting the words
+     read and assigning them to variables. */
+  orig_input_string = input_string;
+
+  /* Remove IFS white space at the beginning of the input string.  If
+     $IFS is null, no field splitting is performed. */
+  for (t = input_string; ifs_chars && *ifs_chars && spctabnl(*t) && isifs(*t); t++)
+    ;
+  input_string = t;
+
+  for (; list->next; list = list->next)
+    {
+      varname = list->word->word;
+#if defined (ARRAY_VARS)
+      if (legal_identifier (varname) == 0 && valid_array_reference (varname) == 0)
+#else
+      if (legal_identifier (varname) == 0)
+#endif
+	{
+	  sh_invalidid (varname);
+	  xfree (orig_input_string);
+	  return (EXECUTION_FAILURE);
+	}
+
+      /* If there are more variables than words read from the input,
+	 the remaining variables are set to the empty string. */
+      if (*input_string)
+	{
+	  /* This call updates INPUT_STRING. */
+	  t = get_word_from_string (&input_string, ifs_chars, &e);
+	  if (t)
+	    *e = '\0';
+	  /* Don't bother to remove the CTLESC unless we added one
+	     somewhere while reading the string. */
+	  if (t && saw_escape)
+	    {
+	      t1 = dequote_string (t);
+	      var = bind_read_variable (varname, t1);
+	      xfree (t1);
+	    }
+	  else
+	    var = bind_read_variable (varname, t);
+	}
+      else
+	{
+	  t = (char *)0;
+	  var = bind_read_variable (varname, "");
+	}
+
+      FREE (t);
+      if (var == 0)
+	{
+	  xfree (orig_input_string);
+	  return (EXECUTION_FAILURE);
+	}
+
+      stupidly_hack_special_variables (varname);
+      VUNSETATTR (var, att_invisible);
+    }
+
+  /* Now assign the rest of the line to the last variable argument. */
+#if defined (ARRAY_VARS)
+  if (legal_identifier (list->word->word) == 0 && valid_array_reference (list->word->word) == 0)
+#else
+  if (legal_identifier (list->word->word) == 0)
+#endif
+    {
+      sh_invalidid (list->word->word);
+      xfree (orig_input_string);
+      return (EXECUTION_FAILURE);
+    }
+
+  /* This has to be done this way rather than using string_list
+     and list_string because Posix.2 says that the last variable gets the
+     remaining words and their intervening separators. */
+  input_string = strip_trailing_ifs_whitespace (input_string, ifs_chars, saw_escape);
+
+  if (saw_escape)
+    {
+      t = dequote_string (input_string);
+      var = bind_read_variable (list->word->word, t);
+      xfree (t);
+    }
+  else
+    var = bind_read_variable (list->word->word, input_string);
+  stupidly_hack_special_variables (list->word->word);
+  if (var)
+    VUNSETATTR (var, att_invisible);
+  xfree (orig_input_string);
+
+  return (retval);
+}
+
+static SHELL_VAR *
+bind_read_variable (name, value)
+     char *name, *value;
+{
+#if defined (ARRAY_VARS)
+  if (valid_array_reference (name) == 0)
+    return (bind_variable (name, value));
+  else
+    return (assign_array_element (name, value));
+#else /* !ARRAY_VARS */
+  return bind_variable (name, value);
+#endif /* !ARRAY_VARS */
+}
+
+#if defined (READLINE)
+static rl_completion_func_t *old_attempted_completion_function;
+
+static char *
+edit_line (p)
+     char *p;
+{
+  char *ret;
+  int len;
+
+  if (!bash_readline_initialized)
+    initialize_readline ();
+  old_attempted_completion_function = rl_attempted_completion_function;
+  rl_attempted_completion_function = (rl_completion_func_t *)NULL;
+  ret = readline (p);
+  rl_attempted_completion_function = old_attempted_completion_function;
+  if (ret == 0)
+    return ret;
+  len = strlen (ret);
+  ret = (char *)xrealloc (ret, len + 2);
+  ret[len++] = delim;
+  ret[len] = '\0';
+  return ret;
+}
+
+static int old_delim_ctype;
+static rl_command_func_t *old_delim_func;
+static int old_newline_ctype;
+static rl_command_func_t *old_newline_func;
+
+static unsigned char delim_char;
+
+static void
+set_eol_delim (c)
+     int c;
+{
+  Keymap cmap;
+
+  if (bash_readline_initialized == 0)
+    initialize_readline ();
+  cmap = rl_get_keymap ();
+
+  /* Change newline to self-insert */
+  old_newline_ctype = cmap[RETURN].type;
+  old_newline_func =  cmap[RETURN].function;
+  cmap[RETURN].type = ISFUNC;
+  cmap[RETURN].function = rl_insert;
+
+  /* Bind the delimiter character to accept-line. */
+  old_delim_ctype = cmap[c].type;
+  old_delim_func = cmap[c].function;
+  cmap[c].type = ISFUNC;
+  cmap[c].function = rl_newline;
+
+  delim_char = c;
+}
+
+static void
+reset_eol_delim (cp)
+     char *cp;
+{
+  Keymap cmap;
+
+  cmap = rl_get_keymap ();
+
+  cmap[RETURN].type = old_newline_ctype;
+  cmap[RETURN].function = old_newline_func;
+
+  cmap[delim_char].type = old_delim_ctype;
+  cmap[delim_char].function = old_delim_func;
+}
+#endif

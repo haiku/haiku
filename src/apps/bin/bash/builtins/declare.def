@@ -1,0 +1,442 @@
+This file is declare.def, from which is created declare.c.
+It implements the builtins "declare" and "local" in Bash.
+
+Copyright (C) 1987-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES declare.c
+
+$BUILTIN declare
+$FUNCTION declare_builtin
+$SHORT_DOC declare [-afFirtx] [-p] name[=value] ...
+Declare variables and/or give them attributes.  If no NAMEs are
+given, then display the values of variables instead.  The -p option
+will display the attributes and values of each NAME.
+
+The flags are:
+
+  -a	to make NAMEs arrays (if supported)
+  -f	to select from among function names only
+  -F	to display function names without definitions
+  -i	to make NAMEs have the `integer' attribute
+  -r	to make NAMEs readonly
+  -t	to make NAMEs have the `trace' attribute
+  -x	to make NAMEs export
+
+Variables with the integer attribute have arithmetic evaluation (see
+`let') done when the variable is assigned to.
+
+When displaying values of variables, -f displays a function's name
+and definition.  The -F option restricts the display to function
+name only.
+
+Using `+' instead of `-' turns off the given attribute instead.  When
+used in a function, makes NAMEs local, as with the `local' command.
+$END
+
+$BUILTIN typeset
+$FUNCTION declare_builtin
+$SHORT_DOC typeset [-afFirtx] [-p] name[=value] ...
+Obsolete.  See `declare'.
+$END
+
+#include <config.h>
+
+#if defined (HAVE_UNISTD_H)
+#  ifdef _MINIX
+#    include <sys/types.h>
+#  endif
+#  include <unistd.h>
+#endif
+
+#include <stdio.h>
+
+#include "../bashansi.h"
+
+#include "../shell.h"
+#include "common.h"
+#include "builtext.h"
+#include "bashgetopt.h"
+
+extern int array_needs_making;
+
+static int declare_internal __P((register WORD_LIST *, int));
+
+/* Declare or change variable attributes. */
+int
+declare_builtin (list)
+     register WORD_LIST *list;
+{
+  return (declare_internal (list, 0));
+}
+
+$BUILTIN local
+$FUNCTION local_builtin
+$SHORT_DOC local name[=value] ...
+Create a local variable called NAME, and give it VALUE.  LOCAL
+can only be used within a function; it makes the variable NAME
+have a visible scope restricted to that function and its children.
+$END
+int
+local_builtin (list)
+     register WORD_LIST *list;
+{
+  if (variable_context)
+    return (declare_internal (list, 1));
+  else
+    {
+      builtin_error ("can only be used in a function");
+      return (EXECUTION_FAILURE);
+    }
+}
+
+#if defined (ARRAY_VARS)
+#  define DECLARE_OPTS	"+afiprtxF"
+#else
+#  define DECLARE_OPTS	"+fiprtxF"
+#endif
+
+/* The workhorse function. */
+static int
+declare_internal (list, local_var)
+     register WORD_LIST *list;
+     int local_var;
+{
+  int flags_on, flags_off, *flags, any_failed, assign_error, pflag, nodefs, opt;
+  char *t, *subscript_start;
+  SHELL_VAR *var;
+
+  flags_on = flags_off = any_failed = assign_error = pflag = nodefs = 0;
+  reset_internal_getopt ();
+  while ((opt = internal_getopt (list, DECLARE_OPTS)) != EOF)
+    {
+      flags = list_opttype == '+' ? &flags_off : &flags_on;
+
+      switch (opt)
+	{
+	case 'a':
+#if defined (ARRAY_VARS)
+	  *flags |= att_array;
+#endif
+	  break;
+	case 'p':
+	  if (local_var == 0)
+	    pflag++;
+	  break;
+        case 'F':
+	  nodefs++;
+	  *flags |= att_function;
+	  break;
+	case 'f':
+	  *flags |= att_function;
+	  break;
+	case 'i':
+	  *flags |= att_integer;
+	  break;
+	case 'r':
+	  *flags |= att_readonly;
+	  break;
+	case 't':
+	  *flags |= att_trace;
+	  break;
+	case 'x':
+	  *flags |= att_exported;
+	  array_needs_making = 1;
+	  break;
+	default:
+	  builtin_usage ();
+	  return (EX_USAGE);
+	}
+    }
+
+  list = loptend;
+
+  /* If there are no more arguments left, then we just want to show
+     some variables. */
+  if (list == 0)	/* declare -[afFirtx] */
+    {
+      /* Show local variables defined at this context level if this is
+	 the `local' builtin. */
+      if (local_var)
+	{
+	  register SHELL_VAR **vlist;
+	  register int i;
+
+	  vlist = all_local_variables ();
+
+	  if (vlist)
+	    {
+	      for (i = 0; vlist[i]; i++)
+		print_assignment (vlist[i]);
+
+	      free (vlist);
+	    }
+	}
+      else
+	{
+	  if (flags_on == 0)
+	    set_builtin ((WORD_LIST *)NULL);
+	  else
+	    set_or_show_attributes ((WORD_LIST *)NULL, flags_on, nodefs);
+	}
+
+      fflush (stdout);
+      return (EXECUTION_SUCCESS);
+    }
+
+  if (pflag)	/* declare -p [-afFirtx] name [name...] */
+    {
+      for (any_failed = 0; list; list = list->next)
+	{
+	  pflag = show_name_attributes (list->word->word, nodefs);
+	  if (pflag)
+	    {
+	      sh_notfound (list->word->word);
+	      any_failed++;
+	    }
+	}
+      return (any_failed ? EXECUTION_FAILURE : EXECUTION_SUCCESS);
+    }
+
+#define NEXT_VARIABLE() free (name); list = list->next; continue
+
+  /* There are arguments left, so we are making variables. */
+  while (list)		/* declare [-afFirx] name [name ...] */
+    {
+      char *value, *name;
+      int offset;
+#if defined (ARRAY_VARS)
+      int making_array_special, compound_array_assign, simple_array_assign;
+#endif
+
+      name = savestring (list->word->word);
+      offset = assignment (name);
+
+      if (offset)	/* declare [-afFirx] name=value */
+	{
+	  name[offset] = '\0';
+	  value = name + offset + 1;
+	}
+      else
+	value = "";
+
+#if defined (ARRAY_VARS)
+      compound_array_assign = simple_array_assign = 0;
+      subscript_start = (char *)NULL;
+      if (t = strchr (name, '['))	/* ] */
+	{
+	  subscript_start = t;
+	  *t = '\0';
+	  making_array_special = 1;
+	}
+      else
+	making_array_special = 0;
+#endif
+	
+      if (legal_identifier (name) == 0)
+	{
+	  sh_invalidid (name);
+	  assign_error++;
+	  NEXT_VARIABLE ();
+	}
+
+      /* If VARIABLE_CONTEXT has a non-zero value, then we are executing
+	 inside of a function.  This means we should make local variables,
+	 not global ones. */
+
+      /* XXX - this has consequences when we're making a local copy of a
+	       variable that was in the temporary environment.  Watch out
+	       for this. */
+      if (variable_context && ((flags_on & att_function) == 0))
+	{
+#if defined (ARRAY_VARS)
+	  if ((flags_on & att_array) || making_array_special)
+	    var = make_local_array_variable (name);
+	  else
+#endif
+	  var = make_local_variable (name);
+	  if (var == 0)
+	    {
+	      any_failed++;
+	      NEXT_VARIABLE ();
+	    }
+	}
+      else
+	var = (SHELL_VAR *)NULL;
+
+      /* If we are declaring a function, then complain about it in some way.
+	 We don't let people make functions by saying `typeset -f foo=bar'. */
+
+      /* There should be a way, however, to let people look at a particular
+	 function definition by saying `typeset -f foo'. */
+
+      if (flags_on & att_function)
+	{
+	  if (offset)	/* declare -f [-rix] foo=bar */
+	    {
+	      builtin_error ("cannot use `-f' to make functions");
+	      free (name);
+	      return (EXECUTION_FAILURE);
+	    }
+	  else		/* declare -f [-rx] name [name...] */
+	    {
+	      var = find_function (name);
+
+	      if (var)
+		{
+		  if (readonly_p (var) && (flags_off & att_readonly))
+		    {
+		      builtin_error ("%s: readonly function", name);
+		      any_failed++;
+		      NEXT_VARIABLE ();
+		    }
+
+		  /* declare -[Ff] name [name...] */
+		  if (flags_on == att_function && flags_off == 0)
+		    {
+		      t = nodefs ? var->name
+				 : named_function_string (name, function_cell (var), 1);
+		      printf ("%s\n", t);
+		    }
+		  else		/* declare -[fF] -[rx] name [name...] */
+		    {
+		      VSETATTR (var, flags_on);
+		      VUNSETATTR (var, flags_off);
+		    }
+		}
+	      else
+		any_failed++;
+	      NEXT_VARIABLE ();
+	    }
+	}
+      else		/* declare -[airx] name [name...] */
+	{
+	  /* Non-null if we just created or fetched a local variable. */
+	  if (var == 0)
+	    var = find_variable (name);
+
+	  if (var == 0)
+	    {
+#if defined (ARRAY_VARS)
+	      if ((flags_on & att_array) || making_array_special)
+		var = make_new_array_variable (name);
+	      else
+#endif
+	      var = bind_variable (name, "");
+	    }
+
+	  /* Cannot use declare +r to turn off readonly attribute. */ 
+	  if (readonly_p (var) && (flags_off & att_readonly))
+	    {
+	      sh_readonly (name);
+	      any_failed++;
+	      NEXT_VARIABLE ();
+	    }
+
+	  /* Cannot use declare to assign value to readonly or noassign
+	     variable. */
+	  if ((readonly_p (var) || noassign_p (var)) && offset)
+	    {
+	      if (readonly_p (var))
+		sh_readonly (name);
+	      assign_error++;
+	      NEXT_VARIABLE ();
+	    }
+
+#if defined (ARRAY_VARS)
+	  if ((making_array_special || (flags_on & att_array) || array_p (var)) && offset)
+	    {
+	      if (value[0] == '(' && strchr (value, ')'))
+		compound_array_assign = 1;
+	      else
+		simple_array_assign = 1;
+	    }
+
+	  /* Cannot use declare +a name to remove an array variable. */
+	  if ((flags_off & att_array) && array_p (var))
+	    {
+	      builtin_error ("%s: cannot destroy array variables in this way", name);
+	      any_failed++;
+	      NEXT_VARIABLE ();
+	    }
+
+	  /* declare -a name makes name an array variable. */
+	  if ((making_array_special || (flags_on & att_array)) && array_p (var) == 0)
+	    var = convert_var_to_array (var);
+#endif /* ARRAY_VARS */
+
+	  VSETATTR (var, flags_on);
+	  VUNSETATTR (var, flags_off);
+
+#if defined (ARRAY_VARS)
+	  if (offset && compound_array_assign)
+	    assign_array_var_from_string (var, value);
+	  else if (simple_array_assign && subscript_start)
+	    {
+	      /* declare [-a] name[N]=value */
+	      *subscript_start = '[';	/* ] */
+	      var = assign_array_element (name, value);
+	      *subscript_start = '\0';
+	    }
+	  else if (simple_array_assign)
+	    /* let bind_array_variable take care of this. */
+	    bind_array_variable (name, 0, value);
+	  else
+#endif
+	  /* bind_variable_value duplicates the essential internals of
+	     bind_variable() */
+	  if (offset)
+	    bind_variable_value (var, value);
+
+	  /* If we found this variable in the temporary environment, as with
+	     `var=value declare -x var', make sure it is treated identically
+	     to `var=value export var'.  Do the same for `declare -r' and
+	     `readonly'.  Preserve the attributes, except for att_tempvar. */
+	  /* XXX -- should this create a variable in the global scope, or
+	     modify the local variable flags?  ksh93 has it modify the
+	     global scope.
+	     Need to handle case like in set_var_attribute where a temporary
+	     variable is in the same table as the function local vars. */
+	  if ((flags_on & (att_exported|att_readonly)) && tempvar_p (var))
+	    {
+	      SHELL_VAR *tv;
+	      char *tvalue;
+
+	      tv = find_tempenv_variable (var->name);
+	      if (tv)
+		{
+		  tvalue = var_isset (var) ? savestring (value_cell (var)) : savestring ("");
+	          tv = bind_variable (var->name, tvalue);
+	          tv->attributes |= var->attributes & ~att_tempvar;
+	          if (tv->context > 0)
+		    VSETATTR (tv, att_propagate);
+	          free (tvalue);
+		}
+	      VSETATTR (var, att_propagate);
+	    }
+	}
+
+      stupidly_hack_special_variables (name);
+
+      NEXT_VARIABLE ();
+    }
+
+  return (assign_error ? EX_BADASSIGN
+		       : ((any_failed == 0) ? EXECUTION_SUCCESS
+  					    : EXECUTION_FAILURE));
+}

@@ -1,0 +1,523 @@
+This file is shopt.def, from which is created shopt.c.
+It implements the Bash `shopt' builtin.
+
+Copyright (C) 1994-2002 Free Software Foundation, Inc.
+
+This file is part of GNU Bash, the Bourne Again SHell.
+
+Bash is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free
+Software Foundation; either version 2, or (at your option) any later
+version.
+
+Bash is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License along
+with Bash; see the file COPYING.  If not, write to the Free Software
+Foundation, 59 Temple Place, Suite 330, Boston, MA 02111 USA.
+
+$PRODUCES shopt.c
+
+$BUILTIN shopt
+$FUNCTION shopt_builtin
+$SHORT_DOC shopt [-pqsu] [-o long-option] optname [optname...]
+Toggle the values of variables controlling optional behavior.
+The -s flag means to enable (set) each OPTNAME; the -u flag
+unsets each OPTNAME.  The -q flag suppresses output; the exit
+status indicates whether each OPTNAME is set or unset.  The -o
+option restricts the OPTNAMEs to those defined for use with
+`set -o'.  With no options, or with the -p option, a list of all
+settable options is displayed, with an indication of whether or
+not each is set.
+$END
+
+#include <config.h>
+
+#if defined (HAVE_UNISTD_H)
+#  ifdef _MINIX
+#    include <sys/types.h>
+#  endif
+#  include <unistd.h>
+#endif
+
+#include <stdio.h>
+
+#include "../shell.h"
+#include "../flags.h"
+#include "common.h"
+#include "bashgetopt.h"
+
+#define UNSETOPT	0
+#define SETOPT		1
+
+#define OPTFMT		"%-15s\t%s\n"
+
+extern int allow_null_glob_expansion, glob_dot_filenames;
+extern int cdable_vars, mail_warning, source_uses_path;
+extern int no_exit_on_failed_exec, print_shift_error;
+extern int check_hashed_filenames, promptvars;
+extern int cdspelling, expand_aliases;
+extern int check_window_size;
+extern int glob_ignore_case;
+extern int hup_on_exit;
+extern int xpg_echo;
+
+#if defined (EXTENDED_GLOB)
+extern int extended_glob;
+#endif
+
+#if defined (HISTORY)
+extern int literal_history, command_oriented_history;
+extern int force_append_history;
+#endif
+
+#if defined (READLINE)
+extern int hist_verify, history_reediting, perform_hostname_completion;
+extern int no_empty_command_completion;
+extern int enable_hostname_completion __P((int));
+#endif
+
+#if defined (PROGRAMMABLE_COMPLETION)
+extern int prog_completion_enabled;
+#endif
+
+#if defined (RESTRICTED_SHELL)
+extern char *shell_name;
+#endif
+
+static void shopt_error __P((char *));
+
+static int set_interactive_comments __P((int));
+
+#if defined (RESTRICTED_SHELL)
+static int set_restricted_shell __P((int));
+#endif
+
+static int shopt_login_shell;
+
+typedef int shopt_set_func_t __P((int));
+
+static struct {
+  char *name;
+  int  *value;
+  shopt_set_func_t *set_func;
+} shopt_vars[] = {
+  { "cdable_vars", &cdable_vars, (shopt_set_func_t *)NULL },
+  { "cdspell", &cdspelling, (shopt_set_func_t *)NULL },
+  { "checkhash", &check_hashed_filenames, (shopt_set_func_t *)NULL },
+  { "checkwinsize", &check_window_size, (shopt_set_func_t *)NULL },
+#if defined (HISTORY)
+  { "cmdhist", &command_oriented_history, (shopt_set_func_t *)NULL },
+#endif
+  { "dotglob", &glob_dot_filenames, (shopt_set_func_t *)NULL },
+  { "execfail", &no_exit_on_failed_exec, (shopt_set_func_t *)NULL },
+  { "expand_aliases", &expand_aliases, (shopt_set_func_t *)NULL },
+#if defined (EXTENDED_GLOB)
+  { "extglob", &extended_glob, (shopt_set_func_t *)NULL },
+#endif
+#if defined (READLINE)
+  { "histreedit", &history_reediting, (shopt_set_func_t *)NULL },
+#endif
+#if defined (HISTORY)
+  { "histappend", &force_append_history, (shopt_set_func_t *)NULL },
+#endif
+#if defined (READLINE)
+  { "histverify", &hist_verify, (shopt_set_func_t *)NULL },
+  { "hostcomplete", &perform_hostname_completion, enable_hostname_completion },
+#endif
+  { "huponexit", &hup_on_exit, (shopt_set_func_t *)NULL },
+  { "interactive_comments", &interactive_comments, set_interactive_comments },
+#if defined (HISTORY)
+  { "lithist", &literal_history, (shopt_set_func_t *)NULL },
+#endif
+  { "login_shell", &shopt_login_shell, set_login_shell },
+  { "mailwarn", &mail_warning, (shopt_set_func_t *)NULL },
+#if defined (READLINE)
+  { "no_empty_cmd_completion", &no_empty_command_completion, (shopt_set_func_t *)NULL },
+#endif
+  { "nocaseglob", &glob_ignore_case, (shopt_set_func_t *)NULL },
+  { "nullglob",	&allow_null_glob_expansion, (shopt_set_func_t *)NULL },
+#if defined (PROGRAMMABLE_COMPLETION)
+  { "progcomp", &prog_completion_enabled, (shopt_set_func_t *)NULL },
+#endif
+  { "promptvars", &promptvars, (shopt_set_func_t *)NULL },
+#if defined (RESTRICTED_SHELL)
+  { "restricted_shell", &restricted_shell, set_restricted_shell },
+#endif
+  { "shift_verbose", &print_shift_error, (shopt_set_func_t *)NULL },
+  { "sourcepath", &source_uses_path, (shopt_set_func_t *)NULL },
+  { "xpg_echo", &xpg_echo, (shopt_set_func_t *)NULL },
+  { (char *)0, (int *)0, (shopt_set_func_t *)NULL }
+};
+
+static char *on = "on";
+static char *off = "off";
+
+static int find_shopt __P((char *));
+static int toggle_shopts __P((int, WORD_LIST *, int));
+static void print_shopt __P((char *, int, int));
+static int list_shopts __P((WORD_LIST *, int));
+static int list_some_shopts __P((int, int));
+static int list_shopt_o_options __P((WORD_LIST *, int));
+static int list_some_o_options __P((int, int));
+static int set_shopt_o_options __P((int, WORD_LIST *, int));
+
+#define SFLAG	0x01
+#define UFLAG	0x02
+#define QFLAG	0x04
+#define OFLAG	0x08
+#define PFLAG	0x10
+
+int
+shopt_builtin (list)
+     WORD_LIST *list;
+{
+  int opt, flags, rval;
+
+  flags = 0;
+  reset_internal_getopt ();
+  while ((opt = internal_getopt (list, "psuoq")) != -1)
+    {
+      switch (opt)
+	{
+	case 's':
+	  flags |= SFLAG;
+	  break;
+	case 'u':
+	  flags |= UFLAG;
+	  break;
+	case 'q':
+	  flags |= QFLAG;
+	  break;
+	case 'o':
+	  flags |= OFLAG;
+	  break;
+	case 'p':
+	  flags |= PFLAG;
+	  break;
+	default:
+	  builtin_usage ();
+	  return (EX_USAGE);
+	}
+    }
+  list = loptend;
+
+  if ((flags & (SFLAG|UFLAG)) == (SFLAG|UFLAG))
+    {
+      builtin_error ("cannot set and unset shell options simultaneously");
+      return (EXECUTION_FAILURE);
+    }
+
+  rval = EXECUTION_SUCCESS;
+  if ((flags & OFLAG) && ((flags & (SFLAG|UFLAG)) == 0))	/* shopt -o */
+    rval = list_shopt_o_options (list, flags);
+  else if (list && (flags & OFLAG))		/* shopt -so args */
+    rval = set_shopt_o_options ((flags & SFLAG) ? FLAG_ON : FLAG_OFF, list, flags & QFLAG);
+  else if (flags & OFLAG)	/* shopt -so */
+    rval = list_some_o_options ((flags & SFLAG) ? 1 : 0, flags);
+  else if (list && (flags & (SFLAG|UFLAG)))	/* shopt -su args */
+    rval = toggle_shopts ((flags & SFLAG) ? SETOPT : UNSETOPT, list, flags & QFLAG);
+  else if ((flags & (SFLAG|UFLAG)) == 0)	/* shopt [args] */
+    rval = list_shopts (list, flags);
+  else						/* shopt -su */
+    rval = list_some_shopts ((flags & SFLAG) ? SETOPT : UNSETOPT, flags);
+  return (rval);
+}
+
+/* Reset the options managed by `shopt' to the values they would have at
+   shell startup. */
+void
+reset_shopt_options ()
+{
+  allow_null_glob_expansion = glob_dot_filenames = 0;
+  cdable_vars = mail_warning = 0;
+  no_exit_on_failed_exec = print_shift_error = 0;
+  check_hashed_filenames = cdspelling = expand_aliases = check_window_size = 0;
+
+  source_uses_path = promptvars = 1;
+
+#if defined (EXTENDED_GLOB)
+  extended_glob = 0;
+#endif
+
+#if defined (HISTORY)
+  literal_history = force_append_history = 0;
+  command_oriented_history = 1;
+#endif
+
+#if defined (READLINE)
+  hist_verify = history_reediting = 0;
+  perform_hostname_completion = 1;
+#endif
+
+  shopt_login_shell = login_shell;
+}
+
+static int
+find_shopt (name)
+     char *name;
+{
+  int i;
+
+  for (i = 0; shopt_vars[i].name; i++)
+    if (STREQ (name, shopt_vars[i].name))
+      return i;
+  return -1;
+}
+
+static void
+shopt_error (s)
+     char *s;
+{
+  builtin_error ("%s: invalid shell option name", s);
+}
+
+static int
+toggle_shopts (mode, list, quiet)
+     int mode;
+     WORD_LIST *list;
+     int quiet;
+{
+  WORD_LIST *l;
+  int ind, rval;
+
+  for (l = list, rval = EXECUTION_SUCCESS; l; l = l->next)
+    {
+      ind = find_shopt (l->word->word);
+      if (ind < 0)
+	{
+	  shopt_error (l->word->word);
+	  rval = EXECUTION_FAILURE;
+	}
+      else
+	{
+	  *shopt_vars[ind].value = mode;	/* 1 for set, 0 for unset */
+	  if (shopt_vars[ind].set_func)
+	    (*shopt_vars[ind].set_func) (mode);
+	}
+    }
+  return (rval);
+}
+
+static void
+print_shopt (name, val, flags)
+     char *name;
+     int val, flags;
+{
+  if (flags & PFLAG)
+    printf ("shopt %s %s\n", val ? "-s" : "-u", name);
+  else
+    printf (OPTFMT, name, val ? on : off);
+}
+
+/* List the values of all or any of the `shopt' options.  Returns 0 if
+   all were listed or all variables queried were on; 1 otherwise. */
+static int
+list_shopts (list, flags)
+     WORD_LIST *list;
+     int flags;
+{
+  WORD_LIST *l;
+  int i, val, rval;
+
+  if (list == 0)
+    {
+      for (i = 0; shopt_vars[i].name; i++)
+	{
+	  val = *shopt_vars[i].value;
+	  if ((flags & QFLAG) == 0)
+	    print_shopt (shopt_vars[i].name, val, flags);
+	}
+      return (EXECUTION_SUCCESS);
+    }
+
+  for (l = list, rval = EXECUTION_SUCCESS; l; l = l->next)
+    {
+      i = find_shopt (l->word->word);
+      if (i < 0)
+	{
+	  shopt_error (l->word->word);
+	  rval = EXECUTION_FAILURE;
+	  continue;
+	}
+      val = *shopt_vars[i].value;
+      if (val == 0)
+	rval = EXECUTION_FAILURE;
+      if ((flags & QFLAG) == 0)
+	print_shopt (l->word->word, val, flags);
+    }
+
+  return (rval);
+}
+
+static int
+list_some_shopts (mode, flags)
+     int mode, flags;
+{
+  int val, i;
+
+  for (i = 0; shopt_vars[i].name; i++)
+    {
+      val = *shopt_vars[i].value;
+      if (((flags & QFLAG) == 0) && mode == val)
+	print_shopt (shopt_vars[i].name, val, flags);
+    }
+  return (EXECUTION_SUCCESS);
+}
+
+static int
+list_shopt_o_options (list, flags)
+     WORD_LIST *list;
+     int flags;
+{
+  WORD_LIST *l;
+  int val, rval;
+
+  if (list == 0)
+    {
+      if ((flags & QFLAG) == 0)
+	list_minus_o_opts (-1, (flags & PFLAG));
+      return (EXECUTION_SUCCESS);
+    }
+
+  for (l = list, rval = EXECUTION_SUCCESS; l; l = l->next)
+    {
+      val = minus_o_option_value (l->word->word);
+      if (val == -1)
+	{
+	  sh_invalidoptname (l->word->word);
+	  rval = EXECUTION_FAILURE;
+	  continue;
+	}
+      if (val == 0)
+	rval = EXECUTION_FAILURE;
+      if ((flags & QFLAG) == 0)
+	{
+	  if (flags & PFLAG)
+	    printf ("set %co %s\n", val ? '-' : '+', l->word->word);
+	  else
+	    printf (OPTFMT, l->word->word, val ? on : off);
+	}
+    }
+  return (rval);
+}
+
+static int
+list_some_o_options (mode, flags)
+     int mode, flags;
+{
+  if ((flags & QFLAG) == 0)
+    list_minus_o_opts (mode, (flags & PFLAG));
+  return (EXECUTION_SUCCESS);
+}
+
+static int
+set_shopt_o_options (mode, list, quiet)
+     int mode;
+     WORD_LIST *list;
+     int quiet;
+{
+  WORD_LIST *l;
+  int rval;
+
+  for (l = list, rval = EXECUTION_SUCCESS; l; l = l->next)
+    {
+      if (set_minus_o_option (mode, l->word->word) == EXECUTION_FAILURE)
+	rval = EXECUTION_FAILURE;
+    }
+  set_shellopts ();
+  return rval;
+}
+
+/* If we set or unset interactive_comments with shopt, make sure the
+   change is reflected in $SHELLOPTS. */
+static int
+set_interactive_comments (mode)
+     int mode;
+{
+  set_shellopts ();
+  return (0);
+}
+
+#if defined (RESTRICTED_SHELL)
+/* Don't allow the value of restricted_shell to be modified. */
+
+static int
+set_restricted_shell (mode)
+     int mode;
+{
+  static int save_restricted = -1;
+
+  if (save_restricted == -1)
+    save_restricted = shell_is_restricted (shell_name);
+
+  restricted_shell = save_restricted;
+  return (0);
+}
+#endif /* RESTRICTED_SHELL */
+
+/* Not static so shell.c can call it to initialize shopt_login_shell */
+int
+set_login_shell (mode)
+     int mode;
+{
+  shopt_login_shell = login_shell != 0;
+  return (0);
+}
+
+char **
+get_shopt_options ()
+{
+  char **ret;
+  int n, i;
+
+  n = sizeof (shopt_vars) / sizeof (shopt_vars[0]);
+  ret = strvec_create (n + 1);
+  for (i = 0; shopt_vars[i].name; i++)
+    ret[i] = savestring (shopt_vars[i].name);
+  ret[i] = (char *)NULL;
+  return ret;
+}
+
+/*
+ * External interface for other parts of the shell.  NAME is a string option;
+ * MODE is 0 if we want to unset an option; 1 if we want to set an option.
+ * REUSABLE is 1 if we want to print output in a form that may be reused.
+ */
+int
+shopt_setopt (name, mode)
+     char *name;
+     int mode;
+{
+  WORD_LIST *wl;
+  int r;
+
+  wl = add_string_to_list (name, (WORD_LIST *)NULL);
+  r = toggle_shopts (mode, wl, 0);
+  dispose_words (wl);
+  return r;
+}
+
+int
+shopt_listopt (name, reusable)
+     char *name;
+     int reusable;
+{
+  int i;
+
+  if (name == 0)
+    return (list_shopts ((WORD_LIST *)NULL, reusable ? PFLAG : 0));
+
+  i = find_shopt (name);
+  if (i < 0)
+    {
+      shopt_error (name);
+      return (EXECUTION_FAILURE);
+    }
+
+  print_shopt (name, *shopt_vars[i].value, reusable ? PFLAG : 0);
+  return (EXECUTION_SUCCESS);
+}

@@ -1,0 +1,142 @@
+Bash POSIX Mode
+===============
+
+Starting Bash with the `--posix' command-line option or executing `set
+-o posix' while Bash is running will cause Bash to conform more closely
+to the POSIX 1003.2 standard by changing the behavior to match that
+specified by POSIX in areas where the Bash default differs.
+
+When invoked as `sh', Bash enters POSIX mode after reading the startup
+files.
+
+The following list is what's changed when `POSIX mode' is in effect:
+
+  1. When a command in the hash table no longer exists, Bash will
+     re-search `$PATH' to find the new location.  This is also
+     available with `shopt -s checkhash'.
+
+  2. The message printed by the job control code and builtins when a job
+     exits with a non-zero status is `Done(status)'.
+
+  3. The message printed by the job control code and builtins when a job
+     is stopped is `Stopped(SIGNAME)', where SIGNAME is, for example,
+     `SIGTSTP'.
+
+  4. Reserved words may not be aliased.
+
+  5. The POSIX 1003.2 `PS1' and `PS2' expansions of `!' to the history
+     number and `!!' to `!' are enabled, and parameter expansion is
+     performed on the values of `PS1' and `PS2' regardless of the
+     setting of the `promptvars' option.
+
+  6. Interactive comments are enabled by default.  (Bash has them on by
+     default anyway.)
+
+  7. The POSIX 1003.2 startup files are executed (`$ENV') rather than
+     the normal Bash files.
+
+  8. Tilde expansion is only performed on assignments preceding a
+     command name, rather than on all assignment statements on the line.
+
+  9. The default history file is `~/.sh_history' (this is the default
+     value of `$HISTFILE').
+
+ 10. The output of `kill -l' prints all the signal names on a single
+     line, separated by spaces.
+
+ 11. Non-interactive shells exit if FILENAME in `.' FILENAME is not
+     found.
+
+ 12. Non-interactive shells exit if a syntax error in an arithmetic
+     expansion results in an invalid expression.
+
+ 13. Redirection operators do not perform filename expansion on the word
+     in the redirection unless the shell is interactive.
+
+ 14. Redirection operators do not perform word splitting on the word in
+     the redirection.
+
+ 15. Function names must be valid shell `name's.  That is, they may not
+     contain characters other than letters, digits, and underscores, and
+     may not start with a digit.  Declaring a function with an invalid
+     name causes a fatal syntax error in non-interactive shells.
+
+ 16. POSIX 1003.2 `special' builtins are found before shell functions
+     during command lookup.
+
+ 17. If a POSIX 1003.2 special builtin returns an error status, a
+     non-interactive shell exits.  The fatal errors are those listed in
+     the POSIX.2 standard, and include things like passing incorrect
+     options, redirection errors, variable assignment errors for
+     assignments preceding the command name, and so on.
+
+ 18. If the `cd' builtin finds a directory to change to using
+     `$CDPATH', the value it assigns to the `PWD' variable does not
+     contain any symbolic links, as if `cd -P' had been executed.
+
+ 19. If `CDPATH' is set, the `cd' builtin will not implicitly append
+     the current directory to it.  This means that `cd' will fail if no
+     valid directory name can be constructed from any of the entries in
+     `$CDPATH', even if the a directory with the same name as the name
+     given as an argument to `cd' exists in the current directory.
+
+ 20. A non-interactive shell exits with an error status if a variable
+     assignment error occurs when no command name follows the assignment
+     statements.  A variable assignment error occurs, for example, when
+     trying to assign a value to a readonly variable.
+
+ 21. A non-interactive shell exits with an error status if the iteration
+     variable in a `for' statement or the selection variable in a
+     `select' statement is a readonly variable.
+
+ 22. Process substitution is not available.
+
+ 23. Assignment statements preceding POSIX 1003.2 special builtins
+     persist in the shell environment after the builtin completes.
+
+ 24. Assignment statements preceding shell function calls persist in the
+     shell environment after the function returns, as if a POSIX
+     special builtin command had been executed.
+
+ 25. The `export' and `readonly' builtin commands display their output
+     in the format required by POSIX 1003.2.
+
+ 26. The `trap' builtin displays signal names without the leading `SIG'.
+
+ 27. The `.' and `source' builtins do not search the current directory
+     for the filename argument if it is not found by searching `PATH'.
+
+ 28. Subshells spawned to execute command substitutions inherit the
+     value of the `-e' option from the parent shell.  When not in POSIX
+     mode, Bash clears the `-e' option in such subshells.
+
+ 29. Alias expansion is always enabled, even in non-interactive shells.
+
+ 30. When the `set' builtin is invoked without options, it does not
+     display shell function names and definitions.
+
+ 31. When the `set' builtin is invoked without options, it displays
+     variable values without quotes, unless they contain shell
+     metacharacters, even if the result contains nonprinting characters.
+
+ 32. When the `cd' builtin is invoked in LOGICAL mode, and the pathname
+     constructed from `$PWD' and the directory name supplied as an
+     argument does not refer to an existing directory, `cd' will fail
+     instead of falling back to PHYSICAL mode.
+
+There is other POSIX 1003.2 behavior that Bash does not implement.
+Specifically:
+
+  1. Assignment statements affect the execution environment of all
+     builtins, not just special ones.
+
+  2. When a subshell is created to execute a shell script with execute
+     permission, but without a leading `#!', Bash sets `$0' to the full
+     pathname of the script as found by searching `$PATH', rather than
+     the command as typed by the user.
+
+  3. When using `.' to source a shell script found in `$PATH', bash
+     checks execute permission bits rather than read permission bits,
+     just as if it were searching for a command.
+
+
