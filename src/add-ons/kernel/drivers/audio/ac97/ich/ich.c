@@ -550,27 +550,27 @@ init_driver(void)
 		reset = ich_codec_read(0x00);	/* access the primary codec */
 		if (reset == 0 || reset == 0xFFFF) {
 			LOG(("primary codec not present\n"));
-		} //else {
+		} else {
 			sdin = 0x02 & ich_reg_read_8(ICH_REG_SDM);
 			id = 0x02 & (ich_codec_read(0x00 + 0x28) >> 14);
 			LOG(("primary codec id %d is connected to AC_SDIN%d\n", id, sdin));
-		//}
+		}
 		reset = ich_codec_read(0x80);	/* access the secondary codec */
 		if (reset == 0 || reset == 0xFFFF) {
 			LOG(("secondary codec not present\n"));
-		} //else {
+		} else {
 			sdin = 0x02 & ich_reg_read_8(ICH_REG_SDM);
 			id = 0x02 & (ich_codec_read(0x80 + 0x28) >> 14);
 			LOG(("secondary codec id %d is connected to AC_SDIN%d\n", id, sdin));
-		//}
+		}
 		reset = ich_codec_read(0x100);	/* access the tertiary codec */
 		if (reset == 0 || reset == 0xFFFF) {
 			LOG(("tertiary codec not present\n"));
-		} //else {
+		} else {
 			sdin = 0x02 & ich_reg_read_8(ICH_REG_SDM);
 			id = 0x02 & (ich_codec_read(0x100 + 0x28) >> 14);
 			LOG(("tertiary codec id %d is connected to AC_SDIN%d\n", id, sdin));
-		//}
+		}
 		
 		/* XXX this may be wrong */
 		ich_reg_write_8(ICH_REG_SDM, (ich_reg_read_8(ICH_REG_SDM) & 0x0F) | 0x08 | 0x90);
@@ -662,14 +662,57 @@ init_driver(void)
 
 	/* install interrupt or polling thread */
 	if (config->irq != 0) {
-		install_io_interrupt_handler(config->irq,ich_int,0,0);
+		install_io_interrupt_handler(config->irq, ich_int, 0, 0);
 	} else {
 		int_thread_id = spawn_kernel_thread(int_thread, "ich_ac97 interrupt poller", B_REAL_TIME_PRIORITY, 0);
 		resume_thread(int_thread_id);
 	}
 	
-	/* calibrate the clock */
-	ich_clock_calibrate();
+	/* Only if the codec supports continuous sample rates,
+	   try to calibrate the clock... */
+	if (ac97_has_capability(config->ac97, CAP_PCM_RATE_CONTINUOUS)) {
+#if DEBUG
+		uint32 rate;
+		if (ac97_get_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, &rate)) {
+			LOG(("AC97_PCM_FRONT_DAC_RATE was %d\n", rate));
+		} else {
+			LOG(("couldn't get current AC97_PCM_FRONT_DAC_RATE rate\n"));
+		}
+		start_chan(chan_po);
+		snooze(23000);
+		LOG(("codec supports continuous sample rates, clock before calibration is %d\n", ich_clock_get()));
+		stop_chan(chan_po);
+#endif
+
+		/* calibrate the clock */
+		ich_clock_calibrate();
+
+#if DEBUG
+		start_chan(chan_po);
+		snooze(23000);
+		LOG(("codec supports continuous sample rates, clock after calibration is %d\n", ich_clock_get()));
+		stop_chan(chan_po);
+
+		if (ac97_get_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, &rate)) {
+			LOG(("AC97_PCM_FRONT_DAC_RATE is now %d\n", rate));
+		} else {
+			LOG(("couldn't get current AC97_PCM_FRONT_DAC_RATE rate\n"));
+		}
+#endif
+	} else {
+#if DEBUG
+		uint32 rate;
+		start_chan(chan_po);
+		snooze(23000);
+		LOG(("codec doesn't support continuous sample rates, running at clock %d\n", ich_clock_get()));
+		stop_chan(chan_po);
+		if (ac97_get_rate(config->ac97, AC97_PCM_FRONT_DAC_RATE, &rate)) {
+			LOG(("current AC97_PCM_FRONT_DAC_RATE is %d\n", rate));
+		} else {
+			LOG(("couldn't get current AC97_PCM_FRONT_DAC_RATE rate\n"));
+		}
+#endif
+	}
 	
 	LOG(("init_driver finished!\n"));
 	return B_OK;

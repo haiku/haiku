@@ -38,8 +38,6 @@
 device_config c;
 device_config *config = &c;
 
-status_t find_pci_pin_irq(uint8 pin, uint8 *irq);
-
 /* 
  * search for the ICH AC97 controller, and initialize the global config 
  * XXX multiple controllers not supported
@@ -163,21 +161,13 @@ status_t probe_device(void)
 	#endif
 		
 	config->irq = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
-	if (config->irq == 0 || config->irq == 0xff) {
-		// workaround: even if no irq is configured, we may be able to find the correct one
-		uint8 pin;
-		uint8 irq;
-		pin = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3d, 1);
-		LOG(("IRQ not assigned to pin %d\n",pin));
-		LOG(("Searching for IRQ...\n"));
-		if (B_OK == find_pci_pin_irq(pin, &irq)) {
-			LOG(("Assigning IRQ %d to pin %d\n",irq,pin));
-			config->irq = irq;
-		} else {
-			config->irq = 0; // always 0, not 0xff if no irq assigned
-		}
+	if (config->irq == 0xff) {
+		// always 0, not 0xff if no irq assigned
+		config->irq = 0;
 	}
-		
+	if (config->irq == 0) {
+		LOG(("IRQ not assigned to pin %d\n", pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3d, 1)));
+	}
 	if (config->type & TYPE_ICH4) {
 		// memory mapped access
 		config->mmbar = 0xfffffffe & pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
@@ -217,44 +207,3 @@ status_t probe_device(void)
 	put_module(B_PCI_MODULE_NAME);
 	return result;
 }
-
-
-/*
- * This is another ugly workaround. If no irq has been assigned
- * to our card, we try to find another card that uses the same
- * interrupt pin, but has an irq assigned, and use it.
- */
-status_t find_pci_pin_irq(uint8 pin, uint8 *irq)
-{
-	pci_module_info *module;
-	struct pci_info info; 
-	status_t result;
-	long index;
-
-	if (get_module(B_PCI_MODULE_NAME,(module_info **)&module) < 0) {
-		PRINT(("ERROR: couldn't load pci module\n"));
-		return B_ERROR; 
-	}
-
-	result = B_ERROR;
-	for (index = 0; B_OK == module->get_nth_pci_info(index, &info); index++) {
-		uint8 pciirq = module->read_pci_config(info.bus, info.device, info.function, PCI_interrupt_line, 1);
-		uint8 pcipin = module->read_pci_config(info.bus, info.device, info.function, PCI_interrupt_pin, 1);
-		LOG(("pin %d, irq %d\n",pcipin,pciirq));
-		if (pcipin == pin && pciirq != 0 && pciirq != 0xff) {
-			*irq = pciirq;
-			result = B_OK;
-			break;
-		}
-	}
-
-	#if DEBUG 
-		if (result != B_OK) {
-			LOG(("Couldn't find IRQ for pin %d\n",pin));
-		}
-	#endif
-
-	put_module(B_PCI_MODULE_NAME);
-	return result;
-}
-

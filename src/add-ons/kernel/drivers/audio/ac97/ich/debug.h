@@ -54,7 +54,7 @@ void debug_printf(const char *text,...);
 	#define LOG(a)			log_printf a
 	#define LOG_CREATE()	log_create()
 	#define ASSERT(a)		if (a) {} else LOG(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
-	void log_create();
+	void log_create(void);
 	void log_printf(const char *text,...);
 #else
 	#define PRINT(a)	debug_printf a

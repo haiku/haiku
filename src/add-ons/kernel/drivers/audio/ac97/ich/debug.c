@@ -50,7 +50,7 @@ void debug_printf(const char *text,...)
 static const char * logfile="/boot/home/ich_ac97.log";
 static sem_id loglock;
 
-void log_create()
+void log_create(void)
 {
 	int fd = open(logfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	const char *text = DRIVER_NAME ", " VERSION "\n";

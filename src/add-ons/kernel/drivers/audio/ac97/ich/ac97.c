@@ -500,76 +500,77 @@ void
 ac97_dump_capabilities(ac97_dev *dev)
 {
 	LOG(("AC97 capabilities:\n"));
-	if (dev->capabilities & CAP_PCM_MIC)
+	if (ac97_has_capability(dev, CAP_PCM_MIC))
 		LOG(("CAP_PCM_MIC\n"));
-	if (dev->capabilities & CAP_BASS_TREBLE_CTRL)
+	if (ac97_has_capability(dev, CAP_BASS_TREBLE_CTRL))
 		LOG(("CAP_BASS_TREBLE_CTRL\n"));
-	if (dev->capabilities & CAP_SIMULATED_STEREO)
+	if (ac97_has_capability(dev, CAP_SIMULATED_STEREO))
 		LOG(("CAP_SIMULATED_STEREO\n"));
-	if (dev->capabilities & CAP_HEADPHONE_OUT)
+	if (ac97_has_capability(dev, CAP_HEADPHONE_OUT))
 		LOG(("CAP_HEADPHONE_OUT\n"));
-	if (dev->capabilities & CAP_LAUDNESS)
+	if (ac97_has_capability(dev, CAP_LAUDNESS))
 		LOG(("CAP_LAUDNESS\n"));
-	if (dev->capabilities & CAP_DAC_18BIT)
+	if (ac97_has_capability(dev, CAP_DAC_18BIT))
 		LOG(("CAP_DAC_18BIT\n"));
-	if (dev->capabilities & CAP_DAC_20BIT)
+	if (ac97_has_capability(dev, CAP_DAC_20BIT))
 		LOG(("CAP_DAC_20BIT\n"));
-	if (dev->capabilities & CAP_ADC_18BIT)
+	if (ac97_has_capability(dev, CAP_ADC_18BIT))
 		LOG(("CAP_ADC_18BIT\n"));
-	if (dev->capabilities & CAP_ADC_20BIT)
+	if (ac97_has_capability(dev, CAP_ADC_20BIT))
 		LOG(("CAP_ADC_20BIT\n"));
-	if (dev->capabilities & CAP_3D_ENHANCEMENT)
+	if (ac97_has_capability(dev, CAP_3D_ENHANCEMENT))
 		LOG(("CAP_3D_ENHANCEMENT\n"));
-	if (dev->capabilities & CAP_VARIABLE_PCM)
+	if (ac97_has_capability(dev, CAP_VARIABLE_PCM))
 		LOG(("CAP_VARIABLE_PCM\n"));
-	if (dev->capabilities & CAP_DOUBLE_PCM)
+	if (ac97_has_capability(dev, CAP_DOUBLE_PCM))
 		LOG(("CAP_DOUBLE_PCM\n"));
-	if (dev->capabilities & CAP_VARIABLE_MIC)
+	if (ac97_has_capability(dev, CAP_VARIABLE_MIC))
 		LOG(("CAP_VARIABLE_MIC\n"));
-	if (dev->capabilities & CAP_CENTER_DAC)
+	if (ac97_has_capability(dev, CAP_CENTER_DAC))
 		LOG(("CAP_CENTER_DAC\n"));
-	if (dev->capabilities & CAP_SURR_DAC)
+	if (ac97_has_capability(dev, CAP_SURR_DAC))
 		LOG(("CAP_SURR_DAC\n"));
-	if (dev->capabilities & CAP_LFE_DAC)
+	if (ac97_has_capability(dev, CAP_LFE_DAC))
 		LOG(("CAP_LFE_DAC\n"));
-	if (dev->capabilities & CAP_AMAP)
+	if (ac97_has_capability(dev, CAP_AMAP))
 		LOG(("CAP_AMAP\n"));
-	if (dev->capabilities & CAP_REV21)
+	if (ac97_has_capability(dev, CAP_REV21))
 		LOG(("CAP_REV21\n"));
-	if (dev->capabilities & CAP_REV22)
+	if (ac97_has_capability(dev, CAP_REV22))
 		LOG(("CAP_REV22\n"));
-	if (dev->capabilities & CAP_REV23)
+	if (ac97_has_capability(dev, CAP_REV23))
 		LOG(("CAP_REV23\n"));
-	if (dev->capabilities & CAP_PCM_RATE_CONTINUOUS)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_CONTINUOUS))
 		LOG(("CAP_PCM_RATE_CONTINUOUS\n"));
-	if (dev->capabilities & CAP_PCM_RATE_8000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_8000))
 		LOG(("CAP_PCM_RATE_8000\n"));
-	if (dev->capabilities & CAP_PCM_RATE_11025)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_11025))
 		LOG(("CAP_PCM_RATE_11025\n"));
-	if (dev->capabilities & CAP_PCM_RATE_12000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_12000))
 		LOG(("CAP_PCM_RATE_12000\n"));
-	if (dev->capabilities & CAP_PCM_RATE_16000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_16000))
 		LOG(("CAP_PCM_RATE_16000\n"));
-	if (dev->capabilities & CAP_PCM_RATE_22050)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_22050))
 		LOG(("CAP_PCM_RATE_22050\n"));
-	if (dev->capabilities & CAP_PCM_RATE_24000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_24000))
 		LOG(("CAP_PCM_RATE_24000\n"));
-	if (dev->capabilities & CAP_PCM_RATE_32000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_32000))
 		LOG(("CAP_PCM_RATE_32000\n"));
-	if (dev->capabilities & CAP_PCM_RATE_44100)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_44100))
 		LOG(("CAP_PCM_RATE_44100\n"));
-	if (dev->capabilities & CAP_PCM_RATE_48000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_48000))
 		LOG(("CAP_PCM_RATE_48000\n"));
-	if (dev->capabilities & CAP_PCM_RATE_88200)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_88200))
 		LOG(("CAP_PCM_RATE_88200\n"));
-	if (dev->capabilities & CAP_PCM_RATE_96000)
+	if (ac97_has_capability(dev, CAP_PCM_RATE_96000))
 		LOG(("CAP_PCM_RATE_96000\n"));
 }
 
 bool
 ac97_has_capability(ac97_dev *dev, uint64 cap)
 {
-	return (dev->capabilities & cap);
+	// return (dev->capabilities & cap); // does not work! GCC bug with 64 bit variables?
+	return (dev->capabilities & cap) != 0;
 }
 
 /*************************************************
