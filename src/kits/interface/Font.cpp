@@ -1,7 +1,7 @@
 #include <Rect.h>
 #include <stdio.h>
-#include "Font.h"
-
+#include <Font.h>
+/*
 class BFontPrivate
 {
 public:
@@ -35,11 +35,11 @@ BFontPrivate & BFontPrivate::operator=(const BFontPrivate &fontdata)
 	fDirection=fontdata.fDirection;
 	return *this;
 }
-
+*/
 
 BFont::BFont(void)
 {
-	private_data=new BFontPrivate();
+//	private_data=new BFontPrivate();
 	if(be_plain_font)
 	{
 		fFamilyID=be_plain_font->fFamilyID;
@@ -51,7 +51,7 @@ BFont::BFont(void)
 		fEncoding=be_plain_font->fEncoding;
 		fFace=be_plain_font->fFace;
 		fHeight=be_plain_font->fHeight;
-		private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
+//		private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
 	}
 	else
 	{
@@ -66,13 +66,13 @@ BFont::BFont(void)
 		fHeight.ascent=0.0;
 		fHeight.descent=0.0;
 		fHeight.leading=0.0;
-		private_data->fPrivateFlags=0;
+//		private_data->fPrivateFlags=0;
 	}
 }
 
 BFont::BFont(const BFont &font)
 {
-	private_data=new BFontPrivate();
+//	private_data=new BFontPrivate();
 	fFamilyID=font.fFamilyID;
 	fStyleID=font.fStyleID;
 	fSize=font.fSize;
@@ -82,12 +82,12 @@ BFont::BFont(const BFont &font)
 	fEncoding=font.fEncoding;
 	fFace=font.fFace;
 	fHeight=font.fHeight;
-	private_data->fPrivateFlags=font.private_data->fPrivateFlags;
+//	private_data->fPrivateFlags=font.private_data->fPrivateFlags;
 }
 
 BFont::BFont(const BFont *font)
 {
-	private_data=new BFontPrivate();
+//	private_data=new BFontPrivate();
 	if(font)
 	{
 		fFamilyID=font->fFamilyID;
@@ -99,7 +99,7 @@ BFont::BFont(const BFont *font)
 		fEncoding=font->fEncoding;
 		fFace=font->fFace;
 		fHeight=font->fHeight;
-		private_data->fPrivateFlags=font->private_data->fPrivateFlags;
+//		private_data->fPrivateFlags=font->private_data->fPrivateFlags;
 	}
 	else
 	{
@@ -114,7 +114,7 @@ BFont::BFont(const BFont *font)
 			fEncoding=be_plain_font->fEncoding;
 			fFace=be_plain_font->fFace;
 			fHeight=be_plain_font->fHeight;
-			private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
+//			private_data->fPrivateFlags=be_plain_font->private_data->fPrivateFlags;
 		}
 		else
 		{
@@ -129,7 +129,7 @@ BFont::BFont(const BFont *font)
 			fHeight.ascent=0.0;
 			fHeight.descent=0.0;
 			fHeight.leading=0.0;
-			private_data->fPrivateFlags=0;
+//			private_data->fPrivateFlags=0;
 		}
 	}
 	
@@ -413,7 +413,7 @@ BFont &BFont::operator=(const BFont &font)
 	fEncoding=font.fEncoding;
 	fFace=font.fFace;
 	fHeight=font.fHeight;
-	private_data->fPrivateFlags=font.private_data->fPrivateFlags;
+//	private_data->fPrivateFlags=font.private_data->fPrivateFlags;
 	return *this;
 }
 
@@ -429,8 +429,9 @@ bool BFont::operator==(const BFont &font) const
 			fFace!=font.fFace ||
 			fHeight.ascent!=font.fHeight.ascent ||
 			fHeight.descent!=font.fHeight.descent ||
-			fHeight.leading!=font.fHeight.leading ||
-			private_data->fPrivateFlags!=font.private_data->fPrivateFlags )
+			fHeight.leading!=font.fHeight.leading //||
+//			private_data->fPrivateFlags!=font.private_data->fPrivateFlags 
+			)
 		return false;
 	return true;
 }
@@ -447,8 +448,9 @@ bool BFont::operator!=(const BFont &font) const
 			fFace!=font.fFace ||
 			fHeight.ascent!=font.fHeight.ascent ||
 			fHeight.descent!=font.fHeight.descent ||
-			fHeight.leading!=font.fHeight.leading ||
-			private_data->fPrivateFlags!=font.private_data->fPrivateFlags )
+			fHeight.leading!=font.fHeight.leading //||
+//			private_data->fPrivateFlags!=font.private_data->fPrivateFlags 
+			)
 		return true;
 	return false;
 }
