@@ -878,8 +878,8 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 		|| timeout < 0)
 		return B_BAD_VALUE;
 
-	flags = flags & (B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT | B_TIMEOUT);
-		// ToDo: We don't support absolute timeouts here?
+	flags = flags & (B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT
+				| B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT);
 	slot = id % sMaxPorts;
 
 	state = disable_interrupts();
@@ -981,7 +981,8 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 		return B_BAD_PORT_ID;
 
 	// mask irrelevant flags (for acquire_sem() usage)
-	flags = flags & (B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT | B_TIMEOUT);
+	flags = flags & (B_CAN_INTERRUPT | B_KILL_CAN_INTERRUPT
+				| B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT);
 	slot = id % sMaxPorts;
 
 	if (bufferSize > PORT_MAX_MESSAGE_SIZE)
