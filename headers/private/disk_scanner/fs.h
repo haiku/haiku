@@ -51,8 +51,28 @@ typedef struct fs_module_info {
 			  stored. Used in case several FS add-ons recognize the FS;
 			  then the module returning the highest priority is used.
 			  -1 <= *priority <= 1
+	get_buffer: Function that should be used to read data from the device.
+	cache: To be passed to get_buffer.
 
 	Returns true, if successful (i.e. the FS was recognized), false otherwise.
+
+
+	fs_get_buffer():
+	---------------
+
+	Supplied with offset and size the function reads data from the device
+	into a buffer it allocates, and returns the buffer.
+
+	params:
+	cache: the cache for the device
+	offset: offset from which to read, relative to the beginning of the
+			*partition*
+	size: number of bytes to be read
+	buffer: pointer to a pre-allocated void* to be set to the read buffer
+	actualSize: pointer to a pre-allocated size_t to be set to the actual
+				number of bytes read from the device
+
+	Returns B_OK, if everything went fine, an error code otherwise.
 */
 
 #endif	// _PARTSCAN_FS_H
