@@ -92,7 +92,7 @@ BChannelSlider::~BChannelSlider()
 	delete fLeftKnob;
 	delete fMidKnob;
 	delete fRightKnob;
-	delete fInitialValues;
+	delete[] fInitialValues;
 }
 
 
@@ -206,7 +206,9 @@ BChannelSlider::MessageReceived(BMessage *message)
 						Invalidate(Bounds());
 					}
 				} else if (message->what == B_GET_PROPERTY)
-					reply.AddInt32("result", (int32)Orientation());					
+					reply.AddInt32("result", (int32)Orientation());
+				else
+					status = B_BAD_SCRIPT_SYNTAX;					
 			}	
 					
 			if (handled) {
@@ -261,8 +263,8 @@ BChannelSlider::MouseDown(BPoint where)
 				fMinpoint = frame.top + frame.Height() / 2;
 				frame.bottom += range;
 			} else {
-				frame.right += range;
 				fMinpoint = frame.Width();
+				frame.right += range;
 			}
 			
 			// Found. Now set the initial values
@@ -296,7 +298,7 @@ BChannelSlider::MouseDown(BPoint where)
 						Flush();	
 					}
 					
-					MouseMovedCommon(where, B_ORIGIN);
+					MouseMovedCommon(where, where);
 					SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 				
 				} else {
@@ -321,7 +323,6 @@ BChannelSlider::MouseUp(BPoint where)
 		fMinpoint = 0;
 	} else
 		BControl::MouseUp(where);
-	
 }
 
 
@@ -425,12 +426,24 @@ BChannelSlider::GetSupportedSuites(BMessage *data)
 void
 BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed)
 {
-	BPoint leftTop(area.left + area.Width() / 2, area.top);
-	BPoint bottomRight(leftTop.x , area.top + ThumbRangeFor(channel));
+	float hCenter = area.Width() / 2;
+	float vCenter = area.Height() / 2;
+	
+	BPoint leftTop;
+	BPoint bottomRight;
+	if (Vertical()) {
+		leftTop.Set(area.left + hCenter, area.top);
+		bottomRight.Set(leftTop.x , area.top + ThumbRangeFor(channel));
+	} else {
+		leftTop.Set(area.left, area.top + vCenter);
+		bottomRight.Set(area.left + ThumbRangeFor(channel), leftTop.y);
+	}	
+	
 	DrawGroove(into, channel, leftTop, bottomRight);
 	
 	BPoint thumbLocation = leftTop;
-	thumbLocation.y += ThumbDeltaFor(channel);
+	if (Vertical())
+		thumbLocation.y += ThumbDeltaFor(channel);
 	
 	DrawThumb(into, channel, thumbLocation, pressed);
 }
@@ -441,7 +454,14 @@ BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint topLeft, BPoint bo
 {
 	// TODO: Draw the real thing
 	ASSERT(into != NULL);
-	into->StrokeRect(BRect(topLeft, bottomRight), B_SOLID_HIGH); 
+	BRect rect(topLeft, bottomRight);
+	
+	if (Vertical())
+		rect.InsetBy(-1, 0);
+	else
+		rect.InsetBy(0, -1);
+			
+	into->FillRect(rect, B_SOLID_HIGH); 
 }
 
 
@@ -628,6 +648,7 @@ BChannelSlider::DrawThumbs()
 		}
 		
 		bitmapFrame.OffsetTo(B_ORIGIN);
+	
 		fBacking = new BBitmap(bitmapFrame, BScreen(Window()).ColorSpace(), true, false);
 		if (fBacking->Lock()) {
 			fBackingView = new BView(bitmapFrame, "backing view", B_FOLLOW_NONE, B_WILL_DRAW);
@@ -652,7 +673,12 @@ BChannelSlider::DrawThumbs()
 	drawHere.y = (Bounds().Height() - fBacking->Bounds().Height()) / 2;
 	
 	fClickDelta = drawHere;
+	
 	DrawBitmapAsync(fBacking, drawHere);
+#if 1		
+	SetHighColor(125, 125, 125, 0);
+	StrokeRect(fBacking->Bounds().OffsetToCopy(drawHere));
+#endif	
 }
 
 
@@ -686,7 +712,7 @@ BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 	if (Vertical())
 		floatValue = range - (point.y - fMinpoint);		
 	else
-		floatValue = range - fMinpoint + point.x;
+		floatValue = range + (point.x - fMinpoint);
 	
 	int32 value = (int32)(floatValue / range * limitRange);
 	if (fAllChannels)
@@ -695,6 +721,7 @@ BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 		SetValueFor(fCurrentChannel, value);
 		
 	InvokeNotifyChannel(ModificationMessage());
+	DrawThumbs();
 }
 
 

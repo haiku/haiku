@@ -403,8 +403,12 @@ status_t
 BChannelControl::SetAllValue(int32 values)
 {
 	int32 *newValues = new int32[fChannelCount];
-	for (int32 i = 0; i < fChannelCount; i++)
-		newValues[i] = values;
+	for (int32 i = 0; i < fChannelCount; i++) {
+		int32 limitedValue = max_c(values, MinLimitList()[i]);
+		limitedValue = min_c(limitedValue, MaxLimitList()[i]);
+					
+		newValues[i] = limitedValue;
+	}
 	
 	delete[] fChannelValues;
 	fChannelValues = newValues;
