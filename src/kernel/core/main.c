@@ -14,6 +14,7 @@
 #include <console.h>
 #include <debug.h>
 #include <arch/faults.h>
+#include <arch/dbg_console.h>
 #include <vm.h>
 #include <timer.h>
 #include <smp.h>
@@ -57,9 +58,13 @@ _start(kernel_args *oldka, int cpu_num)
 	kernel_startup = true;
 
 	if (oldka->kernel_args_size != sizeof(kernel_args)
-		|| oldka->version != CURRENT_KERNEL_ARGS_VERSION)
-		// ToDo: there is no debug output yet...
+		|| oldka->version != CURRENT_KERNEL_ARGS_VERSION) {
+		// This is something we cannot handle right now - release kernels
+		// should always be able to handle the kernel_args of earlier
+		// released kernels.
+		arch_dbg_con_early_boot_message("Version mismatch between boot loader and kernel!\n");
 		return -1;
+	}
 
 	memcpy(&ka, oldka, sizeof(kernel_args));
 		// the passed in kernel args are in a non-allocated range of memory
