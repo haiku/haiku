@@ -73,7 +73,7 @@ inline uint32 MixerOutput::GetOutputChannelSourceCount(int channel)
 
 inline void MixerOutput::GetMixerChannelInfo(int channel, int index, int *type, float *gain)
 {
-	ASSERT (channel >= 0 && channel < fOutputChannelCount);
+	ASSERT(channel >= 0 && channel < fOutputChannelCount);
 	ASSERT(index >= 0 && index < fOutputChannelInfo[channel].source_count);
 	*type = fOutputChannelInfo[channel].source_type[index];
 	*gain = fOutputChannelInfo[channel].source_gain[index];
