@@ -94,6 +94,11 @@
  * 02/22/95 (seiwald) - -v for version info.
  * 09/11/00 (seiwald) - PATCHLEVEL folded into VERSION.
  * 01/10/01 (seiwald) - pathsys.h split from filesys.h
+ * 01/21/02 (seiwald) - new -q to quit quickly on build failure
+ * 03/16/02 (seiwald) - support for -g (reorder builds by source time)
+ * 09/19/02 (seiwald) - new -d displays
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 # include "jam.h"
@@ -132,16 +137,16 @@ struct globs globs = {
 	0,			/* quitquick */
 	0,			/* newestfirst */
 # ifdef OS_MAC
-	{ 0, 0 },		/* debug - suppress tracing output */
+	{ 0 },			/* display - suppress actions output */
 # else
-	{ 0, 1 }, 		/* debug ... */
+	{ 0, 1 }, 		/* display actions  */
 # endif
 	0			/* output commands, not run them */
 } ;
 
 /* Symbols to be defined as true for use in Jambase */
 
-static char *othersyms[] = { OSMAJOR, OSMINOR, OSPLAT, JAMVERSYM, 0 } ;
+static const char *othersyms[] = { OSMAJOR, OSMINOR, OSPLAT, JAMVERSYM, 0 } ;
 
 /* Known for sure: 
  *	mac needs arg_enviro
@@ -165,9 +170,9 @@ extern char **environ;
 main( int argc, char **argv, char **arg_environ )
 {
 	int		n;
-	char		*s;
+	const char	*s;
 	struct option	optv[N_OPTS];
-	char		*all = "all";
+	const char	*all = "all";
 	int		anyhow = 0;
 	int		status;
 
@@ -182,9 +187,10 @@ main( int argc, char **argv, char **arg_environ )
 	    printf( "\nusage: jam [ options ] targets...\n\n" );
 
             printf( "-a      Build all targets, even if they are current.\n" );
-            printf( "-dx     Set the debug level to x (0-9).\n" );
+            printf( "-dx     Display (a)actions (c)causes (d)dependencies\n" );
+	    printf( "        (m)make tree (x)commands (0-9) debug levels.\n" );
             printf( "-fx     Read x instead of Jambase.\n" );
-	    /* printf( "-g      Build from newest sources first.\n" ); */
+	    printf( "-g      Build from newest sources first.\n" );
             printf( "-jx     Run up to x shell commands concurrently.\n" );
             printf( "-n      Don't actually execute the updating actions.\n" );
             printf( "-ox     Write the updating actions to file x.\n" );
@@ -211,7 +217,7 @@ main( int argc, char **argv, char **arg_environ )
 	/* Pick up interesting options */
 
 	if( ( s = getoptval( optv, 'n', 0 ) ) )
-	    globs.noexec++, globs.debug[2] = 1;
+	    globs.noexec++, DEBUG_MAKE = DEBUG_MAKEQ = DEBUG_EXEC = 1; 
 
 	if( ( s = getoptval( optv, 'q', 0 ) ) )
 	    globs.quitquick = 1;
@@ -229,45 +235,55 @@ main( int argc, char **argv, char **arg_environ )
 
 	for( n = 0; s = getoptval( optv, 'd', n ); n++ )
 	{
-	    int i;
+	    int i = atoi( s );
 
 	    /* First -d, turn off defaults. */
 
 	    if( !n )
-		for( i = 0; i < DEBUG_MAX; i++ )
-		    globs.debug[i] = 0;
+		DEBUG_MAKE = DEBUG_MAKEQ = DEBUG_EXEC = 0;
 
-	    i = atoi( s );
+	    /* n turns on levels 1-n */
+	    /* +n turns on level n */
+	    /* c turns on named display c */
 
 	    if( i < 0 || i >= DEBUG_MAX )
 	    {
 		printf( "Invalid debug level '%s'.\n", s );
-		continue;
 	    }
-
-	    /* n turns on levels 1-n */
-	    /* +n turns on level n */
-
-	    if( *s == '+' )
+	    else if( *s == '+' )
+	    {
 		globs.debug[i] = 1;
-	    else while( i )
+	    }
+	    else if( i ) while( i )
+	    {
 		globs.debug[i--] = 1;
+	    }
+	    else while( *s ) switch( *s++ )
+	    {
+	    case 'a': DEBUG_MAKE = DEBUG_MAKEQ = 1; break;
+	    case 'c': DEBUG_CAUSES = 1; break;
+	    case 'd': DEBUG_DEPENDS = 1; break;
+	    case 'm': DEBUG_MAKEPROG = 1; break;
+	    case 'x': DEBUG_EXEC = 1; break;
+	    case '0': break;
+	    default: printf( "Invalid debug flag '%c'.\n", s[-1] );
+	    }
 	}
 
 	/* Set JAMDATE first */
 
 	{
-	    char *date;
+	    char buf[ 128 ];
 	    time_t clock;
 	    time( &clock );
-	    date = newstr( ctime( &clock ) );
+	    strcpy( buf, ctime( &clock ) );
 
 	    /* Trim newline from date */
 
-	    if( strlen( date ) == 25 )
-		date[ 24 ] = 0;
+	    if( strlen( buf ) == 25 )
+		buf[ 24 ] = 0;
 
-	    var_set( "JAMDATE", list_new( L0, newstr( date ) ), VAR_SET );
+	    var_set( "JAMDATE", list_new( L0, buf, 0 ), VAR_SET );
 	}
 
 	/* And JAMUNAME */
@@ -277,17 +293,13 @@ main( int argc, char **argv, char **arg_environ )
 
 	    if( uname( &u ) >= 0 )
 	    {
-		var_set( "JAMUNAME", 
-			list_new( 
-			list_new(
-			list_new(
-			list_new(
-			list_new( L0, 
-				newstr( u.sysname ) ),
-				newstr( u.nodename ) ),
-				newstr( u.release ) ),
-				newstr( u.version ) ),
-				newstr( u.machine ) ), VAR_SET );
+		LIST *l = L0;
+		l = list_new( l, u.machine, 0 );
+		l = list_new( l, u.version, 0 );
+		l = list_new( l, u.release, 0 );
+		l = list_new( l, u.nodename, 0 );
+		l = list_new( l, u.sysname, 0 );
+		var_set( "JAMUNAME", l, VAR_SET );
 	    }
 	}
 # endif /* unix */
@@ -300,13 +312,13 @@ main( int argc, char **argv, char **arg_environ )
 
 	/* load up environment variables */
 
-	var_defines( use_environ );
+	var_defines( (const char **)use_environ );
 
 	/* Load up variables set on command line. */
 
 	for( n = 0; s = getoptval( optv, 's', n ); n++ )
 	{
-	    char *symv[2];
+	    const char *symv[2];
 	    symv[0] = s;
 	    symv[1] = 0;
 	    var_defines( symv );
@@ -355,7 +367,7 @@ main( int argc, char **argv, char **arg_environ )
 	if( !argc )
 	    status |= make( 1, &all, anyhow );
 	else
-	    status |= make( argc, argv, anyhow );
+	    status |= make( argc, (const char **)argv, anyhow );
 
 	/* Widely scattered cleanup */
 

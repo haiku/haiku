@@ -234,7 +234,7 @@ hcache_init()
 		fprintf(stderr, "invalid %s\n", hcachename);
 		goto bail;
 	    }
-	    l = list_new(l, s);
+	    l = list_new(l, s, 1);
 	}
 	c->includes = l;
 
@@ -252,7 +252,7 @@ hcache_init()
 		fprintf(stderr, "invalid %s\n", hcachename);
 		goto bail;
 	    }
-	    l = list_new(l, s);
+	    l = list_new(l, s, 1);
 	}
 	c->hdrscan = l;
 
@@ -344,7 +344,7 @@ hcache_done()
 }
 
 LIST *
-hcache (TARGET *t, int rec, regexp *re[], LIST *hdrscan)
+hcache (TARGET *t, LIST *hdrscan)
 {
     HCACHEDATA  cachedata, *c = &cachedata;
     LIST 	*l = 0;
@@ -408,7 +408,7 @@ hcache (TARGET *t, int rec, regexp *re[], LIST *hdrscan)
 
     /* 'c' points at the cache entry.  Its out of date. */
 
-    l = headers1 (0, t->boundname, rec, re);
+    l = headers1 (t->boundname, 0);
 
     c->time = t->time;
     c->age = 0;

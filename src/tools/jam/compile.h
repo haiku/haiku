@@ -6,36 +6,37 @@
 
 /*
  * compile.h - compile parsed jam statements
+ *
+ * 01/22/01 (seiwald) - replace evaluate_if() with compile_eval()
+ * 01/24/01 (seiwald) - 'while' statement
+ * 03/02/02 (seiwald) - rules can be invoked via variable names
+ * 02/28/02 (seiwald) - merge EXEC_xxx flags in with RULE_xxx 
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
 void compile_builtins();
 
-LIST *compile_append( PARSE *parse, LOL *args );
-LIST *compile_foreach( PARSE *parse, LOL *args );
-LIST *compile_if( PARSE *parse, LOL *args );
-LIST *compile_eval( PARSE *parse, LOL *args );
-LIST *compile_include( PARSE *parse, LOL *args );
-LIST *compile_jumptoeof( PARSE *parse, LOL *args );
-LIST *compile_list( PARSE *parse, LOL *args );
-LIST *compile_local( PARSE *parse, LOL *args );
-LIST *compile_null( PARSE *parse, LOL *args );
-LIST *compile_on( PARSE *parse, LOL *args );
-LIST *compile_rule( PARSE *parse, LOL *args );
-LIST *compile_rules( PARSE *parse, LOL *args );
-LIST *compile_set( PARSE *parse, LOL *args );
-LIST *compile_setcomp( PARSE *parse, LOL *args );
-LIST *compile_setexec( PARSE *parse, LOL *args );
-LIST *compile_settings( PARSE *parse, LOL *args );
-LIST *compile_switch( PARSE *parse, LOL *args );
-LIST *compile_while( PARSE *parse, LOL *args );
+LIST *compile_append( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_break( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_foreach( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_if( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_eval( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_include( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_list( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_local( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_null( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_on( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_rule( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_rules( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_set( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_setcomp( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_setexec( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_settings( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_switch( PARSE *parse, LOL *args, int *jmp );
+LIST *compile_while( PARSE *parse, LOL *args, int *jmp );
 
-LIST *evaluate_rule( char *rulename, LOL *args, LIST *result );
-
-/* Flags for compile_set(), etc */
-
-# define ASSIGN_SET	0x00	/* = assign variable */
-# define ASSIGN_APPEND	0x01	/* += append variable */
-# define ASSIGN_DEFAULT	0x02	/* set only if unset */
+LIST *evaluate_rule( const char *rulename, LOL *args, LIST *result );
 
 /* Conditions for compile_if() */
 
@@ -51,3 +52,11 @@ LIST *evaluate_rule( char *rulename, LOL *args, LIST *result );
 # define EXPR_MORE	8	/* arg > arg  */
 # define EXPR_MOREEQ	9	/* arg >= arg */
 # define EXPR_IN	10	/* arg in arg */
+
+/* Flags for compile_return */
+
+# define JMP_NONE	0	/* flow continues */
+# define JMP_BREAK	1	/* break out of loop */
+# define JMP_CONTINUE	2	/* step to end of loop */
+# define JMP_RETURN	3	/* return from rule */
+# define JMP_EOF	4	/* stop executing the current file */

@@ -7,7 +7,7 @@
 #
 
 #
-# JAMBASE - jam 2.3 ruleset providing make(1)-like functionality
+# JAMBASE - jam 2.5 ruleset providing make(1)-like functionality
 #
 # Supports UNIX, NT, and VMS.
 #
@@ -104,6 +104,8 @@
 # FGristFiles value ;			return $(value:G=$(SOURCE_GRIST))
 # FGristSourceFiles value ;		return $(value:G=$(SOURCE_GRIST))
 # FIsPrefix a : b ;				return whether or not a is a prefix of b
+# FStripCommon v1 : v2 ; 		strip common initial parts of v1 v2
+# FReverse a1 a2 ... ;			return ... a2 a1 
 # FRelPath d1 : d2 ;			return rel path from d1 to d2
 # FSubDir d1 d2 ... ;			return path to root
 #
@@ -141,7 +143,7 @@
 #	$(>) - sources of a rule (to the right of the :)
 #	$(xxx) - true on xxx (UNIX, VMS, NT, OS2, MAC)
 #	$(OS) - name of OS - varies wildly
-#	$(JAMVERSION) - version number (2.3)
+#	$(JAMVERSION) - version number (2.5)
 #
 # Special variables used by jam:
 #	SEARCH - where to find something (used during binding and actions)
@@ -152,6 +154,10 @@
 # Special targets:
 #	all - default if none given on command line
 #
+
+# for perforce use -- jambase version
+
+JAMBASEDATE = 2002.05.09 ;
 
 # Initialize variables
 #
@@ -165,6 +171,7 @@ if $(NT)
     	MV		?= move /y ;
     	CP		?= copy ;
     	RM		?= del /f/q ;
+	RMDIR		?= rmdir /s/q ;
     	SLASH		?= \\ ;
     	SUFLIB		?= .lib ;
     	SUFOBJ		?= .obj ;
@@ -172,8 +179,6 @@ if $(NT)
      
     if $(BCCROOT)
     {
-	Echo "Compiler is Borland C++" ;
-
 	AR		?= tlib /C /P64 ;
 	CC		?= bcc32 ;
 	CCFLAGS		?= -v -w- -q -DWIN -tWR -tWM -tWC ;
@@ -187,8 +192,6 @@ if $(NT)
     }
     else if $(MSVC)
     {
-	Echo "Compiler is Microsoft Visual C++ 16 bit" ;
-
 	AR		?= lib /nologo ;
 	CC		?= cl /nologo ;
 	CCFLAGS		?= /D \"WIN\" ;
@@ -197,12 +200,8 @@ if $(NT)
 	LINK		?= $(CC) ;
 	LINKFLAGS	?= $(CCFLAGS) ;
 	LINKLIBS	?= 
-				#$(MSVC)\\lib\\advapi32.lib
-				#$(MSVC)\\lib\\libcmt.lib
 				$(MSVC)\\lib\\mlibce.lib
-				#$(MSVC)\\lib\\slibce.lib
 				$(MSVC)\\lib\\oldnames.lib
-				#$(MSVC)\\lib\\kernel32.lib 
 				;
 	LINKLIBS	?= ;
 	NOARSCAN	?= true ;
@@ -210,9 +209,15 @@ if $(NT)
 	STDHDRS		?= $(MSVC)\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
-    else if $(MSVCNT)
+    else if $(MSVCNT) || $(MSVCDIR)
     {
-	Echo "Compiler is Microsoft Visual C++" ;
+	# Visual C++ 6.0 uses MSVCDIR
+
+	MSVCNT		?= $(MSVCDIR) ;	
+
+	# bury IA64 in the path for the SDK
+
+	local I ; if $(OSPLAT) = IA64 { I = ia64\\ ; } else { I = "" ; }
 
 	AR		?= lib ;
 	AS		?= masm386 ;
@@ -222,18 +227,18 @@ if $(NT)
 	C++FLAGS	?= $(CCFLAGS) ;
 	LINK		?= link /nologo ;
 	LINKFLAGS	?= "" ;
-	LINKLIBS	?= $(MSVCNT)\\lib\\advapi32.lib
-				$(MSVCNT)\\lib\\libc.lib
-				$(MSVCNT)\\lib\\oldnames.lib
-				$(MSVCNT)\\lib\\kernel32.lib ;
+	LINKLIBS	?= 
+				$(MSVCNT)\\lib\\$(I)libc.lib
+				$(MSVCNT)\\lib\\$(I)oldnames.lib
+				$(MSVCNT)\\lib\\$(I)kernel32.lib ;
 	OPTIM		?= "" ;
 	STDHDRS		?= $(MSVCNT)\\include ;
 	UNDEFFLAG	?= "/u _" ;
     }
     else
     {
-	Exit On NT, set BCCROOT, MSVCNT, or MSVC to the root of the
-		Borland or Microsoft directories. ;
+	EXIT On NT, set BCCROOT, MSVCDIR, MSVCNT, or MSVC to the root
+		of the Borland or Microsoft directories. ;
     }
 
 }
@@ -331,24 +336,24 @@ else if $(MAC)
 		"$(CW):MacOS Support:Universal:Libraries:StubLibraries:Mathlib" ;
 
 	MPWLIBS ?= 
-		"$(CW):MacOS Support:Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL C.PPC MPW.Lib" ;
+		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_MPWCRuntime_PPC.lib"
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC_MPW.Lib" ;
 
 	MPWNLLIBS ?= 
-		"$(CW):MacOS Support:Libraries:Runtime:Runtime PPC:MSL MPWCRuntime.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL C.PPC MPW(NL).Lib" ;
+		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_MPWCRuntime_PPC.lib"
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC_MPW(NL).Lib" ;
 		
 	SIOUXHDRS ?= ;
 	
 	SIOUXLIBS ?= 
-		"$(CW):MacOS Support:Libraries:Runtime:Runtime PPC:MSL RuntimePPC.lib"
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL SIOUX.PPC.Lib" 
-		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL C.PPC.Lib" ;
+		"$(CW):MacOS Support:Libraries:Runtime:Libs:MSL_Runtime_PPC.lib"
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_SIOUX_PPC.Lib" 
+		"$(CW):MSL:MSL_C:MSL_MacOS:Lib:PPC:MSL_C_PPC.Lib" ;
 
 	C++		?= mwcppc ;
-	C++FLAGS	?= -w off -nomapcr ;
+	C++FLAGS	?= -w off ;
 	CC		?= mwcppc ;
-	CCFLAGS		?= -w off -nomapcr ;
+	CCFLAGS		?= -w off ;
 	CP		?= duplicate -y ;
 	DOT		?= ":" ;
 	DOTDOT		?= "::" ;
@@ -378,12 +383,13 @@ else if $(OS) = BEOS && $(OSPLAT) = PPC
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
-	LEX			?= flex ;
+	LEX		?= flex ;
 	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= mwld ;
 	LINKFLAGS	?= "" ;
 	MANDIR		?= /boot/home/config/man ;
 	NOARSCAN	?= true ;
+	RANLIB		?= ranlib ;
 	STDHDRS		?= /boot/develop/headers/posix ;
 	YACC		?= bison -y ;
 	YACCGEN		?= .c ;
@@ -399,7 +405,7 @@ else if $(OS) = BEOS
 	CHGRP		?= chgrp ;
 	CHOWN		?= chown ;
 	FORTRAN		?= "" ;
-	LEX			?= flex ;
+	LEX		?= flex ;
 	LIBDIR		?= /boot/home/config/lib ;
 	LINK		?= gcc ;
 	MANDIR		?= /boot/home/config/man ;
@@ -463,10 +469,8 @@ else if $(UNIX)
 	RANLIB		?= "" ;
 
     case MACOSX :
-	AR		?= libtool -o ;
 	C++		?= c++ ;
 	MANDIR		?= /usr/local/share/man ;
-	RANLIB		?= "" ;
 
     case NCR :
 	RANLIB		?= "" ;
@@ -560,12 +564,15 @@ else if $(UNIX)
 	OPTIM		?= ;
 	RCP		?= rcp ;
 	RM		?= rm -f ;
+	RMDIR		?= $(RM) ;
 	RSH		?= rsh ;
 	SED		?= sed ;
 	SHELLHEADER	?= "#!/bin/sh" ;
 	SHELLMODE	?= 755 ;
 	SLASH		?= / ;
 	STDHDRS		?= /usr/include ;
+	SUBDIRRULES 	?= ;
+	SUBDIRRESET 	?= ASFLAGS HDRS C++FLAGS CCFLAGS ;
 	SUFEXE		?= "" ;
 	SUFLIB		?= .a ;
 	SUFOBJ		?= .o ;
@@ -886,7 +893,7 @@ rule LibraryFromObjects
 
 	# If we can't scan the library, we have to leave the .o's around.
 
-	if ! ( $(NOARSCAN) || $(KEEPOBJS) ) { RmTemps $(_l) : $(_s) ; }
+	if ! ( $(NOARSCAN) || $(NOARUPDATE) ) { RmTemps $(_l) : $(_s) ; }
 }
 
 rule Link
@@ -965,37 +972,52 @@ rule MainFromObjects
 
 rule MakeLocate
 {
+	# MakeLocate targets : directory ;
+
+	# Sets special variable LOCATE on targets, and arranges
+	# with MkDir to create target directory.
+
+	# Note we grist the directory name with 'dir',
+	# so that directory path components and other
+	# targets don't conflict.
+
 	if $(>)
 	{
 	    LOCATE on $(<) = $(>) ;
-	    Depends $(<) : $(>[1]) ;
-	    MkDir $(>[1]) ;
+	    Depends $(<) : $(>[1]:G=dir) ;
+	    MkDir $(>[1]:G=dir) ;
 	}
 }
 
 rule MkDir
 {
-	# If dir exists, don't update it
-	# Do this even for $(DOT).
+	# MkDir directory ;
+
+	# Make a directory and all its parent directories.
+
+	# Ignore timestamps on directories: we only care if they 
+	# exist.
 
 	NoUpdate $(<) ;
 
-	if $(<) != $(DOT) && ! $($(<)-mkdir) 
-	{
-	    local s ;
+	# Don't create . or any directory already created.
 
+	if $(<:G=) != $(DOT) && ! $($(<)-mkdir) 
+	{
 	    # Cheesy gate to prevent multiple invocations on same dir
-	    # MkDir1 has the actions 
 	    # Arrange for jam dirs
+	    # MkDir1 has the actions 
 
 	    $(<)-mkdir = true ;
-	    MkDir1 $(<) ;
 	    LocalDepends dirs : $(<) ;
+	    MkDir1 $(<) ;
 
 	    # Recursively make parent directories.
 	    # $(<:P) = $(<)'s parent, & we recurse until root
 
-	    s = $(<:P) ;
+	    local s = $(<:P) ;
+
+	    # Don't try to create A: or A:\ on windows
 
 	    if $(NT)
 	    {
@@ -1006,16 +1028,21 @@ rule MkDir
 		}
 	    }
 
-	    if $(s) && $(s) != $(<)
+	    if $(s) = $(<)
 	    {
+		# The parent is the same as the dir.
+		# We're at the root, which some OS's can't stat, so we mark
+		# it as NotFile.
+
+	        NotFile $(s) ;
+	    }
+	    else if $(s:G=)
+	    {
+		# There's a parent; recurse.
+
 		Depends $(<) : $(s) ;
 		MkDir $(s) ;
 	    }
-	    else if $(s)
-	    {
-	        NotFile $(s) ;
-	    }
-
 	}
 }
 
@@ -1151,65 +1178,190 @@ rule SoftLink
 rule SubDir
 {
 	#
-	# SubDir TOP d1 [ ... ]
+	# SubDir TOP d1 d2 ... ;
 	#
-	# This introduces a Jamfile that is part of a project tree 
-	# rooted at $(TOP).  It (only once) includes the project-specific
-	# rules file $(TOP)/Jamrules and then sets search & locate stuff.
+	# Support for a project tree spanning multiple directories.
 	#
-	# If the variable $(TOPRULES) is set (where TOP is the first arg 
-	# to SubDir), that file is included instead of $(TOP)/Jamrules.
+	# SubDir declares a Jamfile's location in a project tree, setting
+	# Jambase variables (SEARCH_SOURCE, LOCATE_TARGET) so that source
+	# files can be found.
 	#
-	# d1 ... are the directory elements that lead to this directory 
-	# from $(TOP).  We construct the system dependent path from these
-	# directory elements in order to set search&locate stuff.
-	# 
+	# TOP is a user-select variable name for root of the tree, and
+	# d1 d2 ...  are the directory elements that lead from the root
+	# of the tree to the directory of the Jamfile.
+	#
+	# TOP can be set externally, but normally the first SubDir call
+	# computes TOP as the path up from the current directory; the
+	# path contains one ../ for each of d1 d2 ...
+	#
+	# SubDir reads once the project-specific rules file Jamrules 
+	# in the TOP directory, if present.  This can be overridden
+	# with the variable TOPRULES.
+	#
+	# SubDir supports multiple, overlaid project trees:  SubDir
+	# invocations with different TOPs can appear in the same Jamfile.
+	# The location established by the first SubDir call is used set
+	# the TOPs for the subsequent SubDir calls.
+	#
+	# SubDir's public variables:
+	#
+	#	$(TOP) = path from CWD to root.
+	#	$(SUBDIR) = path from CWD to the directory SubDir names.
+	#	$(SUBDIR_TOKENS) = path from $(TOP) to $(SUBDIR) as dir names
+	#	$(SEARCH_SOURCE) = $(SUBDIR)
+	#	$(LOCATE_SOURCE) = $(ALL_LOCATE_TARGET) $(SUBDIR)
+	#	$(LOCATE_TARGET) = $(ALL_LOCATE_TARGET) $(SUBDIR)
+	#	$(SOURCE_GRIST) = $(SUBDIR_TOKENS) with !'s 
+	#
 
 	local _top = $(<[1]) ;
+	local _tokens = $(<[2-]) ;
 
-	if ! $($(_top))
+	#
+	# First time through sets up relative root and includes Jamrules.
+	#
+
+	if ! $(_top)
 	{
-	    if ! $(_top)
+	    Exit SubDir syntax error ;
+	}
+
+	if ! $($(_top)-SET)
+	{
+	    $(_top)-SET = true ;
+
+	    # First time we've seen this TOP.
+	    # We'll initialize a number of internal variables:
+	    #
+	    #	$(TOP-UP) = directories from ROOT to a common point
+	    #	$(TOP-DOWN) = directories from common point to TOP
+	    #	$(TOP-ROOT) = root directory for UP/DOWN -- normally CWD
+	    #	$(SUBDIR_UP) = current value of $(TOP-UP)
+	    #	$(SUBDIR_DOWN) = current value of $(TOP-DOWN)
+	    #	$(SUBDIR_ROOT) = current value of $(TOP-ROOT)
+	    #
+
+	    if $($(_top))
 	    {
-		Exit SubDir syntax error ;
+		# TOP externally set.
+		# We'll ignore the relative (UP/DOWN) path that
+		# got us here, and instead remember the hard ROOT.
+
+		$(_top)-UP = ;
+		$(_top)-DOWN = ;
+		$(_top)-ROOT = $($(_top)) ;
+	    }
+	    else
+	    {
+		# TOP not preset.
+
+		# Establishing a new TOP.  In the simplest case,
+		# (SUBDIR_UP/SUBDIR_DOWN/SUBDIR_ROOT unset), it's
+		# merely a certain number of directories down from
+		# the current directory, and FSubDirPath will set
+		# TOP to a path consisting of ../ for each of the
+		# elements of _tokens, because that represents how 
+		# far below TOP the current directory sits.
+		#
+		# In the more complicated case, the starting directory
+		# isn't the directory of jam's invocation but an 
+		# location established by previous SubDir call.  The
+		# starting directory is SUBDIR_UP directories up from
+		# SUBDIR_ROOT, and then SUBDIR_DOWN directories down
+		# from that.   If SUBDIR_ROOT is not set, that means
+		# SUBDIR_DOWN and SUBDIR_UP represent the path from
+		# the directory of jam's invocation.
+		#
+		# In the most complicated case, the _tokens also 
+		# represents directories down, because TOP is being
+		# estalished in a directory other than TOP's root.
+		# Hopefully, _tokens and SUBDIR_DOWN represent the
+		# same final directory, relative to the new TOP and
+		# the previous SubDIr's TOP.  To find the new TOP,
+		# we have to chop off any common directories from
+		# then ends of _tokens and SUBDIR_DOWN.  To do so,
+		# we reverse each of them, call FStripCommon to
+		# remove the initial common elements, and then
+		# reverse them again.  After this process, if
+		# both _tokens and SUBDIR_DOWN have elements, it
+		# means the directory names estalished by the two
+		# SubDir calls don't match, and a warning is issued.
+		# All hell will likely break loose at this point,
+		# since the whole SubDir scheme relies on the SubDir
+		# calls accurately naming the current directory.
+
+		# Strip common trailing elements of _tokens and SUBDIR_DOWN.
+
+		_tokens = [ FReverse $(_tokens) ] ;
+		SUBDIR_DOWN = [ FReverse $(SUBDIR_DOWN) ] ;
+		FStripCommon _tokens : SUBDIR_DOWN ;
+		SUBDIR_DOWN = [ FReverse $(SUBDIR_DOWN) ] ;
+		_tokens = [ FReverse $(_tokens) ] ;
+
+		if $(SUBDIR_DOWN) && $(_tokens) 
+		{ 
+		    Echo Warning: SubDir $(<) misplaced! ; 
+		}
+
+		# We'll remember the relative (UP/DOWN) path that
+		# got us here, plus any hard ROOT starting point
+		# for the UP/DOWN.  If TOP is never set externally,
+		# ROOT will always be "" (directory of jam's invocation).
+
+		$(_top)-UP = $(SUBDIR_UP) $(_tokens) ;
+		$(_top)-DOWN = $(SUBDIR_DOWN) ;
+		$(_top)-ROOT = $(SUBDIR_ROOT:E="") ;
+		$(_top) = [ FSubDirPath $(_top) ] ;
 	    }
 
-	    $(_top) = [ FSubDir $(<[2-]) ] ;
-	}
+	    # Set subdir vars for the inclusion of the Jamrules,
+	    # just in case they have SubDir rules of their own.
+	    # Note that SUBDIR_DOWN is empty: it's all the way
+	    # up where the Jamrules live.  These gets overrided
+	    # just after the inclusion.
 
-	# If we are the first Jamfile, include the top Jamfile and stop processing
-	# this file any further.
-	#
-	if ! $(INVOCATION_SUBDIR_SET) {
-		INVOCATION_SUBDIR_SET = true ;
-		INVOCATION_SUBDIR = $(<[2-]) ;
-		if $(INVOCATION_SUBDIR) {
-			SubInclude $(_top) ;
-			jumptoeof ;
+	    SUBDIR_UP = $($(_top)-UP) ;
+	    SUBDIR_DOWN = ;
+	    SUBDIR_ROOT = $($(_top)-ROOT) ;
+
+	    # Include $(TOPRULES) or $(TOP)/Jamrules.
+	    # Include $(TOPRULES) if set.
+	    # Otherwise include $(TOP)/Jamrules if present.
+
+	    if $($(_top)RULES) { 
+		include $($(_top)RULES) ;
+	    } else { 
+		NoCare $(JAMRULES:R=$($(_top)):G=$(_top)) ;
+		include $(JAMRULES:R=$($(_top)):G=$(_top)) ;
+	    }
+
+		## LOCAL CHANGE
+		#
+		# If we are the first Jamfile, we include the top Jamfile of this
+		# tree and  stop processing.
+		#
+		if ! $(INVOCATION_SUBDIR_SET) {
+			INVOCATION_SUBDIR_SET = true ;
+			INVOCATION_SUBDIR_TOP = $(_top) ;
+			INVOCATION_SUBDIR = $(_tokens) ;
+			if $(INVOCATION_SUBDIR) {
+				SubInclude $(_top) ;
+				jumptoeof ;
+			}
 		}
+		#
+		## LOCAL CHANGE
 	}
 
-	#
-	# If $(TOP)/Jamrules hasn't been included, do so.
-	#
-
-	if ! $($(_top)-included)
-	{
-	    # Gated entry.
-
-	    $(_top)-included = TRUE ;
-
-	    # File is $(TOPRULES) or $(TOP)/Jamrules.
-
-	    include $($(_top)RULES:E=$(JAMRULES:R=$($(_top)))) ;
-	}
-
-	# Get path to current directory from root using SubDir.
+	# Get path from $(TOP) to named directory.
 	# Save dir tokens for other potential uses.
 
-	local _s = [ FDirName $(<[2-]) ] ;
-	SUBDIR = $(_s:R=$($(_top))) ;
-        SUBDIR_TOKENS = $(<[2-]) ;
+	SUBDIR_UP = $($(_top)-UP) ;
+        SUBDIR_DOWN = $($(_top)-DOWN) $(_tokens) ;
+	SUBDIR_ROOT = $($(_top)-ROOT) ;
+        SUBDIR_TOKENS = $(SUBDIR_DOWN) ;
+
+	SUBDIR = [ FSubDirPath $(<) ] ;
 
 	# Now set up SEARCH_SOURCE, LOCATE_TARGET, SOURCE_GRIST
 	# These can be reset if needed.	 For example, if the source
@@ -1219,7 +1371,8 @@ rule SubDir
 	SEARCH_SOURCE = $(SUBDIR) ;
 	LOCATE_SOURCE = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
 	LOCATE_TARGET = $(ALL_LOCATE_TARGET) $(SUBDIR) ;
-	SOURCE_GRIST = [ FGrist $(<[2-]) ] ;
+	SOURCE_GRIST = [ FGrist $(SUBDIR_TOKENS) ] ;
+
 	## LOCAL CHANGE -- OPT_HEADER_CACHE_EXT.  With the header
 	# cache, we can grist all files found during a header scan
 	# without incurring a performance penalty.
@@ -1228,11 +1381,35 @@ rule SubDir
 	#
 	## LOCAL CHANGE
 
-	# Reset per-directory ccflags, hdrs
+	# Reset per-directory ccflags, hdrs, etc,
+	# listed in SUBDIRRESET.
+	# Note use of variable expanded assignment var
 
-	SUBDIRCCFLAGS = ;
-	SUBDIRC++FLAGS = ;
-	SUBDIRHDRS = ;
+	SUBDIR$(SUBDIRRESET) = ;
+
+	# Invoke user-specific SubDir extensions,
+	# rule names listed in SUBDIRRULES.
+	# Note use of variable expanded rule invocation
+
+	$(SUBDIRRULES) $(<) ;
+}
+
+rule FSubDirPath
+{
+	# FSubDirPath TOP d1 ... ;
+
+	# Returns path to named directory.
+
+	# If jam is invoked in a subdirectory of the TOP, then we
+	# need to prepend a ../ for every level we must climb up
+	# (TOP-UP), and then append the directory names we must 
+	# climb down (TOP-DOWN), plus the named directories d1 ...
+	# If TOP was set externally, or computed from another TOP 
+	# that was, we'll have to reroot the whole thing at TOP-ROOT.
+
+	local _r = [ FRelPath $($(<[1])-UP) : $($(<[1])-DOWN) $(<[2-]) ] ;
+
+	return $(_r:R=$($(<[1])-ROOT)) ;
 }
 
 rule SubDirCcFlags
@@ -1252,21 +1429,38 @@ rule SubDirHdrs
 
 rule SubInclude
 {
-	local _s ;
-
-	# That's
-	#	SubInclude TOP d1 [ d2 [ d3 [ d4 ] ] ]
+	# SubInclude TOP d1 ... ;
 	#
-	# to include a subdirectory's Jamfile.
+	# Include a subdirectory's Jamfile.
+
+	# We use SubDir to get there, in case the included Jamfile
+	# either doesn't have its own SubDir (naughty) or is a subtree
+	# with its own TOP.
 
 	if ! $($(<[1]))
 	{
-	    Exit Top level of source tree has not been set with $(<[1]) ;
+	    Exit SubInclude $(<[1]) without prior SubDir $(<[1]) ;
 	}
 
-	_s = [ FDirName $(<[2-]) ] ;
-	
-	include $(JAMFILE:D=$(_s):R=$($(<[1]))) ;
+	SubDir $(<) ;
+
+	include $(JAMFILE:D=$(SUBDIR)) ;
+}
+
+rule SubRules
+{
+	# SubRules TOP d1 ... : Other-TOP ;
+	#
+	# Read another tree's Jamrules, by giving it's path according
+	# to this tree and it's own name.
+
+	if ! $($(<[1]))
+	{
+	    Exit SubRules $(<[1]) without prior SubDir $(<[1]) ;
+	}
+
+	SubDir $(<) ;
+	SubDir $(>) ;
 }
 
 rule Undefines
@@ -1375,6 +1569,14 @@ rule FIsPrefix
 	}
 }
 
+rule FReverse 
+{
+	# FReverse a1 a2 a3 ... ;
+	# return ... a3 a2 a1 ;
+
+	if $(1) { return [ FReverse $(1[2-]) ] $(1[1]) ; }
+}
+
 rule FSubDir
 {
 	# If $(>) is the path to the current directory, compute the
@@ -1400,15 +1602,18 @@ rule FSubDir
 	}
 }
 
-rule _makeCommon
+rule FStripCommon
 {
-	# strip common initial elements
+	# FStripCommon v1 : v2 ;
+
+	# Strip common initial elements of variables v1 and v2.
+	# Modifies the variable values themselves.
 
 	if $($(<)[1]) && $($(<)[1]) = $($(>)[1])
 	{
 	    $(<) = $($(<)[2-]) ;
 	    $(>) = $($(>)[2-]) ;
-	    _makeCommon $(<) : $(>) ;
+	    FStripCommon $(<) : $(>) ;
 	}
 }
 
@@ -1421,7 +1626,7 @@ rule FRelPath
 	_l = $(<) ;
 	_r = $(>) ;
 
-	_makeCommon _l : _r ;
+	FStripCommon _l : _r ;
 
 	# now make path to root and path down
 
@@ -1717,6 +1922,19 @@ if $(NOARUPDATE)
 }
 
 #
+# UNIX specific actions
+#
+
+if $(UNIX)
+{
+	actions GenFile1
+	{
+	PATH="$PATH:."
+	$(>[1]) $(<) $(>[2-])
+	}
+}
+
+#
 # NT specific actions
 #
 
@@ -1939,7 +2157,8 @@ rule INSTALLMAN { InstallMan $(MANDIR) : $(<) ; }
 # Compatibility with jam 2.2.
 
 rule addDirName { $(<) += [ FDirName $(>) ] ; }
-rule makeCommon { _makeCommon $(<) : $(>) ; }
+rule makeCommon { FStripCommon $(<) : $(>) ; }
+rule _makeCommon { FStripCommon $(<) : $(>) ; }
 rule makeDirName { $(<) = [ FDirName $(>) ] ; }
 rule makeGrist { $(<) = [ FGrist $(>) ] ; }
 rule makeGristedName { $(<) = [ FGristSourceFiles $(>) ] ; }

@@ -4,20 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "compile.h"
-# include "rules.h"
-# include "variable.h"
-# include "regexp.h"
-# include "headers.h"
-# include "newstr.h"
-
-#ifdef OPT_HEADER_CACHE_EXT
-# include "hcache.h"
-#endif
-
 /*
  * headers.c - handle #includes in source files
  *
@@ -37,10 +23,28 @@
  * 09/10/00 (seiwald) - replaced call to compile_rule with evaluate_rule,
  *		so that headers() doesn't have to mock up a parse structure
  *		just to invoke a rule.
+ * 03/02/02 (seiwald) - rules can be invoked via variable names
+ * 10/22/02 (seiwald) - list_new() now does its own newstr()/copystr()
+ * 11/04/02 (seiwald) - const-ing for string literals
+ * 12/09/02 (seiwald) - push regexp creation down to headers1().
  */
 
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "compile.h"
+# include "rules.h"
+# include "variable.h"
+# include "regexp.h"
+# include "headers.h"
+# include "newstr.h"
+
+#ifdef OPT_HEADER_CACHE_EXT
+# include "hcache.h"
+#endif
+
 #ifndef OPT_HEADER_CACHE_EXT
-static LIST *headers1( LIST *l, char *file, int rec, regexp *re[] );
+static LIST *headers1( const char *file, LIST *hdrscan );
 #endif
 
 /*
@@ -54,35 +58,26 @@ headers( TARGET *t )
 {
 	LIST	*hdrscan;
 	LIST	*hdrrule;
-	LIST	*headlist = 0;
+	LIST	*hdrcache;
 	LOL	lol;
-	regexp	*re[ MAXINC ];
-	int	rec = 0;
 
 	if( !( hdrscan = var_get( "HDRSCAN" ) ) || 
 	    !( hdrrule = var_get( "HDRRULE" ) ) )
 	        return;
 
-	if( DEBUG_HEADER )
-	    printf( "header scan %s\n", t->name );
-
-	/* Compile all regular expressions in HDRSCAN */
-
-	while( rec < MAXINC && hdrscan )
-	{
-	    re[rec++] = regcomp( hdrscan->string );
-	    hdrscan = list_next( hdrscan );
-	}
-
 	/* Doctor up call to HDRRULE rule */
 	/* Call headers1() to get LIST of included files. */
 
+	if( DEBUG_HEADER )
+	    printf( "header scan %s\n", t->name );
+
 	lol_init( &lol );
-	lol_add( &lol, list_new( L0, t->name ) );
+
+	lol_add( &lol, list_new( L0, t->name, 1 ) );
 #ifdef OPT_HEADER_CACHE_EXT
-	lol_add( &lol, hcache( t, rec, re, var_get("HDRSCAN") ) );
+	lol_add( &lol, hcache( t, var_get("HDRSCAN") ) );
 #else
-	lol_add( &lol, headers1( headlist, t->boundname, rec, re ) );
+	lol_add( &lol, headers1( t->boundname, hdrscan ) );
 #endif
 
 	if( lol_get( &lol, 1 ) )
@@ -91,9 +86,6 @@ headers( TARGET *t )
 	/* Clean up */
 
 	lol_free( &lol );
-
-	while( rec )
-	    free( (char *)re[--rec] );
 }
 
 /*
@@ -106,39 +98,47 @@ LIST *
 static LIST *
 #endif
 headers1( 
-	LIST	*l,
-	char	*file,
-	int	rec,
-	regexp	*re[] )
+	const char *file,
+	LIST *hdrscan )
 {
 	FILE	*f;
+	int	i;
+	int	rec = 0;
+	LIST	*result = 0;
+	regexp	*re[ MAXINC ];
 	char	buf[ 1024 ];
-	int		i;
 
 	if( !( f = fopen( file, "r" ) ) )
-	    return l;
+	    return result;
+
+	while( rec < MAXINC && hdrscan )
+	{
+	    re[rec++] = regcomp( hdrscan->string );
+	    hdrscan = list_next( hdrscan );
+	}
 
 	while( fgets( buf, sizeof( buf ), f ) )
 	{
 	    for( i = 0; i < rec; i++ )
 		if( regexec( re[i], buf ) && re[i]->startp[1] )
 	    {
-		re[i]->endp[1][0] = '\0';
+		/* Copy and terminate extracted string. */
+
+		char buf2[ MAXSYM ];
+		int l = re[i]->endp[1] - re[i]->startp[1];
+		memcpy( buf2, re[i]->startp[1], l );
+		buf2[ l ] = 0;
+		result = list_new( result, buf2, 0 );
 
 		if( DEBUG_HEADER )
-		    printf( "header found: %s\n", re[i]->startp[1] );
-
-		l = list_new( l, newstr( re[i]->startp[1] ) );
+		    printf( "header found: %s\n", buf2 );
 	    }
 	}
 
+	while( rec )
+	    free( (char *)re[--rec] );
+
 	fclose( f );
 
-	return l;
-}
-
-void
-regerror( char *s )
-{
-	printf( "re error %s\n", s );
+	return result;
 }

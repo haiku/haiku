@@ -4,15 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "scan.h"
-# include "jcache.h"
-# include "jamgram.h"
-# include "jambase.h"
-# include "newstr.h"
-
 /*
  * scan.c - the jam yacc scanner
  *
@@ -24,10 +15,21 @@
  * 02/11/95 (seiwald) - honor only punctuation keywords if SCAN_PUNCT.
  * 07/27/95 (seiwald) - Include jamgram.h after scan.h, so that YYSTYPE is
  *			defined before Linux's yacc tries to redefine it.
+ * 01/10/01 (seiwald) - \ can now escape any whitespace char
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
 
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "scan.h"
+# include "jamgram.h"
+# include "jambase.h"
+# include "jcache.h"
+# include "newstr.h"
+
 struct keyword {
-	char *word;
+	const char *word;
 	int type;
 } keywords[] = {
 # include "jamgramtab.h"
@@ -35,13 +37,13 @@ struct keyword {
 } ;
 
 struct include {
-	struct include *next;	/* next serial include file */
-	char 	*string;	/* pointer into current line */
-	char	**strings;	/* for yyfparse() -- text to parse */
-	FILE 	*file;		/* for yyfparse() -- file being read */
-	char 	*fname;		/* for yyfparse() -- file name */
-	int 	line;		/* line counter for error messages */
-	char 	buf[ 512 ];	/* for yyfparse() -- line buffer */
+	struct include 	*next;		/* next serial include file */
+	const char 	*string;	/* pointer into current line */
+	char		**strings;	/* for yyfparse() -- text to parse */
+	FILE 		*file;		/* for yyfparse() -- file being read */
+	const char 	*fname;		/* for yyfparse() -- file name */
+	int 		line;		/* line counter for error messages */
+	char 		buf[ 512 ];	/* for yyfparse() -- line buffer */
 } ;
 
 static struct include *incp = 0; /* current file; head of chain */
@@ -63,7 +65,7 @@ yymode( int n )
 }
 
 void
-yyerror( char *s )
+yyerror( const char *s )
 {
 	if( incp )
 	    printf( "%s: line %d: ", incp->fname, incp->line );
@@ -80,7 +82,7 @@ yyanyerrors()
 }
 
 void
-yyfparse( char *s )
+yyfparse( const char *s )
 {
 	struct include *i = (struct include *)malloc( sizeof( *i ) );
 
@@ -144,7 +146,7 @@ yyline()
 	{
 		if ( strcmp( i->fname, "-" ) )
 		{
-			i->strings = jcache(i->fname);
+			i->strings = jcache((char*)i->fname);
 			if (!i->strings || !*i->strings)
 				goto next;
 			i->line++;

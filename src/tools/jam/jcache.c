@@ -338,7 +338,7 @@ find_jcache_entry(jamfile_cache* cache, char* filename)
 {
 	jcache_entry _entry;
 	jcache_entry* entry = &_entry;
-	entry->filename = filename;
+entry->filename = filename;
 	if (!hashcheck(cache->entries, (HASHDATA**)&entry))
 		entry = 0;
 	return entry;
@@ -554,7 +554,7 @@ jcache_name(void)
 			popsettings( t->settings );
 
 			if (t->boundname) {
-				name = copystr(t->boundname);
+				name = (char*)copystr(t->boundname);
 			}
 		}
 	}

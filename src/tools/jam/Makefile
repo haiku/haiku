@@ -1,8 +1,9 @@
 # Makefile for jam
 
 CC = cc
-TARGET = -o jam0
 CFLAGS =
+EXENAME = ./jam0
+TARGET = -o $(EXENAME)
 
 # Special flavors - uncomment appropriate lines
 
@@ -22,12 +23,14 @@ CFLAGS =
 #CFLAGS = -I $(Include) -DNT 
 #TARGET = /Fejam0
 #LINKLIBS = $(Lib)/oldnames.lib $(Lib)/kernel32.lib $(Lib)/libc.lib
+#EXENAME = .\jam0.exe
 
 # NT (with Microsoft compiler)
 # People with DevStudio settings already in shell environment.
 #CC = cl /nologo
 #CFLAGS = -DNT 
 #TARGET = /Fejam0
+#EXENAME = .\jam0.exe
 
 # Interix - gcc
 #CC = gcc
@@ -55,8 +58,8 @@ SOURCES = \
 	newstr.c option.c parse.c pathunix.c pathvms.c regexp.c \
 	rules.c scan.c search.c timestamp.c variable.c
 
-all: jam0
-	./jam0
+all: $(EXENAME)
+	$(EXENAME)
 
-jam0:
+$(EXENAME):
 	$(CC) $(TARGET) $(CFLAGS) $(SOURCES) $(LINKLIBS)

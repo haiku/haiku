@@ -24,9 +24,18 @@
  * 11/21/96 (peterk)  - added BeOS with MW CW mwcc
  * 12/21/96 (seiwald) - OSPLAT now defined for NT.
  * 07/19/99 (sickel)  - Mac OS X Server and Client support added
+ * 02/22/01 (seiwald) - downshift paths on case-insensitive macintosh
+ * 03/23/01 (seiwald) - VMS C++ changes.
+ * 10/29/01 (brett) - More IA64 ifdefs for MS.
  * 02/18/00 (belmonte)- Support for Cygwin.
  * 09/12/00 (seiwald) - OSSYMS split to OSMAJOR/OSMINOR/OSPLAT
  * 12/29/00 (seiwald) - OSVER dropped.
+ * 01/21/02 (seiwald) - new -q to quit quickly on build failure
+ * 03/16/02 (seiwald) - support for -g (reorder builds by source time)
+ * 03/20/02 (seiwald) - MINGW porting from Max Blagai
+ * 08/16/02 (seiwald) - BEOS porting from Ingo Weinhold
+ * 09/19/02 (seiwald) - new -d displays
+ * 11/05/02 (seiwald) - OSPLAT now set to sparc on solaris.
  */
 
 /*
@@ -167,6 +176,7 @@
 # include <stdlib.h>
 # include <string.h>
 # include <stdio.h>
+# include <ctype.h>
 
 # define OSMAJOR "MAC=true"
 # define OSMINOR "OS=MAC"
@@ -414,8 +424,7 @@
 # endif 
 
 # ifdef __sparc__
-# if !defined( OS_SUNOS ) && \
-     !defined( OS_SOLARIS )
+# if !defined( OS_SUNOS )
 # define OSPLAT "OSPLAT=SPARC"
 # endif
 # endif
@@ -471,7 +480,7 @@
 
 /* Jam private definitions below. */
 
-# define DEBUG_MAX	10
+# define DEBUG_MAX	15
 
 struct globs {
 	int	noexec;
@@ -484,11 +493,8 @@ struct globs {
 
 extern struct globs globs;
 
-# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* show actions when executed */
-# define DEBUG_MAKEQ	( globs.debug[ 2 ] )	/* show even quiet actions */
-# define DEBUG_EXEC	( globs.debug[ 2 ] )	/* show text of actons */
-# define DEBUG_MAKEPROG	( globs.debug[ 3 ] )	/* show progress of make0 */
-# define DEBUG_BIND	( globs.debug[ 3 ] )	/* show when files bound */
+# define DEBUG_MAKE	( globs.debug[ 1 ] )	/* -da show actions when executed */
+# define DEBUG_MAKEPROG	( globs.debug[ 3 ] )	/* -dm show progress of make0 */
 
 # define DEBUG_EXECCMD	( globs.debug[ 4 ] )	/* show execcmds()'s work */
 
@@ -505,4 +511,9 @@ extern struct globs globs;
 # define DEBUG_LISTS	( globs.debug[ 9 ] )	/* show list manipulation */
 # define DEBUG_SCAN	( globs.debug[ 9 ] )	/* show scanner tokens */
 # define DEBUG_MEM	( globs.debug[ 9 ] )	/* show memory use */
+
+# define DEBUG_MAKEQ	( globs.debug[ 11 ] )	/* -da show even quiet actions */
+# define DEBUG_EXEC	( globs.debug[ 12 ] )	/* -dx show text of actions */
+# define DEBUG_DEPENDS	( globs.debug[ 13 ] )	/* -dd show dependency graph */
+# define DEBUG_CAUSES	( globs.debug[ 14 ] )	/* -dc show dependency graph */
 

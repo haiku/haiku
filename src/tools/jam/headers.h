@@ -11,6 +11,5 @@
 void headers( TARGET *t );
 
 #ifdef OPT_HEADER_CACHE_EXT
-struct regexp;
-LIST *headers1( LIST *l, char *file, int rec, struct regexp *re[] );
+LIST *headers1( const char *file, LIST *hdrscan );
 #endif

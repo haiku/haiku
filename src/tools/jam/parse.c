@@ -4,12 +4,6 @@
  * This file is part of Jam - see jam.c for Copyright information.
  */
 
-# include "jam.h"
-# include "lists.h"
-# include "parse.h"
-# include "scan.h"
-# include "newstr.h"
-
 /*
  * parse.c - make and destroy parse trees as driven by the parser
  *
@@ -17,14 +11,21 @@
  *		as per Matt Armstrong.
  * 09/11/00 (seiwald) - structure reworked to reflect that (*func)()
  *		returns a LIST *.
+ * 10/22/02 (seiwald) - working return/break/continue statements
+ * 11/04/02 (seiwald) - const-ing for string literals
  */
+
+# include "jam.h"
+# include "lists.h"
+# include "parse.h"
+# include "scan.h"
+# include "newstr.h"
+# include "compile.h"
 
 static PARSE *yypsave;
 
-static int jumptoeof = 0;
-
 void
-parse_file( char *f )
+parse_file( const char *f )
 {
 	/* Suspend scan of current file */
 	/* and push this new file in the stream */
@@ -35,10 +36,11 @@ parse_file( char *f )
 	/* Execute it outside of the parser so that recursive */
 	/* calls to yyrun() work (no recursive yyparse's). */
 
-	while (!parse_shall_skip())
+	for(;;)
 	{
 	    LOL l;
 	    PARSE *p;
+	    int jmp = 0; /* JMP_NONE */
 
 	    /* $(<) and $(>) empty in outer scope. */
 
@@ -55,11 +57,13 @@ parse_file( char *f )
 
 	    /* Run the parse tree. */
 
-	    (*(p->func))( p, &l );
+	    list_free( (*(p->func))( p, &l, &jmp ) );
 
 	    parse_free( p );
+
+	    if ( jmp == JMP_EOF )
+		break;
 	}
-	jumptoeof = 0;
 }
 
 void
@@ -68,27 +72,15 @@ parse_save( PARSE *p )
 	yypsave = p;
 }
 
-void
-parse_jumptoeof()
-{
-	jumptoeof = 1;
-}
-
-int
-parse_shall_skip()
-{
-	return jumptoeof;
-}
-
 PARSE *
 parse_make( 
-	LIST	*(*func)( PARSE *p, LOL *args ),
-	PARSE	*left,
-	PARSE	*right,
-	PARSE	*third,
-	char	*string,
-	char	*string1,
-	int	num )
+	LIST		*(*func)( PARSE *p, LOL *args, int *jmp ),
+	PARSE		*left,
+	PARSE		*right,
+	PARSE		*third,
+	const char 	*string,
+	const char 	*string1,
+	int		num )
 {
 	PARSE	*p = (PARSE *)malloc( sizeof( PARSE ) );
 
