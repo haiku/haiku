@@ -57,12 +57,23 @@ ModemWindow::~ModemWindow()
 }
 // -------------------------------------------------------------------------------------------------- //
 
+/*BBox(BRect frame, const char *name = NULL, 
+  
+    uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+      uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS |  
+            B_NAVIGABLE_JUMP, 
+      border_style border = B_FANCY_BORDER)*/
+
 
 // ModemWindow::InitWindow -- Initialization Commands here
 void ModemWindow::InitWindow(void)
 {
 	BRect r;
 	r = Bounds();
+	
+	boxInternalModem = new BBox(BRect (r.left+10,r.top+15,r.right-10,r.bottom-50),
+						 " Internal Modem ", B_FOLLOW_LEFT | B_FOLLOW_TOP,
+						 B_WILL_DRAW, B_FANCY_BORDER);
 	
 	BRect CancelButtonRect(24,r.bottom-37,100,r.bottom-13);
 	btnCancel = new BButton(CancelButtonRect,"btnCancel","Cancel",
@@ -77,6 +88,7 @@ void ModemWindow::InitWindow(void)
 		
 	// Create the Views
 	AddChild(ptrModemView = new ModemView(r));
+	ptrModemView->AddChild(boxInternalModem);
 	ptrModemView->AddChild(btnCancel);
 	ptrModemView->AddChild(btnAdd);
 }

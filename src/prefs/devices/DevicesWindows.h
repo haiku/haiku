@@ -43,6 +43,7 @@ class ModemWindow : public BWindow
 		void InitWindow(void);
 	    ModemView*	 ptrModemView;
 	    
+	    BBox		 *boxInternalModem;
 	    BButton      *btnAdd;
 	    BButton		 *btnCancel;
 };
