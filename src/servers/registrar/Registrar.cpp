@@ -40,6 +40,7 @@ Registrar::Registrar()
 Registrar::~Registrar()
 {
 	FUNCTION_START();
+	Lock();
 	fMIMEManager->Lock();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
@@ -118,9 +119,13 @@ void
 Registrar::ReadyToRun()
 {
 	FUNCTION_START();
+	// create roster
 	fRoster = new TRoster;
+	fRoster->Init();
+	// create clipboard handler
 	fClipboardHandler = new ClipboardHandler;
 	AddHandler(fClipboardHandler);
+	// create MIME manager
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
 	FUNCTION_END();
