@@ -54,9 +54,10 @@
 #define CREATIVELABS_SBLIVE_DEVICE_ID	0x0002	/* Creative Labs SoundBlaster Live */
 #define CREATIVELABS_AUDIGY_DEVICE_ID	0x0004	/* Creative Labs Audigy and Audigy 2 */
 
-#define AUDIGY 1	// Audigy is not tested for now, but Audigy 2 is
+#define AUDIGY 1	// Audigy seems to work
+#define MIDI 0 		// Midi is not supported for now
 
-#define VERSION "Version alpha 4, Copyright (c) 2002 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
+#define VERSION "Version alpha 7, Copyright (c) 2002,2003 Jérôme Duval, compiled on " ## __DATE__ ## " " ## __TIME__ 
 #define DRIVER_NAME "emuxki"
 #define FRIENDLY_NAME "Emuxki"
 #define FRIENDLY_NAME_LIVE FRIENDLY_NAME" SB Live"

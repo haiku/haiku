@@ -1210,6 +1210,7 @@ emuxki_open(const char *name, uint32 flags, void** cookie)
 	emuxki_stream_set_audioparms(card->rstream, true, 2, true, 48000);
 	emuxki_stream_set_audioparms(card->rstream2, true, 2, true, 48000);
 	recparams.efx_voices[0] = 3; // channels 1,2
+	recparams.efx_voices[1] = 0;
 	//emuxki_voice_set_recparms(card->rvoice, EMU_RECSRC_FX, &recparams);
 	emuxki_stream_set_recparms(card->rstream, EMU_RECSRC_ADC, NULL);
 	emuxki_stream_set_recparms(card->rstream2, EMU_RECSRC_FX, &recparams);

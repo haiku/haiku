@@ -1906,6 +1906,7 @@ int32 emuxki_int(void *arg)
 				}
 			}
 		}
+#if MIDI
 		if (ipr & (/*EMU_IPR_MIDITRANSBUFE | */EMU_IPR_MIDIRECVBUFE)) {
 			midi_interrupt(card);
 		}
@@ -1915,6 +1916,7 @@ int32 emuxki_int(void *arg)
 				TRACE(("EMU_INTE_MIDITXENABLE disabled\n"));
 			}
 		}
+#endif
 		if (ipr & (EMU_IPR_ADCBUFHALFFULL | EMU_IPR_ADCBUFFULL
 			| EMU_IPR_MICBUFHALFFULL | EMU_IPR_MICBUFFULL
 			| EMU_IPR_EFXBUFHALFFULL | EMU_IPR_EFXBUFFULL)) {
@@ -2018,9 +2020,10 @@ make_device_names(
 {
 	/*char * name = card->name;
 	sprintf(name, "emuxki/%ld", card-cards+1);*/
-	
+#if MIDI	
 	sprintf(card->midi.name, "midi/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->midi.name;
+#endif
 	
 	sprintf(card->name, "audio/multi/emuxki/%ld", card-cards+1);
 	names[num_names++] = card->name;
@@ -2063,12 +2066,14 @@ emuxki_setup(emuxki_dev * card)
 	
 	dump_hardware_regs(&card->config);
 	
+#if MIDI
 	if ((err = (*mpu401->create_device)(card->config.nabmbar + IS_AUDIGY(&card->config) ? EMU_A_MUDATA1 : EMU_MUDATA, 
 		&card->midi.driver, 0, midi_interrupt_op, &card->midi)) < B_OK)
 		return (err);
 		
 	card->midi.card = card;
-		
+#endif
+
 	/* reset the codec */	
 	PRINT(("codec reset\n"));
 	emuxki_codec_write(&card->config, 0x00, 0x0000);
@@ -2373,7 +2378,7 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L), EMU_A_DSP_CST(4));
-		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R), EMU_A_DSP_CST(4));
@@ -2571,6 +2576,10 @@ emuxki_init(emuxki_dev * card)
 	emuxki_chan_write(&card->config, 0, EMU_FXBA, 0);
 	emuxki_chan_write(&card->config, 0, EMU_ADCBS, EMU_RECBS_BUFSIZE_NONE);
 	emuxki_chan_write(&card->config, 0, EMU_ADCBA, 0);
+	
+	if(IS_AUDIGY(&card->config)) {
+		emuxki_chan_write(&card->config, 0, EMU_SPBYPASS, EMU_SPBYPASS_24_BITS);
+	}
 
 	/* Initialize all channels to stopped and no effects */
 	for (i = 0; i < EMU_NUMCHAN; i++) {
@@ -2676,6 +2685,9 @@ emuxki_init(emuxki_dev * card)
 
 	/* Init streams list */
 	LIST_INIT(&(card->streams));
+	
+	/* Init mems list */
+	LIST_INIT(&(card->mem));
 
 	/* Timer is stopped */
 	card->timerstate &= ~EMU_TIMER_STATE_ENABLED;
@@ -2848,9 +2860,11 @@ find_device(const char * name)
 	PRINT(("emuxki: find_device(%s)\n", name));
 
 	for (ix=0; ix<num_cards; ix++) {
+#if MIDI
 		if (!strcmp(cards[ix].midi.name, name)) {
 			return &midi_hooks;
 		}
+#endif
 		if (!strcmp(cards[ix].name, name)) {
 			return &multi_hooks;
 		}
