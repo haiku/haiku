@@ -15,6 +15,7 @@ UnitTest UnitTester
 	:
 ;
 
+AddResources UnitTesterHelper : UnitTesterHelper.rsrc ;
 UnitTest UnitTesterHelper
 	: UnitTesterHelper.cpp
 	: unittester
@@ -23,6 +24,7 @@ UnitTest UnitTesterHelper
 	:
 ;
 
+AddResources UnitTesterHelper_r5 : UnitTesterHelper.rsrc ;
 R5UnitTest UnitTesterHelper
 	: UnitTesterHelper.cpp
 	: unittester_r5
