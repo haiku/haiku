@@ -4,6 +4,7 @@
 // ##### Include headers for your tests here #####
 #include "bmptranslator/BMPTranslatorTest.h"
 #include "stxttranslator/STXTTranslatorTest.h"
+#include "tifftranslator/TIFFTranslatorTest.h"
 
 BTestSuite *
 getTestSuite()
@@ -13,6 +14,7 @@ getTestSuite()
 	// ##### Add test suites here #####
 	suite->addTest("BMPTranslator", BMPTranslatorTest::Suite());
 	suite->addTest("STXTTranslator", STXTTranslatorTest::Suite());
-	
+	suite->addTest("TIFFTranslator", TIFFTranslatorTest::Suite());
+
 	return suite;
 }
