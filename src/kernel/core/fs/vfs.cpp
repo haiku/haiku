@@ -208,6 +208,10 @@ static status_t index_dir_read(struct file_descriptor *, struct dirent *buffer, 
 static status_t index_dir_rewind(struct file_descriptor *);
 static void index_dir_free_fd(struct file_descriptor *);
 static status_t index_dir_close(struct file_descriptor *);
+static status_t query_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t query_rewind(struct file_descriptor *);
+static void query_free_fd(struct file_descriptor *);
+static status_t query_close(struct file_descriptor *);
 
 static status_t common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
 static status_t common_read_stat(struct file_descriptor *, struct stat *);
@@ -313,6 +317,21 @@ static struct fd_ops sIndexOps = {
 	NULL		// free_fd()
 };
 #endif
+
+static struct fd_ops sQueryOps = {
+	NULL,		// read()
+	NULL,		// write()
+	NULL,		// seek()
+	NULL,		// ioctl()
+	NULL,		// select()
+	NULL,		// deselect()
+	query_read,
+	query_rewind,
+	NULL,		// read_stat()
+	NULL,		// write_stat()
+	query_close,
+	query_free_fd
+};
 
 
 // VNodePutter
@@ -1536,6 +1555,9 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 		case FDTYPE_INDEX_DIR:
 			descriptor->ops = &sIndexDirectoryOps;
 			break;
+		case FDTYPE_QUERY:
+			descriptor->ops = &sQueryOps;
+			break;
 		default:
 			panic("get_new_fd() called with unknown type %d\n", type);
 			break;
@@ -1549,7 +1571,10 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 		return B_NO_MORE_FDS;
 	}
 
-	cache_node_opened(vnode->cache, vnode->device, vnode->id);
+	// index directories and queries don't have a vnode but a mount structure attached
+	if (type != FDTYPE_INDEX_DIR && type != FDTYPE_QUERY)
+		cache_node_opened(vnode->cache, vnode->device, vnode->id);
+
 	return fd;
 }
 
@@ -3703,7 +3728,7 @@ index_dir_close(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
 
-	FUNCTION(("dir_close(descriptor = %p)\n", descriptor));
+	FUNCTION(("index_dir_close(descriptor = %p)\n", descriptor));
 
 	if (FS_MOUNT_CALL(mount, close_index_dir))
 		return FS_MOUNT_CALL(mount, close_index_dir)(mount->cookie, descriptor->cookie);
@@ -3850,6 +3875,101 @@ index_remove(mount_id mountID, const char *name, bool kernel)
 out:
 	put_mount(mount);
 	return status;
+}
+
+
+/**	ToDo: the query FS API is still the pretty much the same as in R5.
+ *		It would be nice if the FS would find some more kernel support
+ *		for them.
+ *		For example, query parsing should be moved into the kernel.
+ */
+
+static int
+query_open(dev_t device, const char *query, uint32 flags,
+	port_id port, int32 token, bool kernel)
+{
+	struct fs_mount *mount;
+	fs_cookie cookie;
+	status_t status;
+
+	FUNCTION(("query_open(device = %ld, query = \"%s\", kernel = %d)\n", mountID, query, kernel));
+
+	mount = get_mount(device);
+	if (mount == NULL)
+		return B_BAD_VALUE;
+
+	if (FS_MOUNT_CALL(mount, open_query) == NULL) {
+		status = EOPNOTSUPP;
+		goto out;
+	}
+
+	status = FS_MOUNT_CALL(mount, open_query)(mount->cookie, query, flags, port, token, &cookie);
+	if (status < B_OK)
+		goto out;
+
+	// get fd for the index directory
+	status = get_new_fd(FDTYPE_QUERY, (struct vnode *)mount, cookie, 0, kernel);
+	if (status >= 0)
+		goto out;
+
+	// something went wrong
+	FS_MOUNT_CALL(mount, close_query)(mount->cookie, cookie);
+	FS_MOUNT_CALL(mount, free_query_cookie)(mount->cookie, cookie);
+
+out:
+	put_mount(mount);
+	return status;
+}
+
+
+static status_t
+query_close(struct file_descriptor *descriptor)
+{
+	struct fs_mount *mount = descriptor->u.mount;
+
+	FUNCTION(("query_close(descriptor = %p)\n", descriptor));
+
+	if (FS_MOUNT_CALL(mount, close_query))
+		return FS_MOUNT_CALL(mount, close_query)(mount->cookie, descriptor->cookie);
+
+	return B_OK;
+}
+
+
+static void
+query_free_fd(struct file_descriptor *descriptor)
+{
+	struct fs_mount *mount = descriptor->u.mount;
+
+	if (mount != NULL) {
+		FS_MOUNT_CALL(mount, free_query_cookie)(mount->cookie, descriptor->cookie);
+		// ToDo: find a replacement ref_count object - perhaps the root dir?
+		//put_vnode(vnode);
+	}
+}
+
+
+static status_t 
+query_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+{
+	struct fs_mount *mount = descriptor->u.mount;
+
+	if (FS_MOUNT_CALL(mount, read_query))
+		return FS_MOUNT_CALL(mount, read_query)(mount->cookie, descriptor->cookie, buffer, bufferSize, _count);
+
+	return EOPNOTSUPP;
+}
+
+
+static status_t 
+query_rewind(struct file_descriptor *descriptor)
+{
+	struct fs_mount *mount = descriptor->u.mount;
+
+	if (FS_MOUNT_CALL(mount, rewind_query))
+		return FS_MOUNT_CALL(mount, rewind_query)(mount->cookie, descriptor->cookie);
+
+	return EOPNOTSUPP;
 }
 
 
@@ -4260,13 +4380,9 @@ fs_read_info(dev_t device, struct fs_info *info)
 	struct fs_mount *mount;
 	status_t status = B_OK;
 
-	mutex_lock(&sMountMutex);	
-
-	mount = find_mount(device);
-	if (mount == NULL) {
-		status = B_BAD_VALUE;
-		goto out;
-	}
+	mount = get_mount(device);
+	if (mount == NULL)
+		return B_BAD_VALUE;
 
 	// fill in info the file system doesn't (have to) know about
 	memset(info, 0, sizeof(struct fs_info));
@@ -4282,8 +4398,7 @@ fs_read_info(dev_t device, struct fs_info *info)
 	// if the call is not supported by the file system, there are still
 	// the parts that we filled out ourselves
 
-out:
-	mutex_unlock(&sMountMutex);
+	put_mount(mount);
 	return status;
 }
 
@@ -4292,23 +4407,18 @@ static status_t
 fs_write_info(dev_t device, const struct fs_info *info, int mask)
 {
 	struct fs_mount *mount;
-	int status;
+	status_t status;
 
-	mutex_lock(&sMountMutex);	
-
-	mount = find_mount(device);
-	if (mount == NULL) {
-		status = EINVAL;
-		goto out;
-	}
+	mount = get_mount(device);
+	if (mount == NULL)
+		return B_BAD_VALUE;
 
 	if (FS_MOUNT_CALL(mount, write_fs_info))
 		status = FS_MOUNT_CALL(mount, write_fs_info)(mount->cookie, info, mask);
 	else
 		status = EROFS;
 
-out:
-	mutex_unlock(&sMountMutex);
+	put_mount(mount);
 	return status;
 }
 
@@ -5935,9 +6045,24 @@ _user_setcwd(int fd, const char *userPath)
 
 
 int
-_user_open_query(dev_t device, const char *query, uint32 flags, port_id port,
-	int32 token)
+_user_open_query(dev_t device, const char *userQuery, size_t queryLength,
+	uint32 flags, port_id port, int32 token)
 {
-	// TODO: Implement!
-	return B_ERROR;
+	char *query;
+
+	if (device < 0 || userQuery == NULL || queryLength == 0 || queryLength >= 65536)
+		return B_BAD_VALUE;
+
+	query = (char *)malloc(queryLength + 1);
+	if (query == NULL)
+		return B_NO_MEMORY;
+	if (user_strlcpy(query, userQuery, queryLength + 1) < B_OK) {
+		free(query);
+		return B_BAD_ADDRESS;
+	}
+
+	int fd = query_open(device, query, flags, port, token, false);
+
+	free(query);
+	return fd;
 }
