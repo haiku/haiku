@@ -1,6 +1,16 @@
 #ifndef REPLACE_WINDOW_H 
 #define REPLACE_WINDOW_H 
 
+#include <Window.h>
+#include <Rect.h>
+#include <Handler.h>
+#include <String.h>
+#include <Message.h>
+#include <View.h>
+#include <TextControl.h>
+#include <CheckBox.h>
+#include <Button.h>
+
 class ReplaceWindow : public BWindow {
 	public:
 				ReplaceWindow(BRect frame, BHandler *_handler,BString *searchString,

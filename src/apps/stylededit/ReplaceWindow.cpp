@@ -1,53 +1,39 @@
-#ifndef _BUTTON_H
+#include <Box.h>
 #include <Button.h>
-#endif
-
-#ifndef _CHECK_BOX_H
 #include <CheckBox.h>
-#endif
-
-#ifndef _STRING_H
 #include <String.h>
-#endif
-
-#ifndef _TEXT_CONTROL_H
 #include <TextControl.h>
-#endif
-
-#ifndef _WINDOW_H 
 #include <Window.h>
-#endif
 
-#ifndef CONSTANTS_H
-#include "Constants.h"
-#endif
-
-#ifndef REPLACE_WINDOW_H
-#include "ReplaceWindow.h"
-#endif
+#include <Constants.h>
+#include <ReplaceWindow.h>
 
 ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchString, BString *replaceString, bool *caseState, bool *wrapState, bool *backState)
 				: BWindow(frame, "", B_MODAL_WINDOW, B_NOT_RESIZABLE,B_CURRENT_WORKSPACE) 
 			{
-	
-	fReplaceView= new BView(Bounds(),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW);
+	AddChild(fReplaceView=new BBox(BRect(-1,-1,Bounds().Width()+1.5,Bounds().Height()+1.5),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW));
 	fReplaceView->SetViewColor(216,216,216);
 	
-	fReplaceView->AddChild (fSearchString= new BTextControl(BRect(5,10,290,50), "", "Find:",NULL, NULL,
+	char * findLabel = "Find:";
+	float findWidth = fReplaceView->StringWidth(findLabel);
+	fReplaceView->AddChild (fSearchString= new BTextControl(BRect(5,10,290,50), "", findLabel,NULL, NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
-	fSearchString-> SetDivider(65);
 	
-	fReplaceView->AddChild(fReplaceString=new BTextControl(BRect(5,35,290,50), "", "Replace with:",NULL,
+	char * replaceWithLabel = "Replace with:";
+	float replaceWithWidth = fReplaceView->StringWidth(replaceWithLabel);
+	fReplaceView->AddChild(fReplaceString=new BTextControl(BRect(5,35,290,50), "", replaceWithLabel,NULL,
 		 NULL,B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
-	fReplaceString->SetDivider(65);
+	float maxWidth = (replaceWithWidth > findWidth ? replaceWithWidth : findWidth) + 1;
+	fSearchString->SetDivider(maxWidth);
+	fReplaceString->SetDivider(maxWidth);
 	
-	fReplaceView->AddChild(fCaseSensBox=new BCheckBox(BRect(72,60,162,52),"","Case-sensitive", NULL,
+	fReplaceView->AddChild(fCaseSensBox=new BCheckBox(BRect(maxWidth+8,60,290,52),"","Case-sensitive", NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
-	fReplaceView->AddChild(fWrapBox=new BCheckBox(BRect(72,80,195,70),"","Wrap-around search", NULL,
+	fReplaceView->AddChild(fWrapBox=new BCheckBox(BRect(maxWidth+8,80,290,70),"","Wrap-around search", NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
-	fReplaceView->AddChild(fBackSearchBox=new BCheckBox(BRect(72,100,179,95),"","Search backwards", NULL,
+	fReplaceView->AddChild(fBackSearchBox=new BCheckBox(BRect(maxWidth+8,100,290,95),"","Search backwards", NULL,
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE)); 
-	fReplaceView->AddChild(fAllWindowsBox=new BCheckBox(BRect(72,120,195,95),"","Replace in all windows",
+	fReplaceView->AddChild(fAllWindowsBox=new BCheckBox(BRect(maxWidth+8,120,290,95),"","Replace in all windows",
 		new BMessage(CHANGE_WINDOW) ,B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
 		fUichange=false;
 	
@@ -60,7 +46,6 @@ ReplaceWindow::ReplaceWindow(BRect frame, BHandler *_handler, BString *searchStr
 		B_FOLLOW_LEFT|B_FOLLOW_TOP,B_WILL_DRAW|B_NAVIGABLE));
 	fReplaceButton->MakeDefault(true);
 	
-	AddChild(fReplaceView);
 	fHandler= _handler;
 	
 	const char *searchtext= searchString->String();
