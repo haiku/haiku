@@ -6,7 +6,7 @@
 #include <ColorUtils.h>
 #include "PNGDump.h"
 
-//#define DEBUG_PNGDUMP
+#define DEBUG_PNGDUMP
 
 void SaveToPNG(const char *filename, const BRect &bounds, color_space space, 
 	const void *bits, const int32 &bitslength, const int32 bytesperrow)
@@ -64,7 +64,9 @@ printf("Couldn't set jump\n");
 	
 	png_set_compression_level(png_ptr,Z_NO_COMPRESSION);
 	
-   	png_set_IHDR(png_ptr, info_ptr, bounds.IntegerWidth(), bounds.IntegerHeight(), 8, PNG_COLOR_TYPE_RGB,
+	png_set_bgr(png_ptr);
+	
+   	png_set_IHDR(png_ptr, info_ptr, bounds.IntegerWidth(), bounds.IntegerHeight(), 8, PNG_COLOR_TYPE_RGB_ALPHA,
 	PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_BASE, PNG_FILTER_TYPE_BASE);
 	
 	png_write_info(png_ptr, info_ptr);
