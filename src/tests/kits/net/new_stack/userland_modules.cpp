@@ -367,7 +367,7 @@ _EXPORT status_t close_module_list(void *cookie)
 	
 	free(mlc->search_paths);
 	free(mlc->prefix);
-	// free(mlc);
+	free(mlc);
 
 	return B_ERROR;
 }
