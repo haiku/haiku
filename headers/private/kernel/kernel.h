@@ -20,6 +20,12 @@
 #define IS_KERNEL_ADDRESS(x) \
 	((addr_t)(x) >= KERNEL_BASE && (addr_t)(x) <= KERNEL_TOP)
 
+//#define DEBUG_KERNEL_STACKS
+	// Note, debugging kernel stacks doesn't really work yet. Since the
+	// interrupt will also try to use the stack on a page fault, all
+	// you get is a reboot.
+	// At least, you then know that the stack overflows in this case :)
+
 /** Size of the kernel stack */
 #ifndef DEBUG_KERNEL_STACKS
 #	define KERNEL_STACK_SIZE		(B_PAGE_SIZE * 2)	// 8 kB
@@ -45,5 +51,9 @@
 #define SET_BIT(a, b) ((a) | (1 << (b)))
 #define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
 
+#ifdef __cplusplus
+extern "C"
+#endif
+status_t shutdown(bool reboot);
 
 #endif	/* _KERNEL_KERNEL_H */
