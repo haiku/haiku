@@ -34,6 +34,15 @@
 #include "TokenHandler.h"
 
 class ServerBitmap;
+
+/*!
+	\class BitmapManager BitmapManager.h
+	\brief Handler for BBitmap allocation
+	
+	Whenever a ServerBitmap associated with a client-side BBitmap needs to be 
+	created or destroyed, the BitmapManager needs to handle it. It takes care of 
+	all memory management related to them.
+*/
 class BitmapManager
 {
 public:

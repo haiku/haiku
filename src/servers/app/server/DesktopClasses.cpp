@@ -143,8 +143,8 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 		_fbinfo.height=_driver->GetHeight();
 		_fbinfo.display_width=_driver->GetWidth();
 		_fbinfo.display_height=_driver->GetHeight();
-		_fbinfo.display_x=0;
-		_fbinfo.display_y=0;
+		_fbinfo.display_x=_driver->GetWidth();;
+		_fbinfo.display_y=_driver->GetHeight();
 		
 		// right now, we won't do anything with the gcinfo structure. ** LAZY PROGRAMMER ALERT ** :P
 

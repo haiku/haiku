@@ -72,7 +72,7 @@ VDView::VDView(BRect bounds)
 	serverlink=new PortLink(find_port(SERVER_INPUT_PORT));
 
 	// Create a cursor which isn't just a box
-	cursor=new BBitmap(BRect(0,0,20,20),B_CMAP8,true);
+	cursor=new BBitmap(BRect(0,0,20,20),B_RGBA32,true);
 	BView *v=new BView(cursor->Bounds(),"v", B_FOLLOW_NONE, B_WILL_DRAW);
 	hide_cursor=0;
 
@@ -335,6 +335,7 @@ ViewDriver::ViewDriver(void)
 	_SetHeight(480);
 	_SetDepth(8);
 	_SetMode(B_8_BIT_640x480);
+	_SetBytesPerRow(framebuffer->BytesPerRow());
 }
 
 ViewDriver::~ViewDriver(void)

@@ -43,6 +43,8 @@
 #include <String.h>
 #include <math.h>
 
+extern RGBColor workspace_default_color;	// defined in AppServer.cpp
+
 //TODO: Remove the need for these
 int64 solidhigh64=0xFFFFFFFFLL;
 int8 *solidhigh=(int8*)solidhigh64;
@@ -380,11 +382,14 @@ ScreenDriver::ScreenDriver(void) : DisplayDriver()
 	status_t st;
 	fbuffer=new FrameBuffer("OBAppServer",B_8_BIT_640x480,&st,true);
 
-	drawmode = B_OP_COPY;
-
 	cursor=NULL;
 	under_cursor=NULL;
 	cursorframe.Set(0,0,0,0);
+	_SetMode(B_8_BIT_640x480);
+	_SetWidth(640);
+	_SetHeight(480);
+	_SetDepth(8);
+	_SetBytesPerRow(fbuffer->FrameBufferInfo()->bytes_per_row);
 }
 
 ScreenDriver::~ScreenDriver(void)
@@ -401,6 +406,20 @@ bool ScreenDriver::Initialize(void)
 
 	// wait 1 sec for the window to show...
 	snooze(500000);
+
+	if(fbuffer->IsConnected())
+	{
+		graphics_card_info *info=fbuffer->CardInfo();
+		fbuffer->gcinfo=*info;
+		
+		// clear the frame buffer. Otherwise, we'll have garbage in it
+		LayerData d;
+		d.highcolor=workspace_default_color;
+		for(int32 i=0; i<info->height; i++)
+		{
+			Line(BPoint(0,i),BPoint(info->width-1,i),&d,solidhigh);
+		}
+	}
 
 	// we start out without a cursor shown because otherwise we get glitches in the
 	// upper left corner. init_desktop *always* sets a cursor, so this shouldn't be a problem
@@ -808,11 +827,17 @@ void ScreenDriver::SetMode(int32 space)
 		
 		// clear the frame buffer. Otherwise, we'll have garbage in it
 		LayerData d;
-		d.highcolor.SetColor(80,85,152);
+		d.highcolor=workspace_default_color;
 		for(int32 i=0; i<info->height; i++)
 		{
 			Line(BPoint(0,i),BPoint(info->width-1,i),&d,solidhigh);
 		}
+		_SetMode(space);
+		frame_buffer_info fbi=*fbuffer->FrameBufferInfo();
+		_SetBytesPerRow(fbi.bytes_per_row);
+		_SetWidth(fbi.display_width);
+		_SetHeight(fbi.display_height);
+		_SetDepth(fbi.bits_per_pixel);
 	}
 	_Unlock();
 }

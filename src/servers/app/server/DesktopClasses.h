@@ -37,6 +37,13 @@ class DisplayDriver;
 class ServerWindow;
 class RGBColor;
 
+/*!
+	\class Workspace DesktopClasses.h
+	\brief Object used to handle all things Workspace related.
+	
+	Doesn't actually do a whole lot except to couple some associated data with a 
+	RootLayer.
+*/
 class Workspace
 {
 public:
@@ -54,6 +61,13 @@ protected:
 	frame_buffer_info _fbinfo;
 };
 
+/*!
+	\class Screen DesktopClasses.h
+	\brief Handles each DisplayDriver/video card pair and associated management.
+	
+	There is only one per monitor. Manages all workspaces displayed on that 
+	particular monitor and also Window-Desktop management for all workspaces therein.
+*/
 class Screen
 {
 public:

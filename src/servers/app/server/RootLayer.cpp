@@ -28,6 +28,8 @@
 #include <View.h>
 #include "RootLayer.h"
 #include "Desktop.h"
+#include "PatternHandler.h" // for pattern_union
+
 
 /*!
 	\brief Sets up internal variables needed by the RootLayer
@@ -67,12 +69,14 @@ void RootLayer::RequestDraw(void)
 {
 	if(!_is_dirty)
 		return;
+	pattern_union low;
+	low.type64=0LL;
 	
 	// Redraw the base
 	for(int32 i=0; _invalid->CountRects();i++)
 	{
 		if(_invalid->RectAt(i).IsValid())
-			_driver->FillRect(_invalid->RectAt(i),_layerdata, 0LL);
+			_driver->FillRect(_invalid->RectAt(i),_layerdata, (int8*)low.type8);
 		else
 			break;
 	}

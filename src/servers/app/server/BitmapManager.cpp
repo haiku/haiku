@@ -28,7 +28,7 @@
 #include "ServerBitmap.h"
 #include <stdio.h>
 
-// Define BGET function calls here because of C++ name mangling causes link problems
+//! BGET function calls - defined here because of C++ name mangling causing link problems
 typedef long bufsize;
 extern "C" void	bpool(void *buffer, bufsize len);
 extern "C" void *bget(bufsize size);
@@ -46,12 +46,16 @@ extern "C" void	bufdump(void *buf);
 extern "C" void	bpoold(void *pool, int dumpalloc, int dumpfree);
 extern "C" int	bpoolv(void *pool);
 
-// This is a call which makes BGET use a couple of home-grown functions which
-// manage the buffer via area functions
+/*!
+	\brief This is a call which makes BGET use a couple of home-grown functions which
+	manage the buffer via area functions
+*/
 extern "C" void set_area_buffer_management(void);
 
+//! Number of bytes to allocate to each area used for bitmap storage
 #define BITMAP_AREA_SIZE	B_PAGE_SIZE * 2
 
+//! Sets up stuff to be ready to allocate space for bitmaps
 BitmapManager::BitmapManager(void)
 {
 	bmplist=new BList(0);
@@ -73,6 +77,7 @@ BitmapManager::BitmapManager(void)
 	bpool(buffer,BITMAP_AREA_SIZE);
 }
 
+//! Deallocates everything associated with the manager
 BitmapManager::~BitmapManager(void)
 {
 	if(bmplist->CountItems()>0)
@@ -95,6 +100,15 @@ BitmapManager::~BitmapManager(void)
 	delete_sem(lock);
 }
 
+/*!
+	\brief Allocates a new ServerBitmap.
+	\param bounds Size of the bitmap
+	\param space Color space of the bitmap
+	\param flags Bitmap flags as defined in Bitmap.h
+	\param bytes_per_row Number of bytes per row.
+	\param screen Screen id of the screen associated with it. Unused.
+	\return A new ServerBitmap or NULL if unable to allocate one.
+*/
 ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int32 flags,
 	int32 bytes_per_row=-1, screen_id screen=B_MAIN_SCREEN_ID)
 {
@@ -117,6 +131,10 @@ ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int3
 	return bmp;
 }
 
+/*!
+	\brief Deletes a ServerBitmap.
+	\param bitmap The bitmap to delete
+*/
 void BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 {
 	acquire_sem(lock);

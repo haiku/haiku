@@ -31,6 +31,14 @@
 #include "DisplayDriver.h"
 #include "Layer.h"
 
+/*!
+	\class RootLayer RootLayer.h
+	\brief Class used for the top layer of each workspace's Layer tree
+	
+	RootLayers are used to head up the top of each Layer tree and reimplement certain 
+	Layer functions to act accordingly. There is only one for each workspace class.
+	
+*/
 class RootLayer : public Layer
 {
 public:

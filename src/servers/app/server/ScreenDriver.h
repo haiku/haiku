@@ -152,7 +152,6 @@ protected:
 	void SetThickPixel8(int x, int y, int thick, uint8 col);
 	FrameBuffer *fbuffer;
 	ServerCursor *cursor, *under_cursor;
-	int32 drawmode;
 	BRect cursorframe;
 };
 
