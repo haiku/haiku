@@ -37,8 +37,46 @@ BChannelControl::BChannelControl(BRect frame, const char *name, const char *labe
 
 
 BChannelControl::BChannelControl(BMessage *archive)
-	: BControl(archive)
+	: BControl(archive),
+	fChannelCount(0),
+	fCurrentChannel(0),
+	fChannelMin(NULL),
+	fChannelMax(NULL),
+	fChannelValues(NULL),
+	fMultiLabels(NULL),
+	fModificationMsg(NULL)
 {
+	archive->FindInt32("be:_m_channel_count", &fChannelCount);
+	archive->FindInt32("be:_m_value_channel", &fCurrentChannel);
+	
+	if (fChannelCount > 0) {
+		fChannelMin = new int32[fChannelCount];
+		memset(fChannelMin, 0, sizeof(int32) * fChannelCount);
+	
+		fChannelMax = new int32[fChannelCount];
+		memset(fChannelMax, 100, sizeof(int32) * fChannelCount);
+	
+		fChannelValues = new int32[fChannelCount];
+		memset(fChannelValues, 0, sizeof(int32) * fChannelCount);
+	
+		for (int32 c = 0; c < fChannelCount; c++) {
+			archive->FindInt32("be:_m_channel_min", c, &fChannelMin[c]);
+			archive->FindInt32("be:_m_channel_max", c, &fChannelMax[c]);
+			archive->FindInt32("be:_m_channel_val", c, &fChannelValues[c]);
+		}
+	}
+	
+	const char *label = NULL;
+	if (archive->FindString("be:_m_min_*label", &label) == B_OK)
+		fMinLabel = label;
+	if (archive->FindString("be:_m_max_label", &label) == B_OK)
+		fMaxLabel = label;
+	
+	BMessage *modificationMessage = new BMessage;
+	if (archive->FindMessage("_mod_msg", modificationMessage) == B_OK)
+		fModificationMsg = modificationMessage;
+	else
+		delete modificationMessage;
 	
 }
 
@@ -48,6 +86,7 @@ BChannelControl::~BChannelControl()
 	delete[] fChannelMin;
 	delete[] fChannelMax;
 	delete[] fChannelValues;
+	delete fModificationMsg;
 }
 
 
@@ -55,14 +94,14 @@ status_t
 BChannelControl::Archive(BMessage *message, bool deep) const
 {
 	status_t status = BControl::Archive(message, deep);
-	
-	status = message->AddInt32("be:_m_channel_count", fChannelCount);
 	if (status == B_OK)
-		message->AddInt32("be:_m_value_channel", fCurrentChannel);
+		status = message->AddInt32("be:_m_channel_count", fChannelCount);
 	if (status == B_OK)
-		message->AddString("be:_m_min_label", fMinLabel.String());
+		status = message->AddInt32("be:_m_value_channel", fCurrentChannel);
 	if (status == B_OK)
-		message->AddString("be:_m_max_label", fMaxLabel.String());
+		status = message->AddString("be:_m_min_label", fMinLabel.String());
+	if (status == B_OK)
+		status = message->AddString("be:_m_max_label", fMaxLabel.String());
 	 
 	if (status == B_OK && fChannelValues != NULL
 		&& fChannelMax != NULL && fChannelMin != NULL) {

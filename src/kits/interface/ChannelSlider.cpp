@@ -100,8 +100,6 @@ BChannelSlider::~BChannelSlider()
 	delete fLeftKnob;
 	delete fMidKnob;
 	delete fRightKnob;
-	delete fBacking;
-	delete fBackingView;
 	delete fInitialValues;
 }
 
@@ -373,8 +371,12 @@ BHandler *
 BChannelSlider::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
 								int32 form, const char *property)
 {
-	// TODO: Implement
-	return NULL;
+	BHandler *target = this;
+	BPropertyInfo propertyInfo(sPropertyInfo);
+	if (propertyInfo.FindMatch(msg, index, specifier, form, property) < B_OK)
+		target = BChannelControl::ResolveSpecifier(msg, index, specifier, form, property); 
+	
+	return target;
 }
 
 
