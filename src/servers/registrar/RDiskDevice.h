@@ -37,8 +37,7 @@ public:
 
 	int32 ID() const { return fID; }
 	int32 ChangeCounter() const { return fChangeCounter.Count(); }
-//	void Changed() { fChangeCounter.Increment(); }
-void Changed() { if (fChangeCounter.Increment()) PRINT(("RDiskDevice::Changed()\n")); }
+	void Changed() { fChangeCounter.Increment(); }
 
 	void SetTouched(bool touched) { fTouched = touched; }
 	bool Touched() const { return fTouched; }

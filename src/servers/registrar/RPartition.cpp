@@ -117,7 +117,6 @@ RPartition::Update(const extended_partition_info *partitionInfo)
 		|| strcmp(partitionInfo->file_system_long_name,
 				  fInfo.file_system_long_name)
 		|| strcmp(partitionInfo->volume_name, fInfo.volume_name)
-		|| partitionInfo->partition_code != fInfo.partition_code
 		|| partitionInfo->file_system_flags != fInfo.file_system_flags) {
 		fInfo = *partitionInfo;
 		PartitionChanged();
@@ -179,7 +178,6 @@ print_partition_info(const char *prefix, const extended_partition_info &info)
 	printf("%spartition ID:   %ld\n", prefix, info.info.partition);
 	printf("%sdevice:         `%s'\n", prefix, info.info.device);
 	printf("%sflags:          %lx\n", prefix, info.flags);
-	printf("%spartition code: 0x%lx\n", prefix, info.partition_code);
 	printf("%spartition name: `%s'\n", prefix, info.partition_name);
 	printf("%spartition type: `%s'\n", prefix, info.partition_type);
 	printf("%sFS short name:  `%s'\n", prefix, info.file_system_short_name);

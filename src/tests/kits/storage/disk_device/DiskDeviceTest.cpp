@@ -286,23 +286,18 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 	// MediaChanged
 	void MediaChanged(BMessage *message)
 	{
-bigtime_t time = system_time();
 		printf("TestApp::MediaChanged()\n");
 		PrintDeviceInfo(message);
-print_time("PrintDeviceInfo()", time);
 		int32 id;
 		if (message->FindInt32("device_id", &id) == B_OK) {
 			for (int32 i = 0; BDiskDevice *device = fDevices.ItemAt(i); i++) {
 				if (device->UniqueID() == id) {
 					bool updated;
-print_time("finding device", time);
 					status_t error = device->Update(&updated);
-print_time("updating device", time);
 					printf("updated: %d\n", updated);
 					if (error == B_OK) {
 						DumpVisitor visitor;
 						device->Traverse(&visitor);
-print_time("dumping device", time);
 					} else {
 						printf("device->Update() failed: %s\n",
 							   strerror(error));
@@ -366,19 +361,12 @@ print_time("dumping device", time);
 	// PrintDeviceInfo
 	void PrintDeviceInfo(BMessage *message)
 	{
-bigtime_t time = system_time();
 		int32 deviceID;
 		if (message->FindInt32("device_id", &deviceID) == B_OK) {
-print_time("finding device_id", time);
 			BDiskDeviceRoster roster;
-print_time("creating roster", time);
 			BDiskDevice device;
 			if (roster.GetDeviceWithID(deviceID, &device) == B_OK)
-{
-print_time("getting device", time);
 				DumpVisitor().Visit(&device);
-print_time("dumping device", time);
-}
 		}
 	}
 

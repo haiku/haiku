@@ -494,8 +494,6 @@ BDiskDeviceRoster::StopWatching(BMessenger target)
 	return error;
 }
 
-void print_time(const char *format, bigtime_t &time);
-
 // _GetObjectWithID
 /*!	\brief Returns a BDiskDevice for a given device, session or partition ID.
 
@@ -517,18 +515,15 @@ status_t
 BDiskDeviceRoster::_GetObjectWithID(const char *fieldName, int32 id,
 									BDiskDevice *device) const
 {
-bigtime_t time = system_time();
 	status_t error = (device ? B_OK : B_BAD_VALUE);
 	// compose request message
 	BMessage request(B_REG_GET_DISK_DEVICE);
 	if (error == B_OK)
 		error = request.AddInt32(fieldName, id);
-print_time("composing request message", time);
 	// send request
 	BMessage reply;
 	if (error == B_OK)
 		error = fManager.SendMessage(&request, &reply);
-print_time("sending request", time);
 	// analyze reply
 	if (error == B_OK) {
 		// result
@@ -540,10 +535,8 @@ print_time("sending request", time);
 		BMessage archive;
 		if (error == B_OK)
 			error = reply.FindMessage("device", &archive);
-print_time("extracting archived device", time);
 		if (error == B_OK)
 			error = device->_Unarchive(&archive);
-print_time("unarchiving device", time);
 	}
 	return error;
 }
