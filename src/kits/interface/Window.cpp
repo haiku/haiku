@@ -319,7 +319,7 @@ void BWindow::Quit(){
 	while (!IsHidden())	{ Hide(); }
 
 		// ... also its children
-	detachTopView();
+	//detachTopView();
 
 		// tell app_server, this window will finish execution
 	stopConnection();
@@ -1877,11 +1877,9 @@ void BWindow::InitData(	BRect frame,
 	
 	fFrame		= frame;
 
-/*	if (title)
+	if (title)
 		SetTitle( title );
-	else
-		SetTitle( "no_name_window" );
-*/
+
 	fFeel			= feel;
 	fLook			= look;
 	fFlags			= flags;
@@ -1953,7 +1951,10 @@ void BWindow::InitData(	BRect frame,
 
 		// HERE we are in BApplication's thread, so for locking we use be_app variable
 		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
-//	be_app->Lock();
+	bool	locked = false;
+	if ( !(be_app->IsLocked()) && !locked)
+		{ be_app->Lock(); locked = true; }
+		
 	session->WriteInt32( AS_CREATE_WINDOW );
 	session->WriteRect( fFrame );
 	session->WriteInt32( (int32)fLook );
@@ -1966,18 +1967,19 @@ void BWindow::InitData(	BRect frame,
 	session->Sync();
 		// The port on witch app_server will listen for us	
 	session->ReadData( &send_port, sizeof(port_id) );
+	
 		// unlock, so other threads can do their job.
-//	be_app->Unlock();
+	if( locked )
+		be_app->Unlock();
 
 	session->SetSendPort(send_port);
 	#ifdef DEBUG_WIN
 		printf("BWindow::InitData(): app_server link established - port_id received\n");
+		PrintToStream();
 	#endif
 
-		// Create and attach the top view
-//	top_view			= buildTopView();
-		// Here we will register the top view with app_server
-//	attachTopView( );
+		// build and register top_view with app_server
+	BuildTopView();
 }
 
 //------------------------------------------------------------------------------
@@ -2208,55 +2210,26 @@ void BWindow::decomposeType(window_type type,
 
 //------------------------------------------------------------------------------
 
-BView* BWindow::buildTopView(){
-	BView			*topView;
+void BWindow::BuildTopView(){
 
-	topView					= new BView( fFrame.OffsetToCopy(0,0), "top_view",
-										 B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->owner			= this;
-	topView->top_level_view	= true;
+	top_view		= new BView( fFrame.OffsetToCopy(0,0), "top_view",
+								 B_FOLLOW_ALL, B_WILL_DRAW);
+	top_view->top_level_view	= true;
+	top_view->fShowLevel		= 1;
 
-/* Note:
-		I don't think adding top_view to BLooper's list
-		of eligible handlers is a good idea!
-*/
+		// set top_view's owner, add it to window's eligible handler list
+		// and also set its next handler to be this window.
+	top_view->setOwner( this );	
 
-	return topView;
-}
-
-//------------------------------------------------------------------------------
-
-void BWindow::attachTopView(){
-
-// TODO: implement after you have a messaging protocol with app_server
-
-	Lock();
+		// send top_view's information to app_server
 	session->WriteInt32( AS_LAYER_CREATE_ROOT );
-	session->WriteInt32( _get_object_token_( top_view ) ); // no need for that!
-/*	session->Attach( top_view->Name() );
-	session->Attach( fCachedBounds.OffsetToCopy( origin_h, origin_v ) );
-	session->Attach( ...ResizeMode... );
-	session->Attach( top_view->fFlags );
-	session->Attach( top_view->fShowLevel );
-*/
+	session->WriteInt32( _get_object_token_( top_view ) );
+	session->WriteRect( top_view->Frame() );
+	session->WriteInt32( top_view->ResizingMode() );
+	session->WriteInt32( top_view->Flags() );
+	session->WriteString( top_view->Name() );
+		// we DO NOT send our current state; the server knows the default values!
 	session->Sync();
-	Unlock();
-
-}
-
-//------------------------------------------------------------------------------
-
-void BWindow::detachTopView(){
-
-// TODO: detach all views
-
-	Lock();
-	session->WriteInt32( AS_LAYER_DELETE_ROOT );
-	session->WriteInt32( _get_object_token_( top_view ) ); // no need for that!
-	session->Sync();
-	Unlock();
-
-	delete top_view;
 }
 
 //------------------------------------------------------------------------------
@@ -3299,6 +3272,84 @@ void BWindow::_ReservedWindow7() { }
 //------------------------------------------------------------------------------
 void BWindow::_ReservedWindow8() { }
 
+void BWindow::PrintToStream() const{
+	printf("BWindow '%s' data:
+		Title			= %s
+		InTransaction 	= %s
+		Active 			= %s
+		fShowLevel		= %d
+		Flags			= %lx
+		send_port		= %ld
+		receive_port	= %ld
+		top_view name	= %s
+		focus view name	= %s
+		lastMouseMoved	= %s
+		session			= %s
+		KeyMenuBar name	= %s
+		DefaultButton	= %s
+		# of shortcuts	= %ld",
+		Name(),
+		fTitle!=NULL? fTitle:"NULL",
+		fInTransaction==true? "yes":"no",
+		fActive==true? "yes":"no",
+		fShowLevel,
+		fFlags,
+		send_port,
+		receive_port,
+		top_view!=NULL? top_view->Name():"NULL",
+		fFocus!=NULL? fFocus->Name():"NULL",
+		fLastMouseMovedView!=NULL? fLastMouseMovedView->Name():"NULL",
+		session!=NULL? "In place":"NULL",
+		fKeyMenuBar!=NULL? fKeyMenuBar->Name():"NULL",
+		fDefaultButton!=NULL? fDefaultButton->Name():"NULL",
+		accelList.CountItems());
+/*
+	for( int32 i=0; i<accelList.CountItems(); i++){
+		_BCmdKey	*key = (_BCmdKey*)accelList.ItemAt(i);
+		printf("\tShortCut %ld: char %s\n\t\t message: \n", i, (key->key > 127)?"ASCII":"UNICODE");
+		key->message->PrintToStream();
+	}
+*/	
+	printf("
+		topViewToken	= %ld
+		pluseEnabled	= %s
+		isFilePanel		= %s
+		MaskActivated	= %s
+		pulseRate		= %lld
+		waitingForMenu	= %s
+		minimized		= %s
+		Menu semaphore	= %ld
+		maxZoomHeight	= %f
+		maxZoomWidth	= %f
+		minWindHeight	= %f
+		minWindWidth	= %f
+		maxWindHeight	= %f
+		maxWindWidth	= %f
+		frame			= ( %f, %f, %f, %f )
+		look			= %d
+		feel			= %d
+		lastViewToken	= %ld
+		pulseRUNNER		= %s\n",
+		fTopViewToken,
+		fPulseEnabled==true?"Yes":"No",
+		fIsFilePanel==true?"Yes":"No",
+		fMaskActivated==true?"Yes":"No",
+		fPulseRate,
+		fWaitingForMenu==true?"Yes":"No",
+		fMinimized==true?"Yes":"No",
+		fMenuSem,
+		fMaxZoomHeight,
+		fMaxZoomWidth,
+		fMinWindHeight,
+		fMinWindWidth,
+		fMaxWindHeight,
+		fMaxWindWidth,
+		fFrame.left, fFrame.top, fFrame.right, fFrame.bottom, 
+		(int16)fLook,
+		(int16)fFeel,
+		fLastViewToken,
+		fPulseRunner!=NULL?"In place":"NULL");
+}
 
 /*
 TODO list:
