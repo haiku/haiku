@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -20,9 +23,8 @@
 #include "builtin_fs.h"
 
 
-#define ROOTFS_TRACE 0
-
-#if ROOTFS_TRACE
+//#define TRACE_ROOTFS
+#ifdef TRACE_ROOTFS
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x)
@@ -441,7 +443,7 @@ rootfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 static status_t
 rootfs_put_vnode(fs_volume _fs, fs_vnode _vnode, bool reenter)
 {
-#if ROOTFS_TRACE
+#ifdef TRACE_ROOTFS
 	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
 
 	TRACE(("rootfs_putvnode: entry on vnode 0x%Lx, r %d\n", vnode->id, reenter));
@@ -497,7 +499,7 @@ rootfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 static status_t
 rootfs_close(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
-#if ROOTFS_TRACE
+#ifdef TRACE_ROOTFS
 	struct rootfs_vnode *v = _v;
 	struct rootfs_cookie *cookie = _cookie;
 
@@ -511,7 +513,7 @@ static status_t
 rootfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 {
 	struct rootfs_cookie *cookie = _cookie;
-#if ROOTFS_TRACE
+#ifdef TRACE_ROOTFS
 	struct rootfs_vnode *v = _v;
 
 	TRACE(("rootfs_freecookie: entry vnode %p, cookie %p\n", v, cookie));
@@ -554,7 +556,8 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 	struct rootfs_vnode *vnode;
 	status_t status = 0;
 
-	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n", dir, name, perms,*new_vnid, new_vnid));
+	TRACE(("rootfs_create_dir: dir %p, name = '%s', perms = %d, id = 0x%Lx pointer id = %p\n",
+		dir, name, perms,*_newID, _newID));
 
 	mutex_lock(&fs->lock);
 
@@ -564,7 +567,7 @@ rootfs_create_dir(fs_volume _fs, fs_vnode _dir, const char *name, int perms, vno
 		goto err;
 	}
 
-	dprintf("rootfs_create: creating new vnode\n");
+	TRACE(("rootfs_create: creating new vnode\n"));
 	vnode = rootfs_create_vnode(fs, name, STREAM_TYPE_DIR);
 	if (vnode == NULL) {
 		status = B_NO_MEMORY;
@@ -752,7 +755,7 @@ rootfs_symlink(fs_volume _fs, fs_vnode _dir, const char *name, const char *path,
 		goto err;
 	}
 
-	dprintf("rootfs_create: creating new symlink\n");
+	TRACE(("rootfs_create: creating new symlink\n"));
 	vnode = rootfs_create_vnode(fs, name, STREAM_TYPE_SYMLINK);
 	if (vnode == NULL) {
 		status = B_NO_MEMORY;
@@ -888,8 +891,7 @@ rootfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 static status_t
 rootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
-#if ROOTFS_TRACE
-	struct rootfs *fs = _fs;
+#ifdef TRACE_ROOTFS
 	struct rootfs_vnode *v = _v;
 
 	TRACE(("rootfs_wstat: vnode %p (0x%Lx), stat %p\n", v, v->id, stat));
@@ -960,7 +962,7 @@ static struct fs_ops rootfs_ops = {
 status_t
 bootstrap_rootfs(void)
 {
-	dprintf("bootstrap_rootfs: entry\n");
+	TRACE(("bootstrap_rootfs: entry\n"));
 
-	return vfs_register_filesystem("rootfs", &rootfs_ops);
+	return vfs_register_file_system("rootfs", &rootfs_ops);
 }
