@@ -25,6 +25,7 @@ KernelLd boot_loader :
 	<$(SOURCE_GRIST)!libroot!posix!string>strcat.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strcpy.o
 	<$(SOURCE_GRIST)!libroot!posix!string>strlcpy.o
+	<$(SOURCE_GRIST)!libroot!posix!string>strrchr.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>qsort.o
 	: $(SUBDIR)/ldscripts/$(OBOS_ARCH)/boot_loader.ld 
 	: -Bstatic
@@ -311,7 +312,7 @@ KernelLd fortune :
 	beos/bin/fortune
 	;
 
-KernelConfigSection etc/fortunes : data : $(SUBDIR)/apps/fortune/fortunes ;
+KernelConfigSection beos/etc/fortunes : data : $(SUBDIR)/apps/fortune/fortunes ;
 
 KernelLd kernel_ls :
 	libglue2.o
