@@ -3,33 +3,31 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
+#include <KernelExport.h>
+#include <Drivers.h>
+#include <device_manager.h>
+#include <pnp_devfs.h>
+
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
 #include <malloc.h>
 #include <lock.h>
 #include <vm.h>
-#include <Errors.h>
-#include <Drivers.h>
-#include <sys/stat.h>
-#include <KernelExport.h>
 
 #include <arch/cpu.h>
 #include <devfs.h>
 
 #include <string.h>
 #include <stdio.h>
+#include <sys/stat.h>
 
 
-#define DEVFS_TRACE 0
-
-#if DEVFS_TRACE
+//#define TRACE_DEVFS
+#ifdef TRACE_DEVFS
 #	define TRACE(x) dprintf x
-#	define INSANE(x) dprintf x
 #else
 #	define TRACE(x)
-#	define INSANE(x)
 #endif
 
 typedef enum {
@@ -101,6 +99,9 @@ struct devfs_cookie {
 
 /* the one and only allowed devfs instance */
 static struct devfs *gDeviceFileSystem = NULL;
+
+static status_t pnp_devfs_open(void *_device, uint32 flags, void **_deviceCookie);
+
 
 #define BOOTFS_HASH_SIZE 16
 
@@ -230,9 +231,9 @@ devfs_find_in_dir(struct devfs_vnode *dir, const char *path)
 		return dir->parent;
 
 	for (v = dir->stream.u.dir.dir_head; v; v = v->dir_next) {
-		INSANE(("devfs_find_in_dir: looking at entry '%s'\n", v->name));
+		TRACE(("devfs_find_in_dir: looking at entry '%s'\n", v->name));
 		if (strcmp(v->name, path) == 0) {
-			INSANE(("devfs_find_in_dir: found it at %p\n", v));
+			TRACE(("devfs_find_in_dir: found it at %p\n", v));
 			return v;
 		}
 	}
@@ -587,7 +588,7 @@ devfs_get_vnode(fs_volume _fs, vnode_id id, fs_vnode *_vnode, bool reenter)
 static status_t
 devfs_put_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 {
-#if DEVFS_TRACE
+#ifdef TRACE_DEVFS
 	struct devfs_vnode *vnode = (struct devfs_vnode *)_v;
 
 	TRACE(("devfs_put_vnode: entry on vnode %p, id = %Ld, reenter %d\n", vnode, vnode->id, reenter));
@@ -645,7 +646,12 @@ devfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 	if (vnode->stream.type != STREAM_TYPE_DEVICE)
 		return EINVAL;
 
-	status = vnode->stream.u.dev.ops->open(vnode->name, oflags, &cookie->u.dev.dcookie);
+	// ToDo: gross hack!
+	if (vnode->stream.u.dev.ident != NULL)
+		status = pnp_devfs_open(vnode->stream.u.dev.ident, oflags, &cookie->u.dev.dcookie);
+	else
+		status = vnode->stream.u.dev.ops->open(vnode->name, oflags, &cookie->u.dev.dcookie);
+
 	*_cookie = cookie;
 
 	return status;
@@ -719,7 +725,7 @@ devfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buffe
 		if (pos > part_map->size)
 			return 0;
 
-		*length = min(*length, part_map->size - pos );
+		*length = min(*length, part_map->size - pos);
 		pos += part_map->offset;
 	}
 
@@ -1018,7 +1024,7 @@ devfs_read_stat(fs_volume _fs, fs_vnode _v, struct stat *stat)
 static status_t
 devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
-#if DEVFS_TRACE
+#ifdef TRACE_DEVFS
 	struct devfs_vnode *v = _v;
 
 	TRACE(("devfs_wstat: vnode %p (%Ld), stat %p\n", v, v->id, stat));
@@ -1026,9 +1032,6 @@ devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_m
 	// cannot change anything
 	return EPERM;
 }
-
-
-//	#pragma mark -
 
 
 static struct fs_ops devfs_ops = {
@@ -1086,10 +1089,226 @@ static struct fs_ops devfs_ops = {
 };
 
 
+//	#pragma mark -
+//	temporary hack to get it to work with the current device manager
+
+
+// info about one device
+typedef struct device_info {
+	struct device_info	*next, *prev;
+	
+	char 				*name;				// device name
+	pnp_devfs_driver_info *interface;		// interface of pnp driver
+	device_hooks		devfs_hooks;		// hooks passed to devfs
+	void				*cookie;			// pnp driver cookie for device
+	uint32				ref_count;			// number of open file handles + 1 if device
+											// is not a zombie
+	uint32				load_count;			// number of (virtual) load_driver calls
+	pnp_node_handle		parent;				// underlying node of driver
+	benaphore			load_lock;			// lock for load/unload calls
+} device_info;
+
+
+static device_manager_info *pnp;
+
+
+static status_t
+pnp_devfs_open(void *_device, uint32 flags, void **_deviceCookie)
+{
+	device_info *device = (device_info *)_device;
+	void *cookie;
+	status_t res;
+
+	TRACE(("pnp_devfs_open()\n"));
+
+	res = device->interface->open(device->cookie, flags, &cookie);
+	if (res != B_OK)
+		return res;
+
+	*_deviceCookie = cookie;
+	return B_OK;
+}
+
+
+static const pnp_node_attr pnp_devfs_attrs[] =
+{
+	{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
+	{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "devfs_device_notifier" }},
+	{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "devfs" }},
+	{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "devfs" }},
+	{ NULL }
+};
+
+
+/** someone registered a device */
+
+static status_t
+pnp_devfs_probe(pnp_node_handle parent)
+{
+	char *str = NULL, *filename = NULL;
+	device_info *device;
+	pnp_node_handle node;
+	status_t res;
+
+	TRACE(("pnp_devfs_probe()\n"));
+
+	// make sure we can handle this parent
+	if (pnp->get_attr_string(parent, PNP_DRIVER_TYPE, &str, false) != B_OK
+		|| strcmp(str, PNP_DEVFS_TYPE_NAME) != 0) {
+		res = B_ERROR;
+		goto err0;
+	}
+
+	if (pnp->get_attr_string(parent, PNP_DEVFS_FILENAME, &filename, true) != B_OK) {
+		dprintf("Item containing file name is missing\n");
+		res = B_ERROR;
+		goto err0;
+	}
+
+	TRACE(("Adding %s\n", filename));
+
+	device = malloc(sizeof(*device));
+	if (device == NULL)
+		return B_NO_MEMORY;
+
+	memset(device, 0, sizeof(*device));
+
+	device->name = strdup(filename);
+	if (device->name == NULL) {
+		res = B_NO_MEMORY;
+		goto err;
+	}
+
+	device->parent = parent;
+	device->ref_count = 1;
+	device->load_count = 0;
+
+	res = pnp->load_driver(parent, NULL, 
+			(pnp_driver_info **)&device->interface, 
+			&device->cookie);
+	if (res != B_OK)
+		goto err2;
+
+	res = pnp->register_device(parent, pnp_devfs_attrs, NULL, &node);
+	if (res != B_OK || node == NULL)
+		goto err3;
+
+	//add_device(device);
+	devfs_publish_device(device->name, device, (device_hooks *)(((struct pnp_driver_info *)(device->interface)) + 1));
+	//nudge();
+
+	return B_OK;
+
+err3:
+	pnp->unload_driver(parent);
+err2:
+	free(device->name);
+err:
+	free(device);
+err0:
+	free(str);
+	free(filename);
+
+	return res;
+}
+
+
+#if 0
+// remove device from public list and add it to unpublish list
+// (devices_lock must be hold)
+static void
+pnp_devfs_remove_device(device_info *device)
+{
+	TRACE(("removing device %s from public list\n", device->name));
+
+	--num_devices;	
+	REMOVE_DL_LIST( device, devices, );
+	
+	++num_unpublished_devices;
+	ADD_DL_LIST_HEAD( device, devices_to_unpublish, );
+	
+	// (don't free it even if no handle is open - the device
+	//  info block contains the hook list which may just got passed
+	//  to the devfs layer; we better wait until next 
+	//  publish_devices, so we are sure that devfs won't access 
+	//  the hook list anymore)
+}
+#endif
+
+
+// device got removed
+static void
+pnp_devfs_device_removed(pnp_node_handle node, void *cookie)
+{
+#if 0
+	device_info *device;
+	pnp_node_handle parent;
+	status_t res = B_OK;
+#endif
+	TRACE(("pnp_devfs_device_removed()\n"));
+#if 0
+	parent = pnp->get_parent(node);
+	
+	// don't use cookie - we don't use pnp loading scheme but
+	// global data and keep care of everything ourself!
+	ACQUIRE_BEN( &device_list_lock );
+	
+	for( device = devices; device; device = device->next ) {
+		if( device->parent == parent ) 
+			break;
+	}
+	
+	if( device != NULL ) {
+		pnp_devfs_remove_device( device );
+	} else {
+		SHOW_ERROR( 0, "bug: node %p couldn't been found", node );
+		res = B_NAME_NOT_FOUND;
+	}
+		
+	RELEASE_BEN( &device_list_lock );
+	
+	//nudge();
+#endif
+}
+
+
+static status_t
+std_ops(int32 op, ...)
+{
+	switch (op) {
+		case B_MODULE_INIT:
+			return get_module(DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp);
+
+		case B_MODULE_UNINIT:
+			put_module(DEVICE_MANAGER_MODULE_NAME);
+			return B_OK;
+
+		default:
+			return B_ERROR;
+	}
+}
+
+
+pnp_driver_info gDeviceForDriversModule = {
+	{
+		PNP_DEVFS_MODULE_NAME,
+		0 /*B_KEEP_LOADED*/,
+		std_ops
+	},
+
+	NULL,
+	NULL,
+	pnp_devfs_probe,
+	pnp_devfs_device_removed
+};
+
+
+//	#pragma mark -
+
+
 status_t
 bootstrap_devfs(void)
 {
-
 	TRACE(("bootstrap_devfs: entry\n"));
 
 	return vfs_register_file_system("devfs", &devfs_ops);
@@ -1110,8 +1329,12 @@ devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 
 	if (ops == NULL || path == NULL) {
 		panic("devfs_publish_device called with NULL pointer!\n");
-		return EINVAL;
+		return B_BAD_VALUE;
 	}
+
+	if (ops->open == NULL || ops->close == NULL
+		|| ops->read == NULL || ops->write == NULL)
+		return B_BAD_VALUE;
 
 	if (!gDeviceFileSystem) {
 		panic("devfs_publish_device called before devfs mounted\n");
