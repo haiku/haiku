@@ -4,6 +4,18 @@ UsePrivateHeaders shared ;
 
 AddResources DiskProbe : DiskProbe.rdef ;
 
+# set some additional defines for R5 compatibility
+{
+	local defines = ;
+
+	if $(COMPILE_FOR_R5) {
+		defines += COMPILE_FOR_R5 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+}
+
 App DiskProbe :
 	DiskProbe.cpp
 	DataEditor.cpp

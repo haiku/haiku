@@ -301,8 +301,15 @@ PositionSlider::DrawBar()
 	frame.top++;
 	frame.left++;
 	frame.right = ThumbFrame().left + ThumbFrame().Width() / 2;
+#ifdef COMPILE_FOR_R5
+	if (IsEnabled())
+		view->SetHighColor(102, 152, 203);
+	else
+		view->SetHighColor(92, 102, 160);
+#else
 	view->SetHighColor(IsEnabled() ? ui_color(B_CONTROL_HIGHLIGHT_COLOR)
 		: tint_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR), B_DARKEN_1_TINT));
+#endif
 	view->FillRect(frame);
 
 	frame.left = frame.right + 1;
@@ -312,8 +319,13 @@ PositionSlider::DrawBar()
 
 	rgb_color cornerColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 	rgb_color darkColor = tint_color(ViewColor(), B_DARKEN_3_TINT);
+#ifdef COMPILE_FOR_R5
+	rgb_color shineColor = {255, 255, 255};
+	rgb_color shadowColor = {0, 0, 0};
+#else
 	rgb_color shineColor = ui_color(B_SHINE_COLOR);
 	rgb_color shadowColor = ui_color(B_SHADOW_COLOR);
+#endif
 	if (!IsEnabled()) {
 		darkColor = tint_color(ViewColor(), B_DARKEN_1_TINT);
 		shineColor = tint_color(shineColor, B_DARKEN_2_TINT);
@@ -577,7 +589,11 @@ HeaderView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
 
+#ifdef COMPILE_FOR_R5
+	SetHighColor(255, 255, 255);
+#else
 	SetHighColor(ui_color(B_SHINE_COLOR));
+#endif
 	StrokeLine(rect.LeftTop(), rect.LeftBottom());
 	StrokeLine(rect.LeftTop(), rect.RightTop());
 
