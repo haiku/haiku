@@ -1080,22 +1080,17 @@ LM_STATUS
 b44_LM_ServiceInterrupts(PLM_DEVICE_BLOCK pDevice)
 {
 	LM_UINT32 intstatus, intmask;
-	LM_UINT32 count = 0;
-	
+
 	while (1) {
 		intstatus = REG_RD(pDevice, intstatus);
 		intmask = REG_RD(pDevice, intmask);
-		count++;
-		
+
 		/* defer unsolicited interrupts */
 		intstatus &= intmask;
 
 		/* if not for us */
 		if (intstatus == 0)
-			if (count > 0)
-				return LM_STATUS_SUCCESS;
-			else
-				return 12;
+			return LM_STATUS_SUCCESS;
 
 		/* clear the interrupt */
 		REG_WR(pDevice, intstatus, intstatus);

@@ -3,11 +3,11 @@
 #include <KernelExport.h>
 #include <malloc.h>
 #include <string.h>
-#include <ether_driver.h>
 
 #include "b44mm.h"
 #include "b44lm.h"
 #include "mempool.h"
+#include "ether_driver.h"
 
 struct pci_module_info *pci = NULL;
 
@@ -226,7 +226,9 @@ status_t b44_read(void *cookie,off_t pos,void *data,size_t *numBytes) {
 	
 	if (pUmDevice->block)
 		acquire_sem(pUmDevice->packet_release_sem);
-	
+	else
+		acquire_sem_etc(pUmDevice->packet_release_sem,1,B_RELATIVE_TIMEOUT,0); // Decrement the receive sem anyway, but don't block
+		
 	cpu = disable_interrupts();
 	acquire_spinlock(&pUmDevice->lock);
 	
@@ -238,7 +240,7 @@ status_t b44_read(void *cookie,off_t pos,void *data,size_t *numBytes) {
 	
 	if (pPacket == 0)
 		return B_ERROR;
-		
+	
 	pUmPacket = (struct B_UM_PACKET *) pPacket;
 	if ((pPacket->PacketStatus != LM_STATUS_SUCCESS) ||
 		((pPacket->PacketSize) > 1518)) {
