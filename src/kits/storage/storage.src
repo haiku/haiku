@@ -40,6 +40,7 @@ STORAGE_KIT_SOURCE =
 	database_support.cpp
 
 	# storage/sniffer
+	CharStream.cpp
 	Err.cpp				
 	DisjList.cpp		
 	Pattern.cpp			
