@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src apps bin zic ;
+
+SubDirCcFlags -DNOID ;
+
+UsePrivateHeaders [ FDirName libroot time ] ;
+
+BinCommand zic :
+	zic.c
+	scheck.c
+	ialloc.c
+;
+
+BinCommand zdump :
+	zdump.c 
+	ialloc.c
+;
