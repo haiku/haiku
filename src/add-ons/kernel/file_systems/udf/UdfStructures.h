@@ -1283,6 +1283,8 @@ private:
 */
 struct logical_volume_integrity_descriptor {
 public:
+	static const uint32 minimum_implementation_use_length = 46;
+
 	void dump() const; 
 
 	descriptor_tag& tag() { return _tag; }
@@ -1299,20 +1301,24 @@ public:
 	array<uint8, 32>& logical_volume_contents_use() { return _logical_volume_contents_use; }
 	const array<uint8, 32>& logical_volume_contents_use() const { return _logical_volume_contents_use; }
 	
+	// next_unique_id() field is actually stored in the logical_volume_contents_use()
+	// field, per UDF-2.50 3.2.1
+	uint64 next_unique_id() const { return B_LENDIAN_TO_HOST_INT64(_next_unique_id()); }
+	
 	uint32 partition_count() const { return B_LENDIAN_TO_HOST_INT32(_partition_count); }
 	uint32 implementation_use_length() const { return B_LENDIAN_TO_HOST_INT32(_implementation_use_length); }
 
 	/*! \todo double-check the pointer arithmetic here. */
-	uint32* free_space_table() { return reinterpret_cast<uint32*>(this+80); }
-	const uint32* free_space_table() const { return reinterpret_cast<const uint32*>(this+80); }
-	uint32* size_table() { return reinterpret_cast<uint32*>(free_space_table()+partition_count()*sizeof(uint32)); }
-	const uint32* size_table() const { return reinterpret_cast<const uint32*>(free_space_table()+partition_count()*sizeof(uint32)); }
-	uint8* implementation_use() { return reinterpret_cast<uint8*>(size_table()+partition_count()*sizeof(uint32)); }	
-	const uint8* implementation_use() const { return reinterpret_cast<const uint8*>(size_table()+partition_count()*sizeof(uint32)); }	
+	uint32* free_space_table() { return reinterpret_cast<uint32*>(reinterpret_cast<uint8*>(this)+80); }
+	const uint32* free_space_table() const { return reinterpret_cast<const uint32*>(reinterpret_cast<const uint8*>(this)+80); }
+	uint32* size_table() { return reinterpret_cast<uint32*>(reinterpret_cast<uint8*>(free_space_table())+partition_count()*sizeof(uint32)); }
+	const uint32* size_table() const { return reinterpret_cast<const uint32*>(reinterpret_cast<const uint8*>(free_space_table())+partition_count()*sizeof(uint32)); }
+	uint8* implementation_use() { return reinterpret_cast<uint8*>(reinterpret_cast<uint8*>(size_table())+partition_count()*sizeof(uint32)); }	
+	const uint8* implementation_use() const { return reinterpret_cast<const uint8*>(reinterpret_cast<const uint8*>(size_table())+partition_count()*sizeof(uint32)); }	
 
 	// accessors for fields stored in implementation_use() field per UDF-2.50 2.2.6.4
-	entity_id& id() { return _accessor().id; }
-	const entity_id& id() const { return _accessor().id; }
+	entity_id& implementation_id() { return _accessor().id; }
+	const entity_id& implementation_id() const { return _accessor().id; }
 	uint32 file_count() const { return B_LENDIAN_TO_HOST_INT32(_accessor().file_count); }
 	uint32 directory_count() const { return B_LENDIAN_TO_HOST_INT32(_accessor().directory_count); }
 	uint16 minimum_udf_read_revision() const { return B_LENDIAN_TO_HOST_INT16(_accessor().minimum_udf_read_revision); }
@@ -1321,8 +1327,9 @@ public:
 		
 	// set functions
 	void set_integrity_type(uint32 type) { _integrity_type = B_HOST_TO_LENDIAN_INT32(type); }
+	void set_next_unique_id(uint64 id) { _next_unique_id() = B_HOST_TO_LENDIAN_INT64(id); }
 	void set_partition_count(uint32 count) { _partition_count = B_HOST_TO_LENDIAN_INT32(count); }
-	void set_impelementation_use_length(uint32 length) { _implementation_use_length = B_HOST_TO_LENDIAN_INT32(length); }
+	void set_implementation_use_length(uint32 length) { _implementation_use_length = B_HOST_TO_LENDIAN_INT32(length); }
 	
 	// set functions for fields stored in implementation_use() field per UDF-2.50 2.2.6.4
 	void set_file_count(uint32 count) { _accessor().file_count = B_HOST_TO_LENDIAN_INT32(count); }
@@ -1347,6 +1354,9 @@ private:
 	const _lvid_implementation_use_accessor& _accessor() const {
 		return *reinterpret_cast<const _lvid_implementation_use_accessor*>(implementation_use());
 	}
+	
+	uint64& _next_unique_id() { return *reinterpret_cast<uint64*>(logical_volume_contents_use().data); }
+	const uint64& _next_unique_id() const { return *reinterpret_cast<const uint64*>(logical_volume_contents_use().data); }
 
 	descriptor_tag  _tag;
 	timestamp _recording_time;
@@ -1647,7 +1657,7 @@ struct allocation_extent_descriptor {
 	uint32 length_of_allocation_descriptors;
 	
 	/*! \todo Check that this is really how things work: */
-	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(allocation_extent_descriptor)); }
+	uint8* allocation_descriptors() { return (uint8*)(reinterpret_cast<uint8*>(this)+sizeof(allocation_extent_descriptor)); }
 } __attribute__((packed));
 
 

@@ -848,27 +848,28 @@ logical_volume_integrity_descriptor::dump() const
 	DUMP(next_integrity_extent());
 	PRINT(("logical_volume_contents_use:\n"));
 	DUMP(logical_volume_contents_use());
+	PRINT(("next_unique_id:             %Ld\n", next_unique_id()));
 	PRINT(("partition_count:            %ld\n", partition_count()));
 	PRINT(("implementation_use_length:  %ld\n", implementation_use_length()));
 	if (partition_count() > 0) {
 		PRINT(("free_space_table:\n"));
 		for (uint32 i = 0; i < partition_count(); i++) {
-			PRINT(("%ld: %ld free blocks\n", i, free_space_table()[i]));
+			PRINT(("partition %ld: %ld free blocks\n", i, free_space_table()[i]));
 		}
 		PRINT(("size_table:\n"));
 		for (uint32 i = 0; i < partition_count(); i++) {
-			PRINT(("%ld: %ld blocks large\n", i, size_table()[i]));
+			PRINT(("partition %ld: %ld blocks large\n", i, size_table()[i]));
 		}
 	}
 		
-	if (implementation_use_length() >= 46) {
-		PRINT(("id:\n"));
-		DUMP(id());
+	if (implementation_use_length() >= minimum_implementation_use_length) {
+		PRINT(("implementation_id:\n"));
+		DUMP(implementation_id());
 		PRINT(("file_count:                 %ld\n", file_count()));
 		PRINT(("directory_count:            %ld\n", directory_count()));
-		PRINT(("minimum_udf_read_revision:  %d\n", minimum_udf_read_revision()));
-		PRINT(("minimum_udf_write_revision: %d\n", minimum_udf_write_revision()));
-		PRINT(("maximum_udf_write_revision: %d\n", maximum_udf_write_revision()));	
+		PRINT(("minimum_udf_read_revision:  0x%04x\n", minimum_udf_read_revision()));
+		PRINT(("minimum_udf_write_revision: 0x%04x\n", minimum_udf_write_revision()));
+		PRINT(("maximum_udf_write_revision: 0x%04x\n", maximum_udf_write_revision()));	
 	} else {
 		PRINT(("NOTE: implementation_use() field of insufficient length to contain \n"));
 		PRINT(("      appropriate UDF-2.50 2.2.6.4 fields.\n"));
