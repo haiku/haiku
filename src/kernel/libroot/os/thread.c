@@ -50,20 +50,6 @@ find_thread(const char *name)
 }
 
 
-#ifdef __INTEL__
-// see OS.h for the reason why we need this
-thread_id _kfind_thread_(const char *name);
-
-thread_id
-_kfind_thread_(const char *name)
-{
-	// ToDo: _kfind_thread_()
-	printf("find_thread(): Not yet implemented!!\n");
-	return B_ERROR;
-}
-#endif
-
-
 status_t
 rename_thread(thread_id thread, const char *name)
 {

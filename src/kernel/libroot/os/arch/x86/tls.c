@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -10,17 +10,10 @@
 #endif
 
 #include "support/TLS.h"
+#include "tls.h"
 
 
-// ToDo: we probably need to set some standard slots (like it's done in BeOS)!
-// 	Slot 1 is obviously the thread ID, but there are 8 pre-allocated slots in BeOS.
-//	I have no idea what the other slots are used for; they are all NULL when the
-//	thread has just started, but slots 0 & 1.
-//	Slot 0 seems to be an address somewhere on the stack. Another slot is most probably
-//	reserved for "errno", the others could have been used to make some POSIX calls
-//	thread-safe - but we also have to find out which supposely non-thread-safe POSIX
-//	calls are thread-safe in BeOS.
-static int32 gNextSlot = 0;
+static int32 gNextSlot = TLS_FIRST_FREE_SLOT;
 
 
 int32
@@ -33,8 +26,6 @@ tls_allocate(void)
 	return next;
 }
 
-
-#if __INTEL__ && __GNUC__
 
 void *
 tls_get(int32 index)
@@ -67,6 +58,3 @@ tls_set(int32 index, void *value)
 		: : "d"(index), "a"(value) );
 }
 
-#else
-#	error "TLS has not been implemented for this platform"
-#endif
