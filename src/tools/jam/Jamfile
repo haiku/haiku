@@ -145,10 +145,49 @@ if $(BINDIR) 	{ InstallBin $(BINDIR) : jam ; }
 # Build stat cache server under BeOS.
 #
 if $(OS) = BEOS {
+	rule CompileResources
+	{
+		SEARCH on $(2) += $(SEARCH_SOURCE) ;
+		MakeLocate $(1) : $(LOCATE_TARGET) ;
+		Depends $(1) : $(2) ;
+		LocalClean clean : $(1) ;
+	}
+
+	# rc must exist, if we are to compile the resources. We hard-code the
+	# path where it should be located. Not nice, but good enough for the moment.
+	actions CompileResources
+	{
+		if [ -f ../../../distro/x86.R1/beos/bin/rc ]; then
+			../../../distro/x86.R1/beos/bin/rc -o "$(1)" "$(2)"
+		else
+			echo "Error: Couldn't find rc, the resources compiler. It should "
+			echo "Error: be located in distro/x86.R1/beos/bin and can be made"
+			echo "Error: by invoking \`jam rc'. You can also build the"
+			echo "Error: StatCacheServer without resources by running"
+			echo "Error:   NO_STAT_CACHE_SERVER_RESOURCES=1 jam"
+			exit 1;
+		fi
+	}
+
+	rule AddResources
+	{
+		SEARCH on $(2) += $(SEARCH_SOURCE) ;
+		Depends $(1) : $(2) ;
+	}
+
+	actions AddResources
+	{
+		xres -o "$(1)" $(2)
+	}
+
 	LINK on StatCacheServer = g++ ;
 	LINKLIBS on StatCacheServer
 		= [ on StatCacheServer return $(LINKLIBS) ] -lbe ;
 	Main StatCacheServer : StatCacheServer.cpp ;
+	if ! $(NO_STAT_CACHE_SERVER_RESOURCES) {
+		CompileResources StatCacheServer.rsrc : StatCacheServer.rdef ;
+		AddResources StatCacheServer : StatCacheServer.rsrc ;
+	}
 }
 #
 ### LOCAL CHANGE
