@@ -30,6 +30,54 @@ const char *kSettings[] = {
 };
 
 
+// needed by the driver_settings implementation, but not part of
+// the original R5 libroot.so
+
+size_t
+strnlen(char const *string, size_t count)
+{
+	const char *pos = string;
+
+	while (count-- && pos[0] != '\0')
+		pos++;
+
+	return pos - string;
+}
+
+
+/** Concatenates the source string to the destination, writes
+ *	as much as "maxLength" bytes to the dest string.
+ *	Always null terminates the string as long as maxLength is
+ *	larger than the dest string.
+ *	Returns the length of the string that 
+ */
+
+size_t
+strlcat(char *dest, const char *source, size_t maxLength)
+{
+	size_t destLength = strnlen(dest, maxLength);
+
+	// This returns the wrong size, but it's all we can do
+	if (maxLength == destLength)
+		return destLength + strlen(source);
+
+	dest += destLength;
+	maxLength -= destLength;
+
+	size_t i = 0;
+	for (; i < maxLength - 1 && source[i]; i++) {
+		dest[i] = source[i];
+	}
+
+	dest[i] = '\0';
+
+	return destLength + i + strlen(source + i);
+}
+
+
+//	#pragma mark -
+
+
 void
 put_level_space(int32 level)
 {
