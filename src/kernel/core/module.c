@@ -1,8 +1,8 @@
 /* Module manager */
 
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, Haiku Inc.. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Thomas Kurschel. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -790,7 +790,6 @@ iterator_get_next_module(module_iterator *iterator, char *buffer, size_t *_buffe
 
 		for (i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
 			// the module name must fit the prefix
-dprintf(":: compare: \"%s\" <-> \"%s\" (%ld)\n", iterator->prefix, sBuiltInModules[i]->name, iterator->prefix_length);
 			if (strncmp(sBuiltInModules[i]->name, iterator->prefix, iterator->prefix_length))
 				continue;
 
