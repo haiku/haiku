@@ -264,7 +264,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 		return;
 	}
 
-	TRACE("MediaAddonServer::AddOnAdded: loading finished, id %d\n",(int)id);
+	TRACE("MediaAddonServer::AddOnAdded: loading finished, id %ld\n", id);
 
 	filemap->Insert(file_node, id);
 	flavorcountmap->Insert(id, 0);
@@ -272,7 +272,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	ScanAddOnFlavors(addon);
 	
 	if (addon->WantsAutoStart())
-		TRACE("#### WantsAutoStart!\n");
+		FATAL("#### add-on %ld WantsAutoStart!\n", id);
 
 /*
  * the mixer (which we can't load because of unresolved symbols)
@@ -325,17 +325,30 @@ flavor 0:
 void
 MediaAddonServer::AddOnRemoved(ino_t file_node)
 {	
-	media_addon_id *id;
-	
+	media_addon_id *tempid;
+	media_addon_id id;
+	int32 *tempflavorcount;
+	int32 oldflavorcount;
 	// XXX locking?
 	
-	if (!filemap->Get(file_node, &id)) {
+	if (!filemap->Get(file_node, &tempid)) {
 		FATAL("MediaAddonServer::AddOnRemoved: inode %Ld removed, but no media add-on found\n", file_node);
 		return;
 	}
+	id = *tempid; // tempid pointer is invalid after Removing() it from the map
 	filemap->Remove(file_node);
-	flavorcountmap->Remove(*id);
-	_DormantNodeManager->UnregisterAddon(*id);
+	
+	if (!flavorcountmap->Get(id, &tempflavorcount)) {
+		FATAL("MediaAddonServer::AddOnRemoved: couldn't get flavor count for add-on %ld\n", id);
+		oldflavorcount = 1000;
+	} else {
+		oldflavorcount = *tempflavorcount; //same reason as above
+	}
+	flavorcountmap->Remove(id);
+	
+	_DormantNodeManager->UnregisterAddon(id);
+	
+	BPrivate::media::notifications::FlavorsChanged(id, 0, oldflavorcount);
 }
 
 void 
