@@ -464,3 +464,24 @@ reply fields:
 
 -----------------------------------------------------------------------
 
+remove an app from the list of supporting apps for given types
+
+target:		mime manager (BRoster::fMimeMess)
+message:	B_REG_MIME_UNSUPPORT_TYPES
+			"type": B_STRING_TYPE
+			"unsupported_types": B_STRING_TYPE[]
+reply:		standard general result
+
+message fields:
+- "type": The signature of the application that doesn't support the
+		  given types any longer.
+- "unsupported_types": The types that aren't supported any longer.
+
+
+reply fields:
+- "result":
+  - B_OK: success
+  - (error code): failure			
+
+-----------------------------------------------------------------------
+
