@@ -449,7 +449,8 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 			 * internal transmitters... */
 			DACW(FP_DEBUG0, (DACR(FP_DEBUG0) & 0xcfffffff));
 			/* ... and powerup external TMDS transmitter if it exists */
-			CRTCW(LCD, (CRTCR(LCD) | 0x10));
+			/* (confirmed OK on NV28 and NV34) */
+			CRTCW(0x59, (CRTCR(0x59) | 0x01));
 		}
 
 		LOG(4,("display on, "));
@@ -464,7 +465,8 @@ status_t nv_crtc_dpms(bool display, bool h, bool v)
 			 * internal transmitters... */
 			DACW(FP_DEBUG0, (DACR(FP_DEBUG0) | 0x30000000));
 			/* ... and powerdown external TMDS transmitter if it exists */
-			CRTCW(LCD, (CRTCR(LCD) & 0xef));
+			/* (confirmed OK on NV28 and NV34) */
+			CRTCW(0x59, (CRTCR(0x59) & 0xfe));
 		}
 
 		LOG(4,("display off, "));

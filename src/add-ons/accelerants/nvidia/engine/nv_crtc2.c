@@ -432,7 +432,8 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 			 * internal transmitters... */
 			DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) & 0xcfffffff));
 			/* ... and powerup external TMDS transmitter if it exists */
-			CRTC2W(LCD, (CRTC2R(LCD) | 0x10));
+			/* (confirmed OK on NV28 and NV34) */
+			CRTC2W(0x59, (CRTC2R(0x59) | 0x01));
 		}
 
 		LOG(4,("display on, "));
@@ -447,7 +448,8 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 			 * internal transmitters... */
 			DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) | 0x30000000));
 			/* ... and powerdown external TMDS transmitter if it exists */
-			CRTC2W(LCD, (CRTC2R(LCD) & 0xef));
+			/* (confirmed OK on NV28 and NV34) */
+			CRTC2W(0x59, (CRTC2R(0x59) & 0xfe));
 		}
 
 		LOG(4,("display off, "));
