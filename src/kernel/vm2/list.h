@@ -11,10 +11,9 @@ struct node
 
 class list {
 	public:
-		list(void) {nodeCount=0;rock=NULL;}
-		void add (void *in)
+		list(void){nodeCount=0;rock=NULL;} 
+		void add (node *newNode)
 			{
-			struct node *newNode=reinterpret_cast<node *>(in);
 			newNode->next=rock;
 			rock=newNode;
 			nodeCount++;
@@ -60,7 +59,7 @@ class list {
 			{
 			for (struct node *cur=rock;cur;cur=cur->next)
 				{
-				printf ("list::dump: At %x, next = %x\n",cur,cur->next);
+				printf ("list::dump: At %p, next = %p\n",cur,cur->next);
 				}
 			}
 		struct node *rock;

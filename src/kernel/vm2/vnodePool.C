@@ -29,7 +29,7 @@ vnode *poolvnode::get(void)
 		acquire_sem(inUse);
 		//printf ("poolvnode::get: Adding %d new elements to the pool!\n",newCount);
 		for (int i=0;i<newCount;i++)
-			unused.add(((void *)(newPage->getAddress()+(i*sizeof(vnode)))));	
+			unused.add(((node *)(newPage->getAddress()+(i*sizeof(vnode)))));	
 		release_sem(inUse);
 		return (get()); // A little cheat - call self again to get the first one from stack...
 		}

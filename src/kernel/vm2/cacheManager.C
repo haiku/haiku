@@ -3,6 +3,17 @@
 #include <vpagePool.h>
 #include "vmHeaderBlock.h"
 
+bool cacheMemberIsLessThan(void *a,void *b)
+{
+	vnode *v1 = reinterpret_cast<cacheMember *>(a)->vn;
+	vnode *v2 = reinterpret_cast<cacheMember *>(b)->vn;
+	if (v1->fd < v2->fd) 
+		return true;
+	if ((v1->fd==v2->fd) && (v1->offset<v2->offset)) 
+		return true;
+	return false;
+}
+
 extern vmHeaderBlock *vmBlock;
 // TODO - we need to (somehow) make sure that the same vnodes here are shared with mmap.
 // Maybe a vnode manager...
@@ -28,6 +39,7 @@ void *cacheManager::createBlock(vnode *target,bool readOnly)
 	bool foundSpot=false;
 	vpage *prev=NULL,*cur=NULL;
 	unsigned long begin=CACHE_BEGIN;
+	// Find a place in the cache's virtual space to put this vnode...
 	if (vpages.rock)
 		for (cur=((vpage *)(vpages.rock));!foundSpot && cur;cur=(vpage *)(cur->next))
 			if (cur->getStartAddress()!=(void *)begin)

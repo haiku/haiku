@@ -31,7 +31,7 @@ area *poolarea::get(void)
 		acquire_sem(inUse);
 		//printf ("poolarea::get: Adding %d new elements to the pool!\n",newCount);
 		for (int i=0;i<newCount;i++)
-			unused.add(((void *)(newPage->getAddress()+(i*sizeof(area)))));	
+			unused.add(((node *)(newPage->getAddress()+(i*sizeof(area)))));	
 		release_sem(inUse);
 		return (get()); // A little cheat - call self again to get the first one from stack...
 		}

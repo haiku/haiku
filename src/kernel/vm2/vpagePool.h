@@ -15,7 +15,7 @@ class poolvpage
 		void put(vpage *in)
 			{
 			acquire_sem(inUse);
-			unused.add(in);
+			unused.add((node *)in);
 			release_sem(inUse);
 			}
 

@@ -29,10 +29,10 @@ void swapFileManager::write_block(vnode &node,void *loc,unsigned long size)
 
 void swapFileManager::read_block(vnode &node,void *loc,unsigned long size)
 	{
-	lseek(node.fd,node.offset,SEEK_SET);
 	if (node.valid==false)
 		return; // Do nothing. This prevents "garbage" data on disk from being read in...	
 	//printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d into %x\n",node.fd, node.offset,loc);
+	lseek(node.fd,node.offset,SEEK_SET);
 	read(node.fd,loc,size);
 	}
 

@@ -5,7 +5,6 @@
 class vmInterface // This is the class that "owns" all of the managers.
 {
 	private:
-		int nextAreaID;
 		areaManager *getAM(void); // This is for testing only...
 	public:
 		vmInterface(int pages);
@@ -28,6 +27,8 @@ class vmInterface // This is the class that "owns" all of the managers.
 		void pager(void);
 		void saver(void);
 		void cleaner(void);
+		status_t writeCachedBlock(int fd, size_t offset, void *data);
+		status_t readCachedBlock(int fd, size_t offset, void *data);
 		char getByte(unsigned long offset) {return getAM()->getByte(offset);} // This is for testing only
 		void setByte(unsigned long offset,char value) {getAM()->setByte(offset,value);} // This is for testing only
 		int getInt(unsigned long offset) {return getAM()->getInt(offset);} // This is for testing only

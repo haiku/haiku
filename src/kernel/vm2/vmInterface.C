@@ -14,6 +14,8 @@
 vmHeaderBlock *vmBlock;
 static areaManager am;
 	
+// The purpose of this interface is to validate options, translate where necessary and pass through to the areaManager.
+
 areaManager *getAM(void)
 {
 	return &am;
@@ -62,7 +64,7 @@ int32 pagerThread(void *areaMan)
 vmInterface::vmInterface(int pages) 
 	{
 	char temp[1000];
-	sprintf (temp,"vm_test_clone_%d",getpid());
+	sprintf (temp,"vm_test_clone_%ld",getpid());
 	if (clone_area(temp,(void **)(&vmBlock),B_ANY_ADDRESS,B_WRITE_AREA,find_area("vm_test"))<0)
 		{
 		// This is compatability for in BeOS usage only...
@@ -97,7 +99,6 @@ vmInterface::vmInterface(int pages)
 		//printf ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
 		vmBlock->pageMan->setup(addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
 	    }
-	nextAreaID=0;
 
 	resume_thread(spawn_thread(cleanerThread,"cleanerThread",0,(vmBlock->pageMan)));
 	resume_thread(spawn_thread(saverThread,"saverThread",0,getAM()));
@@ -106,98 +107,68 @@ vmInterface::vmInterface(int pages)
 
 int vmInterface::getAreaByAddress(void *address)
 	{
-	area *myArea = getAM()->findArea(address);
+	int retVal;
+	area *myArea = getAM()->findAreaLock(address);
 	if (myArea)
-		return myArea->getAreaID();
+		retVal= myArea->getAreaID();
 	else
-		return B_ERROR;
+		retVal= B_ERROR;
+	return retVal;
 	}
 
 status_t vmInterface::setAreaProtection(int Area,protectType prot)
 	{
-	area *myArea = getAM()->findArea(Area);
-	if (myArea)
-		return myArea->setProtection(prot);
-	else
-		return B_ERROR;					
+	status_t retVal;
+	retVal= getAM()->setProtection(Area,prot);
+	return retVal;
 	}
 
 status_t vmInterface::resizeArea(int Area,size_t size)
 	{
-	area *oldArea;
-	oldArea=getAM()->findArea(Area);	
-	if (oldArea)
-		return oldArea->resize(size);
-	else
-		return B_ERROR;					
+	status_t retVal;
+	retVal = getAM()->resizeArea(Area,size);
+	return retVal;
 	}
 
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
-	area *newArea = new (vmBlock->areaPool->get()) area;
-	areaManager *foo;
-	printf ("vmInterface::createArea - got a new area (%x) from the areaPool\n",newArea);
-	foo=getAM();
-	newArea->setup(getAM());
-	newArea->createArea(AreaName,pageCount,address,addType,state,protect);
-	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
-	getAM()->addArea(newArea);
-	return newArea->getAreaID();
+	int retVal;
+	retVal = getAM()->createArea(AreaName,pageCount,address,addType,state,protect);
+	return retVal;
 	}
 
-void vmInterface::freeArea(int Area)
+void vmInterface::freeArea(int area)
 	{
-	//printf ("vmInterface::freeArea: begin\n");
-	area *oldArea=getAM()->findArea(Area);	
-	//printf ("vmInterface::freeArea: found area %x\n",oldArea);
-	if (oldArea)
-		{
-//		printf ("vmInterface::freeArea: removing area %x from linked list\n",oldArea);
-		areaManager *manager=getAM();
-//		printf ("vmInterface::freeArea: areaManager =  %x \n",manager);
-		manager->removeArea(oldArea);
-//		printf ("vmInterface::freeArea: deleting area %x \n",oldArea);
-		oldArea->freeArea();
-//		printf ("vmInterface::freeArea: freeArea complete \n");
-		vmBlock->areaPool->put(oldArea);
-		}
-	else
-		printf ("vmInterface::freeArea: unable to find requested area\n");
+	getAM()->freeArea(area);
 	}
 
 status_t vmInterface::getAreaInfo(int Area,area_info *dest)
 	{
-	area *oldArea=getAM()->findArea(Area);	
-	if (oldArea)
-		return oldArea->getInfo(dest);
-	else
-		printf ("vmInterface::getAreaInfo: unable to find requested area\n");
+	status_t retVal;
+	retVal = getAM()->getAreaInfo(Area,dest);
+	return retVal;
 	}
 
 status_t vmInterface::getNextAreaInfo(int  process,int32 *cookie,area_info *dest)
 	{
-	area *oldArea=getAM()->findArea(*cookie);	
-	area *newArea=(area *)(oldArea->next);
-	if (newArea)
-		return newArea->getInfo(dest);
-	else
-		return B_BAD_VALUE;
+	status_t retVal; 
+	// We *SHOULD* be getting the AM for this process. Something for HW integration time...
+	retVal = getAM()->getInfoAfter(*cookie,dest);
+	return retVal;
 	}
 
 int vmInterface::getAreaByName(char *name)
 	{
-	return getAM()->findArea(name)->getAreaID();
+	int retVal;
+	retVal = getAM()->getAreaByName(name);
+	return retVal;
 	}
 
 int vmInterface::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable)
 	{
-	area *newArea = new (vmBlock->areaPool->get()) area;
-	newArea->setup(getAM());
-	area *oldArea=getAM()->findArea(newAreaID);
-	newArea->cloneArea(oldArea,AreaName,address,addType,state,prot);
-	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
-	getAM()->addArea(newArea);
-	return newArea->getAreaID();
+	int retVal;
+	retVal = getAM()->cloneArea(newAreaID,AreaName,address, addType, state, prot);
+	return retVal;
 	}
 
 void vmInterface::pager(void)
@@ -228,36 +199,14 @@ void vmInterface::cleaner(void)
 
 void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 	{
-	char name[MAXPATHLEN];
-	// Get the filename from fd...
-	strcpy(	name,"mmap - need to include fileName");
-		
-	addressSpec addType=((flags&MAP_FIXED)?EXACT:ANY);
-	protectType protType=(prot&PROT_WRITE)?writable:(prot&PROT_READ)?readable:none;
-	// Not doing anything with MAP_SHARED and MAP_COPY - needs to be done
-	//printf ("flags = %x, anon = %x\n",flags,MAP_ANON);
-	if (flags & MAP_ANON) 
-		{
-		createArea(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr, addType ,LAZY,protType);
-		return addr;
-		}
-
-	area *newArea = new (vmBlock->areaPool->get()) area;
-	newArea->setup(getAM());
-	//printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
-	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);
-	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
-	getAM()->addArea(newArea);
-	newArea->getAreaID();
-	//pageMan.dump();
-	//newArea->dump();
-	return addr;
+	void *retVal;
+	retVal = getAM()->mmap(addr,len,prot,flags,fd,offset);
+	return retVal;
 	}
 
 status_t vmInterface::munmap(void *addr, size_t len)
 {
-	// Note that this is broken for any and all munmaps that are not full area in size. This is an all or nothing game...
-	int area=getAreaByAddress(addr);
-	freeArea(area);	
-	//pageMan.dump();
+	int retVal;
+	retVal = getAM()->munmap(addr,len);
+	return retVal;
 }

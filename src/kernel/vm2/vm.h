@@ -16,7 +16,6 @@ struct vnode : public node
 	count=0;
 	}
 };
-typedef unsigned long owningProcess;
 #define B_OS_NAME_LENGTH 32
 enum protectType {none=0,readable, writable,copyOnWrite,symCopyOnWrite};
 enum pageState {FULL,CONTIGUOUS,LAZY,NO_LOCK,LOMEM};

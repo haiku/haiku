@@ -15,7 +15,7 @@ class poolarea
 		void put(area *in)
 			{
 			acquire_sem(inUse);
-			unused.add(in);
+			unused.add((node *)in);
 			release_sem(inUse);
 			}
 

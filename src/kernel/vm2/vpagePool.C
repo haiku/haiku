@@ -30,7 +30,7 @@ vpage *poolvpage::get(void)
 		acquire_sem(inUse);
 		//printf ("poolvpage::get: Adding %d new elements to the pool!\n",newCount);
 		for (int i=0;i<newCount;i++)
-			unused.add(((void *)(newPage->getAddress()+(i*sizeof(vpage)))));	
+			unused.add(((node *)(newPage->getAddress()+(i*sizeof(vpage)))));	
 		release_sem(inUse);
 		return (get()); // A little cheat - call self again to get the first one from stack...
 		}

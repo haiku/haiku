@@ -4,6 +4,7 @@
 #include <pageManager.h>
 #include <swapFileManager.h>
 
+class areaManager;
 class vpage : public node
 {
 	private:
@@ -35,15 +36,15 @@ class vpage : public node
 		
 		void dump(void)
 		{
-			printf ("Dumping vpage %x, address = %x, \n\t physPage: ",this,start_address);
+			printf ("Dumping vpage %p, address = %lx, \n\t physPage: ",this,start_address);
 			if (physPage)
 				physPage->dump();
 			else
 				printf ("NULL\n");
 		}
-		char getByte(unsigned long offset); // This is for testing only
-		void setByte(unsigned long offset,char value); // This is for testing only
-		int getInt(unsigned long offset); // This is for testing only
-		void setInt(unsigned long offset,int value); // This is for testing only
+		char getByte(unsigned long offset,areaManager *manager); // This is for testing only
+		void setByte(unsigned long offset,char value,areaManager *manager); // This is for testing only
+		int getInt(unsigned long offset,areaManager *manager); // This is for testing only
+		void setInt(unsigned long offset,int value,areaManager *manager); // This is for testing only
 };
 #endif

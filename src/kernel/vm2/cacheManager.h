@@ -2,6 +2,7 @@
 #include <vm.h>
 #include <vpage.h>
 #include <area.h>
+#include <olist.h>
 
 struct cacheMember : public node
 {
@@ -12,7 +13,7 @@ struct cacheMember : public node
 class cacheManager : public area
 {
 	private:
-		list cacheMembers; // Yes, this is slow and should be a hash table. This should be done prior to 
+		orderedList cacheMembers; // Yes, this is slow and should be a hash table. This should be done prior to 
 		// moving into the kernel, so we can test it better.
 		// While this very much mirrors the area's vpage list, it won't when it is a hash table...
 		void *findBlock (vnode *target,bool readOnly); 

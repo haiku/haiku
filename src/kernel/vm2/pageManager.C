@@ -22,7 +22,7 @@ void pageManager::setup(void *area,int pages)
 		//printf ("newPage = %x, setup = %x\n",newPage,addOffset(area,(i+pageOverhead)*PAGE_SIZE));
 		//printf ("i = %d, sizeof(page) = %x, pageOverhead = %d\n",i,sizeof(page),pageOverhead);
 		//newPage->dump();
-		unused.add(addOffset(area,i*sizeof(page)));
+		unused.add(newPage);
 		}
 
 	cleanLock=create_sem (1,"clean_lock");
@@ -77,9 +77,7 @@ page *pageManager::getPage(void)
 void pageManager::freePage(page *toFree)
 	{
 //	printf ("Inside freePage; old value = %d",toFree->count);
-	toFree->count--;
-//	printf (" new value = %d, page = %x\n",toFree->count,toFree->getAddress());
-	if (toFree->count==0)
+	if (atomic_add(&(toFree->count),-1)==0)
 		{
 		acquire_sem(inUseLock);
 		inUse.remove(toFree);
@@ -88,6 +86,7 @@ void pageManager::freePage(page *toFree)
 		unused.add(toFree);
 		release_sem(unusedLock);
 		}
+//	printf (" new value = %d, page = %x\n",toFree->count,toFree->getAddress());
 	}
 
 void pageManager::cleaner(void)
@@ -99,11 +98,11 @@ void pageManager::cleaner(void)
 			//printf ("pageManager::cleaner: About to vacuum a page\n");
 			acquire_sem(unusedLock);
 			page *first=(page *)unused.next();   
+			release_sem(unusedLock);
 			first->zero();
 			acquire_sem(cleanLock);
 			clean.add(first);
 			release_sem(cleanLock);
-			release_sem(unusedLock);
 			//printf ("pageManager::cleaner: All done with vacuum a page\n");
 			snooze(125000);	
 			}

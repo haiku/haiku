@@ -1,6 +1,7 @@
 #include "vpage.h"
 #include "vnodePool.h"
 #include "vmHeaderBlock.h"
+#include "areaManager.h"
 
 	extern vmHeaderBlock *vmBlock;
 
@@ -33,7 +34,6 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 	end_address=start+PAGE_SIZE-1;
 	protection=prot;
 	swappable=(state==NO_LOCK);
-	dirty=true;
 
 	if (backing)
 		{
@@ -50,6 +50,7 @@ void vpage::setup(unsigned long start,vnode *backing, page *physMem,protectType 
 			physMem->count++;
 		physPage=physMem;
 		}
+	dirty=(physPage!=NULL);
 	//printf ("vpage::vpage: ended : start = %x, vnode.fd=%d, vnode.offset=%d, physMem = %x\n",start,((backing)?backing->fd:0),((backing)?backing->offset:0), ((physMem)?(physMem->getAddress()):0));
 	}
 
@@ -73,7 +74,7 @@ void vpage::setProtection(protectType prot)
 
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
-//	printf ("vpage::fault: virtual address = %x, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
+	printf ("vpage::fault: virtual address = %lx, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError)
 		{
 		dirty=true;
@@ -107,39 +108,42 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 	return true;
 	}
 
-char vpage::getByte(unsigned long address)
+char vpage::getByte(unsigned long address,areaManager *manager)
 	{
-//	printf ("vpage::getByte: address = %d\n",address );
+	//printf ("vpage::getByte: address = %ld\n",address );
 	if (!physPage)
-		if (!fault((void *)(address),false))
-			throw ("vpage::getByte",address,0);
-//	printf ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
+		if (!manager->fault((void *)(address),false))
+			throw ("vpage::getByte");
+	//printf ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
 
-void vpage::setByte(unsigned long address,char value)
+void vpage::setByte(unsigned long address,char value,areaManager *manager)
 	{
 //	printf ("vpage::setByte: address = %d, value = %d\n",address, value);
 	if (!physPage)
-		if (!fault((void *)(address),true))
-			throw ("vpage::setByte",address,(int)value);
+		if (!manager->fault((void *)(address),true))
+			throw ("vpage::setByte");
 	*((char *)(address-start_address+physPage->getAddress()))=value;
 //	printf ("vpage::setByte: physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
 	}
 
-int  vpage::getInt(unsigned long address)
+int  vpage::getInt(unsigned long address,areaManager *manager)
 	{
+	printf ("vpage::getInt: address = %ld\n",address );
 	if (!physPage)
-		if (!fault((void *)(address),false))
-			throw ("vpage::getInt",address,0);
+		if (!manager->fault((void *)(address),false))
+			throw ("vpage::getInt");
+	printf ("vpage::getInt: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
+	dump();
 	return *((int *)(address-start_address+physPage->getAddress()));
 	}
 
-void  vpage::setInt(unsigned long address,int value)
+void  vpage::setInt(unsigned long address,int value,areaManager *manager)
 	{
 	if (!physPage)
-		if (!fault((void *)(address),true))
-			throw ("vpage::setInt",address,value);
+		if (!manager->fault((void *)(address),true))
+			throw ("vpage::setInt");
 	*((int *)(address-start_address+physPage->getAddress()))=value;
 	}
 
