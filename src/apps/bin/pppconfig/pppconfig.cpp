@@ -5,9 +5,9 @@
 //  Copyright (c) 2003 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //---------------------------------------------------------------------
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cctype>
 #include <String.h>
 #include <driver_settings.h>
 
@@ -85,8 +85,10 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 	int32 count;
 	interface_id *interfaces = manager.Interfaces(&count, filter);
 	
-	if(!interfaces)
+	if(!interfaces) {
+		fprintf(stderr, "Error: Could not get interfaces information!\n");
 		return -1;
+	}
 	
 	ppp_interface_info_t info;
 	PPPInterface interface;
