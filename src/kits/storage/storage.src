@@ -2,7 +2,7 @@ STORAGE_KIT_SOURCE =
 	# storage
 	AppFileInfo.cpp
 	Directory.cpp
-	DiskScannerAddOn.cpp
+#	DiskScannerAddOn.cpp
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
