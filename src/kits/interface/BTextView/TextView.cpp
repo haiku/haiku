@@ -279,7 +279,7 @@ BTextView::BTextView(BMessage *archive)
 		SetColorSpace((color_space)flag);
 
 	if (archive->FindInt32("_max", &flag) == B_OK)
-		SetMaxBytes(value);
+		SetMaxBytes(flag);
 
 	if (archive->FindInt32("_sel", &flag) == B_OK &&
 		archive->FindInt32("_sel", &flag2) == B_OK)
