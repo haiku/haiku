@@ -68,7 +68,9 @@ pnp_root_init_root(void)
 	};
 
 	if (pnp_register_device(NULL, attrs, NULL, &sRootNode) != B_OK)
-		panic("Cannot register PnP-Root\n");
+		dprintf("Cannot register PnP-Root\n");
+	// ToDo: don't panic for now
+	//	panic("Cannot register PnP-Root\n");
 }
 
 
