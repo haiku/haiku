@@ -29,18 +29,18 @@ public:
 	
 	// The physical output channels
 	uint32	GetOutputChannelCount();
-	uint32	GetOutputChannelType(int channel);
+	int		GetOutputChannelType(int channel);
 	void	SetOutputChannelGain(int channel, float gain);
 	float	GetOutputChannelGain(int channel);
 	
-	// The Sources for each channel
+	// The sources for each channel
 	void	AddOutputChannelSource(int channel, int source_type);
 	void	RemoveOutputChannelSource(int channel, int source_type);
 	void	SetOutputChannelSourceGain(int channel, int source_type, float source_gain);
 	float	GetOutputChannelSourceGain(int channel, int source_type);
 	bool	HasOutputChannelSource(int channel, int source_type);
 	
-	// The Output can be muted
+	// The output can be muted
 	void	SetMuted(bool yesno);
 	bool	IsMuted();
 
@@ -61,7 +61,7 @@ private:
 private:
 	
 	/* An entry in the source array is not the same as the
-	 * channel type, but the number should be the same
+	 * channel type, but the count should be the same
 	 */
 	 enum {
 		MAX_SOURCE_ENTRIES = MAX_CHANNEL_TYPES
@@ -100,15 +100,14 @@ inline float MixerOutput::GetOutputChannelGain(int channel)
 
 inline uint32 MixerOutput::GetOutputChannelSourceCount(int channel)
 {
-	if (channel < 0 || channel >= fOutputChannelCount)
-		return 0;
+	ASSERT(channel >= 0 && channel < fOutputChannelCount);
 	return fOutputChannelInfo[channel].source_count;
 }
 
 inline void MixerOutput::GetOutputChannelSourceInfoAt(int channel, int source_index, int *source_type, float *source_gain)
 {
 	ASSERT(channel >= 0 && channel < fOutputChannelCount);
-	ASSERT(index >= 0 && source_index < fOutputChannelInfo[channel].source_count);
+	ASSERT(source_index >= 0 && source_index < fOutputChannelInfo[channel].source_count);
 	*source_type = fOutputChannelInfo[channel].source_type[source_index];
 	*source_gain = fOutputChannelInfo[channel].source_gain[source_index];
 }

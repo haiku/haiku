@@ -104,7 +104,7 @@ MixerOutput::UpdateOutputChannels()
 		delete [] oldInfo;
 	}
 	for (int i = 0; i < fOutputChannelCount; i++)
-		TRACE("UpdateOutputChannels: output channel %d, des 0x%08X (type %2d), gain %.3f\n", i, fOutputChannelInfo[i].designation, ChannelMaskToChannelType(fOutputChannelInfo[i].designation), fOutputChannelInfo[i].gain);
+		TRACE("UpdateOutputChannels: output channel %d, type %2d, gain %.3f\n", i, fOutputChannelInfo[i].channel_type, fOutputChannelInfo[i].channel_gain);
 }
 
 void
@@ -229,7 +229,7 @@ MixerOutput::AssignDefaultSources()
 	}
 }
 
-uint32
+int
 MixerOutput::GetOutputChannelType(int channel)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)

@@ -883,7 +883,7 @@ status_t
 AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change, 
 							  void *value, size_t *ioSize)
 {
-	TRACE("GetParameterValue: id %ld, ioSize %ld\n", id, *ioSize);
+	TRACE("GetParameterValue: id 0x%08x, ioSize %ld\n", id, *ioSize);
 	int param = PARAM(id);
 	fCore->Lock();
 	if (param == 0) {
@@ -922,7 +922,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		for (int i = 0; (input = fCore->Input(i)); i++)
 			if (input->ID() == param)
 				break;
-		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !input)
+		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id) && !PARAM_IS_DST_GAIN(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
@@ -939,6 +939,18 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 			for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
 				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetInputChannelGain(chan));
 		}
+		if (PARAM_IS_DST_ENABLE(id)) {
+			if (*ioSize < sizeof(int32))
+				goto err;
+			*ioSize = sizeof(int32);
+			static_cast<int32 *>(value)[0] = input->HasInputChannelDestination(PARAM_CHAN(id), PARAM_DST(id));
+		}
+		if (PARAM_IS_DST_GAIN(id)) {
+			if (*ioSize < sizeof(float))
+				goto err;
+			*ioSize = sizeof(float);
+			static_cast<float *>(value)[0] = GAIN_TO_PERCENT(input->GetInputChannelDestinationGain(PARAM_CHAN(id), PARAM_DST(id)));
+		}
 	}
 	*last_change = TimeSource()->Now(); // XXX we could do better
 	fCore->Unlock();
@@ -952,7 +964,7 @@ void
 AudioMixer::SetParameterValue(int32 id, bigtime_t when, 
 							  const void *value, size_t size)
 {
-	TRACE("SetParameterValue: id %ld, size %ld\n", id, size);
+	TRACE("SetParameterValue: id 0x%08x, size %ld\n", id, size);
 	int param = PARAM(id);
 	fCore->Lock();
 	if (param == 0) {
@@ -991,7 +1003,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		for (int i = 0; (input = fCore->Input(i)); i++)
 			if (input->ID() == param)
 				break;
-		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !input)
+		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id) && !PARAM_IS_DST_GAIN(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
@@ -1005,6 +1017,34 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 				goto err;
 			for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
 				input->SetInputChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
+		}
+		if (PARAM_IS_DST_ENABLE(id)) {
+			if (size != sizeof(int32))
+				goto err;
+			if (static_cast<const int32 *>(value)[0]) {
+				int oldchan = input->GetInputChannelForDestination(PARAM_DST(id));
+				if (oldchan != -1) {
+					input->RemoveInputChannelDestination(oldchan, PARAM_DST(id));
+					int32 null = 0;
+					BroadcastNewParameterValue(when, PARAM_DST_ENABLE(PARAM(id), oldchan, PARAM_DST(id)), &null, sizeof(null));
+				}
+				input->AddInputChannelDestination(PARAM_CHAN(id), PARAM_DST(id));
+			} else {
+				input->RemoveInputChannelDestination(PARAM_CHAN(id), PARAM_DST(id));
+			}
+		}
+		if (PARAM_IS_DST_GAIN(id)) {
+			if (size != sizeof(float))
+				goto err;
+			input->SetInputChannelDestinationGain(PARAM_CHAN(id), PARAM_DST(id), PERCENT_TO_GAIN(static_cast<const float *>(value)[0]));
+			// We have an ugly display where each destination gain slider
+			// is diplayed for each input channel.
+			// Update all other sliders for this destination type
+			for (int chan = 0; chan < input->GetInputChannelCount(); chan++) {
+				if (PARAM_CHAN(id) == chan)
+					continue;
+				BroadcastNewParameterValue(when, PARAM_DST_GAIN(PARAM(id), chan, PARAM_DST(id)), const_cast<void *>(value), size);
+			}
 		}
 	}
 	BroadcastNewParameterValue(when, id, const_cast<void *>(value), size);
@@ -1077,10 +1117,10 @@ AudioMixer::UpdateParameterWeb()
 		}
 	}
 	
-#if 0 
 	top = web->MakeGroup("Input Mapping"); // top level group
 	inputchannels = top->MakeGroup("");
-	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
+//	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
+	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations (PREVIEW; DISPLAYS ONLY ONE CONNECTED INPUT)", B_GENERIC);
 
 //	for (int i = 0; (in = fCore->Input(i)); i++) {
 	if ((in = fCore->Input(1)) || (in = fCore->Input(0))) { // XXX limited to input 1 or 0 to aviod BSlider problems
@@ -1101,7 +1141,6 @@ AudioMixer::UpdateParameterWeb()
 				
 		}
 	}
-#endif
 
 	fCore->Unlock();
 

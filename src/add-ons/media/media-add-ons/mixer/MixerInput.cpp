@@ -24,13 +24,16 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	fLastDataAvailableTime(-1),
 	fResampler(0),
 	fRtmPool(0),
-	fUserOverridesChannelDesignations(false)
+	fUserOverridesChannelDestinations(false)
 {
 	fix_multiaudio_format(&fInput.format.u.raw_audio);
 	PRINT_INPUT("MixerInput::MixerInput", fInput);
 	PRINT_CHANNEL_MASK(fInput.format);
 	
 	ASSERT(fInput.format.u.raw_audio.channel_count > 0);
+
+	for (int i = 0; i <	MAX_CHANNEL_TYPES; i++)
+		fChannelTypeGain[i] = 1.0f;
 
 	fInputChannelCount = fInput.format.u.raw_audio.channel_count;
 	fInputChannelMask = fInput.format.u.raw_audio.channel_mask;
@@ -48,7 +51,7 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	// initialize fInputChannelInfo
 	for (int i = 0; i < fInputChannelCount; i++) {
 		fInputChannelInfo[i].buffer_base = 0;	// will be set by SetMixBufferFormat()
-		fInputChannelInfo[i].designations = 0;	// will be set by UpdateChannelDesignations()
+		fInputChannelInfo[i].destination_mask = 0;	// will be set by UpdateInputChannelDestinationMask()
 		fInputChannelInfo[i].gain = 1.0;
 	}
 
@@ -57,18 +60,9 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixFrame
 	for (int i = 0; i < fInputChannelCount; i++)
 		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format, media_raw_audio_format::B_AUDIO_FLOAT);
 	
-	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateMixerChannels()
+	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateInputChannelDestinations()
 
 	SetMixBufferFormat(mixFrameRate, mixFrameCount);
-	
-	// XXX a test:
-/*
-	SetMixerChannelGain(0, 0.222);
-	SetMixerChannelGain(1, 0.444);
-	AddInputChannelDesignation(0, B_CHANNEL_REARRIGHT);
-	SetMixerChannelGain(2, 0.666);
-	AddInputChannelDesignation(1, B_CHANNEL_REARLEFT);
-*/
 }
 
 MixerInput::~MixerInput()
@@ -196,65 +190,81 @@ MixerInput::GetInputChannelCount()
 }
 
 void
-MixerInput::AddInputChannelDesignation(int channel, uint32 des)
+MixerInput::AddInputChannelDestination(int channel, int destination_type)
 {
-	ASSERT(count_nonzero_bits(des) == 1);
+	uint32 mask = ChannelTypeToChannelMask(destination_type);
 	
 	// test if the channel is valid
 	if (channel < 0 || channel >= fInputChannelCount)
 		return;
 
 	// test if it is already set
-	if (fInputChannelInfo[channel].designations & des)
+	if (fInputChannelInfo[channel].destination_mask & mask)
 		return;
 
-	// remove it from all other channels that might have it
-	for (int i = 0; i < fInputChannelCount; i++)
-		fInputChannelInfo[i].designations &= ~des;
-	
-	// add it to specified channel
-	fInputChannelInfo[channel].designations |= des;
+	// verify that no other channel has id
+	if (-1 != GetInputChannelForDestination(destination_type)) {
+		ERROR("MixerInput::AddInputChannelDestination: destination_type %d already assigned to channel %d\n", destination_type, GetInputChannelForDestination(destination_type));
+		return;
+	}		
 
-	fUserOverridesChannelDesignations = true;
-	UpdateMixerChannels();
+	// add it to specified channel
+	fInputChannelInfo[channel].destination_mask |= mask;
+
+	fUserOverridesChannelDestinations = true;
+	UpdateInputChannelDestinations();
 }
 
 void
-MixerInput::RemoveInputChannelDesignation(int channel, uint32 des)
+MixerInput::RemoveInputChannelDestination(int channel, int destination_type)
 {
-	ASSERT(count_nonzero_bits(des) == 1);
+	uint32 mask = ChannelTypeToChannelMask(destination_type);
 
 	// test if the channel is valid
 	if (channel < 0 || channel >= fInputChannelCount)
 		return;
 
 	// test if it is really set
-	if ((fInputChannelInfo[channel].designations & des) == 0)
+	if ((fInputChannelInfo[channel].destination_mask & mask) == 0)
 		return;
 
 	// remove it from specified channel
-	fInputChannelInfo[channel].designations &= ~des;
+	fInputChannelInfo[channel].destination_mask &= ~mask;
 
-	fUserOverridesChannelDesignations = true;
-	UpdateMixerChannels();
+	fUserOverridesChannelDestinations = true;
+	UpdateInputChannelDestinations();
 }
 
-uint32
-MixerInput::GetInputChannelDesignations(int channel)
+bool
+MixerInput::HasInputChannelDestination(int channel, int destination_type)
 {
-	// test if the channel is valid
 	if (channel < 0 || channel >= fInputChannelCount)
-		return 0;
-	return fInputChannelInfo[channel].designations;
+		return false;
+	if (destination_type < 0 || destination_type >= MAX_CHANNEL_TYPES)
+		return false;
+	return fInputChannelInfo[channel].destination_mask & ChannelTypeToChannelMask(destination_type);
 }
 
-uint32
+int
+MixerInput::GetInputChannelForDestination(int destination_type)
+{
+	if (destination_type < 0 || destination_type >= MAX_CHANNEL_TYPES)
+		return -1;
+	uint32 mask = ChannelTypeToChannelMask(destination_type);
+	for (int chan = 0; chan < fInputChannelCount; chan++) {
+		if (fInputChannelInfo[chan].destination_mask & mask)
+			return chan;
+	}
+	return -1;
+}
+
+int
 MixerInput::GetInputChannelType(int channel)
 {
 	// test if the channel is valid
 	if (channel < 0 || channel >= fInputChannelCount)
 		return 0;
-	return GetChannelMask(channel, fInputChannelMask);
+	return GetChannelType(channel, fInputChannelMask);
 }
 
 void
@@ -279,17 +289,17 @@ MixerInput::GetInputChannelGain(int channel)
 }
 
 void
-MixerInput::UpdateChannelDesignations()
+MixerInput::UpdateInputChannelDestinationMask()
 {
 	// is the user already messed with the assignmens, don't do anything.
-	if (fUserOverridesChannelDesignations)
+	if (fUserOverridesChannelDestinations)
 		return;
 
-	TRACE("UpdateChannelDesignations: enter\n");
+	TRACE("UpdateInputChannelDestinationMask: enter\n");
 
 	// first apply a 1:1 mapping
 	for (int i = 0; i < fInputChannelCount; i++)
-		fInputChannelInfo[i].designations = GetChannelMask(i, fInputChannelMask);
+		fInputChannelInfo[i].destination_mask = GetChannelMask(i, fInputChannelMask);
 	
 	// specialize this, depending on the available physical output channels
 	switch (fCore->OutputChannelCount()) {
@@ -299,80 +309,70 @@ MixerInput::UpdateChannelDesignations()
 			
 		case 2:
 			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-				fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 			}
 			break;
 			
 		default:
 			if (fInputChannelCount == 1 && (GetChannelMask(0, fInputChannelMask) & (B_CHANNEL_LEFT | B_CHANNEL_RIGHT))) {
-				fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT;
+				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT | B_CHANNEL_REARLEFT | B_CHANNEL_REARRIGHT;
 			}
 			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_LEFT)) {
-				fInputChannelInfo[0].designations = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+				fInputChannelInfo[0].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
 			}
 			if (fInputChannelCount == 2 && (GetChannelMask(0, fInputChannelMask) & B_CHANNEL_RIGHT)) {
-				fInputChannelInfo[0].designations = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+				fInputChannelInfo[0].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
 			}
 			if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_LEFT)) {
-				fInputChannelInfo[1].designations = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
+				fInputChannelInfo[1].destination_mask = B_CHANNEL_LEFT | B_CHANNEL_REARLEFT;
 			}
 			if (fInputChannelCount == 2 && (GetChannelMask(1, fInputChannelMask) & B_CHANNEL_RIGHT)) {
-				fInputChannelInfo[1].designations = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
+				fInputChannelInfo[1].destination_mask = B_CHANNEL_RIGHT | B_CHANNEL_REARRIGHT;
 			}
 			break;
 	}
 
 	for (int i = 0; i < fInputChannelCount; i++)
-		TRACE("UpdateChannelDesignations: input channel %d, designations 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].designations, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+		TRACE("UpdateInputChannelDestinationMask: input channel %d, destination_mask 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 
-	TRACE("UpdateChannelDesignations: leave\n");
+	TRACE("UpdateInputChannelDestinationMask: leave\n");
 }
 
 void
-MixerInput::UpdateMixerChannels()
+MixerInput::UpdateInputChannelDestinations()
 {
 	uint32 channel_count;
 	uint32 all_bits;
 	uint32 mask;
 	
-	mixer_chan_info *old_mixer_channel_info;
-	uint32 old_mixer_channel_count;
-
-	TRACE("UpdateMixerChannels: enter\n");
+	TRACE("UpdateInputChannelDestinations: enter\n");
 	
 	for (int i = 0; i < fInputChannelCount; i++)
-		TRACE("UpdateMixerChannels: input channel %d, designations 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].designations, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
+		TRACE("UpdateInputChannelDestinations: input channel %d, destination_mask 0x%08X, base %p, gain %.3f\n", i, fInputChannelInfo[i].destination_mask, fInputChannelInfo[i].buffer_base, fInputChannelInfo[i].gain);
 	
 	all_bits = 0;
 	for (int i = 0; i < fInputChannelCount; i++)
-		all_bits |= fInputChannelInfo[i].designations;
+		all_bits |= fInputChannelInfo[i].destination_mask;
 
-	TRACE("UpdateMixerChannels: all_bits = %08x\n", all_bits);
+	TRACE("UpdateInputChannelDestinations: all_bits = %08x\n", all_bits);
 	
 	channel_count = count_nonzero_bits(all_bits);
 		
-	TRACE("UpdateMixerChannels: %ld input channels, %ld mixer channels (%ld old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
+	TRACE("UpdateInputChannelDestinations: %ld input channels, %ld mixer channels (%ld old)\n", fInputChannelCount, channel_count, fMixerChannelCount);
 
-	// If we resize the channel info array, we preserve the gain setting
-	// by saving the old array until new assignments are finished, and
-	// then applying the old gains. New gains are set to 1.0
 	if (channel_count != fMixerChannelCount) {
-		old_mixer_channel_info = fMixerChannelInfo;
-		old_mixer_channel_count = fMixerChannelCount;
+		delete [] fMixerChannelInfo;
 		fMixerChannelInfo = new mixer_chan_info[channel_count];
 		fMixerChannelCount = channel_count;
-		for (int i = 0; i < fMixerChannelCount; i++)
-			fMixerChannelInfo[i].gain = 1.0;
-	} else {
-		old_mixer_channel_info = 0;
-		old_mixer_channel_count = 0;
 	}
-	
+		
 	// assign each mixer channel one type
+	// and the gain from the fChannelTypeGain[]
 	for (int i  = 0, mask = 1; i < fMixerChannelCount; i++) {
 		while (mask != 0 && (all_bits & mask) == 0)
 			mask <<= 1;
-		fMixerChannelInfo[i].type = ChannelMaskToChannelType(mask);
+		fMixerChannelInfo[i].destination_type = ChannelMaskToChannelType(mask);
+		fMixerChannelInfo[i].destination_gain = fChannelTypeGain[fMixerChannelInfo[i].destination_type];
 		mask <<= 1;
 	}
 
@@ -380,7 +380,7 @@ MixerInput::UpdateMixerChannels()
 	for (int i  = 0; i < fMixerChannelCount; i++) {
 		int j;
 		for (j = 0; j < fInputChannelCount; j++) {
-			if (fInputChannelInfo[j].designations & ChannelTypeToChannelMask(fMixerChannelInfo[i].type)) {
+			if (fInputChannelInfo[j].destination_mask & ChannelTypeToChannelMask(fMixerChannelInfo[i].destination_type)) {
 				fMixerChannelInfo[i].buffer_base = fMixBuffer ? &fMixBuffer[j] : 0;
 				break;
 			}
@@ -390,50 +390,46 @@ MixerInput::UpdateMixerChannels()
 			fMixerChannelInfo[i].buffer_base = fMixBuffer;
 		}
 	}
-	
-	// apply old gains, overriding the 1.0 defaults for the old channels
-	if (old_mixer_channel_info != 0) {
-		for (int i  = 0; i < fMixerChannelCount; i++) {
-			for (int j = 0; j < old_mixer_channel_count; j++) {
-				if (fMixerChannelInfo[i].type == old_mixer_channel_info[j].type) {
-					fMixerChannelInfo[i].gain = old_mixer_channel_info[j].gain;
-					break;
-				}
-			}
-		}
-		// also delete the old info array
-		delete [] old_mixer_channel_info;
-	}
 
 	for (int i = 0; i < fMixerChannelCount; i++)
-		TRACE("UpdateMixerChannels: mixer channel %d, type %2d, des 0x%08X, base %p, gain %.3f\n", i, fMixerChannelInfo[i].type, ChannelTypeToChannelMask(fMixerChannelInfo[i].type), fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].gain);
+		TRACE("UpdateInputChannelDestinations: mixer channel %d, type %2d, base %p, gain %.3f\n", i, fMixerChannelInfo[i].destination_type, fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].destination_gain);
 
-	TRACE("UpdateMixerChannels: leave\n");
-}
-
-uint32
-MixerInput::GetMixerChannelCount()
-{
-	return fMixerChannelCount;
+	TRACE("UpdateInputChannelDestinations: leave\n");
 }
 
 void
-MixerInput::SetMixerChannelGain(int channel, float gain)
+MixerInput::SetInputChannelDestinationGain(int channel, int destination_type, float gain)
 {
-	TRACE("SetMixerChannelGain chan %d, gain %.5f\n", channel, gain);
+	TRACE("SetInputChannelDestinationGain: channel %d, destination_type %d, gain %.4f\n", channel, destination_type, gain);
+	// we don't need the channel, as each destination_type can only exist
+	// once for each MixerInput, but we use it for parameter validation
+	// and to have a interface similar to MixerOutput
 	if (channel < 0 || channel >= fMixerChannelCount)
+		return;
+	if (destination_type < 0 || destination_type >= MAX_CHANNEL_TYPES)
 		return;
 	if (gain < 0.0f)
 		gain = 0.0f;
-	fMixerChannelInfo[channel].gain = gain;
+	fChannelTypeGain[destination_type] = gain;
+	for (int i = 0; i < fMixerChannelCount; i++) {
+		if (fMixerChannelInfo[i].destination_type == destination_type) {
+			fMixerChannelInfo[i].destination_gain = gain;
+			return;
+		}
+	}
 }
-	
+
 float
-MixerInput::GetMixerChannelGain(int channel)
+MixerInput::GetInputChannelDestinationGain(int channel, int destination_type)
 {
+	// we don't need the channel, as each destination_type can only exist
+	// once for each MixerInput, but we use it for parameter validation
+	// and to have a interface similar to MixerOutput
 	if (channel < 0 || channel >= fMixerChannelCount)
-		return 1.0;
-	return fMixerChannelInfo[channel].gain;
+		return 0.0f;
+	if (destination_type < 0 || destination_type >= MAX_CHANNEL_TYPES)
+		return 0.0f;
+	return fChannelTypeGain[destination_type];
 }
 
 void
@@ -466,8 +462,8 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 			fInputChannelInfo[i].buffer_base = 0;
 		fMixBufferFrameCount = 0;
 
-		UpdateChannelDesignations();
-		UpdateMixerChannels();
+		UpdateInputChannelDestinationMask();
+		UpdateInputChannelDestinations();
 		return;
 	}
 
@@ -502,6 +498,6 @@ MixerInput::SetMixBufferFormat(int32 framerate, int32 frames)
 	for (int i = 0; i < fInputChannelCount; i++)
 		fInputChannelInfo[i].buffer_base = &fMixBuffer[i];
 
-	UpdateChannelDesignations();
-	UpdateMixerChannels();
+	UpdateInputChannelDestinationMask();
+	UpdateInputChannelDestinations();
 }

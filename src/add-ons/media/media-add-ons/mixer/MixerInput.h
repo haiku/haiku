@@ -3,9 +3,9 @@
 
 #include <RealtimeAlloc.h>
 #include <MediaNode.h>
+#include "MixerCore.h"
 #include "debug.h"
 
-class MixerCore;
 class ByteSwap;
 class Resampler;
 
@@ -20,50 +20,54 @@ public:
 	void BufferReceived(BBuffer *buffer);
 	
 	media_input & MediaInput();
-	
-	uint32 GetMixerChannelCount();
-	void SetMixerChannelGain(int channel, float gain);
-	float GetMixerChannelGain(int channel);
-	
-	uint32 GetInputChannelCount();
-	void AddInputChannelDesignation(int channel, uint32 des);
-	void RemoveInputChannelDesignation(int channel, uint32 des);
-	uint32 GetInputChannelDesignations(int channel);
-	uint32 GetInputChannelType(int channel);
-	void SetInputChannelGain(int channel, float gain);
-	float GetInputChannelGain(int channel);
+
+	// The physical input channels
+	uint32	GetInputChannelCount();
+	int		GetInputChannelType(int channel);
+	void	SetInputChannelGain(int channel, float gain);
+	float	GetInputChannelGain(int channel);
+
+	// The destinations for each channel
+	void 	AddInputChannelDestination(int channel, int destination_type);
+	void 	RemoveInputChannelDestination(int channel, int destination_type);
+	void 	SetInputChannelDestinationGain(int channel, int destination_type, float gain);
+	float	GetInputChannelDestinationGain(int channel, int destination_type);
+	bool 	HasInputChannelDestination(int channel, int destination_type);
+	int 	GetInputChannelForDestination(int destination_type); // returns -1 if not found
 	
 	void SetEnabled(bool yesno);
 	bool IsEnabled();
 
 	// only for use by MixerCore
-	bool GetMixerChannelInfo(int channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
-	int GetMixerChannelType(int channel);
+	uint32 GetMixerChannelCount();
+	bool GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 
 protected:
 	friend class MixerCore;
 	void SetMixBufferFormat(int32 framerate, int32 frames);
 	
 private:
-	void UpdateChannelDesignations();
-	void UpdateMixerChannels();
+	void UpdateInputChannelDestinationMask();
+	void UpdateInputChannelDestinations();
 
 private:
 	struct input_chan_info {
 		float *buffer_base;
-		uint32 designations;	// multiple or no bits sets
+		uint32 destination_mask;	// multiple or no bits sets
 		float gain;
 	};	
 	struct mixer_chan_info {
 		float *buffer_base;
-		int type;
-		float gain;
+		int		destination_type;
+		float	destination_gain;
 	};
 	
 private:
 	MixerCore		*fCore;
 	media_input		fInput;
 	ByteSwap		*fInputByteSwap;
+	
+	float			fChannelTypeGain[MAX_CHANNEL_TYPES];
 	
 	bool			fEnabled;
 
@@ -84,34 +88,32 @@ private:
 	Resampler		**fResampler; // array
 	rtm_pool		*fRtmPool;
 
-	bool			fUserOverridesChannelDesignations;
+	bool			fUserOverridesChannelDestinations;
 	
 	int32			debugMixBufferFrames;
 };
 
+inline uint32
+MixerInput::GetMixerChannelCount()
+{
+	return fMixerChannelCount;
+}
+
 inline bool
-MixerInput::GetMixerChannelInfo(int channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain)
+MixerInput::GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain)
 {
 	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
-	ASSERT(channel >= 0 && channel < fMixerChannelCount);
+	ASSERT(mixer_channel >= 0 && mixer_channel < fMixerChannelCount);
 	if (time > fLastDataAvailableTime || !fEnabled)
 		return false;
 	
 	int32 offset = framepos % fMixBufferFrameCount;
-	if (channel == 0) PRINT(3, "GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames - 1);
-	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
+	if (mixer_channel == 0) PRINT(3, "GetMixerChannelInfo: frames %ld to %ld\n", offset, offset + debugMixBufferFrames - 1);
+	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[mixer_channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
 	*sample_offset = sizeof(float) * fInputChannelCount;
-	*type = fMixerChannelInfo[channel].type;
-	*gain = fMixerChannelInfo[channel].gain;
+	*type = fMixerChannelInfo[mixer_channel].destination_type;
+	*gain = fMixerChannelInfo[mixer_channel].destination_gain;
 	return true;
-}
-
-inline int
-MixerInput::GetMixerChannelType(int channel)
-{
-	ASSERT(fMixBuffer); // this function should not be called if we don't have a mix buffer!
-	ASSERT(channel >= 0 && channel < fMixerChannelCount);
-	return fMixerChannelInfo[channel].type;
 }
 
 #endif
