@@ -8,6 +8,34 @@
 //fixme: implement: (used for virtual screens!)
 //void move_overlay(uint16 hdisp_start, uint16 vdisp_start);
 
+status_t nv_bes_to_crtc(uint8 crtc)
+{
+	if (si->ps.secondary_head)
+	{
+		if (crtc)
+		{
+			LOG(4,("Overlay: switching overlay to CRTC2\n"));
+			/* switch overlay engine to CRTC2 */
+			NV_REG32(NV32_FUNCSEL) &= ~0x00001000;
+			NV_REG32(NV32_2FUNCSEL) |= 0x00001000;
+			si->overlay.crtc = 1;
+		}
+		else
+		{
+			LOG(4,("Overlay: switching overlay to CRTC1\n"));
+			/* switch overlay engine to CRTC1 */
+			NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
+			NV_REG32(NV32_FUNCSEL) |= 0x00001000;
+			si->overlay.crtc = 0;
+		}
+		return B_OK;
+	}
+	else
+	{
+		return B_ERROR;
+	}
+}
+
 status_t nv_bes_init()
 {
 	if (si->ps.card_arch < NV10A)
@@ -103,13 +131,12 @@ status_t nv_configure_bes
 	/* the BES does not respect virtual_workspaces, but adheres to CRTC
 	 * constraints only */
 	crtc_hstart = si->dm.h_display_start;
-	/* make dualhead switch mode with TVout enabled work while we're at it.. */
-//fixme: probably no fix at all needed on NV cards...
-/*	if (si->switched_crtcs)
+	/* make dualhead stretch and switch mode work while we're at it.. */
+	if (si->overlay.crtc)
 	{
 		crtc_hstart += si->dm.timing.h_display;
 	}
-*/
+
 	/* horizontal end is the first position beyond the displayed range on the CRTC */
 	crtc_hend = crtc_hstart + si->dm.timing.h_display;
 	crtc_vstart = si->dm.v_display_start;

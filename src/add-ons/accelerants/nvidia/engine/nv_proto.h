@@ -106,6 +106,7 @@ status_t nv_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
+status_t nv_bes_to_crtc(uint8 crtc);
 status_t nv_bes_init(void);
 status_t nv_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);

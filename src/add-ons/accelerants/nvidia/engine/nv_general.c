@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-8 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-9 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -936,11 +936,14 @@ status_t nv_general_bios_to_powergraphics()
 
 	if (si->ps.secondary_head)
 	{
-		/* switch overlay engine to head 1 */
-		//fixme: add other function blocks...
-		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
+		/* switch overlay engine to CRTC1 */
+		/* bit 12: overlay engine,
+		 * bit  8: TVout chip (fixme: or bit 4?),
+		 * bit  4: DDC channel (fixme: or bit 8?) */
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
+		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
 	}
+	si->overlay.crtc = 0;
 
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */
