@@ -100,7 +100,7 @@ void InitDesktop(void)
 		delete tdriver;
 		tdriver=NULL;
 	}
-#endif
+#else
 
 #if DISPLAYDRIVER == SCREENDRIVER
 	tdriver=new ScreenDriver;
@@ -124,6 +124,7 @@ void InitDesktop(void)
 		delete tdriver;
 		tdriver=NULL;
 	}
+#endif
 	
 	// Once we utilize multiple monitors, we'll make Screen 0 the active one.
 	if(tdriver)
