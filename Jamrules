@@ -489,11 +489,11 @@ rule TestObjects
 	}
 
 	# set headers/defines
-	UseCppUnitObjectHeaders $(objects) ;
+	UseCppUnitObjectHeaders $(sources) : $(objects) ;
 	if $(r5) {
 		ObjectDefines $(objects) : TEST_R5 ;
 	} else {
-		UsePublicObjectHeaders $(objects) : $(headerDirs) ;
+		UsePublicObjectHeaders $(sources) : $(headerDirs) : $(objects) ;
 		ObjectDefines $(objects) : TEST_OBOS ;
 	}
 
@@ -731,6 +731,30 @@ rule AddResources
 	RESFILES on $(1) += $(2) ;
 }
 
+rule SourceHdrs
+{
+	# SourceHdrs <sources> : <headers> [ : <gristed objects> ] ;
+	#
+	# Is a wrapper for ObjectHdrs, that passes <sources> and <headers> or,
+	# if supplied <objects> and <headers>, and also adjusts HDRSEARCH (not
+	# done by ObjectHdrs).
+
+	local sources = [ FGristFiles $(1) ] ;
+	local headers = $(2) ;
+	local objects = $(3) ;
+
+	if $(objects) {
+		ObjectHdrs $(objects) : $(headers) ;
+	} else {
+		ObjectHdrs $(sources) : $(headers) ;
+	}
+
+	# Also add the header search dirs to HDRSEARCH. Note, that these dirs
+	# will be listed after the STDHDRS (if any), but that's better than not
+	# being listed at all.
+	HDRSEARCH on $(sources) += $(headers) ;
+}
+
 rule PublicHeaders
 {
 	# PublicHeaders <group list>
@@ -778,13 +802,14 @@ rule UsePublicHeaders
 
 rule UsePublicObjectHeaders
 {
-	# UsePublicObjectHeaders <sources_or_objects> : <group list> ;
+	# UsePublicObjectHeaders <sources> : <group list> [ : <objects> ] ;
 	#
 	# Adds the public C header dirs given by <group list> to the header search
-	# dirs of <sources_or_objects>.
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
 	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
-	ObjectHdrs $(1) : [ PublicHeaders $(2) ] ;
+	SourceHdrs $(1) : [ PublicHeaders $(2) ] : $(3) ;
 }
 
 rule UsePrivateHeaders
@@ -800,13 +825,14 @@ rule UsePrivateHeaders
 
 rule UsePrivateObjectHeaders
 {
-	# UsePrivateObjectHeaders <sources_or_objects> : <group list> ;
+	# UsePrivateObjectHeaders <sources> : <group list> [ : <objects> ] ;
 	#
 	# Adds the private C header dirs given by <group list> to the header search
-	# dirs of <sources_or_objects>.
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
 	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
-	ObjectHdrs $(1) : [ PrivateHeaders $(2) ] ;
+	SourceHdrs $(1) : [ PrivateHeaders $(2) ] : $(3) ;
 }
 
 rule UseHeaders
@@ -830,7 +856,8 @@ rule UseCppUnitHeaders
 
 rule UseCppUnitObjectHeaders
 {
-	ObjectHdrs $(1) : [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
+	# UseCppUnitObjectHeaders <sources> [ : <objects> ] ;
+	SourceHdrs $(1) : [ FDirName $(OBOS_TOP) headers tools cppunit ] : $(2) ;
 }
 
 rule UseArchHeaders
@@ -850,19 +877,26 @@ rule UseArchHeaders
 
 rule UseArchObjectHeaders
 {
-	# usage: UseArchObjectHeaders <sources_or_objects> : <arch> ;
+	# usage: UseArchObjectHeaders <sources> : <arch> : [ <objects> ] ;
 	#
 	# <arch> specifies the architecture (e.g. x86).
 	# <sources_or_objects> Source or object files.
 	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
-	local targets = $(1) ;
+	local sources = $(1) ;
 	local headers = [ ArchHeaders $(2) ] ;
+	local objects = $(3) ;
+	local targets ;
+	if $(objects) {
+		targets = $(objects) ;
+	} else {
+		targets = $(sources) ;
+	}
 	local opt = -D$(OBOS_TARGET_DEFINE) ;
 
 	ObjectCcFlags $(targets) : $(opt)  ;
 	ObjectC++Flags $(targets) : $(opt)  ;
-	ObjectHdrs $(targets) : $(headers) ;
+	SourceHdrs $(sources) : $(headers) : $(objects) ;
 }
 
 rule UsePosixHeaders
@@ -872,13 +906,14 @@ rule UsePosixHeaders
 
 rule UsePosixObjectHeaders
 {
-	# UsePosixObjectHeaders <sources_or_objects> ;
+	# UsePosixObjectHeaders <sources> [ : <objects> ] ;
 	#
 	# Adds the POSIX header dir to the header search
-	# dirs of <sources_or_objects>.
+	# dirs of either the object targets of <sources> or if supplied to
+	# <objects>. Also adjusts HDRSEARCH of <sources>.
 	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
-	ObjectHdrs $(1) : [ FDirName $(OBOS_TOP) headers posix ] ;
+	SourceHdrs $(1) : [ FDirName $(OBOS_TOP) headers posix ] : $(2) ;
 }
 
 rule SplitPath
@@ -953,7 +988,7 @@ rule RelSymLink
 
 	SymLink $(target)
 		: [ FRelPath $(targetDirComponents) : $(sourceComponents) ] ;
-	NOUPDATE $(target);
+	NOUPDATE $(target) ;
 	Depends $(target) : $(source) ;
 	LocalClean clean : $(target) ;
 }
@@ -1455,7 +1490,8 @@ rule UseFreeTypeHeaders
 
 rule UseFreeTypeObjectHeaders
 {
-	ObjectHdrs $(1) : $(FT2_INCLUDE) ;
+	# UseFreeTypeObjectHeaders <sources> [ : <objects> ] ;
+	SourceHdrs $(1) : $(FT2_INCLUDE) : $(2) ;
 }
 
 rule FT2_SubDir
