@@ -39,9 +39,9 @@ void dump_fd(int fd, struct file_descriptor *descriptor);
 void
 dump_fd(int fd,struct file_descriptor *descriptor)
 {
-	dprintf("fd[%d] = %p: type = %d, ref_count = %d, ops = %p, vnode = %p, cookie = %p, dummy = %x\n",
+	dprintf("fd[%d] = %p: type = %ld, ref_count = %ld, ops = %p, u.vnode = %p, u.mount = %p, cookie = %p, open_mode = %lx, pos = %Ld\n",
 		fd, descriptor, descriptor->type, descriptor->ref_count, descriptor->ops,
-		descriptor->vnode, descriptor->cookie, descriptor->dummy);
+		descriptor->u.vnode, descriptor->u.mount, descriptor->cookie, descriptor->open_mode, descriptor->pos);
 }
 #endif
 
