@@ -3,10 +3,10 @@
 
 #include <Point.h>
 #include <Font.h>
-#include "RGBColor.h"
-#include "FontServer.h"
-#include "ServerFont.h"
-#include "PatternHandler.h"
+#include <RGBColor.h>
+#include <FontServer.h>
+#include <ServerFont.h>
+#include <PatternHandler.h>
 #include "GraphicsDefs.h"
 #include "InterfaceDefs.h"
 
