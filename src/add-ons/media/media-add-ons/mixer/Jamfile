@@ -1,11 +1,12 @@
 SubDir OBOS_TOP src add-ons media media-add-ons mixer ;
 
-UsePrivateHeaders media ;
-
 Addon mixer.media_addon : media :
 	AudioMixer.cpp
-	MixerAddOn.cpp
 	FillMixBuffer.cpp
+	MixerAddOn.cpp
+	MixerCore.cpp
+	MixerInput.cpp
+	MixerOutput.cpp
 	Resampler.cpp
 ;
 
