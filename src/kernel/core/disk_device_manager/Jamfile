@@ -14,6 +14,7 @@ SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
 SubDirC++Flags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
 
 SharedLibrary disk_device_manager :
+	ddm_operation_validation.cpp
 	ddm_userland_interface.cpp
 	disk_device_manager.cpp
 	KDiskDevice.cpp
