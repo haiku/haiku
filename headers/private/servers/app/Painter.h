@@ -311,6 +311,7 @@ class Painter {
 	// font file, it uses the FontManager to locate a file
 	// by Family and Style
 	AGGTextRenderer*			fTextRenderer;
+	uint32						fLastFamilyAndStyle;
 };
 
 // SetHighColor

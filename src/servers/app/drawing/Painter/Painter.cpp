@@ -63,7 +63,8 @@ Painter::Painter()
 	  fPenLocation(0.0, 0.0),
 	  fPatternHandler(new PatternHandler()),
 	  fFont(be_plain_font),
-	  fTextRenderer(new AGGTextRenderer())
+	  fTextRenderer(new AGGTextRenderer()),
+	  fLastFamilyAndStyle(0)
 {
 	_UpdateFont();
 	_UpdateLineWidth();
@@ -276,8 +277,11 @@ Painter::SetFont(const ServerFont& font)
 	fFont.SetShear(font.Shear());
 	fFont.SetRotation(font.Rotation());
 	fFont.SetSize(font.Size());
-	
-	_UpdateFont(font.GetPath());
+
+	if (fLastFamilyAndStyle != font.GetFamilyAndStyle()) {
+		fLastFamilyAndStyle = font.GetFamilyAndStyle();
+		_UpdateFont(font.GetPath());
+	}
 }
 
 // #pragma mark -
@@ -1034,19 +1038,23 @@ Painter::_RebuildClipping()
 void
 Painter::_UpdateFont(const char* pathToFontFile)
 {
+	bool success = false;
 	if (pathToFontFile) {
-		fTextRenderer->SetFont(pathToFontFile);
+		success = fTextRenderer->SetFont(pathToFontFile);
+		if (!success)
+			fprintf(stderr, "unable to set '%s'\n", pathToFontFile);
 	} else {
 		font_family family;
 		font_style style;
 		fFont.GetFamilyAndStyle(&family, &style);
 	
-		bool success = fTextRenderer->SetFamilyAndStyle(family, style);
-		if (!success) {
+		success = fTextRenderer->SetFamilyAndStyle(family, style);
+		if (!success)
 			fprintf(stderr, "unable to set '%s' + '%s'\n", family, style);
-			fprintf(stderr, "font is still: '%s' + '%s'\n",
-							fTextRenderer->Family(), fTextRenderer->Style());
-		}
+	}
+	if (!success) {
+		fprintf(stderr, "font is still: '%s' + '%s'\n",
+						fTextRenderer->Family(), fTextRenderer->Style());
 	}
 
 	fTextRenderer->SetPointSize(fFont.Size());

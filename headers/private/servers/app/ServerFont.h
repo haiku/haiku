@@ -79,7 +79,7 @@ public:
 	const char *GetPath(void) const { return fStyle->GetPath(); }
 	uint16 StyleID(void) const { return fStyle->GetID(); }
 	uint16 FamilyID(void) const { return fStyle->Family()->GetID(); }
-	uint32 GetFamilyAndStyle(void);
+	uint32 GetFamilyAndStyle(void) const;
 
 	BRect BoundingBox(void);
 	void Height(font_height *fh);

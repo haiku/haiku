@@ -213,7 +213,7 @@ status_t ServerFont::SetFamilyAndStyle(const uint32 &fontID)
 	\brief Gets the ID values for the ServerFont instance in one shot
 	\return the combination of family and style ID numbers
 */
-uint32 ServerFont::GetFamilyAndStyle(void)
+uint32 ServerFont::GetFamilyAndStyle(void) const
 {
 	uint32 famsty=0;
 	
