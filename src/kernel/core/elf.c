@@ -97,8 +97,6 @@ register_elf_image(struct elf_image_info *image)
 {
 	image_info imageInfo;
 
-	image->id = register_image(team_get_kernel_team(), &imageInfo, sizeof(image_info));
-
 	memset(&imageInfo, 0, sizeof(image_info));
 	imageInfo.id = image->id;
 	imageInfo.type = B_SYSTEM_IMAGE;
@@ -109,6 +107,7 @@ register_elf_image(struct elf_image_info *image)
 	imageInfo.data = (void *)image->data_region.start;
 	imageInfo.data_size = image->data_region.size;
 
+	image->id = register_image(team_get_kernel_team(), &imageInfo, sizeof(image_info));
 	hash_insert(sImagesHash, image);
 }
 
