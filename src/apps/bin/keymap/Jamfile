@@ -13,7 +13,7 @@ rule MkKeymapComp
 	SEARCH on $(source) = $(SEARCH_SOURCE) ;
 	MakeLocate $(binary) : [ FDirName $(OBOS_ETC_DIR) Keymap ] ;
 
-	Depends files : $(binary) ;
+	LocalDepends files : $(binary) ;
 	Depends $(binary) : $(source) keymap ;
 	MkKeymapComp1 $(binary) : keymap $(source) ;
 	LocalClean clean : $(binary) ;
@@ -29,6 +29,6 @@ local keymapFiles = [ GLOB $(SUBDIR) : *.keymap ] ;
 # generate the binary file for the keymap files
 local keymapFile ;
 for keymapFile in [ FGristFiles $(keymapFiles:D=) ] {
-	local binary = <keymap>$(keymapFile:B) ;
+	local binary = $(keymapFile:BG=keymap) ;
 	MkKeymapComp $(binary) : $(keymapFile) ;
 }
