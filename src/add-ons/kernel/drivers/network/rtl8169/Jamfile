@@ -9,6 +9,7 @@ UsePrivateHeaders net ;
 R5KernelAddon rtl8169 : kernel drivers bin :
 	driver.c
 	device.c
+	timer.c 
 	util.c
 	;
 
