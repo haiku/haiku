@@ -34,14 +34,14 @@
 #define SGIVIEW_H
 
 #include <View.h>
+#include "TranslatorSettings.h"
 
 class BMenuField;
-class SGITranslatorSettings;
 
 class SGIView : public BView {
 public:
 	SGIView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags, SGITranslatorSettings* psettings);
+		uint32 flags, TranslatorSettings *settings);
 		// sets up the view
 		
 	~SGIView();
@@ -62,7 +62,7 @@ public:
 private:
 	BMenuField*				fCompressionMF;
 
-	SGITranslatorSettings*	fSettings;
+	TranslatorSettings *fSettings;
 		// the actual settings for the translator,
 		// shared with the translator
 };

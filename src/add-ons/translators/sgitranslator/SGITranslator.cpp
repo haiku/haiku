@@ -48,7 +48,6 @@
 
 #include "SGIImage.h"
 #include "SGITranslator.h"
-#include "SGITranslatorSettings.h"
 #include "SGIView.h"
 
 // The input formats that this translator supports.
@@ -89,6 +88,14 @@ translation_format gOutputFormats[] = {
 		"image/sgi",
 		"SGI image"
 	}
+};
+
+// Default settings for the Translator
+TranSetting gDefaultSettings[] = {
+	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
+	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false},
+	{SGI_SETTING_COMPRESSION, TRAN_SETTING_INT32, SGI_COMP_RLE}
+		// compression is set to RLE by default
 };
 
 // ---------------------------------------------------------------
@@ -137,23 +144,20 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 // Returns:
 // ---------------------------------------------------------------
 SGITranslator::SGITranslator()
-	:	BTranslator(),
-		fSettings(new SGITranslatorSettings())
+	: BaseTranslator("SGI Images", "SGI image translator",
+		SGI_TRANSLATOR_VERSION,
+		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
+		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		"SGITranslator_Settings",
+		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		B_TRANSLATOR_BITMAP, SGI_FORMAT)
 {
-	fSettings->LoadSettings();
-		// load settings from the SGI Translator settings file
-
-	strcpy(fName, "SGI Images");
-	sprintf(fInfo, "SGI image translator v%d.%d.%d %s",
-		static_cast<int>(SGI_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((SGI_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(SGI_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------
 // Destructor
 //
-// releases the settings object
+// Does nothing
 //
 // Preconditions:
 //
@@ -165,229 +169,12 @@ SGITranslator::SGITranslator()
 // ---------------------------------------------------------------
 SGITranslator::~SGITranslator()
 {
-	fSettings->Release();
-}
-
-// ---------------------------------------------------------------
-// TranslatorName
-//
-// Returns the short name of the translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the short name of the translator
-// ---------------------------------------------------------------	
-const char *
-SGITranslator::TranslatorName() const
-{
-	return fName;
-}
-
-// ---------------------------------------------------------------
-// TranslatorInfo
-//
-// Returns a more verbose name for the translator than the one
-// TranslatorName() returns. This usually includes version info.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the verbose name of the translator
-// ---------------------------------------------------------------
-const char *
-SGITranslator::TranslatorInfo() const
-{
-	return fInfo;
-}
-
-// ---------------------------------------------------------------
-// TranslatorVersion
-//
-// Returns the integer representation of the current version of
-// this translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-int32 
-SGITranslator::TranslatorVersion() const
-{
-	return SGI_TRANSLATOR_VERSION;
-}
-
-// ---------------------------------------------------------------
-// InputFormats
-//
-// Returns a list of input formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of input formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of input formats and the number of input
-// formats through the out_count parameter, if out_count is NULL,
-// NULL is returned
-// ---------------------------------------------------------------
-const translation_format *
-SGITranslator::InputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gInputFormats) /
-			sizeof(translation_format);
-		return gInputFormats;
-	} else
-		return NULL;
-}
-
-// ---------------------------------------------------------------
-// OutputFormats
-//
-// Returns a list of output formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of output formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of output formats and the number of output
-// formats through the out_count parameter, if out_count is NULL,
-// NULL is returned
-// ---------------------------------------------------------------	
-const translation_format *
-SGITranslator::OutputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gOutputFormats) /
-			sizeof(translation_format);
-		return gOutputFormats;
-	} else
-		return NULL;
-}
-
-// ---------------------------------------------------------------
-// identify_bits_header
-//
-// Determines if the data in inSource is in the
-// B_TRANSLATOR_BITMAP ('bits') format. If it is, it returns 
-// info about the data in inSource to outInfo and pheader.
-//
-// Preconditions:
-//
-// Parameters:	inSource,	The source of the image data
-//
-//				outInfo,	Information about the translator
-//							is copied here
-//
-//				amtread,	Amount of data read from inSource
-//							before this function was called
-//
-//				read,		Pointer to the data that was read
-// 							in before this function was called
-//
-//				pheader,	The bits header is copied here after
-//							it is read in from inSource
-//
-// Postconditions:
-//
-// Returns: B_NO_TRANSLATOR,	if the data does not look like
-//								bits format data
-//
-// B_ERROR,	if the header data could not be converted to host
-//			format
-//
-// B_OK,	if the data looks like bits data and no errors were
-//			encountered
-// ---------------------------------------------------------------
-status_t 
-identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, TranslatorBitmap *pheader = NULL)
-{
-	TranslatorBitmap header;
-		
-	memcpy(&header, read, amtread);
-		// copy portion of header already read in
-	// read in the rest of the header
-	ssize_t size = sizeof(TranslatorBitmap) - amtread;
-	if (inSource->Read(
-		(reinterpret_cast<uint8 *> (&header)) + amtread, size) != size)
-		return B_NO_TRANSLATOR;
-		
-	// convert to host byte order
-	if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
-		return B_ERROR;
-
-// TODO: supress unwanted colorspaces here already?
-	// check if header values are reasonable
-	if (header.colors != B_RGB32 &&
-		header.colors != B_RGB32_BIG &&
-		header.colors != B_RGBA32 &&
-		header.colors != B_RGBA32_BIG &&
-		header.colors != B_RGB24 &&
-		header.colors != B_RGB24_BIG &&
-		header.colors != B_RGB16 &&
-		header.colors != B_RGB16_BIG &&
-		header.colors != B_RGB15 &&
-		header.colors != B_RGB15_BIG &&
-		header.colors != B_RGBA15 &&
-		header.colors != B_RGBA15_BIG &&
-		header.colors != B_CMAP8 &&
-		header.colors != B_GRAY8 &&
-		header.colors != B_GRAY1 &&
-		header.colors != B_CMYK32 &&
-		header.colors != B_CMY32 &&
-		header.colors != B_CMYA32 &&
-		header.colors != B_CMY24)
-		return B_NO_TRANSLATOR;
-	if (header.rowBytes * (header.bounds.Height() + 1) != header.dataSize)
-		return B_NO_TRANSLATOR;
-			
-	if (outInfo) {
-		outInfo->type = B_TRANSLATOR_BITMAP;
-		outInfo->group = B_TRANSLATOR_BITMAP;
-		outInfo->quality = BBT_IN_QUALITY;
-		outInfo->capability = BBT_IN_CAPABILITY;
-		strcpy(outInfo->name, "Be Bitmap Format (SGITranslator)");
-		strcpy(outInfo->MIME, "image/x-be-bitmap");
-	}
-	
-	if (pheader) {
-		pheader->magic = header.magic;
-		pheader->bounds = header.bounds;
-		pheader->rowBytes = header.rowBytes;
-		pheader->colors = header.colors;
-		pheader->dataSize = header.dataSize;
-	}
-	
-	return B_OK;
 }
 
 status_t
-identify_sgi_header(BPositionIO *inSource, BMessage *ioExtension,
-	translator_info *outInfo, uint32 outType,
+identify_sgi_header(BPositionIO *inSource, translator_info *outInfo, uint32 outType,
 	SGIImage **poutSGIImage = NULL)
 {
-	// Can only output to bits for now
-	if (outType != B_TRANSLATOR_BITMAP)
-		return B_NO_TRANSLATOR;
-	
 	status_t status = B_NO_MEMORY;
 	// construct new SGIImage object and set it to the provided BPositionIO
 	SGIImage* sgiImage = new(nothrow) SGIImage();
@@ -418,7 +205,7 @@ identify_sgi_header(BPositionIO *inSource, BMessage *ioExtension,
 }
 	
 // ---------------------------------------------------------------
-// Identify
+// DerivedIdentify
 //
 // Examines the data from inSource and determines if it is in a
 // format that this translator knows how to work with.
@@ -457,96 +244,28 @@ identify_sgi_header(BPositionIO *inSource, BMessage *ioExtension,
 // Other errors if BPositionIO::Read() returned an error value
 // ---------------------------------------------------------------
 status_t
-SGITranslator::Identify(BPositionIO *inSource,
+SGITranslator::DerivedIdentify(BPositionIO *inSource,
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
 {
-	if (!outType)
-		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP && outType != SGI_FORMAT)
-		return B_NO_TRANSLATOR;
-	
-	// Convert the magic numbers to the various byte orders so that
-	// I won't have to convert the data read in to see whether or not
-	// it is a supported type
-	uint32 nbits = B_TRANSLATOR_BITMAP;
-	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
-		B_SWAP_HOST_TO_BENDIAN) != B_OK)
-		return B_ERROR;
-	
-	// Read in the magic number and determine if it
-	// is a supported type
-	uint8 ch[4];
-	if (inSource->Read(ch, 4) != 4)
-		return B_NO_TRANSLATOR;
-	// Read settings from ioExtension
-	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
-		return B_BAD_VALUE; // reason could be invalid settings,
-							// like header only and data only set at the same time
-	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	// if B_TRANSLATOR_BITMAP type	
-	if (n32ch == nbits)
-		return identify_bits_header(inSource, outInfo, 4, ch);
-	// Might be SGI image
-	else
-		return identify_sgi_header(inSource, ioExtension, outInfo, outType);
+	return identify_sgi_header(inSource, outInfo, outType);
 }
 
 // translate_from_bits
 status_t
-translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
-	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination,
-	SGITranslatorSettings &settings)
+SGITranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
+	BPositionIO *outDestination)
 {
 	TranslatorBitmap bitsHeader;
 
-	bool bheaderonly = false, bdataonly = false;
-	uint32 compression = settings.SetGetCompression();
+	uint32 compression = fSettings->SetGetInt32(SGI_SETTING_COMPRESSION);
 
-	status_t ret = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
+	status_t ret = identify_bits_header(inSource, NULL, &bitsHeader);
 	if (ret < B_OK)
 		return ret;
 
-	// Translate B_TRANSLATOR_BITMAP to B_TRANSLATOR_BITMAP, easy enough :)
-	if (outType == B_TRANSLATOR_BITMAP) {
-		// write out bitsHeader (only if configured to)
-		if (bheaderonly || (!bheaderonly && !bdataonly)) {
-			if (swap_data(B_UINT32_TYPE, &bitsHeader,
-				sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK)
-				return B_ERROR;
-			if (outDestination->Write(&bitsHeader,
-				sizeof(TranslatorBitmap)) != sizeof(TranslatorBitmap))
-				return B_ERROR;
-		}
-		
-		// write out the data (only if configured to)
-		if (bdataonly || (!bheaderonly && !bdataonly)) {
-			uint32 size = 4096;
-			uint8* buf = new uint8[size];
-			uint32 remaining = B_BENDIAN_TO_HOST_INT32(bitsHeader.dataSize);
-			ssize_t rd, writ = B_ERROR;
-			rd = inSource->Read(buf, size);
-			while (rd > 0) {
-				writ = outDestination->Write(buf, rd);
-				if (writ < 0)
-					break;
-				remaining -= static_cast<uint32>(writ);
-				rd = inSource->Read(buf, min_c(size, remaining));
-			}
-			delete[] buf;
-		
-			if (remaining > 0)
-				// writ may contain a more specific error
-				return writ < 0 ? writ : B_ERROR;
-			else
-				return B_OK;
-		} else
-			return B_OK;
-		
 	// Translate B_TRANSLATOR_BITMAP to SGI_FORMAT
-	} else if (outType == SGI_FORMAT) {
+	if (outType == SGI_FORMAT) {
 
 		// common fields which are independent of the bitmap format
 		uint32 width = bitsHeader.bounds.IntegerWidth() + 1;
@@ -555,7 +274,7 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		uint32 bytesPerChannel = 1;
 		color_space format = bitsHeader.colors;
 
-	uint32 channelCount;
+		uint32 channelCount;
 		switch (format) {
 			case B_GRAY8:
 				channelCount = 1;
@@ -711,16 +430,21 @@ printf("WriteRow() returned %s!\n", strerror(ret));
 
 // translate_from_sgi
 status_t
-translate_from_sgi(BPositionIO *inSource, BMessage *ioExtension,
-	uint32 outType, BPositionIO *outDestination,
-	SGITranslatorSettings &settings)
+SGITranslator::translate_from_sgi(BPositionIO *inSource, uint32 outType,
+	BPositionIO *outDestination)
 {
 	status_t ret = B_NO_TRANSLATOR;
+	
+	// if copying SGI_FORMAT to SGI_FORMAT
+	if (outType == SGI_FORMAT) {
+		translate_direct_copy(inSource, outDestination);
+		return B_OK;
+	}
 
 	// variables needing cleanup
 	SGIImage* sgiImage = NULL;
 	
-	ret = identify_sgi_header(inSource, ioExtension, NULL, outType, &sgiImage);
+	ret = identify_sgi_header(inSource, NULL, outType, &sgiImage);
 
 	if (ret >= B_OK) {
 
@@ -952,7 +676,7 @@ printf("error writing bits header: %s\n", strerror(ret));
 }
 
 // ---------------------------------------------------------------
-// Translate
+// DerivedTranslate
 //
 // Translates the data in inSource to the type outType and stores
 // the translated data in outDestination.
@@ -971,6 +695,10 @@ printf("error writing bits header: %s\n", strerror(ret));
 //				outDestination,	where the translated data is
 //								put
 //
+//				baseType, indicates whether inSource is in the
+//				          bits format, not in the bits format or
+//				          is unknown
+//
 // Postconditions:
 //
 // Returns: B_BAD_VALUE, if the options in ioExtension are bad
@@ -983,101 +711,25 @@ printf("error writing bits header: %s\n", strerror(ret));
 // B_OK, if all went well
 // ---------------------------------------------------------------
 status_t
-SGITranslator::Translate(BPositionIO *inSource,
+SGITranslator::DerivedTranslate(BPositionIO *inSource,
 		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination)
+		uint32 outType, BPositionIO *outDestination, int32 baseType)
 {
-	if (!outType)
-		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP && outType != SGI_FORMAT)
-		return B_NO_TRANSLATOR;
-	
-	// Convert the magic numbers to the various byte orders so that
-	// I won't have to convert the data read in to see whether or not
-	// it is a supported type
-	uint32 nbits = B_TRANSLATOR_BITMAP;
-	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
-		B_SWAP_HOST_TO_BENDIAN) != B_OK)
-		return B_ERROR;
-	
-	// Read in the magic number and determine if it
-	// is a supported type
-	uint8 ch[4];
-	inSource->Seek(0, SEEK_SET);
-	if (inSource->Read(ch, 4) != 4)
-		return B_NO_TRANSLATOR;
-		
-	// Read settings from ioExtension
-	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
-		return B_BAD_VALUE;
-	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	if (n32ch == nbits) {
-		// B_TRANSLATOR_BITMAP type
-		return translate_from_bits(inSource, 4, ch, ioExtension, outType,
-								   outDestination, *fSettings);
-	} else
-		// Might be SGI image
-		return translate_from_sgi(inSource, ioExtension, outType,
-								  outDestination, *fSettings);
+	if (baseType == 1)
+		// if inSource is in bits format
+		return translate_from_bits(inSource, outType, outDestination);
+	else if (baseType == 0)
+		// if inSource is NOT in bits format
+		return translate_from_sgi(inSource, outType, outDestination);
+	else
+		// if BaseTranslator did not properly identify the data as
+		// bits or not bits
+		return B_NO_TRANSLATOR;		
 }
 
-// returns the current translator settings into ioExtension
-status_t
-SGITranslator::GetConfigurationMessage(BMessage *ioExtension)
+BView *
+SGITranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return fSettings->GetConfigurationMessage(ioExtension);
+	return new SGIView(BRect(0, 0, 225, 175), "SGITranslator Settings",
+		B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
-
-// ---------------------------------------------------------------
-// MakeConfigurationView
-//
-// Makes a BView object for configuring / displaying info about
-// this translator. 
-//
-// Preconditions:
-//
-// Parameters:	ioExtension,	configuration options for the
-//								translator
-//
-//				outView,		the view to configure the
-//								translator is stored here
-//
-//				outExtent,		the bounds of the view are
-//								stored here
-//
-// Postconditions:
-//
-// Returns: B_BAD_VALUE if outView or outExtent is NULL,
-//			B_NO_MEMORY if the view couldn't be allocated,
-//			B_OK if no errors
-// ---------------------------------------------------------------
-status_t
-SGITranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
-	BRect *outExtent)
-{
-	if (!outView || !outExtent)
-		return B_BAD_VALUE;
-	if (ioExtension && fSettings->LoadSettings(ioExtension) < B_OK)
-		return B_BAD_VALUE;
-
-	SGIView *view = new SGIView(BRect(0, 0, 225, 175),
-		"SGITranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW,
-		AcquireSettings());
-	if (!view)
-		return B_NO_MEMORY;
-
-	*outView = view;
-	*outExtent = view->Bounds();
-
-	return B_OK;
-}
-
-// AcquireSettings
-SGITranslatorSettings *
-SGITranslator::AcquireSettings()
-{
-	return fSettings->Acquire();
-}
-

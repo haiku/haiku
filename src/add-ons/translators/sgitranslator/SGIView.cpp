@@ -41,8 +41,6 @@
 
 #include "SGIImage.h"
 #include "SGITranslator.h"
-#include "SGITranslatorSettings.h"
-
 #include "SGIView.h"
 
 const char* author = "Stephan Aßmus, <stippi@yellowbites.com>";
@@ -75,7 +73,7 @@ add_menu_item(BMenu* menu,
 // Returns:
 // ---------------------------------------------------------------
 SGIView::SGIView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags, SGITranslatorSettings* settings)
+	uint32 resize, uint32 flags, TranslatorSettings *settings)
 	:	BView(frame, name, resize, flags),
 		fSettings(settings)
 {
@@ -83,7 +81,7 @@ SGIView::SGIView(const BRect &frame, const char *name,
 
 	BPopUpMenu* menu = new BPopUpMenu("pick compression");
 
-	uint32 currentCompression = fSettings->SetGetCompression();
+	uint32 currentCompression = fSettings->SetGetInt32(SGI_SETTING_COMPRESSION);
 	// create the menu items with the various compression methods
 	add_menu_item(menu, SGI_COMP_NONE, "None", currentCompression);
 //	menu->AddSeparatorItem();
@@ -163,9 +161,9 @@ SGIView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_COMPRESSION_CHANGED: {
-			uint32 value;
-			if (message->FindInt32("value", (int32*)&value) >= B_OK) {
-				fSettings->SetGetCompression(&value);
+			int32 value;
+			if (message->FindInt32("value", &value) >= B_OK) {
+				fSettings->SetGetInt32(SGI_SETTING_COMPRESSION, &value);
 				fSettings->SaveSettings();
 			}
 			break;
@@ -280,8 +278,10 @@ SGIView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		SGI_TRANSLATOR_VERSION / 100, (SGI_TRANSLATOR_VERSION / 10) % 10,
-		SGI_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(SGI_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VER(SGI_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVSN_VER(SGI_TRANSLATOR_VERSION)),
+		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 
 	BPoint offset = fCompressionMF->Frame().LeftBottom();

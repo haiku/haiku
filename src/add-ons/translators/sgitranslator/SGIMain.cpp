@@ -35,11 +35,8 @@
 /*****************************************************************************/
 
 #include <Application.h>
-#include <Screen.h>
-#include <Alert.h>
 #include "SGITranslator.h"
-#include "SGIWindow.h"
-#include "SGIView.h"
+#include "TranslatorWindow.h"
 
 // ---------------------------------------------------------------
 // main
@@ -58,47 +55,12 @@ int
 main()
 {
 	BApplication app("application/x-vnd.obos-sgi-translator");
-	SGITranslator *ptranslator = new SGITranslator;
-	BView *view = NULL;
-	BRect rect(0, 0, 225, 175);
-	if (ptranslator->MakeConfigurationView(NULL, &view, &rect)) {
-		BAlert *err = new BAlert("Error",
-			"Unable to create the SGITranslator view.", "OK");
-		err->Go();
+	status_t result;
+	result = LaunchTranslatorWindow(new SGITranslator,
+		"SGI Settings", BRect(0, 0, 225, 175));
+	if (result == B_OK) {
+		app.Run();
+		return 0;
+	} else
 		return 1;
-	}
-	// release the translator even though I never really used it anyway
-	ptranslator->Release();
-	ptranslator = NULL;
-
-	SGIWindow *wnd = new SGIWindow(rect);
-	view->ResizeTo(rect.Width(), rect.Height());
-	wnd->AddChild(view);
-	BPoint wndpt = B_ORIGIN;
-	{
-		BScreen scrn;
-		BRect frame = scrn.Frame();
-		frame.InsetBy(10, 23);
-		// if the point is outside of the screen frame,
-		// use the mouse location to find a better point
-		if (!frame.Contains(wndpt)) {
-			uint32 dummy;
-			view->GetMouse(&wndpt, &dummy, false);
-			wndpt.x -= rect.Width() / 2;
-			wndpt.y -= rect.Height() / 2;
-			// clamp location to screen
-			if (wndpt.x < frame.left)
-				wndpt.x = frame.left;
-			if (wndpt.y < frame.top)
-				wndpt.y = frame.top;
-			if (wndpt.x > frame.right)
-				wndpt.x = frame.right;
-			if (wndpt.y > frame.bottom)
-				wndpt.y = frame.bottom;
-		}
-	}
-	wnd->MoveTo(wndpt);
-	wnd->Show();
-	app.Run();
-	return 0;
 }

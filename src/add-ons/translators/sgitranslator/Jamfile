@@ -1,12 +1,19 @@
 SubDir OBOS_TOP src add-ons translators sgitranslator ;
 
+# Include BaseTranslator code from shared directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
 Translator SGITranslator :
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp
+
+	# SGITranslator classes
 	SGIImage.cpp
 	SGIMain.cpp
 	SGITranslator.cpp
-	SGITranslatorSettings.cpp
-	SGIView.cpp
-	SGIWindow.cpp ;
+	SGIView.cpp ;
 
 LinkSharedOSLibs SGITranslator : be translation ;
 
