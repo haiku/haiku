@@ -296,6 +296,37 @@ main(int, char **argv)
 	BList actionList;
 		
 	for(int32 i=1; argv[i]!=NULL; i++) {
+
+		if (strcmp(argv[i], "--list") == 0) {
+			BDeskbar db;
+			int32 i, found = 0, count;
+			count = db.CountItems();
+			printf("Deskbar items:\n");
+			/* the API is doomed, so don't try to enum for too long */
+			for (i = 0; (found < count) && (i >= 0) && (i < 5000); i++) {
+				const char scratch[2] = ""; /* BDeskbar is buggy */
+				const char *name=scratch;
+				if (db.GetItemInfo(i, &name) >= B_OK) {
+					found++;
+					printf("Item %d: '%s'\n", i, name);
+					free((void *)name); /* INTENDED */
+				}
+			}
+			return 0;
+		}
+
+		if (strcmp(argv[i], "--remove") == 0) {
+			BDeskbar db;
+			int32 found = 0;
+			int32 count = db.CountItems();
+			/* BDeskbar is definitely doomed ! */
+			while ((db.RemoveItem("DeskButton") == B_OK) && (db.CountItems() < count)) {
+				count = db.CountItems();
+				found++;
+			}
+			printf("removed %d items.\n", found);
+			return 0;
+		}
 		
 		if (strncmp(argv[i], "cmd=", 4) == 0) {
 			BString *title = new BString(argv[i] + 4);
@@ -337,7 +368,9 @@ main(int, char **argv)
 	
 	if (!atLeastOnePath) {
 		// print a simple usage string
-		printf(	"usage: desklink { [ cmd=title:action ... ] path } ...\n");
+		printf(	"usage: desklink { [ --list|--remove|cmd=title:action ... ] path } ...\n"
+			"--list: list all Deskbar addons.\n"
+			"--remove: delete all desklink addons.\n");
 		return 1;
 	}
 	
