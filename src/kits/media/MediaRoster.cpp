@@ -49,67 +49,41 @@ status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id, BS
 	if (out_node == NULL)
 		return B_BAD_VALUE;
 
-	xfer_server_get_node msg;
-	xfer_server_get_node_reply reply;
-	port_id port;
+	server_get_node_request request;
+	server_get_node_reply reply;
 	status_t rv;
-	int32 code;
 
-	port = find_port("media_server port");
-	if (port <= B_OK)
-		return B_ERROR;
-		
-	msg.type = type;
-	msg.reply_port = _PortPool->GetPort();
-	rv = write_port(port, SERVER_GET_NODE, &msg, sizeof(msg));
-	if (rv != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
+	request.type = type;
+	rv = QueryServer(SERVER_GET_NODE, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
 		return rv;
-	}
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(msg.reply_port);
-	if (rv < B_OK)
-		return rv;
+
 	*out_node = reply.node;
 	if (out_input_id)
 		*out_input_id = reply.input_id;
 	if (out_input_name)
 		*out_input_name = reply.input_name;
-	return reply.result;
+	return rv;
 }
 
 status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
 {
-	xfer_server_set_node msg;
-	xfer_server_set_node_reply reply;
-	port_id port;
+	server_set_node_request request;
+	server_set_node_reply reply;
 	status_t rv;
-	int32 code;
-
-	port = find_port("media_server port");
-	if (port <= B_OK)
-		return B_ERROR;
 		
-	msg.type = type;
-	msg.use_node = node ? true : false;
+	request.type = type;
+	request.use_node = node ? true : false;
 	if (node)
-		msg.node = *node;
-	msg.use_dni = info ? true : false;
+		request.node = *node;
+	request.use_dni = info ? true : false;
 	if (info)
-		msg.dni = *info;
-	msg.use_input = input ? true : false;
+		request.dni = *info;
+	request.use_input = input ? true : false;
 	if (input)
-		msg.input = *input;
-	msg.reply_port = _PortPool->GetPort();
-	rv = write_port(port, SERVER_SET_NODE, &msg, sizeof(msg));
-	if (rv != B_OK) {
-		_PortPool->PutPort(msg.reply_port);
-		return rv;
-	}
-	rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(msg.reply_port);
-
-	return (rv < B_OK) ? rv : reply.result;
+		request.input = *input;
+		
+	return QueryServer(SERVER_SET_NODE, &request, sizeof(request), &reply, sizeof(reply));
 }
 
 };
@@ -310,125 +284,114 @@ BMediaRoster::Connect(const media_source & from,
 	if (to == media_destination::null)
 		return B_MEDIA_BAD_DESTINATION;
 
-	xfer_producer_format_proposal msg1;
-	xfer_producer_format_proposal_reply reply1;
-	xfer_consumer_accept_format msg2;
-	xfer_consumer_accept_format_reply reply2;
-	xfer_producer_prepare_to_connect msg3;
-	xfer_producer_prepare_to_connect_reply reply3;
-	xfer_consumer_connected msg4;
-	xfer_consumer_connected_reply reply4;
-	xfer_producer_connect msg5;
-	xfer_producer_connect_reply reply5;
-	status_t rv;	
-	port_id port;
-	int32 code;
-
-	port = _PortPool->GetPort();
-
-	// BBufferProducer::FormatProposal
-	msg1.output = from;
-	msg1.format = *io_format;
-	msg1.reply_port = port;
-	rv = write_port(from.port, PRODUCER_FORMAT_PROPOSAL, &msg1, sizeof(msg1));
-	if (rv != B_OK) 
-		goto failed;
-	rv = read_port(port, &code, &reply1, sizeof(reply1));
-	if (rv < B_OK)
-		goto failed;
-	if (reply1.result != B_OK) {
-		rv = reply1.result;
-		goto failed;
-	}
-
-	// BBufferConsumer::AcceptFormat
-	msg2.dest = to;
-	msg2.format = *io_format;
-	msg2.reply_port = port;
-	rv = write_port(to.port, CONSUMER_ACCEPT_FORMAT, &msg2, sizeof(msg2));
-	if (rv != B_OK) 
-		goto failed;
-	rv = read_port(port, &code, &reply2, sizeof(reply2));
-	if (rv < B_OK)
-		goto failed;
-	if (reply2.result != B_OK) {
-		rv = reply2.result;
-		goto failed;
-	}
-	*io_format = reply2.format;
+	status_t rv;
+	producer_format_proposal_request request1;
+	producer_format_proposal_reply reply1;
 	
-	// BBufferProducer::PrepareToConnect
-	msg3.source = from;
-	msg3.destination = to;
-	msg3.format = *io_format;
-	msg3.reply_port = port;
-	rv = write_port(from.port, PRODUCER_PREPARE_TO_CONNECT, &msg3, sizeof(msg3));
-	if (rv != B_OK) 
-		goto failed;
-	rv = read_port(port, &code, &reply3, sizeof(reply3));
-	if (rv < B_OK)
-		goto failed;
-	if (reply3.result != B_OK) {
-		rv = reply3.result;
-		goto failed;
+	// BBufferProducer::FormatProposal
+	request1.output = from;
+	request1.format = *io_format;
+	rv = QueryPort(from.port, PRODUCER_FORMAT_PROPOSAL, &request1, sizeof(request1), &reply1, sizeof(reply1));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::FormatProposal, status = %#x\n",rv);
+		return rv;
 	}
-	*io_format = reply3.format;
-	//reply3.out_source;
-	//reply3.name;
+	// reply1.format now contains the format proposed by the producer
+
+	consumer_accept_format_request request2;
+	consumer_accept_format_reply reply2;
+	
+	// BBufferConsumer::AcceptFormat
+	request2.dest = to;
+	request2.format = reply1.format;
+	rv = QueryPort(to.port, CONSUMER_ACCEPT_FORMAT, &request2, sizeof(request2), &reply2, sizeof(reply2));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::Connect: aborted after BBufferConsumer::AcceptFormat, status = %#x\n",rv);
+		return rv;
+	}
+	// reply2.format now contains the format accepted by the consumer
+
+	// BBufferProducer::PrepareToConnect
+	producer_prepare_to_connect_request request3;
+	producer_prepare_to_connect_reply reply3;
+
+	request3.source = from;
+	request3.destination = to;
+	request3.format = reply2.format;
+	strcpy(request3.name, "XXX some default name"); // XXX fix this
+	rv = QueryPort(from.port, PRODUCER_PREPARE_TO_CONNECT, &request3, sizeof(request3), &reply3, sizeof(reply3));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::PrepareToConnect, status = %#x\n",rv);
+		return rv;
+	}
+	// reply3.format is still our pretty media format
+	// reply3.out_source the real source to be used for the connection
+	// reply3.name the name BBufferConsumer::Connected will see in the outInput->name argument
 
 	// BBufferConsumer::Connected
-	msg4.producer = reply3.out_source;
-	msg4.where = to;
-	msg4.with_format = *io_format;
-	msg4.reply_port = port;
-	rv = write_port(to.port, CONSUMER_CONNECTED, &msg4, sizeof(msg4));
-	if (rv != B_OK) 
-		goto failed;
-	rv = read_port(port, &code, &reply4, sizeof(reply4));
-	if (rv < B_OK)
-		goto failed;
-	if (reply4.result != B_OK) {
-		rv = reply4.result;
-		goto failed;
+	consumer_connected_request request4;
+	consumer_connected_reply reply4;
+	status_t con_status;
+	
+	request4.producer = reply3.out_source;
+	request4.where = to;
+	request4.with_format = reply3.format;
+	con_status = QueryPort(to.port, CONSUMER_CONNECTED, &request4, sizeof(request4), &reply4, sizeof(reply4));
+	if (con_status != B_OK) {
+		TRACE("BMediaRoster::Connect: aborting after BBufferConsumer::Connected, status = %#x\n",con_status);
+		// we do NOT return here!
 	}
-	// reply4.input;
+	// con_status contains the status code to be supplied to BBufferProducer::Connect's status argument
+	// reply4.input contains the media_input that describes the connection from the consumer point of view
 
 	// BBufferProducer::Connect
-	msg5.error = B_OK;
-	msg5.source = reply3.out_source;
-	msg5.destination = to;
-	msg5.format = *io_format;
-	msg5.name[0] = 0;
-	msg5.reply_port = port;
-
-	rv = write_port(from.port, PRODUCER_CONNECT, &msg5, sizeof(msg5));
-	if (rv != B_OK) 
-		goto failed;
-	rv = read_port(port, &code, &reply5, sizeof(reply5));
-	if (rv < B_OK)
-		goto failed;
+	producer_connect_request request5;
+	producer_connect_reply reply5;
 	
-//	out_output->node =
-	out_output->source = reply3.out_source;
-	out_output->destination = to;//reply4.input;
-	out_output->format = *io_format;
-	strcpy(out_output->name,reply5.name);
+	request5.error = con_status;
+	request5.source = reply3.out_source;
+	request5.destination = reply4.input.destination;
+	request5.format = reply3.format; // XXX reply4.input.format ???
+	strcpy(request5.name, reply4.input.name);
+	rv = QueryPort(reply4.input.node.port, PRODUCER_CONNECT, &request5, sizeof(request5), &reply5, sizeof(reply5));
+	if (con_status != B_OK) {
+		TRACE("BMediaRoster::Connect: aborted\n");
+		return con_status;
+	}
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::Connect: aborted after BBufferProducer::Connect, status = %#x\n",rv);
+		return rv;
+	}
+	// reply5.name contains the name assigned to the connection by the producer
 
-//	out_input->node
-	out_input->source = reply3.out_source;
-	out_input->destination = to;//reply4.input;
-	out_input->format = *io_format;
-	strcpy(out_input->name,reply3.name);
+	// find the output node
+	// XXX isn't there a easier way?
+	media_node sourcenode;
+	GetNodeFor(NodeIDFor(from.port), &sourcenode);
+	ReleaseNode(sourcenode);
 
-	_PortPool->PutPort(port);
+	// initilize connection info
+	*io_format = reply3.format;
+	*out_input = reply4.input;
+	out_output->node = sourcenode;
+	out_output->source = reply4.input.source;
+	out_output->destination = reply4.input.destination;
+	out_output->format = reply4.input.format;
+	strcpy(out_output->name, reply5.name);
+
+	// the connection is now made
+	
+	
+	// XXX register connection with server
+
+
+	// XXX if (mute) BBufferProducer::EnableOutput(false)
+
+
 	return B_OK;
+};
 
-failed:
-	_PortPool->PutPort(port);
-	return rv;
-}
 
-					  
 status_t 
 BMediaRoster::Disconnect(media_node_id source_node,
 						 const media_source & source,
@@ -1071,8 +1034,8 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		// forward this request into the media_addon_server,
 		// which in turn will call InstantiateDormantNode()
 		// to create it there localy
-		request_addonserver_instantiate_dormant_node request;
-		reply_addonserver_instantiate_dormant_node reply;
+		addonserver_instantiate_dormant_node_request request;
+		addonserver_instantiate_dormant_node_reply reply;
 		status_t rv;
 		
 		request.info = in_info;
@@ -1112,6 +1075,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	BMediaNode *node;
 	BMessage config;
 	status_t out_error;
+	status_t rv;
 	addon = _DormantNodeManager->GetAddon(in_info.addon);
 	if (!addon) {
 		printf("BMediaRoster::InstantiateDormantNode: GetAddon failed\n");
@@ -1125,6 +1089,18 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		_DormantNodeManager->PutAddon(in_info.addon);
 		return B_ERROR;
 	}
+	rv = RegisterNode(node);
+	if (rv != B_OK) {
+		printf("BMediaRoster::InstantiateDormantNode: RegisterNode failed\n");
+		delete node;
+		_DormantNodeManager->PutAddon(in_info.addon);
+		return B_ERROR;
+	}
+	
+	// XXX we must remember in_info.addon and call
+	// XXX _DormantNodeManager->PutAddon when the
+	// XXX node is unregistered
+	
 	*out_node = node->Node();
 	return B_OK;
 }

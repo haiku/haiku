@@ -62,18 +62,15 @@ enum {
 	NODE_REGISTERED,
 	NODE_SET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
-	CONSUMER_ACCEPT_FORMAT,
 	CONSUMER_GET_NEXT_INPUT,
 	CONSUMER_DISPOSE_INPUT_COOKIE,
 	CONSUMER_BUFFER_RECEIVED,
 	CONSUMER_PRODUCER_DATA_STATUS,
 	CONSUMER_GET_LATENCY_FOR,
-	CONSUMER_CONNECTED,
 	CONSUMER_DISCONNECTED,
 	CONSUMER_FORMAT_CHANGED,
 	CONSUMER_SEEK_TAG_REQUESTED,
 	PRODUCER_LATE_NOTICE_RECEIVED,
-	PRODUCER_ENABLE_OUTPUT,
 	PRODUCER_LATENCY_CHANGED,
 	PRODUCER_ADDITIONAL_BUFFER_REQUESTED,
 	PRODUCER_VIDEO_CLIPPING_CHANGED,
@@ -84,35 +81,19 @@ enum {
 	PRODUCER_DISPOSE_OUTPUT_COOKIE,
 	PRODUCER_GET_INITIAL_LATENCY,
 	PRODUCER_FORMAT_SUGGESTION_REQUESTED,
-	PRODUCER_FORMAT_PROPOSAL,
-	PRODUCER_PREPARE_TO_CONNECT,
-	PRODUCER_CONNECT,
 	PRODUCER_DISCONNECT,
 	PRODUCER_SET_PLAY_RATE,
+	PRODUCER_ENABLE_OUTPUT,	
 	ADDONSERVER_INSTANTIATE_DORMANT_NODE,
 	SERVER_REGISTER_MEDIAADDON,
 	SERVER_UNREGISTER_MEDIAADDON,
 	SERVER_GET_MEDIAADDON_REF,
 	ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS,
 	SERVER_REGISTER_DORMANT_NODE,
-	SERVER_GET_NODE,
-	SERVER_SET_NODE,
 	TIMESOURCE_OP, // datablock is a struct time_source_op_info
 	SERVER_GET_DORMANT_NODES,
 	SERVER_GET_DORMANT_FLAVOR_INFO,
 	END
-};
-
-enum node_type 
-{ 
-	VIDEO_INPUT, 
-	AUDIO_INPUT, 
-	VIDEO_OUTPUT, 
-	AUDIO_MIXER, 
-	AUDIO_OUTPUT, 
-	AUDIO_OUTPUT_EX, 
-	TIME_SOURCE, 
-	SYSTEM_TIME_SOURCE 
 };
 
 
@@ -182,39 +163,6 @@ struct xfer_server_get_dormant_nodes_reply
 	int32 count; // if count > 0, a second reply containing count dormant_node_infos is send
 };
 
-struct xfer_server_set_node
-{
-	node_type type;
-	bool use_node;
-	media_node node;
-	bool use_dni;
-	dormant_node_info dni;
-	bool use_input;
-	media_input input;
-	port_id reply_port;
-};
-
-struct xfer_server_set_node_reply
-{
-	status_t result;
-};
-
-struct xfer_server_get_node
-{
-	node_type type;
-	port_id reply_port;
-};
-
-struct xfer_server_get_node_reply
-{
-	media_node node;
-	status_t result;
-
-	// for AUDIO_OUTPUT_EX
-	char input_name[B_MEDIA_NAME_LENGTH];
-	int32 input_id;
-};
-
 struct xfer_server_register_dormant_node
 {
 	media_addon_id	purge_id; // if > 0, server must first remove all dormant_flavor_infos belonging to that id
@@ -267,49 +215,6 @@ struct xfer_producer_format_suggestion_requested_reply
 {
 	media_format format;
 	status_t result;
-};
-
-struct xfer_producer_format_proposal
-{
-	media_source output;
-	media_format format;
-	port_id reply_port;
-};
-
-struct xfer_producer_format_proposal_reply
-{
-	status_t result;
-};
-
-struct xfer_producer_prepare_to_connect
-{
-	media_source source;
-	media_destination destination;
-	media_format format;
-	port_id reply_port;
-};
-
-struct xfer_producer_prepare_to_connect_reply
-{
-	media_format format;
-	media_source out_source;
-	char name[B_MEDIA_NAME_LENGTH];
-	status_t result;
-};
-
-struct xfer_producer_connect
-{
-	status_t error;
-	media_source source;
-	media_destination destination;
-	media_format format;
-	char name[B_MEDIA_NAME_LENGTH];
-	port_id reply_port;
-};
-
-struct xfer_producer_connect_reply
-{
-	char name[B_MEDIA_NAME_LENGTH];
 };
 
 struct xfer_producer_disconnect
@@ -476,19 +381,6 @@ struct xfer_node_set_timesource
 	media_node_id timesource_id;
 };
 
-struct xfer_consumer_accept_format
-{
-	media_destination dest;
-	media_format format;
-	port_id reply_port;
-};
-
-struct xfer_consumer_accept_format_reply
-{
-	media_format format;
-	status_t result;
-};
-
 struct xfer_consumer_get_next_input
 {
 	int32 cookie;
@@ -533,19 +425,6 @@ struct xfer_consumer_get_latency_for_reply
 	status_t result;
 };
 	
-struct xfer_consumer_connected
-{
-	media_source producer;
-	media_destination where;
-	media_format with_format;
-	port_id reply_port;
-};
-
-struct xfer_consumer_connected_reply
-{
-	media_input input;
-	status_t result;
-};
 
 struct xfer_consumer_disconnected
 {

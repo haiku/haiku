@@ -171,19 +171,19 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 
 		case SERVER_GET_NODE:
 		{
-			xfer_server_get_node *msg = (xfer_server_get_node *)data;
-			xfer_server_get_node_reply reply;
-			reply.result = B_ERROR;
-			write_port(msg->reply_port, 0, &reply, sizeof(reply));
+			server_get_node_request *request = (server_get_node_request *)data;
+			server_get_node_reply reply;
+			// XXX do something here
+			request->SendReply(B_ERROR, &reply, sizeof(reply));
 			break;
 		}
 
 		case SERVER_SET_NODE:
 		{
-			xfer_server_set_node *msg = (xfer_server_set_node *)data;
-			xfer_server_set_node_reply reply;
-			reply.result = B_ERROR;
-			write_port(msg->reply_port, 0, &reply, sizeof(reply));
+			server_set_node_request *request = (server_set_node_request *)data;
+			server_set_node_reply reply;
+			// XXX do something here
+			request->SendReply(B_ERROR, &reply, sizeof(reply));
 			break;
 		}
 

@@ -81,10 +81,11 @@ MediaAddonServer::HandleMessage(int32 code, void *data, size_t size)
 	switch (code) {
 		case ADDONSERVER_INSTANTIATE_DORMANT_NODE:
 		{
-			const request_addonserver_instantiate_dormant_node *msg = (const request_addonserver_instantiate_dormant_node *)data;
-			reply_addonserver_instantiate_dormant_node reply;
-			reply.result = mediaroster->InstantiateDormantNode(msg->info, &reply.node);
-			msg->SendReply(&reply, sizeof(reply));
+			const addonserver_instantiate_dormant_node_request *msg = (const addonserver_instantiate_dormant_node_request *)data;
+			addonserver_instantiate_dormant_node_reply reply;
+			status_t rv;
+			rv = mediaroster->InstantiateDormantNode(msg->info, &reply.node);
+			msg->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 

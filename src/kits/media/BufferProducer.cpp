@@ -8,6 +8,7 @@
 #include <Buffer.h>
 #include "PortPool.h"
 #include "debug.h"
+#include "DataExchange.h"
 #include "ServerInterface.h"
 
 /*************************************************************
@@ -26,7 +27,7 @@ BBufferProducer::~BBufferProducer()
 /* static */ status_t
 BBufferProducer::ClipDataToRegion(int32 format,
 								  int32 size,
-								  const void *data,
+								  const void *request,
 								  BRegion *region)
 {
 	CALLED();
@@ -34,7 +35,7 @@ BBufferProducer::ClipDataToRegion(int32 format,
 	if (format != B_CLIP_SHORT_RUNS)
 		return B_MEDIA_BAD_CLIP_FORMAT;
 	
-	return clip_shorts_to_region((const int16 *)data, size / sizeof(int16), region);
+	return clip_shorts_to_region((const int16 *)request, size / sizeof(int16), region);
 }
 
 media_type
@@ -103,199 +104,201 @@ BBufferProducer::HandleMessage(int32 message,
 							   size_t size)
 {
 	CALLED();
+	status_t rv;
 	switch (message) {
 
 		case PRODUCER_FORMAT_SUGGESTION_REQUESTED:
 		{
-			const xfer_producer_format_suggestion_requested *data = (const xfer_producer_format_suggestion_requested *)rawdata;
+			const xfer_producer_format_suggestion_requested *request = (const xfer_producer_format_suggestion_requested *)rawdata;
 			xfer_producer_format_suggestion_requested_reply reply;
-			reply.result = FormatSuggestionRequested(data->type, data->quality, &reply.format);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			reply.result = FormatSuggestionRequested(request->type, request->quality, &reply.format);
+			write_port(request->reply_port, 0, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_FORMAT_PROPOSAL:
 		{
-			const xfer_producer_format_proposal *data = (const xfer_producer_format_proposal *)rawdata;
-			xfer_producer_format_proposal_reply reply;
-			reply.result = FormatProposal(data->output, (media_format *)&data->format);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			const producer_format_proposal_request *request = (const producer_format_proposal_request *)rawdata;
+			producer_format_proposal_reply reply;
+			reply.format = request->format;
+			rv = FormatProposal(request->output, &reply.format);
+			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_PREPARE_TO_CONNECT:
 		{
-			const xfer_producer_prepare_to_connect *data = (const xfer_producer_prepare_to_connect *)rawdata;
-			xfer_producer_prepare_to_connect_reply reply;
-			reply.format = data->format;
-			reply.name[0] = 0;
-			reply.result = PrepareToConnect(data->source, data->destination, &reply.format, &reply.out_source, reply.name);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			const producer_prepare_to_connect_request *request = (const producer_prepare_to_connect_request *)rawdata;
+			producer_prepare_to_connect_reply reply;
+			reply.format = request->format;
+			memcpy(reply.name, request->name, B_MEDIA_NAME_LENGTH);
+			rv = PrepareToConnect(request->source, request->destination, &reply.format, &reply.out_source, reply.name);
+			request->SendReply(rv, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_CONNECT:
 		{
-			const xfer_producer_connect *data = (const xfer_producer_connect *)rawdata;
-			xfer_producer_connect_reply reply;
-			memcpy(reply.name, data->name, B_MEDIA_NAME_LENGTH);
-			Connect(data->error, data->source, data->destination, data->format, reply.name);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			const producer_connect_request *request = (const producer_connect_request *)rawdata;
+			producer_connect_reply reply;
+			memcpy(reply.name, request->name, B_MEDIA_NAME_LENGTH);
+			Connect(request->error, request->source, request->destination, request->format, reply.name);
+			request->SendReply(B_OK, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_DISCONNECT:
 		{
-			const xfer_producer_disconnect *data = (const xfer_producer_disconnect *)rawdata;
-			Disconnect(data->source, data->destination);
+			const xfer_producer_disconnect *request = (const xfer_producer_disconnect *)rawdata;
+			Disconnect(request->source, request->destination);
 			return B_OK;
 		}
 
 		case PRODUCER_GET_INITIAL_LATENCY:
 		{
-			const xfer_producer_get_initial_latency *data = (const xfer_producer_get_initial_latency *)rawdata;
+			const xfer_producer_get_initial_latency *request = (const xfer_producer_get_initial_latency *)rawdata;
 			xfer_producer_get_initial_latency_reply reply;
 			reply.initial_latency = fInitialLatency;
 			reply.flags = fInitialFlags;
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			write_port(request->reply_port, 0, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_SET_PLAY_RATE:
 		{
-			const xfer_producer_set_play_rate *data = (const xfer_producer_set_play_rate *)rawdata;
+			const xfer_producer_set_play_rate *request = (const xfer_producer_set_play_rate *)rawdata;
 			xfer_producer_set_play_rate_reply reply;
-			reply.result = SetPlayRate(data->numer, data->denom);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			reply.result = SetPlayRate(request->numer, request->denom);
+			write_port(request->reply_port, 0, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_GET_LATENCY:
 		{
-			const xfer_producer_get_latency *data = (const xfer_producer_get_latency *)rawdata;
+			const xfer_producer_get_latency *request = (const xfer_producer_get_latency *)rawdata;
 			xfer_producer_get_latency_reply reply;
 			reply.result = GetLatency(&reply.latency);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			write_port(request->reply_port, 0, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_GET_NEXT_OUTPUT:
 		{
-			const xfer_producer_get_next_output *data = (const xfer_producer_get_next_output *)rawdata;
+			const xfer_producer_get_next_output *request = (const xfer_producer_get_next_output *)rawdata;
 			xfer_producer_get_next_output_reply reply;
-			reply.cookie = data->cookie;
+			reply.cookie = request->cookie;
 			reply.result = GetNextOutput(&reply.cookie, &reply.output);
-			write_port(data->reply_port, 0, &reply, sizeof(reply));
+			write_port(request->reply_port, 0, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_DISPOSE_OUTPUT_COOKIE:
 		{
-			const xfer_producer_dispose_output_cookie *data = (const xfer_producer_dispose_output_cookie *)rawdata;
-			DisposeOutputCookie(data->cookie);
+			const xfer_producer_dispose_output_cookie *request = (const xfer_producer_dispose_output_cookie *)rawdata;
+			DisposeOutputCookie(request->cookie);
 			return B_OK;
 		}
 
 		case PRODUCER_SET_BUFFER_GROUP:
 		{
-			const xfer_producer_set_buffer_group *data = (const xfer_producer_set_buffer_group *)rawdata;
+			const xfer_producer_set_buffer_group *request = (const xfer_producer_set_buffer_group *)rawdata;
 			xfer_node_request_completed reply;
 			BBufferGroup *group;
 			status_t rv;
-			group = data->buffer_count != 0 ? new BBufferGroup(data->buffer_count, data->buffers) : NULL;
-			rv = SetBufferGroup(data->source, group);
-			if (data->destination == media_destination::null)
+			group = request->buffer_count != 0 ? new BBufferGroup(request->buffer_count, request->buffers) : NULL;
+			rv = SetBufferGroup(request->source, group);
+			if (request->destination == media_destination::null)
 				return B_OK;
 			reply.info.what = media_request_info::B_SET_OUTPUT_BUFFERS_FOR;
-			reply.info.change_tag = data->change_tag;
+			reply.info.change_tag = request->change_tag;
 			reply.info.status = rv;
 			reply.info.cookie = (int32)group;
-			reply.info.user_data = data->user_data;
-			reply.info.source = data->source;
-			reply.info.destination = data->destination;
-			write_port(data->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
+			reply.info.user_data = request->user_data;
+			reply.info.source = request->source;
+			reply.info.destination = request->destination;
+			write_port(request->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_FORMAT_CHANGE_REQUESTED:
 		{
-			const xfer_producer_format_change_requested *data = (const xfer_producer_format_change_requested *)rawdata;
+			const xfer_producer_format_change_requested *request = (const xfer_producer_format_change_requested *)rawdata;
 			xfer_node_request_completed reply;
 			status_t rv;
-			reply.info.format = data->format;
-			rv = FormatChangeRequested(data->source, data->destination, &reply.info.format, NULL);
-			if (data->destination == media_destination::null)
+			reply.info.format = request->format;
+			rv = FormatChangeRequested(request->source, request->destination, &reply.info.format, NULL);
+			if (request->destination == media_destination::null)
 				return B_OK;
 			reply.info.what = media_request_info::B_REQUEST_FORMAT_CHANGE;
-			reply.info.change_tag = data->change_tag;
+			reply.info.change_tag = request->change_tag;
 			reply.info.status = rv;
 			//reply.info.cookie
-			reply.info.user_data = data->user_data;
-			reply.info.source = data->source;
-			reply.info.destination = data->destination;
-			write_port(data->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
+			reply.info.user_data = request->user_data;
+			reply.info.source = request->source;
+			reply.info.destination = request->destination;
+			write_port(request->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 
 		case PRODUCER_VIDEO_CLIPPING_CHANGED:
 		{
-			const xfer_producer_video_clipping_changed *data = (const xfer_producer_video_clipping_changed *)rawdata;
+			const xfer_producer_video_clipping_changed *request = (const xfer_producer_video_clipping_changed *)rawdata;
 			xfer_node_request_completed reply;
 			status_t rv;
-			rv = VideoClippingChanged(data->source, data->short_count, (int16 *)data->shorts, data->display, NULL);
-			if (data->destination == media_destination::null)
+			rv = VideoClippingChanged(request->source, request->short_count, (int16 *)request->shorts, request->display, NULL);
+			if (request->destination == media_destination::null)
 				return B_OK;
 			reply.info.what = media_request_info::B_SET_VIDEO_CLIPPING_FOR;
-			reply.info.change_tag = data->change_tag;
+			reply.info.change_tag = request->change_tag;
 			reply.info.status = rv;
 			//reply.info.cookie
-			reply.info.user_data = data->user_data;
-			reply.info.source = data->source;
-			reply.info.destination = data->destination;
+			reply.info.user_data = request->user_data;
+			reply.info.source = request->source;
+			reply.info.destination = request->destination;
 			reply.info.format.type = B_MEDIA_RAW_VIDEO;
-			reply.info.format.u.raw_video.display = data->display;
-			write_port(data->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
+			reply.info.format.u.raw_video.display = request->display;
+			write_port(request->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
 			return B_OK;
 		}
 
 		case PRODUCER_ADDITIONAL_BUFFER_REQUESTED:
 		{
-			const xfer_producer_additional_buffer_requested *data = (const xfer_producer_additional_buffer_requested *)rawdata;
-			AdditionalBufferRequested(data->source, data->prev_buffer, data->prev_time, data->has_seek_tag ? &data->prev_tag : NULL);
+			const xfer_producer_additional_buffer_requested *request = (const xfer_producer_additional_buffer_requested *)rawdata;
+			AdditionalBufferRequested(request->source, request->prev_buffer, request->prev_time, request->has_seek_tag ? &request->prev_tag : NULL);
 			return B_OK;
 		}
 	
 		case PRODUCER_LATENCY_CHANGED:
 		{
-			const xfer_producer_latency_changed *data = (const xfer_producer_latency_changed *)rawdata;
-			LatencyChanged(data->source, data->destination, data->latency, data->flags);
+			const xfer_producer_latency_changed *request = (const xfer_producer_latency_changed *)rawdata;
+			LatencyChanged(request->source, request->destination, request->latency, request->flags);
 			return B_OK;
 		}
 
 		case PRODUCER_LATE_NOTICE_RECEIVED:
 		{
-			const xfer_producer_late_notice_received *data = (const xfer_producer_late_notice_received *)rawdata;
-			LateNoticeReceived(data->source, data->how_much, data->performance_time);
+			const xfer_producer_late_notice_received *request = (const xfer_producer_late_notice_received *)rawdata;
+			LateNoticeReceived(request->source, request->how_much, request->performance_time);
 			return B_OK;
 		}
 
 		case PRODUCER_ENABLE_OUTPUT:
 		{
-			const xfer_producer_enable_output *data = (const xfer_producer_enable_output *)rawdata;
+			const xfer_producer_enable_output *request = (const xfer_producer_enable_output *)rawdata;
 			xfer_node_request_completed reply;
-			EnableOutput(data->source, data->enabled, NULL);
-			if (data->destination == media_destination::null)
+			EnableOutput(request->source, request->enabled, NULL);
+			if (request->destination == media_destination::null)
 				return B_OK;
 			reply.info.what = media_request_info::B_SET_OUTPUT_ENABLED;
-			reply.info.change_tag = data->change_tag;
+			reply.info.change_tag = request->change_tag;
 			reply.info.status = B_OK;
 			//reply.info.cookie
-			reply.info.user_data = data->user_data;
-			reply.info.source = data->source;
-			reply.info.destination = data->destination;
+			reply.info.user_data = request->user_data;
+			reply.info.source = request->source;
+			reply.info.destination = request->destination;
 			//reply.info.format
-			write_port(data->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
+			write_port(request->destination.port, NODE_REQUEST_COMPLETED, &reply, sizeof(reply));
 			return B_OK;
 		}
 				
@@ -336,13 +339,13 @@ BBufferProducer::SendBuffer(BBuffer *buffer,
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	xfer_consumer_buffer_received data;
-	data.buffer = buffer->ID();
-	data.header = *(buffer->Header());
-	data.header.buffer = data.buffer;
-	data.header.destination = destination.id;
+	xfer_consumer_buffer_received request;
+	request.buffer = buffer->ID();
+	request.header = *(buffer->Header());
+	request.header.buffer = request.buffer;
+	request.header.destination = destination.id;
 
-	return write_port(destination.port, CONSUMER_BUFFER_RECEIVED, &data, sizeof(data));
+	return write_port(destination.port, CONSUMER_BUFFER_RECEIVED, &request, sizeof(request));
 }
 
 
@@ -355,12 +358,12 @@ BBufferProducer::SendDataStatus(int32 status,
 	if (destination == media_destination::null)
 		return B_MEDIA_BAD_DESTINATION;
 		
-	xfer_consumer_producer_data_status data;
-	data.for_whom = destination;
-	data.status = status;
-	data.at_performance_time = at_time;
+	xfer_consumer_producer_data_status request;
+	request.for_whom = destination;
+	request.status = status;
+	request.at_performance_time = at_time;
 
-	return write_port(destination.port, CONSUMER_PRODUCER_DATA_STATUS, &data, sizeof(data));
+	return write_port(destination.port, CONSUMER_PRODUCER_DATA_STATUS, &request, sizeof(request));
 }
 
 
@@ -372,29 +375,18 @@ BBufferProducer::ProposeFormatChange(media_format *format,
 	if (for_destination == media_destination::null)
 		return B_MEDIA_BAD_DESTINATION;
 		
+	consumer_accept_format_request request;
+	consumer_accept_format_reply reply;
 	status_t rv;
-	int32 code;
-	xfer_consumer_accept_format data;
-	xfer_consumer_accept_format_reply reply;
-
-	data.dest = for_destination;
-	data.format = *format;
-	data.reply_port = _PortPool->GetPort();
 	
-	rv = write_port(for_destination.port, CONSUMER_ACCEPT_FORMAT, &data, sizeof(data));
-	if (rv != B_OK) {
-		_PortPool->PutPort(data.reply_port);
+	request.dest = for_destination;
+	request.format = *format;
+	rv = QueryPort(for_destination.port, CONSUMER_ACCEPT_FORMAT, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
 		return rv;
-	}
 
-	rv = read_port(data.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(data.reply_port);
-	if (rv < B_OK)
-		return rv;
-	
 	*format = reply.format;
-
-	return reply.result;
+	return B_OK;
 }
 
 
@@ -411,22 +403,22 @@ BBufferProducer::ChangeFormat(const media_source &for_source,
 		
 	status_t rv;
 	int32 code;
-	xfer_consumer_format_changed data;
+	xfer_consumer_format_changed request;
 	xfer_consumer_format_changed_reply reply;
 
-	data.producer = for_source;
-	data.consumer = for_destination;
-	data.format = *format;
-	data.reply_port = _PortPool->GetPort();
+	request.producer = for_source;
+	request.consumer = for_destination;
+	request.format = *format;
+	request.reply_port = _PortPool->GetPort();
 	
-	rv = write_port(for_destination.port, CONSUMER_FORMAT_CHANGED, &data, sizeof(data));
+	rv = write_port(for_destination.port, CONSUMER_FORMAT_CHANGED, &request, sizeof(request));
 	if (rv != B_OK) {
-		_PortPool->PutPort(data.reply_port);
+		_PortPool->PutPort(request.reply_port);
 		return rv;
 	}
 
-	rv = read_port(data.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(data.reply_port);
+	rv = read_port(request.reply_port, &code, &reply, sizeof(reply));
+	_PortPool->PutPort(request.reply_port);
 	if (rv < B_OK)
 		return rv;
 	
@@ -445,20 +437,20 @@ BBufferProducer::FindLatencyFor(const media_destination &for_destination,
 		
 	status_t rv;
 	int32 code;
-	xfer_consumer_get_latency_for data;
+	xfer_consumer_get_latency_for request;
 	xfer_consumer_get_latency_for_reply reply;
 
-	data.for_whom = for_destination;
-	data.reply_port = _PortPool->GetPort();
+	request.for_whom = for_destination;
+	request.reply_port = _PortPool->GetPort();
 	
-	rv = write_port(for_destination.port, CONSUMER_GET_LATENCY_FOR, &data, sizeof(data));
+	rv = write_port(for_destination.port, CONSUMER_GET_LATENCY_FOR, &request, sizeof(request));
 	if (rv != B_OK) {
-		_PortPool->PutPort(data.reply_port);
+		_PortPool->PutPort(request.reply_port);
 		return rv;
 	}
 
-	rv = read_port(data.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(data.reply_port);
+	rv = read_port(request.reply_port, &code, &reply, sizeof(reply));
+	_PortPool->PutPort(request.reply_port);
 	if (rv < B_OK)
 		return rv;
 	
@@ -483,22 +475,22 @@ BBufferProducer::FindSeekTag(const media_destination &for_destination,
 		
 	status_t rv;
 	int32 code;
-	xfer_consumer_seek_tag_requested data;
+	xfer_consumer_seek_tag_requested request;
 	xfer_consumer_seek_tag_requested_reply reply;
 
-	data.destination = for_destination;
-	data.target_time = in_target_time;
-	data.flags = in_flags;
-	data.reply_port = _PortPool->GetPort();
+	request.destination = for_destination;
+	request.target_time = in_target_time;
+	request.flags = in_flags;
+	request.reply_port = _PortPool->GetPort();
 	
-	rv = write_port(for_destination.port, CONSUMER_SEEK_TAG_REQUESTED, &data, sizeof(data));
+	rv = write_port(for_destination.port, CONSUMER_SEEK_TAG_REQUESTED, &request, sizeof(request));
 	if (rv != B_OK) {
-		_PortPool->PutPort(data.reply_port);
+		_PortPool->PutPort(request.reply_port);
 		return rv;
 	}
 
-	rv = read_port(data.reply_port, &code, &reply, sizeof(reply));
-	_PortPool->PutPort(data.reply_port);
+	rv = read_port(request.reply_port, &code, &reply, sizeof(reply));
+	_PortPool->PutPort(request.reply_port);
 	if (rv < B_OK)
 		return rv;
 
@@ -548,7 +540,7 @@ status_t BBufferProducer::_Reserved_BufferProducer_15(void *) { return B_ERROR; 
 
 
 status_t
-BBufferProducer::clip_shorts_to_region(const int16 *data,
+BBufferProducer::clip_shorts_to_region(const int16 *request,
 									   int count,
 									   BRegion *output)
 {
@@ -560,7 +552,7 @@ BBufferProducer::clip_shorts_to_region(const int16 *data,
 
 status_t
 BBufferProducer::clip_region_to_shorts(const BRegion *input,
-									   int16 *data,
+									   int16 *request,
 									   int max_count,
 									   int *out_count)
 {

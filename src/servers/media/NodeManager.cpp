@@ -144,4 +144,3 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 	}
 	return B_ERROR;
 }
-

@@ -41,8 +41,9 @@ initit _initit;
 
 
 void
-request_data::SendReply(reply_data *reply, int replysize) const
+request_data::SendReply(status_t result, reply_data *reply, int replysize) const
 {
+	reply->result = result;
 	SendToPort(reply_port, 0, reply, replysize);
 }
 
