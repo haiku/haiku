@@ -10,7 +10,7 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 StaticLibrary tar : 
 	addext.c
-	alloca.c
+#	alloca.c
 	argmatch.c
 	backupfile.c
 	basename.c
