@@ -12,11 +12,6 @@ status_t _CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_fo
 void _DestroyReader(Reader *reader);
 void _DestroyDecoder(Decoder *decoder);
 
-status_t _PublishDecoder(DecoderPlugin *decoderplugin,
-						 const char *meta_description,
-						 const char *short_name,
-						 const char *pretty_name,
-						 const char *default_mapping /* = 0 */);
 
 class PluginManager
 {

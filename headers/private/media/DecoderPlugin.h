@@ -20,7 +20,9 @@ class Decoder
 public:
 						Decoder();
 	virtual				~Decoder();
-	
+
+	virtual void		GetCodecInfo(media_codec_info &codecInfo) = 0;
+
 						// Setup get's called with the info data from Reader::GetStreamInfo
 	virtual status_t	Setup(media_format *ioEncodedFormat, const void *infoBuffer, int32 infoSize) = 0;
 
@@ -44,20 +46,11 @@ private:
 
 class DecoderPlugin : public virtual MediaPlugin
 {
-public:
-						DecoderPlugin();
+	public:
+		DecoderPlugin();
 
-	virtual Decoder *	NewDecoder() = 0;
-	
-	status_t 			PublishDecoder(const char *meta_description,
-									   const char *short_name,
-									   const char *pretty_name,
-									   const char *default_mapping = 0);
-
-private:
-	friend class AddOnManager;
-	void				Setup(void *publish_hook);
-	void *				fPublishHook;
+		virtual Decoder *NewDecoder() = 0;
+		virtual status_t RegisterDecoder() = 0;
 };
 
 } } // namespace BPrivate::media

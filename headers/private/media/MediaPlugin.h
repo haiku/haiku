@@ -11,8 +11,6 @@ class MediaPlugin
 public:
 						MediaPlugin();
 	virtual				~MediaPlugin();
-	
-	virtual status_t	RegisterPlugin();
 };
 
 class Decoder;
