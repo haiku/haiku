@@ -76,6 +76,15 @@ StringAccessTest::PerformTest(void)
 	strcat(ptr, "pippo");
 	emptylocked.UnlockBuffer();
 	CPPUNIT_ASSERT(strcmp(emptylocked.String(), "pippo") == 0);
+	
+	// LockBuffer(0) and UnlockBuffer(-1) on a zero lenght string
+#ifndef TEST_R5	
+	NextSubTest();
+	BString crashesR5;
+	ptr = crashesR5.LockBuffer(0);
+	crashesR5.UnlockBuffer(-1);
+	CPPUNIT_ASSERT(strcmp(crashesR5.String(), "") == 0);
+#endif
 }
 
 

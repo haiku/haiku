@@ -203,13 +203,14 @@ StringReplaceTest::PerformTest(void)
 	delete str1;
 
 	//&IReplaceLast(const char*, const char*)
+#ifndef TEST_R5	
 	NextSubTest();
 	str1 = new BString("she sells sea shells on the SEashore");
 	str1->IReplaceLast("sea", "the");
 	CPPUNIT_ASSERT(strcmp(str1->String(),
 		"she sells sea shells on the theshore") == 0);
 	delete str1;
-
+#endif
 	NextSubTest();
 	str1 = new BString("she sells sea shells on the seashore");
 	str1->IReplaceLast("tex", "the");
@@ -252,12 +253,14 @@ StringReplaceTest::PerformTest(void)
 	CPPUNIT_ASSERT(strcmp(str1->String(), "ccccccccccccccc") == 0);
 	delete str1;
 	
+#ifndef TEST_R5
 	//ReplaceSet(const char*, const char*)
 	NextSubTest();
 	str1 = new BString("abcd abcd abcd");
 	str1->ReplaceSet("ad", "da");
 	CPPUNIT_ASSERT(strcmp(str1->String(), "dabcda dabcda dabcda") == 0);
 	delete str1;
+#endif
 }
 
 

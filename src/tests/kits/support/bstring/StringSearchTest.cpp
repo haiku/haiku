@@ -407,12 +407,14 @@ StringSearchTest::PerformTest(void)
 	i = string1->IFindLast("st");
 	CPPUNIT_ASSERT(i == 16);
 	delete string1;
-	
+
+#ifndef TEST_R5	
 	NextSubTest();
 	string1 = new BString("laSt but NOT leaSt");
 	i = string1->IFindLast("ST");
 	CPPUNIT_ASSERT(i == 16);
 	delete string1;
+#endif
 	
 	NextSubTest();
 	string1 = new BString;
@@ -455,18 +457,20 @@ StringSearchTest::PerformTest(void)
 	delete string2;
 
 	//IFindLast(const char*, int32)
+//#ifndef TEST_R5
 	NextSubTest();
 	string1 = new BString("abc abc abc");
 	i = string1->IFindLast("abc", 9);
 	CPPUNIT_ASSERT(i == 4);
 	delete string1;
-	
+//#endif
+#ifndef TEST_R5	
 	NextSubTest();
 	string1 = new BString("ABc abC aBC");
 	i = string1->IFindLast("aBc", 9);
 	CPPUNIT_ASSERT(i == 4);
 	delete string1;
-	
+#endif	
 	NextSubTest();
 	string1 = new BString("abc abc abc");
 	i = string1->IFindLast("abc", -10);
