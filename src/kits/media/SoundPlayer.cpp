@@ -152,16 +152,12 @@ BSoundPlayer::Start()
 		return B_ERROR;
 	}
 	
-	BTimeSource *timeSource = roster->MakeTimeSourceFor(_m_node->Node());
-	
 	// make sure we give the producer enough time to run buffers through
 	// the node chain, otherwise it'll start up already late
 	bigtime_t latency = 0;
 	status_t err = roster->GetLatencyFor(_m_node->Node(), &latency);
 
-	err = roster->StartNode(_m_node->Node(), timeSource->Now() + latency + 5000);
-	
-	timeSource->Release();
+	err = roster->StartNode(_m_node->Node(), _m_node->TimeSource()->Now() + latency + 5000);
 	
 	return err;
 }
