@@ -716,6 +716,21 @@ StyledEditWindow::MenusBeginning()
 			}
 		}
 	}
+	
+	switch (fTextView->Alignment()) {
+	case B_ALIGN_LEFT:
+		fAlignLeft->SetMarked(true);
+	break;
+	case B_ALIGN_CENTER:
+		fAlignCenter->SetMarked(true);
+	break;
+	case B_ALIGN_RIGHT:
+		fAlignRight->SetMarked(true);
+	break;
+	default:
+	    // I am so confused.
+	break;
+	}
 }
 
 void
