@@ -52,8 +52,9 @@ enum _DebugCategoryFlags {
 	
 	// Misc categories
 	CF_HIGH_VOLUME		= 0x00000200,	//!< often-called functions
-	CF_DEBUGGING		= 0x00000400,	//!< internal debugging functions
-	CF_DUMP				= 0x00000800,	//!< dump() functions
+	CF_HELPER			= 0x00000400,	//!< helper functions and classes (i.e. Array, CS0String, etc.)
+	CF_DEBUGGING		= 0x00000800,	//!< internal debugging functions
+	CF_DUMP				= 0x00001000,	//!< dump() functions
 	
 	//-------------------------------
 	
@@ -71,6 +72,7 @@ enum _DebugCategoryFlags {
 */
 #define CATEGORY_FILTER	CF_ALL
 //#define CATEGORY_FILTER	~CF_DUMP
+//#define CATEGORY_FILTER	~CF_DUMP & ~CF_HIGH_VOLUME
 //#define CATEGORY_FILTER	CF_ALL_STANDARD
 //#define CATEGORY_FILTER	CF_ENTRY
 //#define CATEGORY_FILTER	(CF_ENTRY | CF_PUBLIC)
@@ -141,7 +143,7 @@ private:
 		}
 		
 	#define DUMP_INIT(categoryFlags, className)	\
-		DEBUG_INIT_SILENT(categoryFlags, className);	
+		DEBUG_INIT_SILENT((categoryFlags) | CF_DUMP , className);	
 				
 	#define PRINT(x) { 														\
 		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)				\
