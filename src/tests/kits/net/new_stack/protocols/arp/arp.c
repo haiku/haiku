@@ -134,7 +134,7 @@ static status_t process_input(net_layer *me, net_buffer *buffer)
 	if (!buffer)
 		return B_ERROR;
 		
-	if (g_stack->find_buffer_attribute(buffer, ethernet_protocol_attr, 0, NULL, &protocol, NULL) != B_OK)
+	if (g_stack->find_buffer_attribute(buffer, ethernet_protocol_attr, 0, NULL, (void **) &protocol, NULL) != B_OK)
 		return B_ERROR;
 
 	if (*protocol != htons(0x0806))	// ARP on Ethernet protocol value
