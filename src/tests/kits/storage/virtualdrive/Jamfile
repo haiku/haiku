@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src tests kits storage virtualdrive ;
+
+R5KernelAddon virtualdrive : kernel drivers bin : virtualdrive.c ;
+
+{
+	local bintarget = <installed-bin>virtualdrive ;
+	local devtarget = <installed-dev>virtualdrive ;
+	LOCATE on $(bintarget) = /boot/home/config/add-ons/kernel/drivers/bin ;
+	LOCATE on $(devtarget)
+		= /boot/home/config/add-ons/kernel/drivers/dev/disk/virtual ;
+	File $(bintarget) : virtualdrive ;
+	RelSymLink $(devtarget) : $(bintarget) ;
+	NotFile install_virtualdrive ;
+	Depends install_virtualdrive : $(devtarget) ;
+}
+
