@@ -82,7 +82,7 @@ while [ $# \> 0 ] ; do
 		--include-gpl-addons)	include_gpl_addons=1; shift 1;;
 		--floppy)		assertparam "$1" $#; floppy=$2; shift 2;;
 		--bochs-debug)	bochs_debug=1; shift 1;;
-		--target=*)     target=(echo $T | cut -d'=' -f2-); shift 1;;
+		--target=*)     target=`echo $1 | cut -d'=' -f2-`; shift 1;;
 		--help | -h)	usage; exit 0;;
 		*)				echo Invalid argument: \`$1\'; exit 1;;
 	esac
