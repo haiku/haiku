@@ -1130,10 +1130,24 @@ InputServer::DispatchEvents(BList *eventList)
 		for ( int32 i = 0; NULL != (event = (BMessage *)fEventsCache.ItemAt(i)); i++ ) {
 			// now we must send each event to the app_server
 			if (event->what == B_INPUT_METHOD_EVENT && !fIMAware) {
-				if (!fBLWindow)
-					fBLWindow = new BottomlineWindow(be_bold_font);
+				SERIAL_PRINT(("IME received\n"));
+				int32 opcode = -1;
+				event->FindInt32("be:opcode", &opcode);
+				BList events;
+				if (!fBLWindow && opcode == B_INPUT_METHOD_STARTED) {
+					fBLWindow = new BottomlineWindow(be_plain_font);
+				}
+				
+				if (fBLWindow) {
+					fBLWindow->HandleInputMethodEvent(event, &events);
+				
+					if (!events.IsEmpty()) {
+						fBLWindow->PostMessage(B_QUIT_REQUESTED);
+						fBLWindow = NULL;
 
-				fBLWindow->HandleInputMethodEvent(event, eventList);
+						fEventsCache.AddList(&events);
+					}
+				}
 			} else {
 				DispatchEvent(event);
 			}
@@ -1152,6 +1166,23 @@ int
 InputServer::DispatchEvent(BMessage *message)
 {
 	CALLED();
+
+	switch (message->what) {
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN: {
+			uint32 modifiers;
+			ssize_t size;
+			uint8 *data;	
+			if (message->FindData("states", B_UINT8_TYPE, (const void**)&data, &size) != B_OK)
+				message->AddData("states", B_UINT8_TYPE, fKey_info.key_states, 16);
+			if (message->FindInt32("modifiers", (int32*)&modifiers)!=B_OK)
+				message->AddInt32("modifiers", fKey_info.modifiers);
+
+			break;
+		}
+	}
 	
 	// BPortLink is incompatible with R5 one
 #ifndef COMPILE_FOR_R5
