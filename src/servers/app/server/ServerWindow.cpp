@@ -411,9 +411,9 @@ void ServerWindow::DispatchMessage( int32 code )
 			if (current)
 				cl		= current;
 			else // hope this NEVER happens! :-)
-				printf("!Server PANIC: window %s: cannot find Layer with ID %ld\n", _title->String(), token);
+				printf("Server PANIC: window %s: cannot find Layer with ID %ld\n", _title->String(), token);
 
-			STRACE(("ServerWindow %s: Message Set_Current_Layer: Layer ID: %ld\n", _title->String(), token));
+			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", _title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CREATE:
@@ -422,12 +422,14 @@ void ServerWindow::DispatchMessage( int32 code )
 			// us to attach a layer in the tree in the same manner and invalidate
 			// the area in which the new layer resides assuming that it is
 			// visible.
+			STRACE(("SW %s: AS_LAYER_CREATE...\n", _title->String()));
 			Layer		*oldCL = cl;
 			
 			int32		token;
 			BRect		frame;
 			uint32		resizeMask;
 			uint32		flags;
+			bool		hidden;
 			int32		childCount;
 			char*		name;
 		
@@ -436,20 +438,34 @@ void ServerWindow::DispatchMessage( int32 code )
 			ses->ReadRect( &frame );
 			ses->ReadInt32( (int32*)&resizeMask );
 			ses->ReadInt32( (int32*)&flags );
+			ses->ReadBool( &hidden );
 			ses->ReadInt32( &childCount );
 			
+				// view's visible area is invalidated here
 			Layer		*newLayer;
 			newLayer	= new Layer(frame, name, token, resizeMask, flags, this);
+				// there is no way of setting this, other than manual. :-)
+			newLayer->_hidden	= hidden;
+			
+			// TODO: 'before' Layer support???
 			
 			// TODO: review Layer::AddChild
+				// newLayer's parent will invalidate the area that its new child
+				//    occupies, here in AddChild()
 			cl->AddChild( newLayer );
+			cl->PrintTree();
 			
+				// we set Layer attributes (BView's state)...
 			cl			= newLayer;
 			
 			int32		msgCode;
+			ses->ReadInt32( &msgCode );		// this is AS_LAYER_SET_FONT_STATE
+			DispatchMessage( msgCode );
+
 			ses->ReadInt32( &msgCode );		// this is AS_LAYER_SET_STATE
 			DispatchMessage( msgCode );
 			
+				// ... and attach its children.
 			for(int i = 0; i < childCount; i++){
 				ses->ReadInt32( &msgCode );		// this is AS_LAYER_CREATE
 				DispatchMessage( msgCode );
@@ -457,7 +473,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			
 			cl			= oldCL;
 			
-			STRACE(("ServerWindow %s: Message Create_Layer unimplemented\n",_title->String()));
+			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", _title->String(), cl->_name->String(), name));
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -466,13 +482,22 @@ void ServerWindow::DispatchMessage( int32 code )
 			// the less taxing operation - we call PruneTree() on the removed
 			// layer, detach the layer itself, delete it, and invalidate the
 			// area assuming that the view was visible when removed
+			STRACE(("SW %s: AS_LAYER_DELETE(self)...\n", _title->String()));			
+			Layer		*parent;
+			parent		= cl->_parent;
 			
-			// Attached Data:
-			// 1) (int32) id of the removed view
+				// here we remove current layer from list.
+			cl->RemoveSelf( false );
+			// TODO: invalidate the region occupied by this view.
+			//			Should be done in Layer::RemoveChild() though!
+			cl->PruneTree();
 
-			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Delete_Layer unimplemented\n",_title->String()));
+			parent->PrintTree();
+			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", _title->String(), parent->_name->String(), cl->_name->String()));
 
+			delete cl;
+
+			cl 			= parent;
 			break;
 		}
 		case AS_LAYER_SET_STATE:
@@ -500,7 +525,7 @@ void ServerWindow::DispatchMessage( int32 code )
 			ses->ReadBool( &(cl->_layerdata->fontAliasing) );
 			ses->ReadInt32( &clippRegRects );
 			
-			cl->_layerdata->patt.Set( (int8*)&patt );
+			cl->_layerdata->patt.Set( *((uint64*)&patt) );
 			cl->_layerdata->highcolor.SetColor( highColor );
 			cl->_layerdata->lowcolor.SetColor( lowColor );
 			cl->_layerdata->viewcolor.SetColor( viewColor );
@@ -525,7 +550,124 @@ void ServerWindow::DispatchMessage( int32 code )
 				}
 			}
 
-			STRACE(("ServerWindow %s: Message Layer_Set_State\n",_title->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_SET_FONT_STATE:
+		{
+			uint16			mask;
+
+			ses->ReadInt16( (int16*)&mask );
+			
+			if ( mask & B_FONT_FAMILY_AND_STYLE ){
+				uint32		fontID;
+				ses->ReadInt32( (int32*)&fontID );
+				// TODO: implement later. Currently there is no SetFamAndStyle(uint32)
+				//   in ServerFont class. DW, could you add one?
+				//cl->_layerdata->font->
+			}
+	
+			if ( mask & B_FONT_SIZE ){
+				float		size;
+				ses->ReadFloat( &size );
+				cl->_layerdata->font.SetSize( size );
+			}
+
+			if ( mask & B_FONT_SHEAR ){
+				float		shear;
+				ses->ReadFloat( &shear );
+				cl->_layerdata->font.SetShear( shear );
+			}
+
+			if ( mask & B_FONT_ROTATION ){
+				float		rotation;
+				ses->ReadFloat( &rotation );
+				cl->_layerdata->font.SetRotation( rotation );
+			}
+
+			if ( mask & B_FONT_SPACING ){
+				uint8		spacing;
+				ses->ReadInt8( (int8*)&spacing );	// uint8
+				cl->_layerdata->font.SetSpacing( spacing );
+			}
+
+			if ( mask & B_FONT_ENCODING ){
+				uint8		encoding;
+				ses->ReadInt8( (int8*)&encoding ); // uint8
+				cl->_layerdata->font.SetEncoding( encoding );
+			}
+
+			if ( mask & B_FONT_FACE ){
+				uint16		face;
+				ses->ReadInt16( (int16*)&face );	// uint16
+				cl->_layerdata->font.SetFace( face );
+			}
+	
+			if ( mask & B_FONT_FLAGS ){
+				uint32		flags;
+				ses->ReadInt32( (int32*)&flags ); // uint32
+				cl->_layerdata->font.SetFlags( flags );
+			}
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_STATE:
+		{
+			LayerData	*ld;
+				// these 4 are here because of a compiler warning. Maybe he's right... :-)
+			rgb_color	hc, lc, vc; // high, low and view colors
+			uint64		patt;		// current pattern as a uint64
+
+			ld			= cl->_layerdata; // now we write fewer characters. :-)
+			hc			= ld->highcolor.GetColor32();
+			lc			= ld->lowcolor.GetColor32();
+			vc			= ld->viewcolor.GetColor32();
+			patt		= ld->patt.GetInt64();
+			
+			// TODO: DW implement such a method in ServerFont class!
+			ses->WriteUInt32( 0UL /*uint32 ld->font.GetFamAndStyle()*/ );
+			ses->WriteFloat( ld->font.Size() );
+			ses->WriteFloat( ld->font.Shear() );
+			ses->WriteFloat( ld->font.Rotation() );
+			ses->WriteUInt8( ld->font.Spacing() );
+			ses->WriteUInt8( ld->font.Encoding() );
+			ses->WriteUInt16( ld->font.Face() );
+			ses->WriteUInt32( ld->font.Flags() );
+			
+			ses->WritePoint( ld->penlocation );
+			ses->WriteFloat( ld->pensize );
+			ses->WriteData( &hc, sizeof(rgb_color)/* 4*8 */ );
+			ses->WriteData( &lc, sizeof(rgb_color)/* 4*8 */ );
+			ses->WriteData( &vc, sizeof(rgb_color)/* 4*8 */ );
+			ses->WriteData( &patt, sizeof(pattern)/* 8*8 */ );
+			ses->WritePoint( ld->coordOrigin );
+			ses->WriteUInt8( (uint8)(ld->draw_mode) );
+			ses->WriteUInt8( (uint8)(ld->lineCap) );
+			ses->WriteUInt8( (uint8)(ld->lineJoin) );
+			ses->WriteFloat( ld->miterLimit );
+			ses->WriteUInt8( (uint8)(ld->alphaSrcMode) );
+			ses->WriteUInt8( (uint8)(ld->alphaFncMode) );
+			ses->WriteFloat( ld->scale );
+			ses->WriteBool( ld->fontAliasing );
+			
+			int32		noOfRects = 0;
+			if ( ld->clippReg )
+				noOfRects = ld->clippReg->CountRects();
+
+			ses->WriteInt32( noOfRects );
+			
+			for( int i = 0; i < noOfRects; i++ ){
+				ses->WriteRect( ld->clippReg->RectAt(i) );
+			}
+			
+			ses->WriteFloat( cl->_frame.left );
+			ses->WriteFloat( cl->_frame.top );
+			ses->WriteRect( cl->_frame.OffsetToCopy( cl->_boundsLeftTop ) );
+			
+			ses->Sync();
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		
@@ -549,8 +691,11 @@ void ServerWindow::DispatchMessage( int32 code )
 			
 			top_layer		= new Layer( frame, name, token, resizeMode,
 											flags, this );
-											
+			cl				= top_layer;
+			
+			STRACE(("ServerWindow %s: Setting currentLayer to: '%s'\n", _title->String(), name ));
 			STRACE(("ServerWindow %s: Message Create_Layer_Root\n",_title->String()));
+			delete name;
 			break;
 		}
 		case AS_LAYER_DELETE_ROOT:
@@ -1469,21 +1614,43 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 {
 	if( !start )
 		return NULL;
+	
+		// see if we're looking for 'start'
+	if( start->_view_token == token )
+		return const_cast<Layer*>(start);
 
 	Layer		*c = start->_topchild; //c = short for: current
 	if( c != NULL )
-		while( c != start ){
-			if( c->_view_token == token )
-				return c;
+		while( true ){
+			// action block
+			{
+				if( c->_view_token == token )
+					return c;
+			}
 
-			if(	c->_topchild )
+				// go deep
+			if(	c->_topchild ){
 				c = c->_topchild;
+			}
+				// go right or up
 			else
-				if( c->_lowersibling )
+					// go right
+				if( c->_lowersibling ){
 					c = c->_lowersibling;
-				else
-					c = c->_parent;
+				}
+					// go up
+				else{
+					while( !c->_parent->_lowersibling && c->_parent != start ){
+						c = c->_parent;
+					}
+						// that enough! We've reached the start layer.
+					if( c->_parent == start )
+						break;
+						
+					c = c->_parent->_lowersibling;
+				}
 		}
+
 	return NULL;
 }
 
@@ -1505,3 +1672,13 @@ STRACE(("ActivateWindow: old=%s, new=%s\n",oldwin?oldwin->Title():"NULL",newwin?
 	if(newwin)
 		newwin->SetFocus(true);
 }
+
+/*
+ @log
+	* Added a handler for AS_LAYER_SET_FONT_STATE message
+	* Modified a bit AS_LAYER_CREATE handler 'cause I forgot about AS_LAYER_SET_FONT_STATE and hidden state.
+	* Added a handler for AS_LAYER_GET_STATE message
+	* Added a handler for AS_LAYER_DELETE message
+	* Modified FindLayer() - now it works OK
+	* added debugging code for AS_LAYER_CREATE handler.
+*/
