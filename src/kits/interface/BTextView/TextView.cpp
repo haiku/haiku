@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
+#include <cstdlib>
 
 // System Includes -------------------------------------------------------------
 #include <Application.h>
@@ -242,6 +243,11 @@ BTextView::BTextView(BMessage *archive)
 	BRect rect;
 	bool toggle;
 
+	if (archive->FindRect("_trect", &rect) != B_OK)
+		rect.Set(0, 0, 0, 0);
+
+	InitObject(rect, NULL, NULL); 
+
 	if (archive->FindString("_text", &text) == B_OK)
 		SetText(text);
 
@@ -254,19 +260,13 @@ BTextView::BTextView(BMessage *archive)
 	if (archive->FindInt32("_col_sp", &flag) == B_OK)
 		SetColorSpace((color_space)flag);
 
-	if (archive->FindRect("_trect", &rect) == B_OK)
-		SetTextRect(rect);
-
 	if (archive->FindInt32("_max", &flag) == B_OK)
 		SetMaxBytes(value);
 
 	if (archive->FindInt32("_sel", &flag) == B_OK &&
 		archive->FindInt32("_sel", &flag2) == B_OK)
 		Select(flag, flag2);
-
-	//"_dis_ch" (array) B_RAW_TYPE Disallowed characters.
-	//"_runs" B_RAW_TYPE Flattened run array.
-
+	
 	if (archive->FindBool("_stylable", &toggle) == B_OK)
 		SetStylable(toggle);
 
@@ -281,6 +281,27 @@ BTextView::BTextView(BMessage *archive)
 
 	if (archive->FindBool("_nedit", &toggle) == B_OK)
 		MakeEditable(!toggle);
+
+	ssize_t disallowedCount = 0;
+	const int32 *disallowedChars = NULL;
+	if (archive->FindData("_dis_ch", B_RAW_TYPE,
+		(const void **)&disallowedChars, &disallowedCount) == B_OK) {
+		
+		fDisallowedChars = new BList;
+		disallowedCount /= sizeof(int32);
+		for (int32 x = 0; x < disallowedCount; x++)
+			fDisallowedChars->AddItem(reinterpret_cast<void *>(disallowedChars[x]));
+	}
+	
+	ssize_t runSize = 0;
+	const void *flattenedRunArray = NULL;
+	if (archive->FindData("_runs", B_RAW_TYPE, &flattenedRunArray, &runSize) == B_OK) {
+		
+		text_run_array *runArray = UnflattenRunArray(runArray, (int32*)&runSize);
+		SetRunArray(0, TextLength(), runArray);
+		free(runArray);
+	}
+	
 }
 //------------------------------------------------------------------------------
 BTextView::~BTextView()
@@ -314,14 +335,25 @@ BTextView::Archive(BMessage *data, bool deep) const
 	data->AddRect("_trect", fTextRect);
 	data->AddInt32("_max", fMaxBytes);
 	data->AddInt32("_sel", fSelStart);
-	data->AddInt32("_sel", fSelEnd);
-	//"_dis_ch" (array) B_RAW_TYPE Disallowed characters.
-	//"_runs" B_RAW_TYPE Flattened run array.
+	data->AddInt32("_sel", fSelEnd);	
 	data->AddBool("_stylable", fStylable);
 	data->AddBool("_auto_in", fAutoindent);
 	data->AddBool("_wrap", fWrap);
 	data->AddBool("_nsel", !fSelectable);
 	data->AddBool("_nedit", !fEditable);
+	
+	if (fDisallowedChars != NULL)
+		data->AddData("_dis_ch", B_RAW_TYPE, fDisallowedChars->Items(),
+			fDisallowedChars->CountItems() * sizeof(int32));
+
+	ssize_t runSize = 0;
+	text_run_array *runArray = RunArray(0, TextLength());
+	void *flattened = FlattenRunArray(runArray, (int32*)&runSize);
+
+	data->AddData("_runs", B_RAW_TYPE, flattened, runSize);
+	
+	free(flattened);
+	free(runArray);
 	
 	return err;
 }
@@ -566,7 +598,9 @@ BTextView::WindowActivated(bool state)
 void
 BTextView::KeyDown(const char *bytes, int32 numBytes)
 {
-	//TODO: Remove this and move it to specific key handlers ?
+	// TODO: Remove this and move it to specific key handlers ?
+	// moreover, we should check if ARROW keys works in case the object
+	// isn't editable
 	if (!fEditable)
 		return;
 	
@@ -702,14 +736,13 @@ BTextView::MessageReceived(BMessage *message)
 				return;
 
 			if (propInfo.FindMatch(message, 0, &specifier, specifier.what,
-				property) == B_ERROR)
-			{
+				property) == B_ERROR) {
 				BView::MessageReceived(message);
 				break;
 			}
 
-			switch(message->what)
-			{
+			switch(message->what) 	{
+
 				case B_GET_PROPERTY:
 				{
 					BMessage reply;
@@ -740,6 +773,8 @@ BTextView::MessageReceived(BMessage *message)
 
 					break;
 				}
+				default:
+					break;
 			}
 
 			break;
@@ -758,8 +793,7 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 	BPropertyInfo propInfo(prop_list);
 	BHandler *target = NULL;
 
-	switch (propInfo.FindMatch(message, 0, specifier, form, property))
-	{
+	switch (propInfo.FindMatch(message, 0, specifier, form, property)) {
 		case B_ERROR:
 			break;
 
@@ -1032,8 +1066,8 @@ BTextView::GetText(int32 offset, int32 length, char *buffer) const
 uchar
 BTextView::ByteAt(int32 offset) const
 {
-	if ((offset < 0) || (offset > (fText->Length() - 1)))
-		return ('\0');
+	if (offset < 0 || offset > (fText->Length() - 1))
+		return '\0';
 		
 	return (*fText)[offset];
 }
