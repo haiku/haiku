@@ -11,8 +11,9 @@ INTERFACE_KIT_SOURCE =
 	Deskbar.cpp
 	Dragger.cpp
 	Font.cpp
-	Globals.cpp
+	GraphicsDefs.cpp
 	Input.cpp
+	InterfaceDefs.cpp
 	Menu.cpp
 	MenuBar.cpp
 	MenuField.cpp
