@@ -1,0 +1,22 @@
+SubDir OBOS_TOP src tests add-ons kernel file_systems bfs structureSizes ;
+
+SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+
+{
+	local defines = [ FDefines USER ] ; # _NO_INLINE_ASM
+	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ; #-fcheck-memory-usage
+}
+
+# To check the effects of different compiler options to the structures
+# without _PACKED use:
+# $ OPTIM=-Ox DEBUG=0 NO_TEST_DEBUG=1 jam -a
+
+SimpleTest structureSizes
+	: structureSizes.cpp
+	: ;
+
+# Tell Jam where to find these sources
+SEARCH on [ FGristFiles BufferPool.cpp ]
+	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+
