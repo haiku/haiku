@@ -64,6 +64,7 @@
 # define pfor( s,l,r )    	parse_make( compile_foreach,l,r,P0,s,S0,0 )
 # define pif( l,r,t )	  	parse_make( compile_if,l,r,t,S0,S0,0 )
 # define pincl( l )       	parse_make( compile_include,l,P0,P0,S0,S0,0 )
+# define pj2eof( )       	parse_make( compile_jumptoeof,P0,P0,P0,S0,S0,0 )
 # define plist( s )	  	parse_make( compile_list,P0,P0,P0,s,S0,0 )
 # define plocal( l,r,t )  	parse_make( compile_local,l,r,t,S0,S0,0 )
 # define pnull()	  	parse_make( compile_null,P0,P0,P0,S0,S0,0 )
@@ -117,6 +118,8 @@ rule	: `{` block `}`
 		{ $$.parse = $2.parse; }
 	| `include` list `;`
 		{ $$.parse = pincl( $2.parse ); }
+	| `jumptoeof` `;`
+		{ $$.parse = pj2eof( ); }
 	| arg lol `;`
 		{ $$.parse = prule( $1.parse, $2.parse ); }
 	| arg assign list `;`
