@@ -58,8 +58,8 @@ arch_vm_init_endvm(kernel_args *ka)
 	TRACE(("arch_vm_init_endvm: entry\n"));
 
 	// map 0 - 0xa0000 directly
-	id = vm_map_physical_memory(vm_get_kernel_aspace_id(), "dma_region", &ptr,
-		REGION_ADDR_ANY_ADDRESS, 0xa0000, LOCK_RW | LOCK_KERNEL, 0x0);
+	id = map_physical_memory("dma_region", (void *)0x0, 0xa0000,
+		B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, &ptr);
 	if (id < 0) {
 		panic("arch_vm_init_endvm: unable to map dma region\n");
 		return B_NO_MEMORY;

@@ -1353,13 +1353,9 @@ pci_module_init(void)
 
 	check_pci();
 
-	gPCI_Region = vm_map_physical_memory(vm_get_kernel_aspace_id(),
-	                                    "pci_bios",
-	                                    (void **)&gPCI_BIOS_Address,
-	                                    REGION_ADDR_ANY_ADDRESS,
-	                                    0x10000,
-	                                    LOCK_RO | LOCK_KERNEL,
-	                                    (addr)0xf0000);
+	gPCI_Region = map_physical_memory("pci_bios", (void *)0xf0000,
+		0x10000, B_ANY_KERNEL_ADDRESS, B_KERNEL_READ_AREA,
+		(void **)&gPCI_BIOS_Address);
 
 	pirTable = find_pir_table();
 	if (pirTable) {
