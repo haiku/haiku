@@ -85,7 +85,7 @@ typedef struct _ch_randgen {
 
 
 static ch_randgen *sRandomEnv;
-static unsigned int randcount=0;
+static uint32 sRandomCount = 0;
 static sem_id sRandomSem;
 
 
@@ -310,7 +310,6 @@ new_chrand(const unsigned int inittimes)
 static void
 kill_chrand(ch_randgen *randgen)
 {
-	memset(randgen, 0, sizeof (ch_randgen));
 	free(randgen);
 }
 
@@ -331,8 +330,9 @@ status_t
 init_driver(void)
 {
 	TRACE((DRIVER_NAME ": init_driver()\n"));
-	sRandomEnv = new_chrand(8);
+
 	sRandomSem = create_sem(1, "RNG semaphore");
+	set_sem_owner(sRandomSem, B_SYSTEM_TEAM);
 	return B_OK;
 }
 
@@ -376,7 +376,15 @@ static status_t
 random_open(const char *name, uint32 flags, void **cookie)
 {
 	TRACE((DRIVER_NAME ": open(\"%s\")\n", name));
-	return B_OK;
+	acquire_sem(sRandomSem);
+
+	sRandomEnv = new_chrand(8);
+		// the random generator is only initialized on demand, but
+		// remains valid as long as the driver is loaded
+
+	release_sem(sRandomSem);
+
+	return sRandomEnv != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -388,18 +396,18 @@ random_read(void *cookie, off_t position, void *_buffer, size_t *_numBytes)
 	uint32 i, j;
 
 	acquire_sem(sRandomSem);
-	randcount += *_numBytes;
+	sRandomCount += *_numBytes;
 
 	/* Reseed if we have or are gonna use up > 1/16th the entropy around */
-	if (randcount >= NK/8) {
-		randcount = 0;
+	if (sRandomCount >= NK/8) {
+		sRandomCount = 0;
 		reseed(sRandomEnv, 1);
 	}
 
-	/* Yes, i know this is not the way we should do it. What we really should do is
+	/* ToDo: Yes, i know this is not the way we should do it. What we really should do is
 	 * take the md5 or sha1 hash of the state of the pool, and return that. Someday.
 	 */
-	for (i = 0; i < (*_numBytes)/4; i++)
+	for (i = 0; i < (*_numBytes) / 4; i++)
 		buffer[i] = chrand32(sRandomEnv);
 	for (j = 0; j < (*_numBytes) % 4; j++)
 		buffer8[(i*4) + j] = chrand8(sRandomEnv);
