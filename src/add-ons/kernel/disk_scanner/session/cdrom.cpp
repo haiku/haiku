@@ -560,7 +560,7 @@ Disc::GetSessionInfo(int32 index, int32 blockSize, session_info *sessionInfo)
 					sessionInfo->offset = start_lba * blockSize;
 					sessionInfo->size = (end_lba - start_lba) * blockSize;
 					sessionInfo->index = index;
-					sessionInfo->flags = 0;
+					sessionInfo->flags = B_DATA_SESSION;
 					
 					return B_OK;														
 				}			
