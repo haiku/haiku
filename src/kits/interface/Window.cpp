@@ -1791,7 +1791,6 @@ void BWindow::Show(){
 	if (fShowLevel == 0){
 		STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name() ));
 		if ( !isLocked ) Lock();
-		top_view->Show();
 		session->WriteInt32( AS_SHOW_WINDOW );
 		session->Sync();
 		if ( !isLocked ) Unlock();
