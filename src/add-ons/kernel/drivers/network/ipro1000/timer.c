@@ -104,7 +104,7 @@ timer_thread(void *cookie)
 		}
 
 		status = acquire_sem_etc(sTimerSem, 1, B_ABSOLUTE_TIMEOUT, timeout);
-	} while (status == B_OK || status == B_TIMED_OUT);
+	} while (status != B_BAD_SEM_ID);
 
 	return 0;
 }
