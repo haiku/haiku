@@ -144,9 +144,11 @@ extern clock_t	clock(void);
 extern int 		pause(void);
 
 /* process */
-extern pid_t	getpgrp(void);
 extern pid_t	getpid(void);
+extern pid_t	getpgrp(void);
 extern pid_t	getppid(void);
+extern pid_t	getsid(pid_t pid);
+extern pid_t	getpgid(pid_t pid);
 
 extern pid_t	setsid(void);
 extern int		setpgid(pid_t pid, pid_t pgid);
