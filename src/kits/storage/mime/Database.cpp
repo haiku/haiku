@@ -370,13 +370,18 @@ Database::SetPreferredApp(const char *type, const char *signature, app_verb verb
 
 // SetSupportedTypes
 status_t
-Database::SetSupportedTypes(const char *type, const BMessage *types)
+Database::SetSupportedTypes(const char *type, const BMessage *types, bool fullSync)
 {
 	DBG(OUT("Database::SetSupportedTypes()\n"));	
 	bool didCreate = false;
 	status_t err = (type && types) ? B_OK : B_BAD_VALUE;
+	// Write the attr
 	if (!err)
 		err = write_mime_attr_message(type, kSupportedTypesAttr, types, &didCreate);
+	// Update the supporting apps map
+	if (!err)
+		err = fSupportingApps.SetSupportedTypes(type, types, fullSync);
+	// Notify the monitor
 	if (!err)
 		err = SendMonitorUpdate(B_SUPPORTED_TYPES_CHANGED, type, B_META_MIME_MODIFIED);
 	return err;
@@ -403,7 +408,7 @@ Database::GetInstalledTypes(const char *supertype, BMessage *subtypes)
 status_t
 Database::GetSupportingApps(const char *type, BMessage *signatures)
 {
-	return B_ERROR;
+	return fSupportingApps.GetSupportingApps(type, signatures);
 }
 
 
@@ -492,7 +497,7 @@ Database::StartWatching(BMessenger target)
 	DBG(OUT("Database::StartWatching()\n"));
 	status_t err = target.IsValid() ? B_OK : B_BAD_VALUE;	
 	if (!err) 
-		fMonitorSet.insert(target);
+		fMonitorMessengers.insert(target);
 	return err;	
 }
 
@@ -504,9 +509,9 @@ status_t
 Database::StopWatching(BMessenger target)
 {
 	DBG(OUT("Database::StopWatching()\n"));
-	status_t err = fMonitorSet.find(target) != fMonitorSet.end() ? B_OK : B_ENTRY_NOT_FOUND;
+	status_t err = fMonitorMessengers.find(target) != fMonitorMessengers.end() ? B_OK : B_ENTRY_NOT_FOUND;
 	if (!err)
-		fMonitorSet.erase(target);
+		fMonitorMessengers.erase(target);
 	return err;	
 }
 
@@ -744,7 +749,7 @@ Database::SendMonitorUpdate(BMessage &msg) {
 	DBG(OUT("Database::SendMonitorUpdate(BMessage&)\n"));
 	status_t err;
 	std::set<BMessenger>::const_iterator i;
-	for (i = fMonitorSet.begin(); i != fMonitorSet.end(); i++) {
+	for (i = fMonitorMessengers.begin(); i != fMonitorMessengers.end(); i++) {
 		status_t err = (*i).SendMessage(&msg, (BHandler*)NULL);
 		if (err)
 			DBG(OUT("Database::SendMonitorUpdate(BMessage&): BMessenger::SendMessage failed, %p\n", err));

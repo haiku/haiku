@@ -11,6 +11,7 @@
 #define _MIME_DATABASE_H
 
 #include <mime/InstalledTypes.h>
+#include <mime/SupportingApps.h>
 #include <Mime.h>
 #include <Messenger.h>
 #include <StorageDefs.h>
@@ -49,7 +50,7 @@ public:
 							size_t dataSize, icon_size which);
 	status_t SetPreferredApp(const char *type, const char *signature, app_verb verb = B_OPEN);
 //	status_t SetSnifferRule(const char *);
-	status_t SetSupportedTypes(const char *type, const BMessage *types);
+	status_t SetSupportedTypes(const char *type, const BMessage *types, bool fullSync);
 
 	// Non-atomic Get()
 	status_t GetInstalledSupertypes(BMessage *super_types);
@@ -96,8 +97,9 @@ private:
 	status_t SendMonitorUpdate(BMessage &msg);
 	
 	status_t fCStatus;
-	std::set<BMessenger> fMonitorSet;
+	std::set<BMessenger> fMonitorMessengers;
 	InstalledTypes fInstalledTypes;
+	SupportingApps fSupportingApps;
 };
 
 } // namespace Mime
