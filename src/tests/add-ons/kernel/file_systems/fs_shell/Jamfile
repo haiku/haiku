@@ -1,5 +1,48 @@
 SubDir OBOS_TOP src tests add-ons kernel file_systems fs_shell ;
 
+include [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell
+				   FSShellRules ] ;
+
+# We compile the fs_shell in a mixed environment: We use the platform POSIX
+# and STL headers (to have a proper interface to use), and we use all other
+# BeOS specific headers. Ideally we would get rid of the latter, but we still
+# have dependencies to them.
+
+SetupFSShellIncludes ;
+
+rule BuildLibFSShell
+{
+	SetupObjectsDir ;
+
+	# Remove `-nostdinc' from CCFLAGS and C++FLAGS.
+	local oldCCFLAGS = $(CCFLAGS) ;
+	local oldC++FLAGS = $(C++FLAGS) ;
+	CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
+	C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
+
+	Objects $(2) ;
+	LibraryFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
+
+	ObjectsDefines $(2) : _NO_INLINE_ASM ;
+
+	# Reset CCFLAGS and C++FLAGS to original values.
+	CCFLAGS = $(oldCCFLAGS) ;
+	C++FLAGS = $(oldC++FLAGS) ;
+}
+
+{
+	local defines = [ FDefines USER DEBUG ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ;
+}
+		
+BuildLibFSShell libfs_shell.a
+	:
+	fsh.cpp rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
+	stub.c tracker.cpp sysdep.c hexdump.c argv.c errors.cpp
+;
+
+
 local fsShellCommandSources ;
 if $(OS) = BEOS {
 	fsShellCommandSources = fs_shell_command_beos.cpp ;
