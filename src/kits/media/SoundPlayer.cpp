@@ -359,7 +359,8 @@ float
 BSoundPlayer::Volume()
 {
 	CALLED();
-	return _m_volume;
+	
+	return pow(10.0, VolumeDB(true)/20.0);
 }
 
 
@@ -367,16 +368,7 @@ void
 BSoundPlayer::SetVolume(float new_volume)
 {
 	CALLED();
-	if(_m_volumeSlider==NULL)
-		get_volume_slider();
-	if(_m_volumeSlider==NULL)
-		return;
-	
-	if (new_volume >= 0.0f && new_volume <= 1.0f) {
-		_m_volume = new_volume;
-		SetVolumeDB(_m_volumeSlider->MinValue() + 
-			_m_volume * (_m_volumeSlider->MaxValue() - _m_volumeSlider->MinValue()) );
-	}
+	SetVolumeDB(20.0 * log10(new_volume));
 }
 
 
@@ -388,13 +380,19 @@ BSoundPlayer::VolumeDB(bool forcePoll)
 		get_volume_slider();
 	if(_m_volumeSlider==NULL)
 		return 0.0;
+		
+	if(!forcePoll && (system_time() - _m_gotVolume < 500000))
+		return _m_volume;
 	
-	float values[32];
-	size_t size = 32 * sizeof(float);
-	_m_volumeSlider->GetValue(&values, &size, &_m_perfTime);
-	
+	bigtime_t lastChange;
+	int32 count = _m_volumeSlider->CountChannels(); 
+	float values[count];
+	size_t size = count * sizeof(float);
+	_m_volumeSlider->GetValue(&values, &size, &lastChange);
+	_m_gotVolume = system_time();
 	_m_volume = values[0];
-	return _m_volume;
+		
+	return values[0];
 }
 
 
@@ -406,13 +404,19 @@ BSoundPlayer::SetVolumeDB(float volume_dB)
 		get_volume_slider();
 	if(_m_volumeSlider==NULL)
 		return;
-	
-	_m_volume = volume_dB;
+		
+	if(volume_dB < _m_volumeSlider->MinValue())
+		volume_dB = _m_volumeSlider->MinValue();
+	if(volume_dB > _m_volumeSlider->MaxValue())
+		volume_dB = _m_volumeSlider->MaxValue();
+		
 	int32 count = _m_volumeSlider->CountChannels(); 
 	float values[count];
 	for(int32 i=0; i<count; i++)
-		values[i] = _m_volume;
+		values[i] = volume_dB;
 	_m_volumeSlider->SetValue(values, sizeof(float) * count, 0);
+	_m_volume = volume_dB;
+	_m_gotVolume = system_time();
 }
 
 
@@ -520,6 +524,8 @@ BSoundPlayer::NotifySoundDone(play_id sound,
 void
 BSoundPlayer::get_volume_slider()
 {
+	CALLED();
+	
 	BMediaRoster *roster = BMediaRoster::CurrentRoster();
 	if(roster==NULL)
 		return;
@@ -529,7 +535,7 @@ BSoundPlayer::get_volume_slider()
 	for(int32 i=0; i<web->CountParameters(); i++) {
 		BParameter *parameter = web->ParameterAt(i);
 		if(parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER
-			|| parameter->Kind() != B_GAIN
+			|| strcmp(parameter->Kind(), B_GAIN) != 0
 			|| (parameter->ID() >> 16) != m_input.destination.id)
 			continue;
 		_m_volumeSlider = (BContinuousParameter*)parameter;
