@@ -53,6 +53,7 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fpbitmap = NULL;
 	fdocumentIndex = 1;
 	fdocumentCount = 1;
+	fbhasSelection = false;
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetHighColor(0, 0, 0);
@@ -150,13 +151,103 @@ ShowImageView::Draw(BRect updateRect)
 				BORDER_HEIGHT - PEN_SIZE,
 				fpbitmap->Bounds().Width() + BORDER_WIDTH + PEN_SIZE,
 				fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE));
+				
+		if (fbhasSelection)
+			DrawInvertBox(fselectionRect);
 	}
+}
+
+void
+ShowImageView::DrawInvertBox(BRect &rect)
+{
+	drawing_mode oldmode = DrawingMode();
+	SetDrawingMode(B_OP_INVERT);
+	StrokeRect(rect);
+	SetDrawingMode(oldmode);
 }
 
 void
 ShowImageView::FrameResized(float /* width */, float /* height */)
 {
 	FixupScrollBars();
+}
+
+void
+ShowImageView::ConstrainToImage(BPoint &point)
+{
+	point.ConstrainTo(
+		BRect(
+			BORDER_WIDTH, BORDER_HEIGHT,
+			fpbitmap->Bounds().Width() + BORDER_WIDTH,
+			fpbitmap->Bounds().Height() + BORDER_HEIGHT
+		)
+	);
+}
+
+void
+ShowImageView::MouseDown(BPoint point)
+{
+	// TODO: Need to handle the case where user clicks
+	// inside an existing selection and starts a drag operation
+	
+	if (fbhasSelection)
+		DrawInvertBox(fselectionRect);
+	
+	fbhasSelection = false;
+	
+	if (!fpbitmap) {
+		// Can't select anything if there is no image
+		Invalidate();
+		return;
+	}
+
+	BPoint firstPoint, secondPoint;
+	firstPoint = point;
+	ConstrainToImage(firstPoint);
+	secondPoint = firstPoint;
+		// just to be safe
+	
+	BRect curSel, lastSel;
+
+	BMessage *pmsg = Window()->CurrentMessage();
+	uint32 buttons = static_cast<uint32>(pmsg->FindInt32("buttons"));
+	bool bfirst = true;
+	// While any combination of mouse buttons is down,
+	// allow the user to size their selection. When all
+	// mouse buttons are up, the loop ends, and the selection
+	// has been made.
+	while (buttons) {
+		ConstrainToImage(secondPoint);
+		curSel = BRect(firstPoint, secondPoint);
+		if (!bfirst && curSel != lastSel)
+			DrawInvertBox(lastSel);
+		if (curSel != lastSel)
+			DrawInvertBox(curSel);
+				
+		snooze(20 * 1000);
+		lastSel = curSel;
+		GetMouse(&secondPoint, &buttons);
+		bfirst = false;
+	}
+
+	if (curSel.IntegerWidth() < 2 && curSel.IntegerHeight() < 2) {
+		// The user must select at least 2 pixels
+		fbhasSelection = false;
+		Invalidate();
+	} else {
+		fselectionRect = curSel;
+		fbhasSelection = true;
+	}
+}
+
+void
+ShowImageView::MouseMoved(BPoint point, uint32 state, const BMessage *pmsg)
+{
+}
+
+void
+ShowImageView::MouseUp(BPoint point)
+{
 }
 
 void

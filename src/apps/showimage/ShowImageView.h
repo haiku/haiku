@@ -46,6 +46,9 @@ public:
 	virtual void AttachedToWindow();
 	virtual void Draw(BRect updateRect);
 	virtual void FrameResized(float width, float height);
+	virtual void MouseDown(BPoint point);
+	virtual void MouseMoved(BPoint point, uint32 state, const BMessage *pmsg);
+	virtual void MouseUp(BPoint point);
 	virtual void MessageReceived(BMessage *pmsg);
 	
 	void FixupScrollBars();
@@ -59,10 +62,15 @@ public:
 	void PrevPage();
 	
 private:
+	void ConstrainToImage(BPoint &point);
+	void DrawInvertBox(BRect &rect);
+	
 	entry_ref fcurrentRef;
 	int32 fdocumentIndex;
 	int32 fdocumentCount;
 	BBitmap *fpbitmap;
+	bool fbhasSelection;
+	BRect fselectionRect;
 };
 
 #endif /* _ShowImageView_h */
