@@ -1265,7 +1265,8 @@ pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t /*pos*/
 static status_t
 pipefs_create_dir(fs_volume _volume, fs_vnode _dir, const char *name, int perms, vnode_id *_newID)
 {
-	return ENOSYS;
+	TRACE(("pipefs: create directory \"%s\" requested...\n", name));
+	return B_NOT_SUPPORTED;
 }
 
 
