@@ -462,6 +462,43 @@ PRINT(("team: %ld, thread: %ld, token: %lu\n", team, thread, token));
 	FUNCTION_END();
 }
 
+// HandleSetSignature
+/*!	\brief Handles a SetSignature() request.
+	\param request The request message
+*/
+void
+TRoster::HandleSetSignature(BMessage *request)
+{
+	FUNCTION_START();
+
+	status_t error = B_OK;
+	// get the parameters
+	team_id team;
+	const char *signature;
+	if (request->FindInt32("team", &team) != B_OK)
+		error = B_BAD_VALUE;
+	if (request->FindString("signature", &signature) != B_OK)
+		error = B_BAD_VALUE;
+	// find the app and set the signature
+	if (error == B_OK) {
+		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team))
+			strcpy(info->signature, signature);
+		else
+			SET_ERROR(error, B_REG_APP_NOT_REGISTERED);
+	}
+	// reply to the request
+	if (error == B_OK) {
+		BMessage reply(B_REG_SUCCESS);
+		request->SendReply(&reply);
+	} else {
+		BMessage reply(B_REG_ERROR);
+		reply.AddInt32("error", error);
+		request->SendReply(&reply);
+	}
+
+	FUNCTION_END();
+}
+
 // HandleGetAppInfo
 /*!	\brief Handles a Get{Running,Active,}AppInfo() request.
 	\param request The request message

@@ -58,6 +58,7 @@ public:
 	void HandleRemovePreRegApp(BMessage *request);
 	void HandleRemoveApp(BMessage *request);
 	void HandleSetThreadAndTeam(BMessage *request);
+	void HandleSetSignature(BMessage *request);
 	void HandleGetAppInfo(BMessage *request);
 	void HandleGetAppList(BMessage *request);
 	void HandleActivateApp(BMessage *request);

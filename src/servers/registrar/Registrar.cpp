@@ -95,6 +95,9 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_SET_THREAD_AND_TEAM:
 			fRoster->HandleSetThreadAndTeam(message);
 			break;
+		case B_REG_SET_SIGNATURE:
+			fRoster->HandleSetSignature(message);
+			break;
 		case B_REG_GET_APP_INFO:
 			fRoster->HandleGetAppInfo(message);
 			break;
