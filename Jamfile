@@ -5,5 +5,15 @@ InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
 NotFile alltests ;
 Depends alltests : r5tests obostests ;
 
+NotFile net_stack ;
+Depends net_stack :
+	net_stack_driver net_server_driver
+	core
+	ethernet loopback 
+	raw	ipv4 icmp udp tcp
+	libnet.so libnetapi.so 
+	ping ifconfig route traceroute arp
+;	
+ 
 SubInclude OBOS_TOP src ;
 
