@@ -24,10 +24,10 @@
 #include "hardware.h"
 #include "timer.h"
 
-#define TX_TIMEOUT		6000000		// 6 seconds
-#define FRAME_SIZE		1536		// must be multiple of 8
-#define TX_DESC_COUNT	256			// must be <= 1024
-#define RX_DESC_COUNT	256			// must be <= 1024
+#define TX_TIMEOUT				6000000		// 6 seconds
+#define FRAME_SIZE				1536		// must be multiple of 8
+#define DEFAULT_TX_BUF_COUNT	256			// must be <= 1024
+#define DEFAULT_RX_BUF_COUNT	256			// must be <= 1024
 
 extern pci_module_info *gPci;
 
@@ -63,12 +63,14 @@ typedef struct {
 	volatile int32		txNextIndex;	// next descriptor that will be used for writing
 	volatile int32		txIntIndex;		// current descriptor that needs be checked
 	volatile int32		txUsed;
+	int					txBufferCount;
 	
 	spinlock			rxSpinlock;
 	sem_id				rxReadySem;
 	volatile int32		rxNextIndex;	// next descriptor that will be used for reading
 	volatile int32		rxIntIndex;		// current descriptor that needs be checked
 	volatile int32		rxFree;
+	int					rxBufferCount;
 
 	volatile buf_desc *	txDesc;
 	volatile buf_desc *	rxDesc;
@@ -76,8 +78,8 @@ typedef struct {
 	area_id				txDescArea;
 	area_id				rxDescArea;
 
-	void *				txBuf[TX_DESC_COUNT];
-	void *				rxBuf[RX_DESC_COUNT];
+	void **				txBuf;
+	void **				rxBuf;
 
 	area_id				txBufArea;
 	area_id				rxBufArea;
@@ -87,6 +89,7 @@ typedef struct {
 
 	uint8				irq;
 	uint8				macaddr[6];
+	int					maxframesize;
 	int					mac_version;
 	int					phy_version;
 } rtl8169_device;

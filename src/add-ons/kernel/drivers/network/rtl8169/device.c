@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
+#include <driver_settings.h>
 
 #include "debug.h"
 #include "device.h"
@@ -30,6 +31,42 @@
 #include "util.h"
 
 static int32 gOpenMask = 0;
+
+
+static void
+read_settings(rtl8169_device *device)
+{
+	void *handle;
+	const char *param;
+	int mtu, count;
+	
+	handle = load_driver_settings("rtl8169");
+	if (!handle)
+		return;
+	
+	param = get_driver_parameter(handle, "mtu", "-1", "-1");
+	mtu = atoi(param);
+	if (mtu >= 50 && mtu <= 1500)
+		device->maxframesize = mtu + 14;
+	else if (mtu != -1)
+		dprintf("rtl8169: unsupported mtu setting '%s' ignored\n", param);
+
+	param = get_driver_parameter(handle, "rx_buffer_count", "-1", "-1");
+	count = atoi(param);
+	if (count >= 2 && count <= 1024)
+		device->rxBufferCount = count;
+	else if (count != -1)
+		dprintf("rtl8169: unsupported rx_buffer_count setting '%s' ignored\n", param);
+
+	param = get_driver_parameter(handle, "tx_buffer_count", "-1", "-1");
+	count = atoi(param);
+	if (count >= 2 && count <= 1024)
+		device->txBufferCount = count;
+	else if (count != -1)
+		dprintf("rtl8169: unsupported tx_buffer_count setting '%s' ignored\n", param);
+
+	unload_driver_settings(handle);
+}
 
 
 static void
@@ -243,10 +280,10 @@ init_buf_desc(rtl8169_device *device)
 	void *rx_buf_virt, *rx_buf_phy;
 	int i;
 
-	device->txBufArea = alloc_mem(&tx_buf_virt, &tx_buf_phy, TX_DESC_COUNT * FRAME_SIZE, 0, "rtl8169 tx buf");
-	device->rxBufArea = alloc_mem(&rx_buf_virt, &rx_buf_phy, RX_DESC_COUNT * FRAME_SIZE, 0, "rtl8169 rx buf");
-	device->txDescArea = alloc_mem(&tx_buf_desc_virt, &tx_buf_desc_phy, TX_DESC_COUNT * sizeof(buf_desc), 0, "rtl8169 tx desc");
-	device->rxDescArea = alloc_mem(&rx_buf_desc_virt, &rx_buf_desc_phy, RX_DESC_COUNT * sizeof(buf_desc), 0, "rtl8169 rx desc");
+	device->txBufArea = alloc_mem(&tx_buf_virt, &tx_buf_phy, device->txBufferCount * FRAME_SIZE, 0, "rtl8169 tx buf");
+	device->rxBufArea = alloc_mem(&rx_buf_virt, &rx_buf_phy, device->rxBufferCount * FRAME_SIZE, 0, "rtl8169 rx buf");
+	device->txDescArea = alloc_mem(&tx_buf_desc_virt, &tx_buf_desc_phy, device->txBufferCount * sizeof(buf_desc), 0, "rtl8169 tx desc");
+	device->rxDescArea = alloc_mem(&rx_buf_desc_virt, &rx_buf_desc_phy, device->rxBufferCount * sizeof(buf_desc), 0, "rtl8169 rx desc");
 	if (device->txBufArea < B_OK || device->rxBufArea < B_OK || device->txDescArea < B_OK || device->rxDescArea < B_OK)
 		return B_NO_MEMORY;
 	
@@ -254,7 +291,7 @@ init_buf_desc(rtl8169_device *device)
 	device->rxDesc = (buf_desc *) rx_buf_desc_virt;
 
 	// setup transmit descriptors
-	for (i = 0; i < TX_DESC_COUNT; i++) {
+	for (i = 0; i < device->txBufferCount; i++) {
 		device->txBuf[i] = (char *)tx_buf_virt + (i * FRAME_SIZE);
 		device->txDesc[i].stat_len = TX_DESC_FS | TX_DESC_LS;
 		device->txDesc[i].buf_low  = (uint32)((char *)tx_buf_phy + (i * FRAME_SIZE));
@@ -263,7 +300,7 @@ init_buf_desc(rtl8169_device *device)
 	device->txDesc[i - 1].stat_len |= TX_DESC_EOR;
 
 	// setup receive descriptors
-	for (i = 0; i < RX_DESC_COUNT; i++) {
+	for (i = 0; i < device->rxBufferCount; i++) {
 		device->rxBuf[i] = (char *)rx_buf_virt + (i * FRAME_SIZE);
 		device->rxDesc[i].stat_len = RX_DESC_OWN | FRAME_SIZE;
 		device->rxDesc[i].buf_low  = (uint32)((char *)rx_buf_phy + (i * FRAME_SIZE));
@@ -293,7 +330,7 @@ rtl8169_tx_int(rtl8169_device *device)
 	for (count = 0, limit = device->txUsed; limit > 0; limit--) {
 		if (device->txDesc[device->txIntIndex].stat_len & TX_DESC_OWN)
 			break;
-		device->txIntIndex = (device->txIntIndex + 1) % TX_DESC_COUNT;
+		device->txIntIndex = (device->txIntIndex + 1) % device->txBufferCount;
 		count++;
 	}
 
@@ -319,7 +356,7 @@ rtl8169_rx_int(rtl8169_device *device)
 	for (count = 0, limit = device->rxFree; limit > 0; limit--) {
 		if (device->rxDesc[device->rxIntIndex].stat_len & RX_DESC_OWN)
 			break;
-		device->rxIntIndex = (device->rxIntIndex + 1) % RX_DESC_COUNT;
+		device->rxIntIndex = (device->rxIntIndex + 1) % device->rxBufferCount;
 		count++;
 	}
 
@@ -421,19 +458,28 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->pciInfo = gDevList[dev_id];
 	device->nonblocking = (flags & O_NONBLOCK) ? true : false;
 	device->closed = false;
+	
+	// setup defaults
+	device->maxframesize  = 1514; // not FRAME_SIZE
+	device->txBufferCount = DEFAULT_TX_BUF_COUNT;
+	device->rxBufferCount = DEFAULT_RX_BUF_COUNT;
+	// get modifications from settings file
+	read_settings(device);
 
+	device->rxBuf = (void **)malloc(sizeof(void *) * device->rxBufferCount);
 	device->rxSpinlock = 0;
 	device->rxNextIndex = 0;
 	device->rxIntIndex = 0;
-	device->rxFree = RX_DESC_COUNT;
+	device->rxFree = device->rxBufferCount;
 	device->rxReadySem = create_sem(0, "rtl8169 rx ready");
 	set_sem_owner(device->rxReadySem, B_SYSTEM_TEAM);
 	
+	device->txBuf = (void **)malloc(sizeof(void *) * device->txBufferCount);
 	device->txSpinlock = 0;
 	device->txNextIndex = 0;
 	device->txIntIndex = 0;
 	device->txUsed = 0;
-	device->txFreeSem = create_sem(TX_DESC_COUNT, "rtl8169 tx free");
+	device->txFreeSem = create_sem(device->txBufferCount, "rtl8169 tx free");
 	set_sem_owner(device->txFreeSem, B_SYSTEM_TEAM);
 	
 	// enable busmaster and memory mapped access, disable io port access
@@ -594,6 +640,8 @@ err:
 	delete_area(device->rxBufArea);
 	delete_area(device->txDescArea);
 	delete_area(device->rxDescArea);
+	free(device->txBuf);
+	free(device->rxBuf);
 	free(device);
 	atomic_and(&gOpenMask, ~(1 << dev_id));
 	return B_ERROR;
@@ -638,6 +686,8 @@ rtl8169_free(void* cookie)
 	delete_area(device->rxBufArea);
 	delete_area(device->txDescArea);
 	delete_area(device->rxDescArea);
+	free(device->txBuf);
+	free(device->rxBuf);
 	free(device);
 	atomic_and(&gOpenMask, ~(1 << device->devId));
 	return B_OK;
@@ -697,7 +747,7 @@ retry:
 	release_spinlock(&device->rxSpinlock);
 	restore_interrupts(cpu);
 	
-	device->rxNextIndex = (device->rxNextIndex + 1) % RX_DESC_COUNT;
+	device->rxNextIndex = (device->rxNextIndex + 1) % device->rxBufferCount;
 	
 	TRACE("rtl8169_read() leave\n");
 	return B_OK;
@@ -760,7 +810,7 @@ retry:
 	release_spinlock(&device->txSpinlock);
 	restore_interrupts(cpu);
 
-	device->txNextIndex = (device->txNextIndex + 1) % TX_DESC_COUNT;
+	device->txNextIndex = (device->txNextIndex + 1) % device->txBufferCount;
 	
 	write8(REG_TPPOLL, read8(REG_TPPOLL) | TPPOLL_NPQ); // set queue polling bit
 
@@ -822,8 +872,8 @@ rtl8169_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_OK;
 
 		case ETHER_GETFRAMESIZE:
-			TRACE("rtl8169_control() ETHER_GETFRAMESIZE\n");
-			*(uint32*)arg = FRAME_SIZE;
+			TRACE("rtl8169_control() ETHER_GETFRAMESIZE, framesize = %d (MTU = %d)\n", device->maxframesize,  device->maxframesize - 14);
+			*(uint32*)arg = device->maxframesize;
 			return B_OK;
 			
 		default:
