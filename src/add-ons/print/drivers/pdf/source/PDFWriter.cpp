@@ -78,9 +78,6 @@ PDFWriter::PDFWriter()
 // --------------------------------------------------
 PDFWriter::~PDFWriter()
 {	
-	if (Transport())
-		CloseTransport();
-
 	delete fScreen;
 	delete fFonts;
 	delete fBookmark;
@@ -154,8 +151,11 @@ PDFWriter::PrintPage(int32	pageNumber, int32 pageCount)
 	PDF_TRY(fPdf) {
 	BeginPage(paperRect, printRect);
 	for (i = 0; i < pictureCount; i++) {
+		SetOrigin(picPoints[i]);
+		PushInternalState();
 		Iterate(pictures[i]);
 		delete pictures[i];
+		PopInternalState();
 	}
 	EndPage();
 	} PDF_CATCH(fPdf) {
@@ -661,9 +661,7 @@ PDFWriter::SetColor(rgb_color color)
 		if (SupportsOpacity() && fState->currentColor.alpha != color.alpha && color.alpha < 255) {
 			FindTransparency(color.alpha);
 		}
-		return;	
-	}
-	if (fState->currentColor.red != color.red || 
+	} else if (fState->currentColor.red != color.red || 
 		fState->currentColor.blue != color.blue || 
 		fState->currentColor.green != color.green || 
 		fState->currentColor.alpha != color.alpha) {
@@ -707,11 +705,15 @@ PDFWriter::CreatePattern()
 		return;
 	}
 	
-	for (int pass = 0; pass < 2; pass ++) {
+	const int kPassForeground = 0;
+	const int kPassBackground = 1;
+	const int kNumPasses = 2;
+	
+	for (int pass = 0; pass < kNumPasses; pass ++) {
 		float r, g, b;
 		bool is_transparent;
 	
-		if (pass == 0) {
+		if (pass == kPassForeground) {
 			r =  fState->foregroundColor.red / 255.0;
 			g =  fState->foregroundColor.green / 255.0;
 			b =  fState->foregroundColor.blue / 255.0;
@@ -732,9 +734,9 @@ PDFWriter::CreatePattern()
 			uint8  d = *data;
 			for (int8 x = 0; x <= 7; x ++, d >>= 1) {
 				if (d & 1 == 1) { // foreground
-					if (pass != 0) continue;
+					if (pass != kPassForeground) continue;
 				} else { // background
-					if (pass != 1) continue;
+					if (pass != kPassBackground) continue;
 				}
 				
 				// create rectangle for pixel
@@ -877,7 +879,7 @@ PDFWriter::IsSame(const pattern &p1, const pattern &p2)
 {
 	char *a = (char*)p1.data;
 	char *b = (char*)p2.data;
-	return strncmp(a, b, 8) == 0;
+	return memcmp(a, b, 8) == 0;
 }
 
 
@@ -887,7 +889,7 @@ PDFWriter::IsSame(const rgb_color &c1, const rgb_color &c2)
 {
 	char *a = (char*)&c1;
 	char *b = (char*)&c1;
-	return strncmp(a, b, sizeof(rgb_color)) == 0;
+	return memcmp(a, b, sizeof(rgb_color)) == 0;
 }
 
 
@@ -1207,6 +1209,7 @@ PDFWriter::AlphaFromRGBA32_BIG(uint8* in)
 void *
 PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32 flags, void *data)
 {
+	static bool errorReported = false;
 	uint8	*in;
 	uint8   *inRow;
 	int32	x, y;
@@ -1245,11 +1248,18 @@ PDFWriter::CreateSoftMask(BRect src, int32 bytesPerRow, int32 pixelFormat, int32
 			// For each pixel
 			switch (pixelFormat) {
 				case B_RGB32:      // fall through
-				case B_RGBA32:     a = AlphaFromRGBA32(in); break;
+				case B_RGBA32:     a = AlphaFromRGBA32(in); 
+					break;
+
 				case B_RGB32_BIG:  // fall through
-				case B_RGBA32_BIG: a = AlphaFromRGBA32_BIG(in); break;
+				case B_RGBA32_BIG: a = AlphaFromRGBA32_BIG(in); 
+					break;
+
 				default: a = 255; // should not reach here
-					REPORT(kDebug, fPage, "CreateSoftMask: non transparentable pixelFormat");
+					if (!errorReported) {
+						REPORT(kDebug, fPage, "CreateSoftMask: non transparentable pixelFormat");
+						errorReported = true;
+					}
 			}
 
 			*out = a;
@@ -1584,7 +1594,9 @@ PDFWriter::StoreTranslatorBitmap(BBitmap *bitmap, const char *filename, uint32 t
 */
 	BFile file(filename, B_CREATE_FILE | B_WRITE_ONLY | B_ERASE_FILE);
 	bool res = roster->Translate(&stream, NULL /*i*/, NULL, &file, type) == B_OK;
-	BBitmap *bm = NULL; stream.DetachBitmap(&bm); // otherwise bitmap destructor crashes here!
+	BBitmap *bm = NULL; 
+	// detach bitmap so BBitmapStream destructor does not delete our bitmap!
+	stream.DetachBitmap(&bm); 
 	ASSERT(bm == bitmap);
 	return res;
 }
@@ -1599,9 +1611,9 @@ PDFWriter::GetImages(BRect src, int32 /*width*/, int32 /*height*/, int32 bytesPe
 
 	int32 width = src.IntegerWidth() + 1;
 	int32 height = src.IntegerHeight() + 1;
+
 	int length = 0;
 	int bpc = 0;
-	
 		
 	if (HasAlphaChannel(pixelFormat)) {
 		if (NeedsBPC1Mask(pixelFormat) || !SupportsSoftMask()) {
