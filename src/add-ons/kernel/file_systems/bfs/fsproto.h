@@ -56,6 +56,9 @@ typedef ino_t		vnode_id;
 
 // missing ioctl() call added
 #define		IOCTL_FILE_UNCACHED_IO	10000
+#define		IOCTL_CREATE_TIME		10002
+#define		IOCTL_MODIFIED_TIME		10003
+
 
 // B_CUR_FS_API_VERSION is 2 for R5, but 3 on Dano, because of the
 // added calls for power management - so it's set to 3 here because
@@ -258,4 +261,4 @@ extern _IMPEXP_KERNEL int	is_vnode_removed(nspace_id nsid, vnode_id vnid);
 extern _EXPORT vnode_ops	fs_entry;
 extern _EXPORT int32		api_version;
 
-#endif
+#endif	/* _FSPROTO_H */

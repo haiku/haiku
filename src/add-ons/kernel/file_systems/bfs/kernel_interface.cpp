@@ -584,6 +584,24 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 				inode->Node()->flags |= INODE_NO_CACHE;
 			return status;
 		}
+		case IOCTL_CREATE_TIME:
+		{
+			if (inode == NULL || buffer == NULL)
+				return B_BAD_VALUE;
+
+			off_t *creationTime = (off_t *)buffer;
+			*creationTime = inode->Node()->create_time;
+			return B_OK;
+		}
+		case IOCTL_MODIFIED_TIME:
+		{
+			if (inode == NULL || buffer == NULL)
+				return B_BAD_VALUE;
+
+			off_t *modifiedTime = (off_t *)buffer;
+			*modifiedTime = inode->LastModified();
+			return B_OK;
+		}
 		case BFS_IOCTL_VERSION:
 		{
 			uint32 *version = (uint32 *)buffer;
