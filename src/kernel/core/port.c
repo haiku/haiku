@@ -851,14 +851,14 @@ port_count(port_id id)
 }
 
 
-status_t
+ssize_t
 read_port(port_id port, int32 *msgCode, void *msgBuffer, size_t bufferSize)
 {
 	return read_port_etc(port, msgCode, msgBuffer, bufferSize, 0, 0);
 }
 
 
-status_t
+ssize_t
 read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	uint32 flags, bigtime_t timeout)
 {
@@ -1208,7 +1208,7 @@ _user_port_count(port_id port)
 }
 
 
-status_t
+ssize_t
 _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	size_t bufferSize, uint32 flags, bigtime_t timeout)
 {
@@ -1223,7 +1223,7 @@ _user_read_port_etc(port_id port, int32 *userCode, void *userBuffer,
 	status = read_port_etc(port, &messageCode, userBuffer, bufferSize,
 				flags | PORT_FLAG_USE_USER_MEMCPY | B_CAN_INTERRUPT, timeout);
 
-	if (status == B_OK && user_memcpy(userCode, &messageCode, sizeof(int32)) < B_OK)
+	if (status >= 0 && user_memcpy(userCode, &messageCode, sizeof(int32)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return status;
