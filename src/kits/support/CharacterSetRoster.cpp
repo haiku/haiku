@@ -87,6 +87,10 @@ BCharacterSetRoster::FindCharacterSetByName(char * name)
 		if (strcmp(character_sets_by_id[id]->GetName(),name) == 0) {
 			return character_sets_by_id[id];
 		}
+		const char * mime = character_sets_by_id[id]->GetMIMEName();
+		if ((mime != NULL) && (strcmp(mime,name) == 0)) {
+			return character_sets_by_id[id];
+		}
 		for (int alias = 0 ; (alias < character_sets_by_id[id]->CountAliases()) ; alias++) {
 			if (strcmp(character_sets_by_id[id]->AliasAt(alias),name) == 0) {
 				return character_sets_by_id[id];
