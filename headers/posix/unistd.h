@@ -77,9 +77,9 @@ extern char		*getcwd(char *buffer, size_t size);
 extern int		dup(int fd);
 extern int		dup2(int fd1, int fd2);
 extern int		close(int fd);
-//extern int		link(const char *name, const char *new_name);
-//extern int		unlink(const char *name);
-//extern int		rmdir(const char *path);
+extern int		link(const char *name, const char *new_name);
+extern int		unlink(const char *name);
+extern int		rmdir(const char *path);
 
 extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
 extern int      symlink(const char *from, const char *to);

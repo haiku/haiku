@@ -1031,6 +1031,7 @@ static struct fs_calls bootfs_calls = {
 	NULL,	// read_link
 	NULL,	// write_link
 	NULL,	// symlink
+	NULL,	// link
 	&bootfs_unlink,
 	&bootfs_rename,
 
@@ -1049,6 +1050,7 @@ static struct fs_calls bootfs_calls = {
 
 	/* dir */
 	&bootfs_create_dir,
+	NULL,	// remove_dir
 	&bootfs_open_dir,
 	&bootfs_close,			// we are using the same operations for directories
 	&bootfs_free_cookie,	// and files here - that's intended, not by accident

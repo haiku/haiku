@@ -730,6 +730,7 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 
 /** Returns the vnode in the next to last segment of the path, and returns
  *	the last portion in filename.
+ *	The path buffer must be able to store at least one additional character.
  */
 
 static int
@@ -746,7 +747,6 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 		// replace the filename portion of the path with a '.'
 		strcpy(filename, ++p);
 
-		// ToDo: this could write behind the array limit
 		if (p[0] != '\0'){
 			p[0] = '.';
 			p[1] = '\0';
@@ -898,6 +898,12 @@ out:
 	return status;
 }
 
+
+/**	Checks the length of every path component, and adds a '.'
+ *	if the path ends in a slash.
+ *	The given path buffer must be able to store at least one
+ *	additional character.
+ */
 
 static status_t
 check_path(char *to)
@@ -1975,6 +1981,27 @@ dir_close(struct file_descriptor *descriptor)
 }
 
 
+static status_t
+dir_remove(char *path, bool kernel)
+{
+	char name[B_FILE_NAME_LENGTH];
+	struct vnode *directory;
+	status_t status;
+	
+	status = path_to_dir_vnode(path, &directory, name, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (FS_CALL(directory, fs_remove_dir))
+		status = FS_CALL(directory, fs_remove_dir)(directory->mount->cookie, directory->private_node, name);
+	else
+		status = EROFS;
+
+	put_vnode(directory);
+	return status;
+}
+
+
 static int
 common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 {
@@ -2062,7 +2089,7 @@ common_write_link(char *path, char *toPath, bool kernel)
 }
 
 
-static int
+static status_t
 common_create_symlink(char *path, const char *toPath, int mode, bool kernel)
 {
 	// path validity checks have to be in the calling function!
@@ -2070,14 +2097,14 @@ common_create_symlink(char *path, const char *toPath, int mode, bool kernel)
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("common_create_alias(path = %s, toPath = %s, mode = %d, kernel = %d)\n", path, toPath, mode, kernel));
+	FUNCTION(("common_create_symlink(path = %s, toPath = %s, mode = %d, kernel = %d)\n", path, toPath, mode, kernel));
 
 	status = path_to_dir_vnode(path, &vnode, name, kernel);
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode,fs_symlink) != NULL)
-		status = FS_CALL(vnode,fs_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath, mode);
+	if (FS_CALL(vnode,fs_create_symlink) != NULL)
+		status = FS_CALL(vnode,fs_create_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath, mode);
 	else
 		status = EROFS;
 
@@ -2087,7 +2114,44 @@ common_create_symlink(char *path, const char *toPath, int mode, bool kernel)
 }
 
 
-static int
+static status_t
+common_create_link(char *path, char *toPath, bool kernel)
+{
+	// path validity checks have to be in the calling function!
+	char name[B_FILE_NAME_LENGTH];
+	struct vnode *directory, *vnode;
+	int status;
+
+	FUNCTION(("common_create_link(path = %s, toPath = %s, kernel = %d)\n", path, toPath, kernel));
+
+	status = path_to_dir_vnode(path, &directory, name, kernel);
+	if (status < B_OK)
+		return status;
+
+	status = path_to_vnode(toPath, true, &vnode, kernel);
+	if (status < B_OK)
+		goto err;
+
+	if (directory->mount != vnode->mount) {
+		status = B_CROSS_DEVICE_LINK;
+		goto err1;
+	}
+
+	if (FS_CALL(vnode, fs_link) != NULL)
+		status = FS_CALL(vnode,fs_link)(directory->mount->cookie, directory->private_node, name, vnode->private_node);
+	else
+		status = EROFS;
+
+err1:
+	put_vnode(vnode);
+err:
+	put_vnode(directory);
+
+	return status;
+}
+
+
+static status_t
 common_unlink(char *path, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
@@ -2548,24 +2612,20 @@ err:
 int
 sys_mount(const char *path, const char *device, const char *fs_name, void *args)
 {
-	char buf[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return fs_mount(buf, device, fs_name, args, true);
+	return fs_mount(pathBuffer, device, fs_name, args, true);
 }
 
 
 int
 sys_unmount(const char *path)
 {
-	char buf[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return fs_unmount(buf, true);
+	return fs_unmount(pathBuffer, true);
 }
 
 
@@ -2580,9 +2640,7 @@ int
 sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 {
 	char nameCopy[B_FILE_NAME_LENGTH];
-
-	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
-	nameCopy[sizeof(nameCopy) - 1] = '\0';
+	strlcpy(nameCopy, name, sizeof(nameCopy) - 1);
 
 	return file_open_entry_ref(device, inode, nameCopy, omode, true);
 }
@@ -2591,12 +2649,10 @@ sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 int
 sys_open(const char *path, int omode)
 {
-	char pathCopy[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(pathCopy, path, SYS_MAX_PATH_LEN);
-	pathCopy[SYS_MAX_PATH_LEN] = 0;
-
-	return file_open(pathCopy, omode, true);
+	return file_open(pathBuffer, omode, true);
 }
 
 
@@ -2610,24 +2666,17 @@ sys_open_dir_node_ref(dev_t device, ino_t inode)
 int
 sys_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 {
-	char nameCopy[B_FILE_NAME_LENGTH];
-
-	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
-	nameCopy[sizeof(nameCopy) - 1] = '\0';
-
-	return dir_open_entry_ref(device, inode, nameCopy, true);
+	return dir_open_entry_ref(device, inode, name, true);
 }
 
 
 int
 sys_open_dir(const char *path)
 {
-	char buffer[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
-
-	return dir_open(buffer, true);
+	return dir_open(pathBuffer, true);
 }
 
 
@@ -2641,13 +2690,7 @@ sys_fsync(int fd)
 int
 sys_create_entry_ref(dev_t device, ino_t inode, const char *name, int omode, int perms)
 {
-	char nameCopy[B_FILE_NAME_LENGTH];
-	int status;
-
-	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
-	nameCopy[sizeof(nameCopy) - 1] = '\0';
-
-	return file_create_entry_ref(device, inode, nameCopy, omode, perms, true);
+	return file_create_entry_ref(device, inode, name, omode, perms, true);
 }
 
 
@@ -2655,9 +2698,7 @@ int
 sys_create(const char *path, int omode, int perms)
 {
 	char buffer[SYS_MAX_PATH_LEN + 1];
-
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = '\0';
+	strlcpy(buffer, path, SYS_MAX_PATH_LEN - 1);
 
 	return file_create(buffer, omode, perms, true);
 }
@@ -2666,135 +2707,134 @@ sys_create(const char *path, int omode, int perms)
 int
 sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms)
 {
-	char nameCopy[B_FILE_NAME_LENGTH];
-
-	strncpy(nameCopy, name, sizeof(nameCopy) - 1);
-	nameCopy[sizeof(nameCopy) - 1] = '\0';
-
-	return dir_create_entry_ref(device, inode, nameCopy, perms, true);
+	return dir_create_entry_ref(device, inode, name, perms, true);
 }
 
 
 int
 sys_create_dir(const char *path, int perms)
 {
-	char buffer[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
+	return dir_create(pathBuffer, perms, true);
+}
 
-	return dir_create(buffer, perms, true);
+
+int
+sys_remove_dir(const char *path)
+{
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+
+	return dir_remove(pathBuffer, true);
 }
 
 
 int
 sys_read_link(const char *path, char *buffer, size_t bufferSize)
 {
-	char pathCopy[SYS_MAX_PATH_LEN + 1];
-	int status;
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(pathCopy, path, SYS_MAX_PATH_LEN);
-	pathCopy[SYS_MAX_PATH_LEN] = '\0';
-
-	return common_read_link(pathCopy, buffer, bufferSize, true);
+	return common_read_link(pathBuffer, buffer, bufferSize, true);
 }
 
 
 int
 sys_write_link(const char *path, const char *toPath)
 {
-	char pathCopy[SYS_MAX_PATH_LEN + 1];
-	char toPathCopy[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	strncpy(pathCopy, path, SYS_MAX_PATH_LEN);
-	pathCopy[SYS_MAX_PATH_LEN] = '\0';
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(toPathCopy, toPath, SYS_MAX_PATH_LEN);
-	toPathCopy[SYS_MAX_PATH_LEN] = '\0';
-
-	status = check_path(toPathCopy);
+	status = check_path(toPathBuffer);
 	if (status < B_OK)
 		return status;
 
-	return common_write_link(pathCopy, toPathCopy, true);
+	return common_write_link(pathBuffer, toPathBuffer, true);
 }
 
 
 int
-sys_create_symlink(const char *userPath, const char *userToPath, int mode)
+sys_create_symlink(const char *path, const char *toPath, int mode)
 {
-	char path[SYS_MAX_PATH_LEN + 1];
-	char toPath[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
 	int status;
-	
-	strncpy(path, userPath, SYS_MAX_PATH_LEN);
-	path[SYS_MAX_PATH_LEN] = '\0';
 
-	strncpy(toPath, userToPath, SYS_MAX_PATH_LEN);
-	toPath[SYS_MAX_PATH_LEN] = '\0';
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
 
-	status = check_path(toPath);
+	status = check_path(toPathBuffer);
 	if (status < B_OK)
 		return status;
 
-	return common_create_symlink(path, toPath, mode, true);
+	return common_create_symlink(pathBuffer, toPathBuffer, mode, true);
+}
+
+
+int
+sys_create_link(const char *path, const char *toPath)
+{
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
+	
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
+
+	return common_create_link(pathBuffer, toPathBuffer, true);
 }
 
 
 int
 sys_unlink(const char *path)
 {
-	char buf[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(buf, path, SYS_MAX_PATH_LEN);
-	buf[SYS_MAX_PATH_LEN] = 0;
-
-	return common_unlink(buf, true);
+	return common_unlink(pathBuffer, true);
 }
 
 
 int
-sys_rename(const char *oldpath, const char *newpath)
+sys_rename(const char *oldPath, const char *newPath)
 {
-	char buf1[SYS_MAX_PATH_LEN + 1];
-	char buf2[SYS_MAX_PATH_LEN + 1];
+	char oldPathBuffer[SYS_MAX_PATH_LEN + 1];
+	char newPathBuffer[SYS_MAX_PATH_LEN + 1];
 
-	strncpy(buf1, oldpath, SYS_MAX_PATH_LEN);
-	buf1[SYS_MAX_PATH_LEN] = 0;
+	strlcpy(oldPathBuffer, oldPath, SYS_MAX_PATH_LEN - 1);
+	strlcpy(newPathBuffer, newPath, SYS_MAX_PATH_LEN - 1);
 
-	strncpy(buf2, newpath, SYS_MAX_PATH_LEN);
-	buf2[SYS_MAX_PATH_LEN] = 0;
-
-	return common_rename(buf1, buf2, true);
+	return common_rename(oldPathBuffer, newPathBuffer, true);
 }
 
 
 int
 sys_access(const char *path, int mode)
 {
-	char pathCopy[SYS_MAX_PATH_LEN + 1];
-	int status;
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	strlcpy(pathCopy, path, SYS_MAX_PATH_LEN - 1);
-
-	return common_access(pathCopy, mode, true);
+	return common_access(pathBuffer, mode, true);
 }
 
 
 int
 sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 {
-	char buffer[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	struct vnode *vnode;
 	int status;
 
-	strncpy(buffer, path, SYS_MAX_PATH_LEN);
-	buffer[SYS_MAX_PATH_LEN] = 0;
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
 	FUNCTION(("sys_read_stat: path '%s', stat %p,\n", path, stat));
 
-	status = path_to_vnode(buffer, traverseLeafLink, &vnode, true);
+	status = path_to_vnode(pathBuffer, traverseLeafLink, &vnode, true);
 	if (status < 0)
 		return status;
 
@@ -2806,29 +2846,27 @@ sys_read_stat(const char *path, bool traverseLeafLink, struct stat *stat)
 
 
 int
-sys_write_stat(int fd, const char *_path, bool traverseLeafLink, struct stat *stat, int statMask)
+sys_write_stat(int fd, const char *path, bool traverseLeafLink, struct stat *stat, int statMask)
 {
-	char path[SYS_MAX_PATH_LEN + 1];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
-	if (fd == -1) {
-		strncpy(path, _path, SYS_MAX_PATH_LEN - 1);
-		path[SYS_MAX_PATH_LEN - 1] = '\0';
-	}
+	if (fd == -1)
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	return common_write_stat(fd, path, traverseLeafLink, stat, statMask, true);
+	return common_write_stat(fd, pathBuffer, traverseLeafLink, stat, statMask, true);
 }
 
 
 int
 sys_getcwd(char *buffer, size_t size)
 {
-	char path[SYS_MAX_PATH_LEN + 1];
+	char path[SYS_MAX_PATH_LEN];
 	int status;
 
 	PRINT(("sys_getcwd: buf %p, %ld\n", buffer, size));
 
 	// Call vfs to get current working directory
-	status = get_cwd(path, SYS_MAX_PATH_LEN - 1,true);
+	status = get_cwd(path, SYS_MAX_PATH_LEN - 1, true);
 	if (status < 0)
 		return status;
 
@@ -2840,21 +2878,12 @@ sys_getcwd(char *buffer, size_t size)
 
 
 int
-sys_setcwd(int fd, const char *_path)
+sys_setcwd(int fd, const char *path)
 {
-	char path[SYS_MAX_PATH_LEN];
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	PRINT(("sys_setcwd: path = %s\n", _path));
-
-	if (_path != NULL) {
-		// Copy new path to kernel space
-		strncpy(path, _path, SYS_MAX_PATH_LEN - 1);
-		path[SYS_MAX_PATH_LEN - 1] = '\0';
-	} else
-		path[0] = '\0';
-
-	// Call vfs to set new working directory
-	return set_cwd(fd, path, true);
+	return set_cwd(fd, pathBuffer, true);
 }
 
 
@@ -2875,23 +2904,23 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 		|| !CHECK_USER_ADDRESS(udevice))
 		return B_BAD_ADDRESS;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	rc = user_strncpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN);
+	rc = user_strncpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN - 1);
 	if (rc < 0)
 		return rc;
-	fs_name[SYS_MAX_OS_NAME_LEN] = 0;
+	fs_name[SYS_MAX_OS_NAME_LEN - 1] = '\0';
 
 	if (udevice) {
-		rc = user_strncpy(device, udevice, SYS_MAX_PATH_LEN);
+		rc = user_strncpy(device, udevice, SYS_MAX_PATH_LEN - 1);
 		if (rc < 0)
 			return rc;
-		device[SYS_MAX_PATH_LEN] = 0;
+		device[SYS_MAX_PATH_LEN - 1] = '\0';
 	} else
-		device[0] = 0;
+		device[0] = '\0';
 
 	return fs_mount(path, device, fs_name, args, false);
 }
@@ -2901,12 +2930,12 @@ int
 user_unmount(const char *upath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
-	int rc;
+	int status;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
+	status = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return fs_unmount(path, false);
 }
@@ -2920,15 +2949,15 @@ user_sync(void)
 
 
 int
-user_open_entry_ref(dev_t device, ino_t inode, const char *uname, int omode)
+user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
 
-	if (!CHECK_USER_ADDRESS(uname))
+	if (!CHECK_USER_ADDRESS(userName))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	status = user_strncpy(name, uname, sizeof(name) - 1);
+	status = user_strncpy(name, userName, sizeof(name) - 1);
 	if (status < B_OK)
 		return status;
 	name[sizeof(name) - 1] = '\0';
@@ -2938,18 +2967,18 @@ user_open_entry_ref(dev_t device, ino_t inode, const char *uname, int omode)
 
 
 int
-user_open(const char *upath, int omode)
+user_open(const char *userPath, int omode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
-	int rc;
+	int status;
 
-	if (!CHECK_USER_ADDRESS(upath))
+	if (!CHECK_USER_ADDRESS(userPath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_strncpy(path, upath, sizeof(path));
-	if (rc < 0)
-		return rc;
-	path[sizeof(path)] = 0;
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return file_open(path, omode, false);
 }
@@ -2981,18 +3010,18 @@ user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 
 
 int
-user_open_dir(const char *upath)
+user_open_dir(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	if (!CHECK_USER_ADDRESS(upath))
+	if (!CHECK_USER_ADDRESS(userPath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	status = user_strncpy(path, upath, sizeof(path));
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	path[sizeof(path)] = 0;
+	path[SYS_MAX_PATH_LEN - 1] = 0;
 
 	return dir_open(path, false);
 }
@@ -3024,18 +3053,18 @@ user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, i
 
 
 int
-user_create(const char *upath, int omode, int perms)
+user_create(const char *userPath, int omode, int perms)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userPath))
+		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN] = '\0';
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return file_create(path, omode, perms, false);
 }
@@ -3048,7 +3077,7 @@ user_create_dir_entry_ref(dev_t device, ino_t inode, const char *uname, int perm
 	int status;
 
 	if (!CHECK_USER_ADDRESS(uname))
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
 	status = user_strncpy(name, uname, sizeof(name) - 1);
 	if (status < 0)
@@ -3066,14 +3095,32 @@ user_create_dir(const char *userPath, int perms)
 	int status;
 
 	if (!CHECK_USER_ADDRESS(userPath))
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN] = '\0';
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return dir_create(path, perms, false);
+}
+
+
+int
+user_remove_dir(const char *userPath)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(userPath))
+		return B_BAD_ADDRESS;
+
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
+
+	return dir_remove(path, false);
 }
 
 
@@ -3088,16 +3135,19 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 		|| !CHECK_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN] = '\0';
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
+
+	if (bufferSize > SYS_MAX_PATH_LEN)
+		bufferSize = SYS_MAX_PATH_LEN;
 
 	status = common_read_link(path, buffer, bufferSize, false);
 	if (status < B_OK)
 		return status;
 
-	return user_strncpy(userBuffer, buffer, SYS_MAX_PATH_LEN);
+	return user_strncpy(userBuffer, buffer, bufferSize);
 }
 
 
@@ -3112,15 +3162,15 @@ user_write_link(const char *userPath, const char *userToPath)
 		|| !CHECK_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN] = '\0';
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	toPath[SYS_MAX_PATH_LEN] = '\0';
+	toPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	status = check_path(toPath);
 	if (status < B_OK)
@@ -3141,21 +3191,50 @@ user_create_symlink(const char *userPath, const char *userToPath, int mode)
 		|| !CHECK_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN] = '\0';
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN);
+	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN - 1);
 	if (status < 0)
 		return status;
-	toPath[SYS_MAX_PATH_LEN] = '\0';
+	toPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	status = check_path(toPath);
 	if (status < B_OK)
 		return status;
 
 	return common_create_symlink(path, toPath, mode, false);
+}
+
+
+int
+user_create_link(const char *userPath, const char *userToPath)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	char toPath[SYS_MAX_PATH_LEN + 1];
+	int status;
+
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userToPath))
+		return B_BAD_ADDRESS;
+
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
+
+	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	toPath[SYS_MAX_PATH_LEN - 1] = '\0';
+
+	status = check_path(toPath);
+	if (status < B_OK)
+		return status;
+
+	return common_create_link(path, toPath, false);
 }
 
 
@@ -3178,29 +3257,26 @@ user_unlink(const char *userPath)
 
 
 int
-user_rename(const char *uoldpath, const char *unewpath)
+user_rename(const char *userOldPath, const char *userNewPath)
 {
-	char oldpath[SYS_MAX_PATH_LEN + 1];
-	char newpath[SYS_MAX_PATH_LEN + 1];
-	int rc;
+	char oldPath[SYS_MAX_PATH_LEN + 1];
+	char newPath[SYS_MAX_PATH_LEN + 1];
+	int status;
 
-	if ((addr)uoldpath >= KERNEL_BASE && (addr)uoldpath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userOldPath) || !CHECK_USER_ADDRESS(userNewPath))
+		return B_BAD_ADDRESS;
 
-	if ((addr)unewpath >= KERNEL_BASE && (addr)unewpath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	status = user_strncpy(oldPath, userOldPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	oldPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	rc = user_strncpy(oldpath, uoldpath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	oldpath[SYS_MAX_PATH_LEN] = 0;
+	status = user_strncpy(newPath, userNewPath, SYS_MAX_PATH_LEN - 1);
+	if (status < 0)
+		return status;
+	newPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	rc = user_strncpy(newpath, unewpath, SYS_MAX_PATH_LEN);
-	if (rc < 0)
-		return rc;
-	newpath[SYS_MAX_PATH_LEN] = 0;
-
-	return common_rename(oldpath, newpath, false);
+	return common_rename(oldPath, newPath, false);
 }
 
 
@@ -3234,10 +3310,10 @@ user_read_stat(const char *userPath, bool traverseLink, struct stat *userStat)
 		|| !CHECK_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
 
-	rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN] = 0;
+	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	FUNCTION(("user_read_stat(path = %s, traverseLeafLink = %d)\n", path, traverseLink));
 
@@ -3284,24 +3360,26 @@ user_write_stat(int fd, const char *userPath, bool traverseLeafLink, struct stat
 
 
 int
-user_getcwd(char *buffer, size_t size)
+user_getcwd(char *userBuffer, size_t size)
 {
-	char path[SYS_MAX_PATH_LEN];
+	char buffer[SYS_MAX_PATH_LEN];
 	int status;
 
-	PRINT(("user_getcwd: buf %p, %ld\n", buffer, size));
+	PRINT(("user_getcwd: buf %p, %ld\n", userBuffer, size));
 
-	// Check if userspace address is inside "shared" kernel space
-	if ((addr)buffer >= KERNEL_BASE && (addr)buffer <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userBuffer))
+		return B_BAD_ADDRESS;
+
+	if (size > SYS_MAX_PATH_LEN)
+		size = SYS_MAX_PATH_LEN;
 
 	// Call vfs to get current working directory
-	status = get_cwd(path, sizeof(path), false);
+	status = get_cwd(buffer, size, false);
 	if (status < 0)
 		return status;
 
 	// Copy back the result
-	if (user_strncpy(buffer, path, size) < 0)
+	if (user_strncpy(userBuffer, buffer, size) < 0)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	return status;
@@ -3316,15 +3394,13 @@ user_setcwd(int fd, const char *userPath)
 
 	PRINT(("user_setcwd: path = %p\n", userPath));
 
-	if (userPath != NULL) {
+	if (fd == -1) {
 		if (!CHECK_USER_ADDRESS(userPath))
 			return B_BAD_ADDRESS;
 
-		// Copy new path to kernel space
 		rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
 		if (rc < 0)
 			return rc;
-
 		path[SYS_MAX_PATH_LEN - 1] = '\0';
 	} else
 		path[0] = '\0';

@@ -998,7 +998,7 @@ devfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 
 	status = vfs_remove_vnode(fs->id, vnode->id);
 
-err:	
+err:
 	mutex_unlock(&fs->lock);
 
 	return status;
@@ -1069,6 +1069,7 @@ static struct fs_calls devfs_calls = {
 	NULL,	// read_link
 	NULL,	// write_link
 	NULL,	// symlink
+	NULL,	// link
 	&devfs_unlink,
 	&devfs_rename,
 
@@ -1087,6 +1088,7 @@ static struct fs_calls devfs_calls = {
 
 	/* directory */
 	&devfs_create_dir,
+	NULL,	// remove_dir
 	&devfs_open_dir,
 	&devfs_close,			// we are using the same operations for directories
 	&devfs_free_cookie,		// and files here - that's intended, not by accident

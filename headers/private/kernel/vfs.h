@@ -72,9 +72,11 @@ int sys_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode
 int sys_create(const char *path, int omode, int perms);
 int sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int sys_create_dir(const char *path, int perms);
+int sys_remove_dir(const char *path);
 int sys_read_link(const char *path, char *buffer, size_t bufferSize);
 int sys_write_link(const char *path, const char *toPath);
 int sys_create_symlink(const char *path, const char *toPath, int mode);
+int sys_create_link(const char *path, const char *toPath);
 int sys_unlink(const char *path);
 int sys_rename(const char *oldpath, const char *newpath);
 int sys_access(const char *path, int mode);
@@ -98,9 +100,11 @@ int user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omod
 int user_create(const char *path, int omode, int perms);
 int user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 int user_create_dir(const char *path, int perms);
+int user_remove_dir(const char *path);
 int user_read_link(const char *path, char *buffer, size_t bufferSize);
 int user_write_link(const char *path, const char *toPath);
 int user_create_symlink(const char *path, const char *toPath, int mode);
+int user_create_link(const char *path, const char *toPath);
 int user_unlink(const char *path);
 int user_rename(const char *oldpath, const char *newpath);
 int user_access(const char *path, int mode);

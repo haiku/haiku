@@ -225,6 +225,39 @@ rootfs_is_dir_empty(struct rootfs_vnode *dir)
 }
 
 
+static int
+rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, bool isDirectory)
+{
+	struct rootfs_vnode *vnode;
+	int status = B_OK;
+
+	mutex_lock(&fs->lock);
+
+	vnode = rootfs_find_in_dir(dir, name);
+	if (!vnode)
+		status = B_ENTRY_NOT_FOUND;
+	else if (isDirectory && vnode->stream.type != STREAM_TYPE_DIR)
+		status = B_NOT_A_DIRECTORY;
+	else if (!isDirectory && vnode->stream.type == STREAM_TYPE_DIR)
+		status = B_IS_A_DIRECTORY;
+	else if (isDirectory && !rootfs_is_dir_empty(vnode))
+		status = B_DIRECTORY_NOT_EMPTY;
+
+	if (status < B_OK)
+		goto err;
+
+	rootfs_remove_from_dir(dir, vnode);
+
+	// schedule this vnode to be removed when it's ref goes to zero
+	vfs_remove_vnode(fs->id, vnode->id);
+
+err:
+	mutex_unlock(&fs->lock);
+
+	return status;
+}
+
+
 //	#pragma mark -
 
 
@@ -566,6 +599,18 @@ err:
 
 
 static int
+rootfs_remove_dir(fs_cookie _fs, fs_vnode _dir, const char *name)
+{
+	struct rootfs *fs = _fs;
+	struct rootfs_vnode *dir = _dir;
+
+	TRACE(("rootfs_remove_dir: dir 0x%x (0x%x 0x%x), name '%s'\n", dir, dir->id, name));
+
+	return rootfs_remove(fs, dir, name, true);
+}
+
+
+static int
 rootfs_open_dir(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
@@ -759,36 +804,10 @@ rootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	struct rootfs *fs = _fs;
 	struct rootfs_vnode *dir = _dir;
-	struct rootfs_vnode *vnode;
-	int status;
 
 	TRACE(("rootfs_unlink: dir 0x%x (0x%x 0x%x), name '%s'\n", dir, dir->id, name));
 
-	mutex_lock(&fs->lock);
-
-	vnode = rootfs_find_in_dir(dir, name);
-	if (!vnode) {
-		status = B_ENTRY_NOT_FOUND;
-		goto err;
-	}
-
-	// if the node is a directory, only delete it if it's empty
-	if (vnode->stream.type == STREAM_TYPE_DIR && !rootfs_is_dir_empty(vnode)) {
-		status = B_DIRECTORY_NOT_EMPTY;
-		goto err;
-	}
-
-	rootfs_remove_from_dir(dir, vnode);
-
-	// schedule this vnode to be removed when it's ref goes to zero
-	vfs_remove_vnode(fs->id, vnode->id);
-
-	status = 0;
-
-err:
-	mutex_unlock(&fs->lock);
-
-	return status;
+	return rootfs_remove(fs, dir, name, false);
 }
 
 
@@ -922,6 +941,7 @@ static struct fs_calls rootfs_calls = {
 	&rootfs_read_link,
 	NULL,	// fs_write_link()
 	&rootfs_symlink,
+	NULL,	// fs_link()
 	&rootfs_unlink,
 	&rootfs_rename,
 
@@ -940,6 +960,7 @@ static struct fs_calls rootfs_calls = {
 
 	/* directory */
 	&rootfs_create_dir,
+	&rootfs_remove_dir,
 	&rootfs_open_dir,
 	&rootfs_close,			// we are using the same operations for directories
 	&rootfs_free_cookie,	// and files here - that's intended, not by accident
