@@ -36,7 +36,7 @@
 #include <stdio.h>
 
 
-#define USE_VIEW_FILL_HACK
+//#define USE_VIEW_FILL_HACK
 
 //#define DEBUG_DECORATOR
 #ifdef DEBUG_DECORATOR
@@ -53,12 +53,13 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	taboffset=0;
 	titlepixelwidth=0;
 
-	framecolors=new RGBColor[5];
-	framecolors[0].SetColor(255,255,255);
-	framecolors[1].SetColor(216,216,216);
-	framecolors[2].SetColor(152,152,152);
+	framecolors=new RGBColor[6];
+	framecolors[0].SetColor(152,152,152);
+	framecolors[1].SetColor(255,255,255);
+	framecolors[2].SetColor(216,216,216);
 	framecolors[3].SetColor(136,136,136);
-	framecolors[4].SetColor(96,96,96);
+	framecolors[4].SetColor(152,152,152);
+	framecolors[5].SetColor(96,96,96);
 
 	// Set appropriate colors based on the current focus value. In this case, each decorator
 	// defaults to not having the focus.
@@ -67,9 +68,6 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	// Do initial decorator setup
 	_DoLayout();
 	
-	// This flag is used to determine whether or not we're moving the tab
-	slidetab=false;
-
 //	tab_highcol=_colors->window_tab;
 //	tab_lowcol=_colors->window_tab;
 
@@ -153,14 +151,14 @@ click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 	}
 
 	// We got this far, so user is clicking on the border?
-	BRect brect(_frame);
-	brect.top+=19;
-	BRect clientrect(brect.InsetByCopy(3,3));
-	if(brect.Contains(pt) && !clientrect.Contains(pt))
+	if (leftborder.Contains(pt) || rightborder.Contains(pt)
+		|| topborder.Contains(pt) || bottomborder.Contains(pt))
 	{
-		if(_resizerect.Contains(pt))
-			return DEC_RESIZE;
-		
+		if (_look == B_TITLED_WINDOW_LOOK || _look == B_FLOATING_WINDOW_LOOK){
+			BRect		temp(BPoint(bottomborder.right-18, bottomborder.bottom-18), bottomborder.RightBottom());
+			if (temp.Contains(pt))
+				return DEC_RESIZE;
+		}
 		return DEC_DRAG;
 	}
 
@@ -178,13 +176,6 @@ STRACE(("DefaultDecorator: Do Layout\n"));
 	{
 		case B_FLOATING_WINDOW_LOOK:
 		case B_MODAL_WINDOW_LOOK:
-		
-		// We're going to make the frame 5 pixels wide, no matter what. R5's decorator frame
-		// requires the skills of a gaming master to click on the tiny frame if resizing is necessary,
-		// and there *are* apps which do this
-//			borderwidth=3;
-//			break;
-
 		case B_BORDERED_WINDOW_LOOK:
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
@@ -202,13 +193,13 @@ STRACE(("DefaultDecorator: Do Layout\n"));
 					_frame.top - borderwidth - 19.0,
 					((_frame.right - _frame.left) < 35.0 ?
 							_frame.left + 35.0 : _frame.right) + borderwidth,
-					_frame.top - (borderwidth-1) );
+					_frame.top - borderwidth );
 
 	// make it text width sensitive
 	if(strlen(GetTitle())>1)
 	{
 		if(_driver)
-			titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_drawdata);
+			titlepixelwidth=_driver->StringWidth(GetTitle(), _TitleWidth(), &_drawdata);
 		else
 			titlepixelwidth=10;
 		
@@ -225,19 +216,17 @@ STRACE(("DefaultDecorator: Do Layout\n"));
 
 	// calculate left/top/right/bottom borders
 	if ( borderwidth != 0 ){
-		_borderrect		= _frame.InsetByCopy( -borderwidth, -borderwidth );
-		leftborder.Set( _borderrect.left, _frame.top - borderwidth,
-						_frame.left, _frame.bottom + borderwidth );
-		rightborder.Set( _frame.right, _frame.top - borderwidth,
-						 _borderrect.right, _frame.bottom + borderwidth );
-		topborder.Set( 	_borderrect.left, _borderrect.top,
-						_borderrect.right, _frame.top );
-		bottomborder.Set( _borderrect.left, _frame.bottom,
-						  _borderrect.right, _borderrect.bottom );
+		leftborder.Set( _frame.left - borderwidth, _frame.top,
+						_frame.left - 1, _frame.bottom);
+		rightborder.Set(_frame.right + 1, _frame.top ,
+						_frame.right + borderwidth, _frame.bottom);
+		topborder.Set( 	_frame.left - borderwidth, _frame.top - borderwidth,
+						_frame.right + borderwidth, _frame.top - 1);
+		bottomborder.Set(	_frame.left - borderwidth, _frame.bottom + 1,
+							_frame.right + borderwidth, _frame.bottom + borderwidth);
 	}
 	else{
 		// no border ... (?) useful when displaying windows that are just images
-		_borderrect	= _frame;
 		leftborder.Set( 0.0, 0.0, -1.0, -1.0 );
 		rightborder.Set( 0.0, 0.0, -1.0, -1.0 );
 		topborder.Set( 0.0, 0.0, -1.0, -1.0 );
@@ -245,8 +234,8 @@ STRACE(("DefaultDecorator: Do Layout\n"));
 	}
 
 	// calculate resize rect
-	_resizerect.Set(	_borderrect.right - 19.0, _borderrect.bottom - 19.0,
-						_borderrect.right, _borderrect.bottom);
+	_resizerect.Set(	bottomborder.right - 18.0, bottomborder.bottom - 18.0,
+						bottomborder.right - 3, bottomborder.bottom - 3);
 
 	// format tab rect for a floating window - make the rect smaller
 	if ( _look == B_FLOATING_WINDOW_LOOK ){
@@ -284,8 +273,8 @@ void DefaultDecorator::MoveBy(BPoint pt)
 	_closerect.OffsetBy(pt);
 	_tabrect.OffsetBy(pt);
 	_resizerect.OffsetBy(pt);
-	_borderrect.OffsetBy(pt);
 	_zoomrect.OffsetBy(pt);
+	_borderrect.OffsetBy(pt);
 	
 	leftborder.OffsetBy(pt);
 	rightborder.OffsetBy(pt);
@@ -302,20 +291,26 @@ void DefaultDecorator::GetFootprint(BRegion *region)
 	if(!region)
 		return;
 
+	region->MakeEmpty();
+
 	if(_look == B_NO_BORDER_WINDOW_LOOK)
 	{
-		region->Set(_frame);
-		return;
-	}
-	
-	if(_look == B_BORDERED_WINDOW_LOOK)
-	{
-		region->Set(_borderrect);
 		return;
 	}
 
-	region->Set(_borderrect);
+	region->Include(leftborder);
+	region->Include(rightborder);
+	region->Include(topborder);
+	region->Include(bottomborder);
+	
+	if(_look == B_BORDERED_WINDOW_LOOK)
+		return;
+
 	region->Include(_tabrect);
+
+	if(_look == B_DOCUMENT_WINDOW_LOOK)
+		region->Include(BRect(_frame.right - 13.0f, _frame.bottom - 13.0f,
+								_frame.right, _frame.bottom));
 }
 
 BRect DefaultDecorator::SlideTab(float dx, float dy=0)
@@ -387,7 +382,7 @@ void DefaultDecorator::Draw(void)
 	// Easy way to draw everything - no worries about drawing only certain
 	// things
 
-	_DrawFrame(_borderrect);
+	_DrawFrame(BRect(topborder.LeftTop(), bottomborder.RightBottom()));
 	_DrawTab(_tabrect);
 }
 
@@ -422,18 +417,29 @@ void DefaultDecorator::_DrawTab(BRect r)
 	// in it.
 	if(_look == B_NO_BORDER_WINDOW_LOOK || _look == B_BORDERED_WINDOW_LOOK)
 		return;
-	
-	_driver->FillRect(_tabrect,(GetFocus())?_colors->window_tab:_colors->inactive_window_tab);
-	
-	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),framecolors[2]);
-	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),framecolors[2]);
 
-	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),framecolors[4]);
+	RGBColor		tabColor = (GetFocus())?_colors->window_tab:_colors->inactive_window_tab;	
+	_driver->FillRect(_tabrect, tabColor);
+	
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),framecolors[0]);
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),framecolors[0]);
+	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),framecolors[5]);
+	_driver->StrokeLine( BPoint( _tabrect.left + 2, _tabrect.bottom+1 ),
+						 BPoint( _tabrect.right - 2, _tabrect.bottom+1 ),
+						 framecolors[2]);
 
-	_driver->StrokeLine( BPoint( _tabrect.left + 2, _tabrect.bottom ),
-						 BPoint( _tabrect.right - 2, _tabrect.bottom ),
+
+	_driver->StrokeLine( BPoint( _tabrect.left + 1, _tabrect.top + 1 ),
+						 BPoint( _tabrect.left + 1, _tabrect.bottom ),
 						 framecolors[1]);
-	
+	_driver->StrokeLine( BPoint( _tabrect.left + 1, _tabrect.top + 1 ),
+						 BPoint( _tabrect.right - 1, _tabrect.top + 1 ),
+						 framecolors[1]);
+
+	_driver->StrokeLine( BPoint( _tabrect.right - 1, _tabrect.top + 2 ),
+						 BPoint( _tabrect.right - 1, _tabrect.bottom ),
+						 framecolors[3]);
+
 	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
@@ -506,9 +512,7 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 {
 STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 									 invalid.right, invalid.bottom));
-	// We need to test each side to determine whether or not it needs drawn. Additionally,
-	// we must clip the lines drawn by this function to the invalid rectangle we are given
-	
+
 	#ifdef USE_VIEW_FILL_HACK
 		_drawdata.highcolor = RGBColor( 192, 192, 192 );	
 		_driver->FillRect(_frame,_drawdata.highcolor);
@@ -519,351 +523,72 @@ STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
 
 	if(!borderwidth)
 		return;
-	
-	// Data specifically for the StrokeLineArray call.
-	int32 numlines=0, maxlines=20;
 
-	BPoint points[maxlines*2];
-	RGBColor colors[maxlines],temprgbcol;
-	
-	// For quick calculation of gradients for each side. Top is same as left, right is same as
-	// bottom
-//	int8 rightindices[borderwidth],leftindices[borderwidth];
-	int8 *rightindices=new int8[borderwidth],
-		*leftindices=new int8[borderwidth];
-	
-	if(borderwidth==5)
-	{
-		leftindices[0]=2;
-		leftindices[1]=0;
-		leftindices[2]=1;
-		leftindices[3]=3;
-		leftindices[4]=2;
+	{ // a block start
 
-		rightindices[0]=2;
-		rightindices[1]=0;
-		rightindices[2]=1;
-		rightindices[3]=3;
-		rightindices[4]=4;
+	BRect		r = BRect(topborder.LeftTop(), bottomborder.RightBottom());
+	//top
+	for (int8 i=0; i<5; i++){
+		_driver->StrokeLine(BPoint(r.left+i, r.top+i), BPoint(r.right-i, r.top+i), framecolors[i]);
 	}
-	else
-	{
-		// TODO: figure out border colors for floating window look
-		leftindices[0]=2;
-		leftindices[1]=2;
-		leftindices[2]=1;
-		leftindices[3]=1;
-		leftindices[4]=4;
-
-		rightindices[0]=2;
-		rightindices[1]=2;
-		rightindices[2]=1;
-		rightindices[3]=1;
-		rightindices[4]=4;
+	//left
+	for (int8 i=0; i<5; i++){
+		_driver->StrokeLine(BPoint(r.left+i, r.top+i), BPoint(r.left+i, r.bottom-i), framecolors[i]);
 	}
-	
-	// Variables used in each calculation
-	int32 startx,endx,starty,endy,i;
-	bool topcorner,bottomcorner,leftcorner,rightcorner;
-	int8 step,colorindex;
-	BRect r;
-	BPoint start, end;
-	
-	// Right side
-	if(TestRectIntersection(rightborder,invalid))
-	{
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		startx=(int32) MAX(invalid.left,rightborder.left);
-		endx=(int32) MIN(invalid.right,rightborder.right);
-
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=(rightborder);
-		r.bottom=r.top+borderwidth;
-		topcorner=TestRectIntersection(invalid,r);
-
-		r=rightborder;
-		r.top=r.bottom-borderwidth;
-		bottomcorner=TestRectIntersection(invalid,r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=startx+1; i<=endx; i++)
-		{
-			start.x=end.x=i;
-			
-			if(topcorner)
-			{
-				start.y=rightborder.top+(borderwidth-(i-rightborder.left));
-				start.y=MAX(start.y,invalid.top);
-			}
-			else
-				start.y=MAX(start.y+borderwidth,invalid.top);
-
-			if(bottomcorner)
-			{
-				end.y=rightborder.bottom-(borderwidth-(i-rightborder.left));
-				end.y=MIN(end.y,invalid.bottom);
-			}
-			else
-				end.y=MIN(end.y-borderwidth,invalid.bottom);
-							
-			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
-			colors[numlines]=framecolors[rightindices[colorindex]];
-			colorindex+=step;
-			numlines++;
-		}
+	//bottom
+	for (int8 i=0; i<5; i++){
+		_driver->StrokeLine(BPoint(r.left+i, r.bottom-i), BPoint(r.right-i, r.bottom-i), framecolors[(4-i)==4? 5: (4-i)]);
+	}
+	//right
+	for (int8 i=0; i<5; i++){
+		_driver->StrokeLine(BPoint(r.right-i, r.top+i), BPoint(r.right-i, r.bottom-i), framecolors[(4-i)==4? 5: (4-i)]);
 	}
 
-	// Left side
-	if(TestRectIntersection(leftborder,invalid))
-	{
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		startx=(int32) MAX(invalid.left,leftborder.left);
-		endx=(int32) MIN(invalid.right,leftborder.right);
+	} // end of the block/
 
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=leftborder;
-		r.bottom=r.top+borderwidth;
-		topcorner=TestRectIntersection(invalid,r);
-
-		r=leftborder;
-		r.top=r.bottom-borderwidth;
-		bottomcorner=TestRectIntersection(invalid,r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=startx; i<endx; i++)
-		{
-			start.x=end.x=i;
-			
-			if(topcorner)
-			{
-				start.y=leftborder.top+(i-leftborder.left);
-				start.y=MAX(start.y,invalid.top);
-			}
-			else
-				start.y=MAX(start.y+borderwidth,invalid.top);
-
-			if(bottomcorner)
-			{
-				end.y=leftborder.bottom-(i-leftborder.left);
-				end.y=MIN(end.y,invalid.bottom);
-			}
-			else
-				end.y=MIN(end.y-borderwidth,invalid.bottom);
-							
-			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
-			colors[numlines]=framecolors[leftindices[colorindex]];
-			colorindex+=step;
-			numlines++;
-		}
-	}
-
-	// Top side
-	if(TestRectIntersection(topborder,invalid))
-	{
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		starty=(int32) MAX(invalid.top,topborder.top);
-		endy=(int32) MIN(invalid.bottom,topborder.bottom);
-
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=topborder;
-		r.bottom=r.top+borderwidth;
-		r.right=r.left+borderwidth;
-		leftcorner=TestRectIntersection(invalid,r);
-
-		r=topborder;
-		r.top=r.bottom-borderwidth;
-		r.left=r.right-borderwidth;
-		
-		rightcorner=TestRectIntersection(invalid,r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=starty; i<endy; i++)
-		{
-			start.y=end.y=i;
-			
-			if(leftcorner)
-			{
-				start.x=topborder.left+(i-topborder.top);
-				start.x=MAX(start.x,invalid.left);
-			}
-			else
-				start.x=MAX(start.x+borderwidth,invalid.left);
-
-			if(rightcorner)
-			{
-				end.x=topborder.right-(i-topborder.top);
-				end.x=MIN(end.x,invalid.right);
-			}
-			else
-				end.x=MIN(end.x-borderwidth,invalid.right);
-							
-			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
-			
-			// Top side uses the same color order as the left one
-			colors[numlines]=framecolors[leftindices[colorindex]];
-			colorindex+=step;
-			numlines++;
-		}
-	}
-
-	// Bottom side
-	if(TestRectIntersection(bottomborder,invalid))
-	{
-		// We may not have to redraw the entire width of the frame itself. Rare case, but
-		// it must be accounted for.
-		starty=(int32) MAX(invalid.top,bottomborder.top);
-		endy=(int32) MIN(invalid.bottom,bottomborder.bottom);
-
-		// We'll need these flags to see if we must include the corners in final line
-		// calculations
-		r=bottomborder;
-		r.bottom=r.top+borderwidth;
-		r.right=r.left+borderwidth;
-		leftcorner=TestRectIntersection(invalid,r);
-
-		r=bottomborder;
-		r.top=r.bottom-borderwidth;
-		r.left=r.right-borderwidth;
-		
-		rightcorner=TestRectIntersection(invalid,r);
-		step=(borderwidth==5)?1:2;
-		colorindex=0;
-		
-		// Generate the lines for this side
-		for(i=starty+1; i<=endy; i++)
-		{
-			start.y=end.y=i;
-			
-			if(leftcorner)
-			{
-				start.x=bottomborder.left+(borderwidth-(i-bottomborder.top));
-				start.x=MAX(start.x,invalid.left);
-			}
-			else
-				start.x=MAX(start.x+borderwidth,invalid.left);
-
-			if(rightcorner)
-			{
-				end.x=bottomborder.right-(borderwidth-(i-bottomborder.top));
-				end.x=MIN(end.x,invalid.right);
-			}
-			else
-				end.x=MIN(end.x-borderwidth,invalid.right);
-							
-			// Make the appropriate 
-			points[numlines*2]=start;
-			points[(numlines*2)+1]=end;
-			
-			// Top side uses the same color order as the left one
-			colors[numlines]=framecolors[rightindices[colorindex]];
-			colorindex+=step;
-			numlines++;
-		}
-	}
-
-	if(_feel == B_NO_BORDER_WINDOW_LOOK){
-		//do(draw) nothing!
-	}
-	else{
-		_driver->StrokeLineArray(points,numlines,&_drawdata,colors);
-	}
-	
-	delete rightindices;
-	delete leftindices;
-	
 	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
-		r=_resizerect;
-//		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
+		BRect		r = _resizerect;
 
 		switch(_look){
 		// This code is strictly for B_DOCUMENT_WINDOW looks
 			case B_DOCUMENT_WINDOW_LOOK:{
-				r.right-=4;
-				r.bottom-=4;
 
-				_driver->StrokeLine(r.LeftTop(),r.RightTop(),framecolors[2]);
-				_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),framecolors[2]);
-
-				r.OffsetBy(1,1);
-				_driver->StrokeLine(r.LeftTop(),r.RightTop(),framecolors[0]);
-				_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),framecolors[0]);
-			
-				r.OffsetBy(1,1);
-				_driver->FillRect(r,framecolors[1]);
-			
-/*				r.left+=2;
-				r.top+=2;
-				r.right-=3;
-				r.bottom-=3;
-*/
-				r.right-=2;
-				r.bottom-=2;
-				int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-		
-				rgb_color halfcol, startcol, endcol;
-				float rstep,gstep,bstep,i;
-			
-				int steps=(w<h)?w:h;
-		
-				startcol=framecolors[0].GetColor32();
-				endcol=framecolors[4].GetColor32();
-		
-				halfcol=framecolors[0].MakeBlendColor(framecolors[4],0.5).GetColor32();
-		
-				rstep=(startcol.red-halfcol.red)/steps;
-				gstep=(startcol.green-halfcol.green)/steps;
-				bstep=(startcol.blue-halfcol.blue)/steps;
-			
 				// Explicitly locking the driver is normally unnecessary. However, we need to do
 				// this because we are rapidly drawing a series of calls which would not necessarily
 				// draw correctly if we didn't do so.
+				float	x = r.right;
+				float	y = r.bottom;
 				_driver->Lock();
-				for(i=0;i<=steps; i++)
-				{
-					temprgbcol.SetColor(uint8(startcol.red-(i*rstep)),
-						uint8(startcol.green-(i*gstep)),
-						uint8(startcol.blue-(i*bstep)));
-				
-					_driver->StrokeLine(BPoint(r.left,r.top+i),
-						BPoint(r.left+i,r.top),temprgbcol);
-		
-					temprgbcol.SetColor(uint8(halfcol.red-(i*rstep)),
-						uint8(halfcol.green-(i*gstep)),
-						uint8(halfcol.blue-(i*bstep)));
-					_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-						BPoint(r.left+i,r.top+steps),temprgbcol);			
+				_driver->FillRect(BRect(x-13, y-13, x, y), framecolors[2]);
+				_driver->StrokeLine(BPoint(x-15, y-15), BPoint(x-15, y-2), framecolors[0]);
+				_driver->StrokeLine(BPoint(x-14, y-14), BPoint(x-14, y-1), framecolors[1]);
+				_driver->StrokeLine(BPoint(x-15, y-15), BPoint(x-2, y-15), framecolors[0]);
+				_driver->StrokeLine(BPoint(x-14, y-14), BPoint(x-1, y-14), framecolors[1]);
+
+				for(int8 i=1; i <= 4; i++){
+					for(int8 j=1; j<=i; j++){
+						BPoint		pt1(x-(3*j)+1, y-(3*(5-i))+1);
+						BPoint		pt2(x-(3*j)+2, y-(3*(5-i))+2);
+						_driver->StrokePoint(pt1, framecolors[0]);
+						_driver->StrokePoint(pt2, framecolors[1]);
+					}
 				}
+//				RGBColor		c(255,128,0);
+//				_driver->FillRect(BRect(50,50,600,400), c);
 				_driver->Unlock();
 				break;
 			}
 
 			case B_TITLED_WINDOW_LOOK:
 			case B_FLOATING_WINDOW_LOOK:{
-				_driver->StrokeLine(BPoint(r.right-4,r.top),BPoint(r.right-2,r.top),
-					framecolors[2]);
-				_driver->StrokeLine(BPoint(r.left,r.bottom-4),BPoint(r.left,r.bottom-2),
-					framecolors[2]);
-				
+				_driver->StrokeLine(BPoint(rightborder.left, rightborder.bottom-13),
+									BPoint(rightborder.right, rightborder.bottom-13),
+									framecolors[2]);
+				_driver->StrokeLine(BPoint(bottomborder.left-18, bottomborder.top),
+									BPoint(bottomborder.right-18, bottomborder.bottom),
+									framecolors[2]);
 				break;
 			}
 			
