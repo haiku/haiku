@@ -438,6 +438,12 @@ status_t b57_ioctl(void *cookie,uint32 op,void *data,size_t len) {
 				 LM_SetReceiveMask(&pUmDevice->lm_dev,
 					pUmDevice->lm_dev.ReceiveMask & ~LM_PROMISCUOUS_MODE);
 			return B_OK;
+		case ETHER_GETLINKSTATE: {
+			ether_link_state_t *state_buffer = (ether_link_state_t *)(data);
+			state_buffer->link_speed = pUmDevice->lm_dev.LineSpeed;
+			state_buffer->link_quality = (pUmDevice->lm_dev.LinkStatus == LM_STATUS_LINK_DOWN) ? 0.0 : 1.0;
+			state_buffer->duplex_mode = (pUmDevice->lm_dev.DuplexMode == LM_DUPLEX_MODE_FULL);
+			} return B_OK;
 	}
 	return B_ERROR;
 }

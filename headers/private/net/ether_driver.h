@@ -30,7 +30,8 @@ enum {
 	ETHER_GETFRAMESIZE,						/* get frame size */
 	ETHER_ADDTIMESTAMP,						/* (try to) add timestamps to packets (BONE ext) */
 	ETHER_HASIOVECS,						/* does the driver implement readv/writev ? (BONE ext) (bool *) */
-	ETHER_GETIFTYPE							/* get the IFT_ type of the interface (int *) */
+	ETHER_GETIFTYPE,						/* get the IFT_ type of the interface (int *) */
+	ETHER_GETLINKSTATE						/* get line speed, quality, duplex mode, etc. */
 };
 
 
@@ -51,6 +52,16 @@ typedef struct ether_init_params {
 	short irq;
 	unsigned long mem;
 } ether_init_params_t;
+
+/*
+ *  info returned from ETHER_GETLINKSTATE
+ */
+
+typedef struct ether_link_state {
+	float  link_speed; 	 /* In Mbits per second */
+	float  link_quality; /* Set to zero if not connected */
+	char   duplex_mode;  /* Set to 1 for full duplex, 0 for half */
+} ether_link_state_t;
 
 #ifdef __cplusplus
 }
