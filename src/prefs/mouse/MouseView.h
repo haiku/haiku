@@ -28,6 +28,7 @@ class MouseSettings;
 class MouseView : public BView {
 	public:
 		MouseView(BRect frame, const MouseSettings &settings);
+		virtual ~MouseView();
 
 		virtual void AttachedToWindow();
 		virtual void MouseDown(BPoint where);
@@ -45,6 +46,7 @@ class MouseView : public BView {
 
 		const MouseSettings &fSettings;
 		BBitmap		*fMouseBitmap, *fMouseDownBitmap;
+		BRect		fMouseDownBounds;
 		mouse_map 	fCurrentMouseMap;
 
 		int32		fType;

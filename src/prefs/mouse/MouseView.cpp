@@ -39,7 +39,6 @@ static const int32 kOneButtonOffsets[4] = {0, 55};
 static const int32 kTwoButtonOffsets[4] = {0, 27, 55};
 static const int32 kThreeButtonOffsets[4] = {0, 18, 36, 55};
 
-static const int32 kButtonHeight = 26;
 static const int32 kButtonTop = 6;
 
 static const rgb_color kButtonPressedColor = {120, 120, 120};
@@ -90,11 +89,27 @@ MouseView::MouseView(BRect rect, const MouseSettings &settings)
 	fButtons(0),
 	fOldButtons(0)
 {
-  	fMouseBitmap = new BBitmap(BRect(0, 0, kMouseWidth - 1, kMouseHeight - 1), B_CMAP8);
-  	fMouseBitmap->SetBits(kMouseBits, sizeof(kMouseBits), 0, kMouseColorSpace);
+	fMouseBitmap = new BBitmap(BRect(0, 0, kMouseWidth - 1, kMouseHeight - 1), B_CMAP8);
+	fMouseBitmap->SetBits(kMouseBits, sizeof(kMouseBits), 0, kMouseColorSpace);
 
-  	fMouseDownBitmap = new BBitmap(BRect(0, 0, kMouseDownWidth - 1, kMouseDownHeight - 1), B_CMAP8);
-  	fMouseDownBitmap->SetBits(kMouseDownBits, sizeof(kMouseDownBits), 0, kMouseDownColorSpace);
+	fMouseDownBitmap = new BBitmap(BRect(0, 0, kMouseDownWidth - 1, kMouseDownHeight - 1), B_CMAP8);
+	fMouseDownBitmap->SetBits(kMouseDownBits, sizeof(kMouseDownBits), 0, kMouseDownColorSpace);
+
+	// ToDo: move these images to the resources as well
+	//fMouseBitmap = BTranslationUtils::GetBitmap('PNG ', "mouse_bmap");
+	//fMouseDownBitmap = BTranslationUtils::GetBitmap('PNG ', "pressed_mouse_bmap");
+
+  	if (fMouseDownBitmap != NULL)
+  		fMouseDownBounds = fMouseDownBitmap->Bounds();
+  	else
+  		fMouseDownBounds.Set(0, 0, 55, 29);
+}
+
+
+MouseView::~MouseView()
+{
+	delete fMouseBitmap;
+	delete fMouseDownBitmap;
 }
 
 
@@ -102,9 +117,9 @@ void
 MouseView::GetPreferredSize(float *_width, float *_height)
 {
 	if (_width)
-		*_width = kMouseWidth;
+		*_width = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Width() : 57;
 	if (_height)
-		*_height = kMouseHeight;
+		*_height = fMouseBitmap != NULL ? fMouseBitmap->Bounds().Height() : 82;
 }
 
 
@@ -114,7 +129,8 @@ MouseView::MouseDown(BPoint where)
 	const int32 *offset = getButtonOffsets(fType);
 	int32 button = -1;
 	for (int32 i = 0; i <= fType; i++) {
-		BRect frame(offset[i], kButtonTop, offset[i + 1] - 1, kButtonTop + kButtonHeight);
+		BRect frame(offset[i], kButtonTop, offset[i + 1] - 1,
+			kButtonTop + fMouseDownBounds.Height());
 		if (frame.Contains(where)) {
 			button = i;
 			break;
@@ -162,7 +178,8 @@ MouseView::Pulse()
 	GetMouse(&point, &fButtons, true);
 
 	if (fOldButtons != fButtons) {
-		Invalidate(BRect(0, kButtonTop, kMouseWidth, kButtonTop + kButtonHeight));
+		Invalidate(BRect(0, kButtonTop,
+			fMouseDownBounds.Width(), kButtonTop + fMouseDownBounds.Height()));
 		fOldButtons = fButtons;
 	}
 }
@@ -173,10 +190,10 @@ MouseView::Draw(BRect updateFrame)
 {
 	inherited::Draw(updateFrame);
 
-	SetDrawingMode(B_OP_OVER);
-
 	// Draw the mouse top
-	DrawBitmapAsync(fMouseBitmap, updateFrame, updateFrame);
+	SetDrawingMode(B_OP_ALPHA);
+	if (fMouseBitmap != NULL)
+		DrawBitmapAsync(fMouseBitmap, updateFrame, updateFrame);
 
 	mouse_map map;
 	fSettings.Mapping(map);
@@ -185,14 +202,22 @@ MouseView::Draw(BRect updateFrame)
 	bool middlePressed = fType == 3 && (map.button[2] & fButtons) != 0;
 
 	for (int32 i = 0; i < fType; i++) {
-		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1, kButtonTop + kButtonHeight - 2);
+		BRect border(offset[i] + 1, kButtonTop + 2, offset[i + 1] - 1,
+			kButtonTop + fMouseDownBounds.Height() - 4);
 		bool pressed = (fButtons & map.button[ConvertFromVisualOrder(i)]) != 0;
 			// is button currently pressed?
 
 		if (pressed) {
-			BRect frame(offset[i], 0, offset[i + 1], kMouseDownHeight + 1);
-			DrawBitmapAsync(fMouseDownBitmap, frame, frame.OffsetByCopy(0, kButtonTop));
+			BRect frame(offset[i], 0, offset[i + 1], fMouseDownBounds.Height() + 1);
+			if (fMouseDownBitmap != NULL)
+				DrawBitmapAsync(fMouseDownBitmap, frame, frame.OffsetByCopy(0, kButtonTop));
+			else if (fMouseBitmap == NULL) {
+				SetHighColor(kButtonPressedColor);
+				SetDrawingMode(B_OP_OVER);
+				FillRect(frame.OffsetByCopy(0, kButtonTop));
+			}
 		}
+		SetDrawingMode(B_OP_OVER);
 
 		if (i > 0 && fType > i) {
 			// left border
@@ -202,6 +227,8 @@ MouseView::Draw(BRect updateFrame)
 			// draw separator
 			BRect separator = border.OffsetByCopy(-1, -1);
 			separator.bottom += 2;
+			if (!middlePressed)
+				border.top++;
 
 			SetHighColor(middlePressed ?
 				kButtonPressedSeparatorColor : kButtonReleasedSeparatorColor);
