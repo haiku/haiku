@@ -47,7 +47,7 @@ kernel_daemon(void *data)
 			if (((iteration + daemon->offset) % daemon->frequency) == 0)
 				daemon->function(daemon->arg, iteration);
 		}
-		mutex_lock(&gDaemonMutex);
+		mutex_unlock(&gDaemonMutex);
 
 		iteration++;
 		snooze(100000);	// 0.1 seconds
@@ -71,7 +71,7 @@ unregister_kernel_daemon(void (*function)(void *, int), void *arg)
 			break;
 		}
 	}
-	mutex_lock(&gDaemonMutex);
+	mutex_unlock(&gDaemonMutex);
 
 	// if we've iterated through the whole list, we didn't
 	// find the daemon, and "daemon" is NULL
@@ -114,7 +114,7 @@ register_kernel_daemon(void (*function)(void *, int), void *arg, int frequency)
 		daemon->offset = 0;
 
 	list_add_item(&gDaemons, daemon);
-	mutex_lock(&gDaemonMutex);
+	mutex_unlock(&gDaemonMutex);
 
 	return B_OK;
 }
@@ -123,10 +123,13 @@ register_kernel_daemon(void (*function)(void *, int), void *arg, int frequency)
 status_t
 kernel_daemon_init(void)
 {
+	thread_id thread;
+
 	if (mutex_init(&gDaemonMutex, "kernel daemon") < B_OK)
 		return B_ERROR;
 
 	list_init(&gDaemons);
 
-	return spawn_kernel_thread(&kernel_daemon, "kernel daemon", B_LOW_PRIORITY, NULL);
+	thread = spawn_kernel_thread(&kernel_daemon, "kernel daemon", B_LOW_PRIORITY, NULL);
+	return resume_thread(thread);
 }
