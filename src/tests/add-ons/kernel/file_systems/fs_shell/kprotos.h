@@ -20,7 +20,7 @@ int sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent,
 int sys_close(bool kernel, int fd);
 fs_off_t sys_lseek(bool kernel, int fd, fs_off_t pos, int whence);
 ssize_t sys_read(bool kernel, int fd, void *buf, size_t len);
-ssize_t sys_write(bool kernel, int fd, void *buf, size_t len);
+ssize_t sys_write(bool kernel, int fd, const void *buf, size_t len);
 int sys_unlink(bool kernel, int fd, const char *path);
 int sys_link(bool kernel, int ofd, const char *oldpath, int nfd,
              const char *newpath);
@@ -47,10 +47,15 @@ int sys_access(bool kernel, int fd, const char *path, int mode);
 
 int sys_sync(void);
 
-ssize_t sys_read_attr(bool kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos);
-ssize_t sys_write_attr(bool kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos);
+int sys_open_attr_dir(bool kernel, int fd, const char *path);
+ssize_t sys_read_attr(bool kernel, int fd, const char *name, int type,
+			void *buffer, size_t len, off_t pos);
+ssize_t sys_write_attr(bool kernel, int fd, const char *name, int type,
+			const void *buffer, size_t len, off_t pos);
 ssize_t sys_remove_attr(bool kernel, int fd, const char *name);
-
+int sys_stat_attr(bool kernel, int fd, const char *path, const char *name,
+			my_attr_info *info);
+ 
 int sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie);
 int sys_close_query(bool kernel, int fd, const char *path, void *cookie);
 int sys_read_query(bool kernel, int fd, const char *path, void *cookie, struct my_dirent *dent,size_t bufferSize,long num);

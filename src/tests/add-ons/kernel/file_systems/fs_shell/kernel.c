@@ -36,7 +36,7 @@
 
 #include <sys/stat.h>
 
-#define     OMODE_MASK      (O_RDONLY | O_WRONLY | O_RDWR)
+#define     OMODE_MASK      (MY_O_RDONLY | MY_O_WRONLY | MY_O_RDWR)
 #define     SLEEP_TIME      (10000.0)
 #define     MAX_SYM_LINKS   16
 
@@ -48,8 +48,9 @@
 #define     FD_FILE         1
 #define     FD_DIR          2
 #define     FD_WD           4
+#define     FD_ATTR_DIR     8
 
-#define     FD_ALL          (FD_FILE | FD_DIR | FD_WD)
+#define     FD_ALL          (FD_FILE | FD_DIR | FD_WD | FD_ATTR_DIR)
 
 #define     DEFAULT_FD_NUM  (128)
 #define     VNNUM           256
@@ -171,6 +172,7 @@ int                 sys_rstat(bool kernel, int fd, const char *path,
                               struct my_stat *st, bool eatlink);
 static fsystem *    inc_file_system(const char *name);
 static int          dec_file_system(fsystem *fs);
+static ioctx *		get_cur_ioctx(void);
 
 static int      get_dir_fd(bool kernel, int fd, const char *path, char *filename,
                     vnode **dvn);
@@ -474,6 +476,7 @@ init_vnode_layer(void)
     nspace      *ns;
     void        *data;
     extern vnode_ops rootfs;  /* XXXdbg */
+    ioctx       *io;
 
     /*
     compute vnnum based on memsize. 256 vnodes with 8MB.
@@ -564,6 +567,11 @@ init_vnode_layer(void)
     ns->data = data;
     ns->root = lookup_vnode(ns->nsid, vnid);
     rootvn = ns->root;
+
+    // set cwd to "/"
+    io = get_cur_ioctx();
+    inc_vnode(rootvn);
+    io->cwd = rootvn;
 
 #ifndef USER
 #ifdef DEBUG
@@ -880,7 +888,7 @@ error1:
 int
 sys_closedir(bool kernel, int fd)
 {
-    return remove_fd(kernel, fd, FD_DIR);
+    return remove_fd(kernel, fd, FD_DIR | FD_ATTR_DIR);
 }
 
 /*
@@ -901,15 +909,20 @@ sys_readdir(bool kernel, int fd, struct my_dirent *buf, size_t bufsize,
     vnode_id          vnid;
     long              nm;
 
-    f = get_fd(kernel, fd, FD_DIR);
+    f = get_fd(kernel, fd, FD_DIR | FD_ATTR_DIR);
     if (!f) {
         err = FS_EBADF;
         goto error1;
     }
     vn = f->vn;
     nm = count;
-    err = (*vn->ns->fs->ops.readdir)(vn->ns->data, vn->data, f->cookie,
-            &nm, buf, bufsize);
+    if (f->type == FD_DIR) {
+	    err = (*vn->ns->fs->ops.readdir)(vn->ns->data, vn->data, f->cookie,
+    	        &nm, buf, bufsize);
+    } else {
+	    err = (*vn->ns->fs->ops.read_attrdir)(vn->ns->data, vn->data, f->cookie,
+    	        &nm, buf, bufsize);
+    }
     if (err)
         goto error1;
 
@@ -922,23 +935,25 @@ sys_readdir(bool kernel, int fd, struct my_dirent *buf, size_t bufsize,
     patch the mount points and the root.
     */
 
-    LOCK(vnlock);
-    nsid = vn->ns->nsid;
-    p = buf;
-    for(i=0; i<nm; i++) {
-        if (is_mount_vnid(nsid, p->d_ino, &vnid))
-            p->d_ino = vnid;
-        if (vn->ns->mount && !strcmp(p->d_name, "..")) {
-            UNLOCK(vnlock);
-            err = sys_rstat(kernel, fd, "..", &st, FALSE);
-            if (err)
-                goto error2;
-            LOCK(vnlock);
-            p->d_ino = st.ino;
-        }
-        p = (struct my_dirent *) ((char *) p + p->d_reclen);
-    }
-    UNLOCK(vnlock);
+	if (f->type == FD_DIR) {
+	    LOCK(vnlock);
+	    nsid = vn->ns->nsid;
+	    p = buf;
+	    for(i=0; i<nm; i++) {
+	        if (is_mount_vnid(nsid, p->d_ino, &vnid))
+	            p->d_ino = vnid;
+	        if (vn->ns->mount && !strcmp(p->d_name, "..")) {
+	            UNLOCK(vnlock);
+	            err = sys_rstat(kernel, fd, "..", &st, FALSE);
+	            if (err)
+	                goto error2;
+	            LOCK(vnlock);
+	            p->d_ino = st.ino;
+	        }
+	        p = (struct my_dirent *) ((char *) p + p->d_reclen);
+	    }
+	    UNLOCK(vnlock);
+	}
 
     put_fd(f);
     return nm;
@@ -961,11 +976,16 @@ sys_rewinddir(bool kernel, int fd)
     int         err;
     vnode       *vn;
 
-    f = get_fd(kernel, fd, FD_DIR);
+    f = get_fd(kernel, fd, FD_DIR | FD_ATTR_DIR);
     if (!f)
         return FS_EBADF;
     vn = f->vn;
-    err = (*vn->ns->fs->ops.rewinddir)(vn->ns->data, vn->data, f->cookie);
+    if (f->type == FD_DIR) {
+	    err = (*vn->ns->fs->ops.rewinddir)(vn->ns->data, vn->data, f->cookie);
+    } else {
+	    err = (*vn->ns->fs->ops.rewind_attrdir)(vn->ns->data, vn->data,
+	    	f->cookie);
+    }
     put_fd(f);
     return err;
 }
@@ -990,7 +1010,7 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
     op_open         *opo;
     op_free_cookie  *opf;
 
-    if (omode & O_CREAT) {
+    if (omode & MY_O_CREAT) {
         err = get_dir_fd(kernel, fd, path, filename, &dvn);
         if (err)
             goto errorA;
@@ -1009,7 +1029,7 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
 
         dec_vnode(dvn, FALSE);
     } else {
-        err = get_file_fd(kernel, fd, path, TRUE, &vn);
+        err = get_file_fd(kernel, fd, path, !(omode & MY_O_NOTRAVERSE), &vn);
         if (err)
             goto error1;
         opo = vn->ns->fs->ops.open;
@@ -1055,7 +1075,7 @@ error3:
     opf = vn->ns->fs->ops.free_cookie;
     if (opf)
         (*opf)(vn->ns->data, vn->data, cookie);
-    if (omode & O_CREAT)
+    if (omode & MY_O_CREAT)
         goto errorC;
 error2:
     dec_vnode(vn, FALSE);
@@ -1170,11 +1190,11 @@ sys_lseek(bool kernel, int fd, fs_off_t pos, int whence)
         goto error1;
     }
     switch(whence) {
-    case SEEK_SET:
+    case MY_SEEK_SET:
         f->pos = pos;
         break;
-    case SEEK_CUR:
-        if ((f->omode & O_APPEND) == 0)
+    case MY_SEEK_CUR:
+        if ((f->omode & MY_O_APPEND) == 0)
             f->pos += pos;
         else {               /* we're in append mode so ask where the EOF is */
             vn = f->vn;
@@ -1191,7 +1211,7 @@ sys_lseek(bool kernel, int fd, fs_off_t pos, int whence)
             break;
         }
         break;
-    case SEEK_END:
+    case MY_SEEK_END:
         vn = f->vn;
         op = vn->ns->fs->ops.rstat;
         if (!op) {
@@ -1245,7 +1265,7 @@ sys_read(bool kernel, int fd, void *buf, size_t len)
         err = FS_EBADF;
         goto error1;
     }
-    if ((f->omode & OMODE_MASK) == O_WRONLY) {
+    if ((f->omode & OMODE_MASK) == MY_O_WRONLY) {
         err = FS_EBADF;
         goto error2;
     }
@@ -1279,7 +1299,7 @@ error1:
  */
 
 ssize_t
-sys_write(bool kernel, int fd, void *buf, size_t len)
+sys_write(bool kernel, int fd, const void *buf, size_t len)
 {
     ofile       *f;
     int         err;
@@ -1291,7 +1311,7 @@ sys_write(bool kernel, int fd, void *buf, size_t len)
         err = FS_EBADF;
         goto error1;
     }
-    if ((f->omode & OMODE_MASK) == O_RDONLY) {
+    if ((f->omode & OMODE_MASK) == MY_O_RDONLY) {
         err = FS_EBADF;
         goto error2;
     }
@@ -1311,96 +1331,6 @@ sys_write(bool kernel, int fd, void *buf, size_t len)
 
     put_fd(f);
     return sz;
-
-error2:
-    put_fd(f);  
-error1:
-    return err;
-}
-
-
-ssize_t
-sys_read_attr(bool kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos)
-{
-    ofile       *f;
-    int         err;
-    vnode       *vn;
-    size_t      sz;
-
-    f = get_fd(kernel, fd, FD_FILE);
-    if (!f) {
-        err = FS_EBADF;
-        goto error1;
-    }
-
-    vn = f->vn;
-    sz = len;
-    err = (*vn->ns->fs->ops.read_attr)(vn->ns->data, vn->data, name, type, buffer, &sz, pos);
-    if (err)
-        goto error2;
-
-    put_fd(f);
-
-    return sz;
-
-error2:
-    put_fd(f);  
-error1:
-    return err;
-}
-
-
-ssize_t
-sys_write_attr(bool kernel, int fd, const char *name,int type,void *buffer, size_t len, off_t pos)
-{
-    ofile       *f;
-    int         err;
-    vnode       *vn;
-    size_t      sz;
-
-    f = get_fd(kernel, fd, FD_FILE);
-    if (!f) {
-        err = FS_EBADF;
-        goto error1;
-    }
-
-    vn = f->vn;
-    sz = len;
-    err = (*vn->ns->fs->ops.write_attr)(vn->ns->data, vn->data, name, type, buffer, &sz, pos);
-    if (err)
-        goto error2;
-
-    put_fd(f);
-    return sz;
-
-error2:
-    put_fd(f);  
-error1:
-    return err;
-}
-
-
-ssize_t
-sys_remove_attr(bool kernel, int fd, const char *name)
-{
-    ofile       *f;
-    int         err;
-    vnode       *vn;
-
-    f = get_fd(kernel, fd, FD_FILE);
-    if (!f) {
-        err = FS_EBADF;
-        goto error1;
-    }
-
-    vn = f->vn;
-    err = (*vn->ns->fs->ops.remove_attr)(vn->ns->data, vn->data, name);
-    if (err)
-        goto error2;
-
-    put_fd(f);
-
-    return 0;
 
 error2:
     put_fd(f);  
@@ -1778,6 +1708,188 @@ add_nspace(nspace *ns, fsystem *fs, const char *fileSystem, dev_t dev, ino_t ino
 	nshead = ns;
 
 	return FS_OK;
+}
+
+
+int
+sys_open_attr_dir(bool kernel, int fd, const char *path)
+{
+    int             err;
+    op_open_attrdir *op;
+    op_free_cookie  *opf;
+    ofile           *f;
+    int             nfd;
+    vnode           *vn;
+    void            *cookie;
+
+    err = get_file_fd(kernel, fd, path, TRUE, &vn);
+    if (err)
+        goto error1;
+    op = vn->ns->fs->ops.open_attrdir;
+    if (!op) {
+        err = FS_EINVAL;
+        goto error2;
+    }
+    err = (*op)(vn->ns->data, vn->data, &cookie);
+    if (err)
+        goto error2;
+
+    /*
+    find a file descriptor
+    */
+
+    f = (ofile *) calloc(sizeof(ofile), 1);
+    if (!f) {
+        err = FS_ENOMEM;
+        goto error3;
+    }
+
+    f->type = FD_ATTR_DIR;
+    f->vn = vn;
+    f->cookie = cookie;
+    f->rcnt = 0;
+    f->ocnt = 0;
+
+    nfd = new_fd(kernel, -1, f, -1, TRUE);
+    if (nfd < 0) {
+        err = FS_EMFILE;
+        goto error4;
+    }
+
+    return nfd;
+
+error4:
+    free(f);
+error3:
+    (*vn->ns->fs->ops.close_attrdir)(vn->ns->data, vn->data, cookie);
+    opf = vn->ns->fs->ops.free_attrdircookie;
+    if (opf)
+        (*opf)(vn->ns->data, vn->data, cookie);
+error2:
+    dec_vnode(vn, FALSE);
+error1:
+    return err;
+}
+
+
+ssize_t
+sys_read_attr(bool kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos)
+{
+    ofile       *f;
+    int         err;
+    vnode       *vn;
+    size_t      sz;
+
+    f = get_fd(kernel, fd, FD_FILE);
+    if (!f) {
+        err = FS_EBADF;
+        goto error1;
+    }
+
+    vn = f->vn;
+    sz = len;
+    err = (*vn->ns->fs->ops.read_attr)(vn->ns->data, vn->data, name, type, buffer, &sz, pos);
+    if (err)
+        goto error2;
+
+    put_fd(f);
+
+    return sz;
+
+error2:
+    put_fd(f);  
+error1:
+    return err;
+}
+
+
+ssize_t
+sys_write_attr(bool kernel, int fd, const char *name,int type,
+	const void *buffer, size_t len, off_t pos)
+{
+    ofile       *f;
+    int         err;
+    vnode       *vn;
+    size_t      sz;
+
+    f = get_fd(kernel, fd, FD_FILE);
+    if (!f) {
+        err = FS_EBADF;
+        goto error1;
+    }
+
+    vn = f->vn;
+    sz = len;
+    err = (*vn->ns->fs->ops.write_attr)(vn->ns->data, vn->data, name, type, buffer, &sz, pos);
+    if (err)
+        goto error2;
+
+    put_fd(f);
+    return sz;
+
+error2:
+    put_fd(f);  
+error1:
+    return err;
+}
+
+
+ssize_t
+sys_remove_attr(bool kernel, int fd, const char *name)
+{
+    ofile       *f;
+    int         err;
+    vnode       *vn;
+
+    f = get_fd(kernel, fd, FD_FILE);
+    if (!f) {
+        err = FS_EBADF;
+        goto error1;
+    }
+
+    vn = f->vn;
+    err = (*vn->ns->fs->ops.remove_attr)(vn->ns->data, vn->data, name);
+    if (err)
+        goto error2;
+
+    put_fd(f);
+
+    return 0;
+
+error2:
+    put_fd(f);  
+error1:
+    return err;
+}
+
+
+int
+sys_stat_attr(bool kernel, int fd, const char *path, const char *name,
+	my_attr_info *info)
+{
+    int         err;
+    vnode       *vn;
+    op_stat_attr *op;
+
+    err = get_file_fd(kernel, fd, path, TRUE, &vn);
+    if (err)
+        goto error1;
+    op = vn->ns->fs->ops.stat_attr;
+    if (!op) {
+        err = FS_EINVAL;
+        goto error2;
+    }
+    err = (*op)(vn->ns->data, vn->data, name, info);
+    if (err)
+        goto error2;
+    dec_vnode(vn, FALSE);
+
+    return 0;
+
+error2:
+    dec_vnode(vn, FALSE);
+error1:
+    return err;
 }
 
 
@@ -2986,7 +3098,7 @@ remove_fd(bool kernel, int fd, int type)
     LOCK(fds->lock);
     if ((fd >= 0) && (fd < fds->num) && fds->fds[fd]) {
         f = fds->fds[fd];
-        if (f->type == type) {
+        if (f->type & type) {
             SETBIT(fds->alloc, fd, 0);
             fds->fds[fd] = NULL;
         } else
@@ -3094,6 +3206,10 @@ invoke_close(ofile *f)
     case FD_DIR:
         err = (*vn->ns->fs->ops.closedir)(vn->ns->data, vn->data, f->cookie);
         break;
+    case FD_ATTR_DIR:
+        err = (*vn->ns->fs->ops.close_attrdir)(vn->ns->data, vn->data,
+        	f->cookie);
+        break;
     case FD_WD:
     default:
         err = 0;
@@ -3118,6 +3234,9 @@ invoke_free(ofile *f)
         break;
     case FD_WD:
         op = NULL;
+        break;
+    case FD_ATTR_DIR:
+        op = vn->ns->fs->ops.free_attrdircookie;
         break;
     }
     if (op)
