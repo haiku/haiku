@@ -61,6 +61,7 @@ StdBinCommands
 	mount.c
 	prio.c
 	ps.c
+	release.c
 	renice.c
 	rescan.c
 	rmattr.cpp
