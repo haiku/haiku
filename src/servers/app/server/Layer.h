@@ -105,6 +105,7 @@ public:
 	void PrintToStream(void);
 	void PrintNode(void);
 	void PruneTree(void);
+	void PrintTree();
 
 protected:
 	friend class RootLayer;
@@ -113,6 +114,7 @@ protected:
 	friend class ServerWindow;
 	
 	BRect		_frame;
+	BPoint		_boundsLeftTop;
 	Layer		*_parent,
 				*_uppersibling,
 				*_lowersibling,
@@ -135,3 +137,7 @@ protected:
 };
 
 #endif
+/*
+ @log
+ 	* added a new member, BPoint _boundsLeftTop. Beside other uses, (DW don't forget!)it will be needed in redraw code.
+*/
