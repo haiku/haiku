@@ -309,7 +309,7 @@ BTabView::BTabView(BMessage *archive)
 	:	BView(archive),
 		fFocus(-1)
 {
-	fContainerView == NULL;
+	fContainerView = NULL;
 	fTabList = new BList;
 
 	int16 width;
@@ -418,7 +418,7 @@ status_t BTabView::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 status_t BTabView::Perform(perform_code d, void *arg)
 {
-	return BTabView::Perform(d, arg);
+	return BView::Perform(d, arg);
 }
 //------------------------------------------------------------------------------
 void BTabView::WindowActivated(bool active)
@@ -689,7 +689,7 @@ void BTabView::SetResizingMode(uint32 mode)
 //------------------------------------------------------------------------------
 void BTabView::GetPreferredSize(float *width, float *height)
 {
-	BTabView::GetPreferredSize(width, height);
+	BView::GetPreferredSize(width, height);
 }
 //------------------------------------------------------------------------------
 void BTabView::ResizeToPreferred()
