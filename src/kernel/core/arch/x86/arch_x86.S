@@ -4,6 +4,8 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <arch/x86/descriptors.h>
+
 #define FUNCTION(x) .global x; .type x,@function; x
 
 .text
@@ -182,10 +184,10 @@ FUNCTION(i386_enter_uspace):
 	movl	4(%esp),%eax	// get entry point
 	movl	8(%esp),%edx	// get arguments
 	movl	12(%esp),%ebx	// get user stack
-	movw	$0x23,%cx
+	movw	$USER_DATA_SEG,%cx
 	movw	%cx,%ds
 	movw	%cx,%es
-	//movw	%cx,%fs			// fs points to the TLS storage (CPU dependent segment)
+	//movw	$0x33 + cpu_num,%fs	-> fs points to the TLS storage (CPU dependent segment)
 	movw	%cx,%gs
 
 	// copy exit stub to stack
@@ -203,10 +205,10 @@ _copy_more:
 	movl	%ebx,-8(%ebx)	// fake return address to copied exit stub
 	sub		$8,%ebx
 
-	pushl	$0x23			// user data segment
+	pushl	$USER_DATA_SEG	// user data segment
 	pushl	%ebx			// user stack
 	pushl	$(1 << 9) | 2	// user flags
-	pushl	$0x1b			// user code segment
+	pushl	$USER_CODE_SEG	// user code segment
 	pushl	%eax			// user IP
 	iret
 

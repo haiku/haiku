@@ -15,6 +15,7 @@
 #include <string.h>
 #include <Errors.h>
 #include <signal.h>
+#include <tls.h>
 
 
 // from arch_interrupts.S
@@ -37,10 +38,20 @@ i386_pop_iframe(struct thread *thread)
 }
 
 
-static void
-i386_set_fs_register(uint32 segment)
+static inline void
+set_fs_register(uint32 segment)
 {
 	asm("movl %0,%%fs" :: "r" (segment));
+}
+
+
+static void
+set_tls_context(struct thread *thread)
+{
+	int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
+
+	set_segment_descriptor_base(&gGDT[entry], thread->user_local_storage);
+	set_fs_register((entry << 3) | DPL_USER);
 }
 
 
@@ -66,7 +77,7 @@ arch_thread_init_thread_struct(struct thread *t)
 
 
 int
-arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
+arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
 	unsigned int *kstack = (unsigned int *)t->kernel_stack_base;
 	unsigned int kstack_size = KSTACK_SIZE;
@@ -109,6 +120,28 @@ arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(void), 
 }
 
 
+/** Initializes the user-space TLS local storage pointer in
+ *	the thread structure, and the reserved TLS slots.
+ *
+ *	Is called from _create_user_thread_kentry().
+ */
+
+void
+arch_thread_init_tls(struct thread *thread)
+{
+	uint32 *tls;
+
+	thread->user_local_storage = thread->user_stack_base + STACK_SIZE;
+	tls = (uint32 *)thread->user_local_storage;
+
+	tls[TLS_BASE_ADDRESS_SLOT] = thread->user_local_storage;
+	tls[TLS_THREAD_ID_SLOT] = thread->id;
+	tls[TLS_ERRNO_SLOT] = 0;
+
+	set_tls_context(thread);
+}
+
+
 void
 arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg)
 {
@@ -120,6 +153,7 @@ void
 arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 {
 	addr new_pgdir;
+
 #if 0
 	int i;
 
@@ -133,13 +167,12 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	for (i = 0; i < 11; i++)
 		dprintf("*esp[%d] (0x%x) = 0x%x\n", i, ((unsigned int *)new_at->esp + i), *((unsigned int *)new_at->esp + i));
 #endif
-	i386_set_kstack(t_to->kernel_stack_base + KSTACK_SIZE);
+	i386_set_tss_and_kstack(t_to->kernel_stack_base + KSTACK_SIZE);
 
-#if 0
-{
-	int a = *(int *)(t_to->kernel_stack_base + KSTACK_SIZE - 4);
-}
-#endif
+	// set TLS GDT entry to the current thread - since this action is
+	// dependent on the current CPU, we have to do it here
+	if (t_to->user_local_storage != NULL)
+		set_tls_context(t_to);
 
 	if (t_from->team->_aspace_id >= 0 && t_to->team->_aspace_id >= 0) {
 		// they are both uspace threads
@@ -159,36 +192,12 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 	} else {
 		new_pgdir = vm_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 	}
-#if 0
-	dprintf("new_pgdir is 0x%x\n", new_pgdir);
-#endif
-
-#if 0
-{
-	int a = *(int *)(t_to->arch_info.current_stack.esp - 4);
-}
-#endif
 
 	if ((new_pgdir % PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
 	i386_context_switch(&t_from->arch_info, &t_to->arch_info, new_pgdir);
-
-	// set TLS GDT entry to the current thread - since this action is
-	// dependent on the current CPU, we have to do it here
-	{
-		int entry = smp_get_current_cpu() + TLS_BASE_SEGMENT;
-
-		// ToDo: the TLS storage is currently located simply at the bottom of the user stack
-		//	perhaps we want to put it somewhere else, in a safe place?
-		//	very strange: the user_stack_base pointer seg faults, (+ PAGE_SIZE) improves
-		//		the situation, but the main thread still don't work correctly...
-		//	Also have a look at the stack addresses: the main thread is located at
-		//	0x7ffd600, the ones of the others are at 0x0062b000 and following
-		set_segment_descriptor_base(&gGDT[entry], t_to->user_stack_base + PAGE_SIZE);
-		i386_set_fs_register((entry << 3) | DPL_USER);
-	}
 }
 
 
@@ -203,9 +212,14 @@ arch_thread_dump_info(void *info)
 }
 
 
+/** Sets up initial thread context and enters user space
+ */
+
 void
-arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
+arch_thread_enter_uspace(struct thread *t, addr entry, void *args)
 {
+	addr ustack_top = t->user_stack_base + STACK_SIZE;
+
 	dprintf("arch_thread_enter_uspace: entry 0x%lx, args %p, ustack_top 0x%lx\n",
 		entry, args, ustack_top);
 
@@ -219,7 +233,10 @@ arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
 
 	disable_interrupts();
 
-	i386_set_kstack(thread_get_current_thread()->kernel_stack_base + KSTACK_SIZE);
+	i386_set_tss_and_kstack(t->kernel_stack_base + KSTACK_SIZE);
+
+	// set the CPU dependent GDT entry for TLS
+	set_tls_context(t);
 
 	i386_enter_uspace(entry, args, ustack_top - 4);
 }

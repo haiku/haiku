@@ -105,19 +105,19 @@ arch_cpu_init2(kernel_args *ka)
 
 
 void
-i386_set_kstack(addr kstack)
+i386_set_tss_and_kstack(addr kstack)
 {
-	int curr_cpu = smp_get_current_cpu();
+	int currentCPU = smp_get_current_cpu();
 
-//	dprintf("i386_set_kstack: kstack 0x%x, cpu %d\n", kstack, curr_cpu);
-	if (tss_loaded[curr_cpu] == 0) {
-		short seg = (0x28 + 8*curr_cpu);
+//	dprintf("i386_set_kstack: kstack 0x%x, cpu %d\n", kstack, currentCPU);
+	if (tss_loaded[currentCPU] == 0) {
+		short seg = ((TSS_BASE_SEGMENT + currentCPU) << 3) | DPL_KERNEL;
 		asm("movw  %0, %%ax;"
 			"ltr %%ax;" : : "r" (seg) : "eax");
-		tss_loaded[curr_cpu] = 1;
+		tss_loaded[currentCPU] = 1;
 	}
 
-	tss[curr_cpu]->sp0 = kstack;
+	tss[currentCPU]->sp0 = kstack;
 //	dprintf("done\n");
 }
 
