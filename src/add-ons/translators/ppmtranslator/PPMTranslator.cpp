@@ -44,12 +44,12 @@
  #define B_CMYK32 ((color_space)0xC003) /* C[7:0]  M[7:0]  Y[7:0]  K[7:0]                                       */
 #endif
 
+#define PPM_TRANSLATOR_VERSION 100
 
 /* These three data items are exported by every translator. */
-char translatorName[] = "PPMTranslator";
-char translatorInfo[] = "Reads and writes images in the PPM file format. http://www.be.com/";
-int32 translatorVersion = 100; /* format is revision+minor*10+major*100 */
-
+char translatorName[] = "PPM Images";
+char translatorInfo[] = "PPM image translator v1.0.0, " __DATE__;
+int32 translatorVersion = PPM_TRANSLATOR_VERSION; /* format is revision+minor*10+major*100 */
 
 /*	Be reserves all codes with non-lowecase letters in them.	*/
 /*	Luckily, there is already a reserved code for PPM. If you	*/
@@ -59,14 +59,14 @@ int32 translatorVersion = 100; /* format is revision+minor*10+major*100 */
 
 /* These two data arrays are a really good idea to export from Translators, but not required. */
 translation_format inputFormats[] = {
-	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap Format (PPMHandler)" },
-	{	PPM_TYPE, B_TRANSLATOR_BITMAP, 0.3, 0.8, "image/x-ppm", "PPM portable pixmap format" },
+	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap image" },
+	{	PPM_TYPE, B_TRANSLATOR_BITMAP, 0.3, 0.8, "image/x-portable-pixmap", "PPM image" },
 	{	0, 0, 0, 0, "\0", "\0" }
 };		/*	optional (else Identify is always called)	*/
 
 translation_format outputFormats[] = {
-	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap Format (PPMHandler)" },
-	{	PPM_TYPE, B_TRANSLATOR_BITMAP, 0.3, 0.8, "image/x-ppm", "PPM portable pixmap format" },
+	{	B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP, 0.4, 0.8, "image/x-be-bitmap", "Be Bitmap image" },
+	{	PPM_TYPE, B_TRANSLATOR_BITMAP, 0.3, 0.8, "image/x-portable-pixmap", "PPM image" },
 	{	0, 0, 0, 0, "\0", "\0" }
 };	/*	optional (else Translate is called anyway)	*/
 
@@ -256,14 +256,14 @@ Identify(	/*	required	*/
 		outInfo->type = PPM_TYPE;
 		outInfo->quality = 0.3;		/* no alpha, etc */
 		outInfo->capability = 0.8;	/* we're pretty good at PPM reading, though */
-		strcpy(outInfo->name, "PPM portable pixmap format");
-		strcpy(outInfo->MIME, "image/x-ppm");
+		strcpy(outInfo->name, "PPM image");
+		strcpy(outInfo->MIME, "image/x-portable-pixmap");
 	}
 	else {
 		outInfo->type = B_TRANSLATOR_BITMAP;
 		outInfo->quality = 0.4;		/* B_TRANSLATOR_BITMAP can do alpha, at least */
 		outInfo->capability = 0.8;	/* and we might not know many variations thereof */
-		strcpy(outInfo->name, "Be Bitmap Format (PPMHandler)");
+		strcpy(outInfo->name, "Be Bitmap image");
 		strcpy(outInfo->MIME, "image/x-be-bitmap");	/* this is the MIME type of B_TRANSLATOR_BITMAP */
 	}
 	return B_OK;
@@ -451,12 +451,12 @@ public:
 				mMenu->AddItem(new BMenuItem("RGB 5:5:5 16 bits big-endian", CSMessage(B_RGB15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGBA 5:5:5:1 16 bits big-endian", CSMessage(B_RGBA15_BIG)));
 				mMenu->AddItem(new BMenuItem("RGB 5:6:5 16 bits big-endian", CSMessage(B_RGB16)));
-				mField = new BMenuField(BRect(20,70,180,90), "Color Space Field", "Color Space", mMenu);
+				mField = new BMenuField(BRect(10,110,190,130), "Color Space Field", "Input Color Space", mMenu);
 				mField->SetViewColor(ViewColor());
 				AddChild(mField);
 				SelectColorSpace(g_settings.out_space);
 				BMessage * msg = new BMessage(CHANGE_ASCII);
-				mAscii = new BCheckBox(BRect(20,45,180,62), "Write ASCII", "Write ASCII", msg);
+				mAscii = new BCheckBox(BRect(10,135,170,155), "Write ASCII", "Write ASCII", msg);
 				if (g_settings.write_ascii) {
 					mAscii->SetValue(1);
 				}
@@ -476,13 +476,32 @@ public:
 virtual	void Draw(
 				BRect area)
 			{
-				area = area; /* silence compiler */
 				SetFont(be_bold_font);
 				font_height fh;
 				GetFontHeight(&fh);
-				char str[100];
-				sprintf(str, "PPMTranslator %.2f", (float)translatorVersion/100.0);
-				DrawString(str, BPoint(fh.descent+1, fh.ascent+fh.descent*2+fh.leading));
+				float xbold, ybold;
+				xbold = fh.descent + 1;
+				ybold = fh.ascent + fh.descent * 2 + fh.leading;
+	
+				char title[] = "OpenBeOS PPM Image Translator";
+				DrawString(title, BPoint(xbold, ybold));
+	
+				SetFont(be_plain_font);
+				font_height plainh;
+				GetFontHeight(&plainh);
+				float yplain;
+				yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
+	
+				char detail[100];
+				int ver = static_cast<int>(translatorVersion);
+				sprintf(detail, "Version %d.%d.%d %s", ver / 100, (ver / 10) % 10,
+					ver % 10, __DATE__);
+				DrawString(detail, BPoint(xbold, yplain + ybold));
+
+				DrawString("Based on PPMTranslator sample code",
+					BPoint(xbold, yplain * 3 + ybold));
+				DrawString("Sample code copyright 1999, Be Incorporated",
+					BPoint(xbold, yplain * 4 + ybold));
 			}
 virtual	void MessageReceived(
 				BMessage * message)
@@ -577,7 +596,7 @@ MakeConfig(	/*	optional	*/
 	BView * * outView,
 	BRect * outExtent)
 {
-	PPMView * v = new PPMView(BRect(0,0,200,100), "PPMTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
+	PPMView * v = new PPMView(BRect(0,0,225,175), "PPMTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
 	*outView = v;
 	*outExtent = v->Bounds();
 	if (ioExtension) {

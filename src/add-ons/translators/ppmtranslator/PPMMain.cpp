@@ -39,7 +39,7 @@ main()
 {
 	BApplication app("application/x-vnd.hplus-ppm-translator");
 	BView * v = NULL;
-	BRect r(0,0,200,100);
+	BRect r(0,0,225,175);
 	if (MakeConfig(NULL, &v, &r)) {
 		BAlert * err = new BAlert("Error", "Something is wrong with the PPMTranslator!", "OK");
 		err->Go();
