@@ -1209,6 +1209,7 @@ int dosfs_rename(void *_vol, void *_odir, const char *oldname,
 #endif
 
 	notify_listener(B_ENTRY_MOVED, vol->id, odir->vnid, ndir->vnid, file->vnid, newname);
+
 	// update MIME information
 	if(!(file->mode & FAT_SUBDIR)) {
 		set_mime_type(file, newname);

@@ -905,19 +905,19 @@ const table_segment	sjistables[] = { {sjis00tou, 0x0000},
 	if ((str[0]&0x80) == 0)\
 		*uni_str++ = *str++;\
 	else if ((str[1] & 0xC0) != 0x80) {\
-        *uni_str++ = 0xfffd;\
+		*uni_str++ = 0xfffd;\
 		str+=1;\
 	} else if ((str[0]&0x20) == 0) {\
 		*uni_str++ = ((str[0]&31)<<6) | (str[1]&63);\
 		str+=2;\
 	} else if ((str[2] & 0xC0) != 0x80) {\
-        *uni_str++ = 0xfffd;\
+		*uni_str++ = 0xfffd;\
 		str+=2;\
 	} else if ((str[0]&0x10) == 0) {\
 		*uni_str++ = ((str[0]&15)<<12) | ((str[1]&63)<<6) | (str[2]&63);\
 		str+=3;\
 	} else if ((str[3] & 0xC0) != 0x80) {\
-        *uni_str++ = 0xfffd;\
+		*uni_str++ = 0xfffd;\
 		str+=3;\
 	} else {\
 		err_flag = 1;\
@@ -1054,13 +1054,13 @@ _utf8_to_sjis_bendian(
 	int32 dstLimit = *dstLen;
 	int32 srcCount = 0;
 	int32 dstCount = 0;
-	uint16 unicode;
-	uint16 *UNICODE = &unicode;
 
 	while ((srcCount < srcLimit) && (dstCount < dstLimit)) {
 		if ((srcCount + utf8_char_len(src[srcCount])) > srcLimit)
 			break; 
 
+		uint16 unicode;
+		uint16 *UNICODE = &unicode;
 		int				err_flag;
 		bool			multibyte = false;
 		const uint16	*table = NULL;	
