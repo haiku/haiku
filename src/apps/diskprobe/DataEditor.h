@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef DATA_EDITOR_H
 #define DATA_EDITOR_H
 
@@ -78,6 +78,7 @@ class DataEditor : public BLocker {
 					BMessenger progressMessenger, volatile bool *stop = NULL);
 
 		BFile &File() { return fFile; }
+		const entry_ref &AttributeRef() const { return fAttributeRef; }
 		const entry_ref &Ref() const { return fRef; }
 
 	private:
@@ -94,7 +95,7 @@ class DataEditor : public BLocker {
 
 		BObjectList<BMessenger> fObservers;
 
-		entry_ref	fRef;
+		entry_ref	fRef, fAttributeRef;
 		BFile		fFile;
 		const char	*fAttribute;
 		type_code	fType;

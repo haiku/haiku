@@ -399,17 +399,21 @@ status_t
 DataEditor::SetTo(BEntry &entry, const char *attribute)
 {
 	fSize = 0;
+	fLastChange = fFirstChange = NULL;
+	fChangesFromSaved = 0;
+	fView = NULL;
+	fRealViewOffset = 0;
+	fViewOffset = 0;
+	fRealViewSize = fViewSize = fBlockSize = 512;
 
 	struct stat stat;
-	stat.st_mode = 0;
-
 	status_t status = entry.GetStat(&stat);
 	if (status < B_OK)
 		return status;
 
-	bool isFileSystem = false;
+	entry.GetRef(&fAttributeRef);
 
-	fBlockSize = 512;
+	bool isFileSystem = false;
 
 	if (entry.IsDirectory()) {
 		// we redirect root directories to their volumes
@@ -443,7 +447,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fIsReadOnly = false;
 
 	entry.GetRef(&fRef);
-
 	fIsDevice = S_ISBLK(stat.st_mode) || S_ISCHR(stat.st_mode);
 
 	if (attribute != NULL)
@@ -452,8 +455,9 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		fAttribute = NULL;
 
 	if (IsAttribute()) {
+		BNode node(&fAttributeRef);
 		attr_info info;
-		status = fFile.GetAttrInfo(fAttribute, &info);
+		status = node.GetAttrInfo(fAttribute, &info);
 		if (status != B_OK) {
 			fFile.Unset();
 			return status;
@@ -488,11 +492,6 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		}
 	}
 
-	fLastChange = fFirstChange = NULL;
-	fChangesFromSaved = 0;
-	fView = NULL;
-	fRealViewOffset = 0;
-	fViewOffset = 0;
 	fRealViewSize = fViewSize = fBlockSize;
 	fNeedsUpdate = true;
 
@@ -921,9 +920,10 @@ status_t
 DataEditor::Update()
 {
 	ssize_t bytesRead;
-	if (IsAttribute())
-		bytesRead = fFile.ReadAttr(fAttribute, fType, fRealViewOffset, fView, fRealViewSize);
-	else
+	if (IsAttribute()) {
+		BNode node(&fAttributeRef);
+		bytesRead = node.ReadAttr(fAttribute, fType, fRealViewOffset, fView, fRealViewSize);
+	} else
 		bytesRead = fFile.ReadAt(fRealViewOffset, fView, fRealViewSize);
 
 	if (bytesRead < B_OK)
