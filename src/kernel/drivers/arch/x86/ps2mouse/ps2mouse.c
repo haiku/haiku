@@ -164,7 +164,7 @@ static ssize_t mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
 
    // wait until there is data to read
 	if(acquire_sem_etc(mouse_sem, 1, B_CAN_INTERRUPT, 0) ==
-	   ERR_SEM_INTERRUPTED) {
+	   EINTR) {
 		return 0;
 	} // if
 
@@ -190,7 +190,7 @@ static ssize_t mouse_read(void * cookie, off_t pos, void* buf, size_t *len)
 static ssize_t mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	*len = 0;
-	return ERR_VFS_READONLY_FS;
+	return EROFS;
 } // mouse_write
 
 /*
@@ -198,7 +198,7 @@ static ssize_t mouse_write(void * cookie, off_t pos, const void *buf, size_t *le
  */
 static int mouse_ioctl(void * cookie, uint32 op, void *buf, size_t len)
 {
-	return ERR_INVALID_ARGS;
+	return EINVAL;
 } // mouse_ioctl
 
 /*
