@@ -202,7 +202,7 @@ disk_super_block::Initialize(const char *diskName, off_t numBlocks, uint32 block
 	// constant).
 
 	while (true) {
-		num_ags = bitmapBlocks / blocks_per_ag;
+		num_ags = (bitmapBlocks + blocks_per_ag - 1) / blocks_per_ag;
 		if (num_ags > kDesiredAllocationGroups) {
 			if (ag_shift == 16)
 				break;
