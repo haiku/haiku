@@ -42,8 +42,8 @@ typedef enum
 	B_CURSOR_RESIZE_NESW,
 	B_CURSOR_RESIZE_NS,
 	B_CURSOR_RESIZE_EW,
-	B_CURSOR_APP,
 	B_CURSOR_OTHER,
+	B_CURSOR_APP,
 	B_CURSOR_INVALID
 } cursor_which;
 
@@ -73,7 +73,8 @@ public:
 	void RemoveCursor(cursor_which which);
 	status_t FindCursor(cursor_which which, BBitmap **cursor, BPoint *hotspot);
 	status_t FindCursor(cursor_which which, ServerCursor **cursor);
-	void Rename(const char *name);
+	void SetName(const char *name);
+	const char *GetName(void);
 };
 
 

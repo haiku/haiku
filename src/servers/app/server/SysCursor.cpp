@@ -340,12 +340,24 @@ status_t CursorSet::FindCursor(cursor_which which, ServerCursor **cursor)
 }
 
 /*!
+	\brief Returns the name of the set
+	\return The name of the set
+*/
+const char *CursorSet::GetName(void)
+{
+	BString name;
+	if(FindString("name",&name)==B_OK)
+		return name.String();
+	return NULL;
+}
+
+/*!
 	\brief Renames the cursor set
 	\param name new name of the set.
 	
 	This function will fail if given a NULL name
 */
-void CursorSet::Rename(const char *name)
+void CursorSet::SetName(const char *name)
 {
 	if(!name)
 		return;
