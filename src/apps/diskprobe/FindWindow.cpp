@@ -39,6 +39,7 @@ class FindTextView : public BTextView {
 		virtual void TargetedByScrollView(BScrollView *view);
 
 		status_t SetMode(find_mode mode);
+		void SetData(BMessage &message);
 		void GetData(BMessage &message);
 
 		virtual void KeyDown(const char *bytes, int32 numBytes);
@@ -49,6 +50,8 @@ class FindTextView : public BTextView {
 
 	private:
 		void HexReformat(int32 oldCursor, int32 &newCursor);
+		status_t GetHexFromData(const uint8 *in, size_t inSize, char **_hex, size_t *_hexSize);
+		status_t GetDataFromHex(const char *text, size_t textLength, uint8 **_data, size_t *_dataSize);
 
 		BScrollView	*fScrollView;
 		find_mode	fMode;
@@ -230,6 +233,64 @@ FindTextView::KeyDown(const char *bytes, int32 numBytes)
 
 
 status_t
+FindTextView::GetHexFromData(const uint8 *in, size_t inSize, char **_hex, size_t *_hexSize)
+{
+	char *hex = (char *)malloc(inSize * 3 + 1);
+	if (hex == NULL)
+		return B_NO_MEMORY;
+
+	const char *text = Text();
+	char *out = hex;
+	for (uint32 i = 0; i < inSize; i++) {
+		out += sprintf(out, "%02x", *(unsigned char *)(text + i));
+	}
+	out[0] = '\0';
+	
+	*_hex = hex;
+	*_hexSize = out + 1 - hex;
+	return B_OK;
+}
+
+
+status_t 
+FindTextView::GetDataFromHex(const char *text, size_t textLength, uint8 **_data, size_t *_dataSize)
+{
+	uint8 *data = (uint8 *)malloc(textLength);
+	if (data == NULL)
+		return B_NO_MEMORY;
+
+	size_t dataSize = 0;
+	uint8 hiByte = 0;
+	bool odd = false;
+	for (uint32 i = 0; i < textLength; i++) {
+		char c = text[i];
+		int32 number;
+		if (c >= 'A' && c <= 'F')
+			number = c + 10 - 'A';
+		else if (c >= 'a' && c <= 'f')
+			number = c + 10 - 'a';
+		else if (c >= '0' && c <= '9')
+			number = c - '0';
+		else
+			continue;
+
+		if (!odd)
+			hiByte = (number << 4) & 0xf0;
+		else
+			data[dataSize++] = hiByte | (number & 0x0f);
+
+		odd = !odd;
+	}
+	if (odd)
+		data[dataSize++] = hiByte;
+
+	*_data = data;
+	*_dataSize = dataSize;
+	return B_OK;
+}
+
+
+status_t
 FindTextView::SetMode(find_mode mode)
 {
 	if (fMode == mode)
@@ -238,24 +299,27 @@ FindTextView::SetMode(find_mode mode)
 	if (mode == kHexMode) {
 		// convert text to hex mode
 
-		int32 length = TextLength();
-		char *hex = (char *)malloc(length * 3 + 1);
-		if (hex == NULL)
+		char *hex;
+		size_t hexSize;
+		if (GetHexFromData((const uint8 *)Text(), TextLength(), &hex, &hexSize) < B_OK)
 			return B_NO_MEMORY;
 
 		fMode = mode;
 
-		const char *text = Text();
-		char *out = hex;
-		for (int32 i = 0; i < length; i++) {
-			out += sprintf(out, "%02x", *(unsigned char *)(text + i));
-		}
-		out[0] = '\0';
-		SetText(hex);
+		SetText(hex, hexSize);
 		free(hex);
 	} else {
-		// ToDo: convert to ascii
-		return B_ERROR;
+		// convert hex to ascii
+		
+		uint8 *data;
+		size_t dataSize;
+		if (GetDataFromHex(Text(), TextLength(), &data, &dataSize) < B_OK)
+			return B_NO_MEMORY;
+
+		fMode = mode;
+
+		SetText((const char *)data, dataSize);
+		free(data);
 	}
 
 	return B_OK;	
@@ -263,10 +327,38 @@ FindTextView::SetMode(find_mode mode)
 
 
 void
+FindTextView::SetData(BMessage &message)
+{
+	uint8 *data;
+	ssize_t dataSize;
+	if (message.FindData("data", B_RAW_TYPE, (const void **)&data, &dataSize) != B_OK)
+		return;
+
+	if (fMode == kHexMode) {
+		char *hex;
+		size_t hexSize;
+		if (GetHexFromData((const uint8 *)Text(), TextLength(), &hex, &hexSize) < B_OK)
+			return;
+
+		SetText(hex, hexSize);
+		free(hex);
+	} else
+		SetText((char *)data, dataSize);
+}
+
+
+void
 FindTextView::GetData(BMessage &message)
 {
 	if (fMode == kHexMode) {
-		// ToDo: ...
+		// convert hex-text to real data
+		uint8 *data;
+		size_t dataSize;
+		if (GetDataFromHex(Text(), TextLength(), &data, &dataSize) != B_OK)
+			return;
+
+		message.AddData("data", B_RAW_TYPE, data, dataSize);
+		free(data);
 	} else 
 		message.AddData("data", B_RAW_TYPE, Text(), TextLength());
 }
@@ -288,7 +380,7 @@ FindWindow::FindWindow(BRect rect, BMessenger &target)
 	fMenu = new BPopUpMenu("mode");
 	BMessage *message;
 	BMenuItem *item;
-	fMenu->AddItem(item = new BMenuItem("String", message = new BMessage(kMsgFindMode)));
+	fMenu->AddItem(item = new BMenuItem("Text", message = new BMessage(kMsgFindMode)));
 	item->SetMarked(true);
 	message->AddInt8("mode", kAsciiMode);
 	fMenu->AddItem(item = new BMenuItem("Hexadecimal", message = new BMessage(kMsgFindMode)));
