@@ -219,6 +219,7 @@ int_io_interrupt_handler(int vector)
 	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list
 		|| io_vectors[vector].handler_list.next == NULL) {
 		dprintf("unhandled io interrupt %d\n", vector);
+		release_spinlock(&io_vectors[vector].vector_lock);
 		return B_UNHANDLED_INTERRUPT;
 	}
 
