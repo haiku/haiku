@@ -108,7 +108,7 @@ void MediaWriter::NodeRegistered(void)
 	// now we can do this
 	input.node = Node();
 	input.destination.id = 0;
-	input.destination.port = input.node.port;
+	input.destination.port = input.node.port; // same as ControlPort()
 	
 	// creates the parameter web and starts the looper thread
 	AbstractFileInterfaceNode::NodeRegistered();
@@ -420,8 +420,28 @@ status_t MediaWriter::Connected(
 		delete group;
 	}
 
-	// XXX: set the latency here?
-	// SetEventLatency(latency);
+	// compute the latency or just guess
+	if (GetCurrentFile() != 0) {
+		bigtime_t start, end;
+		uint8 * data = new uint8[input.format.u.multistream.max_chunk_size]; // <- buffer group buffer size
+		ssize_t bytesWritten = 0;
+		{ // timed section
+			start = TimeSource()->RealTime();
+			bytesWritten = GetCurrentFile()->Write(data,input.format.u.multistream.max_chunk_size);
+			end = TimeSource()->RealTime();
+		}
+		delete data;
+		GetCurrentFile()->Seek(-bytesWritten,SEEK_CUR); // put it back where we found it
+	
+		fInternalLatency = end - start;
+		
+		fprintf(stderr,"  internal latency from disk write = %i\n",fInternalLatency);
+	} else {
+		fInternalLatency = 500; // just guess
+		fprintf(stderr,"  internal latency guessed = %i\n",fInternalLatency);
+	}
+	
+	SetEventLatency(fInternalLatency);
 
 	// record the agreed upon values
 	input.source = producer;
@@ -486,8 +506,8 @@ status_t MediaWriter::SeekTagRequested(
 				uint32 * out_flags)
 {
 	fprintf(stderr,"MediaWriter::SeekTagRequested\n");
-	BBufferConsumer::SeekTagRequested(destination,in_target_time,in_flags,
-									out_seek_tag,out_tagged_time,out_flags);
+	return BBufferConsumer::SeekTagRequested(destination,in_target_time,in_flags,
+											out_seek_tag,out_tagged_time,out_flags);
 }
 
 // -------------------------------------------------------- //
@@ -505,6 +525,14 @@ status_t MediaWriter::HandleBuffer(
 {
 	fprintf(stderr,"MediaWriter::HandleBuffer\n");
 	BBuffer * buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
+	if (buffer == 0) {
+		fprintf(stderr,"<- B_BAD_VALUE\n");
+		return B_BAD_VALUE;
+	}
+	if (buffer->Header()->destination != input.destination.id) {
+		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
+		return B_MEDIA_BAD_DESTINATION;
+	}
 	WriteFileBuffer(buffer);
 	buffer->Recycle();
 	return B_OK;
@@ -575,6 +603,8 @@ status_t MediaWriter::WriteFileBuffer(
 		fprintf(stderr,"<- B_NO_INIT\n");
 		return B_NO_INIT;
 	}
+	fprintf(stderr,"  writing %i bytes at %i\n",
+			buffer->SizeUsed(),GetCurrentFile()->Position());
 	ssize_t bytesWriten = GetCurrentFile()->Write(buffer->Data(),buffer->SizeUsed());
 	if (bytesWriten < 0) {
 		fprintf(stderr,"<- B_FILE_ERROR\n");

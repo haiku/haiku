@@ -184,7 +184,6 @@ private:
 		bool fInputEnabled;
 		
 		BBufferGroup * fBufferGroup;
-		bigtime_t fDownstreamLatency;
 		bigtime_t fInternalLatency;
 		// this is computed from the real (negotiated) chunk size and bit rate,
 		// not the defaults that are in the parameters
