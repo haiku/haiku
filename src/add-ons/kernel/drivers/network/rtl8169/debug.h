@@ -23,8 +23,10 @@
 
 #ifdef DEBUG
 	#define TRACE(a...) dprintf("rtl8169: " a)
+	#define ASSERT(a)	if (a) ; else panic("rtl8169: ASSERT failed, " #a)
 #else
 	#define TRACE(a...)
+	#define ASSERT(a...)
 #endif
 
 #define ERROR(a...) dprintf("rtl8169: ERROR " a)
