@@ -166,6 +166,7 @@ SharedLibrary "bind" :
 	# private functions
 	arc4random.c
 	ethers.c
+	linkaddr.c
 	pthread_emu.c
 	strsep.c
 ;
