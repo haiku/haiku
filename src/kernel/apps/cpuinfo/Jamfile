@@ -1,20 +1,3 @@
 SubDir OBOS_TOP src kernel apps cpuinfo ;
 
-KernelObjects
-	<$(SOURCE_GRIST)>main.c
-	:
-	-fpic
-	;
-
-KernelLd cpuinfo :
-	libglue2.o
-	<$(SOURCE_GRIST)>main.o
-	libroot.so
-	:
-	../../ldscripts/$(OBOS_ARCH)/app.ld
-	:
-	:
-	:
-	bin/cpuinfo
-	;
-
+KernelObjects <$(SOURCE_GRIST)>main.c : -fpic -Wno-unused ;
