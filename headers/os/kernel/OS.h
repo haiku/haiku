@@ -547,9 +547,7 @@ typedef struct {
 	int32			max_teams;
 	int32			used_teams;
 
-//	ToDo: B_FILE_NAME_LENGTH is currently not defined at this point
-//	char			kernel_name[B_FILE_NAME_LENGTH];		/* name of kernel */
-	char			kernel_name[256];
+	char			kernel_name[B_FILE_NAME_LENGTH];		/* name of kernel */
 	char			kernel_build_date[B_OS_NAME_LENGTH];	/* date kernel built */
 	char			kernel_build_time[B_OS_NAME_LENGTH];	/* time kernel built */
 	int64			kernel_version;             /* version of this kernel */
