@@ -47,8 +47,12 @@ dump_run_q(int argc, char **argv)
 }
 
 
+/** Enqueues the thread to the run queue.
+ *	Note: THREAD_LOCK must be held when entering this function
+ */
+
 void
-thread_enqueue_run_q(struct thread *t) //XXX no locks? is this save?
+thread_enqueue_run_q(struct thread *t)
 {
 	struct thread *curr, *prev;
 	
@@ -93,7 +97,10 @@ thread_set_priority(thread_id id, int32 priority)
 	if (t->id == id) {
 		// it's ourself, so we know we aren't in the run queue, and we can manipulate
 		// our structure directly
-		retval = t->priority; //XXX is this really save? can't we get preempted right here?
+		retval = t->priority;
+			// note that this might not return the correct value if we are preempted
+			// here, and another thread changes our priority before the next line is
+			// executed
 		t->priority = priority;
 	} else {
 		int state = disable_interrupts();
