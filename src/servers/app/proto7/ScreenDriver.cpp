@@ -20,7 +20,6 @@
 #include "ScreenDriver.h"
 #include "ServerProtocol.h"
 #include "ServerBitmap.h"
-#include "ServerCursor.h"
 #include "SystemPalette.h"
 #include "ColorUtils.h"
 #include "PortLink.h"
@@ -682,6 +681,212 @@ printf("ScreenDriver::SetScreen(%lu}\n",space);
 		}
 	}
 	Unlock();
+}
+
+
+// Currently only supports line thickness 1 and no pattern
+void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+{
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*ry);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int startx, endx;
+	int startQuad, endQuad;
+	bool useQuad1, useQuad2, useQuad3, useQuad4;
+	bool shortspan = false;
+
+	// Watch out for bozos giving us whacko spans
+	if ( (span >= 360) || (span <= -360) )
+	{
+	  StrokeEllipse(r,d,pat);
+	  return;
+	}
+
+	if ( span > 0 )
+	{
+		startQuad = (int)(angle/90)%4+1;
+		endQuad = (int)((angle+span)/90)%4+1;
+		startx = ROUND(.5*r.Width()*cos(angle*M_PI/180));
+		endx = ROUND(.5*r.Width()*cos((angle+span)*M_PI/180));
+	}
+	else
+	{
+		endQuad = (int)(angle/90)%4+1;
+		startQuad = (int)((angle+span)/90)%4+1;
+		endx = ROUND(.5*r.Width()*cos(angle*M_PI/180));
+		startx = ROUND(.5*r.Width()*cos((angle+span)*M_PI/180));
+	}
+
+	if ( startQuad != endQuad )
+	{
+		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
+		useQuad2 = (endQuad > 2) && ((startQuad < 2) || (startQuad > endQuad));
+		useQuad3 = (endQuad > 3) && ((startQuad < 3) || (startQuad > endQuad));
+		useQuad4 = (endQuad > 4) && ((startQuad < 4) || (startQuad > endQuad));
+	}
+	else
+	{
+		if ( (span < 90) && (span > -90) )
+		{
+			useQuad1 = false;
+			useQuad2 = false;
+			useQuad3 = false;
+			useQuad4 = false;
+			shortspan = true;
+		}
+		else
+		{
+			useQuad1 = (startQuad != 1);
+			useQuad2 = (startQuad != 2);
+			useQuad3 = (startQuad != 3);
+			useQuad4 = (startQuad != 4);
+		}
+	}
+
+	if ( useQuad1 || 
+	     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
+	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+		SetPixel(xc+x,yc+y,d->highcolor);
+	if ( useQuad2 || 
+	     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
+	     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
+		SetPixel(xc-x,yc+y,d->highcolor);
+	if ( useQuad3 || 
+	     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
+	     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
+		SetPixel(xc-x,yc-y,d->highcolor);
+	if ( useQuad4 || 
+	     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		SetPixel(xc+x,yc-y,d->highcolor);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetPixel(xc+x,yc+y,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
+		     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
+			SetPixel(xc-x,yc+y,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
+		     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
+			SetPixel(xc-x,yc-y,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetPixel(xc+x,yc-y,d->highcolor);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && ((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetPixel(xc+x,yc+y,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && ((startQuad == 2) && (-x <= startx)) || ((endQuad == 2) && (-x >= endx))) || 
+		     (shortspan && (startQuad == 2) && (-x <= startx) && (-x >= endx)) ) 
+			SetPixel(xc-x,yc+y,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && ((startQuad == 3) && (-x >= startx)) || ((endQuad == 3) && (-x <= endx))) || 
+		     (shortspan && (startQuad == 3) && (-x >= startx) && (-x <= endx)) ) 
+			SetPixel(xc-x,yc-y,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && ((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetPixel(xc+x,yc-y,d->highcolor);
+	}
+}
+
+// Currently only supports line thickness 1 and no pattern
+void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
+{
+	double Ax, Bx, Cx, Dx;
+	double Ay, By, Cy, Dy;
+	int x, y;
+	int lastx=-1, lasty=-1;
+	double t;
+	double dt = .001;
+	double dt2, dt3;
+	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+
+	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
+	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
+	Cx = -3*pts[0].x + 3*pts[1].x;
+	Dx = pts[0].x;
+
+	Ay = -pts[0].y + 3*pts[1].y - 3*pts[2].y + pts[3].y;
+	By = 3*pts[0].y - 6*pts[1].y + 3*pts[2].y;
+	Cy = -3*pts[0].y + 3*pts[1].y;
+	Dy = pts[0].y;
+	
+	dt2 = dt * dt;
+	dt3 = dt2 * dt;
+	X = Dx;
+	dx = Ax*dt3 + Bx*dt2 + Cx*dt;
+	ddx = 6*Ax*dt3 + 2*Bx*dt2;
+	dddx = 6*Ax*dt3;
+	Y = Dy;
+	dy = Ay*dt3 + By*dt2 + Cy*dt;
+	ddy = 6*Ay*dt3 + 2*By*dt2;
+	dddy = 6*Ay*dt3;
+
+	lastx = -1;
+	lasty = -1;
+
+	for (t=0; t<=1; t+=dt)
+	{
+		x = ROUND(X);
+		y = ROUND(Y);
+		if ( (x!=lastx) || (y!=lasty) )
+			SetPixel(x,y,d->highcolor);
+		lastx = x;
+		lasty = y;
+
+		X += dx;
+		dx += ddx;
+		ddx += dddx;
+		Y += dy;
+		dy += ddy;
+		ddy += dddy;
+	}
 }
 
 // Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on

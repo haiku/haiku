@@ -72,8 +72,8 @@ public:
 	virtual void ObscureCursor(void);
 	virtual void SetCursor(ServerBitmap *cursor, const BPoint &spot);
 
-//	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
-//	virtual void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat);
+	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
+	virtual void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat);
 	virtual void StrokeEllipse(BRect r, LayerData *d, int8 *pat);
 	virtual void StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat);
 	virtual void StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true);
