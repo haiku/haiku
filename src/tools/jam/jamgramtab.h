@@ -26,6 +26,7 @@
 	{ "ignore", IGNORE_t },
 	{ "in", IN_t },
 	{ "include", INCLUDE_t },
+	{ "jumptoeof", JUMPTOEOF_t },
 	{ "local", LOCAL_t },
 	{ "on", ON_t },
 	{ "piecemeal", PIECEMEAL_t },

@@ -26,6 +26,7 @@
 %token IGNORE_t
 %token IN_t
 %token INCLUDE_t
+%token JUMPTOEOF_t
 %token LOCAL_t
 %token ON_t
 %token PIECEMEAL_t
@@ -106,6 +107,7 @@
 # define pfor( s,l,r )    	parse_make( compile_foreach,l,r,P0,s,S0,0 )
 # define pif( l,r,t )	  	parse_make( compile_if,l,r,t,S0,S0,0 )
 # define pincl( l )       	parse_make( compile_include,l,P0,P0,S0,S0,0 )
+# define pj2eof( )       	parse_make( compile_jumptoeof,P0,P0,P0,S0,S0,0 )
 # define plist( s )	  	parse_make( compile_list,P0,P0,P0,s,S0,0 )
 # define plocal( l,r,t )  	parse_make( compile_local,l,r,t,S0,S0,0 )
 # define pnull()	  	parse_make( compile_null,P0,P0,P0,S0,S0,0 )
@@ -159,6 +161,8 @@ rule	: _LBRACE_t block _RBRACE_t
 		{ $$.parse = $2.parse; }
 	| INCLUDE_t list _SEMIC_t
 		{ $$.parse = pincl( $2.parse ); }
+	| JUMPTOEOF_t _SEMIC_t
+		{ $$.parse = pj2eof( ); }
 	| arg lol _SEMIC_t
 		{ $$.parse = prule( $1.parse, $2.parse ); }
 	| arg assign list _SEMIC_t
