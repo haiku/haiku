@@ -64,7 +64,8 @@ enum {
 	B_REG_MIME_DELETE					= 'rgdl',
 	B_REG_MIME_GET_INSTALLED_TYPES		= 'rgit',
 	B_REG_MIME_GET_INSTALLED_SUPERTYPES	= 'rgis',
-	B_REG_MIME_UNSUPPORT_TYPES			= 'rgut',
+	B_REG_MIME_GET_SUPPORTING_APPS		= 'rgsa',
+	B_REG_MIME_UNSUPPORT_TYPES			= 'rgut',	//! \todo Remove once BAppFileInfo no longer uses it
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
