@@ -20,6 +20,8 @@ Server
 	ResourceManager.cpp
 	Jobs.cpp
 	BeUtils.cpp
+	Settings.cpp
+	ConfigWindow.cpp
 	;
 
 LinkSharedOSLibs 
