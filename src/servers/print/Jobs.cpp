@@ -82,7 +82,7 @@ Job::Job(const BEntry& job, BHandler* handler)
 			p = c; c ++;
 		}
 			// and get time from file name
-		fTime = atoi(p+1);
+		if (p) fTime = atoi(p+1);
     }
     
     	// start watching the node
@@ -179,7 +179,7 @@ bool Folder::AddJob(BEntry& entry) {
 	Job* job = new Job(entry, this);
 	if (job->InitCheck() == B_OK) {
 		fJobs.AddItem(job);
-		if (job->IsValid() && job->IsWaiting()) NotifyPrinter();
+		if (job->IsValid() && job->IsWaiting()) NotifyPrintServer();
 		return true;
 	} else {
 		job->Release();
@@ -227,7 +227,7 @@ void Folder::AttributeChanged(BMessage* msg) {
 		Job* job = Find(node);
 		if (job) {
 			job->UpdateAttribute();
-			if (job->IsValid() && job->IsWaiting()) NotifyPrinter();
+			if (job->IsValid() && job->IsWaiting()) NotifyPrintServer();
 		}
 	}
 }
@@ -252,7 +252,8 @@ void Folder::HandleNodeMonitorMessage(BMessage* msg) {
 	}
 }
 
-void Folder::NotifyPrinter() {
+// Notify print_server that there is a job file waiting for printing
+void Folder::NotifyPrintServer() {
 	be_app_messenger.SendMessage(PSRV_PRINT_SPOOLED_JOB);
 }
 
@@ -323,8 +324,6 @@ Job* Folder::GetNextJob() {
 	for (int i = 0; i < fJobs.CountItems(); i ++) {
 		Job* job = fJobs.ItemAt(i);
 		if (job->IsValid() && job->IsWaiting()) {
-			/*fJobs.RemoveItem(job);
-			job->StopNodeWatching();*/
 			job->Acquire(); return job;
 		}
 	}

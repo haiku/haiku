@@ -40,15 +40,16 @@
 #include <String.h>
 #include <StorageDefs.h>
 
-enum JobStatus {
-	kWaiting,     // to be processed
-	kProcessing,  // processed by a printer add-on
-	kFailed,      // failed to process the job file
-	kUnknown,     // other
+enum JobStatus {  // job file
+	kWaiting,     //   to be processed
+	kProcessing,  //   processed by a printer add-on
+	kFailed,      //   failed to process the job file
+	kUnknown,     //   other
 };
 
 class Printer;
 
+// Job file in printer folder
 class Job : public Object {
 private:
 	BHandler* fHandler;   // the handler that watches the node of the job file
@@ -80,7 +81,7 @@ public:
 	bool IsWaiting() const            { return fStatus == kWaiting; }
 	Printer* GetPrinter() const       { return fPrinter; }
 
-	// modification
+	// modifiers
 	void SetPrinter(Printer* p) { fPrinter = p; }
 	void SetStatus(JobStatus s, bool writeToNode = true);
 	void UpdateAttribute();
@@ -91,6 +92,8 @@ public:
 };
 
 
+// Printer folder watches creation, deletion and attribute changes of job files
+// and notifies print_server if a job is waiting for processing
 class Folder : public BHandler {
 	typedef BHandler inherited;
 	
@@ -109,7 +112,7 @@ private:
 	void AttributeChanged(BMessage* msg);
 	void HandleNodeMonitorMessage(BMessage* msg);
 
-	void NotifyPrinter();
+	void NotifyPrintServer();
 
 	void SetupJobList();
 	
@@ -118,6 +121,8 @@ public:
 	~Folder();
 
 	void MessageReceived(BMessage* msg);
+
+	BDirectory* GetSpoolDir() { return &fSpoolDir; }
 
 		// Caller is responsible to set the status of the job appropriately
 		// and to release the object when done
