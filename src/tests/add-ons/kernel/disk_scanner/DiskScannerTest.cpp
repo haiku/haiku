@@ -43,7 +43,7 @@ print_partition_info(const char *prefix, const extended_partition_info &info)
 	printf("%sFS short name:  `%s'\n", prefix, info.file_system_short_name);
 	printf("%sFS long name:   `%s'\n", prefix, info.file_system_long_name);
 	printf("%svolume name:    `%s'\n", prefix, info.volume_name);
-	printf("%smounted at:     `%s'\n", prefix, info.mounted_at);
+//	printf("%smounted at:     `%s'\n", prefix, info.mounted_at);
 	printf("%sFS flags:       0x%lx\n", prefix, info.file_system_flags);
 }
 
