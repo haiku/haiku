@@ -532,7 +532,10 @@ status_t
 translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 	PNGTranslatorSettings &settings)
 {
-	status_t result = B_NO_TRANSLATOR;
+	status_t result = B_ERROR;
+		// if a libpng errors before this is set
+		// to a different value, the above is what
+		// will be returned from this function
 	
 	bool bheaderonly, bdataonly;
 	bheaderonly = settings.SetGetHeaderOnly();
@@ -547,24 +550,18 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 	while (ppng == NULL) {
 		// create PNG read pointer with default error handling routines
 		ppng = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-		if (!ppng) {
-			result = B_ERROR;
+		if (!ppng)
 			break;
-		}
 		// alocate / init memory for image information
 		pinfo = png_create_info_struct(ppng);
-		if (!pinfo) {
-			result = B_ERROR;
+		if (!pinfo)
 			break;
-		}
 		// set error handling
-		if (setjmp(png_jmpbuf(ppng))) {
+		if (setjmp(png_jmpbuf(ppng)))
 			// When an error occurs in libpng, it uses
 			// the longjmp function to continue execution
 			// from this point
-			result = B_ERROR;
 			break;
-		}
 		
 		// set read callback function
 		png_set_read_fn(ppng, static_cast<void *>(inSource), pngcb_read_data);
@@ -657,15 +654,15 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 				png_read_row(ppng, prow, NULL);
 				outDestination->Write(prow, width * kbytes);
 			}
-			
-			// Here would be the place to call
-			// png_read_end(). However, since this program
-			// is not interested in PNG comments or
-			// date / time info and errors found by
-			// png_read_end() will cause translation to fail,
-			// png_read_end() is not called here.
-			
 			result = B_OK;
+				// Set OK status here, because, in the event of
+				// an error, png_read_end() will longjmp to error
+				// handler above and not execute lines below it
+						
+			// finish reading, pass NULL for info because I
+			// don't need the extra data
+			png_read_end(ppng, NULL);
+			
 			break;
 			
 		} else {
@@ -686,12 +683,15 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 				result = B_NO_MEMORY;
 			else {
 				png_read_image(ppng, prows);
-				png_read_end(ppng, NULL);
 				
 				for (png_uint_32 i = 0; i < height; i++)
 					outDestination->Write(prows[i], width * kbytes);
-				
 				result = B_OK;
+					// Set OK status here, because, in the event of
+					// an error, png_read_end() will longjmp to error
+					// handler above and not execute lines below it
+				
+				png_read_end(ppng, NULL);
 			}
 			
 			break;
