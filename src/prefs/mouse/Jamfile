@@ -1,5 +1,11 @@
 SubDir OBOS_TOP src prefs mouse ;
 
+if $(COMPILE_FOR_R5) {
+        SubDirC++Flags -DCOMPILE_FOR_R5 ;
+}
+
+SubDirC++Flags -fmultiple-symbol-spaces ;
+
 UsePrivateHeaders input ;
 
 AddResources Mouse : Mouse.rdef ;
