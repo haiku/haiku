@@ -145,8 +145,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 			break;
 		case B_RGB32_LITTLE:
 			colour_depth2 = 32;
-			nv_dac2_mode(BPP32DIR, 1.0);
-			nv_crtc2_depth(BPP32DIR);
+			nv_dac2_mode(BPP32, 1.0);
+			nv_crtc2_depth(BPP32);
 			break;
 		}
 

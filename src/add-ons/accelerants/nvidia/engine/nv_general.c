@@ -935,9 +935,13 @@ status_t nv_general_bios_to_powergraphics()
 	//fixme: FX5600 cards have a second postdivider for the pixel PLL VCO.
 	//find it and program it, instead of relying on the cards BIOS...
 	//BIOS tested: FX5600 BIOS V4.31.20.38.00
-	/* non-NV31 cards have no second postdivider */
+
+	//UPDATE: create new pllsetup (all 4 PLL's) for NV31(FX5600) and NV36(FX5700)
+	//these cards have extra N and M dividers at offset $70 above primary dividers.
+
+	/* non-NV31/NV36 cards have no second postdivider */
 	si->pixpll_vco_div2 = 1;
-	if (si->ps.card_type == NV31)
+	if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
 	{
 		/* only reading b0-7, as the rest seems to be write-only */
 		uint16 v_display = CRTCR(VDISPE) + 1;

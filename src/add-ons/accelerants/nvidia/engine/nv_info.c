@@ -526,7 +526,7 @@ static void getstrap_arch_nv10_20_30(void)
 	default:
 		LOG(8,("INFO: (Memory detection) Strapinfo value is: $%08x\n", strapinfo));
 
-		switch ((strapinfo & 0x0ff00000) >> 20)
+		switch ((strapinfo & 0x1ff00000) >> 20)
 		{
 		case 2:
 			si->ps.memory_size = 2;
@@ -548,6 +548,9 @@ static void getstrap_arch_nv10_20_30(void)
 			break;
 		case 128:
 			si->ps.memory_size = 128;
+			break;
+		case 256:
+			si->ps.memory_size = 256;
 			break;
 		default:
 			si->ps.memory_size = 16;
@@ -578,6 +581,7 @@ static void getstrap_arch_nv10_20_30(void)
 	case 0x031010de:
 	case 0x032010de:
 	case 0x033010de:
+	case 0x034010de:
 	/* Varisys cards: */
 	case 0x35001888:
 		if (strapinfo & 0x00400000) si->ps.f_ref = 27.00000;
@@ -600,6 +604,7 @@ static void getstrap_arch_nv10_20_30(void)
 	case 0x031010de:
 	case 0x032010de:
 	case 0x033010de:
+	case 0x034010de:
 	/* Varisys cards: */
 	case 0x35001888:
 		si->ps.secondary_head = true;

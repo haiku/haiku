@@ -115,5 +115,5 @@ status_t nv_release_bes(void);
 status_t i2c_sec_tv_adapter(void);
 
 /*driver structures and enums*/
-enum{BPP8=0,BPP15=1,BPP16=2,BPP24=3,BPP32DIR=4,BPP32=7};
+enum{BPP8=0,BPP15=1,BPP16=2,BPP24=3,BPP32=4};
 enum{DS_CRTC1DAC_CRTC2MAVEN, DS_CRTC1MAVEN_CRTC2DAC, DS_CRTC1CON1_CRTC2CON2, DS_CRTC1CON2_CRTC2CON1};
