@@ -80,8 +80,7 @@ BPositionIO) begin reading and writing. How the position argument is understood 
 	<LI><P>
 	SEEK_SET. The position passed is an offset from the beginning of allocated memory; in other 
 	words, the current position is set to position. For this mode, position should be a positive 
-	value, but the BMemoryIO object doesn't do any checking, so it is possible to seek to a negative position
-	(but any consequent Read() or Write() calls will fail).
+	value.
 	 </P></LI>
 	 <LI><P>
 	SEEK_CUR. The position argument is an offset from the current position; the value of the 
@@ -100,7 +99,7 @@ Seek() Always return the new position.
 
 <A NAME="implement"></A><H2>BMemoryIO Implementation:</H2>
 
-<P>The implementation of the BMessageFilter is simple.  It consist in implementing memory read/write on a buffer
+<P>The implementation of the BMemoryIO is simple.  It consist in implementing memory read/write on a buffer
 with an index.</P>
 
 </BODY>
