@@ -116,17 +116,8 @@ AppServer::AppServer(void)
 
 	// Create the cursor manager. Object declared in CursorManager.cpp
 	cursormanager=new CursorManager();
-
-	// Default cursor data stored in CursorData.cpp
-	
-	// TODO: fix the cursor display
-	extern int8 default_cursor_data[];
-	ServerCursor *sc=new ServerCursor(default_cursor_data);
-
-	cursormanager->AddCursor(sc);
-	cursormanager->ChangeCursor(B_CURSOR_DEFAULT, sc->ID());
 	cursormanager->SetCursor(B_CURSOR_DEFAULT);
-
+	
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	bitmapmanager=new BitmapManager();
 

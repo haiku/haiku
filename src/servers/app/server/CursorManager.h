@@ -29,25 +29,10 @@
 
 #include <List.h>
 #include <OS.h>
+#include <SysCursor.h>
 #include "TokenHandler.h"
 
 class ServerCursor;
-
-// Duplicate definition - do NOT include <Cursor.h> or errors will abound...
-// We do this so that we don't have to modify R5's headers in order to compile
-typedef enum
-{
-	B_CURSOR_DEFAULT=0,
-	B_CURSOR_TEXT,
-	B_CURSOR_MOVE,
-	B_CURSOR_DRAG,
-	B_CURSOR_RESIZE,
-	B_CURSOR_RESIZE_NWSE,
-	B_CURSOR_RESIZE_NESW,
-	B_CURSOR_RESIZE_NS,
-	B_CURSOR_RESIZE_EW,
-	B_CURSOR_OTHER
-} cursor_which;
 
 /*!
 	\class CursorManager CursorManager.h

@@ -28,6 +28,7 @@
 #include "Desktop.h"
 #include "CursorManager.h"
 #include "ServerCursor.h"
+#include "CursorData.h"
 #include <Errors.h>
 #include <string.h>
 
@@ -44,15 +45,39 @@ CursorManager::CursorManager(void)
 	_tokenizer.ExcludeValue(B_ERROR);
 
 	// Set system cursors to "unassigned"
-	_defaultcsr=NULL;
-	_textcsr=NULL;
+	ServerCursor *cdefault=new ServerCursor(default_cursor_data);
+	AddCursor(cdefault);
+	_defaultcsr=cdefault;
+	
+	ServerCursor *ctext=new ServerCursor(default_text_data);
+	AddCursor(ctext);
+	_textcsr=ctext;
+
+	ServerCursor *cdrag=new ServerCursor(default_drag_data);
+	AddCursor(cdrag);
+	_dragcsr=cdrag;
+
 	_movecsr=NULL;
-	_dragcsr=NULL;
-	_resizecsr=NULL;
-	_resize_nwse_csr=NULL;
-	_resize_nesw_csr=NULL;
-	_resize_ns_csr=NULL;
-	_resize_ew_csr=NULL;
+
+	ServerCursor *cresize=new ServerCursor(default_resize_data);
+	AddCursor(cresize);
+	_resizecsr=cresize;
+
+	ServerCursor *cresizeew=new ServerCursor(default_resize_ew_data);
+	AddCursor(cresizeew);
+	_resize_ew_csr=cresizeew;
+
+	ServerCursor *cresizenesw=new ServerCursor(default_resize_nesw_data);
+	AddCursor(cresizenesw);
+	_resize_nesw_csr=cresizenesw;
+
+	ServerCursor *cresizens=new ServerCursor(default_resize_ns_data);
+	AddCursor(cresizens);
+	_resize_ns_csr=cresizens;
+
+	ServerCursor *cresizenwse=new ServerCursor(default_resize_nwse_data);
+	AddCursor(cresizenwse);
+	_resize_nwse_csr=cresizenwse;
 }
 
 //! Does all the teardown
