@@ -1,12 +1,13 @@
-/* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <syscalls.h>
 
 #include <unistd.h>
+#include <stdlib.h>
 #include <errno.h>
 
 
@@ -39,8 +40,24 @@ fchdir(int fd)
 char *
 getcwd(char *buffer, size_t size)
 {
-	int status = _kern_getcwd(buffer, size);
+	bool allocated = false;
+	status_t status;
+
+	if (buffer == NULL) {
+		buffer = malloc(size = PATH_MAX);
+		if (buffer == NULL) {
+			errno = B_NO_MEMORY;
+			return NULL;
+		}
+
+		allocated = true;
+	}
+
+	status = _kern_getcwd(buffer, size);
 	if (status < B_OK) {
+		if (allocated)
+			free(buffer);
+
 		errno = status;
 		return NULL;
 	}
