@@ -1,9 +1,12 @@
 SubDir OBOS_TOP src apps bin ;
 
+UsePrivateHeaders kernel ;
+
 # standard commands that don't need any additional library
 StdBinCommands
 	chop.c
 	clear.c
+	clockconfig.c
 #	csplit.c
 	driveinfo.c
 #	echo.c
