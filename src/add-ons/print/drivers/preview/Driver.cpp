@@ -117,9 +117,12 @@ config_job(BNode *spoolDir, BMessage *msg)
 char* 
 add_printer(char *printerName)
 {
+	status_t st;
 	PrinterDriver* driver;
 	driver = instanciate_driver(NULL);
-	if (driver->PrinterSetup(printerName) == B_OK) {
+	st = driver->PrinterSetup(printerName);
+	delete driver;
+	if (st == B_OK) {
 		return printerName; 
 	} else {
 		return NULL;
