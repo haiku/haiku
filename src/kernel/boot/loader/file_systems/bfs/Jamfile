@@ -6,6 +6,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
 
+SubDirC++Flags -fno-rtti ;
+
 KernelStaticLibrary boot_bfs :
 	bfs.cpp
 	Directory.cpp

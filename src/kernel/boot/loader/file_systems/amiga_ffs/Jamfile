@@ -6,6 +6,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 
 #SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems amiga_ffs ;
 
+SubDirC++Flags -fno-rtti ;
+
 KernelStaticLibrary boot_amiga_ffs :
 	amiga_ffs.cpp
 	Volume.cpp

@@ -2,6 +2,8 @@ SubDir OBOS_TOP src kernel boot platform openfirmware arch ppc ;
 
 SubDirHdrs $(OBOS_TOP) src kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 
+SubDirC++Flags -fno-rtti ;
+
 KernelStaticLibrary boot_platform_openfirmware_ppc :
 	arch_mmu.cpp
 	arch_cpu_asm.S

@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kernel boot platform openfirmware ;
 
+SubDirC++Flags -fno-rtti ;
+
 KernelMergeObject boot_platform_openfirmware.o :
 	<$(SOURCE_GRIST)>start.c
 	<$(SOURCE_GRIST)>openfirmware.c
