@@ -1512,6 +1512,8 @@ _get_thread_info(thread_id id, thread_info *info, size_t size)
 	if (t->state == B_THREAD_WAITING) {
 		if (t->sem_blocking == snooze_sem)
 			info->state = B_THREAD_ASLEEP;
+		else if (t->sem_blocking == t->msg.read_sem)
+			info->state = B_THREAD_RECEIVING;
 		else
 			info->state = B_THREAD_WAITING;
 	} else
@@ -1600,6 +1602,8 @@ _get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size
 		if (t->state == B_THREAD_WAITING) {
 			if (t->sem_blocking == snooze_sem)
 				info->state = B_THREAD_ASLEEP;
+			else if (t->sem_blocking == t->msg.read_sem)
+				info->state = B_THREAD_RECEIVING;
 			else
 				info->state = B_THREAD_WAITING;
 		} else
