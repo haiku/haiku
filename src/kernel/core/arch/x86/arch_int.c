@@ -185,13 +185,13 @@ i386_handle_trap(struct iframe frame)
 
 			asm("movl %%cr2, %0" : "=r" (cr2));
 
-			// get the old interrupt enable/disable state and restore to that
-			if (frame.flags & 0x200) {
-				dprintf("page_fault: enabling interrupts\n");
-				if (!kernel_startup)
-					dprintf("page_fault, but interrupts are disabled. touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
-				enable_interrupts();
+			// if the interrupts were disabled, and we are not running the kernel startup
+			// the page fault was not allowed to happen and we must panic
+			if (0 == (frame.flags & 0x200) && !kernel_startup) {
+				panic("page_fault, but interrupts were disabled. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
 			}
+			enable_interrupts();
+
 			ret = vm_page_fault(cr2, frame.eip,
 				(frame.error_code & 0x2) != 0,
 				(frame.error_code & 0x4) != 0,
