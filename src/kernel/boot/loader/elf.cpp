@@ -289,6 +289,22 @@ elf_load_image(Directory *directory, const char *path)
 	if (fd < 0)
 		return fd;
 
+	// check if this file has already been loaded
+
+	struct stat stat;
+	fstat(fd, &stat);
+
+	image = gKernelArgs.preloaded_images;
+	for (; image != NULL; image = image->next) {
+		if (image->inode == stat.st_ino) {
+			// file has already been loaded, no need to load it twice!
+			close(fd);
+			return B_OK;
+		}
+	}
+
+	// we still need to load it, so do it
+
 	image = (preloaded_image *)kernel_args_malloc(sizeof(preloaded_image));
 	if (image == NULL) {
 		close(fd);
@@ -298,6 +314,7 @@ elf_load_image(Directory *directory, const char *path)
 	status_t status = elf_load_image(fd, image);
 	if (status == B_OK) {
 		image->name = kernel_args_strdup(path);
+		image->inode = stat.st_ino;
 
 		// insert to kernel args
 		image->next = gKernelArgs.preloaded_images;
