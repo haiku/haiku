@@ -5,7 +5,12 @@ SimpleTest DriverSettingsTest
 	: be
 	;
 
+SimpleTest ParseDateTest
+	: ParseDateTest.cpp parsedate.cpp
+	;
+
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		driver_settings.c
+		parsedate.cpp
 	] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
