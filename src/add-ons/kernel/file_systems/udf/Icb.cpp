@@ -32,7 +32,17 @@ Icb::Icb(Volume *volume, long_address address)
 		error = fVolume->MapBlock(address, &block);
 		if (!error) {
 			icb_header *header = reinterpret_cast<icb_header*>(fData.SetTo(block));
-			PDUMP(header);
+			if (header->tag().id() == TAGID_FILE_ENTRY) {
+				file_icb_entry *entry = reinterpret_cast<file_icb_entry*>(header);
+				PDUMP(entry);
+				(void)entry;	// warning death
+			} else if (header->tag().id() == TAGID_EXTENDED_FILE_ENTRY) {
+				extended_file_icb_entry *entry = reinterpret_cast<extended_file_icb_entry*>(header);
+				PDUMP(entry);
+				(void)entry;	// warning death
+			} else {
+				PDUMP(header);
+			}
 			error = header->tag().init_check(address.block());
 		}
 	}		
