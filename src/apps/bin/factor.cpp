@@ -30,7 +30,6 @@
 #include <ctype.h>
 #include <errno.h>
 #include <getopt.h>
-#include <ktypes.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,32 +38,31 @@
 
 static	int		char_to_int(char in);
 static	uint64	to_uint64(char *input);
-static	int		Process(char *FromString);
-static	int		Factor(uint64 BigNumber, uint64 FactorBy);
-static	int		SuggestHelpMessage();
-static	int		WarnNotValid(char *NotValidString);
-static	int		usage(void);
-static	int		version(void);
+static	int		process_potential_number(char *fromString);
+static	int		factor_number(uint64 bigNumber, uint64 factorBy);
+static	int		suggest_help(void);
+static	int		warn_invalid(char *fromString);
+static	void	usage(void);
+static	void	version(void);
 
 #define MAX_INT_CALCULATED "18446744073709551615"	// a fairly big number, 2^64 minus 1
 #define MAX_TOKEN_LENGTH 20							// Hopefully we can change this upper limit in the future. ;)
 
-char* prog_name;
-bool SuggestHelp = false;
+char* progName;
+bool suggestHelp = false;
 
 
 static int
-char_to_int (char in)
+char_to_int(char in)
 {
 	if (in >= '0' && in <= '9')
 		return in - '0';
-
 	return(0);
 }
 
 
 static uint64
-to_uint64 (char *input)
+to_uint64(char *input)
 {
 	uint64 output = 0;
 	while (*input && isdigit (*input)) {
@@ -75,7 +73,7 @@ to_uint64 (char *input)
 
 
 static int
-readline(char *buf, int len)
+read_line(char *buf, int len)
 {
 	int i = 0;
 	char ch;
@@ -108,15 +106,15 @@ readline(char *buf, int len)
 
 
 static int
-Process(char *FromString)
+process_potential_number(char *fromString)
 {
-	char *TestForChar;
-	bool FoundChar = false;
-	uint64 NumberToFactor;
-	int BaseFactor = 2;
+	char *testForChar;
+	bool foundChar = false;
+	uint64 numberToFactor;
+	int baseFactor = 2;
 	char str[1024];
-	char *Token;
-	const char *Tokens = " \t";
+	char *token;
+	const char *token_set = " \t";
 	bool factorNumber = true;
 	int i;
 
@@ -124,33 +122,33 @@ Process(char *FromString)
 	BString chrptr; // predefined character pointer
 	BString usrptr; // user submitted pointer
 
-	strcpy(str,FromString);
-	Token = strtok(str, Tokens);
+	strcpy(str,fromString);
+	token = strtok(str, token_set);
 
 	while (1) {
-		TestForChar = Token;
-		FoundChar = false;
+		testForChar = token;
+		foundChar = false;
 
-		while (*TestForChar) {
-			if (! isdigit (*TestForChar) ) {
-				FoundChar = true;
+		while (*testForChar) {
+			if (! isdigit (*testForChar) ) {
+				foundChar = true;
 				break;
 			}
-			*TestForChar++;
+			*testForChar++;
 		}
 
-		if (FoundChar) {
-			WarnNotValid(Token);
+		if (foundChar) {
+			warn_invalid(token);
 		} else {
-			if ( strlen(Token) >= MAX_TOKEN_LENGTH ) {
+			if ( strlen(token) >= MAX_TOKEN_LENGTH ) {
 
 				for(i=0; i < MAX_TOKEN_LENGTH; i++) {
 					chrptr << maxint[i];
-					usrptr << Token[i];
+					usrptr << token[i];
 					
 					if ( usrptr > chrptr ) {
-						WarnNotValid(Token);
-						SuggestHelp = true;
+						warn_invalid(token);
+						suggestHelp = true;
 						factorNumber = false;
 						break;
 						
@@ -159,16 +157,16 @@ Process(char *FromString)
 			}
 			
 			if ( factorNumber ) {
-				NumberToFactor = to_uint64(Token);
-				(void)fprintf(stdout, "%Lu:", NumberToFactor);
-				Factor(NumberToFactor, BaseFactor);
-				(void)printf("\n");
+				numberToFactor = to_uint64(token);
+				fprintf(stdout, "%Lu:", numberToFactor);
+				factor_number(numberToFactor, baseFactor);
+				fprintf(stdout, "\n");
 			}
 		}
 
-		Token = strtok(NULL, Tokens);
+		token = strtok(NULL, token_set);
 
-		if (Token == NULL)
+		if (token == NULL)
 			break;
 	}
 
@@ -177,75 +175,73 @@ Process(char *FromString)
 
 
 static int
-Factor(uint64 BigNumber, uint64 FactorBy)
+factor_number(uint64 bigNumber, uint64 factorBy)
 {
-	if ( ( BigNumber == 1 ) || ( BigNumber == 0 ) ) {
-		if ( BigNumber == 1 )
-			(void)fprintf(stdout, " %d", 1);
+	if ( ( bigNumber == 1 ) || ( bigNumber == 0 ) ) {
+		if ( bigNumber == 1 )
+			fprintf(stdout, " %d", 1);
 		return(0);
 	}
 		
-	uint64 RootNumber = (uint64)sqrt(BigNumber) + 1 ;
+	uint64 rootNumber = (uint64)sqrt(bigNumber) + 1 ;
 
-	while ( FactorBy <= RootNumber ) {
-		if ( (BigNumber % FactorBy) == 0 ) {
-			(void)fprintf(stdout, " %Lu", FactorBy);
+	while ( factorBy <= rootNumber ) {
+		if ( (bigNumber % factorBy) == 0 ) {
+			fprintf(stdout, " %Lu", factorBy);
 			break;
 		}
-		FactorBy++;
+		factorBy++;
 	}
 
-	if ( FactorBy > RootNumber ) {
-		(void)fprintf(stdout, " %Lu", BigNumber);
+	if ( factorBy > rootNumber ) {
+		fprintf(stdout, " %Lu", bigNumber);
 		return(0);
 	}
-	Factor(BigNumber/FactorBy, FactorBy);
+	factor_number(bigNumber/factorBy, factorBy);
 	return(0);
 }
 
 
 static int
-SuggestHelpMessage()
+suggest_help()
 {
-	(void)fprintf(stdout, "Try `%s --help' for more information.\n", prog_name);
+	fprintf(stderr, "Try `%s --help' for more information.\n", progName);
 	return(0);
 }
 
 
 static int
-WarnNotValid(char *NotValidString)
+warn_invalid(char *fromString)
 {
-	(void)fprintf(stdout, "%s: `%s' is not a valid positive integer\n", prog_name, NotValidString);
+	fprintf(stderr, "%s: `%s' is not a valid positive integer\n", progName, fromString);
 	return(0);
 }
 
 
-static int
+static void
 usage(void)
 {
-	(void)fprintf(stdout, "factor OBOS (http://www.openbeos.org/)
+	(void)fprintf(stdout, "%s OBOS (http://www.openbeos.org/)
 
 Usage: %s [NUMBER]...
    or: %s OPTION
 
-	--help\t\tdisplay this help and exit
-	--version\tdisplay version information and exit
+     --help      display this help and exit
+     --version   output version information and exit
 
   Print the prime factors of all specified positive integer NUMBERs.
   If no NUMBERS are specified on the command line, they are read from standard input.
   
   You may use a delimiter characters such as space and tab to separate NUMBERS.
 
-", prog_name, prog_name );
-	return(0);
+", progName, progName, progName );
 }
 
 
-static int
+static void
 version(void)
 {
-	(void)fprintf(stdout, "%s OBOS (http://www.openbeos.org/)\n", prog_name);
-	return(0);
+	fprintf(stdout, "%s OBOS (http://www.openbeos.org/)\n", progName);
 }
 
 
@@ -255,34 +251,34 @@ main(int argc, char *argv[])
 	int argOption;
 	int indexptr = 0;
 	char * const * optargv = argv;
-	bool Processed = false;
+	bool processed = false;
 	int i;
 	char buf[1024];
 	
-	prog_name = argv[0];
+	progName = argv[0];
 
-	struct option help_opt = { "help", no_argument, 0, 1 } ;
-	struct option version_opt = { "version", no_argument, 0, 2 } ;
+	struct option helpOption = { "help", no_argument, 0, 1 } ;
+	struct option versionOption = { "version", no_argument, 0, 2 } ;
 
 	struct option options[] = {
-	help_opt, version_opt, 0
+	helpOption, versionOption, {0}
 	};
 
 	for ( i=1; i<argc; i++ ) {
 		if ((argv[i][0] >= '0') && (argv[i][0] <= '9')) {
-			Processed = true;
-			Process(argv[i]);
+			processed = true;
+			process_potential_number(argv[i]);
 		} else {
 			if ( ( argv[i][0] == '-' ) && (argv[i][1] >= '0') && (argv[i][1] <= '9') ) {
-				Processed = true;
-				WarnNotValid(argv[i]);
-				SuggestHelp = true;
+				processed = true;
+				warn_invalid(argv[i]);
+				suggestHelp = true;
 			}
 		}
 	}
 	
-	if ( SuggestHelp == true ) {
-		SuggestHelpMessage();
+	if ( suggestHelp == true ) {
+		suggest_help();
 		exit(0);
 	}
 
@@ -305,14 +301,14 @@ main(int argc, char *argv[])
 
 	argc -= optind;
 
-	if ( (argc == 0) || (Processed == false) ) {
+	if ( (argc == 0) || (processed == false) ) {
 
 		// read stdin
 		for (;;) {
 			int chars_read;
-			chars_read = readline(buf, sizeof(buf));
+			chars_read = read_line(buf, sizeof(buf));
 			if (chars_read > 0)
-				Process(buf);
+				process_potential_number(buf);
 		}
 	}
 	return B_NO_ERROR;
