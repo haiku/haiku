@@ -26,7 +26,7 @@
 
 #include "rld_priv.h"
 
-#define TRACE_RLD
+//#define TRACE_RLD
 #ifdef TRACE_RLD
 #	define TRACE(x) dprintf x
 #else
@@ -42,12 +42,10 @@
 // ToDo: implement lazy binding
 
 #define	PAGE_MASK (B_PAGE_SIZE - 1)
-#define	PAGE_OFFS(y) ((y) & (PAGE_MASK))
-#define	PAGE_BASE(y) ((y) & ~(PAGE_MASK))
 
-/* david - added '_' to avoid macro's in kernel.h */
-#define	_ROUNDOWN(x,y) ((x)&~((y)-1))
-#define	_ROUNDUP(x,y) ROUNDOWN(x+y-1,y)
+#define	PAGE_OFFSET(x) ((x) & (PAGE_MASK))
+#define	PAGE_BASE(x) ((x) & ~(PAGE_MASK))
+#define TO_PAGE_SIZE(x) ((x + (PAGE_MASK)) & ~(PAGE_MASK))
 
 
 enum {
@@ -311,12 +309,9 @@ count_regions(char const *buff, int phnum, int phentsize)
 				break;
 			case PT_LOAD:
 				retval += 1;
-				if (pheaders->p_memsz!= pheaders->p_filesz) {
-					unsigned A = pheaders->p_vaddr + pheaders->p_memsz;
-					unsigned B = pheaders->p_vaddr + pheaders->p_filesz - 1;
-
-					A = PAGE_BASE(A);
-					B = PAGE_BASE(B);
+				if (pheaders->p_memsz != pheaders->p_filesz) {
+					addr_t A = TO_PAGE_SIZE(pheaders->p_vaddr + pheaders->p_memsz);
+					addr_t B = TO_PAGE_SIZE(pheaders->p_vaddr + pheaders->p_filesz);
 
 					if (A != B)
 						retval += 1;
@@ -411,9 +406,9 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 					 */
 					image->regions[regcount].start = pheader->p_vaddr;
 					image->regions[regcount].size = pheader->p_memsz;
-					image->regions[regcount].vmstart = _ROUNDOWN(pheader->p_vaddr, B_PAGE_SIZE);
-					image->regions[regcount].vmsize = _ROUNDUP(pheader->p_memsz +
-						(pheader->p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+					image->regions[regcount].vmstart = PAGE_BASE(pheader->p_vaddr);
+					image->regions[regcount].vmsize = TO_PAGE_SIZE(pheader->p_memsz
+						+ PAGE_OFFSET(pheader->p_vaddr));
 					image->regions[regcount].fdstart = pheader->p_offset;
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
@@ -426,17 +421,14 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 					/*
 					 * may require splitting
 					 */
-					unsigned A = pheader->p_vaddr + pheader->p_memsz;
-					unsigned B = pheader->p_vaddr + pheader->p_filesz - 1;
-
-					A = PAGE_BASE(A);
-					B = PAGE_BASE(B);
+					addr_t A = TO_PAGE_SIZE(pheader->p_vaddr + pheader->p_memsz);
+					addr_t B = TO_PAGE_SIZE(pheader->p_vaddr + pheader->p_filesz);
 
 					image->regions[regcount].start = pheader->p_vaddr;
 					image->regions[regcount].size = pheader->p_filesz;
-					image->regions[regcount].vmstart = _ROUNDOWN(pheader->p_vaddr, B_PAGE_SIZE);
-					image->regions[regcount].vmsize = _ROUNDUP (pheader->p_filesz +
-						(pheader->p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
+					image->regions[regcount].vmstart = PAGE_BASE(pheader->p_vaddr);
+					image->regions[regcount].vmsize = TO_PAGE_SIZE(pheader->p_filesz
+						+ PAGE_OFFSET(pheader->p_vaddr));
 					image->regions[regcount].fdstart = pheader->p_offset;
 					image->regions[regcount].fdsize = pheader->p_filesz;
 					image->regions[regcount].delta = 0;
@@ -454,8 +446,7 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 						image->regions[regcount].start = pheader->p_vaddr;
 						image->regions[regcount].size = pheader->p_memsz - pheader->p_filesz;
 						image->regions[regcount].vmstart = image->regions[regcount-1].vmstart + image->regions[regcount-1].vmsize;
-						image->regions[regcount].vmsize = _ROUNDUP(pheader->p_memsz
-								+ (pheader->p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE)
+						image->regions[regcount].vmsize = TO_PAGE_SIZE(pheader->p_memsz + PAGE_OFFSET(pheader->p_vaddr))
 							- image->regions[regcount-1].vmsize;
 						image->regions[regcount].fdstart = 0;
 						image->regions[regcount].fdsize = 0;
@@ -495,7 +486,7 @@ parse_program_headers(image_t *image, char *buff, int phnum, int phentsize)
 static bool
 assert_dynamic_loadable(image_t *image)
 {
-	unsigned i;
+	uint32 i;
 
 	if (!image->dynamic_ptr)
 		return true;
@@ -513,14 +504,14 @@ assert_dynamic_loadable(image_t *image)
 static bool
 map_image(int fd, char const *path, image_t *image, bool fixed)
 {
-	unsigned i;
+	uint32 i;
 
 	(void)(fd);
 
 	for (i = 0; i < image->num_regions; i++) {
 		char regionName[B_OS_NAME_LENGTH];
-		addr_t load_address;
-		unsigned addr_specifier;
+		addr_t loadAddress;
+		uint32 addressSpecifier;
 
 		// for BeOS compatibility: if we load an old BeOS executable, we
 		// have to relocate it, if possible - we recognize it because the
@@ -528,7 +519,7 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 		if (fixed && image->regions[i].vmstart == 0)
 			fixed = false;
 
-		snprintf(regionName, sizeof(regionName), "%s_seg%d%s",
+		snprintf(regionName, sizeof(regionName), "%s_seg%lu%s",
 			path, i, (image->regions[i].flags & RFLAG_RW) ? "rw" : "ro");
 
 		if (image->dynamic_ptr && !fixed) {
@@ -539,59 +530,58 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				/*
 				 * but only the first segment gets a free ride
 				 */
-				load_address = 0;
-				addr_specifier = B_ANY_ADDRESS;
+				loadAddress = 0;
+				addressSpecifier = B_ANY_ADDRESS;
 			} else {
-				load_address = image->regions[i].vmstart + image->regions[i-1].delta;
-				addr_specifier = B_EXACT_ADDRESS;
+				loadAddress = image->regions[i].vmstart + image->regions[i-1].delta;
+				addressSpecifier = B_EXACT_ADDRESS;
 			}
 		} else {
 			/*
 			 * not relocatable, put it where it asks or die trying
 			 */
-			load_address = image->regions[i].vmstart;
-			addr_specifier = B_EXACT_ADDRESS;
+			loadAddress = image->regions[i].vmstart;
+			addressSpecifier = B_EXACT_ADDRESS;
 		}
 
 		if (image->regions[i].flags & RFLAG_ANON) {
-			image->regions[i].id = _kern_create_area(regionName, (void **)&load_address,
-				addr_specifier, image->regions[i].vmsize, B_NO_LOCK,
+			image->regions[i].id = _kern_create_area(regionName, (void **)&loadAddress,
+				addressSpecifier, image->regions[i].vmsize, B_NO_LOCK,
 				B_READ_AREA | B_WRITE_AREA);
 
 			if (image->regions[i].id < 0)
 				goto error;
 
-			image->regions[i].delta = load_address - image->regions[i].vmstart;
-			image->regions[i].vmstart = load_address;
+			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
+			image->regions[i].vmstart = loadAddress;
 		} else {
-			image->regions[i].id = sys_vm_map_file(regionName, (void **)&load_address,
-				addr_specifier, image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
-				REGION_PRIVATE_MAP, path,
-				_ROUNDOWN(image->regions[i].fdstart, B_PAGE_SIZE));
+			image->regions[i].id = sys_vm_map_file(regionName, (void **)&loadAddress,
+				addressSpecifier, image->regions[i].vmsize, B_READ_AREA | B_WRITE_AREA,
+				REGION_PRIVATE_MAP, path, PAGE_BASE(image->regions[i].fdstart));
 
 			if (image->regions[i].id < 0)
 				goto error;
 
-			TRACE(("\"%s\" at %p (%s)\n", path, (void *)load_address,
+			TRACE(("\"%s\" at %p (%s)\n", path, (void *)loadAddress,
 				image->regions[i].flags & RFLAG_RW ? "rw" : "read-only"));
 
-			image->regions[i].delta = load_address - image->regions[i].vmstart;
-			image->regions[i].vmstart = load_address;
+			image->regions[i].delta = loadAddress - image->regions[i].vmstart;
+			image->regions[i].vmstart = loadAddress;
 
 			/*
 			 * handle trailer bits in data segment
 			 */
 			if (image->regions[i].flags & RFLAG_RW) {
-				unsigned start_clearing;
-				unsigned to_clear;
+				addr_t startClearing;
+				addr_t toClear;
 
-				start_clearing = image->regions[i].vmstart
-					+ PAGE_OFFS(image->regions[i].start)
+				startClearing = image->regions[i].vmstart
+					+ PAGE_OFFSET(image->regions[i].start)
 					+ image->regions[i].size;
-				to_clear = image->regions[i].vmsize
-					- PAGE_OFFS(image->regions[i].start)
+				toClear = image->regions[i].vmsize
+					- PAGE_OFFSET(image->regions[i].start)
 					- image->regions[i].size;
-				memset((void*)start_clearing, 0, to_clear);
+				memset((void *)startClearing, 0, toClear);
 			}
 		}
 	}
@@ -609,7 +599,7 @@ error:
 static void
 unmap_image(image_t *image)
 {
-	unsigned i;
+	uint32 i;
 
 	for (i = 0; i < image->num_regions; i++) {
 		_kern_delete_area(image->regions[i].id);
