@@ -955,7 +955,7 @@ bfs_link(void *ns, void *dir, const char *name, void *node)
 {
 	FUNCTION_START(("name = \"%s\"\n", name));
 
-	// ToDo: implement bfs_link()?!?
+	// This one won't be implemented in a binary compatible BFS
 
 	return B_ERROR;
 }
@@ -1732,7 +1732,9 @@ bfs_rename_attr(void *ns, void *node, const char *oldname, const char *newname)
 	FUNCTION_START(("name = \"%s\",to = \"%s\"\n", oldname, newname));
 
 	// ToDo: implement bfs_rename_attr()!
-	// Does anybody need this? :-)
+	// I'll skip the implementation here, and will do it for OpenBeOS - at least
+	// there will be an API to move one attribute to another file, making that
+	// function much more complicated - oh joy ;-)
 
 	RETURN_ERROR(B_ENTRY_NOT_FOUND);
 }
@@ -1970,7 +1972,6 @@ bfs_rename_index(void *ns, const char *oldname, const char *newname)
 {
 	FUNCTION_START(("from = %s, to = %s\n", oldname, newname));
 
-	// ToDo: implement bfs_rename_index()?!
 	// Well, renaming an index doesn't make that much sense, as you
 	// would also need to remove every file in it (or the index
 	// would contain wrong data)
