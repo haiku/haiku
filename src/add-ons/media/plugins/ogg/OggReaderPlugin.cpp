@@ -15,24 +15,6 @@
   #define TRACE(a...) ((void)0)
 #endif
 
-// codec identification 
-static bool isVorbisPacket(ogg_packet * packet) {
-	static const char * vorbis = "vorbis";
-	if ((unsigned)packet->bytes < (sizeof(vorbis)+1)) {
-		return false;
-	}
-	return !memcmp(&packet->packet[1], vorbis, sizeof(vorbis));
-}
-
-// codec-dependent packet gobbling for extra header packets
-static int getPacketsLeft(ogg_packet * packet) {
-	if (isVorbisPacket(packet)) {
-		return 2;
-	}
-	return 0;
-}
-
-
 oggReader::oggReader()
 {
 	TRACE("oggReader::oggReader\n");
@@ -187,7 +169,7 @@ oggReader::Sniff(int32 *streamCount)
 		memcpy(buffer, packet.packet, packet.bytes);
 		packet.packet = buffer;
 		fHeaderPackets[serialno].push_back(packet);
-		fHeaderPacketsLeft[serialno] = getPacketsLeft(&packet);
+		fHeaderPacketsLeft[serialno] = GetExtraHeaderPacketCount(&packet);
 		if (GetPage(&page) != B_OK) {
 			return B_ERROR;
 		}
@@ -272,22 +254,6 @@ oggReader::FreeCookie(void *cookie)
 	return B_OK;
 }
 
-// estimate: 1 frame = 256 bytes
-int filePositionToFrame(int position) {
-	return position/256;
-}
-int frameToFilePosition(int frame) {
-	return frame*256;
-}
-
-// estimate: 1 second = 8 bytes
-int filePositionToTime(int position) {
-	return position*1000/8;
-}
-int timeToFilePosition(int duration) {
-	return duration*8/1000;
-}
-
 status_t
 oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 						 media_format *format, void **infoBuffer, int32 *infoSize)
@@ -295,28 +261,9 @@ oggReader::GetStreamInfo(void *cookie, int64 *frameCount, bigtime_t *duration,
 	TRACE("oggReader::GetStreamInfo\n");
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	memset(format, 0, sizeof(*format));
-	if (fSeekable) {
-		off_t input_length;
-		{
-			off_t current_position = fSeekable->Seek(0,SEEK_CUR);
-			input_length = fSeekable->Seek(0,SEEK_END)-fPostSniffPosition;
-			fSeekable->Seek(current_position,SEEK_SET);
-		}
-		*frameCount = filePositionToFrame(input_length);
-		*duration = filePositionToTime(input_length);
-	} else {
-		assert(sizeof(bigtime_t)==sizeof(uint64_t));
-		// if the input is not seekable, we return really large sizes
-		*frameCount = INT64_MAX;
-		*duration = INT64_MAX;
-	}
 	std::vector<ogg_packet> * ogg_packets = &fHeaderPackets[stream->serialno];
 	format->SetMetaData((void*)ogg_packets,sizeof(ogg_packets));
-	if (isVorbisPacket(&(*ogg_packets)[0])) {
-		format->type = B_MEDIA_ENCODED_AUDIO;
-		format->u.encoded_audio.encoding
-         = (media_encoded_audio_format::audio_encoding)'vorb';
-	}
+	GetCodecStreamInfo(stream,frameCount,duration,format);
 	*infoBuffer = 0;
 	*infoSize = 0;
 	return B_OK;
@@ -336,9 +283,9 @@ oggReader::Seek(void *cookie,
 	ogg_stream_state * stream = static_cast<ogg_stream_state *>(cookie);
 	int position;
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
-		position = fPostSniffPosition+frameToFilePosition(*frame);
+		position = fPostSniffPosition+frameToPosition(stream,*frame);
 	} else if (seekTo & B_MEDIA_SEEK_TO_TIME) {
-		position = fPostSniffPosition+timeToFilePosition(*time);
+		position = fPostSniffPosition+timeToPosition(stream,*time);
 	} else {
 		return B_ERROR;
 	}
@@ -391,8 +338,8 @@ synced:
 		return B_ERROR;
 	}
 	// output the values from where we regained sync
-	*frame = filePositionToFrame(position);
-	*time = filePositionToTime(position);
+	*frame = positionToFrame(stream,position);
+	*time = positionToTime(stream,position);
 	return B_OK;
 }
 

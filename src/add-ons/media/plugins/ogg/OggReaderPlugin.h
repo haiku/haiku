@@ -42,6 +42,15 @@ public:
 private:
 	status_t	GetPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE,
 				        bool short_page = false);
+	int			GetExtraHeaderPacketCount(ogg_packet * packet);
+	status_t	GetCodecStreamInfo(ogg_stream_state * stream,
+				                   int64 *frameCount, bigtime_t *duration,
+				                   media_format *format);
+	
+	int64		positionToFrame(ogg_stream_state * stream, off_t position);
+	off_t		frameToPosition(ogg_stream_state * stream, int64 frame);
+	bigtime_t	positionToTime(ogg_stream_state * stream, off_t position);
+	off_t		timeToPosition(ogg_stream_state * stream, bigtime_t time);
 
 	BPositionIO *	fSeekable;
 	off_t			fPostSniffPosition;
