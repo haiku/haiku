@@ -897,7 +897,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 	status_t result = B_OK;
 	bool end = false;
 	uint8 index, byte, byte2, safe, shift;
-	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, safe32, offset32, size32;
+	uint32 reg, reg2, data, data2, and_out, and_out2, or_in, or_in2, safe32, offset32, size32;
 
 	while (!end)
 	{
@@ -1134,6 +1134,58 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			data = *((uint8*)(&(rom[*adress])));
 			*adress += 1;
 			exec_cmd_39_type2(rom, data, tabs, exec);
+			break;
+		case 0x49: /* new */
+			size32 = *((uint8*)(&(rom[*adress + 17])));
+			if (!size32) size32 = 256;
+			*size -= (18 + (size32 << 1));
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			reg2 = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			and_out = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			or_in = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			size32 = *((uint8*)(&(rom[*adress])));
+			if (!size32) size32 = 256;
+			*adress += 1;
+//fix log and doublecheck exe
+			LOG(8,("cmd 'blabla'\n"));
+			for (index = 0; index < size32; index++)
+			{
+				LOG(8,("INFO (cont.) blabla\n"));
+			}
+			if (*exec)
+			{
+				for (index = 0; index < size32; index++)
+				{
+					or_in2 = *((uint8*)(&(rom[*adress])));
+					*adress += 1;
+					data2 = *((uint8*)(&(rom[*adress])));
+					*adress += 1;
+					NV_REG32(reg2) = data2;
+					data = NV_REG32(reg);
+					data &= and_out;
+					data |= or_in;
+					data |= or_in2;
+					NV_REG32(reg) = data;
+				}
+			}
+			else
+			{
+				*adress += (size32 << 1);
+			}
 			break;
 		case 0x62: /* new */
 			*size -= 5;
