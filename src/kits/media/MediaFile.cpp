@@ -281,6 +281,7 @@ BMediaFile::InitReader(BDataIO *source, int32 flags)
 	CALLED();
 	
 	fSource = source;
+	
 	fExtractor = new MediaExtractor(source, flags);
 	fErr = fExtractor->InitCheck();
 	if (fErr)

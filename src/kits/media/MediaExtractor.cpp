@@ -10,12 +10,13 @@ MediaExtractor::MediaExtractor(BDataIO * source, int32 flags)
 	CALLED();
 	fSource = source;
 	fStreamInfo = 0;
-	fStreamCount = 0;
-	fReader = 0;
 	
 	fErr = _CreateReader(&fReader, &fStreamCount, &fMff, source);
-	if (fErr)
+	if (fErr) {
+		fStreamCount = 0;
+		fReader = 0;
 		return;
+	}
 		
 	fStreamInfo = new stream_info[fStreamCount];
 	
@@ -162,19 +163,22 @@ status_t
 MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci)
 {
 	CALLED();
-	if (fStreamInfo[stream].status != B_OK) {
+	status_t res;
+
+	res = fStreamInfo[stream].status;
+	if (res != B_OK) {
 		printf("MediaExtractor::CreateDecoder can't create decoder for stream %ld\n", stream);
-		return B_ERROR;
+		return res;
 	}
 	
-	if (B_OK != _CreateDecoder(decoder, mci, &fStreamInfo[stream].encodedFormat)) {
+	res = _CreateDecoder(decoder, mci, &fStreamInfo[stream].encodedFormat);
+	if (res != B_OK) {
 		printf("MediaExtractor::CreateDecoder failed for stream %ld\n", stream);
-		return B_ERROR;
+		return res;
 	}
 
 	(*decoder)->Setup(this, stream);
 	
-	status_t res;
 	res = (*decoder)->Setup(&fStreamInfo[stream].encodedFormat, fStreamInfo[stream].infoBuffer , fStreamInfo[stream].infoBufferSize);
 	if (res != B_OK) {
 		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld\n", stream);

@@ -37,7 +37,9 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 	
 	if (B_OK != (*reader)->Sniff(streamCount)) {
 		printf("_CreateReader: Sniff failed\n");
-		return B_ERROR;
+		_DestroyReader(*reader);
+		return B_MEDIA_NO_HANDLER;
+//		return B_ERROR;
 	}
 	
 	(*reader)->GetFileFormatInfo(mff);

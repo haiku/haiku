@@ -130,12 +130,13 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	if (!mh)
 		mh = &temp_header;
 	
-	*out_frameCount = 0;
 	result = fDecoder->Decode(out_buffer, out_frameCount, mh, info);
-
-	fCurFrame += *out_frameCount;
-	fCurTime = mh->start_time;
-
+	if (result == B_OK) {
+		fCurFrame += *out_frameCount;
+		fCurTime = mh->start_time;
+	} else {
+		*out_frameCount = 0;
+	}
 	return result;
 }
 
@@ -452,13 +453,16 @@ BMediaTrack::BMediaTrack(BPrivate::media::MediaExtractor *extractor,
 	CALLED();
 	fExtractor = extractor;
 	fStream = stream;
+	fErr = B_OK;
 	
-	if (B_OK != fExtractor->CreateDecoder(fStream, &fDecoder, &fMCI))
+	if (fExtractor->CreateDecoder(fStream, &fDecoder, &fMCI) != B_OK) {
+		// we do not set fErr here, because ReadChunk should still work
 		fDecoder = 0;
+		return;
+	}
 
 	fCurFrame = 0;
 	fCurTime = 0;
-	fErr = B_OK;
 	
 	// not used:
 	fEncoder = 0;
