@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src add-ons translators ;
 
 SubInclude OBOS_TOP src add-ons translators bmptranslator ;
+SubInclude OBOS_TOP src add-ons translators giftranslator ;
 SubInclude OBOS_TOP src add-ons translators jpegtranslator ;
 SubInclude OBOS_TOP src add-ons translators jpeg2000translator ;
 SubInclude OBOS_TOP src add-ons translators libtifftranslator ;
