@@ -10,6 +10,8 @@ Preference Appearance :
 	APRWindow.cpp
 	CurView.cpp
 	DecView.cpp
+	FontMenu.cpp
+	MenuView.cpp
 	PreviewDriver.cpp
 #	SysCursorAPI.cpp
 	ColorWell.cpp
