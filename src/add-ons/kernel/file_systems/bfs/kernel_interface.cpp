@@ -1269,29 +1269,33 @@ bfs_access(void *_ns, void *_node, int accessMode)
 
 
 static status_t
-bfs_read_link(void *_ns, void *_node, char *buffer, size_t bufferSize)
+bfs_read_link(void *_ns, void *_node, char *buffer, size_t *_bufferSize)
 {
 	FUNCTION();
 
 	Inode *inode = (Inode *)_node;
-	
+	size_t bufferSize = *_bufferSize;
+
 	if (!inode->IsSymLink())
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (inode->Flags() & INODE_LONG_SYMLINK) {
 		// we also need space for the terminating null byte
-		if (inode->Size() >= bufferSize)
+		if (inode->Size() >= bufferSize) {
+			*_bufferSize = inode->Size();
 			return B_BUFFER_OVERFLOW;
+		}
 
-		status_t status = inode->ReadAt(0, (uint8 *)buffer, &bufferSize);
+		status_t status = inode->ReadAt(0, (uint8 *)buffer, _bufferSize);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
-		buffer[bufferSize] = '\0';
+		buffer[*_bufferSize] = '\0';
 		return B_OK;
 	}
 
-	if (strlcpy(buffer, inode->Node().short_symlink, bufferSize) > bufferSize)
+	*_bufferSize = strlcpy(buffer, inode->Node().short_symlink, bufferSize);
+	if (*_bufferSize > bufferSize)
 		return B_BUFFER_OVERFLOW;
 
 	return B_OK;

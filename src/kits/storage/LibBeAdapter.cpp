@@ -529,14 +529,16 @@ _kern_rewind_dir(int fd)
 
 // _kern_read_link
 extern "C"
-ssize_t
-_kern_read_link(int fd, const char *path, char *buffer, size_t bufferSize)
+status_t
+_kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 {
-	ssize_t result = _kreadlink_(fd, path, buffer, bufferSize);
-	if (result >= 0)
-		buffer[result] = '\0';
+	ssize_t result = _kreadlink_(fd, path, buffer, *_bufferSize);
+	if (result < 0)
+		return result;
 
-	return result;
+	buffer[result] = '\0';
+	*_bufferSize = result;
+	return B_OK;
 }
 
 // _kern_unlink

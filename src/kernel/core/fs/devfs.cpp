@@ -1115,15 +1115,17 @@ devfs_fsync(fs_volume _fs, fs_vnode _v)
 
 
 static status_t
-devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t bufferSize)
+devfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize)
 {
 	struct devfs_vnode *link = (struct devfs_vnode *)_link;
 
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	if (bufferSize <= link->stream.u.symlink.length)
-		return B_NAME_TOO_LONG;
+	if (*_bufferSize <= link->stream.u.symlink.length) {
+		*_bufferSize = link->stream.u.symlink.length + 1;
+		return B_BUFFER_OVERFLOW;
+	}
 
 	memcpy(buffer, link->stream.u.symlink.path, link->stream.u.symlink.length + 1);
 	return B_OK;

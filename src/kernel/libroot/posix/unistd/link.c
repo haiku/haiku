@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -20,9 +20,13 @@
 ssize_t
 readlink(const char *path, char *buffer, size_t bufferSize)
 {
-	int status = _kern_read_link(-1, path, buffer, bufferSize);
+	status_t status = _kern_read_link(-1, path, buffer, &bufferSize);
+	if (status < B_OK && status != B_BUFFER_OVERFLOW) {
+		errno = status;
+		return -1;
+	}
 
-	RETURN_AND_SET_ERRNO(status);
+	return bufferSize;
 }
 
 

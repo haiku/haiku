@@ -134,8 +134,8 @@ extern off_t		_kern_seek(int fd, off_t pos, int seekType);
 extern status_t		_kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 extern status_t		_kern_create_dir(int fd, const char *path, int perms);
 extern status_t		_kern_remove_dir(const char *path);
-extern ssize_t		_kern_read_link(int fd, const char *path, char *buffer,
-						size_t bufferSize);
+extern status_t		_kern_read_link(int fd, const char *path, char *buffer,
+						size_t *_bufferSize);
 extern status_t		_kern_write_link(const char *path, const char *toPath);
 extern status_t		_kern_create_symlink(int fd, const char *path,
 						const char *toPath, int mode);

@@ -1,10 +1,11 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include <KernelExport.h>
 #include <vfs.h>
@@ -768,27 +769,29 @@ rootfs_can_page(fs_volume _fs, fs_vnode _v, fs_cookie cookie)
 static status_t
 rootfs_read_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	return EPERM;
+	return B_NOT_ALLOWED;
 }
 
 
 static status_t
 rootfs_write_pages(fs_volume _fs, fs_vnode _v, fs_cookie cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	return EPERM;
+	return B_NOT_ALLOWED;
 }
 
 
 static status_t
-rootfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t bufferSize)
+rootfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t *_bufferSize)
 {
 	struct rootfs_vnode *link = _link;
-	
+
 	if (!S_ISLNK(link->stream.type))
 		return B_BAD_VALUE;
 
-	if (bufferSize <= link->stream.symlink.length)
-		return B_NAME_TOO_LONG;
+	if (*_bufferSize <= link->stream.symlink.length) {
+		*_bufferSize = link->stream.symlink.length + 1;
+		return B_BUFFER_OVERFLOW;
+	}
 
 	memcpy(buffer, link->stream.symlink.path, link->stream.symlink.length + 1);
 	return B_OK;

@@ -1358,6 +1358,7 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 
 		// If the new node is a symbolic link, resolve it (if we've been told to do it)
 		if (S_ISLNK(type) && !(!traverseLeafLink && nextPath[0] == '\0')) {
+			size_t bufferSize;
 			char *buffer;
 
 			PRINT(("traverse link\n"));
@@ -1368,13 +1369,14 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 				goto resolve_link_error;
 			}
 
-			buffer = (char *)malloc(B_PATH_NAME_LENGTH);
+			buffer = (char *)malloc(bufferSize = B_PATH_NAME_LENGTH);
 			if (buffer == NULL) {
 				status = B_NO_MEMORY;
 				goto resolve_link_error;
 			}
 
-			status = FS_CALL(nextVnode, read_link)(nextVnode->mount->cookie, nextVnode->private_node, buffer, B_PATH_NAME_LENGTH);
+			status = FS_CALL(nextVnode, read_link)(nextVnode->mount->cookie,
+				nextVnode->private_node, buffer, &bufferSize);
 			if (status < B_OK) {
 				free(buffer);
 
@@ -3573,7 +3575,7 @@ common_unlock_node(int fd, bool kernel)
 
 
 static status_t
-common_read_link(int fd, char *path, char *buffer, size_t bufferSize,
+common_read_link(int fd, char *path, char *buffer, size_t *_bufferSize,
 	bool kernel)
 {
 	struct vnode *vnode;
@@ -3583,9 +3585,10 @@ common_read_link(int fd, char *path, char *buffer, size_t bufferSize,
 	if (status < B_OK)
 		return status;
 
-	if (FS_CALL(vnode, read_link) != NULL)
-		status = FS_CALL(vnode, read_link)(vnode->mount->cookie, vnode->private_node, buffer, bufferSize);
-	else
+	if (FS_CALL(vnode, read_link) != NULL) {
+		status = FS_CALL(vnode, read_link)(vnode->mount->cookie,
+			vnode->private_node, buffer, _bufferSize);
+	} else
 		status = B_BAD_VALUE;
 
 	put_vnode(vnode);
@@ -5261,17 +5264,19 @@ _kern_remove_dir(const char *path)
  *	symlink to be read. If both are given and the path is absolute, \a fd is
  *	ignored; a relative path is reckoned off of the directory (!) identified
  *	by \a fd.
+ *	If this function fails with B_BUFFER_OVERFLOW, the \a _bufferSize pointer
+ *	will still be updated to reflect the required buffer size.
  *
  *	\param fd The FD. May be < 0.
  *	\param path The absolute or relative path. May be \c NULL.
  *	\param buffer The buffer into which the contents of the symlink shall be
  *		   written.
- *	\param bufferSize The size of the supplied buffer.
+ *	\param _bufferSize A pointer to the size of the supplied buffer.
  *	\return The length of the link on success or an appropriate error code
  */
 
-ssize_t
-_kern_read_link(int fd, const char *path, char *buffer, size_t bufferSize)
+status_t
+_kern_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize)
 {
 	status_t status;
 
@@ -5279,15 +5284,10 @@ _kern_read_link(int fd, const char *path, char *buffer, size_t bufferSize)
 		char pathBuffer[B_PATH_NAME_LENGTH + 1];
 		strlcpy(pathBuffer, path, B_PATH_NAME_LENGTH);
 
-		status = common_read_link(fd, pathBuffer, buffer, bufferSize, true);
-	} else
-		status = common_read_link(fd, NULL, buffer, bufferSize, true);
-	
-	if (status < B_OK)
-		return status;
+		return common_read_link(fd, pathBuffer, buffer, _bufferSize, true);
+	}
 
-	// Unlike what POSIX wants, our file systems must always null terminate links
-	return strlen(buffer);
+	return common_read_link(fd, NULL, buffer, _bufferSize, true);
 }
 
 
@@ -6083,14 +6083,16 @@ _user_remove_dir(const char *userPath)
 }
 
 
-ssize_t
-_user_read_link(int fd, const char *userPath, char *userBuffer, size_t bufferSize)
+status_t
+_user_read_link(int fd, const char *userPath, char *userBuffer, size_t *userBufferSize)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	char buffer[B_PATH_NAME_LENGTH];
+	size_t bufferSize;
 	int status;
 
-	if (!IS_USER_ADDRESS(userBuffer))
+	if (!IS_USER_ADDRESS(userBuffer) || !IS_USER_ADDRESS(userBufferSize)
+		|| user_memcpy(&bufferSize, userBufferSize, sizeof(size_t)) < B_OK)
 		return B_BAD_ADDRESS;
 
 	if (userPath) {
@@ -6103,18 +6105,22 @@ _user_read_link(int fd, const char *userPath, char *userBuffer, size_t bufferSiz
 
 		if (bufferSize > B_PATH_NAME_LENGTH)
 			bufferSize = B_PATH_NAME_LENGTH;
+	}
 
-		status = common_read_link(fd, path, buffer, bufferSize, false);
-	} else
-		status = common_read_link(fd, NULL, buffer, bufferSize, false);
+	status = common_read_link(fd, userPath ? path : NULL, buffer, &bufferSize, false);
+
+	// we also update the bufferSize in case of errors
+	// (the real length will be returned in case of B_BUFFER_OVERFLOW)
+	if (user_memcpy(userBufferSize, &bufferSize, sizeof(size_t)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	if (status < B_OK)
 		return status;
 
-	status = user_strlcpy(userBuffer, buffer, bufferSize);
-	if (status < 0)
-		return status;
-	return (status >= (int)bufferSize ? bufferSize : status + 1);
+	if (user_strlcpy(userBuffer, buffer, bufferSize) < 0)
+		return B_BAD_ADDRESS;
+
+	return B_OK;
 }
 
 

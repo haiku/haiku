@@ -119,7 +119,7 @@ off_t _user_seek(int fd, off_t pos, int seekType);
 status_t _user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
 status_t _user_create_dir(int fd, const char *path, int perms);
 status_t _user_remove_dir(const char *path);
-ssize_t _user_read_link(int fd, const char *path, char *buffer, size_t bufferSize);
+status_t _user_read_link(int fd, const char *path, char *buffer, size_t *_bufferSize);
 status_t _user_write_link(const char *path, const char *toPath);
 status_t _user_create_symlink(int fd, const char *path, const char *toPath,
 			int mode);

@@ -90,7 +90,7 @@ typedef struct file_system_info {
 				uint8 event, selectsync *sync);
 	status_t (*fsync)(fs_volume fs, fs_vnode v);
 
-	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);
+	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t *_bufferSize);
 	status_t (*write_link)(fs_volume fs, fs_vnode link, char *toPath);
 	status_t (*create_symlink)(fs_volume fs, fs_vnode dir, const char *name, const char *path, int mode);
 

@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 /*!
 	\file Entry.cpp
@@ -925,10 +925,10 @@ BEntry::set(int dirFD, const char *path, bool traverse)
 			// we need to traverse the symlink
 			if (--linkLimit < 0)
 				return B_LINK_LIMIT;
-			ssize_t readBytes = _kern_read_link(dirFD, leafName, tmpPath,
-				B_PATH_NAME_LENGTH);
-			if (readBytes < 0)
-				return readBytes;
+			size_t bufferSize = B_PATH_NAME_LENGTH;
+			error = _kern_read_link(dirFD, leafName, tmpPath, &bufferSize);
+			if (error < 0)
+				return error;
 			path = tmpPath;
 			// next round...
 		}

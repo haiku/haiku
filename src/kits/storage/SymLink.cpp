@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 /*!
 	\file SymLink.cpp
@@ -103,13 +103,18 @@ BSymLink::~BSymLink()
 	- some other error code
 */
 ssize_t
-BSymLink::ReadLink(char *buf, size_t size)
+BSymLink::ReadLink(char *buffer, size_t size)
 {
-	if (!buf)
+	if (!buffer)
 		return B_BAD_VALUE;
 	if (InitCheck() != B_OK)
 		return B_FILE_ERROR;
-	return _kern_read_link(get_fd(), NULL, buf, size);
+
+	status_t error = _kern_read_link(get_fd(), NULL, buffer, &size);
+	if (error < B_OK)
+		return error;
+
+	return size;
 }
 
 // MakeLinkedPath
