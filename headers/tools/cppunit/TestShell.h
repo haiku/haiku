@@ -7,9 +7,12 @@
 #include <cppunit/TestListener.h>
 #include <cppunit/TestResult.h>
 #include <cppunit/TestResultCollector.h>
+#include <TestSuite.h>
 #include <map>
 #include <set>
 #include <string>
+
+class BDirectory;
 
 // Defines SuiteFunction to be a pointer to a function that
 // takes no arguments and returns a pointer to a CppUnit::Test
@@ -29,6 +32,12 @@ class BTestShell {
 public:
 	BTestShell(const std::string &description = "", SyncObject *syncObject = 0);
 	
+	// This function is used to add the tests for a given kit (as contained
+	// in a BTestSuite object) to the list of available tests. The shell assumes
+	// ownership of the BTestSuite object. Each test in the kit is added to
+	// the list of tests via a call to AddTest(std::string
+	status_t AddSuite(BTestSuite *kit);
+
 	// This function is used to add test suites to the list of available
 	// tests. A SuiteFunction is just a function that takes no parameters
 	// and returns a pointer to a CppUnit::Test object. Return NULL at
@@ -36,7 +45,11 @@ public:
 	// when the program is run with "--list" as an argument. Usually the
 	// given suite would be a test suite for an entire class, but that's
 	// not a requirement.
-	void AddSuite(const std::string &name, const SuiteFunction suite);
+	void AddTest(const std::string &name, CppUnit::Test* test);
+
+	// This function loads all the test addons it finds in the given
+	// directory, returning the number of tests actually loaded.
+	int32 LoadSuitesFrom(BDirectory *libDir);
 
 	// This is the function you call after you've added all your test
 	// suites with calls to AddSuite(). It runs the test, or displays
@@ -52,14 +65,19 @@ public:
 	// allowed to make noise.
 	bool BeVerbose() const { return Verbosity() >= v2; };
 	
+	static BTestShell* Shell() { return fGlobalShell; };
+	static void SetShell(BTestShell *shell) { fGlobalShell = shell; };
+	
 
 protected:	
 	VerbosityLevel fVerbosityLevel;
 	std::set<std::string> fTestsToRun;
-	std::map<std::string, SuiteFunction> fTests;	
+	std::map<std::string, CppUnit::Test*> fTests;
+	std::map<std::string, BTestSuite*> fSuites;	
 	CppUnit::TestResult fTestResults;
 	CppUnit::TestResultCollector fResultsCollector;
 	std::string fDescription;
+	static BTestShell* fGlobalShell;
 
 	// Prints a brief description of the program and a guess as to
 	// which Storage Kit library the app was linked with based on
