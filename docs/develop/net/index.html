@@ -1,0 +1,134 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3c.org/TR/1999/REC-html401-19991224/loose.dtd"> 
+
+<HTML> 
+<HEAD> 
+<TITLE>OpenBeOS Network Kit</TITLE> 
+<META http-equiv=Content-Type content="text/html; charset=windows-1252"> 
+<STYLE type="text/css"> 
+body 
+{ 
+        text-indent: 0in; 
+        font-stretch: normal; 
+        text-align: left; 
+        font-weight: normal; 
+        text-decoration: none; 
+        font-variant: normal; 
+        color: #000000; 
+        font-size: 12pt; 
+        font-style: normal; 
+        widows: 2; 
+        font-family: "Century Gothic", "Trebuchet MS", "Trebuchet", "Arial", "Helvetica"; 
+        background-color: #ffffff; 
+} 
+</STYLE> 
+</HEAD> 
+<BODY text=#000000 vLink=#0000a0 aLink=#0000ff link=#0000c0 bgColor=#ffffff> 
+
+<H1>OpenBeOS Network Kit</H1>
+
+<H2>Table Of Content</H2>
+
+  <P>
+  <UL>
+  <LI><A href="#overview">Overview</A>
+  <LI>Implementation:
+	<UL>
+	<LI><A href="#stack">The network stack</A>
+		<UL>
+		<LI><A href="#core">Core module
+		<LI><A href="#interfaces">Interfaces modules</A>
+		<LI><A href="#protocols">Protocols modules</A>
+		</UL>
+	<LI><A href="#stack_driver">The stack driver</A>
+	<LI><A href="#libnet">The libnet.so shared library</A>
+		<UL>
+		<LI><A href="#sockets_api">POSIX/BSD sockets support</A>
+		<LI><A href="#dns_resolver">DNS resolver</A>
+		<LI><A href="#libnet_misc">Misc functions</A>
+		</UL>
+	<LI><A href="#libnetapi">The libnetapi.so shared library</A>
+	<LI><A href="#bin">Basic network utilities</A>
+		<UL>
+		<LI><A href="#ping">ping</A>
+		<LI><A href="#ifconfig">ifconfig</A>
+		<LI><A href="#route">route</A>
+		<LI><A href="#traceroute">traceroute</A>
+		<LI><A href="#arp">arp</A>
+		</UL>
+	<LI><A href="#preflet">The Network GUI preference app</A>
+	</UL>
+  </UL>
+  </P>
+
+<HR>
+
+<!-------------------->
+<A name="overview">
+<H2>Overview</H2>
+
+<P>The OpenBeOS Network Kit consists of:
+  <UL>
+  <LI>a modular, add-ons based <A href="#stack">network stack</A>
+  <LI>two shared libraries, <A href="#libnet">libnet.so</A> and <A href="#libnetapi">libnetapi.so</A>
+  <LI>a <A href="#stack_driver">stack driver</A>, acting as interface between the
+     <A href="#stack">network stack</A> and <A href="#libnet">libnet.so</A>
+  <LI>basic network utilities
+  <LI>a modular GUI <A href="#preflet">preflet</A>
+  </UL>
+</P>
+
+<H3>Let's picture(s) talk</H3>
+<P>The following image shows the overall network design:</P>
+
+<IMG ALT="OpenBeOS Network Kit block diagram" SRC="obos_net_stack_design_1.gif"><BR>
+
+<HR>
+
+<H2>Implementation</H2>
+
+<UL>
+
+<LI><A name="stack">
+<H3>The network stack</H3>
+<I>Location</I>: <CODE>src/add-ons/kernel/network</CODE>
+<P>Todo...</P>
+
+<LI><A name="stack_driver">
+<H3>The stack driver</H3>
+<I>Location</I>: <CODE>src/add-ons/kernel/drivers/net/stack</CODE>
+<P>Todo...</P>
+
+<LI><A name="libnet">
+<H3>The libnet.so shared library</H3>
+<I>Location</I>: <CODE>src/kits/net/libnet</CODE>
+<P>Todo...</P>
+
+<LI><A name="libnetapi">
+<H3>The libnetapi.so shared library</H3>
+<I>Location</I>: <CODE>src/kits/net/libnetapi</CODE>
+<P>Todo...</P>
+
+<LI><A name="bin">
+<H3>Basic network utilities</H3>
+
+	<UL>
+	<LI><B>ping</B><BR>
+		<I>Location</I>: <CODE>src/apps/bin/ping</CODE>
+	<LI><B>ifconfig</B><BR>
+		<I>Location</I>: <CODE>src/apps/bin/ifconfig</CODE>
+	<LI><B>route</B><BR>
+		<I>Location</I>: <CODE>src/apps/bin/route</CODE>
+	<LI><B>traceroute</B><BR>
+		<I>Location</I>: <CODE>src/apps/bin/traceroute</CODE>
+	<LI><B>arp</B><BR>
+		<I>Location</I>: <CODE>src/apps/bin/arp</CODE>
+	</UL>
+
+</UL>
+
+<HR>
+
+<H6>Philippe Houdoin, March 24rd, 2003</H6>
+
+</BODY>
+</HTML>
