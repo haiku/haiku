@@ -1,6 +1,28 @@
 SubDir OBOS_TOP src tests kits app ;
 
+# Let Jam know where to find some of our source files
+#SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
+#SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
+#SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
+
+CommonTestLib libapptest.so
+	: AppKitTestAddon.cpp
+
+		# BMessenger
+		MessengerTest.cpp
+		BMessengerTester.cpp
+		LockTargetTester.cpp
+		TargetTester.cpp
+		
+	: <boot!home!config!lib>libopenbeos.so
+		be stdc++.r4
+	: be stdc++.r4
+	: 
+	: app support
+;
+
 SubInclude OBOS_TOP src tests kits app bhandler ;
 SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
-SubInclude OBOS_TOP src tests kits app bmessenger ;
+#SubInclude OBOS_TOP src tests kits app bmessenger ;
