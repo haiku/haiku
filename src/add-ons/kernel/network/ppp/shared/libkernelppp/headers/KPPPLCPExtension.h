@@ -37,10 +37,10 @@ class KPPPLCPExtension {
 		driver_parameter *Settings() const
 			{ return fSettings; }
 		
-		//!	Enables or disables this handler.
+		//!	Enables or disables this extension.
 		void SetEnabled(bool enabled = true)
 			{ fEnabled = enabled; }
-		//!	Returns if the handler is enabled.
+		//!	Returns if the extension is enabled.
 		bool IsEnabled() const
 			{ return fEnabled; }
 		

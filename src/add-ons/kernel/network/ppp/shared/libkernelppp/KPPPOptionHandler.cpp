@@ -5,11 +5,26 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPOptionHandler
+	\brief Handler for LCP configure packets.
+	
+	This class can be used to extend the supported LCP configure packets.
+*/
+
 #include <KPPPOptionHandler.h>
 
 #include <PPPControl.h>
 
 
+/*!	\brief Constructor.
+	
+	If an error occurs in the constructor you should set \c fInitStatus.
+	
+	\param name Name of the handler.
+	\param type Request type you can handle.
+	\param interface Owning interface.
+	\param settings Settings for this handler.
+*/
 KPPPOptionHandler::KPPPOptionHandler(const char *name, uint8 type,
 		KPPPInterface& interface, driver_parameter *settings)
 	: fInitStatus(B_OK),
@@ -25,14 +40,16 @@ KPPPOptionHandler::KPPPOptionHandler(const char *name, uint8 type,
 }
 
 
+//!	Destructor. Frees the name and unregisters handler from LCP protocol.
 KPPPOptionHandler::~KPPPOptionHandler()
 {
-	free(fName);
-	
 	Interface().LCP().RemoveOptionHandler(this);
+	
+	free(fName);
 }
 
 
+//!	Returns \c fInitStatus. May be overridden to return status-dependend errors.
 status_t
 KPPPOptionHandler::InitCheck() const
 {
@@ -40,6 +57,7 @@ KPPPOptionHandler::InitCheck() const
 }
 
 
+//!	Allows controlling this handler from userlevel.
 status_t
 KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 {
@@ -70,6 +88,7 @@ KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 }
 
 
+//!	Stack ioctl handler.
 status_t
 KPPPOptionHandler::StackControl(uint32 op, void *data)
 {
@@ -82,8 +101,97 @@ KPPPOptionHandler::StackControl(uint32 op, void *data)
 }
 
 
+/*!	\brief Notification hook when the interface profile changes dynamically.
+	
+	You should override this method to update your profile settings if this handler
+	has such settings at all. This is mostly used by authenticators and possibly
+	protocols.
+*/
 void
 KPPPOptionHandler::ProfileChanged()
+{
+	// do nothing by default
+}
+
+
+/*!	\brief Add request item.
+	
+	What you do here depends on the connection side (client or server). \n
+	Received nak and reject packets influence which value gets added to the
+	request, too.
+*/
+status_t
+KPPPOptionHandler::AddToRequest(KPPPConfigurePacket& request)
+{
+	return B_OK;
+}
+
+
+/*!	\brief Parse a nak received from the peer.
+	
+	This method is called only once for each option handler. You must find the item
+	yourself (no index is given).
+*/
+status_t
+KPPPOptionHandler::ParseNak(const KPPPConfigurePacket& nak)
+{
+	return B_OK;
+}
+
+
+/*!	\brief Parse a reject received from the peer.
+	
+	This method is called only once for each option handler. You must find the item
+	yourself (no index is given).
+*/
+status_t
+KPPPOptionHandler::ParseReject(const KPPPConfigurePacket& reject)
+{
+	return B_OK;
+}
+
+
+/*!	\brief Parse an ack received from the peer.
+	
+	This method is called only once for each option handler. You must find the item
+	yourself (no index is given).
+*/
+status_t
+KPPPOptionHandler::ParseAck(const KPPPConfigurePacket& ack)
+{
+	return B_OK;
+}
+
+
+/*!	\brief Handler for configure requests sent by peer.
+	
+	Index may be behind the last item which means additional values can be
+	appended.
+	
+	\param request The requested values.
+	\param index Index of item in \a request.
+	\param nak Values for the nak should be added here.
+	\param reject Values for the reject should be added here.
+*/
+status_t
+KPPPOptionHandler::ParseRequest(const KPPPConfigurePacket& request,
+	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
+{
+	return B_OK;
+}
+
+
+//!	Notification that we ack the values in \a ack.
+status_t
+KPPPOptionHandler::SendingAck(const KPPPConfigurePacket& ack)
+{
+	return B_OK;
+}
+
+
+//!	Reset internal state (e.g.: remove list of rejected values).
+void
+KPPPOptionHandler::Reset()
 {
 	// do nothing by default
 }

@@ -42,9 +42,9 @@ class KPPPDevice : public KPPPLayer {
 		
 		/*!	\brief This brings the device up.
 			
-			ATTENTION: This method must not block!\n
+			ATTENTION: This method must not block! \n
 			Call UpStarted() to check if you are allowed to go down. After UpStarted()
-			is called the connection attempt may be aborted by calling Down().\n
+			is called the connection attempt may be aborted by calling Down(). \n
 			In server mode you should listen for incoming connections.
 			On error: \e Either call \c UpFailedEvent() and return \c true \e or
 			return \c false only. \e Never call \c UpFailedEvent() and return
@@ -56,7 +56,7 @@ class KPPPDevice : public KPPPLayer {
 		virtual bool Up() = 0;
 		/*!	\brief Bring the interface down.
 			
-			Call DownStarted() to check if you are allowed to go down.\n
+			Call DownStarted() to check if you are allowed to go down. \n
 			The return value of this method is currently ignored.
 			
 			\sa DownStarted()
@@ -77,13 +77,13 @@ class KPPPDevice : public KPPPLayer {
 		
 		/*!	\brief Input speed in bytes per second.
 			
-			The biggest of the two tranfer rates will be set in ifnet.\n
+			The biggest of the two tranfer rates will be set in ifnet. \n
 			Should return default value when disconnected.
 		*/
 		virtual uint32 InputTransferRate() const = 0;
 		/*!	\brief Output speed in bytes per second.
 			
-			The biggest of the two tranfer rates will be set in ifnet.\n
+			The biggest of the two tranfer rates will be set in ifnet. \n
 			Should return default value when disconnected.
 		*/
 		virtual uint32 OutputTransferRate() const = 0;

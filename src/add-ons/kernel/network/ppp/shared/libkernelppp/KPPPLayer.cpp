@@ -28,7 +28,7 @@
 
 /*!	\brief Creates a new layer.
 	
-	If an error appears in the constructor you should set \c fInitStatus.
+	If an error occurs in the constructor you should set \c fInitStatus.
 */
 KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
 	: fInitStatus(B_OK),

@@ -172,7 +172,7 @@ class KPPPInterface : public KPPPLayer {
 			{ return fPFCOptions; }
 		/*!	\brief Local PFC state
 			
-			Values defined in \c ppp_pfc_state.\n
+			Values defined in \c ppp_pfc_state. \n
 			The local PFC state says if we accepted a request from the peer
 			i.e.: we may use PFC in outgoing packets.
 		*/
@@ -180,7 +180,7 @@ class KPPPInterface : public KPPPLayer {
 			{ return fLocalPFCState; }
 		/*!	\brief Peer PFC state
 			
-			Values defined in \c ppp_pfc_state.\n
+			Values defined in \c ppp_pfc_state. \n
 			The peer PFC state says if the peer accepted a request us
 			i.e.: the peer might send PFC-compressed packets to us
 		*/

@@ -5,14 +5,30 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPLCPExtension
+	\brief LCP protocol extension
+	
+	This class can be used to extend the supported LCP protocol codes.
+*/
+
 #include <KPPPLCPExtension.h>
 
 #include <PPPControl.h>
 
 
-KPPPLCPExtension::KPPPLCPExtension(const char *name, uint8 code, KPPPInterface& interface,
-		driver_parameter *settings)
-	: fInterface(interface),
+/*!	\brief Constructor.
+	
+	If an error occurs in the constructor you should set \c fInitStatus.
+	
+	\param name Name of the extension.
+	\param code LCP code that this extension can handle.
+	\param interface Owning interface.
+	\param settings Settings for this extension.
+*/
+KPPPLCPExtension::KPPPLCPExtension(const char *name, uint8 code,
+		KPPPInterface& interface, driver_parameter *settings)
+	: fInitStatus(B_OK),
+	fInterface(interface),
 	fSettings(settings),
 	fCode(code),
 	fEnabled(true)
@@ -24,14 +40,16 @@ KPPPLCPExtension::KPPPLCPExtension(const char *name, uint8 code, KPPPInterface& 
 }
 
 
+//!	Destructor. Frees the name and unregisters extension from LCP protocol.
 KPPPLCPExtension::~KPPPLCPExtension()
 {
-	free(fName);
-	
 	Interface().LCP().RemoveLCPExtension(this);
+	
+	free(fName);
 }
 
 
+//!	Returns \c fInitStatus. May be overridden to return status-dependend errors.
 status_t
 KPPPLCPExtension::InitCheck() const
 {
@@ -39,6 +57,7 @@ KPPPLCPExtension::InitCheck() const
 }
 
 
+//!	Allows controlling this extension from userlevel.
 status_t
 KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 {
@@ -69,6 +88,7 @@ KPPPLCPExtension::Control(uint32 op, void *data, size_t length)
 }
 
 
+//!	Stack ioctl handler.
 status_t
 KPPPLCPExtension::StackControl(uint32 op, void *data)
 {
@@ -81,6 +101,12 @@ KPPPLCPExtension::StackControl(uint32 op, void *data)
 }
 
 
+/*!	\brief Notification hook when the interface profile changes dynamically.
+	
+	You should override this method to update your profile settings if this extension
+	has such settings at all. This is mostly used by authenticators and possibly
+	protocols.
+*/
 void
 KPPPLCPExtension::ProfileChanged()
 {
@@ -88,6 +114,10 @@ KPPPLCPExtension::ProfileChanged()
 }
 
 
+/*!	\brief Reset internal connection state.
+	
+	This method is called when: connecting, reconfiguring, or disconnecting.
+*/
 void
 KPPPLCPExtension::Reset()
 {
@@ -95,6 +125,10 @@ KPPPLCPExtension::Reset()
 }
 
 
+/*!	\brief You may override this for periodic tasks.
+	
+	This method gets called every \c PPP_PULSE_RATE microseconds.
+*/
 void
 KPPPLCPExtension::Pulse()
 {

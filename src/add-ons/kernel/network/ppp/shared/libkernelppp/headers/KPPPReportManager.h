@@ -16,6 +16,7 @@
 #include <TemplateList.h>
 
 
+//!	Sends a reply to the report message sender.
 #define PPP_REPLY(sender, value) \
 	send_data_with_timeout((sender), (value), NULL, 0, PPP_REPORT_TIMEOUT)
 

@@ -20,6 +20,7 @@
 
 
 class KPPPInterface;
+//!	Private structure used by PPP interface manager.
 typedef struct ppp_interface_entry {
 	KPPPInterface *interface;
 	vint32 accessing;

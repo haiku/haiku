@@ -9,11 +9,11 @@
 	\brief The LCP protocol.
 	
 	Every PPP interface \e must have an LCP protocol. It is used for establishing
-	and terminating connections.\n
+	and terminating connections. \n
 	When establishing a connecition the LCP protocol determines connection-specific
 	settings like the packet MRU. These settings are handled by the KPPPOptionHandler
 	class. Additional LCP codes like the PPP Multilink-Protocol uses them should
-	be implemented through the KPPPLCPExtension class.\n
+	be implemented through the KPPPLCPExtension class. \n
 */
 
 #include <KPPPInterface.h>
@@ -50,7 +50,11 @@ KPPPLCP::~KPPPLCP()
 }
 
 
-//!	Adds a new option handler.
+/*!	\brief Adds a new option handler.
+	
+	NOTE: You can only add option handlers in \c PPP_DOWN_PHASE. \n
+	There may only be one handler per option type!
+*/
 bool
 KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 {
@@ -59,7 +63,8 @@ KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 	
 	LockerHelper locker(StateMachine().fLock);
 	
-	if(Interface().Phase() != PPP_DOWN_PHASE || OptionHandlerFor(optionHandler->Type()))
+	if(Interface().Phase() != PPP_DOWN_PHASE
+			|| OptionHandlerFor(optionHandler->Type()))
 		return false;
 			// a running connection may not change and there may only be
 			// one handler per option type
@@ -68,7 +73,10 @@ KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 }
 
 
-//!	Removes an option handler, but does not delete it.
+/*!	\brief Removes an option handler, but does not delete it.
+	
+	NOTE: You can only remove option handlers in \c PPP_DOWN_PHASE.
+*/
 bool
 KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 {
@@ -122,7 +130,10 @@ KPPPLCP::OptionHandlerFor(uint8 type, int32 *start = NULL) const
 }
 
 
-//!	Adds a new LCP extension.
+/*!	\brief Adds a new LCP extension.
+	
+	NOTE: You can only add LCP extensions in \c PPP_DOWN_PHASE.
+*/
 bool
 KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 {
@@ -139,7 +150,10 @@ KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 }
 
 
-//!	Removes an LCP extension, but does not delete it.
+/*!	\brief Removes an LCP extension, but does not delete it.
+	
+	NOTE: You can only remove LCP extensions in \c PPP_DOWN_PHASE.
+*/
 bool
 KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 {

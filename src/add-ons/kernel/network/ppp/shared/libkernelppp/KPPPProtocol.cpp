@@ -5,6 +5,12 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPProtocol.
+	\brief Represents a PPP protocol object.
+	
+	This class is the base for all protocols, encapsulators, and authenticators.
+*/
+
 #include <KPPPInterface.h>
 #include <KPPPUtils.h>
 #include <PPPControl.h>
@@ -13,6 +19,27 @@
 #include <cstring>
 
 
+/*!	\brief Constructs a PPP protocol.
+	
+	If you are creating a normal protocol use a level of \c PPP_PROTOCOL_LEVEL.
+	Encapsulators like compression protocols should use a different level. \n
+	Authenticators are identified by a type string equal to "Authenticator" and they
+	have an optionHandler that implements only the following methods:
+	- AddToRequest
+	- ParseRequest
+	
+	\param name The protocol name.
+	\param activationPhase Our activation phase.
+	\param protocolNumber Our protocol number.
+	\param level The level at which we get inserted into the list of protocols.
+	\param addressFamily The address family.  Values < 0 and > 0xFF are ignored.
+	\param overhead The protocol's header size.
+	\param interface The owner.
+	\param settings Our settings.
+	\param flags Optional flags. See \c ppp_protocol_flags for more information.
+	\param type Optional type string. Used by authenticators, for example.
+	\param optionHandler Optional handler associated with this protocol.
+*/
 KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 		uint16 protocolNumber, ppp_level level, int32 addressFamily,
 		uint32 overhead, KPPPInterface& interface,
@@ -48,6 +75,7 @@ KPPPProtocol::KPPPProtocol(const char *name, ppp_phase activationPhase,
 }
 
 
+//!	Removes this protocol from the interface and frees the type.
 KPPPProtocol::~KPPPProtocol()
 {
 	Interface().RemoveProtocol(this);
@@ -56,6 +84,10 @@ KPPPProtocol::~KPPPProtocol()
 }
 
 
+/*!	\brief This should uninit the protocol before it gets deleted.
+	
+	You may want to remove all routes of this protocol.
+*/
 void
 KPPPProtocol::Uninit()
 {
@@ -63,6 +95,10 @@ KPPPProtocol::Uninit()
 }
 
 
+/*!	\brief Allows private extensions.
+	
+	If you override this method you must call the parent's method for unknown ops.
+*/
 status_t
 KPPPProtocol::Control(uint32 op, void *data, size_t length)
 {
@@ -104,6 +140,7 @@ KPPPProtocol::Control(uint32 op, void *data, size_t length)
 }
 
 
+//!	Stack ioctl handler.
 status_t
 KPPPProtocol::StackControl(uint32 op, void *data)
 {
@@ -116,6 +153,10 @@ KPPPProtocol::StackControl(uint32 op, void *data)
 }
 
 
+/*!	\brief Enables or disables this protocol.
+	
+	A disabled protocol is ignored and Up() is not called!
+*/
 void
 KPPPProtocol::SetEnabled(bool enabled = true)
 {
@@ -129,6 +170,7 @@ KPPPProtocol::SetEnabled(bool enabled = true)
 }
 
 
+//!	Returns if this protocol is allowed to send a packet (enabled, up, etc.).
 bool
 KPPPProtocol::IsAllowedToSend() const
 {
@@ -136,6 +178,11 @@ KPPPProtocol::IsAllowedToSend() const
 }
 
 
+/*!	\brief Report that the protocol is going up.
+	
+	Called by Up(). \n
+	From now on, the connection attempt can may be aborted by calling Down().
+*/
 void
 KPPPProtocol::UpStarted()
 {
@@ -143,6 +190,10 @@ KPPPProtocol::UpStarted()
 }
 
 
+/*!	\brief Report that the protocol is going down.
+	
+	Called by Down().
+*/
 void
 KPPPProtocol::DownStarted()
 {
@@ -150,6 +201,10 @@ KPPPProtocol::DownStarted()
 }
 
 
+/*!	\brief Reports that we failed going up. May only be called after Up() was called.
+	
+	Authenticators \e must call the state machine's authentication notification first!
+*/
 void
 KPPPProtocol::UpFailedEvent()
 {
@@ -159,6 +214,10 @@ KPPPProtocol::UpFailedEvent()
 }
 
 
+/*!	\brief Reports that we went up. May only be called after Up() was called.
+	
+	Authenticators \e must call the state machine's authentication notification first!
+*/
 void
 KPPPProtocol::UpEvent()
 {
@@ -168,6 +227,10 @@ KPPPProtocol::UpEvent()
 }
 
 
+/*!	\brief Reports that we went down. This may be called to indicate connection loss.
+	
+	Authenticators \e must call the state machine's authentication notification first!
+*/
 void
 KPPPProtocol::DownEvent()
 {

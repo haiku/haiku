@@ -71,7 +71,7 @@ class KPPPLCP : public KPPPProtocol {
 		/*!	\brief Sets the target protocol handler for outgoing LCP packets.
 			
 			This may be used for filtering or routing LCP packets. Multilink
-			protocols might need this method.\n
+			protocols might need this method. \n
 			If \a target != \c NULL all packets will be passed to the given protocol
 			instead of the interface/device.
 		*/

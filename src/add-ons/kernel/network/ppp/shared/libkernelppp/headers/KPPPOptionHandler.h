@@ -28,19 +28,25 @@ class KPPPOptionHandler {
 		
 		virtual status_t InitCheck() const;
 		
+		//!	Returns the name of this handler.
 		const char *Name() const
 			{ return fName; }
 		
+		//!	Returns the LCP item type this object can handle.
 		uint8 Type() const
 			{ return fType; }
 		
+		//!	Returns the owning interface.
 		KPPPInterface& Interface() const
 			{ return fInterface; }
+		//!	Returns the handler's settings.
 		driver_parameter *Settings() const
 			{ return fSettings; }
 		
+		//!	Enables or disables this handler.
 		void SetEnabled(bool enabled = true)
 			{ fEnabled = enabled; }
+		//!	Returns if the handler is enabled.
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
@@ -51,24 +57,19 @@ class KPPPOptionHandler {
 		virtual void ProfileChanged();
 		
 		// we want to send a configure request or we received a reply
-		virtual status_t AddToRequest(KPPPConfigurePacket& request) = 0;
-		virtual status_t ParseNak(const KPPPConfigurePacket& nak) = 0;
+		virtual status_t AddToRequest(KPPPConfigurePacket& request);
+		virtual status_t ParseNak(const KPPPConfigurePacket& nak);
 			// create next request based on these and previous values
-		virtual status_t ParseReject(const KPPPConfigurePacket& reject) = 0;
+		virtual status_t ParseReject(const KPPPConfigurePacket& reject);
 			// create next request based on these and previous values
-		virtual status_t ParseAck(const KPPPConfigurePacket& ack) = 0;
+		virtual status_t ParseAck(const KPPPConfigurePacket& ack);
 			// this is called for all handlers
 		
-		// peer sent configure request
 		virtual status_t ParseRequest(const KPPPConfigurePacket& request,
-			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject) = 0;
-			// index may be behind the last item which means additional values can be
-			// appended
-		virtual status_t SendingAck(const KPPPConfigurePacket& ack) = 0;
-			// notification that we ack these values
+			int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject);
+		virtual status_t SendingAck(const KPPPConfigurePacket& ack);
 		
-		virtual void Reset() = 0;
-			// e.g.: remove list of rejected values
+		virtual void Reset();
 
 	protected:
 		status_t fInitStatus;

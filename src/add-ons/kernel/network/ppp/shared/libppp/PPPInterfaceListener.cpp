@@ -5,6 +5,23 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class PPPInterfaceListener
+	\brief This class simplifies the process of monitoring PPP interfaces.
+	
+	PPPInterfaceListener converts all kernel report messages from the PPP stack
+	into BMessage objects and forwards them to the target BHandler.\n
+	In case the BLooper's message queue is full and does not respond after a timeout
+	period it sends the reply message to the PPP stack for you. Otherwise you must
+	do it yourself.\n
+	Of course you can use this class to watch for all interfaces. This includes
+	automatically adding newly created interfaces to the watch-list.\n
+	The following values are added to each BMessage as int32 values:
+		- "sender": the thread_id of the report sender (your reply target)
+		- "interface" (optional): the interface ID of the affected interface
+		- "type": the report type
+		- "code": the report code
+*/
+
 #include "PPPInterfaceListener.h"
 
 #include "PPPInterface.h"
@@ -20,6 +37,7 @@ static const uint32 kReportFlags = PPP_WAIT_FOR_REPLY | PPP_NO_REPLY_TIMEOUT
 static const int32 kCodeQuitReportThread = 'QUIT';
 
 
+//!	Private class.
 class PPPInterfaceListenerThread {
 	public:
 		PPPInterfaceListenerThread(PPPInterfaceListener *listener)
@@ -75,7 +93,8 @@ PPPInterfaceListenerThread::Run()
 				// needed to tell compiler which version of SendMessage we want
 			if(messenger.SendMessage(&message, noHandler, 100000) != B_OK)
 				send_data(sender, B_OK, NULL, 0);
-		}
+		} else
+			send_data(sender, B_OK, NULL, 0);
 	}
 	
 	return B_OK;
@@ -96,6 +115,10 @@ report_thread(void *data)
 }
 
 
+/*!	\brief Constructs a new listener that sends report messages to \a target.
+	
+	\param target The target BHandler which should receive report messages.
+*/
 PPPInterfaceListener::PPPInterfaceListener(BHandler *target)
 	: fTarget(target),
 	fDoesWatch(false),
@@ -105,6 +128,7 @@ PPPInterfaceListener::PPPInterfaceListener(BHandler *target)
 }
 
 
+//!	Copy constructor.
 PPPInterfaceListener::PPPInterfaceListener(const PPPInterfaceListener& copy)
 	: fTarget(copy.Target()),
 	fDoesWatch(false),
@@ -114,6 +138,7 @@ PPPInterfaceListener::PPPInterfaceListener(const PPPInterfaceListener& copy)
 }
 
 
+//!	Removes all report message requests.
 PPPInterfaceListener::~PPPInterfaceListener()
 {
 	// disable all report messages
@@ -127,6 +152,15 @@ PPPInterfaceListener::~PPPInterfaceListener()
 }
 
 
+/*!	\brief Returns whether the listener was constructed correctly.
+	
+	\return
+		- \c B_OK: No errors.
+		- \c B_ERROR: Some not defined error occured (like missing PPP stack).
+		- any other value: see \c PPPManager::InitCheck()
+	
+	\sa PPPManager::InitCheck()
+*/
 status_t
 PPPInterfaceListener::InitCheck() const
 {
@@ -137,6 +171,7 @@ PPPInterfaceListener::InitCheck() const
 }
 
 
+//!	Changes the target BHandler for the report messages (may be \c NULL).
 void
 PPPInterfaceListener::SetTarget(BHandler *target)
 {
@@ -146,6 +181,14 @@ PPPInterfaceListener::SetTarget(BHandler *target)
 }
 
 
+/*!	\brief Changes the interface being monitored.
+	
+	This unregisters the old interface from the watch-list.
+	
+	\param ID The ID of the interface you want to watch.
+	
+	\return \c true on sucess, \c false on failure.
+*/
 bool
 PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
 {
@@ -166,6 +209,7 @@ PPPInterfaceListener::WatchInterface(ppp_interface_id ID)
 }
 
 
+//!	Enables mode for watching all interfaces. New interfaces are added automatically.
 void
 PPPInterfaceListener::WatchAllInterfaces()
 {
@@ -192,6 +236,11 @@ PPPInterfaceListener::WatchAllInterfaces()
 }
 
 
+/*!	\brief Stops watching interfaces.
+	
+	Beware that this does not disable the PPP stack's own report messages (e.g.: new
+	interfaces that being created).
+*/
 void
 PPPInterfaceListener::StopWatchingInterfaces()
 {

@@ -15,7 +15,7 @@ class BHandler;
 
 
 #define PPP_REPORT_MESSAGE	'P3RM'
-	// the what field of report messages
+	//!< The what field of PPPInterfaceListener report messages.
 
 
 class PPPInterfaceListener {
@@ -28,15 +28,19 @@ class PPPInterfaceListener {
 		
 		status_t InitCheck() const;
 		
+		//!	Returns the target BHandler for the report messages.
 		BHandler *Target() const
 			{ return fTarget; }
 		void SetTarget(BHandler *target);
 		
+		//!	Returns whether watching an interface.
 		bool DoesWatch() const
 			{ return fDoesWatch; }
+		//!	Returns which interface is being watched or \c PPP_UNDEFINED_INTERFACE_ID.
 		ppp_interface_id WatchingInterface() const
 			{ return fWatchingInterface; }
 		
+		//!	Returns the internal PPPManager object used for accessing the PPP stack.
 		const PPPManager& Manager() const
 			{ return fManager; }
 		
@@ -44,9 +48,9 @@ class PPPInterfaceListener {
 		void WatchAllInterfaces();
 		void StopWatchingInterfaces();
 		
+		//!	Just sets the target to the given listener's target.
 		PPPInterfaceListener& operator= (const PPPInterfaceListener& copy)
 			{ SetTarget(copy.Target()); return *this; }
-				// all interface listeners have the same number of interfaces
 
 	private:
 		void Construct();

@@ -98,17 +98,21 @@ enum ppp_pfc_state {
 		//!< PFC was rejected by other side. Not used for peer state.
 };
 
-// protocol flags
-enum {
+//!	Protocol flags.
+enum ppp_protocol_flags {
 	PPP_NO_FLAGS = 0x00,
+		//!< No flags.
 	PPP_ALWAYS_ALLOWED = 0x01,
-		// protocol may send/receive in Phase() >= PPP_ESTABLISHMENT_PHASE,
-		// but only LCP is allowed in State() != PPP_OPENED_STATE!
+		//!< Protocol may send/receive in Phase() >= PPP_ESTABLISHMENT_PHASE.
+		// But only LCP is allowed in State() != PPP_OPENED_STATE!
 	PPP_NOT_IMPORTANT = 0x02,
-		// if this protocol fails to go up we do not disconnect
-	PPP_INCLUDES_NCP = 0x04,
-		// This protocol includes the corresponding NCP protocol (e.g.: IPCP + IP).
-		// All protocol values will also be checked against Protocol() & 0x7FFF.
+		//!< If this protocol fails to go up we do not disconnect.
+	
+	/*!	\brief This protocol includes the corresponding NCP protocol (e.g.: IPCP + IP).
+		
+		All protocol values will also be checked against Protocol() & 0x7FFF.
+	*/
+	PPP_INCLUDES_NCP = 0x04
 };
 
 // phase when the protocol is brought up

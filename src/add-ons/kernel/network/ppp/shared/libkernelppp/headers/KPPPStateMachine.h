@@ -34,21 +34,26 @@ class KPPPStateMachine {
 		KPPPStateMachine& operator= (const KPPPStateMachine& copy);
 
 	public:
+		//!	Returns the interface that owns this state machine.
 		KPPPInterface& Interface() const
 			{ return fInterface; }
+		//!	Returns the LCP protocol object belonging to this state machine.
 		KPPPLCP& LCP() const
 			{ return fLCP; }
 		
+		//!	Returns the current state as defined in RFC 1661.
 		ppp_state State() const
 			{ return fState; }
+		//!	Returns the internal phase.
 		ppp_phase Phase() const
 			{ return fPhase; }
 		
 		uint8 NextID();
-			// return the next id for LCP packets
 		
+		//!	Sets our packets' magic number. Used by Link-Quality-Monitoring.
 		void SetMagicNumber(uint32 magicNumber)
 			{ fMagicNumber = magicNumber; }
+		//!	Returns our packets' magic number.
 		uint32 MagicNumber() const
 			{ return fMagicNumber; }
 		
@@ -64,16 +69,20 @@ class KPPPStateMachine {
 		void LocalAuthenticationRequested();
 		void LocalAuthenticationAccepted(const char *name);
 		void LocalAuthenticationDenied(const char *name);
+		//!	Returns the name/login string we used for authentication.
 		const char *LocalAuthenticationName() const
 			{ return fLocalAuthenticationName; }
+		//!	Returns our local authentication status.
 		ppp_authentication_status LocalAuthenticationStatus() const
 			{ return fLocalAuthenticationStatus; }
 		
 		void PeerAuthenticationRequested();
 		void PeerAuthenticationAccepted(const char *name);
 		void PeerAuthenticationDenied(const char *name);
+		//!	Returns the name/login string the peer used for authentication.
 		const char *PeerAuthenticationName() const
 			{ return fPeerAuthenticationName; }
+		//!	Returns the peer's authentication status.
 		ppp_authentication_status PeerAuthenticationStatus() const
 			{ return fPeerAuthenticationStatus; }
 		

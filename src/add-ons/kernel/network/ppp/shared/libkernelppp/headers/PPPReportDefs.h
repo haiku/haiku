@@ -18,7 +18,7 @@
 #define PPP_REPORT_CODE				'_3PR'
 	// the code of receive_data() must have this value
 
-// report flags
+//!	Report flags.
 enum ppp_report_flags {
 	PPP_WAIT_FOR_REPLY = 0x01,
 	PPP_REMOVE_AFTER_REPORT = 0x02,
@@ -64,15 +64,17 @@ enum ppp_connection_report_codes {
 };
 
 
+//!	This is the structure of a report message.
 typedef struct ppp_report_packet {
 	int32 type;
 	int32 code;
 	uint8 length;
-		// length of data
+		//!< Length of the additional data.
 	char data[PPP_REPORT_DATA_LIMIT];
 } ppp_report_packet;
 
 
+//!	Private structure used for storing report requests.
 typedef struct ppp_report_request {
 	ppp_report_type type;
 	thread_id thread;

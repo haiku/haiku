@@ -8,7 +8,7 @@
 /*!	\class KPPPDevice
 	\brief Represents a device at the lowest level of the communcation stack.
 	
-	A device may be, for example: Modem, PPPoE, PPTP.\n
+	A device may be, for example: Modem, PPPoE, PPTP. \n
 	It encapsulates the packet and sends it over a line to the other end.
 	The device is the first layer that receives a packet.
 */
@@ -101,7 +101,7 @@ KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 
 /*!	\brief Report that device is going up.
 	
-	Called by Up().\n
+	Called by Up(). \n
 	From now on, the connection attempt can may be aborted by calling Down().
 	
 	\return

@@ -5,18 +5,27 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPReportManager
+	\brief Manager for PPP reports and report requests.
+*/
+
 #include <KPPPReportManager.h>
 #include <LockerHelper.h>
 
 #include <KPPPUtils.h>
 
 
+/*!	\brief Constructor.
+	
+	\param lock The BLocker that should be used by this report manager.
+*/
 KPPPReportManager::KPPPReportManager(BLocker& lock)
 	: fLock(lock)
 {
 }
 
 
+//!	Deletes all report requests.
 KPPPReportManager::~KPPPReportManager()
 {
 	for(int32 index = 0; index < fReportRequests.CountItems(); index++)
@@ -24,6 +33,12 @@ KPPPReportManager::~KPPPReportManager()
 }
 
 
+/*!	\brief Requests report messages of a given \a type.
+	
+	\param type The type of report.
+	\param thread The receiver thread.
+	\param flags Optional report flags. See \c ppp_report_flags for more information.
+*/
 void
 KPPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 	int32 flags = PPP_NO_FLAGS)
@@ -42,6 +57,7 @@ KPPPReportManager::EnableReports(ppp_report_type type, thread_id thread,
 }
 
 
+//!	Removes a report request.
 void
 KPPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 {
@@ -64,6 +80,7 @@ KPPPReportManager::DisableReports(ppp_report_type type, thread_id thread)
 }
 
 
+//!	Returns if we report messages of a given \a type to the given \a thread.
 bool
 KPPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 {
@@ -85,6 +102,18 @@ KPPPReportManager::DoesReport(ppp_report_type type, thread_id thread)
 }
 
 
+/*!	\brief Send out report messages to all requestors.
+	
+	You may append additional data to the report messages. The data length may not be
+	greater than \c PPP_REPORT_DATA_LIMIT.
+	
+	\param type The report type.
+	\param code The report code belonging to the report type.
+	\param data Additional data.
+	\param length Length of the data.
+	
+	\return \c true if all receivers accepted the message or \c false otherwise.
+*/
 bool
 KPPPReportManager::Report(ppp_report_type type, int32 code, void *data, int32 length)
 {

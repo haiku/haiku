@@ -5,6 +5,14 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+/*!	\class KPPPStateMachine
+	\brief PPP state machine belonging to the LCP protocol
+	
+	The state machine is responsible for handling events and state changes.
+	
+	\sa KPPPLCP
+*/
+
 #include <OS.h>
 
 #include <KPPPInterface.h>
@@ -23,6 +31,7 @@ static const bigtime_t kPPPStateMachineTimeout = 3000000;
 	// 3 seconds
 
 
+//!	Constructor.
 KPPPStateMachine::KPPPStateMachine(KPPPInterface& interface)
 	: fInterface(interface),
 	fLCP(interface.LCP()),
@@ -45,6 +54,7 @@ KPPPStateMachine::KPPPStateMachine(KPPPInterface& interface)
 }
 
 
+//!	Destructor. Frees loaded memory.
 KPPPStateMachine::~KPPPStateMachine()
 {
 	free(fLocalAuthenticationName);
@@ -52,6 +62,7 @@ KPPPStateMachine::~KPPPStateMachine()
 }
 
 
+//!	Creates an ID for the next LCP packet.
 uint8
 KPPPStateMachine::NextID()
 {
@@ -59,8 +70,11 @@ KPPPStateMachine::NextID()
 }
 
 
-// remember: NewState() must always be called _after_ IllegalEvent()
-// because IllegalEvent() also looks at the current state.
+/*!	\brief Changes the current state.
+	
+	Remember: NewState() must always be called \e after IllegalEvent() because
+	IllegalEvent() also looks at the current state.
+*/
 void
 KPPPStateMachine::NewState(ppp_state next)
 {
@@ -79,6 +93,11 @@ KPPPStateMachine::NewState(ppp_state next)
 }
 
 
+/*!	\brief Changes the current phase.
+	
+	This method is responsible for setting the \c if_flags and sending the
+	\c PPP_REPORT_UP_SUCCESSFUL report message.
+*/
 void
 KPPPStateMachine::NewPhase(ppp_phase next)
 {
@@ -120,6 +139,8 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 
 
 // public actions
+
+//!	Reconfigures the state machine. This initiates a new configure request handshake.
 bool
 KPPPStateMachine::Reconfigure()
 {
@@ -146,6 +167,7 @@ KPPPStateMachine::Reconfigure()
 }
 
 
+//!	Sends an echo request packet.
 bool
 KPPPStateMachine::SendEchoRequest()
 {
@@ -176,6 +198,7 @@ KPPPStateMachine::SendEchoRequest()
 }
 
 
+//!	Sends a discard request packet.
 bool
 KPPPStateMachine::SendDiscardRequest()
 {
@@ -206,6 +229,11 @@ KPPPStateMachine::SendDiscardRequest()
 
 
 // authentication events
+
+/*!	Notification that local authentication is requested.
+	
+	NOTE: This must be called \e after \c KPPPProtocol::Up().
+*/
 void
 KPPPStateMachine::LocalAuthenticationRequested()
 {
@@ -226,6 +254,12 @@ KPPPStateMachine::LocalAuthenticationRequested()
 }
 
 
+/*!	\brief Notification that local authentication was accepted.
+	
+	NOTE: This must be called \e before \c UpEvent().
+	
+	\param name The username/login that was accepted.
+*/
 void
 KPPPStateMachine::LocalAuthenticationAccepted(const char *name)
 {
@@ -249,6 +283,12 @@ KPPPStateMachine::LocalAuthenticationAccepted(const char *name)
 }
 
 
+/*!	\brief Notification that local authentication was denied.
+	
+	NOTE: This must be called \e before \c UpFailedEvent().
+	
+	\param name The username/login that was denied.
+*/
 void
 KPPPStateMachine::LocalAuthenticationDenied(const char *name)
 {
@@ -270,6 +310,7 @@ KPPPStateMachine::LocalAuthenticationDenied(const char *name)
 }
 
 
+//!	Notification that peer authentication is requested.
 void
 KPPPStateMachine::PeerAuthenticationRequested()
 {
@@ -290,6 +331,12 @@ KPPPStateMachine::PeerAuthenticationRequested()
 }
 
 
+/*!	\brief Notification that peer authentication was accepted.
+	
+	NOTE: This must be called \e before \c UpEvent().
+	
+	\param name The username/login that was accepted.
+*/
 void
 KPPPStateMachine::PeerAuthenticationAccepted(const char *name)
 {
@@ -313,6 +360,12 @@ KPPPStateMachine::PeerAuthenticationAccepted(const char *name)
 }
 
 
+/*!	\brief Notification that peer authentication was denied.
+	
+	NOTE: This must be called \e before \c UpFailedEvent().
+	
+	\param name The username/login that was denied.
+*/
 void
 KPPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
@@ -336,6 +389,7 @@ KPPPStateMachine::PeerAuthenticationDenied(const char *name)
 }
 
 
+//!	Notification that a child interface failed to go up.
 void
 KPPPStateMachine::UpFailedEvent(KPPPInterface& interface)
 {
@@ -349,6 +403,7 @@ KPPPStateMachine::UpFailedEvent(KPPPInterface& interface)
 }
 
 
+//!	Notification that a child interface went up successfully.
 void
 KPPPStateMachine::UpEvent(KPPPInterface& interface)
 {
@@ -379,6 +434,7 @@ KPPPStateMachine::UpEvent(KPPPInterface& interface)
 }
 
 
+//!	Notification that a child interface went down.
 void
 KPPPStateMachine::DownEvent(KPPPInterface& interface)
 {
@@ -425,6 +481,11 @@ KPPPStateMachine::DownEvent(KPPPInterface& interface)
 }
 
 
+/*!	\brief Notification that a protocol failed to go up.
+	
+	NOTE FOR AUTHENTICATORS: This \e must be called \e after an authentication
+	notification method like \c LocalAuthenticationFailed().
+*/
 void
 KPPPStateMachine::UpFailedEvent(KPPPProtocol *protocol)
 {
@@ -450,6 +511,11 @@ KPPPStateMachine::UpFailedEvent(KPPPProtocol *protocol)
 }
 
 
+/*!	\brief Notification that a protocol went up successfully.
+	
+	NOTE FOR AUTHENTICATORS: This \e must be called \e after an authentication
+	notification method like \c LocalAuthenticationSuccessful().
+*/
 void
 KPPPStateMachine::UpEvent(KPPPProtocol *protocol)
 {
@@ -465,6 +531,11 @@ KPPPStateMachine::UpEvent(KPPPProtocol *protocol)
 }
 
 
+/*!	\brief Notification that a protocol went down.
+	
+	NOTE FOR AUTHENTICATORS: This \e must be called \e after an authentication
+	notification method like \c LocalAuthenticationFailed().
+*/
 void
 KPPPStateMachine::DownEvent(KPPPProtocol *protocol)
 {
@@ -475,11 +546,14 @@ KPPPStateMachine::DownEvent(KPPPProtocol *protocol)
 }
 
 
-// This is called by the device to tell us that it entered establishment
-// phase. We can use Device::Down() to abort establishment until UpEvent()
-// is called.
-// The return value says if we are waiting for an UpEvent(). If false is
-// returned the device should immediately abort its attempt to connect.
+/*!	\brief Notification that the device entered establishment phase.
+	
+	We can use \c Device::Down() to abort establishment until \c UpEvent() is called.
+	
+	\return
+		- \c true: We are waiting for an \c UpEvent()
+		- \c false: The device should immediately abort its attempt to connect.
+*/
 bool
 KPPPStateMachine::TLSNotify()
 {
@@ -501,10 +575,14 @@ KPPPStateMachine::TLSNotify()
 }
 
 
-// This is called by the device to tell us that it entered termination phase.
-// A Device::Up() should wait until the device went down.
-// If false is returned we want to stay connected, though we called
-// Device::Down().
+/*!	\brief Notification that the device entered termination phase.
+	
+	A \c Device::Up() should wait until the device went down.
+	
+	\return
+		- \c true: Continue terminating.
+		- \c false: We want to stay connected, though we called \c Device::Down().
+*/
 bool
 KPPPStateMachine::TLFNotify()
 {
@@ -522,6 +600,7 @@ KPPPStateMachine::TLFNotify()
 }
 
 
+//!	Notification that the device failed to go up.
 void
 KPPPStateMachine::UpFailedEvent()
 {
@@ -550,6 +629,7 @@ KPPPStateMachine::UpFailedEvent()
 }
 
 
+//!	Notification that the device went up successfully.
 void
 KPPPStateMachine::UpEvent()
 {
@@ -615,6 +695,11 @@ KPPPStateMachine::UpEvent()
 }
 
 
+/*!	\brief Notification that the device went down.
+	
+	If this is called without a prior \c TLFNotify() the state machine will assume
+	that we lost our connection.
+*/
 void
 KPPPStateMachine::DownEvent()
 {

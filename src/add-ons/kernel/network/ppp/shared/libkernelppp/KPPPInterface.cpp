@@ -9,14 +9,14 @@
 	\brief The kernel representation of a PPP interface.
 	
 	This class is never created by the programmer directly. Instead, the PPP manager
-	kernel module should be used.\n
+	kernel module should be used. \n
 	KPPPInterface handles all interface-specific commands from userspace and it
 	passes packets to their receiver or sends them to the device. Additionally,
 	it contains the KPPPLCP object with represents the LCP protocol and the
-	KPPPStateMachine object which represents the state machine.\n
-	All PPP modules are loaded from here.\n
+	KPPPStateMachine object which represents the state machine. \n
+	All PPP modules are loaded from here. \n
 	Protocols and encapsulators should be added to this class. LCP-specific extensions
-	belong to the KPPPLCP object.\n
+	belong to the KPPPLCP object. \n
 	Multilink support is distributed between KPPPInterface and KPPPStateMachine.
 */
 
@@ -57,7 +57,7 @@
 // - add missing settings support (DialRetryDelay, etc.)
 
 
-// needed for redial:
+//!	Private structure needed for redialing.
 typedef struct redial_info {
 	KPPPInterface *interface;
 	thread_id *thread;
@@ -614,6 +614,7 @@ KPPPInterface::SetDevice(KPPPDevice *device)
 
 /*!	\brief Adds a new protocol to this interface.
 	
+	NOTE: You can only add protocols in \c PPP_DOWN_PHASE. \n
 	A protocol add-on should call this method to register itself. The best place to do
 	this is in your module's \c add_to() function.
 	
@@ -687,8 +688,9 @@ KPPPInterface::AddProtocol(KPPPProtocol *protocol)
 
 /*!	\brief Removes a protocol from this interface.
 	
+	NOTE: You can only remove protocols in \c PPP_DOWN_PHASE. \n
 	A protocol add-on should call this method to remove itself explicitly from the
-	interface.\n
+	interface. \n
 	Normally, this method is called in KPPPProtocol's destructor. Do not call it
 	yourself unless you know what you do!
 	
@@ -945,7 +947,7 @@ KPPPInterface::SetPFCOptions(uint8 pfcOptions)
 
 /*!	\brief Brings this interface up.
 	
-	\c Down() overrides all \c Up() requests.\n
+	\c Down() overrides all \c Up() requests. \n
 	This blocks until the connection process is finished.
 	
 	\return \c true if successful or \c false otherwise.
@@ -1143,7 +1145,7 @@ KPPPInterface::Up()
 
 /*!	\brief Brings this interface down.
 	
-	\c Down() overrides all \c Up() requests.\n
+	\c Down() overrides all \c Up() requests. \n
 	This blocks until diconnecting finished.
 	
 	\return \c true if successful or \c false otherwise.
@@ -1342,7 +1344,7 @@ KPPPInterface::IsAllowedToSend() const
 /*!	\brief Sends a packet to the device.
 	
 	This brings the interface up if dial-on-demand is enabled and we are not
-	connected.\n
+	connected. \n
 	PFC encoding is handled here.
 	
 	\param packet The packet.
@@ -1450,7 +1452,7 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	
 	Encapsulation protocols may use this method to pass encapsulated packets to the
 	PPP interface. Packets will be handled as if they were raw packets that came
-	directly from the device via \c ReceiveFromDevice().\n
+	directly from the device via \c ReceiveFromDevice(). \n
 	If no handler could be found in this interface the parent's \c Receive() method
 	is called.
 	
@@ -1527,7 +1529,7 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 
 /*!	\brief Receives a base PPP packet from the device.
 	
-	KPPPDevice should call this method when it receives a packet.\n
+	KPPPDevice should call this method when it receives a packet. \n
 	PFC decoding is handled here.
 	
 	\param packet The packet.
@@ -1682,7 +1684,7 @@ KPPPInterface::StackControl(uint32 op, void *data)
 }
 
 
-// used by ControlEachHandler()
+//!	Utility class used by ControlEachHandler().
 template<class T>
 class CallStackControl {
 	public:
@@ -1845,6 +1847,7 @@ redial_thread(void *data)
 // ----------------------------------
 // Function: interface_deleter_thread
 // ----------------------------------
+//!	Private class.
 class KPPPInterfaceAccess {
 	public:
 		KPPPInterfaceAccess() {}

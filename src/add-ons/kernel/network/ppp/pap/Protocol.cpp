@@ -57,27 +57,6 @@ PAPHandler::AddToRequest(KPPPConfigurePacket& request)
 
 
 status_t
-PAPHandler::ParseNak(const KPPPConfigurePacket& nak)
-{
-	return B_OK;
-}
-
-
-status_t
-PAPHandler::ParseReject(const KPPPConfigurePacket& reject)
-{
-	return B_OK;
-}
-
-
-status_t
-PAPHandler::ParseAck(const KPPPConfigurePacket& ack)
-{
-	return B_OK;
-}
-
-
-status_t
 PAPHandler::ParseRequest(const KPPPConfigurePacket& request,
 	int32 index, KPPPConfigurePacket& nak, KPPPConfigurePacket& reject)
 {
@@ -92,19 +71,6 @@ PAPHandler::ParseRequest(const KPPPConfigurePacket& request,
 		return B_ERROR;
 	
 	return B_OK;
-}
-
-
-status_t
-PAPHandler::SendingAck(const KPPPConfigurePacket& ack)
-{
-	return B_OK;
-}
-
-
-void
-PAPHandler::Reset()
-{
 }
 
 

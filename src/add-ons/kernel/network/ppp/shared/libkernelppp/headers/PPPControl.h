@@ -90,13 +90,13 @@ enum ppp_control_ops {
 
 //!	Basic structure used for creating and searching PPP interfaces.
 typedef struct ppp_interface_description_info {
+	//!	Different values for describing an interface.
 	union {
 		const driver_settings *settings;
 			//!< Interface settings.
 		const char *name;
 			//!< Name of interface description file.
 	} u;
-		//!< Different values for describing an interface.
 	const driver_settings *profile;
 		//!< An optional profile. If \a profile == NULL the default profile is used.
 	ppp_interface_id interface;
@@ -137,6 +137,7 @@ typedef struct ppp_control_info {
 // -----------------------------------------------------------
 #define _PPP_INFO_T_SIZE_								256
 
+//!	Structure used by \c PPPC_GET_INTERFACE_INFO.
 typedef struct ppp_interface_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	int32 if_unit;
@@ -158,13 +159,17 @@ typedef struct ppp_interface_info {
 	
 	bool doesDialOnDemand, doesAutoRedial, hasDevice, isMultilink, hasParent;
 } ppp_interface_info;
+/*!	\brief You \e must use this encapsulator instead of \c ppp_interface_info!
+	
+	This structure guarantees backwards compatibility.
+*/
 typedef struct ppp_interface_info_t {
 	ppp_interface_info info;
 	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_interface_info)];
 } ppp_interface_info_t;
 
 
-// devices are special handlers, so they have their own structure
+//!	Structure used by \c PPPC_GET_DEVICE_INFO.
 typedef struct ppp_device_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
@@ -172,12 +177,17 @@ typedef struct ppp_device_info {
 	uint32 inputTransferRate, outputTransferRate, outputBytesCount;
 	bool isUp;
 } ppp_device_info;
+/*!	\brief You \e must use this encapsulator instead of \c ppp_device_info!
+	
+	This structure guarantees backwards compatibility.
+*/
 typedef struct ppp_device_info_t {
 	ppp_device_info info;
 	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_device_info)];
 } ppp_device_info_t;
 
 
+//!	Structure used by \c PPPC_GET_PROTOCOL_INFO.
 typedef struct ppp_protocol_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	char type[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
@@ -199,12 +209,17 @@ typedef struct ppp_protocol_info {
 	bool isEnabled;
 	bool isUpRequested;
 } ppp_protocol_info;
+/*!	\brief You \e must use this encapsulator instead of \c ppp_protocol_info!
+	
+	This structure guarantees backwards compatibility.
+*/
 typedef struct ppp_protocol_info_t {
 	ppp_protocol_info info;
 	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_protocol_info)];
 } ppp_protocol_info_t;
 
 
+//!	Structure used by \c PPPC_GET_SIMPLE_HANDLER_INFO.
 typedef struct ppp_simple_handler_info {
 	char name[PPP_HANDLER_NAME_LENGTH_LIMIT + 1];
 	
@@ -213,6 +228,10 @@ typedef struct ppp_simple_handler_info {
 	uint8 code;
 		// only KPPPLCPExtension
 } ppp_simple_handler_info;
+/*!	\brief You \e must use this encapsulator instead of \c ppp_simple_handler_info!
+	
+	This structure guarantees backwards compatibility.
+*/
 typedef struct ppp_simple_handler_info_t {
 	ppp_simple_handler_info info;
 	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_simple_handler_info)];
