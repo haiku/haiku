@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ const uint32 MSG_MKDEF_PRINTER		= 'MDfP';
 const uint32 MSG_PRINTER_SELECTED	= 'PSel';
 const uint32 MSG_CANCEL_JOB			= 'CncJ';
 const uint32 MSG_RESTART_JOB		= 'RstJ';
+const uint32 MSG_JOB_SELECTED       = 'JSel';
 
 const uint32 MSG_TRANSPORT_SELECTED = 'TSel';
 const uint32 MSG_NAME_CHANGED       = 'NCgd';

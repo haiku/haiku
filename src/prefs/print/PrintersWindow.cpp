@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -24,6 +24,8 @@
 #include "pr_server.h"
 #include "Globals.h"
 #include "Messages.h"
+#include "JobListView.h"
+#include "SpoolFolder.h"
 
 // BeOS API
 #include <Box.h>
@@ -31,9 +33,11 @@
 #include <ListView.h>
 #include <ScrollView.h>
 #include <Application.h>
+#include <FindDirectory.h>
 
 PrintersWindow::PrintersWindow(BRect frame)
 	: Inherited(BRect(78.0, 71.0, 561.0, 409.0), "Printers", B_TITLED_WINDOW, B_NOT_H_RESIZABLE)
+	, fSelectedPrinter(NULL)
 {
 	BuildGUI();
 }
@@ -54,52 +58,35 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 	{
 		case MSG_PRINTER_SELECTED:
 			{
-				int32 prIndex = fPrinterListView->CurrentSelection();
-				if (prIndex >= 0)
+				PrinterItem* fSelectedPrinter = fPrinterListView->SelectedItem();
+				if (fSelectedPrinter)
 				{
-					BMessenger msgr;
-					if (::GetPrinterServerMessenger(msgr) == B_OK)
-					{
-						BMessage script(B_GET_PROPERTY);
-						BMessage reply;
-						BString name;
-						
-						script.AddSpecifier("Name");
-						script.AddSpecifier("Printer", fPrinterListView->CurrentSelection());
-						msgr.SendMessage(&script,&reply);
-						if (reply.FindString("result", &name) == B_OK)
-						{
-							fJobsBox->SetLabel((BString("Print Jobs for ") << name).String());
-							fMakeDefault->SetEnabled(true);
-							fRemove->SetEnabled(true);
-						}
-					}
+					fJobsBox->SetLabel((BString("Print Jobs for ") << fSelectedPrinter->Name()).String());
+					fMakeDefault->SetEnabled(true);
+					fRemove->SetEnabled(true);
+					fJobListView->SetSpoolFolder(fSelectedPrinter->Folder());
 				}
 				else
 				{
 					fJobsBox->SetLabel("Print Jobs: No printer selected");
 					fMakeDefault->SetEnabled(false);
 					fRemove->SetEnabled(false);
+					fSelectedPrinter = NULL;
+					fJobListView->SetSpoolFolder(NULL);
 				}
+				UpdateJobButtons();
+				UpdatePrinterButtons();
 			}
 			break;
 
 		case MSG_ADD_PRINTER:
-			if (AddPrinterDialog::Start() == B_OK);
+			AddPrinterDialog::Start();
 			break;
 
 		case MSG_REMOVE_PRINTER:
 			{
-					// Get selection
-				int32 idx = fPrinterListView->CurrentSelection();
-				
-					// If a printer is selected
-				if (idx >= 0)
-				{
-					PrinterItem* item = (PrinterItem*)fPrinterListView->ItemAt(idx);
-					if (item != NULL)
-						item->Remove(fPrinterListView);
-				}
+				fSelectedPrinter = fPrinterListView->SelectedItem();
+				if (fSelectedPrinter) fSelectedPrinter->Remove(fPrinterListView);
 			}
 			break;
 
@@ -118,19 +105,27 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 						msgr.SendMessage(&setActivePrinter);
 						
 						fPrinterListView->Invalidate();
+						UpdatePrinterButtons();
 					}
 				}
 			}
 			break;
 
 
-		case MSG_CANCEL_JOB:
+		case MSG_CANCEL_JOB: fJobListView->CancelJob();
 			break;
 
-		case MSG_RESTART_JOB:
+		case MSG_RESTART_JOB: fJobListView->RestartJob();
 			break;
 
+		case MSG_JOB_SELECTED: UpdateJobButtons();
+			break;
 
+		case B_PRINTER_CHANGED:
+				// active printer could have been changed
+			fPrinterListView->Invalidate();
+			break;
+			
 		default:
 			Inherited::MessageReceived(msg);
 	}
@@ -216,6 +211,7 @@ void PrintersWindow::BuildGUI()
 	BButton* cancelButton = new BButton(BRect(5,5,5,5), "cancel", "Cancel Job", new BMessage(MSG_CANCEL_JOB), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(cancelButton);
 	cancelButton->ResizeToPreferred();
+	fCancel = cancelButton;
 
 	maxWidth = cancelButton->Bounds().Width();
 
@@ -223,6 +219,7 @@ void PrintersWindow::BuildGUI()
 	BButton* restartButton = new BButton(BRect(5,30,5,30), "restart", "Restart Job", new BMessage(MSG_RESTART_JOB), B_FOLLOW_RIGHT+B_FOLLOW_TOP);
 	fJobsBox->AddChild(restartButton);
 	restartButton->ResizeToPreferred();
+	fRestart = restartButton;
 
 	if (restartButton->Bounds().Width() > maxWidth)
 		maxWidth = restartButton->Bounds().Width();
@@ -242,7 +239,7 @@ void PrintersWindow::BuildGUI()
 		// Create listview with scroller
 	listBounds = BRect(boxInset, boxInset+5, cancelButton->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
 					fJobsBox->Bounds().Height()-boxInset);
-	fJobListView = new BListView(listBounds, "jobs_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL);
+	fJobListView = new JobListView(listBounds);
 	BScrollView* jscroller = new BScrollView("jobs_scroller", fJobListView,
 								B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
 	fJobsBox->AddChild(jscroller);
@@ -257,4 +254,51 @@ void PrintersWindow::BuildGUI()
 	pscroller->ResizeTo(width, pscroller->Bounds().Height());
 	
 	SetSizeLimits(Bounds().Width(), Bounds().Width(), Bounds().Height(), 20000);	
+}
+
+bool PrintersWindow::IsSelected(PrinterItem* printer) {
+	return fSelectedPrinter && fSelectedPrinter == printer;
+}
+
+void PrintersWindow::AddJob(SpoolFolder* folder, Job* job) {
+	if (IsSelected(folder->Item())) {
+		fJobListView->AddJob(job);
+	}
+	fPrinterListView->UpdateItem(folder->Item());
+	UpdatePrinterButtons();
+}
+
+void PrintersWindow::RemoveJob(SpoolFolder* folder, Job* job) {
+	if (IsSelected(folder->Item())) {
+		fJobListView->RemoveJob(job);
+	}
+	fPrinterListView->UpdateItem(folder->Item());
+	UpdatePrinterButtons();
+}
+
+void PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job) {
+	if (IsSelected(folder->Item())) {
+		fJobListView->UpdateJob(job);
+		UpdateJobButtons();
+	}
+	fPrinterListView->UpdateItem(folder->Item());
+	UpdatePrinterButtons();
+}
+
+void PrintersWindow::UpdatePrinterButtons() {
+	PrinterItem* item = fPrinterListView->SelectedItem();
+	fRemove->SetEnabled(item && !item->HasPendingJobs());
+	fMakeDefault->SetEnabled(item && !item->IsActivePrinter());
+}
+	
+void PrintersWindow::UpdateJobButtons() {
+	JobItem* item = fJobListView->SelectedItem();
+	if (item != NULL) {
+		Job* job = item->GetJob();
+		fCancel->SetEnabled(job->Status() != kProcessing);
+		fRestart->SetEnabled(job->Status() == kFailed);
+	} else {
+		fCancel->SetEnabled(false);
+		fRestart->SetEnabled(false);
+	}
 }

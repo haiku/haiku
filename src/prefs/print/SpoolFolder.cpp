@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -17,22 +17,38 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef PRINTERS_H
-#define PRINTERS_H
+#include "SpoolFolder.h"
+#include "JobListView.h"
+#include "pr_server.h"
 
-class PrintersApp;
+#include "Messages.h"
+#include "Globals.h"
+#include "Jobs.h"
+#include "PrintersWindow.h"
 
-#include <Application.h>
+#include <Messenger.h>
+#include <Bitmap.h>
+#include <String.h>
+#include <Alert.h>
+#include <Mime.h>
+#include <Roster.h>
 
-#define PRINTERS_SIGNATURE	"application/x-vnd.Be-PRNT2"
-
-class PrintersApp : public BApplication
+SpoolFolder::SpoolFolder(PrintersWindow* window, PrinterItem* item, const BDirectory& spoolDir)
+	: Folder(NULL, window, spoolDir)
+	, fWindow(window)
+	, fItem(item)
 {
-	typedef BApplication Inherited;
-public:
-	PrintersApp();
-	void ReadyToRun();
-	void MessageReceived(BMessage* msg);
-};
+}
 
-#endif
+void SpoolFolder::Notify(Job* job, int kind) 
+{
+	switch (kind) {
+		case kJobAdded: fWindow->AddJob(this, job);
+			break;
+		case kJobRemoved: fWindow->RemoveJob(this, job);
+			break;
+		case kJobAttrChanged: fWindow->UpdateJob(this, job);
+			break;
+		default: ;
+	}
+}

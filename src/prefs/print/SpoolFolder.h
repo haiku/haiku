@@ -17,22 +17,29 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef PRINTERS_H
-#define PRINTERS_H
+#ifndef SPOOL_FOLDER_H
+#define SPOOL_FODLER_H
 
-class PrintersApp;
+#include <Messenger.h>
+#include <ListView.h>
+#include <String.h>
 
-#include <Application.h>
+#include "Jobs.h"
 
-#define PRINTERS_SIGNATURE	"application/x-vnd.Be-PRNT2"
+class PrintersWindow;
+class PrinterItem;
 
-class PrintersApp : public BApplication
-{
-	typedef BApplication Inherited;
+class SpoolFolder : public Folder {
+protected:
+	void Notify(Job* job, int kind);
+
+	PrintersWindow* fWindow;
+	PrinterItem* fItem;
+	
 public:
-	PrintersApp();
-	void ReadyToRun();
-	void MessageReceived(BMessage* msg);
+	SpoolFolder(PrintersWindow* window, PrinterItem* item, const BDirectory& spoolDir);
+	PrinterItem* Item() const { return fItem; }
 };
+
 
 #endif

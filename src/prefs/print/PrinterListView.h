@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -25,37 +25,72 @@ class PrinterListView;
 #include <Messenger.h>
 #include <ListView.h>
 #include <String.h>
+#include <Directory.h>
+#include <Entry.h>
 
-class PrinterListView : public BListView
+#include "FolderWatcher.h"
+
+class SpoolFolder;
+class PrinterItem;
+class PrinterListView;
+
+class PrinterListView : public BListView, public FolderListener
 {
 	typedef BListView Inherited;
+	
+	BDirectory fNode;
+	FolderWatcher* fFolder;
+	
+	void AddPrinter(BDirectory& printer);
+	PrinterItem* FindItem(node_ref* node);
+	
+	void EntryCreated(node_ref* node, entry_ref* entry);
+	void EntryRemoved(node_ref* node);
+	void AttributeChanged(node_ref* node);
+
 public:
 	PrinterListView(BRect frame);
 	void AttachedToWindow();
+	bool QuitRequested();
+
+	void BuildPrinterList();
+	PrinterItem* SelectedItem();
+		
+	void UpdateItem(PrinterItem* item);
 };
 
 class BBitmap;
+class PrintersWindow;
 class PrinterItem : public BListItem
 {
 public:
-	PrinterItem(const BMessenger& thePrinter);
-
+	PrinterItem(PrintersWindow* window, const BDirectory& node/*const BMessenger& thePrinter*/);
+	~PrinterItem();
+	
 	void DrawItem(BView *owner, BRect bounds, bool complete);
 	void Update(BView *owner, const BFont *font);
 	
-	void Remove(BListView* view);
+	bool Remove(BListView* view);
 	bool IsActivePrinter();
+	bool HasPendingJobs();
 	
 	const char* Name() const 
 		{ return fName.String(); }
+		
+	SpoolFolder* Folder();
+	BDirectory* Node();
+	void UpdatePendingJobs();
+	
 private:
 	void GetStringProperty(const char* propName, BString& outString);
 
-	BMessenger	fMessenger;
+	SpoolFolder *fFolder;
+	BDirectory  fNode;
 	BString		fComments;
 	BString		fTransport;
 	BString		fDriverName;
 	BString		fName;
+	BString     fPendingJobs;
 	static BBitmap* sIcon;
 	static BBitmap* sSelectedIcon;
 };

@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -39,4 +39,17 @@ void PrintersApp::ReadyToRun()
 {
 	PrintersWindow* win = new PrintersWindow(BRect(78.0, 71.0, 561.0, 409.0));
 	win->Show();
+}
+
+void PrintersApp::MessageReceived(BMessage* msg) {
+	if (msg->what == B_PRINTER_CHANGED) {
+			// broadcast message
+		BWindow* w;
+		for (int32 i = 0; (w = WindowAt(i)) != NULL; i ++) {
+			BMessenger msgr(NULL, w);
+			msgr.SendMessage(B_PRINTER_CHANGED);
+		}
+	} else {
+		BApplication::MessageReceived(msg);
+	}
 }

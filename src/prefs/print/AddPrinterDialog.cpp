@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -259,6 +259,8 @@ void AddPrinterDialog::BuildGUI(int stage)
 
 	// Auto resize window
 	ResizeTo(ok->Frame().right + H_MARGIN, ok->Frame().bottom + V_MARGIN);
+	
+	fName->MakeFocus(true);
 	
 	Update();
 // Stage == 0

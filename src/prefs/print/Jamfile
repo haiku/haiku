@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs print ;
 
-UsePrivateHeaders interface ;
+UsePrivateHeaders interface shared print ;
 
 AddResources Printers : Printers.FileTypes.rsrc ;
 
@@ -9,6 +9,15 @@ Preference Printers :
 	Printers.cpp
 	PrintersWindow.cpp
 	PrinterListView.cpp
+	JobListView.cpp
+	SpoolFolder.cpp
 	Globals.cpp ;
 
-LinkSharedOSLibs Printers : be ;
+# TODO remove dependency to libtranslation (BeUtils) 
+LinkSharedOSLibs 
+	Printers 
+	: 
+	be 
+	translation 
+	libprint.a 
+	;

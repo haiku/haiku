@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -22,41 +22,48 @@
 
 #include "Messages.h"
 #include "Globals.h"
+#include "PrintersWindow.h"
+#include "SpoolFolder.h"
 
 #include <Messenger.h>
 #include <Bitmap.h>
 #include <String.h>
 #include <Alert.h>
 #include <Mime.h>
+#include <StorageKit.h>
+
+// Implementation of PrinterListView
 
 PrinterListView::PrinterListView(BRect frame)
 	: Inherited(frame, "printers_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_ALL)
+	, fFolder(NULL)
 {
-		// TODO: Fixup situation in which PrintServer is not running
-	BMessenger msgr;
-	if (GetPrinterServerMessenger(msgr) == B_OK)
-	{
-		BMessage count(B_COUNT_PROPERTIES);
-		count.AddSpecifier("Printers");
-	
-		BMessage reply;
-		msgr.SendMessage(&count, &reply);
+}
 
-		int32 countPrinters;
-		if (reply.FindInt32("result", &countPrinters) == B_OK)
-		{
-			for (int32 printerIdx=0; printerIdx < countPrinters; printerIdx++)
-			{
-				BMessage getPrinter(B_GET_PROPERTY);
-				getPrinter.AddSpecifier("Printer", printerIdx);
-				msgr.SendMessage(&getPrinter, &reply);
-				
-				reply.PrintToStream();
-				
-				BMessenger thePrinter;
-				if (reply.FindMessenger("result", &thePrinter) == B_OK) {
-					AddItem(new PrinterItem(thePrinter), CountItems());
-				}
+void PrinterListView::BuildPrinterList() {	
+		// clear list
+	const BListItem** items = Items();
+	for (int32 i = CountItems()-1; i >= 0; i --) {
+		delete items[i];
+	}
+	MakeEmpty();
+
+		// TODO: Fixup situation in which PrintServer is not running	
+	BEntry entry;
+	status_t rc;
+	BPath path;
+	
+		// Find directory containing printer definition nodes
+	if ((rc=::find_directory(B_USER_PRINTERS_DIRECTORY, &path)) == B_OK) {
+		BDirectory dir(path.Path());
+		
+			// Can we reach the directory?
+		if ((rc = dir.InitCheck()) == B_OK) {
+			fNode = dir;
+				// Yes, so loop over it's entries
+			while((rc = dir.GetNextEntry(&entry)) == B_OK) {
+				BDirectory printer(&entry);
+				AddPrinter(printer);
 			}
 		}
 	}
@@ -70,6 +77,8 @@ void PrinterListView::AttachedToWindow()
 	SetInvocationMessage(new BMessage(MSG_MKDEF_PRINTER));
 	SetTarget(Window());	
 
+	BuildPrinterList();
+
 		// Select active printer
 	for (int32 i = 0; i < CountItems(); i ++) {
 		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
@@ -77,14 +86,89 @@ void PrinterListView::AttachedToWindow()
 			Select(i); break;
 		}
 	}
+
+	BPath path;	
+	if (find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK) {
+		BDirectory dir(path.Path());
+		if (dir.InitCheck() == B_OK) {
+			fFolder = new FolderWatcher(this->Window(), dir, true);
+			fFolder->SetListener(this);
+		}
+	}	
+}
+
+bool PrinterListView::QuitRequested() {
+	delete fFolder; fFolder = NULL;
+	return true;
+}
+
+void PrinterListView::AddPrinter(BDirectory& printer) {
+	BString state;
+	node_ref node;
+		// If the entry is a directory
+	if (printer.InitCheck() == B_OK && 
+		printer.GetNodeRef(&node) == B_OK &&
+		FindItem(&node) == NULL &&
+		printer.ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK &&
+		state == "free") {
+			// Check it's Mime type for a spool director
+		BNodeInfo info(&printer);
+		char buffer[256];
+		
+		if (info.GetType(buffer) == B_OK &&
+			strcmp(buffer, PSRV_PRINTER_FILETYPE) == 0) {
+				// Yes, it is a printer definition node
+			AddItem(new PrinterItem(dynamic_cast<PrintersWindow*>(Window()), printer));
+		}
+	}
+}
+
+PrinterItem* PrinterListView::FindItem(node_ref* node) {
+	for (int32 i = CountItems()-1; i >= 0; i --) {
+		PrinterItem* item = dynamic_cast<PrinterItem*>(ItemAt(i));
+		node_ref ref;
+		if (item && item->Node()->GetNodeRef(&ref) == B_OK && ref == *node) {
+			return item;
+		}
+	}
+	return NULL;
+}
+
+void PrinterListView::EntryCreated(node_ref* node, entry_ref* entry) {
+	BDirectory printer(node);
+	AddPrinter(printer);
+}
+
+void PrinterListView::EntryRemoved(node_ref* node) {
+	PrinterItem* item = FindItem(node);
+	if (item) {
+		RemoveItem(item);
+		delete item;
+	}
+}
+
+void PrinterListView::AttributeChanged(node_ref* node) {
+	BDirectory printer(node);
+	AddPrinter(printer);
+}
+
+void PrinterListView::UpdateItem(PrinterItem* item) {
+	item->UpdatePendingJobs();
+	InvalidateItem(IndexOf(item));
+}
+
+PrinterItem* PrinterListView::SelectedItem() {
+	BListItem* item = ItemAt(CurrentSelection());
+	return dynamic_cast<PrinterItem*>(item);
 }
 
 BBitmap* PrinterItem::sIcon = NULL;
 BBitmap* PrinterItem::sSelectedIcon = NULL;
 
-PrinterItem::PrinterItem(const BMessenger& thePrinter)
-	: BListItem(0, false),
-	fMessenger(thePrinter)
+PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node)
+	: BListItem(0, false)
+	, fFolder(NULL)
+	, fNode(node)
 {
 	if (sIcon == NULL)
 	{
@@ -101,19 +185,29 @@ PrinterItem::PrinterItem(const BMessenger& thePrinter)
 	}
 
 		// Get Name of printer
-	GetStringProperty("Name", fName);
-	GetStringProperty("Comments", fComments);
-	GetStringProperty("TransportAddon", fTransport);
-	GetStringProperty("PrinterAddon", fDriverName);
+	GetStringProperty(PSRV_PRINTER_ATTR_PRT_NAME, fName);
+	GetStringProperty(PSRV_PRINTER_ATTR_COMMENTS, fComments);
+	GetStringProperty(PSRV_PRINTER_ATTR_TRANSPORT, fTransport);
+	GetStringProperty(PSRV_PRINTER_ATTR_DRV_NAME, fDriverName);
+
+	BPath path;
+		// Setup spool folder
+	if (find_directory(B_USER_PRINTERS_DIRECTORY, &path) == B_OK) {
+		path.Append(fName.String());
+		BDirectory dir(path.Path());
+		if (dir.InitCheck() != B_OK) return;
+		fFolder = new SpoolFolder(window, this, dir);
+	}
+	UpdatePendingJobs();
+}
+
+PrinterItem::~PrinterItem() {
+	delete fFolder; fFolder = NULL;
 }
 
 void PrinterItem::GetStringProperty(const char* propName, BString& outString)
 {
-	BMessage script(B_GET_PROPERTY);
-	BMessage reply;
-	script.AddSpecifier(propName);	
-	fMessenger.SendMessage(&script,&reply);
-	reply.FindString("result", &outString);
+	fNode.ReadAttrString(propName, &outString);
 }
 
 void PrinterItem::Update(BView *owner, const BFont *font)
@@ -126,7 +220,7 @@ void PrinterItem::Update(BView *owner, const BFont *font)
 	SetHeight( (height.ascent+height.descent+height.leading) * 3.0 +4 );
 }
 
-void PrinterItem::Remove(BListView* view)
+bool PrinterItem::Remove(BListView* view)
 {
 	BMessenger msgr;
 	
@@ -137,9 +231,11 @@ void PrinterItem::Remove(BListView* view)
 	
 		script.AddSpecifier("Printer", view->IndexOf(this));	
 	
-		if (msgr.SendMessage(&script,&reply) == B_OK)
-			view->RemoveItem(this);
+		if (msgr.SendMessage(&script,&reply) == B_OK) {
+			return true;
+		}
 	}
+	return false;
 }
 
 void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
@@ -174,7 +270,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 		BPoint driverPt = iconPt + BPoint(B_LARGE_ICON+8, fntheight*2);
 		BPoint commentPt = iconPt + BPoint(B_LARGE_ICON+8, fntheight*3);
 		
-		float width = owner->StringWidth("No jobs pending.");
+		float width = owner->StringWidth("No pending jobs.");
 		BPoint pendingPt(bounds.right - width -8, namePt.y);
 		BPoint transportPt(bounds.right - width -8, driverPt.y);
 		
@@ -188,7 +284,7 @@ void PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 		owner->DrawString(fComments.String(), fComments.Length(), commentPt);
 		
 			// right of item
-		owner->DrawString("No jobs pending.", 16, pendingPt);
+		owner->DrawString(fPendingJobs.String(), 16, pendingPt);
 		owner->DrawString(fTransport.String(), fTransport.Length(), transportPt);
 		
 		owner->SetDrawingMode(mode);
@@ -218,3 +314,28 @@ bool PrinterItem::IsActivePrinter()
 	return rc;	
 }
 
+bool PrinterItem::HasPendingJobs() {
+	return fFolder && fFolder->CountJobs() > 0;
+}
+
+SpoolFolder* PrinterItem::Folder() {
+	return fFolder;
+}
+
+BDirectory* PrinterItem::Node() {
+	return &fNode;
+}
+
+void PrinterItem::UpdatePendingJobs() {
+	if (fFolder) {
+		uint32 pendingJobs = fFolder->CountJobs();
+		fPendingJobs = "";
+		if (pendingJobs == 1) {
+			fPendingJobs = "1 pending job.";
+		} else if (pendingJobs > 1) {
+			fPendingJobs << pendingJobs << " pending jobs.h";
+		}
+		if (pendingJobs >= 1) return;
+	}
+	fPendingJobs = "No pending jobs.";
+}

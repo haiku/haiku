@@ -1,6 +1,6 @@
 /*
  *  Printers Preference Application.
- *  Copyright (C) 2001 OpenBeOS. All Rights Reserved.
+ *  Copyright (C) 2001, 2002 OpenBeOS. All Rights Reserved.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,11 @@
 #define PRINTERSWINDOW_H
 
 class PrintersWindow;
+class PrinterListView;
+class JobListView;
+class Job;
+class SpoolFolder;
+class PrinterItem;
 
 #include <Window.h>
 
@@ -32,15 +37,28 @@ public:
 	
 	void MessageReceived(BMessage* msg);
 	bool QuitRequested();
+	
+	void AddJob(SpoolFolder* folder, Job* job);
+	void RemoveJob(SpoolFolder* folder, Job* job);
+	void UpdateJob(SpoolFolder* folder, Job* job);
+	
 private:
 	void BuildGUI();
+	bool IsSelected(PrinterItem* printer);
+	void UpdatePrinterButtons();
+	void UpdateJobButtons();
 	
-	BListView*	fPrinterListView;
+	PrinterListView*	fPrinterListView;
 	BButton*	fMakeDefault;
 	BButton*	fRemove;
 
-	BListView*	fJobListView;
+	JobListView*	fJobListView;
+	BButton*	fRestart;
+	BButton*    fCancel;
+	
 	BBox*		fJobsBox;
+
+	PrinterItem* fSelectedPrinter;
 };
 
 #endif

@@ -17,11 +17,61 @@
  *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef JOBLISTVIEW_H
+#define JOBLISTVIEW_H
 
 #include <Messenger.h>
+#include <ListView.h>
+#include <String.h>
 
-status_t GetPrinterServerMessenger(BMessenger& msgr);
+#include "Jobs.h"
+
+class JobItem;
+class JobListView;
+class SpoolFolder;
+
+class JobListView : public BListView
+{
+	typedef BListView Inherited;
+private:	
+	JobItem* Find(Job* job);
+	
+public:
+	JobListView(BRect frame);
+	void AttachedToWindow();
+	void SetSpoolFolder(SpoolFolder* folder);
+	
+	void AddJob(Job* job);
+	void RemoveJob(Job* job);
+	void UpdateJob(Job* job);
+
+	JobItem* SelectedItem();
+	
+	void RestartJob();
+	void CancelJob();
+};
+
+class BBitmap;
+class JobItem : public BListItem
+{
+public:
+	JobItem(Job* job);
+	~JobItem();
+
+	void Update();
+	
+	void Update(BView *owner, const BFont *font);
+	void DrawItem(BView *owner, BRect bounds, bool complete);
+	
+	Job* GetJob() { return fJob; }
+
+private:
+
+	Job* fJob;
+	BBitmap* fIcon;
+	BString fName, fPages;
+	BString fStatus, fSize;
+};
+
 
 #endif
