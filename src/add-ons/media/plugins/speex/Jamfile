@@ -8,7 +8,7 @@ SubDirHdrs $(SUBDIR) libspeex ;
 Addon speex : media plugins :
 	speexCodecPlugin.cpp
 	speexCodecDefaults.cpp
-	: false : libspeex.a libogg.a
+	: false : libspeex.a 
 ;
 
 LinkSharedOSLibs speex : be libmedia.so ;
