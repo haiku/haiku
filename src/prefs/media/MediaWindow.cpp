@@ -632,7 +632,7 @@ MediaWindow::RestartMediaServices(void *data)
 	}
 	launch_media_server();
 	
-	window->PostMessage(ML_INIT_MEDIA);
+	return window->PostMessage(ML_INIT_MEDIA);
 }
 
 bool 
