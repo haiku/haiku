@@ -10,6 +10,7 @@
 #include <vm_store_null.h>
 #include <vfs.h>
 #include <Errors.h>
+#include <kerrors.h>
 
 static void null_destroy(struct vm_store *store)
 {

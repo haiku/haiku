@@ -15,6 +15,7 @@
 #include <memheap.h>
 #include <thread.h>
 #include <Errors.h>
+#include <kerrors.h>
 
 #include <stage2.h>
 

@@ -11,6 +11,7 @@
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <arch/cpu.h>
 #include <sys/stat.h>
 
@@ -138,7 +139,7 @@ bootfs_delete_vnode(struct bootfs *fs, struct bootfs_vnode *v, bool force_delete
 	// cant delete it if it's in a directory or is a directory
 	// and has children
 	if(!force_delete && ((v->stream.type == STREAM_TYPE_DIR && v->stream.u.dir.dir_head != NULL) || v->dir_next != NULL)) {
-		return ERR_NOT_ALLOWED;
+		return EPERM;
 	}
 
 	// remove it from the global hash table
@@ -218,7 +219,7 @@ static int
 bootfs_insert_in_dir(struct bootfs_vnode *dir, struct bootfs_vnode *v)
 {
 	if(dir->stream.type != STREAM_TYPE_DIR)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	v->dir_next = dir->stream.u.dir.dir_head;
 	dir->stream.u.dir.dir_head = v;
@@ -355,7 +356,7 @@ bootfs_create_vnode_tree(struct bootfs *fs, struct bootfs_vnode *root)
 
 			new_vnode = bootfs_create_vnode(fs, leaf);
 			if(new_vnode == NULL)
-				return ERR_NO_MEMORY;
+				return ENOMEM;
 
 			// set up the new node
 			new_vnode->stream.type = STREAM_TYPE_FILE;
@@ -390,7 +391,7 @@ bootfs_mount(fs_cookie *_fs, fs_id id, const char *device, void *args, vnode_id 
 
 	fs = kmalloc(sizeof(struct bootfs));
 	if(fs == NULL) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err;
 	}
 
@@ -405,14 +406,14 @@ bootfs_mount(fs_cookie *_fs, fs_id id, const char *device, void *args, vnode_id 
 	fs->vnode_list_hash = hash_init(BOOTFS_HASH_SIZE, (addr)&v->all_next - (addr)v,
 		&bootfs_vnode_compare_func, &bootfs_vnode_hash_func);
 	if(fs->vnode_list_hash == NULL) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err2;
 	}
 
 	// create a vnode
 	v = bootfs_create_vnode(fs, "");
 	if(v == NULL) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err3;
 	}
 
@@ -494,7 +495,7 @@ bootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
 	TRACE(("bootfs_lookup: entry dir 0x%x, name '%s'\n", dir, name));
 
 	if (dir->stream.type != STREAM_TYPE_DIR)
-		return ERR_VFS_NOT_DIR;
+		return ENOTDIR;
 
 	mutex_lock(&fs->lock);
 
@@ -605,7 +606,7 @@ bootfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, stream_type st, in
 
 	cookie = kmalloc(sizeof(struct bootfs_cookie));
 	if (cookie == NULL) {
-		err = ERR_NO_MEMORY;
+		err = ENOMEM;
 		goto err;
 	}
 
@@ -783,12 +784,12 @@ bootfs_seek(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, off_t pos, int st)
 						cookie->u.file.pos = pos + cookie->s->u.file.len;
 					break;
 				default:
-					err = ERR_INVALID_ARGS;
+					err = EINVAL;
 
 			}
 			break;
 		default:
-			err = ERR_INVALID_ARGS;
+			err = EINVAL;
 	}
 
 	mutex_unlock(&fs->lock);
@@ -819,7 +820,7 @@ bootfs_read_dir(fs_cookie _fs, fs_vnode _vnode, file_cookie _cookie, struct dire
 	dirent->d_reclen = strlen(cookie->u.dir.ptr->name);
 
 	if (sizeof(struct dirent) + dirent->d_reclen + 1 > bufferSize) {
-		status = ERR_VFS_INSUFFICIENT_BUF;
+		status = ENOBUFS;
 		goto err;
 	}
 
@@ -912,28 +913,28 @@ bootfs_writepage(fs_cookie _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 	TRACE(("bootfs_writepage: vnode 0x%x, vecs 0x%x, pos 0x%x 0x%x\n", v, vecs, pos));
 
-	return ERR_NOT_ALLOWED;
+	return EPERM;
 }
 
 
 static int
 bootfs_create(fs_cookie _fs, fs_vnode _dir, const char *name, stream_type st, void *create_args, vnode_id *new_vnid)
 {
-	return ERR_VFS_READONLY_FS;
+	return EROFS;
 }
 
 
 static int
 bootfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
-	return ERR_VFS_READONLY_FS;
+	return EROFS;
 }
 
 
 static int
 bootfs_rename(fs_cookie _fs, fs_vnode _olddir, const char *oldname, fs_vnode _newdir, const char *newname)
 {
-	return ERR_VFS_READONLY_FS;
+	return EROFS;
 }
 
 
@@ -985,7 +986,7 @@ bootfs_wstat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
 	TRACE(("bootfs_wstat: vnode 0x%x (0x%x 0x%x), stat 0x%x\n", v, v->id, stat));
 
 	// cannot change anything
-	return ERR_VFS_READONLY_FS;
+	return EROFS;
 }
 
 

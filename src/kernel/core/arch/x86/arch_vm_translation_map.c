@@ -16,6 +16,7 @@
 #include <string.h>
 #include <stage2.h>
 #include <Errors.h>
+#include <kerrors.h>
 
 #include <arch/cpu.h>
 #include <arch/vm_translation_map.h>

@@ -11,6 +11,7 @@
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <sys/stat.h>
 
 #include <rootfs.h>

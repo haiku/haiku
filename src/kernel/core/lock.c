@@ -26,7 +26,7 @@ int recursive_lock_get_recursion(recursive_lock *lock)
 int recursive_lock_create(recursive_lock *lock)
 {
 	if(lock == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 	lock->holder = -1;
 	lock->recursion = 0;
 	lock->sem = create_sem(1, "recursive_lock_sem");
@@ -80,7 +80,7 @@ int mutex_init(mutex *m, const char *in_name)
 	const char *name;
 
 	if(m == NULL)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	if(in_name == NULL)
 		name = "mutex_sem";

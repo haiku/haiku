@@ -13,6 +13,7 @@
 #include <lock.h>
 #include <vm.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <drivers.h>
 #include <sys/stat.h>
 

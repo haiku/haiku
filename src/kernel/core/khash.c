@@ -106,7 +106,7 @@ int hash_remove(void *_hash_table, void *e)
 		}
 	}
 
-	return ERR_GENERAL;
+	return B_ERROR;
 }
 
 void *hash_find(void *_hash_table, void *e)

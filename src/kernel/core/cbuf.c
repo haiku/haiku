@@ -9,6 +9,7 @@
 #include <arch/debug.h>
 #include <cbuf.h>
 #include <arch/cpu.h>
+#include <kerrors.h>
 #include <Errors.h>
 #include <debug.h>
 #include <int.h>

@@ -61,7 +61,7 @@ new_fd(struct io_context *ioctx, struct file_descriptor *f)
 		}
 	}
 	if (fd < 0) {
-		fd = ERR_NO_MORE_HANDLES;
+		fd = EMFILE;
 		goto err;
 	}
 

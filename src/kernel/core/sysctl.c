@@ -5,8 +5,9 @@
 #include <vm.h>
 #include <debug.h>
 #include <memheap.h>
-#include <Errors.h>
 #include <sysctl.h>
+
+#include <Errors.h>
 
 /* Not sure where to put this definition yet (sys/param.h?), 
  * so just add it here 

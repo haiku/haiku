@@ -9,6 +9,7 @@
 #include <debug.h>
 #include <smp.h>
 #include <Errors.h>
+#include <kerrors.h>
 
 #include <stage2.h>
 

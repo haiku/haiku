@@ -21,6 +21,7 @@
 #include <bootfs.h>
 #include <devfs.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <atomic.h>
 #include <OS.h>
 #include <fd.h>

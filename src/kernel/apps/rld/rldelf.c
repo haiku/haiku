@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <elf32.h>
 #include <user_runtime.h>
 #include <syscalls.h>

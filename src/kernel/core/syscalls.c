@@ -11,7 +11,6 @@
 #include <debug.h>
 #include <vfs.h>
 #include <thread.h>
-#include <OS.h>
 #include <sem.h>
 #include <port.h>
 #include <cpu.h>
@@ -19,9 +18,10 @@
 #include <resource.h>
 #include <fd.h>
 #include <sysctl.h>
-#include <sys/socket.h>
 #include <ksocket.h>
 #include <sys/ioccom.h>
+#include <sys/socket.h>
+#include <OS.h>
 
 #define INT32TOINT64(x, y) ((int64)(x) | ((int64)(y) << 32))
 

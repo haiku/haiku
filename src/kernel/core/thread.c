@@ -32,6 +32,7 @@
 #include <stdlib.h>
 #include <resource.h>
 #include <atomic.h>
+#include <kerrors.h>
 
 struct proc_key {
 	proc_id id;

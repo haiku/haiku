@@ -3,6 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 #include <Errors.h>
+#include <kerrors.h>
 #include <kernel.h>
 #include <vm.h>
 #include <vm_priv.h>

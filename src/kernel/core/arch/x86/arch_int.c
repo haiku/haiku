@@ -11,6 +11,7 @@
 #include <smp.h>
 #include <syscalls.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <vm_priv.h>
 #include <ksyscalls.h>
 

@@ -7,6 +7,7 @@
 
 #include <kernel.h>
 #include <Errors.h>
+#include <kerrors.h>
 #include <elf.h>
 #include <vfs.h>
 #include <vm.h>

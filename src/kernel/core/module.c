@@ -5,10 +5,6 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-// TODO:
-// - "offsetof" macro is missing
-//   -> move it to a public place
-
 #include <kernel.h>
 #include <module.h>
 #include <lock.h>
@@ -533,21 +529,21 @@ static inline int init_module(module *module)
 		
 		case MOD_INIT:
 			SHOW_ERROR( 0, "circular reference to %s\n", module->name );
-			res = ERR_GENERAL;
+			res = B_ERROR;
 			break;
 		
 		case MOD_UNINIT:
 			SHOW_ERROR( 0, "tried to load module %s which is currently unloading\n", module->name );
-			res = ERR_GENERAL;
+			res = B_ERROR;
 			break;
 
 		case MOD_ERROR:
 			SHOW_INFO( 0, "cannot load module %s because its earlier unloading failed\n", module->name );
-			res = ERR_GENERAL;
+			res = B_ERROR;
 			break;
 		
 		default:
-			res = ERR_GENERAL;
+			res = B_ERROR;
 	}
 	
 	return res;
@@ -563,11 +559,11 @@ static inline int uninit_module(module *module)
 		case MOD_INIT:
 			panic( "Trying to unload module %s which is initializing\n", 
 				module->name );
-			return ERR_GENERAL;
+			return B_ERROR;
 
 		case MOD_UNINIT:
 			panic( "Trying to unload module %s which is un-initializing\n", module->name );
-			return ERR_GENERAL;
+			return B_ERROR;
 		
 		case MOD_RDY:
 			{
@@ -592,7 +588,7 @@ static inline int uninit_module(module *module)
 			
 		// fall through
 		default:	
-			return ERR_GENERAL;		
+			return B_ERROR;		
 	}
 }
 
@@ -640,12 +636,12 @@ static inline int module_create_dir_iterator( module_iterator *iter, int file, c
 	
 	dir = (struct module_dir_iterator *)kmalloc( sizeof( *dir ));
 	if (dir == NULL )
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 		
 	dir->name = (char *)kstrdup( name );
 	if (dir->name == NULL ) {
 		kfree( dir );
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	}
 
 	dir->file = file;
@@ -830,7 +826,7 @@ static inline int module_enter_base_path(module_iterator *iter)
 
 	if (iter->base_path_id >= (int)num_module_paths ) {
 		SHOW_FLOW0( 3, "no locations left\n" );
-		return ERR_NOT_FOUND;
+		return ENOENT;
 	}
 
 	SHOW_FLOW(3, "trying base path (%s)\n", module_paths[iter->base_path_id]);
