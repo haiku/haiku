@@ -164,7 +164,7 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 			partition_data *child = create_child_partition(partition->id,
 														   i, -1);
 			if (!child) {
-				PRINT(("Unable to create child at index %ld.\n", i));
+				PRINT(("Unable to create child at index %d.\n", i));
 				// something went wrong
 				error = B_ERROR;
 				break;
@@ -188,7 +188,7 @@ scan_partition(int fd, partition_data *partition, void *cookie)
 		partition->content_cookie = NULL;
 		for (int32 i = 0; i < partition->child_count; i++) {
 			if (partition_data *child = get_child_partition(partition->id, i)) {
-				delete child->cookie;
+				delete static_cast<Session *>(child->cookie);
 				child->cookie = NULL;
 			}
 		}
@@ -203,7 +203,7 @@ free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 {
 	if (cookie) {
 		DEBUG_INIT_ETC(NULL, ("cookie: %p", cookie));
-		delete cookie;
+		delete static_cast<Disc*>(cookie);
 	}
 }
 
@@ -213,7 +213,7 @@ free_partition_cookie(partition_data *partition)
 {
 	if (partition && partition->cookie) {
 		DEBUG_INIT_ETC(NULL, ("partition->cookie: %p", partition->cookie));
-		delete partition->cookie;
+		delete static_cast<Session *>(partition->cookie);
 		partition->cookie = NULL;
 	}
 }
@@ -224,7 +224,7 @@ free_partition_content_cookie(partition_data *partition)
 {
 	if (partition && partition->content_cookie) {
 		DEBUG_INIT_ETC(NULL, ("partition->content_cookie: %p", partition->content_cookie));
-		delete partition->content_cookie;
+		delete static_cast<Disc*>(partition->content_cookie);
 		partition->content_cookie = NULL;
 	}
 }
