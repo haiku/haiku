@@ -1,7 +1,10 @@
-/* 
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler. All rights reserved.
+ * Distributed under the terms of the MIT license.
+ * 
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 #include <SupportDefs.h>
@@ -367,9 +370,9 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		}
 
 		if (qualifier == 'L')
-			num = va_arg(args, unsigned long long);
+			num = va_arg(args, uint64);
 		else if (qualifier == 'l') {
-			num = va_arg(args, unsigned long);
+			num = va_arg(args, uint32);
 			if (flags & SIGN)
 				num = (long)num;
 		} else if (qualifier == 'h') {
