@@ -1,0 +1,33 @@
+# This file belongs into /boot/home/config/settings/Media and is called codec_mapping 
+# It contains codec assignments for the new OpenBeOS media kit
+#
+# WARNIG! This format is experimental and will possibly be changed!
+#
+
+[version1]
+"audiocodec/mpeg1-Layer1" = { MPEG : 0x101 }
+"audiocodec/mpeg1-Layer2" = { MPEG : 0x102 }
+"audiocodec/mpeg2-Layer1" = { MPEG : 0x201 }
+"audiocodec/mpeg2-Layer2" = { MPEG : 0x202 }
+"audiocodec/mpeg2-Layer3" = { MPEG : 0x203 }
+"audiocodec/mpeg2.5-layer1" = { MPEG : 0x301 }
+"audiocodec/mpeg2.5-layer2" = { MPEG : 0x302 }
+"audiocodec/mpeg2.5-layer3" = { MPEG : 0x303 }
+"audiocodec/mpeg1-Layer3" = { MPEG : 0x103 }, { WAV : 0x50, 0x55 }, { QT : 0x33706d2e, 0x5500736d }
+"audiocodec/raw" = { BEOS : 'rawa' }, { WAV : 0x1 }, { QT : 0x20776172, 0x736f7774, 0x74776f73 }
+"audiocodec/MS-WMAv1" = { WAV : 0x160 }
+"audiocodec/MS-WMAv2" = { WAV : 0x161 }
+"audiocodec/aLaw" = { WAV : 0x6 }, { QT : 0x77616C61 }
+"audiocodec/uLaw" = { WAV : 0x7 }, { QT : 0x77616c75 }
+"audiocodec/AC3" = { WAV : 0x2000 }
+"audiocodec/MS-ADPCM" = { WAV : 0x2 }, { QT : 0x0200736d }
+"audiocodec/IMA-ADPCM" = { WAV : 0x11 }, { QT : 0x34616d69, 0x1100736d }
+"videocodec/raw" = { BEOS : 'rawv' }, { AVI : 0x0 }, { QT : 0x20776172 }
+"videocodec/Intel-Indeo-3.1" = { AVI : 'iv31' }
+"videocodec/intel-Indeo-3.2" = { AVI : 'iv32' }
+"videocodec/MS-MPEG4v1" = { AVI : 'DIV1', 'div1' }
+"videocodec/MS-MPEG4v2" = { AVI : 'DIV2', 'div2', 'MP42', 'mp42' }
+"videocodec/MS-MPEG4v3" = { AVI : 'MPG3', 'mpg3', 'MP43', 'mp43', 'DIV4', 'div4', 'DIV5', 'div5', 'DIV6', 'div6', 'AP41', 'COL0', 'col0', 'COL1', 'col1', '3IVD', '3ivd' }
+"videocodec/OpenDivX" = { AVI : 'MP4S', 'mp4s', 'M4S2', 'm4s2', 'DX50', 'BLZ0', 'mp4v', 'UMP4', '3IV2', '3iv2' }
+"videocodec/XviD" = { AVI : 'DIVX', 'divx', 'XVID', 'xvid' }
+"videocodec/3ivx-Delta-3.5" = { AVI : '3IV1' }
