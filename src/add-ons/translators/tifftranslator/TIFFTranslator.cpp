@@ -360,46 +360,65 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 // return B_NO_TRANSLATOR, otherwise, 
 // return B_OK
 status_t
-check_tiff_fields(TiffIfd &ifd)
+check_tiff_fields(TiffIfd &ifd, TiffDetails *pdetails)
 {
-	uint32 value;
-	TiffUintField *pfield = NULL;
+	TiffDetails details;
+	memset(&details, 0, sizeof(TiffDetails));
 	
-	// Only the default values are supported for the
-	// following fields
-	if (ifd.GetUintField(TAG_FILL_ORDER, pfield) == B_OK &&
-		pfield->GetUint(value) == B_OK &&
-		value != 1)
-		return B_NO_TRANSLATOR;
-	
-	if (ifd.GetUintField(TAG_ORIENTATION, pfield) == B_OK &&
-		pfield->GetUint(value) == B_OK &&
-		value != 1)
-		return B_NO_TRANSLATOR;
-	
-	if (ifd.GetUintField(TAG_PLANAR_CONFIGURATION, pfield) == B_OK &&
-		pfield->GetUint(value) == B_OK &&
-		value != 1)
-		return B_NO_TRANSLATOR;
+	try {	
+		// Only the default values are supported for the
+		// following fields.  HasField is called so that
+		// if a field is not present, a TiffIfdFieldNotFoundException
+		// will not be thrown when GetUint is called.
+		// (If they are not present, that is fine, but if
+		// they are present and have a non-default value,
+		// that is a problem)	
+		if (ifd.HasField(TAG_FILL_ORDER) &&
+			ifd.GetUint(TAG_FILL_ORDER) != 1)
+			return B_NO_TRANSLATOR;
+		if (ifd.HasField(TAG_ORIENTATION) &&
+			ifd.GetUint(TAG_ORIENTATION) != 1)
+			return B_NO_TRANSLATOR;
+		if (ifd.HasField(TAG_PLANAR_CONFIGURATION) &&
+			ifd.GetUint(TAG_PLANAR_CONFIGURATION) != 1)
+			return B_NO_TRANSLATOR;
+		if (ifd.HasField(TAG_SAMPLE_FORMAT) &&
+			ifd.GetUint(TAG_SAMPLE_FORMAT) != 1)
+			return B_NO_TRANSLATOR;
+			
+		// Copy fields useful to TIFFTranslator
+		details.width			= ifd.GetUint(TAG_IMAGE_WIDTH);
+		details.height			= ifd.GetUint(TAG_IMAGE_HEIGHT);
+		details.compression		= ifd.GetUint(TAG_COMPRESSION);
+		details.interpretation	= ifd.GetUint(TAG_PHOTO_INTERPRETATION);
 		
-	if (ifd.GetUintField(TAG_SAMPLE_FORMAT, pfield) == B_OK &&
-		pfield->GetUint(value) == B_OK &&
-		value != 1)
-		return B_NO_TRANSLATOR;
+		printf("width: %d\nheight: %d\ncompression: %d\ninterpretation: %d\n",
+			details.width, details.height, details.compression,
+			details.interpretation);
+			
+		// Currently, only uncompressed, non-tile RGB
+		// images are supported
+		if (details.compression != COMPRESSION_NONE)
+			return B_NO_TRANSLATOR;
+		if (details.interpretation != PHOTO_RGB)
+			return B_NO_TRANSLATOR;
 		
-	// Only uncompressed images are supported
-	if (ifd.GetUintField(TAG_COMPRESSION, pfield) != B_OK)
+		// return read in details if output 
+		// pointer is supplied
+		if (pdetails)
+			memcpy(pdetails, &details, sizeof(TiffDetails));
+			
+	} catch (TiffIfdException) {
+		printf("-- Caught TiffIfdException --\n");
 		return B_NO_TRANSLATOR;
-	if (pfield->GetUint(value) != B_OK)
-		return B_NO_TRANSLATOR;
-	
+	}
 		
 	return B_OK;
 }
 
 status_t
 identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, swap_action swp)
+	ssize_t amtread, uint8 *read, swap_action swp, TiffDetails *pdetails = NULL)
 {
 	if (amtread != 4)
 		return B_ERROR;
@@ -425,26 +444,9 @@ identify_tiff_header(BPositionIO *inSource, translator_info *outInfo,
 	// Read in some fields in order to determine whether or not
 	// this particular TIFF image is supported by this translator
 	
-	// Get some stats and print them out
-	if (initcheck == B_OK) {
-		uint32 value;
-		TiffUintField *pfield = NULL;
-		
-		if (ifd.GetUintField(TAG_IMAGE_WIDTH, pfield) == B_OK) {
-			if (pfield->GetUint(value) == B_OK)
-				printf("image width: %d\n", value);
-		}
-		if (ifd.GetUintField(TAG_IMAGE_HEIGHT, pfield) == B_OK) {
-			if (pfield->GetUint(value) == B_OK)
-				printf("image height: %d\n", value);
-		}
-		if (ifd.GetUintField(TAG_COMPRESSION, pfield) == B_OK) {
-			if (pfield->GetUint(value) == B_OK)
-				printf("compression: %d\n", value);
-		}
-		
-		return check_tiff_fields(ifd);
-	}
+	// Check the required fields
+	if (initcheck == B_OK)
+		return check_tiff_fields(ifd, pdetails);
 		
 	if (initcheck != B_OK && initcheck != B_ERROR && initcheck != B_NO_MEMORY)
 		// return B_NO_TRANSLATOR if unexpected data was encountered

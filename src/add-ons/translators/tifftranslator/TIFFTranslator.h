@@ -54,6 +54,15 @@
 #define BBT_OUT_QUALITY 0.4
 #define BBT_OUT_CAPABILITY 0.6
 
+// structure for storing only the TIFF fields
+// that are of interest to the TIFFTranslator
+struct TiffDetails {
+	uint32 width;
+	uint32 height;
+	uint32 compression;
+	uint16 interpretation;
+};
+
 class TIFFTranslator : public BTranslator {
 public:
 	TIFFTranslator();

@@ -36,16 +36,47 @@
 #include "TiffField.h"
 #include "TiffUintField.h"
 
+class TiffIfdException {
+public:
+	TiffIfdException() { };
+};
+class TiffIfdFieldNotFoundException : public TiffIfdException {
+public:
+	TiffIfdFieldNotFoundException() { };
+};
+class TiffIfdUnexpectedTypeException : public TiffIfdException {
+public:
+	TiffIfdUnexpectedTypeException() { };
+};
+class TiffIfdBadIndexException : public TiffIfdException {
+public:
+	TiffIfdBadIndexException() { };
+};
+
 class TiffIfd {
 public:
 	TiffIfd(uint32 offset, BPositionIO &io, swap_action swp);
-	~TiffIfd();
-	
+	~TiffIfd();	
 	status_t InitCheck() { return finitStatus; };
-	status_t GetUintField(uint16 tag, TiffUintField *&poutField);
+	
+	bool HasField(uint16 tag);
+	uint32 GetCount(uint16 tag);
+		// throws: TiffIfdFieldNotFoundException()
+	
+	uint32 GetUint(uint16 tag, uint32 index = 0);
+		// index is the base one index for the desired
+		// number in the specified field. When index is the default
+		// value of zero: if the count is one, the
+		// first number will be returned, if it is not
+		// one, TiffIfdBadIndexException() will be thrown
+		//
+		// throws: TiffIfdFieldNotFoundException(),
+		// TiffIfdUnexpectedTypeException(),
+		// TiffIfdBadIndexException()
 
 private:
 	void LoadFields(uint32 offset, BPositionIO &io, swap_action swp);
+	TiffField *GetField(uint16 tag);
 	
 	TiffField **fpfields;
 	status_t finitStatus;

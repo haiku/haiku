@@ -129,48 +129,66 @@ TiffIfd::~TiffIfd()
 	fnextIFDOffset = 0;
 }
 
-// ---------------------------------------------------------------
-// GetUintField
-//
-// Retrieves the TiffUintField with the given tag. 
-//
-// Preconditions:
-//
-// Parameters:	tag,		the field id tag
-//
-//				poutField,	the pointer to the desired field
-//							is stored here
-//
-// Postconditions:
-//
-// Returns:	B_OK if the field was found and it is a TiffUintField
-//			based object,
-//
-//			B_BAD_TYPE if the field was found BUT it was not a
-//			TiffUintField based object
-//
-//			B_BAD_INDEX if a field with the given tag
-//			was not found
-// ---------------------------------------------------------------
-status_t
-TiffIfd::GetUintField(uint16 tag, TiffUintField *&poutField)
+bool
+TiffIfd::HasField(uint16 tag)
+{
+	TiffField *pfield = GetField(tag);
+	if (pfield)
+		return true;
+	else
+		return false;
+}
+
+uint32
+TiffIfd::GetCount(uint16 tag)
+{
+	TiffField *pfield = GetField(tag);
+	if (pfield)
+		return pfield->GetCount();
+	else
+		throw TiffIfdFieldNotFoundException();
+}
+
+uint32
+TiffIfd::GetUint(uint16 tag, uint32 index)
+{
+	TiffField *pfield = GetField(tag);
+	if (pfield) {
+	
+		TiffUintField *puintField = NULL;		
+		puintField = dynamic_cast<TiffUintField *>(pfield);
+		if (puintField) {
+		
+			uint32 num;
+			status_t ret = puintField->GetUint(num, index);
+			if (ret == B_OK)
+				return num;
+			else if (ret == B_BAD_INDEX)
+				throw TiffIfdBadIndexException();
+			else
+				throw TiffIfdUnexpectedTypeException();
+				
+		} else
+			throw TiffIfdUnexpectedTypeException();
+	}
+	
+	throw TiffIfdFieldNotFoundException();
+}
+
+TiffField *
+TiffIfd::GetField(uint16 tag)
 {
 	for (uint16 i = 0; i < ffieldCount; i++) {
-		TiffField *pfield;
-		
-		pfield = fpfields[i];
-		if (pfield && tag == pfield->GetTag()) {
-			TiffUintField *puintField = NULL;
-			
-			puintField = dynamic_cast<TiffUintField *>(pfield);
-			if (puintField) {
-				poutField = puintField;
-				return B_OK;
-			} else
-				return B_BAD_TYPE;
+		TiffField *pfield = fpfields[i];
+		if (pfield) {
+			uint16 ltag = pfield->GetTag();
+			if (tag == ltag)
+				return pfield;
+			else if (ltag > tag)
+				break;
 		}
 	}
 	
-	return B_BAD_INDEX;
+	return NULL;
 }
 
