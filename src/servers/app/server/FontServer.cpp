@@ -115,7 +115,7 @@ int32 FontServer::CountFamilies(void)
 */
 int32 FontServer::CountStyles(const char *family)
 {
-	FontFamily *f=_FindFamily(family);
+	FontFamily *f=GetFamily(family);
 	if(f)
 	{
 		return f->CountStyles();
@@ -129,7 +129,7 @@ int32 FontServer::CountStyles(const char *family)
 */
 void FontServer::RemoveFamily(const char *family)
 {
-	FontFamily *f=_FindFamily(family);
+	FontFamily *f=GetFamily(family);
 	if(f)
 	{
 		families->RemoveItem(f);
@@ -151,7 +151,7 @@ const char *FontServer::GetFamilyName(uint16 id) const
 
 const char *FontServer::GetStyleName(const char *family, uint16 id) const
 {
-	FontFamily *fam=_FindFamily(family);
+	FontFamily *fam=GetFamily(family);
 	FontStyle *sty;
 	for(int32 i=0; i<families->CountItems(); i++)
 	{
@@ -164,7 +164,7 @@ const char *FontServer::GetStyleName(const char *family, uint16 id) const
 
 FontStyle *FontServer::GetStyle(const char *family, uint16 id) const
 {
-	FontFamily *fam=_FindFamily(family);
+	FontFamily *fam=GetFamily(family);
 	FontStyle *sty;
 	for(int32 i=0; i<families->CountItems(); i++)
 	{
@@ -182,7 +182,7 @@ FontStyle *FontServer::GetStyle(const char *family, uint16 id) const
 	
 	Do NOT delete the FontFamily returned by this function.
 */
-FontFamily *FontServer::_FindFamily(const char *name) const
+FontFamily *FontServer::GetFamily(const char *name) const
 {
 	if(!init)
 		return NULL;
@@ -258,7 +258,7 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 		
 		face->charmap=charmap;
 
-		family=_FindFamily(face->family_name);
+		family=GetFamily(face->family_name);
 		
 		if(!family)
 		{
@@ -280,7 +280,6 @@ status_t FontServer::ScanDirectory(const char *fontspath)
 		printf("\tFont Style: %s\n",face->style_name);
 		#endif
 
-		// Has vertical metrics?
 		style=new FontStyle(path.Path(),face);
 		if(!family->AddStyle(style))
 			delete style;
@@ -424,7 +423,7 @@ void FontServer::SaveList(void)
 */
 FontStyle *FontServer::GetStyle(const char *family, const char *style)
 {
-	FontFamily *ffam=_FindFamily(family);
+	FontFamily *ffam=GetFamily(family);
 
 	if(ffam)
 	{
@@ -443,10 +442,16 @@ FontStyle *FontServer::GetStyle(const char *family, const char *style)
 FontStyle *FontServer::GetStyle(const uint16 &familyid, const uint16 &styleid)
 {
 	// TODO: Implement FontServer::GetStyle(id,id)
+	FontFamily *fam=GetFamily(familyid);
+	if(fam)
+	{
+		FontStyle *sty=fam->GetStyle(styleid);
+		return sty;
+	}
 	return NULL;
 }
 
-FontFamily *FontServer::GetFamily(const uint16 &familyid)
+FontFamily *FontServer::GetFamily(const uint16 &familyid) const
 {
 	for(int32 i=0; i<families->CountItems(); i++)
 	{
@@ -515,7 +520,7 @@ ServerFont *FontServer::GetSystemFixed(void)
 */
 bool FontServer::SetSystemPlain(const char *family, const char *style, float size)
 {
-	FontFamily *fam=_FindFamily(family);
+	FontFamily *fam=GetFamily(family);
 	if(!fam)
 		return false;
 	FontStyle *sty=fam->GetStyle(style);
@@ -539,7 +544,7 @@ bool FontServer::SetSystemPlain(const char *family, const char *style, float siz
 */
 bool FontServer::SetSystemBold(const char *family, const char *style, float size)
 {
-	FontFamily *fam=_FindFamily(family);
+	FontFamily *fam=GetFamily(family);
 	if(!fam)
 		return false;
 	FontStyle *sty=fam->GetStyle(style);
@@ -563,7 +568,7 @@ bool FontServer::SetSystemBold(const char *family, const char *style, float size
 */
 bool FontServer::SetSystemFixed(const char *family, const char *style, float size)
 {
-	FontFamily *fam=_FindFamily(family);
+	FontFamily *fam=GetFamily(family);
 	if(!fam)
 		return false;
 	FontStyle *sty=fam->GetStyle(style);

@@ -192,6 +192,6 @@ void LayerData::PrintToStream() const{
 	printf("\t FontRotation: %f\n", font.Rotation());
 	printf("\t FontSpacing: %ld\n", font.Spacing());
 	printf("\t FontEncoding: %ld\n", font.Encoding());
-	printf("\t FontFace: %ld\n", font.Face());
+	printf("\t FontFace: %d\n", font.Face());
 	printf("\t FontFlags: %lu\n", font.Flags());
 }

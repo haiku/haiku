@@ -52,6 +52,10 @@ FontStyle::FontStyle(const char *filepath, FT_Face face)
 	fbounds.Set(0,0,0,0);
 	fFace=TranslateStyleToFace(face->style_name);
 	fID=0;
+	fHeight.ascent=face->ascender;
+	fHeight.descent=face->descender;
+	fHeight.leading=face->height;
+	fHeight.units_per_em=face->units_per_EM;
 }
 
 /*!
@@ -74,6 +78,21 @@ FontStyle::~FontStyle(void)
 const char *FontStyle::Name(void) const
 {
 	return fName.String();
+}
+
+font_height FontStyle::GetHeight(const float &size)
+{
+	font_height fh={0,0,0};
+	
+	// font units are 26.6 format, so we get REALLY big numbers if
+	// we don't do some shifting.
+	fh.ascent=(fHeight.ascent * size) / fHeight.units_per_em;
+	
+	// FT2's descent numbers are negative. Be's is positive
+	fh.descent=(fHeight.descent * size * -1) / fHeight.units_per_em;
+	
+	fh.leading=(fHeight.leading * size) / fHeight.units_per_em;
+	return fh;
 }
 
 /*!

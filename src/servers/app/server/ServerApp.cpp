@@ -1232,60 +1232,204 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		case AS_COUNT_FONT_FAMILIES:
 		{
 			// Attached Data:
-			// None
+			// 1) port_id - reply port
 			
 			// Returns:
 			// 1) int32 - # of font families
+			port_id replyport=-1;
+			
+			replylink.SetSendPort(replyport);
+			fontserver->Lock();
+			replylink.StartMessage(SERVER_TRUE);
+			replylink.Attach<int32>(fontserver->CountFamilies());
+			replylink.Flush();
+			fontserver->Unlock();
+			
 			break;
 		}
 		case AS_COUNT_FONT_STYLES:
 		{
 			// Attached Data:
 			// 1) font_family - name of font family
+			// 2) port_id - reply port
 			
 			// Returns:
 			// 1) int32 - # of font styles
+			port_id replyport;
+			font_family fam;
+			
+			msg.Read(fam,sizeof(font_family));
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontFamily *ffam=fontserver->GetFamily(fam);
+			if(ffam)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<int32>(ffam->CountStyles());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_PLAIN:
 		{
 			// Attached Data:
-			// None
+			// port_id reply port
 			
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - size in points
 			// 4) uint16 - face flags
-			// 5) font_height - height structure
+			// 5) uint32 - font flags
 			
-			// TODO: See if font_height is needed in SET_SYSFONT_XXXX messages
+			port_id replyport;
+			msg.Read<port_id>(&replyport);
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			ServerFont *sf=fontserver->GetSystemPlain();
+			if(sf)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<uint16>(sf->FamilyID());
+				replylink.Attach<uint16>(sf->StyleID());
+				replylink.Attach<float>(sf->Size());
+				replylink.Attach<uint16>(sf->Face());
+				replylink.Attach<uint32>(sf->Flags());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			
+			delete sf;
+			break;
+		}
+		case AS_GET_FONT_HEIGHT:
+		{
+			// Attached Data:
+			// 1) uint16 family ID
+			// 2) uint16 style ID
+			// 3) float size
+			// 4) port_id reply port
+			uint16 famid,styid;
+			float ptsize;
+			port_id replyport;
+			
+			msg.Read<uint16>(&famid);
+			msg.Read<uint16>(&styid);
+			msg.Read<float>(&ptsize);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(famid,styid);
+			if(fstyle)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<font_height>(fstyle->GetHeight(ptsize));
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_SYSFONT_BOLD:
 		{
 			// Attached Data:
-			// None
+			// port_id reply port
 			
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - size in points
 			// 4) uint16 - face flags
-			// 5) font_height - height structure
+			// 5) uint32 - font flags
+			
+			port_id replyport;
+			msg.Read<port_id>(&replyport);
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			ServerFont *sf=fontserver->GetSystemBold();
+			if(sf)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<uint16>(sf->FamilyID());
+				replylink.Attach<uint16>(sf->StyleID());
+				replylink.Attach<float>(sf->Size());
+				replylink.Attach<uint16>(sf->Face());
+				replylink.Attach<uint32>(sf->Flags());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			
+			delete sf;
 			break;
 		}
 		case AS_SET_SYSFONT_FIXED:
 		{
 			// Attached Data:
-			// None
+			// port_id reply port
 			
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
 			// 3) float - size in points
 			// 4) uint16 - face flags
-			// 5) font_height - height structure
+			// 5) uint32 - font flags
+			
+			port_id replyport;
+			msg.Read<port_id>(&replyport);
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			ServerFont *sf=fontserver->GetSystemFixed();
+			if(sf)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<uint16>(sf->FamilyID());
+				replylink.Attach<uint16>(sf->StyleID());
+				replylink.Attach<float>(sf->Size());
+				replylink.Attach<uint16>(sf->Face());
+				replylink.Attach<uint32>(sf->Flags());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			
+			delete sf;
 			break;
 		}
 		default:

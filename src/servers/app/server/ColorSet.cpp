@@ -159,7 +159,7 @@ printf("Initializing color settings to defaults\n");
 	control_text.SetColor(0,0,0);
 	control_border.SetColor(0,0,0);
 	control_highlight.SetColor(115,120,184);
-	keyboard_navigation_base.SetColor(170,50,184);
+	keyboard_navigation_base.SetColor(0,0,229);
 	keyboard_navigation_pulse.SetColor(0,0,0);
 	shine.SetColor(255,255,255);
 	shadow.SetColor(0,0,0);
