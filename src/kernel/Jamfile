@@ -52,6 +52,7 @@ KernelLd kernel :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
+	kernel_disk_device_manager.o
 
 	libbus.a
 	lib$(OBOS_ARCH).a
@@ -86,6 +87,7 @@ KernelLd kernel.so :
 	kernel_core.o
 	kernel_fs.o
 	kernel_vm.o
+	kernel_disk_device_manager.o
 
 	libbus.a
 	lib$(OBOS_ARCH).a
