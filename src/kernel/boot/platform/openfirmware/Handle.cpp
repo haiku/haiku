@@ -62,3 +62,12 @@ Handle::WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize)
 	return B_ERROR;
 }
 
+
+off_t 
+Handle::Size() const
+{
+	// ToDo: fix this!
+	return 1024LL * 1024 * 1024 * 1024;
+		// 1024 GB
+}
+

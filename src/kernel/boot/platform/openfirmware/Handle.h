@@ -22,6 +22,8 @@ class Handle : public ConsoleNode {
 		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
 		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
 
+		virtual off_t Size() const;
+
 	protected:
 		int		fHandle;
 		bool	fOwnHandle;
