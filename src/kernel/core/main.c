@@ -122,7 +122,7 @@ _start(kernel_args *oldka, int cpu_num)
 	} else {
 		// this is run per cpu for each AP processor after they've been set loose
 		smp_per_cpu_init(&ka, cpu_num);
-		thread_init_percpu(cpu_num);
+		thread_per_cpu_init(cpu_num);
 	}
 	TRACE(("##################################################################\n"));
 	TRACE(("interrupts now enabled\n"));
