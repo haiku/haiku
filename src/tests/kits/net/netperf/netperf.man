@@ -1,0 +1,165 @@
+.TH netperf 1L ""
+.SH NAME
+
+netperf \- a network performance benchmark
+
+.SH SYNOPSIS
+
+.B netperf
+[global options] -- [test specific options]
+
+.SH DESCRIPTION
+.B Netperf
+is a benchmark that can be used to measure various aspects of
+networking performance.
+Currently, its focus is on bulk data transfer and request/response
+performance using either TCP or UDP, and the Berkeley Sockets
+interface. In addition, tests for DLPI, the Fore ATM API, Unix Domain
+Sockets, and HP HiPPI LLA may be conditionally compiled-in.
+
+.SS GLOBAL OPTIONS
+
+.TP
+.B \-a sizespec
+Alter the send and receive buffer alignments on the local system.
+This defaults to 8 bytes.
+.TP
+.B \-A sizespec
+As -a, but for the remote system.
+.TP
+.B \-c [rate]
+Request CPU utilization and service demand calculations for the
+local system. If the optional rate parameter is specified,
+.B netperf
+will use that instead of calculating the rate itself.
+.TP
+.B \-C [rate]
+As -c, but for the remote system.
+.TP
+.B \-d
+Increase the quantity of debugging output displayed during
+a test (possibly at the expense of performance).
+.TP
+.B \-f GMKgmk
+Change the units of measure for stream tests. Capital letters are
+powers of two, lowercase are powers of ten.
+.TP
+.B \-F fill_file
+Pre-fill the send buffers with data from the named file. This is
+intended to provide a means for avoiding buffers that are filled with
+data which is trivially easy to compress. A good choice for a file
+that should be present on any system is this manpage - netperf.man.
+Other files may be provided as part of the distribution.
+.TP
+.B \-h
+Display a usage string, and exit.
+.TP
+.B \-H remote_host
+Set the hostname (or IP address) of the remote system.
+.TP
+.B \-i max,min
+Set the maximum and minimum number of iterations when trying to reach
+certain confidence levels.
+.TP
+.B \-I lvl,[,intvl]
+Specify the confidence level (either 95 or 99 - 99 is the default) and
+the width of the confidence interval as a percentage (default 10)
+.TP
+.B \-l testlen
+Specify the length of the test (default 10 seconds).
+A negative value sets the number of request/response transactions,
+or the number of bytes for a stream test.
+.TP
+.B \-n numcpus
+Specify the number of CPU's in the system on those systems for which
+netperf has no way to find the number of CPU's programatically. (all
+but HP-UX)
+.TP
+.B \-o sizespec
+Set an offset from the alignment specified with -a.
+.TP
+.B \-O sizespec
+As -o, but for the remote system.
+.TP
+.B \-p portnum
+Connect to a
+.C netsetver
+listening on the specified port, rather than using /etc/services.
+.TP
+.B \-P 0|1
+Show (1) or suppress (0) the test banner.
+.TP
+.B \-t testname
+Specify the test to perform.
+Valid testnames are (but not always compiled-in):
+.RS
+.RS
+.nf
+.I TCP_STREAM
+.I TCP_RR
+.I TCP_CRR
+.I UDP_STREAM
+.I UDP_RR
+.I TCPIPV6_STREAM
+.I TCPIPV6_RR
+.I TCPIPV6_CRR
+.I UDPIPV6_STREAM
+.I UDPIPV6_RR
+.I DLCO_STREAM
+.I DLCO_RR
+.I DLCL_STREAM
+.I DLCL_RR
+.I STREAM_STREAM
+.I STREAM_RR
+.I DG_STREAM
+.I DG_RR
+.I FORE_STREAM
+.I FORE_RR
+.I HIPPI_STREAM
+.I HIPPI_RR
+.I LOC_CPU
+.I REM_CPU
+.fi
+.RE
+.RE
+.TP
+.B \-v verbosity
+Set the verbosity level for the test (only with -P).
+.TP
+.B \-V
+Enable the copy-avoidance features (HP-UX 9.0 and later only).
+
+.SS TEST SPECIFIC OPTIONS
+
+.TP
+.B \-h
+Display a usage string based on the test name set with -t, and exit.
+
+Please consult the netperf manual
+.I 
+Netperf: A Network Performance Benchamrk 
+(netperf.ps) for more information.
+
+.SH BUGS 
+There is a fairly large list of known defects and misfeatures in the
+manual. If you think you have found a bug, please send email to Rick
+Jones <raj@cup.hp.com>.
+
+.SH SEE ALSO
+.C netserver
+.br
+.I
+Netperf: A Network Performance Benchmark
+.br
+http://www.cup.hp.com/netperf/NetperfPage.html
+
+.SH AUTHORS
+HP Information Networks Division - Networking Performance Team.
+.br
+Rick Jones	<raj@cup.hp.com>
+.br
+Karen Choy	HP IND
+.br
+Dave Shield	<daves@csc.liv.ac.uk>	(man pages)
+.br
+Others too numerous to mention here - see the ACKNWLDGMNTS file

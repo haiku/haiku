@@ -1,0 +1,66 @@
+February 11, 2003
+
+At the time of the initial port, I was not aware of a make facility
+for OpenVMS.  So, I would just compile and link the various files by
+hand:
+
+   $ cc netperf.c
+   $ cc netlib.c
+   $ cc netsh.c
+   $ cc nettest_bsd.c
+   $ cc netserver.c
+   $ link/exe=netperf netperf.obj,netsh.obj,netlib.obj,nettest_bsd.obj
+   $ link/exe=netserver netserver.obj,netsh.obj,netlib.obj,nettest_bsd.obj
+
+Installation for OpenVMS has a few differences from installation under
+say Unix.  There is no inetd for VMS - however, there is the concept
+of an adding an auxilliary service that seems quite similar.
+
+To configure netperf for operation as an auxilliary service, you will
+need to edit/use the netserver_run.com file and alter the "path" to
+netserver accordingly.  The version that ships is setup for where Rick
+Jones did his initial porting work and most likely is not apropriate
+for you :)
+
+   $  define sys$output sys$sysroot:[netperf]hello_service.log 
+   $  define sys$error  sys$sysroot:[netperf]hello_service.log 
+   $  run sys$sysroot:[netperf]netserver.exe 
+
+Then it will be necessary to "define" netperf (netserver) as an
+auxilliary service. This will need to be customized as apropriate for
+your system
+
+   $ tcpip set service netserver - 
+   _$ /port=12865 - 
+   _$ /protocol=tcp - 
+   _$ /user=system - 
+   _$ /limit=48 -
+   _$ /process_name=netserver - 
+   _$ /file=sys$sysroot:[netperf]netserver_run.com 
+
+And then it is necessary to enable the service:
+
+$ tcpip enable service netserver
+
+If you want to disable the service, you can issue the command
+
+$ tcpip set noservice netserver
+
+By default, OpenVMS is case-insensitive with commandlines, and will
+downshift everything to lower case.  This does not interact well with
+netperf's use of command-line options like "-H" and "-h" with rather
+different meanings.
+
+To workaround that, the following defines are believed to be
+sufficient.
+
+$ define  DECC$ARGV_PARSE_STYLE       ENABLE
+$ define  DECC$EFS_CASE_PRESERVE      ENABLE
+$ define  DECC$POSIX_SEEK_STREAM_FILE ENABLE
+$ define  DECC$EFS_CHARSET            ENABLE
+$ set process /parse_style=extended
+
+I do not know if this will be something one can also do for the
+netserver - presumeably one could put these things in the
+netserver_run.com file (guessing). At present though I've not tried
+that, and I'm also not sure that netserver has any upper-case options.

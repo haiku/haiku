@@ -1,0 +1,69 @@
+#
+# @(#)Makefile  2.1alpha4  01/23/96
+#
+# Makefile to build netperf benchmark tool   for Win32 (NT and 95 hopefully)
+# based on work by Robin Callender
+#
+
+NETPERF_HOME = .\
+
+# it should be OK to build a straight win32 application?
+#!include <ntwin32.mak>
+!include <win32.mak>
+
+cflags   = $(cflags)
+
+# initial ports of netperf required -D_WINDOWS_NT_, but since the port 
+# has a decent chance of working on both NT and 95, and it seems that
+# WIN32 is the common point, we rely on a WIN32 being defined, along 
+# with _CONSOLE_
+
+DFLAGS   = -D_CONSOLE_ -DDEBUG_LOG_FILE="\"netperf.log\"" -DUSE_LOOPER
+#LIBS     = wsock32.lib ntdll.lib
+LIBS     = wsock32.lib
+#INCS     = -Iy:\nt\public\sdk\inc  -Iy:\nt\public\sdk\inc\crt
+#DEPS     = netlib.h makefile
+DEPS     = netlib.h
+
+SHAR_SOURCE_FILES = netlib.c netlib.h netperf.c netserver.c \
+                    netsh.c netsh.h \
+                    nettest_bsd.c nettest_bsd.h \
+                    makefile
+
+
+NETPERF_OBJS    = netperf.obj netsh.obj netlib.obj nettest_bsd.obj
+
+NETSERVER_OBJS  = netserver.obj nettest_bsd.obj netlib.obj netsh.obj
+
+
+all:            netperf.exe netserver.exe
+
+netperf.exe:    $(NETPERF_OBJS)
+                $(link) $(conflags) $(ldebug) $(conlibsmt) $(NETPERF_OBJS) \
+                $(LIBS) -out:$@
+
+netserver.exe:  $(NETSERVER_OBJS)
+                $(link) $(conflags) $(ldebug) $(conlibsmt) $(NETSERVER_OBJS) \
+                $(LIBS) -out:$@
+
+netperf.obj:    netperf.c netsh.h $(DEPS)
+                $(cc) $(cflags) $(DFLAGS) $(INCS) $(cvarsmt) netperf.c
+
+netsh.obj:      netsh.c netsh.h nettest_bsd.h $(DEPS)
+                $(cc) $(cflags) $(DFLAGS) $(INCS) $(cvarsmt) netsh.c
+
+netlib.obj:     netlib.c netsh.h $(DEPS)
+                $(cc) $(cflags) $(DFLAGS) $(INCS) $(cvarsmt) netlib.c
+
+nettest_bsd.obj: nettest_bsd.c nettest_bsd.h netsh.h $(DEPS)
+                $(cc) $(cflags) $(DFLAGS) $(INCS) $(cvarsmt) nettest_bsd.c
+
+netserver.obj:  netserver.c nettest_bsd.h $(DEPS)
+                $(cc) $(cflags) $(DFLAGS) $(INCS) $(cvarsmt) netserver.c
+
+clean:
+        del *.obj
+        del *.exe
+
+
+

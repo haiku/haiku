@@ -1,0 +1,226 @@
+#!/bin/sh
+#set -x
+#
+# This is a script to generate a quick "snapshot" of performance for a
+# pair of nodes. At first, it will perform the following tests:
+#
+# TCP Stream test with 56KB socket buffers and 4KB sends
+# TCP Stream test with 32KB socket buffers and 4KB sends
+# TCP Request/Response test with 1 byte requests and 1 byte responses
+# UDP Request/Response test with 1 byte requests and 1 byte responses
+# UDP Request/Response test with 516 byte requests and 4 byte responses
+# UDP Stream test with 32KB socket buffers and 4KB sends
+# UDP Stream test with 32KB socket buffers and 1KB sends
+#
+# All tests will run for sixty seconds. Confidence intervals are used
+# to insure the repeatability of the test. This means that the soonest
+# the script will be finished is 21 minutes.
+#
+# This script takes two parameters. The first parm is the name of the
+# remote host. It is a required parameter. The second will either
+# enable or disable CPU utilization measurements. It is an optional
+# parameter which defaults to no CPU utilization measurements.
+#
+# usage: snapshot_script hostname [CPU]
+#
+# mod 6/29/95 - echo progress information to stderr so that we can 
+#               see forward progress even when the results are 
+#               re-directed to a file
+#
+# mod 5/27/96 - switch from NETHOME to NETPERF and take the user's value
+#               if it is already set
+#
+# mod 8/12/96 - fix the default netperf command variable so it finds the
+#               executable and not the directory...
+#
+# First, let us set-up some of the defaults
+#
+# where is netperf installed, there are a few possible places:
+
+NETPERF_CMD=${NETPERF_CMD:=/opt/netperf/netperf}
+
+
+# there should be no more than two parms passed
+
+if [ $# -gt 2 ]; then
+  echo "try again, correctly -> snapshot_script hostname [CPU]"
+  exit 1
+fi
+
+if [ $# -eq 0 ]; then
+  echo "try again, correctly -> snapshot_script hostname [CPU]"
+  exit 1
+fi
+
+# if there are two parms, parm one it the hostname and parm two will
+# be a CPU indicator. actuall, anything as a second parm will cause
+# the CPU to be measured, but we will "advertise" it should be "CPU"
+
+if [ $# -eq 2 ]; then
+  REM_HOST=$1
+  LOC_CPU="-c"
+  REM_CPU="-C"
+fi
+
+if [ $# -eq 1 ]; then
+  REM_HOST=$1
+fi
+
+# at what port will netserver be waiting? If you decide to run
+# netserver at a differnet port than the default of 12865, then set
+# the value of PORT apropriately
+#NETPERF_PORT="-p some_other_portnum"
+NETPERF_PORT=${NETPERF_PORT:=""}
+
+# How accurate we want the estimate of performance: 
+#      maximum and minimum test iterations (-i)
+#      confidence level (99 or 95) and interval (percent)
+STATS_STUFF="-i 10,3 -I 99,5"
+
+# length in time of the test - should be 60 seconds
+NETPERF_TIME=${NETPERF_TIME:=60}
+
+# where is the bitbucket?
+BITBUCKET="/dev/null"
+
+# announce start of test
+echo Netperf snapshot script started at `date` >&2
+
+# If we are measuring CPU utilization, then we can save beaucoup time
+# by saving the results of the CPU calibration and passing them in
+# during the real tests. So, we execute the new CPU "tests" of netperf
+# and put the values into shell vars.
+
+case $LOC_CPU in
+\-c) LOC_RATE=`$NETPERF_CMD $NETPERF_PORT -t LOC_CPU`;;
+*) LOC_RATE=""
+esac
+
+case $REM_CPU in
+\-C) REM_RATE=`$NETPERF_CMD $NETPERF_PORT -t REM_CPU -H $REM_HOST`;;
+*) REM_RATE=""
+esac
+
+# We will perform three twenty second warm-up tests at this point, but
+# we will not display the results of those tests. This is unlikely to
+# make any difference in the results except right after a system
+# reboot, but this is supposed to be rather "general." We will do a
+# TCP stream and a TCP req/resp test
+
+WARM_TIME="10"
+
+$NETPERF_CMD $NETPERF_PORT -l $WARM_TIME -t TCP_STREAM -H $REM_HOST -- \
+  -s 32768 -S 32768 -m 4096 > ${BITBUCKET}
+$NETPERF_CMD $NETPERF_PORT -l $WARM_TIME -t TCP_STREAM -H $REM_HOST -- \
+  -s 32768 -S 32768 -m 96 > ${BITBUCKET}
+$NETPERF_CMD $NETPERF_PORT -l $WARM_TIME -t TCP_RR -H $REM_HOST -- \
+  -r 1,1 > ${BITBUCKET}
+
+# The warm-ups are complete, so perform the real tests first, the
+# stream tests, then the request/response
+
+echo Starting 56x4  TCP_STREAM tests at `date` >&2
+
+# a 56x4 TCP_STREAM test
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+echo $NETPERF_CMD $NETPERF_PORT -t TCP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+  $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+  -s 57344 -S 57344 -m 4096
+echo
+$NETPERF_CMD $NETPERF_PORT -t TCP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+  $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+  -s 57344 -S 57344 -m 4096
+echo
+echo
+# a 32x4 TCP_STREAM test
+echo Starting 32x4  TCP_STREAM tests at `date` >&2
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+echo $NETPERF_CMD $NETPERF_PORT -t TCP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -s 32768 -S 32768 -m 4096 
+echo
+$NETPERF_CMD $NETPERF_PORT -t TCP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -s 32768 -S 32768 -m 4096 
+echo
+echo
+# a single-byte TCP_RR
+echo Starting 1,1   TCP_RR     tests at `date` >&2
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+echo $NETPERF_CMD $NETPERF_PORT -t TCP_RR -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -r 1,1
+echo
+$NETPERF_CMD $NETPERF_PORT -t TCP_RR -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -r 1,1
+echo
+echo
+echo Starting 1,1   UDP_RR     tests at `date` >&2
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+# a single-byte UDP_RR
+echo $NETPERF_CMD $NETPERF_PORT -t UDP_RR -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -r 1,1
+echo
+$NETPERF_CMD $NETPERF_PORT -t UDP_RR -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -r 1,1
+echo
+echo
+# a UDP_RR test much like tftp
+echo Starting 512,4 UDP_RR     tests at `date` >&2
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+echo $NETPERF_CMD $NETPERF_PORT -t UDP_RR -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -r 516,4
+echo
+$NETPERF_CMD $NETPERF_PORT -t UDP_RR -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- -r 516,4
+# a 32x4 UDP_STREAM test
+echo Starting 32x4  UDP_STREAM tests at `date` >&2
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+echo $NETPERF_CMD $NETPERF_PORT -t UDP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -s 32768 -S 32768 -m 4096
+echo
+$NETPERF_CMD $NETPERF_PORT -t UDP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -s 32768 -S 32768 -m 4096
+echo
+echo
+# a 32x1 UDP_STREAM test
+echo Starting 32x1  UDP_STREAM tests at `date` >&2
+echo
+echo ------------------------------------
+echo Testing with the following command line:
+echo $NETPERF_CMD $NETPERF_PORT -t UDP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -s 32768 -S 32768 -m 1024
+echo
+$NETPERF_CMD $NETPERF_PORT -t UDP_STREAM -l $NETPERF_TIME -H $REM_HOST \
+ $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF -- \
+ -s 32768 -S 32768 -m 1024
+echo
+echo
+
+# and that's that
+echo Tests completed at `date` >&2
+
+echo
+echo If you wish to submit these results to the netperf database at
+echo http://www.cup.hp.com/netperf/NetperfPage.html, please submit each
+echo datapoint individually. Individual datapoints are separated by
+echo lines of dashes. 

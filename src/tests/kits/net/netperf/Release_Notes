@@ -1,0 +1,192 @@
+These are the Release Notes for Revision 2.2pl4 of netperf:
+
+Things changed in this release
+
+*) USE_SYSCTL available on suitable FreeBSD releases to measure CPU
+   utilization without having to resort to -DUSE_LOOPER.
+
+*) Include Solaris 9 with the Linux sendfile path under -DHAVE_SENDFILE
+
+This still outstanding in this release
+
+*) Knowing why signals are not interrupting socket calls under
+   OpenVMS.  A quick try to use threads for timing a la Win32 worked,
+   but also cut performance in half.  Any and all assistance in this
+   area would be most welcome.
+
+These are the Release Notes for revisoin 2.2pl3 of netperf:
+
+Things changed in this release
+
+*) I started practicing what I preach and will set SO_REUSEADDR before
+   netserver tries to bind to its well-known port.
+
+*) Initial port to OpenVMS.  This includes support for the OVMS
+   Auxilliary server (inetd replacement).  See README.ovms for more
+   details on what is involved in compiling and running netperf under
+   OpenVMS.
+
+*) Testname comparisons are now case insensitive.  This is a side
+   effect of OpenVMS downshifting commandlines to lowercase.  I made
+   the change and decided it was OK to keep it that way, even though
+   for OpenVMS one _has_ to set the right defines to disable that
+   downshifting or the command-line options will not work. For example
+   "-H" will become "-h" which isn't quite the same thing...
+
+*) Misc fixes for nettest_ipv6.c.
+
+*) Support for sendfile() under Linux
+
+Thins I would like to have changed but did not know how or didn't have
+time:
+
+*) Allow netserver to run as a standalone daemon under OpenVMS
+*) Allow netserver to run as a standalone daemon under Windows
+*) Rediscover an inetd-like facility for Windows
+*) Figure-out how to get low-overhead, accurate, per-CPU utilization
+   figures under OpenVMS
+*) Get the UDP_RR and UDP_STREAM tests to work under OpenVMS, and get
+   the TCP_RR test to work based on time rather than transaction
+   count.  There is some bug (possibly in OpenVMS?) where the SIGALRM
+   fires, but a socket call will not return an EINTR.
+
+Things that changed prior to this release:
+
+*) Addition of the TCP_MAERTS test - this is a TCP_STREAM test where
+   the data flows from the netserver to the netperf rather than from
+   the netperf to the netserver.  This can be useful in those
+   situations where netperf (netserver) is installed on a remote
+   system, but the tester has no shell access and wishes to get
+   performance data for the path from netserver to netperf.
+
+These are the Release Notes for the 2.2 revision of netperf:
+
+Things changed in this release
+
+*) Various and sundry bugs fixed (in theory) for platforms such as
+   FreeBSD and Linux. If I left-out your bug fix, it was purely
+   accidental - my mind has a very small cache, and sometimes I will
+   "lose" email in the shuffle.
+
+*) Initial support for sendfile() on HP-UX. This test will use the
+   sendfile() call instead of send() to send data to the
+   remote. Netperf "lies" to netserver and calls it a TCP_STREAM test
+   since what netserver needs to do is exactly the same. A future
+   patch may change that and simply have netserver call the same
+   routine for both test types. Kudos to Charles Harris for the
+   initial prototype.
+
+*) The Fore ATM API and HiPPI tests have been dropped from the
+   distribution. 
+
+Things I would have liked to have changed, but did not have time for:
+
+*) Conversion of the source and makefile to use the GNU configure/autoconf 
+   utility to make it easier for folks to build by not having to edit
+   makefiles... You will notice that I have started to switch from
+   "DO_MUMBLE" to "HAVE_MUMBLE"
+
+as always - happy benchmarking,
+
+rick jones <raj@cup.hp.com>
+
+---------------------------------------------------------------------
+
+These are the Release Notes for the 2.1pl3 revision of netperf:
+
+*) An OBOB (Off By One Bug) in netlib.c that was causing a core dump
+   on Irix should be fixed.
+
+*) Irix systems should now be able to determine the number of CPU's
+   present automagically (code from outside, not tested yet because I
+   have no MP Irix systems at my disposal)
+
+*) An alpha version of a TCP_CC test has been added - this is a
+   TCP_CRR test with out the "RR."
+
+*) The -Ae has been removed from the default makefile. If someone has
+   a nice way to automagically generate the correct makefile for
+   different platforms I would like to learn how.
+
+happy benchmarking,
+
+rick jones <raj@cup.hp.com>
+
+----------------------------------------------------------------------
+
+These are the Release Notes for the 2.1 revision of netperf:
+
+Things Changed in this release:
+
+*) The XTI (Version 2 of the spec) tests are now documented in the
+   manual. 
+
+*) The TCP_CRR (Connect Request/Response) test is now documented in
+   the manual, including a description of how it mimics the behaviour
+   of http (the protocol underlying the WWW).
+
+*) Support for for Windows NT 3.51 OS in the BSD Sockets tests (ok, so
+   they are really Winsock in that case :). Other test suites may be
+   ported as required/desired/appropriate. 
+
+*) Tests for TCP and UDP, using the IPv6 extensions to BSD sockets are
+   included in this release. They are included by adding -DUSE_IPv6 to
+   the makefile and recompiling.
+
+*) Support for a "long long" datatype should only be required for
+   -DUSE_PSTAT compilation which is an HP-UX only thing. The
+   *unbundled* HP compilers from at least "HP92453-01 A.09.61 HP C
+   Compiler" and later should have the required support. The bundled
+   compiler may not. GCC should work - check the archives listed in
+   the comp.sys.hp.hpux FAQ for copies. The FAQ is archived on
+   rtfm.mit.edu under the path pub/usenet/comp.sys.hp.hpux.
+
+*) A "proper" fix for double data type alignment has been included.
+
+*) A new script is included with this release which can be used to
+   measure aggregate TCP_RR performance (multiple, concurrent
+   instances of the TCP_RR test). A related use of this script would
+   be measuring MP scaling. A single-byte TCP_RR test is good for this
+   purpose for two reasons:
+
+      1) it excercises the control/protocol paths heavily without
+         using much in the way of data copies which may be easier to
+         scale.
+      2) most systems can easily saturate cards with bandwidth, but
+         not so easily with request/response
+
+   Of course, feedback on this is most welcome.
+
+*) When measuring CPU utilization, the units for service demand have
+   been changed from milliseconds (designated ms) of CPU per unit (KB
+   or Transaction) to microseconds (desginated us).
+
+*) For accurate reporting of service demand, netperf needs to know the
+   number of CPU's present on a system. On some systems (HP-UX), this
+   is automatic. For others (All), it is necessary to add a global "-n
+   <numcpu>" option to both netperf and netserver.
+
+   !! IF THIS IS LEFT-OUT CPU UTILIZATION AND SERVICE DEMAND FOR !!
+	     !! MULTI-PROCESSOR SYSTEMS WILL BE WRONG. !!
+
+   If you know of ways to programatically determine the number of
+   active CPUs on a system, please let the author Rick Jones
+   <raj@cup.hp.com> know.
+
+*) other things I've probably forgotten :)
+
+Things Not Changed in this release:
+
+*) The ancillary test suites are essentially unchanged - DLPI,
+   HiPPI/LLA, Unix Domain, and Fore ATM API. Unless there is much
+   interest expressed in these tests, 2.1 may be the last release in
+   which they are included. The order of retirement would likely be
+   Unix Domain, HiPPI/LLA, Fore ATM API, and then DLPI.
+
+Miscelaneous Comments:
+
+*) The -DUSE_LOOPER CPU utilization _seems_ to be nice and low-impact
+   on HP-UX, Digital Unix, and IRIX. It does not yet seem to be
+   low-impact on Solaris (I need an example of priocntl usage), AIX
+   (setpri only works if you are root), and NT (not sure of the
+   reason). Help with those problems would be most appreciated.

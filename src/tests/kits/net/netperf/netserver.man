@@ -1,0 +1,57 @@
+.TH netserver 8L ""
+.SH NAME
+
+netserver \- a network performance benchmark server
+
+.SH SYNOPSIS
+
+.B netserver
+[-P portnum]
+[-n numcpus]
+
+.SH DESCRIPTION
+.B Netserver
+listens for connections from a
+.C netperf
+benchmark, and responds accordingly.
+It can either be run from
+.C inetd
+or as a standalone daemon (with the -p flag). If run from
+.C inetd
+the -p option should not be used.
+
+.SS OPTIONS
+.TP
+.B \-h
+Display a usage string, and exit.
+.TP
+.B \-n numcpus
+Specify the number of CPU's in the system on those systems for which
+netperf has no way to find the number of CPU's programatically. (all
+but HP-UX)
+.TP
+.B \-p portnum
+Listen on the specified port.
+This is used when running as a standalone daemon.
+
+.SH BUGS
+No known bugs at this time. If you think you have found a bug, please send email to Rick Jones <raj@cup.hp.com>.
+
+.SH SEE ALSO
+.C netperf
+.br
+.I
+Netperf: A Network Performance Benchmark
+.br
+http://www.cup.hp.com/netperf/NetperfPage.html
+
+.SH AUTHORS
+HP Information Networks Division - Networking Performance Team.
+.br
+Rick Jones	<raj@cup.hp.com>
+.br
+Karen Choy	HP IND
+.br
+Dave Shield	<daves@csc.liv.ac.uk>	(man pages)
+.br
+Others too numerous to mention here - see the ACKNWLDGMNTS file

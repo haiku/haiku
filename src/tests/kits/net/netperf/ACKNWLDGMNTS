@@ -1,0 +1,104 @@
+This file is here for people to list their contributions to the
+netperf benchmark. When you enhance or fix something, put your name
+and a description of the what/where/whey/why/how here. If you like,
+feel free to include an email address. 
+
+I would like to apologize in advance to anyone I've forgotten to
+include.
+
+Rick Jones <raj@cup.hp.com>
+Responsible for initial packaging and release of netperf and
+"editorial" continuity for subsequent releases. 
+
+Karen Choy
+Code to allow netserver to run as a standalone daemon. 
+
+Dave Shield <daves@csc.liv.ac.uk>
+Wrote the first revision of the netperf and netserver manpages.
+
+Sarr Blumson <sarr@citi.umich.edu>
+Fixes for AIX 3.1 and 3.2. Also fixes for Solaris 2.1 without
+realizing it ;-) 
+
+Jeff Smits <jgs@usl.com>
+Fixes for TCP_RR and UDP_RR on sytems with an htonl that is not a no-op.
+
+Warren Burnett <somewhere in Kansas>
+Example code for DLPI tests.
+
+Several Folks
+Code to tell SunOS 4 to *not* restart system calls on receipt of a
+signal. 
+
+Fore Systems Inc.
+Manpages for the FORE API and question answering
+
+David Channin
+Access to systems running the Fore ATM API
+
+Jonathan Stone <jonathan@DSG.Stanford.EDU>
+Include file fixes for Ultrix
+
+Bruce Barnett <barnett@grymoire.crd.ge.com>
+Bunches of warnings fixes and lint picks for Solaris 2.3
+
+Herman Dierks et al <dierks@austin.ibm.com>
+Code to calculate confidence intervals for tests
+
+Hal Murray <murray@pa.dec.com>
+Helpful suggestions for the scripts to make them more compatible with
+the netperf database (http://www.cup.hp.com/netperf/NetperfPage.html).
+His prompting finally got me off my whatever to put the confidence
+interval stuff from the guys at IBM into netperf
+
+Peter Skopp pds@cs.columbia.edu
+Fixes to make netperf more secure.	
+
+Tom Wilson <tcwilson@newbridge.com>
+A fix to send_udp_rr to correct bogus throughput values.
+
+Thorsten Lockert <tholo@tetherless.com>
+A bunch of clean-up for the *BSD OSes
+
+Serge Pachkovsky <ps@ocisgi7.unizh.ch>
+Code for low-priority soaker process for AIX and SGI
+
+The fine folks at Adaptec
+The initial port of netperf (1.9PL4) to Windows NT 3.51.
+
+Robin Callender <robin_callender@VNET.IBM.COM>
+The PPC binaries for the 1.9PL4 port of netperf to NT and for assorted
+code clean-ups and help with CPU utilization measurements.
+
+"Todd J. Derr" <tjd@fore.com>
+For offering to take-on support of the Fore ATM API files with 2.1 and
+for his help in making the tar files and such more user-friendly
+
+Michael Shuldman <michaels@inet.no>
+Improvements to the makefile and additional checks for OpenBSD
+
+Kris Corwin
+discovery of a debug statement outside of if (debug) that may have
+been the cause of all the nasty connection refused errors in random
+UDP_RR tests... 
+
+Charles Harris
+Initial prototype of the TCP_SENDFILE test support
+
+Philip Pishioneri of Cornel
+Conversion of the netperf.ps manul to PDF format.
+
+The Hewlett-Packard OpenVMS folks
+Assistance with the port to OpenVMS
+
+Munechika SUMIKAWA @ KAME Project / FreeBSD.org
+IPv6 fixes
+
+Jan Iven of CERN
+initial mods for sendfile() under Linux
+
+Fabrice Bacchella
+for pointing-out that Solaris 9 has a copy of Linux sendfile()
+
+Andrew Gallatin 
+for assistance with the FreeBSD sysctl() stuff

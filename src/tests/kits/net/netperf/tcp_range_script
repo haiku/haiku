@@ -1,0 +1,113 @@
+#!/bin/sh
+#
+# stream_range
+#
+# generate a whole lot of numbers from netperf to see the effects
+# of send size on thruput
+#
+
+#
+# usage : tcp_stream_range hostname [CPU]
+#
+
+if [ $# -gt 2 ]; then
+	echo "try again, correctly -> tcp_stream_range hostname [CPU]"
+	exit 1
+fi
+
+if [ $# -eq 0 ]; then
+  echo "try again, correctly -> tcp_stream_range hostname [CPU]"
+  exit 1
+fi
+
+# if there are two parms, parm one it the hostname and parm two will
+# be a CPU indicator. actually, anything as a second parm will cause
+# the CPU to be measured, but we will "advertise" it should be "CPU"
+
+if [ $# -eq 2 ]; then
+  REM_HOST=$1
+  LOC_CPU="-c"
+  REM_CPU="-C"
+fi
+
+if [ $# -eq 1 ]; then
+  REM_HOST=$1
+fi
+
+# at what port will netserver be waiting? If you decide to run
+# netserver at a differnet port than the default of 12865, then set
+# the value of PORT apropriately
+#PORT="-p some_other_portnum"
+PORT=""
+
+# where is netperf, and are there any "constant" options such as 
+# the netserver port number
+#NETHOME=/usr/etc/net_perf
+NETHOME="."
+NETPERF=$NETHOME/netperf $PORT
+
+# How accurate we want the estimate of performance: 
+#      maximum and minimum test iterations (-i)
+#      confidence level (99 or 95) and interval (percent)
+STATS_STUFF="-i 10,2 -I 99,3"
+
+#
+# some stuff for the arithmetic 
+#
+# we start at start, and then multiply by MULT and add ADD. by changing
+# these numbers, we can double each time, or increase by a fixed
+# amount, or go up by 4x, whatever we like...
+#
+START=1
+
+END=65536
+
+MULT=4
+
+ADD=0
+
+# If we are measuring CPU utilization, then we can save beaucoup
+# time by saving the results of the CPU calibration and passing
+# them in during the real tests. So, we execute the new CPU "tests"
+# of netperf and put the values into shell vars.
+case $LOC_CPU in
+\-c) LOC_RATE=`$NETPERF -t LOC_CPU`;;
+*) LOC_RATE=""
+esac
+
+case $REM_CPU in
+\-C) REM_RATE=`$NETPERF -t REM_CPU -H $REM_HOST`;;
+*) REM_RATE=""
+esac
+
+TIME="60"
+
+#
+# the maximum socket buffer size is system dependent. for the
+# "cannonical" tests we use 32KB, but this can be altered
+#
+SOCKET_SIZE="-s 32768 -S 32768"
+
+MESSAGE=$START
+while [ $MESSAGE -le $END ]; do
+  echo
+  echo ------------------------------------
+  echo Testing with the following command line:
+  echo  $NETPERF -l $TIME -H $REM_HOST -t TCP_STREAM\
+        $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF --\
+        -m $MESSAGE $SOCKET_SIZE 
+  echo
+  $NETPERF -l $TIME -H $REM_HOST -t TCP_STREAM\
+  $LOC_CPU $LOC_RATE $REM_CPU $REM_RATE $STATS_STUFF --\
+  -m $MESSAGE $SOCKET_SIZE
+
+  MESSAGE=`expr $MESSAGE + $ADD`
+  MESSAGE=`expr $MESSAGE \* $MULT`
+
+done
+echo
+echo If you wish to submit these results to the netperf database at
+echo http://www.cup.hp.com/netperf/NetperfPage.html, please submit each
+echo datapoint individually. Individual datapoints are separated by
+echo lines of dashes. 
+
