@@ -8,9 +8,10 @@
 //----------------------------------------------------------------------
 #include "Volume.h"
 
+#include "Icb.h"
 #include "MemoryChunk.h"
 
-using namespace UDF;
+using namespace Udf;
 
 //----------------------------------------------------------------------
 // Volume 
@@ -19,12 +20,13 @@ using namespace UDF;
 /*! \brief Creates an unmounted volume with the given id.
 */
 Volume::Volume(nspace_id id)
-	: fID(id)
+	: fId(id)
 	, fDevice(0)
 	, fReadOnly(false)
-	, fStartAddress(0)
+	, fStart(0)
 	, fBlockSize(0)
 	, fInitStatus(B_UNINITIALIZED)
+	, fRootIcb(NULL)
 {
 }
 
@@ -35,6 +37,9 @@ Volume::Identify(int device, off_t base)
 }
 
 /*! \brief Attempts to mount the given device.
+
+	\param volumeStart The block on the given device whereat the volume begins.
+	\param volumeLength The block length of the volume on the given device.
 */
 status_t
 Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
@@ -49,7 +54,7 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 			// Already mounted, thank you for asking
 		
 	fReadOnly = flags & B_READ_ONLY;
-	fStartAddress = volumeStart;
+	fStart = volumeStart;
 	fLength = volumeLength;	
 	fBlockSize = blockSize;
 	
@@ -80,9 +85,14 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 	// Now identify the volume
 	if (!err)
 		err = _Identify();
+		
+	// Success, create a vnode for the root
+	if (!err)
+		err = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
 
-	RETURN(B_ERROR);
+	RETURN(err);
 }
+
 
 off_t
 Volume::_MapAddress(udf_extent_address address)
@@ -90,10 +100,44 @@ Volume::_MapAddress(udf_extent_address address)
 	return address.location() * BlockSize();	
 }
 
-off_t
-Volume::_MapAddress(udf_long_address address)
+
+/*! \brief Maps the given \c udf_long_address to an absolute block address.
+*/
+status_t
+Volume::_MapBlock(udf_long_address address, off_t *mappedBlock)
 {
-	return 0;
+	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume", ("long_address(block: %ld, partition: %d), %p",
+		address.block(), address.partition(), mappedBlock));
+	status_t err = mappedBlock ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = _InitStatus() >= B_LOGICAL_VOLUME_INITIALIZED ? B_OK : B_NO_INIT;
+	if (!err) {
+		udf_partition_descriptor* partition = fPartitionMap.Find(address.partition());
+		err = partition ? B_OK : B_BAD_ADDRESS;
+		if (!err) {
+			*mappedBlock = Start() + partition->start() + address.block();	
+		}
+		if (!err) {
+			PRINT(("mapped to block %lld\n", *mappedBlock));
+		}
+	}
+	RETURN_ERROR(err);
+}
+
+/*! \brief Maps the given \c udf_long_address to an absolute byte address.
+*/
+status_t
+Volume::_MapAddress(udf_long_address address, off_t *mappedAddress)
+{
+	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Volume", ("long_address(block: %ld, partition: %d), %p",
+		address.block(), address.partition(), mappedAddress));
+	status_t err = _MapBlock(address, mappedAddress);
+	if (!err)
+		*mappedAddress = *mappedAddress * BlockSize();
+	if (!err) {
+		PRINT(("mapped to address %lld\n", *mappedAddress));
+	}
+	RETURN_ERROR(err);
 }
 
 off_t
@@ -102,7 +146,7 @@ Volume::_MapAddress(udf_short_address address)
 	return 0;
 }
 
-status_t
+/*status_t
 Volume::_Read(udf_extent_address address, ssize_t length, void *data)
 {
 	DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Volume");
@@ -116,9 +160,30 @@ Volume::_Read(udf_extent_address address, ssize_t length, void *data)
 			       length, bytesRead));
 		}
 	}
-	return err;	
+	RETURN(err);
 }
+*/
 
+/*template <class AddressType>
+status_t
+Volume::_Read(AddressType address, ssize_t length, void *data)
+{
+	DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Volume");
+	off_t mappedAddress;
+	status_t err = data ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = _MapAddress(address, &mappedAddress);
+	if (!err) {
+		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
+		if (bytesRead != (ssize_t)BlockSize()) {
+			err = B_IO_ERROR;
+			PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", mappedAddress,
+			       length, bytesRead));
+		}
+	}
+	RETURN(err);
+}
+*/
 /*!	\brief Walks through the volume recognition and descriptor sequences,
 	gathering volume description info as it goes.
 
@@ -146,8 +211,10 @@ Volume::_Identify()
 	// At this point we've found a valid set of volume descriptors. We
 	// now need to investigate the file set descriptor pointed to by
 	// the logical volume descriptor
-	if (!err)
+	if (!err) {
+		fInitStatus = B_LOGICAL_VOLUME_INITIALIZED;
 		err = _InitFileSetDescriptor();
+	}
 	
 	RETURN(err);
 }
@@ -410,19 +477,20 @@ Volume::_InitFileSetDescriptor()
 {
 	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS, "Volume");
 	MemoryChunk chunk(fLogicalVD.file_set_address().length());
-	udf_file_set_descriptor* fileSet = NULL;
-
-	udf_extent_address ad;
-	ad.set_length(2048);
-	ad.set_location(257);
+	
 	status_t err = chunk.InitCheck();
-	if (!err)
-		err = _Read(ad, fLogicalVD.file_set_address().length(), chunk.Data());
-//		err = _Read(fLogicalVD.file_set_address(), fLogicalVD.file_set_address().length(), fileSet);
 	if (!err) {
-		fileSet = reinterpret_cast<udf_file_set_descriptor*>(chunk.Data());
-		fileSet->tag().init_check(0);
-		PDUMP(fileSet);
+//		err = Read(ad, fLogicalVD.file_set_address().length(), chunk.Data());
+		err = Read(fLogicalVD.file_set_address(), fLogicalVD.file_set_address().length(), chunk.Data());
+		if (!err) {
+			udf_file_set_descriptor *fileSet = reinterpret_cast<udf_file_set_descriptor*>(chunk.Data());
+			fileSet->tag().init_check(0);
+			PDUMP(fileSet);
+			fRootIcb = new Icb(this, fileSet->root_directory_icb());
+			err = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
+		}
 	}
-	return err;
+	
+	RETURN(err);
 }
+

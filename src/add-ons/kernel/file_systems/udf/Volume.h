@@ -27,7 +27,9 @@ extern "C" {
 #include "DiskStructures.h"
 #include "PartitionMap.h"
 
-namespace UDF {
+namespace Udf {
+
+class Icb;
 
 class Volume {
 public:
@@ -41,19 +43,28 @@ public:
 	
 	const char *Name() const;
 	int Device() const { return fDevice; }
-	nspace_id ID() const { return fID; }
+	nspace_id Id() const { return fId; }
 	
-	off_t StartAddress() const { return fStartAddress; }
+	off_t Start() const { return fStart; }
 	off_t Length() const { return fLength; }
 	
 	uint32 BlockSize() const { return fBlockSize; }
-	off_t AddressForRelativeBlock(off_t block) { return StartAddress() + block * BlockSize(); }
-	off_t RelativeAddress(off_t address) { return StartAddress() + address; }
+	off_t AddressForRelativeBlock(off_t block) { return (Start() + block) * BlockSize(); }
+	off_t RelativeAddress(off_t address) { return Start() * BlockSize() + address; }
 		
 	bool IsReadOnly() const { return fReadOnly; }
 	
-	vnode_id ToVnodeID(off_t block) const { return (vnode_id)block; }	
+	vnode_id ToVnodeId(off_t block) const { return (vnode_id)block; }	
+
+	template <class AddressType>
+		ssize_t Read(AddressType address, ssize_t length, void *data);
+		
+	Icb* RootIcb() { return fRootIcb; }
 private:
+	Volume();						// unimplemented
+	Volume(const Volume &ref);		// unimplemented
+	Volume& operator=(const Volume &ref);	// unimplemented
+
 	status_t _InitStatus() const { return fInitStatus; }
 	// Private _InitStatus() status_t values
 	enum {
@@ -65,33 +76,59 @@ private:
 	};
 	
 	off_t _MapAddress(udf_extent_address address);
-	off_t _MapAddress(udf_long_address address);
+	status_t _MapBlock(udf_long_address address, off_t *mappedBlock);
+	status_t _MapAddress(udf_long_address address, off_t *mappedAddress);
 	off_t _MapAddress(udf_short_address address);
 	
-	ssize_t _Read(udf_extent_address address, ssize_t length, void *data);
-
 	// Called by Mount(), either directly or indirectly
 	status_t _Identify();
 	status_t _WalkVolumeRecognitionSequence();
 	status_t _WalkAnchorVolumeDescriptorSequences();
 	status_t _WalkVolumeDescriptorSequence(udf_extent_address extent);
 	status_t _InitFileSetDescriptor();
-		
+			
 private:
-	nspace_id fID;
+	nspace_id fId;
 	int fDevice;
 	bool fReadOnly;
 
-	off_t fStartAddress;	//!< Start address of volume on given device
-	off_t fLength;			//!< Length of volume (in blocks)
+	off_t fStart;	//!< Starting block of the volume on the given device
+	off_t fLength;	//!< Block length of volume on the given device
 	uint32 fBlockSize;
 
 	status_t fInitStatus;
 	
 	udf_logical_descriptor fLogicalVD;
 	PartitionMap fPartitionMap;
+	Icb *fRootIcb;	// Destroyed by vfs via callback to udf_release_node()
 };
 
-};	// namespace UDF
+//----------------------------------------------------------------------
+// Template functions
+//----------------------------------------------------------------------
+
+
+template <class AddressType>
+status_t
+Volume::Read(AddressType address, ssize_t length, void *data)
+{
+	DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Volume");
+	off_t mappedAddress;
+	status_t err = data ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = _MapAddress(address, &mappedAddress);
+	if (!err) {
+		ssize_t bytesRead = read_pos(fDevice, mappedAddress, data, BlockSize());
+		if (bytesRead != (ssize_t)BlockSize()) {
+			err = B_IO_ERROR;
+			PRINT(("read_pos(pos:%lld, len:%ld) failed with: 0x%lx\n", mappedAddress,
+			       length, bytesRead));
+		}
+	}
+	RETURN(err);
+}
+
+
+};	// namespace Udf
 
 #endif	// _UDF_VOLUME_H
