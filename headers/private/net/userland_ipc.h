@@ -11,6 +11,9 @@
 #include <OS.h>
 #include "net_stack_driver.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #define NET_STACK_PORTNAME "net_server connection"
 
@@ -47,7 +50,13 @@ typedef struct {
 	uint32	numCommands,bufferSize;
 } net_connection;
 
+
 extern status_t init_userland_ipc(void);
 extern void shutdown_userland_ipc(void);
+
+
+#ifdef __cplusplus
+}  // end of extern "C"
+#endif
 
 #endif	/* USERLAND_IPC_H */

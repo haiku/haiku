@@ -15,19 +15,7 @@
 #include "net/if.h"
 #include "net/route.h"
 
-#ifdef _KERNEL_MODE
 #include <module.h>
-#else
-typedef struct module_info {
-	const char *name;
-	uint32 flags;
-	status_t (*std_ops)(int32, ...);
-} module_info;
-
-#define	B_MODULE_INIT	    1
-#define	B_MODULE_UNINIT	    2
-#define	B_KEEP_LOADED		0x00000001
-#endif
 
 struct kernel_net_module_info {
 	module_info info;
@@ -39,9 +27,6 @@ struct net_module {
 	struct net_module *next;
 	char *name;
 	struct kernel_net_module_info *ptr;
-#ifndef _KERNEL_MODE
-	image_id iid;
-#endif
 	int status;
 };
 

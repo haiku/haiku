@@ -41,53 +41,53 @@ class NLPacket;
 class BNetBuffer : public BArchivable
 {
 public:
-    BNetBuffer( size_t size = 0 );
-    virtual ~BNetBuffer( void );
+    BNetBuffer(size_t size = 0);
+    virtual ~BNetBuffer();
 
-    status_t InitCheck( void );
+    status_t InitCheck();
 
-    BNetBuffer( BMessage* Archive );
-    virtual  status_t Archive( BMessage* into, bool deep = true ) const;
-    static   BArchivable* Instantiate( BMessage* archive );
+    BNetBuffer(BMessage *archive);
+    virtual  status_t Archive(BMessage *into, bool deep = true) const;
+    static   BArchivable *Instantiate(BMessage *archive);
 
-    BNetBuffer( const BNetBuffer& );
-    BNetBuffer& operator=( const BNetBuffer& );
+    BNetBuffer(const BNetBuffer &);
+    BNetBuffer& operator=(const BNetBuffer &);
 
 // Mutators.
-    status_t AppendInt8( int8 );
-    status_t AppendUint8( uint8 );
-    status_t AppendInt16( int16 );
-    status_t AppendUint16( uint16 );
-    status_t AppendInt32( int32 );
-    status_t AppendUint32( uint32 );
-    status_t AppendFloat( float );
-    status_t AppendDouble( double );
-    status_t AppendString( const char* );
-    status_t AppendData( const void*, size_t );
-    status_t AppendMessage( const BMessage& );
-    status_t AppendInt64( int64 );
-    status_t AppendUint64( uint64 );
+    status_t AppendInt8(int8);
+    status_t AppendUint8(uint8);
+    status_t AppendInt16(int16);
+    status_t AppendUint16(uint16);
+    status_t AppendInt32(int32);
+    status_t AppendUint32(uint32);
+    status_t AppendFloat(float);
+    status_t AppendDouble(double);
+    status_t AppendString(const char *);
+    status_t AppendData(const void *, size_t);
+    status_t AppendMessage(const BMessage &);
+    status_t AppendInt64(int64);
+    status_t AppendUint64(uint64);
 
-    status_t RemoveInt8( int8& );
-    status_t RemoveUint8( uint8& );
-    status_t RemoveInt16( int16& );
-    status_t RemoveUint16( uint16& );
-    status_t RemoveInt32( int32& );
-    status_t RemoveUint32( uint32& );
-    status_t RemoveFloat( float& );
-    status_t RemoveDouble( double& );
-    status_t RemoveString( char*, size_t );
-    status_t RemoveData( void*, size_t );
-    status_t RemoveMessage( BMessage& );
-    status_t RemoveInt64( int64& );
-    status_t RemoveUint64( uint64& );
+    status_t RemoveInt8(int8 &);
+    status_t RemoveUint8(uint8 &);
+    status_t RemoveInt16(int16 &);
+    status_t RemoveUint16(uint16 &);
+    status_t RemoveInt32(int32 &);
+    status_t RemoveUint32(uint32 &);
+    status_t RemoveFloat(float &);
+    status_t RemoveDouble(double &);
+    status_t RemoveString(char *, size_t);
+    status_t RemoveData(void *, size_t);
+    status_t RemoveMessage(BMessage &);
+    status_t RemoveInt64(int64 &);
+    status_t RemoveUint64(uint64 &);
 
 // Accessors.
-    unsigned char* Data( void ) const;
-    size_t Size( void ) const;
-    size_t BytesRemaining( void ) const;
+    unsigned char *Data() const;
+    size_t Size() const;
+    size_t BytesRemaining() const;
 
-    inline NLPacket *GetImpl( void ) const;
+    inline NLPacket *GetImpl() const;
 
 protected:
 // Attributes.
@@ -117,5 +117,3 @@ inline NLPacket* BNetBuffer::GetImpl( void ) const
 
 #endif // <-- #ifndef _NETBUFFER_H
 
-
-/*=------------------------------------------------------------------- End -=*/

@@ -46,13 +46,11 @@ public:
     static bool IsEnabled();
 
 	// print a debugging message
-    static void Print( const char* msg );
+    static void Print(const char *msg);
 
 	// dump raw data in a nice hd-like format
-    static void Dump( const char* data, size_t size, const char* title );
+    static void Dump(const char *data, size_t size, const char *title);
 };
 
 #endif // <-- #ifndef _NETDEBUG_H
 
-
-/*=------------------------------------------------------------------- End -=*/
