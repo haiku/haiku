@@ -246,7 +246,7 @@ void BRadioButton::SetValue(int32 value)
 	if (BControl::Value() == value)
 		return;
 
-	if (!IsTracking())
+	if (!IsTracking() && value == B_CONTROL_ON)
 	{
 		BView *sibling;
 		
@@ -269,7 +269,7 @@ void BRadioButton::SetValue(int32 value)
 		}
 	}
 
-	BControl::SetValue(B_CONTROL_ON);
+	BControl::SetValue(value);
 }
 //------------------------------------------------------------------------------
 void BRadioButton::GetPreferredSize(float *width, float *height)
