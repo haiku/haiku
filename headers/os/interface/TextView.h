@@ -299,7 +299,7 @@ virtual void			_ReservedTextView12();
 								int32	toOffset, 
 								bool	erase, 
 								bool	scroll);
-		void			RecalLineBreaks(int32 *startLine, int32 *endLine);
+		void			RecalculateLineBreaks(int32 *startLine, int32 *endLine);
 		int32			FindLineBreak(int32	fromOffset, 
 									  float	*outAscent, 
 								  	  float	*outDescent, 

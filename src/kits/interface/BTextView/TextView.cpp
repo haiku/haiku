@@ -3278,7 +3278,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 	float saveLineHeight = LineHeight(fromLine);
 	BRect bounds = Bounds();
 	
-	RecalLineBreaks(&fromLine, &toLine);
+	RecalculateLineBreaks(&fromLine, &toLine);
 
 	float newHeight = fTextRect.Height();
 	
@@ -3333,7 +3333,7 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 
 
 void
-BTextView::RecalLineBreaks(int32 *startLine, int32 *endLine)
+BTextView::RecalculateLineBreaks(int32 *startLine, int32 *endLine)
 {
 	CALLED();
 	// are we insane?
@@ -3368,13 +3368,13 @@ BTextView::RecalLineBreaks(int32 *startLine, int32 *endLine)
 			// the new line comes before the old line start, add a line
 			STELine newLine;
 			newLine.offset = toOffset;
-			newLine.origin = curLine->origin + ascent + descent;
+			newLine.origin = ceil(curLine->origin + ascent + descent);
 			newLine.ascent = 0;
 			fLines->InsertLine(&newLine, lineIndex);
 		} else {
 			// update the exising line
 			nextLine->offset = toOffset;
-			nextLine->origin = curLine->origin + ascent + descent;
+			nextLine->origin = ceil(curLine->origin + ascent + descent);
 			
 			// remove any lines that start before the current line
 			while ( lineIndex < fLines->NumLines() &&
