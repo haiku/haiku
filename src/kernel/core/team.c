@@ -2075,8 +2075,14 @@ _user_setpgid(pid_t processID, pid_t groupID)
 		teamID = currentTeam->id;
 
 		// we must not change our process group ID if we're a group leader
-		if (is_process_group_leader(currentTeam))
+		if (is_process_group_leader(currentTeam)) {
+			// if the group ID was not specified, we just return the
+			// process ID as we already are a process group leader
+			if (groupID == 0)
+				return processID;
+
 			return B_NOT_ALLOWED;
+		}
 
 		status = B_OK;
 	} else {
