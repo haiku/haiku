@@ -22,7 +22,8 @@ print_time(char *buffer, size_t bufferSize, const struct tm *tm)
 	};
 
 	snprintf(buffer, bufferSize, "%.3s %.3s%3d %02d:%02d:%02d %d\n",
-		weekdays[tm->tm_wday % 7], months[tm->tm_mon % 12],
+		tm->tm_wday < 0 ? "???" : weekdays[tm->tm_wday % 7],
+		tm->tm_mon < 0 ? "???" : months[tm->tm_mon % 12],
 		tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
 		1900 + tm->tm_year);
 
