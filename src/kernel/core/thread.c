@@ -788,6 +788,9 @@ thread_exit(void)
 		delete_sem_etc(s, t->return_code, t->return_flags & THREAD_RETURN_INTERRUPTED ? true : false);
 	}
 
+	// TODO: get_death_stack() disables interrupts
+	// and leave them disabled, so I wonder if it's good to disable
+	// them again a bunch of lines after this
 	death_stack = get_death_stack();
 	{
 		struct thread_exit_args args;
