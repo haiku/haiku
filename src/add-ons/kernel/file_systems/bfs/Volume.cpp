@@ -133,8 +133,10 @@ DeviceOpener::GetSize(off_t *_size, uint32 *_blockSize)
 		return B_OK;
 	}
 
-	if (_size)
-		*_size = geometry.head_count * geometry.cylinder_count * geometry.sectors_per_track;
+	if (_size) {
+		*_size = 1LL * geometry.head_count * geometry.cylinder_count
+					* geometry.sectors_per_track * geometry.bytes_per_sector;
+	}
 	if (_blockSize)
 		*_blockSize = geometry.bytes_per_sector;
 
@@ -326,6 +328,11 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		return B_BAD_VALUE;
 	}
 
+	// initialize short hands to the super block (to save byte swapping)
+	fBlockSize = fSuperBlock.BlockSize();
+	fBlockShift = fSuperBlock.BlockShift();
+	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
+
 	// check if the device size is large enough to hold the file system
 	off_t diskSize;
 	if (opener.GetSize(&diskSize) < B_OK)
@@ -336,11 +343,6 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	// set the current log pointers, so that journaling will work correctly
 	fLogStart = fSuperBlock.LogStart();
 	fLogEnd = fSuperBlock.LogEnd();
-
-	// initialize short hands to the super block (to save byte swapping)
-	fBlockSize = fSuperBlock.BlockSize();
-	fBlockShift = fSuperBlock.BlockShift();
-	fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
 
 	if (opener.InitCache(NumBlocks()) != B_OK)
 		return B_ERROR;
@@ -356,7 +358,8 @@ Volume::Mount(const char *deviceName, uint32 flags)
 
 	fRootNode = new Inode(this, ToVnode(Root()));
 	if (fRootNode && fRootNode->InitCheck() == B_OK) {
-		if (new_vnode(fID, ToVnode(Root()), (void *)fRootNode) == B_OK) {
+		status = new_vnode(fID, ToVnode(Root()), (void *)fRootNode);
+		if (status == B_OK) {
 			// try to get indices root dir
 
 			// question: why doesn't get_vnode() work here??
@@ -385,11 +388,13 @@ Volume::Mount(const char *deviceName, uint32 flags)
 			opener.Keep();
 			return B_OK;
 		} else
-			status = B_NO_MEMORY;
-	} else
-		status = B_BAD_VALUE;
+			FATAL(("could not create root node: new_vnode() failed!\n"));
 
-	FATAL(("could not create root node: new_vnode() failed!\n"));
+		delete fRootNode;
+	} else {
+		status = B_BAD_VALUE;
+		FATAL(("could not create root node!\n"));
+	}
 
 	return status;
 }
