@@ -170,7 +170,7 @@ public:
 	void SetChangeFlags(uint32 flags);
 	uint32 ChangeFlags() const;
 	int32 ChangeCounter() const;
-	void UninitializeContents(bool logChanges = true);
+	status_t UninitializeContents(bool logChanges = true);
 
 	void SetAlgorithmData(uint32 data);
 	uint32 AlgorithmData() const;

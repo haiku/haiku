@@ -834,7 +834,7 @@ KPartition::ChangeCounter() const
 }
 
 // UninitializeContents
-void
+status_t
 KPartition::UninitializeContents(bool logChanges)
 {
 	if (DiskSystem()) {
@@ -844,7 +844,8 @@ KPartition::UninitializeContents(bool logChanges)
 					   | B_PARTITION_CHANGED_FLAGS;
 		// children
 		if (CountChildren() > 0) {
-			RemoveAllChildren();
+			if (!RemoveAllChildren())
+				return B_ERROR;
 			flags |= B_PARTITION_CHANGED_CHILDREN;
 		}
 		// volume
@@ -890,6 +891,7 @@ KPartition::UninitializeContents(bool logChanges)
 						   | B_PARTITION_CHANGED_REPAIR);
 		}
 	}
+	return B_OK;
 }
 
 // SetAlgorithmData
