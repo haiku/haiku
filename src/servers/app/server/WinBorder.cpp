@@ -110,13 +110,8 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_vresizewin	= false;
 	_driver		= GetGfxDriver(ActiveScreen());
 	_decorator	= new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
+	_decorator->GetFootprint(_visible);
 
-	// We need to do this because GetFootprint is supposed to generate a new BRegion.
-	// I suppose the call probably ought to be void GetFootprint(BRegion *recipient), but we can
-	// change that later.
-
-	delete _visible; // it was initialized in Layer's constructor.
-	_visible	= _decorator->GetFootprint();
 	*_full		= *_visible;
 	*_invalid	= *_visible;
 	_frame		= _visible->Frame();
@@ -314,21 +309,22 @@ STRACE_CLICK(("ClickMove: Drag\n"));
 			// by the new location so we know what areas to invalidate.
 			
 			// The original location
-			BRegion *reg=_decorator->GetFootprint();
+			BRegion reg;
+			_decorator->GetFootprint(&reg);
 			
 			// The new location
-			BRegion reg2(*reg);
+			BRegion reg2(reg);
 			reg2.OffsetBy((int32)dx, (int32)dy);
 
 			MoveBy(dx,dy);
 			_decorator->MoveBy(BPoint(dx, dy));
 
 			// 3) quickly move the window
-			_driver->CopyRegion(reg,reg2.Frame().LeftTop());
+			_driver->CopyRegion(&reg,reg2.Frame().LeftTop());
 
 			// 4) Invalidate only the areas which we can't redraw directly
 			for(int32 i=0; i<reg2.CountRects();i++)
-				reg->Exclude(reg2.RectAt(i));
+				reg.Exclude(reg2.RectAt(i));
 			
 			// TODO: DW's notes to self
 			// As of right now, dragging the window is extremely slow despite the use
@@ -344,12 +340,11 @@ STRACE_CLICK(("ClickMove: Drag\n"));
 			//  layer's coordinates, etc) and set things right. Secondly, nuke the invalid region
 			// in this call so that when RequestDraw is called, this WinBorder doesn't redraw itself
 			
-			_parent->Invalidate(*reg);
+			_parent->Invalidate(reg);
 			
 			_parent->RebuildRegions();
 			_parent->RequestDraw();
 			
-			delete reg;
 			unlock_layers();
 		}
 	}

@@ -293,16 +293,17 @@ STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
 	bottomborder.OffsetBy(pt);
 }
 
-BRegion * DefaultDecorator::GetFootprint(void)
+void DefaultDecorator::GetFootprint(BRegion *region)
 {
 STRACE(("DefaultDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
+	if(!region)
+		return;
 	
-	BRegion *reg=new BRegion(_borderrect);
-	reg->Include(_tabrect);
-	return reg;
+	region->Set(_borderrect);
+	region->Include(_tabrect);
 }
 
 BRect DefaultDecorator::SlideTab(float dx, float dy=0){

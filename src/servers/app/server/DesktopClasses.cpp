@@ -436,10 +436,14 @@ WinBorder* Screen::GetWindowAt( BPoint pt ){
 	{
 		if(child->_hidden)
 			continue;
-		wb		= dynamic_cast<WinBorder*>( child );
-		if (wb)
-			if(wb->GetDecorator()->GetFootprint()->Contains(pt))
+		wb = dynamic_cast<WinBorder*>(child);
+		if(wb)
+		{
+			BRegion reg;
+			wb->GetDecorator()->GetFootprint(&reg);
+			if(reg.Contains(pt))
 				return wb;
+		}
 	}
 	return NULL;
 }

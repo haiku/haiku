@@ -541,17 +541,12 @@ void Decorator::_SetColors(void)
 
 /*!
 	\brief Returns the "footprint" of the entire window, including decorator
-	\return Region representing the window's screen footprint
-	
-	This function should generate a new BRegion allocated on the heap which represents
-	the entire area occupied by the window decorator on the screen. For example, a BeOS
-	decorator would return _tabrect + _borderrect.
+	\param region Region to be changed to represent the window's screen footprint
 	
 	This function is required by all subclasses.
 */
-BRegion *Decorator::GetFootprint(void)
+void Decorator::GetFootprint(BRegion *region)
 {
-	return NULL;
 }
 
 /*!

@@ -40,7 +40,7 @@ public:
 	virtual void MoveBy(BPoint pt);
 	virtual void Draw(BRect r);
 	virtual void Draw(void);
-	virtual BRegion *GetFootprint(void);
+	virtual void GetFootprint(BRegion *region);
 	virtual BRect SlideTab(float dx, float dy);
 	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 protected:
