@@ -81,7 +81,7 @@ new_fd(struct io_context *context, struct file_descriptor *descriptor)
 		}
 	}
 	if (fd < 0) {
-		fd = EMFILE;
+		fd = B_NO_MORE_FDS;
 		goto err;
 	}
 
@@ -178,7 +178,7 @@ fd_dup(int fd, bool kernel)
 	// Try to get the fd structure
 	descriptor = get_fd(context, fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	// now put the fd in place
 	status = new_fd(context, descriptor);
@@ -199,7 +199,7 @@ fd_dup2(int oldfd, int newfd, bool kernel)
 
 	// quick check
 	if (oldfd < 0 || newfd < 0)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	// Get current I/O context and lock it
 	context = get_current_io_context(kernel);
@@ -211,7 +211,7 @@ fd_dup2(int oldfd, int newfd, bool kernel)
 		|| newfd >= context->table_size
 		|| context->fds[oldfd] == NULL) {
 		mutex_unlock(&context->io_mutex);
-		return EBADF;
+		return B_FILE_ERROR;
 	}
 
 	// Check for identity, note that it cannot be made above
@@ -249,7 +249,7 @@ user_read(int fd, off_t pos, void *buffer, size_t length)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read) {
 		retval = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
@@ -273,7 +273,7 @@ user_write(int fd, off_t pos, const void *buffer, size_t length)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_write) {
 		retval = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
@@ -294,7 +294,7 @@ user_seek(int fd, off_t pos, int seekType)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	TRACE(("user_seek(descriptor = %p)\n",descriptor));
 
@@ -320,7 +320,7 @@ user_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (!descriptor)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_ioctl)
 		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
@@ -344,7 +344,7 @@ user_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
@@ -369,7 +369,7 @@ user_rewind_dir(int fd)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
@@ -392,7 +392,7 @@ user_fstat(int fd, struct stat *stat)
 
 	descriptor = get_fd(get_current_io_context(false), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	TRACE(("user_fstat(descriptor = %p)\n",descriptor));
 
@@ -419,7 +419,7 @@ user_close(int fd)
 	struct file_descriptor *descriptor = get_fd(io, fd);
 
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	TRACE(("user_close(descriptor = %p)\n",descriptor));
 
@@ -456,7 +456,7 @@ sys_read(int fd, off_t pos, void *buffer, size_t length)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read) {
 		retval = descriptor->ops->fd_read(descriptor, pos, buffer, &length);
@@ -478,7 +478,7 @@ sys_write(int fd, off_t pos, const void *buffer, size_t length)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_write) {
 		retval = descriptor->ops->fd_write(descriptor, pos, buffer, &length);
@@ -501,7 +501,7 @@ sys_seek(int fd, off_t pos, int seekType)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (!descriptor)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_seek)
 		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
@@ -523,7 +523,7 @@ sys_ioctl(int fd, ulong op, void *buffer, size_t length)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_ioctl)
 		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
@@ -545,7 +545,7 @@ sys_read_dir(int fd, struct dirent *buffer,size_t bufferSize,uint32 maxCount)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read_dir) {
 		uint32 count = maxCount;
@@ -570,7 +570,7 @@ sys_rewind_dir(int fd)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_rewind_dir)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
@@ -590,7 +590,7 @@ sys_fstat(int fd, struct stat *stat)
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	TRACE(("sys_fstat(descriptor = %p)\n",descriptor));
 
@@ -611,7 +611,7 @@ sys_close(int fd)
 	struct file_descriptor *descriptor = get_fd(io, fd);
 
 	if (descriptor == NULL)
-		return EBADF;
+		return B_FILE_ERROR;
 
 	remove_fd(io, fd);
 

@@ -194,6 +194,24 @@ error:
 
 
 int
+arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr *faultHandler)
+{
+	*faultHandler = (addr)&&error;
+
+	to[--size] = '\0';
+	while (size-- && (*to++ = *from++) != '\0')
+		;
+
+	*faultHandler = 0;
+	return 0;
+
+error:
+	*faultHandler = 0;
+	return ERR_VM_BAD_USER_MEMORY;
+}
+
+
+int
 arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
 {
 	char *xs = (char *) s;

@@ -140,28 +140,28 @@ static ssize_t file_read(struct file_descriptor *, off_t pos, void *buffer, size
 static ssize_t file_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void file_free_fd(struct file_descriptor *);
-static int file_close(struct file_descriptor *);
+static status_t file_close(struct file_descriptor *);
 static status_t dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
 static status_t dir_rewind(struct file_descriptor *);
 static void dir_free_fd(struct file_descriptor *);
-static int dir_close(struct file_descriptor *);
+static status_t dir_close(struct file_descriptor *);
 static status_t attr_dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
 static status_t attr_dir_rewind(struct file_descriptor *);
 static void attr_dir_free_fd(struct file_descriptor *);
-static int attr_dir_close(struct file_descriptor *);
+static status_t attr_dir_close(struct file_descriptor *);
 static ssize_t attr_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
 static ssize_t attr_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
 static off_t attr_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void attr_free_fd(struct file_descriptor *);
-static int attr_close(struct file_descriptor *);
-static int attr_read_stat(struct file_descriptor *, struct stat *);
+static status_t attr_close(struct file_descriptor *);
+static status_t attr_read_stat(struct file_descriptor *, struct stat *);
 static status_t index_dir_read(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
 static status_t index_dir_rewind(struct file_descriptor *);
 static void index_dir_free_fd(struct file_descriptor *);
-static int index_dir_close(struct file_descriptor *);
+static status_t index_dir_close(struct file_descriptor *);
 
-static int common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
-static int common_read_stat(struct file_descriptor *, struct stat *);
+static status_t common_ioctl(struct file_descriptor *, ulong, void *buf, size_t len);
+static status_t common_read_stat(struct file_descriptor *, struct stat *);
 
 static int vfs_open(char *path, int omode, bool kernel);
 static int vfs_open_dir(char *path, bool kernel);
@@ -171,7 +171,6 @@ static int vfs_create_dir(char *path, int perms, bool kernel);
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
 
 struct fd_ops gFileOps = {
-	"file",
 	file_read,
 	file_write,
 	file_seek,
@@ -184,7 +183,6 @@ struct fd_ops gFileOps = {
 };
 
 struct fd_ops gDirectoryOps = {
-	"directory",
 	NULL,
 	NULL,
 	NULL,
@@ -197,7 +195,6 @@ struct fd_ops gDirectoryOps = {
 };
 
 struct fd_ops gAttributeDirectoryOps = {
-	"attribute directory",
 	NULL,
 	NULL,
 	NULL,
@@ -210,7 +207,6 @@ struct fd_ops gAttributeDirectoryOps = {
 };
 
 struct fd_ops gAttributeOps = {
-	"attribute",
 	attr_read,
 	attr_write,
 	attr_seek,
@@ -223,7 +219,6 @@ struct fd_ops gAttributeOps = {
 };
 
 struct fd_ops gIndexDirectoryOps = {
-	"index directory",
 	NULL,
 	NULL,
 	NULL,
@@ -1965,7 +1960,7 @@ file_open(char *path, int omode, bool kernel)
 }
 
 
-static int
+static status_t
 file_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2170,7 +2165,7 @@ dir_open(char *path, bool kernel)
 }
 
 
-static int
+static status_t
 dir_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2241,7 +2236,7 @@ dir_remove(char *path, bool kernel)
 }
 
 
-static int
+static status_t
 common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2253,7 +2248,7 @@ common_ioctl(struct file_descriptor *descriptor, ulong op, void *buffer, size_t 
 }
 
 
-static int
+static status_t
 common_sync(int fd, bool kernel)
 {
 	struct file_descriptor *descriptor;
@@ -2297,7 +2292,7 @@ common_read_link(char *path, char *buffer, size_t bufferSize, bool kernel)
 }
 
 
-static int
+static status_t
 common_write_link(char *path, char *toPath, bool kernel)
 {
 	struct vnode *vnode;
@@ -2404,7 +2399,7 @@ common_unlink(char *path, bool kernel)
 }
 
 
-static int
+static status_t
 common_access(char *path, int mode, bool kernel)
 {
 	struct vnode *vnode;
@@ -2425,7 +2420,7 @@ common_access(char *path, int mode, bool kernel)
 }
 
 
-static int
+static status_t
 common_rename(char *path, char *newPath, bool kernel)
 {
 	struct vnode *fromVnode, *toVnode;
@@ -2462,7 +2457,7 @@ err:
 }
 
 
-static int
+static status_t
 common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2472,7 +2467,7 @@ common_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 }
 
 
-static int
+static status_t
 common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
@@ -2495,36 +2490,16 @@ common_write_stat(int fd, char *path, bool traverseLeafLink, const struct stat *
 }
 
 
-static int
-attr_dir_open_fd(int fd, bool kernel)
+static status_t
+attr_dir_open(int fd, char *path, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("attr_dir_open_fd(fd = %d, kernel = %d)\n", fd, kernel));
+	FUNCTION(("attr_dir_open(fd = %d, path = '%s', kernel = %d)\n", fd, path, kernel));
 
-	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
-	if (vnode == NULL)
-		return B_FILE_ERROR;
-
-	status = open_attr_dir_vnode(vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, true, &vnode, kernel);
 	if (status < B_OK)
-		put_vnode(vnode);
-
-	return status;
-}
-
-
-static int
-attr_dir_open(char *path, bool kernel)
-{
-	struct vnode *vnode;
-	int status;
-
-	FUNCTION(("attr_dir_open(path = '%s', kernel = %d)\n", path, kernel));
-
-	status = path_to_vnode(path, true, &vnode, kernel);
-	if (status < 0)
 		return status;
 
 	status = open_attr_dir_vnode(vnode, kernel);
@@ -2535,7 +2510,7 @@ attr_dir_open(char *path, bool kernel)
 }
 
 
-static int
+static status_t
 attr_dir_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2661,7 +2636,7 @@ err:
 }
 
 
-static int
+static status_t
 attr_close(struct file_descriptor *descriptor)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2757,7 +2732,7 @@ attr_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 }
 
 
-static int
+static status_t
 attr_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2770,7 +2745,7 @@ attr_read_stat(struct file_descriptor *descriptor, struct stat *stat)
 }
 
 
-static int
+static status_t
 attr_write_stat(int fd, const struct stat *stat, int statMask, bool kernel)
 {
 	struct file_descriptor *descriptor;
@@ -2794,7 +2769,7 @@ attr_write_stat(int fd, const struct stat *stat, int statMask, bool kernel)
 }
 
 
-static int
+static status_t
 attr_remove(int fd, const char *name, bool kernel)
 {
 	struct file_descriptor *descriptor;
@@ -2821,7 +2796,7 @@ attr_remove(int fd, const char *name, bool kernel)
 }
 
 
-static int
+static status_t
 attr_rename(int fromfd, const char *fromName, int tofd, const char *toName, bool kernel)
 {
 	struct file_descriptor *fromDescriptor, *toDescriptor;
@@ -2863,7 +2838,7 @@ err:
 }
 
 
-static int
+static status_t
 index_dir_open(mount_id mountID, bool kernel)
 {
 	struct fs_mount *mount;
@@ -2905,7 +2880,7 @@ err:
 }
 
 
-static int
+static status_t
 index_dir_close(struct file_descriptor *descriptor)
 {
 	struct fs_mount *mount = descriptor->u.mount;
@@ -2960,7 +2935,7 @@ index_dir_rewind(struct file_descriptor *descriptor)
 //	General File System functions
 
 
-static int
+static status_t
 fs_mount(char *path, const char *device, const char *fsName, void *args, bool kernel)
 {
 	struct fs_mount *mount;
@@ -3083,7 +3058,7 @@ err:
 }
 
 
-static int
+static status_t
 fs_unmount(char *path, bool kernel)
 {
 	struct fs_mount *mount;
@@ -3172,7 +3147,7 @@ err:
 }
 
 
-static int
+static status_t
 fs_sync(void)
 {
 	struct hash_iterator iter;
@@ -3198,7 +3173,7 @@ fs_sync(void)
 }
 
 
-static int
+static status_t
 fs_read_info(dev_t device, struct fs_info *info)
 {
 	struct fs_mount *mount;
@@ -3227,7 +3202,7 @@ error:
 }
 
 
-static int
+static status_t
 fs_write_info(dev_t device, const struct fs_info *info, int mask)
 {
 	struct fs_mount *mount;
@@ -3252,7 +3227,7 @@ error:
 }
 
 
-static int
+static status_t
 get_cwd(char *buffer, size_t size, bool kernel)
 {
 	// Get current working directory from io context
@@ -3273,7 +3248,7 @@ get_cwd(char *buffer, size_t size, bool kernel)
 }
 
 
-static int
+static status_t
 set_cwd(int fd, char *path, bool kernel)
 {
 	struct io_context *context;
@@ -3573,6 +3548,53 @@ sys_write_stat(int fd, const char *path, bool traverseLeafLink, struct stat *sta
 
 
 int
+sys_open_attr_dir(int fd, const char *path)
+{
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+
+	if (fd == -1)
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+
+	return attr_dir_open(fd, pathBuffer, true);
+}
+
+
+int
+sys_create_attr(int fd, const char *name, uint32 type, int openMode)
+{
+	return attr_create(fd, name, type, openMode, true);
+}
+
+
+int
+sys_open_attr(int fd, const char *name, int openMode)
+{
+	return attr_open(fd, name, openMode, true);
+}
+
+
+int
+sys_write_attr_stat(int fd, const struct stat *stat, int statMask)
+{
+	return attr_write_stat(fd, stat, statMask, true);
+}
+
+
+int
+sys_remove_attr(int fd, const char *name)
+{
+	return attr_remove(fd, name, true);
+}
+
+
+int
+sys_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName)
+{
+	return attr_rename(fromFile, fromName, toFile, toName, true);
+}
+
+
+int
 sys_getcwd(char *buffer, size_t size)
 {
 	char path[SYS_MAX_PATH_LEN];
@@ -3596,7 +3618,9 @@ int
 sys_setcwd(int fd, const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+
+	if (fd == -1)
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
 	return set_cwd(fd, pathBuffer, true);
 }
@@ -3619,21 +3643,18 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 		|| !CHECK_USER_ADDRESS(udevice))
 		return B_BAD_ADDRESS;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
+	rc = user_strlcpy(path, upath, SYS_MAX_PATH_LEN);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	rc = user_strncpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN - 1);
+	rc = user_strlcpy(fs_name, ufs_name, SYS_MAX_OS_NAME_LEN);
 	if (rc < 0)
 		return rc;
-	fs_name[SYS_MAX_OS_NAME_LEN - 1] = '\0';
 
 	if (udevice) {
-		rc = user_strncpy(device, udevice, SYS_MAX_PATH_LEN - 1);
+		rc = user_strlcpy(device, udevice, SYS_MAX_PATH_LEN);
 		if (rc < 0)
 			return rc;
-		device[SYS_MAX_PATH_LEN - 1] = '\0';
 	} else
 		device[0] = '\0';
 
@@ -3642,15 +3663,14 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 
 
 int
-user_unmount(const char *upath)
+user_unmount(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	status = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return fs_unmount(path, false);
 }
@@ -3672,10 +3692,9 @@ user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 	if (!CHECK_USER_ADDRESS(userName))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	status = user_strncpy(name, userName, sizeof(name) - 1);
+	status = user_strlcpy(name, userName, sizeof(name) - 1);
 	if (status < B_OK)
 		return status;
-	name[sizeof(name) - 1] = '\0';
 
 	return file_open_entry_ref(device, inode, name, omode, false);
 }
@@ -3690,10 +3709,9 @@ user_open(const char *userPath, int omode)
 	if (!CHECK_USER_ADDRESS(userPath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return file_open(path, omode, false);
 }
@@ -3713,12 +3731,11 @@ user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 	int status;
 
 	if (!CHECK_USER_ADDRESS(uname))
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
-	status = user_strncpy(name, uname, sizeof(name) - 1);
+	status = user_strlcpy(name, uname, sizeof(name));
 	if (status < B_OK)
 		return status;
-	name[sizeof(name) - 1] = '\0';
 
 	return dir_open_entry_ref(device, inode, name, false);
 }
@@ -3731,12 +3748,11 @@ user_open_dir(const char *userPath)
 	int status;
 
 	if (!CHECK_USER_ADDRESS(userPath))
-		return ERR_VM_BAD_USER_MEMORY;
+		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = 0;
 
 	return dir_open(path, false);
 }
@@ -3750,25 +3766,24 @@ user_fsync(int fd)
 
 
 int
-user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms)
+user_create_entry_ref(dev_t device, ino_t inode, const char *userName, int openMode, int perms)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
 
-	if (!CHECK_USER_ADDRESS(uname))
-		return ERR_VM_BAD_USER_MEMORY;
+	if (!CHECK_USER_ADDRESS(userName))
+		return B_BAD_ADDRESS;
 
-	status = user_strncpy(name, uname, sizeof(name) - 1);
+	status = user_strlcpy(name, userName, sizeof(name));
 	if (status < 0)
 		return status;
-	name[sizeof(name) - 1] = '\0';
 
-	return file_create_entry_ref(device, inode, name, omode, perms, false);
+	return file_create_entry_ref(device, inode, name, openMode, perms, false);
 }
 
 
 int
-user_create(const char *userPath, int omode, int perms)
+user_create(const char *userPath, int openMode, int perms)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -3776,28 +3791,26 @@ user_create(const char *userPath, int omode, int perms)
 	if (!CHECK_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	return file_create(path, omode, perms, false);
+	return file_create(path, openMode, perms, false);
 }
 
 
 int
-user_create_dir_entry_ref(dev_t device, ino_t inode, const char *uname, int perms)
+user_create_dir_entry_ref(dev_t device, ino_t inode, const char *userName, int perms)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
 
-	if (!CHECK_USER_ADDRESS(uname))
+	if (!CHECK_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(name, uname, sizeof(name) - 1);
+	status = user_strlcpy(name, userName, sizeof(name));
 	if (status < 0)
 		return status;
-	name[sizeof(name) - 1] = '\0';
 
 	return dir_create_entry_ref(device, inode, name, perms, false);
 }
@@ -3812,10 +3825,9 @@ user_create_dir(const char *userPath, int perms)
 	if (!CHECK_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return dir_create(path, perms, false);
 }
@@ -3830,10 +3842,9 @@ user_remove_dir(const char *userPath)
 	if (!CHECK_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return dir_remove(path, false);
 }
@@ -3850,10 +3861,9 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 		|| !CHECK_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	if (bufferSize > SYS_MAX_PATH_LEN)
 		bufferSize = SYS_MAX_PATH_LEN;
@@ -3862,7 +3872,8 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 	if (status < B_OK)
 		return status;
 
-	return user_strncpy(userBuffer, buffer, bufferSize);
+	// ToDo: think about buffer length and the return value at read_link()
+	return user_strlcpy(userBuffer, buffer, bufferSize);
 }
 
 
@@ -3877,15 +3888,13 @@ user_write_link(const char *userPath, const char *userToPath)
 		|| !CHECK_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(toPath, userToPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	toPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	status = check_path(toPath);
 	if (status < B_OK)
@@ -3906,15 +3915,13 @@ user_create_symlink(const char *userPath, const char *userToPath, int mode)
 		|| !CHECK_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(toPath, userToPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	toPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	status = check_path(toPath);
 	if (status < B_OK)
@@ -3935,15 +3942,13 @@ user_create_link(const char *userPath, const char *userToPath)
 		|| !CHECK_USER_ADDRESS(userToPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(toPath, userToPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	toPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	status = check_path(toPath);
 	if (status < B_OK)
@@ -3962,10 +3967,9 @@ user_unlink(const char *userPath)
 	if (!CHECK_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return common_unlink(path, false);
 }
@@ -3981,15 +3985,13 @@ user_rename(const char *userOldPath, const char *userNewPath)
 	if (!CHECK_USER_ADDRESS(userOldPath) || !CHECK_USER_ADDRESS(userNewPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(oldPath, userOldPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(oldPath, userOldPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	oldPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
-	status = user_strncpy(newPath, userNewPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(newPath, userNewPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	newPath[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return common_rename(oldPath, newPath, false);
 }
@@ -4004,10 +4006,9 @@ user_access(const char *userPath, int mode)
 	if (!CHECK_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (status < 0)
 		return status;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	return common_access(path, mode, false);
 }
@@ -4025,10 +4026,9 @@ user_read_stat(const char *userPath, bool traverseLink, struct stat *userStat)
 		|| !CHECK_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
 
-	rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
+	rc = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
 	if (rc < 0)
 		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
 
 	FUNCTION(("user_read_stat(path = %s, traverseLeafLink = %d)\n", path, traverseLink));
 
@@ -4053,24 +4053,106 @@ user_write_stat(int fd, const char *userPath, bool traverseLeafLink, struct stat
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
-	int rc;
 
-	if ((fd == -1 && !CHECK_USER_ADDRESS(userPath))
-		|| !CHECK_USER_ADDRESS(userStat))
+	if (!CHECK_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
 
 	if (fd == -1) {
-		rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
-		if (rc < 0)
-			return rc;
-		path[SYS_MAX_PATH_LEN - 1] = '\0';
+		if (!CHECK_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
+			return B_BAD_ADDRESS;
 	}
 
-	rc = user_memcpy(&stat, userStat, sizeof(struct stat));
-	if (rc < 0)
-		return rc;
+	if (user_memcpy(&stat, userStat, sizeof(struct stat)) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return common_write_stat(fd, path, traverseLeafLink, &stat, statMask, false);
+}
+
+
+int
+user_open_attr_dir(int fd, const char *userPath)
+{
+	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+
+	if (fd == -1) {
+		if (!CHECK_USER_ADDRESS(userPath)
+			|| user_strlcpy(pathBuffer, userPath, SYS_MAX_PATH_LEN) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return attr_dir_open(fd, pathBuffer, false);
+}
+
+
+int
+user_create_attr(int fd, const char *userName, uint32 type, int openMode)
+{
+	char name[B_FILE_NAME_LENGTH];
+	status_t status;
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return attr_create(fd, name, type, openMode, false);
+}
+
+
+int
+user_open_attr(int fd, const char *userName, int openMode)
+{
+	char name[B_FILE_NAME_LENGTH];
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return attr_open(fd, name, openMode, false);
+}
+
+
+int
+user_write_attr_stat(int fd, const struct stat *userStat, int statMask)
+{
+	struct stat stat;
+
+	if (!CHECK_USER_ADDRESS(userStat)
+		|| user_memcpy(&stat, userStat, sizeof(struct stat)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return attr_write_stat(fd, &stat, statMask, false);
+}
+
+
+int
+user_remove_attr(int fd, const char *userName)
+{
+	char name[B_FILE_NAME_LENGTH];
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return attr_remove(fd, name, false);
+}
+
+
+int
+user_rename_attr(int fromFile, const char *userFromName, int toFile, const char *userToName)
+{
+	char fromName[B_FILE_NAME_LENGTH];
+	char toName[B_FILE_NAME_LENGTH];
+
+	if (!CHECK_USER_ADDRESS(userFromName)
+		|| !CHECK_USER_ADDRESS(userToName))
+		return B_BAD_ADDRESS;
+
+	if (user_strlcpy(fromName, userFromName, B_FILE_NAME_LENGTH) < B_OK
+		|| user_strlcpy(toName, userToName, B_FILE_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return attr_rename(fromFile, fromName, toFile, toName, false);
 }
 
 
@@ -4088,14 +4170,13 @@ user_getcwd(char *userBuffer, size_t size)
 	if (size > SYS_MAX_PATH_LEN)
 		size = SYS_MAX_PATH_LEN;
 
-	// Call vfs to get current working directory
 	status = get_cwd(buffer, size, false);
 	if (status < 0)
 		return status;
 
 	// Copy back the result
-	if (user_strncpy(userBuffer, buffer, size) < 0)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (user_strlcpy(userBuffer, buffer, size) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return status;
 }
@@ -4105,22 +4186,15 @@ int
 user_setcwd(int fd, const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN];
-	int rc;
 
 	PRINT(("user_setcwd: path = %p\n", userPath));
 
 	if (fd == -1) {
-		if (!CHECK_USER_ADDRESS(userPath))
+		if (!CHECK_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
 			return B_BAD_ADDRESS;
+	}
 
-		rc = user_strncpy(path, userPath, SYS_MAX_PATH_LEN - 1);
-		if (rc < 0)
-			return rc;
-		path[SYS_MAX_PATH_LEN - 1] = '\0';
-	} else
-		path[0] = '\0';
-
-	// Call vfs to set new working directory
 	return set_cwd(fd, path, false);
 }
 
