@@ -43,7 +43,6 @@ MouseWindow::MouseWindow(BRect rect)
 	view->AddChild(fView);
 
 	// Add the "Default" button
-//	(10,259,85,279);
 	BRect rect(kBorderSpace, fView->Frame().bottom + kItemSpace + 2,
 		kBorderSpace + 75, fView->Frame().bottom + 20);
 	BButton *button = new BButton(rect, "defaults", "Defaults", new BMessage(BUTTON_DEFAULTS));
@@ -51,7 +50,6 @@ MouseWindow::MouseWindow(BRect rect)
 	view->AddChild(button);
 
 	// Add the "Revert" button
-	//frame.Set(92,259,167,279);
 	rect.OffsetBy(button->Bounds().Width() + kItemSpace, 0);
 	fRevertButton = new BButton(rect, "revert", "Revert", new BMessage(BUTTON_REVERT));
 	fRevertButton->SetEnabled(false);
