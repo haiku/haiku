@@ -858,9 +858,9 @@ RemotePackageRepository HaikuPorts
 	qjson_x86-0.8.1-1
 	qjson_x86_devel-0.8.1-1
 	qmplay2_x86-15.05.30-2
-	qt5_x86-5.5.1-1
-	qt5_x86_devel-5.5.1-1
-	qt5_x86_docs-5.5.1-1
+	qt5_x86-5.5.1-2
+	qt5_x86_devel-5.5.1-2
+	qt5_x86_docs-5.5.1-2
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.12-1
 	qupzilla_x86-1.8.6-1
