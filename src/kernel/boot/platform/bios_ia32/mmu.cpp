@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
  * Based on code written by Travis Geiselbrecht for NewOS.
  *
  * Distributed under the terms of the MIT License.
@@ -57,8 +57,9 @@ struct extended_memory {
 	uint32 type;
 };
 
-static const uint32 kDefaultPageFlags = 0x03;	// present, R/W
-static const size_t kMaxKernelSize = 0x100000;	// 1 MB for the kernel
+static const uint32 kDefaultPageFlags = 0x03;		// present, R/W
+static const uint32 kDefaultPageTableFlags = 0x07;	// present, user, R/W
+static const size_t kMaxKernelSize = 0x100000;		// 1 MB for the kernel
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
@@ -122,7 +123,7 @@ add_page_table(addr_t base)
 		sPageTable[i] = 0;
 
 	// put the new page table into the page directory
-	sPageDirectory[base/(4*1024*1024)] = (uint32)sPageTable | kDefaultPageFlags;
+	sPageDirectory[base/(4*1024*1024)] = (uint32)sPageTable | kDefaultPageTableFlags;
 }
 
 
