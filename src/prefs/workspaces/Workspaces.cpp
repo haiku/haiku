@@ -34,7 +34,7 @@
 static const char *kWorkspacesSignature = "application/x-vnd.Be-WORK";
 static const char *kWorkspacesSettingFile = "Workspace_data";
 
-static const uint32 kScreenBorderOffset = 10;
+static const float kScreenBorderOffset = 10.0;
 
 
 class WorkspacesPreferences {
@@ -123,7 +123,7 @@ WorkspacesPreferences::WorkspacesPreferences()
 		fWindowFrame = fScreenFrame;
 		fWindowFrame.OffsetBy(-kScreenBorderOffset, -kScreenBorderOffset);
 		fWindowFrame.left = fWindowFrame.right - 160;
-		fWindowFrame.top = fWindowFrame.bottom - 120;
+		fWindowFrame.top = fWindowFrame.bottom - 140;
 	}
 }
 
