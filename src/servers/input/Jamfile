@@ -1,10 +1,6 @@
 SubDir OBOS_TOP src servers input ;
 
-# AddResources
-#	input_server
-#	:
-#	input_server.rsrc
-#	;
+AddResources input_server : input_server.rdef ;
 
 UsePrivateHeaders app ;
 

@@ -2,7 +2,7 @@ SubDir OBOS_TOP src servers app server ;
 
 Depends app_server : install_fonts ;
 
-AddResources app_server : app_server.rsrc ;
+AddResources app_server : app_server.rdef ;
 
 UseLibraryHeaders png zlib ;
 UsePrivateHeaders app interface [ FDirName servers app ] ;

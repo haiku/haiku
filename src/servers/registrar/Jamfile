@@ -4,6 +4,8 @@ UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
+AddResources obos_registrar : registrar.rdef ;
+
 Server obos_registrar :
 	AppInfoList.cpp
 	ClipboardHandler.cpp

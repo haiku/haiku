@@ -2,7 +2,7 @@ SubDir OBOS_TOP src servers media ;
 
 UsePrivateHeaders media ;
 
-AddResources media_server : media_server.rsrc ;
+AddResources media_server : media_server.rdef ;
 
 Server media_server :
 	media_server.cpp

@@ -1,10 +1,48 @@
+/*
+** midi_server.rdef
+**
+*/
 
-resource app_signature "application/x-vnd.OpenBeOS.midi-server";
+/* BEOS:APP_SIG :
+   application:/x-vnd.obos.app-name
+   */
 
-resource app_flags 0x00000004;  // BACKGROUND_APP | SINGLE_LAUNCH
+resource app_signature "application/x-vnd.OBOS-midi_server";
 
-resource(10, "bus_large") #'ICON' array
-{
+/* BEOS:APP_FLAGS :
+   00000000 = 							   SINGLE LAUNCH
+   00000001 = 							   MULTIPLE LAUNCH
+   00000002 = 							   EXCLUSIVE LAUNCH
+   00000004 = 			  BACKGROUND APP + SINGLE LAUNCH
+   00000005 = 			  BACKGROUND APP + MULTIPLE LAUNCH
+   00000006 = 			  BACKGROUND APP + EXCLUSIVE LAUNCH
+   00000008 = ARGV_ONLY + 				   SINGLE LAUNCH
+   00000009 = ARGV_ONLY + 				   MULTIPLE LAUNCH
+   0000000A = ARGV_ONLY + 				   EXCLUSIVE LAUNCH
+   0000000C = ARGV_ONLY + BACKGROUND APP + SINGLE LAUNCH
+   0000000D = ARGV_ONLY + BACKGROUND APP + MULTIPLE LAUNCH
+   0000000E = ARGV_ONLY + BACKGROUND APP + EXCLUSIVE LAUNCH
+   */
+
+resource app_flags 0x00000004;
+
+resource app_version {
+
+	major  = 1, 
+	middle = 0,
+	minor  = 0,
+	
+	/* 0 = development	1 = alpha			2 = beta
+	   3 = gamma		4 = golden master	5 = final */
+	variety = 1,
+	
+	internal = 0,
+	
+	short_info = "midi_server",
+	long_info = "OpenBeOS - midi_server"
+};
+
+resource large_icon array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFF0000000000000000000000000000FFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFF00000000000A0A0A0A0A0A0A0A0000000000FFFFFFFFFFFFFF"
@@ -39,8 +77,7 @@ resource(10, "bus_large") #'ICON' array
 	$"FFFFFFFFFFFFFFFFFFFFFFFF0000000000000000FFFFFFFFFFFFFFFFFFFFFFFF"
 };
 
-resource(11, "bus_small") #'MICN' array
-{
+resource mini_icon array {
 	$"FFFFFFFFFFFF00000000FFFFFFFFFFFF"
 	$"FFFFFFFF00000A0A0A0A0000FFFFFFFF"
 	$"FFFFFF000A0A0A00000A0A0A00FFFFFF"
