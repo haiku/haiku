@@ -12,6 +12,7 @@
 #include <DiskDeviceVisitor.h>
 #include <DiskSystem.h>
 #include <Message.h>
+#include <PartitioningInfo.h>
 #include <Volume.h>
 
 #include "ddm_userland_interface.h"
@@ -375,8 +376,9 @@ BPartition::FindDescendant(partition_id id) const
 status_t
 BPartition::GetPartitioningInfo(BPartitioningInfo *info) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!info || !fPartitionData || !_IsShadow())
+		return B_BAD_VALUE;
+	return info->_SetTo(_ShadowID());
 }
 
 // VisitEachChild
