@@ -1,10 +1,18 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        MediaListItem.h
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Media Preferences
+//  Created :    June 25, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-MediaListItem Header by Sikosis
-
-(C)2003
-
-*/
 
 #ifndef __MEDIALISTITEM_H__
 #define __MEDIALISTITEM_H__

@@ -1,10 +1,17 @@
-/*
-
-Media Windows Header by Sikosis
-
-(C)2003
-
-*/
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        MediaWindow.h
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Media Preferences
+//  Created :    June 25, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #ifndef __MEDIAWINDOWS_H__
 #define __MEDIAWINDOWS_H__
@@ -18,6 +25,7 @@ Media Windows Header by Sikosis
 
 #include "MediaViews.h"
 #include "MediaListItem.h"
+#include "MediaAlert.h"
 
 #define SETTINGS_FILE "MediaPrefs Settings"
 
@@ -26,7 +34,7 @@ class MediaWindow : public BWindow
 	public:
     	MediaWindow(BRect frame);
 	    ~MediaWindow();
-    	virtual bool QuitRequested();
+	    virtual bool QuitRequested();
 	    virtual void MessageReceived(BMessage *message);
 	    virtual void FrameResized(float width, float height); 
 	private:
@@ -55,6 +63,7 @@ class MediaWindow : public BWindow
 		BList					mVideoOutputs;
 		
 		BList					mIcons;
+		MediaAlert				*mAlert;
 };
 
 #endif

@@ -1,22 +1,31 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        MediaViews.cpp
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Media Preferences
+//  Created :    June 25, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-MediaViews by Sikosis
-
-(C)2003
-
-*/
 
 // Includes -------------------------------------------------------------------------------------------------- //
 #include <Box.h>
 #include <Button.h>
 #include <TextView.h>
 #include <MenuField.h>
-#include <Menu.h>
+#include <PopUpMenu.h>
 #include <MediaRoster.h>
 #include <Deskbar.h>
 #include <Entry.h>
 #include <stdio.h>
 #include <MediaAddOn.h>
+#include <String.h>
 #include "MediaViews.h"
 
 BarView::BarView(BRect frame) 
@@ -38,7 +47,7 @@ BarView::Draw(BRect updateRect)
 
 
 SettingsView::SettingsView (BRect frame, bool isVideo)
- : BView (frame, "SettingsView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW ),
+ : BView (frame, "SettingsView", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW ),
  	mIsVideo(isVideo)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -52,7 +61,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	AddChild(defaultsBox);
 	
 	BRect defaultRect(20, 22, 250, 40);
-	mMenu1 = new BMenu("menu1");
+	mMenu1 = new BPopUpMenu("menu1");
 	mMenu1->SetLabelFromMarked(true);
 	BMenuField *menuField1 = new BMenuField(defaultRect, "menuField1", 
 		mIsVideo ? "Video Input:" : "Audio Input:", mMenu1);
@@ -60,7 +69,7 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	menuField1->SetDivider(75);
 	
 	defaultRect.OffsetBy(0, 26);
-	mMenu2 = new BMenu("menu2");
+	mMenu2 = new BPopUpMenu("menu2");
 	mMenu2->SetLabelFromMarked(true);
 	BMenuField *menuField2 = new BMenuField(defaultRect, "menuField2", 
 		mIsVideo ? "Video Output:" : "Audio Output:", mMenu2);
@@ -69,12 +78,12 @@ SettingsView::SettingsView (BRect frame, bool isVideo)
 	
 	if(!mIsVideo) {
 		defaultRect.OffsetBy(186, 0);
-		BMenu *mMenu3 = new BMenu("menu3");
+		mMenu3 = new BPopUpMenu("menu3");
 		mMenu3->SetLabelFromMarked(true);
-		BMenuField *menuField3 = new BMenuField(defaultRect, "menuField3", 
+		BMenuField *mMenuField3 = new BMenuField(defaultRect, "menuField3", 
 			"Channel:", mMenu3);
-		defaultsBox->AddChild(menuField3);
-		menuField3->SetDivider(50);
+		defaultsBox->AddChild(mMenuField3);
+		mMenuField3->SetDivider(50);
 		defaultRect.OffsetBy(-186, 0);
 	}
 	
@@ -144,7 +153,7 @@ void
 SettingsView::AddNodes(BList &list, bool isInput)
 {
 	BMenu *menu = isInput ? mMenu1 : mMenu2;
-	BMenuItem *item;
+	void *item;
 	while(item = menu->RemoveItem((int32)0))
 		delete item;
 		
@@ -159,7 +168,7 @@ SettingsView::AddNodes(BList &list, bool isInput)
 }
 
 void
-SettingsView::SetDefault(dormant_node_info &info, bool isInput)
+SettingsView::SetDefault(dormant_node_info &info, bool isInput, int32 outputID)
 {
 	BMenu *menu = isInput ? mMenu1 : mMenu2;
 		
@@ -170,6 +179,36 @@ SettingsView::SetDefault(dormant_node_info &info, bool isInput)
 			break;
 		}
 	}
+	
+	if(!mIsVideo&&!isInput&&outputID>-1) {
+		BMenuItem *item;
+		while(item = mMenu3->RemoveItem((int32)0))
+			delete item;
+		BMediaRoster *roster = BMediaRoster::Roster();
+		media_node node;
+		media_node_id node_id;
+		status_t err;
+		if(roster->GetInstancesFor(info.addon, info.flavor_id, &node_id)!=B_OK) 
+			err = roster->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
+		else
+			err = roster->GetNodeFor(node_id, &node);
+		
+		if(err == B_OK) {	
+			media_input inputs[16];
+			int32 inputCount = 16;
+			if(roster->GetAllInputsFor(node, inputs, 16, &inputCount)==B_OK) {
+				BMessage message(ML_DEFAULTOUTPUT_CHANGE);
+				Settings2Item *listItem;
+				for(int32 i=0; i<inputCount; i++) {
+					media_input *input = new media_input();
+					memcpy(input, &inputs[i], sizeof(*input));
+					mMenu3->AddItem(item = new Settings2Item(&info, input, new BMessage(message)));
+					if(inputs[i].destination.id == outputID)
+						item->SetMarked(true);
+				}
+			}
+		}
+	}
 }
 
 SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message, 
@@ -178,5 +217,19 @@ SettingsItem::SettingsItem(dormant_node_info *info, BMessage *message,
 	mInfo(info)
 {
 	
+}
+
+Settings2Item::Settings2Item(dormant_node_info *info, media_input *input, BMessage *message, 
+			char shortcut, uint32 modifiers)
+	: BMenuItem(input->name, message, shortcut, modifiers),
+	mInfo(info),
+	mInput(input)
+{
+	
+}
+
+Settings2Item::~Settings2Item()
+{
+	delete mInput;
 }
 		

@@ -1,13 +1,22 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        Media.cpp
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Media Preferences
+//  Created :    June 25, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-Media by Sikosis
-
-(C)2003
-
-*/
 
 // Includes -------------------------------------------------------------------------------------------------- //
 #include <StorageKit.h>
+#include <Roster.h>
 #include <String.h>
 #include <stdio.h>
 #include "Media.h"
@@ -49,19 +58,31 @@ Media::Media()
 
 	mWindow = new MediaWindow(rect);
 	mWindow->SetSizeLimits(605.0, 10000.0, 378.0, 10000.0);
+	mWindow->Show();
+	
+	be_roster->StartWatching(BMessenger(this)); 
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
+Media::~Media()
+{
+	be_roster->StopWatching(BMessenger(this)); 
+}
+
 // Media::MessageReceived -- handles incoming messages
-/*void Media::MessageReceived (BMessage *message)
+void Media::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
+		case B_SOME_APP_LAUNCHED:
+		case B_SOME_APP_QUIT:
+			mWindow->PostMessage(message);
+			break;
 	    default:
     	    BApplication::MessageReceived(message); // pass it along ... 
         	break;
     }
-}*/
+}
 // ---------------------------------------------------------------------------------------------------------- //
 
 // Media Main
