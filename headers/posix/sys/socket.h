@@ -22,14 +22,14 @@ typedef uint32_t socklen_t;
  * to agree with the Be versions...
  */
 #define	AF_UNSPEC       0
-#define AF_LOCAL        1
+#define AF_INET         1
+#define AF_LOCAL        2
 #define AF_UNIX         AF_LOCAL /* for compatability */
-#define AF_INET         2
 #define AF_ROUTE        3
-#define AF_IMPLINK      4
-#define AF_LINK         18
-#define AF_IPX          23
-#define AF_INET6        24
+#define AF_LINK         4
+#define AF_INET6        5
+#define AF_IPX          7
+#define AF_IMPLINK      20
 
 #define AF_MAX          24
 
