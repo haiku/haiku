@@ -88,17 +88,6 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	}
 	AddChild(mb);
 */
-	BRect wellrect(0,0,20,20);
-	wellrect.OffsetTo(Bounds().Width()-(wellrect.Width()+10),25);
-
-	colorwell=new ColorWell(wellrect,new BMessage(COLOR_DROPPED));
-	AddChild(colorwell);
-
-	wellrect.OffsetTo(10,25);
-	wellrect.right=colorwell->Frame().left - 20;
-//	colorset_label=new BStringView(wellrect,"colorset_label","Color Set: ");
-//	AddChild(colorset_label);
-//	colorset_label->ResizeToPreferred();
 
 	// Set up list of color attributes
 	BRect rect(10,10,200,100);
@@ -136,6 +125,13 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	attrlist->AddItem(new ColorWhichItem((color_which)B_WINDOW_TAB_TEXT_COLOR));
 	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_COLOR));
 	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR));
+
+
+	BRect wellrect(0,0,50,50);
+	wellrect.OffsetTo(rect.right + 42,25);
+
+	colorwell=new ColorWell(wellrect,new BMessage(COLOR_DROPPED),true);
+	AddChild(colorwell);
 
 	picker=new BColorControl(BPoint(10,scrollview->Frame().bottom+20),B_CELLS_32x8,5.0,"Picker",
 		new BMessage(UPDATE_COLOR));
@@ -320,7 +316,6 @@ void APRView::MessageReceived(BMessage *msg)
 			if(!revert->IsEnabled())
 				revert->SetEnabled(true);
 			
-//			SetColorSetName("<untitled>");
 			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
@@ -379,7 +374,6 @@ void APRView::MessageReceived(BMessage *msg)
 				defaults->SetEnabled(false);
 			revert->SetEnabled(false);
 			
-//			SetColorSetName(currentset->name.String());
 			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
@@ -404,9 +398,9 @@ void APRView::MessageReceived(BMessage *msg)
 	}
 }
 
+/*
 BMenu *APRView::LoadColorSets(void)
 {
-
 	STRACE(("Loading color sets from disk\n"));
 
 	// This function populates the member menu *colorset_menu with the color
@@ -482,7 +476,7 @@ BMenu *APRView::LoadColorSets(void)
 		return menu;
 	}
 
-/*	int32 count=dir.CountEntries();
+	int32 count=dir.CountEntries();
 
 	BMessage *msg;
 	for(int32 i=0;i<count;i++)
@@ -497,9 +491,10 @@ BMenu *APRView::LoadColorSets(void)
 		msg->AddString("name",name);
 		menu->AddItem(new BMenuItem(name.String(),msg));
 	}
-*/	
+	
 	return menu;
 }	
+*/
 
 void APRView::LoadColorSet(const BString &name)
 {
@@ -589,9 +584,9 @@ void APRView::SetColorSetName(const char *name)
 	BString namestr("Color Set: ");
 	currentset->name.SetTo(name);
 	namestr+=name;
-	colorset_label->SetText(namestr.String());
-	colorset_label->ResizeToPreferred();
-	colorset_label->Invalidate();
+	colorwell_label->SetText(namestr.String());
+	colorwell_label->ResizeToPreferred();
+	colorwell_label->Invalidate();
 }
 */
 void APRView::SaveSettings(void)

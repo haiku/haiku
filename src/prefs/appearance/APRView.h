@@ -61,19 +61,14 @@ public:
 protected:
 	friend APRWindow;
 	void UpdateControlsFromAttr(const char *string);
-	BMenu *LoadColorSets(void);
-//	void SaveColorSet(const BString &name);
+//	BMenu *LoadColorSets(void);
 	void LoadColorSet(const BString &name);
-//	void SetColorSetName(const char *name);
 	BColorControl *picker;
 	BButton *apply,*revert,*defaults;
 	BListView *attrlist;
 	color_which attribute;
 	BString attrstring;
 	BScrollView *scrollview;
-//	BStringView *colorset_label;
-//	BMenu *colorset_menu,*settings_menu;
-//	BFilePanel *savepanel;
 	ColorWell *colorwell;
 	
 	ColorSet *currentset,*prevset;

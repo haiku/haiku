@@ -110,7 +110,24 @@ void ColorWell::Draw(BRect update)
 	{
 		FillRect(Bounds());
 		if(is_enabled)
-			StrokeRect(Bounds(),B_SOLID_LOW);
+		{
+			BRect r(Bounds());
+			SetHighColor(184,184,184);
+			StrokeRect(r);
+			
+			SetHighColor(255,255,255);
+			StrokeLine(BPoint(r.right,r.top+1), r.RightBottom());
+			
+			r.InsetBy(1,1);
+			
+			SetHighColor(216,216,216);
+			StrokeLine(r.RightTop(), r.RightBottom());
+			
+			SetHighColor(96,96,96);
+			StrokeLine(r.LeftTop(), r.RightTop());
+			StrokeLine(r.LeftTop(), r.LeftBottom());
+
+		}
 	}
 	else
 	{
