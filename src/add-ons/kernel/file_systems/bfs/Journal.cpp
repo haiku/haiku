@@ -181,6 +181,8 @@ Journal::blockNotify(int32 transactionID, void *arg)
 {
 	log_entry *logEntry = (log_entry *)arg;
 
+	PRINT(("Log entry %p has been finished, transaction ID = %ld\n", logEntry, transactionID));
+
 	Journal *journal = logEntry->journal;
 	disk_super_block &superBlock = journal->fVolume->SuperBlock();
 	bool update = false;
@@ -283,7 +285,6 @@ Journal::WriteLogEntry()
 	if (logEntry != NULL) {
 		logEntry->start = logStart;
 		logEntry->length = TransactionSize();
-		logEntry->cached_blocks = array->count;
 		logEntry->journal = this;
 
 		fEntriesLock.Lock();
@@ -322,7 +323,7 @@ Journal::WriteLogEntry()
 status_t 
 Journal::FlushLogAndBlocks()
 {
-	status_t status = Lock((Transaction *)this);
+	status_t status = fLock.Lock();
 	if (status != B_OK)
 		return status;
 
@@ -335,7 +336,7 @@ Journal::FlushLogAndBlocks()
 	}
 	status = fVolume->FlushDevice();
 
-	Unlock((Transaction *)this, true);
+	fLock.Unlock();
 	return status;
 }
 
