@@ -464,19 +464,23 @@ reply fields:
 
 -----------------------------------------------------------------------
 
-perform an update_mime_info() call asynchronously
+perform an update_mime_info() call
 
 target:		mime manager (BRoster::fMimeMess)
-message:	B_REG_MIME_UPDATE_MIME_INFO_ASYNC
+message:	B_REG_MIME_UPDATE_MIME_INFO
 			"entry": B_REF_TYPE
 			"recursive": B_BOOLEAN_TYPE
+			"synchronous": B_BOOLEAN_TYPE
 			"force": B_BOOLEAN_TYPE
 reply:		standard general result
 
 message fields:
 - "entry": The base entry to update.
-- "recursive": If true and "entry" is a directory, update all entries below 
-               "entry" in the hierarchy.
+- "recursive": If true and "entry" is a directory, update all entries
+  below "entry" in the hierarchy.
+- "synchronous": If true, the call will block until the operation is
+  completed. If false, the call will return immediately and the operation
+  will run asynchronously in another thread.                 
 - "force": If true, also update entries for which a BEOS:TYPE attribute
            already exists.
 
@@ -488,22 +492,39 @@ reply fields:
 
 -----------------------------------------------------------------------
 
-notify the mime manager to clean up after a now completed asynchronous
-call to update_mime_info() or create_app_meta_mime()
+perform a create_app_meta_mime() call 
 
 target:		mime manager (BRoster::fMimeMess)
-message:	B_REG_MIME_ASYNC_THREAD_FINISHED
-			"thread id": B_INT32_TYPE
+message:	B_REG_MIME_CREATE_APP_META_MIME
+			"entry": B_REF_TYPE
+			"recursive": B_BOOLEAN_TYPE
+			"synchronous": B_BOOLEAN_TYPE
+			"force": B_BOOLEAN_TYPE
 reply:		standard general result
 
 message fields:
-- "thread id": The thread id of the now finished asynchronous process.
+- "entry": The base entry to update.
+- "recursive": If true and "entry" is a directory, update all entries
+  below "entry" in the hierarchy.
+- "synchronous": If true, the call will block until the operation is
+  completed. If false, the call will return immediately and the operation
+  will run asynchronously in another thread.                 
+- "force": If true, also update entries for which meta app information
+  already exists.
 
 reply fields:
-- "result": 
-  - B_OK: All related data successfully deallocated
-  - B_ENTRY_NOT_FOUND: No such thread found in the list of asychronous threads
-  - (other error code): failure
+- "result":
+  - B_OK: The asynchronous update_mime_info() call has been successfully
+          started (and may still be running).
+  - (error code): failure
+
+-----------------------------------------------------------------------
+
+notify the thread manager to perform a clean up run
+
+target:		thread manager/mime manager (MIMEManager::fThreadManager/BRoster::fMimeMess)
+message:	B_REG_MIME_UPDATE_THREAD_FINISHED
+reply:		none (message should be sent asynchronously)
 
 
 
