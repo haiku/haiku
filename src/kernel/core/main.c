@@ -110,19 +110,16 @@ int _start(kernel_args *oldka, int cpu_num)
 
 static int main2(void *unused)
 {
-//	int err;
-
 	(void)(unused);
 
 	dprintf("start of main2: initializing devices\n");
 
-	// bootstrap all the filesystems
+	/* bootstrap all the filesystems */
 	vfs_bootstrap_all_filesystems();
 
-	dev_init(&ka);
 	module_init(&ka, NULL);
 	bus_init(&ka);
-	devs_init(&ka);
+	dev_init(&ka);
 	con_init(&ka);
 	
 	//net_init_postdev(&ka);
