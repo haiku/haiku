@@ -8,6 +8,7 @@
 
 #include <boot/partitions.h>
 #include <boot/platform.h>
+#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <unistd.h>
