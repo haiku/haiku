@@ -38,7 +38,7 @@ class DisplayDriver;
 class WinBorder : public Layer
 {
 public:
-	WinBorder(BRect r, const char *name, int32 resize, int32 flags, ServerWindow *win);
+	WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 flags, ServerWindow *win);
 	~WinBorder(void);
 	void RequestDraw(void);
 	void RequestDraw(const BRect &r);

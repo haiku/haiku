@@ -35,6 +35,7 @@
 #include "DisplayDriver.h"
 #include "Desktop.h"
 #include "WinBorder.h"
+#include "AppServer.h"	// for new_decorator()
 
 namespace winborder_private
 {
@@ -53,8 +54,8 @@ void set_is_resizing_window(bool state) { winborder_private::is_resizing_window=
 WinBorder * get_active_winborder(void) { return winborder_private::active_winborder; }
 void set_active_winborder(WinBorder *win) { winborder_private::active_winborder=win; }
 
-WinBorder::WinBorder(BRect r, const char *name, int32 resize, int32 flags, ServerWindow *win)
- : Layer(r,name,resize,flags,win)
+WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 flags, ServerWindow *win)
+ : Layer(r,name,0,flags,win)
 {
 	_mbuttons=0;
 	_win=win;
@@ -67,6 +68,8 @@ WinBorder::WinBorder(BRect r, const char *name, int32 resize, int32 flags, Serve
 	_title=new BString(name);
 	_hresizewin=false;
 	_vresizewin=false;
+
+	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver());
 }
 
 WinBorder::~WinBorder(void)
@@ -282,24 +285,24 @@ void WinBorder::MouseUp(int8 *buffer)
 
 void WinBorder::Draw(BRect update_rect)
 {
-/*	if(_update && _visible!=NULL)
+	if(_update && _visible!=NULL)
 		_is_updating=true;
 
 	_decorator->Draw(update_rect);
 
 	if(_update && _visible!=NULL)
 		_is_updating=false;
-*/
 }
 
 void WinBorder::RequestDraw(const BRect &r)
 {
+	_decorator->Draw(r);
 }
 
 void WinBorder::RequestDraw(void)
 {
-/*
-//printf("Layer %s::RequestDraw\n",name->String());
+
+printf("WinBorder %s::RequestDraw\n",_title->String());
 	if(_invalid)
 	{
 //printf("drew something\n");
@@ -310,7 +313,6 @@ void WinBorder::RequestDraw(void)
 		_invalid=NULL;
 		_is_dirty=false;
 	}
-*/
 }
 
 void WinBorder::MoveBy(BPoint pt)

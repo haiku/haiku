@@ -53,13 +53,14 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index)
 {
 	_title=new BString;
-	_title->SetTo( (string)?string:"Window" );
+	if(string)
+		_title->SetTo(string);
 	_frame=rect;
 	_flags=wflags;
 	_look=wlook;
 	_feel=wfeel;
 
-	_winborder=new WinBorder(_frame,_title->String(),0,wflags,this);
+	_winborder=new WinBorder(_frame,_title->String(),wlook,wfeel,wflags,this);
 
 	// _sender is the monitored window's event port
 	_sender=winport;
