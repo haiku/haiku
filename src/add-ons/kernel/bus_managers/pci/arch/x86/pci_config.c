@@ -119,18 +119,6 @@ pci_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 si
 }
 
 
-uint8
-pci_read_irq(uint8 bus, uint8 device, uint8 function, uint8 line)
-{
-}
-
-
-void
-pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 line, uint8 irq)
-{
-}
-
-
 uint32
 pci_mech1_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 size)
 {
