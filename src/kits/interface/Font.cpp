@@ -44,6 +44,15 @@ const BFont *be_bold_font = &sBoldFont;
 const BFont *be_fixed_font = &sFixedFont;
 
 
+extern "C" void
+_init_global_fonts()
+{
+	_font_control_(&sPlainFont,AS_SET_SYSFONT_PLAIN,NULL);
+	_font_control_(&sBoldFont,AS_SET_SYSFONT_BOLD,NULL);
+	_font_control_(&sFixedFont,AS_SET_SYSFONT_FIXED,NULL);
+}
+
+
 /*!
 	\brief Private function originally used by Be. Now used for initialization
 	\param font The font to initialize
@@ -86,9 +95,7 @@ _font_control_(BFont *font, int32 cmd, void *data)
 	link.Read<uint16>(&font->fStyleID);
 	link.Read<float>(&font->fSize);
 	link.Read<uint16>(&font->fFace);
-	
-	// we may or may not need this ultimately
-	link.Read<font_height>(&font->fHeight);
+	link.Read<uint32>(&font->fFlags);
 }
 
 
@@ -799,8 +806,23 @@ BFont::GetEdges(const char charArray[], int32 numBytes, edge_info edgeArray[]) c
 void
 BFont::GetHeight(font_height *height) const
 {
-	if (height)
-		*height = fHeight;
+	if(height)
+	{
+		// R5's version actually contacts the server in this call. The more and more
+		// I work with this class, the more and more I can't wait for R2 to fix it. Yeesh.
+		int32 code;
+		BPrivate::BAppServerLink link;
+		link.StartMessage(AS_GET_FONT_HEIGHT);
+		link.Attach<uint16>(fFamilyID);
+		link.Attach<uint16>(fStyleID);
+		link.Attach<float>(fSize);
+		link.FlushWithReply(&code);
+		
+		if(code==SERVER_FALSE)
+			return;
+		
+		link.Read<font_height>(height);
+	}
 }
 
 
