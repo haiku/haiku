@@ -156,10 +156,6 @@ private:
 	friend int	_init_roster_();
 	friend status_t _send_to_roster_(BMessage *, BMessage *, bool);
 	friend bool _is_valid_roster_mess_(bool);
-	friend status_t BMimeType::StartWatching(BMessenger);
-	friend status_t BMimeType::StopWatching(BMessenger);
-	friend status_t BClipboard::StartWatching(BMessenger);
-	friend status_t BClipboard::StopWatching(BMessenger);
 	friend void BPrivate::init_registrar_roster(BMessenger, BMessenger);
 
 	class ArgVector;
