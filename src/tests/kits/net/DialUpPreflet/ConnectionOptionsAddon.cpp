@@ -22,15 +22,12 @@ static const uint32 kMsgUpdateControls = 'UCTL';
 // labels
 #ifdef LANG_GERMAN
 static const char *kLabelConnectionOptions = "Optionen";
-static const char *kLabelDialOnDemand = "Automatisch Verbinden Bei Zugriff Auf "
-										"Internet";
-static const char *kLabelAskBeforeDialing = "Vor Dem Verbinden Fragen";
-static const char *kLabelAutoRedial = "Verbindung Automatisch Wiederherstellen";
+static const char *kLabelAskBeforeConnecting = "Vor Dem Verbinden Fragen";
+static const char *kLabelAutoReconnect = "Verbindung Automatisch Wiederherstellen";
 #else
 static const char *kLabelConnectionOptions = "Options";
-static const char *kLabelDialOnDemand = "Connect Automatically When Needed";
-static const char *kLabelAskBeforeDialing = "Ask Before Connecting";
-static const char *kLabelAutoRedial = "Reconnect Automatically";
+static const char *kLabelAskBeforeConnecting = "Ask Before Connecting";
+static const char *kLabelAutoReconnect = "Reconnect Automatically";
 #endif
 
 
@@ -56,7 +53,7 @@ bool
 ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 {
 	fIsNew = isNew;
-	fDoesDialOnDemand = fAskBeforeDialing = fDoesAutoRedial = false;
+	fAskBeforeConnecting = fDoesAutoReconnect = false;
 	fSettings = settings;
 	fProfile = profile;
 	
@@ -69,30 +66,20 @@ ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool
 	BMessage parameter;
 	int32 index = 0;
 	const char *value;
-	if(FindMessageParameter(PPP_DIAL_ON_DEMAND_KEY, *fSettings, &parameter, &index)
-			&& parameter.FindString(MDSU_VALUES, &value) == B_OK) {
+	if(FindMessageParameter(PPP_ASK_BEFORE_CONNECTING_KEY, *fSettings, &parameter,
+			&index) && parameter.FindString(MDSU_VALUES, &value) == B_OK) {
 		if(get_boolean_value(value, false))
-			fDoesDialOnDemand = true;
+			fAskBeforeConnecting = true;
 		
 		parameter.AddBool(MDSU_VALID, true);
 		fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
 	
 	index = 0;
-	if(FindMessageParameter(PPP_ASK_BEFORE_DIALING_KEY, *fSettings, &parameter, &index)
+	if(FindMessageParameter(PPP_AUTO_RECONNECT_KEY, *fSettings, &parameter, &index)
 			&& parameter.FindString(MDSU_VALUES, &value) == B_OK) {
 		if(get_boolean_value(value, false))
-			fAskBeforeDialing = true;
-		
-		parameter.AddBool(MDSU_VALID, true);
-		fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
-	}
-	
-	index = 0;
-	if(FindMessageParameter(PPP_AUTO_REDIAL_KEY, *fSettings, &parameter, &index)
-			&& parameter.FindString(MDSU_VALUES, &value) == B_OK) {
-		if(get_boolean_value(value, false))
-			fDoesAutoRedial = true;
+			fDoesAutoReconnect = true;
 		
 		parameter.AddBool(MDSU_VALID, true);
 		fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
@@ -113,9 +100,8 @@ ConnectionOptionsAddon::IsModified(bool *settings, bool *profile) const
 	if(!fSettings || !fConnectionOptionsView)
 		return;
 	
-	*settings = DoesDialOnDemand() != fConnectionOptionsView->DoesDialOnDemand()
-		|| AskBeforeDialing() != fConnectionOptionsView->AskBeforeDialing()
-		|| DoesAutoRedial() != fConnectionOptionsView->DoesAutoRedial();
+	*settings = AskBeforeConnecting() != fConnectionOptionsView->AskBeforeConnecting()
+		|| DoesAutoReconnect() != fConnectionOptionsView->DoesAutoReconnect();
 }
 
 
@@ -127,23 +113,9 @@ ConnectionOptionsAddon::SaveSettings(BMessage *settings, BMessage *profile,
 		return false;
 	
 	BMessage parameter;
-	if(fConnectionOptionsView->DoesDialOnDemand()) {
+	if(fConnectionOptionsView->DoesAutoReconnect()) {
 		parameter.MakeEmpty();
-		parameter.AddString(MDSU_NAME, PPP_DIAL_ON_DEMAND_KEY);
-		parameter.AddString(MDSU_VALUES, "enabled");
-		settings->AddMessage(MDSU_PARAMETERS, &parameter);
-		
-		if(fConnectionOptionsView->AskBeforeDialing()) {
-			parameter.MakeEmpty();
-			parameter.AddString(MDSU_NAME, PPP_ASK_BEFORE_DIALING_KEY);
-			parameter.AddString(MDSU_VALUES, "enabled");
-			settings->AddMessage(MDSU_PARAMETERS, &parameter);
-		}
-	}
-	
-	if(fConnectionOptionsView->DoesAutoRedial()) {
-		parameter.MakeEmpty();
-		parameter.AddString(MDSU_NAME, PPP_AUTO_REDIAL_KEY);
+		parameter.AddString(MDSU_NAME, PPP_AUTO_RECONNECT_KEY);
 		parameter.AddString(MDSU_VALUES, "enabled");
 		settings->AddMessage(MDSU_PARAMETERS, &parameter);
 	}
@@ -193,36 +165,25 @@ ConnectionOptionsView::ConnectionOptionsView(ConnectionOptionsAddon *addon, BRec
 	BRect rect = Bounds();
 	rect.InsetBy(10, 10);
 	rect.bottom = rect.top + 15;
-	fDialOnDemand = new BCheckBox(rect, "DialOnDemand", kLabelDialOnDemand,
-		new BMessage(kMsgUpdateControls));
-	rect.top = rect.bottom + 3;
+	fAskBeforeConnecting = new BCheckBox(rect, "AskBeforeConnecting",
+		kLabelAskBeforeConnecting, NULL);
+	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 15;
-	rect.left += 20;
-	fAskBeforeDialing = new BCheckBox(rect, "AskBeforeDialing", kLabelAskBeforeDialing,
-		NULL);
-	rect.left -= 20;
-	rect.top = rect.bottom + 20;
-	rect.bottom = rect.top + 15;
-	fAutoRedial = new BCheckBox(rect, "AutoRedial", kLabelAutoRedial, NULL);
+	fAutoReconnect = new BCheckBox(rect, "AutoReconnect", kLabelAutoReconnect, NULL);
 	
-	AddChild(fDialOnDemand);
-	AddChild(fAskBeforeDialing);
-	AddChild(fAutoRedial);
+	AddChild(fAskBeforeConnecting);
+	AddChild(fAutoReconnect);
 }
 
 
 void
 ConnectionOptionsView::Reload()
 {
-	fDialOnDemand->SetValue(Addon()->DoesDialOnDemand() || Addon()->IsNew());
-		// this is enabled by default
-	fAskBeforeDialing->SetValue(Addon()->AskBeforeDialing());
-	fAutoRedial->SetValue(Addon()->DoesAutoRedial());
+	fAskBeforeConnecting->SetValue(Addon()->AskBeforeConnecting());
+	fAutoReconnect->SetValue(Addon()->DoesAutoReconnect());
 	
 	if(!Addon()->Settings())
 		return;
-	
-	UpdateControls();
 }
 
 
@@ -230,27 +191,4 @@ void
 ConnectionOptionsView::AttachedToWindow()
 {
 	SetViewColor(Parent()->ViewColor());
-	fDialOnDemand->SetTarget(this);
-}
-
-
-void
-ConnectionOptionsView::MessageReceived(BMessage *message)
-{
-	switch(message->what) {
-		case kMsgUpdateControls:
-			UpdateControls();
-		break;
-		
-		default:
-			BView::MessageReceived(message);
-	}
-}
-
-
-void
-ConnectionOptionsView::UpdateControls()
-{
-	fAskBeforeDialing->SetEnabled(fDialOnDemand->Value());
-	fAskBeforeDialing->SetValue(fDialOnDemand->Value());
 }

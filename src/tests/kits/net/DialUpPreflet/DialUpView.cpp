@@ -3,6 +3,12 @@
  * Distributed under the terms of the MIT License.
  */
 
+/*
+	TODO:
+	- finish |[ ] "Default" | interface handling
+	- if no interface is default a newly created one becomes default
+*/
+
 #include "DialUpView.h"
 #include "DialUpAddon.h"
 
@@ -19,6 +25,8 @@
 
 #include <Alert.h>
 #include <Button.h>
+#include <CheckBox.h>
+#include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <Messenger.h>
@@ -30,6 +38,9 @@
 #include <Entry.h>
 #include <Path.h>
 
+
+// GUI constants
+static const uint32 kInterfaceFieldWidth = 175;
 
 // message constants
 static const uint32 kMsgCreateNew = 'NEWI';
@@ -44,6 +55,7 @@ static const char *kLabelInterface = "Verbindung: ";
 static const char *kLabelInterfaceName = "Verbindungs-Name: ";
 static const char *kLabelCreateNewInterface = "Neue Verbindung Erstellen";
 static const char *kLabelCreateNew = "Neu...";
+static const char *kLabelDefaultInterface = "Standard";
 static const char *kLabelDeleteCurrent = "Auswahl Löschen";
 static const char *kLabelConnect = "Verbinden";
 static const char *kLabelDisconnect = "Trennen";
@@ -53,6 +65,7 @@ static const char *kLabelInterface = "Interface: ";
 static const char *kLabelInterfaceName = "Interface Name: ";
 static const char *kLabelCreateNewInterface = "Create New Interface";
 static const char *kLabelCreateNew = "Create New...";
+static const char *kLabelDefaultInterface = "Default";
 static const char *kLabelDeleteCurrent = "Delete Current";
 static const char *kLabelConnect = "Connect";
 static const char *kLabelDisconnect = "Disconnect";
@@ -137,11 +150,17 @@ DialUpView::DialUpView(BRect frame)
 	fInterfaceMenu = new BPopUpMenu(kLabelCreateNew);
 	BRect rect = bounds;
 	rect.InsetBy(5, 5);
+	rect.right = kInterfaceFieldWidth;
 	rect.bottom = rect.top + 20;
 	fMenuField = new BMenuField(rect, "Interfaces", kLabelInterface, fInterfaceMenu);
 	fMenuField->SetDivider(StringWidth(fMenuField->Label()) + 5);
-	
-	rect.top = rect.bottom + 10;
+	rect.top += 3;
+	rect.bottom -= 2;
+	rect.left = rect.right + 5;
+	rect.right = bounds.right - 5;
+	fDefaultInterface = new BCheckBox(rect, "Default", kLabelDefaultInterface, NULL);
+	rect.left = bounds.left + 5;
+	rect.top = rect.bottom + 12;
 	rect.bottom = bounds.bottom
 		- 20 // height of bottom controls
 		- 20; // space for bottom controls
@@ -178,6 +197,7 @@ DialUpView::DialUpView(BRect frame)
 		new BMessage(kMsgConnectButton));
 	
 	AddChild(fMenuField);
+	AddChild(fDefaultInterface);
 	AddChild(fTabView);
 	AddChild(fStringView);
 	AddChild(fCreateNewButton);
@@ -229,6 +249,7 @@ DialUpView::MessageReceived(BMessage *message)
 		
 		// -------------------------------------------------
 		case kMsgCreateNew: {
+			UpdateControls();
 			(new TextRequestDialog(kLabelCreateNewInterface, kTextChooseInterfaceName,
 					kLabelInterfaceName))->Go(
 				new BInvoker(new BMessage(kMsgFinishCreateNew), this));
@@ -243,6 +264,8 @@ DialUpView::MessageReceived(BMessage *message)
 			
 			if(fCurrentItem)
 				fCurrentItem->SetMarked(true);
+			
+			UpdateControls();
 		} break;
 		// -------------------------------------------------
 		
@@ -599,6 +622,8 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 		WatchInterface(fListener.Manager().InterfaceWithName(fCurrentItem->Label()));
 	}
 	
+	UpdateControls();
+	
 	if(!fCurrentItem)
 		fSettings.LoadSettings(NULL, false);
 			// tell modules to unload all settings
@@ -637,4 +662,11 @@ DialUpView::UpdateControls()
 		fCreateNewButton->Show();
 		fConnectButton->SetEnabled(false);
 	}
+	
+	float width = fInterfaceMenu->StringWidth(fMenuField->Label())
+		+ fInterfaceMenu->StringWidth(fInterfaceMenu->Superitem()->Label()) + 30;
+	if(width > kInterfaceFieldWidth)
+		width = kInterfaceFieldWidth;
+	fDefaultInterface->MoveTo(fMenuField->Frame().left + width,
+		fDefaultInterface->Frame().top);
 }

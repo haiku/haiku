@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
-#ifndef _TEXT_REQUEST_DIALOG__H
-#define _TEXT_REQUEST_DIALOG__H
+#ifndef _TEXT_REQUEST_CONNECTOG__H
+#define _TEXT_REQUEST_CONNECTOG__H
 
 #include <Window.h>
 

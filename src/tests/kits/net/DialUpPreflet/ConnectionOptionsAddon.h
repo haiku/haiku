@@ -27,12 +27,10 @@ class ConnectionOptionsAddon : public DialUpAddon {
 		bool IsNew() const
 			{ return fIsNew; }
 		
-		bool DoesDialOnDemand() const
-			{ return fDoesDialOnDemand; }
-		bool AskBeforeDialing() const
-			{ return fAskBeforeDialing; }
-		bool DoesAutoRedial() const
-			{ return fDoesAutoRedial; }
+		bool AskBeforeConnecting() const
+			{ return fAskBeforeConnecting; }
+		bool DoesAutoReconnect() const
+			{ return fDoesAutoReconnect; }
 		
 		BMessage *Settings() const
 			{ return fSettings; }
@@ -50,7 +48,7 @@ class ConnectionOptionsAddon : public DialUpAddon {
 
 	private:
 		bool fIsNew, fDeleteView;
-		bool fDoesDialOnDemand, fAskBeforeDialing, fDoesAutoRedial;
+		bool fAskBeforeConnecting, fDoesAutoReconnect;
 		BMessage *fSettings, *fProfile;
 			// saves last settings state
 		ConnectionOptionsView *fConnectionOptionsView;
@@ -65,22 +63,16 @@ class ConnectionOptionsView : public BView {
 			{ return fAddon; }
 		void Reload();
 		
-		bool DoesDialOnDemand() const
-			{ return fDialOnDemand->Value(); }
-		bool AskBeforeDialing() const
-			{ return fAskBeforeDialing->Value(); }
-		bool DoesAutoRedial() const
-			{ return fAutoRedial->Value(); }
+		bool AskBeforeConnecting() const
+			{ return fAskBeforeConnecting->Value(); }
+		bool DoesAutoReconnect() const
+			{ return fAutoReconnect->Value(); }
 		
 		virtual void AttachedToWindow();
-		virtual void MessageReceived(BMessage *message);
-
-	private:
-		void UpdateControls();
 
 	private:
 		ConnectionOptionsAddon *fAddon;
-		BCheckBox *fDialOnDemand, *fAskBeforeDialing, *fAutoRedial;
+		BCheckBox *fAskBeforeConnecting, *fAutoReconnect;
 };
 
 

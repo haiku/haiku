@@ -11,7 +11,7 @@
 #include "DialUpView.h"
 
 
-static const char *kSignature = "application/x-vnd.haiku.dial-up-preflet";
+static const char *kSignature = "application/x-vnd.haiku.connect-up-preflet";
 
 
 class DialUpApplication : public BApplication {

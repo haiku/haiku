@@ -55,6 +55,7 @@ class DialUpView : public BView {
 		BButton *fConnectButton, *fCreateNewButton;
 		BPopUpMenu *fInterfaceMenu;
 		BMenuField *fMenuField;
+		BCheckBox *fDefaultInterface;
 		BStringView *fStringView;
 			// shows "No interfaces found..." notice
 		BTabView *fTabView;

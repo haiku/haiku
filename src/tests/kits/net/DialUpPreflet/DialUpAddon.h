@@ -6,7 +6,7 @@
 /*!	\class DialUpAddon
 	\brief Base class for DialUpPreflet add-ons.
 	
-	Dial-Up add-ons must export the following function: \n
+	Connect-Up add-ons must export the following function: \n
 	bool register(BMessage *addons) \n
 	You should add your DialUpAddon object to the given BMessage. \n
 	\n
