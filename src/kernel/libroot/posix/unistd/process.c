@@ -73,6 +73,13 @@ setpgid(pid_t process, pid_t group)
 }
 
 
+int
+setpgrp(void)
+{
+	return setpgid(0, 0);	
+}
+
+
 pid_t 
 setsid(void)
 {
