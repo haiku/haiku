@@ -20,9 +20,9 @@ extern "C" {
 
 #ifndef __HAIKU__
 void    _kdprintf_(const char *format, ...);
-#define dprintf _kdprintf_
+#define dprintf		_kdprintf_
 #else
-#define dprintf		debug_printf
+#define dprintf		_sPrintf
 #endif
 
 extern int debug_level_flow;
