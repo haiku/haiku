@@ -14,6 +14,7 @@
 #include <boot/stdio.h>
 
 #include <unistd.h>
+#include <string.h>
 
 #ifndef BOOT_ARCH
 #	error BOOT_ARCH has to be defined to differentiate the kernel per platform
@@ -88,12 +89,12 @@ load_kernel(stage2_args *args, Directory *volume)
 }
 
 
-status_t 
-load_modules(stage2_args *args, Directory *volume)
+static status_t
+load_modules_from(Directory *volume, const char *path)
 {
 	// we don't have readdir() & co. yet...
 
-	int fd = open_from(volume, "beos/system/add-ons/kernel/boot", O_RDONLY);
+	int fd = open_from(volume, path, O_RDONLY);
 	if (fd < B_OK)
 		return fd;
 
@@ -104,10 +105,33 @@ load_modules(stage2_args *args, Directory *volume)
 	void *cookie;
 	if (modules->Open(&cookie, O_RDONLY) == B_OK) {
 		char name[B_FILE_NAME_LENGTH];
-		while (modules->GetNextEntry(cookie, name, sizeof(name)) == B_OK)
-			printf("\t%s\n", name);
+		while (modules->GetNextEntry(cookie, name, sizeof(name)) == B_OK) {
+			if (!strcmp(name, ".") || !strcmp(name, ".."))
+				continue;
+
+			status_t status = elf_load_image(modules, name);
+			if (status != B_OK)
+				dprintf("Could not load \"%s\" error %ld\n", name, status);
+		}
 
 		modules->Close(cookie);
+	}
+
+	return B_OK;
+}
+
+
+status_t 
+load_modules(stage2_args *args, Directory *volume)
+{
+	const char *paths[] = {
+		"beos/system/add-ons/kernel/boot",
+		"home/config/add-ons/kernel/boot",
+		NULL
+	};
+	
+	for (int32 i = 0; paths[i]; i++) {
+		load_modules_from(volume, paths[i]);
 	}
 
 	return B_OK;
