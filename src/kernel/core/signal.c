@@ -123,25 +123,12 @@ handle_signals(struct thread *thread, int state)
 }
 
 
-int
-send_signal_etc(pid_t threadID, uint signal, uint32 flags)
+static status_t
+deliver_signal(struct thread *thread, uint signal, uint32 flags)
 {
-	struct thread *thread;
-	cpu_status state;
-
-	if (signal < 1 || signal > MAX_SIGNO)
-		return B_BAD_VALUE;
-
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-
-	thread = thread_get_thread_struct_locked(threadID);
-	if (!thread) {
-		RELEASE_THREAD_LOCK();
-		restore_interrupts(state);
-		return B_BAD_THREAD_ID;
+	if (flags & B_CHECK_PERMISSION) {
+		// ToDo: introduce euid & uid fields to the team and check permission
 	}
-	// XXX check permission
 
 	if (thread->team == team_get_kernel_team()) {
 		// Signals to kernel threads will only wake them up
@@ -149,57 +136,134 @@ send_signal_etc(pid_t threadID, uint signal, uint32 flags)
 			thread->state = thread->next_state = B_THREAD_READY;
 			scheduler_enqueue_in_run_queue(thread);
 		}
-	} else {
-		thread->sig_pending |= SIGNAL_TO_MASK(signal);
-
-		switch (signal) {
-			case SIGKILL:
-			{
-				struct thread *mainThread = thread->team->main_thread;
-				// Forward KILLTHR to the main thread of the team
-
-				mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
-				// Wake up main thread
-				if (mainThread->state == B_THREAD_SUSPENDED) {
-					mainThread->state = mainThread->next_state = B_THREAD_READY;
-					scheduler_enqueue_in_run_queue(mainThread);
-				} else if (mainThread->state == B_THREAD_WAITING)
-					sem_interrupt_thread(mainThread);
-
-				// Supposed to fall through
-			}
-			case SIGKILLTHR:
-				// Wake up suspended threads and interrupt waiting ones
-				if (thread->state == B_THREAD_SUSPENDED) {
-					thread->state = thread->next_state = B_THREAD_READY;
-					scheduler_enqueue_in_run_queue(thread);
-				} else if (thread->state == B_THREAD_WAITING)
-					sem_interrupt_thread(thread);
-				break;
-			case SIGCONT:
-				// Wake up thread if it was suspended
-				if (thread->state == B_THREAD_SUSPENDED) {
-					thread->state = thread->next_state = B_THREAD_READY;
-					scheduler_enqueue_in_run_queue(thread);
-				}
-				break;
-			default:
-				if (thread->sig_pending & (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
-					// Interrupt thread if it was waiting
-					if (thread->state == B_THREAD_WAITING)
-						sem_interrupt_thread(thread);
-				}
-				break;
-		}
+		return B_OK;
 	}
-	
-	if (!(flags & B_DO_NOT_RESCHEDULE))
+
+	thread->sig_pending |= SIGNAL_TO_MASK(signal);
+
+	switch (signal) {
+		case SIGKILL:
+		{
+			struct thread *mainThread = thread->team->main_thread;
+			// Forward KILLTHR to the main thread of the team
+
+			mainThread->sig_pending |= SIGNAL_TO_MASK(SIGKILLTHR);
+			// Wake up main thread
+			if (mainThread->state == B_THREAD_SUSPENDED) {
+				mainThread->state = mainThread->next_state = B_THREAD_READY;
+				scheduler_enqueue_in_run_queue(mainThread);
+			} else if (mainThread->state == B_THREAD_WAITING)
+				sem_interrupt_thread(mainThread);
+
+			// Supposed to fall through
+		}
+		case SIGKILLTHR:
+			// Wake up suspended threads and interrupt waiting ones
+			if (thread->state == B_THREAD_SUSPENDED) {
+				thread->state = thread->next_state = B_THREAD_READY;
+				scheduler_enqueue_in_run_queue(thread);
+			} else if (thread->state == B_THREAD_WAITING)
+				sem_interrupt_thread(thread);
+			break;
+		case SIGCONT:
+			// Wake up thread if it was suspended
+			if (thread->state == B_THREAD_SUSPENDED) {
+				thread->state = thread->next_state = B_THREAD_READY;
+				scheduler_enqueue_in_run_queue(thread);
+			}
+			break;
+		default:
+			if (thread->sig_pending & (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
+				// Interrupt thread if it was waiting
+				if (thread->state == B_THREAD_WAITING)
+					sem_interrupt_thread(thread);
+			}
+			break;
+	}
+	return B_OK;
+}
+
+
+int
+send_signal_etc(pid_t id, uint signal, uint32 flags)
+{
+	status_t status = B_BAD_THREAD_ID;
+	struct thread *thread;
+	cpu_status state;
+
+	if (signal < 1 || signal > MAX_SIGNO)
+		return B_BAD_VALUE;
+
+	if (id == 0) {
+		// send a signal to the current team
+		id = thread_get_current_thread()->team->main_thread->id;
+	}
+
+	state = disable_interrupts();
+
+	if (id > 0) {
+		// send a signal to the specified thread
+
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(id);
+		if (thread != NULL)
+			status = deliver_signal(thread, signal, flags);
+	} else {
+		// send a signal to the specified process group
+		// (the absolute value of the id)
+
+		GRAB_THREAD_LOCK();
+
+		thread = thread_get_thread_struct_locked(id);
+		if (thread != NULL) {
+			struct process_group *group;
+			struct team *team, *next;
+
+			// we need a safe way to get from the thread to the process group
+			id = thread->team->id;
+
+			RELEASE_THREAD_LOCK();
+			GRAB_TEAM_LOCK();
+
+			// get a pointer to the process group
+			team = team_get_team_struct_locked(id);
+			group = team->group;
+
+			for (team = group->teams; team != NULL; team = next) {
+				// ToDo: there is a *big* race condition here on SMP machines;
+				// the team pointer will probably have gone bad in the mean time
+				next = team->group_next;
+				id = team->main_thread->id;
+
+				RELEASE_TEAM_LOCK();
+				GRAB_THREAD_LOCK();
+
+				thread = thread_get_thread_struct_locked(id);
+				if (thread != NULL) {
+					// we don't stop because of an error sending the signal; we
+					// rather want to send as much signals as possible
+					status = deliver_signal(thread, signal, flags);
+				}
+
+				RELEASE_THREAD_LOCK();
+				GRAB_TEAM_LOCK();
+			}
+			
+			RELEASE_TEAM_LOCK();
+			GRAB_THREAD_LOCK();
+		}
+	}		
+
+	// ToDo: maybe the scheduler should only be invoked is there is reason to do it?
+	//	(ie. deliver_signal() moved some threads in the running queue?)
+	if ((flags & B_DO_NOT_RESCHEDULE) == 0)
 		scheduler_reschedule();
 
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	return B_OK;
+	return status;
 }
 
 
@@ -345,7 +409,7 @@ _user_set_alarm(bigtime_t time, uint32 mode)
 int
 _user_send_signal(pid_t team, uint signal)
 {
-	return send_signal(team, signal);
+	return send_signal_etc(team, signal, B_CHECK_PERMISSION);
 }
 
 
