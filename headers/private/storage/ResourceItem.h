@@ -10,7 +10,7 @@
 #ifndef _sk_resource_item_h_
 #define _sk_resource_item_h_
 
-#include <MallocIO.h>
+#include <DataIO.h>
 #include <String.h>
 
 namespace StorageKit {
