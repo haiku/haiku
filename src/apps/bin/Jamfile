@@ -86,6 +86,7 @@ SubInclude OBOS_TOP src apps bin compress ;
 SubInclude OBOS_TOP src apps bin coreutils-5.0 ;
 SubInclude OBOS_TOP src apps bin desklink ;
 SubInclude OBOS_TOP src apps bin diffutils-2.8.1 ;
+SubInclude OBOS_TOP src apps bin findutils ;
 SubInclude OBOS_TOP src apps bin flex ;
 SubInclude OBOS_TOP src apps bin gawk ;
 #SubInclude OBOS_TOP src apps bin gnu ;
