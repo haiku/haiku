@@ -241,7 +241,7 @@ TMailApp::AboutRequested()
 	(new BAlert("",
 		"BeMail\nBy Robert Polic\n\n"
 		"Enhanced by Axel Dörfler and the Dr. Zoidberg crew\n\n"
-		"Mail.cpp $Revision: 1.2 $\n"
+		"Mail.cpp $Revision: 1.3 $\n"
 		"Compiled on " __DATE__ " at " __TIME__ ".",
 		"Close"))->Go();
 }
@@ -781,7 +781,9 @@ TMailApp::CheckForSpamFilterExistence()
 		for (addonNameIndex = 0; B_OK == settingsMessage.FindString (
 			"filter_addons", addonNameIndex, &addonNamePntr);
 			addonNameIndex++) {
-			if (strstr (addonNamePntr, "SpamFilter") != NULL) {
+			printf("%s\n", addonNamePntr);
+			if (strstr (addonNamePntr, "Spam Filter") != NULL) {
+				printf("Found it\n");
 				gShowSpamGUI = true; // Found it!
 				return;
 			}
