@@ -1,5 +1,5 @@
 
-resource app_signature "application/x-vnd.OpenBeOS.midi-server";
+resource app_signature "application/x-vnd.haiku.midi-server";
 
 resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;
 
@@ -11,7 +11,7 @@ resource app_version
 	variety    = B_APPV_ALPHA,
 	internal   = 0,
 	short_info = "midi_server",
-	long_info  = "OpenBeOS - midi_server"
+	long_info  = "Haiku midi_server"
 };
 
 resource(10, "bus_large") #'ICON' array

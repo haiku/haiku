@@ -82,18 +82,18 @@ int32 MidiPortProducer::SpawnThread(void* data)
 int32 MidiPortProducer::GetData()
 {
 	uint8 msgBuf[3];
-	uint8* sysexBuf;
+	uint8* sysexBuf = NULL;
 
-	uint8* msgPtr;
-	size_t msgSize;
+	uint8* msgPtr = NULL;
+	size_t msgSize = 0;
 	size_t needed = 0;
 	uint8 runningStatus = 0;
 
 	bool haveSysEx = false;
-	size_t sysexAlloc;
-	size_t sysexSize;
+	size_t sysexAlloc = 0;
+	size_t sysexSize = 0;
 
-	uint8 next;
+	uint8 next = 0;
 
 	while (keepRunning)
 	{

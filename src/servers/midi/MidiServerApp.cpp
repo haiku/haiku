@@ -33,7 +33,7 @@
 MidiServerApp::MidiServerApp()
 	: BApplication(MIDI_SERVER_SIGNATURE)
 {
-	TRACE(("Running OpenBeOS MIDI server"))
+	TRACE(("Running Haiku MIDI server"))
 
 	nextId = 1;
 	devWatcher.Start();
@@ -59,7 +59,7 @@ MidiServerApp::~MidiServerApp()
 void MidiServerApp::AboutRequested()
 {
 	(new BAlert(0,
-		"OpenBeOS midi_server\n\n"
+		"Haiku midi_server 1.0.0 alpha\n\n"
 		"notes disguised as bytes\n"
 		"propagating to endpoints,\n"
 		"an aural delight",
