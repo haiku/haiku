@@ -8,6 +8,7 @@
 #include <List.h>
 
 class PortLinkData;
+class PortMessage;
 
 class PortLink
 {
@@ -31,6 +32,8 @@ public:
 	int8* FlushWithReply(int32 *code, status_t *status, ssize_t *buffersize,
 		bigtime_t timeout=B_INFINITE_TIMEOUT);
 	status_t FlushWithReply(PortLink::ReplyData *data,bigtime_t timeout=B_INFINITE_TIMEOUT);
+	status_t FlushWithReply(PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT);
+	
 	status_t Attach(const void *data, size_t size);
 	status_t Attach(int32 data);
 	status_t Attach(int16 data);

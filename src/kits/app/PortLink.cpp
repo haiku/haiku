@@ -24,7 +24,8 @@
 //	Description:	A helper class for port-based messaging
 //
 //------------------------------------------------------------------------------
-#include "PortLink.h"
+#include <PortLink.h>
+#include <PortMessage.h>
 #include <string.h>
 #include <stdio.h>
 #include <malloc.h>
@@ -392,6 +393,94 @@ printf("\tFlushWithReply(): unable to assign reply port to data\n");
 	}
 
 	// We got this far, so we apparently have some data
+	return B_OK;
+}
+
+status_t PortLink::FlushWithReply(PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT)
+{
+#ifdef PLDEBUG
+printf("PortLink::FlushWithReply(PortMessage*,bigtime_t)\n");
+#endif
+	// Fires a message to the target and then waits for a reply. The target will
+	// receive a message with the first item being the port_id to reply to.
+
+	// Effectively, an Attach() call inlined for changes
+	if(!port_ok || !msg)
+	{
+#ifdef PLDEBUG
+printf("\tFlushWithReply(): invalid port\n");
+#endif
+		return B_BAD_VALUE;
+	}
+
+	// create a new storage object and stash the data
+	PortLinkData *pld=new PortLinkData;
+	if(pld->Set(&replyport,sizeof(port_id))==B_OK)
+	{
+		bufferlength+=sizeof(port_id);
+	}
+	else
+	{
+#ifdef PLDEBUG
+printf("\tFlushWithReply(): unable to assign reply port to data\n");
+#endif
+		delete pld;
+		return B_ERROR;
+	}
+
+	// Flatten() inlined to make some necessary changes
+	int8 *buffer=new int8[bufferlength];
+	int8 *bufferindex=buffer;
+	size_t size=0;
+
+	// attach our port_id first
+	memcpy(bufferindex, pld->buffer, pld->buffersize);
+	bufferindex += pld->buffersize;
+	size+=pld->buffersize;
+
+	// attach everything else
+	for(int i=0;i<attachlist->CountItems();i++)
+	{
+		pld=(PortLinkData*)attachlist->ItemAt(i);
+		memcpy(bufferindex, pld->buffer, pld->buffersize);
+		bufferindex += pld->buffersize;
+		size+=pld->buffersize;
+	}
+
+	// Flush the thing....FOOSH! :P
+	write_port(target,opcode,buffer,size);
+	MakeEmpty();
+	delete buffer;
+	
+	// Now we wait for the reply
+	ssize_t rbuffersize;
+	int8 *rbuffer=NULL;
+	int32 rcode;
+	
+	if(timeout==B_INFINITE_TIMEOUT)
+	{
+		rbuffersize=port_buffer_size(replyport);
+		if(rbuffersize>0)
+			rbuffer=(int8*)new int8[rbuffersize];
+
+		read_port(replyport,&rcode,rbuffer,rbuffersize);
+	}
+	else
+	{
+		rbuffersize=port_buffer_size_etc(replyport,0,timeout);
+		if(rbuffersize==B_TIMED_OUT)
+			return B_TIMED_OUT;
+
+		if(rbuffersize>0)
+			rbuffer=(int8*)new int8[rbuffersize];
+
+		read_port(replyport,&rcode,rbuffer,rbuffersize);
+	}
+
+	// We got this far, so we apparently have some data
+	msg->SetCode(rcode);
+	msg->SetBuffer(rbuffer,rbuffersize,false);
+	
 	return B_OK;
 }
 
