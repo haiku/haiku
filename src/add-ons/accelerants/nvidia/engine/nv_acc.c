@@ -465,12 +465,22 @@ status_t nv_acc_init()
 	}
 	if (si->ps.card_arch >= NV20A)
 	{
-		/* fixme(?): assuming more BLIMIT registers here: Then how about BBASE6-9?
-		 * (linux fixed value 'BLIMIT6-9' 0x01ffffff) */
-		ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
-		ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
-		ACCW(NV20_BLIMIT8, (si->ps.memory_size - 1));
-		ACCW(NV20_BLIMIT9, (si->ps.memory_size - 1));
+		if (si->ps.card_type > NV40)
+		{
+			ACCW(NV40P_BLIMIT6, (si->ps.memory_size - 1));
+			ACCW(NV40P_BLIMIT7, (si->ps.memory_size - 1));
+		}
+		else
+		{
+			/* fixme(?): assuming more BLIMIT registers here: Then how about BBASE6-9? */
+			ACCW(NV20_BLIMIT6, (si->ps.memory_size - 1));
+			ACCW(NV20_BLIMIT7, (si->ps.memory_size - 1));
+			if (si->ps.card_type < NV40)
+			{
+				ACCW(NV20_BLIMIT8, (si->ps.memory_size - 1));
+				ACCW(NV20_BLIMIT9, (si->ps.memory_size - 1));
+			}
+		}
 	}
 
 	/* disable all acceleration engine INT reguests */
@@ -687,7 +697,6 @@ status_t nv_acc_init()
 		break;
 	case NV20A:
 	case NV30A:
-	case NV40A:
 		/* location of active screen in framebuffer */
 		ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
 		ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
@@ -699,6 +708,34 @@ status_t nv_acc_init()
 		ACCW(NV20_PITCH1, (si->fbc.bytes_per_row & 0x0000ffff));
 		ACCW(NV20_PITCH2, (si->fbc.bytes_per_row & 0x0000ffff));
 		ACCW(NV20_PITCH3, (si->fbc.bytes_per_row & 0x0000ffff));
+		break;
+	case NV40A:
+		if (si->ps.card_type == NV40)
+		{
+			/* location of active screen in framebuffer */
+			ACCW(NV20_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+			ACCW(NV20_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+			//ACCW(NV20_OFFSET2, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+			//ACCW(NV20_OFFSET3, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+
+			/* setup buffer pitch */
+			//fixme?
+			ACCW(NV20_PITCH0, (si->fbc.bytes_per_row & 0x0000ffff));
+			ACCW(NV20_PITCH1, (si->fbc.bytes_per_row & 0x0000ffff));
+			ACCW(NV20_PITCH2, (si->fbc.bytes_per_row & 0x0000ffff));
+			ACCW(NV20_PITCH3, (si->fbc.bytes_per_row & 0x0000ffff));
+		}
+		else
+		{
+			/* location of active screen in framebuffer */
+			ACCW(NV40P_OFFSET0, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+			ACCW(NV40P_OFFSET1, ((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer));
+
+			/* setup buffer pitch */
+			//fixme?
+			ACCW(NV40P_PITCH0, (si->fbc.bytes_per_row & 0x0000ffff));
+			ACCW(NV40P_PITCH1, (si->fbc.bytes_per_row & 0x0000ffff));
+		}
 		break;
 	}
 
@@ -724,8 +761,23 @@ status_t nv_acc_init()
 		if (si->ps.card_arch >= NV20A)
 		{
 			/* unknown: */
-			ACCW(NV20_WHAT0, ACCR(NV20_FBWHAT0));
-			ACCW(NV20_WHAT1, ACCR(NV20_FBWHAT1));
+			if (si->ps.card_type > NV40)
+			{
+				ACCW(NV40P_WHAT_T0, ACCR(NV20_FBWHAT0));
+				ACCW(NV40P_WHAT_T1, ACCR(NV20_FBWHAT1));
+				ACCW(NV40P_WHAT_T2, ACCR(NV20_FBWHAT0));
+				ACCW(NV40P_WHAT_T3, ACCR(NV20_FBWHAT1));
+			}
+			else
+			{
+				ACCW(NV20_WHAT_T0, ACCR(NV20_FBWHAT0));
+				ACCW(NV20_WHAT_T1, ACCR(NV20_FBWHAT1));
+				if (si->ps.card_type == NV40)
+				{
+					ACCW(NV40_WHAT_T2, ACCR(NV20_FBWHAT0));
+					ACCW(NV40_WHAT_T3, ACCR(NV20_FBWHAT1));
+				}
+			}
 		}
 		/* tile 0: */
 		/* tile invalid, tile adress = $00000 (18bit) */
