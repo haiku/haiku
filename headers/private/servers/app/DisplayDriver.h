@@ -132,6 +132,11 @@ public:
 	void SetSize(const int32 &w, const int32 &h) { _width=w; _height=h; }
 	void SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
 	void SetBitsPerPixel(color_space space,int32 bytesperline) { _HandleSpace(space,bytesperline); }
+	void ShallowCopy(const FBBitmap *from)
+	{
+		ServerBitmap::ShallowCopy((ServerBitmap*)from);
+		SetBuffer(from->Bits());
+	}
 };
 
 /*!
@@ -268,6 +273,10 @@ protected:
 	// for a set of glyph-blitting virtual functions for each driver.
 	virtual bool AcquireBuffer(FBBitmap *bmp);
 	virtual void ReleaseBuffer(void);
+	
+	// This is for drivers which are internally double buffered and calling this will cause the real
+	// framebuffer to be updated
+	virtual void Invalidate(const BRect &r);
 	
 	void FillArc(const BRect &r, const float &angle, const float &span, DisplayDriver*, SetHorizontalLineFuncType setLine);
 	void FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontalLineFuncType setLine);

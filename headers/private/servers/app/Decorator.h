@@ -122,7 +122,7 @@ protected:
 	
 	ColorSet *_colors;
 	DisplayDriver *_driver;
-	LayerData _layerdata;
+	DrawData _drawdata;
 	int32 _look, _feel, _flags;
 	BRect _zoomrect,_closerect,_minimizerect,_tabrect,_frame,
 		_resizerect,_borderrect;

@@ -88,6 +88,25 @@ public:
 	//! Returns the identifier token for the bitmap
 	int32 Token(void) const { return _token; }
 	
+	//! Does a shallow copy of the bitmap passed to it
+	void ShallowCopy(const ServerBitmap *from)
+	{
+		if(!from)
+			return;
+		
+		_initialized=from->_initialized;
+		_area=from->_area;
+		_buffer=from->_buffer;
+		_width=from->_width;
+		_height=from->_height;
+		_bytesperrow=from->_bytesperrow;
+		_space=from->_space;
+		_flags=from->_flags;
+		_bpp=from->_bpp;
+		_token=from->_token;
+		_offset=from->_offset;
+	}
+	
 protected:
 	friend class BitmapManager;
 	friend class PicturePlayer;
