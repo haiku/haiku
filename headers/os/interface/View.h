@@ -600,6 +600,10 @@ private:
 			bool		removeFromList();
 			bool		callDetachHooks( BView *aView );			
 
+				// Debugging methods
+			void 		PrintToStream();
+			void		PrintTree();
+
 			int32			server_token;
 			uint32			fFlags;			// used		// was: f_type
 			float			originX;		// used		// was: origin_h
@@ -671,9 +675,8 @@ inline void	BView::SetLowColor(uchar r, uchar g, uchar b, uchar a)
 #endif	// _VIEW_H
 
 /*
- * $Log $
- *
- * $Id  $
- *
+ @log
+	* added PrintToStream() method for debugging BView.
+ 
  */
 
