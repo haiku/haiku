@@ -26,16 +26,24 @@ if ! $(INVOCATION_SUBDIR_SET) {
 
 } # vanilla Jam compatibility
 
+# The directory for build system specific files
+OBOS_BUILD_DIR = [ FDirName $(OBOS_TOP) build ] ;
+
+# Cache files for header scanning and jamfile caching
+HCACHEFILE = header_cache ;
+JCACHEFILE = jamfile_cache ;
+LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(OBOS_BUILD_DIR) ;
 
 # Include BuildConfig
 {
-	local buildConfig = [ GLOB $(OBOS_TOP) : BuildConfig ] ;
+	local buildConfig = [ GLOB $(OBOS_BUILD_DIR) : BuildConfig ] ;
 	if ! $(buildConfig)
 	{
-		EXIT "No BuildConfig!"
-			 "Run ./configure in the source tree's root directory first!" ;
+		ECHO "No BuildConfig found in $(OBOS_BUILD_DIR)!" ;
+		EXIT "Run ./configure in the source tree's root directory first!" ;
 	}
-	include $(buildConfig) ;
+	LOCATE on BuildConfig = $(OBOS_BUILD_DIR) ;
+	include BuildConfig ;
 }
 
 # We do not include any local BeOS system headers by default
