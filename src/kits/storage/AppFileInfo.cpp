@@ -52,10 +52,10 @@ enum {
 	B_VERSION_INFO_TYPE	= 'APPV',
 };
 
-
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
+// debugging
+//#define DBG(x) x
+#define DBG(x)
+#define OUT	printf
 
 // constructor
 /*!	\brief Creates an uninitialized BAppFileInfo object.

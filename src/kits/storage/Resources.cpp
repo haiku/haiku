@@ -18,6 +18,7 @@
 #include <Resources.h>
 
 #include <new>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "ResourceFile.h"
@@ -27,9 +28,10 @@
 using namespace BPrivate::Storage;
 using namespace std;
 
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
+// debugging
+//#define DBG(x) x
+#define DBG(x)
+#define OUT	printf
 
 // constructor
 /*!	\brief Creates an unitialized BResources object.
