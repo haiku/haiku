@@ -1,0 +1,27 @@
+SubDir OBOS_TOP src tests kits storage disk_device ;
+
+UsePrivateHeaders app ;
+UsePrivateHeaders shared ;
+UsePrivateHeaders storage ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits app ]
+				 [ FDirName $(OBOS_TOP) src kits storage ] ;
+
+SimpleTest DiskDeviceTest
+	: DiskDeviceTest.cpp
+
+	  # We compile these classes in. If we would link against libopenbeos
+	  # instead, we couldn't use any GUI. At least not at this time.
+	  #
+	  DiskDevice.cpp
+	  DiskDevicePrivate.cpp
+	  DiskDeviceRoster.cpp
+	  DiskDeviceVisitor.cpp
+	  Mime.cpp
+	  Partition.cpp
+	  RegistrarDefs.cpp
+	  RosterPrivate.cpp
+	  Session.cpp
+
+	: be
+;
