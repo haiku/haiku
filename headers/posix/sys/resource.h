@@ -53,7 +53,7 @@ struct rusage {
 extern "C" {
 #endif
 
-extern int getrusage(int processes, struct rusage *rusage);
+extern int getrusage(int who, struct rusage *rusage);
 
 extern int getrlimit(int resource, struct rlimit * rlp);
 extern int setrlimit(int resource, const struct rlimit * rlp);
