@@ -457,8 +457,7 @@ team_create_team2(void *args)
 
 	for (arg_cnt = 0; arg_cnt < teamArgs->argc; arg_cnt++) {
 		uargs[arg_cnt] = udest;
-		user_strcpy(udest, teamArgs->args[arg_cnt]);
-		udest += (strlen(teamArgs->args[arg_cnt]) + 1);
+		udest += user_strlcpy(udest, teamArgs->args[arg_cnt], totalSize) + 1;
 	}
 	uargs[arg_cnt] = NULL;
 
@@ -467,9 +466,10 @@ team_create_team2(void *args)
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
 //	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", teamArgs->envc, (void *)teamArgs->envp);
 	for (env_cnt = 0; env_cnt < teamArgs->envc; env_cnt++) {
-		udest -= (strlen(teamArgs->envp[env_cnt]) + 1);
+		size_t length = strlen(teamArgs->envp[env_cnt]) + 1;
+		udest -= length;
 		uenv[env_cnt] = udest;
-		user_strcpy(udest, teamArgs->envp[env_cnt]);
+		user_memcpy(udest, teamArgs->envp[env_cnt], length);
 	}
 	uenv[env_cnt] = NULL;
 
