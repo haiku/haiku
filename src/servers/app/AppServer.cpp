@@ -149,7 +149,7 @@ AppServer::AppServer(void)
 	fDecoratorLock= create_sem(1,"app_server_decor_sem");
 	
 	// Spawn our thread-monitoring thread
-	fPicassoThreadID= spawn_thread(PicassoThread,"Picasso", B_NORMAL_PRIORITY, this);
+	fPicassoThreadID= spawn_thread(PicassoThread,"picasso", B_NORMAL_PRIORITY, this);
 	if (fPicassoThreadID >= 0)
 		resume_thread(fPicassoThreadID);
 
@@ -229,6 +229,7 @@ int32 AppServer::PicassoThread(void *data)
 thread_id AppServer::Run(void)
 {
 	MainLoop();
+	kill_thread(fPicassoThreadID);
 	return 0;
 }
 

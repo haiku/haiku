@@ -26,7 +26,7 @@ class BitmapManager;
 	application start and quit messages. It also starts the housekeeping threads
 	and initializes most of the server's globals.
 */
-#if DISPLAYDRIVER == HWDRIVER
+#ifndef TEST_MODE
 class AppServer
 #else
 class AppServer : public BApplication
