@@ -128,8 +128,38 @@ static status_t
 get_audio_format(tobias_stream_header * header, media_format * format)
 {
 	TRACE("  get_audio_format\n");
-	debugger("get_audio_format");
-	return B_UNSUPPORTED;
+	// get the format for the description
+	media_format_description description = tobias_audio_description();
+	unsigned int wav_id = 0;
+	sscanf(header->subtype, "%04x", &wav_id);
+	description.u.wav.codec = wav_id;
+	BMediaFormats formats;
+	status_t result = formats.InitCheck();
+	if (result == B_OK) {
+		result = formats.GetFormatFor(description, format);
+	}
+	if (result != B_OK) {
+		*format = tobias_audio_encoded_media_format();
+		// ignore error, allow user to use ReadChunk interface
+	}
+
+	// fill out format from header packet
+	format->user_data_type = B_CODEC_TYPE_INFO;
+	strncpy((char*)format->user_data, header->subtype, 4);
+	format->u.encoded_audio.bit_rate = header->audio.avgbytespersec * 8;
+	if (header->audio.channels == 1) {
+		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT;
+	} else {
+		format->u.encoded_audio.multi_info.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+	}
+	format->u.encoded_audio.output.frame_rate = header->samples_per_unit * 10000000.0 / header->time_unit;
+	format->u.encoded_audio.output.channel_count = header->audio.channels;
+	format->u.encoded_audio.output.buffer_size
+	  = AudioBufferSize(&format->u.encoded_audio.output);
+
+	// TODO: wring more info out of the headers
+
+	return B_OK;
 }
 
 
@@ -216,7 +246,7 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	format->SetMetaData((void*)&GetHeaderPackets(),sizeof(GetHeaderPackets()));
 	fMediaFormat = *format;
 	fMicrosecPerFrame = header->time_unit / 10.0;
-	fFrameRate = 1000000.0 / fMicrosecPerFrame;
+	fFrameRate = header->samples_per_unit * 1000000.0 / fMicrosecPerFrame;
 	
 	// TODO: count the frames in the first page.. somehow.. :-/
 	int64 frames = 0;
@@ -252,7 +282,7 @@ OggTobiasSeekable::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	frames = last_granulepos - fFirstGranulepos;
 
 	*frameCount = frames;
-	*duration = (1000000LL * frames) / (long long)fFrameRate;
+	*duration = (long long)((1000000LL * frames) / (double)fFrameRate);
 	return B_OK;
 }
 
@@ -274,6 +304,9 @@ OggTobiasSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 		   = fMediaFormat.u.encoded_video.output.first_active;
 		mediaHeader->u.encoded_video.line_count
 		   = fMediaFormat.u.encoded_video.output.display.line_count;
+	}
+	if (fMediaFormat.type == B_MEDIA_ENCODED_AUDIO) {
+		mediaHeader->type = fMediaFormat.type;
 	}
 	if (mediaHeader->start_time < 0) {
 		fCurrentFrame++;
