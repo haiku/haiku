@@ -26,10 +26,13 @@
 #include "threadheap.h"
 #include "processheap.h"
 
+using namespace BPrivate;
 
-threadHeap::threadHeap (void)
-  : _pHeap (0)
-{}
+
+threadHeap::threadHeap(void)
+	:_pHeap(0)
+{
+}
 
 
 // malloc (sz):
@@ -38,73 +41,74 @@ threadHeap::threadHeap (void)
 //   side effects: allocates a block from a superblock;
 //                 may call sbrk() (via makeSuperblock).
 
-void * threadHeap::malloc (const size_t size)
+void *
+threadHeap::malloc(const size_t size)
 {
-  const int sizeclass = sizeClass (size);
-  block * b = NULL;
+	const int sizeclass = sizeClass(size);
+	block *b = NULL;
 
-  lock();
+	lock();
 
-  // Look for a free block.
-  // We usually have memory locally so we first look for space in the
-  // superblock list.
+	// Look for a free block.
+	// We usually have memory locally so we first look for space in the
+	// superblock list.
 
-  superblock * sb = findAvailableSuperblock (sizeclass, b, _pHeap);
+	superblock *sb = findAvailableSuperblock(sizeclass, b, _pHeap);
 
-  if (sb == NULL) {
+	if (sb == NULL) {
+		// We don't have memory locally.
+		// Try to get more from the process heap.
 
-    // We don't have memory locally.
-    // Try to get more from the process heap.
+		assert(_pHeap);
+		sb = _pHeap->acquire((int)sizeclass, this);
 
-    assert (_pHeap);
-    sb = _pHeap->acquire ((int) sizeclass, this);
-
-    // If we didn't get any memory from the process heap,
-    // we'll have to allocate our own superblock.
-    if (sb == NULL) {
-      sb = superblock::makeSuperblock (sizeclass, _pHeap);
-      if (sb == NULL) {
-		// We're out of memory!
-		unlock ();
-		return NULL;
-      }
+		// If we didn't get any memory from the process heap,
+		// we'll have to allocate our own superblock.
+		if (sb == NULL) {
+			sb = superblock::makeSuperblock(sizeclass, _pHeap);
+			if (sb == NULL) {
+				// We're out of memory!
+				unlock();
+				return NULL;
+			}
 #if HEAP_LOG
-      // Record the memory allocation.
-      MemoryRequest m;
-      m.allocate ((int) sb->getNumBlocks() * (int) sizeFromClass(sb->getBlockSizeClass()));
-      _pHeap->getLog(getIndex()).append(m);
+			// Record the memory allocation.
+			MemoryRequest m;
+			m.allocate((int)sb->getNumBlocks() *
+				(int)sizeFromClass(sb->getBlockSizeClass()));
+			_pHeap->getLog(getIndex()).append(m);
 #endif
 #if HEAP_FRAG_STATS
-      _pHeap->setAllocated (0, sb->getNumBlocks() * sizeFromClass(sb->getBlockSizeClass()));
+			_pHeap->setAllocated(0,
+				sb->getNumBlocks() * sizeFromClass(sb->getBlockSizeClass()));
 #endif
-    }
+		}
+		// Get a block from the superblock.
+		b = sb->getBlock();
+		assert(b != NULL);
 
-    // Get a block from the superblock.
-    b = sb->getBlock ();
-    assert (b != NULL);
+		// Insert the superblock into our list.
+		insertSuperblock(sizeclass, sb, _pHeap);
+	}
 
-    // Insert the superblock into our list.
-    insertSuperblock (sizeclass, sb, _pHeap);
-  }
+	assert(b != NULL);
+	assert(b->isValid());
+	assert(sb->isValid());
 
-  assert (b != NULL);
-  assert (b->isValid());
-  assert (sb->isValid());
-
-  b->markAllocated();
+	b->markAllocated();
 
 #if HEAP_LOG
-  MemoryRequest m;
-  m.malloc ((void *) (b + 1), align(size));
-  _pHeap->getLog(getIndex()).append(m);
+	MemoryRequest m;
+	m.malloc((void *)(b + 1), align(size));
+	_pHeap->getLog(getIndex()).append(m);
 #endif
 #if HEAP_FRAG_STATS
-  b->setRequestedSize (align(size));
-  _pHeap->setAllocated (align(size), 0);
+	b->setRequestedSize(align(size));
+	_pHeap->setAllocated(align(size), 0);
 #endif
 
-  unlock();
+	unlock();
 
-  // Skip past the block header and return the pointer.
-  return (void *) (b + 1);
+	// Skip past the block header and return the pointer.
+	return (void *)(b + 1);
 }

@@ -23,10 +23,13 @@
  */
 
 #include <string.h>
+
 #include "config.h"
 #include "threadheap.h"
 #include "processheap.h"
 #include "arch-specific.h"
+
+using namespace BPrivate;
 
 
 inline static processHeap *
@@ -38,21 +41,7 @@ getAllocator(void)
 	return theAllocator;
 }
 
-#define HOARD_MALLOC(x) malloc(x)
-#define HOARD_FREE(x) free(x)
-#define HOARD_REALLOC(x,y) realloc(x,y)
-#define HOARD_CALLOC(x,y) calloc(x,y)
-#define HOARD_MEMALIGN(x,y) memalign(x,y)
-#define HOARD_VALLOC(x) valloc(x)
-
-extern "C" void * HOARD_MALLOC(size_t);
-extern "C" void HOARD_FREE(void *);
-extern "C" void * HOARD_REALLOC(void *, size_t);
-extern "C" void * HOARD_CALLOC(size_t, size_t);
-extern "C" void * HOARD_MEMALIGN(size_t, size_t);
-extern "C" void * HOARD_VALLOC(size_t);
-
-
+#if 0
 void * operator new (size_t size)
 {
   return HOARD_MALLOC (size);
@@ -80,6 +69,7 @@ void operator delete[] (void * ptr)
 {
   HOARD_FREE (ptr);
 }
+#endif
 
 
 extern "C" void *
@@ -133,7 +123,7 @@ extern "C" void *
 realloc(void *ptr, size_t sz)
 {
 	if (ptr == NULL)
-		return HOARD_MALLOC (sz);
+		return malloc(sz);
 
 	if (sz == 0) {
 		free(ptr);
@@ -148,7 +138,6 @@ realloc(void *ptr, size_t sz)
 		return ptr;
 
 	// Allocate a new block of size sz.
-
 	void *buffer = malloc(sz);
 
 	// Copy the contents of the original object
@@ -158,7 +147,6 @@ realloc(void *ptr, size_t sz)
 	memcpy(buffer, ptr, minSize);
 
 	// Free the old block.
-
 	free(ptr);
 
 	// Return a pointer to the new one.

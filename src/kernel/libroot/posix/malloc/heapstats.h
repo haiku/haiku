@@ -26,148 +26,150 @@
 
 
 class heapStats {
-public:
-
-  heapStats (void)
-    :
-    U (0),
-    A (0)
+	public:
+		heapStats(void)
+			: U(0), A(0)
 #if HEAP_STATS
-    ,Umax (0),
-    Amax (0)
+			, Umax(0), Amax(0)
 #endif
-  {}
+		{
+		}
 
-  inline const heapStats& operator= (const heapStats& p);
+		inline const heapStats & operator=(const heapStats & p);
 
-  inline void incStats (int updateU, int updateA);
-  inline void incUStats (void);
+		inline void incStats(int updateU, int updateA);
+		inline void incUStats(void);
 
-  inline void decStats (int updateU, int updateA);
-  inline void decUStats (void);
-  inline void decUStats (int& Uout, int& Aout);
+		inline void decStats(int updateU, int updateA);
+		inline void decUStats(void);
+		inline void decUStats(int &Uout, int &Aout);
 
-  inline void getStats (int& Uout, int& Aout);
-
+		inline void getStats(int &Uout, int &Aout);
 
 #if HEAP_STATS
-
-  inline int getUmax (void);
-  inline int getAmax (void);
-
+		inline int getUmax(void);
+		inline int getAmax(void);
 #endif
 
+	private:
+		// U and A *must* be the first items in this class --
+		// we will depend on this to atomically update them.
 
-private:
-
-  // U and A *must* be the first items in this class --
-  // we will depend on this to atomically update them.
-
-  int U;	// Memory in use.
-  int A;	// Memory allocated.
+		int U;						// Memory in use.
+		int A;						// Memory allocated.
 
 #if HEAP_STATS
-  int Umax;
-  int Amax;
+		int Umax;
+		int Amax;
 #endif
 };
 
 
-inline void heapStats::incStats (int updateU, int updateA)
+inline void
+heapStats::incStats(int updateU, int updateA)
 {
-  assert (updateU >= 0);
-  assert (updateA >= 0);
-  assert (U <= A);
-  assert (U >= 0);
-  assert (A >= 0);
-  U += updateU;
-  A += updateA;
+	assert(updateU >= 0);
+	assert(updateA >= 0);
+	assert(U <= A);
+	assert(U >= 0);
+	assert(A >= 0);
+	U += updateU;
+	A += updateA;
+
 #if HEAP_STATS
-  Amax = MAX (Amax, A);
-  Umax = MAX (Umax, U);
+	Amax = MAX(Amax, A);
+	Umax = MAX(Umax, U);
 #endif
-  assert (U <= A);
-  assert (U >= 0);
-  assert (A >= 0);
+
+	assert(U <= A);
+	assert(U >= 0);
+	assert(A >= 0);
 }
 
 
-inline void heapStats::incUStats (void)
+inline void
+heapStats::incUStats(void)
 {
-  assert (U < A);
-  assert (U >= 0);
-  assert (A >= 0);
-  U++;
+	assert(U < A);
+	assert(U >= 0);
+	assert(A >= 0);
+	U++;
+
 #if HEAP_STATS
-  Umax = MAX (Umax, U);
+	Umax = MAX(Umax, U);
 #endif
-  assert (U >= 0);
-  assert (A >= 0);
+
+	assert(U >= 0);
+	assert(A >= 0);
 }
 
 
-inline void heapStats::decStats (int updateU, int updateA)
+inline void
+heapStats::decStats(int updateU, int updateA)
 {
-  assert (updateU >= 0);
-  assert (updateA >= 0);
-  assert (U <= A);
-  assert (U >= updateU);
-  assert (A >= updateA);
-  U -= updateU;
-  A -= updateA;
-  assert (U <= A);
-  assert (U >= 0);
-  assert (A >= 0);
+	assert(updateU >= 0);
+	assert(updateA >= 0);
+	assert(U <= A);
+	assert(U >= updateU);
+	assert(A >= updateA);
+	U -= updateU;
+	A -= updateA;
+	assert(U <= A);
+	assert(U >= 0);
+	assert(A >= 0);
 }
 
 
-inline void heapStats::decUStats (int& Uout, int& Aout)
+inline void
+heapStats::decUStats(int &Uout, int &Aout)
 {
-  assert (U <= A);
-  assert (U > 0);
-  assert (A >= 0);
-  U--;
-  Uout = U;
-  Aout = A;
-  assert (U >= 0);
-  assert (A >= 0);
+	assert(U <= A);
+	assert(U > 0);
+	assert(A >= 0);
+	U--;
+	Uout = U;
+	Aout = A;
+	assert(U >= 0);
+	assert(A >= 0);
 }
 
 
-inline void heapStats::decUStats (void)
+inline void
+heapStats::decUStats(void)
 {
-  assert (U <= A);
-  assert (U > 0);
-  assert (A >= 0);
-  U--;
+	assert(U <= A);
+	assert(U > 0);
+	assert(A >= 0);
+	U--;
 }
 
 
-inline void heapStats::getStats (int& Uout, int& Aout)
+inline void
+heapStats::getStats(int &Uout, int &Aout)
 {
-  assert (U >= 0);
-  assert (A >= 0);
-  Uout = U;
-  Aout = A;
-  assert (U <= A);
-  assert (U >= 0);
-  assert (A >= 0);
+	assert(U >= 0);
+	assert(A >= 0);
+	Uout = U;
+	Aout = A;
+	assert(U <= A);
+	assert(U >= 0);
+	assert(A >= 0);
 }
 
 
 #if HEAP_STATS
-inline int heapStats::getUmax (void)
+inline int
+heapStats::getUmax(void)
 {
-  return Umax;
+	return Umax;
 }
 
 
-inline int heapStats::getAmax (void)
+inline int
+heapStats::getAmax(void)
 {
-  return Amax;
+	return Amax;
 }
 #endif // HEAP_STATS
-
-
 
 #endif // _HEAPSTATS_H_

@@ -30,149 +30,155 @@
 #include "arch-specific.h"
 #include "heap.h"
 #if USE_PRIVATE_HEAPS
-#include "privateheap.h"
-#define HEAPTYPE privateHeap
+#	include "privateheap.h"
+#	define HEAPTYPE privateHeap
 #else
-#define HEAPTYPE threadHeap
-#include "threadheap.h"
+#	define HEAPTYPE threadHeap
+#	include "threadheap.h"
 #endif
 
 #if HEAP_LOG
-#include "memstat.h"
-#include "log.h"
+#	include "memstat.h"
+#	include "log.h"
 #endif
+
+
+namespace BPrivate {
 
 class processHeap : public hoardHeap {
+	public:
+		// Always grab at least this many superblocks' worth of memory which
+		// we parcel out.
+		enum { REFILL_NUMBER_OF_SUPERBLOCKS = 16 };
 
-public:
-
-  // Always grab at least this many superblocks' worth of memory which
-  // we parcel out.
-  enum { REFILL_NUMBER_OF_SUPERBLOCKS = 16 };
-
-  processHeap (void);
-
-  ~processHeap (void) {
+		processHeap(void);
+		~processHeap(void)
+		{
 #if HEAP_STATS
-    stats();
+			stats();
 #endif
-  }
+		}
+		// Memory deallocation routines.
+		void free(void *ptr);
 
-  // Memory deallocation routines.
-  void free (void * ptr);
+		// Print out statistics information.
+		void stats(void);
 
-  // Print out statistics information.
-  void stats (void);
+		// Get a thread heap index.
+		inline int getHeapIndex(void);
 
-  // Get a thread heap index.
-  inline int getHeapIndex (void);
+		// Get the thread heap with index i.
+		inline HEAPTYPE & getHeap(int i);
 
-  // Get the thread heap with index i.
-  inline HEAPTYPE& getHeap (int i);
+		// Extract a superblock.
+		inline superblock *acquire(const int c, hoardHeap * dest);
 
-  // Extract a superblock.
-  inline superblock * acquire (const int c,
-			       hoardHeap * dest);
+		// Get space for a superblock.
+		inline char *getSuperblockBuffer(void);
 
-  // Get space for a superblock.
-  inline char * getSuperblockBuffer (void);
-
-  // Insert a superblock.
-  inline void release (superblock * sb);
+		// Insert a superblock.
+		inline void release(superblock * sb);
 
 #if HEAP_LOG
-  // Get the log for index i.
-  inline Log<MemoryRequest>& getLog (int i);
+		// Get the log for index i.
+		inline Log < MemoryRequest > &getLog(int i);
 #endif
 
 #if HEAP_FRAG_STATS
-  // Declare that we have allocated an object.
-  void setAllocated (int requestedSize,
-		     int actualSize);
+		// Declare that we have allocated an object.
+		void setAllocated(int requestedSize, int actualSize);
 
-  // Declare that we have deallocated an object.
-  void setDeallocated (int requestedSize,
-		       int actualSize);
+		// Declare that we have deallocated an object.
+		void setDeallocated(int requestedSize, int actualSize);
 
-  // Return the number of wasted bytes at the high-water mark
-  // (maxAllocated - maxRequested)
-  inline int getFragmentation (void);
+		// Return the number of wasted bytes at the high-water mark
+		// (maxAllocated - maxRequested)
+		inline int getFragmentation(void);
 
-  int getMaxAllocated (void) {
-    return _maxAllocated;
-  }
+		int
+		getMaxAllocated(void)
+		{
+			return _maxAllocated;
+		}
 
-  int getInUseAtMaxAllocated (void) {
-    return _inUseAtMaxAllocated;
-  }
+		int
+		getInUseAtMaxAllocated(void)
+		{
+			return _inUseAtMaxAllocated;
+		}
 
-  int getMaxRequested (void) {
-    return _maxRequested;
-  }
-
+		int
+		getMaxRequested(void)
+		{
+			return _maxRequested;
+		}
 #endif
 
-private:
+	private:
+		// Hide the lock & unlock methods.
+		void
+		lock(void)
+		{
+			hoardHeap::lock();
+		}
 
-  // Hide the lock & unlock methods.
+		void
+		unlock(void)
+		{
+			hoardHeap::unlock();
+		}
 
-  void lock (void) {
-    hoardHeap::lock();
-  }
+		// Prevent copying and assignment.
+		processHeap(const processHeap &);
+		const processHeap & operator=(const processHeap &);
 
-  void unlock (void) {
-    hoardHeap::unlock();
-  }
-
-  // Prevent copying and assignment.
-  processHeap (const processHeap&);
-  const processHeap& operator= (const processHeap&);
-
-  // The per-thread heaps.
-  HEAPTYPE theap[MAX_HEAPS];
+		// The per-thread heaps.
+		HEAPTYPE theap[MAX_HEAPS];
 
 #if HEAP_FRAG_STATS
-  // Statistics required to compute fragmentation.  We cannot
-  // unintrusively keep track of these on a multiprocessor, because
-  // this would become a bottleneck.
+		// Statistics required to compute fragmentation.  We cannot
+		// unintrusively keep track of these on a multiprocessor, because
+		// this would become a bottleneck.
 
-  int _currentAllocated;
-  int _currentRequested;
-  int _maxAllocated;
-  int _maxRequested;
-  int _inUseAtMaxAllocated;
-  int _fragmentation;
+		int _currentAllocated;
+		int _currentRequested;
+		int _maxAllocated;
+		int _maxRequested;
+		int _inUseAtMaxAllocated;
+		int _fragmentation;
 
-  // A lock to protect these statistics.
-  hoardLockType _statsLock;
+		// A lock to protect these statistics.
+		hoardLockType _statsLock;
 #endif
 
 #if HEAP_LOG
-  Log<MemoryRequest> _log[MAX_HEAPS + 1];
+		Log < MemoryRequest > _log[MAX_HEAPS + 1];
 #endif
 
-  // A lock for the superblock buffer.
-  hoardLockType _bufferLock;
+		// A lock for the superblock buffer.
+		hoardLockType _bufferLock;
 
-  char * 	_buffer;
-  int 		_bufferCount;
+		char *_buffer;
+		int _bufferCount;
 };
 
 
-HEAPTYPE& processHeap::getHeap (int i)
+HEAPTYPE &
+processHeap::getHeap(int i)
 {
-  assert (i >= 0);
-  assert (i < MAX_HEAPS);
-  return theap[i];
+	assert(i >= 0);
+	assert(i < MAX_HEAPS);
+	return theap[i];
 }
 
 
 #if HEAP_LOG
-Log<MemoryRequest>& processHeap::getLog (int i)
+Log<MemoryRequest > &
+processHeap::getLog(int i)
 {
-  assert (i >= 0);
-  assert (i < MAX_HEAPS + 1);
-  return _log[i];
+	assert(i >= 0);
+	assert(i < MAX_HEAPS + 1);
+	return _log[i];
 }
 #endif
 
@@ -180,77 +186,86 @@ Log<MemoryRequest>& processHeap::getLog (int i)
 #ifdef NEED_LG
 // Return ceil(log_2(num)).
 // num must be positive.
-static int lg (int num)
+static int
+lg(int num)
 {
-  assert (num > 0);
-  int power = 0;
-  int n = 1;
-  // Invariant: 2^power == n.
-  while (n < num) {
-    n <<= 1;
-    power++;
-  }
-  return power;
+	assert(num > 0);
+	int power = 0;
+	int n = 1;
+	// Invariant: 2^power == n.
+	while (n < num) {
+		n <<= 1;
+		power++;
+	}
+	return power;
 }
 #endif /* NEED_LG */
 
 // Hash out the thread id to a heap and return an index to that heap.
-int processHeap::getHeapIndex (void) {
-  // Here we use the number of processors as the maximum number of heaps.
-  // In fact, for efficiency, we just round up to the highest power of two,
-  // times two.
-  int tid = hoardGetThreadID() & _numProcessorsMask;
-  assert (tid < MAX_HEAPS);
-  return tid;
+
+int
+processHeap::getHeapIndex(void)
+{
+	// Here we use the number of processors as the maximum number of heaps.
+	// In fact, for efficiency, we just round up to the highest power of two,
+	// times two.
+	int tid = hoardGetThreadID() & _numProcessorsMask;
+	assert(tid < MAX_HEAPS);
+	return tid;
 }
 
 
-superblock * processHeap::acquire (const int sizeclass,
-				   hoardHeap * dest)
+superblock *
+processHeap::acquire(const int sizeclass, hoardHeap * dest)
 {
-  lock ();
+	lock();
 
-  // Remove the superblock with the most free space.
-  superblock * maxSb = removeMaxSuperblock (sizeclass);
-  if (maxSb) {
-    maxSb->setOwner (dest);
-  }
+	// Remove the superblock with the most free space.
+	superblock *maxSb = removeMaxSuperblock(sizeclass);
+	if (maxSb)
+		maxSb->setOwner(dest);
 
-  unlock ();
+	unlock();
 
-  return maxSb;
+	return maxSb;
 }
 
 
-inline char * processHeap::getSuperblockBuffer (void)
+inline char *
+processHeap::getSuperblockBuffer(void)
 {
-  char * buf;
-  hoardLock (_bufferLock);
-  if (_bufferCount == 0) {
-    _buffer = (char *) hoardSbrk (SUPERBLOCK_SIZE * REFILL_NUMBER_OF_SUPERBLOCKS);
-    _bufferCount = REFILL_NUMBER_OF_SUPERBLOCKS;
-  }
-  buf = _buffer;
-  _buffer += SUPERBLOCK_SIZE;
-  _bufferCount--;
-  hoardUnlock (_bufferLock);
-  return buf;
+	char *buf;
+	hoardLock(_bufferLock);
+	if (_bufferCount == 0) {
+		_buffer = (char *)hoardSbrk(SUPERBLOCK_SIZE
+			* REFILL_NUMBER_OF_SUPERBLOCKS);
+		_bufferCount = REFILL_NUMBER_OF_SUPERBLOCKS;
+	}
+
+	buf = _buffer;
+	_buffer += SUPERBLOCK_SIZE;
+	_bufferCount--;
+	hoardUnlock(_bufferLock);
+
+	return buf;
 }
 
 
 // Put a superblock back into our list of superblocks.
-void processHeap::release (superblock * sb)
+
+void
+processHeap::release(superblock *sb)
 {
-  assert (EMPTY_FRACTION * sb->getNumAvailable() > sb->getNumBlocks());
+	assert(EMPTY_FRACTION * sb->getNumAvailable() > sb->getNumBlocks());
 
-  lock();
+	lock();
 
-  // Insert the superblock.
-  insertSuperblock (sb->getBlockSizeClass(), sb, this);
+	// Insert the superblock.
+	insertSuperblock(sb->getBlockSizeClass(), sb, this);
 
-  unlock();
+	unlock();
 }
 
+}	// namespace BPrivate
 
 #endif // _PROCESSHEAP_H_
-

@@ -20,11 +20,11 @@
 #define _CONFIG_H_
 
 #ifndef _REENTRANT
-#define _REENTRANT		// If defined, generate a multithreaded-capable version.
+#	define _REENTRANT		// If defined, generate a multithreaded-capable version.
 #endif
 
 #ifndef USER_LOCKS
-#define USER_LOCKS 1		// Use our own user-level locks if they're available for the current architecture.
+#	define USER_LOCKS 1		// Use our own user-level locks if they're available for the current architecture.
 #endif
 
 #define HEAP_LOG 0		// If non-zero, keep a log of heap accesses.
@@ -63,15 +63,15 @@ enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 // CACHE_LINE = The number of bytes in a cache line.
 
 #if defined(i386) || defined(WIN32)
-#define CACHE_LINE 32
+#	define CACHE_LINE 32
 #endif
 
 #ifdef sparc
-#define CACHE_LINE 64
+#	define CACHE_LINE 64
 #endif
 
 #ifdef __sgi
-#define CACHE_LINE 128
+#	define CACHE_LINE 128
 #endif
 
 #ifndef CACHE_LINE
@@ -82,11 +82,10 @@ enum { SUPERBLOCK_FULLNESS_GROUP = 9 };
 
 #ifdef __GNUG__
 // Use the max operator, an extension to C++ found in GNU C++.
-#define MAX(a,b) ((a) >? (b))
+#	define MAX(a,b) ((a) >? (b))
 #else
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#	define MAX(a,b) (((a) > (b)) ? (a) : (b))
 #endif
 
 
 #endif // _CONFIG_H_
-

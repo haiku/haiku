@@ -33,6 +33,7 @@ extern "C" {
 #include <OS.h>
 #include <unistd.h>
 
+using namespace BPrivate;
 
 static area_id heap_region = -1;
 static addr_t brk;

@@ -23,7 +23,7 @@
   The superblock class controls a number of blocks (which are
   allocatable units of memory).
   ------------------------------------------------------------------------
-  @(#) $Id: superblock.h,v 1.1 2002/10/05 17:13:30 axeld Exp $
+  @(#) $Id$
   ------------------------------------------------------------------------
   Emery Berger                    | <http://www.cs.utexas.edu/users/emery>
   Department of Computer Sciences |             <http://www.cs.utexas.edu>
@@ -44,244 +44,262 @@
 #include "arch-specific.h"
 #include "block.h"
 
-class hoardHeap; // forward declaration
-class processHeap; // forward declaration
+
+namespace BPrivate {
+
+class hoardHeap;				// forward declaration
+class processHeap;				// forward declaration
 
 class superblock {
+	public:
+		// Construct a superblock for a given size class and set the heap
+		// owner.
+		superblock(int numblocks, int sizeclass, hoardHeap *owner);
+		~superblock(void) {}
 
-public:
+		// Make (allocate or re-use) a superblock for a given size class.
+		static superblock *makeSuperblock(int sizeclass, processHeap *pHeap);
 
-  // Construct a superblock for a given size class and set the heap
-  // owner.
-  superblock (int numblocks,
-	      int sizeclass,
-	      hoardHeap * owner);
+		// Find out who allocated this superblock.
+		inline hoardHeap *getOwner(void);
 
-  ~superblock (void)
-    {}
+		// Set the superblock's owner.
+		inline void setOwner(hoardHeap *o);
 
-  // Make (allocate or re-use) a superblock for a given size class.
-  static superblock * makeSuperblock (int sizeclass, processHeap * pHeap);
+		// Get a block from the superblock.
+		inline block *getBlock(void);
 
-  // Find out who allocated this superblock.
-  inline hoardHeap * getOwner (void);
+		// Put a block back in the superblock.
+		inline void putBlock(block *b);
 
-  // Set the superblock's owner.
-  inline void setOwner (hoardHeap * o);
+		// How many blocks are available?
+		inline int getNumAvailable(void);
 
-  // Get a block from the superblock.
-  inline block * getBlock (void);
+		// How many blocks are there, in total?
+		inline int getNumBlocks(void);
 
-  // Put a block back in the superblock.
-  inline void putBlock (block * b);
+		// What size class are blocks in this superblock?
+		inline int getBlockSizeClass(void);
 
-  // How many blocks are available?
-  inline int getNumAvailable (void);
+		// Insert this superblock before the next one.
+		inline void insertBefore(superblock *nextSb);
 
-  // How many blocks are there, in total?
-  inline int getNumBlocks (void);
+		// Return the next pointer (to the next superblock in the list).
+		inline superblock *const getNext(void);
 
-  // What size class are blocks in this superblock?
-  inline int getBlockSizeClass (void);
+		// Return the prev pointer (to the previous superblock in the list).
+		inline superblock *const getPrev(void);
 
-  // Insert this superblock before the next one.
-  inline void insertBefore (superblock * nextSb);
+		// Compute the 'fullness' of this superblock.
+		inline void computeFullness(void);
 
-  // Return the next pointer (to the next superblock in the list).
-  inline superblock * const getNext (void);
-
-  // Return the prev pointer (to the previous superblock in the list).
-  inline superblock * const getPrev (void);
-
-  // Compute the 'fullness' of this superblock.
-  inline void computeFullness (void);
-
-  // Return the 'fullness' of this superblock.
-  inline int getFullness (void);
+		// Return the 'fullness' of this superblock.
+		inline int getFullness(void);
 
 #if HEAP_FRAG_STATS
-  // Return the amount of waste in every allocated block.
-  int getMaxInternalFragmentation (void);
+		// Return the amount of waste in every allocated block.
+		int getMaxInternalFragmentation(void);
 #endif
 
-  // Remove this superblock from its linked list.
-  inline void remove (void);
+		// Remove this superblock from its linked list.
+		inline void remove(void);
 
-  // Is this superblock valid? (i.e.,
-  // does it have the right magic number?)
-  inline int isValid (void);
+		// Is this superblock valid? (i.e.,
+		// does it have the right magic number?)
+		inline int isValid(void);
 
-  void upLock (void) {
-    hoardLock (_upLock);
-  }
+		void
+		upLock(void)
+		{
+			hoardLock(_upLock);
+		}
 
-  void upUnlock (void) {
-    hoardUnlock (_upLock);
-  }
+		void
+		upUnlock(void)
+		{
+			hoardUnlock(_upLock);
+		}
 
-private:
+	private:
+		// Disable copying and assignment.
 
-  // Disable copying and assignment.
+		superblock(const superblock &);
+		const superblock & operator=(const superblock &);
 
-  superblock (const superblock&);
-  const superblock& operator= (const superblock&);
-
-  // Used for sanity checking.
-  enum { SUPERBLOCK_MAGIC = 0xCAFEBABE };
+		// Used for sanity checking.
+		enum { SUPERBLOCK_MAGIC = 0xCAFEBABE };
 
 #if HEAP_DEBUG
-  unsigned long _magic;
+		unsigned long _magic;
 #endif
 
-  const int 	_sizeClass;	// The size class of blocks in the superblock.
-  const int 	_numBlocks;	// The number of blocks in the superblock.
-  int		_numAvailable;	// The number of blocks available.
-  int		_fullness;	// How full is this superblock?
-				// (which SUPERBLOCK_FULLNESS group is it in)
-  block *	_freeList;	// A pointer to the first free block.
-  hoardHeap * 	_owner;		// The heap who owns this superblock.
-  superblock * 	_next;		// The next superblock in the list.
-  superblock * 	_prev;		// The previous superblock in the list.
+		const int _sizeClass;		// The size class of blocks in the superblock.
+		const int _numBlocks;		// The number of blocks in the superblock.
+		int _numAvailable;			// The number of blocks available.
+		int _fullness;				// How full is this superblock?
+		// (which SUPERBLOCK_FULLNESS group is it in)
+		block *_freeList;			// A pointer to the first free block.
+		hoardHeap *_owner;			// The heap who owns this superblock.
+		superblock *_next;			// The next superblock in the list.
+		superblock *_prev;			// The previous superblock in the list.
 
-  hoardLockType _upLock;	// Lock this when moving a superblock to the global (process) heap.
+		hoardLockType _upLock;		// Lock this when moving a superblock to the global (process) heap.
 
-  // We insert a cache pad here to prevent false sharing with the
-  // first block (which immediately follows the superblock).
-
-  double _pad[CACHE_LINE / sizeof(double)];
+		// We insert a cache pad here to prevent false sharing with the
+		// first block (which immediately follows the superblock).
+		double _pad[CACHE_LINE / sizeof(double)];
 };
 
 
-hoardHeap * superblock::getOwner (void)
+hoardHeap *
+superblock::getOwner(void)
 {
-  assert (isValid());
-  hoardHeap * o = _owner;
-  return o;
+	assert(isValid());
+	hoardHeap *o = _owner;
+	return o;
 }
 
 
-void superblock::setOwner (hoardHeap * o)
+void
+superblock::setOwner(hoardHeap *o)
 {
-  assert (isValid());
-  _owner = o;
+	assert(isValid());
+	_owner = o;
 }
 
 
-block * superblock::getBlock (void)
+block *
+superblock::getBlock(void)
 {
-  assert (isValid());
-  // Pop off a block from this superblock's freelist,
-  // if there is one available.
-  if (_freeList == NULL) {
-    // The freelist is empty.
-    assert (getNumAvailable() == 0);
-    return NULL;
-  }
-  assert (getNumAvailable() > 0);
-  block * b = _freeList;
-  _freeList = _freeList->getNext();
-  _numAvailable--;
+	assert(isValid());
+	// Pop off a block from this superblock's freelist,
+	// if there is one available.
+	if (_freeList == NULL) {
+		// The freelist is empty.
+		assert(getNumAvailable() == 0);
+		return NULL;
+	}
 
-  b->setNext(NULL);
+	assert(getNumAvailable() > 0);
+	block *b = _freeList;
+	_freeList = _freeList->getNext();
+	_numAvailable--;
 
-  computeFullness();
+	b->setNext(NULL);
 
-  return b;
+	computeFullness();
+	return b;
 }
 
 
-void superblock::putBlock (block * b)
+void
+superblock::putBlock(block *b)
 {
-  assert (isValid());
-  // Push a block onto the superblock's freelist.
-  assert (b->isValid());
-  assert (b->getSuperblock() == this);
-  assert (getNumAvailable() < getNumBlocks());
-  b->setNext (_freeList);
-  _freeList = b;
-  _numAvailable++;
-  computeFullness();
+	assert(isValid());
+	// Push a block onto the superblock's freelist.
+	assert(b->isValid());
+	assert(b->getSuperblock() == this);
+	assert(getNumAvailable() < getNumBlocks());
+	b->setNext(_freeList);
+	_freeList = b;
+	_numAvailable++;
+	computeFullness();
 }
 
-int superblock::getNumAvailable (void)
+
+int
+superblock::getNumAvailable(void)
 {
-  assert (isValid());
-  return _numAvailable;
+	assert(isValid());
+	return _numAvailable;
 }
 
 
-int superblock::getNumBlocks (void)
+int
+superblock::getNumBlocks(void)
 {
-  assert (isValid());
-  return _numBlocks;
+	assert(isValid());
+	return _numBlocks;
 }
 
 
-int superblock::getBlockSizeClass (void)
+int
+superblock::getBlockSizeClass(void)
 {
-  assert (isValid());
-  return _sizeClass;
+	assert(isValid());
+	return _sizeClass;
 }
 
 
-superblock * const superblock::getNext (void)
+superblock * const
+superblock::getNext(void)
 {
-  assert (isValid());
-  return _next;
+	assert(isValid());
+	return _next;
 }
 
-superblock * const superblock::getPrev (void)
+superblock * const
+superblock::getPrev(void)
 {
-  assert (isValid());
-  return _prev;
+	assert(isValid());
+	return _prev;
 }
 
 
-void superblock::insertBefore (superblock * nextSb) {
-  assert (isValid());
-  // Insert this superblock before the next one (nextSb).
-  assert (nextSb != this);
-  _next = nextSb;
-  if (nextSb) {
-    _prev = nextSb->_prev;
-    nextSb->_prev = this;
-  }
-}
-
-
-void superblock::remove (void) {
-  // Remove this superblock from a doubly-linked list.
-  if (_next) {
-    _next->_prev = _prev;
-  }
-  if (_prev) {
-    _prev->_next = _next;
-  }
-  _prev = NULL;
-  _next = NULL;
-}
-
-
-int superblock::isValid (void)
+void
+superblock::insertBefore(superblock * nextSb)
 {
-  assert (_numBlocks > 0);
-  assert (_numAvailable <= _numBlocks);
-  assert (_sizeClass >= 0);
-  return 1;
+	assert(isValid());
+	// Insert this superblock before the next one (nextSb).
+	assert(nextSb != this);
+	_next = nextSb;
+	if (nextSb) {
+		_prev = nextSb->_prev;
+		nextSb->_prev = this;
+	}
 }
 
 
-void superblock::computeFullness (void)
+void
+superblock::remove(void)
 {
-  assert (isValid());
-  _fullness = (((SUPERBLOCK_FULLNESS_GROUP - 1)
+	// Remove this superblock from a doubly-linked list.
+	if (_next)
+		_next->_prev = _prev;
+	if (_prev)
+		_prev->_next = _next;
+
+	_prev = NULL;
+	_next = NULL;
+}
+
+
+int
+superblock::isValid(void)
+{
+	assert(_numBlocks > 0);
+	assert(_numAvailable <= _numBlocks);
+	assert(_sizeClass >= 0);
+	return 1;
+}
+
+
+void
+superblock::computeFullness(void)
+{
+	assert(isValid());
+	_fullness = (((SUPERBLOCK_FULLNESS_GROUP - 1)
 		* (getNumBlocks() - getNumAvailable())) / getNumBlocks());
 }
 
-int superblock::getFullness (void)
+
+int
+superblock::getFullness(void)
 {
-  assert (isValid());
-  return _fullness;
+	assert(isValid());
+	return _fullness;
 }
+
+}	// namespace BPrivate
 
 #endif // _SUPERBLOCK_H_
