@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -75,5 +75,20 @@ void
 arch_vm_aspace_swap(vm_address_space *aspace)
 {
 	i386_swap_pgdir((addr_t)i386_translation_map_get_pgdir(&aspace->translation_map));
+}
+
+
+bool
+arch_vm_supports_protection(uint32 protection)
+{
+	// x86 always has the same read/write properties for userland and the kernel.
+	// That's why we do not support user-read/kernel-write access. While the
+	// other way around is not supported either, we don't care in this case
+	// and give the kernel full access.
+	if ((protection & (B_READ_AREA | B_WRITE_AREA)) == B_READ_AREA
+		&& protection & B_KERNEL_WRITE_AREA)
+		return false;
+
+	return true;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -21,6 +21,7 @@ status_t arch_vm_init(struct kernel_args *args);
 status_t arch_vm_init_post_area(struct kernel_args *args);
 status_t arch_vm_init_end(struct kernel_args *args);
 void arch_vm_aspace_swap(vm_address_space *aspace);
+bool arch_vm_supports_protection(uint32 protection);
 
 #ifdef __cplusplus
 }
