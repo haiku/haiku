@@ -2,17 +2,22 @@ SubDir OBOS_TOP src add-ons print drivers shared libprint ;
 
 SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ; 
 
+# for BeUtils.h
+SubDirHdrs [ FDirName $(OBOS_TOP) headers private print ] ; 
+
 StaticLibrary print :
 	AboutBox.cpp
 	DbgMsg.cpp
 	GraphicsDriver.cpp
 	Halftone.cpp
+	HalftoneView.cpp
 	JobData.cpp
 	JobSetupDlg.cpp
 	PackBits.cpp
 	PageSetupDlg.cpp
 	Preview.cpp
 	PrinterData.cpp
+	PrinterDriver.cpp
 	PrinterCap.cpp
 	PrintProcess.cpp
 	SpoolMetaData.cpp
