@@ -7,6 +7,7 @@
 #include "bcursor/CursorTest.h"
 #include "bhandler/HandlerTest.h"
 #include "blooper/LooperTest.h"
+#include "bmessage/MessageTest.h"
 #include "bmessagequeue/MessageQueueTest.h"
 #include "bmessagerunner/MessageRunnerTest.h"
 #include "bmessenger/MessengerTest.h"
@@ -23,6 +24,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BCursor", CursorTestSuite());
 	suite->addTest("BHandler", HandlerTestSuite());
 	suite->addTest("BLooper", LooperTestSuite());
+	suite->addTest("BMessage", MessageTestSuite());
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
 	suite->addTest("BMessageRunner", MessageRunnerTestSuite());
 	suite->addTest("BMessenger", MessengerTestSuite());

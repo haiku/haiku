@@ -8,6 +8,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) bclipboard ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bcursor ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bhandler ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) blooper ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessage ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagequeue ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessagerunner ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmessenger ] ;
@@ -68,6 +69,12 @@ CommonTestLib libapptest.so
 		LooperSizeTest.cpp
 		SetCommonFilterListTest.cpp
 		QuitTest.cpp
+
+		# BMessage
+		MessageTest.cpp
+		MessageConstructTest.cpp
+		MessageOpAssignTest.cpp
+		MessageEasyFindTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp
@@ -140,6 +147,7 @@ SubInclude OBOS_TOP src tests kits app bclipboard ;
 SubInclude OBOS_TOP src tests kits app bcursor ;
 #SubInclude OBOS_TOP src tests kits app bhandler ;
 #SubInclude OBOS_TOP src tests kits app blooper ;
+#SubInclude OBOS_TOP src tests kits app bmessage ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
 SubInclude OBOS_TOP src tests kits app bmessenger ;
 SubInclude OBOS_TOP src tests kits app broster ;
