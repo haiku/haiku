@@ -6,7 +6,7 @@ BinCommand <bin>route :
 	keywords.c
 	route.c
 	show.c
-:  libnet.so ;
+: socket bind ;
 
 # Installation -- in the test directory for the time being
 OBOSInstall install-networking
