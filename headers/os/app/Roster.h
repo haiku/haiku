@@ -57,7 +57,7 @@ struct app_info {
 
 // watching request flags
 enum {
-	B_REQUEST_LAUNCH	= 0x00000001,
+	B_REQUEST_LAUNCHED	= 0x00000001,
 	B_REQUEST_QUIT		= 0x00000002,
 	B_REQUEST_ACTIVATED	= 0x00000004,
 };
