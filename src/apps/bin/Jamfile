@@ -1,0 +1,29 @@
+SubDir OBOS_TOP src apps bin ;
+
+StdBinCommands
+		alert.cpp
+		clipboard.cpp
+	: be ;
+
+StdBinCommands
+		roster.cpp
+	: be stdc++.r4 ;
+
+StdBinCommands
+	chop.c
+	echo.c
+	hd.c
+	listarea.c
+	listimage.c
+	listport.c
+	listsem.c
+	prio.c
+	ps.c
+	renice.c
+	rescan.c
+	unchop.c
+	waitfor.c
+;
+
+#SubInclude OBOS_TOP src apps bin gnu ;
+
