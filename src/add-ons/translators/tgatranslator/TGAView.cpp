@@ -54,14 +54,23 @@ TGAView::TGAView(const BRect &frame, const char *name,
 	
 	SetViewColor(220,220,220,0);
 	
-	BMessage *pmsgRLE = new BMessage(CHANGE_RLE);
-	fpchkRLE = new BCheckBox(BRect(10, 45, 180, 62),
-		"Save with RLE Compression",
-		"Save with RLE Compression", pmsgRLE);
-		
+	BMessage *pmsg;
 	int32 val;
+	
+	pmsg = new BMessage(CHANGE_IGNORE_ALPHA);
+	fpchkIgnoreAlpha = new BCheckBox(BRect(10, 45, 180, 62),
+		"Ignore TGA alpha channel",
+		"Ignore TGA alpha channel", pmsg);
+	val = (psettings->SetGetIgnoreAlpha()) ? 1 : 0;
+	fpchkIgnoreAlpha->SetValue(val);
+	fpchkIgnoreAlpha->SetViewColor(ViewColor());
+	AddChild(fpchkIgnoreAlpha);
+	
+	pmsg = new BMessage(CHANGE_RLE);
+	fpchkRLE = new BCheckBox(BRect(10, 67, 180, 84),
+		"Save with RLE Compression",
+		"Save with RLE Compression", pmsg);
 	val = (psettings->SetGetRLE()) ? 1 : 0;
-
 	fpchkRLE->SetValue(val);
 	fpchkRLE->SetViewColor(ViewColor());
 	AddChild(fpchkRLE);
@@ -102,6 +111,7 @@ void
 TGAView::AllAttached()
 {
 	BMessenger msgr(this);
+	fpchkIgnoreAlpha->SetTarget(msgr);
 	fpchkRLE->SetTarget(msgr);
 }
 
@@ -121,16 +131,30 @@ TGAView::AllAttached()
 void
 TGAView::MessageReceived(BMessage *message)
 {
-	if (message->what == CHANGE_RLE) {
-		bool bnewval;
-		if (fpchkRLE->Value())
-			bnewval = true;
-		else
-			bnewval = false;
-		fpsettings->SetGetRLE(&bnewval);
-		fpsettings->SaveSettings();
-	} else
-		BView::MessageReceived(message);
+	bool bnewval;
+	switch (message->what) {
+		case CHANGE_IGNORE_ALPHA:
+			if (fpchkIgnoreAlpha->Value())
+				bnewval = true;
+			else
+				bnewval = false;
+			fpsettings->SetGetIgnoreAlpha(&bnewval);
+			fpsettings->SaveSettings();
+			break;
+		
+		case CHANGE_RLE:
+			if (fpchkRLE->Value())
+				bnewval = true;
+			else
+				bnewval = false;
+			fpsettings->SetGetRLE(&bnewval);
+			fpsettings->SaveSettings();
+			break;
+		
+		default:
+			BView::MessageReceived(message);
+			break;
+	}
 }
 
 // ---------------------------------------------------------------

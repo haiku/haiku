@@ -40,6 +40,7 @@
 
 // TGA Translator Settings
 #define TGA_SETTING_RLE "tga /rle"
+#define TGA_SETTING_IGNORE_ALPHA "tga /ignore_alpha"
 
 class TGATranslatorSettings {
 public:
@@ -67,9 +68,13 @@ public:
 		// specifiees if only the image data should be
 		// outputted
 	bool SetGetRLE(bool *pbRLE = NULL);
-		// sets /gets RLE setting
+		// sets / gets RLE setting
 		// specifies if RLE compression will be used
 		// when the TGATranslator creates TGA images
+	bool SetGetIgnoreAlpha(bool *pbIgnoreAlpha = NULL);
+		// sets / gets ignore alpha setting
+		// specifies whether or not TGATranslator uses
+		// the alpha data from TGA files
 	
 private:
 	~TGATranslatorSettings();

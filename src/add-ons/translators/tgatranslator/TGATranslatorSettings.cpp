@@ -65,6 +65,8 @@ TGATranslatorSettings::TGATranslatorSettings()
 	fmsgSettings.AddBool(B_TRANSLATOR_EXT_DATA_ONLY, false);
 	fmsgSettings.AddBool(TGA_SETTING_RLE, false);
 		// RLE compression is off by default
+	fmsgSettings.AddBool(TGA_SETTING_IGNORE_ALPHA, false);
+		// Don't ignore the alpha channel in TGA files by default
 }
 
 // ---------------------------------------------------------------
@@ -207,20 +209,22 @@ TGATranslatorSettings::LoadSettings(BMessage *pmsg)
 	if (pmsg) {
 		// Make certain that no TGA settings
 		// are missing from the file
-		bool bheaderOnly, bdataOnly, brle;
+		bool bheaderOnly, bdataOnly, brle, bignore;
 		
 		flock.Lock();
+		
 		result = pmsg->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderOnly);
 		if (result != B_OK)
 			bheaderOnly = SetGetHeaderOnly();
-			
 		result = pmsg->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataOnly);
 		if (result != B_OK)
 			bdataOnly = SetGetDataOnly();
-			
 		result = pmsg->FindBool(TGA_SETTING_RLE, &brle);
 		if (result != B_OK)
 			brle = SetGetRLE();
+		result = pmsg->FindBool(TGA_SETTING_IGNORE_ALPHA, &bignore);
+		if (result != B_OK)
+			bignore = SetGetIgnoreAlpha();
 				
 		if (bheaderOnly && bdataOnly)
 			// "write header only" and "write data only"
@@ -231,13 +235,14 @@ TGATranslatorSettings::LoadSettings(BMessage *pmsg)
 			
 			result = fmsgSettings.ReplaceBool(
 				B_TRANSLATOR_EXT_HEADER_ONLY, bheaderOnly);
-			
 			if (result == B_OK)
 				result = fmsgSettings.ReplaceBool(
 					B_TRANSLATOR_EXT_DATA_ONLY, bdataOnly);
-		
 			if (result == B_OK)		
 				result = fmsgSettings.ReplaceBool(TGA_SETTING_RLE, brle);
+			if (result == B_OK)
+				result = fmsgSettings.ReplaceBool(TGA_SETTING_IGNORE_ALPHA,
+					bignore);
 		}
 		flock.Unlock();
 	}
@@ -304,7 +309,8 @@ TGATranslatorSettings::GetConfigurationMessage(BMessage *pmsg)
 		const char *kNames[] = {
 			B_TRANSLATOR_EXT_HEADER_ONLY,
 			B_TRANSLATOR_EXT_DATA_ONLY,
-			TGA_SETTING_RLE
+			TGA_SETTING_RLE,
+			TGA_SETTING_IGNORE_ALPHA
 		};
 		const int32 klen = sizeof(kNames) / sizeof(const char *);
 		int32 i;
@@ -319,14 +325,14 @@ TGATranslatorSettings::GetConfigurationMessage(BMessage *pmsg)
 			
 			result = pmsg->AddBool(B_TRANSLATOR_EXT_HEADER_ONLY,
 				SetGetHeaderOnly());
-			
 			if (result == B_OK)
 				result = pmsg->AddBool(B_TRANSLATOR_EXT_DATA_ONLY,
 					SetGetDataOnly());
-		
 			if (result == B_OK)		
-				result = pmsg->AddBool(TGA_SETTING_RLE,
-					SetGetRLE());
+				result = pmsg->AddBool(TGA_SETTING_RLE, SetGetRLE());
+			if (result == B_OK)
+				result = pmsg->AddBool(TGA_SETTING_IGNORE_ALPHA,
+					SetGetIgnoreAlpha());
 				
 			flock.Unlock();
 		}
@@ -430,6 +436,38 @@ TGATranslatorSettings::SetGetRLE(bool *pbRLE)
 	fmsgSettings.FindBool(TGA_SETTING_RLE, &bprevValue);
 	if (pbRLE)
 		fmsgSettings.ReplaceBool(TGA_SETTING_RLE, *pbRLE);
+	flock.Unlock();
+	
+	return bprevValue;
+}
+
+// ---------------------------------------------------------------
+// SetGetIgnoreAlpha
+//
+// Sets the state of the ignore alpha setting (if pbIgnoreAlpha
+// is not NULL) and returns the previous value of the setting.
+//
+// If ignore alpha is true, the alpha channel from TGA images
+// will not be included when they are converted to BBitmp images.
+//
+// Preconditions:
+//
+// Parameters:	pbIgnoreAlpha	pointer to bool which specifies
+//								the new ignore alpha setting
+//
+// Postconditions:
+//
+// Returns: the prior value of the ignore alpha setting
+// ---------------------------------------------------------------
+bool
+TGATranslatorSettings::SetGetIgnoreAlpha(bool *pbIgnoreAlpha)
+{
+	bool bprevValue;
+	
+	flock.Lock();
+	fmsgSettings.FindBool(TGA_SETTING_IGNORE_ALPHA, &bprevValue);
+	if (pbIgnoreAlpha)
+		fmsgSettings.ReplaceBool(TGA_SETTING_IGNORE_ALPHA, *pbIgnoreAlpha);
 	flock.Unlock();
 	
 	return bprevValue;

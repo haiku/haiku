@@ -366,20 +366,40 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 }
 
 uint8
-tga_alphabits(TGAImageSpec &imagespec)
+tga_alphabits(TGAFileHeader &filehead, TGAColorMapSpec &mapspec,
+	TGAImageSpec &imagespec, TGATranslatorSettings &settings)
 {
-	uint8 nalpha;
-	if (imagespec.depth == 32)
-		// Some programs that generate 32-bit TGA files 
-		// have an alpha channel, but have an incorrect
-		// descriptor which says there are no alpha bits.
-		// This logic is so that the alpha data can be
-		// obtained from TGA files that lie.
-		nalpha = 8;
-	else
-		nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
+	if (settings.SetGetIgnoreAlpha())
+		return 0;
+	else {
+		uint8 nalpha;
+		if (filehead.imagetype == TGA_NOCOMP_COLORMAP ||
+			filehead.imagetype == TGA_RLE_COLORMAP) {
+			// color mapped images
+			
+			if (mapspec.entrysize == 32)
+				nalpha = 8;
+			else if (mapspec.entrysize == 16)
+				nalpha = 1;
+			else
+				nalpha = 0;
+
+		} else {
+			// non-color mapped images
+			
+			if (imagespec.depth == 32)
+				// Some programs that generate 32-bit TGA files 
+				// have an alpha channel, but have an incorrect
+				// descriptor which says there are no alpha bits.
+				// This logic is so that the alpha data can be
+				// obtained from TGA files that lie.
+				nalpha = 8;
+			else
+				nalpha = imagespec.descriptor & TGA_DESC_ALPHABITS;
+		}
 		
-	return nalpha;
+		return nalpha;
+	}
 }
 
 // ---------------------------------------------------------------
@@ -1788,7 +1808,13 @@ pix_tganm_to_bits(uint8 *pbits, uint8 *ptga,
 //
 // outDestination,	where the bits data will be written to
 //
+// filehead, image type info
+//
+// mapspec, color map info
+//
 // imagespec, width / height info
+//
+// settings, TGATranslator settings
 //
 //
 // Postconditions:
@@ -1799,14 +1825,16 @@ pix_tganm_to_bits(uint8 *pbits, uint8 *ptga,
 // ---------------------------------------------------------------
 status_t
 translate_from_tganm_to_bits(BPositionIO *inSource,
-	BPositionIO *outDestination, TGAImageSpec &imagespec)
+	BPositionIO *outDestination, TGAFileHeader &filehead,
+	TGAColorMapSpec &mapspec, TGAImageSpec &imagespec,
+	TGATranslatorSettings &settings)
 {
 	bool bvflip;
 	if (imagespec.descriptor & TGA_ORIGIN_VERT_BIT)
 		bvflip = false;
 	else
 		bvflip = true;
-	uint8 nalpha = tga_alphabits(imagespec);
+	uint8 nalpha = tga_alphabits(filehead, mapspec, imagespec, settings);
 	int32 bitsRowBytes = imagespec.width * 4;
 	uint8 tgaBytesPerPixel = (imagespec.depth / 8) +
 		((imagespec.depth % 8) ? 1 : 0);
@@ -1878,7 +1906,13 @@ translate_from_tganm_to_bits(BPositionIO *inSource,
 //
 // outDestination,	where the bits data will be written to
 //
+// filehead, image type info
+//
+// mapspec, color map info
+//
 // imagespec, width / height info
+//
+// settings, TGATranslator settings
 //
 //
 // Postconditions:
@@ -1889,7 +1923,9 @@ translate_from_tganm_to_bits(BPositionIO *inSource,
 // ---------------------------------------------------------------
 status_t
 translate_from_tganmrle_to_bits(BPositionIO *inSource,
-	BPositionIO *outDestination, TGAImageSpec &imagespec)
+	BPositionIO *outDestination, TGAFileHeader &filehead,
+	TGAColorMapSpec &mapspec, TGAImageSpec &imagespec,
+	TGATranslatorSettings &settings)
 {
 	status_t result = B_OK;
 	
@@ -1898,7 +1934,7 @@ translate_from_tganmrle_to_bits(BPositionIO *inSource,
 		bvflip = false;
 	else
 		bvflip = true;
-	uint8 nalpha = tga_alphabits(imagespec);
+	uint8 nalpha = tga_alphabits(filehead, mapspec, imagespec, settings);
 	int32 bitsRowBytes = imagespec.width * 4;
 	uint8 tgaBytesPerPixel = (imagespec.depth / 8) +
 		((imagespec.depth % 8) ? 1 : 0);
@@ -2174,9 +2210,13 @@ translate_from_tgam_to_bits(BPositionIO *inSource,
 //
 // outDestination,	where the bits data will be written to
 //
+// filehead, image type info
+//
 // mapspec, info about the color map (palette)
 //
 // imagespec, width / height info
+//
+// settings, TGATranslator settings
 //
 // pmap, color palette
 //
@@ -2189,8 +2229,9 @@ translate_from_tgam_to_bits(BPositionIO *inSource,
 // ---------------------------------------------------------------
 status_t
 translate_from_tgamrle_to_bits(BPositionIO *inSource,
-	BPositionIO *outDestination, TGAColorMapSpec &mapspec,
-	TGAImageSpec &imagespec, uint8 *pmap)
+	BPositionIO *outDestination, TGAFileHeader &filehead,
+	TGAColorMapSpec &mapspec, TGAImageSpec &imagespec,
+	TGATranslatorSettings &settings, uint8 *pmap)
 {
 	status_t result = B_OK;
 	
@@ -2199,19 +2240,7 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 		bvflip = false;
 	else
 		bvflip = true;
-	uint8 nalpha = 0;
-	switch (mapspec.entrysize) {
-		case 32:
-			nalpha = 8;
-			break;
-		case 16:
-			nalpha = 1;
-			break;
-		default:
-			nalpha = 0;
-			break;
-	}
-
+	uint8 nalpha = tga_alphabits(filehead, mapspec, imagespec, settings);
 	int32 bitsRowBytes = imagespec.width * 4;
 	uint8 tgaPalBytesPerPixel = (mapspec.entrysize / 8) +
 		((mapspec.entrysize % 8) ? 1 : 0);
@@ -2413,7 +2442,7 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		bitsHeader.rowBytes = imagespec.width * 4;
 		if (fileheader.imagetype != TGA_NOCOMP_BW &&
 			fileheader.imagetype != TGA_RLE_BW &&
-			tga_alphabits(imagespec))
+			tga_alphabits(fileheader, mapspec, imagespec, settings))
 			bitsHeader.colors = B_RGBA32;
 		else
 			bitsHeader.colors = B_RGB32;
@@ -2437,7 +2466,7 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 			case TGA_NOCOMP_TRUECOLOR:
 			case TGA_NOCOMP_BW:
 				result = translate_from_tganm_to_bits(inSource,
-					outDestination, imagespec);
+					outDestination, fileheader, mapspec, imagespec, settings);
 				break;
 				
 			case TGA_NOCOMP_COLORMAP:
@@ -2448,12 +2477,12 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 			case TGA_RLE_TRUECOLOR:
 			case TGA_RLE_BW:
 				result = translate_from_tganmrle_to_bits(inSource,
-					outDestination, imagespec);
+					outDestination, fileheader, mapspec, imagespec, settings);
 				break;
 				
 			case TGA_RLE_COLORMAP:
-				result = translate_from_tgamrle_to_bits(inSource,
-					outDestination, mapspec, imagespec, ptgapalette);
+				result = translate_from_tgamrle_to_bits(inSource, outDestination,
+					fileheader, mapspec, imagespec, settings, ptgapalette);
 				break;
 				
 			default:

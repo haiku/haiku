@@ -50,8 +50,9 @@ public:
 	virtual	void Draw(BRect area);
 		// draws information about the TGATranslator
 		
-	enum { CHANGE_RLE };
+	enum { CHANGE_RLE, CHANGE_IGNORE_ALPHA };
 private:
+	BCheckBox *fpchkIgnoreAlpha;
 	BCheckBox *fpchkRLE;
 	
 	TGATranslatorSettings *fpsettings;
