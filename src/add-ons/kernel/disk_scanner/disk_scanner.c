@@ -26,11 +26,34 @@ static const char *kFSModulePrefix			= "disk_scanner/fs";
 #define TRACE(x) ;
 //#define TRACE(x) dprintf x
 
+// fs_block
+typedef struct fs_block {
+	off_t			offset;
+	void			*data;
+	struct fs_block	*previous;
+	struct fs_block	*next;
+} fs_block;
+
+// fs_buffer_cache
+typedef struct fs_buffer_cache {
+	int					fd;
+	off_t				offset;
+	off_t				size;
+	size_t				block_size;
+	struct fs_block		*first_block;
+	struct fs_block		*last_block;
+} fs_buffer_cache;
+
 // prototypes
 static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
 static status_t get_partition_module_block(int deviceFD,
 	const session_info *sessionOffset, const uchar *block,
 	partition_module_info **partitionModule);
+static status_t init_fs_buffer_cache(struct fs_buffer_cache *cache, int fd,
+	off_t offset, off_t size, size_t blockSize);
+static status_t cleanup_fs_buffer_cache(struct fs_buffer_cache *cache);
+static status_t get_buffer(struct fs_buffer_cache *cache, off_t offset,
+						   size_t size, void **_buffer, size_t *actualSize);
 
 
 // std_ops
@@ -91,7 +114,7 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 	if (error == B_OK) {
 		*block = malloc(size);
 		if (*block) {
-			if (read_pos(fd, 0, *block, size) != (ssize_t)size) {
+			if (read_pos(fd, offset, *block, size) != (ssize_t)size) {
 				error = errno;
 				if (error == B_OK)
 					error = B_ERROR;
@@ -170,10 +193,12 @@ disk_scanner_get_partition_module(int deviceFD,
 static
 status_t
 disk_scanner_get_nth_session_info(int deviceFD, int32 index,
-								  session_info *sessionInfo)
+								  session_info *sessionInfo,
+								  session_module_info **_sessionModule)
 {
 	status_t error = B_OK;
-	session_module_info *sessionModule = NULL;
+	session_module_info *sessionModule
+		= (_sessionModule ? *_sessionModule : NULL);
 	bool isCD = false;
 	int32 blockSize = 0;
 	off_t deviceSize = 0;
@@ -192,18 +217,24 @@ disk_scanner_get_nth_session_info(int deviceFD, int32 index,
 		} else
 			error = errno;
 	}
+TRACE(("disk_scanner:   check: %s\n", strerror(error)));
 	// get a session module, if the device is a CD, otherwise return a
 	// virtual session
 	if (error == B_OK) {
 		if (isCD) {
 			// get the session module
-			error = disk_scanner_get_session_module(deviceFD, deviceSize,
-												blockSize, &sessionModule);
+			if (!sessionModule) {
+				error = disk_scanner_get_session_module(deviceFD, deviceSize,
+														blockSize,
+														&sessionModule);
+TRACE(("disk_scanner:     check: %s\n", strerror(error)));
+			}
 			// get the info
 			if (error == B_OK) {
 				error = sessionModule->get_nth_info(deviceFD, index,
 													deviceSize, blockSize,
 													sessionInfo);
+TRACE(("disk_scanner:     check: %s\n", strerror(error)));
 			}
 		} else if (index == 0) {
 			// no CD -- virtual session
@@ -215,9 +246,14 @@ disk_scanner_get_nth_session_info(int deviceFD, int32 index,
 		} else	// no CD, fail after the first session
 			error = B_ENTRY_NOT_FOUND;
 	}
-	// cleanup
-	if (sessionModule)
+TRACE(("disk_scanner:   check: %s\n", strerror(error)));
+	// cleanup / set results
+	if (_sessionModule)
+		*_sessionModule = sessionModule;
+	else if (sessionModule)
 		put_module(sessionModule->module.name);
+	TRACE(("disk_scanner: get_nth_session_info() done: %s\n",
+		   strerror(error)));
 	return error;
 }
 
@@ -227,12 +263,14 @@ status_t
 disk_scanner_get_nth_partition_info(int deviceFD,
 									const session_info *sessionInfo,
 									int32 partitionIndex,
-									extended_partition_info *partitionInfo)
+									extended_partition_info *partitionInfo,
+									partition_module_info **_partitionModule)
 {
-	partition_module_info *partitionModule = NULL;
+	partition_module_info *partitionModule
+		= (_partitionModule ? *_partitionModule : NULL);
 	status_t error = (partitionInfo ? B_OK : B_BAD_VALUE);
 	TRACE(("disk_scanner: get_nth_partition_info(%d, %lld, %lld, %ld, %ld, %ld)\n",
-		   deviceFD, sessionOffset, sessionSize,
+		   deviceFD, sessionInfo->offset, sessionInfo->size,
 		   partitionInfo->info.logical_block_size, partitionInfo->info.session,
 		   partitionInfo->info.partition));
 	if (error == B_OK) {
@@ -245,21 +283,23 @@ disk_scanner_get_nth_partition_info(int deviceFD,
 		partitionInfo->info.session = sessionInfo->index;
 		partitionInfo->info.partition = partitionIndex;
 		// read the first block of the session and get the partition module
-		error = read_block(deviceFD, sessionOffset, blockSize, &block);
-		if (error == B_OK) {
-			error = get_partition_module_block(deviceFD, sessionInfo, block,
-											   &partitionModule);
-			if (error == B_ENTRY_NOT_FOUND
-				&& partitionInfo->info.partition == 0) {
-				// no matching partition module found: return a virtual
-				// partition info
-				partitionInfo->info.offset = sessionOffset;
-				partitionInfo->info.size = sessionSize;
-				partitionInfo->flags = B_VIRTUAL_PARTITION;
-				partitionInfo->partition_name[0] = '\0';
-				partitionInfo->partition_type[0] = '\0';
-				partitionInfo->partition_code = 0xeb;	// doesn't matter
-				error = B_OK;
+		if (!partitionModule) {
+			error = read_block(deviceFD, sessionOffset, blockSize, &block);
+			if (error == B_OK) {
+				error = get_partition_module_block(deviceFD, sessionInfo,
+												   block, &partitionModule);
+				if (error == B_ENTRY_NOT_FOUND
+					&& partitionInfo->info.partition == 0) {
+					// no matching partition module found: return a virtual
+					// partition info
+					partitionInfo->info.offset = sessionOffset;
+					partitionInfo->info.size = sessionSize;
+					partitionInfo->flags = B_VIRTUAL_PARTITION;
+					partitionInfo->partition_name[0] = '\0';
+					partitionInfo->partition_type[0] = '\0';
+					partitionInfo->partition_code = 0xeb;	// doesn't matter
+					error = B_OK;
+				}
 			}
 		}
 		// get the info
@@ -267,8 +307,10 @@ disk_scanner_get_nth_partition_info(int deviceFD,
 			error = partitionModule->get_nth_info(deviceFD, sessionInfo,
 				block, partitionIndex, partitionInfo);
 		}
-		// cleanup
-		if (partitionModule)
+		// cleanup / set results
+		if (_partitionModule)
+			*_partitionModule = partitionModule;
+		else if (partitionModule)
 			put_module(partitionModule->module.name);
 		if (block)
 			free(block);
@@ -280,15 +322,24 @@ disk_scanner_get_nth_partition_info(int deviceFD,
 static
 status_t
 disk_scanner_get_partition_fs_info(int deviceFD,
-							   extended_partition_info *partitionInfo)
+								   extended_partition_info *partitionInfo)
 {
-	// Iterate through the list of FS modules and return the result of the
-	// first one that thinks, it is the right one.
 	status_t error = (partitionInfo ? B_OK : B_BAD_VALUE);
 	void *list = NULL;
+	fs_buffer_cache cache;
+	bool cacheInitialized = false;
 	TRACE(("disk_scanner: get_partition_fs_info(%d, %lld, %lld, %ld)\n", deviceFD,
 		   partitionInfo->info.offset, partitionInfo->info.size,
 		   partitionInfo->info.logical_block_size));
+	// init the cache
+	if (error == B_OK) {
+		error = init_fs_buffer_cache(&cache, deviceFD,
+			partitionInfo->info.offset, partitionInfo->info.size,
+			partitionInfo->info.logical_block_size);
+		cacheInitialized = (error == B_OK);
+	}
+	// Iterate through the list of FS modules and return the result of the
+	// first one that thinks, it is the right one.
 	if (error == B_OK && ((list = open_module_list(kFSModulePrefix)))) {
 		extended_partition_info bestInfo;
 		float bestPriority = -2;
@@ -304,7 +355,8 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 				// get the info
 				extended_partition_info info = *partitionInfo;
 				float priority = 0;
-				if (module->identify(deviceFD, &info, &priority)) {
+				if (module->identify(deviceFD, &info, &priority, get_buffer,
+									 &cache)) {
 					// copy the info, if it is the first or the has a higher
 					// priority than the one found before
 					if (error == B_ENTRY_NOT_FOUND
@@ -322,8 +374,167 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 		}
 		close_module_list(list);
 	}
+	// cleanup the cache
+	if (cacheInitialized)
+		cleanup_fs_buffer_cache(&cache);
 	return error;
 }
+
+// new_fs_block
+static
+status_t
+new_fs_block(int fd, off_t offset, size_t size, fs_block **_block)
+{
+	status_t error = (_block ? B_OK : B_BAD_VALUE);
+	fs_block *block = NULL;
+	// alloc the block
+	if (error == B_OK) {
+		block = (fs_block*)malloc(sizeof(fs_block));
+		if (!block)
+			error = B_NO_MEMORY;
+	}
+	// read the block
+	if (error == B_OK)
+		error = read_block(fd, offset, size, (uchar**)&block->data);
+	// set the fields / cleanup on error
+	if (error == B_OK) {
+		block->offset = offset;
+		block->previous = NULL;
+		block->next = NULL;
+		*_block = block;
+	} else {
+		if (block)
+			free(block);
+	}
+	return error;
+}
+
+// delete_fs_block
+static
+void
+delete_fs_block(fs_block *block)
+{
+	if (block) {
+		if (block->data)
+			free(block->data);
+		free(block);
+	}
+}
+
+// init_fs_buffer_cache
+static
+status_t
+init_fs_buffer_cache(struct fs_buffer_cache *cache, int fd, off_t offset,
+					 off_t size, size_t blockSize)
+{
+	cache->fd = fd;
+	cache->offset = offset;
+	cache->size = size;
+	cache->block_size = blockSize;
+	cache->first_block = NULL;
+	cache->last_block = NULL;
+	return B_OK;
+}
+
+// cleanup_fs_buffer_cache
+static
+status_t
+cleanup_fs_buffer_cache(struct fs_buffer_cache *cache)
+{
+	if (cache) {
+		while (cache->first_block) {
+			fs_block *block = cache->first_block;
+			cache->first_block = block->next;
+			delete_fs_block(block);
+		}
+	}
+	return B_OK;
+}
+
+// get_buffer
+static
+status_t
+get_buffer(struct fs_buffer_cache *cache, off_t offset, size_t size,
+		   void **_buffer, size_t *actualSize)
+{
+	status_t error = (cache && _buffer && actualSize
+					  && offset >= cache->offset && size > 0
+					  ? B_OK : B_BAD_VALUE);
+	uint8 *buffer = NULL;
+	// check the bounds
+	if (error == B_OK) {
+		if (offset >= cache->offset + cache->size)
+			size = 0;
+		else if (offset + size > cache->offset + cache->size)
+			size = cache->offset + cache->size - offset;
+	}
+	// allocate the buffer
+	if (error == B_OK && size > 0) {
+		buffer = (uint8*)malloc(size);
+		if (buffer) {
+			// iterate through the list of cached blocks
+			off_t blockOffset = offset - offset % cache->block_size;
+			size_t remainingBytes = size;
+			fs_block *block = NULL;
+			for (block = cache->first_block;
+				 error == B_OK && remainingBytes > 0;
+				 block = block->next) {
+				if (!block || block->offset >= blockOffset) {
+					if (!block || block->offset > blockOffset) {
+						// the block is not in cache, read it
+						fs_block *newBlock = NULL;
+						error = new_fs_block(cache->fd, blockOffset,
+											 cache->block_size, &newBlock);
+						if (error == B_OK) {
+							// insert the new block
+							if (block)
+								newBlock->previous = block->previous;
+							else
+								newBlock->previous = cache->last_block;
+							newBlock->next = block;
+							if (newBlock->previous)
+								newBlock->previous->next = newBlock;
+							else
+								cache->first_block = newBlock;
+							if (newBlock->next)
+								newBlock->next->previous = newBlock;
+							else
+								cache->last_block = newBlock;
+							block = newBlock;
+						}
+					}
+					if (error == B_OK) {
+						// block is (now) in cache, copy the data
+						off_t inBlockOffset = 0;
+						size_t toCopy = cache->block_size;
+						if (blockOffset < offset) {
+							inBlockOffset = offset - blockOffset;
+							toCopy -= inBlockOffset;
+						}
+						if (toCopy > remainingBytes)
+							toCopy = remainingBytes;
+						memcpy(buffer + blockOffset + inBlockOffset - offset,
+							   (uint8*)block->data + inBlockOffset, toCopy);
+						blockOffset += cache->block_size;
+						remainingBytes -= toCopy;
+					}
+				}
+			}
+		} else
+			error = B_NO_MEMORY;
+	}
+	// set results	/ cleanup on error
+	if (error == B_OK) {
+		*_buffer = buffer;
+		*actualSize = size;
+	} else {
+		if (buffer)
+			free(buffer);
+	}
+	return error;
+}
+
+
 
 static disk_scanner_module_info disk_scanner_module = 
 {
