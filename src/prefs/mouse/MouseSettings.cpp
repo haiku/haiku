@@ -199,13 +199,12 @@ MouseSettings::Defaults()
 void 
 MouseSettings::Revert()
 {
-	set_mouse_type(fOriginalSettings.type);
-	set_click_speed(fOriginalSettings.click_speed);
-	set_mouse_speed(fOriginalSettings.accel.speed);
-	set_mouse_acceleration(fOriginalSettings.accel.accel_factor);
-	set_mouse_map(&fOriginalSettings.map);
-
-	set_mouse_mode(fOriginalMode);
+	SetClickSpeed(fOriginalSettings.click_speed);
+	SetMouseSpeed(fOriginalSettings.accel.speed);
+	SetMouseType(fOriginalSettings.type);
+	SetAccelerationFactor(fOriginalSettings.accel.accel_factor);
+	SetMouseMode(fOriginalMode);
+	SetMapping(fOriginalSettings.map);
 }
 
 
