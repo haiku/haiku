@@ -6,13 +6,21 @@
 #ifndef _DISK_DEVICE_ROSTER_H
 #define _DISK_DEVICE_ROSTER_H
 
+#include <image.h>
+
 #include <DiskDeviceVisitor.h>
 #include <Messenger.h>
 #include <SupportDefs.h>
 
+class BDirectory;
 class BDiskDevice;
+class BDiskScannerPartitionAddOn;
 class BPartition;
 class BSession;
+
+namespace BPrivate {
+	class AddOnImage;
+}
 
 // watchable events
 enum {
@@ -99,13 +107,41 @@ public:
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
 	status_t StopWatching(BMessenger target);
 
+	// partition and FS add-ons
+	status_t GetNextPartitioningSystem(char *shortName, char *longName = NULL);
+	status_t GetNextFileSystem(char *shortName, char *longName = NULL);
+	status_t RewindPartitiningSystems();
+	status_t RewindFileSystems();
+
 private:
 	status_t _GetObjectWithID(const char *fieldName, int32 id,
 							  BDiskDevice *device) const;
 
+	// TODO: Introduce iterators instead of these functions.
+
+	static status_t _GetNextAddOn(BDirectory **directory, int32 *index,
+								  const char *subdir,
+								  BPrivate::AddOnImage *image);
+	static status_t _GetNextAddOn(BDirectory *directory,
+								  BPrivate::AddOnImage *image);
+	static status_t _GetNextAddOnDir(BPath *path, int32 *index,
+									 const char *subdir);
+	static status_t _GetNextAddOnDir(BDirectory **directory, int32 *index,
+									 const char *subdir);
+
+	static status_t _LoadPartitionAddOn(const char *partitioningSystem,
+										BPrivate::AddOnImage *image,
+										BDiskScannerPartitionAddOn **addOn);
+
 private:
+	friend class BSession;
+
 	BMessenger	fManager;
 	int32		fCookie;
+	BDirectory	*fPartitionAddOnDir;
+	BDirectory	*fFSAddOnDir;
+	int32		fPartitionAddOnDirIndex;
+	int32		fFSAddOnDirIndex;
 };
 
 #endif	// _DISK_DEVICE_ROSTER_H

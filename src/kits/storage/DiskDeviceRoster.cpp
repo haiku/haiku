@@ -5,20 +5,38 @@
 
 #include <new.h>
 
-#include <DiskDeviceRoster.h>
+#include <Directory.h>
 #include <DiskDevice.h>
 #include <DiskDevicePrivate.h>
+#include <DiskDeviceRoster.h>
+#include <DiskScannerAddOn.h>
+#include <Entry.h>
+#include <FindDirectory.h>
 #include <Message.h>
 #include <Partition.h>
+#include <Path.h>
 #include <RegistrarDefs.h>
 #include <RosterPrivate.h>
 #include <Session.h>
+
+#include "AddOnImage.h"
 
 /*!	\class BDiskDeviceRoster
 	\brief An interface for iterating through the disk devices known to the
 		   system and for a notification mechanism provided to listen to their
 		   changes.
 */
+
+/*!	\brief find_directory constants of the add-on dirs to be searched. */
+static const directory_which kAddOnDirs[] = {
+	B_USER_ADDONS_DIRECTORY,
+	B_COMMON_ADDONS_DIRECTORY,
+	B_BEOS_ADDONS_DIRECTORY
+};
+/*!	\brief Size of the kAddOnDirs array. */
+static const int32 kAddOnDirCount
+	= sizeof(kAddOnDirs) / sizeof(directory_which);
+
 
 // constructor
 /*!	\brief Creates a BDiskDeviceRoster object.
@@ -27,7 +45,11 @@
 */
 BDiskDeviceRoster::BDiskDeviceRoster()
 	: fManager(),
-	  fCookie(0)
+	  fCookie(0),
+	  fPartitionAddOnDir(NULL),
+	  fFSAddOnDir(NULL),
+	  fPartitionAddOnDirIndex(0),
+	  fFSAddOnDirIndex(0)
 {
 	get_disk_device_messenger(&fManager);
 }
@@ -37,6 +59,10 @@ BDiskDeviceRoster::BDiskDeviceRoster()
 */
 BDiskDeviceRoster::~BDiskDeviceRoster()
 {
+	if (fPartitionAddOnDir)
+		delete fPartitionAddOnDir;
+	if (fFSAddOnDir)
+		delete fFSAddOnDir;
 }
 
 // GetNextDevice
@@ -494,6 +520,156 @@ BDiskDeviceRoster::StopWatching(BMessenger target)
 	return error;
 }
 
+// GetNextPartitioningSystem
+/*!	\brief Returns the next partitioning system capable of partitioning.
+
+	The returned \a shortName can be passed to BSession::Partition().
+
+	\param shortName Pointer to a pre-allocation char buffer, of size
+		   \c B_FILE_NAME_LENGTH or larger into which the short name of the
+		   partitioning system shall be written.
+	\param longName Pointer to a pre-allocation char buffer, of size
+		   \c B_FILE_NAME_LENGTH or larger into which the long name of the
+		   partitioning system shall be written. May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a shortName.
+	- \c B_ENTRY_NOT_FOUND: End of the list has been reached.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::GetNextPartitioningSystem(char *shortName, char *longName)
+{
+	status_t error = (shortName ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// search until an add-on has been found or the end of all directories
+		// has been reached
+		bool found = false;
+		do {
+			// get the next add-on in the current dir
+			AddOnImage image;
+			error = _GetNextAddOn(fPartitionAddOnDir, &image);
+			if (error == B_OK) {
+				// add-on loaded: get the function that creates an add-on
+				// object
+				BDiskScannerPartitionAddOn *(*create_add_on)();
+				if (get_image_symbol(image.ID(), "create_ds_partition_add_on",
+									 B_SYMBOL_TYPE_TEXT,
+									 (void**)&create_add_on) == B_OK) {
+					// create the add-on object and copy the requested data
+					if (BDiskScannerPartitionAddOn *addOn
+						= (*create_add_on)()) {
+						const char *addOnShortName = addOn->ShortName();
+						const char *addOnLongName = addOn->LongName();
+						if (addOnShortName && addOnLongName) {
+							strcpy(shortName, addOnShortName);
+							if (longName)
+								strcpy(longName, addOnLongName);
+							found = true;
+						}
+						delete addOn;
+					}
+				}
+			} else if (error == B_ENTRY_NOT_FOUND) {
+				// end of the current directory has been reached, try next dir
+				error = _GetNextAddOnDir(&fPartitionAddOnDir,
+										 &fPartitionAddOnDirIndex,
+										 "partition");
+			}
+		} while (error == B_OK && !found);
+	}
+	return error;
+}
+
+// GetNextFileSystem
+/*!	\brief Returns the next file system capable of initializing.
+
+	The returned \a shortName can be passed to BPartition::Initialize().
+
+	\param shortName Pointer to a pre-allocation char buffer, of size
+		   \c B_FILE_NAME_LENGTH or larger into which the short name of the
+		   file system shall be written.
+	\param longName Pointer to a pre-allocation char buffer, of size
+		   \c B_FILE_NAME_LENGTH or larger into which the long name of the
+		   file system shall be written. May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a shortName.
+	- \c B_ENTRY_NOT_FOUND: End of the list has been reached.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::GetNextFileSystem(char *shortName, char *longName)
+{
+	status_t error = (shortName ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// search until an add-on has been found or the end of all directories
+		// has been reached
+		bool found = false;
+		do {
+			// get the next add-on in the current dir
+			AddOnImage image;
+			error = _GetNextAddOn(fFSAddOnDir, &image);
+			if (error == B_OK) {
+				// add-on loaded: get the function that creates an add-on
+				// object
+				BDiskScannerFSAddOn *(*create_add_on)();
+				if (get_image_symbol(image.ID(), "create_ds_fs_add_on",
+									 B_SYMBOL_TYPE_TEXT,
+									 (void**)&create_add_on) == B_OK) {
+					// create the add-on object and copy the requested data
+					if (BDiskScannerFSAddOn *addOn = (*create_add_on)()) {
+						const char *addOnShortName = addOn->ShortName();
+						const char *addOnLongName = addOn->LongName();
+						if (addOnShortName && addOnLongName) {
+							strcpy(shortName, addOnShortName);
+							if (longName)
+								strcpy(longName, addOnLongName);
+							found = true;
+						}
+						delete addOn;
+					}
+				}
+			} else if (error == B_ENTRY_NOT_FOUND) {
+				// end of the current directory has been reached, try next dir
+				error = _GetNextAddOnDir(&fFSAddOnDir, &fFSAddOnDirIndex,
+										 "fs");
+			}
+		} while (error == B_OK && !found);
+	}
+	return error;
+}
+
+// RewindPartitiningSystems
+/*!	\brief Rewinds the partitioning system list iterator.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BDiskDeviceRoster::RewindPartitiningSystems()
+{
+	if (fPartitionAddOnDir) {
+		delete fPartitionAddOnDir;
+		fPartitionAddOnDir = NULL;
+	}
+	fPartitionAddOnDirIndex = 0;
+	return B_OK;
+}
+
+// RewindFileSystems
+/*!	\brief Rewinds the file system list iterator.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BDiskDeviceRoster::RewindFileSystems()
+{
+	if (fFSAddOnDir) {
+		delete fFSAddOnDir;
+		fFSAddOnDir = NULL;
+	}
+	fFSAddOnDirIndex = 0;
+	return B_OK;
+}
+
 // _GetObjectWithID
 /*!	\brief Returns a BDiskDevice for a given device, session or partition ID.
 
@@ -538,6 +714,176 @@ BDiskDeviceRoster::_GetObjectWithID(const char *fieldName, int32 id,
 		if (error == B_OK)
 			error = device->_Unarchive(&archive);
 	}
+	return error;
+}
+
+
+// _GetNextAddOn
+/*!	\brief Finds and loads the next add-on of an add-on subdirectory.
+	\param directory The add-on directory.
+	\param image Pointer to an image_id into which the image ID of the loaded
+		   add-on shall be written.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_ENTRY_NOT_FOUND: End of directory.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::_GetNextAddOn(BDirectory **directory, int32 *index,
+								 const char *subdir, AddOnImage *image)
+{
+	status_t error = (directory && index && subdir && image
+					  ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		// search until an add-on has been found or the end of all directories
+		// has been reached
+		bool found = false;
+		do {
+			// get the next add-on in the current dir
+			error = _GetNextAddOn(*directory, image);
+			if (error == B_OK) {
+				found = true;
+			} else if (error == B_ENTRY_NOT_FOUND) {
+				// end of the current directory has been reached, try next dir
+				error = _GetNextAddOnDir(directory, index, subdir);
+			}
+		} while (error == B_OK && !found);
+	}
+	return error;
+}
+
+// _GetNextAddOn
+/*!	\brief Finds and loads the next add-on of an add-on subdirectory.
+	\param directory The add-on directory.
+	\param image Pointer to an image_id into which the image ID of the loaded
+		   add-on shall be written.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_ENTRY_NOT_FOUND: End of directory.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::_GetNextAddOn(BDirectory *directory, AddOnImage *image)
+{
+	status_t error = (directory ? B_OK : B_ENTRY_NOT_FOUND);
+	if (error == B_OK) {
+		// iterate through the entry list and try to load the entries
+		bool found = false;
+		while (error == B_OK && !found) {
+			BEntry entry;
+			error = directory->GetNextEntry(&entry);
+			BPath path;
+			if (error == B_OK && entry.GetPath(&path) == B_OK)
+				found = (image->Load(path.Path()) == B_OK);
+		}
+	}
+	return error;
+}
+
+// _GetNextAddOnDir
+/*!	\brief Gets the next add-on directory path.
+	\param path Pointer to a BPath to be set to the found directory.
+	\param index Pointer to an index into the kAddOnDirs array indicating
+		   which add-on dir shall be retrieved next.
+	\param subdir Name of the subdirectory (in the "disk_scanner" subdirectory
+		   of the add-on directory) \a directory shall be set to.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_ENTRY_NOT_FOUND: End of directory list.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::_GetNextAddOnDir(BPath *path, int32 *index,
+									const char *subdir)
+{
+	status_t error = (*index < kAddOnDirCount ? B_OK : B_ENTRY_NOT_FOUND);
+	// get the add-on dir path
+	if (error == B_OK) {
+		error = find_directory(kAddOnDirs[*index], path);
+		(*index)++;
+	}
+	// construct the subdirectory path
+	if (error == B_OK) {
+		error = path->Append("disk_scanner");
+		if (error == B_OK)
+			error = path->Append(subdir);
+	}
+	return error;
+}
+
+// _GetNextAddOnDir
+/*!	\brief Gets the next add-on directory.
+	\param directory Pointer to a BDirectory* to be set to the found directory.
+	\param index Pointer to an index into the kAddOnDirs array indicating
+		   which add-on dir shall be retrieved next.
+	\param subdir Name of the subdirectory (in the "disk_scanner" subdirectory
+		   of the add-on directory) \a directory shall be set to.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_ENTRY_NOT_FOUND: End of directory list.
+	- other error codes
+*/
+status_t
+BDiskDeviceRoster::_GetNextAddOnDir(BDirectory **directory, int32 *index,
+									const char *subdir)
+{
+	BPath path;
+	status_t error = _GetNextAddOnDir(&path, index, subdir);
+	// create a BDirectory object, if there is none yet.
+	if (error == B_OK && !*directory) {
+		*directory = new BDirectory;
+		if (!*directory)
+			error = B_NO_MEMORY;
+	}
+	// init the directory
+	if (error == B_OK)
+		error = (*directory)->SetTo(path.Path());
+	// cleanup on error
+	if (error != B_OK && *directory) {
+		delete *directory;
+		*directory = NULL;
+	}
+	return error;
+}
+
+// _LoadPartitionAddOn
+status_t
+BDiskDeviceRoster::_LoadPartitionAddOn(const char *partitioningSystem,
+									   AddOnImage *image,
+									   BDiskScannerPartitionAddOn **_addOn)
+{
+	status_t error = (partitioningSystem && image && _addOn
+		? B_OK : B_BAD_VALUE);
+	// load the image
+	bool found = false;
+	BPath path;
+	BDirectory *directory = NULL;
+	int32 index = 0;
+	while (error == B_OK && !found) {
+		error = _GetNextAddOn(&directory, &index, "partition", image);
+		if (error == B_OK) {
+			// add-on loaded: get the function that creates an add-on
+			// object
+			BDiskScannerPartitionAddOn *(*create_add_on)();
+			if (get_image_symbol(image->ID(), "create_ds_partition_add_on",
+								 B_SYMBOL_TYPE_TEXT,
+								 (void**)&create_add_on) == B_OK) {
+				// create the add-on object and copy the requested data
+				if (BDiskScannerPartitionAddOn *addOn = (*create_add_on)()) {
+					if (!strcmp(addOn->ShortName(), partitioningSystem)) {
+						*_addOn = addOn;
+						found = true;
+					} else
+						delete addOn;
+				}
+			}
+		}
+	}
+	// cleanup
+	if (directory)
+		delete directory;
+	if (error != B_OK && image)
+		image->Unload();
 	return error;
 }
 
