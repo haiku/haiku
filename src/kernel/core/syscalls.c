@@ -319,11 +319,6 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = socket((int)arg0, (int)arg1, (int)arg2, false);
 			break;
  */
-		case SYSCALL_GETDTABLESIZE:
-			// ToDo: the correct way would be to lock the io_context
-			// or just call vfs_getrlimit()
-			*call_ret = (get_current_io_context(false))->table_size;
-			break;
 		case SYSCALL_SETENV:
 			*call_ret = user_setenv((const char *)arg0, (const char *)arg1, (int)arg2);
 			break;
