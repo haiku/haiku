@@ -177,6 +177,23 @@ typedef struct packetheader
 } packetheader_t;
 
 static status_t close_hook( void * );
+/* -----
+	Here all platform dependant code is placed: this keeps the code clean
+----- */
+#ifdef __INTEL__
+	#define WRITE_8(  offset , value)	(m_pcimodule->write_io_8 ((data->reg_base + (offset)), (value) ) )
+	#define WRITE_16( offset , value)	(m_pcimodule->write_io_16((data->reg_base + (offset)), (value) ) )
+	#define WRITE_32( offset , value)	(m_pcimodule->write_io_32((data->reg_base + (offset)), (value) ) )
+	
+	#define READ_8(  offset )			(m_pcimodule->read_io_8 ((data->reg_base + offset)))
+	#define READ_16( offset )			(m_pcimodule->read_io_16((data->reg_base + offset)))
+	#define READ_32( offset )			(m_pcimodule->read_io_32((data->reg_base + offset)))
+
+	void rtl8139_init_registers( rtl8139_properties_t *data )
+	{
+		data->reg_base = data->pcii->u.h0.base_registers[0];
+	}
+#endif
 
 /* -----
 	null-terminated array of device names supported by this driver
@@ -323,7 +340,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	data->pcii = m_device;
 	
 	//Enable the registers
-	data->reg_base = data->pcii->u.h0.base_registers[0];
+	rtl8139_init_registers( data );
 	
 	/* enable pci address access */	
 	cmd = m_pcimodule->read_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2);
@@ -331,7 +348,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	m_pcimodule->write_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2, cmd );
 	
 	// Check for the chipversion -- The version bits are bits 31-27 and 24-23
-	temp32 = m_pcimodule->read_io_32( data->reg_base + TxConfig );
+	temp32 = READ_32( TxConfig );
 	
 	if ( temp32 == 0xFFFFFF )
 	{
@@ -363,9 +380,9 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	/* TODO: Linux driver does power management here... */
 
 	/* Reset the chip -- command register;*/
-	m_pcimodule->write_io_8( data->reg_base + Command , Reset );
+	WRITE_8 ( Command , Reset );
 	temp16 = 10000;
-	while ( ( m_pcimodule->read_io_8( data->reg_base + Command ) & Reset ) && temp16 > 0 )
+	while ( ( READ_8( Command ) & Reset ) && temp16 > 0 )
 		temp16--;
 	
 	if ( temp16 == 0 )
@@ -378,39 +395,38 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	dprintf( "rtl8139_nielx open_hook(): Chip reset: %u \n" , temp16 );
 	
 	/* Enable writing to the configuration registers */
-	m_pcimodule->write_io_8( data->reg_base + _9346CR , 0xc0 );
+	WRITE_8( _9346CR , 0xc0 );
 
 	/* Since the reset was succesful, we can immediately open the transmit and receive registers */
-	m_pcimodule->write_io_8( data->reg_base + Command , EnableReceive | EnableTransmit );
+	WRITE_8( Command , EnableReceive | EnableTransmit );
 			
 	/* Reset Config1 register */
-	m_pcimodule->write_io_8( data->reg_base + Config1 , 0 );
+	WRITE_8( Config1 , 0 );
 	
 	// Turn off lan-wake and set the driver-loaded bit
-	m_pcimodule->write_io_8( data->reg_base + Config1, (m_pcimodule->read_io_8(data->reg_base + Config1 )& ~0x30) | 0x20);
+	WRITE_8( Config1, ( READ_8( Config1 )& ~0x30) | 0x20);
 
 	// Enable FIFO auto-clear
-	m_pcimodule->write_io_8( data->reg_base + Config4, m_pcimodule->read_io_8( data->reg_base + Config4) | 0x80);
+	WRITE_8( Config4, READ_8( Config4) | 0x80);
 
 	// Go to normal operation
-	m_pcimodule->write_io_8( data->reg_base + _9346CR , 0 );
+	WRITE_8( _9346CR , 0 );
 	
 	/* Reset Rx Missed counter*/
-	m_pcimodule->write_io_16( data->reg_base + MPC , 0 );
+	WRITE_16( MPC , 0 );
 	
 	/* Configure the Transmit Register */
 	//settings: Max DMA burst size per Tx DMA burst is 1024 ( = 110 )
 	//settings: Interframe GAP time according to IEEE standard ( = 11 )
-	m_pcimodule->write_io_32( data->reg_base + TxConfig , 
-			(m_pcimodule->read_io_32( data->reg_base + TxConfig )) /*| IFG_1 | 
-			IFG_0*/ | MXDMA_2 | MXDMA_1 );
+	WRITE_32( TxConfig , 
+			READ_32( TxConfig ) | MXDMA_2 | MXDMA_1 );
 	
 	/* Configure the Receive Register */
 	//settings: Early Rx Treshold is 1024 kB ( = 110 ) DISABLED
 	//settings: Max DMA burst size per Rx DMA burst is 1024 ( = 110 )
 	//settings: The Rx Buffer length is 64k + 16 bytes ( = 11 )
 	//settings: continue last packet in memory if it exceeds buffer length.
-	m_pcimodule->write_io_32( data->reg_base + RxConfig , /*RXFTH2 | RXFTH1 | */
+	WRITE_32( RxConfig , /*RXFTH2 | RXFTH1 | */
 		RBLEN_1 | RBLEN_0 | WRAP | MXDMA_2 | MXDMA_1 | APM | AB);
 	
 	//Disable blocking
@@ -423,26 +439,26 @@ open_hook(const char *name, uint32 flags, void** cookie)
 		dprintf( "rtl8139_nielx open_hook(): memory allocation for ringbuffer failed\n" );
 		return B_ERROR;
 	}
-	m_pcimodule->write_io_32( data->reg_base + RBSTART , (int32) data->receivebufferphy );
+	WRITE_32( RBSTART , (int32) data->receivebufferphy );
 	data->receivebufferoffset = 0;  //First packet starts at 0
 	
 	//Disable all multi-interrupts
-	m_pcimodule->write_io_16( data->reg_base + MULINT , 0 );
+	WRITE_16( MULINT , 0 );
 
 	//Allocate buffers for transmit (There can be two buffers in one page)
 	data->transmitbuffer[0] = alloc_mem( &(data->transmitbufferlog[0]) , &(data->transmitbufferphy[0]) , 4096 , "txbuffer01" );
-	m_pcimodule->write_io_32( data->reg_base + TSAD0 , (int32)data->transmitbufferphy[0] );
+	WRITE_32( TSAD0 , (int32)data->transmitbufferphy[0] );
 	data->transmitbuffer[1] = data->transmitbuffer[0];
 	data->transmitbufferlog[1] = data->transmitbufferlog[0] + 2048;
 	data->transmitbufferphy[1] = data->transmitbufferphy[0] + 2048;
-	m_pcimodule->write_io_32( data->reg_base + TSAD1 , (int32)data->transmitbufferphy[1] );
+	WRITE_32( TSAD1 , (int32)data->transmitbufferphy[1] );
 	
 	data->transmitbuffer[2] = alloc_mem( &(data->transmitbufferlog[2]) , &(data->transmitbufferphy[2]) , 4096 , "txbuffer23" );
-	m_pcimodule->write_io_32( data->reg_base + TSAD2 , (int32)data->transmitbufferphy[2] );
+	WRITE_32( TSAD2 , (int32)data->transmitbufferphy[2] );
 	data->transmitbuffer[3] = data->transmitbuffer[2];
 	data->transmitbufferlog[3] = data->transmitbufferlog[2] + 2048;
 	data->transmitbufferphy[3] = data->transmitbufferphy[2] + 2048;
-	m_pcimodule->write_io_32( data->reg_base + TSAD3 , (int32)data->transmitbufferphy[3] );
+	WRITE_32( TSAD3 , (int32)data->transmitbufferphy[3] );
 	
 	if( data->transmitbuffer[0] == B_ERROR || data->transmitbuffer[2] == B_ERROR )
 	{
@@ -457,7 +473,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	temp8 = 0;
 	do 
 	{
-		data->address.ebyte[ temp8 ] = m_pcimodule->read_io_8( data->reg_base + IDR0 + temp8  );
+		data->address.ebyte[ temp8 ] = READ_8( IDR0 + temp8  );
 		temp8++;
 	} while ( temp8 < 6 );
 	
@@ -466,12 +482,12 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	data->address.ebyte[3] , data->address.ebyte[4] , data->address.ebyte[5] );
 	
 	/* Receive physical match packets and broadcast packets */
-	m_pcimodule->write_io_32( data->reg_base + RxConfig ,
-			(m_pcimodule->read_io_32( data->reg_base + RxConfig )) | APM | AB );
+	WRITE_32( RxConfig ,
+			(READ_32( RxConfig )) | APM | AB );
 	
 	//Clear multicast mask
-	m_pcimodule->write_io_32( data->reg_base + MAR0 , 0 );
-	m_pcimodule->write_io_32( data->reg_base + MAR0 + 4 , 0 );
+	WRITE_32( MAR0 , 0 );
+	WRITE_32( MAR0 + 4 , 0 );
 	
 
 	/* We want interrupts! */
@@ -481,24 +497,24 @@ open_hook(const char *name, uint32 flags, void** cookie)
 		return B_ERROR;
 	}
 
-	m_pcimodule->write_io_16( data->reg_base + IMR , 
+	WRITE_16( IMR , 
 		ReceiveOk | ReceiveError | TransmitOk | TransmitError | 
 		ReceiveOverflow | ReceiveUnderflow | ReceiveFIFOOverrun |
 		TimeOut | SystemError );
 	      
 	/* Enable once more */
-	m_pcimodule->write_io_8( data->reg_base + _9346CR , 0 );
-	m_pcimodule->write_io_8( data->reg_base + Command , EnableReceive | EnableTransmit );
+	WRITE_8( _9346CR , 0 );
+	WRITE_8( Command , EnableReceive | EnableTransmit );
 	
 	//Check if Tx and Rx are enabled
-	if( !( m_pcimodule->read_io_8( data->reg_base + Command ) & EnableReceive ) || !( m_pcimodule->read_io_8( data->reg_base + Command ) & EnableTransmit ) )
+	if( !( READ_8( Command ) & EnableReceive ) || !( READ_8( Command ) & EnableTransmit ) )
 		dprintf( "TRANSMIT AND RECEIVE NOT ENABLED!!!\n" );
 	else
 		dprintf( "TRANSMIT AND RECEIVE ENABLED!!!\n" );
 		
 	dprintf( "rtl8139_nielx open_hook(): Basic Mode Status Register: 0x%x ESRS: 0x%x\n" ,
-		m_pcimodule->read_io_16( data->reg_base + BMSR ) , 
-		m_pcimodule->read_io_8( data->reg_base + ESRS ) );
+		READ_16( BMSR ) , 
+		READ_8( ESRS ) );
 		
 	return B_OK;
 }
@@ -520,7 +536,7 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 		acquire_sem_etc( data->input_wait , 1 , B_CAN_INTERRUPT , 0 );
 	
 	//Next: check in command register if there's actually anything to be read
-	if ( m_pcimodule->read_io_8( data->reg_base + Command ) & BUFE  )
+	if ( READ_8( Command ) & BUFE  )
 	{
 		dprintf( "rtl8139_nielx read_hook: Nothing to read!!!\n" );
 		return B_IO_ERROR;
@@ -561,13 +577,13 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 	//Update the buffer -- 4 for the header length, plus 3 for the dword allignment
 	data->receivebufferoffset = ( data->receivebufferoffset + packet_header->length + 4 + 3 ) & ~3;
 			
-	m_pcimodule->write_io_16( data->reg_base + CAPR , data->receivebufferoffset - 16 ); //-16, avoid overflow
+	WRITE_16( CAPR , data->receivebufferoffset - 16 ); //-16, avoid overflow
 	
-	dprintf( "rtl8139_nielx read_hook(): CBP %u CAPR %u \n" , m_pcimodule->read_io_16( data->reg_base + CBR ) , m_pcimodule->read_io_16( data->reg_base + CAPR ) );
+	dprintf( "rtl8139_nielx read_hook(): CBP %u CAPR %u \n" , READ_16( CBR ) , READ_16( CAPR ) );
 	
 	// Re-enable interrupts
-	m_pcimodule->write_io_16( data->reg_base + ISR , ReceiveOk );
-	m_pcimodule->write_io_16( data->reg_base + IMR , 
+	WRITE_16( ISR , ReceiveOk );
+	WRITE_16( IMR , 
 		ReceiveOk | ReceiveError | TransmitOk | TransmitError | 
 		ReceiveOverflow | ReceiveUnderflow | ReceiveFIFOOverrun |
 		TimeOut | SystemError );
@@ -643,9 +659,9 @@ write_hook (void* cookie, off_t position, const void* buffer, size_t* num_bytes)
 	//Clear OWN and start transfer Create transmit description with early Tx FIFO, size
 	transmitdescription = ( buflen | 0x80000 | transmitdescription ) ^OWN; //0x80000 = early tx treshold
 	dprintf( "rtl8139_nielx write: transmitdescription = %lu\n" , transmitdescription );
-	m_pcimodule->write_io_32( data->reg_base + TSD0 + (sizeof(uint32) * transmitid ) , transmitdescription );
+	WRITE_32( TSD0 + (sizeof(uint32) * transmitid ) , transmitdescription );
 
-	dprintf( "rtl8139_nielx write: TSAD: %u\n" , m_pcimodule->read_io_16( data->reg_base + TSAD ) );
+	dprintf( "rtl8139_nielx write: TSAD: %u\n" , READ_16( TSAD ) );
 
 	//Done
 	return B_OK;
@@ -692,11 +708,6 @@ control_hook (void* cookie, uint32 op, void* arg, size_t len)
 		address.ebyte[5] );
 		return B_OK;
 
-		/*data->multiset;
-		m_pcimodule->write_io_32( MAR0 , address[0] ); //First 32 bits
-		m_pcimodule->write_io_32( MAR0 + 0x4 , address
-		*/
-	
 	case ETHER_NONBLOCK:
 		if ( data == NULL )
 			return B_ERROR;
@@ -738,14 +749,14 @@ rtl8139_interrupt( void *cookie )
 	
 	status = lock();
 	
-	isr_contents = m_pcimodule->read_io_16( data->reg_base + ISR );
+	isr_contents = READ_16( ISR );
 	dprintf( "NIELX INTERRUPT: %u \n" , isr_contents );
 	if( isr_contents & ReceiveOk )
 	{
 		dprintf( "rtl8139_nielx interrupt ReceiveOk\n" );
 		release_sem_etc( data->input_wait , 1 , B_DO_NOT_RESCHEDULE );
 		// First, disable all interrupts until the read hook is finished. It will re-enable them.
-		m_pcimodule->write_io_16( data->reg_base + IMR , 0 );
+		WRITE_16( IMR , 0 );
 		retval = B_INVOKE_SCHEDULER;
 	}
 	
@@ -763,10 +774,8 @@ rtl8139_interrupt( void *cookie )
 			// If a register isn't used, continue next run
 			if ( data->transmitstatus[temp8] != 1 )
 				continue;
-			txstatus = m_pcimodule->read_io_32( data->reg_base + TSD0 + temp8 * sizeof( int32 ) );
+			txstatus = READ_32( TSD0 + temp8 * sizeof( int32 ) );
 			dprintf( "run: %u txstatus: %lu Register: %lx\n" , temp8 , txstatus , TSD0 + temp8 * sizeof( int32 ) );
-			
-			//m_pcimodule->write_io_32( data->reg_base + TSAD0 + temp8 * sizeof( int32) , (m_pcimodule->read_io_32( data->reg_base + TSAD0 + temp8 * sizeof( int32 ) ) ) | OWN ) ;
 			
 			if ( ( txstatus & TOK ) )
 			{
@@ -792,7 +801,7 @@ rtl8139_interrupt( void *cookie )
 	if( isr_contents & ReceiveOverflow )
 	{
 		// Discard all the current packages to be processed -- newos driver
-		m_pcimodule->write_io_16( data->reg_base + CAPR , ( m_pcimodule->read_io_16( CBR ) + 16 ) % 0x1000 );
+		WRITE_16( CAPR , ( READ_16( CBR ) + 16 ) % 0x1000 );
 		isr_write |= ReceiveOverflow;
 		retval = B_HANDLED_INTERRUPT;
 	}
@@ -802,8 +811,8 @@ rtl8139_interrupt( void *cookie )
 		// Most probably a link change -> TODO CHECK!
 		isr_write |= ReceiveUnderflow;
 		dprintf( "rtl8139_nielx interrupt(): BMCR: 0x%x BMSR: 0x%x\n" ,
-			m_pcimodule->read_io_16( data->reg_base + BMCR ) ,
-			m_pcimodule->read_io_16( data->reg_base + BMSR ) );
+			READ_16( BMCR ) ,
+			READ_16( BMSR ) );
 		retval = B_HANDLED_INTERRUPT;
 	}
 	
@@ -825,7 +834,7 @@ rtl8139_interrupt( void *cookie )
 		;
 	}
 	
-	m_pcimodule->write_io_16( data->reg_base + ISR , isr_write );
+	WRITE_16( ISR , isr_write );
 
 	unlock( status );
 	
@@ -841,8 +850,8 @@ close_hook (void* cookie)
 {
 	rtl8139_properties_t * data = (rtl8139_properties_t *) cookie;
 	//Stop Rx and Tx process
-	m_pcimodule->write_io_8( data->reg_base + Command , 0 );
-	m_pcimodule->write_io_16( data->reg_base + IMR , 0 );
+	WRITE_8( Command , 0 );
+	WRITE_16( IMR , 0 );
 	return B_OK;
 }
 
