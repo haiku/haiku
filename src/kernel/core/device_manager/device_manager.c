@@ -15,6 +15,7 @@
 #include <kdevice_manager.h>
 
 #include <KernelExport.h>
+#include <string.h>
 
 
 //#define TRACE_DEVICE_MANAGER
@@ -109,6 +110,9 @@ status_t
 device_manager_init(struct kernel_args *args)
 {
 	status_t status;
+//	char name[B_FILE_NAME_LENGTH];
+//	size_t size = sizeof(name);
+//	int32 cookie;
 
 	TRACE(("device manager init\n"));
 
@@ -135,6 +139,20 @@ device_manager_init(struct kernel_args *args)
 	pnp_fs_emulation_nesting = 0;
 
 	pnp_root_init_root();
+
+	// build initial device tree; register all root bus_managers
+
+#if 0
+	cookie = 0;
+	while (get_next_loaded_module_name(&cookie, name, &size) == B_OK) {
+		if (strncmp(name, "bus_managers", 12))
+			continue;
+
+		dprintf(": %s\n", name);
+		size = sizeof(name);
+	}
+#endif
+
 	return B_OK;
 }
 
