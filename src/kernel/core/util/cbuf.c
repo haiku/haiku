@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 
 /* This file contains the cbuf functions. Cbuf is a memory allocator,
@@ -122,7 +122,6 @@ allocate_cbuf(size_t *_size)
 static cbuf *
 allocate_cbuf_mem(size_t size)
 {
-	void *_buffer;
 	cbuf *buffer = NULL;
 	cbuf *lastBuffer = NULL;
 	cbuf *headBuffer = NULL;
@@ -134,36 +133,33 @@ allocate_cbuf_mem(size_t size)
 
 	while (size > 0) {
 		foundSize = size;
-		_buffer = allocate_cbuf(&foundSize);
-		if (!_buffer) {
+		buffer = (cbuf *)allocate_cbuf(&foundSize);
+		if (buffer == NULL) {
 			// couldn't allocate, lets bail with what we have
 			break;
 		}
+
 		size -= foundSize;
-		count = foundSize / CBUF_LENGTH;
-//		dprintf("allocate_cbuf_mem: returned %d of memory, %d left\n", found_size, size);
 
-		buffer = (cbuf *)_buffer;
-		if (headBuffer == NULL) {
-			headBuffer = buffer;
-			headBuffer->flags |= CBUF_FLAG_CHAIN_HEAD;
-		}
+		if (headBuffer == NULL)
+			headBuffer = lastBuffer = buffer;
 
-		for (i = 0; i < count; i++) {
+		while (foundSize > 0) {
 			initialize_cbuf(buffer);
-			if (lastBuffer)
-				lastBuffer->next = buffer;
-			if (headBuffer)
-				buffer->total_length += buffer->length;
+
+			headBuffer->total_length += buffer->length;
+			lastBuffer->next = buffer;
 
 			lastBuffer = buffer;
 			buffer++;
+			foundSize -= CBUF_LENGTH;
 		}
 	}
 
-	if (lastBuffer) {
-		lastBuffer->next = NULL;
+	if (headBuffer) {
+		headBuffer->flags |= CBUF_FLAG_CHAIN_HEAD;
 		lastBuffer->flags |= CBUF_FLAG_CHAIN_TAIL;
+		lastBuffer->next = NULL;
 	}
 
 	return headBuffer;
@@ -841,32 +837,29 @@ status_t
 cbuf_truncate_tail(cbuf *buffer, size_t truncBytes)
 {
 	cbuf *head = buffer;
-	size_t bufferOffset;
 	size_t offset;
 
 	if (!buffer || (buffer->flags & CBUF_FLAG_CHAIN_HEAD) == 0)
 		return B_BAD_VALUE;
 
+	// we can't remove more than there is
+	if (truncBytes > head->total_length)
+		truncBytes = head->total_length;
+
 	offset = buffer->total_length - truncBytes;
-		// ToDo: what happens if truncBytes >= total_length??
-	bufferOffset = 0;
-	while (buffer && offset > 0) {
-		if (offset < buffer->length) {
-			// this is the one
-			bufferOffset = offset;
+
+	while (buffer) {
+		if (offset < buffer->length)
 			break;
-		}
+
 		offset -= buffer->length;
 		buffer = buffer->next;
 	}
 	if (!buffer)
 		return B_ERROR;
 
-	head->total_length -= buffer->length - bufferOffset;
-	buffer->length -= bufferOffset;
-		// ToDo: is this correct?
-		// Isn't bufferOffset the part that has to stay in the buffer?
-		// can't we just have head->total_length -= truncBytes?
+	head->total_length -= buffer->length - offset;
+	buffer->length = offset;
 
 	// clear out the rest of the buffers in this chain
 	while ((buffer = buffer->next) != NULL) {
