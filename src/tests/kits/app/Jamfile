@@ -90,6 +90,8 @@ CommonTestLib libapptest.so
 		GetAppInfoTester.cpp
 		GetAppListTester.cpp
 		IsRunningTester.cpp
+		LaunchTester.cpp
+		LaunchTesterHelper.cpp
 		TeamForTester.cpp
 		
 		# RegistrarThreadManager
@@ -111,4 +113,5 @@ SubInclude OBOS_TOP src tests kits app bapplication ;
 #SubInclude OBOS_TOP src tests kits app blooper ;
 #SubInclude OBOS_TOP src tests kits app bmessageQueue ;
 SubInclude OBOS_TOP src tests kits app bmessenger ;
+SubInclude OBOS_TOP src tests kits app broster ;
 SubInclude OBOS_TOP src tests kits app common ;
