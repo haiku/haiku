@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src kernel drivers arch ppc ;
+
+# nothing to do here
