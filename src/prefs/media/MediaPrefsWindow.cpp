@@ -1,5 +1,5 @@
 #include "MediaPrefsApp.h"
-#include "VolumeControl.h"
+//#include "VolumeControl.h"
 
 
 MediaPrefsWindow::MediaPrefsWindow( BRect wRect )
@@ -23,14 +23,14 @@ MediaPrefsWindow::MediaPrefsWindow( BRect wRect )
 	view->AddChild( slider );
 
 	// use private API
-	if ( MediaKitPrivate::GetMasterVolume( &fLeft, &fRight ) == B_OK ) {
-		// left,right range is 0..9.999
-		iLeft = (int32)( fLeft / vI2F );
-		iRight = (int32)( fRight / vI2F );
-	} else {
+//	if ( MediaKitPrivate::GetMasterVolume( &fLeft, &fRight ) == B_OK ) {
+//		// left,right range is 0..9.999
+//		iLeft = (int32)( fLeft / vI2F );
+//		iRight = (int32)( fRight / vI2F );
+//	} else {
 		iLeft = 0;
 		iRight = 0;
-	}
+//	}
 
 	slider->SetValueFor( 0, iLeft );
 	slider->SetValueFor( 1, iRight );
@@ -55,7 +55,7 @@ void MediaPrefsWindow::MessageReceived( BMessage *msg )
 				float fLeft = float( iLeft ) * vI2F;
 				float fRight = float( iRight ) * vI2F;
 
-				MediaKitPrivate::SetMasterVolume( fLeft, fRight );
+//				MediaKitPrivate::SetMasterVolume( fLeft, fRight );
 			}
 			break;
 

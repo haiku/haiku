@@ -1,5 +1,5 @@
 #include "MediaPrefsSlider.h"
-#include "VolumeControl.h"
+//#include "VolumeControl.h"
 
 
 MediaPrefsSlider::MediaPrefsSlider( BRect r, const char *name, const char *label, BMessage *model,
