@@ -1,8 +1,8 @@
 #!/bin/sh
 
-launchdir=$(dirname $0)
+launchdir=$(dirname "$0")
 copyattr -d "$launchdir/PDF Writer" "$HOME/config/add-ons/Print/PDF Writer"
-copyattr -d "$launchdir/libpdf.so" "$HOME/config/lib/libpdf.so"
+# copyattr -d "$launchdir/libpdf.so" "$HOME/config/lib/libpdf.so"
 
 mkdir /boot/home/config/settings/PDF\ Writer
 cd $launchdir
