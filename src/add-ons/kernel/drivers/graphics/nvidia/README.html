@@ -134,13 +134,28 @@ On AGP cards you can block the use of AGP mode transfers.
 Keep this option set to <strong>force_pci false</strong>, unless the graphics card or motherboard has trouble using AGP.
 		<li><strong>true:</strong><br>
 <strong>force_pci true</strong> prevents the graphicsdriver from activating AGP mode, so it will be using PCI mode like it has always been in the past. The downside of this is that this comes at a performance penalty if your motherboard supports the AGP 'fastwrite' (FW) option, which won't be utilized with this setting.
-  
+	</ul>
+	<li><strong>unhide_fw:</strong><br>
+This option is only used if your card is running in AGP mode. It's a real <strong>tweak</strong> option. It's officially unsupported, and it's unknown if it can do harm to your card or system. It exists because using it <strong>can</strong> speedup unaccelerated graphics <strong>a lot</strong>. Think about video playback or playing quake2 in software rendering mode...
+	<ul>
+		<li><strong>false:</strong> (default setting)<br>
+Keep this option set to <strong>unhide_fw false</strong> unless you are certain you want to try the 'unsupported' graphics speedup. NV15, NV18, NV28 and NV34 cards for example probably don't need it as they officially support the AGP FW (fastwrites) feature already. On cards supporting FW by default the unhide_fw option has no effect.
+		<li><strong>true:</strong><br>
+If you have an older card that officially doesn't support the AGP FW feature, you could possibly get this feature anyway by setting <strong>unhide_fw true</strong>. For instance (some) NV11 cards work nicely with AGP FW enabled this way and unaccelerated graphics speedup considerably. Please <strong>make sure</strong> that at the first sign of trouble (system hanging, displaying artifacts, etc) you disable this feature here again, or you might risk <strong>destroying</strong> your card and/or AGP slot.
+	</ul>
+	<li><strong>pgm_panel:</strong><br>
+This option only has an effect if you have a laptop panel or DVI panel connected. It's existing because it's currently impossible to setup the driver in a way every single panel outthere is happy about it.
+	<ul>
+		<li><strong>false:</strong><br>
+If you select <strong>pgm_panel false</strong> the driver will not program the panel's pixelclock (refreshrate). Instead it relies on your cardBIOS to have done that correctly. While this is probably the case, it might introduce some displaying errors every now and then.
+		<li><strong>true:</strong> (default setting)<br>
+With the <strong>pgm_panel true</strong> setting, the driver will fix your panel's refreshrate to 60Hz. While this should be working on all panels outthere, some panels are particular picky about refreshrates below 60.0Hz (they shut off), and some other panels are particular picky about refreshrates above 60.0Hz (they shut off). While the driver requests the hardware to set 60.0Hz, this isn't exactly possible, so the actual setting is <strong>bound</strong> to be a tiny bit below or above 60.0Hz.
 	</ul>
 </ul>
 
 <hr>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on June 21, 2004)</p>
+<p>(Page last updated on July 6, 2004)</p>
 </body>
 </html>
