@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src servers ;
 
 SubInclude OBOS_TOP src servers app ;
+SubInclude OBOS_TOP src servers input ;
 

@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src servers input ;
+
+Server input_server :
+	InputServer.cpp
+	InputServerDevice.cpp
+	InputServerFilter.cpp
+	InputServerMethod.cpp
+;
+LinkSharedOSLibs input_server : be root ;
