@@ -640,7 +640,12 @@ bfs_read_stat(void *_ns, void *_node, struct stat *st)
 	st->st_uid = node->UserID();
 	st->st_gid = node->GroupID();
 	st->st_mode = node->Mode();
-	st->st_size = node->data.Size();
+
+	if (inode->IsSymLink() && (node->Flags() & INODE_LONG_SYMLINK) == 0) {
+		// symlinks report the size of the link here
+		st->st_size = strlen(node->short_symlink) + 1;
+	} else
+		st->st_size = node->data.Size();
 
 	st->st_atime = time(NULL);
 	st->st_mtime = st->st_ctime = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
@@ -1323,13 +1328,15 @@ bfs_read_link(void *_ns, void *_node, char *buffer, size_t bufferSize)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	if (inode->Flags() & INODE_LONG_SYMLINK) {
-		if (inode->Size() > bufferSize)
+		// we also need space for the terminating null byte
+		if (inode->Size() >= bufferSize)
 			return B_BUFFER_OVERFLOW;
 
 		status_t status = inode->ReadAt(0, (uint8 *)buffer, &bufferSize);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 
+		buffer[bufferSize] = '\0';
 		return B_OK;
 	}
 
