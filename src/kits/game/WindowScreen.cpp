@@ -15,7 +15,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "R5_AppServerLink.h"
+#include <input_globals.h>
+#include <InputServerTypes.h> // For IS_SET_MOUSE_POSITION
+#include <R5_AppServerLink.h>
+#include <WindowPrivate.h>
+
 
 // WindowScreen commands
 #define WS_PROPOSE_MODE			0x00000102
@@ -31,21 +35,12 @@
 #define WS_SET_PALETTE			0x00000f27
 
 
-static const uint32 WS_SET_MOUSE_POSITION = 'Ismp';
-
-
-// WindowScreen Window flag (not defined anywhere else)
-#define WS_SPECIAL_FLAG			0x10000
-
- 
 #if TRACE_WINDOWSCREEN
 #define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 #else
 #define CALLED() ;
 #endif
 
-// TODO: Move this declaration somewhere else
-_IMPEXP_BE status_t _control_input_server_(BMessage *command, BMessage *reply);
 
 static graphics_card_info card_info_global;
 fill_rectangle fill_rect_global;
@@ -283,7 +278,7 @@ mode2parms(uint32 space, uint32 *out_space, int32 *width, int32 *height)
 void
 set_mouse_position(int32 x, int32 y)
 {
-	BMessage command(WS_SET_MOUSE_POSITION);
+	BMessage command(IS_SET_MOUSE_POSITION);
 	BMessage reply;
 	
 	command.AddPoint("where", BPoint(x, y));
@@ -294,7 +289,7 @@ set_mouse_position(int32 x, int32 y)
 BWindowScreen::BWindowScreen(const char *title, uint32 space, status_t *error, bool debug_enable)
 	:
 	BWindow(BScreen().Frame(), title, B_TITLED_WINDOW,
-		WS_SPECIAL_FLAG | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();
@@ -311,7 +306,7 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space, status_t *error, b
 BWindowScreen::BWindowScreen(const char *title, uint32 space, uint32 attributes, status_t *error)
 	:
 	BWindow(BScreen().Frame(), title, B_TITLED_WINDOW, 
-		WS_SPECIAL_FLAG | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
+		kWindowScreenFlag | B_NOT_MINIMIZABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE | B_NOT_MOVABLE | B_NOT_RESIZABLE,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();

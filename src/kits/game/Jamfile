@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kits game ;
 
 UsePrivateHeaders interface ;
+UsePrivateHeaders input ;
 
 SharedLibrary game :
 	# Public Game Kit
