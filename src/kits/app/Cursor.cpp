@@ -65,6 +65,7 @@ BCursor::BCursor(const void *cursorData)
 	
 	serverlink.WriteInt32(AS_CREATE_BCURSOR);
 	serverlink.WriteData(cursorData,68);
+	serverlink.WriteInt32(serverlink.GetRecvPort());
 	serverlink.Sync();
 	serverlink.ReadInt32(&m_serverToken);
 }

@@ -79,7 +79,7 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout=B_INFINITE
 	Attach<int32>(fReceivePort);
 
 	// Flush the thing....FOOSH! :P
-	write_port(fSendPort, fSendCode, fSendBuffer, fSendPosition);
+	write_port(fSendPort, AS_SERVER_SESSION, fSendBuffer, fSendPosition);
 	fSendPosition	= 4;
 	
 	// Now we wait for the reply
@@ -124,6 +124,14 @@ status_t PortLink::Attach(const void *data, size_t size)
 		return B_OK;
 	}
 	return B_NO_MEMORY;
+}
+
+status_t PortLink::AttachString(const char *string)
+{
+	int16 len = (int16)strlen(string)+1;
+
+	Attach<int16>(len);
+	return Attach(string, len);
 }
 
 void PortLink::MakeEmpty()

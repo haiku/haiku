@@ -172,3 +172,23 @@ void PortMessage::BSessionWorkaround(void)
 	else
 		is_session_msg=false;
 }
+
+status_t PortMessage::ReadString(char **string)
+{
+	int16 len=0;
+
+	if(Read<int16>(&len)!= B_OK)
+		return B_ERROR;
+
+	if (len)
+	{
+		*string=new char[len];
+		if(Read(*string, len)!= B_OK)
+		{
+			delete *string;
+			*string=NULL;
+		}
+	}
+
+	return B_OK;
+}

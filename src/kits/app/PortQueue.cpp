@@ -76,7 +76,7 @@ void PortQueue::GetMessagesFromPort(bool wait_for_messages)
 				delete msg;
 				break;
 			}
-			
+			msg->BSessionWorkaround();
 			_q.push(msg);
 		}
 		
@@ -90,6 +90,7 @@ PortMessage *PortQueue::GetMessageFromQueue(void)
 
 	PortMessage *msg=_q.front();
 	_q.pop();
+	msg->BSessionWorkaround();
 	return msg;
 }
 

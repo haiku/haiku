@@ -52,6 +52,8 @@
 #include <ObjectLocker.h>
 #include <AppServerLink.h>
 #include <ServerProtocol.h>
+#include <PortLink.h>
+#include <PortMessage.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -757,24 +759,21 @@ void BApplication::InitData(const char* signature, status_t* error)
 	
 			// Attach data:
 			// 1) port_id - receiver port of a regular app
-			// 2) char * - signature of the regular app
-			port_id srcv=create_port(100,"BApp reply port");
-			BSession session(srcv,fServerTo);
-			session.WriteInt32(AS_CREATE_APP);
-			session.WriteInt32(fServerTo);
-			session.WriteInt32(_get_object_token_(this));
-			session.WriteData(signature,strlen(signature)+1);
-			session.Sync();
+			// 2) int32 - handler ID token of the app
+			// 3) char * - signature of the regular app
+			PortLink link(fServerFrom);
+			PortMessage pmsg;
 			
-			port_id serverapp_port;
-			session.ReadInt32(&serverapp_port);
-			
+			link.SetOpCode(AS_CREATE_APP);
+			link.Attach<port_id>(fServerTo);
+			link.Attach<port_id>(_get_object_token_(this));
+			link.AttachString(signature);
+			link.FlushWithReply(&pmsg);
+
 			// Reply code: AS_CREATE_APP
 			// Reply data:
 			//	1) port_id server-side application port (fServerFrom value)
-			fServerFrom=serverapp_port;
-			
-			delete_port(srcv);
+			pmsg.Read<port_id>(&fServerFrom);
 		}
 		else
 			fInitError=fServerTo;
