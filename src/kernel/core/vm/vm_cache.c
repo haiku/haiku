@@ -73,7 +73,7 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 }
 
 
-int
+status_t
 vm_cache_init(kernel_args *ka)
 {
 	vm_page p;
@@ -84,7 +84,7 @@ vm_cache_init(kernel_args *ka)
 		panic("vm_cache_init: cannot allocate memory for page cache hash table\n");
 	page_cache_table_lock = 0;
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -254,12 +254,18 @@ vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 }
 
 
+/**	Removes the vm_page from this cache. Of course, the page must
+ *	really be in this cache or evil things will happen.
+ *	The vm_cache_ref lock must be held.
+ */
+
 void
 vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 {
 	int state;
 
 	TRACE(("vm_cache_remove_page: cache 0x%x, page 0x%x\n", cache_ref, page));
+	ASSERT_LOCKED_MUTEX(&cache_ref->lock);
 
 	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
@@ -283,7 +289,44 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 }
 
 
-int
+status_t
+vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize)
+{
+	vm_cache *cache = cacheRef->cache;
+	size_t oldSize;
+
+	// ToDo: only cache's with an anonymous memory store should be resizable!
+	if (!cache->temporary)
+		return B_NOT_ALLOWED;
+
+	mutex_lock(&cacheRef->lock);
+
+	oldSize = cache->virtual_size;
+	if (newSize < oldSize) {
+		// we need to remove all pages in the cache outside of the new virtual size
+		vm_page *page, *next;
+
+		for (page = cache->page_list; page; page = next) {
+			next = page->cache_next;
+
+			if (page->offset >= newSize) {
+				// remove the page and put it into the free queue
+				vm_cache_remove_page(cacheRef, page);
+				vm_page_set_state(page, PAGE_STATE_FREE);
+			}
+		}
+	}
+
+	cache->virtual_size = newSize;
+	mutex_unlock(&cacheRef->lock);
+
+	vm_increase_max_commit(oldSize - newSize);
+
+	return B_OK;
+}
+
+
+status_t
 vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region)
 {
 	mutex_lock(&cache_ref->lock);
@@ -295,11 +338,11 @@ vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region)
 	cache_ref->region_list = region;
 
 	mutex_unlock(&cache_ref->lock);
-	return 0;
+	return B_OK;
 }
 
 
-int
+status_t
 vm_cache_remove_region(vm_cache_ref *cache_ref, vm_region *region)
 {
 	mutex_lock(&cache_ref->lock);
@@ -312,5 +355,5 @@ vm_cache_remove_region(vm_cache_ref *cache_ref, vm_region *region)
 		cache_ref->region_list = region->cache_next;
 
 	mutex_unlock(&cache_ref->lock);
-	return 0;
+	return B_OK;
 }
