@@ -20,6 +20,7 @@ namespace Sniffer {
 class Err;
 class Pattern;
 
+//! A list of patterns, all of which are to be searched over the same range.
 class PatternList : public Expr {
 public:
 	PatternList(Range range);

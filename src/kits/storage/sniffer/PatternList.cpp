@@ -37,6 +37,9 @@ PatternList::GetErr() const {
 	return fRange.GetErr();
 }
 
+/*! \brief Sniffs the given data stream, searching for a match with
+	any of the list's patterns.
+*/
 bool
 PatternList::Sniff(BPositionIO *data) const {
 	if (InitCheck() != B_OK)

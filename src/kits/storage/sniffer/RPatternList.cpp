@@ -36,6 +36,10 @@ RPatternList::GetErr() const {
 	return NULL;
 }
 
+/*! Sniffs the given data stream, searching for a match
+	with any of the list's patterns. Each pattern is searched
+	over its own specified range.
+*/
 bool
 RPatternList::Sniff(BPositionIO *data) const {
 	if (InitCheck() != B_OK)

@@ -15,6 +15,15 @@
 namespace Sniffer {
 
 //! Exception class used by the MIME Sniffer
+/*! Each exception contains an error message, and an byte offset into
+	the original rule that generated the error, for the sake of
+	providing spiffy error messages of the following sort:
+	
+	<code>
+	"1.0 ('abc' & 0xFFAAFFAA)"
+	              ^    Sniffer pattern error: pattern and mask lengths do not match
+	</code>
+*/
 class Err {
 public:
 	Err(const char *msg, const ssize_t pos);
@@ -27,13 +36,13 @@ public:
 	status_t SetTo(const std::string &msg, const ssize_t pos);
 	void Unset();
 	
+	void SetMsg(const char *msg);
+	void SetPos(ssize_t pos);
+
 	const char* Msg() const;
 	ssize_t Pos() const;
 	
 private:
-	friend class Parser;	// So it can update the pos of its out of mem object
-	void SetMsg(const char *msg);
-	void SetPos(ssize_t pos);
 	char *fMsg;
 	ssize_t fPos;
 };

@@ -36,8 +36,6 @@ Pattern::GetErr() const {
 		return NULL;
 	else
 		return new(nothrow) Err(*fErrorMessage);
-//	return fErrorMessage ? NULL : new Err(*fErrorMessage);
-//	return new Err("HEY, FIX THIS CRAP!", -1);
 }
 
 status_t
@@ -66,6 +64,10 @@ Pattern::SetTo(const char *string, const char *mask) {
 	}
 }
 
+/*! \brief Looks for a pattern match in the given data stream, starting from
+	each offset withing the given range. Returns true is a match is found,
+	false if not.
+*/
 bool
 Pattern::Sniff(Range range, BPositionIO *data) const {
 	// If our range contains negative values relative to the end of

@@ -13,7 +13,7 @@ class BPositionIO;
 
 namespace Sniffer {
 
-//! Abstract class definining an interface for sniffing BFile objects
+//! Base expression class
 class Expr {
 public:
 	virtual ~Expr() {}

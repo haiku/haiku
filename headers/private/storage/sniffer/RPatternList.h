@@ -19,6 +19,7 @@ namespace Sniffer {
 class Err;	
 class RPattern;
 
+//! A list of patterns, each of which is to be searched over its own specified range.
 class RPatternList : public Expr {
 public:
 	RPatternList();

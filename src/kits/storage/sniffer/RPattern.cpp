@@ -51,6 +51,7 @@ RPattern::~RPattern() {
 	delete fPattern;
 }
 
+//! Sniffs the given data stream over the object's range for the object's pattern
 bool
 RPattern::Sniff(BPositionIO *data) const {
 	if (!data || InitCheck() != B_OK)

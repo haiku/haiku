@@ -19,7 +19,8 @@ namespace Sniffer {
 
 class Err;
 
-//! Abstract class definining an interface for sniffing BPositionIO objects
+//! A byte string and optional mask to be compared against a data stream.
+/*! The byte string and mask (if supplied) must be of the same length. */
 class Pattern {
 public:
 	Pattern(const char *string, const char *mask = NULL);

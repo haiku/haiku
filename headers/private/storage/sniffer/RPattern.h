@@ -18,7 +18,7 @@ namespace Sniffer {
 class Err;
 class Pattern;
 
-//! Abstract class definining an interface for sniffing BFile objects
+//! A Pattern and a Range, bundled into one.
 class RPattern {
 public:
 	RPattern(Range range, Pattern *pattern);

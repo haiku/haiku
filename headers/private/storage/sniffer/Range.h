@@ -15,6 +15,7 @@ namespace Sniffer {
 
 class Err;
 
+//! A range of byte offsets from which to check a pattern against a data stream.
 class Range {
 public:
 	Range(int32 start, int32 end);
