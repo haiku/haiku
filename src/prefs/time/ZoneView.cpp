@@ -265,7 +265,3 @@ ZoneView::setTimeZone()
 	fSetTimeZone -> SetEnabled(false);
 } //ZoneView::setTimeZone()
 
-
-
-
-	

@@ -15,7 +15,7 @@ class SettingsView : public BView
 public:
 						SettingsView(BRect frame);
 		virtual void	Draw(BRect frame);
-				void	changeRTCsetting();
+				void	changeRTCSetting();
 		
 				
 private:
