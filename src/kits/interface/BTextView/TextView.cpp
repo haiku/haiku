@@ -3615,7 +3615,7 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 		maxDescent = max_c(descent, maxDescent);
 		
 		// Use _BWidthBuffer_ if possible
-		if (sWidths != NULL) {
+		if (false && (sWidths != NULL)) {
 			LockWidthBuffer();
 			result += sWidths->StringWidth(*fText, fromOffset, numChars, font);
 			UnlockWidthBuffer();
@@ -4391,6 +4391,16 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	
 	be_app->ObscureCursor();
 	
+	// If we find the "be:confirmed" boolean (and the boolean is true),
+	// it means it's over for now, so the current _BInlineInput_ object
+	// should become inactive
+	bool confirmed = false;
+	if (message->FindBool("be:confirmed", &confirmed) == B_OK && confirmed) {
+		fInline->SetActive(false);
+		Refresh(0, fInline->Offset(), true, false);
+		return;
+	}
+	
 	// Delete the previously inserted text (if any)
 	if (fInline->IsActive()) {
 		int32 oldOffset = fInline->Offset();
@@ -4425,22 +4435,13 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	fInline->SetSelectionOffset(selectionStart);
 	fInline->SetSelectionLength(selectionEnd - selectionStart);
 	
-	if (clauseCount > 0) {
-		// Insert the new text
-		InsertText(string, stringLen, fSelStart, NULL);
-		fSelStart += stringLen;
-		fClickOffset = fSelEnd = fSelStart;
-	}
+	// Insert the new text
+	InsertText(string, stringLen, fSelStart, NULL);
+	fSelStart += stringLen;
+	fClickOffset = fSelEnd = fSelStart;
 	
-	// If we find the "be:confirmed" boolean (and the boolean is true),
-	// it means it's over for now, so the current _BInlineInput_ object
-	// should become inactive
-	bool confirmed = false;
-	if (message->FindBool("be:confirmed", &confirmed) < B_OK || !confirmed)
-		fInline->SetActive(true);
-	else
-		fInline->SetActive(false);
-	
+	fInline->SetActive(true);
+
 	Refresh(0, fSelEnd, true, false);
 }
 
