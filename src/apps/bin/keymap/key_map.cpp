@@ -53,11 +53,13 @@ int main(int argc, char **argv)
 			} else if (operation == 'r') {
 				Keymap keymap;
 				keymap.RestoreSystemDefault();
+				printf("System default key map restored.\n");
 				return 0;
 			} else if (operation == 'l') {
 				Keymap keymap;
 				keymap.LoadSource(stdin);
 				keymap.SaveAsCurrent();
+				printf("Key map loaded.\n");
 				return 0;
 			}
 			
