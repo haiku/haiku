@@ -56,6 +56,8 @@ typedef struct {
 } desc_table;
 static desc_table *idt = NULL;
 
+struct iframe_stack gBootFrameStack;
+
 
 static void
 interrupt_ack(int n)
@@ -191,7 +193,9 @@ i386_handle_trap(struct iframe frame)
 	int ret = B_HANDLED_INTERRUPT;
 
 	if (thread)
-		i386_push_iframe(thread, &frame);
+		x86_push_iframe(&thread->arch_info.iframes, &frame);
+	else
+		x86_push_iframe(&gBootFrameStack, &frame);
 
 	if (frame.cs == USER_CODE_SEG) {
 		i386_exit_user_debug_at_kernel_entry();
@@ -307,7 +311,9 @@ i386_handle_trap(struct iframe frame)
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
 
 	if (thread)
-		i386_pop_iframe(thread);
+		x86_pop_iframe(&thread->arch_info.iframes);
+	else
+		x86_pop_iframe(&gBootFrameStack);
 }
 
 

@@ -58,18 +58,18 @@ arch_thread_init(struct kernel_args *args)
 
 
 void
-i386_push_iframe(struct thread *thread, struct iframe *frame)
+x86_push_iframe(struct iframe_stack *stack, struct iframe *frame)
 {
-	ASSERT(thread->arch_info.iframe_ptr < IFRAME_TRACE_DEPTH);
-	thread->arch_info.iframes[thread->arch_info.iframe_ptr++] = frame;
+	ASSERT(stack->index < IFRAME_TRACE_DEPTH);
+	stack->frames[stack->index++] = frame;
 }
 
 
 void
-i386_pop_iframe(struct thread *thread)
+x86_pop_iframe(struct iframe_stack *stack)
 {
-	ASSERT(thread->arch_info.iframe_ptr > 0);
-	thread->arch_info.iframe_ptr--;
+	ASSERT(stack->index > 0);
+	stack->index--;
 }
 
 
@@ -84,8 +84,8 @@ i386_get_current_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();
 
-	ASSERT(thread->arch_info.iframe_ptr >= 0);
-	return thread->arch_info.iframes[thread->arch_info.iframe_ptr - 1];
+	ASSERT(thread->arch_info.iframes.index >= 0);
+	return thread->arch_info.iframes.frames[thread->arch_info.iframes.index - 1];
 }
 
 
@@ -95,15 +95,16 @@ i386_get_current_iframe(void)
  *	\return The iframe, or \c NULL, if there is no such iframe (e.g. when
  *			the thread is a kernel thread).
  */
+
 struct iframe *
 i386_get_user_iframe(void)
 {
 	struct thread *thread = thread_get_current_thread();
 	int i;
 
-	for (i = thread->arch_info.iframe_ptr - 1; i >= 0; i--) {
-		struct iframe *frame = thread->arch_info.iframes[i];
-		if (frame->cs == USER_CODE_SEG) 
+	for (i = thread->arch_info.iframes.index - 1; i >= 0; i--) {
+		struct iframe *frame = thread->arch_info.iframes.frames[i];
+		if (frame->cs == USER_CODE_SEG)
 			return frame;
 	}
 

@@ -1,22 +1,23 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, The Haiku Team. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_ARCH_x86_THREAD_H
 #define _KERNEL_ARCH_x86_THREAD_H
+
+
+#include <arch/cpu.h>
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#include <arch/cpu.h>
-
-
-void i386_push_iframe(struct thread *t, struct iframe *frame);
-void i386_pop_iframe(struct thread *t);
+void x86_push_iframe(struct iframe_stack *stack, struct iframe *frame);
+void x86_pop_iframe(struct iframe_stack *stack);
 struct iframe *i386_get_user_iframe(void);
 
 void i386_return_from_signal();

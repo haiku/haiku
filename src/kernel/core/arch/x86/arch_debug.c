@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -11,12 +11,14 @@
 #include <debug.h>
 #include <thread.h>
 #include <elf.h>
-#include <arch/debug.h>
 
+#include <arch/debug.h>
 #include <arch_cpu.h>
 
 
 #define NUM_PREVIOUS_LOCATIONS 16
+
+extern struct iframe_stack gBootFrameStack;
 
 
 static bool
@@ -45,50 +47,60 @@ static int
 dbg_stack_trace(int argc, char **argv)
 {
 	uint32 previousLocations[NUM_PREVIOUS_LOCATIONS];
-	struct thread *t;
+	struct iframe_stack *frameStack;
+	struct thread *thread;
 	uint32 ebp;
 	int32 i, num = 0, last = 0;
 
-	if (argc < 2)
-		t = thread_get_current_thread();
-	else {
+	if (argc < 2) {
+		thread = thread_get_current_thread();
+		if (thread != NULL)
+			frameStack = &thread->arch_info.iframes;
+		else
+			frameStack = &gBootFrameStack;
+	} else {
 		dprintf("not supported\n");
 		return 0;
 	}
 
-	for (i = 0; i < t->arch_info.iframe_ptr; i++) {
-		char *temp = (char *)t->arch_info.iframes[i];
-		dprintf("iframe %p %p %p\n", temp, temp + sizeof(struct iframe), temp + sizeof(struct iframe) - 8);
+	for (i = 0; i < frameStack->index; i++) {
+		dprintf("iframe %p (end = %p)\n",
+			frameStack->frames[i], frameStack->frames[i] + 1);
 	}
 
-	dprintf("stack trace for thread 0x%lx \"%s\"\n", t->id, t->name);
+	// We don't have a thread pointer early in the boot process
+	if (thread != NULL) {
+		dprintf("stack trace for thread 0x%lx \"%s\"\n", thread->id, thread->name);
 
-	dprintf("    kernel stack: %p to %p\n", 
-		(void *)t->kernel_stack_base, (void *)(t->kernel_stack_base + KERNEL_STACK_SIZE));
-	if (t->user_stack_base != 0) {
-		dprintf("      user stack: %p to %p\n", (void *)t->user_stack_base,
-			(void *)(t->user_stack_base + t->user_stack_size));
+		dprintf("    kernel stack: %p to %p\n", 
+			(void *)thread->kernel_stack_base, (void *)(thread->kernel_stack_base + KERNEL_STACK_SIZE));
+		if (thread->user_stack_base != 0) {
+			dprintf("      user stack: %p to %p\n", (void *)thread->user_stack_base,
+				(void *)(thread->user_stack_base + thread->user_stack_size));
+		}
 	}
 
 	dprintf("frame            caller     <image>:function + offset\n");
 
 	read_ebp(ebp);
 	for (;;) {
-		bool is_iframe = false;
+		bool isIFrame = false;
 		// see if the ebp matches the iframe
-		for (i = 0; i < t->arch_info.iframe_ptr; i++) {
-			if (ebp == ((uint32)t->arch_info.iframes[i] - 8)) {
+		for (i = 0; i < frameStack->index; i++) {
+			if (ebp == ((uint32)frameStack->frames[i] - 8)) {
 				// it's an iframe
-				is_iframe = true;
+				isIFrame = true;
 			}
 		}
 
-		if (is_iframe) {
+		if (isIFrame) {
 			struct iframe *frame = (struct iframe *)(ebp + 8);
 
 			dprintf("iframe at %p\n", frame);
-			dprintf(" eax 0x%-9x    ebx 0x%-9x     ecx 0x%-9x  edx 0x%x\n", frame->eax, frame->ebx, frame->ecx, frame->edx);
-			dprintf(" esi 0x%-9x    edi 0x%-9x     ebp 0x%-9x  esp 0x%x\n", frame->esi, frame->edi, frame->ebp, frame->esp);
+			dprintf(" eax 0x%-9x    ebx 0x%-9x     ecx 0x%-9x  edx 0x%x\n",
+				frame->eax, frame->ebx, frame->ecx, frame->edx);
+			dprintf(" esi 0x%-9x    edi 0x%-9x     ebp 0x%-9x  esp 0x%x\n",
+				frame->esi, frame->edi, frame->ebp, frame->esp);
 			dprintf(" eip 0x%-9x eflags 0x%-9x", frame->eip, frame->flags);
 			if ((frame->error_code & 0x4) != 0) {
 				// from user space
@@ -136,7 +148,7 @@ dbg_stack_trace(int argc, char **argv)
 
 
 int
-arch_dbg_init(kernel_args *ka)
+arch_dbg_init(kernel_args *args)
 {
 	// at this stage, the debugger command system is alive
 
