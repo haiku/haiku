@@ -228,11 +228,11 @@ auvia_stream_curaddr(auvia_stream *stream)
 	uint32 addr;
 	if(IS_8233(&stream->card->config)) {
 		addr = auvia_reg_read_32(&stream->card->config, stream->base + AUVIA_RP_DMAOPS_BASE);
-		//TRACE(("auvia_stream_curaddr %p\n", addr));
-		//TRACE(("auvia_stream_curaddr %p\n", (uint32)stream->dmaops_phy_base));
+		TRACE(("stream_curaddr %p, phy_base %p\n", addr, (uint32)stream->dmaops_phy_base));
 		return (addr - (uint32)stream->dmaops_phy_base - 4) / 8;
 	} else {
 		addr = auvia_reg_read_32(&stream->card->config, stream->base + AUVIA_RP_DMAOPS_BASE);
+		TRACE(("stream_curaddr %p, phy_base %p\n", addr, (uint32)stream->dmaops_phy_base));
 		return (addr - (uint32)stream->dmaops_phy_base - 8) / 8;
 	}
 }
@@ -374,8 +374,7 @@ int32 auvia_int(void *arg)
 				//TRACE(("interrupt\n"));
 				
 				curblk = auvia_stream_curaddr(stream);
-				//TRACE(("AUVIA_RPSTAT_INTR at trigblk %lu\n", curblk));
-				//TRACE(("AUVIA_RPSTAT_INTR at stream->trigblk %lu\n", stream->trigblk));
+				TRACE(("RPSTAT_INTR at trigblk %lu, stream->trigblk %lu\n", curblk, stream->trigblk));
 				if (curblk == stream->trigblk) {
 					//TRACE(("AUVIA_RPSTAT_INTR at trigblk %lu\n", curblk));
 						
@@ -389,7 +388,7 @@ int32 auvia_int(void *arg)
 				auvia_reg_write_8(&card->config, stream->base + AUVIA_RP_STAT, AUVIA_RPSTAT_INTR);
 			}
 	} else {
-		TRACE(("AUVIA_SGD_SHADOW %x %x\n", card->interrupt_mask, auvia_reg_read_32(&card->config, AUVIA_SGD_SHADOW)));
+		TRACE(("SGD_SHADOW %x %x\n", card->interrupt_mask, auvia_reg_read_32(&card->config, AUVIA_SGD_SHADOW)));
 	}
 	
 	if(gotone)

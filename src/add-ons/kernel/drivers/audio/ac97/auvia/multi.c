@@ -642,6 +642,9 @@ auvia_get_description(auvia_dev *card, multi_description *data)
 		strncpy(data->friendly_name, FRIENDLY_NAME_686, 32);
 	else if(IS_8233(&card->config)) {
 		switch(card->info.revision) {
+			case VIATECH_8233_AC97_REV_8233_10:
+				strncpy(data->friendly_name, FRIENDLY_NAME_8233, 32);
+				break;
 			case VIATECH_8233_AC97_REV_8233C:
 				strncpy(data->friendly_name, FRIENDLY_NAME_8233C, 32);
 				break;
