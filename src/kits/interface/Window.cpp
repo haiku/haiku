@@ -853,13 +853,25 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			uint32			modifiers;
 			uint32			buttons;
 			int32			clicks;
+			int32			viewToken;
+			BView			*targetView;
 			
 			msg->FindPoint( "where", &where );
 			msg->FindInt32( "modifiers", (int32*)&modifiers );
 			msg->FindInt32( "buttons", (int32*)&buttons );
 			msg->FindInt32( "clicks", &clicks );
-			
-			sendMessageUsingEventMask( B_MOUSE_DOWN, where );
+			msg->FindInt32( "haiku:token", &viewToken );
+			msg->RemoveName("haiku:token");
+
+			targetView = findView(top_view, viewToken);
+			if (viewToken != B_NULL_TOKEN && targetView)
+			{
+				targetView->ConvertFromScreen(&where);
+				targetView->MouseDown(where);
+			}
+
+// TODO: use the following line later, instead of the above 2.
+//			sendMessageUsingEventMask( B_MOUSE_DOWN, where );
 			break;
 		}
 		case B_MOUSE_UP:
