@@ -128,6 +128,8 @@ float AccLineCalc::MaxX()
 
 float AccLineCalc::GetY(float x)
 {
+	if ( start.x == end.x )
+		return start.y;
 	return ( (slope * x) + offset );
 }
 
@@ -518,21 +520,18 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	int px = 0;
 	int py = twoRx2 * y;
 	int startx, endx;
+	int starty, endy;
+	int xclip, startclip, endclip;
 	int startQuad, endQuad;
 	bool useQuad1, useQuad2, useQuad3, useQuad4;
 	bool shortspan = false;
 	float oldpensize;
 	BPoint center(xc,yc);
 
-        /* TODO: Fix this */
-	/* This should be optimized later.  It is quick for the filled quadrants, but
-	   is inefficient for the partially filled quadrants.
-	 */
-
 	// Watch out for bozos giving us whacko spans
 	if ( (span >= 360) || (span <= -360) )
 	{
-	  StrokeEllipse(r,d,pat);
+	  FillEllipse(r,d,pat);
 	  return;
 	}
 
@@ -556,6 +555,9 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
 		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
 	}
+
+	starty = ROUND(ry*sqrt(1-(double)startx*startx/(rx*rx)));
+	endy = ROUND(ry*sqrt(1-(double)endx*endx/(rx*rx)));
 
 	if ( startQuad != endQuad )
 	{
@@ -626,18 +628,195 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 			HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
 		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
 			HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
-		if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
-		if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
-		if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
-		if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
+		if ( !shortspan )
+		{
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc),yc+y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc+y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc+y,&pattern);
+					}
+				}
+			}
+
+			if ( endQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc),yc-y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc+y,&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc+y,&pattern);
+					}
+				}
+			}
+		}
+		else
+		{
+			startclip = ROUND(y*startx/(double)starty);
+			endclip = ROUND(y*endx/(double)endy);
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+endclip),CLIP_X(xc+x),yc-y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
+							HLine(CLIP_X(xc+endclip),CLIP_X(xc+startclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-startclip),yc-y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
+							HLine(CLIP_X(xc-endclip),CLIP_X(xc-startclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-endclip),yc+y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
+							HLine(CLIP_X(xc-startclip),CLIP_X(xc-endclip),yc+y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+startclip),CLIP_X(xc+x),yc+y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
+							HLine(CLIP_X(xc+startclip),CLIP_X(xc+endclip),yc+y,&pattern);
+					}
+				}
+			}
+		}
 	}
 
 	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
@@ -662,18 +841,195 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 			HLine(CLIP_X(xc),CLIP_X(xc-x),yc+y,&pattern);
 		if ( useQuad4 && CHECK_Y(yc+y) && (CHECK_X(xc) || CHECK_X(xc+x)) )
 			HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
-		if ( (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
-			StrokeLine(BPoint(xc+x,yc-y),center,d,pat);
-		if ( (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
-			StrokeLine(BPoint(xc-x,yc-y),center,d,pat);
-		if ( (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
-		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
-			StrokeLine(BPoint(xc-x,yc+y),center,d,pat);
-		if ( (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
-		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
-			StrokeLine(BPoint(xc+x,yc+y),center,d,pat);
+		if ( !shortspan )
+		{
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc),CLIP_X(xc+x),yc-y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= startx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc),yc+y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc+y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= startx )
+					{
+						xclip = ROUND(y*startx/(double)starty);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc+y,&pattern);
+					}
+				}
+			}
+
+			if ( endQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc+xclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+xclip),CLIP_X(xc+x),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc),yc-y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-xclip) || CHECK_X(xc) )
+							HLine(CLIP_X(xc-xclip),CLIP_X(xc),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x >= endx )
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc-x) || CHECK_X(xc-xclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-xclip),yc+y,&pattern);
+					}
+				}
+			}
+			else if ( endQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( x <= endx )
+					{
+						if ( CHECK_X(xc) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc),CLIP_X(xc+x),yc+y,&pattern);
+					}
+					else
+					{
+						xclip = ROUND(y*endx/(double)endy);
+						if ( CHECK_X(xc) || CHECK_X(xc+xclip) )
+							HLine(CLIP_X(xc),CLIP_X(xc+xclip),yc+y,&pattern);
+					}
+				}
+			}
+		}
+		else
+		{
+			startclip = ROUND(y*startx/(double)starty);
+			endclip = ROUND(y*endx/(double)endy);
+			if ( startQuad == 1 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+endclip),CLIP_X(xc+x),yc-y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+endclip) || CHECK_X(xc+startclip) )
+							HLine(CLIP_X(xc+endclip),CLIP_X(xc+startclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 2 )
+			{
+				if ( CHECK_Y(yc-y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-startclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-startclip),yc-y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-endclip) || CHECK_X(xc-startclip) )
+							HLine(CLIP_X(xc-endclip),CLIP_X(xc-startclip),yc-y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 3 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc-x) || CHECK_X(xc-endclip) )
+							HLine(CLIP_X(xc-x),CLIP_X(xc-endclip),yc+y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc-startclip) || CHECK_X(xc-endclip) )
+							HLine(CLIP_X(xc-startclip),CLIP_X(xc-endclip),yc+y,&pattern);
+					}
+				}
+			}
+			else if ( startQuad == 4 )
+			{
+				if ( CHECK_Y(yc+y) )
+				{
+					if ( (x <= startx) && (x >= endx) )
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+x) )
+							HLine(CLIP_X(xc+startclip),CLIP_X(xc+x),yc+y,&pattern);
+					}
+					else
+					{
+						if ( CHECK_X(xc+startclip) || CHECK_X(xc+endclip) )
+							HLine(CLIP_X(xc+startclip),CLIP_X(xc+endclip),yc+y,&pattern);
+					}
+				}
+			}
+		}
 	}
 	d->pensize = oldpensize;
 	_Unlock();
@@ -688,6 +1044,8 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
 	Bounds checking must be done in this call.
+	I am not sure if this correctly handles cases where the curve backtracks along the diagonal
+	line.  I should probably investigate how the be code handles that, but it is a low priority.
 */
 void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
@@ -696,13 +1054,16 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 	int x, y;
 	int lastx=-1, lasty=-1;
 	double t;
-	double dt = .001;
+	double dt = .0002;
 	double dt2, dt3;
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
 	float oldpensize;
+	bool steep = false;
 
-        /* TODO: Fix this */
 	_Lock();
+	if ( fabs(pts[3].y-pts[0].y) > fabs(pts[3].x-pts[0].x) )
+		steep = true;
+	
 	AccLineCalc line(pts[0], pts[3]);
 	oldpensize = d->pensize;
 	d->pensize = 1;
@@ -736,7 +1097,12 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 		x = ROUND(X);
 		y = ROUND(Y);
 		if ( (x!=lastx) || (y!=lasty) )
-			StrokeLine(BPoint(x,y),BPoint(x,line.GetY(x)),d,pat);
+		{
+			if ( steep )
+				StrokeLine(BPoint(x,y),BPoint(line.GetX(y),y),d,pat);
+			else
+				StrokeLine(BPoint(x,y),BPoint(x,line.GetY(x)),d,pat);
+		}
 		lastx = x;
 		lasty = y;
 
@@ -1732,7 +2098,7 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	int x, y;
 	int lastx=-1, lasty=-1;
 	double t;
-	double dt = .001;
+	double dt = .0005;
 	double dt2, dt3;
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
 
