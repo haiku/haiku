@@ -14,12 +14,7 @@
  *
  */
 
-
-// ToDo: these are supposed to be declared in <stdlib.h>
-// - - - - - - - - - - - - - - - 
-int  abs(int);
-long labs(long);
-// - - - - - - - - - - - - - - -
+#include <stdlib.h>
 
 
 int

@@ -23,14 +23,6 @@
 // ToDo: move this puppy to a more standard location
 #include "../stdio/local.h"
 
-// ToDo: these are supposed to be declared in <stdlib.h>
-// - - - - - - - - - - - - - - - 
-#define EXIT_SUCCESS  0
-#define EXIT_FAILURE  1
-void abort(void); 
-int  atexit(void (*func)(void));
-// - - - - - - - - - - - - - - - 
-
 
 
 static void (*_Exit_Stack[ATEXIT_MAX])(void) = {0};

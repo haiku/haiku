@@ -14,13 +14,7 @@
  *
  */
 
-
-// ToDo: these are supposed to be declared in <stdlib.h>
-// - - - - - - - - - - - - - - -
-#include <div_t.h>
-div_t	div(int, int);
-ldiv_t	ldiv(long, long);
-// - - - - - - - - - - - - - - -
+#include <stdlib.h>
 
 
 div_t
