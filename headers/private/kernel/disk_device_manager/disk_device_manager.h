@@ -7,8 +7,9 @@
 #ifndef _DISK_DEVICE_MANAGER_H
 #define _DISK_DEVICE_MANAGER_H
 
-#include <DiskDeviceDefs.h>
 #include <Drivers.h>
+
+#include <storage/DiskDeviceDefs.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -117,7 +118,6 @@ bool set_disk_device_job_error_message(disk_job_id jobID, const char *message);
 uint32 update_disk_device_job_interrupt_properties(disk_job_id jobID,
 												   uint32 interruptProperties);
 	// returns one of B_DISK_DEVICE_JOB_{CONTINUE,CANCEL,REVERSE}
-
 
 #ifdef __cplusplus
 }
