@@ -1,9 +1,10 @@
 SubDir OBOS_TOP src add-ons print drivers pdf ;
 
+Package openbeos-pdf_writer-cvs :
+	README TODO CHANGES ;
+
 SubInclude OBOS_TOP src add-ons print drivers pdf source ;
 SubInclude OBOS_TOP src add-ons print drivers pdf bookmarks ;
 SubInclude OBOS_TOP src add-ons print drivers pdf encoding ;
 SubInclude OBOS_TOP src add-ons print drivers pdf xrefs ;
 
-Package openbeos-pdf_writer-cvs :
-	README TODO CHANGES ;

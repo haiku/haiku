@@ -2,4 +2,6 @@ SubDir OBOS_TOP src add-ons print drivers pdf bookmarks ;
 
 Package openbeos-pdf_writer-cvs :
 	Sample :
+# Don't work, create a PDF folder + a jam local Driver folder!...
+#	boot home config settings PDF\ Writer bookmarks ;	
 	boot home config settings PDF_Writer bookmarks ;
