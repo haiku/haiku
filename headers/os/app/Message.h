@@ -328,6 +328,9 @@ virtual	void		_ReservedMessage3();
 									ssize_t stack_size,
 									bool incl_reply,
 									ssize_t *size = NULL) const;
+
+		status_t	_UnflattenKMessage(const char *buffer);
+
 		ssize_t		calc_size(uchar flags) const;
 		ssize_t		calc_hdr_size(uchar flags) const;
 		ssize_t		min_hdr_size() const;
@@ -355,6 +358,10 @@ virtual	void		_ReservedMessage3();
 								BMessage *reply,
 								bigtime_t send_timeout,
 								bigtime_t reply_timeout) const;
+static	status_t	_SendFlattenedMessage(void *data, int32 size,
+						port_id port, int32 token, bool preferred,
+						bigtime_t timeout);
+
 		enum		{ sNumReplyPorts = 3 };
 static	port_id		sReplyPorts[sNumReplyPorts];
 static	long		sReplyPortInUse[sNumReplyPorts];

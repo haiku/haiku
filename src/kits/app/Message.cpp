@@ -54,6 +54,7 @@
 #ifdef USING_TEMPLATE_MADNESS
 #include <AppMisc.h>
 #include <DataBuffer.h>
+#include <KMessage.h>
 #include <MessageBody.h>
 #include <MessageUtils.h>
 #include <TokenSpace.h>
@@ -100,6 +101,9 @@ static status_t handle_reply(port_id   reply_port,
                              int32*    pCode,
                              bigtime_t timeout,
                              BMessage* reply);
+
+static status_t convert_message(const KMessage *fromMessage,
+	BMessage *toMessage);
 
 //------------------------------------------------------------------------------
 extern "C" {
@@ -612,6 +616,16 @@ status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
 //------------------------------------------------------------------------------
 status_t BMessage::Unflatten(const char* flat_buffer)
 {
+	if (!flat_buffer)
+		return B_BAD_VALUE;
+
+	// check whether this is a KMessage
+	if (((KMessage::Header*)flat_buffer)->magic
+		== KMessage::kMessageHeaderMagic) {
+		return _UnflattenKMessage(flat_buffer);
+	}
+
+	// assume it's a normal flattened BMessage
 	uint32 size = ((uint32*)flat_buffer)[2];
 
 	BMemoryIO MemIO(flat_buffer, size);
@@ -1748,8 +1762,24 @@ char* BMessage::stack_flatten(char* stack_ptr, ssize_t stack_size,
 	}
 	return new_ptr;
 }
-//------------------------------------------------------------------------------
-ssize_t BMessage::calc_hdr_size(uchar flags) const
+
+
+status_t
+BMessage::_UnflattenKMessage(const char *buffer)
+{
+	// init a real KMessage
+	KMessage message;
+	status_t error = message.SetTo(buffer, ((KMessage::Header*)buffer)->size);
+	if (error != B_OK)
+		return error;
+
+	// let convert_message() do the real job
+	return convert_message(&message, this);
+}
+
+
+ssize_t
+BMessage::calc_hdr_size(uchar flags) const
 {
 	ssize_t size = min_hdr_size();
 
@@ -1899,8 +1929,60 @@ error:
 	delete_port(reply_port);
 	return err;
 }
-//------------------------------------------------------------------------------
-int32 BMessage::sGetCachedReplyPort()
+
+
+status_t
+BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
+	int32 token, bool preferred, bigtime_t timeout)
+{
+	if (!data)
+		return B_BAD_VALUE;
+
+	// prepare flattened fields
+	if (((KMessage::Header*)data)->magic == KMessage::kMessageHeaderMagic) {
+		// a KMessage
+		KMessage::Header *header = (KMessage::Header*)data;
+		header->sender = -1;
+		header->targetToken = (preferred ? B_PREFERRED_TOKEN : token);
+		header->replyPort = -1;
+		header->replyToken = B_NULL_TOKEN;
+
+	} else if (*(int32*)data == '1BOF' || *(int32*)data == 'FOB1') {
+//		bool swap = (*(int32*)data == '1BOF');
+		// TODO: Replace the target token. This is not so simple, since the
+		// position of the target token is not always the same. It can even
+		// happen that no target token is included at all (the one who is
+		// flattening the message must set a dummy token at least).
+
+		// dummy implementation to make it work at least
+
+		// unflatten the message
+		BMessage message;
+		status_t error = message.Unflatten((const char*)data);
+		if (error != B_OK)
+			return error;
+
+		// send the message
+		BMessenger messenger;
+		return message._send_(port, token, preferred, timeout, false,
+			messenger);
+	} else {
+		return B_NOT_A_MESSAGE;
+	}
+
+	// send the message
+	status_t error;
+	do {
+		error = write_port_etc(port, 'pjpp', data, size, B_RELATIVE_TIMEOUT,
+			timeout);
+	} while (error == B_INTERRUPTED);
+
+	return error;
+}
+
+
+int32
+BMessage::sGetCachedReplyPort()
 {
 	int index = -1;
 	for (int32 i = 0; i < sNumReplyPorts; i++)
@@ -3433,3 +3515,54 @@ void BMessage::da_swap_fixed_sized(dyn_array *da)
 //------------------------------------------------------------------------------
 
 #endif	// USING_TEMPLATE_MADNESS
+
+
+// convert_message
+static
+status_t
+convert_message(const KMessage *fromMessage, BMessage *toMessage)
+{
+	if (!fromMessage || !toMessage)
+		return B_BAD_VALUE;
+
+	// make empty and init what of the target message
+	toMessage->MakeEmpty();
+	toMessage->what = fromMessage->What();
+
+	// iterate through the fields and import them in the target message
+	KMessageField field;
+	while (fromMessage->GetNextField(&field) == B_OK) {
+		int32 elementCount = field.CountElements();
+		if (elementCount > 0) {
+			for (int32 i = 0; i < elementCount; i++) {
+				int32 size;
+				const void *data = field.ElementAt(i, &size);
+				status_t error;
+				if (field.TypeCode() == B_MESSAGE_TYPE) {
+					// message type: if it's a KMessage, convert it
+					KMessage message;
+					if (message.SetTo(data, size) == B_OK) {
+						BMessage bMessage;
+						error = convert_message(&message, &bMessage);
+						if (error != B_OK)
+							return error;
+						error = toMessage->AddMessage(field.Name(), &bMessage);
+					} else {
+						// just add it
+						error = toMessage->AddData(field.Name(),
+							field.TypeCode(), data, size,
+							field.HasFixedElementSize(), 1);
+					}
+				} else {
+					error = toMessage->AddData(field.Name(), field.TypeCode(),
+						data, size, field.HasFixedElementSize(), 1);
+				}
+
+				if (error != B_OK)
+					return error;
+			}
+		}
+	}
+	return B_OK;
+}
+
