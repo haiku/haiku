@@ -408,7 +408,6 @@ MimeTypeEditor::DetachedFromWindow()
 	fEditor.StopWatching(this);
 	
 	if (fPreviousText != fTextControl->Text()) {
-		BAutolock locker(fEditor);
 		fEditor.Replace(0, (const uint8 *)fTextControl->Text(),
 			strlen(fTextControl->Text()) + 1);
 	}
@@ -420,12 +419,9 @@ MimeTypeEditor::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
 		case kMsgValueChanged:
-		{
-			BAutolock locker(fEditor);
 			fEditor.Replace(0, (const uint8 *)fTextControl->Text(),
 				strlen(fTextControl->Text()) + 1);
 			break;
-		}
 
 		case kMsgDataEditorUpdate:
 			UpdateText();
@@ -689,7 +685,6 @@ NumberEditor::UpdateNumber()
 			return;
 	}
 
-	BAutolock locker(fEditor);
 	fEditor.Replace(0, buffer, Size());
 }
 
@@ -912,7 +907,6 @@ BooleanEditor::MessageReceived(BMessage *message)
 	switch (message->what) {
 		case kMsgValueChanged:
 		{
-			BAutolock locker(fEditor);
 			uint8 boolean = message->FindInt8("value");
 			fEditor.Replace(0, (const uint8 *)&boolean, 1);
 			break;
