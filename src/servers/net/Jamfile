@@ -3,13 +3,20 @@ SubDir OBOS_TOP src servers net ;
 UsePrivateHeaders net ;
 
 Server net_server :
-	userland_server.c
-	userland_ipc.c 
+	NetServer.cpp
+	
+	# utils
+	SimpleMessageFilter.cpp
+	
+	# built-in add-ons
+	PPPServer.cpp
+	
+	# old net_server (was a netstack tester app)
+#	userland_server.c
+#	userland_ipc.c 
 ;
 
 LinkSharedOSLibs net_server : 
 	be 
-	root 
-	libnet.so
+	net
 ;
-
