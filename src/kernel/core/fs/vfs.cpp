@@ -108,7 +108,7 @@ static struct vnode *sRoot;
 
 #define MOUNTS_HASH_TABLE_SIZE 16
 static hash_table *sMountsTable;
-static mount_id sNextMountID = 0;
+static mount_id sNextMountID = 1;
 
 // This can be used by other code to see if there is a boot file system already
 dev_t gBootDevice = -1;
@@ -3337,6 +3337,38 @@ out:
 }
 
 
+static dev_t
+fs_next_device(int32 *_cookie)
+{
+	struct fs_mount *mount = NULL;
+	dev_t device = *_cookie;
+
+	mutex_lock(&sMountMutex);	
+
+	// Since device IDs are assigned sequentially, this algorithm
+	// does work good enough. It makes sure that the device list
+	// returned is sorted, and that no device is skipped when an
+	// already visited device got unmounted.
+
+	while (device < sNextMountID) {
+		mount = find_mount(device++);
+		if (mount != NULL)
+			break;
+	}
+
+	*_cookie = device;
+
+	if (mount != NULL)
+		device = mount->id;
+	else
+		device = B_BAD_VALUE;
+
+	mutex_unlock(&sMountMutex);
+	
+	return device;
+}
+
+
 static status_t
 get_cwd(char *buffer, size_t size, bool kernel)
 {
@@ -3453,6 +3485,13 @@ status_t
 _kern_sync(void)
 {
 	return fs_sync();
+}
+
+
+dev_t
+_kern_next_device(int32 *_cookie)
+{
+	return fs_next_device(_cookie);
 }
 
 
@@ -3879,6 +3918,28 @@ _user_write_fs_info(dev_t device, const struct fs_info *userInfo, int mask)
 		return B_BAD_ADDRESS;
 
 	return fs_write_info(device, &info, mask);
+}
+
+
+dev_t
+_user_next_device(int32 *_userCookie)
+{
+	int32 cookie;
+	dev_t device;
+
+	if (!IS_USER_ADDRESS(_userCookie)
+		|| user_memcpy(&cookie, _userCookie, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	device = fs_next_device(&cookie);
+
+	if (device >= B_OK) {
+		// update user cookie
+		if (user_memcpy(_userCookie, &cookie, sizeof(int32)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return device;
 }
 
 
