@@ -58,8 +58,10 @@ load_kernel(stage2_args *args, Directory *volume)
 
 	close(fd);
 
-	if (status < B_OK)
+	if (status < B_OK) {
+		printf("loading kernel failed!\n");
 		return status;
+	}
 
 	puts("kernel loaded successfully");
 /*	void *cookie;
