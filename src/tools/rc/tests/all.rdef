@@ -7,5 +7,6 @@
 #include "array.rdef"
 #include "message.rdef"
 #include "type.rdef"
+#include "expr.rdef"
 
 //#include "defaults.rdef"  // test separately

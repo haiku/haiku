@@ -62,6 +62,14 @@ static type_tab_t type_table;  // symbol table for data types
 
 static void add_user_type(id_t, type_code, char*, list_t);
 
+typedef std::map<char*, define_t, ident_compare_t> define_tab_t;
+typedef define_tab_t::iterator define_iter_t;
+
+static define_tab_t define_table;  // symbol table for defines
+
+static bool is_type(char* name);
+static define_t get_define(char* name);
+
 static data_t make_data(size_t, type_t);
 static data_t make_bool(bool);
 static data_t make_int(uint64);
@@ -84,12 +92,15 @@ static data_t concat_data(data_t, data_t);
 
 static data_t cast(type_t, data_t);
 
+static data_t unary_expr(data_t, char);
+static data_t binary_expr(data_t, data_t, char);
+
 static void add_resource(id_t, type_code, data_t);
 
 //------------------------------------------------------------------------------
 %}
 
-%expect 1
+%expect 7
 
 %union
 {
@@ -117,10 +128,18 @@ static void add_resource(id_t, type_code, data_t);
 %type <i> integer
 %type <f> float
 %type <id> id
-%type <d> data array arrayfields message msgfield archive type typefield
+%type <d> archive array arrayfields data expr message msgfield
+%type <d> type typefield type_or_define
 %type <l> msgfields typefields typedeffields 
 %type <F> typedeffield
 %type <T> datatype typecast
+
+%left '|'
+%left '^'
+%left '&'
+%left '+' '-'
+%left '*' '/' '%'
+%right FLIP
 
 %%
 
@@ -184,7 +203,7 @@ typedeffield
 			$$.resize = 0;
 			$$.data   = make_default($1);
 		}
-	| datatype IDENT '=' data
+	| datatype IDENT '=' expr
 		{ 
 			$$.type   = $1;
 			$$.name   = $2;
@@ -198,7 +217,7 @@ typedeffield
 			$$.resize = (size_t) $4;
 			$$.data   = resize_data(make_default($1), $$.resize);
 		}
-	| datatype IDENT '[' INTEGER ']' '=' data
+	| datatype IDENT '[' INTEGER ']' '=' expr
 		{
 			$$.type   = $1;
 			$$.name   = $2;
@@ -208,22 +227,22 @@ typedeffield
 	;
 
 resource
-	: RESOURCE id data ';' 
+	: RESOURCE id expr ';' 
 		{ 
 			add_resource($2, $3.type.code, $3); 
 		}
-	| RESOURCE id TYPECODE data ';' 
+	| RESOURCE id TYPECODE expr ';' 
 		{ 
 			add_resource($2, $3, $4); 
 		}
-	| RESOURCE id '(' TYPECODE ')' data ';' 
+	| RESOURCE id '(' TYPECODE ')' expr ';' 
 		{ 
 			add_resource($2, $4, $6); 
 		}
 	;
 
 id
-	: /* empty (causes shift/reduce conflict with typecast) */
+	: /* empty */
 		{
 			$$.has_id = false; $$.has_name = false; $$.name = NULL;
 		} 
@@ -277,8 +296,8 @@ array
 	;
 
 arrayfields
-	: arrayfields ',' data { $$ = concat_data($1, $3); }
-	| data                 { $$ = $1; $$.type = get_type("raw"); }
+	: arrayfields ',' expr { $$ = concat_data($1, $3); }
+	| expr                 { $$ = $1; $$.type = get_type("raw"); }
 	;
 
 message
@@ -311,23 +330,23 @@ msgfields
 	;
 
 msgfield
-	: STRING '=' data
+	: STRING '=' expr
 		{
 			$$ = $3;
 			$$.name = (char*) $1.ptr;
 		}
-	| datatype STRING '=' data
+	| datatype STRING '=' expr
 		{
 			$$ = cast($1, $4);
 			$$.name = (char*) $2.ptr;
 		}
-	| TYPECODE STRING '=' data
+	| TYPECODE STRING '=' expr
 		{
 			$$ = $4;
 			$$.type.code = $1;
 			$$.name = (char*) $2.ptr;
 		}
-	| TYPECODE datatype STRING '=' data
+	| TYPECODE datatype STRING '=' expr
 		{
 			$$ = cast($2, $5);
 			$$.type.code = $1;
@@ -382,11 +401,24 @@ type
 	| IDENT data
 		{
 			$$ = make_type($1, make_data_list($2));
-		}
-	| IDENT
+		} 
+	| type_or_define { $$ = $1; }
+	;
+
+type_or_define
+	: IDENT
 		{
-			list_t list; list.count = 0; list.items = NULL;
-			$$ = make_type($1, list);
+			if (is_type($1))
+			{
+				list_t list; list.count = 0; list.items = NULL;
+				$$ = make_type($1, list);
+			}
+			else
+			{
+				define_t define = get_define($1);
+				$$ = cast(get_type("int32"), make_int(define.value));
+				free_mem($1);
+			}
 		}
 	;
 
@@ -396,34 +428,52 @@ typefields
 	;
 
 typefield
-	: IDENT '=' data { $$ = $3; $$.name = $1; }
-	| data           { $$ = $1; }
+	: IDENT '=' expr { $$ = $3; $$.name = $1; }
+	| expr           { $$ = $1; }
+	;
+
+expr 
+	: expr '+' expr         { $$ = binary_expr($1, $3, '+'); }
+	| expr '-' expr         { $$ = binary_expr($1, $3, '-'); }
+	| expr '*' expr         { $$ = binary_expr($1, $3, '*'); }
+	| expr '/' expr         { $$ = binary_expr($1, $3, '/'); }
+	| expr '%' expr         { $$ = binary_expr($1, $3, '%'); }
+	| expr '|' expr         { $$ = binary_expr($1, $3, '|'); }
+	| expr '^' expr         { $$ = binary_expr($1, $3, '^'); }
+	| expr '&' expr         { $$ = binary_expr($1, $3, '&'); }
+	| '~' expr %prec FLIP   { $$ = unary_expr($2, '~'); }
+	| data                  { $$ = $1; }
 	;
 
 data
-	: BOOL             { $$ = cast(get_type("bool"), make_bool($1)); }
-	| integer          { $$ = cast(get_type("int32"), make_int($1)); }
-	| float            { $$ = cast(get_type("float"), make_float($1)); }
-	| STRING           { $$ = cast($1.type, $1); }
-	| RAW              { $$ = cast($1.type, $1); }
-	| array            { $$ = cast($1.type, $1); }
-	| message          { $$ = cast($1.type, $1); }
-	| archive          { $$ = cast($1.type, $1); }
-	| type             { $$ = cast($1.type, $1); }
-	| typecast BOOL    { $$ = cast($1, make_bool($2)); }
-	| typecast integer { $$ = cast($1, make_int($2)); }
-	| typecast float   { $$ = cast($1, make_float($2)); }
-	| typecast STRING  { $$ = cast($1, $2); }
-	| typecast RAW     { $$ = cast($1, $2); }
-	| typecast array   { $$ = cast($1, $2); }
-	| typecast message { $$ = cast($1, $2); }
-	| typecast archive { $$ = cast($1, $2); }
-	| typecast type    { $$ = cast($1, $2); }
+	: BOOL                  { $$ = cast(get_type("bool"), make_bool($1)); }
+	| integer               { $$ = cast(get_type("int32"), make_int($1)); }
+	| float                 { $$ = cast(get_type("float"), make_float($1)); }
+	| STRING                { $$ = cast($1.type, $1); }
+	| RAW                   { $$ = cast($1.type, $1); }
+	| array                 { $$ = cast($1.type, $1); }
+	| message               { $$ = cast($1.type, $1); }
+	| archive               { $$ = cast($1.type, $1); }
+	| type                  { $$ = cast($1.type, $1); }
+	| '(' expr ')'          { $$ = $2; }
+	| typecast BOOL         { $$ = cast($1, make_bool($2)); }
+	| typecast integer      { $$ = cast($1, make_int($2)); }
+	| typecast float        { $$ = cast($1, make_float($2)); }
+	| typecast STRING       { $$ = cast($1, $2); }
+	| typecast RAW          { $$ = cast($1, $2); }
+	| typecast array        { $$ = cast($1, $2); }
+	| typecast message      { $$ = cast($1, $2); }
+	| typecast archive      { $$ = cast($1, $2); }
+	| typecast type         { $$ = cast($1, $2); }
+	| typecast '(' expr ')' { $$ = cast($1, $3); }
 	;
 
 typecast
-	: '(' datatype ')' { $$ = $2; }
-	;
+	: '(' ARRAY ')'         { $$ = get_type("raw"); }
+	| '(' MESSAGE ')'       { $$ = get_type("message"); }
+	| '(' ARCHIVE IDENT ')' { $$ = get_type("message"); free_mem($3); }
+	| '(' IDENT ')'         { $$ = get_type($2); free_mem($2); }
+	; 
 
 datatype
 	: ARRAY         { $$ = get_type("raw"); }
@@ -438,8 +488,8 @@ integer
 	;
 
 float
-	: FLOAT     { $$ = $1; }
-	| '-' FLOAT { $$ = -($2); }
+	: FLOAT       { $$ = $1; }
+	| '-' FLOAT   { $$ = -($2); }
 	;
 
 %%
@@ -551,6 +601,27 @@ type_t get_type(char* name)
 	if (i == type_table.end())
 	{
 		abort_compile(RDEF_COMPILE_ERR, "unknown type %s", name);
+	}
+
+	return i->second;
+}
+
+//------------------------------------------------------------------------------
+
+bool is_type(char* name)
+{
+	return type_table.find(name) != type_table.end();
+}
+
+//------------------------------------------------------------------------------
+
+define_t get_define(char* name)
+{
+	define_iter_t i = define_table.find(name);
+
+	if (i == define_table.end())
+	{
+		abort_compile(RDEF_COMPILE_ERR, "unknown define %s", name);
 	}
 
 	return i->second;
@@ -1248,6 +1319,77 @@ data_t cast(type_t new_type, data_t data)
 
 //------------------------------------------------------------------------------
 
+data_t unary_expr(data_t data, char oper)
+{
+	data_t op = cast_to_uint32(get_type("int32"), data);
+
+	int32 i = *((int32*) op.ptr);
+
+	data_t out;
+
+	switch (oper)
+	{
+		case '~': out = make_int(~i); break;
+	}
+
+	free_mem(op.ptr);
+
+	return cast(get_type("int32"), out);
+}
+
+//------------------------------------------------------------------------------
+
+data_t binary_expr(data_t data1, data_t data2, char oper)
+{
+	data_t op1 = cast_to_uint32(get_type("int32"), data1);
+	data_t op2 = cast_to_uint32(get_type("int32"), data2);
+
+	int32 i1 = *((int32*) op1.ptr);
+	int32 i2 = *((int32*) op2.ptr);
+
+	data_t out;
+
+	switch (oper)
+	{
+		case '+': out = make_int(i1 + i2); break;
+		case '-': out = make_int(i1 - i2); break;
+		case '*': out = make_int(i1 * i2); break;
+
+		case '/':
+			if (i2 == 0)
+			{
+				abort_compile(RDEF_COMPILE_ERR, "division by zero");
+			}
+			else
+			{
+				 out = make_int(i1 / i2);
+			}
+			break;
+
+		case '%':
+			if (i2 == 0)
+			{
+				abort_compile(RDEF_COMPILE_ERR, "division by zero");
+			}
+			else
+			{
+				out = make_int(i1 % i2);
+			}
+			break;
+
+		case '|': out = make_int(i1 | i2); break;
+		case '^': out = make_int(i1 ^ i2); break;
+		case '&': out = make_int(i1 & i2); break;
+	}
+
+	free_mem(op1.ptr);
+	free_mem(op2.ptr);
+
+	return cast(get_type("int32"), out);
+}
+
+//------------------------------------------------------------------------------
+
 void add_resource(id_t id, type_code code, data_t data)
 {
 	if (!id.has_id)
@@ -1532,6 +1674,17 @@ static void add_file_types()
 
 //------------------------------------------------------------------------------
 
+static void add_define(char* name, int32 value)
+{
+	define_t define;
+	define.name  = name;
+	define.value = value;
+
+	define_table.insert(make_pair(define.name, define));
+}
+
+//------------------------------------------------------------------------------
+
 void init_parser()
 {
 	add_builtin_type(B_BOOL_TYPE,    "bool");
@@ -1563,6 +1716,19 @@ void init_parser()
 	add_large_icon();
 	add_mini_icon();
 	add_file_types();
+
+	add_define("B_SINGLE_LAUNCH",    0x0);
+	add_define("B_MULTIPLE_LAUNCH",  0x1);
+	add_define("B_EXCLUSIVE_LAUNCH", 0x2);
+	add_define("B_BACKGROUND_APP",   0x4);
+	add_define("B_ARGV_ONLY",        0x8);
+
+	add_define("B_APPV_DEVELOPMENT",   0x0);
+	add_define("B_APPV_ALPHA",         0x1);
+	add_define("B_APPV_BETA",          0x2);
+	add_define("B_APPV_GAMMA",         0x3);
+	add_define("B_APPV_GOLDEN_MASTER", 0x4);
+	add_define("B_APPV_FINAL",         0x5);
 }
 
 //------------------------------------------------------------------------------
@@ -1574,10 +1740,14 @@ void clean_up_parser()
 	// so we don't need to free them here; compile.cpp already does that
 	// when it cleans up. However, we do need to remove the entries from
 	// the tables, otherwise they will still be around the next time we are
-	// asked to compile something. In DEBUG mode, however, we do free these
-	// items, so they don't show up in the mem leak statistics.
+	// asked to compile something. 
 
 #ifdef DEBUG
+	// Note that in DEBUG mode, we _do_ free these items, so they don't show
+	// up in the mem leak statistics. The names etc of builtin items are not
+	// alloc_mem()'d but we still free_mem() them. Not entirely correct, but
+	// it doesn't seem to hurt, and we only do it in DEBUG mode anyway.
+
 	for (sym_iter_t i = symbol_table.begin(); i != symbol_table.end(); ++i)
 	{
 		free_mem(i->first);
@@ -1600,6 +1770,7 @@ void clean_up_parser()
 
 	symbol_table.clear();
 	type_table.clear();
+	define_table.clear();
 }
 
 //------------------------------------------------------------------------------

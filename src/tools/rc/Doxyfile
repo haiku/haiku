@@ -3,7 +3,7 @@
 #---------------------------------------------------------------------------
 # General configuration options
 #---------------------------------------------------------------------------
-PROJECT_NAME           = "librdef API version 1"
+PROJECT_NAME           = "librdef API version 2"
 PROJECT_NUMBER         = 
 OUTPUT_DIRECTORY       = 
 OUTPUT_LANGUAGE        = English

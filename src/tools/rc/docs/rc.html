@@ -6,6 +6,8 @@
 
 <H1>The rc resource compiler</H1>
 
+<P>Version 1.1</P>
+
 <H2>Table of contents</H2>
 
 <UL>
@@ -26,28 +28,13 @@
 
 <H2>Introduction</H2>
 
-<P>In the world of BeOS programming, a "resource" is data that is bundled with 
-your application. Typical examples are the application's icons and its 
-signature, but you can attach any data you want (bitmaps, text, cursors, etc). 
-You stuff this data into a .rsrc file that will be linked to your application 
-when it is compiled.</P>
+<P>In the world of BeOS programming, a "resource" is data that is bundled with your application. Typical examples are the application's icons and its signature, but you can attach any data you want (bitmaps, text, cursors, etc). You stuff this data into a .rsrc file that will be linked to your application when it is compiled.</P>
 
-<P>Because .rsrc files have a binary file format, you need to use special tools 
-to edit them, such as FileTypes, QuickRes, or Resourcer. Alternatively, you can 
-use a "resource compiler". This is a command line tool that takes a text-based 
-resource script and turns it into a .rsrc file.</P>
+<P>Because .rsrc files have a binary file format, you need to use special tools to edit them, such as FileTypes, QuickRes, or Resourcer. Alternatively, you can use a "resource compiler". This is a command line tool that takes a text-based resource script and turns it into a .rsrc file.</P>
 
-<P>With a resource compiler, you express your resources as ASCII text using a 
-special definition language, which makes the resource files much easier to edit 
-and maintain. You no longer need separate GUI tools to build your .rsrc files, 
-and you can even automate the whole process by calling the compiler from your 
-Makefile or Jamfile. Resource scripts will also make your life easier if you 
-use CVS, because CVS doesn't handle .rsrc files very well.</P>
+<P>With a resource compiler, you express your resources as ASCII text using a special definition language, which makes the resource files much easier to edit and maintain. You no longer need separate GUI tools to build your .rsrc files, and you can even automate the whole process by calling the compiler from your Makefile or Jamfile. Resource scripts will also make your life easier if you use CVS, because CVS doesn't handle .rsrc files very well.</P>
 
-<P>BeOS R5 comes with an (experimental) resource compiler called "beres", and a 
-corresponding decompiler called "deres". rc is an open source replacement (and 
-enhancement) of these tools. It is (mostly) backwards compatible, so you should 
-be able to compile your old .rdef files without any problems.</P>
+<P>BeOS R5 comes with an (experimental) resource compiler called "beres", and a corresponding decompiler called "deres". rc is an open source replacement (and enhancement) of these tools. It is (mostly) backwards compatible, so you should be able to compile your old .rdef files without any problems.</P>
 
 <!-- *********************************************************************** -->
 
@@ -67,10 +54,7 @@ be able to compile your old .rdef files without any problems.</P>
 
 <H2>Writing resource scripts</H2>
 
-<P>Writing resource scripts is not difficult, although the syntax may take some 
-getting used to. A resource script is a plain text file with one or more 
-resource definition statements. In addition, it may contain C or C++ style 
-comments. By convention, resource script files have the extension ".rdef".</P>
+<P>Writing resource scripts is not difficult, although the syntax may take some getting used to. A resource script is a plain text file with one or more resource definition statements. In addition, it may contain C or C++ style comments. By convention, resource script files have the extension ".rdef".</P>
 
 <P>Here is an example of a simple resource script:</P>
 
@@ -80,61 +64,43 @@ resource(3) 3.14;
 resource(4) "hello world";
 resource(5) $"0123456789ABCDEF";</PRE></BLOCKQUOTE>
 
-<P>When compiled, this script produces a resource file with five resources. The 
-above example also illustrates the types of data that resources are allowed to 
-have: boolean, integer, floating point, character string (UTF-8), and raw data 
-buffer (hexadecimal).</P>
+<P>When compiled, this script produces a resource file with five resources. The above example also illustrates the types of data that resources are allowed to have: boolean, integer, floating point, character string (UTF-8), and raw data buffer (hexadecimal).</P>
 
-<P>By default, integer data is stored as a 32-bit int, and floating point data 
-is stored as a 4-byte float. If you want to change the way the data is stored, 
-you have to cast it:</P>
+<P>By default, integer data is stored as a 32-bit int, and floating point data is stored as a 4-byte float. If you want to change the way the data is stored, you have to cast it:</P>
 
 <BLOCKQUOTE><PRE>resource(6) (int8) 123;
 resource(7) (double) 3.14;</PRE></BLOCKQUOTE>
 
-<P>You can cast integer data to the following types: int8, uint8, int16, 
-uint16, int32, uint32, int64, uint64, ssize_t, size_t, off_t, time_t, float, 
-double, raw. You can cast floating point data to: float, double, raw. You are 
-not allowed to cast boolean, string, or raw data to other types.</P>
+<P>You can cast integer data to the following types: int8, uint8, int16, uint16, int32, uint32, int64, uint64, ssize_t, size_t, off_t, time_t, float, double, raw. You can cast floating point data to: float, double, raw. You are not allowed to cast boolean, string, or raw data to other types.</P>
 
-<P>In addition to casting, you can also change the resource's type code. This 
-does not change the way the data is stored, only what it is called. To change 
-the type code of a resource:</P>
+<P>In addition to casting, you can also change the resource's type code. This does not change the way the data is stored, only what it is called. To change the type code of a resource:</P>
 
 <BLOCKQUOTE><PRE>resource(8) #'dude' 123;</PRE></BLOCKQUOTE>
 
-<P>This changes the type of resource 8 to the four-character-code 'dude'. If 
-you did not change it, it would be 'LONG', which stands for 32-bit integer. By 
-changing the type code, you assign a new meaning to the resource. You can also 
-specify type codes as decimal or hexadecimal numbers:</P>
+<P>This changes the type of resource 8 to the four-character-code 'dude'. If you did not change it, it would be 'LONG', which stands for 32-bit integer. By changing the type code, you assign a new meaning to the resource. You can also specify type codes as decimal or hexadecimal numbers:</P>
 
 <BLOCKQUOTE><PRE>resource(9) #200 123;
 resource(10) #0xC8 123;</PRE></BLOCKQUOTE>
 
-<P>For historical reasons, you may also enclose the type code in parens, but 
-that is not the preferred notation. Type casts and type codes can be 
-combined:</P>
+<P>For historical reasons, you may also enclose the type code in parens, but that is not the preferred notation. Type casts and type codes can be combined:</P>
 
 <BLOCKQUOTE><PRE>resource(11) #'dude' (int8) 123;
 resource(11) (#'dude') (int8) 123;</PRE></BLOCKQUOTE>
 
-<P>In the above examples, we have given the resources numeric IDs. The 
-combination of ID and type code must be unique in the resource file; you cannot 
-have two int32 resources with ID 1, for example. However, it is perfectly fine 
-(but not necessarily a good idea) to do the following, because the data types 
-are different:</P>
+<P>In the above examples, we have given the resources numeric IDs. The combination of ID and type code must be unique in the resource file; you cannot have two int32 resources with ID 1, for example. However, it is perfectly fine (but not necessarily a good idea) to do the following, because the data types are different:</P>
 
 <BLOCKQUOTE><PRE>resource(12) 123;
 resource(12) "w00t!";</PRE></BLOCKQUOTE>
 
-<P>For your own convenience, you can also name resources. Unlike the ID/type 
-code combination, names do not have to be unique. </P>
+<P>For your own convenience, you can also name resources. Unlike the ID/type code combination, names do not have to be unique. </P>
 
 <BLOCKQUOTE><PRE>resource(13, "Friday") "Bad Luck";</PRE></BLOCKQUOTE>
 
-<P>Since it is likely that you will be using these resources from a C/C++ 
-program, it may be convenient to refer to them by symbolic names instead of 
-hardcoded numeric ID's. The rdef format allows you to do this:</P>
+<P>You can also do simple maths. The emphasis here is on simple because the number of operators is limited, they only work on integer data (or anything that can be cast to integer), and the result is always 32-bit integer as well. Still, the lazy amongst you may find it handy:</P>
+
+<BLOCKQUOTE><PRE>resource(14) 2 * (4 + 3);</PRE></BLOCKQUOTE>
+
+<P>Since it is likely that you will be using these resources from a C/C++ program, it may be convenient to refer to them by symbolic names instead of hardcoded numeric ID's. The rdef format allows you to do this:</P>
 
 <BLOCKQUOTE><PRE>enum
 {
@@ -144,14 +110,9 @@ hardcoded numeric ID's. The rdef format allows you to do this:</P>
 
 resource(R_AppName) "MyKillerApp";</PRE></BLOCKQUOTE>
 
-<P>The compiler will automatically substitute the symbol R_AppName with the 
-number 1. (You don't have to start these symbol names with the prefix R_, but 
-it is somewhat of a convention.)</P>
+<P>The compiler will automatically substitute the symbol R_AppName with the number 1. (You don't have to start these symbol names with the prefix R_, but it is somewhat of a convention.)</P>
 
-<P>Now how do you tell your C/C++ app about these symbolic names? You simply 
-put the enum into a header file that you include both from your application's 
-source code and your rdef file. The header file, which we'll call 
-"myresources.h", now looks like this:</P>
+<P>Now how do you tell your C/C++ app about these symbolic names? You simply put the enum into a header file that you include both from your application's source code and your rdef file. The header file, which we'll call "myresources.h", now looks like this:</P>
 
 <BLOCKQUOTE><PRE>enum
 {
@@ -165,22 +126,13 @@ source code and your rdef file. The header file, which we'll call
 
 resource(R_AppName) "MyKillerApp";</PRE></BLOCKQUOTE>
 
-<P>Don't let the .h suffix fool you: the header file is still considered to be 
-an rdef file, and must contain valid rdef syntax. If you add any other C/C++ 
-code, your resource script will fail to compile. Of course, you shouldn't add 
-any other rdef syntax to the header either (unless you want your C++ compiler 
-to start complaining). Besides comments, the only safe thing to put in that 
-header file is the enum statement, because both rdef and C/C++ understand 
-it.</P>
+<P>Don't let the .h suffix fool you: the header file is still considered to be an rdef file, and must contain valid rdef syntax. If you add any other C/C++ code, your resource script will fail to compile. Of course, you shouldn't add any other rdef syntax to the header either (unless you want your C++ compiler to start complaining). Besides comments, the only safe thing to put in that header file is the enum statement, because both rdef and C/C++ understand it.</P>
 
 <P>Just like IDs, symbolic identifiers can be combined with a name:</P>
 
 <BLOCKQUOTE><PRE>resource(R_AppName, "AppName") "MyKillerApp";</PRE></BLOCKQUOTE>
 
-<P>If you don't specify a name, and invoke the compiler with the 
-<CODE>--auto-names</CODE> option, it automatically uses the symbolic ID for the
-name as well. So the ID of the following resource is 1 (because that is what 
-R_AppName corresponds to) and its name becomes "R_AppName":</P>
+<P>If you don't specify a name, and invoke the compiler with the <CODE>--auto-names</CODE> option, it automatically uses the symbolic ID for the name as well. So the ID of the following resource is 1 (because that is what R_AppName corresponds to) and its name becomes "R_AppName":</P>
 
 <BLOCKQUOTE><PRE>resource(R_AppName) "MyKillerApp";</PRE></BLOCKQUOTE>
 
@@ -190,15 +142,11 @@ R_AppName corresponds to) and its name becomes "R_AppName":</P>
 
 <H2>Big fat resources</H2>
 
-<P>The resources we have made so far consisted of a single data item, but you 
-can also supply a collection of data values. The simplest of these compound 
-data structures is the array:</P>
+<P>The resources we have made so far consisted of a single data item, but you can also supply a collection of data values. The simplest of these compound data structures is the array:</P>
 
 <BLOCKQUOTE><PRE>resource(20) array { 1234, 5678 };</PRE></BLOCKQUOTE>
 
-<P>An array is nothing more than a raw buffer. The above statement takes the 
-two 32-bit integers 1234 and 5678 and stuffs them into a new 64-bit buffer. You 
-can put any kind of data into an array, even other arrays:</P>
+<P>An array is nothing more than a raw buffer. The above statement takes the two 32-bit integers 1234 and 5678 and stuffs them into a new 64-bit buffer. You can put any kind of data into an array, even other arrays:</P>
 
 <BLOCKQUOTE><PRE>resource(21) array
 {
@@ -209,10 +157,7 @@ can put any kind of data into an array, even other arrays:</P>
     $"AABB"
 };</PRE></BLOCKQUOTE>
 
-<P>It is up to you to remember the structure of this array, because array 
-resources don't keep track of what kind of values you put into them and where 
-you put these values. For that, we have messages. A message resource is a 
-flattened BMessage:</P>
+<P>It is up to you to remember the structure of this array, because array resources don't keep track of what kind of values you put into them and where you put these values. For that, we have messages. A message resource is a flattened BMessage:</P>
 
 <BLOCKQUOTE><PRE>resource(22) message('blah')
 {
@@ -222,10 +167,7 @@ flattened BMessage:</P>
     "Other Msg" = message { "field" = "value" }
 };</PRE></BLOCKQUOTE>
 
-<P>A message has an optional "what" code, in this case 'blah', and one or more 
-fields. A field has a name (between double quotes), a value, and a data type. 
-By default, the field assumes the type of its data, but you can also specify an 
-explicit data type and type code in front of the field name:</P>
+<P>A message has an optional "what" code, in this case 'blah', and one or more fields. A field has a name (between double quotes), a value, and a data type. By default, the field assumes the type of its data, but you can also specify an explicit data type and type code in front of the field name:</P>
 
 <BLOCKQUOTE><PRE>resource(23) message('bla2')
 {
@@ -235,9 +177,7 @@ explicit data type and type code in front of the field name:</P>
     #'dude' raw "buffer2" = $"aabbccdd"  // you can also combine them
 };</PRE></BLOCKQUOTE>
 
-<P>A special type of message is the "archive". The BeOS API allows you to take 
-a BArchivable class and flatten it into a BMessage. You can also add such 
-archives to your resource scripts:</P>
+<P>A special type of message is the "archive". The BeOS API allows you to take a BArchivable class and flatten it into a BMessage. You can also add such archives to your resource scripts:</P>
 
 <BLOCKQUOTE><PRE>resource(24) #'BBMP' archive BBitmap
 {
@@ -251,11 +191,9 @@ archives to your resource scripts:</P>
     }
 };</PRE></BLOCKQUOTE>
 
-<P>So what's this "rect" thing in the "_frame" field? Besides arrays and 
-messages, the compiler also supports a number of other data structures from the 
-BeAPI:</P>
+<P>So what's this "rect" thing in the "_frame" field? Besides arrays and messages, the compiler also supports a number of other data structures from the BeAPI:</P>
 
-<BLOCKQUOTE><TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 <TR><TH>type</TH><TH>corresponds to</TH><TH>fields</TH></TR>
 <TR><TD>point</TD><TD>BPoint, B_POINT_TYPE</TD><TD>float x, y</TD></TR>
 <TR><TD>rect</TD><TD>BRect, B_RECT_TYPE</TD><TD>float left, top, right, bottom</TD></TR>
@@ -266,17 +204,14 @@ BeAPI:</P>
 
 <BLOCKQUOTE><PRE>resource(25) rgb_color { 255, 128, 0, 0 };</PRE></BLOCKQUOTE>
 
-<P>Or you can use the field names, in which case the order of the fields does 
-not matter:</P>
+<P>Or you can use the field names, in which case the order of the fields does not matter:</P>
 
 <BLOCKQUOTE><PRE>resource(26) rgb_color
 {
     blue = 0, green = 128, alpha = 0, red = 255
 };</PRE></BLOCKQUOTE>
 
-<P>You can also make your own data structures, or as we refer to them, 
-"user-defined types". Suppose that your application wants to store its GUI
-elements in the resources:</P>
+<P>You can also make your own data structures, or as we refer to them, "user-defined types". Suppose that your application wants to store its GUI elements in the resources:</P>
 
 <BLOCKQUOTE><PRE>type #'menu' menu
 {
@@ -292,12 +227,7 @@ type #'item' menuitem
     bool enabled = true  // default value is "true"
 };</PRE></BLOCKQUOTE>
 
-<P>A type has a name, an optional type code, and one or more fields. You are 
-advised not to pick a type code that already belongs to one of the built-in 
-types, to avoid any confusion. Each field has a data type, a name, and a 
-default value. If you don't specify a default, it is typically 0 or empty. To 
-create a new menu resource using the types from the above example, you might 
-do:</P>
+<P>A type has a name, an optional type code, and one or more fields. You are advised not to pick a type code that already belongs to one of the built-in types, to avoid any confusion. Each field has a data type, a name, and a default value. If you don't specify a default, it is typically 0 or empty. To create a new menu resource using the types from the above example, you might do:</P>
 
 <BLOCKQUOTE><PRE>resource(27) menu
 {
@@ -311,15 +241,9 @@ do:</P>
     }
 };</PRE></BLOCKQUOTE>
 
-<P>Like an array, a type resource doesn't remember its internal structure. You 
-can regard types as fancy arrays that are easier to fill in, a template if you 
-will. User-defined types work under the same rules as the built-in types point, 
-rect, and rgb_color, so you can specify the fields in order or by their names.
-If you don't specify a field, its default value will be used.</P>
+<P>Like an array, a type resource doesn't remember its internal structure. You can regard types as fancy arrays that are easier to fill in, a template if you will. User-defined types work under the same rules as the built-in types point, rect, and rgb_color, so you can specify the fields in order or by their names. If you don't specify a field, its default value will be used.</P>
 
-<P>Types can also have a default resource ID and/or name. If you omit to give
-the resource an ID or a name, it uses the defaults from its data type. For
-example, this:</P>
+<P>Types can also have a default resource ID and/or name. If you omit to give the resource an ID or a name, it uses the defaults from its data type. For example, this:</P>
 
 <BLOCKQUOTE><PRE>type myint { int32 i };
 resource(10, "MyName") myint { 123 };</PRE></BLOCKQUOTE>
@@ -329,35 +253,21 @@ resource(10, "MyName") myint { 123 };</PRE></BLOCKQUOTE>
 <BLOCKQUOTE><PRE>type(10, "MyName") myint { int32 i };
 resource myint { 123 };</PRE></BLOCKQUOTE>
 
-<P>And to save you even more typing, simple types that have only one field can 
-also be specified as:</P>
+<P>And to save you even more typing, simple types that have only one field can also be specified as:</P>
 
 <BLOCKQUOTE><PRE>resource myint 123;</PRE></BLOCKQUOTE>
 
-<P>Most data types have a fixed size; a uint16 is always 2 bytes long, a float
-always comprises 4 bytes, and so on. But the sizes of string and raw data
-resources depend on what you put in them. Sometimes you may want to force
-these kinds of resources to have a fixed size as well. You can do this as
-follows:</P>
+<P>Most data types have a fixed size; a uint16 is always 2 bytes long, a float always comprises 4 bytes, and so on. But the sizes of string and raw data resources depend on what you put in them. Sometimes you may want to force these kinds of resources to have a fixed size as well. You can do this as follows:</P>
 
 <BLOCKQUOTE><PRE>type fixed { string s[64] };</PRE></BLOCKQUOTE>
 
-<P>Any resources with type "fixed" will always contain a 64-byte string, no
-matter how many characters you actually specify. Too much data will be
-truncated; too little data will be padded with zeroes. Note that string
-resources are always terminated with a null character, so string "s" in the
-above type only allows for 63 real characters. The number between the square
-brackets always indicates bytes (unlike C/C++ arrays which use a similar
-notation).</P>
+<P>Any resources with type "fixed" will always contain a 64-byte string, no matter how many characters you actually specify. Too much data will be truncated; too little data will be padded with zeroes. Note that string resources are always terminated with a null character, so string "s" in the above type only allows for 63 real characters. The number between the square brackets always indicates bytes (unlike C/C++ arrays which use a similar notation).</P>
 
-<P>If you have (large) binary files that you want to include in the resources,
-such as pictures of Buffy, you don't need to convert the binary data to text
-form first. You can simply "import" the file:</P>
+<P>If you have (large) binary files that you want to include in the resources, such as pictures of Buffy, you don't need to convert the binary data to text form first. You can simply "import" the file:</P>
 
 <BLOCKQUOTE><PRE>resource(22) #'PNG ' import "buffy.png";</PRE></BLOCKQUOTE>
 
-<P>Imported resources are always arrays (raw data), and you can specify the
-import statement everywhere that array data is valid.</P>
+<P>Imported resources are always arrays (raw data), and you can specify the import statement everywhere that array data is valid.</P>
 
 <!-- *********************************************************************** -->
 
@@ -365,12 +275,9 @@ import statement everywhere that array data is valid.</P>
 
 <H2>Application resources</H2>
 
-<P>All BeOS applications (except command line apps) have a basic set of 
-resources, such as a MIME signature, launch flags, icons, and a few others. 
-Adding these kinds of resources is easy, because rc also has a number of 
-built-in types for that:</P>
+<P>All BeOS applications (except command line apps) have a basic set of resources, such as a MIME signature, launch flags, icons, and a few others. Adding these kinds of resources is easy, because rc also has a number of built-in types for that:</P>
 
-<BLOCKQUOTE><TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 <TR><TH>type</TH><TH>corresponds to</TH><TH>fields</TH></TR>
 
 <TR><TD>app_signature</TD><TD>the app's MIME signature</TD><TD>string 
@@ -390,12 +297,57 @@ minor, variety, internal<BR>string short_info, long_info</TD></TR>
 
 </TABLE></BLOCKQUOTE>
 
-<!-- examples on how to fill in these resources -->
+<P>Here are some examples on how to use these resources. These things are also documented in the Storage Kit section of the BeBook, so refer to that for more information.</P>
 
-<P>Filling in these application resources is a little tricky with the current 
-version of rc. A future version will make this easier, when the user-defined 
-types mechanism becomes more powerful. For now, see the file 
-<CODE>tests/builtin.rdef</CODE> for more info.</P>
+<P>The signature:</P>
+
+<BLOCKQUOTE><PRE>resource app_signature "application/x-vnd.YourName.YourApp";</PRE></BLOCKQUOTE>
+
+<P>The application flags determine how your application is launched. You must 'OR' together a combination of the following symbols:</P>
+
+<UL>
+<LI><CODE>B_SINGLE_LAUNCH</CODE></LI>
+<LI><CODE>B_MULTIPLE_LAUNCH</CODE></LI>
+<LI><CODE>B_EXCLUSIVE_LAUNCH</CODE></LI>
+<LI><CODE>B_BACKGROUND_APP</CODE></LI>
+<LI><CODE>B_ARGV_ONLY</CODE></LI>
+</UL>
+
+<P>For example:</P>
+
+<BLOCKQUOTE><PRE>resource app_flags B_SINGLE_LAUNCH | B_BACKGROUND_APP;</PRE></BLOCKQUOTE>
+
+<P>The version information resource contains a number of fields for you to fill in. Most are pretty obvious, except maybe for the "variety" field. It can take one of the following values:</P>
+
+<UL>
+<LI><CODE>B_APPV_DEVELOPMENT</CODE> - development version</LI>
+<LI><CODE>B_APPV_ALPHA</CODE> - alpha version</LI>
+<LI><CODE>B_APPV_BETA</CODE> - beta version</LI>
+<LI><CODE>B_APPV_GAMMA</CODE> - gamma version</LI>
+<LI><CODE>B_APPV_GOLDEN_MASTER</CODE> - golden master</LI>
+<LI><CODE>B_APPV_FINAL</CODE> - release version</LI>
+</UL>
+
+<P>For example:</P>
+
+<BLOCKQUOTE><PRE>resource app_version
+{
+    major      = 1,
+    middle     = 0,
+    minor      = 0,
+    variety    = B_APPV_BETA,
+    internal   = 0,
+    short_info = "My Cool Program",
+    long_info  = "My Cool Program - Copyright Me"
+};</PRE></BLOCKQUOTE>
+
+<P>The supported file types resource contains a list of MIME types, not unlike this:</P>
+
+<BLOCKQUOTE><PRE>resource file_types message
+{
+    "types" = "text/plain",
+    "types" = "text"
+};</PRE></BLOCKQUOTE>
 
 <!-- *********************************************************************** -->
 
@@ -403,24 +355,15 @@ types mechanism becomes more powerful. For now, see the file
 
 <H2>Compiling</H2>
 
-<P>rc is a command line tool, which means you must run it from a Terminal 
-window. Typical usage example:</P>
+<P>rc is a command line tool, which means you must run it from a Terminal window. Typical usage example:</P>
 
 <BLOCKQUOTE><PRE>rc -o things.rsrc things.rdef</PRE></BLOCKQUOTE>
 
-<P>This tells rc that you wish to compile the script "things.rdef" to the 
-resource file "things.rsrc". The default name for the output file is 
-"out.rsrc", but you can change that with the <CODE>-o</CODE> or 
-<CODE>--output</CODE> switch, just like we did here.</P>
+<P>This tells rc that you wish to compile the script "things.rdef" to the resource file "things.rsrc". The default name for the output file is "out.rsrc", but you can change that with the <CODE>-o</CODE> or <CODE>--output</CODE> switch, just like we did here.</P>
 
-<P>You can specify multiple rdef files if you wish, and they will all be 
-compiled into one big resource file. If your rdef files #include files that are 
-not in the current working directory, you can add include paths with the 
-<CODE>-I</CODE> or <CODE>--include</CODE> option. For a complete list of 
-options, type <CODE>rc --help</CODE>.</P>
+<P>You can specify multiple rdef files if you wish, and they will all be compiled into one big resource file. If your rdef files #include files that are not in the current working directory, you can add include paths with the <CODE>-I</CODE> or <CODE>--include</CODE> option. For a complete list of options, type <CODE>rc --help</CODE>.</P>
 
-<P>If your project uses a Makefile, you can have rc automatically generate
-the resource file for you:</P>
+<P>If your project uses a Makefile, you can have rc automatically generate the resource file for you:</P>
 
 <BLOCKQUOTE><PRE>things.rsrc: things.rdef
 	rc -o $@ $^</PRE></BLOCKQUOTE>
@@ -433,28 +376,15 @@ the resource file for you:</P>
 
 <H2>Decompiling</H2>
 
-<P>Of course you can write the resource scripts by hand, but if you already 
-have a .rsrc file you can tell rc to decompile it. This will produce a 
-ready-to-go rdef script, and save you some trouble. (Although in some cases 
-it may be necessary to edit the script a little to suit your needs.) Note that 
-rc isn't limited to just .rsrc files; you can decompile any file that has
-resources, including applications.</P>
+<P>Of course you can write the resource scripts by hand, but if you already have a .rsrc file you can tell rc to decompile it. This will produce a ready-to-go rdef script, and save you some trouble. (Although in some cases it may be necessary to edit the script a little to suit your needs.) Note that rc isn't limited to just .rsrc files; you can decompile any file that has resources, including applications.</P>
 
 <P>For example, to decompile the file "things.rsrc" into "things.rdef", do:</P>
 
 <BLOCKQUOTE><PRE>rc --decompile -o things.rdef things.rsrc</PRE></BLOCKQUOTE>
 
-<P>The decompiler produces an rdef resource script with the name "out.rdef", 
-but you can change that name with the <CODE>-o</CODE> or <CODE>--output</CODE> 
-switches. If you specify the <CODE>--auto-names</CODE> option, rc will also 
-write a C/C++ header file. Any resources whose name is a valid C/C++ 
-identifier will be added to the header file. Now your program can access the 
-resource using this symbolic name.</P>
+<P>The decompiler produces an rdef resource script with the name "out.rdef", but you can change that name with the <CODE>-o</CODE> or <CODE>--output</CODE> switches. If you specify the <CODE>--auto-names</CODE> option, rc will also write a C/C++ header file. Any resources whose name is a valid C/C++ identifier will be added to the header file. Now your program can access the resource using this symbolic name.</P>
 
-<P>Note: Even though rc can decompile multiple .rsrc files into one script, it
-does not detect conflicts in resource names or IDs. In such cases, the 
-resulting .rdef and/or .h files may give errors when you try to compile 
-them.</P>
+<P>Note: Even though rc can decompile multiple .rsrc files into one script, it does not detect conflicts in resource names or IDs. In such cases, the resulting .rdef and/or .h files may give errors when you try to compile them.</P>
 
 <!-- *********************************************************************** -->
 
@@ -462,11 +392,7 @@ them.</P>
 
 <H2>Authors</H2>
 
-<P>The rc resource compiler and its companion library librdef were written by 
-<A HREF="mailto:mahlzeit@users.sourceforge.net">Matthijs Hollemans</A> for the 
-<A HREF="http://www.openbeos.org">OpenBeOS</A> project. Thanks to Ingo Weinhold
-for the Jamfile and the Jam rules. Comments, bug reports, suggestions, and
-patches are welcome!</P>
+<P>The rc resource compiler and its companion library librdef were written by <A HREF="mailto:mahlzeit@users.sourceforge.net">Matthijs Hollemans</A> for the <A HREF="http://www.openbeos.org">OpenBeOS</A> project. Thanks to Ingo Weinhold for the Jamfile and the Jam rules. Comments, bug reports, suggestions, and patches are welcome!</P>
 
 <!-- *********************************************************************** -->
 
@@ -476,23 +402,11 @@ patches are welcome!</P>
 
 <P>Copyright (c) 2003 Matthijs Hollemans</P>
 
-<P>Permission is hereby granted, free of charge, to any person obtaining a 
-copy of this software and associated documentation files (the "Software"), 
-to deal in the Software without restriction, including without limitation 
-the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-and/or sell copies of the Software, and to permit persons to whom the 
-Software is furnished to do so, subject to the following conditions:</P>
+<P>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</P>
 
-<P>The above copyright notice and this permission notice shall be included in 
-all copies or substantial portions of the Software.</P>
+<P>The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.</P>
 
-<P>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-DEALINGS IN THE SOFTWARE.</P>
+<P>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</P>
 
 </BODY>
 </HTML>

@@ -1,0 +1,62 @@
+
+resource(10000) 0x80 | 0x01;    // 129  (0x00000081)
+resource(10001) ~0x01;          // -2   (0xFFFFFFFE)
+resource(10002) 0x3F1 & ~0x01;  // 1008 (0x000003F0)
+
+resource(10010) 100 + 10 + 1;   // 111
+resource(10011) 100 + 10 + -1;  // 109
+resource(10012) -15 + -15;      // -30
+resource(10013) -15 - -15;      // 0
+//resource(10014) -15 - +15;      // syntax error
+resource(10015) 2 * (4 + 3);    // 14
+
+resource(10020) 10 + 5 * 3;     // 25
+resource(10021) (10 + 5) * 3;   // 45
+resource(10022) 10 / 1 * 0;     // 0
+
+//resource(10030) 10 / 0;         // div by 0 error
+//resource(10031) 10 % 0;         // div by 0 error
+//resource(10032) 10 / (1 - 1);   // div by 0 error
+
+//resource(10040) 10.1 + 3.14;    // cannot cast
+
+resource(10041) (int8) 100 + (int8) 257;           // 101 (32-bit)
+resource(10042) ((int8) 100) + ((int8) 257);       // 101  (32-bit)
+resource(10043) (int8) ((int8) 100 + (int8) 257);  // 101 (8-bit)
+
+/* don't try this at home kids */
+type #'LONG' my_int32 { int32 x = 10 };
+resource(10050) my_int32;             // 10
+resource(10051) my_int32 6;           // 6
+resource(10052) my_int32 + 10;        // 20
+resource(10053) my_int32 6 + 10;      // 16
+resource(10054) my_int32 { 6 } + 10;  // 16
+resource(10056) my_int32 (int8) 257;  // 1
+resource(10057) my_int32 (6 + 10);    // 16
+
+type sumtin { int32 x = 10 + 5 };
+resource(10060) sumtin;  // 15
+
+resource(10061) #'LONG' array { 10 + 5, 0xFF & 0x88 };  // 0x0F00...0088
+
+resource(10062) #'LONG' array 
+{ 
+	(int8) (10 + 5), (int8) (0xFF & 0x88)  // 0x0F88
+};
+
+resource(10063) message { "field" = (10 + 5)*3 };  // 45
+
+//resource(10070) (array);                       // parse error
+//resource(10071) my_int32 (my_int32);           // parse error
+//resource(10072) my_int32(my_int32(my_int32));  // parse error
+//resource(10073) array array;                   // parse error
+//resource(10074) array (array);                 // parse error
+
+resource(10080) my_int32 my_int32;    // 10
+resource(10081) my_int32 my_int32 my_int32;  // and so on
+
+//------------------------------------------------------------------------------
+
+resource(10100) B_SINGLE_LAUNCH;
+resource(10101) (int8) B_EXCLUSIVE_LAUNCH;
+resource(10102) B_MULTIPLE_LAUNCH | B_BACKGROUND_APP | B_ARGV_ONLY;

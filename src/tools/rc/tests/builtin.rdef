@@ -36,11 +36,11 @@ type(1, "BEOS:APP_SIG") #'MIMS' app_signature
 /* Application launch flags */
 type(1, "BEOS:APP_FLAGS") #'APPF' app_flags
 {
-	// 0x00000000 B_SINGLE_LAUNCH
-	// 0x01000000 B_MULTIPLE_LAUNCH
-	// 0x02000000 B_EXCLUSIVE_LAUNCH
-	// 0x04000000 B_BACKGROUND_APP
-	// 0x08000000 B_ARGV_ONLY
+	// B_SINGLE_LAUNCH    (0x0)
+	// B_MULTIPLE_LAUNCH  (0x1)
+	// B_EXCLUSIVE_LAUNCH (0x2)
+	// B_BACKGROUND_APP   (0x4)
+	// B_ARGV_ONLY        (0x8)
 	uint32 flags
 };
 
@@ -54,8 +54,12 @@ type(1, "BEOS:APP_VERSION") #'APPV' app_version
 	uint32 middle,
 	uint32 minor,
 
-	// 0 = development  1 = alpha          2 = beta
-	// 3 = gamma        4 = golden master  5 = final
+	// B_APPV_DEVELOPMENT   (0)
+	// B_APPV_ALPHA         (1)
+	// B_APPV_BETA          (2)
+	// B_APPV_GAMMA         (3)
+	// B_APPV_GOLDEN_MASTER (4)
+	// B_APPV_FINAL         (5)
 	uint32 variety,  
 
 	uint32 internal,

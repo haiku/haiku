@@ -1,35 +1,20 @@
 <HTML>
 <HEAD>
-<TITLE>Planned features</TITLE>
+<TITLE>Ye Olde To Do List</TITLE>
 </HEAD>
 <BODY BGCOLOR="#FFFFFF">
 
-<H1>Planned features</H1>
+<H1>Ye Olde To Do List</H1>
+
+<P>What will future versions of rc bring? Here are some ideas.</P>
 
 <UL>
 
-<LI><P>Simple integer expressions + - * / | & ~ ()</P></LI>
+<LI>Attributes, so you can also use rdef scripts to add attributes to your files instead of (or in addition to) resources.<BR>&nbsp;</LI> 
 
-<LI><P>Make user-defined types more powerful. Some ideas: bitmask fields (for 
-app_flags), choice fields (for app_version), conditional constructs.</P></LI>
+<LI>Expand the expressions to handle other data types besides integer data. This would include floating point (+ - * /), string (+), raw (+), and booleans (! &amp;&amp; ||).<BR>&nbsp;</LI>
 
-<LI><P>Attributes, so you can also use rdef scripts to add attributes to your 
-files instead of (or in addition to) resources.</P></LI> 
-
-<LI><P>In "auto names" mode, the decompiler currently does not use the enum 
-symbol table. So if two resources have the same name and that name is a valid 
-C/C++ identifier, the decompiler will add two conflicting symbols to the enum 
-statement. This can also happen when multiple input files have conflicting 
-resource IDs.</P></LI>
-
-<LI><P>Support for the built-in types point, rect, and rgb_color is hardcoded 
-into the decompiler. The other built-in types--app_flags, mini_icon, etc--are
-not supported at all. It would be better to use the type symbol table for this 
-as well. Then the decompiler can also support user-defined types (although these
-type definitions must be provided to the decompiler somehow.)</P></LI>
-
-<LI><P>Right now, archives are treated as messages. Maybe we should give them 
-their own type, B_ARCHIVED_OBJECT (type code 'ARCV').</P></LI>
+<LI>Allow users to create their own symbolic constants.</LI>
 
 </UL>
 

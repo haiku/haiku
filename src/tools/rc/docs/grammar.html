@@ -7,87 +7,47 @@
 
 <H1>rdef grammar</H1>
 
-<P>This is the (somewhat boring) specification of the rdef file format as it is 
-understood by librdef. It also describes to a certain extent how the compiler 
-works. You don't need to read this unless you want to hack librdef. Knowledge 
-of compiler theory and lex/yacc is assumed.</P>
+<P>Version 1.1</P>
+
+<P>This is the (somewhat boring) specification of the rdef file format as it is understood by librdef. It also describes to a certain extent how the compiler works. You don't need to read this unless you want to hack librdef. Knowledge of compiler theory and lex/yacc is assumed.</P>
 
 <H2>The lexer</H2>
 
-<P>Like any compiler, librdef contains a lexer (aka scanner) and a parser. The 
-lexer reads the input file and chops it up into tokens. The lexer ignores 
-single-line // comments and /* ... */ multi-line comments. It also ignores 
-whitespace and newlines.</P>
+<P>Like any compiler, librdef contains a lexer (aka scanner) and a parser. The lexer reads the input file and chops it up into tokens. The lexer ignores single-line // comments and /* ... */ multi-line comments. It also ignores whitespace and newlines.</P>
 
 <P>The lexer recognizes the following tokens:</P>
 
-<BLOCKQUOTE>
-<TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 
 <TR><TD WIDTH="20%">BOOL</TD><TD>true or false</TD></TR>
 
-<TR><TD>INTEGER</TD><TD>You can specify integers as decimal numbers, 
-hexadecimal numbers (starting with 0x or 0X, alpha digits are case 
-insensitive), octal numbers (starting with a leading 0), binary numbers 
-(starting with 0b or 0B), or as a four character code ('CCCC'). Valid range is 
-64 bits. At this point, numbers are always unsigned. The minus sign is treated 
-as a separate token, and is dealt with by the parser.</TD></TR>
+<TR><TD>INTEGER</TD><TD>You can specify integers as decimal numbers, hexadecimal numbers (starting with 0x or 0X, alpha digits are case insensitive), octal numbers (starting with a leading 0), binary numbers (starting with 0b or 0B), or as a four character code ('CCCC'). Valid range is 64 bits. At this point, numbers are always unsigned. The minus sign is treated as a separate token, and is dealt with by the parser.</TD></TR>
 
-<TR><TD>FLOAT</TD><TD>A floating point literal. Must contain a decimal point, 
-may contain a signed exponent. Stored internally as a double.</TD></TR>
+<TR><TD>FLOAT</TD><TD>A floating point literal. Must contain a decimal point, may contain a signed exponent. Stored internally as a double.</TD></TR>
 
-<TR><TD>STRING</TD><TD>UTF-8 compatible string literal, enclosed by double 
-quotes. Can contain escape sequences (\b \f \n \r \t \v \" \\ \0), octal 
-escapes (\000) and hex escapes (\0x00 or \x00). May not span more than one 
-line, although you are allowed to specify multiple string literals in a row and 
-the lexer will automatically concatenate them. There is no maximum length.</TR>
+<TR><TD>STRING</TD><TD>UTF-8 compatible string literal, enclosed by double quotes. Can contain escape sequences (\b \f \n \r \t \v \" \\ \0), octal escapes (\000) and hex escapes (\0x00 or \x00). May not span more than one line, although you are allowed to specify multiple string literals in a row and the lexer will automatically concatenate them. There is no maximum length.</TR>
 
-<TR><TD>RAW</TD><TD>Hexadecimal representation of raw data, enclosed by double 
-quotes, and prefixed by a dollar sign: $"12FFAB". Each byte is represented by 
-two hex characters, so there must be an even number of characters between the 
-quotes. The alpha digits are not case sensitive. Like STRING, a RAW token may 
-not span more than one line, but multiple consecutive RAW tokens are 
-automatically concatenated. No maximum length.</TD></TR>
+<TR><TD>RAW</TD><TD>Hexadecimal representation of raw data, enclosed by double quotes, and prefixed by a dollar sign: $"12FFAB". Each byte is represented by two hex characters, so there must be an even number of characters between the quotes. The alpha digits are not case sensitive. Like STRING, a RAW token may not span more than one line, but multiple consecutive RAW tokens are automatically concatenated. No maximum length.</TD></TR>
 
-<TR><TD>IDENT</TD><TD>C/C++ identifier. First character is alphabetic or 
-underscore. Other characters are alphanumeric or underscore.</TD></TR>
+<TR><TD>IDENT</TD><TD>C/C++ identifier. First character is alphabetic or underscore. Other characters are alphanumeric or underscore.</TD></TR>
 
-<TR><TD>TYPECODE</TD><TD>A hash sign followed by a 32-bit unsigned decimal 
-number, hex number, or four character code. Examples: #200, #0x00C8, 
-#'MIMS'</TD></TR>
+<TR><TD>TYPECODE</TD><TD>A hash sign followed by a 32-bit unsigned decimal number, hex number, or four character code. Examples: #200, #0x00C8, #'MIMS'</TD></TR>
 
-</TABLE>
-</BLOCKQUOTE>
+</TABLE></BLOCKQUOTE>
 
 <P>The following are treated as keywords and special symbols:</P>
 
-<BLOCKQUOTE><CODE>enum resource array message archive type import
-{ } ( ) , ; = -</CODE></BLOCKQUOTE>
+<BLOCKQUOTE><CODE>enum resource array message archive type import { } ( ) , ; = - + * / % ^ | &amp; ~</CODE></BLOCKQUOTE>
 
-<P>The lexer also deals with #include statements, which look like: #include 
-"filename"\n. When you #include a file, the lexer expects it to contain valid 
-rdef syntax. So even though the include file is probably a C/C++ header, it 
-should not contain anything but the enum statement and/or comments. The lexer 
-only looks for include files in the include search paths that you have 
-specified, so if you want it to look in the current working directory you have 
-to explicitly specify that. You may nest #includes.</P>
+<P>The lexer also deals with #include statements, which look like: #include "filename"\n. When you #include a file, the lexer expects it to contain valid rdef syntax. So even though the include file is probably a C/C++ header, it should not contain anything but the enum statement and/or comments. The lexer only looks for include files in the include search paths that you have specified, so if you want it to look in the current working directory you have to explicitly specify that. You may nest #includes.</P>
 
-<P>A note about UTF-8. Since the double quote (hex 0x22) is never part of the 
-second or third byte of a UTF-8 character, the lexer can safely deal with UTF-8 
-characters inside string literals. That is also the reason that the decompiler 
-does not escape characters that are not human-readable (except the ones in the 
-7-bit ASCII range), because they could be part of a UTF-8 encoding. The current 
-version of librdef does not handle L"..." (wide char) strings, but nobody uses 
-them anyway.</P>
+<P>A note about UTF-8. Since the double quote (hex 0x22) is never part of the second or third byte of a UTF-8 character, the lexer can safely deal with UTF-8 characters inside string literals. That is also the reason that the decompiler does not escape characters that are not human-readable (except the ones in the 7-bit ASCII range), because they could be part of a UTF-8 encoding. The current version of librdef does not handle L"..." (wide char) strings, but nobody uses them anyway.</P>
 
 <H2>The parser</H2>
 
-<P>The parser takes the tokens from the lexer and matches them against the 
-rules of the grammar. What follows is the grammar in a simplified variation of 
-BNF, so the actual bison source file may look a little different. Legend:</P>
+<P>The parser takes the tokens from the lexer and matches them against the rules of the grammar. What follows is the grammar in a simplified variation of BNF, so the actual bison source file may look a little different. Legend:</P>
 
-<BLOCKQUOTE>
-<TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 <TR><TD>[ a ]</TD><TD>match a 0 or 1 times</TD></TR>
 <TR><TD>{ b }</TD><TD>match b 0 or more times</TD></TR>
 <TR><TD>c | d</TD><TD>match either c or d</TD></TR>
@@ -95,34 +55,31 @@ BNF, so the actual bison source file may look a little different. Legend:</P>
 <TR><TD>lowercase</TD><TD>nonterminal</TD></TR>
 <TR><TD>UPPER</TD><TD>token from the lexer</TD></TR>
 <TR><TD>'c'</TD><TD>token from the lexer</TD></TR>
-</TABLE>
-</BLOCKQUOTE>
+</TABLE></BLOCKQUOTE>
 
 <P>The rdef grammar consists of the following rules:</P>
 
-<BLOCKQUOTE>
-<TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 
 <TR><TD>script</TD><TD>{enum | typedef | resource}</TD></TR>
 
-<TR><TD>enum</TD><TD> ENUM '{' [symboldef {',' symboldef} [',']] '}' 
-';'</TD></TR>
+<TR><TD>enum</TD><TD> ENUM '{' [symboldef {',' symboldef} [',']] '}' ';'</TD></TR>
 
 <TR><TD>symboldef</TD><TD>IDENT ['=' integer]</TD></TR>
 
-<TR><TD>typedef</TD><TD>TYPE [id] [TYPECODE] IDENT '{' fielddef {',' fieldef} 
-'}' ';'</TD></TR>
+<TR><TD>typedef</TD><TD>TYPE [id] [TYPECODE] IDENT '{' fielddef {',' fielddef} '}' ';'</TD></TR>
 
-<TR><TD>fielddef</TD><TD>datatype IDENT ['[' INTEGER ']'] ['=' data]</TD></TR>
+<TR><TD>fielddef</TD><TD>datatype IDENT ['[' INTEGER ']'] ['=' expr]</TD></TR>
 
-<TR><TD>resource</TD><TD>RESOURCE [id] [typecode] data ';'</TD></TR>
+<TR><TD>resource</TD><TD>RESOURCE [id] [typecode] expr ';'</TD></TR>
 
 <TR><TD>id</TD><TD>'(' [(integer | IDENT) [',' STRING] | STRING] ')'</TD></TR>
 
 <TR><TD>typecode</TD><TD>['('] TYPECODE [')']</TD></TR>
 
-<TR><TD>data</TD><TD>[typecast] (BOOL | integer | float | STRING | RAW | array 
-| message | archive | type)</TD></TR>
+<TR><TD>expr</TD><TD>expr BINARY_OPER expr | UNARY_OPER expr | data</TD></TR>
+
+<TR><TD>data</TD><TD>[typecast] (BOOL | integer | float | STRING | RAW | array | message | archive | type | define | '(' expr ')' )</TD></TR>
 
 <TR><TD>typecast</TD><TD>['(' datatype ')']</TD></TR>
 
@@ -132,79 +89,57 @@ BNF, so the actual bison source file may look a little different. Legend:</P>
 
 <TR><TD>float</TD><TD>['-'] FLOAT</TD></TR>
 
-<TR><TD>array</TD><TD>ARRAY ['{' [data {',' data}] '}'] | [ARRAY] IMPORT
-STRING</TD></TR>
+<TR><TD>array</TD><TD>ARRAY ['{' [expr {',' expr}] '}'] | [ARRAY] IMPORT STRING</TD></TR>
 
-<TR><TD>message</TD><TD>MESSAGE ['(' integer ')'] ['{' [msgfield {',' 
-msgfield}] '}']</TD></TR>
+<TR><TD>message</TD><TD>MESSAGE ['(' integer ')'] ['{' [msgfield {',' msgfield}] '}']</TD></TR>
 
-<TR><TD>msgfield</TD><TD>[TYPECODE] [datatype] STRING '=' data</TD></TR>
+<TR><TD>msgfield</TD><TD>[TYPECODE] [datatype] STRING '=' expr</TD></TR>
 
-<TR><TD>archive</TD><TD>ARCHIVE [archiveid] IDENT '{' msgfield {',' msgfield} 
-'}'</TD></TR>
+<TR><TD>archive</TD><TD>ARCHIVE [archiveid] IDENT '{' msgfield {',' msgfield} '}'</TD></TR>
 
 <TR><TD>archiveid</TD><TD>'(' [STRING] [',' integer] ')'</TD></TR>
 
-<TR><TD>type</TD><TD>IDENT [data | '{' [typefield {',' typefield}] 
-'}']</TD></TR>
+<TR><TD>type</TD><TD>IDENT [data | '{' [typefield {',' typefield}] '}']</TD></TR>
 
-<TR><TD>typefield</TD><TD>[IDENT '='] data</TD></TR>
+<TR><TD>typefield</TD><TD>[IDENT '='] expr</TD></TR>
 
-</TABLE>
-</BLOCKQUOTE>
+<TR><TD>define</TD><TD>IDENT</TD></TR>
+
+</TABLE></BLOCKQUOTE>
 
 <H2>Semantics</H2>
 
 <H3>Resource names</H3>
 
-<P>There are several different ways to specify the ID and name of a new 
-resource:</P>
+<P>There are several different ways to specify the ID and name of a new resource:</P>
 
-<BLOCKQUOTE>
-<TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 
-<TR><TD WIDTH="25%">resource</TD><TD>The resource is assigned the default name 
-and ID of its data type.</TD></TR>
+<TR><TD WIDTH="25%">resource</TD><TD>The resource is assigned the default name and ID of its data type.</TD></TR>
 
-<TR><TD>resource()</TD><TD>The resource is assigned the default name and ID of 
-its data type.</TD></TR>
+<TR><TD>resource()</TD><TD>The resource is assigned the default name and ID of its data type.</TD></TR>
 
-<TR><TD>resource(1)</TD><TD>The resource is assigned the numeric ID 1, and the 
-default name of its data type.</TD></TR>
+<TR><TD>resource(1)</TD><TD>The resource is assigned the numeric ID 1, and the default name of its data type.</TD></TR>
 
-<TR><TD>resource("xxx")</TD><TD>The resource is assigned the name "xxx" and the 
-default ID of its data type.</TD></TR>
+<TR><TD>resource("xxx")</TD><TD>The resource is assigned the name "xxx" and the default ID of its data type.</TD></TR>
 
-<TR><TD>resource(1, "xxx")</TD><TD>The resource is assigned the numeric ID 1, 
-and the name "xxx".</TD></TR>
+<TR><TD>resource(1, "xxx")</TD><TD>The resource is assigned the numeric ID 1, and the name "xxx".</TD></TR>
 
-<TR><TD>resource(sss)</TD><TD>The resource is assigned the numeric ID that 
-corresponds with the symbol sss, which should have been defined in an enum 
-earlier. If the "auto names" option is passed to the compiler, the resource is 
-also given the name "sss", otherwise the default name from its data type is 
-used.</TD></TR>
+<TR><TD>resource(sss)</TD><TD>The resource is assigned the numeric ID that corresponds with the symbol sss, which should have been defined in an enum earlier. If the "auto names" option is passed to the compiler, the resource is also given the name "sss", otherwise the default name from its data type is used.</TD></TR>
 
-<TR><TD>resource(sss, "xxx")</TD><TD>The resource is assigned the numeric ID 
-that corresponds with the symbol sss, and the name "xxx".</TD></TR>
+<TR><TD>resource(sss, "xxx")</TD><TD>The resource is assigned the numeric ID that corresponds with the symbol sss, and the name "xxx".</TD></TR>
 
-</TABLE>
-</BLOCKQUOTE>
+</TABLE></BLOCKQUOTE>
 
 <H3>Data types and type casts</H3>
 
-<P>Resources (and message fields) have a type code and a data type. The data 
-type determines the format the data is stored in, while the type code tells the 
-user how to interpret the data. Typically, there is some kind of relation 
-between the two, otherwise the resource will be a little hard to read.</P>
+<P>Resources (and message fields) have a type code and a data type. The data type determines the format the data is stored in, while the type code tells the user how to interpret the data. Typically, there is some kind of relation between the two, otherwise the resource will be a little hard to read.</P>
 
-<P>The following table lists the compiler's built-in data types. (Users can 
-also define their own types; this is described in a later section.)</P>
+<P>The following table lists the compiler's built-in data types. (Users can also define their own types; this is described in a later section.)</P>
 
-<BLOCKQUOTE>
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY=""><TR><TD VALIGN="top">
 
-<TABLE BORDER="0"><TR><TD VALIGN="top">
-
-<TABLE BORDER="1">
+<TABLE BORDER=1 SUMMARY="">
 <TR><TD>bool</TD><TD>B_BOOL_TYPE</TD></TR>
 <TR><TD>int8</TD><TD>B_INT8_TYPE</TD></TR>
 <TR><TD>uint8</TD><TD>B_UINT8_TYPE</TD></TR>
@@ -220,7 +155,7 @@ also define their own types; this is described in a later section.)</P>
 
 </TD><TD VALIGN="top">
 
-<TABLE BORDER="1">
+<TABLE BORDER=1 SUMMARY="">
 <TR><TD>off_t</TD><TD>B_OFF_T_TYPE</TD></TR>
 <TR><TD>time_t</TD><TD>B_TIME_TYPE</TD></TR>
 <TR><TD>float</TD><TD>B_FLOAT_TYPE</TD></TR>
@@ -233,70 +168,50 @@ also define their own types; this is described in a later section.)</P>
 <TR><TD>archive</TD><TD>B_MESSAGE_TYPE</TD></TR>
 </TABLE>
 
-</TD></TR></TABLE>
-</BLOCKQUOTE>
+</TD></TR></TABLE></BLOCKQUOTE>
 
-<P>The type code has no effect on how the data is stored. For example, if you 
-do this: "resource(x) #'LONG' true", then the data will not automatically be 
-stored as a 32-bit number! If you don't specify an explicit type code, the 
-compiler uses the type of the data for that.</P>
+<P>The type code has no effect on how the data is stored. For example, if you do this: "resource(x) #'LONG' true", then the data will not automatically be stored as a 32-bit number! If you don't specify an explicit type code, the compiler uses the type of the data for that.</P>
 
-<P>You can change the data type with a type cast. The following casts are 
-allowed:</P>
+<P>You can change the data type with a type cast. The following casts are allowed:</P>
 
-<BLOCKQUOTE>
-<TABLE BORDER="1">
+<BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 
 <TR><TD WIDTH="20%">bool</TD><TD>You cannot cast bool data.</TD></TR>
 
-<TR><TD>integer</TD><TD>You can cast to all numeric data types. Casts to 
-smaller datatypes will truncate the number. Casting negative numbers to 
-unsigned datatypes (and vice versa) will wrap them, i.e. (uint8) -1 becomes 
-255.</TD></TR>
+<TR><TD>integer</TD><TD>You can cast to all numeric data types. Casts to smaller datatypes will truncate the number. Casting negative numbers to unsigned datatypes (and vice versa) will wrap them, i.e. (uint8) -1 becomes 255.</TD></TR>
 
 <TR><TD>floating point</TD><TD>You can only cast to float or double.</TD></TR>
 
 <TR><TD>string</TD><TD>You cannot cast string data.</TD></TR>
 
-<TR><TD>raw, buffer, array</TD><TD>You can cast anything to raw, but not the 
-other way around.</TD></TR>
+<TR><TD>raw, buffer, array</TD><TD>You can cast anything to raw, but not the other way around.</TD></TR>
 
 <TR><TD>message, archive</TD><TD>You cannot cast message data.</TD></TR>
 
 <TR><TD>type</TD><TD>You cannot cast user-defined types.</TD></TR>
 
-</TABLE>
-</BLOCKQUOTE>
+</TABLE></BLOCKQUOTE>
 
-<P>In addition to the "simple" built-in data types, the compiler also natively 
-supports several data structures from the BeOS API (point, rect, rgb_color) and 
-a few convenience types (app_signature, app_flags, etc). These types all follow 
-the same rules as user-defined types.</P>
+<P>In addition to the "simple" built-in data types, the compiler also natively supports several data structures from the BeOS API (point, rect, rgb_color) and a few convenience types (app_signature, app_flags, etc). These types all follow the same rules as user-defined types.</P>
 
 <H3>Arrays</H3>
 
-<P>The following definitions are semantically 
-equivalent:</P>
+<P>The following definitions are semantically equivalent:</P>
 
 <BLOCKQUOTE><PRE>resource(x) $"AABB";
 resource(x) array { $"AA" $"BB" };
 resource(x) array { $"AA", $"BB" };</PRE></BLOCKQUOTE>
 
-<P>The comma is optional and simply concatenates the two literals. When you 
-decompile this code, it always looks like:</P>
+<P>The comma is optional and simply concatenates the two literals. When you decompile this code, it always looks like:</P>
 
 <BLOCKQUOTE><PRE>resource(x) $"AABB";</PRE></BLOCKQUOTE>
 
-<P>Strings behave differently. The following two definitions are equivalent, 
-and concatenate the two literals into one string:</P>
+<P>Strings behave differently. The following two definitions are equivalent, and concatenate the two literals into one string:</P>
 
 <BLOCKQUOTE><PRE>resource(x) "AA" "BB";
 resource(x) #'CSTR' array { "AA" "BB" };</PRE></BLOCKQUOTE>
 
-<P>However, if you put a comma between the the strings, the compiler will still 
-glue them together but with a '\0' character in the middle. Now the resource 
-contains <I>two</I> strings: "AA" and "BB". You can also specify the '\0' 
-character yourself:</P>
+<P>However, if you put a comma between the the strings, the compiler will still glue them together but with a '\0' character in the middle. Now the resource contains <I>two</I> strings: "AA" and "BB". You can also specify the '\0' character yourself:</P>
 
 <BLOCKQUOTE><PRE>resource(x) "AA\0BB";
 resource(x) #'CSTR' array { "AA", "BB" };</PRE></BLOCKQUOTE>
@@ -306,133 +221,85 @@ resource(x) #'CSTR' array { "AA", "BB" };</PRE></BLOCKQUOTE>
 <BLOCKQUOTE><PRE>resource(x) "AA", "BB";
 resource(x) $"AA", $"BB";</PRE></BLOCKQUOTE>
 
-<P>Note that the data type of an array is always raw data, no matter how you 
-specify its contents. Because raw literals may be empty ($""), so may 
-arrays.</P>
+<P>Note that the data type of an array is always raw data, no matter how you specify its contents. Because raw literals may be empty ($""), so may arrays.</P>
 
 <H3>Messages and archives</H3>
 
-<P>A message resource is a flattened BMessage. By default it has the data type 
-B_MESSAGE_TYPE and corresponding type code #'MSGG'. If you don't specify a 
-"what" code for the message, it defaults to 0.</P>
+<P>A message resource is a flattened BMessage. By default it has the data type B_MESSAGE_TYPE and corresponding type code #'MSGG'. If you don't specify a "what" code for the message, it defaults to 0.</P>
 
-<P>Message fields assume the type of their data, unless you specify a different 
-type in front of the field name. (Normal casting rules apply here.) You can 
-also give the field a different type code, which tells the BMessage how to 
-interpret the data, but not how it is stored in the message. This type code 
-also goes in front of the field name. You can give the same name to multiple 
-fields, provided that they all have the same type. (The data of these fields 
-does not have to be the same size.) A message may be empty; it is still a valid 
-BMessage, but it contains no fields.</P>
+<P>Message fields assume the type of their data, unless you specify a different type in front of the field name. (Normal casting rules apply here.) You can also give the field a different type code, which tells the BMessage how to interpret the data, but not how it is stored in the message. This type code also goes in front of the field name. You can give the same name to multiple fields, provided that they all have the same type. (The data of these fields does not have to be the same size.) A message may be empty; it is still a valid BMessage, but it contains no fields.</P>
 
-<P>An archive is also a flattened BMessage, but one that was made by 
-Archive()'ing a BArchivable class, such as BBitmap. The name of the archive, in 
-this case BBitmap, is automatically added to the message in a field called 
-"class". The "archive" keyword is optionally followed by a set of parentheses 
-that enclose a string and/or an integer. The int is the "what" code, the string 
-is stored in a field called "add_on" (used for dynamic loading of 
-BArchivables). Other than that, archives and messages are identical. The 
-compiler does not check whether the contents of the archive actually make 
-sense, so if you don't structure the data properly you may be unable to 
-unarchive the object later. Unlike a message, an archive may not be empty, 
-because that is pointless.</P>
+<P>An archive is also a flattened BMessage, but one that was made by Archive()'ing a BArchivable class, such as BBitmap. The name of the archive, in this case BBitmap, is automatically added to the message in a field called "class". The "archive" keyword is optionally followed by a set of parentheses that enclose a string and/or an integer. The int is the "what" code, the string is stored in a field called "add_on" (used for dynamic loading of BArchivables). Other than that, archives and messages are identical. The compiler does not check whether the contents of the archive actually make sense, so if you don't structure the data properly you may be unable to unarchive the object later. Unlike a message, an archive may not be empty, because that is pointless.</P>
 
 <H3>User-defined types</H3>
 
-<P>We allow users to define their own types. A "type" is just a fancy array, 
-because the data from the various fields is simply concatenated into one big 
-block of bytes. The difference is that user-defined types are much easier to 
-fill in.</P>
+<P>We allow users to define their own types. A "type" is just a fancy array, because the data from the various fields is simply concatenated into one big block of bytes. The difference is that user-defined types are much easier to fill in.</P>
 
-<P>A user-defined type has a symbolic name, a type code, and a number of data 
-fields. After all the fields have been concatenated, the type code is applied 
-to the whole block. So, the data type of this resource is always the same as 
-its type code (unlike arrays, which are always raw data). If no type code is 
-specified, it defaults to B_RAW_TYPE.</P>
+<P>A user-defined type has a symbolic name, a type code, and a number of data fields. After all the fields have been concatenated, the type code is applied to the whole block. So, the data type of this resource is always the same as its type code (unlike arrays, which are always raw data). If no type code is specified, it defaults to B_RAW_TYPE.</P>
 
-<P>The data fields always have a default value. For simple fields this is 
-typically 0 (numeric types) or empty (string, raw, message). The default value 
-of a user-defined type as a whole is the combination of the default values of 
-its fields. Of course, the user can specify other defaults. (When a user 
-creates a new resource that uses such a type, he is basically overriding the 
-default values with his own.)</P>
+<P>The data fields always have a default value. For simple fields this is typically 0 (numeric types) or empty (string, raw, message). The default value of a user-defined type as a whole is the combination of the default values of its fields. Of course, the user can specify other defaults. (When a user creates a new resource that uses such a type, he is basically overriding the default values with his own.)</P>
 
-<P>The user may fill in the data fields by name, by order, or using a 
-combination of both. Every time the compiler sees an unnamed data item, it 
-stuffs it into the next available field. Named data items are simply assigned 
-to the field with the same name, and may overwrite a value that was previously 
-put there "by order". Any fields that are not filled in keep their default 
-value. For example:</P>
+<P>The user may fill in the data fields by name, by order, or using a combination of both. Every time the compiler sees an unnamed data item, it stuffs it into the next available field. Named data items are simply assigned to the field with the same name, and may overwrite a value that was previously put there "by order". Any fields that are not filled in keep their default value. For example:</P>
 
 <BLOCKQUOTE><PRE>type vector { int32 x, int32 y, int32 z, int32 w = 4 };
 resource(1) vector { 1, 3, x = 2 };</PRE></BLOCKQUOTE>
 
-<P>Here, x is first set to 1, y is set to 3, x is now overwritten by the value 
-2, z is given the default value 0, and w defaults to 4.</P>
+<P>Here, x is first set to 1, y is set to 3, x is now overwritten by the value 2, z is given the default value 0, and w defaults to 4.</P>
 
-<P>Note: if a user-defined type contains string, raw, or message fields, the 
-size of the type depends on the data that the user puts into it, because these 
-fields have a variable size. However, the user may specify a fixed size for a
-field (number of bytes, enclosed in square brackets following the field name).
-In this case, data that is too long will be truncated and data that is too
-short will be padded with zeroes. You can do this for all types, but it really
-only makes sense for strings and raw data.</P>
+<P>Note: if a user-defined type contains string, raw, or message fields, the size of the type depends on the data that the user puts into it, because these fields have a variable size. However, the user may specify a fixed size for a field (number of bytes, enclosed in square brackets following the field name). In this case, data that is too long will be truncated and data that is too short will be padded with zeroes. You can do this for all types, but it really only makes sense for strings and raw data. More about this in the manual.</P>
 
-<P>A type definition may also contain a default resource ID and name. The 
-default ID of built-in types is usually 1 and the name is empty (NULL). For 
-example:</P>
+<P>A type definition may also contain a default resource ID and name. The default ID of built-in types is usually 1 and the name is empty (NULL). For example:</P>
 
 <BLOCKQUOTE><PRE>type(10, "MyName") mytype { int32 a };
 resource mytype 123;</PRE></BLOCKQUOTE>
 
-<P>The resource is now called "MyName" and has ID 10. Obviously you can only do 
-this once or you will receive a duplicate resource error. If this type is used 
-inside an array or other compound type, the default ID and resource name are 
-ignored. Note: this feature introduces a shift/reduce conflict in the 
-compiler:</P>
+<P>The resource is now called "MyName" and has ID 10. Obviously you can only do this once or you will receive a duplicate resource error. If this type is used inside an array or other compound type, the default ID and resource name are ignored. Note: this feature introduces a shift/reduce conflict in the compiler:</P>
 
 <BLOCKQUOTE><PRE>resource (int8) 123;</PRE></BLOCKQUOTE>
 
-<P>This probably doesn't do what you expect. The compiler now considers the 
-"(int8)" to be the resource ID, not a typecast. If you did not declare "int8" 
-in an enum (probably not), this gives a compiler error. Not a big problem, 
-because it is unlikely that you will ever do this. Here is a workaround:</P>
+<P>This probably doesn't do what you expect. The compiler now considers the "(int8)" to be the resource ID, not a typecast. If you did not declare "int8" in an enum (probably not), this gives a compiler error. Not a big problem, because it is unlikely that you will ever do this. Here is a workaround:</P>
 
 <BLOCKQUOTE><PRE>resource() (int8) 123;</PRE></BLOCKQUOTE>
 
+<H3>The grammar and Bison</H3>
+
+<P>Above I mentioned one of the shift/reduce conflicts from the grammar. There are several others. These are mostly the result of keeping the original grammar intact as much as possible, without having to introduce weird syntax rules for the new features. These issues aren't fatal but if you try to do something funky in your script, you may get an error message.</P>
+
+<P>The main culprit here is the "( expr )" rule from "data", which allows you to nest expressions with parens, e.g. "<CODE>(10 + 5) * 3</CODE>". This causes problems for Bison, because we already use parens all over the place. Specifically, this rule conflicts with the empty "MESSAGE" from the "message" rule, "ARRAY" from "array", and "IDENT" from "type". These rules have no other symbols following them, which makes them ambiguous with respect to the "datatype" rules. Still with me? The parser will typically pick the right one, though.</P>
+
+<P>The nested expressions rule also caused a reduce/reduce conflict. To get rid of that, I had to explicitly mention the names of the various types in the "typecast" rule, which introduces a little code duplication but it's not too bad. Just so you know, the original rule was simply:</P>
+
+<BLOCKQUOTE><PRE>typecast
+    : '(' datatype ')' { $$ = $2; }
+    ;</PRE></BLOCKQUOTE>
+
+<P>The new rule is a little more bulky:</P>
+
+<BLOCKQUOTE><PRE>typecast
+    : '(' ARRAY ')'   { ... }
+    | '(' MESSAGE ')' { ... }
+    ...<I>and so on for all the datatypes</I>...
+    ;</PRE></BLOCKQUOTE>
+
+<P>The unary minus operator is not part of the "expr" (or "data") rules, but of "integer" and "float". This also causes a shift/reduce warning.</P>
+
 <H3>Symbol table</H3>
 
-<P>The compiler uses two symbol tables: one for the enum symbols, and one with 
-the data type definitions. We need those tables to find the numeric ID/type 
-definition that corresponds with an identifier, and to make sure that there are 
-no duplicate or missing identifiers. These two symbol tables are independent, 
-so you may use the same identifier both as an enum symbol and a type name.</P>
+<P>The compiler uses two symbol tables: one for the enum symbols, and one with the data type definitions. We need those tables to find the numeric ID/type definition that corresponds with an identifier, and to make sure that there are no duplicate or missing identifiers. These two symbol tables are independent, so you may use the same identifier both as an enum symbol and a type name.</P>
 
-<P>The compiler does not need to keep a symbol table for the resources. 
-Although the combination of a resource's ID and its type code must be unique, 
-we can use the BResources class to check for this when we add a resource. There 
-is no point in duplicating this functionality in the compiler. (However, if we 
-are merging the new resources into an existing resource file, we will simply 
-overwrite duplicates.)</P>
+<P>The compiler does not need to keep a symbol table for the resources. Although the combination of a resource's ID and its type code must be unique, we can use the BResources class to check for this when we add a resource. There is no point in duplicating this functionality in the compiler. (However, if we are merging the new resources into an existing resource file, we will simply overwrite duplicates.)</P>
 
 <H3>Misc remarks</H3>
 
 <UL>
 
-<LI><P>As the grammar shows, the last field in an enum statement may be 
-followed by a comma. This is valid C/C++ syntax, and since the enum will 
-typically end up in a header file, we support that feature as well. For 
-anything else between braces, the last item may not be followed by a 
-comma.</P></LI>
+<LI>As the grammar shows, the last field in an enum statement may be followed by a comma. This is valid C/C++ syntax, and since the enum will typically end up in a header file, we support that feature as well. For anything else between braces, the last item may not be followed by a comma.<BR>&nbsp;</LI>
 
-<LI><P>The type code that follows the "resource" keyword may be enclosed by 
-parens for historical reasons. The preferred notation is without, just like in 
-front of field names (where no parens are allowed).</P></LI>
+<LI>The type code that follows the "resource" keyword may be enclosed by parens for historical reasons. The preferred notation is without, just like in front of field names (where no parens are allowed).<BR>&nbsp;</LI>
 
-<LI><P>Even though "ARCHIVE IDENT" is a valid data type, we simply ignore the 
-identifier for now. Maybe later we will support casting between different 
-archives or whatever. For now, casting to an archive is the same as casting to 
-a message, since an archive is really a message.</P></LI>
+<LI>Even though "ARCHIVE IDENT" is a valid data type, we simply ignore the identifier for now. Maybe later we will support casting between different archives or whatever. For now, casting to an archive is the same as casting to a message, since an archive is really a message.<BR>&nbsp;</LI>
+
+<LI>User-defined types and defines have their own symbol tables. Due to the way the parser is structured, we can only distinguish between types and defines by matching the identifier against both symbol tables. Here types have priority, so you could 'shadow' a define with a type name if you were really evil. Maybe it makes sense for rc to use one symbol table for all things in the future, especially since we're using yet another table for enums. We'll see.</LI>
 
 </UL>
 

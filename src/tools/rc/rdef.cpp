@@ -54,7 +54,7 @@ void free_ptr_list(ptr_list_t& list)
 
 int32 rdef_get_version()
 {
-	return 1;
+	return 2;
 }
 
 //------------------------------------------------------------------------------

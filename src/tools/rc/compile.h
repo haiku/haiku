@@ -85,6 +85,13 @@ struct id_t
 	char* name;
 };
 
+// Describes a symbolic constant.
+struct define_t
+{
+	char* name;
+	int32 value;
+};
+
 // The output file we add resources to.
 extern BResources rsrc;
 extern const char* rsrc_file;
