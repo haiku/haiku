@@ -27,6 +27,7 @@
 #include <AppDefs.h>
 #include <PortMessage.h>
 #include <Entry.h>
+#include <Path.h>
 #include <Directory.h>
 #include <PortMessage.h>
 #include <PortLink.h>
@@ -155,6 +156,7 @@ AppServer::AppServer(void)
 
 	_active_app=-1;
 	_p_active_app=NULL;
+	decorator_name="Default";
 }
 
 /*!
@@ -382,13 +384,24 @@ void AppServer::MainLoop(void)
 	\param path Path to the decorator to load
 	\return True if successful, false if not.
 	
-	If the server cannot load the specified decorator, nothing changes.
+	If the server cannot load the specified decorator, nothing changes. Passing a 
+	NULL string to this function sets the decorator	to the internal one.
 */
 bool AppServer::LoadDecorator(const char *path)
 {
 	// Loads a window decorator based on the supplied path and forces a decorator update.
 	// If it cannot load the specified decorator, it will retain the current one and
-	// return false.
+	// return false. Note that passing a NULL string to this function sets the decorator
+	// to the internal one.
+
+	// passing the string "Default" will set the window decorator to the app_server's
+	// internal one
+	if(!path)
+	{
+		make_decorator=NULL;
+		return true;
+	}
+	
 	create_decorator *pcreatefunc=NULL;
 	status_t stat;
 	image_id addon;
@@ -409,7 +422,10 @@ bool AppServer::LoadDecorator(const char *path)
 		unload_add_on(addon);
 		return false;
 	}
-
+	
+	BPath temppath(path);
+	decorator_name=temppath.Leaf();
+	
 	acquire_sem(_decor_lock);
 	make_decorator=pcreatefunc;
 	_decorator_id=addon;
@@ -596,33 +612,88 @@ void AppServer::DispatchMessage(PortMessage *msg)
 		}
 		case AS_SET_UI_COLORS:
 		{
-			// TODO: Unpack the colors and set the color set to such
-			printf("AppServer::AS_SET_UI_COLORS unimplemented\n");
-			break;
-		}
-		case AS_GET_UI_COLOR:
-		{
-			// TODO: get a partiular UI color and return it to the sender
-			printf("AppServer::AS_GET_UI_COLOR unimplemented\n");
+			// Client application is asking to set all the system colors at once
+			// using a ColorSet object
+			
+			// Attached data:
+			// 1) ColorSet new colors to use
+			
+			gui_colorset.Lock();
+			msg->Read<ColorSet>(&gui_colorset);
+			gui_colorset.Unlock();
+			Broadcast(AS_UPDATE_COLORS);
 			break;
 		}
 		case AS_SET_DECORATOR:
 		{
-			// TODO: set up window decorator notification stuff here
-			printf("AppServer::AS_SET_DECORATOR unimplemented\n");
+			// Received from an application when the user wants to set the window
+			// decorator to a new one
+			
+			// Attached Data:
+			// char * name of the decorator in the decorators path to use
+			
+			char *decname;
+			msg->ReadString(&decname);
+			if(decname)
+			{
+				if(strcmp(decname,"Default")!=0)
+				{
+					BString decpath;
+					decpath.SetTo(DECORATORS_DIR);
+					decpath+=decname;
+					if(LoadDecorator(decpath.String()))
+						Broadcast(AS_UPDATE_DECORATOR);
+				}
+				else
+				{
+					LoadDecorator(NULL);
+					Broadcast(AS_UPDATE_DECORATOR);
+				}
+			}
+			delete decname;
+			
 			break;
 		}
 		case AS_GET_DECORATOR:
 		{
-			// TODO: get window decorator and return it to the sender
-			printf("AppServer::AS_GET_DECORATOR unimplemented\n");
+			// TODO: get window decorator's name and return it to the sender
+			// Attached Data:
+			// 1) port_id reply port
+			
+			port_id replyport;
+			msg->Read<port_id>(&replyport);
+			PortLink replylink(replyport);
+			replylink.SetOpCode(AS_GET_DECORATOR);
+			replylink.AttachString(decorator_name.String());
+			replylink.Flush();
 			break;
 		}
 		case AS_R5_SET_DECORATOR:
 		{
-			// TODO: Implement. This will translate the codes to names of the
-			// decorators and perform the same actions as AS_SET_DECORATOR
+			// Sort of supports Tracker's nifty Easter Egg. It was easy to do and 
+			// it's kind of neat, so why not?
+			
+			// Attached Data:
+			// char * name of the decorator in the decorators path to use
 			printf("AppServer::AS_R5_SET_DECORATOR unimplemented\n");
+			
+			int32 decindex;
+			msg->Read<int32>(&decindex);
+			
+			BString decpath;
+			decpath.SetTo(DECORATORS_DIR);
+			switch(decindex)
+			{
+				case 0: decpath+="BeOS"; break;
+				case 1: decpath+="AmigaOS"; break;
+				case 2: decpath+="Windows"; break;
+				case 3: decpath+="MacOS"; break;
+				default:
+					break;
+			}
+			if(LoadDecorator(decpath.String()))
+				Broadcast(AS_UPDATE_DECORATOR);
+
 			break;
 		}
 		case AS_GET_SCREEN_MODE:

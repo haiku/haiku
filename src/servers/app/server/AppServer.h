@@ -7,6 +7,7 @@
 #include <Application.h>
 #include <Window.h>
 #include <PortQueue.h>
+#include <String.h>
 #include "Decorator.h"
 #include "ServerConfig.h"
 
@@ -53,6 +54,7 @@ private:
 
 	port_id	_messageport,_mouseport;
 	image_id _decorator_id;
+	BString decorator_name;
 	bool _quitting_server;
 	BList *_applist;
 	int32 _active_app;

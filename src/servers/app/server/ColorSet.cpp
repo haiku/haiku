@@ -26,6 +26,7 @@
 //  
 //------------------------------------------------------------------------------
 #include <stdio.h>
+#include <InterfaceDefs.h>
 #include <Message.h>
 #include <File.h>
 #include <Entry.h>
@@ -412,6 +413,148 @@ RGBColor *ColorSet::StringToMember(const char *string)
 	
 }
 
+RGBColor ColorSet::AttributeToColor(int32 which)
+{
+	switch(which)
+	{
+		case B_PANEL_BACKGROUND_COLOR:
+		{
+			return panel_background;
+			break;
+		}
+		case B_PANEL_TEXT_COLOR:
+		{
+			return panel_text;
+			break;
+		}
+		case B_DOCUMENT_BACKGROUND_COLOR:
+		{
+			return document_background;
+			break;
+		}
+		case B_DOCUMENT_TEXT_COLOR:
+		{
+			return document_text;
+			break;
+		}
+		case B_CONTROL_BACKGROUND_COLOR:
+		{
+			return control_background;
+			break;
+		}
+		case B_CONTROL_TEXT_COLOR:
+		{
+			return control_text;
+			break;
+		}
+		case B_CONTROL_BORDER_COLOR:
+		{
+			return control_highlight;
+			break;
+		}
+		case B_CONTROL_HIGHLIGHT_COLOR:
+		{
+			return control_border;
+			break;
+		}
+		case B_NAVIGATION_BASE_COLOR:
+		{
+			return keyboard_navigation_base;
+			break;
+		}
+		case B_NAVIGATION_PULSE_COLOR:
+		{
+			return keyboard_navigation_pulse;
+			break;
+		}
+		case B_SHINE_COLOR:
+		{
+			return shine;
+			break;
+		}
+		case B_SHADOW_COLOR:
+		{
+			return shadow;
+			break;
+		}
+		case B_MENU_BACKGROUND_COLOR:
+		{
+			return menu_background;
+			break;
+		}
+		case B_MENU_SELECTED_BACKGROUND_COLOR:
+		{
+			return menu_selected_background;
+			break;
+		}
+		case B_MENU_ITEM_TEXT_COLOR:
+		{
+			return menu_text;
+			break;
+		}
+		case B_MENU_SELECTED_ITEM_TEXT_COLOR:
+		{
+			return menu_selected_text;
+			break;
+		}
+		case B_MENU_SELECTED_BORDER_COLOR:
+		{
+			return menu_selected_border;
+			break;
+		}
+		case B_TOOLTIP_BACKGROUND_COLOR:
+		{
+			return tooltip_background;
+			break;
+		}
+		case B_TOOLTIP_TEXT_COLOR:
+		{
+			return tooltip_text;
+			break;
+		}
+		case B_SUCCESS_COLOR:
+		{
+			return success;
+			break;
+		}
+		case B_FAILURE_COLOR:
+		{
+			return failure;
+			break;
+		}
+		case B_WINDOW_TAB_COLOR:
+		{
+			return window_tab;
+			break;
+		}
+		
+		// DANGER! DANGER, WILL ROBINSON!!
+		// These are magic numbers to work around compatibility difficulties while still keeping
+		// functionality. This __will__ break following R1
+		case 22:
+		{
+			return window_tab_text;
+			break;
+		}
+		case 23:
+		{
+			return inactive_window_tab;
+			break;
+		}
+		case 24:
+		{
+			return inactive_window_tab_text;
+			break;
+		}
+		
+		default:
+		{
+			return RGBColor(0,0,0,0);
+			break;
+		}
+	}
+}
+
 /*!
 	\brief Loads the saved system colors into a ColorSet
 	\param set the set to receive the system colors
@@ -465,3 +608,4 @@ void SaveGUIColors(const ColorSet &set)
 
 	msg.Flatten(&file);	
 }
+

@@ -48,6 +48,10 @@ class Workspace;
 class BSession;
 class Layer;
 
+#define AS_UPDATE_DECORATOR 'asud'
+#define AS_UPDATE_COLORS 'asuc'
+#define AS_UPDATE_FONTS 'asuf'
+
 /*!
 	\class ServerWindow ServerWindow.h
 	\brief Shadow BWindow class

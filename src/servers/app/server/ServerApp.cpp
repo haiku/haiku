@@ -743,6 +743,12 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			replysession.Sync();
 			break;
 		}
+		case AS_GET_UI_COLOR:
+		{
+			// TODO: get a partiular UI color and return it to the sender
+			printf("ServerApp::AS_GET_UI_COLOR unimplemented\n");
+			break;
+		}
 		default:
 		{
 			STRACE(("ServerApp %s received unhandled message code offset %s\n",_signature.String(),MsgCodeToString(msg->Code())));
