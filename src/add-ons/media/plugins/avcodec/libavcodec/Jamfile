@@ -40,6 +40,7 @@ StaticLibrary avcodec :
 	jfdctfst.c 
 	jfdctint.c 
 	jrevdct.c 
+	lcl.c
 	mace.c 
 	mdct.c 
 	mem.c 
@@ -70,6 +71,7 @@ StaticLibrary avcodec :
 	truemotion1.c 
 	utils.c 
 	vcr1.c 
+	vmdav.c
 	vp3.c 
 	vqavideo.c 
 	wmadec.c 
