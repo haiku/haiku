@@ -730,25 +730,35 @@ static inline int msmpeg4_pred_dc(MpegEncContext * s, int n,
        necessitate to modify mpegvideo.c. The problem comes from the
        fact they decided to store the quantized DC (which would lead
        to problems if Q could vary !) */
-#if defined ARCH_X86 && !defined PIC
-    asm volatile(
-        "movl %3, %%eax		\n\t"
-	"shrl $1, %%eax		\n\t"
-	"addl %%eax, %2		\n\t"
-	"addl %%eax, %1		\n\t"
-	"addl %0, %%eax		\n\t"
-	"mull %4		\n\t"
-	"movl %%edx, %0		\n\t"
-	"movl %1, %%eax		\n\t"
-	"mull %4		\n\t"
-	"movl %%edx, %1		\n\t"
-	"movl %2, %%eax		\n\t"
-	"mull %4		\n\t"
-	"movl %%edx, %2		\n\t"
-	: "+b" (a), "+c" (b), "+D" (c)
-	: "g" (scale), "S" (inverse[scale])
+#if defined ARCH_X86
+	/* removed usage of ebx, still this gets optimized by GCC pretty well */
+    asm (
+	"movl  %0, %%eax    \n\t"
+	"addl  %1, %%eax	\n\t"
+	"mull  %2           \n\t"
+	"movl  %%eax, %0    \n\t"
+	: "+g" (a)
+	: "g" (scale >> 1), "g" (inverse[scale])
 	: "%eax", "%edx"
-    );
+	);
+    asm (
+	"movl  %0, %%eax    \n\t"
+	"addl  %1, %%eax	\n\t"
+	"mull  %2           \n\t"
+	"movl  %%eax, %0    \n\t"
+	: "+g" (b)
+	: "g" (scale >> 1), "g" (inverse[scale])
+	: "%eax", "%edx"
+	);
+    asm (
+	"movl  %0, %%eax    \n\t"
+	"addl  %1, %%eax	\n\t"
+	"mull  %2           \n\t"
+	"movl  %%eax, %0    \n\t"
+	: "+g" (c)
+	: "g" (scale >> 1), "g" (inverse[scale])
+	: "%eax", "%edx"
+	);
 #else
     /* #elif defined (ARCH_ALPHA) */
     /* Divisions are extremely costly on Alpha; optimize the most
