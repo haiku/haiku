@@ -61,37 +61,16 @@ clipping_rect	RectAtInt(int32 index);
 		void	IntersectWith(const BRegion*);
 
 /*----- Private or reserved -----------------------------------------*/
+		class Support;
 
 private:
 
 friend class BView;
 friend class BDirectWindow;
-friend void zero_region(BRegion *a_region);
-friend void clear_region(BRegion *a_region);
-friend void cleanup_region_1(BRegion *region_in);
-friend void cleanup_region(BRegion *region_in);
-friend void sort_rects(clipping_rect *rects, long count);
-friend void sort_trans(long *lptr1, long *lptr2, long count);
-friend void cleanup_region_horizontal(BRegion *region_in);
-friend void copy_region(BRegion *src_region, BRegion *dst_region);
-friend void copy_region_n(BRegion*, BRegion*, long);
-friend void and_region_complex(BRegion*, BRegion*, BRegion*);
-friend void and_region_1_to_n(BRegion*, BRegion*, BRegion*);
-friend void and_region(BRegion*, BRegion*, BRegion*);
-friend void append_region(BRegion*, BRegion*, BRegion*);
-friend void r_or(long, long, BRegion*, BRegion*, BRegion*, long*, long *);
-friend void or_region_complex(BRegion*, BRegion*, BRegion*);
-friend void or_region_1_to_n(BRegion*, BRegion*, BRegion*);
-friend void or_region_no_x(BRegion*, BRegion*, BRegion*);
-friend void or_region(BRegion*, BRegion*, BRegion*);
-friend void sub(long, long, BRegion*, BRegion*, BRegion*, long*, long*);
-friend void sub_region_complex(BRegion*, BRegion*, BRegion*);
-friend void r_sub(long , long, BRegion*, BRegion*, BRegion*, long*, long*);
-friend void sub_region(BRegion*, BRegion*, BRegion*);
+friend class Support;
 
 		void	_AddRect(clipping_rect r);
 		void	set_size(long new_size);
-		long	find_small_bottom(long y1, long y2, long *hint, long *where);
 
 private:
 		long	count;

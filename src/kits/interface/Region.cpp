@@ -25,7 +25,8 @@
 //
 //------------------------------------------------------------------------------
 
-//	Notes: As now, memory is always allocated and never freed (except on destruction).
+//	Notes: As now, memory is always allocated and never freed (except on destruction,
+//	or sometimes when a copy is made).
 //  This let us be a bit faster since we don't do many reallocations.
 //	But that means that even an empty region could "waste" much space, if it contained
 //	many rects before being emptied.
@@ -46,9 +47,9 @@
 #include <Debug.h>
 #include <Region.h>
 
+// Private Includes -------------------------------------------------------------
 #include <clipping.h>
-
-#include "region_helpers.h"
+#include <RegionSupport.h>
 
 
 /*! \brief Initializes a region. The region will have no rects,
@@ -61,7 +62,7 @@ BRegion::BRegion()
 {
 	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
 	
-	zero_region(this);
+	Support::ZeroRegion(this);
 }
 
 
@@ -70,25 +71,18 @@ BRegion::BRegion()
 */
 BRegion::BRegion(const BRegion &region)
 	:
-	data_size(8),
 	data(NULL)
 {
-	if (&region != this) {
-		bound = region.bound;
-		count = region.count;
-		data_size = region.data_size;
+	bound = region.bound;
+	count = region.count;
+	data_size = region.data_size;
+	
+	if (data_size <= 0)
+		data_size = 1;
 		
-		if (data_size <= 0)
-			data_size = 1;
-			
-		data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
-		
-		memcpy(data, region.data, count * sizeof(clipping_rect));
-	} else {
-
-		data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
-		zero_region(this);
-	}
+	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
+	
+	memcpy(data, region.data, count * sizeof(clipping_rect));
 }
 
 
@@ -200,7 +194,7 @@ BRegion::Set(clipping_rect newBounds)
 		bound = newBounds;
 	}
 	else
-		zero_region(this);	
+		Support::ZeroRegion(this);	
 }
 
 
@@ -310,7 +304,7 @@ BRegion::OffsetBy(int32 dh, int32 dv)
 void
 BRegion::MakeEmpty()
 {
-	zero_region(this);
+	Support::ZeroRegion(this);
 }
 
 
@@ -335,8 +329,8 @@ BRegion::Include(clipping_rect rect)
 
 	region.Set(rect);
 	
-	or_region(this, &region, &newRegion);
-	copy_region(&newRegion, this);
+	Support::OrRegion(this, &region, &newRegion);
+	Support::CopyRegion(&newRegion, this);
 }
 
 
@@ -348,8 +342,8 @@ BRegion::Include(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	or_region(this, const_cast<BRegion *>(region), &newRegion);
-	copy_region(&newRegion, this);
+	Support::OrRegion(this, const_cast<BRegion *>(region), &newRegion);
+	Support::CopyRegion(&newRegion, this);
 }
 
 
@@ -374,8 +368,8 @@ BRegion::Exclude(clipping_rect rect)
 	
 	region.Set(rect);
 
-	sub_region(this, &region, &newRegion);
-	copy_region(&newRegion, this);
+	Support::SubRegion(this, &region, &newRegion);
+	Support::CopyRegion(&newRegion, this);
 }
 
 
@@ -387,8 +381,8 @@ BRegion::Exclude(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	sub_region(this, const_cast<BRegion *>(region), &newRegion);
-	copy_region(&newRegion, this);
+	Support::SubRegion(this, const_cast<BRegion *>(region), &newRegion);
+	Support::CopyRegion(&newRegion, this);
 }
 
 
@@ -400,8 +394,8 @@ BRegion::IntersectWith(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	and_region(this, const_cast<BRegion *>(region), &newRegion);
-	copy_region(&newRegion, this);
+	Support::AndRegion(this, const_cast<BRegion *>(region), &newRegion);
+	Support::CopyRegion(&newRegion, this);
 }
 
 
@@ -514,13 +508,4 @@ BRegion::set_size(long new_size)
 	data_size = new_size;
 	
 	ASSERT(count <= data_size);		
-}
-
-
-long
-BRegion::find_small_bottom(long y1, long y2, long *hint, long *where)
-{
-	//XXX: What does this do?
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
-	return 0;
 }
