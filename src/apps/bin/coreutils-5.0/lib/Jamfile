@@ -27,7 +27,7 @@ StaticLibrary fetish :
 	euidaccess.c
 	exclude.c
 	exitfail.c
-#	fchdir-stub.c
+	fchdir-stub.c
 #	fchown-stub.c
 	file-type.c
 #	fileblocks.c

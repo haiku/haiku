@@ -136,7 +136,12 @@
 /* #undef ino_t */
 
 /* Define if you have the fchdir function.  */
+#ifndef B_BEOS_VERSION
+#include <BeBuild.h>
+#endif
+#if B_BEOS_VERSION > B_BEOS_VERSION_5
 #define HAVE_FCHDIR 1
+#endif
 
 /* Define if you have the getcwd function.  */
 #define HAVE_GETCWD 1
