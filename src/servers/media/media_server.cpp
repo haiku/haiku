@@ -141,7 +141,8 @@ ServerApp::ServerApp()
 
 void ServerApp::ReadyToRun()
 {
-	be_app_messenger.SendMessage(MEDIA_SERVER_READY);
+	gAppManager->StartAddonServer();
+	gAddOnManager->LoadState();
 }
 
 ServerApp::~ServerApp()
@@ -732,11 +733,6 @@ ServerApp::MessageReceived(BMessage *msg)
 {
 	TRACE("ServerApp::MessageReceived %lx enter\n", msg->what);
 	switch (msg->what) {
-		case MEDIA_SERVER_READY:
-			gAppManager->StartAddonServer();
-			gAddOnManager->LoadState();
-			break;
-
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS:
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS:
 		case MEDIA_SERVER_SEND_NOTIFICATIONS:

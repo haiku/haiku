@@ -72,8 +72,6 @@ enum {
 
 	MEDIA_SERVER_GET_FORMATS,
 	MEDIA_SERVER_MAKE_FORMAT_FOR,
-
-	MEDIA_SERVER_READY,
 };
 
 // Raw port based communication
