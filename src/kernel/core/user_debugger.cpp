@@ -131,8 +131,8 @@ prepare_thread_stopped_message(debug_thread_stopped &message,
 {
 	struct thread *thread = thread_get_current_thread();
 
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	message.why = whyStopped;
 	message.nub_port = nubPort;
 	message.data = data;
@@ -320,8 +320,8 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 
 	// prepare the message
 	debug_pre_syscall message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	message.syscall = syscall;
 
 	// copy the syscall args
@@ -354,8 +354,8 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 
 	// prepare the message
 	debug_post_syscall message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	message.start_time = startTime;
 	message.end_time = system_time();
 	message.return_value = returnValue;
@@ -424,8 +424,8 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 
 	// prepare the message
 	debug_signal_received message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	message.signal = signal;
 	message.handler = *handler;
 	message.deadly = deadly;
@@ -457,8 +457,8 @@ user_debug_team_created(team_id teamID)
 
 	// prepare the message
 	debug_team_created message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	message.new_team = teamID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_CREATED, &message,
@@ -471,7 +471,8 @@ user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 {
 	if (debuggerPort >= 0) {
 		debug_team_deleted message;
-		message.team = teamID;
+		message.origin.thread = -1;
+		message.origin.team = teamID;
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
 			sizeof(message), B_RELATIVE_TIMEOUT, 0);
 			// TODO: Would it be OK to wait here?
@@ -492,8 +493,8 @@ user_debug_thread_created(thread_id threadID)
 
 	// prepare the message
 	debug_thread_created message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	message.new_thread = threadID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_CREATED, &message,
@@ -529,8 +530,8 @@ user_debug_thread_deleted(team_id teamID, thread_id threadID)
 	// notify the debugger
 	if (debuggerPort >= 0) {
 		debug_thread_deleted message;
-		message.thread = threadID;
-		message.team = teamID;
+		message.origin.thread = threadID;
+		message.origin.team = teamID;
 		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_THREAD_DELETED,
 			&message, sizeof(message), B_RELATIVE_TIMEOUT, 0);
 			// TODO: Would it be OK to wait here?
@@ -551,8 +552,8 @@ user_debug_image_created(const image_info *imageInfo)
 
 	// prepare the message
 	debug_image_created message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
@@ -573,8 +574,8 @@ user_debug_image_deleted(const image_info *imageInfo)
 
 	// prepare the message
 	debug_image_deleted message;
-	message.thread = thread->id;
-	message.team = thread->team->id;
+	message.origin.thread = thread->id;
+	message.origin.team = thread->team->id;
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,

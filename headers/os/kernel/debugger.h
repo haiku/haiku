@@ -207,11 +207,16 @@ typedef enum {
 	B_DEBUGGER_MESSAGE_IMAGE_DELETED,		// an image has been deleted
 } debug_debugger_message;
 
+// first member of all debugger messages -- not a message by itself
+typedef struct {
+	thread_id	thread;			// the thread being the event origin
+	team_id		team;			// the thread's team
+} debug_origin;
+
 // B_DEBUGGER_MESSAGE_THREAD_STOPPED
 
 typedef struct {
-	thread_id			thread;		// the stopped thread
-	team_id				team;		// the thread's team
+	debug_origin		origin;
 	debug_why_stopped	why;		// reason for contacting debugger
 	port_id				nub_port;	// port to debug nub for this team
 	debug_cpu_state		cpu_state;	// cpu state
@@ -221,29 +226,26 @@ typedef struct {
 // B_DEBUGGER_MESSAGE_PRE_SYSCALL
 
 typedef struct {
-	thread_id	thread;			// thread
-	team_id		team;			// the thread's team
-	uint32		syscall;		// the syscall number
-	uint32		args[16];		// syscall arguments
+	debug_origin	origin;
+	uint32			syscall;		// the syscall number
+	uint32			args[16];		// syscall arguments
 } debug_pre_syscall;
 
 // B_DEBUGGER_MESSAGE_POST_SYSCALL
 
 typedef struct {
-	thread_id	thread;			// thread
-	team_id		team;			// the thread's team
-	bigtime_t	start_time;		// time of syscall start
-	bigtime_t	end_time;		// time of syscall completion
-	uint64		return_value;	// the syscall's return value
-	uint32		syscall;		// the syscall number
-	uint32		args[16];		// syscall arguments
+	debug_origin	origin;
+	bigtime_t		start_time;		// time of syscall start
+	bigtime_t		end_time;		// time of syscall completion
+	uint64			return_value;	// the syscall's return value
+	uint32			syscall;		// the syscall number
+	uint32			args[16];		// syscall arguments
 } debug_post_syscall;
 
 // B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED
 
 typedef struct {
-	thread_id			thread;		// thread
-	team_id				team;		// the thread's team
+	debug_origin		origin;
 	int					signal;		// the signal
 	struct sigaction	handler;	// the signal handler
 	bool				deadly;		// true, if handling the signal will kill
@@ -253,47 +255,42 @@ typedef struct {
 // B_DEBUGGER_MESSAGE_TEAM_CREATED
 
 typedef struct {
-	thread_id	thread;			// the thread responsible for creating the team
-	team_id		team;			// the thread's team
-	team_id		new_team;		// the newly created team
+	debug_origin	origin;
+	team_id			new_team;		// the newly created team
 } debug_team_created;
 
 // B_DEBUGGER_MESSAGE_TEAM_DELETED
 
 typedef struct {
-	team_id		team;			// the team
+	debug_origin	origin;			// thread is < 0, team is the deleted team
+									// (asynchronous message)
 } debug_team_deleted;
 
 // B_DEBUGGER_MESSAGE_THREAD_CREATED
 
 typedef struct {
-	thread_id	thread;			// the thread responsible for creating the new
-								// thread
-	team_id		team;			// the thread's team
-	team_id		new_thread;		// the newly created thread
+	debug_origin	origin;			// the thread that created the new thread
+	team_id			new_thread;		// the newly created thread
 } debug_thread_created;
 
 // B_DEBUGGER_MESSAGE_THREAD_DELETED
 
 typedef struct {
-	thread_id	thread;			// the thread
-	team_id		team;			// the thread's team
+	debug_origin	origin;			// the deleted thread (asynchronous message)
 } debug_thread_deleted;
 
 // B_DEBUGGER_MESSAGE_IMAGE_CREATED
 
 typedef struct {
-	thread_id	thread;			// the thread responsible for creating the image
-	team_id		team;			// the thread's team
-	image_info	info;			// info for the image
+	debug_origin	origin;
+	image_info		info;			// info for the image
 } debug_image_created;
 
 // B_DEBUGGER_MESSAGE_IMAGE_DELETED
 
 typedef struct {
-	thread_id	thread;			// the thread responsible for deleting the image
-	team_id		team;			// the thread's team
-	image_info	info;			// info for the image
+	debug_origin	origin;
+	image_info		info;			// info for the image
 } debug_image_deleted;
 
 // union of all messages structures sent to the debugger
@@ -308,7 +305,8 @@ typedef union {
 	debug_thread_deleted			thread_deleted;
 	debug_image_created				image_created;
 	debug_image_deleted				image_deleted;
-	// ...
+
+	debug_origin					origin;	// for convenience (no real message)
 } debug_debugger_message_data;
 
 #ifdef __cplusplus
