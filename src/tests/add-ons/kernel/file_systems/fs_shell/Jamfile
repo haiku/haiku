@@ -33,7 +33,7 @@ rule BuildLibFSShell
 }
 
 {
-	local defines = [ FDefines USER DEBUG ] ;
+	local defines = [ FDefines USER DEBUG _GNU_SOURCE ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti ;
 }
@@ -49,8 +49,9 @@ BuildLibFSShell libfs_shell.a
 local fsShellCommandSources ;
 if $(OS) = BEOS {
 	fsShellCommandSources = fs_shell_command_beos.cpp ;
+} else {
+	fsShellCommandSources = fs_shell_command_unix.cpp ;
 }
 
-if $(fsShellCommandSources) {
-	BuildPlatformMain fs_shell_command : $(fsShellCommandSources) ;
-}
+BuildPlatformMain fs_shell_command
+	: fs_shell_command.cpp $(fsShellCommandSources) ;
