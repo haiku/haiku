@@ -43,6 +43,8 @@ _kern_dir_node_ref_to_path(dev_t device, ino_t inode, char *buffer, size_t size)
 
 // private libroot.so functions
 
+extern "C" status_t _kwfsstat_(dev_t device, const struct fs_info *info, long mask);
+
 extern "C" status_t _kstart_watching_vnode_(dev_t device, ino_t node,
 											uint32 flags, port_id port,
 											int32 handlerToken);
@@ -52,6 +54,13 @@ extern "C" status_t _kstop_watching_vnode_(dev_t device, ino_t node,
 
 
 extern "C" status_t _kstop_notifying_(port_id port, int32 handlerToken);
+
+
+status_t
+_kern_write_fs_info(dev_t device, const struct fs_info *info, int mask)
+{
+	return _kwfsstat_(device, info, mask);
+}
 
 
 status_t
