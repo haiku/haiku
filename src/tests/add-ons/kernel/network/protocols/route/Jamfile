@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src tests add-ons kernel network protocols route ;
+
+UsePrivateHeaders net ;
+
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel network protocols route ] ;
+
+Addon <userland>route : userland obos_network protocols : 
+	route.c
+;
+
+LinkSharedOSLibs <userland>route : <installed>net_stack_tester ;
