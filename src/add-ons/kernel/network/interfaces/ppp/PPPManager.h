@@ -31,6 +31,10 @@ class PPPManager {
 		int32 Control(ifnet *ifp, ulong cmd, caddr_t data);
 		
 		ppp_interface_id CreateInterface(const driver_settings *settings,
+			const driver_settings *profile = NULL,
+			ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
+		ppp_interface_id CreateInterfaceWithName(const char *name,
+			const driver_settings *profile = NULL,
 			ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 		bool DeleteInterface(ppp_interface_id ID);
 		bool RemoveInterface(ppp_interface_id ID);
@@ -46,14 +50,16 @@ class PPPManager {
 			ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);
 		int32 CountInterfaces(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES);
 		
-		PPPReportManager& ReportManager()
+		KPPPReportManager& ReportManager()
 			{ return fReportManager; }
 		bool Report(ppp_report_type type, int32 code, void *data, int32 length)
 			{ return ReportManager().Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
-		ppp_interface_entry *EntryFor(ppp_interface_id ID, int32 *saveIndex = NULL) const;
+		ppp_interface_entry *EntryFor(ppp_interface_id ID,
+			int32 *saveIndex = NULL) const;
 		ppp_interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
+		ppp_interface_entry *EntryFor(const driver_settings *settings) const;
 		
 		ppp_interface_id NextID()
 			{ return (ppp_interface_id) atomic_add((int32*) &fNextID, 1); }
@@ -62,11 +68,14 @@ class PPPManager {
 		void Pulse();
 
 	private:
+		ppp_interface_id _CreateInterface(const char *name,
+			const driver_settings *settings, const driver_settings *profile,
+			ppp_interface_id parentID);
 		int32 FindUnit() const;
 
 	private:
 		BLocker fLock, fReportLock;
-		PPPReportManager fReportManager;
+		KPPPReportManager fReportManager;
 		TemplateList<ppp_interface_entry*> fEntries;
 		ppp_interface_id fNextID;
 		thread_id fDeleterThread, fPulseTimer;

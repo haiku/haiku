@@ -5,9 +5,12 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+#include <cstdio>
+
 #include "PPPManager.h"
 #include <PPPControl.h>
 #include <KPPPUtils.h>
+#include <settings_tools.h>
 
 #include <LockerHelper.h>
 
@@ -15,7 +18,7 @@
 #include <sys/sockio.h>
 
 
-static const char sPPPIfNameBase[] =	"ppp";
+static const char sKPPPIfNameBase[] =	"ppp";
 
 
 static
@@ -191,7 +194,7 @@ PPPManager::Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
 	}
 	
 	int32 result = B_ERROR;
-	PPPProtocol *protocol = entry->interface->FirstProtocol();
+	KPPPProtocol *protocol = entry->interface->FirstProtocol();
 	for(; protocol; protocol = protocol->NextProtocol()) {
 		if(!protocol->IsEnabled() || protocol->AddressFamily() != dst->sa_family)
 			continue;
@@ -254,54 +257,39 @@ PPPManager::Control(ifnet *ifp, ulong cmd, caddr_t data)
 
 ppp_interface_id
 PPPManager::CreateInterface(const driver_settings *settings,
+	const driver_settings *profile = NULL,
 	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
 {
-#if DEBUG
-	dprintf("PPPManager: CreateInterface()\n");
-#endif
-	
-	LockerHelper locker(fLock);
-	
-	ppp_interface_entry *parentEntry = EntryFor(parentID);
-	if(parentID != PPP_UNDEFINED_INTERFACE_ID && !parentEntry)
+	return _CreateInterface(NULL, settings, profile, parentID);
+}
+
+
+ppp_interface_id
+PPPManager::CreateInterfaceWithName(const char *name,
+	const driver_settings *profile = NULL,
+	ppp_interface_id parentID = PPP_UNDEFINED_INTERFACE_ID)
+{
+	if(!name)
 		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	// the day when NextID() returns 0 will come, be prepared! ;)
-	ppp_interface_id id = NextID();
-	if(id == PPP_UNDEFINED_INTERFACE_ID)
-		id = NextID();
+	char path[B_PATH_NAME_LENGTH];
+	sprintf(path, "pppidf/%s", name);
+		// XXX: TODO: change base path to "/etc/ppp" when settings API supports it
 	
-	ppp_interface_entry *entry = new ppp_interface_entry;
-	entry->accessing = 1;
-	entry->deleting = false;
-	fEntries.AddItem(entry);
-		// nothing bad can happen because we are in a locked section here
+	void *handle = load_driver_settings(path);
+	if(!handle)
+		return PPP_UNDEFINED_INTERFACE_ID;
 	
-	new PPPInterface(entry, id, settings, parentEntry ? parentEntry->interface : NULL);
-		// PPPInterface will add itself to the entry (no need to do it here)
-	if(entry->interface->InitCheck() != B_OK) {
-		delete entry->interface;
-		delete entry;
+	const driver_settings *settings = get_driver_settings(handle);
+	if(!settings) {
+		unload_driver_settings(handle);
 		return PPP_UNDEFINED_INTERFACE_ID;
 	}
 	
-	locker.UnlockNow();
-		// it is safe to access the manager from userland
+	ppp_interface_id result = _CreateInterface(name, settings, profile, parentID);
+	unload_driver_settings(handle);
 	
-	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
-			&id, sizeof(ppp_interface_id))) {
-		DeleteInterface(id);
-		--entry->accessing;
-		return PPP_UNDEFINED_INTERFACE_ID;
-	}
-	
-	// notify handlers that interface has been created and they can initialize it now
-	entry->interface->StateMachine().DownProtocols();
-	entry->interface->StateMachine().ResetLCPHandlers();
-	
-	--entry->accessing;
-	
-	return id;
+	return result;
 }
 
 
@@ -376,7 +364,7 @@ PPPManager::RegisterInterface(ppp_interface_id ID)
 	memset(ifp, 0, sizeof(ifnet));
 	ifp->devid = -1;
 	ifp->if_type = IFT_PPP;
-	ifp->name = sPPPIfNameBase;
+	ifp->name = sKPPPIfNameBase;
 	ifp->if_unit = FindUnit();
 	ifp->if_flags = IFF_POINTOPOINT;
 	ifp->rx_thread = ifp->tx_thread = -1;
@@ -428,14 +416,29 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 	
 	switch(op) {
 		case PPPC_CREATE_INTERFACE: {
-			if(length < sizeof(ppp_interface_settings_info) || !data)
+			if(length < sizeof(ppp_interface_description_info) || !data)
 				return B_ERROR;
 			
-			ppp_interface_settings_info *info = (ppp_interface_settings_info*) data;
-			if(!info->settings)
+			ppp_interface_description_info *info
+				= (ppp_interface_description_info*) data;
+			if(!info->u.settings)
 				return B_ERROR;
 			
-			info->interface = CreateInterface(info->settings);
+			info->interface = CreateInterface(info->u.settings, info->profile);
+				// parents cannot be set from userland
+			return info->interface != PPP_UNDEFINED_INTERFACE_ID ? B_OK : B_ERROR;
+		} break;
+		
+		case PPPC_CREATE_INTERFACE_WITH_NAME: {
+			if(length < sizeof(ppp_interface_description_info) || !data)
+				return B_ERROR;
+			
+			ppp_interface_description_info *info
+				= (ppp_interface_description_info*) data;
+			if(!info->u.name)
+				return B_ERROR;
+			
+			info->interface = CreateInterfaceWithName(info->u.name, info->profile);
 				// parents cannot be set from userland
 			return info->interface != PPP_UNDEFINED_INTERFACE_ID ? B_OK : B_ERROR;
 		} break;
@@ -512,6 +515,24 @@ PPPManager::Control(uint32 op, void *data, size_t length)
 			
 			return CountInterfaces(*(ppp_interface_filter*)data);
 		break;
+		
+		case PPPC_FIND_INTERFACE_WITH_SETTINGS: {
+			if(length < sizeof(ppp_interface_description_info) || !data)
+				return B_ERROR;
+			
+			ppp_interface_description_info *info
+				= (ppp_interface_description_info*) data;
+			if(!info->u.settings)
+				return B_ERROR;
+			
+			ppp_interface_entry *entry = EntryFor(info->u.settings);
+			if(entry)
+				info->interface = entry->interface->ID();
+			else {
+				info->interface = PPP_UNDEFINED_INTERFACE_ID;
+				return B_ERROR;
+			}
+		} break;
 		
 		case PPPC_ENABLE_REPORTS: {
 			if(length < sizeof(ppp_report_request) || !data)
@@ -688,11 +709,87 @@ PPPManager::EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const
 }
 
 
+ppp_interface_entry*
+PPPManager::EntryFor(const driver_settings *settings) const
+{
+	if(!settings)
+		return NULL;
+	
+#if DEBUG
+	dprintf("PPPManager: EntryFor(settings)\n");
+#endif
+	
+	ppp_interface_entry *entry;
+	for(int32 index = 0; index < fEntries.CountItems(); index++) {
+		entry = fEntries.ItemAt(index);
+		if(entry && equal_interface_settings(entry->interface->Settings(), settings))
+			return entry;
+	}
+	
+	return NULL;
+}
+
+
 static
 int
 greater(const void *a, const void *b)
 {
 	return (*(const int*)a - *(const int*)b);
+}
+
+
+// used by the public CreateInterface() methods
+ppp_interface_id
+PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
+	const driver_settings *profile, ppp_interface_id parentID)
+{
+#if DEBUG
+	dprintf("PPPManager: CreateInterface(%s)\n", name ? name : "Unnamed");
+#endif
+	
+	LockerHelper locker(fLock);
+	
+	ppp_interface_entry *parentEntry = EntryFor(parentID);
+	if(parentID != PPP_UNDEFINED_INTERFACE_ID && !parentEntry)
+		return PPP_UNDEFINED_INTERFACE_ID;
+	
+	// the day when NextID() returns 0 will come, be prepared! ;)
+	ppp_interface_id id = NextID();
+	if(id == PPP_UNDEFINED_INTERFACE_ID)
+		id = NextID();
+	
+	ppp_interface_entry *entry = new ppp_interface_entry;
+	entry->accessing = 1;
+	entry->deleting = false;
+	fEntries.AddItem(entry);
+		// nothing bad can happen because we are in a locked section here
+	
+	new KPPPInterface(name, entry, id, settings, profile,
+		parentEntry ? parentEntry->interface : NULL);
+		// KPPPInterface will add itself to the entry (no need to do it here)
+	if(entry->interface->InitCheck() != B_OK) {
+		delete entry->interface;
+		delete entry;
+		return PPP_UNDEFINED_INTERFACE_ID;
+	}
+	
+	locker.UnlockNow();
+		// it is safe to access the manager from userland
+	
+	if(!Report(PPP_MANAGER_REPORT, PPP_REPORT_INTERFACE_CREATED,
+			&id, sizeof(ppp_interface_id))) {
+		DeleteInterface(id);
+		--entry->accessing;
+		return PPP_UNDEFINED_INTERFACE_ID;
+	}
+	
+	// notify handlers that interface has been created and they can initialize it now
+	entry->interface->StateMachine().DownProtocols();
+	entry->interface->StateMachine().ResetLCPHandlers();
+	
+	--entry->accessing;
+	
+	return id;
 }
 
 
