@@ -125,7 +125,7 @@ void _SoundPlayNode::NodeRegistered(void)
 	mOutput.format = mFormat;
 	mOutput.destination = media_destination::null;
 	mOutput.source.port = ControlPort();
-	mOutput.source.id = 1;
+	mOutput.source.id = 0;
 	mOutput.node = Node();
 	strcpy(mOutput.name, Name());
 	
@@ -212,12 +212,13 @@ _SoundPlayNode::GetNextOutput(int32* cookie, media_output* out_output)
 {
 	CALLED();
 
-	if ((*cookie < 1) && (*cookie >= 0)) {
+	if (*cookie == 0) {
 		*out_output = mOutput;
 		*cookie += 1;
 		return B_OK;
-	} else
+	} else {
 		return B_BAD_INDEX;
+	}
 }
 
 status_t 
@@ -555,7 +556,7 @@ status_t
 _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness, bool realTimeEvent)
 {
 	CALLED();
-//	printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
+	// printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
 
 	// make sure we're both started *and* connected before delivering a buffer
 	if ((RunState() != BMediaEventLooper::B_STARTED) || (mOutput.destination == media_destination::null))
@@ -566,7 +567,7 @@ _SoundPlayNode::SendNewBuffer(const media_timed_event *event, bigtime_t lateness
 	// (based on EventLatency() and the SchedulingLatency()) to make this possible.
 	// lateness is independent of EventLatency()!
 
-	if (lateness > 1000) {
+	if (lateness > (BufferDuration() / 3) ) {
 		printf("_SoundPlayNode::SendNewBuffer, event scheduled much too late, lateness is %Ld\n", lateness);
 	}
 
@@ -720,15 +721,12 @@ _SoundPlayNode::AllocateBuffers()
 	size_t size = mOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(mLatency / BufferDuration() + 1 + 1);
 
-	DPRINTF("\tlatency = %Ld, buffer duration = %Ld\n", mLatency, BufferDuration());
-	DPRINTF("\tcreating group of %ld buffers, size = %lu\n", count, size);
+	DPRINTF("\tlatency = %Ld, buffer duration = %Ld, count %ld\n", mLatency, BufferDuration(), count);
 	
 	if (count < 3)
 		count = 3;
-
-	if (count < 5)
-		count = 5;
 	
+	DPRINTF("\tcreating group of %ld buffers, size = %lu\n", count, size);
 	mBufferGroup = new BBufferGroup(size, count);
 }
 
@@ -743,12 +741,12 @@ _SoundPlayNode::FillNextBuffer(bigtime_t event_time)
 	// if we fail to get a buffer (for example, if the request times out), we skip this
 	// buffer and go on to the next, to avoid locking up the control thread
 	if (!buf) {
-		printf("RequestBuffer failed\n");
+		ERROR("_SoundPlayNode::FillNextBuffer: RequestBuffer failed\n");
 		return NULL;
 	}
 	
 	memset(buf->Data(), 0, mOutput.format.u.raw_audio.buffer_size);
-	if(mPlayer->HasData()) {
+	if (mPlayer->HasData()) {
 		mPlayer->PlayBuffer(buf->Data(), 
 			mOutput.format.u.raw_audio.buffer_size, mOutput.format.u.raw_audio);
 	}

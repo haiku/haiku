@@ -84,7 +84,8 @@ status_t SendToServer(BMessage *msg)
 	status_t rv;
 	rv = MediaServerMessenger->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
 	if (rv != B_OK) {
-		ERROR("SendToServer: SendMessage failed\n");
+		ERROR("SendToServer: SendMessage failed, error 0x%08lx (%s)\n", rv, strerror(rv));
+		DEBUG_ONLY(msg->PrintToStream());
 	}
 	return rv;
 }
@@ -120,7 +121,7 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 	status_t rv;
 	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 	if (rv != B_OK) {
-		ERROR("SendToPort: write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
+		ERROR("SendToPort: write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, sendport, rv, strerror(rv));
 		if (rv == B_BAD_PORT_ID && sendport == MediaServerPort) {
 			find_media_server_port();
 			sendport = MediaServerPort;
@@ -132,7 +133,7 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 		}
 		rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
-			ERROR("SendToPort: retrying write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
+			ERROR("SendToPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, sendport, rv, strerror(rv));
 			return rv;
 		}
 	}
@@ -150,7 +151,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 	
 	if (rv != B_OK) {
-		ERROR("QueryPort: write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
+		ERROR("QueryPort: write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));
 		if (rv == B_BAD_PORT_ID && requestport == MediaServerPort) {
 			find_media_server_port();
 			requestport = MediaServerPort;
@@ -163,7 +164,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 		}
 		rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
-			ERROR("QueryPort: retrying write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
+			ERROR("QueryPort: retrying write_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, requestport, rv, strerror(rv));
 			_PortPool->PutPort(request->reply_port);
 			return rv;
 		}
@@ -173,7 +174,7 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	_PortPool->PutPort(request->reply_port);
 
 	if (rv < B_OK) {
-		ERROR("QueryPort: read_port failed, port %ld, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
+		ERROR("QueryPort: read_port failed, msgcode 0x%lx, port %ld, error %#lx (%s)\n", msgcode, request->reply_port, rv, strerror(rv));
 	}
 	
 	return (rv < B_OK) ? rv : reply->result;
