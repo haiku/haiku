@@ -67,13 +67,13 @@ tcp_seq	tcp_iss;                /* tcp initial send seq # */
 // XXX shared? look into sockbuf.c
 uint32 sb_max = SB_MAX;
 
-void tcp_init(void)
+static void tcp_init(void)
 {
 	tcp_now = arc4random() / 2;
 	tcp_iss = 1;
 	
 	tcb.inp_next = tcb.inp_prev = &tcb;
-	if (get_max_protohdr() < sizeof(struct tcpiphdr))
+	if (get_max_protohdr() < (int) sizeof(struct tcpiphdr))
 		set_max_protohdr(sizeof(struct tcpiphdr));
 	memset(&tcpstat, 0, sizeof(struct tcpstat));
 		
@@ -277,7 +277,7 @@ void tcp_respond(struct tcpcb *tp, struct tcpiphdr *ti, struct mbuf *m,
 	ipm->output(m, NULL, ro, 0, NULL);
 }
 	
-struct tcpcb *tcp_usrclosed(struct tcpcb *tp)
+static struct tcpcb *tcp_usrclosed(struct tcpcb *tp)
 {
 	switch(tp->t_state) {
 		case TCPS_CLOSED:
@@ -554,7 +554,8 @@ struct kernel_net_module_info protocol_info = {
 		std_ops
 	},
 	tcp_module_init,
-	tcp_module_stop
+	tcp_module_stop,
+	NULL
 };
 
 // #pragma mark -

@@ -1195,7 +1195,8 @@ struct ipv4_module_info protocol_info = {
 			std_ops
 		},
 		ipv4_module_init, 
-		ipv4_module_stop
+		ipv4_module_stop,
+		NULL
 	},
 
 	ipv4_output,

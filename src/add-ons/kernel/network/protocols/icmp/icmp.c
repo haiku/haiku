@@ -121,8 +121,7 @@ static void icmp_reflect(struct mbuf *m)
 	ip->ip_ttl = MAXTTL;
 	if (optlen > 0) {
 		uint8 *cp;
-		int opt, cnt;
-		uint len;
+		int opt, cnt, len;
 		
 		cp = (uint8*)(ip + 1);
 		if ((opts = ipm->srcroute()) == 0 &&
@@ -172,7 +171,7 @@ done:
 		m_free(opts);
 }
 
-void icmp_input(struct mbuf *buf, int hdrlen)
+static void icmp_input(struct mbuf *buf, int hdrlen)
 {
 	struct ip *ip = mtod(buf, struct ip *);	
 	struct icmp *ic;
@@ -189,8 +188,8 @@ void icmp_input(struct mbuf *buf, int hdrlen)
 #if SHOW_DEBUG
 	dump_icmp(buf);
 #endif
-	i = hdrlen + min(icl, ICMP_ADVLENMIN);
-	if (buf->m_len < i && (buf = m_pullup(buf, i)) == NULL) {
+	i = hdrlen + min(icl, (int) ICMP_ADVLENMIN);
+	if ((int) buf->m_len < i && (buf = m_pullup(buf, i)) == NULL) {
 		icmpstat.icps_tooshort++;
 		return;
 	}
@@ -254,7 +253,7 @@ void icmp_input(struct mbuf *buf, int hdrlen)
 				goto badcode;
 			code = PRC_QUENCH;
 deliver:
-			if (icl < ICMP_ADVLENMIN || icl < ICMP_ADVLEN(ic) ||
+			if (icl < (int) ICMP_ADVLENMIN || icl < ICMP_ADVLEN(ic) ||
 			    (ic->icmp_ip.ip_hl < sizeof(struct ip) >> 2)) {
 				icmpstat.icps_badlen++;
 				goto freeit;
@@ -295,7 +294,7 @@ freeit:
 }
 
 
-void icmp_error(struct mbuf *n, int type, int code, n_long dest, 
+static void icmp_error(struct mbuf *n, int type, int code, n_long dest, 
                 struct ifnet *destifp)
 {
 	struct ip *oip = mtod(n, struct ip*), *nip;
@@ -432,7 +431,8 @@ struct icmp_module_info protocol_info = {
 			std_ops
 		},
 		icmp_protocol_init,
-		icmp_protocol_stop
+		icmp_protocol_stop,
+		NULL
 	},
 
 	icmp_error

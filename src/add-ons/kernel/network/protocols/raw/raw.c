@@ -32,7 +32,7 @@ static int rip_recvspace = 8192;
 
 struct ipstat ipstat; //XXX might need to be shared
 
-void rip_init(void)
+static void rip_init(void)
 {
 	rawinpcb.inp_next = rawinpcb.inp_prev = &rawinpcb;
 	memset(&ripsrc, 0, sizeof(ripsrc));
@@ -40,7 +40,7 @@ void rip_init(void)
 	ripsrc.sin_len = sizeof(ripsrc);
 }
 
-void rip_input(struct mbuf *m, int hdrlen)
+static void rip_input(struct mbuf *m, int hdrlen)
 {
 	struct ip *ip = mtod(m, struct ip*);
 	struct inpcb *inp;
@@ -80,7 +80,7 @@ void rip_input(struct mbuf *m, int hdrlen)
 	return;
 }
 
-int rip_output(struct mbuf *m, struct socket *so, uint32 dst)
+static int rip_output(struct mbuf *m, struct socket *so, uint32 dst)
 {
 	struct ip *ip;
 	struct inpcb *inp = sotoinpcb(so);
@@ -88,7 +88,7 @@ int rip_output(struct mbuf *m, struct socket *so, uint32 dst)
 	int flags = (so->so_options & SO_DONTROUTE) | IP_ALLOWBROADCAST;
 
 	if ((inp->inp_flags & INP_HDRINCL) == 0) {
-		M_PREPEND(m, sizeof(struct ip));
+		M_PREPEND(m, (int) sizeof(struct ip));
 		ip = mtod(m, struct ip *);
 		ip->ip_p = inp->inp_ip.ip_p;
 		ip->ip_len = m->m_pkthdr.len;
@@ -120,7 +120,7 @@ int rip_output(struct mbuf *m, struct socket *so, uint32 dst)
 	return 0;
 }
 
-int rip_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
+static int rip_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
                 struct mbuf *control)
 {
 	int error = 0;
@@ -229,7 +229,7 @@ int rip_userreq(struct socket *so, int req, struct mbuf *m, struct mbuf *nam,
 	return error;
 }
 
-int rip_ctloutput(int op, struct socket *so, int level,
+static int rip_ctloutput(int op, struct socket *so, int level,
                   int optnum, struct mbuf **m)
 {
 	struct inpcb *inp = sotoinpcb(so);
@@ -314,7 +314,8 @@ struct raw_module_info protocol_info = {
 			std_ops
 		},
 		raw_module_init,
-		raw_module_stop
+		raw_module_stop,
+		NULL
 	},
 	&rip_input
 };

@@ -57,7 +57,8 @@ static void dump_udp(struct mbuf *buf)
 }
 #endif /* SHOW_DEBUG */
 
-int udp_output(struct inpcb *inp, struct mbuf *m, struct mbuf *addr,struct mbuf *control)
+static int udp_output(struct inpcb *inp, struct mbuf *m, struct mbuf *addr,
+	struct mbuf *control)
 {
 	struct udpiphdr *ui;
 	uint16 len = m->m_pkthdr.len;
@@ -85,7 +86,7 @@ int udp_output(struct inpcb *inp, struct mbuf *m, struct mbuf *addr,struct mbuf 
 		}
 	}
 
-	M_PREPEND(m, sizeof(*ui));
+	M_PREPEND(m, (int) sizeof(*ui));
 	if (!m) {
 		error = ENOMEM;
 		goto release;
@@ -132,7 +133,7 @@ release:
 	return error;
 }
 
-int udp_userreq(struct socket *so, int req,
+static int udp_userreq(struct socket *so, int req,
 			    struct mbuf *m, struct mbuf *addr, struct mbuf *ctrl)
 {
 	struct inpcb *inp = sotoinpcb(so);
@@ -227,7 +228,7 @@ release:
 	return error;
 }
 
-void udp_input(struct mbuf *buf, int hdrlen)
+static void udp_input(struct mbuf *buf, int hdrlen)
 {
 	struct ip *ip = mtod(buf, struct ip*);
 	struct udphdr *udp = (struct udphdr*)((caddr_t)ip + hdrlen);
@@ -332,7 +333,7 @@ static void udp_ctlinput(int cmd, struct sockaddr *sa, void *ipp)
 		in_pcbnotify(&udb, sa, 0, zeroin_addr, 0, cmd, udp_notify);
 }
 
-void udp_init(void)
+static void udp_init(void)
 {
 	udb.inp_prev = udb.inp_next = &udb;
 	udp_sendspace = 9216; /* default size */
@@ -392,7 +393,8 @@ struct kernel_net_module_info protocol_info = {
 		std_ops
 	},
 	udp_module_init,
-	udp_module_stop
+	udp_module_stop,
+	NULL
 };
 
 // #pragma mark -
