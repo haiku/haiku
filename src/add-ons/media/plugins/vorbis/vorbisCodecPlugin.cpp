@@ -82,13 +82,36 @@ vorbisDecoder::Setup(media_format *ioEncodedFormat,
 	// initialize decoder
 	vorbis_synthesis_init(&fDspState,&fInfo);
 	vorbis_block_init(&fDspState,&fBlock);
-	ioEncodedFormat->type = B_MEDIA_ENCODED_AUDIO;
+	// fill out the encoding format
+	CopyInfoToEncodedFormat(ioEncodedFormat);
 	return B_OK;
 }
 
-size_t get_audio_buffer_size(const media_raw_audio_format & raf) {
-	BMediaRoster * roster = BMediaRoster::Roster();
-	return roster->AudioBufferSizeFor(raf.channel_count,raf.format,raf.frame_rate);
+void vorbisDecoder::CopyInfoToEncodedFormat(media_format * format) {
+	format->type = B_MEDIA_ENCODED_AUDIO;
+	format->u.encoded_audio.encoding
+	 = (media_encoded_audio_format::audio_encoding)'vorb';
+	if (fInfo.bitrate_nominal) {
+		format->u.encoded_audio.bit_rate = fInfo.bitrate_nominal;
+	} else if (fInfo.bitrate_upper) {
+		format->u.encoded_audio.bit_rate = fInfo.bitrate_upper;
+	} else if (fInfo.bitrate_lower) {
+		format->u.encoded_audio.bit_rate = fInfo.bitrate_lower;
+	}
+	CopyInfoToDecodedFormat(&format->u.encoded_audio.output);
+}	
+
+void vorbisDecoder::CopyInfoToDecodedFormat(media_raw_audio_format * raf) {
+	raf->frame_rate = (float)fInfo.rate; // XXX long->float ??
+	raf->channel_count = fInfo.channels;
+	raf->format = media_raw_audio_format::B_AUDIO_FLOAT; // XXX verify: support others?
+	raf->byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
+
+	if (raf->buffer_size < 512 || raf->buffer_size > 65536) {
+		BMediaRoster * roster = BMediaRoster::Roster();
+		raf->buffer_size
+		 = roster->AudioBufferSizeFor(raf->channel_count,raf->format,raf->frame_rate);
+    }
 }
 
 status_t
@@ -99,19 +122,14 @@ vorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	// => This means, we never return an error, and always change the format values
 	//    that we don't support to something more applicable
 	ioDecodedFormat->type = B_MEDIA_RAW_AUDIO;
-	ioDecodedFormat->u.raw_audio.frame_rate = (float)fInfo.rate; // XXX long->float ??
-	ioDecodedFormat->u.raw_audio.channel_count = fInfo.channels;
-	ioDecodedFormat->u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT; // XXX verify: support others?
-	ioDecodedFormat->u.raw_audio.byte_order = B_MEDIA_HOST_ENDIAN; // XXX should support other endain, too
-
-	if (ioDecodedFormat->u.raw_audio.buffer_size < 512
-     || ioDecodedFormat->u.raw_audio.buffer_size > 65536)
-		ioDecodedFormat->u.raw_audio.buffer_size
-		 = get_audio_buffer_size(ioDecodedFormat->u.raw_audio);
-	if (ioDecodedFormat->u.raw_audio.channel_mask == 0)
-		ioDecodedFormat->u.raw_audio.channel_mask
-		  = (fInfo.channels == 1) ? B_CHANNEL_LEFT : B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
-
+	CopyInfoToDecodedFormat(&ioDecodedFormat->u.raw_audio);
+	if (ioDecodedFormat->u.raw_audio.channel_mask == 0) {
+		if (fInfo.channels == 1) {
+			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT;
+		} else {
+			ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
+		}
+	}
 	// setup rest of the needed variables
 	fFrameSize = (ioDecodedFormat->u.raw_audio.format & 0xf) * fInfo.channels;
 	fOutputBufferSize = ioDecodedFormat->u.raw_audio.buffer_size;
@@ -136,7 +154,6 @@ status_t
 vorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
-	debugger("vorbisDecoder::Decode");
 	TRACE("vorbisDecoder::Decode\n");
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
@@ -191,15 +208,30 @@ vorbisDecoder::DecodeNextChunk()
 
 	//TRACE("vorbisDecoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
 
-	int outsize = 0;
 	if (vorbis_synthesis(&fBlock,packet)==0) {
 		vorbis_synthesis_blockin(&fDspState,&fBlock);
 	}
-		
+	int convsize = DECODE_BUFFER_SIZE / fInfo.channels;
+	int samples;
+	float **pcm;
+	ogg_int16_t * ptr;
+	while ((samples = vorbis_synthesis_pcmout(&fDspState,&pcm)) > 0) {
+		int bout = (samples < convsize ? samples : convsize) ;
+		for(int i = 0; (i < fInfo.channels) ; i++) {
+			ptr = (ogg_int16_t *)fDecodeBuffer;
+			float * mono = pcm[i];
+			for(int j = 0; (j < bout) ; j++) {
+				*ptr = *reinterpret_cast<ogg_int16_t*>(&mono[j]);
+				ptr += fInfo.channels;
+			}
+		}
+		vorbis_synthesis_read(&fDspState,bout);
+	}
+	
 	//printf("vorbisDecoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
 		
 	fResidualBuffer = fDecodeBuffer;
-	fResidualBytes = outsize;
+	fResidualBytes = (uint8 *)ptr - fDecodeBuffer;
 	
 	return B_OK;
 }

@@ -24,6 +24,9 @@ public:
 	status_t	DecodeNextChunk();
 	
 private:
+	void		CopyInfoToEncodedFormat(media_format * format);
+	void		CopyInfoToDecodedFormat(media_raw_audio_format * raf);
+
 	vorbis_info			fInfo;
 	vorbis_comment		fComment;
 	vorbis_dsp_state	fDspState;
