@@ -160,7 +160,7 @@ POP3Protocol::Open(const char *server, int port, int)
 			#else
 				closesocket(net);
 			#endif
-			runner->Stop();
+			runner->Stop(true);
 			return B_ERROR;
 		
 		}
@@ -391,7 +391,7 @@ status_t POP3Protocol::RetrieveInternal(const char *command, int32 message,
 		if (result == 0) {
 			// No data available, even after waiting a minute.
 			fLog = "POP3 timeout - no data received after a long wait.";
-			runner->Stop();
+			runner->Stop(true);
 			return B_ERROR;
 		}
 		if (amountToReceive > bufSize - 1 - amountInBuffer)
@@ -597,7 +597,7 @@ POP3Protocol::ReceiveLine(BString &line)
 		}
 	} else {
 		fLog = "POP3 socket timeout.";
-		runner->Stop();
+		runner->Stop(true);
 	}
 	return len;
 }

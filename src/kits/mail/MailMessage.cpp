@@ -25,12 +25,15 @@
 #include <parsedate.h>
 
 #ifdef BONE
-	#ifdef _KERNEL_MODE
-		#undef _KERNEL_MODE
-		#include <sys/socket.h>
-		#define _KERNEL_MODE 1
-	#endif
-	#include <bone_serial_ppp.h>
+	#include <sys/socket.h>
+	#define BONE_SERIAL_PPP_GET_STATUS 0xbe230501
+	#define BSPPP_CONNECTED 4
+	typedef struct {
+		char if_name[32];
+		int connection_status;
+		status_t last_error;
+		int connect_speed;
+	} bsppp_status_t;
 	#include <unistd.h>
 #endif
 

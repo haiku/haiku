@@ -49,7 +49,7 @@ class BMailChainRunner : public BLooper {
 		// a filter returns MD_ALL_PASSES_DONE and before everything
 		// is unloaded and sent home.
 		
-		void Stop();
+		void Stop(bool immediately = false);
 		void ReportProgress(int bytes, int messages, const char *message = NULL);
 		void ResetProgress(const char *message = NULL);
 

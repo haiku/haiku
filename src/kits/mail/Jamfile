@@ -8,6 +8,12 @@ if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
 }
 
+if $(TARGET_PLATFORM) = r5 {
+	SubDirC++Flags -DBUILDING_R5_LIBNET ;
+} else {
+	SubDirC++Flags -DBONE ;
+}
+
 SubDirC++Flags -D_BUILDING_mail=1 -DUSE_NASTY_SYNC_THREAD_HACK=1 ;
 
 SharedLibrary mail :
@@ -44,6 +50,23 @@ LinkSharedOSLibs libmail.so :
 	tracker
 	stdc++.r4
 ;
+
+if $(TARGET_PLATFORM) = r5 {
+	LinkSharedOSLibs libmail.so :
+		be
+		textencoding
+		tracker
+		stdc++.r4
+	;
+} else {
+	LinkSharedOSLibs libmail.so :
+		be
+		textencoding
+		tracker
+		stdc++.r4
+		socket
+	;
+}
 
 MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
 RelSymLink <develop>libmail.so : libmail.so ;

@@ -163,7 +163,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		closesocket(net);
 	#endif
 		net = -1;
-		runner->Stop();
+		runner->Stop(true);
 		return;
 	}
 	
@@ -200,7 +200,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 				error << ":" << port;
 			error << '.';
 			runner->ShowError(error.String());
-			runner->Stop();
+			runner->Stop(true);
 			return;
 		}
 	} else {
@@ -211,7 +211,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		error << ". (" << strerror(errno) << ')';
 		runner->ShowError(error.String());
 		net = -1;
-		runner->Stop();
+		runner->Stop(true);
 		return;
 	}
 	
@@ -242,7 +242,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 			#else
 				closesocket(net);
 			#endif
-			runner->Stop();
+			runner->Stop(true);
 			return;
 		}
 	}
@@ -272,7 +272,7 @@ IMAP4Client::IMAP4Client(BMessage *settings, BMailChainRunner *run) : BRemoteMai
 		response << ')';
 		runner->ShowError(response.String());
 		err = B_ERROR;
-		runner->Stop();
+		runner->Stop(true);
 		return;
 	}
 	
@@ -986,7 +986,7 @@ IMAP4Client::ReceiveLine(BString &out)
 				closesocket(net);
 			#endif
 				net = -1;
-				runner->Stop();
+				runner->Stop(true);
 				runner->ShowError(error.String());
 				return -1;
 			}
@@ -996,7 +996,7 @@ IMAP4Client::ReceiveLine(BString &out)
 		}
 	}else{
 		// Log an error somewhere instead
-		runner->Stop();
+		runner->Stop(true);
 		runner->ShowError("IMAP Timeout.");
 		return B_TIMED_OUT;
 	}
@@ -1070,7 +1070,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 				closesocket(net);
 			#endif
 				net = -1;
-				runner->Stop();
+				runner->Stop(true);
 				runner->ShowError(error.String());
 				return -1;
 			}
@@ -1173,7 +1173,7 @@ int IMAP4Client::GetResponse(BString &tag, NestedString *parsed_response, bool r
 		}
 	}else{
 		// Log an error somewhere instead
-		runner->Stop();
+		runner->Stop(true);
 		runner->ShowError("IMAP Timeout.");
 		return B_TIMED_OUT;
 	}

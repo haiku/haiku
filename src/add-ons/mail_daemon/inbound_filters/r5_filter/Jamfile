@@ -11,4 +11,4 @@ LinkSharedOSLibs R5\ Daemon\ Filter :
 
 Package haiku-maildaemon-cvs :
 	R5\ Daemon\ Filter : 
-	boot home config add-ons mail_daemon inbound_filters ;
+	boot beos system add-ons mail_daemon inbound_filters ;
