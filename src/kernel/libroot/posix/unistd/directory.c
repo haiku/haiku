@@ -65,8 +65,12 @@ readdir(DIR *dir)
 	 */
 	
 	ssize_t count = sys_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
-	if (count <= 0)
+	if (count <= 0) {
+		if (count < 0)
+			errno = count;
+
 		return NULL;
+	}
 	
 	return &dir->ent;
 }
