@@ -199,7 +199,8 @@ enum {
 	B_GET_WORKSPACES			= 0x0860,
 	B_SET_WORKSPACES			= 0x0861,
 
-	B_SHOW_CURSOR				= 0x0ECD,
+	// This is necessary because B_SHOW_CURSOR is defined in Accelerant.h
+	B_BPIC_SHOW_CURSOR			= 0x0ECD,
 	B_HIDE_CURSOR				= 0x0ECE,
 	B_OBSCURE_CURSOR			= 0x0ECF,
 
