@@ -186,6 +186,22 @@ region_id vm_find_region_by_name(aspace_id aid, const char *name)
 
 
 static vm_region *
+_vm_create_reserved_region_struct(vm_virtual_map *map)
+{
+	vm_region *reserved = malloc(sizeof(vm_region));
+	if (reserved == NULL)
+		return NULL;
+
+	memset(reserved, 0, sizeof(vm_region));
+	reserved->id = -1;
+		// this marks it as reserved space
+	reserved->map = map;
+
+	return reserved;
+}
+
+
+static vm_region *
 _vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock)
 {
 	vm_region *region = NULL;
@@ -226,7 +242,83 @@ _vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring,
 }
 
 
+static status_t
+find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_region *region)
+{
+	vm_region *next, *last = NULL;
+
+	next = map->region_list;
+	while (next) {
+		if (next->base <= start && next->base + next->size >= start + size) {
+			// this region covers the requested range
+			if (next->id != -1) {
+				// but it's not reserved space, it's a real region
+				return ERR_VM_NO_REGION_SLOT;
+			}
+
+			break;
+		}
+		last = next;
+		next = next->aspace_next;
+	}
+	if (next == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// now we have to transfer the requested part of the reserved
+	// range to the new region - and remove, resize or split the old
+	// reserved region.
+	
+	if (start == next->base) {
+		// the region starts at the beginning of the reserved range
+		if (last)
+			last->aspace_next = region;
+		else
+			map->region_list = region;
+
+		if (size == next->size) {
+			// the new region fully covers the reversed range
+			region->aspace_next = next->aspace_next;
+			free(next);
+		} else {
+			// resize the reserved range behind the region
+			region->aspace_next = next;
+			next->base += size;
+			next->size -= size;
+		}
+	} else if (start + size == next->base + next->size) {
+		// the region is at the end of the reserved range
+		region->aspace_next = next->aspace_next;
+		next->aspace_next = region;
+
+		// resize the reserved range before the region
+		next->size = start - next->base;
+	} else {
+		// the region splits the reserved range into two separate ones
+		// we need a new reserved region to cover this space
+		vm_region *reserved = _vm_create_reserved_region_struct(map);
+		if (reserved == NULL)
+			return B_NO_MEMORY;
+
+		reserved->aspace_next = next->aspace_next;
+		region->aspace_next = reserved;
+		next->aspace_next = region;
+
+		// resize regions
+		reserved->size = next->base + next->size - start - size;
+		next->size = start - next->base;
+		reserved->base = start + size;
+	}
+
+	region->base = start;
+	region->size = size;
+	map->change_count++;
+
+	return B_OK;
+}
+
+
 // must be called with this address space's virtual_map.sem held
+
 static status_t
 find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, int addr_type, vm_region *region)
 {
@@ -236,11 +328,20 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 
 	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addr_type %d, region %p\n",
 		map, start, size, end, addr_type, region));
-//	dprintf("map->base 0x%x, map->size 0x%x\n", map->base, map->size);
 
 	// do some sanity checking
 	if (start < map->base || size == 0 || (end - 1) > (map->base + (map->size - 1)) || start + size > end)
-		return ERR_VM_BAD_ADDRESS;
+		return B_BAD_ADDRESS;
+
+	if (addr_type == B_EXACT_ADDRESS) {
+		// search for a reserved region
+		status_t status = find_reserved_region(map, start, size, region);
+		if (status == B_OK || status == ERR_VM_NO_REGION_SLOT)
+			return status;
+
+		// there was no reserved region, and the slot doesn't seem to be used already
+		// ToDo: this could be further optimized.
+	}
 
 	// walk up to the spot where we should start searching
 	next_r = map->region_list;
@@ -294,7 +395,6 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 			}
 			break;
 		case B_EXACT_ADDRESS:
-		case B_EXACT_KERNEL_ADDRESS:
 			// see if we can create it exactly here
 			if (!last_r) {
 				if (!next_r || (next_r->base >= start + size)) {
@@ -318,7 +418,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 			}
 			break;
 		default:
-			return EINVAL;
+			return B_BAD_VALUE;
 	}
 
 	if (!foundspot)
@@ -353,7 +453,6 @@ insert_area(vm_address_space *addressSpace, void **_address,
 
 	switch (addressSpec) {
 		case B_EXACT_ADDRESS:
-		case B_EXACT_KERNEL_ADDRESS:
 			searchBase = (addr_t)*_address;
 			searchEnd = (addr_t)*_address + size;
 			break;
@@ -534,15 +633,11 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	if (addressSpace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	area = malloc(sizeof(vm_region));
+	area = _vm_create_reserved_region_struct(&addressSpace->virtual_map);
 	if (area == NULL) {
 		status = B_NO_MEMORY;
 		goto err1;
 	}
-
-	area->id = -1;
-		// this marks it as reserved space
-	area->map = &addressSpace->virtual_map;
 
 	acquire_sem_etc(addressSpace->virtual_map.sem, WRITE_COUNT, 0, 0);
 
@@ -591,7 +686,6 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		case B_EXACT_ADDRESS:
 		case B_BASE_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
-		case B_EXACT_KERNEL_ADDRESS:
 			break;
 
 		default:
@@ -1775,12 +1869,12 @@ create_preloaded_image_areas(struct preloaded_image *image)
 	memcpy(name, fileName, length);
 	strcpy(name + length, "_text");
 	address = (void *)ROUNDOWN(image->text_region.start, PAGE_SIZE);
-	image->text_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_KERNEL_ADDRESS,
+	image->text_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->text_region.size), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	strcpy(name + length, "_data");
 	address = (void *)ROUNDOWN(image->data_region.start, PAGE_SIZE);
-	image->data_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_KERNEL_ADDRESS,
+	image->data_region.id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), name, &address, B_EXACT_ADDRESS,
 		PAGE_ALIGN(image->data_region.size), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 }
 
@@ -1853,7 +1947,7 @@ vm_init(kernel_args *ka)
 	// allocate regions to represent stuff that already exists
 
 	address = (void *)ROUNDOWN(heap_base, PAGE_SIZE);
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &address, B_EXACT_KERNEL_ADDRESS,
+	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "kernel_heap", &address, B_EXACT_ADDRESS,
 		HEAP_SIZE, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	ka->kernel_image.name = "kernel";
@@ -1871,7 +1965,7 @@ vm_init(kernel_args *ka)
 
 		sprintf(temp, "idle_thread%d_kstack", i);
 		address = (void *)ka->cpu_kstack[i].start;
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &address, B_EXACT_KERNEL_ADDRESS,
+		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &address, B_EXACT_ADDRESS,
 			ka->cpu_kstack[i].size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 	{
@@ -2407,7 +2501,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 		return B_BAD_VALUE;
 
 	// in which address space is the address to be found?	
-	if (virtualAddress < KERNEL_BASE)
+	if (IS_USER_ADDRESS(virtualAddress))
 		addressSpace = vm_get_current_user_aspace();
 	else
 		addressSpace = vm_get_kernel_aspace();
@@ -2452,6 +2546,10 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 	// close the entry list
 
 	if (status == B_OK) {
+		// if it's only one entry, we will silently accept the missing ending
+		if (numEntries == 1)
+			return B_OK;
+
 		if (++index + 1 > numEntries)
 			return B_BUFFER_OVERFLOW;
 
@@ -2564,10 +2662,11 @@ create_area_etc(struct team *team, const char *name, void **address, uint32 addr
 
 
 area_id
-create_area(const char *name, void **address, uint32 addressSpec, size_t size, uint32 lock,
+create_area(const char *name, void **_address, uint32 addressSpec, size_t size, uint32 lock,
 	uint32 protection)
 {
-	aspace_id areaSpace;
+	aspace_id addressSpace;
+	bool kernel = false;
 
 	if ((protection & B_KERNEL_PROTECTION) == 0)
 		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
@@ -2575,15 +2674,17 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 	switch (addressSpec) {
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
-		case B_EXACT_KERNEL_ADDRESS:
-			areaSpace = vm_get_kernel_aspace_id();
+			kernel = true;
 			break;
-		default:
-			areaSpace = vm_get_current_user_aspace_id();
+		case B_EXACT_ADDRESS:
+			if (IS_KERNEL_ADDRESS(*_address))
+				kernel = true;
 			break;
 	}
 
-	return vm_create_anonymous_region(areaSpace, (char *)name, address, 
+	addressSpace = kernel ? vm_get_kernel_aspace_id() : vm_get_current_user_aspace_id();
+
+	return vm_create_anonymous_region(addressSpace, (char *)name, _address, 
 				addressSpec, size, lock, protection);
 }
 
@@ -2702,7 +2803,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	// filter out some unavailable values (for userland)
 	switch (addressSpec) {
 		case B_ANY_KERNEL_ADDRESS:
-		case B_EXACT_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
 			return B_BAD_VALUE;
 	}
 	if (protection & B_KERNEL_PROTECTION)
@@ -2713,6 +2814,10 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
+
+	if (addressSpec == B_EXACT_ADDRESS
+		&& IS_KERNEL_ADDRESS(address))
+		return B_BAD_VALUE;
 
 	area = create_area(name, &address, addressSpec, size, lock, protection);
 
