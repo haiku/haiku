@@ -81,7 +81,7 @@ LINKFLAGS on app_server += -lbe ;
 
 LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserver.so
 							  libpainter.a <boot!home!config!lib>libopenbeos.so 
-							  libagg.so libfreetype.so ;
+							  libagg.a libfreetype.so ;
 
 SubInclude OBOS_TOP src servers app fonts ;
 SubInclude OBOS_TOP src servers app drawing Painter ;
