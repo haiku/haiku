@@ -4,8 +4,7 @@
 /
 /	Description:	Kernel module implementing kernel-space mime_table API
 /
-/	Copyright 1999, Be Incorporated, All Rights Reserved.
-/	This file may be used under the terms of the Be Sample Code License.
+/	Copyright 2004, François Revol.
 /
 *******************************************************************************/
 
