@@ -30,9 +30,10 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
-#include <algobase.h>
+#include <algorithm>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 // System Includes -------------------------------------------------------------
 #include <DataIO.h>
@@ -198,7 +199,7 @@ BMemoryIO::ReadAt(off_t pos, void *buffer, size_t size)
 		
 	ssize_t sizeRead = 0;
 	if (pos < fLen) {
-		sizeRead = min(static_cast<off_t>(size), fLen - pos);
+		sizeRead = min_c(static_cast<off_t>(size), fLen - pos);
 		memcpy(buffer, fBuf + pos, sizeRead);
 	}
 	return sizeRead;
@@ -217,7 +218,7 @@ BMemoryIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		
 	ssize_t sizeWritten = 0;	
 	if (pos < fPhys) {
-		sizeWritten = min(static_cast<off_t>(size), fPhys - pos);
+		sizeWritten = min_c(static_cast<off_t>(size), fPhys - pos);
 		memcpy(fBuf + pos, buffer, sizeWritten);
 	}
 	
@@ -325,7 +326,7 @@ BMallocIO::ReadAt(off_t pos, void *buffer, size_t size)
 	
 	ssize_t sizeRead = 0;
 	if (pos < fLength) {
-		sizeRead = min(static_cast<off_t>(size), fLength - pos);
+		sizeRead = min_c(static_cast<off_t>(size), fLength - pos);
 		memcpy(buffer, fData + pos, sizeRead);
 	}
 	return sizeRead;
@@ -339,7 +340,7 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 		
-	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
+	size_t newSize = max_c(pos + size, static_cast<off_t>(fLength));
 	
 	status_t error = B_OK;
 	
