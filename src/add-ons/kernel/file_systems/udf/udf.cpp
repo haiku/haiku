@@ -237,7 +237,8 @@ int
 udf_mount(nspace_id nsid, const char *deviceName, ulong flags, void *parms,
 		size_t parmsLength, void **volumeCookie, vnode_id *rootID)
 {
-	DEBUG_INIT(CF_ENTRY | CF_VOLUME_OPS, NULL);
+	INITIALIZE_DEBUGGING_OUTPUT_FILE("/boot/home/Desktop/udf_debug.txt");
+	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("deviceName: `%s'", deviceName));
 
 	status_t err = B_OK;
 	off_t deviceSize = 0;	// in blocks
@@ -308,7 +309,7 @@ udf_read_fs_stat(void *ns, struct fs_info *info)
 	sprintf(info->volume_name, "%s", volume->Name());
 
 	// File system name
-	sprintf(info->fsh_name, "udf");
+	strcpy(info->fsh_name, "udf");
 
 	RETURN(B_OK);
 }
