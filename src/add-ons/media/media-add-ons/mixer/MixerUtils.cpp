@@ -164,12 +164,16 @@ CopySamples(float *_dst, int32 _dst_sample_offset,
 int64
 frames_for_duration(double framerate, bigtime_t duration)
 {
+	if (duration <= 0 || framerate <= 0.0)
+		return 0;
 	return (int64) ceil(framerate * double(duration) / 1000000.0);
 }
 
 bigtime_t
 duration_for_frames(double framerate, int64 frames)
 {
+	if (frames <= 0 || framerate <= 0.0)
+		return 0;
 	return (bigtime_t)((1000000.0 * frames) / framerate);
 }
 
