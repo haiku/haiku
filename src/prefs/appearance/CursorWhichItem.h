@@ -29,7 +29,7 @@
 
 #include <InterfaceDefs.h>
 #include <ListItem.h>
-
+#include <Bitmap.h>
 #include <SysCursor.h>
 
 class CursorWhichItem : public BStringItem
@@ -39,8 +39,11 @@ public:
 	~CursorWhichItem(void);
 	void SetAttribute(cursor_which which);
 	cursor_which GetAttribute(void);
+	void SetBitmap(BBitmap *bmp) { if(image) delete image; image=bmp; }
+	BBitmap *GetBitmap(void) const { return image; }
 private:
 	cursor_which attribute;
+	BBitmap *image;
 };
 
 #endif

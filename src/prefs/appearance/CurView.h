@@ -43,18 +43,24 @@
 #include <Invoker.h>
 #include <SysCursor.h>
 #include <Bitmap.h>
+#include <Box.h>
+#include <Invoker.h>
 
 class APRWindow;
 
-class BitmapView : public BView
+class BitmapView : public BBox, public BInvoker
 {
 public:
-	BitmapView(const BPoint &pt);
+	BitmapView(const BPoint &pt,BMessage *message, 
+		const BHandler *handler, const BLooper *looper=NULL);
 	~BitmapView(void);
 	void SetBitmap(BBitmap *bmp);
+	BBitmap *GetBitmap(void) const { return bitmap; }
 	void Draw(BRect r);
+	void MessageReceived(BMessage *msg);
 protected:
 	BBitmap *bitmap;
+	BRect drawrect;
 };
 
 class CurView : public BView

@@ -31,11 +31,14 @@ CursorWhichItem::CursorWhichItem(cursor_which which)
  : BStringItem(NULL,0,false)
 {
 	SetAttribute(which);
+	image=NULL;
 }
 
 CursorWhichItem::~CursorWhichItem(void)
 {
 	// Empty, but exists for just-in-case
+	if(image)
+		delete image;
 }
 
 void CursorWhichItem::SetAttribute(cursor_which which)

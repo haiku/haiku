@@ -39,12 +39,14 @@
 #include <ServerProtocol.h>
 #include <PortMessage.h>
 #include <InterfaceDefs.h>
+#include <TranslationUtils.h>
 
 //#define DEBUG_CURSORSET
 
 #define SAVE_CURSORSET 'svcu'
 #define DELETE_CURSORSET 'dlcu'
 #define LOAD_CURSORSET 'ldcu'
+#define CURSOR_UPDATED 'csru'
 
 CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags), settings(B_SIMPLE_DATA)
@@ -128,12 +130,12 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	AddChild(apply);
 	apply->SetEnabled(false);
 
-	cvrect.Set(0,0,48,48);
+	cvrect.Set(0,0,75,75);
 	BPoint pt;
 	pt.x=scrollview->Frame().right+(Bounds().right-scrollview->Frame().right-cvrect.Width())/2;
 	pt.y=mb->Frame().bottom+(apply->Frame().top-mb->Frame().bottom-cvrect.Height())/2;
 	
-	bmpview=new BitmapView(pt);
+	bmpview=new BitmapView(pt,new BMessage(CURSOR_UPDATED),this);
 	AddChild(bmpview);
 
 	BEntry entry(COLOR_SET_DIR);
@@ -163,7 +165,7 @@ void CurView::AllAttached(void)
 	revert->SetTarget(this);
 	settings_menu->SetTargetForItems(this);
 	cursorset_menu->SetTargetForItems(this);
-
+	bmpview->SetTarget(this);
 	BMessenger msgr(this);
 	savepanel->SetTarget(msgr);
 }
@@ -176,99 +178,26 @@ void CurView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
-/*		case DELETE_CURSORSET:
+		case CURSOR_UPDATED:
 		{
-			// Construct the path and delete
-			BString path(COLOR_SET_DIR);
-			path+=cursorset_name;
+			CursorWhichItem *cwi=(CursorWhichItem*)attrlist->ItemAt(attrlist->CurrentSelection());
+			if(cwi)
+				cwi->SetBitmap(bmpview->GetBitmap());
 			
-			BString printstring("Remove ");
-			printstring+=cursorset_name;
-			printstring+=" from disk permenantly?";
-			BAlert *a=new BAlert("OpenBeOS",printstring.String(),"Yes", "No");
-			if(a->Go()==0)
-			{
-				int stat=remove(path.String());
-				if(stat!=0)
-				{
-#ifdef DEBUG_CURSORSET
-printf("MSG: Delete Request - couldn't delete file %s\n",path.String());
-#endif
-				}
-				else
-				{
-					BMenuItem *item=cursorset_menu->FindItem(cursorset_name.String());
-					if(item!=NULL)
-					{
-						if(cursorset_menu->RemoveItem(item))
-							delete item;
-					}
-				}
-			}
-			break;
-		}
-		case LOAD_CURSORSET:
-		{
-			BString name;
-			if(msg->FindString("name",&name)!=B_OK)
-			{
-#ifdef DEBUG_CURSORSET
-printf("MSG: Load Request - couldn't find file name\n");
-#endif
-				break;
-			}
-			LoadCursorSet(name);
-			break;
-		}
-		case SAVE_CURSORSET:
-		{
-			savepanel->Show();
-			break;
-		}
-		case B_SAVE_REQUESTED:
-		{
-			BString name;
-			if(msg->FindString("name",&name)!=B_OK)
-			{
-#ifdef DEBUG_CURSORSET
-printf("MSG: Save Request - couldn't find file name\n");
-#endif
-				break;
-			}
-			SaveCursorSet(name);
 			break;
 		}
 		case ATTRIBUTE_CHOSEN:
 		{
-			break;
-		}
-		case APPLY_SETTINGS:
-		{
-			SaveSettings();
-			NotifyServer();
-			break;
-		}
-		case TRY_SETTINGS:
-		{
-			// Tell server to apply settings here without saving them.
-			// Theoretically, the user can set this temporarily and keep it
-			// until the next boot.
-			NotifyServer();
-			break;
-		}
-		case REVERT_SETTINGS:
-		{
-			if(prev_set_name=="Default")
-				SetDefaults();
+			CursorWhichItem *cwi=(CursorWhichItem*)attrlist->ItemAt(attrlist->CurrentSelection());
+			if(cwi)
+			{
+				bmpview->SetBitmap(cwi->GetBitmap());
+				bmpview->Invalidate();
+			}
 			
-			LoadCursorSet(prev_set_name);
 			break;
 		}
-		case DEFAULT_SETTINGS:
-		{
-			break;
-		}
-*/		default:
+		default:
 			BView::MessageReceived(msg);
 			break;
 	}
@@ -473,29 +402,86 @@ void CurView::SetDefaults(void)
 
 }
 
-BitmapView::BitmapView(const BPoint &pt)
- : BView(BRect(0,0,48,48).OffsetToCopy(pt),"bitmapview",B_FOLLOW_NONE,B_WILL_DRAW)
+BitmapView::BitmapView(const BPoint &pt,BMessage *message, const BHandler *handler, const BLooper *looper=NULL)
+ : BBox(BRect(0,0,75,75).OffsetToCopy(pt),"bitmapview",B_FOLLOW_NONE,B_WILL_DRAW, B_PLAIN_BORDER),
+ 	BInvoker(message,handler,looper)
 {
+	SetFont(be_plain_font);
 	bitmap=NULL;
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetDrawingMode(B_OP_ALPHA);
+	drawrect=Bounds().InsetByCopy(5,5);
 }
 
 BitmapView::~BitmapView(void)
 {
-	if(bitmap)
-		delete bitmap;
 }
 
 void BitmapView::SetBitmap(BBitmap *bmp)
 {
-	if(bitmap)
-		delete bitmap;
 	bitmap=bmp;
 }
 
 void BitmapView::Draw(BRect r)
 {
+	BBox::Draw(r);
+	
 	if(bitmap)
-		DrawBitmap(bitmap);
+		DrawBitmap(bitmap, drawrect);
+}
+
+void BitmapView::MessageReceived(BMessage *msg)
+{
+	if(msg->WasDropped())
+	{
+		entry_ref ref;
+		if(msg->FindRef("refs",&ref)!=B_OK)
+			return;
+		
+		BBitmap *tmp=BTranslationUtils::GetBitmap(&ref);
+		if(tmp)
+		{
+			delete bitmap;
+			bitmap=tmp;
+			
+			int32 offset;
+			BRect r(Bounds());
+			r.right-=10;
+			r.bottom-=10;
+
+			drawrect=bitmap->Bounds();
+			if(r.Contains(bitmap->Bounds()))
+			{
+				// calculate a centered rect for direct display
+				offset=((r.IntegerWidth()-bitmap->Bounds().IntegerWidth()) >> 1)+5;
+				drawrect.OffsetBy(offset,offset);
+			}
+			else
+			{
+				// calculate a scaled-down rectangle for display
+				drawrect.left=drawrect.top=0;
+				
+				if(bitmap->Bounds().Height() > bitmap->Bounds().Width())
+				{
+					drawrect.right=(r.Height()*bitmap->Bounds().Width())/bitmap->Bounds().Height();
+					drawrect.bottom=r.Height();
+					offset=((r.IntegerWidth()-drawrect.IntegerWidth()) >> 1)+5;
+					drawrect.OffsetBy(offset,5);
+				}
+				else
+				{
+					drawrect.bottom=(r.Width()*bitmap->Bounds().Height())/bitmap->Bounds().Width();
+					drawrect.right=r.Width();
+					offset=((r.IntegerHeight()-drawrect.IntegerHeight()) >> 1)+5;
+					drawrect.OffsetBy(5,offset);
+				}
+			}
+			Invoke();
+			Invalidate();
+			return;
+		}
+	}
+	else
+		BBox::MessageReceived(msg);
 }
 

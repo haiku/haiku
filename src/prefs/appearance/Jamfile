@@ -17,4 +17,4 @@ Preference Appearance :
 	CursorWhichItem.cpp
  ;
 
-LinkSharedOSLibs Appearance : be tracker libappserver.so libopenbeos.so ;
+LinkSharedOSLibs Appearance : be tracker translation libappserver.so libopenbeos.so ;

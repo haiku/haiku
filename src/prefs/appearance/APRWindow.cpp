@@ -40,7 +40,11 @@ APRWindow::APRWindow(BRect frame)
 
 	BTab *tab=NULL;
 	
-	
+	// TODO: Finish CurView
+	cursors=new CurView(Bounds(),"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
+	tab=new BTab(cursors);
+	tabview->AddTab(cursors,tab);
+
 	colors=new APRView(Bounds(),"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
 	tab=new BTab(colors);
 	tabview->AddTab(colors,tab);
@@ -48,11 +52,6 @@ APRWindow::APRWindow(BRect frame)
 	decorators=new DecView(Bounds(),"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
 	tab=new BTab(decorators);
 	tabview->AddTab(decorators,tab);
-
-	// TODO: Finish CurView
-	cursors=new CurView(Bounds(),"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(cursors);
-	tabview->AddTab(cursors,tab);
 
 	AddChild(tabview);
 	decorators->SetColors(*colors->currentset);
