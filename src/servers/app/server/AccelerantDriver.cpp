@@ -383,7 +383,12 @@ void AccelerantDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pa
 */
 void AccelerantDriver::HideCursor(void)
 {
-//	_SetCursorHidden(true);
+  /* Need to check for hardware cursor support */
+	_Lock();
+	if(!IsCursorHidden())
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	DisplayDriver::HideCursor();
+	_Unlock();
 }
 
 /*!
@@ -398,6 +403,18 @@ void AccelerantDriver::HideCursor(void)
 */
 void AccelerantDriver::MoveCursorTo(float x, float y)
 {
+  /* Need to check for hardware cursor support */
+	_Lock();
+	if(!IsCursorHidden())
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+
+	cursorframe.OffsetTo(x,y);
+	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+	
+	if(!IsCursorHidden())
+		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	
+	_Unlock();
 }
 
 /*!
@@ -406,6 +423,60 @@ void AccelerantDriver::MoveCursorTo(float x, float y)
 */
 void AccelerantDriver::InvertRect(BRect r)
 {
+  /* Need to check for hardware support for this */
+	_Lock();
+	if( (r.top < 0) || (r.left < 0) || 
+		(r.right > mDisplayMode.virtual_width-1) || (r.bottom > mDisplayMode.virtual_height-1) )
+	{
+		_Unlock();
+		return;
+	}
+
+	switch (mDisplayMode.space)
+	{
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB32_LITTLE:
+		case B_RGBA32_LITTLE:
+		{
+			uint16 width=r.IntegerWidth();
+			uint16 height=r.IntegerHeight();
+			uint32 *start=(uint32*)mFrameBufferConfig.frame_buffer;
+			uint32 *index;
+			start = (uint32 *)((uint8 *)start+(int32)r.top*mFrameBufferConfig.bytes_per_row);
+			start+=(int32)r.left;
+				
+			index = start;
+			for(int32 i=0;i<height;i++)
+			{
+				/* Are we inverting the right bits?
+				   Not sure about location of alpha */
+				for(int32 j=0; j<width; j++)
+					index[j]^=0xFFFFFF00L;
+				index = (uint32 *)((uint8 *)index+mFrameBufferConfig.bytes_per_row);
+			}
+			break;
+		}
+		case B_RGB16_BIG:
+		case B_RGB16_LITTLE:
+			// TODO: Implement
+			printf("ScreenDriver::16-bit mode unimplemented\n");
+			break;
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+		case B_RGB15_LITTLE:
+		case B_RGBA15_LITTLE:
+			// TODO: Implement
+			printf("ScreenDriver::15-bit mode unimplemented\n");
+			break;
+		case B_CMAP8:
+			// TODO: Implement
+			printf("ScreenDriver::8-bit mode unimplemented\n");
+			break;
+		default:
+			break;
+	}
+	_Unlock();
 }
 
 /*!
@@ -417,7 +488,12 @@ void AccelerantDriver::InvertRect(BRect r)
 */
 void AccelerantDriver::ShowCursor(void)
 {
-	//_SetCursorHidden(false);
+  /* Need to check for hardware cursor support */
+	_Lock();
+	if(IsCursorHidden())
+		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	DisplayDriver::ShowCursor();
+	_Unlock();
 }
 
 /*!
@@ -429,7 +505,12 @@ void AccelerantDriver::ShowCursor(void)
 */
 void AccelerantDriver::ObscureCursor(void)
 {
-	//_SetCursorObscured(true);
+  /* Need to check for hardware cursor support */
+	_Lock();
+	if (!IsCursorHidden() )
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+	DisplayDriver::ObscureCursor();
+	_Unlock();
 }
 
 /*!
@@ -440,15 +521,42 @@ void AccelerantDriver::ObscureCursor(void)
 	a copy of the cursor passed to it. The default version of this function hides the
 	cursor, replaces it, and shows the cursor if previously visible.
 */
-void AccelerantDriver::SetCursor(ServerCursor *cursor)
+void AccelerantDriver::SetCursor(ServerCursor *csr)
 {
+  /* Need to check for hardware cursor support */
+	if(!csr)
+		return;
+		
+	_Lock();
+
+	// erase old if visible
+	if(!IsCursorHidden() && under_cursor)
+		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
+
+	if(cursor)
+		delete cursor;
+	if(under_cursor)
+		delete under_cursor;
+	
+	cursor=new ServerCursor(csr);
+	under_cursor=new ServerCursor(csr);
+	
+	cursorframe.right=cursorframe.left+csr->Bounds().Width();
+	cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
+	
+	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+	
+	if(!IsCursorHidden())
+		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
+	
+	_Unlock();
 }
 
 /*!
 	\brief Called for all BView::StrokeArc calls
-	\param r Rectangle enclosing the entire arc
-	\param angle Starting angle for the arc in degrees
-	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param r Rectangle enclosing the entire ellipse the arc is part of
+	\param angle Starting angle for the arc in degrees (zero is pointing to the right)
+	\param span Span of the arc in degrees counterclockwise. Ending angle = angle+span.
 	\param d Data structure containing any other data necessary for the call. Always non-NULL.
 	\param pat 8-byte array containing the pattern to use. Always non-NULL.
 
@@ -456,6 +564,157 @@ void AccelerantDriver::SetCursor(ServerCursor *cursor)
 	being clipped.
 */void AccelerantDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
+  /* Need to add bounds checking code */
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int startx, endx;
+	int startQuad, endQuad;
+	bool useQuad1, useQuad2, useQuad3, useQuad4;
+	bool shortspan = false;
+	int thick;
+
+	// Watch out for bozos giving us whacko spans
+	if ( (span >= 360) || (span <= -360) )
+	{
+	  StrokeEllipse(r,d,pat);
+	  return;
+	}
+
+	_Lock();
+	thick = (int)d->pensize;
+	if ( span > 0 )
+	{
+		startQuad = (int)(angle/90)%4+1;
+		endQuad = (int)((angle+span)/90)%4+1;
+		startx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		endx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+	else
+	{
+		endQuad = (int)(angle/90)%4+1;
+		startQuad = (int)((angle+span)/90)%4+1;
+		endx = ROUND(.5*r.Width()*fabs(cos(angle*M_PI/180)));
+		startx = ROUND(.5*r.Width()*fabs(cos((angle+span)*M_PI/180)));
+	}
+
+	if ( startQuad != endQuad )
+	{
+		useQuad1 = (endQuad > 1) && (startQuad > endQuad);
+		useQuad2 = ((startQuad == 1) && (endQuad > 2)) || ((startQuad > endQuad) && (endQuad > 2));
+		useQuad3 = ((startQuad < 3) && (endQuad == 4)) || ((startQuad < 3) && (endQuad < startQuad));
+		useQuad4 = (startQuad < 4) && (startQuad > endQuad);
+	}
+	else
+	{
+		if ( (span < 90) && (span > -90) )
+		{
+			useQuad1 = false;
+			useQuad2 = false;
+			useQuad3 = false;
+			useQuad4 = false;
+			shortspan = true;
+		}
+		else
+		{
+			useQuad1 = (startQuad != 1);
+			useQuad2 = (startQuad != 2);
+			useQuad3 = (startQuad != 3);
+			useQuad4 = (startQuad != 4);
+		}
+	}
+
+	if ( useQuad1 || 
+	     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+	if ( useQuad2 || 
+	     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+	if ( useQuad3 || 
+	     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+	     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+	if ( useQuad4 || 
+	     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+	     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		if ( useQuad1 || 
+		     (!shortspan && (((startQuad == 1) && (x <= startx)) || ((endQuad == 1) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 1) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		if ( useQuad2 || 
+		     (!shortspan && (((startQuad == 2) && (x >= startx)) || ((endQuad == 2) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 2) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		if ( useQuad3 || 
+		     (!shortspan && (((startQuad == 3) && (x <= startx)) || ((endQuad == 3) && (x >= endx)))) || 
+		     (shortspan && (startQuad == 3) && (x <= startx) && (x >= endx)) ) 
+			SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		if ( useQuad4 || 
+		     (!shortspan && (((startQuad == 4) && (x >= startx)) || ((endQuad == 4) && (x <= endx)))) || 
+		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
+			SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+	}
+	_Unlock();
 }
 
 /*!
@@ -479,6 +738,8 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	double dt = .001;
 	double dt2, dt3;
 	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+
+	_Lock();
 
 	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
 	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
@@ -520,6 +781,7 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 		dy += ddy;
 		ddy += dddy;
 	}
+	_Unlock();
 }
 
 /*!
@@ -533,6 +795,71 @@ void AccelerantDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 {
+  /* Need to add bounds checking code */
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+	int thick;
+
+	_Lock();
+	thick = (int)d->pensize;
+
+	SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+	SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+	SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+	SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+	}
+	_Unlock();
+
 }
 
 /*!
@@ -547,7 +874,6 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
-	_Lock();
 	int x1 = ROUND(start.x);
 	int y1 = ROUND(start.y);
 	int x2 = ROUND(end.x);
@@ -559,6 +885,7 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 	double x = x1;
 	double y = y1;
 
+	_Lock();
 	if ( abs(dx) > abs(dy) )
 		steps = abs(dx);
 	else
@@ -589,6 +916,12 @@ void AccelerantDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *
 */
 void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
 {
+	_Lock();
+	for(int32 i=0; i<(numpts-1); i++)
+		StrokeLine(ptlist[i],ptlist[i+1],d,pat);
+	if(is_closed)
+		StrokeLine(ptlist[numpts-1],ptlist[0],d,pat);
+	_Unlock();
 }
 
 /*!
@@ -600,6 +933,14 @@ void AccelerantDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, L
 */
 void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
+/* Optimize later with HLine and VLine calls, once they support patterns */
+/* Maybe this should be drawn counterclockwise ? */
+	_Lock();
+	StrokeLine(r.LeftTop(),r.RightTop(),d,pat);
+	StrokeLine(r.RightTop(),r.RightBottom(),d,pat);
+	StrokeLine(r.RightBottom(),r.LeftBottom(),d,pat);
+	StrokeLine(r.LeftTop(),r.LeftBottom(),d,pat);
+	_Unlock();
 }
 
 /*!
@@ -615,6 +956,34 @@ void AccelerantDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
+  /* Check to make sure counterclockwise is ok.
+     Check where start point is.
+     This stuff won't matter until patterns are done.
+   */
+	float hLeft, hRight;
+	float vTop, vBottom;
+	float bLeft, bRight, bTop, bBottom;
+	_Lock();
+	hLeft = r.left + xrad;
+	hRight = r.right - xrad;
+	vTop = r.top + yrad;
+	vBottom = r.bottom - yrad;
+	bLeft = hLeft + xrad;
+	bRight = hRight -xrad;
+	bTop = vTop + yrad;
+	bBottom = vBottom - yrad;
+	StrokeArc(BRect(bRight,r.top,r.right,bTop), 0, 90, d, pat);
+	StrokeLine(BPoint(hRight,r.top),BPoint(hLeft,r.top),d,pat);
+	
+	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
+	StrokeLine(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
+
+	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
+	StrokeLine(BPoint(hLeft,r.bottom),BPoint(hRight,r.bottom),d,pat);
+
+	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
+	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
+	_Unlock();
 }
 
 //void AccelerantDriver::StrokeShape(SShape *sh, LayerData *d, int8 *pat)
@@ -634,6 +1003,11 @@ void AccelerantDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerDat
 */
 void AccelerantDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
+	_Lock();
+	StrokeLine(pts[0],pts[1],d,pat);
+	StrokeLine(pts[1],pts[2],d,pat);
+	StrokeLine(pts[2],pts[0],d,pat);
+	_Unlock();
 }
 
 /*!
@@ -809,6 +1183,7 @@ void AccelerantDriver::SetPixel(int x, int y, RGBColor col)
 	}
 }
 
+/* This will probably need reworked or replaced when we deal with patterns */
 void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 {
 	switch (mDisplayMode.space)
@@ -847,6 +1222,7 @@ void AccelerantDriver::SetThickPixel(int x, int y, int thick, RGBColor col)
 	}
 }
 
+/* Need to replace this with one that takes patterns */
 void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor col)
 {
 	switch (mDisplayMode.space)
@@ -882,5 +1258,208 @@ void AccelerantDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor col)
 			} break;
 		default:
 			printf("Error: Unknown color space\n");
+	}
+}
+
+void AccelerantDriver::BlitBitmap(ServerBitmap *sourcebmp, BRect sourcerect, BRect destrect, drawing_mode mode=B_OP_COPY)
+{
+	/* Need to check for hardware support for this. */
+	if(!sourcebmp)
+		return;
+
+	/* Need to fix this 
+	if(sourcebmp->BitsPerPixel() != fbuffer->gcinfo.bits_per_pixel)
+		return;
+		*/
+
+	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
+	// First, clip source rect to destination
+	if(sourcerect.Width() > destrect.Width())
+		sourcerect.right=sourcerect.left+destrect.Width();
+	
+
+	if(sourcerect.Height() > destrect.Height())
+		sourcerect.bottom=sourcerect.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect;
+
+	work_rect.Set(	sourcebmp->Bounds().left,
+					sourcebmp->Bounds().top,
+					sourcebmp->Bounds().right,
+					sourcebmp->Bounds().bottom	);
+	if( !(work_rect.Contains(sourcerect)) )
+	{	// something in selection must be clipped
+		if(sourcerect.left < 0)
+			sourcerect.left = 0;
+		if(sourcerect.right > work_rect.right)
+			sourcerect.right = work_rect.right;
+		if(sourcerect.top < 0)
+			sourcerect.top = 0;
+		if(sourcerect.bottom > work_rect.bottom)
+			sourcerect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,mDisplayMode.virtual_width-1,mDisplayMode.virtual_height-1);
+
+	if( !(work_rect.Contains(destrect)) )
+	{	// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
+	}
+
+	// Set pointers to the actual data
+	uint8 *src_bits  = (uint8*) sourcebmp->Bits();	
+	uint8 *dest_bits = (uint8*) mFrameBufferConfig.frame_buffer;
+
+	// Get row widths for offset looping
+	uint32 src_width  = uint32 (sourcebmp->BytesPerRow());
+	uint32 dest_width = uint32 (mFrameBufferConfig.bytes_per_row);
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
+
+	switch(mode)
+	{
+		case B_OP_OVER:
+		{
+			uint32 srow_pixels=src_width>>2;
+			uint8 *srow_index, *drow_index;
+			
+			
+			// This could later be optimized to use uint32's for faster copying
+			for (uint32 pos_y=0; pos_y!=lines; pos_y++)
+			{
+				
+				srow_index=src_bits;
+				drow_index=dest_bits;
+				
+				for(uint32 pos_x=0; pos_x!=srow_pixels;pos_x++)
+				{
+					// 32-bit RGBA32 mode byte order is BGRA
+					if(srow_index[3]>127)
+					{
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						*drow_index=*srow_index; drow_index++; srow_index++;
+						// we don't copy the alpha channel
+						drow_index++; srow_index++;
+					}
+					else
+					{
+						srow_index+=4;
+						drow_index+=4;
+					}
+				}
+		
+				// Increment offsets
+		   		src_bits += src_width;
+		   		dest_bits += dest_width;
+			}
+			break;
+		}
+		default:	// B_OP_COPY
+		{
+			for (uint32 pos_y = 0; pos_y != lines; pos_y++)
+			{
+				memcpy(dest_bits,src_bits,line_length);
+		
+				// Increment offsets
+		   		src_bits += src_width;
+		   		dest_bits += dest_width;
+			}
+			break;
+		}
+	}
+
+}
+
+void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BRect sourcerect)
+{
+	/* Need to check for hardware support for this. */
+	if(!destbmp)
+		return;
+
+	/* Need to fix this
+	if(destbmp->BitsPerPixel() != fbuffer->gcinfo.bits_per_pixel)
+		return;
+		*/
+
+	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
+	// First, clip source rect to destination
+	if(sourcerect.Width() > destrect.Width())
+		sourcerect.right=sourcerect.left+destrect.Width();
+	
+
+	if(sourcerect.Height() > destrect.Height())
+		sourcerect.bottom=sourcerect.top+destrect.Height();
+	
+
+	// Second, check rectangle bounds against their own bitmaps
+	BRect work_rect;
+
+	work_rect.Set(	destbmp->Bounds().left,
+					destbmp->Bounds().top,
+					destbmp->Bounds().right,
+					destbmp->Bounds().bottom	);
+	if( !(work_rect.Contains(destrect)) )
+	{	// something in selection must be clipped
+		if(destrect.left < 0)
+			destrect.left = 0;
+		if(destrect.right > work_rect.right)
+			destrect.right = work_rect.right;
+		if(destrect.top < 0)
+			destrect.top = 0;
+		if(destrect.bottom > work_rect.bottom)
+			destrect.bottom = work_rect.bottom;
+	}
+
+	work_rect.Set(0,0,mDisplayMode.virtual_width-1,mDisplayMode.virtual_height-1);
+
+	if( !(work_rect.Contains(sourcerect)) )
+	{	// something in selection must be clipped
+		if(sourcerect.left < 0)
+			sourcerect.left = 0;
+		if(sourcerect.right > work_rect.right)
+			sourcerect.right = work_rect.right;
+		if(sourcerect.top < 0)
+			sourcerect.top = 0;
+		if(sourcerect.bottom > work_rect.bottom)
+			sourcerect.bottom = work_rect.bottom;
+	}
+
+	// Set pointers to the actual data
+	uint8 *dest_bits  = (uint8*) destbmp->Bits();	
+	uint8 *src_bits = (uint8*) mFrameBufferConfig.frame_buffer;
+
+	// Get row widths for offset looping
+	uint32 dest_width  = uint32 (destbmp->BytesPerRow());
+	uint32 src_width = uint32 (mFrameBufferConfig.bytes_per_row);
+
+	// Offset bitmap pointers to proper spot in each bitmap
+	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
+	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
+
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
+	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
+
+	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
+	{ 
+		memcpy(dest_bits,src_bits,line_length);
+
+		// Increment offsets
+   		src_bits += src_width;
+   		dest_bits += dest_width;
 	}
 }

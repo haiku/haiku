@@ -81,7 +81,7 @@ public:
 	virtual void InvertRect(BRect r);
 	virtual void ShowCursor(void);
 	virtual void ObscureCursor(void);
-	virtual void SetCursor(ServerCursor *cursor);
+	virtual void SetCursor(ServerCursor *csr);
 
 	virtual void StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
 	virtual void StrokeBezier(BPoint *pts, LayerData *d, int8 *pat);
