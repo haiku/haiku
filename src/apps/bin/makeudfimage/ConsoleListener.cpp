@@ -83,7 +83,7 @@ ConsoleListener::OnCompletion(status_t result, const Statistics &statistics) con
 	if (Level() > VERBOSITY_NONE) {
 		if (result == B_OK) {
 			printf("Finished\n");
-			printf("- Build time:  %ld seconds\n", statistics.ElapsedTime());
+			printf("- Build time:  %s\n", statistics.ElapsedTimeString().c_str());
 			printf("- Directories: %Ld directories in %s\n",
 			       statistics.Directories(), statistics.DirectoryBytesString().c_str());
 			printf("- Files:       %Ld files in %s\n",
