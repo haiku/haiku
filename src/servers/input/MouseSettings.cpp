@@ -34,6 +34,10 @@ MouseSettings::MouseSettings()
 {
 	RetrieveSettings();
 
+#ifdef DEBUG
+        Dump();
+#endif
+
 	fOriginalSettings = fSettings;
 	fOriginalMode = fMode;
 }
@@ -63,7 +67,8 @@ MouseSettings::RetrieveSettings()
 	// retrieve current values
 
 	fMode = mouse_mode();
-
+	Defaults();
+	
 	// also try to load the window position from disk
 
 	BPath path;
@@ -88,10 +93,11 @@ MouseSettings::RetrieveSettings()
 		Defaults();
 	}
 #endif
-	
-#ifdef DEBUG
-	Dump();
-#endif
+
+	if ((fSettings.click_speed == 0)
+		|| (fSettings.type == 0)) {
+		Defaults();
+	}
 }
 
 

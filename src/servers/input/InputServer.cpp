@@ -48,9 +48,6 @@
 #include <PortLink.h>
 #include <ServerProtocol.h>
 
-#define X_VALUE "x"
-#define Y_VALUE "y"
-
 
 extern "C" void RegisterDevices(input_device_ref** devices)
 {
@@ -123,16 +120,32 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n")); 
-		uint32 buffer[2];
+		int32 buffer[2];
+		thread_id appThreadId;
 		memset(buffer, 0, sizeof(buffer));
-		int32 code = receive_data(&fAppThreadId, buffer, sizeof(buffer));
-		PRINT(("tid : %ld, code :%ld\n", fAppThreadId, code));
+		int32 code = receive_data(&appThreadId, buffer, sizeof(buffer));
+		PRINT(("tid : %ld, code :%ld\n", appThreadId, code));
 		for (int32 i=0; i<2; i++) {
 			PRINT(("data : %lx\n", buffer[i]));
 		}
 		fCursorSem = buffer[0];
-		fAppArea = buffer[1];
+		area_id appArea = buffer[1];
 		
+		fAppArea = clone_area("isClone", (void**)&fAppBuffer, B_ANY_ADDRESS, B_READ_AREA|B_WRITE_AREA, appArea);
+		if (fAppArea < B_OK) {
+			PRINT(("clone_area error : %s\n", strerror(fAppArea)));
+		}
+
+		fAsPort = create_port(100, "is_as");
+
+		fAsReadSem = create_sem(0, "is_as");
+		fAsWriteSem = create_sem(100, "is_as");
+		buffer[0] = fAsReadSem;
+		buffer[1] = fAsWriteSem;
+	
+		status_t err;
+		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
+			PRINT(("error when send_data %s\n", strerror(err)));
 	}
 }
 
@@ -652,38 +665,50 @@ InputServer::HandleGetSetMouseSpeed(BMessage* message,
 status_t
 InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 {
+	CALLED();
 	
 	// this assumes that both supplied pointers are identical
 	
 	ASSERT(outbound == message);
-		
-	int32 xValue, yValue;
-    
-    message->FindInt32("x",xValue);
-    PRINT(("[HandleSetMousePosition] x = %lu:\n",xValue));
+	
+	int32 xValue, yValue;	
 	
    	switch(message->what){
    		case B_MOUSE_MOVED:
    		case B_MOUSE_DOWN:
    		case B_MOUSE_UP:
    			// get point and button from msg
-    		if((outbound->FindInt32(X_VALUE, &xValue) == B_OK) 
-    			&& (outbound->FindInt32(Y_VALUE, &yValue) == B_OK)) {
+    		if((outbound->FindInt32("x", &xValue) == B_OK) 
+    			&& (outbound->FindInt32("y", &yValue) == B_OK)) {
 				fMousePos.x += xValue;
 				fMousePos.y += yValue;
-				outbound->RemoveName(X_VALUE); 
-				outbound->RemoveName(Y_VALUE);
+				outbound->RemoveName("x"); 
+				outbound->RemoveName("y");
 				outbound->AddPoint("where", fMousePos);
 				outbound->AddInt32("modifiers", fKey_info.modifiers);
+
+				PRINT(("new position : %f, %f, %ld, %ld\n", fMousePos.x, fMousePos.y, xValue, yValue));
 	   		}
-    		break;
+    	
+		if (fAppBuffer) {
+       		         fAppBuffer[0] =
+       		                 (0x3 << 30)
+               		         | ((uint32)fMousePos.x & 0x7fff) << 15
+               		         | ((uint32)fMousePos.y & 0x7fff);
+
+			PRINT(("released cursorSem with value : %08lx\n", fAppBuffer[0]));
+                	release_sem(fCursorSem);
+        	}
+
+
+		break;
     	
     	// some Key Down and up codes ..
    		default:
       		break;
    			
-		}
-	
+	}
+
 	return B_OK;
 }
 
@@ -1125,11 +1150,7 @@ int
 InputServer::DispatchEvent(BMessage *message)
 {
 	CALLED();
-	
-	// variables
-	int32 xValue, 
-		  yValue;
-    
+	int32 xValue, yValue;
 	port_id pid = find_port(SERVER_INPUT_PORT);
 
 	// BPortLink is incompatible with R5 one

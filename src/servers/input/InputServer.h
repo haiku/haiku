@@ -209,10 +209,12 @@ private:
 	//fMouseState;
 
 	sem_id 		fCursorSem;
+	sem_id		fAsReadSem, fAsWriteSem;
+	port_id		fAsPort;
 	area_id		fAppArea;
 	area_id		fCloneArea;
-	void		*fAppBuffer;
-	thread_id 	fAppThreadId;
+	uint32		*fAppBuffer;
+	
 #if DEBUG == 2
 public:
 	static FILE *sLogFile;
