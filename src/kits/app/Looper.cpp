@@ -1005,7 +1005,7 @@ void BLooper::InitData()
 	if (sTeamID == -1)
 	{
 		thread_info info;
-		get_thread_info(fTaskID,&info);
+		get_thread_info(find_thread(NULL), &info);
 		sTeamID = info.team;
 	}
 
