@@ -34,7 +34,7 @@ THE SOFTWARE.
 #include <ctype.h>
 
 #if HAVE_FULLVERSION_PDF_LIB
-// pdflib 5.x supports password protection and permissions in the commercial license only!
+// pdflib 5.x supports password protection and permissions in the commercial version only!
 static const PermissionLabels gPermissionLabels[] = {
 	PermissionLabels("Prevent printing the file.", "noprint"),
 	PermissionLabels("Prevent making any changes.", "nomodify"),
