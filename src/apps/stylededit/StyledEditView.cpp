@@ -106,6 +106,8 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		}
 	}
 	if (fEncoding != 0) {
+		int32 length = stream->Seek(0,SEEK_END);
+		text_run_array * run_array = RunArray(0,length);
 		CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
 		if (result == B_OK) {
 			uint32 id = roster->FindCharacterSetByFontID(fEncoding)->GetConversionID();
@@ -134,6 +136,7 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 				}
 			}
 		}
+		SetRunArray(0,length,run_array);
 	}
 	fSuppressChanges = false;
 	return result;
