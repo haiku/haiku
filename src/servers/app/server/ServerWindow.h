@@ -97,7 +97,7 @@ protected:
 	PortLink *_winlink,*_applink;
 	BLocker _locker;
 	BRect _frame;
-	uint8 _hidecount;
+	bool _hidecount;
 	uint32 _token;
 };
 
