@@ -15,6 +15,7 @@
 #include <fs_info.h>
 #include <fs_interface.h>
 
+#include <disk_device_manager/KDiskDeviceManager.h>
 #include <kernel.h>
 #include <boot/kernel_args.h>
 #include <vfs.h>
@@ -30,6 +31,7 @@
 #include <kerrors.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
+#include <util/kernel_cpp.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -1603,27 +1605,27 @@ vfs_bootstrap_file_systems(void)
 	status_t status;
 
 	// bootstrap the root filesystem
-	status = sys_mount("/", NULL, "rootfs", NULL);
+	status = _kern_mount("/", NULL, "rootfs", NULL);
 	if (status < B_OK)
 		panic("error mounting rootfs!\n");
 
-	sys_setcwd(-1, "/");
+	_kern_setcwd(-1, "/");
 
 	// bootstrap the devfs
-	sys_create_dir("/dev", 0755);
-	status = sys_mount("/dev", NULL, "devfs", NULL);
+	_kern_create_dir("/dev", 0755);
+	status = _kern_mount("/dev", NULL, "devfs", NULL);
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
-	sys_create_dir("/pipe", 0755);
-	status = sys_mount("/pipe", NULL, "pipefs", NULL);
+	_kern_create_dir("/pipe", 0755);
+	status = _kern_mount("/pipe", NULL, "pipefs", NULL);
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
 	// bootstrap the bootfs (if possible)
-	sys_create_dir("/boot", 0755);
-	status = sys_mount("/boot", NULL, "bootfs", NULL);
+	_kern_create_dir("/boot", 0755);
+	status = _kern_mount("/boot", NULL, "bootfs", NULL);
 	if (status < B_OK) {
 		// this is no fatal exception at this point, as we may mount
 		// a real on disk file system later
@@ -1633,7 +1635,7 @@ vfs_bootstrap_file_systems(void)
 	// create some standard links on the rootfs
 
 	for (int32 i = 0; sPredefinedLinks[i].path != NULL; i++) {
-		sys_create_symlink(sPredefinedLinks[i].path, sPredefinedLinks[i].target, 0);
+		_kern_create_symlink(sPredefinedLinks[i].path, sPredefinedLinks[i].target, 0);
 			// we don't care if it will succeed or not
 	}
 
@@ -1644,16 +1646,19 @@ vfs_bootstrap_file_systems(void)
 status_t
 vfs_mount_boot_file_system()
 {
+	// make the boot partition (and probably others) available
+	KDiskDeviceManager::CreateDefault();
+
 	file_system_info *bootfs;
 	if ((bootfs = get_file_system("bootfs")) == NULL) {
 		// no bootfs there, yet
 
 		// ToDo: do this for real!
-		status_t status = sys_mount("/boot", "/dev/disk/scsi/0/0/0/raw", "bfs", NULL);
+		status_t status = _kern_mount("/boot", "/dev/disk/scsi/0/0/0/raw", "bfs", NULL);
 		if (status < B_OK)
 			panic("could not get boot device: %s!\n", strerror(status));
 
-		DIR *dir = opendir("/boot");
+		DIR *dir = opendir("/boot/beos/system/add-ons/kernel/bus_managers");
 		if (dir != NULL) {
 			dprintf("Boot Directory Contents:\n");
 			struct dirent *dirent;
@@ -1674,7 +1679,7 @@ vfs_mount_boot_file_system()
 		char path[B_FILE_NAME_LENGTH + 1];
 		snprintf(path, sizeof(path), "/%s", info.volume_name);
 
-		sys_create_symlink(path, "/boot", 0);
+		_kern_create_symlink(path, "/boot", 0);
 	}
 
 	return B_OK;
@@ -2018,12 +2023,12 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 }
 
 
-static int
+static status_t
 dir_create_entry_ref(mount_id mountID, vnode_id parentID, const char *name, int perms, bool kernel)
 {
 	struct vnode *vnode;
 	vnode_id newID;
-	int status;
+	status_t status;
 
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
@@ -2044,13 +2049,13 @@ dir_create_entry_ref(mount_id mountID, vnode_id parentID, const char *name, int 
 }
 
 
-static int
+static status_t
 dir_create(char *path, int perms, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
 	struct vnode *vnode;
 	vnode_id newID;
-	int status;
+	status_t status;
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
 
@@ -2239,7 +2244,7 @@ common_sync(int fd, bool kernel)
 }
 
 
-static int
+static ssize_t
 common_read_link(char *path, char *buffer, size_t bufferSize, bool kernel)
 {
 	struct vnode *vnode;
@@ -3128,7 +3133,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	mutex_unlock(&sMountOpMutex);
 
-	return 0;
+	return B_OK;
 
 err6:
 	FS_MOUNT_CALL(mount, unmount)(mount->cookie);
@@ -3400,8 +3405,8 @@ err:
 //	Calls from within the kernel
 
 
-int
-sys_mount(const char *path, const char *device, const char *fs_name, void *args)
+status_t
+_kern_mount(const char *path, const char *device, const char *fs_name, void *args)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3410,8 +3415,8 @@ sys_mount(const char *path, const char *device, const char *fs_name, void *args)
 }
 
 
-int
-sys_unmount(const char *path)
+status_t
+_kern_unmount(const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3440,15 +3445,15 @@ _kern_write_fs_info(dev_t device, const struct fs_info *info, int mask)
 }
 
 
-int
-sys_sync(void)
+status_t
+_kern_sync(void)
 {
 	return fs_sync();
 }
 
 
 int
-sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
+_kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 {
 	char nameCopy[B_FILE_NAME_LENGTH];
 	strlcpy(nameCopy, name, sizeof(nameCopy) - 1);
@@ -3458,7 +3463,7 @@ sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 
 
 int
-sys_open(const char *path, int omode)
+_kern_open(const char *path, int omode)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3468,21 +3473,21 @@ sys_open(const char *path, int omode)
 
 
 int
-sys_open_dir_node_ref(dev_t device, ino_t inode)
+_kern_open_dir_node_ref(dev_t device, ino_t inode)
 {
 	return dir_open_node_ref(device, inode, true);
 }
 
 
 int
-sys_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
+_kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 {
 	return dir_open_entry_ref(device, inode, name, true);
 }
 
 
 int
-sys_open_dir(const char *path)
+_kern_open_dir(const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3491,22 +3496,22 @@ sys_open_dir(const char *path)
 }
 
 
-int
-sys_fsync(int fd)
+status_t
+_kern_fsync(int fd)
 {
 	return common_sync(fd, true);
 }
 
 
 int
-sys_create_entry_ref(dev_t device, ino_t inode, const char *name, int omode, int perms)
+_kern_create_entry_ref(dev_t device, ino_t inode, const char *name, int omode, int perms)
 {
 	return file_create_entry_ref(device, inode, name, omode, perms, true);
 }
 
 
 int
-sys_create(const char *path, int omode, int perms)
+_kern_create(const char *path, int omode, int perms)
 {
 	char buffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(buffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3515,15 +3520,15 @@ sys_create(const char *path, int omode, int perms)
 }
 
 
-int
-sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms)
+status_t
+_kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms)
 {
 	return dir_create_entry_ref(device, inode, name, perms, true);
 }
 
 
-int
-sys_create_dir(const char *path, int perms)
+status_t
+_kern_create_dir(const char *path, int perms)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3532,8 +3537,8 @@ sys_create_dir(const char *path, int perms)
 }
 
 
-int
-sys_remove_dir(const char *path)
+status_t
+_kern_remove_dir(const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3542,8 +3547,8 @@ sys_remove_dir(const char *path)
 }
 
 
-int
-sys_read_link(const char *path, char *buffer, size_t bufferSize)
+ssize_t
+_kern_read_link(const char *path, char *buffer, size_t bufferSize)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3552,8 +3557,8 @@ sys_read_link(const char *path, char *buffer, size_t bufferSize)
 }
 
 
-int
-sys_write_link(const char *path, const char *toPath)
+status_t
+_kern_write_link(const char *path, const char *toPath)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
@@ -3570,12 +3575,12 @@ sys_write_link(const char *path, const char *toPath)
 }
 
 
-int
-sys_create_symlink(const char *path, const char *toPath, int mode)
+status_t
+_kern_create_symlink(const char *path, const char *toPath, int mode)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
-	int status;
+	status_t status;
 
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
@@ -3588,8 +3593,8 @@ sys_create_symlink(const char *path, const char *toPath, int mode)
 }
 
 
-int
-sys_create_link(const char *path, const char *toPath)
+status_t
+_kern_create_link(const char *path, const char *toPath)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
@@ -3601,8 +3606,8 @@ sys_create_link(const char *path, const char *toPath)
 }
 
 
-int
-sys_unlink(const char *path)
+status_t
+_kern_unlink(const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3611,8 +3616,8 @@ sys_unlink(const char *path)
 }
 
 
-int
-sys_rename(const char *oldPath, const char *newPath)
+status_t
+_kern_rename(const char *oldPath, const char *newPath)
 {
 	char oldPathBuffer[SYS_MAX_PATH_LEN + 1];
 	char newPathBuffer[SYS_MAX_PATH_LEN + 1];
@@ -3624,8 +3629,8 @@ sys_rename(const char *oldPath, const char *newPath)
 }
 
 
-int
-sys_access(const char *path, int mode)
+status_t
+_kern_access(const char *path, int mode)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
@@ -3685,7 +3690,7 @@ _kern_write_path_stat(const char *path, bool traverseLeafLink, const struct stat
 
 
 int
-sys_open_attr_dir(int fd, const char *path)
+_kern_open_attr_dir(int fd, const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
@@ -3697,63 +3702,63 @@ sys_open_attr_dir(int fd, const char *path)
 
 
 int
-sys_create_attr(int fd, const char *name, uint32 type, int openMode)
+_kern_create_attr(int fd, const char *name, uint32 type, int openMode)
 {
 	return attr_create(fd, name, type, openMode, true);
 }
 
 
 int
-sys_open_attr(int fd, const char *name, int openMode)
+_kern_open_attr(int fd, const char *name, int openMode)
 {
 	return attr_open(fd, name, openMode, true);
 }
 
 
-int
-sys_remove_attr(int fd, const char *name)
+status_t
+_kern_remove_attr(int fd, const char *name)
 {
 	return attr_remove(fd, name, true);
 }
 
 
-int
-sys_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName)
+status_t
+_kern_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName)
 {
 	return attr_rename(fromFile, fromName, toFile, toName, true);
 }
 
 
 int
-sys_open_index_dir(dev_t device)
+_kern_open_index_dir(dev_t device)
 {
 	return index_dir_open(device, true);
 }
 
 
-int
-sys_create_index(dev_t device, const char *name, uint32 type, uint32 flags)
+status_t
+_kern_create_index(dev_t device, const char *name, uint32 type, uint32 flags)
 {
 	return index_create(device, name, type, flags, true);
 }
 
 
-int
-sys_read_index_stat(dev_t device, const char *name, struct stat *stat)
+status_t
+_kern_read_index_stat(dev_t device, const char *name, struct stat *stat)
 {
 	return index_name_read_stat(device, name, stat, true);
 }
 
 
-int
-sys_remove_index(dev_t device, const char *name)
+status_t
+_kern_remove_index(dev_t device, const char *name)
 {
 	return index_remove(device, name, true);
 }
 
 
-int
-sys_getcwd(char *buffer, size_t size)
+status_t
+_kern_getcwd(char *buffer, size_t size)
 {
 	char path[SYS_MAX_PATH_LEN];
 	int status;
@@ -3772,8 +3777,8 @@ sys_getcwd(char *buffer, size_t size)
 }
 
 
-int
-sys_setcwd(int fd, const char *path)
+status_t
+_kern_setcwd(int fd, const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
@@ -3788,8 +3793,8 @@ sys_setcwd(int fd, const char *path)
 //	Calls from userland (with extra address checks)
 
 
-int
-user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
+status_t
+_user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char fs_name[B_OS_NAME_LENGTH + 1];
@@ -3820,8 +3825,8 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 }
 
 
-int
-user_unmount(const char *userPath)
+status_t
+_user_unmount(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -3873,15 +3878,15 @@ _user_write_fs_info(dev_t device, const struct fs_info *userInfo, int mask)
 }
 
 
-int
-user_sync(void)
+status_t
+_user_sync(void)
 {
 	return fs_sync();
 }
 
 
 int
-user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
+_user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
@@ -3898,7 +3903,7 @@ user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 
 
 int
-user_open(const char *userPath, int omode)
+_user_open(const char *userPath, int omode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -3915,14 +3920,14 @@ user_open(const char *userPath, int omode)
 
 
 int
-user_open_dir_node_ref(dev_t device, ino_t inode)
+_user_open_dir_node_ref(dev_t device, ino_t inode)
 {
 	return dir_open_node_ref(device, inode, false);
 }
 
 
 int
-user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
+_user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
@@ -3939,7 +3944,7 @@ user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 
 
 int
-user_open_dir(const char *userPath)
+_user_open_dir(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -3955,15 +3960,15 @@ user_open_dir(const char *userPath)
 }
 
 
-int
-user_fsync(int fd)
+status_t
+_user_fsync(int fd)
 {
 	return common_sync(fd, false);
 }
 
 
 int
-user_create_entry_ref(dev_t device, ino_t inode, const char *userName, int openMode, int perms)
+_user_create_entry_ref(dev_t device, ino_t inode, const char *userName, int openMode, int perms)
 {
 	char name[B_FILE_NAME_LENGTH];
 	int status;
@@ -3980,7 +3985,7 @@ user_create_entry_ref(dev_t device, ino_t inode, const char *userName, int openM
 
 
 int
-user_create(const char *userPath, int openMode, int perms)
+_user_create(const char *userPath, int openMode, int perms)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -3996,11 +4001,11 @@ user_create(const char *userPath, int openMode, int perms)
 }
 
 
-int
-user_create_dir_entry_ref(dev_t device, ino_t inode, const char *userName, int perms)
+status_t
+_user_create_dir_entry_ref(dev_t device, ino_t inode, const char *userName, int perms)
 {
 	char name[B_FILE_NAME_LENGTH];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
@@ -4013,11 +4018,11 @@ user_create_dir_entry_ref(dev_t device, ino_t inode, const char *userName, int p
 }
 
 
-int
-user_create_dir(const char *userPath, int perms)
+status_t
+_user_create_dir(const char *userPath, int perms)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
@@ -4030,8 +4035,8 @@ user_create_dir(const char *userPath, int perms)
 }
 
 
-int
-user_remove_dir(const char *userPath)
+status_t
+_user_remove_dir(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -4047,8 +4052,8 @@ user_remove_dir(const char *userPath)
 }
 
 
-int
-user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
+ssize_t
+_user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char buffer[SYS_MAX_PATH_LEN + 1];
@@ -4077,8 +4082,8 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 }
 
 
-int
-user_write_link(const char *userPath, const char *userToPath)
+status_t
+_user_write_link(const char *userPath, const char *userToPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
@@ -4104,12 +4109,12 @@ user_write_link(const char *userPath, const char *userToPath)
 }
 
 
-int
-user_create_symlink(const char *userPath, const char *userToPath, int mode)
+status_t
+_user_create_symlink(const char *userPath, const char *userToPath, int mode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
-	int status;
+	status_t status;
 	
 	if (!IS_USER_ADDRESS(userPath)
 		|| !IS_USER_ADDRESS(userToPath))
@@ -4131,12 +4136,12 @@ user_create_symlink(const char *userPath, const char *userToPath, int mode)
 }
 
 
-int
-user_create_link(const char *userPath, const char *userToPath)
+status_t
+_user_create_link(const char *userPath, const char *userToPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
-	int status;
+	status_t status;
 
 	if (!IS_USER_ADDRESS(userPath)
 		|| !IS_USER_ADDRESS(userToPath))
@@ -4158,8 +4163,8 @@ user_create_link(const char *userPath, const char *userToPath)
 }
 
 
-int
-user_unlink(const char *userPath)
+status_t
+_user_unlink(const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -4175,8 +4180,8 @@ user_unlink(const char *userPath)
 }
 
 
-int
-user_rename(const char *userOldPath, const char *userNewPath)
+status_t
+_user_rename(const char *userOldPath, const char *userNewPath)
 {
 	char oldPath[SYS_MAX_PATH_LEN + 1];
 	char newPath[SYS_MAX_PATH_LEN + 1];
@@ -4197,8 +4202,8 @@ user_rename(const char *userOldPath, const char *userNewPath)
 }
 
 
-int
-user_access(const char *userPath, int mode)
+status_t
+_user_access(const char *userPath, int mode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -4263,7 +4268,7 @@ _user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct 
 
 
 int
-user_open_attr_dir(int fd, const char *userPath)
+_user_open_attr_dir(int fd, const char *userPath)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
@@ -4278,7 +4283,7 @@ user_open_attr_dir(int fd, const char *userPath)
 
 
 int
-user_create_attr(int fd, const char *userName, uint32 type, int openMode)
+_user_create_attr(int fd, const char *userName, uint32 type, int openMode)
 {
 	char name[B_FILE_NAME_LENGTH];
 
@@ -4291,7 +4296,7 @@ user_create_attr(int fd, const char *userName, uint32 type, int openMode)
 
 
 int
-user_open_attr(int fd, const char *userName, int openMode)
+_user_open_attr(int fd, const char *userName, int openMode)
 {
 	char name[B_FILE_NAME_LENGTH];
 
@@ -4303,8 +4308,8 @@ user_open_attr(int fd, const char *userName, int openMode)
 }
 
 
-int
-user_remove_attr(int fd, const char *userName)
+status_t
+_user_remove_attr(int fd, const char *userName)
 {
 	char name[B_FILE_NAME_LENGTH];
 
@@ -4316,8 +4321,8 @@ user_remove_attr(int fd, const char *userName)
 }
 
 
-int
-user_rename_attr(int fromFile, const char *userFromName, int toFile, const char *userToName)
+status_t
+_user_rename_attr(int fromFile, const char *userFromName, int toFile, const char *userToName)
 {
 	char fromName[B_FILE_NAME_LENGTH];
 	char toName[B_FILE_NAME_LENGTH];
@@ -4335,14 +4340,14 @@ user_rename_attr(int fromFile, const char *userFromName, int toFile, const char 
 
 
 int
-user_open_index_dir(dev_t device)
+_user_open_index_dir(dev_t device)
 {
 	return index_dir_open(device, false);
 }
 
 
-int
-user_create_index(dev_t device, const char *userName, uint32 type, uint32 flags)
+status_t
+_user_create_index(dev_t device, const char *userName, uint32 type, uint32 flags)
 {
 	char name[B_FILE_NAME_LENGTH];
 	
@@ -4354,8 +4359,8 @@ user_create_index(dev_t device, const char *userName, uint32 type, uint32 flags)
 }
 
 
-int
-user_read_index_stat(dev_t device, const char *userName, struct stat *userStat)
+status_t
+_user_read_index_stat(dev_t device, const char *userName, struct stat *userStat)
 {
 	char name[B_FILE_NAME_LENGTH];
 	struct stat stat;
@@ -4376,8 +4381,8 @@ user_read_index_stat(dev_t device, const char *userName, struct stat *userStat)
 }
 
 
-int
-user_remove_index(dev_t device, const char *userName)
+status_t
+_user_remove_index(dev_t device, const char *userName)
 {
 	char name[B_FILE_NAME_LENGTH];
 	
@@ -4389,8 +4394,8 @@ user_remove_index(dev_t device, const char *userName)
 }
 
 
-int
-user_getcwd(char *userBuffer, size_t size)
+status_t
+_user_getcwd(char *userBuffer, size_t size)
 {
 	char buffer[SYS_MAX_PATH_LEN];
 	int status;
@@ -4415,8 +4420,8 @@ user_getcwd(char *userBuffer, size_t size)
 }
 
 
-int
-user_setcwd(int fd, const char *userPath)
+status_t
+_user_setcwd(int fd, const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN];
 
