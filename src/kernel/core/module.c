@@ -157,6 +157,8 @@ static const char * const sModulePaths[] = {
 static hash_table *sModuleImagesHash;
 static hash_table *sModulesHash;
 
+extern dev_t gBootDevice;
+
 
 /** calculates hash for a module using its name */
 
@@ -336,7 +338,10 @@ put_module_image(module_image *image)
 	int32 refCount = atomic_add(&image->ref_count, -1);
 	ASSERT(refCount > 0);
 
-	if (refCount == 1 && !image->keep_loaded)
+	// Don't unload anything when there is no boot device yet
+	// (because chances are that we will never be able to access it again)
+
+	if (refCount == 1 && !image->keep_loaded && gBootDevice > 0)
 		unload_module_image(image, NULL);
 }
 
@@ -785,6 +790,7 @@ iterator_get_next_module(module_iterator *iterator, char *buffer, size_t *_buffe
 
 		for (i = iterator->module_offset; sBuiltInModules[i] != NULL; i++) {
 			// the module name must fit the prefix
+dprintf(":: compare: \"%s\" <-> \"%s\" (%ld)\n", iterator->prefix, sBuiltInModules[i]->name, iterator->prefix_length);
 			if (strncmp(sBuiltInModules[i]->name, iterator->prefix, iterator->prefix_length))
 				continue;
 
@@ -1072,6 +1078,12 @@ module_init(kernel_args *args)
  *	contain all modules available under the prefix.
  *	The structure is then used by read_next_module_name(), and
  *	must be freed by calling close_module_list().
+ *
+ *	During early boot, when there is no boot device accessible,
+ *	it will only find built-in modules, not those that have
+ *	been preloaded - use get_next_loaded_module_name() instead
+ *	if you need to have a list of loaded modules.
+ *	ToDo: this could be changed
  */
 
 void *
