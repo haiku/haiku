@@ -14,6 +14,10 @@
 #include "media_server.h"
 #include "debug.h"
 
+#include "/boot/home/develop/openbeos/current/src/kits/media/SystemTimeSource.h"
+#include <MediaRoster.h>
+#include <MediaNode.h>
+
 /*
  *
  * An implementation of a new media_server for the OpenBeOS MediaKit
@@ -49,6 +53,7 @@ public:
 	void HandleMessage(int32 code, void *data, size_t size);
 	void ArgvReceived(int32 argc, char **argv);
 	static int32 controlthread(void *arg);
+	void StartSystemTimeSource();
 
 /* functionality not yet implemented
 00014a00 T _ServerApp::_ServerApp(void)
@@ -85,9 +90,6 @@ ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
 	fLocker(new BLocker("media server locker"))
 {
-	//load volume settings from config file
-	//mVolumeLeft = ???;
-	//mVolumeRight = ???;
 
  	gNotificationManager = new NotificationManager;
  	gBufferManager = new BufferManager;
@@ -97,7 +99,9 @@ ServerApp::ServerApp()
 	control_port = create_port(64,"media_server port");
 	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
 	resume_thread(control_thread);
-	
+
+	StartSystemTimeSource();
+	gNodeManager->LoadState();
 	gAppManager->StartAddonServer();
 }
 
@@ -139,8 +143,37 @@ bool
 ServerApp::QuitRequested()
 {
 	TRACE("ServerApp::QuitRequested()\n");
+	gNodeManager->SaveState();
 	gAppManager->TerminateAddonServer();
 	return true;
+}
+
+void
+ServerApp::StartSystemTimeSource()
+{
+	printf("StartSystemTimeSource enter\n");
+	media_node node;
+	status_t rv;
+	BTimeSource *source;
+
+	printf("StartSystemTimeSource creating object\n");
+
+	source = new _SysTimeSource;
+
+	printf("StartSystemTimeSource registering\n");
+
+	BMediaRoster::Roster()->RegisterNode(source);
+
+	printf("StartSystemTimeSource getting Node()\n");
+
+	node = source->Node();
+
+	printf("StartSystemTimeSource setting as default\n");
+	
+	rv = gNodeManager->SetDefaultNode(SYSTEM_TIME_SOURCE, &node, NULL, NULL);
+	ASSERT(rv == B_OK);
+	
+	printf("StartSystemTimeSource leave\n");
 }
 
 void 
@@ -149,6 +182,12 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 	status_t rv;
 	INFO("ServerApp::HandleMessage %#lx\n", code);
 	switch (code) {
+		case SERVER_RESCAN_DEFAULTS:
+		{
+			gNodeManager->RescanDefaultNodes();
+			break;
+		}
+	
 		case SERVER_REGISTER_ADDONSERVER:
 		{
 			const server_register_addonserver_request *request = reinterpret_cast<const server_register_addonserver_request *>(data);
@@ -336,9 +375,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_set_node_request *request = reinterpret_cast<const server_set_node_request *>(data);
 			server_set_node_reply reply;
-			// XXX do something here
-			debugger("SERVER_SET_NODE seems to be needed\n");
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->SetDefaultNode(request->type, request->use_node ? &request->node : NULL, request->use_dni ? &request->dni : NULL, request->use_input ?  &request->input : NULL);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		

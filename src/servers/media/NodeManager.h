@@ -6,6 +6,7 @@
 #include "TMap.h"
 #include "TStack.h"
 #include "DataExchange.h"
+#include "DefaultManager.h"
 
 struct registered_node
 {
@@ -47,7 +48,12 @@ public:
 	
 	void Dump();
 
+	/* Management of system wide default nodes */
+	status_t SetDefaultNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input);
+	status_t GetDefaultNode(media_node_id *nodeid, char *input_name, int32 *input_id, node_type type);
+	status_t RescanDefaultNodes();
 
+	/* Management of live nodes */
 	status_t RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team);
 	status_t UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team_id team);
 	status_t GetCloneForId(media_node *node, media_node_id nodeid, team_id team);
@@ -96,4 +102,5 @@ private:
 	List<dormant_flavor_info> *fDormantFlavorList;
 	Map<media_addon_id,entry_ref> *fAddonPathMap;
 	Map<media_node_id,registered_node> *fRegisteredNodeMap;
+	DefaultManager *fDefaultManager;
 };

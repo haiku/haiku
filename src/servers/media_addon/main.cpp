@@ -49,10 +49,12 @@ public:
 	ino_t		DirNodeUser;
 	port_id		control_port;
 	thread_id	control_thread;
+	bool		fStartup;
 };
 
 MediaAddonServer::MediaAddonServer(const char *sig) : 
-	BApplication(sig)
+	BApplication(sig),
+	fStartup(true)
 {
 	mediaroster = BMediaRoster::Roster();
 	filemap = new Map<ino_t, media_addon_id>;
@@ -140,6 +142,8 @@ MediaAddonServer::ReadyToRun()
 		return;
 	}
 
+	fStartup = true;
+
 	// load dormant media nodes
 	node_ref nref;
 	BEntry e("/boot/beos/system/add-ons/media");
@@ -155,6 +159,11 @@ MediaAddonServer::ReadyToRun()
 	e2.GetNodeRef(&nref);
 	DirNodeUser = nref.node;
 	WatchDir(&e2);
+	
+	fStartup = false;
+
+	server_rescan_defaults_command cmd;
+	SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
 }
 
 void 
@@ -318,6 +327,12 @@ flavor 0:
 		return;
 	}
 */
+
+	if (!fStartup) {
+		server_rescan_defaults_command cmd;
+		SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
+	}
+
 	_DormantNodeManager->PutAddon(id);
 }
 

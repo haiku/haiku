@@ -14,6 +14,8 @@
 #include "debug.h"
 #include "NodeManager.h"
 
+const char *get_node_type(node_type t);
+
 NodeManager::NodeManager() :
 	nextaddonid(1),
 	nextnodeid(1)
@@ -22,6 +24,7 @@ NodeManager::NodeManager() :
 	fDormantFlavorList = new List<dormant_flavor_info>;
 	fAddonPathMap = new Map<media_addon_id, entry_ref>;
 	fRegisteredNodeMap = new Map<media_node_id, registered_node>;
+	fDefaultManager = new DefaultManager;
 }
 
 
@@ -31,6 +34,7 @@ NodeManager::~NodeManager()
 	delete fDormantFlavorList;
 	delete fAddonPathMap;
 	delete fRegisteredNodeMap;
+	delete fDefaultManager;
 }
 
 
@@ -175,13 +179,38 @@ NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
 }
 
 
+/* This function locates the default "node" for the requested "type" and returnes a clone.
+ * If the requested type is AUDIO_OUTPUT_EX, also "input_name" and "input_id" need to be set and returned,
+ * as this is required by BMediaRoster::GetAudioOutput(media_node *out_node, int32 *out_input_id, BString *out_input_name)
+ */
 status_t
 NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team)
 {
 	BAutolock lock(fLocker);
-	FATAL("!!! NodeManager::GetClone not implemented\n");
-	*node = media_node::null;
-	return B_ERROR;
+	status_t status;
+	media_node_id id;
+
+	FATAL("NodeManager::GetClone enter: team %ld, type %d (%s)\n", team, type, get_node_type(type));
+	
+	status = GetDefaultNode(&id, input_name, input_id, type);
+	if (status != B_OK) {
+		FATAL("NodeManager::GetClone Error: couldn't GetDefaultNode, team %ld, type %d (%s)\n", team, type, get_node_type(type));
+		*node = media_node::null;
+		return status;
+	}
+	ASSERT(id > 0);
+
+	status = GetCloneForId(node, id, team);
+	if (status != B_OK) {
+		FATAL("NodeManager::GetClone Error: couldn't GetCloneForId, id %ld, team %ld, type %d (%s)\n", id, team, type, get_node_type(type));
+		*node = media_node::null;
+		return status;
+	}
+	ASSERT(id == node->node);
+
+	FATAL("NodeManager::GetClone leave: node id %ld, node port %ld, node kind %Ld\n", node->node, node->port, node->kind);
+
+	return B_OK;
 }
 
 
@@ -560,11 +589,47 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addon,
 	return B_ERROR;
 }
 
+status_t
+NodeManager::SetDefaultNode(node_type type, const media_node *node, const dormant_node_info *info, const media_input *input)
+{
+	BAutolock lock(fLocker);
+	return fDefaultManager->Set(type, node, info, input);
+}
+
+status_t
+NodeManager::GetDefaultNode(media_node_id *nodeid, char *input_name, int32 *input_id, node_type type)
+{
+	BAutolock lock(fLocker);
+	return fDefaultManager->Get(nodeid, input_name, input_id, type);
+}
+
+status_t
+NodeManager::RescanDefaultNodes()
+{
+	BAutolock lock(fLocker);
+	return fDefaultManager->Rescan();
+}
+
 void
 NodeManager::CleanupTeam(team_id team)
 {
 	BAutolock lock(fLocker);
 	FATAL("NodeManager::CleanupTeam: should cleanup team %ld\n", team);
+	fDefaultManager->CleanupTeam(team);
+}
+
+status_t
+NodeManager::LoadState()
+{
+	BAutolock lock(fLocker);
+	return fDefaultManager->LoadState();
+}
+
+status_t
+NodeManager::SaveState()
+{
+	BAutolock lock(fLocker);
+	return fDefaultManager->SaveState();
 }
 
 void
@@ -619,4 +684,23 @@ NodeManager::Dump()
 		printf("    flavor-info \"%s\"\n", dfi->info);
 	}
 	printf("NodeManager: list end\n");
+	fDefaultManager->Dump();
 }
+
+const char *
+get_node_type(node_type t)
+{
+	switch (t) {
+		#define CASE(c) case c: return #c;
+		CASE(VIDEO_INPUT)
+		CASE(AUDIO_INPUT)
+		CASE(VIDEO_OUTPUT)
+		CASE(AUDIO_MIXER)
+		CASE(AUDIO_OUTPUT)
+		CASE(AUDIO_OUTPUT_EX)
+		CASE(TIME_SOURCE)
+		CASE(SYSTEM_TIME_SOURCE)
+		default: "unknown";
+	}
+};
+
