@@ -34,10 +34,12 @@ class DataView : public BView {
 		virtual void MouseUp(BPoint where);
 
 		virtual void WindowActivated(bool active);
+		virtual void FrameResized(float width, float height);
 		virtual void SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 		virtual void GetPreferredSize(float *_width, float *_height);
 
 		void SetFontSize(float point);
+		void UpdateScroller();
 
 		void SetSelection(int32 start, int32 end, view_focus focus = kNoFocus);
 		void GetSelection(int32 &start, int32 &end);

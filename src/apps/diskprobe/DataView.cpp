@@ -7,8 +7,9 @@
 #include "DataView.h"
 #include "DataEditor.h"
 
-#include <Messenger.h>
+//#include <Messenger.h>
 #include <Looper.h>
+#include <ScrollBar.h>
 
 
 static const uint32 kBlockSize = 16;
@@ -158,6 +159,9 @@ DataView::Draw(BRect updateRect)
 int32 
 DataView::PositionAt(view_focus focus, BPoint point, view_focus *_newFocus)
 {
+	if (!Bounds().Contains(point))
+		return -1;
+
 	float left = fCharWidth * (fPositionLength + kBlockSpace) + kHorizontalSpace;
 	float hexWidth = fCharWidth * kBlockSize * kHexByteWidth;
 	float width = fCharWidth;
@@ -475,6 +479,41 @@ DataView::WindowActivated(bool active)
 		DrawSelectionBlock(fFocus);
 		DrawSelectionFrame(fFocus);
 	}
+}
+
+
+void 
+DataView::UpdateScroller()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	BScrollBar *bar;
+	if ((bar = ScrollBar(B_HORIZONTAL)) != NULL) {
+		float delta = width - Bounds().Width();
+		if (delta < 0)
+			delta = 0;
+
+		bar->SetRange(0, delta);
+		bar->SetSteps(fCharWidth, Bounds().Width());
+		bar->SetProportion(Bounds().Width() / width);
+	}
+	if ((bar = ScrollBar(B_VERTICAL)) != NULL) {
+		float delta = height - Bounds().Height();
+		if (delta < 0)
+			delta = 0;
+
+		bar->SetRange(0, delta);
+		bar->SetSteps(fFontHeight, Bounds().Height());
+		bar->SetProportion(Bounds().Height() / height);
+	}
+}
+
+
+void
+DataView::FrameResized(float width, float height)
+{
+	UpdateScroller();
 }
 
 

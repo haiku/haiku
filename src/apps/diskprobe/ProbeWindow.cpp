@@ -83,7 +83,14 @@ ProbeWindow::~ProbeWindow()
 void 
 ProbeWindow::MessageReceived(BMessage *message)
 {
-	BWindow::MessageReceived(message);
+	switch (message->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+			if (BView *view = FindView("dataView"))
+				view->MessageReceived(message);
+			break;
+		default:
+			BWindow::MessageReceived(message);
+	}
 }
 
 

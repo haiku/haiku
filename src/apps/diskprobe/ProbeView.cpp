@@ -365,6 +365,8 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 
 	fScrollView = new BScrollView("scroller", fDataView, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
 	AddChild(fScrollView);
+
+	fDataView->UpdateScroller();
 }
 
 
@@ -383,7 +385,7 @@ ProbeView::UpdateSizeLimits()
 	fDataView->GetPreferredSize(&width, &height);
 
 	Window()->SetSizeLimits(200, width + B_V_SCROLL_BAR_WIDTH,
-		200, height + fHeaderView->Frame().bottom + 1 + B_H_SCROLL_BAR_HEIGHT + Frame().top);
+		200, height + fHeaderView->Frame().bottom + 4 + B_H_SCROLL_BAR_HEIGHT + Frame().top);
 }
 
 
