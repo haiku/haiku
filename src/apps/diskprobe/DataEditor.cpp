@@ -20,8 +20,7 @@ class DataChange {
 
 class ReplaceChange : public DataChange {
 	public:
-		ReplaceChange(off_t bufferOffset, uint8 *buffer,
-			off_t offset, const uint8 *data, size_t size);
+		ReplaceChange(off_t offset, const uint8 *data, size_t size);
 		~ReplaceChange();
 
 		virtual void Apply(off_t offset, uint8 *buffer, size_t size);
@@ -46,8 +45,7 @@ DataChange::~DataChange()
 //	#pragma mark -
 
 
-ReplaceChange::ReplaceChange(off_t bufferOffset, uint8 *buffer,
-	off_t offset, const uint8 *data, size_t size)
+ReplaceChange::ReplaceChange(off_t offset, const uint8 *data, size_t size)
 {
 	fOffset = offset;
 
@@ -264,7 +262,7 @@ DataEditor::Replace(off_t offset, const uint8 *data, size_t length)
 			return status;
 	}
 
-	ReplaceChange *change = new ReplaceChange(fRealViewOffset, fView, offset, data, length);
+	ReplaceChange *change = new ReplaceChange(offset, data, length);
 	AddChange(change);
 
 	return B_OK;
