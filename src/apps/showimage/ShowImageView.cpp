@@ -1461,8 +1461,6 @@ ShowImageView::MessageReceived(BMessage *pmsg)
 			break;
 			
 		case B_COPY_TARGET:
-			printf("\n\nB_COPY_TARGET:\n");
-			pmsg->PrintToStream();
 			HandleDrop(pmsg);
 			break;
 		case B_MOUSE_WHEEL_CHANGED:
@@ -1894,7 +1892,9 @@ ShowImageView::SetZoom(float zoom)
 void
 ShowImageView::ZoomIn()
 {
-	SetZoom(fZoom + 0.25);
+	if (fZoom < 16) {
+		SetZoom(fZoom + 0.25);
+	}
 }
 
 void
