@@ -374,7 +374,7 @@ BList::DoForEach(bool (*func)(void *))
 	{
 		while ((!terminate) && (index < fItemCount))	//check terminate condition.
 		{
-			terminate = func(fItemList[index]);			//reset immediate terminator
+			terminate = func(fObjectList[index]);			//reset immediate terminator
 			index++;									//advance along the list.
 		};
 	}
@@ -390,7 +390,7 @@ BList::DoForEach(bool (*func)(void *, void*), void * arg)
 	{
 		while ((!terminate) && (index < fItemCount))
 		{	
-			terminate = func(fItemList[index], arg);
+			terminate = func(fObjectList[index], arg);
 			index++;
 		};
 	}
