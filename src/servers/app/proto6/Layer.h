@@ -67,7 +67,8 @@ public:
 			*bottomchild;
 
 	BRegion *visible,
-			*invalid;
+			*invalid,
+			*full;
 
 	ServerWindow *serverwin;
 
@@ -78,6 +79,7 @@ public:
 	uint8 hidecount;
 	bool is_dirty;		// true if we need to redraw
 	bool is_updating;
+	bool is_visible;
 };
 
 class RootLayer : public Layer

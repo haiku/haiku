@@ -21,6 +21,7 @@ public:
 	void SetDecorator(Decorator *newdecor);
 	ServerWindow *Window(void) const;
 	void RequestDraw(void);
+	void InvalidateLowerSiblings(BRect r);
 	void MoveToBack(void);
 	void MoveToFront(void);
 
