@@ -156,6 +156,12 @@ RecentEntries::Add(const entry_ref *ref, const char *appSig)
 	If there are fewer than \a maxCount items in the list, the entire
 	list is returned.
 	
+	Duplicate entries are never returned, i.e. if two instances of the
+	same entry were added under different app sigs, and both instances
+	match the given filter criterion, only the most recent instance is
+	returned; the latter instance is ignored and not counted towards
+	the \a maxCount number of entries to return.
+	
 	Since BRoster::GetRecentEntries() returns \c void, the message pointed
 	to by \a list is simply cleared if maxCount is invalid (i.e. <= 0).
 	
@@ -170,8 +176,11 @@ RecentEntries::Get(int32 maxCount, const char *fileTypes[], int32 fileTypesCount
 	               ? B_OK : B_BAD_VALUE;
 	if (!error) {
 		result->MakeEmpty();
+		
+		std::list<recent_entry*> duplicateList;
 		std::list<recent_entry*>::iterator item;
 		int count = 0;
+		
 		for (item = fEntryList.begin();
 		       count < maxCount && item != fEntryList.end();
 		         item++)
@@ -197,6 +206,22 @@ RecentEntries::Get(int32 maxCount, const char *fileTypes[], int32 fileTypesCount
 				}
 			}
 			if (match) {
+				// Check for duplicates
+				for (std::list<recent_entry*>::iterator dupItem
+				     = duplicateList.begin();
+				       dupItem != duplicateList.end();
+				         dupItem++)
+				{
+					if ((*dupItem)->ref == (*item)->ref) {
+						match = false;
+						break;
+					}
+				}
+			}
+			if (match) {
+				// Add the ref to the list used to check
+				// for duplicates, and then to the result
+				duplicateList.push_back(*item);			
 				result->AddRef("refs", &(*item)->ref);
 				count++;
 			}
