@@ -250,13 +250,16 @@ Description: When passed a NULL description, doesn't crash, but does
              unreliable (sometimes they work, sometimes they don't).
 
 
-OS:          BeOS R5
+OS:          BeOS R5 vs. OBOS
 Module:      BMimeType
 Location:    
-Description: The maximal MIME string length, BMimeType accepts is
+Description: R5: The maximal MIME string length, BMimeType accepts is
              B_MIME_TYPE_LENGTH *not* including terminating null. Note, that
              app_info reserves only B_MIME_TYPE_LENGTH chars for the
              signature field.
+             OBOS: That's why we support strings that fit into a buffer of
+             size B_MIME_TYPE_LENGTH only. This is consistent with the use
+             of the other *_LENGTH constants.
 
 
 OS:          BeOS R5
