@@ -183,20 +183,20 @@ i386_handle_trap(struct iframe frame)
 			unsigned int cr2;
 			addr newip;
 
-			asm ("movl %%cr2, %0" : "=r" (cr2) );
+			asm("movl %%cr2, %0" : "=r" (cr2));
 
 			// get the old interrupt enable/disable state and restore to that
-			if(frame.flags & 0x200) {
+			if (frame.flags & 0x200) {
 				dprintf("page_fault: enabling interrupts\n");
 				if (!kernel_startup)
-					dprintf("page_fault, but interrupts are disabled. touching address %p from eip %p\n", cr2, frame.eip);
+					dprintf("page_fault, but interrupts are disabled. touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
 				enable_interrupts();
 			}
 			ret = vm_page_fault(cr2, frame.eip,
 				(frame.error_code & 0x2) != 0,
 				(frame.error_code & 0x4) != 0,
 				&newip);
-			if(newip != 0) {
+			if (newip != 0) {
 				// the page fault handler wants us to modify the iframe to set the
 				// IP the cpu will return to to be this ip
 				frame.eip = newip;
