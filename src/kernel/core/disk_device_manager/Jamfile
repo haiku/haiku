@@ -39,6 +39,7 @@ SharedLibrary disk_device_manager :
 	KResizeJob.cpp
 	KScanPartitionJob.cpp
 	KSetParametersJob.cpp
+	KUninitializeJob.cpp
 
 	# utilities
 	Locker.cpp
