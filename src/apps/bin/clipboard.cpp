@@ -1,178 +1,334 @@
-/*===============================================================
-** Clipboard - Applet - Code File
-**===============================================================
-** 24 June 2002 - Mathew Hounsell - Created
-*/
-#include <app/Clipboard.h>
+/*
+ * Copyright 2005, Haiku Inc.
+ * Distributed under the terms of the MIT license.
+ *
+ * Authors:
+ *		jonas.sundstrom@kirilla.com
+ *		Axel Dörfler, axeld@pinc-software.de.
+ */
+
+
+#include <Application.h>
+#include <Clipboard.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
+#include <String.h>
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <getopt.h>
 
-#include <new.h>
 
-/*===============================================================
-** Status
-*/
-namespace Status {
+extern const char *__progname;
+static const char *kProgramName = __progname;
 
-	status_t Code = B_OK;
+static int sExitValue = EXIT_SUCCESS;
+
+
+class ClipboardApp : public BApplication {
+	public:
+		ClipboardApp(void);
+		virtual ~ClipboardApp(void);
+
+		virtual void ReadyToRun(void);
+		virtual void ArgvReceived(int32 argc, char **argv);
+
+	private:
+		void Usage(void);
+		status_t Load(const char *path);
+		status_t Save(const char *path);
+		status_t Copy(const char *string);
+		status_t Clear(void);
+		status_t Print(bool debug);
+
+		bool fGotArguments;
+};
+
+
+ClipboardApp::ClipboardApp(void)
+	: BApplication("application/x-vnd.haiku-clipboard"),
+	fGotArguments(false)
+{
 }
 
-/*===============================================================
-** Clipboard
-*/
-namespace Clipboard {
 
-	// Use system clipboard by default.
-	char const * Name = "system";
-	bool InstanceExists = false;
+ClipboardApp::~ClipboardApp(void)
+{
+}
 
-    //-----------------------------------------------------------
-	class Locker {
-		private:	BClipboard *clip;
-		public:		Locker( BClipboard * nclip )
-						: clip( nclip )
-					{ 
-						if( ! ( InstanceExists = clip->Lock() ) )
-							Status::Code = B_NAME_NOT_FOUND ;
-					}
-		public:		~Locker( void )
-						{  clip->Unlock();  }
+
+void 
+ClipboardApp::ArgvReceived(int32 argc, char **argv)
+{
+	status_t status = B_OK;
+
+	static struct option const kLongOptions[] = {
+		{"load", required_argument, 0, 'l'},
+		{"save", required_argument, 0, 's'},
+		{"copy", required_argument, 0, 'c'},
+		{"clear", no_argument, 0, 'r'},
+		{"stdin", no_argument, 0, 'i'},
+		{"print", no_argument, 0, 'p'},
+		{"debug", no_argument, 0, 'd'},
+		{"help", no_argument, 0, 'h'},
+		{NULL}
 	};
 
-    //-----------------------------------------------------------
-	BClipboard * Instance = NULL;
+	int c;
+	while ((c = getopt_long(argc, argv, "l:o:c:ripd", kLongOptions, NULL)) != -1) {
+		switch (c) {
+			case 'l':
+				status = Load(optarg);
+				break;
+			case 'o':
+				status = Save(optarg);
+				break;
+			case 'c':
+				status = Copy(optarg);
+				break;
+			case 'r':
+				status = Clear();
+				break;
+			case 'i':
+				status = Copy(NULL);
+				break;
+			case 'p':
+				status = Print(false);
+				break;
+			case 'd':
+				status = Print(true);
+				break;
+			case 0:
+				break;
+			case 'h':
+				// help text is printed in ReadyToRun()
+				return;
+			default:
+				status = B_ERROR;
+				break;
+		}
+	}
 
-	// Open or Create clipboard.
-	bool ConnectOrCreate( void ) {
-		Instance = new( std::nothrow ) BClipboard( Name );
-		if( ! ( InstanceExists = ( Instance != NULL ) ) ) {
-			Status::Code = B_NO_MEMORY;
-		}
-		return InstanceExists;
-	}
-	
-    //-----------------------------------------------------------
-	void Print( void ) {
-		// Retrieve Data - Concurrent Access Possible.
-		Locker clip_lock( Instance ); // Unlocks on destruction.
-		if( InstanceExists ) {
-			BMessage *data = NULL;
-			if( 0 == ( data = Instance->Data() ) ) {
-				Status::Code = B_NO_INIT;
-			} else {
-				// Clipboard fills in message
-				// Then tell message to print itself.
-				data->PrintToStream();
-			}
-		}
-	}
-
-    //-----------------------------------------------------------
-	void Read( char const * entry_name ) {
-		// Retrieve Data - Concurrent Access Possible.
-		Locker clip_lock( Instance ); // Unlocks on destruction.
-		if( InstanceExists ) {
-			BMessage *data = NULL;
-			if( 0 == ( data = Instance->Data() ) ) {
-				Status::Code = B_NO_INIT;
-			} else {
-				type_code entry_type = 0;
-				int32 entry_count = 0;
-	
-				if( B_OK == ( Status::Code = data->GetInfo( entry_name, & entry_type, & entry_count ) ) ) {
-					ssize_t entry_size = 0;
-					void const * entry_data = 0;
-	
-					if( B_OK == ( Status::Code = data->FindData( entry_name, entry_type, & entry_data, & entry_size ) ) ) {
-						fwrite( entry_data, entry_size, 1, stdout );
-					}
-				}
-			}
-		}
-	}
+	if (status == B_OK)
+		fGotArguments =	true;
+	else
+		sExitValue = EXIT_FAILURE;
 }
 
-/*===============================================================
-** Arguments
-*/
-namespace Arguments {
-	enum { NONE, PRINT, READ, WRITE }  Operation;
-	char const * ProgramName = "";
-
-    //-----------------------------------------------------------
-	void Usage( void )
-	{
-		printf( "USAGE : %s -p [clipboard-name]\n", ProgramName );
-		printf( "USAGE : %s -r [entry] [clipboard-name]\n", ProgramName );
-		//	printf( "USAGE : %s -w [entry] [clipboard-name]\n", ProgramName );
-	}
-
-    //-----------------------------------------------------------
-	void Decode( int const argc, char const * const * const argv )
-	{
-		ProgramName = argv[0];
-		Operation = NONE;
-
-		// Test arguments.
-		if( argc < 2 || argc > 3 ) {
-			Usage();
-		} else if( argv[1][0] != '-' ) {
-			Usage();
-		} else if( argv[1][1] == 'p' && ( argc == 2 || argc == 3 ) ) {
-			Operation = PRINT;
-		} else if( argv[1][1] == 'r' && ( argc == 3 || argc == 4 ) ) {
-			Operation = READ;
-	//	} else if( argv[1][1] == 'w' && ( argc == 3 || argc == 4 ) ) {
-	//		op = WRITE;
-		} else {
-			Usage();
-		}
-
-		if( Operation == PRINT && argc == 3 ) {
-			// Use user clipboard.
-			Clipboard::Name = argv[2];
-		} else if( ( Operation == READ || Operation == WRITE ) && argc == 4 ) {
-			// Use user clipboard.
-			Clipboard::Name = argv[3];
-		}
-	}
-}
-
-/*===============================================================
-** Main Routine
-*/
-int main( int argc, char **argv )
+void
+ClipboardApp::ReadyToRun(void)
 {
-	Arguments::Decode( argc, argv );
+	if (fGotArguments == false)
+		Usage();
 
-	if( Arguments::NONE == Arguments::Operation ) {
-		Status::Code = B_BAD_VALUE;
-	} else {
-		// Open or Create clipboard.
-		if( Clipboard::ConnectOrCreate() ) {
-			switch( Arguments::Operation ) {
-				case Arguments::PRINT:
-					Clipboard::Print();
-					break;
-				case Arguments::READ:
-					Clipboard::Read( argv[2] );
-					break;
-				default:	//Shouldn't happen
-					Status::Code = B_BAD_VALUE;
-					break;
-			}
-		}
-	}
-	
-	if( B_OK != Status::Code ) {
-		fputs( strerror( Status::Code ), stderr );
-		fputc( '\n', stderr );
-		return Status::Code;
-	}
-	return 0;
+	PostMessage(B_QUIT_REQUESTED);
 }
 
-/*===============================================================
-** End Of Code
-*/
+
+void
+ClipboardApp::Usage(void)
+{
+	printf("usage: %s [-olcirpd]\n"
+		"  -o, --save=file\tSave clipboard to file (flattened BMessage)\n"
+		"  -l, --load=file\tLoad clipboard from file (flattened BMessage)\n"
+		"  -c, --copy=string\tPuts the given string into the clipboard\n"
+		"  -i, --stdin\t\tLoad clipboard from standard input\n\n"
+
+		"  -r, --clear\t\tRemove all contents from clipboard\n\n"
+
+		"  -p, --print\t\tPrint clipboard to standard output\n"
+		"  -d, --debug\t\tPrint clipboard message to stdout\n\n"
+
+		"  --help\t\tDisplay this help and exit\n",
+		kProgramName);
+}
+
+
+status_t
+ClipboardApp::Load(const char *path)
+{
+	status_t status = B_OK;
+	BFile file;
+
+	status = file.SetTo(path, B_READ_ONLY);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Could not open file: %s\n", kProgramName, strerror(status));
+		return status;
+	}
+
+	// get BMessage from file
+	BMessage clipFromFile;
+	status = clipFromFile.Unflatten(&file);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Could not read clip: %s\n", kProgramName, strerror(status));
+		return status;
+	}
+
+	// load clip into clipboard
+	if (!be_clipboard->Lock()) {
+		fprintf(stderr, "%s: could not lock clipboard.\n", kProgramName);
+		return B_ERROR;
+	}
+
+	be_clipboard->Clear();
+
+	BMessage *clip = be_clipboard->Data();
+	*clip = clipFromFile;
+
+	status = be_clipboard->Commit();
+	if (status != B_OK) {
+		fprintf(stderr, "%s: could not commit data to clipboard.\n", kProgramName);
+		be_clipboard->Unlock();
+		return status;
+	}
+
+	be_clipboard->Unlock();
+	return B_OK;
+}
+
+
+status_t
+ClipboardApp::Save(const char *path)
+{
+	status_t status = B_OK;
+	BFile file;
+
+	status = file.SetTo(path, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Could not create file: %s\n", kProgramName, strerror(status));
+		return status;
+	}
+
+	// get clip
+	if (!be_clipboard->Lock()) {
+		fprintf(stderr, "%s: could not lock clipboard.\n", kProgramName);
+		return B_ERROR;
+	}
+
+	BMessage *clip = be_clipboard->Data();
+
+	be_clipboard->Unlock();
+
+	// flatten clip to file
+	status = clip->Flatten(&file);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: Could not write data: %s\n", kProgramName, strerror(status));
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ClipboardApp::Copy(const char *string)
+{
+	status_t status = B_OK;
+	BString inputString;
+
+	if (string == NULL) {
+		// read from standard input
+		char c;
+		while ((c = fgetc(stdin)) != EOF) {
+			inputString += c;
+		}
+
+		string = inputString.String();
+	}
+
+	// get clipboard BMessage
+	
+	if (be_clipboard->Lock()) {
+		be_clipboard->Clear();
+
+		BMessage *clip = be_clipboard->Data();
+
+		// add data to clipboard
+		clip->AddData("text/plain", B_MIME_TYPE, string, strlen(string));			
+
+		status = be_clipboard->Commit();
+		if (status != B_OK) {
+			fprintf(stderr, "%s: could not commit data to clipboard.\n", kProgramName);
+			be_clipboard->Unlock();
+			return status;
+		}
+
+		be_clipboard->Unlock();
+	} else {
+		fprintf(stderr, "%s: could not lock clipboard.\n", kProgramName);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+ClipboardApp::Clear(void)
+{
+	status_t status = B_OK;
+
+	if (!be_clipboard->Lock()) {
+		fprintf(stderr, "%s: could not lock clipboard.\n", kProgramName);
+		return B_ERROR;
+	}
+
+	be_clipboard->Clear();
+
+	status = be_clipboard->Commit();
+	if (status != B_OK) {
+		fprintf(stderr, "%s: could not clear clipboard.\n", kProgramName);
+		be_clipboard->Unlock();
+		return status;
+	}
+
+	be_clipboard->Unlock();
+	return B_OK;
+}
+
+
+status_t
+ClipboardApp::Print(bool debug)
+{
+	// get clip & print contents 
+	// (or the entire clip, in case of --debug)
+
+	if (!be_clipboard->Lock()) {
+		fprintf(stderr, "%s: could not lock clipboard.\n", kProgramName);
+		return B_ERROR;
+	}
+
+	BMessage *clip = be_clipboard->Data();
+
+	if (debug) {
+		clip->PrintToStream();
+	} else {
+		const char * textBuffer;
+		int32 textLength;
+		clip->FindData("text/plain", B_MIME_TYPE, (const void **)&textBuffer, &textLength);
+
+		if (textBuffer != NULL && textLength > 0) {
+			BString textString(textBuffer, textLength);
+			printf("%s\n", textString.String());
+		}
+	}	
+
+	be_clipboard->Unlock();
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+int
+main()
+{
+	ClipboardApp clip_app;
+	clip_app.Run();
+
+	return sExitValue;
+}
+
