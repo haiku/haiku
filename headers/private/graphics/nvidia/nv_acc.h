@@ -1,7 +1,7 @@
 /* 
 	definitions for used nVidia acceleration engine commands.
 
-	Written by Rudolf Cornelissen 12/2004
+	Written by Rudolf Cornelissen 12/2004-1/2005
 */
 
 #ifndef NV_ACC_H
@@ -11,7 +11,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bb];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00ae];
 	uint32 SetRop5;				/* b0-7 is ROP5 */
 } cmd_nv_rop5_solid;
 
@@ -19,7 +22,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bb];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00ae];
 	uint32 TopLeft;				/* b0-15 is left, b16-31 is top */
 	uint32 HeightWidth;			/* b0-15 is width, b16-31 is height */
 } cmd_nv_image_black_rectangle;
@@ -28,9 +34,12 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bd];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00b0];
 	uint32 SetShape;			/* b0-1: %00 = 8X_8Y; %01 = 64X_1Y; %10 = 1X_64Y */
-	uint32 reserved02[0x0001];
+	uint32 reserved03[0x0001];
 	uint32 SetColor0;			/* b0-31 is color */
 	uint32 SetColor1;			/* b0-31 is color */
 	uint32 SetPattern[0x0002];	/* b0-31 is bitmap */
@@ -40,7 +49,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bb];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00ae];
 	uint32 SourceOrg;			/* b0-15 is X, b16-31 is Y */
 	uint32 DestOrg;				/* b0-15 is X, b16-31 is Y */
 	uint32 HeightWidth;			/* b0-15 is width, b16-31 is height */
@@ -50,7 +62,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00fa];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00ed];
 	uint32 Color1A;				/* b0-31 is color */
 	struct {
 		uint32 LeftTop;			/* b0-15 is top, b16-31 is left */
@@ -115,9 +130,12 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bc];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00af];
 	uint32 Color;				/* b0-31 is color */
-	uint32 reserved02[0x003e];
+	uint32 reserved03[0x003e];
 	struct {
 		uint32 Point0;			/* b0-15 is X, b16-31 is Y: starting coordinate */
 		uint32 Point1;			/* b0-15 is X, b16-31 is Y: ending coordinate */
@@ -151,9 +169,12 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bc];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00af];
 	uint32 Color;				/* b0-31 is color */
-	uint32 reserved02[0x003e];
+	uint32 reserved03[0x003e];
 	struct {
 		uint32 TopLeft;			/* b0-15 is left, b16-31 is top */
 		uint32 HeightWidth;		/* b0-15 is width, b16-31 is height */
@@ -176,7 +197,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bb];
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00ae];
 	uint32 Colorkey;			/* texture colorkey */
 	uint32 Offset;				/* texture offset */
 	uint32 Format;				/* texture colorspace, size, and a lot more */
@@ -184,7 +208,7 @@ typedef struct {
 	uint32 Blend;				/* triangle blend: shade, perspective, specular.. */
 	uint32 Control;				/* triangle control: Z-enable, culling, dither.. */	
 	uint32 FogColor;			/* fog colorvalue */
-	uint32 reserved02[0x0039];
+	uint32 reserved03[0x0039];
 	struct {
 		float ScreenX;			/* X */
 		float ScreenY;			/* Y */
@@ -210,7 +234,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bd];	/* fixme? there's more here that's not used apparantly */
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00b0];	/* fixme? there's more here that's not used apparantly */
 	uint32 Pitch;				/* b16-31 is Z-buffer, b0-15 is colorbuffer pitch */
 	uint32 SetOffsetColor;		/* b0-31 is colorbuffer (renderbuffer) offset */
 	uint32 SetOffsetZeta;		/* b0-31 is Z-buffer (zeta buffer) offset */
@@ -222,7 +249,10 @@ typedef struct {
 	uint32 reserved00[0x0004];
 	uint16 FifoFree;			/* little endian (FIFO internal register) */
 	uint16 Nop;					/* little endian (FIFO internal register) */
-	uint32 reserved01[0x00bd];	/* fixme? there's more here that's not used apparantly */
+	uint32 reserved01[0x000b];
+	uint32 DMAPut;				/* b2-28 is DMA Put offset (FIFO internal register) */
+	uint32 DMAGet;				/* b2-28 is DMA Get offset (FIFO internal register) */
+	uint32 reserved02[0x00b0];	/* fixme? there's more here that's not used apparantly */
 	uint32 Pitch;				/* b0-15 is buffer pitch */
 	uint32 SetOffset;			/* b0-22 is buffer offset (so just 1st 8Mb adressable!) */
 } cmd_nv3_surface_x;			/* x = 0, 1, 2 or 3: selects buffer to be setup;
