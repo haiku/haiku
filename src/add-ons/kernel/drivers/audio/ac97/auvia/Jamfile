@@ -16,3 +16,15 @@ R5KernelAddon auvia : kernel drivers bin :
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : auvia ;
 }
+
+Package openbeos-auvia-cvs
+	:
+	auvia
+	:
+	boot home config add-ons kernel drivers bin ;
+
+Package openbeos-auvia-cvs
+	:
+	<kernel!drivers!dev!audio!multi>auvia
+	:
+	boot home config add-ons kernel drivers dev audio multi ;
