@@ -389,6 +389,20 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 			} else {
 				// create a pop up menu field
 
+				// ToDo: replace BOptionPopUp (or fix it in OpenBeOS...)
+				// this is a workaround for a bug in BOptionPopUp - you need to
+				// know the actual width before creating the object - very nice...
+
+				BFont font;
+				float width = 0;
+				for (int32 i = 0; i < discrete.CountItems(); i++) {
+					float labelWidth = font.StringWidth(discrete.ItemNameAt(i));
+					if (labelWidth > width)
+						width = labelWidth;
+				}
+				width += font.StringWidth(discrete.Name()) + 55;
+				rect.right = rect.left + width;
+
 				BOptionPopUp *popUp = new BOptionPopUp(rect, discrete.Name(), discrete.Name(), NULL);
 
 				for (int32 i = 0; i < discrete.CountItems(); i++) {
