@@ -233,7 +233,7 @@ TerminalApp::ArgvReceived(int32 argc, char * const argv[], const char * cwd)
 					}
 				break;
 				case '?':
-					printf("wth is that?\n");
+					// getopt prints error message
 					return;
 				break;
 				default:

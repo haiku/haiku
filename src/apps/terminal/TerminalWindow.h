@@ -73,7 +73,7 @@ private:
 	BMenuItem		*fSaveAsSettingsFile;
 	
 	// Main views
-	TerminalTextView*fTextView;
+	BView           *fShellView;
 	BScrollView     *fScrollView;
 	
 	// File panels

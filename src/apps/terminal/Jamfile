@@ -8,7 +8,6 @@ AddResources Terminal :
 
 App Terminal :
 	Terminal.cpp
-	TerminalTextView.cpp
 	TerminalWindow.cpp
 	TerminalApp.cpp
 	;
