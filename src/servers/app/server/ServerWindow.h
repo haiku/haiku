@@ -95,7 +95,7 @@ public:
 	bool IsLocked(void);
 	thread_id ThreadID(void) const { return fMonitorThreadID;}
 	
-	void DispatchMessage(int32 code);
+	void DispatchMessage(PortMessage *msg);
 	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
 	static int32 MonitorWin(void *data);
 	static void HandleMouseEvent(PortMessage *msg);

@@ -235,6 +235,10 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	
 	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName()));
 	
+	// in case we want to be added to the current workspace
+	if (winBorder->Window()->Workspaces() == 0)
+		winBorder->Window()->QuietlySetWorkspaces(0x00000001 << (ActiveWorkspaceIndex()-1));
+
 	// add winBorder to the known list of WinBorders so we can keep track of it.
 	AddChild(winBorder, this);
 

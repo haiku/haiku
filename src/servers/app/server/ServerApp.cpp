@@ -364,6 +364,7 @@ int32 ServerApp::MonitorApp(void *data)
 				{
 					BMessage pleaseQuit(B_QUIT_REQUESTED);
 					app->SendMessageToClient(&pleaseQuit);
+					app->WindowBroadcast(AS_QUIT_APP);
 				}
 				break;
 			}

@@ -318,7 +318,6 @@ void ServerWindow::Show(void)
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
-debugger("");
 	if(fWinBorder->IsHidden())
 		return;
 
@@ -539,21 +538,20 @@ bool ServerWindow::IsLocked(void)
 	return fLocker.IsLocked();
 }
 
-void ServerWindow::DispatchMessage(int32 code)
+void ServerWindow::DispatchMessage(PortMessage *msg)
 {
-	PortMessage msg;
-	switch(code)
+	switch(msg->Code())
 	{
 		//--------- BView Messages -----------------
 		case AS_SET_CURRENT_LAYER:
 		{
 			int32 token;
 			
-			msg.Read<int32>(&token);
+			msg->Read<int32>(&token);
 			
 			Layer *current = FindLayer(fTopLayer, token);
 			if (current)
-				cl		= current;
+				cl=current;
 			else // hope this NEVER happens! :-)
 				debugger("Server PANIC: window cannot find Layer with ID\n");
 
@@ -563,7 +561,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		case AS_LAYER_CREATE:
 		{
 /*
-TODO:	Figure out what Adi did here and convert to PortMessages
+			// TODO: Figure out what Adi did here and convert to PortMessages
 
 			// Received when a view is attached to a window. This will require
 			// us to attach a layer in the tree in the same manner and invalidate
@@ -580,45 +578,47 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32		childCount;
 			char*		name;
 		
-			msg.Read<int32>(&token);
-			msg.ReadString(&name);
-			msg.Read<BRect>(&frame);
-			msg.Read<int32>((int32*)&resizeMask);
-			msg.Read<int32>((int32*)&flags);
-			msg.Read<bool>(&hidden);
-			msg.Read<int32>(&childCount);
+			msg->Read<int32>(&token);
+			msg->ReadString(&name);
+			msg->Read<BRect>(&frame);
+			msg->Read<int32>((int32*)&resizeMask);
+			msg->Read<int32>((int32*)&flags);
+			msg->Read<bool>(&hidden);
+			msg->Read<int32>(&childCount);
 			
-				// view's visible area is invalidated here
+			// view's visible area is invalidated here
 			Layer		*newLayer;
 			newLayer	= new Layer(frame, name, token, resizeMask, flags, this);
-				// there is no way of setting this, other than manual. :-)
+
+			// there is no way of setting this, other than manual. :-)
 			newLayer->_hidden	= hidden;
 			
 				// we set Layer's attributes (BView's state)
 			cl			= newLayer;
 			
 			int32 msgCode;
-			msg.Read<int32>(&msgCode);		// this is AS_LAYER_SET_FONT_STATE
+			msg->Read<int32>(&msgCode);		// this is AS_LAYER_SET_FONT_STATE
 			DispatchMessage(msgCode);
 
-			msg.Read<int32>(&msgCode);		// this is AS_LAYER_SET_STATE
+			msg->Read<int32>(&msgCode);		// this is AS_LAYER_SET_STATE
 			DispatchMessage(msgCode);
 
-				// attach the view to the tree structure.
+			// attach the view to the tree structure.
 			oldCL->AddChild(newLayer);
 			
-				// attach its children.
-			for(int i = 0; i < childCount; i++){
-				msg.Read<int32>(&msgCode);		// this is AS_LAYER_CREATE
+			// attach its children.
+			for(int i = 0; i < childCount; i++)
+			{
+				msg->Read<int32>(&msgCode);		// this is AS_LAYER_CREATE
 				DispatchMessage(msgCode);
 			}
 			
 			cl			= oldCL;
 			
 			STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", fTitle.String(), cl->_name->String(), name));
-*/
+
 			break;
-		}
+*/		}
 		case AS_LAYER_DELETE:
 		{
 			// Received when a view is detached from a window. This is definitely
@@ -629,10 +629,11 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			Layer		*parent;
 			parent		= cl->_parent;
 			
-				// here we remove current layer from list.
+			// here we remove current layer from list.
 			cl->RemoveSelf();
+
 			// TODO: invalidate the region occupied by this view.
-			//			Should be done in Layer::RemoveChild() though!
+			// Should be done in Layer::RemoveChild() though!
 			cl->PruneTree();
 
 			parent->PrintTree();
@@ -640,7 +641,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 
 			delete cl;
 
-			cl 			= parent;
+			cl=parent;
 			break;
 		}
 		case AS_LAYER_SET_STATE:
@@ -651,22 +652,22 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			pattern			patt;
 			int32			clippRegRects;
 
-			msg.Read<BPoint>(&(cl->_layerdata->penlocation));
-			msg.Read<float>(&(cl->_layerdata->pensize));
-			msg.Read<rgb_color>(&highColor);
-			msg.Read<rgb_color>(&lowColor);
-			msg.Read<rgb_color>(&viewColor);
-			msg.Read<pattern>(&patt);	
-			msg.Read<int8>((int8*)&(cl->_layerdata->draw_mode));
-			msg.Read<BPoint>(&(cl->_layerdata->coordOrigin));
-			msg.Read<int8>((int8*)&(cl->_layerdata->lineJoin));
-			msg.Read<int8>((int8*)&(cl->_layerdata->lineCap));
-			msg.Read<float>(&(cl->_layerdata->miterLimit));
-			msg.Read<int8>((int8*)&(cl->_layerdata->alphaSrcMode));
-			msg.Read<int8>((int8*)&(cl->_layerdata->alphaFncMode));
-			msg.Read<float>(&(cl->_layerdata->scale));
-			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
-			msg.Read<int32>(&clippRegRects);
+			msg->Read<BPoint>(&(cl->_layerdata->penlocation));
+			msg->Read<float>(&(cl->_layerdata->pensize));
+			msg->Read<rgb_color>(&highColor);
+			msg->Read<rgb_color>(&lowColor);
+			msg->Read<rgb_color>(&viewColor);
+			msg->Read<pattern>(&patt);	
+			msg->Read<int8>((int8*)&(cl->_layerdata->draw_mode));
+			msg->Read<BPoint>(&(cl->_layerdata->coordOrigin));
+			msg->Read<int8>((int8*)&(cl->_layerdata->lineJoin));
+			msg->Read<int8>((int8*)&(cl->_layerdata->lineCap));
+			msg->Read<float>(&(cl->_layerdata->miterLimit));
+			msg->Read<int8>((int8*)&(cl->_layerdata->alphaSrcMode));
+			msg->Read<int8>((int8*)&(cl->_layerdata->alphaFncMode));
+			msg->Read<float>(&(cl->_layerdata->scale));
+			msg->Read<bool>(&(cl->_layerdata->fontAliasing));
+			msg->Read<int32>(&clippRegRects);
 			
 			cl->_layerdata->patt.Set(*((uint64*)&patt));
 			cl->_layerdata->highcolor.SetColor(highColor);
@@ -682,7 +683,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				BRect		rect;
 				
 				for(int32 i = 0; i < clippRegRects; i++){
-					msg.Read<BRect>(&rect);
+					msg->Read<BRect>(&rect);
 					cl->_layerdata->clippReg->Include(rect);
 				}
 
@@ -704,11 +705,11 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			uint16			mask;
 
-			msg.Read<uint16>(&mask);
+			msg->Read<uint16>(&mask);
 			
 			if (mask & B_FONT_FAMILY_AND_STYLE){
 				uint32		fontID;
-				msg.Read<int32>((int32*)&fontID);
+				msg->Read<int32>((int32*)&fontID);
 				// TODO: implement later. Currently there is no SetFamAndStyle(uint32)
 				//   in ServerFont class. DW, could you add one?
 				//cl->_layerdata->font->
@@ -716,43 +717,43 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 	
 			if (mask & B_FONT_SIZE){
 				float		size;
-				msg.Read<float>(&size);
+				msg->Read<float>(&size);
 				cl->_layerdata->font.SetSize(size);
 			}
 
 			if (mask & B_FONT_SHEAR){
 				float		shear;
-				msg.Read<float>(&shear);
+				msg->Read<float>(&shear);
 				cl->_layerdata->font.SetShear(shear);
 			}
 
 			if (mask & B_FONT_ROTATION){
 				float		rotation;
-				msg.Read<float>(&rotation);
+				msg->Read<float>(&rotation);
 				cl->_layerdata->font.SetRotation(rotation);
 			}
 
 			if (mask & B_FONT_SPACING){
 				uint8		spacing;
-				msg.Read<uint8>(&spacing);	// uint8
+				msg->Read<uint8>(&spacing);	// uint8
 				cl->_layerdata->font.SetSpacing(spacing);
 			}
 
 			if (mask & B_FONT_ENCODING){
 				uint8		encoding;
-				msg.Read<int8>((int8*)&encoding); // uint8
+				msg->Read<int8>((int8*)&encoding); // uint8
 				cl->_layerdata->font.SetEncoding(encoding);
 			}
 
 			if (mask & B_FONT_FACE){
 				uint16		face;
-				msg.Read<uint16>(&face);	// uint16
+				msg->Read<uint16>(&face);	// uint16
 				cl->_layerdata->font.SetFace(face);
 			}
 	
 			if (mask & B_FONT_FLAGS){
 				uint32		flags;
-				msg.Read<uint32>(&flags); // uint32
+				msg->Read<uint32>(&flags); // uint32
 				cl->_layerdata->font.SetFlags(flags);
 			}
 
@@ -822,8 +823,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			float		x, y;
 			
-			msg.Read<float>(&x);
-			msg.Read<float>(&y);
+			msg->Read<float>(&x);
+			msg->Read<float>(&y);
 			
 			cl->MoveBy(x, y);
 
@@ -834,8 +835,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			float		newWidth, newHeight;
 			
-			msg.Read<float>(&newWidth);
-			msg.Read<float>(&newHeight);
+			msg->Read<float>(&newWidth);
+			msg->Read<float>(&newHeight);
 
 			// TODO: check for minimum alowed. WinBorder should provide such
 			// a method, based on its decorator.
@@ -859,8 +860,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			float		x, y;
 			
-			msg.Read<float>(&x);
-			msg.Read<float>(&y);
+			msg->Read<float>(&x);
+			msg->Read<float>(&y);
 			
 			cl->_layerdata->coordOrigin.Set(x, y);
 			
@@ -877,7 +878,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
-			msg.Read<uint32>(&(cl->_resize_mode));
+			msg->Read<uint32>(&(cl->_resize_mode));
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
@@ -886,7 +887,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			int32		token;
 
-			msg.Read<int32>(&token);
+			msg->Read<int32>(&token);
 			
 			cursormanager->SetCursor(token);
 
@@ -895,7 +896,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
-			msg.Read<uint32>(&(cl->_flags));
+			msg->Read<uint32>(&(cl->_flags));
 			
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
@@ -923,9 +924,9 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			// it was called. e.g.: different lineCap or lineJoin. Strange result
 			// would appear.
 
-			msg.Read<int8>(&lineCap);
-			msg.Read<int8>(&lineJoin);
-			msg.Read<float>(&(cl->_layerdata->miterLimit));
+			msg->Read<int8>(&lineCap);
+			msg->Read<int8>(&lineJoin);
+			msg->Read<float>(&(cl->_layerdata->miterLimit));
 			
 			cl->_layerdata->lineCap		= (cap_mode)lineCap;
 			cl->_layerdata->lineJoin	= (join_mode)lineJoin;
@@ -972,7 +973,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			msg.Read<float>(&(cl->_layerdata->scale));
+			msg->Read<float>(&(cl->_layerdata->scale));
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
 			break;
@@ -995,8 +996,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			float		x, y;
 			
-			msg.Read<float>(&x);
-			msg.Read<float>(&y);
+			msg->Read<float>(&x);
+			msg->Read<float>(&y);
 			
 			cl->_layerdata->penlocation.Set(x, y);
 		
@@ -1013,7 +1014,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			msg.Read<float>(&(cl->_layerdata->pensize));
+			msg->Read<float>(&(cl->_layerdata->pensize));
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
@@ -1030,7 +1031,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			rgb_color		c;
 			
-			msg.Read<rgb_color>(&c);
+			msg->Read<rgb_color>(&c);
 			
 			cl->_layerdata->highcolor.SetColor(c);
 		
@@ -1041,7 +1042,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			rgb_color		c;
 			
-			msg.Read<rgb_color>(&c);
+			msg->Read<rgb_color>(&c);
 			
 			cl->_layerdata->lowcolor.SetColor(c);
 		
@@ -1052,7 +1053,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			rgb_color		c;
 			
-			msg.Read<rgb_color>(&c);
+			msg->Read<rgb_color>(&c);
 			
 			cl->_layerdata->viewcolor.SetColor(c);
 		
@@ -1079,8 +1080,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			int8		srcAlpha, alphaFunc;
 			
-			msg.Read<int8>(&srcAlpha);
-			msg.Read<int8>(&alphaFunc);
+			msg->Read<int8>(&srcAlpha);
+			msg->Read<int8>(&alphaFunc);
 			
 			cl->_layerdata->alphaSrcMode	= (source_alpha)srcAlpha;
 			cl->_layerdata->alphaFncMode	= (alpha_function)alphaFunc;
@@ -1101,7 +1102,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		{
 			int8		drawingMode;
 			
-			msg.Read<int8>(&drawingMode);
+			msg->Read<int8>(&drawingMode);
 			
 			cl->_layerdata->draw_mode	= (drawing_mode)drawingMode;
 
@@ -1118,7 +1119,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
-			msg.Read<bool>(&(cl->_layerdata->fontAliasing));
+			msg->Read<bool>(&(cl->_layerdata->fontAliasing));
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
@@ -1129,8 +1130,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32		pictureToken;
 			BPoint		where;
 			
-			msg.Read<int32>(&pictureToken);
-			msg.Read<BPoint>(&where);
+			msg->Read<int32>(&pictureToken);
+			msg->Read<BPoint>(&where);
 
 		
 			BRegion			reg;
@@ -1198,8 +1199,8 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32		pictureToken;
 			BPoint		where;
 			
-			msg.Read<int32>(&pictureToken);
-			msg.Read<BPoint>(&where);
+			msg->Read<int32>(&pictureToken);
+			msg->Read<BPoint>(&where);
 
 			ServerPicture	*sp = NULL;
 			int32			i = 0;
@@ -1272,10 +1273,10 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			else
 				cl->_layerdata->clippReg = new BRegion();
 			
-			msg.Read<int32>(&noOfRects);
+			msg->Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++){
-				msg.Read<BRect>(&r);
+				msg->Read<BRect>(&r);
 				cl->_layerdata->clippReg->Include(r);
 			}
 
@@ -1292,7 +1293,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 // TODO: watch out for the coordinate system
 			BRect		invalRect;
 			
-			msg.Read<BRect>(&invalRect);
+			msg->Read<BRect>(&invalRect);
 			
 			cl->Invalidate(invalRect);
 
@@ -1308,10 +1309,10 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 			int32			noOfRects;
 			BRect			rect;
 			
-			msg.Read<int32>(&noOfRects);
+			msg->Read<int32>(&noOfRects);
 			
 			for(int i = 0; i < noOfRects; i++){
-				msg.Read<BRect>(&rect);
+				msg->Read<BRect>(&rect);
 				invalReg.Include(rect);
 			}
 			
@@ -1398,8 +1399,6 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				fSession->WriteInt32(SERVER_FALSE);
 				fSession->Sync();
 			}
-			// TODO: Implement
-			STRACE(("\n\n\n\n\n\nServerWindow %s: Message ADD_TO_SUBSET unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_REM_FROM_SUBSET:
@@ -1422,8 +1421,6 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 				fSession->WriteInt32(SERVER_FALSE);
 				fSession->Sync();
 			}
-			// TODO: Implement
-			STRACE(("ServerWindow %s: Message Remove_From_Subset unimplemented\n",fTitle.String()));
 			break;
 		}
 		case AS_SET_LOOK:
@@ -1506,7 +1503,7 @@ TODO:	Figure out what Adi did here and convert to PortMessages
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), msg.Code() - SERVER_TRUE);
+			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), msg->Code() - SERVER_TRUE);
 			break;
 		}
 	}
@@ -2062,14 +2059,22 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow 	*win = (ServerWindow *)data;
-	bool			quitting = false;
-	int32			code;
+	PortQueue msgqueue(win->fMessagePort);
+	PortMessage *msg;
+	bool quitting = false;
 	
 	while(!quitting)
 	{
-		code		= 0;
-		win->fSession->ReadInt32(&code);
-		switch(code)
+		if(!msgqueue.MessagesWaiting())
+			msgqueue.GetMessagesFromPort(true);
+		else
+			msgqueue.GetMessagesFromPort(false);
+
+		msg	= msgqueue.GetMessageFromQueue();
+		if(!msg)
+			continue;
+
+		switch(msg->Code())
 		{
 			case AS_QUIT_APP:
 			{
@@ -2105,7 +2110,7 @@ int32 ServerWindow::MonitorWin(void *data)
 			default:
 			{
 				STRACE(("ServerWindow %s: got a message to dispatch\n",win->Title()));
-				win->DispatchMessage(code);
+				win->DispatchMessage(msg);
 				break;
 			}
 		}
