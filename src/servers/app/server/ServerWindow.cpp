@@ -90,7 +90,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	if(_monitorthread!=B_NO_MORE_THREADS && _monitorthread!=B_NO_MEMORY)
 		resume_thread(_monitorthread);
 
-	_workspace=index;
+	_workspace_index=index;
 
 	AddWindowToDesktop(this,index);
 }
@@ -138,12 +138,12 @@ ServerApp *ServerWindow::GetApp(void)
 
 void ServerWindow::Show(void)
 {
-	if(_winborder)
+/*	if(_winborder)
 	{
-//	TODO: uncomment this when we have WinBorder.h	
-//		_winborder->ShowLayer();
+		_winborder->ShowLayer();
 		ActivateWindow(this);
 	}
+*/
 }
 
 void ServerWindow::Hide(void)
@@ -448,13 +448,14 @@ void ServerWindow::HandleKeyEvent(int32 code, int8 *buffer)
 {
 }
 
-void ActivateWindow(ServerWindow *win)
+void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin)
 {
-	if(active_serverwindow==win)
+/*	if(active_serverwindow==win)
 		return;
 	if(active_serverwindow)
 		active_serverwindow->SetFocus(false);
 	active_serverwindow=win;
 	if(win)
 		win->SetFocus(true);
+*/
 }

@@ -41,6 +41,7 @@ class ServerApp;
 class Decorator;
 class PortLink;
 class WinBorder;
+class Workspace;
 
 class ServerWindow
 {
@@ -76,6 +77,9 @@ public:
 	static void HandleMouseEvent(int32 code, int8 *buffer);
 	static void HandleKeyEvent(int32 code, int8 *buffer);
 	void Loop(void);
+	
+	int32 GetWorkspaceIndex(void) { return _workspace_index; }
+	Workspace *GetWorkspace(void) { return _workspace; }
 
 protected:	
 	friend ServerApp;
@@ -83,7 +87,8 @@ protected:
 	
 	BString *_title;
 	int32 _look, _feel, _flags;
-	int32 _workspace;
+	int32 _workspace_index;
+	Workspace *_workspace;
 	bool _active;
 	
 	ServerApp *_app;
@@ -101,7 +106,7 @@ protected:
 	uint32 _token;
 };
 
-void ActivateWindow(ServerWindow *win);
+void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin);
 
 
 #endif

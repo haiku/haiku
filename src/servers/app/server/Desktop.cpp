@@ -48,7 +48,7 @@ namespace desktop_private {
 	BLocker draglock,
 			layerlock,
 			workspacelock;
-	BList *desktop_private::screenlist=NULL;
+	BList *screenlist=NULL;
 	Screen *activescreen=NULL;
 }
 
@@ -320,24 +320,55 @@ void RemoveWindowFromDesktop(ServerWindow *win)
 {
 }
 
+/*!
+	\brief Returns the active window in the current workspace of the active screen
+	\return The active window in the current workspace of the active screen
+*/
 ServerWindow *GetActiveWindow(void)
 {
-	return NULL;
+	desktop_private::workspacelock.Lock();
+	ServerWindow *w=desktop_private::activescreen->ActiveWindow();
+	desktop_private::workspacelock.Unlock();
+
+	return w;
 }
 
+/*!
+	\brief Sets the active window in the current workspace of the active screen
+	\param win The window to activate
+	
+	If the window is not in the current workspace of the active screen, this call fails
+*/
 void SetActiveWindow(ServerWindow *win)
 {
+	desktop_private::workspacelock.Lock();
+	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
+	if(win->GetWorkspace()!=w)
+	{
+		desktop_private::workspacelock.Unlock();
+		return;
+	}
+	
+	ServerWindow *oldwin=desktop_private::activescreen->ActiveWindow();
+	ActivateWindow(oldwin,win);
+	
+	
+	desktop_private::workspacelock.Unlock();
 }
 
 /*!
 	\brief Returns the root layer for the specified workspace
 	\param workspace Index of the workspace to use
-	\param screen Index of the screen to use
+	\param screen Index of the screen to use. Currently ignored.
 	\return The root layer or NULL if there was an invalid parameter.
 */
 Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN_SCREEN_ID)
 {
-	return NULL;
+	desktop_private::workspacelock.Lock();
+	Layer *r=desktop_private::activescreen->GetRootLayer();
+	desktop_private::workspacelock.Unlock();
+
+	return r;
 }
 
 /*!
@@ -354,6 +385,17 @@ Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE, screen_id screen=B_MAIN
 */
 void set_drag_message(int32 size, int8 *flattened)
 {
+	desktop_private::draglock.Lock();
+
+	if(desktop_private::dragmessage)
+	{
+		desktop_private::draglock.Unlock();
+		return;
+	}
+	desktop_private::dragmessage=flattened;
+	desktop_private::dragmessagesize=size;
+
+	desktop_private::draglock.Unlock();
 }
 
 /*!
@@ -368,11 +410,29 @@ void set_drag_message(int32 size, int8 *flattened)
 */
 int8 *get_drag_message(int32 *size)
 {
-	return NULL;
+	int8 *ptr=NULL;
+	
+	desktop_private::draglock.Lock();
+
+	if(desktop_private::dragmessage)
+	{
+		ptr=desktop_private::dragmessage;
+		*size=desktop_private::dragmessagesize;
+	}
+	desktop_private::draglock.Unlock();
+	return ptr;
 }
 
 //! Empties current drag data and allows for new data to be assigned
 void empty_drag_message(void)
 {
+	desktop_private::draglock.Lock();
+
+	if(desktop_private::dragmessage)
+		delete desktop_private::dragmessage;
+	desktop_private::dragmessage=NULL;
+	desktop_private::dragmessagesize=0;
+
+	desktop_private::draglock.Unlock();
 }
 
