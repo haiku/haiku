@@ -338,6 +338,8 @@ extern const int disable_debugger(int state);
 #	define B_MAX_CPU_COUNT	8
 #endif
 
+#define OBOS_CPU_TYPES
+
 typedef enum cpu_types {
 	// ToDo: add latest models
 
@@ -366,8 +368,10 @@ typedef enum cpu_types {
 	B_CPU_INTEL_CELERON					= 0x1066,
 	B_CPU_INTEL_PENTIUM_III				= 0x1067,
 	B_CPU_INTEL_PENTIUM_III_MODEL_8		= 0x1068,
+#ifdef OBOS_CPU_TYPES
 	B_CPU_INTEL_PENTIUM_IV				= 0x10f0,
 	B_CPU_INTEL_PENTIUM_IV_MODEL2,
+#endif
 
 	/* AMD */
 	B_CPU_AMD_X86						= 0x1100,
@@ -381,9 +385,12 @@ typedef enum cpu_types {
 	B_CPU_AMD_K6_2						= 0x1158,
 	B_CPU_AMD_K6_MODEL9					= 0x1159,
 	B_CPU_AMD_K6_III					= 0x1159,
+#ifdef OBOS_CPU_TYPES
 	B_CPU_AMD_K6_III_MODEL2				= 0x115D,
+#endif
 
 	B_CPU_AMD_ATHLON_MODEL1				= 0x1161,
+#ifdef OBOS_CPU_TYPES
 	B_CPU_AMD_ATHLON_MODEL2 			= 0x1162,
 		
 	B_CPU_AMD_DURON 					= 0x1163,	
@@ -392,6 +399,7 @@ typedef enum cpu_types {
 	B_CPU_AMD_ATHLON_XP 				= 0x1166,
 	B_CPU_AMD_ATHLON_XP_MODEL2,
 	B_CPU_AMD_ATHLON_XP_MODEL3,
+#endif
 	
 	/* VIA */
 	B_CPU_CYRIX_X86						= 0x1200,
@@ -406,8 +414,10 @@ typedef enum cpu_types {
 	B_CPU_RISE_X86						= 0x1400,
 	B_CPU_RISE_mP6						= 0x1450,
 
+#ifdef OBOS_CPU_TYPES
 	B_CPU_NATIONAL_X86					= 0x1500,
 	B_CPU_NATIONAL_GEODE_GX1			= 0x1554,
+#endif
 
 	/* For compatibility */
 	B_CPU_AMD_29K						= 14,
