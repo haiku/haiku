@@ -38,13 +38,14 @@ TokenHandler screen_id_handler;
 	\param fbinfo The frame buffer info
 	\param gfxdriver DisplayDriver for the associated RootLayer
 */
-Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, DisplayDriver *gfxdriver)
+Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, Screen *screen)
 {
 	_gcinfo=gcinfo;
 	_fbinfo=fbinfo;
 	
+	_screen=screen;
 	_rootlayer=new RootLayer(BRect(0,0,fbinfo.display_width-1,fbinfo.display_height-1),
-		"Workspace Root",gfxdriver);
+		"Workspace Root",_screen->GetGfxDriver());
 	_rootlayer->SetColor(workspace_default_color);
 }
 
@@ -170,7 +171,7 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 		_workspacecount = workspaces;
 		for (int i=0; i<workspaces; i++)
 		{
-			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo,_driver));
+			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo,this));
 		}
 		_resolution=_driver->GetMode();
 		_currentworkspace=0;
@@ -203,7 +204,7 @@ Screen::~Screen(void)
 */
 void Screen::AddWorkspace(int32 index)
 {
-	Workspace *workspace = new Workspace(_gcinfo,_fbinfo,_driver);
+	Workspace *workspace = new Workspace(_gcinfo,_fbinfo,this);
 	if ( (index == -1) || !_workspacelist->AddItem(workspace,index) )
 		_workspacelist->AddItem(workspace);
 }
@@ -398,3 +399,14 @@ Workspace *Screen::GetActiveWorkspace(void)
 	return _activeworkspace;
 }
 
+/*!
+	\brief Returns a pointer to the Workspace at the specified index
+	\return A pointer to the Workspace at the specified index
+*/
+Workspace *Screen::GetWorkspace(int32 index)
+{
+	if(index==_currentworkspace)
+		return _activeworkspace;
+
+	return (Workspace*)_workspacelist->ItemAt(index);
+}

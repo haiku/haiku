@@ -75,6 +75,7 @@ public:
 
 	void Show(void);
 	void Hide(void);
+	bool IsHidden(void);
 
 	BRect Bounds(void);
 	BRect Frame(void);

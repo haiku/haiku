@@ -516,6 +516,15 @@ void Layer::Hide(void)
 }
 
 /*!
+	\brief Determines whether the layer is hidden or not
+	\return true if hidden, false if not.
+*/
+bool Layer::IsHidden(void)
+{
+	return (_hidecount==0)?false:true;
+}
+
+/*!
 	\brief Counts the number of children the layer has
 	\return the number of children the layer has, not including grandchildren
 */

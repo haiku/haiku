@@ -57,6 +57,7 @@ public:
 	void RebuildRegions(bool recursive=true);
 	void Activate(bool active=false);
 	ServerWindow *Window(void) { return _win; }
+	Decorator *GetDecorator(void) { return _decorator; }
 protected:
 	ServerWindow *_win;
 	BString *_title;

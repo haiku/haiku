@@ -322,12 +322,12 @@ void AppServer::MainLoop(void)
 		{
 			switch(msgcode)
 			{
-				case CREATE_APP:
-				case DELETE_APP:
-				case GET_SCREEN_MODE:
+				case AS_CREATE_APP:
+				case AS_DELETE_APP:
+				case AS_GET_SCREEN_MODE:
 				case B_QUIT_REQUESTED:
-				case UPDATED_CLIENT_FONTLIST:
-				case QUERY_FONTS_CHANGED:
+				case AS_UPDATED_CLIENT_FONTLIST:
+				case AS_QUERY_FONTS_CHANGED:
 					DispatchMessage(msgcode,msgbuffer);
 					break;
 				default:
@@ -341,7 +341,7 @@ void AppServer::MainLoop(void)
 
 		if(buffersize>0)
 			delete msgbuffer;
-		if(msgcode==DELETE_APP || msgcode==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER)
+		if(msgcode==AS_DELETE_APP || msgcode==B_QUIT_REQUESTED && DISPLAYDRIVER!=HWDRIVER)
 		{
 			if(_quitting_server==true && _applist->CountItems()==0)
 				break;
@@ -402,7 +402,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 	int8 *index=buffer;
 	switch(code)
 	{
-		case CREATE_APP:
+		case AS_CREATE_APP:
 		{
 			// Create the ServerApp to node monitor a new BApplication
 			
@@ -436,7 +436,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			_active_app=_applist->CountItems()-1;
 
 			PortLink *replylink=new PortLink(reply_port);
-			replylink->SetOpCode(SET_SERVER_PORT);
+			replylink->SetOpCode(AS_SET_SERVER_PORT);
 			replylink->Attach((int32)newapp->_receiver);
 			replylink->Flush();
 
@@ -447,7 +447,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			newapp->Run();
 			break;
 		}
-		case DELETE_APP:
+		case AS_DELETE_APP:
 		{
 			// Delete a ServerApp. Received only from the respective ServerApp when a
 			// BApplication asks it to quit.
@@ -497,7 +497,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			}
 			break;
 		}
-		case UPDATED_CLIENT_FONTLIST:
+		case AS_UPDATED_CLIENT_FONTLIST:
 		{
 			// received when the client-side global font list has been
 			// refreshed
@@ -506,7 +506,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			fontserver->Unlock();
 			break;
 		}
-		case QUERY_FONTS_CHANGED:
+		case AS_QUERY_FONTS_CHANGED:
 		{
 			// Client application is asking if the font list has changed since
 			// the last client-side refresh
@@ -525,7 +525,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			
 			break;
 		}
-		case GET_SCREEN_MODE:
+		case AS_GET_SCREEN_MODE:
 		{
 			// Synchronous message call to get the stats on the current screen mode
 			// in the app_server. Simply a hack in place for the Input Server until
@@ -540,7 +540,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			// 3) int depth
 			
 			PortLink *replylink=new PortLink(*((port_id*)index));
-			replylink->SetOpCode(GET_SCREEN_MODE);
+			replylink->SetOpCode(AS_GET_SCREEN_MODE);
 			replylink->Attach((int16)_driver->GetWidth());
 			replylink->Attach((int16)_driver->GetHeight());
 			replylink->Attach((int16)_driver->GetDepth());
@@ -559,7 +559,7 @@ void AppServer::DispatchMessage(int32 code, int8 *buffer)
 			if(DISPLAYDRIVER==HWDRIVER)
 				break;
 			
-			Broadcast(QUIT_APP);
+			Broadcast(AS_QUIT_APP);
 
 			// So when we delete the last ServerApp, we can exit the server
 			_quitting_server=true;

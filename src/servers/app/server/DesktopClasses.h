@@ -36,6 +36,7 @@
 class DisplayDriver;
 class ServerWindow;
 class RGBColor;
+class Screen;
 
 /*!
 	\class Workspace DesktopClasses.h
@@ -47,7 +48,7 @@ class RGBColor;
 class Workspace
 {
 public:
-	Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, DisplayDriver *gfxdriver);
+	Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, Screen *screen);
 	~Workspace(void);
 	void SetBGColor(const RGBColor &c);
 	RGBColor BGColor();
@@ -55,10 +56,13 @@ public:
 	void SetData(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo);
 	void GetData(graphics_card_info *gcinfo, frame_buffer_info *fbinfo);
 	void SetSpace(int32 res);
+	//! Returns the screen to which the workspace belongs
+	Screen *GetScreen(void) { return _screen; }
 protected:
 	RootLayer *_rootlayer;
 	graphics_card_info _gcinfo;
 	frame_buffer_info _fbinfo;
+	Screen *_screen;
 };
 
 /*!
@@ -88,6 +92,7 @@ public:
 	void SetActiveWindow(ServerWindow *win);
 	Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE);
 	bool IsInitialized(void);
+	Workspace *GetWorkspace(int32 index);
 	Workspace *GetActiveWorkspace(void);
 	//! Returns the unique identifier for the screen
 	int32 GetID(void) { return _id; }

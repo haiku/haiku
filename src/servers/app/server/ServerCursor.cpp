@@ -26,6 +26,7 @@
 //------------------------------------------------------------------------------
 #include "ServerCursor.h"
 #include <stdio.h>
+#include <string.h>
 /*!
 	\brief Constructor
 	\param r Size of the cursor
@@ -92,9 +93,7 @@ ServerCursor::ServerCursor(int8 *data)
 				cursorval=cursorflip & powval;
 				maskval=maskflip & powval;
 				bmppos[i]=((cursorval!=0)?black:white) & ((maskval>0)?0xFFFFFFFF:0x00FFFFFF);
-				printf("%c",((cursorval!=0)?'*':'-'));
 			}
-			printf("\n");
 		}
 	}
 	else
@@ -142,4 +141,16 @@ void ServerCursor::SetHotSpot(BPoint pt)
 {
 	_hotspot=pt;
 	_hotspot.ConstrainTo(Bounds());
+}
+
+void ServerCursor::SetAppSignature(const char *signature)
+{
+	if(_app_signature)
+		delete _app_signature;
+
+	if(signature)
+	{
+		_app_signature=new char[strlen(signature)];
+		strcpy(_app_signature, signature);
+	}
 }

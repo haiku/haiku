@@ -328,3 +328,19 @@ void WinBorder::ResizeBy(BPoint pt)
 void WinBorder::ResizeBy(float x, float y)
 {
 }
+
+void WinBorder::UpdateColors(void)
+{
+}
+
+void WinBorder::UpdateDecorator(void)
+{
+}
+
+void WinBorder::UpdateFont(void)
+{
+}
+
+void WinBorder::UpdateScreen(void)
+{
+}

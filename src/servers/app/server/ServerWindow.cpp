@@ -28,7 +28,6 @@
 #include <Rect.h>
 #include <string.h>
 #include <stdio.h>
-#include <Debug.h>
 #include <View.h>	// for B_XXXXX_MOUSE_BUTTON defines
 #include "AppServer.h"
 #include "Layer.h"
@@ -38,52 +37,40 @@
 #include "ServerProtocol.h"
 #include "WinBorder.h"
 #include "Desktop.h"
+#include "DesktopClasses.h"
 #include "TokenHandler.h"
 
 //! Handler to get BWindow tokens from
 TokenHandler win_token_handler;
 
-// defined in WinBorder.cpp. Locking is not necessary - the only
-// _monitorthread which accesses them is the Poller _monitorthread
-
-//! Used in window focus management
-ServerWindow *active_serverwindow=NULL;
-
 /*!
 	\brief Contructor
 	
-	Sets up a lot of the stuff
+	Does a lot of stuff to set up for the window - new decorator, new winborder, spawn a 
+	monitor thread.
 */
 ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	uint32 wfeel, uint32 wflags, ServerApp *winapp,  port_id winport, uint32 index)
 {
 	_title=new BString;
 	_title->SetTo( (string)?string:"Window" );
-
-	// This must happen before the WinBorder object - it needs this object's _frame
-	// to be valid
 	_frame=rect;
-
-	// set these early also - the _decorator will also need them
 	_flags=wflags;
 	_look=wlook;
 	_feel=wfeel;
 
-	_decorator=new_decorator(_frame,_title->String(),_look,_feel,_flags,GetGfxDriver());
-
 	_winborder=new WinBorder(_frame,_title->String(),0,wflags,this);
 
-	// _sender is the monitored _app's event port
+	// _sender is the monitored window's event port
 	_sender=winport;
 	_winlink=new PortLink(_sender);
 
 	_applink= (winapp)? new PortLink(winapp->_receiver) : NULL;
 	
-	// _receiver is the port to which the _app sends messages for the server
+	// _receiver is the port to which the app sends messages for the server
 	_receiver=create_port(30,_title->String());
 	
 	_active=false;
-	_hidecount=0;
 
 	// Spawn our message monitoring _monitorthread
 	_monitorthread=spawn_thread(MonitorWin,_title->String(),B_NORMAL_PRIORITY,this);
@@ -96,6 +83,7 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	AddWindowToDesktop(this,index);
 }
 
+//!Tears down all connections with the user application, kills the monitoring thread.
 ServerWindow::~ServerWindow(void)
 {
 	RemoveWindowFromDesktop(this);
@@ -105,192 +93,299 @@ ServerWindow::~ServerWindow(void)
 		_applink=NULL;
 		delete _title;
 		delete _winlink;
-		delete _decorator;
-//	TODO: uncomment this when we have WinBorder.h	
-//		delete _winborder;
+		delete _winborder;
 	}
 	kill_thread(_monitorthread);
 }
 
+/*!
+	\brief Requests an update of the specified rectangle
+	\param rect The area to update, in the parent's coordinates
+	
+	This could be considered equivalent to BView::Invalidate()
+*/
 void ServerWindow::RequestDraw(BRect rect)
 {
-	_winlink->SetOpCode(LAYER_DRAW);
+	_winlink->SetOpCode(AS_LAYER_DRAW);
 	_winlink->Attach(&rect,sizeof(BRect));
 	_winlink->Flush();
 }
 
+//! Requests an update for the entire window
+void ServerWindow::RequestDraw(void)
+{
+	RequestDraw(_frame);
+}
+
+//! Forces the window border to update its decorator
 void ServerWindow::ReplaceDecorator(void)
 {
+	_winborder->UpdateDecorator();
 }
 
+//! Requests that the ServerWindow's BWindow quit
 void ServerWindow::Quit(void)
 {
+	_winlink->SetOpCode(B_QUIT_REQUESTED);
+	_winlink->Flush();
 }
 
+/*!
+	\brief Gets the title for the window
+	\return The title for the window
+*/
 const char *ServerWindow::GetTitle(void)
 {
 	return _title->String();
 }
 
+/*!
+	\brief Gets the window's ServerApp
+	\return The ServerApp for the window
+*/
 ServerApp *ServerWindow::GetApp(void)
 {
 	return _app;
 }
 
+//! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
-/*	if(_winborder)
-	{
-		_winborder->ShowLayer();
-		ActivateWindow(this);
-	}
-*/
+	if(_winborder)
+		_winborder->Show();
 }
 
+//! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
-//	TODO: uncomment this when we have WinBorder.h	
-//	if(_winborder)
-//		_winborder->HideLayer();
+	if(_winborder)
+		_winborder->Hide();
 }
 
+/*
+	\brief Determines whether the window is hidden or not
+	\return true if hidden, false if not
+*/
 bool ServerWindow::IsHidden(void)
 {
-	return (_hidecount==0)?true:false;
+	if(_winborder)
+		return _winborder->IsHidden();
+	return true;
 }
 
+/*!
+	\brief Handles focus and redrawing when changing focus states
+	
+	The ServerWindow is set to (in)active and its decorator is redrawn based on its active status
+*/
 void ServerWindow::SetFocus(bool value)
 {
 	if(_active!=value)
 	{
 		_active=value;
-		_decorator->SetFocus(value);
-		_decorator->Draw();
+		_winborder->RequestDraw();
 	}
 }
 
+/*!
+	\brief Determines whether or not the window is active
+	\return true if active, false if not
+*/
 bool ServerWindow::HasFocus(void)
 {
 	return _active;
 }
 
-void ServerWindow::WorkspaceActivated(int32 newworkspace, const BPoint reso, color_space cspace)
+/*!
+	\brief Notifies window of workspace (de)activation
+	\param workspace Index of the workspace changed
+	\param active New active status of the workspace
+*/
+void ServerWindow::WorkspaceActivated(int32 workspace, bool active)
 {
+	// TODO: implement
 }
 
+/*!
+	\brief Notifies window of a workspace switch
+	\param oldone index of the previous workspace
+	\param newone index of the new workspace
+*/
+void ServerWindow::WorkspacesChanged(int32 oldone,int32 newone)
+{
+	// TODO: implement
+}
+
+/*!
+	\brief Notifies window of a change in focus
+	\param active New active status of the window
+*/
 void ServerWindow::WindowActivated(bool active)
 {
+	// TODO: implement
 }
 
-void ServerWindow::ScreenModeChanged(const BPoint res, color_space cspace)
+/*!
+	\brief Notifies window of a change in screen resolution
+	\param frame Size of the new resolution
+	\param color_space Color space of the new screen mode
+*/
+void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace)
 {
+	// TODO: implement
 }
 
+/*
+	\brief Sets the frame size of the window
+	\rect New window size
+*/
 void ServerWindow::SetFrame(const BRect &rect)
 {
 	_frame=rect;
 }
 
+/*!
+	\brief Returns the frame of the window in screen coordinates
+	\return The frame of the window in screen coordinates
+*/
 BRect ServerWindow::Frame(void)
 {
 	return _frame;
 }
 
+/*!
+	\brief Locks the window
+	\return B_OK if everything is ok, B_ERROR if something went wrong
+*/
 status_t ServerWindow::Lock(void)
 {
-#ifdef DEBUG_SERVERWIN
-printf("%s::Lock()\n",_title->String());
-#endif
-	return _locker.Lock();
+	return (_locker.Lock())?B_OK:B_ERROR;
 }
 
+//! Unlocks the window
 void ServerWindow::Unlock(void)
 {
-#ifdef DEBUG_SERVERWIN
-printf("%s::Unlock()\n",_title->String());
-#endif
 	_locker.Unlock();
 }
 
+/*!
+	\brief Determines whether or not the window is locked
+	\return True if locked, false if not.
+*/
 bool ServerWindow::IsLocked(void)
 {
 	return _locker.IsLocked();
 }
 
-void ServerWindow::Loop(void)
+void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
 {
-	// Message-dispatching loop for the ServerWindow
+	switch(code)
+	{
+		case AS_LAYER_CREATE:
+		{
+			// Received when a view is attached to a window. This will require
+			// us to attach a layer in the tree in the same manner and invalidate
+			// the area in which the new layer resides assuming that it is
+			// visible.
+		
+			// Attached Data:
+			// 1) (int32) id of the parent view
+			// 2) (BRect) frame in parent's coordinates
+			// 3) (int32) resize flags
+			// 4) (int32) view flags
+			// 5) (uint16) view's hide level
+			
+			// This is a synchronous call, so reply immediately with the ID of the layer
+			// so the BView can identify itself
+
+			// TODO: Implement
+
+			break;
+		}
+		case AS_LAYER_DELETE:
+		{
+			// Received when a view is detached from a window. This is definitely
+			// the less taxing operation - we call PruneTree() on the removed
+			// layer, detach the layer itself, delete it, and invalidate the
+			// area assuming that the view was visible when removed
+			
+			// Attached Data:
+			// 1) (int32) id of the removed view
+
+			// TODO: Implement
+
+			break;
+		}
+		case AS_SHOW_WINDOW:
+		{
+			Show();
+			break;
+		}
+		case AS_HIDE_WINDOW:
+		{
+			Hide();
+			break;
+		}
+		case B_MINIMIZE:
+		case B_WINDOW_ACTIVATED:
+		case B_ZOOM:
+		case B_WINDOW_MOVE_TO:
+		case B_WINDOW_MOVE_BY:
+		case AS_SET_LOOK:
+		case AS_SET_FEEL:
+		case AS_SET_FLAGS:
+		case AS_SEND_BEHIND:
+			break;
+		default:
+		{
+			printf("ServerWindow %s received unexpected code %lx",_title->String(),code);
+			break;
+		}
+	}
+}
+
+/*!
+	\brief Message-dispatching loop for the ServerWindow
+
+	MonitorWin() watches the ServerWindow's message port and dispatches as necessary
+	\param data The thread's ServerWindow
+	\return Throwaway code. Always 0.
+*/
+int32 ServerWindow::MonitorWin(void *data)
+{
+	ServerWindow *win=(ServerWindow *)data;
+
 	int32 msgcode;
 	int8 *msgbuffer=NULL;
 	ssize_t buffersize,bytesread;
 	
 	for(;;)
 	{
-		buffersize=port_buffer_size(_receiver);
+		buffersize=port_buffer_size(win->_receiver);
 		
 		if(buffersize>0)
 		{
 			msgbuffer=new int8[buffersize];
-			bytesread=read_port(_receiver,&msgcode,msgbuffer,buffersize);
+			bytesread=read_port(win->_receiver,&msgcode,msgbuffer,buffersize);
 		}
 		else
-			bytesread=read_port(_receiver,&msgcode,NULL,0);
+			bytesread=read_port(win->_receiver,&msgcode,NULL,0);
 
 		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
 		{
 			switch(msgcode)
 			{
-				case LAYER_CREATE:
+				case B_QUIT_REQUESTED:
 				{
-					// Received when a view is attached to a window. This will require
-					// us to attach a layer in the tree in the same manner and invalidate
-					// the area in which the new layer resides assuming that it is
-					// visible.
-				
-					// Attached Data:
-					// 1) (int32) id of the parent view
-					// 2) (BRect) frame in parent's coordinates
-					// 3) (int32) resize flags
-					// 4) (int32) view flags
-					// 5) (uint16) view's hide level
-					
-					// This is a synchronous call, so reply immediately with the ID of the layer
-					// so the BView can identify itself
-
-					break;
-				}
-				case LAYER_DELETE:
-				{
-					// Received when a view is detached from a window. This is definitely
-					// the less taxing operation - we call PruneTree() on the removed
-					// layer, detach the layer itself, delete it, and invalidate the
-					// area assuming that the view was visible when removed
-					
-					// Attached Data:
-					// 1) (int32) id of the removed view
-					break;
-				}
-				case SHOW_WINDOW:
-				{
-					Show();
-					break;
-				}
-				case HIDE_WINDOW:
-				{
-					Hide();
-					break;
-				}
-				case DELETE_WINDOW:
-				{
-					// Received from our window when it is told to quit, so tell our
-					// application to delete this object
-					_applink->SetOpCode(DELETE_WINDOW);
-					_applink->Attach((int32)_monitorthread);
-					_applink->Flush();
+					// Our BWindow sent us this message when it quit.
+					// We need to ask its ServerApp to delete our monitor
+					win->_applink->SetOpCode(AS_DELETE_WINDOW);
+					win->_applink->Attach((int32)win->_token);
+					win->_applink->Flush();
 					break;
 				}
 				default:
-					DispatchMessage(msgcode,msgbuffer);
+					win->DispatchMessage(msgcode,msgbuffer);
 					break;
 			}
 
@@ -302,31 +397,16 @@ void ServerWindow::Loop(void)
 		if(msgcode==B_QUIT_REQUESTED)
 			break;
 	}
-}
 
-void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
-{
-	switch(code)
-	{
-		default:
-		{
-#ifdef DEBUG_SERVERWIN
-printf("%s::ServerWindow(): Received unexpected code: ",_title->String());
-PrintMessageCode(code);
-#endif
-			break;
-		}
-	}
-}
-
-int32 ServerWindow::MonitorWin(void *data)
-{
-	ServerWindow *win=(ServerWindow *)data;
-	win->Loop();
 	exit_thread(0);
 	return 0;
 }
 
+/*!
+	\brief Passes mouse event messages to the appropriate window
+	\param code Message code of the mouse message
+	\param buffer Attachment buffer for the mouse message
+*/
 void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 {
 /*	ServerWindow *mousewin=NULL;
@@ -445,22 +525,53 @@ void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
 */
 }
 
+/*!
+	\brief Passes key event messages to the appropriate window
+	\param code Message code of the key message
+	\param buffer Attachment buffer for the key message
+*/
 void ServerWindow::HandleKeyEvent(int32 code, int8 *buffer)
 {
+/*	ServerWindow *keywin=NULL;
+	int8 *index=buffer;
+	
+	// Dispatch the key event to the active window
+*/
 }
 
+/*!
+	\brief Returns the Workspace object to which the window belongs
+	
+	If the window belongs to all workspaces, it returns the current workspace
+*/
+Workspace *ServerWindow::GetWorkspace(void)
+{
+	if(_workspace_index==B_ALL_WORKSPACES)
+		return _workspace->GetScreen()->GetActiveWorkspace();
+
+	return _workspace;
+}
+
+/*!
+	\brief Assign the window to a particular workspace object
+	\param The ServerWindow's new workspace
+*/
 void ServerWindow::SetWorkspace(Workspace *wkspc)
 {
+	_workspace=wkspc;
 }
 
+/*!
+	\brief Handles window activation stuff. Called by Desktop functions
+*/
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin)
 {
-/*	if(active_serverwindow==win)
+	if(oldwin==newwin)
 		return;
-	if(active_serverwindow)
-		active_serverwindow->SetFocus(false);
-	active_serverwindow=win;
-	if(win)
-		win->SetFocus(true);
-*/
+
+	if(oldwin)
+		oldwin->SetFocus(false);
+
+	if(newwin)
+		newwin->SetFocus(true);
 }

@@ -33,6 +33,7 @@
 #include <Locker.h>
 #include <Rect.h>
 #include <String.h>
+#include <Window.h>
 
 class BString;
 class BMessenger;
@@ -43,6 +44,15 @@ class PortLink;
 class WinBorder;
 class Workspace;
 
+/*!
+	\class ServerWindow ServerWindow.h
+	\brief Shadow BWindow class
+	
+	A ServerWindow handles all the intraserver tasks required of it by its BWindow. There are 
+	too many tasks to list as being done by them, but they include handling View transactions, 
+	coordinating and linking a window's WinBorder half with its messaging half, dispatching 
+	mouse and key events from the server to its window, and other such things.
+*/
 class ServerWindow
 {
 public:
@@ -60,10 +70,12 @@ public:
 	void SetFocus(bool value);
 	bool HasFocus(void);
 	void RequestDraw(BRect rect);
+	void RequestDraw(void);
 	
-	void WorkspaceActivated(int32 NewDesktop, const BPoint Resolution, color_space CSpace);
-	void WindowActivated(bool Active);
-	void ScreenModeChanged(const BPoint Resolution, color_space CSpace);
+	void WorkspaceActivated(int32 workspace, bool active);
+	void WorkspacesChanged(int32 oldone,int32 newone);
+	void WindowActivated(bool active);
+	void ScreenModeChanged(const BRect frame, const color_space cspace);
 	
 	void SetFrame(const BRect &rect);
 	BRect Frame(void);
@@ -76,10 +88,10 @@ public:
 	static int32 MonitorWin(void *data);
 	static void HandleMouseEvent(int32 code, int8 *buffer);
 	static void HandleKeyEvent(int32 code, int8 *buffer);
-	void Loop(void);
 	
+	//! Returns the index of the workspaces to which it belongs
 	int32 GetWorkspaceIndex(void) { return _workspace_index; }
-	Workspace *GetWorkspace(void) { return _workspace; }
+	Workspace *GetWorkspace(void);
 	void SetWorkspace(Workspace *wkspc);
 
 protected:	
@@ -88,13 +100,11 @@ protected:
 	
 	BString *_title;
 	int32 _look, _feel, _flags;
-	int32 _workspace_index;
+	uint32 _workspace_index;
 	Workspace *_workspace;
 	bool _active;
 	
 	ServerApp *_app;
-	
-	Decorator *_decorator;
 	WinBorder *_winborder;
 	
 	thread_id _monitorthread;
@@ -103,7 +113,6 @@ protected:
 	PortLink *_winlink,*_applink;
 	BLocker _locker;
 	BRect _frame;
-	bool _hidecount;
 	uint32 _token;
 };
 

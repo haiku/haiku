@@ -164,7 +164,7 @@ bool ServerApp::PingTarget(void)
 			return false;
 		}
 		_applink->SetPort(serverport);
-		_applink->SetOpCode(DELETE_APP);
+		_applink->SetOpCode(AS_DELETE_APP);
 		_applink->Attach(&_monitor_thread,sizeof(thread_id));
 		_applink->Flush();
 		return false;
@@ -213,17 +213,7 @@ int32 ServerApp::MonitorApp(void *data)
 			switch(msgcode)
 			{
 // -------------- Messages received from the Server ------------------------
-				// Mouse messages simply get passed onto the active app for now
-				case B_MOUSE_UP:
-				case B_MOUSE_DOWN:
-				case B_MOUSE_MOVED:
-				{
-					// everything is formatted as it should be, so just call
-					// write_port.
-					write_port(app->_sender, msgcode, msgbuffer, buffersize);
-					break;
-				}
-				case QUIT_APP:
+				case AS_QUIT_APP:
 				{
 					// If we are using the real, accelerated version of the
 					// DisplayDriver, we do NOT want the user to be able shut down
@@ -251,7 +241,7 @@ int32 ServerApp::MonitorApp(void *data)
 						break;
 					}
 					app->_applink->SetPort(serverport);
-					app->_applink->SetOpCode(DELETE_APP);
+					app->_applink->SetOpCode(AS_DELETE_APP);
 					app->_applink->Attach(&app->_monitor_thread,sizeof(thread_id));
 					app->_applink->Flush();
 					break;
@@ -292,7 +282,7 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 
 	switch(code)
 	{
-		case UPDATED_CLIENT_FONTLIST:
+		case AS_UPDATED_CLIENT_FONTLIST:
 		{
 			// received when the client-side global font list has been
 			// refreshed
@@ -301,7 +291,7 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			fontserver->Unlock();
 			break;
 		}
-		case CREATE_WINDOW:
+		case AS_CREATE_WINDOW:
 		{
 			// Create the ServerWindow to node monitor a new OBWindow
 			
@@ -332,25 +322,26 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			// Window looper is waiting for our reply. Send back the
 			// ServerWindow's message port
 			PortLink *replylink=new PortLink(reply_port);
-			replylink->SetOpCode(SET_SERVER_PORT);
+			replylink->SetOpCode(AS_SET_SERVER_PORT);
 			replylink->Attach((int32)newwin->_receiver);
 			replylink->Flush();
 
 			delete replylink;
 			break;
 		}
-		case DELETE_WINDOW:
+		case AS_DELETE_WINDOW:
 		{
 			// Received from a ServerWindow when its window quits
 			
 			// Attached data:
-			// 1) thread_id  ServerWindow ID
-			thread_id winid;
+			// 1) uint32  ServerWindow ID token
 			ServerWindow *w;
+			uint32 winid=*((uint32*)index);
+
 			for(int32 i=0;i<_winlist->CountItems();i++)
 			{
 				w=(ServerWindow*)_winlist->ItemAt(i);
-				if(w->_monitorthread==winid)
+				if(w->_token==winid)
 				{
 					_winlist->RemoveItem(w);
 					delete w;
@@ -359,7 +350,7 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			}
 			break;
 		}
-		case GFX_SET_SCREEN_MODE:
+		case AS_SET_SCREEN_MODE:
 		{
 			// Attached data
 			// 1) int32 workspace #
@@ -372,7 +363,7 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 
 			break;
 		}
-		case GFX_ACTIVATE_WORKSPACE:
+		case AS_ACTIVATE_WORKSPACE:
 		{
 			// Attached data
 			// 1) int32 workspace index
@@ -384,39 +375,34 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 		
 		// Theoretically, we could just call the driver directly, but we will
 		// call the CursorManager's version to allow for future expansion
-		case SHOW_CURSOR:
+		case AS_SHOW_CURSOR:
 		{
 			cursormanager->ShowCursor();
 			_cursorhidden=false;
 			break;
 		}
-		case HIDE_CURSOR:
+		case AS_HIDE_CURSOR:
 		{
 			cursormanager->HideCursor();
 			_cursorhidden=true;
 			break;
 		}
-		case OBSCURE_CURSOR:
+		case AS_OBSCURE_CURSOR:
 		{
 			cursormanager->ObscureCursor();
 			break;
 		}
-		case QUERY_CURSOR_HIDDEN:
+		case AS_QUERY_CURSOR_HIDDEN:
 		{
 			// Attached data
 			// 1) int32 port to reply to
-			if(_cursorhidden)
-				write_port(*((port_id*)index),SERVER_TRUE,NULL,0);
-			else
-				write_port(*((port_id*)index),SERVER_FALSE,NULL,0);
+			write_port(*((port_id*)index),(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
 			break;
 		}
-		case SET_CURSOR_DATA:
+		case AS_SET_CURSOR_DATA:
 		{
 			// Attached data: 68 bytes of _appcursor data
 			
-			// Get the data, update the app's _appcursor, and update the
-			// app's _appcursor if active.
 			int8 cdata[68];
 			memcpy(cdata, buffer, 68);
 
@@ -428,13 +414,33 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 				cursormanager->DeleteCursor(_appcursor->ID());
 
 			_appcursor=new ServerCursor(cdata);
+			_appcursor->SetAppSignature(_signature.String());
 			cursormanager->AddCursor(_appcursor);
 			cursormanager->SetCursor(_appcursor->ID());
 			break;
 		}
-		case SET_CURSOR_BCURSOR:
+		case AS_SET_CURSOR_BCURSOR:
 		{
-			// TODO: Implement
+			// Attached data:
+			// 1) port_id reply port
+			// 2) 68 bytes of _appcursor data
+			
+			port_id replyport=*((port_id*)index);
+			index+=sizeof(port_id);
+			
+			int8 cdata[68];
+			memcpy(cdata, index, 68);
+
+			_appcursor=new ServerCursor(cdata);
+			_appcursor->SetAppSignature(_signature.String());
+			cursormanager->AddCursor(_appcursor);
+			cursormanager->SetCursor(_appcursor->ID());
+			
+			// Synchronous message - BApplication is waiting on the cursor's ID
+			PortLink replylink(replyport);
+			replylink.SetOpCode(AS_SET_CURSOR_BCURSOR);
+			replylink.Attach(_appcursor->ID());
+			replylink.Flush();
 			break;
 		}
 		default:
