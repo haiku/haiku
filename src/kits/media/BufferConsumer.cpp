@@ -7,6 +7,7 @@
 #include <BufferProducer.h>
 #include <BufferGroup.h>
 #include <Buffer.h>
+#include <TimeSource.h> //for debugging
 #include <malloc.h>
 #include "debug.h"
 #include "MediaMisc.h"
@@ -291,7 +292,7 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 	if (rv == B_OK) {	
 		if (fDeleteBufferGroup) // XXX will leak memory if port write failed
 			delete fDeleteBufferGroup;
-		fDeleteBufferGroup = will_reclaim ? group : NULL;
+		fDeleteBufferGroup = will_reclaim ? NULL : group;
 	}
 	return rv;
 }
@@ -366,6 +367,7 @@ BBufferConsumer::HandleMessage(int32 message,
 			BBuffer *buffer;
 			buffer = fBufferCache->GetBuffer(command->buffer);
 			buffer->SetHeader(&command->header);
+			TRACE("calling BBufferConsumer::BufferReceived buffer %ld at perf %Ld and TimeSource()->Now() is %Ld\n", buffer->Header()->buffer, buffer->Header()->start_time, TimeSource()->Now());
 			BufferReceived(buffer);
 			return B_OK;
 		}
