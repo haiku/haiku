@@ -38,7 +38,7 @@ typedef struct {
 #define	DELETE_BEN(x)	delete_sem(x.sem);
 
 
-#define NV_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
+#define SKEL_PRIVATE_DATA_MAGIC	0x0009 /* a private driver rev, of sorts */
 
 /*dualhead extensions to flags*/
 #define DUALHEAD_OFF (0<<6)
@@ -61,15 +61,15 @@ typedef struct {
 #define SKD_HANDLER_INSTALLED 0x80000000
 
 enum {
-	NV_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
-	NV_GET_PCI,
-	NV_SET_PCI,
-	NV_DEVICE_NAME,
-	NV_RUN_INTERRUPTS,
-	NV_GET_NTH_AGP_INFO,
-	NV_ENABLE_AGP,
-	NV_ISA_OUT,
-	NV_ISA_IN
+	ENG_GET_PRIVATE_DATA = B_DEVICE_OP_CODES_END + 1,
+	ENG_GET_PCI,
+	ENG_SET_PCI,
+	ENG_DEVICE_NAME,
+	ENG_RUN_INTERRUPTS,
+	ENG_GET_NTH_AGP_INFO,
+	ENG_ENABLE_AGP,
+	ENG_ISA_OUT,
+	ENG_ISA_IN
 };
 
 /* max. number of overlay buffers */

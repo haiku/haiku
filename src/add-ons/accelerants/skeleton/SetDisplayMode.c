@@ -22,10 +22,10 @@ static void interrupt_enable(bool flag) {
 	eng_set_bool_state sbs;
 
 	/* set the magic number so the driver knows we're for real */
-	sbs.magic = NV_PRIVATE_DATA_MAGIC;
+	sbs.magic = SKEL_PRIVATE_DATA_MAGIC;
 	sbs.do_it = flag;
 	/* contact driver and get a pointer to the registers and shared data */
-	result = ioctl(fd, NV_RUN_INTERRUPTS, &sbs, sizeof(sbs));
+	result = ioctl(fd, ENG_RUN_INTERRUPTS, &sbs, sizeof(sbs));
 }
 
 /* First validate the mode, then call lots of bit banging stuff to set the mode(s)! */

@@ -20,7 +20,7 @@ int accelerantIsClone;
 
 eng_get_set_pci eng_pci_access=
 	{
-		NV_PRIVATE_DATA_MAGIC,
+		SKEL_PRIVATE_DATA_MAGIC,
 		0,
 		4,
 		0
@@ -28,7 +28,7 @@ eng_get_set_pci eng_pci_access=
 
 eng_in_out_isa eng_isa_access=
 	{
-		NV_PRIVATE_DATA_MAGIC,
+		SKEL_PRIVATE_DATA_MAGIC,
 		0,
 		1,
 		0

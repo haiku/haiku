@@ -84,8 +84,8 @@ status_t eng_dac_mode(int mode,float brightness)
 	if (eng_dac_palette(r,g,b) != B_OK) return B_ERROR;
 
 	/* disable palette RAM adressing mask */
-	NV_REG8(NV8_PALMASK) = 0xff;
-	LOG(2,("DAC: PAL pixrdmsk readback $%02x\n", NV_REG8(NV8_PALMASK)));
+	ENG_REG8(RG8_PALMASK) = 0xff;
+	LOG(2,("DAC: PAL pixrdmsk readback $%02x\n", ENG_REG8(RG8_PALMASK)));
 
 	return B_OK;
 }
@@ -98,17 +98,17 @@ status_t eng_dac_palette(uint8 r[256],uint8 g[256],uint8 b[256])
 	LOG(4,("DAC: setting palette\n"));
 
 	/* select first PAL adress before starting programming */
-	NV_REG8(NV8_PALINDW) = 0x00;
+	ENG_REG8(RG8_PALINDW) = 0x00;
 
 	/* loop through all 256 to program DAC */
 	for (i = 0; i < 256; i++)
 	{
 		/* the 6 implemented bits are on b0-b5 of the bus */
-		NV_REG8(NV8_PALDATA) = r[i];
-		NV_REG8(NV8_PALDATA) = g[i];
-		NV_REG8(NV8_PALDATA) = b[i];
+		ENG_REG8(RG8_PALDATA) = r[i];
+		ENG_REG8(RG8_PALDATA) = g[i];
+		ENG_REG8(RG8_PALDATA) = b[i];
 	}
-	if (NV_REG8(NV8_PALINDW) != 0x00)
+	if (ENG_REG8(RG8_PALINDW) != 0x00)
 	{
 		LOG(8,("DAC: PAL write index incorrect after programming\n"));
 		return B_ERROR;
@@ -118,12 +118,12 @@ if (1)
 	uint8 R, G, B;
 
 	/* select first PAL adress to read (modulo 3 counter) */
-	NV_REG8(NV8_PALINDR) = 0x00;
+	ENG_REG8(RG8_PALINDR) = 0x00;
 	for (i = 0; i < 256; i++)
 	{
-		R = NV_REG8(NV8_PALDATA);
-		G = NV_REG8(NV8_PALDATA);
-		B = NV_REG8(NV8_PALDATA);
+		R = ENG_REG8(RG8_PALDATA);
+		G = ENG_REG8(RG8_PALDATA);
+		B = ENG_REG8(RG8_PALDATA);
 		if ((r[i] != R) || (g[i] != G) || (b[i] != B)) 
 			LOG(1,("DAC palette %d: w %x %x %x, r %x %x %x\n", i, r[i], g[i], b[i], R, G, B)); // apsed
 	}

@@ -25,9 +25,9 @@ static status_t init_common(int the_fd) {
 	/* memorize the file descriptor */
 	fd = the_fd;
 	/* set the magic number so the driver knows we're for real */
-	gpd.magic = NV_PRIVATE_DATA_MAGIC;
+	gpd.magic = SKEL_PRIVATE_DATA_MAGIC;
 	/* contact driver and get a pointer to the registers and shared data */
-	result = ioctl(fd, NV_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
+	result = ioctl(fd, ENG_GET_PRIVATE_DATA, &gpd, sizeof(gpd));
 	if (result != B_OK) goto error0;
 
 	/* clone the shared area for our use */
@@ -211,7 +211,7 @@ ssize_t ACCELERANT_CLONE_INFO_SIZE(void) {
 	Since we're passing the name of the device as the only required
 	info, return the size of the name buffer
 	*/
-	return B_OS_NAME_LENGTH; // apsed, was MAX_NV_DEVICE_NAME_LENGTH;
+	return B_OS_NAME_LENGTH; // apsed, was MAX_ENG_DEVICE_NAME_LENGTH;
 }
 
 
@@ -224,10 +224,10 @@ void GET_ACCELERANT_CLONE_INFO(void *data) {
 	status_t result;
 
 	/* call the kernel driver to get the device name */	
-	dn.magic = NV_PRIVATE_DATA_MAGIC;
+	dn.magic = SKEL_PRIVATE_DATA_MAGIC;
 	/* store the returned info directly into the passed buffer */
 	dn.name = (char *)data;
-	result = ioctl(fd, NV_DEVICE_NAME, &dn, sizeof(dn));
+	result = ioctl(fd, ENG_DEVICE_NAME, &dn, sizeof(dn));
 }
 
 /*

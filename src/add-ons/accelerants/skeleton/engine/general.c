@@ -17,7 +17,7 @@ static void eng_dump_configuration_space (void)
 #define DUMP_CFG(reg, type) if (si->ps.card_type >= type) do { \
 	uint32 value = CFGR(reg); \
 	MSG(("configuration_space 0x%02x %20s 0x%08x\n", \
-		NVCFG_##reg, #reg, value)); \
+		ENCFG_##reg, #reg, value)); \
 } while (0)
 	DUMP_CFG (DEVID,	0);
 	DUMP_CFG (DEVCTRL,	0);
@@ -406,7 +406,7 @@ status_t eng_general_head_select(bool cross)
 static status_t eng_general_bios_to_powergraphics()
 {
 	/* let acc engine make power off/power on cycle to start 'fresh' */
-	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
+	ENG_RG32(RG32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
 
 	/* power-up all hardware function blocks */
@@ -419,10 +419,10 @@ static status_t eng_general_bios_to_powergraphics()
 	 * bit  8: PFIFO,
 	 * bit  4: PMEDIA,
 	 * bit  0: TVOUT. (> NV04A) */
-	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
+	ENG_RG32(RG32_PWRUPCTRL) = 0x13111111;
 
 	/* select colormode CRTC registers base adresses */
-	NV_REG8(NV8_MISCW) = 0xcb;
+	ENG_REG8(RG8_MISCW) = 0xcb;
 
 	/* enable access to primary head */
 	set_crtc_owner(0);
@@ -456,8 +456,8 @@ static status_t eng_general_bios_to_powergraphics()
 		 * bit  9: TVout chip #2	(confirmed on NV18, NV25, NV28),
 		 * bit  8: TVout chip #1	(all cards),
 		 * bit  4: both I2C busses	(all cards) */
-		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
-		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
+		ENG_RG32(RG32_2FUNCSEL) &= ~0x00001000;
+		ENG_RG32(RG32_FUNCSEL) |= 0x00001000;
 	}
 	si->overlay.crtc = false;
 
@@ -497,7 +497,7 @@ static status_t eng_general_bios_to_powergraphics()
 		/* enable access to secondary head */
 		set_crtc_owner(1);
 		/* select colormode CRTC2 registers base adresses */
-		NV_REG8(NV8_MISCW) = 0xcb;
+		ENG_REG8(RG8_MISCW) = 0xcb;
 		/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
 		 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
 		 * behave normally.

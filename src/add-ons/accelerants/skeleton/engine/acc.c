@@ -52,7 +52,7 @@ status_t eng_acc_init()
 	if (si->ps.card_arch == NV04A)
 	{
 		/* set framebuffer config: type = notiling, PRAMIN write access enabled */
-		NV_REG32(NV32_PFB_CONFIG_0) = 0x00001114;
+		ENG_RG32(RG32_PFB_CONFIG_0) = 0x00001114;
 	}
 
 	/*** PFIFO ***/
@@ -685,7 +685,7 @@ status_t eng_acc_init()
 	 * setup clipping region (workspace size) to 32768 x 32768 pixels:
 	 * wait for room in fifo for clipping cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_CLP_FIFOFREE)) >> 2) < 2)
+	while (((ENG_REG16(RG16_CLP_FIFOFREE)) >> 2) < 2)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -703,7 +703,7 @@ status_t eng_acc_setup_blit()
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_PAT_FIFOFREE)) >> 2) < 5)
+	while (((ENG_REG16(RG16_PAT_FIFOFREE)) >> 2) < 5)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -718,7 +718,7 @@ status_t eng_acc_setup_blit()
 	/* ROP3 registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_ROP_FIFOFREE)) >> 2) < 1)
+	while (((ENG_REG16(RG16_ROP_FIFOFREE)) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -736,7 +736,7 @@ status_t eng_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BLT_FIFOFREE)) >> 2) < 3)
+	while (((ENG_REG16(RG16_BLT_FIFOFREE)) >> 2) < 3)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -756,7 +756,7 @@ status_t eng_acc_setup_rectangle(uint32 color)
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_PAT_FIFOFREE)) >> 2) < 5)
+	while (((ENG_REG16(RG16_PAT_FIFOFREE)) >> 2) < 5)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -771,7 +771,7 @@ status_t eng_acc_setup_rectangle(uint32 color)
 	/* ROP3 registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_ROP_FIFOFREE)) >> 2) < 1)
+	while (((ENG_REG16(RG16_ROP_FIFOFREE)) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -782,7 +782,7 @@ status_t eng_acc_setup_rectangle(uint32 color)
 	/* setup fill color:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 1)
+	while (((ENG_REG16(RG16_BMP_FIFOFREE)) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -798,7 +798,7 @@ status_t eng_acc_rectangle(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	/* instruct engine what to fill:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 2)
+	while (((ENG_REG16(RG16_BMP_FIFOFREE)) >> 2) < 2)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -816,7 +816,7 @@ status_t eng_acc_setup_rect_invert()
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_PAT_FIFOFREE)) >> 2) < 5)
+	while (((ENG_REG16(RG16_PAT_FIFOFREE)) >> 2) < 5)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -831,7 +831,7 @@ status_t eng_acc_setup_rect_invert()
 	/* ROP3 registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_ROP_FIFOFREE)) >> 2) < 1)
+	while (((ENG_REG16(RG16_ROP_FIFOFREE)) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -842,7 +842,7 @@ status_t eng_acc_setup_rect_invert()
 	/* reset fill color:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 1)
+	while (((ENG_REG16(RG16_BMP_FIFOFREE)) >> 2) < 1)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 
@@ -858,7 +858,7 @@ status_t eng_acc_rectangle_invert(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 	/* instruct engine what to invert:
 	 * wait for room in fifo for bitmap cmd if needed.
 	 * (fifo holds 256 32bit words: count those, not bytes) */
-	while (((NV_REG16(NV16_BMP_FIFOFREE)) >> 2) < 2)
+	while (((ENG_REG16(RG16_BMP_FIFOFREE)) >> 2) < 2)
 	{
 		/* snooze a bit so I do not hammer the bus */
 		snooze (10); 

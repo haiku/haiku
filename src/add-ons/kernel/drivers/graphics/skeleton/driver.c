@@ -143,33 +143,33 @@ static void dumprom (void *rom, uint32 size)
 /* return 1 if vblank interrupt has occured */
 static int caused_vbi(vuint32 * regs)
 {
-	return (NV_REG32(NV32_CRTC_INTS) & 0x00000001);
+	return (ENG_RG32(RG32_CRTC_INTS) & 0x00000001);
 }
 
 /* clear the vblank interrupt */
 static void clear_vbi(vuint32 * regs)
 {
-	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
 }
 
 static void enable_vbi(vuint32 * regs)
 {
 	/* clear the vblank interrupt */
-	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
 	/* enable nVidia interrupt source vblank */
-	NV_REG32(NV32_CRTC_INTE) |= 0x00000001;
+	ENG_RG32(RG32_CRTC_INTE) |= 0x00000001;
 	/* enable nVidia interrupt system hardware (b0-1) */
-	NV_REG32(NV32_MAIN_INTE) = 0x00000001;
+	ENG_RG32(RG32_MAIN_INTE) = 0x00000001;
 }
 
 static void disable_vbi(vuint32 * regs)
 {
 	/* disable nVidia interrupt source vblank */
-	NV_REG32(NV32_CRTC_INTE) &= 0xfffffffe;
+	ENG_RG32(RG32_CRTC_INTE) &= 0xfffffffe;
 	/* clear the vblank interrupt */
-	NV_REG32(NV32_CRTC_INTS) = 0x00000001;
+	ENG_RG32(RG32_CRTC_INTS) = 0x00000001;
 	/* disable nVidia interrupt system hardware (b0-1) */
-	NV_REG32(NV32_MAIN_INTE) = 0x00000000;
+	ENG_RG32(RG32_MAIN_INTE) = 0x00000000;
 }
 
 /*
@@ -394,7 +394,7 @@ static status_t map_device(device_info *di)
 	 * NV18, NV28 and NV34 keep working.
 	 * confirmed NV28 and NV34 to use upper part of shadowed ROM for scratch purposes,
 	 * however the actual ROM content (so the used part) is intact (confirmed). */
-	//set_pci(NVCFG_ROMSHADOW, 4, 0);
+	//set_pci(ENCFG_ROMSHADOW, 4, 0);
 
 	/* get ROM memory mapped base adress - this is defined in the PCI standard */
 	tmpUlong = get_pci(PCI_rom_base, 4);
@@ -851,39 +851,39 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 		} break;
 		
 		/* PRIVATE ioctl from here on */
-		case NV_GET_PRIVATE_DATA: {
+		case ENG_GET_PRIVATE_DATA: {
 			eng_get_private_data *gpd = (eng_get_private_data *)buf;
-			if (gpd->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (gpd->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				gpd->shared_info_area = di->shared_area;
 				result = B_OK;
 			}
 		} break;
-		case NV_GET_PCI: {
+		case ENG_GET_PCI: {
 			eng_get_set_pci *gsp = (eng_get_set_pci *)buf;
-			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (gsp->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				gsp->value = get_pci(gsp->offset, gsp->size);
 				result = B_OK;
 			}
 		} break;
-		case NV_SET_PCI: {
+		case ENG_SET_PCI: {
 			eng_get_set_pci *gsp = (eng_get_set_pci *)buf;
-			if (gsp->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (gsp->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 				set_pci(gsp->offset, gsp->size, gsp->value);
 				result = B_OK;
 			}
 		} break;
-		case NV_DEVICE_NAME: { // apsed
+		case ENG_DEVICE_NAME: { // apsed
 			eng_device_name *dn = (eng_device_name *)buf;
-			if (dn->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (dn->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				strcpy(dn->name, di->name);
 				result = B_OK;
 			}
 		} break;
-		case NV_RUN_INTERRUPTS: {
+		case ENG_RUN_INTERRUPTS: {
 			eng_set_bool_state *ri = (eng_set_bool_state *)buf;
-			if (ri->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (ri->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				vuint32 *regs = di->regs;
 				if (ri->do_it) {
 					enable_vbi(regs);
@@ -893,9 +893,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				result = B_OK;
 			}
 		} break;
-		case NV_GET_NTH_AGP_INFO: {
+		case ENG_GET_NTH_AGP_INFO: {
 			eng_nth_agp_info *nai = (eng_nth_agp_info *)buf;
-			if (nai->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (nai->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				nai->exist = false;
 				nai->agp_bus = false;
 				if (agp_bus) {
@@ -907,9 +907,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				result = B_OK;
 			}
 		} break;
-		case NV_ENABLE_AGP: {
+		case ENG_ENABLE_AGP: {
 			eng_cmd_agp *nca = (eng_cmd_agp *)buf;
-			if (nca->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (nca->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				if (agp_bus) {
 					nca->agp_bus = true;
 					(*agp_bus->enable_agp)(&(nca->cmd));
@@ -920,9 +920,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				result = B_OK;
 			}
 		} break;
-		case NV_ISA_OUT: {
+		case ENG_ISA_OUT: {
 			eng_in_out_isa *io_isa = (eng_in_out_isa *)buf;
-			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (io_isa->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
 				/* lock the driver:
@@ -949,9 +949,9 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 				RELEASE_BEN(pd->kernel);
    			}
 		} break;
-		case NV_ISA_IN: {
+		case ENG_ISA_IN: {
 			eng_in_out_isa *io_isa = (eng_in_out_isa *)buf;
-			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
+			if (io_isa->magic == SKEL_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
 				/* lock the driver:

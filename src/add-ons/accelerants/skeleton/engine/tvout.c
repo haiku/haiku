@@ -681,7 +681,7 @@ int maventv_init(display_mode target)
 //	if (si->ps.card_type <= G400MAX) MAVW(PGM, 0x01);
 //	else
 //	{
-//		DXIW(TVO_IDX, NVMAV_PGM);
+//		DXIW(TVO_IDX, ENMAV_PGM);
 //		DXIW(TVO_DATA, 0x01);
 //	}
 
@@ -917,7 +917,7 @@ int maventv_init(display_mode target)
 //		MAVW(GAMMA9, 0xC8);	/* 200 */
 
 		/* set flickerfilter */
-		/* OFF: is dependant on MAVEN chip version(?): NV_TVO_B = $40, else $00.
+		/* OFF: is dependant on MAVEN chip version(?): ENG_TVO_B = $40, else $00.
 		 * ON : always set $a2. */
 //		MAVW(FFILTER, 0xa2);
 
@@ -1197,7 +1197,7 @@ int maventv_init(display_mode target)
 //	if (si->ps.card_type <= G400MAX) MAVW(PGM, 0x00);
 //	else
 //	{
-//		DXIW(TVO_IDX, NVMAV_PGM);
+//		DXIW(TVO_IDX, ENMAV_PGM);
 //		DXIW(TVO_DATA, 0x00);
 
 		/* Select 2.0 Volt MAVEN DAC ref. so we have enough contrast/brightness range */

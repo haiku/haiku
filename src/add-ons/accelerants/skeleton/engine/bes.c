@@ -357,16 +357,16 @@ status_t eng_bes_to_crtc(bool crtc)
 		{
 			LOG(4,("Overlay: switching overlay to CRTC2\n"));
 			/* switch overlay engine to CRTC2 */
-			NV_REG32(NV32_FUNCSEL) &= ~0x00001000;
-			NV_REG32(NV32_2FUNCSEL) |= 0x00001000;
+			ENG_RG32(RG32_FUNCSEL) &= ~0x00001000;
+			ENG_RG32(RG32_2FUNCSEL) |= 0x00001000;
 			si->overlay.crtc = !si->crtc_switch_mode;
 		}
 		else
 		{
 			LOG(4,("Overlay: switching overlay to CRTC1\n"));
 			/* switch overlay engine to CRTC1 */
-			NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
-			NV_REG32(NV32_FUNCSEL) |= 0x00001000;
+			ENG_RG32(RG32_2FUNCSEL) &= ~0x00001000;
+			ENG_RG32(RG32_FUNCSEL) |= 0x00001000;
 			si->overlay.crtc = si->crtc_switch_mode;
 		}
 		return B_OK;

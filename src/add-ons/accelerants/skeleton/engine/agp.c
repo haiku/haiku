@@ -25,26 +25,26 @@ status_t eng_agp_setup(void)
 	{
 		uint32 reg;
 
-		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
+		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
 
 		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
 		/* 'force' FW support */
-		reg = (NV_REG32(NV32_NVSTRAPINFO2) & ~0x00000800);
+		reg = (ENG_RG32(RG32_NVSTRAPINFO2) & ~0x00000800);
 		/* enable strapinfo overwrite */
-		NV_REG32(NV32_NVSTRAPINFO2) = (reg | 0x80000000);
+		ENG_RG32(RG32_NVSTRAPINFO2) = (reg | 0x80000000);
 
-		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
+		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
 	}
 
 	/* set the magic number so the skeleton kerneldriver knows we're for real */
-	nca.magic = nai.magic = NV_PRIVATE_DATA_MAGIC;
+	nca.magic = nai.magic = SKEL_PRIVATE_DATA_MAGIC;
 
 	/* contact driver and get a pointer to the registers and shared data */
 	for (index = 0; index < 8; index++)
 	{
 		/* get nth AGP device info */
 		nai.index = index;
-		ioctl(fd, NV_GET_NTH_AGP_INFO, &nai, sizeof(nai));
+		ioctl(fd, ENG_GET_NTH_AGP_INFO, &nai, sizeof(nai));
 
 		/* abort if no agp busmanager found */
 		if (!nai.agp_bus)
@@ -88,8 +88,8 @@ status_t eng_agp_setup(void)
 	/* if our card is not an AGP type, abort here */
 	/* Note:
 	 * We have to iterate through the capability list as specified in the PCI spec
-	 * one way or the other, otherwise we cannot distinquish between nVidia PCI and
-	 * AGP type cards as nVidia PCI cards still have AGP registers that pretend to
+	 * one way or the other, otherwise we cannot distinquish between PCI and
+	 * AGP type cards as PCI cards still might have AGP registers that pretend to
 	 * support AGP.
 	 * We rely on the AGP busmanager to iterate trough this list for us. */
 	if (!agp)
@@ -110,7 +110,7 @@ status_t eng_agp_setup(void)
 		/* let the AGP busmanager setup PCI mode.
 		 * (the AGP speed scheme is of no consequence now) */
 		nca.cmd = 0x00000000;
-		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
+		ioctl(fd, ENG_ENABLE_AGP, &nca, sizeof(nca));
 	}
 	else
 	{
@@ -121,7 +121,7 @@ status_t eng_agp_setup(void)
 		nca.cmd = 0xfffffff7;
 		/* ..but we do need to select the right speed scheme fetched from our card */
 		if (eng_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
-		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
+		ioctl(fd, ENG_ENABLE_AGP, &nca, sizeof(nca));
 	}
 
 	/* list mode now activated,

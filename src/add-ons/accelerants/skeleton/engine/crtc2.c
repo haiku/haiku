@@ -263,7 +263,7 @@ status_t eng_crtc2_set_timing(display_mode target)
 
 		/* setup HSYNC & VSYNC polarity */
 		LOG(2,("CRTC2: sync polarity: "));
-		temp = NV_REG8(NV8_MISCR);
+		temp = ENG_REG8(RG8_MISCR);
 		if (target.timing.flags & B_POSITIVE_HSYNC)
 		{
 			LOG(2,("H:pos "));
@@ -284,9 +284,9 @@ status_t eng_crtc2_set_timing(display_mode target)
 			LOG(2,("V:neg "));
 			temp |= 0x80;
 		}
-		NV_REG8(NV8_MISCW) = temp;
+		ENG_REG8(RG8_MISCW) = temp;
 
-		LOG(2,(", MISC reg readback: $%02x\n", NV_REG8(NV8_MISCR)));
+		LOG(2,(", MISC reg readback: $%02x\n", ENG_REG8(RG8_MISCR)));
 	}
 
 	/* always disable interlaced operation */
@@ -592,7 +592,7 @@ status_t eng_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 
 	/* we might have no retraces during setmode! */
 	/* wait 25mS max. for retrace to occur (refresh > 40Hz) */
-	while (((NV_REG32(NV32_RASTER2) & 0x000007ff) < si->dm.timing.v_display) &&
+	while (((ENG_RG32(RG32_RASTER2) & 0x000007ff) < si->dm.timing.v_display) &&
 			(timeout < (25000/10)))
 	{
 		/* don't snooze much longer or retrace might get missed! */
@@ -609,7 +609,7 @@ status_t eng_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 	 * wrap-around at 16Mb boundaries!! */
 
 	/* 30bit adress in 32bit words */
-	NV_REG32(NV32_NV10FB2STADD32) = (startadd & 0xfffffffc);
+	ENG_RG32(RG32_NV10FB2STADD32) = (startadd & 0xfffffffc);
 
 	/* set byte adress: (b0 - 1) */
 	ATB2W(HORPIXPAN, ((startadd & 0x00000003) << 1));
@@ -648,7 +648,7 @@ status_t eng_crtc2_cursor_init()
 		 * This register does not exist on pre-NV10 and 'Go' cards. */
 
 		/* cursorbitmap must still start on 2Kbyte boundary: */
-		NV_REG32(NV32_NV10CUR2ADD32) = (curadd & 0xfffff800);
+		ENG_RG32(RG32_NV10CUR2ADD32) = (curadd & 0xfffff800);
 	}
 
 	/* set cursor colour: not needed because of direct nature of cursor bitmap. */
@@ -661,7 +661,7 @@ status_t eng_crtc2_cursor_init()
 	}
 
 	/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
-	NV_REG32(NV32_2CURCONF) = 0x02000100;
+	ENG_RG32(RG32_2CURCONF) = 0x02000100;
 
 	/* activate hardware cursor */
 	eng_crtc2_cursor_show();
@@ -769,7 +769,7 @@ status_t eng_crtc2_cursor_position(uint16 x, uint16 y)
 	{
 		/* we have vertical lines below old and new cursorposition to spare. So we
 		 * update the cursor postion 'mid-screen', but below that area. */
-		while (((uint16)(NV_REG32(NV32_RASTER2) & 0x000007ff)) < (yhigh + 16))
+		while (((uint16)(ENG_RG32(RG32_RASTER2) & 0x000007ff)) < (yhigh + 16))
 		{
 			snooze(10);
 		}
@@ -777,7 +777,7 @@ status_t eng_crtc2_cursor_position(uint16 x, uint16 y)
 	else
 	{
 		/* no room to spare, just wait for retrace (is relatively slow) */
-		while ((NV_REG32(NV32_RASTER2) & 0x000007ff) < si->dm.timing.v_display)
+		while ((ENG_RG32(RG32_RASTER2) & 0x000007ff) < si->dm.timing.v_display)
 		{
 			/* don't snooze much longer or retrace might get missed! */
 			snooze(10);
