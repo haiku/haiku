@@ -43,6 +43,10 @@
 status_t
 get_app_path(char *buffer)
 {
+	// The only way to get the path to the application's executable seems to
+	// be to get an image_info of its image, which also contains a path.
+	// Several images may belong to the team (libraries, add-ons), but only
+	// the one in question should be typed B_APP_IMAGE.
 	status_t error = (buffer ? B_OK : B_BAD_VALUE);
 	image_info info;
 	int32 cookie = 0;
@@ -98,7 +102,7 @@ main_thread_for(team_id team)
 {
 	// For I can't find any trace of how to explicitly get the main thread,
 	// I assume the main thread is the one with the least thread ID.
-	thread_id thread = -1;
+	thread_id thread = B_BAD_TEAM_ID;
 	int32 cookie = 0;
 	thread_info info;
 	while (get_next_thread_info(team, &cookie, &info) == B_OK) {
