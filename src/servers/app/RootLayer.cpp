@@ -934,10 +934,12 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			else
 				invalidate		= ActiveWorkspace()->MoveToFront(target);
 
-			if (invalidate)
+			// Performance: MoveToFront() often returns true although it shouldn't do that.
+			// This is because internaly it calls Workspace::ShowWinBorder() and this imposes
+			// a small penalty, but we can live with that; it make Workspace code a lot more clear/clean.
+
+			if (invalidate && get_workspace_windows())
 			{
-				get_workspace_windows();
-					
 				// TODO: should it be improved by calling with region of hidden windows
 				//       plus the full regions of new windows???
 				invalidate_layer(this, fFull);
@@ -1731,12 +1733,13 @@ void RootLayer::hide_winBorder(WinBorder *winBorder)
 	}
 }
 
-void RootLayer::get_workspace_windows()
+bool RootLayer::get_workspace_windows()
 {
 	int32	bufferSize = fWinBorderListLength;
 	int32	exCount = fWinBorderCount;
 	bool	present;
 	bool	newMemory = false;
+	bool	aChange = false;
 
 	memcpy(fWinBorderList2, fWinBorderList, fWinBorderCount * sizeof(WinBorder*));
 
@@ -1753,9 +1756,17 @@ void RootLayer::get_workspace_windows()
 
 	fWinBorderIndex	= 0;
 
+	// to determine if there was a change in window hierarchy 
+	if (exCount != fWinBorderCount)
+		aChange = true;
+
 	// clear visible and full visible regions for windows no more visible.
 	for (int32 i = 0; i < exCount; i++)
 	{
+		// to determine if there was a change in window hierarchy
+		if (!aChange && fWinBorderList2[i] != fWinBorderList[i])
+			aChange = true;
+
 		present	= false;
 
 		for (int32 j = 0; j < fWinBorderCount; j++)
@@ -1775,6 +1786,7 @@ void RootLayer::get_workspace_windows()
 //	printf("Adi: %ld get_workspace_windows(%p)\n", i, fWinBorderList[i]);
 //}
 //printf("Adi: get_workspace_windows DONE\n");
+	return aChange;
 }
 
 void RootLayer::draw_window_tab(WinBorder *exFocus, WinBorder *focus)
