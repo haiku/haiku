@@ -144,6 +144,20 @@ real_time_clock_usecs(void)
 }
 
 
+status_t
+get_rtc_info(rtc_info *info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+	info->time = real_time_clock();
+	info->is_gmt = sIsGMT;
+	info->tz_minuteswest = sTimezoneOffset;
+	info->tz_dsttime = sDaylightSavingTime;
+
+	return B_OK;
+}
+
+
 //	#pragma mark -
 //	public userland API
 
@@ -219,3 +233,4 @@ _user_get_tzfilename(char *filename, size_t length, bool *_isGMT)
 
 	return B_OK;
 }
+

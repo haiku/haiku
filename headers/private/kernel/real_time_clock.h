@@ -17,6 +17,15 @@ status_t rtc_init(kernel_args *args);
 bigtime_t rtc_boot_time(void);
 	// Returns the time at which the system was booted in microseconds since Jan 1, 1970 UTC.
 
+typedef struct rtc_info {
+	uint32 time;
+	bool is_gmt;
+	int32 tz_minuteswest;
+	bool tz_dsttime;
+} rtc_info;
+
+status_t get_rtc_info(rtc_info *info);
+
 bigtime_t _user_system_time(void);
 status_t _user_set_real_time_clock(uint32 time);
 status_t _user_set_timezone(int32 timezoneOffset, bool daylightSavingTime);
