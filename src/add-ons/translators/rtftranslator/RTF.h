@@ -13,90 +13,113 @@
 #include <GraphicsDefs.h>
 
 class BDataIO;
-class RTFCommand;
 
+namespace RTF {
 
-static const size_t kRTFCommandLength = 32;
+class Group;
+class Header;
+class Command;
 
+static const size_t kCommandLength = 32;
 
-enum rtf_destination {
-	RTF_TEXT,
-	RTF_COMMENT,
-	RTF_OTHER,
-	
-	RTF_ALL_DESTINATIONS = 255
+enum group_destination {
+	TEXT_DESTINATION,
+	COMMENT_DESTINATION,
+	OTHER_DESTINATION,
+
+	ALL_DESTINATIONS = 255
 };
 
-class RTFElement {
+
+class Parser {
 	public:
-		RTFElement();
-		virtual ~RTFElement();
+		Parser(BDataIO &stream);
 
-		status_t AddElement(RTFElement *element);
-		uint32 CountElements() const;
-		RTFElement *ElementAt(uint32 index) const;
-		RTFCommand *FindDefinition(const char *name, int32 index = 0) const;
-		RTFElement *FindGroup(const char *name) const;
-		const char *GroupName() const;
-		RTFElement *Parent() const;
-
-		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t);
-		virtual void PrintToStream();
-
-		void DetermineDestination();
-		rtf_destination Destination() const;
-
-	protected:
-		static char ReadChar(BDataIO &stream, bool endOfFileAllowed = false) throw (status_t);
-		static int32 ParseInteger(char first, BDataIO &stream, char &last) throw (status_t);
+		status_t Identify();
+		status_t Parse(RTF::Header &header);
 
 	private:
-		RTFElement	*fParent;
-		BList		fElements;
-		rtf_destination	fDestination;
+		BDataIO	&fStream;
+		bool	fIdentified;
 };
 
-class RTFHeader : public RTFElement {
+
+class Element {
 	public:
-		RTFHeader();
-		virtual ~RTFHeader();
+		Element();
+		virtual ~Element();
+
+		void SetParent(Group *parent);
+		Group *Parent() const;
+
+		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t) = 0;
+		virtual void PrintToStream(int32 level = 0);
+
+	private:
+		Group	*fParent;
+};
+
+
+class Group : public Element {
+	public:
+		Group();
+		virtual ~Group();
+
+		status_t AddElement(RTF::Element *element);
+		uint32 CountElements() const;
+		Element *ElementAt(uint32 index) const;
+
+		Command *FindDefinition(const char *name, int32 index = 0) const;
+		Group *FindGroup(const char *name) const;
+
+		const char *Name() const;
+
+		void DetermineDestination();
+		group_destination Destination() const;
+
+		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t);
+
+	protected:
+		BList				fElements;
+		group_destination	fDestination;
+};
+
+class Header : public Group {
+	public:
+		Header();
+		virtual ~Header();
 
 		int32 Version() const;
 		const char *Charset() const;
 
 		rgb_color Color(int32 index);
 
-		static status_t Identify(BDataIO &stream);
-		static status_t Parse(BDataIO &stream, RTFHeader &header, bool identified = false);
-
-	protected:
 		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t);
 
 	private:
-		int32		fVersion;
+		int32				fVersion;
 		
 };
 
-class RTFText : public RTFElement {
+class Text : public Element {
 	public:
-		RTFText();
-		virtual ~RTFText();
+		Text();
+		virtual ~Text();
 
-		status_t SetText(const char *text);
-		const char *Text() const;
-		uint32 TextLength() const;
+		status_t SetTo(const char *text);
+		const char *String() const;
+		uint32 Length() const;
 
-	protected:
 		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t);
 
 	private:
-		BString		fText;
+		BString				fText;
 };
 
-class RTFCommand : public RTFElement {
+class Command : public Element {
 	public:
-		RTFCommand();
-		virtual ~RTFCommand();
+		Command();
+		virtual ~Command();
 
 		status_t SetName(const char *name);
 		const char *Name();
@@ -106,31 +129,32 @@ class RTFCommand : public RTFElement {
 		bool HasOption() const;
 		int32 Option() const;
 
-	protected:
 		virtual void Parse(char first, BDataIO &stream, char &last) throw (status_t);
 
 	private:
-		BString		fName;
-		bool		fHasOption;
-		int32		fOption;
+		BString				fName;
+		bool				fHasOption;
+		int32				fOption;
 };
 
 //---------------------------------
 
-class RTFIterator {
+class Iterator {
 	public:
-		RTFIterator(RTFElement &start, rtf_destination destination = RTF_ALL_DESTINATIONS);
+		Iterator(Element &start, group_destination destination = ALL_DESTINATIONS);
 
-		void SetTo(RTFElement &start, rtf_destination destination = RTF_ALL_DESTINATIONS);
+		void SetTo(Element &start, group_destination destination = ALL_DESTINATIONS);
 		void Rewind();
 
 		bool HasNext() const;
-		RTFElement *Next();
+		Element *Next();
 
 	private:
-		RTFElement			*fStart;
-		Stack<RTFElement *>	fStack;
-		rtf_destination		fDestination;
+		Element				*fStart;
+		Stack<Element *>	fStack;
+		group_destination	fDestination;
 };
+
+}	// namespace RTF
 
 #endif	/* RTF_H */

@@ -14,191 +14,15 @@
 #include <ctype.h>
 
 
-static void
-dump(RTFElement &element, int32 level = 0)
-{
-	printf("%03ld:", level);
-	for (int32 i = 0; i < level; i++)
-		printf("  ");
-
-	if (RTFHeader *header = dynamic_cast<RTFHeader *>(&element)) {
-		printf("<RTF header, major version %ld>\n", header->Version());
-	} else if (RTFCommand *command = dynamic_cast<RTFCommand *>(&element)) {
-		printf("<Command: %s", command->Name());
-		if (command->HasOption())
-			printf(", Option %ld", command->Option());
-		puts(">");
-	} else if (RTFText *text = dynamic_cast<RTFText *>(&element)) {
-		printf("<Text>");
-		puts(text->Text());
-	} else
-		puts("<Group>");
-
-	for (uint32 i = 0; i < element.CountElements(); i++)
-		dump(*element.ElementAt(i), level + 1);
-}
+static char read_char(BDataIO &stream, bool endOfFileAllowed = false) throw (status_t);
+static int32 parse_integer(char first, BDataIO &stream, char &_last) throw (status_t);
 
 
-//	#pragma mark -
+using namespace RTF;
 
 
-RTFElement::RTFElement()
-	:
-	fParent(NULL),
-	fDestination(RTF_OTHER)
-{
-}
-
-
-RTFElement::~RTFElement()
-{
-	RTFElement *element;
-	while ((element = (RTFElement *)fElements.RemoveItem(0L)) != NULL) {
-		delete element;
-	}
-}
-
-
-void
-RTFElement::Parse(char first, BDataIO &stream, char &last) throw (status_t)
-{
-	if (first == '\0')
-		first = ReadChar(stream);
-
-	if (first != '{')
-		throw (status_t)B_BAD_TYPE;
-
-	last = ReadChar(stream);
-}
-
-
-status_t
-RTFElement::AddElement(RTFElement *element)
-{
-	if (element == NULL)
-		return B_BAD_VALUE;
-
-	if (fElements.AddItem(element)) {
-		element->fParent = this;
-		return B_OK;
-	}
-
-	return B_NO_MEMORY;
-}
-
-
-uint32
-RTFElement::CountElements() const
-{
-	return (uint32)fElements.CountItems();
-}
-
-
-RTFElement *
-RTFElement::ElementAt(uint32 index) const
-{
-	return static_cast<RTFElement *>(fElements.ItemAt(index));
-}
-
-
-RTFCommand *
-RTFElement::FindDefinition(const char *name, int32 index) const
-{
-	if (index < 0)
-		return NULL;
-
-	RTFElement *element;
-	int32 number = 0;
-	for (uint32 i = 0; (element = ElementAt(i)) != NULL; i++) {
-		if (RTFText *text = dynamic_cast<RTFText *>(element)) {
-			// the ';' indicates the next definition
-			if (!strcmp(text->Text(), ";"))
-				number++;
-		} else if (RTFCommand *command = dynamic_cast<RTFCommand *>(element)) {
-			if (command != NULL
-				&& !strcmp(name, command->Name())
-				&& number == index)
-				return command;
-		}
-	}
-
-	return NULL;
-}
-
-
-RTFElement *
-RTFElement::FindGroup(const char *name) const
-{
-	RTFElement *group;
-	for (uint32 i = 0; (group = ElementAt(i)) != NULL; i++) {
-		RTFCommand *command = dynamic_cast<RTFCommand *>(group->ElementAt(0));
-		if (command != NULL && !strcmp(name, command->Name()))
-			return group;
-	}
-
-	return NULL;
-}
-
-
-const char *
-RTFElement::GroupName() const
-{
-	RTFCommand *command = dynamic_cast<RTFCommand *>(ElementAt(0));
-	if (command != NULL)
-		return command->Name();
-
-	return NULL;
-}
-
-
-RTFElement *
-RTFElement::Parent() const
-{
-	return fParent;
-}
-
-
-void
-RTFElement::PrintToStream()
-{
-	dump(*this, 0);
-}
-
-
-void
-RTFElement::DetermineDestination()
-{
-	const char *name = GroupName();
-	if (name == NULL)
-		fDestination = RTF_TEXT;
-
-	if (!strcmp(name, "*")) {
-		fDestination = RTF_COMMENT;
-		return;
-	}
-
-	const char *texts[] = {"rtf", "sect", "par"};
-	for (uint32 i = 0; i < sizeof(texts) / sizeof(texts[0]); i++) {
-		if (!strcmp(texts[i], name)) {
-			fDestination = RTF_TEXT;
-			return;
-		}
-	}
-
-	fDestination = RTF_OTHER;
-}
-
-
-rtf_destination
-RTFElement::Destination() const
-{
-	return fDestination;
-}
-
-
-/* static */
-char
-RTFElement::ReadChar(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
+static char
+read_char(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
 {
 	char c;
 	ssize_t bytesRead = stream.Read(&c, 1);
@@ -213,9 +37,8 @@ RTFElement::ReadChar(BDataIO &stream, bool endOfFileAllowed) throw (status_t)
 }
 
 
-/* static */
-int32
-RTFElement::ParseInteger(char first, BDataIO &stream, char &_last) throw (status_t)
+static int32
+parse_integer(char first, BDataIO &stream, char &_last) throw (status_t)
 {
 	int32 integer = 0;
 	int32 count = 0;
@@ -223,7 +46,7 @@ RTFElement::ParseInteger(char first, BDataIO &stream, char &_last) throw (status
 	char digit = first;
 
 	if (digit == '\0')
-		digit = ReadChar(stream);
+		digit = read_char(stream);
 
 	while (true) {
 		if (isdigit(digit)) {
@@ -234,7 +57,7 @@ RTFElement::ParseInteger(char first, BDataIO &stream, char &_last) throw (status
 			goto out;
 		}
 
-		digit = ReadChar(stream);
+		digit = read_char(stream);
 	}
 
 out:
@@ -245,141 +68,122 @@ out:
 }
 
 
+static void
+dump(Element &element, int32 level = 0)
+{
+	printf("%03ld:", level);
+	for (int32 i = 0; i < level; i++)
+		printf("  ");
+
+	if (RTF::Header *header = dynamic_cast<RTF::Header *>(&element)) {
+		printf("<RTF header, major version %ld>\n", header->Version());
+	} else if (RTF::Command *command = dynamic_cast<RTF::Command *>(&element)) {
+		printf("<Command: %s", command->Name());
+		if (command->HasOption())
+			printf(", Option %ld", command->Option());
+		puts(">");
+	} else if (RTF::Text *text = dynamic_cast<RTF::Text *>(&element)) {
+		printf("<Text>");
+		puts(text->String());
+	} else if (dynamic_cast<RTF::Group *>(&element) != NULL)
+		puts("<Group>");
+
+	if (RTF::Group *group = dynamic_cast<RTF::Group *>(&element)) {
+		for (uint32 i = 0; i < group->CountElements(); i++)
+			dump(*group->ElementAt(i), level + 1);
+	}
+}
+
+
 //	#pragma mark -
 
 
-RTFHeader::RTFHeader()
+Parser::Parser(BDataIO &stream)
 	:
-	fVersion(0)
+	fStream(stream),
+	fIdentified(false)
 {
-}
-
-
-RTFHeader::~RTFHeader()
-{
-}
-
-
-void
-RTFHeader::Parse(char first, BDataIO &stream, char &last) throw (status_t)
-{
-	int32 openBrackets = 1;
-
-	// The stream has been picked up by the static RTFHeader::Parse(), so
-	// the version follows in the stream -- let's pick it up
-
-	fVersion = ParseInteger(first, stream, last);
-
-	RTFElement *parent = this;
-	char c = last;
-
-	while (true) {
-		RTFElement *element = NULL;
-
-		switch (c) {
-			case '{':
-				openBrackets++;
-				parent->AddElement(element = new RTFElement());
-				parent = element;
-				break;
-
-			case '\\':
-				parent->AddElement(element = new RTFCommand());
-				break;
-
-			case '}':
-				openBrackets--;
-				parent->DetermineDestination();
-				parent = parent->Parent();
-			case '\n':
-			case '\r':
-			{
-				ssize_t bytesRead = stream.Read(&c, 1);
-				if (bytesRead < B_OK)
-					throw (status_t)bytesRead;
-				else if (bytesRead != 1) {
-					// this is the only valid exit status
-					if (openBrackets == 0)
-						return;
-
-					throw B_ERROR;
-				}
-				continue;
-			}
-
-			default:
-				parent->AddElement(element = new RTFText());
-				break;
-		}
-
-		if (element == NULL)
-			throw (status_t)B_ERROR;
-
-		element->Parse(c, stream, last);
-		c = last;
-	}
-}
-
-
-int32
-RTFHeader::Version() const
-{
-	return fVersion;
-}
-
-
-const char *
-RTFHeader::Charset() const
-{
-	RTFCommand *command = dynamic_cast<RTFCommand *>(ElementAt(0));
-	if (command == NULL)
-		return NULL;
-
-	return command->Name();
-}
-
-
-rgb_color 
-RTFHeader::Color(int32 index)
-{
-	rgb_color color = {0, 0, 0, 255};
-
-	RTFElement *colorTable = FindGroup("colortbl");
-
-	if (colorTable != NULL) {
-		if (RTFCommand *gun = colorTable->FindDefinition("red", index))
-			color.red = gun->Option();
-		if (RTFCommand *gun = colorTable->FindDefinition("green", index))
-			color.green = gun->Option();
-		if (RTFCommand *gun = colorTable->FindDefinition("blue", index))
-			color.blue = gun->Option();
-	}
-
-	return color;
 }
 
 
 status_t
-RTFHeader::Identify(BDataIO &stream)
+Parser::Identify()
 {
 	char header[5];
-
-	if (stream.Read(header, sizeof(header)) < (ssize_t)sizeof(header))
+	if (fStream.Read(header, sizeof(header)) < (ssize_t)sizeof(header))
 		return B_IO_ERROR;
 
-	return strncmp(header, "{\\rtf", 5) ? B_BAD_TYPE : B_OK;
+	if (strncmp(header, "{\\rtf", 5))
+		return B_BAD_TYPE;
+
+	fIdentified = true;
+	return B_OK;
 }
 
 
 status_t
-RTFHeader::Parse(BDataIO &stream, RTFHeader &header, bool identified)
+Parser::Parse(Header &header)
 {
-	if (!identified && Identify(stream) != B_OK)
+	if (!fIdentified && Identify() != B_OK)
 		return B_BAD_TYPE;
 
 	try {
+		int32 openBrackets = 1;
+
+		// since we already preparsed parts of the RTF header, the header
+		// is handled here directly
 		char last;
-		header.Parse('\0', stream, last);
+		header.Parse('\0', fStream, last);
+
+		Group *parent = &header;
+		char c = last;
+
+		while (true) {
+			Element *element = NULL;
+
+			switch (c) {
+				case '{':
+					openBrackets++;
+					parent->AddElement(element = new Group());
+					parent = static_cast<Group *>(element);
+					break;
+
+				case '\\':
+					parent->AddElement(element = new Command());
+					break;
+
+				case '}':
+					openBrackets--;
+					parent->DetermineDestination();
+					parent = parent->Parent();
+					// supposed to fall through
+				case '\n':
+				case '\r':
+				{
+					ssize_t bytesRead = fStream.Read(&c, 1);
+					if (bytesRead < B_OK)
+						throw (status_t)bytesRead;
+					else if (bytesRead != 1) {
+						// this is the only valid exit status
+						if (openBrackets == 0)
+							return B_OK;
+
+						throw B_ERROR;
+					}
+					continue;
+				}
+
+				default:
+					parent->AddElement(element = new Text());
+					break;
+			}
+
+			if (element == NULL)
+				throw (status_t)B_ERROR;
+
+			element->Parse(c, fStream, last);
+			c = last;
+		}
 	} catch (status_t status) {
 		return status;
 	}
@@ -391,23 +195,278 @@ RTFHeader::Parse(BDataIO &stream, RTFHeader &header, bool identified)
 //	#pragma mark -
 
 
-RTFText::RTFText()
+Element::Element()
+	:
+	fParent(NULL)
 {
 }
 
 
-RTFText::~RTFText()
+Element::~Element()
 {
-	SetText(NULL);
 }
 
 
 void
-RTFText::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+Element::SetParent(Group *parent)
+{
+	fParent = parent;
+}
+
+
+Group *
+Element::Parent() const
+{
+	return fParent;
+}
+
+
+void
+Element::PrintToStream(int32 level)
+{
+	dump(*this, level);
+}
+
+
+//	#pragma mark -
+
+
+Group::Group()
+	:
+	fDestination(OTHER_DESTINATION)
+{
+}
+
+
+Group::~Group()
+{
+	Element *element;
+	while ((element = (Element *)fElements.RemoveItem(0L)) != NULL) {
+		delete element;
+	}
+}
+
+
+void
+Group::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+{
+	if (first == '\0')
+		first = read_char(stream);
+
+	if (first != '{')
+		throw (status_t)B_BAD_TYPE;
+
+	last = read_char(stream);
+}
+
+
+status_t
+Group::AddElement(Element *element)
+{
+	if (element == NULL)
+		return B_BAD_VALUE;
+
+	if (fElements.AddItem(element)) {
+		element->SetParent(this);
+		return B_OK;
+	}
+
+	return B_NO_MEMORY;
+}
+
+
+uint32
+Group::CountElements() const
+{
+	return (uint32)fElements.CountItems();
+}
+
+
+Element *
+Group::ElementAt(uint32 index) const
+{
+	return static_cast<Element *>(fElements.ItemAt(index));
+}
+
+
+Command *
+Group::FindDefinition(const char *name, int32 index) const
+{
+	if (index < 0)
+		return NULL;
+
+	Element *element;
+	int32 number = 0;
+	for (uint32 i = 0; (element = ElementAt(i)) != NULL; i++) {
+		if (Text *text = dynamic_cast<Text *>(element)) {
+			// the ';' indicates the next definition
+			if (!strcmp(text->String(), ";"))
+				number++;
+		} else if (Command *command = dynamic_cast<Command *>(element)) {
+			if (command != NULL
+				&& !strcmp(name, command->Name())
+				&& number == index)
+				return command;
+		}
+	}
+
+	return NULL;
+}
+
+
+Group *
+Group::FindGroup(const char *name) const
+{
+	Element *element;
+	for (uint32 i = 0; (element = ElementAt(i)) != NULL; i++) {
+		Group *group = dynamic_cast<Group *>(element);
+		if (group == NULL)
+			continue;
+
+		Command *command = dynamic_cast<Command *>(group->ElementAt(0));
+		if (command != NULL && !strcmp(name, command->Name()))
+			return group;
+	}
+
+	return NULL;
+}
+
+
+const char *
+Group::Name() const
+{
+	Command *command = dynamic_cast<Command *>(ElementAt(0));
+	if (command != NULL)
+		return command->Name();
+
+	return NULL;
+}
+
+
+void
+Group::DetermineDestination()
+{
+	const char *name = Name();
+	if (name == NULL) {
+		fDestination = TEXT_DESTINATION;
+		return;
+	}
+
+	if (!strcmp(name, "*")) {
+		fDestination = COMMENT_DESTINATION;
+		return;
+	}
+
+	const char *texts[] = {"rtf", "sect", "par"};
+	for (uint32 i = 0; i < sizeof(texts) / sizeof(texts[0]); i++) {
+		if (!strcmp(name, texts[i])) {
+			fDestination = TEXT_DESTINATION;
+			return;
+		}
+	}
+
+	fDestination = OTHER_DESTINATION;
+}
+
+
+group_destination
+Group::Destination() const
+{
+	return fDestination;
+}
+
+
+//	#pragma mark -
+
+
+Header::Header()
+	:
+	fVersion(0)
+{
+}
+
+
+Header::~Header()
+{
+}
+
+
+void
+Header::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+{
+	// The stream has been peeked into by the parser already, and
+	// only the version follows in the stream -- let's pick it up
+
+	fVersion = parse_integer(first, stream, last);
+
+	// recreate "rtf" command to name this group
+
+	Command *command = new Command();
+	command->SetName("rtf");
+	command->SetOption(fVersion);
+
+	AddElement(command);
+}
+
+
+int32
+Header::Version() const
+{
+	return fVersion;
+}
+
+
+const char *
+Header::Charset() const
+{
+	Command *command = dynamic_cast<Command *>(ElementAt(1));
+	if (command == NULL)
+		return NULL;
+
+	return command->Name();
+}
+
+
+rgb_color 
+Header::Color(int32 index)
+{
+	rgb_color color = {0, 0, 0, 255};
+
+	Group *colorTable = FindGroup("colortbl");
+
+	if (colorTable != NULL) {
+		if (Command *gun = colorTable->FindDefinition("red", index))
+			color.red = gun->Option();
+		if (Command *gun = colorTable->FindDefinition("green", index))
+			color.green = gun->Option();
+		if (Command *gun = colorTable->FindDefinition("blue", index))
+			color.blue = gun->Option();
+	}
+
+	return color;
+}
+
+
+//	#pragma mark -
+
+
+Text::Text()
+{
+}
+
+
+Text::~Text()
+{
+	SetTo(NULL);
+}
+
+
+void
+Text::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 {
 	char c = first;
 	if (c == '\0')
-		c = ReadChar(stream);
+		c = read_char(stream);
 	
 	fText = "";
 
@@ -417,7 +476,7 @@ RTFText::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 
 		// ToDo: this is horribly inefficient with BStrings
 		fText.Append(c, 1);
-		c = ReadChar(stream);
+		c = read_char(stream);
 	}
 
 	// ToDo: add support for different charsets - right now, only ASCII is supported!
@@ -428,21 +487,21 @@ RTFText::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 
 
 status_t
-RTFText::SetText(const char *text)
+Text::SetTo(const char *text)
 {
 	return fText.SetTo(text) != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
 const char *
-RTFText::Text() const
+Text::String() const
 {
 	return fText.String();
 }
 
 
 uint32
-RTFText::TextLength() const
+Text::Length() const
 {
 	return fText.Length();
 }
@@ -451,7 +510,7 @@ RTFText::TextLength() const
 //	#pragma mark -
 
 
-RTFCommand::RTFCommand()
+Command::Command()
 	:
 	fName(NULL),
 	fHasOption(false),
@@ -460,76 +519,74 @@ RTFCommand::RTFCommand()
 }
 
 
-RTFCommand::~RTFCommand()
+Command::~Command()
 {
 }
 
 
 void
-RTFCommand::Parse(char first, BDataIO &stream, char &last) throw (status_t)
+Command::Parse(char first, BDataIO &stream, char &last) throw (status_t)
 {
 	if (first == '\0')
-		first = ReadChar(stream);
+		first = read_char(stream);
 
 	if (first != '\\')
 		throw B_BAD_TYPE;
 
 	// get name
-	char name[kRTFCommandLength];
+	char name[kCommandLength];
 	size_t length = 0;
 	char c;
-	while (isalpha(c = ReadChar(stream))) {
+	while (isalpha(c = read_char(stream))) {
 		name[length++] = c;
-		if (length >= kRTFCommandLength - 1)
+		if (length >= kCommandLength - 1)
 			throw B_BAD_TYPE;
 	}
 
 	if (length == 0) {
-		if (c == '*') {
-			// we're a comment!
-			name[0] = 'c';
-			length++;
-		} else if (c == '\n') {
+		if (c == '\n' || c == '\r') {
 			// we're a hard return
-			name[0] = '\n';
-			length++;
-		}
-	}
+			fName.SetTo("par");
+		} else
+			fName.SetTo(c, 1);
 
-	fName.SetTo(name, length);
+		// read over character
+		c = read_char(stream);
+	} else
+		fName.SetTo(name, length);
 
 	// parse numeric option
 
 	if (c == '-')
-		c = ReadChar(stream);
+		c = read_char(stream);
 
 	last = c;
 
 	if (isdigit(c))
-		SetOption(ParseInteger(c, stream, last));
+		SetOption(parse_integer(c, stream, last));
 
 	// a space delimiter is eaten up by the command
 	if (isspace(last))
-		last = ReadChar(stream);
+		last = read_char(stream);
 }
 
 
 status_t
-RTFCommand::SetName(const char *name)
+Command::SetName(const char *name)
 {
 	return fName.SetTo(name) != NULL ? B_OK : B_NO_MEMORY;
 }
 
 
 const char *
-RTFCommand::Name()
+Command::Name()
 {
 	return fName.String();
 }
 
 
 void
-RTFCommand::UnsetOption()
+Command::UnsetOption()
 {
 	fHasOption = false;
 	fOption = -1;
@@ -537,7 +594,7 @@ RTFCommand::UnsetOption()
 
 
 void
-RTFCommand::SetOption(int32 option)
+Command::SetOption(int32 option)
 {
 	fOption = option;
 	fHasOption = true;
@@ -545,14 +602,14 @@ RTFCommand::SetOption(int32 option)
 
 
 bool
-RTFCommand::HasOption() const
+Command::HasOption() const
 {
 	return fHasOption;
 }
 
 
 int32
-RTFCommand::Option() const
+Command::Option() const
 {
 	return fOption;
 }
@@ -561,14 +618,14 @@ RTFCommand::Option() const
 //	#pragma mark -
 
 
-RTFIterator::RTFIterator(RTFElement &start, rtf_destination destination)
+Iterator::Iterator(Element &start, group_destination destination)
 {
 	SetTo(start, destination);
 }
 
 
 void
-RTFIterator::SetTo(RTFElement &start, rtf_destination destination)
+Iterator::SetTo(Element &start, group_destination destination)
 {
 	fStart = &start;
 	fDestination = destination;
@@ -578,7 +635,7 @@ RTFIterator::SetTo(RTFElement &start, rtf_destination destination)
 
 
 void
-RTFIterator::Rewind()
+Iterator::Rewind()
 {
 	fStack.MakeEmpty();
 	fStack.Push(fStart);
@@ -586,31 +643,31 @@ RTFIterator::Rewind()
 
 
 bool
-RTFIterator::HasNext() const
+Iterator::HasNext() const
 {
 	return !fStack.IsEmpty();
 }
 
 
-RTFElement *
-RTFIterator::Next()
+Element *
+Iterator::Next()
 {
-	RTFElement *element;
+	Element *element;
 
 	if (!fStack.Pop(&element))
 		return NULL;
 
-	// put this element's children on the stack in
-	// reverse order, so that we iterate over the
-	// tree in in-order
+	Group *group = dynamic_cast<Group *>(element);
+	if (group != NULL
+		&& (fDestination == ALL_DESTINATIONS
+			|| fDestination == group->Destination())) {
+		// put this group's children on the stack in
+		// reverse order, so that we iterate over
+		// the tree in in-order
 
-	for (int32 i = element->CountElements(); i-- > 0;) {
-		RTFElement *child = element->ElementAt(i);
-
-		if (fDestination == RTF_ALL_DESTINATIONS
-			|| child->CountElements() == 0
-			|| fDestination == element->Destination())
-			fStack.Push(child);
+		for (int32 i = group->CountElements(); i-- > 0;) {
+			fStack.Push(group->ElementAt(i));
+		}
 	}
 
 	return element;
