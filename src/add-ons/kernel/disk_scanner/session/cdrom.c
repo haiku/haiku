@@ -27,8 +27,8 @@
 #include <scsi.h>
 #include <disk_scanner/session.h>
 
-#define DBG(y) (y)
-//#define DBG(y)
+//#define DBG(y) (y)
+#define DBG(y)
 
 #define TRACE(x) DBG(dprintf x)
 
