@@ -9,8 +9,9 @@
 
 // FindWindow::FindWindow()
 FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, bool *caseState, bool *wrapState, bool *backState)
-			: BWindow(frame," ", B_MODAL_WINDOW, B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE) {
-	AddChild(fFindView=new BBox(BRect(-1,-1,Bounds().Width()+1.5,Bounds().Height()+1.5),"",B_FOLLOW_ALL_SIDES,B_WILL_DRAW));
+			: BWindow(frame,"FindWindow", B_MODAL_WINDOW, B_NOT_RESIZABLE|B_ASYNCHRONOUS_CONTROLS, B_CURRENT_WORKSPACE)
+{
+	AddChild(fFindView=new BBox(Bounds(),"FindView",B_FOLLOW_ALL,B_WILL_DRAW,B_PLAIN_BORDER));
 	fFindView->SetViewColor(221,222,221);
 	
 	font_height height;
