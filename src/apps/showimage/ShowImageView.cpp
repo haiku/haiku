@@ -336,11 +336,10 @@ void ShowImageView::DeleteSelBitmap()
 status_t
 ShowImageView::SetImage(const entry_ref *pref)
 {
-	entry_ref ref;
-	if (!pref)
-		ref = fCurrentRef;
-	else
-		ref = *pref;
+	// If no file was specified, load the specified page of
+	// the current file.
+	if (pref == NULL)
+		pref = &fCurrentRef;
 
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (!proster)
@@ -350,11 +349,11 @@ ShowImageView::SetImage(const entry_ref *pref)
 		// if ref is erroneous or a directory, return error
 		return B_ERROR;
 
-	BFile file(&ref, B_READ_ONLY);
+	BFile file(pref, B_READ_ONLY);
 	translator_info info;
 	memset(&info, 0, sizeof(translator_info));
 	BMessage ioExtension;
-	if (ref != fCurrentRef)
+	if (pref != &fCurrentRef)
 		// if new image, reset to first document
 		fDocumentIndex = 1;
 	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
@@ -381,7 +380,7 @@ ShowImageView::SetImage(const entry_ref *pref)
 	DeleteBitmap();
 	fBitmap = newBitmap;
 	newBitmap = NULL;
-	fCurrentRef = ref;
+	fCurrentRef = *pref;
 	
 	// restore orientation
 	int32 orientation;
