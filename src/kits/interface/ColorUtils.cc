@@ -28,15 +28,27 @@
 
 /*!
 	\brief An approximation of 31/255, which is needed for converting from 32-bit
+		colors to 16-bit and 15-bit.
+*/
+#define RATIO_8_TO_5_BIT .121568627451
+
+/*!
+	\brief An approximation of 63/255, which is needed for converting from 32-bit
 		colors to 16-bit.
 */
-#define RATIO_32_TO_16_BIT .121568627451
+#define RATIO_8_TO_6_BIT .247058823529
 
 /*!
 	\brief An approximation of 255/31, which is needed for converting from 16-bit
+		and 15-bit colors to 32-bit.
+*/
+#define RATIO_5_TO_8_BIT 8.22580645161
+
+/*!
+	\brief An approximation of 255/63, which is needed for converting from 16-bit
 		colors to 32-bit.
 */
-#define RATIO_16_TO_32_BIT 8.225806451613
+#define RATIO_6_TO_8_BIT 4.04761904762
 
 /*!
 	\brief Function for easy assignment of values to rgb_color objects
@@ -60,13 +72,13 @@ void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a)
 }
 
 /*!
-	\brief Function for easy conversion of 16-bit colors to 32-bit
+	\brief Function for easy conversion of 15-bit colors to 32-bit
 	\param col Pointer to an rgb_color.
 	\param color RGBA16 color
 	
 	This function will do nothing if passed a NULL 32-bit color.
 */
-void SetRGBColor(rgb_color *col,uint16 color)
+void SetRGBColor15(rgb_color *col,uint16 color)
 {
 	if(!col)
 		return;
@@ -76,13 +88,39 @@ void SetRGBColor(rgb_color *col,uint16 color)
 	// alpha's the easy part
 	col->alpha=(color & 0x8000)?255:0;
 
-	r16= (color >> 15) & 31;
-	g16= (color >> 10) & 31;
+	r16= (color >> 10) & 31;
+	g16= (color >> 5) & 31;
 	b16= color & 31;
 
-	col->red=uint8(r16 * RATIO_16_TO_32_BIT);
-	col->green=uint8(g16 * RATIO_16_TO_32_BIT);
-	col->blue=uint8(b16 * RATIO_16_TO_32_BIT);
+	col->red=uint8(r16 * RATIO_5_TO_8_BIT);
+	col->green=uint8(g16 * RATIO_5_TO_8_BIT);
+	col->blue=uint8(b16 * RATIO_5_TO_8_BIT);
+}
+
+/*!
+	\brief Function for easy conversion of 16-bit colors to 32-bit
+	\param col Pointer to an rgb_color.
+	\param color RGB16 color
+	
+	This function will do nothing if passed a NULL 32-bit color.
+*/
+void SetRGBColor16(rgb_color *col,uint16 color)
+{
+	if(!col)
+		return;
+	
+	uint16 r16,g16,b16;
+	
+	// alpha's the easy part
+	col->alpha=0;
+
+	r16= (color >> 11) & 31;
+	g16= (color >> 5) & 63;
+	b16= color & 31;
+
+	col->red=uint8(r16 * RATIO_5_TO_8_BIT);
+	col->green=uint8(g16 * RATIO_6_TO_8_BIT);
+	col->blue=uint8(b16 * RATIO_5_TO_8_BIT);
 }
 
 /*!
@@ -150,20 +188,43 @@ uint8 FindClosestColor(rgb_color *palette, rgb_color color)
 	
 	Format is ARGB, 1:5:5:5
 */
-uint16 FindClosestColor16(rgb_color color)
+uint16 FindClosestColor15(rgb_color color)
 {
 	uint16 r16,g16,b16;
-	uint16 color16;
+	uint16 color16=0;
 	
-	r16=uint16(color.red * RATIO_32_TO_16_BIT);
-	g16=uint16(color.green * RATIO_32_TO_16_BIT);
-	b16=uint16(color.blue * RATIO_32_TO_16_BIT);
+	r16=uint16(color.red * RATIO_8_TO_5_BIT);
+	g16=uint16(color.green * RATIO_8_TO_5_BIT);
+	b16=uint16(color.blue * RATIO_8_TO_5_BIT);
 
 	// start with alpha value
 	color16=(color.alpha>127)?0x8000:0;
 
-	color16 |= r16 << 15;
-	color16 |= g16 << 10;
+	color16 |= r16 << 10;
+	color16 |= g16 << 5;
+	color16 |= b16;
+
+	return color16;
+}
+
+/*!
+	\brief Constructs a RGB16 color which best matches a given 32-bit color
+	\param color Color to match
+	\return The closest matching color's value
+	
+	Format is RGB, 5:6:5
+*/
+uint16 FindClosestColor16(rgb_color color)
+{
+	uint16 r16,g16,b16;
+	uint16 color16=0;
+	
+	r16=uint16(color.red * RATIO_8_TO_5_BIT);
+	g16=uint16(color.green * RATIO_8_TO_6_BIT);
+	b16=uint16(color.blue * RATIO_8_TO_5_BIT);
+
+	color16 |= r16 << 11;
+	color16 |= g16 << 5;
 	color16 |= b16;
 
 	return color16;
