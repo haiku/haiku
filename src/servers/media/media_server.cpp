@@ -48,10 +48,6 @@ public:
 	void HandleMessage(int32 code, void *data, size_t size);
 	static int32 controlthread(void *arg);
 
-	void GetSharedBufferArea(BMessage *msg);
-	void RegisterBuffer(BMessage *msg);
-	void UnregisterBuffer(BMessage *msg);
-
 /* functionality not yet implemented
 00014a00 T _ServerApp::_ServerApp(void)
 00014e1c T _ServerApp::~_ServerApp(void)
@@ -210,7 +206,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				size = ((reply.count * sizeof(live_node_info)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
 				reply.area = create_area("get live nodes", reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 				if (reply.area < B_OK) {
-					FATAL("SERVER_GET_LIVE_NODES: failed to create area, %#lx\n", reply.area);
+					FATAL("SERVER_GET_LIVE_NODES: failed to create area, error %#lx\n", reply.area);
 					reply.count = 0;
 					rv = B_ERROR;
 				} else {
@@ -271,7 +267,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				area_id clone;
 				clone = clone_area("media_inputs clone", reinterpret_cast<void **>(&inputs), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (clone < B_OK) {
-					FATAL("SERVER_PUBLISH_INPUTS: failed to clone area, %#lx\n", clone);
+					FATAL("SERVER_PUBLISH_INPUTS: failed to clone area, error %#lx\n", clone);
 					rv = B_ERROR;
 				} else {
 					rv = gNodeManager->PublishInputs(request->node, inputs, request->count);
@@ -293,7 +289,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 				area_id clone;
 				clone = clone_area("media_outputs clone", reinterpret_cast<void **>(&outputs), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
 				if (clone < B_OK) {
-					FATAL("SERVER_PUBLISH_OUTPUTS: failed to clone area, %#lx\n", clone);
+					FATAL("SERVER_PUBLISH_OUTPUTS: failed to clone area, error %#lx\n", clone);
 					rv = B_ERROR;
 				} else {
 					rv = gNodeManager->PublishOutputs(request->node, outputs, request->count);
@@ -420,7 +416,42 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			}
 			break;
 		}
-		
+
+		case SERVER_GET_SHARED_BUFFER_AREA:
+		{
+			const server_get_shared_buffer_area_request *request = reinterpret_cast<const server_get_shared_buffer_area_request *>(data);
+			server_get_shared_buffer_area_reply reply;
+
+			reply.area = gBufferManager->SharedBufferListID();
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+				
+		case SERVER_REGISTER_BUFFER:
+		{
+			const server_register_buffer_request *request = reinterpret_cast<const server_register_buffer_request *>(data);
+			server_register_buffer_reply reply;
+			status_t status;
+			if (request->info.buffer == 0) {
+				reply.info = request->info; //size, offset, flags, area is kept
+				// get a new beuffer id into reply.info.buffer 
+				status = gBufferManager->RegisterBuffer(request->team, request->info.size, request->info.flags, request->info.offset, request->info.area, &reply.info.buffer);
+			} else {
+				reply.info = request->info; //buffer id is kept
+				status = gBufferManager->RegisterBuffer(request->team, request->info.buffer, &reply.info.size, &reply.info.flags, &reply.info.offset, &reply.info.area);
+			}
+			request->SendReply(status, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_UNREGISTER_BUFFER:
+		{
+			const server_unregister_buffer_command *cmd = reinterpret_cast<const server_unregister_buffer_command *>(data);
+
+			gBufferManager->UnregisterBuffer(cmd->team, cmd->bufferid);
+			break;
+		}
+
 		default:
 			printf("media_server: received unknown message code %#08lx\n",code);
 	}
@@ -441,73 +472,9 @@ ServerApp::controlthread(void *arg)
 	return 0;
 }
 
-void
-ServerApp::GetSharedBufferArea(BMessage *msg)
-{
-	BMessage reply(B_OK);
-	reply.AddInt32("area",gBufferManager->SharedBufferListID());
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
-void
-ServerApp::RegisterBuffer(BMessage *msg)
-{
-	team_id teamid;
-	media_buffer_id bufferid;
-	size_t size;
-	int32 flags;
-	size_t offset;
-	area_id area;
-	status_t status;
-	
-	//msg->PrintToStream();
-	
-	teamid = 	msg->FindInt32("team");
-	area = 		msg->FindInt32("area");
-	offset =	msg->FindInt32("offset");
-	size = 		msg->FindInt32("size");
-	flags = 	msg->FindInt32("flags");
-	bufferid = 	msg->FindInt32("buffer");
-
-	//TRACE("ServerApp::RegisterBuffer team = 0x%08x, areaid = 0x%08x, offset = 0x%08x, size = 0x%08x, flags = 0x%08x, buffer = 0x%08x\n",(int)teamid,(int)area,(int)offset,(int)size,(int)flags,(int)bufferid);
-
-	if (bufferid == 0)
-		status = gBufferManager->RegisterBuffer(teamid, size, flags, offset, area, &bufferid);
-	else
-		status = gBufferManager->RegisterBuffer(teamid, bufferid, &size, &flags, &offset, &area);
-
-	BMessage reply(status);
-	reply.AddInt32("buffer",bufferid);
-	reply.AddInt32("size",size);
-	reply.AddInt32("flags",flags);
-	reply.AddInt32("offset",offset);
-	reply.AddInt32("area",area);
-
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
-void
-ServerApp::UnregisterBuffer(BMessage *msg)
-{
-	team_id teamid;
-	media_buffer_id bufferid;
-	status_t status;
-
-	teamid = msg->FindInt32("team");
-	bufferid = msg->FindInt32("buffer");
-	
-	status = gBufferManager->UnregisterBuffer(teamid, bufferid);
-
-	BMessage reply(status);
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
 void ServerApp::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
-		case MEDIA_SERVER_GET_SHARED_BUFFER_AREA: GetSharedBufferArea(msg); break;
-		case MEDIA_SERVER_REGISTER_BUFFER: RegisterBuffer(msg); break;
-		case MEDIA_SERVER_UNREGISTER_BUFFER: UnregisterBuffer(msg); break;
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_SEND_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;

@@ -9,13 +9,6 @@
 #define NEW_MEDIA_SERVER_SIGNATURE 	"application/x-vnd.OpenBeOS-media-server"
 
 enum {
-	// Buffer management
-	MEDIA_SERVER_GET_SHARED_BUFFER_AREA,
-	MEDIA_SERVER_REGISTER_BUFFER,
-	MEDIA_SERVER_UNREGISTER_BUFFER,
-};
-
-enum {
 	ADDONSERVER_INSTANTIATE_DORMANT_NODE,
 	SERVER_REGISTER_MEDIAADDON,
 	SERVER_UNREGISTER_MEDIAADDON,
@@ -25,8 +18,6 @@ enum {
 	SERVER_GET_DORMANT_FLAVOR_INFO,
 	END
 };
-
-
 
 struct xfer_server_get_dormant_flavor_info
 {
@@ -70,14 +61,5 @@ struct xfer_server_register_dormant_node
 	size_t 			dfi_size; 
 	char 			dfi[1];   // a flattened dormant_flavor_info, dfi_size large
 };
-
-
-
-
-namespace BPrivate { namespace media { namespace dataexchange {
-	status_t QueryServer(BMessage *query, BMessage *reply);
-}; }; };
-
-using namespace BPrivate::media::dataexchange;
 
 #endif
