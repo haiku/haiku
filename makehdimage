@@ -274,8 +274,8 @@ done
 # apps
 echo "Installing apps..."
 
-cd $sourceDir/objects/${arch}.R1/kernel
-$scd ${sPrefix}$sourceDir/objects/${arch}.R1/kernel
+cd $sourceDir/objects/${arch}.R1/tests/kernel/boot_floppy
+$scd ${sPrefix}$sourceDir/objects/${arch}.R1/tests/kernel/boot_floppy
 for f in fortune; do
 	$cp ${sPrefix}kernel_$f $targetDir/beos/bin/$f
 done
@@ -295,7 +295,7 @@ $scd ${sPrefix}$sourceDir
 $cp ${sPrefix}data/system/boot/Bootscript \
 	${sPrefix}data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
 $cp ${sPrefix}data/etc/profile ${sPrefix}data/etc/termcap $targetDir/beos/etc/
-$cp ${sPrefix}src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
+$cp ${sPrefix}src/tests/kernel/boot_floppy/fortune/fortunes $targetDir/beos/etc/
 $cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
 $cp ${sPrefix}data/settings/kernel/drivers/kernel \
 	$targetDir/home/config/settings/kernel/drivers/
