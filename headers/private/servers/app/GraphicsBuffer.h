@@ -19,18 +19,42 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		SystemPalette.h
+//	File Name:		GraphicsBuffer.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	One global function to generate the palette which is 
-//					the default BeOS System palette and the variable to go with it
-//  
+//
+//	Description:	Convenience class for working with graphics buffers
+//					Based on concepts from the Anti-Grain Geometry vector gfx library
 //------------------------------------------------------------------------------
-#ifndef _SYSTEM_PALETTE_H_
-#define _SYSTEM_PALETTE_H_
+#ifndef GFX_BUFFER_H
+#define GFX_BUFFER_H
 
-#include <GraphicsDefs.h>
+#include <SupportDefs.h>
 
-void GenerateSystemPalette(rgb_color *palette);
-extern const rgb_color system_palette[];
+class GraphicsBuffer
+{
+public:
+	GraphicsBuffer(uint8 *buffer, uint32 width, uint32 height, uint32 rowbytes);
+	~GraphicsBuffer();
+	
+	void SetTo(uint8 *buffer, uint32 width, uint32 height, uint32 rowbytes);
+	void Unset(void);
+	
+	uint8 *Bits(void) const { return fBuffer;    }
+	uint8 *RowAt(uint32 row) { return fRowList[row]; }
+	
+	uint32 Width(void) const { return fWidth;  }
+	uint32 Height(void) const { return fHeight; }
+	
+	uint32 BytesPerRow(void) const { return fBytesPerRow; }
+	
+private:
+	
+	uint32 fWidth;
+	uint32 fHeight;
+	uint8 *fBuffer;
+	uint8 **fRowList;
+	uint32 fBytesPerRow;
+	uint32 fMaxHeight;
+};
 
 #endif
