@@ -8,7 +8,14 @@
 
 #include <SupportDefs.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern status_t device_manager_init(struct kernel_args *args);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KRENEL_DEVICE_MANAGER_H */
