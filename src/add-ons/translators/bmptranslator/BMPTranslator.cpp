@@ -557,26 +557,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			return B_NO_TRANSLATOR;
 		if (!msheader.imagesize && msheader.compression)
 			return B_NO_TRANSLATOR;
-		if (msheader.imagesize && fileHeader.fileSize <
-			fileHeader.dataOffset + msheader.imagesize)
-			return B_NO_TRANSLATOR;
 		if (msheader.colorsimportant > msheader.colorsused)
-			return B_NO_TRANSLATOR;
-			
-		// If file is uncompressed, calculate the size of the
-		// actual image data and use that to determine if
-		// fileHeader.fileSize, fileHeader.dataOffset
-		// and msheader.imagesize are reasonable values
-		if (msheader.compression == BMP_NO_COMPRESS) {
-			uint32 imagesize = get_rowbytes(msheader.width,
-				msheader.bitsperpixel) * msheader.height;
-			if (msheader.imagesize && msheader.imagesize <
-				imagesize)
-				return B_NO_TRANSLATOR;
-			if (fileHeader.fileSize < fileHeader.dataOffset +
-				imagesize)
-				return B_NO_TRANSLATOR;
-		} 
+			return B_NO_TRANSLATOR; 
 			
 		if (outInfo) {
 			outInfo->type = B_BMP_FORMAT;
@@ -643,15 +625,6 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			os2header.bitsperpixel != 4 &&
 			os2header.bitsperpixel != 8 &&
 			os2header.bitsperpixel != 24)
-			return B_NO_TRANSLATOR;
-			
-		// Calculate the size of the actual image data
-		// and use that to determine if
-		// fileHeader.fileSize and fileHeader.dataOffset
-		// are reasonable values
-		uint32 imagesize = get_rowbytes(os2header.width,
-				os2header.bitsperpixel) * os2header.height;
-		if (fileHeader.fileSize < fileHeader.dataOffset + imagesize)
 			return B_NO_TRANSLATOR;
 		
 		if (outInfo) {
