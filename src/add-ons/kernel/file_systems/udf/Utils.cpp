@@ -162,8 +162,10 @@ uint16
 Udf::calculate_crc(uint8 *data, uint16 length)
 {
 	uint16 crc = 0;
-	for ( ; length > 0; length--, data++) 
-		crc = Udf::kCrcTable[(crc >> 8 ^ *data) & 0xff] ^ (crc << 8);
+	if (data) {
+		for ( ; length > 0; length--, data++) 
+			crc = Udf::kCrcTable[(crc >> 8 ^ *data) & 0xff] ^ (crc << 8);
+	}
 	return crc;
 }
 
