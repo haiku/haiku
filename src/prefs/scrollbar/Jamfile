@@ -2,6 +2,6 @@ SubDir OBOS_TOP src prefs scrollbar ;
 
 AddResources ScrollBar : ScrollBar.rdef ;
 
-Preference ScrollBar : ScrollBar.cpp ScrollBarApp.cpp ScrollBarWindow.cpp ;
+Preference ScrollBar : ScrollBar.cpp ScrollBarApp.cpp ScrollBarWindow.cpp ScrollBarView.cpp ;
 
-LinkSharedOSLibs ScrollBar : be root ;
+LinkSharedOSLibs ScrollBar : be root <boot!home!config!lib>libopenbeos.so ;

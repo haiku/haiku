@@ -1,5 +1,5 @@
-#include <ScrollBarApp.h>
-#include <ScrollBarWindow.h>
+#include "ScrollBarApp.h"
+#include "ScrollBarWindow.h"
 
 ScrollBarApp * scroll_bar_app = 0;
 
