@@ -8,21 +8,38 @@
 
 #include <GraphicsDefs.h>
 
-struct CACHE_FOR_CMAP8 {
-	uint density;
-	bool hit;
-};
+// definition for B_RGB32 (=B_RGB32_LITTLE) and B_RGBA32
+typedef struct {
+	uchar blue;
+	uchar green;
+	uchar red;
+	uchar alpha; // unused in B_RGB32
+} ColorRGB32Little;
+
+// definition for B_RGB32_BIG and B_RGBA32_BIG
+typedef struct {
+	uchar alpha; // unused in B_RGB32_BIG
+	uchar red;
+	uchar green;
+	uchar blue;
+} ColorRGB32Big;
+
+typedef union {
+	ColorRGB32Little little;
+	ColorRGB32Big    big;
+} ColorRGB32;
 
 class Halftone;
 typedef int (Halftone::*PFN_dither)(uchar *dst, const uchar *src, int x, int y, int width);
-typedef uint (*PFN_gray)(rgb_color c);
+typedef uint (*PFN_gray)(ColorRGB32 c);
 
 class Halftone {
 public:
-	enum DITHERTYPE {
-		TYPE1,
-		TYPE2,
-		TYPE3
+	enum DitherType {
+		kType1,
+		kType2,
+		kType3,
+		kTypeFloydSteinberg,
 	};
 	enum GrayFunction {
 		kMixToGray,
@@ -30,65 +47,85 @@ public:
 		kGreenChannel,
 		kBlueChannel
 	};
-	Halftone(color_space cs, double gamma = 1.4, DITHERTYPE dither_type = TYPE3);
+	enum Planes {
+		kPlaneMonochrome1, // 1 bit depth (0 white, 1 black)
+		kPlaneRGB1,        // 3 planes, 1 bit depth (0 black, 7 white)
+	};
+	Halftone(color_space cs, double gamma = 1.4, DitherType dither_type = kTypeFloydSteinberg);
 	~Halftone();
+	void setPlanes(Planes planes);
 	int dither(uchar *dst, const uchar *src, int x, int y, int width);
 	int getPixelDepth() const;
 	const rgb_color *getPalette() const;
 	const uchar *getPattern() const;
 	void setPattern(const uchar *pattern);
+
+protected:
 	PFN_gray getGrayFunction() const;
 	void setGrayFunction(PFN_gray gray);
 	void setGrayFunction(GrayFunction grayFunction);
 
-protected:
 	void createGammaTable(double gamma);
 	void initElements(int x, int y, uchar *elements);
-	int ditherGRAY1(uchar *dst, const uchar *src, int x, int y, int width);
-	int ditherGRAY8(uchar *dst, const uchar *src, int x, int y, int width);
-	int ditherCMAP8(uchar *dst, const uchar *src, int x, int y, int width);
+	uint getDensity(ColorRGB32 c) const;
 	int ditherRGB32(uchar *dst, const uchar *src, int x, int y, int width);
+
+	void initFloydSteinberg();
+	void deleteErrorTables();
+	void uninitFloydSteinberg();
+	void setupErrorBuffer(int x, int y, int width);
+	int ditherFloydSteinberg(uchar *dst, const uchar* src, int x, int y, int width);
 
 	Halftone(const Halftone &);
 	Halftone &operator = (const Halftone &);
 
 private:
-	PFN_dither		__dither;
-	PFN_gray        __gray;
-	int             __pixel_depth;
-	const rgb_color *__palette;
-	const uchar     *__pattern;
-	uint            __gamma_table[256];
-	CACHE_FOR_CMAP8 __cache_table[256];
+	enum {
+		kGammaTableSize = 256,
+		kMaxNumberOfPlanes = 3
+	};
+	PFN_dither		fDither;
+	PFN_gray        fGray;
+	int             fPixelDepth;
+	Planes          fPlanes;
+	const uchar     *fPattern;
+	uint            fGammaTable[kGammaTableSize];
+	int             fNumberOfPlanes;
+	int             fCurrentPlane;
+	// fields used for floyd-steinberg dithering
+	int             fX;
+	int             fY;
+	int             fWidth;
+	int             *fErrorTables[kMaxNumberOfPlanes];
 };
 
 inline int Halftone::getPixelDepth() const
 {
-	return __pixel_depth;
-}
-
-inline const rgb_color *Halftone::getPalette() const
-{
-	return __palette;
+	return fPixelDepth;
 }
 
 inline const uchar * Halftone::getPattern() const
 {
-	return __pattern;
+	return fPattern;
 }
 
 inline void Halftone::setPattern(const uchar *pattern)
 {
-	__pattern = pattern;
+	fPattern = pattern;
 }
 
 inline PFN_gray Halftone::getGrayFunction() const
 {
-	return __gray;
+	return fGray;
 }
 inline void Halftone::setGrayFunction(PFN_gray gray)
 {
-	__gray = gray;
+	fGray = gray;
+}
+
+inline uint Halftone::getDensity(ColorRGB32 c) const
+{
+	return fGammaTable[fGray(c)];
 }
 
 #endif	/* __HALFTONE_H */
