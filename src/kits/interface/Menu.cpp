@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -117,7 +117,7 @@ BMenu::BMenu(const char *name, menu_layout layout)
 		fStickyMode(false),
 		fIgnoreHidden(true),
 		fTriggerEnabled(true),
-		fRedrawAfterSticky(true),
+		fRedrawAfterSticky(false),
 		fAttachAborted(false)
 {
 	InitData(NULL);
@@ -151,7 +151,7 @@ BMenu::BMenu(const char *name, float width, float height)
 		fStickyMode(false),
 		fIgnoreHidden(true),
 		fTriggerEnabled(true),
-		fRedrawAfterSticky(true),
+		fRedrawAfterSticky(false),
 		fAttachAborted(false)
 {
 	InitData(NULL);
@@ -239,7 +239,7 @@ BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 	
-	LayoutItems(0);
+	InvalidateLayout();
 }
 
 
@@ -268,8 +268,10 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 		return err;
 
 	// Make sure we update the layout in case we are already attached.
-	if (Window() && fResizeToFit)
+	if (Window() && fResizeToFit) {
 		LayoutItems(index);
+		Invalidate();
+	}
 
 	// Find the root menu window, so we can install this item.
 	BMenu *root = this;
@@ -720,6 +722,7 @@ BMenu::InvalidateLayout()
 {
 	CacheFontInfo();
 	LayoutItems(0);
+	Invalidate();
 }
 
 
@@ -847,7 +850,7 @@ BMenu::BMenu(BRect frame, const char *name, uint32 resizingMode, uint32 flags,
 		fStickyMode(false),
 		fIgnoreHidden(true),
 		fTriggerEnabled(true),
-		fRedrawAfterSticky(true),
+		fRedrawAfterSticky(false),
 		fAttachAborted(false)
 {
 	InitData(NULL);
@@ -997,15 +1000,16 @@ BMenu::operator=(const BMenu &)
 void
 BMenu::InitData(BMessage *data)
 {
+	// TODO: Get _color, _fname, _fflt from the message, if present
 	BFont font;
 	font.SetFamilyAndStyle(sMenuInfo.f_family, sMenuInfo.f_style);
 	font.SetSize(sMenuInfo.font_size);
-	SetFont(&font);
+	SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE);
 	
-	SetDrawingMode(B_OP_COPY);	
+	SetLowColor(sMenuInfo.background_color);
 	SetViewColor(sMenuInfo.background_color);
-	
-	if (data) {
+				
+	if (data != NULL) {
 		data->FindInt32("_layout", (int32 *)&fLayout);
 		data->FindBool("_rsize_to_fit", &fResizeToFit);
 		data->FindBool("_disable", &fEnabled);
@@ -1051,7 +1055,7 @@ BMenu::_hide()
 BMenuItem *
 BMenu::_track(int *action, long start)
 {
-	// TODO: Take Sticky mode into account
+	// TODO: Take Sticky mode into account, handle submenus
 	BPoint location;
 	ulong buttons;
 	BMenuItem *item = NULL;	
@@ -1064,12 +1068,15 @@ BMenu::_track(int *action, long start)
 				UnlockLooper();
 				break;		
 			}
-				 
-			SelectItem(item);						
 			
-			Draw(Bounds());
+			if (item != fSelected) {
+				SelectItem(item);
+				Invalidate();
+			}
+												
 			UnlockLooper();
-		}	
+		}
+		
 		snooze(50000);
 	} while (buttons != 0);
 	
@@ -1080,6 +1087,11 @@ BMenu::_track(int *action, long start)
 			*action = 5;
 	}
 	
+	if (LockLooper()) {
+		SelectItem(NULL);
+		UnlockLooper();
+	}
+		
 	return item;
 }
 
@@ -1123,7 +1135,7 @@ BMenu::RemoveItems(int32 index, int32 count, BMenuItem *_item, bool del)
 		}
 	}	
 	
-	LayoutItems(0);
+	InvalidateLayout();
 	
 	return result;
 }
@@ -1138,8 +1150,6 @@ BMenu::LayoutItems(int32 index)
 	ComputeLayout(index, true, true, &width, &height);
 
 	ResizeTo(width, height);
-	
-	Invalidate();
 }
 
 
@@ -1402,12 +1412,20 @@ BMenu::Uninstall()
 void
 BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 {
-	if (menuItem != fSelected) {
-		if (fSelected != NULL)
-			fSelected->Select(false);
-		menuItem->Select(true);
-		fSelected = menuItem;
+	// TODO: make use of "showSubmenu" and "selectFirstItem".
+	if (fSelected != NULL) {
+		fSelected->Select(false);
+		if (fSelected->Submenu() != NULL)
+			fSelected->Submenu()->_hide();
 	}
+	
+	if (menuItem != NULL)
+		menuItem->Select(true);
+		
+	fSelected = menuItem;
+	if (fSelected != NULL && fSelected->Submenu() != NULL)
+		fSelected->Submenu()->_show();
+	
 }
 
 

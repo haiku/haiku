@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -137,21 +137,21 @@ void
 BMenuBar::Draw(BRect updateRect)
 {
 	// TODO: implement additional border styles
-	// Fix this function, the BMenuBar isn't drawn correctly
-	if (!IsEnabled()) {
-		LayoutItems(0);
-		Sync();
-		Invalidate();
-	} else {
+	if (IsEnabled()) {
 		BRect bounds(Bounds());
-	
+			
 		PushState();
-		
+	
+		// Restore the background color in case a menuitem
+		// was selected.
+		SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
+		FillRect(bounds & updateRect);
+			
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
 		StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
 		StrokeLine(BPoint(bounds.right, 0.0f));
 
-		SetHighColor(tint_color(ui_color( B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
+		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_1_TINT));
 		StrokeLine(BPoint(1.0f, bounds.bottom - 1.0f),
 			BPoint(bounds.right, bounds.bottom - 1.0f));
 
@@ -160,8 +160,13 @@ BMenuBar::Draw(BRect updateRect)
 		StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
 		
 		PopState();
-		
-		DrawItems(updateRect);	
+				
+		DrawItems(updateRect);
+			
+	} else {
+		LayoutItems(0);
+		Sync();
+		Invalidate();
 	}
 }	
 
@@ -398,14 +403,17 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 		BPoint where;
 		ulong buttons;
 		do {
+			snooze(40000);
 			printf("BMenuBar: tracking...\n");	
 			GetMouse(&where, &buttons);
 			BMenuItem *menuItem = HitTestItems(where, B_ORIGIN); 
 			if (menuItem) {
+				SelectItem(menuItem);
+				// TODO: Actually, this test shouldn't be needed, as
+				// all BMenuBar's BMenuItems are BMenus.
 				BMenu *menu = menuItem->Submenu();
 				if (menu) {
 					printf("BMenuBar: showing menu %s\n", menu->Name());			
-					menu->Show();	
 					do {
 						snooze(40000);
 						GetMouse(&where, &buttons);
@@ -414,7 +422,7 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 						BMenuItem *testItem = HitTestItems(where, B_ORIGIN);
 						if (testItem != NULL && testItem != menuItem)
 							break;
-						
+					
 						resultItem = menu->_track((int *)action, startIndex);
 						printf("BMenuBar: menu %s: action: %ld\n", menu->Name(), *action);					
 						
@@ -422,10 +430,10 @@ BMenuBar::Track(int32 *action, int32 startIndex, bool showMenu)
 					} while (*action != 5);		
 					
 					printf("BMenuBar: hiding menu %s\n", menu->Name());
-					menu->_hide();
-				}		
-			}
-			snooze(40000);
+				}
+				SelectItem(NULL);
+				Invalidate();	
+			}			
 		} while (buttons != 0);
 		
 		window->Unlock();
