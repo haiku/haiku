@@ -4,6 +4,10 @@ SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
+local coreutils_rsrc = [ FGristFiles coreutils.rsrc ] ;
+
+ResComp $(coreutils_rsrc) : [ FGristFiles coreutils.rdef ] ;
+
 StdBinCommands
 	basename.c
 	cat.c
@@ -72,7 +76,7 @@ StdBinCommands
 	wc.c
 	whoami.c
 	yes.c
-	: libfetish.a : coreutils.rdef ;
+	: libfetish.a : $(coreutils_rsrc) ;
 
 # stat.c
 # chroot.c
@@ -86,28 +90,28 @@ StdBinCommands
 
 
 BinCommand ls : 
-	ls.c ls-dir.c : libfetish.a : coreutils.rdef ;
+	ls.c ls-dir.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand rm : 
-	rm.c remove.c : libfetish.a : coreutils.rdef ;
+	rm.c remove.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand chgroup : 
-	chgrp.c chown-core.c : libfetish.a : coreutils.rdef ;
+	chgrp.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand chmod : 
-	chmod.c chown-core.c : libfetish.a : coreutils.rdef ;
+	chmod.c chown-core.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand cp : 
-	cp.c copy.c cp-hash.c : libfetish.a : coreutils.rdef ;
+	cp.c copy.c cp-hash.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand md5sum : 
-	md5sum.c md5.c : libfetish.a : coreutils.rdef ;
+	md5sum.c md5.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand mv : 
-	mv.c copy.c cp-hash.c remove.c : libfetish.a : coreutils.rdef ;
+	mv.c copy.c cp-hash.c remove.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand sha1sum : 
-	md5sum.c sha1sum.c : libfetish.a : coreutils.rdef ;
+	md5sum.c sha1sum.c : libfetish.a : $(coreutils_rsrc) ;
 
 BinCommand vdir : 
-	ls.c ls-vdir.c : libfetish.a : coreutils.rdef ;
+	ls.c ls-vdir.c : libfetish.a : $(coreutils_rsrc) ;
