@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src apps bin desklink ;
+
+AddResources desklink : desklink.rsrc ;
+
+BinCommand desklink :
+	desklink.cpp
+	VolumeSlider.cpp
+	DeskButton.cpp
+	: be media
+	;
+
