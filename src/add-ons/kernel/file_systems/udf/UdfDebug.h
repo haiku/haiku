@@ -142,15 +142,6 @@ private:
 	#define DUMP_INIT(categoryFlags, className)	\
 		DEBUG_INIT_SILENT(categoryFlags, className);	
 				
-	#define DUMP_PRINT(x) { 											\
-		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)			\
-		       == _debugHelper.CategoryFlags()) 						\
-		{																\
-			PRINT_INDENT();												\
-			__out x; 													\
-		} 																\
-	}		
-
 	#define PRINT(x) { 														\
 		if ((_debugHelper.CategoryFlags() & CATEGORY_FILTER)				\
 		       == _debugHelper.CategoryFlags()) 							\
@@ -235,11 +226,15 @@ private:
 	#define DBG(x) x ;
 	
 #else	// ifdef DEBUG
-	#define DEBUG_INIT(x) ;
+	#define DEBUG_INIT_SILENT(categoryFlags, className)	;
+	#define DEBUG_INIT(categoryFlags, className) ;
+	#define DEBUG_INIT_ETC(categoryFlags, className, arguments) ;
+	#define DUMP_INIT(categoryFlags, className)	;
 	#define PRINT(x) ;
 	#define LPRINT(x) ;
 	#define SIMPLE_PRINT(x) ;
 	#define PRINT_INDENT(x) ;
+	#define PRINT_DIVIDER()	;
 	#define REPORT_ERROR(status) ;
 	#define RETURN_ERROR(status) return status;
 	#define RETURN(status) return status;
