@@ -14,10 +14,22 @@
 
 using namespace Sniffer;
 
-Pattern::Pattern(const char *string, const char *mask = NULL)
+Pattern::Pattern(const std::string &string, const std::string &mask)
 	: fCStatus(B_NO_INIT)
 	, fErrorMessage(NULL)
 {
+	SetTo(string, mask);
+}
+
+Pattern::Pattern(const std::string &string)
+	: fCStatus(B_NO_INIT)
+	, fErrorMessage(NULL)
+{
+	// Build a mask with all bits turned on of the
+	// appropriate length
+	std::string mask = "";
+	for (int i = 0; i < string.length(); i++)
+		mask += (char)0xFF;
 	SetTo(string, mask);
 }
 
@@ -38,29 +50,28 @@ Pattern::GetErr() const {
 		return new(nothrow) Err(*fErrorMessage);
 }
 
+void dumpStr(const std::string &string, const char *label = NULL) {
+	if (label)
+		printf("%s: ", label);
+	for (int i = 0; i < string.length(); i++)
+		printf("%x ", string[i]);
+	printf("\n");
+}
+
 status_t
-Pattern::SetTo(const char *string, const char *mask) {
-	if (string) {
-		fString = string;
-		if (fString.length() == 0) {
-			SetStatus(B_BAD_VALUE, "Sniffer pattern error: illegal empty pattern");		
-		} else {
-			if (mask) {
-				fMask = mask;
-				if (fString.length() != fMask.length()) {
-					SetStatus(B_BAD_VALUE, "Sniffer pattern error: pattern and mask lengths do not match");
-				} else {
-					SetStatus(B_OK);
-				}		
-			} else {
-				fMask = "";
-				for (int i = 0; i < fString.length(); i++)
-					fMask += (char)0xFF;
-				SetStatus(B_OK);		
-			}
-		}
+Pattern::SetTo(const std::string &string, const std::string &mask) {
+	fString = string;
+	if (fString.length() == 0) {
+		SetStatus(B_BAD_VALUE, "Sniffer pattern error: illegal empty pattern");		
 	} else {
-		SetStatus(B_BAD_VALUE, "Sniffer parser error: NULL string parameter passed to Pattern::SetTo()");
+		fMask = mask;
+//		dumpStr(string, "data");
+//		dumpStr(mask, "mask");
+		if (fString.length() != fMask.length()) {
+			SetStatus(B_BAD_VALUE, "Sniffer pattern error: pattern and mask lengths do not match");
+		} else {
+			SetStatus(B_OK);
+		}		
 	}
 }
 
@@ -82,6 +93,7 @@ Pattern::Sniff(Range range, BPositionIO *data) const {
 		if (Sniff(i, size, data))
 			return true;
 	}
+	return false;
 }
 
 // Assumes the BPositionIO object is in the correct

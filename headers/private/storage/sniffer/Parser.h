@@ -43,23 +43,24 @@ status_t parse(const char *rule, Rule *result, BString *parseError = NULL);
 */
 class CharStream {
 public:
-	CharStream(const char *string = NULL);
+	CharStream(const std::string &string);
+	CharStream();
 	~CharStream();
 	
-	status_t SetTo(const char *string);
+	status_t SetTo(const std::string &string);
 	void Unset();
 	status_t InitCheck() const;
 	bool IsEmpty() const;
 	ssize_t Pos() const;
-	const char *String() const;
+	const std::string& String() const;
 	
 	char Get();
 	void Unget();
 
 private:
-	char *fString;
+	std::string fString;
 	ssize_t fPos;
-	ssize_t fLen;
+//	ssize_t fLen;
 	status_t fCStatus;
 	
 	CharStream(const CharStream &ref);
@@ -95,9 +96,8 @@ const char* tokenTypeToString(TokenType type);
 class Token {
 public:
 	Token(TokenType type = EmptyToken, const ssize_t pos = -1);
-	virtual ~Token();
 	TokenType Type() const;
-	virtual const char* String() const;
+	virtual const std::string& String() const;
 	virtual int32 Int() const;
 	virtual double Float() const;
 	ssize_t Pos() const;
@@ -114,11 +114,10 @@ protected:
 */
 class StringToken : public Token {
 public:
-	StringToken(const char *string, const ssize_t pos);
-	virtual ~StringToken();
-	virtual const char* String() const;
+	StringToken(const std::string &str, const ssize_t pos);
+	virtual const std::string& String() const;
 protected:
-	char *fString;
+	std::string fString;
 };
 
 //! Integer token class
@@ -157,10 +156,11 @@ protected:
 */
 class TokenStream {
 public:
-	TokenStream(const char *string = NULL);
+	TokenStream(const std::string &string);
+	TokenStream();
 	~TokenStream();
 	
-	status_t SetTo(const char *string);
+	status_t SetTo(const std::string &string);
 	void Unset();
 	status_t InitCheck() const;
 	
@@ -177,7 +177,7 @@ public:
 	
 private:
 	void AddToken(TokenType type, ssize_t pos);
-	void AddString(const char *str, ssize_t pos);
+	void AddString(const std::string &str, ssize_t pos);
 	void AddInt(const char *str, ssize_t pos);
 	void AddFloat(const char *str, ssize_t pos);
 

@@ -47,6 +47,7 @@ Rule::Sniff(BPositionIO *data) const {
 			if (*i)
 				result &= (*i)->Sniff(data);		
 		}
+		return result;
 	}
 }
 

@@ -23,7 +23,8 @@ class Err;
 /*! The byte string and mask (if supplied) must be of the same length. */
 class Pattern {
 public:
-	Pattern(const char *string, const char *mask = NULL);
+	Pattern(const std::string &string, const std::string &mask);
+	Pattern(const std::string &string);
 	~Pattern();
 	
 	status_t InitCheck() const;
@@ -31,7 +32,7 @@ public:
 	
 	bool Sniff(Range range, BPositionIO *data) const;
 	
-	status_t SetTo(const char *string, const char *mask = NULL);
+	status_t SetTo(const std::string &string, const std::string &mask);
 private:
 	bool Sniff(off_t start, off_t size, BPositionIO *data) const;
 	

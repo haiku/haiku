@@ -65,13 +65,19 @@ Sniffer::parse(const char *rule, Rule *result, BString *parseError) {
 // CharStream
 //------------------------------------------------------------------------------
 
-CharStream::CharStream(const char *string)
-	: fString(NULL)
+CharStream::CharStream(const std::string &string)
+	: fString(string)
 	, fPos(0)
-	, fLen(-1)
-	, fCStatus(B_NO_INIT)		
+//	, fLen(-1)
+	, fCStatus(B_OK)		
 {
-	SetTo(string);
+}
+
+CharStream::CharStream()
+	: fString("")
+	, fPos(0)
+	, fCStatus(B_NO_INIT)
+{
 }
 
 CharStream::~CharStream() {
@@ -79,27 +85,18 @@ CharStream::~CharStream() {
 }
 
 status_t
-CharStream::SetTo(const char *string) {
-	Unset();
-	if (string) {
-		fString = new(nothrow) char[strlen(string)+1];
-		if (!fString)
-			fCStatus = B_NO_MEMORY;
-		else {
-			strcpy(fString, string);
-			fLen = strlen(fString);
-			fCStatus = B_OK;
-		}
-	}
+CharStream::SetTo(const std::string &string) {
+	fString = string;
+	fPos = 0;
+	fCStatus = B_OK;
 	return fCStatus;
 }
 
 void
 CharStream::Unset() {
-	delete fString;
-	fCStatus = B_NO_INIT;
+	fString = "";
 	fPos = 0;
-	fLen = -1;
+	fCStatus = B_NO_INIT;
 }
 	
 status_t
@@ -109,7 +106,7 @@ CharStream::InitCheck() const {
 
 bool
 CharStream::IsEmpty() const {
-	return fPos >= fLen;
+	return fPos >= fString.length();
 }
 
 ssize_t
@@ -117,7 +114,7 @@ CharStream::Pos() const {
 	return fPos;
 }
 
-const char*
+const std::string&
 CharStream::String() const {
 	return fString;
 }
@@ -126,7 +123,7 @@ char
 CharStream::Get() {
 	if (fCStatus != B_OK)
 		throw new Err("Sniffer parser error: CharStream::Get() called on uninitialized CharStream object", -1);
-	if (fPos < fLen) 
+	if (fPos < fString.length()) 
 		return fString[fPos++];
 	else {
 		fPos++;		// Increment fPos to keep Unget()s consistent
@@ -156,15 +153,12 @@ Token::Token(TokenType type, const ssize_t pos)
 //		cout << "New Token, fType == " << tokenTypeToString(fType) << endl;
 }
 
-Token::~Token() {
-}
-
 TokenType
 Token::Type() const {
 	return fType;
 }
 
-const char*
+const std::string&
 Token::String() const {
 	throw new Err("Sniffer scanner error: Token::String() called on non-string token", fPos);
 }
@@ -194,6 +188,9 @@ Token::operator==(Token &ref) const {
 //				printf(" str2 == '%s'\n", ref.String());
 //				printf(" strcmp() == %d\n", strcmp(String(), ref.String()));
 			{
+				return String() == ref.String();				
+				
+/*				
 				// strcmp() seems to choke on certain, non-normal ASCII chars
 				// (i.e. chars outside the usual alphabets, but still valid
 				// as far as ASCII is concerned), so we'll just compare the
@@ -212,6 +209,7 @@ Token::operator==(Token &ref) const {
 					}
 				}
 				return true;
+*/
 			}
 //				return strcmp(String(), ref.String()) == 0;
 			
@@ -232,22 +230,13 @@ Token::operator==(Token &ref) const {
 // StringToken
 //------------------------------------------------------------------------------
 
-StringToken::StringToken(const char *string, const ssize_t pos)
+StringToken::StringToken(const std::string &str, const ssize_t pos)
 	: Token(CharacterString, pos)
-	, fString(NULL)
+	, fString(str)
 {
-	if (string) {
-		fString = new(nothrow) char[strlen(string)+1];
-		if (fString) 
-			strcpy(fString, string);
-	}
 }
 
-StringToken::~StringToken() {
-	delete fString;
-}
-
-const char*
+const std::string&
 StringToken::String() const {
 	return fString;
 }
@@ -291,7 +280,7 @@ FloatToken::Float() const {
 // TokenStream
 //------------------------------------------------------------------------------
 
-TokenStream::TokenStream(const char *string = NULL)
+TokenStream::TokenStream(const std::string &string)
 	: fCStatus(B_NO_INIT)
 	, fPos(-1)
 	, fStrLen(-1)
@@ -299,434 +288,438 @@ TokenStream::TokenStream(const char *string = NULL)
 	SetTo(string);
 }
 
+TokenStream::TokenStream()
+	: fCStatus(B_NO_INIT)
+	, fPos(-1)
+	, fStrLen(-1)
+{
+}
+
 TokenStream::~TokenStream() {
 	Unset();
 }
 	
 status_t
-TokenStream::SetTo(const char *string) {
-int q = 0;
+TokenStream::SetTo(const std::string &string) {
 	Unset();
-	if (string) {
-		fStrLen = strlen(string);
-		CharStream stream(string);
-		if (stream.InitCheck() != B_OK) 
-			throw new Err("Sniffer scanner error: Unable to intialize character stream", -1);
-		
-		typedef enum TokenStreamScannerState {
-			tsssStart,
-			tsssOneSingle,
-			tsssOneDouble,
-			tsssOneZero,
-			tsssZeroX,
-			tsssOneHex,
-			tsssTwoHex,
-			tsssHexStringEnd,
-			tsssIntOrFloat,
-			tsssFloat,
-			tsssLonelyDecimalPoint,
-			tsssLonelyMinusOrPlus,
-			tsssLonelyFloatExtension,
-			tsssLonelyFloatExtensionWithSign,
-			tsssExtendedFloat,
-			tsssUnquoted,
-			tsssEscape,
-			tsssEscapeX,
-			tsssEscapeOneOctal,
-			tsssEscapeTwoOctal,
-			tsssEscapeOneHex,
-			tsssEscapeTwoHex
-		};
-		
-		TokenStreamScannerState state = tsssStart;
-		TokenStreamScannerState escapedState;
-			// Used to remember which state to return to from an escape sequence
+	fStrLen = string.length();
+	CharStream stream(string);
+	if (stream.InitCheck() != B_OK) 
+		throw new Err("Sniffer scanner error: Unable to intialize character stream", -1);
+	
+	typedef enum TokenStreamScannerState {
+		tsssStart,
+		tsssOneSingle,
+		tsssOneDouble,
+		tsssOneZero,
+		tsssZeroX,
+		tsssOneHex,
+		tsssTwoHex,
+		tsssHexStringEnd,
+		tsssIntOrFloat,
+		tsssFloat,
+		tsssLonelyDecimalPoint,
+		tsssLonelyMinusOrPlus,
+		tsssLonelyFloatExtension,
+		tsssLonelyFloatExtensionWithSign,
+		tsssExtendedFloat,
+		tsssUnquoted,
+		tsssEscape,
+		tsssEscapeX,
+		tsssEscapeOneOctal,
+		tsssEscapeTwoOctal,
+		tsssEscapeOneHex,
+		tsssEscapeTwoHex
+	};
+	
+	TokenStreamScannerState state = tsssStart;
+	TokenStreamScannerState escapedState;
+		// Used to remember which state to return to from an escape sequence
 
-		std::string charStr;	// Used to build up character strings
-		char lastChar;			// For two char lookahead
-		char lastLastChar;		// For three char lookahead
-		bool keepLooping = true;
-		ssize_t startPos;
-		while (keepLooping) {
-			ssize_t pos = stream.Pos();
-			char ch = stream.Get();
-			switch (state) {				
-				case tsssStart:
-					startPos = pos;
-					switch (ch) {
-						case 0x3:	// End-Of-Text
-							if (stream.IsEmpty()) 
-								keepLooping = false;
-							else 
-								throw new Err(std::string("Sniffer pattern error: invalid character '") + ch + "'", pos);
-							break;							
-					
-						case '\t':
-						case '\n':
-						case ' ':
-							// Whitespace, so ignore it.
-							break;
-
-						case '"':
-							charStr = "";
-							state = tsssOneDouble;
-							break;
-							
-						case '\'':
-							charStr = "";
-							state = tsssOneSingle;
-							break;
-							
-						case '+':	
-						case '-':
-							charStr = ch;
-							state = tsssLonelyMinusOrPlus;
-							break;
-							
-						case '.':
-							charStr = ch;
-							state = tsssLonelyDecimalPoint;
-							break;
-							
-						case '0':
-							charStr = ch;
-							state = tsssOneZero;
-							break;
-							
-						case '1':
-						case '2':
-						case '3':
-						case '4':
-						case '5':
-						case '6':
-						case '7':
-						case '8':
-						case '9':
-							charStr = ch;
-							state = tsssIntOrFloat;							
-							break;							
-													
-						case '&':	AddToken(Ampersand, pos);		break;
-						case '(':	AddToken(LeftParen, pos);		break;
-						case ')':	AddToken(RightParen, pos);		break;
-						case ':':	AddToken(Colon, pos);			break;
-						case '[':	AddToken(LeftBracket, pos);		break;
-						
-						case '\\':
-							charStr = "";					// Clear our string
-							state = tsssEscape;
-							escapedState = tsssUnquoted;	// Unquoted strings begin with an escaped character
-							break;							
-						
-						case ']':	AddToken(RightBracket, pos);		break;
-						case '|':	AddToken(Divider, pos);			break;
-						
-						default:
+	std::string charStr;	// Used to build up character strings
+	char lastChar;			// For two char lookahead
+	char lastLastChar;		// For three char lookahead (have I mentioned I hate octal?)
+	bool keepLooping = true;
+	ssize_t startPos;
+	while (keepLooping) {
+		ssize_t pos = stream.Pos();
+		char ch = stream.Get();
+		switch (state) {				
+			case tsssStart:
+				startPos = pos;
+				switch (ch) {
+					case 0x3:	// End-Of-Text
+						if (stream.IsEmpty()) 
+							keepLooping = false;
+						else 
 							throw new Err(std::string("Sniffer pattern error: invalid character '") + ch + "'", pos);
-					}			
-					break;
-					
-				case tsssOneSingle:
-					switch (ch) {
-						case '\\':
-							escapedState = state;		// Save our state
-							state = tsssEscape;			// Handle the escape sequence
-							break;							
-						case '\'':
-							AddString(charStr.c_str(), startPos);
-							state = tsssStart;
-							break;
-						case 0x3:
-							if (stream.IsEmpty())
-								throw new Err(std::string("Sniffer pattern error: unterminated single-quoted string"), pos);
-							else
-								charStr += ch;
-							break;
-						default:							
-							charStr += ch;
-							break;
-					}
-					break;
-					
-				case tsssOneDouble:
-					switch (ch) {
-						case '\\':
-							escapedState = state;		// Save our state
-							state = tsssEscape;			// Handle the escape sequence
-							break;							
-						case '"':
-							AddString(charStr.c_str(), startPos);
-							state = tsssStart;
-							break;				
-						case 0x3:
-							if (stream.IsEmpty())
-								throw new Err(std::string("Sniffer pattern error: unterminated double-quoted string"), pos);
-							else
-								charStr += ch;
-							break;
-						default:							
-							charStr += ch;
-							break;
-					}
-					break;
+						break;							
+				
+					case '\t':
+					case '\n':
+					case ' ':
+						// Whitespace, so ignore it.
+						break;
 
-				case tsssOneZero:
-					if (ch == 'x') {
-						charStr = "";	// Reinit, since we actually have a hex string
-						state = tsssZeroX;
-					} else if ('0' <= ch && ch <= '9') {
-						charStr += ch;
-						state = tsssIntOrFloat;
-					} else if (ch == '.') {
-						charStr += ch;
-						state = tsssFloat;
-					} else if (ch == 'e' || ch == 'E') {
-						charStr += ch;
-						state = tsssLonelyFloatExtension;
-					} else {
-						// Terminate the number
-						AddInt(charStr.c_str(), startPos);
+					case '"':
+						charStr = "";
+						state = tsssOneDouble;
+						break;
 						
-						// Push the last char back on and try again
-						stream.Unget();
-						state = tsssStart;
-					}
-					break;
-					
-				case tsssZeroX:
-					if (isHexChar(ch)) {
-						lastChar = ch;
-						state = tsssOneHex;
-					} else
-						throw new Err(std::string("Sniffer pattern error: incomplete hex code"), pos);
-					break;
-					
-				case tsssOneHex:
-					if (isHexChar(ch)) {
-						try { 
-							charStr += hexToChar(lastChar, ch);
-						} catch (Err *err) {
-							if (err)
-								err->SetPos(pos);
-							throw err;
-						}
-						state = tsssTwoHex;
-					} else 
-						throw new Err(std::string("Sniffer pattern error: bad hex literal"), pos);	// Same as R5
-					break;
-					
-				case tsssTwoHex:
-					if (isHexChar(ch)) {
-						lastChar = ch;
-						state = tsssOneHex;
-					} else {
-						AddString(charStr.c_str(), startPos);
-						stream.Unget();		// So punctuation gets handled properly
-						state = tsssStart;
-					}
-					break;
-					
-				case tsssIntOrFloat:
-					if (isDecimalChar(ch))
-						charStr += ch;
-					else if (ch == '.') {
-						charStr += ch;
-						state = tsssFloat;
-					} else if (ch == 'e' || ch == 'E') {
-						charStr += ch;
-						state = tsssLonelyFloatExtension;
-					} else {
-						// Terminate the number
-						AddInt(charStr.c_str(), startPos);
+					case '\'':
+						charStr = "";
+						state = tsssOneSingle;
+						break;
 						
-						// Push the last char back on and try again
-						stream.Unget();
-						state = tsssStart;						
-					}
-					break;
-					
-				case tsssFloat:
-					if (isDecimalChar(ch))
-						charStr += ch;
-					else if (ch == 'e' || ch == 'E') {
-						charStr += ch;
-						state = tsssLonelyFloatExtension;
-					} else {
-						// Terminate the number
-						AddFloat(charStr.c_str(), startPos);
+					case '+':	
+					case '-':
+						charStr = ch;
+						state = tsssLonelyMinusOrPlus;
+						break;
 						
-						// Push the last char back on and try again
-						stream.Unget();
-						state = tsssStart;						
-					}
-					break;
-					
-				case tsssLonelyDecimalPoint:
-					if (isDecimalChar(ch)) {
-						charStr += ch;
-						state = tsssFloat;
-					} else
-						throw new Err(std::string("Sniffer pattern error: incomplete floating point number"), pos);
-					break;
-					
-				case tsssLonelyMinusOrPlus:
-					if (isDecimalChar(ch)) {
-						charStr += ch;
-						state = tsssIntOrFloat;
-					} else if (ch == '.') {
-						charStr += ch;
-						state = tsssLonelyDecimalPoint;					
-					} else
-						throw new Err(std::string("Sniffer pattern error: incomplete signed number"), pos);
-					break;
-
-				case tsssLonelyFloatExtension:
-					if (ch == '+' || ch == '-') {
-						charStr += ch;
-						state = tsssLonelyFloatExtensionWithSign;
-					} else if (isDecimalChar(ch)) {
-						charStr += ch;
-						state = tsssExtendedFloat;
-					} else
-						throw new Err(std::string("Sniffer pattern error: incomplete extended-notation floating point number"), pos);
-					break;
-					
-				case tsssLonelyFloatExtensionWithSign:
-					if (isDecimalChar(ch)) {
-						charStr += ch;
-						state = tsssExtendedFloat;
-					} else
-						throw new Err(std::string("Sniffer pattern error: incomplete extended-notation floating point number"), pos);
-					break;
-					
-				case tsssExtendedFloat:
-					if (isDecimalChar(ch)) {
-						charStr += ch;
-						state = tsssExtendedFloat;
-					} else {
-						// Terminate the number
-						AddFloat(charStr.c_str(), startPos);
+					case '.':
+						charStr = ch;
+						state = tsssLonelyDecimalPoint;
+						break;
 						
-						// Push the last char back on and try again
-						stream.Unget();
-						state = tsssStart;						
-					}
-					break;
-
-				case tsssUnquoted:
-					if (ch == '\\') {
+					case '0':
+						charStr = ch;
+						state = tsssOneZero;
+						break;
+						
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+					case '6':
+					case '7':
+					case '8':
+					case '9':
+						charStr = ch;
+						state = tsssIntOrFloat;							
+						break;							
+												
+					case '&':	AddToken(Ampersand, pos);		break;
+					case '(':	AddToken(LeftParen, pos);		break;
+					case ')':	AddToken(RightParen, pos);		break;
+					case ':':	AddToken(Colon, pos);			break;
+					case '[':	AddToken(LeftBracket, pos);		break;
+					
+					case '\\':
+						charStr = "";					// Clear our string
+						state = tsssEscape;
+						escapedState = tsssUnquoted;	// Unquoted strings begin with an escaped character
+						break;							
+					
+					case ']':	AddToken(RightBracket, pos);		break;
+					case '|':	AddToken(Divider, pos);			break;
+					
+					default:
+						throw new Err(std::string("Sniffer pattern error: invalid character '") + ch + "'", pos);
+				}			
+				break;
+				
+			case tsssOneSingle:
+				switch (ch) {
+					case '\\':
 						escapedState = state;		// Save our state
 						state = tsssEscape;			// Handle the escape sequence
-					} else if (isWhiteSpace(ch) || isPunctuation(ch)) {
-						AddString(charStr.c_str(), startPos);
-						stream.Unget();				// In case it's punctuation, let tsssStart handle it
+						break;							
+					case '\'':
+						AddString(charStr, startPos);
 						state = tsssStart;
-					} else if (ch == '\'' || ch == '"') {
-						throw new Err(std::string("Sniffer pattern error: illegal unquoted character '") + ch + "'", pos);
-					} else if (ch == 0x3 && stream.IsEmpty()) {
-						AddString(charStr.c_str(), startPos);
-						keepLooping = false;
-					} else {							
+						break;
+					case 0x3:
+						if (stream.IsEmpty())
+							throw new Err(std::string("Sniffer pattern error: unterminated single-quoted string"), pos);
+						else
+							charStr += ch;
+						break;
+					default:							
 						charStr += ch;
+						break;
+				}
+				break;
+				
+			case tsssOneDouble:
+				switch (ch) {
+					case '\\':
+						escapedState = state;		// Save our state
+						state = tsssEscape;			// Handle the escape sequence
+						break;							
+					case '"':
+						AddString(charStr, startPos);
+						state = tsssStart;
+						break;				
+					case 0x3:
+						if (stream.IsEmpty())
+							throw new Err(std::string("Sniffer pattern error: unterminated double-quoted string"), pos);
+						else
+							charStr += ch;
+						break;
+					default:							
+						charStr += ch;
+						break;
+				}
+				break;
+
+			case tsssOneZero:
+				if (ch == 'x') {
+					charStr = "";	// Reinit, since we actually have a hex string
+					state = tsssZeroX;
+				} else if ('0' <= ch && ch <= '9') {
+					charStr += ch;
+					state = tsssIntOrFloat;
+				} else if (ch == '.') {
+					charStr += ch;
+					state = tsssFloat;
+				} else if (ch == 'e' || ch == 'E') {
+					charStr += ch;
+					state = tsssLonelyFloatExtension;
+				} else {
+					// Terminate the number
+					AddInt(charStr.c_str(), startPos);
+					
+					// Push the last char back on and try again
+					stream.Unget();
+					state = tsssStart;
+				}
+				break;
+				
+			case tsssZeroX:
+				if (isHexChar(ch)) {
+					lastChar = ch;
+					state = tsssOneHex;
+				} else
+					throw new Err(std::string("Sniffer pattern error: incomplete hex code"), pos);
+				break;
+				
+			case tsssOneHex:
+				if (isHexChar(ch)) {
+					try { 
+						charStr += hexToChar(lastChar, ch);
+					} catch (Err *err) {
+						if (err)
+							err->SetPos(pos);
+						throw err;
 					}
-					break;
+					state = tsssTwoHex;
+				} else 
+					throw new Err(std::string("Sniffer pattern error: bad hex literal"), pos);	// Same as R5
+				break;
+				
+			case tsssTwoHex:
+				if (isHexChar(ch)) {
+					lastChar = ch;
+					state = tsssOneHex;
+				} else {
+					AddString(charStr, startPos);
+					stream.Unget();		// So punctuation gets handled properly
+					state = tsssStart;
+				}
+				break;
+				
+			case tsssIntOrFloat:
+				if (isDecimalChar(ch))
+					charStr += ch;
+				else if (ch == '.') {
+					charStr += ch;
+					state = tsssFloat;
+				} else if (ch == 'e' || ch == 'E') {
+					charStr += ch;
+					state = tsssLonelyFloatExtension;
+				} else {
+					// Terminate the number
+					AddInt(charStr.c_str(), startPos);
 					
-				case tsssEscape:
-					if (isOctalChar(ch)) {
-						lastChar = ch;
-						state = tsssEscapeOneOctal;
-					} else if (ch == 'x') {
-						state = tsssEscapeX;
-					} else {
-						// Check for a true end-of-text marker
-						if (ch == 0x3 && stream.IsEmpty())
-							throw new Err(std::string("Sniffer pattern error: incomplete escape sequence"), pos);
-						else {
-							charStr += escapeChar(ch);
-							state = escapedState;	// Return to the state we were in before the escape
-						}
-					}									
-					break;
+					// Push the last char back on and try again
+					stream.Unget();
+					state = tsssStart;						
+				}
+				break;
+				
+			case tsssFloat:
+				if (isDecimalChar(ch))
+					charStr += ch;
+				else if (ch == 'e' || ch == 'E') {
+					charStr += ch;
+					state = tsssLonelyFloatExtension;
+				} else {
+					// Terminate the number
+					AddFloat(charStr.c_str(), startPos);
 					
-				case tsssEscapeX:
-					if (isHexChar(ch)) {
-						lastChar = ch;
-						state = tsssEscapeOneHex;
-					} else 
-						throw new Err(std::string("Sniffer pattern error: incomplete escaped hex code"), pos);
-					break;
-					
-				case tsssEscapeOneOctal:
-					if (isOctalChar(ch)) {
-						lastLastChar = lastChar;
-						lastChar = ch;
-						state = tsssEscapeTwoOctal;
-					} else {
-						// First handle the octal
-						try {
-							charStr += octalToChar(lastChar);
-						} catch (Err *err) {
-							if (err)
-								err->SetPos(startPos);
-							throw err;
-						}
-						
-						// Push the new char back on and let the state we
-						// were in when the escape sequence was hit handle it.
-						stream.Unget();
-						state = escapedState;
-					}									
-					break;
+					// Push the last char back on and try again
+					stream.Unget();
+					state = tsssStart;						
+				}
+				break;
+				
+			case tsssLonelyDecimalPoint:
+				if (isDecimalChar(ch)) {
+					charStr += ch;
+					state = tsssFloat;
+				} else
+					throw new Err(std::string("Sniffer pattern error: incomplete floating point number"), pos);
+				break;
+				
+			case tsssLonelyMinusOrPlus:
+				if (isDecimalChar(ch)) {
+					charStr += ch;
+					state = tsssIntOrFloat;
+				} else if (ch == '.') {
+					charStr += ch;
+					state = tsssLonelyDecimalPoint;					
+				} else
+					throw new Err(std::string("Sniffer pattern error: incomplete signed number"), pos);
+				break;
 
-				case tsssEscapeTwoOctal:
-					if (isOctalChar(ch)) {
-						try {
-							charStr += octalToChar(lastLastChar, lastChar, ch);
-						} catch (Err *err) {
-							if (err)
-								err->SetPos(startPos);
-							throw err;
-						}
-						state = escapedState;
-					} else {
-						// First handle the octal
-						try {
-							charStr += octalToChar(lastLastChar, lastChar);
-						} catch (Err *err) {
-							if (err)
-								err->SetPos(startPos);
-							throw err;
-						}
-						
-						// Push the new char back on and let the state we
-						// were in when the escape sequence was hit handle it.
-						stream.Unget();
-						state = escapedState;
-					}									
-					break;
-
-				case tsssEscapeOneHex:
-					if (isHexChar(ch)) {
-						try {
-							charStr += hexToChar(lastChar, ch);
-						} catch (Err *err) {
-							if (err)
-								err->SetPos(pos);
-							throw err;
-						}
-						state = escapedState;
-					} else
-						throw new Err(std::string("Sniffer pattern error: incomplete escaped hex code"), pos);
-					break;					
+			case tsssLonelyFloatExtension:
+				if (ch == '+' || ch == '-') {
+					charStr += ch;
+					state = tsssLonelyFloatExtensionWithSign;
+				} else if (isDecimalChar(ch)) {
+					charStr += ch;
+					state = tsssExtendedFloat;
+				} else
+					throw new Err(std::string("Sniffer pattern error: incomplete extended-notation floating point number"), pos);
+				break;
+				
+			case tsssLonelyFloatExtensionWithSign:
+				if (isDecimalChar(ch)) {
+					charStr += ch;
+					state = tsssExtendedFloat;
+				} else
+					throw new Err(std::string("Sniffer pattern error: incomplete extended-notation floating point number"), pos);
+				break;
+				
+			case tsssExtendedFloat:
+				if (isDecimalChar(ch)) {
+					charStr += ch;
+					state = tsssExtendedFloat;
+				} else {
+					// Terminate the number
+					AddFloat(charStr.c_str(), startPos);
 					
-			}
+					// Push the last char back on and try again
+					stream.Unget();
+					state = tsssStart;						
+				}
+				break;
+
+			case tsssUnquoted:
+				if (ch == '\\') {
+					escapedState = state;		// Save our state
+					state = tsssEscape;			// Handle the escape sequence
+				} else if (isWhiteSpace(ch) || isPunctuation(ch)) {
+					AddString(charStr, startPos);
+					stream.Unget();				// In case it's punctuation, let tsssStart handle it
+					state = tsssStart;
+				} else if (ch == '\'' || ch == '"') {
+					throw new Err(std::string("Sniffer pattern error: illegal unquoted character '") + ch + "'", pos);
+				} else if (ch == 0x3 && stream.IsEmpty()) {
+					AddString(charStr, startPos);
+					keepLooping = false;
+				} else {							
+					charStr += ch;
+				}
+				break;
+				
+			case tsssEscape:
+				if (isOctalChar(ch)) {
+					lastChar = ch;
+					state = tsssEscapeOneOctal;
+				} else if (ch == 'x') {
+					state = tsssEscapeX;
+				} else {
+					// Check for a true end-of-text marker
+					if (ch == 0x3 && stream.IsEmpty())
+						throw new Err(std::string("Sniffer pattern error: incomplete escape sequence"), pos);
+					else {
+						charStr += escapeChar(ch);
+						state = escapedState;	// Return to the state we were in before the escape
+					}
+				}									
+				break;
+				
+			case tsssEscapeX:
+				if (isHexChar(ch)) {
+					lastChar = ch;
+					state = tsssEscapeOneHex;
+				} else 
+					throw new Err(std::string("Sniffer pattern error: incomplete escaped hex code"), pos);
+				break;
+				
+			case tsssEscapeOneOctal:
+				if (isOctalChar(ch)) {
+					lastLastChar = lastChar;
+					lastChar = ch;
+					state = tsssEscapeTwoOctal;
+				} else {
+					// First handle the octal
+					try {
+						charStr += octalToChar(lastChar);
+					} catch (Err *err) {
+						if (err)
+							err->SetPos(startPos);
+						throw err;
+					}
+					
+					// Push the new char back on and let the state we
+					// were in when the escape sequence was hit handle it.
+					stream.Unget();
+					state = escapedState;
+				}									
+				break;
+
+			case tsssEscapeTwoOctal:
+				if (isOctalChar(ch)) {
+					try {
+						charStr += octalToChar(lastLastChar, lastChar, ch);
+					} catch (Err *err) {
+						if (err)
+							err->SetPos(startPos);
+						throw err;
+					}
+					state = escapedState;
+				} else {
+					// First handle the octal
+					try {
+						charStr += octalToChar(lastLastChar, lastChar);
+					} catch (Err *err) {
+						if (err)
+							err->SetPos(startPos);
+						throw err;
+					}
+					
+					// Push the new char back on and let the state we
+					// were in when the escape sequence was hit handle it.
+					stream.Unget();
+					state = escapedState;
+				}									
+				break;
+
+			case tsssEscapeOneHex:
+				if (isHexChar(ch)) {
+					try {
+						charStr += hexToChar(lastChar, ch);
+					} catch (Err *err) {
+						if (err)
+							err->SetPos(pos);
+						throw err;
+					}
+					state = escapedState;
+				} else
+					throw new Err(std::string("Sniffer pattern error: incomplete escaped hex code"), pos);
+				break;					
+				
 		}
-		if (state == tsssStart)	{
-			fCStatus = B_OK;
-			fPos = 0;
-		} else {
-			throw new Err("Sniffer pattern error: unterminated rule", stream.Pos());
-		}
+	}
+	if (state == tsssStart)	{
+		fCStatus = B_OK;
+		fPos = 0;
+	} else {
+		throw new Err("Sniffer pattern error: unterminated rule", stream.Pos());
 	}
 	
 	return fCStatus;
@@ -828,7 +821,7 @@ TokenStream::AddToken(TokenType type, ssize_t pos) {
 }
 
 void
-TokenStream::AddString(const char *str, ssize_t pos) {
+TokenStream::AddString(const std::string &str, ssize_t pos) {
 	Token *token = new StringToken(str, pos);
 	fTokenList.push_back(token);
 }
@@ -1274,7 +1267,7 @@ Parser::ParsePattern() {
 		// String (i.e. Mask)
 		const Token *t = stream.Get();
 		if (t->Type() == CharacterString) {
-			Pattern *result = new(nothrow) Pattern(str.c_str(), t->String());
+			Pattern *result = new(nothrow) Pattern(str, t->String());
 			if (!result)
 				ThrowOutOfMemError(t->Pos());
 			if (result->InitCheck() == B_OK) {
@@ -1291,7 +1284,7 @@ Parser::ParsePattern() {
 			ThrowUnexpectedTokenError(CharacterString, t);
 	} else {
 		// No mask specified. 
-		Pattern *result = new(nothrow) Pattern(str.c_str());
+		Pattern *result = new(nothrow) Pattern(str);
 		if (result) {
 			if (result->InitCheck() == B_OK)
 				return result;
