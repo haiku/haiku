@@ -58,6 +58,7 @@ PrintJobPage& PrintJobPage::operator=(const PrintJobPage& copy) {
 		fPicture = copy.fPicture;
 		fStatus = copy.fStatus;
 	}
+	return *this;
 }
 
 PrintJobPage::PrintJobPage(BFile* jobFile, off_t start) 
@@ -135,7 +136,7 @@ void PrintJobReader::BuildPageIndex() {
 			fPageIndex[page] < next_page) {
 			fJobFile.Seek(next_page, SEEK_SET);
 		} else {
-			fNumberOfPages = 0; delete fPageIndex; fPageIndex = NULL; 
+			fNumberOfPages = 0; delete fPageIndex; fPageIndex = NULL;
 			return;
 		}
 	}
