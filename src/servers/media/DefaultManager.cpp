@@ -442,6 +442,7 @@ DefaultManager::FindTimeSource()
 		if (B_OK == BMediaRoster::Roster()->GetNodeFor(fPhysicalAudioOut, &clone)) {
 			if (clone.kind & B_TIME_SOURCE) {
 				fTimeSource = clone.node;
+				BMediaRoster::Roster()->StartTimeSource(clone, system_time() + 1000);
 				BMediaRoster::Roster()->ReleaseNode(clone);
 				printf("Default DAC timesource created!\n");
 				return;
@@ -472,6 +473,7 @@ DefaultManager::FindTimeSource()
 				continue;
 			printf("Default DAC timesource \"%s\" created!\n", info[i].name);
 			fTimeSource = info[i].node.node;
+			BMediaRoster::Roster()->StartTimeSource(info[i].node, system_time() + 1000);
 			return;
 		}
 	} else {
