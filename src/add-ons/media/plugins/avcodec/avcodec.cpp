@@ -30,7 +30,7 @@ struct wave_format_ex
 } _PACKED;
 
 /* uncommenting will make Decode() set the current thread priority to time sharing, so it won't totally freeze 
- * if you busy-loop in there (to help debug with CD Manager
+ * if you busy-loop in there (to help debug with CD Manager)
  */
 //#define UNREAL
 
