@@ -84,6 +84,9 @@ ssize_t vfs_write_page(void *vnode, iovecs *vecs, off_t pos);
 void *vfs_get_cache_ptr(void *vnode);
 int vfs_set_cache_ptr(void *vnode, void *cache);
 
+/* special module convenience call */
+status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
+
 /* calls kernel code should make for file I/O */
 int sys_mount(const char *path, const char *device, const char *fs_name, void *args);
 int sys_unmount(const char *path);
