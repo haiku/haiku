@@ -54,17 +54,37 @@ C++FLAGS += -nostdinc ;
 # Determine mimetype of executable
 # Cross compiling can come later
 
-if $(METROWERKS) {
-	OBOS_TARGET ?= "ppc.R1" ;
-	OBOS_TARGET_TYPE ?= "application/x-be-executable" ;
-	OBOS_ARCH ?= "ppc" ; 
-	OBOS_TARGET_DEFINE ?= "ARCH_ppc" ;
-} else {
-	OBOS_TARGET ?= "x86.R1" ;
+TARGET_CPU = $(OSPLAT:L) ;
+OBOS_VERSION ?= R1 ;
+
+switch $(TARGET_CPU) {
+	case ppc :
+	{
+		if $(METROWERKS) {
+			# at least parts of OpenBeOS still can be compiled with
+			# the Metrowerks compiler on BeOS/PPC
+			OBOS_TARGET_TYPE ?= "application/x-be-executable" ;
+		} else {
+			OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
+		}
+		DEFINES += D__POWERPC__ ;
+	}
+	case x86 :
+	{
+		# nothing special to do here...
+	}
+	case * :
+		Exit "Currently unsupported build platform:" $(TARGET_CPU) ;
+}
+
+# set target specific variables
+{
+	#Echo "Building for" $(TARGET_CPU) ;
+
+	OBOS_TARGET ?= $(TARGET_CPU).$(OBOS_VERSION) ;
 	OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
-	OBOS_ARCH ?= "x86" ;
-	OBOS_TARGET_DEFINE ?= "ARCH_x86" ;
-	OBOS_TARGET_DIR ?= "x86" ;
+	OBOS_ARCH ?= $(TARGET_CPU) ;
+	OBOS_TARGET_DEFINE ?= "ARCH_"$(TARGET_CPU) ;
 }
 
 # Enable warnings only if WARNINGS is defined
