@@ -426,7 +426,7 @@ bfs_lookup(void *_ns, void *_directory, const char *file, vnode_id *_vnodeID, in
 	Inode *directory = (Inode *)_directory;
 
 	// check access permissions
-	status_t status = directory->CheckPermissions(R_OK);
+	status_t status = directory->CheckPermissions(X_OK);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
@@ -742,7 +742,7 @@ bfs_create(void *_ns, void *_directory, const char *name, int omode, int mode,
 #endif
 	Transaction transaction(volume, directory->BlockNumber());
 
-	status = Inode::Create(transaction, directory, name, S_FILE | (mode & S_IUMSK),
+	status_t status = Inode::Create(transaction, directory, name, S_FILE | (mode & S_IUMSK),
 		omode, 0, vnodeID);
 
 	if (status >= B_OK) {
@@ -1375,8 +1375,8 @@ bfs_remove_dir(void *_ns, void *_directory, const char *name)
 }
 
 
-/**	creates fs-specific "cookie" struct that keeps track of where
- *	you are at in reading through directory entries in bfs_readdir.
+/**	Opens a directory ready to be traversed.
+ *	bfs_open_dir() is also used by bfs_open_index_dir().
  */
 
 static status_t
@@ -1388,6 +1388,10 @@ bfs_open_dir(void *_ns, void *_node, void **_cookie)
 		RETURN_ERROR(B_BAD_VALUE);
 	
 	Inode *inode = (Inode *)_node;
+
+	status_t status = inode->CheckPermissions(R_OK);
+	if (status < B_OK)
+		RETURN_ERROR(status);
 
 	// we don't ask here for directories only, because the bfs_open_index_dir()
 	// function utilizes us (so we must be able to open indices as well)

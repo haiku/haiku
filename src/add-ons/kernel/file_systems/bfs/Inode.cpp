@@ -2110,7 +2110,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 
 			if (openMode & O_TRUNC) {
 				// we need write access in order to truncate the file
-				status = inode->CheckPermission(W_OK);
+				status = inode->CheckPermissions(W_OK);
 				if (status != B_OK)
 					return status;
 
@@ -2136,6 +2136,8 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 	} else if (parent && (mode & S_ATTR_DIR) == 0)
 		return B_BAD_VALUE;
 
+	status_t status;
+
 	// do we have the power to create new files at all?
 	if (parent != NULL && (status = parent->CheckPermissions(W_OK)) != B_OK)
 		RETURN_ERROR(status);
@@ -2144,7 +2146,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 	InodeAllocator allocator(transaction);
 	block_run run;
 	Inode *inode;
-	status_t status = allocator.New(&parentRun, mode, run, &inode);
+	status = allocator.New(&parentRun, mode, run, &inode);
 	if (status < B_OK)
 		return status;
 
