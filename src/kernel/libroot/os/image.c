@@ -64,3 +64,13 @@ __init__image(struct uspace_program_args const *args)
 {
 	gRuntimeLinker = args->rld_export;
 }
+
+
+void _call_init_routines_(void);
+void
+_call_init_routines_(void)
+{
+	// This is called by the original BeOS startup code.
+	// We don't need it, because our loader already does the job, right?
+}
+

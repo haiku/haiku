@@ -146,3 +146,11 @@ snooze_until(bigtime_t time, int timeBase)
 }
 
 
+void _thread_do_exit_notification(void);
+void
+_thread_do_exit_notification(void)
+{
+	// this is called from the original BeOS startup code
+	// has probably to do with the on_exit stuff.
+}
+

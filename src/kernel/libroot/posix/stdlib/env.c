@@ -6,6 +6,9 @@
 #include <stdlib.h>
 
 
+char **environ = NULL;
+
+
 int setenv(const char *name, const char *value, int overwrite)
 {
 	return sys_setenv(name, value, overwrite);
