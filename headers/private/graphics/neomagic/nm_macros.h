@@ -205,14 +205,23 @@
 #define NMCR1_22CURADDRESS		0x1014
 
 /* NeoMagic PCI acceleration registers */
+/* all cards, but some registers only on 2090 and later */
 #define NMACC_STATUS			0x0000
 #define NMACC_CONTROL			0x0004
 #define NMACC_FGCOLOR			0x000c
-#define NMACC_CLIPLT			0x0018
-#define NMACC_CLIPRB			0x001c
+#define NMACC_2090_CLIPLT		0x0018
+#define NMACC_2090_CLIPRB		0x001c
 #define NMACC_SRCSTARTOFF		0x0024
-#define NMACC_DSTSTARTOFF		0x002c
-#define NMACC_XYEXT				0x0030
+#define NMACC_2090_DSTSTARTOFF	0x002c
+#define NMACC_2090_XYEXT		0x0030
+/* NM2070 only */
+#define NMACC_2070_PLANEMASK	0x0014
+#define NMACC_2070_XYEXT		0x0018
+#define NMACC_2070_SRCPITCH		0x001c
+#define NMACC_2070_SRCBITOFF	0x0020
+#define NMACC_2070_DSTPITCH		0x0028
+#define NMACC_2070_DSTBITOFF	0x002c
+#define NMACC_2070_DSTSTARTOFF	0x0030
 
 
 /* Macros for convenient accesses to the NM chips */

@@ -4,14 +4,14 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.06-9, Rudolf)</h1></p>
+<p><h1>head (0.06-10, Rudolf)</h1></p>
 <ul>
 	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
 	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
 	<li>Kernel driver now signals abort on not being able to setup the INT routine instead of letting the machine freeze during accelerant initialisation;
 	<li>BWindowScreen R3-style function update for acceleration (once setup) and page flipping/virtualscreens in apps ('Allegro' update): fixed cloning accelerants;
 	<li>Updated acceleration engine management code;
-	<li>Added full 2D acceleration for NM2097 and NM2160 cards (the others will be added later);
+	<li>Added full 2D acceleration for NM2070, NM2097 and NM2160 cards (the others will be added later);
 	<li>Updated acceleration for massive speedup compared to Be driver (now running at approx 200-2000% depending on use!);
 	<li>Fixed acceleration on rectangle fills and inverts: nolonger executing zero-width commands (which the app_server gives to the driver sometimes!) so no more big-time distortion stripes onscreen! (the Be driver does exhibit this fault BTW);
 	<li>Updated hardware cursor to be placed elsewhere in cardRAM (acc engine requirement); distorted mousepointers could be fixed by this also on some cards outthere;
