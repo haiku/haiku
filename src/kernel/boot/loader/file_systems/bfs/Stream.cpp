@@ -54,7 +54,8 @@ CachedBlock::CachedBlock(Volume &volume)
 CachedBlock::CachedBlock(Volume &volume, block_run run)
 	:
 	fVolume(volume),
-	fBlockNumber(-1LL)
+	fBlockNumber(-1LL),
+	fBlock(NULL)
 {
 	SetTo(run);
 }
