@@ -47,22 +47,8 @@ MouseView::MouseView(BRect rect, MouseSettings &settings)
 	BRect frame;
 
 	fDoubleClickBitmap = BTranslationUtils::GetBitmap("double_click_bmap");
-	if (!fDoubleClickBitmap) {
-		printf("can't load double_click_bmap with BTranslationUtils::GetBitmap\n");
-		exit(1);
-	}
-
 	fSpeedBitmap = BTranslationUtils::GetBitmap("speed_bmap");
-	if (!fSpeedBitmap) {
-		printf("can't load speed_bmap with BTranslationUtils::GetBitmap\n");
-		exit(1);
-	}
-
 	fAccelerationBitmap = BTranslationUtils::GetBitmap("acceleration_bmap");
-	if (!fAccelerationBitmap) {
-		printf("can't load acceleration_bmap with BTranslationUtils::GetBitmap\n");
-		exit(1);
-	}
 
 	// i don't really understand this bitmap SetBits : i have to substract 4 lines and add 15 pixels
 	BRect mouseRect(0,0,kMouseWidth-1,kMouseHeight-5); 
@@ -228,9 +214,12 @@ MouseView::Draw(BRect updateFrame)
 	if (updateFrame.Intersects(	// i have to add 10 pixels width and height, so weird
 			BRect(333,16,354+fDoubleClickBitmap->Bounds().Width(),
 			165+fAccelerationBitmap->Bounds().Height()))) {
-		DrawBitmapAsync(fDoubleClickBitmap,BPoint(344,16));
-		DrawBitmapAsync(fSpeedBitmap,BPoint(333,90));	
-		DrawBitmapAsync(fAccelerationBitmap,BPoint(333,155));
+		if (fDoubleClickBitmap != NULL)
+			DrawBitmapAsync(fDoubleClickBitmap, BPoint(344, 16));
+		if (fSpeedBitmap != NULL)
+			DrawBitmapAsync(fSpeedBitmap, BPoint(333, 90));
+		if (fAccelerationBitmap != NULL)
+			DrawBitmapAsync(fAccelerationBitmap, BPoint(333, 155));
 	}
 
 	// Draw the mouse 
