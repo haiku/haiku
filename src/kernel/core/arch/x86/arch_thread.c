@@ -10,7 +10,10 @@
 #include <thread.h>
 #include <arch/thread.h>
 #include <arch_cpu.h>
+#include <kernel.h>
+#include <debug.h>
 #include <int.h>
+#include <vm.h>
 #include <tls.h>
 
 #include <string.h>
