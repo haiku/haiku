@@ -163,6 +163,7 @@ enum inode_flags
 	INODE_ATTR_INODE		= 0x00000004,
 	INODE_LOGGED			= 0x00000008,	// log changes to the data stream
 	INODE_DELETED			= 0x00000010,
+	INODE_NOT_READY			= 0x00000020,	// used during Inode construction
 	INODE_LONG_SYMLINK		= 0x00000040,	// symlink in data stream
 
 	INODE_PERMANENT_FLAGS	= 0x0000ffff,
@@ -171,7 +172,6 @@ enum inode_flags
 	INODE_WAS_WRITTEN		= 0x00020000,
 	INODE_NO_TRANSACTION	= 0x00040000,
 	INODE_DONT_FREE_SPACE	= 0x00080000,	// only used by the "chkbfs" functionality
-	INODE_NOT_READY			= 0x00100000,	// used during construction
 	INODE_CHKBFS_RUNNING	= 0x00200000,
 };
 
