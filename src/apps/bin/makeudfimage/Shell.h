@@ -12,17 +12,21 @@
 #define _SHELL_H
 
 #include <string>
+#include <SupportDefs.h>
 
-#include "SupportDefs.h"
+#include "ProgressListener.h"
 
 class Shell {
 public:
 	Shell();
-	void Run(int argc, char *argv[]);
+	status_t Run(int argc, char *argv[]);
+	
 private:
 	status_t _ProcessArguments(int argc, char *argv[]);
 	status_t _ProcessArgument(std::string arg, int argc, char *argv[]);
 	void _PrintHelp();
+	
+	VerbosityLevel fVerbosityLevel;
 };
 
 
