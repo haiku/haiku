@@ -1,0 +1,472 @@
+2004-06-28  Andrew Cagney  <cagney@gnu.org>
+
+	* interp.c: Rename ui_loop_hook to deprecated_ui_loop_hook.
+
+2003-02-27  Andrew Cagney  <cagney@redhat.com>
+
+	* interp.c (sim_open, sim_create_inferior): Rename _bfd to bfd.
+
+2002-06-16  Andrew Cagney  <ac131313@redhat.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+2002-06-09  Andrew Cagney  <cagney@redhat.com>
+
+	* Makefile.in (INCLUDE): Update path to callback.h.
+	* mn10200_sim.h: Include "gdb/callback.h" and "gdb/remote-sim.h".
+
+2001-04-15  J.T. Conklin  <jtc@redback.com>
+
+	* Makefile.in (simops.o): Add simops.h to dependency list.
+
+Tue May 23 21:39:23 2000  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Thu Sep  2 18:15:53 1999  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+1999-05-08  Felix Lee  <flee@cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	
+1999-04-06  Keith Seitz  <keiths@cygnus.com>
+
+	* interp.c (sim_stop): Set the sim's exception
+	to SIGINT.
+
+1999-04-02  Keith Seitz  <keiths@cygnus.com>
+
+	* interp.c (UI_LOOP_POLL_INTERVAL): Define. Used to tweak the
+	frequency at which ui_loop_hook is called.
+	(ui_loop_hook_counter): New global defined when NEED_UI_LOOP_HOOK
+	is defined.
+	(sim_resume): Call ui_loop_hook (if defined) when the interval
+	passes.
+	* Makefile.in (SIM_EXTRA_CFLAGS): Include NEED_UI_LOOP_HOOK.
+
+Wed Jun 17 11:37:59 1998  Mark Alexander  <marka@cygnus.com>
+
+	* Makefile.in: Define NL_TARGET so that targ-vals.h will be used
+	instead of syscall.h.
+	* simops.c: Use targ-vals.h instead of syscall.h.
+
+Tue Apr 28 18:33:31 1998  Geoffrey Noer  <noer@cygnus.com>
+
+        * configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Sun Apr 26 15:31:55 1998  Tom Tromey  <tromey@creche>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	* config.in: Ditto.
+
+Sun Apr 26 15:19:58 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* acconfig.h: New file.
+	* configure.in: Reverted change of Apr 24; use sinclude again.
+
+Fri Apr 24 14:16:40 1998  Tom Tromey  <tromey@creche>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	* config.in: Ditto.
+
+Fri Apr 24 11:19:13 1998  Tom Tromey  <tromey@cygnus.com>
+
+	* configure.in: Don't call sinclude.
+
+Thu Apr 23 09:48:14 1998  Tom Tromey  <tromey@creche>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Sat Apr  4 20:36:25 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Fri Mar 27 16:15:52 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Wed Mar 25 12:35:29 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Wed Mar 18 12:38:12 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Tue Feb 17 12:46:22 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* interp.c (sim_store_register, sim_fetch_register): Pass in
+ 	length parameter.  Return -1.
+
+Sun Feb  1 16:47:51 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Sat Jan 31 18:15:41 1998  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Mon Jan 19 22:26:29 1998  Doug Evans  <devans@seba>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Tue Jan 13 00:01:40 1998  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Stores to abs16 memory addresses zero extend the
+	abs16 address.
+
+Mon Dec 15 23:17:11 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	* config.in: Ditto.
+
+Thu Dec  4 09:21:05 1997  Doug Evans  <devans@canuck.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Wed Oct 22 14:43:00 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* interp.c (sim_load): Pass lma_p and sim_write args to
+ 	sim_load_file.
+
+Fri Oct  3 09:28:00 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Wed Sep 24 17:38:57 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Tue Sep 23 11:04:38 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Mon Sep 22 11:46:20 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Fri Sep 19 17:45:25 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Mon Sep 15 17:36:15 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Thu Sep  4 17:21:23 1997  Doug Evans  <dje@seba>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Tue Sep  2 18:41:23 1997  Jeffrey A Law  (law@cygnus.com)
+
+        * simops.c: PC relative instructions are relative to the next
+	instruction, not the current instruction.
+
+Wed Aug 27 18:13:22 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	* config.in: Ditto.
+
+Tue Aug 26 10:40:45 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* interp.c (sim_kill): Delete.
+	(sim_create_inferior): Add ABFD argument.
+	(sim_load): Move setting of PC from here.
+	(sim_create_inferior): To here.
+
+Mon Aug 25 17:50:22 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	* config.in: Ditto.
+
+Mon Aug 25 16:14:44 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* interp.c (sim_open): Add ABFD argument.
+
+Tue Jun 24 13:44:08 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (sim_resume): Clear State.exited.
+	(sim_stop_reason): If State.exited is nonzero, then indicate that
+	the simulator exited instead of stopped.
+	* mn10200_sim.h (struct _state): Add exited field.
+	* simops.c (syscall): Set State.exited for SYS_exit.
+
+Tue May 20 17:45:47 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c: Replace all references to load_mem and store_mem
+	with references to load_byte, load_half, load_3_byte, load_word
+	and store_byte, store_half, store_3_byte, store_word.
+	(INLINE): Delete definition.
+	(load_mem_big): Likewise.
+	(max_mem): Make it global.
+	(dispatch): Make this function inline.
+	(load_mem, store_mem): Delete functions.
+	* mn10200_sim.h (INLINE): Define.
+	(RLW): Delete unused definition.
+	(load_mem, store_mem): Delete declarations.
+	(load_mem_big): New definition.
+	(load_byte, load_half, load_3_byte, load_word): New functions.
+	(store_byte, store_half, store_3_byte, store_word): New functions.
+	* simops.c:  Replace all references to load_mem and store_mem
+	with references to load_byte, load_half, load_3_byte, load_word
+	and store_byte, store_half, store_3_byte, store_word.
+
+Tue May 20 10:21:00 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* interp.c (sim_open): Add callback argument.
+	(sim_set_callbacks): Delete SIM_DESC argument.
+
+Sun May 18 16:59:09 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (compare_simops): New function.
+	(sim_open): Sort the Simops table before inserting entries
+	into the hash table.
+
+Fri May 16 16:29:18 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (load_mem): Fix formatting/indention problems with
+	last change.  If we get a load from an out of range address,
+	abort instead of returning zero.
+	(store_mem): Abort if we try to store to an out of range address.
+
+Wed May 14 21:21:30 1997  Bob Manson  <manson@charmed.cygnus.com>
+
+	* simops.c (OP_F010): Fix some arguments to correspond
+	with reality (types of arguments passed to lseek, read,
+	write, open).
+
+	* interp.c (max_mem): New variable.
+	(load_mem): Check memory address against max_mem to
+	avoid some self-destructive behaviors.
+
+Tue May 13 21:45:24 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix typo in cc0 setting for lsr.
+
+Tue May  6 13:22:12 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c: Random typo/thinko cleanups.
+
+Thu Apr 24 00:39:51 1997  Doug Evans  <dje@canuck.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Mon Apr 21 10:29:30 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix typo in "open" syscall emulation.
+
+Fri Apr 18 14:04:31 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* interp.c (sim_stop): Add stub function.
+
+Thu Apr 17 03:23:58 1997  Doug Evans  <dje@canuck.cygnus.com>
+
+	* Makefile.in (SIM_OBJS): Add sim-load.o.
+	* interp.c (sim_kind, myname): New static locals.
+	(sim_open): Set sim_kind, myname.  Ignore -E arg.
+	(sim_load): Return SIM_RC.  New arg abfd.  Call sim_load_file to
+	load file into simulator.  Set start address from bfd.
+	(sim_create_inferior): Return SIM_RC.  Delete arg start_address.
+
+Wed Apr 16 18:06:50 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* simops.c (OP_F010): SYS_execv, SYS_time, SYS_times, SYS_utime
+ 	only include if implemented by host.
+
+Mon Apr  7 15:45:02 1997  Andrew Cagney  <cagney@kremvax.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+	* config.in: Ditto.
+
+Fri Apr  4 20:01:56 1997  Ian Lance Taylor  <ian@cygnus.com>
+
+	* Makefile.in: Change mn10200-opc.o to m10200-opc.o, to match
+	corresponding change in opcodes directory.
+
+Wed Apr  2 15:06:28 1997  Doug Evans  <dje@canuck.cygnus.com>
+
+	* interp.c (sim_open): New arg `kind'.
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Wed Apr  2 14:34:19 1997 Andrew Cagney <cagney@kremvax.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Thu Mar 20 20:28:14 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10200_sim.h: Protect uses of "signed" to cater to broken
+	non-ansi compilers (HPs).  Don't use #error for the same reason.
+
+Tue Mar 18 12:23:31 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Don't sign-extend immediate for "mov imm16,an".
+	Simplify "sub" handling.  Fix "mul" to properly sign extend
+	operands.  Set CF appropriately for btst imm16,dn.  Implement "rti".
+
+	* gencode.c: Delete unused "Opcodes" and "curop" variables.
+
+Wed Mar 19 01:14:00 1997  Andrew Cagney  <cagney@kremvax.cygnus.com>
+
+	* configure: Regenerated to track ../common/aclocal.m4 changes.
+
+Mon Mar 17 15:10:07 1997  Andrew Cagney  <cagney@kremvax.cygnus.com>
+
+	* configure: Re-generate.
+
+Fri Mar 14 10:34:11 1997  Michael Meissner  <meissner@cygnus.com>
+
+	* configure: Regenerate to track ../common/aclocal.m4 changes.
+
+Thu Mar 13 12:53:14 1997  Doug Evans  <dje@canuck.cygnus.com>
+
+	* interp.c (sim_open): New SIM_DESC result.  Argument is now
+	in argv form.
+	(other sim_*): New SIM_DESC argument.
+
+Wed Mar 12 15:02:35 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix typo for "bclr".
+
+Wed Feb 26 16:46:13 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Handle new calling convention in emulated syscall
+	code.
+
+Mon Feb 24 14:25:11 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (load_mem_big): Add some missing parens.
+
+Wed Feb 19 23:19:08 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Don't use "long long" data types for intermediate
+	values in "divu", "mul" and "mulu" instructions.
+
+Fri Feb 14 02:46:46 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (hash): Rework to be more efficient.
+	(dispatch): Renamed from lookup_hash.  Dispatch to the target
+	function and update the PC here.
+	(load_mem_big): Now a macro.
+	(sim_resume): Restructure code to read an insn, determine its
+	length, call dispatch routines, etc to be much more efficient.
+
+Fri Feb  7 12:59:36 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (MAX_HASH): Redefine to 127.
+	(struct hash_entry): Add "count" field when HASH_STAT is defined.
+	(hash): Improve hashing for many heavily used opcodes.
+	(lookup_hash): Bump counters if HASH_STAT is defined.
+	(sim_open): Don't put the same opcode in the hash table more
+	than once.  Clear counters if HASH_STAT is defined.
+	(sim_resume): After program exits, dump hash table stats if
+	HASH_STAT is defined.
+
+Wed Feb  5 10:28:37 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix register extraction for "ext dn".
+
+Tue Feb  4 17:27:41 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix register extractions for "movbu (an), dm".
+
+Tue Feb  4 13:33:30 1997  Doug Evans  <dje@canuck.cygnus.com>
+
+	* Makefile.in (@COMMON_MAKEFILE_FRAG): Use
+	COMMON_{PRE,POST}_CONFIG_FRAG instead.
+	* configure.in: sinclude ../common/aclocal.m4.
+	* configure: Regenerated.
+
+Fri Jan 31 01:19:02 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Get carry-in bit right for rol.  Just clear the
+	NF flag for btst imm8,dn.
+
+Wed Jan 29 15:47:42 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Properly compute ZF flag for many insns.
+
+Sat Jan 25 17:06:55 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Properly truncate divisor and dividend before
+	performing "divu" operation.
+
+Fri Jan 24 10:47:48 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c (init_system): Allocate 2^19 bytes of space for
+	the simulator.
+
+Thu Jan 23 21:17:33 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Rework code to extract arguments for emulated
+	syscalls to handle 24bit pointers.
+
+Thu Jan 23 14:06:04 1997  Stu Grossman  (grossman@critters.cygnus.com)
+
+	* configure configure.in Makefile.in:  Update to new configure
+	scheme which is more compatible with WinGDB builds.
+	* configure.in:  Improve comment on how to run autoconf.
+	* configure:  Re-run autoconf to get new ../common/aclocal.m4.
+	* Makefile.in:  Use autoconf substitution to install common
+	makefile fragment.
+
+Thu Jan 23 12:04:38 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix destination register for "mov (abs24),an".
+
+Tue Jan 21 15:59:21 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: "rts" adds 4 to the stack pointer.
+
+	* simops.c: Fix CF and CX computation for add instructions.
+
+	* simops.c: Leave the upper 8 bits alone for logical ops.
+	Mask off high 8 bits before doing any shifts/rotates.
+	Fix carry bit handling in rotates again.
+
+Mon Jan 20 10:45:08 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Don't lose the sign bit for "asr".
+
+Fri Jan 17 01:45:14 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix overflow computation for "cmp" and "sub"
+	instructions.
+
+	* simops.c: Use the right register for "jmp (an)" and "jsr (an)".
+
+	* interp.c (hash): Improve hashing for 3 byte instructions.
+
+	* simops.c: Fix extraction of 16/24bit immediates for some
+	instructions.  "cmp" instructions only modify the PSW.
+	Fix various thinkos when extracting register operands too.
+
+Thu Jan 16 07:47:56 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* simops.c: Fix "rol" and "ror".
+
+	* simops.c: Truncate PC to 24bits after modifying it.
+	Closer stab at emulated system calls.
+
+Tue Jan 14 12:33:12 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* interp.c (hash): Improve hashing of two byte insns.
+	(store_mem): Handle storing 3 byte quantities.
+
+	* simops.c: Fix various typos/thinkos.
+
+	* interp.c (load_mem_big, load_mem, store_mem): Fix thinko in
+	code to handle 24bit addresses.
+	* simops.c (REG0_8, REG0_16): Fix typo.
+
+Mon Jan  6 16:17:09 1997  Jeffrey A Law  (law@cygnus.com)
+
+	* mn10200_sim.h: Various fixes for mixed 16/24bit architecture.
+	* interp.c: Similarly.
+	* simops.c: Similarly.
+
+	* Makefile.in, config.in, configure, configure.in: New files.
+	* gencode.c, interp.c, mn10200_sim.h, simops.c: New files.
+	

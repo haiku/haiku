@@ -1,0 +1,11 @@
+# Host: Intel 386 running GNU/Linux.
+
+NAT_FILE= nm-linux.h
+NATDEPFILES= infptrace.o inftarg.o fork-child.o corelow.o \
+	core-aout.o i386-nat.o i386-linux-nat.o \
+	proc-service.o thread-db.o gcore.o \
+	linux-nat.o
+
+# The dynamically loaded libthread_db needs access to symbols in the
+# gdb executable.
+LOADLIBES = -ldl -rdynamic

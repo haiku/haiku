@@ -1,0 +1,13 @@
+dnl Process this file with autoconf to produce a configure script.
+sinclude(../common/aclocal.m4)
+AC_PREREQ(2.5)dnl
+AC_INIT(Makefile.in)
+
+SIM_AC_COMMON
+
+SIM_AC_OPTION_WARNINGS
+
+AC_CHECK_HEADERS(unistd.h)
+
+
+SIM_AC_OUTPUT

@@ -1,0 +1,23 @@
+2004-08-13  Mark Kettenis  <kettenis@gnu.org>
+
+	* symconst.h (langMax): Fix typo in comment.
+
+2004-04-23  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (MIPS_R_RELHI, MIPS_R_RELLO, MIPS_R_SWITCH): Remove
+	(MIPS_R_PCREL16): Update comment.
+	* ecoff.h (struct ecoff_value_adjust): Remove structure.
+	(struct ecoff_debug_info): Remove 'adjust' member.
+
+2004-04-20  DJ Delorie  <dj@redhat.com>
+
+	* internal.h (R_SECREL32): Add.
+
+For older changes see ChangeLog-9103
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

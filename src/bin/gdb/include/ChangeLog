@@ -1,0 +1,259 @@
+2004-10-12  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h (EF_ARM_EABI_VER4): Define.
+
+2004-10-08  Daniel Jacobowitz  <dan@debian.org>
+
+	* elf/common.h (PT_SUNW_EH_FRAME): Define.
+	* elf/x86-64.h (SHT_X86_64_UNWIND): Define.
+
+2004-10-07  Bob Wilson  <bob.wilson@acm.org>
+
+	* xtensa-config.h (XSHAL_USE_ABSOLUTE_LITERALS,
+	XCHAL_HAVE_PREDICTED_BRANCHES, XCHAL_INST_FETCH_WIDTH): New.
+	(XCHAL_EXTRA_SA_SIZE, XCHAL_EXTRA_SA_ALIGN): Delete.
+
+	* xtensa-isa-internal.h (ISA_INTERFACE_VERSION): Delete.
+	(config_sturct struct): Delete.
+	(XTENSA_OPERAND_IS_REGISTER, XTENSA_OPERAND_IS_PCRELATIVE,
+	XTENSA_OPERAND_IS_INVISIBLE, XTENSA_OPERAND_IS_UNKNOWN,
+	XTENSA_OPCODE_IS_BRANCH, XTENSA_OPCODE_IS_JUMP,
+	XTENSA_OPCODE_IS_LOOP, XTENSA_OPCODE_IS_CALL,
+	XTENSA_STATE_IS_EXPORTED, XTENSA_INTERFACE_HAS_SIDE_EFFECT): Define.
+	(xtensa_format_encode_fn, xtensa_get_slot_fn, xtensa_set_slot_fn): New.
+	(xtensa_insn_decode_fn): Rename to ...
+	(xtensa_opcode_decode_fn): ... this.
+	(xtensa_immed_decode_fn, xtensa_immed_encode_fn, xtensa_do_reloc_fn,
+	xtensa_undo_reloc_fn): Update.
+	(xtensa_encoding_template_fn): Delete.
+	(xtensa_opcode_encode_fn, xtensa_format_decode_fn,
+	xtensa_length_decode_fn): New.
+	(xtensa_format_internal, xtensa_slot_internal): New types.
+	(xtensa_operand_internal): Delete operand_kind, inout, isPCRelative,
+	get_field, and set_field fields.  Add name, field_id, regfile,
+	num_regs, and flags fields.
+	(xtensa_arg_internal): New type.
+	(xtensa_iclass_internal): Change operands field to array of
+	xtensa_arg_internal.  Add num_stateOperands, stateOperands,
+	num_interfaceOperands, and interfaceOperands fields.
+	(xtensa_opcode_internal): Delete length, template, and iclass fields.
+	Add iclass_id, flags, encode_fns, num_funcUnit_uses, and funcUnit_uses.
+	(opname_lookup_entry): Delete.
+	(xtensa_regfile_internal, xtensa_interface_internal,
+	xtensa_funcUnit_internal, xtensa_state_internal,
+	xtensa_sysreg_internal, xtensa_lookup_entry): New.
+	(xtensa_isa_internal): Replace opcode_table field with opcodes field.
+	Change type of opname_lookup_table.  Delete num_modules,
+	module_opcode_base, module_decode_fn, config, and has_density fields.
+	Add num_formats, formats, format_decode_fn, length_decode_fn,
+	num_slots, slots, num_fields, num_operands, operands, num_iclasses,
+	iclasses, num_regfiles, regfiles, num_states, states,
+	state_lookup_table, num_sysregs, sysregs, sysreg_lookup_table,
+	max_sysreg_num, sysreg_table, num_interfaces, interfaces,
+	interface_lookup_table, num_funcUnits, funcUnits and
+	funcUnit_lookup_table fields.
+	(xtensa_isa_module, xtensa_isa_modules): Delete.
+	(xtensa_isa_name_compare): New prototype.
+	(xtisa_errno, xtisa_error_msg): New.
+	* xtensa-isa.h (XTENSA_ISA_VERSION): Define.
+	(xtensa_isa): Change type.
+	(xtensa_operand): Delete.
+	(xtensa_format, xtensa_regfile, xtensa_state, xtensa_sysreg,
+	xtensa_interface, xtensa_funcUnit, xtensa_isa_status,
+	xtensa_funcUnit_use): New types.
+	(libisa_module_specifier): Delete.
+	(xtensa_isa_errno, xtensa_isa_error_msg): New prototypes.
+	(xtensa_insnbuf_free, xtensa_insnbuf_to_chars,
+	xtensa_insnbuf_from_chars): Update prototypes.
+	(xtensa_load_isa, xtensa_extend_isa, xtensa_default_isa,
+	xtensa_insn_maxlength, xtensa_num_opcodes, xtensa_decode_insn,
+	xtensa_encode_insn, xtensa_insn_length,
+	xtensa_insn_length_from_first_byte, xtensa_num_operands,
+	xtensa_operand_kind, xtensa_encode_result,
+	xtensa_operand_isPCRelative): Delete.
+	(xtensa_isa_init, xtensa_operand_inout, xtensa_operand_get_field,
+	xtensa_operand_set_field, xtensa_operand_encode,
+	xtensa_operand_decode, xtensa_operand_do_reloc,
+	xtensa_operand_undo_reloc): Update prototypes.
+	(xtensa_isa_maxlength, xtensa_isa_length_from_chars,
+	xtensa_isa_num_pipe_stages, xtensa_isa_num_formats,
+	xtensa_isa_num_opcodes, xtensa_isa_num_regfiles, xtensa_isa_num_states,
+	xtensa_isa_num_sysregs, xtensa_isa_num_interfaces,
+	xtensa_isa_num_funcUnits, xtensa_format_name, xtensa_format_lookup,
+	xtensa_format_decode, xtensa_format_encode, xtensa_format_length,
+	xtensa_format_num_slots, xtensa_format_slot_nop_opcode,
+	xtensa_format_get_slot, xtensa_format_set_slot, xtensa_opcode_decode,
+	xtensa_opcode_encode, xtensa_opcode_is_branch, xtensa_opcode_is_jump,
+	xtensa_opcode_is_loop, xtensa_opcode_is_call,
+	xtensa_opcode_num_operands, xtensa_opcode_num_stateOperands,
+	xtensa_opcode_num_interfaceOperands, xtensa_opcode_num_funcUnit_uses,
+	xtensa_opcode_funcUnit_use, xtensa_operand_name,
+	xtensa_operand_is_visible, xtensa_operand_is_register,
+	xtensa_operand_regfile, xtensa_operand_num_regs,
+	xtensa_operand_is_known_reg, xtensa_operand_is_PCrelative,
+	xtensa_stateOperand_state, xtensa_stateOperand_inout,
+	xtensa_interfaceOperand_interface, xtensa_regfile_lookup,
+	xtensa_regfile_lookup_shortname, xtensa_regfile_name,
+	xtensa_regfile_shortname, xtensa_regfile_view_parent,
+	xtensa_regfile_num_bits, xtensa_regfile_num_entries,
+	xtensa_state_lookup, xtensa_state_name, xtensa_state_num_bits,
+	xtensa_state_is_exported, xtensa_sysreg_lookup,
+	xtensa_sysreg_lookup_name, xtensa_sysreg_name, xtensa_sysreg_number,
+	xtensa_sysreg_is_user, xtensa_interface_lookup, xtensa_interface_name,
+	xtensa_interface_num_bits, xtensa_interface_inout,
+	xtensa_interface_has_side_effect, xtensa_funcUnit_lookup,
+	xtensa_funcUnit_name, xtensa_funcUnit_num_copies): New prototypes.
+	* elf/xtensa.h (R_XTENSA_DIFF8, R_XTENSA_DIFF16, R_XTENSA_DIFF32,
+	R_XTENSA_SLOT*_OP, R_XTENSA_SLOT*_ALT): New relocations.
+	(XTENSA_PROP_SEC_NAME): Define.
+	(property_table_entry): Add flags field.
+	(XTENSA_PROP_*, GET_XTENSA_PROP_*, SET_XTENSA_PROP_*): Define.
+
+2004-10-07  Jeff Baker  <jbaker@qnx.com>
+
+	* bfdlink.h (bfd_link_info): Add bitfield: warn_shared_textrel.
+
+2004-09-17  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h: Remove R_ARM_STKCHK and R_ARM_THM_STKCHK.
+	Add R_ARM_TARGET2, R_ARM_PREL31, R_ARM_GOT_ABS, R_ARM_GOT_PREL,
+	R_ARM_GOT_BREL12, R_ARM_GOTOFF12 and R_ARM_GOTRELAX.
+
+2004-09-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_hash_entry): Move und_next into elements
+	of union.
+
+2004-09-13  Aaron W. LaFramboise  <aaronavay62@aaronwl.com>
+
+	* libiberty.h (basename): Prototype for __MINGW32__.
+
+2004-09-13  Paul Brook  <paul@codesourcery.com>
+
+	* elf/arm.h: Rename RELABS to TARGET1.
+
+2004-09-04  Kaveh R. Ghazi  <ghazi@caip.rutgers.edu>
+
+	* ansidecl.h (ATTRIBUTE_SENTINEL): Define.
+	* libiberty.h (concat, reconcat, concat_length, concat_copy,
+	concat_copy2): Use ATTRIBUTE_SENTINEL.
+
+2004-08-13  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_callbacks): Remove "error_handler".
+	(LD_DEFINITION_IN_DISCARDED_SECTION): Delete.
+
+2004-08-02  Gabriel Dos Reis  <gdr@integrable-solutions.net>
+
+	* libiberty.h (XDELETE, XDELETEVEC, XRESIZEVEC): Remove any
+	const-qualification before disposal.
+
+2004-07-24  Bernardo Innocenti  <bernie@develer.com>
+
+	* ansidecl.h (ARG_UNUSED): New Macro.
+
+2004-07-23  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bin-bugs.h (REPORT_BUGS_TO): Set to
+	"<URL:http://www.sourceware.org/bugzilla/>".
+
+2004-07-21  Paolo Bonzini  <bonzini@gnu.org>
+
+	* ansidecl.h (ATTRIBUTE_PURE): New.
+
+2004-07-13  Bernardo Innocenti  <bernie@develer.com>
+
+	* libiberty.h (XNEW, XCNEW, XNEWVEC, XCNEWVEC, XOBNEW): Move here from
+	libcpp/internal.h.
+	(XDELETE, XRESIZEVEC, XDELETEVEC, XNEWVAR, XCNEWVAR, XRESIZEVAR): New
+	macros.
+
+2004-07-13  Bernardo Innocenti  <bernie@develer.com>
+
+	* libiberty.h (ASTRDUP): Add casts required for stricter
+	type conversion rules of C++.
+	* obstack.h (obstack_free): Likewise.
+
+2004-07-07  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* dis-asm.h (print_insn_crx): Declare.
+
+2004-06-24  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdlink.h (struct bfd_link_order): Update comment.
+
+2004-05-11  Jakub Jelinek  <jakub@redhat.com>
+
+	* bfdlink.h (struct bfd_link_info): Add relro, relro_start and
+	relro_end fields.
+	* elf/common.h (PT_GNU_EH_FRAME, PT_GNU_STACK): Add comments.
+	(PT_GNU_RELRO): Define.
+
+2004-05-04  Andreas Jaeger  <aj@suse.de>
+
+	* demangle.h: Do not use C++ reserved keyword typename as
+	parameter for cplus_demangle_fill_builtin_type.
+
+2004-04-22  Richard Henderson  <rth@redhat.com>
+
+	* hashtab.h (struct htab): Add size_prime_index.
+
+2004-04-13  Jeff Law  <law@redhat.com>
+
+	* hashtab.h (htab_remove_elt_with_hash): Prototype new function.
+
+2004-03-30  Zack Weinberg  <zack@codesourcery.com>
+
+	* hashtab.h, splay-tree.h: Use new shorter form of GTY markers.
+
+2004-03-25  Stan Shebs  <shebs@apple.com>
+
+	* mpw/: Remove subdirectory and everything in it.
+
+2004-03-23  Alan Modra  <amodra@bigpond.net.au>
+
+	PR 51.
+	* bfdlink.h (struct bfd_link_info): Add wrap_char.
+
+2004-03-20  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* bfdlink.h (bfd_link_info): Correct comments for the
+	unresolved_syms_in_objects field.
+
+2004-02-24  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* dyn-string.h: Update copyright date.
+
+2004-02-23  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* dyn-string.h: Remove test of IN_LIBGCC2 and IN_GLIBCPP_V3 and
+	the associated #defines.
+
+2004-01-12  Ian Lance Taylor  <ian@wasabisystems.com>
+
+	* demangle.h: Instead of checking ANSI_PROTOTYPES, just include
+	"libiberty.h".
+
+	* demangle.h: If ANSI_PROTOTYPES is defined, include <stddef.h>.
+
+	* demangle.h (enum demangle_component_type): Define.
+	(struct demangle_operator_info): Declare.
+	(struct demangle_builtin_type_info): Declare.
+	(struct demangle_component): Define.
+	(cplus_demangle_fill_component): Declare.
+	(cplus_demangle_fill_name): Declare.
+	(cplus_demangle_fill_builtin_type): Declare.
+	(cplus_demangle_fill_operator): Declare.
+	(cplus_demangle_fill_extended_operator): Declare.
+	(cplus_demangle_fill_ctor, cplus_demangle_fill_dtor): Declare.
+	(cplus_demangle_v3_components): Declare.
+	(cplus_demangle_print): Declare.
+
+For older changes see ChangeLog-9103
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

@@ -1,0 +1,13 @@
+# Host: Little-endian Alpha running Linux
+NAT_FILE= nm-linux.h
+NATDEPFILES= infptrace.o inftarg.o corelow.o alpha-nat.o \
+	fork-child.o proc-service.o thread-db.o gcore.o \
+	linux-nat.o
+
+# The dynamically loaded libthread_db needs access to symbols in the
+# gdb executable.
+LOADLIBES = -ldl -rdynamic
+
+# doublest.c currently assumes some properties of FP arithmetic
+# on the host which require this.
+MH_CFLAGS = -mieee

@@ -1,0 +1,6 @@
+# Host: Intel IA-64 running AIX
+
+NAT_FILE= nm-aix.h
+NATDEPFILES= corelow.o core-regset.o solib.o solib-aix5.o fork-child.o \
+	procfs.o proc-api.o proc-events.o proc-flags.o proc-why.o \
+	ia64-aix-nat.o

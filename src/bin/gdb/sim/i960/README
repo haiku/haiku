@@ -1,0 +1,23 @@
+This is the i960 simulator directory.
+
+It is still a work in progress.  The current sources are reasonably
+well tested and lots of features are in.  However, there's lots
+more yet to come.
+
+---
+
+The simulator only supports the i960KA currently.  Not all instructions
+are supported yet, only those instructions needed by the gcc/g++ testsuites
+have been added so far.  There is no profiling support as yet.  There is
+no pipeline or timing support as yet.
+
+---
+
+There are lots of machine generated files in the source directory!
+They are only generated if you configure with --enable-cgen-maint,
+similar in behaviour to Makefile.in, configure under automake/autoconf.
+
+For details on the generator, see ../../cgen.
+
+devo/cgen isn't part of the comp-tools module yet.
+You'll need to check it out manually (also akin to automake/autoconf).

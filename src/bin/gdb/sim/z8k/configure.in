@@ -1,0 +1,10 @@
+dnl Process this file with autoconf to produce a configure script.
+sinclude(../common/aclocal.m4)
+AC_PREREQ(2.5)dnl
+AC_INIT(Makefile.in)
+
+SIM_AC_COMMON
+
+AC_CHECK_HEADERS(string.h strings.h stdlib.h time.h sys/times.h)
+
+SIM_AC_OUTPUT

@@ -1,0 +1,130 @@
+# Makefile template for Configure for the i960 simulator
+# Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+# Contributed by Cygnus Support.
+#
+# This file is part of GDB, the GNU debugger.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+## COMMON_PRE_CONFIG_FRAG
+
+I960_OBJS = i960.o cpu.o decode.o sem.o model.o mloop.o i960-desc.o
+
+CONFIG_DEVICES = dv-sockser.o
+CONFIG_DEVICES =
+
+SIM_OBJS = \
+	$(SIM_NEW_COMMON_OBJS) \
+	sim-cpu.o \
+	sim-engine.o \
+	sim-hload.o \
+	sim-hrw.o \
+	sim-model.o \
+	sim-reason.o \
+	cgen-utils.o cgen-trace.o cgen-scache.o \
+	cgen-run.o sim-reason.o sim-engine.o sim-stop.o \
+	sim-if.o arch.o \
+	$(I960_OBJS) \
+	traps.o devices.o \
+	$(CONFIG_DEVICES)
+
+# Extra headers included by sim-main.h.
+SIM_EXTRA_DEPS = \
+	$(CGEN_INCLUDE_DEPS) \
+	arch.h cpuall.h i960-sim.h i960-desc.h i960-opc.h
+
+SIM_EXTRA_CFLAGS =
+
+SIM_RUN_OBJS = nrun.o
+SIM_EXTRA_CLEAN = i960-clean
+
+# This selects the i960 newlib/libgloss syscall definitions.
+#
+# ??? This affects what stuff gets included from ../common/nltvals.def.
+# For now, we need SYS_exit because of traps.c.  If we really need this,
+# then we need to add i960 specific definitions to nltvals.def.
+NL_TARGET = -DNL_TARGET_i960
+
+## COMMON_POST_CONFIG_FRAG
+
+arch = i960
+
+sim-if.o: sim-if.c $(SIM_MAIN_DEPS) $(srcdir)/../common/sim-core.h
+
+arch.o: arch.c $(SIM_MAIN_DEPS)
+
+traps.o: traps.c targ-vals.h $(SIM_MAIN_DEPS)
+devices.o: devices.c $(SIM_MAIN_DEPS)
+
+# I960 objs
+
+I960BASE_INCLUDE_DEPS = \
+	$(CGEN_MAIN_CPU_DEPS) \
+	cpu.h decode.h eng.h
+
+i960.o: i960.c $(I960BASE_INCLUDE_DEPS)
+
+# FIXME: Use of `mono' is wip.
+mloop.c eng.h: stamp-mloop
+stamp-mloop: $(srcdir)/../common/genmloop.sh mloop.in Makefile
+	$(SHELL) $(srccom)/genmloop.sh \
+		-mono -fast -pbb -switch sem-switch.c \
+		-cpu i960base -infile $(srcdir)/mloop.in
+	$(SHELL) $(srcroot)/move-if-change eng.hin eng.h
+	$(SHELL) $(srcroot)/move-if-change mloop.cin mloop.c
+	touch stamp-mloop
+#	$(SHELL) $(srccom)/genmloop.sh \
+#		-mono -scache -fast i960base $(srcdir)/mloop.in \
+#		| sed -e 's/@cpu@/i960base/' -e 's/@CPU@/I960BASE/' >mloop.c
+mloop.o: mloop.c sem-switch.c $(I960BASE_INCLUDE_DEPS)
+
+cpu.o: cpu.c $(I960BASE_INCLUDE_DEPS)
+decode.o: decode.c $(I960BASE_INCLUDE_DEPS)
+sem.o: sem.c $(I960BASE_INCLUDE_DEPS)
+model.o: model.c $(I960BASE_INCLUDE_DEPS)
+
+i960-clean:
+	rm -f mloop.c eng.h stamp-mloop
+	rm -f tmp-*
+	rm -f stamp-arch stamp-cpu stamp-desc
+
+# cgen support, enable with --enable-cgen-maint
+CGEN_MAINT = ; @true
+# The following line is commented in or out depending upon --enable-cgen-maint.
+@CGEN_MAINT@CGEN_MAINT =
+
+stamp-arch: $(CGEN_READ_SCM) $(CGEN_ARCH_SCM) $(CGEN_CPU_DIR)/i960.cpu
+	$(MAKE) cgen-arch $(CGEN_FLAGS_TO_PASS) mach=all \
+	  archfile=$(CGEN_CPU_DIR)/i960.cpu \
+	  FLAGS="with-scache with-profile=fn"
+	touch stamp-arch
+arch.h arch.c cpuall.h: $(CGEN_MAINT) stamp-arch
+
+stamp-cpu: $(CGEN_READ_SCM) $(CGEN_CPU_SCM) $(CGEN_DECODE_SCM) $(CGEN_CPU_DIR)/i960.cpu
+	$(MAKE) cgen-cpu-decode $(CGEN_FLAGS_TO_PASS) \
+	  cpu=i960base mach=i960:ka_sa,i960:ca SUFFIX= \
+	  archfile=$(CGEN_CPU_DIR)/i960.cpu \
+	  FLAGS="with-scache with-profile=fn" \
+	  EXTRAFILES="$(CGEN_CPU_SEM) $(CGEN_CPU_SEMSW)"
+	touch stamp-cpu
+cpu.h sem.c sem-switch.c model.c decode.c decode.h: $(CGEN_MAINT) stamp-cpu
+
+stamp-desc: $(CGEN_READ_SCM) $(CGEN_DESC_SCM) \
+		$(CGEN_CPU_DIR)/sparc.cpu $(CGEN_CPU_DIR)/sparccom.cpu $(CGEN_CPU_DIR)/i960.cpu $(CGEN_CPU_DIR)/i960.cpu
+	$(MAKE) cgen-desc $(CGEN_FLAGS_TO_PASS) \
+	  cpu=i960 mach=all \
+	  archfile=$(CGEN_CPU_DIR)/i960.cpu
+	touch stamp-desc
+i960-desc.c i960-desc.h i960-opc.h: $(CGEN_MAINT) stamp-desc

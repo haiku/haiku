@@ -1,0 +1,52 @@
+#    Makefile template for Configure for the mn10200 sim library.
+#    Copyright (C) 1997 Free Software Foundation, Inc.
+#    Written by Cygnus Support.
+# 
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+## COMMON_PRE_CONFIG_FRAG
+
+SIM_OBJS = interp.o table.o simops.o sim-load.o
+SIM_EXTRA_CFLAGS = -I$(srcdir)/../../newlib/libc/sys/sysmec -DNEED_UI_LOOP_HOOK
+SIM_EXTRA_CLEAN = clean-extra
+
+# Select mn10200 support in nltvals.def.
+NL_TARGET = -DNL_TARGET_mn10200
+
+INCLUDE = mn10200_sim.h $(srcdir)/../../include/gdb/callback.h
+
+## COMMON_POST_CONFIG_FRAG
+
+simops.h: gencode
+	./gencode -h >$@
+
+table.c: gencode simops.h
+	./gencode >$@
+
+gencode.o: gencode.c $(INCLUDE)
+	$(CC_FOR_BUILD) $(BUILD_CFLAGS) -c $(srcdir)/gencode.c
+
+m10200-opc.o: $(srcdir)/../../opcodes/m10200-opc.c
+	$(CC_FOR_BUILD) $(BUILD_CFLAGS) -c $(srcdir)/../../opcodes/m10200-opc.c
+
+gencode: gencode.o m10200-opc.o
+	$(CC_FOR_BUILD) $(BUILD_CFLAGS) -o gencode gencode.o m10200-opc.o $(BUILD_LIB)
+
+clean-extra:
+	rm -f table.c simops.h gencode
+
+interp.o: interp.c table.c $(INCLUDE)
+simops.o: simops.c simops.h $(INCLUDE)
+table.o: table.c

@@ -1,0 +1,114 @@
+2004-10-07  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* crx.h: Add COPS_REG_INS - Coprocessor Special register
+	instruction type.
+
+2004-09-30  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (ARM_EXT_V6K, ARM_EXT_V6Z): Define.
+	(ARM_ARCH_V6K, ARM_ARCH_V6Z, ARM_ARCH_V6ZK): Define.
+
+2004-09-11  Theodore A. Roth  <troth@openavr.org>
+
+	* avr.h: Add support for
+	atmega48, atmega88, atmega168, attiny13, attiny2313, at90can128.
+
+2004-09-09  Segher Boessenkool  <segher@kernel.crashing.org>
+
+	* ppc.h (PPC_OPERAND_OPTIONAL): Fix comment.
+
+2004-08-24  Dmitry Diky  <diwil@spec.ru>
+
+	* msp430.h (msp430_opc): Add new instructions.
+	(msp430_rcodes): Declare new instructions.
+	(msp430_hcodes): Likewise..
+
+2004-08-13  Nick Clifton  <nickc@redhat.com>
+
+	PR/301
+	* h8300.h (O_JSR): Do not allow VECIND addressing for non-SX
+	processors.
+
+2004-08-30  Michal Ludvig  <mludvig@suse.cz>
+
+	* i386.h (i386_optab): Added montmul/xsha1/xsha256 insns.
+
+2004-07-22  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (i386_optab): Allow cs/ds in 64bit for branch hints.
+
+2004-07-21  Jan Beulich  <jbeulich@novell.com>
+
+	* i386.h: Adjust instruction descriptions to better match the
+	specification.
+
+2004-07-16  Richard Earnshaw  <rearnsha@arm.com>
+
+	* arm.h: Remove all old content.  Replace with architecture defines
+	from gas/config/tc-arm.c.
+
+2004-07-09  Andreas Schwab  <schwab@suse.de>
+
+	* m68k.h: Fix comment.
+
+2004-07-07  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* crx.h: New file.
+
+2004-06-24  Alan Modra  <amodra@bigpond.net.au>
+
+	* i386.h (i386_optab): Remove fildd, fistpd and fisttpd.
+
+2004-05-24  Peter Barada  <peter@the-baradas.com>
+
+	* m68k.h: Add 'size' to m68k_opcode.
+
+2004-05-05  Peter Barada  <peter@the-baradas.com>
+
+	* m68k.h: Switch from ColdFire chip name to core variant.
+
+2004-04-22  Peter Barada  <peter@the-baradas.com>
+
+	* m68k.h: Add mcfmac/mcfemac definitions.  Update operand
+	descriptions for new EMAC cases.
+	Remove ColdFire macmw/macml/msacmw/msacmw hacks and properly
+	handle Motorola MAC syntax.
+	Allow disassembly of ColdFire V4e object files.
+
+2004-03-16  Alan Modra  <amodra@bigpond.net.au>
+
+	* ppc.h (PPC_OPERAND_GPR_0): Define.  Bump other operand defines.
+
+2004-03-12  Jakub Jelinek  <jakub@redhat.com>
+
+	* i386.h (i386_optab): Remove CpuNo64 from sysenter and sysexit.
+
+2004-03-12  Michal Ludvig  <mludvig@suse.cz>
+
+	* i386.h (i386_optab): Added xstore as an alias for xstorerng.
+
+2004-03-12  Michal Ludvig  <mludvig@suse.cz>
+
+	* i386.h (i386_optab): Added xstore/xcrypt insns.
+
+2004-02-09  Anil Paranjpe  <anilp1@KPITCummins.com>
+
+	* h8300.h (32bit ldc/stc): Add relaxing support.
+
+2004-01-12  Anil Paranjpe  <anilp1@KPITCummins.com>
+
+	* h8300.h (BITOP): Pass MEMRELAX flag.
+
+2004-01-09  Anil Paranjpe  <anilp1@KPITCummins.com>
+
+	* h8300.h (BITOP): Dissallow operations on @aa:16 and @aa:32
+	except for the H8S.
+
+For older changes see ChangeLog-9103
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

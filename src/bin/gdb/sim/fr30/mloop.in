@@ -1,0 +1,236 @@
+# OBSOLETE # Simulator main loop for fr30. -*- C -*-
+# OBSOLETE # Copyright (C) 1998, 1999 Free Software Foundation, Inc.
+# OBSOLETE # Contributed by Cygnus Solutions.
+# OBSOLETE #
+# OBSOLETE # This file is part of the GNU Simulators.
+# OBSOLETE #
+# OBSOLETE # This program is free software; you can redistribute it and/or modify
+# OBSOLETE # it under the terms of the GNU General Public License as published by
+# OBSOLETE # the Free Software Foundation; either version 2, or (at your option)
+# OBSOLETE # any later version.
+# OBSOLETE #
+# OBSOLETE # This program is distributed in the hope that it will be useful,
+# OBSOLETE # but WITHOUT ANY WARRANTY; without even the implied warranty of
+# OBSOLETE # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# OBSOLETE # GNU General Public License for more details.
+# OBSOLETE #
+# OBSOLETE # You should have received a copy of the GNU General Public License along
+# OBSOLETE # with this program; if not, write to the Free Software Foundation, Inc.,
+# OBSOLETE # 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# OBSOLETE 
+# OBSOLETE # Syntax:
+# OBSOLETE # /bin/sh mainloop.in command
+# OBSOLETE #
+# OBSOLETE # Command is one of:
+# OBSOLETE #
+# OBSOLETE # init
+# OBSOLETE # support
+# OBSOLETE # extract-{simple,scache,pbb}
+# OBSOLETE # {full,fast}-exec-{simple,scache,pbb}
+# OBSOLETE #
+# OBSOLETE # A target need only provide a "full" version of one of simple,scache,pbb.
+# OBSOLETE # If the target wants it can also provide a fast version of same.
+# OBSOLETE # It can't provide more than this, however for illustration's sake the FR30
+# OBSOLETE # port provides examples of all.
+# OBSOLETE 
+# OBSOLETE # ??? After a few more ports are done, revisit.
+# OBSOLETE # Will eventually need to machine generate a lot of this.
+# OBSOLETE 
+# OBSOLETE case "x$1" in
+# OBSOLETE 
+# OBSOLETE xsupport)
+# OBSOLETE 
+# OBSOLETE cat <<EOF
+# OBSOLETE 
+# OBSOLETE static INLINE const IDESC *
+# OBSOLETE extract (SIM_CPU *current_cpu, PCADDR pc, CGEN_INSN_INT insn, ARGBUF *abuf,
+# OBSOLETE          int fast_p)
+# OBSOLETE {
+# OBSOLETE   const IDESC *id = @cpu@_decode (current_cpu, pc, insn, abuf);
+# OBSOLETE   @cpu@_fill_argbuf (current_cpu, abuf, id, pc, fast_p);
+# OBSOLETE   if (! fast_p)
+# OBSOLETE     {
+# OBSOLETE       int trace_p = PC_IN_TRACE_RANGE_P (current_cpu, pc);
+# OBSOLETE       int profile_p = PC_IN_PROFILE_RANGE_P (current_cpu, pc);
+# OBSOLETE       @cpu@_fill_argbuf_tp (current_cpu, abuf, trace_p, profile_p);
+# OBSOLETE     }
+# OBSOLETE   return id;
+# OBSOLETE }
+# OBSOLETE 
+# OBSOLETE static INLINE SEM_PC
+# OBSOLETE execute (SIM_CPU *current_cpu, SCACHE *sc, int fast_p)
+# OBSOLETE {
+# OBSOLETE   SEM_PC vpc;
+# OBSOLETE 
+# OBSOLETE   if (fast_p)
+# OBSOLETE     {
+# OBSOLETE #if ! WITH_SEM_SWITCH_FAST
+# OBSOLETE #if WITH_SCACHE
+# OBSOLETE       vpc = (*sc->argbuf.semantic.sem_fast) (current_cpu, sc);
+# OBSOLETE #else
+# OBSOLETE       vpc = (*sc->argbuf.semantic.sem_fast) (current_cpu, &sc->argbuf);
+# OBSOLETE #endif
+# OBSOLETE #else
+# OBSOLETE       abort ();
+# OBSOLETE #endif /* WITH_SEM_SWITCH_FAST */
+# OBSOLETE     }
+# OBSOLETE   else
+# OBSOLETE     {
+# OBSOLETE #if ! WITH_SEM_SWITCH_FULL
+# OBSOLETE       ARGBUF *abuf = &sc->argbuf;
+# OBSOLETE       const IDESC *idesc = abuf->idesc;
+# OBSOLETE #if WITH_SCACHE_PBB
+# OBSOLETE       int virtual_p = CGEN_ATTR_VALUE (NULL, idesc->attrs, CGEN_INSN_VIRTUAL);
+# OBSOLETE #else
+# OBSOLETE       int virtual_p = 0;
+# OBSOLETE #endif
+# OBSOLETE 
+# OBSOLETE       if (! virtual_p)
+# OBSOLETE 	{
+# OBSOLETE 	  /* FIXME: call x-before */
+# OBSOLETE 	  if (ARGBUF_PROFILE_P (abuf))
+# OBSOLETE 	    PROFILE_COUNT_INSN (current_cpu, abuf->addr, idesc->num);
+# OBSOLETE 	  /* FIXME: Later make cover macros: PROFILE_INSN_{INIT,FINI}.  */
+# OBSOLETE 	  if (PROFILE_MODEL_P (current_cpu)
+# OBSOLETE 	      && ARGBUF_PROFILE_P (abuf))
+# OBSOLETE 	    @cpu@_model_insn_before (current_cpu, 1 /*first_p*/);
+# OBSOLETE 	  TRACE_INSN_INIT (current_cpu, abuf, 1);
+# OBSOLETE 	  TRACE_INSN (current_cpu, idesc->idata,
+# OBSOLETE 		      (const struct argbuf *) abuf, abuf->addr);
+# OBSOLETE 	}
+# OBSOLETE #if WITH_SCACHE
+# OBSOLETE       vpc = (*sc->argbuf.semantic.sem_full) (current_cpu, sc);
+# OBSOLETE #else
+# OBSOLETE       vpc = (*sc->argbuf.semantic.sem_full) (current_cpu, abuf);
+# OBSOLETE #endif
+# OBSOLETE       if (! virtual_p)
+# OBSOLETE 	{
+# OBSOLETE 	  /* FIXME: call x-after */
+# OBSOLETE 	  if (PROFILE_MODEL_P (current_cpu)
+# OBSOLETE 	      && ARGBUF_PROFILE_P (abuf))
+# OBSOLETE 	    {
+# OBSOLETE 	      int cycles;
+# OBSOLETE 
+# OBSOLETE 	      cycles = (*idesc->timing->model_fn) (current_cpu, sc);
+# OBSOLETE 	      @cpu@_model_insn_after (current_cpu, 1 /*last_p*/, cycles);
+# OBSOLETE 	    }
+# OBSOLETE 	  TRACE_INSN_FINI (current_cpu, abuf, 1);
+# OBSOLETE 	}
+# OBSOLETE #else
+# OBSOLETE       abort ();
+# OBSOLETE #endif /* WITH_SEM_SWITCH_FULL */
+# OBSOLETE     }
+# OBSOLETE 
+# OBSOLETE   return vpc;
+# OBSOLETE }
+# OBSOLETE 
+# OBSOLETE EOF
+# OBSOLETE 
+# OBSOLETE ;;
+# OBSOLETE 
+# OBSOLETE xinit)
+# OBSOLETE 
+# OBSOLETE cat <<EOF
+# OBSOLETE /*xxxinit*/
+# OBSOLETE EOF
+# OBSOLETE 
+# OBSOLETE ;;
+# OBSOLETE 
+# OBSOLETE xextract-simple | xextract-scache)
+# OBSOLETE 
+# OBSOLETE # Inputs:  current_cpu, vpc, sc, FAST_P
+# OBSOLETE # Outputs: sc filled in
+# OBSOLETE 
+# OBSOLETE cat <<EOF
+# OBSOLETE {
+# OBSOLETE   CGEN_INSN_INT insn = GETIMEMUHI (current_cpu, vpc);
+# OBSOLETE   extract (current_cpu, vpc, insn, SEM_ARGBUF (sc), FAST_P);
+# OBSOLETE }
+# OBSOLETE EOF
+# OBSOLETE 
+# OBSOLETE ;;
+# OBSOLETE 
+# OBSOLETE xextract-pbb)
+# OBSOLETE 
+# OBSOLETE # Inputs:  current_cpu, pc, sc, max_insns, FAST_P
+# OBSOLETE # Outputs: sc, pc
+# OBSOLETE # sc must be left pointing past the last created entry.
+# OBSOLETE # pc must be left pointing past the last created entry.
+# OBSOLETE # If the pbb is terminated by a cti insn, SET_CTI_VPC(sc) must be called
+# OBSOLETE # to record the vpc of the cti insn.
+# OBSOLETE # SET_INSN_COUNT(n) must be called to record number of real insns.
+# OBSOLETE 
+# OBSOLETE cat <<EOF
+# OBSOLETE {
+# OBSOLETE   const IDESC *idesc;
+# OBSOLETE   int icount = 0;
+# OBSOLETE 
+# OBSOLETE   while (max_insns > 0)
+# OBSOLETE     {
+# OBSOLETE       UHI insn = GETIMEMUHI (current_cpu, pc);
+# OBSOLETE       idesc = extract (current_cpu, pc, insn, &sc->argbuf, FAST_P);
+# OBSOLETE       ++sc;
+# OBSOLETE       --max_insns;
+# OBSOLETE       ++icount;
+# OBSOLETE       pc += idesc->length;
+# OBSOLETE       if (IDESC_CTI_P (idesc))
+# OBSOLETE 	{
+# OBSOLETE 	  SET_CTI_VPC (sc - 1);
+# OBSOLETE 
+# OBSOLETE 	  /* Delay slot? */
+# OBSOLETE 	  /* ??? breakpoints in delay slots */
+# OBSOLETE 	  if (CGEN_ATTR_VALUE (NULL, idesc->attrs, CGEN_INSN_DELAY_SLOT))
+# OBSOLETE 	    {
+# OBSOLETE 	      UHI insn = GETIMEMUHI (current_cpu, pc);
+# OBSOLETE 	      idesc = extract (current_cpu, pc, insn, &sc->argbuf, FAST_P);
+# OBSOLETE 	      if (CGEN_ATTR_VALUE (NULL, idesc->attrs, CGEN_INSN_NOT_IN_DELAY_SLOT))
+# OBSOLETE 		{
+# OBSOLETE 		  /* malformed program */
+# OBSOLETE 		  sim_io_eprintf (CPU_STATE (current_cpu),
+# OBSOLETE 				  "malformed program, \`%s' insn in delay slot\n",
+# OBSOLETE 				  CGEN_INSN_NAME (idesc->idata));
+# OBSOLETE 		}
+# OBSOLETE 	      else
+# OBSOLETE 		{
+# OBSOLETE 		  ++sc;
+# OBSOLETE 		  --max_insns;
+# OBSOLETE 		  ++icount;
+# OBSOLETE 		  pc += idesc->length;
+# OBSOLETE 		}
+# OBSOLETE 	    }
+# OBSOLETE 	  break;
+# OBSOLETE 	}
+# OBSOLETE     }
+# OBSOLETE 
+# OBSOLETE  Finish:
+# OBSOLETE   SET_INSN_COUNT (icount);
+# OBSOLETE }
+# OBSOLETE EOF
+# OBSOLETE 
+# OBSOLETE ;;
+# OBSOLETE 
+# OBSOLETE xfull-exec-* | xfast-exec-*)
+# OBSOLETE 
+# OBSOLETE # Inputs: current_cpu, sc, FAST_P
+# OBSOLETE # Outputs: vpc
+# OBSOLETE # vpc contains the address of the next insn to execute
+# OBSOLETE 
+# OBSOLETE cat <<EOF
+# OBSOLETE {
+# OBSOLETE #if (! FAST_P && WITH_SEM_SWITCH_FULL) || (FAST_P && WITH_SEM_SWITCH_FAST)
+# OBSOLETE #define DEFINE_SWITCH
+# OBSOLETE #include "sem-switch.c"
+# OBSOLETE #else
+# OBSOLETE   vpc = execute (current_cpu, vpc, FAST_P);
+# OBSOLETE #endif
+# OBSOLETE }
+# OBSOLETE EOF
+# OBSOLETE 
+# OBSOLETE ;;
+# OBSOLETE 
+# OBSOLETE *)
+# OBSOLETE   echo "Invalid argument to mainloop.in: $1" >&2
+# OBSOLETE   exit 1
+# OBSOLETE   ;;
+# OBSOLETE 
+# OBSOLETE esac

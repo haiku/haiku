@@ -1,0 +1,127 @@
+2004-10-06  Eric Christopher  <echristo@redhat.com>
+
+	* dwarf2.h: Sync with gcc dwarf2.h. Fix typo.
+
+2004-10-01  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (SHT_ARM_EXIDX): Define.
+	(ELF_STRING_ARM_unwind, ELF_STRING_ARM_unwind,
+	ELF_STRING_ARM_unwind_once, ELF_STRING_ARM_unwind_info_once):
+	Define.
+
+2004-08-25  Dmitry Diky  <diwil@spec.ru>
+
+	* msp430.h: Add new relocs.
+
+2004-08-12  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* i386.h (R_386_USED_BY_INTEL_200): New.
+
+2004-07-29  Alexandre Oliva  <aoliva@redhat.com>
+
+	Introduce SH2a support.
+	2004-02-18  Corinna Vinschen  <vinschen@redhat.com>
+	* sh.h (EF_SH2A_NOFPU): New.
+	2003-12-01  Michael Snyder  <msnyder@redhat.com>
+	* sh.h (EF_SH2A): New.
+
+2004-07-27  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* crx.h: Add BFD_RELOC_CRX_SWITCH8, BFD_RELOC_CRX_SWITCH16,
+	BFD_RELOC_CRX_SWITCH32.
+
+2004-07-06  Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* common.h (EM_CRX): Define.
+	* crx.h: New file.
+
+2004-06-25  Kazuhiro Inaoka  <inaoka.kazuhiro@renesas.com>
+
+	* m32r.h: Add defintions of R_M32R_GOTOFF_HI_ULO,
+	R_M32R_GOTOFF_HI_SLO and R_M32R_GOTOFF_LO.
+
+2004-06-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* common.h (ELF64_R_INFO): Warning fix.
+
+2004-06-14  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (R_MIPS_PC32): Add back (undoing removal on 2004-04-24),
+	with an updated comment.
+
+2004-05-28  Andrew Stubbs <andrew.stubbs@superh.com>
+
+	* sh.h (EF_SH_HAS_DSP): Remove.
+	(EF_SH_HAS_FP): Remove.
+	(EF_SH_MERGE_MACH): Remove.
+	(EF_SH4_NOFPU): Convert to decimal.
+	(EF_SH4A_NOFPU): Likewise.
+	(EF_SH4_NOMMU_NOFPU): Likewise.
+	(EF_SH3_NOMMU): Add new macro.
+	(EF_SH_BFD_TABLE): Likewise.
+	(sh_find_elf_flags): Add prototype.
+	(sh_elf_get_flags_from_mach): Likewise.
+
+2004-04-24  Chris Demetriou  <cgd@broadcom.com>
+
+	* mips.h (R_MIPS_PC32, R_MIPS_PC64, R_MIPS_GNU_REL_LO16)
+	(R_MIPS_GNU_REL_HI16): Remove.
+	(R_MIPS_GNU_REL16_S2): Update comment.
+
+2004-30-30  Galit Heller  <Galit.Heller@nsc.com>
+            Tomer Levi  <Tomer.Levi@nsc.com>
+
+	* common.h (EM_CR): Define.
+	* cr16c.h: New file.
+
+2004-03-23  Paul Brook  <paul@codesourcery.com>
+
+	* arm.h (EF_ERM_BE8, EF_ARM_LE8, EF_ARM_EABI_VER3): Add.
+
+2003-03-03  Andrew Stubbs  <andrew.stubbs@superh.com>
+
+	* sh.h: Add EF_SH4_NOMMU_NOFPU.
+
+2004-03-01  Richard Sandiford  <rsandifo@redhat.com>
+
+	* frv.h (EF_FRV_CPU_FR405, EF_FRV_CPU_FR450): Define.
+
+2004-01-28  Roland McGrath  <roland@redhat.com>
+
+	* common.h (AT_SECURE): New macro.
+
+2004-01-21  Roland McGrath  <roland@redhat.com>
+
+	* common.h (AT_SUN_UID, AT_SUN_RUID, AT_SUN_GID): New macros.
+	(AT_SUN_RGID, AT_SUN_LDELF, AT_SUN_LDSHDR, AT_SUN_LDNAME,
+	AT_SUN_LPAGESZ, AT_SUN_PLATFORM, AT_SUN_HWCAP, AT_SUN_IFLUSH,
+	AT_SUN_CPU, AT_SUN_EMUL_ENTRY, AT_SUN_EMUL_EXECFD,
+	AT_SUN_EXECNAME) AT_SUN_MMU, AT_SUN_LDDATA): Likewise.
+
+2004-01-17  Mark Kettenis  <kettenis@gnu.org>
+
+	* common.h (NT_OPENBSD_IDENT): Define.
+
+2004-01-06  Alexandre Oliva  <aoliva@redhat.com>
+
+	2003-09-18  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h (EF_FRV_FDPIC): New macro.
+	(EF_FRV_PIC_FLAGS): Adjust.
+	2003-08-08  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h (R_FRV_FUNCDESC_VALUE, R_FRV_FUNCDESC_GOTOFF12,
+	R_FRV_FUNCDESC_GOTOFFLO, R_FRV_FUNCDESC_GOTOFFHI, R_FRV_GOTOFF12,
+	R_FRV_GOTOFFLO, R_FRV_GOTOFFHI): New.
+	2003-08-04  Alexandre Oliva  <aoliva@redhat.com>
+	* frv.h (R_FRV_GOT12, R_FRV_GOTHI, R_FRV_GOTLO, R_FRV_FUNCDESC,
+	R_FRV_FUNCDESC_GOT12, R_FRV_FUNCDESC_GOTHI, R_FRV_FUNCDESC_GOTLO):
+	New.
+
+
+For older changes see ChangeLog-9103
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

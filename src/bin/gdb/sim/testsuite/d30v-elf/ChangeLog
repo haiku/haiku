@@ -1,0 +1,68 @@
+2001-07-18  Andrew Cagney  <ac131313@redhat.com>
+
+	* configure: Re-generate using autoconf 2.13.
+
+1999-03-17  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-flags.S: Added new test for non-lkr status of MVTSYS.
+
+1999-01-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-flags.S: Added one old, one new regression test.
+
+1999-01-11  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-flags.S: New test for parallel PSW update conflicts.
+	* Makefile.in (TESTS): Run it.
+
+1999-01-07  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-2wordops.S: New test for sign-extension by ld2h.
+
+1998-12-08  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-2wordops.S: New test for double-word load-like operations.
+
+1998-12-04  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-shifts.S: Update an older test case.
+
+1998-12-03  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-shifts.S: New test for more SRC shift counts. 
+
+1998-11-22  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-shifts.S: New test for large SRC shift counts.
+
+1998-11-12  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* br-djsr.S: New test for new R62-update timing.
+
+1998-11-06  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* do-shifts.S: Add test for large mvfacc shifts.
+
+Tue Oct 13 10:54:51 EDT 1998 Frank Ch. Eigler <fche@cygnus.com>
+
+	* Makefile.in (TESTS): Added do-shifts test case.
+	* do-shifts.S: New file.
+
+Wed Apr 29 12:49:00 1998  Frank Ch. Eigler  <fche@cygnus.com>
+
+	* ls-modaddr.S: New test for modular addressing.
+	* Makefile.in: Run it.
+
+Wed Sep  3 14:33:35 1997  Andrew Cagney  <cagney@b1.cygnus.com>
+
+	* Makefile.in (.S.run): Replace .d30v with .run.
+
+Wed Apr  2 14:10:43 1997  Andrew Cagney  <cagney@kremvax.cygnus.com>
+
+	* Makefile.in (.d30v.ko): Limit the cpu time to 5 seconds.
+
+Wed Mar 26 11:13:42 1997  Andrew Cagney  <cagney@kremvax.cygnus.com>
+
+	* Makefile.in (.d30v.ko): Disable the shell's exit-on-error which
+ 	is enabled by BSD style make.
+

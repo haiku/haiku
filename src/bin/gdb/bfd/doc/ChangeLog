@@ -1,0 +1,27 @@
+2004-09-19  H.J. Lu  <hongjiu.lu@intel.com>
+
+	* Makefile.am (AUTOMAKE_OPTIONS): Require 1.9.
+	(bfd.info): Rename the target to ...
+	($(srcdir)/bfd.info): This.
+	* Makefile.in: Regenerated.
+
+2004-09-17  Alan Modra  <amodra@bigpond.net.au>
+
+	* Makefile.in: Regenerate.
+
+2004-03-27  Alan Modra  <amodra@bigpond.net.au>
+
+	* bfdint.texi: Remove all mention of elflink.h.
+
+2004-03-19  Alan Modra  <amodra@bigpond.net.au>
+
+	* Makefile.in: Regenerate.
+
+For older changes see ChangeLog-9103
+
+Local Variables:
+mode: change-log
+left-margin: 8
+fill-column: 74
+version-control: never
+End:

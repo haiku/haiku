@@ -1,0 +1,4 @@
+# Host: Intel 386 running System V
+
+NAT_FILE= nm-i386v.h
+NATDEPFILES= infptrace.o inftarg.o fork-child.o corelow.o core-aout.o i386v-nat.o

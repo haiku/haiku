@@ -1,0 +1,22 @@
+/* config.h.bot */
+/* modify settings or make new ones based on what autoconf tells us. */
+
+/* Ultrix botches type-ahead when switching from canonical to
+   non-canonical mode, at least through version 4.3 */
+#if !defined (HAVE_TERMIOS_H) || !defined (HAVE_TCGETATTR) || defined (ultrix)
+#  define TERMIOS_MISSING
+#endif
+
+#if defined (STRCOLL_BROKEN)
+#  undef HAVE_STRCOLL
+#endif
+
+#if defined (__STDC__) && defined (HAVE_STDARG_H)
+#  define PREFER_STDARG
+#  define USE_VARARGS
+#else
+#  if defined (HAVE_VARARGS_H)
+#    define PREFER_VARARGS
+#    define USE_VARARGS
+#  endif
+#endif
