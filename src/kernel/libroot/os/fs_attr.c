@@ -13,6 +13,15 @@
 #include "syscalls.h"
 
 
+#define RETURN_AND_SET_ERRNO(status) \
+	{ \
+		if (status < 0) { \
+			errno = status; \
+			return -1; \
+		} \
+		return status; \
+	}
+
 // for the DIR structure
 #define BUFFER_SIZE 2048
 
@@ -24,15 +33,15 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos, void *buffer
 
 	int attr = sys_open_attr(fd, attribute, O_RDONLY);
 	if (attr < 0)
-		return attr;
+		RETURN_AND_SET_ERRNO(attr);
 
-	// type is not used at all
+	// type is not used at all in this function
 	(void)type;
 
 	bytes = sys_read(fd, pos, buffer, readBytes);
 	sys_close(attr);
 
-	return bytes;
+	RETURN_AND_SET_ERRNO(bytes);
 }
 
 
@@ -43,19 +52,21 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos, const void 
 
 	int attr = sys_create_attr(fd, attribute, type, O_WRONLY);
 	if (attr < 0)
-		return attr;
+		RETURN_AND_SET_ERRNO(attr);
 
 	bytes = sys_write(fd, pos, buffer, readBytes);
 	sys_close(attr);
 
-	return bytes;
+	RETURN_AND_SET_ERRNO(bytes);
 }
 
 
 int 
 fs_remove_attr(int fd, const char *attribute)
 {
-	return sys_remove_attr(fd, attribute);
+	status_t status = sys_remove_attr(fd, attribute);
+
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
@@ -67,7 +78,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 
 	int attr = sys_open_attr(fd, attribute, O_RDONLY);
 	if (attr < 0)
-		return attr;
+		RETURN_AND_SET_ERRNO(attr);
 
 	status = sys_read_stat(attr, &stat);
 	if (status == B_OK) {
@@ -76,7 +87,7 @@ fs_stat_attr(int fd, const char *attribute, struct attr_info *attrInfo)
 	}
 	sys_close(attr);
 
-	return status;
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
@@ -94,17 +105,23 @@ fs_open_attr(const char *path, const char *attribute, uint32 type, int openMode)
 int 
 fs_open_attr(int fd, const char *attribute, uint32 type, int openMode)
 {
-	if (openMode & O_CREAT)
-		return sys_create_attr(fd, attribute, type, openMode);
+	status_t status;
 
-	return sys_open_attr(fd, attribute, openMode);
+	if (openMode & O_CREAT)
+		status = sys_create_attr(fd, attribute, type, openMode);
+	else
+		status = sys_open_attr(fd, attribute, openMode);
+
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
 int 
 fs_close_attr(int fd)
 {
-	return sys_close(fd);
+	status_t status = sys_close(fd);
+
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
@@ -114,12 +131,17 @@ open_attr_dir(int file, const char *path)
 	DIR *dir;
 
 	int fd = sys_open_attr_dir(file, path);
-	if (fd < 0)
+	if (fd < 0) {
+		errno = fd;
 		return NULL;
+	}
 
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR *)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL)
+	if ((dir = (DIR *)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL) {
+		errno = B_NO_MEMORY;
+		sys_close(fd);
 		return NULL;
+	}
 
 	dir->fd = fd;
 
@@ -148,7 +170,7 @@ fs_close_attr_dir(DIR *dir)
 
 	free(dir);
 
-	return status;
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
@@ -156,8 +178,11 @@ struct dirent *
 fs_read_attr_dir(DIR *dir)
 {
 	ssize_t count = sys_read_dir(dir->fd, &dir->ent, BUFFER_SIZE, 1);
-	if (count <= 0)
+	if (count <= 0) {
+		if (count < 0)
+			errno = count;
 		return NULL;
+	}
 
 	return &dir->ent;
 }
