@@ -1098,15 +1098,14 @@ StyledEditWindow::Print(const char *documentname)
 				currentLine++;
 			}
 		}
-		if (currentHeight >= printable_rect.Height()) {
-			pagesInDocument++;
-		}
-		if (pagesInDocument - 1 == lastPage) {
+		if (pagesInDocument == lastPage) {
 			lastLine = currentLine;
 		}
-		currentLine++;
-		if (pagesInDocument == firstPage) {
-			firstLine = currentLine;
+		if (currentHeight >= printable_rect.Height()) {
+			pagesInDocument++;
+			if (pagesInDocument == firstPage) {
+				firstLine = currentLine;
+			}
 		}
 	}
 	
