@@ -30,5 +30,6 @@ struct syslog_message {
 
 #define SYSLOG_PRIORITY(options)	((options) & 0x7)
 #define SYSLOG_FACILITY(options)	((options) & 0x03f8)
+#define SYSLOG_FACILITY_INDEX(options)	(SYSLOG_FACILITY(options) >> 3)
 
 #endif	/* SYSLOG_DAEMON_H */
