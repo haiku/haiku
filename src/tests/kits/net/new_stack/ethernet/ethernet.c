@@ -5,14 +5,16 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <sys/dirent.h>
 #include <sys/stat.h>
 
+#include <KernelExport.h>
 #include <Drivers.h>
 
 #include "net_stack.h"
-#include "net_interface.h"
+#include "net_layer.h"
 
 enum {
 	ETHER_GETADDR = B_DEVICE_OP_CODES_END,
@@ -24,11 +26,12 @@ enum {
 	ETHER_GETFRAMESIZE
 };
 
-typedef struct ethernet_interface {
-	ifnet_t ifnet;
-	int 	fd;
-	int		max_frame_size;
-} ethernet_interface;
+typedef struct ethernet_device_layer {
+	net_layer			layer;
+	int 				fd;
+	int					max_frame_size;
+	volatile thread_id	reader_thread;
+} ethernet_device_layer;
 
 #define	ETHER_ADDR_LEN	6	/* Ethernet address length		*/
 #define ETHER_TYPE_LEN	2	/* Ethernet type field length		*/
@@ -46,9 +49,10 @@ typedef struct        ether_addr {
 
 status_t	lookup_devices(char *root, void *cookie);
 status_t 	register_device(const char *path, void *cookie);
+status_t 	device_reader(void *args);
 status_t 	std_ops(int32 op, ...);
 
-struct net_interface_module_info nimi;
+struct net_layer_module_info nlmi;
 
 static struct net_stack_module_info *g_stack = NULL;
 
@@ -59,92 +63,79 @@ status_t init(void * params)
 	return lookup_devices("/dev/net", params);
 }
 
-status_t uninit(ifnet_t *iface)
+status_t uninit(net_layer *me)
 {
-	ethernet_interface *ei = (ethernet_interface *) iface;
+	ethernet_device_layer *edl = (ethernet_device_layer *) me;
 	
-	printf("ethernet: uniniting %s interface\n", iface->if_name);
+	printf("%s: uniniting layer\n", me->name);
 	
-	free(iface->if_name);
-	close(ei->fd);
+	close(edl->fd);
+
+	free(me->name);
+	free(me);
 	
 	return B_OK;
 }
 
 
-status_t up(ifnet_t *iface)
+status_t enable(net_layer *me, bool enable)
 {
-	return B_ERROR;
+	ethernet_device_layer *edl = (ethernet_device_layer *) me;
+
+	if (enable) {
+		// enable this layer
+		thread_id tid;
+		char name[B_OS_NAME_LENGTH * 2];
+
+		if (edl->reader_thread != -1)
+			// already up
+			return B_OK;
+		
+		strncpy(name, me->name, sizeof(name));
+		strncat(name, " reader", sizeof(name)); 
+		tid = spawn_kernel_thread(device_reader, name, B_NORMAL_PRIORITY, me);
+		if (tid < 0) {
+			printf("%s: failed to start device reader thread -> %d [%s]\n",
+				me->name, (int) tid, strerror(tid));
+			return tid;
+		};
+
+		edl->reader_thread = tid;
+		return resume_thread(tid);
+
+	} else {
+
+		status_t dummy;
+	
+		// disable this layer
+		if (edl->reader_thread == -1)
+			// already down
+			return B_OK;
+	
+		send_signal_etc(edl->reader_thread, SIGTERM, 0);
+		wait_for_thread(edl->reader_thread, &dummy);
+		printf("%s: device reader stopped.\n", me->name);
+		edl->reader_thread = -1;
+		return B_OK;
+	};
+	
+	return B_OK;
 }
 
 
-status_t down(ifnet_t *iface)
-{
-	return B_ERROR;
-}
-
-
-status_t send(ifnet_t *iface, net_buffer *buffer)
+status_t output_buffer(net_layer *me, net_buffer *buffer)
 {
 	if (!buffer)
 		return B_ERROR;
-
+		
 	// TODO!
-	return B_OK;
-}
+	printf("%s: output_buffer:\n", me->name);
+	g_stack->dump_buffer(buffer);
 
-
-status_t receive(ifnet_t *iface, net_buffer **received_buffer)
-{
-	ethernet_interface *ei = (ethernet_interface *) iface;
-	net_buffer *buffer;
-	void *frame;
-	size_t len;
-	ssize_t sz;
-	
-	len = iface->if_mtu;
-	frame = malloc(len);
-	if (!frame)
-		return B_NO_MEMORY;
-
-	buffer = g_stack->new_buffer();
-	if (!buffer) {
-		free(frame);
-		return B_NO_MEMORY;
-	};
-		
-	sz = read(ei->fd, frame, len);
-	if (sz >= B_OK) {
-		g_stack->add_to_buffer(buffer, 0, frame, sz, (buffer_chunk_free_func) free);
-		*received_buffer = buffer;
-		return sz;
-	};
-	
-	free(frame);
 	g_stack->delete_buffer(buffer, false);
-	return sz;
-}
-	
-status_t control(ifnet_t *iface, int opcode, void *arg) { return -1; }
-	
-status_t get_hardware_address(ifnet_t *iface, net_interface_hwaddr *hwaddr) { return -1; }
-status_t get_multicast_addresses(ifnet_t *iface, net_interface_hwaddr **hwaddr, int nb_addresses) { return -1; }
-status_t set_multicast_addresses(ifnet_t *iface, net_interface_hwaddr *hwaddr, int nb_addresses) { return -1; }
-	
-status_t set_mtu(ifnet_t *iface, uint32 mtu)
-{
-	ethernet_interface *ei = (ethernet_interface *) iface;
-
-	if (mtu > ei->max_frame_size)
-		// hardware constraint always win!
-		mtu = ei->max_frame_size;
-		
-	ei->ifnet.if_mtu = mtu;
 	return B_OK;
 }
 
-status_t set_promiscuous(ifnet_t *iface, bool enable) { return -1; }
-status_t set_media(ifnet_t *iface, uint32 media)  { return -1; }
 
 // #pragma mark -
 
@@ -178,8 +169,9 @@ status_t lookup_devices(char *root, void *cookie)
 		if (S_ISDIR(st.st_mode))
 			status = lookup_devices(path, cookie);
 		else if (S_ISCHR(st.st_mode)) {	// char device = driver!
-			if (strcmp(de->d_name, "stack") == 0 ||	// OBOS stack driver
-				strcmp(de->d_name, "api") == 0)		// BONE stack driver
+			if (strcmp(de->d_name, "stack") == 0 ||		// OBOS stack driver
+				strcmp(de->d_name, "server") == 0 ||	// OBOS server driver
+				strcmp(de->d_name, "api") == 0)			// BONE stack driver
 				continue;	// skip pseudo-entries
 
 			status = register_device(path, cookie);
@@ -194,16 +186,16 @@ status_t lookup_devices(char *root, void *cookie)
 
 status_t register_device(const char *path, void *cookie)
 {
-	ifnet_t *iface;
-	ethernet_interface *ei;
+	ethernet_device_layer *edl;
 	int frame_size;
 	ether_addr_t mac_address;
 	int fd;
 	status_t status;
+	char *name;
 	
 	fd = open(path, O_RDWR);
 	if (fd < B_OK) {
-		printf("ethernet: Unable to open(%s) -> %d [%s]. Skipping...\n", path,
+		printf("ethernet: Unable to open %s device -> %d [%s]. Skipping...\n", path,
 			fd, strerror(fd));
 		return fd;
 	};
@@ -211,7 +203,7 @@ status_t register_device(const char *path, void *cookie)
 	// Init the network card
 	status = ioctl(fd, ETHER_INIT, NULL, 0);
 	if (status < B_OK) {
-		printf("ethernet: Failed to init %s: %ld [%s]. Skipping...\n", path,
+		printf("ethernet: Failed to init %s device -> %ld [%s]. Skipping...\n", path,
 				status, strerror(status));
 		close(fd);
 		return status;
@@ -220,7 +212,7 @@ status_t register_device(const char *path, void *cookie)
 	// get the MAC address...
 	status = ioctl(fd, ETHER_GETADDR, &mac_address, 6);
 	if (status < B_OK) {
-		printf("ethernet: Failed to get %s MAC address: %ld [%s]. Skipping...\n",
+		printf("ethernet: Failed to get %s device MAC address -> %ld [%s]. Skipping...\n",
 			path, status, strerror(status));
 		close(fd);
 		return status;
@@ -230,37 +222,79 @@ status_t register_device(const char *path, void *cookie)
 	status = ioctl(fd, ETHER_GETFRAMESIZE, &frame_size, sizeof(frame_size));
 	if (status < B_OK) {
 		frame_size = ETHERMTU;
-		printf("ethernet: %s device don't support IF_GETFRAMESIZE; defaulting to %d\n",
+		printf("ethernet: %s device don't support ETHER_GETFRAMESIZE; defaulting to %d\n",
 		       path, frame_size);
 	};
 
-	printf("ethernet: interface '%s':\n"
-				"\tMAC address: %02x:%02x:%02x:%02x:%02x:%02x\n"
-				"\tMTU:         %d bytes\n",
+	printf("ethernet: Found device '%s': MAC address: %02x:%02x:%02x:%02x:%02x:%02x, MTU: %d bytes\n",
 			path,
 			mac_address.byte[0], mac_address.byte[1],
 			mac_address.byte[2], mac_address.byte[3],
 			mac_address.byte[4], mac_address.byte[5], frame_size);
 
-	ei = (ethernet_interface *) malloc(sizeof(*ei));
-	if (!ei) {
+	edl = malloc(sizeof(*edl));
+	if (!edl) {
 		close(fd);
 		return B_NO_MEMORY;
 	};
 
-	ei->fd = fd;
-	ei->max_frame_size = frame_size;
+	edl->fd = fd;
+	edl->max_frame_size = frame_size;
+	edl->reader_thread = -1;
 
-	iface = &ei->ifnet;
+	name = malloc(strlen("ethernet/") + strlen(path)); 
+	strcpy(name, "ethernet/");
+	strcat(name, path + strlen("/dev/net/"));
 
-	iface->if_name 	= strdup(path);
-	iface->if_flags = (IFF_BROADCAST|IFF_SIMPLEX|IFF_MULTICAST);
-	iface->if_type 	= 0x20; // IFT_ETHER;
-	iface->if_mtu 	= frame_size;
+	edl->layer.name   = name;
+	edl->layer.module = &nlmi;
 			
-	iface->module = &nimi;
+	return g_stack->register_layer(&edl->layer);
+}
+
+// ----------------------------------------------------
+status_t device_reader(void *args)
+{
+	net_layer 	*me = args;
+	ethernet_device_layer *edl = (ethernet_device_layer *) me;
+	net_buffer 	*buffer;
+	status_t status;
+	void *frame;
+	ssize_t sz;
+
+	printf("%s: device reader started.\n", me->name);
+	
+	status = B_OK;
+	while(1) {
+		frame = malloc(edl->max_frame_size);
+		if (!frame) {
+			status = B_NO_MEMORY;
+			break;
+		};
+
+		// read on frame at time
+		sz = read(edl->fd, frame, edl->max_frame_size);
+		if (sz >= B_OK) {
+			buffer = g_stack->new_buffer();
+			if (!buffer) {
+				free(frame);
+				status = B_NO_MEMORY;
+				break;
+			};
+		
+			g_stack->add_to_buffer(buffer, 0, frame, sz, (buffer_chunk_free_func) free);
 			
-	return g_stack->register_interface(iface);
+			printf("%s: input buffer:\n", me->name);
+			g_stack->dump_buffer(buffer);
+
+			if (g_stack->push_buffer_up(me, buffer) != B_OK)
+				// nobody above us *eat* this buffer, so we drop it ourself :-(
+				g_stack->delete_buffer(buffer, false);
+		};
+	};
+	
+	edl->reader_thread = -1;
+	return status;
 }
 
 // #pragma mark -
@@ -283,29 +317,21 @@ status_t std_ops(int32 op, ...)
 	return B_OK;
 }
 
-struct net_interface_module_info nimi = {
+struct net_layer_module_info nlmi = {
 	{
-		NET_INTERFACE_MODULE_ROOT "ethernet/v0",
+		NET_LAYER_MODULE_ROOT "interfaces/ethernet",
 		0,
 		std_ops
 	},
 	
 	init,
 	uninit,
-	up,
-	down,
-	send,
-	receive,
-	control,
-	get_hardware_address,
-	get_multicast_addresses,
-	set_multicast_addresses,
-	set_mtu,
-	set_promiscuous,
-	set_media
+	enable,
+	output_buffer,
+	NULL // interface layer: no input_buffer
 };
 
 _EXPORT module_info *modules[] = {
-	(module_info*) &nimi,	// net_interface_module_info
+	(module_info*) &nlmi,	// net_layer_module_info
 	NULL
 };
