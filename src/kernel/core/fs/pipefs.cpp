@@ -22,13 +22,10 @@
 
 #include "builtin_fs.h"
 
-
-namespace pipefs {
-
 // ToDo: handles file names suboptimally - it has all file names
 //	in a single linked list, no hash lookups or whatever.
 
-#define PIPEFS_TRACE 1
+#define PIPEFS_TRACE 0
 
 #if PIPEFS_TRACE
 #	define TRACE(x) dprintf x
@@ -36,11 +33,23 @@ namespace pipefs {
 #	define TRACE(x)
 #endif
 
+
+namespace pipefs {
+
+class Volume;
+class Inode;
+struct dir_cookie;
+
 struct read_request {
+	read_request	*prev;
 	read_request	*next;
 	void			*buffer;
 	size_t			buffer_size;
 	size_t			bytes_read;
+	
+	size_t SpaceLeft() const { return buffer_size - bytes_read; }
+	void Fill(Volume *volume);
+	status_t PutBuffer(const void **_buffer, size_t *_bufferSize);
 };
 
 class ReadRequests {
@@ -48,19 +57,19 @@ class ReadRequests {
 		ReadRequests();
 		~ReadRequests();
 
-		status_t Lock();
-		status_t Unlock();
+		void Lock();
+		void Unlock();
 
 		status_t Add(read_request &request);
 		status_t Remove(read_request &request);
 
+		read_request *GetCurrent() const { return fCurrent; }
+		void SkipCurrent() { if (fCurrent) fCurrent = fCurrent->next; }
+
 	private:
-		benaphore		fLock;
+		mutex			fLock;
 		read_request	*fFirst, *fCurrent, *fLast;
 };
-
-class Inode;
-struct dir_cookie;
 
 class Volume {
 	public:
@@ -120,8 +129,8 @@ class Inode {
 		Inode		*Next() const { return fNext; }
 		void		SetNext(Inode *inode) { fNext = inode; }
 
-		benaphore	*ReadLock() { return &fReadLock; }
-		benaphore	*WriteLock() { return &fWriteLock; }
+		sem_id		ReadLock() { return fReadLock; }
+		mutex		*WriteMutex() { return &fWriteMutex; }
 
 		static int32 HashNextOffset();
 		static uint32 hash_func(void *_node, const void *_key, uint32 range);
@@ -135,8 +144,8 @@ class Inode {
 		int32		fType;
 		const char	*fName;
 
-		benaphore	fReadLock;
-		benaphore	fWriteLock;
+		sem_id		fReadLock;
+		mutex		fWriteMutex;
 };
 
 
@@ -241,7 +250,9 @@ Volume::CreateNode(const char *name, int32 type)
 
 	if (type == S_IFIFO)
 		InsertNode(inode);
+
 	hash_insert(fNodeHash, inode);
+	vfs_new_vnode(ID(), inode->ID(), inode);
 
 	return inode;
 }
@@ -386,7 +397,8 @@ err:
 
 Inode::Inode(Volume *volume, const char *name, int32 type)
 	:
-	fNext(NULL)
+	fNext(NULL),
+	fHashNext(NULL)
 {
 	fName = strdup(name);
 	if (fName == NULL)
@@ -395,14 +407,21 @@ Inode::Inode(Volume *volume, const char *name, int32 type)
 	fID = volume->GetNextNodeID();
 	fType = type;
 
-	if (benaphore_init(&fReadLock, "pipe read") == B_OK)
-		benaphore_init(&fWriteLock, "pipe write");
+	if (type == S_IFIFO) {
+		fReadLock = create_sem(0, "pipe read");
+		mutex_init(&fWriteMutex, "pipe write");
+	}
 }
 
 
 Inode::~Inode()
 {
 	free(const_cast<char *>(fName));
+
+	if (fType == S_IFIFO) {	
+		delete_sem(fReadLock);
+		mutex_destroy(&fWriteMutex);
+	}
 }
 
 
@@ -410,8 +429,7 @@ status_t
 Inode::InitCheck()
 {
 	if (fName == NULL
-		|| fReadLock.sem < B_OK
-		|| fWriteLock.sem < B_OK)
+		|| fType == S_IFIFO && (fReadLock < B_OK || fWriteMutex.sem < B_OK))
 		return B_ERROR;
 
 	return B_OK;
@@ -455,33 +473,66 @@ Inode::compare_func(void *_node, const void *_key)
 //	#pragma mark -
 
 
+void 
+read_request::Fill(Volume *volume)
+{
+	// ToDo: implement me - fill this request with waiting buffers
+	return;
+}
+
+
+status_t
+read_request::PutBuffer(const void **_buffer, size_t *_bufferSize)
+{
+	TRACE(("pipefs: read_request::PutUserBuffer(buffer = %p, size = %lu)\n", *_buffer, *_bufferSize));
+
+	size_t bytes = *_bufferSize;
+	if (bytes > SpaceLeft())
+		bytes = SpaceLeft();
+
+	uint8 *source = (uint8 *)*_buffer;
+
+	if (user_memcpy((uint8 *)buffer + bytes_read, source, bytes) < B_OK)
+		return B_BAD_ADDRESS;
+
+	bytes_read += bytes;
+	*_buffer = (void *)(source + bytes);
+	*_bufferSize -= bytes;
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
 ReadRequests::ReadRequests()
 	:
 	fFirst(NULL),
 	fCurrent(NULL),
 	fLast(NULL)
 {
-	benaphore_init(&fLock, "pipefs read requests");
+	mutex_init(&fLock, "pipefs read requests");
 }
 
 
 ReadRequests::~ReadRequests()
 {
-	benaphore_destroy(&fLock);
+	mutex_destroy(&fLock);
 }
 
 
-status_t 
+void
 ReadRequests::Lock()
 {
-	return benaphore_lock(&fLock);
+	mutex_lock(&fLock);
 }
 
 
-status_t 
+void
 ReadRequests::Unlock()
 {
-	return benaphore_unlock(&fLock);
+	mutex_unlock(&fLock);
 }
 
 
@@ -494,14 +545,34 @@ ReadRequests::Add(read_request &request)
 	if (fFirst == NULL)
 		fFirst = &request;
 
-	fLast = &request;		
+	// ToDo: could directly skip full requests
+	if (fCurrent == NULL)
+		fCurrent = &request;
+
+	request.prev = fLast;
 	request.next = NULL;
+	fLast = &request;		
 }
 
 
 status_t 
 ReadRequests::Remove(read_request &request)
 {
+	if (request.next != NULL)
+		request.next->prev = request.prev;
+	if (request.prev != NULL)
+		request.prev->next = request.next;
+
+	// update pointers
+
+	if (fCurrent == &request)
+		fCurrent = fCurrent->next;
+
+	if (fLast == &request)
+		fLast = request.prev;
+
+	if (fFirst == &request)
+		fFirst = request.next;
 }
 
 
@@ -626,11 +697,13 @@ pipefs_get_vnode(fs_volume _volume, vnode_id id, fs_vnode *_inode, bool reenter)
 static status_t
 pipefs_put_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 {
-#if PIPEFS_TRACE
 	Inode *inode = (Inode *)_node;
 
 	TRACE(("pipefs_putvnode: entry on vnode 0x%Lx, r %d\n", inode->ID(), reenter));
-#endif
+
+	// ToDo: delete pipe - it isn't needed anymore!
+
+	//delete inode;
 	return B_OK;
 }
 
@@ -661,13 +734,17 @@ pipefs_remove_vnode(fs_volume _volume, fs_vnode _node, bool reenter)
 
 
 static status_t
-pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int omode, int perms,
+pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int openMode, int perms,
 	fs_cookie *_cookie, vnode_id *_newVnodeID)
 {
 	Volume *volume = (Volume *)_volume;
 
-	TRACE(("pipefs_create_dir: dir = %p, name = '%s', perms = %d, &id = %p\n",
+	TRACE(("pipefs_create(): dir = %p, name = '%s', perms = %d, &id = %p\n",
 		_dir, name, perms, _newVnodeID));
+
+	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
+	if (cookie == NULL)
+		return B_NO_MEMORY;
 
 	volume->Lock();
 
@@ -688,22 +765,34 @@ pipefs_create(fs_volume _volume, fs_vnode _dir, const char *name, int omode, int
 
 	volume->Unlock();
 
+	cookie->open_mode = openMode;
+
+	*_cookie = (void *)cookie;
+	*_newVnodeID = inode->ID();
 	notify_listener(B_ENTRY_CREATED, volume->ID(), directory->ID(), 0, inode->ID(), name);
+
 	return B_OK;
 
 err:
 	volume->Unlock();
+	free(cookie);
+
 	return status;
 }
 
 
 static status_t
-pipefs_open(fs_volume _volume, fs_vnode _v, int openMode, fs_cookie *_cookie)
+pipefs_open(fs_volume _volume, fs_vnode _node, int openMode, fs_cookie *_cookie)
 {
 	// allow to open the file, but it can't be done anything with it
 
-	*_cookie = NULL;
-		// initialize the cookie, because pipefs_free_cookie() relies on it
+	file_cookie *cookie = (file_cookie *)malloc(sizeof(file_cookie));
+	if (cookie == NULL)
+		return B_NO_MEMORY;
+
+	cookie->open_mode = openMode;
+
+	*_cookie = (void *)cookie;
 
 	return B_OK;
 }
@@ -719,14 +808,13 @@ pipefs_close(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
 
 
 static status_t
-pipefs_free_cookie(fs_volume _volume, fs_vnode _vnode, fs_cookie _cookie)
+pipefs_free_cookie(fs_volume _volume, fs_vnode _node, fs_cookie _cookie)
 {
-//	pipefs_cookie *cookie = _cookie;
+	file_cookie *cookie = (file_cookie *)_cookie;
 
-	TRACE(("pipefs_freecookie: entry vnode %p, cookie %p\n", _vnode, _cookie));
+	TRACE(("pipefs_freecookie: entry vnode %p, cookie %p\n", _node, _cookie));
 
-//	if (cookie)
-//		free(cookie);
+	free(cookie);
 
 	return 0;
 }
@@ -744,54 +832,116 @@ pipefs_read(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	void *buffer, size_t *_length)
 {
 	file_cookie *cookie = (file_cookie *)_cookie;
-	Volume *fs = (Volume *)_volume;
+	Volume *volume = (Volume *)_volume;
 
 	(void)pos;
 	TRACE(("pipefs_read: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", _node, cookie, pos, *_length));
+
+	if ((cookie->open_mode & O_RWMASK) != O_RDONLY)
+		return B_NOT_ALLOWED;
+
+	// issue read request
 
 	read_request request;
 	request.buffer = buffer;
 	request.buffer_size = *_length;
 	request.bytes_read = 0;
 
-	ReadRequests &requests = fs->GetReadRequests();
+	ReadRequests &requests = volume->GetReadRequests();
 
-	if (requests.Lock() != B_OK)
-		return B_ERROR;
-
+	requests.Lock();
 	requests.Add(request);
 	requests.Unlock();
 
-	Inode *inode = (Inode *)_node;
-	status_t status = benaphore_lock_etc(inode->ReadLock(),
-						cookie->open_mode & O_NONBLOCK ? B_TIMEOUT : 0, 0);
-	
-	if (requests.Lock() != B_OK)
-		panic("pipefs: could not get lock for read requests");
+	// ToDo: here is the race condition that another reader issues
+	//	its read request after this one, but locks earlier; this
+	//	will currently lead to a dead-lock or failure - that could
+	//	be solved by attaching a thread to the request
 
-//	if (status == B_OK) {
-//		requests.FillRequest(request);
+	// wait for it to be filled
+
+	Inode *inode = (Inode *)_node;
+	status_t status = acquire_sem_etc(inode->ReadLock(), 1,
+						(cookie->open_mode & O_NONBLOCK ? B_TIMEOUT : 0 ) | B_CAN_INTERRUPT, 0);
+
+	requests.Lock();
+
+	if (status == B_OK)
+		request.Fill(volume);
 
 	requests.Remove(request);
 	requests.Unlock();
 
-	if (status == B_TIMED_OUT && request.bytes_read > 0)
+	if (status == B_TIMED_OUT || B_INTERRUPTED && request.bytes_read > 0)
 		status = B_OK;
 
-	if (status == B_OK) {
+	if (status == B_OK)
 		*_length = request.bytes_read;
-	}
+
 	return status;
 }
 
 
 static ssize_t
-pipefs_write(fs_volume fs, fs_vnode _node, fs_cookie cookie, off_t pos,
+pipefs_write(fs_volume _volume, fs_vnode _node, fs_cookie _cookie, off_t pos,
 	const void *buffer, size_t *_length)
 {
+	file_cookie *cookie = (file_cookie *)_cookie;
+	Volume *volume = (Volume *)_volume;
+	Inode *inode = (Inode *)_node;
+
 	TRACE(("pipefs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", _node, cookie, pos, *_length));
 
-	return EINVAL;
+	if ((cookie->open_mode & O_RWMASK) != O_WRONLY)
+		return B_NOT_ALLOWED;
+
+	mutex_lock(inode->WriteMutex());
+
+	ReadRequests &requests = volume->GetReadRequests();
+	requests.Lock();
+
+	size_t bytesLeft = *_length;
+	read_request *request = NULL;
+
+	do {
+		request = requests.GetCurrent();
+		if (request != NULL) {
+			// fill this request
+
+			request->Fill(volume);
+			if (request->SpaceLeft() > 0) {
+				// place our data into that buffer
+				request->PutBuffer(&buffer, &bytesLeft);
+				if (bytesLeft == 0) {
+					release_sem(inode->ReadLock());
+					break;
+				}
+			}
+
+			requests.SkipCurrent();
+		}
+	} while (request != NULL);
+
+	status_t status;
+
+	if (request == NULL) {
+		// there is no read request pending, so we have to put
+		// our data in a temporary buffer
+
+		// ToDo: do that using cbufs!
+		*_length -= bytesLeft;
+		dprintf("pipefs: lazy write saw no read_request...\n");
+		release_sem(inode->ReadLock());
+		status = B_OK;
+	} else {
+		// could write everything without the need to copy!
+		status = B_OK;
+	}
+
+	requests.Unlock();
+	mutex_unlock(inode->WriteMutex());
+
+	return status;
 }
 
 
@@ -839,9 +989,9 @@ pipefs_open_dir(fs_volume _volume, fs_vnode _node, fs_cookie *_cookie)
 	cookie->current = volume->FirstEntry();
 	volume->InsertCookie(cookie);
 
-	*_cookie = cookie;
-
 	volume->Unlock();
+
+	*_cookie = (void *)cookie;
 
 	return B_OK;
 }
