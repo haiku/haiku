@@ -739,6 +739,9 @@ set_sem_owner(sem_id id, team_id team)
 		return B_BAD_SEM_ID;
 	}
 
+	// Todo: this is a small race condition: the team ID could already
+	// be invalid at this point - we would lose one semaphore slot in
+	// this case!
 	gSems[slot].owner = team;
 
 	RELEASE_SEM_LOCK(gSems[slot]);
@@ -799,7 +802,7 @@ remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_qu
 
 	// remove the thread from the queue and place it in the supplied queue
 	t1 = thread_dequeue_id(&sem->q, t->id);
-	if(t != t1)
+	if (t != t1)
 		return ERR_NOT_FOUND;
 	sem->count += t->sem_acquire_count;
 	t->state = B_THREAD_READY;
@@ -811,7 +814,7 @@ remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_qu
 		int delta = min(t->sem_count, sem->count);
 
 		t->sem_count -= delta;
-		if(t->sem_count <= 0) {
+		if (t->sem_count <= 0) {
 			t = thread_dequeue(&sem->q);
 			t->state = B_THREAD_READY;
 			thread_enqueue(t, queue);
