@@ -179,6 +179,9 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 			format->u.encoded_audio.output.frame_rate = audio_format->frames_per_sec;
 			format->u.encoded_audio.output.channel_count = audio_format->channels;
 		}
+		// this doesn't seem to work (it's not even a fourcc)
+		format->user_data_type = B_CODEC_TYPE_INFO;
+		*(uint32 *)format->user_data = audio_format->format_tag; format->user_data[4] = 0;
 		return B_OK;
 	}
 
