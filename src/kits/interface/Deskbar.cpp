@@ -337,6 +337,16 @@ status_t BDeskbar::RemoveItem(int32 id)
 	if (result == B_OK) {
 		result = fMessenger->SendMessage(&requestMessage, &replyMessage);
 	}
+	/* here R5 returns B_OK always (probably the result of SendMessage())
+	 * Deskbar itself also always return B_NO_REPLY, so ...
+	 * here add some more checks for the future.
+	 */
+	if (result != B_OK)
+		return(result);
+	if (replyMessage.what == B_NO_REPLY)
+		return(B_OK); /* we can only speculate */
+	result = B_ERROR;
+	replyMessage.FindInt32("error", &result);
 	return(result);
 }
 //------------------------------------------------------------------------------
@@ -350,7 +360,15 @@ status_t BDeskbar::RemoveItem(const char *name)
 	if (result == B_OK) {
 		result = fMessenger->SendMessage(&requestMessage, &replyMessage);
 	}
+	/* same as above */
+	if (result != B_OK)
+		return(result);
+	if (replyMessage.what == B_NO_REPLY)
+		return(B_OK);
+	result = B_ERROR;
+	replyMessage.FindInt32("error", &result);
 	return(result);
+	
 }
 //------------------------------------------------------------------------------
 
