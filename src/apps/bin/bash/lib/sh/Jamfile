@@ -25,7 +25,6 @@ StaticLibrary sh :
 	pathcanon.c
 	pathphys.c
 	tmpfile.c
-	sig.c
 	stringlist.c
 	stringvec.c
 	spell.c
