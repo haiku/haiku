@@ -105,6 +105,13 @@ enum {
 										// a CPU fault will be ignored)
 };
 
+// watchpoint types (ToDo: Check PPC support.)
+enum {
+	B_DATA_READ_WATCHPOINT = 0,			// !x86
+	B_DATA_WRITE_WATCHPOINT,
+	B_DATA_READ_WRITE_WATCHPOINT,
+};
+
 
 // #pragma mark -
 
@@ -115,8 +122,15 @@ typedef enum {
 	B_DEBUG_MESSAGE_SET_TEAM_FLAGS,		// set the team's debugging flags
 	B_DEBUG_MESSAGE_SET_THREAD_FLAGS,	// set a thread's debugging flags
 	B_DEBUG_MESSAGE_RUN_THREAD,			// run a thread full speed
+	B_DEBUG_MESSAGE_STEP_THREAD,		// let a thread execute the next
+										// instruction
 	B_DEBUG_MESSAGE_GET_WHY_STOPPED,	// ask why the thread stopped
-	// ...
+	B_DEBUG_MESSAGE_SET_CPU_STATE,		// change a stopped thread's CPU state
+	B_DEBUG_MESSAGE_SET_BREAKPOINT,		// set a breakpoint
+	B_DEBUG_MESSAGE_CLEAR_BREAKPOINT,	// clear a breakpoint
+	B_DEBUG_MESSAGE_SET_WATCHPOINT,		// set a watchpoint
+	B_DEBUG_MESSAGE_CLEAR_WATCHPOINT,	// clear a watchpoint
+	
 } debug_nub_message;
 
 // maximal number of bytes to read/write via B_{READ,WRITE]_MEMORY
@@ -170,14 +184,68 @@ typedef struct {
 typedef struct {
 	thread_id	thread;			// the thread to be run
 	uint32		handle_event;	// how to handle the occurred event
-	// TODO: CPU state?
 } debug_nub_run_thread;
+
+// B_DEBUG_MESSAGE_STEP_THREAD
+
+typedef struct {
+	thread_id	thread;			// the thread
+	uint32		handle_event;	// how to handle the occurred event
+} debug_nub_step_thread;
 
 // B_DEBUG_MESSAGE_GET_WHY_STOPPED
 
 typedef struct {
 	thread_id	thread;			// the thread
 } debug_nub_get_why_stopped;
+
+// B_DEBUG_MESSAGE_SET_CPU_STATE
+
+typedef struct {
+	thread_id			thread;				// the thread
+	int32				align_to_double;	// alignment
+	debug_cpu_state		cpu_state;			// the new CPU state
+} debug_nub_set_cpu_state;
+
+// B_DEBUG_MESSAGE_SET_BREAKPOINT
+
+typedef struct {
+	port_id		reply_port;		// port to send the reply to
+	void		*address;		// breakpoint address
+} debug_nub_set_breakpoint;
+
+typedef struct {
+	status_t	error;			// B_OK, if the breakpoint has been set
+								// successfully
+} debug_nub_set_breakpoint_reply;
+
+// B_DEBUG_MESSAGE_CLEAR_BREAKPOINT
+
+typedef struct {
+	void		*address;		// breakpoint address
+} debug_nub_clear_breakpoint;
+
+// B_DEBUG_MESSAGE_SET_WATCHPOINT
+
+typedef struct {
+	port_id		reply_port;		// port to send the reply to
+	void		*address;		// watchpoint address
+	uint32		type;			// watchpoint type (see type constants above)
+	int32		length;			// number of bytes to watch (typically 1, 2,
+								// 4); architecture specific alignment
+								// restrictions apply.
+} debug_nub_set_watchpoint;
+
+typedef struct {
+	status_t	error;			// B_OK, if the watchpoint has been set
+								// successfully
+} debug_nub_set_watchpoint_reply;
+
+// B_DEBUG_MESSAGE_CLEAR_WATCHPOINT
+
+typedef struct {
+	void		*address;		// watchpoint address
+} debug_nub_clear_watchpoint;
 
 // union of all messages structures sent to the debug nub thread
 typedef union {
@@ -186,8 +254,13 @@ typedef union {
 	debug_nub_set_team_flags	set_team_flags;
 	debug_nub_set_thread_flags	set_thread_flags;
 	debug_nub_run_thread		run_thread;
+	debug_nub_step_thread		step_thread;
 	debug_nub_get_why_stopped	get_why_stopped;
-	// ...
+	debug_nub_set_cpu_state		set_cpu_state;
+	debug_nub_set_breakpoint	set_breakpoint;
+	debug_nub_clear_breakpoint	clear_breakpoint;
+	debug_nub_set_watchpoint	set_watchpoint;
+	debug_nub_clear_watchpoint	clear_watchpoint;
 } debug_nub_message_data;
 
 
