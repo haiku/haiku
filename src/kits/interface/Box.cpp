@@ -146,8 +146,6 @@ status_t BBox::SetLabel(BView *viewLabel)
 	{
 		// Update fBounds
 		fBounds = Bounds();
-		font_height fh;
-		GetFontHeight(&fh);
 
 		fBounds.top = (float)ceil(viewLabel->Bounds().Height() / 2.0f);
 
