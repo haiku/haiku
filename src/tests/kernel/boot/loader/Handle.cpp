@@ -81,6 +81,7 @@ Handle::SetTo(int handle, bool takeOwnership)
 ssize_t
 Handle::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 {
+	//printf("Handle::ReadAt(pos = %Ld, buffer = %p, size = %lu)\n", pos, buffer, bufferSize);
 	return read_pos(fHandle, pos, buffer, bufferSize);
 }
 
@@ -110,5 +111,13 @@ Handle::Size() const
 	// ToDo: fix this!
 	return 1024LL * 1024 * 1024 * 1024;
 		// 1024 GB
+/*	struct stat stat;
+	if (fstat(fHandle, &stat) == B_OK)
+		return stat.st_size;
+
+	// stat apparently doesn't work with devices
+
+	return 0LL;
+*/
 }
 
