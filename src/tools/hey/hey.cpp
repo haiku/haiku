@@ -350,7 +350,8 @@ status_t Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage
 						bool found=false;
 						if (target && target->IsValid()) {
 							BMessage rply;
-							if(target->SendMessage(&BMessage(B_GET_SUPPORTED_SUITES), &rply)==B_OK){
+							BMessage req(B_GET_SUPPORTED_SUITES);
+							if(target->SendMessage(&req, &rply)==B_OK){
 								// if all goes well, rply contains all kinds of property infos
 								int32 j=0;
 								void *voidptr;
