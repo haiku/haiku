@@ -3,9 +3,7 @@
 /*
 ** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -444,6 +442,13 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 	}
 
 	return B_NAME_NOT_FOUND;
+}
+
+
+uint32
+parse_expression(const char *expression)
+{
+	return strtoul(expression, NULL, 0);
 }
 
 
