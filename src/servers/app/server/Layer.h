@@ -57,6 +57,7 @@ public:
 	void FullInvalidate(const BRect &rect);
 	void FullInvalidate(const BRegion &region);
 	void Invalidate(const BRegion &region);
+	void RebuildAndForceRedraw( const BRegion& reg, Layer *target);
 	
 	virtual	void RebuildFullRegion(void);
 	void StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt);
