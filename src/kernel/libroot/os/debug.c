@@ -29,3 +29,63 @@ disable_debugger(int state)
 	return 0;
 }
 
+
+// relating to Debug.h
+// TODO: verify these functions
+// TODO: add implementations for printfs
+
+#include <Debug.h>
+
+bool _rtDebugFlag = false;
+
+bool
+_debugFlag(void)
+{
+	return _rtDebugFlag;
+}
+
+
+bool
+_setDebugFlag(bool flag)
+{
+	bool previous = _rtDebugFlag;
+	_rtDebugFlag = flag;
+	return previous;
+}
+
+	
+int
+_debugPrintf(const char * message, ...)
+{
+	puts("*** _debugPrintf call - not yet implemented ***");
+	printf("%s\n", message);
+	return 0;
+}
+
+
+int
+_sPrintf(const char * message, ...)
+{
+	puts("*** _sPrintf call - not yet implemented ***");
+	printf("%s\n", message);
+	return 0;
+}
+
+
+int
+_xdebugPrintf(const char * message, ...)
+{
+	puts("*** _xdebugPrintf call - not yet implemented ***");
+	printf("%s\n", message);
+	return 0;
+}
+
+
+int
+_debuggerAssert(const char * file, int line, char * message)
+{
+	puts("*** _debuggerAssert call - not yet implemented ***");
+	printf("%s:%d:%s\n", file, line, message);
+	return 0;
+}
+
