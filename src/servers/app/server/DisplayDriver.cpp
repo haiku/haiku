@@ -2242,6 +2242,7 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDr
 
 void DisplayDriver::StrokePoint(BPoint& pt, RGBColor &color)
 {
+	StrokeLine(pt, pt, color);
 }
 
 void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, RGBColor &color, bool is_closed)
@@ -2979,3 +2980,6 @@ void DisplayDriver::CopyToBitmap(ServerBitmap *target, const BRect &source)
 {
 }
 
+void DisplayDriver::ConstrainClippingRegion(BRegion *reg)
+{
+}
