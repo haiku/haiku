@@ -26,6 +26,8 @@
 //	Description:	BTextView displays and manages styled text.
 //------------------------------------------------------------------------------
 
+// TODO: Finish documenting this class
+
 // Standard Includes -----------------------------------------------------------
 #include <cstdlib>
 #include <cstdio>
@@ -42,8 +44,6 @@
 #include <TextView.h>
 #include <Window.h>
 
-// Project Includes ------------------------------------------------------------
-
 // Local Includes --------------------------------------------------------------
 #include "LineBuffer.h"
 #include "StyleBuffer.h"
@@ -58,6 +58,7 @@
 #else
 	#define CALLED()
 #endif
+
 
 struct flattened_text_run {
 	int32	offset;
@@ -91,6 +92,7 @@ enum {
 // _BTextTrackState_ class -----------------------------------------------------
 class _BTextTrackState_ {
 
+	// TODO: Implement ? 
 public:
 	_BTextTrackState_(bool inSelection)
 		:	fMoved(false),
@@ -100,7 +102,7 @@ public:
 	bool	fMoved;
 	bool	fInSelection;
 };
-//------------------------------------------------------------------------------
+
 
 // Globals ---------------------------------------------------------------------
 static property_info
@@ -167,7 +169,8 @@ int32 BTextView::sWidthAtom = 0;
 //------------------------------------------------------------------------------
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 					 uint32 resizeMask, uint32 flags)
-	:	BView(frame, name, resizeMask, flags | B_FRAME_EVENTS | B_PULSE_NEEDED),
+	:	BView(frame, name, resizeMask,
+				flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE),
 		fText(NULL),
 		fLines(NULL),
 		fStyles(NULL),
@@ -210,7 +213,8 @@ BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 					 const BFont *initialFont, const rgb_color *initialColor,
 					 uint32 resizeMask, uint32 flags)
-	:	BView(frame, name, resizeMask, flags | B_FRAME_EVENTS),
+	:	BView(frame, name, resizeMask,
+				flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE),
 		fText(NULL),
 		fLines(NULL),
 		fStyles(NULL),
@@ -249,7 +253,11 @@ BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 	CALLED();
 	InitObject(textRect, initialFont, initialColor);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Creates a BTextView object from the passed BMessage.
+	\param archive The BMessage from which the object shall be created.
+*/
 BTextView::BTextView(BMessage *archive)
 	:	BView(archive)
 {
@@ -324,7 +332,10 @@ BTextView::BTextView(BMessage *archive)
 	}
 	
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Frees the memory allocated and destroy the object created on construction.
+*/
 BTextView::~BTextView()
 {
 	CALLED();
@@ -335,7 +346,13 @@ BTextView::~BTextView()
 	delete fUndo;
 	delete fOffscreen;
 }
-//------------------------------------------------------------------------------
+
+
+
+/*! \brief Static function used to istantiate a BTextView object from the given BMessage.
+	\param archive The BMessage from which the object shall be created.
+	\return A constructed BTextView as a BArchivable object.
+*/
 BArchivable *
 BTextView::Instantiate(BMessage *archive)
 {
@@ -345,7 +362,13 @@ BTextView::Instantiate(BMessage *archive)
 	else
 		return NULL;
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Archives the object into the passed message.
+	\param data A pointer to the message where to archive the object.
+	\param deep ?
+	\return \c B_OK if everything went well, an error code if not.
+*/
 status_t 
 BTextView::Archive(BMessage *data, bool deep) const
 {
@@ -384,14 +407,20 @@ BTextView::Archive(BMessage *data, bool deep) const
 	
 	return err;
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called when the BTextView is added to the
+	window's view hierarchy.
+	
+	Set the window's pulse rate to 2 per second and adjust scrollbars if needed
+*/
 void
 BTextView::AttachedToWindow()
 {
 	CALLED();
 	BView::AttachedToWindow();
 	
-	Window()->SetPulseRate(50000);
+	Window()->SetPulseRate(500000);
 	
 	fCaretVisible = false;
 	fCaretTime = 0;
@@ -405,14 +434,23 @@ BTextView::AttachedToWindow()
 	
 	UpdateScrollbars();
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called when the BTextView is removed from the
+	window's view hierarchy.
+*/
 void
 BTextView::DetachedFromWindow()
 {
 	CALLED();
 	BView::DetachedFromWindow();
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called whenever
+	the contents of the BTextView need to be (re)drawn.
+	\param updateRect The rect which needs to be redrawn
+*/
 void
 BTextView::Draw(BRect updateRect)
 {
@@ -433,7 +471,12 @@ BTextView::Draw(BRect updateRect)
 		}
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called when a mouse button is clicked while
+	the cursor is in the view.
+	\param where The location where the mouse button has been clicked.
+*/
 void
 BTextView::MouseDown(BPoint where)
 {
@@ -453,6 +496,8 @@ BTextView::MouseDown(BPoint where)
 	
 	int32 mouseOffset = OffsetAt(where);	
 	bool shiftDown = modifiers() & B_SHIFT_KEY;
+
+	// TODO: Asynchronous mouse tracking
 
 	// should we initiate a drag?
 	if (fSelStart != fSelEnd && !shiftDown) {
@@ -577,14 +622,28 @@ BTextView::MouseDown(BPoint where)
 		mouseOffset = OffsetAt(curMouse);		
 	} while (buttons != 0);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called when a mouse button is released while
+	the cursor is in the view.
+	\param where The point where the mouse button has been released.
+
+	Doesn't do anything useful at the moment
+*/
 void
 BTextView::MouseUp(BPoint where)
 {
 	CALLED();
 	PerformMouseUp(where);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called whenever the mouse cursor enters, exits
+	or moves inside the view.
+	\param where The point where the mouse cursor has moved to.
+	\param code A code which tells if the mouse entered or exited the view
+	\param message The message containing dragged information, if any.
+*/
 void
 BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
@@ -613,7 +672,13 @@ BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 			break;
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called when the window becomes the active window
+	or gives up that status.
+	\param state If true, window has just become active, if false, window has
+	just become inactive.
+*/
 void
 BTextView::WindowActivated(bool state)
 {
@@ -628,7 +693,11 @@ BTextView::WindowActivated(bool state)
 			Deactivate();
 	} 
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called whenever a key is pressed while the view is
+	the focus view of the active window.
+*/
 void
 BTextView::KeyDown(const char *bytes, int32 numBytes)
 {
@@ -687,17 +756,29 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 			InvertCaret();
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called every x microseconds.
+	It's the function which makes the caret blink.
+*/
 void
 BTextView::Pulse()
 {
 	CALLED();
 	if (fActive && fEditable && fSelStart == fSelEnd) {
+		// TODO: Is this check needed ?
 		if (system_time() > (fCaretTime + 500000.0))
 			InvertCaret();
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function called when the view's frame is resized.
+	\param width The new view's width.
+	\param height The new view's height.
+
+	Updates the associated scrollbars.
+*/
 void
 BTextView::FrameResized(float width, float height)
 {
@@ -706,7 +787,13 @@ BTextView::FrameResized(float width, float height)
 
 	UpdateScrollbars();
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Highlight/unhighlight the selection when the view gets
+		or looses the focus.
+	\param focusState The focus state: true, if the view is getting the focus,
+		false otherwise.
+*/
 void
 BTextView::MakeFocus(bool focusState)
 {
@@ -721,7 +808,11 @@ BTextView::MakeFocus(bool focusState)
 			Deactivate();
 	} 
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Hook function executed every time the BTextView gets a message.
+	\param message The received message
+*/
 void
 BTextView::MessageReceived(BMessage *message)
 {
@@ -822,17 +913,26 @@ BTextView::MessageReceived(BMessage *message)
 			break;
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Returns the proper handler for the given scripting message.
+	\param message The scripting message which needs to be examined.
+	\param index The index of the specifier
+	\param specifier The message which contains the specifier
+	\param what The 'what' field of the specifier message.
+	\param property The name of the targetted property
+	\return The proper BHandler for the given scripting message.
+*/
 BHandler *
 BTextView::ResolveSpecifier(BMessage *message, int32 index,
-									  BMessage *specifier, int32 form,
+									  BMessage *specifier, int32 what,
 									  const char *property)
 {
 	CALLED();
 	BPropertyInfo propInfo(sPropertyList);
 	BHandler *target = NULL;
 
-	switch (propInfo.FindMatch(message, 0, specifier, form, property)) {
+	switch (propInfo.FindMatch(message, index, specifier, what, property)) {
 		case 0:
 		case 1:
 		case 2:
@@ -848,7 +948,7 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 	}
 
 	if (!target)
-		target = BView::ResolveSpecifier(message, index, specifier, form,
+		target = BView::ResolveSpecifier(message, index, specifier, what,
 			property);
 
 	return target;
@@ -1583,7 +1683,7 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 			result.x += StyledWidth(offset, numChars);
 	
 			if (foundTab) {
-				result.x += fTabWidth - fmod(result.x, fTabWidth);
+				result.x += ActualTabWidth(result.x);
 				numChars++;
 			}
 			
@@ -1700,7 +1800,7 @@ BTextView::OffsetAt(BPoint point) const
 			break;
 			
 		if (foundTab) {
-			tabWidth = fTabWidth - fmod(sigmaWidth, fTabWidth);
+			tabWidth = ActualTabWidth(sigmaWidth);
 			
 			// is the point in the left-half of the tab?
 			if (point.x < (sigmaWidth + (tabWidth / 2)))
@@ -2669,6 +2769,7 @@ void
 BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 						bool scroll)
 {
+	// TODO: Cleanup
 	CALLED();
 	float saveHeight = fTextRect.Height();
 	int32 fromLine = LineAt(fromOffset);
@@ -2683,8 +2784,8 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 	float newHeight = fTextRect.Height();
 	
 	// if the line breaks have changed, force an erase
-	if ( fromLine != saveFromLine || toLine != saveToLine || 
-		 newHeight != saveHeight )
+	if (fromLine != saveFromLine || toLine != saveToLine
+			|| newHeight != saveHeight )
 		erase = true;
 	
 	if (newHeight != saveHeight) {
@@ -2705,7 +2806,11 @@ BTextView::Refresh(int32 fromOffset, int32 toOffset, bool erase,
 	if ( LineHeight(fromLine) != saveLineHeight || 
 		 newHeight < saveHeight || fromLine < saveFromLine )
 		drawOffset = (*fLines)[fromLine]->offset;
-			
+	
+	// TODO: Is it ok here ?
+	if (fResizable)
+		AutoResize(false);
+
 	DrawLines(fromLine, toLine, drawOffset, erase);
 	
 	// erase the area below the text
@@ -2908,7 +3013,7 @@ BTextView::FindLineBreak(int32 fromOffset, float *outAscent,
 			for (int32 i = delta - 1; (*fText)[offset + i] == B_TAB; i--)
 				tabCount++;
 				
-			tabWidth = fTabWidth - fmod(strWidth, fTabWidth);
+			tabWidth = ActualTabWidth(strWidth);
 			if (tabCount > 1)
 				tabWidth += ((tabCount - 1) * fTabWidth);
 			strWidth += tabWidth;
@@ -3018,7 +3123,7 @@ float
 BTextView::ActualTabWidth(float location) const
 {
 	CALLED();
-	return 0.0f;
+	return fTabWidth - fmod(location, fTabWidth);
 }
 //------------------------------------------------------------------------------
 void
@@ -3128,7 +3233,7 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 					
 					if (foundTab) {
 						float penPos = PenLocation().x - fTextRect.left;
-						float tabWidth = fTabWidth - fmod(penPos, fTabWidth);
+						float tabWidth = ActualTabWidth(penPos);
 						if (numTabs > 1)
 							tabWidth += ((numTabs - 1) * fTabWidth);
 							
@@ -3181,7 +3286,11 @@ BTextView::DrawCaret(int32 offset)
 
 	Flush(); ////
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Inverts the blinking caret status.
+	Hides the caret if it is being shown, and if it's hidden, shows it.
+*/
 void
 BTextView::InvertCaret()
 {
@@ -3190,7 +3299,12 @@ BTextView::InvertCaret()
 	fCaretVisible = !fCaretVisible;
 	fCaretTime = system_time();
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Place the blinking caret at the given offset.
+	\param offset The offset (zero based within the object's text) where to place
+	the blinking caret. If it's -1, hide the caret.
+*/
 void
 BTextView::DragCaret(int32 offset)
 {
@@ -3331,18 +3445,22 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 	
 	return true;
 }
-//------------------------------------------------------------------------------				
+
+
+/*! \brief Updates the scrollbars associated with the object (if any).
+*/				
 void
 BTextView::UpdateScrollbars()
 {
 	CALLED();
-	//BRect bounds(Bounds());
+	
+	BRect bounds(Bounds());
 	BScrollBar *hsb = ScrollBar(B_HORIZONTAL);
  	BScrollBar *vsb = ScrollBar(B_VERTICAL);
 
 	// do we have a horizontal scroll bar?
 	if (hsb != NULL) {
-		long viewWidth = Bounds().IntegerWidth();
+		long viewWidth = bounds.IntegerWidth();
 		long dataWidth = fTextRect.IntegerWidth();
 		dataWidth += (long)ceil(fTextRect.left) + 1;
 		
@@ -3356,7 +3474,7 @@ BTextView::UpdateScrollbars()
 	
 	// how about a vertical scroll bar?
 	if (vsb != NULL) {
-		long viewHeight = Bounds().IntegerHeight();
+		long viewHeight = bounds.IntegerHeight();
 		long dataHeight = fTextRect.IntegerHeight();
 		dataHeight += (long)ceil(fTextRect.top) + 1;
 		
@@ -3368,13 +3486,23 @@ BTextView::UpdateScrollbars()
 		vsb->SetSteps(12, viewHeight);
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*!	\brief Autoresizes the view to fit the contained text.
+*/
 void
 BTextView::AutoResize(bool doredraw)
 {
 	CALLED();
+	// TODO: Implement
 }
-//------------------------------------------------------------------------------		
+
+
+/*! \brief Creates a new offscreen BBitmap with an associated BView.
+	param padding Padding (?)
+	
+	Creates an offscreen BBitmap which will be used to draw.
+*/
 void
 BTextView::NewOffscreen(float padding)
 {
@@ -3382,15 +3510,19 @@ BTextView::NewOffscreen(float padding)
 	if (fOffscreen != NULL)
 		DeleteOffscreen();
 	
+	// TODO: Is this correct ?
 	BRect bitmapRect(0, 0, fTextRect.Width() + padding, fTextRect.Height());
 	fOffscreen = new BBitmap(bitmapRect, fColorSpace, true, false);
 	if (fOffscreen != NULL && fOffscreen->Lock()) {
-		BView *bufferView = new BView(bitmapRect, "buffer view", 0, 0);
+		BView *bufferView = new BView(bitmapRect, "drawing view", 0, 0);
 		fOffscreen->AddChild(bufferView);
 		fOffscreen->Unlock();
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Deletes the textview's offscreen bitmap, if any.
+*/ 
 void
 BTextView::DeleteOffscreen()
 {
@@ -3407,6 +3539,7 @@ BTextView::Activate()
 	CALLED();
 	fActive = true;
 	
+	// Create a new offscreen BBitmap
 	NewOffscreen();
 
 	if (fSelStart != fSelEnd) {
@@ -3444,17 +3577,30 @@ BTextView::Deactivate()
 	if (Bounds().Contains(where))
 		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Changes the passed font to be displayable by the object.
+	\param font A pointer to the font to normalize.
+
+	Set font rotation to 0, removes any font flag, set font spacing
+	to \c B_BITMAP_SPACING and font encoding to \c B_UNICODE_UTF8
+*/
 void
 BTextView::NormalizeFont(BFont *font)
 {
 	CALLED();
 	font->SetRotation(0.0f);
-	font->SetFlags(font->Flags() & ~B_DISABLE_ANTIALIASING);
+	font->SetFlags(0);
 	font->SetSpacing(B_BITMAP_SPACING);
 	font->SetEncoding(B_UNICODE_UTF8);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Returns a value which tells if the given charachter is a separator
+	charachter or not.
+	\param offset The offset where the wanted charachter can be found.
+	\return A value which represents the charachter's classification.
+*/
 uint32
 BTextView::CharClassification(int32 offset) const
 {
@@ -3484,7 +3630,12 @@ BTextView::CharClassification(int32 offset) const
 			return B_OTHER_CHARACTER;
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Returns the offset of the next UTF8 charachter within the BTextView's text.
+	\param offset The offset where to start looking.
+	\return The offset of the next UTF8 charachter.
+*/
 int32
 BTextView::NextInitialByte(int32 offset) const
 {
@@ -3499,7 +3650,12 @@ BTextView::NextInitialByte(int32 offset) const
 
 	return offset;
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Returns the offset of the previous UTF8 charachter within the BTextView's text.
+	\param offset The offset where to start looking.
+	\return The offset of the previous UTF8 charachter.
+*/
 int32
 BTextView::PreviousInitialByte(int32 offset) const
 {
@@ -3625,7 +3781,10 @@ BTextView::CancelInputMethod()
 {
 	CALLED();
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Locks the static _BWidthBuffer_ object to be able to access it safely.
+*/
 void
 BTextView::LockWidthBuffer()
 {
@@ -3635,7 +3794,10 @@ BTextView::LockWidthBuffer()
 			;
 	}
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Unlocks the static _BWidthBuffer_ object.
+*/
 void
 BTextView::UnlockWidthBuffer()
 {
@@ -3643,11 +3805,3 @@ BTextView::UnlockWidthBuffer()
 	if (atomic_add(&sWidthAtom, -1) > 1)
 		release_sem(sWidthSem);
 }
-//------------------------------------------------------------------------------
-
-/*
- * $Log $
- *
- * $Id  $
- *
- */
