@@ -29,10 +29,12 @@ typedef status_t (*disk_scanner_get_partition_module_hook)(int deviceFD,
 	struct partition_module_info **partitionModule);
 
 typedef status_t (*disk_scanner_get_nth_session_info_hook)(int deviceFD,
-	int32 index, struct session_info *sessionInfo);
+	int32 index, struct session_info *sessionInfo,
+	struct session_module_info **sessionModule);
 typedef status_t (*disk_scanner_get_nth_partition_info_hook)(int deviceFD,
 	const struct session_info *sessionInfo, int32 partitionIndex,
-	struct extended_partition_info *partitionInfo);
+	struct extended_partition_info *partitionInfo,
+	struct partition_module_info **partitionModule);
 typedef status_t (*disk_scanner_get_partition_fs_info_hook)(int deviceFD,
 	struct extended_partition_info *partitionInfo);
 
