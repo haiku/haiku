@@ -50,6 +50,15 @@ public:
 	KPartition *RegisterPartition(partition_id id, bool noShadow = false);
 	KFileDiskDevice *RegisterFileDevice(const char *filePath);
 
+	KDiskDevice *ReadLockDevice(partition_id id, bool deviceOnly = true);
+	KDiskDevice *WriteLockDevice(partition_id id, bool deviceOnly = true);
+		// The device is also registered and must be unregistered by the
+		// caller.
+	KPartition *ReadLockPartition(partition_id id);
+	KPartition *WriteLockPartition(partition_id id);
+		// Both the device and the partition is also registered and must be
+		// unregistered by the caller.
+
 	partition_id CreateFileDevice(const char *filePath);
 	status_t DeleteFileDevice(const char *filePath);
 	status_t DeleteFileDevice(partition_id id);

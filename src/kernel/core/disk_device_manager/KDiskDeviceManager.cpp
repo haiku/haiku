@@ -359,6 +359,94 @@ KDiskDeviceManager::RegisterFileDevice(const char *filePath)
 	return NULL;
 }
 
+// ReadLockDevice
+KDiskDevice *
+KDiskDeviceManager::ReadLockDevice(partition_id id, bool deviceOnly)
+{
+	// register device
+	KDiskDevice *device = RegisterDevice(id, deviceOnly);
+	if (!device)
+		return NULL;
+	// lock device
+	if (device->ReadLock())
+		return device;
+	device->Unregister();
+	return NULL;
+}
+
+// WriteLockDevice
+KDiskDevice *
+KDiskDeviceManager::WriteLockDevice(partition_id id, bool deviceOnly)
+{
+	// register device
+	KDiskDevice *device = RegisterDevice(id, deviceOnly);
+	if (!device)
+		return NULL;
+	// lock device
+	if (device->WriteLock())
+		return device;
+	device->Unregister();
+	return NULL;
+}
+
+// ReadLockPartition
+KPartition *
+KDiskDeviceManager::ReadLockPartition(partition_id id)
+{
+	// register partition
+	KPartition *partition = RegisterPartition(id);
+	if (!partition)
+		return NULL;
+	// get and register the device
+	KDiskDevice *device = NULL;
+	if (ManagerLocker locker = this) {
+		device = partition->Device();
+		if (device)
+			device->Register();
+	}
+	// lock the device
+	if (device->ReadLock()) {
+		// final check, if the partition still belongs to the device
+		if (partition->Device() == device)
+			return partition;
+		device->ReadUnlock();
+	}
+	// cleanup on failure
+	if (device)
+		device->Unregister();
+	partition->Unregister();
+	return NULL;
+}
+
+// WriteLockPartition
+KPartition *
+KDiskDeviceManager::WriteLockPartition(partition_id id)
+{
+	// register partition
+	KPartition *partition = RegisterPartition(id);
+	if (!partition)
+		return NULL;
+	// get and register the device
+	KDiskDevice *device = NULL;
+	if (ManagerLocker locker = this) {
+		device = partition->Device();
+		if (device)
+			device->Register();
+	}
+	// lock the device
+	if (device->WriteLock()) {
+		// final check, if the partition still belongs to the device
+		if (partition->Device() == device)
+			return partition;
+		device->WriteUnlock();
+	}
+	// cleanup on failure
+	if (device)
+		device->Unregister();
+	partition->Unregister();
+	return NULL;
+}
+
 // CreateFileDevice
 partition_id
 KDiskDeviceManager::CreateFileDevice(const char *filePath)
