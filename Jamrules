@@ -146,21 +146,23 @@ OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
 rule SetupIncludes
 {
 	# XXX add "mail" and "opengl" later
-	local os_includes = add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media midi midi2 net storage support translation ;
+	OS_INCLUDES ?= . add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media midi midi2 net storage support translation ;
 
-	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
+	# include the local directory
+	UseHeaders . ;
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
-	HDRS = [ FDirName $(OBOS_TOP) headers ] ;
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers ] ;
 
 	# Use posix headers directory
-	HDRS += [ FDirName $(OBOS_TOP) headers posix ] ;
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
 
 	# Use public OS header directories
-	HDRS += [ PublicHeaders $(os_includes) ] ;
+	UseHeaders [ PublicHeaders $(OS_INCLUDES) ] ;
 
 	# Used as a fallback, the R5 header directories (we should remove this as soon as possible)
-	HDRS += /boot/develop/headers/posix /boot/develop/headers/cpp ;
+	UseHeaders /boot/develop/headers/posix ;
+	UseHeaders /boot/develop/headers/cpp ;
 }
 
 #-------------------------------------------------------------------------------
@@ -293,8 +295,6 @@ rule TestLib
 	local headerDirs = $(5) ;
 	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
-	SetupIncludes ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
 	TestObjects $(sources) : $(headerDirs) ;
@@ -321,8 +321,6 @@ rule R5TestLib
 	local dest = $(3) ;
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
-
-	SetupIncludes ;
 
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
@@ -372,8 +370,6 @@ rule UnitTest
 	local headerDirs = $(5) ;
 	local objects = [ FGristFiles $(sources:S=$(SUFOBJ)) ] ;
 
-	SetupIncludes ;
-
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
 	TestObjects $(sources) : $(headerDirs) ;
@@ -399,8 +395,6 @@ rule R5UnitTest
 	local dest = $(3) ;
 	local libraries = $(4) ;
 	local objects = [ R5ObjectNames $(sources) ] ;
-
-	SetupIncludes ;
 
 	# Our Main replacement.
 	MainFromObjects $(target) : $(objects) ;
@@ -459,7 +453,6 @@ rule TestObjects
 		OPTIM = ;
 	}
 
-	SetupIncludes ;
 	SetupObjectsDir ;
 
 	# compile
@@ -784,6 +777,7 @@ rule UseHeaders
 
 rule UseCppUnitHeaders
 {
+	SetupIncludes ; #serious hack
 	SubDirHdrs [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
 }
 
@@ -1091,14 +1085,20 @@ rule SetupKernel
 
 	local _objs = $(1:S=$(SUFOBJ)) ;
 
-	#Setup Kernel header directories
-	local kernel_includes = add-ons/file_system add-ons/graphics device drivers kernel storage support ;
+	# XXX add "mail" and "opengl" later
+	OS_INCLUDES ?= . add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media midi midi2 net storage support translation ;
+
+	# include current directory
+	UseHeaders . ;
+
 	# Use posix headers directory
-	HDRS = [ FDirName $(OBOS_TOP) headers posix ] ;
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers posix ] ;
+
 	# Use public OS header directories
-	HDRS += [ PublicHeaders $(kernel_includes) ] ;
+	UseHeaders [ PublicHeaders $(OS_INCLUDES) ] ;
 
 	UsePrivateHeaders kernel ;
+	UsePrivateHeaders libroot ;
 	UseArchHeaders $(OBOS_ARCH) ;
 
 	SetupObjectsDir ;
@@ -1350,6 +1350,8 @@ FT2_LIB     = freetype ;
 rule UseFreeTypeHeaders
 {
 	SubDirHdrs $(FT2_INCLUDE) ;
+
+	SetupIncludes ;
 }
 
 rule UseFreeTypeObjectHeaders
@@ -1382,7 +1384,6 @@ rule FT2_Library
 
 	local library = lib$(1).so ;
 	local sources = $(2) ;
-	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(sources) ;
 	Objects $(sources) ;
