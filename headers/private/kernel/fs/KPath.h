@@ -13,15 +13,17 @@ namespace DiskDevice {
 class KPath {
 public:
 	KPath(int32 bufferSize = B_PATH_NAME_LENGTH);
-	KPath(const char* path, int32 bufferSize = B_PATH_NAME_LENGTH);
+	KPath(const char* path, bool normalize = false,
+		int32 bufferSize = B_PATH_NAME_LENGTH);
 	KPath(const KPath& other);
 	~KPath();
 
-	status_t SetTo(const char *path, int32 bufferSize = B_PATH_NAME_LENGTH);
+	status_t SetTo(const char *path, bool normalize = false,
+		int32 bufferSize = B_PATH_NAME_LENGTH);
 
 	status_t InitCheck() const;
 
-	status_t SetPath(const char *path);
+	status_t SetPath(const char *path, bool normalize = false);
 	const char *Path() const;
 	int32 Length() const;
 

@@ -4,6 +4,8 @@
 #include <string.h>
 
 #include <KPath.h>
+#include <team.h>
+#include <vfs.h>
 
 // debugging
 #define DBG(x)
@@ -21,13 +23,13 @@ KPath::KPath(int32 bufferSize)
 }
 
 // constructor
-KPath::KPath(const char* path, int32 bufferSize)
+KPath::KPath(const char* path, bool normalize, int32 bufferSize)
 	: fBuffer(NULL),
 	  fBufferSize(0),
 	  fPathLength(0),
 	  fLocked(false)
 {
-	SetTo(path, bufferSize);
+	SetTo(path, normalize, bufferSize);
 }
 
 // copy constructor
@@ -48,7 +50,7 @@ KPath::~KPath()
 
 // SetTo
 status_t
-KPath::SetTo(const char* path, int32 bufferSize)
+KPath::SetTo(const char* path, bool normalize, int32 bufferSize)
 {
 	if (bufferSize <= 0)
 		bufferSize = B_PATH_NAME_LENGTH;
@@ -69,7 +71,7 @@ KPath::SetTo(const char* path, int32 bufferSize)
 		fBufferSize = bufferSize;
 		fBuffer[0] = '\0';
 	}
-	return SetPath(path);
+	return SetPath(path, normalize);
 }
 
 // InitCheck
@@ -81,17 +83,29 @@ KPath::InitCheck() const
 
 // SetPath
 status_t
-KPath::SetPath(const char *path)
+KPath::SetPath(const char *path, bool normalize)
 {
 	if (!fBuffer)
 		return B_NO_INIT;
 	if (path) {
-		int32 len = strlen(path);
-		if (len >= fBufferSize)
-			return B_BUFFER_OVERFLOW;
-		memcpy(fBuffer, path, len + 1);
-		fPathLength = len;
-		_ChopTrailingSlashes();
+		if (normalize) {
+			// normalize path
+			status_t error = vfs_normalize_path(path, fBuffer, fBufferSize,
+				team_get_kernel_team_id() == team_get_current_team_id());
+			if (error != B_OK) {
+				SetPath(NULL);
+				return error;
+			}
+			fPathLength = strlen(fBuffer);
+		} else {
+			// don't normalize path
+			int32 len = strlen(path);
+			if (len >= fBufferSize)
+				return B_BUFFER_OVERFLOW;
+			memcpy(fBuffer, path, len + 1);
+			fPathLength = len;
+			_ChopTrailingSlashes();
+		}
 	} else {
 		fBuffer[0] = '\0';
 		fPathLength = 0;
