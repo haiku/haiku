@@ -1,0 +1,9 @@
+The files in this directory (and any other files beginning with "mga_") are independent from Be's sample code
+
+Basically, freely copy them, edit them etc. Just do not claim you wrote them. 
+
+Will think of something more official to put here later:)
+
+Mark Watson
+
+Notes: This excludes the maven_hack port of matroxfb's maven stuff - see notes in that file for info. 

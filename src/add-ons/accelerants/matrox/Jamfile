@@ -1,0 +1,26 @@
+SubDir OBOS_TOP src add-ons accelerants matrox ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics matrox ] ;
+UseHeaders [ FDirName $(SUBDIR) engine ] ;
+
+
+Addon mga.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetDeviceInfo.c
+	GetModeInfo.c
+	GetTimingConstraints.c
+	GlobalData.c
+	InitAccelerant.c
+	Overlay.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: false : libmatrox_engine.a
+;
+
+Depends mga.accelerant : mga.driver ;
+
+SubInclude OBOS_TOP src add-ons accelerants matrox engine ;
