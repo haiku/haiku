@@ -746,7 +746,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 	{
 		// Create the port so that the app_server knows where to send messages
 		fServerTo=create_port(100,"a<fServerTo");
-		if(fServerTo!=B_BAD_VALUE || fServerTo!=B_NO_MORE_PORTS)
+		if(fServerTo!=B_BAD_VALUE && fServerTo!=B_NO_MORE_PORTS)
 		{
 			// AS_CREATE_APP:
 	
@@ -770,7 +770,6 @@ void BApplication::InitData(const char* signature, status_t* error)
 			}
 			else
 				fInitError=replyerr;
-			
 		}
 		else
 			fInitError=fServerTo;
