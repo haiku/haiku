@@ -24,7 +24,7 @@
 //	Description:	Class for low-overhead port-based messaging
 //  
 //------------------------------------------------------------------------------
-#include <malloc.h>
+#include <stdlib.h>
 
 #include <ServerProtocol.h>
 #include "PortLink.h"
