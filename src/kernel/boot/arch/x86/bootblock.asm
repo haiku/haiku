@@ -94,13 +94,13 @@ unreal:
 	call 	disable_floppy_motor
 	mov		si,okmsg
 	call	print
-	cli
 
 	; uncomment the next two lines to enable the VESA mode switch
 	; call	enable_vesa
 	; mov		[in_vesa],al
 
 	call	find_mem_size_real
+	cli
 
 	mov		ebx,[dword 0x100074] ; load dword at rel. address 0x74 from read-destination-buffer
 	add		ebx,0x101000         ; for stage2 entry
