@@ -6,6 +6,7 @@ SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ichaudio lala ;
 
 KernelMergeObject lala.o :
 	driver.c
+	util.c
 	: 
 	-fno-pic -D_KERNEL_MODE
 	;

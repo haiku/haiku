@@ -122,7 +122,6 @@ typedef struct {
 
 /* PCI Configuration Space */
 
-#define PCI_PCICMD		0x04
 #define PCI_PCICMD_IOS	0x01
 #define PCI_PCICMD_MSE	0x02
 #define PCI_PCICMD_BME	0x04

@@ -9,14 +9,14 @@
 
 #include "lala.h"
 
-int32 api_version = B_CUR_DRIVER_API_VERSION;
-
 #define MAX_DEVICES 8
 
-sem_id	drv_sem;
-char *	drv_path[MAX_DEVICES + 1];
-drv_t *	drv_data[MAX_DEVICES];
-int		drv_count;
+int32 			api_version = B_CUR_DRIVER_API_VERSION;
+
+sem_id			drv_sem;
+char *			drv_path[MAX_DEVICES + 1];
+audio_drv_t *	drv_data[MAX_DEVICES];
+int				drv_count;
 
 pci_module_info *pcimodule;
 
@@ -40,7 +40,7 @@ init_driver(void)
 	dprintf("init_driver\n");
 	dprintf("driver base name '%s'\n", driver_info.basename);
 	
-	if (get_module(B_PCI_MODULE_NAME,(module_info **)&pcimodule) < 0) {
+	if (get_module(B_PCI_MODULE_NAME, (module_info **) &pcimodule) < 0) {
 		return B_ERROR; 
 	}
 	
@@ -76,7 +76,7 @@ init_driver(void)
 			drv_path[drv_count] = (char *) malloc(strlen(driver_info.basename) + 5);
 			sprintf(drv_path[drv_count], "%s/%d", driver_info.basename, drv_count + 1);
 			
-			drv_data[drv_count] = (drv_t *) malloc(sizeof(drv_t));
+			drv_data[drv_count] = (audio_drv_t *) malloc(sizeof(audio_drv_t));
 			drv_data[drv_count]->pci 		= pcimodule;
 			drv_data[drv_count]->bus		= pciinfo->bus;
 			drv_data[drv_count]->device		= pciinfo->device;
@@ -132,7 +132,7 @@ ich_open(const char *name, uint32 flags, void** cookie)
 	
 	if (drv_data[index]->open_count == 0) {
 		memset(drv_data[index]->cookie, 0, driver_info.cookie_size);
-		res = driver_info.attach(drv_data[index], drv_data[index]->cookie);
+		res = driver_info.attach(drv_data[index]);
 		drv_data[index]->open_count = (res == B_OK) ? 1 : 0;
 	} else {
 		res = B_OK;
@@ -166,7 +166,7 @@ ich_free(void* cookie)
 	drv_data[index]->open_count--;
 
 	if (drv_data[index]->open_count == 0)
-		res = driver_info.detach(drv_data[index], drv_data[index]->cookie);
+		res = driver_info.detach(drv_data[index]);
 	else
 		res = B_OK;
 	

@@ -1,27 +1,21 @@
 #include <SupportDefs.h>
-
+#include "hardware.h"
 
 typedef struct
 {
-	const char *name;
+	uint32	irq;
 	uint32	nambar;
 	uint32	nabmbar;
-	uint32	irq;
-	uint32	type;
-	uint32	mmbar; // ich4
-	uint32	mbbar; // ich4
-	void *	log_mmbar; // ich4
-	void *	log_mbbar; // ich4
 	area_id area_mmbar; // ich4
 	area_id area_mbbar; // ich4
-	uint32	codecoffset;
+	void *	mmbar; // ich4
+	void *	mbbar; // ich4
+
+	uint32 codecoffset;
 	uint32 input_rate;
 	uint32 output_rate;
 
-	pci_module_info *pci;
-
 } ichaudio_cookie;
-
 
 
 #define TYPE_ICH4			0x01

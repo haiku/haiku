@@ -6,6 +6,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons media media-add-ons lala ] ;
 
 KernelMergeObject ichaudio_driver.o : 
 	ichaudio.c
+	io.c
 	:
 	-fno-pic -Wno-unused -D_KERNEL_MODE
 	;
