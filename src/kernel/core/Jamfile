@@ -11,6 +11,7 @@ KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>fd.c
 	<$(SOURCE_GRIST)>gdb.c 
 	<$(SOURCE_GRIST)>heap.c 
+	<$(SOURCE_GRIST)>image.c 
 	<$(SOURCE_GRIST)>int.c 
 	<$(SOURCE_GRIST)>khash.c 
 	<$(SOURCE_GRIST)>linkhack.c 
