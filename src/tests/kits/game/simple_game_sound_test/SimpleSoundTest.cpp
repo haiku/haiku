@@ -36,8 +36,8 @@
 #include <FilePanel.h>
 #include <TextControl.h>
 
-#include <SimpleGameSound.h>
-#include <SimpleSoundTest.h>
+#include "SimpleGameSound.h"
+#include "SimpleSoundTest.h"
 
 const int32 SLIDER_PAN = 'SPan';
 const int32 SLIDER_GAIN = 'Gain';
@@ -68,18 +68,18 @@ void SimpleSoundApp::ReadyToRun()
 }
 
 
-void SimpleSoundApp::RefsReceived(BMessage* message)
+void SimpleSoundApp::RefsReceived(BMessage* msg)
 {	
 	uint32 type;
 	int32 count;
-	message->GetInfo("refs", &type, &count);
+	msg->GetInfo("refs", &type, &count);
 	if (type == B_REF_TYPE)
 	{
 		// Load the files
 		for(int32 i = 0; i < count; i++)
 		{
 			entry_ref file;
-			if (message->FindRef("refs", i, &file) == B_OK)
+			if (msg->FindRef("refs", i, &file) == B_OK)
 			{
 				BSimpleGameSound * sound = new BSimpleGameSound(&file);
 				
@@ -95,7 +95,9 @@ void SimpleSoundApp::RefsReceived(BMessage* message)
 
 // SimpleSoundWin ---------------------------------------------------------------
 SimpleSoundWin::SimpleSoundWin(BRect frame, const char * title)
-	:	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS)
+	:	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS),
+		fSound(NULL),
+		fPanel(NULL)
 {
 	BRect r(10, 10, 100, 40);
 	fBrowse = new BButton(r, "buttonBrowse", "Browse", new BMessage(BUTTON_BROWSE));

@@ -66,7 +66,7 @@ public:
 	SimpleSoundApp(const char * signature);
 	
 	void ReadyToRun();
-	void RefsReceived(BMessage * message);
+	void RefsReceived(BMessage * msg);
 
 private:
 	SimpleSoundWin *	fWin;
