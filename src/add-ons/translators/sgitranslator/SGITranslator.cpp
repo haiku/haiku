@@ -145,8 +145,9 @@ SGITranslator::SGITranslator()
 
 	strcpy(fName, "SGI Images");
 	sprintf(fInfo, "SGI image translator v%d.%d.%d %s",
-		SGI_TRANSLATOR_VERSION / 100, (SGI_TRANSLATOR_VERSION / 10) % 10,
-		SGI_TRANSLATOR_VERSION % 10, __DATE__);
+		static_cast<int>(SGI_TRANSLATOR_VERSION >> 8),
+		static_cast<int>((SGI_TRANSLATOR_VERSION >> 4) & 0xf),
+		static_cast<int>(SGI_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------
@@ -501,9 +502,7 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 {
 	TranslatorBitmap bitsHeader;
 
-//  TODO: how do I comply with these requests for SGIImage?!?
-	bool bheaderonly = settings.SetGetHeaderOnly();
-	bool bdataonly = settings.SetGetDataOnly();
+	bool bheaderonly = false, bdataonly = false;
 	uint32 compression = settings.SetGetCompression();
 
 	status_t ret = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
@@ -725,8 +724,7 @@ translate_from_sgi(BPositionIO *inSource, BMessage *ioExtension,
 
 	if (ret >= B_OK) {
 
-		bool bheaderonly = settings.SetGetHeaderOnly();
-		bool bdataonly = settings.SetGetDataOnly();
+		bool bheaderonly = false, bdataonly = false;
 	
 		uint32 width = sgiImage->Width();
 		uint32 height = sgiImage->Height();

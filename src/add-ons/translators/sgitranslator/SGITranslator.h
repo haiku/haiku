@@ -44,7 +44,7 @@
 #include <ByteOrder.h>
 #include <fs_attr.h>
 
-#define SGI_TRANSLATOR_VERSION 100
+#define SGI_TRANSLATOR_VERSION 0x100
 
 #define SGI_IN_QUALITY 0.5
 #define SGI_IN_CAPABILITY 0.6
