@@ -82,7 +82,8 @@ status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kern
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
 
 /* calls the syscall dispatcher should use for user file I/O */
-status_t _user_mount(const char *path, const char *device, const char *fs_name, void *args);
+status_t _user_mount(const char *path, const char *device, const char *fs_name,
+			uint32 flags, void *args);
 status_t _user_unmount(const char *path);
 status_t _user_read_fs_info(dev_t device, struct fs_info *info);
 status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);
