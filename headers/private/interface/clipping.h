@@ -42,6 +42,15 @@ sect_rect(clipping_rect r1, clipping_rect r2)
 	return rect;
 }
 
+static inline void
+offset_rect(clipping_rect &rect, int32 x, int32 y)
+{
+	rect.left += x;
+	rect.top += y;
+	rect.right += x;
+	rect.bottom += y;
+}
+
 
 static inline BRect
 to_BRect(clipping_rect rect)
@@ -111,20 +120,6 @@ static inline int32
 rect_height(clipping_rect rect)
 {
 	return rect.bottom - rect.top;
-}
-
-
-static inline clipping_rect
-rect_offset(clipping_rect rect, int32 x, int32 y)
-{
-	clipping_rect offRect;
-
-	offRect.left = rect.left + x;
-	offRect.top = rect.top + y;
-	offRect.right = rect.right + x;
-	offRect.bottom = rect.bottom + y;
-
-	return offRect;
 }
 
 #endif // __CLIPPING_H

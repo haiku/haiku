@@ -19,7 +19,6 @@ void or_region_complex(BRegion*, BRegion*, BRegion*);
 void or_region_1_to_n(BRegion*, BRegion*, BRegion*);
 void or_region_no_x(BRegion*, BRegion*, BRegion*);
 void or_region(BRegion*, BRegion*, BRegion*);
-//void sub(long, long, BRegion*, BRegion*, BRegion*, long*, long*);
 void sub_region_complex(BRegion*, BRegion*, BRegion*);
 void r_sub(long , long, BRegion*, BRegion*, BRegion*, long*, long*);
 void sub_region(BRegion*, BRegion*, BRegion*);

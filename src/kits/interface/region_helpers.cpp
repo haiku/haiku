@@ -1,8 +1,10 @@
-#include <string.h>
+#include <cstring>
+
 #include <Debug.h>
 #include <Region.h>
 
 #include <clipping.h>
+
 #include "region_helpers.h"
 
 static const int32 kMaxPoints = 1024;
@@ -17,8 +19,6 @@ static const int32 kMaxVerticalExtent = 0x10000000;
 void
 zero_region(BRegion *region)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
-	
 	region->count = 0;
 	region->bound.left = 0x7ffffffd;
 	region->bound.top = 0x7ffffffd;
@@ -30,7 +30,6 @@ zero_region(BRegion *region)
 void
 clear_region(BRegion *region)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	region->count = 0;
 	region->bound.left = 0xfffffff;
 	region->bound.top = 0xfffffff;
@@ -45,8 +44,6 @@ clear_region(BRegion *region)
 void
 cleanup_region_1(BRegion *region)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
-
 	clipping_rect testRect =
 		{
 			1, 1,
@@ -85,7 +82,6 @@ cleanup_region_1(BRegion *region)
 void
 cleanup_region(BRegion *region)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	long oldCount;
 	
 	do {
@@ -102,7 +98,6 @@ cleanup_region(BRegion *region)
 void
 sort_rects(clipping_rect *rects, long count)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	bool again; //flag that tells we changed rects positions
 			
 	if (count == 2) {
@@ -130,7 +125,6 @@ sort_rects(clipping_rect *rects, long count)
 void
 sort_trans(long *lptr1, long *lptr2, long count)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	bool again; //flag that tells we changed trans positions
 			
 	if (count == 2) {
@@ -169,8 +163,6 @@ sort_trans(long *lptr1, long *lptr2, long count)
 void
 cleanup_region_horizontal(BRegion *region)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
-
 	clipping_rect testRect =
 		{
 			1, 1,
@@ -204,7 +196,6 @@ cleanup_region_horizontal(BRegion *region)
 void
 copy_region(BRegion *source, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(source);
 	ASSERT(dest);
 	ASSERT(source != dest);
@@ -213,7 +204,7 @@ copy_region(BRegion *source, BRegion *dest)
 	if (dest->data_size < source->count) {
 		free(dest->data);
 		dest->data_size = source->count + 8;
-		dest->data = (clipping_rect*)malloc(dest->data_size * sizeof(clipping_rect));
+		dest->data = (clipping_rect *)malloc(dest->data_size * sizeof(clipping_rect));
 	}
 	
 	dest->count = source->count;
@@ -232,7 +223,6 @@ copy_region(BRegion *source, BRegion *dest)
 void
 copy_region_n(BRegion *source, BRegion *dest, long count)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(source);
 	ASSERT(dest);
 	ASSERT(source != dest);
@@ -241,7 +231,7 @@ copy_region_n(BRegion *source, BRegion *dest, long count)
 	if (dest->data_size < source->count) {
 		free(dest->data);
 		dest->data_size = source->count + count;
-		dest->data = (clipping_rect*)malloc(dest->data_size * sizeof(clipping_rect));
+		dest->data = (clipping_rect *)malloc(dest->data_size * sizeof(clipping_rect));
 	}
 	
 	dest->count = source->count;
@@ -262,7 +252,6 @@ copy_region_n(BRegion *source, BRegion *dest, long count)
 void
 and_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -292,7 +281,6 @@ and_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 void
 and_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -329,7 +317,6 @@ and_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 void
 and_region(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -367,7 +354,6 @@ and_region(BRegion *first, BRegion *second, BRegion *dest)
 void
 append_region(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -382,8 +368,6 @@ append_region(BRegion *first, BRegion *second, BRegion *dest)
 void
 r_or(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *indexA, long *indexB)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
-	
 	int32 lefts[kMaxPoints];
 	int32 rights[kMaxPoints];
 	
@@ -469,7 +453,6 @@ r_or(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long
 void
 or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	long a = 0, b = 0;
 	
 	int32 top;
@@ -518,7 +501,6 @@ or_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 void
 or_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -546,7 +528,6 @@ or_region_1_to_n(BRegion *first, BRegion *second, BRegion *dest)
 void
 or_region_no_x(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -600,7 +581,6 @@ or_region_no_x(BRegion *first, BRegion *second, BRegion *dest)
 void
 or_region(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -652,7 +632,6 @@ or_region(BRegion *first, BRegion *second, BRegion *dest)
 void
 sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	long a = 0, b = 0;
 	
 	int32 top;
@@ -693,8 +672,6 @@ sub_region_complex(BRegion *first, BRegion *second, BRegion *dest)
 void
 r_sub(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, long *indexA, long *indexB)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
-	
 	int32 leftsA[kMaxPoints / 2];
 	int32 rightsA[kMaxPoints / 2];
 	int32 leftsB[kMaxPoints / 2];
@@ -802,9 +779,9 @@ r_sub(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, lon
 							
 		} while (f < foundA);
 		
-		//Last rect: we take the right coordinate of the last minuend rect
-		//as left coordinate of the rect to intersect, and the maximum possible
-		//value as the right coordinate.  
+		// Last rect: we take the right coordinate of the last minuend rect
+		// as left coordinate of the rect to intersect, and the maximum possible
+		// value as the right coordinate.  
 		minuendRect.left = rightsA[foundA - 1] + 1;
 		minuendRect.right = 0x7ffffffd;
 		
@@ -837,7 +814,6 @@ r_sub(long top, long bottom, BRegion *first, BRegion *second, BRegion *dest, lon
 void
 sub_region(BRegion *first, BRegion *second, BRegion *dest)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(first);
 	ASSERT(second);
 	ASSERT(dest);
@@ -845,7 +821,7 @@ sub_region(BRegion *first, BRegion *second, BRegion *dest)
 	if (first->count == 0)
 		zero_region(dest);
 		
-	else if (second->count == 0	|| !valid_rect(sect_rect(first->bound, second->bound)))
+	else if (second->count == 0	|| !rects_intersect(first->bound, second->bound))
 		copy_region(first, dest);
 		
 	else

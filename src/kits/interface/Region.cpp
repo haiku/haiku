@@ -25,10 +25,22 @@
 //
 //------------------------------------------------------------------------------
 
+//	Notes: As now, memory is always allocated and never freed (except on destruction).
+//  This let us be a bit faster since we don't do many reallocations.
+//	But that means that even an empty region could "waste" much space, if it contained
+//	many rects before being emptied.
+//	I.E: a region which contains 24 rects allocates more than 24 * 4 * sizeof(int32)
+//  = 96 * sizeof(int32) bytes. If we call MakeEmpty(), that region will contain no rects,
+//  but it will still keep the allocated memory.
+//	This shouldnt' be an issue, since usually BRegions are just used for calculations, 
+//	and don't last so long.
+//	Anyway, we can change that behaviour if we want, but BeOS's BRegion seems to behave exactly
+//	like this.
+
 
 // Standard Includes -----------------------------------------------------------
 #include <cstdlib>
-#include <string.h>
+#include <cstring>
 
 // System Includes -------------------------------------------------------------
 #include <Debug.h>
@@ -38,14 +50,16 @@
 
 #include "region_helpers.h"
 
+
 /*! \brief Initializes a region. The region will have no rects,
 	and its bound will be invalid.
 */
 BRegion::BRegion()
-	:data_size(8),
+	:
+	data_size(8),
 	data(NULL)	
 {
-	data = (clipping_rect*)malloc(data_size * sizeof(clipping_rect));
+	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
 	
 	zero_region(this);
 }
@@ -55,7 +69,9 @@ BRegion::BRegion()
 	\param region The region to copy.
 */
 BRegion::BRegion(const BRegion &region)
-	:data(NULL)
+	:
+	data_size(8),
+	data(NULL)
 {
 	if (&region != this) {
 		bound = region.bound;
@@ -65,9 +81,13 @@ BRegion::BRegion(const BRegion &region)
 		if (data_size <= 0)
 			data_size = 1;
 			
-		data = (clipping_rect*)malloc(data_size * sizeof(clipping_rect));
+		data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
 		
 		memcpy(data, region.data, count * sizeof(clipping_rect));
+	} else {
+
+		data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
+		zero_region(this);
 	}
 }
 
@@ -76,10 +96,11 @@ BRegion::BRegion(const BRegion &region)
 	\param rect The BRect to set the region to.
 */
 BRegion::BRegion(const BRect rect)
-	:data_size(8),
+	:
+	data_size(8),
 	data(NULL)	
 {
-	data = (clipping_rect*)malloc(data_size * sizeof(clipping_rect));
+	data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
 		
 	Set(rect);	
 }
@@ -201,11 +222,11 @@ BRegion::Intersects(BRect rect) const
 bool
 BRegion::Intersects(clipping_rect rect) const
 {
-	if (!valid_rect(sect_rect(rect, bound)))
+	if (!rects_intersect(rect, bound))
 		return false;
 
 	for (long c = 0; c < count; c++) {
-		if (valid_rect(sect_rect(data[c], rect)))
+		if (rects_intersect(data[c], rect))
 			return true;
 	}
 	
@@ -276,16 +297,10 @@ void
 BRegion::OffsetBy(int32 dh, int32 dv)
 {
 	if (count > 0) {
-		for (long c = 0; c < count; c++) {
-			data[c].left += dh;
-			data[c].right += dh;
-			data[c].top += dv;
-			data[c].bottom += dv;
-		}
-		bound.left += dh;
-		bound.right += dh;
-		bound.top += dv;
-		bound.bottom += dv;		
+		for (long c = 0; c < count; c++)
+			offset_rect(data[c], dh, dv);
+
+		offset_rect(bound, dh, dv);	
 	}
 }
 
@@ -333,7 +348,7 @@ BRegion::Include(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	or_region(this, const_cast<BRegion*>(region), &newRegion);
+	or_region(this, const_cast<BRegion *>(region), &newRegion);
 	copy_region(&newRegion, this);
 }
 
@@ -358,6 +373,7 @@ BRegion::Exclude(clipping_rect rect)
 	BRegion newRegion;
 	
 	region.Set(rect);
+
 	sub_region(this, &region, &newRegion);
 	copy_region(&newRegion, this);
 }
@@ -371,7 +387,7 @@ BRegion::Exclude(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	sub_region(this, const_cast<BRegion*>(region), &newRegion);
+	sub_region(this, const_cast<BRegion *>(region), &newRegion);
 	copy_region(&newRegion, this);
 }
 
@@ -384,7 +400,7 @@ BRegion::IntersectWith(const BRegion *region)
 {
 	BRegion newRegion;
 	
-	and_region(this, const_cast<BRegion*>(region), &newRegion);
+	and_region(this, const_cast<BRegion *>(region), &newRegion);
 	copy_region(&newRegion, this);
 }
 
@@ -405,7 +421,7 @@ BRegion::operator=(const BRegion &region)
 		if (data_size <= 0)
 			data_size = 1;
 			
-		data = (clipping_rect*)malloc(data_size * sizeof(clipping_rect));
+		data = (clipping_rect *)malloc(data_size * sizeof(clipping_rect));
 		
 		memcpy(data, region.data, count * sizeof(clipping_rect));
 	}
@@ -423,46 +439,43 @@ BRegion::operator=(const BRegion &region)
 void
 BRegion::_AddRect(clipping_rect rect)
 {
-	PRINT(("%s\n", __PRETTY_FUNCTION__));
 	ASSERT(count >= 0);
 	ASSERT(data_size >= 0);
 	
 	// Should we just reallocate the memory and
 	// copy the rect ?
-	bool add = false; 
+	bool addRect = true; 
 		
-	if (count <= 0)
-		// Yeah, we don't have any rect here..	
-	 	add = true;
-	else {
-		// Wait! We could merge "rect" with one of the
-		// existing rectangles...
+	if (count > 0) {
+		// Wait! We could merge the rect with one of the
+		// existing rectangles, if it's adiacent.
+		// We just check it against the last rectangle, since
+		// we are keeping them sorted by their "top" coordinates.
 		long last = count - 1;
-		if (rect.top == data[last].bottom + 1
-				&& rect.left == data[last].left
-				&& rect.right == data[last].right) {
+		if (rect.left == data[last].left && rect.right == data[last].right
+				&& rect.top == data[last].bottom + 1) {
 		 
 			data[last].bottom = rect.bottom;
+			addRect = false;
 		
-		} else if (rect.top == data[last].top && rect.bottom == data[last].bottom) {
-			
-			if (rect.left == data[last].right + 1)
+		} else if (rect.top == data[last].top && rect.bottom == data[last].bottom) {			
+			if (rect.left == data[last].right + 1) {
+
 				data[last].right = rect.right;
-				
-			else if (rect.right == data[last].left - 1)
+				addRect = false;
+
+			} else if (rect.right == data[last].left - 1) {
+
 				data[last].left = rect.left;
-				
-			else 
-				add = true; //no luck... just add the rect
-		
-		} else
-			add = true; //just add the rect
+				addRect = false;
+			}	
+		}
 	}		
 	
 	// We weren't lucky.... just add the rect as a new one
-	if (add) {
+	if (addRect) {
 		if (data_size <= count)
-			set_size(data_size + 16);
+			set_size(count + 16);
 			
 		data[count] = rect;
 		
@@ -470,16 +483,16 @@ BRegion::_AddRect(clipping_rect rect)
 	}
 	
 	// Recalculate bounds
-	if (rect.top <= bound.top)
+	if (rect.top < bound.top)
 		bound.top = rect.top;
 
-	if (rect.left <= bound.left)
+	if (rect.left < bound.left)
 		bound.left = rect.left;
  
-	if (rect.right >= bound.right)
+	if (rect.right > bound.right)
 		bound.right = rect.right;
  
-	if (rect.bottom >= bound.bottom)
+	if (rect.bottom > bound.bottom)
 		bound.bottom = rect.bottom;
 }
 
@@ -493,7 +506,7 @@ BRegion::set_size(long new_size)
 	if (new_size <= 0)
 		new_size = data_size + 16;
 	
-	data = (clipping_rect*)realloc(data, new_size * sizeof(clipping_rect));
+	data = (clipping_rect *)realloc(data, new_size * sizeof(clipping_rect));
 	
 	if (data == NULL)
 		debugger("BRegion::set_size realloc error\n");
