@@ -14,6 +14,7 @@
 #include <bus/ISA.h>
 #include <KernelExport.h>
 #include <device_manager.h>
+#include <arch/cpu.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -27,7 +28,7 @@
 #endif
 
 // ToDo: this is architecture dependent and should be made differently!
-#include "i386_io.h"
+//	(for example, the Pegasos (PPC based) also has an ISA bus)
 
 
 #define ISA_MODULE_NAME "bus_managers/isa/root"
