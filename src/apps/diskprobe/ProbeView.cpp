@@ -11,6 +11,9 @@
 	// for SetLimits()
 
 #include <Window.h>
+#include <Clipboard.h>
+#include <Autolock.h>
+#include <MessageQueue.h>
 #include <TextControl.h>
 #include <StringView.h>
 #include <Slider.h>
@@ -120,6 +123,19 @@ class HeaderView : public BView, public BInvoker {
 		BStringView		*fFileOffsetView;
 		PositionSlider	*fPositionSlider;
 		IconView		*fIconView;
+};
+
+
+class UpdateLooper : public BLooper {
+	public:
+		UpdateLooper(const char *name, DataEditor &editor, BMessenger messenger);
+		virtual ~UpdateLooper();
+
+		virtual void MessageReceived(BMessage *message);
+
+	private:
+		DataEditor	&fEditor;
+		BMessenger	fMessenger;
 };
 
 
@@ -563,6 +579,16 @@ HeaderView::MessageReceived(BMessage *message)
 
 		case kMsgSliderUpdate:
 		{
+			// First, make sure we're only considering the most
+			// up-to-date message in the queue (which might not
+			// be this one).
+			// If there is another message of this type in the
+			// queue, we're just ignoring the current message.
+
+			if (Looper()->MessageQueue()->FindMessage(kMsgSliderUpdate, 0) != NULL)
+				break;
+
+			// if nothing has changed, we can ignore this message as well
 			if (fPosition == fPositionSlider->Position())
 				break;
 
@@ -629,6 +655,83 @@ HeaderView::MessageReceived(BMessage *message)
 //	#pragma mark -
 
 
+/** The purpose of this looper is to off-load the editor data
+ *	loading from the main window looper.
+ *	It will listen to the offset changes of the editor, let
+ *	him update its data, and will then synchronously notify
+ *	the target.
+ *	That way, simple offset changes will not stop the main
+ *	looper from operating. Therefore, all offset updates
+ *	for the editor will go through this looper.
+ */
+
+UpdateLooper::UpdateLooper(const char *name, DataEditor &editor, BMessenger target)
+	: BLooper(name),
+	fEditor(editor),
+	fMessenger(target)
+{
+	fEditor.StartWatching(this);
+}
+
+
+UpdateLooper::~UpdateLooper()
+{
+	fEditor.StopWatching(this);
+}
+
+
+void
+UpdateLooper::MessageReceived(BMessage *message)
+{
+	switch (message->what) {
+		case kMsgPositionUpdate:
+		{
+			// First, make sure we're only considering the most
+			// up-to-date message in the queue (which might not
+			// be this one).
+			// If there is another message of this type in the
+			// queue, we're just ignoring the current message.
+
+			if (Looper()->MessageQueue()->FindMessage(kMsgPositionUpdate, 0) != NULL)
+				break;
+
+			off_t position;
+			if (message->FindInt64("position", &position) == B_OK) {
+				BAutolock locker(fEditor);
+				fEditor.SetViewOffset(position);
+			}
+			break;
+		}
+
+		case kMsgDataEditorOffsetChange:
+		{
+			bool updated = false;
+
+			if (fEditor.Lock()) {
+				fEditor.UpdateIfNeeded(&updated);
+				fEditor.Unlock();
+			}
+
+			if (updated) {
+				BMessage reply;
+				fMessenger.SendMessage(kMsgUpdateData, &reply);
+					// We are doing a synchronously transfer, to prevent
+					// that we're already locking the editor again when
+					// our target wants to get the editor data.
+			}
+			break;
+		}
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
+	}
+}
+
+
+//	#pragma mark -
+
+
 ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW)
 {
@@ -674,7 +777,14 @@ ProbeView::UpdateSizeLimits()
 void 
 ProbeView::DetachedFromWindow()
 {
+	if (fUpdateLooper->Lock())
+		fUpdateLooper->Quit();
+	fUpdateLooper = NULL;
+
 	fEditor.StopWatching(this);
+	fDataView->StopWatching(fHeaderView, kDataViewCursorPosition);
+	fDataView->StopWatching(this, kDataViewSelection);
+	be_clipboard->StopWatching(this);
 }
 
 
@@ -692,8 +802,13 @@ ProbeView::AddFileMenuItems(BMenu *menu, int32 index)
 void 
 ProbeView::AttachedToWindow()
 {
+	fUpdateLooper = new UpdateLooper(fEditor.Ref().name, fEditor, BMessenger(fDataView));
+	fUpdateLooper->Run();
+
 	fEditor.StartWatching(this);
 	fDataView->StartWatching(fHeaderView, kDataViewCursorPosition);
+	fDataView->StartWatching(this, kDataViewSelection);
+	be_clipboard->StartWatching(this);
 
 	// Add menu to window
 
@@ -719,9 +834,13 @@ ProbeView::AttachedToWindow()
 	menu->AddItem(new BMenuItem("Undo", NULL, 'Z', B_COMMAND_KEY));
 	menu->AddItem(new BMenuItem("Redo", NULL, 'Z', B_COMMAND_KEY | B_SHIFT_KEY));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem("Copy", NULL, 'C', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Paste", NULL, 'V', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Select All", NULL, 'A', B_COMMAND_KEY));
+	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C', B_COMMAND_KEY));
+	item->SetTarget(fDataView);
+	menu->AddItem(fPasteMenuItem = new BMenuItem("Paste", new BMessage(B_PASTE), 'V', B_COMMAND_KEY));
+	fPasteMenuItem->SetTarget(fDataView);
+	CheckClipboard();
+	menu->AddItem(item = new BMenuItem("Select All", new BMessage(B_SELECT_ALL), 'A', B_COMMAND_KEY));
+	item->SetTarget(fDataView);
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem("Find" B_UTF8_ELLIPSIS, NULL, 'F', B_COMMAND_KEY));
 	menu->AddItem(new BMenuItem("Find Again", NULL, 'G', B_COMMAND_KEY));
@@ -799,7 +918,7 @@ ProbeView::AttachedToWindow()
 void 
 ProbeView::AllAttached()
 {
-	fHeaderView->SetTarget(this);
+	fHeaderView->SetTarget(fUpdateLooper);
 }
 
 
@@ -808,6 +927,28 @@ ProbeView::WindowActivated(bool active)
 {
 	if (active)
 		fDataView->MakeFocus(true);
+}
+
+
+void 
+ProbeView::CheckClipboard()
+{
+	if (!be_clipboard->Lock())
+		return;
+
+	bool hasData = false;
+	BMessage *clip;
+	if ((clip = be_clipboard->Data()) != NULL) {
+		const void *data;
+		ssize_t size;
+		if (clip->FindData(B_FILE_MIME_TYPE, B_MIME_TYPE, &data, &size) == B_OK
+			|| clip->FindData("text/plain", B_MIME_TYPE, &data, &size) == B_OK)
+			hasData = true;
+	}
+
+	be_clipboard->Unlock();
+
+	fPasteMenuItem->SetEnabled(hasData);
 }
 
 
@@ -826,8 +967,8 @@ ProbeView::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case kMsgPositionUpdate:
-			// ToDo: update data
+		case B_CLIPBOARD_CHANGED:
+			CheckClipboard();
 			break;
 
 		default:

@@ -14,9 +14,11 @@
 
 
 class BScrollView;
+class BMenuItem;
 
 class HeaderView;
 class DataView;
+class UpdateLooper;
 
 
 class ProbeView : public BView {
@@ -35,10 +37,14 @@ class ProbeView : public BView {
 		void UpdateSizeLimits();
 
 	private:
+		void CheckClipboard();
+
 		DataEditor		fEditor;
+		UpdateLooper	*fUpdateLooper;
 		HeaderView		*fHeaderView;
 		DataView		*fDataView;
 		BScrollView		*fScrollView;
+		BMenuItem		*fPasteMenuItem;
 };
 
 #endif	/* PROBE_VIEW_H */
