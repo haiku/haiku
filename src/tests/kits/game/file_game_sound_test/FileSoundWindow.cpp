@@ -22,7 +22,9 @@ FileSoundWindow::FileSoundWindow(BRect windowBounds)
 	loop = false;
 	preload = false;
 	playing = false;
+	paused = false;
 	rampTime = 0;
+	fileSound = 0;
 	//make openPanel and let it send its messages to this window
 	openPanel = new BFilePanel();
 	openPanel -> SetTarget(this);
@@ -57,10 +59,10 @@ FileSoundWindow::FileSoundWindow(BRect windowBounds)
 	pauseButton = new BButton(pauseBounds,"pausebutton","Pause",pauseMessage);
 	box -> AddChild(pauseButton);
 	//make textcontrol to enter delay for pausing/resuming
-	BRect delayBounds(pauseBounds.right + 10, pauseBounds.top,pauseBounds.right + 50, pauseBounds.bottom);
-	BMessage *delayMessage = new BMessage(DELAY_MSG);
-	delayControl = new BTextControl(delayBounds,"delay","","",delayMessage);
-	delayControl -> SetDivider(0);
+	BRect delayBounds(pauseBounds.right + 10, pauseBounds.top,pauseBounds.right + 150, pauseBounds.bottom);
+	delayControl = new BTextControl(delayBounds,"delay","Ramp time (ms)","0", new BMessage(DELAY_MSG));
+	delayControl -> SetDivider(90);
+	delayControl -> SetModificationMessage(new BMessage(DELAY_MSG));
 	box -> AddChild(delayControl);
 	//make loop checkbox
 	BRect loopBounds(playBounds.left,playBounds.bottom + 20, playBounds.left + 150, playBounds.bottom + 30);
@@ -78,8 +80,6 @@ FileSoundWindow::FileSoundWindow(BRect windowBounds)
 
 FileSoundWindow::~FileSoundWindow()
 {
-	//delete openPanel;
-	//delete fileSound;
 }
 
 void FileSoundWindow::MessageReceived(BMessage *message)
@@ -106,6 +106,8 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 				status_t error = fileSound -> InitCheck();
 				if (error != B_OK)
 				{
+					delete fileSound;
+					fileSound = 0;
 					if (error == B_NO_MEMORY)
 					{
 						BAlert *alert = new BAlert("alert","Not enough memory.","Ok");
@@ -122,6 +124,8 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 						alert -> Go();
 					}				
 				}
+				paused = false;
+				pauseButton -> SetLabel("Pause");
 				//preload sound file?
 				if (preload)
 				{
@@ -175,12 +179,17 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 					playButton -> SetLabel("Play");
 					playing = false;
 				}
+				delete fileSound;
+				fileSound = 0;
 			}
 		}
 		break;
 		
 		case PAUSE_MSG:
 		{
+			if (!fileSound)
+				break;
+
 			int32 pausedValue = fileSound -> IsPaused();
 			if (pausedValue != BFileGameSound::B_PAUSE_IN_PROGRESS)
 			{
@@ -241,7 +250,7 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 		case DELAY_MSG:
 		{
 			//set delay time for resuming/pausing
-			rampTime = atol(delayControl -> Text());
+			rampTime = atol(delayControl -> Text()) * 1000;
 		}
 		break;
 	}
@@ -250,8 +259,11 @@ void FileSoundWindow::MessageReceived(BMessage *message)
 
 bool FileSoundWindow::QuitRequested() 
 {
-	/*if (fileSound != 0 && fileSound -> IsPlaying())
-		fileSound -> StopPlaying();*/
+	
+	delete openPanel;
+	if (fileSound != 0 && fileSound -> IsPlaying())
+		fileSound -> StopPlaying();
+	delete fileSound;
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return(true);
 }
