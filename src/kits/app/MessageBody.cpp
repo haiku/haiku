@@ -84,13 +84,13 @@ status_t BMessageBody::GetInfo(type_code typeRequested, int32 which,
 	int32 index = 0;
 	for (index = 0; i != fData.end(); ++i)
 	{
-		if (B_ANY_TYPE == typeRequested && i->second->Type() == typeRequested)
+		if (B_ANY_TYPE == typeRequested || i->second->Type() == typeRequested)
 		{
-			++index;
 			if (index == which)
 			{
 				break;
 			}
+			++index;
 		}
 	}
 
@@ -402,7 +402,7 @@ BMessageField* BMessageBody::FindData(const char* name, type_code type,
 	else
 	{
 		Item = i->second;
-		if (Item->Type() != type)
+		if (type != B_ANY_TYPE && Item->Type() != type)
 		{
 			err = B_BAD_TYPE;
 			Item = NULL;
