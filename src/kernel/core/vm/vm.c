@@ -900,22 +900,35 @@ region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_ty
 		return new_region->id;
 }
 
-static int __vm_delete_region(vm_address_space *aspace, vm_region *region)
+
+static int
+__vm_delete_region(vm_address_space *aspace, vm_region *region)
 {
-	if(region->aspace == aspace)
+	// ToDo: allowing a NULL aspace parameter reduces security
+	//	but is needed for BeOS compatibility - we should consider
+	//	introducing team privileges for those things, though.
+	//	Also, I am really not sure if it's a good idea not to
+	//	wait until the area has really been freed - code following
+	//	might rely on the address space to available again, and
+	//	there is no other way to wait for the completion of the
+	//	deletion.
+	if (aspace == NULL || region->aspace == aspace)
 		vm_put_region(region);
+
 	return B_NO_ERROR;
 }
 
-static int _vm_delete_region(vm_address_space *aspace, region_id rid)
+
+static int
+_vm_delete_region(vm_address_space *aspace, region_id rid)
 {
 //	vm_region *temp, *last = NULL;
 	vm_region *region;
 
-	dprintf("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid);
+	dprintf("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace ? aspace->id : -1, rid);
 
 	region = vm_get_region_by_id(rid);
-	if(region == NULL)
+	if (region == NULL)
 		return ERR_VM_INVALID_REGION;
 
 	__vm_delete_region(aspace, region);
@@ -924,7 +937,9 @@ static int _vm_delete_region(vm_address_space *aspace, region_id rid)
 	return 0;
 }
 
-int vm_delete_region(aspace_id aid, region_id rid)
+
+int
+vm_delete_region(aspace_id aid, region_id rid)
 {
 	vm_address_space *aspace;
 	int err;
@@ -938,7 +953,9 @@ int vm_delete_region(aspace_id aid, region_id rid)
 	return err;
 }
 
-static void _vm_put_region(vm_region *region, bool aspace_locked)
+
+static void
+_vm_put_region(vm_region *region, bool aspace_locked)
 {
 	vm_region *temp, *last = NULL;
 	vm_address_space *aspace;
@@ -2344,8 +2361,7 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 status_t
 delete_area(area_id area)
 {
-	// ToDo: works only correctly for kernel areas!
-	return vm_delete_region(vm_get_kernel_aspace_id(), area);
+	return vm_delete_region(NULL, area);
 }
 
 
@@ -2387,6 +2403,6 @@ status_t
 _user_delete_area(area_id area)
 {
 	// ToDo: works only correctly if the area belongs to the caller!
-	return vm_delete_region(vm_get_current_user_aspace_id(), area);
+	return _vm_delete_region(NULL, area);
 }
 
