@@ -2193,7 +2193,7 @@ emuxki_initfx(emuxki_dev * card)
 {
 	uint16       pc, gpr;
 	emuxki_gpr *a_front_gpr, *a_rear_gpr, *a_center_sub_gpr = NULL;
-	emuxki_gpr *p_ac97_in_gpr, *p_cd_in_gpr, *r_ac97_in_gpr, *r_cd_in_gpr;
+	emuxki_gpr *p_ac97_in_gpr, *p_cd_in_gpr, *r_ac97_in_gpr, *r_cd_in_gpr, *r_fx_out_gpr;
 	emuxki_gpr *d_front_gpr, *d_rear_gpr, *d_center_sub_gpr;
 
 	/* Set all GPRs to 0 */
@@ -2242,6 +2242,8 @@ emuxki_initfx(emuxki_dev * card)
 	r_ac97_in_gpr = emuxki_gpr_new(card, "AC97 Record In", 
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_RECORD, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
 	r_cd_in_gpr = emuxki_gpr_new(card, "CD Spdif In", 
+			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_RECORD, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
+	r_fx_out_gpr = emuxki_gpr_new(card, "FX 0/1", 
 			EMU_MIX_GAIN|EMU_MIX_STEREO|EMU_MIX_MUTE|EMU_MIX_RECORD, &gpr, 0.0, 0.0, -46.5, 0.0, -0.75);
 		
 	card->gpr_count = gpr;
@@ -2367,6 +2369,16 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_CST(0),
 				  EMU_A_DSP_INR(EMU_DSP_IN_AC97), EMU_A_DSP_GPR(r_ac97_in_gpr->gpr + 1));
 				  
+		/* DSP_IN_GPR (l/r) = DSP_IN_GPR(l/r) + FX(0/1) * R_FX_OUT_GPR(l/r) */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
+				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
+				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
+				  EMU_DSP_FX(0), EMU_A_DSP_GPR(r_fx_out_gpr->gpr));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
+				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
+				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
+				  EMU_DSP_FX(1), EMU_A_DSP_GPR(r_fx_out_gpr->gpr + 1));
+				  
 		/* DSP_IN_GPR(l/r) = 0 + DSP_IN_GPR(l/r) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
@@ -2387,6 +2399,8 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_A_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_A_DSP_INR(EMU_DSP_IN_CDSPDIF), EMU_A_DSP_GPR(r_cd_in_gpr->gpr + 1));
 		
+		
+				
 		/* zero out the rest of the microcode */
 		while (pc < 512)
 			emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_ACC3,
@@ -2517,6 +2531,16 @@ emuxki_initfx(emuxki_dev * card)
 				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
 				  EMU_DSP_CST(0),
 				  EMU_DSP_INR(EMU_DSP_IN_AC97), EMU_DSP_GPR(r_ac97_in_gpr->gpr + 1));
+				  
+		/* DSP_IN_GPR (l/r) = DSP_IN_GPR(l/r) + FX(0/1) * R_FX_OUT_GPR(l/r) */
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
+				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
+				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_L),
+				  EMU_DSP_FX(0), EMU_DSP_GPR(r_fx_out_gpr->gpr));
+		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACS,
+				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
+				  EMU_DSP_GPR(EMU_DSP_TMPGPR_DSP_IN_R),
+				  EMU_DSP_FX(1), EMU_DSP_GPR(r_fx_out_gpr->gpr + 1));
 				  
 		/* DSP_IN_GPR(l/r) = 0 + DSP_IN_GPR(l/r) * 4 */
 		emuxki_dsp_addop(&card->config, &pc, EMU_DSP_OP_MACINTS,
