@@ -63,7 +63,8 @@ enum {
 	MN_DEVICE_NAME,
 	MN_RUN_INTERRUPTS,
 	MN_ISA_OUT,
-	MN_ISA_IN
+	MN_ISA_IN,
+	MN_PGM_BES
 };
 
 /* max. number of overlay buffers */
@@ -230,6 +231,28 @@ typedef struct {
 	uint8	size;		/* Number of bytes to transfer */
 	uint16	data;		/* The value read or written */
 } mn_in_out_isa;
+
+/* setup ISA BES registers for overlay on ISA cards */
+typedef struct {
+	uint32	magic;		/* magic number to make sure the caller groks us */
+	uint32  card_type;  /* see card_type enum above */
+	uint32 	hcoordv;
+	uint32  vcoordv;
+	uint32  hiscalv;
+	uint32  viscalv;
+	uint32	hsrcstv;
+	uint32  hsrcendv;
+	uint32  hsrclstv;
+	uint32	a1orgv;
+	uint32  globctlv;
+	uint32  v1wghtv;
+	uint32  weight;
+	uint32  v1srclstv; 
+	uint8	colkey_r;
+	uint8	colkey_g;
+	uint8	colkey_b;
+	uint16	ob_width;
+} mn_bes_data;
 
 /* Set some boolean condition (like enabling or disabling interrupts) */
 typedef struct {

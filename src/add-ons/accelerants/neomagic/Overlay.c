@@ -1,4 +1,4 @@
-/* Written by Rudolf Cornelissen 05-2002/03-2003 */
+/* Written by Rudolf Cornelissen 05-2002/06-2003 */
 
 /* Note on 'missing features' in BeOS 5.0.3 and DANO:
  * BeOS needs to define more colorspaces! It would be nice if BeOS would support the FourCC 'definitions'
@@ -10,12 +10,6 @@
 #include "acc_std.h"
 
 /* define the supported overlay input colorspaces */
-/* Note:
- * G200-G550 can all do YUV4:2:0 2-plane colorspace as well,
- * G200 does not support RGB modes while > G200 do (but with limited scaling and without filtering),
- * G200 does not support YUV4:2:0 3-plane mode while > G200 do.
- * It would be nice to have the YUV4:2:0 2-plane mode implemented also later on, but the Be colorspace
- * definitions (in GraphicsDefs.h, R5.0.3 and DANO5.1d0) do not include this one... */
 static uint32 overlay_colorspaces [] = { (uint32)B_YCbCr422, (uint32)B_NO_COLOR_SPACE };
 
 uint32 OVERLAY_COUNT(const display_mode *dm) 
@@ -46,7 +40,7 @@ const uint32 *OVERLAY_SUPPORTED_SPACES(const display_mode *dm)
 		return NULL;
 	}
 
-	/* interlaced VGA is not supported by G200-G550 BES */
+	/* assuming interlaced VGA is not supported */
 	if (dm->timing.flags && B_TIMING_INTERLACED)
 	{
 		return NULL;
@@ -60,16 +54,12 @@ uint32 OVERLAY_SUPPORTED_FEATURES(uint32 a_color_space)
 {
 	LOG(4,("Overlay: supported_features: color_space $%08x\n",a_color_space));
 
-	/* check what features (like the keying method) are supported on the current
-	 * Desktop colorspace */
-	//fixme? Or are we talking about the overlay input bitmap's colorspace?
+	/* check what features are supported for the current overlaybitmap colorspace */
 	switch (a_color_space)
 	{
 	default:
-			/* fixme: for now 'direct 32bit' desktop colorspace assumed */
 			return 
-				( B_OVERLAY_KEYING_USES_ALPHA 	 |
-				  B_OVERLAY_COLOR_KEY 			 |
+				( B_OVERLAY_COLOR_KEY 			 |
 				  B_OVERLAY_HORIZONTAL_FILTERING |
 				  B_OVERLAY_VERTICAL_FILTERING );
 	}
@@ -103,12 +93,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		switch (cs)
 		{
 			case B_YCbCr422:
-					/* check if slopspace is needed: compatible settings choosen for now:
-					 * G200 can do with ~0x0003 while > G200 need ~x0007.
-					 * Optimized settings for G200 could reduce CPU load a tiny little bit there... */
-					/* fixme: update needed for DVDmax support to adhere to CRTC2 constraints:
-					 * case display_mode == B_RGB16: multiple = 32
-					 * case display_mode == B_RGB32: multiple = 16 */
+					/* check if slopspace is needed: NeoMagic cards can do with ~x0007 */
 					if (width == (width & ~0x0007))
 					{
 						si->overlay.myBuffer[offset].width = width;
@@ -119,10 +104,9 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 					}
 					si->overlay.myBuffer[offset].bytes_per_row = 2 * si->overlay.myBuffer[offset].width;
 
-					/* check if the requested horizontal pitch is supported:
-					 * G200 max. pitch is 4092 pixels, > G200 max pitch is 4088 pixels for this colorspace.
-					 * Compatible check done, has no downside consequences here. */
-					if (si->overlay.myBuffer[offset].width > 4088)
+					/* check if the requested horizontal pitch is supported */
+					//fixme?...
+					if (si->overlay.myBuffer[offset].width > 2048)
 					{
 						LOG(4,("Overlay: Sorry, requested buffer pitch not supported, aborted\n"));
 
@@ -132,37 +116,6 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 						return NULL;
 					}
 					break;
-
-//			case 0xffff://fixme: which one(s)?
-					//fixme: 4:2:0 2-plane supported format, should be selected only if detected
-					/* check if slopspace is needed: compatible settings choosen for now:
-					 * G200 can do with ~0x0007 while > G200 need ~x001f.
-					 * Optimized settings for G200 could reduce CPU load a tiny little bit there... */
-/*					if (width == (width & ~0x001f))
-					{
-						si->overlay.myBuffer[offset].width = width;
-					}
-					else
-					{
-						si->overlay.myBuffer[offset].width = (width & ~0x001f) + 32;
-					}
-*/					/* assuming Y-plane only bytes_per_row are requested here */
-/*					si->overlay.myBuffer[offset].bytes_per_row = si->overlay.myBuffer[offset].width;
-*/
-					/* check if the requested horizontal pitch is supported:
-					 * G200 max. pitch is 4088 pixels, > G200 max pitch is 4064 pixels for this colorspace.
-					 * Compatible check done, has no real downside consequences here. */
-/*					if (si->overlay.myBuffer[offset].width > 4064)
-					{
-						LOG(4,("Overlay: Sorry, requested buffer pitch not supported, aborted\n");
-*/
-						/* release the shared benaphore */
-/*						RELEASE_BEN(si->overlay.lock)
-
-						return NULL;
-					}
-					break;
-*/
 			default:
 					/* unsupported colorspace! */
 					LOG(4,("Overlay: Sorry, colorspace $%08x not supported, aborted\n",cs));
@@ -235,16 +188,6 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 			si->overlay.myBuffer[offset].bytes_per_row * si->overlay.myBuffer[offset].height;
 
 		/* calculate virtual memory adress that would be needed for a new bitmap */
-		/* NOTE to app programmers:
-		 * For testing app behaviour regarding workspace switches or screen prefs changes to settings
-		 * that do not have enough cardRAM left for allocation of overlay bitmaps, you need a card with
-		 * a low amount of RAM. Or you can set in the file nm.settings for example:
-		 * memory 8 #8Mb RAM on card
-		 * and reboot (this simulates 8Mb RAM on the card).
-		 *
-		 * If you switch now to settings: 1600x1200x32bit (single head) the app needs to fallback to
-		 * bitmap output or maybe single buffered overlay output if small bitmaps are used. */ 
-
 		adress = (((uint32)((uint8*)si->framebuffer)) + (si->ps.memory_size * 1024));
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
@@ -329,16 +272,6 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		si->overlay.myBuffer[offset].buffer = (void *) adress;
 
 		/* calculate physical memory adress (for dma use) */
-		/* NOTE to app programmers:
-		 * For testing app behaviour regarding workspace switches or screen prefs changes to settings
-		 * that do not have enough cardRAM left for allocation of overlay bitmaps, you need a card with
-		 * a low amount of RAM. Or you can set in the file nm.settings for example:
-		 * memory 8 #8Mb RAM on card
-		 * and reboot (this simulates 8Mb RAM on the card).
-		 *
-		 * If you switch now to settings: 1600x1200x32bit (single head) the app needs to fallback to
-		 * bitmap output or maybe single buffered overlay output if small bitmaps are used. */ 
-
 		adress = (((uint32)((uint8*)si->framebuffer_pci)) + (si->ps.memory_size * 1024));
 		for (cnt = 0; cnt <= offset; cnt++)
 		{
@@ -438,17 +371,11 @@ status_t GET_OVERLAY_CONSTRAINTS
 		switch (ob->space)
 		{
 			case B_YCbCr422:
-					/* G200 can work with 3, > G200 need 7. Compatible setting returned for now. 
+					/* NeoMagic cards can work with 7. 
 					 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
+					//fixme: >= NM2200 use 16 instead of 8???
 					oc->view.width_alignment = 7;
 					break;
-
-//			case 0xffff://fixme: which one(s)? (4:2:0 supported formats. Not yet used...)
-					/* G200 can work with 7, > G200 need 31. Compatible setting returned for now.
-					 * Note: this has to be in sync with the slopspace setup during buffer allocation.. */
-/*					oc->view.width_alignment = 31;
-					break;
-*/
 			default:
 					/* we should not be here, but set the worst-case value just to be safe anyway */
 					oc->view.width_alignment = 31;
@@ -468,6 +395,7 @@ status_t GET_OVERLAY_CONSTRAINTS
 		oc->window.height_alignment = 0;
 		oc->window.width.min = 2;
 		/* G200-G550 can output upto and including 2048 pixels in width */
+		//fixme...
 		if (dm->virtual_width > 2048)
 		{
 			oc->window.width.max = 2048;
@@ -478,6 +406,7 @@ status_t GET_OVERLAY_CONSTRAINTS
 		}
 		oc->window.height.min = 2;
 		/* G200-G550 can output upto and including 2048 pixels in height */
+		//fixme...
 		if (dm->virtual_height > 2048)
 		{
 			oc->window.height.max = 2048;
@@ -487,21 +416,12 @@ status_t GET_OVERLAY_CONSTRAINTS
 			oc->window.height.max = dm->virtual_height;
 		}
 
-		/* G200-G550 scaling restrictions */
-		/* Adjust horizontal restrictions if pixelclock is above BES max. speed! */
-		/* Note: If RGB32 is implemented no scaling is supported! */
-		if (si->dm.timing.pixel_clock > BESMAXSPEED)
-		{
-			oc->h_scale.min = (1 * 2) / (32 - (1 / (float)16384));
-			oc->h_scale.max = (16384 * 2)/(float)(ob->width - si->overlay.myBufInfo[offset].slopspace);
-		}
-		else
-		{
-			oc->h_scale.min = 1 / (32 - (1 / (float)16384));
-			oc->h_scale.max = 16384/(float)(ob->width - si->overlay.myBufInfo[offset].slopspace);
-		}
-		oc->v_scale.min = 1 / (32 - (1 / (float)16384));
-		oc->v_scale.max = 16384/(float)ob->height;
+		/* NeoMagic scaling restrictions */
+		/* Note: NM BES does not support downscaling! */
+		oc->h_scale.min = 1.0;
+		oc->h_scale.max = 1024/(float)(ob->width - si->overlay.myBufInfo[offset].slopspace);
+		oc->v_scale.min = 1.0;
+		oc->v_scale.max = 1024/(float)ob->height;
 
 		return B_OK;
 	}

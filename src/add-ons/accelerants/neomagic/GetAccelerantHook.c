@@ -169,12 +169,12 @@ status_t check_overlay_capability(uint32 feature)
 		break;
 	}
 
-//	if (si->ps.card_type > NM2070)
-//	{
+	if (si->ps.card_type > NM2070)
+	{
 		/* export video overlay functions */
-//		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
-//		return B_OK;
-//	}
+		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
+		return B_OK;
+	}
 
 	/* do not export video overlay functions */
 	LOG(4, ("Overlay: Not exporting hook %s.\n", msg));

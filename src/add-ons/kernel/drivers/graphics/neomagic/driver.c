@@ -33,6 +33,8 @@
 
 #define get_pci(o, s) (*pci_bus->read_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s))
 #define set_pci(o, s, v) (*pci_bus->write_pci_config)(pcii->bus, pcii->device, pcii->function, (o), (s), (v))
+#define KISAGRPHW(A,B)(isa_bus->write_io_16(NMISA16_GRPHIND, ((NMGRPHX_##A) | ((B) << 8))))
+#define KISASEQW(A,B)(isa_bus->write_io_16(NMISA16_SEQIND, ((NMSEQX_##A) | ((B) << 8))))
 
 #define MAX_DEVICES	  8
 
@@ -77,6 +79,7 @@ static status_t map_device(device_info *di);
 static void unmap_device(device_info *di);
 static void probe_devices(void);
 static int32 mn_interrupt(void *data);
+void drv_program_bes_ISA(mn_bes_data *bes);
 
 static DeviceData		*pd;
 static pci_module_info	*pci_bus;
@@ -884,6 +887,122 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
    				result = B_OK;
    			}
 		} break;
+		case MN_PGM_BES: {
+			mn_bes_data *bes_isa = (mn_bes_data *)buf;
+			if (bes_isa->magic == MN_PRIVATE_DATA_MAGIC) {
+				drv_program_bes_ISA(bes_isa);
+  				result = B_OK;
+   			}
+		} break;
 	}
 	return result;
+}
+
+void drv_program_bes_ISA(mn_bes_data *bes)
+{
+	/* ISA card */
+	/* unlock card overlay sequencer registers */
+	KISAGRPHW(GENLOCK, 0x20);
+	/* destination rectangle */
+	KISAGRPHW(HDCOORD1L, ((bes->hcoordv >> 16) & 0xff));
+	KISAGRPHW(HDCOORD2L, (bes->hcoordv & 0xff));
+	KISAGRPHW(HDCOORD21H, (((bes->hcoordv >> 4) & 0xf0) | ((bes->hcoordv >> 24) & 0x0f)));
+	KISAGRPHW(VDCOORD1L, ((bes->vcoordv >> 16) & 0xff));
+	KISAGRPHW(VDCOORD2L, (bes->vcoordv & 0xff));
+	KISAGRPHW(VDCOORD21H, (((bes->vcoordv >> 4) & 0xf0) | ((bes->vcoordv >> 24) & 0x0f)));
+	/* scaling */
+	KISAGRPHW(XSCALEL, (bes->hiscalv & 0xff));
+	KISAGRPHW(XSCALEH, ((bes->hiscalv >> 8) & 0xff));
+	KISAGRPHW(YSCALEL, (bes->viscalv & 0xff));
+	KISAGRPHW(YSCALEH, ((bes->viscalv >> 8) & 0xff));
+	/* inputbuffer #1 origin */
+	/* (we don't program buffer #2 as it's unused.) */
+	/* first include 'pixel precise' left clipping...
+	 * (subpixel precision is not supported by NeoMagic cards) */
+	bes->a1orgv += ((bes->hsrcstv >> 16) * 2);
+	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+	bes->a1orgv &= ~0x03;
+	/* now setup buffer startadress and horizontal source end (minimizes used bandwidth) */
+	if (bes->card_type < NM2200)
+	{
+		bes->a1orgv >>= 1;
+		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+		KISAGRPHW(0xbc, (((((bes->hsrcendv >> 16) + 7) & ~8) / 8) - 1));
+	}
+	else
+	{
+		/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
+		//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
+		//fixme? check if overlaybuffer width should also have granularity of 16 now!
+		KISAGRPHW(0xbc, (((((bes->hsrcendv >> 16) + 15) & ~16) / 16) - 1));
+	}
+	KISAGRPHW(BUF1ORGL, (bes->a1orgv & 0xff));
+	KISAGRPHW(BUF1ORGM, ((bes->a1orgv >> 8) & 0xff));
+	KISAGRPHW(BUF1ORGH, ((bes->a1orgv >> 16) & 0xff));
+	/* b2 = 0: don't use horizontal mirroring (NM2160) */
+	/* other bits do ??? */
+	KISAGRPHW(0xbf, 0x02);
+	/* ??? */
+	KISAGRPHW(0xbd, 0x02);
+	KISAGRPHW(0xbe, 0x00);
+	/* (subpixel precise) source rect clipping is not supported on NeoMagic cards;
+	 * so we do 'pixel precise' left clipping via modification of buffer
+	 * startadress above instead.
+	 * (pixel precise top clipping is also done this way..) */
+	//fixme: checkout real pixel precise clipping on NM2200 and later cards!!!
+/*
+	{
+		uint16 left = 0;
+		uint16 right = 128;
+		uint16 top = 0;
+		uint16 bottom = 128;
+
+		left = (bes->hsrcstv >> 16);
+		right = (bes->hsrclstv >> 16);
+		top = (bes->weight >> 16);
+		bottom = (bes->v1srclstv >> 16);
+
+		KISASEQW(HSCOORD1L, (left & 0xff));
+		KISASEQW(HSCOORD2L, (right & 0xff));
+		KISASEQW(HSCOORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
+		KISASEQW(VSCOORD1L, (top & 0xff));
+		KISASEQW(VSCOORD2L, (bottom & 0xff));
+		KISASEQW(VSCOORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
+	}
+*/
+	/* ??? */
+    KISASEQW(0x1c, 0xfb);
+   	KISASEQW(0x1d, 0x00);
+	KISASEQW(0x1e, 0xe2);
+   	KISASEQW(0x1f, 0x02);
+	/* b1 = 0: disable alternating hardware buffers (NM2160) */
+	/* other bits do ??? */
+	KISASEQW(0x09, 0x11);
+	/* ??? */
+	KISASEQW(0x0a, 0x00);
+	/* global BES control */
+	KISAGRPHW(BESCTRL1, (bes->globctlv & 0xff));
+	KISASEQW(BESCTRL2, ((bes->globctlv >> 8) & 0xff));
+
+
+	/**************************
+	 *** setup color keying ***
+	 **************************/
+
+	KISAGRPHW(COLKEY_R, bes->colkey_r);
+	KISAGRPHW(COLKEY_G, bes->colkey_g);
+	KISAGRPHW(COLKEY_B, bes->colkey_b);
+
+
+	/*************************
+	 *** setup misc. stuff ***
+	 *************************/
+
+	/* setup brightness to be 'neutral' (two's complement number) */
+	KISAGRPHW(BRIGHTNESS, 0x00);
+
+	/* setup inputbuffer #1 pitch including slopspace (in pixels) */
+	/* (we don't program the pitch for inputbuffer #2 as it's unused.) */
+	KISAGRPHW(BUF1PITCHL, (bes->ob_width & 0xff));
+	KISAGRPHW(BUF1PITCHH, ((bes->ob_width >> 8) & 0xff));
 }

@@ -1,5 +1,5 @@
-/* G200-G550 Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-04/2003 */
+/* NeoMagic Back End Scaler functions */
+/* Written by Rudolf Cornelissen 05/2002-06/2003 */
 
 #define MODULE_BIT 0x00000200
 
@@ -26,46 +26,16 @@ status_t mn_configure_bes
 	/* 'ov' is the view in the source bitmap, so which part of the bitmap is actually
 	 * displayed on screen. This is used for the 'hardware zoom' function. */
  
-	/* calculated BES register values */
-	uint32 	hcoordv, vcoordv, hiscalv, hsrcstv, hsrcendv, hsrclstv,
-			viscalv, a1orgv, v1wghtv, v1srclstv, globctlv, ctlv;
+	/* bes setup data */
+	mn_bes_data bi;
 	/* misc used variables */
 	uint16 temp1, temp2;
-	/* interval representation, used for scaling calculations */
-	uint16 intrep, crtc_hstart, crtc_vstart, crtc_hend, crtc_vend;
+	/* BES output coordinate system for virtual workspaces */
+	uint16 crtc_hstart, crtc_vstart, crtc_hend, crtc_vend;
 	/* inverse scaling factor, used for source positioning */
 	uint32 ifactor;
-	/* used for vertical weight starting value */
-	uint32 weight;
 	/* copy of overlay view which has checked valid values */
 	overlay_view my_ov;
-
-	/* Slowdown the G200-G550 BES if the pixelclock is too high for it to cope.
-	 * This will in fact half the horizontal resolution of the BES with high
-	 * pixelclocks (by setting a BES hardware 'zoom' = 2x).
-	 * If you want optimal output quality better make sure you set the refreshrate/resolution
-	 * of your monitor not too high ... */
-	uint16 acczoom = 1;
-	LOG(4,("Overlay: pixelclock is %dkHz, ", si->dm.timing.pixel_clock));
-	if (si->dm.timing.pixel_clock > BESMAXSPEED)
-	{
-		/* BES running at half speed and resolution */
-		/* This is how it works (BES slowing down):
-		 * - Activate BES internal horizontal hardware scaling = 4x (in GLOBCTL below),
-		 * - This also sets up BES only getting half the amount of pixels per line from
-		 *   the input picture buffer (in effect half-ing the BES pixelclock input speed).
-		 * Now in order to get the picture back to original size, we need to also double
-		 * the inverse horizontal scaling factor here (x4 /2 /2 = 1x again).
-		 * Note that every other pixel is now doubled or interpolated, according to another
-		 * GLOBCTL bit. */
-		acczoom = 2;
-		LOG(4,("slowing down BES!\n"));
-	}
-	else
-	{
-		/* BES running at full speed and resolution */
-		LOG(4,("BES is running at full speed\n"));
-	}
 
 
 	/**************************************************************************************
@@ -102,7 +72,7 @@ status_t mn_configure_bes
 	 ****************************************/
 
 	/* setup left and right edges of output window */
-	hcoordv = 0;
+	bi.hcoordv = 0;
 	/* left edge coordinate of output window, must be inside desktop */
 	/* clipping on the left side */
 	if (ow->h_start < crtc_hstart)
@@ -115,27 +85,27 @@ status_t mn_configure_bes
 		if (ow->h_start >= (crtc_hend - 1))
 		{
 			/* width < 2 is not allowed */
-			temp1 = (crtc_hend - crtc_hstart - 2) & 0x7ff;
+			temp1 = (crtc_hend - crtc_hstart - 2);
 		} 
 		else
 		/* no clipping here */
 		{
-			temp1 = (ow->h_start - crtc_hstart) & 0x7ff;
+			temp1 = (ow->h_start - crtc_hstart);
 		}
 	} 
-	hcoordv |= temp1 << 16;
+	bi.hcoordv |= temp1 << 16;
 	/* right edge coordinate of output window, must be inside desktop */
 	/* width < 2 is not allowed */
 	if (ow->width < 2) 
 	{
-		temp2 = (temp1 + 1) & 0x7ff;
+		temp2 = (temp1 + 1);
 	}
 	else 
 	{
 		/* clipping on the right side */
 		if ((ow->h_start + ow->width - 1) > (crtc_hend - 1))
 		{
-			temp2 = (crtc_hend - crtc_hstart - 1) & 0x7ff;
+			temp2 = (crtc_hend - crtc_hstart - 1);
 		}
 		else
 		{
@@ -148,15 +118,15 @@ status_t mn_configure_bes
 			else
 			/* no clipping here */
 			{
-				temp2 = ((uint16)(ow->h_start + ow->width - crtc_hstart - 1)) & 0x7ff;
+				temp2 = ((uint16)(ow->h_start + ow->width - crtc_hstart - 1));
 			}
 		}
 	}
-	hcoordv |= temp2 << 0;
+	bi.hcoordv |= temp2 << 0;
 	LOG(4,("Overlay: CRTC left-edge output %d, right-edge output %d\n",temp1, temp2));
 
 	/* setup top and bottom edges of output window */
-	vcoordv = 0;
+	bi.vcoordv = 0;
 	/* top edge coordinate of output window, must be inside desktop */
 	/* clipping on the top side */
 	if (ow->v_start < crtc_vstart)
@@ -169,27 +139,27 @@ status_t mn_configure_bes
 		if (ow->v_start >= (crtc_vend - 1))
 		{
 			/* height < 2 is not allowed */
-			temp1 = (crtc_vend - crtc_vstart - 2) & 0x7ff;
+			temp1 = (crtc_vend - crtc_vstart - 2);
 		} 
 		else
 		/* no clipping here */
 		{
-			temp1 = (ow->v_start - crtc_vstart) & 0x7ff;
+			temp1 = (ow->v_start - crtc_vstart);
 		}
 	} 
-	vcoordv |= temp1 << 16;
+	bi.vcoordv |= temp1 << 16;
 	/* bottom edge coordinate of output window, must be inside desktop */
 	/* height < 2 is not allowed */
 	if (ow->height < 2) 
 	{
-		temp2 = (temp1 + 1) & 0x7ff;
+		temp2 = (temp1 + 1);
 	}
 	else 
 	{
 		/* clipping on the bottom side */
 		if ((ow->v_start + ow->height - 1) > (crtc_vend - 1))
 		{
-			temp2 = (crtc_vend - crtc_vstart - 1) & 0x7ff;
+			temp2 = (crtc_vend - crtc_vstart - 1);
 		}
 		else
 		{
@@ -202,11 +172,11 @@ status_t mn_configure_bes
 			else
 			/* no clipping here */
 			{
-				temp2 = ((uint16)(ow->v_start + ow->height - crtc_vstart - 1)) & 0x7ff;
+				temp2 = ((uint16)(ow->v_start + ow->height - crtc_vstart - 1));
 			}
 		}
 	}
-	vcoordv |= temp2 << 0;
+	bi.vcoordv |= temp2 << 0;
 	LOG(4,("Overlay: CRTC top-edge output %d, bottom-edge output %d\n",temp1, temp2));
 
 
@@ -218,63 +188,28 @@ status_t mn_configure_bes
 			(ob->width - si->overlay.myBufInfo[offset].slopspace), ob->height));
 	LOG(6,("Overlay: output picture width = %d, height = %d\n", ow->width, ow->height));
 
-	/* do horizontal scaling... */
-	/* determine interval representation value, taking zoom into account */
-	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
-	{
-		/* horizontal filtering is ON */
-		if ((my_ov.width == ow->width) | (ow->width < 2))
-		{
-			/* no horizontal scaling used, OR destination width < 2 */
-			intrep = 0;
-		}
-		else
-		{
-			intrep = 1;
-		}
-	}
-	else
-	{
-		/* horizontal filtering is OFF */
-		if ((ow->width < my_ov.width) & (ow->width >= 2))
-		{
-			/* horizontal downscaling used AND destination width >= 2 */
-			intrep = 1;
-		}
-		else
-		{
-			intrep = 0;
-		}
-	}
-	LOG(4,("Overlay: horizontal interval representation value is %d\n",intrep));
-
 	/* calculate inverse horizontal scaling factor, taking zoom into account */
-	/* standard scaling formula: */
-	ifactor = (((uint32)(my_ov.width - intrep)) << 16) / (ow->width - intrep); 
+	ifactor = ((((uint32)my_ov.width) << 12) / ow->width); 
 
 	/* correct factor to prevent most-right visible 'line' from distorting */
-	ifactor -= (1 << 2);
-	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
-
-	/* compensate for accelerated 2x zoom (slowdown BES if pixelclock is too high) */
-	hiscalv = ifactor * acczoom;
-	LOG(4,("Overlay: horizontal speed compensated factor is %f\n", (float)65536 / hiscalv));
+	ifactor -= 1;
+	bi.hiscalv = ifactor;
+	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)4096 / ifactor));
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	if (((((uint32)my_ov.width) << 16) / 16384) > hiscalv)
+	if (((((uint32)my_ov.width) << 12) / 1024) > bi.hiscalv)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
-		hiscalv = ((((uint32)my_ov.width) << 16) / 16384);
-		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)65536 / hiscalv));
+		bi.hiscalv = ((((uint32)my_ov.width) << 12) / 1024);
+		LOG(4,("Overlay: horizontal scaling factor too large, clamping at %f\n", (float)4096 / bi.hiscalv));
 	}
-	if (hiscalv >= (32 << 16))
+	/* horizontal downscaling cannot be done by NM BES hardware */
+	if (bi.hiscalv > (1 << 12))
 	{
 		/* (non-inverse) factor too small, set factor to min. valid value */
-		hiscalv = 0x1ffffc;
-		LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)65536 / hiscalv));
+		bi.hiscalv = 0x1000;
+		LOG(4,("Overlay: horizontal scaling factor too small, clamping at %f\n", (float)4096 / bi.hiscalv));
 	}
-	/* AND below is required by hardware */
-	hiscalv &= 0x001ffffc;
 
 
 	/* do horizontal clipping... */
@@ -286,7 +221,7 @@ status_t mn_configure_bes
 	 * Note: The input bitmaps slopspace is automatically excluded from the calculations this way! */
 	/* Note also:
 	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
-	hsrcstv = 0;
+	bi.hsrcstv = 0;
 	/* check for destination horizontal clipping at left side */
 	if (ow->h_start < crtc_hstart)
 	{
@@ -295,24 +230,24 @@ status_t mn_configure_bes
 		if ((ow->h_start + ow->width - 1) < (crtc_hstart + 1))
 		{
 			/* increase 'first contributing pixel' with 'fixed value': (total dest. width - 2) */
-			hsrcstv += (ow->width - 2);
+			bi.hsrcstv += (ow->width - 2);
 		}
 		else
 		{
 			/* increase 'first contributing pixel' with actual number of dest. clipping pixels */
-			hsrcstv += (crtc_hstart - ow->h_start);
+			bi.hsrcstv += (crtc_hstart - ow->h_start);
 		}
 		LOG(4,("Overlay: clipping left...\n"));
 
 		/* The calculated value is based on scaling = 1x. So we now compensate for scaling.
 		 * Note that this also already takes care of aligning the value to the BES register! */
-		hsrcstv *= ifactor;
+		bi.hsrcstv *= (ifactor << 4);
 	}
 	/* take zoom into account */
-	hsrcstv += ((uint32)my_ov.h_start) << 16;
+	bi.hsrcstv += ((uint32)my_ov.h_start) << 16;
 	/* AND below required by hardware */
-	hsrcstv &= 0x03fffffc;
-	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", hsrcstv / (float)65536));
+	bi.hsrcstv &= 0x03fffffc;
+	LOG(4,("Overlay: first hor. (sub)pixel of input bitmap contributing %f\n", bi.hsrcstv / (float)65536));
 
 
 	/* Setup horizontal source end: last (sub)pixel contributing to output picture */
@@ -323,7 +258,7 @@ status_t mn_configure_bes
 	/* Note also:
 	 * Even if the scaling factor is clamping we instruct the BES to use the correct source end pos.! */
 
-	hsrcendv = 0;
+	bi.hsrcendv = 0;
 	/* check for destination horizontal clipping at right side */
 	if ((ow->h_start + ow->width - 1) > (crtc_hend - 1))
 	{
@@ -332,98 +267,66 @@ status_t mn_configure_bes
 		if (ow->h_start > (crtc_hend - 2))
 		{
 			/* increase 'number of clipping pixels' with 'fixed value': (total dest. width - 2) */
-			hsrcendv += (ow->width - 2);
+			bi.hsrcendv += (ow->width - 2);
 		}
 		else
 		{
 			/* increase 'number of clipping pixels' with actual number of dest. clipping pixels */
-			hsrcendv += ((ow->h_start + ow->width - 1) - (crtc_hend - 1));
+			bi.hsrcendv += ((ow->h_start + ow->width - 1) - (crtc_hend - 1));
 		}
 		LOG(4,("Overlay: clipping right...\n"));
 
 		/* The calculated value is based on scaling = 1x. So we now compensate for scaling.
 		 * Note that this also already takes care of aligning the value to the BES register! */
-		hsrcendv *= ifactor;
+		bi.hsrcendv *= (ifactor << 4);
 		/* now subtract this value from the last used pixel in (zoomed) inputbuffer, aligned to BES */
-		hsrcendv = (((uint32)((my_ov.h_start + my_ov.width) - 1)) << 16) - hsrcendv;
+		bi.hsrcendv = (((uint32)((my_ov.h_start + my_ov.width) - 1)) << 16) - bi.hsrcendv;
 	}
 	else
 	{
 		/* set last contributing pixel to last used pixel in (zoomed) inputbuffer, aligned to BES */
-		hsrcendv = (((uint32)((my_ov.h_start + my_ov.width) - 1)) << 16);
+		bi.hsrcendv = (((uint32)((my_ov.h_start + my_ov.width) - 1)) << 16);
 	}
 	/* AND below required by hardware */
-	hsrcendv &= 0x03fffffc;
-	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", hsrcendv / (float)65536));
+	bi.hsrcendv &= 0x03fffffc;
+	LOG(4,("Overlay: last horizontal (sub)pixel of input bitmap contributing %f\n", bi.hsrcendv / (float)65536));
 
 
 	/* setup horizontal source last position excluding slopspace: 
 	 * this is the last pixel that will be used for calculating interpolated pixels */
-	hsrclstv = ((ob->width - 1) - si->overlay.myBufInfo[offset].slopspace) << 16; 
+	bi.hsrclstv = ((ob->width - 1) - si->overlay.myBufInfo[offset].slopspace) << 16; 
 	/* AND below required by hardware */
-	hsrclstv &= 0x03ff0000;
+	bi.hsrclstv &= 0x03ff0000;
 
 
 	/*******************************************
 	 *** setup vertical scaling and clipping ***
 	 *******************************************/
 
-	/* do vertical scaling... */
-	/* determine interval representation value, taking zoom into account */
-	if (ow->flags & B_OVERLAY_VERTICAL_FILTERING)
-	{
-		/* vertical filtering is ON */
-		if ((my_ov.height == ow->height) | (ow->height < 2))
-		{
-			/* no vertical scaling used, OR destination height < 2 */
-			intrep = 0;
-		}
-		else
-		{
-			intrep = 1;
-		}
-	}
-	else
-	{
-		/* vertical filtering is OFF */
-		if ((ow->height < my_ov.height) & (ow->height >= 2))
-		{
-			/* vertical downscaling used AND destination height >= 2 */
-			intrep = 1;
-		}
-		else
-		{
-			intrep = 0;
-		}
-	}
-	LOG(4,("Overlay: vertical interval representation value is %d\n",intrep));
-
 	/* calculate inverse vertical scaling factor, taking zoom into account */
-	/* standard scaling formula: */
-	ifactor = (((uint32)(my_ov.height - intrep)) << 16) / (ow->height - intrep); 
+	ifactor = ((((uint32)my_ov.height) << 12) / ow->height); 
 
 	/* correct factor to prevent lowest visible line from distorting */
-	ifactor -= (1 << 2);
-	LOG(4,("Overlay: vertical scaling factor is %f\n", (float)65536 / ifactor));
+	ifactor -= 1;
+	LOG(4,("Overlay: vertical scaling factor is %f\n", (float)4096 / ifactor));
 
 	/* preserve ifactor for source positioning calculations later on */
-	viscalv = ifactor;
+	bi.viscalv = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	if (((((uint32)my_ov.height) << 16) / 16384) > viscalv)
+	if (((((uint32)my_ov.height) << 12) / 1024) > bi.viscalv)
 	{
 		/* (non-inverse) factor too large, set factor to max. valid value */
-		viscalv = ((((uint32)my_ov.height) << 16) / 16384);
-		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)65536 / viscalv));
+		bi.viscalv = ((((uint32)my_ov.height) << 12) / 1024);
+		LOG(4,("Overlay: vertical scaling factor too large, clamping at %f\n", (float)4096 / bi.viscalv));
 	}
-	if (viscalv >= (32 << 16))
+	/* vertical downscaling cannot be done by NM BES hardware */
+	if (bi.viscalv > (1 << 12))
 	{
 		/* (non-inverse) factor too small, set factor to min. valid value */
-		viscalv = 0x1ffffc;
-		LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)65536 / viscalv));
+		bi.viscalv = 0x1000;
+		LOG(4,("Overlay: vertical scaling factor too small, clamping at %f\n", (float)4096 / bi.viscalv));
 	}
-	/* AND below is required by hardware */
-	viscalv &= 0x001ffffc;
 
 
 	/* do vertical clipping... */
@@ -440,11 +343,11 @@ status_t mn_configure_bes
 	 * Even if the scaling factor is clamping we instruct the BES to use the correct source start pos.! */
 
 	/* calculate relative base_adress and 'vertical weight fractional part' */
-	weight = 0;
-	a1orgv = (uint32)((vuint32 *)ob->buffer);
-	a1orgv -= (uint32)((vuint32 *)si->framebuffer);
+	bi.weight = 0;
+	bi.a1orgv = (uint32)((vuint32 *)ob->buffer);
+	bi.a1orgv -= (uint32)((vuint32 *)si->framebuffer);
 	/* calculate origin adress */
-	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n",a1orgv));
+	LOG(4,("Overlay: topleft corner of input bitmap (cardRAM offset) $%08x\n",bi.a1orgv));
 	/* check for destination vertical clipping at top side */
 	if (ow->v_start < crtc_vstart)
 	{
@@ -455,48 +358,38 @@ status_t mn_configure_bes
 			/* increase source buffer origin with 'fixed value':
 			 * (integer part of ('total height - 2' of dest. picture in pixels * inverse scaling factor)) *
 			 * bytes per row source picture */
-			a1orgv += ((((ow->height - 2) * ifactor) >> 16) * ob->bytes_per_row);
-			weight = (ow->height - 2) * ifactor;
+			bi.weight = (ow->height - 2) * (ifactor << 4);
+			bi.a1orgv += ((bi.weight >> 16) * ob->bytes_per_row);
 		}
 		else
 		{
 			/* increase source buffer origin with:
 			 * (integer part of (number of destination picture clipping pixels * inverse scaling factor)) *
 			 * bytes per row source picture */
-			a1orgv += ((((crtc_vstart - ow->v_start) * ifactor) >> 16) * ob->bytes_per_row);
-			weight = (crtc_vstart - ow->v_start) * ifactor;
+			bi.weight = (crtc_vstart - ow->v_start) * (ifactor << 4);
+			bi.a1orgv += ((bi.weight >> 16) * ob->bytes_per_row);
 		}
 		LOG(4,("Overlay: clipping at top...\n"));
 	}
 	/* take zoom into account */
-	a1orgv += (my_ov.v_start * ob->bytes_per_row);
-	weight += (((uint32)my_ov.v_start) << 16);
-	LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n",a1orgv));
-	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", weight / (float)65536));
+	bi.a1orgv += (my_ov.v_start * ob->bytes_per_row);
+	bi.weight += (((uint32)my_ov.v_start) << 16);
+	LOG(4,("Overlay: 'contributing part of buffer' origin is (cardRAM offset) $%08x\n",bi.a1orgv));
+	LOG(4,("Overlay: first vert. (sub)pixel of input bitmap contributing %f\n", bi.weight / (float)65536));
 
-	/* Note:
-	 * Because all > G200 overlay units will ignore b0-3 of the calculated adress,
-	 * we do not use the above way for horizontal source positioning.
-	 * (G200 cards ignore b0-2.)
-	 * If we did, 8 source-image pixel jumps (in 4:2:2 colorspace) will occur if the picture
-	 * is shifted horizontally during left clipping on all > G200 cards, while G200 cards
-	 * will have 4 source-image pixel jumps occuring. */
-
-	/* AND below is required by G200-G550 hardware. > G200 cards can have max. 32Mb RAM on board
-	 * (16Mb on G200 cards). Compatible setting used (between G200 and the rest), this has no
-	 * downside consequences here. */
+	/* AND below is required by NM hardware. */
 	/* Buffer A topleft corner of field 1 (origin)(field 1 contains our full frames) */
-	a1orgv &= 0x01fffff0;
+	bi.a1orgv &= 0x00fffff0;
 
 	/* field 1 weight: AND below required by hardware, also make sure 'sign' is always 'positive' */
-	v1wghtv = weight & 0x0000fffc;
+	bi.v1wghtv = bi.weight & 0x0000fffc;
 
 
 	/* setup field 1 (is our complete frame) vertical source last position.
 	 * this is the last pixel that will be used for calculating interpolated pixels */
-	v1srclstv = (ob->height - 1);
+	bi.v1srclstv = (ob->height - 1);
 	/* AND below required by hardware */
-	v1srclstv &= 0x000003ff;
+	bi.v1srclstv &= 0x000003ff;
 
 
 	/*****************************
@@ -514,103 +407,26 @@ status_t mn_configure_bes
 	 *************************/
 
 	/* BES global control: setup functions */
-	globctlv = 0;
+	bi.globctlv = 0;
 
-	/* slowdown BES if nessesary */
-	if (acczoom == 1)
-	{
-		/* run at full speed and resolution */
-		globctlv |= 0 << 0;
-		/* disable filtering for half speed interpolation */
-		globctlv |= 0 << 1;
-	}
-	else
-	{
-		/* run at half speed and resolution */
-		globctlv |= 1 << 0;
-		/* enable filtering for half speed interpolation */
-		globctlv |= 1 << 1;
-	}
-
-	/* 4:2:0 specific setup: not needed here */
-	globctlv |= 0 << 3;
-	/* BES testregister: keep zero */	
-	globctlv |= 0 << 4;
-	/* the following bits marked (> G200) *must* be zero on G200: */
-	/* 4:2:0 specific setup: not needed here (> G200) */
-	globctlv |= 0 << 5;
-	/* select yuy2 byte-order to B_YCbCr422 (> G200) */
-	globctlv |= 0 << 6;
-	/* BES internal contrast and brighness controls are not used, disabled (> G200) */
-	globctlv |= 0 << 7;
-	/* RGB specific setup: not needed here, so disabled (> G200) */
-	globctlv |= 0 << 8;
-	globctlv |= 0 << 9;
-	/* 4:2:0 specific setup: not needed here (> G200) */
-	globctlv |= 0 << 10;
-	/* Tell BES when to copy the new register values to the actual active registers.
-	 * bits 16-27 (12 bits) are the CRTC vert. count value at which copying takes
-	 * place.
-	 * (This is the double buffering feature: programming must be completed *before*
-	 *  the CRTC vert count value set here!) */
-	/* CRTC vert count for copying = $000, so during retrace, line 0. */
-	globctlv |= 0x000 << 16;
-
-	/* BES control: enable scaler and setup functions */
-	/* pre-reset all bits */
-	ctlv = 0;
 	/* enable BES */
-	ctlv |= 1 << 0;
-	/* we start displaying at an even startline (zero) in 'field 1' (no hardware de-interlacing is used) */
-	ctlv |= 0 << 6;
-	/* we don't use field 2, so its startline is not important */
-	ctlv |= 0 << 7;
+	bi.globctlv |= 1 << 0;
+	/* enable colorkeying */
+	bi.globctlv |= 1 << 1;
+	/* b3 = 1: distorts right-half of overlay output. Keeping it zero. */
+	/* colorspace is YV12, I420 or YUY2 (no RV15 or RV16) */
+	bi.globctlv |= 0 << 5;
 
-	LOG(6,("Overlay: ow->flags is $%08x\n",ow->flags));
-	/* enable horizontal filtering on scaling if asked for: if we *are* actually scaling */
-	if ((ow->flags & B_OVERLAY_HORIZONTAL_FILTERING) && (hiscalv != (0x01 << 16)))
-	{
-		ctlv |= 1 << 10;
-		LOG(6,("Overlay: using horizontal interpolation on scaling\n"));
-	}
-	else
-	{
-		ctlv |= 0 << 10;
-		LOG(6,("Overlay: using horizontal dropping or replication on scaling\n"));
-	}
-	/* enable vertical filtering on scaling if asked for: if we are *upscaling* only */
-	if ((ow->flags & B_OVERLAY_VERTICAL_FILTERING) && (viscalv < (0x01 << 16)))
-	{
-		ctlv |= 1 << 11;
-		LOG(6,("Overlay: using vertical interpolation on scaling\n"));
-	}
-	else
-	{
-		ctlv |= 0 << 11;
-		LOG(6,("Overlay: using vertical dropping or replication on scaling\n"));
-	}
+	/* enable auto-alternating hardware buffers if alternating buffers is enabled (NM2160) */
+	bi.globctlv |= 1 << 8;
+	/* ??? */
+	bi.globctlv |= 1 << 13;
+	/* display one buffer (no alternating buffers) (NM2160: no effect) */
+	bi.globctlv |= 0 << 14;
+	/* display frame (no field) (NM2160: no effect) */
+	bi.globctlv |= 0 << 15;
 
-	/* use actual calculated weight for horizontal interpolation */
-	ctlv |= 0 << 12;
-	/* use horizontal chroma interpolation upsampling on BES input picture */
-	ctlv |= 1 << 16;
-	/* select 4:2:2 BES input format */
-	ctlv |= 0 << 17;
-	/* dithering is enabled */
-	ctlv |= 1 << 18;
-	/* horizontal mirroring is not used */
-	ctlv |= 0 << 19;
-	/* BES output should be in color */
-	ctlv |= 0 << 20;
-	/* BES output blanking is disabled: we want a picture, no 'black box'! */
-	ctlv |= 0 << 21;
-	/* we do software field select (field select is not used) */	
-	ctlv |= 0 << 24;
-	/* we always display field 1 in buffer A, this contains our full frames */
-	/* select field 1 */
-	ctlv |= 0 << 25;
-	/* select buffer A */
-	ctlv |= 0 << 26;
+	/* BTW: horizontal and vertical filtering are always turned on in NM hardware. */
 
 
 	/*************************************
@@ -619,6 +435,8 @@ status_t mn_configure_bes
 
 	/* Make sure reprogramming the BES completes before the next retrace occurs,
 	 * to prevent register-update glitches (double buffer feature). */
+
+	//fixme...
 
 //	LOG(3,("Overlay: starting register programming beyond Vcount %d\n", CR1R(VCOUNT)));
 	/* Even at 1600x1200x90Hz, a single line still takes about 9uS to complete:
@@ -632,51 +450,132 @@ status_t mn_configure_bes
 	/**************************************
 	 *** actually program the registers ***
 	 **************************************/
+
+	if (si->ps.card_type >= NM2097)
+	{
+		/* PCI card */
+		LOG(4,("Overlay: accelerant is programming BES\n"));
+		/* unlock card overlay sequencer registers */
+		PCIGRPHW(GENLOCK, 0x20);
+		/* destination rectangle */
+		PCIGRPHW(HDCOORD1L, ((bi.hcoordv >> 16) & 0xff));
+		PCIGRPHW(HDCOORD2L, (bi.hcoordv & 0xff));
+		PCIGRPHW(HDCOORD21H, (((bi.hcoordv >> 4) & 0xf0) | ((bi.hcoordv >> 24) & 0x0f)));
+		PCIGRPHW(VDCOORD1L, ((bi.vcoordv >> 16) & 0xff));
+		PCIGRPHW(VDCOORD2L, (bi.vcoordv & 0xff));
+		PCIGRPHW(VDCOORD21H, (((bi.vcoordv >> 4) & 0xf0) | ((bi.vcoordv >> 24) & 0x0f)));
+		/* scaling */
+		PCIGRPHW(XSCALEL, (bi.hiscalv & 0xff));
+		PCIGRPHW(XSCALEH, ((bi.hiscalv >> 8) & 0xff));
+		PCIGRPHW(YSCALEL, (bi.viscalv & 0xff));
+		PCIGRPHW(YSCALEH, ((bi.viscalv >> 8) & 0xff));
+		/* inputbuffer #1 origin */
+		/* (we don't program buffer #2 as it's unused.) */
+		/* first include 'pixel precise' left clipping...
+		 * (subpixel precision is not supported by NeoMagic cards) */
+		bi.a1orgv += ((bi.hsrcstv >> 16) * 2);
+		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+		bi.a1orgv &= ~0x03;
+		/* now setup buffer startadress and horizontal source end (minimizes used bandwidth) */
+		if (si->ps.card_type < NM2200)
+		{
+			bi.a1orgv >>= 1;
+			/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+			PCIGRPHW(0xbc, (((((bi.hsrcendv >> 16) + 7) & ~8) / 8) - 1));
+		}
+		else
+		{
+			/* horizontal source end does not use subpixelprecision: granularity is 16 pixels */
+			//fixme? divide by 16 instead of 8 (if >= NM2200 owners report trouble then use 8!)
+			//fixme? check if overlaybuffer width should also have granularity of 16 now!
+			PCIGRPHW(0xbc, (((((bi.hsrcendv >> 16) + 15) & ~16) / 16) - 1));
+		}
+		PCIGRPHW(BUF1ORGL, (bi.a1orgv & 0xff));
+		PCIGRPHW(BUF1ORGM, ((bi.a1orgv >> 8) & 0xff));
+		PCIGRPHW(BUF1ORGH, ((bi.a1orgv >> 16) & 0xff));
+		/* b2 = 0: don't use horizontal mirroring (NM2160) */
+		/* other bits do ??? */
+		PCIGRPHW(0xbf, 0x02);
+		/* ??? */
+		PCIGRPHW(0xbd, 0x02);
+		PCIGRPHW(0xbe, 0x00);
+		/* (subpixel precise) source rect clipping is not supported on NeoMagic cards;
+		 * so we do 'pixel precise' left clipping via modification of buffer
+		 * startadress above instead.
+		 * (pixel precise top clipping is also done this way..) */
+		//fixme: checkout real pixel precise clipping on NM2200 and later cards!!!
 /*
-	BESW(HCOORD, hcoordv);
-	BESW(VCOORD, vcoordv);
-	BESW(HISCAL, hiscalv);
-	BESW(HSRCST, hsrcstv);
-	BESW(HSRCEND, hsrcendv);
-	BESW(HSRCLST, hsrclstv);
-	BESW(VISCAL, viscalv);
-	BESW(A1ORG, a1orgv);
-	BESW(V1WGHT, v1wghtv);
-	BESW(V1SRCLST, v1srclstv);
-	BESW(GLOBCTL, globctlv);  
-	BESW(CTL, ctlv);  
+	{
+		uint16 left = 0;
+		uint16 right = 128;
+		uint16 top = 0;
+		uint16 bottom = 128;
+
+		left = (bi.hsrcstv >> 16);
+		right = (bi.hsrclstv >> 16);
+		top = (bi.weight >> 16);
+		bottom = (bi.v1srclstv >> 16);
+
+		PCISEQW(HSCOORD1L, (left & 0xff));
+		PCISEQW(HSCOORD2L, (right & 0xff));
+		PCISEQW(HSCOORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
+		PCISEQW(VSCOORD1L, (top & 0xff));
+		PCISEQW(VSCOORD2L, (bottom & 0xff));
+		PCISEQW(VSCOORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
+	}
 */
-
-	/**************************
-	 *** setup color keying ***
-	 **************************/
-
-	/* setup colorkeying */
-/*	DXIW(COLKEY, (ow->alpha.value & ow->alpha.mask));
-
-	DXIW(COLKEY0RED, (ow->red.value & ow->red.mask));
-	DXIW(COLKEY0GREEN, (ow->green.value & ow->green.mask));
-	DXIW(COLKEY0BLUE, (ow->blue.value & ow->blue.mask));
-
-	DXIW(COLMSK, ow->alpha.mask);
-
-	DXIW(COLMSK0RED, ow->red.mask);
-	DXIW(COLMSK0GREEN, ow->green.mask);
-	DXIW(COLMSK0BLUE, ow->blue.mask);
-*/
-	/* enable colorkeying */
-//	DXIW(KEYOPMODE,0x01);
+		/* ??? */
+	    PCISEQW(0x1c, 0xfb);
+    	PCISEQW(0x1d, 0x00);
+		PCISEQW(0x1e, 0xe2);
+    	PCISEQW(0x1f, 0x02);
+ 		/* b1 = 0: disable alternating hardware buffers (NM2160) */
+		/* other bits do ??? */
+ 		PCISEQW(0x09, 0x11);
+		/* ??? */
+		PCISEQW(0x0a, 0x00);
+		/* global BES control */
+		PCIGRPHW(BESCTRL1, (bi.globctlv & 0xff));
+		PCISEQW(BESCTRL2, ((bi.globctlv >> 8) & 0xff));
 
 
-	/*************************
-	 *** setup misc. stuff ***
-	 *************************/
+		/**************************
+		 *** setup color keying ***
+		 **************************/
 
-	/* setup brightness and contrast to be 'neutral' (this is not implemented on G200) */
-//	BESW(LUMACTL, 0x00000080);
+		PCIGRPHW(COLKEY_R, (ow->red.value & ow->red.mask));
+		PCIGRPHW(COLKEY_G, (ow->green.value & ow->green.mask));
+		PCIGRPHW(COLKEY_B, (ow->blue.value & ow->blue.mask));
 
-	/* setup source pitch including slopspace (in pixels); AND is required by hardware */
-//	BESW(PITCH, (ob->width & 0x00000fff));
+
+		/*************************
+		 *** setup misc. stuff ***
+		 *************************/
+
+		/* setup brightness to be 'neutral' (two's complement number) */
+		PCIGRPHW(BRIGHTNESS, 0x00);
+
+		/* setup inputbuffer #1 pitch including slopspace (in pixels) */
+		/* (we don't program the pitch for inputbuffer #2 as it's unused.) */
+		PCIGRPHW(BUF1PITCHL, (ob->width & 0xff));
+		PCIGRPHW(BUF1PITCHH, ((ob->width >> 8) & 0xff));
+	}
+	else
+	{
+		/* ISA card. Speed required, so:
+		 * program entire sequence in kerneldriver in one context switch! */
+		LOG(4,("Overlay: kerneldriver programs BES\n"));
+
+		/* complete BES info struct... */
+		bi.card_type = si->ps.card_type;
+		bi.colkey_r = (ow->red.value & ow->red.mask);
+		bi.colkey_g = (ow->green.value & ow->green.mask);
+		bi.colkey_b = (ow->blue.value & ow->blue.mask);
+		bi.ob_width = ob->width;
+		/* ... and call kerneldriver to program the BES */
+		bi.magic = MN_PRIVATE_DATA_MAGIC;
+		ioctl(fd, MN_PGM_BES, &bi, sizeof(bi));
+	}
 
 	/* on a 500Mhz P3 CPU just logging a line costs 400uS (18-19 vcounts at 1024x768x60Hz)!
 	 * programming the registers above actually costs 180uS here */
@@ -688,7 +587,18 @@ status_t mn_configure_bes
 status_t mn_release_bes()
 {
 	/* setup BES control: disable scaler */
-//	BESW(CTL, 0x00000000);  
+	if (si->ps.card_type >= NM2097)
+	{
+		/* PCI card */
+		PCIGRPHW(BESCTRL1, 0x02);
+		PCISEQW(BESCTRL2, 0xa0);
+	}
+	else
+	{
+		/* ISA card */
+		ISAGRPHW(BESCTRL1, 0x02);
+		ISASEQW(BESCTRL2, 0xa0);
+	}
 
 	return B_OK;
 }

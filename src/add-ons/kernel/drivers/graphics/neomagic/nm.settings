@@ -8,7 +8,7 @@
 # accelerant "nm.accelerant"
 
 # nm.accelerant parameters
-usebios     false			# not used currently
+usebios     false			# if true rely on bios to coldstart the card instead of driver
 #memory  2048			# in Kb, override builtin memory size detection
 hardcursor true			# if true use on-chip cursor capabilities
 #logmask   0x00000000	# nothing logged, except errors, is default
@@ -16,6 +16,6 @@ hardcursor true			# if true use on-chip cursor capabilities
 #logmask   0x80000000	# log following mask
 #logmask   0x08000604	# log overlay use in full
 #logmask 	0xffffffff		# log everything
-dumprom    false        		# dump bios rom in ~/nm.rom: not yet working
+dumprom    false        		# dump bios rom in ~/nm.rom
 
 #--------- that's all.

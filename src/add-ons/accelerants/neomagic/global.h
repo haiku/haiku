@@ -9,3 +9,4 @@ extern int accelerantIsClone;
 
 extern mn_get_set_pci mn_pci_access;
 extern mn_in_out_isa mn_isa_access;
+extern mn_bes_data mn_bes_access;

@@ -1,5 +1,6 @@
 /* NM registers definitions and macros for access to */
 
+//old:
 /* PCI_config_space */
 #define NMCFG_DEVID        0x00
 #define NMCFG_DEVCTRL      0x04
@@ -24,8 +25,8 @@
 #define NMCFG_AGP_IDENT    0xf0 // >= MIL2
 #define NMCFG_AGP_STS      0xf4 // >= MIL2
 #define NMCFG_AGP_CMD      0xf8 // >= MIL2
+//end old.
 
-//new:
 /* neomagic ISA direct registers */
 /* VGA standard registers: */
 #define NMISA8_ATTRINDW		0x03c0
@@ -41,6 +42,14 @@
 #define NMISA8_GRPHIND		0x03ce
 #define NMISA8_GRPHDAT		0x03cf
 #define NMISA16_GRPHIND		0x03ce
+
+/* neomagic PCI direct registers */
+#define NM2PCI8_SEQIND		0x03c4
+#define NM2PCI8_SEQDAT		0x03c5
+#define NM2PCI16_SEQIND		0x03c4
+#define NM2PCI8_GRPHIND		0x03ce
+#define NM2PCI8_GRPHDAT		0x03cf
+#define NM2PCI16_GRPHIND	0x03ce
 
 /* neomagic ISA GENERAL direct registers */
 /* VGA standard registers: */
@@ -86,6 +95,25 @@
 #define NMSEQX_RESET		0x00
 #define NMSEQX_CLKMODE		0x01
 #define NMSEQX_MEMMODE		0x04
+/* NeoMagic BES registers: (> NM2070) (accessible via mapped I/O: >= NM2097) */
+#define NMSEQX_BESCTRL2		0x08
+#define NMSEQX_0x09			0x09 //??
+#define NMSEQX_0x0a			0x0a //??
+#define NMSEQX_BUF2ORGL		0x0c
+#define NMSEQX_BUF2ORGM		0x0d
+#define NMSEQX_BUF2ORGH		0x0e
+#define NMSEQX_VSCOORD1L	0x14 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_VSCOORD2L	0x15 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_VSCOORD21H	0x16 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_HSCOORD1L	0x17 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_HSCOORD2L	0x18 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_HSCOORD21H	0x19 /* >= NM2200(?), so clipping done via buffer startadress instead */
+#define NMSEQX_BUF2PITCHL	0x1a
+#define NMSEQX_BUF2PITCHH	0x1b
+#define NMSEQX_0x1c			0x1c //??
+#define NMSEQX_0x1d			0x1d //??
+#define NMSEQX_0x1e			0x1e //??
+#define NMSEQX_0x1f			0x1f //??
 
 /* neomagic ISA ATTRIBUTE indexed registers */
 /* VGA standard registers: */
@@ -129,6 +157,31 @@
 #define NMGRPHX_PLLC_NL		0x9b
 #define NMGRPHX_PLLC_NH		0x8f /* >= NM2200 */
 #define NMGRPHX_PLLC_M		0x9f
+/* NeoMagic BES registers: (> NM2070) (accessible via mapped I/O: >= NM2097) */
+#define NMGRPHX_BESCTRL1	0xb0
+#define NMGRPHX_HDCOORD21H	0xb1
+#define NMGRPHX_HDCOORD1L	0xb2
+#define NMGRPHX_HDCOORD2L	0xb3
+#define NMGRPHX_VDCOORD21H	0xb4
+#define NMGRPHX_VDCOORD1L	0xb5
+#define NMGRPHX_VDCOORD2L	0xb6
+#define NMGRPHX_BUF1ORGH	0xb7
+#define NMGRPHX_BUF1ORGM	0xb8
+#define NMGRPHX_BUF1ORGL	0xb9
+#define NMGRPHX_BUF1PITCHH	0xba
+#define NMGRPHX_BUF1PITCHL	0xbb
+#define NMGRPHX_0xbc		0xbc //??
+#define NMGRPHX_0xbd		0xbd //??
+#define NMGRPHX_0xbe		0xbe //??
+#define NMGRPHX_0xbf		0xbf //??
+#define NMGRPHX_XSCALEH		0xc0
+#define NMGRPHX_XSCALEL		0xc1
+#define NMGRPHX_YSCALEH		0xc2
+#define NMGRPHX_YSCALEL		0xc3
+#define NMGRPHX_BRIGHTNESS	0xc4
+#define NMGRPHX_COLKEY_R	0xc5
+#define NMGRPHX_COLKEY_G	0xc6
+#define NMGRPHX_COLKEY_B	0xc7
 
 /* NeoMagic specific PCI cursor registers < NM2200 */
 #define NMCR1_CURCTRL    		0x0100
@@ -144,8 +197,8 @@
 #define NMCR1_22CURBGCOLOR		0x100c
 #define NMCR1_22CURFGCOLOR   	0x1010
 #define NMCR1_22CURADDRESS		0x1014
-//end new.
 
+//old:
 /* NM ACCeleration registers */
 #define NMACC_DWGCTL          0x1C00
 #define NMACC_MACCESS         0x1C04
@@ -189,56 +242,30 @@
 #define NMACC_TEXORG4         0x2CB0 // >= G200 
 #define NMACC_SRCORG          0x2CB4 // >= G200
 #define NMACC_DSTORG          0x2CB8 // >= G200
-
-/*NM BES (Back End Scaler) registers (>= G200) */
-#define NMBES_A1ORG           0x3D00
-#define NMBES_A2ORG           0x3D04
-#define NMBES_B1ORG           0x3D08
-#define NMBES_B2ORG           0x3D0C
-#define NMBES_A1CORG          0x3D10
-#define NMBES_A2CORG          0x3D14
-#define NMBES_B1CORG          0x3D18
-#define NMBES_B2CORG          0x3D1C
-#define NMBES_CTL             0x3D20
-#define NMBES_PITCH           0x3D24
-#define NMBES_HCOORD          0x3D28
-#define NMBES_VCOORD          0x3D2C
-#define NMBES_HISCAL          0x3D30
-#define NMBES_VISCAL          0x3D34
-#define NMBES_HSRCST          0x3D38
-#define NMBES_HSRCEND         0x3D3C
-#define NMBES_LUMACTL         0x3D40
-#define NMBES_V1WGHT          0x3D48
-#define NMBES_V2WGHT          0x3D4C
-#define NMBES_HSRCLST         0x3D50
-#define NMBES_V1SRCLST        0x3D54
-#define NMBES_V2SRCLST        0x3D58
-#define NMBES_A1C3ORG         0x3D60
-#define NMBES_A2C3ORG         0x3D64
-#define NMBES_B1C3ORG         0x3D68
-#define NMBES_B2C3ORG         0x3D6C
-#define NMBES_GLOBCTL         0x3DC0
-#define NMBES_STATUS          0x3DC4
+//end old.
 
 /* Macros for convenient accesses to the NM chips */
 
+/* primary PCI register area */
 #define NM_REG8(r_)  ((vuint8  *)regs)[(r_)]
+#define NM_REG16(r_) ((vuint16 *)regs)[(r_) >> 1]
 #define NM_REG32(r_) ((vuint32 *)regs)[(r_) >> 2]
+/* secondary PCI register area */
+#define NM_2REG8(r_)  ((vuint8  *)regs2)[(r_)]
+#define NM_2REG16(r_) ((vuint16 *)regs2)[(r_) >> 1]
+#define NM_2REG32(r_) ((vuint32 *)regs2)[(r_) >> 2]
 
 /* read and write to PCI config space */
 #define CFGR(A)   (mn_pci_access.offset=NMCFG_##A, ioctl(fd,MN_GET_PCI, &mn_pci_access,sizeof(mn_pci_access)), mn_pci_access.value)
 #define CFGW(A,B) (mn_pci_access.offset=NMCFG_##A, mn_pci_access.value = B, ioctl(fd,MN_SET_PCI,&mn_pci_access,sizeof(mn_pci_access)))
 
+//old:
 /* read and write from the powergraphics registers */
 #define ACCR(A)    (NM_REG32(NMACC_##A))
 #define ACCW(A,B)  (NM_REG32(NMACC_##A)=B)
 #define ACCGO(A,B) (NM_REG32(NMACC_##A + 0x0100)=B)
+//end old.
 
-/* read and write from the backend scaler registers */
-#define BESR(A)   (NM_REG32(NMBES_##A))
-#define BESW(A,B) (NM_REG32(NMBES_##A)=B)
-
-//new:
 /* read and write from first CRTC (mapped) */
 #define CR1R(A)   (NM_REG32(NMCR1_##A))
 #define CR1W(A,B) (NM_REG32(NMCR1_##A) = (B))
@@ -257,9 +284,17 @@
 #define ISAGRPHW(A,B)(ISAWW(GRPHIND, ((NMGRPHX_##A) | ((B) << 8))))
 #define ISAGRPHR(A)  (ISAWB(GRPHIND, (NMGRPHX_##A)), ISARB(GRPHDAT))
 
+/* read and write from PCI GRAPHICS indexed registers (>= NM2097) */
+#define PCIGRPHW(A,B)(NM_2REG16(NM2PCI16_GRPHIND) = ((NMGRPHX_##A) | ((B) << 8)))
+#define PCIGRPHR(A)  (NM_2REG8(NM2PCI8_GRPHIND) = (NMGRPHX_##A), NM_2REG8(NM2PCI8_GRPHDAT))
+
 /* read and write from ISA SEQUENCER indexed registers */
 #define ISASEQW(A,B)(ISAWW(SEQIND, ((NMSEQX_##A) | ((B) << 8))))
 #define ISASEQR(A)  (ISAWB(SEQIND, (NMSEQX_##A)), ISARB(SEQDAT))
+
+/* read and write from PCI SEQUENCER indexed registers (>= NM2097) */
+#define PCISEQW(A,B)(NM_2REG16(NM2PCI16_SEQIND) = ((NMSEQX_##A) | ((B) << 8)))
+#define PCISEQR(A)  (NM_2REG8(NM2PCI8_SEQIND) = (NMSEQX_##A), NM_2REG8(NM2PCI8_SEQDAT))
 
 /* read and write from ISA ATTRIBUTE indexed registers */
 /* define DUMMY to prevent compiler warnings */

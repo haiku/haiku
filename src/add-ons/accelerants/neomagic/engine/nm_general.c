@@ -47,20 +47,20 @@ status_t mn_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.03 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.04 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
 	{
-	case 0x000110c8: //NM2070
+	case 0x000110c8: //NM2070 ISA
 		si->ps.card_type = NM2070;
 		LOG(4,("POWERUP: Detected MagicGraph 128 (NM2070)\n"));
 		break;
-	case 0x000210c8: //NM2090
+	case 0x000210c8: //NM2090 ISA
 		si->ps.card_type = NM2090;
 		LOG(4,("POWERUP: Detected MagicGraph 128V (NM2090)\n"));
 		break;
-	case 0x000310c8: //NM2093
+	case 0x000310c8: //NM2093 ISA
 		si->ps.card_type = NM2093;
 		LOG(4,("POWERUP: Detected MagicGraph 128ZV (NM2093)\n"));
 		break;
@@ -167,10 +167,10 @@ status_t nm_general_powerup()
 	ISAWB(MISCW, temp);
 
 	/* unlock cards GRAPHICS registers (any other value than 0x26 should lock it again) */
-    ISAGRPHW(GRPHXLOCK,0x26);
+    ISAGRPHW(GRPHXLOCK, 0x26);
 
-	/* unlock shadow registers */
-//	ISAGRPHW(GENLOCK,0x00);//0x01??
+	/* unlock cards CRTC registers */
+	ISAGRPHW(GENLOCK, 0x00);
 
 	/* initialize the shared_info struct */
 	set_specs();

@@ -650,7 +650,7 @@ status_t mn_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 	}
 
 	//test.. only valid for <NM2200!!
-	{
+/*	{
 		float pclk;
 		uint8 n,m,x = 1;
 		n = ISAGRPHR(PLLC_NL);
@@ -665,7 +665,7 @@ status_t mn_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 		LOG(2,("CRTC: Pixelclock is %fMHz\n", pclk));
 		nm_general_output_select();
 	}
-
+*/
 	return B_OK;
 }
 
