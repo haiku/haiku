@@ -1291,6 +1291,18 @@ BTranslatorRoster::FindTranslatorNode(translator_id id)
 	return pTranNode;
 }
 
+const char *
+get_file_name(const char *path)
+{
+	const char *file_name = strrchr(path, '/');
+	if (file_name)
+		file_name++;
+	else
+		file_name = path;
+		
+	return file_name;
+}
+
 // ---------------------------------------------------------------
 // LoadTranslator
 //
@@ -1315,17 +1327,14 @@ BTranslatorRoster::LoadTranslator(const char *path)
 		return B_BAD_VALUE;
 
 	//	check that this ref is not already loaded
-	const char *name = strrchr(path, '/');
-	if (name)
-		name++;
-	else
-		name = path;
+	const char *file_name = get_file_name(path);
+	
+	// If a translator with the same filename has already 
+	// been loaded, do not load the current translator and
+	// return no error. This code is not fool proof, however.
 	for (translator_node *i = fpTranslators; i; i = i->next)
-		if (!strcmp(name, i->translator->TranslatorName()))
+		if (!strcmp(file_name, get_file_name(i->path)))
 			return B_NO_ERROR;
-			//	we use name for determining whether it's loaded
-			//	that is not entirely foolproof, but making SURE will be 
-			//	a very slow process that I don't much care for.
 			
 	image_id image = load_add_on(path);
 		// Load the data and code for the Translator into memory
@@ -1339,13 +1348,9 @@ BTranslatorRoster::LoadTranslator(const char *path)
 		B_SYMBOL_TYPE_TEXT, reinterpret_cast<void **> (&pMakeNthTranslator));
 	if (!err) {
 		// If the translator add-on supports the post R4.5
-		// translator creation mechanism
-		
+		// translator creation mechanism, keep loading translators
+		// until MakeNthTranslator stops returning them.		
 		BTranslator *ptran = NULL;
-		// WARNING: This code assumes that the ref count on the 
-		// BTranslators from MakeNth... begin at 1!!!
-		// I NEED TO WRITE CODE TO TEST WHAT THE REF COUNT FOR 
-		// THESE BTRANSLATORS START AS!!!!
 		for (int32 n = 0; (ptran = pMakeNthTranslator(n, image, 0)); n++)
 			AddTranslatorToList(ptran, path, image, false);
 		
