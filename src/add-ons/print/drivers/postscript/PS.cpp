@@ -19,6 +19,7 @@
 #include "ValidRect.h"
 #include "DbgMsg.h"
 
+
 #if (!__MWERKS__ || defined(MSIPL_USING_NAMESPACE))
 using namespace std;
 #else 
@@ -67,8 +68,11 @@ bool PSDriver::endPage(int)
 }
 
 void PSDriver::setupCTM() {
+	const float leftMargin = getJobData()->getPrintableRect().left;
+	const float topMargin = getJobData()->getPrintableRect().top;
 	// move origin from bottom left to top left
-	writeSpoolString("0 %f translate\n", getJobData()->getPaperRect().Height());
+	// and set margin
+	writeSpoolString("%f %f translate\n", leftMargin, getJobData()->getPaperRect().Height()-topMargin);
 	// y values increase from top to bottom
 	// units of measure is dpi
 	writeSpoolString("72 %d div 72 -%d div scale\n", getJobData()->getXres(), getJobData()->getYres());
