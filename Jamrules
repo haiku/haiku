@@ -801,7 +801,7 @@ rule UseArchHeaders
 
 	SubDirCcFlags $(opt)  ;
 	SubDirC++Flags $(opt)  ;
-	SubDirHdrs $(headers) ;
+	HDRS += $(headers) ;
 }
 
 rule UseArchObjectHeaders
@@ -1089,14 +1089,15 @@ rule SetupKernel
 	local _objs = $(1:S=$(SUFOBJ)) ;
 
 	#Setup Kernel header directories
-	local kernel_includes = add-ons/file_system add-ons/graphics device drivers kernel storage support ;
+	local public_kernel_includes = add-ons/file_system add-ons/graphics device drivers kernel storage support ;
+	local private_kernel_includes = kernel libroot ;
 	# Use posix headers directory
 	HDRS = [ FDirName $(OBOS_TOP) headers posix ] ;
 	# Use public OS header directories
-	HDRS += [ PublicHeaders $(kernel_includes) ] ;
+	HDRS += [ PublicHeaders $(public_kernel_includes) ] ;
+	# Use private directories
+	HDRS += [ PrivateHeaders $(private_kernel_includes) ] ;
 
-	UsePrivateHeaders kernel ;
-	UsePrivateHeaders libroot ;
 	UseArchHeaders $(OBOS_ARCH) ;
 
 	SetupObjectsDir ;
