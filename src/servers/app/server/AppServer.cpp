@@ -45,6 +45,7 @@ AppServer *app_server=NULL;
 
 //! Default background color for workspaces
 RGBColor workspace_default_color(51,102,160);
+
 /*!
 	\brief Constructor
 	
@@ -96,8 +97,7 @@ AppServer::AppServer(void)
 	// TODO: fix the cursor display
 	extern int8 default_cursor_data[];
 	ServerCursor *sc=new ServerCursor(default_cursor_data);
-//	extern int8 cross_cursor[];
-//	ServerCursor *sc=new ServerCursor(cross_cursor);
+
 	cursormanager->AddCursor(sc);
 	cursormanager->ChangeCursor(B_CURSOR_DEFAULT, sc->ID());
 	cursormanager->SetCursor(B_CURSOR_DEFAULT);

@@ -54,7 +54,7 @@ public:
 	RootLayer *GetRoot(void);
 	void SetData(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo);
 	void GetData(graphics_card_info *gcinfo, frame_buffer_info *fbinfo);
-
+	void SetSpace(int32 res);
 protected:
 	RootLayer *_rootlayer;
 	graphics_card_info _gcinfo;
@@ -89,7 +89,8 @@ public:
 	Layer *GetRootLayer(int32 workspace=B_CURRENT_WORKSPACE);
 	bool IsInitialized(void);
 	Workspace *GetActiveWorkspace(void);
-
+	//! Returns the unique identifier for the screen
+	int32 GetID(void) { return _id; }
 protected:
 	int32 _resolution;
 	ServerWindow *_activewin;
@@ -101,6 +102,7 @@ protected:
 	Workspace *_activeworkspace;
 	graphics_card_info _gcinfo;
 	frame_buffer_info _fbinfo;
+	int32 _id;
 };
 
 #endif

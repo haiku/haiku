@@ -21,7 +21,11 @@
 #define HWDRIVER 3
 
 // Display driver to be used by the server.
-#define DISPLAYDRIVER VIEWDRIVER
+#define DISPLAYDRIVER SCREENDRIVER
+
+// Uncomment this if the DisplayDriver should only rely on drawing functions implemented
+// in software even though hardware-accelerated functions are available
+//#define DISABLE_HARDWARE_ACCELERATION
 
 // Define this for a quick hack to test some of the drawing functions
 //#define DISPLAYDRIVER_TEST_HACK
@@ -33,12 +37,6 @@
 // This is the application signature of our app_server when running as a
 // regular application. When running as the app_server, this is not used.
 #define SERVER_SIGNATURE "application/x-vnd.obe-OBAppServer"
-
-// Server port names. The input port is the port which is used to receive
-// input messages from the Input Server. The other is the "main" port for
-// the server and is utilized mostly by BApplication objects.
-#define SERVER_PORT_NAME "OBappserver"
-#define SERVER_INPUT_PORT "OBinputport"
 
 // Directory for all app_server-related settings.
 #define SERVER_SETTINGS_DIR "/boot/home/config/settings/app_server/"

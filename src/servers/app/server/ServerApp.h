@@ -82,7 +82,7 @@ protected:
 	DisplayDriver *_driver;
 	ServerCursor *_appcursor;
 	sem_id _lock;
-
+	bool _cursorhidden;
 	bool _isactive;
 };
 

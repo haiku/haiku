@@ -1,6 +1,12 @@
 #ifndef _APPSERVER_PROTOCOL_
 #define _APPSERVER_PROTOCOL_
 
+// Server port names. The input port is the port which is used to receive
+// input messages from the Input Server. The other is the "main" port for
+// the server and is utilized mostly by BApplication objects.
+#define SERVER_PORT_NAME "OBappserver"
+#define SERVER_INPUT_PORT "OBinputport"
+
 #define CREATE_APP 'drca'
 #define DELETE_APP 'drda'
 #define QUIT_APP 'srqa'
@@ -33,12 +39,17 @@
 #define SET_DECORATOR 'sdec'
 #define GET_DECORATOR 'gdec'
 
+// Cursor-related communications
 #define SET_CURSOR_DATA 'sscd'
 #define SET_CURSOR_BCURSOR 'sscb'
 #define SET_CURSOR_BBITMAP 'sscB'
 #define SHOW_CURSOR 'srsc'
 #define HIDE_CURSOR 'srhc'
 #define OBSCURE_CURSOR 'sroc'
+#define QUERY_CURSOR_HIDDEN 'sqch'
+
+#define BEGIN_RECT_TRACKING 'sbrt'
+#define END_RECT_TRACKING 'sert'
 
 #define GFX_COUNT_WORKSPACES 'gcws'
 #define GFX_SET_WORKSPACE_COUNT 'ggwc'
@@ -102,9 +113,6 @@
 #define LAYER_RESIZE 'lyre'
 #define LAYER_INVALIDATE 'lyin'
 #define LAYER_DRAW 'lydr'
-
-#define BEGIN_RECT_TRACKING 'rtbg'
-#define END_RECT_TRACKING 'rten'
 
 #define VIEW_GET_TOKEN 'vgtk'
 #define VIEW_ADD 'vadd'

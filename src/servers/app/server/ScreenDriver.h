@@ -92,7 +92,9 @@ public:
 	bool IsConnected(void) const { return is_connected; }
 	bool QuitRequested(void);
 	static int32 MouseMonitor(void *data);
+
 	graphics_card_info gcinfo;
+
 protected:
 	friend ScreenDriver;
 	

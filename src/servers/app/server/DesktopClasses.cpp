@@ -26,9 +26,11 @@
 //  
 //------------------------------------------------------------------------------
 #include "DesktopClasses.h"
+#include "TokenHandler.h"
 
 // Defined and initialized in AppServer.cpp
 extern RGBColor workspace_default_color;
+TokenHandler screen_id_handler;
 
 /*!
 	\brief Sets up internal variables needed by the Workspace
@@ -117,6 +119,16 @@ void Workspace::GetData(graphics_card_info *gcinfo, frame_buffer_info *fbinfo)
 }
 
 /*!
+	
+	\brief Changes the size and mode of the workspace
+	\param res The new resolution mode of the workspace
+*/
+void Workspace::SetSpace(int32 res)
+{
+	// TODO: Implement
+}
+
+/*!
 	\brief Sets up internal variables needed by Screen
 	\param gfxmodule Pointer to the uninitialized display driver to use
 	\param workspaces The number of workspaces on this screen
@@ -132,6 +144,7 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 	_workspacecount=0;
 	_init=false;
 	_active=false;
+	_id=screen_id_handler.GetToken();
 
 	if (_driver)
 	{
@@ -143,8 +156,13 @@ Screen::Screen(DisplayDriver *gfxmodule, uint8 workspaces)
 		_fbinfo.height=_driver->GetHeight();
 		_fbinfo.display_width=_driver->GetWidth();
 		_fbinfo.display_height=_driver->GetHeight();
-		_fbinfo.display_x=_driver->GetWidth();;
+		_fbinfo.display_x=_driver->GetWidth();
 		_fbinfo.display_y=_driver->GetHeight();
+
+		_gcinfo.width=_driver->GetWidth();
+		_gcinfo.height=_driver->GetHeight();
+		_gcinfo.bytes_per_row=_driver->GetBytesPerRow();
+		_gcinfo.bits_per_pixel=_driver->GetDepth();
 		
 		// right now, we won't do anything with the gcinfo structure. ** LAZY PROGRAMMER ALERT ** :P
 
@@ -285,6 +303,18 @@ DisplayDriver *Screen::GetGfxDriver(void)
 */
 status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 {
+	// the specified workspace isn't active, so this should be easy...
+	Workspace *wkspc=(Workspace*)_workspacelist->ItemAt(index);
+	if(!wkspc)
+		return B_ERROR;
+	wkspc->SetSpace(res);
+
+	if(index==_currentworkspace)
+	{
+		// change the statistics of the current workspace
+		if(_driver)
+			_driver->SetMode(res);
+	}
 	return B_OK;
 }
 
@@ -299,6 +329,7 @@ status_t Screen::SetSpace(int32 index, int32 res,bool stick)
 */
 void Screen::AddWindow(ServerWindow *win, int32 workspace)
 {
+	//TODO: Implement
 	if(!win)
 		return;
 }
@@ -312,6 +343,7 @@ void Screen::AddWindow(ServerWindow *win, int32 workspace)
 */
 void Screen::RemoveWindow(ServerWindow *win)
 {
+	//TODO: Implement
 	if(!win)
 		return;
 }
@@ -335,7 +367,7 @@ ServerWindow *Screen::ActiveWindow(void)
 */
 void Screen::SetActiveWindow(ServerWindow *win)
 {
-	
+	//TODO: Implement
 }
 
 /*!

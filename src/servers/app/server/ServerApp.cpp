@@ -81,6 +81,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, char *signature)
 	_lock=create_sem(1,"ServerApp sem");
 
 	_driver=GetGfxDriver();
+	_cursorhidden=false;
 }
 
 //! Does all necessary teardown for application
@@ -386,11 +387,13 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 		case SHOW_CURSOR:
 		{
 			cursormanager->ShowCursor();
+			_cursorhidden=false;
 			break;
 		}
 		case HIDE_CURSOR:
 		{
 			cursormanager->HideCursor();
+			_cursorhidden=true;
 			break;
 		}
 		case OBSCURE_CURSOR:
@@ -398,7 +401,16 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			cursormanager->ObscureCursor();
 			break;
 		}
-		
+		case QUERY_CURSOR_HIDDEN:
+		{
+			// Attached data
+			// 1) int32 port to reply to
+			if(_cursorhidden)
+				write_port(*((port_id*)index),SERVER_TRUE,NULL,0);
+			else
+				write_port(*((port_id*)index),SERVER_FALSE,NULL,0);
+			break;
+		}
 		case SET_CURSOR_DATA:
 		{
 			// Attached data: 68 bytes of _appcursor data
