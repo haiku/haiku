@@ -13,6 +13,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Path.h>
+#include <be_apps/Tracker/RecentItems.h>
 
 
 FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
@@ -41,12 +42,15 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	devicesMenu->SetTargetForItems(be_app);
 	menu->AddItem(new BMenuItem(devicesMenu));
 
-	menu->AddItem(new BMenuItem("Open File" B_UTF8_ELLIPSIS,
-					new BMessage(kMsgOpenFilePanel), 'O', B_COMMAND_KEY));
+	BMenu *recentsMenu = BRecentFilesList::NewFileListMenu("Open File" B_UTF8_ELLIPSIS,
+							NULL, NULL, be_app, 10, false, NULL, kSignature);
+	BMenuItem *item;
+	menu->AddItem(item = new BMenuItem(recentsMenu, new BMessage(kMsgOpenFilePanel)));
+	item->SetShortcut('O', B_COMMAND_KEY);
 	menu->AddSeparatorItem();
 
 	// the ProbeView save menu items will be inserted here
-	BMenuItem *item = new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY);
+	item = new BMenuItem("Close", new BMessage(B_CLOSE_REQUESTED), 'W', B_COMMAND_KEY);
 	menu->AddItem(item);
 	menu->AddSeparatorItem();
 

@@ -26,11 +26,9 @@
 #include <string.h>
 
 
-static const char *kSignature = "application/x-vnd.OpenBeOS-DiskProbe";
-
+static const uint32 kMsgDiskProbeSettings = 'DPst';
 static const uint32 kCascadeOffset = 20;
 
-static const uint32 kMsgDiskProbeSettings = 'DPst';
 
 struct disk_probe_settings {
 	BRect	window_frame;
