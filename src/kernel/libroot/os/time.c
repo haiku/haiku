@@ -17,7 +17,7 @@ real_time_clock(void)
 
 
 void
-set_real_time_clock(int32 secs)
+set_real_time_clock(uint32 secs)
 {
 	// ToDo: set_real_time_clock()
 }
