@@ -1,7 +1,7 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <fs_attr.h>
@@ -12,6 +12,8 @@
 
 #include "syscalls.h"
 
+
+// ToDo: think about adding special syscalls for the read/write/stat functions to speed them up
 
 #define RETURN_AND_SET_ERRNO(status) \
 	{ \
@@ -27,7 +29,8 @@
 
 
 ssize_t 
-fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos, void *buffer, size_t readBytes)
+fs_read_attr(int fd, const char *attribute, uint32 type,
+	off_t pos, void *buffer, size_t readBytes)
 {
 	ssize_t bytes;
 
@@ -38,7 +41,7 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos, void *buffer
 	// type is not used at all in this function
 	(void)type;
 
-	bytes = _kern_read(fd, pos, buffer, readBytes);
+	bytes = _kern_read(attr, pos, buffer, readBytes);
 	_kern_close(attr);
 
 	RETURN_AND_SET_ERRNO(bytes);
@@ -46,7 +49,8 @@ fs_read_attr(int fd, const char *attribute, uint32 type, off_t pos, void *buffer
 
 
 ssize_t 
-fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos, const void *buffer, size_t readBytes)
+fs_write_attr(int fd, const char *attribute, uint32 type,
+	off_t pos, const void *buffer, size_t writeBytes)
 {
 	ssize_t bytes;
 
@@ -54,7 +58,7 @@ fs_write_attr(int fd, const char *attribute, uint32 type, off_t pos, const void 
 	if (attr < 0)
 		RETURN_AND_SET_ERRNO(attr);
 
-	bytes = _kern_write(fd, pos, buffer, readBytes);
+	bytes = _kern_write(attr, pos, buffer, writeBytes);
 	_kern_close(attr);
 
 	RETURN_AND_SET_ERRNO(bytes);
