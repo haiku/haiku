@@ -1,7 +1,7 @@
 /* NV Acceleration functions */
 
 /* Author:
-   Rudolf Cornelissen 8/2003-1/2005.
+   Rudolf Cornelissen 8/2003-2/2005.
 
    This code was possible thanks to:
     - the Linux XFree86 NV driver,
@@ -422,6 +422,7 @@ status_t nv_acc_init_dma()
 			switch (si->ps.card_type)
 			{
 			case NV40:
+			case NV45:
 				ACCW(NV40_WHAT0, 0x83280fff);
 				ACCW(NV40_WHAT1, 0x000000a0);
 				ACCW(NV40_WHAT2, 0x0078e366);
@@ -440,7 +441,7 @@ status_t nv_acc_init_dma()
 				ACCW(NV40P_WHAT2, 0x0072cb77);
 				ACCW(NV40P_WHAT3, 0x00000108);
 				break;
-			case NV45: //fixme, checkout: this is cardID 0x016x at least!
+			case NV44:
 				ACCW(NV40P_WHAT0, 0x83280eff);
 				ACCW(NV40P_WHAT1, 0x000000a0);
 
@@ -525,7 +526,7 @@ status_t nv_acc_init_dma()
 
 		if (si->ps.card_arch >= NV40A)
 		{
-			if (si->ps.card_type == NV40)
+			if ((si->ps.card_type == NV40) || (si->ps.card_type == NV45))
 			{
 				/* copy some RAM configuration info(?) */
  				ACCW(NV20_WHAT_T0, NV_REG32(NV32_PFB_CONFIG_0));
