@@ -78,9 +78,11 @@ extern "C" {
 extern status_t vfs_init(stage2_args *args);
 extern status_t mount_boot_file_systems();
 extern status_t add_partitions_for(int fd);
-extern int open_node(Node *node, int mode);
 
 #ifdef __cplusplus
+// this function is only available in C++
+extern int open_node(Node *node, int mode);
+
 }
 #endif
 
