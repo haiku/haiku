@@ -7,9 +7,13 @@
 #ifndef _UDF_DISK_STRUCTURES_H
 #define _UDF_DISK_STRUCTURES_H
 
+#include <string.h>
+
+#include <ByteOrder.h>
 #include <SupportDefs.h>
 
 #include "cpp.h"
+#include "UdfDebug.h"
 
 /*! \file DiskStructures.h
 
@@ -23,7 +27,7 @@
 	For UDF info: <a href='http://www.osta.org'>http://www.osta.org</a>
 	For ECMA info: <a href='http://www.ecma-international.org'>http://www.ecma-international.org</a>
 
-	\todo Add in comments about max struct sizes from UDF-2.01
+	\todo Add in comments about max struct sizes from UDF-2.01 5.1
 
 */
 
@@ -40,9 +44,18 @@ namespace UDF {
 	
 	See also: ECMA 167 1/7.2.1, UDF-2.01 2.1.2
 */
-struct charspec {
-	uint8 character_set_type;		//!< to be set to 0 to indicate CS0
-	char character_set_info[63];	//!< "OSTA Compressed Unicode"
+class charspec {
+public:
+	void dump();
+
+	uint8 character_set_type() const { return _character_set_type; } 
+	const char* character_set_info() const { return _character_set_info; }
+	char* character_set_info() { return _character_set_info; }
+	
+	void set_character_set_type(uint8 type) { _character_set_type = type; } 
+private:
+	uint8 _character_set_type;	//!< to be set to 0 to indicate CS0
+	char _character_set_info[63];	//!< "OSTA Compressed Unicode"
 } __attribute__((packed));
 
 
@@ -52,22 +65,79 @@ extern const charspec kCS0Charspec;
 /*! \brief Date and time stamp 
 
 	See also: ECMA 167 1/7.3, UDF-2.01 2.1.4
+	
+	\todo Check neat-o bitmasking trick endianness
 */
-struct timestamp {
-	union {
+class timestamp {
+private:
+	union type_and_timezone_accessor {
 		uint16 type_and_timezone;
-		uint16 type:4,
-		       timezone:12;
+		struct {
+			uint16 timezone:12,
+			       type:4;
+		} bits;
 	};
-	uint16 year;
-	uint8 month;
-	uint8 day;
-	uint8 hour;
-	uint8 minute;
-	uint8 second;
-	uint8 centisecond;
-	uint8 hundred_microsecond;
-	uint8 microsecond;
+
+public:
+	void dump();
+
+	// Get functions
+	uint16 type_and_timezone() const { return B_LENDIAN_TO_HOST_INT16(_type_and_timezone); }
+	uint8 type() const {
+		type_and_timezone_accessor t;
+		t.type_and_timezone = type_and_timezone();
+		return t.bits.type;
+	}
+	uint16 timezone() const {
+		type_and_timezone_accessor t;
+		t.type_and_timezone = type_and_timezone();
+		return t.bits.timezone;
+	}
+	uint16 year() const { return B_LENDIAN_TO_HOST_INT16(_year); }
+	uint8 month() const { return _month; }
+	uint8 day() const { return _day; }
+	uint8 hour() const { return _hour; }
+	uint8 minute() const { return _minute; }
+	uint8 second() const { return _second; }
+	uint8 centisecond() const { return _centisecond; }
+	uint8 hundred_microsecond() const { return _hundred_microsecond; }
+	uint8 microsecond() const { return _microsecond; }
+	
+	// Set functions
+	void set_type_and_timezone(uint16 type_and_timezone) { _type_and_timezone = B_HOST_TO_LENDIAN_INT16(type_and_timezone); }
+	void set_type(uint8 type) {
+		type_and_timezone_accessor t;
+		t.type_and_timezone = type_and_timezone();
+		t.bits.type = type;
+		set_type_and_timezone(t.type_and_timezone);
+	}
+	void set_timezone(uint8 timezone) {
+		type_and_timezone_accessor t;
+		t.type_and_timezone = type_and_timezone();
+		t.bits.timezone = timezone;
+		set_type_and_timezone(t.type_and_timezone);
+	}
+	void set_year(uint16 year) { _year = B_HOST_TO_LENDIAN_INT16(year); }
+	void set_month(uint8 month) { _month = month; }
+	void set_day(uint8 day) { _day = day; }
+	void set_hour(uint8 hour) { _hour = hour; }
+	void set_minute(uint8 minute) { _minute = minute; }
+	void set_second(uint8 second) { _second = second; }
+	void set_centisecond(uint8 centisecond) { _centisecond = centisecond; }
+	void set_hundred_microsecond(uint8 hundred_microsecond) { _hundred_microsecond = hundred_microsecond; }
+	void set_microsecond(uint8 microsecond) { _microsecond = microsecond; }
+private:
+	uint16 _type_and_timezone;
+	uint16 _year;
+	uint8 _month;
+	uint8 _day;
+	uint8 _hour;
+	uint8 _minute;
+	uint8 _second;
+	uint8 _centisecond;
+	uint8 _hundred_microsecond;
+	uint8 _microsecond;
+
 } __attribute__((packed));
 
 
@@ -77,9 +147,22 @@ struct timestamp {
 	See also: ECMA 167 1/7.4, UDF 2.01 2.1.5
 */
 struct entity_id {
-	uint8 flags;
-	char identifier[23];
-	char identifier_suffix[8];
+public:
+	void dump();
+
+	// Get functions
+	uint8 flags() const { return _flags; }
+	const char* identifier() const { return _identifier; }
+	char* identifier() { return _identifier; }
+	const char* identifier_suffix() const { return _identifier_suffix; }
+	char* identifier_suffix() { return _identifier_suffix; }
+
+	// Set functions
+	void set_flags(uint8 flags) { _flags = flags; }	
+private:
+	uint8 _flags;
+	char _identifier[23];
+	char _identifier_suffix[8];
 } __attribute__((packed));
 
 
@@ -142,8 +225,17 @@ extern const char* kVSDID_ECMA168;
 	See also: ECMA 167 3/7.1
 */
 struct extent_address {
-	uint32 length;
-	uint32 location;
+public:
+	void dump();
+
+	uint32 length() { return B_LENDIAN_TO_HOST_INT32(_length); }	
+	uint32 location() { return B_LENDIAN_TO_HOST_INT32(_location); }
+	
+	void set_length(int32 length) { _length = B_HOST_TO_LENDIAN_INT32(length); }
+	void set_location(int32 location) { _location = B_HOST_TO_LENDIAN_INT32(location); }
+private:
+	uint32 _length;
+	uint32 _location;
 } __attribute__((packed));
 
 
@@ -157,12 +249,34 @@ struct extent_address {
 	See also: ECMA 167 1/7.2, UDF 2.01 2.2.1, UDF 2.01 2.3.1
 */
 struct descriptor_tag {
-	uint16 id;
-	uint16 version;
-	uint8 checksum;			//!< Sum modulo 256 of bytes 0-3 and 5-15 of this struct.
-	uint8 reserved;			//!< Set to #00.
-	uint16 serial_number;
-	uint16 crc;				//!< May be 0 if \c crc_length field is 0.
+public:
+	void dump();	
+
+	status_t init_check(uint32 diskBlock);
+
+	uint16 id() { return B_LENDIAN_TO_HOST_INT16(_id); }
+	uint16 version() { return B_LENDIAN_TO_HOST_INT16(_version); }
+	uint8 checksum() { return _checksum; }
+	uint16 serial_number() { return B_LENDIAN_TO_HOST_INT16(_serial_number); }
+	uint16 crc() { return B_LENDIAN_TO_HOST_INT16(_crc); }
+	uint16 crc_length() { return B_LENDIAN_TO_HOST_INT16(_crc_length); }
+	uint32 location() { return B_LENDIAN_TO_HOST_INT32(_location); }
+
+	void set_id(uint16 id) { _id = B_HOST_TO_LENDIAN_INT16(id); }
+	void set_version(uint16 version) { _version = B_HOST_TO_LENDIAN_INT16(version); }
+	void set_checksum(uint8 checksum) { _checksum = checksum; }
+	void set_serial_number(uint16 serial_number) { _serial_number = B_HOST_TO_LENDIAN_INT16(serial_number); }
+	void set_crc(uint16 crc) { _crc = B_HOST_TO_LENDIAN_INT16(crc); }
+	void set_crc_length(uint16 crc_length) { _crc_length = B_HOST_TO_LENDIAN_INT16(crc_length); }
+	void set_location(uint32 location) { _location = B_HOST_TO_LENDIAN_INT32(location); }
+	
+private:
+	uint16 _id;
+	uint16 _version;
+	uint8 _checksum;			//!< Sum modulo 256 of bytes 0-3 and 5-15 of this struct.
+	uint8 _reserved;			//!< Set to #00.
+	uint16 _serial_number;
+	uint16 _crc;				//!< May be 0 if \c crc_length field is 0.
 	/*! \brief Length of the data chunk used to calculate CRC.
 	
 		If 0, no CRC was calculated, and the \c crc field must be 0.
@@ -172,15 +286,14 @@ struct descriptor_tag {
 		
 		<code>(descriptor length) - (descriptor tag length)</code>
 	*/
-	uint16 crc_length;
+	uint16 _crc_length;
 	/*! \brief Address of this tag within its partition (for error checking).
 	
 		For virtually addressed structures (i.e. those accessed thru a VAT), this
 		shall be the virtual address, not the physical or logical address.
 	*/
-	uint32 location;		
+	uint32 _location;		
 	
-	status_t init_check(off_t diskLocation);
 } __attribute__((packed));
 
 
@@ -221,42 +334,115 @@ enum tag_id {
 /*! \brief Primary volume descriptor
 */
 struct primary_vd {
-	descriptor_tag tag;
-	uint32 vds_number;
-	uint32 primary_volume_descriptor_number;
-	char volume_identifier[32];
-	uint16 volume_sequence_number;
-	uint16 max_volume_sequence_number;
-	uint16 interchange_level; //!< to be set to 3 if part of multivolume set, 2 otherwise
-	uint16 max_interchange_level; //!< to be set to 3 unless otherwise directed by user
-	uint32 character_set_list;
-	uint32 max_character_set_list;
-	char volume_set_identifier[128];
+public:
+	void dump();	
+
+	// Get functions
+	const descriptor_tag& tag() const { return _tag; }
+	descriptor_tag& tag() { return _tag; }
+
+	uint32 volume_descriptor_sequence_number() const { return B_LENDIAN_TO_HOST_INT32(_volume_descriptor_sequence_number); }
+	uint32 primary_volume_descriptor_number() const { return B_LENDIAN_TO_HOST_INT32(_primary_volume_descriptor_number); }
+
+	const char* volume_identifier() const { return _volume_identifier; }
+	char* volume_identifier() { return _volume_identifier; }
+	
+	uint16 volume_sequence_number() const { return B_LENDIAN_TO_HOST_INT16(_volume_sequence_number); }
+	uint16 max_volume_sequence_number() const { return B_LENDIAN_TO_HOST_INT16(_max_volume_sequence_number); }
+	uint16 interchange_level() const { return B_LENDIAN_TO_HOST_INT16(_interchange_level); }
+	uint16 max_interchange_level() const { return B_LENDIAN_TO_HOST_INT16(_max_interchange_level); }
+	uint32 character_set_list() const { return B_LENDIAN_TO_HOST_INT32(_character_set_list); }
+	uint32 max_character_set_list() const { return B_LENDIAN_TO_HOST_INT32(_max_character_set_list); }
+
+	const char* volume_set_identifier() const { return _volume_set_identifier; }
+	char* volume_set_identifier() { return _volume_set_identifier; }
+	
+	const charspec& descriptor_character_set() const { return _descriptor_character_set; }
+	charspec& descriptor_character_set() { return _descriptor_character_set; }
+
+	const charspec& explanatory_character_set() const { return _explanatory_character_set; }
+	charspec& explanatory_character_set() { return _explanatory_character_set; }
+
+	const extent_address& volume_abstract() const { return _volume_abstract; }
+	extent_address& volume_abstract() { return _volume_abstract; }
+	const extent_address& volume_copyright_notice() const { return _volume_copyright_notice; }
+	extent_address& volume_copyright_notice() { return _volume_copyright_notice; }
+
+	const entity_id& application_id() const { return _application_id; }
+	entity_id& application_id() { return _application_id; }
+	
+	const timestamp& recording_date_and_time() const { return _recording_date_and_time; }
+	timestamp& recording_date_and_time() { return _recording_date_and_time; }
+
+	const entity_id& implementation_id() const { return _implementation_id; }
+	entity_id& implementation_id() { return _implementation_id; }
+
+	const uint8* implementation_use() const { return _implementation_use; }
+	uint8* implementation_use() { return _implementation_use; }
+
+	uint32 predecessor_volume_descriptor_sequence_location() const
+	  { return B_LENDIAN_TO_HOST_INT32(_predecessor_volume_descriptor_sequence_location); }
+	uint16 flags() const { return B_LENDIAN_TO_HOST_INT16(_flags); }
+
+	// Set functions
+	void set_volume_descriptor_sequence_number(uint32 number)
+	  { _volume_descriptor_sequence_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_primary_volume_descriptor_number(uint32 number)
+	  { _primary_volume_descriptor_number = B_HOST_TO_LENDIAN_INT32(number); }
+	void set_volume_sequence_number(uint16 number)
+	  { _volume_sequence_number = B_HOST_TO_LENDIAN_INT16(number); }
+	void set_max_volume_sequence_number(uint16 number)
+	  { _max_volume_sequence_number = B_HOST_TO_LENDIAN_INT16(number); }
+	void set_interchange_level(uint16 level)
+	  { _interchange_level = B_HOST_TO_LENDIAN_INT16(level); }
+	void set_max_interchange_level(uint16 level)
+	  { _max_interchange_level = B_HOST_TO_LENDIAN_INT16(level); }
+	void set_character_set_list(uint32 list)
+	  { _character_set_list = B_HOST_TO_LENDIAN_INT32(list); }
+	void set_max_character_set_list(uint32 list)
+	  { _max_character_set_list = B_HOST_TO_LENDIAN_INT32(list); }
+	void set_predecessor_volume_descriptor_sequence_location(uint32 location)
+	  { _predecessor_volume_descriptor_sequence_location = B_HOST_TO_LENDIAN_INT32(location); }
+	void set_flags(uint16 flags)
+	  { _flags = B_HOST_TO_LENDIAN_INT16(flags); }
+
+private:
+	descriptor_tag _tag;
+	uint32 _volume_descriptor_sequence_number;
+	uint32 _primary_volume_descriptor_number;
+	char _volume_identifier[32];
+	uint16 _volume_sequence_number;
+	uint16 _max_volume_sequence_number;
+	uint16 _interchange_level; //!< to be set to 3 if part of multivolume set, 2 otherwise
+	uint16 _max_interchange_level; //!< to be set to 3 unless otherwise directed by user
+	uint32 _character_set_list;
+	uint32 _max_character_set_list;
+	char _volume_set_identifier[128];
 
 	/*! \brief Identifies the character set for the \c volume_identifier
 		and \c volume_set_identifier fields.
 		
 		To be set to CS0.
 	*/
-	charspec descriptor_character_set;	
+	charspec _descriptor_character_set;	
 
 	/*! \brief Identifies the character set used in the \c volume_abstract
 		and \c volume_copyright_notice extents.
 		
 		To be set to CS0.
 	*/
-	charspec explanatory_character_set;
+	charspec _explanatory_character_set;
 	
-	extent_address volume_abstract;
-	extent_address volume_copyright_notice;
+	extent_address _volume_abstract;
+	extent_address _volume_copyright_notice;
 	
-	entity_id application_id;
-	timestamp recording_data_and_time;
-	entity_id implementation_id;
-	char implementation_use[64];
-	uint32 predecessor_vds_location;
-	uint16 flags;
-	char reserved[22];
+	entity_id _application_id;
+	timestamp _recording_date_and_time;
+	entity_id _implementation_id;
+	uint8 _implementation_use[64];
+	uint32 _predecessor_volume_descriptor_sequence_location;
+	uint16 _flags;
+	char _reserved[22];
 
 } __attribute__((packed));
 
@@ -275,11 +461,16 @@ struct primary_vd {
 	
 	See also: ECMA 167 3/10.2, UDF-2.01 2.2.3
 */
-struct anchor_vd_pointer {
-	descriptor_tag tag;
-	extent_address main_vds;	//!< min length of 16 sectors
-	extent_address reserve_vds;	//!< min length of 16 sectors
-	char reserved[480];	
+struct anchor_volume_descriptor_pointer {
+public:
+	descriptor_tag& tag() { return _tag; }
+	extent_address& main_vds() { return _main_vds; }
+	extent_address& reserve_vds() { return _reserve_vds; }
+private:
+	descriptor_tag _tag;
+	extent_address _main_vds;	//!< min length of 16 sectors
+	extent_address _reserve_vds;	//!< min length of 16 sectors
+	char _reserved[480];	
 } __attribute__((packed));
 
 
@@ -320,10 +511,10 @@ struct partition_descriptor {
 	*/
 	union {
 		uint16 partition_flags;
-		struct flags {
+		struct {
 			uint16 allocated:1,
 			       reserved:15;
-		};
+		} flags;
 	};
 	uint16 partition_number;
 
@@ -628,13 +819,15 @@ struct file_id_descriptor {
 	uint16 version_number;
 	/*! \todo Check UDF-2.01 2.3.4.2 for some more restrictions. */
 	union {
-		uint8 characteristics;
-		uint8	may_be_hidden:1,
-				is_directory:1,
-				is_deleted:1,
-				is_parent:1,
-				is_metadata_stream:1,
-				reserved_characteristics:3;
+		uint8 all_characteristics;
+		struct { 
+			uint8	may_be_hidden:1,
+					is_directory:1,
+					is_deleted:1,
+					is_parent:1,
+					is_metadata_stream:1,
+					reserved_characteristics:3;
+		} characteristics;
 	};	
 	uint8 id_length;
 	long_allocation_descriptor icb;
@@ -714,20 +907,22 @@ struct icb_entry_tag {
 	uint8 file_type;
 	logical_block_address parent_icb_location;
 	union {
-		uint16 flags;
-		uint16	descriptor_flags:3,			
-				if_directory_then_sort:1,	//!< To be set to 0 per UDF-2.01 2.3.5.4
-				non_relocatable:1,
-				archive:1,
-				setuid:1,
-				setgid:1,
-				sticky:1,
-				contiguous:1,
-				system:1,
-				transformed:1,
-				multi_version:1,			//!< To be set to 0 per UDF-2.01 2.3.5.4
-				is_stream:1,
-				reserved_icb_entry_flags:2;
+		uint16 all_flags;
+		struct {
+			uint16	descriptor_flags:3,			
+					if_directory_then_sort:1,	//!< To be set to 0 per UDF-2.01 2.3.5.4
+					non_relocatable:1,
+					archive:1,
+					setuid:1,
+					setgid:1,
+					sticky:1,
+					contiguous:1,
+					system:1,
+					transformed:1,
+					multi_version:1,			//!< To be set to 0 per UDF-2.01 2.3.5.4
+					is_stream:1,
+					reserved_icb_entry_flags:2;
+		} flags;
 	};
 } __attribute__((packed));
 
