@@ -70,6 +70,8 @@ BLocker		BApplication::_app_resources_lock("_app_resources_lock");
 
 
 // This isn't static because it's used by PrivateScreen.cpp
+// TODO: Move it to the BPrivate namespace (or prepend a "_" to the name),
+// but maybe we'll want to handle screens differently
 BPrivateScreen *gPrivateScreen = NULL;
 
 static property_info
@@ -400,22 +402,25 @@ void BApplication::ReadyToRun()
 {
 }
 //------------------------------------------------------------------------------
-void BApplication::MessageReceived(BMessage* msg)
+void
+BApplication::MessageReceived(BMessage *message)
 {
-	switch (msg->what) {
+	switch (message->what) {
+	
 		// TODO: Handle these
-		
-		// Bebook says: B_SILENT_RELAUNCH
-		// Sent to a single-launch application when it's activated by being launched
-		// (for example, if the user double-clicks its icon in Tracker).
-		case B_SILENT_RELAUNCH:		
 		case B_COUNT_PROPERTIES:
 		case B_GET_PROPERTY:
 		case B_SET_PROPERTY:
 			break;
 
+		// Bebook says: B_SILENT_RELAUNCH
+		// Sent to a single-launch application when it's activated by being launched
+		// (for example, if the user double-clicks its icon in Tracker).
+		case B_SILENT_RELAUNCH:
+			be_roster->ActivateApp(Team());
+			// supposed to fall through	
 		default:
-			BLooper::MessageReceived(msg);
+			BLooper::MessageReceived(message);
 			break;
 	}
 	
