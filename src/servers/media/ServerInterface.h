@@ -6,8 +6,6 @@
 #include <MediaAddOn.h>
 #include <Entry.h>
 
-#define NEW_MEDIA_SERVER_SIGNATURE 	"application/x-vnd.OpenBeOS-media-server"
-
 enum {
 	ADDONSERVER_INSTANTIATE_DORMANT_NODE,
 	SERVER_REGISTER_MEDIAADDON,

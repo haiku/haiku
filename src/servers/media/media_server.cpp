@@ -117,7 +117,7 @@ private:
 };
 
 ServerApp::ServerApp()
- 	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
+ 	: BApplication(B_MEDIA_SERVER_SIGNATURE),
 	fLocker(new BLocker("media server locker"))
 {
  	gNotificationManager = new NotificationManager;
