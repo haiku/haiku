@@ -41,10 +41,16 @@
 #include <stdio.h>
 
 //#define TRACE_VM
+//#define TRACE_FAULTS
 #ifdef TRACE_VM
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
+#endif
+#ifdef TRACE_FAULTS
+#	define FTRACE(x) dprintf x
+#else
+#	define FTRACE(x) ;
 #endif
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
@@ -2069,7 +2075,7 @@ vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user,
 {
 	int err;
 
-	TRACE(("vm_page_fault: page fault at 0x%lx, ip 0x%lx\n", address, fault_address));
+	FTRACE(("vm_page_fault: page fault at 0x%lx, ip 0x%lx\n", address, fault_address));
 
 	*newip = 0;
 
@@ -2115,7 +2121,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	int change_count;
 	int err;
 
-	TRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
+	FTRACE(("vm_soft_fault: thid 0x%lx address 0x%lx, isWrite %d, isUser %d\n",
 		thread_get_current_thread_id(), originalAddress, isWrite, isUser));
 
 	address = ROUNDOWN(originalAddress, B_PAGE_SIZE);
@@ -2268,7 +2274,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (page == NULL) {
 		// we still haven't found a page, so we allocate a clean one
 		page = vm_page_allocate_page(PAGE_STATE_CLEAR);
-		TRACE(("vm_soft_fault: just allocated page 0x%lx\n", page->ppn));
+		FTRACE(("vm_soft_fault: just allocated page 0x%lx\n", page->ppn));
 
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
 
@@ -2302,7 +2308,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		vm_page *src_page = page;
 		void *src, *dest;
 
-		TRACE(("get new page, copy it, and put it into the topmost cache\n"));
+		FTRACE(("get new page, copy it, and put it into the topmost cache\n"));
 		page = vm_page_allocate_page(PAGE_STATE_FREE);
 
 		// try to get a mapping for the src and dest page so we can copy it
