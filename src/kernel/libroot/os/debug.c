@@ -54,6 +54,22 @@ debug_thread(thread_id thread)
 	return _kern_debug_thread(thread);
 }
 
+
+/**	\brief Suspends the thread until a debugger has been installed for this
+ *		   team.
+ *
+ *	As soon as this happens (immediately, if a debugger is already installed)
+ *	the thread stops for debugging. This is desirable for debuggers that spawn
+ *	their debugged teams via fork() and want the child to wait till they have
+ *	installed themselves as team debugger before continuing with exec*().
+ */
+void
+wait_for_debugger(void)
+{
+	_kern_wait_for_debugger();
+}
+
+
 static const char *const sDebugWhyStrings[] = {
 	"Thread not running",		// B_THREAD_NOT_RUNNING
 	"Signal received",			// B_SIGNAL_RECEIVED

@@ -27,6 +27,7 @@ extern status_t	install_default_debugger(port_id debuggerPort);
 extern port_id	install_team_debugger(team_id team, port_id debuggerPort);
 extern status_t	remove_team_debugger(team_id team);
 extern status_t	debug_thread(thread_id thread);
+extern void		wait_for_debugger(void);
 
 // team debugging flags
 enum {
