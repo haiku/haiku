@@ -94,7 +94,7 @@ const ColorCap color("Color", false, JobData::kCOLOR);
 const ColorCap monochrome("Monochrome", true, JobData::kMONOCHROME);
 
 const ColorCap *colors[] = {
-//	&color,
+	&color,
 	&monochrome
 };
 

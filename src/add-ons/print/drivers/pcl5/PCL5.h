@@ -24,13 +24,15 @@ protected:
 private:
 	void move(int x, int y);
 	void jobStart();
-	void startRasterGraphics();
+	void startRasterGraphics(int width, int height);
 	void endRasterGraphics();
 	void rasterGraphics(
 		int compression_method,
 		const uchar *buffer,
-		int size);
+		int size,
+		bool lastPlane);
 	void jobEnd();
+	int bytesToEnterCompressionMethod(int compression_method);
 
 	int __compression_method;
 	Halftone *__halftone;

@@ -142,26 +142,58 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 			DBGMSG(("move\n"));
 
 			move(x, y);
-			startRasterGraphics();
+			startRasterGraphics(width, height);
 
+			const bool color = getJobData()->getColor() == JobData::kCOLOR;
+			const int num_planes = color ? 3 : 1;
+			const int fill_bits = in_size * 8 - width;
+			const uchar fill_mask = 0xff >> (8 - fill_bits);
+			// ASSERT(0 <= fill_bits && fill_bits < 8);
+			
 			for (int i = rc.top; i <= rc.bottom; i++) {
-				__halftone->dither(in_buffer, ptr, x, y, width);
-	
-				compressed_size = pack_bits(out_buffer, in_buffer, in_size);
+			
+				for (int plane = 0; plane < num_planes; plane ++) {
+					
+					if (color) {
+						switch (plane) {
+							// XXX maybe order should be red, green, blue. This could be
+							// a bug in __halftone dither where it passes rgb_color to
+							// a gray function in wrong order!
+							case 0: __halftone->setGrayFunction(Halftone::kBlueChannel);
+								break;
+							case 1: __halftone->setGrayFunction(Halftone::kGreenChannel);
+								break;
+							case 2: __halftone->setGrayFunction(Halftone::kRedChannel);
+								break;
+						}
+					}
+					
+					__halftone->dither(in_buffer, ptr, x, y, width);
+					
+					if (color) {
+						// in color mode a value of 1 in all three planes means white
+						// fill the remaining bits to the bytes boundary with 1s
+						in_buffer[in_size - 1] |= fill_mask;
+					}
+		
+					compressed_size = pack_bits(out_buffer, in_buffer, in_size);
+					
+					if (compressed_size + bytesToEnterCompressionMethod(2) < in_size + bytesToEnterCompressionMethod(0)) {
+						compression_method = 2; // back bits
+						buffer = out_buffer;
+					} else {
+						compression_method = 0; // uncompressed
+						buffer = in_buffer;
+						compressed_size = in_size;
+					}
+		
+					rasterGraphics(
+						compression_method,
+						buffer,
+						compressed_size,
+						plane == num_planes - 1);
 				
-				if (compressed_size < in_size) {
-					compression_method = 2; // back bits
-					buffer = out_buffer;
-				} else {
-					compression_method = 0; // uncompressed
-					buffer = in_buffer;
-					compressed_size = in_size;
 				}
-	
-				rasterGraphics(
-					compression_method,
-					buffer,
-					compressed_size);
 
 				ptr  += delta;
 				y++;
@@ -192,6 +224,7 @@ bool PCL5Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 
 void PCL5Driver::jobStart()
 {
+	const bool color = getJobData()->getColor() == JobData::kCOLOR;
 	// enter PCL5
 	writeSpoolString("\033%%-12345X@PJL ENTER LANGUAGE=PCL\n");
 	// reset
@@ -204,6 +237,10 @@ void PCL5Driver::jobStart()
 	writeSpoolString("\033&l0A");
 	// page orientation
 	writeSpoolString("\033&l0O");
+	if (color) {
+		// 3 color planes (red, green, blue)
+		writeSpoolString("\033*r3U");
+	}
 	// raster presentation
 	writeSpoolString("\033*r0F");
 	// top maring and perforation skip
@@ -214,8 +251,13 @@ void PCL5Driver::jobStart()
 	// writeSpoolString("\033&l%ldL", getJobData()->getCopies());
 }
 
-void PCL5Driver::startRasterGraphics()
+void PCL5Driver::startRasterGraphics(int width, int height)
 {
+	// width
+	writeSpoolString("\033*r%dS", width);
+	// height
+	writeSpoolString("\033*r%dT", height);
+	// start raster graphics
 	writeSpoolString("\033*r1A");
 	__compression_method = -1;
 }
@@ -228,13 +270,19 @@ void PCL5Driver::endRasterGraphics()
 void PCL5Driver::rasterGraphics(
 	int compression_method,
 	const uchar *buffer,
-	int size)
+	int size,
+	bool lastPlane)
 {
 	if (__compression_method != compression_method) {
 		writeSpoolString("\033*b%dM", compression_method);
 		__compression_method = compression_method;
 	}
-	writeSpoolString("\033*b%dW", size);
+	writeSpoolString("\033*b%d", size);
+	if (lastPlane) {
+		writeSpoolString("W");
+	} else {
+		writeSpoolString("V");
+	}
 	writeSpoolData(buffer, size);
 }
 
@@ -248,3 +296,13 @@ void PCL5Driver::move(int x, int y)
 {
 	writeSpoolString("\033*p%dx%dY", x, y+75);
 }
+
+int PCL5Driver::bytesToEnterCompressionMethod(int compression_method)
+{
+	if (__compression_method == compression_method) {
+		return 0;
+	} else {
+		return 5;
+	}
+}
+
