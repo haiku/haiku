@@ -37,7 +37,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab);
-static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec);
+static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec);
 static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* exec);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
@@ -889,11 +889,11 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	LOG(8,("\nINFO: executing type2 script at adress $%04x...\n", adress));
 	LOG(8,("INFO: ---Executing following command(s):'\n"));
 
-	return exec_type2_script_mode(rom, adress, size, tabs, ram_tab, &exec);
+	return exec_type2_script_mode(rom, &adress, size, tabs, ram_tab, &exec);
 }
 
 /* this routine is used for NV10 and later */
-static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec)
+static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec)
 {
 	status_t result = B_OK;
 	bool end = false;
@@ -902,13 +902,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 
 	while (!end)
 	{
-		LOG(8,("INFO: $%04x ($%02x); ", adress, rom[adress]));
+		LOG(8,("INFO: $%04x ($%02x); ", *adress, rom[*adress]));
 
 		//fixme: complete (if possible) ...
-		switch (rom[adress])
+		switch (rom[*adress])
 		{
 		case 0x32: /* new */
-			*size -= (11 + ((*((uint8*)(&(rom[(adress + 6)])))) << 2));
+			*size -= (11 + ((*((uint8*)(&(rom[(*adress + 6)])))) << 2));
 			if (*size < 0)
 			{
 				LOG(8,("script size error, aborting!\n\n"));
@@ -918,19 +918,19 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint16*)(&(rom[adress])));
-			adress += 2;
-			index = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			and_out = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			byte2 = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			size32 = ((*((uint8*)(&(rom[adress])))) << 2);
-			adress += 1;
-			reg2 = *((uint32*)(&(rom[adress])));
-			adress += 4;
+			*adress += 1;
+			reg = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			index = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			and_out = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			byte2 = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			size32 = ((*((uint8*)(&(rom[*adress])))) << 2);
+			*adress += 1;
+			reg2 = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
 			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
 				index, reg, and_out, byte2));
 			LOG(8,("INFO: (cont.) RD 32bit data from subtable with size $%04x, at offset (result << 2),\n",
@@ -945,13 +945,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 				byte &= (uint8)and_out;
 				byte >>= byte2;
 				offset32 = (byte << 2);
-				data = *((uint32*)(&(rom[(adress + offset32)])));
+				data = *((uint32*)(&(rom[(*adress + offset32)])));
 				NV_REG32(reg2) = data;
 			}
-			adress += size32;
+			*adress += size32;
 			break;
-		case 0x34: /* new */
-			*size -= (12 + ((*((uint8*)(&(rom[(adress + 7)])))) << 1));
+		case 0x33: /* new */
+			*size -= 2;
 			if (*size < 0)
 			{
 				LOG(8,("script size error, aborting!\n\n"));
@@ -961,21 +961,50 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint16*)(&(rom[adress])));
-			adress += 2;
-			index = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			and_out = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			shift = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			offset32 = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			size32 = ((*((uint8*)(&(rom[adress])))) << 1);
-			adress += 1;
-			reg2 = *((uint32*)(&(rom[adress])));
-			adress += 4;
+			*adress += 1;
+			size32 = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			/* executed 1-256 times */
+			if (!size32) size32 = 256;
+			/* remember where to start each time */
+			safe32 = *adress;
+			LOG(8,("cmd 'execute following part of this script $%03x times' (always done)\n", size32));
+			for (offset32 = 0; offset32 < size32; offset32++)
+			{
+				LOG(8,("\nINFO: (#$%02x) executing part of type2 script at adress $%04x...\n",
+					offset32, *adress));
+				LOG(8,("INFO: ---Not touching 'execution' mode at this time:'\n"));
+				*adress = safe32;
+				result = exec_type2_script_mode(rom, adress, size, tabs, ram_tab, exec);
+			}
+			LOG(8,("INFO: ---Continuing script:'\n"));
+			break;
+		case 0x34: /* new */
+			*size -= (12 + ((*((uint8*)(&(rom[(*adress + 7)])))) << 1));
+			if (*size < 0)
+			{
+				LOG(8,("script size error, aborting!\n\n"));
+				end = true;
+				result = B_ERROR;
+				break;
+			}
+
+			/* execute */
+			*adress += 1;
+			reg = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			index = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			and_out = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			shift = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			offset32 = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			size32 = ((*((uint8*)(&(rom[*adress])))) << 1);
+			*adress += 1;
+			reg2 = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
 			safe = ISARB(reg);
 			ISAWB(reg, index);
 			byte = ISARB(reg + 1);
@@ -983,7 +1012,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			byte &= (uint8)and_out;
 			data = (byte >> shift);
 			data <<= 1;
-			data2 = *((uint16*)(&(rom[(adress + data)])));
+			data2 = *((uint16*)(&(rom[(*adress + data)])));
 			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
 				index, reg, and_out, shift));
 			LOG(8,("INFO: (cont.) RD 16bit PLL frequency to pgm from subtable with size $%04x, at offset (result << 1),\n",
@@ -1021,7 +1050,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 //					DACW(PIXPLLC2, 0x80000401);
 			}
 			log_pll(reg2);
-			adress += size32;
+			*adress += size32;
 			break;
 		case 0x37: /* new */
 			*size -= 11;
@@ -1034,19 +1063,19 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			byte2 = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			and_out = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			reg2 = *((uint16*)(&(rom[adress])));
-			adress += 2;
-			index = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			and_out2 = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			byte2 = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			and_out = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			reg2 = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			index = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			and_out2 = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			LOG(8,("cmd 'RD 32bit reg $%08x, shift-right = $%02x, AND-out lsb = $%02x,\n",
 				reg, byte2, and_out));
 			LOG(8,("INFO: (cont.) RD 8bit ISA reg $%02x via $%04x, AND-out = $%02x, OR-in lsb result 32bit, WR-bk'\n",
@@ -1083,7 +1112,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
+			*adress += 1;
 			LOG(8,("cmd 'invert current mode'\n"));
 			*exec = !(*exec);
 			if (*exec)
@@ -1102,9 +1131,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			data = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			data = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			exec_cmd_39_type2(rom, data, tabs, exec);
 			break;
 		case 0x62: /* new */
@@ -1118,13 +1147,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint16*)(&(rom[adress])));
-			adress += 2;
-			index = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			byte = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			reg = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			index = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			byte = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			LOG(8,("cmd 'WR idx ISA reg $%02x via $%04x = $%02x'\n", index, reg, byte));
 			if (*exec)
 			{
@@ -1144,7 +1173,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
+			*adress += 1;
 			LOG(8,("cmd 'setup RAM config' (always done)\n"));
 			/* always done */
 			setup_ram_config_nv10_up(rom, ram_tab);
@@ -1160,13 +1189,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			data = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			data2 = *((uint32*)(&(rom[adress])));
-			adress += 4;
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			data = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			data2 = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
@@ -1189,13 +1218,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint16*)(&(rom[adress])));
-			adress += 2;
-			and_out = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			or_in = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			reg = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			and_out = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			or_in = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			LOG(8,("cmd 'RD 8bit ISA reg $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (*exec)
@@ -1217,9 +1246,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			data = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			data = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			data2 = *((uint16*)(&(rom[(tabs.InitScriptTablePtr + (data << 1))])));
 			LOG(8,("cmd 'gosub script #$%02x at adress $%04x'\n", data, data2));
 			if (*exec && data2)
@@ -1239,13 +1268,13 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			and_out = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			or_in = *((uint32*)(&(rom[adress])));
-			adress += 4;
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			and_out = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			or_in = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
 			LOG(8,("cmd 'RD 32bit reg $%08x, AND-out = $%08x, OR-in = $%08x, WR-bk'\n",
 				reg, and_out, or_in));
 			if (*exec)
@@ -1267,9 +1296,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			data = (*((uint8*)(&(rom[adress]))) << 1);
-			adress += 1;
+			*adress += 1;
+			data = (*((uint8*)(&(rom[*adress]))) << 1);
+			*adress += 1;
 			data += tabs.MacroIndexTablePtr;
 			offset32 = (*((uint8*)(&(rom[data]))) << 3);
 			size32 = *((uint8*)(&(rom[(data + 1)])));
@@ -1313,6 +1342,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 				LOG(8,("script size error!\n\n"));
 				result = B_ERROR;
 			}
+
+			/* execute */
+			*adress += 1; /* needed to make cmd #$33 work correctly! */
 			break;
 		case 0x72: /* identical to type1 */
 			*size -= 1;
@@ -1323,7 +1355,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
+			*adress += 1;
 			LOG(8,("cmd 'PGM commands'\n"));
 			LOG(8,("INFO: ---Executing following command(s):'\n"));
 			*exec = true;
@@ -1339,9 +1371,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			data = *((uint16*)(&(rom[adress])));
-			adress += 2;
+			*adress += 1;
+			data = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
 			LOG(8,("cmd 'SNOOZE for %d ($%04x) microSeconds' (always done)\n", data, data));
 			/* always done */
 			snooze(data);
@@ -1355,9 +1387,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			data = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			data = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			data *= 12;
 			data += tabs.ConditionTablePtr;
 			reg = *((uint32*)(&(rom[data])));
@@ -1386,9 +1418,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			data = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			data = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			data *= 5;
 			data += tabs.IOConditionTablePtr;
 			reg = *((uint16*)(&(rom[data])));
@@ -1423,15 +1455,15 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint16*)(&(rom[adress])));
-			adress += 2;
-			index = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			and_out = *((uint8*)(&(rom[adress])));
-			adress += 1;
-			or_in = *((uint8*)(&(rom[adress])));
-			adress += 1;
+			*adress += 1;
+			reg = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
+			index = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			and_out = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
+			or_in = *((uint8*)(&(rom[*adress])));
+			*adress += 1;
 			LOG(8,("cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
 			if (*exec)
@@ -1457,11 +1489,11 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 
 			/* execute */
 			//fixme: setup new PLL routines that adhere to pins speeds for VCO, etc...
-			adress += 1;
-			reg = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			data = *((uint16*)(&(rom[adress])));
-			adress += 2;
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			data = *((uint16*)(&(rom[*adress])));
+			*adress += 2;
 			LOG(8,("cmd 'calculate and set PLL 32bit reg $%08x for %.3fMHz'\n", reg, (data / 100.0)));
 			if (*exec)
 			{
@@ -1491,11 +1523,11 @@ static status_t exec_type2_script_mode(uint8* rom, uint16 adress, int16* size, P
 			}
 
 			/* execute */
-			adress += 1;
-			reg = *((uint32*)(&(rom[adress])));
-			adress += 4;
-			data = *((uint32*)(&(rom[adress])));
-			adress += 4;
+			*adress += 1;
+			reg = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
+			data = *((uint32*)(&(rom[*adress])));
+			*adress += 4;
 			LOG(8,("cmd 'WR 32bit reg' $%08x = $%08x\n", reg, data));
 			if (*exec) NV_REG32(reg) = data;
 			break;
