@@ -87,6 +87,8 @@ int vfs_set_cache_ptr(void *vnode, void *cache);
 /* calls kernel code should make for file I/O */
 int sys_mount(const char *path, const char *device, const char *fs_name, void *args);
 int sys_unmount(const char *path);
+status_t _kern_read_fs_info(dev_t device, struct fs_info *info);
+status_t _kern_write_fs_info(dev_t device, const struct fs_info *info, int mask);
 int sys_sync(void);
 int sys_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
 int sys_open(const char *path, int omode);
@@ -127,6 +129,8 @@ int sys_setcwd(int fd, const char *path);
 /* calls the syscall dispatcher should use for user file I/O */
 int user_mount(const char *path, const char *device, const char *fs_name, void *args);
 int user_unmount(const char *path);
+status_t _user_read_fs_info(dev_t device, struct fs_info *info);
+status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);
 int user_sync(void);
 int user_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
 int user_open(const char *path, int omode);
