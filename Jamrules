@@ -719,7 +719,7 @@ rule Translator
 
 	# Create output dir path for translator
 	local targetdir;
-	targetdir = [ FDirName $(OBOS_ADDON_DIR) translators ] ;
+	targetdir = [ FDirName $(OBOS_ADDON_DIR) Translators ] ;
 	MakeLocate $(1) : $(targetdir) ;
 }
 
