@@ -33,6 +33,9 @@
 
 #include "DisplayDriver.h"
 
+class HWInterface;
+class Painter;
+
 class DisplayDriverPainter : public DisplayDriver {
  public:
 								DisplayDriverPainter();
@@ -225,16 +228,8 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual	bool				IsCursorObscured(bool state);*/
 	
 	
-	// These two will rarely be implemented by subclasses,
-	// but it still needs to be possible
-	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	virtual void				Unlock();
-
 	// display mode access
 	virtual void				SetMode(const display_mode &mode);
-			void				GetMode(display_mode *mode);
-	inline	const display_mode*	DisplayMode() const
-									{ return &fDisplayMode; }
 	
 	virtual bool				DumpToFile(const char *path);
 	virtual ServerBitmap*		DumpToBitmap();
@@ -282,7 +277,8 @@ class DisplayDriverPainter : public DisplayDriver {
 	virtual	void				ConstrainClippingRegion(BRegion *reg);
 
  private:
-			Painter				fPainter;
+			Painter*			fPainter;
+			HWInterface*		fGraphicsCard;
 };
 
 #endif // _DISPLAY_DRIVER_PAINTER_H_

@@ -26,17 +26,24 @@
 //------------------------------------------------------------------------------
 #include <stdio.h>
 
+#include "Painter.h"
+#include "RenderingBuffer.h"
+#include "ViewHWInterface.h"
+
 #include "DisplayDriverPainter.h"
 
 // constructor
 DisplayDriverPainter::DisplayDriverPainter()
-	: DisplayDriver()
+	: DisplayDriver(),
+	  fPainter(new Painter()),
+	  fGraphicsCard(new ViewHWInterface())
 {
 }
 
 // destructor
 DisplayDriverPainter::~DisplayDriverPainter()
 {
+	delete fGraphicsCard;
 }
 
 // Initialize
@@ -82,7 +89,8 @@ DisplayDriverPainter::InvertRect(const BRect &r)
 {
 	if (Lock()) {
 
-		fPainter.InvertRect(r);
+		fPainter->InvertRect(r);
+		fGraphicsCard->Invalidate(r);
 
 		Unlock();
 	}
@@ -94,22 +102,147 @@ DisplayDriverPainter::DrawBitmap(BRegion *region, ServerBitmap *bitmap,
 								 const BRect &source, const BRect &dest,
 								 const DrawData *d)
 {
-	if (region && Lock()) {
+	// catch PicturePlayer giving us a NULL region
+	if (!region)
+		return;
 
-		fPainter.ConstrainClipping(*region);
-		fPainter.SetDrawData(d);
-		fPainter.DrawBitmap(bitmap, source, dest);
+	if (Lock()) {
+
+		fPainter->ConstrainClipping(*region);
+		fPainter->SetDrawData(d);
+		fPainter->DrawBitmap(bitmap, source, dest);
+
+		fGraphicsCard->Invalidate(dest);
 
 		Unlock();
 	}
 }
 
+// used to move windows arround on screen
+//
 // CopyRegionList
 void
 DisplayDriverPainter::CopyRegionList(BList* list, BList* pList,
 									 int32 rCount, BRegion* clipReg)
 {
-	fprintf(stdout, "DisplayDriverPainter::CopyRegionList()\b");
+	if (!clipReg || !Lock())
+		return;
+
+// This is the same implementation as in DisplayDriverImpl for now
+
+// since we're not using painter.... this won't do much good, will it?
+//	fPainter->ConstrainClipping(*clipReg);
+
+	RenderingBuffer* bmp = fGraphicsCard->BackBuffer();
+	
+	uint32		bytesPerPixel	= bmp->BytesPerRow() / bmp->Width();
+	BList		rectList;
+	int32		i, k;
+	uint8		*bitmapBits = (uint8*)bmp->Bits();
+	int32		Bwidth		= bmp->Width();
+	int32		Bheight		= bmp->Height();
+
+	BRect updateRect;
+
+	for (k = 0; k < rCount; k++) {
+		BRegion* reg = (BRegion*)list->ItemAt(k);
+
+		int32 rectCount = reg->CountRects();
+		for(i=0; i < rectCount; i++) {
+			BRect		r		= reg->RectAt(i);
+			uint8		*rectCopy;
+			uint8		*srcAddress;
+			uint8		*destAddress;
+			int32		firstRow, lastRow;
+			int32		firstCol, lastCol;
+			int32		copyLength;
+			int32		copyRows;
+	
+			firstRow	= (int32)(r.top < 0? 0: r.top);
+			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+			firstCol	= (int32)(r.left < 0? 0: r.left);
+			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+			copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+			copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+	
+			rectCopy	= (uint8*)malloc(copyLength * copyRows * bytesPerPixel);
+	
+			srcAddress	= bitmapBits + (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
+			destAddress	= rectCopy;
+	
+			for (int32 j = 0; j < copyRows; j++) {
+				uint8		*destRowAddress	= destAddress + (j * copyLength * bytesPerPixel);
+				uint8		*srcRowAddress	= srcAddress + (j * Bwidth * bytesPerPixel);
+				memcpy(destRowAddress, srcRowAddress, copyLength * bytesPerPixel );
+			}
+		
+			rectList.AddItem(rectCopy);
+		}
+	}
+
+	int32 item = 0;
+	for(k = 0; k < rCount; k++) {
+		BRegion* reg = (BRegion*)list->ItemAt(k);
+	
+		int32 rectCount = reg->CountRects();
+		for(i=0; i < rectCount; i++)
+		{
+			BRect		r		= reg->RectAt(i);
+			uint8		*rectCopy;
+			uint8		*srcAddress;
+			uint8		*destAddress;
+			int32		firstRow, lastRow;
+			int32		firstCol, lastCol;
+			int32		copyLength, copyLength2;
+			int32		copyRows, copyRows2;
+	
+			firstRow	= (int32)(r.top < 0? 0: r.top);
+			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+			firstCol	= (int32)(r.left < 0? 0: r.left);
+			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+			copyLength	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+			copyRows	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+	
+			rectCopy	= (uint8*)rectList.ItemAt(item++);
+	
+			srcAddress	= rectCopy;
+	
+			r.Set(firstCol, firstRow, lastCol, lastRow);
+			r.OffsetBy( *((BPoint*)pList->ItemAt(k%rCount)) );
+
+			// keep track of invalid area
+			updateRect = updateRect.IsValid() ? updateRect | r : r;
+
+			firstRow	= (int32)(r.top < 0? 0: r.top);
+			lastRow		= (int32)(r.bottom > (Bheight-1)? (Bheight-1): r.bottom);
+			firstCol	= (int32)(r.left < 0? 0: r.left);
+			lastCol		= (int32)(r.right > (Bwidth-1)? (Bwidth-1): r.right);
+			copyLength2	= (lastCol - firstCol + 1) < 0? 0: (lastCol - firstCol + 1);
+			copyRows2	= (lastRow - firstRow + 1) < 0? 0: (lastRow - firstRow + 1);
+	
+			destAddress	= bitmapBits + (((firstRow) * Bwidth + firstCol) * bytesPerPixel);
+	
+			int32		minLength	= copyLength < copyLength2? copyLength: copyLength2;
+			int32		minRows		= copyRows < copyRows2? copyRows: copyRows2;
+	
+			for (int32 j = 0; j < minRows; j++)
+			{
+				uint8		*destRowAddress	= destAddress + (j * Bwidth * bytesPerPixel);
+				uint8		*srcRowAddress	= srcAddress + (j * copyLength * bytesPerPixel);
+				memcpy(destRowAddress, srcRowAddress, minLength * bytesPerPixel );
+			}
+		}
+	}
+
+	int32 count = rectList.CountItems();
+	for (i = 0; i < count; i++) {
+		if (void* rectCopy = rectList.ItemAt(i))
+			free(rectCopy);
+	}
+
+	fGraphicsCard->Invalidate(updateRect);
+
+	Unlock();
 }
 
 // FillArc
@@ -117,10 +250,18 @@ void
 DisplayDriverPainter::FillArc(const BRect &r, const float &angle,
 							  const float &span, const DrawData *d)
 {
-	if (region && Lock()) {
+	if (Lock()) {
 
-		fPainter.SetDrawData(d);
-		fPainter.DrawBitmap(bitmap, source, dest);
+		fPainter->SetDrawData(d);
+
+		float xRadius = r.Width() / 2.0;
+		float yRadius = r.Width() / 2.0;
+		BPoint center(r.left + xRadius,
+					  r.top + yRadius);
+
+		fPainter->FillArc(center, xRadius, yRadius, angle, span);
+
+		fGraphicsCard->Invalidate(r);
 
 		Unlock();
 	}
@@ -130,12 +271,37 @@ DisplayDriverPainter::FillArc(const BRect &r, const float &angle,
 void
 DisplayDriverPainter::FillBezier(BPoint *pts, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		fPainter->FillBezier(pts);
+
+		// TODO: Invalidate
+
+		Unlock();
+	}
 }
 
 // FillEllipse
 void
 DisplayDriverPainter::FillEllipse(const BRect &r, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		float xRadius = r.Width() / 2.0;
+		float yRadius = r.Width() / 2.0;
+		BPoint center(r.left + xRadius,
+					  r.top + yRadius);
+
+		fPainter->FillEllipse(center, xRadius, yRadius);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // FillPolygon
@@ -143,24 +309,68 @@ void
 DisplayDriverPainter::FillPolygon(BPoint *ptlist, int32 numpts,
 								  const BRect &bounds, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->FillPolygon(ptlist, numpts);
+
+		fGraphicsCard->Invalidate(bounds);
+
+		Unlock();
+	}
 }
 
 // FillRect
 void
 DisplayDriverPainter::FillRect(const BRect &r, const RGBColor &color)
 {
+	if (Lock()) {
+
+		fPainter->SetHighColor(color);
+		fPainter->FillRect(r);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // FillRect
 void
 DisplayDriverPainter::FillRect(const BRect &r, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->FillRect(r);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // FillRegion
 void
 DisplayDriverPainter::FillRegion(BRegion& r, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		BRect invalid = r.RectAt(0);
+		fPainter->FillRect(invalid);
+
+		int32 count = r.CountRects();
+		for (int32 i = 1; i < count; i++) {
+			fPainter->FillRect(r.RectAt(i));
+			invalid = invalid | r.RectAt(i);
+		}
+
+		fGraphicsCard->Invalidate(invalid);
+
+		Unlock();
+	}
 }
 
 // FillRoundRect
@@ -208,12 +418,32 @@ DisplayDriverPainter::StrokeEllipse(const BRect &r, const DrawData *d)
 void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
+	if (Lock()) {
+
+		fPainter->SetHighColor(color);
+		fPainter->StrokeLine(start, end);
+
+		BRect r(start, end);
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // StrokeLine
 void
 DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->StrokeLine(start, end);
+
+		BRect r(start, end);
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // used by decorator
@@ -222,12 +452,14 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const D
 void
 DisplayDriverPainter::StrokePoint(const BPoint& pt, const RGBColor &color)
 {
+	StrokeLine(pt, pt, color);
 }
 
 // StrokePoint
 void
 DisplayDriverPainter::StrokePoint(const BPoint& pt, const DrawData *d)
 {
+	StrokeLine(pt, pt, d);
 }
 
 // StrokePolygon
@@ -242,18 +474,53 @@ DisplayDriverPainter::StrokePolygon(BPoint *ptlist, int32 numpts,
 void
 DisplayDriverPainter::StrokeRect(const BRect &r, const RGBColor &color)
 {
+	if (Lock()) {
+
+		fPainter->SetHighColor(color);
+		fPainter->StrokeRect(r);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // StrokeRect
 void
 DisplayDriverPainter::StrokeRect(const BRect &r, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+		fPainter->StrokeRect(r);
+
+		fGraphicsCard->Invalidate(r);
+
+		Unlock();
+	}
 }
 
 // StrokeRegion
 void
 DisplayDriverPainter::StrokeRegion(BRegion& r, const DrawData *d)
 {
+	if (Lock()) {
+
+		fPainter->SetDrawData(d);
+
+		BRect invalid = r.RectAt(0);
+		fPainter->StrokeRect(invalid);
+
+		int32 count = r.CountRects();
+		for (int32 i = 1; i < count; i++) {
+			fPainter->StrokeRect(r.RectAt(i));
+			invalid = invalid | r.RectAt(i);
+		}
+
+		fGraphicsCard->Invalidate(invalid);
+
+		Unlock();
+	}
 }
 
 // StrokeRoundRect
@@ -284,6 +551,7 @@ DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, const RGBColor &color,
 								 escapement_delta *delta)
 {
+	// what - without any clipping?!?
 	DrawData d;
 	d.highcolor=color;
 	
@@ -297,6 +565,17 @@ void
 DisplayDriverPainter::DrawString(const char *string, const int32 &length,
 								 const BPoint &pt, DrawData *d)
 {
+	if (Lock()) {
+		fPainter->SetDrawData(d);
+
+		BRect boundingBox = fPainter->BoundingBox(string, length, pt);
+
+		fPainter->DrawString(string, length, pt);
+
+		fGraphicsCard->Invalidate(boundingBox);
+
+		Unlock();
+	}
 }
 
 // StringWidth
@@ -304,7 +583,14 @@ float
 DisplayDriverPainter::StringWidth(const char *string, int32 length,
 								  const DrawData *d)
 {
-
+	float width = 0.0;
+	if (Lock()) {
+		fPainter->SetDrawData(d);
+		BPoint dummy(0.0, 0.0);
+		width = fPainter->BoundingBox(string, length, dummy).Width();
+		Unlock();
+	}
+	return width;
 }
 
 // StringHeight
@@ -312,6 +598,14 @@ float
 DisplayDriverPainter::StringHeight(const char *string, int32 length,
 								   const DrawData *d)
 {
+	float height = 0.0;
+	if (Lock()) {
+		fPainter->SetDrawData(d);
+		BPoint dummy(0.0, 0.0);
+		height = fPainter->BoundingBox(string, length, dummy).Height();
+		Unlock();
+	}
+	return height;
 }
 
 // GetBoundingBoxes
@@ -321,6 +615,8 @@ DisplayDriverPainter::GetBoundingBoxes(const char *string, int32 count,
 									   escapement_delta *delta,
 									   BRect *rectarray, const DrawData *d)
 {
+	// ?!? each glyph or what?
+	printf("DisplayDriverPainter::GetBoundingBoxes()\n");
 }
 
 // GetEscapements
@@ -331,6 +627,7 @@ DisplayDriverPainter::GetEscapements(const char *string, int32 charcount,
 									 escapement_delta *offsets,
 									 const DrawData *d)
 {
+	printf("DisplayDriverPainter::GetEscapements()\n");
 }
 
 // GetEdges
@@ -338,12 +635,14 @@ void
 DisplayDriverPainter::GetEdges(const char *string, int32 charcount,
 							   edge_info *edgearray, const DrawData *d)
 {
+	printf("DisplayDriverPainter::GetEdges()\n");
 }
 
 // GetHasGlyphs
 void DisplayDriverPainter::GetHasGlyphs(const char *string, int32 charcount,
 										bool *hasarray)
 {
+	printf("DisplayDriverPainter::GetHasGlyphs()\n");
 }
 
 // GetTruncatedStrings
@@ -354,6 +653,18 @@ DisplayDriverPainter::GetTruncatedStrings(const char **instrings,
 										  const float &maxwidth,
 										  char **outstrings)
 {
+	printf("DisplayDriverPainter::GetTruncatedStrings()\n");
+}
+
+// SetMode
+void
+DisplayDriverPainter::SetMode(const display_mode &mode)
+{
+	if (Lock() && fGraphicsCard->SetMode(mode) >= B_OK) {
+		fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
+		DisplayDriver::SetMode(mode);
+		Unlock();
+	}
 }
 
 // DumpToFile
@@ -376,20 +687,43 @@ DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
 									  const LineArrayData *linedata,
 									  const DrawData *d)
 {
+	// I'm suspecting this is not used
+	printf("DisplayDriverPainter::StrokeLineArray()\n");
+}
+
+// SetDPMSMode
+status_t
+DisplayDriverPainter::SetDPMSMode(const uint32 &state)
+{
+	return B_ERROR;
+}
+
+// DPMSMode
+uint32
+DisplayDriverPainter::DPMSMode() const
+{
+	return 0;
+}
+
+// DPMSCapabilities
+uint32
+DisplayDriverPainter::DPMSCapabilities() const
+{
+	return 0;
 }
 
 // GetDeviceInfo
 status_t
 DisplayDriverPainter::GetDeviceInfo(accelerant_device_info *info)
 {
-	return B_ERROR;
+	return fGraphicsCard->GetDeviceInfo(info);
 }
 
 // GetModeList
 status_t
 DisplayDriverPainter::GetModeList(display_mode **mode_list, uint32 *count)
 {
-	return B_UNSUPPORTED;
+	return fGraphicsCard->GetModeList(mode_list, count);
 }
 
 // GetPixelClockLimits
@@ -397,14 +731,14 @@ status_t DisplayDriverPainter::GetPixelClockLimits(display_mode *mode,
 												   uint32 *low,
 												   uint32 *high)
 {
-	return B_UNSUPPORTED;
+	return fGraphicsCard->GetPixelClockLimits(mode, low, high);
 }
 
 // GetTimingConstraints
 status_t
 DisplayDriverPainter::GetTimingConstraints(display_timing_constraints *dtc)
 {
-	return B_UNSUPPORTED;
+	return fGraphicsCard->GetTimingConstraints(dtc);
 }
 
 // ProposeMode
@@ -413,94 +747,14 @@ DisplayDriverPainter::ProposeMode(display_mode *candidate,
 								  const display_mode *low,
 								  const display_mode *high)
 {
-	return B_UNSUPPORTED;
+	return fGraphicsCard->ProposeMode(candidate, low, high);
 }
 
 // WaitForRetrace
 status_t
 DisplayDriverPainter::WaitForRetrace(bigtime_t timeout)
 {
-	return B_UNSUPPORTED;
-}
-
-// _GetCursor
-ServerCursor*
-DisplayDriverPainter::_GetCursor()
-{
-	Lock();
-	ServerCursor *c = fCursorHandler.GetCursor();
-	Unlock();
-	
-	return c;
-}
-
-// HLinePatternThick
-void
-DisplayDriverPainter::HLinePatternThick(int32 x1, int32 x2, int32 y)
-{
-}
-
-// VLinePatternThick
-void
-DisplayDriverPainter::VLinePatternThick(int32 x1, int32 x2, int32 y)
-{
-}
-
-// SetThickPatternPixel
-void
-DisplayDriverPainter::SetThickPatternPixel(int x, int y)
-{
-}
-
-// AcquireBuffer
-bool
-DisplayDriverPainter::AcquireBuffer(FBBitmap *bmp)
-{
-	return false;
-}
-
-// ReleaseBuffer
-void
-DisplayDriverPainter::ReleaseBuffer()
-{
-}
-
-// Blit
-void
-DisplayDriverPainter::Blit(const BRect &src, const BRect &dest,
-						   const DrawData *d)
-{
-}
-
-// FillSolidRect
-void
-DisplayDriverPainter::FillSolidRect(const BRect &rect, const RGBColor &color)
-{
-}
-
-// FillPatternRect
-void
-DisplayDriverPainter::FillPatternRect(const BRect &rect, const DrawData *d)
-{
-}
-
-// StrokeSolidLine
-void
-DisplayDriverPainter::StrokeSolidLine(int32 x1, int32 y1,
-									  int32 x2, int32 y2, const RGBColor &color)
-{
-}
-
-// StrokePatternLine
-void
-DisplayDriverPainter::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
-{
-}
-
-// StrokeSolidRect
-void
-DisplayDriverPainter::StrokeSolidRect(const BRect &rect, const RGBColor &color)
-{
+	return fGraphicsCard->WaitForRetrace(timeout);
 }
 
 // CopyBitmap
@@ -520,9 +774,18 @@ void DisplayDriverPainter::CopyToBitmap(ServerBitmap *target,
 // Invalidate
 void DisplayDriverPainter::Invalidate(const BRect &r)
 {
+	if (Lock()) {
+// ?!? Does this implementation need this?
+		fGraphicsCard->Invalidate(r);
+		Unlock();
+	}
 }
 
 // ConstrainClippingRegion
-void DisplayDriverPainter::ConstrainClippingRegion(BRegion *reg)
+void DisplayDriverPainter::ConstrainClippingRegion(BRegion *region)
 {
+	if (region && Lock()) {
+		fPainter->ConstrainClipping(*region);
+		Unlock();
+	}
 }
