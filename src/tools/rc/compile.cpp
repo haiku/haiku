@@ -32,7 +32,7 @@
 #include "rdef.h"
 #include "compile.h"
 #include "private.h"
-#include "parser.cpp.h"
+#include "parser.hpp"
 
 char lexfile[B_PATH_NAME_LENGTH];
 

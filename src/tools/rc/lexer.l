@@ -29,7 +29,7 @@
 #include "rdef.h"
 #include "compile.h"
 #include "private.h"
-#include "parser.cpp.h"
+#include "parser.hpp"
 
 #define LEXERROR(msg) abort_compile(RDEF_COMPILE_ERR, msg);
 
