@@ -1,0 +1,54 @@
+SubDir OBOS_TOP src add-ons kernel drivers network ipro1000 ;
+
+# set some additional flags
+SubDirCcFlags -Wall ;
+
+# For ether_driver.h
+UsePrivateHeaders net ;
+
+R5KernelAddon ipro1000 : kernel drivers bin :
+	driver.c 
+	device.c 
+	if_compat.c 
+	if_em.c
+	if_em_hw.c
+	if_em_osdep.c 
+	mempool.c 
+	util.c
+	;
+
+# Package openbeos-ipro1000-cvs :
+#	ipro1000 : 
+#	boot home config add-ons kernel drivers bin ;
+# Package openbeos-ipro1000-cvs :
+#	<kernel!drivers!dev!net>ipro1000 :
+#	boot home config add-ons kernel drivers dev net ;
+
+Package openbeos-networkingkit-cvs :
+	ipro1000 :
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-networkingkit-cvs :
+	<kernel!drivers!dev!net>ipro1000 :
+	boot home config add-ons kernel drivers dev net ;
+
+# Link driver(s) to kernel/drivers/dev/net
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
+	local instDriver = <kernel!drivers!dev!net>ipro1000 ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : ipro1000 ;
+}
+
+
+# Installation
+
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
+ 	ipro1000 
+;
+
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>ipro1000 : 
+	installed-symlink 
+;
+
