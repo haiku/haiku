@@ -1,6 +1,6 @@
-/* 
+/*
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
  *
  * Distributed under the terms of the MIT License.
  */
@@ -77,11 +77,12 @@ notify_debugger(struct thread *thread, int signal, struct sigaction *handler,
  *	caller must be aware that operations before calling this function and after
  *	its return might not belong to the same atomic section.
  */
+
 int
 handle_signals(struct thread *thread, cpu_status *state)
 {
 	uint32 signalMask = thread->sig_pending & (~thread->sig_block_mask);
-	int i, sig, global_resched = 0;
+	int i, signal, global_resched = 0;
 	struct sigaction *handler;
 
 	// If SIGKILL[THR] are pending, we ignore other signals.
@@ -108,12 +109,12 @@ handle_signals(struct thread *thread, cpu_status *state)
 			bool debugSignal = !(~atomic_get(&thread->team->debug_info.flags)
 				& (B_TEAM_DEBUG_SIGNALS | B_TEAM_DEBUG_DEBUGGER_INSTALLED));
 
-			sig = i + 1;
+			signal = i + 1;
 			handler = &thread->sig_action[i];
 			signalMask >>= 1;
-			thread->sig_pending &= ~(1L << i);
+			thread->sig_pending &= ~SIGNAL_TO_MASK(signal);
 
-			TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[sig]));
+			TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[signal]));
 
 			if (handler->sa_handler == SIG_IGN) {
 				// signal is to be ignored
@@ -121,12 +122,12 @@ handle_signals(struct thread *thread, cpu_status *state)
 
 				// notify the debugger
 				if (debugSignal)
-					notify_debugger(thread, sig, handler, false, state);
+					notify_debugger(thread, signal, handler, false, state);
 				continue;
 			}
 			if (handler->sa_handler == SIG_DFL) {
 				// default signal behaviour
-				switch (sig) {
+				switch (signal) {
 					case SIGCHLD:
 					case SIGWINCH:
 					case SIGTSTP:
@@ -135,14 +136,14 @@ handle_signals(struct thread *thread, cpu_status *state)
 					case SIGCONT:
 						// notify the debugger
 						if (debugSignal) {
-							notify_debugger(thread, sig, handler, false, state);
+							notify_debugger(thread, signal, handler, false, state);
 						}
 						continue;
 
 					case SIGSTOP:
 						// notify the debugger
 						if (debugSignal) {
-							if (!notify_debugger(thread, sig, handler, false,
+							if (!notify_debugger(thread, signal, handler, false,
 								state)) {
 								continue;
 							}
@@ -158,7 +159,7 @@ handle_signals(struct thread *thread, cpu_status *state)
 					case SIGABRT:
 					case SIGFPE:
 					case SIGSEGV:
-						TRACE(("Shutting down thread 0x%lx due to signal #%d\n", thread->id, sig));
+						TRACE(("Shutting down thread 0x%lx due to signal #%d\n", thread->id, signal));
 					case SIGKILL:
 					case SIGKILLTHR:
 					default:
@@ -166,9 +167,9 @@ handle_signals(struct thread *thread, cpu_status *state)
 							thread->exit.reason = THREAD_RETURN_INTERRUPTED;
 
 						// notify the debugger
-						if (debugSignal && sig != SIGKILL
-								&& sig != SIGKILLTHR) {
-							if (!notify_debugger(thread, sig, handler, true,
+						if (debugSignal && signal != SIGKILL
+								&& signal != SIGKILLTHR) {
+							if (!notify_debugger(thread, signal, handler, true,
 								state)) {
 								continue;
 							}
@@ -191,7 +192,7 @@ handle_signals(struct thread *thread, cpu_status *state)
 
 			// notify the debugger
 			if (debugSignal) {
-				if (!notify_debugger(thread, sig, handler, false, state))
+				if (!notify_debugger(thread, signal, handler, false, state))
 					continue;
 			}
 
@@ -201,12 +202,12 @@ handle_signals(struct thread *thread, cpu_status *state)
 
 			// User defined signal handler
 			TRACE(("### Setting up custom signal handler frame...\n"));
-			arch_setup_signal_frame(thread, handler, sig, thread->sig_block_mask);
+			arch_setup_signal_frame(thread, handler, signal, thread->sig_block_mask);
 
 			if (handler->sa_flags & SA_ONESHOT)
 				handler->sa_handler = SIG_DFL;
 			if (!(handler->sa_flags & SA_NOMASK))
-				thread->sig_block_mask |= (handler->sa_mask | SIGNAL_TO_MASK(sig)) & BLOCKABLE_SIGS;
+				thread->sig_block_mask |= (handler->sa_mask | SIGNAL_TO_MASK(signal)) & BLOCKABLE_SIGS;
 
 			return global_resched;
 		} else
@@ -285,6 +286,7 @@ deliver_signal(struct thread *thread, uint signal, uint32 flags)
 				scheduler_enqueue_in_run_queue(thread);
 			}
 			break;
+
 		default:
 			if (thread->sig_pending & (~thread->sig_block_mask | SIGNAL_TO_MASK(SIGCHLD))) {
 				// Interrupt thread if it was waiting
@@ -328,7 +330,7 @@ send_signal_etc(pid_t id, uint signal, uint32 flags)
 
 		GRAB_THREAD_LOCK();
 
-		thread = thread_get_thread_struct_locked(id);
+		thread = thread_get_thread_struct_locked(-id);
 		if (thread != NULL) {
 			struct process_group *group;
 			struct team *team, *next;
@@ -436,6 +438,7 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldSet)
  *	A \a threadID is < 0 specifies the current thread.
  *
  */
+
 int
 sigaction_etc(thread_id threadID, int signal, const struct sigaction *act,
 	struct sigaction *oact)
@@ -492,7 +495,7 @@ sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
 }
 
 
-// Triggers a SIGALRM to the thread that issued the timer and reschedules
+/** Triggers a SIGALRM to the thread that issued the timer and reschedules */
 
 static int32
 alarm_event(timer *t)
@@ -576,7 +579,7 @@ _user_sigprocmask(int how, const sigset_t *userSet, sigset_t *userOldSet)
 
 
 int
-_user_sigaction(int sig, const struct sigaction *userAction, struct sigaction *userOldAction)
+_user_sigaction(int signal, const struct sigaction *userAction, struct sigaction *userOldAction)
 {
 	struct sigaction act, oact;
 	status_t status;
@@ -585,7 +588,7 @@ _user_sigaction(int sig, const struct sigaction *userAction, struct sigaction *u
 		|| (userOldAction != NULL && user_memcpy(&oact, userOldAction, sizeof(struct sigaction)) < B_OK))
 		return B_BAD_ADDRESS;
 
-	status = sigaction(sig, userAction ? &act : NULL, userOldAction ? &oact : NULL);
+	status = sigaction(signal, userAction ? &act : NULL, userOldAction ? &oact : NULL);
 
 	// only copy the old action if a pointer has been given
 	if (status >= B_OK && userOldAction != NULL
