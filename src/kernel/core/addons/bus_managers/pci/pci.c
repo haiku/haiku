@@ -21,9 +21,9 @@
 
 #include <PCI.h>
 #include <bus.h>
-#include <pci_bus.h>
 
-#include "pci_p.h" // private includes
+/* Change to 1 to see more debugging :) */
+#define THE_FULL_MONTY 0
 
 struct found_pci_device {
 	struct found_pci_device *next;
@@ -49,6 +49,8 @@ static int        bus_max_devices = 32; /* max devices that any bus can support
                                          * this is only 16, instead of the 32 we
                                          * have with pci_mode == 1
                                          */
+static region_id  pci_region;           /* pci_bios region we map */
+static void *     pci_bios_ptr= NULL;   /* virtual address of memory we map */
 
 struct pci_config *pci_list;
 
@@ -210,6 +212,48 @@ static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg,
 	return;
 }
 
+/* pci_get_capability
+ * Try to get the offset and value of the specified capability from the
+ * devices capability list.
+ * returns 0 if unable, 1 if succesful
+ */
+static int pci_get_capability(uint8 bus, uint8 dev, uint8 func, uint8 cap, 
+                              uint8 *offs)
+{
+	uint16 status = read_pci_config(bus, dev, func, PCI_status, 2);
+	uint8 hdr_type, reg_data;
+	uint8 ofs;
+	
+	if (!(status & PCI_status_capabilities))
+		return 0;
+		
+	hdr_type = read_pci_config(bus, dev, func, PCI_header_type, 1);
+	switch(hdr_type) {
+		case PCI_header_type_generic:
+			ofs = PCI_capabilities_ptr;
+			break;
+		case PCI_header_type_cardbus:
+			ofs = PCI_capabilities_ptr_2;
+			break;
+		default:
+			return 0;
+	}
+	
+	ofs = read_pci_config(bus, dev, func, ofs, 1);
+	while (ofs != 0) {
+		reg_data = read_pci_config(bus, dev, func, ofs, 2);
+		if ((reg_data & 0xff) == cap) {
+			if (offs)
+				*offs = ofs;
+			return 1;
+		}
+		ofs = (reg_data >> 8) & 0xff;
+	}
+	return 0;
+}
+
+//static int pci_set_power_state
+
 /* set_pci_mechanism()
  * Try to determine which configuration mechanism the PCI Host Bridge
  * wants to deal with.
@@ -297,7 +341,109 @@ static int check_pci(void)
 	        "PCI will attempt to continue normally.\n");
 	return -1;
 }
+
+/* Intel specific 
+ *
+ * See http://www.microsoft.com/HWDEV/busbios/PCIIRQ.htm
+ *
+ * Intel boards have a PCI IRQ Routing table that contains details of
+ * how things get routed, information we need :(
+ */
+
+struct linkmap {
+	uint8  pin;
+	uint16 possible_irq;
+} _PACKED;
+
+struct pir_slot {
+	uint8  bus;
+	uint8  devfunc;
+	struct linkmap linkmap[4];
+	uint8  slot;
+	uint8  reserved;
+} _PACKED;
+
+#define PIR_HEADER "$PIR"
+
+struct pir_header {
+	char   signature[4];     /* always '$PIR' */
+	uint16 version;
+	uint16 tbl_sz;
+	uint8  router_bus;
+	uint8  router_devfunc;
+	uint16 exclusive_irq;
+	uint32 compat_vend;
+	uint32 miniport;
+	uint8  rsvd[11];
+	uint8  cksum;
+} _PACKED;
+
+struct pir_table {
+	struct pir_header hdr;
+	struct pir_slot slot[1];
+} _PACKED;
+
+#define PIR_DEVICE(devfunc)     (((devfunc) >> 3) & 0x1f)
+#define PIR_FUNCTION(devfunc)   ((devfunc) & 0x07)
+
+/* find_pir_table
+ * No real magic, just scan through the memory until we find it, 
+ * or not!
+ *
+ * When we check the size of the table, we need to satisfy that
+ *  size >= size of a pir_table with no pir_slots
+ *  size <= size of a pir_table with 32 pir_slots
+ * If we find a table, and it's a suitable size we'll check that the
+ * checksum is OK. This is done by simply adding up all the bytes and
+ * checking that the final value == 0. If it is we return the pointer to the table.
+ *
+ * Returns NULL if we fail to find a suitable table.
+ */
+static struct pir_table *find_pir_table(void)
+{
+	uint32 mem_addr = (uint32)pci_bios_ptr;
+	int range = 0x10000;
 	
+	for (; range > 0; range -= 16, mem_addr += 16) {
+		if (memcmp((void*)mem_addr, PIR_HEADER, 4) == 0) {
+			uint16 size = ((struct pir_header*)mem_addr)->tbl_sz;
+			if ((size >= (sizeof(struct pir_header))) &&
+			    (size <= (sizeof(struct pir_header) + sizeof(struct pir_slot) * 32))) {
+				uint16 i;
+				uint8 cksum = 0;
+				
+				for (i = 0; i < size; i++)
+					cksum += ((uint8*)mem_addr)[i];
+				if (cksum == 0)
+					return (struct pir_table *)mem_addr;
+			}
+		}
+	}
+	return NULL;
+}
+
+/* print_pir_table
+ * Print out the table to debug output
+ */
+#if THE_FULL_MONTY
+static void print_pir_table(struct pir_table *tbl)
+{
+	int i, j;
+	int entries = (tbl->hdr.tbl_sz - sizeof(struct pir_header)) / sizeof(struct pir_slot);
+
+	for (i=0; i < entries; i++) {
+		dprintf("PIR slot %d: bus %d, device %d\n",
+		        tbl->slot[i].slot, tbl->slot[i].bus,
+		        PIR_DEVICE(tbl->slot[i].devfunc));
+		for (j=0; j < 4; j++)
+			dprintf("\tINT%c: pin %d possible_irq's %04x\n",
+			        'A'+j, tbl->slot[i].linkmap[j].pin,
+			        tbl->slot[i].linkmap[j].possible_irq);
+	}
+	dprintf("*** end of table\n");
+}
+#endif
+
 static void scan_pci(void)
 {
 	int bus, dev, func; 	
@@ -314,6 +460,7 @@ static void scan_pci(void)
 				struct found_pci_device *npcid = NULL;
 				uint16 vendor_id = read_pci_config(bus, dev, func, 0, 2);
 				uint16 device_id;
+				uint8 offset;
 				/* If we get 0xffff then there is no device here. As there can't
 				 * be any gaps in function allocation this tells us that we
 				 * can move onto the next device/bus
@@ -350,6 +497,11 @@ static void scan_pci(void)
 					return;
 				}
 
+				if (pci_get_capability(bus, dev, func, PCI_cap_id_agp, &offset))
+					dprintf("Device @ %d:%d:%d has AGP capability\n", bus, dev, func);
+				if (pci_get_capability(bus, dev, func, PCI_cap_id_pm, &offset))
+					dprintf("Device @ %d:%d:%d has Power Management capability\n", bus, dev, func);
+				
 				/* basic header */
 				pcii->bus = bus;
 				pcii->device = dev;
@@ -495,159 +647,10 @@ static void pci_write_io_32(int mapped_io_addr, uint32 value)
 	out32(value, mapped_io_addr);
 }
 
-static int pci_open(const char *name, uint32 flags, void * *_cookie)
-{
-	struct pci_config *c = (struct pci_config *)kmalloc(sizeof(struct pci_config));
-
-	/* name points at the devfs_vnode so this is safe as we have to have a shorter
-	 * lifetime than the vnode and the devfs_vnode 
-	 */
-	c->full_path = (char*)name;
-	dprintf("pci_open: entry on '%s'\n", c->full_path);
-
-	*_cookie = c;
-
-	return 0;
-}
-
-static int pci_freecookie(void * cookie)
-{
-	kfree(cookie);
-	return 0;
-}
-
-static int pci_close(void * cookie)
-{
-	return 0;
-}
-
-static ssize_t pci_read(void *cookie, off_t pos, void *buf, size_t *len)
-{
-	*len = 0;
-	return EPERM;
-}
-
-static ssize_t pci_write(void * cookie, off_t pos, const void *buf, size_t *len)
-{
-	return EPERM;
-}
-
-static int pci_ioctl(void * _cookie, uint32 op, void *buf, size_t len)
-{
-	struct pci_config *cookie = _cookie;
-	int err = 0;
-
-	switch(op) {
-		case PCI_GET_CFG:
-			if(len < sizeof(struct pci_cfg)) {
-				err= -1;
-				goto err;
-			}
-
-			err = user_memcpy(buf, cookie->cfg, sizeof(struct pci_cfg));
-			break;
-		case PCI_DUMP_CFG:
-			dump_pci_config(cookie->cfg);
-			break;
-		default:
-			err = EINVAL;
-			goto err;
-	}
-
-err:
-	return err;
-}
-
-device_hooks pci_hooks = {
-	&pci_open,
-	&pci_close,
-	&pci_freecookie,
-	&pci_ioctl,
-	&pci_read,
-	&pci_write,
-	NULL, /* select */
-	NULL, /* deselect */
-	NULL, /* readv */
-	NULL  /* writev */
-};
-
-static int pci_create_config_structs()
-{
-	int bus, unit, function;
-	struct pci_cfg *cfg = NULL;
-	struct pci_config *config;
-	char char_buf[SYS_MAX_PATH_LEN];
-
-	dprintf("pcifs_create_vnode_tree: entry\n");
-
-	for(bus = 0; bus < 256; bus++) {
-		char bus_txt[4];
-		sprintf(bus_txt, "%d", bus);
-		for(unit = 0; unit < 32; unit++) {
-			char unit_txt[3];
-			sprintf(unit_txt, "%d", unit);
-			for(function = 0; function < 8; function++) {
-				char func_txt[2];
-				sprintf(func_txt, "%d", function);
-
-				if(cfg == NULL)
-					cfg = kmalloc(sizeof(struct pci_cfg));
-				if(pci_probe(bus, unit, function, cfg) < 0) {
-					// not possible for a unit to have a hole in functions
-					// if we dont find one in this unit, there are no more
-					break;
-				}
-
-				config = kmalloc(sizeof(struct pci_config));
-				if(!config)
-					panic("pci_create_config_structs: error allocating pci config struct\n");
-
-				sprintf(char_buf, "bus/pci/%s/%s/%s/ctrl", bus_txt, unit_txt, func_txt);
-				dprintf("created node '%s'\n", char_buf);
-
-				config->full_path = kmalloc(strlen(char_buf)+1);
-				strcpy(config->full_path, char_buf);
-
-				config->cfg = cfg;
-				config->next = NULL;
-
-				config->next = pci_list;
-				pci_list = config;
-
-				cfg = NULL;
-			}
-		}
-	}
-
-	if(cfg != NULL)
-		kfree(cfg);
-
-	return 0;
-}
-
-int pci_bus_init(kernel_args *ka)
-{
-	struct pci_config *c;
-
-	pci_list = NULL;
-
-	dprintf("PCI: pci_bus_init()\n");
-
-	pci_create_config_structs();
-
-	// create device nodes
-	for(c = pci_list; c; c = c->next) {
-		devfs_publish_device(c->full_path, c, &pci_hooks);
-	}
-
-	// register with the bus manager
-	bus_register_bus("/dev/bus/pci");
-
-	return 0;
-}
-
 static void pci_module_init(void)
 {
+	struct pir_table *pirt = NULL;
+	
 	/* init the double linked list */
 	pci_dev_list.next = pci_dev_list.prev = &pci_dev_list;
 
@@ -663,8 +666,30 @@ static void pci_module_init(void)
 	 * we can refine the test.
 	 */
 	check_pci();
+
+	pci_region = vm_map_physical_memory(vm_get_kernel_aspace_id(),
+	                                    "pci_bios", &pci_bios_ptr,
+	                                    REGION_ADDR_ANY_ADDRESS,
+	                                    0x10000,
+	                                    LOCK_RO | LOCK_KERNEL,
+	                                    (addr)0xf0000);
+	
+
+	pirt = find_pir_table();
+	if (pirt) {
+		dprintf("PCI IRQ Routing table found\n");
+#if THE_FULL_MONTY
+		print_pir_table(pirt);
+#endif
+	}
+	
 	/* Get our initial list of devices */
 	scan_pci();
+}
+
+static void pci_module_uninit(void)
+{
+	vm_delete_region(vm_get_kernel_aspace_id(), pci_region);
 }
 
 static int std_ops(int32 op, ...)
@@ -676,6 +701,7 @@ static int std_ops(int32 op, ...)
 			break;
 		case B_MODULE_UNINIT:
 			dprintf( "PCI: uninit\n" );
+			pci_module_uninit();
 			break;
 		default:
 			return EINVAL;
