@@ -7,25 +7,123 @@ namespace BPrivate {
 
 /**
  * These variables are used in defining the character_sets_by_id array below.
- */
+ * @see http://www.iana.org/assignments/character-sets
+ **/
 
 const BCharacterSet unicode(0,106,"Unicode","UTF-8","UTF-8",NULL);
 
 const char * isoLatin1aliases[] =
  { "iso-ir-100","ISO_8859-1","ISO-8859-1","latin1","11","IBM819","CP819","csISOLatin1",NULL };
-const BCharacterSet isoLatin1(0,106,"Unicode","UTF-8","UTF-8",isoLatin1aliases);
+const BCharacterSet isoLatin1(1,4,"ISO Latin 1","ISO_8859-1:1987","ISO_8859-1",isoLatin1aliases);
+
+const char * isoLatin2aliases[] =
+ { "iso-ir-101","ISO_8859-2","ISO-8859-2","latin2","12","csISOLatin2",NULL };
+const BCharacterSet isoLatin2(2,5,"ISO Latin 2","ISO_8859-2:1987","ISO_8859-2",isoLatin2aliases);
+
+const char * isoLatin3aliases[] =
+ { "iso-ir-109","ISO_8859-3","ISO-8859-3","latin3","13","csISOLatin3",NULL };
+const BCharacterSet isoLatin3(3,6,"ISO Latin 3","ISO_8859-3:1988","ISO_8859-3",isoLatin3aliases);
+
+const char * isoLatin4aliases[] =
+ { "iso-ir-110","ISO_8859-4","ISO-8859-4","latin4","14","csISOLatin4",NULL };
+const BCharacterSet isoLatin4(4,7,"ISO Latin 4","ISO_8859-4:1988","ISO_8859-4",isoLatin4aliases);
+
+const char * isoLatin5aliases[] =
+ { "iso-ir-144","ISO_8859-5","ISO-8859-5","cyrillic","csISOLatinCyrillic",NULL };
+const BCharacterSet isoLatin5(5,8,"ISO Cyrillic","ISO_8859-5:1988","ISO_8859-5",isoLatin5aliases);
+
+const char * isoLatin6aliases[] =
+ { "iso-ir-127","ISO_8859-6","ISO-8859-6","ECMA-114","ASMO-708","arabic","csISOLatinArabic",NULL };
+const BCharacterSet isoLatin6(6,9,"ISO Arabic","ISO_8859-6:1987","ISO_8859-6",isoLatin6aliases);
+
+const char * isoLatin7aliases[] =
+ { "iso-ir-126","ISO_8859-7","ISO-8859-7","ELOT_928","ECMA-118","greek","greek8","csISOLatinGreek",NULL };
+const BCharacterSet isoLatin7(7,10,"ISO Greek","ISO_8859-7:1987","ISO_8859-7",isoLatin7aliases);
+
+const char * isoLatin8aliases[] =
+ { "iso-ir-138","ISO_8859-8","ISO-8859-8","hebrew","csISOLatinHebrew",NULL };
+const BCharacterSet isoLatin8(8,11,"ISO Hebrew","ISO_8859-8:1988","ISO-8859-8",isoLatin8aliases);
+
+const char * isoLatin9aliases[] =
+ { "iso-ir-148","ISO_8859-9","ISO-8859-9","latin5","15","csISOLatin5",NULL };
+const BCharacterSet isoLatin9(9,12,"ISO Latin 5","ISO_8859-9:1989","ISO-8859-9",isoLatin9aliases);
+
+const char * isoLatin10aliases[] =
+ { "iso-ir-157","16","ISO_8859-10:1992","csISOLatin6","latin6",NULL };
+const BCharacterSet isoLatin10(10,13,"ISO Latin 6","ISO-8859-10","ISO-8859-10",isoLatin10aliases);
+
+const char * macintoshAliases[] =
+ { "mac","csMacintosh",NULL };
+const BCharacterSet macintosh(11,2027,"Macintosh Roman","macintosh",NULL,macintoshAliases);
+
+const char * shiftJISaliases[] =
+ { "MS_Kanji","csShiftJIS",NULL };
+const BCharacterSet shiftJIS(12,17,"Shift JIS","Shift_JIS","Shift_JIS",shiftJISaliases);
+
+const char * EUCPackedJapaneseAliases[] =
+ { "EUC-JP","csEUCPkdFmtJapanese",NULL };
+const BCharacterSet packedJapanese(13,18,"EUC Packed Format Japanese",
+                                   "Extended_UNIX_Code_Packed_Format_for_Japanese","EUC-JP",
+                                   EUCPackedJapaneseAliases);
+
+const char * EUCFixedJapaneseAliases[] =
+ { "csEUCFixWidJapanese",NULL };
+const BCharacterSet fixedJapanese(14,19,"EUC Fixed Width Japanese",
+                                  "Extended_UNIX_Code_Fixed_Width_for_Japanese",NULL,
+                                  EUCFixedJapaneseAliases);
+
+const BCharacterSet windows1252(15,2252,"MS-Windows Codepage 1252","windows-1252",NULL,NULL);
+
+const char * unicode2aliases[] =
+ { "csUnicode",NULL };
+const BCharacterSet unicode2(16,1000,"Unicode 2.0","ISO-10646-UCS-2",NULL,unicode2aliases);
+
+const char * KOI8Raliases[] =
+ { "csKOI8R",NULL };
+const BCharacterSet KOI8R(17,2084,"KOI8-R Cyrillic","KOI8-R","KOI8-R",KOI8Raliases);
+
+const BCharacterSet windows1251(18,2251,"MS-Windows Codepage 1251","windows-1251",NULL,NULL);
+
+const char * IBM866aliases[] =
+ { "cp866","866","csIBM866",NULL };
+const BCharacterSet IBM866(19,2086,"IBM Codepage 866","IBM866","IBM866",IBM866aliases);
+
+const char * IBM437aliases[] =
+ { "cp437","437","csPC8CodePage437",NULL };
+const BCharacterSet IBM437(20,2011,"IBM Codepage 437","IBM437","IBM437",IBM437aliases);
+
+const char * eucKRaliases[] =
+ { "csEUCKR",NULL };
+const BCharacterSet eucKR(21,38,"EUC Korean","EUC-KR","EUC-KR",eucKRaliases);
+
+const BCharacterSet iso13(22,109,"ISO 8859-13","ISO-8859-13","ISO-8859-13",NULL);
+
+const char * iso14aliases[] =
+ { "iso-ir-199","ISO_8859-14:1998","ISO_8859-14","latin8","iso-celtic","l8",NULL };
+const BCharacterSet iso14(23,110,"ISO 8859-14","ISO-8859-14","ISO-8859-14",iso14aliases);
+
+const char * iso15aliases[] =
+ { "ISO_8859-14","Latin-9",NULL };
+const BCharacterSet iso15(24,111,"ISO 8859-15","ISO-8859-15","ISO-8859-15",iso15aliases);
 
 /**
  * The following initializes the global character set array.
  * It is organized by id for efficient retrieval using predefined constants in UTF8.h and Font.h.
  * Character sets are stored contiguously and may be efficiently iterated over.
- * To add a new character set, define the character set above, and then add &<charSetName> to the
- * following list.  That's all.
- */
+ * To add a new character set, define the character set above -- remember to increment the id --
+ * and then add &<charSetName> to the _end_ of the following list.  That's all.
+ **/
 
 const BCharacterSet * character_sets_by_id[] = {
 	&unicode,
-	&isoLatin1,
+	&isoLatin1, &isoLatin2, &isoLatin3,	&isoLatin4,	&isoLatin5,
+	&isoLatin6,	&isoLatin7, &isoLatin8, &isoLatin9, &isoLatin10,
+	&macintosh,
+	// R5 BFont encodings end here
+	&shiftJIS, &packedJapanese, &fixedJapanese,
+	&windows1252, &unicode2, &KOI8R, &windows1251,
+	&IBM866, &IBM437, &eucKR, &iso13, &iso14, &iso15,
+	// R5 convert_to/from_utf8 encodings end here
 };
 const uint32 character_sets_by_id_count = sizeof(character_sets_by_id)/sizeof(const BCharacterSet*);
 
@@ -44,7 +142,7 @@ class MIBenumArrayInitializer {
 public:
 	MIBenumArrayInitializer() {
 		DEBUG_ONLY(static int onlyOneTime = 0;)
-		ASSERT_WITH_MESSAGE(onlyOneTime++ == 1,"MIBenumArrayInitializer should be instantiated only one time.");
+		ASSERT_WITH_MESSAGE(onlyOneTime++ == 0,"MIBenumArrayInitializer should be instantiated only one time.");
 		// analyzing character_sets_by_id
 		uint32 max_MIBenum = 0;
 		for (uint32 index = 0 ; index < character_sets_by_id_count ; index++ ) {
@@ -69,367 +167,4 @@ public:
 } runTheInitializer;
 
 }
-
-/*
-//! This array holds the pointer sorted by id.
-//! It uses the BFont::SetEncoding ids, starting with UTF8=0, ISO1=1, etc.
-//! Some luck is that the conversion ids are only one off from this.
-static const character_set character_sets_by_id[CHARACTER_SET_IDS] = {
-	{ 0, 106, "Unicode", "UTF-8", "UTF-8", { NULL } },
-	{ 1, 4, "ISO Latin 1", "ISO_8859-1:1987","ISO-8859-1", 
-	  { "iso-ir-100", "ISO_8859-1", "ISO-8859-1",
-	    "latin1", "11", "IBM819", "CP819", "csISOLatin1", NULL } 
-	},
-};
-
-
-//! this is the length
-uint32 character_sets_by_id_count = 2;
-//! This array holds the character sets so they can be retrieved by MIB enum
-BCharacterSet * character_sets_by_MIBenum[VALID_MIB_ENUMS];
-
-character_sets_by_id[0] = 
-character_sets_by_MIBenum[106] = 
-	new BCharacterSet(0,106,"Unicode","UTF-8","UTF-8",0,0);
-
-character_sets_by_id[1] = 
-character_sets_by_MIBenum[4] = 
-	new BCharacterSet(1,4,"ISO Latin 1","ISO_8859-1:1987","ISO-8859-1",0,0);
-
-}
-*/
-
-/*
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_1;
-	cs->MIBenum = 4;
-	strcpy(cs->print_name,"ISO Latin 1");
-	strcpy(cs->iana_name,"ISO_8859-1:1987");
-	cs->aliases_count = 8;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-100";
-	cs->aliases[1] = "ISO_8859-1";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-1";
-	cs->aliases[3] = "latin1";
-	cs->aliases[4] = "11";
-	cs->aliases[5] = "IBM819";
-	cs->aliases[6] = "CP819";
-	cs->aliases[7] = "csISOLatin1";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_2;
-	cs->MIBenum = 5;
-	strcpy(cs->print_name,"ISO Latin 2");
-	strcpy(cs->iana_name,"ISO_8859-2:1987");
-	cs->aliases_count = 6;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-101";
-	cs->aliases[1] = "ISO_8859-2";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-2";
-	cs->aliases[3] = "latin2";
-	cs->aliases[4] = "12";
-	cs->aliases[5] = "csISOLatin2";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_3;
-	cs->MIBenum = 6;
-	strcpy(cs->print_name,"ISO Latin 3");
-	strcpy(cs->iana_name,"ISO_8859-3:1988");
-	cs->mime_name = cs->print_name;
-	cs->aliases_count = 6;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-109";
-	cs->aliases[1] = "ISO_8859-3";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-3";
-	cs->aliases[3] = "latin3";
-	cs->aliases[4] = "13";
-	cs->aliases[5] = "csISOLatin3";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_4;
-	cs->MIBenum = 7;
-	strcpy(cs->print_name,"ISO Latin 4");
-	strcpy(cs->iana_name,"ISO_8859-4:1988");
-	cs->aliases_count = 6;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-110";
-	cs->aliases[1] = "ISO_8859-4";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-4";
-	cs->aliases[3] = "latin4";
-	cs->aliases[4] = "14";
-	cs->aliases[5] = "csISOLatin4";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_5;
-	cs->MIBenum = 8;
-	strcpy(cs->print_name,"ISO Cyrillic");
-	strcpy(cs->iana_name,"ISO_8859-5:1988");
-	cs->aliases_count = 5;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-144";
-	cs->aliases[1] = "ISO_8859-5";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-5";
-	cs->aliases[3] = "cyrillic";
-	cs->aliases[4] = "csISOLatinCyrillic";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_6;
-	cs->MIBenum = 9;
-	strcpy(cs->print_name,"ISO Arabic");
-	strcpy(cs->iana_name,"ISO_8859-6:1987");
-	cs->aliases_count = 7;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-127";
-	cs->aliases[1] = "ISO_8859-6";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-6";
-	cs->aliases[3] = "ECMA-114";
-	cs->aliases[4] = "ASMO-708";
-	cs->aliases[5] = "arabic";
-	cs->aliases[6] = "csISOLatinArabic";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_7;
-	cs->MIBenum = 10;
-	strcpy(cs->print_name,"ISO Greek");
-	strcpy(cs->iana_name,"ISO_8859-7:1987");
-	cs->aliases_count = 8;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-126";
-	cs->aliases[1] = "ISO_8859-7";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-7";
-	cs->aliases[3] = "ELOT_928";
-	cs->aliases[4] = "ECMA-118";
-	cs->aliases[5] = "greek";
-	cs->aliases[6] = "greek8";
-	cs->aliases[7] = "csISOLatinGreek";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_8;
-	cs->MIBenum = 11;
-	strcpy(cs->print_name,"ISO Hebrew");
-	strcpy(cs->iana_name,"ISO_8859-8:1988");
-	cs->aliases_count = 5;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-138";
-	cs->aliases[1] = "ISO_8859-8";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-8";
-	cs->aliases[3] = "hebrew";
-	cs->aliases[4] = "csISOLatinHebrew";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_9;
-	cs->MIBenum = 12;
-	strcpy(cs->print_name,"ISO Latin 5");
-	strcpy(cs->iana_name,"ISO_8859-9:1989");
-	cs->aliases_count = 6;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-148";
-	cs->aliases[1] = "ISO_8859-9";
-	cs->aliases[2] = cs->mime_name = "ISO-8859-9";
-	cs->aliases[3] = "latin5";
-	cs->aliases[4] = "15";
-	cs->aliases[5] = "csISOLatin5";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = B_ISO_8859_10;
-	cs->MIBenum = 12;
-	strcpy(cs->print_name,"ISO Latin 6");
-	strcpy(cs->iana_name,"ISO_8859-10");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 5;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-157";
-	cs->aliases[1] = "16";
-	cs->aliases[2] = "ISO-8859-10:1992";
-	cs->aliases[3] = "csISOLatin6";
-	cs->aliases[4] = "latin6";
-	character_sets[cs->id] = cs;
-}
-{ // this is a guess
-	cs = new CharacterSet();
-	cs->id = B_MACINTOSH_ROMAN;
-	cs->MIBenum = 2027;
-	strcpy(cs->print_name,"Macintosh Roman");
-	strcpy(cs->iana_name,"macintosh");
-	cs->aliases_count = 2;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "mac";
-	cs->aliases[1] = "csMacintosh";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 12;
-	cs->MIBenum = 17;
-	strcpy(cs->print_name,"Shift JIS");
-	strcpy(cs->iana_name,"Shift_JIS");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 2;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "MS_Kanji";
-	cs->aliases[1] = "csShiftJIS";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 13;
-	cs->MIBenum = 17;
-	strcpy(cs->print_name,"EUC Packed Format Japanese");
-	strcpy(cs->iana_name,"Extended_UNIX_Code_Packed_Format_for_Japanese");
-	cs->aliases_count = 2;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = cs->mime_name = "EUC-JP";
-	cs->aliases[1] = "csEUCPkdFmtJapanese";
-	character_sets[cs->id] = cs;
-}
-{ // this is just a guess...
-	cs = new CharacterSet();
-	cs->id = 14;
-	cs->MIBenum = 19;
-	strcpy(cs->print_name,"EUC Fixed Width Japanese");
-	strcpy(cs->iana_name,"Extended_UNIX_Code_Fixed_Width_for_Japanese");
-	cs->aliases_count = 1;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "csEUCFixWidJapanese";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 15;
-	cs->MIBenum = 2252;
-	strcpy(cs->print_name,"MS-Windows Codepage 1252");
-	strcpy(cs->iana_name,"windows-1252");
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 16;
-	cs->MIBenum = 1000;
-	strcpy(cs->print_name,"Unicode 2.0");
-	strcpy(cs->iana_name,"ISO-10646-UCS-2");
-	cs->aliases_count = 1;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "csUnicode";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 17;
-	cs->MIBenum = 2084;
-	strcpy(cs->print_name,"KOI8-R Cyrillic");
-	strcpy(cs->iana_name,"KOI8-R");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 1;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "csKOI8R";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 18;
-	cs->MIBenum = 2251;
-	strcpy(cs->print_name,"MS-Windows Codepage 1251");
-	strcpy(cs->iana_name,"windows-1251");
-	cs->mime_name = cs->iana_name;
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 19;
-	cs->MIBenum = 2086;
-	strcpy(cs->print_name,"IBM Codepage 866");
-	strcpy(cs->iana_name,"IBM866");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 3;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "cp866";
-	cs->aliases[1] = "866";
-	cs->aliases[2] = "csIBM866";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 20;
-	cs->MIBenum = 2011;
-	strcpy(cs->print_name,"IBM Codepage 437");
-	strcpy(cs->iana_name,"IBM437");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 3;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "cp437";
-	cs->aliases[1] = "437";
-	cs->aliases[2] = "csPC8CodePage437";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 21;
-	cs->MIBenum = 38;
-	strcpy(cs->print_name,"EUC Korean");
-	strcpy(cs->iana_name,"EUC-KR");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 1;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "csEUCKR";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 22;
-	cs->MIBenum = 109;
-	strcpy(cs->print_name,"ISO 8859-13");
-	strcpy(cs->iana_name,"ISO-8859-13");
-	cs->mime_name = cs->iana_name;
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 23;
-	cs->MIBenum = 110;
-	strcpy(cs->print_name,"ISO 8859-14");
-	strcpy(cs->iana_name,"ISO-8859-14");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 6;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "iso-ir-199";
-	cs->aliases[1] = "ISO_8859-14:1998";
-	cs->aliases[2] = "ISO_8859-14";
-	cs->aliases[3] = "latin8";
-	cs->aliases[4] = "iso-celtic";
-	cs->aliases[5] = "l8";
-	character_sets[cs->id] = cs;
-}
-{
-	cs = new CharacterSet();
-	cs->id = 24;
-	cs->MIBenum = 111;
-	strcpy(cs->print_name,"ISO 8859-15");
-	strcpy(cs->iana_name,"ISO-8859-15");
-	cs->mime_name = cs->iana_name;
-	cs->aliases_count = 2;
-	cs->aliases = new (char*)[cs->aliases_count];
-	cs->aliases[0] = "ISO_8859-15";
-	cs->aliases[1] = "Latin-9";
-	character_sets[cs->id] = cs;
-}
-*/
 

@@ -12,8 +12,10 @@ BCharacterSet::BCharacterSet(uint32 _id, uint32 _MIBenum, const char * _print_na
 	iana_name = _iana_name;
 	mime_name = _mime_name;
 	aliases_count = 0;
-	while (_aliases[aliases_count] != 0) {
-		aliases_count++;
+	if (_aliases != 0) {
+		while (_aliases[aliases_count] != 0) {
+			aliases_count++;
+		}
 	}
 	aliases = _aliases;
 }
