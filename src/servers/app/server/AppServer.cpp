@@ -223,7 +223,8 @@ int32 AppServer::PollerThread(void *data)
 			{
 				if(!msg->Buffer())
 					break;
-				ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
+//				ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
+				ServerWindow::HandleMouseEvent(msg);
 				break;
 			}
 			
@@ -251,7 +252,8 @@ int32 AppServer::PollerThread(void *data)
 				if(appserver->_driver)
 				{
 					appserver->_driver->MoveCursorTo(tempx,tempy);
-					ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
+//					ServerWindow::HandleMouseEvent(msg->Code(),(int8*)msg->Buffer());
+					ServerWindow::HandleMouseEvent(msg);
 				}
 				break;
 			}

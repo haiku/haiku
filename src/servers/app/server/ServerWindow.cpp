@@ -29,9 +29,9 @@
 #include <string.h>
 #include <stdio.h>
 #include <View.h>	// for B_XXXXX_MOUSE_BUTTON defines
+#include <PortLink.h>
 #include "AppServer.h"
 #include "Layer.h"
-#include "PortLink.h"
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "ServerProtocol.h"
@@ -129,20 +129,20 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	_token=win_token_handler.GetToken();
 
 	AddWindowToDesktop(this,index,ActiveScreen());
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s:\n",_title->String());
-printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
-printf("\tPort: %ld\n",_receiver);
-printf("\tWorkspace: %ld\n",index);
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s:\n",_title->String());
+		printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
+		printf("\tPort: %ld\n",_receiver);
+		printf("\tWorkspace: %ld\n",index);
+	#endif
 }
 
 //!Tears down all connections with the user application, kills the monitoring thread.
 ServerWindow::~ServerWindow(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s:~ServerWindow()\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s:~ServerWindow()\n",_title->String());
+	#endif
 	RemoveWindowFromDesktop(this);
 	if(_applink)
 	{
@@ -163,9 +163,9 @@ printf("ServerWindow %s:~ServerWindow()\n",_title->String());
 */
 void ServerWindow::RequestDraw(BRect rect)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Request Draw\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Request Draw\n",_title->String());
+	#endif
 	_winlink->SetOpCode(AS_LAYER_DRAW);
 	_winlink->Attach(&rect,sizeof(BRect));
 	_winlink->Flush();
@@ -180,18 +180,18 @@ void ServerWindow::RequestDraw(void)
 //! Forces the window border to update its decorator
 void ServerWindow::ReplaceDecorator(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Replace Decorator\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Replace Decorator\n",_title->String());
+	#endif
 	_winborder->UpdateDecorator();
 }
 
 //! Requests that the ServerWindow's BWindow quit
 void ServerWindow::Quit(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Quit\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Quit\n",_title->String());
+	#endif
 	_winlink->SetOpCode(B_QUIT_REQUESTED);
 	_winlink->Flush();
 }
@@ -217,9 +217,9 @@ ServerApp *ServerWindow::GetApp(void)
 //! Shows the window's WinBorder
 void ServerWindow::Show(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Show\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Show\n",_title->String());
+	#endif
 	if(_winborder)
 	{
 		_winborder->Show();
@@ -230,9 +230,9 @@ printf("ServerWindow %s: Show\n",_title->String());
 //! Hides the window's WinBorder
 void ServerWindow::Hide(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Hide\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Hide\n",_title->String());
+	#endif
 	if(_winborder)
 		_winborder->Hide();
 }
@@ -255,9 +255,9 @@ bool ServerWindow::IsHidden(void)
 */
 void ServerWindow::SetFocus(bool value)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Set Focus to %s\n",_title->String(),value?"true":"false");
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Set Focus to %s\n",_title->String(),value?"true":"false");
+	#endif
 	if(_active!=value)
 	{
 		_active=value;
@@ -281,10 +281,13 @@ bool ServerWindow::HasFocus(void)
 */
 void ServerWindow::WorkspaceActivated(int32 workspace, bool active)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: WorkspaceActivated unimplemented\n",_title->String());
-#endif
-	// TODO: implement
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: WorkspaceActivated(%ld,%s)\n",_title->String(),workspace,(active)?"active":"inactive");
+	#endif
+	_winlink->SetOpCode(AS_WORKSPACE_ACTIVATED);
+	_winlink->Attach(workspace);
+	_winlink->Attach(active);
+	_winlink->Flush();
 }
 
 /*!
@@ -294,10 +297,13 @@ printf("ServerWindow %s: WorkspaceActivated unimplemented\n",_title->String());
 */
 void ServerWindow::WorkspacesChanged(int32 oldone,int32 newone)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: WorkspaceChanged unimplemented\n",_title->String());
-#endif
-	// TODO: implement
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: WorkspacesChanged(%ld,%ld)\n",_title->String(),oldone,newone);
+	#endif
+	_winlink->SetOpCode(AS_WORKSPACES_CHANGED);
+	_winlink->Attach(oldone);
+	_winlink->Attach(newone);
+	_winlink->Flush();
 }
 
 /*!
@@ -306,10 +312,12 @@ printf("ServerWindow %s: WorkspaceChanged unimplemented\n",_title->String());
 */
 void ServerWindow::WindowActivated(bool active)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: WindowActivated unimplemented\n",_title->String());
-#endif
-	// TODO: implement
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: WindowActivated(%s)\n",_title->String(),(active)?"active":"inactive");
+	#endif
+	_winlink->SetOpCode(AS_WINDOW_ACTIVATED);
+	_winlink->Attach(active);
+	_winlink->Flush();
 }
 
 /*!
@@ -319,10 +327,13 @@ printf("ServerWindow %s: WindowActivated unimplemented\n",_title->String());
 */
 void ServerWindow::ScreenModeChanged(const BRect frame, const color_space cspace)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: ScreenModeChanged unimplemented\n",_title->String());
-#endif
-	// TODO: implement
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: ScreenModeChanged\n",_title->String());
+	#endif
+	_winlink->SetOpCode(AS_SCREENMODE_CHANGED);
+	_winlink->Attach(frame);
+	_winlink->Attach(&cspace,sizeof(color_space));
+	_winlink->Flush();
 }
 
 /*
@@ -331,10 +342,10 @@ printf("ServerWindow %s: ScreenModeChanged unimplemented\n",_title->String());
 */
 void ServerWindow::SetFrame(const BRect &rect)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Set Frame to (%.1f,%.1f,%.1f,%.1f)\n",_title->String(),
-	rect.left,rect.top,rect.right,rect.bottom);
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Set Frame to (%.1f,%.1f,%.1f,%.1f)\n",_title->String(),
+			rect.left,rect.top,rect.right,rect.bottom);
+	#endif
 	_frame=rect;
 }
 
@@ -353,18 +364,18 @@ BRect ServerWindow::Frame(void)
 */
 status_t ServerWindow::Lock(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Lock\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Lock\n",_title->String());
+	#endif
 	return (_locker.Lock())?B_OK:B_ERROR;
 }
 
 //! Unlocks the window
 void ServerWindow::Unlock(void)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Unlock\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Unlock\n",_title->String());
+	#endif
 	_locker.Unlock();
 }
 
@@ -377,9 +388,9 @@ bool ServerWindow::IsLocked(void)
 	return _locker.IsLocked();
 }
 
-void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
+void ServerWindow::DispatchMessage(PortMessage *msg)
 {
-	switch(code)
+	switch(msg->Code())
 	{
 		case AS_LAYER_CREATE:
 		{
@@ -399,9 +410,9 @@ void ServerWindow::DispatchMessage(int32 code, int8 *msgbuffer)
 			// so the BView can identify itself
 
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Create_Layer unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Create_Layer unimplemented\n",_title->String());
+			#endif
 
 			break;
 		}
@@ -416,9 +427,9 @@ printf("ServerWindow %s: Message Create_Layer unimplemented\n",_title->String())
 			// 1) (int32) id of the removed view
 
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Delete_Layer unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Delete_Layer unimplemented\n",_title->String());
+			#endif
 
 			break;
 		}
@@ -427,9 +438,9 @@ printf("ServerWindow %s: Message Delete_Layer unimplemented\n",_title->String())
 			// Received when a window creates its internal top view
 		
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Create_Layer_Root unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Create_Layer_Root unimplemented\n",_title->String());
+			#endif
 
 			break;
 		}
@@ -438,9 +449,9 @@ printf("ServerWindow %s: Message Create_Layer_Root unimplemented\n",_title->Stri
 			// Received when a window deletes its internal top view
 			
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",_title->String());
+			#endif
 
 			break;
 		}
@@ -457,166 +468,166 @@ printf("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",_title->Stri
 		case AS_SEND_BEHIND:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message  Send_Behind unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message  Send_Behind unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_ENABLE_UPDATES:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Enable_Updates unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Enable_Updates unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_DISABLE_UPDATES:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Disable_Updates unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Disable_Updates unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_NEEDS_UPDATE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Needs_Update unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Needs_Update unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_WINDOW_TITLE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Set_Title unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Set_Title unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_ADD_TO_SUBSET:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Add_To_Subset unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Add_To_Subset unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_REM_FROM_SUBSET:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Remove_From_Subset unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Remove_From_Subset unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_SET_LOOK:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Set_Look unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Set_Look unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_SET_FLAGS:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Set_Flags unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Set_Flags unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_SET_FEEL:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Set_Feel unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Set_Feel unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_SET_ALIGNMENT:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Set_Alignment unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Set_Alignment unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_GET_ALIGNMENT:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Get_Alignment unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Get_Alignment unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_GET_WORKSPACES:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Get_Workspaces unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Get_Workspaces unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_SET_WORKSPACES:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Set_Workspaces unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Set_Workspaces unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case AS_WINDOW_RESIZE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Resize unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Resize unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case B_MINIMIZE:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Minimize unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Minimize unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case B_WINDOW_ACTIVATED:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Window_Activated unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Window_Activated unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case B_ZOOM:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Zoom unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Zoom unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case B_WINDOW_MOVE_TO:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Move_To unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Move_To unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		case B_WINDOW_MOVE_BY:
 		{
 			// TODO: Implement
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Message Move_By unimplemented\n",_title->String());
-#endif
+			#ifdef DEBUG_SERVERWINDOW
+				printf("ServerWindow %s: Message Move_By unimplemented\n",_title->String());
+			#endif
 			break;
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code %s\n",_title->String(),MsgCodeToString(code));
+			printf("ServerWindow %s received unexpected code %s\n",_title->String(),MsgCodeToString(msg->Code()));
 			break;
 		}
 	}
@@ -1169,32 +1180,26 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 int32 ServerWindow::MonitorWin(void *data)
 {
 	ServerWindow *win=(ServerWindow *)data;
-
+	PortMessage msg;
+	int32 msgstat;
+	
 	int32 msgcode;
 	int8 *msgbuffer=NULL;
 	ssize_t buffersize,bytesread;
 	
 	for(;;)
 	{
-		buffersize=port_buffer_size(win->_receiver);
+		msgstat=msg.ReadFromPort(win->_receiver);
 		
-		if(buffersize>0)
+		if(msgstat==B_OK)
 		{
-			msgbuffer=new int8[buffersize];
-			bytesread=read_port(win->_receiver,&msgcode,msgbuffer,buffersize);
-		}
-		else
-			bytesread=read_port(win->_receiver,&msgcode,NULL,0);
-
-		if (bytesread != B_BAD_PORT_ID && bytesread != B_TIMED_OUT && bytesread != B_WOULD_BLOCK)
-		{
-			switch(msgcode)
+			switch(msg.Code())
 			{
 				case B_QUIT_REQUESTED:
 				{
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s received Quit request\n",win->Title());
-#endif
+					#ifdef DEBUG_SERVERWINDOW
+						printf("ServerWindow %s received Quit request\n",win->Title());
+					#endif
 					// Our BWindow sent us this message when it quit.
 					// We need to ask its ServerApp to delete our monitor
 					win->_applink->SetOpCode(AS_DELETE_WINDOW);
@@ -1208,16 +1213,14 @@ printf("ServerWindow %s received Quit request\n",win->Title());
 					break;
 				}
 				default:
-					win->DispatchMessage(msgcode,msgbuffer);
+//					win->DispatchMessage(msgcode,msgbuffer);
+					win->DispatchMessage(&msg);
 					break;
 			}
 
 		}
 	
-		if(buffersize>0)
-			delete[] msgbuffer;
-
-		if(msgcode==B_QUIT_REQUESTED)
+		if(msg.Code()==B_QUIT_REQUESTED)
 			break;
 	}
 
@@ -1230,13 +1233,11 @@ printf("ServerWindow %s received Quit request\n",win->Title());
 	\param code Message code of the mouse message
 	\param buffer Attachment buffer for the mouse message
 */
-void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
+//void ServerWindow::HandleMouseEvent(int32 code, int8 *buffer)
+void ServerWindow::HandleMouseEvent(PortMessage *msg)
 {
-#ifdef DEBUG_SERVERWINDOW_MOUSE
-printf("ServerWindow::HandleMouseEvent unimplemented\n");
-#endif
 	ServerWindow *mousewin=NULL;
-	int8 *index=buffer;
+//	int8 *index=buffer;
 	
 	// Find the window which will receive our mouse event.
 	Layer *root=GetRootLayer(CurrentWorkspace(),ActiveScreen());
@@ -1251,7 +1252,8 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 	}
 
 	// Dispatch the mouse event to the proper window
-	switch(code)
+//	switch(code)
+	switch(msg->Code())
 	{
 		case B_MOUSE_DOWN:
 		{
@@ -1263,21 +1265,25 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			// 5) int32 - buttons down
 			// 6) int32 - clicks
 
-//			int64 time=*((int64*)index);
-			index+=sizeof(int64);
-			float x=*((float*)index); index+=sizeof(float);
-			float y=*((float*)index); index+=sizeof(float);
-//			int32 modifiers=*((int32*)index); index+=sizeof(uint32);
-//			uint32 buttons=*((uint32*)index); index+=sizeof(uint32);
-//			int32 clicks=*((int32*)index);
+//			index+=sizeof(int64);
+//			float x=*((float*)index); index+=sizeof(float);
+//			float y=*((float*)index); index+=sizeof(float);
+//			BPoint pt(x,y);
+			float x;
+			float y;
+			int64 dummy;
+			msg->Read(&dummy);
+			msg->Read(&x);
+			msg->Read(&y);
 			BPoint pt(x,y);
-
+			
 			// If we have clicked on a window, 			
 			active_winborder=_winborder=(WinBorder*)root->GetChildAt(pt);
 			if(_winborder)
 			{
 				mousewin=_winborder->Window();
-				_winborder->MouseDown(buffer);
+//				_winborder->MouseDown(buffer);
+				_winborder->MouseDown((int8*)msg->Buffer());
 			}
 			break;
 		}
@@ -1289,11 +1295,16 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - modifier keys down
 
-//			int64 time=*((int64*)index);
-			index+=sizeof(int64);
-			float x=*((float*)index); index+=sizeof(float);
-			float y=*((float*)index); index+=sizeof(float);
-//			int32 modifiers=*((int32*)index);
+//			index+=sizeof(int64);
+//			float x=*((float*)index); index+=sizeof(float);
+//			float y=*((float*)index); index+=sizeof(float);
+//			BPoint pt(x,y);
+			float x;
+			float y;
+			int64 dummy;
+			msg->Read(&dummy);
+			msg->Read(&x);
+			msg->Read(&y);
 			BPoint pt(x,y);
 			
 			set_is_sliding_tab(false);
@@ -1307,7 +1318,8 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 				
 				// Eventually, we will build in MouseUp messages with buttons specified
 				// For now, we just "assume" no mouse specification with a 0.
-				_winborder->MouseUp(buffer);
+//				_winborder->MouseUp(buffer);
+				_winborder->MouseUp((int8*)msg->Buffer());
 			}
 			break;
 		}
@@ -1318,15 +1330,22 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			// 2) float - x coordinate of mouse click
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - buttons down
-//			int64 time=*((int64*)index);
-			index+=sizeof(int64);
-			float x=*((float*)index); index+=sizeof(float);
-			float y=*((float*)index); index+=sizeof(float);
+//			index+=sizeof(int64);
+//			float x=*((float*)index); index+=sizeof(float);
+//			float y=*((float*)index); index+=sizeof(float);
+//			BPoint pt(x,y);
+			float x;
+			float y;
+			int64 dummy;
+			msg->Read(&dummy);
+			msg->Read(&x);
+			msg->Read(&y);
 			BPoint pt(x,y);
 
 			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
 			{
-				active_winborder->MouseMoved(buffer);
+//				active_winborder->MouseMoved(buffer);
+				active_winborder->MouseMoved((int8*)msg->Buffer());
 			}
 			else
 			{
@@ -1334,7 +1353,8 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 				if(_winborder)
 				{
 					mousewin=_winborder->Window();
-					_winborder->MouseMoved(buffer);
+//					_winborder->MouseMoved(buffer);
+					_winborder->MouseMoved((int8*)msg->Buffer());
 				}
 			}				
 			break;
@@ -1353,13 +1373,20 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 */
 void ServerWindow::HandleKeyEvent(int32 code, int8 *buffer)
 {
-#ifdef DEBUG_SERVERWINDOW_KEYBOARD
-printf("ServerWindow::HandleKeyEvent unimplemented\n");
-#endif
+	#ifdef DEBUG_SERVERWINDOW_KEYBOARD
+	printf("ServerWindow::HandleKeyEvent unimplemented\n");
+	#endif
 /*	ServerWindow *keywin=NULL;
-	int8 *index=buffer;
 	
 	// Dispatch the key event to the active window
+	keywin=GetActiveWindow();
+	if(keywin)
+	{
+		keywin->Lock();
+		keywin->_winlink->SetOpCode(code);
+		keywin->_winlink
+		keywin->Unlock();
+	}
 */
 }
 
@@ -1382,9 +1409,9 @@ Workspace *ServerWindow::GetWorkspace(void)
 */
 void ServerWindow::SetWorkspace(Workspace *wkspc)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ServerWindow %s: Set Workspace\n",_title->String());
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ServerWindow %s: Set Workspace\n",_title->String());
+	#endif
 	_workspace=wkspc;
 }
 
@@ -1393,9 +1420,9 @@ printf("ServerWindow %s: Set Workspace\n",_title->String());
 */
 void ActivateWindow(ServerWindow *oldwin,ServerWindow *newwin)
 {
-#ifdef DEBUG_SERVERWINDOW
-printf("ActivateWindow: old=%s, new=%s\n",oldwin?oldwin->Title():"NULL",newwin?newwin->Title():"NULL");
-#endif
+	#ifdef DEBUG_SERVERWINDOW
+		printf("ActivateWindow: old=%s, new=%s\n",oldwin?oldwin->Title():"NULL",newwin?newwin->Title():"NULL");
+	#endif
 	if(oldwin==newwin)
 		return;
 

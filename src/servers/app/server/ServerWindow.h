@@ -34,6 +34,7 @@
 #include <Rect.h>
 #include <String.h>
 #include <Window.h>
+#include <PortMessage.h>
 
 class BString;
 class BMessenger;
@@ -84,10 +85,10 @@ public:
 	void Unlock(void);
 	bool IsLocked(void);
 	
-	void DispatchMessage(int32 code, int8 *msgbuffer);
+	void DispatchMessage(PortMessage *msg);
 	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
 	static int32 MonitorWin(void *data);
-	static void HandleMouseEvent(int32 code, int8 *buffer);
+	static void HandleMouseEvent(PortMessage *msg);
 	static void HandleKeyEvent(int32 code, int8 *buffer);
 	
 	//! Returns the index of the workspaces to which it belongs
