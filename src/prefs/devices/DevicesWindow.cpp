@@ -102,6 +102,7 @@ void DevicesWindow::InitWindow(void)
 	BMenu *FileMenu;
 	BMenu *DevicesMenu;
 	BMenu *JumperedDevicesMenu;
+	BMenuItem *mniRemoveJumperedDevice;
 	
 	// Add the menu bar
 	menubar = new BMenuBar(r, "menu_bar");
@@ -120,9 +121,11 @@ void DevicesWindow::InitWindow(void)
 	//DevicesMenu->AddItem(new BMenuItem("New Jumpered Device", new BMessage(MENU_DEVICES_NEW_JUMPERED_DEVICE), NULL));
 	DevicesMenu->AddItem(JumperedDevicesMenu);
 	
-	DevicesMenu->AddItem(new BMenuItem("Remove Jumpered Device", new BMessage(MENU_DEVICES_REMOVE_JUMPERED_DEVICE), 'R'));
+	DevicesMenu->AddItem(mniRemoveJumperedDevice = new BMenuItem("Remove Jumpered Device", new BMessage(MENU_DEVICES_REMOVE_JUMPERED_DEVICE), 'R'));
 	DevicesMenu->AddSeparatorItem();
 	DevicesMenu->AddItem(new BMenuItem("Resource Usage", new BMessage(MENU_DEVICES_RESOURCE_USAGE), 'U'));
+	
+	mniRemoveJumperedDevice->SetEnabled(false);
 	
 	menubar->AddItem(FileMenu);
 	menubar->AddItem(DevicesMenu);
