@@ -10,14 +10,18 @@
 #include <new>
 #include <stdlib.h>
 
-// I'm not entirely sure if this is such a great idea or not, but
-// I can't find the standard definition of nothrow anywhere (in
-// order to copy it properly here for kernel use), so this will
-// do for the moment so things compile and I can go to bed. :-)
-// ToDo: declare and define this thing properly
-#ifndef nothrow
-#	define nothrow 0
-#endif
+/*!	Looking through the \c &lt;new&gt; header on my Linux distro
+	(can't seem	to find it in the R5 headers...), it looks like
+	the type of \c nothrow_t is just:
+	
+	<code>struct nothrow_t {};</code>
+	
+	Thus, here I'm just declaring an externed \c nothrow_t var called
+	\c nothrow, and defining it in cpp.cpp to be initialized to \c {}.
+	So far, this seems to work okay.
+*/
+extern const nothrow_t nothrow;
+
 
 // Oh no! C++ in the kernel! Are you nuts?
 //

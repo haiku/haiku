@@ -14,3 +14,4 @@ __pure_virtual()
 	//printf("pure virtual function call");
 }
 
+const nothrow_t nothrow = {};
