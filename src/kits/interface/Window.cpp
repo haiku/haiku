@@ -888,10 +888,17 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 		{
 			BPoint			where;
 			uint32			buttons;
+			uint32			transit;
 			
 			msg->FindPoint( "where", &where );
 			msg->FindInt32( "buttons", (int32*)&buttons );
-			sendMessageUsingEventMask( B_MOUSE_MOVED, where );
+			msg->FindInt32( "transit", (int32*)&transit );
+			if (target && target != this && target != top_view)
+			{
+				((BView*)target)->ConvertFromScreen(&where);
+				((BView*)target)->MouseMoved(where, transit, NULL);
+			}
+//			sendMessageUsingEventMask( B_MOUSE_MOVED, where );
 			break;
 		}
 		case B_PULSE:

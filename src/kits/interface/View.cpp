@@ -1330,7 +1330,13 @@ BView::SetEventMask(uint32 mask, uint32 options)
 
 	fState->archivingFlags |= B_VIEW_EVMASK_BIT;
 
-	// TODO: modify! contact app_server!	
+	if (owner) {
+		check_lock();
+
+		owner->fLink->StartMessage(AS_LAYER_SET_EVENT_MASK);
+		owner->fLink->Attach<uint32>(mask);
+		owner->fLink->Attach<uint32>(options);
+	}
 
 	return B_OK;
 }
@@ -3850,6 +3856,8 @@ BView::attachView(BView *aView)
 	owner->fLink->AttachString( aView->Name() );
 	owner->fLink->Attach<BRect>( aView->Frame() );
 	owner->fLink->Attach<uint32>( aView->ResizingMode() );
+	owner->fLink->Attach<uint32>( aView->fEventMask );
+	owner->fLink->Attach<uint32>( aView->fEventOptions );
 	owner->fLink->Attach<uint32>( aView->Flags() );
 	owner->fLink->Attach<bool>( aView->IsHidden(aView) );
 	owner->fLink->Attach<int32>( aView->CountChildren() );
