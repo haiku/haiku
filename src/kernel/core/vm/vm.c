@@ -639,8 +639,8 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		return ENOMEM;
 }
 
-region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, int addr_type,
-	addr size, int lock, addr phys_addr)
+region_id vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
+	int addr_type, addr size, int lock, addr phys_addr)
 {
 	vm_region *region;
 	vm_cache *cache;
@@ -679,16 +679,16 @@ region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address
 	cache->scan_skip = 1;
 
 	vm_cache_acquire_ref(cache_ref, true);
-	err = map_backing_store(aspace, store, address, 0, size, addr_type, 0, lock, REGION_NO_PRIVATE_MAP, &region, name);
+	err = map_backing_store(aspace, store, _address, 0, size, addr_type, 0, lock, REGION_NO_PRIVATE_MAP, &region, name);
 	vm_cache_release_ref(cache_ref);
 	vm_put_aspace(aspace);
-	if(err < 0) {
+	if (err < 0)
 		return err;
-	}
 
 	// modify the pointer returned to be offset back into the new region
 	// the same way the physical address in was offset
-	(*address) += map_offset;
+	*_address = (void *)((addr)*_address + map_offset);
+
 	return region->id;
 }
 

@@ -382,7 +382,8 @@ delete_team_struct(struct team *team)
 static int
 get_arguments_data_size(char **args, int argc)
 {
-	uint32 size = 0, count;
+	uint32 size = 0;
+	int count;
 
 	for (count = 0; count < argc; count++)
 		size += strlen(args[count]) + 1;
