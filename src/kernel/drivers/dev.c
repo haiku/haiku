@@ -14,7 +14,10 @@
 #include <Errors.h>
 #include <devfs.h>
 #include <Drivers.h>
-#include <memheap.h>
+
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 
 #ifdef ARCH_x86
 #	include <arch/x86/console_dev.h>
@@ -28,33 +31,36 @@
  * These are mainly here to allow testing and this needs to be revisited
  */
 const char *device_paths[] = {
+	"/boot/beos/system/add-ons/kernel/drivers/dev",
+	"/boot/beos/system/add-ons/kernel/drivers/dev/audio",
+	"/boot/beos/system/add-ons/kernel/drivers/dev/misc",
+	"/boot/beos/system/add-ons/kernel/drivers/dev/net",
 	"/boot/drivers/dev",
-	"/boot/drivers/dev/audio",	
-	"/boot/drivers/dev/misc",
-	"/boot/drivers/dev/net",
 	NULL
 };
 
-int dev_init(kernel_args *ka)
+
+int
+dev_init(kernel_args *ka)
 {
-	int fd;
 	const char **ptr;
 	
 	dprintf("dev_init: entry\n");
 
 	for (ptr = device_paths; (*ptr); ptr++) {
-		fd = sys_open_dir(*ptr);
-		if (fd >= 0) {
-			ssize_t len;
-			char buf[SYS_MAX_NAME_LEN + sizeof(struct dirent) + 1];
-			struct dirent *dirent = (struct dirent *)buf;
+		DIR *dir = opendir(*ptr);
+		if (dir != NULL) {
+			struct dirent *dirent;
 
-			while ((len = sys_read_dir(fd, dirent, sizeof(buf), 1)) > 0) {
+			while ((dirent = readdir(dir)) != NULL) {
+				if (!strcmp(dirent->d_name, ".") || !strcmp(dirent->d_name, ".."))
+					continue;
+
 				dprintf("loading '%s' dev module\n", dirent->d_name);
 				dev_load_dev_module(dirent->d_name, *ptr);
 				dprintf("loaded dev module!\n");
 			}
-			sys_close(fd);
+			closedir(dir);
 		}
 	}
 
