@@ -2,7 +2,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#include "driver/sound.h"
+#include "driver_io.h"
 
 #include "LegacyAudioDevice.h"
 
@@ -34,8 +34,9 @@ LegacyAudioDevice::LegacyAudioDevice( const char *name, int32 id )
 	input_flavor.out_formats       = &input_format;
 
 	//get driver capture buffer size
-	ioctl( fd, SOUND_GET_CAPTURE_PREFERRED_BUF_SIZE, &buffer_size, 0 );
-	ioctl( fd, SOUND_SET_CAPTURE_PREFERRED_BUF_SIZE, buffer_size, 0 );
+	//ioctl( fd, SOUND_GET_CAPTURE_PREFERRED_BUF_SIZE, &buffer_size, 0 );
+	//ioctl( fd, SOUND_SET_CAPTURE_PREFERRED_BUF_SIZE, buffer_size, 0 );
+	buffer_size = 4096;
 
 	input_format.type                      = B_MEDIA_RAW_AUDIO;
 	input_format.u.raw_audio.frame_rate    = 44100.0;
@@ -68,8 +69,9 @@ LegacyAudioDevice::LegacyAudioDevice( const char *name, int32 id )
 	output_flavor.out_formats       = NULL;
 
 	//get driver playback buffer size
-	ioctl( fd, SOUND_GET_PLAYBACK_PREFERRED_BUF_SIZE, &buffer_size, 0 );
-	ioctl( fd, SOUND_SET_PLAYBACK_PREFERRED_BUF_SIZE, buffer_size, 0 );
+	//ioctl( fd, SOUND_GET_PLAYBACK_PREFERRED_BUF_SIZE, &buffer_size, 0 );
+	//ioctl( fd, SOUND_SET_PLAYBACK_PREFERRED_BUF_SIZE, buffer_size, 0 );
+	buffer_size = 4096; 
 
 	output_format.type                      = B_MEDIA_RAW_AUDIO;
 	output_format.u.raw_audio.frame_rate    = 44100.0;
@@ -131,12 +133,14 @@ LegacyAudioDevice::Input_Thread()
 {
 	while ( 1 ) {
 		/* send IO request */
-		ioctl( fd, SOUND_UNSAFE_READ, buffer, sizeof( buffer ) );
+		// XXX this is wrong, the buffer needs a header
+		//ioctl( fd, SOUND_READ_BUFFER, buffer, sizeof( buffer ) );
+		
 
 		/* Wait for IO completion:
 		   The only acceptable response is B_OK. Everything else means
 		   the thread should quit. */
-_		if ( acquire_sem( in_sem ) != B_OK ) {
+		if ( acquire_sem( in_sem ) != B_OK ) {
 			break;
 		}
 

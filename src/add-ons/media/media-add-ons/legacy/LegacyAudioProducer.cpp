@@ -14,7 +14,7 @@
 #include <support/Autolock.h>
 #include <support/Debug.h>
 
-#include "driver/sound.h"
+#include "driver_io.h"
 
 //#include "LegacyAudioProducer.h"
 

@@ -14,12 +14,8 @@
 #include <support/Autolock.h>
 #include <support/Debug.h>
 
-#include "driver/audio.h"
-#include "driver/sound.h"
-
-#include "LegacyAudioConsumer.h"
-
 #include "driver_io.h"
+#include "LegacyAudioConsumer.h"
 
 
 LegacyAudioConsumer::LegacyAudioConsumer( BMediaAddOn *addon, const char *name, int32 internal_id )
@@ -53,7 +49,7 @@ LegacyAudioConsumer::LegacyAudioConsumer( BMediaAddOn *addon, const char *name, 
 		return;
 	}
 
-	DRIVER_GET_PLAYBACK_PREFERRED_BUF_SIZE( &mBuffer_size, 0 );
+	mBuffer_size = 4096;
 
 	io_buf1 = malloc( 2 * ( sizeof( audio_buffer_header ) + mBuffer_size ) );
 
@@ -413,7 +409,7 @@ LegacyAudioConsumer::RunThread()
 		}
 
 		//send buffer
-		DRIVER_UNSAFE_WRITE( io_buf, 0 );
+		DRIVER_WRITE_BUFFER( io_buf, 0 );
 
 		//wait for IO
 		if ( acquire_sem( mBuffer_waitIO ) == B_BAD_SEM_ID ) {
