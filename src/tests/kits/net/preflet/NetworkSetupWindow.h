@@ -29,10 +29,9 @@ class NetworkSetupWindow : public BWindow
 		typedef BWindow	 		inherited;
 
 		// Virtual function overrides
-	public:	
+
 		// public constantes
-		enum
-			{
+		enum {
 			SELECT_PROFILE_MSG			= 'prof',
 			MANAGE_PROFILES_MSG			= 'mngp',
 			NEW_PROFILE_MSG				= 'newp',
@@ -43,7 +42,7 @@ class NetworkSetupWindow : public BWindow
 			DONT_TOUCH_MSG				= 'lock',
 			APPLY_NOW_MSG 				= 'aply',
 			REVERT_MSG					= 'rvrt'
-			};
+		};
 				
 		bool			QuitRequested();
 		void			MessageReceived(BMessage * msg);
