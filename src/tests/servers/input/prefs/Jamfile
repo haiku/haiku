@@ -89,5 +89,25 @@ SEARCH on [ FGristFiles
 	]
 	= [ FDirName $(OBOS_TOP) src prefs mouse ] ;
 
+BinCommand keymapTest :
+	key_map.cpp
+	Keymap.cpp
+
+	InterfaceDefs.cpp
+	Input.cpp
+	: be ;
+
+if $(COMPILE_FOR_R5) {
+} else {
+	LinkSharedOSLibs keymapTest : <boot!home!config!lib>libopenbeos.so ;
+}
+
+SEARCH on [ FGristFiles
+	key_map.cpp
+	Keymap.cpp
+	]
+	= [ FDirName $(OBOS_TOP) src apps bin keymap ] ;
+
 SEARCH on [ FGristFiles InterfaceDefs.cpp Input.cpp ] 
 	= [ FDirName $(OBOS_TOP) src kits interface ] ;
+
