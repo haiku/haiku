@@ -114,6 +114,7 @@ TRoster::HandleAddApplication(BMessage *request)
 		port = -1;
 	if (request->FindBool("full_registration", &fullReg) != B_OK)
 		fullReg = false;
+PRINT(("team: %ld, signature: %s\n", team, signature));
 	// check the parameters
 	team_id otherTeam = -1;
 	uint32 launchFlags = flags & B_LAUNCH_MASK;
@@ -356,6 +357,7 @@ TRoster::HandleRemoveApp(BMessage *request)
 	team_id team;
 	if (request->FindInt32("team", &team) != B_OK)
 		team = -1;
+PRINT(("team: %ld\n", team));
 	// remove the app
 	if (error == B_OK) {
 		if (RosterAppInfo *info = fRegisteredApps.InfoFor(team)) {
