@@ -49,6 +49,16 @@ typedef struct pattern {
 		uint8		data[8];
 } pattern;
 
+#ifdef __cplusplus
+
+inline bool
+operator==(const pattern& a, const pattern& b)
+{
+	return (*(uint64*)a.data == *(uint64*)b.data);
+}
+
+#endif // __cplusplus
+
 extern _IMPEXP_BE const pattern B_SOLID_HIGH;
 extern _IMPEXP_BE const pattern B_MIXED_COLORS;
 extern _IMPEXP_BE const pattern B_SOLID_LOW;
