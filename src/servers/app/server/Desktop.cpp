@@ -41,6 +41,7 @@
 #include "ServerScreen.h"
 #include "ServerWindow.h"
 #include "ViewDriver.h"
+#include "DirectDriver.h"
 #include "WinBorder.h"
 #include "Workspace.h"
 
@@ -95,6 +96,12 @@ void Desktop::Init(void)
 			// drivers until one can't initialize in order to support multiple monitors. For now,
 			// we'll just load one and be done with it.
 			driver = new AccelerantDriver();
+		}
+		else if(DISPLAYDRIVER == DIRECTDRIVER)
+		{
+			// Eventually, it would be nice to do away with ViewDriver and replace it with
+			// one which uses a double-buffered BDirectWindow as a rendering context
+			driver = new DirectDriver();
 		}
 		else
 		{
@@ -234,7 +241,6 @@ int32 Desktop::CountRootLayers() const
 
 DisplayDriver* Desktop::GetDisplayDriver() const
 {
-// TODO: implement!
 	return ScreenAt(0)->DDriver();
 }
 
@@ -370,18 +376,17 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			// 5) int32 - buttons down
 			// 6) int32 - clicks
 
-			BPoint		pt;
-			int64		dummy;
-			int32 mod;
-			int32 buttons;
+			BPoint pt;
+			int64 dummy;
 			
 			msg->Read<int64>(&dummy);
 			msg->Read<float>(&pt.x);
 			msg->Read<float>(&pt.y);
-			msg->Read<int32>(&mod);
-			msg->Read<int32>(&buttons);
+			
+			// After we read the data, we need to reset it for MouseDown()
+			msg->Rewind();
 
-//			printf("MOUSE DOWN: at (%f, %f)\n", pt.x, pt.y);
+			// printf("MOUSE DOWN: at (%f, %f)\n", pt.x, pt.y);
 			
 			WinBorder	*target;
 			RootLayer	*rl;
@@ -389,15 +394,16 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			rl			= ActiveRootLayer();
 			ws			= rl->ActiveWorkspace();
 			target		= ws->SearchWinBorder(pt);
-			if (target){
+			if (target)
+			{
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
 
 				ws->SearchAndSetNewFront(target);
 				ws->SetFocusLayer(target);
 				
-				fMouseTarget		= target;
-				target->MouseDown(pt,buttons,mod);
+				fMouseTarget = target;
+				target->MouseDown(msg);
 				
 				rl->fMainLock.Unlock();
 				fGeneralLock.Unlock();
@@ -412,26 +418,31 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - modifier keys down
 
-			BPoint pt;
-			int64 dummy;
-			int32 mod;
-			
-			msg->Read<int64>(&dummy);
-			msg->Read<float>(&pt.x);
-			msg->Read<float>(&pt.y);
-			msg->Read<int32>(&mod);
-			
-			if (fMouseTarget){
-				fMouseTarget->MouseUp(pt, mod);
-				fMouseTarget		= NULL;				
+			if (fMouseTarget)
+			{
+				fMouseTarget->MouseUp(msg);
+				fMouseTarget = NULL;				
 			}
-			else{
-				WinBorder *target	= ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
+			else
+			{
+				BPoint pt;
+				int64 dummy;
+				int32 mod;
+
+				msg->Read<int64>(&dummy);
+				msg->Read<float>(&pt.x);
+				msg->Read<float>(&pt.y);
+				msg->Read<int32>(&mod);
+
+				// After we read the data, we need to reset it for MouseUp()
+				msg->Rewind();
+
+				WinBorder *target = ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
 				if(target)
-					target->MouseUp(pt, mod);
+					target->MouseUp(msg);
 			}
 			
-//			printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
+			// printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
 
 			break;
 		}
@@ -450,18 +461,22 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			msg->Read<float>(&x);
 			msg->Read<float>(&y);
 			msg->Read<int32>(&buttons);
-			
-			BPoint pt(x, y);
-			if (fMouseTarget){
+
+			// After we read the data, we need to reset it for MouseDown()
+			msg->Rewind();
+
+			if (fMouseTarget)
+			{
 				fActiveScreen->DDriver()->HideCursor();
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
-				fMouseTarget->MouseMoved(pt, buttons);
+				fMouseTarget->MouseMoved(msg);
 				fActiveScreen->DDriver()->ShowCursor();
 			}
-			else{
-				WinBorder *target	= ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
+			else
+			{
+				WinBorder *target = ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(BPoint(x,y));
 				if(target)
-					target->MouseMoved(pt, buttons);
+					target->MouseMoved(msg);
 
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
 			}
@@ -470,7 +485,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			// TODO: Later on, this will need to be passed onto the client ServerWindow
+			// TODO: Pass this on to the client ServerWindow
 			break;
 		}
 		default:
@@ -628,7 +643,7 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 
-			// TODO: Pass on to ServerWindow? WinBorder? Client window?
+			// TODO: Pass on to client window with the focus
 			break;
 		}
 		case B_KEY_UP:
@@ -680,7 +695,7 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			// We got this far, so apparently it's safe to pass to the active
 			// window.
 			
-			// TODO: Pass on to ServerWindow? WinBorder? Client window?
+			// TODO: Pass on to client window with the focus
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:
@@ -696,7 +711,7 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			index+=sizeof(bigtime_t);
 			printf("Unmapped Key Down: 0x%lx\n",*((int32*)index));
 			#endif
-			// TODO: Pass on to ServerWindow? WinBorder? Client window?
+			// TODO: Pass on to client window with the focus
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
@@ -713,7 +728,7 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			printf("Unmapped Key Up: 0x%lx\n",*((int32*)index));
 			#endif
 
-			// TODO: Pass on to ServerWindow? WinBorder? Client window?
+			// TODO: Pass on to client window with the focus
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
@@ -730,7 +745,7 @@ void Desktop::KeyboardEventHandler(PortMessage *msg)
 			printf("Modifiers Changed\n");
 			#endif
 
-			// TODO: Pass on to ServerWindow? WinBorder? Client window?
+			// TODO: Pass on to client window with the focus
 			break;
 		}
 		default:

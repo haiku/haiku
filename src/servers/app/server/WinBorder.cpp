@@ -30,6 +30,7 @@
 #include <Locker.h>
 #include <Debug.h>
 #include <TokenSpace.h>
+#include "PortMessage.h"
 #include "View.h"	// for mouse button defines
 #include "ServerWindow.h"
 #include "Decorator.h"
@@ -73,11 +74,11 @@
 #endif
 
 //! TokenHandler object used to provide IDs for all WinBorder objects
-TokenHandler	border_token_handler;
+TokenHandler border_token_handler;
 
-bool			gMouseDown = false;
+bool gMouseDown = false;
 
-//---------------------------------------------------------------------------
+
 WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel,
 		const int32 flags, ServerWindow *win, DisplayDriver *driver)
 	: Layer(r, name, B_NULL_TOKEN, B_FOLLOW_NONE, flags, driver)
@@ -102,11 +103,10 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	SetLevel();
 	fNewTopLayerFrame = &(win->fTopLayer->_frame);
 
-	if (feel == B_NO_BORDER_WINDOW_LOOK){
-	}
-	else{
-		fDecorator		= new_decorator(r, name, look, feel, flags, fDriver);
-		fDecFull		= new BRegion();
+	if (feel!= B_NO_BORDER_WINDOW_LOOK)
+	{
+		fDecorator = new_decorator(r, name, look, feel, flags, fDriver);
+		fDecFull = new BRegion();
 		fDecorator->GetFootprint(fDecFull);
 	}
 
@@ -116,247 +116,303 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
 	STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
 }
-//---------------------------------------------------------------------------
+
 WinBorder::~WinBorder(void)
 {
-STRACE(("WinBorder(%s):~WinBorder()\n",GetName()));
-	if (fDecorator)	{
+	STRACE(("WinBorder(%s):~WinBorder()\n",GetName()));
+	if (fDecorator)	
+	{
 		delete fDecorator;
-		fDecorator		= NULL;
+		fDecorator = NULL;
 
 		delete fDecFull;
-		fDecFull		= NULL;
+		fDecFull = NULL;
 	}
 }
-//---------------------------------------------------------------------------
-void WinBorder::RebuildFullRegion(void){
-STRACE(("WinBorder(%s):~RebuildFullRegion()\n",GetName()));
+
+void WinBorder::RebuildFullRegion(void)
+{
+	STRACE(("WinBorder(%s):~RebuildFullRegion()\n",GetName()));
 	BRegion			topLayerFull;
 	Layer			*topLayer = _serverwin->fTopLayer;
 	topLayerFull.Set( ConvertToTop(*fNewTopLayerFrame) );
 	fNewTopLayerFrame = &(_serverwin->fTopLayer->_frame);
 
-// TODO: Convert to screen coordinates!
+	// TODO: Convert to screen coordinates
 	LayerData	*ld;
-	ld			= topLayer->_layerdata;
-	do{
-			// clip to user region
+	ld = topLayer->_layerdata;
+	do
+	{
+		// clip to user region
 		if(ld->clipReg)
 			topLayerFull.IntersectWith( ld->clipReg );
+		
 	} while( (ld = ld->prevState) );
 
-		// clip to user picture region
+	// clip to user picture region
 	if(topLayer->clipToPicture)
-		if(topLayer->clipToPictureInverse) {
+	{
+		if(topLayer->clipToPictureInverse)
 			topLayerFull.Exclude( topLayer->clipToPicture );
-		}
-		else{
+		else
 			topLayerFull.IntersectWith( topLayer->clipToPicture );
-		}
-
+	}
+	
 	_full.MakeEmpty();
-	_full		= topLayerFull;
+	_full = topLayerFull;
 
-	if (fDecorator){
+	if (fDecorator)
+	{
 		fDecFull->MakeEmpty();
 		fDecorator->GetFootprint(fDecFull);
 		_full.Include(fDecFull);
 	}
 }
-//---------------------------------------------------------------------------
-void WinBorder::MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers)
+
+void WinBorder::MouseDown(PortMessage *msg)
 {
 	// this is important to determine how much we should resize or move the Layer(WinBorder)(window)
 
 	// user clicked on WinBorder's visible region, which is in fact decorator's.
 	// so, if true, we find out if the user clicked the decorator.
+
+	// Attached data:
+	// 1) int64 - time of mouse click
+	// 2) float - x coordinate of mouse click
+	// 3) float - y coordinate of mouse click
+	// 4) int32 - modifier keys down
+	// 5) int32 - buttons down
+	// 6) int32 - clicks
+
+	int64 time;
+	BPoint pt;
+	int32 modifierkeys;
+	int32 buttons;
+	int32 clicks;
+	
+	msg->Read<int64>(&time);
+	msg->Read<float>(&pt.x);
+	msg->Read<float>(&pt.y);
+	msg->Read<int32>(&modifierkeys);
+	msg->Read<int32>(&buttons);
+	msg->Read<int32>(&clicks);
+
 	Layer	*target = LayerAt(pt);
-	if (target == this){
-		click_type		action;
+	if (target == this)
+	{
+		click_type action;
+
 		// find out where user clicked in Decorator
-		action			= fDecorator->Clicked(pt, buttons, modifiers);
-		switch(action){
-/*
-TODO: add methods like DrawCloseBtnDown(true/false) to let Decorator draw "down" buttoms
-	for closing and zooming for example. Call them here!
-*/
+		action = fDecorator->Clicked(pt, buttons, modifierkeys);
+		switch(action)
+		{
 			case DEC_CLOSE:
+			{
 				fIsClosing = true;
-//				fDecorator->DrawClosingBtnDown(true);
-STRACE_CLICK(("===> DEC_CLOSE\n"));
+				fDecorator->SetClose(true);
+				fDecorator->DrawClose();
+				STRACE_CLICK(("===> DEC_CLOSE\n"));
 				break;
+			}
 			case DEC_ZOOM:
+			{
 				fIsZooming = true;
-//				fDecorator->DrawZoomBtnDown(true);
-STRACE_CLICK(("===> DEC_ZOOM\n"));
+				fDecorator->SetZoom(true);
+				fDecorator->DrawZoom();
+				STRACE_CLICK(("===> DEC_ZOOM\n"));
 				break;
+			}
 			case DEC_RESIZE:
+			{
 				fIsResizing = true;
-//				fDecorator->DrawResizingBtnDown(true);
-STRACE_CLICK(("===> DEC_RESIZE\n"));
+				STRACE_CLICK(("===> DEC_RESIZE\n"));
 				break;
+			}
 			case DEC_DRAG:
+			{
 				fIsMoving = true;
-//				fDecorator->DrawMovingBtnDown(true);
-STRACE_CLICK(("===> DEC_DRAG\n"));
+				STRACE_CLICK(("===> DEC_DRAG\n"));
 				break;
+			}
 			case DEC_MOVETOBACK:
+			{
 				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
 				break;
+			}
 			case DEC_NONE:
+			{
 				debugger("WinBorder::MouseDown - Decorator should NOT return DEC_NONE\n");
 				break;
+			}
 			default:
+			{
 				debugger("WinBorder::MouseDown - Decorator returned UNKNOWN code\n");
 				break;
+			}
 		}
 	}
-	else{
-/*
-TODO: implement!
-	The problem here is that, there is no way to get the required data for the B_MOUSE_DOWN
-	message. There should be a method like BWindow::CurrentMessage() to get the input message
-	parameters. The problem is that Poller currently use PortLink message system, and there
-	is no way to get the paramets we need(e.g. when, noOfClicks).
-	This yelds PortLink messages from input_server to be replaced by regulat BMessages!!!
-*/
-/*		BMessage	msg;
-		msg->what		= B_MOUSE_DOWN;
-		msg->AddInt64("when", when);
-		msg->AddPoint("where", where);
-		msg->AddInt32("modifiers", modifiers);
-		msg->AddInt32("buttons", buttons);
-		msg->AddInt32("clicks", noOfClicks);
+	else
+	{
+		BMessage msg;
+		msg.what= B_MOUSE_DOWN;
+		msg.AddInt64("when", time);
+		msg.AddPoint("where", pt);
+		msg.AddInt32("modifiers", modifierkeys);
+		msg.AddInt32("buttons", buttons);
+		msg.AddInt32("clicks", clicks);
 		
-		msg->AddInt32("token", token); ??? // Have a look into BLooper::task_looper()!!!
-		Window()->SendMessageToClient(msg);
-*/
+		// TODO: figure out how to specify the target
+		// msg.AddInt32("token", token);
+		Window()->SendMessageToClient(&msg);
 	}
 	
-	fLastMousePosition		= pt;
+	// Just to clean up any mess we've made. :)
+	msg->Rewind();
+	
+	fLastMousePosition = pt;
 }
-//---------------------------------------------------------------------------
-void WinBorder::MouseMoved(const BPoint &pt, const int32 &buttons)
+
+void WinBorder::MouseMoved(PortMessage *msg)
 {
-	if (fIsMoving){
-STRACE_CLICK(("===> Moving...\n"));
+	BPoint pt;
+	int64 dummy;
+	int32 buttons;
+	
+	msg->Read<int64>(&dummy);
+	msg->Read<float>(&pt.x);
+	msg->Read<float>(&pt.y);
+	msg->Read<int32>(&buttons);
+	msg->Rewind();
+	
+	if (fIsMoving)
+	{
+		STRACE_CLICK(("===> Moving...\n"));
 		BPoint		offset = pt;
 		offset		-= fLastMousePosition;
 		MoveBy(offset.x, offset.y);
-		goto MMend;
 	}
-	if (fIsResizing){
-STRACE_CLICK(("===> Resizing...\n"));
+	else
+	if (fIsResizing)
+	{
+		STRACE_CLICK(("===> Resizing...\n"));
 		BPoint		offset = pt;
 		offset		-= fLastMousePosition;
 		ResizeBy(offset.x, offset.y);
-		goto MMend;
 	}
-	if (fIsZooming){
-/*
-TODO: implement!
-	Add what you need to the Decorator API.
-
-		if (fDecorator->GetZoomRegion().Contains(pt)){
-			// do nothing! Mouse still inside the zooming region.
+	else
+	{
+		// Do a click test only if we have to, which would be now. :)
+		click_type location=fDecorator->Clicked(pt,buttons,fKeyModifiers);
+		
+		if (fIsZooming && location!=DEC_ZOOM)
+		{
+			fDecorator->SetZoom(false);
+			fDecorator->DrawZoom();
 		}
-		else{
-			fDecorator->DrawZoomBtnDown(false);
+		else
+		if (fIsClosing && location!=DEC_CLOSE)
+		{
+			fDecorator->SetClose(false);
+			fDecorator->DrawClose();
 		}
-		goto MMend;
-*/
+		else
+		if(fIsMinimizing && location!=DEC_MINIMIZE)
+		{
+			fDecorator->SetMinimize(false);
+			fDecorator->DrawMinimize();
+		}
 	}
-	if (fIsClosing){
-/*
-TODO: implement!
-	Add what you need to the Decorator API.
-
-		if (fDecorator->GetZoomRegion().Contains(pt)){
-			// do nothing! Mouse still inside the zooming region.
-		}
-		else{
-			fDecorator->DrawCloseBtnDown(false);
-		}
-		goto MMend;
-*/
-	}
-
-	MMend:
-	fLastMousePosition		= pt;
+	fLastMousePosition = pt;
 }
-//---------------------------------------------------------------------------
-void WinBorder::MouseUp(const BPoint &pt, const int32 &modifiers)
+
+void WinBorder::MouseUp(PortMessage *msg)
 {
-	if (fIsMoving){
+	if (fIsMoving)
+	{
 		fIsMoving	= false;
-//		DrawMovingBtnDown(false);
 		return;
 	}
-	if (fIsResizing){
+	if (fIsResizing)
+	{
 		fIsResizing	= false;
-//		DrawResisingBtnDown(false);
 		return;
 	}
-	if (fIsZooming){
+	if (fIsZooming)
+	{
 		fIsZooming	= false;
-//		DrawZoomBtnDown(false);
+		fDecorator->SetZoom(false);
+		fDecorator->DrawZoom();
 		return;
 	}
-	if (fIsClosing){
+	if (fIsClosing)
+	{
 		fIsClosing	= false;
-//		DrawCloseBtnDown(false);
+		fDecorator->SetClose(false);
+		fDecorator->DrawClose();
+		return;
+	}
+	if(fIsMinimizing)
+	{
+		fIsMinimizing = false;
+		fDecorator->SetMinimize(false);
+		fDecorator->DrawMinimize();
 		return;
 	}
 }
-//---------------------------------------------------------------------------
+
 void WinBorder::HighlightDecorator(const bool &active)
 {
 	fDecorator->SetFocus(active);
 }
-//---------------------------------------------------------------------------
+
 void WinBorder::Draw(const BRect &r)
 {
-STRACE(("WinBorder(%s)::Draw()\n", GetName()));
-	if(fDecorator){
+	STRACE(("WinBorder(%s)::Draw()\n", GetName()));
+	if(fDecorator)
+	{
 		// decorator is allowed to draw in its entire visible region, not just in the update one.
 		fUpdateReg		= _visible;
 		fUpdateReg.IntersectWith(fDecFull);
 		// restrict Decorator drawing to the update region only.
 		fDriver->ConstrainClippingRegion(&fUpdateReg);
-/*
-fUpdateReg.PrintToStream();
-RGBColor		c(128, 56, 98);
-//fDriver->FillRect(r, c);
-fDriver->FillRect(fUpdateReg.Frame(), c);
-snooze(1000000);
-*/
-// TODO: pass 'r' not as you do now!!! Let Decorator object handle update problems
+
+		
+/*		fUpdateReg.PrintToStream();
+		RGBColor		c(128, 56, 98);
+		//fDriver->FillRect(r, c);
+		fDriver->FillRect(fUpdateReg.Frame(), c);
+		snooze(1000000);
+*/		
+		
+		// TODO: pass 'r' not as you do now!!! Let Decorator object handle update problems
 		fDecorator->Draw(fUpdateReg.Frame());
 
 		// remove the additional clipping region.
 		fDriver->ConstrainClippingRegion(NULL);
 	}
 }
-//---------------------------------------------------------------------------
+
 void WinBorder::MoveBy(float x, float y)
 {
-STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
-	if(fDecorator){
+	STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
+	if(fDecorator)
+	{
 		fDecorator->MoveBy(x,y);
 		fDecFull->OffsetBy(x,y);
 	}
 	
 	Layer::MoveBy(x,y);
 }
-//---------------------------------------------------------------------------
+
 void WinBorder::ResizeBy(float x, float y)
 {
-STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
-	if(fDecorator){
+	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
+	if(fDecorator)
 		fDecorator->ResizeBy(x,y);
-	}
+	
 	BRect		*localRect = new BRect(_serverwin->fTopLayer->_frame);
 	fNewTopLayerFrame			= localRect;
+
 	// force topLayer's frame to resize
 	fNewTopLayerFrame->right	+= x;
 	fNewTopLayerFrame->bottom	+= y;
@@ -364,21 +420,25 @@ STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 	Layer::ResizeBy(x,y);
 	delete localRect;
 }
-//---------------------------------------------------------------------------
-bool WinBorder::HasPoint(BPoint& pt) const{
+
+bool WinBorder::HasPoint(BPoint& pt) const
+{
 	return _fullVisible.Contains(pt);
 }
-//---------------------------------------------------------------------------
-void WinBorder::SetMainWinBorder(WinBorder *newMain){
+
+void WinBorder::SetMainWinBorder(WinBorder *newMain)
+{
 	fMainWinBorder = newMain;
 }
-//---------------------------------------------------------------------------
+
 WinBorder* WinBorder::MainWinBorder() const{
 	return fMainWinBorder;
 }
-//---------------------------------------------------------------------------
-void WinBorder::SetLevel(){
-	switch(_serverwin->Feel()){
+
+void WinBorder::SetLevel()
+{
+	switch(_serverwin->Feel())
+	{
 		case B_NORMAL_WINDOW_FEEL:
 			_level	= B_NORMAL_FEEL;
 			break;
@@ -402,7 +462,8 @@ void WinBorder::SetLevel(){
 			break;
 		case B_SYSTEM_LAST:
 		case B_SYSTEM_FIRST:
-// TODO: uncomment later when this code makes its way into the real server!
+
+			// TODO: uncomment later when this code makes its way into the real server!
 //			if(_win->ServerTeamID() != _win->ClientTeamID())
 //				_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
 //			else
@@ -414,48 +475,55 @@ void WinBorder::SetLevel(){
 			break;
 	}
 }
-//---------------------------------------------------------------------------
-void WinBorder::AddToSubsetOf(WinBorder* main){
-STRACE(("WinBorder(%s)::AddToSubsetOf()\n", GetName()));
+
+void WinBorder::AddToSubsetOf(WinBorder* main)
+{
+	STRACE(("WinBorder(%s)::AddToSubsetOf()\n", GetName()));
 	if (!main || (main && !(main->GetRootLayer())))
 		return;
 
 	if (main->Window()->fWinFMWList.HasItem(this) || !(desktop->HasWinBorder(this)))
 		return;
 
-	if (main->Window()->Feel() == B_NORMAL_WINDOW_FEEL
-			&& ( Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL
-				|| Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
-		)
+	if (main->Window()->Feel() == B_NORMAL_WINDOW_FEEL && 
+		(Window()->Feel()==B_FLOATING_SUBSET_WINDOW_FEEL ||	Window()->Feel()==B_MODAL_SUBSET_WINDOW_FEEL) )
 	{
-			// if the main window is hidden also hide this one.
+		// if the main window is hidden also hide this one.
 		if(main->IsHidden())
 			_hidden = true;
-			// add to main window's subset
+
+		// add to main window's subset
 		main->Window()->fWinFMWList.AddItem(this);
-			// set this member accordingly
+
+		// set this member accordingly
 		fMainWinBorder = main;
-			// because this window is in a subset it should appear in the
-			// workspaces its main window appears in.
+
+		// because this window is in a subset it should appear in the
+		// workspaces its main window appears in.
 		Window()->QuietlySetWorkspaces(main->Window()->Workspaces());
-			// this is a *modal* window, so add it to main windows workspaces.
-		if (Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL){
+
+		// this is a modal window, so add it to main window's workspaces.
+		if (Window()->Feel() == B_MODAL_SUBSET_WINDOW_FEEL)
+		{
 			RootLayer		*rl = main->GetRootLayer();
 			rl->fMainLock.Lock();
 			rl->AddWinBorderToWorkspaces(this, main->Window()->Workspaces());
 			rl->fMainLock.Unlock();
 		}
-			// this a *floating* window so if the main window is 'front',
-			// 	add it to workspace.
-		if ( !(main->IsHidden()) && Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL){
+
+		// this a *floating* window so if the main window is 'front', and add it to workspace.
+		if ( !(main->IsHidden()) && Window()->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL)
+		{
 			RootLayer		*rl = main->GetRootLayer();
 
 			desktop->fGeneralLock.Lock();
 			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
+
 			rl->fMainLock.Lock();
 			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
 
-			for(int32 i = 0; i < rl->WorkspaceCount(); i++){
+			for(int32 i = 0; i < rl->WorkspaceCount(); i++)
+			{
 				Workspace	*ws = rl->WorkspaceAt(i+1);
 				if(ws->FrontLayer() == main)
 					ws->AddLayerPtr(this);
@@ -463,28 +531,35 @@ STRACE(("WinBorder(%s)::AddToSubsetOf()\n", GetName()));
 
 			rl->fMainLock.Unlock();
 			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
+
 			desktop->fGeneralLock.Unlock();
 			STRACE(("WinBorder(%s)::AddToSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
 		}
 	}
 }
-//---------------------------------------------------------------------------
-void WinBorder::RemoveFromSubsetOf(WinBorder* main){
-STRACE(("WinBorder(%s)::RemoveFromSubsetOf()\n", GetName()));
+
+void WinBorder::RemoveFromSubsetOf(WinBorder* main)
+{
+	STRACE(("WinBorder(%s)::RemoveFromSubsetOf()\n", GetName()));
 	RootLayer		*rl = main->GetRootLayer();
 
 	desktop->fGeneralLock.Lock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock acquired\n", GetName(), main->GetName()));
 	rl->fMainLock.Lock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock acquired\n", GetName(), main->GetName()));
-		// remove from main window's subset list.
-	if(main->Window()->fWinFMWList.RemoveItem(this)){
+
+	// remove from main window's subset list.
+	if(main->Window()->fWinFMWList.RemoveItem(this))
+	{
 		int32	count = main->GetRootLayer()->WorkspaceCount();
-		for(int32 i=0; i < count; i++){
-			if(main->Window()->Workspaces() & (0x00000001 << i)){
+		for(int32 i=0; i < count; i++)
+		{
+			if(main->Window()->Workspaces() & (0x00000001 << i))
+			{
 				Workspace	*ws = main->GetRootLayer()->WorkspaceAt(i+1);
-					// if its main window is in 'i' workspaces, remove it from
-					// workspace 'i' if it's in there...
+
+				// if its main window is in 'i' workspaces, remove it from
+				// workspace 'i' if it's in there...
 				ws->RemoveLayerPtr(this);
 			}
 		}
@@ -493,46 +568,55 @@ STRACE(("WinBorder(%s)::RemoveFromSubsetOf()\n", GetName()));
 
 	rl->fMainLock.Unlock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - Main lock released\n", GetName(), main->GetName()));
+
 	desktop->fGeneralLock.Unlock();
 	STRACE(("WinBorder(%s)::RemoveFromSubsetOf(%s) - General lock released\n", GetName(), main->GetName()));
 }
-//---------------------------------------------------------------------------
-void WinBorder::PrintToStream(){
+
+void WinBorder::PrintToStream()
+{
 	printf("\t%s", GetName());
-		if (_level == B_FLOATING_SUBSET_FEEL)
-			printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
-		if (_level == B_FLOATING_APP_FEEL)
-			printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
-		if (_level == B_FLOATING_ALL_FEEL)
-			printf("\t%s", "B_FLOATING_ALL_WINDOW_FEEL");
-		if (_level == B_MODAL_SUBSET_FEEL)
-			printf("\t%s", "B_MODAL_SUBSET_WINDOW_FEEL");
-		if (_level == B_MODAL_APP_FEEL)
-			printf("\t%s", "B_MODAL_APP_WINDOW_FEEL");
-		if (_level == B_MODAL_ALL_FEEL)
-			printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
-		if (_level == B_NORMAL_FEEL)
-			printf("\t%s", "B_NORMAL_WINDOW_FEEL");
+
+	if (_level == B_FLOATING_SUBSET_FEEL)
+		printf("\t%s", "B_FLOATING_SUBSET_WINDOW_FEEL");
+
+	if (_level == B_FLOATING_APP_FEEL)
+		printf("\t%s", "B_FLOATING_APP_WINDOW_FEEL");
+
+	if (_level == B_FLOATING_ALL_FEEL)
+		printf("\t%s", "B_FLOATING_ALL_WINDOW_FEEL");
+
+	if (_level == B_MODAL_SUBSET_FEEL)
+		printf("\t%s", "B_MODAL_SUBSET_WINDOW_FEEL");
+
+	if (_level == B_MODAL_APP_FEEL)
+		printf("\t%s", "B_MODAL_APP_WINDOW_FEEL");
+
+	if (_level == B_MODAL_ALL_FEEL)
+		printf("\t%s", "B_MODAL_ALL_WINDOW_FEEL");
+
+	if (_level == B_NORMAL_FEEL)
+		printf("\t%s", "B_NORMAL_WINDOW_FEEL");
 
 	printf("\t%s\n", _hidden?"hidden" : "not hidden");
 }
-//---------------------------------------------------------------------------
+
 void WinBorder::UpdateColors(void)
 {
-STRACE(("WinBorder %s: UpdateColors unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateColors unimplemented\n",GetName()));
 }
 
 void WinBorder::UpdateDecorator(void)
 {
-STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",GetName()));
 }
 
 void WinBorder::UpdateFont(void)
 {
-STRACE(("WinBorder %s: UpdateFont unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateFont unimplemented\n",GetName()));
 }
 
 void WinBorder::UpdateScreen(void)
 {
-STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
+	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",GetName()));
 }

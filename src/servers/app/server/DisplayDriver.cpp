@@ -21,7 +21,7 @@
 //
 //	File Name:		DisplayDriver.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//				Gabe Yoder <gyoder@stny.rr.com>
+//					Gabe Yoder <gyoder@stny.rr.com>
 //	Description:	Mostly abstract class which handles all graphics output
 //					for the server
 //  

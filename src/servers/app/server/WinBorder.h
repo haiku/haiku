@@ -35,69 +35,69 @@
 class ServerWindow;
 class Decorator;
 class DisplayDriver;
+class PortMessage;
 
 class WinBorder : public Layer
 {
 public:
-								WinBorder(const BRect &r, const char *name, const int32 look,
-									const int32 feel, const int32 flags, ServerWindow *win,
-									DisplayDriver *driver);
-	virtual						~WinBorder(void);
+	WinBorder(const BRect &r, const char *name, const int32 look,const int32 feel, 
+			const int32 flags, ServerWindow *win, DisplayDriver *driver);
+	virtual	~WinBorder(void);
 	
-	virtual	void				Draw(const BRect &r);
+	virtual	void Draw(const BRect &r);
 	
-	virtual	void				MoveBy(float x, float y);
-	virtual	void				ResizeBy(float x, float y);
+	virtual	void MoveBy(float x, float y);
+	virtual	void ResizeBy(float x, float y);
 
-	virtual	void				RebuildFullRegion(void);
+	virtual	void RebuildFullRegion(void);
 
-			void				MouseDown(const BPoint &pt, const int32 &buttons, const int32 &modifiers);
-			void				MouseMoved(const BPoint &pt, const int32 &buttons);
-			void				MouseUp(const BPoint &pt, const int32 &modifiers);
+	void MouseDown(PortMessage *msg);
+	void MouseMoved(PortMessage *msg);
+	void MouseUp(PortMessage *msg);
 	
-			void				UpdateColors(void);
-			void				UpdateDecorator(void);
-			void				UpdateFont(void);
-			void				UpdateScreen(void);
+	void UpdateColors(void);
+	void UpdateDecorator(void);
+	void UpdateFont(void);
+	void UpdateScreen(void);
 	
-			ServerWindow*		Window(void) const { return _serverwin; }
-			Decorator*			GetDecorator(void) const { return fDecorator; }
-			WinBorder*			MainWinBorder() const;
-
-			void				SetLevel();
-			void				HighlightDecorator(const bool &active);
-
-			bool				HasPoint(BPoint &pt) const;
+	ServerWindow *Window(void) const { return _serverwin; }
+	Decorator *GetDecorator(void) const { return fDecorator; }
+	WinBorder *MainWinBorder() const;
 	
-			void				AddToSubsetOf(WinBorder* main);
-			void				RemoveFromSubsetOf(WinBorder* main);
+	void SetLevel();
+	void HighlightDecorator(const bool &active);
 	
-			void				PrintToStream();
+	bool HasPoint(BPoint &pt) const;
+	
+	void AddToSubsetOf(WinBorder* main);
+	void RemoveFromSubsetOf(WinBorder* main);
+	
+	void PrintToStream();
 	
 	// Server "private" :-) - should not be used
-			void				SetMainWinBorder(WinBorder *newMain);	
+	void SetMainWinBorder(WinBorder *newMain);	
 
 protected:
 	friend class Layer;
 	friend class ServerWindow;
 
-			Decorator			*fDecorator;
-			int32				fFlags;
-			int32				fMouseButtons,
-								fKeyModifiers;
-			BPoint				fLastMousePosition;
+	Decorator *fDecorator;
+	int32 fFlags;
+	int32 fMouseButtons;
+	int32 fKeyModifiers;
+	BPoint fLastMousePosition;
 
-			BRegion				*fDecFull;
+	BRegion *fDecFull;
 
-			WinBorder			*fMainWinBorder;
-			bool				fIsMoving;
-			bool				fIsResizing;
-			bool				fIsClosing;
-			bool				fIsMinimizing;
-			bool				fIsZooming;
+	WinBorder *fMainWinBorder;
+	bool fIsMoving;
+	bool fIsResizing;
+	bool fIsClosing;
+	bool fIsMinimizing;
+	bool fIsZooming;
 
-			// having a hard time doing resizing. It's not nice, but this helps a bit
-			BRect				*fNewTopLayerFrame;
+	// having a hard time doing resizing. It's not nice, but this helps a bit
+	BRect *fNewTopLayerFrame;
 };
 
 #endif

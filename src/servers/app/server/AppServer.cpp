@@ -611,7 +611,6 @@ void AppServer::DispatchMessage(PortMessage *msg)
 		}
 		case AS_GET_DECORATOR:
 		{
-			// TODO: get window decorator's name and return it to the sender
 			// Attached Data:
 			// 1) port_id reply port
 			
@@ -630,7 +629,6 @@ void AppServer::DispatchMessage(PortMessage *msg)
 			
 			// Attached Data:
 			// char * name of the decorator in the decorators path to use
-			printf("AppServer::AS_R5_SET_DECORATOR unimplemented\n");
 			
 			int32 decindex;
 			msg->Read<int32>(&decindex);

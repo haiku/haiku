@@ -386,12 +386,14 @@ void ServerWindow::Minimize(bool status){
 
 		SendMessageToClient(&msg);
 		
-// TODO: notify tracker! how???
+	// TODO: notify tracker! how???
 	}
 }
 
 void ServerWindow::Zoom(){
-// TODO: implement;
+	BMessage msg;
+	msg.what=B_ZOOM;
+	SendMessageToClient(&msg);
 }
 
 /*!
