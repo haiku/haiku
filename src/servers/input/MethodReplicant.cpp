@@ -115,7 +115,7 @@ MethodReplicant::AttachedToWindow()
 	BMessage msg(IS_METHOD_REGISTER);
 	msg.AddMessenger("address", messenger);
 
-	BMessenger inputMessenger("application/x-vnd.Be-input_server");
+	BMessenger inputMessenger(fSignature);
 	BMessage reply;
 	if (inputMessenger.SendMessage(&msg, &reply)!=B_OK) {
 		printf("error when contacting input_server\n");
@@ -190,7 +190,7 @@ MethodReplicant::MouseDown(BPoint point)
 	if (item) {
 		BMessage msg(IS_SET_METHOD);
 		msg.AddInt32("cookie", item->Cookie());
-		BMessenger messenger("application/x-vnd.Be-input_server");
+		BMessenger messenger(fSignature);
 		messenger.SendMessage(&msg);
 	}
 }
