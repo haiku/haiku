@@ -82,6 +82,7 @@ DiskDeviceManager::MessageReceived(BMessage *message)
 void
 DiskDeviceManager::_NextDiskDeviceRequest(BMessage *message)
 {
+	FUNCTION_START();
 	status_t error = B_OK;
 	int32 cookie = 0;
 	BMessage reply(B_REG_RESULT);
@@ -90,12 +91,12 @@ DiskDeviceManager::_NextDiskDeviceRequest(BMessage *message)
 		if (RDiskDevice *device = fDeviceList.DeviceWithID(cookie, false)) {
 			// archive device
 			BMessage deviceArchive;
-			error = device->Archive(&deviceArchive);
+			SET_ERROR(error, device->Archive(&deviceArchive));
 			// add archived device and next cookie to reply message
 			if (error == B_OK)
-				error = reply.AddMessage("device", &deviceArchive);
+				SET_ERROR(error, reply.AddMessage("device", &deviceArchive));
 			if (error == B_OK)
-				error = reply.AddInt32("cookie", device->ID() + 1);
+				SET_ERROR(error, reply.AddInt32("cookie", device->ID() + 1));
 		} else
 			error = B_ENTRY_NOT_FOUND;
 	} else

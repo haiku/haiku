@@ -41,7 +41,7 @@ status_t
 RDiskDevice::SetTo(const char *path, int fd, const device_geometry *geometry,
 				   status_t mediaStatus)
 {
-FUNCTION_START();
+PRINT(("RDiskDevice::SetTo()\n"));
 	Unset();
 	status_t error = B_OK;
 	fID = _NextID();
@@ -66,6 +66,7 @@ FUNCTION_START();
 			break;
 		default:
 			error = fMediaStatus;
+			break;
 	}
 	// scan the device for sessions, if we have a media
 	if (fMediaStatus == B_OK) {

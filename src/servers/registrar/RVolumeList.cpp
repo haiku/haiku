@@ -22,9 +22,9 @@ struct CompareIDPredicate : public UnaryPredicate<RVolume> {
 	{
 		dev_t id = volume->ID();
 		if (fID < id)
-			return -1;
-		if (fID > id)
 			return 1;
+		if (fID > id)
+			return -1;
 		return 0;
 	}
 	

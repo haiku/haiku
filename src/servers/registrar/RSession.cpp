@@ -131,18 +131,6 @@ RSession::RemovePartition(RPartition *partition)
 	return success;
 }
 
-// print_session_info
-static
-void
-print_session_info(const char *prefix, const session_info &info)
-{
-	printf("%soffset:        %lld\n", prefix, info.offset);
-	printf("%ssize:          %lld\n", prefix, info.size);
-	printf("%sblock size:    %ld\n", prefix, info.logical_block_size);
-	printf("%sindex:         %ld\n", prefix, info.index);
-	printf("%sflags:         %lx\n", prefix, info.flags);
-}
-
 // Archive
 status_t
 RSession::Archive(BMessage *archive) const
@@ -175,6 +163,18 @@ RSession::Archive(BMessage *archive) const
 			break;
 	}
 	return error;
+}
+
+// print_session_info
+static
+void
+print_session_info(const char *prefix, const session_info &info)
+{
+	printf("%soffset:        %lld\n", prefix, info.offset);
+	printf("%ssize:          %lld\n", prefix, info.size);
+	printf("%sblock size:    %ld\n", prefix, info.logical_block_size);
+	printf("%sindex:         %ld\n", prefix, info.index);
+	printf("%sflags:         %lx\n", prefix, info.flags);
 }
 
 // Dump

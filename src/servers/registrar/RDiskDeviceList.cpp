@@ -48,9 +48,9 @@ struct CompareIDPredicate : public UnaryPredicate<T> {
 	{
 		int32 id = object->ID();
 		if (fID < id)
-			return -1;
-		if (fID > id)
 			return 1;
+		if (fID > id)
+			return -1;
 		return 0;
 	}
 
