@@ -1,0 +1,365 @@
+[5.0]
+* false --help now exits nonzero
+
+[4.5.12]
+* printf no longer treats \x specially when POSIXLY_CORRECT is set
+* printf avoids buffer overrun with format ending in a backslash and
+* printf avoids buffer overrun with incomplete conversion specifier
+* printf accepts multiple flags in a single conversion specifier
+
+[4.5.11]
+* seq no longer requires that a field width be specified
+* seq no longer fails when given a field width of `0'
+* seq now accepts ` ' and `'' as valid format flag characters
+* df now shows a HOSTNAME: prefix for each remote-mounted file system on AIX 5.1
+* portability tweaks for HP-UX, AIX 5.1, DJGPP
+
+[4.5.10]
+* printf no longer segfaults for a negative field width or precision
+* shred now always enables --exact for non-regular files
+* du no longer lists hard-linked files more than once
+* du no longer dumps core on some systems due to `infinite' recursion
+  via nftw's use of the buggy replacement function in getcwd.c
+* portability patches for a few vendor compilers and 64-bit systems
+* du -S *really* now works like it did before the change in 4.5.5
+
+[4.5.9]
+* du no longer truncates file sizes or sums to fit in 32-bit size_t
+* work around Linux kernel bug in getcwd (fixed in 2.4.21-pre4), so that pwd
+  now fails if the name of the working directory is so long that getcwd
+  truncates it.  Before it would print the truncated name and exit successfully.
+* `df /some/mount-point' no longer hangs on a GNU libc system when another
+  hard-mounted NFS file system (preceding /some/mount-point in /proc/mounts)
+  is inaccessible.
+* rm -rf now gives an accurate diagnostic when failing to remove a file
+  under certain unusual conditions
+* mv and `cp --preserve=links' now preserve multiple hard links even under
+  certain unusual conditions where they used to fail
+
+[4.5.8]
+* du -S once again works like it did before the change in 4.5.5
+* stat accepts a new file format, %B, for the size of each block reported by %b
+* du accepts new option: --apparent-size
+* du --bytes (-b) works the same way it did in fileutils-3.16 and before
+* du reports proper sizes for directories (not zero) (broken in 4.5.6 or 4.5.7)
+* df now always displays under `Filesystem', the device file name
+  corresponding to the listed mount point.  Before, for a block- or character-
+  special file command line argument, df would display that argument.  E.g.,
+  `df /dev/hda' would list `/dev/hda' as the `Filesystem', rather than say
+  /dev/hda3 (the device on which `/' is mounted), as it does now.
+* test now works properly when invoked from a set user ID or set group ID
+  context and when testing access to files subject to alternate protection
+  mechanisms.  For example, without this change, a set-UID program that invoked
+  `test -w F' (to see if F is writable) could mistakenly report that it *was*
+  writable, even though F was on a read-only file system, or F had an ACL
+  prohibiting write access, or F was marked as immutable.
+
+[4.5.7]
+* du would fail with more than one DIR argument when any but the last did not
+  contain a slash (due to a bug in ftw.c)
+
+[4.5.6]
+* du no longer segfaults on Solaris systems (fixed heap-corrupting bug in ftw.c)
+* du --exclude=FILE works once again (this was broken by the rewrite for 4.5.5)
+* du no longer gets a failed assertion for certain hierarchy lay-outs
+  involving hard-linked directories
+* `who -r' no longer segfaults when using non-C-locale messages
+* df now displays a mount point (usually `/') for non-mounted
+  character-special and block files
+
+[4.5.5]
+* ls --dired produces correct byte offset for file names containing
+  nonprintable characters in a multibyte locale
+* du has been rewritten to use a variant of GNU libc's ftw.c
+* du now counts the space associated with a directory's directory entry,
+  even if it cannot list or chdir into that subdirectory.
+* du -S now includes the st_size of each entry corresponding to a subdirectory
+* rm on FreeBSD can once again remove directories from NFS-mounted file systems
+* ls has a new option --dereference-command-line-symlink-to-dir, which
+  corresponds to the new default behavior when none of -d, -l -F, -H, -L
+  has been specified.
+* ls dangling-symlink now prints `dangling-symlink'.
+  Before, it would fail with `no such file or directory'.
+* ls -s symlink-to-non-dir and ls -i symlink-to-non-dir now print
+  attributes of `symlink', rather than attributes of their referents.
+* Fix a bug introduced in 4.5.4 that made it so that ls --color would no
+  longer highlight the names of files with the execute bit set when not
+  specified on the command line.
+* shred's --zero (-z) option no longer gobbles up any following argument.
+  Before, `shred --zero file' would produce `shred: missing file argument',
+  and worse, `shred --zero f1 f2 ...' would appear to work, but would leave
+  the first file untouched.
+* readlink: new program
+* cut: new feature: when used to select ranges of byte offsets (as opposed
+  to ranges of fields) and when --output-delimiter=STRING is specified,
+  output STRING between ranges of selected bytes.
+* rm -r can no longer be tricked into mistakenly reporting a cycle.
+* when rm detects a directory cycle, it no longer aborts the entire command,
+  but rather merely stops processing the affected command line argument.
+
+[4.5.4]
+* cp no longer fails to parse options like this: --preserve=mode,ownership
+* `ls --color -F symlink-to-dir' works properly
+* ls is much more efficient on directories with valid dirent.d_type.
+* stty supports all baud rates defined in linux-2.4.19.
+* `du symlink-to-dir/' would improperly remove the trailing slash
+* `du ""' would evoke a bounds violation.
+* In the unlikely event that running `du /' resulted in `stat ("/", ...)'
+  failing, du would give a diagnostic about `' (empty string) rather than `/'.
+* printf: a hexadecimal escape sequence has at most two hex. digits, not three.
+* The following features have been added to the --block-size option
+  and similar environment variables of df, du, and ls.
+  - A leading "'" generates numbers with thousands separators.
+    For example:
+      $ ls -l --block-size="'1" file
+      -rw-rw-r--    1 eggert   src      47,483,707 Sep 24 23:40 file
+  - A size suffix without a leading integer generates a suffix in the output.
+    For example:
+      $ ls -l --block-size="K"
+      -rw-rw-r--    1 eggert   src          46371K Sep 24 23:40 file
+* ls's --block-size option now affects file sizes in all cases, not
+  just for --block-size=human-readable and --block-size=si.  Fractional
+  sizes are now always rounded up, for consistency with df and du.
+* df now displays the block size using powers of 1000 if the requested
+  block size seems to be a multiple of a power of 1000.
+* nl no longer gets a segfault when run like this `yes|nl -s%n'
+
+[4.5.3]
+* du --dereference-args (-D) no longer fails in certain cases
+* `ln --target-dir=DIR' no longer fails when given a single argument
+
+[4.5.2]
+* `rm -i dir' (without --recursive (-r)) no longer recurses into dir
+* `tail -c N FILE' now works with files of size >= 4GB
+* `mkdir -p' can now create very deep (e.g. 40,000-component) directories
+* rmdir -p dir-with-trailing-slash/ no longer fails
+* printf now honors the `--' command line delimiter
+* od's 8-byte formats x8, o8, and u8 now work
+* tail now accepts fractional seconds for its --sleep-interval=S (-s) option
+
+[4.5.1]
+* du and ls now report sizes of symbolic links (before they'd always report 0)
+* uniq now obeys the LC_COLLATE locale, as per POSIX 1003.1-2001 TC1.
+
+========================================================================
+Here are the NEWS entries made from fileutils-4.1 until the
+point at which the packages merged to form the coreutils:
+
+[4.1.11]
+* `rm symlink-to-unwritable' doesn't prompt [introduced in 4.1.10]
+[4.1.10]
+* rm once again gives a reasonable diagnostic when failing to remove a file
+    owned by someone else in a sticky directory [introduced in 4.1.9]
+* df now rounds all quantities up, as per POSIX.
+* New ls time style: long-iso, which generates YYYY-MM-DD HH:MM.
+* Any time style can be preceded by "posix-"; this causes "ls" to
+  use traditional timestamp format when in the POSIX locale.
+* The default time style is now posix-long-iso instead of posix-iso.
+  Set TIME_STYLE="posix-iso" to revert to the behavior of 4.1.1 thru 4.1.9.
+* `rm dangling-symlink' doesn't prompt [introduced in 4.1.9]
+* stat: remove support for --secure/-s option and related %S and %C format specs
+* stat: rename --link/-l to --dereference/-L.
+    The old options will continue to work for a while.
+[4.1.9]
+* rm can now remove very deep hierarchies, in spite of any limit on stack size
+* new programs: link, unlink, and stat
+* New ls option: --author (for the Hurd).
+* `touch -c no-such-file' no longer fails, per POSIX
+[4.1.8]
+* mv no longer mistakenly creates links to preexisting destination files
+    that aren't moved
+[4.1.7]
+* rm: close a hole that would allow a running rm process to be subverted
+[4.1.6]
+* New cp option: --copy-contents.
+* cp -r is now equivalent to cp -R.  Use cp -R -L --copy-contents to get the
+  traditional (and rarely desirable) cp -r behavior.
+* ls now accepts --time-style=+FORMAT, where +FORMAT works like date's format
+* The obsolete usage `touch [-acm] MMDDhhmm[YY] FILE...' is no longer
+  supported on systems conforming to POSIX 1003.1-2001.  Use touch -t instead.
+* cp and inter-partition mv no longer give a misleading diagnostic in some
+    unusual cases
+[4.1.5]
+* cp -r no longer preserves symlinks
+* The block size notation is now compatible with SI and with IEC 60027-2.
+  For example, --block-size=1MB now means --block-size=1000000,
+  whereas --block-size=1MiB now means --block-size=1048576.
+  A missing `B' (e.g. `1M') has the same meaning as before.
+  A trailing `B' now means decimal, not binary; this is a silent change.
+  The nonstandard `D' suffix (e.g. `1MD') is now obsolescent.
+* -H or --si now outputs the trailing 'B', for consistency with the above.
+* Programs now output trailing 'K' (not 'k') to mean 1024, as per IEC 60027-2.
+* New df, du short option -B is short for --block-size.
+* You can omit an integer `1' before a block size suffix,
+  e.g. `df -BG' is equivalent to `df -B 1G' and to `df --block-size=1G'.
+* The following options are now obsolescent, as their names are
+  incompatible with IEC 60027-2:
+   df, du: -m or --megabytes (use -BM or --block-size=1M)
+   df, du, ls: --kilobytes (use --block-size=1K)
+[4.1.4]
+* df --local no longer lists smbfs file systems whose name starts with //
+* dd now detects the Linux/tape/lseek bug at run time and warns about it.
+[4.1.3]
+* ls -R once again outputs a blank line between per-directory groups of files.
+    This was broken by the cycle-detection change in 4.1.1.
+* dd once again uses `lseek' on character devices like /dev/mem and /dev/kmem.
+    On systems with the linux kernel (at least up to 2.4.16), dd must still
+    resort to emulating `skip=N' behavior using reads on tape devices, because
+    lseek has no effect, yet appears to succeed.  This may be a kernel bug.
+[4.1.2]
+* cp no longer fails when two or more source files are the same;
+    now it just gives a warning and doesn't copy the file the second time.
+    E.g., cp a a d/ produces this:
+    cp: warning: source file `a' specified more than once
+* chmod would set the wrong bit when given symbolic mode strings like
+    these: g=o, o=g, o=u.  E.g., `chmod a=,o=w,ug=o f' would give a mode
+    of --w-r---w- rather than --w--w--w-.
+[4.1.1]
+* mv (likewise for cp), now fails rather than silently clobbering one of
+    the source files in the following example:
+    rm -rf a b c; mkdir a b c; touch a/f b/f; mv a/f b/f c
+* ls -R detects directory cycles, per POSIX.  It warns and doesn't infloop.
+* cp's -P option now means the same as --no-dereference, per POSIX.
+    Use --parents to get the old meaning.
+* When copying with the -H and -L options, cp can preserve logical
+    links between source files with --preserve=links
+* cp accepts new options:
+    --preserve[={mode,ownership,timestamps,links,all}]
+    --no-preserve={mode,ownership,timestamps,links,all}
+* cp's -p and --preserve options remain unchanged and are equivalent
+    to `--preserve=mode,ownership,timestamps'
+* mv and cp accept a new option: --reply={yes,no,query};  provides a consistent
+    mechanism to control whether one is prompted about certain existing
+    destination files.  Note that cp's and mv's -f options don't have the
+    same meaning: cp's -f option no longer merely turns off `-i'.
+* remove portability limitations (e.g., PATH_MAX on the Hurd, fixes for
+    64-bit systems)
+* mv now prompts before overwriting an existing, unwritable destination file
+    when stdin is a tty, unless --force (-f) is specified, as per POSIX.
+* mv: fix the bug whereby `mv -uf source dest' would delete source,
+    even though it's older than dest.
+* chown's --from=CURRENT_OWNER:CURRENT_GROUP option now works
+* cp now ensures that the set-user-ID and set-group-ID bits are cleared for
+    the destination file when when copying and not preserving permissions.
+* `ln -f --backup k k' gives a clearer diagnostic
+* ls no longer truncates user names or group names that are longer
+    than 8 characters.
+* ls's new --dereference-command-line option causes it to dereference
+  symbolic links on the command-line only.  It is the default unless
+  one of the -d, -F, or -l options are given.
+* ls -H now means the same as ls --dereference-command-line, as per POSIX.
+* ls -g now acts like ls -l, except it does not display owner, as per POSIX.
+* ls -n now implies -l, as per POSIX.
+* ls can now display dates and times in one of four time styles:
+
+  - The `full-iso' time style gives full ISO-style time stamps like
+    `2001-05-14 23:45:56.477817180 -0700'.
+  - The 'iso' time style gives ISO-style time stamps like '2001-05-14 '
+    and '05-14 23:45'.
+  - The 'locale' time style gives locale-dependent time stamps like
+    'touko  14  2001' and 'touko  14 23:45' (in a Finnish locale).
+  - The 'posix-iso' time style gives traditional POSIX-locale
+    time stamps like 'May 14  2001' and 'May 14 23:45' unless the user
+    specifies a non-POSIX locale, in which case it uses ISO-style dates.
+    This is the default.
+
+  You can specify a time style with an option like --time-style='iso'
+  or with an environment variable like TIME_STYLE='iso'.  GNU Emacs 21
+  and later can parse ISO dates, but older Emacs versions cannot, so
+  if you are using an older version of Emacs outside the default POSIX
+  locale, you may need to set TIME_STYLE="locale".
+
+* --full-time is now an alias for "-l --time-style=full-iso".
+
+
+========================================================================
+Here are the NEWS entries made from sh-utils-2.0 until the
+point at which the packages merged to form the coreutils:
+
+ [2.0.15]
+* date no longer accepts e.g., September 31 in the MMDDhhmm syntax
+* fix a bug in this package's .m4 files and in configure.ac
+ [2.0.14]
+* nohup's behavior is changed as follows, to conform to POSIX 1003.1-2001:
+  - nohup no longer adjusts scheduling priority; use "nice" for that.
+  - nohup now redirects stderr to stdout, if stderr is not a terminal.
+  - nohup exit status is now 126 if command was found but not invoked,
+    127 if nohup failed or if command was not found.
+ [2.0.13]
+* uname and uptime work better on *BSD systems
+* pathchk now exits nonzero for a path with a directory component
+    that specifies a non-directory
+ [2.0.12]
+* kill: new program
+* who accepts new options: --all (-a), --boot (-b), --dead (-d), --login,
+   --process (-p), --runlevel (-r), --short (-s), --time (-t), --users (-u).
+   The -u option now produces POSIX-specified results and is the same as
+   the long option `--users'.  --idle is no longer the same as -u.
+* The following changes apply on systems conforming to POSIX 1003.1-2001,
+  and are required by the new POSIX standard:
+   - `date -I' is no longer supported.  Instead, use `date --iso-8601'.
+   - `nice -NUM' is no longer supported.  Instead, use `nice -n NUM'.
+* New 'uname' options -i or --hardware-platform, and -o or --operating-system.
+   'uname -a' now outputs -i and -o information at the end.
+   New uname option --kernel-version is an alias for -v.
+   Uname option --release has been renamed to --kernel-release,
+   and --sysname has been renamed to --kernel-name;
+   the old options will work for a while, but are no longer documented.
+* 'expr' now uses the LC_COLLATE locale for string comparison, as per POSIX.
+* 'expr' now requires '+' rather than 'quote' to quote tokens;
+    this removes an incompatibility with POSIX.
+* date -d 'last friday' would print a date/time that was one hour off
+    (e.g., 23:00 on *thursday* rather than 00:00 of the preceding friday)
+    when run such that the current time and the target date/time fall on
+    opposite sides of a daylight savings time transition.
+    This problem arose only with relative date strings like `last monday'.
+    It was not a problem with strings that include absolute dates.
+* factor is twice as fast, for large numbers
+ [2.0.11]
+* setting the date now works properly, even when using -u
+* `date -f - < /dev/null' no longer dumps core
+* some DOS/Windows portability changes
+ [2.0j]
+* `date -d DATE' now parses certain relative DATEs correctly
+ [2.0i]
+* fixed a bug introduced in 2.0h that made many programs fail with a
+ `write error' when invoked with the --version option
+ [2.0h]
+* all programs fail when printing --help or --version output to a full device
+* printf exits nonzero upon write failure
+* yes now detects and terminates upon write failure
+* date --rfc-822 now always emits day and month names from the `C' locale
+* portability tweaks for Solaris8, Ultrix, and DOS
+ [2.0g]
+* date now handles two-digit years with leading zeros correctly.
+* printf interprets unicode, \uNNNN \UNNNNNNNN, on systems with the
+  required support;  from Bruno Haible.
+* stty's rprnt attribute now works on HPUX 10.20
+* seq's --equal-width option works more portably
+ [2.0f]
+* fix build problems with ut_name vs. ut_user
+ [2.0e]
+* stty: fix long-standing bug that caused test failures on at least HPUX
+  systems when COLUMNS was set to zero
+* still more portability fixes
+* unified lib/: now that directory and most of the configuration framework
+  is common between fileutils, textutils, and sh-utils
+ [2.0d]
+* fix portability problem with sleep vs lib/strtod.c's requirement for -lm
+ [2.0c]
+* fix portability problems with nanosleep.c and with the new code in sleep.c
+ [2.0b]
+* Regenerate lib/Makefile.in so that nanosleep.c is distributed.
+ [2.0a]
+* sleep accepts floating point arguments on command line
+* sleep's clock continues counting down when sleep is suspended
+* when a suspended sleep process is resumed, it continues sleeping if
+  there is any time remaining
+* who once again prints whatever host information it has, even without --lookup
+
+========================================================================
+For older NEWS entries for the fileutils, textutils, and sh-utils
+packages, see ./old/*/NEWS.
+
+  This package began as the union of the following:
+  textutils-2.1, fileutils-4.1.11, sh-utils-2.0.15.

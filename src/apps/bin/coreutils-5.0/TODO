@@ -1,0 +1,79 @@
+restore djgpp, eventually
+merge TODO lists
+add unit tests for lib/*.c
+rewrite lib/ftw.c not to use explicit recursion, and then use nftw in
+  chown, chgrp, chmod, du
+
+strip: add an option to specify the program used to strip binaries.
+  suggestion from Karl Berry
+
+doc/coreutils.texi:
+  Address this comment: FIXME: mv's behavior in this case is system-dependent
+  Better still: fix the code so it's *not* system-dependent.
+
+implement --target-directory=DIR for install (per texinfo documentation)
+
+ls: add --format=FORMAT option that controls how each line is printed.
+
+cp --no-preserve=X should not attempt to preserve attribute X
+  reported by Andreas Schwab
+
+copy.c: Address the FIXME-maybe comment in copy_internal.
+And once that's done, add an exclusion so that `cp --link'
+no longer incurs the overhead of saving src. dev/ino and dest. filename
+in the hash table.
+
+Apply suggestion from Paul Jarc to use something along the
+lines of http://cr.yp.to/daemontools/setuidgid.html to avoid
+kludges (as in tests/rm/fail-2eperm) when running tests as root.
+
+See if we can be consistent about where --verbose sends its output:
+  These all send --verbose output to stdout:
+    head, tail, rm, cp, mv, ln, chmod, chown, chgrp, install, ln
+  These send it to stderr:
+    shred mkdir split
+  readlink is different
+
+Write an autoconf test to work around build failure in HPUX's 64-bit mode.
+See notes in README -- and remove them once there's a work-around.
+
+after 5.0, change doc strings (like df, ls, etc) not to use `,'
+as thousands separator in e.g. 1,000,000.  Instead, do this:
+
+  SIZE may be (or may be an integer optionally followed by) one of following:
+  kB 1000, K 1024, MB 1000*1000, M 1024*1024 and so on for G, T, P, E, Z, Y.
+
+Integrate use of sendfile, suggested here:
+  http://mail.gnu.org/archive/html/bug-fileutils/2003-03/msg00030.html
+
+Should printf '\0123' print "\n3"?
+  per report from TAKAI Kousuke on Mar 27
+  http://mail.gnu.org/archive/html/bug-coreutils/2003-03/index.html
+
+printf: consider adapting builtins/printf.def from bash
+
+df: add `--total' option, suggested here http://bugs.debian.org/186007
+
+Martin Michlmayr's patch to provide ls with `--sort directory' option
+
+seq: give better diagnostics for invalid formats:
+   e.g. no or too many % directives
+seq: consider allowing format string to contain no %-directives
+
+dd: consider adding an option to suppress `bytes/block read/written'
+output to stderr.  Suggested here:
+  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=165045
+
+nl: fix this bug:
+  http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=177256
+  # printf 'a\n\n'|nl|cat -A
+     1^Ia$
+         $
+  $
+
+m4: rename all macros that start with AC_ to start with another prefix
+
+Consider using an autoconf test and rename wrapper to make mv work
+properly (by unlinking a) in cases like this:
+  : > a; ln a b; mv a b
+Reported by Ed Avis: http://article.gmane.org/gmane.comp.gnu.fileutils.bugs/686
