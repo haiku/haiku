@@ -103,41 +103,50 @@ DataView::UpdateFromEditor(BMessage *message)
 	if (fData == NULL)
 		return;
 
-	if (fEditor.Lock()) {
-		fFileSize = fEditor.FileSize();
+	BAutolock locker(fEditor);
 
-		// get the range of the changes
+	fFileSize = fEditor.FileSize();
 
-		int32 start = 0, end = fDataSize - 1;
-		off_t offset, size;
-		if (message != NULL
-			&& message->FindInt64("offset", &offset) == B_OK
-			&& message->FindInt64("size", &size) == B_OK) {
-			if (offset > fOffset + fDataSize
-				|| offset + size < fOffset) {
-				// the changes are not within our scope, so we can ignore them
-				return;
-			}
+	// get the range of the changes
 
-			if (offset > fOffset)
-				start = offset - fOffset;
-			if (offset + size < fOffset + fDataSize)
-				end = offset + size - fOffset;
+	int32 start = 0, end = fDataSize - 1;
+	off_t offset, size;
+	if (message != NULL
+		&& message->FindInt64("offset", &offset) == B_OK
+		&& message->FindInt64("size", &size) == B_OK) {
+		if (offset > fOffset + fDataSize
+			|| offset + size < fOffset) {
+			// the changes are not within our scope, so we can ignore them
+			return;
 		}
 
-		if (fOffset + fDataSize > fFileSize)
-			fSizeInView = fFileSize - fOffset;
-		else
-			fSizeInView = fDataSize;
+		if (offset > fOffset)
+			start = offset - fOffset;
+		if (offset + size < fOffset + fDataSize)
+			end = offset + size - fOffset;
+	}
 
-		const uint8 *data;
-		if (fEditor.GetViewBuffer(&data) == B_OK)
-			// ToDo: copy only the relevant part
-			memcpy(fData, data, fDataSize);
+	if (fOffset + fDataSize > fFileSize)
+		fSizeInView = fFileSize - fOffset;
+	else
+		fSizeInView = fDataSize;
 
-		fEditor.Unlock();
+	const uint8 *data;
+	if (fEditor.GetViewBuffer(&data) == B_OK)
+		// ToDo: copy only the relevant part
+		memcpy(fData, data, fDataSize);
 
-		InvalidateRange(start, end);
+	fEditor.Unlock();
+
+	InvalidateRange(start, end);
+
+	// we notify our selection listeners also if the
+	// data in the selection has changed
+	if (start <= fEnd && end >= fStart) {
+		BMessage update;
+		update.AddInt64("start", fStart);
+		update.AddInt64("end", fEnd);
+		SendNotices(kDataViewSelection, &update);
 	}
 }
 
