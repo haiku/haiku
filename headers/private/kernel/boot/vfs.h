@@ -54,6 +54,7 @@ class Directory : public Node {
 		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize) = 0;
 		virtual status_t GetNextNode(void *cookie, Node **_node) = 0;
 		virtual status_t Rewind(void *cookie) = 0;
+		virtual bool IsEmpty() = 0;
 
 		virtual status_t AddNode(Node *node);
 };
@@ -74,19 +75,17 @@ class ConsoleNode : public Node {
 /** The root file system */
 extern Directory *gRoot;
 
-extern "C" {
-#endif	/* __cplusplus */
+/* function prototypes */
 
 extern status_t vfs_init(stage2_args *args);
-extern status_t mount_boot_file_systems();
-extern status_t add_partitions_for(int fd);
-
-#ifdef __cplusplus
-// this function is only available in C++
+extern Directory *get_boot_file_system(stage2_args *args);
+extern status_t mount_file_systems(stage2_args *args);
 extern int open_node(Node *node, int mode);
 extern int open_from(Directory *directory, const char *path, int mode);
 
-}
-#endif
+extern status_t add_partitions_for(int fd, bool mountFileSystems);
+extern status_t add_partitions_for(Node *device, bool mountFileSystems);
+
+#endif	/* __cplusplus */
 
 #endif	/* KERNEL_BOOT_VFS_H */
