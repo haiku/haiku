@@ -107,7 +107,7 @@ virtual		status_t _Reserved_AbstractFileInterfaceAddOn_13(void *);
 virtual		status_t _Reserved_AbstractFileInterfaceAddOn_14(void *);
 virtual		status_t _Reserved_AbstractFileInterfaceAddOn_15(void *);
 
-		uint32 _reserved_media_reader_add_on_[16];
+		uint32 _reserved_abstract_file_interface_add_on_[16];
 
 };
 
