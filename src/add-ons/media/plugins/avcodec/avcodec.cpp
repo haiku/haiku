@@ -458,7 +458,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 #ifdef DO_PROFILING
 			prof_t2 = system_time();
 #endif
-			PRINT(("ONE FRAME OUT !! len=%ld sz=%ld (%s)\n", len, fSize, pixfmt_to_string(ffc->pix_fmt)));
+			PRINT(("ONE FRAME OUT !! len=%ld size=%ld (%s)\n", len, size, pixfmt_to_string(ffc->pix_fmt)));
 /*
 			opicture.data[0] = (uint8_t *)out_buffer;
 			opicture.linesize[0] = fOutputVideoFormat.display.bytes_per_row;
