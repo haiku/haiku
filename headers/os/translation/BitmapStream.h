@@ -91,15 +91,11 @@ protected:
 	bool fDetached;
 		// true if the bitmap has been detached, false if not
 
-	static status_t ConvertBEndianToHost(TranslatorBitmap *);
-		// Converts a TranslatorBitmap struct from the Big Endian
-		// format to the host format. This is needed because
-		// the headers are always stored in the Big Endian format
-		// when read in from or written out to files.
-	status_t SetBigEndianHeader();
-		// Sets fpBigEndianHeader to be the Big Endian version
-		// of the data in fHeader. I need a Big Endian copy
-		// of fHeader for the ReadAt() function.
+	void SwapHeader(const TranslatorBitmap *source,
+		TranslatorBitmap *destination);
+		// swaps the byte order of source, no matter what the
+		// byte order of source is, and copies the result to
+		// destination
 	
 private:
 	TranslatorBitmap *fpBigEndianHeader;
