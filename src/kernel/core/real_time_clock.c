@@ -104,7 +104,10 @@ rtc_init(kernel_args *args)
 	// ToDo: initialization of the system time conversion factor is an x86 thing
 	//	and should be moved there
 	sRealTimeData->system_time_conversion_factor = args->arch_args.system_time_cv_factor;
-
+	
+	sRealTimeData->timezone_offset = 0;
+	sRealTimeData->dst_observed = false;
+	
 	rtc_hw_to_system();
 
 	add_debugger_command("rtc", &rtc_debug, "Set and test the real-time clock");
@@ -119,7 +122,8 @@ rtc_init(kernel_args *args)
 void
 set_real_time_clock(uint32 currentTime)
 {
-	sRealTimeData->boot_time = currentTime * 1000000LL - system_time();
+	sRealTimeData->boot_time = currentTime * 1000000LL - system_time()
+		- sRealTimeData->timezone_offset;
 	rtc_system_to_hw();
 }
 
@@ -127,8 +131,8 @@ set_real_time_clock(uint32 currentTime)
 uint32
 real_time_clock(void)
 {
-	// ToDo: implement me - they might be used directly from libroot/os/time.c
-	return (sRealTimeData->boot_time + system_time()) / 1000000;
+	return (sRealTimeData->boot_time + system_time() + 
+		sRealTimeData->timezone_offset) / 1000000;
 }
 
 
@@ -136,7 +140,17 @@ bigtime_t
 real_time_clock_usecs(void)
 {
 	// ToDo: implement me - they might be used directly from libroot/os/time.c
-	return sRealTimeData->boot_time + system_time();
+	return sRealTimeData->boot_time + system_time() +
+		sRealTimeData->timezone_offset;
+}
+
+
+status_t
+set_tzspecs(int32 timezone_offset, bool dst_observed)
+{
+	sRealTimeData->timezone_offset = timezone_offset * 1000000LL;
+	sRealTimeData->dst_observed = dst_observed;
+	return B_OK;
 }
 
 
@@ -154,3 +168,13 @@ _user_set_real_time_clock(uint32 time)
 	return B_OK;
 }
 
+
+status_t
+_user_set_tzspecs(int32 timezone_offset, bool dst_observed)
+{
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+	
+	set_tzspecs(timezone_offset, dst_observed);
+	return B_OK;
+}
