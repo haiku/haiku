@@ -16,7 +16,8 @@
 
 // prototypes
 static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
-static bool bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo);
+static bool bfs_fs_identify(int deviceFD,
+	struct extended_partition_info *partitionInfo, float *priority);
 
 //----------------------------------------------------------------------
 // Stolen from src/add-ons/kernel/file_systems/bfs/bfs.h
@@ -164,7 +165,8 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 */
 static
 bool
-bfs_fs_identify(int deviceFD,	struct extended_partition_info *partitionInfo)
+bfs_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
+				float *priority)
 {
 	bool result = false;
 	TRACE(("fs/bfs: identify(%d, %p, offset: %lld)\n", deviceFD, partitionInfo,
@@ -196,8 +198,9 @@ bfs_fs_identify(int deviceFD,	struct extended_partition_info *partitionInfo)
 				strcpy(partitionInfo->file_system_short_name, "bfs");
 				strcpy(partitionInfo->file_system_long_name, "Be File System");
 				strcpy(partitionInfo->volume_name, superBlock->name);
-				strcpy(partitionInfo->mounted_at, "???");
 				result = true;
+				if (priority)
+					*priority = 0;
 			}
 			free(buffer);
 		}
