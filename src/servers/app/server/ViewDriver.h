@@ -110,7 +110,6 @@ public:
 
 	void InvertRect(const BRect &r);
 
-
 	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
 
 	void SetMode(const int32 &mode);
