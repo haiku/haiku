@@ -121,7 +121,8 @@ void BLooperList::GetLooperList(BList* list)
 	AssertLocked();
 	for (uint32 i = 0; i < fData.size(); ++i)
 	{
-		list->AddItem(fData[i].looper);
+		if (fData[i].looper)
+			list->AddItem(fData[i].looper);
 	}
 }
 //------------------------------------------------------------------------------
