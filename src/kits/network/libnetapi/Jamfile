@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src kits network libnetapi ;
 
-Depends libnetapi.so : libnet.so ;
-
 UsePrivateHeaders net ;
 
 SharedLibrary netapi :
@@ -12,7 +10,7 @@ SharedLibrary netapi :
 ;
 
 LinkSharedOSLibs libnetapi.so :
-	root be libnet.so
+	be socket bind
 ;
 
 # Installation -- in the test directory for the time being
