@@ -1438,14 +1438,19 @@ rule OBOSInstallRelSymLink
 #-------------------------------------------------------------------------------
 # Low-level OBOS utility rules
 #-------------------------------------------------------------------------------
+rule FObjectsDir
+{
+	# FObjectsDir
+	#
+	# Returns the output directory for object files for the current
+	# subdirectory.
+
+	return [ FDirName $(OBOS_OBJECT_TARGET) $(SUBDIR_TOKENS[2-]) ] ;
+}
+
 rule SetupObjectsDir
 {
-	local rel_objectsdir;
-	
-	# Copy subdir tokens except the first, as that will be "sources", and we
-	# do not want to include that :)
-	rel_objectsdir = [ FDirName $(SUBDIR_TOKENS[2-]) ] ;
-	LOCATE_TARGET = [ FDirName $(OBOS_OBJECT_TARGET) $(rel_objectsdir) ] ;
+	LOCATE_TARGET = [ FObjectsDir ] ;
 	LOCATE_SOURCE = $(LOCATE_TARGET) ;
 	SEARCH_SOURCE = [ Filter $(SEARCH_SOURCE) : $(LOCATE_TARGET) ]
 					$(LOCATE_TARGET) ;
