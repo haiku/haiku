@@ -9,6 +9,8 @@
 #include <disk_scanner.h>
 #include <SupportDefs.h>
 
+#include "RChangeCounter.h"
+
 class BMessage;
 
 class RDiskDevice;
@@ -30,17 +32,22 @@ public:
 	RSession *Session() const { return fSession; }
 
 	int32 ID() const { return fID; }
-	int32 ChangeCounter() const { return fChangeCounter; }
+	int32 ChangeCounter() const { return fChangeCounter.Count(); }
+	void Changed();
 
 	int32 Index() const;
 
 	const extended_partition_info *Info() const { return &fInfo; }
 	void GetPath(char *path) const;
+	off_t Offset() const { return fInfo.info.offset; }
+	off_t Size() const { return fInfo.info.size; }
 
 	void SetVolume(const RVolume *volume)	{ fVolume = volume; }
 	const RVolume *Volume() const			{ return fVolume; }
 
 	status_t Archive(BMessage *archive) const;
+
+	status_t Update(const extended_partition_info *partitionInfo);
 
 	void Dump() const;
 
@@ -50,7 +57,7 @@ private:
 private:
 	RSession				*fSession;
 	int32					fID;
-	int32					fChangeCounter;
+	RChangeCounter			fChangeCounter;
 	extended_partition_info	fInfo;
 	const RVolume			*fVolume;
 

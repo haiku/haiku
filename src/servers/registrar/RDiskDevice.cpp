@@ -22,7 +22,7 @@ RDiskDevice::RDiskDevice()
 	: fSessions(10, true),
 	  fDeviceList(NULL),
 	  fID(-1),
-	  fChangeCounter(0),
+	  fChangeCounter(),
 	  fTouched(false),
 	  fPath(),
 	  fFD(-1),
@@ -45,7 +45,7 @@ PRINT(("RDiskDevice::SetTo()\n"));
 	Unset();
 	status_t error = B_OK;
 	fID = _NextID();
-	fChangeCounter = 0;
+	fChangeCounter.Reset();
 	fTouched = true;
 	fPath.SetTo(path);
 	fFD = fd;
@@ -68,28 +68,8 @@ PRINT(("RDiskDevice::SetTo()\n"));
 			error = fMediaStatus;
 			break;
 	}
-	// scan the device for sessions, if we have a media
-	if (fMediaStatus == B_OK) {
-		session_info sessionInfo;
-		for (int32 i = 0; ; i++) {
-			// get the session info
-			status_t status = get_nth_session_info(fFD, i, &sessionInfo);
-			if (status != B_OK) {
-				if (status != B_ENTRY_NOT_FOUND)
-					error = status;
-				break;
-			}
-			// create and add a RSession
-			if (RSession *session = new(nothrow) RSession) {
-				error = session->SetTo(fFD, &sessionInfo);
-				if (error == B_OK)
-					AddSession(session);
-				else
-					delete session;
-			} else
-				error = B_NO_MEMORY;
-		}
-	}
+	// scan the device for sessions
+	error = _RescanSessions(B_DEVICE_CAUSE_UNKNOWN);
 	// cleanup on error
 	if (error != B_OK)
 		Unset();
@@ -102,13 +82,58 @@ void
 RDiskDevice::Unset()
 {
 	for (int32 i = CountSessions() - 1; i >= 0; i--)
-		RemoveSession(i);
+		RemoveSession(i, B_DEVICE_CAUSE_UNKNOWN);
 	fID = -1;
 	fPath.SetTo("");
 	if (fFD >= 0) {
 		close(fFD);
 		fFD = -1;
 	}
+}
+
+// MediaChanged
+status_t
+RDiskDevice::MediaChanged()
+{
+PRINT(("RDiskDevice::MediaChanged()\n"));
+	status_t error = B_OK;
+	// get the new media status
+	status_t mediaStatus;
+	if (ioctl(fFD, B_GET_MEDIA_STATUS, &mediaStatus) == 0) {
+		fMediaStatus = mediaStatus;
+		// analyze the media status
+		switch (fMediaStatus) {
+			case B_NO_ERROR:
+			case B_DEV_NO_MEDIA:
+			case B_DEV_NOT_READY:
+			case B_DEV_MEDIA_CHANGE_REQUESTED:
+			case B_DEV_DOOR_OPEN:
+				break;
+			case B_DEV_MEDIA_CHANGED:
+				// Ignore changes between the our ioctl() and the one before;
+				// we rescan the sessions anyway.
+				fMediaStatus = B_OK;
+				break;
+			default:
+				error = fMediaStatus;
+				break;
+		}
+	}
+	// rescan sessions
+	error = _RescanSessions(B_DEVICE_CAUSE_PARENT_CHANGED);
+	// TODO: send notification
+	// ...
+	return error;
+}
+
+// SessionLayoutChanged
+status_t
+RDiskDevice::SessionLayoutChanged()
+{
+PRINT(("RDiskDevice::SessionLayoutChanged()\n"));
+	status_t error = B_OK;
+	error = _RescanSessions(B_DEVICE_CAUSE_UNKNOWN);
+	return error;
 }
 
 // Size
@@ -120,8 +145,24 @@ RDiskDevice::Size() const
 }
 
 // AddSession
+status_t
+RDiskDevice::AddSession(const session_info *sessionInfo, uint32 cause)
+{
+	status_t error = B_OK;
+	if (RSession *session = new(nothrow) RSession) {
+		error = session->SetTo(fFD, sessionInfo);
+		if (error == B_OK)
+			AddSession(session, cause);
+		else
+			delete session;
+	} else
+		error = B_NO_MEMORY;
+	return error;
+}
+
+// AddSession
 bool
-RDiskDevice::AddSession(RSession *session)
+RDiskDevice::AddSession(RSession *session, uint32 cause)
 {
 	bool success = false;
 	if (session) {
@@ -129,7 +170,7 @@ RDiskDevice::AddSession(RSession *session)
 		if (success) {
 			session->SetDevice(this);
 			if (RDiskDeviceList *deviceList = DeviceList())
-				deviceList->SessionAdded(session);
+				deviceList->SessionAdded(session, cause);
 		}
 	}
 	return success;
@@ -137,12 +178,12 @@ RDiskDevice::AddSession(RSession *session)
 
 // RemoveSession
 bool
-RDiskDevice::RemoveSession(int32 index)
+RDiskDevice::RemoveSession(int32 index, uint32 cause)
 {
 	RSession *session = SessionAt(index);
 	if (session) {
 		if (RDiskDeviceList *deviceList = DeviceList())
-			deviceList->SessionRemoved(session);
+			deviceList->SessionRemoved(session, cause);
 		session->SetDevice(NULL);
 		fSessions.RemoveItemAt(index);
 		delete session;
@@ -152,13 +193,13 @@ RDiskDevice::RemoveSession(int32 index)
 
 // RemoveSession
 bool
-RDiskDevice::RemoveSession(RSession *session)
+RDiskDevice::RemoveSession(RSession *session, uint32 cause)
 {
 	bool success = false;
 	if (session) {
 		int32 index = fSessions.IndexOf(session);
 		if (index >= 0)
-			success = RemoveSession(index);
+			success = RemoveSession(index, cause);
 	}
 	return success;
 }
@@ -167,7 +208,55 @@ RDiskDevice::RemoveSession(RSession *session)
 status_t
 RDiskDevice::Update()
 {
-	return B_ERROR;
+	status_t error = B_OK;
+	status_t mediaStatus = B_OK;
+	if (ioctl(fFD, B_GET_MEDIA_STATUS, &mediaStatus) == 0) {
+		if (mediaStatus == B_DEV_MEDIA_CHANGED
+			|| (mediaStatus == B_NO_ERROR) != (fMediaStatus == B_NO_ERROR)) {
+			// The media status is B_DEV_MEDIA_CHANGED or it changed from
+			// B_NO_ERROR to some error code or the other way around.
+			error = MediaChanged();
+		} else {
+			// TODO: notifications?
+			fMediaStatus = mediaStatus;
+			// The media has not been changed. If this is a read-only device,
+			// then we are safe, since nothing can have changed. Otherwise
+			// we check the sessions.
+			if (!IsReadOnly() && fMediaStatus == B_OK) {
+				session_info sessionInfo;
+				for (int32 i = 0; error == B_OK; i++) {
+					// get the session info
+					status_t status = get_nth_session_info(fFD, i,
+														   &sessionInfo);
+					if (status != B_OK) {
+						if (status == B_ENTRY_NOT_FOUND) {
+							// remove disappeared sessions
+							for (int32 k = CountSessions() - 1; k >= i; k--)
+								RemoveSession(k, B_DEVICE_CAUSE_UNKNOWN);
+						} else
+							error = status;
+						break;
+					}
+					// check the session
+					if (RSession *session = SessionAt(i)) {
+						if (session->Offset() == sessionInfo.offset
+							&& session->Size() == sessionInfo.size) {
+							session->Update(&sessionInfo);
+						} else {
+							// session layout changed
+							error = SessionLayoutChanged();
+							break;
+						}
+					} else {
+						// session added
+						error = AddSession(&sessionInfo,
+										   B_DEVICE_CAUSE_UNKNOWN);
+					}
+				}
+			}
+		}
+	}
+	return error;
 }
 
 // Archive
@@ -179,7 +268,7 @@ RDiskDevice::Archive(BMessage *archive) const
 	if (error == B_OK)
 		error = archive->AddInt32("id", fID);
 	if (error == B_OK)
-		error = archive->AddInt32("change_counter", fChangeCounter);
+		error = archive->AddInt32("change_counter", ChangeCounter());
 	// geometry
 	if (error == B_OK)
 		error = archive->AddInt64("size", Size());
@@ -217,6 +306,32 @@ RDiskDevice::Dump() const
 	printf("device `%s'\n", Path());
 	for (int32 i = 0; RSession *session = SessionAt(i); i++)
 		session->Dump();
+}
+
+// _RescanSessions
+status_t
+RDiskDevice::_RescanSessions(uint32 cause)
+{
+	status_t error = B_OK;
+	// remove the current sessions
+	for (int32 i = CountSessions() - 1; i >= 0; i--)
+		RemoveSession(i, cause);
+	// scan the device for sessions, if we have a media
+	if (fMediaStatus == B_OK) {
+		session_info sessionInfo;
+		for (int32 i = 0; error == B_OK; i++) {
+			// get the session info
+			status_t status = get_nth_session_info(fFD, i, &sessionInfo);
+			if (status != B_OK) {
+				if (status != B_ENTRY_NOT_FOUND)
+					error = status;
+				break;
+			}
+			// create and add a RSession
+			error = AddSession(&sessionInfo, cause);
+		}
+	}
+	RETURN_ERROR(error);
 }
 
 // _NextID

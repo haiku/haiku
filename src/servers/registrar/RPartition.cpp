@@ -12,7 +12,7 @@
 RPartition::RPartition()
 	: fSession(NULL),
 	  fID(-1),
-	  fChangeCounter(0),
+	  fChangeCounter(),
 	  fVolume(NULL)
 {
 }
@@ -29,7 +29,7 @@ RPartition::SetTo(int fd, const extended_partition_info *partitionInfo)
 	Unset();
 	status_t error = B_OK;
 	fID = _NextID();
-	fChangeCounter = 0;
+	fChangeCounter.Reset();
 	fInfo = *partitionInfo;
 	return error;
 }
@@ -55,6 +55,14 @@ RPartition::Device() const
 	return (fSession ? fSession->Device() : NULL);
 }
 
+// Changed
+void
+RPartition::Changed()
+{
+	if (fChangeCounter.Increment() && fSession)
+		fSession->Changed();
+}
+
 // Index
 int32
 RPartition::Index() const
@@ -76,6 +84,16 @@ RPartition::GetPath(char *path) const
 	}
 }
 
+// Update
+status_t
+RPartition::Update(const extended_partition_info *partitionInfo)
+{
+	status_t error = B_OK;
+	// TODO: Check the partition info for changes!
+	fInfo = *partitionInfo;
+	return error;
+}
+
 // Archive
 status_t
 RPartition::Archive(BMessage *archive) const
@@ -85,7 +103,7 @@ RPartition::Archive(BMessage *archive) const
 	if (error == B_OK)
 		error = archive->AddInt32("id", fID);
 	if (error == B_OK)
-		error = archive->AddInt32("change_counter", fChangeCounter);
+		error = archive->AddInt32("change_counter", ChangeCounter());
 	if (error == B_OK)
 		error = archive->AddInt32("index", Index());
 	// fInfo.info.*

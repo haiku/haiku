@@ -9,6 +9,8 @@
 #include <disk_scanner.h>
 #include <ObjectList.h>
 
+#include "RChangeCounter.h"
+
 class RDiskDevice;
 class RDiskDeviceList;
 class RPartition;
@@ -25,14 +27,19 @@ public:
 	RDiskDeviceList *DeviceList() const;
 	RDiskDevice *Device() const { return fDevice; }
 
+	status_t PartitionLayoutChanged();
+
 	int32 ID() const { return fID; }
-	int32 ChangeCounter() const { return fChangeCounter; }
+	int32 ChangeCounter() const { return fChangeCounter.Count(); }
+	void Changed();
 
 	int32 Index() const;
 
-	bool AddPartition(RPartition *partition);
-	bool RemovePartition(int32 index);
-	bool RemovePartition(RPartition *partition);
+	status_t AddPartition(int fd, const extended_partition_info *partitionInfo,
+						  uint32 cause);
+	bool AddPartition(RPartition *partition, uint32 cause);
+	bool RemovePartition(int32 index, uint32 cause);
+	bool RemovePartition(RPartition *partition, uint32 cause);
 	int32 CountPartitions() const { return fPartitions.CountItems(); }
 	RPartition *PartitionAt(int32 index) const
 		{ return fPartitions.ItemAt(index); }
@@ -40,19 +47,25 @@ public:
 		{ return fPartitions.IndexOf(partition); }
 
 	const session_info *Info() const { return &fInfo; }
+	off_t Offset() const { return fInfo.offset; }
+	off_t Size() const { return fInfo.size; }
+
+	status_t Update(const session_info *sessionInfo);
 
 	status_t Archive(BMessage *archive) const;
 
 	void Dump() const;
 
 private:
+
+	status_t _RescanPartitions(int fd, uint32 cause);
 	static int32 _NextID();
 
 private:
 	BObjectList<RPartition>	fPartitions;
 	RDiskDevice				*fDevice;
 	int32					fID;
-	int32					fChangeCounter;
+	RChangeCounter			fChangeCounter;
 	session_info			fInfo;
 	char					fPartitioningSystem[B_FILE_NAME_LENGTH];
 

@@ -17,7 +17,7 @@ RSession::RSession()
 	: fPartitions(10, true),
 	  fDevice(NULL),
 	  fID(-1),
-	  fChangeCounter(0)
+	  fChangeCounter()
 {
 }
 
@@ -33,29 +33,10 @@ RSession::SetTo(int fd, const session_info *sessionInfo)
 	Unset();
 	status_t error = B_OK;
 	fID = _NextID();
-	fChangeCounter = 0;
+	fChangeCounter.Reset();
 	fInfo = *sessionInfo;
-	// iterate through the partitions
-	for (int32 i = 0; ; i++) {
-		// get the partition info
-		extended_partition_info partitionInfo;
-		status_t status = get_nth_partition_info(fd, sessionInfo->index, i,
-			&partitionInfo, (i == 0 ? fPartitioningSystem : NULL));
-		if (status != B_OK) {
-			if (status != B_ENTRY_NOT_FOUND)
-				error = status;
-			break;
-		}
-		// create and add a RPartition
-		if (RPartition *partition = new(nothrow) RPartition) {
-			error = partition->SetTo(fd, &partitionInfo);
-			if (error == B_OK)
-				AddPartition(partition);
-			else
-				delete partition;
-		} else
-			error = B_NO_MEMORY;
-	}
+	// scan for partitions
+	error = _RescanPartitions(fd, B_DEVICE_CAUSE_UNKNOWN);
 	// cleanup on error
 	if (error != B_OK)
 		Unset();
@@ -67,7 +48,7 @@ void
 RSession::Unset()
 {
 	for (int32 i = CountPartitions() - 1; i >= 0; i--)
-		RemovePartition(i);
+		RemovePartition(i, B_DEVICE_CAUSE_UNKNOWN);
 	fID = -1;
 }
 
@@ -76,6 +57,25 @@ RDiskDeviceList *
 RSession::DeviceList() const
 {
 	return (fDevice ? fDevice->DeviceList() : NULL);
+}
+
+// PartitionLayoutChanged
+status_t
+RSession::PartitionLayoutChanged()
+{
+PRINT(("RSession::PartitionLayoutChanged()\n"));
+	status_t error = (fDevice ? B_OK : B_ERROR);
+	if (error == B_OK)
+		error = _RescanPartitions(fDevice->FD(), B_DEVICE_CAUSE_UNKNOWN);
+	return error;
+}
+
+// Changed
+void
+RSession::Changed()
+{
+	if (fChangeCounter.Increment() && fDevice)
+		fDevice->Changed();
 }
 
 // Index
@@ -88,8 +88,25 @@ RSession::Index() const
 }
 
 // AddPartition
+status_t
+RSession::AddPartition(int fd, const extended_partition_info *partitionInfo,
+					   uint32 cause)
+{
+	status_t error = B_OK;
+	if (RPartition *partition = new(nothrow) RPartition) {
+		error = partition->SetTo(fd, partitionInfo);
+		if (error == B_OK)
+			AddPartition(partition, cause);
+		else
+			delete partition;
+	} else
+		error = B_NO_MEMORY;
+	return error;
+}
+
+// AddPartition
 bool
-RSession::AddPartition(RPartition *partition)
+RSession::AddPartition(RPartition *partition, uint32 cause)
 {
 	bool success = false;
 	if (partition) {
@@ -97,7 +114,7 @@ RSession::AddPartition(RPartition *partition)
 		if (success) {
 			partition->SetSession(this);
 			if (RDiskDeviceList *deviceList = DeviceList())
-				deviceList->PartitionAdded(partition);
+				deviceList->PartitionAdded(partition, cause);
 		}
 	}
 	return success;
@@ -105,12 +122,12 @@ RSession::AddPartition(RPartition *partition)
 
 // RemovePartition
 bool
-RSession::RemovePartition(int32 index)
+RSession::RemovePartition(int32 index, uint32 cause)
 {
 	RPartition *partition = PartitionAt(index);
 	if (partition) {
 		if (RDiskDeviceList *deviceList = DeviceList())
-			deviceList->PartitionRemoved(partition);
+			deviceList->PartitionRemoved(partition, cause);
 		partition->SetSession(NULL);
 		fPartitions.RemoveItemAt(index);
 		delete partition;
@@ -120,15 +137,64 @@ RSession::RemovePartition(int32 index)
 
 // RemovePartition
 bool
-RSession::RemovePartition(RPartition *partition)
+RSession::RemovePartition(RPartition *partition, uint32 cause)
 {
 	bool success = false;
 	if (partition) {
 		int32 index = fPartitions.IndexOf(partition);
 		if (index >= 0)
-			success = RemovePartition(index);
+			success = RemovePartition(index, cause);
 	}
 	return success;
+}
+
+// Update
+status_t
+RSession::Update(const session_info *sessionInfo)
+{
+	status_t error = (fDevice ? B_OK : B_ERROR);
+	// TODO: Check the session info for changes!
+	fInfo = *sessionInfo;
+	int fd = (fDevice ? fDevice->FD() : -1);
+	// check the partitions
+	for (int32 i = 0; error == B_OK; i++) {
+		// get the partition info
+		extended_partition_info partitionInfo;
+		char partitioningSystem[B_FILE_NAME_LENGTH];
+		status_t status = get_nth_partition_info(fd, sessionInfo->index, i,
+			&partitionInfo, (i == 0 ? partitioningSystem : NULL));
+		// check the partitioning system
+		if ((status == B_OK || status == B_ENTRY_NOT_FOUND) && i == 0
+			&& strcmp(partitioningSystem, fPartitioningSystem)) {
+			// partitioning system has changed
+			error = PartitionLayoutChanged();
+			break;
+		}
+		if (status != B_OK) {
+			if (status == B_ENTRY_NOT_FOUND) {
+				// remove disappeared partitions
+				for (int32 k = CountPartitions() - 1; k >= i; k--)
+					RemovePartition(k, B_DEVICE_CAUSE_UNKNOWN);
+			} else
+				error = status;
+			break;
+		}
+		// check the partition
+		if (RPartition *partition = PartitionAt(i)) {
+			if (partition->Offset() == partitionInfo.info.offset
+				&& partition->Size() == partitionInfo.info.size) {
+				partition->Update(&partitionInfo);
+			} else {
+				// partition layout changed
+				error = PartitionLayoutChanged();
+				break;
+			}
+		} else {
+			// partition added
+			error = AddPartition(fd, &partitionInfo, B_DEVICE_CAUSE_UNKNOWN);
+		}
+	}
+	return error;
 }
 
 // Archive
@@ -140,7 +206,7 @@ RSession::Archive(BMessage *archive) const
 	if (error == B_OK)
 		error = archive->AddInt32("id", fID);
 	if (error == B_OK)
-		error = archive->AddInt32("change_counter", fChangeCounter);
+		error = archive->AddInt32("change_counter", ChangeCounter());
 	if (error == B_OK)
 		error = archive->AddInt32("index", Index());
 	// fInfo.*
@@ -186,6 +252,31 @@ RSession::Dump() const
 	printf("    partitioning : `%s'\n", fPartitioningSystem);
 	for (int32 i = 0; RPartition *partition = PartitionAt(i); i++)
 		partition->Dump();
+}
+
+// _RescanPartitions
+status_t
+RSession::_RescanPartitions(int fd, uint32 cause)
+{
+	status_t error = B_OK;
+	// remove the current partitions
+	for (int32 i = CountPartitions() - 1; i >= 0; i--)
+		RemovePartition(i, cause);
+	// scan for partitions
+	for (int32 i = 0; error == B_OK; i++) {
+		// get the partition info
+		extended_partition_info partitionInfo;
+		status_t status = get_nth_partition_info(fd, fInfo.index, i,
+			&partitionInfo, (i == 0 ? fPartitioningSystem : NULL));
+		if (status != B_OK) {
+			if (status != B_ENTRY_NOT_FOUND)
+				error = status;
+			break;
+		}
+		// create and add a RPartition
+		error = AddPartition(fd, &partitionInfo, cause);
+	}
+	return error;
 }
 
 // _NextID

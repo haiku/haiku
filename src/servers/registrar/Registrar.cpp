@@ -218,6 +218,8 @@ void
 Registrar::ReadyToRun()
 {
 	FUNCTION_START();
+	// create event queue
+	fEventQueue = new EventQueue(kEventQueueName);
 	// create roster
 	fRoster = new TRoster;
 	fRoster->Init();
@@ -228,10 +230,9 @@ Registrar::ReadyToRun()
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
 	// create disk device manager
-	fDiskDeviceManager = new DiskDeviceManager;
+	fDiskDeviceManager = new DiskDeviceManager(fEventQueue);
 	fDiskDeviceManager->Run();
 	// create message runner manager
-	fEventQueue = new EventQueue(kEventQueueName);
 	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);
 	// init the global be_roster
 	BRoster::Private().SetTo(be_app_messenger, BMessenger(NULL, fMIMEManager));

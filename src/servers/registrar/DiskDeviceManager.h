@@ -15,9 +15,12 @@
 #include "RVolumeList.h"
 #include "WatchingService.h"
 
+class EventQueue;
+class MessageEvent;
+
 class DiskDeviceManager : public BLooper {
 public:
-	DiskDeviceManager();
+	DiskDeviceManager(EventQueue *eventQueue);
 	virtual ~DiskDeviceManager();
 
 	virtual void MessageReceived(BMessage *message);
@@ -37,6 +40,11 @@ private:
 	int32 _Worker();
 
 private:
+	class RescanEvent;
+
+private:
+	EventQueue				*fEventQueue;
+	MessageEvent			*fRescanEvent;
 	BLocker					fDeviceListLock;
 	WatchingService			fWatchingService;
 	RVolumeList				fVolumeList;

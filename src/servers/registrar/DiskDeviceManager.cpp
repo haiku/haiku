@@ -9,20 +9,29 @@
 #include "DiskDeviceManager.h"
 #include "Debug.h"
 #include "EventMaskWatcher.h"
+#include "EventQueue.h"
+#include "MessageEvent.h"
 #include "RDiskDevice.h"
 #include "RDiskDeviceList.h"
 #include "RPartition.h"
 #include "RSession.h"
 
+// priorities of the different message kinds
 enum {
 	REQUEST_PRIORITY			= 0,
+	RESCAN_PRIORITY				= 5,
 	NODE_MONITOR_PRIORITY		= 10,
 	WATCHING_REQUEST_PRIORITY	= 20,
 };
 
+// time interval between device rescans
+static const bigtime_t kRescanEventInterval = 5000000;
+
 // constructor
-DiskDeviceManager::DiskDeviceManager()
+DiskDeviceManager::DiskDeviceManager(EventQueue *eventQueue)
 	: BLooper("disk device manager"),
+	  fEventQueue(eventQueue),
+	  fRescanEvent(NULL),
 	  fDeviceListLock(),
 	  fWatchingService(),
 	  fVolumeList(BMessenger(this), fDeviceListLock),
@@ -45,11 +54,19 @@ DiskDeviceManager::DiskDeviceManager()
 		if (fWorker >= 0)
 			resume_thread(fWorker);
 	}
+	// set up the rescan event
+	fRescanEvent = new MessageEvent(system_time() + kRescanEventInterval,
+									this, B_REG_ROSTER_DEVICE_RESCAN);
+	fRescanEvent->SetAutoDelete(false);
+	fEventQueue->AddEvent(fRescanEvent);
 }
 
 // destructor
 DiskDeviceManager::~DiskDeviceManager()
 {
+	// remove the rescan event from the event queue
+	fEventQueue->RemoveEvent(fRescanEvent);
+	// terminate the worker thread
 	fTerminating = true;
 	delete_sem(fMessageCounter);
 	int32 dummy;
@@ -72,6 +89,11 @@ DiskDeviceManager::MessageReceived(BMessage *message)
 		case B_REG_DEVICE_STOP_WATCHING:
 			DetachCurrentMessage();
 			if (!_PushMessage(message, WATCHING_REQUEST_PRIORITY))
+				delete message;
+			break;
+		case B_REG_ROSTER_DEVICE_RESCAN:
+			DetachCurrentMessage();
+			if (!_PushMessage(message, RESCAN_PRIORITY))
 				delete message;
 			break;
 		case B_NODE_MONITOR:
@@ -306,6 +328,12 @@ DiskDeviceManager::_Worker()
 					break;
 				case B_REG_DEVICE_STOP_WATCHING:
 					_StopWatchingRequest(message);
+					break;
+				case B_REG_ROSTER_DEVICE_RESCAN:
+					fDeviceList.Rescan();
+					fRescanEvent->SetTime(system_time()
+										  + kRescanEventInterval);
+					fEventQueue->AddEvent(fRescanEvent);
 					break;
 				case B_NODE_MONITOR:
 				{

@@ -43,11 +43,14 @@ public:
 
 	virtual void HandleMessage(BMessage *message);
 
+	// external event hooks
 	virtual void VolumeMounted(const RVolume *volume);
 	virtual void VolumeUnmounted(const RVolume *volume);
 	virtual void MountPointMoved(const RVolume *volume,
 								 const entry_ref *oldRoot,
 								 const entry_ref *newRoot);
+	virtual void DeviceAppeared(const char *devicePath);
+	virtual void DeviceDisappeared(const char *devicePath);
 
 	bool AddDevice(RDiskDevice *device);
 	bool RemoveDevice(int32 index);
@@ -74,6 +77,7 @@ public:
 	bool Lock();
 	void Unlock();
 
+	// internal event hooks
 	void DeviceAdded(RDiskDevice *device,
 					 uint32 cause = B_DEVICE_CAUSE_UNKNOWN);
 	void DeviceRemoved(RDiskDevice *device,

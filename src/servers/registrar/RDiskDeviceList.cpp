@@ -186,6 +186,52 @@ RDiskDeviceList::MountPointMoved(const RVolume *volume,
 	Unlock();
 }
 
+// DeviceAppeared
+void
+RDiskDeviceList::DeviceAppeared(const char *devicePath)
+{
+	status_t error = (devicePath ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		int fd = open(devicePath, O_RDONLY);
+		if (fd >= 0) {
+			bool closeFile = true;
+			device_geometry geometry;
+			status_t mediaStatus = B_OK;
+			partition_info partitionInfo;
+			if (ioctl(fd, B_GET_MEDIA_STATUS, &mediaStatus) == 0
+				&& ioctl(fd, B_GET_GEOMETRY, &geometry) == 0
+				&& ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo) < 0) {
+PRINT(("RDiskDeviceList::DeviceAppeared(`%s')\n", devicePath));
+				RDiskDevice *device = new(nothrow) RDiskDevice;
+				if (device) {
+					error = device->SetTo(devicePath, fd, &geometry,
+										  mediaStatus);
+					if (error == B_OK) {
+						closeFile = false;
+						device->SetTouched(true);
+						AddDevice(device);
+					} else
+						delete device;
+				} else
+					error = B_NO_MEMORY;
+			}
+			if (closeFile)
+				close(fd);
+		}
+	}
+}
+
+// DeviceDisappeared
+void
+RDiskDeviceList::DeviceDisappeared(const char *devicePath)
+{
+PRINT(("RDiskDeviceList::DeviceDisappeared(`%s')\n", devicePath));
+	if (devicePath) {
+		if (RDiskDevice *device = DeviceWithPath(devicePath))
+			RemoveDevice(device);
+	}
+}
+
 // AddDevice
 bool
 RDiskDeviceList::AddDevice(RDiskDevice *device)
@@ -280,6 +326,9 @@ status_t
 RDiskDeviceList::Rescan()
 {
 FUNCTION_START();
+// TODO: This method should be reworked, as soon as we react on events only
+// and don't need to poll anymore. This method will then do an initial
+// scan only.
 	status_t error = B_OK;
 	if (Lock()) {
 		// marked all devices untouched
@@ -292,8 +341,9 @@ FUNCTION_START();
 		}
 		// remove all untouched devices
 		for (int32 i = CountDevices() - 1; i >= 0; i--) {
-			if (!DeviceAt(i)->Touched())
-				RemoveDevice(i);
+			RDiskDevice *device = DeviceAt(i);
+			if (!device->Touched())
+				DeviceDisappeared(device->Path());
 		}
 		Unlock();
 	} else
@@ -410,17 +460,11 @@ RDiskDeviceList::Dump() const
 status_t
 RDiskDeviceList::_Scan(BDirectory &dir)
 {
-//BEntry dirEntry;
-//BPath dirPath;
-//dir.GetEntry(&dirEntry);
-//dirEntry.GetPath(&dirPath);
-//PRINT(("RDiskDeviceList::_Scan(`%s')\n", dirPath.Path()));
 	status_t error = B_OK;
 	BEntry entry;
 	while (dir.GetNextEntry(&entry) == B_OK) {
 		struct stat st;
 		if (entry.GetStat(&st) == B_OK) {
-//PRINT(("st.st_mode: 0x%x\n", st.st_mode & S_IFMT));
 			if (S_ISDIR(st.st_mode)) {
 				BDirectory subdir;
 				if (subdir.SetTo(&entry) == B_OK)
@@ -444,37 +488,13 @@ RDiskDeviceList::_ScanDevice(const char *path)
 	// search the list for a device with that path
 	if (RDiskDevice *device = DeviceWithPath(path)) {
 		// found: just update it
+		device->SetTouched(true);
 		error = device->Update();
 	} else {
 		// not found: check whether it is really a disk device and add it to
 		// the list
-		int fd = open(path, O_RDONLY);
-		if (fd >= 0) {
-			bool closeFile = true;
-			device_geometry geometry;
-			status_t mediaStatus = B_OK;
-			partition_info partitionInfo;
-			if (ioctl(fd, B_GET_MEDIA_STATUS, &mediaStatus) == 0
-				&& ioctl(fd, B_GET_GEOMETRY, &geometry) == 0
-				&& ioctl(fd, B_GET_PARTITION_INFO, &partitionInfo) < 0) {
-//				int32 blockSize = geometry.bytes_per_sector;
-//				off_t deviceSize = (off_t)blockSize
-//					* geometry.sectors_per_track * geometry.cylinder_count
-//					* geometry.head_count;
-				RDiskDevice *device = new(nothrow) RDiskDevice;
-				if (device) {
-					error = device->SetTo(path, fd, &geometry, mediaStatus);
-					if (error == B_OK) {
-						closeFile = false;
-						AddDevice(device);
-					} else
-						delete device;
-				} else
-					error = B_NO_MEMORY;
-			}
-			if (closeFile)
-				close(fd);
-		}
+		// The event hook does the work anyway:
+		DeviceAppeared(path);
 	}
 	return error;
 }
