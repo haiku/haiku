@@ -412,16 +412,21 @@ DefaultManager::ConnectMixerToOutput()
 		goto finish;
 	}
 	
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 6; i++) {
 		switch (i) {
 			case 0:
-				printf("DefaultManager: Trying connect in native format\n");
+				printf("DefaultManager: Trying connect in native format (1)\n");
 				if (B_OK != roster->GetFormatFor(input, &format)) {
 					ERROR("DefaultManager: GetFormatFor failed\n");
 					continue;
 				}
+				// XXX BeOS R5 multiaudio node bug workaround
+				if (format.u.raw_audio.channel_count == 1) {
+					printf("##### WARNING! DefaultManager: ignored mono format\n");
+					continue;
+				}
 				break;
-			
+
 			case 1:
 				printf("DefaultManager: Trying connect in format 1\n");
 				memset(&format, 0, sizeof(format));
@@ -447,9 +452,19 @@ DefaultManager::ConnectMixerToOutput()
 				break;
 
 			case 4:
+				// BeOS R5 multiaudio node bug workaround
+				printf("DefaultManager: Trying connect in native format (2)\n");
+				if (B_OK != roster->GetFormatFor(input, &format)) {
+					ERROR("DefaultManager: GetFormatFor failed\n");
+					continue;
+				}
+				break;
+
+			case 5:
 				printf("DefaultManager: Trying connect in format 4\n");
 				memset(&format, 0, sizeof(format));
 				break;
+
 		}
 		rv = roster->Connect(output.source, input.destination, &format, &newoutput, &newinput);
 		if (rv == B_OK)
