@@ -1465,7 +1465,7 @@ wait_for_thread(thread_id id, status_t *_returnCode)
 
 		if (_returnCode) {
 			t = thread_get_current_thread();
-			dprintf("thread_wait_on_thread: thread %ld got return code 0x%x\n",
+			dprintf("wait_for_thread: thread %ld got return code 0x%x\n",
 				t->id, t->sem_deleted_retcode);
 			*_returnCode = t->sem_deleted_retcode;
 		}
