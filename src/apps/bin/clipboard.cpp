@@ -53,7 +53,7 @@ namespace Clipboard {
 	}
 	
     //-----------------------------------------------------------
-	bool Print( void ) {
+	void Print( void ) {
 		// Retrieve Data - Concurrent Access Possible.
 		Locker clip_lock( Instance ); // Unlocks on destruction.
 		if( InstanceExists ) {
@@ -69,7 +69,7 @@ namespace Clipboard {
 	}
 
     //-----------------------------------------------------------
-	bool Read( char const * entry_name ) {
+	void Read( char const * entry_name ) {
 		// Retrieve Data - Concurrent Access Possible.
 		Locker clip_lock( Instance ); // Unlocks on destruction.
 		if( InstanceExists ) {
