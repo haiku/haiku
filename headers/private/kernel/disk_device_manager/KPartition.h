@@ -130,6 +130,7 @@ public:
 	bool RemoveAllChildren();
 	KPartition *ChildAt(int32 index) const;
 	int32 CountChildren() const;
+	int32 CountDescendants() const;
 
 	// Shadow Partition
 

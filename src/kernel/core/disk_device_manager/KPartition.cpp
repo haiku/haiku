@@ -656,6 +656,16 @@ KPartition::CountChildren() const
 	return fPartitionData.child_count;
 }
 
+// CountDescendants
+int32
+KPartition::CountDescendants() const
+{
+	int32 count = 1;
+	for (int32 i = 0; KPartition *child = ChildAt(i); i++)
+		count += child->CountDescendants();
+	return count;
+}
+
 // CreateShadowPartition
 status_t
 KPartition::CreateShadowPartition()
