@@ -14,7 +14,7 @@ extern "C" gensyscall_syscall_info *gensyscall_get_infos(int *count);
 
 // usage
 const char *kUsage =
-"Usage: gensyscalls [ -c <calls> ] [ -d <dispatcher> ]\n"
+"Usage: gensyscalls [ -c <calls> ] [ -d <dispatcher> ] [ -n <numbers> ]\n"
 "\n"
 "The command generates a piece of assembly source file that defines the\n"
 "actual syscalls and a piece of C source (cases of a switch statement) for"
@@ -24,7 +24,9 @@ const char *kUsage =
 "  <calls>                - Output: The assembly source file implementing the\n"
 "                           actual syscalls."
 "  <dispatcher>           - Output: The C source file to be included by the\n"
-"                           syscall dispatcher source file.\n";
+"                           syscall dispatcher source file.\n"
+"  <numbers>              - Output: The C/assembly include files defining the\n"
+"                           syscall numbers.\n";
 
 // print_usage
 static
@@ -47,6 +49,7 @@ public:
 		// parse arguments
 		const char *syscallsFile = NULL;
 		const char *dispatcherFile = NULL;
+		const char *numbersFile = NULL;
 		for (int argi = 1; argi < argc; argi++) {
 			string arg(argv[argi]);
 			if (arg == "-h" || arg == "--help") {
@@ -64,6 +67,12 @@ public:
 					return 1;
 				}
 				dispatcherFile = argv[++argi];
+			} else if (arg == "-n") {
+				if (argi + 1 >= argc) {
+					print_usage(true);
+					return 1;
+				}
+				numbersFile = argv[++argi];
 			} else {
 				print_usage(true);
 				return 1;
@@ -71,7 +80,7 @@ public:
 		}
 		fSyscallInfos = gensyscall_get_infos(&fSyscallCount);
 		_UpdateSyscallInfos();
-		if (!syscallsFile && !dispatcherFile) {
+		if (!syscallsFile && !dispatcherFile && !numbersFile) {
 			printf("Found %d syscalls.\n", fSyscallCount);
 			return 0;
 		}
@@ -80,6 +89,8 @@ public:
 			_WriteSyscallsFile(syscallsFile);
 		if (dispatcherFile)
 			_WriteDispatcherFile(dispatcherFile);
+		if (numbersFile)
+			_WriteNumbersFile(numbersFile);
 		return 0;
 	}
 
@@ -146,6 +157,30 @@ public:
 			}
 			file << ");" << endl;
 			file << "\tbreak;" << endl;
+		}
+	}
+
+	void _WriteNumbersFile(const char *filename)
+	{
+		// open the syscall numbers output file
+		ofstream file(filename, ofstream::out | ofstream::trunc);
+		if (!file.is_open())
+			throw IOException(string("Failed to open `") + filename + "'.");
+		// output the defines
+		const char *prefix = "_user_";
+		size_t prefixLen = strlen(prefix);
+		for (int i = 0; i < fSyscallCount; i++) {
+			const gensyscall_syscall_info &syscall = fSyscallInfos[i];
+			string name(syscall.kernel_name);
+			// drop the leading "_user_" prefix
+			if (name.find(prefix) != 0)
+				throw Exception(string("Bad kernel name: `") + name + "'.");
+			name = string(name, prefixLen);
+			// convert to upper case (is there no function for that?)
+			string defineName;
+			for (int k = 0; k < (int)name.length(); k++)
+				defineName += toupper(name[k]);
+			file << "#define SYSCALL_" << defineName << " " << i << endl;
 		}
 	}
 

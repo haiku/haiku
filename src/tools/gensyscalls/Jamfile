@@ -44,6 +44,7 @@ UseArchObjectHeaders gensyscalls.cpp : $(OBOS_ARCH) ;
 # place them where there are needed
 MakeLocate <syscalls>syscalls.S.inc : [ FObjectsDir src kernel libroot os ] ;
 MakeLocate <syscalls>syscall_dispatcher.h : [ FObjectsDir src kernel core ] ;
+MakeLocate <syscalls>syscall_numbers.h : [ FObjectsDir src kernel core ] ;
 
 Depends <dir>objects/x86.R1/kernel/core : <dir>objects/x86.R1/kernel ;
 
@@ -65,8 +66,18 @@ actions GenSyscallsDispatcher1 {
 	$(2[1]) -d $(1)
 }
 
+rule GenSyscallsNumbers {
+	Depends $(1) : gensyscalls ;
+	GenSyscallsNumbers1 $(1) : gensyscalls ;
+}
+
+actions GenSyscallsNumbers1 {
+	$(2[1]) -n $(1)
+}
+
 GenSyscallsFile <syscalls>syscalls.S.inc ;
 GenSyscallsDispatcher <syscalls>syscall_dispatcher.h ;
+GenSyscallsNumbers <syscalls>syscall_numbers.h ;
 
 
 # preprocess the syscalls header
