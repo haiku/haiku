@@ -68,10 +68,12 @@ void ResourceUsageWindow::InitWindow(void)
     rtab = Bounds();
     rtab.top += 10;
     rlist = Bounds();
-    rlist.top += 44;
+    rlist.top += 10;
     rlist.left += 12;
-    rlist.right -= 12;
-    rlist.bottom -= 12;
+    rlist.right -= 15;
+    rlist.bottom -= 47;
+    
+    ptrIRQView = new IRQView(r);
         
 	// Create the TabView and Tabs
 	tabView = new BTabView(rtab,"resource_usage_tabview");
@@ -79,7 +81,7 @@ void ResourceUsageWindow::InitWindow(void)
 	rtab = tabView->Bounds();
 	rtab.InsetBy(5,5);
 	tab = new BTab();
-	tabView->AddTab(new IRQView(r), tab);
+	tabView->AddTab(ptrIRQView, tab);
 	tab->SetLabel("IRQ");
 	tab = new BTab();
 	tabView->AddTab(new DMAView(r), tab);
@@ -105,14 +107,11 @@ void ResourceUsageWindow::InitWindow(void)
 	Lock();
 	IRQListView->AddItem(new BStringItem(tmp.String()));
 	Unlock();
-
+    ptrIRQView->AddChild(IRQListView);
+	
 	// Create the Views
 	AddChild(ptrResourceUsageView = new ResourceUsageView(r));
 	ptrResourceUsageView->AddChild(tabView);
-	AddChild(IRQListView);
-	
-	IRQListView->MakeFocus();
-	DMAListView->Hide();
 }
 // -------------------------------------------------------------------------------------------------- //
 

@@ -14,6 +14,7 @@ Devices Windows Header by Sikosis
 
 class DevicesView;
 class ResourceUsageView;
+class IRQView;
 
 class ResourceUsageWindow : public BWindow
 {
@@ -24,9 +25,9 @@ class ResourceUsageWindow : public BWindow
 	private:
 		void InitWindow(void);
 	    ResourceUsageView*	 ptrResourceUsageView;
-	    
-	    BTabView		*tabView;
-	    BTab			*tab;
+	    IRQView*             ptrIRQView;
+	    BTabView		     *tabView;
+	    BTab			     *tab;
 };
 
 
