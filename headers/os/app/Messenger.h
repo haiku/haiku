@@ -96,7 +96,6 @@ private:
 	friend class BRoster;
 	friend class BPrivate::TRoster;
 	friend class BMessage;
-	friend class BQuery;
 	friend class Private;
 	friend inline void _set_message_reply_(BMessage *, BMessenger);
 	friend status_t swap_data(type_code, void *, size_t, swap_action);
