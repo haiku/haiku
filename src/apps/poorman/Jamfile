@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src apps poorman ;
 
-AddResources PoorMan : PoorMan.rsrc ;
+AddResources PoorMan : PoorMan.rdef ;
 
-App Poorman : PoorMan.cpp
+App PoorMan : PoorMan.cpp
 	PoorManMainView.cpp
 	PoorManWindow.cpp
 	PoorManView.cpp
