@@ -172,8 +172,31 @@ Partition::AddChild()
 }
 
 
+status_t
+Partition::Mount(Directory **_fileSystem)
+{
+	for (int32 i = 0; i < sNumFileSystemModules; i++) {
+		file_system_module_info *module = sFileSystemModules[i];
+
+		TRACE(("check for file_system: %s\n", module->pretty_name));
+
+		Directory *fileSystem;
+		if (module->get_file_system(this, &fileSystem) == B_OK) {
+			gRoot->AddNode(fileSystem);
+			if (_fileSystem)
+				*_fileSystem = fileSystem;
+
+			fIsFileSystem = true;
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
 status_t 
-Partition::Scan()
+Partition::Scan(bool mountFileSystems)
 {
 	// scan for partitions first (recursively all eventual children as well)
 
@@ -200,10 +223,10 @@ Partition::Scan()
 				TRACE(("*** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
 					child, child->offset, child->size, child->Parent()));
 
-				child->Scan();
+				child->Scan(mountFileSystems);
 
-				if (child->IsFileSystem()) {
-					// move the file systems to the partition list
+				if (!mountFileSystems || child->IsFileSystem()) {
+					// move the partitions containing file systems to the partition list
 					list_remove_item(&fChildren, child);
 					list_add_item(&gPartitions, child);
 
@@ -225,19 +248,8 @@ Partition::Scan()
 
 	// scan for file systems
 
-	for (int32 i = 0; i < sNumFileSystemModules; i++) {
-		file_system_module_info *module = sFileSystemModules[i];
-
-		TRACE(("check for file_system: %s\n", module->pretty_name));
-
-		Directory *fileSystem;
-		if (module->get_file_system(this, &fileSystem) == B_OK) {
-			gRoot->AddNode(fileSystem);
-
-			fIsFileSystem = true;
-			return B_OK;
-		}
-	}
+	if (mountFileSystems)
+		return Mount();
 
 	return B_ENTRY_NOT_FOUND; 
 }
@@ -249,7 +261,7 @@ Partition::Scan()
 
 
 status_t
-add_partitions_for(int fd)
+add_partitions_for(int fd, bool mountFileSystems)
 {
 	Partition *partition = new Partition(fd);
 
@@ -257,12 +269,31 @@ add_partitions_for(int fd)
 	partition->block_size = 512;
 	partition->size = partition->Size();
 
-	if (partition->Scan() == B_OK && partition->IsFileSystem()) {
+	// add this partition to the list of partitions, if it contains
+	// or might contain a file system
+	if ((partition->Scan(mountFileSystems) == B_OK && partition->IsFileSystem())
+		|| (!partition->IsFileSystem() && !mountFileSystems)) {
 		list_add_item(&gPartitions, partition);
 		return B_OK;
 	}
 
 	delete partition;
+	return B_OK;
+}
+
+
+status_t
+add_partitions_for(Node *device, bool mountFileSystems)
+{
+	int fd = open_node(device, O_RDONLY);
+	if (fd < B_OK)
+		return fd;
+
+	status_t status = add_partitions_for(fd, mountFileSystems);
+	if (status < B_OK)
+		printf("add_partitions_for(%d) failed: %ld\n", fd, status);
+
+	close(fd);
 	return B_OK;
 }
 
