@@ -1,3 +1,7 @@
+/*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+*/
 #ifndef VIDEO_H
 #define VIDEO_H
 
@@ -5,12 +9,10 @@
 #include <SupportDefs.h>
 
 
-#ifdef __cplusplus
 class Menu;
-Menu *video_mode_menu();
+class MenuItem;
 
-extern "C"
-#endif
-status_t video_init(void);
+bool video_mode_hook(Menu *menu, MenuItem *item);
+Menu *video_mode_menu();
 
 #endif	/* VIDEO_H */

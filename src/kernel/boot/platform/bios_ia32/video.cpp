@@ -241,6 +241,59 @@ vesa_set_palette(const uint8 *palette, int32 firstIndex, int32 numEntries)
 //	#pragma mark -
 
 
+bool
+video_mode_hook(Menu *menu, MenuItem *item)
+{
+	// find selected mode
+	video_mode *mode = NULL;
+
+	menu = item->Submenu();
+	item = menu->FindMarked();
+	if (item != NULL)
+		mode = (video_mode *)item->Data();
+
+	if (mode != sMode) {
+		// update standard mode
+		// ToDo: update fb settings!
+		sMode = mode;
+	}
+
+	return true;
+}
+
+
+Menu *
+video_mode_menu()
+{
+	Menu *menu = new Menu(CHOICE_MENU, "Select Video Mode");
+	MenuItem *item;
+
+	menu->AddItem(item = new MenuItem("Default"));
+	item->SetMarked(true);
+	item->Select(true);
+
+	menu->AddItem(new MenuItem("Standard VGA"));
+
+	video_mode *mode = NULL;
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+		char label[64];
+		sprintf(label, "%ldx%ld %ld bit", mode->width, mode->height, mode->bits_per_pixel);
+
+		menu->AddItem(item = new MenuItem(label));
+		item->SetData(mode);
+	}
+
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new MenuItem("Return to main menu"));
+	item->SetType(MENU_ITEM_NO_CHOICE);
+
+	return menu;
+}
+
+
+//	#pragma mark -
+
+
 extern "C" void
 platform_switch_to_logo(void)
 {
@@ -302,37 +355,6 @@ platform_switch_to_text_mode(void)
 	regs.eax = 3;
 	call_bios(0x10, &regs);
 	gKernelArgs.fb.enabled = 0;
-}
-
-
-//	#pragma mark -
-
-
-Menu *
-video_mode_menu()
-{
-	Menu *menu = new Menu(CHOICE_MENU, "Select video mode:");
-	MenuItem *item;
-
-	menu->AddItem(item = new MenuItem("Default"));
-	item->SetMarked(true);
-	item->Select(true);
-
-	menu->AddItem(new MenuItem("Standard VGA"));
-
-	video_mode *mode = NULL;
-	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
-		char label[64];
-		sprintf(label, "%ldx%ld %ld bit", mode->width, mode->height, mode->bits_per_pixel);
-
-		menu->AddItem(item = new MenuItem(label));
-		item->SetData(mode);
-	}
-
-	menu->AddSeparatorItem();
-	menu->AddItem(item = new MenuItem("Return to main manu"));
-
-	return menu;
 }
 
 

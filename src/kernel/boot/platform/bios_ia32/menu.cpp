@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -278,6 +278,8 @@ run_menu(Menu *menu)
 				menu->Hide();
 
 				run_menu(item->Submenu());
+				if (item->Target() != NULL)
+					(*item->Target())(menu, item);
 
 				// restore current menu
 				sMenuOffset = offset;
@@ -316,6 +318,7 @@ platform_add_menus(Menu *menu)
 	switch (menu->Type()) {
 		case MAIN_MENU:
 			menu->AddItem(item = new MenuItem("Select fail-safe video mode", video_mode_menu()));
+			item->SetTarget(video_mode_hook);
 			break;
 		case SAFE_MODE_MENU:
 			menu->AddItem(item = new MenuItem("Don't call the BIOS"));
