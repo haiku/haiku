@@ -33,7 +33,8 @@ typedef struct debugger_command {
 	const char *description;
 } debugger_command;
 
-int dbg_register_file[2][14]; /* XXXmpetit -- must be made generic */
+int dbg_register_file[SMP_MAX_CPUS][14];
+	/* XXXmpetit -- must be made generic */
 
 static bool sSerialDebugEnabled = false;
 static spinlock dbg_spinlock = 0;
