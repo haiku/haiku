@@ -89,6 +89,9 @@ private:
 	};
 
 public:
+	timestamp() { _clear(); }
+	timestamp(time_t time);	
+
 	void dump() const;
 
 	// Get functions
@@ -101,7 +104,11 @@ public:
 	int16 timezone() const {
 		type_and_timezone_accessor t;
 		t.type_and_timezone = type_and_timezone();
-		return t.bits.timezone;
+		int16 result = t.bits.timezone;
+		// Fill the lefmost bits with ones if timezone is negative
+		result <<= 4;
+		result >>= 4;	
+		return result;
 	}
 	uint16 year() const { return B_LENDIAN_TO_HOST_INT16(_year); }
 	uint8 month() const { return _month; }
@@ -121,7 +128,7 @@ public:
 		t.bits.type = type;
 		set_type_and_timezone(t.type_and_timezone);
 	}
-	void set_timezone(uint8 timezone) {
+	void set_timezone(int16 timezone) {
 		type_and_timezone_accessor t;
 		t.type_and_timezone = type_and_timezone();
 		t.bits.timezone = timezone;
@@ -137,6 +144,8 @@ public:
 	void set_hundred_microsecond(uint8 hundred_microsecond) { _hundred_microsecond = hundred_microsecond; }
 	void set_microsecond(uint8 microsecond) { _microsecond = microsecond; }
 private:
+	void _clear();
+	
 	uint16 _type_and_timezone;
 	uint16 _year;
 	uint8 _month;
@@ -151,6 +160,51 @@ private:
 } __attribute__((packed));
 
 
+/*! \brief Implementation ID Identify Suffix
+
+	See also: UDF 2.50 2.1.5.3
+*/
+struct implementation_id_suffix {
+public:
+	implementation_id_suffix(uint8 os_class, uint8 os_identifier);
+
+	uint8 os_class() const { return _os_class; }
+	uint8 os_identifier() const { return _os_identifier; }
+
+	void set_os_class(uint8 os_class) { _os_class = os_class; }
+	void set_os_identifier(uint8 identifier) { _os_identifier = identifier; }
+private:
+	uint8 _os_class;
+	uint8 _os_identifier;
+	array<uint8, 6> _implementation_use;
+};
+
+/*! \brief Operating system classes for implementation_id_suffixes
+
+	See also: Udf 2.50 6.3
+*/
+enum {
+	OS_UNDEFINED = 0,
+	OS_DOS,
+	OS_OS2,
+	OS_MACOS,
+	OS_UNIX,
+	OS_WIN9X,
+	OS_WINNT,
+	OS_OS400,
+	OS_BEOS,
+	OS_WINCE
+};
+	
+/*! \brief BeOS operating system classes identifiers for implementation_id_suffixes
+
+	See also: Udf 2.50 6.3
+*/
+enum {
+	BEOS_GENERIC = 0,
+	BEOS_OPENBEOS = 1	// not part of the standard, but perhaps someday. :-)
+};
+
 /*! \brief Identifier used to designate the implementation responsible
 	for writing associated data structures on the medium.
 	
@@ -158,8 +212,13 @@ private:
 */
 struct entity_id {
 public:
+	static const int kIdentifierLength = 23;
+	static const int kIdentifierSuffixLength = 8;
+
 	entity_id(uint8 flags = 0, char *identifier = NULL,
-	              char *identifier_suffix = NULL);
+	          uint8 *identifier_suffix = NULL);
+	entity_id(uint8 flags, char *identifier,
+	          const implementation_id_suffix &suffix);
 	
 	void dump() const;
 	bool matches(const entity_id &id) const;
@@ -168,23 +227,21 @@ public:
 	uint8 flags() const { return _flags; }
 	const char* identifier() const { return _identifier; }
 	char* identifier() { return _identifier; }
-	const char* identifier_suffix() const { return _identifier_suffix; }
-	char* identifier_suffix() { return _identifier_suffix; }
+	const array<uint8, kIdentifierSuffixLength>& identifier_suffix() const { return _identifier_suffix; }
+	array<uint8, kIdentifierSuffixLength>& identifier_suffix() { return _identifier_suffix; }
 
 	// Set functions
 	void set_flags(uint8 flags) { _flags = flags; }
-	
-	static const int kIdentifierLength = 23;
-	static const int kIdentifierSuffixLength = 8;
 private:
 	uint8 _flags;
 	char _identifier[kIdentifierLength];
-	char _identifier_suffix[kIdentifierSuffixLength];
+	array<uint8, kIdentifierSuffixLength> _identifier_suffix;
 } __attribute__((packed));
 
 extern const entity_id kMetadataPartitionMapId;
 extern const entity_id kSparablePartitionMapId;
 extern const entity_id kVirtualPartitionMapId;
+extern const entity_id kImplementationId;
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -601,6 +658,9 @@ public:
 	uint32 predecessor_volume_descriptor_sequence_location() const
 	  { return B_LENDIAN_TO_HOST_INT32(_predecessor_volume_descriptor_sequence_location); }
 	uint16 flags() const { return B_LENDIAN_TO_HOST_INT16(_flags); }
+	
+	const array<uint8, 22>& reserved() const { return _reserved; }
+	array<uint8, 22>& reserved() { return _reserved; }
 
 	// Set functions
 	void set_vds_number(uint32 number)
@@ -660,7 +720,7 @@ private:
 	array<uint8, 64> _implementation_use;
 	uint32 _predecessor_volume_descriptor_sequence_location;
 	uint16 _flags;
-	char _reserved[22];
+	array<uint8, 22> _reserved;
 
 } __attribute__((packed));
 
