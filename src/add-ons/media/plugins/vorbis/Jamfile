@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons media plugins vorbis ;
+
+UsePrivateHeaders media ;
+
+SubDirHdrs $(SUBDIR) libvorbis vorbis ;
+
+Addon vorbis_decoder : media plugins :
+	vorbisCodecPlugin.cpp
+	: false : libvorbis.a
+;
+
+LinkSharedOSLibs vorbis : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins vorbis libvorbis ;
