@@ -1,5 +1,5 @@
 
-resource(1, "BEOS:FILE_TYPES") message;
+resource file_types message;
 
 resource large_icon
 {
