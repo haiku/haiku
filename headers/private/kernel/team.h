@@ -33,7 +33,8 @@ int32 team_max_teams(void);
 int32 team_used_teams(void);
 
 // used in syscalls.c
-thread_id _user_load_image(int32 argCount, const char **args, int32 envCount, const char **envp, int32 priority);
+thread_id _user_load_image(int32 argCount, const char **args, int32 envCount,
+				const char **envp, int32 priority, uint32 flags);
 status_t _user_wait_for_team(team_id id, status_t *_returnCode);
 void _user_exit_team(status_t returnValue);
 status_t _user_kill_team(thread_id thread);

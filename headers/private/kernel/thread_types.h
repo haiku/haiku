@@ -72,6 +72,12 @@ struct process_group {
 	struct team			*teams;
 };
 
+struct team_loading_info {
+	struct thread	*thread;	// the waiting thread
+	status_t		result;		// the result of the loading
+	bool			done;		// set when loading is done/aborted
+};
+
 #define MAX_DEAD_CHILDREN	32
 	// this is a soft limit for the number of dead entries in a team
 
@@ -103,6 +109,7 @@ struct team {
 	struct vm_address_space *kaspace;
 	struct thread	*main_thread;
 	struct thread	*thread_list;
+	struct team_loading_info *loading_info;
 	struct list		image_list;
 	struct arch_team arch_info;
 
