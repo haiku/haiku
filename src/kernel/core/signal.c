@@ -180,6 +180,13 @@ send_signal_etc(pid_t tid, uint sig, uint32 flags)
 
 
 int
+sys_send_signal(pid_t tid, uint sig)
+{
+	return send_signal_etc(tid, sig, 0);
+}
+
+
+int
 has_signals_pending(void *thr)
 {
 	struct thread *t = (struct thread *)thr;
