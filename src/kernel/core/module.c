@@ -265,12 +265,12 @@ static module_info **load_module_file(const char *path)
 		return NULL;
 	}
 		
-	lm->path = (char*)kmalloc(strlen(path));
+	lm->path = (char*)kmalloc(strlen(path) + 1);
 	if (!lm->path) {
 		kfree(lm);
 		return NULL;
 	}
-	memcpy(lm->path, path, strlen(path));
+	strcpy(lm->path, path);
 	lm->ref_cnt = 0;
 
 	recursive_lock_lock(&modules_lock);
@@ -338,12 +338,12 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 	SHOW_FLOW(3, "simple_module_info(%s, %s)\n", mod->name, file);
 	
 	m->module = NULL; /* back pointer */
-	m->name = (char*)kmalloc(strlen(mod->name));
+	m->name = (char*)kmalloc(strlen(mod->name) + 1);
 	if (!m->name) {
 		kfree(m);
 		return -1;
 	}
-	memcpy(m->name, mod->name, strlen(mod->name));	
+	strcpy(m->name, mod->name);	
 	m->state = MOD_QUERIED;
 	/* Record where the module_info can be found */
 	m->offset = offset;
