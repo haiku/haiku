@@ -6,7 +6,8 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 # we start linking to Be libraries, but it doesn't hurt...
 CommonTestLib libkernelutilstest.so
 	: KernelUtilsTestAddon.cpp
-		SinglyLinkedListTest.cpp
+#	  AVLTreeMapTest.cpp
+	  SinglyLinkedListTest.cpp
 	: stdc++.r4
 	: stdc++.r4
 	:
