@@ -531,6 +531,10 @@ Volume::RemoveQuery(Query *query)
 //	Disk initialization
 
 
+#ifdef USER
+extern "C" void kill_device_vnodes(dev_t id);
+	// This call is only available in the userland fs_shell
+
 status_t
 Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint32 flags)
 {
@@ -626,12 +630,11 @@ Volume::Initialize(const char *device, const char *name, uint32 blockSize, uint3
 	if (fIndicesNode != NULL)
 		put_vnode(ID(), fIndicesNode->ID());
 
-	delete fIndicesNode;
-	delete fRootNode;
-		// ToDo: this is a temporary hack until new_vnode()/put_vnode() is working
-		//		correctly in the mkbfs command
+	kill_device_vnodes(ID());
+		// This call is only available in the userland fs_shell
 
 	Sync();
 	opener.RemoveCache(ALLOW_WRITES);
 	return B_OK;
 }
+#endif
