@@ -60,16 +60,6 @@ i386_get_current_iframe(void)
 }
 
 
-static inline uint32
-get_fs_register(void)
-{
-	uint32 fs;
-
-	asm("movl %%fs,%0" : "=r" (fs));
-	return fs;
-}
-
-
 static inline void
 set_fs_register(uint32 segment)
 {
@@ -391,6 +381,7 @@ arch_check_syscall_restart(struct thread *t)
 		frame->eax = frame->orig_eax;
 		frame->edx = frame->orig_edx;
 		frame->eip -= 2;
+			// undos the "int $99" syscall interrupt (so that it'll be called again)
 	}
 }
 
@@ -426,13 +417,12 @@ arch_restore_fork_frame(struct arch_fork_arg *arg)
 {
 	struct thread *thread = thread_get_current_thread();
 
+	disable_interrupts();
+
 	i386_set_tss_and_kstack(thread->kernel_stack_base + KSTACK_SIZE);
 
 	// set the CPU dependent GDT entry for TLS (set the current %fs register)
 	set_tls_context(thread);
-	
-	// patch up %fs register of the frame
-	arg->iframe.fs = get_fs_register();
 
 	i386_restore_frame_from_syscall(arg->iframe);
 }
