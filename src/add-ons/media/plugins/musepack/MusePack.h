@@ -10,7 +10,7 @@
 #include "DecoderPlugin.h"
 
 
-class MusePackPlugin : public ReaderPlugin, DecoderPlugin {
+class MusePackPlugin : public ReaderPlugin, public DecoderPlugin {
 	public:
 		Reader *NewReader();
 

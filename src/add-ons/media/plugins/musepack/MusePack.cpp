@@ -8,9 +8,6 @@
 #include "MusePackReader.h"
 #include "MusePackDecoder.h"
 
-#include <ByteOrder.h>
-#include <InterfaceDefs.h>
-
 
 Reader *
 MusePackPlugin::NewReader()
@@ -28,6 +25,7 @@ status_t
 MusePackPlugin::RegisterPlugin()
 {
 	PublishDecoder("audiocodec/musepack", "musepack", "musepack decoder");
+	return B_OK;
 }
 
 
