@@ -45,11 +45,10 @@ status_t AudioMixerAddon::GetFlavorAt(
 	flavor_info* fInfo = new flavor_info;
 	fInfo->internal_id = n;
 	fInfo->name = "AudioMixer";
-	fInfo->info =
-		"AudioMixer media addon\n";
+	fInfo->info = "AudioMixer media addon\n";
 	fInfo->kinds = B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER | B_CONTROLLABLE;
-	fInfo->flavor_flags = B_FLAVOR_IS_LOCAL;
-	fInfo->possible_count = 500;
+	fInfo->flavor_flags = 0;	// 0 = global or local instantiation allowed, no restrictions
+	fInfo->possible_count = 0;	// 0 = infinite
 	
 	media_format* fFormat = new media_format;
 	fFormat->type = B_MEDIA_RAW_AUDIO;
