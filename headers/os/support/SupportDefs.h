@@ -28,11 +28,11 @@
 #define _SUPPORT_DEFS_H
 
 /* this !must! be located before the include of sys/types.h */
-#ifndef _SYS_TYPES_H
+#if !defined(_SYS_TYPES_H) && !defined(_SYS_TYPES_H_)
 typedef unsigned long			ulong;
 typedef unsigned int			uint;
 typedef unsigned short			ushort;
-#endif  // _SYS_TYPES_H
+#endif  // _SYS_TYPES_H / _SYS_TYPES_H_
 
 
 // Standard Includes -----------------------------------------------------------
