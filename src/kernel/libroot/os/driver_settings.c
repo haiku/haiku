@@ -657,11 +657,17 @@ get_driver_settings_string(void *_handle, char *buffer, size_t *_bufferSize, boo
 	}
 
 	*_bufferSize -= bufferSize;
-	return bufferSize >= 0 ? B_OK : B_DEVICE_FULL;
-		// ToDo: ?? don't we have a B_BUFFER_OVERFLOW kind of error?
-		//	find a better error code for this.
+	return bufferSize >= 0 ? B_OK : B_BUFFER_OVERFLOW;
 }
 
+
+/** Matches the first value of the parameter matching "keyName" with a set
+ *	of boolean values like 1/true/yes/on/enabled/...
+ *	Returns "unknownValue" if the parameter could not be found or doesn't
+ *	have any valid boolean setting, and "noArgValue" if the parameter
+ *	doesn't have any values.
+ *	Also returns "unknownValue" if the handle passed in was not valid.
+ */
 
 bool
 get_driver_boolean_parameter(void *handle, const char *keyName, bool unknownValue, bool noArgValue)
@@ -675,10 +681,6 @@ get_driver_boolean_parameter(void *handle, const char *keyName, bool unknownValu
 	// check for the parameter
 	if ((parameter = get_parameter(handle, keyName)) == NULL)
 		return unknownValue;
-
-	// ToDo: This takes just the first argument/value, and checks that one;
-	// I don't know if they are used to work that way in BeOS, though.
-	// bonefish: Yep, exactly like that.
 
 	// check for the argument
 	if (parameter->value_count <= 0)
