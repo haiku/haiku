@@ -1305,16 +1305,21 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		// write out the data (only if configured to)
 		if (bdataonly || (!bheaderonly && !bdataonly)) {	
 			uint8 buf[1024];
-			ssize_t rd = inSource->Read(buf, 1024);
+			uint32 remaining = B_BENDIAN_TO_HOST_INT32(bitsHeader.dataSize);
+			ssize_t rd, writ;
+			rd = inSource->Read(buf, 1024);
 			while (rd > 0) {
-				outDestination->Write(buf, rd);
-				rd = inSource->Read(buf, 1024);
+				writ = outDestination->Write(buf, rd);
+				if (writ < 0)
+					break;
+				remaining -= static_cast<uint32>(writ);
+				rd = inSource->Read(buf, min(1024, remaining));
 			}
 		
-			if (rd == 0)
-				return B_OK;
-			else
+			if (remaining > 0)
 				return B_ERROR;
+			else
+				return B_OK;
 		} else
 			return B_OK;
 		
