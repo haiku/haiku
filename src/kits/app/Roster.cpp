@@ -26,7 +26,7 @@
 //					Global be_roster represents the default BRoster.
 //					app_info structure provides info for a running app.
 //------------------------------------------------------------------------------
-#include <new.h>
+#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,6 +50,8 @@
 #include <Roster.h>
 #include <RosterPrivate.h>
 #include <Volume.h>
+
+using namespace std;
 
 // debugging
 //#define DBG(x) x
