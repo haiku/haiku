@@ -1,9 +1,9 @@
 /* 
-** Copyright 2002, Angelo Mottola, a.mottola@libero.it. All rights reserved.
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-**
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 /* POSIX signals handling routines */
 
@@ -19,6 +19,14 @@
 
 #include <stddef.h>
 #include <string.h>
+
+//#define TRACE_SIGNAL
+#ifdef TRACE_SIGNAL
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 #define SIGNAL_TO_MASK(signal) (1LL << (signal - 1))
 
@@ -49,7 +57,7 @@ handle_signals(struct thread *thread, int state)
 			signalMask >>= 1;
 			thread->sig_pending &= ~(1L << i);
 
-			dprintf("Thread 0x%lx received signal %s\n", thread->id, sigstr[sig]);
+			TRACE(("Thread 0x%lx received signal %s\n", thread->id, sigstr[sig]));
 
 			if (handler->sa_handler == SIG_IGN) {
 				// signal is to be ignored
@@ -78,7 +86,7 @@ handle_signals(struct thread *thread, int state)
 					case SIGABRT:
 					case SIGFPE:
 					case SIGSEGV:
-						dprintf("Shutting down thread 0x%lx due to signal #%d\n", thread->id, sig);
+						TRACE(("Shutting down thread 0x%lx due to signal #%d\n", thread->id, sig));
 					case SIGKILL:
 					case SIGKILLTHR:
 					default:
@@ -105,7 +113,7 @@ handle_signals(struct thread *thread, int state)
 			//		and may page fault.
 
 			// User defined signal handler
-			dprintf("### Setting up custom signal handler frame...\n");
+			TRACE(("### Setting up custom signal handler frame...\n"));
 			arch_setup_signal_frame(thread, handler, sig, thread->sig_block_mask);
 
 			if (handler->sa_flags & SA_ONESHOT)
@@ -366,7 +374,7 @@ alarm_event(timer *t)
 	struct thread *thread = (struct thread *)((uint8 *)t - offsetof(struct thread, alarm));
 		// ToDo: investigate adding one user parameter to the timer structure to fix this hack
 
-	dprintf("alarm_event: thread = %p\n", thread);
+	TRACE(("alarm_event: thread = %p\n", thread));
 	send_signal_etc(thread->id, SIGALRM, B_DO_NOT_RESCHEDULE);
 
 	return B_INVOKE_SCHEDULER;
@@ -382,7 +390,7 @@ set_alarm(bigtime_t time, uint32 mode)
 	ASSERT(B_ONE_SHOT_RELATIVE_ALARM == B_ONE_SHOT_RELATIVE_TIMER);
 		// just to be sure no one changes the headers some day
 
-	dprintf("set_alarm: thread = %p\n", thread);
+	TRACE(("set_alarm: thread = %p\n", thread));
 
 	if (thread->alarm.period)
 		rv = (bigtime_t)thread->alarm.entry.key - system_time();
