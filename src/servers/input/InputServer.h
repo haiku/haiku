@@ -189,13 +189,12 @@ private:
 	bool 			sSafeMode;
 	port_id 		sEventPort;
 	BPoint			sMousePos;
-	int32			sKeyboardLocks;
 	uint16			sKeyboardID;
 	
 	KeyboardSettings	fKeyboardSettings;
 	MouseSettings		fMouseSettings;
 
-	key_info		s_key_info;		// current key info
+	key_info		fKey_info;		// current key info
 	key_map			fKeys;			// current key_map
 	char			*fChars;		// current keymap chars
 	uint32			fCharsSize;		// current keymap char count

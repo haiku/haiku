@@ -505,7 +505,7 @@ status_t
 InputServer::HandleGetKeyInfo(BMessage *message,
                               BMessage *reply)
 {
-	return reply->AddData("key_info", B_ANY_TYPE, &s_key_info, sizeof(s_key_info));
+	return reply->AddData("key_info", B_ANY_TYPE, &fKey_info, sizeof(fKey_info));
 }
 
 
@@ -517,7 +517,7 @@ status_t
 InputServer::HandleGetModifiers(BMessage *message,
                                 BMessage *reply)
 {
-	return reply->AddInt32("modifiers", s_key_info.modifiers);
+	return reply->AddInt32("modifiers", fKey_info.modifiers);
 }
 
 
@@ -534,9 +534,49 @@ InputServer::HandleSetModifierKey(BMessage *message,
 	if (message->FindInt32("modifier", &modifier) == B_OK
 		&& message->FindInt32("key", &key) == B_OK) {
 	
-		// TODO : impact the keymap
-	
-		// is SetModifierKey a keymap change ?
+		switch (modifier) {
+			case B_CAPS_LOCK:
+				fKeys.caps_key = key;
+				break;
+			case B_NUM_LOCK:
+				fKeys.num_key = key;
+				break;
+			case B_SCROLL_LOCK:
+				fKeys.num_key = key;
+				break;
+			case B_LEFT_SHIFT_KEY:
+				fKeys.left_shift_key = key;
+				break;
+			case B_RIGHT_SHIFT_KEY:
+				fKeys.right_shift_key = key;
+				break;
+			case B_LEFT_COMMAND_KEY:
+				fKeys.left_command_key = key;
+				break;
+			case B_RIGHT_COMMAND_KEY:
+				fKeys.right_command_key = key;
+				break;
+			case B_LEFT_CONTROL_KEY:
+				fKeys.left_control_key = key;
+				break;
+			case B_RIGHT_CONTROL_KEY:
+				fKeys.right_control_key = key;
+				break;
+			case B_LEFT_OPTION_KEY:
+				fKeys.left_option_key = key;
+				break;
+			case B_RIGHT_OPTION_KEY:
+				fKeys.right_option_key = key;
+				break;
+			case B_MENU_KEY:
+				fKeys.menu_key = key;
+				break;
+			default:
+				return B_ERROR;
+		}
+		
+		//TODO : unmap the key ?
+		
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
 	}
 	return status;
@@ -552,7 +592,7 @@ InputServer::HandleSetKeyboardLocks(BMessage *message,
                                     BMessage *reply)
 {
 	status_t status = B_ERROR;
-	if (message->FindInt32("locks", &sKeyboardLocks) == B_OK)
+	if (message->FindInt32("locks", (int32*)&fKeys.lock_settings) == B_OK)
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_LOCKS_CHANGED, NULL);
 	
 	return status;
@@ -726,6 +766,8 @@ status_t
 InputServer::HandleFocusUnfocusIMAwareView(BMessage *,
                                            BMessage *)
 {
+	// TODO
+	return B_OK;
 }
 
 
@@ -737,7 +779,23 @@ status_t
 InputServer::HandleFindDevices(BMessage *message,
                                      BMessage *reply)
 {
+	const char *name = NULL;
+	message->FindString("device", &name);
 	
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if (!name || strcmp(name, item->mDev.name) == 0) {
+			reply->AddString("device", item->mDev.name);
+			reply->AddInt32("type", item->mDev.type);
+			if (name)
+				return B_OK;	
+		}
+	}
+
+	return B_OK;
 }
 
 
@@ -749,6 +807,8 @@ status_t
 InputServer::HandleWatchDevices(BMessage *message,
                                      BMessage *reply)
 {
+	// TODO
+	return B_OK;
 }
 
 
@@ -760,7 +820,20 @@ status_t
 InputServer::HandleIsDeviceRunning(BMessage *message,
                                      BMessage *reply)
 {
+	const char *name = NULL;
+	if (message->FindString("device", &name)!=B_OK)
+		return B_ERROR;
 	
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if (strcmp(name, item->mDev.name) == 0)
+			return (item->mStarted) ? B_OK : B_ERROR;
+	}
+
+	return B_ERROR;
 }
 
 
@@ -772,6 +845,40 @@ status_t
 InputServer::HandleStartStopDevices(BMessage *message,
                                      BMessage *reply)
 {
+	const char *name = NULL;
+	int32 type = 0;
+	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
+		return B_ERROR;
+		
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
+			if (!item->mIsd)
+				return B_ERROR;
+				
+			input_device_ref   dev = item->mDev;
+			
+			if (message->what == IS_START_DEVICE) {
+				PRINT(("  Starting: %s\n", dev.name));
+				item->mIsd->Start(dev.name, dev.cookie);
+				item->mStarted = true;
+			} else {
+				PRINT(("  Stopping: %s\n", dev.name));
+				item->mIsd->Stop(dev.name, dev.cookie);
+				item->mStarted = false;
+			}
+			if (name)
+				return B_OK;
+		}
+	}
+
+	if (name)
+		return B_ERROR;
+	else
+		return B_OK;
 }
 
 
@@ -783,6 +890,41 @@ status_t
 InputServer::HandleControlDevices(BMessage *message,
                                      BMessage *reply)
 {
+	const char *name = NULL;
+	int32 type = 0;
+	if (! ((message->FindInt32("type", &type)!=B_OK) ^ (message->FindString("device", &name)!=B_OK)))
+		return B_ERROR;
+	
+	uint32 code = 0;
+	BMessage msg;	
+	if (message->FindInt32("code", (int32*)&code)!=B_OK)
+		return B_ERROR;
+	if (message->FindMessage("message", &msg)!=B_OK)
+		return B_ERROR;
+		
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--) {
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (!item)
+			continue;
+			
+		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
+			if (!item->mIsd)
+				return B_ERROR;
+				
+			input_device_ref   dev = item->mDev;
+			
+			item->mIsd->Control(dev.name, dev.cookie, code, &msg);
+			
+			if (name)
+				return B_OK;
+		}
+	}
+
+	if (name)
+		return B_ERROR;
+	else
+		return B_OK;
+	
 }
 
 
@@ -794,8 +936,8 @@ status_t
 InputServer::HandleSystemShuttingDown(BMessage *message,
                                      BMessage *reply)
 {
-	status_t status;
-	return status;
+	// TODO
+	return B_OK;
 }
 
 
