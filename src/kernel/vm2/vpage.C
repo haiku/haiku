@@ -6,7 +6,7 @@
 void vpage::flush(void)
 	{
 	if (protection==writable && dirty)
-		swapMan.write_block(*backingNode,physPage, PAGE_SIZE);
+		swapMan.write_block(*backingNode,((void *)(physPage->getAddress())), PAGE_SIZE);
 	}
 
 void vpage::refresh(void)
@@ -52,7 +52,7 @@ void vpage::setProtection(protectType prot)
 
 bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 	{ // This is dispatched by the real interrupt handler, who locates us
-	//printf ("vpage::fault: address = %d, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
+	printf ("vpage::fault: virtual address = %x, write = %s\n",(unsigned long) fault_address,((writeError)?"true":"false"));
 	if (writeError)
 		{
 		dirty=true;
@@ -61,7 +61,7 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			if (protection==copyOnWrite) // Else, this was just a "let me know when I am dirty"...
 				{
 				page *newPhysPage=pageMan.getPage();
-				memcpy(newPhysPage,physPage,PAGE_SIZE);
+				memcpy((void *)(newPhysPage->getAddress()),(void *)(physPage->getAddress()),PAGE_SIZE);
 				physPage=newPhysPage;
 				protection=writable;
 				backingNode=&(swapMan.findNode()); // Need new backing store for this node, since it was copied, the original is no good...
@@ -71,11 +71,11 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 			}
 		}
 	physPage=pageMan.getPage();
-	printf ("vpage::fault: New page allocated! address = %x\n",physPage->getAddress());
+	printf ("vpage::fault: New page allocated! new physical address = %x\n",physPage->getAddress());
 	// Update the architecture specific stuff here...
 	// This refresh is unneeded if the data was never written out... 
 	refresh(); // I wonder if these vnode calls are safe during an interrupt...
-	//printf ("vpage::fault: Refreshed\n");
+	printf ("vpage::fault: Refreshed\n");
 
 	}
 
@@ -83,7 +83,8 @@ char vpage::getByte(unsigned long address)
 	{
 //	printf ("vpage::getByte: address = %d\n",address );
 	if (!physPage)
-		fault((void *)(address),false);
+		if (!fault((void *)(address),false))
+			throw ("vpage::getByte",address,0);
 //	printf ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
@@ -92,7 +93,8 @@ void vpage::setByte(unsigned long address,char value)
 	{
 //	printf ("vpage::setByte: address = %d, value = %d\n",address, value);
 	if (!physPage)
-		fault((void *)(address),true);
+		if (!fault((void *)(address),true))
+			throw ("vpage::setByte",address,(int)value);
 	*((char *)(address-start_address+physPage->getAddress()))=value;
 //	printf ("vpage::setByte: physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
 	}
@@ -100,14 +102,16 @@ void vpage::setByte(unsigned long address,char value)
 int  vpage::getInt(unsigned long address)
 	{
 	if (!physPage)
-		fault((void *)(address),false);
+		if (!fault((void *)(address),false))
+			throw ("vpage::getInt",address,0);
 	return *((int *)(address-start_address+physPage->getAddress()));
 	}
 
 void  vpage::setInt(unsigned long address,int value)
 	{
 	if (!physPage)
-		fault((void *)(address),true);
+		if (!fault((void *)(address),true))
+			throw ("vpage::setInt",address,value);
 	*((int *)(address-start_address+physPage->getAddress()))=value;
 	}
 

@@ -13,18 +13,20 @@ swapFileManager::swapFileManager(void)
 
 void swapFileManager::write_block(vnode &node,void *loc,unsigned long size)
 	{
-	printf ("swapFileManager::write_block: writing, node.fd = %d, node.offset = %d\n",node.fd, node.offset);
-	lseek(node.fd,SEEK_SET,node.offset);
-	write(node.fd,loc,size);
+	printf ("swapFileManager::write_block: writing, node.fd = %d, node.offset = %d, address = %x\n",node.fd, node.offset,loc);
+	if (-1==lseek(node.fd,node.offset,SEEK_SET))
+		printf ("seek failed, fd = %d, errno = %d, %s\n",node.fd,errno,strerror(errno));
+	if (-1==write(node.fd,loc,size))
+		printf ("Write failed, fd = %d, errno = %d, %s\n",node.fd,errno,strerror(errno));
 	node.valid=true;
 	}
 
 void swapFileManager::read_block(vnode &node,void *loc,unsigned long size)
 	{
-	lseek(node.fd,SEEK_SET,node.offset);
+	lseek(node.fd,node.offset,SEEK_SET);
 	if (node.valid==false)
 		return; // Do nothing. This prevents "garbage" data on disk from being read in...	
-	printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d\n",node.fd, node.offset);
+	//printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d\n",node.fd, node.offset);
 	read(node.fd,loc,size);
 	}
 

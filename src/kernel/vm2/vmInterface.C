@@ -151,16 +151,18 @@ void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	// Get the filename from fd...
 	strcpy(	name,"mmap - need to include fileName");
 		
-	addressSpec addType=((flags|MAP_FIXED)?EXACT:ANY);
-	protectType protType=(prot|PROT_WRITE)?writable:(prot|PROT_READ)?readable:none;
+	addressSpec addType=((flags&MAP_FIXED)?EXACT:ANY);
+	protectType protType=(prot&PROT_WRITE)?writable:(prot&PROT_READ)?readable:none;
 	// Not doing anything with MAP_SHARED and MAP_COPY - needs to be done
-	if (flags | MAP_ANON) 
+	printf ("flags = %x, anon = %x\n",flags,MAP_ANON);
+	if (flags & MAP_ANON) 
 		{
 		createArea(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr, addType ,LAZY,protType);
 		return addr;
 		}
 
 	area *newArea = new area(getAM());
+	printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
 	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
 	getAM()->addArea(newArea);

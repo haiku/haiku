@@ -29,31 +29,40 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,unsigned long reque
 			break;
 		case CLONE: base=0;break; // Not sure what to do...
 		}
+	printf ("area::mapAddressSpecToAddress, in type: %s, address = %x, size = %d\n",
+		((type==EXACT)?"Exact":(type==BASE)?"BASE":(type==ANY)?"ANY":(type==CLONE)?"CLONE":"ANY_KERNEL"),
+		requested,pageCount);
 	return base;
 }
 
-status_t area::createAreaMappingFile(char *name, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset)
+status_t area::createAreaMappingFile(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset)
 	{
-	manager->lock();
+	strcpy(name,inName);
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
-	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	vpage *newPage;
-	vnode *newVnode=new vnode;
+
+	manager->lock();
+	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	for (int i=0;i<pageCount;i++)
 		{
+		vnode *newVnode=new vnode;
 		newVnode->fd=fd;
 		newVnode->offset=offset+PAGE_SIZE*i;
 		newPage = new vpage(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
+		printf ("New vnode with fd %d, offset = %d\n",fd,newVnode->offset);
 		}
+	manager->unlock();
+
 	state=inState;
 	start_address=base;
 	end_address=base+pageCount*PAGE_SIZE;
-	manager->unlock();
+	*address=(void *)base;
 	}
 
-status_t area::createArea(char *name, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
+status_t area::createArea(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
 	{
+	strcpy(name,inName);
 	manager->lock();
 	//printf ("area::createArea: Locked in createArea\n");
 	unsigned long requested=(unsigned long)(*address); // Hold onto this to make sure that EXACT works...
