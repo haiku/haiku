@@ -252,7 +252,7 @@ __inline void kill_chrand (ch_randgen *randgen)
    +++++ */
 
 //#include <drivers/KernelExport.h>
-#include <drivers.h>
+#include <Drivers.h>
 #include <Errors.h>
 #include <string.h>
 #include <stdlib.h>
@@ -443,4 +443,3 @@ device_hooks *find_device(const char* name)
 			return &my_device_hooks;
 	return NULL;
 }
-

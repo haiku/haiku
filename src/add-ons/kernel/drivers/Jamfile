@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src add-ons kernel drivers ;
 
+SubInclude OBOS_TOP src add-ons kernel drivers arch ;
 SubInclude OBOS_TOP src add-ons kernel drivers audio ;
 SubInclude OBOS_TOP src add-ons kernel drivers common ;
 SubInclude OBOS_TOP src add-ons kernel drivers random ;

@@ -56,6 +56,34 @@ KernelLd
 	addons/drivers/dev/random
 	; 
 
+KernelLd
+	ps2mouse
+	:
+	<$(SOURCE_GRIST)!kernel!drivers!arch!$(OBOS_ARCH)!ps2mouse>ps2mouse.o
+	kernel.so
+	:
+	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+	addons/drivers/dev/ps2mouse
+	; 
+
+KernelLd
+	keyboard
+	:
+	<$(SOURCE_GRIST)!kernel!drivers!arch!$(OBOS_ARCH)!keyboard>keyboard.o
+	kernel.so
+	:
+	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+	:
+	-Bdynamic -shared
+	:
+	:
+	addons/drivers/dev/keyboard
+	; 
+
 # This needs to be fixed once the various headers are fixed.
 #KernelLd 
 #	ac97
