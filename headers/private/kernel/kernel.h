@@ -44,12 +44,18 @@ extern "C" {
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
+/** return the offset of member 'm' within type 't' */
+#define offsetof(t, m) ((size_t)&(((t *)0)->m)) 
+
 /** Is bit 'b' set in 'a' */
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))
 /** Set bit 'b' in 'a' */
 #define SET_BIT(a, b) ((a) | (1 << (b)))
 /** Unset bit 'b' in 'a' */
 #define CLEAR_BIT(a, b) ((a) & (~(1 << (b))))
+
+__inline void insque(void *, void*);
+__inline void remque(void *); 
 
 #ifdef __cplusplus
 }
