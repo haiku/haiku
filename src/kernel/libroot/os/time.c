@@ -14,9 +14,11 @@ static volatile bigtime_t *sBootTime = NULL;
 static status_t
 setup_rtc_boottime()
 {
-	area_id dataArea = find_area("real time data userland");
+	area_id dataArea; 
 	area_info info;
 	status_t err;
+
+	dataArea = find_area("real time data userland");
 	
 	if (dataArea < 0) {
 		printf("setup_rtc_boottime: error finding real time data area %s\n",
@@ -29,8 +31,12 @@ setup_rtc_boottime()
 		printf("setup_rtc_boottime: error getting real time data info\n");
 		return err;
 	}
-	sBootTime = &((struct real_time_data *)info.address)->boot_time;
-	return B_OK;	
+	printf("setup_rtc_boottime : %d, %p\n", dataArea, info.address);
+/*	sBootTime = &((struct real_time_data *)info.address)->boot_time;
+	printf("setup_rtc_time : %p\n", sBootTime);
+	return B_OK;
+*/
+	return B_ERROR;
 }
 
 
