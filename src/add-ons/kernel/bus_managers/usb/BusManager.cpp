@@ -33,7 +33,7 @@ int32 usb_explore_thread( void *data )
 	if ( roothub == 0 )
 		return B_ERROR;
 	
-	while (true )
+	while ( true )
 	{
 		//Go to the hubs
 		roothub->Explore();
@@ -55,17 +55,15 @@ BusManager::BusManager()
 	set_sem_owner( B_SYSTEM_TEAM , m_lock );
 	
 	// Clear the device map
-	memset( &m_devicemap , false , 128 );
+	memset( &m_devicemap , 0 , 128 );
 	
 	// Set up the default pipes
 	m_defaultPipe = new ControlPipe( this , 0 , Pipe::Default , Pipe::NormalSpeed , 0 );
 	m_defaultLowSpeedPipe = new ControlPipe( this , 0 , Pipe::Default , Pipe::LowSpeed , 0 );
 	
-	// Start the 'explore thread'
-	m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
-	                     B_LOW_PRIORITY , (void *)m_roothub );
-	resume_thread( m_explore_thread );
-	
+	// Clear the 'explore thread'
+	m_explore_thread = 0; 
+
 	m_initok = true;
 }
 
@@ -144,7 +142,7 @@ Device * BusManager::AllocateNewDevice( Device *parent , bool lowspeed )
 		Device *ret = new Hub( this , parent , device_descriptor , devicenum , lowspeed );
 		if ( parent == 0 ) //root hub!!
 			m_roothub = ret;
-		return ret;
+		return 0;
 	}
 	
 	dprintf( "usb Busmanager [new device]: New normal device\n" );
@@ -170,16 +168,19 @@ int8 BusManager::AllocateAddress()
 
 status_t BusManager::Start()
 {
+	dprintf( "USB: BusManager::Start()\n" );
 	if ( InitCheck() != B_OK )
 		return InitCheck();
 	
-	// Start the 'explore thread'
-	m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
+	if ( m_explore_thread == 0 )
+		m_explore_thread = spawn_kernel_thread( usb_explore_thread , "usb_busmanager_explore" ,
 	                     B_LOW_PRIORITY , (void *)m_roothub );
+	
+	// Start the 'explore thread'
 	return resume_thread( m_explore_thread );
 }
 
-status_t BusManager::SubmitTransfer( Transfer &t )
+status_t BusManager::SubmitTransfer( Transfer *t )
 {
 	return B_ERROR;
 };

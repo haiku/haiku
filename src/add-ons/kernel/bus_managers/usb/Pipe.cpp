@@ -53,10 +53,7 @@ ControlPipe::ControlPipe( BusManager *bus , int8 dev_address , Direction dir , S
 {
 	m_bus = bus;
 	m_deviceaddress = dev_address;
-	if ( speed == LowSpeed )
-		m_lowspeed = true;
-	else
-		m_lowspeed = false;
+	m_speed = speed;
 }
 
 int8 ControlPipe::GetDeviceAddress()
@@ -71,19 +68,15 @@ status_t ControlPipe::SendRequest( uint8 request_type , uint8 request , uint16 v
 	                  uint16 index , uint16 length , void *data ,
 	                  size_t data_len , size_t *actual_len )
 {
-	//todo: het moet speciaal soort geheugen worden
-	usb_request_data *req = (usb_request_data *)malloc( sizeof( usb_request_data) );
+	usb_request_data req;
 	
-	req->RequestType = request_type;
-	req->Request = request;
-	req->Value = value;
-	req->Index = index;
-	req->Length = length;
+	req.RequestType = request_type;
+	req.Request = request;
+	req.Value = value;
+	req.Index = index;
+	req.Length = length;
 	
-	//Nicen up the second argument: the default pipe
-	//1) set up the pipe stuff a little nicer
-	//2) don't assume it's a low speed device :-(
-	return SendControlMessage( req , data , data_len , actual_len , 3 * 1000 * 1000 ); 
+	return SendControlMessage( &req , data , data_len , actual_len , 3 * 1000 * 1000 ); 
 }
 
 status_t ControlPipe::SendControlMessage( usb_request_data *command , void *data ,
@@ -91,12 +84,12 @@ status_t ControlPipe::SendControlMessage( usb_request_data *command , void *data
 	                             bigtime_t timeout )
 {
 	// this method should build an usb packet (new class) with the needed data
-	Transfer transfer( this );
+	Transfer *transfer = new Transfer( this , true );
 	
-	transfer.SetRequestData( command );
-	transfer.SetBuffer( (uint8 *)data );
-	transfer.SetBufferLength( data_length );
-	transfer.SetActualLength( actual_length );
+	transfer->SetRequestData( command );
+	transfer->SetBuffer( (uint8 *)data );
+	transfer->SetBufferLength( data_length );
+	transfer->SetActualLength( actual_length );
 	
 	status_t retval = m_bus->SubmitTransfer( transfer );
 	return retval;

@@ -146,9 +146,14 @@ void Hub::Explore()
 			if ( m_port_status[i].status & PORT_STATUS_CONNECTION )
 			{
 				//New device attached!
-				//DO something
 				dprintf( "USB Hub Explore(): New device connected\n" );
-
+				Device *newdev;
+				if ( m_port_status[i].status & PORT_STATUS_LOW_SPEED )
+					newdev = m_bus->AllocateNewDevice( this , true );
+				else
+					newdev = m_bus->AllocateNewDevice( this , false );
+				if ( newdev != 0 )
+					m_children[i] = newdev;
 			}
 			else
 			{

@@ -21,13 +21,28 @@
 
 #include "usb_p.h"
 
-Transfer::Transfer( Pipe *pipe )
+Transfer::Transfer( Pipe *pipe , bool synchronous )
 {
 	m_pipe = pipe;
+	m_buffer = 0;
+	m_bufferlength = 0;
+	m_actual_length = 0;
+	m_timeout = 0;
+	m_status = 0;
+	m_sem = B_ERROR;
+	m_hcpriv = 0;
+	
+	if ( synchronous == true )
+	{
+		m_sem = create_sem( 0 , "USB Transfer" );
+		set_sem_owner ( m_sem , B_SYSTEM_TEAM );
+	}
 }
 
 Transfer::~Transfer()
 {
+	if ( m_sem > B_OK )
+		delete_sem( m_sem );
 }
 
 void Transfer::SetRequestData( usb_request_data *data )
@@ -49,3 +64,32 @@ void Transfer::SetActualLength( size_t *actual_length )
 {
 	m_actual_length = actual_length;
 };
+
+void Transfer::SetCallbackFunction( usb_callback_func callback )
+{
+	m_callback = callback;
+}
+
+void Transfer::SetHostPrivate( hostcontroller_priv *priv )
+{
+	m_hcpriv = priv;
+}
+
+void Transfer::WaitForFinish()
+{
+	if ( m_sem > B_OK )
+		acquire_sem( m_sem );
+}	
+
+void Transfer::TransferDone()
+{
+	if ( m_sem > B_OK )
+		release_sem( m_sem );
+}
+
+void Transfer::Finish()
+{
+	//If we are synchronous, release a sem
+	if ( m_sem > B_OK )
+		release_sem( m_sem );
+}

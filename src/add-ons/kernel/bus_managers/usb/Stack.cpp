@@ -55,14 +55,14 @@ Stack::Stack()
 		return;
 	}
 
-	m_8_listhead = m_logical[0];
+	m_8_listhead = (addr_t)m_logical[0];
 
 	for ( int i = 0 ; i < B_PAGE_SIZE/8 ; i++ )
 	{
 		memory_chunk *chunk = (memory_chunk *)((addr_t)m_logical[0] + 8 * i);
-		chunk->physical = (void *)((addr_t)m_physical[0] + 8 * i);
+		chunk->physical = (addr_t)m_physical[0] + 8 * i;
 		if ( i != B_PAGE_SIZE / 8 - 1 )
-			chunk->next_item = (void *)((addr_t)m_logical[0] + 8 * ( i + 1 ) );
+			chunk->next_item = (addr_t)m_logical[0] + 8 * ( i + 1 );
 		else
 			chunk->next_item = NULL;
 	}
@@ -77,14 +77,14 @@ Stack::Stack()
 		return;
 	}
 
-	m_16_listhead = m_logical[1];
+	m_16_listhead = (addr_t)m_logical[1];
 
 	for ( int i = 0 ; i < B_PAGE_SIZE/16 ; i++ )
 	{
 		memory_chunk *chunk = (memory_chunk *)((addr_t)m_logical[1] + 16 * i);
-		chunk->physical = (void *)((addr_t)m_physical[1] + 16 * i);
+		chunk->physical = (addr_t)m_physical[1] + 16 * i;
 		if ( i != B_PAGE_SIZE / 16 - 1 )
-			chunk->next_item = (void *)((addr_t)m_logical[1] + 16 * ( i + 1 ));
+			chunk->next_item = (addr_t)m_logical[1] + 16 * ( i + 1 );
 		else
 			chunk->next_item = NULL;
 	}
@@ -99,14 +99,14 @@ Stack::Stack()
 		return;
 	}
 
-	m_32_listhead = m_logical[2];
+	m_32_listhead = (addr_t)m_logical[2];
 
 	for ( int i = 0 ; i < B_PAGE_SIZE/32 ; i++ )
 	{
 		memory_chunk *chunk = (memory_chunk *)((addr_t)m_logical[2] + 32 * i);
-		chunk->physical = (void *)((addr_t)m_physical[2] + 32 * i);
+		chunk->physical = (addr_t)m_physical[2] + 32 * i;
 		if ( i != B_PAGE_SIZE / 32 - 1 )
-			chunk->next_item = (void *)((addr_t)m_logical[2] + 32 * ( i + 1 ));
+			chunk->next_item = (addr_t)m_logical[2] + 32 * ( i + 1 );
 		else
 			chunk->next_item = NULL;
 	}
@@ -170,7 +170,7 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 {
 	Lock();
 
-	void *listhead;
+	addr_t listhead;
 	if ( size <= 8 )
 		listhead = m_8_listhead;
 	else if ( size <= 16 )
@@ -187,17 +187,29 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 	if ( listhead == NULL )
 	{
 		Unlock();
+		dprintf( "USB Stack: Out of memory on this list\n" );
 		return B_ERROR;
 	}
 	
+	dprintf( "USB Stack::Allocate() listhead: %l\n" , listhead );
+	
 	memory_chunk *chunk = (memory_chunk *)listhead;
-	*log = listhead;
-	*phy = chunk->physical;
+	*log = (void *)listhead;
+	*phy = (void *)(chunk->physical);
 	if ( chunk->next_item == NULL )
 		//TODO: allocate more memory
 		listhead = NULL;
 	else
-		m_8_listhead = chunk->next_item;
+		listhead = chunk->next_item;
+	
+	//Update our listhead pointers
+	if ( size <= 8 )
+		m_8_listhead = listhead;
+	else if ( size <= 16 )
+		m_16_listhead = listhead;
+	else if ( size <= 32 )
+		m_32_listhead = listhead;
+	
 	Unlock();
 	dprintf( "USB Stack: allocated a new chunk with size %u\n" , size );
 	return B_OK;
@@ -206,7 +218,7 @@ status_t Stack::AllocateChunk( void **log , void **phy , uint8 size )
 status_t Stack::FreeChunk( void *log , void *phy , uint8 size )
 {	
 	Lock();
-	void *listhead;
+	addr_t listhead;
 	if ( size <= 8 )
 		listhead = m_8_listhead;
 	else if ( size <= 16 )
@@ -223,8 +235,15 @@ status_t Stack::FreeChunk( void *log , void *phy , uint8 size )
 	memory_chunk *chunk = (memory_chunk *)log;
 	
 	chunk->next_item = listhead;
-	chunk->physical = phy;
-	listhead = log;
+	chunk->physical = (addr_t)phy;
+	
+	if ( size <= 8 )
+		m_8_listhead = (addr_t)log;
+	else if ( size <= 16 )
+		m_16_listhead = (addr_t)log;
+	else if ( size <= 32 )
+		m_32_listhead = (addr_t)log;
+	
 	Unlock();
 	return B_OK;
 }
@@ -239,7 +258,7 @@ area_id Stack::AllocateArea( void **log , void **phy , size_t size , const char 
 	dprintf("allocating %ld bytes for %s\n",size,name);
 
 	size = (size + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
-	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
+	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, 0 );
 	if (areaid < B_OK) {
 		dprintf("couldn't allocate area %s\n",name);
 		return B_ERROR;
