@@ -1,0 +1,30 @@
+SubDir OBOS_TOP src add-ons kernel drivers input ps2_hid ;
+
+UsePrivateHeaders input ;
+UsePrivateHeaders kernel ;
+
+if ! $(HAIKU_COMPATIBLE) {
+        SubDirCcFlags -DCOMPILE_FOR_R5 ;
+}
+
+R5KernelAddon ps2_hid : kernel drivers bin :
+	common.c
+	keyboard.c
+	mouse.c
+;
+
+# Link to kernel/drivers/dev/input/
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
+	local instDriver = <kernel!drivers!dev!input>ps2_hid ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : ps2_hid ;
+}
+
+Package haiku-inputkit-cvs :
+        ps2_hid :
+        boot home config add-ons kernel drivers bin ;
+
+Package haiku-inputkit-cvs :
+        <kernel!drivers!dev!input>ps2_hid :
+        boot home config add-ons kernel drivers dev input ;
