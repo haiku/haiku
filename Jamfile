@@ -43,10 +43,17 @@ Depends MediaKit :
 #	demultiplexer.media_addon 
 
 	# codecs
-	wav_reader
-	raw_decoder 
-	mp3_reader
+	aiff_reader
+	au_reader
+	avcodec
+	avi_reader
 	mp3_decoder
+	mp3_reader
+	ogg
+	raw_decoder 
+	vorbis
+	wav_reader
+	xvid_decoder
 ;
 
 SubInclude OBOS_TOP src ;
