@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src kits device ;
+
+UsePublicHeaders device ;
+
+SharedLibrary device :
+	A2D.cpp
+	D2A.cpp
+	DigitalPort.cpp
+	Joystick.cpp
+	SerialPort.cpp
+;
+
+LinkSharedOSLibs libdevice.so :
+	be
+;
+
