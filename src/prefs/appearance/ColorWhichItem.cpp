@@ -46,7 +46,7 @@ void ColorWhichItem::SetAttribute(color_which which)
 		case B_PANEL_BACKGROUND_COLOR:
 		{
 			attribute=which;
-			SetText("Background");
+			SetText("Panel Background");
 			break;
 		}
 		case B_PANEL_TEXT_COLOR:

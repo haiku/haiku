@@ -39,10 +39,12 @@
 
 #include "APRView.h"
 #include <PortLink.h>
+#include <PortMessage.h>
 #include "defs.h"
 #include "ColorWell.h"
 #include <ColorUtils.h>
 #include <InterfaceDefs.h>
+#include <ServerProtocol.h>
 #include "ColorWhichItem.h"
 #include "ServerConfig.h"
 
@@ -171,7 +173,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	savepanel=new BFilePanel(B_SAVE_PANEL, NULL, &ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
-	attrstring="Background";
+	attrstring="Panel Background";
 	LoadSettings();
 }
 
@@ -211,6 +213,7 @@ void APRView::MessageReceived(BMessage *msg)
 		{
 			picker->SetValue(*col);
 			colorwell->SetColor(*col);
+			colorwell->Invalidate();
 		}
 	}
 
@@ -218,6 +221,10 @@ void APRView::MessageReceived(BMessage *msg)
 	{
 		case DELETE_COLORSET:
 		{
+			// We can't delete the Default set
+			if(currentset->name.Compare("Default")==0)
+				break;
+			
 			// Construct the path and delete
 			BString path(COLOR_SET_DIR);
 			path+=currentset->name;
@@ -258,6 +265,10 @@ void APRView::MessageReceived(BMessage *msg)
 		}
 		case SAVE_COLORSET:
 		{
+			// Saving the Default set is rather dumb
+			if(currentset->name.Compare("Default")==0)
+				break;
+			
 			savepanel->Show();
 			break;
 		}
@@ -267,6 +278,13 @@ void APRView::MessageReceived(BMessage *msg)
 			if(msg->FindString("name",&name)!=B_OK)
 			{
 				STRACE(("MSG: Save Request - couldn't find file name\n"));
+				break;
+			}
+			if(name.ICompare("Default")==0)
+			{
+				BAlert *a=new BAlert("OpenBeOS","The name 'Default' is reserved. Please choose another.","OK");
+				a->Go();
+				savepanel->Show();
 				break;
 			}
 			SaveColorSet(name);
@@ -310,10 +328,7 @@ void APRView::MessageReceived(BMessage *msg)
 			if(!whichitem)
 				break;
 			attrstring=whichitem->Text();
-			rgb_color col=currentset->StringToColor(whichitem->Text()).GetColor32();
-			picker->SetValue(col);
-			colorwell->SetColor(col);
-			colorwell->Invalidate();
+			UpdateControlsFromAttr(whichitem->Text());
 			break;
 		}
 		case APPLY_SETTINGS:
@@ -375,10 +390,7 @@ void APRView::MessageReceived(BMessage *msg)
 				apply->SetEnabled(true);
 			}
 			SetDefaults();
-			rgb_color col=currentset->StringToColor(attrstring.String()).GetColor32();
-			picker->SetValue(col);
-			colorwell->SetColor(col);
-			colorwell->Invalidate();
+			UpdateControlsFromAttr(attrstring.String());
 			if(Window())
 				Window()->PostMessage(SET_UI_COLORS);
 			break;
@@ -518,8 +530,7 @@ void APRView::LoadColorSet(const BString &name)
 	currentset->ConvertFromMessage(&settings);
 	SetColorSetName(currentset->name.String());
 	
-	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
-	colorwell->SetColor(picker->ValueAsColor());
+	UpdateControlsFromAttr(attrstring.String());
 }
 
 void APRView::SaveColorSet(const BString &name)
@@ -543,7 +554,9 @@ void APRView::SaveColorSet(const BString &name)
 	}
 	
 	BMessage settings;
+	currentset->name=name;
 	currentset->ConvertToMessage(&settings);
+
 	if(settings.Flatten(&file)!=B_OK)
 	{
 		STRACE(("SaveColorSet: Couldn't flatten settings to file\n"));
@@ -558,6 +571,11 @@ void APRView::SaveColorSet(const BString &name)
 		STRACE(("SaveColorSet: Error in adding item to menu\n"));
 	}
 	SetColorSetName(name.String());
+	
+	// If we saved the color set after Applying it, the name won't be updated on disk, so 
+	// save again to disk if this has happened.
+	if(prevset==NULL)
+		SaveSettings();
 }
 
 void APRView::SetColorSetName(const char *name)
@@ -595,46 +613,62 @@ void APRView::LoadSettings(void)
 	// Load the current GUI color settings from disk. This is done instead of
 	// getting them from the server at this point for testing purposes.
 
-	// TODO: Add app_server UI color query code
-	STRACE(("Loading settings from disk\n"));
+/*	TODO: Uncomment the following disabled code when the app_server will handle the message
 
-	BDirectory dir,newdir;
-	if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
+	// Query the server for the current settings
+	port_id port=find_port(SERVER_PORT_NAME);
+	if(port!=B_NAME_NOT_FOUND)
 	{
-		STRACE(("Color set folder not found. Creating %s\n",SERVER_SETTINGS_DIR));
-		create_directory(SERVER_SETTINGS_DIR,0777);
-	}
-
-	BString path(SERVER_SETTINGS_DIR);
-	path+=COLOR_SETTINGS_NAME;
-	BFile file(path.String(),B_READ_ONLY);
-
-	if(file.InitCheck()!=B_OK)
-	{
-		STRACE(("Couldn't open file %s for read\n",path.String()));
-		SetDefaults();
-		SaveSettings();
-		return;
-	}
-
-	BMessage settings;
-	if(settings.Unflatten(&file)!=B_OK)
-	{
-		STRACE(("Error unflattening SystemColors file %s\n",path.String()));
+		STRACE(("Retrieving settings from app_server\n"));
+		PortLink link(port);
+		PortMessage pmsg;
 		
-		SetDefaults();
-		SaveSettings();
+		link.SetOpCode(AS_GET_UI_COLORS);
+		link.FlushWithReply(&pmsg);
+		pmsg.Read<ColorSet>(currentset);
 	}
+	else
+	{
+*/
+		STRACE(("Loading settings from disk\n"));
+		
+		BDirectory dir,newdir;
+		if(dir.SetTo(SERVER_SETTINGS_DIR)==B_ENTRY_NOT_FOUND)
+		{
+			STRACE(("Color set folder not found. Creating %s\n",SERVER_SETTINGS_DIR));
+			create_directory(SERVER_SETTINGS_DIR,0777);
+		}
+	
+		BString path(SERVER_SETTINGS_DIR);
+		path+=COLOR_SETTINGS_NAME;
+		BFile file(path.String(),B_READ_ONLY);
+	
+		if(file.InitCheck()!=B_OK)
+		{
+			STRACE(("Couldn't open file %s for read\n",path.String()));
+			SetDefaults();
+			SaveSettings();
+			return;
+		}
+	
+		BMessage settings;
+		if(settings.Unflatten(&file)!=B_OK)
+		{
+			STRACE(("Error unflattening SystemColors file %s\n",path.String()));
+			
+			SetDefaults();
+			SaveSettings();
+		}
 
-	currentset->ConvertFromMessage(&settings);
+		currentset->ConvertFromMessage(&settings);
+//	}
+
 	SetColorSetName(currentset->name.String());
 	
-	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
-	colorwell->SetColor(picker->ValueAsColor());
+	UpdateControlsFromAttr(attrstring.String());
 	
-	if(currentset->name.String()!="Default")
+	if(currentset->name.Compare("Default")!=0)
 		defaults->SetEnabled(true);
-
 }
 
 void APRView::SetDefaults(void)
@@ -676,4 +710,15 @@ void APRView::NotifyServer(void)
 	
 	if(Window())
 		Window()->PostMessage(SET_UI_COLORS);
+}
+
+void APRView::UpdateControlsFromAttr(const char *string)
+{
+	if(!string)
+		return;
+	STRACE(("Update color for %s\n",string));
+
+	picker->SetValue(currentset->StringToColor(string).GetColor32());
+	colorwell->SetColor(picker->ValueAsColor());
+	colorwell->Invalidate();
 }

@@ -60,6 +60,7 @@ public:
 //	rgb_color GetColorFromMessage(BMessage *msg, const char *name, int32 index=0);
 protected:
 	friend APRWindow;
+	void UpdateControlsFromAttr(const char *string);
 	BMenu *LoadColorSets(void);
 	void SaveColorSet(const BString &name);
 	void LoadColorSet(const BString &name);
