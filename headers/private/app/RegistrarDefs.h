@@ -28,23 +28,30 @@
 #define REGISTRAR_DEFS_H
 
 #include <Errors.h>
+#include <Roster.h>
 
 // names
 extern const char *kRegistrarSignature;
 extern const char *kRosterThreadName;
 extern const char *kRosterPortName;
+extern const char *kRAppLooperPortName;
 
 // message constants
 enum {
+	// replies
 	B_REG_SUCCESS					= 'rgsu',
 	B_REG_ERROR						= 'rger',
+	// general requests
 	B_REG_GET_MIME_MESSENGER		= 'rgmm',
 	B_REG_GET_CLIPBOARD_MESSENGER	= 'rgcm',
+	// roster requests
 	B_REG_ADD_APP					= 'rgaa',
 	B_REG_COMPLETE_REGISTRATION		= 'rgcr',
 	B_REG_IS_PRE_REGISTERED			= 'rgip',
 	B_REG_REMOVE_PRE_REGISTERED_APP	= 'rgrp',
 	B_REG_REMOVE_APP				= 'rgra',
+	B_REG_SET_THREAD_AND_TEAM		= 'rgtt',
+	B_REG_GET_RUNNING_APP_INFO		= 'rgri',
 };
 
 // type constants
@@ -56,8 +63,25 @@ enum {
 #define B_REGISTRAR_ERROR_BASE		(B_ERRORS_END + 1)
 
 enum {
-// not needed: We have B_ALREADY_RUNNING.
-//	B_REG_ALREADY_REGISTERED		= B_REGISTRAR_ERROR_BASE,
+	B_REG_ALREADY_REGISTERED		= B_REGISTRAR_ERROR_BASE,
+		// A team tries to register a second time.
+	B_REG_APP_NOT_REGISTERED,
+	B_REG_APP_NOT_PRE_REGISTERED,
+};
+
+// misc constants
+enum {
+	B_REG_DEFAULT_APP_FLAGS			= B_MULTIPLE_LAUNCH | B_ARGV_ONLY
+									  | _B_APP_INFO_RESERVED1_,
+	B_REG_APP_LOOPER_PORT_CAPACITY	= 100,
+};
+
+// structs
+
+// a flat app_info -- to be found in B_REG_APP_INFO_TYPE message fields
+struct flat_app_info {
+	app_info	info;
+	char		ref_name[B_FILE_NAME_LENGTH + 1];
 };
 
 #endif	// REGISTRAR_DEFS_H

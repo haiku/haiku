@@ -30,4 +30,5 @@
 const char *kRegistrarSignature	= "application/x-vnd.OBOS-Registrar";
 const char *kRosterThreadName	= "_obos_roster_thread_";
 const char *kRosterPortName		= "_obos_roster_port_";
+const char *kRAppLooperPortName	= "rAppLooperPort";
 
