@@ -127,10 +127,12 @@ extern uint16 __swap_int16(uint16 uarg);
 
 /*-------------------------------------------------------------*/
 /*---------Berkeley macros -----------------------------------*/
-#define htonl(x) B_HOST_TO_BENDIAN_INT32(x)
-#define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
-#define htons(x) B_HOST_TO_BENDIAN_INT16(x)
-#define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
+#ifndef htonl /* avoid collision with <netinet/in.h> */
+  #define htonl(x) B_HOST_TO_BENDIAN_INT32(x)
+  #define ntohl(x) B_BENDIAN_TO_HOST_INT32(x)
+  #define htons(x) B_HOST_TO_BENDIAN_INT16(x)
+  #define ntohs(x) B_BENDIAN_TO_HOST_INT16(x)
+#endif
 
 #ifdef __cplusplus
 }
