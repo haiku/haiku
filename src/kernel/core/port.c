@@ -781,7 +781,7 @@ port_buffer_size_etc(port_id id, uint32 flags, bigtime_t timeout)
 	// block if no message, or, if B_TIMEOUT flag set, block with timeout
 
 	status = acquire_sem_etc(cachedSem, 1, flags, timeout);
-	if (status == B_BAD_SEM_ID || status == B_INTERRUPTED) {
+	if (status == B_BAD_SEM_ID) {
 		// somebody deleted the port
 		return B_BAD_PORT_ID;
 	}
@@ -900,8 +900,8 @@ read_port_etc(port_id id, int32 *_msgCode, void *msgBuffer, size_t bufferSize,
 	status = acquire_sem_etc(cachedSem, 1, flags, timeout);
 		// get 1 entry from the queue, block if needed
 
-	if (status == B_BAD_SEM_ID || status == B_INTERRUPTED) {
-		/* somebody deleted the port or the sem went away */
+	if (status == B_BAD_SEM_ID) {
+		// somebody deleted the port
 		return B_BAD_PORT_ID;
 	}
 	if (status != B_OK)
@@ -1012,8 +1012,8 @@ write_port_etc(port_id id, int32 msgCode, const void *msgBuffer,
 	status = acquire_sem_etc(cachedSem, 1, flags, timeout);
 		// get 1 entry from the queue, block if needed
 
-	if (status == B_BAD_SEM_ID || status == B_INTERRUPTED) {
-		// somebody deleted the port or the sem while we were waiting
+	if (status == B_BAD_SEM_ID) {
+		// somebody deleted the port
 		return B_BAD_PORT_ID;
 	}
 	if (status != B_OK)
