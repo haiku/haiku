@@ -30,3 +30,4 @@ CommonTestLib libinterfacetest.so
 ;
 
 SubInclude OBOS_TOP src tests kits interface bprintjob ;
+SubInclude OBOS_TOP src tests kits interface picture ;
