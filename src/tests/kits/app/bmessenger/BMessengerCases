@@ -71,4 +71,43 @@ case 4:	this is initialized to local target with preferred handler =>
 case 5:	this is initialized to remote target with specific handler =>
 		should return false.
 
+BHandler *Target(BLooper **looper) const
+case 1:	this is uninitialized, looper is NULL =>
+		should return NULL.
+case 2:	this is initialized to local target with preferred handler,
+		looper is NULL =>
+		should return NULL.
+case 3:	this is initialized to local target with specific handler,
+		looper is NULL =>
+		should return correct handler.
+case 4:	this is initialized to remote target with preferred handler,
+		looper is NULL =>
+		should return NULL.
+case 5:	this is initialized to remote target with specific handler,
+		looper is NULL =>
+		should return NULL.
+other cases in included in BMessenger(...)
 
+bool LockTarget() const
+case 1:	this is uninitialized =>
+		should return false.
+case 2:	this is initialized to local target with preferred handler,
+		looper is not locked =>
+		should lock the looper and return true.
+case 3:	this is initialized to local target with specific handler,
+		looper is not locked =>
+		should lock the looper and return true.
+case 4:	this is initialized to local target with preferred handler,
+		looper is locked by another thread =>
+		should block until the looper is unlocked, lock it and return true.
+case 5:	this is initialized to local target with specific handler,
+		looper is locked by another thread =>
+		should block until the looper is unlocked, lock it and return true.
+case 6:	this is initialized to remote target with preferred handler,
+		looper is not locked =>
+		should not lock the looper and return false.
+case 7:	this is initialized to remote target with specific handler,
+		looper is not locked =>
+		should not lock the looper and return false.
+
+status_t LockTargetWithTimeout(bigtime_t timeout) const

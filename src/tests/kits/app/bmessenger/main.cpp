@@ -13,6 +13,7 @@
 // Local Includes --------------------------------------------------------------
 #include "../common.h"
 #include "BMessengerTester.h"
+#include "LockTargetTester.h"
 #include "TargetTester.h"
 
 // Local Defines ---------------------------------------------------------------
@@ -32,6 +33,7 @@ Test* addonTestFunc(void)
 {
 	TestSuite* tests = new TestSuite("BHandler");
 
+	tests->addTest(LockTargetTester::Suite());
 	tests->addTest(TBMessengerTester::Suite());
 	tests->addTest(TargetTester::Suite());
 
