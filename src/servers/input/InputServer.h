@@ -198,22 +198,24 @@ private:
 	void WatchPort();
 	
 	static bool doStartStopDevice(void*, void*);
-	
-	// added this to communicate via portlink
-	
-	BPortLink 		*serverlink;
+
 	AddOnManager 	*fAddOnManager;
 	
 	BList			fEventsCache;
+
+#ifndef COMPILE_FOR_R5	
+	// added this to communicate via portlink
 	
-	//fMouseState;
+	BPortLink 		*serverlink;
+	
+#else
 
 	sem_id 		fCursorSem;
-	sem_id		fAsReadSem, fAsWriteSem;
 	port_id		fAsPort;
 	area_id		fAppArea;
 	area_id		fCloneArea;
 	uint32		*fAppBuffer;
+#endif 
 	
 #if DEBUG == 2
 public:

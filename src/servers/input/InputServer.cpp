@@ -113,10 +113,7 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	
 	gDeviceManager.LoadState();
 	
-	InitKeyboardMouseStates();
-	
-	fAddOnManager = new AddOnManager(SafeMode());
-	fAddOnManager->LoadState();
+#ifdef COMPILE_FOR_R5
 
 	if (has_data(find_thread(NULL))) {
 		PRINT(("HasData == YES\n")); 
@@ -138,15 +135,22 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 
 		fAsPort = create_port(100, "is_as");
 
-		fAsReadSem = create_sem(0, "is_as");
-		fAsWriteSem = create_sem(100, "is_as");
-		buffer[0] = fAsReadSem;
-		buffer[1] = fAsWriteSem;
+		PRINT(("is_as port :%ld\n", fAsPort));
+		
+		//buffer[1] = 0;
+		buffer[0] = fAsPort;
 	
 		status_t err;
 		if ((err = send_data(appThreadId, 0, buffer, sizeof(buffer)))!=B_OK)
 			PRINT(("error when send_data %s\n", strerror(err)));
 	}
+
+#endif
+
+	InitKeyboardMouseStates();
+	
+	fAddOnManager = new AddOnManager(SafeMode());
+	fAddOnManager->LoadState();	
 }
 
 /*
@@ -157,6 +161,12 @@ InputServer::~InputServer(void)
 {
 	CALLED();
 	delete fAddOnManager;
+	
+#ifdef COMPILE_FOR_R5
+	delete_port(fAsPort);
+	delete_area(fAppArea);
+#endif
+
 #if DEBUG == 2
 	fclose(sLogFile);
 #endif
@@ -204,6 +214,9 @@ InputServer::InitKeyboardMouseStates(void)
 
 	if (LoadKeymap()!=B_OK)
 		LoadSystemKeymap();
+		
+	BMessage *msg = new BMessage(B_MOUSE_MOVED);
+	HandleSetMousePosition(msg, msg);
 }
 
 
@@ -682,25 +695,28 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
     			&& (outbound->FindInt32("y", &yValue) == B_OK)) {
 				fMousePos.x += xValue;
 				fMousePos.y -= yValue;
+				if (fMousePos.x<0)
+					fMousePos.x = 0;
+				if (fMousePos.y<0)
+					fMousePos.y = 0;
 				outbound->RemoveName("x"); 
 				outbound->RemoveName("y");
 				outbound->AddPoint("where", fMousePos);
 				outbound->AddInt32("modifiers", fKey_info.modifiers);
-
 				PRINT(("new position : %f, %f, %ld, %ld\n", fMousePos.x, fMousePos.y, xValue, yValue));
 	   		}
-    	
-		if (fAppBuffer) {
-       		         fAppBuffer[0] =
-       		                 (0x3 << 30)
-               		         | ((uint32)fMousePos.x & 0x7fff) << 15
-               		         | ((uint32)fMousePos.y & 0x7fff);
 
-			PRINT(("released cursorSem with value : %08lx\n", fAppBuffer[0]));
+#ifdef COMPILE_FOR_R5
+			if (fAppBuffer) {
+				fAppBuffer[0] =
+       		    	(0x3 << 30)
+               		| ((uint32)fMousePos.x & 0x7fff) << 15
+               		| ((uint32)fMousePos.y & 0x7fff);
+
+				PRINT(("released cursorSem with value : %08lx\n", fAppBuffer[0]));
                 	release_sem(fCursorSem);
         	}
-
-
+#endif
 		break;
     	
     	// some Key Down and up codes ..
@@ -1128,7 +1144,7 @@ InputServer::DispatchEvents(BList *eventList)
 	
 	CacheEvents(eventList);
 
-	if (fEventsCache.CountItems()>5) {
+	if (fEventsCache.CountItems()>0) {
 
 		BMessage *event;
 		
@@ -1150,11 +1166,10 @@ int
 InputServer::DispatchEvent(BMessage *message)
 {
 	CALLED();
-	int32 xValue, yValue;
-	port_id pid = find_port(SERVER_INPUT_PORT);
-
+	
 	// BPortLink is incompatible with R5 one
 #ifndef COMPILE_FOR_R5
+	port_id pid = find_port(SERVER_INPUT_PORT);
 
 	BPortLink *appsvrlink = new BPortLink(pid);
    	switch(message->what){
@@ -1162,8 +1177,6 @@ InputServer::DispatchEvent(BMessage *message)
 			uint32 buttons;
 			BPoint pt;
     			message->FindPoint("where",&pt);
-		// get point and button from msg
-    		//if((message->FindInt32(X_VALUE,&xValue) == B_OK) && (message->FindInt32(Y_VALUE,&yValue) == B_OK)){
     			int64 time=(int64)real_time_clock();
     			appsvrlink->StartMessage(B_MOUSE_MOVED);
     			appsvrlink->Attach(&time,sizeof(int64));
@@ -1173,7 +1186,6 @@ InputServer::DispatchEvent(BMessage *message)
     			appsvrlink->Attach(&buttons,sizeof(uint32));
     			appsvrlink->Flush();
     			PRINT(("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",pt.x,pt.y,time,buttons));
-    		//	}
     		break;
     		}
     	case B_MOUSE_DOWN:{
@@ -1349,6 +1361,15 @@ InputServer::DispatchEvent(BMessage *message)
    			
 		}
 	delete appsvrlink;
+#else
+	status_t  	err;
+	
+	ssize_t length = message->FlattenedSize();
+	char buffer[length];
+	if ((err = message->Flatten(buffer,length)) < B_OK)
+		return err;
+	
+	write_port(fAsPort, 0, buffer, length);
 	
 #endif	// COMPILE_FOR_R5
 
@@ -1662,7 +1683,6 @@ InputServer::WatchPort()
 
 			HandleSetMousePosition(event, event);
 						
-			//DispatchEvent(&event);
 			BList list;
 			list.AddItem(event);
 			DispatchEvents(&list);
