@@ -629,7 +629,8 @@ InputServer::MessageReceived(BMessage *message)
 			break;*/
 		default:
 		{
-			PRINT(("Default message ...\n"));
+			PRINT(("Default message ... \n"));
+			PRINT_OBJECT(*message);
 			BMessenger app_server("application/x-vnd.Be-APPS", -1, NULL);
 			if (app_server.IsValid()) {
 				//app_server->SendMessage(message);

@@ -227,9 +227,12 @@ BInputServerDevice::EnqueueMessage(BMessage *message)
 status_t
 BInputServerDevice::StartMonitoringDevice(const char *device)
 {
-    status_t dummy;
+	CALLED();
+	PRINT(("StartMonitoringDevice %s\n", device));
+	
+    status_t status = B_OK;
 
-    return dummy;
+    return status;
 }
 
 
@@ -240,9 +243,10 @@ BInputServerDevice::StartMonitoringDevice(const char *device)
 status_t
 BInputServerDevice::StopMonitoringDevice(const char *device)
 {
-    status_t dummy;
+    CALLED();
+    status_t status = B_OK;
 
-    return dummy;
+    return status;
 }
 
 /**
