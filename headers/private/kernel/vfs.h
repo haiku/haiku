@@ -77,8 +77,7 @@ void vfs_vnode_release_ref(void *vnode);
 ssize_t vfs_can_page(void *vnode);
 ssize_t vfs_read_page(void *vnode, iovecs *vecs, off_t pos);
 ssize_t vfs_write_page(void *vnode, iovecs *vecs, off_t pos);
-void *vfs_get_cache_ptr(void *vnode);
-int vfs_set_cache_ptr(void *vnode, void *cache);
+status_t vfs_get_vnode_cache(void *vnode, void **_cache);
 
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);

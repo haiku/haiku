@@ -55,6 +55,7 @@ region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_ty
 	region_id source_region, int mapping, int lock);
 int vm_delete_region(aspace_id aid, region_id id);
 region_id vm_find_region_by_name(aspace_id aid, const char *name);
+status_t vm_create_vnode_cache(void *vnode, void **_cache);
 
 int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr);
 int vm_get_physical_page(addr paddr, addr *vaddr, int flags);
