@@ -250,28 +250,26 @@ struct ifa_msghdr {
         int     ifam_metric;    /* value of ifa_metric */
 };
 
-#ifdef _KERNEL_MODE
-  /* function declaration */
-  struct  ifq    *start_ifq(void);
-  void            stop_ifq(struct ifq *);
-  struct  ifnet  *get_interfaces(void); 
-  struct	ifnet  *ifunit(char *name);
-  struct	ifaddr *ifa_ifwithaddr(struct sockaddr *);
-  struct	ifaddr *ifa_ifwithaf(int);
-  struct	ifaddr *ifa_ifwithdstaddr(struct sockaddr *);
-  struct	ifaddr *ifa_ifwithnet(struct sockaddr *);
-  struct	ifaddr *ifa_ifwithroute(int, struct sockaddr *,
-                                struct sockaddr *);
-  struct	ifaddr *ifaof_ifpforaddr(struct sockaddr *, struct ifnet *);
-  void	ifafree(struct ifaddr *);
+/* function declaration */
+struct  ifq    *start_ifq(void);
+void            stop_ifq(struct ifq *);
+struct  ifnet  *get_interfaces(void); 
+struct	ifnet  *ifunit(char *name);
+struct	ifaddr *ifa_ifwithaddr(struct sockaddr *);
+struct	ifaddr *ifa_ifwithaf(int);
+struct	ifaddr *ifa_ifwithdstaddr(struct sockaddr *);
+struct	ifaddr *ifa_ifwithnet(struct sockaddr *);
+struct	ifaddr *ifa_ifwithroute(int, struct sockaddr *,
+                              struct sockaddr *);
+struct	ifaddr *ifaof_ifpforaddr(struct sockaddr *, struct ifnet *);
+void	ifafree(struct ifaddr *);
 
-  void    if_attach(struct ifnet *ifp);
-  void    if_detach(struct ifnet *ifp);
+void    if_attach(struct ifnet *ifp);
+void    if_detach(struct ifnet *ifp);
 
-  int     ifioctl(struct socket *so, ulong cmd, caddr_t data);
-  int     ifconf(int cmd, char *data);
-  void    if_init(void);
-#endif
+int     ifioctl(struct socket *so, ulong cmd, caddr_t data);
+int     ifconf(int cmd, char *data);
+void    if_init(void);
 
 #ifdef __cplusplus
 }

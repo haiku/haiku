@@ -59,13 +59,16 @@ status_t std_ops(int32 op, ...);
 
 static int start_stack(void);
 static int stop_stack(void);
+
 static void add_protosw(struct protosw *[], int layer);
 static struct net_module *module_list = NULL;
+
 /* Wider scoped prototypes */
 int net_sysctl(int *name, uint namelen, void *oldp, size_t *oldlenp,
                void *newp, size_t newlen);
 
 struct protosw * protocols;
+struct domain *domains = NULL;
 
 struct core_module_info core_info = {
 	{

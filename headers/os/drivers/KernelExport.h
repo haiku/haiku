@@ -191,6 +191,8 @@ typedef int (*debugger_command_hook)(int argc, char **argv);
 extern int			add_debugger_command(char *name, debugger_command_hook hook, char *help);
 extern int			remove_debugger_command(char *name, debugger_command_hook hook); 
 
+extern status_t 	load_driver_symbols(char *driver_name);
+
 
 /*-------------------------------------------------------------*/
 /* misc */

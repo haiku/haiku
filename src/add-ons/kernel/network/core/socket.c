@@ -36,7 +36,6 @@ static int	sosend(struct socket *so, struct mbuf *addr, struct uio *uio,
 static int	soreceive (struct socket *so, struct mbuf **paddr, struct uio *uio,
 				   struct mbuf **mp0, struct mbuf **controlp, int *flagsp);
 
-
 /* Static global objects... */
 static pool_ctl *spool;
 static benaphore sockets_lock;

@@ -1,5 +1,11 @@
 SubDir OBOS_TOP src servers input ;
 
+# AddResources
+#	input_server
+#	:
+#	input_server.rsrc
+#	;
+
 Server input_server :
 	InputServer.cpp
 	InputServerDevice.cpp

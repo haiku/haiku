@@ -52,9 +52,7 @@ struct in_multi {
  * return a pointer to the addr as a sockaddr_in.
  */
 
-#ifdef _KERNEL_MODE
-
-  #define IA_SIN(ia) (&(((struct in_ifaddr *)(ia))->ia_addr))
+#define IA_SIN(ia) (&(((struct in_ifaddr *)(ia))->ia_addr))
 
 //  extern struct in_ifaddr *in_ifaddr;
 
@@ -63,6 +61,6 @@ struct in_multi {
                 int scrub);
   int inetctlerr(int cmd);
   struct in_ifaddr *get_primary_addr(void);
-#endif
 
 #endif /* NETINET_IN_VAR_H */
+

@@ -46,28 +46,26 @@ struct inpcb {
 	struct route   inp_route;   /* the route to host */
 };
 
-#ifdef _KERNEL_MODE
-  int      in_pcbinit       (void);
-  int      in_pcballoc      (struct socket *, struct inpcb *);
-  int      in_pcbbind       (struct inpcb *, struct mbuf *);
-  int      in_pcbconnect    (struct inpcb *, struct mbuf *);
-  void     in_pcbdetach     (struct inpcb *);
-  int      in_pcbdisconnect (struct inpcb *);
-  void     in_losing        (struct inpcb *);
-  void     in_setpeeraddr   (struct inpcb *, struct mbuf *);
-  void     in_setsockaddr   (struct inpcb *, struct mbuf *);
+int      in_pcbinit       (void);
+int      in_pcballoc      (struct socket *, struct inpcb *);
+int      in_pcbbind       (struct inpcb *, struct mbuf *);
+int      in_pcbconnect    (struct inpcb *, struct mbuf *);
+void     in_pcbdetach     (struct inpcb *);
+int      in_pcbdisconnect (struct inpcb *);
+void     in_losing        (struct inpcb *);
+void     in_setpeeraddr   (struct inpcb *, struct mbuf *);
+void     in_setsockaddr   (struct inpcb *, struct mbuf *);
 
-  struct inpcb *in_pcblookup(struct inpcb *head, struct in_addr faddr,
-                             uint16 fport_a, struct in_addr laddr,
-                             uint16 lport_a, int flags);
-  struct rtentry *in_pcbrtentry (struct inpcb *);
-  void     in_pcbnotify (struct inpcb *, struct sockaddr *,
-                         uint16, struct in_addr, uint16, 
-                         int, void (*)(struct inpcb *, int));
+struct inpcb *in_pcblookup(struct inpcb *head, struct in_addr faddr,
+                           uint16 fport_a, struct in_addr laddr,
+                           uint16 lport_a, int flags);
+struct rtentry *in_pcbrtentry (struct inpcb *);
+void     in_pcbnotify (struct inpcb *, struct sockaddr *,
+                       uint16, struct in_addr, uint16, 
+                       int, void (*)(struct inpcb *, int));
 
-  /* helpful macro's */
-  #define     sotoinpcb(so)   ((struct inpcb *)(so)->so_pcb)
-#endif /* _KERNEL_MODE */
+/* helpful macro's */
+#define     sotoinpcb(so)   ((struct inpcb *)(so)->so_pcb)
 
 #endif /* _NETINET_INPCB_H */
 

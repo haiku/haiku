@@ -11,7 +11,6 @@ typedef struct iovec {
 } iovec;
 
 
-#ifdef _KERNEL_MODE
 enum    uio_rw { UIO_READ, UIO_WRITE };
 
 /* Segment flag values. */
@@ -31,7 +30,6 @@ struct uio {
 };
 
 int uiomove(char *cp, int n, struct uio *uio);
-#endif
 
 ssize_t readv(int fd, const struct iovec *vector, size_t count);
 ssize_t readv_pos(int fd, off_t pos, const struct iovec *vec, size_t count);
