@@ -76,9 +76,6 @@ OBOSInstallRelSymLink install-networking
 	: installed-networking-test ;
 
 Package haiku-networkingkit-cvs :
-	README.html ;
-
-Package haiku-networkingkit-cvs :
 	libnet.so :
 #	boot home config lib ;
 	boot home Desktop haiku-networkingkit lib ;
