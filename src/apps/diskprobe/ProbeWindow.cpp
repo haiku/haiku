@@ -36,7 +36,7 @@ ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref, const char *attribute)
 	}
 
 	// add the menu
-	
+
 	BMenuBar *menuBar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
 	AddChild(menuBar);
 
@@ -53,11 +53,7 @@ ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref, const char *attribute)
 					new BMessage(kMsgOpenFilePanel), 'O', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
 
-	BMenuItem *item;
-	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, NULL));
-	item->SetEnabled(false);
-	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS, NULL, 'P', B_COMMAND_KEY));
-	item->SetEnabled(false);
+	// the ProbeView file menu items will be inserted here
 	menu->AddSeparatorItem();
 
 	menu->AddItem(new BMenuItem("About DiskProbe" B_UTF8_ELLIPSIS, new BMessage(B_ABOUT_REQUESTED)));
@@ -71,8 +67,9 @@ ProbeWindow::ProbeWindow(BRect rect, entry_ref *ref, const char *attribute)
 
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
-	BView *view = new ProbeView(rect, ref, attribute);
-	AddChild(view);
+	ProbeView *probeView = new ProbeView(rect, ref, attribute);
+	probeView->AddFileMenuItems(menu, menu->CountItems() - 4);
+	AddChild(probeView);
 }
 
 

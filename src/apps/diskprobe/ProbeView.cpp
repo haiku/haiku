@@ -17,6 +17,7 @@
 #include <Box.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <ScrollView.h>
 #include <String.h>
 #include <Entry.h>
 #include <Path.h>
@@ -323,19 +324,12 @@ void
 HeaderView::Draw(BRect updateRect)
 {
 	BRect rect = Bounds();
-	rect.bottom -= 2;
 
 	SetHighColor(ui_color(B_SHINE_COLOR));
 	StrokeLine(rect.LeftTop(), rect.LeftBottom());
 	StrokeLine(rect.LeftTop(), rect.RightTop());
 
-	rect.bottom++;
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
-	StrokeLine(rect.LeftBottom(), rect.RightBottom());
-
-	rect.bottom++;
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
-	StrokeLine(rect.LeftBottom(), rect.RightBottom());
+	// the gradient at the bottom is drawn by the BScrollView
 }
 
 
@@ -345,7 +339,7 @@ HeaderView::GetPreferredSize(float *_width, float *_height)
 	if (_width)
 		*_width = Bounds().Width();
 	if (_height)
-		*_height = fPositionSlider->Frame().bottom + 4;
+		*_height = fPositionSlider->Frame().bottom + 2;
 }
 
 
@@ -353,7 +347,8 @@ HeaderView::GetPreferredSize(float *_width, float *_height)
 
 
 ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
-	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW)
+	: BView(rect, "probeView", B_FOLLOW_ALL, B_WILL_DRAW),
+	fAttribute(attribute)
 {
 	BNode node(ref);
 
@@ -369,10 +364,18 @@ ProbeView::ProbeView(BRect rect, entry_ref *ref, const char *attribute)
 	fIsDevice = (stat.st_mode & (S_IFBLK | S_IFCHR)) != 0;
 
 	rect = Bounds();
-	rect.bottom = rect.top + 62;
-	fHeaderView = new HeaderView(rect, ref, fIsDevice);
+	fHeaderView = new HeaderView(rect, ref, fIsDevice, attribute ? fAttribute.String() : NULL);
 	fHeaderView->ResizeToPreferred();
 	AddChild(fHeaderView);
+
+	rect = fHeaderView->Frame();
+	rect.top = rect.bottom + 3;
+	rect.bottom = Bounds().bottom - B_H_SCROLL_BAR_HEIGHT;
+	rect.right -= B_V_SCROLL_BAR_WIDTH;
+	BView *view = new BView(rect, "text", B_FOLLOW_NONE, B_WILL_DRAW);
+
+	fScrollView = new BScrollView("scroller", view, B_FOLLOW_ALL, B_WILL_DRAW, true, true);
+	AddChild(fScrollView);
 }
 
 
@@ -383,13 +386,37 @@ ProbeView::~ProbeView()
 
 
 void 
+ProbeView::AddFileMenuItems(BMenu *menu, int32 index)
+{
+	BMenuItem *item;
+	menu->AddItem(item = new BMenuItem("Page Setup" B_UTF8_ELLIPSIS, NULL), index++);
+	item->SetEnabled(false);
+	menu->AddItem(item = new BMenuItem("Print" B_UTF8_ELLIPSIS, NULL, 'P', B_COMMAND_KEY), index++);
+	item->SetEnabled(false);
+}
+
+
+void 
 ProbeView::AttachedToWindow()
 {
 	// Add menu to window
-	
+
 	BMenuBar *bar = Window()->KeyMenuBar();
-	if (bar == NULL)
-		return;
+	if (bar == NULL) {
+		// there is none? Well, but we really want to have one
+		bar = new BMenuBar(BRect(0, 0, 0, 0), NULL);
+		Window()->AddChild(bar);
+
+		MoveBy(0, bar->Bounds().Height());
+		ResizeBy(0, -bar->Bounds().Height());
+
+		BMenu *menu = new BMenu(fAttribute.Length() > 0 ? "Attribute" : fIsDevice ? "Device" : "File");
+		AddFileMenuItems(menu, 0);
+		menu->AddSeparatorItem();
+
+		menu->AddItem(new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED), 'W', B_COMMAND_KEY));
+		bar->AddItem(menu);
+	}
 
 	BMenu *menu = new BMenu("Edit");
 	menu->AddItem(new BMenuItem("Undo", NULL, 'Z', B_COMMAND_KEY));

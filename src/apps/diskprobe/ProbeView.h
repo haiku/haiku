@@ -7,11 +7,11 @@
 
 
 #include <View.h>
+#include <String.h>
 #include <Path.h>
 
-class BTextControl;
-class BStringView;
-class BSlider;
+
+class BScrollView;
 
 class HeaderView;
 
@@ -24,9 +24,13 @@ class ProbeView : public BView {
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
 
+		void AddFileMenuItems(BMenu *menu, int32 index);
+
 	private:
+		BString			fAttribute;
 		bool			fIsDevice;
 		HeaderView		*fHeaderView;
+		BScrollView		*fScrollView;
 };
 
 #endif	/* PROBE_WINDOW_H */
