@@ -1,4 +1,4 @@
-BFS - ToDo, March 13th, 2003
+BFS - ToDo, May 26th, 2003
 -----
 
 BlockAllocator
@@ -22,6 +22,8 @@ Queries
  - Check permissions of the parent directories
  - Add protection against crashing applications which had a query open - at least the original BeOS kernel does not free the cookie (which throws some memory away *and* prevents unmounting the disk), but that won't be needed for OpenBeOS
  - the query set for "!=" and last_modified/size is not the same as for "="; last_modified/size don't contain directories
+ - check if the query has to be checked for a live update
+ - accept hex values 0x...
 
 
 Journal
