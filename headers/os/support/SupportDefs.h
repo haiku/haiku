@@ -40,6 +40,7 @@ typedef unsigned short			ushort;
 // System Includes -------------------------------------------------------------
 #include <BeBuild.h>
 #include <sys/types.h>
+#include <stdbool.h>
 #include <Errors.h>
 
 // Project Includes ------------------------------------------------------------
@@ -116,11 +117,12 @@ extern _IMPEXP_BE const char *B_EMPTY_STRING;
 
 // Grandfathering --------------------------------------------------------------
 
-#ifndef __cplusplus
-typedef unsigned char			bool;
-#define false	0
-#define true	1
-#endif 
+//#ifndef __cplusplus
+//typedef enum { false = 0, true = 1 } _Bool;
+//#define	bool	_Bool
+//#define false	0
+//#define true	1
+//#endif 
 
 #ifndef NULL
 #define NULL 	(0)
