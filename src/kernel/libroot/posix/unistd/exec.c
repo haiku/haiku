@@ -36,8 +36,8 @@ copy_arguments(va_list list, const char **args, const char *arg)
 	int count = 0;
 
 	while (arg != NULL) {
-		arg = va_arg(list, const char *);
 		args[count++] = arg;
+		arg = va_arg(list, const char *);
 	}
 
 	args[count] = NULL;
