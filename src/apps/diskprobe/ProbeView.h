@@ -37,6 +37,8 @@ class ProbeView : public BView {
 
 		void UpdateSizeLimits();
 
+		DataEditor &Editor() { return fEditor; }
+
 	private:
 		void UpdateAttributesMenu(BMenu *menu);
 		void CheckClipboard();
@@ -47,6 +49,7 @@ class ProbeView : public BView {
 		DataView		*fDataView;
 		BScrollView		*fScrollView;
 		BMenuItem		*fPasteMenuItem;
+		BMenuItem		*fUndoMenuItem, *fRedoMenuItem;
 };
 
 #endif	/* PROBE_VIEW_H */

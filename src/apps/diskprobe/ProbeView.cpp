@@ -352,6 +352,8 @@ PositionSlider::SetSize(off_t size)
 	if (size == fSize)
 		return;
 
+	SetEnabled(fSize > fBlockSize);
+
 	off_t position = Position();
 	if (position >= size)
 		position = size - 1;
@@ -880,8 +882,10 @@ ProbeView::UpdateSizeLimits()
 	float width, height;
 	fDataView->GetPreferredSize(&width, &height);
 
+	BRect frame = Window()->ConvertFromScreen(ConvertToScreen(fHeaderView->Frame()));
+
 	Window()->SetSizeLimits(200, width + B_V_SCROLL_BAR_WIDTH,
-		200, height + fHeaderView->Frame().bottom + 4 + B_H_SCROLL_BAR_HEIGHT + Frame().top);
+		200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
 }
 
 
@@ -997,8 +1001,12 @@ ProbeView::AttachedToWindow()
 
 	BMenu *menu = new BMenu("Edit");
 	BMenuItem *item;
-	menu->AddItem(new BMenuItem("Undo", NULL, 'Z', B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Redo", NULL, 'Z', B_COMMAND_KEY | B_SHIFT_KEY));
+	menu->AddItem(fUndoMenuItem = new BMenuItem("Undo", new BMessage(B_UNDO), 'Z', B_COMMAND_KEY));
+	fUndoMenuItem->SetEnabled(fEditor.CanUndo());
+	fUndoMenuItem->SetTarget(fDataView);
+	menu->AddItem(fRedoMenuItem = new BMenuItem("Redo", new BMessage(B_REDO), 'Z', B_COMMAND_KEY | B_SHIFT_KEY));
+	fRedoMenuItem->SetEnabled(fEditor.CanRedo());
+	fRedoMenuItem->SetTarget(fDataView);
 	menu->AddSeparatorItem();
 	menu->AddItem(item = new BMenuItem("Copy", new BMessage(B_COPY), 'C', B_COMMAND_KEY));
 	item->SetTarget(fDataView);
@@ -1181,6 +1189,17 @@ ProbeView::MessageReceived(BMessage *message)
 		case B_CLIPBOARD_CHANGED:
 			CheckClipboard();
 			break;
+
+		case kMsgDataEditorStateChange:
+		{
+			bool enabled;
+			if (message->FindBool("can_undo", &enabled) == B_OK)
+				fUndoMenuItem->SetEnabled(enabled);
+
+			if (message->FindBool("can_redo", &enabled) == B_OK)
+				fRedoMenuItem->SetEnabled(enabled);
+			break;
+		}
 
 		default:
 			BView::MessageReceived(message);
