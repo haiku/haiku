@@ -8,8 +8,10 @@ public:
 				xvidDecoder();
 				~xvidDecoder();
 	
-	status_t	Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+	status_t	Setup(media_format *ioEncodedFormat,
 					  const void *infoBuffer, int32 infoSize);
+
+	status_t	NegotiateOutputFormat(media_format *ioDecodedFormat);
 
 	status_t	Seek(uint32 seekTo,
 					 int64 seekFrame, int64 *frame,
@@ -18,14 +20,20 @@ public:
 							 
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
+					   
+	status_t	DecodeNextChunk();
+	
 private:
 	XVID_DEC_PARAM	fXvidDecoderParams;
+	int				fXvidColorSpace;
+	struct media_raw_video_format fOutput;
 	int32			fResidualBytes;
 	uint8 *			fResidualBuffer;
 	uint8 *			fDecodeBuffer;
-	int32			fFrameSize;	
-	uint32			fBytesPerRow;
-	int				fColorSpace;
+	bigtime_t		fStartTime;
+	int				fFrameSize;
+	float			fBitRate;
+	int				fOutputBufferSize;
 };
 
 

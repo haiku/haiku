@@ -1,9 +1,11 @@
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #include <Autolock.h>
 #include <DataIO.h>
 #include <Locker.h>
 #include <MediaFormats.h>
+#include <MediaRoster.h>
 #include "xvidDecoderPlugin.h"
 
 #define TRACE_THIS 1
@@ -13,8 +15,10 @@
   #define TRACE(a...)
 #endif
 
-#define OUTPUT_BUFFER_SIZE	(8 * 1024)
 #define DECODE_BUFFER_SIZE	(32 * 1024)
+
+// this colorspace must be supported in translate_colorspace
+#define DEFAULT_COLORSPACE B_RGB32
 
 inline int translate_colorspace(enum color_space cs) {
 	switch (cs) {
@@ -38,10 +42,14 @@ inline int translate_colorspace(enum color_space cs) {
 xvidDecoder::xvidDecoder()
 {
 	memset(&fXvidDecoderParams, 0, sizeof(fXvidDecoderParams));
+	fXvidColorSpace = XVID_CSP_NULL;
 	fResidualBytes = 0;
 	fResidualBuffer = 0;
 	fDecodeBuffer = new uint8 [DECODE_BUFFER_SIZE];
+	fStartTime = 0;
 	fFrameSize = 0;
+	fBitRate = 0;
+	fOutputBufferSize = 0;
 }
 
 
@@ -55,7 +63,7 @@ xvidDecoder::~xvidDecoder()
 
 
 status_t
-xvidDecoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
+xvidDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
 	int xerr;
@@ -66,16 +74,20 @@ xvidDecoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
 		TRACE("xvidDecoder::Setup called twice\n");
 		return B_ERROR;
 	}
-	ioDecodedFormat->type = B_MEDIA_RAW_VIDEO;
-	ioDecodedFormat->u.raw_video = ioEncodedFormat->u.encoded_video.output;
-	fXvidDecoderParams.width = ioDecodedFormat->u.raw_video.display.line_width;
-	fXvidDecoderParams.height = ioDecodedFormat->u.raw_video.display.line_count;
 
-	fColorSpace = translate_colorspace(ioDecodedFormat->u.raw_video.display.format);
-	if (fColorSpace == XVID_CSP_NULL) {
-		TRACE("xvidDecoder: translate_colorspace(...) failed\n");
+	if (ioEncodedFormat->type != B_MEDIA_ENCODED_VIDEO) {
+		TRACE("xvidDecoder::Setup not called with encoded video");
 		return B_ERROR;
 	}
+
+	// save the extractor information for future reference
+	fOutput = ioEncodedFormat->u.encoded_video.output;
+	fBitRate = ioEncodedFormat->u.encoded_video.avg_bit_rate;
+	fFrameSize = ioEncodedFormat->u.encoded_video.frame_size;
+
+	// xvid can not detect the width and height so the extractor better give them to us
+	fXvidDecoderParams.width  = fOutput.display.line_width;
+	fXvidDecoderParams.height = fOutput.display.line_count;
 
 	xerr = xvid_decore(NULL, XVID_DEC_CREATE, &fXvidDecoderParams, NULL);
 	if (xerr) {
@@ -83,16 +95,38 @@ xvidDecoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
 		return B_ERROR;
 	}
 	
-/*	ioDecodedFormat->u.raw_video.field_rate = ?
-	ioDecodedFormat->u.raw_video.interlace = 1;
-	ioDecodedFormat->u.raw_video.first_active = 0;
-	ioDecodedFormat->u.raw_video.last_active = ioDecodedFormat->display.line_count - 1;
-	ioDecodedFormat->u.raw_video.orientation = B_VIDEO_TOP_LEFT_RIGHT;
-	ioDecodedFormat->u.raw_video.pixel_width_aspect = 1;
-	ioDecodedFormat->u.raw_video.pixel_height_aspect = 1;
-	ioDecodedFormat->u.raw_video.display. ? =*/
-	fBytesPerRow = ioDecodedFormat->u.raw_video.display.bytes_per_row;
-	fFrameSize = ioDecodedFormat->u.raw_video.display.line_count * fBytesPerRow;
+	return B_OK;
+}
+
+status_t
+xvidDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
+{
+	// BeBook says: The codec will find and return in ioFormat its best matching format
+	// => This means, we never return an error, and always change the format values
+	//    that we don't support to something more applicable
+
+	ioDecodedFormat->type = B_MEDIA_RAW_VIDEO;
+	
+	// 1st: the requested colorspace, 2nd: the extractor colorspace, 3rd: default
+	fXvidColorSpace = translate_colorspace(ioDecodedFormat->u.raw_video.display.format);
+	if (fXvidColorSpace == XVID_CSP_NULL) {
+		TRACE("xvidDecoder: translate_colorspace(...) failed: trying extractor colorspace\n");
+		fXvidColorSpace = translate_colorspace(fOutput.display.format);
+		if (fXvidColorSpace == XVID_CSP_NULL) {
+			TRACE("xvidDecoder: translate_colorspace(...) failed: using DEFAULT_COLORSPACE\n");
+			fOutput.display.format = DEFAULT_COLORSPACE;
+			fXvidColorSpace = translate_colorspace(fOutput.display.format);
+			assert(fXvidColorSpace != XVID_CSP_NULL);
+		}
+	} else {
+		fOutput.display.format = ioDecodedFormat->u.raw_video.display.format;
+	}
+	
+	// xvid has nothing more to contribute about the output than what is already specified
+	ioDecodedFormat->u.raw_video = fOutput;
+	
+	// setup rest of the needed variables
+	fOutputBufferSize = fOutput.display.line_count * fOutput.display.bytes_per_row;
 	
 	return B_OK;
 }
@@ -128,7 +162,10 @@ xvidDecoder::Decode(void *buffer, int64 *frameCount,
 				   media_header *mediaHeader, media_decode_info *info /* = 0 */)
 {
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
-	int32	out_bytes_needed = OUTPUT_BUFFER_SIZE;
+	int32	out_bytes_needed = fOutputBufferSize;
+	
+	mediaHeader->start_time = fStartTime;
+	//TRACE("xvidDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
 	
 	while (out_bytes_needed > 0) {
 		if (fResidualBytes) {
@@ -138,37 +175,58 @@ xvidDecoder::Decode(void *buffer, int64 *frameCount,
 			fResidualBytes -= bytes;
 			out_buffer += bytes;
 			out_bytes_needed -= bytes;
+			
+			fStartTime += (bigtime_t) (((1000000LL * (bytes / fFrameSize))
+			                             / fOutput.interlace)
+			                           / fOutput.field_rate) ;
+
+			//TRACE("xvidDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 			continue;
 		}
 		
-		void *chunkBuffer;
-		int32 chunkSize;
-		if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, mediaHeader)) {
-			TRACE("xvidDecoder::Decode: GetNextChunk failed\n");
-			return B_ERROR;
-		}
-
-		XVID_DEC_FRAME xframe;
-		xframe.bitstream = chunkBuffer;
-		xframe.length = chunkSize;
-		xframe.image = out_buffer;
-		xframe.stride = fBytesPerRow;
-		xframe.colorspace = fColorSpace;
-		
-		int xerr;
-		xerr = xvid_decore(fXvidDecoderParams.handle,XVID_DEC_DECODE,&xframe,NULL);
-		if (xerr) {
-			TRACE("xvidDecoder::Decode: xvid_decore returned an error\n");
-			return B_ERROR;
-		}
-		
-		//printf("xvidDecoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
-		
-		fResidualBuffer = static_cast<uint8 *>(xframe.bitstream);
-		fResidualBytes = xframe.length;
+		if (B_OK != DecodeNextChunk())
+			break;
 	}
 
-	*frameCount = OUTPUT_BUFFER_SIZE / fFrameSize;
+	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
+
+	// XXX this doesn't guarantee that we always return B_LAST_BUFFER_ERROR bofore returning B_ERROR
+	return (out_bytes_needed == 0) ? B_OK : (out_bytes_needed == fOutputBufferSize) ? B_ERROR : B_LAST_BUFFER_ERROR;
+}
+
+status_t
+xvidDecoder::DecodeNextChunk()
+{
+	void *chunkBuffer;
+	int32 chunkSize;
+	media_header mh;
+	if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, &mh)) {
+		TRACE("xvidDecoder::Decode: GetNextChunk failed\n");
+		return B_ERROR;
+	}
+	
+	fStartTime = mh.start_time;
+
+	//TRACE("xvidDecoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
+
+	XVID_DEC_FRAME xframe;
+	xframe.bitstream = chunkBuffer;
+	xframe.length = chunkSize;
+	xframe.image = fDecodeBuffer;
+	xframe.stride = fOutput.display.bytes_per_row;
+	xframe.colorspace = fXvidColorSpace;
+	
+	int xerr;
+	xerr = xvid_decore(fXvidDecoderParams.handle,XVID_DEC_DECODE,&xframe,NULL);
+	if (xerr) {
+		TRACE("xvidDecoder::Decode: xvid_decore returned an error\n");
+		return B_ERROR;
+	}
+	
+	//printf("xvidDecoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
+	
+	fResidualBuffer = static_cast<uint8 *>(xframe.bitstream);
+	fResidualBytes = xframe.length;
 
 	return B_OK;
 }

@@ -10,6 +10,8 @@ Addon xvid_decoder : media plugins :
 	libxvidcore.a
 ;
 
+SEARCH on libxvidcore.a += $(SUBDIR) ;
+
 LinkSharedOSLibs xvid_decoder : be libmedia.so ;
 
 SubInclude OBOS_TOP src add-ons media plugins xvid_decoder xvidcore ;
