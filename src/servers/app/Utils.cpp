@@ -93,7 +93,7 @@ const char *MsgCodeToString(int32 code)
 	// Used to translate BMessage message codes back to a character
 	// format
 	char string [10];
-	sprintf(string,"'%x%x%x%x'",(char)((code & 0xFF000000) >>  24),
+	sprintf(string,"'%c%c%c%c'",(char)((code & 0xFF000000) >>  24),
 		(char)((code & 0x00FF0000) >>  16),
 		(char)((code & 0x0000FF00) >>  8),
 		(char)((code & 0x000000FF)) );
@@ -105,7 +105,7 @@ BString MsgCodeToBString(int32 code)
 	// Used to translate BMessage message codes back to a character
 	// format
 	char string [10];
-	sprintf(string,"'%x%x%x%x'",(char)((code & 0xFF000000) >>  24),
+	sprintf(string,"'%c%c%c%c'",(char)((code & 0xFF000000) >>  24),
 		(char)((code & 0x00FF0000) >>  16),
 		(char)((code & 0x0000FF00) >>  8),
 		(char)((code & 0x000000FF)) );
