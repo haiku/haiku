@@ -659,7 +659,6 @@ init_module(module *module)
 
 			// init module
 
-dprintf("module = %p, info = %p\n", module, module->info);
 			TRACE(("initializing module %s (at %p)... \n", module->name, module->info->std_ops));
 			status = module->info->std_ops(B_MODULE_INIT);
 			TRACE(("...done (%s)\n", strerror(status)));
