@@ -1,5 +1,5 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -10,6 +10,7 @@
 #include <ParameterWeb.h>
 
 #include <Slider.h>
+#include <ScrollBar.h>
 #include <StringView.h>
 #include <Button.h>
 #include <TextControl.h>
@@ -20,6 +21,7 @@
 #include <TabView.h>
 #include <MenuField.h>
 #include <MessageFilter.h>
+#include <Window.h>
 
 
 using namespace BPrivate;
@@ -27,14 +29,50 @@ using namespace BPrivate;
 
 namespace BPrivate {
 
+class DynamicScrollView : public BView {
+	public:
+		DynamicScrollView(const char *name, BView *target);
+		virtual ~DynamicScrollView();
+
+		virtual void AttachedToWindow(void);
+		virtual void FrameResized(float width, float height);
+
+		void SetContentBounds(BRect bounds);
+		BRect ContentBounds() const { return fContentBounds; }
+
+	private:
+		void UpdateBars();
+
+		BScrollBar	*fHorizontalScrollBar, *fVerticalScrollBar;
+		BRect		fContentBounds;
+		BView		*fTarget;
+		bool		fIsDocumentScroller;
+};
+
 class GroupView : public BView {
 	public:
 		GroupView(BRect frame, const char *name);
 		virtual ~GroupView();
 
 		virtual void AttachedToWindow();
+		virtual void AllAttached();
+		virtual void GetPreferredSize(float *_width, float *_height);
+
+		void SetContentBounds(BRect bounds);
+		BRect ContentBounds() const { return fContentBounds; }
 
 	private:
+		BRect		fContentBounds;
+};
+
+class TabView : public BTabView {
+	public:
+		TabView(BRect frame, const char *name, button_width width = B_WIDTH_AS_USUAL,
+			uint32 resizingMode = B_FOLLOW_ALL, uint32 flags = B_FULL_UPDATE_ON_RESIZE
+				| B_WILL_DRAW | B_NAVIGABLE_JUMP | B_FRAME_EVENTS | B_NAVIGABLE);
+
+		virtual void FrameResized(float width, float height);
+		virtual void Select(int32 tab);
 };
 
 class SeparatorView : public BView {
@@ -118,12 +156,162 @@ parameter_should_be_hidden(BParameter &parameter)
 //	#pragma mark -
 
 
+DynamicScrollView::DynamicScrollView(const char *name, BView *target)
+	: BView(target->Frame(), name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS),
+	fHorizontalScrollBar(NULL),
+	fVerticalScrollBar(NULL),
+	fTarget(target),
+	fIsDocumentScroller(false)
+{
+	fContentBounds.Set(-1, -1, -1, -1);
+	SetViewColor(fTarget->ViewColor());
+	AddChild(target);
+}
+
+
+DynamicScrollView::~DynamicScrollView()
+{
+}
+
+
+void
+DynamicScrollView::AttachedToWindow(void)
+{
+	fIsDocumentScroller = Parent() == NULL
+		&& Window() != NULL
+		&& Window()->Look() == B_DOCUMENT_WINDOW_LOOK
+		&& Frame().right == Window()->Bounds().right
+		&& Frame().bottom == Window()->Bounds().bottom;
+
+	UpdateBars();
+}
+
+
+void 
+DynamicScrollView::FrameResized(float width, float height)
+{
+	UpdateBars();
+}
+
+
+void 
+DynamicScrollView::SetContentBounds(BRect bounds)
+{
+	fContentBounds = bounds;
+	if (Window())
+		UpdateBars();
+}
+
+
+void 
+DynamicScrollView::UpdateBars()
+{
+	// we need the size that the view wants to have, and the one
+	// it could have (without the space for the scroll bars)
+
+	float width, height;
+	if (fContentBounds == BRect(-1, -1, -1, -1))
+		fTarget->GetPreferredSize(&width, &height);
+	else {
+		width = fContentBounds.Width();
+		height = fContentBounds.Height();
+	}
+
+	BRect bounds = Bounds();
+
+	// do we have to remove a scroll bar?
+
+	bool horizontal = width > Bounds().Width();
+	bool vertical = height > Bounds().Height();
+	bool horizontalChanged = false;
+	bool verticalChanged = false;
+
+	if (!horizontal && fHorizontalScrollBar != NULL) {
+		RemoveChild(fHorizontalScrollBar);
+		delete fHorizontalScrollBar;
+		fHorizontalScrollBar = NULL;
+		fTarget->ResizeBy(0, B_H_SCROLL_BAR_HEIGHT);
+		horizontalChanged = true;
+	}
+
+	if (!vertical && fVerticalScrollBar != NULL) {
+		RemoveChild(fVerticalScrollBar);
+		delete fVerticalScrollBar;
+		fVerticalScrollBar = NULL;
+		fTarget->ResizeBy(B_V_SCROLL_BAR_WIDTH, 0);
+		verticalChanged = true;
+	}
+
+	// or do we have to add a scroll bar?
+
+	if (horizontal && fHorizontalScrollBar == NULL) {
+		BRect rect = Frame();
+		rect.top = rect.bottom + 1 - B_H_SCROLL_BAR_HEIGHT;
+		if (vertical || fIsDocumentScroller)
+			rect.right -= B_V_SCROLL_BAR_WIDTH;
+
+		fHorizontalScrollBar = new BScrollBar(rect, "horizontal", fTarget, 0, width, B_HORIZONTAL);
+		fTarget->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
+		AddChild(fHorizontalScrollBar);
+		horizontalChanged = true;
+	}
+
+	if (vertical && fVerticalScrollBar == NULL) {
+		BRect rect = Frame();
+		rect.left = rect.right + 1 - B_V_SCROLL_BAR_WIDTH;
+		if (horizontal || fIsDocumentScroller)
+			rect.bottom -= B_H_SCROLL_BAR_HEIGHT;
+
+		fVerticalScrollBar = new BScrollBar(rect, "vertical", fTarget, 0, height, B_VERTICAL);
+		fTarget->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
+		AddChild(fVerticalScrollBar);
+		verticalChanged = true;
+	}
+
+	// adapt the scroll bars, so that they don't overlap each other
+	if (!fIsDocumentScroller) {
+		if (horizontalChanged && !verticalChanged && vertical)
+			fVerticalScrollBar->ResizeBy(0, (horizontal ? -1 : 1) * B_H_SCROLL_BAR_HEIGHT);
+		if (verticalChanged && !horizontalChanged && horizontal)
+			fHorizontalScrollBar->ResizeBy((vertical ? -1 : 1) * B_V_SCROLL_BAR_WIDTH, 0);
+	}
+
+	// update the scroll bar range & proportions
+
+	bounds = Bounds();
+	if (fHorizontalScrollBar != NULL)
+		bounds.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	if (fVerticalScrollBar != NULL)
+		bounds.right -= B_V_SCROLL_BAR_WIDTH;
+
+	if (fHorizontalScrollBar != NULL) {
+		float delta = width - bounds.Width();
+		if (delta < 0)
+			delta = 0;
+
+		fHorizontalScrollBar->SetRange(0, delta);
+		fHorizontalScrollBar->SetSteps(1, bounds.Width());
+		fHorizontalScrollBar->SetProportion(bounds.Width() / width);
+	}
+	if (fVerticalScrollBar != NULL) {
+		float delta = height - bounds.Height();
+		if (delta < 0)
+			delta = 0;
+
+		fVerticalScrollBar->SetRange(0, delta);
+		fVerticalScrollBar->SetSteps(1, bounds.Height());
+		fVerticalScrollBar->SetProportion(bounds.Height() / height);
+	}
+}
+
+
+//	#pragma mark -
+
+
 GroupView::GroupView(BRect frame, const char *name)
-	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
+	: BView(frame, name, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	// ToDo: show scroll bars if necessary!
 }
 
 
@@ -141,6 +329,72 @@ GroupView::AttachedToWindow()
 			continue;
 
 		control->SetTarget(control);
+	}
+
+}
+
+
+void 
+GroupView::AllAttached()
+{
+}
+
+
+void 
+GroupView::GetPreferredSize(float *_width, float *_height)
+{
+	if (_width)
+		*_width = fContentBounds.Width();
+
+	if (_height)
+		*_height = fContentBounds.Height();
+}
+
+
+void 
+GroupView::SetContentBounds(BRect bounds)
+{
+	fContentBounds = bounds;
+}
+
+
+//	#pragma mark -
+
+
+/** BTabView is really stupid - it doesn't even resize its content
+ *	view when it is resized itself.
+ *	This derived class fixes this issue, and also resizes all tab
+ *	content views to the size of the container view when they are
+ *	selected (does not take their resize flags into account, though).
+ */
+
+TabView::TabView(BRect frame, const char *name, button_width width,
+	uint32 resizingMode, uint32 flags)
+	: BTabView(frame, name, width, resizingMode, flags)
+{
+}
+
+
+void 
+TabView::FrameResized(float width, float height)
+{
+	BRect rect = Bounds();
+	rect.InsetBySelf(1, 1);
+	rect.top += TabHeight();
+
+	ContainerView()->ResizeTo(rect.Width(), rect.Height());
+}
+
+
+void 
+TabView::Select(int32 tab)
+{
+	BTabView::Select(tab);
+
+	BView *view = ViewForTab(Selection());
+	if (view != NULL) {
+		BRect rect = ContainerView()->Bounds();
+		view->ResizeTo(rect.Width(), rect.Height());
 	}
 }
 
@@ -429,10 +683,10 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 	// do we have more than one attached parameter group?
 	// if so, use a tabbed view with a tab for each group
 
-	BTabView *tabView = NULL;
+	TabView *tabView = NULL;
 
 	if (web->CountGroups() > 1)
-		tabView = new BTabView(rect, "web");
+		tabView = new TabView(rect, "web");
 
 	rect.OffsetTo(B_ORIGIN);
 
@@ -445,31 +699,21 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 		if (groupView == NULL)
 			continue;
 
+		// the top-level group views must not be larger than their hintRect
+		if (GroupView *view = dynamic_cast<GroupView *>(groupView))
+			view->ResizeTo(rect.Width() - 10, rect.Height() - 10);
+
 		if (tabView == NULL) {
 			// if we don't need a container to put that view into,
-			// we're done here
-			return groupView;
+			// we're done here (but the groupView may span over the
+			// whole hintRect)
+			groupView->MoveBy(-5, -5);
+			groupView->ResizeBy(10, 10);
+
+			return new DynamicScrollView(groupView->Name(), groupView);
 		}
 
-		tabView->AddTab(groupView);
-
-		// enlarge the bounding rectangle as needed
-
-		if (groupView->Bounds().Width() + 5 > rect.Width())
-			rect.right = groupView->Bounds().Width() - 1;
-
-		if (groupView->Bounds().Height() > rect.Height())
-			rect.bottom = groupView->Bounds().Height();
-	}
-
-	if (tabView != NULL) {
-		tabView->ResizeTo(rect.right + 10, rect.bottom + tabView->TabHeight());
-
-		rect = tabView->Bounds();
-		rect.InsetBySelf(1, 1);
-		rect.top += tabView->TabHeight();
-
-		tabView->ContainerView()->ResizeTo(rect.Width(), rect.Height());
+		tabView->AddTab(new DynamicScrollView(groupView->Name(), groupView));
 	}
 
 	return tabView;
@@ -485,13 +729,13 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		return NULL;
 
 	BRect rect(hintRect);
-	BView *view = new GroupView(rect, group.Name());
+	GroupView *view = new GroupView(rect, group.Name());
 
 	// Create the parameter views - but don't add them yet
 
 	rect.OffsetTo(B_ORIGIN);
 	rect.InsetBySelf(5, 5);
-	
+
 	BList views;
 	for (int32 i = 0; i < group.CountParameters(); i++) {
 		BParameter *parameter = group.ParameterAt(i);
@@ -518,7 +762,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 	}
 
 	// Add the sub-group views
-	
+
 	rect.right = rect.left + 50;
 	rect.bottom = rect.top + 10;
 	float lastHeight = 0;
@@ -553,6 +797,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 	}
 
 	view->ResizeTo(rect.left + 10, rect.bottom + 5);
+	view->SetContentBounds(view->Bounds());
 
 	if (group.CountParameters() == 0)
 		return view;
@@ -607,6 +852,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup &group, const BRect &hintRect)
 		}
 	}
 
+	view->SetContentBounds(view->Bounds());
 	return view;
 }
 
