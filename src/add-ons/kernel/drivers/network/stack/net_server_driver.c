@@ -739,9 +739,9 @@ execute_command(net_server_cookie *nsc, uint32 op, void *data, uint32 length)
 			return command->result;
 		}
 		FATAL(("command couldn't be executed: %s\n", strerror(status)));
-		// if (status == B_INTERRUPTED)
+		if (status == B_INTERRUPTED)
 			// Signaling our net_server counterpart, so his socket thread awake too...
-		// 	send_signal_etc(nsc->socket_thread, SIGINT, 0);
+			send_signal_etc(nsc->socket_thread, SIGINT, 0);
 		return status;
 	}
 }
