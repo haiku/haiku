@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src tests add-ons kernel file_systems fs_shell ;
+
+local fsShellCommandSources ;
+if $(OS) = BEOS {
+	fsShellCommandSources = fs_shell_command_beos.cpp ;
+}
+
+if $(fsShellCommandSources) {
+	BuildPlatformMain fs_shell_command : $(fsShellCommandSources) ;
+}
