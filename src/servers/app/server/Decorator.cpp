@@ -177,11 +177,8 @@ void Decorator::SetFont(ServerFont *font)
 {
 	if(!font)
 		return;
-	
-	if(_layerdata.font)
-		delete _layerdata.font;
-	
-	_layerdata.font=new ServerFont(*font);
+
+	_layerdata.font		= *font;
 }
 
 /*!
@@ -605,3 +602,7 @@ void Decorator::_DoLayout(void)
 {
 	
 }
+/*
+ @log
+ 	* changed SetFont to acomodate(eng?) with LayerData's 'font' member witch is now allocated on stack.
+*/
