@@ -2746,7 +2746,13 @@ static
 void
 init_long_types(char *notTooLongType, char *tooLongType)
 {
+// R5: Allows buffer sizes up to `B_MIME_TYPE_LENGTH + 1'
+// OBOS: We stay consistent: `*_LENGTH' defines the buffer size.
+#ifdef TEST_R5
 	const int notTooLongLength = B_MIME_TYPE_LENGTH;
+#else
+	const int notTooLongLength = B_MIME_TYPE_LENGTH - 1;
+#endif
 	const int tooLongLength = notTooLongLength + 1;
 	strcpy(notTooLongType, "image/");
 	memset(notTooLongType + strlen(notTooLongType), 'a',
