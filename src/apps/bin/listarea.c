@@ -1,53 +1,29 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2001-2004, Haiku
-//
-//  This software is part of the Haiku distribution and is covered 
-//  by the Haiku license.
-//
-//
-//  File:        listarea.c
-//  Author:      Daniel Reinhold (danielre@users.sf.net)
-//  Description: lists area info for all currently running teams
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright (c) 2001-2005, Haiku.
+ *
+ * This software is part of the Haiku distribution and is covered 
+ * by the MIT license.
+ *
+ * Author: Daniel Reinhold (danielre@users.sf.net)
+ */
+
+/** Lists area info for all currently running teams */
 
 
 #include <OS.h>
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
-void list_area_info(team_id id);
-void list_area_info_a(const char *arg);
-void show_memory_totals(void);
+static void list_areas_for_id(team_id team);
+static void list_areas_for_name(const char *teamName);
+static void show_memory_totals(void);
 
 
-int
-main(int argc, char **argv)
-{
-	show_memory_totals();
-
-	if (argc == 1) {
-		int32 cookie = 0;
-		team_info info;
-
-		// list for all teams
-		while (get_next_team_info(&cookie, &info) >= B_OK)
-			list_area_info(info.team);
-	} else {
-		// list for each team_id on the command line
-		while (--argc)
-			list_area_info_a(*++argv);
-	}
-
-	return 0;
-}
-
-
-void
-show_memory_totals()
+static void
+show_memory_totals(void)
 {
 	int32 max = 0, used = 0;
 
@@ -62,8 +38,8 @@ show_memory_totals()
 }
 
 
-void
-list_area_info(team_id id)
+static void
+list_areas_for_id(team_id id)
 {	
 	int32 cookie = 0;
 	team_info teamInfo;
@@ -76,14 +52,14 @@ list_area_info(team_id id)
 		strcpy(teamInfo.args, "KERNEL SPACE");
 
 	printf("\n%s (team %ld)\n", teamInfo.args, id);
-	printf("  ID                              name   address     size   alloc. #-cow  #-in #-out\n");
+	printf("   ID                             name   address     size   alloc. #-cow  #-in #-out\n");
 	printf("------------------------------------------------------------------------------------\n");
 
 	while (get_next_area_info(id, &cookie, &areaInfo) == B_OK) {
 		printf("%5ld %32s  %08lx %8lx %8lx %5ld %5ld %5ld\n",
 			areaInfo.area,
 			areaInfo.name,
-			(void *)areaInfo.address,
+			(addr_t)areaInfo.address,
 			areaInfo.size,
 			areaInfo.ram_size,
 			areaInfo.copy_count,
@@ -93,23 +69,44 @@ list_area_info(team_id id)
 }
 
 
-void
-list_area_info_a(const char *arg)
+static void
+list_areas_for_name(const char *name)
 {
 	int32 cookie = 0;
 	team_info info;
-	team_id tid;
-
-	tid = atoi(arg);
-	// if atoi returns >0 it's likely it's a number, else take it as string
-	if (tid > 0) {
-		list_area_info(tid);
-		return;
-	}
 	while (get_next_team_info(&cookie, &info) >= B_OK) {
-		if (strstr(info.args, arg)) {
-			list_area_info(info.team);
+		if (strstr(info.args, name) != NULL)
+			list_areas_for_id(info.team);
+	}
+}
+
+
+int
+main(int argc, char **argv)
+{
+	show_memory_totals();
+
+	if (argc == 1) {
+		// list areas of all teams
+		int32 cookie = 0;
+		team_info info;
+
+		while (get_next_team_info(&cookie, &info) >= B_OK)
+			list_areas_for_id(info.team);
+	} else {
+		// list areas for each team ID/name on the command line
+		while (--argc) {
+			const char *arg = *++argv;
+			team_id team = atoi(arg);
+
+			// if atoi returns >0 it's likely it's a number, else take it as string
+			if (team > 0)
+				list_areas_for_id(team);
+			else
+				list_areas_for_name(arg);
 		}
 	}
+
+	return 0;
 }
 
