@@ -45,6 +45,7 @@
 #include "Utils.h"
 #include "DisplayDriver.h"
 #include "ServerPicture.h"
+#include "CursorManager.h"
 
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
@@ -730,6 +731,44 @@ void ServerWindow::DispatchMessage( int32 code )
 			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
+		case AS_LAYER_SET_ORIGIN:
+		{
+			float		x, y;
+			
+			ses->ReadFloat( &x );
+			ses->ReadFloat( &y );
+			
+			cl->_layerdata->coordOrigin.Set(x, y);
+			
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_GET_ORIGIN:
+		{
+			ses->WritePoint( cl->_layerdata->coordOrigin );
+			ses->Sync();
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_RESIZE_MODE:
+		{
+			ses->ReadUInt32( &(cl->_resize_mode) );
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_CURSOR:
+		{
+			int32		token;
+
+			ses->ReadInt32( &token );
+			
+			cursormanager->SetCursor( token );
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
 		case AS_LAYER_SET_FLAGS:
 		{
 			ses->ReadUInt32( &(cl->_flags) );
@@ -957,6 +996,7 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
+// TODO: watch out for the coordinate system
 			int32		pictureToken;
 			BPoint		where;
 			
@@ -982,13 +1022,18 @@ void ServerWindow::DispatchMessage( int32 code )
 
 			cl->_layerdata->clippInverse	= false;
 
-// TODO: redraw.
+			/* TODO: modify when you have a function that returns the clipping
+			 *	region composed by: the visible region & local clipping
+			 *	region(across states) & the picture clipping region.
+			 */
+			cl->RequestDraw( cl->_layerdata->clippReg->Frame() );
 		
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
 		{
+// TODO: watch out for the coordinate system
 			int32		pictureToken;
 			BPoint		where;
 			
@@ -1014,17 +1059,22 @@ void ServerWindow::DispatchMessage( int32 code )
 			
 			cl->_layerdata->clippInverse	= true;
 
-// TODO: redraw.
+			/* TODO: modify when you have a function that returns the clipping
+			 *	region composed by: the visible region & local clipping
+			 *	region(across states) & the picture clipping region.
+			 */
+			cl->RequestDraw( cl->_layerdata->clippReg->Frame() );
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_CLIP_REGION:
 		{
+// TODO: watch out for the coordinate system
 			BRegion		reg;
 			LayerData	*ld;
 			int32		noOfRects;
-		// TODO: I think locking is necesary
+
 			ld			= cl->_layerdata;
 			reg			= cl->ConvertFromParent( cl->_visible );
 
@@ -1049,9 +1099,10 @@ void ServerWindow::DispatchMessage( int32 code )
 		}
 		case AS_LAYER_SET_CLIP_REGION:
 		{
+// TODO: watch out for the coordinate system
 			int32		noOfRects;
 			BRect		r;
-		// TODO: I think locking is necesary
+
 			if( cl->_layerdata->clippReg )
 				cl->_layerdata->clippReg->MakeEmpty();
 			else
@@ -1064,9 +1115,49 @@ void ServerWindow::DispatchMessage( int32 code )
 				cl->_layerdata->clippReg->Include( r );
 			}
 			
-// TODO: redraw.
+			/* TODO: modify when you have a function that returns the clipping
+			 *	region composed by: the visible region & local clipping
+			 *	region(across states) & the picture clipping region.
+			 */
+			cl->RequestDraw( cl->_layerdata->clippReg->Frame() );
 
 			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		
+		case AS_LAYER_INVAL_RECT:
+		{
+// TODO: watch out for the coordinate system
+			BRect		invalRect;
+			
+			ses->ReadRect( &invalRect );
+			
+			cl->Invalidate( invalRect );
+
+			cl->RequestDraw( invalRect );
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
+			break;
+		}
+		case AS_LAYER_INVAL_REGION:
+		{
+// TODO: watch out for the coordinate system
+			BRegion			invalReg;
+			int32			noOfRects;
+			BRect			rect;
+			
+			ses->ReadInt32( &noOfRects );
+			
+			for( int i = 0; i < noOfRects; i++ ){
+				ses->ReadRect( &rect );
+				invalReg.Include( rect );
+			}
+			
+			cl->Invalidate( invalReg );
+
+			cl->RequestDraw( invalReg.Frame() );
+
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",_title->String(), cl->_name->String()));
 			break;
 		}
 
