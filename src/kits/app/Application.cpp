@@ -896,7 +896,7 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 			break;
 
 		case B_QUIT_REQUESTED:
-			message->PrintToStream();
+			DBG(message->PrintToStream());
 			if (QuitRequested())
 				Quit();
 			break;
@@ -914,7 +914,7 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		case _DISPOSE_DRAG_: 
 		case _PING_:	
 			puts("not yet handled message:");
-			message->PrintToStream();
+			DBG(message->PrintToStream());
 			break;
 		
 		default:
