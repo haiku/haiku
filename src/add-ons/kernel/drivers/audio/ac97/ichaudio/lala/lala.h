@@ -15,6 +15,9 @@ typedef struct
 	const char *		name;
 	uint32				flags;
 
+// private:
+	int32				open_count;
+	void *				cookie;
 } drv_t;
  
 typedef void stream_id;

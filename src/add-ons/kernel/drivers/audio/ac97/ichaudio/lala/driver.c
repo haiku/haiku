@@ -13,6 +13,7 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 
 #define MAX_DEVICES 8
 
+sem_id	drv_sem;
 char *	drv_path[MAX_DEVICES + 1];
 drv_t *	drv_data[MAX_DEVICES];
 int		drv_count;
@@ -42,6 +43,8 @@ init_driver(void)
 	if (get_module(B_PCI_MODULE_NAME,(module_info **)&pcimodule) < 0) {
 		return B_ERROR; 
 	}
+	
+	drv_sem = create_sem(1, "drv_sem");
 	
 	drv_count = 0;
 	
@@ -80,6 +83,8 @@ init_driver(void)
 			drv_data[drv_count]->function	= pciinfo->function;
 			drv_data[drv_count]->name		= driver_info.table[devindex].name;
 			drv_data[drv_count]->flags		= driver_info.table[devindex].flags;
+			drv_data[drv_count]->open_count	= 0;
+			drv_data[drv_count]->cookie		= 0;
 		
 			drv_count++;
 			break;
@@ -103,13 +108,38 @@ uninit_driver(void)
 		free(drv_path[i]);
 		free(drv_data[i]);
 	}
+	delete_sem(drv_sem);
 }
 
 static status_t
 ich_open(const char *name, uint32 flags, void** cookie)
 {
-	dprintf("open\n");
-	return B_OK;
+	int index;
+	status_t res;
+	
+	acquire_sem(drv_sem);
+	
+	for (index = 0; index < drv_count; index++) {
+		if (0 == strcmp(drv_path[index], name))
+			break;
+	}
+	if (index == drv_count) { // name not found
+		release_sem(drv_sem);
+		return B_ERROR;
+	}
+	*cookie = (void *) index;
+	
+	if (drv_data[drv_count]->open_count == 0) {
+		res = driver_info.attach(drv_data[index], &drv_data[index]->cookie);
+		drv_data[drv_count]->open_count = (res == B_OK) ? 1 : 0;
+	} else {
+		res = B_OK;
+		drv_data[drv_count]->open_count++;
+	}
+
+	release_sem(drv_sem);
+
+	return res;
 }
 
 static status_t
@@ -122,8 +152,25 @@ ich_close(void* cookie)
 static status_t
 ich_free(void* cookie)
 {
+	int index;
+	status_t res;
+	
 	dprintf("free\n");
-	return B_OK;
+	
+	index = (int) cookie;
+
+	acquire_sem(drv_sem);
+
+	drv_data[drv_count]->open_count--;
+
+	if (drv_data[drv_count]->open_count == 0)
+		res = driver_info.detach(drv_data[index], drv_data[index]->cookie);
+	else
+		res = B_OK;
+	
+	release_sem(drv_sem);
+
+	return res;
 }
 
 static status_t

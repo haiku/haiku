@@ -43,10 +43,7 @@ ichaudio_attach(drv_t *drv, void **_cookie)
 	if (!cookie) return B_ERROR;
 	*_cookie = cookie;
 	
-	if (get_module(B_PCI_MODULE_NAME,(module_info **)&cookie->pci) < 0) {
-		return B_ERROR; 
-	}
-	
+	dprintf("ichaudio_attach\n");
 
 	return B_OK;
 err:
@@ -59,6 +56,8 @@ status_t
 ichaudio_detach(drv_t *drv, void *_cookie)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
+
+	dprintf("ichaudio_detach\n");
 
 	free(cookie);
 	return B_OK;
