@@ -50,6 +50,9 @@ commands_info g_commands_info[] = {
 	C2N(NET_STACK_GET_COOKIE),
 	C2N(NET_STACK_STOP),
 	C2N(NET_STACK_NOTIFY_SOCKET_EVENT),
+	C2N(NET_STACK_CONTROL_NET_MODULE),
+
+	// Userland IPC-specific opcodes
 	C2N(NET_STACK_OPEN),
 	C2N(NET_STACK_CLOSE),
 	C2N(NET_STACK_NEW_CONNECTION),
@@ -394,6 +397,10 @@ connection_runner(void *_cookie)
 
 			case NET_STACK_STOP:
 				core->stop();
+				break;
+				
+			case NET_STACK_CONTROL_NET_MODULE:
+				// TODO!
 				break;
 
 			case B_SET_BLOCKING_IO:
