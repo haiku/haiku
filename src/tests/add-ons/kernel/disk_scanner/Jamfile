@@ -4,8 +4,9 @@ UsePrivateHeaders $(DOT) ;
 
 # the test app
 
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
 SimpleTest DiskScannerTest : DiskScannerTest.cpp
-	: libkernelland_emu.a be stdc++.r4 ;
+	: <boot!home!config!lib>libkernelland_emu.so be stdc++.r4 ;
 LOCATE on <installed>DiskScannerTest = [ on DiskScannerTest return $(LOCATE) ] ;
 Depends <installed>DiskScannerTest : DiskScannerTest ;
 
@@ -22,8 +23,7 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons kernel disk_scanner ] ;
 Addon <userland>disk_scanner : userland disk_scanner :
 	disk_scanner.c
 ;
-#LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
-LinkSharedOSLibs <userland>disk_scanner : <installed>DiskScannerTest ;
+LinkSharedOSLibs <userland>disk_scanner : libkernelland_emu.so ;
 
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner fs ;
 SubInclude OBOS_TOP src tests add-ons kernel disk_scanner partition ;

@@ -16,4 +16,4 @@ UsePrivateHeaders $(DOT) ;
 Addon <userland>cdrom : userland disk_scanner session :
 	cdrom.c
 ;
-LinkSharedOSLibs <userland>cdrom : <installed>DiskScannerTest ;
+LinkSharedOSLibs <userland>cdrom : libkernelland_emu.so ;

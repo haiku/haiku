@@ -16,4 +16,4 @@ UsePrivateHeaders $(DOT) ;
 Addon <userland>intel : userland disk_scanner partition :
 	intel.cpp intel_parameters.cpp intel_partition_map.cpp
 ;
-LinkSharedOSLibs <userland>intel : <installed>DiskScannerTest ;
+LinkSharedOSLibs <userland>intel : libkernelland_emu.so ;
