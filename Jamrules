@@ -253,8 +253,14 @@ if $(OS) = BEOS {
 
 if $(GCC_VERSION[1]) >= 3 {
 	C++_SUPPORT_LIBS = supc++ ;
+	KERNEL_C++_SUPPORT_LIBS = -L/usr/lib -l$(C++_SUPPORT_LIBS) -lgcc_eh ;
+		# TODO: -L/usr/lib is a bit Linux specific.
+	STL_HEADERS = /usr/include/g++ ;
+		# TODO: Also a bit Linux specific.
 } else {
 	C++_SUPPORT_LIBS = ;
+	KERNEL_C++_SUPPORT_LIBS = ;
+	STL_HEADERS = [ FDirName $(OBOS_TOP) headers cpp ] ;
 }
 
 
@@ -308,17 +314,35 @@ OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
 rule SetupIncludes
 {
 	# XXX add "opengl" later
-	local os_includes = add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media mail midi midi2 net storage support translation ;
+	local os_includes = add-ons add-ons/file_system add-ons/graphics
+						add-ons/input_server add-ons/screen_saver
+						add-ons/tracker app device drivers game interface
+						kernel media mail midi midi2 net storage support
+						translation ;
 
 	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
 
 	# Use headers directory, to allow to do things like include <posix/string.h>
 	HDRS = [ FDirName $(OBOS_TOP) headers ] ;
 
-	HDRS = [ FDirName $(OBOS_TOP) headers cpp ] ;
-
 	# Use posix headers directory
 	HDRS += [ FDirName $(OBOS_TOP) headers posix ] ;
+
+# TODO: This is actually more correct. Under BeOS
+# /boot/develop/headers/posix/_G_config.h is included, which is not correct,
+# since we use another glibc version. This might even be a reason why STL
+# string has problems (see strace sources). The problem is just that there
+# are conflicts with STL/gcc headers, if we do that.
+#	# This is nasty, but we don't get around it, since some public headers
+#	# include _G_config.h which in turn includes other private headers.
+#	HDRS += [ FDirName $(OBOS_TOP) src kernel libroot posix glibc include ] ;
+#	HDRS += [ FDirName $(OBOS_TOP) src kernel libroot posix glibc include arch
+#					   $(OBOS_ARCH) ] ;
+#	HDRS += [ FDirName $(OBOS_TOP) src kernel libroot posix glibc ] ;
+#	HDRS += [ FDirName $(OBOS_TOP) src kernel libroot posix glibc libio ] ;
+#		# for _G_config.h
+
+	HDRS += $(STL_HEADERS) ;
 
 	# Use public OS header directories
 	HDRS += [ PublicHeaders $(os_includes) ] ;
