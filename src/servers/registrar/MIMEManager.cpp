@@ -3,6 +3,9 @@
 #include <Bitmap.h>
 #include <ClassInfo.h>
 #include <Message.h>
+#include <Messenger.h>
+#include <mime/UpdateMimeInfoThread.h>
+#include <mime/CreateAppMetaMimeThread.h>
 #include <RegistrarDefs.h>
 #include <String.h>
 #include <TypeConstants.h>
@@ -25,7 +28,9 @@
 MIMEManager::MIMEManager()
 		   : BLooper("main_mime")
 		   , fDatabase()
+		   , fThreadManager()
 {
+	AddHandler(&fThreadManager);
 }
 
 // destructor
@@ -166,34 +171,89 @@ MIMEManager::MessageReceived(BMessage *message)
 			break;		
 		}
 		
-		case B_REG_MIME_UPDATE_MIME_INFO_ASYNC:
+		case B_REG_MIME_CREATE_APP_META_MIME:
+		case B_REG_MIME_UPDATE_MIME_INFO:
 		{
-			entry_ref ref;
+			using BPrivate::Storage::Mime::MimeUpdateThread;
+			using BPrivate::Storage::Mime::CreateAppMetaMimeThread;
+			using BPrivate::Storage::Mime::UpdateMimeInfoThread;
+			
+			entry_ref root;
 			bool recursive, force;
-			err = message->FindRef("entry", &ref);
+			bool synchronous = false;
+			
+			MimeUpdateThread *thread = NULL;
+			
+			status_t threadStatus = B_NO_INIT;
+			bool messageIsDetached = false;
+			bool stillOwnThread = true;
+			
+			// Gather our arguments
+			err = message->FindRef("entry", &root);
 			if (!err)
 				err = message->FindBool("recursive", &recursive);
 			if (!err)
-				err = message->FindBool("force", &force);
-			if (!err) 
-				err = fDatabase.UpdateMimeInfoAsync(&ref, recursive, force);
-		
-			reply.what = B_REG_RESULT;
-			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
-			break;
-		}
-		
-		case B_REG_MIME_ASYNC_THREAD_FINISHED:
-		{
-			thread_id id;
-			err = message->FindInt32("thread id", &id);
+				err = message->FindBool("synchronous", &synchronous);
 			if (!err)
-				err = fDatabase.CleanupAfterAsyncThread(id);
-
-			reply.what = B_REG_RESULT;
-			reply.AddInt32("result", err);
-			message->SendReply(&reply, this);				
+				err = message->FindBool("force", &force);
+			
+			// Detach the message for synchronous calls	
+			if (!err && synchronous) {
+				DetachCurrentMessage();
+				messageIsDetached = true;
+			}
+			
+			// Create the appropriate flavor of mime update thread
+			if (!err) {
+				switch (message->what) {
+					case B_REG_MIME_CREATE_APP_META_MIME:
+						thread = new(nothrow) CreateAppMetaMimeThread((synchronous ?
+							"create_app_meta_mime (s)" : "create_app_meta_mime (a)"),
+							B_NORMAL_PRIORITY, BMessenger(&fThreadManager), &root, recursive,
+							force, synchronous ? message : NULL);
+						break;
+					
+					case B_REG_MIME_UPDATE_MIME_INFO:
+						thread = new(nothrow) UpdateMimeInfoThread((synchronous ?
+							"update_mime_info (s)" : "update_mime_info (a)"),
+							B_NORMAL_PRIORITY, BMessenger(&fThreadManager), &root, recursive,
+							force, synchronous ? message : NULL);
+						break;
+						
+					default:
+						err = B_BAD_VALUE;
+						break;					
+				}
+			}
+			if (!err)
+				err = thread ? B_OK : B_NO_MEMORY;			
+			if (!err)
+				err = threadStatus = thread->InitCheck();
+				
+			// Launch the thread
+			if (!err) {
+				err = fThreadManager.LaunchThread(thread);
+				if (!err)
+					stillOwnThread = false;
+			}
+				
+			// If something went wrong, we need to notify the sender regardless. However,
+			// if this is a synchronous call, we've already detached the message, and must
+			// be careful that it gets deleted once and only once. Thus, if the MimeUpdateThread
+			// object was created successfully, we don't need to delete the message, as that
+			// object has assumed control of it. Otherwise, we are still responsible.
+			if (err || !synchronous) {
+				// Send the reply
+				reply.what = B_REG_RESULT;
+				reply.AddInt32("result", err);
+				message->SendReply(&reply, this);
+			}
+			// Delete the message if necessary
+			if (messageIsDetached && threadStatus != B_OK)
+				delete message;
+			// Delete the thread if necessary
+			if (stillOwnThread)
+				delete thread;
 			break;
 		}
 		
