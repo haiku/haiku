@@ -577,9 +577,8 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, ulong cmd, void *buffer, size_t
  *	for a file system.
  */
 
-#if 0
 static status_t
-bfs_setflags(void *_ns, void *_node, void *_cookie, int flags)
+bfs_set_flags(void *_ns, void *_node, void *_cookie, int flags)
 {
 	FUNCTION_START(("node = %p, flags = %d", _node, flags));
 
@@ -589,6 +588,8 @@ bfs_setflags(void *_ns, void *_node, void *_cookie, int flags)
 	return B_OK;
 }
 
+
+#if 0
 static status_t
 bfs_select(void *ns, void *node, void *cookie, uint8 event, uint32 ref, selectsync *sync)
 {
@@ -2053,6 +2054,7 @@ static file_system_info sBeFileSystem = {
 	&bfs_get_file_map,			// get file map
 
 	&bfs_ioctl,					// ioctl
+	&bfs_set_flags,				// set flags
 	&bfs_fsync,					// sync
 
 	&bfs_read_link,				// read link
