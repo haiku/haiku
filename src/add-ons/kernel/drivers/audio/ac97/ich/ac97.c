@@ -757,8 +757,10 @@ void ad1886_init(ac97_dev *dev)
 	LOG(("ad1886_init\n"));
 	ad1881_init(dev);
 	
-	/* disable jack sense */
-	ac97_reg_cached_write(dev, AC97_AD_JACK_SENSE, ac97_reg_cached_read(dev, AC97_AD_JACK_SENSE) | 0x0100);
+	/* change jack sense to always activate outputs*/
+	ac97_reg_cached_write(dev, AC97_AD_JACK_SENSE, 0x0010);
+	/* change SPDIF to a valid value */
+	ac97_reg_cached_write(dev, AC97_SPDIF_CONTROL, 0x2a20);
 }
 
 void ad1980_init(ac97_dev *dev)
