@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -172,6 +172,9 @@ property_info gApplicationPropInfo[] =
 extern const int __libc_argc;
 extern const char * const *__libc_argv;
 
+// TODO: We have a more or less complete BMenuWindow class in Menu.cpp.
+// If this file needs to include its interface, we'd better move it to
+// some private header.
 class BMenuWindow : public BWindow
 {
 };
@@ -226,7 +229,10 @@ BApplication::BApplication(const char* signature, status_t* error)
 BApplication::~BApplication()
 {
 	// tell all loopers(usualy windows) to quit. Also, wait for them.
-	// TODO: I think this should be done in QuitRequested()
+	// TODO: As Axel suggested, this functionality should probably be moved
+	// to quit_all_windows(), and that function should be called from both 
+	// here and QuitRequested().
+
 	BWindow*	window = NULL;
 	BList		looperList;
 	{
@@ -256,8 +262,8 @@ BApplication::~BApplication()
 
 	// uninitialize be_app and be_app_messenger
 	be_app = NULL;
-// R5 doesn't uninitialize be_app_messenger.
-//	be_app_messenger = BMessenger();
+	// R5 doesn't uninitialize be_app_messenger.
+	//be_app_messenger = BMessenger();
 }
 //------------------------------------------------------------------------------
 BApplication::BApplication(BMessage* data)
@@ -277,12 +283,10 @@ BApplication::BApplication(BMessage* data)
 //------------------------------------------------------------------------------
 BArchivable* BApplication::Instantiate(BMessage* data)
 {
-	if (!validate_instantiation(data, "BApplication"))
-	{
-		return NULL;
-	}
-
-	return new BApplication(data);
+	if (validate_instantiation(data, "BApplication"))
+		return new BApplication(data);
+	
+	return NULL;	
 }
 //------------------------------------------------------------------------------
 status_t BApplication::Archive(BMessage* data, bool deep) const
@@ -306,7 +310,7 @@ thread_id BApplication::Run()
 	// fTaskID is cleared by Quit().
 	thread_id thread = fTaskID = find_thread(NULL);
 
-	if (fMsgPort < 0)
+	if (fMsgPort < B_OK)
 		return fMsgPort;
 
 	fRunCalled = true;
@@ -374,7 +378,23 @@ void BApplication::ReadyToRun()
 //------------------------------------------------------------------------------
 void BApplication::MessageReceived(BMessage* msg)
 {
-	BLooper::MessageReceived(msg);
+	switch (msg->what) {
+		// TODO: Handle these
+		
+		// Bebook says: B_SILENT_RELAUNCH
+		// Sent to a single-launch application when it's activated by being launched
+		// (for example, if the user double-clicks its icon in Tracker).
+		case B_SILENT_RELAUNCH:		
+		case B_COUNT_PROPERTIES:
+		case B_GET_PROPERTY:
+		case B_SET_PROPERTY:
+			break;
+
+		default:
+			BLooper::MessageReceived(msg);
+			break;
+	}
+	
 }
 //------------------------------------------------------------------------------
 void BApplication::ArgvReceived(int32 argc, char** argv)
@@ -402,7 +422,7 @@ BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
 										 BMessage* specifier, int32 form,
 										 const char* property)
 {
-	return NULL;	// not implemented
+	return NULL; // TODO: implement
 }
 //------------------------------------------------------------------------------
 void BApplication::ShowCursor()
@@ -516,9 +536,6 @@ status_t BApplication::GetAppInfo(app_info* info) const
 //------------------------------------------------------------------------------
 BResources* BApplication::AppResources()
 {
-	entry_ref ref;
-	bool found = false;
-	
 	if (!_app_resources_lock.Lock())
 		return NULL;
 	
@@ -529,8 +546,11 @@ BResources* BApplication::AppResources()
 		return _app_resources;
 	}
 	
+	entry_ref ref;
+	bool found = false;
+	
 	// App is already running. Get its entry ref with
-	// GetRunningAppInfo()
+	// GetRunningAppInfo()	
 	app_info appInfo;
 	if (be_app && be_roster->GetRunningAppInfo(be_app->Team(), &appInfo) == B_OK) {
 		ref = appInfo.ref;
@@ -539,17 +559,15 @@ BResources* BApplication::AppResources()
 	} else
 		// Run() hasn't been called yet
 		found = BPrivate::get_app_ref(&ref) == B_OK;
-	
-
-	
+		
 	if (found) {
 		BFile file(&ref, B_READ_ONLY);
 		if (file.InitCheck() == B_OK) {
 			BResources *resources = new BResources();
-			if (resources->SetTo(&file, false) != B_OK) {
+			if (resources->SetTo(&file, false) < B_OK)
 				delete resources;
-				resources = NULL;
-			} else
+
+			else
 				_app_resources = resources;			
 		}
 	}
@@ -596,15 +614,32 @@ void BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 			}
 			break;
 		}
+
 		case B_REFS_RECEIVED:
 			RefsReceived(message);
 			break;
+
 		case B_READY_TO_RUN:
-			// TODO: Find out, whether to set fReadyToRunCalled before or
-			// after calling the hook.
 			ReadyToRun();
 			fReadyToRunCalled = true;
 			break;
+		
+		case B_ABOUT_REQUESTED:
+			AboutRequested();
+			break;
+		
+		// TODO: Handle these as well
+		/*
+		// These two are handled by BTextView, don't know if also
+		// by other classes
+		case _DISPOSE_DRAG_: 
+		case _PING_:
+		
+		case _SHOW_DRAG_HANDLES_:
+		case B_QUIT_REQUESTED:
+			
+			break;
+		*/
 		default:
 			BLooper::DispatchMessage(message, handler);
 			break;
@@ -693,7 +728,7 @@ void BApplication::_ReservedApplication8()
 //------------------------------------------------------------------------------
 bool BApplication::ScriptReceived(BMessage* msg, int32 index, BMessage* specifier, int32 form, const char* property)
 {
-	return false;	// not implemented
+	return false; // TODO: Implement
 }
 //------------------------------------------------------------------------------
 void BApplication::run_task()
@@ -880,30 +915,31 @@ void BApplication::get_scs()
 //------------------------------------------------------------------------------
 void BApplication::setup_server_heaps()
 {
+	// TODO: implement
 }
 //------------------------------------------------------------------------------
 void* BApplication::rw_offs_to_ptr(uint32 offset)
 {
-	return NULL;	// not implemented
+	return NULL;	// TODO: implement
 }
 //------------------------------------------------------------------------------
 void* BApplication::ro_offs_to_ptr(uint32 offset)
 {
-	return NULL;	// not implemented
+	return NULL;	// TODO: implement
 }
 //------------------------------------------------------------------------------
 void* BApplication::global_ro_offs_to_ptr(uint32 offset)
 {
-	return NULL;	// not implemented
+	return NULL;	// TODO: implement
 }
 //------------------------------------------------------------------------------
 void BApplication::connect_to_app_server()
 {
 	fServerFrom = find_port(SERVER_PORT_NAME);
-	if (fServerFrom > 0) {
+	if (fServerFrom >= 0) {
 		// Create the port so that the app_server knows where to send messages
 		fServerTo = create_port(100, "a<fServerTo");
-		if (fServerTo > 0) {
+		if (fServerTo >= 0) {
 			// AS_CREATE_APP:
 	
 			// Attach data:
@@ -927,8 +963,8 @@ void BApplication::connect_to_app_server()
 			// Reply data:
 			//	1) port_id server-side application port (fServerFrom value)
 			pmsg.Read<port_id>(&fServerFrom);
-		}
-		else
+		
+		} else
 			fInitError = fServerTo;
 	} else
 		fInitError = fServerFrom;
@@ -936,19 +972,22 @@ void BApplication::connect_to_app_server()
 //------------------------------------------------------------------------------
 void BApplication::send_drag(BMessage* msg, int32 vs_token, BPoint offset, BRect drag_rect, BHandler* reply_to)
 {
+	// TODO: implement
 }
 //------------------------------------------------------------------------------
 void BApplication::send_drag(BMessage* msg, int32 vs_token, BPoint offset, int32 bitmap_token, drawing_mode dragMode, BHandler* reply_to)
 {
+	// TODO: implement
 }
 //------------------------------------------------------------------------------
 void BApplication::write_drag(_BSession_* session, BMessage* a_message)
 {
+	// TODO: implement
 }
 //------------------------------------------------------------------------------
 bool BApplication::quit_all_windows(bool force)
 {
-	return false;	// not implemented
+	return false;	// TODO: implement
 }
 //------------------------------------------------------------------------------
 bool BApplication::window_quit_loop(bool, bool)
@@ -1048,7 +1087,7 @@ status_t BApplication::get_window_list(BList* list, bool incl_menus) const
 //------------------------------------------------------------------------------
 int32 BApplication::async_quit_entry(void* data)
 {
-	return 0;	// not implemented
+	return 0;	// TODO: implement ?
 }
 //------------------------------------------------------------------------------
 
