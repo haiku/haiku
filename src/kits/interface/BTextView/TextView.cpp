@@ -808,6 +808,7 @@ BTextView::MakeFocus(bool focusState)
 void
 BTextView::MessageReceived(BMessage *message)
 {
+	// TODO: block input if not editable (Andrew)
 	CALLED();
 	// was this message dropped?
 	if (message->WasDropped()) {	
@@ -999,8 +1000,6 @@ void
 BTextView::SetText(const char *inText, const text_run_array *inRuns)
 {
 	CALLED();
-	if (!fEditable)
-		return;
 	
 	CancelInputMethod();
 	
@@ -1041,9 +1040,6 @@ BTextView::SetText(const char *inText, int32 inLength, const text_run_array *inR
 {
 	CALLED();
 	
-	if (!fEditable)
-		return;
-		
 	CancelInputMethod();
 	
 	// hide the caret/unhilite the selection
@@ -1082,9 +1078,6 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 {
 	CALLED();
 	
-	if (!fEditable)
-		return;
-		
 	CancelInputMethod();
 	
 	if (!inFile)
@@ -1149,7 +1142,7 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	CancelInputMethod();
 	
 	// do we really need to do anything?
-	if (!fEditable || inLength < 1)
+	if (inLength < 1)
 		return;
 	
 	// hide the caret/unhilite the selection
@@ -1206,9 +1199,6 @@ void
 BTextView::Delete(int32 startOffset, int32 endOffset)
 {
 	CALLED();
-	if (!fEditable)
-		return;
-		
 	// anything to delete?
 	if (startOffset == endOffset)
 		return;
@@ -1328,9 +1318,6 @@ void
 BTextView::Cut(BClipboard *clipboard)
 {
 	CALLED();
-	if (!fEditable)
-		return;
-		
 	CancelInputMethod();
 	if (fUndo) {
 		delete fUndo;
@@ -1383,9 +1370,6 @@ BTextView::Paste(BClipboard *clipboard)
 	CALLED();
 	CancelInputMethod();
 	
-	if (!fEditable)
-		return;
-		
 	BMessage *clip = NULL;
 
 	if (clipboard->Lock()) { 
@@ -1426,8 +1410,6 @@ void
 BTextView::Clear()
 {
 	CALLED();
-	if (!fEditable)
-		return;
 	
 	delete fUndo;
 	fUndo = new _BClearUndoBuffer_(this);
@@ -1573,10 +1555,6 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 								const rgb_color *inColor)
 {
 	CALLED();
-	
-	if (!fEditable)
-		return;
-
 	CancelInputMethod();
 	
 	BFont newFont = *inFont;
@@ -1602,9 +1580,6 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 {
 	CALLED();
 	
-	if (!fEditable)
-		return;
-
 	BFont newFont = *inFont;
 	NormalizeFont(&newFont);
 	
@@ -1647,9 +1622,6 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 {
 	CALLED();
 	
-	if (!fEditable)
-		return;
-
 	CancelInputMethod();
 	
 	// pin offsets at reasonable values
@@ -2749,7 +2721,8 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 						   const text_run_array *inRuns)
 {
 	CALLED();
-	if (!fEditable || inLength < 1)
+	// why add nothing?
+	if (inLength < 1)
 		return;
 	
 	// TODO: Pin offset/lenght
@@ -2777,10 +2750,6 @@ void
 BTextView::DeleteText(int32 fromOffset, int32 toOffset)
 {
 	CALLED();
-	
-	if (!fEditable)
-		return;
-		
 	// sanity checking
 	if (fromOffset >= toOffset || fromOffset < 0 || toOffset < 0)
 		return;
@@ -3206,6 +3175,7 @@ BTextView::HandlePageKey(uint32 inPageKey)
 void
 BTextView::HandleAlphaKey(const char *bytes, int32 numBytes)
 {
+	// TODO: block input if not editable (Andrew)
 	if (fUndo) {
 		_BTypingUndoBuffer_ *undoBuffer = dynamic_cast<_BTypingUndoBuffer_ *>(fUndo);
 		if (!undoBuffer) {
@@ -4386,6 +4356,7 @@ BTextView::CountProperties(BMessage *specifier, int32 form,
 void
 BTextView::HandleInputMethodChanged(BMessage *message)
 {
+	// TODO: block input if not editable (Andrew)
 	if (!fInline)
 		return;
 	
