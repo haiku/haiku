@@ -59,7 +59,7 @@ SharedLibrary net :
 	res_send.c
 	sethostent.c
 
-	: root
+	: libroot.so
 ;
 
 OBOSInstall install_network_etc_files : [ FDirName $(OBOS_ETC_DIR) ] :
