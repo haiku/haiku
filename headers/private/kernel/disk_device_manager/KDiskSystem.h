@@ -76,7 +76,7 @@ public:
 	virtual bool ValidateCreateChild(KPartition *partition, off_t *start,
 									 off_t *size, const char *type,
 									 const char *parameters);
-	virtual bool ValidateInitialize(KPartition *partition,
+	virtual bool ValidateInitialize(KPartition *partition, char *name,
 									const char *parameters);
 	virtual bool ValidateSetParameters(KPartition *partition,
 									   const char *parameters);
@@ -119,8 +119,8 @@ public:
 								 KPartition **child = NULL,
 								 partition_id childID = -1);
 	virtual status_t DeleteChild(KPartition *child, KDiskDeviceJob *job);
-	virtual status_t Initialize(KPartition *partition, const char *parameters,
-								KDiskDeviceJob *job);
+	virtual status_t Initialize(KPartition *partition, const char *name,
+								const char *parameters, KDiskDeviceJob *job);
 	virtual status_t SetParameters(KPartition *partition,
 								   const char *parameters,
 								   KDiskDeviceJob *job);

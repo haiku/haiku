@@ -281,7 +281,7 @@ KPartitioningSystem::ValidateCreateChild(KPartition *partition, off_t *start,
 
 // ValidateInitialize
 bool
-KPartitioningSystem::ValidateInitialize(KPartition *partition,
+KPartitioningSystem::ValidateInitialize(KPartition *partition, char *name,
 										const char *parameters)
 {
 	// to be implemented
@@ -434,8 +434,8 @@ KPartitioningSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
 
 // Initialize
 status_t
-KPartitioningSystem::Initialize(KPartition *partition, const char *parameters,
-								KDiskDeviceJob *job)
+KPartitioningSystem::Initialize(KPartition *partition, const char *name,
+								const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;

@@ -347,7 +347,8 @@ KDiskSystem::ValidateCreateChild(KPartition *partition, off_t *start,
 
 // ValidateInitialize
 bool
-KDiskSystem::ValidateInitialize(KPartition *partition, const char *parameters)
+KDiskSystem::ValidateInitialize(KPartition *partition, char *name,
+								const char *parameters)
 {
 	// to be implemented by derived classes
 	return false;
@@ -501,8 +502,8 @@ KDiskSystem::DeleteChild(KPartition *child, KDiskDeviceJob *job)
 
 // Initialize
 status_t
-KDiskSystem::Initialize(KPartition *partition, const char *parameters,
-						KDiskDeviceJob *job)
+KDiskSystem::Initialize(KPartition *partition, const char *name,
+						const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented by derived classes
 	return B_ERROR;

@@ -67,7 +67,7 @@ typedef bool (*partition_validate_create_child_partition)(
 	partition_data *partition, partition_data *child, off_t *start,
 	off_t *size, const char *type, const char *parameters);
 typedef bool (*partition_validate_initialize_partition)(
-	partition_data *partition, const char *parameters);
+	partition_data *partition, char *name, const char *parameters);
 typedef bool (*partition_validate_set_partition_parameters)(
 	partition_data *partition, const char *parameters);
 typedef bool (*partition_validate_set_partition_content_parameters)(
@@ -107,7 +107,8 @@ typedef status_t (*partition_create_child_partition)(int fd,
 typedef status_t (*partition_delete_child_partition)(int fd,
 	partition_id partition, partition_id child, disk_job_id job);
 typedef status_t (*partition_initialize_partition)(int fd,
-	partition_id partition, const char *parameters, disk_job_id job);
+	partition_id partition, const char *name, const char *parameters,
+	disk_job_id job);
 typedef status_t (*partition_set_parameters_partition)(int fd,
 	partition_id partition, const char *parameters, disk_job_id job);
 typedef status_t (*partition_set_partition_content_parameters)(int fd,
@@ -216,7 +217,7 @@ typedef bool (*fs_validate_move_partition)(partition_data *partition,
 typedef bool (*fs_validate_set_content_name)(partition_data *partition,
 	char *name);
 typedef bool (*fs_validate_initialize_partition)(partition_data *partition,
-	const char *parameters);
+	char *name, const char *parameters);
 typedef bool (*fs_validate_set_partition_content_parameters)(
 	partition_data *partition, const char *parameters);
 
@@ -233,7 +234,7 @@ typedef status_t (*fs_move_partition)(int fd, partition_id partition,
 typedef status_t (*fs_set_content_name)(int fd, partition_id partition,
 	const char *name, disk_job_id job);
 typedef status_t (*fs_initialize_partition)(const char *partition,
-	const char *parameters, disk_job_id job);
+	const char *name, const char *parameters, disk_job_id job);
 	// This is pretty close to how the hook in R5 looked. Save the job ID, of
 	// course and that the parameters were given as (void*, size_t) pair.
 typedef status_t (*fs_set_partition_content_parameters)(int fd,

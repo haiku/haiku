@@ -45,7 +45,7 @@ public:
 	virtual bool ValidateResize(KPartition *partition, off_t *size);
 	virtual bool ValidateMove(KPartition *partition, off_t *start);
 	virtual bool ValidateSetContentName(KPartition *partition, char *name);
-	virtual bool ValidateInitialize(KPartition *partition,
+	virtual bool ValidateInitialize(KPartition *partition, char *name,
 									const char *parameters);
 	virtual bool ValidateSetContentParameters(KPartition *child,
 											  const char *parameters);
@@ -61,8 +61,8 @@ public:
 						  KDiskDeviceJob *job);
 	virtual status_t SetContentName(KPartition *partition, char *name,
 									KDiskDeviceJob *job);
-	virtual status_t Initialize(KPartition *partition, const char *parameters,
-								KDiskDeviceJob *job);
+	virtual status_t Initialize(KPartition *partition, const char *name,
+								const char *parameters, KDiskDeviceJob *job);
 	virtual status_t SetContentParameters(KPartition *partition,
 										  const char *parameters,
 										  KDiskDeviceJob *job);

@@ -184,7 +184,8 @@ KFileSystem::ValidateSetContentName(KPartition *partition, char *name)
 
 // ValidateInitialize
 bool
-KFileSystem::ValidateInitialize(KPartition *partition, const char *parameters)
+KFileSystem::ValidateInitialize(KPartition *partition, char *name,
+								const char *parameters)
 {
 	// to be implemented
 	return false;
@@ -242,8 +243,8 @@ KFileSystem::SetContentName(KPartition *partition, char *name,
 
 // Initialize
 status_t
-KFileSystem::Initialize(KPartition *partition, const char *parameters,
-						KDiskDeviceJob *job)
+KFileSystem::Initialize(KPartition *partition, const char *name,
+						const char *parameters, KDiskDeviceJob *job)
 {
 	// to be implemented
 	return B_ERROR;
