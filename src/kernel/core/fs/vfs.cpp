@@ -125,6 +125,7 @@ static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void file_free_fd(struct file_descriptor *);
 static status_t file_close(struct file_descriptor *);
 static status_t dir_read(struct file_descriptor *, struct dirent *buffer, size_t bufferSize, uint32 *_count);
+static status_t dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count);
 static status_t dir_rewind(struct file_descriptor *);
 static void dir_free_fd(struct file_descriptor *);
 static status_t dir_close(struct file_descriptor *);
@@ -692,6 +693,9 @@ get_dir_path_and_leaf(char *path, char *filename)
 static status_t
 entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, struct vnode **_vnode)
 {
+// TODO: This function should deal with mount points properly. Just as
+// vnode_path_to_vnode() does. In doubt just use that function.
+
 	struct vnode *directory, *vnode;
 	vnode_id id;
 	int status;
@@ -996,8 +1000,7 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 		struct dirent *dirent = (struct dirent *)buffer;
 		while (true) {
 			uint32 num = 1;
-			status = FS_CALL(parent, read_dir)(parent->mount->cookie,
-				parent->private_node, cookie, dirent, sizeof(buffer), &num);
+			status = dir_read(parent, cookie, dirent, sizeof(buffer), &num);
 			if (status < B_OK)
 				break;
 
@@ -1112,8 +1115,9 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 				struct dirent *dirent = (struct dirent *)nameBuffer;
 				while (true) {
 					uint32 num = 1;
-					status = FS_CALL(vnode, read_dir)(vnode->mount->cookie, vnode->private_node,
-						cookie, dirent, sizeof(nameBuffer), &num);
+					status = dir_read(vnode, cookie, dirent, sizeof(nameBuffer),
+						&num);
+
 					if (status < B_OK)
 						break;
 					
@@ -2419,12 +2423,69 @@ dir_free_fd(struct file_descriptor *descriptor)
 static status_t 
 dir_read(struct file_descriptor *descriptor, struct dirent *buffer, size_t bufferSize, uint32 *_count)
 {
-	struct vnode *vnode = descriptor->u.vnode;
+	return dir_read(descriptor->u.vnode, descriptor->cookie, buffer, bufferSize, _count);
+}
 
-	if (FS_CALL(vnode, read_dir))
-		return FS_CALL(vnode, read_dir)(vnode->mount->cookie,vnode->private_node,descriptor->cookie,buffer,bufferSize,_count);
-	
-	return EOPNOTSUPP;
+
+static void
+fix_dirent(struct vnode *parent, struct dirent *entry)
+{
+	// set d_pdev and d_pino
+	entry->d_pdev = parent->device;
+	entry->d_pino = parent->id;
+
+	// If this is the ".." entry and the directory is the root of a FS,
+	// we need to replace d_dev and d_ino with the actual values.
+	if (strcmp(entry->d_name, "..") == 0
+		&& parent->mount->root_vnode == parent
+		&& parent->mount->covers_vnode) {
+
+		inc_vnode_ref_count(parent);	// vnode_path_to_vnode() puts the node
+
+		struct vnode *vnode;
+		status_t status = vnode_path_to_vnode(parent, "..", false, 0, &vnode,
+			NULL);
+
+		if (status == B_OK) {
+			entry->d_dev = vnode->device;
+			entry->d_ino = vnode->id;
+		}
+	} else {
+		// resolve mount points
+		struct vnode *vnode = NULL;
+		status_t status = get_vnode(entry->d_dev, entry->d_ino, &vnode, false);
+		if (status != B_OK)
+			return;
+
+		mutex_lock(&sMountOpMutex);
+		if (vnode->covered_by) {
+			entry->d_dev = vnode->covered_by->device;
+			entry->d_ino = vnode->covered_by->id;
+		}
+		mutex_unlock(&sMountOpMutex);
+
+		put_vnode(vnode);
+	}
+}
+
+
+static status_t 
+dir_read(struct vnode *vnode, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_count)
+{
+	if (!FS_CALL(vnode, read_dir))
+		return EOPNOTSUPP;
+
+	status_t error = FS_CALL(vnode, read_dir)(vnode->mount->cookie,vnode->private_node,cookie,buffer,bufferSize,_count);
+	if (error != B_OK)
+		return error;
+
+	// we need to adjust the read dirents
+	if (*_count > 0) {
+		// XXX: Currently reading only one dirent is supported. Make this a loop!
+		fix_dirent(vnode, buffer);
+	}
+
+	return error;
 }
 
 
