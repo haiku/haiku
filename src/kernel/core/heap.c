@@ -15,14 +15,22 @@
 
 #include <string.h>
 
+#define TRACE_HEAP 0
+#if TRACE_HEAP
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
 /* prevent freeing pointers that were not allocated by kmalloc or are already freeed */
 #define PARANOID_POINTER_CHECK 1
 /* initialize newly allocated memory with something non zero */  
 #define PARANOID_KMALLOC 1
 /* check if freed pointers are already freed */  
-#define PARANOID_KFREE 0
-/* print more debug infos in kmalloc and kfree */  
-#define MAKE_NOIZE 0
+#define PARANOID_KFREE 1
+/* use a back and front wall around each allocation */
+#define USE_WALL 1
+
 
 // heap stuff
 // ripped mostly from nujeffos
@@ -223,11 +231,15 @@ kmalloc(unsigned int size)
 	unsigned int i;
 	struct heap_page *page;
 
-#if MAKE_NOIZE
-	dprintf("kmalloc: asked to allocate size %d\n", size);
-#endif
+	TRACE(("kmalloc: asked to allocate size %d\n", size));
 
 	mutex_lock(&heap_lock);
+
+#if USE_WALL
+	// The wall uses 4 bytes to store the actual length of the requested
+	// block, 8 bytes for the front wall, and 8 bytes for the back wall
+	size += 20;
+#endif
 
 	for (bin_index = 0; bin_index < bin_count; bin_index++)
 		if (size <= bins[bin_index].element_size)
@@ -257,26 +269,38 @@ kmalloc(unsigned int size)
 		bins[bin_index].alloc_count++;
 		page = &heap_alloc_table[((unsigned int)address - heap_base) / PAGE_SIZE];
 		page[0].free_count--;
-#if MAKE_NOIZE
-		dprintf("kmalloc0: page 0x%x: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count);
-#endif
+
+		TRACE(("kmalloc0: page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
+
 		for(i = 1; i < bins[bin_index].element_size / PAGE_SIZE; i++) {
 			page[i].free_count--;
-#if MAKE_NOIZE
-			dprintf("kmalloc1: page 0x%x: bin_index %d, free_count %d\n", page[i], page[i].bin_index, page[i].free_count);
-#endif
+			TRACE(("kmalloc1: page 0x%x: bin_index %d, free_count %d\n", page[i], page[i].bin_index, page[i].free_count));
 		}
 	}
 
 out:
 	mutex_unlock(&heap_lock);
 
-#if MAKE_NOIZE
-	dprintf("kmalloc: asked to allocate size %d, returning ptr = %p\n", size, address);
-#endif
+	TRACE(("kmalloc: asked to allocate size %d, returning ptr = %p\n", size, address));
 
 #if PARANOID_KMALLOC
 	memset(address,0xCC,size);
+#endif
+
+#if USE_WALL
+	{
+		uint32 *wall = address;
+		wall[0] = size;
+		wall[1] = 0xabadcafe;
+		wall[2] = 0xabadcafe;
+
+		address = (uint8 *)address + 12;
+		size -= 20;
+
+		wall = (uint32 *)((uint8 *)address + size);
+		wall[0] = 0xabadcafe;
+		wall[1] = 0xabadcafe;
+	}
 #endif
 
 #if PARANOID_POINTER_CHECK
@@ -300,6 +324,21 @@ kfree(void *address)
 	if ((addr)address < heap_base || (addr)address >= (heap_base + heap_size))
 		panic("kfree: asked to free invalid address %p\n", address);
 
+#if USE_WALL
+	{
+		uint32 *wall = (uint32 *)((uint8 *)address - 12);
+		uint32 size = wall[0];
+		if (wall[1] != 0xabadcafe || wall[2] != 0xabadcafe)
+			panic("kfree: front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[1], wall[2]);
+
+		wall = (uint32 *)((uint8 *)address + size);
+		if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
+			panic("kfree: back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[0], wall[1]);
+
+		address = (uint8 *)address - 12;
+	}
+#endif
+
 #if PARANOID_POINTER_CHECK
 	if (!ptrchecklist_remove(address))
 		panic("kfree: asked to free invalid pointer %p\n", address);
@@ -307,17 +346,13 @@ kfree(void *address)
 
 	mutex_lock(&heap_lock);
 
-#if MAKE_NOIZE
-	dprintf("kfree: asked to free at ptr = %p\n", address);
-#endif
+	TRACE(("kfree: asked to free at ptr = %p\n", address));
 
 	page = &heap_alloc_table[((unsigned)address - heap_base) / PAGE_SIZE];
 
-#if MAKE_NOIZE
-	dprintf("kfree: page 0x%x: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count);
-#endif
+	TRACE(("kfree: page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
-	if(page[0].bin_index >= bin_count)
+	if (page[0].bin_index >= bin_count)
 		panic("kfree: page %p: invalid bin_index %d\n", page, page->bin_index);
 
 	bin = &bins[page[0].bin_index];
