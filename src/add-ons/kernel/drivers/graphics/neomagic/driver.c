@@ -965,22 +965,25 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	snooze(10);
 	KISAGRPHW(GENLOCK, temp);
 	/* destination rectangle #1 (output window position and size) */
-	KISAGRPHW(HD1COORD1L, ((bes->hcoordv >> 16) & 0xff));
-	KISAGRPHW(HD1COORD2L, (bes->hcoordv & 0xff));
-	KISAGRPHW(HD1COORD21H, (((bes->hcoordv >> 4) & 0xf0) | ((bes->hcoordv >> 24) & 0x0f)));
-	KISAGRPHW(VD1COORD1L, ((bes->vcoordv >> 16) & 0xff));
-	KISAGRPHW(VD1COORD2L, (bes->vcoordv & 0xff));
-	KISAGRPHW(VD1COORD21H, (((bes->vcoordv >> 4) & 0xf0) | ((bes->vcoordv >> 24) & 0x0f)));
-	/* scaling */
-	KISAGRPHW(XSCALEL, (bes->hiscalv & 0xff));
-	KISAGRPHW(XSCALEH, ((bes->hiscalv >> 8) & 0xff));
-	KISAGRPHW(YSCALEL, (bes->viscalv & 0xff));
-	KISAGRPHW(YSCALEH, ((bes->viscalv >> 8) & 0xff));
+	KISAGRPHW(HD1COORD1L, ((bes->moi.hcoordv >> 16) & 0xff));
+	KISAGRPHW(HD1COORD2L, (bes->moi.hcoordv & 0xff));
+	KISAGRPHW(HD1COORD21H, (((bes->moi.hcoordv >> 4) & 0xf0) | ((bes->moi.hcoordv >> 24) & 0x0f)));
+	KISAGRPHW(VD1COORD1L, ((bes->moi.vcoordv >> 16) & 0xff));
+	KISAGRPHW(VD1COORD2L, (bes->moi.vcoordv & 0xff));
+	KISAGRPHW(VD1COORD21H, (((bes->moi.vcoordv >> 4) & 0xf0) | ((bes->moi.vcoordv >> 24) & 0x0f)));
+	if (!bes->move_only)
+	{
+		/* scaling */
+		KISAGRPHW(XSCALEL, (bes->hiscalv & 0xff));
+		KISAGRPHW(XSCALEH, ((bes->hiscalv >> 8) & 0xff));
+		KISAGRPHW(YSCALEL, (bes->viscalv & 0xff));
+		KISAGRPHW(YSCALEH, ((bes->viscalv >> 8) & 0xff));
+	}
 	/* inputbuffer #1 origin */
 	/* (we don't program buffer #2 as it's unused.) */
 	if (bes->card_type < NM2200)
 	{
-		bes->a1orgv >>= 1;
+		bes->moi.a1orgv >>= 1;
 		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
 		/* notes:
 		 * - correctly programming horizontal source end minimizes used bandwidth;
@@ -990,7 +993,7 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 		     - adding 1 to convert 'last used position' to 'number of used pixels';
 		     - adding 7 to round-up to the nearest higher (or equal) valid register
 		       value (needed because of it's 8-pixel granularity). */
-		KISAGRPHW(0xbc, ((((bes->hsrcendv >> 16) + 9) >> 3) - 1));
+		KISAGRPHW(0xbc, ((((bes->moi.hsrcendv >> 16) + 9) >> 3) - 1));
 	}
 	else
 	{
@@ -1005,34 +1008,17 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 		 * - make absolutely sure the engine can fetch the last pixel needed from
 		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
 		 *   (see remarks for < NM2200 cards regarding programming this register) */
-		KISAGRPHW(0xbc, ((((bes->hsrcendv >> 16) + 17) >> 4) - 1));
+		KISAGRPHW(0xbc, ((((bes->moi.hsrcendv >> 16) + 17) >> 4) - 1));
 	}
-	KISAGRPHW(BUF1ORGL, (bes->a1orgv & 0xff));
-	KISAGRPHW(BUF1ORGM, ((bes->a1orgv >> 8) & 0xff));
-	KISAGRPHW(BUF1ORGH, ((bes->a1orgv >> 16) & 0xff));
+	KISAGRPHW(BUF1ORGL, (bes->moi.a1orgv & 0xff));
+	KISAGRPHW(BUF1ORGM, ((bes->moi.a1orgv >> 8) & 0xff));
+	KISAGRPHW(BUF1ORGH, ((bes->moi.a1orgv >> 16) & 0xff));
 	/* ??? */
 	KISAGRPHW(0xbd, 0x02);
 	KISAGRPHW(0xbe, 0x00);
 	/* b2 = 0: don't use horizontal mirroring (NM2160) */
 	/* other bits do ??? */
 	KISAGRPHW(0xbf, 0x02);
-
-	/* destination rectangle #2 (output window position and size) */
-/*
-	{
-		uint16 left = 0;
-		uint16 right = 128;
-		uint16 top = 0;
-		uint16 bottom = 128;
-
-		KISASEQW(HD2COORD1L, (left & 0xff));
-		KISASEQW(HD2COORD2L, (right & 0xff));
-		KISASEQW(HD2COORD21H, (((right >> 4) & 0xf0) | ((left >> 8) & 0x0f)));
-		KISASEQW(VD2COORD1L, (top & 0xff));
-		KISASEQW(VD2COORD2L, (bottom & 0xff));
-		KISASEQW(VD2COORD21H, (((bottom >> 4) & 0xf0) | ((top >> 8) & 0x0f)));
-	}
-*/
 	/* ??? */
     KISASEQW(0x1c, 0xfb);
    	KISASEQW(0x1d, 0x00);
@@ -1045,29 +1031,32 @@ void drv_program_bes_ISA(nm_bes_data *bes)
 	/* (b6-4 = Y downscale = 100%, b2-0 = X downscale = 100%;
 	 *  downscaling selectable in 12.5% steps on increasing setting by 1) */
 	KISASEQW(ZVCAP_DSCAL, 0x00);
-	/* global BES control */
-	KISAGRPHW(BESCTRL1, (bes->globctlv & 0xff));
-	KISASEQW(BESCTRL2, ((bes->globctlv >> 8) & 0xff));
+	if (!bes->move_only)
+	{
+		/* global BES control */
+		KISAGRPHW(BESCTRL1, (bes->globctlv & 0xff));
+		KISASEQW(BESCTRL2, ((bes->globctlv >> 8) & 0xff));
 
 
-	/**************************
-	 *** setup color keying ***
-	 **************************/
+		/**************************
+		 *** setup color keying ***
+		 **************************/
 
-	KISAGRPHW(COLKEY_R, bes->colkey_r);
-	KISAGRPHW(COLKEY_G, bes->colkey_g);
-	KISAGRPHW(COLKEY_B, bes->colkey_b);
+		KISAGRPHW(COLKEY_R, bes->colkey_r);
+		KISAGRPHW(COLKEY_G, bes->colkey_g);
+		KISAGRPHW(COLKEY_B, bes->colkey_b);
 
 
-	/*************************
-	 *** setup misc. stuff ***
-	 *************************/
+		/*************************
+		 *** setup misc. stuff ***
+		 *************************/
 
-	/* setup brightness to be 'neutral' (two's complement number) */
-	KISAGRPHW(BRIGHTNESS, 0x00);
+		/* setup brightness to be 'neutral' (two's complement number) */
+		KISAGRPHW(BRIGHTNESS, 0x00);
 
-	/* setup inputbuffer #1 pitch including slopspace */
-	/* (we don't program the pitch for inputbuffer #2 as it's unused.) */
-	KISAGRPHW(BUF1PITCHL, (buf_pitch & 0xff));
-	KISAGRPHW(BUF1PITCHH, ((buf_pitch >> 8) & 0xff));
+		/* setup inputbuffer #1 pitch including slopspace */
+		/* (we don't program the pitch for inputbuffer #2 as it's unused.) */
+		KISAGRPHW(BUF1PITCHL, (buf_pitch & 0xff));
+		KISAGRPHW(BUF1PITCHH, ((buf_pitch >> 8) & 0xff));
+	}
 }
