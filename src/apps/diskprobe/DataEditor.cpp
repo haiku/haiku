@@ -600,7 +600,7 @@ DataEditor::SendNotices(DataChange *change)
 	// update observer
 	BMessage update;
 	update.AddInt64("offset", offset);
-	update.AddInt32("size", size);
+	update.AddInt64("size", size);
 	SendNotices(kMsgDataEditorUpdate, &update);
 }
 
