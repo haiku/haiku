@@ -19,7 +19,7 @@ Depends NetworkingKit :
 # Pseudo-target to build the media stuffs only
 NotFile MediaKit ;
 Depends MediaKit :
-	libmedia.so media_server media_addon_server audio_mixer.media_addon
+	libmedia.so media_server media_addon_server mixer.media_addon
 ;	
  
 SubInclude OBOS_TOP src ;
