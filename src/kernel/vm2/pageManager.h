@@ -13,7 +13,6 @@ class pageManager {
 
 		// Mutators
 		page *getPage(void);
-		bool getContiguousPages(int pages,page **location);
 
 		// Accessors
 		int desperation(void);

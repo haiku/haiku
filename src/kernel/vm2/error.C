@@ -4,6 +4,7 @@
 
 static sem_id errorPrinting=0;
 
+// Create a function for standardized formats. Wish I could get rid of the warning associated with this...
 void error(char *fmt, ...)
 {
 		if (errorPrinting==0)

@@ -9,6 +9,7 @@ class poolvnode;
 class pageManager;
 class swapFileManager;
 class cacheManager;
+class vnodeManager;
 #endif
 
 struct vmHeaderBlock
@@ -19,6 +20,7 @@ struct vmHeaderBlock
 	pageManager *pageMan; 
 	swapFileManager *swapMan;
 	cacheManager *cacheMan;
+	vnodeManager *vnodeMan;
 };
 
 #endif

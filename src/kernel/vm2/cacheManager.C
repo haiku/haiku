@@ -3,6 +3,7 @@
 #include <vpagePool.h>
 #include "vmHeaderBlock.h"
 
+// functions for hash and isEqual. No surprises
 ulong vnodeHash (node &vp) {vnode &vn=reinterpret_cast <vnode &>(vp); return vn.offset+vn.fd;}
 bool vnodeisEqual (node &vp,node &vp2) {
 	vnode &vn=reinterpret_cast <vnode &>(vp);
@@ -13,19 +14,21 @@ bool vnodeisEqual (node &vp,node &vp2) {
 extern vmHeaderBlock *vmBlock;
 // TODO - we need to (somehow) make sure that the same vnodes here are shared with mmap.
 // Maybe a vnode manager...
+// Make the cache lockable
 cacheManager::cacheManager(void) : area (),cacheMembers(30) {
 	myLock=create_sem(1,"Cache Manager Semaphore"); 
 	cacheMembers.setHash(vnodeHash);
 	cacheMembers.setIsEqual(vnodeisEqual);
 }
 
+// Given a vnode and protection level, see if we have it in cache already
 void *cacheManager::findBlock(vnode *target,bool readOnly) {
 	cacheMember *candidate=reinterpret_cast<cacheMember *>(cacheMembers.find(target));
 
 	if (!candidate || readOnly || candidate->vp->getProtection()>=writable)
 		return candidate;
 	
-	// At this point, we have the first one in the hahs bucket. Loop over the hash bucket from now on,
+	// At this point, we have the first one in the hash bucket. Loop over the hash bucket from now on,
 	// looking for an equality and writability match...
 	for (struct cacheMember *cur=candidate;cur;cur=reinterpret_cast<cacheMember *>(cur->next)) {
 		if ((target==cur->vn) && (readOnly || (cur->vp->getProtection()>=writable)))
@@ -36,6 +39,7 @@ void *cacheManager::findBlock(vnode *target,bool readOnly) {
 	return createBlock(target,false);
 	}
 
+// No cache hit found; have to make a new one. Find a virtual page, create a vnode, and map.
 void *cacheManager::createBlock(vnode *target,bool readOnly, cacheMember *candidate) {
 	bool foundSpot=false;
 	vpage *prev=NULL,*cur=NULL;

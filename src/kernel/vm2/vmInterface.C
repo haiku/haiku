@@ -7,6 +7,7 @@
 #include "pageManager.h"
 #include "swapFileManager.h"
 #include "cacheManager.h"
+#include "vnodeManager.h"
 #define I_AM_VM_INTERFACE
 #include "vmHeaderBlock.h"
 #include "vmInterface.h"
@@ -63,6 +64,7 @@ int32 pagerThread(void *areaMan)
 
 vmInterface::vmInterface(int pages) 
 	{
+	// Make the area for testing
 	char temp[1000];
 	sprintf (temp,"vm_test_clone_%ld",getpid());
 	if (clone_area(temp,(void **)(&vmBlock),B_ANY_ADDRESS,B_WRITE_AREA,find_area("vm_test"))<0)
@@ -82,6 +84,7 @@ vmInterface::vmInterface(int pages)
 			exit(1);
 			}
 		error ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		// Make all of the managers and the vmBlock to hold them
 		void *currentAddress = addToPointer(vmBlock,sizeof(struct vmHeaderBlock));
 		vmBlock->pageMan = new (currentAddress) pageManager;
 		currentAddress=addToPointer(currentAddress,sizeof(pageManager));
@@ -97,6 +100,8 @@ vmInterface::vmInterface(int pages)
 		currentAddress=addToPointer(currentAddress,sizeof(swapFileManager));
 		vmBlock->cacheMan = new (currentAddress) cacheManager;
 		currentAddress=addToPointer(currentAddress,sizeof(cacheManager));
+		vmBlock->vnodeMan = new (currentAddress) vnodeManager;
+		currentAddress=addToPointer(currentAddress,sizeof(vnodeManager));
 		error ("Need %d pages, creation calls for %d\n",pageCount,pages);
 		error ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
 	    }
@@ -105,11 +110,13 @@ vmInterface::vmInterface(int pages)
 		error ("Area found!\n");
 		}
 
+	// Start the kernel daemons
 	resume_thread(tid_cleaner=spawn_thread(cleanerThread,"cleanerThread",0,(vmBlock->pageMan)));
 	resume_thread(tid_saver=spawn_thread(saverThread,"saverThread",0,getAM()));
 	resume_thread(tid_pager=spawn_thread(pagerThread,"pagerThread",0,getAM()));
 	}
 
+// Find an area from an address that it contains
 int vmInterface::getAreaByAddress(void *address)
 	{
 	int retVal;

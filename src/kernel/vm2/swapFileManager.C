@@ -8,6 +8,7 @@
 
 extern vmHeaderBlock *vmBlock;
 
+// Set up the swap file and make a semaphore to lock it
 swapFileManager::swapFileManager(void)
 {
 	swapFile = open("/boot/var/tmp/OBOS_swap",O_RDWR|O_CREAT,0x777 );
@@ -16,6 +17,7 @@ swapFileManager::swapFileManager(void)
 	lockFreeList=create_sem(1,"SwapFile Free List Semaphore"); // Should have team name in it.
 }
 
+// Try to get a page from the free list. If not, make a new page
 vnode &swapFileManager::findNode(void)
 	{
 	//error ("swapFileManager::findNode: Entering findNode \n");
@@ -35,15 +37,15 @@ vnode &swapFileManager::findNode(void)
 		//error (" New One: %d\n",newNode->offset);
 		}
 	newNode->valid=false;
-	newNode->count=1;
 	//error ("swapFileManager::findNode: swapFileFreeList is now: ");
 	//swapFileFreeList.dump();
 	return *newNode;
 	}
 
+// Add this page to the free list.
 void swapFileManager::freeVNode(vnode &v)
 	{
-	if ( atomic_add(&v.count,-1)==1)
+	if (!v.vpages.count())
 		{
 	//error ("locking in sfm\n");
 		lock();

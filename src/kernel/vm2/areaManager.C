@@ -10,6 +10,7 @@ bool areaIsLessThan(void *a,void *b)
 	return (((reinterpret_cast<area *>(a))->getStartAddress()) < (reinterpret_cast<area *>(b))->getStartAddress());
 }
 
+// This creates the one true lock for this area
 areaManager::areaManager(void)
 {  
 	team=0; // should be proc_get_current_proc_id()
@@ -18,6 +19,7 @@ areaManager::areaManager(void)
 	areas.setIsLessThan(areaIsLessThan);
 }
 
+// Loops over every area looking for someplace where we can get the space we need.
 unsigned long areaManager::getNextAddress(int pages, unsigned long start)
 {
 		// This function needs to deal with the possibility that we run out of address space...
@@ -39,6 +41,7 @@ unsigned long areaManager::getNextAddress(int pages, unsigned long start)
 	return start;
 }
 
+// Remove the area from our list, put it on the area pool and move on
 void areaManager::freeArea(area_id areaID)
 {
 	error ("areaManager::freeArea: begin\n");
@@ -68,6 +71,7 @@ area *areaManager::findAreaLock(void *address)
 	return retVal;
 }
 
+// Loops over our areas looking for this one by name
 area *areaManager::findArea(char *address)
 {
 	error ("Finding area by string\n");
@@ -83,6 +87,7 @@ area *areaManager::findArea(char *address)
 	return retVal;
 }
 
+// Loops over our areas looking for the one whose virtual address matches the passed in address
 area *areaManager::findArea(void *address)
 {
 	// THIS DOES NOT HAVE LOCKING - all callers must lock.
@@ -107,6 +112,7 @@ area *areaManager::findAreaLock(area_id id)
 	return retVal;
 }
 
+// Loops over our areas looking for the one whose ID was passed in
 area *areaManager::findArea(area_id id)
 {
 	//error ("Finding area by area_id\n");
@@ -120,6 +126,7 @@ area *areaManager::findArea(area_id id)
 	return retVal;
 }
 
+// Find the area whose address matches this page fault and dispatch the fault to it.
 bool areaManager::fault(void *fault_address, bool writeError) // true = OK, false = panic.
 {
 	area *myArea;
@@ -137,6 +144,7 @@ bool areaManager::fault(void *fault_address, bool writeError) // true = OK, fals
 
 long areaManager::nextAreaID=0;
 
+// Create an area; get a new structure, call setup, create the guts, set its ID, add it to our list 
 int areaManager::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect) 
 {
 	error ("areaManager::createArea - Creating an area\n");
@@ -159,6 +167,8 @@ int areaManager::createArea(char *AreaName,int pageCount,void **address, address
     return  retVal;
 }
 
+// FIX: THIS IS WRONG! It will only clone areas in our areaManager.
+// Should: find the specified area, create a new area to be its clone, and set it up
 int areaManager::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType,pageState state,protectType protect) 
     {
 	int retVal;
@@ -251,6 +261,7 @@ void areaManager::setInt(unsigned long address,int value)
 	unlock();
 }
 
+// Call pager for each of our areas
 void areaManager::pager(int desperation)
 {
 	lock();
@@ -264,6 +275,7 @@ void areaManager::pager(int desperation)
 	unlock();
 }
 
+// Call saver for each of our areas
 void areaManager::saver(void)
 {
 	lock();
@@ -275,6 +287,7 @@ void areaManager::saver(void)
 	unlock();
 }
 
+// mmap is basically map POSIX values to ours and call createAreaMappingFile...
 void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
 {
 	char name[MAXPATHLEN];
@@ -306,6 +319,7 @@ void *areaManager::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 	return addr;
 	}
 
+// Custom area destruction for mapped files
 status_t areaManager::munmap(void *addr,size_t len)
 		{
 		// Note that this is broken for any and all munmaps that are not full area in size. This is an all or nothing game...

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+// Handy function (actually handy for the casting) to add a long to a void *
 void *addOffset(void *base,unsigned long offset) {
 	return (void *)(((unsigned long)base+offset));
 }
@@ -10,6 +11,7 @@ void *addOffset(void *base,unsigned long offset) {
 pageManager::pageManager(void) {
 }
 
+// Since all of the physical pages will need page structures, allocate memory off of the top for them. Set up the lists and semaphores.
 void pageManager::setup(void *area,int pages) {
 	// Calculate the number of pages that we will need to hold the page structures
 	int pageOverhead=((pages*sizeof(page))+(PAGE_SIZE-1))/PAGE_SIZE;
@@ -26,6 +28,7 @@ void pageManager::setup(void *area,int pages) {
 	error ("pageManager::setup - %d pages ready to rock and roll\n",unused.count());
 	}
 	
+// Try to get a clean page first. If that fails, get a dirty one and clean it. Loop on this.
 page *pageManager::getPage(void) {
 	page *ret=NULL;
 	while (!ret)
@@ -53,35 +56,7 @@ page *pageManager::getPage(void) {
 	return ret;
 	}
 
-bool pageManager::getContiguousPages(int pages,page **location) {
-	unsigned long current, start=0, next;
-	page *curPage;
-	int count=0; 
-	while (count<pages)		{
-		curPage=getPage();
-		current=curPage->getAddress();
-		if (start==0) {
-			start=current;
-			location[count++]=curPage;
-			}
-		else if (current==start+PAGE_SIZE*count) // This is the next one in line
-			location[count++]=curPage;
-		else if (current==start-PAGE_SIZE) { // Found the one directly previous 
-			memmove(location[1],location[0],count*sizeof(page *));
-			start=current;
-			location[0]=curPage;
-			count++;
-			}
-		else { // Forget this series - it doesn't seem to be going anywhere...  
-			while (--count>=0) {
-				freePage(location[count]);
-				location[count]=NULL;
-				}
-			}
-		}
-	return true;
-}
-
+// Take page from in use list and put it on the unused list
 void pageManager::freePage(page *toFree) {
 	error ("pageManager::freePage; count = %d, address = %p\n",toFree->count,toFree);
 	if (atomic_add(&(toFree->count),-1)==1) { // atomic_add returns the *PREVIOUS* value. So we need to check to see if the one we are wasting was the last one.
@@ -97,6 +72,7 @@ void pageManager::freePage(page *toFree) {
 		}
 	}
 
+// Loop forever cleaning any necessary pages
 void pageManager::cleaner(void) {
 	while (1) {
 		snooze(250000);	
@@ -104,6 +80,7 @@ void pageManager::cleaner(void) {
 		}
 	}
 
+// Find a page that needs cleaning. Take it from the "unused" list, clean it and put it on the clean list.
 void pageManager::cleanOnePage(void) {
 	if (unused.count()) {
 		acquire_sem(unusedLock);
@@ -118,6 +95,7 @@ void pageManager::cleanOnePage(void) {
 		}
 	}
 
+// Calculate how desperate we are for physical pages; 1 is not desperate at all, 5 is critical.
 int pageManager::desperation(void) { // Formula to determine how desperate system is to get pages back...
 	int percentClean=(unused.count()+clean.count())*100/totalPages;
 	if (percentClean>30) return 1;

@@ -12,17 +12,20 @@ extern vmHeaderBlock *vmBlock;
 ulong vpageHash (node &vp) {return reinterpret_cast <vpage &>(vp).hash();}
 bool vpageisEqual (node &vp,node &vp2) {return reinterpret_cast <vpage &>(vp)==reinterpret_cast <vpage &>(vp2);}
 
+// Simple constructor; real work is later
 area::area(void) : vpages(AREA_HASH_TABLE_SIZE) {
 	vpages.setHash(vpageHash);
 	vpages.setIsEqual(vpageisEqual);
 	}
 
+// Not much here, either
 void area::setup (areaManager *myManager) {
 	//error ("area::setup setting up new area\n");
 	manager=myManager;
 	//error ("area::setup done setting up new area\n");
 	}
 
+// Decide which algorithm to use for finding the next virtual address and try to find one.
 unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int pageCount) {
 	// We will lock in the callers
 	unsigned long base,requested=(unsigned long)req;
@@ -49,39 +52,41 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int page
 	return base;
 }
 
+// This is the really interesting part of creating an area
 status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL /* For clone only*/) {
 	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %lx, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
 					inName,pageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
-	strcpy(name,inName);
 	vpage *newPage;
 
+	// Get an address to start this area at
 	unsigned long base=mapAddressSpecToAddress(type,*address,pageCount);
 	if (base==0)
 		return B_ERROR;
+	// Set up some basic info
+	strcpy(name,inName);
 	state=inState;
 	start_address=base;
 	end_address=base+(pageCount*PAGE_SIZE)-1;
 	*address=(void *)base;
 	finalWrite=inFinalWrite;
+	// For non-cloned areas, make a new vpage for every page necesssary. 
 	if (originalArea==NULL) // Not for cloning
 		for (int i=0;i<pageCount;i++) {
 			newPage=new (vmBlock->vpagePool->get()) vpage;
 			if (fd) {
-//				vnode *newVnode=new (vmBlock->vnodePool->get()) vnode;
-				void *currentMemoryLocation;
-				// A future implementation vnode *newVnode=vmBlock->vnodePool->getNode(fd,offset,PAGE_SIZE*i,true,currentMemoryLocation);
-				vnode *newVnode=vmBlock->vnodePool->get();
-				newVnode->fd=fd;
-				newVnode->offset=offset;
-				newPage->setup(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
+				vnode newVnode;
+				newVnode.fd=fd;
+				newVnode.offset=offset;
+//				vmBlock->vnodeManager->addVNode(newVnode,newPage);
+				newPage->setup(base+PAGE_SIZE*i,&newVnode,NULL,protect,inState);
 				}
 			else
 				newPage->setup(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
 			vpages.add(newPage);
 			}
 	else // cloned
-			// Need to lock other area, here, just in case...
-			
+		// Need to lock other area, here, just in case...
+		// Make a copy of each page in the other area...	
 		for (hashIterate hi(vpages);node *cur=hi.get();) {
 			vpage *page=(vpage *)cur;
 			newPage=new (vmBlock->vpagePool->get()) vpage;	
@@ -101,12 +106,13 @@ status_t area::createArea(char *inName, int pageCount,void **address, addressSpe
 	return createAreaGuts(inName,pageCount,address,type,inState,protect,false,0,0);
 	}
 
+// Clone another area.
 status_t area::cloneArea(area *origArea, char *inName, void **address, addressSpec type,pageState inState,protectType protect) {
-	if (type==CLONE)			{
+	if (type==CLONE) {
 		*address=(void *)(origArea->getStartAddress());
 		type=EXACT;
 		}
-	if (origArea->getAreaManager()!=manager) {
+	if (origArea->getAreaManager()!=manager) { // If they are in different areas...
 		origArea->getAreaManager()->lock(); // This is just begging for a deadlock...
 		status_t retVal = createAreaGuts(inName,origArea->getPageCount(),address,type,inState,protect,false,0,0,origArea);
 		origArea->getAreaManager()->unlock(); 
@@ -116,6 +122,7 @@ status_t area::cloneArea(area *origArea, char *inName, void **address, addressSp
 		return createAreaGuts(inName,origArea->getPageCount(),address,type,inState,protect,false,0,0,origArea);
 	}
 
+// To free an area, interate over its poges, final writing them if necessary, then call cleanup and put the vpage back in the pool
 void area::freeArea(void) {
 //error ("area::freeArea: starting \n");
 
@@ -136,6 +143,7 @@ void area::freeArea(void) {
 //error ("area::freeArea: ending \n");
 	}
 
+// Get area info
 status_t area::getInfo(area_info *dest) {
 	dest->area=areaID;
 	strcpy(dest->name,name);
@@ -166,10 +174,13 @@ bool area::contains(void *address) {
 	return ((start_address<=base) && (base<=end_address));
 	}
 
+// Resize an area. 
 status_t area::resize(size_t newSize) {
 	size_t oldSize =end_address-start_address;
+	// Duh. Nothing to do.
 	if (newSize==oldSize)
 		return B_OK;
+	// Grow the area. Figure out how many pages, allocate them and set them up
 	if (newSize>oldSize) {
 		int pageCount = (newSize - oldSize + PAGE_SIZE - 1) / PAGE_SIZE;
 		vpage *newPage;
@@ -180,7 +191,7 @@ status_t area::resize(size_t newSize) {
 			}
 		end_address+=start_address+newSize;
 		}
-	else {
+	else { // Ewww. Shrinking. This is ugly right now. 
 		int pageCount = (oldSize - newSize + PAGE_SIZE - 1) / PAGE_SIZE;
 		vpage *oldPage;
 		struct node *cur;
@@ -192,6 +203,7 @@ status_t area::resize(size_t newSize) {
 					maxAddress=curAddress;
 					max=cur;
 					}
+			// Found the right one to removei; waste it, pool it, and move on
 			oldPage=reinterpret_cast<vpage *>(max);
 			vpages.remove(cur);
 			if (finalWrite) 
@@ -203,6 +215,7 @@ status_t area::resize(size_t newSize) {
 	return B_OK;
 	}
 
+// When the protection for the area changes, the protection for every one of the pages must change
 status_t area::setProtection(protectType prot) {
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
@@ -217,6 +230,7 @@ vpage *area::findVPage(unsigned long address) {
 	return reinterpret_cast <vpage *>(vpages.find(&findMe));
 	}
 
+// To fault, find the vpage associated with the fault and call it's fault function
 bool area::fault(void *fault_address, bool writeError) { // true = OK, false = panic.  
 	vpage *page=findVPage((unsigned long)fault_address);
 	if (page)
@@ -253,6 +267,7 @@ void area::setInt(unsigned long address,int value) { // This is for testing only
 		page->setInt(address,value,manager);
 	}
 
+// For every one of our vpages, call the vpage's pager
 void area::pager(int desperation) {
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
@@ -260,6 +275,7 @@ void area::pager(int desperation) {
 		}
 	}
 
+// For every one of our vpages, call the vpage's saver
 void area::saver(void) {
 	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;

@@ -6,6 +6,7 @@
 
 extern vmHeaderBlock *vmBlock;
 
+// If we can get one from an existing block, cool. If not, get a new block, create as many as will fit in the block, put them on the free list and call ourself recursively
 area *poolarea::get(void)
 	{
 	area *ret=NULL;

@@ -10,12 +10,11 @@ struct vnode : public node
 	int fd;
 	unsigned long offset;
 	bool valid;
-	long  count;
+	list vpages;
 
 	vnode (void)
 	{
 	valid=false;
-	count=0;
 	}
 };
 #define B_OS_NAME_LENGTH 32
