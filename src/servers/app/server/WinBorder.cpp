@@ -91,7 +91,7 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fKeyModifiers	= 0;
 	fMainWinBorder	= NULL;
 	fDecorator		= NULL;
-	fDecFull		= NULL;
+	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 
 	fIsMoving		= false;
 	fIsResizing		= false;
@@ -101,16 +101,9 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 
 	fLastMousePosition.Set(-1,-1);
 	SetLevel();
-	fNewTopLayerFrame = &(win->fTopLayer->fFrame);
 
 	if (feel!= B_NO_BORDER_WINDOW_LOOK)
-	{
 		fDecorator = new_decorator(r, name, look, feel, flags, fDriver);
-		fDecFull = new BRegion();
-		fDecorator->GetFootprint(fDecFull);
-	}
-
-	fFull.MakeEmpty();
 
 	STRACE(("WinBorder %s:\n",GetName()));
 	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
@@ -124,49 +117,18 @@ WinBorder::~WinBorder(void)
 	{
 		delete fDecorator;
 		fDecorator = NULL;
-
-		delete fDecFull;
-		fDecFull = NULL;
 	}
 }
 
 void WinBorder::RebuildFullRegion(void)
 {
 	STRACE(("WinBorder(%s):~RebuildFullRegion()\n",GetName()));
-	BRegion			topLayerFull;
-	Layer			*topLayer = fServerWin->fTopLayer;
-	topLayerFull.Set( ConvertToTop(*fNewTopLayerFrame) );
-	fNewTopLayerFrame = &(fServerWin->fTopLayer->fFrame);
 
-	// TODO: Convert to screen coordinates
-	LayerData	*ld;
-	ld = topLayer->fLayerData;
-	do
-	{
-		// clip to user region
-		if(ld->clipReg)
-			topLayerFull.IntersectWith( ld->clipReg );
-		
-	} while( (ld = ld->prevState) );
-
-	// clip to user picture region
-	if(topLayer->clipToPicture)
-	{
-		if(topLayer->clipToPictureInverse)
-			topLayerFull.Exclude( topLayer->clipToPicture );
-		else
-			topLayerFull.IntersectWith( topLayer->clipToPicture );
-	}
-	
 	fFull.MakeEmpty();
-	fFull = topLayerFull;
 
+	// Winborder holds Decorator's full regions. if any...
 	if (fDecorator)
-	{
-		fDecFull->MakeEmpty();
-		fDecorator->GetFootprint(fDecFull);
-		fFull.Include(fDecFull);
-	}
+		fDecorator->GetFootprint(&fFull);
 }
 
 void WinBorder::MouseDown(PortMessage *msg)
@@ -379,25 +341,20 @@ void WinBorder::HighlightDecorator(const bool &active)
 void WinBorder::Draw(const BRect &r)
 {
 	STRACE(("WinBorder(%s)::Draw()\n", GetName()));
+	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
 	{
-		// decorator is allowed to draw in its entire visible region, not just in the update one.
 		fUpdateReg = fVisible;
-		fUpdateReg.IntersectWith(fDecFull);
 		// restrict Decorator drawing to the update region only.
 		fDriver->ConstrainClippingRegion(&fUpdateReg);
-
-		
-/*		fUpdateReg.PrintToStream();
+/*
+		fUpdateReg.PrintToStream();
 		RGBColor		c(128, 56, 98);
 		//fDriver->FillRect(r, c);
 		fDriver->FillRect(fUpdateReg.Frame(), c);
 		snooze(1000000);
 */		
-		
-		// TODO: pass 'r' not as you do now!!! Let Decorator object handle update problems
 		fDecorator->Draw(fUpdateReg.Frame());
-
 		// remove the additional clipping region.
 		fDriver->ConstrainClippingRegion(NULL);
 	}
@@ -407,11 +364,8 @@ void WinBorder::MoveBy(float x, float y)
 {
 	STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
 	if(fDecorator)
-	{
 		fDecorator->MoveBy(x,y);
-		fDecFull->OffsetBy(x,y);
-	}
-	
+// TODO: Repair! :-))
 	Layer::MoveBy(x,y);
 }
 
@@ -420,16 +374,8 @@ void WinBorder::ResizeBy(float x, float y)
 	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 	if(fDecorator)
 		fDecorator->ResizeBy(x,y);
-	
-	BRect		*localRect = new BRect(fServerWin->fTopLayer->fFrame);
-	fNewTopLayerFrame			= localRect;
-
-	// force topLayer's frame to resize
-	fNewTopLayerFrame->right	+= x;
-	fNewTopLayerFrame->bottom	+= y;
-
+// TODO: Repair! :-))
 	Layer::ResizeBy(x,y);
-	delete localRect;
 }
 
 bool WinBorder::HasPoint(BPoint& pt) const

@@ -49,7 +49,7 @@
 #include "CursorManager.h"
 #include "Workspace.h"
 
-//#define DEBUG_SERVERWINDOW
+#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -174,9 +174,6 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 	fTopLayer->SetAsTopLayer(true);
 	cl = fTopLayer;
 
-	fWinBorder = new WinBorder( fFrame, fTitle.String(),wlook, wfeel, wflags,
-			this, desktop->GetDisplayDriver());
-
 	STRACE(("ServerWindow %s:\n",fTitle.String()));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
 	STRACE(("\tPort: %ld\n",fMessagePort));
@@ -185,7 +182,12 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 
 void ServerWindow::Init(void)
 {
-	fWinBorder->AddChild(fTopLayer);
+	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, fFlags,
+			this, desktop->GetDisplayDriver());
+	fWinBorder->RebuildFullRegion();
+
+	// connect decorator and top layer.
+	fWinBorder->AddChild(fTopLayer, NULL);
 
 	// NOTE: this MUST be before the monitor thread is spawned!
 	desktop->AddWinBorder(fWinBorder);
@@ -632,7 +634,7 @@ void ServerWindow::SetLayerFontState(Layer *layer)
 		layer->fLayerData->font.SetFlags(flags);
 	}
 	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer: %s\n",
-			fTitle.String(), layer->_name->String()));
+			fTitle.String(), layer->fName->String()));
 }
 
 void ServerWindow::SetLayerState(Layer *layer)
@@ -687,7 +689,7 @@ void ServerWindow::SetLayerState(Layer *layer)
 		}
 	}
 	STRACE(("DONE: ServerWindow %s: Message AS_LAYER_SET_STATE: Layer: %s\n",fTitle.String(),
-			 layer->_name->String()));
+			 layer->fName->String()));
 }
 
 Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
@@ -736,7 +738,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 
 	// add the new Layer to the tree structure.
 	if(localRoot)
-		localRoot->AddChild(newLayer);
+		localRoot->AddChild(newLayer, NULL);
 			
 	// attach newLayer's children...
 	for(int i = 0; i < childCount; i++)
@@ -748,7 +750,7 @@ Layer * ServerWindow::CreateLayerTree(Layer *localRoot)
 			debugger("ServerWindow(%s) - AS_LAYER_CREATE Expected!\n");
 	}
 	STRACE(("DONE: ServerWindow %s: Message AS_CREATE_LAYER: Parent: %s, Child: %s\n", fTitle.String(), 
-			newLayer->_name->String(), name));
+			localRoot? localRoot->fName->String(): "NULL", newLayer->fName->String()));
 	
 	return newLayer;
 }
@@ -854,6 +856,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_SET_CURRENT_LAYER:
 		{
+			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32 token;
 			
 			fSession->ReadInt32(&token);
@@ -864,13 +867,21 @@ void ServerWindow::DispatchMessage(int32 code)
 				cl=current;
 			else // hope this NEVER happens! :-)
 				debugger("Server PANIC: window cannot find Layer with ID\n");
-			
-			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CREATE:
 		{
-			CreateLayerTree(cl);
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
+			Layer		*newLayer;
+
+			newLayer	= CreateLayerTree(NULL);
+			cl->AddChild(newLayer, this);
+
+			if (!(newLayer->IsHidden())){
+				// cl is the parent of newLayer, so this call is OK.
+				cl->FullInvalidate(newLayer->fFull.Frame());
+			}
+
 			break;
 		}
 		case AS_LAYER_DELETE:
@@ -888,11 +899,10 @@ void ServerWindow::DispatchMessage(int32 code)
 			cl->RemoveSelf();
 			
 			// TODO: invalidate the region occupied by this view.
-			// Should be done in Layer::RemoveChild() though
 			cl->PruneTree();
 
 			parent->PrintTree();
-			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle.String(), parent->_name->String(), cl->_name->String()));
+			STRACE(("DONE: ServerWindow %s: Message AS_DELETE_LAYER: Parent: %s Layer: %s\n", fTitle.String(), parent->fName->String(), cl->fName->String()));
 
 			delete cl;
 
@@ -901,18 +911,21 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_SET_STATE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			SetLayerState(cl);
 			cl->RebuildFullRegion();
 			break;
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			SetLayerFontState(cl);
 			cl->RebuildFullRegion();
 			break;
 		}
 		case AS_LAYER_GET_STATE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			LayerData	*ld;
 			
 			// these 4 are here because of a compiler warning. Maybe he's right... :-)
@@ -965,12 +978,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->WriteFloat(cl->fFrame.top);
 			fSession->WriteRect(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_MOVETO:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_MOVETO: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			float x, y;
 			
 			fSession->ReadFloat(&x);
@@ -982,6 +994,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_RESIZETO:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZETO: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			float newWidth, newHeight;
 			
 			fSession->ReadFloat(&newWidth);
@@ -996,75 +1009,73 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_GET_COORD:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WriteFloat(cl->fFrame.left);
 			fSession->WriteFloat(cl->fFrame.top);
 			fSession->WriteRect(cl->fFrame.OffsetToCopy(cl->fBoundsLeftTop));
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COORD: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_ORIGIN:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float x, y;
 			
 			fSession->ReadFloat(&x);
 			fSession->ReadFloat(&y);
 			
 			cl->fLayerData->coordOrigin.Set(x, y);
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_ORIGIN: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_GET_ORIGIN:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WritePoint(cl->fLayerData->coordOrigin);
 			fSession->Sync();
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_ORIGIN: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_RESIZE_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->ReadUInt32(&(cl->fResizeMode));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_RESIZE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CURSOR:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int32 token;
-			
+
 			fSession->ReadInt32(&token);
 			
 			cursormanager->SetCursor(token);
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:
 		{
 			fSession->ReadUInt32(&(cl->fFlags));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FLAGS: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			break;
 		}
 		case AS_LAYER_HIDE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			cl->Hide();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_HIDE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SHOW:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			cl->Show();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SHOW: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_LINE_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 lineCap, lineJoin;
 
 			// TODO: DW: Shouldn't we lock before modifying certain memebers?
@@ -1079,35 +1090,35 @@ void ServerWindow::DispatchMessage(int32 code)
 			cl->fLayerData->lineCap	= (cap_mode)lineCap;
 			cl->fLayerData->lineJoin = (join_mode)lineJoin;
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WriteInt8((int8)(cl->fLayerData->lineCap));
 			fSession->WriteInt8((int8)(cl->fLayerData->lineJoin));
 			fSession->WriteFloat(cl->fLayerData->miterLimit);
 			fSession->Sync();
 		
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_PUSH_STATE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			LayerData *ld = new LayerData();
 			ld->prevState = cl->fLayerData;
 			cl->fLayerData = ld;
 			
 			cl->RebuildFullRegion();
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_POP_STATE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			if (!(cl->fLayerData->prevState))
 			{
-				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fTitle.String(), cl->_name->String()));
+				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fTitle.String(), cl->fName->String()));
 				break;
 			}
 			
@@ -1116,20 +1127,21 @@ void ServerWindow::DispatchMessage(int32 code)
 			delete ld;
 			
 			cl->RebuildFullRegion();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_SET_SCALE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
 			fSession->ReadFloat(&(cl->fLayerData->scale));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
 			LayerData		*ld = cl->fLayerData;
+
 			float			scale = ld->scale;
 			
 			while((ld = ld->prevState))
@@ -1137,12 +1149,12 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			fSession->WriteFloat(scale);
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
+
 			break;
 		}
 		case AS_LAYER_SET_PEN_LOC:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float		x, y;
 			
 			fSession->ReadFloat(&x);
@@ -1150,56 +1162,56 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			cl->fLayerData->penlocation.Set(x, y);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WritePoint(cl->fLayerData->penlocation);
+
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->ReadFloat(&(cl->fLayerData->pensize));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WriteFloat(cl->fLayerData->pensize);
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_HIGH_COLOR:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
 			fSession->ReadData(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->highcolor.SetColor(c);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_LOW_COLOR:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
 			fSession->ReadData(&c, sizeof(rgb_color));
 			
 			cl->fLayerData->lowcolor.SetColor(c);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_SET_VIEW_COLOR:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
 			fSession->ReadData(&c, sizeof(rgb_color));
@@ -1208,11 +1220,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			
 			cl->Invalidate(cl->fVisible);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_COLORS:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color highColor, lowColor, viewColor;
 			
 			highColor = cl->fLayerData->highcolor.GetColor32();
@@ -1223,12 +1235,12 @@ void ServerWindow::DispatchMessage(int32 code)
 			fSession->WriteData(&lowColor, sizeof(rgb_color));
 			fSession->WriteData(&viewColor, sizeof(rgb_color));
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_SET_BLEND_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 srcAlpha, alphaFunc;
 			
 			fSession->ReadInt8(&srcAlpha);
@@ -1237,46 +1249,47 @@ void ServerWindow::DispatchMessage(int32 code)
 			cl->fLayerData->alphaSrcMode = (source_alpha)srcAlpha;
 			cl->fLayerData->alphaFncMode = (alpha_function)alphaFunc;
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WriteInt8((int8)(cl->fLayerData->alphaSrcMode));
 			fSession->WriteInt8((int8)(cl->fLayerData->alphaFncMode));
+
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_SET_DRAW_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 drawingMode;
 			
 			fSession->ReadInt8(&drawingMode);
 			
 			cl->fLayerData->draw_mode = (drawing_mode)drawingMode;
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->WriteInt8((int8)(cl->fLayerData->draw_mode));
 			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->ReadBool(&(cl->fLayerData->fontAliasing));
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			// TODO: watch out for the coordinate system
 			int32 pictureToken;
 			BPoint where;
@@ -1346,11 +1359,11 @@ void ServerWindow::DispatchMessage(int32 code)
 			if (redraw)
 				cl->Invalidate(reg);
 
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			// TODO: watch out for the coordinate system
 			int32 pictureToken;
 			BPoint where;
@@ -1385,43 +1398,45 @@ void ServerWindow::DispatchMessage(int32 code)
 				cl->RebuildFullRegion();
 				//cl->RequestDraw(cl->clipToPicture->Frame());
 			}
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), 
-					cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_GET_CLIP_REGION:
 		{
-			// TODO: watch out for the coordinate system
-			BRegion reg;
-			LayerData *ld;
-			int32 noOfRects;
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			// if this Layer is hidden, it is clear that its visible region is void.
+			if (cl->IsHidden()){
+				fSession->WriteInt32(0L);
+				fSession->Sync();
+			}
+			else{
+				// TODO: watch out for the coordinate system
+				BRegion reg;
+				LayerData *ld;
+				int32 noOfRects;
 			
-			ld = cl->fLayerData;
-			reg = cl->ConvertFromParent(&(cl->fVisible));
+				ld = cl->fLayerData;
+				reg = cl->ConvertFromParent(&(cl->fVisible));
 			
-			if(ld->clipReg)
-				reg.IntersectWith(ld->clipReg);
-			
-			while((ld = ld->prevState))
-			{
 				if(ld->clipReg)
 					reg.IntersectWith(ld->clipReg);
-			}
 			
-			noOfRects = reg.CountRects();
-			fSession->WriteInt32(noOfRects);
+				while((ld = ld->prevState))
+				{
+					if(ld->clipReg)
+						reg.IntersectWith(ld->clipReg);
+				}
+			
+				noOfRects = reg.CountRects();
+				fSession->WriteInt32(noOfRects);
 
-			for(int i = 0; i < noOfRects; i++)
-				fSession->WriteRect(reg.RectAt(i));
-			
-			fSession->Sync();
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->_name->String()));
+				for(int i = 0; i < noOfRects; i++)
+					fSession->WriteRect(reg.RectAt(i));
+			}
 			break;
 		}
 		case AS_LAYER_SET_CLIP_REGION:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			// TODO: watch out for the coordinate system
 			int32 noOfRects;
 			BRect r;
@@ -1438,28 +1453,33 @@ void ServerWindow::DispatchMessage(int32 code)
 				fSession->ReadRect(&r);
 				cl->fLayerData->clipReg->Include(r);
 			}
-			
+
 			cl->RebuildFullRegion();
-//			cl->RequestDraw(cl->clipToPicture->Frame());
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			if (!(cl->IsHidden()))
+			{
+				if (cl->fParent)
+					cl->fParent->FullInvalidate(BRegion(cl->fFull));
+				else
+					cl->FullInvalidate(BRegion(cl->fFull));
+			}
+
 			break;
 		}
 		case AS_LAYER_INVAL_RECT:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			// TODO: watch out for the coordinate system
 			BRect		invalRect;
 			
 			fSession->ReadRect(&invalRect);
 			
 			cl->Invalidate(invalRect);
-			//cl->RequestDraw(invalRect);
 			
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->_name->String()));
 			break;
 		}
 		case AS_LAYER_INVAL_REGION:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			// TODO: watch out for the coordinate system
 			BRegion invalReg;
 			int32 noOfRects;
@@ -1474,9 +1494,7 @@ void ServerWindow::DispatchMessage(int32 code)
 			}
 			
 			cl->Invalidate(invalReg);
-//			cl->RequestDraw(invalReg.Frame());
-			
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->_name->String()));
+
 			break;
 		}
 

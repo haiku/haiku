@@ -217,21 +217,22 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 	
 	STRACE(("*RootLayer::AddWinBorder(%s) - General lock acquired\n", winBorder->GetName()));
 	fMainLock.Lock();
-	
+
 	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock acquired\n", winBorder->GetName()));
-	
+
 	// in case we want to be added to the current workspace
 	if (winBorder->Window()->Workspaces() == 0)
 		winBorder->Window()->QuietlySetWorkspaces(0x00000001 << (ActiveWorkspaceIndex()-1));
-	
+
 	// add winBorder to the known list of WinBorders so we can keep track of it.
-	AddChild(winBorder, this);
-	
+	AddChild(winBorder, winBorder->Window());
+
 	// add winBorder to the desired workspaces
 	switch(winBorder->Window()->Feel())
 	{
 		case B_MODAL_SUBSET_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 21\n");
 			// this kind of window isn't added anywhere. It will be added
 			//	to main window's subset when winBorder::AddToSubsetOf(main)
 			//	will be called.
@@ -239,6 +240,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 		}
 		case B_MODAL_APP_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 22\n");
 			// add to app's list of Floating/Modal windows (as opposed to the system's)
 			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
 
@@ -267,6 +269,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 				
 		case B_MODAL_ALL_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 23\n");
 			// add to system's list of Floating/Modal Windows (as opposed to the app's list)
 			fMainFMWList.AddItem(winBorder);
 			
@@ -277,6 +280,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 
 		case B_FLOATING_SUBSET_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 24\n");
 			// this kind of window isn't added anywhere. It *will* be added to WS's list
 			//	when its main window will become the front one.
 			//	Also, it will be added to MainWinBorder's list when
@@ -286,6 +290,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 				
 		case B_FLOATING_APP_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 25\n");
 			// add to app's list of Floating/Modal windows (as opposed to the system's)
 			winBorder->Window()->App()->fAppFMWList.AddItem(winBorder);
 			
@@ -304,6 +309,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 				
 		case B_FLOATING_ALL_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 26\n");
 			// add to system's list of Floating/Modal Windows (as opposed to the app's list)
 			fMainFMWList.AddItem(winBorder);
 			
@@ -314,6 +320,7 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 		
 		case B_NORMAL_WINDOW_FEEL:
 		{
+printf("XXXXXXXX1: 27\n");
 			// add this winBorder to the specified workspaces
 			AddWinBorderToWorkspaces(winBorder, winBorder->Window()->Workspaces());
 			break;
@@ -321,14 +328,17 @@ void RootLayer::AddWinBorder(WinBorder* winBorder)
 		case B_SYSTEM_LAST:
 		case B_SYSTEM_FIRST:
 		{
+printf("XXXXXXXX1: 28\n");
 			// add this winBorder to all workspaces
 			AddWinBorderToWorkspaces(winBorder, 0xffffffffUL);
 			break;
 		}
-		default:
+		default:{
+printf("XXXXXXXX1: 29\n");
 			break;
+		}
 	}	// end switch(winborder->Feel())
-	
+printf("XXXXXXXX1: 4\n");	
 	fMainLock.Unlock();
 	STRACE(("*RootLayer::AddWinBorder(%s) - Main lock released\n", winBorder->GetName()));
 	

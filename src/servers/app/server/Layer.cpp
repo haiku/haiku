@@ -14,7 +14,7 @@
 #include "LayerData.h"
 #include <stdio.h>
 
-//#define DEBUG_LAYER
+#define DEBUG_LAYER
 #ifdef DEBUG_LAYER
 #	define STRACE(x) printf x
 #else
@@ -31,15 +31,6 @@
 BRegion	gRedrawReg;
 BList gCopyRegList;
 BList gCopyList;
-
-enum
-{
-	B_LAYER_NONE		= 0x00001000UL,
-	B_LAYER_MOVE		= 0x00002000UL,
-	B_LAYER_SIMPLE_MOVE	= 0x00004000UL,
-	B_LAYER_RESIZE		= 0x00008000UL,
-	B_LAYER_MASK_RESIZE	= 0x00010000UL,
-};
 
 Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 				uint32 flags, DisplayDriver *driver)
@@ -62,24 +53,25 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	fDriver			= driver;
 
 	// Layer does not start out as a part of the tree
-	fParent = NULL;
-	fUpperSibling = NULL;
-	fLowerSibling = NULL;
-	fTopChild = NULL;
-	fBottomChild = NULL;
+	fParent			= NULL;
+	fUpperSibling	= NULL;
+	fLowerSibling	= NULL;
+	fTopChild		= NULL;
+	fBottomChild	= NULL;
 	
-	fCurrent = NULL;
-	fRootLayer = NULL;
+	fCurrent		= NULL;
+	fRootLayer		= NULL;
 
-	fFlags = flags;
-	fResizeMode	= resize;
-	fHidden = false;
+	fFlags			= flags;
+	fAdFlags		= 0;
+	fResizeMode		= resize;
+	fHidden			= false;
 	
-	fIsUpdating	= false;
-	fIsTopLayer = false;
-	fLevel = 0;
+	fIsUpdating		= false;
+	fIsTopLayer		= false;
+	fLevel			= 0;
 	
-	fViewToken = token;
+	fViewToken		= token;
 	fServerWin		= NULL;
 	clipToPicture	= NULL;
 	
@@ -117,7 +109,7 @@ Layer::~Layer(void)
 	}
 }
 
-void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
+void Layer::AddChild(Layer *layer, ServerWindow *serverWin)
 {
 	STRACE(("Layer(%s)::AddChild(%s) START\n", GetName(), layer->GetName()));
 	
@@ -127,7 +119,7 @@ void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 		return;
 	}
 	
-	// attach layer to the tree structure
+	// 1) attach layer to the tree structure
 	layer->fParent = this;
 	if( fBottomChild )
 	{
@@ -140,66 +132,49 @@ void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
 	}
 	fBottomChild = layer;
 
-	layer->SetRootLayer(fRootLayer);
+	// if no RootLayer, there is no need to set any parameters.
+	// they will be set when the root Layer for this tree will be added
+	// to the main tree structure.
+	if (fRootLayer == NULL)
+		return;
 
-	// higher level objects like RootLayers do not have ServerWindow objects attached
-	// This is in case o a WinBorder object which already has a valid fServerWin member.
-	if(!(layer->fServerWin))
-		layer->SetServerWindow(this->SearchForServerWindow());
-	
-	layer->RebuildFullRegion();
-	
-	 //c = short for: current
-	Layer *c = layer->fTopChild;
-	Layer *stop = layer;
-
-	if( c != NULL )
-	{
-		while( true )
+	// 2) set some fields for this new layer and its children.
+	Layer		*c = layer; //c = short for: current
+	Layer		*stop = layer;
+	while( true ){
+		// action block
 		{
-			// action block
-			{
-				c->SetRootLayer(fRootLayer);
-				c->SetServerWindow(c->SearchForServerWindow());
-				c->RebuildFullRegion();
+			// 2.1) set the RootLayer for this object.
+			c->SetRootLayer(c->fParent->fRootLayer);
+			// 2.2) this Layer must know if it has a ServerWindow object attached.
+			c->SetServerWindow(serverWin);//c->fParent->fServerWin);
+			// 2.3) we are attached to the main tree so build our full region.
+			c->RebuildFullRegion();
+		}
+
+		// tree parsing algorithm
+		if(	c->fTopChild ){	// go deep
+			c = c->fTopChild;
+		}
+		else{ // go right or up
+			if (c == stop) // out trip is over
+				break;
+			if( c->fLowerSibling ){	// go right
+				c = c->fLowerSibling;
 			}
-			
-			// tree parsing algorithm
-			
-			// go deep
-			if(	c->fTopChild )
-			{
-				c = c->fTopChild;
-			}
-			else
-			{
-				// go right or up
-				
-				if( c->fLowerSibling )
-				{
-					// go right
-					c = c->fLowerSibling;
-				}
-				else
-				{
-					// go up
-					while( !c->fParent->fLowerSibling && c->fParent != stop )
-						c = c->fParent;
-					
-					// that enough! We've reached this view.
-					if( c->fParent == stop )
-						break;
-						
-					c = c->fParent->fLowerSibling;
-				}
+			else{ // go up
+				while( !c->fParent->fLowerSibling && c->fParent != stop )
+					c = c->fParent;
+
+				if( c->fParent == stop ) // that enough!
+					break;
+
+				c = c->fParent->fLowerSibling;
 			}
 		}
 	}
-	
-	if ( !(layer->IsHidden()) && layer->fRootLayer && !IsHidden())
-		FullInvalidate( layer->fFull );
-	
-	STRACE(("Layer(%s)::AddChild(%s) END\n", GetName(), layer->GetName()));
+
+STRACE(("Layer(%s)::AddChild(%s) END\n", GetName(), layer->GetName()));
 }
 
 void Layer::RemoveChild(Layer *layer)
@@ -218,87 +193,63 @@ void Layer::RemoveChild(Layer *layer)
 		return;
 	}
 
+	// 1) remove this layer the main tree.
 	// Take care of fParent
-	layer->fParent = NULL;
+	layer->fParent		= NULL;
 	if( fTopChild == layer )
-		fTopChild = layer->fLowerSibling;
-	
+		fTopChild		= layer->fLowerSibling;
 	if( fBottomChild == layer )
-		fBottomChild = layer->fUpperSibling;
+		fBottomChild	= layer->fUpperSibling;
 
 	// Take care of siblings
 	if( layer->fUpperSibling != NULL )
 		layer->fUpperSibling->fLowerSibling	= layer->fLowerSibling;
-	
 	if( layer->fLowerSibling != NULL )
 		layer->fLowerSibling->fUpperSibling = layer->fUpperSibling;
-	
-	layer->fUpperSibling = NULL;
-	layer->fLowerSibling = NULL;
-	
-	//c = short for: current
-	Layer *c = layer->fTopChild;
-	Layer *stop = layer;
+	layer->fUpperSibling	= NULL;
+	layer->fLowerSibling	= NULL;
 
-	if( c != NULL )
-	{
-		while( true )
+	// 2) clear some fields for this layer and its children.
+	Layer		*c = layer; //c = short for: current
+	Layer		*stop = layer;
+	while( true ){
+		// action block
 		{
-			// action block
-			{
-				c->SetRootLayer(NULL);
-				c->SetServerWindow(NULL);
-				c->fFull.MakeEmpty();
-				c->fFullVisible.MakeEmpty();
-				c->fVisible.MakeEmpty();
-			}
+			// 2.1) set the RootLayer for this object.
+			c->SetRootLayer(NULL);
+			// 2.2) this Layer must know if it has a ServerWindow object attached.
+			c->SetServerWindow(NULL);
+			// 2.3) we were removed from the main tree so clear our full region.
+			c->fFull.MakeEmpty();
+			// 2.4) clear fullVisible region.
+			c->fFullVisible.MakeEmpty();
+			// 2.5) we don't have a visible region anymore.
+			c->fVisible.MakeEmpty();
+		}
 
-			// tree parsing algorithm
-			
-			if(	c->fTopChild )
-			{
-				// go deep
-				c = c->fTopChild;
+		// tree parsing algorithm
+		if(	c->fTopChild ){	// go deep
+			c = c->fTopChild;
+		}
+		else{ // go right or up
+			if (c == stop) // out trip is over
+				break;
+
+			if( c->fLowerSibling ){	// go right
+				c = c->fLowerSibling;
 			}
-			else
-			{
-				// go right or up
-				
-				if( c->fLowerSibling )
-				{
-					// go right
-					c = c->fLowerSibling;
-				}
-				else
-				{
-					// go up
-					
-					while( !c->fParent->fLowerSibling && c->fParent != stop )
-						c = c->fParent;
-					
-					// that's enough! We've reached this view.
-					if( c->fParent == stop )
-						break;
-					
-					c = c->fParent->fLowerSibling;
-				}
+			else{ // go up
+				while( !c->fParent->fLowerSibling && c->fParent != stop )
+					c = c->fParent;
+
+				if( c->fParent == stop ) // that enough!
+					break;
+
+				c = c->fParent->fLowerSibling;
 			}
 		}
 	}
-	
-	if ( !(layer->IsHidden()) && layer->fRootLayer)
-	{
-		PrintTree();
-		FullInvalidate( layer->fFullVisible );
-	}
-	
-	layer->fRootLayer = NULL;
-	layer->fServerWin = NULL;
-	layer->fFull.MakeEmpty();
-	layer->fFullVisible.MakeEmpty();
-	layer->fVisible.MakeEmpty();
-	
-	STRACE(("Layer(%s)::RemoveChild(%s) END\n", GetName(), layer->GetName()));
+STRACE(("Layer(%s)::RemoveChild(%s) END\n", GetName(), layer->GetName()));
 }
 
 void Layer::RemoveSelf()
@@ -455,112 +406,68 @@ void Layer::Invalidate(const BRegion& region)
 void Layer::Redraw(const BRegion& reg, Layer *startFrom)
 {
 	STRACE(("Layer(%s)::Redraw();\n", GetName()));
-	
+	if (IsHidden())
+		// this layer has nothing visible on screen, so bail out.
+		return;
+
 	BRegion *pReg = const_cast<BRegion*>(&reg);
 
-	if(fServerWin)
-	{
-		if (pReg->CountRects() > 0)
-			RequestClientUpdate(reg, startFrom);
-	
-	}
-	else
-	{
-		// call Draw() for all server layers
-		if (pReg->CountRects() > 0)
-			RequestDraw(reg, startFrom);
-	
-	}
+	if (pReg->CountRects() > 0)
+		RequestDraw(reg, startFrom);
 	
 	STRACE(("Layer::Redraw ENDED\n"));
 }
 
-void Layer::RequestClientUpdate(const BRegion &reg, Layer *startFrom)
+void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 {
-	STRACE(("Layer(%s)::RequestClientUpdate()\n", GetName()));
-	
-	if (IsHidden())
-	{
-		// this layer has nothing visible on screen, so bail out.
-		return;
-	}
-	
-	// TODO: remove
+	STRACE(("Layer(%s)::RequestDraw()\n", GetName()));
+
+	int redraw = false;
+
+	if (startFrom == NULL)
+		redraw = true;
+
 	if (fVisible.CountRects() > 0)
 	{
 		fUpdateReg = fVisible;
 		fUpdateReg.IntersectWith(&reg);
 		
-		// NOTE: CLEAR to the background color!
-		
-		// draw itself.
-		if (fUpdateReg.CountRects() > 0)
-		{
-			fDriver->ConstrainClippingRegion(&fUpdateReg);
-			Draw(fUpdateReg.Frame());
-			fDriver->ConstrainClippingRegion(NULL);
-		}
-		
-		fUpdateReg.MakeEmpty();
-	}
-	return;
-	
-	
-	// TODO: use startFrom
-	
-	// TODO: Do that! here? or after a message sent by the client just before calling BView::Draw(r)
-	// clear the area in the low color
-	// only the visible area is cleared, because DisplayDriver does the clipping to it.
-	// draw background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
-	
-	BMessage msg;
-	
-	msg.what = _UPDATE_;
-	msg.AddInt32("_token", fViewToken);
-	msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
-	
-	// for test purposes only!
-	msg.AddRect("_rect2", reg.Frame());
+		if (fUpdateReg.CountRects() > 0){
+			if (fServerWin){
+				// clear background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
+				// TODO: DO That!
+				// TODO: UNcomment!!!
+// TODO !!! UPDATE  code !!!
+				/*
+				BMessage msg;
+				msg.what = _UPDATE_;
+				msg.AddInt32("_token", fViewToken);
+				msg.AddRect("_rect", ConvertFromTop(reg.Frame()) );
 
-	fServerWin->SendMessageToClient( &msg );
-}
+				// for test purposes only!
+				msg.AddRect("_rect2", reg.Frame());
 
-void Layer::RequestDraw(const BRegion &reg, Layer *startFrom, bool redraw)
-{
-	STRACE(("Layer(%s)::RequestDraw()\n", GetName()));
-	
-	if (fVisible.CountRects() > 0 && !IsHidden())
-	{
-		fUpdateReg = fVisible;
-		fUpdateReg.IntersectWith(&reg);
-		
-		// NOTE: do not clear background for internal server layers!
-		
-		// draw itself.
-		if (fUpdateReg.CountRects() > 0)
-		{
-			fDriver->ConstrainClippingRegion(&fUpdateReg);
-			Draw(fUpdateReg.Frame());
-			fDriver->ConstrainClippingRegion(NULL);
-		}
-		
-		fUpdateReg.MakeEmpty();
-	}
+				fServerWin->SendMessageToClient( &msg );
+				*/
+			}
+			else{
+				// NOTE: do not clear background for internal server layers!
+				fDriver->ConstrainClippingRegion(&fUpdateReg);
+				Draw(fUpdateReg.Frame());
+				fDriver->ConstrainClippingRegion(NULL);
 
-	// tell children to draw. YES, it's OK - if we're hidden don't tell children to draw
-	if (!IsHidden())
-	{
-		for (Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
-		{
-			if (!redraw && startFrom && lay == startFrom)
-				redraw = true;
-	
-			if ((startFrom && redraw) || !startFrom)
-			{
-				if ( !(lay->IsHidden()) )
-					lay->RequestDraw( reg, startFrom, redraw );
+				fUpdateReg.MakeEmpty();
 			}
 		}
+	}
+
+	for (Layer *lay = VirtualBottomChild(); lay != NULL; lay = VirtualUpperSibling())
+	{
+		if (lay == startFrom)
+			redraw = true;
+
+		if (redraw && !(lay->IsHidden()))
+			lay->RequestDraw(reg, NULL);
 	}
 }
 
@@ -590,9 +497,9 @@ void Layer::Show(bool invalidate)
 	if(invalidate)
 	{
 		if(fParent)
-			fParent->FullInvalidate(fFull);
+			fParent->FullInvalidate( BRegion(fFull) );
 		else
-			FullInvalidate( fFull );
+			FullInvalidate( BRegion(fFull) );
 	}
 }
 
@@ -604,60 +511,13 @@ void Layer::Hide(bool invalidate)
 	
 	fHidden	= true;
 	
-	//c = short for: current
-	Layer *c = fTopChild;
-	Layer *stop = this;
-
-	if( c != NULL )
-	{
-		while(1)
-		{
-			// action block
-			{
-				c->fFullVisible.MakeEmpty();
-				c->fVisible.MakeEmpty();
-			}
-			
-			// tree parsing algorithm
-			
-			if(	c->fTopChild )
-			{
-				// go deep
-				c = c->fTopChild;
-			}
-			else
-			{
-				// go right or up
-				if( c->fLowerSibling )
-				{
-					// go right
-					c = c->fLowerSibling;
-				}
-				else
-				{
-					// go up
-					while( !c->fParent->fLowerSibling && c->fParent != stop )
-						c = c->fParent;
-					
-					// that's enough! We've reached this view.
-					if( c->fParent == stop )
-						break;
-						
-					c = c->fParent->fLowerSibling;
-				}
-			}
-		}
-	}
-	
 	if(invalidate)
 	{
 		if(fParent)
-			fParent->FullInvalidate( fFullVisible );
+			fParent->FullInvalidate( BRegion(fFullVisible) );
 		else
-			FullInvalidate( fFullVisible );
+			FullInvalidate( BRegion(fFullVisible) );
 	}
-	fFullVisible.MakeEmpty();
-	fVisible.MakeEmpty();
 }
 
 bool Layer::IsHidden(void) const
@@ -694,6 +554,7 @@ void Layer::RebuildFullRegion( )
 	else
 		fFull.Set( fFrame );
 	
+	// TODO: restrict to screen coordinates!!!
 	// TODO: Convert to screen coordinates!
 	LayerData *ld;
 	ld = fLayerData;
@@ -711,15 +572,6 @@ void Layer::RebuildFullRegion( )
 			fFull.Exclude( clipToPicture );
 		else
 			fFull.IntersectWith( clipToPicture );
-	}
-	
-	if(IsTopLayer() && fServerWin)
-	{
-		if (fServerWin->fWinBorder->fDecorator)
-		{
-			// decorator overlapping topLayer? put decorator in front.
-			fFull.Exclude( fServerWin->fWinBorder->fDecFull );
-		}
 	}
 }
 
@@ -840,14 +692,39 @@ void Layer::RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint
 
 	if (!IsHidden())
 	{
+		fFullVisible.MakeEmpty();
 		fVisible = fFull;
-		if (fParent)
-		{
-			fVisible.IntersectWith( &(fParent->fVisible) );
-			
-			// exclude from parent's visible area.
-			if ( !IsHidden() && fVisible.CountRects() > 0)
-				fParent->fVisible.Exclude( &(fVisible) );
+		if (fParent && fVisible.CountRects() >0){
+			// not the usual case, but support fot this is needed.
+			if (fParent->fAdFlags & B_LAYER_CHILDREN_DEPENDANT){
+				// because we're skipping one level, we need to do out
+				// parent business as well.
+
+				// our visible area is relative to our parent's parent.
+				if (fParent->fParent)
+					fVisible.IntersectWith(&(fParent->fParent->fVisible));
+
+				// exclude parent's visible area which could be composed by
+				// prior siblings' visible areas.
+				if (fVisible.CountRects() > 0)
+					fVisible.Exclude(&(fParent->fVisible));
+
+				// we have a final visible area. Include it to our parent's one,
+				// exclude from parent's parent.
+				if (fVisible.CountRects() > 0){
+					fParent->fFullVisible.Include(&fVisible);
+					if (fParent->fParent)
+						fParent->fParent->fVisible.Exclude(&fVisible);
+				}
+			}
+			// for 95+% of cases
+			else{
+				// the visible area is the one common with parent's one.
+				fVisible.IntersectWith(&(fParent->fVisible));
+				// exclude from parent's visible area. we're the owners now.
+				if (fVisible.CountRects() > 0)
+					fParent->fVisible.Exclude(&fVisible);
+			}
 		}
 		fFullVisible = fVisible;
 	}
@@ -1001,8 +878,9 @@ void Layer::StartRebuildRegions( const BRegion& reg, Layer *target, uint32 actio
 	// if this is the first time
 	if (oldVisible.CountRects() > 0)
 		redrawReg.Exclude(&oldVisible);
-	
-	gRedrawReg.Include(&redrawReg);
+
+	if (redrawReg.CountRects() > 0)
+		gRedrawReg.Include(&redrawReg);
 	
 	#ifdef DEBUG_LAYER_REBUILD
 	printf("Layer(%s)::StartRebuildREgions() ended! Redraw Region:\n", GetName());

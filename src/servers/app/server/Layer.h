@@ -10,6 +10,17 @@
 #include <Locker.h>
 #include "RGBColor.h"
 
+enum
+{
+	B_LAYER_NONE		= 0x00001000UL,
+	B_LAYER_MOVE		= 0x00002000UL,
+	B_LAYER_SIMPLE_MOVE	= 0x00004000UL,
+	B_LAYER_RESIZE		= 0x00008000UL,
+	B_LAYER_MASK_RESIZE	= 0x00010000UL,
+
+	B_LAYER_CHILDREN_DEPENDANT = 0x10000000UL,
+};
+
 class ServerWindow;
 class RootLayer;
 class DisplayDriver;
@@ -22,7 +33,7 @@ public:
 			uint32 flags, DisplayDriver *driver);
 	virtual ~Layer(void);
 
-	void AddChild(Layer *child, RootLayer *rootLayer = NULL);
+	void AddChild(Layer *child, ServerWindow *serverWin);
 	void RemoveChild(Layer *child);
 	void RemoveSelf(void);
 	bool HasChild(Layer *layer);
@@ -78,7 +89,8 @@ public:
 	BRect ConvertFromTop(BRect rect);
 	
 	DisplayDriver *GetDisplayDriver(void) const { return fDriver; }
-	
+	ServerWindow *Window(void) const { return fServerWin; }
+
 	void PruneTree(void);
 	
 	void PrintToStream(void);
@@ -126,6 +138,7 @@ protected:
 	bool fHidden;
 	bool fIsUpdating;
 	bool fIsTopLayer;
+	uint16 fAdFlags;
 	
 	DisplayDriver *fDriver;
 	LayerData *fLayerData;
@@ -134,8 +147,7 @@ protected:
 	RootLayer *fRootLayer;
 
 private:
-	void RequestClientUpdate(const BRegion &reg, Layer *startFrom);
-	void RequestDraw(const BRegion &reg, Layer *startFrom, bool redraw=false);
+	void RequestDraw(const BRegion &reg, Layer *startFrom);
 	ServerWindow *SearchForServerWindow(void) const;
 
 };

@@ -60,7 +60,6 @@ public:
 	void UpdateFont(void);
 	void UpdateScreen(void);
 	
-	ServerWindow *Window(void) const { return fServerWin; }
 	Decorator *GetDecorator(void) const { return fDecorator; }
 	WinBorder *MainWinBorder() const;
 	
@@ -87,17 +86,12 @@ protected:
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
 
-	BRegion *fDecFull;
-
 	WinBorder *fMainWinBorder;
 	bool fIsMoving;
 	bool fIsResizing;
 	bool fIsClosing;
 	bool fIsMinimizing;
 	bool fIsZooming;
-
-	// having a hard time doing resizing. It's not nice, but this helps a bit
-	BRect *fNewTopLayerFrame;
 };
 
 #endif
