@@ -562,3 +562,24 @@ case 14:ref is valid and refers to an executable without signature =>
 		Should return B_OK and set team to the ID of the team running the
 		application's executable.
 
+status_t Broadcast(BMessage *message) const
+case 1:	NULL message =>
+		Should return B_BAD_VALUE.
+case 2:	valid message, several apps, one is B_ARGV_ONLY =>
+		Should return B_OK and send the message to all (including the
+		B_ARGV_ONLY) apps.
+		Replies go to be_app_messenger.
+
+status_t Broadcast(BMessage *message, BMessenger replyTo) const
+case 1:	NULL message =>
+		Should return B_BAD_VALUE.
+case 2:	valid message, several apps, one is B_ARGV_ONLY, valid replyTo =>
+		Should return B_OK and send the message to all (including the
+		B_ARGV_ONLY) apps.
+		Replies go to the specified messenger.
+case 3:	valid message, several apps, one is B_ARGV_ONLY, invalid replyTo =>
+		Should return B_OK and send the message to all (including the
+		B_ARGV_ONLY) apps.
+		Replies go to the roster!
+
+

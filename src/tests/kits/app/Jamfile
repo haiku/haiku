@@ -68,6 +68,7 @@ CommonTestLib libapptest.so
 		# BMessageRunner
 		MessageRunnerTest.cpp
 		BMessageRunnerTester.cpp
+		BroadcastTester.cpp
 		GetInfoTester.cpp
 		MessageRunnerTestHelpers.cpp
 		SetCountTester.cpp

@@ -67,19 +67,9 @@ rule CopyBRosterTestApp
 # BRoster::Launch() test apps
 #
 
-#local runTestApp1 = [ FGristFiles AppRunTestApp1$(SUFOBJ) ] ;
-
-SimpleBRosterTestApp RosterLaunchTestApp1.cpp ;
-#SimpleBRosterTestApp RosterLaunchTestApp1.cpp : AppRunTestApp1.rsrc
-#				   : $(commonObjects) ;
-#SimpleBRosterTestApp2 AppRunTestApp2 : $(runTestApp1) : AppRunTestApp2.rsrc
-#				   : $(commonObjects) ;
-
-#CopyBRosterTestApp AppRunTestApp3a : AppRunTestApp3 ;
-
-# GetRecentAppsTest apps
 SimpleBRosterTestApp RecentAppsTestQualifyingApp.cpp RecentAppsTestApp.cpp ;
 SimpleBRosterTestApp RecentAppsTestNonQualifyingApp.cpp RecentAppsTestApp.cpp ;
 SimpleBRosterTestApp RecentAppsTestEmptyApp.cpp RecentAppsTestApp.cpp ;
 SimpleBRosterTestApp RecentAppsTestControlApp.cpp RecentAppsTestApp.cpp ;
-
+SimpleBRosterTestApp RosterBroadcastTestApp1.cpp ;
+SimpleBRosterTestApp RosterLaunchTestApp1.cpp ;
