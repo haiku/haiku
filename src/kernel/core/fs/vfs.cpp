@@ -2562,6 +2562,9 @@ file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 {
 	off_t offset;
 
+	FUNCTION(("file_seek(pos = %Ld, seekType = %d)\n", pos, seekType));
+	// ToDo: seek should fail for pipes and FIFOs...
+
 	switch (seekType) {
 		case SEEK_SET:
 			offset = 0;
