@@ -27,6 +27,8 @@
 #include "InlineInput.h"
 #include "StyleBuffer.h"
 
+#include <View.h> // For B_FONT_FAMILY_AND_STYLE, B_FONT_SIZE, etc.
+
 
 // _BStyleRunDescBuffer_
 
@@ -459,24 +461,17 @@ _BStyleBuffer_::SetStyle(uint32 mode, const BFont *fromFont,
 							  BFont *toFont, const rgb_color *fromColor,
 							  rgb_color *toColor)
 {	
-	if (mode & doFont) 
+	if (mode & B_FONT_FAMILY_AND_STYLE) 
 		toFont->SetFamilyAndStyle(fromFont->FamilyAndStyle());
 		
-	if (mode & doSize) {
-		if (mode & addSize)
-			toFont->SetSize(fromFont->Size());
-		else
-			toFont->SetSize(fromFont->Size());
-	}
+	if (mode & B_FONT_SIZE)
+		toFont->SetSize(fromFont->Size());
 		
-	if (mode & doShear)
+	if (mode & B_FONT_SHEAR)
 		toFont->SetShear(fromFont->Shear());
 		
-	if (mode & doUnderline)
-		toFont->SetFace(fromFont->Face());
-		
-	if (mode & doColor)
-		*toColor = *fromColor;
+	//if (mode & doColor)
+	//	*toColor = *fromColor;
 }
 
 
@@ -503,7 +498,8 @@ void
 _BStyleBuffer_::ContinuousGetStyle(BFont *outFont, uint32 *ioMode,
 				rgb_color *outColor, bool *sameColor, int32 fromOffset, int32 toOffset) const
 {
-	uint32 mode = doAll;
+	uint32 mode = B_FONT_ALL;
+
 	if (fStyleRunDesc.ItemCount() < 1) {
 		if (ioMode)
 			*ioMode = mode;
@@ -542,42 +538,31 @@ _BStyleBuffer_::ContinuousGetStyle(BFont *outFont, uint32 *ioMode,
 			styleIndex = fStyleRunDesc[i]->index;
 			style = &fStyleRecord[styleIndex]->style;
 			
-			if (mode & doFont) {
+			if (mode & B_FONT_FAMILY_AND_STYLE) {
 				if (theStyle.font != style->font)
-					mode &= ~doFont;
+					mode &= ~B_FONT_FAMILY_AND_STYLE;
 			}
 				
-			if (mode & doSize) {
+			if (mode & B_FONT_SIZE) {
 				if (theStyle.font.Size() != style->font.Size())
-					mode &= ~doSize;
+					mode &= ~B_FONT_SIZE;
 			}
 				
-			if (mode & doShear) {
+			if (mode & B_FONT_SHEAR) {
 				if (theStyle.font.Shear() != style->font.Shear())
-					mode &= ~doShear;
+					mode &= ~B_FONT_SHEAR;
 			}
-				
-			if (mode & doUnderline) {
-			//	if (theStyle.underline != style->font.underline) {
-					mode &= ~doUnderline;
-			//	}
-			}
-				
-			if (mode & doColor) {
-				if ( (theStyle.color.red != style->color.red) ||
-					 (theStyle.color.green != style->color.green) ||
-					 (theStyle.color.blue != style->color.blue) ||
-					 (theStyle.color.alpha != style->color.alpha) ) {
-					mode &= ~doColor;
-					oneColor = false;
-				}
+								
+			if ( (theStyle.color.red != style->color.red) ||
+				 (theStyle.color.green != style->color.green) ||
+				 (theStyle.color.blue != style->color.blue) ||
+				 (theStyle.color.alpha != style->color.alpha) ) {
+				oneColor = false;
 			}
 			
-			if (mode & doExtra) {
-			//	if (theStyle.extra != style->font.extra) {
-					mode &= ~doExtra;
-			//	}
-			}
+			// TODO: Finish this: handle B_FONT_FACE, B_FONT_FLAGS, etc.
+			// if needed
+			
 		}
 		
 		if (ioMode)

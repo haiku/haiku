@@ -27,26 +27,12 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include <SupportDefs.h>
-#include <InterfaceDefs.h>
-#include "TextViewSupportBuffer.h"
 #include <Font.h>
+#include <InterfaceDefs.h>
+#include <SupportDefs.h>
 
-// Project Includes ------------------------------------------------------------
+#include "TextViewSupportBuffer.h"
 
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
-enum {
-	doFont			= 0x00000001,	// set font
-	doSize			= 0x00000002,	// set size
-	doShear			= 0x00000004,	// set shear
-	doUnderline		= 0x00000008,	// set underline
-	doColor			= 0x00000010,	// set color
-	doExtra			= 0x00000020,	// set the extra field
-	doAll			= 0x0000003F,	// set everything
-	addSize			= 0x00010000	// add size value
-};
 
 typedef struct STEStyle {
 	BFont			font;		// font

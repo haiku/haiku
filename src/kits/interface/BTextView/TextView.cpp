@@ -1095,7 +1095,7 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 		// apply nullStyle to inserted text
 		fStyles->SyncNullStyle(inOffset);
 		fStyles->SetStyleRange(inOffset, inOffset + inLength, 
-							  fText->Length(), doAll, NULL, NULL);
+							  fText->Length(), B_FONT_ALL, NULL, NULL);
 	}
 
 	fClickOffset = fSelStart = fSelEnd = 0;	
@@ -1605,7 +1605,7 @@ BTextView::SetFontAndColor(const BFont *inFont, uint32 inMode,
 	fStyles->SetStyleRange(fSelStart, fSelEnd, fText->Length(),
 						  inMode, &newFont, inColor);
 						
-	if (inMode & doFont || inMode & doSize)
+	if (inMode & B_FONT_FAMILY_AND_STYLE || inMode & B_FONT_SIZE)
 		// recalc the line breaks and redraw with new style
 		Refresh(fSelStart, fSelEnd, fSelStart != fSelEnd, false);
 	else
@@ -1647,7 +1647,7 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 	fStyles->SetStyleRange(startOffset, endOffset, fText->Length(),
 						  inMode, &newFont, inColor);
 						
-	if (inMode & doFont || inMode & doSize)
+	if (inMode & B_FONT_FAMILY_AND_STYLE || inMode & B_FONT_SIZE)
 		// recalc the line breaks and redraw with new style
 		Refresh(startOffset, endOffset, startOffset != endOffset, false);
 	else
@@ -1712,7 +1712,7 @@ BTextView::SetRunArray(int32 startOffset, int32 endOffset,
 			}
 
 			fStyles->SetStyleRange(fromOffset, toOffset, textLength,
-							  	  doAll, &theRun->font, &theRun->color);
+							  	  B_FONT_ALL, &theRun->font, &theRun->color);
 							
 			theRun++;
 		}
@@ -2727,7 +2727,7 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 		// apply nullStyle to inserted text
 		fStyles->SyncNullStyle(inOffset);
 		fStyles->SetStyleRange(inOffset, inOffset + inLength, 
-							  fText->Length(), doAll, NULL, NULL);
+							  fText->Length(), B_FONT_ALL, NULL, NULL);
 	}
 }
 //------------------------------------------------------------------------------
