@@ -23,8 +23,8 @@ public:
 	
 	off_t Offset() const;		// 0 for devices
 	off_t Size() const;
-	int32 BlockSize() const;
-	int32 Index() const;		// 0 for devices
+	uint32 BlockSize() const;
+	uint32 Index() const;		// 0 for devices
 	uint32 Status() const;
 	
 	bool IsMountable() const;
@@ -37,7 +37,7 @@ public:
 	const char* Name() const;
 	const char* Type() const;   		// See DiskDeviceTypes.h
 	const char* ContentType() const;	// See DiskDeviceTypes.h
-	int32 UniqueID() const;
+	uint32 UniqueID() const;
 	uint32 Flags() const;		
 	
 	status_t GetPath(BPath *path) const;
@@ -51,11 +51,10 @@ public:
 
 	BDiskDevice* Device() const;
 	BPartition* Parent() const;
-	BPartition* ChildAt(int32 index) const;
-	int32 CountChildren() const;
+	BPartition* ChildAt(uint32 index) const;
+	uint32 CountChildren() const;
 
-	BPartitionableSpace* PartitionableSpaceAt(int32 index) const;
-	int32 CountPartitionableSpaces() const;
+	BPartitioningInfo* GetPartitioningInfo() const;
 	
 	BPartition* VisitEachChild(BDiskDeviceVisitor *visitor);
 	BPartition* VisitEachDescendent(BDiskDeviceVisitor *visitor);
@@ -84,7 +83,7 @@ public:
 	status_t GetParameterEditor(
                BDiskScannerParameterEditor **editor,
                BDiskScannerParameterEditor **contentEditor);
-    status_t SetParameters(const char *parameters, const char **contentParameters);
+    status_t SetParameters(const char *parameters, const char *contentParameters);
 
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
@@ -100,26 +99,35 @@ public:
 	status_t ValidateCreateChild(off_t *start, off_t *size,
 	           const char *parameters) const;
 	status_t CreateChild(off_t start, off_t size, const char *parameters,
-	           **BPartition child = NULL);
+	           BPartition** child = NULL);
 	
-	bool CanDeleteChild(int32 index) const;
-	status_t DeleteChild(int32 index);
+	bool CanDeleteChild(uint32 index) const;
+	status_t DeleteChild(uint32 index);
 	
 protected:
-	BObjectList<BPartition>	fChildren;
-	int32					fUniqueID;
-	int32					fChangeCounter;
 	off_t					fOffset;
 	off_t					fSize;
-	int32					fBlockSize;
-	int32					fIndex;
+	uint32					fBlockSize;
+	uint32					fIndex;
+	uint32					fStatus;
 
 	bool					fIsMountable;
+	bool					fIsPartitionable;
+
 	bool					fIsDevice;
 	bool					fIsReadOnly;
+	bool					fIsMounted;
 	
 	char					fName[B_FILE_NAME_LENGTH];
 	char					fType[B_FILE_NAME_LENGTH];
+	char					fContentType[B_FILE_NAME_LENGTH];
+
+	uint32					fUniqueID;
+	uint32 					fFlags;
+
+	BObjectList<BPartition>	fChildren;
+
+	uint32					fChangeCounter;
 }
 
 #endif	// _PARTITION_H

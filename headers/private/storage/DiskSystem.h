@@ -28,7 +28,6 @@ public:
 	bool ValidateResizeChild(BPartition *partition, off_t *size) const;
 	bool ValidateMoveChild(BPartition *partition, off_t *start) const;
 	bool ValidateCreateChild(BPartition *partition, off_t *start, off_t *size, const char *parameters) const;
-	bool ValidateInitialize(BPartition *partition) const;
 
 	bool IsPartitioningSystem() const;
 	bool IsFileSystem() const;

@@ -118,8 +118,8 @@ public:
 									 BDiskDevice *device = NULL,
 									 BPartition **partition = NULL);
 									 
-	status_t GetDeviceWithID(int32 id, BDiskDevice *device) const;
-	status_t GetPartitionWithID(int32 id, BDiskDevice *device,
+	status_t GetDeviceWithID(uint32 id, BDiskDevice *device) const;
+	status_t GetPartitionWithID(uint32 id, BDiskDevice *device,
 								BPartition **partition) const;
 
 	status_t StartWatching(BMessenger target,
@@ -129,19 +129,19 @@ public:
 	status_t StopWatching(BMessenger target);
 
 private:
-	status_t _GetObjectWithID(const char *fieldName, int32 id,
+	status_t _GetObjectWithID(const char *fieldName, uint32 id,
 							  BDiskDevice *device) const;
 
 	// TODO: Introduce iterators instead of these functions.
 
-	static status_t _GetNextAddOn(BDirectory **directory, int32 *index,
+	static status_t _GetNextAddOn(BDirectory **directory, uint32 *index,
 								  const char *subdir,
 								  BPrivate::AddOnImage *image);
 	static status_t _GetNextAddOn(BDirectory *directory,
 								  BPrivate::AddOnImage *image);
-	static status_t _GetNextAddOnDir(BPath *path, int32 *index,
+	static status_t _GetNextAddOnDir(BPath *path, uint32 *index,
 									 const char *subdir);
-	static status_t _GetNextAddOnDir(BDirectory **directory, int32 *index,
+	static status_t _GetNextAddOnDir(BDirectory **directory, uint32 *index,
 									 const char *subdir);
 
 	static status_t _LoadPartitionAddOn(const char *partitioningSystem,
@@ -150,11 +150,11 @@ private:
 
 private:
 	BMessenger	fManager;
-	int32		fCookie;
+	uint32		fCookie;
 	BDirectory	*fPartitionAddOnDir;
 	BDirectory	*fFSAddOnDir;
-	int32		fPartitionAddOnDirIndex;
-	int32		fFSAddOnDirIndex;
+	uint32		fPartitionAddOnDirIndex;
+	uint32		fFSAddOnDirIndex;
 };
 
 #endif	// _DISK_DEVICE_ROSTER_H

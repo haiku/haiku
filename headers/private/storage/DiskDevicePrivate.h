@@ -26,7 +26,6 @@ public:
 						   PartitionFilter *filter);
 
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BSession *session);
 	virtual bool Visit(BPartition *partition);
 
 private:
@@ -37,14 +36,13 @@ private:
 // IDFinderVisitor
 class IDFinderVisitor : public BDiskDeviceVisitor {
 public:
-	IDFinderVisitor(int32 id);
+	IDFinderVisitor(uint32 id);
 
 	virtual bool Visit(BDiskDevice *device);
-	virtual bool Visit(BSession *session);
 	virtual bool Visit(BPartition *partition);
 
 private:
-	int32				fID;
+	uint32				fID;
 };
 
 status_t get_disk_device_messenger(BMessenger *messenger);

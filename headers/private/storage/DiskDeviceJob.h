@@ -6,6 +6,8 @@
 #ifndef _DISK_DEVICE_JOB_H
 #define _DISK_DEVICE_JOB_H
 
+#include <String.h>
+
 // disk device job types
 enum {
 	B_DISK_DEVICE_JOB_CREATE,
@@ -29,16 +31,19 @@ enum {
 
 class BDiskDeviceJob {
 public:
-	int32 ID() const;
+	uint32 ID() const;
 	uint32 Type() const;	
-	uint8 Progress() const;		// 0 to 100
+	float Progress() const;		// [0.0, 1.0]
 	uint32 Status() const;	
 	const char *Description() const;
 	
 	BPartition* Partition() const;
 private:
-	int32 fPartitionID;
-	int32 fJobID;
+	uint32 fJobID;
+	uint32 fType;
+	uint32 fPartitionID;
+	uint32 fStatus;
+	BString fDescription;
 };
 
 #endif	// _DISK_DEVICE_JOB_H
