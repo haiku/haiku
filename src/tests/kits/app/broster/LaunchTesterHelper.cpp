@@ -445,7 +445,7 @@ printf("arg[%ld] differ: `%s' vs `%s'\n", i, arg, argv[i - 1]);
 				  && message->FindString("argv", argc + 1, &arg) == B_OK
 				  && path == arg);
 if (!result)
-printf("app paths differ: `%s' vs `%s'\n", arg, path.Path());
+printf("document paths differ: `%s' vs `%s'\n", arg, path.Path());
 	}
 	return result;
 }
