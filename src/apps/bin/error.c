@@ -1,6 +1,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//  Copyright (c) 2001-2002, OpenBeOS
+//  Copyright (c) 2001-2003, OpenBeOS
 //
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
@@ -8,7 +8,7 @@
 //
 //  File:        error.c
 //  Author:      Daniel Reinhold (danielre@users.sf.net)
-//  Description: displays error message text for OS error codes
+//  Description: prints error message text for OS error codes
 //
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
@@ -26,8 +26,8 @@ int
 main(int argc, char *argv[])
 {
 	if (argc != 2)
-		printf("usage: error number\n"
-		       "Displays the message text for OS error codes. "
+		printf("Usage: error number\n"
+		       "Prints the message text for OS error codes. "
 		       "The error number can be in decimal, hex or octal.\n");
 	else
 		print_error(argv[1]);

@@ -1,6 +1,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//  Copyright (c) 2001-2002, OpenBeOS
+//  Copyright (c) 2001-2003, OpenBeOS
 //
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
@@ -80,7 +80,7 @@ int
 main(int argc, char *argv[])
 {
 	if (argc < 2)
-		printf("usage: printf format [arguments]\n");
+		printf("Usage: printf format [arguments]\n");
 	else
 		do_printf(argc, argv);
 	
@@ -108,8 +108,7 @@ do_printf(int argc, char *argv[])
 					++Format, putchar('%');
 				else
 					print_next_arg();
-			}
-			else {
+			} else {
 				e = escaped(c, &Format);
 				putchar(e);
 			}
@@ -194,7 +193,7 @@ get_next_specifier(char *spec_buffer, int buflen)
 		if (++len > buflen)
 			break;
 		
-		if (isalpha (c) || c == '%' || c == '\\') {
+		if (isalpha(c) || c == '%' || c == '\\') {
 			fc = c;
 			break;
 		}
@@ -272,13 +271,13 @@ print_escaped_string(char *fmt, char *s)
 		char c;
 		char e;
 	
-		while (lpad-- > 0) putchar (' ');	// pad on the left
+		while (lpad-- > 0) putchar(' ');	// pad on the left
 		while (len--  > 0) {
 			c = *s++;
 			e = escaped(c, &s);
 			putchar(e);
 		}
-		while (rpad-- > 0) putchar (' ');	// pad on the right
+		while (rpad-- > 0) putchar(' ');	// pad on the right
 	}
 	
 	if (halt)
@@ -383,7 +382,7 @@ escaped(char c, char **src)
 
 
 int
-get_decimal (char **src)
+get_decimal(char **src)
 {
 	// grabs a decimal integer value from the source string
 	// and returns the full computed value.
@@ -394,7 +393,7 @@ get_decimal (char **src)
 	char  c;
 	int   n = 0;
 	
-	while (isdigit (c = *s)) {
+	while (isdigit(c = *s)) {
 		++s;
 		n = n * 10 + (c - '0');
 	}
@@ -407,7 +406,7 @@ get_decimal (char **src)
 #define isodigit(c) (isdigit(c) && !(c == '8' || c == '9'))
 
 bool
-parse_octal (char **src, int min_digits, int max_digits, char *octval)
+parse_octal(char **src, int min_digits, int max_digits, char *octval)
 {
 	// searches for an octal value in the source string.
 	// returns true if valid octal digits were found
@@ -427,7 +426,7 @@ parse_octal (char **src, int min_digits, int max_digits, char *octval)
 	
 	for (i = 0; i < max_digits; ++i) {
 		c = *s;
-		if (isodigit (c)) {
+		if (isodigit(c)) {
 			++s;
 			n = n * 8 + (c - '0');
 		}
@@ -446,7 +445,7 @@ parse_octal (char **src, int min_digits, int max_digits, char *octval)
 
 
 bool
-parse_hex (char **src, int min_digits, int max_digits, char *hexval)
+parse_hex(char **src, int min_digits, int max_digits, char *hexval)
 {
 	// searches for a hex value in the source string.
 	// returns true if valid hex digits were found
@@ -466,7 +465,7 @@ parse_hex (char **src, int min_digits, int max_digits, char *hexval)
 	
 	for (i = 0; i < max_digits; ++i) {
 		c = tolower(*s);
-		if (isxdigit (c)) {
+		if (isxdigit(c)) {
 			++s;
 			n *= 16;
 			if (c > '9')

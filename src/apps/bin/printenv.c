@@ -1,6 +1,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//  Copyright (c) 2001-2002, OpenBeOS
+//  Copyright (c) 2001-2003, OpenBeOS
 //
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
@@ -29,7 +29,7 @@ main(int argc, char *argv[])
 	char *arg = (argc == 2 ? argv[1] : NULL);
 	
 	if ((argc > 2) || (arg && !strcmp(arg, "--help"))) {
-		printf("usage: printenv [VARIABLE]\n"
+		printf("Usage: printenv [VARIABLE]\n"
 		       "If no environment VARIABLE is specified, print them all.\n");
 		return 1;
 	}
@@ -45,26 +45,25 @@ print_env(char *arg)
 	
 	if (arg == NULL) {
 		// print all environment 'key=value' pairs (one per line)
-		while (*env)
+	    while (*env)
 			printf("%s\n", *env++);
 		
 		return 0;
-	}
-	else {
+	} else {
 		// print only the value of the specified variable
 		char *s;
 		int   len   = strlen(arg);
 		bool  found = false;
 		
-		while ((s = *env++) != NULL)
-			if (!strncmp(s, arg, len)) {
-				char *p = strchr(s, '=');
-				if (p) {
+	    while ((s = *env++) != NULL)
+	    	if (!strncmp(s, arg, len)) {
+	    		char *p = strchr(s, '=');
+	    		if (p) {
 					printf("%s\n", p+1);
 					found = true;
 				}
 			}
 		
-		return found ? 0 : 1;
+		return (found ? 0 : 1);
 	}
 }

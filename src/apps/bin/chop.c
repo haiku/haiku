@@ -1,6 +1,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 //
-//  Copyright (c) 2001-2002, OpenBeOS
+//  Copyright (c) 2001-2003, OpenBeOS
 //
 //  This software is part of the OpenBeOS distribution and is covered 
 //  by the OpenBeOS license.
@@ -47,10 +47,9 @@
 #include <sys/stat.h>
 
 
-void usage      (void);
-void do_chop    (char *);
-void chop_file  (int, char *, off_t);
-
+void chop_file (int, char *, off_t);
+void do_chop   (char *);
+void usage     (void);
 
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -63,73 +62,66 @@ static int KBytesPerChunk = 1400;  // determines size of output files
 
 
 void
-usage ()
-	{
-	puts ("usage: chop [-n kbyte_per_chunk] file");
-	puts ("Splits file into smaller files named file00, file01...");
-	puts ("Default split size is 1400k");
-	}
+usage()
+{
+	printf("Usage: chop [-n kbyte_per_chunk] file\n");
+	printf("Splits file into smaller files named file00, file01...\n");
+	printf("Default split size is 1400k\n");
+}
 
 
 
 int
-main (int argc, char *argv[])
-	{
+main(int argc, char *argv[])
+{
 	char *arg = NULL;
 	char *first;
 	
-	if ((argc < 2) || (argc > 4))
-		{
-		usage ();
+	if ((argc < 2) || (argc > 4)) {
+		usage();
 		return 0;
-		}
+	}
 	
 	first = *++argv;
 	
-	if (strcmp (first, "--help") == 0)
-		{
-		usage ();
+	if (strcmp(first, "--help") == 0) {
+		usage();
 		return 0;
-		}
+	}
 	
-	if (strcmp (first, "-n") == 0)
-		{
-		if (--argc > 1)
-			{
+	if (strcmp(first, "-n") == 0) {
+		if (--argc > 1) {
 			char *num = *++argv;
 			
-			if (!isdigit (*num))
-				printf ("-n option needs a numeric argument\n");
-			else
-				{
-				int b = atoi (num);
-				
-				if (b < 1)  b = 1;
-				KBytesPerChunk = b;
+			if (!isdigit(*num))
+				printf("-n option needs a numeric argument\n");
+			else {
+				int b = atoi(num);
+				KBytesPerChunk = (b < 1 ? 1 : b);
 				
 				if (--argc > 1)
 					arg = *++argv;
 				else
-					printf ("no file specified\n");
-				}
+					printf("no file specified\n");
 			}
-		else
-			printf ("-n option needs a numeric argument\n");
 		}
+		else
+			printf("-n option needs a numeric argument\n");
+	}
 	else
 		arg = first;
 	
 	if (arg)
-		do_chop (arg);
+		do_chop(arg);
 	
 	putchar ('\n');
 	return 0;
-	}
+}
 
 
 void
-do_chop (char *fname)
-	{
+do_chop(char *fname)
+{
 	// do some checks for validity
 	// then call chop_file() to do the actual read/writes
 	
@@ -138,55 +130,51 @@ do_chop (char *fname)
 	int    fd;
 	
 	// input file must exist
-	if (stat (fname, &e) == -1)
-		{
-		fprintf (stderr, "'%s': no such file or directory\n", fname);
+	if (stat(fname, &e) == -1) {
+		fprintf(stderr, "'%s': no such file or directory\n", fname);
 		return;
-		}
+	}
 
 	// and it must be not be a directory
-	if (S_ISDIR (e.st_mode))
-		{
-		fprintf (stderr, "'%s' is a directory\n", fname);
+	if (S_ISDIR(e.st_mode)) {
+		fprintf(stderr, "'%s' is a directory\n", fname);
 		return;
-		}
+	}
 	
 	// needs to be big enough such that splitting it actually does something
 	fsize = e.st_size;
-	if (fsize < (KBytesPerChunk * 1024))
-		{
-		fprintf (stderr, "'%s': file is already small enough\n", fname);
+	if (fsize < (KBytesPerChunk * 1024)) {
+		fprintf(stderr, "'%s': file is already small enough\n", fname);
 		return;
-		}
+	}
 
 	// also, don't chop up if chunk files are already present
 	{
-	char buf[256];
-	strcpy (buf, fname);
-	strcat (buf, "00");
-	
-	if (stat (buf, &e) >= 0)
-		{
-		fprintf (stderr, "'%s' already exists - aborting\n", buf);
-		return;
+		char buf[256];
+		
+		strcpy(buf, fname);
+		strcat(buf, "00");
+		
+		if (stat(buf, &e) >= 0) {
+			fprintf(stderr, "'%s' already exists - aborting\n", buf);
+			return;
 		}
 	}
 
 	// finally! chop up the file
-	fd = open (fname, O_RDONLY);
+	fd = open(fname, O_RDONLY);
 	if (fd < 0)
-		fprintf (stderr, "can't open '%s': %s\n", fname, strerror (errno));
-	else
-		{
-		chop_file (fd, fname, fsize);
-		close (fd);
-		}
+		fprintf(stderr, "can't open '%s': %s\n", fname, strerror(errno));
+	else {
+		chop_file(fd, fname, fsize);
+		close(fd);
 	}
+}
 
 
 void
-chop_file (int fdin, char *fname, off_t fsize)
-	{
+chop_file(int fdin, char *fname, off_t fsize)
+{
 	const off_t chunk_size = KBytesPerChunk * 1024;  // max bytes written to any output file
 	
 	bool open_next_file = true;  // when to open a new output file
@@ -204,57 +192,52 @@ chop_file (int fdin, char *fname, off_t fsize)
 	char *beg = Block;  // pointer to the beginning of the block data to be written out
 	char *end = Block;  // end of the current block (init to beginning to force first block read)
 	
-	printf ("Chopping up %s into %d kbyte chunks\n", fname, KBytesPerChunk);
+	printf("Chopping up %s into %d kbyte chunks\n", fname, KBytesPerChunk);
 	
-	while (total_written < fsize)
-		{
-		if (beg >= end)
-			{
+	while (total_written < fsize) {
+		if (beg >= end) {
 			// read in another block
-			got = read (fdin, Block, BLOCKSIZE);
+			got = read(fdin, Block, BLOCKSIZE);
 			if (got <= 0)
 				break;
 			
 			beg = Block;
 			end = Block + got - 1;
-			}
+		}
 		
-		if (open_next_file)
-			{
+		if (open_next_file) {
 			// start a new output file
-			sprintf (fnameN,  "%s%02d", fname, index++);
-			fdout = open (fnameN, O_WRONLY|O_CREAT);
-			if (fdout < 0)
-				{
-				fprintf (stderr, "unable to create chunk file '%s': %s\n", fnameN, strerror (errno));
+			sprintf(fnameN,  "%s%02d", fname, index++);
+			
+			fdout = open(fnameN, O_WRONLY|O_CREAT);
+			if (fdout < 0) {
+				fprintf(stderr, "unable to create chunk file '%s': %s\n", fnameN, strerror(errno));
 				return;
-				}
+			}
 			curr_written = 0;
 			open_next_file = false;
-			}
+		}
 		
 		needed = chunk_size - curr_written;
 		avail  = end - beg + 1;
 		if (needed > avail)
 			needed = avail;
 
-		if (needed > 0)
-			{
-			put = write (fdout, beg, needed);
+		if (needed > 0) {
+			put = write(fdout, beg, needed);
 			beg += put;
-			}
-		
-		curr_written  += put;
-		total_written += put;
-		
-		if (curr_written >= chunk_size)
-			{
-			// the current output file is full
-			close (fdout);
-			open_next_file = true;
-			}
+			
+			curr_written  += put;
+			total_written += put;
 		}
+		
+		if (curr_written >= chunk_size) {
+			// the current output file is full
+			close(fdout);
+			open_next_file = true;
+		}
+	}
 	
 	// close up the last output file
-	close (fdout);
-	}
+	close(fdout);
+}
