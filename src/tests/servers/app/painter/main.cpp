@@ -60,6 +60,16 @@ fprintf(stdout, "done\n");
 	}
 	float penSize = 3.0;
 	float scale = 1.0;
+	rgb_color lineColor1 = (rgb_color){ 20, 20, 20, 255 };
+//	rgb_color lineColor2 = (rgb_color){ 20, 20, 20, 255 };
+	rgb_color textColor1 = (rgb_color){ 200, 200, 200, 255 };
+//	rgb_color textColor2 = (rgb_color){ 200, 200, 200, 255 };
+	rgb_color rectColorH = (rgb_color){ 255, 0, 0, 255 };
+	rgb_color rectColorL = (rgb_color){ 0, 0, 255, 255 };
+	rgb_color arcColor = (rgb_color){ 255, 0, 0, 255 };
+	rgb_color ellipseColorH = (rgb_color){ 255, 255, 0, 255 };
+	rgb_color ellipseColorL = (rgb_color){ 128, 0, 50, 255 };
+	rgb_color roundRectColor = (rgb_color){ 0, 0, 255, 255 };
 // TODO: Painter behaves differently when origin has subpixel offset
 //	BPoint origin(20.3, 10.8);
 	BPoint origin(20, 10);
@@ -79,7 +89,7 @@ fprintf(stdout, "done\n");
 	font.SetRotation(8.0);
 //	font.SetFamilyAndStyle(1);
 
-	BBitmap* testBitmap = new BBitmap(BRect(20, 5, 72, 46), 0, B_RGB32);
+	BBitmap* testBitmap = new BBitmap(BRect(20, 0, 150, 50), 0, B_RGB32);
 	// fill testBitmap with content
 	uint8* bits = (uint8*)testBitmap->Bits();
 	uint32 bitmapWidth = testBitmap->Bounds().IntegerWidth() + 1;
@@ -104,14 +114,16 @@ fprintf(stdout, "done\n");
 	*(uint32*)(&bits[(bitmapHeight - 1) * bpr + (bitmapWidth - 1) * 4]) = 0;
 
 	BRect testBitmapCrop(testBitmap->Bounds());
-//	testBitmapCrop.left += 20.0;
+	testBitmapCrop.left += 20.0;
 	BRect testBitmapDestRect = testBitmapCrop;
-	testBitmapDestRect.OffsetBy(200, 20);
-	testBitmapDestRect.right = testBitmapDestRect.left + testBitmapDestRect.Width() * 2;
-	testBitmapDestRect.bottom = testBitmapDestRect.top + testBitmapDestRect.Height() * 2;
+	testBitmapDestRect.OffsetBy(50, 20);
+//	testBitmapDestRect.OffsetTo(0, 0);
+//	testBitmapDestRect.right = testBitmapDestRect.left + testBitmapDestRect.Width() * 2;
+//	testBitmapDestRect.bottom = testBitmapDestRect.top + testBitmapDestRect.Height() * 2;
 
 	// frame buffer
 	BBitmap* bitmap = new BBitmap(bounds, B_RGB32);
+//memset(bitmap->Bits(), 0, bitmap->BitsLength());
 	BitmapBuffer* buffer = new BitmapBuffer(bitmap);
 	Painter painter;
 	painter.AttachToBuffer(buffer);
@@ -126,15 +138,15 @@ fprintf(stdout, "done\n");
 
 bigtime_t painterNow = system_time();
 
-	painter.SetDrawingMode(B_OP_OVER);
-	painter.SetHighColor(210, 210, 210);
+	painter.SetDrawingMode(B_OP_SUBTRACT);
+	painter.SetHighColor(lineColor1);
 	for (uint32 y = 0; y <= height / 2; y += 10) 
 		painter.StrokeLine(BPoint(0, 0), BPoint(width / 2, y));
 	for (uint32 x = 0; x <= width; x += 10)
 		painter.StrokeLine(BPoint(0, 0), BPoint(x, height));
 	painter.SetPenSize(penSize * 5);
-	painter.SetHighColor(255, 0, 0, 255);
-	painter.SetLowColor(128, 0, 255, 255);
+	painter.SetHighColor(rectColorH);
+	painter.SetLowColor(rectColorL);
 //	painter.SetScale(1.0);
 //	painter.SetOrigin(B_ORIGIN);
 //	painter.SetDrawingMode(B_OP_INVERT);
@@ -149,11 +161,11 @@ bigtime_t painterNow = system_time();
 	painter.StrokeLine(BPoint(230.0, 50.0));
 	painter.StrokeLine(BPoint(230.0, 30.0));*/
 
-	painter.SetHighColor(255, 255, 0, 255);
-	painter.SetLowColor(128, 0, 50, 255);
+	painter.SetHighColor(ellipseColorH);
+	painter.SetLowColor(ellipseColorL);
 	painter.SetDrawingMode(B_OP_OVER);
 	painter.StrokeEllipse(center, xRadius, yRadius, kDottedBigger);
-	painter.SetHighColor(255, 0, 0, 255);
+	painter.SetHighColor(arcColor);
 	painter.SetDrawingMode(B_OP_INVERT);
 	painter.FillArc(center, xRadius * 2, yRadius * 2, angle, span);
 //	painter.StrokeArc(center, xRadius * 2, yRadius * 2, angle, span);
@@ -163,13 +175,13 @@ bigtime_t painterNow = system_time();
 //	painter.FillEllipse(center, xRadius * 3, yRadius * 2);
 //	painter.StrokeLine(bounds.RightTop());
 //	painter.FillRect(rect);
-	painter.SetHighColor(0, 0, 255, 255);
+	painter.SetHighColor(roundRectColor);
 	painter.SetPenSize(1.0);
 	painter.StrokeRoundRect(rect2, 40, 40);
 //	painter.FillRoundRect(rect2, 40, 40);
 
 	painter.SetFont(font);
-	painter.SetHighColor(0, 20, 80, 255);
+	painter.SetHighColor(textColor1);
 	painter.SetDrawingMode(B_OP_OVER);
 	painter.DrawString(string, stringLocation);
 	painter.DrawString(string2);
@@ -193,8 +205,8 @@ bigtime_t painterNow = system_time();
 //	painter.DrawString("Hello Nurse!", stringLocation2);
 
 	// bitmap drawing
-//	painter.SetScale(0.5);
-	painter.SetDrawingMode(B_OP_ADD);
+	painter.SetScale(1.5);
+	painter.SetDrawingMode(B_OP_BLEND);
 	painter.DrawBitmap(testBitmap, testBitmapCrop, testBitmapDestRect);
 
 
@@ -205,6 +217,7 @@ printf("Painter: %lld µsecs\n", painterNow);
 
 	bitmap = new BBitmap(bounds, B_RGB32, true);
 	BView* view = new BView(bounds, NULL, B_FOLLOW_NONE, B_WILL_DRAW);
+//memset(bitmap->Bits(), 0, bitmap->BitsLength());
 	bitmap->Lock();
 	bitmap->AddChild(view);
 
@@ -215,15 +228,15 @@ printf("Painter: %lld µsecs\n", painterNow);
 
 bigtime_t viewNow = system_time();
 
-	view->SetDrawingMode(B_OP_OVER);
-	view->SetHighColor(210, 210, 210);
+	view->SetDrawingMode(B_OP_SUBTRACT);
+	view->SetHighColor(lineColor1);
 	for (uint32 y = 0; y <= height / 2; y += 10) 
 		view->StrokeLine(BPoint(0, 0), BPoint(width / 2, y));
 	for (uint32 x = 0; x <= width; x += 10)
 		view->StrokeLine(BPoint(0, 0), BPoint(x, height));
 	view->SetPenSize(penSize * 5);
-	view->SetHighColor(255, 0, 0, 255);
-	view->SetLowColor(128, 0, 255, 255);
+	view->SetHighColor(rectColorH);
+	view->SetLowColor(rectColorL);
 //	view->SetScale(1.0);
 //	view->SetOrigin(B_ORIGIN);
 //	view->SetDrawingMode(B_OP_INVERT);
@@ -238,12 +251,12 @@ bigtime_t viewNow = system_time();
 	view->StrokeLine(BPoint(230.0, 50.0));
 	view->StrokeLine(BPoint(230.0, 30.0));*/
 
-	view->SetHighColor(255, 255, 0, 255);
-	view->SetLowColor(128, 0, 50, 255);
+	view->SetHighColor(ellipseColorH);
+	view->SetLowColor(ellipseColorL);
 	view->SetDrawingMode(B_OP_OVER);
 	view->StrokeEllipse(center, xRadius, yRadius, kDottedBigger);
 	view->SetDrawingMode(B_OP_INVERT);
-	view->SetHighColor(255, 0, 0, 255);
+	view->SetHighColor(arcColor);
 	view->FillArc(center, xRadius * 2, yRadius * 2, angle, span);
 //	view->StrokeArc(center, xRadius * 2, yRadius * 2, angle, span);
 	view->SetDrawingMode(B_OP_OVER);
@@ -252,14 +265,14 @@ bigtime_t viewNow = system_time();
 //	view->FillEllipse(center, xRadius * 3, yRadius * 2);
 //	view->StrokeLine(bounds.RightTop());
 //	view->FillRect(rect);
-	view->SetHighColor(0, 0, 255, 255);
+	view->SetHighColor(roundRectColor);
 	view->SetPenSize(1.0);
 	view->StrokeRoundRect(rect2, 40, 40);
 //	view->FillRoundRect(rect2, 40, 40);
 
 	// text drawing
 	view->SetFont(&font);
-	view->SetHighColor(0, 20, 80, 255);
+	view->SetHighColor(textColor1);
 	view->SetDrawingMode(B_OP_OVER);
 	view->DrawString(string, stringLocation);
 	view->DrawString(string2);
@@ -283,9 +296,9 @@ bigtime_t viewNow = system_time();
 //	view->DrawString("Hello Nurse!", stringLocation2);
 
 	// bitmap drawing
-//	view->SetScale(0.5);
+	view->SetScale(1.5);
 	view->SetLowColor(0, 0, 0, 0);
-	view->SetDrawingMode(B_OP_ADD);
+	view->SetDrawingMode(B_OP_BLEND);
 	view->DrawBitmap(testBitmap, testBitmapCrop, testBitmapDestRect);
 
 	view->Sync();
