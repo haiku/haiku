@@ -1349,6 +1349,108 @@ err:
 }
 
 
+static status_t
+vm_set_area_protection(aspace_id aspaceID, area_id areaID, uint32 newProtection)
+{
+	vm_cache_ref *cacheRef;
+	vm_cache *cache;
+	vm_area *area;
+	status_t status = B_OK;
+
+	TRACE(("vm_set_area_protection(aspace = %#lx, area = %#lx, protection = %#lx)\n",
+		aspaceID, areaID, newProtection));
+
+	if ((newProtection & (B_EXECUTE_AREA | B_KERNEL_EXECUTE_AREA)) != 0
+		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
+		// executable areas must not be writable
+		return B_NOT_ALLOWED;
+	}
+
+	area = vm_get_area(areaID);
+	if (area == NULL)
+		return B_BAD_VALUE;
+
+	if (aspaceID != vm_get_kernel_aspace_id() && area->aspace->id != aspaceID) {
+		// unless you're the kernel, you are only allowed to set
+		// the protection of your own areas
+		vm_put_area(area);
+		return B_NOT_ALLOWED;
+	}
+
+	cacheRef = area->cache_ref;
+	cache = cacheRef->cache;
+
+	mutex_lock(&cacheRef->lock);
+
+	if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0
+		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0) {
+		// change from read/write to read-only
+
+		if (cache->source != NULL && cache->temporary) {
+			uint32 writableAreas = 0;
+			struct vm_area *cacheArea = cacheRef->areas;
+			for (; cacheArea != NULL; cacheArea = cacheArea->cache_next) {
+				if (cacheArea != area
+					&& (cacheArea->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0)
+					writableAreas++;
+			}
+
+			if (writableAreas == 0) {
+				// Since this cache now lives from the pages in its source cache,
+				// we can change the cache's commitment to take only those pages
+				// into account that really are in this cache.
+	
+				// count existing pages in this cache
+				struct vm_page *page = cache->page_list;
+				uint32 count = 0;
+	
+				for (; page != NULL; page = page->cache_next) {
+					count++;
+				}
+	
+				status = cache->store->ops->commit(cache->store, count * B_PAGE_SIZE);
+	
+				// ToDo: we may be able to join with our source cache, if any
+			}
+		}
+	} else if ((area->protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) == 0
+		&& (newProtection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA)) != 0) {
+		// change from read-only to read/write
+
+		// ToDo: if this is a shared cache, insert new cache
+		// ToDo: eventually change commitment
+		status = B_ERROR;
+	} else {
+		// we don't have anything special to do in all other cases
+	}
+
+	if (status == B_OK && area->protection != newProtection) {
+		// remap existing pages in this cache
+		struct vm_translation_map *map = &area->aspace->translation_map;
+		struct vm_page *page = cache->page_list;
+
+		map->ops->lock(map);
+
+		for (; page != NULL; page = page->cache_next) {
+			// only map those pages inside the area
+			if (page->offset >= area->cache_offset
+				&& page->offset < area->cache_offset + area->size) {
+				map->ops->map(map, area->base + page->offset - area->cache_offset,
+					page->ppn * B_PAGE_SIZE, newProtection);
+			}
+		}
+
+		map->ops->unlock(map);
+		area->protection = newProtection;
+	}
+
+	mutex_unlock(&cacheRef->lock);
+	vm_put_area(area);
+
+	return status;
+}
+
+
 status_t
 vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 {
@@ -2679,8 +2781,7 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 status_t
 set_area_protection(area_id area, uint32 newProtection)
 {
-	// ToDo: implement set_area_protection()
-	return B_ERROR;
+	return vm_set_area_protection(vm_get_kernel_aspace_id(), area, newProtection);
 }
 
 
@@ -2891,7 +2992,7 @@ _user_set_area_protection(area_id area, uint32 newProtection)
 	if ((newProtection & ~B_USER_PROTECTION) != 0)
 		return B_BAD_VALUE;
 
-	return set_area_protection(area, newProtection);
+	return vm_set_area_protection(vm_get_current_user_aspace_id(), area, newProtection);
 }
 
 
