@@ -56,6 +56,7 @@ enum {
 	B_REG_GET_APP_INFO						= 'rgai',
 	B_REG_GET_APP_LIST						= 'rgal',
 	B_REG_ACTIVATE_APP						= 'rgac',
+	B_REG_BROADCAST							= 'rgbc',
 	// MIME requests
 	B_REG_MIME_SET_PARAM					= 'rgsp',
 	B_REG_MIME_DELETE_PARAM					= 'rgdp',
