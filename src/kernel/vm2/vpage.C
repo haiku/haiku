@@ -174,11 +174,10 @@ void vpage::unlock(long flags) {
 }
 
 char vpage::getByte(unsigned long address,areaManager *manager) {
-//	error ("vpage::getByte: address = %ld\n",address );
 	if (!physPage)
 		if (!manager->fault((void *)(address),false))
 			throw ("vpage::getByte");
-//	error ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
+	error ("vpage::getByte: About to return %c from %x\n", *((char *)(address-start_address+physPage->getAddress())),(address-start_address+physPage->getAddress()));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
 
