@@ -783,10 +783,10 @@ em_intr(void *arg)
                 loop_cnt--;
         }
 
-	if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL) {
-		atomic_or(&adapter->event_flags, EVENT_RESTART_TX);
-		release_event_sem = true;
-	}
+//	if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL) {
+//		atomic_or(&adapter->event_flags, EVENT_RESTART_TX);
+//		release_event_sem = true;
+//	}
 	
 	if (release_event_sem)
 		release_sem_etc(adapter->event_sem, 1, B_DO_NOT_RESCHEDULE);
@@ -816,13 +816,6 @@ event_handler(void *cookie)
 			adapter->timer_handle =	timeout(em_local_timer, adapter, 2*hz);
 		}
 
-		if (events & EVENT_RESTART_TX) {
-			TRACE("EVENT_RESTART_TX\n");
-			PRINT("EVENT_RESTART_TX not implemented!\n");
-// XXX not multithread save?
-//        	if (ifp->if_flags & IFF_RUNNING && ifp->if_snd.ifq_head != NULL)
-//                em_start(ifp);
-		}
 	}
 }
 

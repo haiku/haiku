@@ -250,7 +250,6 @@ typedef struct _DESCRIPTOR_PAIR
 // used by interrupt and event handling thread
 enum {
 	EVENT_LINK_CHANGED 		= 0x01,
-	EVENT_RESTART_TX		= 0x02,
 };
 
 /* Our adapter structure */
