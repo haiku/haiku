@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src kits ;
 
+# define USER for KMessage.cpp
+SubDirCcFlags [ FDefines USER=1 ] ;
+SubDirC++Flags [ FDefines USER=1 ] ;
+
 # If defined allows to run applications without the registrar
 # -- for development only, of course.
 if $(RUN_WITHOUT_REGISTRAR) {
@@ -29,6 +33,7 @@ for subdir in $(subdirs) {
 UsePrivateHeaders shared app [ FDirName servers app ] ;
 UsePrivateHeaders kernel ;	# for syscalls.h
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel util ] ;	# KMessage.h
 UsePrivateHeaders input ;
 
 # Add subsubdirs to the SEARCH_SOURCE.
@@ -41,6 +46,8 @@ LIBBE_SOURCE =
 	$(INTERFACE_KIT_SOURCE)
 	$(SUPPORT_KIT_SOURCE)
 	$(STORAGE_KIT_SOURCE)
+
+	KMessage.cpp
 ;
 
 LIBBE_SOURCE_HAIKU_ONLY =
@@ -90,6 +97,9 @@ Includes <boot!home!config!lib>libopenbeos.so
 SEARCH on [ FGristFiles
 		strlcat.c strlcpy.c
 	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
+
+SEARCH on [ FGristFiles KMessage.cpp ]
+	= [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
