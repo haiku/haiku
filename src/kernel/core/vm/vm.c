@@ -460,39 +460,10 @@ err:
 	return err;
 }
 
-region_id user_vm_create_anonymous_region(char *uname, void **uaddress, int addr_type,
-                                          addr size, int wiring, int lock)
-{
-	char name[SYS_MAX_OS_NAME_LEN];
-	void *address;
-	int rc, rc2;
 
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if(rc < 0)
-		return rc;
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	rc = user_memcpy(&address, uaddress, sizeof(address));
-	if(rc < 0)
-		return rc;
-
-	rc = vm_create_anonymous_region(vm_get_current_user_aspace_id(), name, &address, addr_type, size, wiring, lock);
-	if(rc < 0)
-		return rc;
-
-	rc2 = user_memcpy(uaddress, &address, sizeof(address));
-	if(rc2 < 0)
-		return rc2;
-
-	return rc;
-}
-
-region_id vm_create_anonymous_region(aspace_id aid, char *name, void **address, 
-                                     int addr_type, addr size, int wiring, 
-                                     int lock)
+region_id
+vm_create_anonymous_region(aspace_id aid, const char *name, void **address, 
+	int addr_type, addr size, int wiring, int lock)
 {
 	int err;
 	vm_region *region;
@@ -515,10 +486,6 @@ region_id vm_create_anonymous_region(aspace_id aid, char *name, void **address,
 		default:
 			return B_BAD_VALUE;
 	}
-
-	aspace = vm_get_aspace_by_id(aid);
-	if(aspace == NULL)
-		return ERR_VM_INVALID_ASPACE;
 
 	aspace = vm_get_aspace_by_id(aid);
 	if(aspace == NULL)
@@ -2147,9 +2114,9 @@ static int vm_soft_fault(addr address, bool is_write, bool is_user)
 
 	TRACE;
 
-	if(err == 0) {
+	if (err == 0) {
 		int new_lock = region->lock;
-		if(page->cache_ref != top_cache_ref && !is_write)
+		if (page->cache_ref != top_cache_ref && !is_write)
 			new_lock &= ~LOCK_RW;
 
 		atomic_add(&page->ref_count, 1);
@@ -2253,5 +2220,173 @@ user_strlcpy(char *to, const char *from, size_t size)
 int user_memset(void *s, char c, size_t count)
 {
 	return arch_cpu_user_memset(s, c, count, &thread_get_current_thread()->fault_handler);
+}
+
+
+//	#pragma mark -
+
+
+area_id
+create_area_etc(struct team *team, char *name, void **address, uint32 addressSpec,
+	uint32 size, uint32 lock, uint32 protection)
+{
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_ADDRESS:
+			addressSpec = REGION_ADDR_ANY_ADDRESS;
+			break;
+		case B_EXACT_KERNEL_ADDRESS:
+		case B_EXACT_ADDRESS:
+			addressSpec = REGION_ADDR_EXACT_ADDRESS;
+			break;
+		case B_BASE_ADDRESS:
+			dprintf("create_area: B_BASE_ADDRESS demanded (switch to B_ANY_ADDRESS)!\n");
+			addressSpec = REGION_ADDR_ANY_ADDRESS;
+			break;
+		default:
+			dprintf("create_area: invalid address spec!\n");
+			return B_BAD_VALUE;
+	}
+
+	// create_area() "protection" is vm_create_anonymous_region() "lock"
+	protection = PROTECTION_TO_LOCK(protection);
+
+	// create_area() "lock" is vm_create_anonymous_region() "wiring"
+	switch (lock) {
+		case B_ALREADY_WIRED:
+			lock = REGION_WIRING_WIRED_ALREADY;
+			break;
+		case B_LOMEM:
+			dprintf("create_area: asked for B_LOMEM - unsupported (switch to B_FULL_LOCK)!\n");
+		case B_FULL_LOCK:
+		case B_LAZY_LOCK:	// ToDo: lazy lock is not supported by the VM yet
+			lock = REGION_WIRING_WIRED;
+			break;
+		case B_CONTIGUOUS:
+			lock = REGION_WIRING_WIRED_CONTIG;
+			break;
+		case B_NO_LOCK:
+			lock = REGION_WIRING_WIRED_CONTIG;
+			break;
+		default:
+			dprintf("create_area: invalid locking mode!\n");
+			return B_BAD_VALUE;
+	}
+
+	return vm_create_anonymous_region(team->_aspace_id, (char *)name, address, 
+				addressSpec, size, lock, protection);
+}
+
+
+area_id
+create_area(const char *name, void **address, uint32 addressSpec, size_t size, uint32 lock,
+	uint32 protection)
+{
+	aspace_id areaSpace;
+
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_EXACT_KERNEL_ADDRESS:
+			areaSpace = vm_get_kernel_aspace_id();
+			break;
+		default:
+			areaSpace = vm_get_current_user_aspace_id();
+			break;
+	}
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_ADDRESS:
+			addressSpec = REGION_ADDR_ANY_ADDRESS;
+			break;
+		case B_EXACT_KERNEL_ADDRESS:
+		case B_EXACT_ADDRESS:
+			addressSpec = REGION_ADDR_EXACT_ADDRESS;
+			break;
+		case B_BASE_ADDRESS:
+			dprintf("create_area: B_BASE_ADDRESS demanded (switch to B_ANY_ADDRESS)!\n");
+			addressSpec = REGION_ADDR_ANY_ADDRESS;
+			break;
+		default:
+			dprintf("create_area: invalid address spec!\n");
+			return B_BAD_VALUE;
+	}
+
+	// create_area() "protection" is vm_create_anonymous_region() "lock"
+	protection = PROTECTION_TO_LOCK(protection);
+
+	// create_area() "lock" is vm_create_anonymous_region() "wiring"
+	switch (lock) {
+		case B_ALREADY_WIRED:
+			lock = REGION_WIRING_WIRED_ALREADY;
+			break;
+		case B_LOMEM:
+			dprintf("create_area: asked for B_LOMEM - unsupported (switch to B_FULL_LOCK)!\n");
+		case B_FULL_LOCK:
+		case B_LAZY_LOCK:	// ToDo: lazy lock is not supported by the VM yet
+			lock = REGION_WIRING_WIRED;
+			break;
+		case B_CONTIGUOUS:
+			lock = REGION_WIRING_WIRED_CONTIG;
+			break;
+		case B_NO_LOCK:
+			lock = REGION_WIRING_WIRED_CONTIG;
+			break;
+		default:
+			dprintf("create_area: invalid locking mode!\n");
+			return B_BAD_VALUE;
+	}
+
+	return vm_create_anonymous_region(areaSpace, (char *)name, address, 
+				addressSpec, size, lock, protection);
+}
+
+
+status_t
+delete_area(area_id area)
+{
+	// ToDo: works only correctly for kernel areas!
+	return vm_delete_region(vm_get_kernel_aspace_id(), area);
+}
+
+
+area_id
+_user_create_area(const char *userName, void **userAddress, uint32 addressSpec, size_t size, uint32 lock,
+	uint32 protection)
+{
+	char name[B_OS_NAME_LENGTH];
+	area_id area;
+	void *address;
+
+	// filter out some unavailable values (for userland)
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_EXACT_KERNEL_ADDRESS:
+			return B_BAD_VALUE;
+	}
+	if (protection & B_KERNEL_PROTECTION)
+		return B_BAD_VALUE;
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| !CHECK_USER_ADDRESS(userAddress)
+		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	area = create_area(name, &address, addressSpec, size, lock, protection);
+
+	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
+		// ToDo: shouldn't I delete the area here?
+		return B_BAD_ADDRESS;
+	}
+
+	return area;
+}
+
+
+status_t
+_user_delete_area(area_id area)
+{
+	// ToDo: works only correctly if the area belongs to the caller!
+	return vm_delete_region(vm_get_current_user_aspace_id(), area);
 }
 
