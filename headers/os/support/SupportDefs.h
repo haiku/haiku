@@ -27,6 +27,14 @@
 #ifndef _SUPPORT_DEFS_H
 #define _SUPPORT_DEFS_H
 
+/* this !must! be located before the include of sys/types.h */
+#ifndef _SYS_TYPES_H
+typedef unsigned long			ulong;
+typedef unsigned int			uint;
+typedef unsigned short			ushort;
+#endif  // _SYS_TYPES_H
+
+
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
@@ -41,13 +49,6 @@
 // Local Defines ---------------------------------------------------------------
 
 // Globals ---------------------------------------------------------------------
-
-#ifndef _SYS_TYPES_H
-typedef unsigned long			ulong;
-typedef unsigned int			uint;
-typedef unsigned short			ushort;
-#endif  // _SYS_TYPES_H
-
 
 // Shorthand type formats ------------------------------------------------------
 
