@@ -128,11 +128,17 @@ void TBApplicationTester::BApplication4()
 	const char *output1 =
 		"Signature in rsrc doesn't match constructor arg. "
 		"(application/x-vnd.obos-bapplication-testapp4,"
+#ifndef TEST_R5
+		" "
+#endif
 		"application/x-vnd.obos-bapplication-testapp4-or-not)\n"
 		"InitCheck(): 0\n";
 	const char *output2 =
 		"Signature in rsrc doesn't match constructor arg. "
 		"(application/x-vnd.obos-bapplication-testapp4,"
+#ifndef TEST_R5
+		" "
+#endif
 		"application/x-vnd.obos-bapplication-testapp4-or-not)\n"
 		"error: 0\n"
 		"InitCheck(): 0\n";
