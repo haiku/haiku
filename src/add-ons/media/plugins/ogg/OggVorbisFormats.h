@@ -21,6 +21,14 @@ vorbis_description()
 }
 
 
+static void
+init_vorbis_media_raw_audio_format(media_raw_audio_format * output)
+{
+	output->format = media_raw_audio_format::B_AUDIO_FLOAT;
+	output->byte_order = B_MEDIA_HOST_ENDIAN;
+}
+
+
 static media_format
 vorbis_encoded_media_format()
 {
@@ -29,8 +37,7 @@ vorbis_encoded_media_format()
 	format.user_data_type = B_CODEC_TYPE_INFO;
 	strncpy((char*)format.user_data, "vorb", 4);
 	format.u.encoded_audio.frame_size = sizeof(ogg_packet);
-	format.u.encoded_audio.output.byte_order = B_MEDIA_HOST_ENDIAN;
-	format.u.encoded_audio.output.format = media_raw_audio_format::B_AUDIO_FLOAT;
+	init_vorbis_media_raw_audio_format(&format.u.encoded_audio.output);
 	return format;
 }
 
