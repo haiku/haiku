@@ -11,6 +11,9 @@
 
 #include "acc_std.h"
 
+static void add_panel1_mode(display_mode p2, display_mode** dst);
+static void add_panel2_mode(display_mode p2, display_mode** dst);
+
 #define	T_POSITIVE_SYNC	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 /* mode flags will be setup as status info by PROPOSEMODE! */
 #define MODE_FLAGS 0
@@ -416,7 +419,8 @@ status_t GET_MODE_LIST(display_mode *dm)
 }
 
 /* Create a list of display_modes to pass back to the caller.*/
-status_t create_mode_list(void) {
+status_t create_mode_list(void)
+{
 	size_t max_size;
 	uint32
 		i, j,
@@ -447,7 +451,32 @@ status_t create_mode_list(void) {
 	src = mode_list;
 	dst = my_mode_list;
 	si->mode_count = 0;
-	for (i = 0; i < MODE_COUNT; i++) {
+	for (i = 0; i < MODE_COUNT; i++)
+	{
+		/* add flatpanel 1 native mode if it's found and when it's time */
+		if (pan1 && !pan1_added)
+		{
+			/* place panel mode before same H-res mode from src list in dst list so
+			 * widescreen panels are listed in order of total resolution (HxV) */
+			if (src->timing.h_display >= p1.timing.h_display)
+			{
+				add_panel1_mode(p1, &dst);
+				pan1_added = true;
+			}
+		}
+
+		/* add flatpanel 2 native mode if it's found and when it's time */
+		if (pan2 && !pan2_added)
+		{
+			/* place panel mode before same H-res mode from src list in dst list so
+			 * widescreen panels are listed in order of total resolution (HxV) */
+			if (src->timing.h_display >= p2.timing.h_display)
+			{
+				add_panel2_mode(p2, &dst);
+				pan2_added = true;
+			}
+		}
+
 		/* set ranges for acceptable values */
 		low = high = *src;
 		/* range is 6.25% of default clock: arbitrarily picked */ 
@@ -482,68 +511,83 @@ status_t create_mode_list(void) {
 		/* advance to next mode */
 		src++;
 
-		/* add flatpanel 1 native mode if it's found and when it's time */
-		if (pan1 && !pan1_added && (i < (MODE_COUNT - 1)))
+		/* (sort and) add flatpanel native mode(s) that are not added while we did
+		 * reach the end of the src list */
+		if (i == (MODE_COUNT - 1))
 		{
-			if (src->timing.h_display > p1.timing.h_display)
+			if (pan1 && pan2 && !pan1_added && !pan2_added)
 			{
-				/* set ranges for acceptable values */
-				low = high = p1;
-				/* range is 6.25% of default clock: arbitrarily picked */ 
-				pix_clk_range = low.timing.pixel_clock >> 5;
-				low.timing.pixel_clock -= pix_clk_range;
-				high.timing.pixel_clock += pix_clk_range;
-				/* do it once for each depth we want to support */
-				for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
+				/* sort in total resolution order */
+				if ((p2.timing.h_display * p2.timing.v_display) <
+					(p1.timing.h_display * p1.timing.v_display))
 				{
-					/* set target values */
-					*dst = p1;
-					/* poke the specific space */
-					dst->space = low.space = high.space = spaces[j];
-					/* ask for a compatible mode */
-					if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK)
-					{
-						/* count it, and move on to next mode */
-						dst++;
-						si->mode_count++;
-					}
+					display_mode temp = p1;
+					p1 = p2;
+					p2 = temp;
 				}
-				/* panel1 modeline has been added */
-				pan1_added = true;
 			}
-		}
-
-		/* add flatpanel 2 native mode if it's found and when it's time */
-		if (pan2 && !pan2_added && (i < (MODE_COUNT - 1)))
-		{
-			if (src->timing.h_display > p2.timing.h_display)
-			{
-				/* set ranges for acceptable values */
-				low = high = p2;
-				/* range is 6.25% of default clock: arbitrarily picked */ 
-				pix_clk_range = low.timing.pixel_clock >> 5;
-				low.timing.pixel_clock -= pix_clk_range;
-				high.timing.pixel_clock += pix_clk_range;
-				/* do it once for each depth we want to support */
-				for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
-				{
-					/* set target values */
-					*dst = p2;
-					/* poke the specific space */
-					dst->space = low.space = high.space = spaces[j];
-					/* ask for a compatible mode */
-					if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK)
-					{
-						/* count it, and move on to next mode */
-						dst++;
-						si->mode_count++;
-					}
-				}
-				/* panel2 modeline has been added */
-				pan2_added = true;
-			}
+			if (pan1 && !pan1_added) add_panel1_mode(p1, &dst);
+			if (pan2 && !pan2_added) add_panel2_mode(p2, &dst);
 		}
 	}
 
 	return B_OK;
+}
+
+static void add_panel1_mode(display_mode p1, display_mode** dst)
+{
+	uint32 j, pix_clk_range;
+	display_mode low, high;
+	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
+
+	/* set ranges for acceptable values */
+	low = high = p1;
+	/* range is 6.25% of default clock: arbitrarily picked */ 
+	pix_clk_range = low.timing.pixel_clock >> 5;
+	low.timing.pixel_clock -= pix_clk_range;
+	high.timing.pixel_clock += pix_clk_range;
+	/* do it once for each depth we want to support */
+	for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
+	{
+		/* set target values */
+		**dst = p1;
+		/* poke the specific space */
+		(*dst)->space = low.space = high.space = spaces[j];
+		/* ask for a compatible mode */
+		if (PROPOSE_DISPLAY_MODE(*dst, &low, &high) == B_OK)
+		{
+			/* count it, and move on to next mode */
+			(*dst)++;
+			si->mode_count++;
+		}
+	}
+}
+
+static void add_panel2_mode(display_mode p2, display_mode** dst)
+{
+	uint32 j, pix_clk_range;
+	display_mode low, high;
+	color_space spaces[4] = {B_RGB32_LITTLE,B_RGB16_LITTLE,B_RGB15_LITTLE,B_CMAP8};
+
+	/* set ranges for acceptable values */
+	low = high = p2;
+	/* range is 6.25% of default clock: arbitrarily picked */ 
+	pix_clk_range = low.timing.pixel_clock >> 5;
+	low.timing.pixel_clock -= pix_clk_range;
+	high.timing.pixel_clock += pix_clk_range;
+	/* do it once for each depth we want to support */
+	for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) 
+	{
+		/* set target values */
+		**dst = p2;
+		/* poke the specific space */
+		(*dst)->space = low.space = high.space = spaces[j];
+		/* ask for a compatible mode */
+		if (PROPOSE_DISPLAY_MODE(*dst, &low, &high) == B_OK)
+		{
+			/* count it, and move on to next mode */
+			(*dst)++;
+			si->mode_count++;
+		}
+	}
 }
