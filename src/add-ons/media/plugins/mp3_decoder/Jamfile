@@ -7,7 +7,7 @@ Addon mp3_decoder : media plugins :
 	: 
 	false
 	:  
-	$(OBOS_TOP)/objects/x86.R1/add-ons/media/plugins/mp3_decoder/mpglib/libmpglib.a
+	libmpglib.a
 ;
 
 LinkSharedOSLibs mp3_decoder : be libmedia.so ;
