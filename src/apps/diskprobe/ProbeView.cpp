@@ -1432,8 +1432,8 @@ ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
 		snprintf(buffer, sizeof(buffer), "Native: %Ld (0x%0*Lx)", position, size * 2, position);
 
 	fNativeMenuItem->SetLabel(buffer);
-	fNativeMenuItem->SetEnabled(position >= 0 && position < fEditor.FileSize());
-	fNativeMenuItem->Message()->ReplaceInt64("position", position * fEditor.BlockSize());
+	fNativeMenuItem->SetEnabled(position >= 0 && (position * fEditor.BlockSize()) < fEditor.FileSize());
+	fNativeMenuItem->Message()->ReplaceInt64("block", position);
 
 	position = B_SWAP_INT64(position) >> (8 * (8 - size));
 	if (fDataView->Base() == kHexBase)
@@ -1442,8 +1442,8 @@ ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
 		snprintf(buffer, sizeof(buffer), "Swapped: %Ld (0x%0*Lx)", position, size * 2, position);
 
 	fSwappedMenuItem->SetLabel(buffer);
-	fSwappedMenuItem->SetEnabled(position >= 0 && position < fEditor.FileSize());
-	fSwappedMenuItem->Message()->ReplaceInt64("position", position * fEditor.BlockSize());
+	fSwappedMenuItem->SetEnabled(position >= 0 && (position * fEditor.BlockSize()) < fEditor.FileSize());
+	fSwappedMenuItem->Message()->ReplaceInt64("block", position);
 }
 
 
