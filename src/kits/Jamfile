@@ -56,6 +56,7 @@ SubInclude OBOS_TOP src kits midi2 ;
 SubInclude OBOS_TOP src kits screensaver ;
 SubInclude OBOS_TOP src kits storage ;
 SubInclude OBOS_TOP src kits support ;
+SubInclude OBOS_TOP src kits textencoding ;
 SubInclude OBOS_TOP src kits translation ;
 SubInclude OBOS_TOP src kits device ;
 SubInclude OBOS_TOP src kits game ;
