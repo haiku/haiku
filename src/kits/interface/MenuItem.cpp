@@ -328,12 +328,16 @@ void BMenuItem::GetContentSize(float *width, float *height)
 //------------------------------------------------------------------------------
 void BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 {
+	// ToDo: implement me!
 }
 //------------------------------------------------------------------------------
 void BMenuItem::DrawContent()
 {
 	fSuper->MovePenBy(0, fSuper->fAscent);
 	fSuper->DrawString(fLabel);
+	
+	// ToDo: label truncation is missing
+	// ToDo: draw trigger is missing!
 }
 //------------------------------------------------------------------------------
 void BMenuItem::Draw()
