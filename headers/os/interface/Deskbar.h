@@ -91,10 +91,3 @@ private:
 
 #endif	// _DESKBAR_H
 
-/*
- * $Log $
- *
- * $Id  $
- *
- */
-
