@@ -19,7 +19,7 @@
 #include <fs_query.h>	//  BeOS's C-based query functions
 #include <Entry.h>		// entry_ref
 
-#include <fsproto.h>	// this is probably not compatible with our version and should be replaced
+#include <fs_interface.h>
 #include <syscalls.h>
 
 #include <algorithm>
@@ -386,18 +386,18 @@ BPrivate::Storage::set_stat(FileDescriptor file, Stat &s, StatMember what)
 	int result;
 	
 	switch (what) {
-		case WSTAT_MODE:
+		case FS_WRITE_STAT_MODE:
 			// For some stupid reason, BeOS R5 has no fchmod function, just
 			// chmod(char *filename, ...), so for the moment we're screwed.
 //			result = fchmod(file, s.st_mode);
 //			break;
 			return B_BAD_VALUE;
-			
-		case WSTAT_UID:
+
+		case FS_WRITE_STAT_UID:
 			result = ::fchown(file, s.st_uid, 0xFFFFFFFF);
 			break;
-			
-		case WSTAT_GID:
+
+		case FS_WRITE_STAT_GID:
 		{
 			// Should work, but doesn't. uid is set to 0xffffffff.
 //			result = ::fchown(file, 0xFFFFFFFF, s.st_gid);
@@ -408,22 +408,23 @@ BPrivate::Storage::set_stat(FileDescriptor file, Stat &s, StatMember what)
 			break;
 		}
 
-		case WSTAT_SIZE:
+		case FS_WRITE_STAT_SIZE:
 			// For enlarging files the truncate() behavior seems to be not
 			// precisely defined, but with a bit of luck it might come pretty
 			// close to what we need.
 			result = ::ftruncate(file, s.st_size);
 			break;
-			
+
 		// These would all require a call to utime(char *filename, ...), but
 		// we have no filename, only a file descriptor, so they'll have to
 		// wait until our new kernel shows up (or we decide to try calling
 		// into the R5 kernel ;-)
-		case WSTAT_ATIME:
-		case WSTAT_MTIME:
-		case WSTAT_CRTIME:
+		case FS_WRITE_STAT_ATIME:
+		case FS_WRITE_STAT_MTIME:
+		case FS_WRITE_STAT_CRTIME:
+			// ToDo: implement us!
 			return B_BAD_VALUE;
-			
+
 		default:
 			return B_BAD_VALUE;	
 	}
@@ -438,11 +439,11 @@ BPrivate::Storage::set_stat(const char *file, Stat &s, StatMember what)
 	
 	//! \todo Test/verify set_stat() functionality
 	switch (what) {
-		case WSTAT_MODE:
+		case FS_WRITE_STAT_MODE:
 			result = ::chmod(file, s.st_mode);
 			break;
 			
-		case WSTAT_UID:
+		case FS_WRITE_STAT_UID:
 		{
 			// Doesn't work: chown seems to traverse links.
 //			result = ::chown(file, s.st_uid, 0xFFFFFFFF);
@@ -455,7 +456,7 @@ BPrivate::Storage::set_stat(const char *file, Stat &s, StatMember what)
 				result = -1;
 			break;
 		}	
-		case WSTAT_GID:
+		case FS_WRITE_STAT_GID:
 		{
 			// Doesn't work: chown seems to traverse links.
 //			result = ::chown(file, 0xFFFFFFFF, s.st_gid);
@@ -469,15 +470,15 @@ BPrivate::Storage::set_stat(const char *file, Stat &s, StatMember what)
 			break;
 		}
 
-		case WSTAT_SIZE:
+		case FS_WRITE_STAT_SIZE:
 			// For enlarging files the truncate() behavior seems to be not
 			// precisely defined, but with a bit of luck it might come pretty
 			// close to what we need.
 			result = ::truncate(file, s.st_size);
 			break;
 			
-		case WSTAT_ATIME:
-		case WSTAT_MTIME:
+		case FS_WRITE_STAT_ATIME:
+		case FS_WRITE_STAT_MTIME:
 		{
 			// Grab the previous mod and access times so we only overwrite
 			// the specified time and not both
@@ -487,20 +488,21 @@ BPrivate::Storage::set_stat(const char *file, Stat &s, StatMember what)
 				break;
 				
 			utimbuf buffer;
-			buffer.actime = (what == WSTAT_ATIME) ? s.st_atime : oldStat.st_atime;
-			buffer.modtime = (what == WSTAT_MTIME) ? s.st_mtime : oldStat.st_mtime;
+			buffer.actime = (what == FS_WRITE_STAT_ATIME) ? s.st_atime : oldStat.st_atime;
+			buffer.modtime = (what == FS_WRITE_STAT_MTIME) ? s.st_mtime : oldStat.st_mtime;
 			result = ::utime(file, &buffer);
+			break;
 		}
-		
+
 		//! \todo Implement set_stat(..., WSTAT_CRTIME)
-		case WSTAT_CRTIME:
+		case FS_WRITE_STAT_CRTIME:
 			return B_BAD_VALUE;
-			
+
 		default:
 			return B_BAD_VALUE;	
 	}
-	
-	return (result == -1) ? errno : B_OK ;
+
+	return (result == -1) ? errno : B_OK;
 }
 
 
@@ -1195,11 +1197,6 @@ BPrivate::Storage::remove(const char *path)
 	return (::remove(path) == -1) ? errno : B_OK ;
 }
 
-// TODO: This is a hack! I'm not even sure, if the signature of _kwfsstat_()
-// is correct. Isn't libroot.so LGPL and doesn't that mean that the sources
-// are available?
-#define		WFSSTAT_NAME	0x0001
-extern "C" int _kwfsstat_(dev_t device, fs_info *info, long mask);
 
 /*!
 	\param device The device ID of the volume in question.
@@ -1211,6 +1208,7 @@ extern "C" int _kwfsstat_(dev_t device, fs_info *info, long mask);
 	- \c B_NAME_TOO_LONG: \a name is longer than \c B_FILE_NAME_LENGTH.
 	- another error code
 */
+
 status_t
 BPrivate::Storage::set_volume_name(dev_t device, const char *name)
 {
@@ -1218,15 +1216,12 @@ BPrivate::Storage::set_volume_name(dev_t device, const char *name)
 	status_t error = (name ? B_OK : B_BAD_VALUE);
 	if (error == B_OK && strlen(name) >= B_FILE_NAME_LENGTH)
 		error = B_NAME_TOO_LONG;
-	// get FS stat
-	fs_info info;
-	if (error == B_OK && fs_stat_dev(device, &info) != 0)
-		error = errno;
+
 	// replace the name and let it be written
 	if (error == B_OK) {
-		strcpy(info.volume_name, name);
-		if (_kwfsstat_(device, &info, WFSSTAT_NAME) != 0)
-			error = errno;
+		fs_info info;
+		strlcpy(info.volume_name, name, sizeof(info.volume_name));
+		error = _kern_write_fs_info(device, &info, FS_WRITE_FSINFO_NAME);
 	}
 	return error;
 }
