@@ -213,8 +213,14 @@ typedef struct {
 		int_buf_info myBufInfo[MAXBUFFERS];	/* extra info on scaler input buffers */
 		overlay_token myToken;				/* scaler is free/in use */
 		benaphore lock;						/* for creating buffers and aquiring overlay unit routines */
+		/* variables needed for virtualscreens (move_overlay()): */
+		bool active;						/* true is overlay currently in use */
+		overlay_window ow;					/* current position of overlay output window */
+		overlay_buffer ob;					/* current inputbuffer in use */
+		overlay_view my_ov;					/* current corrected view in inputbuffer */
+		uint32 h_ifactor;					/* current 'unclipped' horizontal inverse scaling factor */
+		uint32 v_ifactor;					/* current 'unclipped' vertical inverse scaling factor */
 	} overlay;
-
 } shared_info;
 
 /* Read or write a value in PCI configuration space */
