@@ -39,7 +39,7 @@
 
 // TODO: Document this file completely
 
-//#define DEBUG_WINBORDER
+#define DEBUG_WINBORDER
 //#define DEBUG_WINBORDER_MOUSE
 #define DEBUG_WINBORDER_CLICK
 
@@ -97,8 +97,11 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 		//   rects - given by _decorator::GetBorderRect() - to be able to draw the borders
 	_frame		= _decorator->GetBorderRect();
 	_visible->Set( _frame );
+	_visible->Include( _decorator->GetTabRect() );
 	_full->Set( _frame );
+	_full->Include( _decorator->GetTabRect() );
 	_invalid->Set( _frame );
+	_invalid->Include( _decorator->GetTabRect() );
 
 	_decorator->SetDriver(_driver);
 	_decorator->SetTitle(name);
@@ -274,16 +277,17 @@ void WinBorder::MouseMoved(int8 *buffer)
 printf("ClickMove: Slide Tab\n");
 #endif
 		float dx=pt.x-_mousepos.x;
+		float dy=pt.y-_mousepos.y;		
 
-		if(dx!=0)
+		if(dx != 0 || dy != 0)
 		{
 			// SlideTab returns how much things were moved, and currently
 			// supports just the x direction, so get the value so
 			// we can invalidate the proper area.
 			lock_layers();
-			_parent->Invalidate(_decorator->SlideTab(dx,0));
+			_parent->Invalidate(_decorator->SlideTab(dx,dy));
 			_parent->RequestDraw();
-			_decorator->DrawTab();
+//			_decorator->DrawTab();
 			unlock_layers();
 		}
 	}
@@ -309,18 +313,20 @@ printf("ClickMove: Drag\n");
 			lock_layers();
 			BRegion *reg=_decorator->GetFootprint();
 		// TODO: we get an error here!!! - this method is untested
+		// TODO: we really need to enable this method to avoid lots of drawings.
 			//_driver->CopyRegion(reg,_win->_frame.LeftTop());
-
-			_decorator->MoveBy(BPoint(dx, dy));
-
-			MoveBy(dx,dy);
+			_parent->Invalidate(*reg);
 			
+			_decorator->MoveBy(BPoint(dx, dy));
+			MoveBy(dx,dy);
+
 				// ADI: what do those do???
 			BRegion reg2(oldmoveframe);			
 			reg->OffsetBy((int32)dx, (int32)dy);
 			reg2.Exclude(reg);
 			
 			_parent->RebuildRegions();
+			printf("WinBorder: calling parent = %s::RequestDraw()\n", _parent->_name->String());			
 			_parent->RequestDraw();
 
 			delete reg;
@@ -433,17 +439,23 @@ void WinBorder::SetFocus(const bool &active)
 void WinBorder::RequestDraw(const BRect &r)
 {
 #ifdef DEBUG_WINBORDER
-printf("WinBorder %s: RequestDraw\n",_title->String());
+printf("WinBorder %s: RequestDraw(BRect)\n",_title->String());
+PrintToStream();
 #endif
 	_decorator->Draw(r);
+	delete _invalid;
+	_invalid = NULL;
 }
 
 void WinBorder::RequestDraw(void)
 {
 #ifdef DEBUG_WINBORDER
-printf("WinBorder %s::RequestDraw\n",_title->String());
+printf("WinBorder %s::RequestDraw()\n",_title->String());
+PrintToStream();
 #endif
 	_decorator->Draw();
+	delete _invalid;
+	_invalid = NULL;
 }
 /*
 void WinBorder::MoveBy(BPoint pt)

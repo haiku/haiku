@@ -35,6 +35,7 @@
 #include "RectUtils.h"
 #include <stdio.h>
 
+
 #define USE_VIEW_FILL_HACK
 
 //#define DEBUG_DECORATOR
@@ -355,7 +356,7 @@ printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
 	topborder.OffsetBy(pt);
 	bottomborder.OffsetBy(pt);
 
-	Draw( _borderrect );	
+//	Draw( _borderrect );	
 }
 
 BRegion * DefaultDecorator::GetFootprint(void)
@@ -370,6 +371,11 @@ printf("DefaultDecorator: Get Footprint\n");
 	BRegion *reg=new BRegion(_borderrect);
 	reg->Include(_tabrect);
 	return reg;
+}
+
+BRect DefaultDecorator::SlideTab(float dx, float dy=0){
+	//return Decorator::SlideTab(dx,dy);
+	return _tabrect;
 }
 
 void DefaultDecorator::_DrawTitle(BRect r)
@@ -446,9 +452,9 @@ void DefaultDecorator::Draw(void)
 
 //	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 
-	DrawFrame();
+	_DrawFrame(_borderrect);
 
-	DrawTab();
+	_DrawTab(_tabrect);
 }
 
 void DefaultDecorator::_DrawZoom(BRect r)
@@ -602,7 +608,8 @@ void DefaultDecorator::_DrawFrame(BRect invalid)
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	
 	#ifdef USE_VIEW_FILL_HACK
-	_driver->FillRect(_frame,&_layerdata,pat_solidhigh);
+		_layerdata.highcolor = RGBColor( 255, 255, 255 );	
+		_driver->FillRect(_frame,&_layerdata,pat_solidhigh);
 	#endif
 
 	if(!borderwidth){

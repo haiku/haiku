@@ -50,7 +50,7 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-//#define DEBUG_SERVERAPP
+#define DEBUG_SERVERAPP
 
 /*!
 	\brief Constructor

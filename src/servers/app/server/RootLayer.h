@@ -45,9 +45,9 @@ class RootLayer : public Layer
 public:
 	RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver);
 	~RootLayer();
-	void RequestDraw();
-	void RequestDraw(const BRect &r);
-	void MoveBy(float x, float y);
+	virtual	void RequestDraw();
+	virtual	void RequestDraw(const BRect &r);
+	virtual void MoveBy(float x, float y);
 	void MoveBy(BPoint pt);
 	void ResizeBy(float x, float y);
 	void ResizeBy(BPoint pt);

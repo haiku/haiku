@@ -665,7 +665,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 	BRegion WindowClipRegion;
 	BRegion LayerClipRegion;
 	Layer *sibling;
-	int32 numRects;
+	int32 numRects = 0;
 	
 	if ( !msgsize || !msgbuffer )
 		return;

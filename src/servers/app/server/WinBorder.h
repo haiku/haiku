@@ -40,9 +40,9 @@ class WinBorder : public Layer
 public:
 	WinBorder(const BRect &r, const char *name, const int32 look, const int32 feel, 
 		const int32 flags, ServerWindow *win);
-	~WinBorder(void);
-	void RequestDraw(void);
-	void RequestDraw(const BRect &r);
+	virtual	~WinBorder(void);
+	virtual void RequestDraw(void);
+	virtual void RequestDraw(const BRect &r);
 //	void MoveBy(BPoint pt);
 //	void MoveBy(float x, float y);
 //	void ResizeBy(BPoint pt);

@@ -33,6 +33,7 @@
 #include "PatternHandler.h" // for pattern_union
 #include "ServerConfig.h"
 
+#include <stdio.h>
 
 /*!
 	\brief Sets up internal variables needed by the RootLayer
@@ -44,7 +45,8 @@ RootLayer::RootLayer(BRect rect, const char *layername, DisplayDriver *gfxdriver
 	: Layer(rect,layername,B_FOLLOW_NONE,0, NULL)
 {
 	_driver=gfxdriver;
-	_invalid=new BRegion(Bounds());
+	_invalid->MakeEmpty();
+	_invalid->Include(Bounds());
 	_is_dirty=true;
 	_bgcolor=new RGBColor();
 }
@@ -76,6 +78,9 @@ void RootLayer::RequestDraw(void)
 	// Redraw the base
 	if(_invalid)
 	{
+		printf("ROOTLAYER: ");
+		_invalid->PrintToStream();
+		printf("===========\n");
 		for(int32 i=0; _invalid->CountRects();i++)
 		{
 			if(_invalid->RectAt(i).IsValid())
@@ -92,7 +97,7 @@ void RootLayer::RequestDraw(void)
 	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
 	{
 		if(lay->IsDirty())
-			lay->RequestDraw(lay->Bounds());
+			lay->RequestDraw();
 	}
 
 	_is_dirty=false;

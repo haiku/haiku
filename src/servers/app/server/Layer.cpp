@@ -34,6 +34,7 @@
 #include "PortLink.h"
 #include "TokenHandler.h"
 #include "RectUtils.h"
+#include "RootLayer.h"
 
 //! TokenHandler object used to provide IDs for all Layers and, thus, BViews
 TokenHandler view_token_handler;
@@ -132,11 +133,19 @@ printf("Layer::AddChild lacks before support\n");
 	layer->_parent=this;
 	if(layer->_visible && layer->_hidecount==0 && _visible)
 	{
-		// Technically, we could safely take the address of ConvertToParent(BRegion)
-		// but we don't just to avoid a compiler nag
-		BRegion *reg=new BRegion(layer->ConvertToParent(layer->_visible));
-		_visible->Exclude(reg);
-		delete reg;
+		RootLayer	*rl;
+		rl			= dynamic_cast<RootLayer*>(this);
+		if ( rl ){
+			// RootLayer enters here. It does not need to exclude WinBorder's
+			// visible area!
+		}
+		else{
+			// Technically, we could safely take the address of ConvertToParent(BRegion)
+			// but we don't just to avoid a compiler nag
+			BRegion *reg=new BRegion(layer->ConvertToParent(layer->_visible));
+			_visible->Exclude(reg);
+			delete reg;
+		}
 	}
 
 	// we need to change this to a loop for each _lowersibling of the layer
@@ -342,7 +351,7 @@ Layer *Layer::FindLayer(int32 token)
 	All children of the layer also receive this call, so only 1 Invalidate call is 
 	needed to set a section as invalid on the screen.
 */
-void Layer::Invalidate(BRegion region)
+void Layer::Invalidate(BRegion& region)
 {
 	int32 i;
 	BRect r;
@@ -379,6 +388,7 @@ void Layer::Invalidate(BRegion region)
 			delete reg;
 		}
 	}
+
 }
 
 /*!
@@ -461,7 +471,8 @@ void Layer::RequestDraw(void)
 */
 bool Layer::IsDirty(void) const
 {
-	return (!_invalid)?true:false;
+	//return (!_invalid)?true:false;
+	return _is_dirty;
 }
 
 /*!
@@ -614,33 +625,40 @@ uint32 Layer::CountChildren(void)
 */
 void Layer::MoveBy(float x, float y)
 {
-	BRect oldframe(_frame);
 	_frame.OffsetBy(x,y);
+
+	BRegion		oldVisible( *_visible );
+	_visible->OffsetBy( x, y );
+	_full->OffsetBy( x, y );
 
 	if(_parent)
 	{
-		BRegion *i=new BRegion(oldframe);
-		if(TestRectIntersection(oldframe,_frame))
-			i->Exclude(_frame);
-		
-		if(_parent->_invalid==NULL)
-			_parent->_invalid=i;
+		BRegion		exclude(oldVisible);
+		exclude.Exclude(_visible);
+
+		if(_parent->_invalid == NULL)
+			_parent->_invalid = new BRegion( exclude );
 		else
-		{
-			_parent->_invalid->Include(i);
-			delete i;
-		}
-		_parent->_is_dirty=true;
+			_parent->_invalid->Include( &exclude );
+
+		_parent->_is_dirty	= true;
 
 		// if _uppersibling is non-NULL, we have other layers which we may have been
 		// covering up. If we did cover up some siblings, they need to be redrawn
 		for(Layer *sib=_uppersibling;sib!=NULL;sib=sib->_uppersibling)
 		{
-			if(TestRectIntersection(oldframe,sib->_frame))
+			BRegion		exclude2(oldVisible);
+			exclude2.Exclude(sib->_visible);
+			
+			if( exclude2.CountRects() != 0 )
 			{
 				// The boundaries intersect on screen, so invalidate the area that
 				// was hidden
-				sib->Invalidate(oldframe & sib->_frame);
+				// a new region, becase we do not want to modify 'oldVisible'
+				BRegion		exclude3(oldVisible);
+				exclude3.IntersectWith(sib->_visible);
+				
+				sib->Invalidate( exclude3 );
 				sib->_is_dirty=true;
 			}
 		}

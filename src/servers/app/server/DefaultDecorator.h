@@ -36,21 +36,22 @@ public:
 	DefaultDecorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags);
 	~DefaultDecorator(void);
 	
-	void MoveBy(float x, float y);
-	void MoveBy(BPoint pt);
-	void Draw(BRect r);
-	void Draw(void);
-	BRegion *GetFootprint(void);
-	click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
+	virtual void MoveBy(float x, float y);
+	virtual void MoveBy(BPoint pt);
+	virtual void Draw(BRect r);
+	virtual void Draw(void);
+	virtual BRegion *GetFootprint(void);
+	virtual BRect SlideTab(float dx, float dy);
+	virtual click_type Clicked(BPoint pt, int32 buttons, int32 modifiers);
 protected:
-	void _DrawClose(BRect r);
-	void _DrawFrame(BRect r);
-	void _DrawTab(BRect r);
-	void _DrawTitle(BRect r);
-	void _DrawZoom(BRect r);
-	void _DoLayout(void);
-	void _SetFocus(void);
-	void _SetColors(void);
+	virtual void _DrawClose(BRect r);
+	virtual void _DrawFrame(BRect r);
+	virtual void _DrawTab(BRect r);
+	virtual void _DrawTitle(BRect r);
+	virtual void _DrawZoom(BRect r);
+	virtual void _DoLayout(void);
+	virtual void _SetFocus(void);
+	virtual void _SetColors(void);
 	void DrawBlendedRect(BRect r, bool down);
 	uint32 taboffset;
 
