@@ -13,9 +13,6 @@
 
 class DataEditor;
 
-static const uint32 kMsgBaseType = 'base';
-static const uint32 kDataViewCursorPosition = 'curs';
-
 enum base_type {
 	kHexBase,
 	kDecimalBase
@@ -88,5 +85,12 @@ class DataView : public BView {
 		int32		fStart, fEnd;
 		int32		fMouseSelectionStart;
 };
+
+static const uint32 kMsgBaseType = 'base';
+static const uint32 kMsgUpdateData = 'updt';
+
+// observer notices
+static const uint32 kDataViewCursorPosition = 'curs';
+static const uint32 kDataViewSelection = 'dsel';
 
 #endif	/* DATA_VIEW_H */
