@@ -40,6 +40,9 @@ private:
 	status_t	GetPage(ogg_page * page, int read_size = 4*B_PAGE_SIZE,
 				        bool short_page = false);
 
+	BPositionIO *	fSeekable;
+	off_t			fPostSniffPosition;
+	
 	ogg_sync_state	fSync;
 	ogg_packet_map	fInitialHeaderPackets;
 	ogg_stream_map	fStreams;
