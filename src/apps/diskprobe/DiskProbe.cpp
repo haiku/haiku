@@ -114,7 +114,7 @@ DiskProbe::DiskProbe()
 	: BApplication(kSignature),
 	fOpenWindow(NULL),
 	fWindowCount(0),
-	fWindowPosition(30, 30, 500, 500)
+	fWindowPosition(50, 50, 500, 500)
 {
 	fFilePanel = new BFilePanel();
 
@@ -220,6 +220,8 @@ DiskProbe::ReadyToRun()
 status_t 
 DiskProbe::Probe(entry_ref &ref)
 {
+	int32 probeWindows = 0;
+
 	// Do we already have that window open?
 	for (int32 i = CountWindows(); i-- > 0; ) {
 		ProbeWindow *window = dynamic_cast<ProbeWindow *>(WindowAt(i));
@@ -230,6 +232,7 @@ DiskProbe::Probe(entry_ref &ref)
 			window->Activate(true);
 			return B_OK;
 		}
+		probeWindows++;
 	}
 
 	// Does the file really exists?
@@ -240,7 +243,7 @@ DiskProbe::Probe(entry_ref &ref)
 
 	// cascade window
 	BRect rect = fWindowPosition;
-	rect.OffsetBy(fWindowCount * 15, fWindowCount * 15);
+	rect.OffsetBy(probeWindows * 15, probeWindows * 15);
 
 	BWindow *window = new ProbeWindow(rect, &ref);
 	window->Show();
