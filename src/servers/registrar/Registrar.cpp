@@ -15,6 +15,7 @@
 #include "EventQueue.h"
 #include "MessageEvent.h"
 #include "MessageRunnerManager.h"
+#include "MessagingService.h"
 #include "MIMEManager.h"
 #include "Registrar.h"
 #include "TRoster.h"
@@ -46,7 +47,8 @@ Registrar::Registrar(status_t *error)
 		   fMIMEManager(NULL),
 		   fEventQueue(NULL),
 		   fMessageRunnerManager(NULL),
-		   fSanityEvent(NULL)
+		   fSanityEvent(NULL),
+		   fMessagingService(NULL)
 {
 	FUNCTION_START();
 }
@@ -62,6 +64,7 @@ Registrar::~Registrar()
 	FUNCTION_START();
 	Lock();
 	fEventQueue->Die();
+	delete fMessagingService;
 	delete fMessageRunnerManager;
 	delete fEventQueue;
 	delete fSanityEvent;
@@ -212,26 +215,44 @@ void
 Registrar::ReadyToRun()
 {
 	FUNCTION_START();
+
 	// create event queue
 	fEventQueue = new EventQueue(kEventQueueName);
+
 	// create roster
 	fRoster = new TRoster;
 	fRoster->Init();
+
 	// create clipboard handler
 	fClipboardHandler = new ClipboardHandler;
 	AddHandler(fClipboardHandler);
+
 	// create MIME manager
 	fMIMEManager = new MIMEManager;
 	fMIMEManager->Run();
+
 	// create message runner manager
 	fMessageRunnerManager = new MessageRunnerManager(fEventQueue);
+
 	// init the global be_roster
 	BRoster::Private().SetTo(be_app_messenger, BMessenger(NULL, fMIMEManager));
+
+	// create the messaging service
+	fMessagingService = new MessagingService;
+	status_t error = fMessagingService->Init();
+	if (error != B_OK) {
+		ERROR(("Registrar::ReadyToRun(): Failed to init messaging service "
+			"(that's by design when running under R5): %s\n", strerror(error)));
+		delete fMessagingService;
+		fMessagingService = NULL;
+	}
+
 	// create and schedule the sanity message event
 	fSanityEvent = new MessageEvent(system_time() + kRosterSanityEventInterval,
 									this, B_REG_ROSTER_SANITY_EVENT);
 	fSanityEvent->SetAutoDelete(false);
 	fEventQueue->AddEvent(fSanityEvent);
+
 	FUNCTION_END();
 }
 

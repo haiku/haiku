@@ -33,6 +33,7 @@ class DiskDeviceManager;
 class EventQueue;
 class MessageEvent;
 class MessageRunnerManager;
+class MessagingService;
 class MIMEManager;
 
 namespace BPrivate {
@@ -59,6 +60,7 @@ private:
 	EventQueue				*fEventQueue;
 	MessageRunnerManager	*fMessageRunnerManager;
 	MessageEvent			*fSanityEvent;
+	MessagingService		*fMessagingService;
 };
 
 #endif	// REGISTRAR_H
