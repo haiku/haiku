@@ -286,15 +286,20 @@ ModuleManager::GetModule(const char *path, module_info **infop)
 		BAutolock _lock(fModules);
 		Module *module = fModules.FindModule(path);
 		if (!module) {
+			// module not yet loaded, try to get it
 			module = new Module;
 			error = module->Init(path);
 			if (error == B_OK && !fModules.AddModule(module))
 				error = B_NO_MEMORY;
-			if (error == B_OK) {
-				module->Get();
-				*infop = module->Info();
-			} else
+			if (error != B_OK) {
 				delete module;
+				module = NULL;
+			}
+		}
+		// "get" the module
+		if (error == B_OK) {
+			module->Get();
+			*infop = module->Info();
 		}
 	}
 	return error;
