@@ -12,7 +12,7 @@
 #include <devfs.h>
 #include <khash.h>
 #include <Errors.h>
-
+#include <smp.h> /* for spinlocks */
 #include <arch/cpu.h>
 #include <arch/int.h>
 
@@ -39,16 +39,36 @@ struct pci_config {
 	struct pci_cfg *cfg;
 };
 
-/* The pci_mode we're using, defaults to 1 as this is more common */
-static int pci_mode = 1;
-
-/* If we have configuration mechanism one we have devices 0 - 32 per bus, if
- * we only have configuration mechanism two we have devices 0 - 16
- * XXX - set this when we determine which configuration mechanism we have
- */
-static int bus_max_devices = 32;
+static spinlock_t pci_config_lock = 0;  /* lock for config space access */
+static int        pci_mode = 1;         /* The pci config mechanism we're using.
+                                         * NB defaults to 1 as this is more common, but
+                                         * checked at runtime
+                                         */
+static int        bus_max_devices = 32; /* max devices that any bus can support
+                                         * Yes, if we're using pci_mode == 2 then
+                                         * this is only 16, instead of the 32 we
+                                         * have with pci_mode == 1
+                                         */
 
 struct pci_config *pci_list;
+
+/* Config space locking!
+ * We need to make sure we only have one access at a time into the config space,
+ * so we'll use a spinlock and also disbale interrupts so if we're smp we
+ * won't have problems.
+ */
+
+#define PCI_LOCK_CONFIG(status) \
+{ \
+	status = disable_interrupts(); \
+	acquire_spinlock(&pci_config_lock); \
+}
+
+#define PCI_UNLOCK_CONFIG(cpu_status) \
+{ \
+	release_spinlock(&pci_config_lock); \
+	restore_interrupts(cpu_status); \
+}
 
 /* PCI has 2 Configuration Mechanisms. We need to decide which one the
  * PCI Host Bridge is speaking and then speak to it correctly. This is decided
@@ -74,7 +94,6 @@ struct pci_config *pci_list;
 #define CONFIG_REQ_PORT    0xCF8
 #define CONFIG_DATA_PORT   0xCFC
 
-
 #define CONFIG_ADDR_1(bus, device, func, reg) \
 	(0x80000000 | (bus << 16) | (device << 11) | (func << 8) | (reg & ~3))
 
@@ -83,6 +102,11 @@ struct pci_config *pci_list;
 	
 static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar reg, uchar size)
 {
+	int cpu_status;
+	uint32 val = 0;
+
+	PCI_LOCK_CONFIG(cpu_status);
+
 	if (pci_mode == 1) {
 		/* write request details */
 		out32(CONFIG_ADDR_1(bus, device, function, reg), CONFIG_REQ_PORT);	
@@ -92,46 +116,52 @@ static uint32 read_pci_config(uchar bus, uchar device, uchar function, uchar reg
 		 */
 		switch (size) {
 			case 1:
-				return in8 (CONFIG_DATA_PORT + (reg & 3));
+				val = in8 (CONFIG_DATA_PORT + (reg & 3));
+				break;
 			case 2:
-				return in16(CONFIG_DATA_PORT + (reg & 2));
+				val = in16(CONFIG_DATA_PORT + (reg & 2));
+				break;
 			case 4:
-				return in32(CONFIG_DATA_PORT + reg);
+				val = in32(CONFIG_DATA_PORT + reg);
+				break;
 			default:
-				dprintf("ERROR: read_pci_config: called for %d bytes!!\n", size);
+				dprintf("ERROR: mech #1: read_pci_config: called for %d bytes!!\n", size);
 		}
 	} else if (pci_mode == 2) {
-		uint32 rv = 0;
-		if (device & 0x10)
-			return EINVAL;
-
-		out8((uint8)(0xF0 | (function << 1)), 0xCF8);
-		out8(bus, 0xCFA);
+		if (!(device & 0x10)) {
+			out8((uint8)(0xF0 | (function << 1)), 0xCF8);
+			out8(bus, 0xCFA);
 		
-		switch (size) {
-			case 1:
-				rv = in8 (CONFIG_ADDR_2(device, reg));
-				break;
-			case 2:
-				rv = in16(CONFIG_ADDR_2(device, reg));
-				break;
-			case 4:
-				rv = in32(CONFIG_ADDR_2(device, reg));
-				break;
-			default:
-				dprintf("ERROR: read_pci_config: called for %d bytes!!\n", size);
-		}			
-		out8(0, 0xCF8);
-		return rv;
+			switch (size) {
+				case 1:
+					val = in8 (CONFIG_ADDR_2(device, reg));
+					break;
+				case 2:
+					val = in16(CONFIG_ADDR_2(device, reg));
+					break;
+				case 4:
+					val = in32(CONFIG_ADDR_2(device, reg));
+					break;
+				default:
+					dprintf("ERROR: mech #2: read_pci_config: called for %d bytes!!\n", size);
+			}
+			out8(0, 0xCF8);
+		} else 
+			val = EINVAL;
 	} else
 		dprintf("PCI: Config Mechanism %d isn't known!\n", pci_mode);
 
-	return 0;
+	PCI_UNLOCK_CONFIG(cpu_status);
+	return val;
 }
 
 static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg, 
                              uchar size, uint32 value)
 {
+	int cpu_status;
+	
+	PCI_LOCK_CONFIG(cpu_status);
+	
 	if (pci_mode == 1) {
 		/* write request details */
 		out32(CONFIG_ADDR_1(bus, device, function, reg), CONFIG_REQ_PORT);	
@@ -153,28 +183,29 @@ static void write_pci_config(uchar bus, uchar device, uchar function, uchar reg,
 				dprintf("ERROR: write_pci_config: called for %d bytes!!\n", size);
 		}
 	} else if (pci_mode == 2) {
-		if (device & 0x10)
-			return;
-
-		out8((uint8)(0xF0 | (function << 1)), 0xCF8);
-		out8(bus, 0xCFA);
+		if (!(device & 0x10)) {
+			out8((uint8)(0xF0 | (function << 1)), 0xCF8);
+			out8(bus, 0xCFA);
 		
-		switch (size) {
-			case 1:
-				out8 (value, CONFIG_ADDR_2(device, reg));
-				break;
-			case 2:
-				out16(value, CONFIG_ADDR_2(device, reg));
-				break;
-			case 4:
-				out32(value, CONFIG_ADDR_2(device, reg));
-				break;
-			default:
-				dprintf("ERROR: write_pci_config: called for %d bytes!!\n", size);
+			switch (size) {
+				case 1:
+					out8 (value, CONFIG_ADDR_2(device, reg));
+					break;
+				case 2:
+					out16(value, CONFIG_ADDR_2(device, reg));
+					break;
+				case 4:
+					out32(value, CONFIG_ADDR_2(device, reg));
+					break;
+				default:
+					dprintf("ERROR: write_pci_config: called for %d bytes!!\n", size);
+			}
+			out8(0, 0xCF8);
 		}
-		out8(0, 0xCF8);
 	} else
 		dprintf("PCI: Config Mechanism %d isn't known!\n", pci_mode);
+
+	PCI_UNLOCK_CONFIG(cpu_status);
 	
 	return;
 }
