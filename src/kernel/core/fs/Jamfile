@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel core fs ;
+SubDir OBOS_TOP src kernel core fs ;
 
 KernelStaticLibrary libfs : 
 	<$(SOURCE_GRIST)>bootfs.c 

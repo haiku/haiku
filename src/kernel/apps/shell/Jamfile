@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel apps shell ;
+SubDir OBOS_TOP src kernel apps shell ;
 
 KernelObjects <$(SOURCE_GRIST)>main.c
 	<$(SOURCE_GRIST)>args.c

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel ;
+SubDir OBOS_TOP src kernel ;
 
 KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libc!locale>ctype.o
@@ -855,13 +855,13 @@ BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 
 KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
 
-SubInclude OBOS_TOP sources os kits kernel boot ;
-SubInclude OBOS_TOP sources os kits kernel core ;
-SubInclude OBOS_TOP sources os kits kernel drivers ;
-SubInclude OBOS_TOP sources os kits kernel global ;
-SubInclude OBOS_TOP sources os kits kernel glue ;
-SubInclude OBOS_TOP sources os kits kernel libc ;
-SubInclude OBOS_TOP sources os kits kernel libm ;
-SubInclude OBOS_TOP sources os kits kernel apps ;
-SubInclude OBOS_TOP sources os kits kernel add-ons ;
-SubInclude OBOS_TOP sources os kits kernel libroot ;
+SubInclude OBOS_TOP src kernel boot ;
+SubInclude OBOS_TOP src kernel core ;
+SubInclude OBOS_TOP src kernel drivers ;
+SubInclude OBOS_TOP src kernel global ;
+SubInclude OBOS_TOP src kernel glue ;
+SubInclude OBOS_TOP src kernel libc ;
+SubInclude OBOS_TOP src kernel libm ;
+SubInclude OBOS_TOP src kernel apps ;
+SubInclude OBOS_TOP src kernel add-ons ;
+SubInclude OBOS_TOP src kernel libroot ;

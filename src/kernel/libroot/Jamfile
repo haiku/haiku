@@ -1,3 +1,3 @@
-SubDir OBOS_TOP sources os kits kernel libroot ;
+SubDir OBOS_TOP src kernel libroot ;
 
 KernelObjects libroot.c : -fPIC -DPIC ;

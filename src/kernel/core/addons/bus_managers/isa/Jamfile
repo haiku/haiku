@@ -1,3 +1,3 @@
-SubDir OBOS_TOP sources os kits kernel core addons bus_managers isa ;
+SubDir OBOS_TOP src kernel core addons bus_managers isa ;
 
 KernelObjects isa.c : -fno-pic ;

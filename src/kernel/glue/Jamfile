@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel glue ;
+SubDir OBOS_TOP src kernel glue ;
 
 KernelObjects lib0.c crt0.c ;
 

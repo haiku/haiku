@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel core ;
+SubDir OBOS_TOP src kernel core ;
 
 KernelObjects 
 	<$(SOURCE_GRIST)>cbuf.c 
@@ -36,8 +36,8 @@ KernelLd linkhack.so :
 	-shared -Bdynamic
 	;
 
-SubInclude OBOS_TOP sources os kits kernel core addons ;
-SubInclude OBOS_TOP sources os kits kernel core arch ;
-SubInclude OBOS_TOP sources os kits kernel core fs ;
-SubInclude OBOS_TOP sources os kits kernel core vm ;
-SubInclude OBOS_TOP sources os kits kernel core net ;
+SubInclude OBOS_TOP src kernel core addons ;
+SubInclude OBOS_TOP src kernel core arch ;
+SubInclude OBOS_TOP src kernel core fs ;
+SubInclude OBOS_TOP src kernel core vm ;
+SubInclude OBOS_TOP src kernel core net ;

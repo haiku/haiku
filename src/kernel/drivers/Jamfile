@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel drivers ;
+SubDir OBOS_TOP src kernel drivers ;
 
 KernelStaticLibrary libdrivers : 
 	<$(SOURCE_GRIST)>dev.c 
@@ -14,5 +14,5 @@ KernelStaticLibrary libdrivers :
 	-fno-pic -Wno-unused
 	;
 
-#SubInclude OBOS_TOP sources os kits kernel drivers arch ;
-SubInclude OBOS_TOP sources os kits kernel drivers common ;
+#SubInclude OBOS_TOP src kernel drivers arch ;
+SubInclude OBOS_TOP src kernel drivers common ;

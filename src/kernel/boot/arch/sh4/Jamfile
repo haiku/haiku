@@ -1,2 +1,2 @@
-SubDir OBOS_TOP sources os kits kernel boot arch sh4 ;
+SubDir OBOS_TOP src kernel boot arch sh4 ;
 

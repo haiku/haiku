@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel boot arch x86 ;
+SubDir OBOS_TOP src kernel boot arch x86 ;
 
 KernelObjects 
 	<$(SOURCE_GRIST)>stage2.c 

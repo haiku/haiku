@@ -1,4 +1,4 @@
-SubDir OBOS_TOP sources os kits kernel core arch x86 ;
+SubDir OBOS_TOP src kernel core arch x86 ;
 
 KernelStaticLibrary libx86 : 
 	<$(SOURCE_GRIST)>arch_cpu.c 
