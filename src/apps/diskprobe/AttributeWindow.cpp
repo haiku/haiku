@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "AttributeWindow.h"
@@ -13,6 +13,8 @@
 #include <TabView.h>
 #include <StringView.h>
 #include <Alert.h>
+#include <Directory.h>
+#include <Volume.h>
 
 
 static const uint32 kMsgRemoveAttribute = 'rmat';
@@ -171,8 +173,28 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 	: ProbeWindow(rect, ref),
 	fAttribute(strdup(attribute))
 {
-	char buffer[256];
-	snprintf(buffer, sizeof(buffer), "%s: %s", ref->name, attribute);
+	// Set alternative window title for devices
+
+	char name[B_FILE_NAME_LENGTH];
+#ifdef COMPILE_FOR_R5
+	strncpy(name, ref->name, sizeof(name));
+	name[sizeof(name) - 1] = '\0';
+#else
+	strlcpy(name, ref->name, sizeof(name));
+#endif
+
+	BEntry entry(ref);
+	if (entry.IsDirectory()) {
+		BDirectory directory(&entry);
+		if (directory.InitCheck() == B_OK && directory.IsRootDirectory()) {
+			// use the volume name for root directories
+			BVolume volume;
+			if (directory.GetVolume(&volume) == B_OK)
+				volume.GetName(name);
+		}
+	}
+	char buffer[B_PATH_NAME_LENGTH];
+	snprintf(buffer, sizeof(buffer), "%s: %s", name, attribute);
 	SetTitle(buffer);
 
 	// add the menu
