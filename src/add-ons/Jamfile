@@ -11,7 +11,7 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
-	addons/drivers/dev/zero
+	drivers/dev/zero
 	; 
 
 KernelLd
@@ -25,7 +25,7 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
-	addons/drivers/dev/null
+	drivers/dev/null
 	; 
 
 #KernelLd
@@ -39,7 +39,7 @@ KernelLd
 #	-Bdynamic -shared
 #	:
 #	:
-#	addons/drivers/dev/digit
+#	drivers/dev/digit
 #	; 
 
 KernelLd
@@ -53,7 +53,7 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
-	addons/drivers/dev/random
+	drivers/dev/random
 	; 
 
 KernelLd
@@ -67,7 +67,7 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
-	addons/drivers/dev/ps2mouse
+	drivers/dev/ps2mouse
 	; 
 
 KernelLd
@@ -81,7 +81,7 @@ KernelLd
 	-Bdynamic -shared
 	:
 	:
-	addons/drivers/dev/keyboard
+	drivers/dev/keyboard
 	; 
 
 # This needs to be fixed once the various headers are fixed.
