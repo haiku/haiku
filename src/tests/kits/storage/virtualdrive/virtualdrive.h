@@ -1,5 +1,6 @@
-// virtualdrive_ioctl.h
-
+/* This software is part of the OpenBeOS distribution and is covered 
+** by the OpenBeOS license.
+*/
 #ifndef VIRTUAL_DRIVE_H
 #define VIRTUAL_DRIVE_H
 
@@ -26,11 +27,16 @@ enum {
 		// on data device: virtual_drive_info*
 };
 
+#define VIRTUAL_DRIVE_MAGIC	'VdIn'
+
 typedef struct virtual_drive_info {
+	uint32			magic;
+	size_t			drive_info_size;
 	char			file_name[B_PATH_NAME_LENGTH];
 	char			device_name[B_PATH_NAME_LENGTH];
 	device_geometry	geometry;
 	bool			use_geometry;
+	bool			halted;		// only valid for VIRTUAL_DRIVE_GET_INFO
 } virtual_drive_info;
 
 #endif	// VIRTUAL_DRIVE_H
