@@ -4,6 +4,7 @@
 #include "ColorUtils.h"
 #include "WinDecorator.h"
 #include "RGBColor.h"
+#include "PatternHandler.h"
 
 //#define DEBUG_DECOR
 
@@ -27,8 +28,6 @@ printf("WinDecorator()\n");
 	_DoLayout();
 	
 	textoffset=5;
-	solidhigh=0xFFFFFFFFFFFFFFFFLL;
-	solidlow=0;
 }
 
 WinDecorator::~WinDecorator(void)
@@ -188,10 +187,10 @@ printf("WinDecorator::Draw(): "); update.PrintToStream();
 //	_layerdata.highcolor=blue;
 
 	_layerdata.highcolor=_colors->document_background;
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 
 	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+		_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 	
 	_DrawFrame(update);
 	_DrawTab(update);
@@ -208,9 +207,9 @@ printf("WinDecorator::Draw()\n");
 //	_layerdata.highcolor=blue;
 
 	_layerdata.highcolor=_colors->document_background;
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 	DrawFrame();
 
 	DrawTab();
@@ -232,9 +231,9 @@ void WinDecorator::_DrawZoom(BRect r)
 		rect.OffsetBy(1,1);
 
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(rect,&_layerdata,pat_solidhigh);
 	rect.InsetBy(1,1);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
 	
 }
 
@@ -254,11 +253,11 @@ void WinDecorator::_DrawClose(BRect r)
 		rect.OffsetBy(1,1);
 
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),&_layerdata,(int8*)&solidhigh);
-	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),&_layerdata,pat_solidhigh);
+	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),&_layerdata,pat_solidhigh);
 	rect.OffsetBy(1,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),&_layerdata,(int8*)&solidhigh);
-	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),&_layerdata,pat_solidhigh);
+	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),&_layerdata,pat_solidhigh);
 }
 
 void WinDecorator::_DrawMinimize(BRect r)
@@ -272,7 +271,7 @@ void WinDecorator::_DrawMinimize(BRect r)
 		rect.OffsetBy(1,1);
 	
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(rect,&_layerdata,pat_solidhigh);
 }
 
 void WinDecorator::_DrawTab(BRect r)
@@ -283,12 +282,12 @@ void WinDecorator::_DrawTab(BRect r)
 		return;
 	
 //	_layerdata.highcolor=frame_lowcol;
-//	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
+//	_driver->StrokeRect(_tabrect,&_layerdata,pat_solidhigh);
 
 //	UpdateTitle(layer->name->String());
 
 	_layerdata.highcolor=tab_highcol;
-	_driver->FillRect(_tabrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_tabrect,&_layerdata,pat_solidhigh);
 
 	// Draw the buttons if we're supposed to	
 	if(!(_flags & B_NOT_CLOSABLE))
@@ -323,47 +322,47 @@ void WinDecorator::DrawBeveledRect(BRect r, bool down)
 
 	// Top highlight
 	_layerdata.highcolor=higher;
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
 
 	// Left highlight
-	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,pat_solidhigh);
 
 	// Right shading
 	_layerdata.highcolor=lower;
 
 	pt=rect.RightTop();
 	pt.y++;
-	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,pat_solidhigh);
 	
 	// Bottom shading
 	pt=rect.LeftBottom();
 	pt.x++;
-	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,pat_solidhigh);
 
 	rect.InsetBy(1,1);
 	// Top inside highlight
 	_layerdata.highcolor=higher;
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
 
 	// Left inside highlight
-	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,pat_solidhigh);
 
 	// Right inside shading
 	_layerdata.highcolor=lower;
 
 	pt=rect.RightTop();
 	pt.y++;
-	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,pat_solidhigh);
 	
 	// Bottom inside shading
 	pt=rect.LeftBottom();
 	pt.x++;
-	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,rect.RightBottom(),&_layerdata,pat_solidhigh);
 	
 	rect.InsetBy(1,1);
 
 	_layerdata.highcolor=mid;
-	_driver->FillRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(rect,&_layerdata,pat_solidhigh);
 }
 
 void WinDecorator::_SetColors(void)
@@ -379,40 +378,40 @@ void WinDecorator::_DrawFrame(BRect rect)
 	BRect r=_borderrect;
 	
 	_layerdata.highcolor.SetColor(255,0,0);
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 	
 	BPoint pt;
 
 	_layerdata.highcolor=frame_midcol;
 	pt=r.RightTop();
 	pt.x--;
-	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,pat_solidhigh);
 	pt=r.LeftBottom();
 	pt.y--;
-	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,pat_solidhigh);
 
 	_layerdata.highcolor=frame_lowercol;
-	_driver->StrokeLine(r.RightTop(),r.RightBottom(),&_layerdata,(int8*)&solidhigh);
-	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(r.RightTop(),r.RightBottom(),&_layerdata,pat_solidhigh);
+	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),&_layerdata,pat_solidhigh);
 	
 	r.InsetBy(1,1);
 	_layerdata.highcolor=frame_highcol;
 	pt=r.RightTop();
 	pt.x--;
-	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,pat_solidhigh);
 	pt=r.LeftBottom();
 	pt.y--;
-	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(r.LeftTop(),pt,&_layerdata,pat_solidhigh);
 
 	_layerdata.highcolor=frame_lowcol;
-	_driver->StrokeLine(r.RightTop(),r.RightBottom(),&_layerdata,(int8*)&solidhigh);
-	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(r.RightTop(),r.RightBottom(),&_layerdata,pat_solidhigh);
+	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),&_layerdata,pat_solidhigh);
 	
 	r.InsetBy(1,1);
 	_layerdata.highcolor=frame_midcol;
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 	r.InsetBy(1,1);
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 }
 
 extern "C" float get_decorator_version(void)

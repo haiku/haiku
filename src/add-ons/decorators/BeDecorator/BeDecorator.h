@@ -19,13 +19,13 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		BeDecorator.cpp
+//	File Name:		BeDecorator.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Decorator in the style of BeOS R5
+//	Description:	Fallback decorator for the app_server
 //  
 //------------------------------------------------------------------------------
-#ifndef _BE_DECORATOR_H_
-#define _BE_DECORATOR_H_
+#ifndef _DEFAULT_DECORATOR_H_
+#define _DEFAULT_DECORATOR_H_
 
 #include "Decorator.h"
 #include <Region.h>
@@ -59,7 +59,14 @@ protected:
 	RGBColor frame_highcol, frame_midcol, frame_lowcol, frame_highercol,
 		frame_lowercol;
 	RGBColor textcol;
+
+	RGBColor *framecolors;
+	
+	// Individual rects for handling window frame rendering the proper way
+	BRect rightborder,leftborder,topborder,bottomborder;
 	uint64 solidhigh, solidlow;
+	
+	int32 borderwidth;
 
 	bool slidetab;
 	int textoffset;

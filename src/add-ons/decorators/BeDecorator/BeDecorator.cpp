@@ -21,7 +21,7 @@
 //
 //	File Name:		BeDecorator.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Decorator in the style of BeOS R5
+//	Description:	Fallback decorator for the app_server
 //  
 //------------------------------------------------------------------------------
 #include <Rect.h>
@@ -30,10 +30,10 @@
 #include "LayerData.h"
 #include "ColorUtils.h"
 #include "BeDecorator.h"
+#include "PatternHandler.h"
 #include "RGBColor.h"
-
-//#define DEBUG_DECORATOR
-
+#include "RectUtils.h"
+#include <stdio.h>
 
 #define USE_VIEW_FILL_HACK
 
@@ -44,28 +44,23 @@
 BeDecorator::BeDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
  : Decorator(rect,wlook,wfeel,wflags)
 {
+
 	taboffset=0;
 	titlepixelwidth=0;
 
+	framecolors=new RGBColor[5];
+	framecolors[0].SetColor(255,255,255);
+	framecolors[1].SetColor(216,216,216);
+	framecolors[2].SetColor(152,152,152);
+	framecolors[3].SetColor(136,136,136);
+	framecolors[4].SetColor(96,96,96);
+
 	_SetFocus();
-
-	// These hard-coded assignments will go bye-bye when the system _colors 
-	// API is implemented
-	frame_highercol.SetColor(216,216,216);
-	frame_lowercol.SetColor(110,110,110);
-
-	textcol.SetColor(0,0,0);
-	
-	frame_highcol=frame_lowercol.MakeBlendColor(frame_highercol,0.75);
-	frame_midcol=frame_lowercol.MakeBlendColor(frame_highercol,0.5);
-	frame_lowcol=frame_lowercol.MakeBlendColor(frame_highercol,0.25);
 
 	_DoLayout();
 	
 	// This flag is used to determine whether or not we're moving the tab
 	slidetab=false;
-	solidhigh=0xFFFFFFFFFFFFFFFFLL;
-	solidlow=0;
 
 //	tab_highcol=_colors->window_tab;
 //	tab_lowcol=_colors->window_tab;
@@ -81,6 +76,7 @@ BeDecorator::~BeDecorator(void)
 #ifdef DEBUG_DECORATOR
 printf("BeDecorator: ~BeDecorator()\n");
 #endif
+	delete [] framecolors;
 }
 
 click_type BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
@@ -184,14 +180,48 @@ printf("BeDecorator: Do Layout\n");
 	_borderrect=_frame;
 	_closerect=_frame;
 
+	
+	switch(GetLook())
+	{
+		case B_FLOATING_WINDOW_LOOK:
+		case B_MODAL_WINDOW_LOOK:
+		
+		// We're going to make the frame 5 pixels wide, no matter what. R5's decorator frame
+		// requires the skills of a gaming master to click on the tiny frame if resizing is necessary,
+		// and there *are* apps which do this
+//			borderwidth=3;
+//			break;
+		case B_BORDERED_WINDOW_LOOK:
+		case B_TITLED_WINDOW_LOOK:
+		case B_DOCUMENT_WINDOW_LOOK:
+			borderwidth=5;
+			break;
+		default:
+			borderwidth=0;
+	}
+
 	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
 
 	_closerect.left+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
 	_closerect.top+=(_look==B_FLOATING_WINDOW_LOOK)?6:4;
 	_closerect.right=_closerect.left+10;
 	_closerect.bottom=_closerect.top+10;
-
+	
+	
 	_borderrect.top+=19;
+
+	if(borderwidth)
+	{
+		// Set up the border rectangles to handle the window's frame
+		rightborder=leftborder=topborder=bottomborder=_borderrect;
+		
+		// We want the rectangles to intersect because of the beveled intersections, so all
+		// that is necessary is to set the short dimension of each side
+		leftborder.right=leftborder.left+borderwidth;
+		rightborder.left=rightborder.right-borderwidth;
+		topborder.bottom=topborder.top+borderwidth;
+		bottomborder.top=bottomborder.bottom-borderwidth;
+	}
 	
 	_resizerect.top=_resizerect.bottom-18;
 	_resizerect.left=_resizerect.right-18;
@@ -307,9 +337,10 @@ printf("BeDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.
 	_layerdata.highcolor=_colors->document_background;
 
 	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+		_driver->FillRect(_borderrect & update,&_layerdata,pat_solidhigh);
 	
 	_DrawFrame(update);
+
 }
 
 void BeDecorator::Draw(void)
@@ -318,13 +349,13 @@ void BeDecorator::Draw(void)
 	// things
 
 	// Draw the top view's client area - just a hack :)
-	_layerdata.highcolor=_colors->document_background;
+//	_layerdata.highcolor=_colors->document_background;
 
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+//	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
+
 	DrawFrame();
 
 	DrawTab();
-
 }
 
 void BeDecorator::_DrawZoom(BRect r)
@@ -353,9 +384,9 @@ void BeDecorator::_DrawTab(BRect r)
 		return;
 	
 	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
-	_driver->FillRect(_tabrect,&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowcol;
-	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_tabrect,&_layerdata,pat_solidhigh);
+	_layerdata.highcolor=framecolors[3];
+	_driver->StrokeLine(_tabrect.LeftBottom(),_tabrect.RightBottom(),&_layerdata,pat_solidhigh);
 
 	_DrawTitle(_tabrect);
 
@@ -409,7 +440,7 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 			uint8(startcol.blue-(i*bstep)));
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(r.left,r.top+i),
-			BPoint(r.left+i,r.top),&_layerdata,(int8*)&solidhigh);
+			BPoint(r.left+i,r.top),&_layerdata,pat_solidhigh);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
@@ -417,99 +448,350 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-			BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);
+			BPoint(r.left+i,r.top+steps),&_layerdata,pat_solidhigh);
 
 	}
 
 //	_layerdata.highcolor=startcol;
-//	_driver->FillRect(r,&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowcol;
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+//	_driver->FillRect(r,&_layerdata,pat_solidhigh);
+	_layerdata.highcolor=framecolors[3];
+	_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 }
 
-void BeDecorator::_DrawFrame(BRect rect)
+void BeDecorator::_DrawFrame(BRect invalid)
 {
-	// Duh, draws the window frame, I think. ;)
 
-#ifdef USE_VIEW_FILL_HACK
-_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
-#endif
+	// We need to test each side to determine whether or not it needs drawn. Additionally,
+	// we must clip the lines drawn by this function to the invalid rectangle we are given
+	
+	#ifdef USE_VIEW_FILL_HACK
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
+	#endif
 
-	if(_look==B_NO_BORDER_WINDOW_LOOK)
+	if(!borderwidth)
 		return;
 	
-	BRect r=_borderrect;
+	// Data specifically for the StrokeLineArray call.
+	int32 numlines=0, maxlines=20;
 
-	_layerdata.highcolor=frame_midcol;
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowcol;
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowercol;
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowercol;
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-
-	r.InsetBy(1,1);
-	_layerdata.highcolor=frame_highercol;
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_highercol;
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_midcol;
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_midcol;
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
+	BPoint points[maxlines*2];
+	RGBColor colors[maxlines];
 	
-	r.InsetBy(1,1);
-	_layerdata.highcolor=frame_highcol;
-	_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+	// For quick calculation of gradients for each side. Top is same as left, right is same as
+	// bottom
+//	int8 rightindices[borderwidth],leftindices[borderwidth];
+	int8 *rightindices=new int8[borderwidth],
+		*leftindices=new int8[borderwidth];
+	
+	if(borderwidth==5)
+	{
+		leftindices[0]=2;
+		leftindices[1]=0;
+		leftindices[2]=1;
+		leftindices[3]=3;
+		leftindices[4]=2;
 
-	r.InsetBy(1,1);
-	_layerdata.highcolor=frame_lowercol;
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.right-1,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_lowercol;
-	_driver->StrokeLine(BPoint(r.left,r.top),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_highercol;
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.right,r.top),
-		&_layerdata,(int8*)&solidhigh);
-	_layerdata.highcolor=frame_highercol;
-	_driver->StrokeLine(BPoint(r.right,r.bottom),BPoint(r.left,r.bottom),
-		&_layerdata,(int8*)&solidhigh);
-	_driver->StrokeRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+		rightindices[0]=2;
+		rightindices[1]=0;
+		rightindices[2]=1;
+		rightindices[3]=3;
+		rightindices[4]=4;
+	}
+	else
+	{
+		// TODO: figure out border colors for floating window look
+		leftindices[0]=2;
+		leftindices[1]=2;
+		leftindices[2]=1;
+		leftindices[3]=1;
+		leftindices[4]=4;
 
+		rightindices[0]=2;
+		rightindices[1]=2;
+		rightindices[2]=1;
+		rightindices[3]=1;
+		rightindices[4]=4;
+	}
+	
+	// Variables used in each calculation
+	int32 startx,endx,starty,endy,i;
+	bool topcorner,bottomcorner,leftcorner,rightcorner;
+	int8 step,colorindex;
+	BRect r;
+	BPoint start, end;
+	
+	// Right side
+	if(TestRectIntersection(rightborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		startx=(int32) MAX(invalid.left,rightborder.left);
+		endx=(int32) MIN(invalid.right,rightborder.right);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=(rightborder);
+		r.bottom=r.top+borderwidth;
+		topcorner=TestRectIntersection(invalid,r);
+
+		r=rightborder;
+		r.top=r.bottom-borderwidth;
+		bottomcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=startx+1; i<=endx; i++)
+		{
+			start.x=end.x=i;
+			
+			if(topcorner)
+			{
+				start.y=rightborder.top+(borderwidth-(i-rightborder.left));
+				start.y=MAX(start.y,invalid.top);
+			}
+			else
+				start.y=MAX(start.y+borderwidth,invalid.top);
+
+			if(bottomcorner)
+			{
+				end.y=rightborder.bottom-(borderwidth-(i-rightborder.left));
+				end.y=MIN(end.y,invalid.bottom);
+			}
+			else
+				end.y=MIN(end.y-borderwidth,invalid.bottom);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			colors[numlines]=framecolors[rightindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
+	// Left side
+	if(TestRectIntersection(leftborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		startx=(int32) MAX(invalid.left,leftborder.left);
+		endx=(int32) MIN(invalid.right,leftborder.right);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=leftborder;
+		r.bottom=r.top+borderwidth;
+		topcorner=TestRectIntersection(invalid,r);
+
+		r=leftborder;
+		r.top=r.bottom-borderwidth;
+		bottomcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=startx; i<endx; i++)
+		{
+			start.x=end.x=i;
+			
+			if(topcorner)
+			{
+				start.y=leftborder.top+(i-leftborder.left);
+				start.y=MAX(start.y,invalid.top);
+			}
+			else
+				start.y=MAX(start.y+borderwidth,invalid.top);
+
+			if(bottomcorner)
+			{
+				end.y=leftborder.bottom-(i-leftborder.left);
+				end.y=MIN(end.y,invalid.bottom);
+			}
+			else
+				end.y=MIN(end.y-borderwidth,invalid.bottom);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			colors[numlines]=framecolors[leftindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
+	// Top side
+	if(TestRectIntersection(topborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		starty=(int32) MAX(invalid.top,topborder.top);
+		endy=(int32) MIN(invalid.bottom,topborder.bottom);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=topborder;
+		r.bottom=r.top+borderwidth;
+		r.right=r.left+borderwidth;
+		leftcorner=TestRectIntersection(invalid,r);
+
+		r=topborder;
+		r.top=r.bottom-borderwidth;
+		r.left=r.right-borderwidth;
+		
+		rightcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=starty; i<endy; i++)
+		{
+			start.y=end.y=i;
+			
+			if(leftcorner)
+			{
+				start.x=topborder.left+(i-topborder.top);
+				start.x=MAX(start.x,invalid.left);
+			}
+			else
+				start.x=MAX(start.x+borderwidth,invalid.left);
+
+			if(rightcorner)
+			{
+				end.x=topborder.right-(i-topborder.top);
+				end.x=MIN(end.x,invalid.right);
+			}
+			else
+				end.x=MIN(end.x-borderwidth,invalid.right);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			
+			// Top side uses the same color order as the left one
+			colors[numlines]=framecolors[leftindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
+	// Bottom side
+	if(TestRectIntersection(bottomborder,invalid))
+	{
+		
+		// We may not have to redraw the entire width of the frame itself. Rare case, but
+		// it must be accounted for.
+		starty=(int32) MAX(invalid.top,bottomborder.top);
+		endy=(int32) MIN(invalid.bottom,bottomborder.bottom);
+
+		// We'll need these flags to see if we must include the corners in final line
+		// calculations
+		r=bottomborder;
+		r.bottom=r.top+borderwidth;
+		r.right=r.left+borderwidth;
+		leftcorner=TestRectIntersection(invalid,r);
+
+		r=bottomborder;
+		r.top=r.bottom-borderwidth;
+		r.left=r.right-borderwidth;
+		
+		rightcorner=TestRectIntersection(invalid,r);
+		step=(borderwidth==5)?1:2;
+		colorindex=0;
+		
+		// Generate the lines for this side
+		for(i=starty+1; i<=endy; i++)
+		{
+			start.y=end.y=i;
+			
+			if(leftcorner)
+			{
+				start.x=bottomborder.left+(borderwidth-(i-bottomborder.top));
+				start.x=MAX(start.x,invalid.left);
+			}
+			else
+				start.x=MAX(start.x+borderwidth,invalid.left);
+
+			if(rightcorner)
+			{
+				end.x=bottomborder.right-(borderwidth-(i-bottomborder.top));
+				end.x=MIN(end.x,invalid.right);
+			}
+			else
+				end.x=MIN(end.x-borderwidth,invalid.right);
+							
+			// Make the appropriate 
+			points[numlines*2]=start;
+			points[(numlines*2)+1]=end;
+			
+			// Top side uses the same color order as the left one
+			colors[numlines]=framecolors[rightindices[colorindex]];
+			colorindex+=step;
+			numlines++;
+		}
+	}
+
+	_driver->StrokeLineArray(points,numlines,colors,&_layerdata);
+	
+	delete rightindices;
+	delete leftindices;
+	
 	// Draw the resize thumb if we're supposed to
 	if(!(_flags & B_NOT_RESIZABLE))
 	{
 		r=_resizerect;
 
-		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
+//		int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
 		
 		// This code is strictly for B_DOCUMENT_WINDOW looks
 		if(_look==B_DOCUMENT_WINDOW_LOOK)
 		{
+			r.right-=4;
+			r.bottom-=4;
+			_layerdata.highcolor=framecolors[2];
+
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,pat_solidhigh);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,pat_solidhigh);
+
+			r.OffsetBy(1,1);
+			_layerdata.highcolor=framecolors[0];
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),&_layerdata,pat_solidhigh);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),&_layerdata,pat_solidhigh);
+			
+			r.OffsetBy(1,1);
+			_layerdata.highcolor=framecolors[1];
+			_driver->FillRect(r,&_layerdata,pat_solidhigh);
+			
+/*			r.left+=2;
+			r.top+=2;
+			r.right-=3;
+			r.bottom-=3;
+*/
+			r.right-=2;
+			r.bottom-=2;
+			int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
+		
 			rgb_color halfcol, startcol, endcol;
 			float rstep,gstep,bstep,i;
 			
 			int steps=(w<h)?w:h;
 		
-			startcol=frame_highercol.GetColor32();
-			endcol=frame_lowercol.GetColor32();
+			startcol=framecolors[0].GetColor32();
+			endcol=framecolors[4].GetColor32();
 		
-			halfcol=frame_highercol.MakeBlendColor(frame_lowercol,0.5).GetColor32();
+			halfcol=framecolors[0].MakeBlendColor(framecolors[4],0.5).GetColor32();
 		
 			rstep=(startcol.red-halfcol.red)/steps;
 			gstep=(startcol.green-halfcol.green)/steps;
 			bstep=(startcol.blue-halfcol.blue)/steps;
-
+			
+			// Explicitly locking the driver is normally unnecessary. However, we need to do
+			// this because we are rapidly drawing a series of calls which would not necessarily
+			// draw correctly if we didn't do so.
+			_driver->Lock();
 			for(i=0;i<=steps; i++)
 			{
 				_layerdata.highcolor.SetColor(uint8(startcol.red-(i*rstep)),
@@ -517,24 +799,25 @@ _driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
 					uint8(startcol.blue-(i*bstep)));
 				
 				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),&_layerdata,(int8*)&solidhigh);
+					BPoint(r.left+i,r.top),&_layerdata,pat_solidhigh);
 		
 				_layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
 					uint8(halfcol.green-(i*gstep)),
 					uint8(halfcol.blue-(i*bstep)));
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),&_layerdata,(int8*)&solidhigh);			
+					BPoint(r.left+i,r.top+steps),&_layerdata,pat_solidhigh);			
 			}
-			_layerdata.highcolor=frame_lowercol;
-			_driver->StrokeRect(r,&_layerdata,(int8*)&solidhigh);
+			_driver->Unlock();
+//			_layerdata.highcolor=framecolors[4];
+//			_driver->StrokeRect(r,&_layerdata,pat_solidhigh);
 		}
 		else
 		{
-			_layerdata.highcolor=frame_lowercol;
+			_layerdata.highcolor=framecolors[4];
 			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
-				&_layerdata,(int8*)&solidhigh);
+				&_layerdata,pat_solidhigh);
 			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
-				&_layerdata,(int8*)&solidhigh);
+				&_layerdata,pat_solidhigh);
 		}
 	}
 }

@@ -4,6 +4,7 @@
 #include "ColorUtils.h"
 #include "MacDecorator.h"
 #include "RGBColor.h"
+#include "PatternHandler.h"
 
 //#define DEBUG_DECOR
 
@@ -33,8 +34,6 @@ printf("MacDecorator()\n");
 	_DoLayout();
 	
 	textoffset=5;
-	solidhigh=0xFFFFFFFFFFFFFFFFLL;
-	solidlow=0;
 }
 
 MacDecorator::~MacDecorator(void)
@@ -183,10 +182,10 @@ printf("MacDecorator::Draw(): "); update.PrintToStream();
 #endif
 	// Draw the top view's client area - just a hack :)
 	_layerdata.highcolor=_colors->document_background;
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 
 	if(_borderrect.Intersects(update))
-		_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+		_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 	
 	_DrawFrame(update);
 	_DrawTab(update);
@@ -203,9 +202,9 @@ printf("MacDecorator::Draw()\n");
 //	_layerdata.highcolor=blue;
 
 	_layerdata.highcolor=_colors->document_background;
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 
-	_driver->FillRect(_borderrect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(_borderrect,&_layerdata,pat_solidhigh);
 	DrawFrame();
 
 	DrawTab();
@@ -222,25 +221,25 @@ void MacDecorator::_DrawZoom(BRect r)
 	
 	pt2.x--;
 	_layerdata.highcolor.SetColor(136,136,136);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
 	_layerdata.highcolor.SetColor(255,255,255);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 
 	rect.InsetBy(1,1);
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(rect,&_layerdata,pat_solidhigh);
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -252,7 +251,7 @@ void MacDecorator::_DrawZoom(BRect r)
 	rect.right++;
 	
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
 }
 
 void MacDecorator::_DrawClose(BRect r)
@@ -266,25 +265,25 @@ void MacDecorator::_DrawClose(BRect r)
 	
 	pt2.x--;
 	_layerdata.highcolor.SetColor(136,136,136);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
 	_layerdata.highcolor.SetColor(255,255,255);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 
 	rect.InsetBy(1,1);
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(rect,&_layerdata,pat_solidhigh);
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -296,7 +295,7 @@ void MacDecorator::_DrawClose(BRect r)
 //	rect.right--;
 	
 //	_layerdata.highcolor.SetColor(0,0,0);
-//	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+//	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
 }
 
 void MacDecorator::_DrawMinimize(BRect r)
@@ -310,25 +309,25 @@ void MacDecorator::_DrawMinimize(BRect r)
 	
 	pt2.x--;
 	_layerdata.highcolor.SetColor(136,136,136);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt2=r.LeftBottom();
 	pt2.y--;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt=r.RightBottom();
 	pt2=r.RightTop();
 	pt2.y++;
 	_layerdata.highcolor.SetColor(255,255,255);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	
 	pt2=r.LeftBottom();
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 
 	rect.InsetBy(1,1);
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(rect,&_layerdata,pat_solidhigh);
 	
 	rect.InsetBy(1,1);
 	DrawBlendedRect(rect,down);
@@ -340,7 +339,7 @@ void MacDecorator::_DrawMinimize(BRect r)
 	rect.InsetBy(-2,0);
 	
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeRect(rect,&_layerdata,pat_solidhigh);
 }
 
 void MacDecorator::_DrawTab(BRect r)
@@ -351,29 +350,29 @@ void MacDecorator::_DrawTab(BRect r)
 		return;
 	
 //	_layerdata.highcolor=frame_lowcol;
-//	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
+//	_driver->StrokeRect(_tabrect,&_layerdata,pat_solidhigh);
 
 //	UpdateTitle(layer->name->String());
 	BRect rect(_tabrect);
 	_layerdata.highcolor.SetColor(frame_midcol);
-	_driver->FillRect(rect,&_layerdata,(int8*)&solidhigh);
+	_driver->FillRect(rect,&_layerdata,pat_solidhigh);
 	
 	
 	if(GetFocus())
 	{
 		_layerdata.highcolor.SetColor(frame_lowercol);
-		_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
-		_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,(int8*)&solidhigh);
-		_driver->StrokeLine(rect.RightBottom(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+		_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
+		_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,pat_solidhigh);
+		_driver->StrokeLine(rect.RightBottom(),rect.RightTop(),&_layerdata,pat_solidhigh);
 	
 		rect.InsetBy(1,1);
 		rect.bottom++;
 		
 		_layerdata.highcolor.SetColor(frame_highcol);
-		_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
-		_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,(int8*)&solidhigh);
+		_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),&_layerdata,pat_solidhigh);
+		_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),&_layerdata,pat_solidhigh);
 		_layerdata.highcolor.SetColor(frame_lowcol);
-		_driver->StrokeLine(rect.RightBottom(),rect.RightTop(),&_layerdata,(int8*)&solidhigh);
+		_driver->StrokeLine(rect.RightBottom(),rect.RightTop(),&_layerdata,pat_solidhigh);
 		
 		// Draw the neat little lines on either side of the title if there's room
 		if((_tabrect.left+textoffset)>(_closerect.right+5))
@@ -385,7 +384,7 @@ void MacDecorator::_DrawTab(BRect r)
 			_layerdata.highcolor.SetColor(frame_highcol);
 			for(int32 i=0;i<6;i++)
 			{
-				_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+				_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 				pt.y+=2;
 				pt2.y+=2;
 			}
@@ -395,7 +394,7 @@ void MacDecorator::_DrawTab(BRect r)
 			_layerdata.highcolor.SetColor(frame_lowcol);
 			for(int32 i=0;i<6;i++)
 			{
-				_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+				_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 				pt.y+=2;
 				pt2.y+=2;
 			}
@@ -409,7 +408,7 @@ void MacDecorator::_DrawTab(BRect r)
 				_layerdata.highcolor.SetColor(frame_highcol);
 				for(int32 i=0;i<6;i++)
 				{
-					_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+					_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 					pt.y+=2;
 					pt2.y+=2;
 				}
@@ -418,7 +417,7 @@ void MacDecorator::_DrawTab(BRect r)
 				_layerdata.highcolor.SetColor(frame_lowcol);
 				for(int32 i=0;i<6;i++)
 				{
-					_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+					_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 					pt.y+=2;
 					pt2.y+=2;
 				}
@@ -474,7 +473,7 @@ void MacDecorator::DrawBlendedRect(BRect r, bool down)
 			uint8(startcol.blue-(i*bstep)));
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(rect.left,rect.top+i),
-			BPoint(rect.left+i,rect.top),&_layerdata,(int8*)&solidhigh);
+			BPoint(rect.left+i,rect.top),&_layerdata,pat_solidhigh);
 
 		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
@@ -482,17 +481,17 @@ void MacDecorator::DrawBlendedRect(BRect r, bool down)
 
 		_layerdata.highcolor=tmpcol;
 		_driver->StrokeLine(BPoint(rect.left+steps,rect.top+i),
-			BPoint(rect.left+i,rect.top+steps),&_layerdata,(int8*)&solidhigh);
+			BPoint(rect.left+i,rect.top+steps),&_layerdata,pat_solidhigh);
 
 	}
 }
 
-
+/*
 void MacDecorator::_SetColors(void)
 {
 	_SetFocus();
 }
-
+*/
 void MacDecorator::_DrawFrame(BRect rect)
 {
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
@@ -506,28 +505,28 @@ void MacDecorator::_DrawFrame(BRect rect)
 
 	// Draw the left side of the frame
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt2.x++;
 	pt2.y--;
 	
 	_layerdata.highcolor.SetColor(frame_highcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt2.x++;
 	pt2.y--;
 	
 	_layerdata.highcolor.SetColor(frame_midcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt2.x++;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt2.x++;
 	pt2.y--;
 
 	_layerdata.highcolor.SetColor(frame_lowcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt.y+=2;
 	topleftpt=pt;
@@ -535,7 +534,7 @@ void MacDecorator::_DrawFrame(BRect rect)
 	pt2.y--;
 
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 
 
 	pt=r.RightTop();
@@ -543,42 +542,42 @@ void MacDecorator::_DrawFrame(BRect rect)
 	
 	// Draw the right side of the frame
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x--;
 	pt2.x--;
 
 	_layerdata.highcolor.SetColor(frame_lowcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x--;
 	pt2.x--;
 
 	_layerdata.highcolor.SetColor(frame_midcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x--;
 	pt2.x--;
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x--;
 	pt2.x--;
 
 	_layerdata.highcolor.SetColor(frame_highcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x--;
 	pt.y+=2;
 	toprightpt=pt;
 	pt2.x--;
 	
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 
 	// Draw the top side of the frame that is not in the tab
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(topleftpt,toprightpt,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(topleftpt,toprightpt,&_layerdata,pat_solidhigh);
 	topleftpt.y--;
 	toprightpt.x++;
 	toprightpt.y--;
 
 	_layerdata.highcolor.SetColor(frame_lowcol);
-	_driver->StrokeLine(topleftpt,toprightpt,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(topleftpt,toprightpt,&_layerdata,pat_solidhigh);
 	
 	pt=r.RightTop();
 	pt2=r.RightBottom();
@@ -589,41 +588,41 @@ void MacDecorator::_DrawFrame(BRect rect)
 	
 	// Draw the bottom side of the frame
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
 	_layerdata.highcolor.SetColor(frame_lowcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
 	_layerdata.highcolor.SetColor(frame_midcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x++;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 
 	_layerdata.highcolor.SetColor(frame_highcol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.x+=2;
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
 	
 	_layerdata.highcolor.SetColor(frame_lowercol);
-	_driver->StrokeLine(pt,pt2,&_layerdata,(int8*)&solidhigh);
+	_driver->StrokeLine(pt,pt2,&_layerdata,pat_solidhigh);
 	pt.y--;
 	pt2.x--;
 	pt2.y--;
@@ -636,5 +635,5 @@ extern "C" float get_decorator_version(void)
 
 extern "C" Decorator *instantiate_decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 {
-	return new MacDecorator(rect,wlook,wfeel,wflags);
+	return (new MacDecorator(rect,wlook,wfeel,wflags));
 }

@@ -26,7 +26,7 @@ protected:
 	void _DrawZoom(BRect r);
 	void _DrawMinimize(BRect r);
 	void _DoLayout(void);
-	void _SetColors(void);
+//	void _SetColors(void);
 	void DrawBlendedRect(BRect r, bool down);
 	uint32 taboffset;
 
