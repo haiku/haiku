@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "serial.h"
@@ -11,6 +11,10 @@
 #include <boot/stage2.h>
 
 #include <string.h>
+
+
+//#define ENABLE_SERIAL
+	// define this to always enable serial output
 
 
 enum serial_register_offsets {
@@ -65,7 +69,7 @@ serial_puts(const char *string, size_t size)
 extern "C" void 
 serial_disable(void)
 {
-#if ENABLE_SERIAL
+#ifdef ENABLE_SERIAL
 	sSerialEnabled = 0;
 #else
 	sSerialEnabled--;
