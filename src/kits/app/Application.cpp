@@ -33,12 +33,14 @@
 #include <unistd.h>
 
 // System Includes -------------------------------------------------------------
+#include <Alert.h>
 #include <AppFileInfo.h>
 #include <Application.h>
 #include <AppMisc.h>
 #include <Cursor.h>
 #include <Entry.h>
 #include <File.h>
+#include <InterfaceDefs.h>
 #include <Locker.h>
 #include <Path.h>
 #include <PropertyInfo.h>
@@ -365,6 +367,11 @@ void BApplication::RefsReceived(BMessage* a_message)
 //------------------------------------------------------------------------------
 void BApplication::AboutRequested()
 {
+	thread_info info;
+	if (get_thread_info(Thread(), &info) == B_OK) {
+		BAlert *alert = new BAlert("_about_", info.name, "OK");
+		alert->Go(NULL);
+	}
 }
 //------------------------------------------------------------------------------
 BHandler* BApplication::ResolveSpecifier(BMessage* msg, int32 index,
@@ -742,38 +749,16 @@ void BApplication::InitData(const char* signature, status_t* error)
 	}
 #endif	// ifdef RUN_WITHOUT_REGISTRAR
 
-	// Notify app_server that we exist
-	fServerFrom=find_port(SERVER_PORT_NAME);
-	if(fServerFrom!=B_NAME_NOT_FOUND)
-	{
-		// Create the port so that the app_server knows where to send messages
-		fServerTo=create_port(100,"a<fServerTo");
-		if(fServerTo!=B_BAD_VALUE && fServerTo!=B_NO_MORE_PORTS)
-		{
-			// AS_CREATE_APP:
-	
-			// Attach data:
-			// 1) port_id - receiver port of a regular app
-			// 2) int32 - handler ID token of the app
-			// 3) char * - signature of the regular app
-			PortLink link(fServerFrom);
-			PortMessage pmsg;
-			
-			link.SetOpCode(AS_CREATE_APP);
-			link.Attach<port_id>(fServerTo);
-			link.Attach<port_id>(_get_object_token_(this));
-			link.AttachString(signature);
-			link.FlushWithReply(&pmsg);
-
-			// Reply code: AS_CREATE_APP
-			// Reply data:
-			//	1) port_id server-side application port (fServerFrom value)
-			pmsg.Read<port_id>(&fServerFrom);
-		}
-		else
-			fInitError=fServerTo;
-	}
-	
+	// TODO: Not sure about the order
+	if (fInitError == B_OK)
+		connect_to_app_server();
+	if (fInitError == B_OK)
+		setup_server_heaps();
+	if (fInitError == B_OK)
+		get_scs();
+	if (fInitError == B_OK)
+		fInitError = _init_interface_kit_();
+		
 	// init be_app and be_app_messenger
 	if (fInitError == B_OK) {
 		be_app = this;
@@ -813,6 +798,7 @@ void BApplication::EndRectTracking()
 //------------------------------------------------------------------------------
 void BApplication::get_scs()
 {
+	//gPrivateScreen = new BPrivateScreen();
 }
 //------------------------------------------------------------------------------
 void BApplication::setup_server_heaps()
@@ -836,6 +822,35 @@ void* BApplication::global_ro_offs_to_ptr(uint32 offset)
 //------------------------------------------------------------------------------
 void BApplication::connect_to_app_server()
 {
+	fServerFrom = find_port(SERVER_PORT_NAME);
+	if (fServerFrom > 0) {
+		// Create the port so that the app_server knows where to send messages
+		fServerTo = create_port(100, "a<fServerTo");
+		if (fServerTo > 0) {
+			// AS_CREATE_APP:
+	
+			// Attach data:
+			// 1) port_id - receiver port of a regular app
+			// 2) int32 - handler ID token of the app
+			// 3) char * - signature of the regular app
+			PortLink link(fServerFrom);
+			PortMessage pmsg;
+			
+			link.SetOpCode(AS_CREATE_APP);
+			link.Attach<port_id>(fServerTo);
+			link.Attach<port_id>(_get_object_token_(this));
+			link.AttachString(fAppName);
+			link.FlushWithReply(&pmsg);
+
+			// Reply code: AS_CREATE_APP
+			// Reply data:
+			//	1) port_id server-side application port (fServerFrom value)
+			pmsg.Read<port_id>(&fServerFrom);
+		}
+		else
+			fInitError = fServerTo;
+	} else
+		fInitError = fServerFrom;
 }
 //------------------------------------------------------------------------------
 void BApplication::send_drag(BMessage* msg, int32 vs_token, BPoint offset, BRect drag_rect, BHandler* reply_to)
