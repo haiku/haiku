@@ -15,6 +15,7 @@ Addon
 	Driver.cpp
 	Fonts.cpp
 	FontsWindow.cpp
+	ImageCache.cpp
 	InterfaceUtils.cpp
 	JobSetupWindow.cpp
 	LinePathBuilder.cpp
