@@ -2,6 +2,8 @@ SubDir OBOS_TOP src servers media_addon ;
 
 UsePrivateHeaders media ;
 
+AddResources media_addon_server : media_addon_server.rsrc ;
+
 # That's ugly. The header (ServerInterface.h) should reside in
 # headers/private/media.
 SubDirHdrs [ FDirName $(OBOS_TOP) src servers media ] ;
