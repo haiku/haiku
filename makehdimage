@@ -51,6 +51,10 @@ else
 	echo "Building $imageSize MB image at $imagePath..."
 fi
 
+# paths of helper commands
+rc=$sourceDir/distro/x86.R1/beos/bin/rc
+resattr=$sourceDir/objects/x86.R1/tools/resattr/resattr
+
 export RUN_WITHOUT_APP_SERVER=1
 
 BEOS_BIN="touch sync ln listarea listattr listsem listport \
@@ -66,7 +70,7 @@ BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 
 BEOS_SYSTEM_SERVERS="registrar syslog_daemon"
 
-jam -q kernel boot_loader config_manager pci isa ide scsi \
+jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 	ide_isa bfs blkman fast_log ide_adapter locked_pool \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
@@ -205,6 +209,43 @@ for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		linkName=../$linkName
 	done
 	(cd $(dirname $f); ln -fs $linkName .)
+done
+
+
+# install MIME database
+mimeDBSource=$sourceDir/src/data/beos_mime
+mimeDBDest=$targetDir/home/config/settings/beos_mime
+
+rm -rf $mimeDBDest
+mkdir -p $mimeDBDest
+
+for inSuperFile in $mimeDBSource/*.super; do
+	superType=$(basename $inSuperFile .super)
+	outSuperDir=$mimeDBDest/$superType
+
+	# create super type dir
+	mkdir -p $outSuperDir
+
+	# compile rdef to rsrc file and the rsrc file to attributes
+	tmpFile=/tmp/mimedb$$.rsrc
+	$rc -o $tmpFile $inSuperFile
+	$resattr -O -o $outSuperDir $tmpFile
+	rm -f $tmpFile
+
+	# iterate through the sub types
+	for inSubFile in $mimeDBSource/$superType/*; do
+		# check, if the type exists
+		if test -f $inSubFile && grep META:TYPE $inSubFile &> /dev/null; then
+			subType=$(basename $inSubFile)
+			outSubFile=$outSuperDir/$subType
+
+			# compile rdef to rsrc file and the rsrc file to attributes
+			tmpFile=/tmp/mimedb$$.rsrc
+			$rc -o $tmpFile $inSubFile
+			$resattr -O -o $outSubFile $tmpFile
+			rm -f $tmpFile
+		fi
+	done
 done
 
 
