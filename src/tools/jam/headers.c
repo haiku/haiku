@@ -75,7 +75,7 @@ headers( TARGET *t )
 
 	lol_add( &lol, list_new( L0, t->name, 1 ) );
 #ifdef OPT_HEADER_CACHE_EXT
-	lol_add( &lol, hcache( t, var_get("HDRSCAN") ) );
+	lol_add( &lol, hcache( t, hdrscan ) );
 #else
 	lol_add( &lol, headers1( t->boundname, hdrscan ) );
 #endif

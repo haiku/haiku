@@ -408,7 +408,7 @@ hcache (TARGET *t, LIST *hdrscan)
 
     /* 'c' points at the cache entry.  Its out of date. */
 
-    l = headers1 (t->boundname, 0);
+    l = headers1 (t->boundname, hdrscan);
 
     c->time = t->time;
     c->age = 0;
