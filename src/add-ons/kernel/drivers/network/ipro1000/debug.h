@@ -24,6 +24,7 @@
 #ifdef DEBUG
 
 	#define TRACE(a...) dprintf("ipro1000: " a)
+	#define ASSERT(a)	if (a) ; else panic("ipro1000: ASSERT failed, " #a)
 
 	/* used by if_em.h */
 	#define DEBUG_INIT  1
@@ -34,6 +35,7 @@
 #else
 
 	#define TRACE(a...)
+	#define ASSERT(a)
 
 	/* used by if_em.h */
 	#define DEBUG_INIT  0

@@ -45,16 +45,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "debug.h"
 #include "timer.h"
 
-#define DBG 0
-
-#define ASSERT(x) if(!(x)) panic("ipro1000: " #x)
-
 #define usec_delay(x) snooze(x)
 #define msec_delay(x) snooze(1000*(x))
 
 #define MSGOUT(S, A, B)     dprintf("ipro1000: " S "\n", A, B)
 #define DEBUGFUNC(F)        DEBUGOUT(F);
-#if DBG
+
+#if DEBUG_HW
 	#define DEBUGOUT(S)         dprintf("ipro1000: " S "\n")
 	#define DEBUGOUT1(S,A)      dprintf("ipro1000: " S "\n",A)
 	#define DEBUGOUT2(S,A,B)    dprintf("ipro1000: " S "\n",A,B)
@@ -67,8 +64,6 @@ POSSIBILITY OF SUCH DAMAGE.
 	#define DEBUGOUT3(S,A,B,C)
 	#define DEBUGOUT7(S,A,B,C,D,E,F,G)
 #endif
-
-#define printf dprintf
 
 // no longer used in FreeBSD
 #define splx(s)
