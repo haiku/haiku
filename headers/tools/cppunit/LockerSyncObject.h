@@ -4,25 +4,28 @@
 #include <cppunit/SynchronizedObject.h>
 #include <Locker.h>
 
-/*! \brief BLocker based implementation of CppUnit::SynchronizedObject::SynchronizationObject
+//! BLocker based implementation of CppUnit::SynchronizedObject::SynchronizationObject
+/*!	This class is used to serialize access to a TestResult object. You should
+	not need to explicitly use it anywhere in your testing code.
 */
 class LockerSyncObject : public CppUnit::SynchronizedObject::SynchronizationObject {
 public:
-/*	LockerSyncObject() : fLock(new BLocker()) {}
-	virtual ~LockerSyncObject() { cout << 1 << endl; delete fLock; cout << 2 << endl; }
-
-	virtual void lock() { fLock->Lock(); }
-	virtual void unlock() { fLock->Unlock(); }
-protected:
-	BLocker *fLock;
-*/
 	LockerSyncObject() {}
 	virtual ~LockerSyncObject() {}
 
 	virtual void lock() { fLock.Lock(); }
 	virtual void unlock() { fLock.Unlock(); }
+
 protected:
 	BLocker fLock;
+
+private:
+  //! Prevents the use of the copy constructor.
+  LockerSyncObject( const LockerSyncObject &copy );
+
+  //! Prevents the use of the copy operator.
+  void operator =( const LockerSyncObject &copy );
+  
 };
 
 #endif  // _beos_synchronization_object_h_
