@@ -58,7 +58,7 @@ StdBinCommands
 	shutdown.cpp
 	version.cpp
 #	yes.cpp
-	: be ;
+	: libroot.so be ;
 
 # standard commands that need libbe.so, libtranslation.so
 StdBinCommands
