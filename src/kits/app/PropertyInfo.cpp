@@ -418,33 +418,28 @@ void BPropertyInfo::PrintToStream() const
 	printf("      property   commands                       types                specifiers\n");
 	printf("--------------------------------------------------------------------------------\n");
 
-	for (int32 pi = 0; fPropInfo[pi].name != 0; pi++)
-	{
+	for (int32 pi = 0; fPropInfo[pi].name != 0; pi++) {
 		// property
 		printf("%14s", fPropInfo[pi].name);
 		// commands
-		for (int32 i = 0; i < 10 && fPropInfo[pi].commands[i] != 0; i++)
-		{
+		for (int32 i = 0; i < 10 && fPropInfo[pi].commands[i] != 0; i++) {
 			uint32 command = fPropInfo[pi].commands[i];
 
-			printf("   %c%c%c%-28c", (command & 0xFF000000) >> 24,
-				(command & 0xFF0000) >> 16, (command & 0xFF00) >> 8,
-				command & 0xFF);
+			printf("   %c%c%c%-28c", int(command & 0xFF000000) >> 24,
+				int(command & 0xFF0000) >> 16, int(command & 0xFF00) >> 8,
+				int(command) & 0xFF);
 		}
 		// types
-		for (int32 i = 0; i < 10 && fPropInfo[pi].types[i] != 0; i++)
-		{
+		for (int32 i = 0; i < 10 && fPropInfo[pi].types[i] != 0; i++) {
 			uint32 type = fPropInfo[pi].types[i];
 
-			printf("%c%c%c%c", (type & 0xFF000000) >> 24,
-				(type & 0xFF0000) >> 16, (type & 0xFF00) >> 8, type & 0xFF);
+			printf("%c%c%c%c", int(type & 0xFF000000) >> 24,
+				int(type & 0xFF0000) >> 16, int(type & 0xFF00) >> 8, (int)type & 0xFF);
 		}
 		// specifiers
-		for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++)
-		{
+		for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++) {
 			uint32 spec = fPropInfo[pi].specifiers[i];
-
-			printf("%d", spec);
+			printf("%lu", spec);
 		}
 		printf("\n");
 	}
