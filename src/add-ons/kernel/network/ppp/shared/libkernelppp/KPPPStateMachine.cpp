@@ -20,7 +20,7 @@
 #ifdef _KERNEL_MODE
 	#define spawn_thread spawn_kernel_thread
 	#define printf dprintf
-#else DEBUG
+#else
 	#include <cstdio>
 #endif
 
@@ -1893,7 +1893,7 @@ bool
 PPPStateMachine::SendCodeReject(struct mbuf *packet, uint16 protocolNumber, uint8 code)
 {
 #if DEBUG
-	printf("PPPSM: SendCodeReject(protocolNumber=%d;code=%d) state=%d phase=%d\n",
+	printf("PPPSM: SendCodeReject(protocolNumber=%X;code=%d) state=%d phase=%d\n",
 		protocolNumber, code, State(), Phase());
 #endif
 	

@@ -11,8 +11,13 @@
 #include <cstring>
 #include <core_funcs.h>
 
+
 #ifdef _KERNEL_MODE
 	#include <kernel_cpp.h>
+	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
+#else
+	#include <cstdio>
 #endif
 
 
@@ -56,6 +61,7 @@ PPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 		else
 			return Next()->SendToNext(packet, protocolNumber);
 	} else {
+		printf("PPPLayer: SendToNext() failed because there is no next handler!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}

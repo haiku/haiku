@@ -648,16 +648,27 @@ PPPInterface::ProtocolAt(int32 index) const
 PPPProtocol*
 PPPInterface::ProtocolFor(uint16 protocolNumber, PPPProtocol *start = NULL) const
 {
+#if DEBUG
+	printf("PPPInterface: ProtocolFor(%X), p&=%X\n", protocolNumber,
+		protocolNumber & 0x7FFF);
+#endif
+	
 	PPPProtocol *current = start ? start : FirstProtocol();
 	
 	for(; current; current = current->NextProtocol()) {
+#if DEBUG
+		printf("PPPInterface: ProtocolFor(): c=%X, c&=%X\n", current->ProtocolNumber(),
+			current->ProtocolNumber() & 0x7FFF);
+#endif
+		
 		if(current->ProtocolNumber() == protocolNumber
 				|| (current->Flags() & PPP_INCLUDES_NCP
-					&& current->ProtocolNumber() & 0x7FFF == protocolNumber & 0x7FFF))
+					&& (current->ProtocolNumber() & 0x7FFF)
+						== (protocolNumber & 0x7FFF)))
 			return current;
 	}
 	
-	return current;
+	return NULL;
 }
 
 
@@ -1194,9 +1205,23 @@ PPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 		protocol = protocol->NextProtocol() ?
 			ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL;
 	
+#if DEBUG
+	if(!protocol)
+		printf("PPPInterface::Send(): no protocol found!\n");
+	else if(!Device()->IsUp())
+		printf("PPPInterface::Send(): device is not up!\n");
+	else if(!protocol->IsEnabled())
+		printf("PPPInterface::Send(): protocol not enabled!\n");
+	else if(!IsProtocolAllowed(*protocol))
+		printf("PPPInterface::Send(): protocol not allowed to send!\n");
+	else
+		printf("PPPInterface::Send(): protocol allowed\n");
+#endif
+	
 	// make sure that protocol is allowed to send and everything is up
 	if(!Device()->IsUp() || !protocol || !protocol->IsEnabled()
 			|| !IsProtocolAllowed(*protocol)) {
+		printf("PPPInterface::Send(): cannot send!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -1272,6 +1297,10 @@ PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	for(; protocol;
 			protocol = protocol->NextProtocol() ?
 				ProtocolFor(protocolNumber, protocol->NextProtocol()) : NULL) {
+#if DEBUG
+		printf("PPPInterface::Receive(): trying protocol\n");
+#endif
+		
 		if(!protocol->IsEnabled() || !IsProtocolAllowed(*protocol))
 			continue;
 				// skip handler if disabled or not allowed
@@ -1282,6 +1311,10 @@ PPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 		
 		return result;
 	}
+	
+#if DEBUG
+	printf("PPPInterface::Receive(): trying parent\n");
+#endif
 	
 	// maybe the parent interface can handle the packet
 	if(Parent())

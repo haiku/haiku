@@ -217,8 +217,10 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 	if(!packet)
 		return B_ERROR;
 	
-	if(protocolNumber != PPP_LCP_PROTOCOL)
+	if(protocolNumber != PPP_LCP_PROTOCOL) {
+		printf("PPPLCP::Receive(): wrong protocol number!\n");
 		return PPP_UNHANDLED;
+	}
 	
 	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
 	

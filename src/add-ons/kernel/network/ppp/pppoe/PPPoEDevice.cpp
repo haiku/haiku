@@ -282,14 +282,16 @@ PPPoEDevice::CountOutputBytes() const
 status_t
 PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 {
+	// Send() is only for PPP packets. PPPoE packets are sent directly to ethernet.
+	
 #if DEBUG
 	printf("PPPoEDevice: Send()\n");
-	dump_packet(packet);
 #endif
 	
 	if(!packet)
 		return B_ERROR;
 	else if(InitCheck() != B_OK || protocolNumber != 0) {
+		printf("PPPoEDevice::Send(): InitCheck() != B_OK!\n");
 		m_freem(packet);
 		return B_ERROR;
 	}
@@ -297,6 +299,7 @@ PPPoEDevice::Send(struct mbuf *packet, uint16 protocolNumber = 0)
 	LockerHelper locker(fLock);
 	
 	if(!IsUp()) {
+		printf("PPPoEDevice::Send(): no connection!\n");
 		m_freem(packet);
 		return PPP_NO_CONNECTION;
 	}

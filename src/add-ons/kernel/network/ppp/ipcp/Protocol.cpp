@@ -179,9 +179,15 @@ IPCP::Down()
 status_t
 IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
 {
+#if DEBUG
+	printf("IPCP: Send(0x%X)\n", protocolNumber);
+#endif
+	
 	if((protocolNumber == IP_PROTOCOL && State() == PPP_OPENED_STATE)
 			|| protocolNumber == IPCP_PROTOCOL)
 		return SendToNext(packet, protocolNumber);
+	
+	printf("IPCP: Send() failed because of wrong state or protocol number!\n");
 	
 	m_freem(packet);
 	return B_ERROR;
@@ -191,6 +197,10 @@ IPCP::Send(struct mbuf *packet, uint16 protocolNumber = IPCP_PROTOCOL)
 status_t
 IPCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 {
+#if DEBUG
+	printf("IPCP: Receive(0x%X)\n", protocolNumber);
+#endif
+	
 	if(!packet)
 		return B_ERROR;
 	
@@ -359,10 +369,14 @@ IPCP::UpdateAddresses()
 	if(State() != PPP_OPENED_STATE && !Interface().DoesDialOnDemand())
 		return;
 	
-	in_addr_t netmask;
+	struct sockaddr_in gateway;
 	struct in_aliasreq inreq;
 	struct ifreq ifreqAddress, ifreqDestination;
+	memset(&inreq, 0, sizeof(struct in_aliasreq));
+	memset(&ifreqAddress, 0, sizeof(struct ifreq));
+	memset(&ifreqDestination, 0, sizeof(struct ifreq));
 	
+	// create local address
 	inreq.ifra_addr.sin_family = AF_INET;
 	if(fLocalRequests.address != INADDR_ANY)
 		inreq.ifra_addr.sin_addr.s_addr = fLocalRequests.address;
@@ -370,42 +384,59 @@ IPCP::UpdateAddresses()
 		inreq.ifra_addr.sin_addr.s_addr = INADDR_BROADCAST;
 	else
 		inreq.ifra_addr.sin_addr.s_addr = fLocalConfiguration.address;
-	inreq.ifra_addr.sin_len = sizeof(sockaddr_in);
-	memcpy(&ifreqAddress.ifr_addr, &inreq.ifra_addr, sizeof(sockaddr_in));
+	inreq.ifra_addr.sin_len = sizeof(struct sockaddr_in);
+	memcpy(&ifreqAddress.ifr_addr, &inreq.ifra_addr, sizeof(struct sockaddr_in));
 	
-	inreq.ifra_dstaddr.sin_family = AF_INET;
+	// create destination address
+	gateway.sin_family = AF_INET;
 	if(fPeerRequests.address != INADDR_ANY)
-		inreq.ifra_dstaddr.sin_addr.s_addr = fPeerRequests.address;
+		gateway.sin_addr.s_addr = fPeerRequests.address;
 	else if(fPeerConfiguration.address == INADDR_ANY)
-		inreq.ifra_dstaddr.sin_addr.s_addr = INADDR_BROADCAST;
+		gateway.sin_addr.s_addr = INADDR_BROADCAST;
 	else
-		inreq.ifra_dstaddr.sin_addr.s_addr = fPeerConfiguration.address;
-	inreq.ifra_dstaddr.sin_len = sizeof(sockaddr_in);
-	memcpy(&ifreqDestination.ifr_dstaddr, &inreq.ifra_dstaddr, sizeof(sockaddr_in));
+		gateway.sin_addr.s_addr = fPeerConfiguration.address;
+	gateway.sin_len = sizeof(struct sockaddr_in);
+	memcpy(&inreq.ifra_dstaddr, &gateway,
+		sizeof(struct sockaddr_in));
+	memcpy(&ifreqDestination.ifr_dstaddr, &inreq.ifra_dstaddr,
+		sizeof(struct sockaddr_in));
 	
+	// create netmask
 	inreq.ifra_mask.sin_family = AF_INET;
-	if(fLocalRequests.netmask != INADDR_ANY)
-		netmask = fLocalRequests.netmask;
-	else if(State() != PPP_OPENED_STATE)
-		netmask = INADDR_BROADCAST;
-	else
-		netmask = 0x80000000;
-	inreq.ifra_mask.sin_addr.s_addr = netmask;
-	inreq.ifra_mask.sin_len = sizeof(sockaddr_in);
+	inreq.ifra_mask.sin_addr.s_addr = fLocalRequests.netmask;
+	inreq.ifra_mask.sin_len = sizeof(struct sockaddr_in);
 	
+	// tell stack to use these values
+	if(in_control(NULL, SIOCAIFADDR, (caddr_t) &inreq,
+			Interface().Ifnet()) != B_OK)
+		printf("IPCP: UpdateAddress(): SIOCAIFADDR returned error!\n");
 	if(in_control(NULL, SIOCSIFADDR, (caddr_t) &ifreqAddress,
 			Interface().Ifnet()) != B_OK)
 		printf("IPCP: UpdateAddress(): SIOCSIFADDR returned error!\n");
 	if(in_control(NULL, SIOCSIFDSTADDR, (caddr_t) &ifreqDestination,
 			Interface().Ifnet()) != B_OK)
 		printf("IPCP: UpdateAddress(): SIOCSIFDSTADDR returned error!\n");
+	memcpy(&inreq.ifra_addr, &inreq.ifra_mask, sizeof(struct sockaddr_in));
+		// SIOCISFNETMASK wants the netmask to be in ifra_addr
+	if(in_control(NULL, SIOCSIFNETMASK, (caddr_t) &inreq,
+			Interface().Ifnet()) != B_OK)
+		printf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
 	
-	// the netmask is optional for PPP interfaces
-	if(fLocalRequests.netmask != INADDR_ANY) {
-		if(in_control(NULL, SIOCSIFNETMASK, (caddr_t) &inreq.ifra_mask,
-				Interface().Ifnet()) != B_OK)
-			printf("IPCP: UpdateAddress(): SIOCSIFNETMASK returned error!\n");
-	}
+	// add default/subnet route
+	struct rtentry *rt;
+	struct sockaddr_in destination;
+	destination.sin_family = AF_INET;
+	destination.sin_addr.s_addr = fLocalRequests.netmask;
+	if(fLocalRequests.netmask == INADDR_ANY)
+		destination.sin_len = 0;
+	else
+		destination.sin_len = sizeof(struct sockaddr_in);
+	
+	if(rtrequest(RTM_ADD, (struct sockaddr*) &destination, (struct sockaddr*) &gateway,
+			(struct sockaddr*) &inreq.ifra_mask, RTF_UP | RTF_GATEWAY, &rt) != B_OK)
+		printf("IPCP: UpdateAddress(): could not add default route!\n");
+	
+	--rt->rt_refcnt;
 }
 
 
