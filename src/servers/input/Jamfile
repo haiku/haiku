@@ -3,6 +3,7 @@ SubDir OBOS_TOP src servers input ;
 AddResources input_server : input_server.rdef ;
 
 UsePrivateHeaders app ;
+UsePrivateHeaders input ;
 
 Server input_server :
 	InputServer.cpp

@@ -35,18 +35,19 @@
 #include <stdio.h>
 
 #include "InputServer.h"
-#include "Path.h"
-#include "Directory.h"
-#include "FindDirectory.h"
-#include "Entry.h"
-#include "Locker.h"
-#include "Debug.h"
+#include <Path.h>
+#include <Directory.h>
+#include <FindDirectory.h>
+#include <Entry.h>
+#include <Locker.h>
+#include <Debug.h>
 #include <String.h>
 
 #include "InputServerDeviceListEntry.h"
 #include "InputServerFilterListEntry.h"
 #include "InputServerMethodListEntry.h"
-#include "Message.h"
+#include <Message.h>
+#include "InputServerTypes.h"
 
 // include app_server headers for communication
 #include <PortLink.h>
