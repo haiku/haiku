@@ -103,7 +103,7 @@ GetAllOutputs(const media_node & node, Stack<media_output> *stack)
 		producer_get_next_output_request request;
 		producer_get_next_output_reply reply;
 		request.cookie = cookie;
-		rv = QueryServer(PRODUCER_GET_NEXT_OUTPUT, &request, sizeof(request), &reply, sizeof(reply));
+		rv = QueryPort(node.port, PRODUCER_GET_NEXT_OUTPUT, &request, sizeof(request), &reply, sizeof(reply));
 		if (rv != B_OK)
 			break;
 		cookie = reply.cookie;
@@ -115,7 +115,7 @@ GetAllOutputs(const media_node & node, Stack<media_output> *stack)
 
 	producer_dispose_output_cookie_request request;
 	producer_dispose_output_cookie_reply reply;
-	QueryServer(PRODUCER_DISPOSE_OUTPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
+	QueryPort(node.port, PRODUCER_DISPOSE_OUTPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
 	
 	return result;
 }
@@ -133,7 +133,7 @@ GetAllInputs(const media_node & node, Stack<media_input> *stack)
 		consumer_get_next_input_request request;
 		consumer_get_next_input_reply reply;
 		request.cookie = cookie;
-		rv = QueryServer(CONSUMER_GET_NEXT_INPUT, &request, sizeof(request), &reply, sizeof(reply));
+		rv = QueryPort(node.port, CONSUMER_GET_NEXT_INPUT, &request, sizeof(request), &reply, sizeof(reply));
 		if (rv != B_OK)
 			break;
 		cookie = reply.cookie;
@@ -145,7 +145,7 @@ GetAllInputs(const media_node & node, Stack<media_input> *stack)
 
 	consumer_dispose_input_cookie_request request;
 	consumer_dispose_input_cookie_reply reply;
-	QueryServer(CONSUMER_DISPOSE_INPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
+	QueryPort(node.port, CONSUMER_DISPOSE_INPUT_COOKIE, &request, sizeof(request), &reply, sizeof(reply));
 	
 	return result;
 }
@@ -495,7 +495,7 @@ BMediaRoster::Connect(const media_source & from,
 	request5.destination = reply4.input.destination;
 	request5.format = reply3.format; // XXX reply4.input.format ???
 	strcpy(request5.name, reply4.input.name);
-	rv = QueryPort(reply4.input.node.port, PRODUCER_CONNECT, &request5, sizeof(request5), &reply5, sizeof(reply5));
+	rv = QueryPort(reply4.input.source.port, PRODUCER_CONNECT, &request5, sizeof(request5), &reply5, sizeof(reply5));
 	if (con_status != B_OK) {
 		TRACE("BMediaRoster::Connect: aborted\n");
 		return con_status;
@@ -773,7 +773,7 @@ BMediaRoster::GetFreeInputsFor(const media_node & node,
 							   media_type filter_type)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (node.node == 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_free_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
@@ -811,7 +811,7 @@ BMediaRoster::GetConnectedInputsFor(const media_node & node,
 									int32 * out_total_count)
 {
 	CALLED();
-	if (node.node == 0 || (node.kind & B_BUFFER_PRODUCER) == 0)
+	if (node.node == 0 || (node.kind & B_BUFFER_CONSUMER) == 0)
 		return B_MEDIA_BAD_NODE;
 	if (out_active_inputs == NULL || out_total_count == NULL)
 		return B_BAD_VALUE;
