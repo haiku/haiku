@@ -17,6 +17,7 @@ struct stat {
 	gid_t			st_gid;			/* group id of the owner of this file */
 	off_t			st_size;		/* size in bytes of this file */
 	// ToDo: st_type is new for OpenBeOS - it replaces the unused st_rdev field
+	//	we might also define special types for files and TTYs
 	unsigned int	st_type;		/* attribute/index type */
 	//dev_t			st_rdev;		/* device type (not used) */
 	size_t			st_blksize;		/* preferred block size for i/o */

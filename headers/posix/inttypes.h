@@ -5,15 +5,29 @@
 */
 
 
-typedef signed char 		int8_t;
-typedef signed short int 	int16_t;
-typedef signed int 			int32_t;
-typedef signed long long 	int64_t;
+#include <stdint.h>
 
-typedef	unsigned char 		u_int8_t;
-typedef	unsigned short int 	u_int16_t;
-typedef	unsigned int 		u_int32_t;
-typedef unsigned long long  u_int64_t;
 
+typedef struct {
+	intmax_t	quot;	/* quotient */
+	intmax_t	rem;	/* remainder */
+} imaxdiv_t;
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+extern intmax_t		imaxabs(intmax_t num);
+extern imaxdiv_t	imaxdiv(intmax_t numer, intmax_t denom);
+
+extern intmax_t		strtoimax(const char *, char **, int);
+extern uintmax_t	strtoumax(const char *, char **, int);
+//extern intmax_t		wcstoimax(const __wchar_t *, __wchar_t **, int);
+//extern uintmax_t	wcstoumax(const __wchar_t *, __wchar_t **, int);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _INTTYPES_H_ */

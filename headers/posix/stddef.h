@@ -3,6 +3,7 @@
 // XXX Doesn't belong into posix, should be replaced as soon as possible
 
 #include <size_t.h>
+#include <wchar_t.h>
 
 #if (!defined(_STDDEF_H) && !defined(_STDDEF_H_) && !defined(_ANSI_STDDEF_H) \
      && !defined(__STDDEF_H__)) \

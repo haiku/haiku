@@ -9,6 +9,7 @@
 #include <wchar_t.h>
 #include <stddef.h>
 #include <limits.h>
+#include <alloca.h>
 
 
 #define RAND_MAX      0x7fffffff
