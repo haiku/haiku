@@ -177,6 +177,8 @@ codec_table codecs[] =
 	{ 0x00000000,		0x00000000, default_init,	"Unknown" } /* must be last one, matches every codec */
 };
 
+codec_table *find_codec_table(uint32 codecid);
+
 codec_table *
 find_codec_table(uint32 codecid)
 {
@@ -478,12 +480,18 @@ ac97_detect_rates(ac97_dev *dev)
 		dev->capabilities |= CAP_PCM_RATE_44100;
 	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 48000))
 		dev->capabilities |= CAP_PCM_RATE_48000;
-	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 48000))
-		dev->capabilities |= CAP_PCM_RATE_48000;
-	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 88200))
-		dev->capabilities |= CAP_PCM_RATE_88200;
-	if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 96000))
-		dev->capabilities |= CAP_PCM_RATE_96000;
+
+	if (dev->capabilities & CAP_DOUBLE_PCM) {
+		// enable double rate mode
+		if (ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 0x0002, 0x0002)) {
+			if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 88200))
+				dev->capabilities |= CAP_PCM_RATE_88200;	
+			if (ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 96000))
+				dev->capabilities |= CAP_PCM_RATE_96000;
+			// disable double rate mode
+			ac97_reg_update_bits(dev, AC97_EXTENDED_STAT_CTRL, 0x0002, 0x0000);
+		}
+	}
 		
 	ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, oldrate);
 }
