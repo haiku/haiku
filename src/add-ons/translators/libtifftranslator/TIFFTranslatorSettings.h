@@ -41,7 +41,7 @@
 #define TIFF_SETTINGS_FILENAME "TIFFTranslator_Settings"
 
 // TIFF Translator Settings
-#define TIFF_SETTING_COMPRESSION "tga /compression"
+#define TIFF_SETTING_COMPRESSION "tiff /compression"
 
 class TIFFTranslatorSettings {
 public:
