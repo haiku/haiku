@@ -9,6 +9,7 @@ Server app_server :
 	# Misc. Sources
 	Angle.cpp
 	TokenHandler.cpp
+	PatternHandler.cpp
 
 	# PortLink will disappear as soon as I can figure out how to link the server
 	# against libopenbeos
