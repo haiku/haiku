@@ -197,8 +197,10 @@ load_driver_int(pnp_node_info *node, void *user_cookie)
 	}
 
 	res = driver->init_device(node, user_cookie, &cookie);
-	if (res < B_OK)
+	if (res < B_OK) {
+		dprintf("init device failed (node %p, %s): %s\n", node, module_name, strerror(res));
 		goto err2;
+	}
 
 	node->driver = driver;
 	node->cookie = cookie;
@@ -318,7 +320,8 @@ pnp_load_driver(pnp_node_handle node, void *user_cookie,
 		if (cookie)
 			*cookie = node->cookie;
 
-		TRACE(("load_driver: Success\n"));
+		TRACE(("load_driver: Success \"%s\"\n",
+			((struct module_info *)(*interface))->name));
 	} else {
 		TRACE(("load_driver: Failure (%s)\n", strerror(res)));
 	}
