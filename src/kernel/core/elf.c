@@ -1013,7 +1013,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 	int i;
 	ssize_t len;
 
-	dprintf("elf_load: entry path '%s', team %p\n", path, p);
+	TRACE(("elf_load: entry path '%s', team %p\n", path, p));
 
 	fd = _kern_open(-1, path, 0);
 	if (fd < 0)
@@ -1045,7 +1045,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 		goto error;
 	}
 
-	dprintf("reading in program headers at 0x%lx, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
+	TRACE(("reading in program headers at 0x%lx, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize));
 	len = _kern_read(fd, eheader.e_phoff, pheaders, eheader.e_phnum * eheader.e_phentsize);
 	if (len < 0) {
 		err = len;
@@ -1151,7 +1151,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 		}
 	}
 
-	dprintf("elf_load: done!\n");
+	TRACE(("elf_load: done!\n"));
 
 	*entry = eheader.e_entry;
 
