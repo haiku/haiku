@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src apps bin rcs ;
 
+local rcs_rsrc = [ FGristFiles rcs.rsrc ] ;
+
+ResComp $(rcs_rsrc) : [ FGristFiles rcs.rdef ] ;
+
 StaticLibrary rcs : 
 	rcsutil.c
 	rcsfnms.c
@@ -21,7 +25,7 @@ BinCommand ci :
 	rcsedit.c
 	rcsfcmp.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand co :
@@ -29,7 +33,7 @@ BinCommand co :
 	rcsgen.c
 	rcsedit.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand ident :
@@ -37,20 +41,20 @@ BinCommand ident :
 	rcsmap.c
 	version.c
 	: be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand merge :
 	merge.c
 	merger.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand rlog :
 	rlog.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand rcs :
@@ -58,7 +62,7 @@ BinCommand rcs :
 	rcsgen.c
 	rcsedit.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand rcsclean :
@@ -67,18 +71,18 @@ BinCommand rcsclean :
 	rcsfcmp.c
 	rcsgen.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand rcsdiff :
 	rcsdiff.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
 
 BinCommand rcsmerge :
 	rcsmerge.c
 	merger.c
 	: librcs.a be
-	: rcs.rdef
+	: $(rcs_rsrc)
 ;
