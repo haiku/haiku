@@ -72,6 +72,7 @@ struct process_group {
 	struct process_session *session;
 	pid_t				id;
 	sem_id				dead_child_sem;
+	int32				wait_for_any;
 	struct team			*teams;
 };
 
