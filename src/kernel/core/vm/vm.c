@@ -884,7 +884,7 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 
 
 area_id
-vm_create_null_area(aspace_id aid, char *name, void **address, uint32 addressSpec, addr_t size)
+vm_create_null_area(aspace_id aid, const char *name, void **address, uint32 addressSpec, addr_t size)
 {
 	vm_area *area;
 	vm_cache *cache;
@@ -964,7 +964,7 @@ vm_create_vnode_cache(void *vnode, void **_cache)
  */
 
 static area_id
-_vm_map_file(aspace_id aid, char *name, void **_address, uint32 addressSpec,
+_vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpec,
 	size_t size, uint32 protection, uint32 mapping, const char *path, off_t offset, bool kernel)
 {
 	vm_cache_ref *cache_ref;
@@ -1013,12 +1013,14 @@ err1:
 
 
 area_id
-vm_map_file(aspace_id aid, char *name, void **address, uint32 addressSpec,
+vm_map_file(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	addr_t size, uint32 protection, uint32 mapping, const char *path, off_t offset)
 {
 	return _vm_map_file(aid, name, address, addressSpec, size, protection, mapping, path, offset, true);
 }
 
+
+// ToDo: create a BeOS style call for this!
 
 area_id
 _user_vm_map_file(const char *uname, void **uaddress, int addressSpec,
@@ -1051,10 +1053,10 @@ _user_vm_map_file(const char *uname, void **uaddress, int addressSpec,
 
 
 area_id
-vm_clone_area(aspace_id aid, char *name, void **address, uint32 addressSpec,
+vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	uint32 protection, uint32 mapping, area_id sourceID)
 {
-	vm_area *newArea;
+	vm_area *newArea = NULL;
 	vm_area *sourceArea;
 	status_t status;
 
@@ -1068,11 +1070,16 @@ vm_clone_area(aspace_id aid, char *name, void **address, uint32 addressSpec,
 		return ERR_VM_INVALID_REGION;
 	}
 
-	vm_cache_acquire_ref(sourceArea->cache_ref, true);
-	status = map_backing_store(aspace, sourceArea->cache_ref->cache->store, address,
-				sourceArea->cache_offset, sourceArea->size, addressSpec, sourceArea->wiring,
-				protection, mapping, &newArea, name);
-	vm_cache_release_ref(sourceArea->cache_ref);
+	if (sourceArea->aspace == kernel_aspace && aspace != kernel_aspace) {
+		// kernel areas must not be cloned in userland
+		status = B_NOT_ALLOWED;
+	} else {
+		vm_cache_acquire_ref(sourceArea->cache_ref, true);
+		status = map_backing_store(aspace, sourceArea->cache_ref->cache->store, address,
+					sourceArea->cache_offset, sourceArea->size, addressSpec, sourceArea->wiring,
+					protection, mapping, &newArea, name);
+		vm_cache_release_ref(sourceArea->cache_ref);
+	}
 
 	vm_put_area(sourceArea);
 	vm_put_aspace(aspace);
@@ -2752,7 +2759,11 @@ area_id
 clone_area(const char *name, void **_address, uint32 addressSpec, uint32 protection,
 	area_id source)
 {
-	return B_ERROR;
+	if ((protection & B_KERNEL_PROTECTION) == 0)
+		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+
+	return vm_clone_area(vm_get_kernel_aspace_id(), name, _address, addressSpec,
+				protection, REGION_NO_PRIVATE_MAP, source);
 }
 
 
@@ -2881,13 +2892,24 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 	void *address;
 	area_id clonedArea;
 
+	// filter out some unavailable values (for userland)
+	switch (addressSpec) {
+		case B_ANY_KERNEL_ADDRESS:
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
+			return B_BAD_VALUE;
+	}
+	if (protection & B_KERNEL_PROTECTION)
+		return B_BAD_VALUE;
+
 	if (!IS_USER_ADDRESS(userName)
 		|| !IS_USER_ADDRESS(userAddress)
 		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
 		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
 		return B_BAD_ADDRESS;
 
-	clonedArea = clone_area(name, &address, addressSpec, protection, sourceArea);
+	clonedArea = vm_clone_area(vm_get_current_user_aspace_id(), name, &address,
+		addressSpec, protection | B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA,
+		REGION_NO_PRIVATE_MAP, sourceArea);
 	if (clonedArea < B_OK)
 		return clonedArea;
 
