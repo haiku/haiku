@@ -1,19 +1,14 @@
 SubDir OBOS_TOP src servers registrar ;
 
 UsePublicHeaders app ;
-UsePrivateHeaders $(DOT) ;	# needed for disk_scanner.cpp
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
-
-# needed as long as disk_scanner.cpp is compiled in
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
 
 Server obos_registrar :
 	AppInfoList.cpp
 	ClipboardHandler.cpp
 	ClipboardTree.cpp
-	DiskDeviceManager.cpp
 	Event.cpp
 	EventMaskWatcher.cpp
 	EventQueue.cpp
@@ -21,35 +16,18 @@ Server obos_registrar :
 	MessageHandler.cpp
 	MessageRunnerManager.cpp
 	MIMEManager.cpp
-	NodeMonitoring.cpp
 	PriorityMessageQueue.cpp
-	RDiskDevice.cpp
-	RDiskDeviceList.cpp
 	RecentApps.cpp
 	RecentEntries.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp
 	RosterSettingsCharStream.cpp
-	RPartition.cpp
-	RSession.cpp
-	RVolumeList.cpp
 	TRoster.cpp
 	Watcher.cpp
 	WatchingService.cpp
-
-	# from .../libroot/os
-	disk_scanner.cpp
 ;
 LinkSharedOSLibs obos_registrar :
 	<boot!home!config!lib>libopenbeos.so
-	<boot!home!config!lib>libkernelland_emu.so	# needed for disk_scanner.cpp
 	stdc++.r4
 	be
 ;
-
-# Helper needed for node watching
-#
-BinCommand NodeMonitor : NodeMonitor.cpp : be ;
-
-Depends obos_registrar : NodeMonitor ;
-

@@ -56,7 +56,6 @@ private:
 	BPrivate::TRoster		*fRoster;
 	ClipboardHandler		*fClipboardHandler;
 	MIMEManager				*fMIMEManager;
-	DiskDeviceManager		*fDiskDeviceManager;
 	EventQueue				*fEventQueue;
 	MessageRunnerManager	*fMessageRunnerManager;
 	MessageEvent			*fSanityEvent;

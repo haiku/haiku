@@ -29,6 +29,7 @@
 
 #include <Application.h>
 #include <AppMisc.h>
+#include <File.h>
 #include <storage_support.h>
 
 #include <errno.h>
