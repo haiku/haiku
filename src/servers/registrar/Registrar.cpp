@@ -13,15 +13,18 @@
 #include "ClipboardHandler.h"
 #include "MIMEManager.h"
 #include "Registrar.h"
+#include "TRoster.h"
 
 // constructor
 Registrar::Registrar()
 		 : BApplication(kRegistrarSignature),
+		   fRoster(NULL),
 		   fClipboardHandler(NULL),
 		   fMIMEManager(NULL)
 {
 FUNCTION_START();
 	// move the following code to ReadyToRun() once it works.
+	fRoster = new TRoster;
 	fClipboardHandler = new ClipboardHandler;
 	AddHandler(fClipboardHandler);
 	fMIMEManager = new MIMEManager;
@@ -36,6 +39,7 @@ FUNCTION_START();
 	fMIMEManager->Quit();
 	RemoveHandler(fClipboardHandler);
 	delete fClipboardHandler;
+	delete fRoster;
 }
 
 // MessageReceived
@@ -62,6 +66,21 @@ FUNCTION_START();
 			message->SendReply(&reply);
 			break;
 		}
+		case B_REG_ADD_APP:
+			fRoster->HandleAddApplication(message);
+			break;
+		case B_REG_COMPLETE_REGISTRATION:
+			fRoster->HandleCompleteRegistration(message);
+			break;
+		case B_REG_IS_PRE_REGISTERED:
+			fRoster->HandleIsAppPreRegistered(message);
+			break;
+		case B_REG_REMOVE_PRE_REGISTERED_APP:
+			fRoster->HandleRemovePreRegApp(message);
+			break;
+		case B_REG_REMOVE_APP:
+			fRoster->HandleRemoveApp(message);
+			break;
 		default:
 			BApplication::MessageReceived(message);
 			break;

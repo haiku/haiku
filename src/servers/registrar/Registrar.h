@@ -31,6 +31,10 @@
 class ClipboardHandler;
 class MIMEManager;
 
+namespace BPrivate {
+	class TRoster;
+};
+
 class Registrar : public BApplication {
 public:
 	Registrar();
@@ -41,6 +45,7 @@ public:
 	virtual bool QuitRequested();
 
 private:
+	BPrivate::TRoster	*fRoster;
 	ClipboardHandler	*fClipboardHandler;
 	MIMEManager			*fMIMEManager;
 };
