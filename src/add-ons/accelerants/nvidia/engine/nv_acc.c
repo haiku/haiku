@@ -26,9 +26,8 @@ blit
 	nVidia hardware info:
 	We should be able to do FIFO assignment setup changes on-the-fly now, using
 	all the engine-command-handles that are pre-defined on any FIFO channel.
-
-	We should be able to even setup new additional handles to previously unused engine
-	commands now, and DMA use should also be possible.
+	Also we should be able to setup new additional handles to previously unused
+	engine commands now.
 */
 
 /* FIFO channel pointers */
@@ -82,14 +81,12 @@ status_t nv_acc_init()
 	/* (setup caches) */
 	/* disable caches reassign */
 	ACCW(PF_CACHES, 0x00000000);
-	//fixme: set this up for DMA use one day..
 	/* PFIFO mode for all 32 channels is PIO (instead of DMA) */
 	ACCW(PF_MODE, 0x00000000);
 	/* cache1 push0 access disabled */
 	ACCW(PF_CACH1_PSH0, 0x00000000);
 	/* cache1 pull0 access disabled */
 	ACCW(PF_CACH1_PUL0, 0x00000000);
-	//fixme: set this up for DMA use one day..
 	/* cache1 push1 mode = pio (disable DMA use) */
 	ACCW(PF_CACH1_PSH1, 0x00000000);
 	/* cache1 DMA Put offset = 0 (b2-28) */
@@ -100,10 +97,8 @@ status_t nv_acc_init()
 	 * instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000). */
 	/* note:
 	 * should point to a DMA definition in CTX register space (which is sort of RAM).
-	 * This define tells the engine where the DMA cmd buffer is and what it's size is;
-	 * inside that cmd buffer you'll find the engine handles for the FIFO channels,
-	 * followed by actual issued engine commands. */
-	//fixme: set this up for DMA use one day..
+	 * This define tells the engine where the DMA cmd buffer is and what it's size is.
+	 * Inside that cmd buffer you'll find the actual issued engine commands. */
 	ACCW(PF_CACH1_DMAI, 0x00000000);
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
@@ -144,7 +139,6 @@ status_t nv_acc_init()
 	 * use little endian */
 	ACCW(PF_CACH1_DMAF, 0x000f0078);
 	/* cache1 DMA push: b0=0 is access disabled */
-	//fixme: set this up for DMA use one day..
 	ACCW(PF_CACH1_DMAS, 0x00000000);
 	/* cache1 push0 access enabled */
 	ACCW(PF_CACH1_PSH0, 0x00000001);

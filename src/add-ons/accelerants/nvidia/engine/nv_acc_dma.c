@@ -61,8 +61,6 @@ status_t nv_acc_init_dma()
 {
 	uint16 cnt;
 	uint32 surf_depth, patt_depth;
-	//fixme: move to shared info:
-	uint32 max;
 
 	/* a hanging engine only recovers from a complete power-down/power-up cycle */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
@@ -555,7 +553,7 @@ status_t nv_acc_init_dma()
 	}
 
 	/* all cards: */
-	/* setup some clipping: rect size is 32768 x 32768, probably max. setting */
+	/* setup clipping: rect size is 32768 x 32768, probably max. setting */
 	ACCW(ABS_UCLP_XMIN, 0x00000000);
 	ACCW(ABS_UCLP_YMIN, 0x00000000);
 	ACCW(ABS_UCLP_XMAX, 0x00007fff);
@@ -584,9 +582,8 @@ status_t nv_acc_init_dma()
 	 * instance being b4-19 with baseadress NV_PRAMIN_CTX_0 (0x00700000). */
 	/* note:
 	 * should point to a DMA definition in CTX register space (which is sort of RAM).
-	 * This define tells the engine where the DMA cmd buffer is and what it's size is;
-	 * inside that cmd buffer you'll find the engine handles for the FIFO channels,
-	 * followed by actual issued engine commands. */
+	 * This define tells the engine where the DMA cmd buffer is and what it's size is.
+	 * Inside that cmd buffer you'll find the actual issued engine commands. */
 	ACCW(PF_CACH1_DMAI, 0x0000114e);
 	/* cache0 push0 access disabled */
 	ACCW(PF_CACH0_PSH0, 0x00000000);
@@ -679,11 +676,15 @@ status_t nv_acc_init_dma()
 	 * one word is reserved at the end of the DMA buffer to be able to instruct the
 	 * engine to do a buffer wrap-around!
 	 * (DMA opcode 'noninc method': issue word $20000000.) */
-	/*si->dma.*/max = 8191;
+	//testing:
+	si->engine.dma.max = 2048 - 1;//8192 - 1;
 	/* note the current free space we have left in the DMA buffer */
-	si->engine.dma.free = /*si->dma.*/max - si->engine.dma.current /*+ 1*/;
+	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
 	/*** init FIFO via DMA command buffer. ***/
+	/* note:
+	 * we know there's space enough in the command buffer to issue these commands,
+	 * so no need to wait for room in there. */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(NV_GENERAL_FIFO_CH0 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
@@ -727,6 +728,9 @@ status_t nv_acc_init_dma()
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
 //		(0x80000000 | si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
 		(0x80000000 | si->engine.fifo.handle[0]);
+
+	/* update the current free space we have left in the DMA buffer */
+	si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
 
 	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
 	//       space in between both functions as errors might hang the engine!
@@ -810,14 +814,55 @@ for (dummy = 0; dummy < 2; dummy++)
 
 static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 {
-	//fixme: implement buffer wraparounds.. (buffer resets when full)
-	//for now only executing the first commands issued and drop exec after;
-	//this offers testing options already (depending on how much windows are visible,
-	//exec remains going say 30 seconds to a few minutes if only blits are enabled.
-//	if (si->dma.free >= cmd_size) return B_OK;
-	if ((si->engine.dma.current + cmd_size) < 8191) return B_OK;
+	//test:
+	uint32 dummy;
 
-	return B_ERROR;
+	if (si->engine.dma.free < cmd_size)
+	{
+		//test:
+		LOG(4,("ACC_FIFOFREE: level 1; free $%08x, max $%08x, current $%08x\n",
+			si->engine.dma.free, si->engine.dma.max, si->engine.dma.current ));
+
+		/* update to actual current situation (free is 'cached') */
+//		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+		/* check again if we have enough space */
+//		if (si->engine.dma.free < cmd_size)
+		{
+			//test:
+			LOG(4,("ACC_FIFOFREE: level 2\n"));
+
+			/* nope, so instruct DMA engine to reset the buffer when it's done */
+			si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x20000000;
+
+			/* reset our buffer pointer, so new commands will be placed at the
+			 * beginning of the buffer. */
+			si->engine.dma.current = 0;
+			/* tell the engine to fetch the remaining command(s) in the DMA buffer
+			 * that where not executed before. */
+			nv_start_dma();
+			/* fixme if needed:
+			 * we are assuming here that a large part in the beginning of the DMA
+			 * cmd buffer is already processed. If this is not true, we need to wait
+			 * here until the engine becomes idle or so... */
+//test:
+//nv_acc_wait_idle_dma();
+//	{
+		/* snooze a bit so I do not hammer the bus */
+//		snooze (100);
+//	}
+for (dummy = 0; dummy < 2; dummy++)
+{
+	LOG(4,("ACC_DMA_WRAP: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
+		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
+	LOG(4,("ACC_DMA_WRAP: put $%08x\n", (si->engine.dma.put << 2)));
+}
+
+			/* update the current free space we have left in the DMA buffer */
+			si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+		}
+	}
+
+	return B_OK;
 }
 
 static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
@@ -836,6 +881,9 @@ static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
 	 * to set a new adress if a gap exists between the previous one and the new one. */
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((size << 18) |
 		((si->engine.fifo.ch_ptr[cmd] + offset) & 0x0000fffc));
+
+	/* space left after issuing the current command is the cmd AND it's data */
+	si->engine.dma.free -= (size + 1);
 }
 
 /* fixme? (check this out..)
@@ -886,6 +934,9 @@ void nv_acc_assert_fifo_dma(void)
 				(0x00000001 + (cnt * 0x00002000));
 		}
 
+		/* wait for room in fifo for new FIFO assigment cmds if needed. */
+		nv_acc_fifofree_dma(12);
+
 		/* program new FIFO assignments */
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(NV_GENERAL_FIFO_CH0 | (1 << 18));
@@ -917,6 +968,9 @@ void nv_acc_assert_fifo_dma(void)
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[5]); /* Bitmap */
 
+		/* update the current free space we have left in the DMA buffer */
+		si->engine.dma.free = si->engine.dma.max - si->engine.dma.current;
+
 		/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 		nv_start_dma();
 	}
@@ -927,8 +981,7 @@ status_t nv_acc_setup_blit_dma()
 {
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed. */
-	//fixme: testing..
-	if (nv_acc_fifofree_dma(7) != B_OK) return B_ERROR;
+	nv_acc_fifofree_dma(7);
 
 	/* now setup pattern (writing 7 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
@@ -940,8 +993,7 @@ status_t nv_acc_setup_blit_dma()
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
 	/* ROP registers (Raster OPeration):
 	 * wait for room in fifo for ROP cmd if needed. */
-	//fixme: testing..
-	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
+	nv_acc_fifofree_dma(2);
 
 	/* now setup ROP (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
@@ -956,8 +1008,7 @@ status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16
 
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed. */
-	//fixme: testing..
-	if (nv_acc_fifofree_dma(4) != B_OK) return B_ERROR;
+	nv_acc_fifofree_dma(4);
 
 	/* now setup blit (writing 4 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
