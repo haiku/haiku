@@ -30,7 +30,7 @@
 // ToDo: These should probably be revised for ISO-8859-1
 // ToDo: change the tables depending on the current locale
 
-static unsigned short int __ctype_b_internal[] = {
+const unsigned short int *__ctype_b = (const unsigned short int[]) {
 	/*   0 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 	/*   8 */	_IScntrl, _ISblank|_IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl|_ISspace, _IScntrl, _IScntrl,
 	/*  16 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
@@ -65,7 +65,7 @@ static unsigned short int __ctype_b_internal[] = {
 	/* 248 */	_IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl, _IScntrl,
 };
 
-const int __ctype_tolower_internal[] = {
+const int *__ctype_tolower = (const int[]) {
 	/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 	/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 	/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -100,7 +100,7 @@ const int __ctype_tolower_internal[] = {
 	/* 248 */	248, 249, 250, 251, 252, 253, 254, 255,
 };
 
-const int __ctype_toupper_internal[] = {
+const int *__ctype_toupper = (const int[]) {
 	/*   0 */	  0,   1,   2,   3,   4,   5,   6,   7,
 	/*   8 */	  8,   9,  10,  11,  12,  13,  14,  15,
 	/*  16 */	 16,  17,  18,  19,  20,  21,  22,  23,
@@ -134,11 +134,6 @@ const int __ctype_toupper_internal[] = {
 	/* 240 */	240, 241, 242, 243, 244, 245, 246, 247,
 	/* 248 */	248, 249, 250, 251, 252, 253, 254, 255,
 };
-
-
-const unsigned short int *__ctype_b = __ctype_b_internal;
-const int *__ctype_tolower = __ctype_tolower_internal;
-const int *__ctype_toupper = __ctype_toupper_internal;
 
 
 int
