@@ -30,7 +30,7 @@ KernelStaticLibrary boot_loader :
 	partitions.cpp
 	heap.cpp
 	stdio.cpp
-	#elf.cpp
+	elf.cpp
 	menu.cpp
 	loader.cpp
 
