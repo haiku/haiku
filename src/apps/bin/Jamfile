@@ -30,7 +30,7 @@ StdBinCommands
 	unmount.c
 	waitfor.c
 	whoami.c
-	;
+	: libroot.so ;
 
 StdBinCommands
 	top.c

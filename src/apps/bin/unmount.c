@@ -1,26 +1,76 @@
-// Author: Ryan Fleet
-// Created: October 11th 2002
-// Modified: October 12th 2002
+/*
+** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+*/
+
+/**	Unmounts a volume */
 
 
-#include <stdio.h>
+#include <fs_volume.h>
+
+#include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
+#include <stdio.h>
 #include <string.h>
 
-int main(int argc, char *argv[])
+
+static void
+usage(const char *programName)
 {
-	if(argc != 2)
-	{
-		fprintf(stderr, "usage: unmount path\n");
-		return 1;
-	}
 	
-	if(unmount(argv[1]) < 0)
-	{
-		fprintf(stderr, "unmount: %s\n", strerror(errno));
-		return 1;
+	printf("usage: %s [-f] <path to volume>\n"
+		"\t-f\tforces unmounting in case of open files left\n", programName);
+	exit(0);
+}
+
+
+int
+main(int argc, char **argv)
+{
+	const char *programName = argv[0];
+	struct stat pathStat;
+	const char *path;
+	status_t status;
+	uint32 flags = 0;
+
+	/* prettify the program name */
+
+	if (strrchr(programName, '/'))
+		programName = strrchr(programName, '/') + 1;
+
+	/* get all options */
+
+	while (*++argv) {
+		char *arg = *argv;
+		if (*arg != '-')
+			break;
+
+		if (!strcmp(arg, "f"))
+			flags |= B_FORCE_UNMOUNT;
+		else
+			usage(programName);
 	}
-		
+
+	path = argv[0];
+
+	/* check the arguments */
+
+	if (path == NULL)
+		usage(programName);
+
+	if (stat(path, &pathStat) < 0) {
+		fprintf(stderr, "%s: The path \"%s\" is not accessible\n", programName, path);
+		return -1;
+	}
+
+	/* do the work */
+
+	status = fs_unmount_volume(path, flags);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: unmounting failed: %s\n", programName, strerror(status));
+		return -1;
+	}
+
 	return 0;
 }
+

@@ -1,20 +1,17 @@
 /*
-**	Copyright (c) 2001-2002, OpenBeOS
-**
-**	This software is part of the OpenBeOS distribution and is covered 
-**	by the OpenBeOS license.
-**
-**	File:        mount.c
-**	Author:      Axel Dörfler (axeld@users.sf.net)
-**	Description: mounts a volume with the specified file system
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
 */
 
+/**	Mounts a volume with the specified file system */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <string.h>
+
+#include <fs_volume.h>
+
 #include <sys/stat.h>
-#include <errno.h>
+#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
 
 
 static void
@@ -36,7 +33,8 @@ main(int argc, char **argv)
 	const char *parameter = NULL;
 	const char *fs = NULL;
 	struct stat mountStat;
-	int flags = 0;
+	status_t status;
+	uint32 flags = 0;
 
 	/* prettify the program name */
 
@@ -82,8 +80,9 @@ main(int argc, char **argv)
 
 	/* do the work */
 
-	if (mount(fs, mountPoint, device, flags, (void *)parameter, parameter ? strlen(parameter) : 0) < 0) {
-		fprintf(stderr, "%s: %s\n", programName, strerror(errno));
+	status = fs_mount_volume(fs, mountPoint, device, flags, parameter);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: %s\n", programName, strerror(status));
 		return -1;
 	}
 	return 0;
