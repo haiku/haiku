@@ -14,9 +14,6 @@
 #include <BeBuild.h>
 #include <View.h>
 
-#include <BeBuild.h>
-#include <View.h>
-
 //----------------------------------------------------------------
 //----- scroll bar defines ---------------------------------------
 
@@ -86,7 +83,7 @@ virtual status_t	GetSupportedSuites(BMessage *data);
 virtual status_t	Perform(perform_code d, void *arg);
 
 private:
-		friend BScrollArrowButton;
+		friend class BScrollArrowButton;
 virtual	void		_ReservedScrollBar1();
 virtual	void		_ReservedScrollBar2();
 virtual	void		_ReservedScrollBar3();
