@@ -1,5 +1,5 @@
 <HTML>
-<!-- $Id: BDeskbarUseCases.html,v 1.4 2002/09/10 03:30:21 jrand Exp $ -->
+<!-- $Id: BDeskbarUseCases.html,v 1.5 2002/09/12 04:47:16 jrand Exp $ -->
 <HEAD>
 <TITLE>BDeskbar Use Cases and Implementation Details</TITLE>
 </HEAD>
@@ -210,7 +210,7 @@ confirms this.</P>
 
 <PRE>
 BMessage theMsg;
-theMsg.what = 'exst'
+theMsg.what = 'info'
 theMsg.AddInt32("id", theID);         // This is the id to check for
    // OR, only one of id or name should be in the message
 theMsg.AddString("name", theName);    // This is the name to check for
@@ -255,7 +255,7 @@ theMsg.AddInt32("count", ItemCount());    // This is the number of items in the 
 
 <PRE>
 BMessage theMsg;
-theMsg.what = 'exst'
+theMsg.what = 'remv'
 theMsg.AddInt32("id", theID);         // This is the id to remove
    // OR, only one of id or name should be in the message
 theMsg.AddString("name", theName);    // This is the name to remove
