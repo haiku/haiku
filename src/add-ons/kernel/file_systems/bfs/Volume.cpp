@@ -288,7 +288,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	if (fstat(fDevice, &stat) < 0)
 		RETURN_ERROR(B_ERROR);
 
-//#ifndef USER
+#ifndef NO_FILE_UNCACHED_IO
 	if (stat.st_mode & S_FILE && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
 		// mount read-only if the cache couldn't be disabled
 #	ifdef DEBUG
@@ -298,7 +298,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 		Panic();
 #	endif
 	}
-//#endif
+#endif
 
 	// read the super block
 	char buffer[1024];
