@@ -120,10 +120,12 @@ public:
 };
 
 
+#ifndef COMPILE_FOR_R5
 // Initialized/finalized by init/fini_interface_kit
 _BWidthBuffer_* BTextView::sWidths = NULL;
 sem_id BTextView::sWidthSem = B_BAD_SEM_ID; 
 int32 BTextView::sWidthAtom = 0;
+#endif
 
 
 static property_info
