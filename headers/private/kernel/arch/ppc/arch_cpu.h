@@ -60,6 +60,7 @@ struct iframe {
 };
 
 enum machine_state {
+	MSR_EXCEPTIONS_ENABLED			= 1L << 15,		// EE
 	MSR_PRIVILEGE_LEVEL				= 1L << 14,		// PR
 	MSR_FP_AVAILABLE				= 1L << 13,		// FP
 	MSR_MACHINE_CHECK_ENABLED		= 1L << 12,		// ME
