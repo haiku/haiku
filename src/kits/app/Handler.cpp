@@ -135,7 +135,7 @@
 #include <PropertyInfo.h>
 
 // Project Includes ------------------------------------------------------------
-#include "TokenSpace.h"
+#include <TokenSpace.h>
 
 // Local Includes --------------------------------------------------------------
 
@@ -668,7 +668,7 @@ BMessage: what =  (0x0, or 0)
 			scripting docs are so bloody horrible.  The corresponding
 			property_info array is declared in the globals section.
  */
-	status_t err;
+	status_t err = B_OK;
 	if (!data)
 	{
 		err = B_BAD_VALUE;

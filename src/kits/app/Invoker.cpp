@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Control.cpp
+//	File Name:		Invoker.cpp
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	BInvoker class defines a protocol for objects that
 //					post messages to a "target".
@@ -28,7 +28,7 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
-#include "Invoker.h"
+#include <Invoker.h>
 #include <Errors.h>
 
 // Project Includes ------------------------------------------------------------
