@@ -4,6 +4,7 @@
 #include <DataIO.h>
 #include <ByteOrder.h>
 #include <InterfaceDefs.h>
+#include <MediaFormats.h>
 #include "MP3ReaderPlugin.h"
 
 #define TRACE_THIS 1
@@ -14,6 +15,7 @@
 #endif
 
 /* see
+ * http://www.dv.co.yu/mpgscript/mpeghdr.htm
  * http://www.multiweb.cz/twoinches/MP3inside.htm
  * http://www.id3.org/id3v2.3.0.txt
  * http://www.id3.org/lyrics3.html
@@ -47,6 +49,15 @@ static const int bit_rate_table[4][4][16] =
 		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 },
 		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0}
 	}
+};
+
+// b_mpeg_id_table[mpeg_version_index][layer_index]
+static const int32 b_mpeg_id_table[4][4] =
+{
+	{ 0, B_MPEG_2_5_AUDIO_LAYER_3, B_MPEG_2_5_AUDIO_LAYER_2, B_MPEG_2_5_AUDIO_LAYER_1 },
+	{ 0, 0, 0, 0 },
+	{ 0, B_MPEG_2_AUDIO_LAYER_3, B_MPEG_2_AUDIO_LAYER_2, B_MPEG_2_AUDIO_LAYER_1 },
+	{ 0, B_MPEG_1_AUDIO_LAYER_3, B_MPEG_1_AUDIO_LAYER_2, B_MPEG_1_AUDIO_LAYER_1 },
 };
 
 // frame_rate_table[mpeg_version_index][sampling_rate_index]
@@ -152,31 +163,48 @@ mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 	mp3data *data = new mp3data;
 	data->chunkBuffer = new char[MAX_CHUNK_SIZE];
 	data->position = 0;
+
+	uint8 header[4];
+	Source()->ReadAt(fDataStart, header, sizeof(header));
+	int mpeg_version_index = (header[1] >> 3) & 0x03;
+	int layer_index = (header[1] >> 1) & 0x03;
+	
+	int bit_rate;
+	int frame_size;
 	
 	if (fXingVbrInfo && fXingVbrInfo->frameCount != -1 && fXingVbrInfo->duration != -1) {
 		TRACE("mp3Reader::AllocateCookie: using timing info from VBR header\n");
+		bit_rate = (fXingVbrInfo->byteCount * 8 * 1000000) / fXingVbrInfo->duration; // average bit rate
+		frame_size = fXingVbrInfo->byteCount / fXingVbrInfo->encodedFramesCount;	 // average frame size
 		data->duration = fXingVbrInfo->duration;
 		data->frameCount = fXingVbrInfo->frameCount;
 		data->frameRate = fXingVbrInfo->frameRate;
 	} else {
 		TRACE("mp3Reader::AllocateCookie: assuming CBR, calculating timing info from file\n");
-		uint8 header[4];
-		Source()->ReadAt(fDataStart, header, sizeof(header));
-		int mpeg_version_index = (header[1] >> 3) & 0x03;
-		int layer_index = (header[1] >> 1) & 0x03;
 		int sampling_rate_index = (header[2] >> 2) & 0x03;
+		int bitrate_index = (header[2] >> 4) & 0x0f;
 		int samples_per_chunk = frame_sample_count_table[layer_index];
+		bit_rate = 1000 * bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
+		frame_size = GetFrameLength(header);
 		data->frameRate = frame_rate_table[mpeg_version_index][sampling_rate_index];
-		data->frameCount = samples_per_chunk * (fDataSize / GetFrameLength(header));
+		data->frameCount = samples_per_chunk * (fDataSize / frame_size);
 	 	data->duration = (data->frameCount * 1000000) / data->frameRate;
 	 }
 
 	TRACE("mp3Reader::AllocateCookie: frameRate %ld, frameCount %Ld, duration %.6f\n",
 		data->frameRate, data->frameCount, data->duration / 1000000.0);
 
-	memset(&data->format, 0, sizeof(data->format));
-	data->format.type = B_MEDIA_ENCODED_AUDIO;
-	// XXX fix this
+	BMediaFormats formats;
+	media_format_description description;
+	description.family = B_MPEG_FORMAT_FAMILY;
+	description.u.mpeg.id = b_mpeg_id_table[mpeg_version_index][layer_index];
+	formats.GetFormatFor(description, &data->format);
+	
+	data->format.u.encoded_audio.encoding = media_encoded_audio_format::B_ANY;
+	data->format.u.encoded_audio.bit_rate = bit_rate;
+	data->format.u.encoded_audio.frame_size = frame_size;
+//	data->format.u.encoded_audio.output.frame_rate = data->frameRate;
+//	data->format.u.encoded_audio.output.channel_count = 2;
 
 	// store the cookie
 	*cookie = data;
@@ -608,7 +636,7 @@ mp3Reader::XingSeekPoint(float percent)
 	fx = fa + (fb - fa) * (percent - a);
 	
 	point = (int64)((1.0f / 256.0f) * fx * fXingVbrInfo->byteCount);
-	TRACE("mp3Reader::XingSeekPoint for %.2f%% is %Ld\n", percent, point);
+	TRACE("mp3Reader::XingSeekPoint for %.8f%% is %Ld\n", percent, point);
 	return point;
 }
 
