@@ -201,14 +201,14 @@ void BMidiPort::SystemExclusive(void* data, size_t dataLength, uint32 time)
 void BMidiPort::SystemCommon(
 	uchar status, uchar data1, uchar data2, uint32 time)
 {
-	local_source->SpraySystemCommon(statusByte, data1, data2, 0);
+	local_source->SpraySystemCommon(status, data1, data2, 0);
 }
 
 //------------------------------------------------------------------------------
 
 void BMidiPort::SystemRealTime(uchar status, uint32 time)
 {
-	local_source->SpraySystemRealTime(statusByte, 0);
+	local_source->SpraySystemRealTime(status, 0);
 }
 
 //------------------------------------------------------------------------------
