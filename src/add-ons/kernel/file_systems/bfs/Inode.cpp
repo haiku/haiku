@@ -1,7 +1,7 @@
 /* Inode - inode access functions
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the Haiku License.
 */
 
 
@@ -521,19 +521,24 @@ Inode::AddSmallData(Transaction *transaction, const char *name, uint32 type,
 					last = last->Next();
 			}
 
-			// move the attributes after the current one
-			small_data *next = item->Next();
-			if (!next->IsLast(Node()))
-				memmove((uint8 *)item + spaceNeeded, next, (uint8 *)last - (uint8 *)next);
+			// Normally, we can just overwrite the attribute data as the size
+			// is specified by the type and does not change that often
+			if (length != item->DataSize()) {
+				// move the attributes after the current one
+				small_data *next = item->Next();
+				if (!next->IsLast(Node()))
+					memmove((uint8 *)item + spaceNeeded, next, (uint8 *)last - (uint8 *)next);
+	
+				// Move the "last" one to its new location and
+				// correctly terminate the small_data section
+				last = (small_data *)((uint8 *)last - ((uint8 *)next - ((uint8 *)item + spaceNeeded)));
+				if ((uint8 *)last < (uint8 *)Node() + fVolume->BlockSize())
+					memset(last, 0, (uint8 *)Node() + fVolume->BlockSize() - (uint8 *)last);
 
-			// Move the "last" one to its new location and
-			// correctly terminate the small_data section
-			last = (small_data *)((uint8 *)last - ((uint8 *)next - ((uint8 *)item + spaceNeeded)));
-			if ((uint8 *)last < (uint8 *)Node() + fVolume->BlockSize())
-				memset(last, 0, (uint8 *)Node() + fVolume->BlockSize() - (uint8 *)last);
+				item->data_size = HOST_ENDIAN_TO_BFS_INT16(length);
+			}
 
 			item->type = HOST_ENDIAN_TO_BFS_INT32(type);
-			item->data_size = HOST_ENDIAN_TO_BFS_INT16(length);
 			memcpy(item->Data(), data, length);
 			item->Data()[length] = '\0';
 
