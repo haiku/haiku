@@ -1,5 +1,9 @@
 SubDir OBOS_TOP src apps bin make ;
 
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
 SubDirHdrs [ FDirName $(SUBDIR) glob ] ;
 
 SubDirCcFlags -DHAVE_CONFIG_H ;
@@ -32,3 +36,6 @@ BinCommand make :
 : libglob.a : make.rdef ;
 
 SubInclude OBOS_TOP src apps bin make glob ;
+
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
