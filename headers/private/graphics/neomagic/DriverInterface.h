@@ -171,9 +171,7 @@ typedef struct {
     	NM2200,
     	NM2230,
     	NM2360,
-    	NM2380,
-    	G100,
-    	G200
+    	NM2380
 	};
 	struct
 	{
