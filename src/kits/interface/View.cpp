@@ -4535,7 +4535,7 @@ void BView::PrintToStream()
 \tVertical Scrollbar %s\
 \tHorizontal Scrollbar %s\
 \tIs Printing?: %s\
-\tShelf?: %s
+\tShelf?: %s\
 \tEventMask: %ld\
 \tEventOptions: %ld\n",
 	Name(),
