@@ -712,20 +712,20 @@ MimeSnifferTest::ScannerTest() {
 		// The uber test
 		{ "0 -0 +0 1 -2 +3 0. -0. +0. 1. -2. +3. 0.0 -0.1 +0.2 1.0 -2.1 +3.2 "
 		  "0.e0 0.e-1 0.e+2 1.e1 2.e-2 3.e+3 -1.e1 -2.e-2 -3.e+3 +1.e1 +2.e-2 +3.e+3 "
-		  "0.012345 1.23456 ( ) [ ] | & : "
-		  " \"abcxyzABCXYZ_ ( ) [ ] | & : \t\n \\\" ' \\012\\0\\377\\x00\\x12\\xab\\xCD\\xeF\\x1A\\xb2 \" "
-		  " 'abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" \\' \\012\\0\\377\\x00\\x12\\xab\\xCD\\xeF\\x1A\\xb2 ' "
-		  " \\000abc_xyz123 \\xA1a1 \\!\\?\\\\ "
-		  " 0x00 0x12 0xabCD 0xaBcD 0x0123456789aBcDeFfEdCbA", 49,
+		  "0.012345 1.23456 ( ) [ ] | & : -i "
+		  " \"abcxyzABCXYZ_ ( ) [ ] | & : -i \t\n \\\" ' \\012\\0\\377\\x00\\x12\\xab\\xCD\\xeF\\x1A\\xb2 \" "
+		  " 'abcxyzABCXYZ_ ( ) [ ] | & : -i \t\n \" \\' \\012\\0\\377\\x00\\x12\\xab\\xCD\\xeF\\x1A\\xb2 ' "
+		  " \\000abc_xyz123\"'\"'456 \\xA1a1 \\!\\?\\\\ "
+		  " 0x00 0x12 0xabCD 0xaBcD 0x0123456789aBcDeFfEdCbA", 50,
 		  	{	I(0), I(0), I(0), I(1), I(-2), I(3), F(0.0), F(0.0), F(0.0),
 		  			F(1.0), F(-2.0), F(3.0), F(0.0), F(-0.1), F(0.2), F(1.0), F(-2.1), F(3.2),
 		  		F(0.0), F(0.0e-1), F(0.0e2), F(1.0e1), F(2.0e-2), F(3.0e3),
 		  			F(-1.0e1), F(-2.0e-2), F(-3.0e3), F(1.0e1), F(2.0e-2), F(3.0e3),
 		  		F(0.012345), F(1.23456), T(LeftParen), T(RightParen), T(LeftBracket),
-		  			T(RightBracket), T(Divider), T(Ampersand), T(Colon),
-		  		S(std::string("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 ", 46)),
-		  		S(std::string("abcxyzABCXYZ_ ( ) [ ] | & : \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 ", 46)),
-		  		S(std::string("\000abc_xyz123", 11)),
+		  			T(RightBracket), T(Divider), T(Ampersand), T(Colon), T(CaseInsensitiveFlag),
+		  		S(std::string("abcxyzABCXYZ_ ( ) [ ] | & : -i \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 ", 49)),
+		  		S(std::string("abcxyzABCXYZ_ ( ) [ ] | & : -i \t\n \" ' \012\0\377\x00\x12\xab\xCD\xeF\x1A\xb2 ", 49)),
+		  		S(std::string("\000abc_xyz123\"'\"'456", 18)),
 		  		S("\241a1"),
 		  		S("!?\\"),
 		  		S(std::string("\x00", 1)), S("\x12"), S("\xAB\xCD"), S("\xAB\xCD"),
@@ -752,9 +752,9 @@ MimeSnifferTest::ScannerTest() {
 			for (int j = 0; j < testCases[i].tokenCount; j++) {
 				const Token *token = stream.Get();
 				CHK(token);
-
-//				cout << tokenTypeToString(token->Type()) << endl;
 /*
+				cout << tokenTypeToString(token->Type()) << endl;
+
 				if (token->Type() == CharacterString) 
 					cout << " token1 == " << token->String() << endl;
 				if (testCases[i].tokens[j]->Type() == CharacterString)
@@ -762,17 +762,17 @@ MimeSnifferTest::ScannerTest() {
 					
 				if (token->Type() == CharacterString) 
 				{
-					const char *str = token->String();
+					const std::string &str = token->String();
 					printf("parser: ");
-					for (int i = 0; i < strlen(str); i++)
+					for (int i = 0; i < str.length(); i++)
 						printf("%x ", str[i]);
 					printf("\n");
 				}
 				if (testCases[i].tokens[j]->Type() == CharacterString)
 				{
-					const char *str = (testCases[i].tokens[j])->String();
+					const std::string &str = (testCases[i].tokens[j])->String();
 					printf("tester: ");
-					for (int i = 0; i < strlen(str); i++)
+					for (int i = 0; i < str.length(); i++)
 						printf("%x ", str[i]);
 					printf("\n");
 				}
@@ -1124,7 +1124,12 @@ MimeSnifferTest::SnifferTest() {
 		// Conjunctions
 		"1.0 ([4] 'rock') ([9] 'roll')",
 		"1.0 [5] ('roll') [10] ('rock')",
-		"1.0 [4] ('rock' | 'roll') ([9] 'rock' | [10] 'roll')",		
+		"1.0 [4] ('rock' | 'roll') ([9] 'rock' | [10] 'roll')",
+		// Case insensitivity tests
+		"1.0 [4] (-i 'Rock' | 'Roll')",
+		"1.0 [9] ('Rock' | -i 'Roll')",
+		"1.0 (-i [4] 'Rock' | [9] 'Roll')",
+		"1.0 ([9] 'Rock' | -i [4] 'Roll')",
 	};
 	const int ruleCount = sizeof(rules)/sizeof(char*);
 	struct test_case {
@@ -1144,7 +1149,8 @@ int main() {			\n\
 ",	{	true, true, true, true, false,
 		false, false, false, false, false, false, false,
 		false, false, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1159,7 +1165,8 @@ int main() {			\n\
 ",	{	false, true, true, true, false,
 		false, false, false, false, false, false, false,
 		false, false, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1174,7 +1181,8 @@ void main();				\n\
 ",	{	false, false, true, false, false,
 		false, false, false, false, false, false, false,
 		false, false, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1192,7 +1200,8 @@ int main() {				\n\
 		false, false, false, false, false, false, false,
 		false, false, false, true,
 		//                   ^^^^ <= coincedence 
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1211,43 +1220,68 @@ is ten times as fun			<br>		\n\
 ",	{	false, false, false, false, true,
 		false, false, false, false, false, false, false,
 		false, false, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //---------  <= Ten characters in
 {
-"     rock&roll",
+"     rock&roll",		// 5,10
 	{	false, false, false, false, false,
 		true, false, true, true, false, false, true,
 		false, false, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //---------  <= Ten characters in
 {
-"    rock&roll",
+"    rock&roll",		// 4,9
 	{ 	false, false, false, false, false,
 		true, true, true, true, false, true, false,
 		false, false, false, false,
-		true, false, false
+		true, false, false,
+		true, true, true, false
 	}
 },
 //---------  <= Ten characters in
 {
-"     roll&rock",
+"     roll&rock",		// 5,10
 	{	false, false, false, false, false,
 		false, true, true, true, false, true, false,
 		false, false, false, false,
-		false, true, false
+		false, true, false,
+		false, false, false, false
 	}
 },
 //---------  <= Ten characters in
 {
-"    roll&rock",
+"    roll&rock",		// 4,9
 	{ 	false, false, false, false, false,
 		true, true, true, true, false, true, true,
 		false, false, false, false,
-		false, false, true
+		false, false, true,
+		true, true, false, true
+	}
+},
+//---------  <= Ten characters in
+{
+"    ROCK&ROLL",		// 4,9
+	{ 	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		false, false, false, false,
+		false, false, false,
+		true, true, true, false
+	}
+},
+//---------  <= Ten characters in
+{
+"    rOlL&RoCk",		// 4,9
+	{ 	false, false, false, false, false,
+		false, false, false, false, false, false, false,
+		false, false, false, false,
+		false, false, false,
+		true, true, false, true
 	}
 },
 //------------------------------
@@ -1256,7 +1290,8 @@ is ten times as fun			<br>		\n\
 	{	false, false, false, false, false,
 		false, false, false, false, false, false, false,
 		true, false, false, true,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1265,7 +1300,8 @@ is ten times as fun			<br>		\n\
 	{	false, false, false, false, false,
 		false, false, false, false, false, false, false,
 		true, false, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1274,7 +1310,8 @@ is ten times as fun			<br>		\n\
 	{	false, false, false, false, false,
 		false, false, false, false, false, false, false,
 		false, false, false, true,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1283,7 +1320,8 @@ std::string("\033\000	033 000", 10),	// Otherwise, it thinks the NULL is the end
 	{	false, false, false, false, false,
 		false, false, false, false, false, false, false,
 		false, true, false, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1292,7 +1330,8 @@ std::string("\000\034	000 034", 10),	// Otherwise, it thinks the NULL is the end
 	{	false, false, false, false, false,
 		false, false, false, false, false, false, false,
 		false, false, true, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 //------------------------------
@@ -1301,7 +1340,8 @@ std::string("\000\034	000 034", 10),	// Otherwise, it thinks the NULL is the end
 	{	false, false, false, false, false,
 		false, false, false, false, false, false, false,
 		false, true, true, false,
-		false, false, false
+		false, false, false,
+		false, false, false, false
 	}
 },
 	};	// tests[]
