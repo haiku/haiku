@@ -29,6 +29,9 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
 	fGeneralLock(StateMachine().Locker())
 {
+	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
+		fManager = NULL;
+	
 	// are we a multilink subinterface?
 	if(parent && parent->IsMultilink()) {
 		fParent = parent;
@@ -72,6 +75,8 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 
 PPPInterface::~PPPInterface()
 {
+	put_module((module_info**) &fManager);
+	
 	// TODO:
 	// remove our iface, so that nobody will access it:
 	//  go down if up
@@ -89,7 +94,7 @@ PPPInterface::~PPPInterface()
 status_t
 PPPInterface::InitCheck() const
 {
-	if(!fSettings)
+	if(!fSettings || !fManager)
 		return B_ERROR;
 	
 	// sub-interfaces should have a device
@@ -118,14 +123,10 @@ PPPInterface::RegisterInterface()
 	if(IsMultilink() && Parent() && Parent()->RegisterInterface())
 		return true;
 	
-	ppp_manager_info *manager;
-	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &manager) != B_OK)
+	if(!fManager)
 		return false;
 	
-	fIfnet = manager->add_interface(this);
-	
-	put_module((module_info**) &manager);
-	
+	fIfnet = fManager->add_interface(this);
 	
 	if(!fIfnet)
 		return false;
@@ -145,14 +146,11 @@ PPPInterface::UnregisterInterface()
 	if(IsMultilink() && Parent())
 		return true;
 	
-	ppp_manager_info *manager;
-	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &manager) != B_OK)
+	if(!fManager)
 		return false;
 	
-	manager->remove_interface(this);
+	fManager->remove_interface(this);
 	fIfnet = NULL;
-	
-	put_module((module_info**) &manager);
 	
 	return true;
 }
@@ -406,6 +404,10 @@ PPPInterface::RemoveChild(PPPInterface *child)
 	
 	child->SetParent(NULL);
 	
+	// parents cannot exist without their children
+	if(CountChildren() == 0 && fManager)
+		fManager->delete_interface(this);
+	
 	CalculateMRU();
 	
 	return true;
@@ -623,13 +625,13 @@ PPPInterface::Send(mbuf *packet, uint16 protocol)
 	
 	// we must pass the basic tests!
 	if(InitCheck() != B_OK) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
 	// test whether are going down
 	if(Phase() == PPP_TERMINATION_PHASE) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
@@ -646,7 +648,7 @@ PPPInterface::Send(mbuf *packet, uint16 protocol)
 	
 	// never send normal protocols when we are down
 	if(!IsUp()) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
@@ -722,7 +724,7 @@ PPPInterface::Receive(mbuf *packet, uint16 protocol)
 		return Parent->Receive(packet, protocol);
 	
 	if(result == PPP_UNHANDLED)
-		m_free(packet);
+		m_freem(packet);
 		return PPP_DISCARDED;
 	else {
 		StateMachine()->RUCEvent(packet, protocol);
@@ -743,13 +745,13 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 	// do we have a device (as main interface)?
 	// did we load all modules?
 	if(InitCheck() != B_OK) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
 	// test whether are going down
 	if(Phase() == PPP_TERMINATION_PHASE) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
@@ -769,12 +771,12 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 				)
 			)
 		) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
 	// encode in ppp frame
-	M_PREPEND(packet, sizeof(uint16));
+	packet = M_PREPEND(packet, sizeof(uint16));
 	
 	if(packet == NULL)
 		return B_ERROR;
@@ -789,14 +791,14 @@ PPPInterface::SendToDevice(mbuf *packet, uint16 protocol)
 		// check if packet is too big for device
 		if((packet->m_flags & M_PKTHDR && packet->m_pkt_hdr.len > LinkMTU())
 			|| packet->m_len > LinkMTU()) {
-			m_free(packet);
+			m_freem(packet);
 			return B_ERROR;
 		}
 		
 		return Device()->Send(packet);
 	} else {
 		// the multilink encapsulator should have sent it to some child interface
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 }
@@ -811,7 +813,7 @@ PPPInterface::ReceiveFromDevice(mbuf *packet)
 		return B_ERROR;
 	
 	if(!InitCheck()) {
-		m_free(packet);
+		m_freem(packet);
 		return B_ERROR;
 	}
 	
@@ -827,7 +829,7 @@ PPPInterface::ReceiveFromDevice(mbuf *packet)
 			// the packet
 		
 		if(!packet->m_pkthdr.rcvif) {
-			m_free(packet);
+			m_freem(packet);
 			return B_ERROR;
 		}
 	}
@@ -852,15 +854,11 @@ PPPInterface::CalculateMRU()
 	
 	fMRU -= fHeaderLength;
 	
-	if(Parent())
-		Parent()->CalculateMRU();
-	
-	for(int32 i = 0; i < fChildren.CountItems(); i++)
-		fMRU += fChildren.ItemAt(i)->MRU();
-			// add our subinterfaces' MRU (so we have the MRRU)
-	
 	if(Ifnet()) {
 		Ifnet()->if_mtu = fMRU;
 		Ifnet()->if_hdrlen = fHeaderLength;
 	}
+	
+	if(Parent())
+		Parent()->CalculateMRU();
 }

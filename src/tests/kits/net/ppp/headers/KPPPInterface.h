@@ -135,6 +135,8 @@ class PPPInterface {
 		PPPLCP fLCP;
 		ifnet *fIfnet;
 		
+		ppp_manager_info *fManager;
+		
 		uint32 fLinkMTU, fMRU, fHeaderLength;
 		
 		PPPInterface *fParent;

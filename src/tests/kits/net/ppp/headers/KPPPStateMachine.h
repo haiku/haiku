@@ -80,6 +80,7 @@ class PPPStateMachine {
 		
 		// private StateMachine methods
 		void NewState(PPP_STATE next);
+		void NewPhase(PPP_PHASE next);
 		
 		// private events
 		void OpenEvent();
@@ -92,7 +93,7 @@ class PPPStateMachine {
 		void RCNEvent(mbuf *packet);
 		void RTREvent(mbuf *packet);
 		void RTAEvent(mbuf *packet);
-		void RUCEvent(mbuf *packet, uint16 protocol);
+		void RUCEvent(mbuf *packet, uint16 protocol, uint8 type);
 		void RXJGoodEvent(mbuf *packet);
 		void RXJBadEvent(mbuf *packet);
 		void RXREvent(mbuf *packet);
@@ -115,8 +116,11 @@ class PPPStateMachine {
 		void SendConfigureNak(mbuf *packet);
 		void SendTerminateRequest();
 		void SendTerminateAck(mbuf *request);
-		void SendCodeReject(mbuf *packet, uint16 protocol);
+		void SendCodeReject(mbuf *packet, uint16 protocol, uint8 type);
 		void SendEchoReply(mbuf *request);
+		
+		void BringHandlersUp();
+		uint32 BringPhaseUp();
 
 	private:
 		PPPInterface *fInterface;

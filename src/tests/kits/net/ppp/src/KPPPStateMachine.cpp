@@ -1,11 +1,15 @@
 #include "KPPPStateMachine.h"
 
 
+// TODO:
+// do not forget to reset authentication status when needed
+
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	: fInterface(&interface), fPhase(PPP_DOWN_PHASE),
 	fState(PPP_INITIAL_STATE), fID(system_time() & 0xFF),
 	fAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
+	fAuthenticationName(NULL), fPeerAuthenticationName(NULL),
 	fAuthenticatorIndex(-1), fPeerAuthenticatorIndex(-1),
 	fMaxTerminate(2), fMaxConfigure(10), fMaxNak(5),
 	fRequestID(0), fTerminateID(0), fTimeout(0)
@@ -15,6 +19,8 @@ PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 
 PPPStateMachine::~PPPStateMachine()
 {
+	free(fAuthenticationName);
+	free(fPeerAuthenticationName);
 }
 
 
@@ -30,6 +36,7 @@ PPPStateMachine::NextID()
 void
 PPPStateMachine::NewState(PPP_STATE next)
 {
+	// TODO:
 //	if(State() == PPP_OPENED_STATE)
 //		ResetOptionHandlers();
 	
@@ -37,90 +44,163 @@ PPPStateMachine::NewState(PPP_STATE next)
 }
 
 
+void
+PPPStateMachine::NewPhase(PPP_PHASE next)
+{
+	// Report a down event to parent if we are not usable anymore.
+	// The report threads get their notification later.
+	if(Phase() == PPP_ESTABLISHED_PHASE && Interface()->Parent())
+		Interface()->Parent()->StateMachine().DownEvent(Interface());
+	
+	// there is nothing after established phase and nothing before down phase
+	if(next > PPP_ESTABLISHED_PHASE)
+		fPhase = PPP_ESTABLISHED_PHASE;
+	else if(next < PPP_DOWN_PHASE)
+		fPhase = PPP_DOWN_PHASE;
+	else
+		fPhase = next;
+}
+
+
 // authentication events
 void
 PPPStateMachine::AuthenticationRequested()
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	fAuthenticationStatus = PPP_AUTHENTICATING;
+	free(fAuthenticationName);
 }
 
 
 void
 PPPStateMachine::AuthenticationAccepted(const char *name)
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	fAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
+	free(fAuthenticationName);
+	fAuthenticationName = strdup(name);
 }
 
 
 void
 PPPStateMachine::AuthenticationDenied(const char *name)
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	fAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
+	free(fAuthenticationName);
+	fAuthenticationName = strdup(name);
 }
 
 
 const char*
 PPPStateMachine::AuthenticationName() const
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	return fAuthenticationName;
 }
 
 
 void
 PPPStateMachine::PeerAuthenticationRequested()
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	fPeerAuthenticationStatus = PPP_AUTHENTICATING;
+	free(fPeerAuthenticationName);
 }
 
 
 void
 PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	fPeerAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
+	free(fPeerAuthenticationName);
+	fPeerAuthenticationName = strdup(name);
 }
 
 
 void
 PPPStateMachine::PeerAuthenticationDenied(const char *name)
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	fPeerAuthenticationStatus = PPP_AUTHENTICATION_FAILED;
+	free(fPeerAuthenticationName);
+	fPeerAuthenticationName = strdup(name);
 }
 
 
 const char*
 PPPStateMachine::PeerAuthenticationName() const
 {
-	// IMPLEMENT ME!
+	LockerHelper locker(fLock);
+	
+	return fPeerAuthenticationName;
 }
 
 
 void
 PPPStateMachine::UpFailedEvent(PPPInterface *interface)
 {
+	// TODO:
+	// log that an interface did not go up
 }
 
 
 void
 PPPStateMachine::UpEvent(PPPInterface *interface)
 {
+	if(Phase() < PPP_ESTABLISHMENT_PHASE) {
+		Interface()->UnregisterInterface();
+		return;
+	}
+	
+	if(Interface()->IsMultilink() && !Interface()->Parent())
+		Interface()->RegisterInterface();
 }
 
 
 void
 PPPStateMachine::DownEvent(PPPInterface *interface)
 {
+	// when all children are down we should not be registered
+	if(Interface()->IsMultilink() && !Interface()->Parent()) {
+		uint32 count = 0;
+		PPPInterface *child;
+		for(int32 i = 0; i < Interface()->CountChildren(); i++) {
+			child = Interface()->ChildAt(i);
+			
+			if(child && child->IsUp())
+				++count;
+		}
+		
+		if(count == 0)
+			Interface()->UnregisterInterface();
+	}
 }
 
 
 void
 PPPStateMachine::UpFailedEvent(PPPProtocol *protocol)
 {
+	// All protocols must go up.
+	CloseEvent();
 }
 
 
 void
 PPPStateMachine::UpEvent(PPPProtocol *protocol)
 {
+	LockerHelper locker(fLock);
+	
+	if(Phase() >= PPP_ESTABLISHMENT_PHASE)
+		BringHandlersUp();
 }
 
 
@@ -133,12 +213,18 @@ PPPStateMachine::DownEvent(PPPProtocol *protocol)
 void
 PPPStateMachine::UpFailedEvent(PPPEncapsulator *encapsulator)
 {
+	// All encapsulators must go up.
+	CloseEvent();
 }
 
 
 void
 PPPStateMachine::UpEvent(PPPEncapsulator *encapsulator)
 {
+	LockerHelper locker(fLock);
+	
+	if(Phase() >= PPP_ESTABLISHMENT_PHASE)
+		BringHandlersUp();
 }
 
 
@@ -160,7 +246,7 @@ PPPStateMachine::TLSNotify()
 	
 	if(State() == PPP_STARTING_STATE) {
 			if(Phase() == PPP_DOWN_PHASE)
-				fPhase = PPP_ESTABLISHMENT_PHASE;
+				NewPhase(PPP_ESTABLISHMENT_PHASE);
 					// this says that the device is going up
 			return true;
 	}
@@ -185,7 +271,7 @@ PPPStateMachine::TLFNotify()
 	}
 	
 	// from now on no packets may be sent to the device
-	fPhase = PPP_DOWN_PHASE;
+	NewPhase(PPP_DOWN_PHASE);
 	
 	return true;
 }
@@ -211,6 +297,8 @@ PPPStateMachine::UpFailedEvent()
 			// TODO:
 			// report that up failed
 			// Report(PPP_CONNECTION_REPORT, PPP_UP_FAILED, NULL, 0);
+			if(Interface()->Parent())
+				Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
 		break;
 		
 		default:
@@ -285,14 +373,14 @@ PPPStateMachine::DownEvent()
 		case PPP_CLOSED_STATE:
 		case PPP_CLOSING_STATE:
 			NewState(PPP_INITIAL_STATE);
-			fPhase = PPP_DOWN_PHASE;
+			NewPhase(PPP_DOWN_PHASE);
 		break;
 		
 		case PPP_STOPPED_STATE:
 			// The RFC says we should reconnect, but our implementation
 			// will only do this if auto-redial is enabled (only clients).
 			NewStatus(PPP_STARTING_STATE);
-			fPhase = PPP_DOWN_PHASE;
+			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -304,7 +392,7 @@ PPPStateMachine::DownEvent()
 		
 		case PPP_STOPPING_STATE:
 			NewStatus(PPP_STARTING_STATE);
-			fPhase = PPP_DOWN_PHASE;
+			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -315,7 +403,7 @@ PPPStateMachine::DownEvent()
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewStatus(PPP_STARTING_STATE);
-			fPhase = PPP_DOWN_PHASE;
+			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -325,7 +413,7 @@ PPPStateMachine::DownEvent()
 		case PPP_OPENED_STATE:
 			// tld/1
 			NewStatus(PPP_STARTING_STATE);
-			fPhase = PPP_DOWN_PHASE;
+			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -339,8 +427,14 @@ PPPStateMachine::DownEvent()
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
 		if(Interface()->DoesAutoRedial()) {
+			NewState(PPP_INITIAL_STATE);
 			// TODO:
 			// redial using a new thread (maybe interface manager will help us)
+		} else {
+			if(Interface()->Parent())
+				Interface()->Parent()->StateMachine().UpFailedEvent(Interface());
+			// TODO:
+			// we must delete our interface
 		}
 	}
 }
@@ -366,7 +460,7 @@ PPPStateMachine::OpenEvent()
 			}
 			
 			NewState(PPP_REQ_SENT_STATE);
-			fPhase = PPP_ESTABLISHMENT_PHASE;
+			NewPhase(PPP_ESTABLISHMENT_PHASE);
 			InitializeRestartCount();
 			locker.UnlockNow();
 			SendConfigureRequest();
@@ -391,7 +485,7 @@ PPPStateMachine::CloseEvent()
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_CLOSING_STATE);
-			fPhase = PPP_TERMINATION_PHASE;
+			NewPhase(PPP_TERMINATION_PHASE);
 			InitializeRestartCount();
 			locker.UnlockNow();
 			SendTerminateRequest();
@@ -405,7 +499,7 @@ PPPStateMachine::CloseEvent()
 			// are in PPP_INITIAL_STATE now
 			if(Phase() == PPP_ESTABLISHMENT_PHASE) {
 				// the device is already up
-				fPhase = PPP_DOWN_PHASE;
+				NewPhase(PPP_DOWN_PHASE);
 					// this says the following DownEvent() was not caused by
 					// a connection fault
 				locker.UnlockNow();
@@ -461,7 +555,7 @@ PPPStateMachine::TOBadEvent()
 	switch(State()) {
 		case PPP_CLOSING_STATE:
 			NewState(PPP_CLOSED_STATE);
-			fPhase = PPP_TERMINATION_PHASE;
+			NewPhase(PPP_TERMINATION_PHASE);
 			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
@@ -471,7 +565,7 @@ PPPStateMachine::TOBadEvent()
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewState(PPP_STOPPED_STATE);
-			fPhase = PPP_TERMINATION_PHASE;
+			NewPhase(PPP_TERMINATION_PHASE);
 			locker.UnlockNow();
 			ThisLayerFinished();
 		break;
@@ -574,9 +668,9 @@ PPPStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
 		case PPP_REQ_SENT_STATE:
 		case PPP_ACK_RCVD_STATE:
 			locker.UnlockNow();
-			if(!nak && mtod(nak, lcp_packet*)->length > 3)
+			if(!nak && ntohs(mtod(nak, lcp_packet*)->length) > 3)
 				SendConfigureNak(nak);
-			else if(!reject && mtod(reject, lcp_packet*)->length > 3)
+			else if(!reject && ntohs(mtod(reject, lcp_packet*)->length) > 3)
 				SendConfigureNak(reject);
 		break;
 	}
@@ -790,7 +884,7 @@ PPPStateMachine::RTAEvent(mbuf *packet)
 
 // receive unknown code
 void
-PPPStateMachine::RUCEvent(mbuf *packet, uint16 protocol)
+PPPStateMachine::RUCEvent(mbuf *packet, uint16 protocol, uint8 type)
 {
 	LockerHelper locker(fLock);
 	
@@ -802,7 +896,7 @@ PPPStateMachine::RUCEvent(mbuf *packet, uint16 protocol)
 		
 		default:
 			locker.UnlockNow();
-			SendCodeReject(packet, protocol);
+			SendCodeReject(packet, protocol, type);
 	}
 }
 
@@ -972,7 +1066,7 @@ PPPStateMachine::RCREvent(mbuf *packet)
 
 
 // ReceiveCodeReject
-// LCP received a code-reject packet and we look if it is acceptable.
+// LCP received a code/protocol-reject packet and we look if it is acceptable.
 // From here we call our Good/Bad counterparts.
 void
 PPPStateMachine::RXJEvent(mbuf *packet)
@@ -981,6 +1075,7 @@ PPPStateMachine::RXJEvent(mbuf *packet)
 	
 	if(reject->code == PPP_CODE_REJECT)
 		RXJBadEvent(packet);
+			// we only have basic codes, so there must be something wrong
 	else if(reject->code == PPP_PROTOCOL_REJECT) {
 		// disable all handlers for rejected protocol type
 		uint16 rejected = *((uint16*) reject->data);
@@ -994,23 +1089,27 @@ PPPStateMachine::RXJEvent(mbuf *packet)
 		
 		int32 index;
 		PPPProtocol *protocol_handler;
-		PPPEncapsulator *encapsulator_handler = fFirstEncapsulator;
+		PPPEncapsulator *encapsulator_handler = Interface()->FirstEncapsulator();
 		
-		for(index = 0; index < LCP().CountProtocols(); index++) {
-			protocol_handler = LCP().ProtocolAt(index);
+		for(index = 0; index < Interface()->CountProtocols(); index++) {
+			protocol_handler = Interface()->ProtocolAt(index);
 			if(protocol_handler && protocol_handler->Protocol() == rejected)
 				protocol_handler->SetEnabled(false);
 					// disable protocol
 		}
 		
 		for(; encapsulator_handler;
-			encapsulator_handler = encapsulator_handler->Next()) {
+				encapsulator_handler = encapsulator_handler->Next()) {
 			if(encapsulator_handler->Protocol() == rejected)
 				encapsulator_handler->SetEnabled(false);
 					// disable encapsulator
 		}
 		
 		RXJGoodEvent(packet);
+		
+		// notify parent, too
+		if(Interface()->Parent())
+			Interface()->Parent()->StateMachine().RXJEvent(packet);
 	}
 }
 
@@ -1027,11 +1126,12 @@ PPPStateMachine::IllegalEvent(PPP_EVENT event)
 void
 PPPStateMachine::ThisLayerUp()
 {
-	// TODO:
-	// bring all P/Es up
-	// increase until we reach PPP_ESTABLISHED_PHASE or until we actually
-	// find P/Es that need an Up().
-	// In this case we continue to increase the phase in UpEvent(P/E).
+	LockerHelper locker(fLock);
+	
+	// We begin with authentication phase and wait until each phase is done.
+	// We stop when we reach established phase.
+	NewPhase(PPP_AUTHENTICATION_PHASE);
+	BringHandlersUp();
 }
 
 
@@ -1163,7 +1263,7 @@ PPPStateMachine::SendTerminateRequest()
 	lcp_packet *request = mtod(m, lcp_packet*);
 	request->code = PPP_TERMINATE_REQUEST;
 	request->id = fTerminateID = NextID();
-	request->length = 4;
+	request->length = htons(4);
 	
 	LCP().Send(m);
 }
@@ -1181,7 +1281,7 @@ PPPStateMachine::SendTerminateAck(mbuf *request)
 
 
 void
-PPPStateMachine::SendCodeReject(mbuf *packet, uint16 protocol)
+PPPStateMachine::SendCodeReject(mbuf *packet, uint16 protocol, uint8 type)
 {
 	// TODO:
 	// add the packet to the reject and truncate it if needed
@@ -1196,4 +1296,58 @@ PPPStateMachine::SendEchoReply(mbuf *request)
 		// the request becomes a reply
 	
 	LCP().Send(request);
+}
+
+
+// methods for bringing protocols/encapsulators up
+void
+PPPStateMachine::BringHandlersUp()
+{
+	while(Phase() <= PPP_ESTABLISHED_PHASE) {
+		if(BringPhaseUp() > 0)
+			break;
+		
+		if(Phase() == PPP_ESTABLISHED_PHASE) {
+			if(Interface()->Parent())
+				Interface()->Parent()->StateMachine().UpEvent(Interface());
+			
+			// TODO:
+			// Report(PPP_CONNECTION_REPORT, PPP_UP_SUCCESSFUL, NULL, 0);
+		} else
+			NewPhase(Phase() + 1);
+	}
+}
+
+
+// this returns the number of handlers waiting to go up
+uint32
+PPPStateMachine::BringPhaseUp()
+{
+	uint32 count = 0;
+	PPPProtocol *protocol_handler;
+	PPPEncapsulator *encapsulator_handler = Interface()->FirstEncapsulator();
+	
+	for(int32 index = 0; index < Interface()->CountProtocols(); index++) {
+		protocol_handler = Interface()->ProtocolAt(index);
+		if(protocol_handler && protocol_handler->Phase() == Phase()) {
+			if(protocol_handler->IsUpRequested()) {
+				++count;
+				protocol_handler->Up();
+			} else if(protocol_handler->IsGoingUp())
+				++count;
+		}
+	}
+	
+	for(; encapsulator_handler;
+			encapsulator_handler = encapsulator_handler->Next()) {
+		if(encapsulator_handler && encapsulator_handler->Phase() == Phase()) {
+			if(encapsulator_handler->IsUpRequested()) {
+				++count;
+				encapsulator_handler->Up();
+			} else if(encapsulator_handler->IsGoingUp())
+				++count;
+		}
+	}
+	
+	return count;
 }

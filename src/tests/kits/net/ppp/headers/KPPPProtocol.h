@@ -51,6 +51,9 @@ class PPPProtocol {
 		virtual status_t Receive(mbuf *packet) = 0;
 
 	protected:
+		void UpStarted();
+		void DownStarted();
+		
 		void UpFailedEvent();
 		void UpEvent();
 		void DownEvent();

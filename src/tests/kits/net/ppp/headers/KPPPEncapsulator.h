@@ -66,6 +66,9 @@ class PPPEncapsulator {
 			// call the interface's SendToDevice function
 
 	protected:
+		void UpStarted();
+		void DownStarted();
+		
 		void UpFailedEvent();
 		void UpEvent();
 		void DownEvent();
