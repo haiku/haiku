@@ -991,6 +991,44 @@ MapView::Draw(BRect rect)
 	// numkeys
 	DrawBorder(BRect(368, 77, 442, 169));
 	
+	DrawLocks();
+	
+	// the line separator
+	r = BRect(11, 40, 353, 43);
+	SetHighColor(255,255,255);
+	StrokeLine(r.LeftBottom(), r.LeftTop());
+	StrokeLine(r.RightTop());
+	SetHighColor(80,80,80);
+	StrokeLine(r.RightBottom());
+	StrokeLine(r.LeftBottom());
+	r.OffsetBySelf(2,4);
+	r.bottom = r.top + 1;
+	SetHighColor(136,136,136);
+	FillRect(r);
+	FillRect(BRect(354,41,355,43));
+	
+	// around the textview
+	SetHighColor(0,0,0);
+	r = BRect(11, 13, Bounds().right-11, 31);
+	StrokeLine(r.LeftBottom(), r.LeftTop());
+	StrokeLine(r.RightTop());
+	SetHighColor(80,80,80);
+	StrokeLine(r.LeftBottom()+BPoint(1,0), r.LeftTop()+BPoint(1,1));
+	StrokeLine(r.RightTop()+BPoint(0,1));
+	SetHighColor(136,136,136);
+	StrokeLine(r.LeftBottom()+BPoint(2,-1), r.LeftTop()+BPoint(2,2));
+	StrokeLine(r.RightTop()+BPoint(0,2));
+	StrokeLine(r.LeftBottom()+BPoint(1,0), r.LeftBottom()+BPoint(1,0));
+	SetHighColor(255,255,255);
+	StrokeLine(r.RightTop()+BPoint(0,1), r.RightBottom());
+	StrokeLine(r.LeftBottom()+BPoint(2,0));
+	BView::Draw(rect);
+}
+
+
+void
+MapView::DrawLocks()
+{
 	// lights
 #define isLighted(i) (fOldKeyInfo.modifiers & i) 
 
@@ -1045,37 +1083,6 @@ MapView::Draw(BRect rect)
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
 	DrawString("scroll", BPoint(lightRect.left-4, 65), &delta);
-	
-	// the line separator
-	r = BRect(11, 40, 353, 43);
-	SetHighColor(255,255,255);
-	StrokeLine(r.LeftBottom(), r.LeftTop());
-	StrokeLine(r.RightTop());
-	SetHighColor(80,80,80);
-	StrokeLine(r.RightBottom());
-	StrokeLine(r.LeftBottom());
-	r.OffsetBySelf(2,4);
-	r.bottom = r.top + 1;
-	SetHighColor(136,136,136);
-	FillRect(r);
-	FillRect(BRect(354,41,355,43));
-	
-	// around the textview
-	SetHighColor(0,0,0);
-	r = BRect(11, 13, Bounds().right-11, 31);
-	StrokeLine(r.LeftBottom(), r.LeftTop());
-	StrokeLine(r.RightTop());
-	SetHighColor(80,80,80);
-	StrokeLine(r.LeftBottom()+BPoint(1,0), r.LeftTop()+BPoint(1,1));
-	StrokeLine(r.RightTop()+BPoint(0,1));
-	SetHighColor(136,136,136);
-	StrokeLine(r.LeftBottom()+BPoint(2,-1), r.LeftTop()+BPoint(2,2));
-	StrokeLine(r.RightTop()+BPoint(0,2));
-	StrokeLine(r.LeftBottom()+BPoint(1,0), r.LeftBottom()+BPoint(1,0));
-	SetHighColor(255,255,255);
-	StrokeLine(r.RightTop()+BPoint(0,1), r.RightBottom());
-	StrokeLine(r.LeftBottom()+BPoint(2,0));
-	BView::Draw(rect);
 }
 
 
@@ -1321,6 +1328,7 @@ MapView::MessageReceived(BMessage *msg)
 				for (int8 i=0; i<16; i++) 
 					fOldKeyInfo.key_states[i] = states[i];
 				InvalidateKeys();
+				DrawLocks();
 			} else {
 								
 				int32 keyCode = -1;

@@ -46,6 +46,7 @@ public:
 	void MouseUp(BPoint point);
 	void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
 	void InvalidateKeys();
+	void DrawLocks();
 private:	
 	key_info fOldKeyInfo;
 	BRect fKeysRect[128];
