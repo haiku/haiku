@@ -46,7 +46,7 @@ Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	_zoom_state=false;
 	_title_string=new BString;
 	_driver=NULL;
-
+	
 	_closerect.Set(0,0,1,1);
 	_zoomrect.Set(0,0,1,1);
 	_minimizerect.Set(0,0,1,1);
@@ -231,6 +231,7 @@ int32 Decorator::GetFlags(void)
 void Decorator::SetTitle(const char *string)
 {
 	_title_string->SetTo(string);
+	_DoLayout();
 }
 
 /*!

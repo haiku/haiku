@@ -113,7 +113,7 @@ protected:
 			*_lowersibling,
 			*_topchild,
 			*_bottomchild;
-
+	
 	BRegion *_visible,
 			*_invalid,
 			*_full;

@@ -39,8 +39,9 @@
 #include "Desktop.h"
 #include "DesktopClasses.h"
 #include "TokenHandler.h"
+#include "Utils.h"
 
-//#define DEBUG_SERVERWINDOW
+#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -386,6 +387,28 @@ printf("ServerWindow %s: Message Delete_Layer unimplemented\n",_title->String())
 
 			break;
 		}
+		case AS_LAYER_CREATE_ROOT:
+		{
+			// Received when a window creates its internal top view
+		
+			// TODO: Implement
+#ifdef DEBUG_SERVERWINDOW
+printf("ServerWindow %s: Message Create_Layer_Root unimplemented\n",_title->String());
+#endif
+
+			break;
+		}
+		case AS_LAYER_DELETE_ROOT:
+		{
+			// Received when a window deletes its internal top view
+			
+			// TODO: Implement
+#ifdef DEBUG_SERVERWINDOW
+printf("ServerWindow %s: Message Delete_Layer_Root unimplemented\n",_title->String());
+#endif
+
+			break;
+		}
 		case AS_SHOW_WINDOW:
 		{
 			Show();
@@ -558,7 +581,7 @@ printf("ServerWindow %s: Message Move_By unimplemented\n",_title->String());
 		}
 		default:
 		{
-			printf("ServerWindow %s received unexpected code %lx",_title->String(),code);
+			printf("ServerWindow %s received unexpected code %s\n",_title->String(),MsgCodeToString(code));
 			break;
 		}
 	}

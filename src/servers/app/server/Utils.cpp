@@ -60,3 +60,15 @@ bool _use_preferred_target_(BMessage *msg)
 {
 	return msg->fPreferred;
 }
+
+const char *MsgCodeToString(int32 code)
+{
+	// Used to translate BMessage message codes back to a character
+	// format
+	char string [10];
+	sprintf(string,"'%c%c%c%c'",(char)((code & 0xFF000000) >>  24),
+		(char)((code & 0x00FF0000) >>  16),
+		(char)((code & 0x0000FF00) >>  8),
+		(char)((code & 0x000000FF)) );
+	return string;
+}

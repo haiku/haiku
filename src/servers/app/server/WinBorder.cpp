@@ -76,6 +76,7 @@ WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 fl
  : Layer(r,name,B_FOLLOW_NONE,flags,win)
 {
 	_mbuttons=0;
+	_kmodifiers=0;
 	_win=win;
 	if(_win)
 		_frame=_win->_frame;
@@ -86,9 +87,10 @@ WinBorder::WinBorder(BRect r, const char *name, int32 look, int32 feel, int32 fl
 	_title=new BString(name);
 	_hresizewin=false;
 	_vresizewin=false;
-
+	_driver=GetGfxDriver(ActiveScreen());
 	_decorator=new_decorator(r,name,look,feel,flags,GetGfxDriver(ActiveScreen()));
-	_decorator->SetDriver(GetGfxDriver(ActiveScreen()));
+	_decorator->SetDriver(_driver);
+	_decorator->SetTitle(name);
 	
 #ifdef DEBUG_WINBORDER
 printf("WinBorder %s:\n",_title->String());
@@ -107,9 +109,6 @@ printf("WinBorder %s:~WinBorder()\n",_title->String());
 
 void WinBorder::MouseDown(int8 *buffer)
 {
-#ifdef DEBUG_WINBORDER_MOUSE
-printf("WinBorder %s: MouseDown unimplemented\n",_title->String());
-#endif
 	// Buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -223,9 +222,6 @@ printf("Click: Resize\n");
 			break;
 		}
 	}
-	// TODO: fix this
-//	if(click!=CLICK_NONE)
-//		ActivateWindow(_win);
 }
 
 void WinBorder::MouseMoved(int8 *buffer)
@@ -242,10 +238,6 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	BPoint pt(x,y);
 	click_type click=_decorator->Clicked(pt, _mbuttons, _kmodifiers);
-
-#ifdef DEBUG_WINBORDER_MOUSE
-printf("WinBorder %s: MouseMoved unimplemented\n",_title->String());
-#endif
 
 	if(click!=CLICK_CLOSE && _decorator->GetClose())
 	{
@@ -291,6 +283,7 @@ printf("ClickMove: Slide Tab\n");
 #ifdef DEBUG_WINBORDER_CLICK
 printf("ClickMove: Drag\n");
 #endif
+//debugger("");
 		float dx=pt.x-_mousepos.x,
 			dy=pt.y-_mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
@@ -303,11 +296,23 @@ printf("ClickMove: Drag\n");
 			_win->Unlock();
 			
 			lock_layers();
-			_parent->Invalidate(oldmoveframe);
+//			_parent->Invalidate(oldmoveframe);
+//			MoveBy(dx,dy);
+//			_decorator->MoveBy(BPoint(dx, dy));
+//			_parent->RequestDraw();
+//			_decorator->Draw();
+			BRegion *reg=_decorator->GetFootprint();
+			_driver->CopyRegion(reg,_win->_frame.LeftTop());
+			
+			BRegion reg2(oldmoveframe);
 			MoveBy(dx,dy);
-			_parent->RequestDraw();
 			_decorator->MoveBy(BPoint(dx, dy));
-			_decorator->Draw();
+			reg->OffsetBy(dx, dy);
+			reg2.Exclude(reg);
+			_parent->RebuildRegions();
+			_parent->RequestDraw();
+			
+			delete reg;
 			unlock_layers();
 		}
 	}
@@ -419,7 +424,7 @@ printf("WinBorder %s::RequestDraw\n",_title->String());
 #endif
 	_decorator->Draw();
 }
-
+/*
 void WinBorder::MoveBy(BPoint pt)
 {
 }
@@ -435,7 +440,7 @@ void WinBorder::ResizeBy(BPoint pt)
 void WinBorder::ResizeBy(float x, float y)
 {
 }
-
+*/
 void WinBorder::UpdateColors(void)
 {
 #ifdef DEBUG_WINBORDER

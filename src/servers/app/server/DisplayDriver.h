@@ -97,6 +97,7 @@ public:
 	virtual bool Initialize(void);
 	virtual void Shutdown(void);
 	virtual void CopyBits(BRect src, BRect dest);
+	virtual void CopyRegion(BRegion *src, const BPoint &lefttop);
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 

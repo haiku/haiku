@@ -108,6 +108,7 @@ public:
 	
 	// Drawing functions
 	void CopyBits(BRect src, BRect dest);
+	void CopyRegion(BRegion *src, const BPoint &lefttop);
 	void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest);
 	void DrawChar(char c, BPoint pt, LayerData *d);
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);

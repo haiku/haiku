@@ -185,7 +185,7 @@ printf("Layer: %s: Add Child (%s, %s, %s) - Incomplete\n",_name->String(),layer?
 		_bottomchild=layer;
 	_topchild=layer;
 	layer->_level=_level+1;
-
+	
 	if(rebuild)
 		RebuildRegions(true);
 }
@@ -233,7 +233,6 @@ printf("Layer: %s: Remove Child (%s,%s)\n",_name->String(),layer?layer->_name->S
 		layer->_lowersibling->_uppersibling=layer->_uppersibling;
 	layer->_uppersibling=NULL;
 	layer->_lowersibling=NULL;
-
 	if(rebuild)
 		RebuildRegions(true);
 }
@@ -754,15 +753,18 @@ printf("Layer: %s: Rebuild Regions (%s)\n",_name->String(),include_children?"inc
 		if(childlay->_visible && childlay->_hidecount==0)
 		{
 			// reg is what is _visible in the layer's _parent's coordinate system
-			reg=new BRegion(ConvertToParent(_visible));
+//			reg=new BRegion(ConvertToParent(_visible));
 			// reg2 is the layer's _visible region in the sibling's coordinate system
-			reg2=new BRegion(childlay->ConvertFromParent(reg));
-			delete reg;
+//			reg2=new BRegion(childlay->ConvertFromParent(reg));
+//			delete reg;
 
 			// lowersiblings occupy screen space _above_ a layer, so the layer itself
 			// must remove from its _visible region 
-			_visible->Exclude(reg2);
-			delete reg2;
+//			_visible->Exclude(reg2);
+//			delete reg2;
+			reg=new BRegion(ConvertToParent(_visible));
+			_visible->Exclude(reg);
+			delete reg;
 		}
 	}
 

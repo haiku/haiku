@@ -97,6 +97,18 @@ void DisplayDriver::CopyBits(BRect src, BRect dest)
 }
 
 /*!
+	\brief A screen-to-screen blit (of sorts) which copies a BRegion
+	\param src Source region
+	\param lefttop Offset to which the region will be copied
+	
+	Bounds checking must be done in this call. This function needs to be literally as
+	fast as possible - all window moves will be done with it.
+*/
+void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
+{
+}
+
+/*!
 	\brief Called for all BView::DrawBitmap calls
 	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
 	space is not guaranteed to match.

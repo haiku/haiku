@@ -44,9 +44,9 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
  : Decorator(rect,wlook,wfeel,wflags)
 {
 	taboffset=0;
+	titlepixelwidth=0;
 
-	// commented these out because they are taken care of by the SetFocus() call
-	SetFocus(false);
+	_SetFocus();
 
 	// These hard-coded assignments will go bye-bye when the system _colors 
 	// API is implemented
@@ -99,7 +99,7 @@ else
 	if(buttons & B_TERTIARY_MOUSE_BUTTON)
 		printf("\t\tTertiary\n");
 }
-printf("\tNodifiers:\n");
+printf("\tModifiers:\n");
 if(modifiers==0)
 	printf("\t\tNone\n");
 else
@@ -182,6 +182,8 @@ printf("DefaultDecorator: Do Layout\n");
 	_borderrect=_frame;
 	_closerect=_frame;
 
+	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
+
 	_closerect.left+=(_look==B_FLOATING_WINDOW_LOOK)?2:4;
 	_closerect.top+=(_look==B_FLOATING_WINDOW_LOOK)?6:4;
 	_closerect.right=_closerect.left+10;
@@ -193,16 +195,14 @@ printf("DefaultDecorator: Do Layout\n");
 	_resizerect.left=_resizerect.right-18;
 	
 	_tabrect.bottom=_tabrect.top+18;
-/*	if(GetTitle())
+	if(GetTitle() && _driver)
 	{
-		float titlewidth=_closerect.right
-			+_driver->StringWidth(layer->name->String(),
-			layer->name->Length())
-			+35;
-		_tabrect.right=(titlewidth<_frame.right -1)?titlewidth:_frame.right;
+		titlepixelwidth=_driver->StringWidth(GetTitle(),_TitleWidth(), &_layerdata);
+		if(_closerect.right+textoffset+titlepixelwidth+35< _frame.Width()-1)
+			_tabrect.right=_tabrect.left+titlepixelwidth;
 	}
 	else
-*/		_tabrect.right=_tabrect.left+_tabrect.Width()/2;
+		_tabrect.right=_tabrect.left+_tabrect.Width()/2;
 
 	if(_look==B_FLOATING_WINDOW_LOOK)
 		_tabrect.top+=4;
@@ -214,7 +214,6 @@ printf("DefaultDecorator: Do Layout\n");
 	_zoomrect.left=_zoomrect.right-10;
 	_zoomrect.bottom=_zoomrect.top+10;
 	
-	textoffset=(_look==B_FLOATING_WINDOW_LOOK)?5:7;
 }
 
 void DefaultDecorator::MoveBy(float x, float y)
@@ -254,14 +253,14 @@ void DefaultDecorator::_DrawTitle(BRect r)
 {
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
-/*	_driver->SetDrawingMode(B_OP_OVER);
-	rgb_color tmpcol=_driver->HighColor();
-	_driver->SetHighColor(textcol.red,textcol.green,textcol.blue);
-	_driver->DrawString((char *)string,strlen(string),
-		BPoint(_closerect.right+textoffset,_closerect.bottom-1));
-	_driver->SetHighColor(tmpcol.red,tmpcol.green,tmpcol.blue);
-	_driver->SetDrawingMode(B_OP_COPY);
-*/
+	_layerdata.draw_mode=B_OP_OVER;
+	_layerdata.highcolor=_colors->window_tab_text;
+	
+	// closerect.bottom+1 because the driver subtracts one from the y coordinate
+	// for compatibility with the BeOS font system
+	_driver->DrawString(GetTitle(),_ClipTitle((_zoomrect.left-5)-(_closerect.right+textoffset)),
+		BPoint(_closerect.right+textoffset,_closerect.bottom+1),&_layerdata);
+	_layerdata.draw_mode=B_OP_COPY;
 }
 
 void DefaultDecorator::_SetFocus(void)
@@ -354,10 +353,11 @@ void DefaultDecorator::_DrawTab(BRect r)
 	_layerdata.highcolor=frame_lowcol;
 	_driver->StrokeRect(_tabrect,&_layerdata,(int8*)&solidhigh);
 
-//	UpdateTitle(layer->name->String());
-
 	_layerdata.highcolor=_colors->window_tab;
 	_driver->FillRect(_tabrect.InsetByCopy(1,1),&_layerdata,(int8*)&solidhigh);
+
+//	UpdateTitle(layer->name->String());
+	_DrawTitle(_tabrect);
 
 	// Draw the buttons if we're supposed to	
 	if(!(_flags & B_NOT_CLOSABLE))

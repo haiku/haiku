@@ -63,6 +63,7 @@ protected:
 
 	bool slidetab;
 	int textoffset;
+	float titlepixelwidth;
 };
 
 #endif

@@ -68,8 +68,8 @@ AppServer::AppServer(void) : BApplication (SERVER_SIGNATURE)
 AppServer::AppServer(void)
 #endif
 {
-	_mouseport=create_port(100,SERVER_INPUT_PORT);
-	_messageport=create_port(100,SERVER_PORT_NAME);
+	_mouseport=create_port(200,SERVER_INPUT_PORT);
+	_messageport=create_port(200,SERVER_PORT_NAME);
 
 	_applist=new BList(0);
 	_quitting_server=false;

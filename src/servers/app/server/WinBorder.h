@@ -42,10 +42,10 @@ public:
 	~WinBorder(void);
 	void RequestDraw(void);
 	void RequestDraw(const BRect &r);
-	void MoveBy(BPoint pt);
-	void MoveBy(float x, float y);
-	void ResizeBy(BPoint pt);
-	void ResizeBy(float x, float y);
+//	void MoveBy(BPoint pt);
+//	void MoveBy(float x, float y);
+//	void ResizeBy(BPoint pt);
+//	void ResizeBy(float x, float y);
 	void MouseDown(int8 *buffer);
 	void MouseMoved(int8 *buffer);
 	void MouseUp(int8 *buffer);
@@ -67,6 +67,7 @@ protected:
 	BPoint _mousepos;
 	bool _update;
 	bool _hresizewin,_vresizewin;
+	DisplayDriver *_driver;
 };
 
 bool is_moving_window(void);
@@ -75,5 +76,7 @@ bool is_resizing_window(void);
 void set_is_resizing_window(bool state);
 void set_active_winborder(WinBorder *win);
 WinBorder * get_active_winborder(void);
+void set_is_resizing_window(bool state);
+bool is_sliding_tab(void);
 
 #endif

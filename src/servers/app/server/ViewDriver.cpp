@@ -40,6 +40,7 @@
 
 #include "Angle.h"
 #include "PortLink.h"
+#include "RectUtils.h"
 #include "ServerProtocol.h"
 #include "ServerBitmap.h"
 #include "ViewDriver.h"
@@ -647,6 +648,83 @@ void ViewDriver::CopyBits(BRect src, BRect dest)
 	drawview->Sync();
 	screenwin->view->Invalidate(src);
 	screenwin->view->Invalidate(dest);
+	framebuffer->Unlock();
+	screenwin->Unlock();
+}
+
+void ViewDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
+{
+#ifdef DEBUG_DRIVER_MODULE
+printf("ViewDriver:: CopyRegion unimplemented()\n");
+#endif
+
+	
+	screenwin->Lock();
+	framebuffer->Lock();
+
+	// Check for overlap
+	bool overlap=false;
+
+	BRect regframe=src->Frame();
+	regframe.OffsetTo(lefttop);
+	
+	BRegion inverse;
+	int8 *savebuffer=NULL,*srcindex=NULL,*destindex=NULL,
+		*framebufferstart=NULL;
+	int32 buffer_row_size=0,i;
+
+	if(TestRectIntersection(regframe,src->Frame()) && src->CountRects()>1)
+		overlap=true;
+	
+	if(overlap)
+	{
+		// If overlap, get the inverse of the region passed to us and save the
+		// inverse region's frame
+		inverse=src->Frame();
+		inverse.Exclude(src);
+		
+		buffer_row_size=inverse.Frame().IntegerWidth() * 4;
+		destindex=savebuffer=new int8[ buffer_row_size * inverse.Frame().IntegerHeight()];
+		framebufferstart=srcindex=(int8*)framebuffer->Bits()+
+				(framebuffer->BytesPerRow()* int32(inverse.Frame().top));
+		srcindex+=int32(inverse.Frame().left)*4;
+		
+		for(i=int32(inverse.Frame().top);i<int32(inverse.Frame().bottom); i++)
+		{
+			memcpy(destindex,srcindex,buffer_row_size);
+			srcindex+=framebuffer->BytesPerRow();
+			destindex+=buffer_row_size;
+		}
+	}
+	
+	// Copy all rectangles in the region to the new offset
+	BRect srcrect,destrect;
+	for(i=0; i<src->CountRects(); i++)
+	{
+		srcrect=destrect=src->RectAt(i);
+		destrect.OffsetTo(lefttop);
+		drawview->CopyBits(srcrect,destrect);
+	}
+	drawview->Sync();
+	
+	if(overlap)
+	{
+		// Copy all saved rectangles back to the screen and clean up
+		srcindex=savebuffer;
+		destindex=framebufferstart;
+		
+		for(i=int32(inverse.Frame().top);i<int32(inverse.Frame().bottom); i++)
+		{
+			memcpy(destindex,srcindex,buffer_row_size);
+			srcindex+=framebuffer->BytesPerRow();
+			destindex+=buffer_row_size;
+		}
+
+		delete savebuffer;
+	}
+	
+	screenwin->view->Invalidate(src->Frame());
+	screenwin->view->Invalidate(regframe);
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
