@@ -1,0 +1,459 @@
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file intel_partition_map.cpp
+	\brief Definitions for "intel" style partitions and implementation
+		   of related classes.
+*/
+
+#include <new.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "intel_partition_map.h"
+
+#define TRACE(x) ;
+//#define TRACE(x) dprintf x
+
+
+// partition_type
+struct partition_type {
+	uint8	type;
+	char	*name;
+};
+
+static const struct partition_type kPartitionTypes[] = {
+	// these entries must be sorted by type (currently not)
+	{ 0x00, "empty" },
+	{ 0x01, "FAT 12-bit" },
+	{ 0x02, "Xenix root" },
+	{ 0x03, "Xenix user" },
+	{ 0x04, "FAT 16-bit (dos 3.0)" },
+	{ 0x05, "Extended Partition" },
+	{ 0x06, "FAT 16-bit (dos 3.31)" },
+	{ 0x07, "OS/2 IFS, Windows NT, Advanced Unix" },
+	{ 0x0b, "FAT 32-bit" },
+	{ 0x0c, "FAT 32-bit, LBA-mapped" },
+	{ 0x0d, "FAT 16-bit, LBA-mapped" },
+	{ 0x0f, "Extended Partition, LBA-mapped" },
+	{ 0x42, "Windows 2000 marker (switches to a proprietary partition table)" },
+	{ 0x4d, "QNX 4" },
+	{ 0x4e, "QNX 4 2nd part" },
+	{ 0x4f, "QNX 4 3rd part" },
+	{ 0x78, "XOSL boot loader" },
+	{ 0x82, "Linux swapfile" },
+	{ 0x83, "Linux native" },
+	{ 0x85, "Linux extendend partition" },
+	{ 0xa5, "FreeBSD" },
+	{ 0xa6, "OpenBSD" },
+	{ 0xa7, "NextSTEP" },
+	{ 0xa8, "MacOS X" },
+	{ 0xa9, "NetBSD" },
+	{ 0xab, "MacOS X boot" },
+	{ 0xbe, "Solaris 8 boot" },
+	{ 0xeb, "BeOS" },
+	{ 0, NULL }
+};
+
+// partition_type_string
+const char *
+partition_type_string(uint8 type)
+{
+	int32 i;
+	for (i = 0; kPartitionTypes[i].name ; i++)
+	{
+		if (type == kPartitionTypes[i].type)
+			return kPartitionTypes[i].name;
+	}
+	return "unknown";
+}
+
+
+// Partition
+
+// constructor
+Partition::Partition()
+	: fPTSOffset(0),
+	  fOffset(0),
+	  fSize(0),
+	  fType(0),
+	  fActive(false)
+{
+}
+
+// constructor
+Partition::Partition(const partition_descriptor *descriptor,off_t ptsOffset,
+					 off_t baseOffset, int32 blockSize)
+	: fPTSOffset(0),
+	  fOffset(0),
+	  fSize(0),
+	  fType(0),
+	  fActive(false)
+{
+	SetTo(descriptor, ptsOffset, baseOffset, blockSize);
+}
+
+// SetTo
+void
+Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
+				 off_t baseOffset, int32 blockSize)
+{
+	fPTSOffset = ptsOffset;
+	fOffset = baseOffset + (off_t)descriptor->start * blockSize;
+	fSize = (off_t)descriptor->size * blockSize;
+	fType = descriptor->type;
+	fActive = descriptor->active;
+	if (fSize == 0)
+		Unset();
+}
+
+// Unset
+void
+Partition::Unset()
+{
+	fPTSOffset = 0;
+	fOffset = 0;
+	fSize = 0;
+	fType = 0;
+	fActive = false;
+}
+
+// CheckLocation
+bool
+Partition::CheckLocation(off_t sessionSize, int32 blockSize) const
+{
+	// offsets and size must be block aligned, PTS and partition must lie
+	// within the session
+	return (fPTSOffset % blockSize == 0
+			&& fOffset % blockSize == 0
+			&& fSize % blockSize == 0
+			&& fPTSOffset >= 0 && fPTSOffset < sessionSize
+			&& fOffset >= 0 && fOffset + fSize <= sessionSize);
+}
+
+
+// PrimaryPartition
+
+// constructor
+PrimaryPartition::PrimaryPartition()
+	: Partition(),
+	  fHead(NULL),
+	  fTail(NULL),
+	  fLogicalPartitionCount(0)
+{
+}
+
+// constructor
+PrimaryPartition::PrimaryPartition(const partition_descriptor *descriptor,
+								   off_t ptsOffset, int32 blockSize)
+	: Partition(),
+	  fHead(NULL),
+	  fTail(NULL),
+	  fLogicalPartitionCount(0)
+{
+	SetTo(descriptor, ptsOffset, blockSize);
+}
+
+// SetTo
+void
+PrimaryPartition::SetTo(const partition_descriptor *descriptor,
+						off_t ptsOffset, int32 blockSize)
+{
+	Unset();
+	Partition::SetTo(descriptor, ptsOffset, 0, blockSize);
+}
+
+// Unset
+void
+PrimaryPartition::Unset()
+{
+	while (LogicalPartition *partition = fHead) {
+		fHead = partition->Next();
+		delete partition;
+	}
+	fHead = NULL;
+	fTail = NULL;
+	fLogicalPartitionCount = 0;
+	Partition::Unset();
+}
+
+// LogicalPartitionAt
+LogicalPartition *
+PrimaryPartition::LogicalPartitionAt(int32 index) const
+{
+	LogicalPartition *partition = NULL;
+	if (index >= 0 && index < fLogicalPartitionCount) {
+		for (partition = fHead; index > 0; index--)
+			partition = partition->Next();
+	}
+	return partition;
+}
+
+// AddLogicalPartition
+void
+PrimaryPartition::AddLogicalPartition(LogicalPartition *partition)
+{
+	if (partition) {
+		partition->SetPrimaryPartition(this);
+		if (fTail) {
+			fTail->SetNext(partition);
+			fTail = partition;
+		} else
+			fHead = fTail = partition;
+		partition->SetNext(NULL);
+		fLogicalPartitionCount++;
+	}
+}
+
+
+// LogicalPartition
+
+// constructor
+LogicalPartition::LogicalPartition()
+	: Partition(),
+	  fPrimary(NULL),
+	  fNext(NULL)
+{
+}
+
+// constructor
+LogicalPartition::LogicalPartition(const partition_descriptor *descriptor,
+								   off_t ptsOffset, int32 blockSize,
+								   PrimaryPartition *primary)
+	: Partition(),
+	  fPrimary(NULL),
+	  fNext(NULL)
+{
+	SetTo(descriptor, ptsOffset, blockSize, primary);
+}
+
+// SetTo
+void
+LogicalPartition::SetTo(const partition_descriptor *descriptor,
+						off_t ptsOffset, int32 blockSize,
+						PrimaryPartition *primary)
+{
+	Unset();
+	if (descriptor && primary) {
+		off_t baseOffset = (descriptor->is_extended() ? primary->Offset()
+													  : ptsOffset);
+		Partition::SetTo(descriptor, ptsOffset, baseOffset, blockSize);
+		fPrimary = primary;
+	}
+}
+
+// Unset
+void
+LogicalPartition::Unset()
+{
+	fPrimary = NULL;
+	fNext = NULL;
+	Partition::Unset();
+}
+
+
+// PartitionMap
+
+// constructor
+PartitionMap::PartitionMap()
+{
+}
+
+// destructor
+PartitionMap::~PartitionMap()
+{
+}
+
+// Unset
+void
+PartitionMap::Unset()
+{
+	for (int32 i = 0; i < 4; i++)
+		fPrimaries[i].Unset();
+}
+
+// PrimaryPartitionAt
+PrimaryPartition *
+PartitionMap::PrimaryPartitionAt(int32 index)
+{
+	PrimaryPartition *partition = NULL;
+	if (index >= 0 && index < 4)
+		partition = fPrimaries + index;
+	return partition;
+}
+
+// PrimaryPartitionAt
+const PrimaryPartition *
+PartitionMap::PrimaryPartitionAt(int32 index) const
+{
+	const PrimaryPartition *partition = NULL;
+	if (index >= 0 && index < 4)
+		partition = fPrimaries + index;
+	return partition;
+}
+
+// CountPartitions
+int32
+PartitionMap::CountPartitions() const
+{
+	int32 count = 4;
+	for (int32 i = 0; i < 4; i++)
+		count += fPrimaries[i].CountLogicalPartitions();
+	return count;
+}
+
+// PartitionAt
+Partition *
+PartitionMap::PartitionAt(int32 index)
+{
+	Partition *partition = NULL;
+	int32 count = CountPartitions();
+	if (index >= 0 && index < count) {
+		if (index < 4)
+			partition  = fPrimaries + index;
+		else {
+			index -= 4;
+			int32 primary = 0;
+			while (index >= fPrimaries[primary].CountLogicalPartitions()) {
+				index -= fPrimaries[primary].CountLogicalPartitions();
+				primary++;
+			}
+			partition = fPrimaries[primary].LogicalPartitionAt(index);
+		}
+	}
+	return partition;
+}
+
+// PartitionAt
+const Partition *
+PartitionMap::PartitionAt(int32 index) const
+{
+	return const_cast<PartitionMap*>(this)->PartitionAt(index);
+}
+
+// cmp_partition_offset
+static
+int
+cmp_partition_offset(const void *p1, const void *p2)
+{
+	const Partition *partition1 = *static_cast<const Partition **>(p1);
+	const Partition *partition2 = *static_cast<const Partition **>(p2);
+	if (partition1->Offset() < partition2->Offset())
+		return -1;
+	else if (partition1->Offset() > partition2->Offset())
+		return 1;
+	return 0;
+}
+
+// cmp_offset
+static
+int
+cmp_offset(const void *o1, const void *o2)
+{
+	off_t offset1 = *static_cast<const off_t*>(o1);
+	off_t offset2 = *static_cast<const off_t*>(o2);
+	if (offset1 < offset2)
+		return -1;
+	else if (offset1 > offset2)
+		return 1;
+	return 0;
+}
+
+// is_inside_partitions
+static
+bool
+is_inside_partitions(off_t location, const Partition **partitions, int32 count)
+{
+	bool result = false;
+	if (count > 0) {
+		// binary search
+		int32 lower = 0;
+		int32 upper = count - 1;
+		while (lower < upper) {
+			int32 mid = (lower + upper) / 2;
+			const Partition *midPartition = partitions[mid];
+			if (location >= midPartition->Offset() + midPartition->Size())
+				lower = mid + 1;
+			else
+				upper = mid;
+		}
+		const Partition *partition = partitions[lower];
+		result = (location >= partition->Offset() &&
+				  location < partition->Offset() + partition->Size());
+	}
+	return result;
+}
+
+// Check
+bool
+PartitionMap::Check(off_t sessionSize, int32 blockSize) const
+{
+	int32 partitionCount = CountPartitions();
+	// 1. check partition locations
+	for (int32 i = 0; i < partitionCount; i++) {
+		if (!PartitionAt(i)->CheckLocation(sessionSize, blockSize))
+			return false;
+	}
+	// 2. check overlapping of partitions and location of PTSs
+	bool result = true;
+	const Partition **byOffset = new(nothrow) const Partition*[partitionCount];
+	off_t *ptsOffsets = new(nothrow) off_t[partitionCount - 3];
+	if (byOffset && ptsOffsets) {
+		// fill the arrays
+		int32 byOffsetCount = 0;
+		int32 ptsOffsetCount = 1;	// primary PTS
+		ptsOffsets[0] = 0;			//
+		for (int32 i = 0; i < partitionCount; i++) {
+			const Partition *partition = PartitionAt(i);
+			if (!partition->IsExtended())
+				byOffset[byOffsetCount++] = partition;
+			// add only logical partition PTS locations
+			if (i >= 4)
+				ptsOffsets[ptsOffsetCount++] = partition->PTSOffset();
+		}
+		// sort the arrays
+		qsort(byOffset, byOffsetCount, sizeof(const Partition*),
+			  cmp_partition_offset);
+		qsort(ptsOffsets, ptsOffsetCount, sizeof(off_t), cmp_offset);
+		// check for overlappings
+		off_t nextOffset = 0;
+		for (int32 i = 0; i < byOffsetCount; i++) {
+			const Partition *partition = byOffset[i];
+			if (partition->Offset() < nextOffset) {
+				TRACE(("intel: PartitionMap::Check(): overlapping partitions!"
+					   "\n"));
+				result = false;
+				break;
+			}
+			nextOffset = partition->Offset() + partition->Size();
+		}
+		// check uniqueness of PTS offsets and whether they lie outside of the
+		// non-extended partitions
+		if (result) {
+			for (int32 i = 0; i < ptsOffsetCount; i++) {
+				if (i > 0 && ptsOffsets[i] == ptsOffsets[i - 1]) {
+					TRACE(("intel: PartitionMap::Check(): same PTS for "
+						   "different extended partitions!\n"));
+					result = false;
+					break;
+				} else if (is_inside_partitions(ptsOffsets[i], byOffset,
+												byOffsetCount)) {
+					TRACE(("intel: PartitionMap::Check(): a PTS lies "
+						   "inside a non-extended partition!\n"));
+					result = false;
+					break;
+				}
+			}
+		}
+	} else
+		result = false;		// no memory: assume failure
+	// cleanup
+	if (byOffset)
+		delete[] byOffset;
+	if (ptsOffsets)
+		delete[] ptsOffsets;
+	return result;
+}
+
