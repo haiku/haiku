@@ -192,6 +192,9 @@ modify or free it, lest you wish to be laughed at by other developers.
     void* data, size_t length, bigtime_t time)
 \brief Invoked when a System Exclusive event is received
 
+The data does not include the sysex start and end control bytes (0xF0 and 0xF7), 
+only the payload of the sysex message.
+
 The data belongs to the Midi Kit and is only valid for the duration of this 
 event. You may not modify or free it.
 
