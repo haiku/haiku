@@ -76,7 +76,7 @@ _protected_code_segment:
 	mov		$0x10000, %ebp	// setup new stack
 	mov		%ebp, %esp
 
-	movw	%dx, gBootDriveID
+	movb	%dl, gBootDriveID
 		// save boot device
 
 	call	_start
@@ -152,6 +152,6 @@ gdt_descriptor:
 
 .globl gBootDriveID
 gBootDriveID:
-	.word	0
+	.byte	0
 
 .org 1024
