@@ -277,5 +277,11 @@ OggTobiasSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 		mediaHeader->u.encoded_video.line_count
 		   = fMediaFormat.u.encoded_video.output.display.line_count;
 	}
+	if (mediaHeader->start_time < 0) {
+		fCurrentFrame++;
+		fCurrentTime = (bigtime_t)((fCurrentFrame * 1000000LL) / fFrameRate);
+		mediaHeader->start_time = fCurrentTime;
+	}
+//	fprintf(stderr, "current frame = %lld, time = %lld\n", fCurrentFrame, fCurrentTime);
 	return B_OK;
 }

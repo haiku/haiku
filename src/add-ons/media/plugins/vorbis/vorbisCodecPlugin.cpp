@@ -195,7 +195,7 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 			}
 			if (!synced) {
 				if (mh.start_time > 0) {
-					mediaHeader->start_time = mh.start_time - total_samples / fInfo.rate;
+					mediaHeader->start_time = mh.start_time - (1000000LL * total_samples) / fInfo.rate;
 					synced = true;
 				}
 			}
@@ -238,7 +238,7 @@ done:
 	if (!synced) {
 		mediaHeader->start_time = fStartTime;
 	}
-	fStartTime = mediaHeader->start_time + total_samples / fInfo.rate;
+	fStartTime = mediaHeader->start_time + (1000000LL * total_samples) / fInfo.rate;
 
 	*frameCount = (fOutputBufferSize - out_bytes_needed) / fFrameSize;
 

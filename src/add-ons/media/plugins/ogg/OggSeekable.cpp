@@ -327,8 +327,7 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	int64 left_granulepos = 0;
 	off_t right = GetLastPagePosition();
 	int64 right_granulepos = 0;
-	bool done = false;
-	while (!done) {
+	while (true) {
 		TRACE("  Seek: [%llu,%llu]: ", left, right);
 		ogg_sync_reset(&fSync);
 		ogg_stream_reset(&fStreamState);
@@ -336,7 +335,7 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 			fPosition = (right + left) / 2;
 		} else {
 			fPosition = left;
-			done = true;
+			break;
 		}
 		do {
 			status = ReadPage(&page, B_PAGE_SIZE);
@@ -367,8 +366,8 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		}
 	}
 
-	// if not zero, look for a granulepos in a packet
-	if (*frame != 0) {
+	// if not the first, look for a granulepos in a packet
+	if (granulepos != fFirstGranulepos) {
 		ogg_packet packet;
 		do {
 			status = GetPacket(&packet);
@@ -383,6 +382,7 @@ OggSeekable::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 	} else {
 		fCurrentFrame = 0;
 		fCurrentTime = 0;
+		Seek(left, SEEK_SET);
 	}
 	TRACE("OggSeekable::Seek done: ");
 	TRACE("[%lld,%lld] => ", left_granulepos, right_granulepos);
@@ -449,8 +449,6 @@ OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
                              media_header *mediaHeader)
 {
 	BAutolock autolock(fPositionLock);
-	mediaHeader->start_time = fCurrentTime;
-	mediaHeader->file_pos = fPosition;
 	status_t result = GetPacket(&fChunkPacket);
 	if (result != B_OK) {
 		TRACE("OggSeekable::GetNextChunk failed: GetPacket = %s\n", strerror(result));
@@ -460,10 +458,12 @@ OggSeekable::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	*chunkSize = sizeof(fChunkPacket);
 	if (fChunkPacket.granulepos > 0) {
 		fCurrentFrame = fChunkPacket.granulepos - fFirstGranulepos;
+		fCurrentTime = (bigtime_t)((fCurrentFrame * 1000000LL) / fFrameRate);
+		mediaHeader->start_time = fCurrentTime;
 	} else {
-		fCurrentFrame++;
+		mediaHeader->start_time = -1;
 	}
-	fCurrentTime = (bigtime_t)((fCurrentFrame * 1000000LL) / fFrameRate);
+	mediaHeader->file_pos = fPosition;
 	return B_OK;
 }
 
