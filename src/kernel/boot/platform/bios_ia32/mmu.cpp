@@ -112,7 +112,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	TRACE(("map_page: vaddr 0x%lx, paddr 0x%lx\n", virtualAddress, physicalAddress));
 
 	if (virtualAddress < KERNEL_BASE || virtualAddress >= (KERNEL_BASE + 4096*1024))
-		panic("map_page: asked to map invalid page!\n");
+		panic("map_page: asked to map invalid page %p!\n", (void *)virtualAddress);
 
 	physicalAddress &= ~(B_PAGE_SIZE - 1);
 
