@@ -1,0 +1,31 @@
+SubDir OBOS_TOP src add-ons kernel drivers network rtl8139 ;
+
+# set some additional defines
+{
+	local defines ;
+
+	if $(DEBUG) {
+		defines += DEBUG ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+}
+
+R5KernelAddon rtl8139 : [ FDirName kernel drivers network ] :
+	driver.c
+	packetlist.c
+	util.c
+	;
+
+rule InstallRTL8139
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore InstallRTL8139
+{
+	cp $(>) /boot/home/config/add-ons/kernel/drivers/bin/
+}
+
+#InstallRTL8139 install : rtl8139 ;
