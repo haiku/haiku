@@ -84,7 +84,7 @@ static image_id next_image_id = 0;
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
 
-/* static */ int
+static int
 get_address_symbol_info(addr address, char *text, int maxtextlen)
 {
 	struct elf_image_info **ptr;
@@ -621,6 +621,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
+	char baseName[64];
 	int fd;
 	int err;
 	int i;
@@ -629,22 +630,27 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 	dprintf("elf_load: entry path '%s', team %p\n", path, p);
 
 	fd = sys_open(path, 0);
-	if(fd < 0)
+	if (fd < 0)
 		return fd;
-		
+
+	// read and verify the ELF header
+
 	len = sys_read(fd, &eheader, 0, sizeof(eheader));
-	if(len < 0) {
+	if (len < 0) {
 		err = len;
 		goto error;
 	}
-	if(len != sizeof(eheader)) {
+
+	if (len != sizeof(eheader)) {
 		// short read
 		err = ERR_INVALID_BINARY;
 		goto error;
 	}
 	err = verify_eheader(&eheader);
-	if(err < 0)
+	if (err < 0)
 		goto error;
+
+	// read program header
 
 	pheaders = (struct Elf32_Phdr *)kmalloc(eheader.e_phnum * eheader.e_phentsize);
 	if (pheaders == NULL) {
@@ -666,82 +672,75 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 		goto error;
 	}
 
-	for(i=0; i < eheader.e_phnum; i++) {
-		char region_name[64];
+	// construct a nice name for the region we have to create below
+	{
+		int32 length = strlen(path);
+		if (length > 52)
+			sprintf(baseName, "...%s", path + length - 52);
+		else
+			strcpy(baseName, path);
+	}
+
+	// map the program's segments into memory
+
+	for (i = 0; i < eheader.e_phnum; i++) {
+		char regionName[64];
+		char *regionAddress;
 		region_id id;
-		char *region_addr;
 
-		sprintf(region_name, "%s_seg%d", path, i);
+		sprintf(regionName, "%s_seg%d", baseName, i);
 
-		region_addr = (char *)ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
-		if(pheaders[i].p_flags & PF_W) {
+		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
+		if (pheaders[i].p_flags & PF_W) {
 			/*
 			 * rw segment
 			 */
-			unsigned start_clearing;
-			unsigned to_clear;
-			unsigned A= pheaders[i].p_vaddr+pheaders[i].p_memsz;
-			unsigned B= pheaders[i].p_vaddr+pheaders[i].p_filesz;
+			uint32 memUpperBound = (pheaders[i].p_vaddr % PAGE_SIZE) + pheaders[i].p_memsz;
+			uint32 fileUpperBound = (pheaders[i].p_vaddr % PAGE_SIZE) + pheaders[i].p_filesz;
 
-			A= ROUNDOWN(A, PAGE_SIZE);
-			B= ROUNDOWN(B, PAGE_SIZE);
+			memUpperBound = ROUNDUP(memUpperBound, PAGE_SIZE);
+			fileUpperBound = ROUNDUP(fileUpperBound, PAGE_SIZE);
 
-			id= vm_map_file(
-				p->_aspace_id,
-				region_name,
-				(void **)&region_addr,
+			id = vm_map_file(p->_aspace_id, regionName,
+				(void **)&regionAddress,
 				REGION_ADDR_EXACT_ADDRESS,
-				ROUNDUP(pheaders[i].p_filesz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
-				LOCK_RW,
-				REGION_PRIVATE_MAP,
-				path,
-				ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE)
-			);
+				fileUpperBound,
+				LOCK_RW, REGION_PRIVATE_MAP,
+				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error allocating region!\n");
 				err = ERR_INVALID_BINARY;
 				goto error;
 			}
 
+			// clean garbage brought by mmap (the region behind the file,
+			// at least parts of it are the bss and have to be zeroed)
+			{
+				uint32 start = (uint32)regionAddress
+					+ (pheaders[i].p_vaddr % PAGE_SIZE)
+					+ pheaders[i].p_filesz;
+				uint32 amount = fileUpperBound
+					- (pheaders[i].p_vaddr % PAGE_SIZE)
+					- (pheaders[i].p_filesz);
+				memset((void *)start, 0, amount);
+			}
 
-			/*
-			 * clean garbage brought by mmap
-			 */
-			start_clearing=
-				(unsigned)region_addr
-				+ (pheaders[i].p_vaddr % PAGE_SIZE)
-				+ pheaders[i].p_filesz;
-			to_clear=
-				ROUNDUP(pheaders[i].p_filesz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE)
-				- (pheaders[i].p_vaddr % PAGE_SIZE)
-				- (pheaders[i].p_filesz);
-			memset((void*)start_clearing, 0, to_clear);
+			// Check if we need extra storage for the bss - we have to do this if
+			// the above region doesn't already comprise the memory size, too.
 
-			/*
-			 * check if we need extra storage for the bss
-			 */
-			if(A != B) {
-				/* XXX - this is broken! The final comma on the 1st line means we don't do the
-				 *       subtraction? What's actually desired here?
-				 */
-				size_t bss_size=
-					ROUNDUP(pheaders[i].p_memsz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE)/*, */
-					- ROUNDUP(pheaders[i].p_filesz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
+			if (memUpperBound != fileUpperBound) {
+				size_t bss_size = memUpperBound - fileUpperBound;
 
-				sprintf(region_name, "%s_bss%d", path, 'X');
+				sprintf(regionName, "%s_bss%d", baseName, 'X');
 
-				region_addr += ROUNDUP(pheaders[i].p_filesz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
-				id = vm_create_anonymous_region(
-					p->_aspace_id,
-					region_name,
-					(void **)&region_addr,
+				regionAddress += fileUpperBound;
+				id = vm_create_anonymous_region(p->_aspace_id, regionName,
+					(void **)&regionAddress,
 					REGION_ADDR_EXACT_ADDRESS,
 					bss_size,
-					REGION_WIRING_LAZY,
-					LOCK_RW
-				);
+					REGION_WIRING_LAZY, LOCK_RW);
 				if (id < 0) {
-					dprintf("error allocating region!\n");
+					dprintf("error allocating bss region: %s!\n", strerror(id));
 					err = ERR_INVALID_BINARY;
 					goto error;
 				}
@@ -750,17 +749,12 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 			/*
 			 * assume rx segment
 			 */
-			id = vm_map_file(
-				p->_aspace_id,
-				region_name,
-				(void **)&region_addr,
+			id = vm_map_file(p->_aspace_id, regionName,
+				(void **)&regionAddress,
 				REGION_ADDR_EXACT_ADDRESS,
 				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
-				LOCK_RO,
-				REGION_PRIVATE_MAP,
-				path,
-				ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE)
-			);
+				LOCK_RO, REGION_PRIVATE_MAP,
+				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error mapping text!\n");
 				err = ERR_INVALID_BINARY;
@@ -776,7 +770,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 	err = 0;
 
 error:
-	if(pheaders)
+	if (pheaders)
 		kfree(pheaders);
 	sys_close(fd);
 
