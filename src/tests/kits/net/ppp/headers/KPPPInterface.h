@@ -7,7 +7,7 @@
 
 #include "KPPPStateMachine.h"
 #include "KPPPLCP.h"
-#include "KPPPReport.h"
+#include "KPPPReportManager.h"
 
 #include "List.h"
 #include "LockerHelper.h"
@@ -40,10 +40,6 @@ class PPPInterface {
 		PPPLCP& LCP() const
 			{ return fLCP; }
 		
-		bool RegisterInterface();
-			// adds us to the manager module and
-			// saves the returned ifnet structure
-		bool UnregisterInterface();
 		ifnet *Ifnet() const
 			{ return fIfnet; }
 		
@@ -105,11 +101,8 @@ class PPPInterface {
 		bool Down();
 		bool IsUp() const;
 		
-		void EnableReports(PPP_REPORT_TYPE type, thread_id thread,
-				int32 flags = PPP_NO_REPORT_FLAGS);
-		void DisableReports(PPP_REPORT_TYPE type, thread_id thread);
-		bool DoesReport(PPP_REPORT_TYPE type, thread_id thread);
-		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length);
+		bool Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
+			{ fReportManager.Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
 		bool LoadModules(const driver_settings *settings,
@@ -126,6 +119,11 @@ class PPPInterface {
 			// SendToDevice()!
 
 	private:
+		bool RegisterInterface();
+			// adds us to the manager module and
+			// saves the returned ifnet structure
+		bool UnregisterInterface();
+		
 		void CalculateMRU();
 		
 		// multilink methods
@@ -136,6 +134,7 @@ class PPPInterface {
 		driver_parameter *fSettings;
 		PPPStateMachine fStateMachine;
 		PPPLCP fLCP;
+		PPPReportManager fReportManager;
 		ifnet *fIfnet;
 		
 		ppp_manager_info *fManager;
@@ -156,7 +155,6 @@ class PPPInterface {
 		PPPEncapsulator *fFirstEncapsulator;
 		List<PPPProtocol*> fProtocols;
 		List<ppp_module_info*> fModules;
-		List<ppp_report_request> fReportRequests;
 		
 		BLocker& fLock;
 };

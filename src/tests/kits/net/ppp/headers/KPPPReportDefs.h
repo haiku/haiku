@@ -1,5 +1,5 @@
-#ifndef _K_PPP_REPORT__H
-#define _K_PPP_REPORT__H
+#ifndef _K_PPP_REPORT_DEFS__H
+#define _K_PPP_REPORT_DEFS__H
 
 #define PPP_REPORT_DATA_LIMIT		128
 	// how much optional data can be added to the report

@@ -25,9 +25,9 @@
 
 PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NULL)
 	: fSettings(dup_driver_settings(settings)),
-	StateMachine(*this), LCP(*this), fIfnet(NULL), fLinkMTU(1500),
-	fAccessing(0), fChildrenCount(0), fDevice(NULL), fFirstEncapsulator(NULL),
-	fLock(StateMachine().Locker())
+	fStateMachine(*this), fLCP(*this), fReportManager(StateMachine().Locker()),
+	fIfnet(NULL), fLinkMTU(1500), fAccessing(0), fChildrenCount(0),
+	fDevice(NULL), fFirstEncapsulator(NULL), fLock(StateMachine().Locker())
 {
 	if(get_module(PPP_MANAGER_MODULE_NAME, (module_info**) &fManager) != B_OK)
 		fManager = NULL;
@@ -116,54 +116,6 @@ PPPInterface::InitCheck() const
 		return B_ERROR;
 	
 	return B_OK;
-}
-
-
-bool
-PPPInterface::RegisterInterface()
-{
-	if(fIfnet)
-		return true;
-			// we are already registered
-	
-	if(!InitCheck())
-		return false;
-			// we cannot register if something is wrong
-	
-	// only MainInterfaces get an ifnet
-	if(IsMultilink() && Parent() && Parent()->RegisterInterface())
-		return true;
-	
-	if(!fManager)
-		return false;
-	
-	fIfnet = fManager->add_interface(this);
-	
-	if(!fIfnet)
-		return false;
-	
-	return true;
-}
-
-
-bool
-PPPInterface::UnregisterInterface()
-{
-	if(!fIfnet)
-		return true;
-			// we are already unregistered
-	
-	// only MainInterfaces get an ifnet
-	if(IsMultilink() && Parent())
-		return true;
-	
-	if(!fManager)
-		return false;
-	
-	fManager->remove_interface(this);
-	fIfnet = NULL;
-	
-	return true;
 }
 
 
@@ -509,107 +461,6 @@ PPPInterface::IsUp() const
 }
 
 
-void
-PPPInterface::EnableReports(PPP_REPORT_TYPE type, thread_id thread,
-	int32 flags = PPP_NO_REPORT_FLAGS)
-{
-	LockerHelper locker(fLock);
-	
-	ppp_report_request request;
-	request.type = type;
-	request.thread = thread;
-	request.flags = flags;
-	
-	fReportRequests.AddItem(request);
-}
-
-
-void
-PPPInterface::DisableReports(PPP_REPORT_TYPE type, thread_id thread)
-{
-	LockerHelper locker(fLock);
-	
-	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
-		ppp_report_request& request = fReportRequests.ItemAt(i);
-		
-		if(request.thread != thread)
-			continue;
-		
-		if(report.type == type)
-			fReportRequest.RemoveItem(request);
-	}
-}
-
-
-bool
-PPPInterface::DoesReport(PPP_REPORT_TYPE type, thread_id thread)
-{
-	LockerHelper locker(fLock);
-	
-	for(int32 i = 0; i < fReportRequests.CountItems(); i++) {
-		ppp_report_request& request = fReportRequests.ItemAt(i);
-		
-		if(request.thread == thread && request.type == type)
-			return true;
-	}
-	
-	return false;
-}
-
-
-bool
-PPPInterface::Report(PPP_REPORT_TYPE type, int32 code, void *data, int32 length)
-{
-	if(length > PPP_REPORT_DATA_LIMIT)
-		return false;
-	
-	if(fReportRequests.CountItems() == 0)
-		return true;
-	
-	if(!data)
-		length = 0;
-	
-	LockerHelper locker(fLock);
-	
-	int32 code, query, result;
-	thread_id sender;
-	bool acceptable = true;
-	
-	report_packet report;
-	report.type = type;
-	report.code = code;
-	report.length = length;
-	memcpy(report.data, data, length);
-	
-	for(int32 index = 0; index < fReportRequests.CountItems(); index++) {
-		ppp_report_request& request = fReportRequests.ItemAt(index);
-		
-		result = send_data_with_timeout(request.port, PPP_REPORT_CODE, &report,
-			sizeof(report), PPP_REPORT_TIMEOUT);
-		
-		if(result == B_BAD_THREAD_ID || result == B_NO_MEMORY) {
-			fReportRequests.RemoveItem(request);
-			--index;
-			continue;
-		} else if(result == B_OK) {
-			if(request.flags & PPP_WAIT_FOR_REPLY) {
-				result = receive_data_with_timeout(fPort, &code, NULL, 0,
-					PPP_REPORT_TIMEOUT);
-				if(result == B_OK && code != B_OK)
-					successful = false;
-			}
-		}
-		
-		if(request.flags & PPP_REMOVE_AFTER_REPORT) {
-			fReportRequests.RemoveItem(request);
-			--index;
-		}
-	}
-	
-	return acceptable;
-}
-
-
 bool
 PPPInterface::LoadModules(const driver_settings *settings,
 	int32 start, int32 count)
@@ -924,6 +775,54 @@ PPPInterface::ReceiveFromDevice(mbuf *packet)
 	}
 	
 	return Receive(packet, protocol);
+}
+
+
+bool
+PPPInterface::RegisterInterface()
+{
+	if(fIfnet)
+		return true;
+			// we are already registered
+	
+	if(!InitCheck())
+		return false;
+			// we cannot register if something is wrong
+	
+	// only MainInterfaces get an ifnet
+	if(IsMultilink() && Parent() && Parent()->RegisterInterface())
+		return true;
+	
+	if(!fManager)
+		return false;
+	
+	fIfnet = fManager->add_interface(this);
+	
+	if(!fIfnet)
+		return false;
+	
+	return true;
+}
+
+
+bool
+PPPInterface::UnregisterInterface()
+{
+	if(!fIfnet)
+		return true;
+			// we are already unregistered
+	
+	// only MainInterfaces get an ifnet
+	if(IsMultilink() && Parent())
+		return true;
+	
+	if(!fManager)
+		return false;
+	
+	fManager->remove_interface(this);
+	fIfnet = NULL;
+	
+	return true;
 }
 
 

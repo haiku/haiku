@@ -624,9 +624,9 @@ PPPStateMachine::RCRGoodEvent(mbuf *packet)
 			NewPhase(PPP_ESTABLISHMENT_PHASE);
 				// tell handlers that we are reconfiguring
 			locker.UnlockNow();
+			ThisLayerDown();
 			SendConfigureRequest();
 			SendConfigureAck(packet);
-			ThisLayerDown();
 		break;
 	}
 }
