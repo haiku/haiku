@@ -40,3 +40,5 @@ CommonTestLib libstoragetest.so
 	RelSymLink $(resdir_r5) : [ FDirName $(SUBDIR) resources ] ;
 	DEPENDS libstoragetest_r5.so : $(resdir_r5) ;
 }
+
+SubInclude OBOS_TOP src tests kits storage virtualdrive ;
