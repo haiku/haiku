@@ -36,6 +36,7 @@ StdBinCommands
 	ps.c
 	renice.c
 	rescan.c
+	sysinfo.c
 	unchop.c
 	unmount.c
 	waitfor.c
