@@ -57,7 +57,7 @@ if $(METROWERKS) {
 
 # Enable warnings only if WARNINGS is defined
 # Should be enabled by default later
-
+#
 if $(WARNINGS) {
 	# For an explanation of the different warning options, see:
 	# http://gcc.gnu.org/onlinedocs/gcc-2.95.3/gcc_2.html
@@ -83,6 +83,9 @@ if $(DEBUG) {
 } else {
 	OPTIM ?= -O2 ;
 }
+#
+# To disable for the tests OPTIM and DEBUG are overridden, set the environment
+# variable NO_TEST_DEBUG.
 
 KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
 KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
@@ -418,8 +421,10 @@ rule TestObjects
 	local objects ;
 
 	# Turn optimization off.
-	local optim = $(OPTIM) ;
-	OPTIM = ;
+	if ! $(NO_TEST_DEBUG) {
+		local optim = $(OPTIM) ;
+		OPTIM = ;
+	}
 
 	SetupObjectsDir ;
 
@@ -441,12 +446,14 @@ rule TestObjects
 		ObjectDefines $(objects) : TEST_OBOS ;
 	}
 
-	# Turn debugging on. That is usually desired for test code.
-	ObjectCcFlags $(objects) : "-g" ;
-	ObjectC++Flags $(objects) : "-g" ;
+	if ! $(NO_TEST_DEBUG) {
+		# Turn debugging on. That is usually desired for test code.
+		ObjectCcFlags $(objects) : "-g" ;
+		ObjectC++Flags $(objects) : "-g" ;
 
-	# Turn optimization on again.
-	OPTIM = $(optim) ;
+		# Turn optimization on again.
+		OPTIM = $(optim) ;
+	}
 }
 
 rule R5SharedLibraryNames
@@ -475,8 +482,10 @@ rule SimpleTest
 	local relPath = [ FRelPath src tests : $(SUBDIR_TOKENS) ] ;
 
 	# Turn optimization off.
-	local optim = $(OPTIM) ;
-	OPTIM = ;
+	if ! $(NO_TEST_DEBUG) {
+		local optim = $(OPTIM) ;
+		OPTIM = ;
+	}
 
 #	SetupIncludes ;
 	SetupObjectsDir ;
@@ -487,12 +496,14 @@ rule SimpleTest
 	LinkSharedOSLibs $(target) : $(libraries) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
 
-	# Turn debugging on. That is usually desired for test code.
-	ObjectCcFlags $(sources) : "-g" ;
-	ObjectC++Flags $(sources) : "-g" ;
+	if ! $(NO_TEST_DEBUG) {
+		# Turn debugging on. That is usually desired for test code.
+		ObjectCcFlags $(sources) : "-g" ;
+		ObjectC++Flags $(sources) : "-g" ;
 
-	# Turn optimization on again.
-	OPTIM = $(optim) ;
+		# Turn optimization on again.
+		OPTIM = $(optim) ;
+	}
 }
 
 rule Addon
