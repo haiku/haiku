@@ -40,11 +40,9 @@ KDiskDeviceJobFactory::CreateRepairJob(partition_id partitionID,
 // CreateResizeJob
 KDiskDeviceJob *
 KDiskDeviceJobFactory::CreateResizeJob(partition_id parentID,
-									   partition_id partitionID, off_t size,
-									   bool resizeContents)
+									   partition_id partitionID, off_t size)
 {
-	return new(nothrow) KResizeJob(parentID, partitionID, size,
-								   resizeContents);
+	return new(nothrow) KResizeJob(parentID, partitionID, size);
 }
 
 // CreateMoveJob

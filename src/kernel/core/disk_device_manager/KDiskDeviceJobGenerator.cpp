@@ -194,11 +194,9 @@ KDiskDeviceJobGenerator::_GenerateResizeJob(KPartition *partition)
 		return B_BAD_VALUE;
 	if (!partition->Parent())
 		return B_ERROR;
-	bool hasContents = shadow->DiskSystem()
-		&& !(shadow->ChangeFlags() & B_PARTITION_CHANGED_INITIALIZATION);
 	return _AddJob(fJobFactory->CreateResizeJob(partition->Parent()->ID(),
 												partition->ID(),
-												shadow->Size(), hasContents));
+												shadow->Size()));
 }
 
 // _GenerateChildPlacementJobs

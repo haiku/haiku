@@ -18,8 +18,7 @@ public:
 	KDiskDeviceJob *CreateDefragmentJob(partition_id partitionID);
 	KDiskDeviceJob *CreateRepairJob(partition_id partitionID, bool checkOnly);
 	KDiskDeviceJob *CreateResizeJob(partition_id parentID,
-									partition_id partitionID, off_t size,
-									bool resizeContents);
+									partition_id partitionID, off_t size);
 	KDiskDeviceJob *CreateMoveJob(partition_id parentID,
 								  partition_id partitionID, off_t offset,
 								  const partition_id *contentsToMove,
