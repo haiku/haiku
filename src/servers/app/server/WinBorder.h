@@ -66,6 +66,10 @@ public:
 
 	virtual	void RebuildFullRegion(void);
 
+	virtual bool IsHidden() const;
+	void ServerHide();
+	void ServerUnhide();
+
 	void MouseDown(PointerEvent& evt, bool sendMessage);
 	void MouseMoved(PointerEvent& evt);
 	void MouseUp(PointerEvent& evt);
@@ -81,7 +85,7 @@ public:
 	void SetLevel();
 	void HighlightDecorator(const bool &active);
 	
-	bool HasPoint(BPoint pt) const;
+	bool HasPoint(const BPoint &pt) const;
 	
 	void AddToSubsetOf(WinBorder* main);
 	void RemoveFromSubsetOf(WinBorder* main);
@@ -103,6 +107,7 @@ protected:
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
 
+	bool fServerHidden;
 	WinBorder *fMainWinBorder;
 	bool fIsMoving;
 	bool fIsResizing;
