@@ -1,18 +1,10 @@
-Contents: Changes to Jam 2.4.
+Contents: Changes to Jam 2.5rc3.
 Author:   Ingo Weinhold (bonefish@users.sf.net)
 
 This version of Jam is NOT the original one distributed by Perforce
 (www.perforce.com). This file lists its differences to the original version
-2.4.
-
-* BeOS specifics
-
-  Changes to the system specific variable settings in the BeOS specific
-  section in Jambase. Several variables were wrong or had weird values.
-  PPC support was broken (very small fix in jam.h, too).
-
-  These changes will be included in the next version published by Perforce.
-
+2.5rc3. The patches have originally been applied to version 2.4 and had to be
+adjusted more or less to work with 2.5rc3.
 
 * Jamfile tree processing
 
@@ -137,10 +129,4 @@ This version of Jam is NOT the original one distributed by Perforce
   If JCACHEFILE is left unset (the default), reading and writing of a cache
   file is not performed. Setting the SEARCH and LOCATE variables does work
   as expected.
-
-
-* Bug Fixes
-
-  - Removed superfluous search() in compile_on() (compile.c), which slowed
-    down on target rule invocations.
 
