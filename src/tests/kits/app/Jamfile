@@ -36,6 +36,7 @@ CommonTestLib libapptest.so
 		RunTest.cpp
 		LooperForThreadTest.cpp
 		AddCommonFilterTest.cpp
+		RemoveCommonFilterTest.cpp
 
 		# BMessageQueue
 		MessageQueueTest.cpp

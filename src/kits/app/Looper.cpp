@@ -747,9 +747,14 @@ void BLooper::AddCommonFilter(BMessageFilter* filter)
 		return;
 	}
 
-	if (!Locked())
+	if (!IsLocked())
 	{
 		debugger("Owning Looper must be locked before calling AddCommonFilter");
+	}
+
+	if (filter->Looper())
+	{
+		debugger("A MessageFilter can only be used once.");
 	}
 
 	if (!fCommonFilters)
@@ -762,7 +767,18 @@ void BLooper::AddCommonFilter(BMessageFilter* filter)
 //------------------------------------------------------------------------------
 bool BLooper::RemoveCommonFilter(BMessageFilter* filter)
 {
-	AssertLocked();
+	if (!IsLocked())
+	{
+		debugger("Owning Looper must be locked before calling "
+				 "RemoveCommonFilter");
+		return false;
+	}
+
+	if (!fCommonFilters)
+	{
+		return false;
+	}
+
 	bool result = fCommonFilters->RemoveItem(filter);
 	if (result)
 	{

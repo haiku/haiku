@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	AddCommonFilterTest.cpp
+//	RemoveCommonFilterTest.cpp
 //
 //------------------------------------------------------------------------------
 
@@ -12,7 +12,7 @@
 // Project Includes ------------------------------------------------------------
 
 // Local Includes --------------------------------------------------------------
-#include "AddCommonFilterTest.h"
+#include "RemoveCommonFilterTest.h"
 
 // Local Defines ---------------------------------------------------------------
 
@@ -20,81 +20,74 @@
 
 //------------------------------------------------------------------------------
 /**
-	AddCommonFilter(BMessageFilter* filter)
+	RemoveCommonFilter(BMessageFilter* filter)
 	@case		NULL filter
 	@param		filter is NULL
-	@results	none
-	@note		R5 chokes on this test; doesn't param check, apparently.
+	@results
  */
-void TAddCommonFilterTest::AddCommonFilterTest1()
+void TRemoveCommonFilterTest::RemoveCommonFilterTest1()
 {
-#ifndef TEST_R5
 	BLooper Looper;
-	Looper.AddCommonFilter(NULL);
-#endif
+	CPPUNIT_ASSERT(!Looper.RemoveCommonFilter(NULL));
 }
 //------------------------------------------------------------------------------
 /**
-	AddCommonFilter(BMessageFilter* filter)
+	RemoveCommonFilter(BMessageFilter* filter)
 	@case		Valid filter, looper not locked
-	@param		Valid BMessageFilter pointer
-	@results	Debugger message "Owning Looper must be locked before calling
-				AddCommonFilter"
- */
-void TAddCommonFilterTest::AddCommonFilterTest2()
-{
-	DEBUGGER_ESCAPE;
-
-	BLooper Looper;
-	Looper.Unlock();
-	BMessageFilter* Filter = new BMessageFilter('1234');
-	Looper.AddCommonFilter(Filter);
-}
-//------------------------------------------------------------------------------
-/**
-	AddCommonFilter(BMessageFilter* filter)
-	@case		Valid filter, looper locked
 	@param		Valid BMessageFilter pointer
 	@results
  */
-void TAddCommonFilterTest::AddCommonFilterTest3()
-{
-	BLooper Looper;
-	BMessageFilter* Filter = new BMessageFilter('1234');
-	Looper.AddCommonFilter(Filter);
-}
-//------------------------------------------------------------------------------
-/**
-	AddCommonFilter(BMessageFilter* filter)
-	@case		Valid filter, looper locked, owned by another looper
-	@param		Valid BMessageFilter pointer
-	@results	Debugger message "A MessageFilter can only be used once."
- */
-void TAddCommonFilterTest::AddCommonFilterTest4()
+void TRemoveCommonFilterTest::RemoveCommonFilterTest2()
 {
 	DEBUGGER_ESCAPE;
 
-	BLooper Looper1;
-	BLooper Looper2;
+	BLooper Looper;
 	BMessageFilter* Filter = new BMessageFilter('1234');
-	Looper1.AddCommonFilter(Filter);
-	Looper2.AddCommonFilter(Filter);
+	Looper.AddCommonFilter(Filter);
+	Looper.Unlock();
+	CPPUNIT_ASSERT(!Looper.RemoveCommonFilter(Filter));
+}
+//------------------------------------------------------------------------------
+/**
+	RemoveCommonFilter(BMessageFilter* filter)
+	@case		Valid filter, not owned by looper
+	@param		Valid BMessageFilter pointer
+	@results
+ */
+void TRemoveCommonFilterTest::RemoveCommonFilterTest3()
+{
+	BLooper Looper;
+	BMessageFilter Filter('1234');
+	CPPUNIT_ASSERT(!Looper.RemoveCommonFilter(&Filter));
+}
+//------------------------------------------------------------------------------
+/**
+	RemoveCommonFilter(BMessageFilter* filter)
+	@case		Valid filter, owned by looper
+	@param		Valid BMessageFilter pointer
+	@results
+ */
+void TRemoveCommonFilterTest::RemoveCommonFilterTest4()
+{
+	BLooper Looper;
+	BMessageFilter Filter('1234');
+	Looper.AddCommonFilter(&Filter);
+	CPPUNIT_ASSERT(Looper.RemoveCommonFilter(&Filter));
 }
 //------------------------------------------------------------------------------
 #ifdef ADD_TEST
 #undef ADD_TEST
 #endif
 #define ADD_TEST(__test_name__)	\
-	ADD_TEST4(BLooper, suite, TAddCommonFilterTest, __test_name__);
-TestSuite* TAddCommonFilterTest::Suite()
+	ADD_TEST4(BLooper, suite, TRemoveCommonFilterTest, __test_name__)
+TestSuite* TRemoveCommonFilterTest::Suite()
 {
-	TestSuite* suite =
-		new TestSuite("BLooper::AddCommonFilter(BMessageFilter*)");
+	TestSuite* suite = new TestSuite("BLooper::RemoveCommonFilter(BMessageFilter*)");
 
-	ADD_TEST(AddCommonFilterTest1);
-	ADD_TEST(AddCommonFilterTest2);
-	ADD_TEST(AddCommonFilterTest3);
-	ADD_TEST(AddCommonFilterTest4);
+	ADD_TEST(RemoveCommonFilterTest1);
+	ADD_TEST(RemoveCommonFilterTest2);
+	ADD_TEST(RemoveCommonFilterTest3);
+	ADD_TEST(RemoveCommonFilterTest4);
 
 	return suite;
 }

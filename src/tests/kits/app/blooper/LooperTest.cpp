@@ -10,6 +10,7 @@
 #include "RunTest.h"
 #include "LooperForThreadTest.h"
 #include "AddCommonFilterTest.h"
+#include "RemoveCommonFilterTest.h"
 
 Test* LooperTestSuite()
 {
@@ -25,6 +26,7 @@ Test* LooperTestSuite()
 	tests->addTest(TRunTest::Suite());
 	tests->addTest(TLooperForThreadTest::Suite());
 	tests->addTest(TAddCommonFilterTest::Suite());
+	tests->addTest(TRemoveCommonFilterTest::Suite());
 
 	return tests;
 }
