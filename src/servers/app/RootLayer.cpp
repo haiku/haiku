@@ -1075,7 +1075,7 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 // TODO: lock here!
 			Layer		*target = LayerAt(evt.where);
 			if (target == NULL)
-				debugger("RooLayer::MouseEventHandler: 'target' can't be null.\n");
+				debugger("RootLayer::MouseEventHandler: 'target' can't be null.\n");
 			WinBorder	*winBorderUnder = NULL;
 
 			// fEventMaskLayer is always != this
