@@ -93,6 +93,12 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 	if (status < B_OK)
 		return status;
 
+	// ToDo: this is a work-around for buggy device drivers!
+	if (size > fileVecs[0].length)
+		size = fileVecs[0].length;
+
+	ASSERT(size <= fileVecs[0].length);
+
 	// If the file portion was contiguous, we're already done now
 	if (size == numBytes)
 		return B_OK;
@@ -318,7 +324,7 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 	off_t fileSize = ((vnode_store *)cache->cache->store)->size;
 
 	TRACE(("readwrite(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s\n",
-		ref, offset, bufferBase, *_size, doWrite ? "write" : "read"));
+		ref, offset, (void *)bufferBase, *_size, doWrite ? "write" : "read"));
 
 	// out of bounds access?
 	if (offset >= fileSize || offset < 0) {
@@ -404,7 +410,7 @@ readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool 
 extern "C" void *
 file_cache_create(mount_id mountID, vnode_id vnodeID, off_t size, int fd)
 {
-	TRACE(("file_cache create(mountID = %ld, vnodeID = %Ld, size = %Ld, fd = %d\n", mountID, vnodeID, size, fd));
+	TRACE(("file_cache create(mountID = %ld, vnodeID = %Ld, size = %Ld, fd = %d)\n", mountID, vnodeID, size, fd));
 
 	file_cache_ref *ref = new file_cache_ref;
 	if (ref == NULL)
@@ -495,7 +501,7 @@ file_cache_write(void *_cacheRef, off_t offset, const void *buffer, size_t *_siz
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
 	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu\n",
-		ref, offset, bufferBase, *_size));
+		ref, offset, buffer, *_size));
 
 	return readwrite(ref, offset, (addr_t)const_cast<void *>(buffer), _size, false);
 }
