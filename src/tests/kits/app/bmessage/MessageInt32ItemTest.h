@@ -18,7 +18,53 @@
 // Local Defines ---------------------------------------------------------------
 
 // Globals ---------------------------------------------------------------------
+#define USE_TEMPLATES
+#ifdef USE_TEMPLATES
+#include "MessageItemTest.h"
 
+typedef TMessageItemFuncPolicy
+<
+	int32,
+	&BMessage::AddInt32,
+	&BMessage::FindInt32,
+	&BMessage::FindInt32,
+	&BMessage::HasInt32,
+	&BMessage::ReplaceInt32
+>
+TInt32FuncPolicy;
+
+struct TInt32InitPolicy : public ArrayTypeBase<int32>
+{
+	inline static int32 Zero()	{ return 0; }
+	inline static int32 Test1()	{ return 1234; }
+	inline static int32 Test2()	{ return 5678; }
+	inline static ArrayType Array()
+	{
+		ArrayType array;
+		array.push_back(123);
+		array.push_back(456);
+		array.push_back(789);
+		return array;
+	}
+};
+
+struct TInt32AssertPolicy
+{
+	inline static int32 Zero()		{ return 0; }
+	inline static int32 Invalid()	{ return 0;}
+};
+
+typedef TMessageItemTest
+<
+	int32,
+	B_INT32_TYPE,
+	TInt32FuncPolicy,
+	TInt32InitPolicy,
+	TInt32AssertPolicy
+>
+TMessageInt32ItemTest;
+
+#else
 class TMessageInt32ItemTest : public TestCase
 {
 	public:
@@ -36,6 +82,7 @@ class TMessageInt32ItemTest : public TestCase
 
 		static TestSuite* Suite();
 };
+#endif
 
 #endif	// MESSAGEINT32ITEMTEST_H
 
