@@ -10,6 +10,7 @@
 #include "UserDataWriter.h"
 
 // get_current_team
+static
 team_id
 get_current_team()
 {
@@ -17,6 +18,15 @@ get_current_team()
 	thread_info info;
 	get_thread_info(find_thread(NULL), &info);
 	return info.team;
+}
+
+// check_shadow_partition
+static
+bool
+check_shadow_partition(const KPartition *partition)
+{
+	return (partition && partition->Device() && partition->IsShadowPartition()
+			&& partition->Device()->ShadowOwner() == get_current_team());
 }
 
 // _kern_get_next_disk_device_id
@@ -201,6 +211,322 @@ _kern_find_disk_system(const char *name, user_disk_system_info *info)
 		}
 	}
 	return B_ENTRY_NOT_FOUND;
+}
+
+// _kern_supports_defragmenting_partition
+bool
+_kern_supports_defragmenting_partition(disk_system_id diskSystemID,
+									   partition_id partitionID,
+									   bool *whileMounted)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsDefragmenting(partition, whileMounted);
+}
+
+// _kern_supports_repairing_partition
+bool
+_kern_supports_repairing_partition(disk_system_id diskSystemID,
+								   partition_id partitionID, bool checkOnly,
+								   bool *whileMounted)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsRepairing(partition, checkOnly, whileMounted);
+}
+
+// _kern_supports_resizing_partition
+bool
+_kern_supports_resizing_partition(disk_system_id diskSystemID,
+								  partition_id partitionID, bool *whileMounted)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsResizing(partition, whileMounted);
+}
+
+// _kern_supports_resizing_child_partition
+bool
+_kern_supports_resizing_child_partition(disk_system_id diskSystemID,
+										partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	if (!partition->Parent())
+		return false;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsResizingChild(partition);
+}
+
+// _kern_supports_moving_partition
+bool
+_kern_supports_moving_partition(disk_system_id diskSystemID,
+								partition_id partitionID, bool *whileMounted)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsMoving(partition, whileMounted);
+}
+
+// _kern_supports_moving_child_partition
+bool
+_kern_supports_moving_child_partition(disk_system_id diskSystemID,
+									  partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	if (!partition->Parent())
+		return false;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsMovingChild(partition);
+}
+
+// _kern_supports_setting_partition_name
+bool
+_kern_supports_setting_partition_name(disk_system_id diskSystemID,
+									  partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	if (!partition->Parent())
+		return false;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsSettingName(partition);
+}
+
+// _kern_supports_setting_partition_content_name
+bool
+_kern_supports_setting_partition_content_name(disk_system_id diskSystemID,
+											  partition_id partitionID,
+											  bool *whileMounted)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsSettingContentName(partition, whileMounted);
+}
+
+// _kern_supports_setting_partition_type
+bool
+_kern_supports_setting_partition_type(disk_system_id diskSystemID,
+									  partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	if (!partition->Parent())
+		return false;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsSettingType(partition);
+}
+
+// _kern_supports_creating_child_partition
+bool
+_kern_supports_creating_child_partition(disk_system_id diskSystemID,
+										partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = partition->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsCreatingChild(partition);
+}
+
+// _kern_supports_deleting_child_partition
+bool
+_kern_supports_deleting_child_partition(disk_system_id diskSystemID,
+										partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	if (!partition->Parent())
+		return false;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsDeletingChild(partition);
+}
+
+// _kern_supports_initializing_partition
+bool
+_kern_supports_initializing_partition(disk_system_id diskSystemID,
+									  partition_id partitionID)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemID);
+	if (!diskSystem)
+		return false;
+	DiskSystemLoader loader(diskSystem, true);
+	// get the info
+	return diskSystem->SupportsInitializing(partition);
+}
+
+// _kern_supports_initializing_child_partition
+bool
+_kern_supports_initializing_child_partition(disk_system_id diskSystemID,
+											partition_id partitionID,
+											const char *childSystem)
+{
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	// get the partition
+	KPartition *partition = manager->ReadLockPartition(partitionID);
+	if (!partition)
+		return false;
+	PartitionRegistrar registrar1(partition, true);
+	PartitionRegistrar registrar2(partition->Device(), true);
+	DeviceReadLocker locker(partition->Device(), true);
+	if (!check_shadow_partition(partition))
+		return false;
+	// get the disk system
+	if (!partition->Parent())
+		return false;
+	KDiskSystem *diskSystem = partition->Parent()->DiskSystem();
+	if (!diskSystem || diskSystem->ID() != diskSystemID)
+		return false;
+	// get the info
+	return diskSystem->SupportsInitializingChild(partition, childSystem);
 }
 
 // _kern_prepare_disk_device_modifications

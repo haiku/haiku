@@ -96,15 +96,38 @@ status_t _kern_get_next_disk_system_info(int32 *cookie,
 										 user_disk_system_info *info);
 status_t _kern_find_disk_system(const char *name, user_disk_system_info *info);
 
-#if 0
-
-bool supports_partition_operation(uint32 operation, void *parameters);
-bool validate_partition_operation(uint32 operation, void *parameters);
-	// TODO: Sorry, I was too lazy: supports_validates_parameters.h is only
-	// for kernel internal use. There needs to be something similar for these
-	// functions.
-
-#endif	// 0
+bool _kern_supports_defragmenting_partition(disk_system_id diskSystemID,
+											partition_id partitionID,
+											bool *whileMounted);
+bool _kern_supports_repairing_partition(disk_system_id diskSystemID,
+										partition_id partitionID,
+										bool checkOnly, bool *whileMounted);
+bool _kern_supports_resizing_partition(disk_system_id diskSystemID,
+									   partition_id partitionID,
+									   bool *whileMounted);
+bool _kern_supports_resizing_child_partition(disk_system_id diskSystemID,
+											 partition_id partitionID);
+bool _kern_supports_moving_partition(disk_system_id diskSystemID,
+									 partition_id partitionID,
+									 bool *whileMounted);
+bool _kern_supports_moving_child_partition(disk_system_id diskSystemID,
+										   partition_id partitionID);
+bool _kern_supports_setting_partition_name(disk_system_id diskSystemID,
+										   partition_id partitionID);
+bool _kern_supports_setting_partition_content_name(disk_system_id diskSystemID,
+												   partition_id partitionID,
+												   bool *whileMounted);
+bool _kern_supports_setting_partition_type(disk_system_id diskSystemID,
+										   partition_id partitionID);
+bool _kern_supports_creating_child_partition(disk_system_id diskSystemID,
+											 partition_id partitionID);
+bool _kern_supports_deleting_child_partition(disk_system_id diskSystemID,
+											 partition_id partitionID);
+bool _kern_supports_initializing_partition(disk_system_id diskSystemID,
+										   partition_id partitionID);
+bool _kern_supports_initializing_child_partition(disk_system_id diskSystemID,
+												 partition_id partitionID,
+												 const char *childSystem);
 
 // disk device modification
 status_t _kern_prepare_disk_device_modifications(partition_id deviceID);
