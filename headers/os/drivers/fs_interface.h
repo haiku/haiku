@@ -174,9 +174,10 @@ extern status_t notify_entry_removed(mount_id device, vnode_id directory,
 extern status_t notify_entry_moved(mount_id device, vnode_id fromDirectory,
 					const char *fromName, vnode_id toDirectory,
 					const char *toName, vnode_id node);
-extern status_t notify_stat_changed(mount_id device, vnode_id node);
+extern status_t notify_stat_changed(mount_id device, vnode_id node,
+					uint32 statFields);
 extern status_t notify_attribute_changed(mount_id device, vnode_id node,
-					const char *attribute);
+					const char *attribute, int32 cause);
 
 extern status_t notify_query_entry_created(port_id port, int32 token,
 					mount_id device, vnode_id directory, const char *name,
