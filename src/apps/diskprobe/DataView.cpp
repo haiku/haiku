@@ -167,6 +167,14 @@ DataView::MessageReceived(BMessage *message)
 		case B_PASTE:
 			break;
 
+		case B_UNDO:
+			fEditor.Undo();
+			break;
+
+		case B_REDO:
+			fEditor.Redo();
+			break;
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -228,7 +236,6 @@ DataView::Draw(BRect updateRect)
 
 		location.y += fFontHeight;
 	}
-	// ToDo: clear unused space!
 
 	DrawSelection();
 }
