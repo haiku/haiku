@@ -119,13 +119,17 @@ status_t probe_device(void)
 	LOG(("revision = %d\n",pciinfo->revision));
 
 	#if DEBUG
-		LOG(("bus = %#x, device = %#x, function = %#x\n", pciinfo->bus, pciinfo->device, pciinfo->function));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x00, 2);
-		LOG(("VID = %#04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x02, 2);
-		LOG(("DID = %#04x\n",value));
-		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x08, 1);
-		LOG(("RID = %#02x\n",value));
+		LOG(("bus = %d, device = %d, function = %d\n", pciinfo->bus, pciinfo->device, pciinfo->function));
+		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_vendor_id, 2);
+		LOG(("vendor id = 0x%04x\n",value));
+		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_device_id, 2);
+		LOG(("device id = 0x%04x\n",value));
+		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_revision, 1);
+		LOG(("revision = 0x%02x\n",value));
+		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_subsystem_vendor_id, 2);
+		LOG(("subsystem vendor = 0x%04x\n",value));
+		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_subsystem_id, 2);
+		LOG(("subsystem device = 0x%04x\n",value));
 		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x04, 2);
 		LOG(("PCICMD = %#04x\n",value));
 		value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x06, 2);
