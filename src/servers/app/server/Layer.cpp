@@ -39,6 +39,7 @@
 #include "ServerCursor.h"
 #include "CursorManager.h"
 #include "TokenHandler.h"
+#include "RectUtils.h"
 #include "RootLayer.h"
 #include "DisplayDriver.h"
 #include "Desktop.h"
@@ -93,8 +94,10 @@ Layer::Layer(BRect frame, const char *name, int32 token, uint32 resize,
 	
 	_serverwin		= win;
 	_cursor			= NULL;
+	clipToPicture	= NULL;
 
-	fDriver			= GetGfxDriver(ActiveScreen());
+	//TODO: Fix
+//	fDriver			= GetGfxDriver(ActiveScreen());
 }
 
 //! Destructor frees all allocated heap space
@@ -162,6 +165,24 @@ void Layer::AddChild(Layer *layer, Layer *before)
 }
 
 /*!
+	\brief Used in the new Desktop Management code
+*/
+void Layer::AddChild(Layer *layer, RootLayer *rootLayer)
+{
+	// TODO: Document
+	
+	if (layer->GetRootLayer())
+	{
+		printf("Error: Layer already belongs to a RootLayer!\n");
+		return;
+	}
+	
+	layer->fRootLayer	= rootLayer;
+
+	fLayerList.AddItem(layer);
+}
+
+/*!
 	\brief Removes a layer from the child stack
 	\param layer The layer to remove
 	\param rebuild Flag to rebuild all visibility regions
@@ -172,8 +193,10 @@ void Layer::RemoveChild(Layer *layer)
 		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
 		return;
 	}
-	if( layer->_parent != this ){
-		printf("ERROR: RemoveChild(): Layer is not a child of this layer\n");
+
+	if (!(fLayerList.HasItem(layer)))
+	{
+		printf("Error: Layer is not a child of this RootLayer!\n");
 		return;
 	}
 
@@ -213,6 +236,9 @@ void Layer::RemoveChild(Layer *layer)
 			DoInvalidate( BRegion(invalidRect), cachedUpperSibling );
 		}
 	}
+
+	fRootLayer	= NULL;
+	fLayerList.RemoveItem(layer);
 }
 
 /*!
@@ -230,12 +256,32 @@ void Layer::RemoveSelf()
 }
 
 /*!
+	\brief Used in the new Desktop Management code
+*/
+bool Layer::HasChild(Layer* layer) const
+{
+	return fLayerList.HasItem(layer);
+}
+
+/*!
+	\brief Used in the new Desktop Management code
+*/
+void Layer::SetRootLayer(RootLayer* rl)
+{
+	fRootLayer	= rl;
+}
+
+/*!
 	\brief Finds the first child at a given point.
 	\param pt Point to look for a child
+	\param recursive Flag to look for the bottom-most child
 	\return non-NULL if found, NULL if not
 
 	Find out which child gets hit if we click at a certain spot. Returns NULL
 	if there are no _visible children or if the click does not hit a child layer
+	If recursive==true, then it will continue to call until it reaches a layer
+	which has no children, i.e. a layer that is at the top of its 'branch' in
+	the layer tree
 */
 Layer* Layer::GetLayerAt(const BPoint &pt)
 {
@@ -1265,9 +1311,3 @@ void Layer::MakeBottomChild(void)
 	_parent->_bottomchild=this;
 	
 }
-
-/*
- @log
-	* added 2 new methods - DoMoveTo and DoResizeTo. They move/resize the frame rectangle of Layer class.
-		In DoResizeTo() I added some code for autoresizing(based on BView's resizeMask parameter) of children. Still, the effective code for resizing need to be written. :-) I could do that, but other things have greater priority. :-)
-*/

@@ -1,0 +1,14 @@
+#ifndef _GLOBALS_H_
+#define _GLOBALS_H_
+
+#define B_SYSTEM_LAST			10
+#define B_NORMAL_FEEL			11
+#define B_FLOATING_SUBSET_FEEL	12
+#define B_FLOATING_APP_FEEL		13
+#define B_MODAL_SUBSET_FEEL		14
+#define B_MODAL_APP_FEEL		15
+#define B_FLOATING_ALL_FEEL		16
+#define B_MODAL_ALL_FEEL		17
+#define B_SYSTEM_FIRST			18
+
+#endif

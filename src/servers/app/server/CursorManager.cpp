@@ -177,31 +177,37 @@ void CursorManager::RemoveAppCursors(const char *signature)
 //! Wrapper around the DisplayDriver ShowCursor call
 void CursorManager::ShowCursor(void)
 {
-	Lock();
+	// TODO: Fix
+/*	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	driver->ShowCursor();
 	Unlock();
+*/
 }
 
 //! Wrapper around the DisplayDriver HideCursor call
 void CursorManager::HideCursor(void)
 {
-	Lock();
+	// TODO: Fix
+/*	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	driver->HideCursor();
 	Unlock();
+*/
 }
 
 //! Wrapper around the DisplayDriver ObscureCursor call
 void CursorManager::ObscureCursor(void)
 {
-	Lock();
+	// TODO: Fix
+/*	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	driver->ObscureCursor();
 	Unlock();
+*/
 }
 
 /*!
@@ -210,7 +216,8 @@ void CursorManager::ObscureCursor(void)
 */
 void CursorManager::SetCursor(int32 token)
 {
-	Lock();
+	// TODO: Fix
+/*	Lock();
 	ServerCursor *c=_FindCursor(token);
 	if(c)
 	{
@@ -219,11 +226,13 @@ void CursorManager::SetCursor(int32 token)
 		_current_which=B_CURSOR_OTHER;
 	}
 	Unlock();
+*/
 }
 
 void CursorManager::SetCursor(cursor_which which)
 {
-	Lock();
+	// TODO: Fix
+/*	Lock();
 
 	DisplayDriver *driver=GetGfxDriver(ActiveScreen());
 	switch(which)
@@ -287,6 +296,7 @@ void CursorManager::SetCursor(cursor_which which)
 	}
 
 	Unlock();
+*/
 }
 
 /*!

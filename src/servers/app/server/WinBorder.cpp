@@ -27,8 +27,10 @@
 #include <Region.h>
 #include <String.h>
 #include <Locker.h>
+#include <Region.h>
 #include <Debug.h>
 #include <TokenSpace.h>
+#include "Globals.h"
 #include "View.h"	// for mouse button defines
 #include "ServerWindow.h"
 #include "Decorator.h"
@@ -322,9 +324,48 @@ void WinBorder::SetFocus(const bool &active)
 	_decorator->SetFocus(active);
 }
 
+void WinBorder::SetServerFeel(int32 feel)
+{
+	switch(_win->GetFeel())
+	{
+		case B_NORMAL_WINDOW_FEEL:
+			_serverfeel	= B_NORMAL_FEEL;
+			break;
+		case B_FLOATING_SUBSET_WINDOW_FEEL:
+			_serverfeel	= B_FLOATING_SUBSET_FEEL;
+			break;
+		case B_FLOATING_APP_WINDOW_FEEL:
+			_serverfeel	= B_FLOATING_APP_FEEL;
+			break;
+		case B_FLOATING_ALL_WINDOW_FEEL:
+			_serverfeel	= B_FLOATING_ALL_FEEL;
+			break;
+		case B_MODAL_SUBSET_WINDOW_FEEL:
+			_serverfeel	= B_MODAL_SUBSET_FEEL;
+			break;
+		case B_MODAL_APP_WINDOW_FEEL:
+			_serverfeel	= B_MODAL_APP_FEEL;
+			break;
+		case B_MODAL_ALL_WINDOW_FEEL:
+			_serverfeel	= B_MODAL_ALL_FEEL;
+			break;
+		case B_SYSTEM_LAST:
+		case B_SYSTEM_FIRST:
+//			if(_win->ServerTeamID() != _win->ClientTeamID())
+//			_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
+//			else
+//				_serverfeel	= _win->GetFeel();
+			break;
+		default:
+			_win->SetFeel(B_NORMAL_WINDOW_FEEL);
+			_serverfeel	= B_NORMAL_FEEL;
+			break;
+	}
+}
+
 void WinBorder::RebuildRegions( const BRect& r ){
 	/* WinBorder is a little bit special. It doesn't have a visible region
-		in which to do its drawings. Instead the whole visible region is split
+		in witch to do its drawings. Instead the hole visible region is split
 		between decorator and top_layer.
 	 */
 

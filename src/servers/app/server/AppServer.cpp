@@ -123,7 +123,7 @@ AppServer::AppServer(void)
 	InitDecorators();
 		
 	// Set up the Desktop
-	InitDesktop();
+	desktop=new Desktop();
 
 	// Create the cursor manager. Object declared in CursorManager.cpp
 	cursormanager=new CursorManager();
@@ -142,7 +142,7 @@ AppServer::AppServer(void)
 	_decor_lock=create_sem(1,"app_server_decor_sem");
 	
 	// Get the driver first - Poller thread utilizes the thing
-	_driver=GetGfxDriver(ActiveScreen());
+	_driver=desktop->GetGfxDriver();
 
 	// Spawn our input-polling thread
 	_poller_id=spawn_thread(PollerThread, "Poller", B_NORMAL_PRIORITY, this);
@@ -183,8 +183,6 @@ AppServer::~AppServer(void)
 	delete bitmapmanager;
 	delete cursormanager;
 
-	ShutdownDesktop();
-
 	// If these threads are still running, kill them - after this, if exit_poller
 	// is deleted, who knows what will happen... These things will just return an
 	// error and fail if the threads have already exited.
@@ -194,6 +192,8 @@ AppServer::~AppServer(void)
 	delete fontserver;
 	
 	make_decorator=NULL;
+	delete desktop;
+	desktop=NULL;
 }
 
 /*!
@@ -824,7 +824,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 				if(modifiers & B_CONTROL_KEY)
 				{
 					STRACE(("Set Workspace %ld\n",scancode-1));
-					SetWorkspace(scancode-2);
+					desktop->SetWorkspace(scancode-2);
 					break;
 				}	
 
@@ -878,7 +878,7 @@ void AppServer::HandleKeyMessage(int32 code, int8 *buffer)
 					if(modifiers & (B_LEFT_SHIFT_KEY | B_LEFT_CONTROL_KEY))
 					{
 						STRACE(("Set Workspace %ld\n",scancode-1));
-						SetWorkspace(scancode-2);
+						desktop->SetWorkspace(scancode-2);
 						break;
 					}	
 				}
@@ -1101,6 +1101,7 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 	\param argv String array of the command-line arguments
 	\return -1 if the app_server is already running, 0 if everything's OK.
 */
+
 int main( int argc, char** argv )
 {
 	// There can be only one....

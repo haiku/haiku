@@ -28,9 +28,16 @@
 #ifndef _ROOTLAYER_H_
 #define _ROOTLAYER_H_
 
-class DisplayDriver;
+#include <List.h>
+
+#include "Layer.h"
+#include "FMWList.h"
+
 class RGBColor;
-//class Layer;
+class Workspace;
+class Screen;
+class WinBorder;
+class Desktop;
 
 /*!
 	\class RootLayer RootLayer.h
@@ -43,19 +50,60 @@ class RGBColor;
 class RootLayer : public Layer
 {
 public:
-									RootLayer(BRect rect, const char *layername,
-										DisplayDriver *gfxdriver);
-	virtual							~RootLayer();
+	RootLayer(const char *layername, int32 workspaceCount, Desktop *desktop);
+	virtual ~RootLayer();
+	
+	virtual	void Draw(const BRect &r);
+	virtual	void MoveBy(float x, float y);
+	virtual	void ResizeBy(float x, float y);
 
-	virtual	void					MoveBy(float x, float y);
-	virtual	void					ResizeBy(float x, float y);
+	virtual	Layer* VirtualTopChild() const;		//
+	virtual	Layer* VirtualLowerSibling() const;	//	... for the active workspace
+	virtual	Layer* VirtualUpperSibling() const;	//
+	virtual	Layer* VirtualBottomChild() const;	//
+ 
+	void AddWinBorder(WinBorder* winBorder);
+	void RemoveWinBorder(WinBorder* winBorder);
+	void ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces);
+	
+	void SetScreens(Screen *screen[], int32 rows, int32 columns);
+	Screen** Screens();
+	bool SetScreenResolution(int32 width, int32 height, uint32 colorspace);
+	int32 ScreenRows() const { return fRows; }
+	int32 ScreenColumns() const { return fColumns; }
+	
+	void SetWorkspaceCount(const int32 count);
+	int32 WorkspaceCount(void) const;
+	Workspace* WorkspaceAt(const int32 index) const;
+	void SetActiveWorkspaceByIndex(const int32 index);
+	void SetActiveWorkspace(Workspace *ws);
+	int32 ActiveWorkspaceIndex(void) const;
+	Workspace* ActiveWorkspace(void) const;
+	
+	void SetBGColor(const RGBColor &col);
+	RGBColor BGColor(void) const;
+	
+	void AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks);
 
-			void					SetDriver(DisplayDriver *driver);
-
-			void					SetColor(const RGBColor &col);
-			RGBColor				GetColor(void) const;
+	// ------- debugging methods -------
+	void PrintToStream();
+	
+	// "Private" to app_server :-) - they should not be used
+	void RemoveAppWindow(WinBorder *wb);
+	
+	FMWList fMainFMWList;
 private:
-
+	Desktop *fDesktop;
+	
+	BList fScreenPtrList;
+	int32 fRows;
+	int32 fColumns;
+	int32 fScreenXResolution;
+	int32 fScreenYResolution;
+	uint32 fColorSpace;
+	
+	BList fWSPtrList;
+	Workspace *fActiveWorkspace;
 };
 
 #endif

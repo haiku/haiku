@@ -29,6 +29,8 @@
 
 #include <OS.h>
 #include <String.h>
+#include <ServerBitmap.h>
+#include "FMWList.h"
 
 class AppServer;
 class BMessage;
@@ -37,6 +39,22 @@ class PortMessage;
 class BList;
 class DisplayDriver;
 class ServerCursor;
+
+
+/*
+class ServerApp{
+public:
+							ServerApp(team_id clientTeamID){
+								fClientTeamID = clientTeamID;
+							}
+	virtual					~ServerApp(){ }
+	team_id					ClientTeamID(){ return fClientTeamID; }
+
+			FMWList			fAppFMWList;
+private:
+			team_id			fClientTeamID;
+};
+*/
 
 /*!
 	\class ServerApp ServerApp.h
@@ -66,6 +84,8 @@ public:
 	void PostMessage(int32 code, size_t size=0, int8 *buffer=NULL);
 
 	void SetAppCursor(void);
+	FMWList *GetFMWList(void) { return &fAppFMWList; }
+	
 protected:
 	friend class AppServer;
 	friend class ServerWindow;
@@ -84,6 +104,7 @@ protected:
 	bool _cursorhidden;
 	bool _isactive;
 	int32 _handlertoken;
+	FMWList fAppFMWList;
 };
 
 #endif

@@ -27,6 +27,7 @@
 //  
 //------------------------------------------------------------------------------
 #include <Accelerant.h>
+#include <stdio.h>
 #include "DisplayDriver.h"
 #include "LayerData.h"
 #include "ServerCursor.h"
@@ -332,11 +333,11 @@ void DisplayDriver::DrawString(const char *string, int32 length, BPoint pt, Laye
 {
 }
 
-void DisplayDriver::FillArc(const BRect r, float angle, float span, const RGBColor& color)
+void DisplayDriver::FillArc(const BRect r, float angle, float span, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillArc(const BRect r, float angle, float span, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -715,11 +716,11 @@ void DisplayDriver::FillArc(const BRect r, float angle, float span, DisplayDrive
 	Unlock();
 }
 
-void DisplayDriver::FillBezier(BPoint *pts, const RGBColor& color)
+void DisplayDriver::FillBezier(BPoint *pts, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillBezier(BPoint *pts, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillBezier(BPoint *pts, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -803,11 +804,11 @@ void DisplayDriver::FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontal
 	*/
 }
 
-void DisplayDriver::FillEllipse(BRect r, const RGBColor& color)
+void DisplayDriver::FillEllipse(BRect r, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillEllipse(BRect r, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillEllipse(BRect r, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -877,11 +878,11 @@ void DisplayDriver::FillEllipse(BRect r, DisplayDriver* driver, SetHorizontalLin
 	Unlock();
 }
 
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor& color)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1018,7 +1019,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, DisplayDriver* dri
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
 	\param color The color used to fill the rectangle
 */
-void DisplayDriver::FillRect(const BRect r, const RGBColor& color)
+void DisplayDriver::FillRect(const BRect r, RGBColor &color)
 {
 }
 
@@ -1029,7 +1030,7 @@ void DisplayDriver::FillRect(const BRect r, const RGBColor& color)
 	\param high_color The high color of the pattern
 	\param low_color The low color of the pattern
 */
-void DisplayDriver::FillRect(const BRect r, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillRect(const BRect r, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1038,7 +1039,7 @@ void DisplayDriver::FillRect(const BRect r, const Pattern& pattern, const RGBCol
 	\param r BRegion to be filled
 	\param color The color used to fill the region
 */
-void DisplayDriver::FillRegion(BRegion& r, const RGBColor& color)
+void DisplayDriver::FillRegion(BRegion& r, RGBColor &color)
 {
 	Lock();
 
@@ -1055,7 +1056,7 @@ void DisplayDriver::FillRegion(BRegion& r, const RGBColor& color)
 	\param high_color The high color of the pattern
 	\param low_color The low color of the pattern
 */
-void DisplayDriver::FillRegion(BRegion& r, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillRegion(BRegion& r, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 	Lock();
 
@@ -1065,11 +1066,11 @@ void DisplayDriver::FillRegion(BRegion& r, const Pattern& pattern, const RGBColo
 	Unlock();
 }
 
-void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, const RGBColor& color)
+void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1102,11 +1103,11 @@ void DisplayDriver::FillRoundRect(BRect r, float xrad, float yrad, DisplayDriver
 //{
 //}
 
-void DisplayDriver::FillTriangle(BPoint *pts, const RGBColor& color)
+void DisplayDriver::FillTriangle(BPoint *pts, RGBColor &color)
 {
 }
 
-void DisplayDriver::FillTriangle(BPoint *pts, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::FillTriangle(BPoint *pts, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1306,11 +1307,11 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	Unlock();
 }
 
-void DisplayDriver::StrokeArc(BRect r, float angle, float span, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, float pensize, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1472,11 +1473,11 @@ void DisplayDriver::StrokeArc(BRect r, float angle, float span, DisplayDriver* d
 }
 
 
-void DisplayDriver::StrokeBezier(BPoint *pts, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeBezier(BPoint *pts, float pensize, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeBezier(BPoint *pts, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1539,11 +1540,11 @@ void DisplayDriver::StrokeBezier(BPoint *pts, DisplayDriver* driver, SetPixelFun
 	}
 }
 
-void DisplayDriver::StrokeEllipse(BRect r, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeEllipse(BRect r, float pensize, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeEllipse(BRect r, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1614,11 +1615,11 @@ void DisplayDriver::StrokeEllipse(BRect r, DisplayDriver* driver, SetPixelFuncTy
 	}
 }
 
-void DisplayDriver::StrokeLine(BPoint start, BPoint end, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeLine(BPoint start, BPoint end, float pensize, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeLine(BPoint start, BPoint end, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1657,15 +1658,15 @@ void DisplayDriver::StrokeLine(BPoint start, BPoint end, DisplayDriver* driver, 
 	}
 }
 
-void DisplayDriver::StrokePoint(BPoint& pt, const RGBColor& color)
+void DisplayDriver::StrokePoint(BPoint& pt, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const RGBColor& color, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, RGBColor &color, bool is_closed)
 {
 }
 
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color, bool is_closed)
 {
 }
 
@@ -1689,11 +1690,11 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, DisplayDriver* d
 	\param pensize Thickness of the lines
 	\param color The color of the rectangle
 */
-void DisplayDriver::StrokeRect(BRect r, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeRect(BRect r, float pensize, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokeRect(BRect r, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeRect(BRect r, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1712,7 +1713,7 @@ void DisplayDriver::StrokeRect(BRect r, DisplayDriver* driver, SetHorizontalLine
 	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::StrokeRegion(BRegion& r, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeRegion(BRegion& r, float pensize, RGBColor &color)
 {
 	Lock();
 
@@ -1722,7 +1723,7 @@ void DisplayDriver::StrokeRegion(BRegion& r, float pensize, const RGBColor& colo
 	Unlock();
 }
 
-void DisplayDriver::StrokeRegion(BRegion& r, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeRegion(BRegion& r, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 	Lock();
 
@@ -1732,11 +1733,11 @@ void DisplayDriver::StrokeRegion(BRegion& r, float pensize, const Pattern& patte
 	Unlock();
 }
 
-void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, RGBColor &color)
 {
 }
 
-void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 }
 
@@ -1786,7 +1787,7 @@ void DisplayDriver::StrokeRoundRect(BRect r, float xrad, float yrad, DisplayDriv
 	\param pensize The line thickness
 	\param color The color of the lines
 */
-void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, const RGBColor& color)
+void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, RGBColor &color)
 {
 	Lock();
 	StrokeLine(pts[0],pts[1],pensize,color);
@@ -1795,7 +1796,7 @@ void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, const RGBColor& c
 	Unlock();
 }
 
-void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, const Pattern& pattern, const RGBColor& high_color, const RGBColor& low_color)
+void DisplayDriver::StrokeTriangle(BPoint *pts, float pensize, const Pattern& pattern, RGBColor &high_color, RGBColor &low_color)
 {
 	Lock();
 	StrokeLine(pts[0],pts[1],pensize,pattern,high_color,low_color);
@@ -1823,6 +1824,25 @@ void DisplayDriver::StrokeLineArray(BPoint *pts, int32 numlines, float pensize, 
 	to update the state variables kept internally by the DisplayDriver class.
 */
 void DisplayDriver::SetMode(int32 mode)
+{
+}
+
+/*
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param mode Data structure as defined in Screen.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
+void DisplayDriver::SetMode(const display_mode &mode)
+{
+}
+
+/*!
+	\brief Sets the attributes in mode to reflect the current display mode
+	\param mode Structure to receive the current display mode's status
+*/
+void DisplayDriver::GetMode(display_mode *mode)
 {
 }
 

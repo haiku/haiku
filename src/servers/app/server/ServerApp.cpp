@@ -102,7 +102,9 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_appcursor=(defaultc)?new ServerCursor(defaultc):NULL;
 	_lock=create_sem(1,"ServerApp sem");
 
-	_driver=GetGfxDriver(ActiveScreen());
+	// TODO: Fix
+//	_driver=GetGfxDriver(ActiveScreen());
+
 	_cursorhidden=false;
 
 	STRACE(("ServerApp %s:\n",_signature.String()));
@@ -351,7 +353,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_COLORS:
 		{
-			ServerWindow *win;
+			// TODO: move message def to ServerProtocol.h to allow for
+			// complete build compatibility under R5
+/*			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
@@ -362,11 +366,14 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win->SendMessageToClient(&msg);
 				win->Unlock();
 			}
-			break;
+*/			break;
+
 		}
 		case AS_UPDATE_FONTS:
 		{
-			ServerWindow *win;
+			// TODO: move message def to ServerProtocol.h to allow for
+			// complete build compatibility under R5
+/*			ServerWindow *win;
 			BMessage msg(_FONTS_UPDATED);
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
@@ -377,11 +384,13 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win->SendMessageToClient(&msg);
 				win->Unlock();
 			}
-			break;
+*/			break;
 		}
 		case AS_UPDATE_DECORATOR:
 		{
-			ServerWindow *win;
+			// TODO: move message def to ServerProtocol.h to allow for
+			// complete build compatibility under R5
+/*			ServerWindow *win;
 			
 			for(int32 i=0; i<_winlist->CountItems(); i++)
 			{
@@ -390,7 +399,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 				win->_winborder->UpdateDecorator();
 				win->Unlock();
 			}
-			break;
+*/			break;
 		}
 		case AS_CREATE_WINDOW:
 		{
@@ -592,8 +601,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&workspace);
 			msg->Read<uint32>(&mode);
 			msg->Read<bool>(&stick);
-			
-			SetSpace(workspace,mode,ActiveScreen(),stick);
+
+			// TODO: Fix			
+//			SetSpace(workspace,mode,ActiveScreen(),stick);
 
 			break;
 		}
@@ -605,7 +615,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
 			int32 workspace;
 			msg->Read<int32>(&workspace);
-			SetWorkspace(workspace);
+
+			// TODO: Fix			
+//			SetWorkspace(workspace);
 			break;
 		}
 		
@@ -723,7 +735,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		{
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-			scroll_bar_info sbi=GetScrollBarInfo();
+			scroll_bar_info sbi=desktop->ScrollBarInfo();
 
 			port_id replyport;
 			msg->Read<int32>(&replyport);
@@ -739,7 +751,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
 			msg->Read<scroll_bar_info>(&sbi);
-			SetScrollBarInfo(sbi);
+			desktop->SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
@@ -751,7 +763,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			msg->Read<int32>(&replyport);
 
 			PortLink link(replyport);
-			link.Attach<bool>(GetFFMouse());
+			link.Attach<bool>(desktop->FFMouseInUse());
 			link.Flush();
 			break;
 		}
@@ -761,7 +773,7 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) scroll_bar_info scroll bar info structure
 			scroll_bar_info sbi;
 			msg->Read<scroll_bar_info>(&sbi);
-			SetScrollBarInfo(sbi);
+			desktop->SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
@@ -770,14 +782,14 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 1) enum mode_mouse FFM mouse mode
 			mode_mouse mmode;
 			msg->Read<mode_mouse>(&mmode);
-			SetFFMouseMode(mmode);
+			desktop->SetFFMouseMode(mmode);
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
 		{
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-			mode_mouse mmode=GetFFMouseMode();
+			mode_mouse mmode=desktop->FFMouseMode();
 			
 			port_id replyport;
 			msg->Read<int32>(&replyport);

@@ -36,6 +36,7 @@ Server app_server :
 	# Misc. Sources
 	Angle.cpp
 	CursorData.cpp
+	FMWList.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
 	SessionStreamReader.cpp
@@ -55,11 +56,13 @@ Server app_server :
 	ScreenDriver.cpp
 	ViewDriver.cpp
 	DefaultDecorator.cpp
-	DesktopClasses.cpp
 	Layer.cpp
 	RootLayer.cpp
-	WinBorder.cpp
 	ServerPicture.cpp
+	ServerScreen.cpp
+	WinBorder.cpp
+	Workspace.cpp
+
 ;
 
 LINKFLAGS on app_server ?= $(LINKFLAGS) ;

@@ -126,7 +126,7 @@ public:
 //	void SetDrawingMode(drawing_mode mode);
 	void ShowCursor(void);
 
-virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
+	virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
 	virtual void FillArc(const BRect r, float angle, float span, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
 	virtual void FillBezier(BPoint *pts, RGBColor& color);
 	virtual void FillBezier(BPoint *pts, const Pattern& pattern, RGBColor& high_color, RGBColor& low_color);
@@ -162,10 +162,23 @@ virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
 	virtual void StrokeLineArray(BPoint *pts, int32 numlines, float pensize, RGBColor *colors);
 
 	void SetMode(int32 mode);
+	void SetMode(const display_mode &mode);
+	
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);
 	bool DumpToFile(const char *path);
 	VDWindow *screenwin;
+
+	virtual status_t SetDPMSMode(const uint32 &state);
+	virtual uint32 DPMSMode(void) const;
+	virtual uint32 DPMSCapabilities(void) const;
+	virtual status_t GetDeviceInfo(accelerant_device_info *info);
+	virtual status_t GetModeList(display_mode **mode_list, uint32 *count);
+	virtual status_t GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high);
+	virtual status_t GetTimingConstraints(display_timing_constraints *dtc);
+	virtual status_t ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high);
+	virtual status_t WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT);
+
 protected:
 	void SetLayerData(LayerData *d, bool set_font_data=false);
 	void BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d);

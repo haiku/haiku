@@ -36,6 +36,7 @@
 #include <BitmapStream.h>
 #include <File.h>
 #include <Entry.h>
+#include <Screen.h>
 #include <TranslatorRoster.h>
 
 #include "Angle.h"
@@ -570,6 +571,45 @@ void ViewDriver::Shutdown(void)
 	Lock();
 	is_initialized=false;
 	Unlock();
+}
+
+void ViewDriver::SetMode(const display_mode &mode)
+{
+	screenwin->Lock();
+	
+	BBitmap *tempbmp=new BBitmap(BRect(0,0,mode.virtual_width-1,mode.virtual_height-1),
+		(color_space)mode.space,true);
+
+	if(!tempbmp)
+		return;
+	
+	if(!tempbmp->IsValid())
+	{
+		delete tempbmp;
+		return;
+	}
+	
+	delete framebuffer;
+
+	// don't forget to update the internal vars!
+	_SetWidth(mode.virtual_width);
+	_SetHeight(mode.virtual_height);
+	_SetMode(mode.space);
+
+	screenwin->view->viewbmp=tempbmp;
+	framebuffer=screenwin->view->viewbmp;
+	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
+	framebuffer->AddChild(drawview);
+
+	framebuffer->Lock();
+	drawview->SetHighColor(workspace_default_color.GetColor32());
+	drawview->FillRect(drawview->Bounds());
+	drawview->Sync();
+	framebuffer->Unlock();
+
+	_SetBytesPerRow(framebuffer->BytesPerRow());
+	screenwin->view->Invalidate();
+	screenwin->Unlock();
 }
 
 void ViewDriver::SetMode(int32 space)
@@ -2062,3 +2102,134 @@ rgb_color ViewDriver::GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, 
 	}
 	return returncolor;
 }
+
+status_t ViewDriver::SetDPMSMode(const uint32 &state)
+{
+	// TODO: Implement software DPMS
+	return B_ERROR;
+}
+
+uint32 ViewDriver::DPMSMode(void) const
+{
+	// TODO: Implement software DPMS
+	return B_DPMS_ON;
+}
+
+uint32 ViewDriver::DPMSCapabilities(void) const
+{
+	// TODO: Implement software DPMS
+	return B_DPMS_ON;
+}
+
+status_t ViewDriver::GetDeviceInfo(accelerant_device_info *info)
+{
+	if(!info)
+		return B_ERROR;
+
+	// We really don't have to provide anything here because this is strictly
+	// a software-only driver, but we'll have some fun, anyway.
+	
+	info->version=100;
+	sprintf(info->name,"OpenBeOS ViewDriver");
+	sprintf(info->chipset,"OpenBeOS Chipset");
+	sprintf(info->serial_no,"3.14159265358979323846");
+	info->memory=134217728;	// 128 MB, not that we really have that much. :)
+	info->dac_speed=0xFFFFFFFF;	// *heh*
+	
+	return B_OK;
+}
+
+status_t ViewDriver::GetModeList(display_mode **modes, uint32 *count)
+{
+	if(!count)
+		return B_ERROR;
+
+	screenwin->Lock();
+		
+	// TODO: Figure out good timing values to be returned in each of the modes
+	// supported.
+	
+	*modes=new display_mode[13];
+	*count=13;
+
+	modes[0]->virtual_width=640;
+	modes[0]->virtual_width=480;
+	modes[0]->space=B_CMAP8;	
+	modes[1]->virtual_width=640;
+	modes[1]->virtual_width=480;
+	modes[1]->space=B_RGB16;
+	modes[2]->virtual_width=640;
+	modes[2]->virtual_width=480;
+	modes[2]->space=B_RGB32;
+	modes[3]->virtual_width=640;
+	modes[3]->virtual_width=480;
+	modes[3]->space=B_RGBA32;	
+
+	modes[4]->virtual_width=800;
+	modes[4]->virtual_width=600;
+	modes[4]->space=B_CMAP8;
+	modes[5]->virtual_width=800;
+	modes[5]->virtual_width=600;
+	modes[5]->space=B_RGB16;	
+	modes[6]->virtual_width=800;
+	modes[6]->virtual_width=600;
+	modes[6]->space=B_RGB32;	
+
+	modes[7]->virtual_width=1024;
+	modes[7]->virtual_width=768;
+	modes[7]->space=B_CMAP8;;
+	modes[8]->virtual_width=1024;
+	modes[8]->virtual_width=768;
+	modes[8]->space=B_RGB16;	
+	modes[9]->virtual_width=1024;
+	modes[9]->virtual_width=768;
+	modes[9]->space=B_RGB32;	
+
+	modes[10]->virtual_width=1152;
+	modes[10]->virtual_width=864;
+	modes[10]->space=B_CMAP8;	
+	modes[11]->virtual_width=1152;
+	modes[11]->virtual_width=864;
+	modes[11]->space=B_RGB16;	
+	modes[12]->virtual_width=1152;
+	modes[12]->virtual_width=864;
+	modes[12]->space=B_RGB32;	
+	
+	for(int32 i=0; i<13; i++)
+	{
+		modes[i]->h_display_start=0;
+		modes[i]->v_display_start=0;
+		modes[i]->flags=B_PARALLEL_ACCESS;
+	}
+	screenwin->Unlock();
+	
+	return B_OK;
+}
+
+status_t ViewDriver::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+{
+	return B_ERROR;
+}
+
+status_t ViewDriver::GetTimingConstraints(display_timing_constraints *dtc)
+{
+	return B_ERROR;
+}
+
+status_t ViewDriver::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+{
+	// TODO: Unhack
+
+	// We should be able to get away with this because we're not dealing with any
+	// specific hardware. This is a Good Thing(TM) because we can support any hardware
+	// we wish within reasbonable expectaions and programmer laziness. :P
+	return B_OK;
+}
+
+status_t ViewDriver::WaitForRetrace(bigtime_t timeout=B_INFINITE_TIMEOUT)
+{
+	// Locking shouldn't be necessary here - R5 should handle this for us. :)
+	BScreen screen;
+	return screen.WaitForRetrace(timeout);
+}
+
