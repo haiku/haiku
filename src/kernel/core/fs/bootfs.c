@@ -34,6 +34,11 @@ static char *bootdir = NULL;
 static off_t bootdir_len = 0;
 static region_id bootdir_region = -1;
 
+typedef enum {
+	STREAM_TYPE_FILE = S_IFREG,
+	STREAM_TYPE_DIR = S_IFDIR,
+} stream_type;
+
 struct bootfs_stream {
 	stream_type type;
 	union {
@@ -484,41 +489,38 @@ bootfs_sync(fs_cookie fs)
 
 
 static int
-bootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
+bootfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
 	struct bootfs_vnode *dir = (struct bootfs_vnode *)_dir;
-	struct bootfs_vnode *v;
-	struct bootfs_vnode *v1;
-	int err;
+	struct bootfs_vnode *vnode, *vdummy;
+	int status;
 
 	TRACE(("bootfs_lookup: entry dir 0x%x, name '%s'\n", dir, name));
 
 	if (dir->stream.type != STREAM_TYPE_DIR)
-		return ENOTDIR;
+		return B_NOT_A_DIRECTORY;
 
 	mutex_lock(&fs->lock);
 
 	// look it up
-	v = bootfs_find_in_dir(dir, name);
-	if (!v) {
-		err = ENOENT;
+	vnode = bootfs_find_in_dir(dir, name);
+	if (!vnode) {
+		status = B_ENTRY_NOT_FOUND;
 		goto err;
 	}
 
-	err = vfs_get_vnode(fs->id, v->id, (fs_vnode *)&v1);
-	if(err < 0) {
+	status = vfs_get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	if (status < 0)
 		goto err;
-	}
 
-	*id = v->id;
-
-	err = B_NO_ERROR;
+	*_id = vnode->id;
+	*_type = dir->stream.type;
 
 err:
 	mutex_unlock(&fs->lock);
 
-	return err;
+	return status;
 }
 
 
@@ -989,7 +991,7 @@ err:
 
 
 static int
-bootfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
+bootfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -1026,6 +1028,8 @@ static struct fs_calls bootfs_calls = {
 	&bootfs_ioctl,
 	&bootfs_fsync,
 
+	NULL,	// read_link
+	NULL,	// symlink
 	&bootfs_unlink,
 	&bootfs_rename,
 

@@ -34,6 +34,12 @@
 #	define INSANE(x)
 #endif
 
+typedef enum {
+	STREAM_TYPE_DIR = S_IFDIR,
+	STREAM_TYPE_DEVICE = S_IFCHR,
+	STREAM_TYPE_SYMLINK = S_IFLNK
+} stream_type;
+
 struct devfs_part_map {
 	off_t offset;
 	off_t size;
@@ -57,6 +63,9 @@ struct devfs_stream {
 			device_hooks *calls;
 			struct devfs_part_map *part_map;
 		} dev;
+		struct stream_symlink {
+			char *path;
+		} symlink;
 	} u;
 };
 
@@ -502,25 +511,24 @@ devfs_sync(fs_cookie fs)
 
 
 static int
-devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
+devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *_id, int *_type)
 {
 	struct devfs *fs = (struct devfs *)_fs;
 	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
-	struct devfs_vnode *vnode;
-	struct devfs_vnode *vdummy;
+	struct devfs_vnode *vnode, *vdummy;
 	int err;
 
 	TRACE(("devfs_lookup: entry dir %p, name '%s'\n", dir, name));
 
 	if (dir->stream.type != STREAM_TYPE_DIR)
-		return ENOTDIR;
+		return B_NOT_A_DIRECTORY;
 
 	mutex_lock(&fs->lock);
 
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
 	if (!vnode) {
-		err = ERR_NOT_FOUND;
+		err = B_ENTRY_NOT_FOUND;
 		goto err;
 	}
 
@@ -528,7 +536,8 @@ devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
 	if (err < 0)
 		goto err;
 
-	*id = vnode->id;
+	*_id = vnode->id;
+	*_type = vnode->stream.type;
 
 err:
 	mutex_unlock(&fs->lock);
@@ -967,33 +976,33 @@ devfs_unlink(fs_cookie _fs, fs_vnode _dir, const char *name)
 {
 	struct devfs *fs = _fs;
 	struct devfs_vnode *dir = _dir;
-	struct devfs_vnode *v;
-	int res = B_NO_ERROR;
+	struct devfs_vnode *vnode;
+	int status = B_NO_ERROR;
 
 	mutex_lock(&fs->lock);
 
-	v = devfs_find_in_dir( dir, name );
-	if(!v) {
-		res = ERR_NOT_FOUND;
+	vnode = devfs_find_in_dir(dir, name);
+	if (!vnode) {
+		status = B_ENTRY_NOT_FOUND;
 		goto err;
 	}
 	
 	// you can unlink partitions only
-	if( v->stream.type != STREAM_TYPE_DEVICE || !v->stream.u.dev.part_map ) {
-		res = EROFS;
+	if (vnode->stream.type != STREAM_TYPE_DEVICE || !vnode->stream.u.dev.part_map) {
+		status = EROFS;
 		goto err;
 	}
 
-	res = devfs_remove_from_dir( v->parent, v );
-	if( res )
+	status = devfs_remove_from_dir(vnode->parent, vnode);
+	if (status < 0)
 		goto err;
 
-	res = vfs_remove_vnode( fs->id, v->id );
+	status = vfs_remove_vnode(fs->id, vnode->id);
 
 err:	
 	mutex_unlock(&fs->lock);
 
-	return res;
+	return status;
 }
 
 
@@ -1012,20 +1021,16 @@ devfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 	TRACE(("devfs_rstat: vnode %p (%Ld), stat %p\n", vnode, vnode->id, stat));
 
 	stat->st_ino = vnode->id;
-	stat->st_mode = DEFFILEMODE;
 	stat->st_size = 0;
-
-	if (vnode->stream.type == STREAM_TYPE_DIR)
-		stat->st_mode |= S_IFDIR;
-	else
-		stat->st_mode |= S_IFCHR;
+	// ToDo: or should this be just DEFFILEMODE (0666 instead of 0644)?
+	stat->st_mode = vnode->stream.type | S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH;
 
 	return 0;
 }
 
 
 static int
-devfs_write_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat, int stat_mask)
+devfs_write_stat(fs_cookie _fs, fs_vnode _v, const struct stat *stat, int stat_mask)
 {
 #if DEVFS_TRACE
 	struct devfs_vnode *v = _v;
@@ -1062,6 +1067,8 @@ static struct fs_calls devfs_calls = {
 	&devfs_ioctl,
 	&devfs_fsync,
 
+	NULL,	// read_link
+	NULL,	// symlink
 	&devfs_unlink,
 	&devfs_rename,
 

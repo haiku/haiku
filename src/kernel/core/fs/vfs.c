@@ -527,31 +527,42 @@ find_fs(const char *fs_name)
 static status_t
 entry_ref_to_vnode(fs_id fsID,vnode_id directoryID,const char *name,struct vnode **_vnode)
 {
-	struct vnode *directory;
+	struct vnode *directory, *vnode;
 	vnode_id id;
 	int status;
+	int type;
 
 	status = get_vnode(fsID,directoryID,&directory,false);
 	if (status < 0)
 		return status;
 
-	status = FS_CALL(directory,fs_lookup)(directory->mount->cookie,directory->private_node,name,&id);
-	dec_vnode_ref_count(directory, false);
+	status = FS_CALL(directory,fs_lookup)(directory->mount->cookie,
+		directory->private_node, name, &id, &type);
+	put_vnode(directory);
 
 	if (status < 0)
 		return status;
 
-	return get_vnode(fsID,id,_vnode,false);
+	mutex_lock(&vfs_vnode_mutex);
+	vnode = lookup_vnode(fsID, id);
+	mutex_unlock(&vfs_vnode_mutex);
+
+	if (vnode == NULL) {
+		// fs_lookup() should have left the vnode referenced, so chances
+		// are good that this will never happen
+		panic("entry_ref_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", fsID, id);
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	*_vnode = vnode;
+	return B_OK;
 }
 
 
 static int
 path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 {
-	char *nextPath;
 	struct vnode *vnode;
-	struct vnode *nextVnode;
-	vnode_id vnid;
 	int err = 0;
 
 	if (!path)
@@ -573,6 +584,11 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 	}
 
 	for (;;) {
+		struct vnode *nextVnode;
+		vnode_id vnodeID;
+		char *nextPath;
+		int type;
+
 		PRINT(("path_to_vnode: top of loop. p = %p, *p = %c, p = '%s'\n", path, *path, path));
 
 		// done?
@@ -581,7 +597,8 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 			break;
 		}
 
-		// walk to find the next component
+		// walk to find the next path component ("path" will point to a single
+		// path component), and filter out multiple slashes
 		for (nextPath = path + 1;*nextPath != '\0' && *nextPath != '/';nextPath++);
 
 		if (*nextPath == '/') {
@@ -602,30 +619,35 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 			}
 		}
 
-		// tell the filesystem to parse this path
-		err = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie, vnode->private_node, path, &vnid);
+		// tell the filesystem to get the vnode of this path component
+		err = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie, vnode->private_node, path, &vnodeID, &type);
 		if (err < 0) {
-			dec_vnode_ref_count(vnode, false);
+			put_vnode(vnode);
 			goto out;
 		}
 
-		// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
-		// from inside the filesystem, thus the vnode would have to be in the list and it's
-		// ref count incremented at this point
-		mutex_lock(&vfs_vnode_mutex);
-		nextVnode = lookup_vnode(vnode->fs_id, vnid);
-		mutex_unlock(&vfs_vnode_mutex);
+		if (S_ISLNK(type)) {
+			// ToDo: we have to resolve the link here
+			nextVnode = NULL;
+		} else {
+			// lookup the vnode, the call to fs_lookup should have caused a get_vnode to be called
+			// from inside the filesystem, thus the vnode would have to be in the list and it's
+			// ref count incremented at this point
+			mutex_lock(&vfs_vnode_mutex);
+			nextVnode = lookup_vnode(vnode->fs_id, vnodeID);
+			mutex_unlock(&vfs_vnode_mutex);
+		}
 
 		if (!nextVnode) {
 			// pretty screwed up here
-			panic("path_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, vnid);
+			panic("path_to_vnode: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, vnodeID);
 			err = ERR_VFS_PATH_NOT_FOUND;
-			dec_vnode_ref_count(vnode, false);
+			put_vnode(vnode);
 			goto out;
 		}
 
 		// decrease the ref count on the old dir we just looked up into
-		dec_vnode_ref_count(vnode, false);
+		put_vnode(vnode);
 
 		path = nextPath;
 		vnode = nextVnode;
@@ -634,7 +656,7 @@ path_to_vnode(char *path, struct vnode **_vnode, bool kernel)
 		if (vnode->covered_by) {
 			nextVnode = vnode->covered_by;
 			inc_vnode_ref_count(nextVnode);
-			dec_vnode_ref_count(vnode, false);
+			put_vnode(vnode);
 			vnode = nextVnode;
 		}
 	}
@@ -662,11 +684,12 @@ path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel
 		strcpy(path, ".");
 	} else {
 		// replace the filename portion of the path with a '.'
-		strcpy(filename, p+1);
+		strcpy(filename, ++p);
 
-		if (p[1] != '\0'){
-			p[1] = '.';
-			p[2] = '\0';
+		// ToDo: this could write behind the array limit
+		if (p[0] != '\0'){
+			p[0] = '.';
+			p[1] = '\0';
 		}
 	}
 	return path_to_vnode(path, _vnode, kernel);
@@ -712,10 +735,24 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		// the name buffer is also used for fs_read_dir()
 		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
 		char *name = &((struct dirent *)nameBuffer)->d_name[0];
-		vnode_id parentId, id;
+		struct vnode *parentVnode;
+		vnode_id parentID, id;
+		int type;
 
 		// lookup the parent vnode
-		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->private_node,"..",&parentId);
+		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->private_node,"..",&parentID,&type);
+		if (status < B_OK)
+			goto out;
+
+		mutex_lock(&vfs_vnode_mutex);
+		parentVnode = lookup_vnode(vnode->fs_id, parentID);
+		mutex_unlock(&vfs_vnode_mutex);
+		
+		if (parentVnode == NULL) {
+			panic("dir_vnode_to_path: could not lookup vnode (fsid 0x%x vnid 0x%Lx)\n", vnode->fs_id, parentID);
+			status = B_ENTRY_NOT_FOUND;
+			goto out;
+		}
 
 		// Does the file system support getting the name of a vnode?
 		// If so, get it here...
@@ -728,27 +765,25 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 		// release the current vnode, we only need its parent from now on
 		put_vnode(vnode);
+		vnode = parentVnode;
 
 		if (status < B_OK)
-			return status;
+			goto out;
 
 		// ToDo: add an explicit check for loops in about 10 levels to do
 		// real loop detection
 
 		// don't go deeper as 'maxLevel' to prevent circular loops
-		if (maxLevel-- < 0)
-			return ELOOP;
-
-		if (parentId == vnode->id) {
-			// we have reached the root level directory of this file system
-			break;
+		if (maxLevel-- < 0) {
+			status = ELOOP;
+			goto out;
 		}
 
-		// Get the parent vnode. The parent of the vnode may have already
-		// changed, though, which would result in an incorrect path
-		status = get_vnode(vnode->mount->id,parentId,&vnode,0);
-		if (status < B_OK)
-			return status;
+		if (parentID == id) {
+			// we have reached the root level directory of this file system
+			// which means we have constructed the full path
+			break;
+		}
 
 		if (!FS_CALL(vnode,fs_get_vnode_name)) {
 			// If we don't got the vnode's name yet, we have to search for it
@@ -771,10 +806,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 				FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->private_node,cookie);
 			}
 
-			if (status < B_OK) {
-				put_vnode(vnode);
-				return status;
-			}
+			if (status < B_OK)
+				goto out;
 		}
 
 		// add the name infront of the current path
@@ -782,8 +815,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		length = strlen(name);
 		insert -= length;
 		if (insert <= 0) {
-			put_vnode(vnode);
-			return ENOBUFS;
+			status = ENOBUFS;
+			goto out;
 		}
 		memcpy(path + insert, name, length);
 		path[--insert] = '/';
@@ -791,13 +824,54 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 
 	// add the mountpoint
 	length = strlen(vnode->mount->mount_point);
-	if (bufferSize - (sizeof(path) - insert) < length + 1)
-		return ENOBUFS;
+	if (bufferSize - (sizeof(path) - insert) < length + 1) {
+		status = ENOBUFS;
+		goto out;
+	}
 
 	memcpy(buffer, vnode->mount->mount_point, length);
 	if (insert != sizeof(path))
 		memcpy(buffer + length, path + insert, sizeof(path) - insert);
 
+out:
+	put_vnode(vnode);
+	return status;
+}
+
+
+static status_t
+check_path(char *to)
+{
+	int32 length = 0;
+
+	// check length of every path component
+
+	while (*to) {
+		char *begin;
+		if (*to == '/')
+			to++, length++;
+		
+		begin = to;
+		while (*to != '/' && *to)
+			to++, length++;
+
+		if (to - begin > B_FILE_NAME_LENGTH)
+			return B_NAME_TOO_LONG;
+	}
+	
+	if (length == 0)
+		return B_ENTRY_NOT_FOUND;
+
+	// complete path if there is a slash at the end
+
+	if (*(to - 1) == '/') {
+		if (length > SYS_MAX_PATH_LEN - 2)
+			return B_NAME_TOO_LONG;
+
+		to[0] = '.';
+		to[1] = '\0';
+	}
+	
 	return B_OK;
 }
 
@@ -810,14 +884,13 @@ int
 vfs_get_vnode(fs_id fsID, vnode_id vnodeID, fs_vnode *_fsNode)
 {
 	struct vnode *vnode;
-	int err;
 
-	err = get_vnode(fsID, vnodeID, &vnode, true);
-	if (err < 0)
-		return err;
+	int status = get_vnode(fsID, vnodeID, &vnode, true);
+	if (status < 0)
+		return status;
 
 	*_fsNode = vnode->private_node;
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
@@ -833,7 +906,7 @@ vfs_put_vnode(fs_id fsID, vnode_id vnodeID)
 	if (vnode)
 		dec_vnode_ref_count(vnode, true);
 
-	return B_NO_ERROR;
+	return B_OK;
 }
 
 
@@ -1869,6 +1942,29 @@ common_sync(int fd, bool kernel)
 
 
 static int
+common_symlink(char *path, const char *toPath, bool kernel)
+{
+	// path validity checks have to be in the calling function!
+	char name[B_FILE_NAME_LENGTH];
+	struct vnode *vnode;
+	int status;
+
+	status = path_to_dir_vnode(path, &vnode, name, kernel);
+	if (status < B_OK)
+		return status;
+
+	if (FS_CALL(vnode,fs_symlink) != NULL)
+		status = FS_CALL(vnode,fs_symlink)(vnode->mount->cookie, vnode->private_node, name, toPath);
+	else
+		status = EROFS;
+
+	put_vnode(vnode);
+
+	return status;
+}
+
+
+static int
 common_unlink(char *path, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
@@ -1928,19 +2024,19 @@ err:
 
 
 static int
-common_write_stat(char *path, struct stat *stat, int stat_mask, bool kernel)
+common_write_stat(char *path, const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("vfs_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, stat_mask, kernel));
+	FUNCTION(("vfs_write_stat: path '%s', stat 0x%p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
 
 	status = path_to_vnode(path, &vnode, kernel);
 	if (status < 0)
 		return status;
 
 	if (FS_CALL(vnode,fs_write_stat))
-		status = FS_CALL(vnode,fs_write_stat)(vnode->mount->cookie, vnode->private_node, stat, stat_mask);
+		status = FS_CALL(vnode,fs_write_stat)(vnode->mount->cookie, vnode->private_node, stat, statMask);
 	else
 		status = EROFS;
 
@@ -2070,29 +2166,27 @@ err:
 static int
 fs_unmount(char *path, bool kernel)
 {
-	struct vnode *v;
 	struct fs_mount *mount;
+	struct vnode *vnode;
 	int err;
 
 	FUNCTION(("vfs_unmount: entry. path = '%s', kernel %d\n", path, kernel));
 
-	err = path_to_vnode(path, &v, kernel);
-	if (err < 0) {
-		err = ERR_VFS_PATH_NOT_FOUND;
-		goto err;
-	}
+	err = path_to_vnode(path, &vnode, kernel);
+	if (err < 0)
+		return ERR_VFS_PATH_NOT_FOUND;
 
 	mutex_lock(&vfs_mount_op_mutex);
 
-	mount = find_mount(v->fs_id);
+	mount = find_mount(vnode->fs_id);
 	if (!mount)
-		panic("vfs_unmount: fsid_to_mount failed on root vnode @%p of mount\n", v);
+		panic("vfs_unmount: fsid_to_mount failed on root vnode @%p of mount\n", vnode);
 
-	if (mount->root_vnode != v) {
+	if (mount->root_vnode != vnode) {
 		// not mountpoint
-		dec_vnode_ref_count(v, false);
+		dec_vnode_ref_count(vnode, false);
 		err = ERR_VFS_NOT_MOUNTPOINT;
-		goto err1;
+		goto err;
 	}
 
 	/* grab the vnode master mutex to keep someone from creating a vnode
@@ -2102,24 +2196,24 @@ fs_unmount(char *path, bool kernel)
 	/* simulate the root vnode having it's refcount decremented */
 	mount->root_vnode->ref_count -= 2;
 
-	/* cycle through the list of vnodes associated with this mount and
-	make sure all of them are not busy or have refs on them */
-	err = 0;
-	for (v = mount->vnodes_head; v; v = v->mount_next) {
-		if (v->busy || v->ref_count != 0) {
+	// cycle through the list of vnodes associated with this mount and
+	// make sure all of them are not busy or have refs on them
+	for (vnode = mount->vnodes_head; vnode != NULL; vnode = vnode->mount_next) {
+		if (vnode->busy || vnode->ref_count != 0) {
 			mount->root_vnode->ref_count += 2;
 			mutex_unlock(&vfs_vnode_mutex);
 			dec_vnode_ref_count(mount->root_vnode, false);
+
 			err = EBUSY;
-			goto err1;
+			goto err;
 		}
 	}
 
 	/* we can safely continue, mark all of the vnodes busy and this mount
 	structure in unmounting state */
-	for (v = mount->vnodes_head; v; v = v->mount_next)
-		if (v != mount->root_vnode)
-			v->busy = true;
+	for (vnode = mount->vnodes_head; vnode; vnode = vnode->mount_next)
+		if (vnode != mount->root_vnode)
+			vnode->busy = true;
 	mount->unmounting = true;
 
 	mutex_unlock(&vfs_vnode_mutex);
@@ -2148,9 +2242,8 @@ fs_unmount(char *path, bool kernel)
 
 	return 0;
 
-err1:
-	mutex_unlock(&vfs_mount_op_mutex);
 err:
+	mutex_unlock(&vfs_mount_op_mutex);
 	return err;
 }
 
@@ -2210,7 +2303,7 @@ error:
 
 
 static int
-fs_write_info(dev_t device, struct fs_info *info, int mask)
+fs_write_info(dev_t device, const struct fs_info *info, int mask)
 {
 	struct fs_mount *mount;
 	int status;
@@ -2264,7 +2357,7 @@ set_cwd(char *path, bool kernel)
 	struct stat stat;
 	int rc;
 
-	FUNCTION(("vfs_set_cwd: path=\'%s\'\n", path));
+	FUNCTION(("vfs_set_cwd: path = \'%s\'\n", path));
 
 	// Get vnode for passed path, and bail if it failed
 	rc = path_to_vnode(path, &vnode, kernel);
@@ -2309,7 +2402,7 @@ err:
 int
 sys_mount(const char *path, const char *device, const char *fs_name, void *args)
 {
-	char buf[SYS_MAX_PATH_LEN+1];
+	char buf[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buf, path, SYS_MAX_PATH_LEN);
 	buf[SYS_MAX_PATH_LEN] = 0;
@@ -2321,7 +2414,7 @@ sys_mount(const char *path, const char *device, const char *fs_name, void *args)
 int
 sys_unmount(const char *path)
 {
-	char buf[SYS_MAX_PATH_LEN+1];
+	char buf[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buf, path, SYS_MAX_PATH_LEN);
 	buf[SYS_MAX_PATH_LEN] = 0;
@@ -2415,7 +2508,7 @@ sys_create_entry_ref(dev_t device, ino_t inode, const char *name, int omode, int
 int
 sys_create(const char *path, int omode, int perms)
 {
-	char buffer[SYS_MAX_PATH_LEN+1];
+	char buffer[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buffer, path, SYS_MAX_PATH_LEN);
 	buffer[SYS_MAX_PATH_LEN] = '\0';
@@ -2439,7 +2532,7 @@ sys_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms)
 int
 sys_create_dir(const char *path, int perms)
 {
-	char buffer[SYS_MAX_PATH_LEN+1];
+	char buffer[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buffer, path, SYS_MAX_PATH_LEN);
 	buffer[SYS_MAX_PATH_LEN] = 0;
@@ -2449,9 +2542,30 @@ sys_create_dir(const char *path, int perms)
 
 
 int
+sys_symlink(const char *userPath, const char *userToPath)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	char toPath[SYS_MAX_PATH_LEN + 1];
+	int status;
+	
+	strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	path[SYS_MAX_PATH_LEN] = '\0';
+
+	strncpy(toPath, userToPath, SYS_MAX_PATH_LEN);
+	toPath[SYS_MAX_PATH_LEN] = '\0';
+
+	status = check_path(toPath);
+	if (status < B_OK)
+		return status;
+
+	return common_symlink(path, toPath, true);
+}
+
+
+int
 sys_unlink(const char *path)
 {
-	char buf[SYS_MAX_PATH_LEN+1];
+	char buf[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buf, path, SYS_MAX_PATH_LEN);
 	buf[SYS_MAX_PATH_LEN] = 0;
@@ -2463,8 +2577,8 @@ sys_unlink(const char *path)
 int
 sys_rename(const char *oldpath, const char *newpath)
 {
-	char buf1[SYS_MAX_PATH_LEN+1];
-	char buf2[SYS_MAX_PATH_LEN+1];
+	char buf1[SYS_MAX_PATH_LEN + 1];
+	char buf2[SYS_MAX_PATH_LEN + 1];
 
 	strncpy(buf1, oldpath, SYS_MAX_PATH_LEN);
 	buf1[SYS_MAX_PATH_LEN] = 0;
@@ -2554,19 +2668,15 @@ sys_setcwd(const char *_path)
 int
 user_mount(const char *upath, const char *udevice, const char *ufs_name, void *args)
 {
-	char path[SYS_MAX_PATH_LEN+1];
-	char fs_name[SYS_MAX_OS_NAME_LEN+1];
-	char device[SYS_MAX_PATH_LEN+1];
+	char path[SYS_MAX_PATH_LEN + 1];
+	char fs_name[SYS_MAX_OS_NAME_LEN + 1];
+	char device[SYS_MAX_PATH_LEN + 1];
 	int rc;
 
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+	if (!CHECK_USER_ADDRESS(upath)
+		|| !CHECK_USER_ADDRESS(ufs_name)
+		|| !CHECK_USER_ADDRESS(udevice))
 		return B_BAD_ADDRESS;
-
-	if ((addr)ufs_name >= KERNEL_BASE && (addr)ufs_name <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if (udevice != NULL && (addr)udevice >= KERNEL_BASE && (addr)udevice <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
 
 	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
 	if (rc < 0)
@@ -2593,7 +2703,7 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 int
 user_unmount(const char *upath)
 {
-	char path[SYS_MAX_PATH_LEN+1];
+	char path[SYS_MAX_PATH_LEN + 1];
 	int rc;
 
 	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
@@ -2633,16 +2743,16 @@ user_open_entry_ref(dev_t device, ino_t inode, const char *uname, int omode)
 int
 user_open(const char *upath, int omode)
 {
-	char path[SYS_MAX_PATH_LEN];
+	char path[SYS_MAX_PATH_LEN + 1];
 	int rc;
 
 	if (!CHECK_USER_ADDRESS(upath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_strncpy(path, upath, sizeof(path) - 1);
+	rc = user_strncpy(path, upath, sizeof(path));
 	if (rc < 0)
 		return rc;
-	path[sizeof(path) - 1] = 0;
+	path[sizeof(path)] = 0;
 
 	return file_open(path, omode, false);
 }
@@ -2676,16 +2786,16 @@ user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 int
 user_open_dir(const char *upath)
 {
-	char path[SYS_MAX_PATH_LEN];
+	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
 
 	if (!CHECK_USER_ADDRESS(upath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	status = user_strncpy(path, upath, sizeof(path) - 1);
+	status = user_strncpy(path, upath, sizeof(path));
 	if (status < 0)
 		return status;
-	path[sizeof(path) - 1] = 0;
+	path[sizeof(path)] = 0;
 
 	return dir_open(path, false);
 }
@@ -2719,16 +2829,16 @@ user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, i
 int
 user_create(const char *upath, int omode, int perms)
 {
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
+	char path[SYS_MAX_PATH_LEN + 1];
+	int status;
 
 	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
+	status = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN] = '\0';
 
 	return file_create(path, omode, perms, false);
 }
@@ -2755,25 +2865,54 @@ user_create_dir_entry_ref(dev_t device, ino_t inode, const char *uname, int perm
 int
 user_create_dir(const char *upath, int perms)
 {
-	char path[SYS_MAX_PATH_LEN];
-	int rc;
+	char path[SYS_MAX_PATH_LEN + 1];
+	int status;
 
 	if (!CHECK_USER_ADDRESS(upath))
 		return ERR_VM_BAD_USER_MEMORY;
 
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN - 1);
-	if (rc < 0)
-		return rc;
-	path[SYS_MAX_PATH_LEN - 1] = '\0';
+	status = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN] = '\0';
 
 	return dir_create(path, perms, false);
 }
 
 
 int
+user_symlink(const char *userPath, const char *userToPath)
+{
+	char path[SYS_MAX_PATH_LEN + 1];
+	char toPath[SYS_MAX_PATH_LEN + 1];
+	int status;
+	
+	if (!CHECK_USER_ADDRESS(userPath)
+		|| !CHECK_USER_ADDRESS(userToPath))
+		return B_BAD_ADDRESS;
+
+	status = user_strncpy(path, userPath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	path[SYS_MAX_PATH_LEN] = '\0';
+
+	status = user_strncpy(toPath, userToPath, SYS_MAX_PATH_LEN);
+	if (status < 0)
+		return status;
+	toPath[SYS_MAX_PATH_LEN] = '\0';
+
+	status = check_path(toPath);
+	if (status < B_OK)
+		return status;
+
+	return common_symlink(path, toPath, false);
+}
+
+
+int
 user_unlink(const char *upath)
 {
-	char path[SYS_MAX_PATH_LEN+1];
+	char path[SYS_MAX_PATH_LEN + 1];
 	int rc;
 
 	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
@@ -2791,8 +2930,8 @@ user_unlink(const char *upath)
 int
 user_rename(const char *uoldpath, const char *unewpath)
 {
-	char oldpath[SYS_MAX_PATH_LEN+1];
-	char newpath[SYS_MAX_PATH_LEN+1];
+	char oldpath[SYS_MAX_PATH_LEN + 1];
+	char newpath[SYS_MAX_PATH_LEN + 1];
 	int rc;
 
 	if ((addr)uoldpath >= KERNEL_BASE && (addr)uoldpath <= KERNEL_TOP)
