@@ -1298,8 +1298,8 @@
       char_height = 1 * 64;
 
     /* Compute pixel sizes in 26.6 units */
-    dim_x = ( ( ( char_width  * horz_resolution ) / 72 ) + 32 ) & -64;
-    dim_y = ( ( ( char_height * vert_resolution ) / 72 ) + 32 ) & -64;
+    dim_x =  ( ( char_width  * horz_resolution ) / 72 ) ;
+    dim_y =  ( ( char_height * vert_resolution ) / 72 ) ;
 
     metrics->x_ppem  = (FT_UShort)( dim_x >> 6 );
     metrics->y_ppem  = (FT_UShort)( dim_y >> 6 );
@@ -1314,6 +1314,15 @@
 
       ft_recompute_scaled_metrics( face, metrics );
     }
+
+    face->internal->orig_width  = char_width;
+    face->internal->orig_height = char_height;
+    
+    face->internal->orig_horz_res = horz_resolution;
+    face->internal->orig_vert_res = vert_resolution;
+
+    face->internal->orig_x_scale = metrics->x_scale;
+    face->internal->orig_y_scale = metrics->y_scale;
 
     if ( clazz->set_char_sizes )
       error = clazz->set_char_sizes( face->size,
@@ -1370,6 +1379,14 @@
       ft_recompute_scaled_metrics( face, metrics );
     }
 
+    face->internal->orig_width  = pixel_width  << 6;
+    face->internal->orig_height = pixel_height << 6;
+    
+    face->internal->orig_horz_res = 0;
+    face->internal->orig_vert_res = 0;
+    
+    face->internal->orig_x_scale = metrics->x_scale;
+    face->internal->orig_y_scale = metrics->y_scale;
     if ( clazz->set_pixel_sizes )
       error = clazz->set_pixel_sizes( face->size,
                                       pixel_width,

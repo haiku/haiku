@@ -387,7 +387,8 @@ FT_BEGIN_HEADER
 
 #define AH_BLUE_CAPITAL_TOP     0                              /* THEZOCQS */
 #define AH_BLUE_CAPITAL_BOTTOM  ( AH_BLUE_CAPITAL_TOP + 1 )    /* HEZLOCUS */
-#define AH_BLUE_SMALL_TOP       ( AH_BLUE_CAPITAL_BOTTOM + 1 ) /* xzroesc  */
+#define AH_BLUE_SMALL_F_TOP     ( AH_BLUE_CAPITAL_BOTTOM + 1 ) /* fijkdbh  */
+#define AH_BLUE_SMALL_TOP       ( AH_BLUE_SMALL_F_TOP + 1 )    /* xzroesc  */
 #define AH_BLUE_SMALL_BOTTOM    ( AH_BLUE_SMALL_TOP + 1 )      /* xzroesc  */
 #define AH_BLUE_SMALL_MINOR     ( AH_BLUE_SMALL_BOTTOM + 1 )   /* pqgjy    */
 #define AH_BLUE_MAX             ( AH_BLUE_SMALL_MINOR + 1 )

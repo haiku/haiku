@@ -28,7 +28,9 @@
 
 
 #define FACE_GLOBALS( face )  ((AH_Face_Globals)(face)->autohint.data)
+#define ABSVAL( x ) ( ( ( x ) < 0 ) ? -( x ) : ( x ))
 
+#define SMOOTH_DEFAULT
 #define AH_USE_IUP
 #define OPTIM_STEM_SNAP
 
@@ -91,7 +93,9 @@
   static FT_Pos
   ah_compute_stem_width( AH_Hinter  hinter,
                          int        vertical,
-                         FT_Pos     width )
+                         FT_Pos     width,
+                         AH_Edge_Flags base_flags,
+                         AH_Edge_Flags stem_flags )
   {
     AH_Globals  globals = &hinter->globals->scaled;
     FT_Pos      dist    = width;
@@ -107,10 +111,20 @@
     if ( (  vertical && !hinter->do_vert_snapping ) ||
          ( !vertical && !hinter->do_horz_snapping ) )
     {
-      /* smooth hinting process, very lightly quantize the stem width */
-      /*                                                              */
-      if ( dist < 64 )
-        dist = 64;
+      /* leave the widths of serifs alone */
+
+      if ( ( stem_flags & AH_EDGE_SERIF ) && vertical && ( dist < 3 * 64 ) )
+        goto Done_Width;
+
+
+      else if ( ( base_flags & AH_EDGE_ROUND ) ) {
+
+        if ( dist < 96 )
+          dist = 64;
+      }
+
+      else if ( dist < 56 )
+        dist = 56;
 
       {
         FT_Pos  delta = dist - globals->stds[vertical];
@@ -124,6 +138,7 @@
           dist = globals->stds[vertical];
           if ( dist < 48 )
             dist = 48;
+            goto Done_Width;
         }
 
         if ( dist < 3 * 64 )
@@ -190,6 +205,9 @@
             dist = ( dist + 32 ) & -64;
         }
       }
+      
+      Done_Width:
+      
     }
 
     if ( sign )
@@ -208,9 +226,13 @@
   {
     FT_Pos  dist = stem_edge->opos - base_edge->opos;
 
+    FT_Pos  fitted_width = ah_compute_stem_width( hinter,
+                                                  vertical,
+                                                  dist,
+                                                  base_edge->flags,
+                                                  stem_edge->flags );
 
-    stem_edge->pos = base_edge->pos +
-                     ah_compute_stem_width( hinter, vertical, dist );
+    stem_edge->pos = base_edge->pos + fitted_width;
   }
 
 
@@ -364,43 +386,120 @@
 
         if ( !anchor )
         {
-          edge->pos = ( edge->opos + 32 ) & -64;
+          FT_Pos   org_len, org_center, cur_len;
+          FT_Pos   cur_pos1, delta1, u_off, d_off;
+
+          org_len    = edge2->opos - edge->opos;
+          cur_len    = ah_compute_stem_width( hinter, dimension, org_len,
+                                              edge->flags, edge2->flags   );
+
+          if (cur_len <= 64 )
+            u_off = d_off = 32;
+          else
+          {
+            u_off = 38;
+            d_off = 26;
+          }
+
+          if ( cur_len < 96 ) {
+
+            org_center = edge->opos + ( org_len >> 1 );
+
+            cur_pos1   = ( org_center + 32 ) & -64;
+
+            delta1 = ABSVAL(   org_center - ( cur_pos1 - u_off ) ) -
+                     ABSVAL( ( org_center - ( cur_pos1 + d_off ) ) );
+
+            if ( delta1 < 0 )
+              cur_pos1 -= u_off;
+            else
+              cur_pos1 += d_off;
+
+            edge->pos  = cur_pos1 - cur_len / 2;
+            edge2->pos = cur_pos1 + cur_len / 2;
+
+          }
+          else
+            edge->pos = ( edge->opos + 32 ) & -64;
+
           anchor    = edge;
 
           edge->flags |= AH_EDGE_DONE;
 
           ah_align_linked_edge( hinter, edge, edge2, dimension );
         }
+        
         else
         {
           FT_Pos   org_pos, org_len, org_center, cur_len;
-          FT_Pos   cur_pos1, cur_pos2, delta1, delta2;
-
-
+          FT_Pos   cur_pos1, cur_pos2, delta1, delta2, u_off, d_off;
+          
           org_pos    = anchor->pos + (edge->opos - anchor->opos);
           org_len    = edge2->opos - edge->opos;
           org_center = org_pos + ( org_len >> 1 );
 
-          cur_len    = ah_compute_stem_width( hinter, dimension, org_len );
+          cur_len    = ah_compute_stem_width( hinter, dimension, org_len,
+                                              edge->flags, edge2->flags  );
 
-          cur_pos1   = ( org_pos + 32 ) & -64;
-          delta1     = ( cur_pos1 + ( cur_len >> 1 ) - org_center );
-          if ( delta1 < 0 )
-            delta1 = -delta1;
+          if ( cur_len < 96 )
+          {
+            cur_pos1   = ( org_center + 32 ) & -64;
 
-          cur_pos2   = ( ( org_pos + org_len + 32 ) & -64 ) - cur_len;
-          delta2     = ( cur_pos2 + ( cur_len >> 1 ) - org_center );
-          if ( delta2 < 0 )
-            delta2 = -delta2;
 
-          edge->pos  = ( delta1 <= delta2 ) ? cur_pos1 : cur_pos2;
-          edge2->pos = edge->pos + cur_len;
+            if (cur_len <= 64 )
+              u_off = d_off = 32;
+            else
+            {
+              u_off = 38;
+              d_off = 26;
+            }
 
-          edge->flags  |= AH_EDGE_DONE;
-          edge2->flags |= AH_EDGE_DONE;
+            delta1 = ABSVAL(   org_center - ( cur_pos1 - u_off ) ) -
+                     ABSVAL( ( org_center - ( cur_pos1 + d_off ) ) );
 
-          if ( edge > edges && edge->pos < edge[-1].pos )
-            edge->pos = edge[-1].pos;
+            if ( delta1 < 0 )
+              cur_pos1 -= u_off;
+            else
+              cur_pos1 += d_off;
+
+            edge->pos  = cur_pos1 - cur_len / 2;
+            edge2->pos = cur_pos1 + cur_len / 2;
+
+            edge->flags  |= AH_EDGE_DONE;
+            edge2->flags |= AH_EDGE_DONE;
+
+            if ( edge > edges && edge->pos < edge[-1].pos )
+              edge->pos = edge[-1].pos;
+          }
+
+          else
+          {
+
+            org_pos    = anchor->pos + (edge->opos - anchor->opos);
+            org_len    = edge2->opos - edge->opos;
+            org_center = org_pos + ( org_len >> 1 );
+
+            cur_len    = ah_compute_stem_width( hinter, dimension, org_len, edge->flags, edge2->flags );
+
+            cur_pos1   = ( org_pos + 32 ) & -64;
+            delta1     = ( cur_pos1 + ( cur_len >> 1 ) - org_center );
+            if ( delta1 < 0 )
+              delta1 = -delta1;
+
+            cur_pos2   = ( ( org_pos + org_len + 32 ) & -64 ) - cur_len;
+            delta2     = ( cur_pos2 + ( cur_len >> 1 ) - org_center );
+            if ( delta2 < 0 )
+              delta2 = -delta2;
+
+            edge->pos  = ( delta1 < delta2 ) ? cur_pos1 : cur_pos2;
+            edge2->pos = edge->pos + cur_len;
+
+            edge->flags  |= AH_EDGE_DONE;
+            edge2->flags |= AH_EDGE_DONE;
+
+            if ( edge > edges && edge->pos < edge[-1].pos )
+              edge->pos = edge[-1].pos;
+          }
         }
       }
 
@@ -1057,6 +1156,65 @@
     AH_Outline        outline  = hinter->glyph;
     AH_Loader         gloader  = hinter->loader;
 
+    {
+      /* Scale the glyph so that, even before grid-fitting, if it has an edge */
+      /* which corresponds to AH_BLUE_SMALL_TOP, then that edge is already    */
+      /* aligned on a pixel boundry.  This helps to preserve the original     */
+      /* shape of the glyph.                                                  */
+
+      AH_Globals  globals_scaled = &hinter->globals->scaled;
+      AH_Globals  globals_design = &hinter->globals->design;
+
+      FT_Int      opt_height, opt_width;  /* optimal h/w to send */
+      FT_Int      pointSize;
+      FT_Int      reset_dim_x, reset_dim_y;
+      FT_Fixed    reset_x_scale, reset_y_scale;
+      FT_Pos      fitted_blue, active_blue;
+
+      y_scale = face->internal->orig_y_scale;
+
+      globals_scaled = &hinter->globals->scaled;
+      globals_design = &hinter->globals->design;
+
+      active_blue = FT_MulFix( globals_design->blue_shoots[AH_BLUE_SMALL_TOP],
+                               face->internal->orig_y_scale );
+
+      fitted_blue = ( active_blue + 32 ) & -64;
+
+      opt_height = ((float)fitted_blue/(float)active_blue) *
+                   (float)face->internal->orig_height;
+
+      reset_dim_x = face->internal->orig_width;
+      reset_dim_y = face->internal->orig_height;
+
+      reset_x_scale = face->internal->orig_x_scale;
+      reset_y_scale = face->internal->orig_y_scale;
+
+      pointSize = (int) face->internal->orig_width;
+
+      if(opt_height > face->internal->orig_height)
+        opt_width = 0.98 * opt_height;
+      else
+        opt_width = opt_height;
+        
+      error = FT_Set_Char_Size( face,
+                                opt_width,
+                                opt_height,
+                                face->internal->orig_horz_res,
+                                face->internal->orig_vert_res );
+
+      ah_hinter_scale_globals( hinter,
+                               face->size->metrics.x_scale,
+                               face->size->metrics.y_scale );
+
+      face->internal->orig_height = reset_dim_y;
+      face->internal->orig_width  = reset_dim_x;
+
+      face->internal->orig_x_scale = reset_x_scale;
+      face->internal->orig_y_scale = reset_y_scale;
+    
+    }
+
 
     /* load the glyph */
     error = FT_Load_Glyph( face, glyph_index, load_flags );
@@ -1160,18 +1318,26 @@
         AH_Edge  edge2 = edge1 +
                          outline->num_vedges - 1; /* rightmost edge */
 
+        /* fit_shift is used to center the glyph in the fitted advance */
+
+        FT_Pos   fit_shift = ( ( hinter->pp2.x + 32 ) & -64 )
+                             - hinter->pp2.x;
 
         old_advance = hinter->pp2.x;
         old_rsb     = old_advance - edge2->opos;
         old_lsb     = edge1->opos;
         new_lsb     = edge1->pos;
 
-        hinter->pp1.x = ( ( new_lsb    - old_lsb ) + 32 ) & -64;
-        hinter->pp2.x = ( ( edge2->pos + old_rsb ) + 32 ) & -64;
-
-        /* try to fix certain bad advance computations */
-        if ( hinter->pp2.x + hinter->pp1.x == edge2->pos && old_rsb > 4 )
-          hinter->pp2.x += 64;
+        if ( hinter->do_horz_hints )
+        {
+          hinter->pp1.x = ( ( new_lsb    - old_lsb - fit_shift/2 ) + 32 ) & -64;
+          hinter->pp2.x = ( ( edge2->pos + old_rsb - fit_shift/2 ) + 32 ) & -64;
+        }
+        else
+        {
+          hinter->pp1.x -= fit_shift / 2;
+          hinter->pp2.x -= fit_shift / 2;
+        }
       }
 
       /* good, we simply add the glyph to our loader's base */
@@ -1408,8 +1574,14 @@
 
     ah_loader_rewind( hinter->loader );
 
+#ifdef SMOOTH_DEFAULT
+    hint_mode = FT_RENDER_MODE_SMOOTH;
+#endif
+
     /* reset hinting flags according to load flags and current render target */
-    hinter->do_horz_hints = !FT_BOOL( load_flags & FT_LOAD_NO_AUTOHINT );
+    hinter->do_horz_hints = !FT_BOOL( ( load_flags & FT_LOAD_NO_AUTOHINT ) ||
+                                      hint_mode == FT_RENDER_MODE_SMOOTH   );
+
     hinter->do_vert_hints = !FT_BOOL( load_flags & FT_LOAD_NO_AUTOHINT );
 
 #ifdef DEBUG_HINTER
@@ -1419,8 +1591,9 @@
 
     /* we snap the width of vertical stems for the monochrome and         */
     /* horizontal LCD rendering targets only.  Corresponds to X snapping. */
-    hinter->do_horz_snapping = FT_BOOL( hint_mode == FT_RENDER_MODE_MONO ||
-                                        hint_mode == FT_RENDER_MODE_LCD  );
+    hinter->do_horz_snapping = FT_BOOL( hint_mode == FT_RENDER_MODE_MONO   ||
+                                        hint_mode == FT_RENDER_MODE_LCD    ||
+                                        hint_mode == FT_RENDER_MODE_SMOOTH );
 
     /* we snap the width of horizontal stems for the monochrome and     */
     /* vertical LCD rendering targets only.  Corresponds to Y snapping. */

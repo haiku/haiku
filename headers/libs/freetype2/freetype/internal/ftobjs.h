@@ -321,6 +321,15 @@ FT_BEGIN_HEADER
     FT_UInt32    hint_flags;
 
     const char*  postscript_name;
+    
+	FT_F26Dot6   orig_width;
+	FT_F26Dot6   orig_height;
+	
+	FT_UInt      orig_horz_res;
+	FT_UInt      orig_vert_res;
+	
+	FT_Fixed     orig_x_scale;
+	FT_Fixed     orig_y_scale;
 
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
     FT_Incremental_InterfaceRec*  incremental_interface;

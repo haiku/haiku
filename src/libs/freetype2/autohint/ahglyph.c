@@ -1351,7 +1351,10 @@
               edge2 = seg2->edge;
 
             if ( is_serif )
+            {
               edge->serif = edge2;
+              edge2->flags |= AH_EDGE_SERIF;
+            }
             else
               edge->link  = edge2;
           }
@@ -1477,8 +1480,8 @@
 
       /* compute the initial threshold as a fraction of the EM size */
       best_dist = FT_MulFix( face_globals->face->units_per_EM / 40, y_scale );
-      if ( best_dist > 64 / 4 )
-        best_dist = 64 / 4;
+      if ( best_dist > 64 / 2 )
+        best_dist = 64 / 2;
 
       for ( blue = AH_BLUE_CAPITAL_TOP; blue < AH_BLUE_MAX; blue++ )
       {

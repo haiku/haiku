@@ -568,11 +568,11 @@
 
     /* Compute root ascender, descender, test height, and max_advance */
     metrics->ascender    = ( FT_MulFix( face->root.ascender,
-                                        metrics->y_scale ) + 32 ) & -64;
+                                        metrics->y_scale ) + 63 ) & -64;
     metrics->descender   = ( FT_MulFix( face->root.descender,
-                                        metrics->y_scale ) + 32 ) & -64;
+                                        metrics->y_scale ) + 0 ) & -64;
     metrics->height      = ( FT_MulFix( face->root.height,
-                                        metrics->y_scale ) + 32 ) & -64;
+                                        metrics->y_scale ) + 63 ) & -64;
     metrics->max_advance = ( FT_MulFix( face->root.max_advance_width,
                                         metrics->x_scale ) + 32 ) & -64;
 

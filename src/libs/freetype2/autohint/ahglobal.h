@@ -33,7 +33,8 @@ FT_BEGIN_HEADER
 
 
 #define AH_IS_TOP_BLUE( b )  ( (b) == AH_BLUE_CAPITAL_TOP || \
-                               (b) == AH_BLUE_SMALL_TOP   )
+                               (b) == AH_BLUE_SMALL_TOP || \
+                               (b) == AH_BLUE_SMALL_F_TOP )
 
 
   /* compute global metrics automatically */
