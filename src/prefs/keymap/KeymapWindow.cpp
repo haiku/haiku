@@ -53,6 +53,8 @@ KeymapWindow::KeymapWindow( BRect frame )
 
 	fMapView = new MapView(BRect(149,29,601,209), "mapView");
 	AddChild(fMapView);
+	
+	SetPulseRate(10000);
 }
 
 
@@ -329,7 +331,7 @@ KeymapWindow::UseKeymap()
 
 
 MapView::MapView(BRect rect, const char *name)
-	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW)
+	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW | B_PULSE_NEEDED)
 {
 
 }
@@ -338,44 +340,6 @@ MapView::MapView(BRect rect, const char *name)
 void
 MapView::Draw(BRect rect)
 {
-	/*rgb_color color = HighColor();
-	BPoint points[] = { BPoint(11,19), BPoint(139,19), BPoint(141,21), 
-						BPoint(141,119), BPoint(139,121), BPoint(118,121), 
-						BPoint(118,126), BPoint(117,127), BPoint(33,127),
-						BPoint(32,126), BPoint(32,121),BPoint(11,121),
-						BPoint(9,119),BPoint(9,21),BPoint(11,19) };
-	
-	SetHighColor(LowColor());
-	FillRect(BRect(9,19,141,127));
-	if(fIsDesktop) {				
-		SetHighColor(184,184,184);
-		FillPolygon(points, 15);
-		SetHighColor(96,96,96);
-		StrokePolygon(points, 15);
-		FillRect(BRect(107,121,111,123));
-		SetHighColor(0,0,0);
-		StrokeRect(BRect(14,24,136,116));
-		SetHighColor(0,255,0);
-		FillRect(BRect(101,122,103,123));
-	} else {
-		SetHighColor(152,152,152);
-		StrokeLine(BPoint(11,13), BPoint(67,13));
-		StrokeLine(BPoint(67,21));
-		StrokeLine(BPoint(139,21));
-		StrokeLine(BPoint(139,119));
-		StrokeLine(BPoint(11,119));
-		StrokeLine(BPoint(11,13));
-		StrokeRect(BRect(14,24,136,116));
-		SetHighColor(255,203,0);
-		FillRect(BRect(12,14,66,21));
-		SetHighColor(240,240,240);
-		StrokeRect(BRect(12,22,137,117));
-		StrokeLine(BPoint(138,22), BPoint(138,22));
-		StrokeLine(BPoint(12,118), BPoint(12,118));
-		SetHighColor(200,200,200);
-		StrokeRect(BRect(13,23,138,118));
-	}
-	SetHighColor(color);*/
 	BRect r = Bounds();
 	SetHighColor(0,0,0);
 	StrokeRect(r);
@@ -404,217 +368,297 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(r.right-9, r.bottom), BPoint(r.right-2, r.bottom));
 	StrokeLine(BPoint(r.right, r.bottom-9), BPoint(r.right, r.bottom-2));
 	
-	bool pressed = false;
+	int32 i = 1;
+#define isPressed(i) (fOldKeyInfo.key_states[i>>3] & (1 << (7 - i%8)) ) 
 	
 	// Esc key
 	BRect keyRect = BRect(11,50,29,68);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	DrawBorder(keyRect.InsetByCopy(-1, -1));
 	
 	// Fx keys
+	i++;
 	keyRect.OffsetBySelf(36,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	DrawBorder(BRect(keyRect.left - 55, 49, keyRect.right + 1, 69));
 	
+	i++;
 	keyRect.OffsetBySelf(27,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	DrawBorder(BRect(keyRect.left - 55, 49, keyRect.right + 1, 69));
 	
+	i++;
 	keyRect.OffsetBySelf(27,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	DrawBorder(BRect(keyRect.left - 55, 49, keyRect.right + 1, 69));
 	
 	// Pause, PrintScreen, ...
+	i++;
 	keyRect.OffsetBySelf(35,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	DrawBorder(BRect(keyRect.left - 37, 49, keyRect.right + 1, 69));
 	
 	// 1st line : numbers and backspace
+	i++;
 	keyRect = BRect(11,78,29,96);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
 	keyRect.right += 18;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	keyRect.left += 18;
 	
 	// Insert, pg up ...
+	i++;
 	keyRect.OffsetBySelf(35,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(0x20));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(0x21));
 	
 	DrawBorder(BRect(keyRect.left - 37, 77, keyRect.right + 1, 115));
 	
 	// 2nd line : tab and azerty ...
+	i = 0x26;
 	keyRect = BRect(11,96,38,114);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(27,0);
 	keyRect.right -= 9;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
 	keyRect.right += 9;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	keyRect.left += 9;
 	
 	// Suppr, pg down ...
+	i++;
 	keyRect.OffsetBySelf(35,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	// 3rd line : caps and qsdfg ...
+	i = 0x3b;
 	keyRect = BRect(11,114,47,132);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(36,0);
 	keyRect.right -= 18;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
 	keyRect.right += 18;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	keyRect.left += 18;
 	
 	// 4th line : shift and wxcv ...
+	i = 0x4b;
 	keyRect = BRect(11,132,56,150);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(45,0);
 	keyRect.right -= 27;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
 	keyRect.right += 27;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	keyRect.left += 27;
 	
 	//5th line : Ctrl, Alt, Space ...
+	i = 0x5c;
 	keyRect = BRect(11,150,38,168);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(27,0);
 	keyRect.OffsetBySelf(26,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(27,0);
 	keyRect.right += 92;
-	DrawKey(keyRect, pressed, true);
+	DrawKey(keyRect, isPressed(i), true);
+	i++;
 	keyRect.right -= 92;
 	keyRect.OffsetBySelf(92,0);
 	keyRect.OffsetBySelf(27,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(26,0);
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	SetHighColor(80,80,80);
 	StrokeLine(BPoint(10,169), BPoint(10,77));
@@ -636,14 +680,18 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(11,169));
 	
 	// Arrows
+	i++;
 	keyRect = BRect(298,150,316,168);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i = 0x57;
 	keyRect.OffsetBySelf(-18,-18);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	SetHighColor(80,80,80);
 	StrokeLine(BPoint(297,169), BPoint(297,149));
@@ -657,50 +705,69 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(298,169));
 	
 	// numkeys
+	i = 0x22;
 	keyRect = BRect(369,78,387,96);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i = 0x37;
 	keyRect.OffsetBySelf(-54, 18);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
 	keyRect.bottom += 18;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i = 0x48;
 	keyRect.bottom -= 18;
 	keyRect.OffsetBySelf(-54, 18);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i = 0x58;
 	keyRect.OffsetBySelf(-36, 18);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.OffsetBySelf(18,0);
 	keyRect.bottom += 18;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i = 0x64;
 	keyRect.bottom -= 18;
 	keyRect.OffsetBySelf(-54, 18);
 	keyRect.right += 18;
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
+	i++;
 	keyRect.right -= 18;
 	keyRect.OffsetBySelf(36,0);
-	DrawKey(keyRect, pressed);
+	DrawKey(keyRect, isPressed(i));
 	
 	DrawBorder(BRect(keyRect.left - 37, 77, keyRect.right + 19, 169));
 	
 	// lights
+#define isLighted(i) (fOldKeyInfo.modifiers & i) 
+
 	DrawBorder(BRect(368, 49, 442, 69));
 	
 	BFont font(be_plain_font);
@@ -717,7 +784,7 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(lightRect.right-1, lightRect.top), lightRect.LeftTop());
 	StrokeLine(BPoint(lightRect.left, lightRect.bottom-1));
 	SetHighColor(0,55,0);
-	if (pressed) 
+	if (isLighted(B_NUM_LOCK)) 
 		SetHighColor(0,178,0);
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
@@ -731,7 +798,7 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(lightRect.right-1, lightRect.top), lightRect.LeftTop());
 	StrokeLine(BPoint(lightRect.left, lightRect.bottom-1));
 	SetHighColor(0,55,0);
-	if (pressed) 
+	if (isLighted(B_CAPS_LOCK)) 
 		SetHighColor(0,178,0);
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
@@ -745,7 +812,7 @@ MapView::Draw(BRect rect)
 	StrokeLine(BPoint(lightRect.right-1, lightRect.top), lightRect.LeftTop());
 	StrokeLine(BPoint(lightRect.left, lightRect.bottom-1));
 	SetHighColor(0,55,0);
-	if (pressed) 
+	if (isLighted(B_SCROLL_LOCK)) 
 		SetHighColor(0,178,0);
 	FillRect(lightRect.InsetByCopy(1,1));
 	SetHighColor(64,64,64);
@@ -888,4 +955,29 @@ MapView::DrawBorder(BRect borderRect)
 	SetHighColor(255,255,255);
 	StrokeLine(BPoint(borderRect.left + 1, borderRect.bottom), borderRect.RightBottom());
 	StrokeLine(BPoint(borderRect.right, borderRect.top + 1));
+}
+
+void
+MapView::Pulse()
+{
+	key_info info;
+	bool need_update = false;
+	get_key_info(&info);
+
+	if (fOldKeyInfo.modifiers != info.modifiers) {
+		need_update = true;
+	}
+		
+	for (int8 i=0; i<16; i++)
+		if (fOldKeyInfo.key_states[i] != info.key_states[i]) {
+			need_update = true;
+			break;
+		}
+		
+	if (need_update) {
+		fOldKeyInfo.modifiers = info.modifiers;
+		for (int8 j=0; j<16; j++) 
+			fOldKeyInfo.key_states[j] = info.key_states[j];
+		Invalidate();
+	}	
 }

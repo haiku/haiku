@@ -25,7 +25,9 @@ public:
 	void Draw(BRect rect);
 	void DrawKey(BRect rect, bool pressed, bool vertical = false);
 	void DrawBorder(BRect borderRect);
+	void Pulse();
 
+	key_info fOldKeyInfo;
 };
 
 
