@@ -355,8 +355,8 @@ static
 int
 cmp_partition_offset(const void *p1, const void *p2)
 {
-	const Partition *partition1 = *static_cast<const Partition **>(p1);
-	const Partition *partition2 = *static_cast<const Partition **>(p2);
+	const Partition *partition1 = *(const Partition**)p1;
+	const Partition *partition2 = *(const Partition**)p2;
 	if (partition1->Offset() < partition2->Offset())
 		return -1;
 	else if (partition1->Offset() > partition2->Offset())
