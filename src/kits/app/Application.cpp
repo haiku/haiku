@@ -551,6 +551,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 			fInitError = regError;
 	}
 	// TODO: SetName()
+	// TODO: create_app_meta_mime()
 	// return the error
 	if (error)
 		*error = fInitError;
