@@ -3,7 +3,7 @@
 
 #include "ScreenSettings.h"
 
-const char ScreenSettings::fScreenSettingsFile[] = "OBOS_Screen_data";
+const char ScreenSettings::fScreenSettingsFile[] = "Screen_data";
 
 ScreenSettings::ScreenSettings()
 {
@@ -11,6 +11,10 @@ ScreenSettings::ScreenSettings()
 	
 	if (!screen.IsValid())
 		; //Debugger() ?
+	
+	fWindowFrame.Set( 0, 0, 356, 202 );
+	
+	BRect screenFrame = screen.Frame();
 		
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK)
@@ -20,19 +24,17 @@ ScreenSettings::ScreenSettings()
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK)
 		{
-			file.Read(&fWindowFrame, sizeof(BRect));
+			BPoint point;
+			file.Read(&point, sizeof(BPoint));
+			fWindowFrame.OffsetTo(point);
 			
 			if (screen.Frame().right >= fWindowFrame.right
 				&& screen.Frame().bottom >= fWindowFrame.bottom)
 				return;
 		}
 	}
-	
-	fWindowFrame = screen.Frame();
-	fWindowFrame.left = (fWindowFrame.right / 2) - 178;
-	fWindowFrame.top = (fWindowFrame.right / 2) - 101;
-	fWindowFrame.right = fWindowFrame.left + 356;
-	fWindowFrame.bottom = fWindowFrame.top + 202;
+	fWindowFrame.OffsetTo((screenFrame.Width() - fWindowFrame.Width()) / 2,
+		(screenFrame.Height() - fWindowFrame.Height()) /2 );
 }
 
 
@@ -45,8 +47,10 @@ ScreenSettings::~ScreenSettings()
 	path.Append(fScreenSettingsFile);
 
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
-	if (file.InitCheck() == B_OK)
-		file.Write(&fWindowFrame, sizeof(BRect));
+	if (file.InitCheck() == B_OK) {
+		BPoint point(fWindowFrame.LeftTop());
+		file.Write(&point, sizeof(BPoint));
+	}
 }
 
 

@@ -12,6 +12,7 @@
 #include <math.h>
 #include <cstring>
 #include <cstdlib>
+#include <cstdio>
 
 #include "ScreenWindow.h"
 #include "ScreenDrawView.h"
@@ -371,8 +372,6 @@ ScreenWindow::MessageReceived(BMessage* message)
 		
 			PostMessage(Message, fScreenDrawView);
 			
-			if (fResolutionMenu->FindMarked() == fInitialResolution)
-			
 			break;
 		}
 		
@@ -425,6 +424,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 		}
 		
 		case BUTTON_REVERT_MSG:
+		case SET_INITIAL_MODE_MSG:
 		{	
 			fInitialResolution->SetMarked(true);
 			fInitialColors->SetMarked(true);
@@ -452,6 +452,14 @@ ScreenWindow::MessageReceived(BMessage* message)
 				fRefreshMenu->Superitem()->SetLabel(string.String());
 			}
 			
+			if (message->what == SET_INITIAL_MODE_MSG)
+			{
+				BScreen screen(B_MAIN_SCREEN_ID);
+				if (!screen.IsValid())
+					break;
+							
+				screen.SetMode(&fInitialMode);
+			}
 			break;
 		}
 			
@@ -549,38 +557,7 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 			break;
 		}
-		
-		case SET_INITIAL_MODE_MSG:
-		{
-			BMenuItem *Other = fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG);
-		
-			if (fInitialRefresh == Other)
-			{	
-				Other->SetMarked(true);
 				
-				BString String;		
-				String << fInitialRefreshN;
-				int32 point = String.FindFirst('.');
-				String.Truncate(point + 2);
-			
-				String << " Hz/Other...";
-			
-				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(String.String());
-			
-				point = String.FindFirst('/');
-				String.Truncate(point);
-			
-				fRefreshMenu->Superitem()->SetLabel(String.String());
-			}
-			BScreen screen(B_MAIN_SCREEN_ID);
-			if (!screen.IsValid())
-				break;
-							
-			screen.SetMode(&fInitialMode);
-		
-			break;
-		}
-		
 		case SET_CUSTOM_REFRESH_MSG:
 		{
 			message->FindFloat("refresh", &fCustomRefresh);
@@ -598,8 +575,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 			fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(String.String());
 			
-			point = String.FindFirst('z');
-			String.Truncate(point + 1);
+			point = String.FindFirst('/');
+			String.Truncate(point);
 			
 			fRefreshMenu->Superitem()->SetLabel(String.String());
 			
