@@ -56,7 +56,7 @@ virtual	status_t FormatSuggestionRequested(
 				media_format * format) = 0;
 virtual	status_t FormatProposal(
 				const media_source & output,
-				media_format * format) = 0;
+				media_format * ioFormat) = 0;
 	/* If the format isn't good, put a good format into *io_format and return error */
 	/* If format has wildcard, specialize to what you can do (and change). */
 	/* If you can change the format, return OK. */

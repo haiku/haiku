@@ -100,7 +100,7 @@ virtual	status_t HandleMessage(
 	/* reply. */
 virtual	status_t AcceptFormat(
 				const media_destination & dest,
-				media_format * format) = 0;
+				media_format * ioFormat) = 0;
 virtual	status_t GetNextInput(
 				int32 * cookie,
 				media_input * out_input) = 0;
