@@ -56,6 +56,7 @@
 //#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
+#define DEBUG_SERVERWINDOW_GRAPHICS
 
 
 #ifdef DEBUG_SERVERWINDOW
@@ -77,6 +78,13 @@
 #	define STRACE_MOUSE(x) printf x
 #else
 #	define STRACE_MOUSE(x) ;
+#endif
+
+#ifdef DEBUG_SERVERWINDOW_GRAPHICS
+#	include <stdio.h>
+#	define DTRACE(x) printf x
+#else
+#	define DTRACE(x) ;
 #endif
 
 //------------------------------------------------------------------------------
@@ -687,6 +695,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		//--------- BView Messages -----------------
 		case AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT:
 		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_AT_POINT: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -712,6 +721,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT:
 		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_AT_POINT: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32		bitmapToken;
 			BPoint 		point;
 			
@@ -735,6 +745,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT:
 		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_SYNC_IN_RECT: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -759,6 +770,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT:
 		{
+			DTRACE(("ServerWindow %s: Message AS_LAYER_DRAW_BITMAP_ASYNC_IN_RECT: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32 bitmapToken;
 			BRect srcRect, dstRect;
 			
@@ -781,7 +793,6 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_SET_CURRENT_LAYER:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_CURRENT_LAYER: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			int32 token;
 			
 			link.Read<int32>(&token);
@@ -797,6 +808,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 
 		case AS_LAYER_CREATE_ROOT:
 		{
+			STRACE(("ServerWindow %s: Message AS_LAYER_CREATE_ROOT: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			// Start receiving top_view data -- pass NULL as the parent view.
 			// This should be the *only* place where this happens.
 			if (cl != NULL)
@@ -862,7 +874,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_STATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 //			SetLayerState(cl);
 			SetLayerState(cl,link);
 			cl->RebuildFullRegion();
@@ -870,7 +882,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_SET_FONT_STATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_FONT_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 //			SetLayerFontState(cl);
 			SetLayerFontState(cl,link);
 			cl->RebuildFullRegion();
@@ -878,7 +890,7 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_GET_STATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_STATE: Layer name: %s\n", fTitle.String(), cl->fName->String()));
 			LayerData	*ld;
 			
 			// these 4 are here because of a compiler warning. Maybe he's right... :-)
@@ -1007,12 +1019,12 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_CURSOR:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int32 token;
 
 			link.Read<int32>(&token);
 			
-debugger("AS_LAYER_CURSOR: not yet available\n");
+printf("AS_LAYER_CURSOR: not yet available\n");
 //			cursormanager->SetCursor(token);
 
 			break;
@@ -1038,7 +1050,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_LINE_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 lineCap, lineJoin;
 
 			// TODO: Look into locking scheme relating to Layers and modifying redraw-related members
@@ -1054,7 +1066,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_GET_LINE_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_LINE_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<int8>((int8)(cl->fLayerData->lineCap));
 			fMsgSender->Attach<int8>((int8)(cl->fLayerData->lineJoin));
@@ -1065,7 +1077,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_PUSH_STATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PUSH_STATE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			LayerData *ld = new LayerData();
 			ld->prevState = cl->fLayerData;
 			cl->fLayerData = ld;
@@ -1076,10 +1088,10 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_POP_STATE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_POP_STATE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			if (!(cl->fLayerData->prevState))
 			{
-				STRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fTitle.String(), cl->fName->String()));
+				DTRACE(("WARNING: SW(%s): User called BView(%s)::PopState(), but there is NO state on stack!\n", fTitle.String(), cl->fName->String()));
 				break;
 			}
 			
@@ -1093,13 +1105,13 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
 			link.Read<float>(&(cl->fLayerData->scale));
 			break;
 		}
 		case AS_LAYER_GET_SCALE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
 			LayerData		*ld = cl->fLayerData;
 
 			float			scale = ld->scale;
@@ -1115,7 +1127,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_PEN_LOC:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			float		x, y;
 			
 			link.Read<float>(&x);
@@ -1127,7 +1139,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<BPoint>(cl->fLayerData->penlocation);
 			fMsgSender->Flush();
@@ -1136,14 +1148,14 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			link.Read<float>(&(cl->fLayerData->pensize));
 		
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<float>(cl->fLayerData->pensize);
 			fMsgSender->Flush();
@@ -1152,7 +1164,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_VIEW_COLOR:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_VIEW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
@@ -1165,7 +1177,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_GET_COLORS:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_COLORS: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color highColor, lowColor, viewColor;
 			
 			highColor = cl->fLayerData->highcolor.GetColor32();
@@ -1182,7 +1194,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_BLEND_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 srcAlpha, alphaFunc;
 			
 			link.Read<int8>(&srcAlpha);
@@ -1195,7 +1207,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_GET_BLEND_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_BLEND_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<int8>((int8)(cl->fLayerData->alphaSrcMode));
 			fMsgSender->Attach<int8>((int8)(cl->fLayerData->alphaFncMode));
@@ -1205,7 +1217,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_DRAW_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			int8 drawingMode;
 			
 			link.Read<int8>(&drawingMode);
@@ -1216,7 +1228,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_GET_DRAW_MODE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_DRAW_MODE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fMsgSender->StartMessage(SERVER_TRUE);
 			fMsgSender->Attach<int8>((int8)(cl->fLayerData->draw_mode));
 			fMsgSender->Flush();
@@ -1225,14 +1237,14 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_PRINT_ALIASING:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_PRINT_ALIASING: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			link.Read<bool>(&(cl->fLayerData->fontAliasing));
 			
 			break;
 		}
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_PICTURE
 			int32 pictureToken;
@@ -1307,7 +1319,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_CLIP_TO_INVERSE_PICTURE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_INVERSE_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_INVERSE_PICTURE
 			int32 pictureToken;
@@ -1347,7 +1359,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_GET_CLIP_REGION:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_GET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
 			// if this Layer is hidden, it is clear that its visible region is void.
 			if (cl->IsHidden())
@@ -1386,7 +1398,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_CLIP_REGION:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_CLIP_REGION: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_SET_CLIP_REGION
 			int32 noOfRects;
@@ -1418,7 +1430,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_INVAL_RECT:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
 			// TODO: Watch out for the coordinate system in AS_LAYER_INVAL_RECT
 			BRect		invalRect;
@@ -1431,7 +1443,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_INVAL_REGION:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_INVAL_RECT: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			
 			// TODO: Watch out for the coordinate system AS_LAYER_INVAL_REGION
 			BRegion invalReg;
@@ -1452,13 +1464,13 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_BEGIN_UPDATE:
 		{
-			STRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n",fTitle.String()));
+			DTRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n",fTitle.String()));
 			cl->UpdateStart();
 			break;
 		}
 		case AS_END_UPDATE:
 		{
-			STRACE(("ServerWindowo %s: AS_END_UPDATE\n",fTitle.String()));
+			DTRACE(("ServerWindowo %s: AS_END_UPDATE\n",fTitle.String()));
 			cl->UpdateEnd();
 			break;
 		}
@@ -1679,7 +1691,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		
 		case AS_LAYER_SET_HIGH_COLOR:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_HIGH_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
@@ -1690,7 +1702,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_LAYER_SET_LOW_COLOR:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_SET_LOW_COLOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			rgb_color c;
 			
 			link.Read(&c, sizeof(rgb_color));
@@ -1701,7 +1713,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_STROKE_LINE:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_LINE\n",fTitle.String()));
 			
 			// TODO: Add clipping TO AS_STROKE_LINE
 			float x1, y1, x2, y2;
@@ -1726,7 +1738,7 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 		}
 		case AS_STROKE_RECT:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_RECT\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_RECT\n",fTitle.String()));
 			
 			// TODO: Add clipping TO AS_STROKE_RECT
 			float left, top, right, bottom;
@@ -1735,14 +1747,14 @@ debugger("AS_LAYER_CURSOR: not yet available\n");
 			link.Read<float>(&right);
 			link.Read<float>(&bottom);
 			BRect rect(left,top,right,bottom);
-debugger("STROKERECT");
+			
 			if (cl && cl->fLayerData)
 				desktop->GetDisplayDriver()->StrokeRect(cl->ConvertToTop(rect),cl->fLayerData);
 			break;
 		}
 		case AS_FILL_RECT:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_RECT\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_RECT\n",fTitle.String()));
 			
 			// TODO: Add clipping TO AS_FILL_RECT
 			BRect rect;
@@ -1753,7 +1765,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_ARC:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_ARC\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_ARC\n",fTitle.String()));
 			
 			// TODO: Add clipping to AS_STROKE_ARC
 			float angle, span;
@@ -1768,7 +1780,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_ARC:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_ARC\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_ARC\n",fTitle.String()));
 			
 			// TODO: Add clipping to AS_FILL_ARC
 			float angle, span;
@@ -1783,7 +1795,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_BEZIER:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_BEZIER\n",fTitle.String()));
 			
 			// TODO: Add clipping to AS_STROKE_BEZIER
 			BPoint *pts;
@@ -1805,7 +1817,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_BEZIER:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_BEZIER\n",fTitle.String()));
 			
 			// TODO: Add clipping to AS_STROKE_BEZIER
 			BPoint *pts;
@@ -1827,7 +1839,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_ELLIPSE:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_ELLIPSE\n",fTitle.String()));
 			
 			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
@@ -1838,7 +1850,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_ELLIPSE:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_ELLIPSE\n",fTitle.String()));
 			
 			// TODO: Add clipping AS_STROKE_ELLIPSE
 			BRect rect;
@@ -1849,7 +1861,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_ROUNDRECT:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_ROUNDRECT\n",fTitle.String()));
 			
 			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
@@ -1864,7 +1876,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_ROUNDRECT:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_ROUNDRECT\n",fTitle.String()));
 			
 			// TODO: Add clipping AS_STROKE_ROUNDRECT
 			BRect rect;
@@ -1879,7 +1891,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_TRIANGLE:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_TRIANGLE\n",fTitle.String()));
 			
 			// TODO:: Add clipping to AS_STROKE_TRIANGLE
 			BPoint pts[3];
@@ -1901,7 +1913,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_TRIANGLE:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_TRIANGLE\n",fTitle.String()));
 			
 			// TODO:: Add clipping to AS_FILL_TRIANGLE
 			BPoint pts[3];
@@ -1923,7 +1935,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_POLYGON:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_POLYGON\n",fTitle.String()));
 			
 			BRect polyframe;
 			bool isclosed;
@@ -1950,7 +1962,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_POLYGON:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_POLYGON\n",fTitle.String()));
 			
 			BRect polyframe;
 			int32 pointcount;
@@ -1974,7 +1986,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_SHAPE:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_SHAPE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_SHAPE\n",fTitle.String()));
 			
 			BRect shaperect;
 			int32 opcount;
@@ -2003,7 +2015,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_SHAPE:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_SHAPE\n",fTitle.String()));
 			
 			BRect shaperect;
 			int32 opcount;
@@ -2033,7 +2045,7 @@ debugger("STROKERECT");
 		}
 		case AS_FILL_REGION:
 		{
-			STRACE(("ServerWindow %s: Message AS_FILL_REGION\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_FILL_REGION\n",fTitle.String()));
 			
 			int32 rectcount;
 			BRect *rectlist;
@@ -2059,7 +2071,7 @@ debugger("STROKERECT");
 		}
 		case AS_STROKE_LINEARRAY:
 		{
-			STRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_STROKE_LINEARRAY\n",fTitle.String()));
 			
 			// Attached Data:
 			// 1) int32 Number of lines in the array
@@ -2091,7 +2103,7 @@ debugger("STROKERECT");
 		}
 		case AS_DRAW_STRING:
 		{
-			STRACE(("ServerWindow %s: Message AS_DRAW_STRING\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_DRAW_STRING\n",fTitle.String()));
 			
 			char *string;
 			int32 length;
@@ -2112,7 +2124,7 @@ debugger("STROKERECT");
 		}
 		case AS_MOVEPENTO:
 		{
-			STRACE(("ServerWindow %s: Message AS_MOVEPENTO\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_MOVEPENTO\n",fTitle.String()));
 			
 			float x,y;
 			
@@ -2125,7 +2137,7 @@ debugger("STROKERECT");
 		}
 		case AS_SETPENSIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_SETPENSIZE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_SETPENSIZE\n",fTitle.String()));
 			float size;
 			
 			link.Read<float>(&size);
@@ -2136,13 +2148,13 @@ debugger("STROKERECT");
 		}
 		case AS_SET_FONT:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_FONT\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_SET_FONT\n",fTitle.String()));
 			// TODO: Implement AS_SET_FONT?
 			break;
 		}
 		case AS_SET_FONT_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n",fTitle.String()));
+			DTRACE(("ServerWindow %s: Message AS_SET_FONT_SIZE\n",fTitle.String()));
 			// TODO: Implement AS_SET_FONT_SIZE?
 			break;
 		}

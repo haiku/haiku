@@ -66,6 +66,15 @@
 #	define STRACE(x) ;
 #endif
 
+#define DEBUG_SERVERAPP_FONT
+
+#ifdef DEBUG_SERVERAPP_FONT
+#	include <stdio.h>
+#	define FTRACE(x) printf x
+#else
+#	define FTRACE(x) ;
+#endif
+
 /*!
 	\brief Constructor
 	\param sendport port ID for the BApplication which will receive the ServerApp's messages
@@ -758,7 +767,7 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n",fSignature.String()));
-debugger("AS_SHOW_CURSOR: not yet available\n");
+printf("AS_SHOW_CURSOR: not yet available\n");
 //			cursormanager->ShowCursor();
 			fCursorHidden=false;
 			break;
@@ -766,7 +775,7 @@ debugger("AS_SHOW_CURSOR: not yet available\n");
 		case AS_HIDE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n",fSignature.String()));
-debugger("AS_HIDE_CURSOR: not yet available\n");
+printf("AS_HIDE_CURSOR: not yet available\n");
 //			cursormanager->HideCursor();
 			fCursorHidden=true;
 			break;
@@ -774,7 +783,7 @@ debugger("AS_HIDE_CURSOR: not yet available\n");
 		case AS_OBSCURE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n",fSignature.String()));
-debugger("AS_OBSCURE_CURSOR: not yet available\n");
+printf("AS_OBSCURE_CURSOR: not yet available\n");
 //			cursormanager->ObscureCursor();
 			break;
 		}
@@ -810,7 +819,7 @@ debugger("AS_OBSCURE_CURSOR: not yet available\n");
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
 			cursormanager->AddCursor(fAppCursor);
-debugger("AS_SET_CURSOR_DATA: not yet available\n");
+printf("AS_SET_CURSOR_DATA: not yet available\n");
 //			cursormanager->SetCursor(fAppCursor->ID());
 			break;
 		}
@@ -830,7 +839,7 @@ debugger("AS_SET_CURSOR_DATA: not yet available\n");
 			if(sync)
 				msg.Read<int32>(&replyport);
 			
-debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
+printf("AS_SET_CURSOR_BCURSOR: not yet available\n");
 //			cursormanager->SetCursor(ctoken);
 			
 			if(sync)
@@ -998,6 +1007,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_QUERY_FONTS_CHANGED:
 		{
+			FTRACE(("ServerApp %s: AS_QUERY_FONTS_CHANGED unimplemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) bool check flag
 			// 2) port_id reply_port
@@ -1009,6 +1019,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_FAMILY_NAME:
 		{
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_NAME\n",fSignature.String()));
 			// Attached Data:
 			// 1) int32 the ID of the font family to get
 			// 2) port_id reply port
@@ -1046,6 +1057,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_STYLE_NAME:
 		{
+			FTRACE(("ServerApp %s: AS_GET_STYLE_NAME\n",fSignature.String()));
 			// Attached Data:
 			// 1) font_family The name of the font family
 			// 2) int32 ID of the style to get
@@ -1089,6 +1101,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_FAMILY_AND_STYLE:
 		{
+			FTRACE(("ServerApp %s: AS_GET_FAMILY_AND_STYLE\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1130,6 +1143,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_FONT_DIRECTION:
 		{
+			FTRACE(("ServerApp %s: AS_GET_FONT_DIRECTION unimplemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1168,6 +1182,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_FONT_BOUNDING_BOX:
 		{
+			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1180,6 +1195,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_TUNED_COUNT:
 		{
+			FTRACE(("ServerApp %s: AS_GET_TUNED_COUNT unimplmemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1191,6 +1207,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_TUNED_INFO:
 		{
+			FTRACE(("ServerApp %s: AS_GET_TUNED_INFO unimplmemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1203,6 +1220,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_QUERY_FONT_FIXED:
 		{
+			FTRACE(("ServerApp %s: AS_QUERY_FONT_FIXED unimplmemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
@@ -1212,8 +1230,44 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 			// 1) bool - font is/is not fixed
 			break;
 		}
+		case AS_SET_FAMILY_NAME:
+		{
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_NAME\n",fSignature.String()));
+			// Attached Data:
+			// 1) font_family - name of font family to use
+			// 2) port_id - reply port
+			
+			// Returns:
+			// 1) uint16 - family ID
+			
+			port_id replyport;
+			font_family fam;
+			
+			msg.Read(fam,sizeof(font_family));
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontFamily *ffam=fontserver->GetFamily(fam);
+			if(ffam)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<uint16>(ffam->GetID());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
+			break;
+		}
 		case AS_SET_FAMILY_AND_STYLE:
 		{
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE\n",fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) font_style - name of style in family
@@ -1222,10 +1276,38 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 			// Returns:
 			// 1) uint16 - family ID
 			// 2) uint16 - style ID
+			
+			port_id replyport;
+			font_family fam;
+			font_style sty;
+			
+			msg.Read(fam,sizeof(font_family));
+			msg.Read(sty,sizeof(font_style));
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			fontserver->Lock();
+			FontStyle *fstyle=fontserver->GetStyle(fam,sty);
+			if(fstyle)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<uint16>(fstyle->Family()->GetID());
+				replylink.Attach<uint16>(fstyle->GetID());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			fontserver->Unlock();
 			break;
 		}
 		case AS_SET_FAMILY_AND_FACE:
 		{
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_FACE unimplmemented\n",fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family to use
 			// 2) uint16 - font face
@@ -1240,12 +1322,15 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_COUNT_FONT_FAMILIES:
 		{
+			FTRACE(("ServerApp %s: AS_COUNT_FONT_FAMILIES\n",fSignature.String()));
 			// Attached Data:
 			// 1) port_id - reply port
 			
 			// Returns:
 			// 1) int32 - # of font families
-			port_id replyport=-1;
+			port_id replyport;
+			
+			msg.Read<port_id>(&replyport);
 			
 			replylink.SetSendPort(replyport);
 			fontserver->Lock();
@@ -1258,6 +1343,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_COUNT_FONT_STYLES:
 		{
+			FTRACE(("ServerApp %s: AS_COUNT_FONT_STYLES\n",fSignature.String()));
 			// Attached Data:
 			// 1) font_family - name of font family
 			// 2) port_id - reply port
@@ -1291,6 +1377,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_SET_SYSFONT_PLAIN:
 		{
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_PLAIN\n",fSignature.String()));
 			// Attached Data:
 			// port_id reply port
 			
@@ -1330,6 +1417,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_GET_FONT_HEIGHT:
 		{
+			FTRACE(("ServerApp %s: AS_GET_FONT_HEIGHT\n",fSignature.String()));
 			// Attached Data:
 			// 1) uint16 family ID
 			// 2) uint16 style ID
@@ -1365,6 +1453,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_SET_SYSFONT_BOLD:
 		{
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_BOLD\n",fSignature.String()));
 			// Attached Data:
 			// port_id reply port
 			
@@ -1404,6 +1493,7 @@ debugger("AS_SET_CURSOR_BCURSOR: not yet available\n");
 		}
 		case AS_SET_SYSFONT_FIXED:
 		{
+			FTRACE(("ServerApp %s: AS_SET_SYSFONT_FIXED\n",fSignature.String()));
 			// Attached Data:
 			// port_id reply port
 			
