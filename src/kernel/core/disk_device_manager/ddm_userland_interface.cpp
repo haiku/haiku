@@ -23,6 +23,19 @@ using namespace BPrivate::DiskDevice;
 // debugging
 #define ERROR(x)
 
+// ddm_strlcpy
+/*! \brief Wrapper around user_strlcpy() that returns a status_t
+	indicating appropriate success or failure.
+*/
+static
+status_t
+ddm_strlcpy(char *to, const char *from, size_t size) {
+	int error = user_strlcpy(to, from, size);
+	error = (0 <= error && size_t(error) < size) ? B_OK
+	        : (error < B_OK ? error : B_NAME_TOO_LONG);
+	return status_t(error);
+}
+
 // move_descendants
 static
 void
@@ -97,10 +110,11 @@ _kern_find_disk_device(const char *_filename, size_t *neededSize)
 	if (!_filename)
 		return B_BAD_VALUE;
 
-	char filename[SYS_MAX_PATH_LEN+1];
-	if (user_strlcpy(filename, _filename, SYS_MAX_PATH_LEN) >= SYS_MAX_PATH_LEN) 		
-		return B_NAME_TOO_LONG;
-	
+	char filename[B_PATH_NAME_LENGTH];
+	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
+	if (error)
+		return error;
+		
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// find the device
@@ -127,9 +141,10 @@ _kern_find_partition(const char *_filename, size_t *neededSize)
 	if (!_filename)
 		return B_BAD_VALUE;
 
-	char filename[SYS_MAX_PATH_LEN+1];
-	if (user_strlcpy(filename, _filename, SYS_MAX_PATH_LEN) >= SYS_MAX_PATH_LEN) 		
-		return B_NAME_TOO_LONG;
+	char filename[B_PATH_NAME_LENGTH];
+	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
+	if (error)
+		return error;
 
 	partition_id id = B_ENTRY_NOT_FOUND;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
@@ -303,8 +318,9 @@ _kern_register_file_device(const char *_filename)
 	if (!_filename)
 		return B_BAD_VALUE;
 	char filename[B_PATH_NAME_LENGTH];
-	if (user_strlcpy(filename, _filename, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KFileDiskDevice *device = manager->FindFileDevice(filename))
@@ -325,8 +341,9 @@ _kern_unregister_file_device(partition_id deviceID, const char *_filename)
 		return manager->DeleteFileDevice(deviceID);
 	} else {
 		char filename[B_PATH_NAME_LENGTH];
-		if (user_strlcpy(filename, _filename, B_PATH_NAME_LENGTH) >= B_PATH_NAME_LENGTH)
-			return B_NAME_TOO_LONG;
+		status_t error = ddm_strlcpy(filename, _filename, B_PATH_NAME_LENGTH);
+		if (error)
+			return error;
 		return manager->DeleteFileDevice(filename);
 	}
 }
@@ -380,8 +397,9 @@ _kern_find_disk_system(const char *_name, user_disk_system_info *_info)
 	if (!_name || !_info)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	if (user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
 		if (KDiskSystem *diskSystem = manager->FindDiskSystem(name)) {
@@ -683,8 +701,9 @@ _kern_supports_initializing_partition(partition_id partitionID,
 	if (_diskSystemName)
 		return false;
 	char diskSystemName[B_OS_NAME_LENGTH];
-	if (user_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return false;
+	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -827,8 +846,9 @@ _kern_validate_set_partition_name(partition_id partitionID,
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	if (user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;	
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -848,8 +868,9 @@ _kern_validate_set_partition_content_name(partition_id partitionID,
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	if (user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;	
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -869,8 +890,9 @@ _kern_validate_set_partition_type(partition_id partitionID,
 	if (!_type)
 		return B_BAD_VALUE;
 	char type[B_OS_NAME_LENGTH];
-	if (user_strlcpy(type, _type, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;	
+	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
@@ -894,9 +916,11 @@ _kern_validate_initialize_partition(partition_id partitionID,
 	char diskSystemName[B_OS_NAME_LENGTH];
 	char name[B_OS_NAME_LENGTH];
 	char *parameters = NULL;
-	if (user_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH
-	    || 	user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH);
+	if (!error)
+		error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	if (_parameters) {
 		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
 		if (parameters)
@@ -907,7 +931,7 @@ _kern_validate_initialize_partition(partition_id partitionID,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
@@ -934,8 +958,9 @@ _kern_validate_create_child_partition(partition_id partitionID,
 	char *parameters = NULL;
 	user_memcpy(&offset, _offset, sizeof(offset));
 	user_memcpy(&size, _size, sizeof(size));
-	if (user_strlcpy(type, _type, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;	
+	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	if (_parameters) {
 		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
 		if (parameters)
@@ -946,7 +971,7 @@ _kern_validate_create_child_partition(partition_id partitionID,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->ReadLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
@@ -990,8 +1015,7 @@ _kern_get_next_supported_partition_type(partition_id partitionID,
 				char type[B_OS_NAME_LENGTH];
 				error = diskSystem->GetNextSupportedType(partition, &cookie, type);
 				if (!error) {
-					error = user_strlcpy(_type, type, B_OS_NAME_LENGTH) < B_OS_NAME_LENGTH
-					        ? B_OK : B_NAME_TOO_LONG;
+					error = ddm_strlcpy(_type, type, B_OS_NAME_LENGTH);
 				}
 			}
 		}
@@ -1009,8 +1033,9 @@ _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
 	if (!_contentType || !_type)
 		return B_BAD_VALUE;
 	char contentType[B_OS_NAME_LENGTH];
-	if (user_strlcpy(contentType, _contentType, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;	
+	status_t error = ddm_strlcpy(contentType, _contentType, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the disk system
 	KDiskSystem *diskSystem = manager->LoadDiskSystem(diskSystemID);
@@ -1020,8 +1045,7 @@ _kern_get_partition_type_for_content_type(disk_system_id diskSystemID,
 	// get the info
 	char type[B_OS_NAME_LENGTH];
 	if (diskSystem->GetTypeForContentType(contentType, type)) {
-		user_strlcpy(_type, type, B_OS_NAME_LENGTH);
-		return B_OK;
+		return ddm_strlcpy(_type, type, B_OS_NAME_LENGTH);
 	}
 	return B_ERROR;
 }
@@ -1244,8 +1268,9 @@ _kern_set_partition_name(partition_id partitionID, int32 changeCounter,
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	if (user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1257,7 +1282,7 @@ _kern_set_partition_name(partition_id partitionID, int32 changeCounter,
 	// check name
 	char proposedName[B_OS_NAME_LENGTH];
 	strcpy(proposedName, name);
-	status_t error = validate_set_partition_name(partition, changeCounter,
+	error = validate_set_partition_name(partition, changeCounter,
 												 proposedName);
 	if (error != B_OK)
 		return error;
@@ -1281,8 +1306,9 @@ _kern_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 	if (!_name)
 		return B_BAD_VALUE;
 	char name[B_OS_NAME_LENGTH];
-	if (user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1294,7 +1320,7 @@ _kern_set_partition_content_name(partition_id partitionID, int32 changeCounter,
 	// check name
 	char proposedName[B_OS_NAME_LENGTH];
 	strcpy(proposedName, name);
-	status_t error = validate_set_partition_content_name(partition,
+	error = validate_set_partition_content_name(partition,
 		changeCounter, proposedName);
 	if (error != B_OK)
 		return error;
@@ -1318,8 +1344,9 @@ _kern_set_partition_type(partition_id partitionID, int32 changeCounter,
 	if (!_type)
 		return B_BAD_VALUE;
 	char type[B_OS_NAME_LENGTH];
-	if (user_strlcpy(type, _type, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
@@ -1329,8 +1356,8 @@ _kern_set_partition_type(partition_id partitionID, int32 changeCounter,
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceWriteLocker locker(partition->Device(), true);
 	// check type
-	status_t error = validate_set_partition_type(partition, changeCounter,
-												 type);
+	error = validate_set_partition_type(partition, changeCounter,
+									    type);
 	if (error != B_OK)
 		return error;
 	// set type
@@ -1437,9 +1464,11 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 	char diskSystemName[B_OS_NAME_LENGTH];
 	char name[B_OS_NAME_LENGTH];
 	char *parameters = NULL;
-	if (user_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH
-	    || 	user_strlcpy(name, _name, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(diskSystemName, _diskSystemName, B_OS_NAME_LENGTH);
+	if (!error)
+		error = ddm_strlcpy(name, _name, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	if (_parameters) {
 		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
 		if (parameters)
@@ -1450,7 +1479,7 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
@@ -1518,8 +1547,9 @@ _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 		return B_BAD_VALUE;
 	char type[B_OS_NAME_LENGTH];
 	char *parameters = NULL;
-	if (user_strlcpy(type, _type, B_OS_NAME_LENGTH) >= B_OS_NAME_LENGTH)
-		return B_NAME_TOO_LONG;
+	status_t error = ddm_strlcpy(type, _type, B_OS_NAME_LENGTH);
+	if (error)
+		return error;
 	if (_parameters) {
 		parameters = static_cast<char*>(malloc(strlen(_parameters)+1));
 		if (parameters)
@@ -1530,7 +1560,7 @@ _kern_create_child_partition(partition_id partitionID, int32 changeCounter,
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the partition
 	KPartition *partition = manager->WriteLockPartition(partitionID);
-	status_t error = partition ? B_OK : B_ENTRY_NOT_FOUND;
+	error = partition ? B_OK : B_ENTRY_NOT_FOUND;
 	if (!error) {
 		PartitionRegistrar registrar1(partition, true);
 		PartitionRegistrar registrar2(partition->Device(), true);
