@@ -1,4 +1,9 @@
-/* Semaphore code. Lots of "todo" items*/
+/* Semaphore code. Lots of "todo" items */
+
+/*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+*/
 
 /*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -775,11 +780,7 @@ set_sem_owner(sem_id id, team_id team)
 		return B_NO_MORE_SEMS;
 	if (id < 0)
 		return B_BAD_SEM_ID;
-	if (team < 0)
-		return B_BAD_TEAM_ID;
-
-	// check if the team ID is valid
-	if (team_get_team_struct(team) == NULL)
+	if (team < 0 || !team_is_valid(team))
 		return B_BAD_TEAM_ID;
 
 	slot = id % MAX_SEMS;
@@ -794,9 +795,11 @@ set_sem_owner(sem_id id, team_id team)
 		return B_BAD_SEM_ID;
 	}
 
-	// Todo: this is a small race condition: the team ID could already
+	// ToDo: this is a small race condition: the team ID could already
 	// be invalid at this point - we would lose one semaphore slot in
 	// this case!
+	// The only safe way to do this is to prevent either team (the new
+	// or the old owner) from dying until we leave the spinlock.
 	gSems[slot].u.used.owner = team;
 
 	RELEASE_SEM_LOCK(gSems[slot]);
@@ -816,12 +819,13 @@ sem_interrupt_thread(struct thread *t)
 	int slot;
 	struct thread_queue wakeup_queue;
 
-	TRACE(("sem_interrupt_thread: called on thread %p (%d), blocked on sem 0x%x\n", t, t->id, t->sem_blocking));
+	TRACE(("sem_interrupt_thread: called on thread %p (%d), blocked on sem 0x%x\n",
+		t, t->id, t->sem_blocking));
 
 	if (t->state != B_THREAD_WAITING || t->sem_blocking < 0)
-		return EINVAL;
+		return B_BAD_VALUE;
 	if (!(t->sem_flags & B_CAN_INTERRUPT))
-		return ERR_SEM_NOT_INTERRUPTABLE;
+		return B_NOT_ALLOWED;
 
 	slot = t->sem_blocking % MAX_SEMS;
 
@@ -832,7 +836,7 @@ sem_interrupt_thread(struct thread *t)
 	}
 
 	wakeup_queue.head = wakeup_queue.tail = NULL;
-	if (remove_thread_from_sem(t, &gSems[slot], &wakeup_queue, EINTR) == ERR_NOT_FOUND)
+	if (remove_thread_from_sem(t, &gSems[slot], &wakeup_queue, EINTR) != B_OK)
 		panic("sem_interrupt_thread: thread 0x%lx not found in sem 0x%lx's wait queue\n", t->id, t->sem_blocking);
 
 	RELEASE_SEM_LOCK(gSems[slot]);
@@ -858,7 +862,8 @@ remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_qu
 	// remove the thread from the queue and place it in the supplied queue
 	t1 = thread_dequeue_id(&sem->u.used.q, t->id);
 	if (t != t1)
-		return ERR_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
+
 	sem->u.used.count += t->sem_acquire_count;
 	t->state = t->next_state = B_THREAD_READY;
 	t->sem_errcode = sem_errcode;
