@@ -28,6 +28,8 @@ class hashTable : public list
 		// Get the block for the page of pointers
 		page *newPage=vmBlock->pageMan->getPage();
 		error ("hashTable::hashTable - Got Page %x\n",newPage);
+		pageList.add(newPage);
+
 		if (!newPage) {
 			error ("Out of pages to allocate a pool! newPage = %x\n",newPage);
 			throw ("Out of pages to allocate a pool!");
@@ -37,8 +39,7 @@ class hashTable : public list
 
 		int listsPerPage=PAGE_SIZE/sizeof(list);
 		int pages=(size+(listsPerPage-1))/listsPerPage;
-		for (int pageCount=0;pageCount<pages;pageCount++)
-			{
+		for (int pageCount=0;pageCount<pages;pageCount++) {
 			// Allocate a page of lists
 			page *newPage=vmBlock->pageMan->getPage();
 			error ("hashTable::hashTable - Got Page %x\n",newPage);
@@ -46,9 +47,15 @@ class hashTable : public list
 				throw ("Out of pages to allocate a pool!");
 			for (int i=0;i<listsPerPage;i++)
 				rocks[i]=new ((list *)(newPage->getAddress()+(i*sizeof(list)))) list;	
+			pageList.add(newPage);
 			}
 		} 
-
+	~hashTable() {
+		while (struct page *cur=reinterpret_cast<page *>(pageList.next())) {
+			error ("hashTable::~hashTable; freeing page %x\n",cur);
+			vmBlock->pageMan->freePage(cur);
+		}
+	}
 		// Mutators
 	void setHash (ulong (*hash_in)(node &)) { hash=hash_in; }
 	void setIsEqual (bool (*isEqual_in)(node &,node &)) { isEqual=isEqual_in; }
@@ -98,6 +105,7 @@ class hashTable : public list
 	ulong (*hash)(node &a);
 	bool (*isEqual)(node &a,node &b);
 	list **rocks;
+	list pageList;
 	int numRocks;
 };
 

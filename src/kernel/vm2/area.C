@@ -131,6 +131,7 @@ void area::freeArea(void) {
 		//page->next=NULL;
 		vmBlock->vpagePool->put(page);
 		}
+	vpages.~hashTable();
 //error ("area::freeArea: unlocking \n");
 //error ("area::freeArea: ending \n");
 	}

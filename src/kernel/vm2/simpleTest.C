@@ -31,6 +31,7 @@ int createFillAndTest(int pages,char *name)
 		if (i%256!=readByte(addr,i))
 				error ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(addr,i));
 		}
+	vm->freeArea(area1);
 	error ("%s: createFillAndTest: reading done\n",name);
 	return area1;
 }

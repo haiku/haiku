@@ -42,7 +42,10 @@ int main(int argc,char **argv) {
 		error ("Failure on adding with no hash, unknown exception\n");
 		}
 
-	hashTable foo(20);
+	hashTable *moo;
+	moo=new hashTable(20);  
+	hashTable &foo=*moo;
+
 	foo.setHash(hash);
 	foo.setIsEqual(isEqual);
 
@@ -114,5 +117,6 @@ int main(int argc,char **argv) {
 		error ("found 1000, as expected!\n");
 	else
 		error ("did NOT find 1000, as expected, found %d!\n",count);
+	delete moo;
 	return 0;
 }
