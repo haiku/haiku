@@ -212,12 +212,6 @@ TGATranslator::tga_alphabits(TGAFileHeader &filehead, TGAColorMapSpec &mapspec,
 //				outInfo,	Information about the translator
 //							is copied here
 //
-//				amtread,	Amount of data read from inSource
-//							before this function was called
-//
-//				read,		Pointer to the data that was read
-// 							in before this function was called
-//
 //				pfileheader,	File header info for the TGA is
 //								copied here after it is read from
 //								the file.
@@ -1177,42 +1171,9 @@ TGATranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 	result = identify_bits_header(inSource, NULL, &bitsHeader);
 	if (result != B_OK)
 		return result;
-	
-	// Translate B_TRANSLATOR_BITMAP to B_TRANSLATOR_BITMAP, easy enough :)	
-	if (outType == B_TRANSLATOR_BITMAP) {
-		// write out bitsHeader (only if configured to)
-		if (bheaderonly || (!bheaderonly && !bdataonly)) {
-			if (swap_data(B_UINT32_TYPE, &bitsHeader,
-				sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN) != B_OK)
-				return B_ERROR;
-			if (outDestination->Write(&bitsHeader,
-				sizeof(TranslatorBitmap)) != sizeof(TranslatorBitmap))
-				return B_ERROR;
-		}
-		
-		// write out the data (only if configured to)
-		if (bdataonly || (!bheaderonly && !bdataonly)) {	
-			uint8 buf[1024];
-			uint32 remaining = B_BENDIAN_TO_HOST_INT32(bitsHeader.dataSize);
-			ssize_t rd, writ;
-			rd = inSource->Read(buf, 1024);
-			while (rd > 0) {
-				writ = outDestination->Write(buf, rd);
-				if (writ < 0)
-					break;
-				remaining -= static_cast<uint32>(writ);
-				rd = inSource->Read(buf, min(1024, remaining));
-			}
-		
-			if (remaining > 0)
-				return B_ERROR;
-			else
-				return B_OK;
-		} else
-			return B_OK;
-		
+
 	// Translate B_TRANSLATOR_BITMAP to B_TGA_FORMAT
-	} else if (outType == B_TGA_FORMAT) {
+	if (outType == B_TGA_FORMAT) {
 		// Set up TGA header
 		TGAFileHeader fileheader;
 		fileheader.idlength = 0;

@@ -50,7 +50,7 @@ main()
 	BApplication app("application/x-vnd.obos-tga-translator");
 	status_t result;
 	result = LaunchTranslatorWindow(new TGATranslator,
-		"TGATranslator", BRect(0, 0, 225, 175));
+		"TGA Settings", BRect(0, 0, 225, 175));
 	if (result == B_OK) {
 		app.Run();
 		return 0;
