@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-5/2004
+	Rudolf Cornelissen 4/2003-6/2004
 */
 
 #define MODULE_BIT 0x00200000
@@ -276,7 +276,13 @@ status_t SET_DPMS_MODE(uint32 dpms_flags)
 /* Report device DPMS capabilities. */
 uint32 DPMS_CAPABILITIES(void)
 {
-	return 	(B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF);
+	if (si->ps.card_type < NM2200)
+		/* MagicGraph cards don't have full DPMS support */
+		return 	B_DPMS_ON | B_DPMS_OFF;
+	else
+		/* MagicMedia cards do have full DPMS support for external monitors */
+		//fixme: checkout if this is true...
+		return 	B_DPMS_ON | B_DPMS_STAND_BY | B_DPMS_SUSPEND | B_DPMS_OFF;
 }
 
 /* Return the current DPMS mode. */
@@ -288,12 +294,25 @@ uint32 DPMS_MODE(void)
 	nm_crtc_dpms_fetch(&display, &h, &v);
 	interrupt_enable(true);
 
-	if (display && h && v)
-		return B_DPMS_ON;
-	else if(v)
-		return B_DPMS_STAND_BY;
-	else if(h)
-		return B_DPMS_SUSPEND;
+	if (si->ps.card_type < NM2200)
+	{
+		/* MagicGraph cards don't have full DPMS support */
+		if (display && h && v)
+			return B_DPMS_ON;
+		else
+			return B_DPMS_OFF;
+	}
 	else
-		return B_DPMS_OFF;
+	{
+		/* MagicMedia cards do have full DPMS support for external monitors */
+		//fixme: checkout if this is true...
+		if (display && h && v)
+			return B_DPMS_ON;
+		else if(v)
+			return B_DPMS_STAND_BY;
+		else if(h)
+			return B_DPMS_SUSPEND;
+		else
+			return B_DPMS_OFF;
+	}
 }

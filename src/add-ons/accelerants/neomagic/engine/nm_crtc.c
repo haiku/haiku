@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-5/2004
+   Rudolf Cornelissen 4/2003-6/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -382,7 +382,7 @@ status_t nm_crtc_depth(int mode)
 
 status_t nm_crtc_dpms(bool display, bool h, bool v)
 {
-	uint8 temp;
+	uint8 temp, size_outputs;
 
 	LOG(4,("CRTC: setting DPMS: "));
 
@@ -401,22 +401,106 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 		/* end synchronous reset if display should be enabled */
 		ISASEQW(RESET, 0x03);
 
-		LOG(4,("display on\n"));
+		LOG(4,("display on, "));
 	}
 	else
 	{
 		ISASEQW(CLKMODE, (temp | 0x20));
 
-		LOG(4,("display off\n"));
+		LOG(4,("display off, "));
 	}
 
-//	LOG(4,("CRTC: setting DPMS (%d,%d,%d)\n", display,h,v));
+	temp = 0x00;
+	if (h)
+	{
+		LOG(4,("hsync enabled, "));
+	}
+	else
+	{
+		temp |= 0x10;
+		LOG(4,("hsync disabled, "));
+	}
+	if (v)
+	{
+		LOG(4,("vsync enabled\n"));
+	}
+	else
+	{
+		temp |= 0x20;
+		LOG(4,("vsync disabled\n"));
+	}
 
-//	VGAW_I(CRTCEXT,1,(VGAR_I(CRTCEXT,1)&0xCF)|((!v)<<5))|((!h)<<4);
-	
-	/* set some required fixed values for proper nm mode initialisation */
-//	VGAW_I(CRTC,0x17,0xC3);
-//	VGAW_I(CRTC,0x14,0x00);
+	/* read panelsize and currently active outputs */
+	size_outputs = ISAGRPHR(PANELCTRL1);
+	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+	snooze(10);
+
+//fixme!: note current DPMS state, if fully on: just copy outputs on, else do this:
+	/* update noted currently active outputs if prudent:
+	 * - tracks active output devices, even if the keyboard shortcut is used because
+	 *   using that key will take the selected output devices out of DPMS sleep mode
+	 *   if programmed via these bits;
+	 * - when the shortcut key is not used, and DPMS was in a sleep mode while
+	 *   programmed via these bits, an output device will still be shut-off. */
+	if (si->ps.card_type < NM2200)
+	{
+		/* both output devices do DPMS via these bits */
+		if (size_outputs & 0x03) si->ps.outputs = (size_outputs & 0x03);
+	}
+	else
+	{
+		/* only the internal panel does DPMS via these bits, so the external setting
+		 * can always be copied */
+		si->ps.outputs &= 0xfe;
+		si->ps.outputs |= (size_outputs & 0x01);
+		if (size_outputs & 0x02) si->ps.outputs |= 0x02;
+	}
+
+	if (si->ps.card_type < NM2200)
+	{
+		/* no full DPMS support */
+		if (temp)
+		{
+		    /* Turn panel plus backlight and external monitor's sync signals off */
+    		ISAGRPHW(PANELCTRL1, (size_outputs & 0xfc));
+		}
+		else
+		{
+		    /* restore previous output device(s) */
+    		ISAGRPHW(PANELCTRL1, ((size_outputs & 0xfc) | (si->ps.outputs & 0x03)));
+		}
+	}
+	else
+	{
+		/* if internal panel is active, update it's DPMS state */
+		if (si->ps.outputs & 0x02)
+		{
+			if (temp)
+			{
+			    /* Turn panel plus backlight off */
+    			ISAGRPHW(PANELCTRL1, (size_outputs & 0xfd));
+			}
+			else
+			{
+			    /* Turn panel plus backlight on */
+    			ISAGRPHW(PANELCTRL1, (size_outputs | 0x02));
+			}
+		}
+
+		/* if external monitor is active, update it's DPMS state */
+		if (si->ps.outputs & 0x01)
+		{
+			/* we have full DPMS support for external monitors */
+			//fixme: checkout if so...
+			temp |= ((ISAGRPHR(ENSETRESET) & 0x0f) | 0x80);
+			/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
+			snooze(10);
+			ISAGRPHW(ENSETRESET, temp);
+
+			snooze(10);
+			LOG(4,("CRTC: DPMS readback $%02x, programmed $%02x\n", ISAGRPHR(ENSETRESET), temp));
+		}
+	}
 
 	return B_OK;
 }
@@ -425,15 +509,26 @@ status_t nm_crtc_dpms_fetch(bool * display, bool * h, bool * v)
 {
 	*display = !(ISASEQR(CLKMODE) & 0x20);
 
-//	*display=!((VGAR_I(SEQ,1)&0x20)>>5);
-//	*h=!((VGAR_I(CRTCEXT,1)&0x10)>>4);
-//	*v=!((VGAR_I(CRTCEXT,1)&0x20)>>5);
+	if (si->ps.card_type < NM2200)
+	{
+		/* no full DPMS support */
+		*h = *v = *display;
+	}
+	else
+	{
+		/* full DPMS support for external monitors */
+		//fixme: checkout if so...
+		*h = !(ISAGRPHR(ENSETRESET) & 0x10);
+		*v = !(ISAGRPHR(ENSETRESET) & 0x20);
+	}
 
-	*h = *v = true;
-
-	LOG(4,("CTRC: fetched DPMS state:"));
-	if (display) LOG(4,("display on\n"));
-	else LOG(4,("display off\n"));
+	LOG(4,("CTRC: fetched DPMS state: "));
+	if (*display) LOG(4,("display on, "));
+	else LOG(4,("display off, "));
+	if (*h) LOG(4,("hsync enabled, "));
+	else LOG(4,("hsync disabled, "));
+	if (*v) LOG(4,("vsync enabled\n"));
+	else LOG(4,("vsync disabled\n"));
 
 	return B_OK;
 }
