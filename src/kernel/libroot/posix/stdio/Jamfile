@@ -48,7 +48,7 @@ KernelMergeObject posix_stdio.o :
 	;
 
 KernelMergeObject kernel_posix_stdio.o :
-	<$(SOURCE_GRIST)>kvsprintf.c
+	<$(SOURCE_GRIST)>kernel_vsprintf.c
 	:
 	-fPIC -DPIC
 	;
