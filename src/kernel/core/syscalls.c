@@ -291,3 +291,6 @@ unregister_generic_syscall(const char *subsystem, uint32 version)
 	return status;
 }
 
+
+#include "syscall_table.h"
+	// generate by gensyscalls
