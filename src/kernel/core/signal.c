@@ -6,16 +6,16 @@
 
 #include <OS.h>
 #include <KernelExport.h>
-#include <kernel.h>
 #include <debug.h>
 #include <thread.h>
 #include <arch/thread.h>
 #include <int.h>
 #include <sem.h>
 #include <ksignal.h>
-#include <string.h>
 #include <syscalls.h>
 
+#include <stddef.h>
+#include <string.h>
 
 #define SIGNAL_TO_MASK(signal) (1LL << (signal - 1))
 
@@ -245,7 +245,16 @@ sigaction(int signal, const struct sigaction *act, struct sigaction *oact)
 static int32
 alarm_event(timer *t)
 {
-	send_signal_etc(thread_get_current_thread()->id, SIGALRM, B_DO_NOT_RESCHEDULE);
+	// The hook can be called from any context, but we have to
+	// deliver the signal to the thread that originally called
+	// set_alarm().
+	// Since thread->alarm is this timer structure, we can just
+	// cast it back - ugly but it works for now
+	struct thread *thread = (struct thread *)((uint8 *)t - offsetof(struct thread, alarm));
+		// ToDo: investigate adding one user parameter to the timer structure to fix this hack
+
+	dprintf("alarm_event: thread = %p\n", thread);
+	send_signal_etc(thread->id, SIGALRM, B_DO_NOT_RESCHEDULE);
 
 	return B_INVOKE_SCHEDULER;
 }
@@ -259,6 +268,8 @@ set_alarm(bigtime_t time, uint32 mode)
 
 	ASSERT(B_ONE_SHOT_RELATIVE_ALARM == B_ONE_SHOT_RELATIVE_TIMER);
 		// just to be sure no one changes the headers some day
+
+	dprintf("set_alarm: thread = %p\n", thread);
 
 	if (thread->alarm.period)
 		rv = (bigtime_t)thread->alarm.entry.key - system_time();
