@@ -1426,7 +1426,7 @@ sys_exit_thread(status_t return_value)
 thread_id
 sys_get_current_thread_id()
 {
-	return thread_get_current_thread()->id;
+	return thread_get_current_thread_id();
 }
 
 
