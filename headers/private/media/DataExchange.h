@@ -96,7 +96,8 @@ enum {
 	SERVER_GET_INSTANCES_FOR,
 	SERVER_GET_SHARED_BUFFER_AREA,
 	SERVER_REGISTER_BUFFER,
-	SERVER_UNREGISTER_BUFFER,	
+	SERVER_UNREGISTER_BUFFER,
+	SERVER_RESCAN_DEFAULTS,
 	SERVER_MESSAGE_END,
 	NODE_MESSAGE_START = 0x200,
 	
@@ -773,8 +774,9 @@ struct server_get_instances_for_reply : public reply_data
 	media_node_id node_id[MAX_NODE_ID]; // no area here, MAX_NODE_ID is really large
 };
 
-
-
+struct server_rescan_defaults_command : public command_data
+{
+};
 
 
 
