@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.09-1 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.09-2 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1033,8 +1033,8 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	if (0)
 	{
 		/* confirmed for:
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
-		 * the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
+		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
 		switch (target->space)
 		{
 			case B_CMAP8: crtc_mask = 0x1f; break;
@@ -1051,15 +1051,22 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* confirmed for:
 		 * TNT1 always;
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
-		 * the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
+		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
+		/* NOTE:
+		 * Unfortunately older cards have a hardware fault that prevents use.
+		 * We need doubled granularity on those to prevent the single top line
+		 * from shifting to the left!
+		 * This is confirmed for TNT2, GeForce2 MX200, GeForce2 MX400.
+		 * Confirmed OK are:
+		 * GeForce4 MX440, GeForce4 Ti4200, GeForceFX 5200. */
 		switch (target->space)
 		{
-			case B_CMAP8: crtc_mask = 0x07; break;
-			case B_RGB15: crtc_mask = 0x03; break;
-			case B_RGB16: crtc_mask = 0x03; break;
-			case B_RGB24: crtc_mask = 0x07; break;
-			case B_RGB32: crtc_mask = 0x01; break;
+			case B_CMAP8: crtc_mask = 0x0f; break; /* 0x07 */
+			case B_RGB15: crtc_mask = 0x07; break; /* 0x03 */
+			case B_RGB16: crtc_mask = 0x07; break; /* 0x03 */
+			case B_RGB24: crtc_mask = 0x0f; break; /* 0x07 */
+			case B_RGB32: crtc_mask = 0x03; break; /* 0x01 */
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
@@ -1122,8 +1129,8 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	if (0)
 	{
 		/* confirmed for:
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
-		 * the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
+		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 1 */
 		switch(target->space)
 		{
 			case B_CMAP8: max_crtc_width = 16352; break;
@@ -1140,15 +1147,22 @@ status_t nv_general_validate_pic_size (display_mode *target, uint32 *bytes_per_r
 	{
 		/* confirmed for:
 		 * TNT1 always;
-		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForceFX 5200 if
-		 * the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
+		 * TNT2, TNT2-M64, GeForce2 MX400, GeForce4 MX440, GeForce4 Ti4200,
+		 * GeForceFX 5200: if the CRTC1 (and CRTC2) BUFFER register b2 = 0 */
+		/* NOTE:
+		 * Unfortunately older cards have a hardware fault that prevents use.
+		 * We need doubled granularity on those to prevent the single top line
+		 * from shifting to the left!
+		 * This is confirmed for TNT2, GeForce2 MX200, GeForce2 MX400.
+		 * Confirmed OK are:
+		 * GeForce4 MX440, GeForce4 Ti4200, GeForceFX 5200. */
 		switch(target->space)
 		{
-			case B_CMAP8: max_crtc_width = 16376; break;
-			case B_RGB15: max_crtc_width =  8188; break;
-			case B_RGB16: max_crtc_width =  8188; break;
-			case B_RGB24: max_crtc_width =  5456; break;
-			case B_RGB32: max_crtc_width =  4094; break;
+			case B_CMAP8: max_crtc_width = 16368; break; /* 16376 */
+			case B_RGB15: max_crtc_width =  8184; break; /*  8188 */
+			case B_RGB16: max_crtc_width =  8184; break; /*  8188 */
+			case B_RGB24: max_crtc_width =  5456; break; /*  5456 */
+			case B_RGB32: max_crtc_width =  4092; break; /*  4094 */
 			default:
 				LOG(8,("INIT: unknown color space: 0x%08x\n", target->space));
 				return B_ERROR;
