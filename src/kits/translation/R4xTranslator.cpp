@@ -59,17 +59,18 @@
 BR4xTranslator::BR4xTranslator(const translator_data *kpData) : BTranslator()
 {
 	fpData = new translator_data;
+	if (fpData) {
+		fpData->translatorName = kpData->translatorName;
+		fpData->translatorInfo = kpData->translatorInfo;
+		fpData->translatorVersion = kpData->translatorVersion;
+		fpData->inputFormats = kpData->inputFormats;
+		fpData->outputFormats = kpData->outputFormats;
 	
-	fpData->translatorName = kpData->translatorName;
-	fpData->translatorInfo = kpData->translatorInfo;
-	fpData->translatorVersion = kpData->translatorVersion;
-	fpData->inputFormats = kpData->inputFormats;
-	fpData->outputFormats = kpData->outputFormats;
-	
-	fpData->Identify = kpData->Identify;
-	fpData->Translate = kpData->Translate;
-	fpData->MakeConfig = kpData->MakeConfig;
-	fpData->GetConfigMessage = kpData->GetConfigMessage;
+		fpData->Identify = kpData->Identify;
+		fpData->Translate = kpData->Translate;
+		fpData->MakeConfig = kpData->MakeConfig;
+		fpData->GetConfigMessage = kpData->GetConfigMessage;
+	}
 }
 
 // ---------------------------------------------------------------
@@ -89,7 +90,10 @@ BR4xTranslator::BR4xTranslator(const translator_data *kpData) : BTranslator()
 // ---------------------------------------------------------------
 BR4xTranslator::~BR4xTranslator()
 {
-	delete fpData;
+	if (fpData) {
+		delete fpData;
+		fpData = NULL;
+	}
 }
 
 // ---------------------------------------------------------------
@@ -103,11 +107,15 @@ BR4xTranslator::~BR4xTranslator()
 //
 // Postconditions:
 //
-// Returns:
+// Returns: NULL if fpData was not allocated successfully,
+//			or the short name of the translator otherwise
 // ---------------------------------------------------------------
 const char *BR4xTranslator::TranslatorName() const
 {
-	return fpData->translatorName;
+	if (fpData)
+		return fpData->translatorName;
+	else
+		return NULL;
 }
 
 // ---------------------------------------------------------------
@@ -122,11 +130,15 @@ const char *BR4xTranslator::TranslatorName() const
 //
 // Postconditions:
 //
-// Returns:
+// Returns: NULL if fpData was not allocated successfully,
+//			or the verbose name of the translator otherwise
 // ---------------------------------------------------------------
 const char *BR4xTranslator::TranslatorInfo() const
 {
-	return fpData->translatorInfo;
+	if (fpData)
+		return fpData->translatorInfo;
+	else
+		return NULL;
 }
 
 // ---------------------------------------------------------------
@@ -140,11 +152,16 @@ const char *BR4xTranslator::TranslatorInfo() const
 //
 // Postconditions:
 //
-// Returns:
+// Returns:	B_ERROR if fpData was not allocated successfully,
+//			or the integer representation of the translator
+//			version otherwise
 // ---------------------------------------------------------------
 int32 BR4xTranslator::TranslatorVersion() const
 {
-	return fpData->translatorVersion;
+	if (fpData)
+		return fpData->translatorVersion;
+	else
+		return B_ERROR;
 }
 
 // ---------------------------------------------------------------
@@ -160,15 +177,24 @@ int32 BR4xTranslator::TranslatorVersion() const
 //
 // Postconditions:
 //
-// Returns: the list of supported input formats
+// Returns:	NULL if out_count is NULL,
+//			NULL if fpData is not allocated,
+//			or the list of supported input formats if all is well
 // ---------------------------------------------------------------
 const translation_format *BR4xTranslator::InputFormats(int32 *out_count) const
 {
-	int32 i;
-	for (i = 0; fpData->inputFormats[i].type; i++);
+	if (!out_count)
+		return NULL;
+	if (fpData) {
+		int32 i;
+		for (i = 0; fpData->inputFormats[i].type; i++);
 	
-	*out_count = i;
-	return fpData->inputFormats;
+		*out_count = i;
+		return fpData->inputFormats;
+	} else {
+		*out_count = 0;
+		return NULL;
+	}
 }
 
 // ---------------------------------------------------------------
@@ -183,15 +209,24 @@ const translation_format *BR4xTranslator::InputFormats(int32 *out_count) const
 //
 // Postconditions:
 //
-// Returns: the list of supported output formats
+// Returns:	NULL if out_count is NULL,
+//			NULL if fpData is not allocated,
+//			or the list of supported output formats if all is well
 // ---------------------------------------------------------------
 const translation_format *BR4xTranslator::OutputFormats(int32 *out_count) const
 {
-	int32 i;
-	for (i = 0; fpData->outputFormats[i].type; i++);
+	if (!out_count)
+		return NULL;
+	if (fpData) {
+		int32 i;
+		for (i = 0; fpData->outputFormats[i].type; i++);
 	
-	*out_count = i;
-	return fpData->outputFormats;
+		*out_count = i;
+		return fpData->outputFormats;
+	} else {
+		*out_count = 0;
+		return NULL;
+	}
 }
 
 // ---------------------------------------------------------------
@@ -223,13 +258,19 @@ const translation_format *BR4xTranslator::OutputFormats(int32 *out_count) const
 // Postconditions:
 //
 // Returns: B_OK if this translator can handle the data,
+//			B_ERROR, if fpData is unallocated or something else
+//			         went wrong
 //          B_NO_TRANSLATOR if it can't
 // ---------------------------------------------------------------
 status_t BR4xTranslator::Identify(BPositionIO *inSource, 
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
 {
-	return fpData->Identify(inSource, inFormat, ioExtension, outInfo, outType);
+	if (fpData && fpData->Identify)
+		return fpData->Identify(inSource, inFormat, ioExtension, outInfo,
+			outType);
+	else
+		return B_ERROR;
 }
 
 // ---------------------------------------------------------------
@@ -255,14 +296,19 @@ status_t BR4xTranslator::Identify(BPositionIO *inSource,
 //
 // Returns: B_OK, if it converted the data 
 //          B_NO_TRANSLATOR, if it couldn't
+//			B_ERROR, if fpData is unallocated or something else
+//			         went wrong
 //          some other value, if it feels like it
 // ---------------------------------------------------------------
 status_t BR4xTranslator::Translate(BPositionIO *inSource, 
 	const translator_info *inInfo, BMessage *ioExtension, uint32 outType, 
 	BPositionIO *outDestination)
 {
-	return fpData->Translate(inSource, inInfo, ioExtension, outType,
-		outDestination);
+	if (fpData && fpData->Translate)
+		return fpData->Translate(inSource, inInfo, ioExtension, outType,
+			outDestination);
+	else
+		return B_ERROR;
 }
 
 // ---------------------------------------------------------------
@@ -281,14 +327,14 @@ status_t BR4xTranslator::Translate(BPositionIO *inSource,
 //
 // Postconditions:
 //
-// Returns: B_NO_TRANSLATOR, if this function is not support
+// Returns: B_ERROR, if this function is not supported
 //          anything else, whatever the translator feels like 
 //                         returning
 // ---------------------------------------------------------------
 status_t BR4xTranslator::MakeConfigurationView(BMessage *ioExtension,
 	BView **outView, BRect *outExtent)
 {
-	if (fpData->MakeConfig)
+	if (fpData && fpData->MakeConfig)
 		return fpData->MakeConfig(ioExtension, outView, outExtent);
 	else
 		return B_ERROR;
@@ -307,12 +353,12 @@ status_t BR4xTranslator::MakeConfigurationView(BMessage *ioExtension,
 //
 // Postconditions:
 //
-// Returns: B_NO_TRANSLATOR, if function is not support
+// Returns: B_ERROR, if function is not supported
 //          something else, if it is
 // ---------------------------------------------------------------
 status_t BR4xTranslator::GetConfigurationMessage(BMessage *ioExtension)
 {
-	if (fpData->GetConfigMessage)
+	if (fpData && fpData->GetConfigMessage)
 		return fpData->GetConfigMessage(ioExtension);
 	else
 		return B_ERROR;	
