@@ -231,6 +231,7 @@ StyledEditWindow::InitWindow()
 	font_family plain_family;
 	font_style plain_style;
 	be_plain_font->GetFamilyAndStyle(&plain_family,&plain_style);
+	fCurrentFontItem = 0;
 
 	int32 numFamilies = count_font_families();
 	for ( int32 i = 0; i < numFamilies; i++ ) {
@@ -429,7 +430,8 @@ StyledEditWindow::MessageReceived(BMessage *message)
 			const char * fontFamily = 0, * fontStyle = 0;
 			void * ptr;
 			if (message->FindPointer("source",&ptr) == B_OK) {
-				fontFamily = static_cast<BMenuItem*>(ptr)->Label();
+				fCurrentFontItem = static_cast<BMenuItem*>(ptr);
+				fontFamily = fCurrentFontItem->Label();
 			}
 			SetFontStyle(fontFamily, fontStyle);
 			}
@@ -443,9 +445,9 @@ StyledEditWindow::MessageReceived(BMessage *message)
 				fontStyle = item->Label();
 				BMenu * menu = item->Menu();
 				if (menu != 0) {
-					BMenuItem * superitem = menu->Superitem();
-					if (superitem != 0) {
-						fontFamily = superitem->Label();
+					fCurrentFontItem = menu->Superitem();
+					if (fCurrentFontItem != 0) {
+						fontFamily = fCurrentFontItem->Label();
 					}
 				}
 			}
@@ -472,13 +474,6 @@ StyledEditWindow::MessageReceived(BMessage *message)
 					SetFontColor(&YELLOW);
 				}
 			}
-			
-//			void		*v; 
-//			rgb_color 	*color;
-//			
-//			message->FindPointer("colour",&v); 
-//			color= (rgb_color *) v; 
-//			SetFontColor(color);
 		}
 		break;
 /*********"Document"-menu*************/
@@ -644,7 +639,9 @@ StyledEditWindow::MenusBeginning()
 	
 	// update the font menu be/interface/GraphicsDefs.h
 	// unselect the old values
-	fCurrentFontItem->SetMarked(false);
+	if (fCurrentFontItem != 0) {
+		fCurrentFontItem->SetMarked(false);
+	}
 	BMenuItem * oldColorItem = fFontColorMenu->FindMarked();
 	if (oldColorItem != 0) {
 		oldColorItem->SetMarked(false);
@@ -661,6 +658,7 @@ StyledEditWindow::MenusBeginning()
 	fTextView->GetFontAndColor(&font,&sameProperties,&color,&sameColor);
 	
 	if (sameColor && (color.alpha == 255)) {
+		// select the current color
 		if (color.red == 0) {
 			if (color.green == 0) {
 				if (color.blue == 0) {
@@ -690,7 +688,34 @@ StyledEditWindow::MenusBeginning()
 		} 
 	}
 	
-	// TODO: select current font & size
+	if (sameProperties & B_FONT_SIZE) {
+		if ((int)font.Size() == font.Size()) {
+			// select the current font size
+			char fontSizeStr[16];
+			snprintf(fontSizeStr,15,"%i",(int)font.Size());
+			BMenuItem * item = fFontSizeMenu->FindItem(fontSizeStr);
+			if (item != 0) {
+				item->SetMarked(true);
+			}
+		}
+	}
+	
+	if (sameProperties & B_FONT_FAMILY_AND_STYLE) {
+		font_family family;
+		font_style style;
+		font.GetFamilyAndStyle(&family,&style);
+		fCurrentFontItem = fFontMenu->FindItem(family);
+		if (fCurrentFontItem != 0) {
+			fCurrentFontItem->SetMarked(true);
+			BMenu * menu = fCurrentFontItem->Submenu();
+			if (menu != 0) {
+				BMenuItem * item = menu->FindItem(style);
+				if (item != 0) {
+					item->SetMarked(true);
+				}
+			}
+		}
+	}
 }
 
 void
@@ -1192,7 +1217,7 @@ StyledEditWindow::SetFontColor(const rgb_color *color)
 	BFont font;
 	
 	fTextView->GetFontAndColor(&font,&sameProperties,NULL,NULL);
-	fTextView->SetFontAndColor(&font, B_FONT_ALL,color);
+	fTextView->SetFontAndColor(&font, 0, color);
 	fClean = false;
 	fUndoCleans = false;
 	fRedoCleans = false;	
