@@ -23,7 +23,8 @@ struct elf_image_info {
 	image_id	id;
 	int32		ref_count;
 	void		*vnode;
-	elf_region	regions[2];			// describes the text and data regions
+	elf_region	text_region;
+	elf_region	data_region;
 	addr_t		dynamic_ptr;		// pointer to the dynamic section
 	struct elf_linked_image *linked_images;
 
