@@ -13,12 +13,27 @@
   Dominic Giampaolo
   dbg@be.com
 */
+#include "compat.h"
+
 #include <stdio.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 
-#include "compat.h"
+
+// Let the FS think, we are the root user.
+uid_t
+geteuid()
+{
+	return 0;
+}
+
+
+gid_t
+getegid()
+{
+	return 0;
+}
 
 
 int
@@ -129,7 +144,7 @@ read_pos(int fd, fs_off_t _pos, void *data,  size_t nbytes)
     
     if (lseek(fd, pos, SEEK_SET) < 0) {
         perror("read lseek");
-        return EINVAL;
+        return FS_EINVAL;
     }
     
     ret = read(fd, data, nbytes);
@@ -150,7 +165,7 @@ write_pos(int fd, fs_off_t _pos, const void *data,  size_t nbytes)
     
     if (lseek(fd, pos, SEEK_SET) < 0) {
         perror("read lseek");
-        return EINVAL;
+        return FS_EINVAL;
     }
     
     ret = write(fd, data, nbytes);
@@ -186,7 +201,7 @@ readv_pos(int fd, fs_off_t _pos, struct iovec *iov, int count)
 
     if (lseek(fd, pos, SEEK_SET) < 0) {
         perror("read lseek");
-        return EINVAL;
+        return FS_EINVAL;
     }
 
     i = 0;
@@ -221,7 +236,7 @@ writev_pos(int fd, fs_off_t _pos, struct iovec *iov,  int count)
 
     if (lseek(fd, pos, SEEK_SET) < 0) {
         perror("read lseek");
-        return EINVAL;
+        return FS_EINVAL;
     }
 
     i = 0;
@@ -246,8 +261,129 @@ writev_pos(int fd, fs_off_t _pos, struct iovec *iov,  int count)
 }
 
 
+int fs_shell_fstat(int fd, struct my_stat *myst);
 
-#endif /* __BEOS__ */
+int
+fs_shell_fstat(int fd, struct my_stat *myst)
+{
+	struct stat st;
+	
+	if (!myst) {
+		errno = FS_EINVAL;
+		return -1;
+	}
+	
+	if (fstat(fd, &st) < 0) {
+		errno = from_platform_error(errno);
+		return -1;
+	}
+
+	// translate the stat structure
+    myst->dev = st.st_dev;
+    myst->ino = st.st_ino;
+    myst->nlink = st.st_nlink;
+    myst->uid = st.st_uid;
+    myst->gid = st.st_gid;
+    myst->size = st.st_size;
+    myst->blksize = st.st_blksize;
+    myst->atime = st.st_atime;
+    myst->mtime = st.st_mtime;
+    myst->ctime = st.st_ctime;
+    myst->crtime = st.st_ctime;
+
+	// translate st_mode
+	myst->mode = 0;
+
+	#define SET_ST_MODE_BIT(flag, myflag)	\
+		if (st.st_mode & flag)			\
+			myst->mode |= myflag;
+			
+	#ifndef S_ATTR_DIR
+		#define S_ATTR_DIR 0
+	#endif
+	#ifndef S_ATTR
+		#define S_ATTR 0
+	#endif
+	#ifndef S_INDEX_DIR
+		#define S_INDEX_DIR 0
+	#endif
+	#ifndef S_INT_INDEX
+		#define S_INT_INDEX 0
+	#endif
+	#ifndef S_UINT_INDEX
+		#define S_UINT_INDEX 0
+	#endif
+	#ifndef S_LONG_LONG_INDEX
+		#define S_LONG_LONG_INDEX 0
+	#endif
+	#ifndef S_ULONG_LONG_INDEX
+		#define S_ULONG_LONG_INDEX 0
+	#endif
+	#ifndef S_FLOAT_INDEX
+		#define S_FLOAT_INDEX 0
+	#endif
+	#ifndef S_DOUBLE_INDEX
+		#define S_DOUBLE_INDEX 0
+	#endif
+	#ifndef S_ALLOW_DUPS
+		#define S_ALLOW_DUPS 0
+	#endif
+	#ifndef S_LINK_SELF_HEALING
+		#define S_LINK_SELF_HEALING 0
+	#endif
+	#ifndef S_LINK_AUTO_DELETE
+		#define S_LINK_AUTO_DELETE 0
+	#endif
+
+	SET_ST_MODE_BIT(MY_S_ATTR_DIR, S_ATTR_DIR);
+	SET_ST_MODE_BIT(MY_S_ATTR, S_ATTR);
+	SET_ST_MODE_BIT(MY_S_INDEX_DIR, S_INDEX_DIR);
+	SET_ST_MODE_BIT(MY_S_INT_INDEX, S_INT_INDEX);
+	SET_ST_MODE_BIT(MY_S_UINT_INDEX, S_UINT_INDEX);
+	SET_ST_MODE_BIT(MY_S_LONG_LONG_INDEX, S_LONG_LONG_INDEX);
+	SET_ST_MODE_BIT(MY_S_ULONG_LONG_INDEX, S_ULONG_LONG_INDEX);
+	SET_ST_MODE_BIT(MY_S_FLOAT_INDEX, S_FLOAT_INDEX);
+	SET_ST_MODE_BIT(MY_S_DOUBLE_INDEX, S_DOUBLE_INDEX);
+	SET_ST_MODE_BIT(MY_S_ALLOW_DUPS, S_ALLOW_DUPS);
+	SET_ST_MODE_BIT(MY_S_LINK_SELF_HEALING, S_LINK_SELF_HEALING);
+	SET_ST_MODE_BIT(MY_S_LINK_AUTO_DELETE, S_LINK_AUTO_DELETE);
+
+	switch (st.st_mode & S_IFMT) {
+		case S_IFLNK:
+			myst->mode |= MY_S_IFLNK;
+			break;
+		case S_IFREG:
+			myst->mode |= MY_S_IFREG;
+			break;
+		case S_IFBLK:
+			myst->mode |= MY_S_IFBLK;
+			break;
+		case S_IFDIR:
+			myst->mode |= MY_S_IFDIR;
+			break;
+		case S_IFIFO:
+			myst->mode |= MY_S_IFIFO;
+			break;
+	}
+
+	SET_ST_MODE_BIT(MY_S_ISUID, S_ISUID);
+	SET_ST_MODE_BIT(MY_S_ISGID, S_ISGID);
+	SET_ST_MODE_BIT(MY_S_ISVTX, S_ISVTX);
+	SET_ST_MODE_BIT(MY_S_IRUSR, S_IRUSR);
+	SET_ST_MODE_BIT(MY_S_IWUSR, S_IWUSR);
+	SET_ST_MODE_BIT(MY_S_IXUSR, S_IXUSR);
+	SET_ST_MODE_BIT(MY_S_IRGRP, S_IRGRP);
+	SET_ST_MODE_BIT(MY_S_IWGRP, S_IWGRP);
+	SET_ST_MODE_BIT(MY_S_IXGRP, S_IXGRP);
+	SET_ST_MODE_BIT(MY_S_IROTH, S_IROTH);
+	SET_ST_MODE_BIT(MY_S_IWOTH, S_IWOTH);
+	SET_ST_MODE_BIT(MY_S_IXOTH, S_IXOTH);
+
+	return 0;
+}
+
+
+#endif /* ! __BEOS__ */
 
 
 #include <stdarg.h>

@@ -17,20 +17,17 @@
   Dominic Giampaolo
   dbg@be.com
 */
+#include "compat.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <time.h>
 
-#include "compat.h"
-
 #include "skiplist.h"
 #include "lock.h"
 
 #include "fsproto.h"
-
-#define my_dirent dirent
-#define my_stat stat
 
 typedef struct vnode vnode;
 typedef struct nspace nspace;
@@ -172,11 +169,11 @@ rootfs_walk(void *_ns, void *_base, const char *file, char **newpath,
     */
 
     if (!MY_S_ISDIR(base->mode)) {
-        err = ENOTDIR;
+        err = FS_ENOTDIR;
         goto exit;
     }
     if (base->removed) {
-        err = ENOENT;
+        err = FS_ENOENT;
         goto exit;
     }
 
@@ -219,7 +216,7 @@ rootfs_walk(void *_ns, void *_base, const char *file, char **newpath,
     */
 
     if (!vn) {
-        err = ENOENT;
+        err = FS_ENOENT;
         goto exit;
     }
 
@@ -287,7 +284,7 @@ rootfs_symlink(void *_ns, void *_dir, const char *name, const char *path)
 
     buf = (char *) malloc(strlen(path)+1);
     if (!buf) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error1;
     }
     strcpy(buf, path);
@@ -322,7 +319,7 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
 
     LOCK(ns->lock);
     if (!MY_S_ISDIR(olddir->mode) || !MY_S_ISDIR(newdir->mode)) {
-        err = ENOTDIR;
+        err = FS_ENOTDIR;
         goto error1;
     }
     
@@ -331,7 +328,7 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
     */
 
     if (!strcmp(oldname, ".") || !strcmp(oldname, "..")) {
-        err = EPERM;
+        err = FS_EPERM;
         goto error1;
     }
 
@@ -342,7 +339,7 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
         vn = vn->next;
     }
     if (!vn) {
-        err = ENOENT;
+        err = FS_ENOENT;
         goto error1;
     }
 
@@ -351,7 +348,7 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
     */
 
     if (!strcmp(newname, ".") || !strcmp(newname, "..")) {
-        err = EPERM;
+        err = FS_EPERM;
         goto error1;
     }
 
@@ -377,7 +374,7 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
     while (avn != ns->root) {
         avn = avn->parent;
         if (avn == olddir) {
-            err = EINVAL;
+            err = FS_EINVAL;
             goto error1;
         }
     }
@@ -385,7 +382,7 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
     if (strlen(newname) > strlen(vn->name)) {
         p = (char *) realloc(vn->name, strlen(newname)+1);
         if (!p) {
-            err = ENOMEM;
+            err = FS_ENOMEM;
             goto error1;
         }
     } else
@@ -402,11 +399,11 @@ rootfs_rename(void *_ns, void *_olddir, const char *oldname, void *_newdir,
     */
 
         if (nvn == nvn->ns->root) {
-            err = EBUSY;
+            err = FS_EBUSY;
             goto error1;
         }
         if (MY_S_ISDIR(nvn->mode) && nvn->head) {
-            err = ENOTEMPTY;
+            err = FS_ENOTEMPTY;
             goto error1;
         }
 
@@ -554,7 +551,7 @@ rootfs_readlink(void *_ns, void *_node, char *buf, size_t *bufsize)
     node = (vnode *) _node;
 
     if (!MY_S_ISLNK(node->mode)) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error1;
     }
     l = strlen(node->symlink);
@@ -581,16 +578,16 @@ rootfs_opendir(void *_ns, void *_node, void **cookie)
     node = (vnode *) _node;
 
     if (!MY_S_ISDIR(node->mode)) {
-        err = ENOTDIR;
+        err = FS_ENOTDIR;
         goto error1;
     }
     pos = (dirpos *) malloc(sizeof(dirpos));
     if (!pos) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error1;
     }
     if (new_lock(&pos->lock, "rootdirlock") < 0) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     pos->pos = 0;
@@ -717,15 +714,15 @@ rootfs_rstat(void *_ns, void *_node, struct my_stat *st)
     node = (vnode *) _node;
 
     LOCK(ns->lock);
-    st->st_dev = ns->nsid;
-    st->st_ino = node->vnid;
-    st->st_mode = node->mode;
-    st->st_nlink = 1;
-    st->st_uid = node->uid;
-    st->st_gid = node->gid;
-    st->st_size = 0;
-    st->st_blksize = 0;
-    st->st_atime = st->st_ctime = st->st_mtime = node->mtime;
+    st->dev = ns->nsid;
+    st->ino = node->vnid;
+    st->mode = node->mode;
+    st->nlink = 1;
+    st->uid = node->uid;
+    st->gid = node->gid;
+    st->size = 0;
+    st->blksize = 0;
+    st->atime = st->ctime = st->mtime = node->mtime;
     UNLOCK(ns->lock);
     return 0;
 }
@@ -740,20 +737,20 @@ rootfs_wstat(void *_ns, void *_node, struct my_stat *st, long mask)
     node = (vnode *) _node;
 
     if (mask & WSTAT_SIZE)
-        return EINVAL;
+        return FS_EINVAL;
 
     LOCK(ns->lock);
 
     if (mask & WSTAT_MODE)
-        node->mode = (node->mode & MY_S_IFMT) | (st->st_mode & ~MY_S_IFMT);
+        node->mode = (node->mode & MY_S_IFMT) | (st->mode & ~MY_S_IFMT);
     if (mask & WSTAT_UID)
-        node->uid = st->st_uid;
+        node->uid = st->uid;
     if (mask & WSTAT_GID)
-        node->gid = st->st_gid;
+        node->gid = st->gid;
     if (mask & WSTAT_MTIME)
-        node->mtime = st->st_mtime;
+        node->mtime = st->mtime;
     if (mask & WSTAT_ATIME)
-        node->mtime = st->st_atime;
+        node->mtime = st->atime;
 
     UNLOCK(ns->lock);
     return 0;
@@ -769,19 +766,19 @@ rootfs_mount(nspace_id nsid, const char *device, ulong flags, void *parms,
     vnode_id        rvnid;
 
     if (device || parms || (len != 0)) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error1;
     }
 
     ns = (nspace *) malloc(sizeof(nspace));
     if (!ns) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error1;
     }
 
     root = (vnode *) malloc(sizeof(vnode));
     if (!root) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error2;
     }
 
@@ -897,7 +894,7 @@ do_create(nspace *ns, vnode *dir, const char *name, mode_t mode, vnode **vnp)
     vnode_id    vnid;
 
     if (!MY_S_ISDIR(dir->mode)) {
-        err = ENOTDIR;
+        err = FS_ENOTDIR;
         goto error1;
     }
     
@@ -907,7 +904,7 @@ do_create(nspace *ns, vnode *dir, const char *name, mode_t mode, vnode **vnp)
     */
 
     if (dir->removed) {
-        err = ENOENT;
+        err = FS_ENOENT;
         goto error1;
     }
 
@@ -917,7 +914,7 @@ do_create(nspace *ns, vnode *dir, const char *name, mode_t mode, vnode **vnp)
     */
 
     if (!strcmp(name, ".") || !strcmp(name, "..")) {
-        err = EEXIST;
+        err = FS_EEXIST;
         goto error1;
     }
         
@@ -941,7 +938,7 @@ do_create(nspace *ns, vnode *dir, const char *name, mode_t mode, vnode **vnp)
     */
 
     if (vn) {
-        err = EEXIST;
+        err = FS_EEXIST;
         goto error1;
     }
 
@@ -954,7 +951,7 @@ do_create(nspace *ns, vnode *dir, const char *name, mode_t mode, vnode **vnp)
     vn = (vnode *) malloc(sizeof(vnode));
     buf = (char *) malloc(strlen(name)+1);
     if (!vn || !buf) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error2;
     }
     strcpy(buf, name);
@@ -1015,7 +1012,7 @@ do_unlink(nspace *ns, vnode *dir, const char *name, bool isdir)
 
     LOCK(ns->lock);
     if (!MY_S_ISDIR(dir->mode)) {
-        err = ENOTDIR;
+        err = FS_ENOTDIR;
         goto error1;
     }
     
@@ -1024,7 +1021,7 @@ do_unlink(nspace *ns, vnode *dir, const char *name, bool isdir)
     */
 
     if (!strcmp(name, "..") || !strcmp(name, ".")) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error1;
     }
         
@@ -1044,7 +1041,7 @@ do_unlink(nspace *ns, vnode *dir, const char *name, bool isdir)
     */
 
     if (!vn) {
-        err = ENOENT;
+        err = FS_ENOENT;
         goto error1;
     }
 
@@ -1053,12 +1050,12 @@ do_unlink(nspace *ns, vnode *dir, const char *name, bool isdir)
     */
 
     if (isdir && !(vn->mode & MY_S_IFDIR)) {
-        err = ENOTDIR;
+        err = FS_ENOTDIR;
         goto error1;
     }
 
     if (!isdir && (vn->mode & MY_S_IFDIR)) {
-        err = EISDIR;
+        err = FS_EISDIR;
         goto error1;
     }
         
@@ -1067,7 +1064,7 @@ do_unlink(nspace *ns, vnode *dir, const char *name, bool isdir)
     */
 
     if (vn == vn->ns->root) {
-        err = EBUSY;
+        err = FS_EBUSY;
         goto error1;
     }
 
@@ -1076,7 +1073,7 @@ do_unlink(nspace *ns, vnode *dir, const char *name, bool isdir)
     */
 
     if (MY_S_ISDIR(vn->mode) && vn->head) {
-        err = ENOTEMPTY;
+        err = FS_ENOTEMPTY;
         goto error1;
     }
 

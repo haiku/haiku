@@ -1,10 +1,8 @@
 #ifndef KPROTOS_H
 #define KPROTOS_H
 
+#include "compat.h"
 #include "myfs.h"
-
-#define my_stat stat
-#define my_dirent dirent
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,7 +53,7 @@ ssize_t sys_remove_attr(bool kernel, int fd, const char *name);
 
 int sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie);
 int sys_close_query(bool kernel, int fd, const char *path, void *cookie);
-int sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct dirent *dent,size_t bufferSize,long num);
+int sys_read_query(bool kernel, int fd, const char *path, void *cookie, struct my_dirent *dent,size_t bufferSize,long num);
 
 struct nspace;
 struct fsystem;

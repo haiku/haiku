@@ -6,12 +6,14 @@
 #ifndef _FSPROTO_H
 #define _FSPROTO_H
 
-#include <sys/dirent.h>
+#include "compat.h"
+
+#include <dirent.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <iovec.h>
+#include <sys/uio.h>
 
 #include <OS.h>
 #include <NodeMonitor.h>
@@ -19,10 +21,9 @@
 #include <fs_info.h>
 #include <BeBuild.h>
 #include <Drivers.h>
-#include "compat.h"
 
-typedef dev_t		nspace_id;
-typedef ino_t		vnode_id;
+typedef my_dev_t		nspace_id;
+typedef my_ino_t		vnode_id;
 
 /*
  * PUBLIC PART OF THE FILE SYSTEM PROTOCOL
@@ -90,25 +91,25 @@ typedef int op_opendir(void *ns, void *node, void **cookie);
 typedef int	op_closedir(void *ns, void *node, void *cookie);
 typedef int	op_rewinddir(void *ns, void *node, void *cookie);
 typedef int	op_readdir(void *ns, void *node, void *cookie, long *num,
-					struct dirent *buf, size_t bufsize);
+					struct my_dirent *buf, size_t bufsize);
 
 typedef int	op_open(void *ns, void *node, int omode, void **cookie);
 typedef int	op_close(void *ns, void *node, void *cookie);
 typedef int op_free_cookie(void *ns, void *node, void *cookie);
-typedef int op_read(void *ns, void *node, void *cookie, off_t pos, void *buf,
+typedef int op_read(void *ns, void *node, void *cookie, fs_off_t pos, void *buf,
 					size_t *len);
-typedef int op_write(void *ns, void *node, void *cookie, off_t pos,
+typedef int op_write(void *ns, void *node, void *cookie, fs_off_t pos,
 					const void *buf, size_t *len);
-typedef int op_readv(void *ns, void *node, void *cookie, off_t pos, const iovec *vec,
+typedef int op_readv(void *ns, void *node, void *cookie, fs_off_t pos, const iovec *vec,
 					size_t count, size_t *len);
-typedef int op_writev(void *ns, void *node, void *cookie, off_t pos, const iovec *vec,
+typedef int op_writev(void *ns, void *node, void *cookie, fs_off_t pos, const iovec *vec,
 					size_t count, size_t *len);
 typedef int	op_ioctl(void *ns, void *node, void *cookie, int cmd, void *buf,
 					size_t len);
 typedef	int	op_setflags(void *ns, void *node, void *cookie, int flags);
 
-typedef int	op_rstat(void *ns, void *node, struct stat *);
-typedef int op_wstat(void *ns, void *node, struct stat *, long mask);
+typedef int	op_rstat(void *ns, void *node, struct my_stat *);
+typedef int op_wstat(void *ns, void *node, struct my_stat *, long mask);
 typedef int	op_fsync(void *ns, void *node);
 
 typedef int	op_select(void *ns, void *node, void *cookie, uint8 event,
@@ -129,7 +130,7 @@ typedef int	op_open_attrdir(void *ns, void *node, void **cookie);
 typedef int	op_close_attrdir(void *ns, void *node, void *cookie);
 typedef int	op_rewind_attrdir(void *ns, void *node, void *cookie);
 typedef int	op_read_attrdir(void *ns, void *node, void *cookie, long *num,
-					struct dirent *buf, size_t bufsize);
+					struct my_dirent *buf, size_t bufsize);
 typedef int	op_remove_attr(void *ns, void *node, const char *name);
 typedef	int	op_rename_attr(void *ns, void *node, const char *oldname,
 					const char *newname);
@@ -137,15 +138,15 @@ typedef int	op_stat_attr(void *ns, void *node, const char *name,
 					struct attr_info *buf);
 
 typedef int	op_write_attr(void *ns, void *node, const char *name, int type,
-					const void *buf, size_t *len, off_t pos);
+					const void *buf, size_t *len, fs_off_t pos);
 typedef int	op_read_attr(void *ns, void *node, const char *name, int type,
-					void *buf, size_t *len, off_t pos);
+					void *buf, size_t *len, fs_off_t pos);
 
 typedef int	op_open_indexdir(void *ns, void **cookie);
 typedef int	op_close_indexdir(void *ns, void *cookie);
 typedef int	op_rewind_indexdir(void *ns, void *cookie);
 typedef int	op_read_indexdir(void *ns, void *cookie, long *num,
-					struct dirent *buf, size_t bufsize);
+					struct my_dirent *buf, size_t bufsize);
 typedef int	op_create_index(void *ns, const char *name, int type, int flags);
 typedef int	op_remove_index(void *ns, const char *name);
 typedef	int	op_rename_index(void *ns, const char *oldname, 
@@ -156,7 +157,7 @@ typedef int	op_open_query(void *ns, const char *query, ulong flags,
 					port_id port, long token, void **cookie);
 typedef int	op_close_query(void *ns, void *cookie);
 typedef int	op_read_query(void *ns, void *cookie, long *num,
-					struct dirent *buf, size_t bufsize);
+					struct my_dirent *buf, size_t bufsize);
 
 typedef struct vnode_ops {
 	op_read_vnode			(*read_vnode);

@@ -639,14 +639,14 @@ sys_chdir(bool kernel, int fd, const char *path)
         goto error1;
     op = vn->ns->fs->ops.rstat;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(vn->ns->data, vn->data, &st);
     if (err)
         goto error2;
-    if (!MY_S_ISDIR(st.st_mode)) {
-        err = ENOTDIR;
+    if (!MY_S_ISDIR(st.mode)) {
+        err = FS_ENOTDIR;
         goto error2;
     }
     io = get_cur_ioctx();
@@ -680,7 +680,7 @@ sys_access(bool kernel, int fd, const char *path, int mode)
         goto error1;
     op = vn->ns->fs->ops.access;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(vn->ns->data, vn->data, mode);
@@ -716,7 +716,7 @@ sys_symlink(bool kernel, const char *oldpath, int nfd, const char *newpath)
         goto error2;
     op = dvn->ns->fs->ops.symlink;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error3;
     }
     err = (*op)(dvn->ns->data, dvn->data, filename, buf);
@@ -753,7 +753,7 @@ sys_readlink(bool kernel, int fd, const char *path, char *buf, size_t bufsize)
         goto error1;
     op = vn->ns->fs->ops.readlink;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     sz = bufsize;
@@ -787,7 +787,7 @@ sys_mkdir(bool kernel, int fd, const char *path, int perms)
         goto error1;
     op = dvn->ns->fs->ops.mkdir;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(dvn->ns->data, dvn->data, filename, perms);
@@ -825,7 +825,7 @@ sys_opendir(bool kernel, int fd, const char *path, bool coe)
         goto error1;
     op = vn->ns->fs->ops.opendir;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(vn->ns->data, vn->data, &cookie);
@@ -838,7 +838,7 @@ sys_opendir(bool kernel, int fd, const char *path, bool coe)
 
     f = (ofile *) calloc(sizeof(ofile), 1);
     if (!f) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error3;
     }
 
@@ -850,7 +850,7 @@ sys_opendir(bool kernel, int fd, const char *path, bool coe)
 
     nfd = new_fd(kernel, -1, f, -1, coe);
     if (nfd < 0) {
-        err = EMFILE;
+        err = FS_EMFILE;
         goto error4;
     }
 
@@ -903,7 +903,7 @@ sys_readdir(bool kernel, int fd, struct my_dirent *buf, size_t bufsize,
 
     f = get_fd(kernel, fd, FD_DIR);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
     vn = f->vn;
@@ -913,7 +913,12 @@ sys_readdir(bool kernel, int fd, struct my_dirent *buf, size_t bufsize,
     if (err)
         goto error1;
 
-    /*
+		
+	// set d_pdev and d_pino
+	buf->d_pdev = vn->ns->nsid;
+	buf->d_pino = vn->vnid;
+    
+	/*
     patch the mount points and the root.
     */
 
@@ -929,7 +934,7 @@ sys_readdir(bool kernel, int fd, struct my_dirent *buf, size_t bufsize,
             if (err)
                 goto error2;
             LOCK(vnlock);
-            p->d_ino = st.st_ino;
+            p->d_ino = st.ino;
         }
         p = (struct my_dirent *) ((char *) p + p->d_reclen);
     }
@@ -958,7 +963,7 @@ sys_rewinddir(bool kernel, int fd)
 
     f = get_fd(kernel, fd, FD_DIR);
     if (!f)
-        return EBADF;
+        return FS_EBADF;
     vn = f->vn;
     err = (*vn->ns->fs->ops.rewinddir)(vn->ns->data, vn->data, f->cookie);
     put_fd(f);
@@ -991,7 +996,7 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
             goto errorA;
         opc = dvn->ns->fs->ops.create;
         if (!opc) {
-            err = EINVAL;
+            err = FS_EINVAL;
             goto errorB;
         }
         err = (*opc)(dvn->ns->data, dvn->data, filename, omode, perms, &vnid,
@@ -1009,7 +1014,7 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
             goto error1;
         opo = vn->ns->fs->ops.open;
         if (!opo) {
-            err = EINVAL;
+            err = FS_EINVAL;
             goto error2;
         }
         err = (*opo)(vn->ns->data, vn->data, omode, &cookie);
@@ -1023,7 +1028,7 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
 
     f = (ofile *) calloc(sizeof(ofile), 1);
     if (!f) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error3;
     }
 
@@ -1037,7 +1042,7 @@ sys_open(bool kernel, int fd, const char *path, int omode, int perms,
 
     nfd = new_fd(kernel, -1, f, -1, coe);
     if (nfd < 0) {
-        err = EMFILE;
+        err = FS_EMFILE;
         goto error4;
     }
 
@@ -1088,7 +1093,7 @@ sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent, const char *n
 
 	opo = vn->ns->fs->ops.open;
 	if (!opo) {
-		err = EINVAL;
+		err = FS_EINVAL;
 		goto error1;
 	}
 	err = (*opo)(vn->ns->data, vn->data, openMode, &cookie);
@@ -1101,7 +1106,7 @@ sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent, const char *n
 
 	f = (ofile *)calloc(sizeof(ofile), 1);
     if (!f) {
-		err = ENOMEM;
+		err = FS_ENOMEM;
 		goto error2;
 	}
 
@@ -1115,7 +1120,7 @@ sys_open_entry_ref(bool kernel, nspace_id device, vnode_id parent, const char *n
 
 	nfd = new_fd(kernel, -1, f, -1, coe);
 	if (nfd < 0) {
-		err = EMFILE;
+		err = FS_EMFILE;
 		goto error3;
 	}
 
@@ -1161,7 +1166,7 @@ sys_lseek(bool kernel, int fd, fs_off_t pos, int whence)
     
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
     switch(whence) {
@@ -1175,13 +1180,13 @@ sys_lseek(bool kernel, int fd, fs_off_t pos, int whence)
             vn = f->vn;
             op = vn->ns->fs->ops.rstat;
             if (!op) {
-                err = EINVAL;
+                err = FS_EINVAL;
                 goto error2;
             }
             err = (*op)(vn->ns->data, vn->data, &st);
             if (err)
                 goto error2;
-            pos += st.st_size;
+            pos += st.size;
             f->pos = pos;
             break;
         }
@@ -1190,23 +1195,23 @@ sys_lseek(bool kernel, int fd, fs_off_t pos, int whence)
         vn = f->vn;
         op = vn->ns->fs->ops.rstat;
         if (!op) {
-            err = EINVAL;
+            err = FS_EINVAL;
             goto error2;
         }
         err = (*op)(vn->ns->data, vn->data, &st);
         if (err)
             goto error2;
-        pos += st.st_size;
+        pos += st.size;
         f->pos = pos;
         break;
     default:
         put_fd(f);
-        return EINVAL;
+        return FS_EINVAL;
     }
 
     if (f->pos < 0) {
         f->pos = 0;
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
 
@@ -1237,11 +1242,11 @@ sys_read(bool kernel, int fd, void *buf, size_t len)
 
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
     if ((f->omode & OMODE_MASK) == O_WRONLY) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error2;
     }
     vn = f->vn;
@@ -1283,11 +1288,11 @@ sys_write(bool kernel, int fd, void *buf, size_t len)
 
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
     if ((f->omode & OMODE_MASK) == O_RDONLY) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error2;
     }
     vn = f->vn;
@@ -1324,7 +1329,7 @@ sys_read_attr(bool kernel, int fd, const char *name, int type, void *buffer, siz
 
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
 
@@ -1355,7 +1360,7 @@ sys_write_attr(bool kernel, int fd, const char *name,int type,void *buffer, size
 
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
 
@@ -1384,7 +1389,7 @@ sys_remove_attr(bool kernel, int fd, const char *name)
 
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
 
@@ -1418,7 +1423,7 @@ sys_ioctl(bool kernel, int fd, int cmd, void *arg, size_t sz)
 
     f = get_fd(kernel, fd, FD_FILE);
     if (!f) {
-        err = EBADF;
+        err = FS_EBADF;
         goto error1;
     }
     vn = f->vn;
@@ -1426,7 +1431,7 @@ sys_ioctl(bool kernel, int fd, int cmd, void *arg, size_t sz)
     if (op)
         err = (*op)(vn->ns->data, vn->data, f->cookie, cmd, arg, sz);
     else
-        err = EINVAL;
+        err = FS_EINVAL;
     if (err)
         goto error2;
 
@@ -1461,12 +1466,12 @@ sys_link(bool kernel, int ofd, const char *oldpath, int nfd,
         goto error2;
 
     if (vn->ns != dvn->ns) {
-        err = EXDEV;
+        err = FS_EXDEV;
         goto error3;
     }
     op = dvn->ns->fs->ops.link;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error3;
     }
     err = (*op)(dvn->ns->data, dvn->data, filename, vn->data);
@@ -1503,7 +1508,7 @@ sys_unlink(bool kernel, int fd, const char *path)
 
     op = dvn->ns->fs->ops.unlink;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(dvn->ns->data, dvn->data, filename);
@@ -1538,7 +1543,7 @@ sys_rmdir(bool kernel, int fd, const char *path)
 
     op = dvn->ns->fs->ops.rmdir;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(dvn->ns->data, dvn->data, filename);
@@ -1575,13 +1580,13 @@ sys_rename(bool kernel, int ofd, const char *oldpath,
         goto error2;
     
     if (odvn->ns != ndvn->ns) {
-        err = EXDEV;
+        err = FS_EXDEV;
         goto error2;
     }
 
     op = odvn->ns->fs->ops.rename;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error3;
     }
     err = (*op)(odvn->ns->data, odvn->data, oldname, ndvn->data, newname);
@@ -1619,7 +1624,7 @@ sys_rstat(bool kernel, int fd, const char *path, struct my_stat *st, bool eatlin
         goto error1;
     op = vn->ns->fs->ops.rstat;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(vn->ns->data, vn->data, st);
@@ -1652,7 +1657,7 @@ sys_wstat(bool kernel, int fd, const char *path, struct my_stat *st, long mask,
         goto error1;
     op = vn->ns->fs->ops.wstat;
     if (!op) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
     err = (*op)(vn->ns->data, vn->data, st, mask);
@@ -1741,7 +1746,7 @@ add_nspace(nspace *ns, fsystem *fs, const char *fileSystem, dev_t dev, ino_t ino
 	if (fileSystem != NULL)
 		fs = inc_file_system(fileSystem);
 	if (!fs)
-		return ENODEV;
+		return FS_ENODEV;
 
 	for (i = 0; i < nns; i++, nxnsid++) {
 		if (!nstab[nxnsid % nns]) {
@@ -1753,7 +1758,7 @@ add_nspace(nspace *ns, fsystem *fs, const char *fileSystem, dev_t dev, ino_t ino
 	}
 	if (i == nns) {
 		dec_file_system(fs);
-		return EMFILE;
+		return FS_EMFILE;
 	}
 
 	nstab[ns->nsid % nns] = ns;
@@ -1772,7 +1777,7 @@ add_nspace(nspace *ns, fsystem *fs, const char *fileSystem, dev_t dev, ino_t ino
 		nshead->prev = ns;
 	nshead = ns;
 
-	return B_OK;
+	return FS_OK;
 }
 
 
@@ -1812,20 +1817,20 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
     err = (*mount->ns->fs->ops.rstat)(mount->ns->data, mount->data, &mst);
     if (err)
         goto error2;
-    if (!MY_S_ISDIR(mst.st_mode)) {
-        err = ENOTDIR;
+    if (!MY_S_ISDIR(mst.mode)) {
+        err = FS_ENOTDIR;
         goto error2;
     }
 
     ns = (nspace *)malloc(sizeof(nspace));
     if (!ns) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error2;
     }
 
     fs = inc_file_system(filesystem);
     if (!fs) {
-        err = ENODEV;
+        err = FS_ENODEV;
         goto error3;
     }
 
@@ -1837,7 +1842,7 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
                 UNLOCK(vnlock);
 				printf("KERNEL: trying to mount %s twice (already mounted as %s)\n",
 					device, ans->fs->name);
-                err = ENODEV;
+                err = FS_ENODEV;
                 goto error4;
             }
     }
@@ -1846,7 +1851,7 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
 
     UNLOCK(vnlock);
 
-	if (err != B_OK)
+	if (err != FS_OK)
 		goto error5;
 
     err = (*fs->ops.mount)(ns->nsid, device, flags, parms, len, &data, &vnid);
@@ -1858,7 +1863,7 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
     ns->data = data;
     
     if ((mount == rootvn) || (mount->mounted)) {
-        err = EBUSY;
+        err = FS_EBUSY;
         goto error6;
     }
     mount->mounted = ns;
@@ -1907,7 +1912,7 @@ sys_unmount(bool kernel, int fd, const char *where)
     ns = root->ns;
     fs = ns->fs;
     if (ns->root != root) {
-        err = EINVAL;
+        err = FS_EINVAL;
         goto error2;
     }
 
@@ -1917,7 +1922,7 @@ sys_unmount(bool kernel, int fd, const char *where)
     */
 
     if (root == rootvn) {
-        err = EBUSY;
+        err = FS_EBUSY;
         goto error2;
     }
 
@@ -1929,7 +1934,7 @@ sys_unmount(bool kernel, int fd, const char *where)
 
     for(vn = ns->vnodes.head; vn; vn = vn->nspace.next)
         if (vn->busy || (vn->rcnt != 0)) {
-            err = EBUSY;
+            err = FS_EBUSY;
             goto error3;
         }
 
@@ -1973,11 +1978,11 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong f
 	ns = root->ns;
 	fs = ns->fs;
 	if (ns->root != root)
-		return EINVAL;
+		return FS_EINVAL;
 
 	if (fs->ops.open_query == NULL) {
 		dec_vnode(root, FALSE);
-		return EPERM;
+		return FS_EPERM;
 	}
 	err = (*fs->ops.open_query)(ns->data, query, flags, port, token, cookie);
 	TRACE("sys_open_query() -- end: %d\n",err);
@@ -2002,11 +2007,11 @@ sys_close_query(bool kernel, int fd, const char *path, void *cookie)
     ns = root->ns;
     fs = ns->fs;
     if (ns->root != root)
-        return EINVAL;
+        return FS_EINVAL;
 
 	if (fs->ops.close_query == NULL) {
 		dec_vnode(root, FALSE);
-		return EPERM;
+		return FS_EPERM;
 	}
 	
 	err = (*fs->ops.close_query)(ns->data, cookie);
@@ -2019,7 +2024,7 @@ sys_close_query(bool kernel, int fd, const char *path, void *cookie)
 
 
 int
-sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct dirent *dent,size_t bufferSize,long count)
+sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct my_dirent *dent,size_t bufferSize,long count)
 {
 	int		err;
 	nspace	*ns;
@@ -2034,11 +2039,11 @@ sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct dirent
     ns = root->ns;
     fs = ns->fs;
     if (ns->root != root)
-        return EINVAL;
+        return FS_EINVAL;
 
 	if (fs->ops.close_query == NULL) {
 		dec_vnode(root, FALSE);
-		return EPERM;
+		return FS_EPERM;
 	}
 
 	num = count;
@@ -2149,7 +2154,7 @@ parse_path_fd(bool kernel, int fd, char **pstart, int eatsymlink, vnode **vnp)
         if (fd >= 0) {
             f = get_fd(kernel, fd, FD_ALL);
             if (!f)
-                return EBADF;
+                return FS_EBADF;
             bvn = f->vn;
             inc_vnode(bvn);
             put_fd(f);
@@ -2279,14 +2284,14 @@ parse_path(vnode *bvn, char **pstart, char *path, int eatsymlink, vnode **vnp)
             iter++;
             if (iter > MAX_SYM_LINKS) {
                 dec_vnode(vn, FALSE);
-                err = ELOOP;
+                err = FS_ELOOP;
                 break;
             }
 
             p = cat_paths(newpath, np);
             if (!p) {
                 dec_vnode(vn, FALSE);
-                err = ENOMEM;
+                err = FS_ENOMEM;
                 break;
             }
             free_path(*pstart);
@@ -2356,7 +2361,7 @@ put_vnode(nspace_id nsid, vnode_id vnid)
     vn = lookup_vnode(nsid, vnid);
     if (!vn) {
         UNLOCK(vnlock);
-        return ENOENT;
+        return FS_ENOENT;
     }
     UNLOCK(vnlock);
     dec_vnode(vn, TRUE);
@@ -2410,7 +2415,7 @@ restart:
         if (!vn) {
             PANIC("OUT OF VNODE!!!\n");
             UNLOCK(vnlock);
-            return ENOMEM;
+            return FS_ENOMEM;
         }
         flush_vnode(vn, TRUE);
     }
@@ -2418,7 +2423,7 @@ restart:
     vn->ns = nsidtons(nsid);
     if (!vn->ns) {
         UNLOCK(vnlock);
-        return ENOENT;
+        return FS_ENOENT;
     }
     vn->vnid = vnid;
     vn->data = data;
@@ -2441,7 +2446,7 @@ remove_vnode(nspace_id nsid, vnode_id vnid)
     vn = lookup_vnode(nsid, vnid);
     if (!vn || (vn->rcnt == 0)) {
         UNLOCK(vnlock);
-        return ENOENT;
+        return FS_ENOENT;
     }
     vn->remove = TRUE;
     UNLOCK(vnlock);
@@ -2461,7 +2466,7 @@ unremove_vnode(nspace_id nsid, vnode_id vnid)
     vn = lookup_vnode(nsid, vnid);
     if (!vn || (vn->rcnt == 0)) {
         UNLOCK(vnlock);
-        return ENOENT;
+        return FS_ENOENT;
     }
     vn->remove = FALSE;
     UNLOCK(vnlock);
@@ -2482,7 +2487,7 @@ is_vnode_removed(nspace_id nsid, vnode_id vnid)
     vn = lookup_vnode(nsid, vnid);
     if (!vn) {
         UNLOCK(vnlock);
-        return ENOENT;
+        return FS_ENOENT;
     }
     res = vn->remove;
     UNLOCK(vnlock);
@@ -2563,7 +2568,7 @@ static int
 sort_vnode(vnode *vn)
 {
     if (!InsertSL(skiplist, vn))
-        return ENOMEM;
+        return FS_ENOMEM;
 
     vn->nspace.next = vn->ns->vnodes.head;
     vn->nspace.prev = NULL;
@@ -2671,7 +2676,7 @@ load_vnode(nspace_id nsid, vnode_id vnid, char r, vnode **vnp)
     if (vn->ns == NULL) {
         vn->ns = nsidtons(nsid);
         if (!vn->ns) {
-            err = ENOENT;
+            err = FS_ENOENT;
             goto error1;
         }
         vn->vnid = vnid;
@@ -2739,13 +2744,13 @@ new_path(const char *path, char **copy)
     }
     l = strlen(path);
     if (l == 0)
-        return ENOENT;
+        return FS_ENOENT;
     s = l;
     if (path[l-1] == '/')
         s++;
 
     if (l >= MAXPATHLEN)
-        return ENAMETOOLONG;
+        return FS_ENAMETOOLONG;
 
     q = path;
     while (*q != '\0') {
@@ -2755,12 +2760,12 @@ new_path(const char *path, char **copy)
         while ((*q != '/') && (*q != '\0'))
             q++;
         if (q - r >= FILE_NAME_LENGTH)
-            return ENAMETOOLONG;        
+            return FS_ENAMETOOLONG;
     }
 
     p = (char *) malloc(s+1);
     if (!p)
-        return ENOMEM;
+        return FS_ENOMEM;
 
     /* ### do real checking: MAXPATHLEN, max file name len, buffer address... */
 
@@ -2901,12 +2906,12 @@ new_fd(bool kernel, int nfd, ofile *f, int fd, bool coe)
 
     if (!f) {
         if ((fd < 0) || (fd >= num)) {
-            err = EBADF;
+            err = FS_EBADF;
             goto error1;
         }
         f = fds->fds[fd];
         if (!f) {
-            err = EBADF;
+            err = FS_EBADF;
             goto error1;
         }
     }
@@ -2916,7 +2921,7 @@ new_fd(bool kernel, int nfd, ofile *f, int fd, bool coe)
 
     if (nfd >= 0) {
         if (nfd >= num) {
-            err = EBADF;
+            err = FS_EBADF;
             goto error2;
         }
         of = fds->fds[nfd];
@@ -2946,7 +2951,7 @@ new_fd(bool kernel, int nfd, ofile *f, int fd, bool coe)
         if (!GETBIT(fds->alloc, i))
             goto found;
 
-    err = EMFILE;
+    err = FS_EMFILE;
     goto error2;
 
 found:
@@ -2989,7 +2994,7 @@ remove_fd(bool kernel, int fd, int type)
     }
     UNLOCK(fds->lock);
     if (f == NULL)
-        return EBADF;
+        return FS_EBADF;
 
     err = 0;
     cnt = atomic_add(&f->ocnt, -1);
@@ -3023,7 +3028,7 @@ get_coe(bool kernel, int fd, int type, bool *coe)
         }
     }
     UNLOCK(fds->lock);
-    return EBADF;
+    return FS_EBADF;
 }
 
 static int
@@ -3047,7 +3052,7 @@ set_coe(bool kernel, int fd, int type, bool coe)
         }
     }
     UNLOCK(fds->lock);
-    return EBADF;
+    return FS_EBADF;
 }
 
 static int
@@ -3071,7 +3076,7 @@ get_omode(bool kernel, int fd, int type, int *omode)
         }
     }
     UNLOCK(fds->lock);
-    return EBADF;
+    return FS_EBADF;
 }
 #endif
 
@@ -3152,7 +3157,7 @@ alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp)
 
     f = (ofile *) calloc(sizeof(ofile), 1);
     if (!f) {
-        err = ENOMEM;
+        err = FS_ENOMEM;
         goto error1;
     }
 
@@ -3163,7 +3168,7 @@ alloc_wd_fd(bool kernel, vnode *vn, bool coe, int *fdp)
 
     nfd = new_fd(kernel, -1, f, -1, coe);
     if (nfd < 0) {
-        err = EMFILE;
+        err = FS_EMFILE;
         goto error2;
     }
 
@@ -3388,7 +3393,7 @@ send_notification(port_id port, long token, ulong what, long op, nspace_id nsida
 
 	return write_port(gTrackerPort, what, &message, sizeof(message));
 #else
-	return B_OK;
+	return FS_OK;
 #endif
 }
 
@@ -3401,7 +3406,7 @@ notify_select_event(selectsync *sync, uint32 ref)
 status_t
 notify_select_event(selectsync *sync, uint32 ref, uint8 event)
 {
-	return B_UNSUPPORTED;
+	return FS_UNSUPPORTED;
 }
 #endif
 

@@ -20,11 +20,27 @@
 #ifndef _COMPAT_H
 #define _COMPAT_H
 
+#define _FS_INTERFACE_H
+	// don't include that file
 
+#ifndef __BEOS__
+#define _ERRORS_H
+	// don't include <Errors.h>, we use the platform <errno.h>
+#define dprintf build_platform_dprintf
+#include <stdio.h>
+#undef dprintf
+
+typedef struct dirent dirent_t;
+typedef struct iovec iovec;
+
+#endif
+
+
+#include <dirent.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
-#include <memory.h>
+#include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>
 #include <time.h>
@@ -36,7 +52,11 @@
 #include <iovec.h>           /* because we're boneheads sometimes */
 #else
 #include <sys/uio.h>
+#include <image.h>           /* for a few typedefs */
+#include <Drivers.h>         /* for various ioctl structs, etc */
 #endif
+
+#include "errors.h"
 
 
 /*
@@ -76,7 +96,9 @@ typedef int my_gid_t;
 
 typedef struct my_dirent {
     my_dev_t        d_dev;
+    my_dev_t        d_pdev;
     my_ino_t        d_ino;
+    my_ino_t        d_pino;
     unsigned short  d_reclen;
     char            d_name[1];
 } my_dirent_t;
@@ -110,6 +132,21 @@ struct my_stat {
     time_t          crtime;     /* creation time; not posix but useful */
 };
 
+
+#define MY_S_ATTR_DIR          01000000000 /* attribute directory */
+#define MY_S_ATTR              02000000000 /* attribute */
+#define MY_S_INDEX_DIR         04000000000 /* index (or index directory) */
+#define MY_S_STR_INDEX         00100000000 /* string index */
+#define MY_S_INT_INDEX         00200000000 /* int32 index */
+#define MY_S_UINT_INDEX        00400000000 /* uint32 index */
+#define MY_S_LONG_LONG_INDEX   00010000000 /* int64 index */
+#define MY_S_ULONG_LONG_INDEX  00020000000 /* uint64 index */
+#define MY_S_FLOAT_INDEX       00040000000 /* float index */
+#define MY_S_DOUBLE_INDEX      00001000000 /* double index */
+#define MY_S_ALLOW_DUPS        00002000000 /* allow duplicate entries (currently unused) */
+
+#define MY_S_LINK_SELF_HEALING 00001000000 /* link will be updated if you move its target */
+#define MY_S_LINK_AUTO_DELETE  00002000000 /* link will be deleted if you delete its target */
 
 #define     MY_S_IFMT        00000170000 /* type of file */
 #define     MY_S_IFLNK       00000120000 /* symbolic link */
@@ -147,7 +184,6 @@ struct my_stat {
 #define MY_S_IXOTH 00001     /* execute permission: other */
 
 
-
 #ifndef TRUE
 #define TRUE 1
 #endif
@@ -157,37 +193,11 @@ struct my_stat {
 #endif
 
 #ifndef __BEOS__
-typedef long               sem_id;
-typedef unsigned char      uchar;
-typedef short              int16;
-typedef unsigned short     uint16;
-typedef int                int32;
-typedef unsigned int       uint32;
-#define ulong unsigned long         /* make it a #define to avoid conflicts */
-typedef long long          int64;
-typedef unsigned long long uint64;
-typedef unsigned int       port_id;
-typedef int                bool;
-typedef int                image_id;
-typedef long long          bigtime_t;
-typedef long               thread_id;
-typedef long               status_t;
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-sem_id     create_sem(long count, const char *name);
-long       delete_sem(sem_id sem);
-long       acquire_sem(sem_id sem);
-long       acquire_sem_etc(sem_id sem, int count, int flags,
-                           bigtime_t microsecond_timeout);
-long       release_sem(sem_id sem);
-long       release_sem_etc(sem_id sem, long count, long flags);
-
-long       atomic_add(long *value, long addvalue);
-int        snooze(bigtime_t f);
-bigtime_t  system_time(void);
 ssize_t    read_pos(int fd, fs_off_t _pos, void *data,  size_t nbytes);
 ssize_t    write_pos(int fd, fs_off_t _pos, const void *data,  size_t nbytes);
 ssize_t    readv_pos(int fd, fs_off_t _pos, struct iovec *iov, int count);
@@ -197,7 +207,7 @@ ssize_t    writev_pos(int fd, fs_off_t _pos, struct iovec *iov,  int count);
 }
 #endif
 
-#endif /* __BEOS__ */
+#endif /* ! __BEOS__ */
 
 #ifdef __cplusplus
 extern "C" {

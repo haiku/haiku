@@ -8,7 +8,7 @@
 extern "C" {
 #endif
 
-#include "compat.h"
+//#include "compat.h"
 
 #include "lock.h"
 #include "cache.h"

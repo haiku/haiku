@@ -99,4 +99,20 @@ reply_to_external_command(int result)
 	}
 }
 
-#endif // __BEOS__
+#else // ! __BEOS__
+
+char *
+get_external_command(const char *prompt, char *input, int len)
+{
+	// TODO: Implement!
+	return 0;
+}
+
+
+void
+reply_to_external_command(int result)
+{
+	// TODO: Implement!
+}
+
+#endif // ! __BEOS__

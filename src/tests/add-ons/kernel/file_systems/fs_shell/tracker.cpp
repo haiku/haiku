@@ -26,7 +26,7 @@ tracker_query_file(dev_t device, ino_t parent, char *name)
 		return;
 	}
 
-	struct stat stat;
+	struct my_stat stat;
 	int status = sys_rstat(true, fd, NULL, &stat, 1);
 	if (status < 0) {
 		printf("tracker: could not stat file: %s\n", name);

@@ -112,7 +112,7 @@ read_phys_blocks(int fd, fs_off_t bnum, void *data, uint num_blocks, int bsize)
     if (ret == num_blocks * bsize)
         return 0;
     else
-        return EBADF;
+        return FS_EBADF;
 }
 
 size_t
@@ -150,7 +150,7 @@ write_phys_blocks(int fd, fs_off_t bnum, void *data, uint num_blocks, int bsize)
     if (ret == num_blocks * bsize)
         return 0;
     else
-        return EBADF;
+        return FS_EBADF;
 }
 
 //	#pragma mark -
@@ -164,7 +164,7 @@ init_hash_table(hash_table *ht)
 
     ht->table = (hash_ent **)calloc(ht->max, sizeof(hash_ent *));
     if (ht->table == NULL)
-        return ENOMEM;
+        return FS_ENOMEM;
 
     return 0;
 }
@@ -254,7 +254,7 @@ grow_hash_table(hash_table *ht)
 
     new_table = (hash_ent **)calloc(newsize, sizeof(hash_ent *));
     if (new_table == NULL)
-        return ENOMEM;
+        return FS_ENOMEM;
 
     for(i=0; i < omax; i++) {
         for(he=ht->table[i]; he; he=next) {
@@ -292,12 +292,12 @@ hash_insert(hash_table *ht, int dev, fs_off_t bnum, void *data)
 
     if (curr && curr->dev == dev && curr->bnum == bnum) {
         printf("entry %d:%Ld already in the hash table!\n", dev, bnum);
-        return EEXIST;
+        return FS_EEXIST;
     }
 
     he = new_hash_ent(dev, bnum, data);
     if (he == NULL)
-        return ENOMEM;
+        return FS_ENOMEM;
     
     he->next        = ht->table[hash];
     ht->table[hash] = he;
@@ -305,7 +305,7 @@ hash_insert(hash_table *ht, int dev, fs_off_t bnum, void *data)
     ht->num_elements++;
     if (ht->num_elements >= ((ht->max * 3) / 4)) {
         if (grow_hash_table(ht) != 0)
-            return ENOMEM;
+            return FS_ENOMEM;
     }
 
     return 0;
@@ -402,7 +402,7 @@ init_block_cache(int max_blocks, int flags)
     memset(&max_device_blocks, 0, sizeof(max_device_blocks));
 
     if (init_hash_table(&bc.ht) != 0)
-        return ENOMEM;
+        return FS_ENOMEM;
 
     bc.lock.s = iovec_lock.s = -1;
 
@@ -438,7 +438,7 @@ init_block_cache(int max_blocks, int flags)
 
     shutdown_hash_table(&bc.ht);
     memset((void *)&bc, 0, sizeof(bc));
-    return ENOMEM;
+    return FS_ENOMEM;
 }
 
 
@@ -908,7 +908,7 @@ flush_ents(cache_ent **ents, int n_ents)
     
     iov = get_iovec_array();
     if (iov == NULL)
-        return ENOMEM;
+        return FS_ENOMEM;
 
 restart:
     for(i=0; i < n_ents; i++) {
@@ -962,11 +962,11 @@ restart:
 
             for(idx=0; idx < iocnt; idx++)
                 printf("iov[%2d] = %p :: %ld\n", idx, iov[idx].iov_base,
-                       iov[idx].iov_len);
+                       (long)iov[idx].iov_len);
 
             printf("error %s writing blocks %Ld:%d (%d != %d)\n",
                    strerror(errno), start_bnum, iocnt, ret, iocnt*bsize);
-            ret = EINVAL;
+            ret = FS_EINVAL;
             break;
         }
         ret = 0;
@@ -1103,6 +1103,8 @@ int
 init_cache_for_device(int fd, fs_off_t max_blocks)
 {
     int ret = 0;
+
+printf("init_cache_for_device(%d, %lld)\n", fd, max_blocks);
     
     if (fd >= MAX_DEVICES)
         return -1;
@@ -1178,7 +1180,7 @@ set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
         if (ce == NULL) {
             panic("*** set_block_info can't find bnum %ld!\n", blocks[i]);
             UNLOCK(bc.lock);
-            return ENOENT;   /* hopefully this doesn't happen... */
+            return FS_ENOENT;   /* hopefully this doesn't happen... */
         }
 
 
@@ -1186,7 +1188,7 @@ set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
             UNLOCK(bc.lock);
             panic("** error1: looked up dev %d block %ld but found dev %d "
                     "bnum %ld\n", dev, blocks[i], ce->dev, ce->block_num);
-            return EBADF;
+            return FS_EBADF;
         }
 
         if (ce->lock == 0) {
@@ -1243,7 +1245,7 @@ set_blocks_info(int dev, fs_off_t *blocks, int nblocks,
         if (ce == NULL) {
             panic("*** set_block_info can't find bnum %Ld!\n", blocks[i]);
             UNLOCK(bc.lock);
-            return ENOENT;   /* hopefully this doesn't happen... */
+            return FS_ENOENT;   /* hopefully this doesn't happen... */
         }
 
         ce->flags &= ~(CE_DIRTY | CE_BUSY);
@@ -1436,7 +1438,9 @@ real_remove_cached_blocks(int dev, int allow_writes, cache_ent_list *cel)
 int
 remove_cached_device_blocks(int dev, int allow_writes)
 {
-    LOCK(bc.lock);
+printf("remove_cached_device_blocks(%d, %d)\n", dev, allow_writes);
+
+	LOCK(bc.lock);
 
     real_remove_cached_blocks(dev, allow_writes, &bc.normal);
     real_remove_cached_blocks(dev, allow_writes, &bc.locked);
@@ -1472,7 +1476,7 @@ flush_blocks(int dev, fs_off_t bnum, int nblocks)
             UNLOCK(bc.lock);
             panic("error2: looked up dev %d block %ld but found %d %ld\n",
                   dev, bnum, ce->dev, ce->block_num);
-            return EBADF;
+            return FS_EBADF;
         }
 
         if ((ce->flags & CE_DIRTY) == 0 && ce->clone == NULL)
@@ -1529,7 +1533,7 @@ mark_blocks_dirty(int dev, fs_off_t bnum, int nblocks)
         } else {     /* hmmm, that's odd, didn't find it */
             printf("** mark_blocks_diry couldn't find block %Ld (len %d)\n",
                    bnum, nblocks);
-            ret = ENOENT;
+            ret = FS_ENOENT;
             break;
         }
     }
@@ -1555,7 +1559,7 @@ release_block(int dev, fs_off_t bnum)
             panic("*** error3: looked up dev %d block %ld but found %d %ld\n",
                     dev, bnum, ce->dev, ce->block_num);
             UNLOCK(bc.lock);
-            return EBADF;
+            return FS_EBADF;
         }
 
         ce->lock--;
@@ -1698,7 +1702,7 @@ read_into_ents(int dev, fs_off_t bnum, cache_ent **ents, int num, int bsize)
         printf("read_into_ents: asked to read %d bytes but got %d\n",
                num*bsize, ret);
         printf("*** iov @ %p (num %d)\n", iov, num);
-        return EINVAL;
+        return FS_EINVAL;
     } else
         return 0;
 }
@@ -1755,7 +1759,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
     if (data == NULL && dataptr == NULL) {
         printf("major butthead move: null data and dataptr! bnum %Ld:%Ld\n",
                 bnum, num_blocks);
-        return ENOMEM;
+        return FS_ENOMEM;
     }
         
     if (data == NULL) {
@@ -1775,7 +1779,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
 		debugger("Accessed blocks out of device range!");
 		//*(int *)0x3100 = 0xc0debabe;
 
-        return EINVAL;
+        return FS_EINVAL;
     }
 
     last_cache_access = system_time();
@@ -1793,7 +1797,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             if (read_phys_blocks(dev, bnum, data, num_blocks, bsize) != 0) {
                 printf("cache read:read_phys_blocks failed (%s on blocks %Ld:%Ld)!\n",
                         strerror(errno), bnum, num_blocks);
-                return EINVAL;
+                return FS_EINVAL;
             }
 
             LOCK(bc.lock);
@@ -1835,7 +1839,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                         panic("*** error5: looked up dev %d block %Ld but "
                                 "found %d %Ld\n", dev, tmp, ce->dev,
                                 ce->block_num);
-                        return EBADF;
+                        return FS_EBADF;
                     }
 
                     /* XXXdbg -- this isn't strictly necessary */
@@ -1854,11 +1858,11 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
             if (write_phys_blocks(dev, bnum, data, num_blocks, bsize) != 0) {
                 printf("cache write: write_phys_blocks failed (%s on blocks "
                        "%Ld:%Ld)!\n", strerror(errno), bnum, num_blocks);
-                return EINVAL;
+                return FS_EINVAL;
             }
         } else {
             printf("bad cache op %d (bnum %Ld nblocks %Ld)\n", op, bnum, num_blocks);
-            return EINVAL;
+            return FS_EINVAL;
         }
 
         return 0;
@@ -1874,7 +1878,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 UNLOCK(bc.lock);
                 panic("*** error6: looked up dev %d block %ld but found "
                         "%d %ld\n", dev, bnum, ce->dev, ce->block_num);
-                return EBADF;
+                return FS_EBADF;
             }
 
             if (bsize != ce->bsize) {
@@ -2097,7 +2101,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                 if (ents[cur]->data == NULL) {
                     printf("cache: no memory for block (bsize %d)!\n",
                            bsize);
-                    err = ENOMEM;
+                    err = FS_ENOMEM;
                     break;
                 }
             }
@@ -2147,7 +2151,7 @@ cache_block_io(int dev, fs_off_t bnum, void *data, fs_off_t num_blocks, int bsiz
                     UNLOCK(bc.lock);
                 }
 
-                return ENOMEM;
+                return FS_ENOMEM;
             }
                 
 
