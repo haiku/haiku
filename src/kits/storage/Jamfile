@@ -42,8 +42,13 @@ SharedLibrary storage :
 	ResourceItem.cpp
 	Resources.cpp
 	ResourceStrings.cpp
+	Err.cpp			# Hack-o-rama
+	Pattern.cpp		# Hack-o-rama
+	PatternList.cpp		# Hack-o-rama
 	Parser.cpp		# Hack-o-rama
 	Range.cpp		# Hack-o-rama
+	RPattern.cpp		# Hack-o-rama
+	RPatternList.cpp		# Hack-o-rama
 	Rule.cpp		# Hack-o-rama
 	Statable.cpp
 	SymLink.cpp
