@@ -4,6 +4,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <vm.h>
 #include <lock.h>
@@ -87,22 +88,31 @@ static void dump_bin(int bin_index)
 	dprintf("NULL\n");
 }
 
-static int dump_bin_list(int argc, char **argv)
+
+static int
+dump_bin_list(int argc, char **argv)
 {
 	int i;
 
 	dprintf("%d heap bins at %p:\n", bin_count, bins);
 
-	for(i=0; i<bin_count; i++) {
+	for (i = 0; i<bin_count; i++) {
 		dump_bin(i);
 	}
 	return 0;
 }
 
-// called from vm_init. The heap should already be mapped in at this point, we just
-// do a little housekeeping to set up the data structure.
-int heap_init(addr new_heap_base, unsigned int new_heap_size)
+
+/* called from vm_init. The heap should already be mapped in at this point, we just
+ * do a little housekeeping to set up the data structure.
+ */
+
+int
+heap_init(addr new_heap_base, unsigned int new_heap_size)
 {
+	// ToDo: the heap size may overflow in certain circumstances, but I didn't like
+	// the NewOS fix for this... -- axeld.
+
 	// set some global pointers
 	heap_alloc_table = (struct heap_page *)new_heap_base;
 	heap_size = new_heap_size;
@@ -115,7 +125,7 @@ int heap_init(addr new_heap_base, unsigned int new_heap_size)
 
 	// pre-init the mutex to at least fall through any semaphore calls
 	heap_lock.sem = -1;
-	heap_lock.count = 0;
+	heap_lock.holder = -1;
 
 	// set up some debug commands
 	add_debugger_command("heap_bindump", &dump_bin_list, "dump stats about bin usage");
@@ -123,15 +133,19 @@ int heap_init(addr new_heap_base, unsigned int new_heap_size)
 	return 0;
 }
 
-int heap_init_postsem(kernel_args *ka)
+
+int
+heap_init_postsem(kernel_args *ka)
 {
-	if(mutex_init(&heap_lock, "heap_mutex") < 0) {
+	if (mutex_init(&heap_lock, "heap_mutex") < 0)
 		panic("error creating heap mutex\n");
-	}
+
 	return 0;
 }
 
-static char *raw_alloc(unsigned int size, int bin_index)
+
+static char *
+raw_alloc(unsigned int size, int bin_index)
 {
 	unsigned int new_heap_ptr;
 	char *retval;
@@ -139,11 +153,10 @@ static char *raw_alloc(unsigned int size, int bin_index)
 	unsigned int addr;
 
 	new_heap_ptr = heap_base_ptr + PAGE_ALIGN(size);
-	if(new_heap_ptr > heap_base + heap_size) {
+	if (new_heap_ptr > heap_base + heap_size)
 		panic("heap overgrew itself!\n");
-	}
 
-	for(addr = heap_base_ptr; addr < new_heap_ptr; addr += PAGE_SIZE) {
+	for (addr = heap_base_ptr; addr < new_heap_ptr; addr += PAGE_SIZE) {
 		page = &heap_alloc_table[(addr - heap_base) / PAGE_SIZE];
 		page->in_use = 1;
 		page->cleaning = 0;
@@ -159,7 +172,9 @@ static char *raw_alloc(unsigned int size, int bin_index)
 	return retval;
 }
 
-void *kmalloc(unsigned int size)
+
+void *
+kmalloc(unsigned int size)
 {
 	void *address = NULL;
 	int bin_index;
@@ -220,7 +235,9 @@ out:
 	return address;
 }
 
-void kfree(void *address)
+
+void
+kfree(void *address)
 {
 	struct heap_page *page;
 	struct heap_bin *bin;
@@ -279,11 +296,13 @@ void kfree(void *address)
 	mutex_unlock(&heap_lock);
 }
 
-char *kstrdup(const char *text)
+
+char *
+kstrdup(const char *text)
 {
 	char *buf = (char *)kmalloc(strlen(text) + 1);
 
-	if(buf != NULL)
+	if (buf != NULL)
 		strcpy(buf,text);
 	return buf;
 }

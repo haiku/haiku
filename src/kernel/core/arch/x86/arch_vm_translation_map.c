@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <memheap.h>
 #include <int.h>
@@ -667,7 +668,7 @@ int vm_translation_map_module_init(kernel_args *ka)
 	queue_init(&mapped_paddr_lru);
 	memset(iospace_pgtables, 0, PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)));
 	iospace_mutex.sem = -1;
-	iospace_mutex.count = 0;
+	iospace_mutex.holder = -1;
 	iospace_full_sem = -1;
 
 	dprintf("mapping iospace_pgtables\n");

@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <Errors.h>
 #include <kerrors.h>
 #include <kernel.h>
@@ -1162,7 +1163,7 @@ static int dump_cache_ref(int argc, char **argv)
 
 	dprintf("cache_ref at %p:\n", cache_ref);
 	dprintf("cache: %p\n", cache_ref->cache);
-	dprintf("lock.count: %d\n", cache_ref->lock.count);
+	dprintf("lock.holder: %d\n", cache_ref->lock.holder);
 	dprintf("lock.sem: 0x%x\n", cache_ref->lock.sem);
 	dprintf("region_list:\n");
 	for(region = cache_ref->region_list; region != NULL; region = region->cache_next) {
@@ -1762,12 +1763,11 @@ int vm_init_postsem(kernel_args *ka)
 	// it isn't that hard to find all of the ones we need to create
 	vm_translation_map_module_init_post_sem(ka);
 	kernel_aspace->virtual_map.sem = create_sem(WRITE_COUNT, "kernel_aspacelock");
-	kernel_aspace->translation_map.lock.sem = create_sem(1, "recursive_lock");
+	recursive_lock_create(&kernel_aspace->translation_map.lock);
 
-	for(region = kernel_aspace->virtual_map.region_list; region; region = region->aspace_next) {
-		if(region->cache_ref->lock.sem < 0) {
-			region->cache_ref->lock.sem = create_sem(1, "cache_ref_mutex");
-		}
+	for (region = kernel_aspace->virtual_map.region_list; region; region = region->aspace_next) {
+		if (region->cache_ref->lock.sem < 0)
+			mutex_init(&region->cache_ref->lock, "cache_ref_mutex");
 	}
 
 	region_hash_sem = create_sem(WRITE_COUNT, "region_hash_sem");

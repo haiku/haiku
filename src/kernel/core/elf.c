@@ -23,6 +23,13 @@
 #include <string.h>
 #include <stdio.h>
 
+#define ELF_TRACE 0
+#if ELF_TRACE
+#	define PRINT(x) dprintf x
+#else
+#	define PRINT(x)
+#endif
+
 struct elf_region {
 	region_id id;
 	addr start;
@@ -74,7 +81,9 @@ static image_id next_image_id = 0;
 #define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
-static void insert_image_in_list(struct elf_image_info *image)
+
+static void
+insert_image_in_list(struct elf_image_info *image)
 {
 	mutex_lock(&image_lock);
 
@@ -84,7 +93,9 @@ static void insert_image_in_list(struct elf_image_info *image)
 	mutex_unlock(&image_lock);
 }
 
-static void remove_image_from_list(struct elf_image_info *image)
+
+static void
+remove_image_from_list(struct elf_image_info *image)
 {
 	struct elf_image_info **ptr;
 
@@ -101,7 +112,9 @@ static void remove_image_from_list(struct elf_image_info *image)
 	mutex_unlock(&image_lock);
 }
 
-static struct elf_image_info *find_image(image_id id)
+
+static struct elf_image_info *
+find_image(image_id id)
 {
 	struct elf_image_info *image;
 
@@ -116,7 +129,9 @@ static struct elf_image_info *find_image(image_id id)
 	return image;
 }
 
-static struct elf_image_info *find_image_by_vnode(void *vnode)
+
+static struct elf_image_info *
+find_image_by_vnode(void *vnode)
 {
 	struct elf_image_info *image;
 
@@ -131,7 +146,9 @@ static struct elf_image_info *find_image_by_vnode(void *vnode)
 	return image;
 }
 
-static struct elf_image_info *create_image_struct()
+
+static struct elf_image_info *
+create_image_struct()
 {
 	struct elf_image_info *image;
 
@@ -147,7 +164,9 @@ static struct elf_image_info *create_image_struct()
 	return image;
 }
 
-static unsigned long elf_hash(const unsigned char *name)
+
+static unsigned long
+elf_hash(const unsigned char *name)
 {
 	unsigned long hash = 0;
 	unsigned long temp;
@@ -161,14 +180,16 @@ static unsigned long elf_hash(const unsigned char *name)
 	return hash;
 }
 
-static void dump_image_info(struct elf_image_info *image)
+
+static void
+dump_image_info(struct elf_image_info *image)
 {
 	int i;
 
 	dprintf("elf_image_info at %p:\n", image);
 	dprintf(" next %p\n", image->next);
 	dprintf(" id 0x%x\n", image->id);
-	for(i=0; i<2; i++) {
+	for (i = 0; i < 2; i++) {
 		dprintf(" regions[%d].id 0x%x\n", i, image->regions[i].id);
 		dprintf(" regions[%d].start 0x%lx\n", i, image->regions[i].start);
 		dprintf(" regions[%d].size 0x%lx\n", i, image->regions[i].size);
@@ -200,7 +221,8 @@ static void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 }
 */
 
-static struct Elf32_Sym *elf_find_symbol(struct elf_image_info *image, const char *name)
+static struct Elf32_Sym *
+elf_find_symbol(struct elf_image_info *image, const char *name)
 {
 	unsigned int hash;
 	unsigned int i;
@@ -218,37 +240,41 @@ static struct Elf32_Sym *elf_find_symbol(struct elf_image_info *image, const cha
 	return NULL;
 }
 
-addr elf_lookup_symbol(image_id id, const char *symbol)
+
+addr
+elf_lookup_symbol(image_id id, const char *symbol)
 {
 	struct elf_image_info *image;
 	struct Elf32_Sym *sym;
-	
-	//dprintf( "elf_lookup_symbol: %s\n", symbol );
+
+	PRINT(("elf_lookup_symbol: %s\n", symbol));
 
 	image = find_image(id);
-	if(!image)
+	if (!image)
 		return 0;
 
 	sym = elf_find_symbol(image, symbol);
-	if(!sym)
+	if (!sym)
 		return 0;
 
-	if(sym->st_shndx == SHN_UNDEF) {
+	if (sym->st_shndx == SHN_UNDEF)
 		return 0;
-	}
-	
-	/*dprintf( "found: %x (%x + %x)\n", sym->st_value + image->regions[0].delta, 
-		sym->st_value, image->regions[0].delta );*/
+
+	PRINT(("found: %x (%x + %x)\n", sym->st_value + image->regions[0].delta, 
+		sym->st_value, image->regions[0].delta));
+
 	return sym->st_value + image->regions[0].delta;
 }
 
-static int elf_parse_dynamic_section(struct elf_image_info *image)
+
+static int
+elf_parse_dynamic_section(struct elf_image_info *image)
 {
 	struct Elf32_Dyn *d;
 	int i;
 	int needed_offset = -1;
 
-//	dprintf("top of elf_parse_dynamic_section\n");
+	PRINT(("top of elf_parse_dynamic_section\n"));
 
 	image->symhash = 0;
 	image->syms = 0;
@@ -300,7 +326,7 @@ static int elf_parse_dynamic_section(struct elf_image_info *image)
 	if(!image->symhash || !image->syms || !image->strtab)
 		return ERR_GENERAL;
 
-//	dprintf("needed_offset = %d\n", needed_offset);
+	PRINT(("needed_offset = %d\n", needed_offset));
 
 	if(needed_offset >= 0)
 		image->needed = STRING(image, needed_offset);
@@ -308,10 +334,14 @@ static int elf_parse_dynamic_section(struct elf_image_info *image)
 	return B_NO_ERROR;
 }
 
-// this function first tries to see if the first image and it's already resolved symbol is okay, otherwise
-// it tries to link against the shared_image
-// XXX gross hack and needs to be done better
-static int  elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct elf_image_info *shared_image, const char *sym_prepend,addr *sym_addr)
+
+/* this function first tries to see if the first image and it's already resolved symbol is okay, otherwise
+ * it tries to link against the shared_image
+ * XXX gross hack and needs to be done better
+ */
+
+static int
+elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct elf_image_info *shared_image, const char *sym_prepend,addr *sym_addr)
 {
 	struct Elf32_Sym *sym2;
 	char new_symname[512];
@@ -324,7 +354,7 @@ static int  elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *s
 
 			// it's undefined, must be outside this image, try the other image
 			sym2 = elf_find_symbol(shared_image, new_symname);
-			if(!sym2) {
+			if (!sym2) {
 				dprintf("!sym2: elf_resolve_symbol: could not resolve symbol '%s'\n", new_symname);
 				return ERR_ELF_RESOLVING_SYMBOL;
 			}
@@ -336,7 +366,7 @@ static int  elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *s
 			}
 
 			if(ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
-//				dprintf("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname);
+				PRINT(("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname));
 				return ERR_ELF_RESOLVING_SYMBOL;
 			}
 
@@ -347,17 +377,19 @@ static int  elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *s
                         return B_NO_ERROR;
 		case SHN_COMMON:
 			// XXX finish this
-//			dprintf("elf_resolve_symbol: COMMON symbol, finish me!\n");
+			PRINT(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
 			return ERR_NOT_IMPLEMENTED_YET;
 		default:
 			// standard symbol
 			*sym_addr = sym->st_value + image->regions[0].delta;
-                        return B_NO_ERROR;
+			return B_NO_ERROR;
 	}
 }
 
-static int elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
-                            struct Elf32_Rel *rel, int rel_len )
+
+static int
+elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
+	struct Elf32_Rel *rel, int rel_len )
 {
 	int i;
 	struct Elf32_Sym *sym;
@@ -369,8 +401,8 @@ static int elf_relocate_rel(struct elf_image_info *image, const char *sym_prepen
 
 	S = A = P = 0;
 	
-	for(i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
-		//dprintf("looking at rel type %d, offset 0x%x\n", ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset);
+	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
+		PRINT(("looking at rel type %d, offset 0x%x\n", ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset));
 
 		// calc S
 		switch(ELF32_R_TYPE(rel[i].r_info)) {
@@ -384,7 +416,7 @@ static int elf_relocate_rel(struct elf_image_info *image, const char *sym_prepen
 				vlErr = elf_resolve_symbol(image, sym, kernel_image, sym_prepend, &S);
 				if (vlErr < 0)
 					return vlErr;
-//				dprintf("S 0x%x\n", S);
+				PRINT(("S 0x%x\n", S));
 		}
 		// calc A
 		switch(ELF32_R_TYPE(rel[i].r_info)) {
@@ -396,7 +428,7 @@ static int elf_relocate_rel(struct elf_image_info *image, const char *sym_prepen
 			case R_386_GOTOFF:
 			case R_386_GOTPC:
 				A = *(addr *)(image->regions[0].delta + rel[i].r_offset);
-//					dprintf("A 0x%x\n", A);
+				PRINT(("A 0x%x\n", A));
 				break;
 		}
 		// calc P
@@ -406,7 +438,7 @@ static int elf_relocate_rel(struct elf_image_info *image, const char *sym_prepen
 			case R_386_PLT32:
 			case R_386_GOTPC:
 				P = image->regions[0].delta + rel[i].r_offset;
-//					dprintf("P 0x%x\n", P);
+				PRINT(("P 0x%x\n", P));
 				break;
 		}
 
@@ -439,58 +471,66 @@ static int elf_relocate_rel(struct elf_image_info *image, const char *sym_prepen
 	return B_NO_ERROR;
 }
 
+
 // XXX for now just link against the kernel
-static int elf_relocate(struct elf_image_info *image, const char *sym_prepend)
+static int
+elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 {
 	int res = B_NO_ERROR;
 	int i;
-//	dprintf("top of elf_relocate\n");
+	PRINT(("top of elf_relocate\n"));
 
 	// deal with the rels first
-	if( image->rel ) {
-		dprintf( "total %i relocs\n", image->rel_len / (int)sizeof(struct Elf32_Rel) );
-		res = elf_relocate_rel( image, sym_prepend, image->rel, image->rel_len );
+	if (image->rel) {
+		dprintf("total %i relocs\n", image->rel_len / (int)sizeof(struct Elf32_Rel));
+		res = elf_relocate_rel(image, sym_prepend, image->rel, image->rel_len);
 		
-		if(res)
-			return res;
-	}
-	
-	if( image->pltrel ) {
-		dprintf( "total %i plt-relocs\n", image->pltrel_len / (int)sizeof(struct Elf32_Rel) );
-		res = elf_relocate_rel( image, sym_prepend, image->pltrel, image->pltrel_len );
-
-		if( res )
+		if (res)
 			return res;
 	}
 
-	if(image->rela) {
+	if (image->pltrel) {
+		dprintf("total %i plt-relocs\n", image->pltrel_len / (int)sizeof(struct Elf32_Rel));
+		res = elf_relocate_rel(image, sym_prepend, image->pltrel, image->pltrel_len);
+
+		if (res)
+			return res;
+	}
+
+	if (image->rela) {
 		dprintf("RELA relocations not supported\n");
-		return ERR_NOT_ALLOWED;
+#if ELF_TRACE
 		for(i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
 			dprintf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
 		}
+#endif
+		return EPERM;
 	}
 	return res;
 }
 
-static int verify_eheader(struct Elf32_Ehdr *eheader)
+
+static int
+verify_eheader(struct Elf32_Ehdr *eheader)
 {
-	if(memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
 		return ERR_INVALID_BINARY;
 
-	if(eheader->e_ident[4] != ELFCLASS32)
+	if (eheader->e_ident[4] != ELFCLASS32)
 		return ERR_INVALID_BINARY;
 
-	if(eheader->e_phoff == 0)
+	if (eheader->e_phoff == 0)
 		return ERR_INVALID_BINARY;
 
-	if(eheader->e_phentsize < sizeof(struct Elf32_Phdr))
+	if (eheader->e_phentsize < sizeof(struct Elf32_Phdr))
 		return ERR_INVALID_BINARY;
 
 	return 0;
 }
 
-int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
+
+int
+elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 {
 	struct Elf32_Ehdr eheader;
 	struct Elf32_Phdr *pheaders = NULL;
@@ -520,7 +560,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 		goto error;
 
 	pheaders = (struct Elf32_Phdr *)kmalloc(eheader.e_phnum * eheader.e_phentsize);
-	if(pheaders == NULL) {
+	if (pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
 		err = ENOMEM;
 		goto error;
@@ -528,12 +568,12 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 
 	dprintf("reading in program headers at 0x%x, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
 	len = sys_read(fd, pheaders, eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
-	if(len < 0) {
+	if (len < 0) {
 		err = len;
 		dprintf("error reading in program headers\n");
 		goto error;
 	}
-	if(len != eheader.e_phnum * eheader.e_phentsize) {
+	if (len != eheader.e_phnum * eheader.e_phentsize) {
 		dprintf("short read while reading in program headers\n");
 		err = -1;
 		goto error;
@@ -570,7 +610,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 				path,
 				ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE)
 			);
-			if(id < 0) {
+			if (id < 0) {
 				dprintf("error allocating region!\n");
 				err = ERR_INVALID_BINARY;
 				goto error;
@@ -603,8 +643,8 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 
 				sprintf(region_name, "%s_bss%d", path, 'X');
 
-				region_addr+= ROUNDUP(pheaders[i].p_filesz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
-				id= vm_create_anonymous_region(
+				region_addr += ROUNDUP(pheaders[i].p_filesz+ (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
+				id = vm_create_anonymous_region(
 					p->_aspace_id,
 					region_name,
 					(void **)&region_addr,
@@ -613,7 +653,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 					REGION_WIRING_LAZY,
 					LOCK_RW
 				);
-				if(id < 0) {
+				if (id < 0) {
 					dprintf("error allocating region!\n");
 					err = ERR_INVALID_BINARY;
 					goto error;
@@ -623,7 +663,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 			/*
 			 * assume rx segment
 			 */
-			id= vm_map_file(
+			id = vm_map_file(
 				p->_aspace_id,
 				region_name,
 				(void **)&region_addr,
@@ -634,7 +674,7 @@ int elf_load_uspace(const char *path, struct proc *p, int flags, addr *entry)
 				path,
 				ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE)
 			);
-			if(id < 0) {
+			if (id < 0) {
 				dprintf("error mapping text!\n");
 				err = ERR_INVALID_BINARY;
 				goto error;
@@ -656,7 +696,9 @@ error:
 	return err;
 }
 
-image_id elf_load_kspace(const char *path, const char *sym_prepend)
+
+image_id
+elf_load_kspace(const char *path, const char *sym_prepend)
 {
 	struct Elf32_Ehdr *eheader;
 	struct Elf32_Phdr *pheaders;
@@ -667,14 +709,14 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 	int i;
 	ssize_t len;
 
-//	dprintf("elf_load_kspace: entry path '%s'\n", path);
+	PRINT(("elf_load_kspace: entry path '%s'\n", path));
 
 	fd = sys_open(path, 0);
-	if(fd < 0)
+	if (fd < 0)
 		return fd;
 
 	err = vfs_get_vnode_from_fd(fd, true, &vnode);
-	if(err < 0)
+	if (err < 0)
 		goto error0;
 
 	// XXX awful hack to keep someone else from trying to load this image
@@ -683,34 +725,34 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 
 	// make sure it's not loaded already. Search by vnode
 	image = find_image_by_vnode(vnode);
-	if( image ) {
-		atomic_add( &image->ref_count, 1 );
+	if (image) {
+		atomic_add(&image->ref_count, 1);
 		//err = ERR_NOT_ALLOWED;
 		goto done;
 	}
-	
-	eheader = (struct Elf32_Ehdr *)kmalloc( sizeof( *eheader ));
-	if( !eheader ) {
+
+	eheader = (struct Elf32_Ehdr *)kmalloc(sizeof(*eheader));
+	if (!eheader) {
 		err = ENOMEM;
 		goto error;
 	}
 
 	len = sys_read(fd, eheader, 0, sizeof(*eheader));
-	if(len < 0) {
+	if (len < 0) {
 		err = len;
 		goto error1;
 	}
-	if(len != sizeof(*eheader)) {
+	if (len != sizeof(*eheader)) {
 		// short read
 		err = ERR_INVALID_BINARY;
 		goto error1;
 	}
 	err = verify_eheader(eheader);
-	if(err < 0)
+	if (err < 0)
 		goto error1;
 
 	image = create_image_struct();
-	if(!image) {
+	if (!image) {
 		err = ENOMEM;
 		goto error1;
 	}
@@ -718,35 +760,35 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 	image->eheader = eheader;
 
 	pheaders = (struct Elf32_Phdr *)kmalloc(eheader->e_phnum * eheader->e_phentsize);
-	if(pheaders == NULL) {
+	if (pheaders == NULL) {
 		dprintf("error allocating space for program headers\n");
 		err = ENOMEM;
 		goto error2;
 	}
 
-//	dprintf("reading in program headers at 0x%x, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
+	PRINT(("reading in program headers at 0x%x, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize));
 	len = sys_read(fd, pheaders, eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize);
-	if(len < 0) {
+	if (len < 0) {
 		err = len;
-//		dprintf("error reading in program headers\n");
+		PRINT(("error reading in program headers\n"));
 		goto error3;
 	}
-	if(len != eheader->e_phnum * eheader->e_phentsize) {
-//		dprintf("short read while reading in program headers\n");
+	if (len != eheader->e_phnum * eheader->e_phentsize) {
+		PRINT(("short read while reading in program headers\n"));
 		err = -1;
 		goto error3;
 	}
 
-	for(i=0; i < eheader->e_phnum; i++) {
+	for (i = 0; i < eheader->e_phnum; i++) {
 		char region_name[64];
 		bool ro_segment_handled = false;
 		bool rw_segment_handled = false;
 		int image_region;
 		int lock;
 
-//		dprintf("looking at program header %d\n", i);
+		PRINT(("looking at program header %d\n", i));
 
-		switch(pheaders[i].p_type) {
+		switch (pheaders[i].p_type) {
 			case PT_LOAD:
 				break;
 			case PT_DYNAMIC:
@@ -758,7 +800,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 		}
 
 		// we're here, so it must be a PT_LOAD segment
-		if((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_W)) {
+		if ((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_W)) {
 			// this is the writable segment
 			if(rw_segment_handled) {
 				// we've already created this segment
@@ -768,7 +810,7 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 			image_region = 1;
 			lock = LOCK_RW|LOCK_KERNEL;
 			sprintf(region_name, "%s_rw", path);
-		} else if((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_X)) {
+		} else if ((pheaders[i].p_flags & (PF_R | PF_W | PF_X)) == (PF_R | PF_X)) {
 			// this is the non-writable segment
 			if(ro_segment_handled) {
 				// we've already created this segment
@@ -787,42 +829,41 @@ image_id elf_load_kspace(const char *path, const char *sym_prepend)
 		image->regions[image_region].id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), region_name,
 			(void **)&image->regions[image_region].start, REGION_ADDR_ANY_ADDRESS,
 			image->regions[image_region].size, REGION_WIRING_WIRED, lock);
-		if(image->regions[image_region].id < 0) {
+		if (image->regions[image_region].id < 0) {
 			dprintf("error allocating region!\n");
 			err = ERR_INVALID_BINARY;
 			goto error3;
 		}
 		image->regions[image_region].delta = image->regions[image_region].start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
 
-//		dprintf("elf_load_kspace: created a region at 0x%x\n", image->regions[image_region].start);
+		PRINT(("elf_load_kspace: created a region at 0x%x\n", image->regions[image_region].start));
 
 		len = sys_read(fd, (void *)(image->regions[image_region].start + (pheaders[i].p_vaddr % PAGE_SIZE)),
 			pheaders[i].p_offset, pheaders[i].p_filesz);
-		if(len < 0) {
+		if (len < 0) {
 			err = len;
 			dprintf("error reading in seg %d\n", i);
 			goto error4;
 		}
 	}
 
-	if(image->regions[1].start != 0) {
-		if(image->regions[0].delta != image->regions[1].delta) {
-			dprintf("could not load binary, fix the region problem!\n");
-			dump_image_info(image);
-			err = ENOMEM;
-			goto error4;
-		}
+	if (image->regions[1].start != 0
+		&& image->regions[0].delta != image->regions[1].delta) {
+		dprintf("could not load binary, fix the region problem!\n");
+		dump_image_info(image);
+		err = ENOMEM;
+		goto error4;
 	}
 
 	// modify the dynamic ptr by the delta of the regions
 	image->dynamic_ptr += image->regions[0].delta;
 
 	err = elf_parse_dynamic_section(image);
-	if(err < 0)
+	if (err < 0)
 		goto error4;
 
 	err = elf_relocate(image, sym_prepend);
-	if(err < 0)
+	if (err < 0)
 		goto error4;
 
 	err = 0;
@@ -858,13 +899,14 @@ error0:
 	return err;
 }
 
-static int elf_unload_image( struct elf_image_info *image );
 
-static int elf_unlink_relocs( struct elf_image_info *image )
+static int elf_unload_image(struct elf_image_info *image);
+static int
+elf_unlink_relocs(struct elf_image_info *image)
 {
 	elf_linked_image *link, *next_link;
 	
-	for( link = image->linked_images; link; link = next_link ) {
+	for (link = image->linked_images; link; link = next_link) {
 		next_link = link->next;
 		elf_unload_image( link->image );
 		kfree( link );
@@ -873,34 +915,40 @@ static int elf_unlink_relocs( struct elf_image_info *image )
 	return B_NO_ERROR;
 }
 
-static void elf_unload_image_final( struct elf_image_info *image )
+
+static void
+elf_unload_image_final(struct elf_image_info *image)
 {
 	int i;
 	
-	for( i = 0; i < 2; ++i ) {
-		vm_delete_region( vm_get_kernel_aspace_id(), image->regions[i].id );
+	for (i = 0; i < 2; ++i) {
+		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[i].id);
 	}
 
-	if( image->vnode )
-		vfs_put_vnode_ptr( image->vnode );
+	if (image->vnode)
+		vfs_put_vnode_ptr(image->vnode);
 
 	remove_image_from_list(image);
-	kfree( image->eheader );
-	kfree( image );
+	kfree(image->eheader);
+	kfree(image);
 }
 
-static int elf_unload_image( struct elf_image_info *image )
+
+static int
+elf_unload_image(struct elf_image_info *image)
 {
-	if( atomic_add( &image->ref_count, -1 ) > 0 )
+	if (atomic_add(&image->ref_count, -1) > 0)
 		return B_NO_ERROR;
 
-	elf_unlink_relocs( image );
-	elf_unload_image_final( image );
+	elf_unlink_relocs(image);
+	elf_unload_image_final(image);
 
 	return B_NO_ERROR;
 }
 
-int elf_unload_kspace( const char *path )
+
+int
+elf_unload_kspace(const char *path)
 {
 	int fd;
 	int err;
@@ -908,23 +956,23 @@ int elf_unload_kspace( const char *path )
 	struct elf_image_info *image;
 	
 	fd = sys_open(path, 0);
-	if(fd < 0)
+	if (fd < 0)
 		return fd;
 
 	err = vfs_get_vnode_from_fd(fd, true, &vnode);
-	if(err < 0)
+	if (err < 0)
 		goto error0;
 
 	mutex_lock(&image_load_lock);
 
 	image = find_image_by_vnode(vnode);
-	if( !image ) {
-		dprintf( "Tried to unload image that wasn't loaded (%s)\n", path );
+	if (!image) {
+		dprintf("Tried to unload image that wasn't loaded (%s)\n", path);
 		err = ERR_NOT_FOUND;
 		goto error;
 	}
 	
-	err = elf_unload_image( image );
+	err = elf_unload_image(image);
 
 error:
 	mutex_unlock(&image_load_lock);
@@ -936,9 +984,14 @@ error0:
 	return err;
 }
 
-int elf_init(kernel_args *ka)
+
+int
+elf_init(kernel_args *ka)
 {
 	vm_region_info rinfo;
+
+	mutex_init(&image_lock, "kimages_lock");
+	mutex_init(&image_load_lock, "kimages_load_lock");
 
 	// build a image structure for the kernel, which has already been loaded
 	kernel_image = create_image_struct();
@@ -963,15 +1016,12 @@ int elf_init(kernel_args *ka)
 	kernel_image->dynamic_ptr = (addr)ka->kernel_dynamic_section_addr.start;
 
 	// parse the dynamic section
-	if(elf_parse_dynamic_section(kernel_image) < 0)
+	if (elf_parse_dynamic_section(kernel_image) < 0)
 		dprintf("elf_init: WARNING elf_parse_dynamic_section couldn't find dynamic section.\n");
 
 	// insert it first in the list of kernel images loaded
 	kernel_images = NULL;
 	insert_image_in_list(kernel_image);
-
-	mutex_init(&image_lock, "kimages_lock");
-	mutex_init(&image_load_lock, "kimages_load_lock");
 
 	return 0;
 }
