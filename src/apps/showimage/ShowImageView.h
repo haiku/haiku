@@ -50,6 +50,7 @@ public:
 	void Pulse();
 	
 	status_t SetImage(const entry_ref *pref);
+	void SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, const translation_format* format);
 	void SetDither(bool dither);
 	bool GetDither() const { return fDither; }
 	void SetShowCaption(bool show);
@@ -166,7 +167,6 @@ private:
 	BBitmap* CopySelection(uchar alpha = 255, bool imageSize = true);
 	bool AddSupportedTypes(BMessage* msg, BBitmap* bitmap);
 	void BeginDrag(BPoint sourcePoint);
-	void SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, translation_format* format);
 	void SendInMessage(BMessage* msg, BBitmap* bitmap, translation_format* format);
 	bool OutputFormatForType(BBitmap* bitmap, const char* type, translation_format* format);
 	void HandleDrop(BMessage* msg);

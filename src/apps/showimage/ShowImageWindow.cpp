@@ -816,26 +816,26 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 		reinterpret_cast<int32 *>(&outType)) != B_OK)
 		return;
 	
-	// Create the output file
-	BDirectory dir(&dirref);
-	BFile file(&dir, filename, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
-	if (file.InitCheck() != B_OK)
+	// Find the translator_format information needed to
+	// write a MIME attribute for the image file
+	BTranslatorRoster *roster = BTranslatorRoster::Default();
+	const translation_format *pouts = NULL;
+	int32 outsCount = 0;
+	if (roster->GetOutputFormats(outTranslator, &pouts, &outsCount) != B_OK)
+		return;
+	if (outsCount < 1)
+		return;
+	int32 i;
+	for (i = 0; i < outsCount; i++) {
+		if (pouts[i].group == B_TRANSLATOR_BITMAP && pouts[i].type == outType)
+			break;
+	}
+	if (i == outsCount)
 		return;
 	
-	// Translate the image and write it out to the output file
-	BBitmapStream stream(fImageView->GetBitmap());	
-	BTranslatorRoster *proster = BTranslatorRoster::Default();
-	if (proster->Translate(outTranslator, &stream, NULL,
-		&file, outType) != B_OK) {
-		BAlert *palert = new BAlert(NULL, "Error writing image file.", "Ok");
-		palert->Go();
-	} else
-		fModified = false;
-	
-	BBitmap *pout = NULL;
-	stream.DetachBitmap(&pout);
-		// bitmap used by stream still belongs to the view,
-		// detach so it doesn't get deleted
+	// Write out the image file
+	BDirectory dir(&dirref);
+	fImageView->SaveToFile(&dir, filename, NULL, &pouts[i]);
 }
 
 bool

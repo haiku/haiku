@@ -1010,18 +1010,44 @@ ShowImageView::OutputFormatForType(BBitmap* bitmap, const char* type, translatio
 }
 
 void
-ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, translation_format* format)
+ShowImageView::SaveToFile(BDirectory* dir, const char* name, BBitmap* bitmap, const translation_format* format)
 {
-	BTranslatorRoster *roster = BTranslatorRoster::Default();
-	BBitmapStream stream(bitmap); // destructor deletes bitmap
-	// write data
-	BFile file(dir, name, B_WRITE_ONLY);
-	roster->Translate(&stream, NULL, NULL, &file, format->type);
-	// set mime type
-	BNodeInfo info(&file);
-	if (info.InitCheck() == B_OK) {
-		info.SetType(format->MIME);
+	if (!bitmap)
+		// If no bitmap is supplied, write out the whole image
+		bitmap = fBitmap;
+
+	BBitmapStream stream(bitmap);
+		
+	bool loop = true;
+	while (loop) {
+		BTranslatorRoster *roster = BTranslatorRoster::Default();
+		if (!roster)
+			break;
+		// write data
+		BFile file(dir, name, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+		if (file.InitCheck() != B_OK)
+			break;
+		if (roster->Translate(&stream, NULL, NULL, &file, format->type) < B_OK)
+			break;
+		// set mime type
+		BNodeInfo info(&file);
+		if (info.InitCheck() == B_OK)
+			info.SetType(format->MIME);
+			
+		loop = false;
+			// break out of loop gracefully (indicates no errors)
 	}
+	if (loop) {
+		// If loop terminated because of a break, there was an error
+		BString errText;
+		errText << "Sorry, the file '" << name << "' could not be written.";
+		BAlert *palert = new BAlert(NULL, errText.String(), "Ok");
+		palert->Go();
+	}
+	
+	stream.DetachBitmap(&bitmap);
+		// Don't allow the bitmap to be deleted, this is
+		// especially important when using fBitmap as the bitmap
 }
 
 void
@@ -1065,6 +1091,7 @@ ShowImageView::HandleDrop(BMessage* msg)
 	if (saveToFile) {
 		BDirectory dir(&dirRef);
 		SaveToFile(&dir, name.String(), bitmap, &format);
+		delete bitmap;
 	} else if (sendInMessage) {
 		SendInMessage(msg, bitmap, &format);
 	} else {
