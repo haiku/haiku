@@ -12,6 +12,9 @@
 #include <fd.h>
 #include <lock.h>
 #include <khash.h>
+#include <messaging.h>
+#include <util/AutoLock.h>
+#include <util/KMessage.h>
 #include <util/list.h>
 
 #include <malloc.h>
@@ -55,6 +58,12 @@ struct node_monitor {
 struct monitor_hash_key {
 	mount_id	device;
 	vnode_id	node;
+};
+
+struct interested_monitor_listener_list {
+	struct list			*listeners;
+	monitor_listener	*first_listener;
+	uint32				flags;
 };
 
 #define MONITORS_HASH_TABLE_SIZE 16
@@ -493,6 +502,130 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 
 	mutex_unlock(&gMonitorMutex);
 	return B_OK;
+}
+
+
+static
+void
+get_interested_monitor_listeners(mount_id device, vnode_id node,
+	uint32 flags, interested_monitor_listener_list *interestedListeners,
+	int32 &interestedListenerCount)
+{
+	// get the monitor for the node
+	node_monitor *monitor = get_monitor_for(device, node);
+	if (!monitor)
+		return;
+
+	// iterate through the listeners until we find one with matching flags
+	monitor_listener *listener = NULL;
+	while ((listener = (monitor_listener*)list_get_next_item(
+			&monitor->listeners, listener)) != NULL) {
+		if (listener->flags & flags) {
+			interested_monitor_listener_list &list
+				= interestedListeners[interestedListenerCount++];
+			list.listeners = &monitor->listeners;
+			list.first_listener = listener;
+			list.flags = flags;
+			return;
+		}
+	}
+}
+
+
+static
+status_t
+send_notification_message(KMessage &message,
+	interested_monitor_listener_list *interestedListeners,
+	int32 interestedListenerCount)
+{
+	// Since the messaging service supports broadcasting and that is more
+	// efficient than sending the messages individually, we collect the
+	// listener targets in an array and send the message to them at once.
+	const int32 maxTargetCount = 16;
+	messaging_target targets[maxTargetCount];
+	int32 targetCount = 0;
+
+	// iterate through the lists
+	interested_monitor_listener_list *list = interestedListeners;
+	for (int32 i = 0; i < interestedListenerCount; i++, list++) {
+		// iterate through the listeners
+		monitor_listener *listener = list->first_listener;
+		do {
+			if (listener->flags & list->flags) {
+				// the listener's flags match: add it to the targets
+				messaging_target &target = targets[targetCount++];
+				target.port = listener->port;
+				target.token = listener->token;
+
+				// if the target array is full, send the message
+				if (targetCount == maxTargetCount) {
+					status_t error = send_message(&message, targets,
+						targetCount);
+					if (error != B_OK)
+						return error;
+
+					targetCount = 0;
+				}
+			}
+		} while ((listener = (monitor_listener*)list_get_next_item(
+				list->listeners, listener)) != NULL);
+	}
+
+	// if any targets are left (the usual case, unless the target array got
+	// full early), send the message
+	if (targetCount > 0)
+		return send_message(&message, targets, targetCount);
+
+	return B_OK;
+}
+
+
+status_t
+notify_entry_moved(mount_id device, vnode_id fromDirectory,
+	const char *fromName, vnode_id toDirectory, const char *toName,
+	vnode_id node)
+{
+	if (!fromName || !toName)
+		return B_BAD_VALUE;
+
+	// If node is a mount point, we need to resolve it to the mounted
+	// volume's root node.
+	mount_id nodeDevice = device;
+	resolve_mount_point_to_volume_root(device, node, &nodeDevice, &node);
+
+	MutexLocker locker(gMonitorMutex);
+
+	// get the lists of all interested listeners
+	interested_monitor_listener_list interestedListeners[3];
+	int32 interestedListenerCount = 0;
+	// ... for the node
+	get_interested_monitor_listeners(nodeDevice, node, B_WATCH_NAME,
+		interestedListeners, interestedListenerCount);
+	// ... for the source directory
+	get_interested_monitor_listeners(device, fromDirectory, B_WATCH_DIRECTORY,
+		interestedListeners, interestedListenerCount);
+	// ... for the target directory
+	get_interested_monitor_listeners(device, toDirectory, B_WATCH_DIRECTORY,
+		interestedListeners, interestedListenerCount);
+
+	if (interestedListenerCount == 0)
+		return B_OK;
+
+	// there are iterested listeners: construct the message and send it
+	char messageBuffer[1024];
+	KMessage message;
+	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
+	message.AddInt32("opcode", B_ENTRY_MOVED);
+	message.AddInt32("device", device);
+	message.AddInt64("from directory", fromDirectory);
+	message.AddInt64("to directory", toDirectory);
+	message.AddInt32("node device", nodeDevice);	// not R5
+	message.AddInt64("node", node);
+	message.AddString("from name", fromName);		// not R5
+	message.AddString("name", toName);
+
+	return send_notification_message(message, interestedListeners,
+		interestedListenerCount);
 }
 
 
