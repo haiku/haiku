@@ -451,41 +451,20 @@ get_node_for_path(const char *path, struct devfs_vnode **_node)
 
 
 static status_t
-devfs_publish_device(const char *path, pnp_node_info *node, pnp_devfs_driver_info *info, device_hooks *ops)
+publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 {
 	status_t status = B_OK;
 	char temp[B_PATH_NAME_LENGTH + 1];
 
-	TRACE(("devfs_publish_device: entry path '%s', node %p, info %p, hooks %p\n", path, node, info, ops));
-
-	if (sDeviceFileSystem == NULL) {
-		panic("devfs_publish_device called before devfs mounted\n");
-		return B_ERROR;
-	}
-
-	if ((ops == NULL && (node == NULL || info == NULL))
-		|| path == NULL || path[0] == '/')
-		return B_BAD_VALUE;
-
-	// are the provided device hooks okay?
-	if ((ops != NULL && (ops->open == NULL || ops->close == NULL
-		|| ops->read == NULL || ops->write == NULL))
-		|| info != NULL && (info->open == NULL || info->close == NULL
-		|| info->read == NULL || info->write == NULL))
-		return B_BAD_VALUE;
-
 	// copy the path over to a temp buffer so we can munge it
 	strlcpy(temp, path, B_PATH_NAME_LENGTH);
 
-	mutex_lock(&sDeviceFileSystem->lock);
-
 	// create the path leading to the device
 	// parse the path passed in, stripping out '/'
-	struct devfs_vnode *dir = sDeviceFileSystem->root_vnode;
+	struct devfs_vnode *dir = fs->root_vnode;
 	struct devfs_vnode *vnode = NULL;
 	int32 i = 0, last = 0;
 	bool atLeaf = false;
-	bool isDisk = false;
 
 	for (;;) {
 		if (temp[i] == 0) {
@@ -518,7 +497,7 @@ devfs_publish_device(const char *path, pnp_node_info *node, pnp_devfs_driver_inf
 			status = B_FILE_EXISTS;
 			goto out;
 		} else {
-			vnode = devfs_create_vnode(sDeviceFileSystem, dir, &temp[last]);
+			vnode = devfs_create_vnode(fs, dir, &temp[last]);
 			if (!vnode) {
 				status = B_NO_MEMORY;
 				goto out;
@@ -526,45 +505,86 @@ devfs_publish_device(const char *path, pnp_node_info *node, pnp_devfs_driver_inf
 		}
 
 		// set up the new vnode
-		if (atLeaf) {
-			// this is the last component
-			vnode->stream.type = S_IFCHR | 0644;
-
-			if (node != NULL)
-				vnode->stream.u.dev.info = info;
-			else
-				vnode->stream.u.dev.info = create_new_driver_info(ops);
-
-			vnode->stream.u.dev.node = node;
-			vnode->stream.u.dev.ops = ops;
-
-			// every raw disk gets an I/O scheduler object attached
-			// ToDo: the driver should ask for a scheduler (ie. using its devfs node attributes)
-			if (isDisk && !strcmp(&temp[last], "raw")) 
-				vnode->stream.u.dev.scheduler = new IOScheduler(path, info);
-		} else {
+		if (!atLeaf) {
 			// this is a dir
 			vnode->stream.type = S_IFDIR | 0755;
 			vnode->stream.u.dir.dir_head = NULL;
 			vnode->stream.u.dir.jar_head = NULL;
-
-			// mark disk devices - they might get an I/O scheduler
-			if (last == 0 && !strcmp(temp, "disk"))
-				isDisk = true;
+		} else {
+			// this is the last component
+			*_node = vnode;
 		}
 
 		hash_insert(sDeviceFileSystem->vnode_list_hash, vnode);
-
 		devfs_insert_in_dir(dir, vnode);
 
 		if (atLeaf)
 			break;
+
 		last = i;
 		dir = vnode;
 	}
 
 out:
-	mutex_unlock(&sDeviceFileSystem->lock);
+	return status;
+}
+
+
+static status_t
+publish_device(struct devfs *fs, const char *path, pnp_node_info *pnpNode,
+	pnp_devfs_driver_info *info, device_hooks *ops)
+{
+	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p)\n",
+		path, pnpNode, info, ops));
+
+	if (sDeviceFileSystem == NULL) {
+		panic("publish_device() called before devfs mounted\n");
+		return B_ERROR;
+	}
+
+	if ((ops == NULL && (pnpNode == NULL || info == NULL))
+		|| path == NULL || path[0] == '/')
+		return B_BAD_VALUE;
+
+	// are the provided device hooks okay?
+	if ((ops != NULL && (ops->open == NULL || ops->close == NULL
+		|| ops->read == NULL || ops->write == NULL))
+		|| info != NULL && (info->open == NULL || info->close == NULL
+		|| info->read == NULL || info->write == NULL))
+		return B_BAD_VALUE;
+
+	// mark disk devices - they might get an I/O scheduler
+	bool isDisk = false;
+	if (!strncmp(path, "disk/", 5))
+		isDisk = true;
+
+	struct devfs_vnode *node;
+	status_t status;
+
+	mutex_lock(&fs->lock);
+
+	status = publish_node(fs, path, &node);
+	if (status != B_OK)
+		goto out;
+
+	// all went fine, let's initialize the node
+	node->stream.type = S_IFCHR | 0644;
+
+	if (pnpNode != NULL)
+		node->stream.u.dev.info = info;
+	else
+		node->stream.u.dev.info = create_new_driver_info(ops);
+
+	node->stream.u.dev.node = pnpNode;
+	node->stream.u.dev.ops = ops;
+
+	// every raw disk gets an I/O scheduler object attached
+	// ToDo: the driver should ask for a scheduler (ie. using its devfs node attributes)
+	if (isDisk && !strcmp(node->name, "raw")) 
+		node->stream.u.dev.scheduler = new IOScheduler(path, info);
+
+out:
+	mutex_unlock(&fs->lock);
 	return status;
 }
 
@@ -1446,11 +1466,15 @@ pnp_devfs_probe(pnp_node_handle parent)
 		goto err2;
 
 	//add_device(device);
-	devfs_publish_device(filename, node, info, NULL);
+	status = publish_device(sDeviceFileSystem, filename, node, info, NULL);
+	if (status != B_OK)
+		goto err3;
 	//nudge();
 
 	return B_OK;
 
+err3:
+	pnp->unregister_device(node);
 err2:
 	pnp->unload_driver(parent);
 err1:
@@ -1555,10 +1579,25 @@ pnp_driver_info gDeviceForDriversModule = {
 
 
 extern "C" status_t
+devfs_unpublish_file_device(const char *path)
+{
+	dprintf("unpublish file device: %s\n", path);
+	return B_ERROR;
+}
+
+
+extern "C" status_t
+devfs_publish_file_device(const char *path, const char *filePath)
+{
+	return B_ERROR;
+}
+
+
+extern "C" status_t
 devfs_unpublish_partition(const char *path)
 {
 	dprintf("unpublish partition: %s\n", path);
-	return B_OK;
+	return B_ERROR;
 }
 
 
@@ -1594,6 +1633,6 @@ devfs_publish_partition(const char *path, const partition_info *info)
 extern "C" status_t
 devfs_publish_device(const char *path, void *obsolete, device_hooks *ops)
 {
-	return devfs_publish_device(path, NULL, NULL, ops);
+	return publish_device(sDeviceFileSystem, path, NULL, NULL, ops);
 }
 
