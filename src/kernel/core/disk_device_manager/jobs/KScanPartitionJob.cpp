@@ -1,5 +1,7 @@
 // KScanPartitionJob.cpp
 
+#include <KernelExport.h>
+
 #include <stdio.h>
 #include <string.h>
 
@@ -13,22 +15,21 @@
 
 // debugging
 #define DBG(x)
-//#define DBG(x) x
 #define OUT dprintf
 
-// constructor
+
 KScanPartitionJob::KScanPartitionJob(partition_id partitionID)
 	: KDiskDeviceJob(B_DISK_DEVICE_JOB_SCAN, partitionID)
 {
 	SetDescription("scanning partition");
 }
 
-// destructor
+
 KScanPartitionJob::~KScanPartitionJob()
 {
 }
 
-// Do
+
 status_t
 KScanPartitionJob::Do()
 {
@@ -37,6 +38,7 @@ KScanPartitionJob::Do()
 	KPartition *partition = manager->WriteLockPartition(PartitionID());
 	if (!partition)
 		return B_ENTRY_NOT_FOUND;
+
 	KDiskDevice *device = partition->Device();
 	PartitionRegistrar registrar1(partition, true);
 	PartitionRegistrar registrar2(device, true);
@@ -53,7 +55,7 @@ KScanPartitionJob::Do()
 	return error;
 }
 
-// _ScanPartition
+
 status_t
 KScanPartitionJob::_ScanPartition(KPartition *partition)
 {
@@ -61,25 +63,31 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 	// the partition's device must be write-locked
 	if (!partition)
 		return B_BAD_VALUE;
-DBG(
-KPath partitionPath;
-partition->GetPath(&partitionPath);
-OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath.Path())
-)
+
+	DBG(
+		KPath partitionPath;
+		partition->GetPath(&partitionPath);
+		OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath.Path());
+	)
+
 	// publish the partition
 	status_t error = partition->PublishDevice();
 	if (error != B_OK)
 		return error;
+
 	// find the disk system that returns the best priority for this partition
 	float bestPriority = -1;
 	KDiskSystem *bestDiskSystem = NULL;
 	void *bestCookie = NULL;
 	int32 itCookie = 0;
 	while (KDiskSystem *diskSystem = manager->LoadNextDiskSystem(&itCookie)) {
-DBG(OUT("  trying: %s\n", diskSystem->Name()));
+		DBG(OUT("  trying: %s\n", diskSystem->Name()));
+
 		void *cookie = NULL;
 		float priority = diskSystem->Identify(partition, &cookie);
-DBG(OUT("  returned: %f\n", priority));
+
+		DBG(OUT("  returned: %ld/1000\n", int32(1000 * priority)));
+
 		if (priority >= 0 && priority > bestPriority) {
 			// new best disk system
 			if (bestDiskSystem) {
@@ -96,9 +104,10 @@ DBG(OUT("  returned: %f\n", priority));
 			diskSystem->Unload();
 		}
 	}
+
 	// now, if we have found a disk system, let it scan the partition
 	if (bestDiskSystem) {
-DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
+		DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
 		error = bestDiskSystem->Scan(partition, bestCookie);
 		if (error == B_OK) {
 			partition->SetDiskSystem(bestDiskSystem);
@@ -106,7 +115,7 @@ DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
 				_ScanPartition(child);
 		} else {
 			// TODO: Handle the error.
-DBG(OUT("  scanning failed: %s\n", strerror(error)));
+			DBG(OUT("  scanning failed: %s\n", strerror(error)));
 		}
 		// now we can safely unload the disk system -- it has been loaded by
 		// the partition(s) and thus will not really be unloaded
