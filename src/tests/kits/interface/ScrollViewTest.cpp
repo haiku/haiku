@@ -13,7 +13,9 @@
 #include <stdio.h>
 
 
-#define TESTS
+//#define ARCHIVE_TEST
+//#define CHANGE_BORDER_TEST
+//#define SIZE_TEST
 
 
 class Window : public BWindow {
@@ -27,7 +29,7 @@ class Window : public BWindow {
 
 Window::Window()
 	: BWindow(BRect(100, 100, 580, 580), "Scroll-Test",
-			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE)
+			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	const bool horiz[] = {false, true, false, true};
 	const bool vert[] = {false, false, true, true};
@@ -39,22 +41,32 @@ Window::Window()
 		if (i > 0 && (i % 4) == 0)
 			rect.OffsetBy(-480, 120);
 
-		BBox *box = new BBox(rect);
+		int32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP;
+		if (i % 4 == 3) {
+			if (i == 15)
+				resizingMode = B_FOLLOW_ALL;
+			else
+				resizingMode = B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP;
+		} else if (i > 11)
+			resizingMode = B_FOLLOW_TOP_BOTTOM | B_FOLLOW_LEFT;
+
+		BBox *box = new BBox(rect, "box", resizingMode);
 		AddChild(box);
 
 		BView *view = new BView(frame, "main view", B_FOLLOW_ALL, B_WILL_DRAW);
-		BView *inner = new BView(frame.OffsetToCopy(B_ORIGIN).InsetBySelf(2, 2),
+		view->SetViewColor(200, 200, 21);
+		BView *inner = new BView(frame.OffsetToCopy(B_ORIGIN).InsetBySelf(3, 3),
 								"inner", B_FOLLOW_ALL, B_WILL_DRAW);
 		inner->SetViewColor(200, 42, 42);
 		view->AddChild(inner);
 
-		BScrollView *scroller = new BScrollView("scroller", view, B_FOLLOW_ALL,
+		BScrollView *scroller = new BScrollView("scroller", view, resizingMode,
 			0, horiz[i % 4], vert[i % 4], border[i / 4]);
 		if (i >= 12)
 			scroller->SetBorderHighlighted(true);
 		box->AddChild(scroller);
 
-#ifdef TESTS
+#ifdef ARCHIVE_TEST
 		if (i == 7) {
 			BMessage archive;
 			if (scroller->Archive(&archive/*, false*/) == B_OK) {
@@ -70,16 +82,22 @@ Window::Window()
 				archive.PrintToStream();
 			}
 		}
+#endif
 
-		if (i % 4 == 3)
+#ifdef CHANGE_BORDER_TEST
+		if (i % 4 == 1)
 			scroller->SetBorder(B_FANCY_BORDER);
+		else if (i % 4 == 2)
+			scroller->SetBorder(B_PLAIN_BORDER);
+		else if (i % 4 == 3)
+			scroller->SetBorder(B_NO_BORDER);
 #endif
 
 		rect.OffsetBy(120, 0);
 	}
 
-#ifdef TESTS
-	printf("sizeof = %lu\n", sizeof(BScrollView));
+#ifdef SIZE_TEST
+	printf("sizeof = %lu (R5 == 212)\n", sizeof(BScrollView));
 #endif
 }
 
