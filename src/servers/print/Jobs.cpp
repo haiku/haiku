@@ -39,7 +39,7 @@
 #include <string.h>
 
 // BeOS
-#include <be/kernel/fs_attr.h>
+#include <kernel/fs_attr.h>
 #include <Application.h>
 #include <Autolock.h>
 #include <Node.h>

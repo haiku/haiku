@@ -35,6 +35,7 @@
 #include <TimeSource.h>
 #include <MediaTheme.h>
 
+#include "GSUtility.h"
 #include "GameSoundDevice.h"
 #include "GameSoundBuffer.h"
 #include "GameProducer.h"

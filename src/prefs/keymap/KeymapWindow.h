@@ -2,9 +2,9 @@
 #define OBOS_KEYMAP_WINDOW_H
 
 
-#include <be/interface/Window.h>
-#include <be/support/List.h>
-#include <be/interface/MenuBar.h>
+#include <interface/Window.h>
+#include <support/List.h>
+#include <interface/MenuBar.h>
 
 
 #if !DEBUG

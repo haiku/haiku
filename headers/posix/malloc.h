@@ -4,8 +4,7 @@
 ** Distributed under the terms of the OpenBeOS License.
 */
 
-#include <sys/types.h>
-
+#include <unistd.h> 
 
 // ToDo: there are some BeOS specific things missing, most
 //	things are only rarely or almost never used, though.

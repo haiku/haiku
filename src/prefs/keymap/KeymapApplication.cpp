@@ -1,9 +1,9 @@
-#include <be/add-ons/input_server/InputServerDevice.h>
-#include <be/storage/File.h>
-#include <be/app/Application.h>
-#include <be/storage/Directory.h>
+#include <add-ons/input_server/InputServerDevice.h>
+#include <storage/File.h>
+#include <app/Application.h>
+#include <storage/Directory.h>
 #if DEBUG
-	#include <be/interface/Input.h>
+	#include <interface/Input.h>
 	#include <iostream.h>
 #endif //DEBUG
 #include "KeymapWindow.h"

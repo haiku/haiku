@@ -4,7 +4,7 @@
  * Creation: Sandor Vroemisse
  */
 
-#include <be/app/Application.h>
+#include <app/Application.h>
 #include "KeymapApplication.h"
 
 

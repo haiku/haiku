@@ -33,7 +33,7 @@ namespace Storage {
 
 // Type aliases
 typedef dirent DirEntry;
-typedef flock FileLock;
+typedef struct flock FileLock;
 typedef struct stat Stat;
 typedef uint32 StatMember;
 typedef attr_info AttrInfo;

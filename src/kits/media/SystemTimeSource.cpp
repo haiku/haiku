@@ -26,7 +26,7 @@ _SysTimeSource::SnoozeUntil(
 	bigtime_t time = performance_time - with_latency;
 	status_t err;
 	do {
-		err = snooze_until(time,B_SYSTEM_TIMEBASE);
+		err = snooze_until(time, B_SYSTEM_TIMEBASE);
 	} while (err == B_INTERRUPTED && retry_signals);
 	return err;
 }

@@ -6,8 +6,8 @@
 #ifndef OBOS_KEYMAP_LIST_ITEM_H
 #define OBOS_KEYMAP_LIST_ITEM_H
 
-#include <be/interface/ListItem.h>
-#include <be/storage/Entry.h>
+#include <interface/ListItem.h>
+#include <storage/Entry.h>
 
 
 class KeymapListItem : public BStringItem {

@@ -3,7 +3,7 @@
 **===============================================================
 ** 24 June 2002 - Mathew Hounsell - Created
 */
-#include "be/app/Clipboard.h"
+#include <app/Clipboard.h>
 
 #include <stdio.h>
 #include <string.h>

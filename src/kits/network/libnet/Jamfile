@@ -1,9 +1,6 @@
 SubDir OBOS_TOP src kits net libnet ;
 
-UsePosixHeaders ;
 UsePrivateHeaders net ;
-SetupIncludes ;
-SubDirCcFlags -nostdinc ;
 
 SharedLibrary net :
 	socket.c

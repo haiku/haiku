@@ -11,10 +11,16 @@
 
 #define NOFILE          OPEN_MAX
 
-#define MIN(a,b) (((a) < (b)) ? (a) : (b))
-#define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#ifndef MIN
+  #define MIN(a,b) (((a) < (b)) ? (a) : (b))
+#endif
+#ifndef MAX
+  #define MAX(a,b) (((a) > (b)) ? (a) : (b))
+#endif
 
 /* maximum possible length of this machine's hostname */
-#define MAXHOSTNAMELEN 256
+#ifndef MAXHOSTNAMELEN
+  #define MAXHOSTNAMELEN 256
+#endif
 
 #endif	/* _SYS_PARAM_H */

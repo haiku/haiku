@@ -1,8 +1,8 @@
 #ifndef OBOS_KEYMAP_APPLICATION_H
 #define OBOS_KEYMAP_APPLICATION_H
 
-#include <be/storage/Entry.h>
-#include <be/support/List.h>
+#include <storage/Entry.h>
+#include <support/List.h>
 
 #define APP_SIGNATURE		"application/x-vnd.OpenBeOS-Keymap"
 #define COPY_BUFFER_SIZE	1 * 1024

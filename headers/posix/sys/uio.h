@@ -3,7 +3,7 @@
 #ifndef _SYS_UIO_H
 #define _SYS_UIO_H
 
-#include <ktypes.h>
+#include <sys/types.h>
 
 typedef struct iovec {
 	void  *iov_base;

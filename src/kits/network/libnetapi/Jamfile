@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kits net libnetapi ;
 
-UsePosixHeaders ;
+UsePrivateHeaders net ;
 
 SharedLibrary netapi :
 	NetEndpoint.cpp
