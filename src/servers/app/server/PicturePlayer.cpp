@@ -29,17 +29,21 @@
 #include "PicturePlayer.h"
 #include "PictureProtocol.h"
 #include "DisplayDriver.h"
+#include <ServerBitmap.h>
 #include <stdio.h>
 
 PicturePlayer::PicturePlayer(DisplayDriver *d,void *data, int32 size)
  : fData(data, size)
 {
 	fdriver=d;
-	pat=0xFFFFFFFFFFFFFFFFLL;
+	stipplepat=0xFFFFFFFFFFFFFFFFLL;
+	clipreg=NULL;
 }
 
 PicturePlayer::~PicturePlayer()
 {
+	if(clipreg)
+		delete clipreg;
 }
 
 int16 PicturePlayer::GetOp()
@@ -149,47 +153,47 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				BPoint start = GetCoord();
 				BPoint end = GetCoord();
-				fdriver->StrokeLine(start,end,&fldata,pat);
+				fdriver->StrokeLine(start,end,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_STROKE_RECT:
 			{
 				BRect rect = GetRect();
-				fdriver->StrokeRect(rect,&fldata,pat);
+				fdriver->StrokeRect(rect,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_FILL_RECT:
 			{
 				BRect rect = GetRect();
-				fdriver->FillRect(rect,&fldata,pat);
+				fdriver->FillRect(rect,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_STROKE_ROUND_RECT:
 			{
 				BRect rect = GetRect();
 				BPoint radii = GetCoord();
-				fdriver->StrokeRoundRect(rect,radii.x,radii.y,&fldata,pat);
+				fdriver->StrokeRoundRect(rect,radii.x,radii.y,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_FILL_ROUND_RECT:
 			{
 				BRect rect = GetRect();
 				BPoint radii = GetCoord();
-				fdriver->FillRoundRect(rect,radii.x,radii.y,&fldata,pat);
+				fdriver->FillRoundRect(rect,radii.x,radii.y,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_STROKE_BEZIER:
 			{
 				BPoint control[4];
 				GetData(control, sizeof(control));
-				fdriver->StrokeBezier(control,&fldata,pat);
+				fdriver->StrokeBezier(control,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_FILL_BEZIER:
 			{
 				BPoint control[4];
 				GetData(control, sizeof(control));
-				fdriver->FillBezier(control,&fldata,pat);
+				fdriver->FillBezier(control,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_STROKE_POLYGON:
@@ -198,7 +202,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
 				bool isClosed = GetBool();
-				fdriver->StrokePolygon(points,numPoints,BRect(0,0,0,0),&fldata,pat,isClosed);
+				fdriver->StrokePolygon(points,numPoints,BRect(0,0,0,0),&fldata,stipplepat,isClosed);
 				delete points;
 				break;
 			}
@@ -207,7 +211,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				int32 numPoints = GetInt32();
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
-				fdriver->FillPolygon(points,numPoints,BRect(0,0,0,0),&fldata,pat);
+				fdriver->FillPolygon(points,numPoints,BRect(0,0,0,0),&fldata,stipplepat);
 				delete points;
 				break;
 			}
@@ -234,24 +238,27 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				// Equivalent of DrawBitmap(). 
 				
-				// TODO: Implement
-				
-/*				BRect src = GetRect();
+				// Normally, we wouldn't explicitly play around with ServerBitmap's buffer memory, but
+				// we don't want the overhead of going through the pool allocator for a quick bitmap.
+				BRect src = GetRect();
 				BRect dest = GetRect();
 				int32 width = GetInt32();
 				int32 height = GetInt32();
 				int32 bytesPerRow = GetInt32();
 				int32 pixelFormat = GetInt32();
 				int32 flags = GetInt32();
-				char *data = new char[size - (fData.Position() - pos)];
-				GetData(data, size - (fData.Position() - pos));
-				((fnc_DrawPixels)callBackTable[18])(userData, src, dest,
-					width, height, bytesPerRow, pixelFormat, flags, data);
-				delete data;
-*/				break;
+
+				ServerBitmap sbmp(BRect(0,0,width-1,height-1), (color_space)pixelFormat, flags, bytesPerRow);
+				sbmp._AllocateBuffer();
+				GetData(sbmp.Bits(), size - (fData.Position() - pos));
+				fdriver->DrawBitmap(&sbmp,src,dest,&fldata);
+				sbmp._FreeBuffer();
+				break;
 			}
 			case B_PIC_DRAW_PICTURE:
 			{
+				// TODO: Implement
+				printf("DEBUG: PicturePlayer::Play(): B_PIC_DRAW_PICTURE unimplemented!\n");
 				break;
 			}
 			case B_PIC_STROKE_ARC:
@@ -261,7 +268,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				float startTheta = GetFloat();
 				float arcTheta = GetFloat();
 				fdriver->StrokeArc(BRect(center.x-radii.x,center.y-radii.y,center.x+radii.x,
-						center.y+radii.y),startTheta, arcTheta, &fldata,pat);
+						center.y+radii.y),startTheta, arcTheta, &fldata,stipplepat);
 				break;
 			}
 			case B_PIC_FILL_ARC:
@@ -271,7 +278,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				float startTheta = GetFloat();
 				float arcTheta = GetFloat();
 				fdriver->FillArc(BRect(center.x-radii.x,center.y-radii.y,center.x+radii.x,
-						center.y+radii.y),startTheta, arcTheta, &fldata,pat);
+						center.y+radii.y),startTheta, arcTheta, &fldata,stipplepat);
 				break;
 			}
 			case B_PIC_STROKE_ELLIPSE:
@@ -280,7 +287,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 				center = rect.LeftTop() + radii;
-				fdriver->StrokeEllipse(rect,&fldata,pat);
+				fdriver->StrokeEllipse(rect,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_FILL_ELLIPSE:
@@ -289,15 +296,14 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint center;
 				BPoint radii((rect.Width() + 1) / 2.0f, (rect.Height() + 1) / 2.0f);
 				center = rect.LeftTop() + radii;
-				fdriver->FillEllipse(rect,&fldata,pat);
+				fdriver->FillEllipse(rect,&fldata,stipplepat);
 				break;
 			}
 			case B_PIC_ENTER_STATE_CHANGE:
 			{
-				break;
-			}
-			case B_PIC_SET_CLIPPING_RECTS:
-			{
+				// This simply signals that only state stuff will follow until 
+				// B_PIC_EXIT_STATE_CHANGE is encountered. This doesn't affect us AFAIK,
+				// so we'll do absolutely nothing.
 				break;
 			}
 			case B_PIC_CLIP_TO_PICTURE:
@@ -315,9 +321,14 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				//TODO: Implement
 				break;
 			}
+			case B_PIC_SET_CLIPPING_RECTS:
+			{
+				// TODO: Find out how the data will be stored and implement
+				break;
+			}
 			case B_PIC_CLEAR_CLIPPING_RECTS:
 			{
-				//TODO: Implement
+				SetClippingRegion(NULL, 0);
 				break;
 			}
 			case B_PIC_SET_ORIGIN:
@@ -340,13 +351,10 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			}
 			case B_PIC_SET_LINE_MODE:
 			{
-				//TODO: Implement
-
-/*				int16 capMode = GetInt16();
-				int16 joinMode = GetInt16();
-				float miterLimit = GetFloat();
-				((fnc_ssf)callBackTable[31])(userData, capMode, joinMode, miterLimit);
-*/				break;
+				GetData(&fldata.lineCap,sizeof(cap_mode));
+				GetData(&fldata.lineJoin,sizeof(join_mode));
+				fldata.miterLimit = GetFloat();
+				break;
 			}
 			case B_PIC_SET_PEN_SIZE:
 			{
@@ -376,12 +384,12 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			{
 				pattern p;
 				GetData(&p, sizeof(p));
-				pat=*((uint64*)p.data);
+				stipplepat=*((uint64*)p.data);
 				break;
 			}
 			case B_PIC_ENTER_FONT_STATE:
 			{
-				//TODO: Implement
+				// We don't really care about this call, so do nothing
 				break;
 			}
 			case B_PIC_SET_BLENDING_MODE:
@@ -416,44 +424,37 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 			}
 			case B_PIC_SET_FONT_SPACING:
 			{
-				//TODO: Implement
-//				int32 spacing = GetInt32();
+				fldata.font.SetSpacing(GetInt32());
 				break;
 			}
 			case B_PIC_SET_FONT_ENCODING:
 			{
-				//TODO: Implement
-//				int32 encoding = GetInt32();
+				fldata.font.SetEncoding(GetInt32());
 				break;
 			}
 			case B_PIC_SET_FONT_FLAGS:
 			{
-				//TODO: Implement
-//				int32 flags = GetInt32();
+				fldata.font.SetFlags(GetInt32());
 				break;
 			}
 			case B_PIC_SET_FONT_SIZE:
 			{
-				//TODO: Implement
-//				float size = GetFloat();
+				fldata.font.SetSize(GetFloat());
 				break;
 			}
 			case B_PIC_SET_FONT_ROTATE:
 			{
-				//TODO: Implement
-//				float rotation = GetFloat();
+				fldata.font.SetRotation(GetFloat());
 				break;
 			}
 			case B_PIC_SET_FONT_SHEAR:
 			{
-				//TODO: Implement
-//				float shear = GetFloat();
+				fldata.font.SetShear(GetFloat());
 				break;
 			}
 			case B_PIC_SET_FONT_FACE:
 			{
-				//TODO: Implement
-//				int32 flags = GetInt32();
+				fldata.font.SetFace(GetInt32());
 				break;
 			}
 			default:
@@ -469,4 +470,36 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 	return B_OK;
 }
 
-
+void PicturePlayer::SetClippingRegion(BRect *rects, int32 numrects)
+{
+	// Sets the player's clipping region to the union of the rectangles passed to it. 
+	// Passing NULL or 0 rectangles to the function empties the clipping region. The clipping 
+	// region is also emptied if there is no union of all rectangles passed to the function.
+	
+	if(!rects || numrects)
+	{
+		delete clipreg;
+		clipreg=NULL;
+		return;
+	}
+	
+	if(!clipreg)
+		clipreg=new BRegion();
+	else
+		clipreg->MakeEmpty();
+	
+	*clipreg=rects[0];
+	BRegion temp;
+	
+	for(int32 i=1; i<numrects; i++)
+	{
+		temp=rects[i];
+		clipreg->IntersectWith(&temp);
+	}
+	
+	if(clipreg->CountRects()==0)
+	{
+		delete clipreg;
+		clipreg=NULL;
+	}
+}

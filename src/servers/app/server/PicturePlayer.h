@@ -78,7 +78,9 @@ public:
 
 	void EnterFontChange();
 	void ExitFontChange();
-
+	
+	void SetClippingRegion(BRect *rects, int32 numrects);
+	
 	status_t Play(int32 tableEntries,void *userData, LayerData *d);
 	status_t Rewind();
 
@@ -88,7 +90,8 @@ private:
 	DisplayDriver *fdriver;
 	LayerData fldata;
 	BPoint forigin;
-	Pattern pat;
+	Pattern stipplepat;
+	BRegion *clipreg;
 };
 
 #endif
