@@ -17,6 +17,8 @@ extern "C" const char * const*__libc_argv;
 const char *kUsage =
 "Usage: %s [ --install ] [ --size <size> ] <file>\n"
 "       %s --uninstall  <device>\n"
+"       %s --halt <device> (dangerous!)\n"
+"       %s --info  <device>\n"
 "       %s ( --help | -h )\n"
 ;
 
@@ -29,8 +31,9 @@ print_usage(bool error = false)
 	BPath path;
 	if (path.SetTo(__libc_argv[0]) == B_OK)
 		name = path.Leaf();
-	fprintf((error ? stderr : stdout), kUsage, name, name, name);
+	fprintf((error ? stderr : stdout), kUsage, name, name, name, name);
 }
+
 
 // parse_size
 static
@@ -87,6 +90,7 @@ parse_size(const char *str, off_t *_size)
 	return true;
 }
 
+
 // install_file
 status_t
 install_file(const char *file, off_t size)
@@ -98,8 +102,12 @@ install_file(const char *file, off_t size)
 				strerror(errno));
 		return errno;
 	}
+
 	// set up the info
 	virtual_drive_info info;
+	info.magic = VIRTUAL_DRIVE_MAGIC;
+	info.drive_info_size = sizeof(info);
+
 	strcpy(info.file_name, file);
 	if (size >= 0) {
 		info.use_geometry = true;
@@ -125,23 +133,24 @@ install_file(const char *file, off_t size)
 	} else {
 		info.use_geometry = false;
 	}
+
 	// issue the ioctl
 	status_t error = B_OK;
 	if (ioctl(fd, VIRTUAL_DRIVE_REGISTER_FILE, &info) != 0) {
 		error = errno;
 		fprintf(stderr, "Failed to install device: %s\n", strerror(error));
 	} else {
-		printf("File `%s' registered as device `%s'.\n", file,
-			   info.device_name);
+		printf("File `%s' registered as device `%s'.\n", file, info.device_name);
 	}
 	// close the control device
 	close(fd);
 	return error;
 }
 
+
 // uninstall_file
 status_t
-uninstall_file(const char *device)
+uninstall_file(const char *device, bool immediately)
 {
 	// open the device
 	int fd = open(device, O_RDONLY);
@@ -150,9 +159,10 @@ uninstall_file(const char *device)
 				device, strerror(errno));
 		return errno;
 	}
+
 	// issue the ioctl
 	status_t error = B_OK;
-	if (ioctl(fd, VIRTUAL_DRIVE_UNREGISTER_FILE) != 0) {
+	if (ioctl(fd, VIRTUAL_DRIVE_UNREGISTER_FILE, immediately) != 0) {
 		error = errno;
 		fprintf(stderr, "Failed to uninstall device: %s\n", strerror(error));
 	}
@@ -161,14 +171,54 @@ uninstall_file(const char *device)
 	return error;
 }
 
+
+status_t
+info_for_device(const char *device)
+{
+	// open the device
+	int fd = open(device, O_RDONLY);
+	if (fd < 0) {
+		fprintf(stderr, "Failed to open device `%s': %s\n",
+				device, strerror(errno));
+		return errno;
+	}
+
+	// set up the info
+	virtual_drive_info info;
+	info.magic = VIRTUAL_DRIVE_MAGIC;
+	info.drive_info_size = sizeof(info);
+
+	// issue the ioctl
+	status_t error = B_OK;
+	if (ioctl(fd, VIRTUAL_DRIVE_GET_INFO, &info) != 0) {
+		error = errno;
+		fprintf(stderr, "Failed to get device info: %s\n", strerror(error));
+	} else {
+		printf("Device `%s' points to file `%s'.\n", info.device_name, info.file_name);
+		off_t size = (off_t)info.geometry.bytes_per_sector
+				* info.geometry.sectors_per_track
+				* info.geometry.cylinder_count
+				* info.geometry.head_count;
+		printf("\tdisk size is %Ld bytes (%g MB)\n", size, size / (1024.0 * 1024));
+		if (info.halted)
+			printf("\tdevice is currently halted.\n");
+	}
+	// close the control device
+	close(fd);
+	return error;
+}
+
+
 // main
 int
 main(int argc, const char **argv)
 {
 	status_t error = B_OK;
 	int argIndex = 1;
-	bool install = true;
+	enum { INSTALL, UNINSTALL, INFO } mode = INSTALL;
+	bool immediately = false;
 	off_t size = -1;
+
 	// parse options
 	for (; error == B_OK && argIndex < argc
 		   && argv[argIndex][0] == '-'; argIndex++) {
@@ -177,7 +227,7 @@ main(int argc, const char **argv)
 			// "--" option
 			arg += 2;
 			if (!strcmp(arg, "install")) {
-				install = true;
+				mode = INSTALL;
 			} else if (!strcmp(arg, "size")) {
 				argIndex++;
 				if (argIndex >= argc) {
@@ -192,7 +242,12 @@ main(int argc, const char **argv)
 					return 1;
 				}
 			} else if (!strcmp(arg, "uninstall")) {
-				install = false;
+				mode = UNINSTALL;
+			} else if (!strcmp(arg, "halt")) {
+				mode = UNINSTALL;
+				immediately = true;
+			} else if (!strcmp(arg, "info")) {
+				mode = INFO;
 			} else if (!strcmp(arg, "help")) {
 				print_usage();
 				return 0;
@@ -218,17 +273,27 @@ main(int argc, const char **argv)
 			}
 		}
 	}
+
 	// parse rest (the file name)
 	if (argIndex != argc - 1) {
 		print_usage(true);
 		return 1;
 	}
 	const char *file = argv[argIndex];
+
 	// do the job
-	if (install)
-		error = install_file(file, size);
-	else
-		error = uninstall_file(file);
+	switch (mode) {
+		case INSTALL:
+			error = install_file(file, size);
+			break;
+		case UNINSTALL:
+			error = uninstall_file(file, immediately);
+			break;
+		case INFO:
+			error = info_for_device(file);
+			break;
+	}
+
 	return (error == B_OK ? 0 : 1);
 }
 
