@@ -1173,6 +1173,7 @@ load_kernel_add_on(const char *path)
 	struct Elf32_Ehdr *eheader;
 	struct Elf32_Phdr *pheaders;
 	struct elf_image_info *image;
+	const char *fileName;
 	void *vnode = NULL;
 	void *reservedAddress;
 	addr_t start;
@@ -1191,6 +1192,13 @@ load_kernel_add_on(const char *path)
 	err = vfs_get_vnode_from_fd(fd, true, &vnode);
 	if (err < 0)
 		goto error0;
+
+	// get the file name
+	fileName = strrchr(path, '/');
+	if (fileName == NULL)
+		fileName = path;
+	else
+		fileName++;
 
 	// XXX awful hack to keep someone else from trying to load this image
 	// probably not a bad thing, shouldn't be too many races
@@ -1298,7 +1306,7 @@ load_kernel_add_on(const char *path)
 			rw_segment_handled = true;
 			region = &image->data_region;
 
-			snprintf(regionName, B_OS_NAME_LENGTH, "%s_data", path);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_data", fileName);
 		} else if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_EXECUTE)) {
 			// this is the non-writable segment
 			if (ro_segment_handled) {
@@ -1308,7 +1316,7 @@ load_kernel_add_on(const char *path)
 			ro_segment_handled = true;
 			region = &image->text_region;
 
-			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", path);
+			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", fileName);
 		} else {
 			dprintf("weird program header flags 0x%lx\n", pheaders[i].p_flags);
 			continue;
@@ -1328,7 +1336,7 @@ load_kernel_add_on(const char *path)
 		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
 		start += region->size;
 
-		TRACE(("elf_load_kspace: created a region at %p\n", (void *)region->start));
+		TRACE(("elf_load_kspace: created a region \"%s\" at %p\n", regionName, (void *)region->start));
 
 		len = _kern_read(fd, pheaders[i].p_offset,
 			(void *)(region->start + (pheaders[i].p_vaddr % B_PAGE_SIZE)),
