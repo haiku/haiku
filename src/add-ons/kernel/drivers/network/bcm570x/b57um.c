@@ -319,7 +319,7 @@ status_t init_driver(void) {
  		cards_found++;
  	}
  	 	
- 	mempool_init((MAX_RX_PACKET_DESC_COUNT+10) * cards_found);
+ 	mempool_init((MAX_RX_PACKET_DESC_COUNT+MAX_TX_PACKET_DESC_COUNT) * cards_found);
  	
  	dev_list[cards_found] = NULL;
 
@@ -569,9 +569,6 @@ status_t b57_read(void *cookie,off_t pos,void *data,size_t *numBytes) {
 	release_spinlock(&pUmDevice->lock);
 	enable_interrupts(cpu);
 	
-	//write(debug_fd,"\n\nPacket follows\n",17);
-	//write(debug_fd,data,*numBytes);
-	
 	return B_OK;
 }
 
@@ -581,7 +578,6 @@ status_t b57_write(void *cookie,off_t pos,const void *data,size_t *numBytes) {
 	PLM_PACKET pPacket;
 	struct B_UM_PACKET *pUmPacket;
 	cpu_status cpu;
-	//char debug[255];
 	
 	/*if ((pDevice->LinkStatus == LM_STATUS_LINK_DOWN) || !pDevice->InitDone)
 	{
@@ -597,17 +593,12 @@ status_t b57_write(void *cookie,off_t pos,const void *data,size_t *numBytes) {
 	pUmPacket = (struct B_UM_PACKET *) pPacket;
 	pUmPacket->data = chunk_pool_get();
 	
-	/*sprintf(debug,"Copy %d bytes of packet data (0x%08x->0x%08x (0x%08x - size %d))...",*numBytes,data,pPacket,pUmPacket->data,pUmPacket->size);
-	kernel_debugger(debug);*/
-	
-	memcpy(pUmPacket->data/*+pDevice->dataoffset*/,data,*numBytes); /* no guarantee data is contiguous, so we have to copy */
-	pPacket->PacketSize = pUmPacket->size = *numBytes/*+pDevice->rxoffset*/;
+	memcpy(pUmPacket->data,data,*numBytes); /* no guarantee data is contiguous, so we have to copy */
+	pPacket->PacketSize = pUmPacket->size = *numBytes;
 	
 	pPacket->u.Tx.FragCount = 1;
 	pPacket->Flags = 0;
-	
-	//kernel_debugger("Sending packet...");
-	
+		
 	tx_cleanup_thread(pUmDevice);
 	
 	cpu = disable_interrupts();
@@ -617,9 +608,7 @@ status_t b57_write(void *cookie,off_t pos,const void *data,size_t *numBytes) {
 	
 	release_spinlock(&pUmDevice->lock);
 	enable_interrupts(cpu);
-	
-	//kernel_debugger("Packet sent!");
-	
+		
 	return B_OK;
 }
 
