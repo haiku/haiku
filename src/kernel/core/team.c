@@ -981,7 +981,7 @@ _user_wait_for_team(team_id id, status_t *_userReturnCode)
 		return B_BAD_ADDRESS;
 
 	status = wait_for_team(id, &returnCode);
-	if (status >= B_OK) {
+	if (status >= B_OK && _userReturnCode != NULL) {
 		if (user_memcpy(_userReturnCode, &returnCode, sizeof(returnCode)) < B_OK)
 			return B_BAD_ADDRESS;
 	}
