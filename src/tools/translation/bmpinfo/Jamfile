@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src tools translation bmpinfo ;
+
+BinCommand bmpinfo : bmpinfo.cpp : be ;
+
