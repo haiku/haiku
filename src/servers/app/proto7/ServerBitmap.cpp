@@ -87,6 +87,7 @@ ServerBitmap::ServerBitmap(const char *path)
 		bytesperline=bmp->BytesPerRow();
 		buffer=new uint8[bmp->BitsLength()];
 		memcpy(buffer,(void *)bmp->Bits(),bmp->BitsLength());
+		HandleSpace(cspace,bytesperline);
 	}
 }
 
@@ -113,6 +114,7 @@ ServerBitmap::ServerBitmap(uint32 type,int32 id)
 		bytesperline=bmp->BytesPerRow();
 		buffer=new uint8[bmp->BitsLength()];
 		memcpy(buffer,(void *)bmp->Bits(),bmp->BitsLength());
+		HandleSpace(cspace,bytesperline);
 	}
 }
 
@@ -138,6 +140,7 @@ ServerBitmap::ServerBitmap(uint32 type, const char *name)
 		bytesperline=bmp->BytesPerRow();
 		buffer=new uint8[bmp->BitsLength()];
 		memcpy(buffer,(void *)bmp->Bits(),bmp->BitsLength());
+		HandleSpace(cspace,bytesperline);
 	}
 }
 
@@ -146,6 +149,7 @@ ServerBitmap::ServerBitmap(ServerBitmap *bitmap)
 	is_initialized=true;
 	width=bitmap->width;
 	height=bitmap->height;
+	bytesperline = bitmap->bytesperline;
 	cspace=bitmap->cspace;
 	areaid=B_ERROR;
 
@@ -178,6 +182,8 @@ ServerBitmap::ServerBitmap(int8 *data)
 		width=16;
 		height=16;
 		bytesperline=64;
+		cspace=B_RGBA32;
+		HandleSpace(cspace,bytesperline);
 		
 		// for each row in the cursor data
 		for(j=0;j<16;j++)
@@ -206,6 +212,7 @@ ServerBitmap::ServerBitmap(int8 *data)
 		width=0;
 		height=0;
 		bytesperline=0;
+		cspace=B_NO_COLOR_SPACE;
 	}
 	
 #ifdef DEBUG_SERVER_CURSOR
@@ -216,7 +223,7 @@ ServerBitmap::ServerBitmap(int8 *data)
 ServerBitmap::~ServerBitmap(void)
 {
 	if(buffer)
-		delete buffer;
+		delete[] buffer;
 }
 
 void ServerBitmap::UpdateSettings(void)

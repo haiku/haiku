@@ -106,7 +106,7 @@ protected:
 	int hide_cursor;
 	ServerBitmap *cursor, *under_cursor;
 	int32 drawmode;
-	BRect cursorframe, oldcursorframe;
+	BRect cursorframe;
 };
 
 #endif

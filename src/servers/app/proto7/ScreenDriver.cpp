@@ -306,7 +306,6 @@ ScreenDriver::ScreenDriver(void)
 	under_cursor=NULL;
 
 	cursorframe.Set(0,0,0,0);
-	oldcursorframe.Set(0,0,0,0);
 }
 
 ScreenDriver::~ScreenDriver(void)
@@ -319,12 +318,19 @@ ScreenDriver::~ScreenDriver(void)
 
 bool ScreenDriver::Initialize(void)
 {
+	int8 cross[] = { 16,1,5,5,
+	14,0,4,0,4,0,4,0,128,32,241,224,128,32,4,0,
+	4,0,4,0,14,0,0,0,0,0,0,0,0,0,0,0,
+	14,0,4,0,4,0,4,0,128,32,245,224,128,32,4,0,
+	4,0,4,0,14,0,0,0,0,0,0,0,0,0,0,0 };
+	ServerBitmap *crosscursor;
 	fbuffer->Show();
 
-	// draw on the module's default cursor here to make it look preety
-	
 	// wait 1 sec for the window to show...
 	snooze(500000);
+	crosscursor = new ServerBitmap(cross);
+	SetCursor(crosscursor,BPoint(5,5));
+	delete crosscursor;
 	return true;
 }
 
@@ -1303,16 +1309,13 @@ void ScreenDriver::MoveCursorTo(float x, float y)
 printf("ScreenDriver::MoveCursorTo(%f,%f)\n",x,y);
 #endif
 	Lock();
-	if(!IsCursorHidden() && under_cursor)
+	if(!IsCursorHidden())
 		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 
-	oldcursorframe=cursorframe;
-
 	cursorframe.OffsetTo(x,y);
-	if (under_cursor)
-		ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
+	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	
-	if(!IsCursorHidden() && cursor)
+	if(!IsCursorHidden())
 		BlitBitmap(cursor,cursor->Bounds(),cursorframe);
 	
 	Unlock();
@@ -1327,7 +1330,7 @@ printf("ScreenDriver::ShowCursor\n");
 	if(fbuffer->IsConnected())
 	{
 		SetCursorHidden(false);
-		if(CursorStateChanged() && cursor)
+		if(CursorStateChanged())
 			BlitBitmap(cursor,cursor->Bounds(),cursorframe);
 	}
 	Unlock();
@@ -1340,7 +1343,7 @@ printf("ScreenDriver::ObscureCursor\n");
 #endif
 	Lock();
 	SetCursorObscured(true);
-	if(!IsCursorHidden() && fbuffer->IsConnected() && under_cursor)
+	if(!IsCursorHidden() && fbuffer->IsConnected())
 		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	Unlock();
 }
@@ -1372,13 +1375,12 @@ printf("ScreenDriver::SetCursor\n");
 	else
 		SetHotSpot(BPoint(0,0));
 	
-	cursorframe.right=cursorframe.left+csr->Bounds().Width()-1;
-	cursorframe.bottom=cursorframe.top+csr->Bounds().Height()-1;
-	oldcursorframe=cursorframe;
+	cursorframe.right=cursorframe.left+csr->Bounds().Width();
+	cursorframe.bottom=cursorframe.top+csr->Bounds().Height();
 	
 	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
 	
-	if(!IsCursorHidden() && cursor)
+	if(!IsCursorHidden())
 		BlitBitmap(cursor,cursor->Bounds(),cursorframe);
 	
 	Unlock();
@@ -1477,7 +1479,7 @@ printf("ScreenDriver::BlitBitmap(): Incompatible bitmap pixel depth\n");
 		return;
 	}
 
-	uint8 colorspace_size=sourcebmp->BitsPerPixel();
+	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
 	// First, clip source rect to destination
 	if(sourcerect.Width() > destrect.Width())
 		sourcerect.right=sourcerect.left+destrect.Width();
@@ -1532,7 +1534,7 @@ printf("ScreenDriver::BlitBitmap(): Incompatible bitmap pixel depth\n");
 	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
 	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
 
-	uint32 line_length = uint32 ((destrect.right - destrect.left)*colorspace_size);
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
 	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
 
 	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
@@ -1548,7 +1550,7 @@ printf("ScreenDriver::BlitBitmap(): Incompatible bitmap pixel depth\n");
 void ScreenDriver::ExtractToBitmap(ServerBitmap *destbmp,BRect destrect, BRect sourcerect)
 {
 	// Another internal function called from other functions.
-	
+
 	if(!destbmp)
 	{
 #ifdef DEBUG_DRIVER
@@ -1565,7 +1567,7 @@ printf("ScreenDriver::ExtractToBitmap(): Incompatible bitmap pixel depth\n");
 		return;
 	}
 
-	uint8 colorspace_size=destbmp->BitsPerPixel();
+	uint8 colorspace_size=destbmp->BitsPerPixel()/8;
 	// First, clip source rect to destination
 	if(sourcerect.Width() > destrect.Width())
 		sourcerect.right=sourcerect.left+destrect.Width();
@@ -1620,7 +1622,7 @@ printf("ScreenDriver::ExtractToBitmap(): Incompatible bitmap pixel depth\n");
 	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
 	dest_bits += uint32 ( (destrect.top * dest_width) + (destrect.left * colorspace_size) );
 
-	uint32 line_length = uint32 ((destrect.right - destrect.left)*colorspace_size);
+	uint32 line_length = uint32 ((destrect.right - destrect.left+1)*colorspace_size);
 	uint32 lines = uint32 (destrect.bottom-destrect.top+1);
 
 	for (uint32 pos_y = 0; pos_y != lines; pos_y++)
