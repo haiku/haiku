@@ -82,8 +82,9 @@ KernelLd kernel.so :
 	-Bdynamic -shared -export-dynamic -dynamic-linker /foo/bar
 	;
 
-KernelLd libglue.o :
-	<$(SOURCE_GRIST)!glue>lib0.o
+KernelLd libglue.o :	# libglue.o is used for dynamic libraries
+	<$(SOURCE_GRIST)!glue>crt0.o
+	<$(SOURCE_GRIST)!glue>init_term_dyn.o
 	:
 	:
 	-r
@@ -116,13 +117,18 @@ KernelLd libroot.so :
 	:
 	-shared -soname libroot.so -Bdynamic -export-dynamic
 	:
-	no_gcc
+	# no_gcc
+	# for now link against libgcc.a to allow more BeOS executables to be run.
+	# Needs a definitive decision - most probably we will have to link it statically
+	# against libroot.so, too, like BeOS does it
 	:
 	lib/libroot.so
 	;
 
-KernelLd libglue2.o :
+KernelLd libglue2.o :	# libglue2.o is used for executables
 	<$(SOURCE_GRIST)!glue>crt0.o
+	<$(SOURCE_GRIST)!glue>init_term_dyn.o
+	<$(SOURCE_GRIST)!glue>start_dyn.o
 	:
 	:
 	-r
@@ -144,19 +150,15 @@ KernelLd init :
 
 KernelStaticLibraryObjects librld.a :
 	# needed for rld.so only
-	<$(SOURCE_GRIST)!libroot>libroot_init.o
-
 	<$(SOURCE_GRIST)!libroot!os>syscalls.o
 	<$(SOURCE_GRIST)!libroot!os>sem.o
 	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>atomic.o
-	<$(SOURCE_GRIST)!libroot!os!arch!$(OBOS_ARCH)>cpuid.o
 
 	<$(SOURCE_GRIST)!libroot!posix>errno.o
-	<$(SOURCE_GRIST)!libroot!posix>dlfcn.o
-	<$(SOURCE_GRIST)!libroot!posix>rlimit.o
 
  	<$(SOURCE_GRIST)!libroot!posix!locale>ctype.o
   	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
+  	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
@@ -191,8 +193,7 @@ KernelLd rld.so :
 	<$(SOURCE_GRIST)!apps!rld>rld0.o
 	<$(SOURCE_GRIST)!apps!rld>rld.o
 	<$(SOURCE_GRIST)!apps!rld>rldelf.o
-	<$(SOURCE_GRIST)!apps!rld>rldunix.o
-	<$(SOURCE_GRIST)!apps!rld>rldbeos.o
+	<$(SOURCE_GRIST)!apps!rld>rldexport.o
 	<$(SOURCE_GRIST)!apps!rld>rldheap.o
 	<$(SOURCE_GRIST)!apps!rld>rldaux.o
 	librld.a
@@ -435,7 +436,6 @@ KernelLd uname :
 	:
 	bin/uname
 	;
-
 
 WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 
