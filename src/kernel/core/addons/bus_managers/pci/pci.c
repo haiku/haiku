@@ -11,7 +11,7 @@
 #include <vm.h>
 #include <devfs.h>
 #include <khash.h>
-#include <Errors.h>
+#include <errno.h>
 
 #include <arch/cpu.h>
 #include <arch/int.h>
@@ -57,7 +57,7 @@ static int pci_freecookie(void * cookie)
 /*
 static int pci_seek(void * cookie, off_t pos, seek_type st)
 {
-	return ERR_NOT_ALLOWED;
+	return EPERM;
 }
 */
 
@@ -69,12 +69,12 @@ static int pci_close(void * cookie)
 static ssize_t pci_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
 	*len = 0;
-	return ERR_NOT_ALLOWED;
+	return EPERM;
 }
 
 static ssize_t pci_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
-	return ERR_NOT_ALLOWED;
+	return EPERM;
 }
 
 static int pci_ioctl(void * _cookie, uint32 op, void *buf, size_t len)
@@ -95,7 +95,7 @@ static int pci_ioctl(void * _cookie, uint32 op, void *buf, size_t len)
 			dump_pci_config(cookie->cfg);
 			break;
 		default:
-			err = ERR_INVALID_ARGS;
+			err = EINVAL;
 			goto err;
 	}
 
