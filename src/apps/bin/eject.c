@@ -21,34 +21,46 @@
 
 int usage(char *prog)
 {
-	printf("usage: eject [-q|-l] /dev/disk/.../raw\n");
+	printf("usage: eject [-q|-l|-s] /dev/disk/.../raw\n");
 	printf("	eject the device, or:\n");
 	printf("	-l: load it (close the tray)\n");
 	printf("	-q: query for media status\n");
+	printf("	-s: swap tray position (close/eject)\n");
 	return 0;
 }
 
+static int do_eject(char operation, char *device);
+
 int main(int argc, char **argv)
 {
-	char *device = "/dev/disk/floppy/raw";
+	char *device = NULL;
 	char operation = 'e';
-	int fd, i;
-	status_t devstatus;
+	int i;
+	int ret;
 	for (i = 1; i < argc; i++) {
 		if (strncmp(argv[i], "-", 1) == 0) {
 			if (strlen(argv[i]) > 1)
 				operation = argv[i][1];
 			else {
-				usage(argv[0]);
+				usage("eject");
 				return 1;
 			}
 		} else if (strncmp(argv[i], "--h", 2) == 0)
-			return usage(argv[0]);
+			return usage("eject");
 		else {
 			device = argv[i];
-			break;
+			ret = do_eject(operation, device);
+			if (ret != 0)
+				return ret;
 		}
 	}
+	if (device == NULL)
+		return do_eject(operation, "/dev/disk/floppy/raw");
+}
+static int do_eject(char operation, char *device)
+{
+	int fd;
+	status_t devstatus;
 	fd = open(device, O_RDONLY);
 	if (fd < 0) {
 		perror(device);
@@ -56,7 +68,7 @@ int main(int argc, char **argv)
 	}
 	switch (operation) {
 	case 'h':
-		return usage(argv[0]);
+		return usage("eject");
 	case 'e':
 		if (ioctl(fd, B_EJECT_DEVICE) < 0) {
 			perror(device);
@@ -82,8 +94,31 @@ int main(int argc, char **argv)
 			puts(strerror(devstatus));
 		}
 		break;
+	case 's':
+		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus) < 0) {
+			perror(device);
+			return 1;
+		}
+		switch (devstatus) {
+		case B_NO_ERROR:
+		case B_DEV_NO_MEDIA:
+			if (ioctl(fd, B_EJECT_DEVICE) < 0) {
+				perror(device);
+				return 1;
+			}
+			break;
+		case B_DEV_DOOR_OPEN:
+			if (ioctl(fd, B_LOAD_MEDIA) < 0) {
+				perror(device);
+				return 1;
+			}
+			break;
+		default:
+			perror(device);
+		}
+		break;
 	default:
-		usage(argv[0]);
+		usage("eject");
 		return 1;
 	}
 	close(fd);
