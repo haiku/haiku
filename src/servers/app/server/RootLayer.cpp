@@ -95,10 +95,7 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 		return;
 
 	// Spawn our working thread
-	fThreadID= spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
-	if (fThreadID >= 0)
-		resume_thread(fThreadID);
-
+	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
 }
 
 RootLayer::~RootLayer()
@@ -118,6 +115,15 @@ RootLayer::~RootLayer()
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
 }
 
+void RootLayer::RunThread()
+{
+	
+	if (fThreadID > 0)
+		resume_thread(fThreadID);
+	else
+		debugger("Can not create any more threads.\n");
+}
+
 /*!
 	\brief Thread function for handling input messages and calculating visible regions.
 	\param data Pointer to the app_server to which the thread belongs
@@ -129,12 +135,20 @@ int32 RootLayer::WorkingThread(void *data)
 	status_t	err = B_OK;
 	RootLayer	*oneRootLayer	= (RootLayer*)data;
 	BPortLink	messageQueue(-1, oneRootLayer->fListenPort);
+
+	// first make sure we are actualy visible
+	oneRootLayer->Lock();
+	oneRootLayer->RebuildFullRegion();
+	oneRootLayer->FullInvalidate(oneRootLayer->Bounds());
+	oneRootLayer->Unlock();
 	
 	for(;;)
 	{
 		STRACE(("info: RootLayer(%s)::WorkingThread listening on port %ld.\n", oneRootLayer->GetName(), oneRootLayer->fListenPort));
 		err = messageQueue.GetNextReply(&code);
-		
+
+		oneRootLayer->Lock();
+
 		if(err < B_OK)
 		{
 			STRACE(("WorkingThread: messageQueue.GetNextReply failed\n"));
@@ -165,10 +179,26 @@ int32 RootLayer::WorkingThread(void *data)
 				exit_thread(0);
 				break;
 
+			case AS_ROOTLAYER_SHOW_WINBORDER:
+			{
+					WinBorder	*winBorder = NULL;
+					messageQueue.Read<WinBorder*>(&winBorder);
+					oneRootLayer->show_winBorder(winBorder);
+				break;
+			}
+			case AS_ROOTLAYER_HIDE_WINBORDER:
+			{
+					WinBorder	*winBorder = NULL;
+					messageQueue.Read<WinBorder*>(&winBorder);
+					oneRootLayer->hide_winBorder(winBorder);
+				break;
+			}
 			default:
 				STRACE(("RootLayer(%s)::WorkingThread received unexpected code %lx\n",oneRootLayer->GetName(), oneRootLayer->code));
 				break;
 		}
+
+		oneRootLayer->Unlock();
 
 		// if we still have other messages in our queue, but we really want to quit
 		if (oneRootLayer->fQuiting)
@@ -454,6 +484,22 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 	
 	fMainLock.Unlock();
 	desktop->fGeneralLock.Unlock();
+}
+
+void RootLayer::HideWinBorder(WinBorder* winBorder)
+{
+	BPortLink	msg(fListenPort, -1);
+	msg.StartMessage(AS_ROOTLAYER_HIDE_WINBORDER);
+	msg.Attach<WinBorder*>(winBorder);
+	msg.Flush();
+}
+
+void RootLayer::ShowWinBorder(WinBorder* winBorder)
+{
+	BPortLink	msg(fListenPort, -1);
+	msg.StartMessage(AS_ROOTLAYER_SHOW_WINBORDER);
+	msg.Attach<WinBorder*>(winBorder);
+	msg.Flush();
 }
 
 WinBorder* RootLayer::WinBorderAt(const BPoint& pt){
@@ -1207,9 +1253,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddString("bytes",string);
 					keymsg.AddInt32("raw_char",raw_char);
 					
-					win->Lock();
 					win->SendMessageToClient(&keymsg);
-					win->Unlock();
 				}
 			}
 			
@@ -1304,9 +1348,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddString("bytes",string);
 					keymsg.AddInt32("raw_char",raw_char);
 					
-					win->Lock();
 					win->SendMessageToClient(&keymsg);
-					win->Unlock();
 				}
 			}
 			
@@ -1352,9 +1394,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddInt32("modifiers",modifiers);
 					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
 					
-					win->Lock();
 					win->SendMessageToClient(&keymsg);
-					win->Unlock();
 				}
 			}
 			
@@ -1398,9 +1438,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddInt32("modifiers",modifiers);
 					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
 					
-					win->Lock();
 					win->SendMessageToClient(&keymsg);
-					win->Unlock();
 				}
 			}
 			
@@ -1442,9 +1480,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 					keymsg.AddInt32("be:old_modifiers",oldmodifiers);
 					keymsg.AddData("states",B_INT8_TYPE,keystates,sizeof(int8)*16);
 					
-					win->Lock();
 					win->SendMessageToClient(&keymsg);
-					win->Unlock();
 				}
 			}
 			fMainLock.Unlock();
@@ -1492,4 +1528,98 @@ void RootLayer::PrintToStream()
 		printf("~~~~~~~~\n");
 	}
 	printf("Active Workspace: %ld\n", fActiveWorkspace? fActiveWorkspace->ID(): -1);
+}
+
+
+void RootLayer::show_winBorder(WinBorder *winBorder)
+{
+	desktop->fGeneralLock.Lock();
+	fMainLock.Lock();
+
+	int32 wksCount;
+	uint32 feel = winBorder->Window()->Feel();
+	// make WinBorder unhidden, but *do not* rebuild and redraw! We'll do that
+	// after we bring it (its modal and floating windows also) in front.
+	winBorder->Show(false);
+
+	if ( (feel == B_FLOATING_SUBSET_WINDOW_FEEL || feel == B_MODAL_SUBSET_WINDOW_FEEL)
+		 && winBorder->MainWinBorder() == NULL)
+	{
+		// This window hasn't been added to a normal window subset,	
+		// so don't call placement or redrawing methods
+	}
+	else
+	{
+		wksCount	= WorkspaceCount();
+		for(int32 i = 0; i < wksCount; i++)
+		{
+			if (winBorder->Window()->Workspaces() & (0x00000001UL << i))
+			{
+				WinBorder		*previousFocus;
+				BRegion			invalidRegion;
+				Workspace		*ws;
+					
+				// TODO: can you unify this method with Desktop::MouseEventHandler::B_MOUSE_DOWN
+					
+				ws				= WorkspaceAt(i+1);
+				ws->BringToFrontANormalWindow(winBorder);
+				ws->SearchAndSetNewFront(winBorder);
+				previousFocus	= ws->FocusLayer();
+				ws->SearchAndSetNewFocus(winBorder);
+					
+				// TODO: only do this in for the active workspace!
+					
+				// first redraw previous window's decorator. It has lost focus state.
+				if (previousFocus)
+					if (previousFocus->fDecorator)
+						winBorder->fParent->Invalidate(previousFocus->fVisible);
+
+				// we must build the rebuild region. we have nowhere to take it from.
+				// include decorator's(if any) and fTopLayer's full regions.
+				winBorder->fTopLayer->RebuildFullRegion();
+				winBorder->RebuildFullRegion();
+				invalidRegion.Include(&(winBorder->fTopLayer->fFull));
+				if (winBorder->fDecorator)
+					invalidRegion.Include(&(winBorder->fFull));
+
+				winBorder->fParent->FullInvalidate(invalidRegion);
+			}
+		}
+	}
+
+	fMainLock.Unlock();
+	desktop->fGeneralLock.Unlock();
+}
+
+void RootLayer::hide_winBorder(WinBorder *winBorder)
+{
+	Workspace *ws = NULL;
+		
+	desktop->fGeneralLock.Lock();
+	fMainLock.Lock();
+		
+	winBorder->Hide();
+		
+	int32		wksCount= WorkspaceCount();
+	for(int32 i = 0; i < wksCount; i++)
+	{
+		ws = WorkspaceAt(i+1);
+
+		if (ws->FrontLayer() == winBorder)
+		{
+			ws->HideSubsetWindows(winBorder);
+			ws->SearchAndSetNewFocus(ws->FrontLayer());
+		}
+		else
+		{
+			if (ws->FocusLayer() == winBorder)
+				ws->SearchAndSetNewFocus(winBorder);
+			else{
+				// TODO: RootLayer or Desktop class should take care of invalidating
+//				ws->Invalidate();
+			}
+		}
+	}
+	fMainLock.Unlock();
+	desktop->fGeneralLock.Unlock();
 }
