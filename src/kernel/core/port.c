@@ -84,7 +84,7 @@ port_init(kernel_args *ka)
 	int i;
 	int size = sizeof(struct port_entry) * MAX_PORTS;
 
-	// create and initialize semaphore table
+	// create and initialize ports table
 	gPortRegion = create_area("port_table", (void **)&gPorts, B_ANY_KERNEL_ADDRESS,
 		size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (gPortRegion < 0) {
@@ -103,6 +103,109 @@ port_init(kernel_args *ka)
 
 	return 0;
 }
+
+
+#ifdef DEBUG
+// ToDo: the test code does not belong here!
+/*
+ * testcode
+ */
+
+static int32 port_test_thread_func(void *arg);
+
+port_id test_p1, test_p2, test_p3, test_p4;
+
+void
+port_test()
+{
+	char testdata[5];
+	thread_id t;
+	int res;
+	int32 dummy;
+	int32 dummy2;
+
+	strcpy(testdata, "abcd");
+
+	dprintf("porttest: create_port()\n");
+	test_p1 = create_port(1,    "test port #1");
+	test_p2 = create_port(10,   "test port #2");
+	test_p3 = create_port(1024, "test port #3");
+	test_p4 = create_port(1024, "test port #4");
+
+	dprintf("porttest: find_port()\n");
+	dprintf("'test port #1' has id %ld (should be %ld)\n", find_port("test port #1"), test_p1);
+
+	dprintf("porttest: write_port() on 1, 2 and 3\n");
+	write_port(test_p1, 1, &testdata, sizeof(testdata));
+	write_port(test_p2, 666, &testdata, sizeof(testdata));
+	write_port(test_p3, 999, &testdata, sizeof(testdata));
+	dprintf("porttest: port_count(test_p1) = %ld\n", port_count(test_p1));
+
+	dprintf("porttest: write_port() on 1 with timeout of 1 sec (blocks 1 sec)\n");
+	write_port_etc(test_p1, 1, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
+	dprintf("porttest: write_port() on 2 with timeout of 1 sec (wont block)\n");
+	res = write_port_etc(test_p2, 777, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
+	dprintf("porttest: res=%d, %s\n", res, res == 0 ? "ok" : "BAD");
+
+	dprintf("porttest: read_port() on empty port 4 with timeout of 1 sec (blocks 1 sec)\n");
+	res = read_port_etc(test_p4, &dummy, &dummy2, sizeof(dummy2), B_TIMEOUT, 1000000);
+	dprintf("porttest: res=%d, %s\n", res, res == B_TIMED_OUT ? "ok" : "BAD");
+
+	dprintf("porttest: spawning thread for port 1\n");
+	t = spawn_kernel_thread(port_test_thread_func, "port_test", B_NORMAL_PRIORITY, NULL);
+	resume_thread(t);
+
+	dprintf("porttest: write\n");
+	write_port(test_p1, 1, &testdata, sizeof(testdata));
+
+	// now we can write more (no blocking)
+	dprintf("porttest: write #2\n");
+	write_port(test_p1, 2, &testdata, sizeof(testdata));
+	dprintf("porttest: write #3\n");
+	write_port(test_p1, 3, &testdata, sizeof(testdata));
+
+	dprintf("porttest: waiting on spawned thread\n");
+	wait_for_thread(t, NULL);
+
+	dprintf("porttest: close p1\n");
+	close_port(test_p2);
+	dprintf("porttest: attempt write p1 after close\n");
+	res = write_port(test_p2, 4, &testdata, sizeof(testdata));
+	dprintf("porttest: write_port ret %d\n", res);
+
+	dprintf("porttest: testing delete p2\n");
+	delete_port(test_p2);
+
+	dprintf("porttest: end test main thread\n");
+	
+}
+
+
+static int32
+port_test_thread_func(void *arg)
+{
+	int32 msg_code;
+	int n;
+	char buf[6];
+	buf[5] = '\0';
+
+	dprintf("porttest: port_test_thread_func()\n");
+	
+	n = read_port(test_p1, &msg_code, &buf, 3);
+	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
+	n = read_port(test_p1, &msg_code, &buf, 4);
+	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
+	buf[4] = 'X';
+	n = read_port(test_p1, &msg_code, &buf, 5);
+	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
+
+	dprintf("porttest: testing delete p1 from other thread\n");
+	delete_port(test_p1);
+	dprintf("porttest: end port_test_thread_func()\n");
+	
+	return 0;
+}
+#endif	/* DEBUG */
 
 
 int
@@ -175,6 +278,51 @@ dump_port_info(int argc, char **argv)
 	}
 	return 0;
 }
+
+
+/** this function cycles through the ports table, deleting all
+ *	the ports that are owned by the passed team_id
+ */
+
+int
+delete_owned_ports(team_id owner)
+{
+	// ToDo: investigate maintaining a list of ports in the team
+	//	to make this simpler and more efficient.
+	int state;
+	int i;
+	int count = 0;
+
+	if (ports_active == false)
+		return B_BAD_PORT_ID;
+
+	state = disable_interrupts();
+	GRAB_PORT_LIST_LOCK();
+
+	for (i = 0; i < MAX_PORTS; i++) {
+		if (gPorts[i].id != -1 && gPorts[i].owner == owner) {
+			port_id id = gPorts[i].id;
+
+			RELEASE_PORT_LIST_LOCK();
+			restore_interrupts(state);
+
+			delete_port(id);
+			count++;
+
+			state = disable_interrupts();
+			GRAB_PORT_LIST_LOCK();
+		}
+	}
+
+	RELEASE_PORT_LIST_LOCK();
+	restore_interrupts(state);
+
+	return count;
+}
+
+
+//	#pragma mark -
+// public kernel API
 
 
 port_id		
@@ -911,149 +1059,6 @@ set_port_owner(port_id id, team_id team)
 
 	return B_NO_ERROR;
 }
-
-
-/** this function cycles through the ports table, deleting all
- *	the ports that are owned by the passed team_id
- */
-
-int
-delete_owned_ports(team_id owner)
-{
-	// ToDo: investigate maintaining a list of ports in the team
-	//	to make this simpler and more efficient.
-	int state;
-	int i;
-	int count = 0;
-
-	if (ports_active == false)
-		return B_BAD_PORT_ID;
-
-	state = disable_interrupts();
-	GRAB_PORT_LIST_LOCK();
-
-	for (i = 0; i < MAX_PORTS; i++) {
-		if (gPorts[i].id != -1 && gPorts[i].owner == owner) {
-			port_id id = gPorts[i].id;
-
-			RELEASE_PORT_LIST_LOCK();
-			restore_interrupts(state);
-
-			delete_port(id);
-			count++;
-
-			state = disable_interrupts();
-			GRAB_PORT_LIST_LOCK();
-		}
-	}
-
-	RELEASE_PORT_LIST_LOCK();
-	restore_interrupts(state);
-
-	return count;
-}
-
-
-#ifdef DEBUG
-/*
- * testcode
- */
-
-static int32 port_test_thread_func(void *arg);
-
-port_id test_p1, test_p2, test_p3, test_p4;
-
-void
-port_test()
-{
-	char testdata[5];
-	thread_id t;
-	int res;
-	int32 dummy;
-	int32 dummy2;
-
-	strcpy(testdata, "abcd");
-
-	dprintf("porttest: create_port()\n");
-	test_p1 = create_port(1,    "test port #1");
-	test_p2 = create_port(10,   "test port #2");
-	test_p3 = create_port(1024, "test port #3");
-	test_p4 = create_port(1024, "test port #4");
-
-	dprintf("porttest: find_port()\n");
-	dprintf("'test port #1' has id %ld (should be %ld)\n", find_port("test port #1"), test_p1);
-
-	dprintf("porttest: write_port() on 1, 2 and 3\n");
-	write_port(test_p1, 1, &testdata, sizeof(testdata));
-	write_port(test_p2, 666, &testdata, sizeof(testdata));
-	write_port(test_p3, 999, &testdata, sizeof(testdata));
-	dprintf("porttest: port_count(test_p1) = %ld\n", port_count(test_p1));
-
-	dprintf("porttest: write_port() on 1 with timeout of 1 sec (blocks 1 sec)\n");
-	write_port_etc(test_p1, 1, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
-	dprintf("porttest: write_port() on 2 with timeout of 1 sec (wont block)\n");
-	res = write_port_etc(test_p2, 777, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
-	dprintf("porttest: res=%d, %s\n", res, res == 0 ? "ok" : "BAD");
-
-	dprintf("porttest: read_port() on empty port 4 with timeout of 1 sec (blocks 1 sec)\n");
-	res = read_port_etc(test_p4, &dummy, &dummy2, sizeof(dummy2), B_TIMEOUT, 1000000);
-	dprintf("porttest: res=%d, %s\n", res, res == B_TIMED_OUT ? "ok" : "BAD");
-
-	dprintf("porttest: spawning thread for port 1\n");
-	t = spawn_kernel_thread(port_test_thread_func, "port_test", B_NORMAL_PRIORITY, NULL);
-	resume_thread(t);
-
-	dprintf("porttest: write\n");
-	write_port(test_p1, 1, &testdata, sizeof(testdata));
-
-	// now we can write more (no blocking)
-	dprintf("porttest: write #2\n");
-	write_port(test_p1, 2, &testdata, sizeof(testdata));
-	dprintf("porttest: write #3\n");
-	write_port(test_p1, 3, &testdata, sizeof(testdata));
-
-	dprintf("porttest: waiting on spawned thread\n");
-	wait_for_thread(t, NULL);
-
-	dprintf("porttest: close p1\n");
-	close_port(test_p2);
-	dprintf("porttest: attempt write p1 after close\n");
-	res = write_port(test_p2, 4, &testdata, sizeof(testdata));
-	dprintf("porttest: write_port ret %d\n", res);
-
-	dprintf("porttest: testing delete p2\n");
-	delete_port(test_p2);
-
-	dprintf("porttest: end test main thread\n");
-	
-}
-
-
-static int32
-port_test_thread_func(void *arg)
-{
-	int32 msg_code;
-	int n;
-	char buf[6];
-	buf[5] = '\0';
-
-	dprintf("porttest: port_test_thread_func()\n");
-	
-	n = read_port(test_p1, &msg_code, &buf, 3);
-	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
-	n = read_port(test_p1, &msg_code, &buf, 4);
-	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
-	buf[4] = 'X';
-	n = read_port(test_p1, &msg_code, &buf, 5);
-	dprintf("read_port #1 code %ld len %d buf %s\n", msg_code, n, buf);
-
-	dprintf("porttest: testing delete p1 from other thread\n");
-	delete_port(test_p1);
-	dprintf("porttest: end port_test_thread_func()\n");
-	
-	return 0;
-}
-#endif	/* DEBUG */
 
 
 //	#pragma mark -
