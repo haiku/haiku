@@ -34,52 +34,53 @@ class AppServer : public BApplication
 #endif
 {
 public:
-								AppServer(void);
-								~AppServer(void);
+	AppServer(void);
+	~AppServer(void);
 
-	static	int32				PollerThread(void *data);
-	static	int32				PicassoThread(void *data);
-			thread_id			Run(void);
-			void				MainLoop(void);
+	static	int32 PollerThread(void *data);
+	static	int32 PicassoThread(void *data);
+	thread_id			Run(void);
+	void				MainLoop(void);
+	
+	bool				LoadDecorator(const char *path);
+	void				InitDecorators(void);
+	
+	void				DispatchMessage(PortMessage *msg);
+	void				Broadcast(int32 code);
 
-			bool				LoadDecorator(const char *path);
-			void				InitDecorators(void);
-
-			void				DispatchMessage(PortMessage *msg);
-			void				Broadcast(int32 code);
 	// TODO: remove shortly!
-			void				HandleKeyMessage(int32 code, int8 *buffer);
-
-			ServerApp*			FindApp(const char *sig);
+	void				HandleKeyMessage(int32 code, int8 *buffer);
+	
+	ServerApp*			FindApp(const char *sig);
 
 private:
-	friend	Decorator*			new_decorator(BRect rect, const char *title,
-									int32 wlook, int32 wfeel,
-									int32 wflags, DisplayDriver *ddriver);
+	friend	Decorator*	new_decorator(BRect rect, const char *title,
+				int32 wlook, int32 wfeel, int32 wflags, DisplayDriver *ddriver);
 
-			create_decorator	*make_decorator;	// global function pointer
-
-			port_id				_messageport,
-								_mouseport;
-
-			image_id			_decorator_id;
-
-			BString				decorator_name;
-
-			bool				_quitting_server,
-								_exit_poller;
-
-			BList				*_applist;
-			thread_id			_poller_id,
-								_picasso_id;
-
-			sem_id				_active_lock,
-								_applist_lock,
-								_decor_lock;
-
-			DisplayDriver		*_driver;
-
-			int32				_ssindex;
+	// global function pointer
+	create_decorator	*make_decorator;
+	
+	port_id	_messageport,
+			_mouseport;
+	
+	image_id _decorator_id;
+	
+	BString decorator_name;
+	
+	bool _quitting_server,
+		_exit_poller;
+	
+	BList *_applist;
+	thread_id _poller_id,
+			  _picasso_id;
+	
+	sem_id 	_active_lock,
+			_applist_lock,
+			_decor_lock;
+	
+	DisplayDriver *_driver;
+	
+	int32 _ssindex;
 };
 
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,

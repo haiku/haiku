@@ -94,6 +94,7 @@ public:
 	virtual void SetCursor(ServerCursor *csr);
 
 	virtual void SetMode(int32 mode);
+	virtual void SetMode(const display_mode &mode);
 	virtual bool DumpToFile(const char *path);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);

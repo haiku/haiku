@@ -24,7 +24,7 @@ Desktop::Desktop(void){
 	fActiveRootLayer	= NULL;
 	fFrontWinBorder		= NULL;
 	fFocusWinBorder		= NULL;
-	fCursorScreen		= NULL;
+	fActiveScreen		= NULL;
 }
 //---------------------------------------------------------------------------
 Desktop::~Desktop(void){
@@ -92,7 +92,7 @@ void Desktop::Init(void){
 //---------------------------------------------------------------------------
 void Desktop::InitMode(void){
 		// this is init mode for n-SS.
-	fCursorScreen	= fScreenList.ItemAt(0)? (Screen*)fScreenList.ItemAt(0): NULL;
+	fActiveScreen	= fScreenList.ItemAt(0)? (Screen*)fScreenList.ItemAt(0): NULL;
 	for (int32 i=0; i<fScreenList.CountItems(); i++){
 		char		name[32];
 		sprintf(name, "RootLayer %ld", i+1);
@@ -120,8 +120,8 @@ int32 Desktop::ScreenCount() const{
 	return fScreenList.CountItems();
 }
 //---------------------------------------------------------------------------
-Screen* Desktop::CursorScreen() const{
-	return fCursorScreen;
+Screen* Desktop::ActiveScreen() const{
+	return fActiveScreen;
 }
 //---------------------------------------------------------------------------
 void Desktop::SetActiveRootLayerByIndex(int32 listIndex){
@@ -344,7 +344,15 @@ void Desktop::MouseEventHandler(PortMessage *msg){
 			// 2) float - x coordinate of mouse click
 			// 3) float - y coordinate of mouse click
 			// 4) int32 - buttons down
-
+			int64 dummy;
+			float x,y;
+			msg->Read<int64>(&dummy);
+			msg->Read<float>(&x);
+			msg->Read<float>(&y);
+			
+			// We need this so that we can see the cursor on the screen
+			if(fActiveScreen)
+				fActiveScreen->DDriver()->MoveCursorTo(x,y);
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:{

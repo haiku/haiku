@@ -122,6 +122,7 @@ virtual void FillArc(const BRect r, float angle, float span, RGBColor& color);
 	virtual void SetCursor(ServerCursor *cursor);
 
 	virtual void SetMode(int32 mode);
+	virtual void SetMode(const display_mode &mode);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);
 //	virtual bool DumpToFile(const char *path);

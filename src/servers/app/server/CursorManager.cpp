@@ -29,6 +29,7 @@
 #include "CursorManager.h"
 #include "ServerCursor.h"
 #include "CursorData.h"
+#include "ServerScreen.h"
 #include "ServerConfig.h"
 #include <Errors.h>
 #include <Directory.h>
@@ -177,37 +178,31 @@ void CursorManager::RemoveAppCursors(const char *signature)
 //! Wrapper around the DisplayDriver ShowCursor call
 void CursorManager::ShowCursor(void)
 {
-	// TODO: Fix
-/*	Lock();
+	Lock();
 
-	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
+	DisplayDriver *driver = desktop->ActiveScreen()->DDriver();
 	driver->ShowCursor();
 	Unlock();
-*/
 }
 
 //! Wrapper around the DisplayDriver HideCursor call
 void CursorManager::HideCursor(void)
 {
-	// TODO: Fix
-/*	Lock();
+	Lock();
 
-	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
+	DisplayDriver *driver = desktop->ActiveScreen()->DDriver();
 	driver->HideCursor();
 	Unlock();
-*/
 }
 
 //! Wrapper around the DisplayDriver ObscureCursor call
 void CursorManager::ObscureCursor(void)
 {
-	// TODO: Fix
-/*	Lock();
+	Lock();
 
-	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
+	DisplayDriver *driver = desktop->ActiveScreen()->DDriver();
 	driver->ObscureCursor();
 	Unlock();
-*/
 }
 
 /*!
@@ -216,25 +211,22 @@ void CursorManager::ObscureCursor(void)
 */
 void CursorManager::SetCursor(int32 token)
 {
-	// TODO: Fix
-/*	Lock();
+	Lock();
 	ServerCursor *c=_FindCursor(token);
 	if(c)
 	{
-		DisplayDriver *driver = desktop->CursorScreen()->DDriver();
+		DisplayDriver *driver = desktop->ActiveScreen()->DDriver();
 		driver->SetCursor(c);
 		_current_which=B_CURSOR_OTHER;
 	}
 	Unlock();
-*/
 }
 
 void CursorManager::SetCursor(cursor_which which)
 {
-	// TODO: Fix
-/*	Lock();
+	Lock();
 
-	DisplayDriver *driver = desktop->CursorScreen()->DDriver();
+	DisplayDriver *driver = desktop->ActiveScreen()->DDriver();
 	switch(which)
 	{
 		case B_CURSOR_DEFAULT:
@@ -296,7 +288,6 @@ void CursorManager::SetCursor(cursor_which which)
 	}
 
 	Unlock();
-*/
 }
 
 /*!

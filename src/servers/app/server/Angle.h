@@ -69,7 +69,7 @@ public:
 	bool operator<=(const Angle &from);
 
 protected:	
-	float angle_value;
+	float fAngleValue;
 	void InitTrigTables(void);
 };
 

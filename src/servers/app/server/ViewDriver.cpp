@@ -52,10 +52,6 @@
 #include "LayerData.h"
 #include "PNGDump.h"
 
-// TODO: remove later!!!!!!!
-#include <Cursor.h>
-#include "CursorData.h"
-
 #ifdef DEBUG_DRIVER_MODULE
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -74,8 +70,6 @@ VDWIN_MOVECURSOR,
 VDWIN_SETCURSOR,
 };
 
-//ViewDriver *viewdriver_global;
-
 extern RGBColor workspace_default_color;
 
 
@@ -86,9 +80,7 @@ VDView::VDView(BRect bounds)
 	viewbmp=new BBitmap(bounds,B_CMAP8,true);
 
 	// This link for sending mouse messages to the OBAppServer.
-	// This is only to take the place of the Input Server. I suppose I could write
-	// an addon filter to be more like the Input Server, but then I wouldn't be working
-	// on this thing! :P
+	// This is only to take the place of the Input Server. 
 	serverlink=new PortLink(find_port(SERVER_INPUT_PORT));
 
 	// Create a cursor which isn't just a box
@@ -512,14 +504,11 @@ bool VDWindow::QuitRequested(void)
 void VDWindow::WindowActivated(bool active)
 {
 	// This is just to hide the regular system cursor so we can see our own
-// TODO: REactivate later!!!!
-/*	if(active)
+
+	if(active)
 		be_app->HideCursor();
 	else
 		be_app->ShowCursor();
-*/
-	BCursor	cursor(default_cursor_data);
-	view->SetViewCursor(&cursor, true);
 }
 
 //-----------------------------------------------------------------------
@@ -534,7 +523,6 @@ void VDWindow::WindowActivated(bool active)
 
 ViewDriver::ViewDriver(void)
 {
-//	viewdriver_global=this;
 	screenwin=new VDWindow();
 	framebuffer=screenwin->view->viewbmp;
 	serverlink=screenwin->view->serverlink;
@@ -544,6 +532,16 @@ ViewDriver::ViewDriver(void)
 	_SetDepth(8);
 	_SetMode(B_8_BIT_640x480);
 	_SetBytesPerRow(framebuffer->BytesPerRow());
+	
+	// We add this because if we see the default workspace color, then we have at least
+	// a reasonable idea that everything is kosher.
+	framebuffer->Lock();
+	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
+	framebuffer->AddChild(drawview);
+	drawview->SetHighColor(workspace_default_color.GetColor32());
+	drawview->FillRect(drawview->Bounds());
+	drawview->Sync();
+	framebuffer->Unlock();
 }
 
 ViewDriver::~ViewDriver(void)

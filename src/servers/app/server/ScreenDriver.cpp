@@ -365,6 +365,45 @@ void ScreenDriver::Shutdown(void)
 	Unlock();
 }
 
+void ScreenDriver::SetMode(const display_mode &mode)
+{
+	screenwin->Lock();
+	int16 w=mode.virtual_width,h=mode.virtual_height;
+	color_space s=(color_space)mode.space;
+
+	screenwin->ResizeTo(w-1,h-1);
+
+	// Clear the invalid flag so that there is no danger of a crash	
+	while(screenwin->invalidflag>0)
+		atomic_add(&screenwin->invalidflag,-1);
+		
+	delete framebuffer;
+
+	// don't forget to update the internal vars!
+	_SetWidth(w);
+	_SetHeight(h);
+	_SetMode(s);
+
+	screenwin->SetSpace((uint32)s);
+
+	screenwin->viewbmp=new BBitmap(screenwin->Bounds(),s,true);
+	framebuffer=screenwin->viewbmp;
+	drawview=new BView(framebuffer->Bounds(),"drawview",B_FOLLOW_ALL, B_WILL_DRAW);
+	framebuffer->AddChild(drawview);
+
+	framebuffer->Lock();
+	drawview->SetHighColor(workspace_default_color.GetColor32());
+	drawview->FillRect(drawview->Bounds());
+	drawview->Sync();
+	framebuffer->Unlock();
+
+	screenwin->Invalidate(framebuffer->Bounds());
+
+	_SetBytesPerRow(framebuffer->BytesPerRow());
+	atomic_add(&screenwin->invalidflag,1);
+	screenwin->Unlock();
+}
+
 void ScreenDriver::SetMode(int32 space)
 {
 	screenwin->Lock();

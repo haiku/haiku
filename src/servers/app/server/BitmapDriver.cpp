@@ -500,6 +500,12 @@ void BitmapDriver::SetMode(int32 space)
 }
 
 //! Empty
+void BitmapDriver::SetMode(const display_mode &mode)
+{
+	// No need to reset a bitmap's color space
+}
+
+//! Empty
 void BitmapDriver::HideCursor(void)
 {
 	// Nothing is done with cursor for this, so even the inherited versions need not be called.

@@ -40,7 +40,7 @@ float sintable[360], costable[360], tantable[360];
 */
 Angle::Angle(float angle)
 {
-	angle_value=angle;
+	fAngleValue=angle;
 	if(tables_initialized==false)
 	{
 		InitTrigTables();
@@ -51,7 +51,7 @@ Angle::Angle(float angle)
 //! Constructor
 Angle::Angle(void)
 {
-	angle_value=0;
+	fAngleValue=0;
 	if(tables_initialized==false)
 	{
 		InitTrigTables();
@@ -70,16 +70,16 @@ void Angle::Normalize(void)
 	// if the value of the angle is >=360 or <0, make it so that it is 
 	// within those bounds
 	
-	if(angle_value>359)
+	if(fAngleValue>359)
 	{
-		while(angle_value>359)
-			angle_value-=360;
+		while(fAngleValue>359)
+			fAngleValue-=360;
 		return;
 	}
-	if(angle_value<0)
+	if(fAngleValue<0)
 	{
-		while(angle_value<0)
-			angle_value+=360;
+		while(fAngleValue<0)
+			fAngleValue+=360;
 	}
 }
 
@@ -89,7 +89,7 @@ void Angle::Normalize(void)
 */
 float Angle::Sine(void)
 {
-	return sintable[(int)angle_value];
+	return sintable[(int)fAngleValue];
 }
 
 /*!
@@ -128,7 +128,7 @@ Angle Angle::InvSine(float value)
 */
 float Angle::Cosine(void)
 {
-	return costable[(int)angle_value];
+	return costable[(int)fAngleValue];
 }
 
 /*!
@@ -166,14 +166,14 @@ Angle Angle::InvCosine(float value)
 */
 float Angle::Tangent(int *status)
 {
-	if(angle_value==90 || angle_value==270)
+	if(fAngleValue==90 || fAngleValue==270)
 	{
 		if(status)
 			*status=0;
 		return 0.0;
 	}
 	
-	return tantable[(int)angle_value];
+	return tantable[(int)fAngleValue];
 }
 
 /*!
@@ -213,13 +213,13 @@ uint8 Angle::Quadrant(void)
 {
 	// We can get away with not doing extra value checks because of the order in
 	// which the checks are done.
-	if(angle_value < 90)
+	if(fAngleValue < 90)
 		return 1;
 
-	if(angle_value < 180)
+	if(fAngleValue < 180)
 		return 2;
 
-	if(angle_value < 270)
+	if(fAngleValue < 270)
 		return 3;
 	
 	return 4;
@@ -232,10 +232,10 @@ uint8 Angle::Quadrant(void)
 Angle Angle::Constrain180(void)
 {
 	// Constrains angle to 0 <= angle < 180
-	float val=angle_value;
+	float val=fAngleValue;
 
-	if(angle_value<180)
-		return Angle(angle_value);
+	if(fAngleValue<180)
+		return Angle(fAngleValue);
 
 	while(!(val<180))
 		val-=90;
@@ -249,10 +249,10 @@ Angle Angle::Constrain180(void)
 Angle Angle::Constrain90(void)
 {
 	// Constrains angle to 0 <= angle < 90
-	float val=angle_value;
+	float val=fAngleValue;
 
-	if(angle_value<90)
-		return Angle(angle_value);
+	if(fAngleValue<90)
+		return Angle(fAngleValue);
 
 	while(!(val<90))
 		val-=90;
@@ -265,7 +265,7 @@ Angle Angle::Constrain90(void)
 */
 void Angle::SetValue(float angle)
 {
-	angle_value=angle;
+	fAngleValue=angle;
 	Normalize();
 }
 
@@ -275,7 +275,7 @@ void Angle::SetValue(float angle)
 */
 float Angle::Value(void) const
 {
-	return angle_value;
+	return fAngleValue;
 }
 
 //! Initializes the global trig tables
@@ -319,7 +319,7 @@ void Angle::InitTrigTables(void)
 */
 Angle & Angle::operator=(const Angle &from)
 {
-	angle_value=from.angle_value;
+	fAngleValue=from.fAngleValue;
 	return *this;
 }
 
@@ -330,7 +330,7 @@ Angle & Angle::operator=(const Angle &from)
 */
 Angle & Angle::operator=(const float &from)
 {
-	angle_value=from;
+	fAngleValue=from;
 	return *this;
 }
 
@@ -341,7 +341,7 @@ Angle & Angle::operator=(const float &from)
 */
 Angle & Angle::operator=(const long &from)
 {
-	angle_value=(float)from;
+	fAngleValue=(float)from;
 	return *this;
 }
 
@@ -352,7 +352,7 @@ Angle & Angle::operator=(const long &from)
 */
 Angle & Angle::operator=(const int &from)
 {
-	angle_value=(float)from;
+	fAngleValue=(float)from;
 	return *this;
 }
 
@@ -363,7 +363,7 @@ Angle & Angle::operator=(const int &from)
 */
 bool Angle::operator==(const Angle &from)
 {
-	return (angle_value==from.angle_value)?true:false;
+	return (fAngleValue==from.fAngleValue)?true:false;
 }
 
 /*!
@@ -373,7 +373,7 @@ bool Angle::operator==(const Angle &from)
 */
 bool Angle::operator!=(const Angle &from)
 {
-	return (angle_value!=from.angle_value)?true:false;
+	return (fAngleValue!=from.fAngleValue)?true:false;
 }
 
 /*!
@@ -383,7 +383,7 @@ bool Angle::operator!=(const Angle &from)
 */
 bool Angle::operator>(const Angle &from)
 {
-	return (angle_value>from.angle_value)?true:false;
+	return (fAngleValue>from.fAngleValue)?true:false;
 }
 
 /*!
@@ -393,7 +393,7 @@ bool Angle::operator>(const Angle &from)
 */
 bool Angle::operator<(const Angle &from)
 {
-	return (angle_value<from.angle_value)?true:false;
+	return (fAngleValue<from.fAngleValue)?true:false;
 }
 
 /*!
@@ -403,7 +403,7 @@ bool Angle::operator<(const Angle &from)
 */
 bool Angle::operator>=(const Angle &from)
 {
-	return (angle_value>=from.angle_value)?true:false;
+	return (fAngleValue>=from.fAngleValue)?true:false;
 }
 
 /*!
@@ -413,5 +413,5 @@ bool Angle::operator>=(const Angle &from)
 */
 bool Angle::operator<=(const Angle &from)
 {
-	return (angle_value<=from.angle_value)?true:false;
+	return (fAngleValue<=from.fAngleValue)?true:false;
 }

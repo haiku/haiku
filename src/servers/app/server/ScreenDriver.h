@@ -177,6 +177,7 @@ public:
 //	void StrokeShape(SShape *sh, LayerData *d, const Pattern &pat);
 	void StrokeTriangle(BPoint *pts, BRect r, LayerData *d, const Pattern &pat);
 	void SetMode(int32 mode);
+	void SetMode(const display_mode &mode);
 	float StringWidth(const char *string, int32 length, LayerData *d);
 	float StringHeight(const char *string, int32 length, LayerData *d);
 	bool DumpToFile(const char *path);

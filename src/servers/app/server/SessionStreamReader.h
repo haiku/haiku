@@ -47,11 +47,12 @@ public:
 	SessionStreamReader(msg_dispatcher_func *func);
 	~SessionStreamReader(void);
 	void DispatchMessages(void *msgbuffer, size_t buffersize);
+
 protected:
-	int8 *_buffer;
-	uint32 _msgsize,_msgcode, _currentbuffersize;
-	msg_dispatcher_func *_dispatcher;
-	SessionMessage _msg;
+	int8 *fBuffer;
+	uint32 fMsgSize,fMsgCode, fCurrentBufferSize;
+	msg_dispatcher_func *fDispatcherFunc;
+	SessionMessage fSessionMessage;
 };
 
 #endif

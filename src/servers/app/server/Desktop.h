@@ -26,7 +26,7 @@ public:
 				// Methods for multiple monitors.
 			Screen*				ScreenAt(int32 index) const;
 			int32				ScreenCount() const;
-			Screen*				CursorScreen() const;
+			Screen*				ActiveScreen() const;
 
 			void				SetActiveRootLayerByIndex(int32 listIndex);
 			void				SetActiveRootLayer(RootLayer* rl);
@@ -91,7 +91,7 @@ private:
 
 			BList				fScreenList;
 			int32				fScreenMode;	// '1' or 'n' Screen(s). Not sure it's needed though.
-			Screen*				fCursorScreen;
+			Screen*				fActiveScreen;
 
 			scroll_bar_info		fScrollBarInfo;
 			menu_info			fMenuInfo;

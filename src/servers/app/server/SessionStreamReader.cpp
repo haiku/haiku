@@ -23,9 +23,7 @@
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	Reader for BSession message streams
 //					
-//  
 //------------------------------------------------------------------------------
-
 #include <stdio.h>
 #include "SessionStreamReader.h"
 
@@ -52,26 +50,26 @@ void SessionMessage::SetData(const int32 &code, void *buffer, size_t buffersize)
 
 SessionStreamReader::SessionStreamReader(msg_dispatcher_func *func)
 {
-	_buffer=NULL;
-	_dispatcher=func;
-	_msgsize=0;
-	_msgcode=0;
-	_currentbuffersize=0;
+	fBuffer=NULL;
+	fDispatcherFunc=func;
+	fMsgSize=0;
+	fMsgCode=0;
+	fCurrentBufferSize=0;
 }
 
 SessionStreamReader::~SessionStreamReader(void)
 {
-	if(_buffer)
+	if(fBuffer)
 	{
 		printf("DEBUG: Deleting non-empty SessionStreamReader!\n");
-		delete _buffer;
+		delete fBuffer;
 	}
 }
 
 void SessionStreamReader::DispatchMessages(void *msgbuffer, size_t buffersize)
 {
 	// This is the main functionality of the stream reader - it takes a BSession message buffer
-	// and reads as much as it can. The entire function centers around _buffer. If _buffer is
+	// and reads as much as it can. The entire function centers around fBuffer. If fBuffer is
 	// NULL, then the stream reader is not waiting on the completion of a message.
 	
 	if(!msgbuffer || buffersize==0)
@@ -82,34 +80,34 @@ void SessionStreamReader::DispatchMessages(void *msgbuffer, size_t buffersize)
 	// do we have a message waiting to be completed?
 	while(index<((int8*)msgbuffer+buffersize))
 	{
-		if(_buffer)
+		if(fBuffer)
 		{
 			// We need to see if the data we have received in this call
 			// will complete the message or not
-			if(_currentbuffersize+buffersize>_msgsize)
+			if(fCurrentBufferSize+buffersize>fMsgSize)
 			{
 				// It will, so copy the data to the current location in the buffer (indicated by
-				// _currentbuffersize), call the Dispatch function, make the SSR empty, and iterate
+				// fCurrentBufferSize), call the Dispatch function, make the SSR empty, and iterate
 								
-				memcpy(_buffer+_currentbuffersize, msgbuffer, _msgsize-_currentbuffersize);
-				index+=_msgsize-_currentbuffersize;
+				memcpy(fBuffer+fCurrentBufferSize, msgbuffer, fMsgSize-fCurrentBufferSize);
+				index+=fMsgSize-fCurrentBufferSize;
 
-				_msg.SetData(_msgcode,_buffer,_msgsize);
-				(*_dispatcher)(&_msg);
+				fSessionMessage.SetData(fMsgCode,fBuffer,fMsgSize);
+				(*fDispatcherFunc)(&fSessionMessage);
 				
-				delete _buffer;
-				_buffer=NULL;
-				_currentbuffersize=0;
-				_msgsize=0;
-				_msgcode=0;
+				delete fBuffer;
+				fBuffer=NULL;
+				fCurrentBufferSize=0;
+				fMsgSize=0;
+				fMsgCode=0;
 				
 				continue;
 			}
 			else
 			{
 				// We will not be completing the message here, so simply copy the buffer and exit
-				memcpy(_buffer+_currentbuffersize, msgbuffer, buffersize);
-				_currentbuffersize+=buffersize;
+				memcpy(fBuffer+fCurrentBufferSize, msgbuffer, buffersize);
+				fCurrentBufferSize+=buffersize;
 				break;
 			}
 			
@@ -117,16 +115,16 @@ void SessionStreamReader::DispatchMessages(void *msgbuffer, size_t buffersize)
 		else
 		{
 			// Get basic message data
-			_msgcode=*((int32*)index); index+=sizeof(int32);
-			_msgsize=*((int32*)index); index+=sizeof(int32);
+			fMsgCode=*((int32*)index); index+=sizeof(int32);
+			fMsgSize=*((int32*)index); index+=sizeof(int32);
 			
 			// Now that we have basic stuff for the message, let's see if it is complete
-			if((index+_msgsize)>((int8*)msgbuffer+buffersize))
+			if((index+fMsgSize)>((int8*)msgbuffer+buffersize))
 			{
 				// We have an incomplete message. Allocate a buffer to contain all attached
 				// data, copy it over, and exit
-				_buffer=new int8[_msgsize];
-				memcpy(_buffer, msgbuffer, ((int8*)msgbuffer+buffersize)-index);
+				fBuffer=new int8[fMsgSize];
+				memcpy(fBuffer, msgbuffer, ((int8*)msgbuffer+buffersize)-index);
 				break;
 			}
 			else
@@ -134,9 +132,9 @@ void SessionStreamReader::DispatchMessages(void *msgbuffer, size_t buffersize)
 				// This message is complete, so set the appropriate SessionMessage data and
 				// call the Dispatch function
 				
-				_msg.SetData(_msgcode,index,_msgsize);
-				(*_dispatcher)(&_msg);
-				index+=_msgsize;
+				fSessionMessage.SetData(fMsgCode,index,fMsgSize);
+				(*fDispatcherFunc)(&fSessionMessage);
+				index+=fMsgSize;
 			}
 		}
 	}

@@ -180,8 +180,9 @@ bool AccelerantDriver::Initialize(void)
 	accShowCursor = (show_cursor)accelerant_hook(B_SHOW_CURSOR,NULL);
 
 #ifdef DRAW_TEST
-	RGBColor red(255,0,0,0);
-	RGBColor green(0,255,0,0);
+	// Commented out to remove a couple warnings
+//	RGBColor red(255,0,0,0);
+//	RGBColor green(0,255,0,0);
 	RGBColor blue(0,0,255,0);
 	FillRect(BRect(0,0,1024,768),blue);
 #endif
@@ -1053,6 +1054,12 @@ void AccelerantDriver::SetMode(int32 mode)
 	}
 
 	Unlock();
+}
+
+void AccelerantDriver::SetMode(const display_mode &mode)
+{
+	// TODO: Implement
+	
 }
 
 /*!
