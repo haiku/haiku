@@ -925,25 +925,22 @@ sem_delete_owned_sems(team_id owner)
 }
 
 
+//	#pragma mark -
+
+
 sem_id
-user_create_sem(int32 count, const char *uname)
+user_create_sem(int32 count, const char *userName)
 {
-	if (uname != NULL) {
-		char name[SYS_MAX_OS_NAME_LEN];
-		int rc;
+	char name[B_OS_NAME_LENGTH];
 
-		if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-			return ERR_VM_BAD_USER_MEMORY;
+	if (userName == NULL)
+		return create_sem_etc(count, NULL, team_get_current_team_id());
 
-		rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-		if (rc < 0)
-			return rc;
-		name[SYS_MAX_OS_NAME_LEN-1] = 0;
+	if (!IS_USER_ADDRESS(userName)
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
 
-		return create_sem_etc(count, name, team_get_current_team_id());
-	}
-
-	return create_sem_etc(count, NULL, team_get_current_team_id());
+	return create_sem_etc(count, name, team_get_current_team_id());
 }
 
 
@@ -971,9 +968,7 @@ user_acquire_sem(sem_id id)
 status_t
 user_acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 {
-	flags = flags | B_CAN_INTERRUPT;
-
-	return acquire_sem_etc(id, count, flags, timeout);
+	return acquire_sem_etc(id, count, flags | B_CAN_INTERRUPT, timeout);
 }
 
 
@@ -992,67 +987,66 @@ user_release_sem_etc(sem_id id, int32 count, uint32 flags)
 
 
 status_t
-user_get_sem_count(sem_id uid, int32* uthread_count)
+user_get_sem_count(sem_id id, int32 *userCount)
 {
-	int32 thread_count;
-	status_t rc;
-	int rc2;
-	rc  = get_sem_count(uid, &thread_count);
-	rc2 = user_memcpy(uthread_count, &thread_count, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
+	status_t status;
+	int32 count;
 
-	return rc;
+	if (userCount == NULL || !IS_USER_ADDRESS(userCount))
+		return B_BAD_ADDRESS;
+
+	status = get_sem_count(id, &count);
+	if (status == B_OK && user_memcpy(userCount, &count, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
 status_t
-user_get_sem_info(sem_id uid, struct sem_info *uinfo, size_t sz)
+user_get_sem_info(sem_id id, struct sem_info *userInfo, size_t size)
 {
 	struct sem_info info;
-	status_t rc;
-	int rc2;
+	status_t status;
 
-	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (userInfo == NULL || !IS_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
 
-	rc = _get_sem_info(uid, &info, sz);
-	rc2 = user_memcpy(uinfo, &info, sz);
-	if (rc2 < 0)
-		return rc2;
+	status = _get_sem_info(id, &info, size);
+	if (status == B_OK && user_memcpy(userInfo, &info, size) < B_OK)
+		return B_BAD_ADDRESS;
 
-	return rc;
+	return status;
 }
 
 
 status_t
-user_get_next_sem_info(team_id uteam, int32 *ucookie, struct sem_info *uinfo, size_t sz)
+user_get_next_sem_info(team_id team, int32 *userCookie, struct sem_info *userInfo,
+	size_t size)
 {
 	struct sem_info info;
 	int32 cookie;
-	status_t rc;
-	int rc2;
+	status_t status;
 
-	if ((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
+	if (userCookie == NULL || userInfo == NULL
+		|| !IS_USER_ADDRESS(userCookie) || !IS_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
 
-	rc2 = user_memcpy(&cookie, ucookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	rc = _get_next_sem_info(uteam, &cookie, &info, sz);
-	rc2 = user_memcpy(uinfo, &info, sz);
-	if (rc2 < 0)
-		return rc2;
-	rc2 = user_memcpy(ucookie, &cookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
+	status = _get_next_sem_info(team, &cookie, &info, size);
 
-	return rc;
+	if (status == B_OK) {
+		if (user_memcpy(userInfo, &info, size) < B_OK
+			|| user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return status;
 }
 
 
 status_t
-user_set_sem_owner(sem_id uid, team_id uteam)
+user_set_sem_owner(sem_id id, team_id team)
 {
-	return set_sem_owner(uid, uteam);
+	return set_sem_owner(id, team);
 }
