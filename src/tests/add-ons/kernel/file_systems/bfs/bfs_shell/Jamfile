@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 
 SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
-SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ;
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
@@ -39,7 +39,7 @@ SEARCH on [ FGristFiles
 		Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 		BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
 		Debug.cpp cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
 
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp

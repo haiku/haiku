@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src tests add-ons kernel file_systems bfs array ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ;
 UsePrivateHeaders [ FDirName kernel  ] ;			# For kernel_cpp.cpp
 
 {
@@ -21,5 +21,5 @@ SimpleTest smallArrayTest
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles Utility.cpp ]
-	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+	= [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
 

@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src tests add-ons kernel file_systems bfs structureSizes ;
 
-SubDirHdrs $(OBOS_TOP) src add-ons kernel file_systems bfs ;
+SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ;
 
 {
 	local defines = [ FDefines USER ] ; # _NO_INLINE_ASM
@@ -18,5 +18,5 @@ SimpleTest structureSizes
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles BufferPool.cpp ]
-	= [ FDirName $(OBOS_TOP) src add-ons kernel file_systems bfs ] ;
+	= [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
 
