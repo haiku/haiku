@@ -44,7 +44,7 @@ status_t ToneProducerAddOn::GetFlavorAt(
 	
 	flavor_info* pInfo = new flavor_info;
 	pInfo->internal_id = n;
-	pInfo->name = "ToneProducer";
+	pInfo->name = "Demo Audio Producer";
 	pInfo->info =
 		"An add-on version of the ToneProducer node.\n"
 		"See the Be Developer Newsletter: 2 June, 1999\n"
