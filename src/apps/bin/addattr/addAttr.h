@@ -1,30 +1,16 @@
-// Author:      Sebastian Nozzi
-// Created:     3 may 2002
-
-// Modifications:
-// (please include author, date, and description)
-
-// mmu_man@sf.net: note the original one doesn't link to libbe
-
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002, Sebastian Nozzi.
+ *
+ * Distributed under the terms of the MIT license.
+ */
 #ifndef _ADD_ATTR_H
 #define _ADD_ATTR_H
 
-#include <StorageDefs.h>
 
-status_t addAttrToFiles( 	type_code attrType, 
-							const char *attrName, 
-							const char *attrValue, 
-							char **files, 
-							unsigned fileCount );
+#include <SupportDefs.h>
 
-status_t addAttr( 	type_code attrType, 
-					const char *attrName, 
-					const char *attrValue, 
-					const char *file );
-					
-bool hasAttribute( BNode *node, const char *attrName );
-ssize_t writeAttr( 	BNode *node, type_code attrType, 
-					const char *attrName, const char *attrValue );
-					
 
-#endif
+status_t addAttr(const char *file, type_code attrType, const char *attrName, const char *attrValue);
+
+#endif	/* _ADD_ATTR_H */

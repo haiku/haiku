@@ -1,188 +1,145 @@
-// Author:      Sebastian Nozzi
-// Created:     3 may 2002
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002, Sebastian Nozzi.
+ *
+ * Distributed under the terms of the MIT license.
+ */
 
-// Modifications:
-// (please include author, date, and description)
-
-// mmu_man@sf.net: note the original one doesn't link to libbe
-
-
-#include <TypeConstants.h>
-#include <SupportDefs.h>
-#include <Mime.h>
-#include <Entry.h>
-#include <Node.h>
-
-#include <stdio.h>
 
 #include "addAttr.h"
-#include "messages.h"
 
-// Adds a certain attribute to many files, specified in an array 
-// of strings
-// 
-// On success it will return B_OK
-// On failure it returns an error code (negative number)
-status_t addAttrToFiles( 	type_code attrType, 
-							const char *attrName, 
-							const char *attrValue, 
-							char **files, 
-							unsigned fileCount ) {
+#include <TypeConstants.h>
+#include <Mime.h>
 
-	status_t returnCode;
-	status_t result;
-	unsigned fileIdx;
+#include <fs_attr.h>
 
-	returnCode = B_OK;
+#include <stdlib.h>
+#include <string.h>
+#include <errno.h>
+#include <ctype.h>
 
-	// Iterate through all the files and add the attribute
-	// to each of them
 
-	for( fileIdx = 0; fileIdx < fileCount; fileIdx++ ) {
-		result = addAttr( attrType, attrName, attrValue, files[fileIdx] );
-		// Try to keep the first error code, if any
-		if( returnCode == B_OK && result != B_OK )
-			returnCode = result;
-	}
-	
-	return returnCode;
+template<class Type>
+ssize_t
+writeAttrValue(int fd, const char *name, type_code type, Type value)
+{
+	ssize_t bytes = fs_write_attr(fd, name, type, 0, &value, sizeof(Type));
+	if (bytes < 0)
+		return errno;
+
+	return bytes;
 }
 
-// Adds an attribute to a file for the given type, name and value
-// Locks and unlocks the corresponding node to avoid data inconsistence
-// Converts the value accordingly in case of numeric or boolean types
-// 
-// On success it will return the amount of bytes writen
-// On failure it returns an error code (negative number)
-status_t addAttr( 	type_code attrType, 
-					const char *attrName, 
-					const char *attrValue, 
-					const char *file ) {
 
-	status_t returnCode;
+/**	Writes an attribute to a node, taking the type into account and
+ *	convertig the value accordingly
+ *
+ *	On success it will return the amount of bytes writen
+ *	On failure it returns an error code (negative number)
+ */
 
-	BNode node;
-	// Traverse links
-	BEntry entry(file, true);
-	
-	node.SetTo(&entry);
-	// Release file descriptor
-	entry.Unset();
-	
-#ifdef DEBUG
-	printf("%lu | %s | %s | %s\n", attrType, attrName, attrValue, file );		
-#endif
+static ssize_t
+writeAttr(int fd, type_code type, const char *name, const char *value)
+{
+	uint64 uint64value = 0;
+	int64 int64value = 0;
+	double floatValue = 0.0;
 
-	returnCode = node.InitCheck();
-	
-	if( returnCode == B_OK ) {
+	// parse number input at once
 
-		returnCode = node.Lock();	// to avoid data inconsistency
-
-		if( returnCode == B_OK ) {
-			// Only add the attribute if not already there
-			if( hasAttribute( &node, attrName ) == false ) {
-
-				ssize_t bytesWrittenCode;
-
-				// Write the attribute now
-				bytesWrittenCode = writeAttr( &node, attrType, attrName, attrValue );
-				
-				// If negative, then it's an error code
-				if( bytesWrittenCode < 0 ) {
-					problemsWithFileMsg( file );
-					returnCode = bytesWrittenCode;
-				}
-			}	
-			node.Sync();
-			node.Unlock();
-		} else { // Node could not be locked
-			problemsWithFileMsg( file );
-		}
-	} else { 
-		// File could not be initialized
-		// (maybe it doesn't exist)
-		problemsWithFileMsg( file );
-	}
-		
-	return returnCode;
-}
-
-// Writes an attribute to a node, taking the type into account and
-// convertig the value accordingly
-// 
-// On success it will return the amount of bytes writen
-// On failure it returns an error code (negative number)
-ssize_t writeAttr( 	BNode *node, type_code attrType, 
-					const char *attrName, const char *attrValue ) {
-
-	int32 int32buffer = 0;
-	int64 int64buffer = 0;
-	int boolBuffer = 0;
-	float floatBuffer = 0.0;
-	double doubleBuffer = 0.0;
-
-	ssize_t bytesWrittenOrErrorCode;
-
-	switch( attrType ) {
-		case B_INT32_TYPE:
-			sscanf( attrValue, "%ld", &int32buffer );
-			bytesWrittenOrErrorCode = 
-				node->WriteAttr( attrName, attrType, 0, &int32buffer, sizeof(int32) );
-			break;
-		case B_INT64_TYPE:
-			sscanf( attrValue, "%lld", &int64buffer );
-			bytesWrittenOrErrorCode = 
-				node->WriteAttr( attrName, attrType, 0, &int64buffer, sizeof(int64) );
-			break;
-		case B_FLOAT_TYPE:
-			sscanf( attrValue, "%f", &floatBuffer );
-			bytesWrittenOrErrorCode = 
-				node->WriteAttr( attrName, attrType, 0, &floatBuffer, sizeof(float) );
-			break;
-		case B_DOUBLE_TYPE:
-			sscanf( attrValue, "%lf", &doubleBuffer );
-			bytesWrittenOrErrorCode = 
-				node->WriteAttr( attrName, attrType, 0, &doubleBuffer, sizeof(double) );
-			break;
+	switch (type) {
 		case B_BOOL_TYPE:
-			// NOTE: the conversion from "int" to "signed char" might seem strange
-			// but this is the only way I could think to replicate Be's addattr behaviour
-			sscanf( attrValue, "%d", &boolBuffer );
-			boolBuffer = (signed char) boolBuffer;
-			bytesWrittenOrErrorCode = 
-				node->WriteAttr( attrName, attrType, 0, &boolBuffer, sizeof(signed char) );
+		case B_INT8_TYPE:
+		case B_INT16_TYPE:
+		case B_INT32_TYPE:
+		case B_INT64_TYPE:
+			int64value = strtoll(value, NULL, 0);
 			break;
+
+		case B_UINT8_TYPE:
+		case B_UINT16_TYPE:
+		case B_UINT32_TYPE:
+		case B_UINT64_TYPE:
+			uint64value = strtoull(value, NULL, 0);
+			break;
+
+		case B_FLOAT_TYPE:
+		case B_DOUBLE_TYPE:
+			floatValue = strtod(value, NULL);
+			break;
+	}
+
+	switch (type) {
+		case B_INT8_TYPE:
+			return writeAttrValue<int8>(fd, name, type, (int8)int64value);
+		case B_INT16_TYPE:
+			return writeAttrValue<int16>(fd, name, type, (int16)int64value);
+		case B_INT32_TYPE:
+			return writeAttrValue<int32>(fd, name, type, (int32)int64value);
+		case B_INT64_TYPE:
+			return writeAttrValue<int64>(fd, name, type, int64value);
+
+		case B_UINT8_TYPE:
+			return writeAttrValue<uint8>(fd, name, type, (uint8)uint64value);
+		case B_UINT16_TYPE:
+			return writeAttrValue<uint16>(fd, name, type, (uint16)uint64value);
+		case B_UINT32_TYPE:
+			return writeAttrValue<uint32>(fd, name, type, (uint32)uint64value);
+		case B_UINT64_TYPE:
+			return writeAttrValue<uint64>(fd, name, type, uint64value);
+
+		case B_FLOAT_TYPE:
+			return writeAttrValue<float>(fd, name, type, (float)floatValue);
+		case B_DOUBLE_TYPE:
+			return writeAttrValue<double>(fd, name, type, (double)floatValue);
+
+		case B_BOOL_TYPE:
+		{
+			uint8 boolValue = 0;
+
+			if (!strcasecmp(value, "true") || !strcasecmp(value, "t")
+				|| !strcasecmp(value, "on") || !strcasecmp(value, "enabled")
+				|| (isdigit(value[0]) && int64value == 1))
+				boolValue = 1;
+			else if (!strcasecmp(value, "false") || !strcasecmp(value, "f")
+				|| !strcasecmp(value, "off") || !strcasecmp(value, "disabled")
+				|| (isdigit(value[0]) && int64value == 0))
+				boolValue = 0;
+			else
+				return B_BAD_VALUE;
+
+			return writeAttrValue<uint8>(fd, name, B_BOOL_TYPE, boolValue);
+		}
+
 		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE:
 		default:
 			// For string, mime-strings and any other type we just write the value
 			// NOTE that the trailing NULL -IS- added
-			bytesWrittenOrErrorCode = 
-				node->WriteAttr( attrName, attrType, 0, attrValue, strlen(attrValue)+1 );
-			break;
-	};
-
-	return bytesWrittenOrErrorCode;
+			ssize_t bytes = fs_write_attr(fd, name, type, 0, value, strlen(value) + 1);
+			if (bytes < 0)
+				return errno;
+			return bytes;
+	}
 }
 
-// Checks wether a node has an attribute under the given name or not
-//
-// The user is responsible for locking and unlocking the node, and
-// for assuring that we are retrieving all attributes from the beginning
-// by calling RewindAttrs() on the node, if necesary
-bool hasAttribute( BNode *node, const char *attrName ) {
 
-	char retrievedName[B_ATTR_NAME_LENGTH];
-	bool found;
-	
-	found = false;
-	
-	while( (!found) && (node->GetNextAttrName( retrievedName )==B_OK) ) {
-		if( strcmp( retrievedName, attrName ) == 0 )
-			found = true;
-	}
+/**	Adds an attribute to a file for the given type, name and value
+ *	Converts the value accordingly in case of numeric or boolean types
+ *
+ *	On success, it returns B_OK, or else an appropriate error code.
+ */
 
-	return found;
+status_t
+addAttr(const char *file, type_code type, const char *name, const char *value)
+{
+	int fd = open(file, O_WRONLY);
+	if (fd < 0)
+		return errno;
+
+	fs_remove_attr(fd, name);
+	ssize_t bytes = writeAttr(fd, type, name, value);
+
+	return bytes >= 0 ? B_OK : bytes;
 }
 
