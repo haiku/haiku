@@ -355,6 +355,7 @@ _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
 	ka->arch_args.page_hole = 0xffc00000;
 	ka->num_kernel_args_ranges = 0;
 	ka->num_cpus = 1;
+	ka->driver_settings = NULL;
 #if 0
 	dprintf("kernel args at 0x%x\n", ka);
 	dprintf("pgdir = 0x%x\n", ka->pgdir);
