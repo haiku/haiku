@@ -10,12 +10,12 @@
 #define _sk_sniffer_parser_h_
 
 #include <SupportDefs.h>
+#include <sniffer/Err.h>
 #include <sniffer/Range.h>
 #include <sniffer/Rule.h>
 #include <List.h>
 #include <string>
 #include <vector>
-
 
 class BString;
 
@@ -23,10 +23,8 @@ namespace Sniffer {
 
 class Rule;
 class Expr;
-class Range;
 class RPattern;
 class Pattern;
-typedef std::vector<Expr*> ExprList;
 
 //------------------------------------------------------------------------------
 // The mighty parsing function ;-)
@@ -38,21 +36,6 @@ status_t parse(const char *rule, Rule *result, BString *parseError = NULL);
 // Classes used internally by the parser
 //------------------------------------------------------------------------------
 
-class Err {
-public:
-	Err(const char *msg, const ssize_t pos);
-	Err(const std::string &msg, const ssize_t pos);
-	Err(const Err &ref);
-	Err& operator=(const Err &ref);
-	const char* Msg() const;
-	ssize_t Pos() const;
-	
-private:
-	void SetMsg(const char *msg);
-	char *fMsg;
-	ssize_t fPos;
-};
-
 class CharStream {
 public:
 	CharStream(const char *string = NULL);
@@ -63,6 +46,7 @@ public:
 	status_t InitCheck() const;
 	bool IsEmpty() const;
 	ssize_t Pos() const;
+	const char *String() const;
 	
 	char Get();
 	void Unget();
@@ -102,7 +86,7 @@ public:
 	virtual int32 Int() const;
 	virtual double Float() const;
 	ssize_t Pos() const;
-	bool operator==(Token &ref);
+	bool operator==(Token &ref) const;
 protected:
 	TokenType fType;
 	ssize_t fPos;
@@ -143,10 +127,16 @@ public:
 	void Unset();
 	status_t InitCheck() const;
 	
-	Token* Get();
-	void Unget(Token *token);
+	const Token* Get();
+	void Unget();
 	
-	bool IsEmpty();
+	void Read(TokenType type);
+	bool CondRead(TokenType type);
+	
+	ssize_t Pos() const;
+	ssize_t EndPos() const;
+	
+	bool IsEmpty() const;
 	
 private:
 	void AddToken(TokenType type, ssize_t pos);
@@ -154,8 +144,11 @@ private:
 	void AddInt(const char *str, ssize_t pos);
 	void AddFloat(const char *str, ssize_t pos);
 
-	BList fTokenList;
+	std::vector<Token*> fTokenList;
+	int fPos;
+	int fStrLen;
 	status_t fCStatus;
+
 
 	TokenStream(const TokenStream &ref);
 	TokenStream& operator=(const TokenStream &ref);
@@ -164,22 +157,31 @@ private:
 class Parser {
 public:
 	Parser();
+	~Parser();
 	status_t Parse(const char *rule, Rule *result, BString *parseError = NULL);	
 private:
 	std::string ErrorMessage(Err *err, const char *rule);
 
+	// Things that get done a lot :-)
+	void ThrowEndOfStreamError();
+	inline void ThrowOutOfMemError(ssize_t pos);
+	void ThrowUnexpectedTokenError(TokenType expected, const Token *found);
+	void ThrowUnexpectedTokenError(TokenType expected1, TokenType expected2, const Token *found);
+
 	// Parsing functions
 	void ParseRule(Rule *result);
 	double ParsePriority();
-	ExprList* ParseExprList();
+	std::vector<Expr*>* ParseExprList();
 	Expr* ParseExpr();
 	Range ParseRange();
-	Expr* ParsePatternList();
+	Expr* ParsePatternList(Range range);
 	Expr* ParseRPatternList();
 	RPattern* ParseRPattern();
 	Pattern* ParsePattern();
 	
 	TokenStream stream;
+	
+	Err *fOutOfMemErr;
 };
 
 }	// namespace Sniffer
