@@ -15,8 +15,6 @@
 // transform official mode to internal, multi-screen mode enhanced mode
 void Radeon_DetectMultiMode( virtual_card *vc, display_mode *mode )
 {
-//	uint32 x, y, offset;
-	
 	mode->timing.flags &= ~RADEON_MODE_MASK;
 	
 	switch( vc->wanted_multi_mode ) {
@@ -33,12 +31,6 @@ void Radeon_DetectMultiMode( virtual_card *vc, display_mode *mode )
 	default:
 	}
 	
-	// swap displays if asked for
-	if( vc->swapDisplays )
-		mode->timing.flags |= RADEON_MODE_DISPLAYS_SWAPPED;
-	else
-		mode->timing.flags &= ~RADEON_MODE_DISPLAYS_SWAPPED;
-
 	// combine mode is used if virtual area is twice as visible area 
 	// and if scrolling is enabled; if combining is impossible, use
 	// cloning instead
@@ -73,7 +65,7 @@ void Radeon_DetectMultiMode( virtual_card *vc, display_mode *mode )
 		SHOW_FLOW0( 3, "wasn't really a combine mode" );
 		mode->timing.flags &= ~RADEON_MODE_MASK;
 		mode->timing.flags |= RADEON_MODE_CLONE;
-		mode->flags |= ~B_SCROLL;
+		mode->flags |= B_SCROLL;
 	}
 }
 
@@ -82,9 +74,9 @@ void Radeon_VerifyMultiMode( virtual_card *vc, shared_info *si, display_mode *mo
 {
 	// if there is no second port or no second monitor connected,
 	// fall back to standard mode
-	if( vc->num_ports == 1 || 
-		(si->ports[vc->ports[0].physical_port].disp_type == dt_none ||
-		 si->ports[vc->ports[1].physical_port].disp_type == dt_none) )
+	if( vc->num_heads == 1 || 
+		(si->heads[vc->heads[0].physical_head].chosen_displays == dd_none ||
+		 si->heads[vc->heads[1].physical_head].chosen_displays == dd_none) )
 	{
 		SHOW_FLOW0( 3, "only one monitor - disabling any multi-mon mode" );
 		// restore flags if combine mode is selected
@@ -100,6 +92,8 @@ void Radeon_VerifyMultiMode( virtual_card *vc, shared_info *si, display_mode *mo
 // to official mode
 void Radeon_HideMultiMode( virtual_card *vc, display_mode *mode )
 {
+	(void) vc;
+	
 	// restore flags for combine mode
 	if( (mode->timing.flags & RADEON_MODE_MASK) == RADEON_MODE_COMBINE )
 		mode->flags |= B_SCROLL;
@@ -109,21 +103,20 @@ void Radeon_HideMultiMode( virtual_card *vc, display_mode *mode )
 // initialize multi-screen mode dependant variables
 void Radeon_InitMultiModeVars( virtual_card *vc, display_mode *mode )
 {
-//	uint32 offset;
 	uint32 x, y;
 
 	// setup single-screen mode
 	vc->eff_width = mode->timing.h_display;
 	vc->eff_height = mode->timing.v_display;
 		
-	vc->ports[0].rel_x = 0;
-	vc->ports[0].rel_y = 0;
+	vc->heads[0].rel_x = 0;
+	vc->heads[0].rel_y = 0;
 	
 	switch( mode->timing.flags & RADEON_MODE_MASK ) {
 	case RADEON_MODE_CLONE:
 		// in clone mode, ports are independant but show the same
-		vc->ports[1].rel_x = 0;
-		vc->ports[1].rel_y = 0;
+		vc->heads[1].rel_x = 0;
+		vc->heads[1].rel_y = 0;
 		break;
 		
 	case RADEON_MODE_COMBINE:
@@ -141,16 +134,16 @@ void Radeon_InitMultiModeVars( virtual_card *vc, display_mode *mode )
 		
 		SHOW_FLOW( 3, "relative position of second screen: %d, %d", x, y );
 		
-		vc->ports[1].rel_x = 0;
-		vc->ports[1].rel_y = 0;
+		vc->heads[1].rel_x = 0;
+		vc->heads[1].rel_y = 0;
 
 		// set relative offset
-		if( (mode->timing.flags & RADEON_MODE_DISPLAYS_SWAPPED) == 0 ) {
-			vc->ports[1].rel_x = x;
-			vc->ports[1].rel_y = y;
+		if( !vc->swap_displays ) {
+			vc->heads[1].rel_x = x;
+			vc->heads[1].rel_y = y;
 		} else {
-			vc->ports[0].rel_x = x;
-			vc->ports[0].rel_y = y;
+			vc->heads[0].rel_x = x;
+			vc->heads[0].rel_y = y;
 		}
 		break;
 		
@@ -195,9 +188,9 @@ status_t Radeon_CheckMultiMonTunnel( virtual_card *vc, display_mode *mode,
 	switch( mode->h_display_start ) {
 	case ms_swap:
 		if( mode->v_display_start != 0 )
-			vc->swapDisplays = mode->timing.flags != 0;
+			vc->swap_displays = mode->timing.flags != 0;
 		else
-			mode->timing.flags = vc->swapDisplays;
+			mode->timing.flags = vc->swap_displays;
 			
 		// write settings instantly
 		Radeon_WriteSettings( vc );

@@ -11,17 +11,11 @@
 #include "radeon_accelerant.h"
 #include "GlobalData.h"
 #include "generic.h"
-#include "cp_regs.h"
 #include "3d_regs.h"
 #include "2d_regs.h"
 #include "mmio.h"
+#include "CP.h"
 
-
-// currently, an CP instruction stream is written to
-// a buffer on stack and then copied into the official
-// CP buffer
-		
-#define PACKET_BUFFER_LEN 0x100
 
 // copy screen to screen
 //	et - ignored
@@ -30,38 +24,32 @@
 void SCREEN_TO_SCREEN_BLIT(engine_token *et, blit_params *list, uint32 count) 
 {
 	virtual_card *vc = ai->vc;
-	int offset = 0;
-	uint32 buffer[PACKET_BUFFER_LEN];
-	
+		
 	SHOW_FLOW0( 4, "" );
 	
-	for( ; count > 0; --count, ++list ) {
-		if( offset == 0 ) {
-			buffer[offset++] = RADEON_CP_PACKET3_CNTL_BITBLT_MULTI;
-			buffer[offset++] = RADEON_GMC_BRUSH_NONE
-				| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
-				| RADEON_GMC_SRC_DATATYPE_COLOR
-				| RADEON_ROP3_S
-				| RADEON_DP_SRC_SOURCE_MEMORY;
-		}
+	(void)et;
 
-		buffer[offset++] = (list->src_left << 16) | list->src_top;
-		buffer[offset++] = (list->dest_left << 16) | list->dest_top;
-		buffer[offset++] = ((list->width + 1) << 16) | (list->height + 1);
+	while( count > 0 ) {
+		uint32 sub_count;
+
+		START_IB();
+
+		WRITE_IB_PACKET3_HEAD( RADEON_CP_PACKET3_CNTL_BITBLT_MULTI, count, 
+			INDIRECT_BUFFER_SIZE, 3, 2 );
+					
+		*buffer++ = RADEON_GMC_BRUSH_NONE
+			| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
+			| RADEON_GMC_SRC_DATATYPE_COLOR
+			| RADEON_ROP3_S
+			| RADEON_DP_SRC_SOURCE_MEMORY;
 		
-		if( offset + 3 > PACKET_BUFFER_LEN ) {
-			buffer[0] |= (offset - 2) << 16;
-
-			Radeon_SendCP( ai, buffer, offset );
-			
-			offset = 0;
+		for( ; sub_count > 0; --sub_count, ++list ) {
+			*buffer++ = (list->src_left << 16) | list->src_top;
+			*buffer++ = (list->dest_left << 16) | list->dest_top;
+			*buffer++ = ((list->width + 1) << 16) | (list->height + 1);
 		}
-	}
-	
-	if( offset > 0 ) {
-		buffer[0] |= (offset - 2) << 16;
 
-		Radeon_SendCP( ai, buffer, offset );
+		SUBMIT_IB_VC();
 	}
 	
 	++ai->si->engine.count;
@@ -77,41 +65,35 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex,
 	fill_rect_params *list, uint32 count) 
 {
 	virtual_card *vc = ai->vc;
-	int offset = 0;
-	uint32 buffer[PACKET_BUFFER_LEN];
 	
 	SHOW_FLOW0( 4, "" );
 	
-	for( ; count > 0; --count, ++list ) {
-		if( offset == 0 ) {
-			buffer[offset++] = RADEON_CP_PACKET3_CNTL_PAINT_MULTI;
-			buffer[offset++] = RADEON_GMC_BRUSH_SOLID_COLOR
+	(void)et;
+
+	while( count > 0 ) {
+		uint32 sub_count;
+		
+		START_IB();
+
+		WRITE_IB_PACKET3_HEAD( RADEON_CP_PACKET3_CNTL_PAINT_MULTI, count, 
+			INDIRECT_BUFFER_SIZE, 2, 3 );
+
+		*buffer++ = RADEON_GMC_BRUSH_SOLID_COLOR
 				| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
 				| RADEON_GMC_SRC_DATATYPE_COLOR
 				| RADEON_ROP3_P;
-			buffer[offset++] = colorIndex;
+		*buffer++ = colorIndex;
+
+		for( ; sub_count > 0; --sub_count, ++list ) {
+			*buffer++ = (list->left << 16) | list->top;
+			*buffer++ = 
+				((list->right - list->left + 1) << 16) | 
+				(list->bottom - list->top + 1);
 		}
-
-		buffer[offset++] = (list->left << 16) | list->top;
-		buffer[offset++] = 
-			((list->right - list->left + 1) << 16) | 
-			(list->bottom - list->top + 1);
 		
-		if( offset + 2 > PACKET_BUFFER_LEN ) {
-			buffer[0] |= (offset - 2) << 16;
-
-			Radeon_SendCP( ai, buffer, offset );
-			
-			offset = 0;
-		}
+		SUBMIT_IB_VC();
 	}
-	
-	if( offset > 0 ) {
-		buffer[0] |= (offset - 2) << 16;
 
-		Radeon_SendCP( ai, buffer, offset );
-	}
-		
 	++ai->si->engine.count;
 }
 
@@ -123,54 +105,49 @@ void FILL_RECTANGLE(engine_token *et, uint32 colorIndex,
 void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count) 
 {
 	virtual_card *vc = ai->vc;
-	int offset = 0;
-	uint32 buffer[PACKET_BUFFER_LEN];
 	
 	SHOW_FLOW0( 4, "" );
 	
-	for( ; count > 0; --count, ++list ) {
-		if( offset == 0 ) {
-			buffer[offset++] = RADEON_CP_PACKET3_CNTL_PAINT_MULTI;
-			buffer[offset++] = RADEON_GMC_BRUSH_NONE
-				| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
-				| RADEON_GMC_SRC_DATATYPE_COLOR
-				| RADEON_ROP3_Dn;
+	(void)et;
+
+	while( count > 0 ) {
+		uint32 sub_count;
+		
+		START_IB();
+		
+		// take core to leave space for ROP reset!
+		WRITE_IB_PACKET3_HEAD( RADEON_CP_PACKET3_CNTL_PAINT_MULTI, count, 
+			INDIRECT_BUFFER_SIZE - 2, 2, 2 );
+		
+		*buffer++ = RADEON_GMC_BRUSH_NONE
+			| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
+			| RADEON_GMC_SRC_DATATYPE_COLOR
+			| RADEON_ROP3_Dn;
+
+		for( ; sub_count > 0; --sub_count, ++list ) {
+			*buffer++ = (list->left << 16) | list->top;
+			*buffer++ = 
+				((list->right - list->left + 1) << 16) | 
+				(list->bottom - list->top + 1);
 		}
+		
+		// we have to reset ROP, else we get garbage during next
+		// CPU access; it looks like some cache coherency/forwarding
+		// problem as it goes away later on; things like flushing the
+		// destination cache or waiting for 2D engine or HDP to become
+		// idle and clean didn't change a thing
+		// (I dont't really understand what exactly happens,
+		//  but this code fixes it)
+		*buffer++ = CP_PACKET0( RADEON_DP_GUI_MASTER_CNTL, 1 );
+		*buffer++ = RADEON_GMC_BRUSH_NONE
+			| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
+			| RADEON_GMC_SRC_DATATYPE_COLOR
+			| RADEON_ROP3_S
+			| RADEON_DP_SRC_SOURCE_MEMORY;
 
-		buffer[offset++] = (list->left << 16) | list->top;
-		buffer[offset++] = 
-			((list->right - list->left + 1) << 16) | 
-			(list->bottom - list->top + 1);
-
-		// always leave 2 extra bytes for fix (see below)		
-		if( offset + 2 > PACKET_BUFFER_LEN - 2 ) {
-			buffer[0] |= (offset - 2) << 16;
-
-			Radeon_SendCP( ai, buffer, offset );
-			
-			offset = 0;
-		}
+		SUBMIT_IB_VC();
 	}
 
-	buffer[0] |= (offset - 2) << 16;
-
-	// we have to reset ROP, else we get garbage during next
-	// CPU access; it looks like some cache coherency/forwarding
-	// problem as it goes away later on; things like flushing the
-	// destination cache or waiting for 2D engine or HDP to become
-	// idle and clean didn't change a thing
-	// (I dont't really understand what exactly happens,
-	//  but this code fixes it)
-	buffer[offset++] = CP_PACKET0( RADEON_DP_GUI_MASTER_CNTL, 0 );
-	buffer[offset++] = RADEON_GMC_BRUSH_NONE
-		| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
-		| RADEON_GMC_SRC_DATATYPE_COLOR
-		| RADEON_ROP3_S
-		| RADEON_DP_SRC_SOURCE_MEMORY;
-
-	if( offset > 0 )
-		Radeon_SendCP( ai, buffer, offset );
-		
 	++ai->si->engine.count;
 }
 
@@ -182,68 +159,86 @@ void INVERT_RECTANGLE(engine_token *et, fill_rect_params *list, uint32 count)
 void FILL_SPAN(engine_token *et, uint32 colorIndex, uint16 *list, uint32 count) 
 {
 	virtual_card *vc = ai->vc;
-	int offset = 0;
-	uint32 buffer[PACKET_BUFFER_LEN];
 	
 	SHOW_FLOW0( 4, "" );
 	
-	for( ; count > 0; --count ) {
-		uint16 y, x, width;
-		
-		if( offset == 0 ) {
-			buffer[offset++] = RADEON_CP_PACKET3_CNTL_PAINT_MULTI;
-			buffer[offset++] = RADEON_GMC_BRUSH_SOLID_COLOR
-				| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
-				| RADEON_GMC_SRC_DATATYPE_COLOR
-				| RADEON_ROP3_P;
-			buffer[offset++] = colorIndex;
-		}
-		
-		y = *list++;
-		x = *list++;
-		width = *list++ - x + 1;
+	(void)et;
 
-		buffer[offset++] = (x << 16) | y;
-		buffer[offset++] = (width << 16) | 1;
+	while( count > 0 ) {
+		uint32 sub_count;
 		
-		if( offset + 2 > PACKET_BUFFER_LEN ) {
-			buffer[0] |= (offset - 2) << 16;
+		START_IB();
 
-			Radeon_SendCP( ai, buffer, offset );
-			
-			offset = 0;
-		}
-	}
+		WRITE_IB_PACKET3_HEAD( RADEON_CP_PACKET3_CNTL_PAINT_MULTI, count, 
+			INDIRECT_BUFFER_SIZE , 2, 3 );
+				
+		*buffer++ = RADEON_GMC_BRUSH_SOLID_COLOR
+			| (vc->datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
+			| RADEON_GMC_SRC_DATATYPE_COLOR
+			| RADEON_ROP3_P;
+		*buffer++ = colorIndex;
+		
+		for( ; sub_count > 0; --sub_count ) {
+			uint16 y, x, width;
 	
-	if( offset > 0 ) {
-		buffer[0] |= (offset - 2) << 16;
-
-		Radeon_SendCP( ai, buffer, offset );
-	}
+			y = *list++;
+			x = *list++;
+			width = *list++ - x + 1;
 	
+			*buffer++ = (x << 16) | y;
+			*buffer++ = (width << 16) | 1;
+		}
+				
+		SUBMIT_IB_VC();
+	}
+
 	++ai->si->engine.count;
 }
 
 
 // prepare 2D acceleration
-void Radeon_Init2D( accelerator_info *ai, uint32 datatype )
+void Radeon_Init2D( accelerator_info *ai )
 {
 	SHOW_FLOW0( 3, "" );
 
-	// forget about 3D	
-	OUTREG( ai->regs, RADEON_RB3D_CNTL, 0 );
+	START_IB();
 	
-	//Radeon_ResetEngine( ai );
+	// forget about 3D	
+	WRITE_IB_REG( RADEON_RB3D_CNTL, 0 );
+		
+	SUBMIT_IB();
+}
+
+
+// fill state buffer that sets 2D registers up for accelerated operations
+void Radeon_FillStateBuffer( accelerator_info *ai, uint32 datatype )
+{
+	virtual_card *vc = ai->vc;
+	uint32 pitch_offset;
+	uint32 *buffer, *buffer_start;
+	
+	SHOW_FLOW0( 4, "" );
+
+	// make sure buffer is not used
+	Radeon_InvalidateStateBuffer( ai, vc->state_buffer_idx );
+	
+	buffer = buffer_start = Radeon_GetIndirectBufferPtr( ai, vc->state_buffer_idx );
+
+	// set offset of frame buffer and pitch
+	pitch_offset = 
+		((ai->si->memory[mt_local].virtual_addr_start + vc->fb_offset) >> 10) | 
+		((vc->pitch >> 6) << 22);
+	WRITE_IB_REG( RADEON_DEFAULT_OFFSET, pitch_offset );
+	WRITE_IB_REG( RADEON_DST_PITCH_OFFSET, pitch_offset );
+	WRITE_IB_REG( RADEON_SRC_PITCH_OFFSET, pitch_offset );
 	
 	// no siccors	
-	Radeon_WaitForFifo( ai, 1 );
-	OUTREG( ai->regs, RADEON_DEFAULT_SC_BOTTOM_RIGHT, (RADEON_DEFAULT_SC_RIGHT_MAX
-		    | RADEON_DEFAULT_SC_BOTTOM_MAX));
+	WRITE_IB_REG( RADEON_DEFAULT_SC_BOTTOM_RIGHT, 
+		(RADEON_DEFAULT_SC_RIGHT_MAX | RADEON_DEFAULT_SC_BOTTOM_MAX));
 
 	// setup general flags - perhaps this is not needed as all
 	// 2D commands contain this register
-	Radeon_WaitForFifo( ai, 1 );
-	OUTREG( ai->regs, RADEON_DP_GUI_MASTER_CNTL, 
+	WRITE_IB_REG( RADEON_DP_GUI_MASTER_CNTL, 
 		(datatype << RADEON_GMC_DST_DATATYPE_SHIFT)
 		| RADEON_GMC_CLR_CMP_CNTL_DIS
 		
@@ -257,37 +252,40 @@ void Radeon_Init2D( accelerator_info *ai, uint32 datatype )
 	
 	// most of this init is probably not nessacary
 	// as we neither draw lines nor use brushes
-	Radeon_WaitForFifo( ai, 7 );
-	OUTREG( ai->regs, RADEON_DST_LINE_START,    0);
-	OUTREG( ai->regs, RADEON_DST_LINE_END,      0);
-	OUTREG( ai->regs, RADEON_DP_BRUSH_FRGD_CLR, 0xffffffff);
-	OUTREG( ai->regs, RADEON_DP_BRUSH_BKGD_CLR, 0x00000000);
-	OUTREG( ai->regs, RADEON_DP_SRC_FRGD_CLR,   0xffffffff);
-	OUTREG( ai->regs, RADEON_DP_SRC_BKGD_CLR,   0x00000000);
-	OUTREG( ai->regs, RADEON_DP_WRITE_MASK,     0xffffffff);
-	
-	Radeon_WaitForIdle( ai );
-}
+	WRITE_IB_REG( RADEON_DST_LINE_START,    0);
+	WRITE_IB_REG( RADEON_DST_LINE_END,      0);
+	WRITE_IB_REG( RADEON_DP_BRUSH_FRGD_CLR, 0xffffffff);
+	WRITE_IB_REG( RADEON_DP_BRUSH_BKGD_CLR, 0x00000000);
+	WRITE_IB_REG( RADEON_DP_SRC_FRGD_CLR,   0xffffffff);
+	WRITE_IB_REG( RADEON_DP_SRC_BKGD_CLR,   0x00000000);
+	WRITE_IB_REG( RADEON_DP_WRITE_MASK,     0xffffffff);
 
-// switch to virtual card, i.e. setup all specific engine registers
-void Radeon_ActivateVirtualCard( accelerator_info *ai )
-{
-	virtual_card *vc = ai->vc;
-	uint32 buffer[3*2];
-	uint32 pitch_offset;
-	int idx = 0;
-	
-	SHOW_FLOW0( 4, "" );
-	
-	pitch_offset = (vc->fb_offset >> 10) | ((vc->pitch >> 6) << 22);
-	buffer[idx++] = CP_PACKET0( RADEON_DEFAULT_OFFSET, 0 );
-	buffer[idx++] = pitch_offset;
-	buffer[idx++] = CP_PACKET0( RADEON_DST_PITCH_OFFSET, 0 );
-	buffer[idx++] = pitch_offset;
-	buffer[idx++] = CP_PACKET0( RADEON_SRC_PITCH_OFFSET, 0 );
-	buffer[idx++] = pitch_offset;
-	
-	Radeon_SendCP( ai, buffer, idx );
+
+	vc->state_buffer_size = buffer - buffer_start;
 	
 	ai->si->active_vc = vc->id;
+}
+
+
+// allocate indirect buffer to contain state of virtual card
+void Radeon_AllocateVirtualCardStateBuffer( accelerator_info *ai )
+{
+	virtual_card *vc = ai->vc;
+	
+	vc->state_buffer_idx = Radeon_AllocIndirectBuffer( ai, false );
+	// mark as being unused
+	vc->state_buffer_size = -1;
+}
+
+
+// free indirect buffer containing state of virtual card
+void Radeon_FreeVirtualCardStateBuffer( accelerator_info *ai )
+{
+	virtual_card *vc = ai->vc;
+
+	// make sure it's not used anymore
+	Radeon_InvalidateStateBuffer( ai, vc->state_buffer_idx );
+
+	// get rid of it
+	Radeon_FreeIndirectBuffer( ai, vc->state_buffer_idx, false );
 }

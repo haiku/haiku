@@ -1,0 +1,12 @@
+SubDir OBOS_TOP src add-ons accelerants common ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics radeon ] ;
+UsePrivateHeaders [ FDirName graphics common ] ;
+
+StaticLibrary accelerantscommon :
+	ddc.c
+	decode_edid.c
+	dump_edid.c
+	i2c.c
+;

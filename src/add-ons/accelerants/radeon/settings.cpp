@@ -21,22 +21,19 @@
 #include "generic.h"
 #include "GlobalData.h"
 
-#ifdef ENABLE_SETTINGS_FILE
 #include <FindDirectory.h>
 #include <Path.h>
 #include <File.h>
-#endif
 
 void Radeon_ReadSettings( virtual_card *vc )
 {
-#ifdef ENABLE_SETTINGS_FILE
 	BPath path;
 	int32 tmp;
 
 	// per default we enable combine mode;
 	// if actual mode isn't combine mode, we fall back to clone mode	
 	vc->wanted_multi_mode = mm_combine;
-	vc->swapDisplays = false;
+	vc->swap_displays = false;
 	
 	// per default, show overlay on first port
 	//vc->whished_overlay_port = 0;
@@ -59,8 +56,8 @@ void Radeon_ReadSettings( virtual_card *vc )
 	if( settings.Unflatten( &file ) != B_OK )
 		return;
 	
-	if( settings.FindBool( "SwapDisplays", &vc->swapDisplays ) != B_OK )
-		vc->swapDisplays = false;
+	if( settings.FindBool( "SwapDisplays", &vc->swap_displays ) != B_OK )
+		vc->swap_displays = false;
 
 	if( settings.FindInt32( "MultiMonitorMode", &tmp ) != B_OK )
 		tmp = mm_combine;
@@ -80,16 +77,10 @@ void Radeon_ReadSettings( virtual_card *vc )
 		tmp = 0;
 		
 	//vc->whished_overlay_port = tmp;
-#else
-	vc->wanted_multi_mode = mm_combine;
-	vc->swapDisplays = false;
-	vc->swapDisplays = false;
-#endif
 }
 
 void Radeon_WriteSettings( virtual_card *vc )
 {
-#ifdef ENABLE_SETTINGS_FILE
 	BPath path;
 	int32 tmp;
 	
@@ -108,12 +99,11 @@ void Radeon_WriteSettings( virtual_card *vc )
 		
 	BMessage settings;
 	
-	settings.AddBool( "SwapDisplays", vc->swapDisplays );
+	settings.AddBool( "SwapDisplays", vc->swap_displays );
 	tmp = vc->wanted_multi_mode;
 	settings.AddInt32( "MultiMonitorMode", tmp );
 	/*tmp = vc->whished_overlay_port;
 	settings.AddInt32( "OverlayPort", tmp );*/
 	
 	settings.Flatten( &file );
-#endif
 }

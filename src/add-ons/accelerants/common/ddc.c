@@ -11,13 +11,12 @@
 #include <KernelExport.h>
 #include <stdlib.h>
 #include "ddc_int.h"
-#include "edid.h"
+#include "ddc.h"
 
 #include "i2c.h"
 
+// number of retries to read ddc data
 #define READ_RETRIES 4
-
-status_t ddc2_read_edid1( const i2c_bus *bus, edid1_info *edid, void **vdif, size_t *vdif_len );
 
 // verify checksum of ddc data
 // (some monitors have a broken checksum - bad luck for them)
@@ -27,21 +26,18 @@ static status_t verify_checksum( const uint8 *data, size_t len )
 	uint8 sum = 0;
 	uint8 all_or = 0;
 	
-	for( i = 0; i < (int)len; ++i, ++data ) {
+	for( i = 0; i < len; ++i, ++data ) {
 		sum += *data;
 		all_or |= *data;
-//		SHOW_FLOW( 2, "%x", *data );
 	}
 	
 	if( all_or == 0 ) {
-		SHOW_INFO0( 2, "DDC information contains zeros only" );
+		SHOW_ERROR0( 2, "DDC information contains zeros only" );
 		return B_ERROR;
 	}
 	
-//	SHOW_INFO( 2, "sum=%x", sum );
-		
 	if( sum != 0 ) {
-		SHOW_INFO0( 2, "Checksum error of DDC information" );
+		SHOW_ERROR0( 2, "Checksum error of DDC information" );
 		return B_IO_ERROR;
 	}
 		
@@ -54,7 +50,7 @@ static status_t ddc2_read( const i2c_bus *bus, int start, uint8 *buffer, size_t 
 	uint8 write_buffer[2];
 	i2c_timing timing;
 	int i;
-	status_t res = B_ERROR;
+	status_t res;
 
 	write_buffer[0] = start & 0xff;	
 	write_buffer[1] = (start >> 8) & 0xff;
@@ -71,7 +67,8 @@ static status_t ddc2_read( const i2c_bus *bus, int start, uint8 *buffer, size_t 
 		res = i2c_send_receive( bus, &timing, 
 			0xa0, write_buffer, start < 0x100 ? 1 : 2, 
 			buffer, len );
-		if( res == B_OK && verify_checksum( buffer, len ) == B_OK )
+		// don't verify checksum - it's often broken
+		if( res == B_OK /*&& verify_checksum( buffer, len ) == B_OK*/ )
 			break;
 			
 		res = B_ERROR;
@@ -128,17 +125,6 @@ status_t ddc2_read_edid1( const i2c_bus *bus, edid1_info *edid,
 	status_t res;
 	edid1_raw raw;
 
-	// see edid_raw.h for values to be expected
-	SHOW_INFO( 5, "structure size test: %ld, %ld, %ld, %ld, %ld, %ld, %ld, %ld",
-		sizeof( edid1_header_raw ),
-		sizeof( edid1_vendor_raw ),
-		sizeof( edid1_version_raw ),
-		sizeof( edid1_display_raw ),
-		sizeof( edid1_established_timing ),
-		sizeof( edid1_std_timing_raw ),
-		sizeof( edid1_detailed_monitor_raw ),
-		sizeof( edid1_raw ));
-		
 	res = ddc2_read( bus, 0, (uint8 *)&raw, sizeof( raw ));
 	if( res != B_OK )
 		return res;

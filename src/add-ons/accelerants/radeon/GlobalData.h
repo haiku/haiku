@@ -10,6 +10,8 @@
 #include "radeon_accelerant.h"
 #endif
 
+
+// the one and only we support
 extern accelerator_info *ai;
 
 

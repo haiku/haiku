@@ -11,7 +11,6 @@
 #include "radeon_accelerant.h"
 #include "GlobalData.h"
 #include "generic.h"
-#include <sys/ioctl.h>
 #include <GraphicsDefs.h>
 
 
@@ -69,7 +68,7 @@ status_t GET_PIXEL_CLOCK_LIMITS(display_mode *dm, uint32 *low, uint32 *high)
 */
 sem_id ACCELERANT_RETRACE_SEMAPHORE(void) 
 {
-//	virtual_card *vc = ai->vc;
+	virtual_card *vc = ai->vc;
 
 	/*
 	NOTE:
@@ -81,10 +80,10 @@ sem_id ACCELERANT_RETRACE_SEMAPHORE(void)
 	// with multi-monitor mode, we have two vertical blanks!
 	// until we find a better solution, we always return virtual port 0,
 	// which may be either physical port 0 or 1
-//	int physical_port = vc->ports[0].physical_port;
+	int physical_head = vc->heads[0].physical_head;
 	
 	//SHOW_INFO( 3, "semaphore: %x", ai->si->ports[physical_port].vblank );
 	
-	//return ai->si->ports[physical_port].vblank;
-	return 0;
+	return ai->si->heads[physical_head].vblank;
+	//return B_ERROR;
 }

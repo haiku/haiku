@@ -23,6 +23,8 @@ noted on a case by case below.
 
 */
 void *	get_accelerant_hook(uint32 feature, void *data) {
+	(void)data;
+	
 	switch (feature) {
 /*
 These definitions are out of pure lazyness.

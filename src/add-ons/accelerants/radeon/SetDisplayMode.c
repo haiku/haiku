@@ -23,34 +23,6 @@
 
 #include <string.h>
 
-void Radeon_SetMode( accelerator_info *ai, virtual_port *port, display_mode *mode );
-void Radeon_EnableIRQ( accelerator_info *ai, bool enable );
-
-
-// Radeon's DACs share same public registers, this function
-// selects the DAC you'll talk to
-static void selectDAC( accelerator_info *ai, virtual_port *port )
-{
-	Radeon_WriteRegCP( ai, RADEON_DAC_CNTL2, 
-		(port->is_crtc2 ? RADEON_DAC2_PALETTE_ACC_CTL : 0) |
-		(ai->si->dac_cntl2 & ~RADEON_DAC2_PALETTE_ACC_CTL) );
-}
-
-
-// set standard colour palette (needed for non-palette modes)
-static void initDAC( accelerator_info *ai, virtual_port *port )
-{
-	int i;
-	
-	selectDAC( ai, port );
-	
-	Radeon_WriteRegCP( ai, RADEON_PALETTE_INDEX, 0 );
-	
-	for( i = 0; i < 256; ++i )
-		Radeon_WriteRegCP( ai, RADEON_PALETTE_DATA, (i << 16) | (i << 8) | i );
-}
-
-
 
 // round virtual width up to next valid size
 uint32 Radeon_RoundVWidth( int virtual_width, int bpp )
@@ -90,8 +62,8 @@ static struct {
 	{ RADEON_SUBPIC_CNTL, 0 },
 	{ RADEON_VIPH_CONTROL, 0 },
 	{ RADEON_I2C_CNTL_1, 0 },
-	{ RADEON_GEN_INT_CNTL, 0 },
-	{ RADEON_CAP0_TRIG_CNTL, 0 },
+	//{ RADEON_GEN_INT_CNTL, 0 },	// VBI irqs are handled seperately
+	//{ RADEON_CAP0_TRIG_CNTL, 0 },	// leave capturing on during mode switch
 };
 
 static void Radeon_InitCommonRegs( accelerator_info *ai )
@@ -103,35 +75,39 @@ static void Radeon_InitCommonRegs( accelerator_info *ai )
 		OUTREG( regs, common_regs[i].reg, common_regs[i].val );
 }
 
-// set display mode of one port;
+// set display mode of one head;
 // port restrictions, like fixed-sync TFTs connected to it, are taken care of
-void Radeon_SetMode( accelerator_info *ai, virtual_port *port, display_mode *mode )
+void Radeon_SetMode( accelerator_info *ai, physical_head *head, display_mode *mode )
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
 	vuint8 *regs = ai->regs;
 	int    format;
 	int    bpp;
-	display_type_e disp_type;
+	display_device_e disp_devices;
+	fp_info *fp_info;
 	port_regs values;
+	tv_params tv_params;
+	tv_standard tv_format = ts_ntsc;
+	tv_timing *tv_timing = &Radeon_std_tv_timing[tv_format];
+	bool internal_tv_encoder;
 	
-	port->mode = *mode;
+	head->mode = *mode;
 	
 	// don't destroy passed values, use our copy instead
-	mode = &port->mode;
+	mode = &head->mode;
 	
-	disp_type = si->ports[port->physical_port].disp_type;
+	disp_devices = head->chosen_displays;
+	fp_info = &si->flatpanels[head->flatpanel_port];
 	
 	// if using an flat panel or LCD, maximum resolution
 	// is determined by the physical resolution; 
 	// also, all timing is fixed
-	if( disp_type == dt_dvi_1 || disp_type == dt_lvds ) {
-		fp_info *fp_info = &si->fp_port;
-		
+	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext )) != 0 ) {
 		if( mode->timing.h_display > fp_info->panel_xres )
-		mode->timing.h_display = fp_info->panel_xres;
+			mode->timing.h_display = fp_info->panel_xres;
 		if(	mode->timing.v_display > fp_info->panel_yres )
-		mode->timing.v_display = fp_info->panel_yres;
+			mode->timing.v_display = fp_info->panel_yres;
 		
 		mode->timing.h_total = mode->timing.h_display + fp_info->h_blank;
 		mode->timing.h_sync_start = mode->timing.h_display + fp_info->h_over_plus;
@@ -142,48 +118,110 @@ void Radeon_SetMode( accelerator_info *ai, virtual_port *port, display_mode *mod
 		
 		mode->timing.pixel_clock = fp_info->dot_clock;
 	}
+
+	// if using TV-Out, the timing of the source signal must be tweaked to
+	// get proper timing
+	internal_tv_encoder = si->tv_chip != tc_external_rt1;
+	
+	// we need higher accuracy then Be thought of;
+	mode->timing.pixel_clock *= 1000;
+
+	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
+		display_mode tweaked_mode;
+		
+		Radeon_CalcTVParams( &si->pll, &tv_params, tv_timing, internal_tv_encoder, 
+			mode, &tweaked_mode );
+			
+		*mode = tweaked_mode;
+	}
 	
 	Radeon_GetFormat( mode->space, &format, &bpp );
 	
 	vc->bpp = bpp;
-	vc->datatype = format;    
+	vc->datatype = format;  
+	
+	// time to read original register content
+	// lock hardware so noone bothers us
+	Radeon_WaitForIdle( ai, true );
+	
+	Radeon_ReadCRTCRegisters( ai, head, &values );
+	Radeon_ReadMonitorRoutingRegs( ai, head, &values );
+	
+	if( (disp_devices & (dd_dvi | dd_lvds | dd_dvi_ext)) != 0 ) {
+		if( !head->is_crtc2 )
+			Radeon_ReadRMXRegisters( ai, &values );
+			
+		Radeon_ReadFPRegisters( ai, &values );
+	}
 
 	// calculate all hardware register values
-	Radeon_CalcCRTCRegisters( ai, port, mode, &values );
+	Radeon_CalcCRTCRegisters( ai, head, mode, &values );
 
 	values.surface_cntl = RADEON_SURF_TRANSLATION_DIS;
 
 	// for flat panels, we may not have pixel clock if DDC data is missing;
 	// as we don't change effective resolution we can leave it as set by BIOS
-	if( mode->timing.pixel_clock )
-		Radeon_CalcPLLDividers( &si->pll, mode->timing.pixel_clock / 10, &values );
+	if( mode->timing.pixel_clock ) {
+		Radeon_CalcPLLRegisters( &si->pll, mode/*->timing.pixel_clock / 10*/, 
+			(/*(disp_devices & (dd_stv | dd_ctv)) != 0 ? &tv_params.crt_dividers : */NULL),
+			&values );
+	}
 	
-	if( disp_type == dt_dvi_1 || disp_type == dt_lvds )
-		Radeon_CalcFPRegisters( ai, port, &si->fp_port, mode, &values );
+	// for first CRTC1, we need to setup RMX properly
+	if( !head->is_crtc2 )
+		Radeon_CalcRMXRegisters( fp_info, mode, 
+			(disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0,
+			&values );
+			
+	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 )
+		Radeon_CalcFPRegisters( ai, head, fp_info, &values );
 
+	if( (disp_devices & (dd_ctv | dd_stv)) != 0 ) {
+		Radeon_CalcTVRegisters( ai, mode, tv_timing, &tv_params, &values, 
+			head, internal_tv_encoder, tv_format );
+	}
+
+	Radeon_CalcMonitorRouting( ai, head, &values );
+	
+	// we don't use pixel clock anymore, so it can be reset to Be's kHz
+	mode->timing.pixel_clock /= 1000;
 	
 	// write values to registers
-	Radeon_SetDPMS( ai, port, B_DPMS_SUSPEND );
+	// we first switch off all output, so the monitor(s) won't get invalid signals
+	Radeon_SetDPMS( ai, head, B_DPMS_SUSPEND );
 	
 	Radeon_InitCommonRegs( ai );
 		
-	Radeon_ProgramCRTCRegisters( ai, port, &values );
+	Radeon_ProgramCRTCRegisters( ai, head, &values );
 
 	OUTREG( regs, RADEON_SURFACE_CNTL, values.surface_cntl );
 
-	if( disp_type == dt_dvi_1 || disp_type == dt_lvds ) 
-		Radeon_ProgramFPRegisters( ai, &si->fp_port, &values );
+	if( !head->is_crtc2 )
+		Radeon_ProgramRMXRegisters( ai, &values );
 
+	if( (disp_devices & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 )
+		Radeon_ProgramFPRegisters( ai, head, fp_info, &values );
 
-	if( mode->timing.pixel_clock )
-		Radeon_ProgramPLL( ai, port, &values );
+	//if( mode->timing.pixel_clock )
+	Radeon_ProgramPLL( ai, head, &values );
+		
+	if( (disp_devices & (dd_ctv | dd_stv)) != 0 )
+		Radeon_ProgramTVRegisters( ai, &values, internal_tv_encoder );
+		
+	Radeon_ProgramMonitorRouting( ai, head, &values );
 	
-	Radeon_SetDPMS( ai, port, B_DPMS_ON );
+	head->active_displays = disp_devices;
+	
+	// programming is over, so hardware can be used again
+	RELEASE_BEN( si->cp.lock );
+	
+	// well done - switch display(s) on
+	Radeon_SetDPMS( ai, head, B_DPMS_ON );
 	
 	// overlay must be setup again after modeswitch (whoever was using it)
 	// TBD: this won't work if another virtual card was using it,
 	// but currently, virtual cards don't work anyway...
-	si->active_overlay.port = -1;
+	si->active_overlay.head = -1;
 }
 
 
@@ -196,7 +234,7 @@ void Radeon_EnableIRQ( accelerator_info *ai, bool enable )
 	int_cntl = INREG( ai->regs, RADEON_GEN_INT_CNTL );
 	int_mask = 
 		RADEON_CRTC_VBLANK_MASK
-		| (si->has_crtc2 ? RADEON_CRTC2_VBLANK_MASK : 0);
+		| (si->num_heads > 1 ? RADEON_CRTC2_VBLANK_MASK : 0);
 		
 	if( enable )
 		int_cntl |= int_mask;
@@ -238,7 +276,7 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	}
 
 	// already done by propose_display_mode, but it was undone on return;
-	// do this before equality check to recognize changed to multi-monitor mode 
+	// do this before equality check to recognize changes of multi-monitor mode 
 	Radeon_DetectMultiMode( vc, &mode );
 	
 	// mode switches can take quite long and are visible, 
@@ -247,25 +285,27 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 		RELEASE_BEN( si->engine.lock );
 		return B_OK;
 	}
-
+	
 	// make sure, we don't get disturbed
-	Radeon_Finish( ai );
+	//Radeon_Finish( ai );
 	Radeon_EnableIRQ( ai, false );
 
 	// free cursor and framebuffer memory
 	{
-		radeon_free_local_mem fm;
+		radeon_free_mem fm;
 		
 		fm.magic = RADEON_PRIVATE_DATA_MAGIC;
+		fm.memory_type = mt_local;
+		fm.global = true;
 	
 		if( vc->cursor.mem_handle ) {
 			fm.handle = vc->cursor.mem_handle;
-			ioctl( ai->fd, RADEON_FREE_LOCAL_MEM, &fm );
+			ioctl( ai->fd, RADEON_FREE_MEM, &fm );
 		}
 		
 		if( vc->fb_mem_handle ) {
 			fm.handle = vc->fb_mem_handle;
-			ioctl( ai->fd, RADEON_FREE_LOCAL_MEM, &fm );
+			ioctl( ai->fd, RADEON_FREE_MEM, &fm );
 		}
 	}
 	
@@ -278,24 +318,26 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	Radeon_VerifyMultiMode( vc, si, &mode );
 
 	// set main flags	
-	vc->independant_ports = Radeon_NeedsSecondPort( &mode ) ? 2 : 1;
-	vc->different_ports = Radeon_DifferentPorts( &mode );
-	SHOW_FLOW( 2, "independant ports: %d", vc->independant_ports );
+	vc->independant_heads = Radeon_NeedsSecondPort( &mode ) ? 2 : 1;
+	vc->different_heads = Radeon_DifferentPorts( &mode );
+	SHOW_FLOW( 2, "independant heads: %d", vc->independant_heads );
 	vc->scroll = mode.flags & B_SCROLL;
 	SHOW_FLOW( 2, "scrolling %s", vc->scroll ? "enabled" : "disabled" );
 
 	// allocate frame buffer and cursor image memory
 	{
-		radeon_alloc_local_mem am;
+		radeon_alloc_mem am;
 		int format, bpp;
 		
 		// alloc cursor memory		
 		am.magic = RADEON_PRIVATE_DATA_MAGIC;
 		am.size = 1024;
+		am.memory_type = mt_local;
+		am.global = true;
 		
-		if( ioctl( ai->fd, RADEON_ALLOC_LOCAL_MEM, &am ) == B_OK ) {
+		if( ioctl( ai->fd, RADEON_ALLOC_MEM, &am ) == B_OK ) {
 			vc->cursor.mem_handle = am.handle;
-			vc->cursor.fb_offset = am.fb_offset;
+			vc->cursor.fb_offset = am.offset;
 		} else {
 			// too bad that we are out of mem -> set reasonable values as
 			// it's too late to give up (ouch!)
@@ -304,16 +346,16 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 			vc->cursor.fb_offset = 0;
 		}
 		
-		vc->cursor.data = si->framebuffer + vc->cursor.fb_offset;
+		vc->cursor.data = si->local_mem + vc->cursor.fb_offset;
 	
 		// alloc frame buffer
 		Radeon_GetFormat( mode.space, &format, &bpp );
 		vc->pitch = Radeon_RoundVWidth( mode.virtual_width, bpp ) * bpp;
 		am.size = vc->pitch * mode.virtual_height;
 		
-		if( ioctl( ai->fd, RADEON_ALLOC_LOCAL_MEM, &am ) == B_OK ) {
+		if( ioctl( ai->fd, RADEON_ALLOC_MEM, &am ) == B_OK ) {
 			vc->fb_mem_handle = am.handle;
-			vc->fb_offset = am.fb_offset;
+			vc->fb_offset = am.offset;
 		} else 	{
 			// ouch again - set reasonable values
 			SHOW_ERROR0( 2, "no memory for frame buffer!" );
@@ -321,52 +363,55 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 			vc->fb_offset = 1024;
 		}
 		
-		vc->fbc.frame_buffer = si->framebuffer + vc->fb_offset;
+		vc->fbc.frame_buffer = si->local_mem + vc->fb_offset;
 		vc->fbc.frame_buffer_dma = (void *)((uint8 *)si->framebuffer_pci + vc->fb_offset);
 		vc->fbc.bytes_per_row = vc->pitch;
+		
+		SHOW_FLOW( 0, "frame buffer CPU-address=%x, phys-address=%x", 
+			vc->fbc.frame_buffer, vc->fbc.frame_buffer_dma );
 	}
 	
 	// multi-screen stuff
 	Radeon_InitMultiModeVars( vc, &mode );
 	
 	// GO!	
-	Radeon_SetMode( ai, &vc->ports[0], &mode );
+	Radeon_SetMode( ai, &si->heads[vc->heads[0].physical_head], &mode );
 	
-	if( vc->independant_ports > 1 )
-		Radeon_SetMode( ai, &vc->ports[1], &mode );
+	if( vc->independant_heads > 1 )
+		Radeon_SetMode( ai, &si->heads[vc->heads[1].physical_head], &mode );
    	
    	SHOW_FLOW( 3, "pitch=%ld", vc->pitch );
    	
    	// we'll modify bits of this reg, so save it for async access
 	si->dac_cntl2 = INREG( ai->regs, RADEON_DAC_CNTL2 );
 	
-	// init accelerator
-	Radeon_Init2D( ai, vc->datatype );
+	// setup 2D registers
+	Radeon_Init2D( ai );
+	// setup position of framebuffer for 2D commands
+	Radeon_FillStateBuffer( ai, vc->datatype );
 	
 	// remember that 2D accelerator is not prepared for any virtual card
 	si->active_vc = -1;
 	
-	Radeon_ActivateVirtualCard( ai );
-
 	// first move to well-defined position (to setup CRTC offset)
 	Radeon_MoveDisplay( ai, 0, 0 );		
 	// then to (probably faulty) user-defined pos
 	Radeon_MoveDisplay( ai, mode.h_display_start, mode.v_display_start );
 
 	// set standard palette in direct-colour modes
-	initDAC( ai, &vc->ports[0] );
-	if( vc->independant_ports > 1 )
-		initDAC( ai, &vc->ports[1] );
+	Radeon_InitPalette( ai, &si->heads[vc->heads[0].physical_head] );
+	if( vc->independant_heads > 1 )
+		Radeon_InitPalette( ai, &si->heads[vc->heads[1].physical_head] );
 	
 	// initialize cursor data
-	Radeon_SetCursorColors( ai, &vc->ports[0] );
-	if( vc->independant_ports > 1 )
-		Radeon_SetCursorColors( ai, &vc->ports[1] );
+	Radeon_SetCursorColors( ai, &si->heads[vc->heads[0].physical_head] );
+	if( vc->independant_heads > 1 )
+		Radeon_SetCursorColors( ai, &si->heads[vc->heads[1].physical_head] );
 		
 	// sync should be settled now, so we can reenable IRQs
 	// TBD: IRQ handling doesn't work correctly and doesn't make sense with two 
 	// displays connected, so let's leave them disabled for now
-	//Radeon_EnableIRQ( ai, true );
+	Radeon_EnableIRQ( ai, true );
 		
 	RELEASE_BEN( si->engine.lock );
 
@@ -379,115 +424,4 @@ status_t SET_DISPLAY_MODE( display_mode *mode_in )
 	MOVE_CURSOR( 0, 0 );
 
 	return B_OK;
-}
-
-// update shown are of one port
-static void moveOneDisplay( accelerator_info *ai, virtual_port *port )
-{
-	virtual_card *vc = ai->vc;
-	uint32 offset;
-	
-	offset = (vc->mode.v_display_start + port->rel_y) * vc->pitch + 
-		(vc->mode.h_display_start + port->rel_x) * vc->bpp + 
-		vc->fb_offset;
-	
-	SHOW_FLOW( 3, "Setting address %x on port %d", 
-		offset,	port->is_crtc2 );
-	
-	Radeon_WaitForFifo( ai, 1 );
-
-	OUTREG( ai->regs, port->is_crtc2 ? RADEON_CRTC2_OFFSET : RADEON_CRTC_OFFSET, offset );
-/*	Radeon_WriteRegCP( ai, port->is_crtc2 ? RADEON_CRTC2_OFFSET : RADEON_CRTC_OFFSET, 
-		offset );*/
-}
-
-status_t Radeon_MoveDisplay( accelerator_info *ai, uint16 h_display_start, uint16 v_display_start )
-{
-	virtual_card *vc = ai->vc;
-	
-	SHOW_FLOW( 4, "h_display_start=%ld, v_display_start=%ld",
-		h_display_start, v_display_start );
-
-	if( h_display_start + vc->eff_width > vc->mode.virtual_width ||
-		v_display_start + vc->eff_height > vc->mode.virtual_height )
-		return B_ERROR;
-
-	// this is needed both for get_mode_info and for scrolling of virtual screens
-	vc->mode.h_display_start = h_display_start & ~7;
-	vc->mode.v_display_start = v_display_start;
-
-	// do it
-	moveOneDisplay( ai, &vc->ports[0] );
-
-	if( vc->independant_ports > 1 )
-		moveOneDisplay( ai, &vc->ports[1] );
-		
-	// overlay position must be adjusted 
-	Radeon_UpdateOverlay( ai );
-	
-	return B_OK;
-}
-
-// public function: pan display
-status_t MOVE_DISPLAY( uint16 h_display_start, uint16 v_display_start ) 
-{
-	shared_info *si = ai->si;
-	status_t result;
-		
-	ACQUIRE_BEN( si->engine.lock );
-	
-	// TBD: we should probably lock card first; in this case, we must
-	//      split this function into locking and worker part, as this
-	//      function is used internally as well
-	result = Radeon_MoveDisplay( ai, h_display_start, v_display_start );
-		
-	RELEASE_BEN( si->engine.lock );
-			
-	return result;
-}
-
-static void setPalette( accelerator_info *ai, virtual_port *port, 
-	uint count, uint8 first, uint8 *color_data );
-
-// public function: set colour palette
-void SET_INDEXED_COLORS(uint count, uint8 first, uint8 *color_data, uint32 flags) 
-{
-	virtual_card *vc = ai->vc;
-	shared_info *si = ai->si;
-//	uint i;
-
-	SHOW_FLOW( 3, "first=%d, count=%d", first, flags );
-	
-	if( vc->mode.space != B_CMAP8 ) {
-		SHOW_ERROR0( 2, "Tried to set palette in non-palette mode" );
-		return;
-	} 
-
-	// we need to lock card, though this isn't done	in sample driver
-	ACQUIRE_BEN( si->engine.lock );
-
-	setPalette( ai, &vc->ports[0], count, first, color_data );
-	
-	if( vc->independant_ports > 1 )
-		setPalette( ai, &vc->ports[1], count, first, color_data );
-		
-	RELEASE_BEN( si->engine.lock );
-}
-
-
-// set palette of one DAC
-static void setPalette( accelerator_info *ai, virtual_port *port, 
-	uint count, uint8 first, uint8 *color_data )
-{
-	uint i;
-	
-	selectDAC( ai, port );
-	
-	Radeon_WriteRegCP( ai, RADEON_PALETTE_INDEX, first );
-	
-	for( i = 0; i < count; ++i, color_data += 3 )
-		Radeon_WriteRegCP( ai, RADEON_PALETTE_DATA, 
-			((uint32)color_data[0] << 16) | 
-			((uint32)color_data[1] << 8) | 
-			 color_data[2] );
 }

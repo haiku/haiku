@@ -4,7 +4,10 @@
 
 	Part of DDC driver
 		
-	EDID handling.
+	EDID decoder.
+	
+	The EDID information is tightly packed; this file takes care of
+	converting it to a usable structure.
 */
 
 #include "edid.h"
@@ -131,7 +134,7 @@ static void copy_str( char *dest, const uint8 *src, size_t len )
 	int i;
 	
 	// copy until 0xa
-	for( i = 0; i < (int)len; ++i ) {
+	for( i = 0; i < len; ++i ) {
 		if( src[i] == 0xa )
 			break;
 			

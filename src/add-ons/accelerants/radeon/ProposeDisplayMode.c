@@ -10,7 +10,6 @@
 #include "radeon_accelerant.h"
 #include "generic.h"
 #include <string.h>
-#include <sys/ioctl.h>
 #include "GlobalData.h"
 
 #include "crtc_regs.h"
@@ -25,6 +24,9 @@
 //#define MODE_COUNT (sizeof (mode_list) / sizeof (display_mode))
 
 static const display_mode base_mode_list[] = {
+// PAL
+//{ { 25175, 640, 656, 752, 816, 480, 490, 492, 625, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
+
 { { 25175, 640, 656, 752, 800, 480, 490, 492, 525, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@60Hz_(640X480X8.Z1) */
 { { 27500, 640, 672, 768, 864, 480, 488, 494, 530, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* 640X480X60Hz */
 { { 30500, 640, 672, 768, 864, 480, 517, 523, 588, 0}, B_CMAP8, 640, 480, 0, 0, MODE_FLAGS}, /* SVGA_640X480X60HzNI */
@@ -55,11 +57,6 @@ static const display_mode base_mode_list[] = {
 { { 216000, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}, /* Vesa_Monitor_@80Hz_(1600X1200X8.Z1) */
 { { 229500, 1600, 1664, 1856, 2160, 1200, 1201, 1204, 1250, T_POSITIVE_SYNC}, B_CMAP8, 1600, 1200, 0, 0, MODE_FLAGS}  /* Vesa_Monitor_@85Hz_(1600X1200X8.Z1) */
 };
-
-status_t Radeon_ProposeDisplayMode( shared_info *si, physical_port *port, 
-	pll_info *pll, display_mode *target, 
-	const display_mode *low, const display_mode *high );
-void Radeon_DisposeModeList( shared_info *si );
 
 
 // convert Be colour space in Radeon data type
@@ -108,8 +105,8 @@ bool Radeon_GetFormat( int space, int *format, int *bpp )
 	 return B_BAD_VALUE.
 	If the mode is both valid AND falls within the limits, return B_OK.
 */
-status_t Radeon_ProposeDisplayMode( shared_info *si, physical_port *port, 
-	pll_info *pll, display_mode *target, 
+status_t Radeon_ProposeDisplayMode( shared_info *si, physical_head *head, 
+	general_pll_info *pll, display_mode *target, 
 	const display_mode *low, const display_mode *high )
 {
 	status_t result = B_OK;
@@ -119,7 +116,7 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_port *port,
 	int format, bpp;
 	uint32 row_bytes;
 	int eff_virtual_width;
-//	display_type_e disp_type;
+	fp_info *flatpanel = &si->flatpanels[head->flatpanel_port];
 
 	// save refresh rate - we want to leave this (artifical) value untouched
 	// don't use floating point, we are in kernel mode
@@ -136,20 +133,29 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_port *port,
 	// for flat panels, check maximum resolution;
 	// all the other tricks (like fixed resolution and resulting scaling)
 	// are done automagically by set_display_mode
-    if( port->disp_type == dt_dvi_1 || port->disp_type == dt_lvds ) {
-        if( target->timing.h_display > si->fp_port.panel_xres )
-            target->timing.h_display = si->fp_port.panel_xres;
-            
-        if(	target->timing.v_display > si->fp_port.panel_yres )
-            target->timing.v_display = si->fp_port.panel_yres;
+    if( (head->chosen_displays & (dd_lvds | dd_dvi | dd_dvi_ext)) != 0 ) {
+		if( target->timing.h_display > flatpanel->panel_xres )
+			target->timing.h_display = flatpanel->panel_xres;
+		
+		if(	target->timing.v_display > flatpanel->panel_yres )
+			target->timing.v_display = flatpanel->panel_yres;
 	}
-			
+
+	// the TV-Out encoder can "only" handle up to 1024x768
+	if( (head->chosen_displays & (dd_ctv | dd_stv)) != 0 ) {
+		if( target->timing.h_display > 1024 )
+			target->timing.h_display = 1024;
+		
+		if(	target->timing.v_display > 768 )
+			target->timing.v_display = 768;
+	}
+				
 	// validate horizontal timings
 	{
 		int h_sync_fudge, h_display, h_sync_start, h_sync_wid, h_total;
 			
 		h_display = target->timing.h_display;
-		h_sync_fudge = Radeon_GetHSyncFudge( si, port, format );
+		h_sync_fudge = Radeon_GetHSyncFudge( head, format );
 		h_sync_start = target->timing.h_sync_start;
 		h_sync_wid = target->timing.h_sync_end - target->timing.h_sync_start;
 		h_total = target->timing.h_total;
@@ -328,8 +334,8 @@ status_t Radeon_ProposeDisplayMode( shared_info *si, physical_port *port,
 	
 	// careful about additionally required memory: 
 	// 1024 bytes are needed for hardware cursor
-	if ((row_bytes * target->virtual_height) > si->local_mem_size - 1024 )
-		target->virtual_height = (si->local_mem_size - 1024) / row_bytes;
+	if ((row_bytes * target->virtual_height) > si->memory[mt_local].size - 1024 )
+		target->virtual_height = (si->memory[mt_local].size - 1024) / row_bytes;
 
 	// make sure we haven't shrunk virtual height too much
 	if (target->virtual_height < target->timing.v_display) {
@@ -425,7 +431,7 @@ static void checkAndAddMode( accelerator_info *ai, const display_mode *mode, boo
 		*dst = *mode;
 		dst->space = low.space = high.space = spaces[i];
 
-		if( Radeon_ProposeDisplayMode( si, &si->ports[0], 
+		if( Radeon_ProposeDisplayMode( si, &si->heads[0], 
 			&si->pll, dst, &low, &high ) == B_OK ) 
 		{
 			si->mode_count++;
@@ -436,7 +442,7 @@ static void checkAndAddMode( accelerator_info *ai, const display_mode *mode, boo
 			*dst = *mode;
 			dst->space = spaces[i];
 			
-			if( Radeon_ProposeDisplayMode( si, &si->ports[1],
+			if( Radeon_ProposeDisplayMode( si, &si->heads[1],
 				&si->pll, dst, &low, &high ) == B_OK )
 			{
 				si->mode_count++;
@@ -474,9 +480,11 @@ static void checkAndAddMultiMode( accelerator_info *ai, const display_mode *mode
 }
 
 // add display mode of flat panel to official list
-static void addFPMode( accelerator_info *ai, fp_info *fp_info )
+static void addFPMode( shared_info *si )
 {
-    if( fp_info->disp_type == dt_dvi_1 || fp_info->disp_type == dt_lvds ) {
+	fp_info *fp_info = &si->flatpanels[0];
+	
+    if( (si->connected_displays & (dd_dvi | dd_lvds)) != 0 ) {
     	display_mode mode;
     	
 		mode.virtual_width = mode.timing.h_display = fp_info->panel_xres;
@@ -547,7 +555,7 @@ status_t Radeon_CreateModeList( shared_info *si )
 		checkAndAddMultiMode( ai, &base_mode_list[i], false );
 
 	// plus fp mode
-	addFPMode( ai, &si->fp_port );
+	addFPMode( si );
 
 	// as we've created the list ourself, we don't clone it
 	ai->mode_list_area = si->mode_list_area;
@@ -572,28 +580,40 @@ status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low,
 	status_t result1, result2;
 	bool isTunneled;
 	status_t result;
+	display_mode tmp_target;
 	
 	// check whether we got a tunneled settings command
 	result = Radeon_CheckMultiMonTunnel( vc, target, low, high, &isTunneled );
 	if( isTunneled )
 		return result;
 
+	// check how many heads are needed by target mode
+	tmp_target = *target;
+	Radeon_DetectMultiMode( vc, &tmp_target );
+		
+	// before checking multi-monitor mode, we must define a monitor signal routing
+	// TBD: this may be called a bit too frequently if someone scans available modes
+	// via successive Propose_Display_Mode; though this doesn't do any _real_ harm
+	// it leads to annoying distortions on screen!!
+	Radeon_DetectDisplays( ai);
+	Radeon_SetupDefaultMonitorRouting( ai, Radeon_DifferentPorts( &tmp_target ) );
+
 	// transform to multi-screen mode first
 	Radeon_DetectMultiMode( vc, target );
 	Radeon_VerifyMultiMode( vc, si, target );
 	
-	SHOW_FLOW0( 2, "wished:" );
-	SHOW_FLOW( 2, "H: %4d %4d %4d %4d (v=%4d)", 
+	SHOW_FLOW0( 3, "wished:" );
+	SHOW_FLOW( 3, "H: %4d %4d %4d %4d (v=%4d)", 
 		target->timing.h_display, target->timing.h_sync_start, 
 		target->timing.h_sync_end, target->timing.h_total, target->virtual_width );
-	SHOW_FLOW( 2, "V: %4d %4d %4d %4d (h=%4d)", 
+	SHOW_FLOW( 3, "V: %4d %4d %4d %4d (h=%4d)", 
 		target->timing.v_display, target->timing.v_sync_start, 
 		target->timing.v_sync_end, target->timing.v_total, target->virtual_height );
-	SHOW_FLOW( 2, "clk: %ld", target->timing.pixel_clock );
+	SHOW_FLOW( 3, "clk: %ld", target->timing.pixel_clock );
 	
 	// we must assure that each ProposeMode call doesn't tweak the mode in
 	// a way that it cannot be handled by the other port anymore
-	result1 = Radeon_ProposeDisplayMode( si, &si->ports[vc->ports[0].physical_port], 
+	result1 = Radeon_ProposeDisplayMode( si, &si->heads[vc->heads[0].physical_head], 
 		&si->pll, target, low, high );
 		
 	if( result1 == B_ERROR )
@@ -601,7 +621,7 @@ status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low,
 		
 	if( Radeon_NeedsSecondPort( target )) {
 		// if both ports are used, make sure both can handle mode
-		result2 = Radeon_ProposeDisplayMode( si, &si->ports[vc->ports[1].physical_port],
+		result2 = Radeon_ProposeDisplayMode( si, &si->heads[vc->heads[1].physical_head],
 			&si->pll, target, low, high );
 			
 		if( result2 == B_ERROR )
@@ -610,14 +630,14 @@ status_t PROPOSE_DISPLAY_MODE( display_mode *target, const display_mode *low,
 		result2 = B_OK;
 	}
 	
-	SHOW_INFO0( 2, "got:" );
-	SHOW_INFO( 2, "H: %4d %4d %4d %4d (v=%4d)", 
+	SHOW_INFO0( 4, "got:" );
+	SHOW_INFO( 4, "H: %4d %4d %4d %4d (v=%4d)", 
 		target->timing.h_display, target->timing.h_sync_start, 
 		target->timing.h_sync_end, target->timing.h_total, target->virtual_width );
-	SHOW_INFO( 2, "V: %4d %4d %4d %4d (h=%4d)", 
+	SHOW_INFO( 4, "V: %4d %4d %4d %4d (h=%4d)", 
 		target->timing.v_display, target->timing.v_sync_start, 
 		target->timing.v_sync_end, target->timing.v_total, target->virtual_height );
-	SHOW_INFO( 2, "clk: %ld", target->timing.pixel_clock );
+	SHOW_INFO( 4, "clk: %ld", target->timing.pixel_clock );
 
 	Radeon_HideMultiMode( vc, target );
 	

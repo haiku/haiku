@@ -15,16 +15,6 @@
 #include <string.h>
 #include "overlay_regs.h"
 
-uint32 OVERLAY_COUNT( const display_mode *dm );
-const uint32 *OVERLAY_SUPPORTED_SPACES( const display_mode *dm );
-uint32 OVERLAY_SUPPORTED_FEATURES( uint32 color_space );
-const overlay_buffer *ALLOCATE_OVERLAY_BUFFER( color_space cs, uint16 width, uint16 height );
-status_t RELEASE_OVERLAY_BUFFER( const overlay_buffer *ob );
-status_t GET_OVERLAY_CONSTRAINTS( const display_mode *dm, const overlay_buffer *ob, overlay_constraints *oc );
-overlay_token ALLOCATE_OVERLAY( void );
-status_t RELEASE_OVERLAY(overlay_token ot);
-status_t CONFIGURE_OVERLAY( overlay_token ot, const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov );
-
 // we could add support of planar modes and YUV modes
 // but I neither know how planar modes are defined nor
 // whether there is any program that makes use of them
@@ -39,6 +29,8 @@ uint32 OVERLAY_COUNT( const display_mode *dm )
 {
 	SHOW_FLOW0( 3, "" );
 
+	(void) dm;
+	
 	return 1;
 }
 
@@ -48,6 +40,8 @@ uint32 OVERLAY_COUNT( const display_mode *dm )
 const uint32 *OVERLAY_SUPPORTED_SPACES( const display_mode *dm )
 {
 	SHOW_FLOW0( 3, "" );
+	
+	(void) dm;
 
 	return overlay_colorspaces;
 }
@@ -58,6 +52,8 @@ const uint32 *OVERLAY_SUPPORTED_SPACES( const display_mode *dm )
 uint32 OVERLAY_SUPPORTED_FEATURES( uint32 color_space )
 {
 	SHOW_FLOW0( 3, "" );
+	
+	(void) color_space;
 
 	return 
 		B_OVERLAY_COLOR_KEY |
@@ -73,7 +69,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER( color_space cs, uint16 width, uin
 {
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
-	radeon_alloc_local_mem am;
+	radeon_alloc_mem am;
 	overlay_buffer_node *node;
 	overlay_buffer *buffer;
 	status_t result;
@@ -142,16 +138,18 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER( color_space cs, uint16 width, uin
 	
 	am.magic = RADEON_PRIVATE_DATA_MAGIC;
 	am.size = buffer->bytes_per_row * height;
+	am.memory_type = mt_local;
+	am.global = false;
 	
-	result = ioctl( ai->fd, RADEON_ALLOC_LOCAL_MEM, &am );
+	result = ioctl( ai->fd, RADEON_ALLOC_MEM, &am );
 	if( result != B_OK )
 		goto err;
 		
 	node->mem_handle = am.handle;
-	node->mem_offset = am.fb_offset;
-	buffer->buffer = (int8*)si->framebuffer + am.fb_offset;
-	buffer->buffer_dma = (int8*)si->framebuffer_pci + am.fb_offset;
-
+	node->mem_offset = am.offset;
+	buffer->buffer = si->local_mem + am.offset;
+	buffer->buffer_dma = si->framebuffer_pci + am.offset;
+	
 	// add to list of overlays
 	node->next = vc->overlay_buffers;
 	node->prev = NULL;
@@ -162,7 +160,8 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER( color_space cs, uint16 width, uin
 	
 	RELEASE_BEN( si->engine.lock );
 	
-	SHOW_FLOW( 3, "success: mem_handle=%x, offset=%x", node->mem_handle, node->mem_offset );
+	SHOW_FLOW( 0, "success: mem_handle=%x, offset=%x, CPU-address=%x, phys-address=%x", 
+		node->mem_handle, node->mem_offset, buffer->buffer, buffer->buffer_dma );
 
 	return buffer;
 	
@@ -178,20 +177,23 @@ status_t RELEASE_OVERLAY_BUFFER( const overlay_buffer *ob )
 	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
 	overlay_buffer_node *node;
-	radeon_free_local_mem fm;
+	radeon_free_mem fm;
 	status_t result;
-
+	
 	SHOW_FLOW0( 3, "" );
 
 	node = (overlay_buffer_node *)((char *)ob - offsetof( overlay_buffer_node, buffer ));
 	
-	if( si->active_overlay.on == node )
+	if( si->active_overlay.on == node || si->active_overlay.prev_on )
 		Radeon_HideOverlay( ai );
 
 	// free memory		
 	fm.magic = RADEON_PRIVATE_DATA_MAGIC;
 	fm.handle = node->mem_handle;
-	result = ioctl( ai->fd, RADEON_FREE_LOCAL_MEM, &fm );
+	fm.memory_type = mt_local;
+	fm.global = false;
+	
+	result = ioctl( ai->fd, RADEON_FREE_MEM, &fm );
 	if( result != B_OK ) {
 		SHOW_FLOW( 3, "ups - couldn't free memory (handle=%x, status=%s)", 
 			node->mem_handle, strerror( result ));
@@ -337,9 +339,8 @@ status_t CONFIGURE_OVERLAY( overlay_token ot, const overlay_buffer *ob,
 	const overlay_window *ow, const overlay_view *ov )
 {
 	shared_info *si = ai->si;
-//	virtual_card *vc = ai->vc;
 	status_t result;
-		
+	
 	SHOW_FLOW0( 4, "" );
 	
 	if( (uint32)ot != si->overlay_mgr.token )

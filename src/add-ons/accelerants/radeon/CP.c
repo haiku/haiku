@@ -5,292 +5,401 @@
 	Part of Radeon accelerant
 		
 	Command Processor handling
+	
+
+	Something about synchronization in general: 
+	
+	The DDK says that only some register accesses are stored in the 
+	Command FIFO, i.e. in almost all cases you don't have to wait until
+	there is enough space in this FIFO. Unfortunately, ATI doesn't speak
+	clearly here and doesn't tell you which registers are buffered and 
+	which not (the r300 DDK provides some examples only, other DDKs refer
+	to some include file where no such info could be found).
+	
+	Looking at pre-Radeon specs, we have the following register ranges:
+		0		configuration/display/multi-media registers
+		0xf00	read-only PCI configuration space 
+		0x1000	CCE registers
+		0x1400	FIFOed GUI-registers
+		
+	So, if the list is still correct, the affected registers are only 
+	those used for 2D/3D drawing.
+	
+	This is very important as if the register you want to write is 
+	buffered, you have to do a busy wait until there is enough FIFO
+	space. As concurrent threads may do the same, register access should
+	only be done with a lock held. We never write GUI-registers directly,
+	so we never have to wait for the FIFO and thus don't need this lock.
+
 */
 
 #include "radeon_accelerant.h"
 #include "mmio.h"
-#include "CPMicroCode.h"
-#include "cp_regs.h"
 #include "buscntrl_regs.h"
 #include "utils.h"
 #include <sys/ioctl.h>
+#include "CP.h"
 
 #include "log_coll.h"
 #include "log_enum.h"
 
 #include <string.h>
 
-uint getAvailRingBuffer( accelerator_info *ai );
-
-
-// non-local memory is used as following:
-// - 0x10000 dwords for ring buffer
-// - 8 dwords for returned data (i.e. current read ptr)
-// - 6 dwords for "scratch registers"
-//
-// usage of scratch registers:
-// - reg 0 = reached engine.count
-//
-// the ring buffer stuff must be at a constant offset as
-// clones cannot be informed if it were changed
-
-
-// upload Micro-Code of CP
-static void loadMicroEngineRAMData( accelerator_info *ai )
-{
-	int i;
-	const uint32 (*microcode)[2];
-	
-	SHOW_FLOW0( 3, "" );
-	
-	switch( ai->si->asic ) {
-	case rt_r300:
-	case rt_r300_4p:
-	case rt_rv350:
-	case rt_rv360:
-	case rt_r350:
-	case rt_r360:
-		microcode = r300_cp_microcode;
-		break;
-	case rt_r200:
-	//case rt_rv250:
-	//case rt_m9:
-		microcode = r200_cp_microcode;
-		break;
-	default:
-		microcode = radeon_cp_microcode;
-	}
-
-	Radeon_WaitForIdle( ai );
-
-	OUTREG( ai->regs, RADEON_CP_ME_RAM_ADDR, 0 );
-	
-	for ( i = 0 ; i < 256 ; i++ ) {
-		OUTREG( ai->regs, RADEON_CP_ME_RAM_DATAH, microcode[i][1] );
-		OUTREG( ai->regs, RADEON_CP_ME_RAM_DATAL, microcode[i][0] );
-	}
-}
-
-// convert CPU's to graphics card's virtual address
-#define CPU2GC( addr ) (((uint32)(addr) - (uint32)si->nonlocal_mem) + si->nonlocal_vm_start)
-
-// initialize bus mastering
-static status_t setupCPRegisters( accelerator_info *ai, int aring_size )
-{
-	vuint8 *regs = ai->regs;
-	shared_info *si = ai->si;
-	uint32 tmp;
-	
-#if 0
-	{
-		// allocate ring buffer etc. from local memory instead of PCI memory
-		radeon_alloc_local_mem am;
-	
-		am.magic = RADEON_PRIVATE_DATA_MAGIC;
-		am.size = (aring_size + 14) * 4;
-		
-		if( ioctl( ai->fd, RADEON_ALLOC_LOCAL_MEM, &am ) != B_OK )
-			SHOW_ERROR0( 0, "Cannot allocate ring buffer from local memory" );
-		else {
-			si->nonlocal_vm_start = am.fb_offset;
-			si->nonlocal_mem = (uint32 *)(si->framebuffer + am.fb_offset);
-		}
-	}
-#endif
-	
-	memset( &si->ring, 0, sizeof( si->ring ));
-	
-	// set write pointer delay to zero;
-	// we assume that memory synchronization is done correctly my MoBo
-	// and Radeon_SendCP contains a hack that hopefully fixes such problems
-	OUTREG( regs, RADEON_CP_RB_WPTR_DELAY, 0 );
-
-	// setup CP buffer
-	si->ring.start = si->nonlocal_mem;
-	si->ring.size = aring_size;
-	OUTREG( regs, RADEON_CP_RB_BASE, CPU2GC( si->ring.start ));
-	SHOW_INFO( 3, "CP buffer address=%lx", CPU2GC( si->ring.start ));
-
-	// setup CP read pointer buffer
-	si->ring.head = si->ring.start + si->ring.size;
-	OUTREG( regs, RADEON_CP_RB_RPTR_ADDR, CPU2GC( si->ring.head ));
-	SHOW_INFO( 3, "CP read pointer buffer==%lx", CPU2GC( si->ring.head ));
-	
-	// set ring buffer size
-	// (it's log2 of qwords)
-	OUTREG( regs, RADEON_CP_RB_CNTL, log2( si->ring.size / 2 ));
-	SHOW_INFO( 3, "CP buffer size mask=%ld", log2( si->ring.size / 2 ) );
-
-	// set CP buffer pointers
-	OUTREG( regs, RADEON_CP_RB_RPTR, 0 );
-	OUTREG( regs, RADEON_CP_RB_WPTR, 0 );
-	*si->ring.head = 0;
-	si->ring.tail = 0;
-
-	// setup scratch register buffer
-	si->scratch_ptr = si->ring.head + RADEON_SCRATCH_REG_OFFSET / sizeof( uint32 );
-	OUTREG( regs, RADEON_SCRATCH_ADDR, CPU2GC( si->scratch_ptr ));
-	OUTREG( regs, RADEON_SCRATCH_UMSK, 0x3f );
-
-	Radeon_WaitForIdle( ai );
-
-	// enable bus mastering
-#if 1
-	tmp = INREG( ai->regs, RADEON_BUS_CNTL ) & ~RADEON_BUS_MASTER_DIS;
-	OUTREG( regs, RADEON_BUS_CNTL, tmp );
-#endif
-
-	// sync units
-	OUTREG( regs, RADEON_ISYNC_CNTL,
-		(RADEON_ISYNC_ANY2D_IDLE3D |
-		 RADEON_ISYNC_ANY3D_IDLE2D |
-		 RADEON_ISYNC_WAIT_IDLEGUI |
-		 RADEON_ISYNC_CPSCRATCH_IDLEGUI) );
-
-	return B_OK;
-}
-
 
 // get number of free entries in CP's ring buffer
-uint getAvailRingBuffer( accelerator_info *ai )
+static uint getAvailRingBuffer( accelerator_info *ai )
 {
-	shared_info *si = ai->si;
+	CP_info *cp = &ai->si->cp;
 	int space;
 	
-//	space = *si->ring.head - si->ring.tail;
-	space = INREG( ai->regs, RADEON_CP_RB_RPTR ) - si->ring.tail;
+	space = 
+		*(uint32 *)(ai->mapped_memory[cp->feedback.mem_type].data + cp->feedback.head_mem_offset)
+		//*cp->ring.head 
+		- cp->ring.tail;
+	//space = INREG( ai->regs, RADEON_CP_RB_RPTR ) - cp->ring.tail;
 
 	if( space <= 0 )
-		space += si->ring.size;
+		space += cp->ring.size;
 		
 	// don't fill up the entire buffer as we cannot
 	// distinguish between a full and an empty ring
 	--space;
 	
-	SHOW_FLOW( 4, "head=%ld, tail=%ld, space=%ld", *si->ring.head, si->ring.tail, space );
+	SHOW_FLOW( 3, "head=%ld, tail=%ld, space=%ld", 
+		*(uint32 *)(ai->mapped_memory[cp->feedback.mem_type].data + cp->feedback.head_mem_offset),
+		//*cp->ring.head, 
+		cp->ring.tail, space );
 
 	LOG1( si->log, _GetAvailRingBufferQueue, space );
+	
+	cp->ring.space = space;
 		
 	return space;
 }
 
-// initialize CP so it's ready for BM
-status_t Radeon_InitCP( accelerator_info *ai )
-{	
-//	shared_info *si = ai->si;
-	status_t result;
+
+// mark all indirect buffers that have been processed as being free;
+// lock must be hold
+void Radeon_FreeIndirectBuffers( accelerator_info *ai )
+{
+	CP_info *cp = &ai->si->cp;
+	int32 cur_processed_tag = 
+		((uint32 *)(ai->mapped_memory[cp->feedback.mem_type].data + cp->feedback.scratch_mem_offset))[1];
+		//ai->si->cp.scratch.ptr[1];
+	//INREG( ai->regs, RADEON_SCRATCH_REG1 );
+	
+	SHOW_FLOW( 3, "processed_tag=%d", cur_processed_tag );
+	
+	// mark all sent indirect buffers as free
+	while( cp->buffers.oldest != -1 ) {
+		indirect_buffer *oldest_buffer = 
+			&cp->buffers.buffers[cp->buffers.oldest];
+		int tmp_oldest_buffer;
+		
+		SHOW_FLOW( 3, "oldset buffer's tag: %d", oldest_buffer->send_tag );
+			
+		// this is a tricky calculation to handle wrap-arounds correctly,
+		// so don't change it unless you really understand the signess problem
+		if( (int32)(cur_processed_tag - oldest_buffer->send_tag) < 0 )
+			break;
+			
+		SHOW_FLOW( 3, "mark %d as being free", oldest_buffer->send_tag );
+			
+		// remove buffer from "used" list
+		tmp_oldest_buffer = oldest_buffer->next;
+			
+		if( tmp_oldest_buffer == -1 )
+			cp->buffers.newest = -1;
+			
+		// put it on free list
+		oldest_buffer->next = cp->buffers.free_list;
+		cp->buffers.free_list = cp->buffers.oldest;
+		
+		cp->buffers.oldest = tmp_oldest_buffer;
+	}
+}
+
+
+// wait until an indirect buffer becomes available;
+// lock must be hold
+void Radeon_WaitForFreeIndirectBuffers( accelerator_info *ai )
+{
+	bigtime_t start_time;
+	CP_info *cp = &ai->si->cp;
 	
 	SHOW_FLOW0( 3, "" );
 	
-	// init raw CP
-	loadMicroEngineRAMData( ai );
+	start_time = system_time();
 
-	// do soft-reset
-	Radeon_ResetEngine( ai );
-	
-	// after warm-reset, the CP may still be active and thus react to
-	// register writes during initialization unpredictably, so we better
-	// stop it first
-	OUTREG( ai->regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIDIS_INDDIS );
-	INREG( ai->regs, RADEON_CP_CSQ_CNTL );
-	
-	// reset CP to make disabling active
-	Radeon_ResetEngine( ai );
-
-	// setup CP memory ranges
-	result = setupCPRegisters( ai, 0x10000 );
-	if( result < 0 )
-		return result;
-
-	// tell CP to use BM
-	Radeon_WaitForIdle( ai );
-	OUTREG( ai->regs, RADEON_CP_CSQ_CNTL, RADEON_CSQ_PRIBM_INDBM );
-
-	// this may be a bit too much	
-	Radeon_SendPurgeCache( ai );
-	Radeon_SendWaitUntilIdle( ai );
-	
-	return B_OK;
-}
-
-
-// write to register via CP
-void Radeon_WriteRegCP( accelerator_info *ai, uint32 reg, uint32 value )
-{
-	uint32 buffer[2];
-	
-	SHOW_FLOW0( 4, "" );
-	
-	LOG2( ai->si->log, _Radeon_WriteRegFifo, reg, value );
-	
-	buffer[0] = CP_PACKET0( reg, 0 );
-	buffer[1] = value;
-	
-	Radeon_SendCP( ai, buffer, 2 );
-}
-
-
-// send packets to CP
-void Radeon_SendCP( accelerator_info *ai, uint32 *buffer, uint32 num_dwords )
-{
-	shared_info *si = ai->si;
-	
-	SHOW_FLOW( 4, "num_dwords=%d", num_dwords );
-
-	while( num_dwords > 0 ) {
-		uint32 space;
-		uint32 max_copy;
-//		uint i;
+	while( 1 ) {
+		bigtime_t sample_time;
 		
-		space = getAvailRingBuffer( ai );
+		Radeon_FreeIndirectBuffers( ai );
 		
-		if( space == 0 )
-			continue;
+		if( cp->buffers.free_list >= 0 )
+			return;
+		
+		sample_time = system_time();
+		
+		if( sample_time - start_time > 100000 )
+			break;
 			
-		max_copy = min( space, num_dwords );
+		RELEASE_BEN( cp->lock );
 
-#ifdef ENABLE_LOGGING		
-		for( i = 0; i < max_copy; ++i )
-			LOG1( si->log, _Radeon_SendCP, buffer[i] );
-#endif
-					
-		if( si->ring.tail + max_copy >= si->ring.size ) {
-			uint32 sub_len;
-			
-			sub_len = si->ring.size - si->ring.tail;
-			memcpy( si->ring.start + si->ring.tail, buffer, sub_len * sizeof( uint32 ));
-			buffer += sub_len;
-			num_dwords -= sub_len;
-			max_copy -= sub_len;
-			si->ring.tail = 0;
-		}
-		
-		memcpy( si->ring.start + si->ring.tail, buffer, max_copy * sizeof( uint32 ) );
-		buffer += max_copy;
-		num_dwords -= max_copy;
-		if( si->ring.tail + max_copy < si->ring.size )
-			si->ring.tail += max_copy;
+		// use exponential fall-off
+		// in the beginning do busy-waiting, later on we let the thread sleep;
+		// the micro-spin is used to reduce PCI load
+		if( sample_time - start_time > 5000 ) 
+			snooze( (sample_time - start_time) / 10 );
 		else
-			si->ring.tail = 0;
+			Radeon_Spin( 1 );
+
+		ACQUIRE_BEN( cp->lock );
 	}
 	
-	// some chipsets have problems with write buffers; effectively, the command
-	// list we've just created gets delayed in some queue and the graphics chip
-	// reads out-dated commands, which don't make sense and thus crash the
-	// graphics card
+	SHOW_ERROR0( 0, "All buffers are in use and engine doesn't finish any of them" );
+
+	// lock must be released during reset (reset acquires it automatically)
+	RELEASE_BEN( cp->lock );
+	Radeon_ResetEngine( ai );
+	ACQUIRE_BEN( cp->lock );
+}
+
+// allocate an indirect buffer
+int Radeon_AllocIndirectBuffer( accelerator_info *ai, bool keep_lock )
+{
+	CP_info *cp = &ai->si->cp;
+	int buffer_idx;
 	
-	// flush writes to ring
+	SHOW_FLOW0( 3, "" );
+	
+	ACQUIRE_BEN( cp->lock );
+	
+	if( cp->buffers.free_list == -1 )
+		Radeon_WaitForFreeIndirectBuffers( ai );
+		
+	buffer_idx = cp->buffers.free_list;
+	cp->buffers.free_list = cp->buffers.buffers[buffer_idx].next;
+
+	//if( !keep_lock )
+		RELEASE_BEN( cp->lock );
+	(void)keep_lock;
+	
+	SHOW_FLOW( 3, "got %d", buffer_idx );
+	
+	return buffer_idx;
+}
+
+
+// explicitely free an indirect buffer;
+// this is not needed if the buffer was send via SendIndirectBuffer()
+// never_used	- 	set to true if the buffer wasn't even sent indirectly
+//					as a state buffer
+// !Warning! 
+// if never_used is false, execution may take very long as all buffers 
+// must be flushed!
+void Radeon_FreeIndirectBuffer( accelerator_info *ai, int buffer_idx, bool never_used )
+{
+	CP_info *cp = &ai->si->cp;
+	
+	SHOW_FLOW( 3, "buffer_idx=%d, never_used=%d", buffer_idx, never_used );
+	
+	// if the buffer was used as a state buffer, we don't record its usage,
+	// so we don't know if the buffer was/is/will be used;
+	// the only way to be sure is to let the CP run dry
+	if( !never_used ) 
+		Radeon_WaitForIdle( ai, false );
+
+	ACQUIRE_BEN( cp->lock );
+
+	cp->buffers.buffers[buffer_idx].next = cp->buffers.free_list;
+	cp->buffers.free_list = buffer_idx;	
+
+	RELEASE_BEN( cp->lock );
+	
+	SHOW_FLOW0( 3, "done" );
+}
+
+// this function must be moved to end of file to avoid inlining
+void Radeon_WaitForRingBufferSpace( accelerator_info *ai, uint num_dwords );
+
+
+// start writing to ring buffer
+// num_dwords - number of dwords to write (must be precise!)
+// !Warning! 
+// during wait, CP's benaphore is released
+#define WRITE_RB_START( num_dwords ) \
+	{ \
+		uint32 *ring_start; \
+		uint32 ring_tail, ring_tail_mask; \
+		uint32 ring_tail_increment = (num_dwords); \
+		if( cp->ring.space < ring_tail_increment ) \
+			Radeon_WaitForRingBufferSpace( ai, ring_tail_increment ); \
+		ring_start = \
+		(uint32 *)(ai->mapped_memory[cp->ring.mem_type].data + cp->ring.mem_offset); \
+			/*cp->ring.start;*/ \
+		ring_tail = cp->ring.tail; \
+		ring_tail_mask = cp->ring.tail_mask;
+
+// write single dword to ring buffer
+#define WRITE_RB( value ) \
+	{ \
+		uint32 val = (value); \
+		SHOW_FLOW( 3, "@%d: %x", ring_tail, val ); \
+		ring_start[ring_tail++] = val; \
+		ring_tail &= ring_tail_mask; \
+	}
+	
+// finish writing to ring buffer
+#define WRITE_RB_FINISH \
+		cp->ring.tail = ring_tail; \
+		cp->ring.space -= ring_tail_increment; \
+	}
+
+// submit indirect buffer for execution.
+// the indirect buffer must not be used afterwards!
+// buffer_idx			- index of indirect buffer to submit
+// buffer_size  		- size of indirect buffer in 32 bits
+// state_buffer_idx		- index of indirect buffer to restore required state
+// state_buffer_size	- size of indirect buffer to restore required state
+// returns:				  tag of buffer (so you can wait for its execution)
+// if no special state is required, set state_buffer_size to zero
+void Radeon_SendIndirectBuffer( accelerator_info *ai, 
+	int buffer_idx, int buffer_size, 
+	int state_buffer_idx, int state_buffer_size, bool has_lock )
+{
+	CP_info *cp = &ai->si->cp;
+	bool need_stateupdate;
+	
+	SHOW_FLOW( 3, "buffer_idx=%d, buffer_size=%d, state_buffer_idx=%d, state_buffer_size=%d", 
+		buffer_idx, buffer_size, state_buffer_idx, state_buffer_size );
+	
+	if( (buffer_size & 1) != 0 ) {
+		SHOW_FLOW( 3, "buffer has uneven size (%d)", buffer_size );
+		// size of indirect buffers _must_ be multiple of 64 bits, so
+		// add a nop to fulfil alignment
+		Radeon_GetIndirectBufferPtr( ai, buffer_idx )[buffer_size] = RADEON_CP_PACKET2;
+		buffer_size += 1;
+	}
+
+	//if( !has_lock )
+		ACQUIRE_BEN( cp->lock );
+	(void)has_lock;
+
+	need_stateupdate = 
+		state_buffer_size > 0 && state_buffer_idx != cp->buffers.active_state;
+		
+	WRITE_RB_START( 5 + (need_stateupdate ? 3 : 0) );
+	
+	// if the indirect buffer to submit requires a special state and the
+	// hardware is in wrong state then execute state buffer
+	if( need_stateupdate ) {
+		SHOW_FLOW0( 3, "update state" );
+		
+		WRITE_RB( CP_PACKET0( RADEON_CP_IB_BASE, 2 ));
+		WRITE_RB( cp->buffers.vm_start + 
+			state_buffer_idx * INDIRECT_BUFFER_SIZE * sizeof( uint32 ));
+		WRITE_RB( state_buffer_size );
+		
+		cp->buffers.active_state = state_buffer_idx;
+	}
+
+	// execute indirect buffer
+	WRITE_RB( CP_PACKET0( RADEON_CP_IB_BASE, 2 ));
+	WRITE_RB( cp->buffers.vm_start + buffer_idx * INDIRECT_BUFFER_SIZE * sizeof( uint32 ));
+	WRITE_RB( buffer_size );
+	
+	// give buffer a tag so it can be freed after execution
+	WRITE_RB( CP_PACKET0( RADEON_SCRATCH_REG1, 1 ));
+	WRITE_RB( cp->buffers.buffers[buffer_idx].send_tag = (int32)++cp->buffers.cur_tag );
+	
+	SHOW_FLOW( 3, "Assigned tag %d", cp->buffers.buffers[buffer_idx].send_tag );
+	
+	WRITE_RB_FINISH;
+
+	// append buffer to list of submitted buffers
+	if( cp->buffers.newest > 0 )
+		cp->buffers.buffers[cp->buffers.newest].next = buffer_idx;
+	else
+		cp->buffers.oldest = buffer_idx;
+		
+	cp->buffers.newest = buffer_idx;
+	cp->buffers.buffers[buffer_idx].next = -1;
+	
+	// flush writes to CP buffers
 	// (this code is a bit of a overkill - currently, only some WinChip/Cyrix 
 	//  CPU's support out-of-order writes, but we are prepared)
 	__asm__ __volatile__ ("lock; addl $0,0(%%esp)": : :"memory");
-	// make sure the chipset has flushed its write buffer by
+	// make sure the motherboard chipset has flushed its write buffer by
 	// reading some uncached memory
-	(void)*si->ring.head;
+	//(void)*(volatile int *)si->framebuffer;
+	INREG( ai->regs, RADEON_CP_RB_RPTR );
 
+	//SHOW_FLOW( 3, "new tail: %d", cp->ring.tail );
+	
+	//snooze( 100 );
+	
 	// now, the command list should really be written to memory,
 	// so it's safe to instruct the graphics card to read it
-	OUTREG( ai->regs, RADEON_CP_RB_WPTR, si->ring.tail );
+	OUTREG( ai->regs, RADEON_CP_RB_WPTR, cp->ring.tail );
 
 	// read from PCI bus to ensure correct posting
-	INREG( ai->regs, RADEON_CP_RB_RPTR );
+	//INREG( ai->regs, RADEON_CP_RB_RPTR );
+	
+	RELEASE_BEN( cp->lock );
+		
+	SHOW_FLOW0( 3, "done" );
+}
+
+
+// mark state buffer as being invalid;
+// this must be done _before_ modifying the state buffer as the
+// state buffer may be in use
+void Radeon_InvalidateStateBuffer( accelerator_info *ai, int state_buffer_idx )
+{
+	CP_info *cp = &ai->si->cp;
+
+	// make sure state buffer is not used anymore
+	Radeon_WaitForIdle( ai, false );
+
+	ACQUIRE_BEN( cp->lock );
+
+	// mark state as being invalid
+	if( cp->buffers.active_state == state_buffer_idx )
+		cp->buffers.active_state = -1;
+
+	RELEASE_BEN( cp->lock );
+}
+
+
+// wait until there is enough space in ring buffer
+// num_dwords - number of dwords needed in ring buffer
+// must be called with benaphore hold
+void Radeon_WaitForRingBufferSpace( accelerator_info *ai, uint num_dwords )
+{
+	bigtime_t start_time;
+	CP_info *cp = &ai->si->cp;
+	
+	start_time = system_time();
+
+	while( getAvailRingBuffer( ai ) < num_dwords ) {
+		bigtime_t sample_time;
+		
+		sample_time = system_time();
+		
+		if( sample_time - start_time > 100000 )
+			break;
+			
+		RELEASE_BEN( cp->lock );
+
+		// use exponential fall-off
+		// in the beginning do busy-waiting, later on we let the thread sleep;
+		// the micro-spin is used to reduce PCI load
+		if( sample_time - start_time > 5000 ) 
+			snooze( (sample_time - start_time) / 10 );
+		else
+			Radeon_Spin( 1 );
+
+		ACQUIRE_BEN( cp->lock );
+	}
 }

@@ -41,10 +41,10 @@
 
 #include "radeon_accelerant.h"
 #include "generic.h"
-#include "cp_regs.h"
 #include "rbbm_regs.h"
 #include "GlobalData.h"
 #include "mmio.h"
+#include "CP.h"
 
 static engine_token radeon_engine_token = { 1, B_2D_ACCELERATION, NULL };
 
@@ -56,32 +56,30 @@ uint32 ACCELERANT_ENGINE_COUNT(void)
 	return 1;
 }
 
-// write current token into CP stream
+// write current sync token into CP stream;
+// we instruct the CP to flush all kind of cache first to not interfere
+// with subsequent host writes
 static void writeSyncToken( accelerator_info *ai )
 {
-	uint32 buffer[6];
-	uint idx = 0;
-	
 	// don't write token if it hasn't changed since last write
 	if( ai->si->engine.count == ai->si->engine.written )
 		return;
 
+	START_IB();
+
 	// flush pending data
-	buffer[idx++] = CP_PACKET0( RADEON_RB2D_DSTCACHE_CTLSTAT, 0 );
-	buffer[idx++] = RADEON_RB2D_DC_FLUSH_ALL;
+	WRITE_IB_REG( RADEON_RB2D_DSTCACHE_CTLSTAT, RADEON_RB2D_DC_FLUSH_ALL );
 	
 	// make sure commands are finished
-	buffer[idx++] = CP_PACKET0( RADEON_WAIT_UNTIL, 0 );
-	buffer[idx++] = RADEON_WAIT_2D_IDLECLEAN |
-		RADEON_WAIT_3D_IDLECLEAN | RADEON_WAIT_HOST_IDLECLEAN;
+	WRITE_IB_REG( RADEON_WAIT_UNTIL, RADEON_WAIT_2D_IDLECLEAN |
+		RADEON_WAIT_3D_IDLECLEAN | RADEON_WAIT_HOST_IDLECLEAN );
 		
 	// write scratch register
-	buffer[idx++] = CP_PACKET0( RADEON_SCRATCH_REG0, 0 );
-	buffer[idx++] = ai->si->engine.count;
+	WRITE_IB_REG( RADEON_SCRATCH_REG0, ai->si->engine.count );
 	
 	ai->si->engine.written = ai->si->engine.count;
 	
-	Radeon_SendCP( ai, buffer, idx );
+	SUBMIT_IB();
 }
 
 // public function: acquire engine for future use
@@ -92,15 +90,14 @@ static void writeSyncToken( accelerator_info *ai )
 status_t ACQUIRE_ENGINE( uint32 capabilities, uint32 max_wait, 
 	sync_token *st, engine_token **et ) 
 {
-	virtual_card *vc = ai->vc;
 	shared_info *si = ai->si;
 	
 	SHOW_FLOW0( 4, "" );
 	
-	ACQUIRE_BEN( si->engine.lock)
+	(void)capabilities;
+	(void)max_wait;
 	
-	if( si->active_vc != vc->id )
-		Radeon_ActivateVirtualCard( ai );
+	ACQUIRE_BEN( si->engine.lock)
 
 	// wait for sync
 	if (st) 
@@ -134,11 +131,12 @@ status_t RELEASE_ENGINE( engine_token *et, sync_token *st )
 
 // public function: wait until engine is idle 
 // ??? which engine to wait for? Is there anyone using this function?
+//     is lock hold?
 void WAIT_ENGINE_IDLE(void) 
 {
 	SHOW_FLOW0( 4, "" );
 	
-	Radeon_Finish( ai );
+	Radeon_WaitForIdle( ai, false );
 }
 
 // public function: get sync token
@@ -161,7 +159,7 @@ status_t GET_SYNC_TOKEN( engine_token *et, sync_token *st )
 }
 
 // this is the same as the corresponding kernel function
-static void spin( uint32 delay )
+void Radeon_Spin( uint32 delay )
 {
 	bigtime_t start_time;
 	
@@ -177,21 +175,32 @@ status_t SYNC_TO_TOKEN( sync_token *st )
 {
 	shared_info *si = ai->si;
 	bigtime_t start_time, sample_time;
-//	status_t result;
 	
 	SHOW_FLOW0( 4, "" );
 	
 	start_time = system_time();
 
 	while( 1 ) {
-		SHOW_FLOW( 4, "passed counter=%d", *si->scratch_ptr );
+		SHOW_FLOW( 4, "passed counter=%d", 
+			((uint32 *)(ai->mapped_memory[si->cp.feedback.mem_type].data + si->cp.feedback.scratch_mem_offset))[0] );
+			//si->cp.scratch.ptr[0] );
 		
 		// a bit nasty: counter is 64 bit, but we have 32 bit only,
 		// this is a tricky calculation to handle wrap-arounds correctly
-		/*if( (int32)(*si->scratch_ptr - st->counter) >= 0 )
-			return B_OK;*/
-		if( (int32)(INREG( ai->regs, RADEON_SCRATCH_REG0 ) - st->counter) >= 0 )
+		if( (int32)(
+			((uint32 *)(ai->mapped_memory[si->cp.feedback.mem_type].data + si->cp.feedback.scratch_mem_offset))[0]
+			//si->cp.scratch.ptr[0] 
+			- st->counter) >= 0 )
 			return B_OK;
+		/*if( (int32)(INREG( ai->regs, RADEON_SCRATCH_REG0 ) - st->counter) >= 0 )
+			return B_OK;*/
+		
+		// commands have not been finished;
+		// this is a good time to free completed buffers as we have to
+		// busy-wait anyway
+		ACQUIRE_BEN( si->cp.lock );
+		Radeon_FreeIndirectBuffers( ai );
+		RELEASE_BEN( si->cp.lock );
 
 		sample_time = system_time();
 		
@@ -204,14 +213,18 @@ status_t SYNC_TO_TOKEN( sync_token *st )
 		if( sample_time - start_time > 5000 ) 
 			snooze( (sample_time - start_time) / 10 );
 		else
-			spin( 1 );
+			Radeon_Spin( 1 );
 	} 
 
 	// we could reset engine now, but caller doesn't need to acquire
 	// engine before calling this function, so we either reset it
 	// without sync (ouch!) or acquire engine first and risk deadlocking
 	SHOW_ERROR( 0, "Failed waiting for token %d (active token: %d)",
-		st->counter, INREG( ai->regs, RADEON_SCRATCH_REG0 )/**si->scratch_ptr*/ );
+		st->counter, /*INREG( ai->regs, RADEON_SCRATCH_REG0 )*/
+		((uint32 *)(ai->mapped_memory[si->cp.feedback.mem_type].data + si->cp.feedback.scratch_mem_offset))[0] );
+		//si->cp.scratch.ptr[0] );
+		
+	Radeon_ResetEngine( ai );
 		
 	return B_ERROR;
 }

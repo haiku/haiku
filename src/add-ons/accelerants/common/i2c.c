@@ -62,7 +62,7 @@ static status_t send_start_condition( const i2c_bus *bus, const i2c_timing *timi
 	
 	res = wait_for_clk( bus, timing, timing->start_timeout );
 	if( res != B_OK ) {
-		SHOW_FLOW0( 2, "Timeout sending start condition" );
+		SHOW_FLOW0( 3, "Timeout sending start condition" );
 		return res;
 	}
 		
@@ -89,7 +89,7 @@ static status_t send_stop_condition( const i2c_bus *bus, const i2c_timing *timin
 	// to make the slave release bus control
 	res = wait_for_clk( bus, timing, timing->ack_timeout );
 	if( res != B_OK ) {
-		SHOW_FLOW0( 2, "Timeout sending stop condition" );
+		SHOW_FLOW0( 3, "Timeout sending stop condition" );
 		return res;
 	}
 
@@ -116,7 +116,7 @@ static status_t send_bit( const i2c_bus *bus, const i2c_timing *timing, bool bit
 	
 	res = wait_for_clk( bus, timing, timeout );
 	if( res != B_OK ) {
-		SHOW_FLOW0( 2, "Timeout when sending next bit" );
+		SHOW_FLOW0( 3, "Timeout when sending next bit" );
 		return res;
 	}
 		
@@ -141,7 +141,7 @@ static status_t send_acknowledge( const i2c_bus *bus, const i2c_timing *timing )
 	
 	res = wait_for_clk( bus, timing, timing->ack_start_timeout );
 	if( res != B_OK ) {
-		SHOW_FLOW0( 2, "Timeout when sending acknowledge" );
+		SHOW_FLOW0( 3, "Timeout when sending acknowledge" );
 		return res;
 	}
 
@@ -158,7 +158,7 @@ static status_t send_acknowledge( const i2c_bus *bus, const i2c_timing *timing )
 			break;
 			
 		if( system_time() - start_time > timing->ack_timeout ) {
-			SHOW_FLOW0( 2, "Slave didn't acknowledge byte" );
+			SHOW_FLOW0( 3, "Slave didn't acknowledge byte" );
 			return B_TIMEOUT;
 		}
 			
@@ -183,7 +183,7 @@ static status_t send_byte( const i2c_bus *bus, const i2c_timing *timing,
 {
 	int i;
 	
-	SHOW_FLOW( 2, "%x ", byte );
+	SHOW_FLOW( 3, "%x ", byte );
 
 	for( i = 7; i >= 0; --i ) {
 		status_t res;
@@ -243,7 +243,7 @@ static status_t receive_bit( const i2c_bus *bus, const i2c_timing *timing,
 	// wait for slave to raise clock
 	res = wait_for_clk( bus, timing, timeout );
 	if( res != B_OK ) {
-		SHOW_FLOW0( 2, "Timeout waiting for bit sent by slave" );
+		SHOW_FLOW0( 3, "Timeout waiting for bit sent by slave" );
 		return res;
 	}
 	
@@ -361,7 +361,7 @@ status_t i2c_send_receive( const i2c_bus *bus, const i2c_timing *timing,
 	return res;
 	
 err:
-	SHOW_FLOW0( 2, "Cancelling transmission" );
+	SHOW_FLOW0( 3, "Cancelling transmission" );
 	send_stop_condition( bus, timing );
 	return res;
 }
