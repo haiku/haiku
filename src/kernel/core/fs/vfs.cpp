@@ -1230,11 +1230,12 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
 			if (status < B_OK)
 				break;
 
-			if (vnode->id == dirent->d_ino)
+			if (vnode->id == dirent->d_ino) {
 				// found correct entry!
 				if (strlcpy(name, dirent->d_name, nameSize) >= nameSize)
 					status = B_BUFFER_OVERFLOW;
 				break;
+			}
 		}
 		FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
 	}
