@@ -347,6 +347,7 @@ void DirectDriver::SetMode(const display_mode &mode)
 			break;
 		
 		default:
+		STRACE(("DirectDriver::SetMode:invalid mode height\n"));
 			Unlock();
 			return;
 	}
@@ -381,14 +382,28 @@ void DirectDriver::SetMode(const display_mode &mode)
 	}
 */	
 	// It would seem that everything passed the error check, so actually set the mode
+	DTRACE(("Locking screen window\n"));
 	screenwin->Lock();
+	
+	DTRACE(("Hiding screen window\n"));
+	screenwin->Hide();
+	screenwin->Unlock();
+	
+	DTRACE(("Locking screen window\n"));
+	screenwin->Lock();
+	
+	DTRACE(("Quitting old screen window\n"));
 	screenwin->Quit();
+	
+	DTRACE(("deleting framebuffer\n"));
 	delete framebuffer;
 
+	DTRACE(("creating new framebuffer\n"));
 	framebuffer=new BBitmap(BRect(0,0,mode.virtual_width-1, mode.virtual_height-1),(color_space)mode.space,true);
 	drawview=new BView(framebuffer->Bounds(),"drawview",0,0);
 	framebuffer->AddChild(drawview);
 	
+	DTRACE(("creating new window\n"));
 	screenwin=new DDWindow(mode.virtual_width, mode.virtual_height,(color_space)mode.space,this);
 	while(find_thread("drawing_thread")==B_NAME_NOT_FOUND)
 	{
@@ -999,6 +1014,7 @@ DDWindow::DDWindow(uint16 width, uint16 height, color_space space, DirectDriver 
 	fClipList=NULL;
 	fNumClipRects=0;
 	fDirty=true;
+	fDrawThreadID=-1;
 	
 	if(!owner)
 		debugger("DDWindow requires a non-NULL owner.");
@@ -1028,9 +1044,9 @@ DDWindow::~DDWindow(void)
 	int32 result;
 	
 	fConnectionDisabled=true;
-	Hide();
 //	Sync();
-	wait_for_thread(fDrawThreadID,&result);
+	if(fDrawThreadID!=-1)
+		wait_for_thread(fDrawThreadID,&result);
 	free(fClipList);
 }
 
@@ -1150,6 +1166,8 @@ int32 DDWindow::DrawingThread(void *data)
 				w->locker.Lock();
 				if(w->fConnected)
 				{
+					int32 winleft=(int32)w->Frame().left,wintop=(int32)w->Frame().top;
+					
 					DTRACE(("\tcheck to see if window is dirty\n"));
 					if(w->fDirty)
 					{
@@ -1158,7 +1176,6 @@ int32 DDWindow::DrawingThread(void *data)
 						uint8 *srcbits, *destbits;
 						clipping_rect *clip;
 						uint32 i;
-						int32 winleft=(int32)w->Frame().left,wintop=(int32)w->Frame().top;
 						
 						DTRACE(("\tClipping rectangles to copy: %lu\n",w->fNumClipRects)); 
 						for(i=0; i<w->fNumClipRects; i++)
@@ -1209,8 +1226,8 @@ int32 DDWindow::DrawingThread(void *data)
 						bytes_to_copy=((rect.right-rect.left)+1)<<2;
 						height=(rect.bottom-rect.top)+1;
 						
-						destbits=w->fBits+ ( (rect.top+(int32)w->Frame().top)*w->fRowBytes)+
-												( (rect.left+(int32)w->Frame().left)<<2);
+						destbits=w->fBits+ ( (rect.top+wintop)*w->fRowBytes)+
+												( (rect.left+winleft)<<2);
 
 						srcbits=(uint8*)w->framebuffer->Bits()+
 								(rect.top*w->framebuffer->BytesPerRow())+
@@ -1275,6 +1292,7 @@ int32 DDWindow::DrawingThread(void *data)
 			debugger("DirectDriver was given an unsupported color mode.");
 			break;
 	}
+	w->fDrawThreadID=-1;
 	return 0;
 }
 
