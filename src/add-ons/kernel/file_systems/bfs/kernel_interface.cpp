@@ -329,7 +329,10 @@ bfs_initialize(const char *deviceName, void *parms, size_t len)
 {
 	FUNCTION_START(("deviceName = %s, parameter len = %ld\n", deviceName, len));
 
-	// ToDo: implement bfs_initialize()!
+	// This function is not available from the outside in BeOS
+	// It will be similarly implemented in OpenBeOS, though - the
+	// backend (to create the file system) is already done; just
+	// call Volume::Initialize().
 
 	return B_ERROR;
 }
