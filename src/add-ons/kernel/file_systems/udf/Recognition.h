@@ -21,7 +21,7 @@ status_t udf_recognize(int device, off_t offset, off_t length,
                        udf_partition_descriptor partitionDescriptors[],
                        uint8 &partitionDescriptorCount);
 status_t udf_recognize(int device, off_t offset, off_t length,
-					   uint32 blockSize, uint32 &blockShift);
+					   uint32 blockSize, char *volumeName);
 
 }	// namespace Udf
 

@@ -1,5 +1,6 @@
 #include "Recognition.h"
 
+#include "CS0String.h"
 #include "MemoryChunk.h"
 
 using namespace Udf;
@@ -35,7 +36,9 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 				   udf_partition_descriptor partitionDescriptors[],
 				   uint8 &partitionDescriptorCount)
 {
-	DEBUG_INIT(CF_PRIVATE, NULL);
+	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
+	               "blockSize: %ld, [...descriptors, etc...]", device, offset,
+	               length, blockSize));
 
 	// Check the block size
 	uint32 bitCount = 0;
@@ -70,14 +73,23 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 
 status_t
 Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
-                   uint32 &blockShift)
+                   char *volumeName)
 {
+	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
+	               "blockSize: %ld, volumeName: %p", device, offset, length,
+	               blockSize, volumeName));
 	udf_logical_descriptor logicalVolumeDescriptor;
 	udf_partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
 	uint8 partitionDescriptorCount;
-	return udf_recognize(device, offset, length, blockSize, blockShift,
-	                     logicalVolumeDescriptor, partitionDescriptors,
-	                     partitionDescriptorCount);
+	uint32 blockShift;
+	status_t error = udf_recognize(device, offset, length, blockSize, blockShift,
+	                               logicalVolumeDescriptor, partitionDescriptors,
+	                               partitionDescriptorCount);
+	if (!error && volumeName) {
+		CS0String name(logicalVolumeDescriptor.logical_volume_identifier());
+		strcpy(volumeName, name.String());
+	}
+	RETURN(error);
 }
 
 //------------------------------------------------------------------------------
@@ -399,9 +411,17 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 			}
 		}
 	}
+
+	PRINT(("found %d unique partition%s\n", uniquePartitions,
+	       (uniquePartitions == 1 ? "" : "s")));
 	
-	if (!err)
+	if (!err) 
 		err = foundLogicalVolumeDescriptor ? B_OK : B_ERROR;
+	if (!err) 
+		err = uniquePartitions >= 1 ? B_OK : B_ERROR;
+	if (!err) 
+		partitionDescriptorCount = uniquePartitions;	
+			
 	RETURN(err);
 }
 
