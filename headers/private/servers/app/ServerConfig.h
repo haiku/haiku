@@ -25,6 +25,9 @@
 // and not in testing mode like the other drivers are for.
 #define HWDRIVER 3
 
+
+#define DIRECTDRIVER 4
+
 // Display driver to be used by the server.
 #define DISPLAYDRIVER VIEWDRIVER
 
