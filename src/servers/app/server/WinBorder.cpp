@@ -27,7 +27,6 @@
 #include <Region.h>
 #include <String.h>
 #include <Locker.h>
-#include <Region.h>
 #include <Debug.h>
 #include <TokenSpace.h>
 #include "View.h"	// for mouse button defines
@@ -325,7 +324,7 @@ void WinBorder::SetFocus(const bool &active)
 
 void WinBorder::RebuildRegions( const BRect& r ){
 	/* WinBorder is a little bit special. It doesn't have a visible region
-		in witch to do its drawings. Instead the hole visible region is split
+		in which to do its drawings. Instead the whole visible region is split
 		between decorator and top_layer.
 	 */
 
