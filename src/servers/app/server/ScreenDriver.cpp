@@ -26,6 +26,7 @@
 //  
 //------------------------------------------------------------------------------
 #include "Angle.h"
+#include "PatternHandler.h"
 #include "ScreenDriver.h"
 #include "ServerProtocol.h"
 #include "ServerBitmap.h"
@@ -43,11 +44,20 @@
 #include <String.h>
 #include <math.h>
 
+#define CLIP_X(a) ( (a < 0) ? 0 : ((a > fbuffer->gcinfo.width-1) ? \
+			fbuffer->gcinfo.width-1 : a) )
+#define CLIP_Y(a) ( (a < 0) ? 0 : ((a > fbuffer->gcinfo.height-1) ? \
+			fbuffer->gcinfo.height-1 : a) )
+#define CHECK_X(a) ( (a >= 0) || (a <= fbuffer->gcinfo.width-1) )
+#define CHECK_Y(a) ( (a >= 0) || (a <= fbuffer->gcinfo.height-1) )
+
+// TODO: add code to take advantage of HW acceleration
+
 extern RGBColor workspace_default_color;	// defined in AppServer.cpp
 
 //TODO: Remove the need for these
-int64 solidhigh64=0xFFFFFFFFLL;
-int8 *solidhigh=(int8*)solidhigh64;
+int64 patsolidhigh64=0xFFFFFFFFLL;
+int8 *patsolidhigh=(int8*)patsolidhigh64;
 
 void HLine_32Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, rgb_color col);
 void HLine_16Bit(graphics_card_info i, uint16 x, uint16 y, uint16 length, uint16 col);
@@ -117,6 +127,34 @@ void FrameBuffer::ScreenConnected(bool connected)
 		// Cache the state just in case
 		graphics_card_info *info=CardInfo();
 		gcinfo=*info;
+
+		// Add our spiffy HW acceleration support
+//		graphics_card_hook gchook;
+/*		_ae=(acquire_engine)CardHookAt(B_ACQUIRE_ENGINE);
+		_re=(release_engine)CardHookAt(B_RELEASE_ENGINE);
+		_s2sb=(screen_to_screen_blit)CardHookAt(B_SCREEN_TO_SCREEN_BLIT);
+		_fspan=(fill_span)CardHookAt(B_FILL_SPAN);
+		_ir=(invert_rectangle)CardHookAt(HWINVERT);
+
+		printf("Hardware Acceleration capabilities:\n");
+		if(_ae)
+			printf("Acquire Engine\n");
+		if(_re)
+			printf("Release Engine\n");
+		if(_s2sb)
+			printf("Screen-To-Screen Blit\n");
+		if(_fspan)
+			printf("Fill Span\n");
+		if(_ir)
+			printf("Invert Rectangle\n");
+
+		gchook=CardHookAt(HWLINE_32BIT);
+		if(gchook)
+			printf("32-big line\n");
+		gchook=CardHookAt(HWBLIT);
+		if(gchook)
+			printf("Screen Blit\n");
+*/
 	}
 }
 
@@ -544,9 +582,12 @@ bool ScreenDriver::Initialize(void)
 		d.highcolor=workspace_default_color;
 		for(int32 i=0; i<info->height; i++)
 		{
-			Line(BPoint(0,i),BPoint(info->width-1,i),&d,solidhigh);
+			Line(BPoint(0,i),BPoint(info->width-1,i),&d,patsolidhigh);
+//			HLine(0, info->width-1, i, workspace_default_color);
 		}
 	}
+	else
+		printf("Not connected in Initialize\n");
 
 	// we start out without a cursor shown because otherwise we get glitches in the
 	// upper left corner. init_desktop *always* sets a cursor, so this shouldn't be a problem
@@ -575,6 +616,7 @@ void ScreenDriver::Shutdown(void)
 */
 void ScreenDriver::CopyBits(BRect src, BRect dest)
 {
+printf("ScreenDriver::CopyBits unimplemented\n");
 }
 
 /*!
@@ -698,8 +740,8 @@ void ScreenDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 		pstart = y - half;
 		for (pix = pstart; pix < pstart + thick; pix++)
 		{
-			Line( BPoint(cx - x, cy + pix), BPoint(cx + x, cy + pix), ldata, solidhigh);
-			Line( BPoint(cx - x, cy - pix), BPoint(cx + x, cy - pix), ldata, solidhigh);
+			Line( BPoint(cx - x, cy + pix), BPoint(cx + x, cy + pix), ldata, patsolidhigh);
+			Line( BPoint(cx - x, cy - pix), BPoint(cx + x, cy - pix), ldata, patsolidhigh);
 		}
 		if (d < 0)
 			d += b_sq_4 * x++ + b_sq_6;
@@ -723,8 +765,8 @@ void ScreenDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 			pstart = yp - half2;
 			for (pix = pstart; pix < pstart + thick2; pix++)
 			{
-				Line( BPoint(cx - xp, cy + pix), BPoint(cx + xp, cy + pix), ldata, solidhigh);
-				Line( BPoint(cx - xp, cy - pix), BPoint(cx + xp, cy - pix), ldata, solidhigh);
+				Line( BPoint(cx - xp, cy + pix), BPoint(cx + xp, cy + pix), ldata, patsolidhigh);
+				Line( BPoint(cx - xp, cy - pix), BPoint(cx + xp, cy - pix), ldata, patsolidhigh);
 			}
 			if (dp < 0)
 				dp += b_sq_4 * xp++ + b_sq_6;
@@ -740,8 +782,8 @@ void ScreenDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 		pstart = x - half;
 		for (pix = pstart; pix < pstart + thick; pix++)
 		{
-			Line( BPoint(cx - pix, cy + y), BPoint(cx + pix, cy + y), ldata, solidhigh);
-			Line( BPoint(cx - pix, cy - y), BPoint(cx + pix, cy - y), ldata, solidhigh);
+			Line( BPoint(cx - pix, cy + y), BPoint(cx + pix, cy + y), ldata, patsolidhigh);
+			Line( BPoint(cx - pix, cy - y), BPoint(cx + pix, cy - y), ldata, patsolidhigh);
 		}
 		
 		if (d < 0)
@@ -784,7 +826,8 @@ void ScreenDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 */
 void ScreenDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
-	FillRect(r,d,pat);
+	printf("ScreenDriver::FillRoundRect unimplemented\n");
+	StrokeRoundRect(r,xrad,yrad,d,pat);
 }
 
 /*!
@@ -1058,7 +1101,8 @@ void ScreenDriver::SetMode(int32 space)
 		d.highcolor=workspace_default_color;
 		for(int32 i=0; i<info->height; i++)
 		{
-			Line(BPoint(0,i),BPoint(info->width-1,i),&d,solidhigh);
+			Line(BPoint(0,i),BPoint(info->width-1,i),&d,patsolidhigh);
+//			HLine(0,info->width-1,i,workspace_default_color);
 		}
 		_SetMode(space);
 		frame_buffer_info fbi=*fbuffer->FrameBufferInfo();
@@ -1515,10 +1559,33 @@ void ScreenDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 */
 void ScreenDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
-// TODO: Implement
-printf("ScreenDriver::StrokeRoundRect( (%f,%f,%f,%f), %llx) ---->Unimplemented<----\n",r.left,r.top,
-	r.right,r.bottom,*((uint64*)pat));
-	StrokeRect(r,d,pat);
+	float hLeft, hRight;
+	float vTop, vBottom;
+	float bLeft, bRight, bTop, bBottom;
+	_Lock();
+	PatternHandler pattern(pat);
+	pattern.SetColors(d->highcolor, d->lowcolor);
+
+	hLeft = r.left + xrad;
+	hRight = r.right - xrad;
+	vTop = r.top + yrad;
+	vBottom = r.bottom - yrad;
+	bLeft = hLeft + xrad;
+	bRight = hRight -xrad;
+	bTop = vTop + yrad;
+	bBottom = vBottom - yrad;
+	StrokeArc(BRect(bRight, r.top, r.right, bTop), 0, 90, d, pat);
+	Line(BPoint(hLeft,r.top), BPoint(hRight, r.top), d, pat);
+	
+	StrokeArc(BRect(r.left,r.top,bLeft,bTop), 90, 90, d, pat);
+	Line(BPoint(r.left,vTop),BPoint(r.left,vBottom),d,pat);
+
+	StrokeArc(BRect(r.left,bBottom,bLeft,r.bottom), 180, 90, d, pat);
+	Line(BPoint(hLeft,r.bottom), BPoint(hRight, r.bottom), d, pat);
+
+	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d, pat);
+	StrokeLine(BPoint(r.right,vBottom),BPoint(r.right,vTop),d,pat);
+	_Unlock();
 }
 
 /*!
@@ -1654,13 +1721,15 @@ void ScreenDriver::HideCursor(void)
 */
 void ScreenDriver::MoveCursorTo(float x, float y)
 {
+	if(!under_cursor)
+		return;
 	_Lock();
 	if(!IsCursorHidden())
 		BlitBitmap(under_cursor,under_cursor->Bounds(),cursorframe, B_OP_COPY);
 
 	cursorframe.OffsetTo(x,y);
 	ExtractToBitmap(under_cursor,under_cursor->Bounds(),cursorframe);
-	
+		
 	if(!IsCursorHidden())
 		BlitBitmap(cursor,cursor->Bounds(),cursorframe, B_OP_OVER);
 	
@@ -1744,8 +1813,22 @@ void ScreenDriver::SetCursor(ServerCursor *csr)
 
 void ScreenDriver::HLine(int32 x1, int32 x2, int32 y, RGBColor color)
 {
+// TODO: make this work with HW Acceleration, if possible
+#ifndef DISABLE_HARDWARE_ACCELERATION
 	// Internal function called from others in the driver
-	
+	if(fbuffer->_fspan)
+	{
+		uint16 ptarray[3];
+		ptarray[0]=(uint16)x1;
+		ptarray[1]=(uint16)x2;
+		ptarray[2]=(uint16)y;
+		rgb_color col=color.GetColor32();
+		fbuffer->_ae(B_2D_ACCELERATION,100000,&fbuffer->_stoken,&fbuffer->_et);
+		fbuffer->_fspan(fbuffer->_et,*((uint32*)&col),ptarray,1);
+		fbuffer->_re(fbuffer->_et,&fbuffer->_stoken);
+		return;
+	}
+#endif
 	// TODO: Implement and substitute Line() calls with HLine calls as appropriate
 	// elsewhere in the driver
 	
@@ -1833,10 +1916,8 @@ void ScreenDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect de
 	// Second, check rectangle bounds against their own bitmaps
 	BRect work_rect;
 
-	work_rect.Set(	sourcebmp->Bounds().left,
-					sourcebmp->Bounds().top,
-					sourcebmp->Bounds().right,
-					sourcebmp->Bounds().bottom	);
+	work_rect=sourcebmp->Bounds();
+	
 	if( !(work_rect.Contains(sourcerect)) )
 	{	// something in selection must be clipped
 		if(sourcerect.left < 0)
@@ -1849,19 +1930,22 @@ void ScreenDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect de
 			sourcerect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(	0,0,fbuffer->gcinfo.width-1,fbuffer->gcinfo.height-1);
+	work_rect.Set(0,0,fbuffer->gcinfo.width-1,fbuffer->gcinfo.height-1);
 
-	if( !(work_rect.Contains(destrect)) )
-	{	// something in selection must be clipped
-		if(destrect.left < 0)
-			destrect.left = 0;
-		if(destrect.right > work_rect.right)
-			destrect.right = work_rect.right;
-		if(destrect.top < 0)
-			destrect.top = 0;
-		if(destrect.bottom > work_rect.bottom)
-			destrect.bottom = work_rect.bottom;
-	}
+	// Check to see if we actually need to copy anything
+	if( (destrect.right<work_rect.left) || (destrect.left>work_rect.right) ||
+			(destrect.bottom<work_rect.top) || (destrect.top>work_rect.bottom) )
+		return;
+
+	// something in selection must be clipped
+	if(destrect.left < 0)
+		destrect.left = 0;
+	if(destrect.right > work_rect.right)
+		destrect.right = work_rect.right;
+	if(destrect.top < 0)
+		destrect.top = 0;
+	if(destrect.bottom > work_rect.bottom)
+		destrect.bottom = work_rect.bottom;
 
 	// Set pointers to the actual data
 	uint8 *src_bits  = (uint8*) sourcebmp->Bits();	
@@ -1882,7 +1966,8 @@ void ScreenDriver::BlitBitmap(ServerBitmap *sourcebmp,BRect sourcerect, BRect de
 	{
 		case B_OP_OVER:
 		{
-			uint32 srow_pixels=src_width>>2;
+//			uint32 srow_pixels=src_width>>2;
+			uint32 srow_pixels=((destrect.IntegerWidth()>=sourcerect.IntegerWidth())?src_width:destrect.IntegerWidth()+1)>>2;
 			uint8 *srow_index, *drow_index;
 			
 			

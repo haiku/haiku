@@ -32,6 +32,7 @@
 #include <WindowScreen.h>
 #include <View.h>
 #include <GraphicsCard.h>
+#include <Accelerant.h>
 #include <Message.h>
 #include <OS.h>
 #include <Locker.h>
@@ -48,7 +49,38 @@ class ServerCursor;
 class ServerBitmap;
 class RGBColor;
 class PortLink;
+class ScreenDriver;
+class PatternHandler;
 
+// defines to translate acceleration function indices to something I can remember
+#define HWLINE_8BIT 3
+#define HWLINE_32BIT 4
+#define HWRECT_8BIT 5
+#define HWRECT_32BIT 6
+#define HWBLIT 7
+#define HWLINEARRAY_8BIT 8
+#define HWLINEARRAY_32BIT 9
+#define HWSYNC 10
+#define HWINVERT 11
+#define HWLINE_16BIT 12
+#define HWRECT_16BIT 13
+
+// function pointer typedefs for accelerated 2d functions - from Be Advanced Topics.
+typedef int32 hwline8bit(int32 sx,int32 dx, int32 sy, int32 dy, uint8 color,
+				bool cliptorect,int16 clipleft, int16 cliptop, int16 clipright, int16 clipbottom);
+typedef int32 hwline32bit(int32 sx,int32 dx, int32 sy, int32 dy, uint32 color,
+				bool cliptorect,int16 clipleft, int16 cliptop, int16 clipright, int16 clipbottom);
+typedef int32 hwrect8bit(int32 left, int32 top, int32 right, int32 bottom, uint8 color);
+typedef int32 hwrect32bit(int32 left, int32 top, int32 right, int32 bottom, uint32 color);
+typedef int32 hwblit(int32 sx, int32 sy, int32 dx, int32 dy, int32 width, int32 height);
+typedef int32 hwlinearray8bit(indexed_color_line *array, int32 linecount,
+				bool cliptorect,int16 clipleft, int16 cliptop, int16 clipright, int16 clipbottom);
+typedef int32 hwlinearray32bit(rgb_color_line *array, int32 linecount,
+				bool cliptorect,int16 clipleft, int16 cliptop, int16 clipright, int16 clipbottom);
+typedef int32 hwsync(void);
+typedef int32 hwline16bit(int32 sx,int32 dx, int32 sy, int32 dy, uint16 color,
+				bool cliptorect,int16 clipleft, int16 cliptop, int16 clipright, int16 clipbottom);
+typedef int32 hwrect16bit(int32 left, int32 top, int32 right, int32 bottom, uint16 color);
 
 class FrameBuffer : public BWindowScreen
 {
@@ -62,12 +94,40 @@ public:
 	static int32 MouseMonitor(void *data);
 	graphics_card_info gcinfo;
 protected:
+	friend ScreenDriver;
+	
 	bool is_connected;
 	PortLink *serverlink;
 	BPoint mousepos;
 	uint32 buttons;
 	thread_id monitor_thread;
 	BView *view;
+
+	// HW Acceleration stuff
+	display_mode _dm;
+	
+	frame_buffer_config _fbc;
+	
+	set_cursor_shape _scs;
+	move_cursor _mc;
+	show_cursor _sc;
+	sync_token _st;
+	engine_token *_et;
+	acquire_engine _ae;
+	release_engine _re;
+	fill_rectangle _frect;
+	fill_span _fspan;
+	
+	screen_to_screen_blit _s2sb;
+	fill_rectangle _fr;
+	invert_rectangle _ir;
+	screen_to_screen_transparent_blit _s2stb;
+	fill_span _fs;
+	
+	hwline32bit _hwline32;
+	hwrect32bit _hwrect32;
+	
+	sync_token _stoken;
 };
 
 /*
@@ -144,6 +204,7 @@ protected:
 	void SetPixelPattern(int x, int y, uint8 *pattern, uint8 patternindex);
 	void Line(BPoint start, BPoint end, LayerData *d, int8 *pat);
 	void HLine(int32 x1, int32 x2, int32 y, RGBColor color);
+	void HLineThick(int32 x1, int32 x2, int32 y, int32 thick, PatternHandler *pat);
 	rgb_color GetBlitColor(rgb_color src, rgb_color dest, LayerData *d, bool use_high=true);
 	void SetPixel(int x, int y, RGBColor col);
 	void SetPixel32(int x, int y, rgb_color col);
