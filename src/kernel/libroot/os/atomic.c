@@ -1,14 +1,17 @@
 /* 
 ** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
+
 
 #include <SupportDefs.h>
 
-#include <arch_cpu.h>
+#include <arch_config.h>
 #include <syscalls.h>
 
+
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
+
 int32
 atomic_set(vint32 *value, int32 newValue)
 {
@@ -44,9 +47,11 @@ atomic_get(vint32 *value)
 {
 	return _kern_atomic_get(value);
 }
-#endif
+
+#endif	/* ATOMIC_FUNCS_ARE_SYSCALLS */
 
 #ifdef ATOMIC64_FUNCS_ARE_SYSCALLS
+
 int64
 atomic_set64(vint64 *value, int64 newValue)
 {
@@ -82,4 +87,5 @@ atomic_get64(vint64 *value)
 {
 	return _kern_atomic_get64(value);
 }
-#endif
+
+#endif	/* ATOMIC64_FUNCS_ARE_SYSCALLS */

@@ -17,7 +17,7 @@
 #include <sem.h>
 #include <port.h>
 #include <cpu.h>
-#include <arch/cpu.h>
+#include <arch_config.h>
 #include <sys/resource.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
