@@ -69,8 +69,6 @@ enum {
 
 /* max. number of overlay buffers */
 #define MAXBUFFERS 3
-/* max. pixelclock speed the BES supports */
-#define BESMAXSPEED 135000
 
 /* internal used info on overlay buffers */
 typedef	struct
