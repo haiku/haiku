@@ -48,15 +48,15 @@ private:
 	ssize_t ReadStream();
 		// Load the stream buffer from the stream
 
-	BPositionIO *m_pStream;
+	BPositionIO *fpStream;
 		// stream object this object is buffering
-	uint8 *m_pBuffer;
-		// buffered data from m_pStream
-	size_t m_nBufferSize;
-		// number of bytes of memory allocated for m_pBuffer
-	size_t m_nLen;
-		// number of bytes of actual data in m_pBuffer
-	size_t m_nPos;
+	uint8 *fpBuffer;
+		// buffered data from fpStream
+	size_t fnBufferSize;
+		// number of bytes of memory allocated for fpBuffer
+	size_t fnLen;
+		// number of bytes of actual data in fpBuffer
+	size_t fnPos;
 		// current position in the buffer
 };
 
