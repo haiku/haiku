@@ -28,6 +28,7 @@
 #include "device.h"
 #include "driver.h"
 #include "setup.h"
+#include "timer.h"
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -103,12 +104,20 @@ init_driver(void)
 
 	free(item);
 	
-	if (!cards) {
-		put_module(B_PCI_MODULE_NAME);
-		return B_ERROR;
+	if (!cards)
+		goto err_cards;
+	
+	if (initialize_timer() != B_OK) {
+		ERROR("timer init failed\n");
+		goto err_timer;
 	}
-
+	
 	return B_OK;
+	
+err_timer:
+err_cards:
+	put_module(B_PCI_MODULE_NAME);
+	return B_ERROR;	
 }
 
 
@@ -119,6 +128,8 @@ uninit_driver(void)
 
 	TRACE("uninit_driver()\n");
 	
+	terminate_timer();
+
 	for (i = 0; gDevNameList[i] != NULL; i++) {
 		free(gDevList[i]);
 		free(gDevNameList[i]);
