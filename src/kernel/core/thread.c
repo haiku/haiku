@@ -74,7 +74,7 @@ static struct thread_queue run_q[(B_MAX_PRIORITY / 2) + 1] = { { NULL, NULL }, }
 #endif /* NEW_SCHEDULER */
 struct thread_queue dead_q;
 
-static void thread_entry(void);
+static void thread_kthread_entry(void);
 static void thread_kthread_exit(void);
 //static void deliver_signal(struct thread *t, int signal);
 
@@ -414,7 +414,7 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 
 	if (kernel) {
 		// this sets up an initial kthread stack that runs the entry
-		arch_thread_initialize_kthread_stack(t, &_create_kernel_thread_kentry, &thread_entry, &thread_kthread_exit);
+		arch_thread_initialize_kthread_stack(t, &_create_kernel_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	} else {
 		// create user stack
 		// XXX make this better. For now just keep trying to create a stack
@@ -438,7 +438,7 @@ _create_thread(const char *name, team_id pid, addr entry, void *args, int priori
 		// copy the user entry over to the args field in the thread struct
 		// the function this will call will immediately switch the thread into
 		// user space.
-		arch_thread_initialize_kthread_stack(t, &_create_user_thread_kentry, &thread_entry, &thread_kthread_exit);
+		arch_thread_initialize_kthread_stack(t, &_create_user_thread_kentry, &thread_kthread_entry, &thread_kthread_exit);
 	}
 
 	t->state = B_THREAD_SUSPENDED;
@@ -894,7 +894,7 @@ snooze(bigtime_t timeout)
 // this function gets run by a new thread before anything else
 
 static void
-thread_entry(void)
+thread_kthread_entry(void)
 {
 	// simulates the thread spinlock release that would occur if the thread had been
 	// rescheded from. The resched didn't happen because the thread is new.
