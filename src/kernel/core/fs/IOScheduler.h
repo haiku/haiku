@@ -14,15 +14,13 @@
 #include <lock.h>
 
 
-class IORequest {
+class IORequest : public DoublyLinkedListLinkImpl<IORequest> {
 	public:
 		IORequest(void *cookie, off_t offset, void *buffer, size_t size, bool write = false);
 		IORequest(void *cookie, off_t offset, const void *buffer, size_t size, bool write = true);
 			// ToDo: iovecs version?
 
 		size_t Size() const { return size; }
-
-		DoublyLinked::Link link;
 
 		void		*cookie;
 		addr_t		physical_address;
@@ -54,7 +52,7 @@ class IOScheduler {
 		pnp_devfs_driver_info	*fDeviceHooks;
 		mutex					fLock;
 		thread_id				fThread;
-		DoublyLinked::List<IORequest, &IORequest::link> fRequests;
+		DoublyLinkedList<IORequest> fRequests;
 };
 
 #endif	/* IO_SCHEDULER_H */

@@ -38,7 +38,8 @@
 #define DEBUG_CHANGED
 
 struct cache_transaction;
-typedef DoublyLinked::Link block_link;
+struct cached_block;
+typedef DoublyLinkedListLink<cached_block> block_link;
 
 struct cached_block {
 	cached_block	*next;			// next in hash
@@ -67,7 +68,9 @@ struct block_cache {
 	hash_table	*transaction_hash;
 };
 
-typedef DoublyLinked::List<cached_block, &cached_block::previous_transaction_link> block_list;
+typedef DoublyLinkedList<cached_block,
+	DoublyLinkedListMemberGetLink<cached_block,
+		&cached_block::previous_transaction_link> > block_list;
 
 struct cache_transaction {
 	cache_transaction *next;
@@ -514,7 +517,7 @@ cache_sync_transaction(void *_cache, int32 id)
 
 		if (transaction->id <= id && !transaction->open) {
 			while (transaction->num_blocks > 0) {
-				status = write_cached_block(cache, block_list::GetItem(transaction->blocks.Head()), false);
+				status = write_cached_block(cache, transaction->blocks.Head(), false);
 				if (status != B_OK)
 					return status;
 			}
