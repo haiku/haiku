@@ -1,4 +1,4 @@
-BFS - ToDo, September 7th, 2002
+BFS - ToDo, October 22th, 2002
 -----
 
 BlockAllocator
@@ -36,6 +36,7 @@ Journal
 BPlusTree
 
  - BPlusTree::Remove() could trigger CachedNode::Free() to go through the free nodes list and free all pages at the end of the data stream
+ - BPlusTree::Remove() could let the tree shrink (simple kind of reorganization)
  - updating the TreeIterators doesn't work yet for duplicates (which may be a problem if a duplicate node will go away after a remove)
  - BPlusTree::RemoveDuplicate() could spread the contents of duplicate node with only a few entries to save some space (right now, only empty nodes are freed)
 
@@ -69,6 +70,8 @@ kernel_interface
 general stuff
 
  - There are also some comments with a leading "ToDo:" directly in the code which may not be mentioned here.
+ - implement chkbfs functionality in BFS (with a small ioctl API for the shell command)
+ - implement mkbfs (try to do it in OpenBeOS style directly - only write the super block from user space)
 
 
 -----
