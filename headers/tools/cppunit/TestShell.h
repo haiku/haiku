@@ -13,6 +13,7 @@
 #include <string>
 
 class BDirectory;
+class BPath;
 
 // Defines SuiteFunction to be a pointer to a function that
 // takes no arguments and returns a pointer to a CppUnit::Test
