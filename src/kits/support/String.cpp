@@ -629,28 +629,32 @@ BString::ICompare(const char *str, int32 n) const
 int32
 BString::FindFirst(const BString &string) const
 {
-	return _FindAfter(string.String(), 0, -1);
+	return _ShortFindAfter(string.String(), string.Length());
 }
 
 
 int32
 BString::FindFirst(const char *string) const
 {
-	return _FindAfter(string, 0, -1);
+	if (string == NULL)
+		return 0;
+	return _ShortFindAfter(string, strlen(string));
 }
 
 
 int32
 BString::FindFirst(const BString &string, int32 fromOffset) const
 {
-	return _FindAfter(string.String(), fromOffset, -1);
+	return _FindAfter(string.String(), fromOffset, string.Length());
 }
 
 
 int32
 BString::FindFirst(const char *string, int32 fromOffset) const
 {
-	return _FindAfter(string, fromOffset, -1);
+	if (string == NULL)
+		return 0;
+	return _FindAfter(string, fromOffset, strlen(string));
 }
 
 
@@ -659,7 +663,7 @@ BString::FindFirst(char c) const
 {
 	char tmp[2] = { c, '\0' };
 	
-	return _FindAfter(tmp, 0, -1);	
+	return _ShortFindAfter(tmp, 1);	
 }
 
 
@@ -668,35 +672,39 @@ BString::FindFirst(char c, int32 fromOffset) const
 {
 	char tmp[2] = { c, '\0' };
 	
-	return _FindAfter(tmp, fromOffset, -1);	
+	return _FindAfter(tmp, fromOffset, 1);	
 }
 
 
 int32
 BString::FindLast(const BString &string) const
 {
-	return _FindBefore(string.String(), Length(), -1);
+	return _FindBefore(string.String(), Length(), string.Length());
 }
 
 
 int32
 BString::FindLast(const char *str) const
 {
-	return _FindBefore(str, Length(), -1);
+	if (str == NULL)
+		return 0;
+	return _FindBefore(str, Length(), strlen(str));
 }
 
 
 int32
 BString::FindLast(const BString &string, int32 beforeOffset) const
 {
-	return _FindBefore(string.String(), beforeOffset, -1); 
+	return _FindBefore(string.String(), beforeOffset, string.Length()); 
 }
 
 
 int32
 BString::FindLast(const char *str, int32 beforeOffset) const
 {
-	return _FindBefore(str, beforeoffset, -1);
+	if (str == NULL)
+		return 0;
+	return _FindBefore(str, beforeOffset, strlen(str));
 }
 
 
@@ -705,7 +713,7 @@ BString::FindLast(char c) const
 {
 	char tmp[2] = { c, '\0' };
 	
-	return _FindBefore(tmp, Length(), -1);
+	return _FindBefore(tmp, Length(), 1);
 }
 
 
@@ -714,63 +722,71 @@ BString::FindLast(char c, int32 beforeOffset) const
 {
 	char tmp[2] = { c, '\0' };
 	
-	return _FindBefore(tmp, beforeOffset, -1);	
+	return _FindBefore(tmp, beforeOffset, 1);	
 }
 
 
 int32
 BString::IFindFirst(const BString &string) const
 {
-	return _IFindAfter(string.String(), 0, -1);
+	return _IFindAfter(string.String(), 0, string.Length());
 }
 
 
 int32
 BString::IFindFirst(const char *string) const
 {
-	return _IFindAfter(string, 0, -1);
+	if (string == NULL)
+		return 0;
+	return _IFindAfter(string, 0, strlen(string));
 }
 
 
 int32
 BString::IFindFirst(const BString &string, int32 fromOffset) const
 {
-	return _IFindAfter(string.String(), fromOffset, -1);
+	return _IFindAfter(string.String(), fromOffset, string.Length());
 }
 
 
 int32
 BString::IFindFirst(const char *string, int32 fromOffset) const
 {
-	return _IFindAfter(string, fromOffset, -1);
+	if (string == NULL)
+		return 0;
+	return _IFindAfter(string, fromOffset, strlen(string));
 }
 
 
 int32
 BString::IFindLast(const BString &string) const
 {
-	return _IFindBefore(string.String(), Length(), -1);
+	return _IFindBefore(string.String(), Length(), string.Length());
 }
 
 
 int32
 BString::IFindLast(const char *string) const
 {
-	return _IFindBefore(string, Length(), -1);
+	if (string == NULL)
+		return 0;
+	return _IFindBefore(string, Length(), strlen(string));
 }
 
 
 int32
 BString::IFindLast(const BString &string, int32 beforeOffset) const
 {
-	return _IFindBefore(string.String(), beforeOffset, -1);
+	return _IFindBefore(string.String(), beforeOffset, string.Length());
 }
 
 
 int32
 BString::IFindLast(const char *string, int32 beforeOffset) const
 {
-	return _IFindBefore(string, beforeOffset, -1);
+	if (string == NULL)
+		return 0;
+	return _IFindBefore(string, beforeOffset, strlen(string));
 }
 
 
@@ -1471,10 +1487,9 @@ BString::_DoPrepend(const char *str, int32 count)
 
 
 int32
-BString::_FindAfter(const char *str, int32 offset, int32) const
+BString::_FindAfter(const char *str, int32 offset, int32 strlen) const
 {	
-	if (!str)
-		return 0;
+	ASSERT(str != NULL);
 	
 	if (offset > Length())
 		return B_ERROR;
@@ -1489,10 +1504,9 @@ BString::_FindAfter(const char *str, int32 offset, int32) const
 
 
 int32
-BString::_IFindAfter(const char *str, int32 offset, int32 ) const
+BString::_IFindAfter(const char *str, int32 offset, int32 strlen) const
 {
-	if (!str)
-		return 0;
+	ASSERT(str != NULL);
 
 	if (offset > Length())
 		return B_ERROR;
@@ -1507,29 +1521,31 @@ BString::_IFindAfter(const char *str, int32 offset, int32 ) const
 
 
 int32
-BString::_ShortFindAfter(const char *str, int32) const
+BString::_ShortFindAfter(const char *str, int32 strlen) const
 {
 	ASSERT(str != NULL);
-	//TODO: Implement?
+	
+	char *ptr = strstr(String(), str);
+
+	if (ptr != NULL)
+		return ptr - String();
+	
 	return B_ERROR;
 }
 
 
 int32
-BString::_FindBefore(const char *str, int32 offset, int32) const
+BString::_FindBefore(const char *str, int32 offset, int32 strlen) const
 {
-	if (!str)
-		return 0;
+	ASSERT(str != NULL);
 	
 	if (offset <= 0)
 		return B_ERROR;
-	
-	int len2 = strlen(str);
-		
-	char *ptr1 = _privateData + offset - len2;
+			
+	char *ptr1 = _privateData + offset - strlen;
 	
 	while (ptr1 >= _privateData) {
-		if (!memcmp(ptr1, str, len2))
+		if (!memcmp(ptr1, str, strlen))
 			return ptr1 - _privateData; 
 		ptr1--;
 	}
@@ -1539,20 +1555,17 @@ BString::_FindBefore(const char *str, int32 offset, int32) const
 
 
 int32
-BString::_IFindBefore(const char *str, int32 offset, int32) const
+BString::_IFindBefore(const char *str, int32 offset, int32 strlen) const
 {
-	if (!str)
-		return 0;
+	ASSERT(str != NULL);
 	
 	if (offset <= 0)
 		return B_ERROR;
-	
-	int len2 = strlen(str);
-		
-	char *ptr1 = _privateData + offset - len2;
+			
+	char *ptr1 = _privateData + offset - strlen;
 	
 	while (ptr1 >= _privateData) {
-		if (!strncasecmp(ptr1, str, len2))
+		if (!strncasecmp(ptr1, str, strlen))
 			return ptr1 - _privateData; 
 		ptr1--;
 	}
@@ -1579,6 +1592,7 @@ BString::_SetUsingAsCString(bool state)
 void
 BString::_AssertNotUsingAsCString() const
 {
+	ASSERT(*((int32*)_privateData - 1) & 0x80000000 == 0);
 }
 #endif
 
