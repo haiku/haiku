@@ -2,15 +2,14 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#include <kernel.h>
-#include <stage2.h>
-#include <memheap.h>
-#include <devfs.h>
+
+
+#include <Drivers.h>
 #include <vm.h>
 #include <string.h>
-#include <Errors.h>
 
 #define DEVICE_NAME "zero"
+
 
 static status_t
 zero_open(const char *name, uint32 flags, void **cookie)
@@ -19,47 +18,54 @@ zero_open(const char *name, uint32 flags, void **cookie)
 	return 0;
 }
 
+
 static status_t
-zero_close(void * cookie)
+zero_close(void *cookie)
 {
 	return 0;
 }
 
+
 static status_t
-zero_freecookie(void * cookie)
+zero_freecookie(void *cookie)
 {
 	return 0;
 }
 
+
 static status_t
-zero_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+zero_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	return EPERM;
 }
 
-static ssize_t
-zero_read(void * cookie, off_t pos, void *buf, size_t *len)
-{
-	int rc;
 
-	rc = user_memset(buf, 0, *len);
-	if(rc < 0)
-		return rc;
+static ssize_t
+zero_read(void *cookie, off_t pos, void *buffer, size_t *_length)
+{
+	if (user_memset(buffer, 0, *_length) < B_OK)
+		return B_BAD_ADDRESS;
 
 	return 0;
 }
 
+
 static ssize_t
-zero_write(void * cookie, off_t pos, const void *buf, size_t *len)
+zero_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	return 0;
 }
+
+
+//	#pragma mark -
+
 
 status_t
 init_hardware()
 {
 	return 0;
 }
+
 
 const char **
 publish_devices(void)
@@ -71,6 +77,7 @@ publish_devices(void)
 
 	return devices;
 }
+
 
 device_hooks *
 find_device(const char *name)
@@ -97,11 +104,13 @@ find_device(const char *name)
 	return NULL;
 }
 
+
 status_t
 init_driver()
 {
 	return 0;
 }
+
 
 void
 uninit_driver()

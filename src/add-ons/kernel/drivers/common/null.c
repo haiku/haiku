@@ -2,45 +2,49 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-#include <kernel.h>
-#include <stage2.h>
-#include <memheap.h>
-#include <devfs.h>
-#include <Errors.h>
+
+
+#include <Drivers.h>
 #include <string.h>
 
 #define DEVICE_NAME "null"
 
+
 static status_t
-null_open(const char *name, uint32 flags, void * *cookie)
+null_open(const char *name, uint32 flags, void **cookie)
 {
 	*cookie = NULL;
 	return 0;
 }
 
+
 static status_t
-null_close(void * cookie)
+null_close(void *cookie)
 {
 	return 0;
 }
 
+
 static status_t
-null_freecookie(void * cookie)
+null_freecookie(void *cookie)
 {
 	return 0;
 }
 
+
 static status_t
-null_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+null_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 {
 	return EPERM;
 }
 
+
 static ssize_t
-null_read(void * cookie, off_t pos, void *buf, size_t *len)
+null_read(void *cookie, off_t pos, void *buffer, size_t *length)
 {
 	return 0;
 }
+
 
 static ssize_t
 null_write(void * cookie, off_t pos, const void *buf, size_t *len)
@@ -48,11 +52,16 @@ null_write(void * cookie, off_t pos, const void *buf, size_t *len)
 	return 0;
 }
 
+
+//	#pragma mark -
+
+
 status_t
 init_hardware()
 {
 	return 0;
 }
+
 
 const char **
 publish_devices(void)
@@ -64,6 +73,7 @@ publish_devices(void)
 
 	return devices;
 }
+
 
 device_hooks *
 find_device(const char *name)
@@ -90,14 +100,16 @@ find_device(const char *name)
 	return NULL;
 }
 
+
 status_t
-init_driver()
+init_driver(void)
 {
 	return 0;
 }
 
+
 void
-uninit_driver()
+uninit_driver(void)
 {
 }
 
