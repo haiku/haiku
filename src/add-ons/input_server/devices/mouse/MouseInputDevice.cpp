@@ -142,9 +142,15 @@ MouseInputDevice::InitCheck()
 {
 	InitFromSettings();
 	
+	input_device_ref **devices = NULL;
+	devices = (input_device_ref **)malloc(sizeof(input_device_ref *) * 2);
+	if (!devices)
+		return B_NO_MEMORY;
+
 	input_device_ref mouse1 = { "Mouse 1", B_POINTING_DEVICE, (void *)this };
 		
-	input_device_ref *devices[2] = { &mouse1, NULL };
+	devices[0] = &mouse1;
+	devices[1] = NULL;
 		
 	if (fFd >= 0 && fThread >= 0) {	
 		RegisterDevices(devices);
@@ -215,7 +221,8 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	BMessage *message;
 	char log[128];
 	while (!dev->fQuit) {
-		ioctl(dev->fFd, kGetMouseMovements, &movements);
+		if (ioctl(dev->fFd, kGetMouseMovements, &movements) < B_OK)
+			continue;
 		
 		// TODO: send B_MOUSE_UP/B_MOUSE_DOWN messages
 		uint32 buttons = dev->fButtons ^ movements.buttons;
