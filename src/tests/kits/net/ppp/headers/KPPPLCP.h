@@ -41,10 +41,15 @@ class PPPLCP : public PPPProtocol {
 			{ return fOptionHandlers.CountItems(); }
 		PPPOptionHandler *OptionHandlerAt(int32 index) const;
 		
+		PPPEncapsulator *Target() const
+			{ return fTarget; }
 		void SetTarget(PPPEncapsulator *target)
 			{ fTarget = target; }
 			// if target != all packtes will be passed to the encapsulator
 			// instead of the interface/device
+		
+		uint32 AdditionalOverhead() const;
+			// the overhead caused by the target, the device, and the interface
 
 	private:
 		List<PPPOptionHandler*> fOptionHandlers;

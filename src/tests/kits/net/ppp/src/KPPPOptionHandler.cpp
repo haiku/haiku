@@ -6,3 +6,33 @@
 //---------------------------------------------------------------------
 
 #include "KPPPOptionHandler.h"
+
+
+PPPOptionHandler::PPPOptionHandler(const char *name, PPPInterface *interface,
+		driver_parameter *settings)
+	: fInterface(interface), fSettings(settings)
+{
+	fName = name ? strdup(name) : NULL;
+	
+	if(interface)
+		interface->LCP().AddOptionHandler(this);
+}
+
+
+PPPOptionHandler::~PPPOptionHandler()
+{
+	free(fName);
+	
+	if(Interface())
+		Interface()->LCP().RemoveOptionHandler(this);
+}
+
+
+status_t
+PPPOptionHandler::InitCheck() const
+{
+	if(!Interface() || !Settings())
+		return B_ERROR;
+	
+	return B_OK;
+}

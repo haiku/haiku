@@ -13,25 +13,30 @@
 
 #define PPP_MANAGER_MODULE_NAME "network/interfaces/ppp"
 
+// this allows you to ask for specific interface_ids
+enum PPP_INTERFACE_FILTER {
+	PPP_ALL_INTERFACES,
+	PPP_REGISTERED_INTERFACES,
+	PPP_UNREGISTERED_INTERFACES
+};
 
 typedef struct ppp_manager_info {
 	kernel_net_module_info knminfo;
 	
-	// when you want to iterate through interfaces you should use locking
-	void (*lock)();
-	void (*unlock)();
+	uint32 (*create_interface)(driver_settings *settings, interface_id parent);
+		// you should always create interfaces using this function
+	void (*delete_interface)(interface_id ID);
+		// this marks the interface for deletion
 	
-	ifnet* (*add_interface)(PPPInterface *interface);
-	bool (*remove_interface)(PPPInterface *interface);
+	ifnet* (*register_interface)(interface_id ID);
+	bool (*unregister_interface)(interface_id ID);
 	
-	int32 (*count_interfaces)(int32 index);
+	status_t (*control)(interface_id ID, uint32 op, void *data, size_t length);
 	
-	PPPInterface *(*get_interface_at)(int32 index);
-	void (*put_interface)(PPPInterface *interface);
-	
-	void (*delete_interface)(PPPInterface *interface);
-		// this deletes the interface when it is not needed anymore
-} ppp_manager;
+	status_t (*get_interfaces)(interface_id **interfaces, uint32 *count,
+		PPP_INTERFACE_FILTER filter = PPP_REGISTERED_INTERFACES);
+		// the user is responsible for free()'ing the interface_id array
+} ppp_manager_info;
 
 
 #endif

@@ -105,6 +105,8 @@ PPPStateMachine::AuthenticationAccepted(const char *name)
 	fAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
 	free(fAuthenticationName);
 	fAuthenticationName = strdup(name);
+	
+	Interface()->Report(PPP_CONNECTION_REPORT, PPP_REPORT_AUTHENTICATION_SUCCESSFUL, 0);
 }
 
 
@@ -147,6 +149,9 @@ PPPStateMachine::PeerAuthenticationAccepted(const char *name)
 	fPeerAuthenticationStatus = PPP_AUTHENTICATION_SUCCESSFUL;
 	free(fPeerAuthenticationName);
 	fPeerAuthenticationName = strdup(name);
+	
+	Interface()->Report(PPP_CONNECTION_REPORT,
+		PPP_REPORT_PEER_AUTHENTICATION_SUCCESSFUL, 0);
 }
 
 
@@ -183,17 +188,23 @@ PPPStateMachine::UpEvent(PPPInterface *interface)
 {
 	LockerHelper locker(fLock);
 	
-	if(Phase() <= PPP_TERMINATION_PHASE || State() != PPP_STARTING_STATE) {
+	if(Phase() <= PPP_TERMINATION_PHASE) {
 		interface->StateMachine().CloseEvent();
 		return;
 	}
 	
-	NewState(PPP_OPENED_STATE);
+	Interface()->CalculateBaudRate();
+	
 	if(Phase() == PPP_ESTABLISHMENT_PHASE) {
-		NewPhase(PPP_AUTHENTICATION_PHASE);
+		// this is the first interface that went up
+		Interface()->SetLinkMTU(interface->LinkMTU());
 		locker.UnlockNow();
 		ThisLayerUp();
-	}
+	} else if(Interface()->LinkMTU() > interface->LinkMTU())
+		Interface()->SetLinkMTU(interface->LinkMTU());
+			// linkMTU should always be the smallest value of all children
+	
+	NewState(PPP_OPENED_STATE);
 }
 
 
@@ -202,6 +213,11 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 {
 	LockerHelper locker(fLock);
 	
+	uint32 linkMTU = 0;
+		// the new linkMTU
+	
+	Interface()->CalculateBaudRate();
+	
 	// when all children are down we should not be running
 	if(Interface()->IsMultilink() && !Interface()->Parent()) {
 		uint32 count = 0;
@@ -209,9 +225,18 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 		for(int32 index = 0; index < Interface()->CountChildren(); index++) {
 			child = Interface()->ChildAt(index);
 			
-			if(child && child->IsUp())
+			if(child && child->IsUp()) {
+				// set linkMTU to the smallest value of all children
+				if(linkMTU == 0)
+					linkMTU = child->LinkMTU();
+				else if(linkMTU > child->LinkMTU())
+					linkMTU = child->LinkMTU();
+				
 				++count;
+			}
 		}
+		
+		Interface()->SetLinkMTU(linkMTU);
 		
 		if(count == 0) {
 			locker.UnlockNow();
@@ -372,10 +397,7 @@ PPPStateMachine::UpEvent()
 		return;
 			// it is not our device that went up...
 	
-	if(Interface()->Ifnet())
-		Interface()->Ifnet()->if_baudrate = max(
-			Interface()->Device()->InputTransferRate(),
-			Interface()->Device()->OutputTransferRate());
+	Interface()->CalculateBaudRate();
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -428,14 +450,14 @@ PPPStateMachine::DownEvent()
 {
 	LockerHelper locker(fLock);
 	
-	if(!Interface()->Device() || Interface()->Device->IsUp())
+	if(Interface()->Device() && Interface()->Device->IsUp())
 		return;
 			// it is not our device that went up...
 	
-	if(Interface()->Ifnet())
-		Interface()->Ifnet()->if_baudrate = max(
-			Interface()->Device()->InputTransferRate(),
-			Interface()->Device()->OutputTransferRate());
+	Interface()->CalculateBaudRate();
+	
+	// reset IdleSince
+	Interface()->fIdleSince = 0;
 	
 	switch(State()) {
 		case PPP_CLOSED_STATE:
@@ -1150,7 +1172,7 @@ PPPStateMachine::RCREvent(mbuf *packet)
 		handled = false;
 		
 		for(int32 index = 0; index < LCP().CountOptionHandlers();
-			index++) {
+				index++) {
 			handler = LCP().OptionHandlerAt(index);
 			error = handler->ParseRequest(&request, item, &nak, &reject);
 			if(error == PPP_UNHANLED)
@@ -1171,9 +1193,9 @@ PPPStateMachine::RCREvent(mbuf *packet)
 	}
 	
 	if(nak.CountItems() > 0)
-		RCRBadEvent(nak.ToMbuf(), NULL);
+		RCRBadEvent(nak.ToMbuf(LCP().AdditionalOverhead()), NULL);
 	else if(reject.CountItmes() > 0)
-		RCRBadEvent(NULL, reject.ToMbuf());
+		RCRBadEvent(NULL, reject.ToMbuf(LCP().AdditionalOverhead()));
 	else
 		RCRGoodEvent(packet);
 }
@@ -1326,7 +1348,7 @@ PPPStateMachine::SendConfigureRequest()
 		}
 	}
 	
-	LCP().Send(request.ToMbuf());
+	LCP().Send(request.ToMbuf(LCP().AdditionalOverhead()));
 }
 
 
@@ -1369,11 +1391,7 @@ PPPStateMachine::SendTerminateRequest()
 	--fTerminateCounter;
 	
 	// reserve some space for other protocols
-	m->m_data += PPP_PROTOCOL_OVERHEAD;
-	if(LCP().Encapsulator())
-		m->m_data += LCP().Encapsulator()->Overhead();
-	if(Interface()->Device())
-		m->m_data += Interface()->Device()->Overhead();
+	m->m_data += LCP().AdditionalOverhead();
 	
 	lcp_packet *request = mtod(m, lcp_packet*);
 	request->code = PPP_TERMINATE_REQUEST;
@@ -1398,8 +1416,36 @@ PPPStateMachine::SendTerminateAck(mbuf *request)
 void
 PPPStateMachine::SendCodeReject(mbuf *packet, uint16 protocol, uint8 type)
 {
-	// TODO:
-	// add the packet to the reject and truncate it if needed
+	int32 length;
+		// additional space needed for this reject
+	if(type == PPP_PROTOCOL_REJECT)
+		length = 6;
+	else
+		length = 4;
+	
+	M_PREPEND(packet, length + LCP().AdditionalOverhead());
+	
+	int32 adjust = 0;
+		// adjust packet size by this value if packet is too big
+	if(packet->m_flags & M_PKTHDR) {
+		if(packet->m_pkthdr.len > Interface()->LinkMTU())
+			adjust = Interface()->LinkMTU() - packet->m_pkthdr.len;
+	} else if(packet->m_len > Interface()->LinkMTU())
+		adjust = Interface()->LinkMTU() - packet->m_len;
+	
+	if(adjust != 0)
+		m_adj(packet, adjust);
+	
+	lcp_packet *reject = mtod(packet, lcp_packet*);
+	data->code = type;
+	data->id = NextID();
+	data->length = (uint16) htons(reject->m_pkthdr.len);
+	
+	protocol = (uint16) htons(protocol);
+	if(type == PPP_PROTOCOL_REJECT)
+		memcpy(&data->data, &protocol, sizeof(protocol));
+	
+	LCP().Send(packet);
 }
 
 
@@ -1483,7 +1529,8 @@ void
 PPPStateMachine::DownProtocols()
 {
 	for(int32 index = 0; index < Interface()->CountProtocols(); index++)
-		Interface()->ProtocolAt(index)->Down();
+		if(Interface()->ProtocolAt(index)->IsEnabled())
+			Interface()->ProtocolAt(index)->Down();
 }
 
 
@@ -1494,7 +1541,8 @@ PPPStateMachine::DownEncapsulators()
 	
 	for(; encapsulator_handler;
 			encapsulator_handler = encapsulator_handler->Next())
-		encapsualtor_handler->Down();
+		if(encapsulator_handler->IsEnabled())
+			encapsualtor_handler->Down();
 }
 
 

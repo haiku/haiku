@@ -18,7 +18,7 @@ class PPPProtocol {
 			driver_parameter *settings, int32 flags = PPP_NO_FLAGS);
 		virtual ~PPPProtocol();
 		
-		virtual status_t InitCheck() const = 0;
+		virtual status_t InitCheck() const;
 		
 		const char *Name() const
 			{ return fName; }
@@ -41,7 +41,8 @@ class PPPProtocol {
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
-		void SetUpRequested(bool requested = true);
+		void SetUpRequested(bool requested = true)
+			{ fUpRequested = requested; }
 		bool IsUpRequested() const
 			{ return fUpRequested; }
 		
@@ -60,6 +61,8 @@ class PPPProtocol {
 		
 		virtual status_t Send(mbuf *packet) = 0;
 		virtual status_t Receive(mbuf *packet) = 0;
+		
+		virtual void Pulse();
 
 	protected:
 		void UpStarted();
@@ -74,9 +77,10 @@ class PPPProtocol {
 		char *name;
 		PPP_PHASE fPhase;
 		uint16 fProtocol;
-		int32 fAddressFamily, fFlags;
+		int32 fAddressFamily;
 		PPPInterface fInterface;
 		driver_parameter fSettings;
+		int32 fFlags;
 		
 		bool fEnabled;
 		bool fUpRequested;

@@ -11,29 +11,35 @@
 #include <Errors.h>
 
 
+typedef uint32 interface_id;
+
+// various constants
+#define PPP_PULSE_RATE						750000
+
 // settings keys
-#define PPP_MODE_KEY				"Mode"
-#define PPP_DIAL_ON_DEMAND_KEY		"DialOnDemand"
-#define PPP_AUTO_REDIAL_KEY			"AutoRedial"
-#define PPP_LOAD_MODULE_KEY			"LoadModule"
-#define PPP_PROTOCOL_KEY			"Protocol"
-#define PPP_DEVICE_KEY				"Device"
-#define PPP_AUTHENTICATOR_KEY		"Authenticator"
-#define PPP_PEER_AUTHENTICATOR_KEY	"Peer-Authenticator"
-#define PPP_MULTILINK_KEY			"Multilink-Protocol"
+#define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
+#define PPP_MODE_KEY						"Mode"
+#define PPP_DIAL_ON_DEMAND_KEY				"DialOnDemand"
+#define PPP_AUTO_REDIAL_KEY					"AutoRedial"
+#define PPP_LOAD_MODULE_KEY					"LoadModule"
+#define PPP_PROTOCOL_KEY					"Protocol"
+#define PPP_DEVICE_KEY						"Device"
+#define PPP_AUTHENTICATOR_KEY				"Authenticator"
+#define PPP_PEER_AUTHENTICATOR_KEY			"Peer-Authenticator"
+#define PPP_MULTILINK_KEY					"Multilink-Protocol"
 
 // settings values
-#define PPP_CLIENT_MODE_VALUE		"Client"
-#define PPP_SERVER_MODE_VALUE		"Server"
+#define PPP_CLIENT_MODE_VALUE				"Client"
+#define PPP_SERVER_MODE_VALUE				"Server"
 
 // path defines
-#define PPP_MODULES_PATH			"network/ppp-modules"
+#define PPP_MODULES_PATH					"network/ppp-modules"
 
 // built-in protocols
-#define PPP_LCP_PROTOCOL			0xC021
+#define PPP_LCP_PROTOCOL					0xC021
 
 
-#define PPP_ERROR_BASE				B_ERRORS_END
+#define PPP_ERROR_BASE						B_ERRORS_END
 
 // return values for Send()/Receive() methods in addition to B_ERROR and B_OK
 // PPP_UNHANDLED is also used by PPPOptionHandler

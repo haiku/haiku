@@ -64,3 +64,16 @@ PPPLCP::OptionHandlerAt(int32 index) const
 	
 	return handler;
 }
+
+uint32
+PPPLCP::AdditionalOverhead const
+{
+	uint32 overhead += PPP_PROTOCOL_OVERHEAD;
+	
+	if(Target())
+		overhead += Target()->Overhead();
+	if(Interface()->Device())
+		overhead += Interface()->Device()->Overhead();
+	
+	return overhead;
+}

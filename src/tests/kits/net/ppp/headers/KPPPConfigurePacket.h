@@ -44,7 +44,7 @@ class PPPConfigurePacket {
 		int32 CountItems() const;
 		configure_item *ItemAt(int32 index) const;
 		
-		mbuf *ToMbuf();
+		mbuf *ToMbuf(uint32 reserve = 0, uint32 maxSize = 0);
 			// the user is responsible for freeing the mbuf
 
 	private:

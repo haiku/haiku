@@ -34,12 +34,16 @@ class PPPInterface {
 		PPPInterface& operator= (const PPPInterface& copy);
 
 	public:
-		PPPInterface(driver_settings *settings, PPPInterface *parent = NULL);
+		PPPInterface(interface_id ID, driver_settings *settings,
+			PPPInterface *parent = NULL);
 		~PPPInterface();
 		
 		void Delete();
 		
 		status_t InitCheck() const;
+		
+		interface_id ID() const
+			{ return fID; }
 		
 		driver_settings* Settings()
 			{ return fSettings; }
@@ -54,6 +58,12 @@ class PPPInterface {
 		
 		struct ifq *InQueue() const
 			{ return fInQueue; }
+		
+		// idle handling
+		bigtime_t IdleSince() const
+			{ return fIdleSince; }
+		bigtime_t DisconnectAfterIdleSince() const
+			{ return fDisconnectAfterIdleSince; }
 		
 		void SetLinkMTU(uint32 linkMTU);
 		uint32 LinkMTU() const
@@ -142,6 +152,7 @@ class PPPInterface {
 		bool UnregisterInterface();
 		
 		void CalculateMRU();
+		void CalculateBaudRate();
 		
 		void Redial();
 		
@@ -150,7 +161,9 @@ class PPPInterface {
 			{ fParent = parent; }
 
 	private:
-		driver_parameter *fSettings;
+		interface_id fID;
+			// the manager assigns an ID to every interface
+		driver_settings *fSettings;
 		PPPStateMachine fStateMachine;
 		PPPLCP fLCP;
 		PPPReportManager fReportManager;
@@ -164,6 +177,7 @@ class PPPInterface {
 		
 		ppp_manager_info *fManager;
 		
+		bigtime_t fIdleSince, fDisconnectAfterIdleSince;
 		uint32 fLinkMTU, fMRU, fHeaderLength;
 		
 		PPPInterface *fParent;

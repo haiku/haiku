@@ -13,11 +13,11 @@
 
 class PPPDevice {
 	public:
-		PPPDevice(const char *fName, uint32 overhead, PPPInterface *interface,
+		PPPDevice(const char *name, uint32 overhead, PPPInterface *interface,
 			driver_parameter *settings);
 		virtual ~PPPDevice();
 		
-		virtual status_t InitCheck() const = 0;
+		virtual status_t InitCheck() const;
 		
 		const char *Name() const
 			{ return fName; }
@@ -58,18 +58,20 @@ class PPPDevice {
 			// This will pass the packet to the interface's queue.
 			// Do not call Interface::ReceiveFromDevice directly
 			// if this can block a Send()!
+		
+		virtual void Pulse();
 
 	protected:
 		// Report that we are going up/down
 		// (from now on, the Up() process can be aborted).
 		// Abort if false is returned!
-		bool UpStarted();
-		bool DownStarted();
+		bool UpStarted() const;
+		bool DownStarted() const;
 		
 		// report up/down events
-		void UpEvent();
-		void UpFailedEvent();
-		void DownEvent();
+		void UpFailedEvent() const;
+		void UpEvent() const;
+		void DownEvent() const;
 
 	protected:
 		bool fIsUp;

@@ -18,7 +18,7 @@ class PPPOptionHandler {
 			driver_parameter *settings);
 		virtual ~PPPOptionHandler();
 		
-		virtual status_t InitCheck() = 0;
+		virtual status_t InitCheck() const;
 		
 		void SetEnabled(bool enabled = true);
 		bool IsEnabled() const

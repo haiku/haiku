@@ -19,7 +19,7 @@ class PPPEncapsulator {
 			int32 flags = PPP_NO_FLAGS);
 		virtual ~PPPEncapsulator();
 		
-		virtual status_t InitCheck() const = 0;
+		virtual status_t InitCheck() const;
 		
 		const char *Name() const
 			{ return fName; }
@@ -46,7 +46,8 @@ class PPPEncapsulator {
 		bool IsEnabled() const
 			{ return fEnabled; }
 		
-		void SetUpRequested(bool requested = true);
+		void SetUpRequested(bool requested = true)
+			{ fUpRequested = requested; }
 		bool IsUpRequested() const
 			{ return fUpRequested; }
 		
@@ -71,10 +72,12 @@ class PPPEncapsulator {
 		virtual status_t Send(mbuf *packet, uint16 protocol) = 0;
 		virtual status_t Receive(mbuf *packet, uint16 protocol) = 0;
 		
-		status_t SendToNext(mbuf *packet, uint16 protocol);
+		status_t SendToNext(mbuf *packet, uint16 protocol) const;
 			// this will send your packet to the next (up) encapsulator
 			// if there is no next encapsulator (==NULL), it will
 			// call the interface's SendToDevice function
+		
+		virtual void Pulse();
 
 	protected:
 		void UpStarted();
@@ -91,10 +94,11 @@ class PPPEncapsulator {
 	private:
 		char *fName;
 		PPP_ENCAPSULATION_LEVEL fLevel;
+		uint16 fProtocol;
+		int32 fAddressFamily;
 		PPPInterface *fInterface;
 		driver_parameter *fSettings;
-		uint16 fProtocol;
-		int32 fAddressFamily, fFlags;
+		int32 fFlags;
 		
 		PPPEncapsulator *fNext;
 		
