@@ -1,6 +1,4 @@
 /* OS.h
- * 
- * Quake with fear - it's back!!!
  */
 
 #ifndef _OS_H
@@ -39,19 +37,92 @@ extern "C" {
 
 #include <ktypes.h>
 
-#define B_OS_NAME_LENGTH 32
+/**
+ * @defgroup Sys_Consts Constants
+ * @ingroup OpenBeOS_Headers
+ * @brief Constants defined by the system headers
+ * @note these are prefixed B_ for compatability with BeOS
+ * @{
+ */
+/**
+ * @def B_OS_NAME_LENGTH
+ * the maximum length of names applied to various structures
+ * for example the maximum length of a thread name supplied in
+ * a spawn_thread() call is determined by this value
+ */
+/** 
+ * @def B_PAGE_SIZE
+ *size of a single page of memory.
+ * @note this is also the smallest area that can be requested
+ */
+
+#define B_OS_NAME_LENGTH      32
+#define B_PAGE_SIZE         4096
+
+/** @def B_CAN_INTERRUPT
+ * if set the call can be interrupted
+ */
+/** @def B_DO_NOT_RESCHEDULE
+ * explanation reqd
+ */
+/** @def B_CHECK_PERMISSION
+ * when set the ownership will be checked, and if permission
+ * is not available then the call will fail.
+ */
+/** @def B_TIMEOUT
+ * there is a timeout given in this call
+ */
+/** @def B_RELATIVE_TIMEOUT
+ * the timeout given in this call is relative to the time now
+ */
+/** @def B_ABSOLUTE_TIMEOUT
+ * the timeout given in this call is a time that the timeout will expire
+ */
+#define B_CAN_INTERRUPT          1
+#define B_DO_NOT_RESCHEDULE      2
+#define B_CHECK_PERMISSION       4
+#define B_TIMEOUT                8
+#define	B_RELATIVE_TIMEOUT       8
+#define B_ABSOLUTE_TIMEOUT      16
+
+/** @} */
+
+/**
+ * @defgroup Sys_types Types
+ * @ingroup OpenBeOS_Headers
+ * @brief Definitions of basic system types.
+ * @note these are not in sys/types.h as they are specific to
+ *       this system
+ * @note these are global to the system.
+ * @{
+ */
+
+/** 
+ * @typedef team_id 
+ * id of an team (process) 
+ */
+/**
+ * @typedef area_id
+ * id of an area
+ */
+
+typedef int32   team_id;
+typedef int32   area_id;
+
+/** @} */
 
 /**
  * @defgroup Areas Memory Areas
+ * @brief memory areas
  * @ingroup OpenBeOS_Headers
  * @{
  */
 
-/* temporary hacks */
-typedef int32   team_id;
-typedef int32   area_id;
-
 /* Areas */
+/**
+ * @struct area_info
+ * gives details about a particular area
+ */
 typedef struct area_info {
 	area_id		area;
 	char		name[B_OS_NAME_LENGTH];
@@ -76,11 +147,16 @@ typedef struct area_info {
 
 /**
  * @defgroup Ports Messaging Ports
+ * @brief A system wide messaging system
  * @ingroup OpenBeOS_Headers
  * @{
  */
 
 /* Ports */
+/**
+ * @struct port_info
+ * details about a port, including ownership
+ */
 typedef struct port_info {
 	port_id		port;
 	team_id		team;
@@ -117,17 +193,16 @@ int     _get_next_port_info(team_id, int32 *, port_info *, size_t);
 
 /**
  * @defgroup Sems Semaphores
+ * @brief used to provide synchronisation between threads
  * @ingroup OpenBeOS_Headers
  * @{
  */
 
-#define B_CAN_INTERRUPT          1
-#define B_DO_NOT_RESCHEDULE      2
-#define B_CHECK_PERMISSION       4
-#define B_TIMEOUT                8
-#define	B_RELATIVE_TIMEOUT       8
-#define B_ABSOLUTE_TIMEOUT      16
 
+/**
+ * @struct sem_info
+ * information on a semaphore
+ */
 typedef struct sem_info {
 	sem_id		sem;
 	proc_id		proc;
@@ -159,6 +234,7 @@ int    set_sem_owner(sem_id id, proc_id proc);
 
 /**
  * @defgroup Threads Threads
+ * @brief a distinct, independantly executing task belong to a team 
  * @ingroup OpenBeOS_Headers
  * @{
  */
@@ -210,6 +286,9 @@ typedef enum {
 #define	B_URGENT_PRIORITY					110
 #define B_REAL_TIME_PRIORITY				120
 
+/** information on a thread
+ * @note the thread can be in any state
+ */
 typedef struct  {
 	thread_id		thread;
 	team_id			team;
@@ -223,13 +302,31 @@ typedef struct  {
 	void			*stack_end;
 } thread_info;
 
+/** 
+ * gives information on user and kernel time for a thread
+ */
 typedef struct {
 	bigtime_t		user_time;
 	bigtime_t		kernel_time;
 } team_usage_info;
 
+/** @typedef thread_func
+ * the prototype for a function passed in a spawn_thread() call is
+ * @code
+ *  int32 some_thread_func(void *data)
+ *  {
+ *     ...
+ *  }
+ * @endcode
+ */
 typedef int32 (*thread_func) (void *);
 
+/** @fn thread_id spawn_thread(thread_func func, const char *name, int32 priority, void *data)
+ * creates a new thread within a team
+ * @note the new thread will be created in the suspended state and will not run
+ *       until a resume_thread() call is issued
+ * @note the maximum length of name is B_OS_NAME_LENGTH characters
+ */
 thread_id spawn_thread (thread_func, const char *, int32, void *);
 int       kill_thread(thread_id thread);
 int       resume_thread(thread_id thread);
