@@ -15,114 +15,20 @@
 //#include <sniffer/RPatternList.h>
 #include <sniffer/Rule.h>
 
-#include <string>
-#include <List.h>
 #include <new.h>
 #include <stdio.h>
+#include <stdlib.h>	// For atol(), atof()
 #include <string.h>
 #include <String.h>	// BString
 
 using namespace Sniffer;
-
-namespace Sniffer {
-
-class Err {
-public:
-	Err(const char *msg);
-	Err(const std::string &msg);
-	Err(const Err &ref);
-	Err& operator=(const Err &ref);
-	const char* Msg() const;
-	
-private:
-	void SetMsg(const char *msg);
-	char *fMsg;
-};
-
-} // namespace Sniffer
-
-class CharStream {
-public:
-	CharStream(const char *string = NULL);
-	~CharStream();
-	
-	status_t SetTo(const char *string);
-	void Unset();
-	status_t InitCheck() const;
-	bool IsEmpty();
-	
-	char Get();
-	void Unget();
-
-private:
-	char *fString;
-	size_t fPos;
-	ssize_t fLen;
-	status_t fCStatus;
-	
-	CharStream(const CharStream &ref);
-	CharStream& operator=(const CharStream &ref);
-};
-
-typedef enum TokenType {
-	LeftParen,
-	RightParen,
-	LeftBracket,
-	RightBracket,
-	Colon,
-	Divider,
-	Ampersand,
-	CharacterString
-};
-
-class Token {
-public:
-	Token(TokenType type);
-	virtual ~Token();
-	TokenType Type() const;
-	virtual const char* String() const;
-protected:
-	TokenType fType;
-};
-
-class PString : public Token {
-public:
-	PString(const char *string);
-	virtual ~PString();
-	virtual const char* String() const;
-protected:
-	char *fString;
-};
-
-class TokenStream {
-public:
-	TokenStream(const char *string = NULL);
-	~TokenStream();
-	
-	status_t SetTo(const char *string);
-	void Unset();
-	status_t InitCheck() const;
-	
-	Token* Get();
-	void Unget(Token *token);
-	
-private:
-	void AddToken(TokenType type);
-	void AddString(const char *str);
-
-	BList fTokenList;
-	status_t fCStatus;
-
-	TokenStream(const TokenStream &ref);
-	TokenStream& operator=(const TokenStream &ref);
-};
 
 // Our global token stream object
 TokenStream stream;
 
 // Private parsing functions
 /*
-float parsePriority();
+double parsePriority();
 BList* parseExprList();
 Expr* parseExpr();
 Range parseRange();
@@ -141,6 +47,7 @@ char octalToChar(char hi, char mid, char low);
 bool isHexChar(char ch);
 bool isWhiteSpace(char ch);
 bool isOctalChar(char ch);
+bool isDecimalChar(char ch);
 
 status_t
 Sniffer::parse(const char *rule, Rule *result, BString *parseError = NULL) {
@@ -152,7 +59,7 @@ Sniffer::parse(const char *rule, Rule *result, BString *parseError = NULL) {
 		if (stream.SetTo(rule) != B_OK)
 			throw Err("Sniffer parser error: Unable to intialize token stream");
 			
-		float priority;
+		double priority;
 		BList* exprList;
 		
 //		priority = parsePriority();
@@ -253,7 +160,7 @@ CharStream::InitCheck() const {
 }
 
 bool
-CharStream::IsEmpty() {
+CharStream::IsEmpty() const {
 	return fPos >= fLen;
 }
 
@@ -261,10 +168,12 @@ char
 CharStream::Get() {
 	if (fCStatus != B_OK)
 		throw Err("Sniffer parser error: CharStream::Get() called on uninitialized CharStream object");
-	if (!IsEmpty()) 
+	if (fPos < fLen) 
 		return fString[fPos++];
-	else
-		throw Err("Sniffer pattern error: unterminated rule");
+	else {
+		fPos++;		// Increment fPos to keep Unget()s consistent
+		return 0x3;	// Return End-Of-Text char
+	}
 }
 
 void
@@ -284,6 +193,8 @@ CharStream::Unget() {
 Token::Token(TokenType type)
 	: fType(type)
 {
+//	if (type != EmptyToken)
+//		cout << "New Token, fType == " << tokenTypeToString(fType) << endl;
 }
 
 Token::~Token() {
@@ -299,11 +210,42 @@ Token::String() const {
 	throw Err("Sniffer scanner error: Token::String() called on non-string token");
 }
 
+int32
+Token::Int() const {
+	throw Err("Sniffer scanner error: Token::Int() called on non-integer token");
+}
+
+double
+Token::Float() const {
+	throw Err("Sniffer scanner error: Token::Float() called on non-float token");
+}
+
+bool
+Token::operator==(Token &ref) {
+	// Compare types, then data if necessary
+	if (Type() == ref.Type()) {
+		switch (Type()) {
+			case CharacterString:
+				return strcmp(String(), ref.String()) == 0;
+			
+			case Integer:
+				return Int() == ref.Int();
+				
+			case FloatingPoint:
+				return Float() == ref.Float();		
+			
+			default:
+				return true;	
+		}	
+	} else
+		return false;
+}
+
 //------------------------------------------------------------------------------
-// PString
+// StringToken
 //------------------------------------------------------------------------------
 
-PString::PString(const char *string)
+StringToken::StringToken(const char *string)
 	: Token(CharacterString)
 	, fString(NULL)
 {
@@ -314,13 +256,48 @@ PString::PString(const char *string)
 	}
 }
 
-PString::~PString() {
+StringToken::~StringToken() {
 	delete fString;
 }
 
 const char*
-PString::String() const {
+StringToken::String() const {
 	return fString;
+}
+
+//------------------------------------------------------------------------------
+// IntToken
+//------------------------------------------------------------------------------
+
+IntToken::IntToken(const int32 value)
+	: Token(Integer)
+	, fValue(value)
+{
+}
+
+int32
+IntToken::Int() const {
+	return fValue;
+}
+
+double
+IntToken::Float() const {
+	return (double)fValue;
+}
+
+//------------------------------------------------------------------------------
+// FloatToken
+//------------------------------------------------------------------------------
+
+FloatToken::FloatToken(const double value)
+	: Token(FloatingPoint)
+	, fValue(value)
+{
+}
+
+double
+FloatToken::Float() const {
+	return fValue;
 }
 
 //------------------------------------------------------------------------------
@@ -355,6 +332,11 @@ TokenStream::SetTo(const char *string) {
 			tsssZeroX,
 			tsssOneHex,
 			tsssTwoHex,
+			tsssIntOrFloat,
+			tsssFloat,
+			tsssLonelyDecimalPoint,
+			tsssLonelyMinusSign,
+			tsssNegativeInt,
 			tsssOneEscape,
 			tsssOneOctal,
 			tsssTwoOctal,
@@ -367,11 +349,19 @@ TokenStream::SetTo(const char *string) {
 		std::string charStr;	// Used to build up character strings
 		char lastChar;			// For two char lookahead
 		char lastLastChar;		// For three char lookahead
-		while (!stream.IsEmpty()) {
+		bool keepLooping = true;
+		while (keepLooping) {
 			char ch = stream.Get();
 			switch (state) {				
 				case tsssStart:
 					switch (ch) {
+						case 0x3:	// End-Of-Text
+							if (stream.IsEmpty())
+								keepLooping = false;
+							else
+								throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
+							break;							
+					
 						case '\t':
 						case '\n':
 						case ' ':
@@ -388,9 +378,33 @@ TokenStream::SetTo(const char *string) {
 							state = tsssOneSingle;
 							break;
 							
+						case '-':
+							charStr = ch;
+							state = tsssLonelyMinusSign;
+							break;
+							
+						case '.':
+							charStr = ch;
+							state = tsssLonelyDecimalPoint;
+							break;
+							
 						case '0':
+							charStr = ch;
 							state = tsssOneZero;
 							break;
+							
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+							charStr = ch;
+							state = tsssIntOrFloat;							
+							break;							
 													
 						case '&':	AddToken(Ampersand);		break;
 						case '(':	AddToken(LeftParen);		break;
@@ -418,7 +432,13 @@ TokenStream::SetTo(const char *string) {
 						case '\'':
 							AddString(charStr.c_str());
 							state = tsssStart;
-							break;				
+							break;
+						case 0x3:
+							if (stream.IsEmpty())
+								throw Err(std::string("Sniffer scanner error: unterminated single-quoted string"));
+							else
+								charStr += ch;
+							break;
 						default:							
 							charStr += ch;
 							break;
@@ -426,8 +446,13 @@ TokenStream::SetTo(const char *string) {
 					break;
 					
 				case tsssSingleEscape:
-					charStr += escapeChar(ch);
-					state = tsssOneSingle;					
+					// Check for a true end-of-text marker
+					if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: unterminated escape sequence in single-quoted string"));
+					else {
+						charStr += escapeChar(ch);
+						state = tsssOneSingle;
+					}
 					break;
 					
 				case tsssOneDouble:
@@ -439,6 +464,12 @@ TokenStream::SetTo(const char *string) {
 							AddString(charStr.c_str());
 							state = tsssStart;
 							break;				
+						case 0x3:
+							if (stream.IsEmpty())
+								throw Err(std::string("Sniffer scanner error: unterminated single-quoted string"));
+							else
+								charStr += ch;
+							break;
 						default:							
 							charStr += ch;
 							break;
@@ -446,22 +477,46 @@ TokenStream::SetTo(const char *string) {
 					break;
 
 				case tsssDoubleEscape:
-					charStr += escapeChar(ch);
-					state = tsssOneDouble;					
+					// Check for a true end-of-text marker
+					if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: unterminated escape sequence in single-quoted string"));
+					else {
+						charStr += escapeChar(ch);
+						state = tsssOneDouble;
+					}
 					break;
 					
 				case tsssOneZero:
-					if (ch == 'x')
+					if (ch == 'x') {
+						charStr = "";	// Reinit, since we actually have a hex string
 						state = tsssZeroX;
-					else
-						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
+					} else if ('0' <= ch && ch <= '9') {
+						charStr += ch;
+						state = tsssIntOrFloat;
+					} else if (ch == '.') {
+						charStr += ch;
+						state = tsssFloat;
+					} else if (ch == 0x3 && stream.IsEmpty()) {
+						// Terminate the number and then the loop
+						AddInt(charStr.c_str());
+						keepLooping = false;
+					} else {
+						// Terminate the number
+						AddInt(charStr.c_str());
+						
+						// Push the last char back on and try again
+						stream.Unget();
+						state = tsssStart;
+					}
 					break;
 					
 				case tsssZeroX:
 					if (isHexChar(ch)) {
 						lastChar = ch;
 						state = tsssOneHex;
-					} else 
+					} else if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: incomplete hex code"));
+					else 
 						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
 					break;
 					
@@ -469,7 +524,9 @@ TokenStream::SetTo(const char *string) {
 					if (isHexChar(ch)) {
 						charStr += hexToChar(lastChar, ch);
 						state = tsssTwoHex;
-					} else 
+					} else if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: incomplete hex code (the number of hex digits must be a multiple of two)"));
+					else 
 						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
 					break;
 					
@@ -480,17 +537,89 @@ TokenStream::SetTo(const char *string) {
 					} else if (isWhiteSpace(ch)) {
 						AddString(charStr.c_str());
 						state = tsssStart;
+					} else if (ch == 0x3 && stream.IsEmpty()) {
+						AddString(charStr.c_str());
+						keepLooping = false;						
 					} else
 						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
 					break;
 					
+				case tsssIntOrFloat:
+					if (isDecimalChar(ch))
+						charStr += ch;
+					else if (ch == '.') {
+						charStr += ch;
+						state = tsssFloat;
+					} else {
+						// Terminate the number
+						AddInt(charStr.c_str());
+						
+						// Push the last char back on and try again
+						stream.Unget();
+						state = tsssStart;						
+					}
+					break;
+					
+				case tsssFloat:
+					if (isDecimalChar(ch))
+						charStr += ch;
+					else {
+						// Terminate the number
+						AddFloat(charStr.c_str());
+						
+						// Push the last char back on and try again
+						stream.Unget();
+						state = tsssStart;						
+					}
+					break;
+					
+				case tsssLonelyDecimalPoint:
+					if (isDecimalChar(ch)) {
+						charStr += ch;
+						state = tsssFloat;
+					} else if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: incomplete floating point number"));
+					else
+						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
+					break;
+					
+				case tsssLonelyMinusSign:
+					if (isDecimalChar(ch)) {
+						charStr += ch;
+						state = tsssNegativeInt;
+					} else if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: incomplete negative integer"));
+					else
+						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
+					break;
+
+				case tsssNegativeInt:
+					if (isDecimalChar(ch)) 
+						charStr += ch;
+					else if (ch == '.') 
+						throw Err(std::string("Sniffer scanner error: negative floating point numbers are useless and thus illegal"));
+					else {
+						// Terminate the number
+						AddInt(charStr.c_str());
+						
+						// Push the last char back on and try again
+						stream.Unget();
+						state = tsssStart;						
+					}
+					break;
+
 				case tsssOneEscape:
 					if (isOctalChar(ch)) {
 						lastChar = ch;
 						state = tsssOneOctal;
 					} else {
-						charStr += escapeChar(ch);
-						state = tsssUnquoted;
+						// Check for a true end-of-text marker
+						if (ch == 0x3 && stream.IsEmpty())
+							throw Err(std::string("Sniffer scanner error: unterminated escape sequence"));
+						else {
+							charStr += escapeChar(ch);
+							state = tsssUnquoted;
+						}
 					}									
 					break;
 					
@@ -533,14 +662,22 @@ TokenStream::SetTo(const char *string) {
 						state = tsssStart;
 					} else if (ch == '\'' || ch == '"' || ch == '&') {
 						throw Err(std::string("Sniffer scanner error: illegal unquoted character '") + ch + "'");
+					} else if (ch == 0x3 && stream.IsEmpty()) {
+						AddString(charStr.c_str());
+						keepLooping = false;
 					} else {							
 						charStr += ch;
 					}
 					break;
 					
 				case tsssUnquotedEscape:
-					charStr += escapeChar(ch);
-					state = tsssUnquoted;					
+					// Check for a true end-of-text marker
+					if (ch == 0x3 && stream.IsEmpty())
+						throw Err(std::string("Sniffer scanner error: unterminated escape sequence in unquoted string"));
+					else {
+						charStr += escapeChar(ch);
+						state = tsssUnquoted;
+					}
 					break;
 			
 			}
@@ -567,11 +704,17 @@ TokenStream::InitCheck() const {
 	
 Token*
 TokenStream::Get() {
-	
+	return (Token*)fTokenList.RemoveItem((int32)0);
 }
 
 void
 TokenStream::Unget(Token *token) {
+	fTokenList.AddItem(token, 0);
+}
+
+bool
+TokenStream::IsEmpty() {
+	return fCStatus != B_OK || fTokenList.IsEmpty();
 }
 
 void
@@ -582,7 +725,23 @@ TokenStream::AddToken(TokenType type) {
 
 void
 TokenStream::AddString(const char *str) {
-	Token *token = new PString(str);
+	Token *token = new StringToken(str);
+	fTokenList.AddItem(token);
+}
+
+void
+TokenStream::AddInt(const char *str) {
+	// Convert the string to an int
+	int32 value = atol(str);	
+	Token *token = new IntToken(value);
+	fTokenList.AddItem(token);
+}
+
+void
+TokenStream::AddFloat(const char *str) {
+	// Convert the string to a float
+	double value = atof(str);
+	Token *token = new FloatToken(value);
 	fTokenList.AddItem(token);
 }
 
@@ -653,4 +812,47 @@ isOctalChar(char ch) {
 	return ('0' <= ch && ch <= '7');
 }
 
+bool
+isDecimalChar(char ch) {
+	return ('0' <= ch && ch <= '9');
+}
+
+const char*
+Sniffer::tokenTypeToString(TokenType type) {
+	switch (type) {
+		case LeftParen:
+			return "LeftParen";
+			break;
+		case RightParen:
+			return "RightParen";
+			break;
+		case LeftBracket:
+			return "LeftBracket";
+			break;
+		case RightBracket:
+			return "RightBracket";
+			break;
+		case Colon:
+			return "Colon";
+			break;
+		case Divider:
+			return "Divider";
+			break;
+		case Ampersand:
+			return "Ampersand";
+			break;
+		case CharacterString:
+			return "CharacterString";
+			break;
+		case Integer:
+			return "Integer";
+			break;
+		case FloatingPoint:
+			return "FloatingPoint";
+			break;
+		default:
+			return "UNKNOWN TOKEN TYPE";
+			break;
+	}
+}
 
