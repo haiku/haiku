@@ -8,6 +8,7 @@
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
 #include "KPartition.h"
+#include "KPath.h"
 #include "KScanPartitionJob.h"
 
 // debugging
@@ -60,9 +61,11 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 	// the partition's device must be write-locked
 	if (!partition)
 		return B_BAD_VALUE;
-char partitionPath[B_PATH_NAME_LENGTH];
-partition->GetPath(partitionPath);
-DBG(OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath));
+DBG(
+KPath partitionPath;
+partition->GetPath(&partitionPath);
+OUT("KDiskDeviceManager::_ScanPartition(%s)\n", partitionPath.Path())
+)
 	// publish the partition
 	status_t error = partition->PublishDevice();
 	if (error != B_OK)
