@@ -501,6 +501,7 @@ struct media_format {	/* no more than 192 bytes */
 	bool 			IsAudio() const		{ return (type==B_MEDIA_ENCODED_AUDIO)||(type==B_MEDIA_RAW_AUDIO); };
 	uint32 			AudioFormat() const	{ return (type==B_MEDIA_ENCODED_AUDIO)?u.encoded_audio.output.format:u.raw_audio.format; };
 	uint32 & 		AudioFormat()		{ return (type==B_MEDIA_ENCODED_AUDIO)?u.encoded_audio.output.format:u.raw_audio.format; };
+	uint32 			AudioFrameSize() const	{ return (type==B_MEDIA_ENCODED_AUDIO)?(u.encoded_audio.output.format & 0xf)*u.encoded_audio.output.channel_count:(u.raw_audio.format & 0xf)*u.raw_audio.channel_count; };
 
 	uint32			Encoding() const	{ return (type==B_MEDIA_ENCODED_VIDEO)?u.encoded_video.encoding:(type==B_MEDIA_ENCODED_AUDIO)?u.encoded_audio.encoding:(type==B_MEDIA_MULTISTREAM)?u.multistream.format:0UL; }
 
