@@ -590,6 +590,13 @@ struct BMessageFieldGetDataPolicy<BDataBuffer>
 		{ return data->Buffer(); }
 };
 //------------------------------------------------------------------------------
+template<>
+struct BMessageFieldGetDataPolicy<BString>
+{
+	inline static const void* GetData(const BString* data)
+		{ return data->String(); }
+};
+//------------------------------------------------------------------------------
 
 }	// namespace BPrivate
 

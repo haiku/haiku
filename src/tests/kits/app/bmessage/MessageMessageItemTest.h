@@ -190,7 +190,7 @@ struct TMessageAssertPolicy
 	 static bool		Size(size_t size, BMessage& msg)
 		;//{ return size == msg.FlattenedSize(); }
 };
- bool TMessageAssertPolicy::Size(size_t size, BMessage& msg)
+bool TMessageAssertPolicy::Size(size_t size, BMessage& msg)
 {
 	ssize_t msgSize = msg.FlattenedSize();
 	return size == msgSize;

@@ -14,9 +14,9 @@
 #include "MessageFloatItemTest.h"
 #include "MessageDoubleItemTest.h"
 #include "MessageMessageItemTest.h"
-//#ifdef TEST_OBOS
 #include "MessageRefItemTest.h"
-//#endif
+#include "MessageBStringItemTest.h"
+#include "MessageCStringItemTest.h"
 
 Test* MessageTestSuite()
 {
@@ -35,9 +35,9 @@ Test* MessageTestSuite()
 	tests->addTest(TMessageFloatItemTest::Suite());
 	tests->addTest(TMessageDoubleItemTest::Suite());
 	tests->addTest(TMessageMessageItemTest::Suite());
-//#ifdef TEST_OBOS
 	tests->addTest(TMessageRefItemTest::Suite());
-//#endif
+	tests->addTest(TMessageBStringItemTest::Suite());
+	tests->addTest(TMessageCStringItemTest::Suite());
 
 	return tests;
 }
