@@ -90,11 +90,11 @@ public:
 
 	SinglyLinkedListIterator(Parent *parent, NodeType *node, NodeType *previous);
 	
-	bool operator==(const IteratorType &ref);
-	bool operator!=(const IteratorType &ref);
-	inline Reference operator*();
-	inline Pointer operator->();
-	IteratorType operator++();
+	bool operator==(const IteratorType &ref) const;
+	bool operator!=(const IteratorType &ref) const;
+	inline Reference operator*() const;
+	inline Pointer operator->() const;
+	IteratorType &operator++();
 	IteratorType operator++(int);
 					
 private:
@@ -116,13 +116,14 @@ _ITERATOR::SinglyLinkedListIterator(Parent *parent, NodeType *node, NodeType *pr
 
 _ITERATOR_TEMPLATE_LIST
 bool
-_ITERATOR::operator==(const _ITERATOR &ref) {
+_ITERATOR::operator==(const _ITERATOR &ref) const
+{
 	return fParent == ref.fParent && fNode == ref.fNode && fPrevious == ref.fPrevious;
 }
 
 _ITERATOR_TEMPLATE_LIST
 bool
-_ITERATOR::operator!=(const _ITERATOR &ref)
+_ITERATOR::operator!=(const _ITERATOR &ref) const
 {
 	return !operator==(ref);
 }
@@ -130,18 +131,20 @@ _ITERATOR::operator!=(const _ITERATOR &ref)
 _ITERATOR_TEMPLATE_LIST
 inline
 Reference
-_ITERATOR::operator*() {
+_ITERATOR::operator*() const
+{
 	return fParent->GetValue(fNode);			
 }
 		
 _ITERATOR_TEMPLATE_LIST
 Pointer
-_ITERATOR::operator->() {
+_ITERATOR::operator->() const
+{
 	return &(operator*());			
 }
 		
 _ITERATOR_TEMPLATE_LIST
-_ITERATOR
+_ITERATOR&
 _ITERATOR::operator++() {
 	if (fNode) {
 		fPrevious = fNode;
