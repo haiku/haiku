@@ -55,8 +55,8 @@ thread_get_current_thread_id(void)
 	return t ? t->id : 0;
 }
 
-thread_id allocate_thread_id();
-thread_id peek_next_thread_id();
+thread_id allocate_thread_id(void);
+thread_id peek_next_thread_id(void);
 
 thread_id spawn_kernel_thread_etc(thread_func, const char *name, int32 priority,
 	void *args, team_id team, thread_id threadID);
