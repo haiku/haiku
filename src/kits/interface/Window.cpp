@@ -233,12 +233,13 @@ BWindow::~BWindow(){
 		delete cmdKey;
 	}
 	
-// TODO: release other dinamicaly alocated objects
+// TODO: release other dynamically-allocated objects
 
 		// disable pulsing
 	SetPulseRate( 0 );
 
 	delete		session;
+	delete		fServerLink;
 	delete_port( receive_port );
 }
 
@@ -373,9 +374,9 @@ void BWindow::Minimize(bool minimize){
 		return;		
 
 	Lock();
-	session->WriteInt32( AS_WINDOW_MINIMIZE );
-	session->WriteBool( minimize );
-	session->Sync( );
+	fServerLink->SetOpCode(AS_WINDOW_MINIMIZE);
+	fServerLink->Attach<bool>( minimize );
+	fServerLink->Flush();
 	Unlock();
 }
 //------------------------------------------------------------------------------
@@ -385,16 +386,14 @@ status_t BWindow::SendBehind(const BWindow* window){
 	if (!window)
 		return B_ERROR;
 	
-	int32		rCode;
-
 	Lock();
-	session->WriteInt32( AS_SEND_BEHIND );
-	session->WriteInt32( _get_object_token_(window) );	
-	session->Sync();
-	session->ReadInt32( &rCode );
+	PortMessage pmsg;
+	fServerLink->SetOpCode( AS_SEND_BEHIND );
+	fServerLink->Attach<int32>( _get_object_token_(window) );
+	fServerLink->FlushWithReply(&pmsg);
 	Unlock();
 	
-	return rCode == SERVER_TRUE? B_OK : B_ERROR;
+	return (pmsg.Code() == SERVER_TRUE)? B_OK : B_ERROR;
 }
 
 //------------------------------------------------------------------------------
@@ -961,24 +960,23 @@ void BWindow::MenusEnded(){
 
 void BWindow::SetSizeLimits(float minWidth, float maxWidth, 
 							float minHeight, float maxHeight){
-	int32		rCode;
-
 	if (minWidth > maxWidth)
 		return;
 	if (minHeight > maxHeight)
 		return;
 		
 	Lock();
-	session->WriteInt32( AS_SET_SIZE_LIMITS );
-	session->WriteFloat( fMinWindWidth );
-	session->WriteFloat( fMaxWindWidth );
-	session->WriteFloat( fMinWindHeight );
-	session->WriteFloat( fMaxWindHeight );
-	session->Sync();
-	session->ReadInt32( &rCode );
+	PortMessage pmsg;
+	
+	fServerLink->Attach<int32>( AS_SET_SIZE_LIMITS );
+	fServerLink->Attach<float>( fMinWindWidth );
+	fServerLink->Attach<float>( fMaxWindWidth );
+	fServerLink->Attach<float>( fMinWindHeight );
+	fServerLink->Attach<float>( fMaxWindHeight );
+	fServerLink->FlushWithReply(&pmsg);
 	Unlock();
 
-	if (rCode == SERVER_TRUE){
+	if (pmsg.Code() == SERVER_TRUE){
 		fMinWindHeight		= minHeight;
 		fMinWindWidth		= minWidth;
 		fMaxWindHeight		= maxHeight;
@@ -1248,9 +1246,9 @@ void BWindow::Activate(bool active){
 		return;
 
 	Lock();
-	session->WriteInt32( AS_ACTIVATE_WINDOW );
-	session->WriteBool( active );
-	session->Sync( );
+	fServerLink->SetOpCode( AS_ACTIVATE_WINDOW );
+	fServerLink->Attach<bool>( active );
+	fServerLink->Flush();
 	Unlock();
 }
 
@@ -1391,9 +1389,9 @@ void BWindow::SetTitle(const char* title){
 
 			// we notify the app_server so we can actually see the change
 		Lock();
-		session->WriteInt32( AS_WINDOW_TITLE);
-		session->WriteString( fTitle );
-		session->Sync( );
+		fServerLink->SetOpCode( AS_WINDOW_TITLE );
+		fServerLink->AttachString( fTitle );
+		fServerLink->Flush();
 		Unlock();
 	}
 	else
@@ -1451,19 +1449,18 @@ status_t BWindow::AddToSubset(BWindow* window){
 	if ( !window )
 			return B_ERROR;
 	
-	int32		rCode;
+	PortMessage pmsg;
 
 	if (window->Feel() == B_MODAL_SUBSET_WINDOW_FEEL ||
 		window->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL){
 		
 		Lock();
-		session->WriteInt32( AS_ADD_TO_SUBSET );
-		session->WriteInt32( _get_object_token_(window) );
-		session->Sync();
-		session->ReadInt32( &rCode );
+		fServerLink->SetOpCode( AS_ADD_TO_SUBSET );
+		fServerLink->Attach<int32>( _get_object_token_(window) );
+		fServerLink->FlushWithReply(&pmsg);
 		Unlock();
 
-		return rCode == SERVER_TRUE? B_OK : B_ERROR;
+		return (pmsg.Code() == SERVER_TRUE)? B_OK : B_ERROR;
 	}
 
 	return B_ERROR;
@@ -1475,16 +1472,15 @@ status_t BWindow::RemoveFromSubset(BWindow* window){
 	if ( !window )
 			return B_ERROR;
 	
-	int32		rCode;
+	PortMessage pmsg;
 
 	Lock();
-	session->WriteInt32( AS_REM_FROM_SUBSET );
-	session->WriteInt32( _get_object_token_(window) );
-	session->Sync();
-	session->ReadInt32( &rCode );
+	fServerLink->SetOpCode( AS_REM_FROM_SUBSET );
+	fServerLink->Attach<int32>( _get_object_token_(window) );
+	fServerLink->FlushWithReply(&pmsg);
 	Unlock();
 
-	return rCode == SERVER_TRUE? B_OK : B_ERROR;
+	return ( pmsg.Code() == SERVER_TRUE)? B_OK : B_ERROR;
 }
 
 //------------------------------------------------------------------------------
@@ -1497,8 +1493,15 @@ status_t BWindow::Perform(perform_code d, void* arg){
 
 status_t BWindow::SetType(window_type type){
 	decomposeType(type, &fLook, &fFeel);
-	SetLook( fLook );
-	SetFeel( fFeel );
+	
+	status_t stat1, stat2;
+	
+	stat1=SetLook( fLook );
+	stat2=SetFeel( fFeel );
+
+	if(stat1==B_OK && stat2==B_OK)
+		return B_OK;
+	return B_ERROR;
 }
 
 //------------------------------------------------------------------------------
@@ -1511,17 +1514,16 @@ window_type	BWindow::Type() const{
 
 status_t BWindow::SetLook(window_look look){
 
-	int32		rCode;
+	PortMessage pmsg;
 
 	Lock();
-	session->WriteInt32( AS_SET_LOOK );
-	session->WriteInt32( (int32)look );
-	session->Sync();
-	session->ReadInt32( &rCode );
+	fServerLink->SetOpCode( AS_SET_LOOK );
+	fServerLink->Attach<window_look>( fLook );
+	fServerLink->FlushWithReply(&pmsg);
 	Unlock();
 	
-	if (rCode == SERVER_TRUE){
-		fLook		= look;
+	if(pmsg.Code() == SERVER_TRUE){
+		fLook = look;
 		return B_OK;
 	}
 	
@@ -1540,20 +1542,19 @@ status_t BWindow::SetFeel(window_feel feel){
 /* TODO:	See what happens when a window that is part of a subset, changes its
 			feel!? should it be removed from the subset???
 */
-	int32		rCode;
+	PortMessage pmsg;
 
 	Lock();
-	session->WriteInt32( AS_SET_FEEL );
-	session->WriteInt32( (int32)feel );
-	session->Sync();
-	session->ReadInt32( &rCode );	
+	fServerLink->SetOpCode( AS_SET_FEEL );
+	fServerLink->Attach<window_feel>( fFeel );
+	fServerLink->FlushWithReply(&pmsg);
 	Unlock();
 	
-	if (rCode == SERVER_TRUE){
-		fFeel		= feel;
+	if(pmsg.Code() == SERVER_TRUE){
+		fFeel = feel;
 		return B_OK;
 	}
-
+	
 	return B_ERROR;
 }
 
@@ -1567,20 +1568,19 @@ window_feel	BWindow::Feel() const{
 
 status_t BWindow::SetFlags(uint32 flags){
 
-	int32		rCode;
+	PortMessage pmsg;
 
-	Lock();	
-	session->WriteInt32( AS_SET_FLAGS );
-	session->WriteUInt32( flags );
-	session->Sync();
-	session->ReadInt32( &rCode );
+	Lock();
+	fServerLink->SetOpCode( AS_SET_FLAGS );
+	fServerLink->Attach<int32>( fFlags );
+	fServerLink->FlushWithReply(&pmsg);
 	Unlock();
 	
-	if (rCode == SERVER_TRUE){
-		fFlags		= flags;
+	if(pmsg.Code() == SERVER_TRUE){
+		fFlags = flags;
 		return B_OK;
 	}
-
+	
 	return B_ERROR;
 }
 
@@ -1617,28 +1617,24 @@ status_t BWindow::SetWindowAlignment(window_alignment mode,
 		return B_ERROR;
 
 // TODO: test if hOffset = 0 and set it to 1 if true.
-	int32		rCode;
+	PortMessage pmsg;
 
 	Lock();
-	session->WriteInt32( AS_SET_ALIGNMENT );
-	session->WriteInt32( (int32)mode );
-	session->WriteInt32( h );
-	session->WriteInt32( hOffset );
-	session->WriteInt32( width );
-	session->WriteInt32( widthOffset );
-	session->WriteInt32( v );
-	session->WriteInt32( vOffset );
-	session->WriteInt32( height );
-	session->WriteInt32( heightOffset );
-	session->Sync();
-	session->ReadInt32( &rCode );
+	fServerLink->SetOpCode( AS_SET_ALIGNMENT );
+
+	fServerLink->Attach<window_alignment>( mode );
+	fServerLink->Attach<int32>( h );
+	fServerLink->Attach<int32>( hOffset );
+	fServerLink->Attach<int32>( width );
+	fServerLink->Attach<int32>( widthOffset );
+	fServerLink->Attach<int32>( v );
+	fServerLink->Attach<int32>( vOffset );
+	fServerLink->Attach<int32>( height );
+	fServerLink->Attach<int32>( heightOffset );
+	fServerLink->FlushWithReply( &pmsg );
 	Unlock();
 	
-	if ( rCode == SERVER_TRUE){
-		return B_NO_ERROR;
-	}
-
-	return B_ERROR;
+	return ( pmsg.Code() == SERVER_TRUE) ? B_OK : B_ERROR;
 }
 
 //------------------------------------------------------------------------------
@@ -1649,25 +1645,24 @@ status_t BWindow::GetWindowAlignment(window_alignment* mode,
 											int32* v, int32* vOffset,
 											int32* height, int32* heightOffset) const
 {
-	int32		rCode;
+	PortMessage pmsg;
 
 	const_cast<BWindow*>(this)->Lock();
-	session->WriteInt32( AS_GET_ALIGNMENT );
-	session->Sync();
-	session->ReadInt32( &rCode );
-	
-	if (rCode == SERVER_TRUE){
-		session->ReadInt32( (int32*)mode );
-		session->ReadInt32( h );
-		session->ReadInt32( hOffset );
-		session->ReadInt32( width );
-		session->ReadInt32( widthOffset );
-		session->ReadInt32( v );
-		session->ReadInt32( hOffset );
-		session->ReadInt32( height );
-		session->ReadInt32( heightOffset );		
+	fServerLink->SetOpCode( AS_GET_ALIGNMENT );
+	fServerLink->FlushWithReply( &pmsg );
 
-		return B_NO_ERROR;
+	if (pmsg.Code() == SERVER_TRUE){
+		pmsg.Read<window_alignment>( mode );
+		pmsg.Read<int32>( h );
+		pmsg.Read<int32>( hOffset );
+		pmsg.Read<int32>( width );
+		pmsg.Read<int32>( widthOffset );
+		pmsg.Read<int32>( v );
+		pmsg.Read<int32>( hOffset );
+		pmsg.Read<int32>( height );
+		pmsg.Read<int32>( heightOffset );		
+
+		return B_OK;
 	}
 	const_cast<BWindow*>(this)->Unlock();
 	
@@ -1677,13 +1672,16 @@ status_t BWindow::GetWindowAlignment(window_alignment* mode,
 //------------------------------------------------------------------------------
 
 uint32 BWindow::Workspaces() const{
-	uint32					workspaces;
+
+	uint32 workspaces;
+	PortMessage pmsg;
 
 	const_cast<BWindow*>(this)->Lock();
-	session->WriteInt32( AS_GET_WORKSPACES );
-	session->Sync();
-	session->ReadInt32( (int32*)&workspaces );
+	fServerLink->SetOpCode( AS_GET_WORKSPACES );
+	fServerLink->FlushWithReply( &pmsg );
 	const_cast<BWindow*>(this)->Unlock();
+
+	pmsg.Read<uint32>( &workspaces );
 	
 	return workspaces;
 }
@@ -1693,9 +1691,9 @@ uint32 BWindow::Workspaces() const{
 void BWindow::SetWorkspaces(uint32 workspaces){
 
 	Lock();
-	session->WriteInt32( AS_SET_WORKSPACES );
-	session->WriteInt32( (int32)workspaces );
-	session->Sync( );
+	fServerLink->SetOpCode( AS_SET_WORKSPACES );
+	fServerLink->Attach<uint32>( workspaces );
+	fServerLink->Flush();
 	Unlock();
 }
 
@@ -1725,10 +1723,10 @@ void BWindow::MoveTo( BPoint point ){
 void BWindow::MoveTo(float x, float y){
 
 	Lock();
-	session->WriteInt32( AS_WINDOW_MOVE );
-	session->WriteFloat( x );
-	session->WriteFloat( y );
-	session->Sync();
+	fServerLink->SetOpCode( AS_WINDOW_MOVE );
+	fServerLink->Attach<float>( x );
+	fServerLink->Attach<float>( y );
+	fServerLink->Flush();
 	Unlock();
 }
 
@@ -1758,10 +1756,10 @@ void BWindow::ResizeTo(float width, float height){
 	height = (height > fMaxWindHeight) ? fMaxWindHeight : height;
 
 	Lock();
-	session->WriteInt32( AS_WINDOW_RESIZE );
-	session->WriteFloat( width );
-	session->WriteFloat( height );
-	session->Sync( );
+	fServerLink->SetOpCode( AS_WINDOW_RESIZE );
+	fServerLink->Attach<float>( width );
+	fServerLink->Attach<float>( height );
+	fServerLink->Flush();
 	Unlock();
 }
 
@@ -1774,17 +1772,22 @@ void BWindow::Show(){
 
 	if (fShowLevel == 0){
 		STRACE(("BWindow(%s): sending AS_SHOW_WINDOW message...\n", Name() ));
-		if ( !isLocked ) Lock();
-		session->WriteInt32( AS_SHOW_WINDOW );
-		session->Sync( );
-		if ( !isLocked) Unlock();
+		if ( !isLocked )
+			Lock();
+			
+		fServerLink->SetOpCode( AS_SHOW_WINDOW );
+		fServerLink->Flush();
+		
+		if ( !isLocked)
+			Unlock();
 	}
 
-		// if it's the fist time Show() is called... start the Looper thread.
+		// if it's the fist time Show() is called, start the Looper thread.
 	if ( Thread() == B_ERROR )
 	{
-			// normaly this won't happen, but I want to be sure!
-		if ( !isLocked ) Lock();
+			// normally this won't happen, but I want to be sure!
+		if ( !isLocked )
+			Lock();
 		Run();
 	}
 	
@@ -1795,8 +1798,8 @@ void BWindow::Show(){
 void BWindow::Hide(){
 	if (fShowLevel == 0){
 		Lock();
-		session->WriteInt32( AS_HIDE_WINDOW );
-		session->Sync();
+		fServerLink->SetOpCode( AS_HIDE_WINDOW );
+		fServerLink->Flush();
 		Unlock();
 	}
 	fShowLevel++;
@@ -2011,6 +2014,8 @@ void BWindow::InitData(	BRect frame,
 	pmsg.Read<port_id>( &send_port );
 	
 	delete serverlink;
+	
+	fServerLink=new PortLink(send_port);
 	
 		// unlock, so other threads can do their job.
 	if( locked )
@@ -2260,14 +2265,15 @@ void BWindow::BuildTopView(){
 	top_view->setOwner( this );	
 
 		// send top_view's information to app_server
-	session->WriteInt32( AS_LAYER_CREATE_ROOT );
-	session->WriteInt32( _get_object_token_( top_view ) );
-	session->WriteRect( top_view->Frame() );
-	session->WriteInt32( top_view->ResizingMode() );
-	session->WriteInt32( top_view->Flags() );
-	session->WriteString( top_view->Name() );
+	fServerLink->SetOpCode( AS_LAYER_CREATE_ROOT );
+	fServerLink->Attach<int32>( AS_LAYER_CREATE_ROOT );
+	fServerLink->Attach<int32>( _get_object_token_( top_view ) );
+	fServerLink->Attach<BRect>( top_view->Frame() );
+	fServerLink->Attach<int32>( top_view->ResizingMode() );
+	fServerLink->Attach<int32>( top_view->Flags() );
+	fServerLink->AttachString( top_view->Name() );
 		// we DO NOT send our current state; the server knows the default values!
-	session->Sync();
+	fServerLink->Flush();
 
 	fLastViewToken		= _get_object_token_( top_view );
 }
@@ -2276,8 +2282,8 @@ void BWindow::BuildTopView(){
 
 void BWindow::stopConnection(){
 	Lock();
-	session->WriteInt32( AS_QUIT_WINDOW );
-	session->Sync();
+	fServerLink->SetOpCode( AS_QUIT_WINDOW );
+	fServerLink->Flush();
 	Unlock();
 }
 
