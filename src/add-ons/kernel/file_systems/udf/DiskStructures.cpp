@@ -14,7 +14,9 @@
 
 #include <string.h>
 
-using namespace UDF;
+#include "CS0String.h"
+
+using namespace Udf;
 
 //----------------------------------------------------------------------
 // Constants
@@ -27,13 +29,13 @@ using namespace UDF;
 //                              };
                               
 // Volume structure descriptor ids 
-const char* UDF::kVSDID_BEA 		= "BEA01";
-const char* UDF::kVSDID_TEA 		= "TEA01";
-const char* UDF::kVSDID_BOOT 		= "BOOT2";
-const char* UDF::kVSDID_ISO 		= "CD001";
-const char* UDF::kVSDID_ECMA167_2 	= "NSR02";
-const char* UDF::kVSDID_ECMA167_3 	= "NSR03";
-const char* UDF::kVSDID_ECMA168		= "CDW02";
+const char* Udf::kVSDID_BEA 		= "BEA01";
+const char* Udf::kVSDID_TEA 		= "TEA01";
+const char* Udf::kVSDID_BOOT 		= "BOOT2";
+const char* Udf::kVSDID_ISO 		= "CD001";
+const char* Udf::kVSDID_ECMA167_2 	= "NSR02";
+const char* Udf::kVSDID_ECMA167_3 	= "NSR03";
+const char* Udf::kVSDID_ECMA168		= "CDW02";
 
 //----------------------------------------------------------------------
 // udf_volume_structure_descriptor_header
@@ -109,16 +111,23 @@ udf_extent_address::dump()
 }
 
 void
+udf_logical_block_address::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_logical_block_address");
+	PRINT(("block:     %ld\n", block()));
+	PRINT(("partition: %d\n", partition()));
+}
+
+void
 udf_long_address::dump()
 {
 	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_long_address");
 	PRINT(("length:   %ld\n", length()));
-	PRINT(("location: %ld\n", location().location));
-	PRINT(("partiton: %d\n", location().partition));
+	PRINT(("block:    %ld\n", block()));
+	PRINT(("partiton: %d\n", partition()));
 	PRINT(("implementation_use:\n"));
 	DUMP(implementation_use());
 }
-
 
 //----------------------------------------------------------------------
 // udf_tag
@@ -146,7 +155,7 @@ udf_tag::dump()
 status_t 
 udf_tag::init_check(uint32 diskBlock)
 {
-	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS, "udf_descriptor_tag");
+	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_HIGH_VOLUME, "udf_descriptor_tag");
 	PRINT(("diskLocation == %ld\n", diskBlock));
 	PRINT(("location() == %ld\n", location()));
 	status_t err = (diskBlock == location()) ? B_OK : B_NO_INIT;
@@ -173,18 +182,23 @@ void
 udf_primary_descriptor::dump()
 {
 	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_primary_descriptor");
+	
+	CS0String string;
+	
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                       %ld\n", vds_number()));
 	PRINT(("primary_volume_descriptor_number: %ld\n", primary_volume_descriptor_number()));
-	PRINT(("volume_identifier:                `%s'\n", volume_identifier()));
+	string = volume_identifier();
+	PRINT(("volume_identifier:                `%s'\n", string.String()));
 	PRINT(("volume_sequence_number:           %d\n", volume_sequence_number()));
 	PRINT(("max_volume_sequence_number:       %d\n", max_volume_sequence_number()));
 	PRINT(("interchange_level:                %d\n", interchange_level()));
 	PRINT(("max_interchange_level:            %d\n", max_interchange_level()));
 	PRINT(("character_set_list:               %ld\n", character_set_list()));
 	PRINT(("max_character_set_list:           %ld\n", max_character_set_list()));
-	PRINT(("volume_set_identifier:            `%s'\n", volume_set_identifier()));
+	string = volume_set_identifier();
+	PRINT(("volume_set_identifier:            `%s'\n", string.String()));
 	PRINT(("descriptor_character_set:\n"));
 	DUMP(descriptor_character_set());
 	PRINT(("explanatory_character_set:\n"));
@@ -279,7 +293,8 @@ udf_logical_descriptor::dump()
 	PRINT(("vds_number:                %ld\n", vds_number()));
 	PRINT(("character_set:\n"));
 	DUMP(character_set());
-	PRINT(("logical_volume_identifier: `%s'\n", logical_volume_identifier()));
+	CS0String string(logical_volume_identifier());
+	PRINT(("logical_volume_identifier: `%s'\n", string.String()));
 	PRINT(("logical_block_size:        %ld\n", logical_block_size()));
 	PRINT(("domain_id:\n"));
 	DUMP(domain_id());
@@ -367,3 +382,59 @@ udf_file_set_descriptor::dump()
 	DUMP(system_stream_directory_icb());
 }
 
+void
+udf_icb_entry_tag::dump()
+{
+	DUMP_INIT(CF_PUBLIC, "udf_icb_entry_tag");
+	PRINT(("prior_entries: %ld\n", prior_recorded_number_of_direct_entries()));
+	PRINT(("strategy_type: %d\n", strategy_type()));
+	PRINT(("strategy_parameters:\n"));
+	DUMP(strategy_parameters());
+	PRINT(("entry_count: %d\n", entry_count()));
+	PRINT(("file_type: %d\n", file_type()));
+	PRINT(("parent_icb_location:\n"));
+	DUMP(parent_icb_location());
+	PRINT(("all_flags: %d\n", flags()));
+	
+/*
+	uint32 prior_recorded_number_of_direct_entries;
+	uint16 strategy_type;
+	array<uint8, 2> strategy_parameters;
+	uint16 entry_count;
+	uint8 reserved;
+	uint8 file_type;
+	udf_logical_block_address parent_icb_location;
+	union {
+		uint16 all_flags;
+		struct {
+			uint16	descriptor_flags:3,			
+					if_directory_then_sort:1,	//!< To be set to 0 per UDF-2.01 2.3.5.4
+					non_relocatable:1,
+					archive:1,
+					setuid:1,
+					setgid:1,
+					sticky:1,
+					contiguous:1,
+					system:1,
+					transformed:1,
+					multi_version:1,			//!< To be set to 0 per UDF-2.01 2.3.5.4
+					is_stream:1,
+					reserved_icb_entry_flags:2;
+		} flags;
+	};
+
+*/
+
+}
+
+void
+udf_icb_header::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_DUMP, "udf_icb_header");
+
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("icb_tag:\n"));
+	DUMP(icb_tag());
+	
+}
