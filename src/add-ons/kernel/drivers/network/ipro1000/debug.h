@@ -21,14 +21,29 @@
 
 #include <KernelExport.h>
 
-#define DEBUG
-
 #ifdef DEBUG
+
 	#define TRACE(a...) dprintf("ipro1000: " a)
+
+	/* used by if_em.h */
+	#define DEBUG_INIT  1
+	#define DEBUG_IOCTL 1
+	#define DEBUG_HW    1
+	#define DBG_STATS	1
+
 #else
+
 	#define TRACE(a...)
+
+	/* used by if_em.h */
+	#define DEBUG_INIT  0
+	#define DEBUG_IOCTL 0
+	#define DEBUG_HW    0
+	#undef DBG_STATS
+
 #endif
 
-#define ERROR(a...) dprintf("ipro1000: " a)
+#define ERROR(a...) dprintf("ipro1000: ERROR " a)
+#define PRINT(a...) dprintf("ipro1000: " a)
 
 #endif

@@ -197,9 +197,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #define ETHER_ALIGN                     2
 
 /* Defines for printing debug information */
-#define DEBUG_INIT  1
-#define DEBUG_IOCTL 1
-#define DEBUG_HW    1
 
 #define INIT_DEBUGOUT(S)            if (DEBUG_INIT)  printf("ipro1000: " S "\n")
 #define INIT_DEBUGOUT1(S, A)        if (DEBUG_INIT)  printf("ipro1000: " S "\n", A)
@@ -249,7 +246,13 @@ typedef struct _DESCRIPTOR_PAIR
     ADDRESS_LENGTH_PAIR descriptor[4];
     u_int32_t   elements;
 } DESC_ARRAY, *PDESC_ARRAY;
-  
+
+// used by interrupt and event handling thread
+enum {
+	EVENT_LINK_CHANGED 		= 0x01,
+	EVENT_RESTART_TX		= 0x02,
+};
+
 /* Our adapter structure */
 struct adapter {
 	struct arpcom   interface_data;
@@ -268,12 +271,10 @@ struct adapter {
 	int             io_rid;
 	u_int8_t        unit;
 
-	/* Even processing thread, to move link status change out of the interrupt */ 	
+	/* Event processing thread, to move link status change out of the interrupt */ 	
 	thread_id		event_thread;
 	sem_id			event_sem;
 	volatile int32	event_flags;
-	enum { EVENT_LINK_CHANGED = 0x1, EVENT_RESTART_TX = 0x02 };
-	#define atomic_read(a) atomic_or(a, 0)
 
 	/* Info about the board itself */
 	u_int32_t       part_num;

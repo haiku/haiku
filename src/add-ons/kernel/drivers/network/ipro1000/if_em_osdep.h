@@ -201,7 +201,7 @@ void *driver_malloc(int size, int p2, int p3);
 void  driver_free(void *p, int p2);
 
 /* GCC will always emit a read opcode when reading from */
-/* a volatile poitner, even if the result is unused */
+/* a volatile pointer, even if the result is unused */
 #define E1000_WRITE_FLUSH(a) \
 	E1000_READ_REG(a, STATUS)
 

@@ -29,4 +29,6 @@ void	area_free(void *p);
 // generic macro for rounding, can only be used for power of 2 blocksize
 #define ROUNDUP(size, blocksize) 	(((size) + (blocksize) - 1) & ~((blocksize) - 1))
 
+#define atomic_read(a) atomic_or(a, 0)
+
 #endif

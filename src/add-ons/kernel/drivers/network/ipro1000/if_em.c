@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /*$FreeBSD: /repoman/r/ncvs/src/sys/dev/em/if_em.c,v 1.2.2.19 2004/04/22 22:03:26 ru Exp $*/
 
 #include "if_em.h"
-
+#include "util.h"
 
 
 /*********************************************************************
