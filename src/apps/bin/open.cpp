@@ -8,6 +8,7 @@
 #include <Roster.h>
 #include <Entry.h>
 #include <String.h>
+#include <List.h>
 
 #include <stdio.h>
 #include <string.h>
