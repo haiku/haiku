@@ -688,6 +688,11 @@ private:
 } __attribute__((packed));
 
 
+/*! \brief Maximum number of partition descriptors to be found in volume
+	descriptor sequence, per UDF-2.50
+*/
+extern const uint8 kMaxPartitionDescriptors;
+
 /*! \brief Partition Descriptor
 
 	See also: ECMA 167 3/10.5

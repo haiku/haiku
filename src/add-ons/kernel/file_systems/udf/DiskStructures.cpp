@@ -312,10 +312,11 @@ udf_implementation_use_descriptor::dump() const
 	DUMP(implementation_use());
 }
 
-
 //----------------------------------------------------------------------
 // udf_partition_descriptor
 //----------------------------------------------------------------------
+
+const uint8 Udf::kMaxPartitionDescriptors = 2;
 
 void
 udf_partition_descriptor::dump() const
