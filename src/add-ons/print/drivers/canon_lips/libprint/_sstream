@@ -1,0 +1,24 @@
+/*
+ * _sstream
+ * Copyright 1999-2000 Y.Takagi. All Rights Reserved.
+ */
+
+#if __MWERKS__
+#include <sstream>
+#else
+
+#ifndef __SSTREAM_H
+#define __SSTREAM_H
+
+#include <strstream>
+#include <string>
+
+class ostringstream : public ostrstream {
+public:
+	ostringstream() : ostrstream() {}
+	~ostringstream() { delete [] ostrstream::str(); }
+	string str() { *this << ends; return string(ostrstream::str()); }
+};
+
+#endif	/* __SSTREAM_H */
+#endif	/* USING_STRSTREAM */
