@@ -118,21 +118,25 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 				   "partitions for extended partition reached. Cycle?\n"));
 			error = B_BAD_DATA;
 		}
+
 		// read the PTS
 		if (error == B_OK)
 			error = _ReadPTS(offset);
+
 		// check the signature
 		if (error == B_OK
 			&& fPTS->signature != kPartitionTableSectorSignature) {
 			TRACE(("intel: _ParseExtended(): invalid PTS signature\n"));
 			error = B_BAD_DATA;
 		}
+
 		// ignore the PTS, if any error occured till now
 		if (error != B_OK) {
 			TRACE(("intel: _ParseExtended(): ignoring this PTS\n"));
 			error = B_OK;
 			break;
 		}
+
 		// examine the table
 		LogicalPartition extended;
 		LogicalPartition nonExtended;
@@ -168,10 +172,15 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 					if (partition && !partition->CheckLocation(fSessionSize,
 															   fBlockSize)) {
 						error = B_BAD_DATA;
+						TRACE(("intel: _ParseExtended(): Invalid partition "
+							"location: pts: %lld, offset: %lld, size: %lld\n",
+							partition->PTSOffset(), partition->Offset(),
+							partition->Size()));
 					}
 				}
 			}
 		}
+
 		// add non-extended partition to list
 		if (error == B_OK && !nonExtended.IsEmpty()) {
 			LogicalPartition *partition
@@ -181,12 +190,14 @@ PartitionMapParser::_ParseExtended(PrimaryPartition *primary, off_t offset)
 			else
 				error = B_NO_MEMORY;
 		}
+
 		// prepare to parse next extended partition
 		if (error == B_OK && !extended.IsEmpty())
 			offset = extended.Offset();
 		else
 			break;
 	}
+
 	return error;
 }
 
@@ -212,8 +223,7 @@ PartitionMapParser::_ReadPTS(off_t offset, partition_table_sector *pts)
 #else
 		error = B_IO_ERROR;
 #endif
-		TRACE(("intel: _ReadPTS(): reading the PTS failed: %s\n",
-			   strerror(error)));
+		TRACE(("intel: _ReadPTS(): reading the PTS failed: %lx\n", error));
 	}
 	return error;
 }

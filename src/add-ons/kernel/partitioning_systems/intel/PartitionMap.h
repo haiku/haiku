@@ -14,6 +14,12 @@
 #include <SupportDefs.h>
 #include <util/kernel_cpp.h>
 
+// These match those in DiskDeviceTypes.cpp and *must* be kept in sync.
+#define INTEL_PARTITION_NAME "Intel Partition Map"
+#define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
+#define BFS_NAME "BFS Filesystem"
+
+
 // is_empty_type
 static inline
 bool

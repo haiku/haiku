@@ -38,9 +38,24 @@
 #define INTEL_PARTITION_MODULE_NAME "partitioning_systems/intel/map/v1"
 #define INTEL_EXTENDED_PARTITION_MODULE_NAME "partitioning_systems/intel/extended/v1"
 
-// these match those in DiskDeviceTypes.cpp
-#define INTEL_PARTITION_NAME "Intel Partition Map"
-#define INTEL_EXTENDED_PARTITION_NAME "Intel Extended Partition"
+// no atomic_add() in the boot loader
+#ifdef _BOOT_MODE
+
+inline int32
+atomic_add(int32 *a, int32 num)
+{
+	int32 oldA = *a;
+	*a += num;
+	return oldA;
+}
+
+#endif
+
+
+// A PartitionMap with reference count.
+struct PartitionMapCookie : PartitionMap {
+	int32	ref_count;
+};
 
 
 // intel partition map module
@@ -275,14 +290,17 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	// check parameters
 	if (fd < 0 || !partition || !cookie)
 		return -1;
+
 	TRACE(("intel: pm_identify_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
 		   partition->id, partition->offset, partition->size,
 		   partition->block_size));
+
 	// reject extended partitions
 	if (partition->type
 		&& !strcmp(partition->type, kPartitionTypeIntelExtended)) {
 		return -1;
 	}
+
 	// check block size
 	uint32 blockSize = partition->block_size;
 	if (blockSize < sizeof(partition_table_sector)) {
@@ -290,10 +308,13 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 			   ">= %ld\n", blockSize, sizeof(partition_table_sector)));
 		return -1;
 	}
+
 	// allocate a PartitionMap
-	PartitionMap *map = new(nothrow) PartitionMap;
+	PartitionMapCookie *map = new(nothrow) PartitionMapCookie;
 	if (!map)
 		return -1;
+	map->ref_count = 1;
+
 	// read the partition structure
 	PartitionMapParser parser(fd, 0, partition->size, blockSize);
 	status_t error = parser.Parse(NULL, map);
@@ -301,6 +322,7 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 		*cookie = map;
 		return 0.5;
 	}
+
 	// cleanup, if not detected
 	delete map;
 	return -1;
@@ -311,14 +333,15 @@ static
 status_t
 pm_scan_partition(int fd, partition_data *partition, void *cookie)
 {
-	ObjectDeleter<PartitionMap> deleter((PartitionMap*)cookie);
 	// check parameters
 	if (fd < 0 || !partition || !cookie)
 		return B_ERROR;
+
 	TRACE(("intel: pm_scan_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
 		   partition->id, partition->offset, partition->size,
 		   partition->block_size));
-	PartitionMap *map = (PartitionMap*)cookie;
+
+	PartitionMapCookie *map = (PartitionMapCookie*)cookie;
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM
@@ -339,7 +362,6 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 														   index, -1);
 			index++;
 			if (!child) {
-TRACE(("Creating child at index %ld failed\n", index - 1));
 				// something went wrong
 				error = B_ERROR;
 				break;
@@ -364,9 +386,10 @@ TRACE(("Creating child at index %ld failed\n", index - 1));
 			}
 		}
 	}
+
 	// keep map on success or cleanup on error
 	if (error == B_OK) {
-		deleter.Detach();
+		atomic_add(&map->ref_count, 1);
 	} else {
 		partition->content_cookie = NULL;
 		for (int32 i = 0; i < partition->child_count; i++) {
@@ -382,8 +405,11 @@ static
 void
 pm_free_identify_partition_cookie(partition_data */*partition*/, void *cookie)
 {
-	if (cookie)
-		delete (PartitionMap*)cookie;
+	if (cookie) {
+		PartitionMapCookie *map = (PartitionMapCookie*)cookie;
+		if (atomic_add(&map->ref_count, -1) == 1)
+			delete map;
+	}
 }
 
 // pm_free_partition_cookie
@@ -403,7 +429,7 @@ void
 pm_free_partition_content_cookie(partition_data *partition)
 {
 	if (partition && partition->content_cookie) {
-		delete (PartitionMap*)partition->content_cookie;
+		pm_free_identify_partition_cookie(partition, partition->content_cookie);
 		partition->content_cookie = NULL;
 	}
 }
@@ -518,8 +544,10 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 	// check parameters
 	if (fd < 0 || !partition || !cookie || !partition->cookie)
 		return -1;
+
 	TRACE(("intel: ep_identify_partition(%d, %lld, %lld, %ld)\n", fd,
 		   partition->offset, partition->size, partition->block_size));
+
 	// our parent must be a intel partition map partition and we must have
 	// extended partition type
 	if (!partition->type
@@ -531,6 +559,7 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 		|| strcmp(parent->content_type, kPartitionTypeIntel)) {
 		return -1;
 	}
+
 	// things seem to be in order
 	return 0.5;
 }
@@ -543,6 +572,10 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	// check parameters
 	if (fd < 0 || !partition || !partition->cookie)
 		return B_ERROR;
+
+	TRACE(("intel: ep_scan_partition(%d, %lld, %lld, %ld)\n", fd,
+		   partition->offset, partition->size, partition->block_size));
+
 	partition_data *parent = get_parent_partition(partition->id);
 	if (!parent)
 		return B_ERROR;
@@ -566,6 +599,8 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		index++;
 		if (!child) {
 			// something went wrong
+			TRACE(("intel: ep_scan_partition(): failed to create child "
+				"partition\n"));
 			error = B_ERROR;
 			break;
 		}
@@ -576,6 +611,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		char type[B_FILE_NAME_LENGTH];
 		logical->GetTypeString(type);
 		child->type = strdup(type);
+
 		// parameters
 		char buffer[128];
 		sprintf(buffer, "type = %u ; active = %d", logical->Type(),
@@ -584,6 +620,8 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		child->cookie = logical;
 		// check for allocation problems
 		if (!child->type || !child->parameters) {
+			TRACE(("intel: ep_scan_partition(): failed to allocation type "
+				"or parameters\n"));
 			error = B_NO_MEMORY;
 			break;
 		}
