@@ -325,7 +325,7 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 		header.colors != B_CMYA32 &&
 		header.colors != B_CMY24)
 		return B_NO_TRANSLATOR;
-	if (header.rowBytes * (header.bounds.Height() + 1) > header.dataSize)
+	if (header.rowBytes * (header.bounds.Height() + 1) != header.dataSize)
 		return B_NO_TRANSLATOR;
 			
 	if (outInfo) {
@@ -442,6 +442,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			return B_ERROR;
 	
 		// check if msheader is valid
+		if (msheader.width == 0 || msheader.height == 0)
+			return B_NO_TRANSLATOR;
 		if (msheader.planes != 1)
 			return B_NO_TRANSLATOR;
 		if ((msheader.bitsperpixel != 1 ||
@@ -458,6 +460,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 				msheader.compression != BMP_NO_COMPRESS) &&
 			(msheader.bitsperpixel != 32 ||
 				msheader.compression != BMP_NO_COMPRESS))
+			return B_NO_TRANSLATOR;
+		if (msheader.imagesize == 0 && msheader.compression)
 			return B_NO_TRANSLATOR;
 		if (msheader.colorsimportant > msheader.colorsused)
 			return B_NO_TRANSLATOR;
@@ -513,6 +517,8 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			return B_ERROR;
 	
 		// check if msheader is valid
+		if (os2header.width == 0 || os2header.height == 0)
+			return B_NO_TRANSLATOR;
 		if (os2header.planes != 1)
 			return B_NO_TRANSLATOR;
 		if (os2header.bitsperpixel != 1 &&
@@ -551,7 +557,6 @@ identify_bmp_header(BPositionIO *inSource, translator_info *outInfo,
 			int32 padding = 0;
 			// determine fileSize / imagesize
 			switch (pmsheader->bitsperpixel) {
-				case 32:
 				case 24:
 				{
 					if (pos2skip && fileHeader.dataOffset > 26)
@@ -1616,129 +1621,151 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 	uint8 mask = (1 << bitsPerPixel) - 1;
 
 	uint8 count, indices, index;
-	// assumes datasize is relatively small
-	uint8 *bitspixels = new uint8[datasize];
-	if (!bitspixels)
-		return B_ERROR;
+	// Setup outDestination so that it can be written to
+	// from the end of the file to the beginning instead of
+	// the other way around
 	int32 bitsRowBytes = msheader.width * 4;
+	off_t bitsFileSize = (bitsRowBytes * msheader.height) + 
+		sizeof(TranslatorBitmap);
+	if (outDestination->SetSize(bitsFileSize) != B_OK)
+		// This call should work for BFile and BMallocIO objects,
+		// but may not work for other BPositionIO based types
+		return B_ERROR;
+	uint8 *bitsRowData = new uint8[bitsRowBytes];
+	if (!bitsRowData)
+		return B_ERROR;
 	uint32 bmppixcol = 0, bmppixrow = 0;
-	int32 bitsoffset = 0;
+	uint32 defaultcolor = 0;
+	memcpy(&defaultcolor, palette, 4);
+	// set bits output to last row in the image
+	off_t bitsoffset = ((msheader.height - (bmppixrow + 1)) * bitsRowBytes) +
+		(bmppixcol * 4);
+	outDestination->Seek(bitsoffset, SEEK_CUR);
 	ssize_t rd = inSource->Read(&count, 1);
 	while (rd > 0) {
 		// repeated color
 		if (count) {
-			rd = inSource->Read(&indices, 1);
-			if (rd != 1)
+			// abort if count is greater than the number of
+			// pixels remaining in the current row
+			if (count + bmppixcol > msheader.width) {
+				rd = -1;
 				break;
+			}
+			
+			rd = inSource->Read(&indices, 1);
+			if (rd != 1) {
+				rd = -1;
+				break;
+			}
 			for (uint8 i = 0; i < count; i++) {
-				bitsoffset = ((msheader.height -
-					(bmppixrow + 1)) * bitsRowBytes) +
-						(bmppixcol * 4);
 				index = (indices >> (bitsPerPixel * ((pixelsPerByte - 1) - 
 					(i % pixelsPerByte)))) & mask;
-				memcpy(bitspixels + bitsoffset, palette + (index * 4), 3);
+				memcpy(bitsRowData + (bmppixcol*4), palette + (index*4), 4);
 				bmppixcol++;
 			}
 		// special code
 		} else {
 			uint8 code;
 			rd = inSource->Read(&code, 1);
-			if (rd != 1)
+			if (rd != 1) {
+				rd = -1;
 				break;
+			}
 			switch (code) {
+				// end of line
 				case 0:
-					// end of line
 					// if there are columns remaing on this
 					// line, set them to the color at index zero
-					while (bmppixcol != msheader.width) {
-						bitsoffset = ((msheader.height -
-							(bmppixrow + 1)) *
-								bitsRowBytes) +
-								(bmppixcol * 4);
-						memcpy(bitspixels + bitsoffset, palette, 3);
-						bmppixcol++;
-					}
+					if (bmppixcol != msheader.width)
+						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+							(msheader.width - bmppixcol) * 4);
+					outDestination->Write(bitsRowData, bitsRowBytes);
 					bmppixcol = 0;
 					bmppixrow++;
+					if (bmppixrow < msheader.height)
+						outDestination->Seek(-(bitsRowBytes * 2), SEEK_CUR);
 					break;
-								
+				
+				// end of bitmap				
 				case 1:
-					// end of bitmap
+					// if at the end of a row
 					if (bmppixcol == msheader.width) {
+						outDestination->Write(bitsRowData, bitsRowBytes);
 						bmppixcol = 0;
 						bmppixrow++;
+						if (bmppixrow < msheader.height)
+							outDestination->Seek(-(bitsRowBytes * 2),
+								SEEK_CUR);
 					}
 					
 					while (bmppixrow < msheader.height) {
-						bitsoffset = ((msheader.height -
-							(bmppixrow + 1)) *
-								bitsRowBytes) +
-								(bmppixcol * 4);
-						memcpy(bitspixels + bitsoffset, palette, 3);
-						bmppixcol++;
-						
-						if (bmppixcol == msheader.width) {
-							bmppixcol = 0;
-							bmppixrow++;
-						}
+						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+							(msheader.width - bmppixcol) * 4);
+						outDestination->Write(bitsRowData, bitsRowBytes);
+						bmppixcol = 0;
+						bmppixrow++;
+						if (bmppixrow < msheader.height)
+							outDestination->Seek(-(bitsRowBytes * 2),
+								SEEK_CUR);
 					}
 					rd = 0;
 						// break out of while loop
 					break;
-								
+				
+				// delta, skip several rows and/or columns and
+				// fill the skipped pixels with the default color				
 				case 2:
 				{
-					// delta, wierd feature
-					uint8 x, dx, dy;
-					inSource->Read(&dx, 1);
-					inSource->Read(&dy, 1);
+					uint8 da[2], lastcol, dx, dy;
+					rd = inSource->Read(da, 2);
+					if (rd != 2) {
+						rd = -1;
+						break;
+					}
+					dx = da[0];
+					dy = da[1];
+					
+					// abort if dx or dy is too large
+					if ((dx + bmppixcol >= msheader.width) ||
+						(dy + bmppixrow >= msheader.height)) {
+						rd = -1;
+						break;
+					}	
 								
-					x = bmppixcol;
+					lastcol = bmppixcol;
 								
 					// set all pixels to the first entry in
 					// the palette, for the number of rows skipped
 					while (dy > 0) {
-						bitsoffset = ((msheader.height -
-							(bmppixrow + 1)) *
-								bitsRowBytes) +
-								(bmppixcol * 4);
-						memcpy(bitspixels + bitsoffset, palette, 3);
-						bmppixcol++;
-									
-						if (bmppixcol == msheader.width) {
-							bmppixcol = 0;
-							bmppixrow++;
-							dy--;
-						}
+						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+							(msheader.width - bmppixcol) * 4);
+						outDestination->Write(bitsRowData, bitsRowBytes);
+						bmppixcol = 0;
+						bmppixrow++;
+						dy--;
+						outDestination->Seek(-(bitsRowBytes * 2), SEEK_CUR);
 					}
 								
-					// get to the same column as where we started
-					while (x != bmppixcol) {
-						bitsoffset = ((msheader.height -
-							(bmppixrow + 1)) *
-								bitsRowBytes) +
-								(bmppixcol * 4);
-						memcpy(bitspixels + bitsoffset, palette, 3);
-						bmppixcol++;
-					}
-								
-					// move over dx pixels
-					for (uint8 i = 0; i < dx; i++) {
-						bitsoffset = ((msheader.height -
-							(bmppixrow + 1)) *
-								bitsRowBytes) +
-								(bmppixcol * 4);
-						memcpy(bitspixels + bitsoffset, palette, 3);
-						bmppixcol++;
+					if (bmppixcol < (uint32) lastcol + dx) {
+						memset(bitsRowData + (bmppixcol * 4), defaultcolor,
+							(dx + lastcol - bmppixcol) * 4);
+						bmppixcol = dx + lastcol;
 					}
 					
 					break;
 				}
-							
-							
+
 				// code >= 3
+				// read code uncompressed indices
 				default:
-					// read code uncompressed indices
+					// abort if number of uncompressed pixels
+					// is larger than the number of pixels remaining
+					// in the current row
+					if (code + bmppixcol > msheader.width) {
+						rd = -1;
+						break;
+					}
+					
 					uint8 uncomp[256];
 					int32 padding;
 					if (!(code % pixelsPerByte))
@@ -1750,20 +1777,16 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 						((code % pixelsPerByte) ? 1 : 0) + padding;
 					rd = inSource->Read(uncomp, uncompBytes);
 					if (rd != uncompBytes) {
-						rd = 0;
+						rd = -1;
 						break;
 					}
 					for (uint8 i = 0; i < code; i++) {
-						bitsoffset = ((msheader.height - 
-							(bmppixrow + 1)) *
-								bitsRowBytes) +
-								(bmppixcol * 4);
 						indices = (uncomp + (i / pixelsPerByte))[0];
 						index = (indices >>
 							(bitsPerPixel * ((pixelsPerByte - 1) - 
 								(i % pixelsPerByte)))) & mask;
-						memcpy(bitspixels + bitsoffset,
-							palette + (index * 4), 3);
+						memcpy(bitsRowData + (bmppixcol * 4),
+							palette + (index * 4), 4);
 						bmppixcol++;
 					}
 
@@ -1773,10 +1796,13 @@ translate_from_bmppalr_to_bits(BPositionIO *inSource,
 		if (rd > 0)
 			rd = inSource->Read(&count, 1);
 	}
-	outDestination->Write(bitspixels, datasize);
-				
-	delete[] bitspixels;
-	return B_OK;
+	
+	delete[] bitsRowData;
+	
+	if (!rd)
+		return B_OK;
+	else
+		return B_NO_TRANSLATOR;
 }
 
 // ---------------------------------------------------------------
@@ -1905,7 +1931,8 @@ translate_from_bmp(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 				msheader.colorsused = 1 << msheader.bitsperpixel;
 			
 			if (inSource->Read(bmppalette, msheader.colorsused *
-				palBytesPerPixel) != (off_t) msheader.colorsused * palBytesPerPixel)
+				palBytesPerPixel) !=
+					(off_t) msheader.colorsused * palBytesPerPixel)
 				return B_NO_TRANSLATOR;
 				
 			// skip over non-BMP data
@@ -2107,7 +2134,7 @@ BMPTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 	if (!outView || !outExtent)
 		return B_BAD_VALUE;
 
-	BMPView *view = new BMPView(BRect(0,0,225,175),
+	BMPView *view = new BMPView(BRect(0, 0, 225, 175),
 		"BMPTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
 	*outView = view;
 	*outExtent = view->Bounds();
