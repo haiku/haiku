@@ -49,28 +49,6 @@ bool PCL6Driver::startDoc()
 	} 
 }
 
-bool PCL6Driver::startPage(int)
-{
-	// XXX orientation
-	HP_BeginPage_1(__stream, HP_ePortraitOrientation, mediaSize(getJobData()->getPaper()));
-	HP_SetPageOrigin_1(__stream, 0, 0); // XXX
-	HP_SetColorSpace_1(__stream, HP_eGray);
-	HP_SetPaintTxMode_1(__stream, HP_eOpaque);
-	HP_SetSourceTxMode_1(__stream, HP_eOpaque);
-	return true;
-}
-
-bool PCL6Driver::endPage(int)
-{
-	try {
-		HP_EndPage_2(__stream, getJobData()->getCopies());
-		return true;
-	}
-	catch (TransportException &err) {
-		return false;
-	} 
-}
-
 bool PCL6Driver::endDoc(bool)
 {
 	try {
@@ -211,13 +189,30 @@ void PCL6Driver::jobStart()
 {
 	// PJL header
 	writeSpoolString("\033%%-12345X@PJL JOB\n"
+					 "@PJL SET RESOLUTION=%d\n"
 	                 "@PJL ENTER LANGUAGE=PCLXL\n"
 	                 ") HP-PCL XL;1;1;"
-	                 "Comment Copyright (c) 2003 OBOS\n");
+	                 "Comment Copyright (c) 2003 OBOS\n",
+	                 getJobData()->getXres());
 	// PCL6 begin
 	__stream = HP_NewStream(16 * 1024, this);
-	HP_BeginSession_1(__stream, getJobData()->getXres(), getJobData()->getYres(), HP_eInch);
+	HP_BeginSession_2(__stream, getJobData()->getXres(), getJobData()->getYres(), HP_eInch, HP_eBackChAndErrPage);
 	HP_OpenDataSource_1(__stream, HP_eDefaultDataSource, HP_eBinaryLowByteFirst);	
+}
+
+bool PCL6Driver::startPage(int)
+{
+	// XXX orientation
+	HP_BeginPage_3(__stream, HP_ePortraitOrientation, mediaSize(getJobData()->getPaper()), HP_eAutoSelect);
+	// PageOrigin from Windows NT printer driver
+	int x = 142 * getJobData()->getXres() / 600;
+	int y = 100 * getJobData()->getYres() / 600;
+	HP_SetPageOrigin_1(__stream, x, y);
+	HP_SetColorSpace_1(__stream, HP_eGray);
+	HP_SetPaintTxMode_1(__stream, HP_eOpaque);
+	HP_SetSourceTxMode_1(__stream, HP_eOpaque);
+	HP_SetROP_1(__stream, 204);
+	return true;
 }
 
 void PCL6Driver::startRasterGraphics(int x, int y, int width, int height)
@@ -229,6 +224,7 @@ void PCL6Driver::startRasterGraphics(int x, int y, int width, int height)
 
 void PCL6Driver::endRasterGraphics()
 {
+	HP_EndImage_1(__stream);
 }
 
 void PCL6Driver::rasterGraphics(
@@ -243,6 +239,17 @@ void PCL6Driver::rasterGraphics(
 	HP_RawUByteArray(__stream, (uchar*)buffer, size);
 }
 
+bool PCL6Driver::endPage(int)
+{
+	try {
+		HP_EndPage_2(__stream, getJobData()->getCopies());
+		return true;
+	}
+	catch (TransportException &err) {
+		return false;
+	} 
+}
+
 void PCL6Driver::jobEnd()
 {
 	HP_CloseDataSource_1(__stream);
@@ -255,8 +262,7 @@ void PCL6Driver::jobEnd()
 
 void PCL6Driver::move(int x, int y)
 {
-	// XXX optimise use "smallest" data type
-	HP_SetCursor_3(__stream, x, y);
+	HP_SetCursor_1(__stream, x, y);
 }
 
 HP_UByte PCL6Driver::mediaSize(JobData::PAPER paper)
