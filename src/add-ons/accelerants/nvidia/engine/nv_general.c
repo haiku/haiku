@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.18 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.19 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1129,7 +1129,10 @@ static status_t nv_general_bios_to_powergraphics()
 	 * (NOTE: testsignal function block resides in DAC1 only (!)) */
 	if (si->ps.secondary_head) DAC2W(TSTCTRL, (DAC2R(TSTCTRL) & 0xfffeefff));
 
-	/* setup AGP */
+	/* setup AGP:
+	 * Note:
+	 * This may only be done when no transfers are in progress on the bus, so now
+	 * is probably a good time.. */
 	nv_agp_setup();
 
 	/* turn screen one on */

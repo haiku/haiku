@@ -81,7 +81,6 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	// for driver
 	char   accelerant[B_FILE_NAME_LENGTH];
 	bool   dumprom;
-	bool   unhide_fw;
 	// for accelerant
 	uint32 logmask;
 	uint32 memory;
@@ -89,6 +88,7 @@ typedef struct settings {  // apsed, see comments in nv.settings
 	bool   hardcursor;
 	bool   switchhead;
 	bool   force_pci;
+	bool   unhide_fw;
 	bool   pgm_panel;
 } settings;
 

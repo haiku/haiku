@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.18), (Rudolf)</h1></p>
+<p><h1>head (0.19), (Rudolf)</h1></p>
 <ul>
 	<li>Added AGP mode capability on AGP cards along with the option to block it in nv.settings. No GART and AGP aperture support; but if your card and system AGP host bridge support the 'fastwrite' (FW) feature, you'll notice a nice speedup of unaccelerated graphics.
 	<ul>
@@ -12,7 +12,7 @@
 	<li>Also tested video playback using bitmap output mode: CPU load drops considerably depending on desktop colordepth and resolution of the video played back.<br>
 	<li>2D acceleration will not speedup because it's working 'local', so within the graphics cards engine and it's RAM only.
 	</ul>
-<strong>Note please :</strong><br>
+<strong>Note please:</strong><br>
 	<ul>
 	<li>You need the new AGP kernel driver I setup for this feature, without it you will remain using PCI mode as usual.
 	<li>This AGP stuff BTW will be re-setup later on (as a module) to be graphics driver-independant so all AGP cards, even AGP cards running in VESA mode, can profit from it.
@@ -21,7 +21,11 @@
 	<li>Updated CRTC modeline tuning for panels: this should fix the 'right-shifted' picture on some panels in their native modes;
 	<li>Fixed BIOS ROM dump (to file) option;
 	<li>Fixed GET_TIMING_CONSTRAINTS and GET_ACCELERANT_DEVICE_INFO accelerant hooks to return valid data; updated modeline checking and modification code (used by ProposeDisplayMode) to adhere to one more timing constraint
-	<li>Lowered fixed refreshrate setting for panels to be 61Hz now: it turns out panels exist that are picky 'on the high side' as well.
+	<li>Lowered fixed refreshrate setting for panels to be 60Hz now: it turns out panels exist that are picky 'on the high side' as well;
+	<li>Added option in nv.settings to block refreshrate programming if a flatpanel is active: this should enable support on picky panels;
+	<li>Added option in nv.settings to 'unhide' fastwrite support in AGP cards. Some older cards support FW even though normally they don't show it so it won't get activated (confirmed GeForce2 MX400, NV11).<br>
+ 	<strong>NOTE please:</strong><br>
+ 	This is a tweak that you <strong>can</strong> enable, but you do so at your own risk (of course)!
 </ul>
 <p><h1>nv_driver 0.10, (Rudolf)</h1></p>
 <ul>

@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-6/2004.
+	Rudolf Cornelissen 10/2002-7/2004.
 */
 
 #define MODULE_BIT 0x00800000

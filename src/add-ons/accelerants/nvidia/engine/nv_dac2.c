@@ -149,13 +149,23 @@ status_t nv_dac2_set_pix_pll(display_mode target)
 	float pix_setting, req_pclk;
 	status_t result;
 
-	/* fix a DVI or laptop flatpanel to 61Hz refresh!
-	 * (we can't risk getting below 60.0Hz as some panels shut-off then!) */
+	/* we offer this option because some panels have very tight restrictions,
+	 * and there's no overlapping settings range that makes them all work.
+	 * note:
+	 * this assumes the cards BIOS correctly programmed the panel (is likely) */
+	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
+	if (si->ps.tmds2_active && !si->settings.pgm_panel)
+	{
+		LOG(4,("DAC2: Not programming DFP refresh (specified in nv.settings)\n"));
+		return B_OK;
+	}
+
+	/* fix a DVI or laptop flatpanel to 60Hz refresh! */
 	/* Note:
 	 * The pixelclock drives the flatpanel modeline, not the CRTC modeline. */
 	if (si->ps.tmds2_active)
 	{
-		LOG(4,("DAC2: Fixing DFP refresh to 61Hz!\n"));
+		LOG(4,("DAC2: Fixing DFP refresh to 60Hz!\n"));
 
 		/* use the panel's modeline to determine the needed pixelclock */
 		target.timing.pixel_clock = si->ps.p2_timing.pixel_clock;

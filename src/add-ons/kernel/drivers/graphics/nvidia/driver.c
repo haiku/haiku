@@ -258,7 +258,6 @@ static settings current_settings = { // see comments in nv.settings
 	// for driver
 	DRIVER_PREFIX ".accelerant",
 	false,      // dumprom
-	false,		// unhide_fw
 	// for accelerant
 	0x00000000, // logmask
 	0,          // memory
@@ -266,6 +265,7 @@ static settings current_settings = { // see comments in nv.settings
 	false,      // hardcursor
 	false,		// switchhead
 	false,		// force_pci
+	false,		// unhide_fw
 	true,		// pgm_panel
 };
 
@@ -379,7 +379,6 @@ init_driver(void) {
 			strcpy (current_settings.accelerant, item);
 		}
 		current_settings.dumprom = get_driver_boolean_parameter (settings_handle, "dumprom", false, false);
-		current_settings.unhide_fw = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
 
 		// for accelerant
 		item = get_driver_parameter (settings_handle, "logmask", "0x00000000", "0x00000000");
@@ -394,6 +393,7 @@ init_driver(void) {
 		current_settings.usebios = get_driver_boolean_parameter (settings_handle, "usebios", false, false);
 		current_settings.switchhead = get_driver_boolean_parameter (settings_handle, "switchhead", false, false);
 		current_settings.force_pci = get_driver_boolean_parameter (settings_handle, "force_pci", false, false);
+		current_settings.unhide_fw = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
 		current_settings.pgm_panel = get_driver_boolean_parameter (settings_handle, "pgm_panel", false, false);
 
 		unload_driver_settings (settings_handle);

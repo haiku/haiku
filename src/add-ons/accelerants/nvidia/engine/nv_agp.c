@@ -2,7 +2,7 @@
    Rudolf Cornelissen 6/2004-7/2004
 
    Note:
-   This stuff will probably be relocated to the AGP busmanager module later on,
+   Most of this stuff will probably be relocated to the AGP busmanager module later on,
    but for now we have something to test with...
 */
 
@@ -39,6 +39,22 @@ status_t nv_agp_setup(void)
 	LOG(4,("AGP: graphicscard is AGP type, supporting specification %d.%d;\n",
 		((ai_card.config.agp_cap_id & AGP_rev_major) >> AGP_rev_major_shift),
 		((ai_card.config.agp_cap_id & AGP_rev_minor) >> AGP_rev_minor_shift)));
+
+	/* try to enable FW support if user requested this ('unsupported' tweak!) */
+	if (si->settings.unhide_fw)
+	{
+		uint32 reg;
+
+		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
+
+		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
+		/* 'force' FW support */
+		reg = (NV_REG32(NV32_NVSTRAPINFO2) & ~0x00000800);
+		/* enable strapinfo overwrite */
+		NV_REG32(NV32_NVSTRAPINFO2) = (reg | 0x80000000);
+
+		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
+	}
 
 	nv_agp_list_caps(ai_card);
 
