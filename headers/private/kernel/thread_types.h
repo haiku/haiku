@@ -54,6 +54,14 @@ enum {
 struct image;
 	// defined in image.c
 
+struct death_entry {
+	struct list_link	link;
+	team_id				team;
+	thread_id			thread;
+	status_t			status;
+	uint32				reason;
+};
+
 struct team {
 	struct team		*next;			/* next team in the hash */
 	struct team		*siblings_next;
@@ -68,6 +76,8 @@ struct team {
 	int				pending_signals;
 	void			*io_context;
 	sem_id			death_sem;		/* semaphore to wait on for dying threads */
+	sem_id			dead_child_sem;	/* wait for dead child entries */
+	struct list		dead_children;
 	vm_address_space *aspace;
 	vm_address_space *kaspace;
 	addr_t			user_env_base;
@@ -100,7 +110,6 @@ struct thread {
 	sem_id			sem_blocking;
 	int				sem_count;
 	int				sem_acquire_count;
-	int				sem_deleted_retcode;
 	int				sem_errcode;
 	int				sem_flags;
 
@@ -120,9 +129,13 @@ struct thread {
 	thread_entry_func entry;
 	void			*args1, *args2;
 	struct team		*team;
-	status_t		return_code;
-	sem_id			return_code_sem;
-	int				return_flags;
+
+	struct {
+		sem_id		sem;
+		status_t	status;
+		uint32		reason;
+		struct list	waiters;
+	} exit;
 
 	// stack
 	region_id		kernel_stack_region_id;
