@@ -35,8 +35,7 @@
 // to refresh only changed parts of text (currently we often redraw the whole text)
 
 // Known Bugs:
-// - PointAt(), OffsetAt(), and possibly some other functions don't work right yet
-// when alignment is different than B_ALIGN_LEFT.
+// - some issues when alignment is different than B_ALIGN_LEFT.
 // - visual artifacts appears when you highlight some text which spans between
 // multiple lines and with mixed sizes/styles (could be something in GetTextRegion())
 
@@ -1845,12 +1844,11 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	}
 	
 	if (fAlignment != B_ALIGN_LEFT) {
-		float modifier = fTextRect.right - StyledWidth(line->offset,
-												(line + 1)->offset - line->offset);
+		float modifier = fTextRect.right - LineWidth(lineNum);
 		if (fAlignment == B_ALIGN_CENTER)
 			modifier /= 2;
 		result.x += modifier;
-	}	
+	}
 	// convert from text rect coordinates
 	result.x += fTextRect.left - 1.0;
 
@@ -1894,6 +1892,13 @@ BTextView::OffsetAt(BPoint point) const
 	}
 	
 	// convert to text rect coordinates
+	if (fAlignment != B_ALIGN_LEFT) {
+		float lineWidth = fTextRect.right - LineWidth(lineNum);
+		if (fAlignment == B_ALIGN_CENTER)
+			lineWidth /= 2;
+		point.x -= lineWidth;
+	}
+	
 	point.x -= fTextRect.left;
 	point.x = max_c(point.x, 0.0);
 	
@@ -2055,8 +2060,10 @@ BTextView::LineWidth(int32 lineNum) const
 	CALLED();
 	if (lineNum < 0 || lineNum >= fLines->NumLines())
 		return 0;
-	else
-		return (*fLines)[lineNum]->width;
+	else {
+		STELinePtr line = (*fLines)[lineNum];
+		return StyledWidth(line->offset, (line + 1)->offset - line->offset);
+	}
 }
 
 
@@ -2734,7 +2741,6 @@ BTextView::InsertText(const char *inText, int32 inLength, int32 inOffset,
 	fStyles->BumpOffset(inLength, fStyles->OffsetToRun(inOffset - 1) + 1);
 	
 	if (inRuns != NULL)
-		//SetStyleRange(inOffset, inOffset + inLength, inStyles, false);
 		SetRunArray(inOffset, inOffset + inLength, inRuns);
 	else {
 		// apply nullStyle to inserted text
@@ -3572,10 +3578,14 @@ BTextView::StyledWidth(int32 fromOffset, int32 length, float *outAscent,
 		maxAscent = max_c(ascent, maxAscent);
 		maxDescent = max_c(descent, maxDescent);
 		
-		// TODO: Change this with a call to _BWidthBuffer_::StringWidth()
-		// as soon as everything else work
-		result += font->StringWidth(fText->Text() + fromOffset, numChars);
-
+		// Use _BWidthBuffer_ if possible
+		if (sWidths != NULL) {
+			LockWidthBuffer();
+			result += sWidths->StringWidth(fText->Text(), fromOffset, numChars, font);
+			UnlockWidthBuffer();
+		} else
+			result += font->StringWidth(fText->Text() + fromOffset, numChars);
+		
 		fromOffset += numChars;
 		length -= numChars;
 	}
@@ -3673,9 +3683,10 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 
 		if (fAlignment != B_ALIGN_LEFT) {
 			// B_ALIGN_RIGHT
-			startLeft = (fTextRect.right - StyledWidth(line->offset, length));
+			startLeft = (fTextRect.right - LineWidth(i));
 			if (fAlignment == B_ALIGN_CENTER)
-				startLeft /= 2;	
+				startLeft /= 2;
+			startLeft += fTextRect.left;
 		}
 			
 		MovePenTo(startLeft, line->origin + line->ascent + fTextRect.top);

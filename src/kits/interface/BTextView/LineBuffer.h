@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2003, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -24,25 +24,15 @@
 //	Description:	Line storage used by BTextView
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
-
-// System Includes -------------------------------------------------------------
 #include <SupportDefs.h>
 #include "TextViewSupportBuffer.h"
 
-// Project Includes ------------------------------------------------------------
-
-// Local Includes --------------------------------------------------------------
-
-// Local Defines ---------------------------------------------------------------
 typedef struct STELine {
 	long			offset;		// offset of first character of line
 	float			origin;		// pixel position of top of line
 	float			ascent;		// maximum ascent for line
-	float			width;		// width of line
 } STELine, *STELinePtr;
 
-// Globals ---------------------------------------------------------------------
 
 // _BLineBuffer_ class ---------------------------------------------------------
 class _BLineBuffer_ : public _BTextViewSupportBuffer_<STELine> {
@@ -64,19 +54,21 @@ virtual					~_BLineBuffer_();
 		long			NumLines() const;
 		const STELinePtr operator[](int32 index) const;
 };
-//------------------------------------------------------------------------------
+
+
 inline int32
 _BLineBuffer_::NumLines() const
 {
 	return fItemCount - 1;
 }
-//------------------------------------------------------------------------------
+
+
 inline const STELinePtr
 _BLineBuffer_::operator[](int32 index) const
 {
 	return &fBuffer[index];
 }
-//------------------------------------------------------------------------------
+
 
 /*
  * $Log $
