@@ -4,6 +4,7 @@
 #define _beos_test_app_h_
 
 #include <Application.h>
+#include <List.h>
 #include <MessageQueue.h>
 
 // TestHandler
@@ -23,20 +24,25 @@ private:
 class BTestApp : public BApplication {
 public:
 	BTestApp(const char *signature);
+	virtual ~BTestApp();
 
 	status_t Init();
 	void Terminate();
 
 	virtual void ReadyToRun();
 
+	BTestHandler *CreateTestHandler();
+	bool DeleteTestHandler(BTestHandler *handler);
+
 	BTestHandler &Handler();
+	BTestHandler *TestHandlerAt(int32 index);
 
 private:
 	static int32 _AppThreadStart(void *data);
 
 private:
 	thread_id		fAppThread;
-	BTestHandler	fHandler;
+	BList			fHandlers;
 };
 
 #endif	// _beos_test_app_h_
