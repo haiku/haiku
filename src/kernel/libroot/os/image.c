@@ -27,7 +27,8 @@ load_image(int32 argCount, const char **args, const char **environ)
 	while (environ[envCount] != NULL)
 		envCount++;
 
-	return _kern_load_image(argCount, args, envCount, environ, B_NORMAL_PRIORITY);
+	return _kern_load_image(argCount, args, envCount, environ,
+		B_NORMAL_PRIORITY, B_WAIT_TILL_LOADED);
 }
 
 
