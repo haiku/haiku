@@ -63,7 +63,7 @@ public:
 	*/
 	status_t FindExtent(off_t start, udf_long_address *extent, bool *isEmpty) {
 		DEBUG_INIT_ETC(CF_PUBLIC | CF_FILE_OPS | CF_HIGH_VOLUME, "AllocationDescriptorList<>",
-		               ("start: %lld, extent: %p, isEmpty: %p", start, extent, isEmpty));
+		               ("start: %Ld, extent: %p, isEmpty: %p", start, extent, isEmpty));
 		off_t startBlock = start >> fVolume->BlockShift();
 	
 		// This should never have to happen, as FindExtent is only called by

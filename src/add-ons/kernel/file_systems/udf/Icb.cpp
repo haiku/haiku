@@ -55,7 +55,7 @@ status_t
 Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 {
 	DEBUG_INIT_ETC(CF_PUBLIC | CF_HIGH_VOLUME, "Icb",
-	               ("pos: %lld, buffer: %p, length: (%p)->%ld", pos, buffer, length, (length ? *length : 0)));
+	               ("pos: %Ld, buffer: %p, length: (%p)->%ld", pos, buffer, length, (length ? *length : 0)));
 
 	if (!buffer || !length || pos < 0)
 		RETURN(B_BAD_VALUE);		

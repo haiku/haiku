@@ -61,7 +61,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 		} else {
 			CS0String string(entry->id(), entry->id_length());
 			PRINT(("id == `%s'\n", string.String()));
-			PRINT(("vnode_id: %lld\n", to_vnode_id(entry->icb())));
+			PRINT(("vnode_id: %Ld\n", to_vnode_id(entry->icb())));
 			DUMP(entry->icb());
 			sprintf(name, "%s", string.String());
 			*length = string.Length();

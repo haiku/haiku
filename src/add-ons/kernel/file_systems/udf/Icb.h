@@ -128,7 +128,7 @@ template <class DescriptorList>
 status_t
 Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint32 *block)
 {
-	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Icb", ("list: %p, pos: %lld, buffer: %p, length: (%p)->%ld",
+	DEBUG_INIT_ETC(CF_PRIVATE | CF_HIGH_VOLUME, "Icb", ("list: %p, pos: %Ld, buffer: %p, length: (%p)->%ld",
 	               &list, pos, _buffer, length, (length ? *length : 0))); 
 	if (!_buffer || !length)
 		RETURN(B_BAD_VALUE);
@@ -144,14 +144,14 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 	
 	while (bytesLeft > 0 && !err) {
 		
-		PRINT(("pos: %lld\n", pos));
+		PRINT(("pos: %Ld\n", pos));
 		PRINT(("bytesLeft: %ld\n", bytesLeft));
 		
 		udf_long_address extent;
 		bool isEmpty = false;
 		err = list.FindExtent(pos, &extent, &isEmpty);
 		if (!err) {
-			PRINT(("found extent for offset %lld: (block: %ld, partition: %d, length: %ld, type: %d)\n",
+			PRINT(("found extent for offset %Ld: (block: %ld, partition: %d, length: %ld, type: %d)\n",
 			       pos, extent.block(), extent.partition(), extent.length(), extent.type()));
 			       
 			switch (extent.type()) {
@@ -201,7 +201,7 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 							off_t diskBlock;
 							err = volume->MapBlock(extent, &diskBlock);
 							if (!err) {							
-								PRINT(("reading %ld bytes from disk block %lld using cached_read()\n",
+								PRINT(("reading %ld bytes from disk block %Ld using cached_read()\n",
 								       readLength, diskBlock));
 								err = cached_read(volume->Device(), diskBlock, buffer,
 								                  readLength >> volume->BlockShift(),
@@ -234,7 +234,7 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 							partialLength = bytesLeft;
 					}					
 					
-					PRINT(("partialOffset: %lld\n", partialOffset));
+					PRINT(("partialOffset: %Ld\n", partialOffset));
 					PRINT(("partialLength: %ld\n", partialLength));
 					
 					if (isEmpty) {
@@ -244,7 +244,7 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 						off_t diskBlock;
 						err = volume->MapBlock(extent, &diskBlock);
 						if (!err) {
-							PRINT(("reading %ld bytes from disk block %lld using get_block()\n",
+							PRINT(("reading %ld bytes from disk block %Ld using get_block()\n",
 							       partialLength, diskBlock));
 							uint8 *data = (uint8*)get_block(volume->Device(), diskBlock, volume->BlockSize());
 							err = data ? B_OK : B_BAD_DATA;
@@ -264,7 +264,7 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 				}				 
 			}
 		} else {
-			PRINT(("error finding extent for offset %lld: 0x%lx, `%s'", pos,
+			PRINT(("error finding extent for offset %Ld: 0x%lx, `%s'", pos,
 			       err, strerror(err)));
 			break;
 		}
