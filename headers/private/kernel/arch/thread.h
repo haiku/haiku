@@ -24,7 +24,7 @@ struct thread *arch_thread_get_current_thread(void);
 void arch_thread_set_current_thread(struct thread *t);
 #endif
 
-void arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask);
+status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask);
 int64 arch_restore_signal_frame(void);
 void arch_check_syscall_restart(struct thread *t);
 
