@@ -43,6 +43,13 @@ to_platform_stat(const struct my_stat *myst, struct stat *st)
 }
 
 
+int
+to_platform_open_mode(int myMode)
+{
+	return myMode;
+}
+
+
 #else // !__BEOS__
 
 #ifndef S_ATTR_DIR
@@ -234,6 +241,46 @@ to_platform_stat(const struct my_stat *myst, struct stat *st)
 	st->st_mtime = myst->mtime;
 	st->st_ctime = myst->ctime;
 //	st->st_crtime = myst->crtime;
+}
+
+
+int
+to_platform_open_mode(int myMode)
+{
+	#define SET_OPEN_MODE_FLAG(flag, myFlag)	\
+		if (myMode & myFlag)			\
+			mode |= flag;
+
+	int mode = 0;
+
+	// the r/w mode
+	switch (myMode & MY_O_RWMASK) {
+		case MY_O_RDONLY:
+			mode |= O_RDONLY;
+			break;
+		case MY_O_WRONLY:
+			mode |= O_WRONLY;
+			break;
+		case MY_O_RDWR:
+			mode |= O_RDWR;
+			break;
+	}
+
+	// the flags
+	//SET_OPEN_MODE_FLAG(O_CLOEXEC, MY_O_CLOEXEC)
+	SET_OPEN_MODE_FLAG(O_NONBLOCK, MY_O_NONBLOCK)
+	SET_OPEN_MODE_FLAG(O_EXCL, MY_O_EXCL)
+	SET_OPEN_MODE_FLAG(O_CREAT, MY_O_CREAT)
+	SET_OPEN_MODE_FLAG(O_TRUNC, MY_O_TRUNC)
+	SET_OPEN_MODE_FLAG(O_APPEND, MY_O_APPEND)
+	SET_OPEN_MODE_FLAG(O_NOCTTY, MY_O_NOCTTY)
+	SET_OPEN_MODE_FLAG(O_NOTRAVERSE, MY_O_NOTRAVERSE)
+	//SET_OPEN_MODE_FLAG(O_TEXT, MY_O_TEXT)
+	//SET_OPEN_MODE_FLAG(O_BINARY, MY_O_BINARY)
+
+	#undef SET_OPEN_MODE_FLAG
+
+	return mode;
 }
 
 #endif // !__BEOS__

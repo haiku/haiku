@@ -17,6 +17,8 @@ mode_t to_platform_mode(my_mode_t mode);
 void from_platform_stat(const struct stat *st, struct my_stat *myst);
 void to_platform_stat(const struct my_stat *myst, struct stat *st);
 
+extern int to_platform_open_mode(int myMode);
+
 #ifdef __cplusplus
 }
 #endif
