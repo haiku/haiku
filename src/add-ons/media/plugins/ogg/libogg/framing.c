@@ -12,7 +12,7 @@
 
  function: code raw [Vorbis] packets into framed OggSquish stream and
            decode Ogg streams back into raw packets
- last mod: $Id: framing.c,v 1.1 2003/12/13 20:12:32 shatty Exp $
+ last mod: $Id: framing.c,v 1.2 2004/02/24 13:52:39 shatty Exp $
 
  note: The CRC code is directly derived from public domain code by
  Ross Williams (ross@guest.adelaide.edu.au).  See docs/framing.html
@@ -321,14 +321,14 @@ int ogg_stream_packetin(ogg_stream_state *os,ogg_packet *op){
    (undersized page). If there are no packets or partial packets to
    flush, ogg_stream_flush returns 0.  Note that ogg_stream_flush will
    try to flush a normal sized page like ogg_stream_pageout; a call to
-   ogg_stream_flush does not gurantee that all packets have flushed.
+   ogg_stream_flush does not guarantee that all packets have flushed.
    Only a return value of 0 from ogg_stream_flush indicates all packet
    data is flushed into pages.
 
-   ogg_stream_page will flush the last page in a stream even if it's
-   undersized; you almost certainly want to use ogg_stream_pageout
-   (and *not* ogg_stream_flush) unless you need to flush an undersized
-   page in the middle of a stream for some reason. */
+   since ogg_stream_flush will flush the last page in a stream even if
+   it's undersized, you almost certainly want to use ogg_stream_pageout
+   (and *not* ogg_stream_flush) unless you specifically need to flush 
+   an page regardless of size in the middle of a stream. */
 
 int ogg_stream_flush(ogg_stream_state *os,ogg_page *og){
   int i;

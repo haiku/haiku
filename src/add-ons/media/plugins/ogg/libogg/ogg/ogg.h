@@ -11,7 +11,7 @@
  ********************************************************************
 
  function: toplevel libogg include
- last mod: $Id: ogg.h,v 1.1 2003/12/13 20:12:32 shatty Exp $
+ last mod: $Id: ogg.h,v 1.2 2004/02/24 13:52:39 shatty Exp $
 
  ********************************************************************/
 #ifndef _OGG_H
@@ -126,6 +126,24 @@ extern long  oggpack_read1(oggpack_buffer *b);
 extern long  oggpack_bytes(oggpack_buffer *b);
 extern long  oggpack_bits(oggpack_buffer *b);
 extern unsigned char *oggpack_get_buffer(oggpack_buffer *b);
+
+extern void  oggpackB_writeinit(oggpack_buffer *b);
+extern void  oggpackB_writetrunc(oggpack_buffer *b,long bits);
+extern void  oggpackB_writealign(oggpack_buffer *b);
+extern void  oggpackB_writecopy(oggpack_buffer *b,void *source,long bits);
+extern void  oggpackB_reset(oggpack_buffer *b);
+extern void  oggpackB_writeclear(oggpack_buffer *b);
+extern void  oggpackB_readinit(oggpack_buffer *b,unsigned char *buf,int bytes);
+extern void  oggpackB_write(oggpack_buffer *b,unsigned long value,int bits);
+extern long  oggpackB_look(oggpack_buffer *b,int bits);
+extern long  oggpackB_look1(oggpack_buffer *b);
+extern void  oggpackB_adv(oggpack_buffer *b,int bits);
+extern void  oggpackB_adv1(oggpack_buffer *b);
+extern long  oggpackB_read(oggpack_buffer *b,int bits);
+extern long  oggpackB_read1(oggpack_buffer *b);
+extern long  oggpackB_bytes(oggpack_buffer *b);
+extern long  oggpackB_bits(oggpack_buffer *b);
+extern unsigned char *oggpackB_get_buffer(oggpack_buffer *b);
 
 /* Ogg BITSTREAM PRIMITIVES: encoding **************************/
 
