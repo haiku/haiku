@@ -21,7 +21,6 @@ public:
 	virtual	void	DispatchMessage(BMessage *an_event, BHandler *handler);
 
 			void	OpenTerminal(BMessage * message = 0);
-			void	CloseTerminal();
 private:
 			void	PrintUsage(const char * execname);
 	bool            fWindowOpened;
