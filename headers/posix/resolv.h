@@ -243,7 +243,8 @@ struct res_sym {
 	char *	humanname;	/* Its fun name, like "mail exchanger" */
 };
 
-extern struct __res_state _res;
+extern struct __res_state _resolver_configuration;
+
 #ifdef INET6
 extern struct __res_state_ext _res_ext;
 #endif
