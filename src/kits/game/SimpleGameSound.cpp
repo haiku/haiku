@@ -25,25 +25,20 @@
 //					short, and consists of non-changing samples in memory.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <malloc.h>
 #include <memory.h>
 
-// System Includes -------------------------------------------------------------
 #include <Entry.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
 
-// Project Includes ------------------------------------------------------------
-#include <GameSoundBuffer.h>
-#include <GameSoundDevice.h>
+#include "GameSoundDefs.h"
+#include "GameSoundBuffer.h"
+#include "GameSoundDevice.h"
+#include "GSUtility.h"
 
-// Local Includes --------------------------------------------------------------
 #include <SimpleGameSound.h>
 
-// Local Defines ---------------------------------------------------------------
-
-// BSimpleGameSound ------------------------------------------------------------
 BSimpleGameSound::BSimpleGameSound(const entry_ref *inFile,
 								   BGameSoundDevice *device)
  		:	BGameSound(device)
@@ -141,13 +136,6 @@ BSimpleGameSound::IsLooping() const
 }
 
 status_t
-BSimpleGameSound::Perform(int32 selector,
-							 void *data)
-{
-	return B_ERROR;
-}
-
-status_t
 BSimpleGameSound::Init(const entry_ref* inFile)
 {
 	BMediaFile file(inFile);
@@ -165,14 +153,12 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 	
 	memset(&mformat, 0, sizeof(media_format));
 	mformat.type = B_MEDIA_RAW_AUDIO;
-	mformat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
-	audioStream->DecodedFormat(&mformat);
+//	mformat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
+	status_t error = audioStream->DecodedFormat(&mformat);
+	if (error != B_OK) return error;
 	
 	memset(&gsformat, 0, sizeof(gs_audio_format));
-	gsformat.frame_rate = mformat.u.raw_audio.frame_rate;
-	gsformat.channel_count = mformat.u.raw_audio.channel_count;
-	gsformat.byte_order = mformat.u.raw_audio.byte_order;
-	gsformat.buffer_size = mformat.u.raw_audio.buffer_size; 
+	media_to_gs_format(&gsformat, &mformat.u.raw_audio); 
 	
 	if (mformat.u.raw_audio.format == media_raw_audio_format::B_AUDIO_CHAR)
 	{
@@ -197,62 +183,35 @@ BSimpleGameSound::Init(const entry_ref* inFile)
 		
 		gsformat.format = gs_audio_format::B_GS_U8;
 		
-		status_t error = Init(data, frames, &gsformat);
+		error = Init(data, frames, &gsformat);
 		
 		// free the buffers we no longer need
 		delete [] buffer;
 		delete [] data;
-		
-		file.ReleaseTrack(audioStream);
-		return error;
 	}
-	
-	// We need to detriman the size, in bytes, of a single sample.
-	// At the same time, we will store the format of the audio buffer		
-	size_t sampleSize;
-	switch(mformat.u.raw_audio.format)
+	else
 	{
-		case media_raw_audio_format::B_AUDIO_UCHAR:
-			sampleSize = sizeof(uchar);
-			gsformat.format = gs_audio_format::B_GS_U8;
-			break;
-			
-		case media_raw_audio_format::B_AUDIO_SHORT:
-			sampleSize = sizeof(int16);
-			gsformat.format = gs_audio_format::B_GS_S16;
-			break;
-			
-		case media_raw_audio_format::B_AUDIO_INT:
-			sampleSize = sizeof(int32);
-			gsformat.format = gs_audio_format::B_GS_S32;
-			break;
-			
-		case media_raw_audio_format::B_AUDIO_FLOAT:
-			sampleSize = sizeof(float);
-			gsformat.format = gs_audio_format::B_GS_F;
-			break;
-			
-		default: return B_ERROR;
-	}
+		// We need to detriman the size, in bytes, of a single sample.
+		// At the same time, we will store the format of the audio buffer		
+		size_t frameSize = get_sample_size(gsformat.format) * gsformat.channel_count;
+		char * data = new char[frames * frameSize]; 
+		gsformat.buffer_size = frames * frameSize;
 	
-			 
-	char * data = (char*)malloc(frames * gsformat.channel_count * sampleSize); 
-	gsformat.buffer_size = frames * gsformat.channel_count * sampleSize;
-	
-	while(framesTotal < frames)
-	{
-		int64 position = framesTotal * gsformat.channel_count * sampleSize;
-		audioStream->ReadFrames(&data[position], &framesRead);
+		while(framesTotal < frames)
+		{
+			char * position = &data[framesTotal * frameSize];
+			audioStream->ReadFrames(position, &framesRead);
 		
-		framesTotal += framesRead;
-	}
+			framesTotal += framesRead;
+		}
 	
-	status_t error = Init(data, frames, &gsformat);
+		error = Init(data, frames, &gsformat);
 	
-	free(data);
-	
+		delete [] data;
+	} 
+		
 	file.ReleaseTrack(audioStream);
-	return error; 
+	return error;
 }
  
 

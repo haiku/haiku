@@ -26,26 +26,18 @@
 //					this time. Use at your own risk.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <malloc.h>
 
-// System Includes -------------------------------------------------------------
 #include <List.h>
-#include <MediaAddOn.h>
 #include <MediaRoster.h>
-#include <MediaTheme.h>
+#include <MediaAddOn.h>
 #include <TimeSource.h>
+#include <MediaTheme.h>
 
-// Project Includes ------------------------------------------------------------
-#include <GameSoundBuffer.h>
-#include <GameProducer.h>
-#include <GSUtility.h>
-
-// Local Includes --------------------------------------------------------------
-#include <GameSoundDevice.h>
-
-// Local Defines ---------------------------------------------------------------
+#include "GameSoundDevice.h"
+#include "GameSoundBuffer.h"
+#include "GameProducer.h"
 
 // BGameSoundDevice definitions ------------------------------------
 const int32 kInitSoundCount = 32;
@@ -96,7 +88,10 @@ BGameSoundDevice::~BGameSoundDevice()
 
 	// We need to stop all the sounds before we stop the mixer
 	for(int32 i = 0; i < fSoundCount; i++)
+	{
+		if (fSounds[i]) fSounds[i]->StopPlaying();
 		delete fSounds[i];
+	}
 	
 	if (fIsConnected)
 	{
@@ -193,8 +188,15 @@ BGameSoundDevice::CreateBuffer(gs_id * sound,
 void
 BGameSoundDevice::ReleaseBuffer(gs_id sound)
 {
-	delete fSounds[sound-1];
-	fSounds[sound-1] = NULL;	
+	if (fSounds[sound-1])
+	{
+		// We must stop playback befor destroying the sound or else
+		// we may recieve fatel errors.
+		fSounds[sound-1]->StopPlaying();
+		
+		delete fSounds[sound-1];
+		fSounds[sound-1] = NULL;
+	}	
 }
 	
 

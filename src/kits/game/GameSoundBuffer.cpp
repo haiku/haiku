@@ -24,27 +24,20 @@
 //	Description:	Interface to a single sound, managed by the GameSoundDevice.
 //------------------------------------------------------------------------------
 
-// Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 #include <malloc.h>
 #include <memory.h>
 
-// System Includes -------------------------------------------------------------
-#include <MediaAddOn.h>
 #include <MediaRoster.h>
+#include <MediaAddOn.h>
 #include <MediaTheme.h>
 #include <TimeSource.h>
 
-// Project Includes ------------------------------------------------------------
-#include <GameSoundDevice.h>
-#include <GameProducer.h>
-#include <GSUtility.h>
-
-// Local Includes --------------------------------------------------------------
-#include <GameSoundBuffer.h>
-#include <StreamingGameSound.h>
-
-// Local Defines ---------------------------------------------------------------
+#include "GameProducer.h"
+#include "GameSoundBuffer.h"
+#include "GameSoundDevice.h"
+#include "StreamingGameSound.h"
+#include "GSUtility.h"
 
 // Sound Buffer Utility functions ----------------------------------------
 inline void ApplyMod(uint8 * data, uint8 * buffer, int64 index, float gain, float * pan)
@@ -94,12 +87,11 @@ GameSoundBuffer::GameSoundBuffer(const gs_audio_format * format)
 	memcpy(&fFormat, format, sizeof(gs_audio_format));
 }
 
-
+// Play must stop before the distructor is called; otherwise, a fatel 
+// error occures if the playback is in a subclass.
 GameSoundBuffer::~GameSoundBuffer()
 {
 	BMediaRoster* r = BMediaRoster::Roster();
-	
-	if (fIsPlaying) r->StopNode(fConnection->producer, 0, true);
 	
 	if (fIsConnected)
 	{
@@ -481,7 +473,9 @@ SimpleSoundBuffer::SimpleSoundBuffer(const gs_audio_format * format,
 		
 {
 	fBuffer = new char[frames * fFrameSize];
-	fBufferSize = frames * fFrameSize;		 		
+	fBufferSize = frames * fFrameSize;
+	
+	memcpy(fBuffer, data, fBufferSize);		 		
 }
 
 
@@ -507,12 +501,28 @@ SimpleSoundBuffer::FillBuffer(void * data, int64 frames)
 	
 	if (fPosition + bytes >= fBufferSize)
 	{
-		size_t remainder = fBufferSize - fPosition;
-		memcpy(buffer, &fBuffer[fPosition], remainder);
+		if (fPosition < fBufferSize)
+		{
+			// copy the remaining frames
+			size_t remainder = fBufferSize - fPosition;
+			memcpy(buffer, &fBuffer[fPosition], remainder);
 		
-		if (fLooping) memcpy(&buffer[remainder], fBuffer, bytes - remainder);
+			if (fLooping) 
+			{
+				// restart the sound from the begging
+				memcpy(&buffer[remainder], fBuffer, bytes - remainder);
+				fPosition = bytes - remainder;
+			}
+			else fPosition = fBufferSize;
+		}
+		else memset(data, 0, bytes);
+			// there is nothing left to play
 	}
-	else memcpy(buffer, &fBuffer[fPosition], bytes);
+	else 
+	{
+		memcpy(buffer, &fBuffer[fPosition], bytes);
+		fPosition += bytes;
+	}
 }
 
 
