@@ -868,7 +868,7 @@ Painter::_DrawEllipse(BPoint center, float xRadius, float yRadius,
 	float width = fPenSize;
 	_Transform(&width);
 
-	int32 divisions = (int32)((xRadius + yRadius) * PI) / 2 * (int32)width;
+	int32 divisions = (int32)max_c(12, ((xRadius + yRadius) * PI) / 2 * (int32)width);
 
 	agg::ellipse path(center.x, center.y, xRadius, yRadius, divisions);
 
@@ -976,7 +976,7 @@ Painter::_SetPattern(const pattern& p) const
 //	if ((uint64)p != (uint64)*fPatternHandler->GetR5Pattern()) {
 printf("Painter::_SetPattern()\n");
 		fPatternHandler->SetPattern(p);
-		agg::DrawingMode* mode = NULL;
+		DrawingMode* mode = NULL;
 		if (memcmp(&p, &B_SOLID_HIGH, sizeof(pattern)) == 0) {
 			_SetRendererColor(fPatternHandler->HighColor().GetColor32());
 			mode = DrawingModeFactory::DrawingModeFor(fDrawingMode,
