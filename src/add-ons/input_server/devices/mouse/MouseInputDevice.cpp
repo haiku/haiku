@@ -28,6 +28,8 @@
 // TODO: Use strlcpy instead of strcpy
 
 #include "MouseInputDevice.h"
+#include "kb_mouse_settings.h"
+#include "kb_mouse_driver.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -67,17 +69,6 @@ const static char *kMouseDevicesDirectory = "/dev/input/mouse";
 
 // "/dev/" is automatically prepended by StartMonitoringDevice()
 const static char *kMouseDevicesDirectoryUSB = "input/mouse/usb";
-
-struct mouse_movement {
-  int32 ser_fd_index;
-  uint32 buttons;
-  int32 xdelta;
-  int32 ydelta;
-  int32 click_count;
-  int32 mouse_mods;
-  int64 mouse_time;
-};
-
 
 struct mouse_device {
 	mouse_device(const char *path);
@@ -387,45 +378,57 @@ MouseInputDevice::DeviceWatcher(void *arg)
 	
 		snprintf(log, 128, "%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld\n",
 				dev->device_ref.name, movements.buttons, movements.xdelta,
-				movements.ydelta, movements.click_count);
+				movements.ydelta, movements.clicks);
 			
 		LOG(log);
+		
+		// TODO: add acceleration computing
+		int32 xdelta = movements.xdelta * dev->settings.accel.speed >> 15;
+		int32 ydelta = movements.ydelta * dev->settings.accel.speed >> 15;
 
 		// TODO: B_MOUSE_DOWN and B_MOUSE_UP messages don't seem
-		// to be generated correctly.
+		// to be generated correctly.	
 		if (buttons != 0) {
-			message = new BMessage;				
+			message = new BMessage(B_MOUSE_UP);				
 			if ((buttons & movements.buttons) > 0) {
 				message->what = B_MOUSE_DOWN;
-				LOG("B_MOUSE_DOWN\n");
-				
+				message->AddInt32("clicks", movements.clicks);
+				LOG("B_MOUSE_DOWN\n");	
 			} else {
-				message->what = B_MOUSE_UP;
 				LOG("B_MOUSE_UP\n");
 			}
 			
-			message->AddInt64("when", movements.mouse_time);
-			message->AddInt32("buttons", movements.buttons);
-			message->AddInt32("clicks", movements.click_count);
-			message->AddInt32("x", movements.xdelta);
-			message->AddInt32("y", movements.ydelta);
-						
-			dev->buttons_state = movements.buttons;
-			
+			message->AddInt64("when", movements.timestamp);
+			message->AddInt32("buttons", movements.buttons);						
+			message->AddInt32("x", xdelta);
+			message->AddInt32("y", ydelta);
 			sSingletonMouseDevice->EnqueueMessage(message);
+			dev->buttons_state = movements.buttons;
 		}
-
+		
 		if (movements.xdelta != 0 || movements.ydelta != 0) {
 			message = new BMessage(B_MOUSE_MOVED);
 			if (message) {
-				message->AddInt64("when", movements.mouse_time);
+				message->AddInt64("when", movements.timestamp);
 				message->AddInt32("buttons", movements.buttons);
-				message->AddInt32("x", movements.xdelta);
-				message->AddInt32("y", movements.ydelta);
+				message->AddInt32("x", xdelta);
+				message->AddInt32("y", ydelta);
 					
 				sSingletonMouseDevice->EnqueueMessage(message);
 			}
 		}
+		
+		if (movements.wheel_delta != 0) {
+			message = new BMessage(B_MOUSE_WHEEL_CHANGED);
+			if (message) {
+				message->AddInt64("when", movements.timestamp);
+				message->AddFloat("be:wheel_delta_x", 0.0);
+				message->AddFloat("be:wheel_delta_y", movements.wheel_delta);
+				
+				sSingletonMouseDevice->EnqueueMessage(message);
+			}	
+		}
+		
 	}
 	
 	return 0;

@@ -31,7 +31,6 @@
 #include <InterfaceDefs.h>
 
 #include <stdio.h>
-#include "kb_mouse_settings.h"
 
 class BList;
 class MouseInputDevice : public BInputServerDevice {
