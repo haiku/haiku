@@ -1,5 +1,8 @@
 // ddm_userland_interface.cpp
 
+#include <stdlib.h>
+
+#include <AutoDeleter.h>
 #include <ddm_userland_interface.h>
 #include <KDiskDevice.h>
 #include <KDiskDeviceJob.h>
@@ -9,11 +12,13 @@
 #include <KDiskSystem.h>
 #include <KFileDiskDevice.h>
 #include <KShadowPartition.h>
-#include <malloc.h>
-#include <vm.h>
+#include <syscall_args.h>
 
 #include "KDiskDeviceJobGenerator.h"
 #include "UserDataWriter.h"
+
+// debugging
+#define ERROR(x)
 
 // get_current_team
 static
@@ -552,45 +557,98 @@ _kern_find_partition(const char *_filename, size_t *neededSize)
 }
 
 // _kern_get_disk_device_data
+/*!	\brief Writes data describing the disk device identified by ID and all
+		   its partitions into the supplied buffer.
+
+	The function passes the buffer size required to hold the data back
+	through the \a _neededSize parameter, if the device could be found at
+	least and no serious error occured. If fails with \c B_BUFFER_OVERFLOW,
+	if the supplied buffer is too small or a \c NULL buffer is supplied
+	(and \c bufferSize is 0).
+
+	The device is identified by \a id. If \a deviceOnly is \c true, then
+	it must be the ID of a disk device, otherwise the disk device is
+	chosen, on which the partition \a id refers to resides.
+
+	\param id The ID of an arbitrary partition on the disk device (including
+		   the disk device itself), whose data shall be returned
+		   (if \a deviceOnly is \c false), or the ID of the disk device
+		   itself (if \a deviceOnly is true).
+	\param deviceOnly Specifies whether only IDs of disk devices (\c true),
+		   or also IDs of partitions (\c false) are accepted for \a id.
+	\param shadow If \c true, the data of the shadow disk device is returned,
+		   otherwise of the physical device. If there is no shadow device,
+		   the parameter is ignored.
+	\param buffer The buffer into which the disk device data shall be written.
+		   May be \c NULL.
+	\param bufferSize The size of \a buffer.
+	\param _neededSize Pointer to a variable into which the actually needed
+		   buffer size is written. May be \c NULL.
+	\return
+	- \c B_OK: Everything went fine. The device was found and, if not \c NULL,
+	  in \a _neededSize the actually needed buffer size is returned. And
+	  \a buffer will contain the disk device data.
+	- \c B_BAD_VALUE: \c NULL \a buffer, but not 0 \a bufferSize.
+	- \c B_BUFFER_OVERFLOW: The supplied buffer was too small. \a _neededSize,
+	  if not \c NULL, will contain the required buffer size.
+	- \c B_NO_MEMORY: Insufficient memory to complete the operation.
+	- \c B_ENTRY_NOT_FOUND: \a id is no valid disk device ID (if \a deviceOnly
+	  is \c true) or not even a valid partition ID (if \a deviceOnly is
+	  \c false).
+	- \c B_ERROR: An unexpected error occured.
+	- another error code...
+*/
 status_t
 _kern_get_disk_device_data(partition_id id, bool deviceOnly, bool shadow,
-						   user_disk_device_data *_buffer, size_t bufferSize,
-						   size_t *neededSize)
+						   user_disk_device_data *buffer, size_t bufferSize,
+						   size_t *_neededSize)
 {
-	if (!_buffer && bufferSize > 0)
+	if (!buffer && bufferSize > 0)
 		return B_BAD_VALUE;
-
-	// copy in
-	user_disk_device_data *buffer = bufferSize > 0
-	                                ? reinterpret_cast<user_disk_device_data*>(malloc(bufferSize))
-	                                : NULL;
-	if (buffer)
-		user_memcpy(buffer, _buffer, bufferSize);
-		
-	status_t result = B_OK;	
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	// get the device
 	if (KDiskDevice *device = manager->RegisterDevice(id, deviceOnly)) {
 		PartitionRegistrar _(device, true);
 		if (DeviceReadLocker locker = device) {
-			// write the device data into the buffer
-			UserDataWriter writer(buffer, bufferSize);
+			// do a dry run first to get the needed size
+			UserDataWriter writer;
 			device->WriteUserData(writer, shadow);
-			if (neededSize)
-				*neededSize = writer.AllocatedSize();
-			if (writer.AllocatedSize() > bufferSize)
-				result = B_BUFFER_OVERFLOW;
-		}
-	} else {
-		result = B_ENTRY_NOT_FOUND;
+			size_t neededSize = writer.AllocatedSize();
+			if (_neededSize) {
+				status_t error = copy_ref_var_to_user(neededSize, _neededSize);
+				if (error != B_OK)
+					return error;
+			}
+			// if no buffer has been supplied or the buffer is too small,
+			// then we're done
+			if (!buffer || bufferSize < neededSize)
+				return B_BUFFER_OVERFLOW;
+			// otherwise allocate a kernel buffer
+			user_disk_device_data *kernelBuffer
+				= static_cast<user_disk_device_data*>(malloc(neededSize));
+			if (!kernelBuffer)
+				return B_NO_MEMORY;
+			MemoryDeleter deleter(kernelBuffer);
+			// write the device data into the buffer
+			writer.SetTo(kernelBuffer, bufferSize);
+			device->WriteUserData(writer, shadow);
+			// sanity check
+			if (writer.AllocatedSize() != neededSize) {
+				ERROR(("Size of written disk device user data changed from "
+					   "%lu to %lu while device was locked!\n"));
+				return B_ERROR;
+			}
+			// relocate
+			status_t error = writer.Relocate(buffer);
+			if (error != B_OK)
+				return error;
+			// copy out
+			if (buffer)
+				return user_memcpy(buffer, kernelBuffer, neededSize);
+		} else
+			return B_ERROR;
 	}
-
-	// copy out
-	if (result == B_OK && buffer)
-		user_memcpy(_buffer, buffer, bufferSize);
-	free(buffer);
-	
-	return result;
+	return B_ENTRY_NOT_FOUND;
 }
 
 // _kern_get_partitionable_spaces
