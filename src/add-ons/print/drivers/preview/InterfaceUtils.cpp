@@ -133,6 +133,8 @@ BlockingWindow::QuitRequested() {
 	if (fReadyToQuit) {
 		return true;
 	} else {
+		// user requested to quit the window
+		*fResult = B_OK;
 		release_sem(fExitSem);
 		return false;
 	}
