@@ -968,25 +968,20 @@ AudioMixer::UpdateParameterWeb()
 	fCore->Lock();
 	BParameterWeb *web = new BParameterWeb(); 
 	BParameterGroup *top;
-	BParameterGroup *output;
-	BParameterGroup *inputs;
 	BParameterGroup *outputchannels;
 	BParameterGroup *inputchannels;
 	BParameterGroup *group;
 	MixerInput *in;
 	MixerOutput *out;
 	
-	top = web->MakeGroup("Gain Controls"); // top level group
-	output = top->MakeGroup("");
-	inputs = top->MakeGroup("");
-	
-	group = output->MakeGroup("");
+	top = web->MakeGroup("Gain Controls");
+
 	out = fCore->Output();
+	group = top->MakeGroup("");
+	group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
 	if (!out) {
-		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
 	} else {
-		group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, StringForFormat(out), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
 		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.5) 
@@ -994,13 +989,8 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeNullParameter(PARAM_OUTPUT(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
 	}
 
-	if (!fCore->Input(0)) {
-		//group = inputs->MakeGroup("");
-		//group->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "Input", B_WEB_BUFFER_INPUT); 
-		//group->MakeNullParameter(100, B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
-	}
 	for (int i = 0; (in = fCore->Input(i)); i++) {
-		group = inputs->MakeGroup("");
+		group = top->MakeGroup("");
 		group->MakeNullParameter(PARAM_INPUT(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_FORMAT(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(in), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
@@ -1009,20 +999,28 @@ AudioMixer::UpdateParameterWeb()
 		group->MakeNullParameter(PARAM_OUTPUT(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
 
-	top = web->MakeGroup("Output Channels"); // top level group
+	top = web->MakeGroup("Output Mapping"); // top level group
 	outputchannels = top->MakeGroup("");
+	outputchannels->MakeNullParameter(10001, B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_GENERIC);
+
 	group = outputchannels->MakeGroup("");
-	
-	group->MakeNullParameter(10001, B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_WEB_BUFFER_OUTPUT); 
+	group->MakeNullParameter(10002, B_MEDIA_RAW_AUDIO, "Master Output", B_GENERIC); 
+	group = group->MakeGroup("");
+	if (!out) {
+		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+	} else {
+	}
 
-	top = web->MakeGroup("Input Channels"); // top level group
+	top = web->MakeGroup("Input Mapping"); // top level group
 	inputchannels = top->MakeGroup("");
+	inputchannels->MakeNullParameter(10003, B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
 
-	group = inputchannels->MakeGroup("");
-	group->MakeNullParameter(10002, B_MEDIA_RAW_AUDIO, "Input Channel Sources 0", B_WEB_BUFFER_OUTPUT); 
-
-	group = inputchannels->MakeGroup("");
-	group->MakeNullParameter(10003, B_MEDIA_RAW_AUDIO, "Input Channel Sources 1", B_WEB_BUFFER_OUTPUT); 
+	for (int i = 0; (in = fCore->Input(i)); i++) {
+		group = inputchannels->MakeGroup("");
+		group->MakeNullParameter(1000 + in->ID(), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC); 
+		group = group->MakeGroup("");
+		
+	}
 
 	fCore->Unlock();
 
