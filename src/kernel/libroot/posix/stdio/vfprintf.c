@@ -171,7 +171,7 @@ vfprintf(fp, fmt0, ap)
 	int width;		/* width from format (%8d), or 0 */
 	int prec;		/* precision from format (%.3d), or -1 */
 	char sign;		/* sign prefix (' ', '+', '-', or \0) */
-	int wc;
+	wchar_t wc;
 #ifdef FLOATING_POINT
 	char *decimal_point = localeconv()->decimal_point;
 	char softsign;		/* temporary negative sign for floats */
