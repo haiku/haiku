@@ -154,7 +154,7 @@ KernelLd libroot.so :
 	# Needs a definitive decision - most probably we will have to link it statically
 	# against libroot.so, too, like BeOS does it
 	:
-	lib/libroot.so
+	beos/system/lib/libroot.so
 	;
 
 KernelLd libglue2.o :	# libglue2.o is used for executables
@@ -177,7 +177,7 @@ KernelLd init :
 	:
 	:
 	:
-	bin/init
+	beos/bin/init
 	;
 
 KernelStaticLibraryObjects librld.a :
@@ -234,7 +234,7 @@ KernelLd rld.so :
 	:
 	:
 	:
-	libexec/rld.so
+	beos/system/lib/rld.so
 	;
 
 KernelLd false :
@@ -246,7 +246,7 @@ KernelLd false :
 	:
 	:
 	:
-	bin/false
+	beos/bin/false
 	;
 
 KernelLd true :
@@ -258,7 +258,7 @@ KernelLd true :
 	:
 	:
 	:
-	bin/true
+	beos/bin/true
 	;
 
 KernelLd fibo :
@@ -270,7 +270,7 @@ KernelLd fibo :
 	:
 	:
 	:
-	bin/fibo
+	beos/bin/fibo
 	;
 
 KernelLd sig_test :
@@ -282,7 +282,7 @@ KernelLd sig_test :
 	:
 	:
 	:
-	bin/sig_test
+	beos/bin/sig_test
 	;
 
 KernelLd monitor_test :
@@ -294,7 +294,7 @@ KernelLd monitor_test :
 	:
 	:
 	:
-	bin/monitor_test
+	beos/bin/monitor_test
 	;
 
 KernelLd fortune :
@@ -306,7 +306,7 @@ KernelLd fortune :
 	:
 	:
 	:
-	bin/fortune
+	beos/bin/fortune
 	;
 
 KernelConfigSection etc/fortunes : data : $(SUBDIR)/apps/fortune/fortunes ;
@@ -320,7 +320,7 @@ KernelLd kernel_ls :
 	:
 	:
 	:
-	bin/ls
+	beos/bin/ls
 	;
 
 KernelLd symlink :
@@ -332,7 +332,7 @@ KernelLd symlink :
 	:
 	:
 	:
-	bin/symlink
+	beos/bin/symlink
 	;
 
 # Note: shell is a built in target, thus we need the grist.
@@ -353,7 +353,7 @@ KernelLd obos_shell :
 	:
 	:
 	:
-	bin/shell
+	beos/bin/shell
 	;
 
 KernelLd testapp :
@@ -365,7 +365,7 @@ KernelLd testapp :
 	:
 	:
 	:
-	bin/testapp
+	beos/bin/testapp
 	;
 
 KernelLd tls_test :
@@ -377,7 +377,7 @@ KernelLd tls_test :
 	:
 	:
 	:
-	bin/tls_test
+	beos/bin/tls_test
 	;
 
 KernelLd pipe_test :
@@ -389,7 +389,7 @@ KernelLd pipe_test :
 	:
 	:
 	:
-	bin/pipe_test
+	beos/bin/pipe_test
 	;
 
 KernelLd envtest :
@@ -401,7 +401,7 @@ KernelLd envtest :
 	:
 	:
 	:
-	bin/envtest
+	beos/bin/envtest
 	;
 
 #if $(OS) = "BEOS" 
@@ -430,7 +430,7 @@ KernelLd ps :
 	:
 	:
 	:
-	bin/ps
+	beos/bin/ps
 	; 
 
 KernelLd echo :
@@ -442,7 +442,7 @@ KernelLd echo :
 	:
 	:
 	:
-	bin/echo
+	beos/bin/echo
 	; 
 
 KernelLd uname :
@@ -454,7 +454,7 @@ KernelLd uname :
 	:
 	:
 	:
-	bin/uname
+	beos/bin/uname
 	;
 
 WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
