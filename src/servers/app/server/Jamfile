@@ -38,7 +38,7 @@ SharedLibrary appserver :
 
 LinkSharedOSLibs libappserver.so : root be 							  
 	<boot!home!config!lib>libopenbeos.so
-	<boot!home!config!lib>libfreetype.so ;
+	libfreetype.so ;
 
 Server app_server :
 	# Misc. Sources

@@ -50,5 +50,4 @@ SharedLibrary agg :
 	#gpc/gpc.c
 ;
 
-LinkSharedOSLibs libagg.so : root be
-	<boot!home!config!lib>libfreetype.so ;
+LinkSharedOSLibs libagg.so : root be libfreetype.so ;

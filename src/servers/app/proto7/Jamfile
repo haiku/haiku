@@ -35,7 +35,7 @@ Server OBAppServer :
 	ViewDriver.cpp
 ;
 LinkSharedOSLibs OBAppServer : be root game translation stdc++.r4
-							   <boot!home!config!lib>libfreetype.so ;
+							   libfreetype.so ;
 
 SubInclude OBOS_TOP src servers app proto7 testobapp ;
 
