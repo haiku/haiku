@@ -1062,7 +1062,8 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
-				/* lock the driver */
+				/* lock the driver:
+				 * no other graphics card may have ISA I/O enabled when we enter */
 				AQUIRE_BEN(pd->kernel);
 
 				/* enable ISA I/O access */
@@ -1090,7 +1091,8 @@ control_hook (void* dev, uint32 msg, void *buf, size_t len) {
 			if (io_isa->magic == NV_PRIVATE_DATA_MAGIC) {
 				pci_info *pcii = &(di->pcii);
 
-				/* lock the driver */
+				/* lock the driver:
+				 * no other graphics card may have ISA I/O enabled when we enter */
 				AQUIRE_BEN(pd->kernel);
 
 				/* enable ISA I/O access */
