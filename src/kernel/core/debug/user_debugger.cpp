@@ -17,6 +17,8 @@
 #include <thread.h>
 #include <thread_types.h>
 #include <user_debugger.h>
+#include <vm.h>
+#include <vm_types.h>
 #include <arch/user_debugger.h>
 
 //#define TRACE_USER_DEBUGGER
@@ -160,8 +162,11 @@ destroy_team_debug_info(struct team_debug_info *info)
 
 		// wait for the nub thread
 		if (info->nub_thread >= 0) {
-			int32 result;
-			wait_for_thread(info->nub_thread, &result);
+			if (info->nub_thread != thread_get_current_thread()->id) {
+				int32 result;
+				wait_for_thread(info->nub_thread, &result);
+			}
+
 			info->nub_thread = -1;
 		}
 
@@ -202,6 +207,74 @@ destroy_thread_debug_info(struct thread_debug_info *info)
 
 		atomic_set(&info->flags, 0);
 	}
+}
+
+
+void
+user_debug_prepare_for_exec()
+{
+	struct thread *thread = thread_get_current_thread();
+	struct team *team = thread->team;
+
+	// If a debugger is installed for the team and the thread debug stuff
+	// initialized, changed the ownership of the debug port for the thread
+	// to the kernel team, since exec_team() deletes all ports owned by this
+	// team. We change the ownership back later.
+	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+		// get the port
+		port_id debugPort = -1;
+
+		cpu_status state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		if (thread->debug_info.flags & B_THREAD_DEBUG_INITIALIZED)
+			debugPort = thread->debug_info.debug_port;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+
+		// set the new port ownership
+		if (debugPort >= 0)
+			set_port_owner(debugPort, team_get_kernel_team_id());
+	}
+}
+
+
+void
+user_debug_finish_after_exec()
+{
+	struct thread *thread = thread_get_current_thread();
+	struct team *team = thread->team;
+
+	// If a debugger is installed for the team and the thread debug stuff
+	// initialized for this thread, change the ownership of its debug port
+	// back to this team.
+	if (atomic_get(&team->debug_info.flags) & B_TEAM_DEBUG_DEBUGGER_INSTALLED) {
+		// get the port
+		port_id debugPort = -1;
+
+		cpu_status state = disable_interrupts();
+		GRAB_THREAD_LOCK();
+
+		if (thread->debug_info.flags & B_THREAD_DEBUG_INITIALIZED)
+			debugPort = thread->debug_info.debug_port;
+
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+
+		// set the new port ownership
+		if (debugPort >= 0)
+			set_port_owner(debugPort, team->id);
+	}
+}
+
+
+void
+init_user_debug()
+{
+	#ifdef ARCH_INIT_USER_DEBUG
+		ARCH_INIT_USER_DEBUG();
+	#endif
 }
 
 
@@ -313,8 +386,15 @@ thread_hit_debug_event_internal(debug_debugger_message event,
 
 	// send a message to the debugger port
 	if (debuggerInstalled) {
+		// update the message's origin info first
+		debug_origin *origin = (debug_origin *)message;
+		origin->thread = thread->id;
+		origin->team = thread->team->id;
+		origin->nub_port = nubPort;
+
 		TRACE(("thread_hit_debug_event(): thread: %ld, sending message to "
 			"debugger port %ld\n", thread->id, debuggerPort));
+
 		error = debugger_write(debuggerPort, event, message, size, false);
 	}
 
@@ -481,9 +561,6 @@ user_debug_pre_syscall(uint32 syscall, void *args)
 
 	// prepare the message
 	debug_pre_syscall message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.syscall = syscall;
 
 	// copy the syscall args
@@ -516,9 +593,6 @@ user_debug_post_syscall(uint32 syscall, void *args, uint64 returnValue,
 
 	// prepare the message
 	debug_post_syscall message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.start_time = startTime;
 	message.end_time = system_time();
 	message.return_value = returnValue;
@@ -558,9 +632,6 @@ user_debug_exception_occurred(debug_exception_type exception, int signal)
 
 	// prepare the message
 	debug_exception_occurred message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
 	message.exception = exception;
 	message.signal = signal;
 
@@ -583,9 +654,6 @@ user_debug_handle_signal(int signal, struct sigaction *handler, bool deadly)
 
 	// prepare the message
 	debug_signal_received message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.signal = signal;
 	message.handler = *handler;
 	message.deadly = deadly;
@@ -611,9 +679,6 @@ user_debug_stop_thread()
 
 	// prepare the message
 	debug_thread_debugged message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
 		sizeof(message), true);
@@ -634,9 +699,6 @@ user_debug_team_created(team_id teamID)
 
 	// prepare the message
 	debug_team_created message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.new_team = teamID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_TEAM_CREATED, &message,
@@ -648,6 +710,9 @@ void
 user_debug_team_deleted(team_id teamID, port_id debuggerPort)
 {
 	if (debuggerPort >= 0) {
+		TRACE(("user_debug_team_deleted(team: %ld, debugger port: %ld)\n",
+			teamID, debuggerPort));
+
 		debug_team_deleted message;
 		message.origin.thread = -1;
 		message.origin.team = teamID;
@@ -672,9 +737,6 @@ user_debug_thread_created(thread_id threadID)
 
 	// prepare the message
 	debug_thread_created message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	message.new_thread = threadID;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_CREATED, &message,
@@ -737,9 +799,6 @@ user_debug_image_created(const image_info *imageInfo)
 
 	// prepare the message
 	debug_image_created message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
@@ -760,9 +819,6 @@ user_debug_image_deleted(const image_info *imageInfo)
 
 	// prepare the message
 	debug_image_deleted message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = thread->team->debug_info.nub_port;
 	memcpy(&message.info, imageInfo, sizeof(image_info));
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_IMAGE_CREATED, &message,
@@ -785,9 +841,6 @@ user_debug_breakpoint_hit(bool software)
 
 	// prepare the message
 	debug_breakpoint_hit message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
 	message.software = software;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
@@ -811,9 +864,6 @@ user_debug_watchpoint_hit()
 
 	// prepare the message
 	debug_watchpoint_hit message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_WATCHPOINT_HIT, &message,
@@ -836,9 +886,6 @@ user_debug_single_stepped()
 
 	// prepare the message
 	debug_single_step message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
 	arch_get_debug_cpu_state(&message.cpu_state);
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_SINGLE_STEP, &message,
@@ -891,6 +938,9 @@ broadcast_debugged_thread_message(struct thread *nubThread, int32 code,
 static void
 nub_thread_cleanup(struct thread *nubThread)
 {
+	TRACE(("nub_thread_cleanup(%ld): debugger port: %ld\n", nubThread->id,
+		nubThread->team->debug_info.debugger_port));
+
 	team_debug_info teamDebugInfo;
 	bool destroyDebugInfo = false;
 
@@ -968,6 +1018,94 @@ read_user_memory(const void *_address, void *_buffer, int32 size,
 		address += toRead;
 		buffer += toRead;
 		size -= toRead;
+	}
+
+	return B_OK;
+}
+
+
+static status_t
+write_user_memory(void *_address, const void *_buffer, int32 size,
+	int32 &bytesWritten)
+{
+	char *address = (char*)_address;
+	const char *buffer = (const char*)_buffer;
+
+	// check the parameters
+	if (!IS_USER_ADDRESS(address))
+		return B_BAD_ADDRESS;
+	if (size <= 0)
+		return B_BAD_VALUE;
+
+	// If the region to be written crosses area boundaries, we split it up into
+	// smaller chunks.
+	status_t error = B_OK;
+	bytesWritten = 0;
+	while (size > 0) {
+		int32 toWrite = size;
+
+		// get the area for the address (we need to use _user_area_for(), since
+		// we're looking for a user area)
+		area_id area = _user_area_for((void*)address);
+		if (area < 0) {
+			TRACE(("write_user_memory(): area not found for address: %p: "
+				"%lx\n", address, area));
+			error = area;
+			break;
+		}
+
+		area_info areaInfo;
+		status_t error = get_area_info(area, &areaInfo);
+		if (error != B_OK) {
+			TRACE(("write_user_memory(): failed to get info for area %ld: "
+				"%lx\n", area, error));
+			error = B_BAD_ADDRESS;
+			break;
+		}
+
+		// restrict this round of writing to the found area
+		if (address + toWrite > (char*)areaInfo.address + areaInfo.size)
+			toWrite = (char*)areaInfo.address + areaInfo.size - address;
+
+		// if the area is read-only, we temporarily need to make it writable
+		bool protectionChanged = false;
+		if (!(areaInfo.protection & (B_WRITE_AREA | B_KERNEL_WRITE_AREA))) {
+			error = set_area_protection(area,
+//				areaInfo.protection | B_KERNEL_WRITE_AREA);
+(areaInfo.protection & ~B_EXECUTE_AREA) | B_KERNEL_WRITE_AREA);
+// TODO: Not being writable when being executable is currently a requirement
+// of vm_set_area_protection().
+			if (error != B_OK) {
+				TRACE(("write_user_memory(): failed to set new protection for "
+					"area %ld: %lx\n", area, error));
+				break;
+			}
+			protectionChanged = true;
+		}
+
+		// copy the memory
+		error = user_memcpy(address, buffer, toWrite);
+
+		// reset the area protection
+		if (protectionChanged)
+			set_area_protection(area, areaInfo.protection);
+
+		if (error != B_OK) {
+			TRACE(("write_user_memory(): user_memcpy() failed: %lx\n", error));
+			break;
+		}
+
+		bytesWritten += toWrite;
+		address += toWrite;
+		buffer += toWrite;
+		size -= toWrite;
+	}
+
+	// If writing fails, we only fail, if we haven't written anything yet.
+	if (error != B_OK) {
+		if (bytesWritten > 0)
+			return B_OK;
+		return error;
 	}
 
 	return B_OK;
@@ -1092,8 +1230,9 @@ debug_nub_thread(void *)
 				reply.read_memory.error = result;
 
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_READ_MEMORY: "
-					"reply port: %ld, address: %p, size: %ld, result: %lx\n",
-					nubThread->id, replyPort, address, size, result));
+					"reply port: %ld, address: %p, size: %ld, result: %lx, "
+					"read: %ld\n", nubThread->id, replyPort, address, size,
+					result, bytesRead));
 
 				// send only as much data as necessary
 				reply.read_memory.size = bytesRead;
@@ -1112,10 +1251,6 @@ debug_nub_thread(void *)
 				int32 realSize = (char*)&message + messageSize - data;
 				status_t result = B_OK;
 
-				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_WRITE_MEMORY: "
-					"reply port: %ld, address: %p, size: %ld\n", nubThread->id,
-					replyPort, address, size));
-
 				// check the parameters
 				if (!IS_USER_ADDRESS(address))
 					result = B_BAD_ADDRESS;
@@ -1123,10 +1258,19 @@ debug_nub_thread(void *)
 					result = B_BAD_VALUE;
 
 				// write the memory
-				if (result == B_OK)
-					result = user_memcpy(address, data, size);
+				int32 bytesWritten = 0;
+				if (result == B_OK) {
+					result = write_user_memory(address, data, size,
+						bytesWritten);
+				}
 				reply.write_memory.error = result;
 
+				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_WRITE_MEMORY: "
+					"reply port: %ld, address: %p, size: %ld, result: %lx, "
+					"written: %ld\n", nubThread->id, replyPort, address, size,
+					result, bytesWritten));
+
+				reply.write_memory.size = bytesWritten;
 				sendReply = true;
 				replySize = sizeof(debug_nub_write_memory_reply);
 				break;
@@ -1878,9 +2022,6 @@ _user_debugger(const char *userMessage)
 
 	// prepare the message
 	debug_debugger_call message;
-	message.origin.thread = thread->id;
-	message.origin.team = thread->team->id;
-	message.origin.nub_port = nubPort;
 	message.message = (void*)userMessage;
 
 	thread_hit_debug_event(B_DEBUGGER_MESSAGE_DEBUGGER_CALL, &message,
@@ -2024,6 +2165,9 @@ _user_debug_thread(thread_id threadID)
 void
 _user_wait_for_debugger(void)
 {
-	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, NULL, 0, false);
+	debug_thread_debugged message;
+	thread_hit_debug_event(B_DEBUGGER_MESSAGE_THREAD_DEBUGGED, &message,
+		sizeof(message), false);
 }
+
 

@@ -139,6 +139,10 @@ void clear_thread_debug_info(struct thread_debug_info *info,
 		bool dying);
 void destroy_thread_debug_info(struct thread_debug_info *info);
 
+void user_debug_prepare_for_exec();
+void user_debug_finish_after_exec();
+
+void init_user_debug();
 
 // debug event callbacks
 
