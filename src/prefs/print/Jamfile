@@ -5,6 +5,7 @@ UsePrivateHeaders interface ;
 AddResources Printers : Printers.FileTypes.rsrc ;
 
 Preference Printers :
+	AddPrinterDialog.cpp
 	Printers.cpp
 	PrintersWindow.cpp
 	PrinterListView.cpp

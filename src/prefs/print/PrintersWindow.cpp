@@ -85,7 +85,7 @@ void PrintersWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case MSG_ADD_PRINTER:
-			//if (AddPrinterDialog::Start() == B_OK)	
+			if (AddPrinterDialog::Start() == B_OK);
 			break;
 
 		case MSG_REMOVE_PRINTER:

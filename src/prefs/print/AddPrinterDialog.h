@@ -12,8 +12,11 @@ public:
 	static status_t Start();
 
 private:
-			AddPrinterDialog();
-	void	BuildGUI();
+				AddPrinterDialog();
+	void        MessageReceived(BMessage* msg);
+
+	void		BuildGUI(int stage);
+
 };
 
 #endif
