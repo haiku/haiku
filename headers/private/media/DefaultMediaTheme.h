@@ -1,5 +1,5 @@
 /* 
-** Copyright 2002-2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 #ifndef DEFAULT_MEDIA_THEME_H
