@@ -6,15 +6,13 @@
  */
 
 
-#include <Mime.h>
-#include <SupportDefs.h>
+#include "addAttr.h"
+
 #include <TypeConstants.h>
+#include <Mime.h>
 
 #include <stdio.h>
 #include <string.h>
-
-#include "addAttr.h"
-#include "messages.h"
 
 
 // supported types (if you add any, make sure that writeAttr() handles them properly)
