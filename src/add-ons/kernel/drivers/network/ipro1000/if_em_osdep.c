@@ -1,5 +1,20 @@
 /* Intel PRO/1000 Family Driver
  * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
+ *
+ * Permission to use, copy, modify and distribute this software and its 
+ * documentation for any purpose and without fee is hereby granted, provided
+ * that the above copyright notice appear in all copies, and that both the
+ * copyright notice and this permission notice appear in supporting documentation.
+ *
+ * Marcus Overhagen makes no representations about the suitability of this software
+ * for any purpose. It is provided "as is" without express or implied warranty.
+ *
+ * MARCUS OVERHAGEN DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING
+ * ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL MARCUS
+ * OVERHAGEN BE LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+ * DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN
+ * CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 #include "if_em_osdep.h"
 #include "debug.h"
@@ -95,7 +110,7 @@ bus_alloc_resource(device_t dev, int type, int *rid, int d, int e, int f, int g)
 		{
 			uint8 v = pci_read_config(dev, PCI_interrupt_line, 1);
 			if (v == 0 || v == 0xff) {
-				TRACE("bus_alloc_resource SYS_RES_IRQ: no irq\n");
+				ERROR("bus_alloc_resource SYS_RES_IRQ: no irq\n");
 				return 0;
 			}
 			return (struct resource *)(int)v;
