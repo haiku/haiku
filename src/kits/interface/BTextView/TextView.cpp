@@ -175,41 +175,7 @@ int32 BTextView::sWidthAtom = 0;
 BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 					 uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask,
-				flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE),
-		fText(NULL),
-		fLines(NULL),
-		fStyles(NULL),
-		fTextRect(textRect),
-		fSelStart(0),
-		fSelEnd(0),
-		fCaretVisible(false),
-		fCaretTime(0),
-		fClickOffset(-1),
-		fClickCount(0),
-		fClickTime(0),
-		fDragOffset(-1),
-		//fCursor
-		fActive(false),
-		fStylable(false),
-		fTabWidth(28.0f),
-		fSelectable(true),
-		fEditable(true),
-		fWrap(true),
-		fMaxBytes(0),
-		fDisallowedChars(NULL),
-		fAlignment(B_ALIGN_LEFT),
-		fAutoindent(false),
-		fOffscreen(NULL),
-		fColorSpace(B_CMAP8),
-		fResizable(false),
-		fContainerView(NULL),
-		fUndo(NULL),
-		fInline(NULL),
-		fDragRunner(NULL),
-		fClickRunner(NULL),
-		//fWhere
-		fTrackingMouse(NULL),
-		fTextChange(NULL)
+				flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	CALLED();
 	InitObject(textRect, NULL, NULL);
@@ -220,41 +186,7 @@ BTextView::BTextView(BRect frame, const char *name, BRect textRect,
 					 const BFont *initialFont, const rgb_color *initialColor,
 					 uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask,
-				flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE),
-		fText(NULL),
-		fLines(NULL),
-		fStyles(NULL),
-		fTextRect(textRect),
-		fSelStart(0),
-		fSelEnd(0),
-		fCaretVisible(false),
-		fCaretTime(0),
-		fClickOffset(-1),
-		fClickCount(0),
-		fClickTime(0),
-		fDragOffset(-1),
-		//fCursor
-		fActive(false),
-		fStylable(false),
-		fTabWidth(28.0f),
-		fSelectable(true),
-		fEditable(true),
-		fWrap(true),
-		fMaxBytes(0),
-		fDisallowedChars(NULL),
-		fAlignment(B_ALIGN_LEFT),
-		fAutoindent(false),
-		fOffscreen(NULL),
-		fColorSpace(B_CMAP8),
-		fResizable(false),
-		fContainerView(NULL),
-		fUndo(NULL),
-		fInline(NULL),
-		fDragRunner(NULL),
-		fClickRunner(NULL),
-		//fWhere
-		fTrackingMouse(NULL),
-		fTextChange(NULL)
+				flags | B_FRAME_EVENTS | B_PULSE_NEEDED | B_INPUT_METHOD_AWARE)
 {
 	CALLED();
 	InitObject(textRect, initialFont, initialColor);
@@ -345,13 +277,14 @@ BTextView::BTextView(BMessage *archive)
 BTextView::~BTextView()
 {
 	CALLED();
+	CancelInputMethod();
+	DeleteOffscreen();
+
 	delete fText;
 	delete fLines;
 	delete fStyles;
 	delete fDisallowedChars;
 	delete fUndo;
-	
-	DeleteOffscreen();
 }
 
 
@@ -441,6 +374,11 @@ BTextView::AttachedToWindow()
 		AutoResize(true);
 	
 	UpdateScrollbars();
+	
+	if (!fCursor)
+		SetViewCursor(B_CURSOR_I_BEAM);
+	else
+		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 }
 
 
@@ -493,10 +431,8 @@ BTextView::MouseDown(BPoint where)
 	if (!fEditable && !fSelectable)
 		return;
 	
-	if (!IsFocus()) {
+	if (!IsFocus())
 		MakeFocus();
-		return;
-	}
 	
 	// hide the caret if it's visible	
 	if (fCaretVisible)
@@ -660,22 +596,19 @@ void
 BTextView::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
 	CALLED();
+	bool sync = false;
 	switch (code) {
+		// We force a sync when the mouse enters the view
 		case B_ENTERED_VIEW:
-			if (fActive && message == NULL)
-				SetViewCursor(B_CURSOR_I_BEAM);
-			break;
-			
+			sync = true;
+			// supposed to fall through
 		case B_INSIDE_VIEW:
-			if (message != NULL) {
-				if (AcceptsDrop(message))
-					DragCaret(OffsetAt(where));
-			}
+			TrackMouse(where, message, sync);
 			break;
 			
 		case B_EXITED_VIEW:
 			DragCaret(-1);
-			if (fActive)
+			if (Window()->IsActive() && message == NULL)
 				SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 			break;
 			
@@ -703,7 +636,14 @@ BTextView::WindowActivated(bool state)
 	} else {
 		if (fActive)
 			Deactivate();
-	} 
+	}
+	
+	BPoint where;
+	ulong buttons;
+	GetMouse(&where, &buttons, true);
+	
+	if (Bounds().Contains(where))
+		TrackMouse(where, NULL); 
 }
 
 
@@ -985,7 +925,7 @@ BTextView::ResolveSpecifier(BMessage *message, int32 index,
 	BPropertyInfo propInfo(sPropertyList);
 	BHandler *target = NULL;
 
-	if (propInfo.FindMatch(message, index, specifier, what, property) != B_ERROR)			
+	if (propInfo.FindMatch(message, index, specifier, what, property) > B_ERROR)			
 		target = this;
 
 	if (!target)
@@ -1470,7 +1410,7 @@ bool
 BTextView::AcceptsDrop(const BMessage *inMessage)
 {
 	CALLED();
-	if (fEditable && inMessage->HasData("text/plain", B_MIME_TYPE))
+	if (fEditable && inMessage && inMessage->HasData("text/plain", B_MIME_TYPE))
 		return true;
 			
 	return false;
@@ -2761,6 +2701,38 @@ BTextView::InitObject(BRect textRect, const BFont *initialFont,
 	fText = new _BTextGapBuffer_;
 	fLines = new _BLineBuffer_;
 	fStyles = new _BStyleBuffer_(&font, initialColor);
+	
+	// We put these here instead of in the constructor initializer list
+	// to have less code duplication, and a single place where to do changes
+	// if needed.,
+	fTextRect = textRect;
+	fSelStart = fSelEnd = 0;
+	fCaretVisible = false;
+	fCaretTime = 0;
+	fClickOffset = 0;
+	fClickCount = 0;
+	fClickTime = 0;
+	fDragOffset = -1;
+	fCursor = 0;
+	fActive = false;
+	fStylable = false;
+	fSelectable = true;
+	fEditable = true;
+	fWrap = true;
+	fMaxBytes = LONG_MAX;
+	fDisallowedChars = NULL;
+	fAlignment = B_ALIGN_LEFT;
+	fAutoindent = false;
+	fOffscreen = NULL;
+	fColorSpace = B_CMAP8;
+	fResizable = false;
+	fContainerView = NULL;
+	fUndo = NULL;
+	fInline = NULL;
+	fDragRunner = NULL;
+	fClickRunner = NULL;
+	fTrackingMouse = NULL;
+	fTextChange = NULL;
 }
 
 
@@ -3583,17 +3555,42 @@ bool BTextView::PerformMouseMoved(BPoint where, uint32 code)
 	CALLED();
 	return false;
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Tracks the mouse position, doing special actions like changing the view cursor.
+	\param where The point where the mouse has moved.
+	\param message The dragging message, if there is any.
+	\param force Passed as second parameter of SetViewCursor()
+*/
 void
 BTextView::TrackMouse(BPoint where, const BMessage *message, bool force)
 {
 	CALLED();
+
+	BRegion textRegion;
+	GetTextRegion(fSelStart, fSelEnd, &textRegion);
+	
+	if (AcceptsDrop(message))
+		TrackDrag(where);
+	else if (!textRegion.Contains(where))
+		SetViewCursor(B_CURSOR_I_BEAM, force);
+		// If we are within the selection, switch to the "hand" cursor,
+	else
+		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT, force);
 }
-//------------------------------------------------------------------------------
+
+
+/*! \brief Tracks the mouse position when the user is dragging some data.
+	\param where The point where the mouse has moved.
+*/
 void
 BTextView::TrackDrag(BPoint where)
 {
 	CALLED();
+	if (Bounds().Contains(where)) {
+		int32 offset = OffsetAt(where);
+		DragCaret(offset);
+	}
 }
 
 
@@ -3637,8 +3634,8 @@ BTextView::MessageDropped(BMessage *inMessage, BPoint where, BPoint offset)
 			&& from == this && fSelEnd != fSelStart)
 		internalDrop = true;
 	
-	if (fActive)
-		SetViewCursor(B_CURSOR_I_BEAM);
+	DragCaret(-1);
+	TrackMouse(where, NULL);
 		
 	// are we sure we like this message?
 	if (!AcceptsDrop(inMessage))
@@ -4015,6 +4012,9 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 {
 	CALLED();
 	// TODO: Implement me
+	if (!fInline)
+		return;
+		
 	message->PrintToStream();
 }
 
@@ -4024,8 +4024,10 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 void
 BTextView::HandleInputMethodLocationRequest()
 {
-	// TODO: Implement me
 	CALLED();
+	if (!fInline)
+		return;
+	// TODO: Implement me
 }
 
 
