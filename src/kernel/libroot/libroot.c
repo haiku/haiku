@@ -76,7 +76,7 @@ ssize_t	port_count(port_id port)
 { return sys_port_count(port); }
 
 // OK
-int set_port_owner(port_id port, team_id team) 
+status_t set_port_owner(port_id port, team_id team) 
 { return sys_port_set_owner(port, team); }
 
 // OK
@@ -137,7 +137,7 @@ status_t	_get_sem_info(sem_id sem, sem_info *info, size_t size)
 { return sys_get_sem_info(sem,info, size); }
 
 // OK
-int _get_next_sem_info(team_id team, int32 *cookie, sem_info *info, size_t size)
+status_t _get_next_sem_info(team_id team, int32 *cookie, sem_info *info, size_t size)
 { return sys_get_next_sem_info(team,cookie,info, size); }
 
 // TO DO

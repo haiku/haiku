@@ -1,11 +1,7 @@
 #ifndef _LIBROOT_TYPES_H
 #define _LIBROOT_TYPES_H
 
-#ifdef __cplusplus
- "C" {
-#endif
-#include <types.h>
-#include <ktypes.h>
+#include <sys/types.h>
 #include <defines.h>
 
 #define B_NO_LOCK			0	
@@ -37,7 +33,7 @@ enum {
 #define	B_URGENT_PRIORITY					110
 #define B_REAL_TIME_PRIORITY				120
 
-  thread_id spawn_thread (
+thread_id spawn_thread (
 	thread_func		function_name, 
 	const char 		*thread_name, 
 	int32			priority, 
@@ -205,9 +201,6 @@ struct {
 		uint32	ecx;
 	} regs; 
 } cpuid_info;
-#endif
-#ifdef __cplusplus
-}
 #endif
 
 #endif		/* ifdef _LIBROOT_TYPES_ */
