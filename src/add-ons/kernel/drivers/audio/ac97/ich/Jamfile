@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src add-ons kernel drivers audio ac97 ich ;
+
+UsePrivateHeaders media ;
+
+Addon ich_ac97 : [ FDirName kernel drivers bin ] :
+	ac97_multi.c
+	config.c
+	debug.c
+	ich.c
+	io.c
+	util.c   
+;
+
+LinkSharedOSLibs ich_ac97 : /boot/develop/lib/x86/_KERNEL_ ;
