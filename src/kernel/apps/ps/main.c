@@ -49,7 +49,7 @@ int main(int argc, char **argv)
 	printf("-----------------------------------------------------------------------\n");
 	
 	while (get_next_team_info(&team_num, &team) == B_OK) {
-		printf("%s (team %ld) (uid %ld) (gid %ld)\n",
+		printf("%s (team %ld) (uid %d) (gid %d)\n",
 			team.args, team.team, team.uid, team.gid);
 		thread_num = 0;
 		while (get_next_thread_info(team.team, &thread_num, &thread) == B_OK) {
