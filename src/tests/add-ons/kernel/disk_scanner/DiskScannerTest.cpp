@@ -1,12 +1,15 @@
 // DiskScannerTest.cpp
+// run that program from the current/ top directory
+
+#include <disk_scanner/disk_scanner.h>
+#include <fs_device.h>
+#include <KernelExport.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
-#include <fs_device.h>
-#include <KernelExport.h>
-#include <disk_scanner/disk_scanner.h>
 
 // The following code will be moved into libroot.
 
@@ -60,18 +63,22 @@ status_t
 get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 					   extended_partition_info *partitionInfo)
 {
-	status_t error = (partitionInfo ? B_OK : B_BAD_VALUE);
+	if (partitionInfo == NULL)
+		return B_BAD_VALUE;
+
 	session_info sessionInfo;
 	disk_scanner_module_info *diskScanner = NULL;
+
 	// get the disk scanner module
-	if (error == B_OK)
-		error = get_module(DISK_SCANNER_MODULE_NAME,
-						   (module_info**)&diskScanner);
+	status_t error = get_module(DISK_SCANNER_MODULE_NAME,
+						(module_info**)&diskScanner);
+	if (diskScanner == NULL)
+		return error;
+
 	// get the session info
-	if (error == B_OK) {
-		error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
+	error = diskScanner->get_nth_session_info(deviceFD, sessionIndex,
 												  &sessionInfo, NULL);
-	}
+
 	// get the partition info
 	if (error == B_OK) {
 		partitionInfo->info.logical_block_size
@@ -307,31 +314,70 @@ print_partition_info(const char *prefix, const extended_partition_info &info)
 
 // main
 int
-main()
+main(int argc, char **argv)
 {
-//	const char *deviceName = "/dev/disk/virtual/0/raw";
+	char buffer[B_FILE_NAME_LENGTH];
 	const char *deviceName = "/dev/disk/ide/ata/0/master/0/raw";
-//	const char *deviceName = "/dev/disk/ide/atapi/1/master/0/raw";
+
+	if (argc > 1) {
+		bool atapi = false;
+		int32 controller = 0;
+		bool master = true;
+		
+		if (argv[1][0] == '/') {
+			deviceName = argv[1];
+		} else if (strstr(argv[1], "virtual") != NULL) {
+			deviceName = "/dev/disk/virtual/0/raw";
+		} else {
+			if (strstr(argv[1], "cd") != NULL || strstr(argv[1], "atapi") != NULL)
+				atapi = true;
+			if (strstr(argv[1], "slave") != NULL)
+				master = false;
+			if (char *digit = strpbrk(argv[1], "0123456789"))
+				controller = atol(digit);
+				
+			sprintf(buffer, "/dev/disk/ide/ata%s/%ld/%s/0/raw", atapi ? "pi" : "",
+				controller, master ? "master" : "slave");
+			
+			deviceName = buffer;
+		}
+	}
 
 	int device = open(deviceName, 0);
-	if (device >= 0) {
-		printf("device: `%s'\n", deviceName);
-		session_info sessionInfo;
-		for (int32 i = 0;
-			 get_nth_session_info(device, i, &sessionInfo) == B_OK;
-			 i++) {
-			printf("session %ld\n", i);
-			print_session_info("  ", sessionInfo);
-			extended_partition_info partitionInfo;
-			for (int32 k = 0;
-				 get_nth_partition_info(device, i, k, &partitionInfo) == B_OK;
-				 k++) {
-				printf("  partition %ld_%ld\n", i, k);
-				print_partition_info("    ", partitionInfo);
-			}
-		}
-		close(device);
+	if (device < 0) {
+		fprintf(stderr, "Could not open device \"%s\": %s\n", deviceName, strerror(device));
+		return -1;
 	}
+
+	printf("device: `%s'\n", deviceName);
+
+	session_info sessionInfo;
+	for (int32 i = 0; ; i++) {
+		status_t status = get_nth_session_info(device, i, &sessionInfo);
+		if (status < B_OK) {
+			if (status != B_ENTRY_NOT_FOUND)
+				fprintf(stderr, "get_nth_session_info() failed: %s\n", strerror(status));
+			break;
+		}
+
+		printf("session %ld\n", i);
+		print_session_info("  ", sessionInfo);
+
+		for (int32 k = 0; ; k++) {
+			extended_partition_info partitionInfo;
+			status = get_nth_partition_info(device, i, k, &partitionInfo);
+			if (status < B_OK) {
+				if (status != B_ENTRY_NOT_FOUND)
+					fprintf(stderr, "get_nth_partition_info() failed: %s\n", strerror(status));
+				break;
+			}
+
+			printf("  partition %ld_%ld\n", i, k);
+			print_partition_info("    ", partitionInfo);
+		}
+	}
+	close(device);
+
 	return 0;
 }
 
