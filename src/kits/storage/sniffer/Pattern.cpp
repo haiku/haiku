@@ -74,6 +74,7 @@ Pattern::SetTo(const std::string &string, const std::string &mask) {
 			SetStatus(B_OK);
 		}		
 	}
+	return fCStatus;
 }
 
 /*! \brief Looks for a pattern match in the given data stream, starting from

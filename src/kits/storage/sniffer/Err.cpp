@@ -51,11 +51,12 @@ status_t
 Err::SetTo(const char *msg, const ssize_t pos) {
 	SetMsg(msg);
 	SetPos(pos);
+	return B_OK;
 }
 
 status_t
 Err::SetTo(const std::string &msg, const ssize_t pos) {
-	SetTo(msg.c_str(), pos);
+	return SetTo(msg.c_str(), pos);
 }
 
 void
