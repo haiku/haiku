@@ -55,13 +55,13 @@
 #define dprintf printf
 
 #ifdef DEBUG
-	#define PRINT(x) { __out("bfs: "); __out x; }
-	#define REPORT_ERROR(status) __out("bfs: %s:%s:%ld: %s\n", __FILE__, __FUNCTION__, __LINE__, strerror(status));
+	#define PRINT(x) { __out("bfs@%ld: ", find_thread(NULL)); __out x; }
+	#define REPORT_ERROR(status) __out("bfs@%ld: %s:%s:%d: %s\n", find_thread(NULL), __FILE__, __FUNCTION__, __LINE__, strerror(status));
 	#define RETURN_ERROR(err) { status_t _status = err; if (_status < B_OK) REPORT_ERROR(_status); return _status;}
-	#define FATAL(x) { __out("bfs: "); __out x; }
-	#define INFORM(x) { __out("bfs: "); __out x; }
-	#define FUNCTION() __out("bfs: %s()\n",__FUNCTION__);
-	#define FUNCTION_START(x) { __out("bfs: %s() ",__FUNCTION__); __out x; }
+	#define FATAL(x) { __out("bfs@%ld: ", find_thread(NULL)); __out x; }
+	#define INFORM(x) { __out("bfs@%ld: ", find_thread(NULL)); __out x; }
+	#define FUNCTION() __out("bfs@%ld: %s:%s()\n", find_thread(NULL), __FILE__, __FUNCTION__);
+	#define FUNCTION_START(x) { __out("bfs@%ld: %s:%s() ", find_thread(NULL), __FILE__, __FUNCTION__); __out x; }
 //	#define FUNCTION() ;
 //	#define FUNCTION_START(x) ;
 	#define D(x) {x;};
