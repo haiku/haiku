@@ -9,7 +9,6 @@
 #define KERNEL_ARCH_THREAD_H
 
 
-#include <thread.h>
 #include <thread_types.h>
 
 
