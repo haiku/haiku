@@ -198,10 +198,11 @@ typedef struct {
 		} fifo;
 		struct {
 			uint32 *cmdbuffer;	/* location of DMA command buffer */
-			uint32 put;			/* */
-			uint32 current;		/* */
-			uint32 free;		/* */
-		}dma;
+			uint32 put;			/* last 32-bit-word adress given to engine to exec. to */
+			uint32 current;		/* first free 32-bit-word adress in buffer */
+			uint32 free;		/* nr. of useable free 32-bit words remaining in buffer */
+			uint32 max;			/* command buffer's useable size in 32-bit words */
+		} dma;
 	} engine;
 
 	/* pointers to first and last free memory adress for 3D use: cardmem local offsets */
