@@ -275,7 +275,7 @@ InputServer::LoadKeymap()
 	if (!fChars)
 		delete[] fChars;
 	fChars = new char[fCharsSize];
-	if (file.Read(fChars, fCharsSize) != fCharsSize)
+	if (file.Read(fChars, fCharsSize) != (signed)fCharsSize)
 		return B_BAD_VALUE;
 	
 	return B_OK;
@@ -1363,7 +1363,7 @@ InputServer::FilterEvents(BList *eventsToFilter)
 				//
 				void *out_item; 
 				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-					delete out_item;
+					delete (BMessage*)out_item;
 			} else if (B_SKIP_MESSAGE == result) {
 				// Use the result in out_list (if any); ignore current message.
 				//
@@ -1377,7 +1377,7 @@ InputServer::FilterEvents(BList *eventsToFilter)
 				//
 				 void* out_item;
 				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-					delete out_item;
+					delete (BMessage*)out_item;
 				return false;
 			}
 			
