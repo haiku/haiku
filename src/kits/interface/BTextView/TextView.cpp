@@ -1913,7 +1913,7 @@ BTextView::OffsetAt(BPoint point) const
 		int32 nextInitial = NextInitialByte(offset);
 		float width = StyledWidth(saveOffset, nextInitial - saveOffset);
 		if (x + width > point.x) {
-			if (abs(x + width - point.x) < abs(x - point.x))
+			if (fabs(x + width - point.x) < fabs(x - point.x))
 				offset = nextInitial;
 			break;
 		}
