@@ -55,7 +55,7 @@ using namespace std;
 
 
 LpsClient::LpsClient(const char *host)
-	: __host(host), __sock(NULL), connected(false)
+	: connected(false), __host(host), __sock(NULL)
 {
 }
 

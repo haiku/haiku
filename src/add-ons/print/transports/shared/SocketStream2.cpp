@@ -15,7 +15,7 @@
 /*-----------------------------------------------------------------*/
 
 socketstreambuf::socketstreambuf(Socket *sock, streamsize n)
-	: streambuf(), __alsize(n), __sock(sock), __pu(NULL), __po(NULL)
+	: streambuf(), __sock(sock), __alsize(n), __pu(NULL), __po(NULL)
 {
 	setg(0, 0, 0);
 	setp(0, 0);
