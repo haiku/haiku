@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-2 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-3 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -810,8 +810,8 @@ status_t nv_general_bios_to_powergraphics()
 	 * bit  0: TVOUT. (> NV04A) */
 	NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
-	if (si->ps.card_arch >= NV10A)
-	{ 
+	if (si->ps.secondary_head)
+	{
 		/* switch overlay engine to head 1 */
 		//fixme: add other function blocks...
 		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
