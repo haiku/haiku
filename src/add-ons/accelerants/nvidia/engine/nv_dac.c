@@ -40,7 +40,7 @@ bool nv_dac_crt_connected(void)
 	snooze(1000);
 
 	/* do actual detection: all signals paths high == CRT connected */
-	if DACR(TSTCTRL & 0x10000000)
+	if (DACR(TSTCTRL) & 0x10000000)
 	{
 		present = true;
 		LOG(4,("DAC: CRT detected\n"));
