@@ -382,7 +382,7 @@ rule UsePublicHeaders
 	local headers ;
 
 	for i in $(list) {
-		headers += [ FDirName $(OBOS_TOP) headers os $(i) ] ;
+		headers += [ FDirName $(OBOS_TOP) headers $(i) ] ;
 	}
 
 	UseHeaders $(headers) : $(targets) ;
