@@ -151,6 +151,7 @@ insert_cookie_in_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
 }
 
 
+#if 0
 static void
 remove_cookie_from_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
 {
@@ -165,6 +166,7 @@ remove_cookie_from_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
 
 	cookie->prev = cookie->next = NULL;
 }
+#endif
 
 
 /* makes sure none of the dircookies point to the vnode passed in */

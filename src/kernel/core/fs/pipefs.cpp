@@ -633,7 +633,9 @@ ReadRequests::Add(read_request &request)
 
 	request.prev = fLast;
 	request.next = NULL;
-	fLast = &request;		
+	fLast = &request;
+
+	return B_OK;
 }
 
 
@@ -655,6 +657,8 @@ ReadRequests::Remove(read_request &request)
 
 	if (fFirst == &request)
 		fFirst = request.next;
+
+	return B_OK;
 }
 
 

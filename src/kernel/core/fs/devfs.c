@@ -179,6 +179,7 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *v, bool force_delete)
 }
 
 
+#if 0
 static void
 insert_cookie_in_jar(struct devfs_vnode *dir, struct devfs_cookie *cookie)
 {
@@ -200,6 +201,7 @@ remove_cookie_from_jar(struct devfs_vnode *dir, struct devfs_cookie *cookie)
 
 	cookie->u.dir.prev = cookie->u.dir.next = NULL;
 }
+#endif
 
 
 /* makes sure none of the dircookies point to the vnode passed in */
@@ -630,12 +632,11 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perm
 static status_t
 devfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 {
-	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie;
 	status_t status = 0;
 
-	TRACE(("devfs_open: fs_cookie %p vnode %p, oflags 0x%x, fs_cookie %p \n", fs, vnode, oflags, _cookie));
+	TRACE(("devfs_open: vnode %p, oflags 0x%x, fs_cookie %p \n", vnode, oflags, _cookie));
 
 	cookie = malloc(sizeof(struct devfs_cookie));
 	if (cookie == NULL)
@@ -698,7 +699,6 @@ devfs_fsync(fs_volume _fs, fs_vnode _v)
 static ssize_t
 devfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buffer, size_t *length)
 {
-	struct devfs *fs = _fs;
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
 	struct devfs_part_map *part_map;
@@ -755,21 +755,6 @@ devfs_write(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, const void
 		return written;
 	}
 	return EINVAL;
-}
-
-
-static off_t
-devfs_seek(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, int seekType)
-{
-#ifdef DEBUG
-	struct devfs *fs = _fs;
-	struct devfs_vnode *vnode = _v;
-	struct devfs_cookie *cookie = _cookie;
-
-	TRACE(("devfs_seek: vnode %p, cookie %p, pos %Ld, seekType %d\n", vnode, cookie, pos, seekType));
-#endif
-
-	return ESPIPE;
 }
 
 
