@@ -1,5 +1,5 @@
 <HTML>
-<!-- $Id: BDeskbarUseCases.html,v 1.3 2002/09/09 04:18:20 jrand Exp $ -->
+<!-- $Id: BDeskbarUseCases.html,v 1.4 2002/09/10 03:30:21 jrand Exp $ -->
 <HEAD>
 <TITLE>BDeskbar Use Cases and Implementation Details</TITLE>
 </HEAD>
@@ -23,7 +23,7 @@ The document has the following sections:</P>
 
 <P>The BDeskbar class is a simple class for getting information from the deskbar and for modifying
 it from your application.  The best source of source of information for the BDeskbar interface can be found
-<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/MessageQueue.html">here in the Be Book</A>.
+<A HREF="file:///boot/beos/documentation/Be%20Book/Deskbar/Deskbar.html">here in the Be Book</A>.
 </P>
 
 <A NAME="usecases"></A><H2>BDeskbar Use Cases:</H2>
@@ -38,9 +38,23 @@ BDeskbar instance creates a connection to the deskbar in order to get and change
 deskbar is closed.  However any change to the deskbar's state made through the BDeskbar instance
 persists.</P></LI>
 
-<LI><P><B>Add Item 1:</B> </P></LI>
+<LI><P><B>Add Item 1:</B> The AddItem() member function can be used to take a passed in pointer to
+a BView and send it to the deskbar for inclusion in its shelf.  This BView must be archivable
+and must be exported by the application (for details on how to do this, 
+<A HREF="http://bedriven.be-in.org/articles/replicant/III_027-stepping%20up%20to%20the%20deskbar.html">this article</A>
+may help).  The item will be added and the id of the new item will be passed back to the caller
+through a pointer to an int32.</P></LI>
 
-<LI><P><B>Add Item 2:</B> </P></LI>
+<LI><P><B>Add Item 2:</B> The AddItem() member function can be used to add an item to the deskbar
+shelf by passing a pointer to an entry_ref.  The file pointed to by this entry_ref should be
+an addon that exports the symbol "BView *instantiate_deskbar_item()".  This entry point is used to
+get a BView which it can display in the shelf.  More information on this mechanism can be found in
+the <A HREF="file:///boot/beos/documentation/Be%20Book/Release%20Notes/Deskbar.html">Deskbar Release Notes</A>
+but not in the Be Book proper.  The item id of the added item is passed back in an int32 pointer
+provided by the caller.  NOTE: The source code for the deskbar found in 
+<A HREF="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/StatusView.cpp?rev=1.5&content-type=text/vnd.viewcvs-markup">TReplicantTray::LoadAddon()</A>
+indicates that it also looks for a symbol called "BView *instantiate_deskbar_entry(image_id, entry_ref *)"
+first, but there is no documentation on this.</P></LI>
 
 <LI><P><B>Remove Item 1:</B> The RemoveItem() member function takes an integer id and removes it
 from the deskbar shelf if it exists.  The member returns B_OK at all times (unless the deskbar is
@@ -127,6 +141,44 @@ here:</P>
 itself.</P>
 
 
+<H3>AddItem:</H3>
+
+<P>The AddItem() member sends the following message to the deskbar to add an item from an
+archived BView:</P>
+
+<PRE>
+BMessage theMsg;
+BMessage viewMsg;
+theView.Archive(&amp;viewMsg);              // This takes the target BView to place in the shelf and archives it into viewMsg
+theMsg.what = 'icon'
+theMsg.AddMessage("view", &amp;viewMsg);    // This puts the archived view in the viewMsg and puts it in the message to the deskbar
+</PRE>
+
+<P>Or, the AddItem() member sends the following message to the deskbar to add an item from a file
+that exports the "BView *instantiate_deskbar_item(void)" function:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.what = 'adon'
+theMsg.AddRef("addon", &amp;theAddonRef);    // This is the addon which contains the hook function to get the view to add
+</PRE>
+
+<P>The /boot/app/Pulse application exports the necessary symbol for this mechanism to work and
+is a good candidate to test with.</P>
+
+<P>In either case, the deskbar responds with a message which looks like:</P>
+
+<PRE>
+BMessage theMsg;
+theMsg.AddInt32("id", theID);         // This is the id of the new item
+</PRE>
+
+<P>Note that in both cases, the deskbar does not set the what code of the reply.  Checking the
+source code for 
+<A href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">TBarWindow::AddItem()</A>
+confirms this.  
+
+
 <H3>HasItem:</H3>
 
 <P>The HasItem() member sends the following message to the deskbar:</P>
@@ -175,7 +227,7 @@ theMsg.AddInt32("id", theID);         // This is the id corresponding to the nam
 
 <P>Note that the deskbar does not set the what code of the reply.  Checking the source code
 for 
-<A href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">TBarWindow::ItemExists()</A>
+<A href="http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/opentracker/opentracker/deskbar/BarWindow.cpp?rev=1.2&content-type=text/vnd.viewcvs-markup">TBarWindow::ItemInfo()</A>
 confirms this.</P>
 
 
