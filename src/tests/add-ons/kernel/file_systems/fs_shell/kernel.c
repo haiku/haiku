@@ -1669,16 +1669,122 @@ error1:
 }
 
 
+void
+kill_device_vnodes(dev_t id)
+{
+	fsystem *fs;
+	nspace *ns;
+
+	LOCK(vnlock);
+
+	ns = nstab[id % nns];
+	fs = ns->fs;
+
+	while (ns->vnodes.head) {
+		int err;
+
+		struct vnode *vn = ns->vnodes.head;
+		UNLOCK(vnlock);
+		err = (*fs->ops.write_vnode)(vn->ns->data, vn->data, FALSE);
+		LOCK(vnlock);
+		if (err)
+			PANIC("ERROR WRITING VNODE!!!\n");
+		vn->busy = FALSE;
+		clear_vnode(vn);
+		move_vnode(vn, FREE_LIST);
+	}
+
+	UNLOCK(vnlock);
+}
+
+
+void
+remove_nspace(nspace *ns)
+{
+	fsystem *fs = ns->fs;
+	vnode *vn;
+
+	ns->shutdown = TRUE;
+	for (vn = ns->vnodes.head; vn; vn = vn->nspace.next)
+		vn->busy = TRUE;
+        
+	while (ns->vnodes.head) {
+		int err;
+
+		vn = ns->vnodes.head;
+		UNLOCK(vnlock);
+		err = (*fs->ops.write_vnode)(vn->ns->data, vn->data, FALSE);
+		LOCK(vnlock);
+		if (err)
+			PANIC("ERROR WRITING VNODE!!!\n");
+		vn->busy = FALSE;
+		clear_vnode(vn);
+		move_vnode(vn, FREE_LIST);
+	}
+
+	nstab[ns->nsid % nns] = NULL;
+
+	if (ns->prev)
+		ns->prev->next = ns->next;
+	else
+		nshead = ns->next;
+	if (ns->next)
+		ns->next->prev = ns->prev;
+}
+
+
+status_t
+add_nspace(nspace *ns, fsystem *fs, const char *fileSystem, dev_t dev, ino_t ino)
+{
+	int i;
+
+	if (fileSystem != NULL)
+		fs = inc_file_system(fileSystem);
+	if (!fs)
+		return ENODEV;
+
+	for (i = 0; i < nns; i++, nxnsid++) {
+		if (!nstab[nxnsid % nns]) {
+			nstab[nxnsid % nns] = ns;
+			ns->nsid = nxnsid;
+			nxnsid++;
+			break;
+		}
+	}
+	if (i == nns) {
+		dec_file_system(fs);
+		return EMFILE;
+	}
+
+	nstab[ns->nsid % nns] = ns;
+	ns->fs = fs;
+	ns->vnodes.head = ns->vnodes.tail = NULL;
+	ns->data = NULL;
+	ns->root = NULL;
+	ns->mount = NULL;
+	ns->prev = NULL;
+	ns->next = nshead;
+	ns->shutdown = FALSE;
+	ns->dev = dev;
+	ns->ino = ino;
+
+	if (nshead)
+		nshead->prev = ns;
+	nshead = ns;
+
+	return B_OK;
+}
+
+
 /*
  * sys_mount
  */
 
 void *
 sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
-        const char *device, ulong flags, void *parms, size_t len)
+	const char *device, ulong flags, void *parms, size_t len)
 {
     int                 err;
-    int                 i;
     vnode_id            vnid;
     vnode               *mount;
     fsystem             *fs;
@@ -1688,7 +1794,7 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
     struct my_stat      mst;
     my_dev_t            dev;
     my_ino_t            ino;
-    
+
     dev = -1;
     ino = -1;
     if (device) {
@@ -1711,7 +1817,7 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
         goto error2;
     }
 
-    ns = (nspace *) malloc(sizeof(nspace));
+    ns = (nspace *)malloc(sizeof(nspace));
     if (!ns) {
         err = ENOMEM;
         goto error2;
@@ -1736,34 +1842,12 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
             }
     }
 
-    for(i=0; i<nns; i++, nxnsid++)
-        if (!nstab[nxnsid % nns]) {
-            nstab[nxnsid % nns] = ns;
-            ns->nsid = nxnsid;
-            nxnsid++;
-            break;
-        }
-    if (i == nns) {
-        UNLOCK(vnlock);
-        err = EMFILE;
-        goto error4;
-    }
-    nstab[ns->nsid % nns] = ns;
-    ns->fs = fs;
-    ns->vnodes.head = ns->vnodes.tail = NULL;
-    ns->data = NULL;
-    ns->root = NULL;
-    ns->mount = NULL;
-    ns->prev = NULL;
-    ns->next = nshead;
-    ns->shutdown = FALSE;
-    ns->dev = dev;
-    ns->ino = ino;
-    if (nshead)
-        nshead->prev = ns;
-    nshead = ns;
+	err = add_nspace(ns, fs, NULL, dev, ino);
 
     UNLOCK(vnlock);
+
+	if (err != B_OK)
+		goto error5;
 
     err = (*fs->ops.mount)(ns->nsid, device, flags, parms, len, &data, &vnid);
     if (err)
@@ -1780,7 +1864,6 @@ sys_mount(bool kernel, const char *filesystem, int fd, const char *where,
     mount->mounted = ns;
     ns->mount = mount;
 
-
     UNLOCK(vnlock);
 
     return data;
@@ -1790,16 +1873,9 @@ error6:
     (*fs->ops.unmount)(data);
 error5:
     LOCK(vnlock);
-    nstab[ns->nsid % nns] = NULL;
-    if (ns->prev)
-        ns->prev->next = ns->next;
-    else
-        nshead = ns->next;
-    if (ns->next)
-        ns->next->prev = ns->prev;
+    remove_nspace(ns);
     UNLOCK(vnlock);
 error4:
-    dec_file_system(fs);
 error3:
     free(ns);
 error2:
@@ -1860,30 +1936,7 @@ sys_unmount(bool kernel, int fd, const char *where)
     mount = ns->mount;
     mount->mounted = NULL;
 
-    ns->shutdown = TRUE;
-    for(vn = ns->vnodes.head; vn; vn = vn->nspace.next)
-        vn->busy = TRUE;
-        
-    while (ns->vnodes.head) {
-        vn = ns->vnodes.head;
-        UNLOCK(vnlock);
-        err = (*fs->ops.write_vnode)(vn->ns->data, vn->data, FALSE);
-        LOCK(vnlock);
-        if (err)
-            PANIC("ERROR WRITING VNODE!!!\n");
-        vn->busy = FALSE;
-        clear_vnode(vn);
-        move_vnode(vn, FREE_LIST);
-    }
-
-    if (ns->prev)
-        ns->prev->next = ns->next;
-    else
-        nshead = ns->next;
-    if (ns->next)
-        ns->next->prev = ns->prev;
-
-    nstab[ns->nsid % nns] = NULL;
+	remove_nspace(ns);
     UNLOCK(vnlock);
 
     (*fs->ops.unmount)(ns->data);

@@ -57,6 +57,14 @@ int sys_open_query(bool kernel, int fd, const char *path, const char *query, ulo
 int sys_close_query(bool kernel, int fd, const char *path, void *cookie);
 int sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct dirent *dent,size_t bufferSize,long num);
 
+struct nspace;
+struct fsystem;
+void kill_device_vnodes(dev_t id);
+struct nspace *allocate_nspace(void);
+void remove_nspace(struct nspace *);
+status_t add_nspace(struct nspace *, struct fsystem *, const char *fileSystem, dev_t, ino_t);
+	// for initialize() hack use only :)
+
 int init_vnode_layer(void);
 void *install_file_system(vnode_ops *ops, const char *name,
                           bool fixed, image_id aid);
