@@ -46,8 +46,12 @@ struct screen_desc {
 
 
 // Defined in Application.cpp
+namespace BPrivate {
 extern BPrivateScreen *gPrivateScreen;
+};
 
+
+using namespace BPrivate;
 
 BPrivateScreen *
 BPrivateScreen::CheckOut(BWindow *win)

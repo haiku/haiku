@@ -29,6 +29,7 @@
 // Standard Includes -----------------------------------------------------------
 #include <new>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 // System Includes -------------------------------------------------------------
@@ -69,10 +70,11 @@ BResources *BApplication::_app_resources = NULL;
 BLocker BApplication::_app_resources_lock("_app_resources_lock");
 
 
-// This isn't static because it's used by PrivateScreen.cpp
-// TODO: Move it to the BPrivate namespace (or prepend a "_" to the name),
-// but maybe we'll want to handle screens differently
+// Used by PrivateScreen.cpp
+// TODO: This setup won`t let us have multiple screens. Change this.
+namespace BPrivate {
 BPrivateScreen *gPrivateScreen = NULL;
+};
 
 static property_info
 sPropertyInfo[] = {
@@ -305,7 +307,7 @@ BApplication::InitData(const char *signature, status_t *_error)
 		fInitError = fileInfo.SetTo(&file);
 		if (fInitError == B_OK) {
 			fileInfo.GetAppFlags(&appFlags);
-			char appFileSignature[B_MIME_TYPE_LENGTH + 1];
+			char appFileSignature[B_MIME_TYPE_LENGTH];
 			// compare the file signature and the supplied signature
 			if (fileInfo.GetSignature(appFileSignature) == B_OK
 				&& strcasecmp(appFileSignature, signature) != 0) {
@@ -755,12 +757,12 @@ BApplication::CountLoopers() const
 BLooper *
 BApplication::LooperAt(int32 index) const
 {
-	BLooper *Looper = NULL;
-	BObjectLocker<BLooperList> ListLock(gLooperList);
-	if (ListLock.IsLocked())
-		Looper = gLooperList.LooperAt(index);
+	BLooper *looper = NULL;
+	BObjectLocker<BLooperList> listLock(gLooperList);
+	if (listLock.IsLocked())
+		looper = gLooperList.LooperAt(index);
 
-	return Looper;
+	return looper;
 }
 
 
@@ -867,9 +869,10 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 		}
 
 		case B_READY_TO_RUN:
-			if (!fReadyToRunCalled)
+			if (!fReadyToRunCalled) {
 				ReadyToRun();
-			fReadyToRunCalled = true;
+				fReadyToRunCalled = true;
+			}
 			break;
 
 		case B_ABOUT_REQUESTED:
@@ -890,17 +893,14 @@ BApplication::DispatchMessage(BMessage *message, BHandler *handler)
 
 		case _SHOW_DRAG_HANDLES_:
 		case B_APP_ACTIVATED:
+		// These two are handled by BTextView classes, so
+		// BApplication probably forwards these messages to them.
+		case _DISPOSE_DRAG_: 
+		case _PING_:	
 			puts("not yet handled message:");
 			message->PrintToStream();
 			break;
-
-		/*
-		// These two are handled by BTextView, don't know if also
-		// by other classes
-		case _DISPOSE_DRAG_: 
-		case _PING_:
-			break;
-		*/
+		
 		default:
 			BLooper::DispatchMessage(message, handler);
 			break;
@@ -1192,10 +1192,8 @@ BApplication::do_argv(BMessage *message)
 			const char *arg = NULL; 
 			error = message->FindString("argv", i, &arg); 
 			if (error == B_OK && arg) { 
-				argv[i] = new(std::nothrow) char[strlen(arg) + 1]; 
-				if (argv[i]) 
-					strcpy(argv[i], arg); 
-				else 
+				argv[i] = strdup(arg); 
+				if (argv[i] == NULL) 
 					error = B_NO_MEMORY; 
 			} 
 		} 
@@ -1208,7 +1206,7 @@ BApplication::do_argv(BMessage *message)
 	// cleanup 
 	if (argv) { 
 		for (int32 i = 0; i < argc; i++) 
-			delete[] argv[i]; 
+			free(argv[i]); 
 		delete[] argv; 
 	} 
 }
