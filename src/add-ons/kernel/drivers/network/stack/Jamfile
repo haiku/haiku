@@ -43,13 +43,13 @@ R5KernelAddon net_stack_driver : kernel drivers bin :
 
 # Installation
 
-# OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
-#	net_server_driver 
-#	net_stack_driver 
-# ;
+OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin	: 
+	net_server_driver 
+	net_stack_driver 
+;
 
-# OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-#	<installed>net_server_driver 
-#	<installed>net_stack_driver	: 
-#	installed-symlink 
-# ;
+OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
+	<installed>net_server_driver 
+	<installed>net_stack_driver	: 
+	installed-symlink 
+;
