@@ -44,26 +44,11 @@ THE SOFTWARE.
  * @param BNode& the spooler folder
  * @return void
  */
-PrinterSettings::PrinterSettings(BNode &printer)
+PrinterSettings::PrinterSettings(BNode &printer, Kind kind)
 {
 	fNode = printer;	
 	fErr = fNode.InitCheck();
-}
-
-/**
- * Constructor
- *
- * @param const char*, the printer name
- * @return void
- */
-PrinterSettings::PrinterSettings(const char *printer)
-{
-	BPath path;
-	
-	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
-	path.Append(PRINTER_SETTINGS_PATH);
-	path.Append(printer);
-	fErr = fNode.SetTo(path.Path());
+	fKind = kind;
 }
 
 /**
@@ -103,14 +88,15 @@ PrinterSettings::ReadSettings(BMessage *msg)
 	msg->MakeEmpty();
 	msg->what = 0;
 	
-	if (fNode.GetAttrInfo(ATTR_NAME, &info) == B_OK) {
+	if (fNode.GetAttrInfo(GetAttrName(), &info) == B_OK) {
 		data = (char *)malloc(info.size);
 		if (data != NULL) { 
-			err = fNode.ReadAttr(ATTR_NAME, B_MESSAGE_TYPE, 0, data, info.size); 
+			err = fNode.ReadAttr(GetAttrName(), B_MESSAGE_TYPE, 0, data, info.size); 
 			if (err >= 0) {
 				err = B_OK;
 				msg->Unflatten(data);	 
 			}
+			free(data);
 		}
 	} else { // no attributes found, then we create them
 		GetDefaults(msg);
@@ -133,15 +119,16 @@ PrinterSettings::WriteSettings(BMessage* msg)
 	size_t length;	
  	char *data = NULL;
 	status_t err = B_ERROR;
-
+	
 	length = msg->FlattenedSize();
 	data = (char *) malloc(length);
 	if (data != NULL) {
 		msg->Flatten(data, length);
-		err = fNode.WriteAttr(ATTR_NAME, B_MESSAGE_TYPE, 0, data, length);
+		err = fNode.WriteAttr(GetAttrName(), B_MESSAGE_TYPE, 0, data, length);
 		if (err > 0) {
 			err = B_OK;
 		}
+		free(data);
 	}
 	return err;
 }
@@ -167,26 +154,28 @@ PrinterSettings::GetDefaults(BMessage *msg)
 		*msg = settings;
 	} else {
 		// set default value if property not set
-		msg->AddInt64("xres", XRES);
-		msg->AddInt64("yres", YRES);
-		msg->AddInt32("orientation", ORIENTATION);
-		msg->AddRect("paper_rect", PAPER_RECT);
-		msg->AddRect("printable_rect", PRINT_RECT);
-		msg->AddFloat("scaling", RES);
-		msg->AddString("pdf_compatibility", PDF_COMPATIBILITY);
-		msg->AddInt32("pdf_compression", PDF_COMPRESSION);
-		msg->AddInt32("units", UNITS);
-		msg->AddBool("create_web_links", CREATE_WEB_LINKS);
-		msg->AddFloat("link_border_width", LINK_BORDER_WIDTH);
-		msg->AddBool("create_bookmarks", CREATE_BOOKMARKS);
-		msg->AddString("bookmark_definition_file", BOOKMARK_DEFINITION_FILE);
-		msg->AddBool("create_xrefs", CREATE_XREFS);
-		msg->AddString("xrefs_file", XREFS_FILE);
-		msg->AddInt32("close_option", CLOSE_OPTION);
-		msg->AddString("pdflib_license_key", PDFLIB_LICENSE_KEY);
-		msg->AddString("master_password", MASTER_PASSWORD);
-		msg->AddString("user_password", USER_PASSWORD);
-		msg->AddString("permissions", PERMISSIONS);
+		msg->AddInt64("xres", kXRes);
+		msg->AddInt64("yres", kYRes);
+		msg->AddInt32("orientation", kOrientation);
+		msg->AddRect("paper_rect", kPaperRect);
+		msg->AddRect("printable_rect", kPrintRect);
+		msg->AddFloat("scaling", kRes);
+		msg->AddString("pdf_compatibility", kPDFCompatibilty);
+		msg->AddInt32("pdf_compression", kPDFCompression);
+		msg->AddInt32("units", kUnits);
+		msg->AddBool("create_web_links", kCreateWebLinks);
+		msg->AddFloat("link_border_width", kLinkBorderWidth);
+		msg->AddBool("create_bookmarks", kCreateBookmarks);
+		msg->AddString("bookmark_definition_file", kBookmarkDefinitionFile);
+		msg->AddBool("create_xrefs", kCreateXRefs);
+		msg->AddString("xrefs_file", kXRefsFile);
+		msg->AddInt32("close_option", kCloseStatusWindow);
+#if HAVE_FULLVERSION_PDF_LIB
+		msg->AddString("pdflib_license_key", kPDFLibLicenseKey);
+		msg->AddString("master_password", kMasterPassword);
+		msg->AddString("user_password", kUserPassword);
+		msg->AddString("permissions", kPermissions);
+#endif
 		
 		// create pdf_printer_settings file
 		prefs.SaveSettings(msg);
@@ -262,6 +251,7 @@ PrinterSettings::Validate(const BMessage *msg)
 	if (msg->FindInt32("close_option", &i32) != B_OK) {
 		return B_ERROR;
 	}
+#if HAVE_FULLVERSION_PDF_LIB
 	if (msg->FindString("pdflib_license_key", &s) != B_OK) {
 		return B_ERROR;
 	}
@@ -274,26 +264,42 @@ PrinterSettings::Validate(const BMessage *msg)
 	if (msg->FindString("permissions", &s) != B_OK) {
 		return B_ERROR;
 	}
+#endif
 	// message ok
 	return B_OK;
 }
 
 
 void
-PrinterSettings::Update(BNode* node, BMessage* msg)
+PrinterSettings::Read(BNode* node, BMessage* msg, Kind kind)
+{
+	PrinterSettings ps(*node, kind);
+	if (ps.Validate(msg) != B_OK) {
+		msg->MakeEmpty();
+	}
+	BMessage settings;
+	// check for previously saved settings
+	if (ps.ReadSettings(&settings) != B_OK || ps.Validate(&settings) != B_OK) {
+		// if there were none, then create a default set...
+		ps.GetDefaults(&settings);
+	}
+	AddFields(msg, &settings, false);
+}
+
+void
+PrinterSettings::Update(BNode* node, BMessage* msg, Kind kind)
 {
 	// Validate the message so that it is good for PDF Writer GUI 
-	PrinterSettings ps(*node);
-	if (ps.Validate(msg) != B_OK) {
-		BMessage settings;
-		// check for previously saved settings
-		if (ps.ReadSettings(&settings) != B_OK || ps.Validate(&settings) != B_OK) {
-			// if there were none, then create a default set...
-			ps.GetDefaults(&settings);
-		}
-		AddFields(msg, &settings, false);
-	}
-	// ...and save them
+	PrinterSettings ps(*node, kind);
 	ps.WriteSettings(msg);
 }
 
+const char*
+PrinterSettings::GetAttrName() const
+{
+	if (fKind == kJobSettings) {
+		return kAttrJobSettings;
+	} else {
+		return kAttrPageSettings;
+	}
+}
