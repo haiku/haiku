@@ -1900,25 +1900,24 @@ bfs_stat_index(fs_volume _fs, const char *name, struct stat *stat)
 //	#pragma mark -
 //	Query functions
 
-#if 0
+
 static status_t
-bfs_open_query(void *_ns, const char *queryString, ulong flags, port_id port,
-	long token, void **cookie)
+bfs_open_query(void *_fs, const char *queryString, uint32 flags, port_id port,
+	uint32 token, void **_cookie)
 {
-	FUNCTION();
-	if (_ns == NULL || queryString == NULL || cookie == NULL)
-		RETURN_ERROR(B_BAD_VALUE);
+	FUNCTION_START(("bfs_open_query(\"%s\", flags = %lu, port_id = %ld, token = %ld)\n",
+		queryString, flags, port, token));
 
-	PRINT(("query = \"%s\", flags = %lu, port_id = %ld, token = %ld\n", queryString, flags, port, token));
-
-	Volume *volume = (Volume *)_ns;
+	Volume *volume = (Volume *)_fs;
 
 	Expression *expression = new Expression((char *)queryString);
 	if (expression == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
 	if (expression->InitCheck() < B_OK) {
-		FATAL(("Could not parse query, stopped at: \"%s\"\n", expression->Position()));
+		INFORM(("Could not parse query \"%s\", stopped at: \"%s\"\n",
+			queryString, expression->Position()));
+
 		delete expression;
 		RETURN_ERROR(B_BAD_VALUE);
 	}
@@ -1932,14 +1931,14 @@ bfs_open_query(void *_ns, const char *queryString, ulong flags, port_id port,
 	if (flags & B_LIVE_QUERY)
 		query->SetLiveMode(port, token);
 
-	*cookie = (void *)query;
+	*_cookie = (void *)query;
 
 	return B_OK;
 }
 
 
 static status_t
-bfs_close_query(void *ns, void *cookie)
+bfs_close_query(void *fs, void *cookie)
 {
 	FUNCTION();
 	return B_OK;
@@ -1947,7 +1946,7 @@ bfs_close_query(void *ns, void *cookie)
 
 
 static status_t
-bfs_free_query_cookie(void *ns, void *node, void *cookie)
+bfs_free_query_cookie(void *fs, void *cookie)
 {
 	FUNCTION();
 	if (cookie == NULL)
@@ -1963,7 +1962,7 @@ bfs_free_query_cookie(void *ns, void *node, void *cookie)
 
 
 static status_t
-bfs_read_query(void */*ns*/, void *cookie, long *num, struct dirent *dirent, size_t bufferSize)
+bfs_read_query(void */*fs*/, void *cookie, struct dirent *dirent, size_t bufferSize, uint32 *_num)
 {
 	FUNCTION();
 	Query *query = (Query *)cookie;
@@ -1972,15 +1971,27 @@ bfs_read_query(void */*ns*/, void *cookie, long *num, struct dirent *dirent, siz
 
 	status_t status = query->GetNextEntry(dirent, bufferSize);
 	if (status == B_OK)
-		*num = 1;
+		*_num = 1;
 	else if (status == B_ENTRY_NOT_FOUND)
-		*num = 0;
+		*_num = 0;
 	else
 		return status;
 
 	return B_OK;
 }
-#endif
+
+
+static status_t
+bfs_rewind_query(void */*fs*/, void *cookie)
+{
+	FUNCTION();
+	Query *query = (Query *)cookie;
+	if (query == NULL)
+		RETURN_ERROR(B_BAD_VALUE);
+
+	return query->Rewind();
+}
+
 
 //	#pragma mark -
 
@@ -2096,14 +2107,13 @@ static file_system_info sBeFileSystem = {
 	&bfs_create_index,
 	&bfs_remove_index,
 	&bfs_stat_index,
-#if 0
+
 	/* query operations */
-	&bfs_open_query,			// open query
-	&bfs_close_query,			// close query
-	&bfs_free_query_cookie,		// free query cookie
-	&bfs_read_query,			// read query
-#endif
-	NULL,
+	&bfs_open_query,
+	&bfs_close_query,
+	&bfs_free_query_cookie,
+	&bfs_read_query,
+	&bfs_rewind_query,
 };
 
 extern module_info gDiskDeviceInfo;
