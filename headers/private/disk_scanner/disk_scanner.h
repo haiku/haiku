@@ -17,13 +17,13 @@ typedef status_t (*disk_scanner_get_session_module_hook)(int deviceFD,
 	off_t deviceSize, int32 blockSize,
 	struct session_module_info **sessionModule);
 typedef status_t (*disk_scanner_get_partition_module_hook)(int deviceFD,
-	off_t sessionOffset, off_t sessionSize, int32 blockSize,
+	const struct session_info *sessionInfo,
 	struct partition_module_info **partitionModule);
 
 typedef status_t (*disk_scanner_get_nth_session_info_hook)(int deviceFD,
 	int32 index, struct session_info *sessionInfo);
 typedef status_t (*disk_scanner_get_nth_partition_info_hook)(int deviceFD,
-	off_t sessionOffset, off_t sessionSize,
+	const struct session_info *sessionInfo, int32 partitionIndex,
 	struct extended_partition_info *partitionInfo);
 typedef status_t (*disk_scanner_get_partition_fs_info_hook)(int deviceFD,
 	struct extended_partition_info *partitionInfo);
@@ -66,10 +66,7 @@ typedef struct disk_scanner_module_info {
 
 	params:
 	deviceFD: a device FD
-	sessionOffset: start of the session in bytes from the beginning of the
-				   device
-	sessionSize: size of the session in bytes
-	blockSize: the logical block size
+	sessionInfo: a complete info about the session the partition resides on
 	partitionModule: buffer the pointer to the found module_info shall be
 					 written into
 
@@ -105,6 +102,9 @@ typedef struct disk_scanner_module_info {
 	the indexth partition on the specified session:
 	* offset
 	* size
+	* logical_block_size
+	* session
+	* partition
 	* flags
 	* partition_name
 	* partition_type
@@ -112,16 +112,9 @@ typedef struct disk_scanner_module_info {
 
 	params:
 	deviceFD: a device FD
-	sessionOffset: start of the session in bytes from the beginning of the
-				   device
-	sessionSize: size of the session in bytes
-	partitionInfo: the partition info
-
-	The following fields of partitionInfo are required to be set when the
-	functions is invoked:
-	* logical_block_size
-	* session
-	* partition
+	sessionInfo: a complete info about the session the partition resides on
+	partitionIndex: partition index
+	partitionInfo: the partition info to be filled in
 
 	The function first tries to find a suitable partition module and to
 	delagate the work to that module. If no module could be found, for

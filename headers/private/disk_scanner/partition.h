@@ -7,11 +7,10 @@
 
 struct extended_partition_info;
 
-typedef bool (*partition_identify_hook)(int deviceFD, off_t sessionOffset,
-	off_t sessionSize, const uchar *block, int32 blockSize);
+typedef bool (*partition_identify_hook)(int deviceFD,
+	const struct session_info *session, const uchar *block);
 typedef status_t (*partition_get_nth_info_hook)(int deviceFD,
-	off_t sessionOffset, off_t sessionSize, const uchar *block,
-	int32 blockSize, int32 index,
+	const struct session_info *session, const uchar *block, int32 index,
 	struct extended_partition_info *partitionInfo);
 
 typedef struct partition_module_info {
@@ -30,11 +29,8 @@ typedef struct partition_module_info {
 
 	params:
 	deviceFD: a device FD
-	sessionOffset: start of the session in bytes from the beginning of the
-				   device
-	sessionSize: size of the session in bytes
+	sessionInfo: a complete info about the session the partition resides on
 	block: the first block of the session
-	blockSize: the logical block size
 
 
 	get_nth_info():
@@ -51,11 +47,8 @@ typedef struct partition_module_info {
 
 	params:
 	deviceFD: a device FD
-	sessionOffset: start of the session in bytes from the beginning of the
-				   device
-	sessionSize: size of the session in bytes
+	sessionInfo: a complete info about the session the partition resides on
 	block: the first block of the session
-	blockSize: the logical block size
 	index: the partition index
 	partitionInfo: the partition info
 
