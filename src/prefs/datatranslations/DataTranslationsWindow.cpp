@@ -147,6 +147,8 @@ DataTranslationsWindow::ShowConfigView(int32 id)
 	}
 	fConfigView->MoveTo(configRect.left, configRect.top);
 	fConfigView->ResizeTo(configRect.Width(), configRect.Height());
+	fConfigView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		// force config views to all have the same color
 	fRightBox->AddChild(fConfigView);
 	
 	UpdateIfNeeded();
