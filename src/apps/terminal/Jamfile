@@ -13,3 +13,5 @@ App Terminal :
 	;
 
 LinkSharedOSLibs Terminal : be translation tracker ;
+
+SubInclude OBOS_TOP src apps terminal MYOB ;

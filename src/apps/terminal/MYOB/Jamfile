@@ -1,0 +1,30 @@
+SubDir OBOS_TOP src apps terminal MYOB ;
+
+AddResources Terminal2 : Terminal.rsrc  ;
+
+App Terminal2 : AboutWindow.cpp
+	AppearPrefView.cpp
+	CodeConv.cpp
+	CurPos.cpp
+	MenuUtil.cpp
+#	MousePrefView.cpp
+	Terminal.cpp
+	PrefDlg.cpp
+	PrefHandler.cpp
+	PrefView.cpp
+	ShellPrefView.cpp
+	spawn.cpp
+	TermApp.cpp
+	TermBaseView.cpp
+	TermBuffer.cpp
+	TermParse.cpp
+	TermView.cpp
+	TermWindow.cpp
+	TTextControl.cpp
+	UTF8WidthTbl.c
+	VTKeyTbl.c
+	VTPrsTbl.c
+	;
+
+LinkSharedOSLibs Terminal2 : be tracker textencoding game  ;
+

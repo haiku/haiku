@@ -1,0 +1,83 @@
+April 21, 2003 - MuTerminal goes from GPL to OBOS!
+
+Thanks to the effort of BiPolar and the generosity of Kazuho Okui and
+Takashi Murai we have had donated to OBOS the sources for MuTerminal.
+MuTerminal was formerly under the GPL license.  The complete MuTerminal
+package as it was originally released on April 2, 2000 (version 2.3) is
+preserved in this directory in the original form that I obtained from
+bebits.
+
+To simplify integration I have performed some code reorganization and
+the initial check-in is not the same as the version 2.3 which is saved
+in the muterm-2.3.zip.  As such, please do not remove the muterm-2.3.zip
+as it is an important checkpoint.  (and also stands as a thank-you to
+Kazuho Okui and Takashi Murai)
+
+Andrew Bachmann
+
+------------------------------------------------------------------------
+
+To: kaz@naan.net
+From: "BiPolar" <BiPolar@SoftHome.net>
+Subject: about MuTerminal
+Date: Tue, 22 Apr 2003 00:32:27 -0300 ART
+
+Hello!
+
+I am a (very) happy user of your mighty program: Muterminal 2.0 for
+BeOS.
+My name is Oscar Lesta. I'm Argentinian (just to inform you, not to
+make you feel sorry for me, he he!).
+
+I've being using MuTerminal for a while (I have even made some small
+changes in the GUI, hiding/unhiding of the scrollbar, rearrangement of
+menu items, fixed some localization issues and things like that) and I
+think that it is a great replacement for Be's original Terminal app.
+
+I really don't know if you are still developing this program, but I
+have to ask you:
+Is there any chance of that you change the license from GPL to MIT/BSD?
+
+If you do so, then the OpenBeOS Team (http://open-beos.sourceforge.net)
+could use your app as a Terminal Replacement in the future release of
+their O.S.
+
+In case you aren't developing it anymore: maybe you can "donate" your
+code to beunited.org (http://www.beunited.org). They are making
+standars for BeOS compatible O.S., and continuing the development of
+several applications for BeOS that original authors have donated to the
+BeOS Community.
+
+About the license: I understand that part of your code depends on
+libconv, which is under GPL, but that part can be replaced with they
+counterpart from OpenBeOS, with is under a MIT/BSD like license.
+
+Thanks for your time, and thanks again for MuTerm!
+
+Your,
+
+Oscar.
+
+------------------------------------------------------------------------
+
+To: BiPolar <BiPolar@SoftHome.net>
+From: Kazuho Okui <kaz@naan.jp>
+Subject: Re: about MuTerminal
+Date: Tue, 22 Apr 2003 13:46:47 +0900
+
+Hi,
+
+Now, Muterm's licence is GPL, but, I'm not use other GPL code in Muterm.
+So, I can change Muterm`s licence to MIT/BSD/AS IS and other.
+
+If you (and OpenBeOS team) adopt Muterm to default terminal on OpenBeOS,
+I will welcome it.
+
+I want you to leave only the credit of me and Takashi Murai in that case.
+
+Please contact me, if some may otherwise be able to be helped. However,
+since my work is busy recently, I think that coding is hardly made.
+
+Thanks,
+-- 
+Kazuho Okui<kaz@naan.jp>
