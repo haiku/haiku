@@ -54,7 +54,7 @@ struct rootfs_vnode {
 };
 
 struct rootfs {
-	fs_id id;
+	mount_id id;
 	mutex lock;
 	vnode_id next_vnode_id;
 	void *vnode_list_hash;
@@ -264,7 +264,7 @@ err:
 
 
 static status_t
-rootfs_mount(fs_id id, const char *device, void *args, fs_volume *_fs, vnode_id *root_vnid)
+rootfs_mount(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct rootfs *fs;
 	struct rootfs_vnode *vnode;

@@ -79,7 +79,7 @@ struct devfs_vnode {
 };
 
 struct devfs {
-	fs_id id;
+	mount_id id;
 	mutex lock;
 	int next_vnode_id;
 	void *vnode_list_hash;
@@ -406,7 +406,7 @@ err2:
 
 
 static status_t
-devfs_mount(fs_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id *root_vnid)
+devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id *root_vnid)
 {
 	struct devfs *fs;
 	struct devfs_vnode *v;
