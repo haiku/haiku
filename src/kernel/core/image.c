@@ -130,6 +130,7 @@ remove_images(struct team *team)
 
 		free(image);
 	}
+	return B_OK;
 }
 
 
