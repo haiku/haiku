@@ -1,6 +1,7 @@
 #include <MediaDefs.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 #include "MixerUtils.h"
 #include "debug.h"
@@ -158,4 +159,32 @@ CopySamples(float *_dst, int32 _dst_sample_offset,
 		src += src_sample_offset;
 		dst += dst_sample_offset;
 	}
+}
+
+int64
+frames_for_duration(double framerate, bigtime_t duration)
+{
+	return (int64) ceil(framerate * double(duration) / 1000000.0);
+}
+
+bigtime_t
+duration_for_frames(double framerate, int64 frames)
+{
+	return (bigtime_t)((1000000.0 * frames) / framerate);
+}
+
+int
+bytes_per_frame(const media_multi_audio_format & format)
+{
+	return format.channel_count * (format.format & 0xf);
+}
+
+int
+frames_per_buffer(const media_multi_audio_format & format)
+{
+	int frames = 0;
+	if (bytes_per_frame(format) > 0) {
+		frames = format.buffer_size / bytes_per_frame(format);
+	}
+	return frames;
 }

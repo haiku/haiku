@@ -1,4 +1,3 @@
-#include <math.h>
 
 void string_for_channel_mask(char *str, uint32 mask);
 void fix_multiaudio_format(media_multi_audio_format *format);
@@ -13,13 +12,11 @@ void CopySamples(float *_dst, int32 _dst_sample_offset,
 				 const float *_src, int32 _src_sample_offset,
 				 int32 _sample_count);
 
+int bytes_per_frame(const media_multi_audio_format & format);
+int frames_per_buffer(const media_multi_audio_format & format);
 
 int64 frames_for_duration(double framerate, bigtime_t duration);
-
-inline int64 frames_for_duration(double framerate, bigtime_t duration)
-{
-	return (int64) ceil(framerate * double(duration) / 1000000.0);
-}
+bigtime_t duration_for_frames(double framerate, int64 frames);
 
 int ChannelMaskToChannelType(uint32 mask);
 uint32 ChannelTypeToChannelMask(int type);
