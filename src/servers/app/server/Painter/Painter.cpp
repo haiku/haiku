@@ -44,6 +44,7 @@ Painter::Painter()
 	  fRenderer(NULL),
 	  fFontRendererSolid(NULL),
 	  fFontRendererBin(NULL),
+	  fLineProfile(),
 	  fSubpixelPrecise(false),
 	  fScale(1.0),
 	  fPenSize(1.0),
@@ -56,6 +57,7 @@ Painter::Painter()
 	  fTextRenderer(new AGGTextRenderer())
 {
 	_UpdateFont();
+	_UpdateLineWidth();
 }
 
 // destructor
@@ -114,6 +116,8 @@ rgb_color color = fPatternHandler->HighColor().GetColor32();
 
 		fOutlineRasterizer = new outline_rasterizer_type(*fOutlineRenderer);
 #endif
+		// attach our line profile to the renderer, it keeps a pointer
+		fOutlineRenderer->profile(fLineProfile);
 
 		// the renderer used for filling paths
 		fRenderer = new renderer_type(*fBaseRenderer);
@@ -132,7 +136,6 @@ rgb_color color = fPatternHandler->HighColor().GetColor32();
 		fFontRendererSolid = new font_renderer_solid_type(*fBaseRenderer);
 
 		fFontRendererBin = new font_renderer_bin_type(*fBaseRenderer);
-
 
 		_RebuildClipping();
 	}
@@ -206,6 +209,7 @@ Painter::SetScale(float scale)
 {
 	fScale = scale;
 	_RebuildClipping();
+	_UpdateLineWidth();
 }
 
 // SetPenSize
@@ -213,6 +217,7 @@ void
 Painter::SetPenSize(float size)
 {
 	fPenSize = size;
+	_UpdateLineWidth();
 }
 
 // SetOrigin
@@ -809,6 +814,16 @@ Painter::_UpdateFont()
 	fTextRenderer->SetPointSize(fFont.Size());
 }
 
+// _UpdateLineWidth
+void
+Painter::_UpdateLineWidth()
+{
+	float width = fPenSize;
+	_Transform(&width);
+
+	fLineProfile.width(width);	
+}
+
 // #pragma mark -
 
 // _DrawTriangle
@@ -920,12 +935,12 @@ Painter::_StrokePath(VertexSource& path, const pattern& p) const
 {
 	fPatternHandler->SetPattern(p);
 
-	float width = fPenSize;
-	_Transform(&width);
-
 #if ALIASED_DRAWING
 	if (width > 1.0) {
 		agg::conv_stroke<VertexSource> stroke(path);
+
+		float width = fPenSize;
+		_Transform(&width);
 		stroke.width(width);
 
 		fRasterizer->add_path(stroke);
@@ -934,9 +949,6 @@ Painter::_StrokePath(VertexSource& path, const pattern& p) const
 		fOutlineRasterizer->add_path(path);
 	}
 #else
-	agg::line_profile_aa prof;
-       prof.width(width);
-	fOutlineRenderer->profile(prof);
 	fOutlineRasterizer->add_path(path);
 #endif
 }

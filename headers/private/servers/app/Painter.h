@@ -184,6 +184,7 @@ class Painter {
 			void				_RebuildClipping();
 
 			void				_UpdateFont();
+			void				_UpdateLineWidth();
 
 								// drawing functions stroke/fill
 			void				_DrawTriangle(	BPoint pt1,
@@ -228,6 +229,8 @@ class Painter {
 
 	font_renderer_solid_type*	fFontRendererSolid;
 	font_renderer_bin_type*		fFontRendererBin;
+
+	agg::line_profile_aa		fLineProfile;
 
 	// for internal coordinate rounding/transformation,
 	// does not concern rendering
