@@ -5,258 +5,193 @@
 
 #include "DrawingMode.h"
 
+// blend_over
+inline void
+blend_over(uint8* d1, uint8* d2, uint8* d3, uint8* da,
+		   uint8 s1, uint8 s2, uint8 s3, uint8 a)
+{
+	blend(d1, d2, d3, da, s1, s2, s3, a);
+}
+
+// assign_over
+inline void
+assign_over(uint8* d1, uint8* d2, uint8* d3, uint8* da,
+			uint8 s1, uint8 s2, uint8 s3)
+{
+	*d1 = s1;
+	*d2 = s2;
+	*d3 = s3;
+	*da = 255;
+}
+
+
 namespace agg
 {
-	//====================================================DrawingModeOver
 	template<class Order>
 	class DrawingModeOver : public DrawingMode
 	{
 	public:
 		typedef Order order_type;
 
-		//--------------------------------------------------------------------
+		// constructor
 		DrawingModeOver()
 			: DrawingMode()
 		{
 		}
 
-		//--------------------------------------------------------------------
+		// blend_pixel
 		virtual	void blend_pixel(int x, int y, const color_type& c, int8u cover)
 		{
-//printf("DrawingModeOver::blend_pixel()\n");
 			if (fPatternHandler->IsHighColor(x, y)) {
 				int8u* p = m_rbuf->row(y) + (x << 2);
-				rgb_color color = fPatternHandler->R5ColorAt(x, y);
-	//			int alpha = int(cover) * int(c.a);
-				int alpha = int(cover) * int(color.alpha);
-				if(alpha == 255*255)
-				{
-	//				p[Order::R] = (int8u)c.r;
-	//				p[Order::G] = (int8u)c.g;
-	//				p[Order::B] = (int8u)c.b;
-	//				p[Order::A] = (int8u)c.a;
-	
-					p[Order::R] = color.red;
-					p[Order::G] = color.green;
-					p[Order::B] = color.blue;
-					p[Order::A] = color.alpha;
-				}
-				else
-				{
-					int r = p[Order::R];
-					int g = p[Order::G];
-					int b = p[Order::B];
-					int a = p[Order::A];
-	//				p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-	//				p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-	//				p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-	//				p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-					p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-					p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-					p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+				rgb_color color = fPatternHandler->HighColor().GetColor32();
+				if (cover == 255) {
+					assign_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+								color.red, color.green, color.blue);
+				} else {
+					blend_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+							   color.red, color.green, color.blue, cover);
 				}
 			}
 		}
 
-		//--------------------------------------------------------------------
+		// blend_hline
 		virtual	void blend_hline(int x, int y, unsigned len, 
 								 const color_type& c, int8u cover)
 		{
-//printf("DrawingModeOver::blend_hline()\n");
-			int alpha = int(cover) * int(c.a);
-			if(alpha == 255*255)
-			{
+			if(cover == 255) {
+				rgb_color color = fPatternHandler->HighColor().GetColor32();
 				int32u v;
 				int8u* p8 = (int8u*)&v;
-				p8[Order::R] = (int8u)c.r;
-				p8[Order::G] = (int8u)c.g;
-				p8[Order::B] = (int8u)c.b;
-				p8[Order::A] = (int8u)c.a;
+				p8[Order::R] = (int8u)color.red;
+				p8[Order::G] = (int8u)color.green;
+				p8[Order::B] = (int8u)color.blue;
+				p8[Order::A] = 255;
 				int32u* p32 = (int32u*)(m_rbuf->row(y)) + x;
-				do
-				{
+				do {
 					if (fPatternHandler->IsHighColor(x, y))
 						*p32 = v;
 					p32++;
 					x++;
-				}
-				while(--len);
-			}
-			else
-			{
+				} while(--len);
+			} else {
 				int8u* p = m_rbuf->row(y) + (x << 2);
-				do
-				{
+				rgb_color color = fPatternHandler->HighColor().GetColor32();
+				do {
 					if (fPatternHandler->IsHighColor(x, y)) {
-						int r = p[Order::R];
-						int g = p[Order::G];
-						int b = p[Order::B];
-						int a = p[Order::A];
-						p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-						p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-						p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+						blend_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+								   color.red, color.green, color.blue, cover);
 					}
 					x++;
 					p += 4;
-				}
-				while(--len);
+				} while(--len);
 			}
 		}
 
-		//--------------------------------------------------------------------
+		// blend_vline
 		virtual	void blend_vline(int x, int y, unsigned len, 
 								 const color_type& c, int8u cover)
 		{
 printf("DrawingModeOver::blend_vline()\n");
 		}
 
-		//--------------------------------------------------------------------
+		// blend_solid_hspan
 		virtual	void blend_solid_hspan(int x, int y, unsigned len, 
 									   const color_type& c, const int8u* covers)
 		{
-//printf("DrawingModeOver::blend_solid_hspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
+			rgb_color color = fPatternHandler->HighColor().GetColor32();
+			do {
 				if (fPatternHandler->IsHighColor(x, y)) {
-					rgb_color color = fPatternHandler->R5ColorAt(x, y);
-	//				int alpha = int(*covers++) * c.a;
-					int alpha = int(*covers) * color.alpha;
-	//int alpha = int(*covers++);
-					if(alpha)
-					{
-						if(alpha == 255*255)
-						{
-	//						p[Order::R] = (int8u)c.r;
-	//						p[Order::G] = (int8u)c.g;
-	//						p[Order::B] = (int8u)c.b;
-	//						p[Order::A] = (int8u)c.a;
-							p[Order::R] = color.red;
-							p[Order::G] = color.green;
-							p[Order::B] = color.blue;
-							p[Order::A] = color.alpha;
-						}
-						else
-						{
-							int r = p[Order::R];
-							int g = p[Order::G];
-							int b = p[Order::B];
-							int a = p[Order::A];
-	//						p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-	//						p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-	//						p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-	//						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-							p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-							p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-							p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-							p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+					if (*covers) {
+						if(*covers == 255) {
+							assign_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+										color.red, color.green, color.blue);
+						} else {
+							blend_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									   color.red, color.green, color.blue, *covers);
 						}
 					}
 				}
 				covers++;
 				p += 4;
 				x++;
-			}
-			while(--len);
+			} while(--len);
 		}
 
 
 
-		//--------------------------------------------------------------------
+		// blend_solid_vspan
 		virtual	void blend_solid_vspan(int x, int y, unsigned len, 
 									   const color_type& c, const int8u* covers)
 		{
-//printf("DrawingModeOver::blend_solid_vspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
+			rgb_color color = fPatternHandler->HighColor().GetColor32();
+			do {
 				if (fPatternHandler->IsHighColor(x, y)) {
-					rgb_color color = fPatternHandler->R5ColorAt(x, y);
-	//				int alpha = int(*covers++) * c.a;
-					int alpha = int(*covers) * color.alpha;
-	//int alpha = int(*covers++);
-	
-					if(alpha)
-					{
-						if(alpha == 255*255)
-						{
-	//						p[Order::R] = (int8u)c.r;
-	//						p[Order::G] = (int8u)c.g;
-	//						p[Order::B] = (int8u)c.b;
-	//						p[Order::A] = (int8u)c.a;
-							p[Order::R] = color.red;
-							p[Order::G] = color.green;
-							p[Order::B] = color.blue;
-							p[Order::A] = color.alpha;
-						}
-						else
-						{
-							int r = p[Order::R];
-							int g = p[Order::G];
-							int b = p[Order::B];
-							int a = p[Order::A];
-	//						p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-	//						p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-	//						p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-	//						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-							p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-							p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-							p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-							p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+					if (*covers) {
+						if (*covers == 255) {
+							assign_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+										color.red, color.green, color.blue);
+						} else {
+							blend_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									   color.red, color.green, color.blue, *covers);
 						}
 					}
-				};
+				}
 				covers++;
 				p += m_rbuf->stride();
 				y++;
-			}
-			while(--len);
+			} while(--len);
 		}
 
 
-		//--------------------------------------------------------------------
+		// blend_color_hspan
 		virtual	void blend_color_hspan(int x, int y, unsigned len, 
 									   const color_type* colors, 
 									   const int8u* covers,
 									   int8u cover)
 		{
-//printf("DrawingModeOver::blend_color_hspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
-				int alpha = colors->a * (covers ? int(*covers++) : int(cover));
-
-				if(alpha)
-				{
-					if(alpha == 255*255)
-					{
-						p[Order::R] = (int8u)colors->r;
-						p[Order::G] = (int8u)colors->g;
-						p[Order::B] = (int8u)colors->b;
-						p[Order::A] = (int8u)colors->a;
+			if (covers) {
+				// non-solid opacity
+				do {
+					if (*covers) {
+						if (*covers == 255) {
+							assign_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+										colors->r, colors->g, colors->b);
+						} else {
+							blend_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									   colors->r, colors->g, colors->b, *covers);
+						}
 					}
-					else
-					{
-						int r = p[Order::R];
-						int g = p[Order::G];
-						int b = p[Order::B];
-						int a = p[Order::A];
-						p[Order::R] = (int8u)((((colors->r - r) * alpha) + (r << 16)) >> 16);
-						p[Order::G] = (int8u)((((colors->g - g) * alpha) + (g << 16)) >> 16);
-						p[Order::B] = (int8u)((((colors->b - b) * alpha) + (b << 16)) >> 16);
-						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					}
+					covers++;
+					p += 4;
+					++colors;
+				} while(--len);
+			} else {
+				// solid full opcacity
+				if (cover == 255) {
+					do {
+						assign_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									colors->r, colors->g, colors->b);
+						p += 4;
+						++colors;
+					} while(--len);
+				// solid partial opacity
+				} else if (cover) {
+					do {
+						blend_over(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+								   colors->r, colors->g, colors->b, cover);
+						p += 4;
+						++colors;
+					} while(--len);
 				}
-				p += 4;
-				++colors;
 			}
-			while(--len);
 		}
 
 
-		//--------------------------------------------------------------------
+		// blend_color_vspan
 		virtual	void blend_color_vspan(int x, int y, unsigned len, 
 									   const color_type* colors, 
 									   const int8u* covers,

@@ -5,284 +5,171 @@
 
 #include "DrawingMode.h"
 
-#define BINARY 0
+// blend_invert
+inline void
+blend_invert(uint8* d1, uint8* d2, uint8* d3, uint8* da, uint8 a)
+{
+	blend(d1, d2, d3, da, 255 - *d1, 255 - *d2, 255 - *d3, a);
+}
+
+// assign_invert
+inline void
+assign_invert(uint8* d1, uint8* d2, uint8* d3, uint8* da)
+{
+	*d1 = 255 - *d1;
+	*d2 = 255 - *d2;
+	*d3 = 255 - *d3;
+	*da = 255;
+}
+
 
 namespace agg
 {
-	//====================================================DrawingModeInvert
 	template<class Order>
 	class DrawingModeInvert : public DrawingMode
 	{
 	public:
 		typedef Order order_type;
 
-		//--------------------------------------------------------------------
+		// constructor
 		DrawingModeInvert()
 			: DrawingMode()
 		{
 		}
 
-		//--------------------------------------------------------------------
+		// blend_pixel
 		virtual	void blend_pixel(int x, int y, const color_type& c, int8u cover)
 		{
-//printf("DrawingModeInvert::blend_pixel()\n");
 			if (fPatternHandler->IsHighColor(x, y)) {
 				int8u* p = m_rbuf->row(y) + (x << 2);
-#if BINARY
-				int alpha = int(cover);
-				if(alpha > 127)
-				{
-					p[Order::R] = 255 - p[Order::R];
-					p[Order::G] = 255 - p[Order::G];
-					p[Order::B] = 255 - p[Order::B];
-				//	p[Order::A] = 255 - p[Order::A];
+				if (cover == 255) {
+					assign_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A]);
+				} else {
+					blend_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A], cover);
 				}
-#else
-				int alpha = int(cover) * int(c.a);
-				if(alpha == 255*255)
-				{
-					p[Order::R] = 255 - p[Order::R];
-					p[Order::G] = 255 - p[Order::G];
-					p[Order::B] = 255 - p[Order::B];
-//					p[Order::A] = 255 - p[Order::A];
-				}
-				else
-				{
-					int r = p[Order::R];
-					int g = p[Order::G];
-					int b = p[Order::B];
-					int a = p[Order::A];
-					p[Order::R] = (int8u)(((((255 - r) - r) * alpha) + (r << 16)) >> 16);
-					p[Order::G] = (int8u)(((((255 - g) - g) * alpha) + (g << 16)) >> 16);
-					p[Order::B] = (int8u)(((((255 - b) - b) * alpha) + (b << 16)) >> 16);
-					p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-				}
-#endif
 			}
 		}
 
-		//--------------------------------------------------------------------
+		// blend_hline
 		virtual	void blend_hline(int x, int y, unsigned len, 
 								 const color_type& c, int8u cover)
 		{
-//printf("DrawingModeInvert::blend_hline()\n");
-#if BINARY
-			if (cover > 127) {
-				int8u* p = m_rbuf->row(y) + (x << 2);
-				do
-				{
+			int8u* p = m_rbuf->row(y) + (x << 2);
+			if(cover == 255) {
+				do {
 					if (fPatternHandler->IsHighColor(x, y)) {
-						p[Order::R] = 255 - p[Order::R];
-						p[Order::G] = 255 - p[Order::G];
-						p[Order::B] = 255 - p[Order::B];
-//						p[Order::A] = 255 - p[Order::A];
-					}
-					p += 4;
-					x++;
-				}
-				while(--len);
-			}
-#else
-			int alpha = int(cover) * int(c.a);
-			if(alpha == 255*255)
-			{
-				int8u* p = m_rbuf->row(y) + (x << 2);
-				do
-				{
-					if (fPatternHandler->IsHighColor(x, y)) {
-						p[Order::R] = 255 - p[Order::R];
-						p[Order::G] = 255 - p[Order::G];
-						p[Order::B] = 255 - p[Order::B];
-//						p[Order::A] = 255 - p[Order::A];
-					}
-					p += 4;
-					x++;
-				}
-				while(--len);
-			}
-			else
-			{
-				int8u* p = m_rbuf->row(y) + (x << 2);
-				do
-				{
-					if (fPatternHandler->IsHighColor(x, y)) {
-						int r = p[Order::R];
-						int g = p[Order::G];
-						int b = p[Order::B];
-						int a = p[Order::A];
-						p[Order::R] = (int8u)(((((255 - r) - r) * alpha) + (r << 16)) >> 16);
-						p[Order::G] = (int8u)(((((255 - g) - g) * alpha) + (g << 16)) >> 16);
-						p[Order::B] = (int8u)(((((255 - b) - b) * alpha) + (b << 16)) >> 16);
-						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+						assign_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A]);
 					}
 					x++;
 					p += 4;
-				}
-				while(--len);
+				} while(--len);
+			} else {
+				do {
+					if (fPatternHandler->IsHighColor(x, y)) {
+						blend_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A], cover);
+					}
+					x++;
+					p += 4;
+				} while(--len);
 			}
-#endif
 		}
 
-		//--------------------------------------------------------------------
+		// blend_vline
 		virtual	void blend_vline(int x, int y, unsigned len, 
 								 const color_type& c, int8u cover)
 		{
 printf("DrawingModeInvert::blend_vline()\n");
 		}
 
-		//--------------------------------------------------------------------
+		// blend_solid_hspan
 		virtual	void blend_solid_hspan(int x, int y, unsigned len, 
 									   const color_type& c, const int8u* covers)
 		{
-//printf("DrawingModeInvert::blend_solid_hspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
+			do {
 				if (fPatternHandler->IsHighColor(x, y)) {
-#if BINARY
-					int alpha = int(*covers);
-					if(alpha > 127)
-					{
-						p[Order::R] = 255 - p[Order::R];
-						p[Order::G] = 255 - p[Order::G];
-						p[Order::B] = 255 - p[Order::B];
-					//	p[Order::A] = 255 - p[Order::A];
-					}
-#else
-					int alpha = int(*covers) * c.a;
-					if(alpha)
-					{
-						if(alpha == 255*255)
-						{
-							p[Order::R] = 255 - p[Order::R];
-							p[Order::G] = 255 - p[Order::G];
-							p[Order::B] = 255 - p[Order::B];
-//							p[Order::A] = 255 - p[Order::A];
-						}
-						else
-						{
-							int r = p[Order::R];
-							int g = p[Order::G];
-							int b = p[Order::B];
-							int a = p[Order::A];
-							p[Order::R] = (int8u)(((((255 - r) - r) * alpha) + (r << 16)) >> 16);
-							p[Order::G] = (int8u)(((((255 - g) - g) * alpha) + (g << 16)) >> 16);
-							p[Order::B] = (int8u)(((((255 - b) - b) * alpha) + (b << 16)) >> 16);
-							p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+					if (*covers) {
+						if(*covers == 255) {
+							assign_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A]);
+						} else {
+							blend_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A], *covers);
 						}
 					}
-#endif
 				}
 				covers++;
 				p += 4;
 				x++;
-			}
-			while(--len);
+			} while(--len);
 		}
 
 
 
-		//--------------------------------------------------------------------
+		// blend_solid_vspan
 		virtual	void blend_solid_vspan(int x, int y, unsigned len, 
 									   const color_type& c, const int8u* covers)
 		{
-//printf("DrawingModeInvert::blend_solid_vspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
+			do {
 				if (fPatternHandler->IsHighColor(x, y)) {
-#if BINARY
-					int alpha = int(*covers);
-					if(alpha > 127)
-					{
-						p[Order::R] = 255 - p[Order::R];
-						p[Order::G] = 255 - p[Order::G];
-						p[Order::B] = 255 - p[Order::B];
-					//	p[Order::A] = 255 - p[Order::A];
-					}
-#else
-					int alpha = int(*covers) * c.a;
-					if(alpha)
-					{
-						if(alpha == 255*255)
-						{
-							p[Order::R] = 255 - p[Order::R];
-							p[Order::G] = 255 - p[Order::G];
-							p[Order::B] = 255 - p[Order::B];
-//							p[Order::A] = 255 - p[Order::A];
-						}
-						else
-						{
-							int r = p[Order::R];
-							int g = p[Order::G];
-							int b = p[Order::B];
-							int a = p[Order::A];
-							p[Order::R] = (int8u)(((((255 - r) - r) * alpha) + (r << 16)) >> 16);
-							p[Order::G] = (int8u)(((((255 - g) - g) * alpha) + (g << 16)) >> 16);
-							p[Order::B] = (int8u)(((((255 - b) - b) * alpha) + (b << 16)) >> 16);
-							p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+					if (*covers) {
+						if (*covers == 255) {
+							assign_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A]);
+						} else {
+							blend_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A], *covers);
 						}
 					}
-#endif
 				}
 				covers++;
 				p += m_rbuf->stride();
 				y++;
-			}
-			while(--len);
+			} while(--len);
 		}
 
 
-		//--------------------------------------------------------------------
+		// blend_color_hspan
 		virtual	void blend_color_hspan(int x, int y, unsigned len, 
 									   const color_type* colors, 
 									   const int8u* covers,
 									   int8u cover)
 		{
-//printf("DrawingModeInvert::blend_color_hspan()\n");
+			// TODO: does the R5 app_server check for the
+			// appearance of the high color in the source bitmap?
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			rgb_color lowColor = fPatternHandler->LowColor().GetColor32();
-			do 
-			{
-				int alpha = colors->a * (covers ? int(*covers++) : int(cover));
-
-				if(alpha)
-				{
-//					if (colors->r != lowColor.red ||
-//						colors->g != lowColor.green ||
-//						colors->b != lowColor.blue) {
-	
-						p[Order::R] = 255 - p[Order::R];
-						p[Order::G] = 255 - p[Order::G];
-						p[Order::B] = 255 - p[Order::B];
-//					}
-/*					if(alpha == 255*255)
-					{
-						p[Order::R] = 255 - p[Order::R];
-						p[Order::G] = 255 - p[Order::G];
-						p[Order::B] = 255 - p[Order::B];
-//						p[Order::A] = 255 - p[Order::A];
+			if (covers) {
+				// non-solid opacity
+				do {
+					if(*covers) {
+						if(*covers == 255) {
+							assign_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A]);
+						} else {
+							blend_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A], *covers);
+						}
 					}
-					else
-					{
-						int r = p[Order::R];
-						int g = p[Order::G];
-						int b = p[Order::B];
-//						int a = p[Order::A];
-						p[Order::R] = (int8u)(((((255 - r) - r) * alpha) + (r << 16)) >> 16);
-						p[Order::G] = (int8u)(((((255 - g) - g) * alpha) + (g << 16)) >> 16);
-						p[Order::B] = (int8u)(((((255 - b) - b) * alpha) + (b << 16)) >> 16);
-//						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					}*/
+					covers++;
+					p += 4;
+//					++colors;
+				} while(--len);
+			} else {
+				// solid full opcacity
+				if (cover == 255) {
+					do {
+						assign_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A]);
+						p += 4;
+//						++colors;
+					} while(--len);
+				// solid partial opacity
+				} else if (cover) {
+					do {
+						blend_invert(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A], cover);
+						p += 4;
+//						++colors;
+					} while(--len);
 				}
-				p += 4;
-				++colors;
 			}
-			while(--len);
 		}
 
 
-		//--------------------------------------------------------------------
+		// blend_color_vspan
 		virtual	void blend_color_vspan(int x, int y, unsigned len, 
 									   const color_type* colors, 
 									   const int8u* covers,

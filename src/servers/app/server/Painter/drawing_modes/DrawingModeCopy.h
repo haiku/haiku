@@ -4,235 +4,199 @@
 #define DRAWING_MODE_COPY_H
 
 #include "DrawingMode.h"
-#include "PatternHandler.h"
+
+// blend_copy
+inline void
+blend_copy(uint8* d1, uint8* d2, uint8* d3, uint8* da,
+		   uint8 s1, uint8 s2, uint8 s3, uint8 a)
+{
+	blend(d1, d2, d3, da, s1, s2, s3, a);
+}
+
+// assign_copy
+inline void
+assign_copy(uint8* d1, uint8* d2, uint8* d3, uint8* da,
+			uint8 s1, uint8 s2, uint8 s3)
+{
+	*d1 = s1;
+	*d2 = s2;
+	*d3 = s3;
+	*da = 255;
+}
+
 
 namespace agg
 {
-	//====================================================DrawingModeCopy
 	template<class Order>
 	class DrawingModeCopy : public DrawingMode
 	{
 	public:
 		typedef Order order_type;
 
-		//--------------------------------------------------------------------
+		// constructor
 		DrawingModeCopy()
 			: DrawingMode()
 		{
 		}
 
-		//--------------------------------------------------------------------
+		// blend_pixel
 		virtual	void blend_pixel(int x, int y, const color_type& c, int8u cover)
 		{
-//printf("DrawingModeCopy::blend_pixel()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
 			rgb_color color = fPatternHandler->R5ColorAt(x, y);
-//			int alpha = int(cover) * int(c.a);
-			int alpha = int(cover) * int(color.alpha);
-			if(alpha == 255*255)
-			{
-//				p[Order::R] = (int8u)c.r;
-//				p[Order::G] = (int8u)c.g;
-//				p[Order::B] = (int8u)c.b;
-//				p[Order::A] = (int8u)c.a;
-
-				p[Order::R] = color.red;
-				p[Order::G] = color.green;
-				p[Order::B] = color.blue;
-				p[Order::A] = color.alpha;
-			}
-			else
-			{
-				int r = p[Order::R];
-				int g = p[Order::G];
-				int b = p[Order::B];
-				int a = p[Order::A];
-//				p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-//				p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-//				p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-//				p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-				p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-				p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-				p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-				p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+			if (cover == 255) {
+				assign_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+							color.red, color.green, color.blue);
+			} else {
+				blend_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+						   color.red, color.green, color.blue, cover);
 			}
 		}
 
-		//--------------------------------------------------------------------
+		// blend_hline
 		virtual	void blend_hline(int x, int y, unsigned len, 
 								 const color_type& c, int8u cover)
 		{
-//printf("DrawingModeCopy::blend_hline()\n");
-			int alpha = int(cover) * int(c.a);
-			int8u* p = m_rbuf->row(y) + (x << 2);
-			if(alpha == 255*255)
-			{
-				do
-				{
-					rgb_color color = fPatternHandler->R5ColorAt(x, y);
-					p[Order::R] = color.red;
-					p[Order::G] = color.green;
-					p[Order::B] = color.blue;
-					p[Order::A] = color.alpha;
-					p += 4;
+			if(cover == 255) {
+				// cache the low and high color as 32bit values
+				// high color
+				rgb_color color = fPatternHandler->HighColor().GetColor32();
+				int32u vh;
+				int8u* p8 = (int8u*)&vh;
+				p8[Order::R] = (int8u)color.red;
+				p8[Order::G] = (int8u)color.green;
+				p8[Order::B] = (int8u)color.blue;
+				p8[Order::A] = 255;
+				// low color
+				color = fPatternHandler->LowColor().GetColor32();
+				int32u vl;
+				p8 = (int8u*)&vl;
+				p8[Order::R] = (int8u)color.red;
+				p8[Order::G] = (int8u)color.green;
+				p8[Order::B] = (int8u)color.blue;
+				p8[Order::A] = 255;
+				// row offset as 32bit pointer
+				int32u* p32 = (int32u*)(m_rbuf->row(y)) + x;
+				do {
+					if (fPatternHandler->IsHighColor(x, y))
+						*p32 = vh;
+					else
+						*p32 = vl;
+					p32++;
 					x++;
-				}
-				while(--len);
-			}
-			else
-			{
-				do
-				{
+				} while(--len);
+			} else {
+				int8u* p = m_rbuf->row(y) + (x << 2);
+				do {
 					rgb_color color = fPatternHandler->R5ColorAt(x, y);
-					int r = p[Order::R];
-					int g = p[Order::G];
-					int b = p[Order::B];
-					int a = p[Order::A];
-//					p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-//					p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-//					p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-//					p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-					p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-					p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-					p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					p += 4;
+					blend_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+							   color.red, color.green, color.blue, cover);
 					x++;
-				}
-				while(--len);
+					p += 4;
+				} while(--len);
 			}
 		}
 
-		//--------------------------------------------------------------------
+		// blend_vline
 		virtual	void blend_vline(int x, int y, unsigned len, 
 								 const color_type& c, int8u cover)
 		{
 printf("DrawingModeCopy::blend_vline()\n");
 		}
 
-		//--------------------------------------------------------------------
+		// blend_solid_hspan
 		virtual	void blend_solid_hspan(int x, int y, unsigned len, 
 									   const color_type& c, const int8u* covers)
 		{
-//printf("DrawingModeCopy::blend_solid_hspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
+			do {
 				rgb_color color = fPatternHandler->R5ColorAt(x, y);
-//				int alpha = int(*covers++) * c.a;
-				int alpha = int(*covers++) * color.alpha;
-//int alpha = int(*covers++);
-				if(alpha)
-				{
-					if(alpha == 255*255)
-					{
-//						p[Order::R] = (int8u)c.r;
-//						p[Order::G] = (int8u)c.g;
-//						p[Order::B] = (int8u)c.b;
-//						p[Order::A] = (int8u)c.a;
-						p[Order::R] = color.red;
-						p[Order::G] = color.green;
-						p[Order::B] = color.blue;
-						p[Order::A] = color.alpha;
+				if (*covers) {
+					if(*covers == 255) {
+						assign_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									color.red, color.green, color.blue);
+					} else {
+						blend_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+								   color.red, color.green, color.blue, *covers);
 					}
-					else
-					{
-						int r = p[Order::R];
-						int g = p[Order::G];
-						int b = p[Order::B];
-						int a = p[Order::A];
-//						p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-//						p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-//						p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-//						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-						p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-						p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-						p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					}
-/*if(alpha > 127)
-{
-	p[Order::R] = (int8u)c.r;
-	p[Order::G] = (int8u)c.g;
-	p[Order::B] = (int8u)c.b;
-	p[Order::A] = (int8u)c.a;
-}*/
 				}
+				covers++;
 				p += 4;
 				x++;
-			}
-			while(--len);
+			} while(--len);
 		}
 
 
 
-		//--------------------------------------------------------------------
+		// blend_solid_vspan
 		virtual	void blend_solid_vspan(int x, int y, unsigned len, 
 									   const color_type& c, const int8u* covers)
 		{
-//printf("DrawingModeCopy::blend_solid_vspan()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			do 
-			{
+			do {
 				rgb_color color = fPatternHandler->R5ColorAt(x, y);
-//				int alpha = int(*covers++) * c.a;
-				int alpha = int(*covers++) * color.alpha;
-//int alpha = int(*covers++);
-
-				if(alpha)
-				{
-					if(alpha == 255*255)
-					{
-//						p[Order::R] = (int8u)c.r;
-//						p[Order::G] = (int8u)c.g;
-//						p[Order::B] = (int8u)c.b;
-//						p[Order::A] = (int8u)c.a;
-						p[Order::R] = color.red;
-						p[Order::G] = color.green;
-						p[Order::B] = color.blue;
-						p[Order::A] = color.alpha;
+				if (*covers) {
+					if (*covers == 255) {
+						assign_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									color.red, color.green, color.blue);
+					} else {
+						blend_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+								   color.red, color.green, color.blue, *covers);
 					}
-					else
-					{
-						int r = p[Order::R];
-						int g = p[Order::G];
-						int b = p[Order::B];
-						int a = p[Order::A];
-//						p[Order::R] = (int8u)((((c.r - r) * alpha) + (r << 16)) >> 16);
-//						p[Order::G] = (int8u)((((c.g - g) * alpha) + (g << 16)) >> 16);
-//						p[Order::B] = (int8u)((((c.b - b) * alpha) + (b << 16)) >> 16);
-//						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-						p[Order::R] = (int8u)((((color.red - r) * alpha) + (r << 16)) >> 16);
-						p[Order::G] = (int8u)((((color.green - g) * alpha) + (g << 16)) >> 16);
-						p[Order::B] = (int8u)((((color.blue - b) * alpha) + (b << 16)) >> 16);
-						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
-					}
-/*if(alpha > 127)
-{
-	p[Order::R] = (int8u)c.r;
-	p[Order::G] = (int8u)c.g;
-	p[Order::B] = (int8u)c.b;
-	p[Order::A] = (int8u)c.a;
-}*/
 				}
+				covers++;
 				p += m_rbuf->stride();
 				y++;
-			}
-			while(--len);
+			} while(--len);
 		}
 
 
-		//--------------------------------------------------------------------
+		// blend_color_hspan
 		virtual	void blend_color_hspan(int x, int y, unsigned len, 
 									   const color_type* colors, 
 									   const int8u* covers,
 									   int8u cover)
 		{
-printf("DrawingModeCopy::blend_color_hspan()\n");
+			int8u* p = m_rbuf->row(y) + (x << 2);
+			if (covers) {
+				// non-solid opacity
+				do {
+					if(*covers) {
+						if(*covers == 255) {
+							assign_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+										colors->r, colors->g, colors->b);
+						} else {
+							blend_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									   colors->r, colors->g, colors->b, *covers);
+						}
+					}
+					covers++;
+					p += 4;
+					++colors;
+				} while(--len);
+			} else {
+				// solid full opcacity
+				if (cover == 255) {
+					do {
+						assign_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+									colors->r, colors->g, colors->b);
+						p += 4;
+						++colors;
+					} while(--len);
+				// solid partial opacity
+				} else if (cover) {
+					do {
+						blend_copy(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
+								   colors->r, colors->g, colors->b, cover);
+						p += 4;
+						++colors;
+					} while(--len);
+				}
+			}
 		}
 
 
-		//--------------------------------------------------------------------
+		// blend_color_vspan
 		virtual	void blend_color_vspan(int x, int y, unsigned len, 
 									   const color_type* colors, 
 									   const int8u* covers,
