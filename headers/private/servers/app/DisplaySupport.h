@@ -12,9 +12,12 @@ public:
 	~BezierCurve();
 	BPoint* GetPointArray();
 	BList points;
+	BRect Frame(void) const { return fFrame; }
 private:
+	void GenerateFrame(BPoint *pts);
 	int GeneratePoints(int startPos);
 	BPoint* pointArray;
+	BRect fFrame;
 };
 
 struct integer_rect
