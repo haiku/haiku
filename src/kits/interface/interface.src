@@ -11,6 +11,8 @@ INTERFACE_KIT_SOURCE =
 	Font.cpp
 	Globals.cpp
 	Input.cpp
+	OptionControl.cpp
+	OptionPopUp.cpp
 	Picture.cpp
 	PictureButton.cpp
 	Point.cpp
