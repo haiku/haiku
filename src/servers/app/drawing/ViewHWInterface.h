@@ -53,23 +53,16 @@ class ViewHWInterface : public HWInterface {
 	virtual	RenderingBuffer*	FrontBuffer() const;
 	virtual	RenderingBuffer*	BackBuffer() const;
 
-	virtual	status_t			Invalidate(const BRect& frame);
-	virtual	status_t			CopyBackToFront(const BRect& area);
+ protected:
+	virtual	void				_DrawCursor(BRect area) const;
 
-private:
-			void				_DrawCursor(BRect area) const;
-			void				_CopyToFront(uint8* src, uint32 srcBPR,
-											 int32 x, int32 y,
-											 int32 right, int32 bottom) const;
-
+ private:
 			BitmapBuffer*		fBackBuffer;
 			BitmapBuffer*		fFrontBuffer;
 
 			CardWindow*			fWindow;
 
 			display_mode		fDisplayMode;
-
-			UpdateQueue*		fUpdateExecutor;
 };
 
 #endif // VIEW_GRAPHICS_CARD_H

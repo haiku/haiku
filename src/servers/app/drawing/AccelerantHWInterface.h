@@ -53,19 +53,14 @@ virtual uint32					DPMSCapabilities() const;
 virtual	RenderingBuffer			*FrontBuffer() const;
 virtual	RenderingBuffer			*BackBuffer() const;
 
-virtual	status_t				Invalidate(const BRect& frame);
-virtual	status_t				CopyBackToFront(const BRect& area);
+protected:
+virtual	void					_DrawCursor(BRect area) const;
 
 private:
 		int						OpenGraphicsDevice(int deviceNumber);
 		status_t				SetupDefaultHooks();
 		status_t				UpdateModeList();
 		status_t				UpdateFrameBufferConfig();
-
-		void					_DrawCursor(BRect area) const;
-		void					_CopyToFront(uint8* src, uint32 srcBPR,
-											 int32 x, int32 y,
-											 int32 right, int32 bottom) const;
 
 		int						fCardFD;
 		image_id				fAccelerantImage;

@@ -17,6 +17,7 @@
 
 class RenderingBuffer;
 class ServerCursor;
+class UpdateQueue;
 
 class HWInterface : public BLocker {
  public:
@@ -60,16 +61,27 @@ class HWInterface : public BLocker {
 	virtual	RenderingBuffer*	BackBuffer() const = 0;
 
 	// Invalidate is planned to be used for scheduling an area for updating
-	virtual	status_t			Invalidate(const BRect& frame) = 0;
+			status_t			Invalidate(const BRect& frame);
 	// while as CopyBackToFront() actually performs the operation
-	virtual	status_t			CopyBackToFront(const BRect& frame) = 0;
+			status_t			CopyBackToFront(const BRect& frame);
 
  protected:
+	// implement this in derived classes
+	virtual	void				_DrawCursor(BRect area) const = 0;
+
+	// does the actual transfer and handles color space conversion
+			void				_CopyToFront(uint8* src, uint32 srcBPR,
+											 int32 x, int32 y,
+											 int32 right, int32 bottom) const;
+
 			BRect				_CursorFrame() const;
 
 			ServerCursor*		fCursor;
 			bool				fCursorVisible;
 			BPoint				fCursorLocation;
+
+ private:
+			UpdateQueue*		fUpdateExecutor;
 };
 
 #endif // HW_INTERFACE_H

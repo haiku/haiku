@@ -55,7 +55,13 @@ DisplayDriverPainter::~DisplayDriverPainter()
 bool
 DisplayDriverPainter::Initialize()
 {
-	return DisplayDriver::Initialize();
+	if (DisplayDriver::Initialize()) {
+		status_t err = fGraphicsCard->Initialize();
+		if (err < B_OK)
+			fprintf(stderr, "HWInterface::Initialize() failed: %s\n", strerror(err));
+		return err >= B_OK;
+	}
+	return false;
 }
 
 // Shutdown

@@ -42,9 +42,11 @@
 #include "Workspace.h"
 
 #include "AccelerantDriver.h"
-#include "ViewDriver.h"
-#include "DirectDriver.h"
-#include "DisplayDriverPainter.h"
+#ifndef __HAIKU__
+	#include "ViewDriver.h"
+	#include "DirectDriver.h"
+	#include "DisplayDriverPainter.h"
+#endif // __HAIKU__
 
 //#define DEBUG_DESKTOP
 
@@ -125,7 +127,8 @@ Desktop::AddDriver(DisplayDriver *driver)
 {
 	if (driver->Initialize()) {
 		// TODO: be careful of screen initialization - monitor may not support 640x480
-		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB32, fScreenList.CountItems()+1);
+//		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB32, fScreenList.CountItems()+1);
+		Screen *sc = new Screen(driver, BPoint(1024, 768), B_RGB32, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_CMAP8, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_GRAY8, fScreenList.CountItems()+1);
 //		Screen *sc = new Screen(driver, BPoint(640, 480), B_RGB15, fScreenList.CountItems()+1);
