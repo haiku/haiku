@@ -30,10 +30,21 @@ extern module_info gDeviceManagerModule;
 extern module_info gDeviceRootModule;
 extern module_info gDeviceForDriversModule;
 
+// file systems
+extern module_info gRootFileSystem;
+extern module_info gDeviceFileSystem;
+extern module_info gBootFileSystem;
+extern module_info gPipeFileSystem;
+
 static module_info *sBuiltInModules[] = {
 	&gDeviceManagerModule,
 	&gDeviceRootModule,
 	&gDeviceForDriversModule,
+
+	&gRootFileSystem,
+	&gDeviceFileSystem,
+	&gBootFileSystem,
+	&gPipeFileSystem,
 	NULL
 };
 
