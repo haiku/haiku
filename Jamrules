@@ -822,12 +822,19 @@ rule R5KernelStaticLibrary
 
 rule MergeObjectFromObjects
 {
-	# MergeObjectFromObjects <name> : <objects> ;
+	# MergeObjectFromObjects <name> : <objects> : <other objects> ;
+	# Merges object files to an object file.
+	# <name>: Name of the object file to create. No grist will be added.
+	# <objects>: Object files to be merged. Grist will be added.
+	# <other objects>: Object files or static libraries to be merged. No grist
+	#                  will be added.
+	#
 	local objects = [ FGristFiles $(2) ] ;
 	MakeLocate $(1) : $(LOCATE_TARGET) ;
 	Depends $(1) : $(objects) ;
+	Depends $(1) : $(3) ;
 	LINK on $(1) = ld ;
-	MergeObjectFromObjects1 $(1) : $(objects) ;
+	MergeObjectFromObjects1 $(1) : $(objects) $(3) ;
 }
 
 actions MergeObjectFromObjects1
@@ -837,12 +844,18 @@ actions MergeObjectFromObjects1
 
 rule MergeObject
 {
-	# MergeObject <name> : <sources> ;
+	# MergeObject <name> : <sources> : <other objects> ;
+	# Compiles source files and merges the object files to an object file.
+	# <name>: Name of the object file to create. No grist will be added.
+	# <sources>: Sources to be compiled. Grist will be added.
+	# <other objects>: Object files or static libraries to be merged. No grist
+	#                  will be added.
+	#
 	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Objects $(2) ;
-	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
+	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(3) ;
 }
 
 rule SharedLibraryFromObjects
@@ -1640,13 +1653,20 @@ actions KernelLd
 
 rule KernelMergeObject
 {
-	# KernelMergeObject <name> : <sources> : <extra CFLAGS> ;
+	# KernelMergeObject <name> : <sources> : <extra CFLAGS> : <other objects> ;
+	# Compiles source files and merges the object files to an object file.
+	# <name>: Name of the object file to create. No grist will be added.
+	# <sources>: Sources to be compiled. Grist will be added.
+	# <extra CFLAGS>: Additional flags for compilation.
+	# <other objects>: Object files or static libraries to be merged. No grist
+	#                  will be added.
+	#
 
 	SetupKernel $(2) : $(3) ;
 
 	MakeLocateObjects $(2) ;
 	Objects $(2) ;
-	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) ;
+	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(4) ;
 }
 
 rule KernelStaticLibrary
