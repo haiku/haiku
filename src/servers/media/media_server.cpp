@@ -153,6 +153,7 @@ ServerApp::~ServerApp()
 	wait_for_thread(control_thread,&err);
 }
 
+
 void 
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
 {
@@ -174,8 +175,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_node_id_for_request *request = reinterpret_cast<const server_node_id_for_request *>(data);
 			server_node_id_for_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->FindNodeId(&reply.nodeid, request->port);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		
@@ -183,8 +184,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_get_live_node_info_request *request = reinterpret_cast<const server_get_live_node_info_request *>(data);
 			server_get_live_node_info_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->GetLiveNodeInfo(&reply.live_info, request->node);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		
@@ -192,8 +193,37 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_get_live_nodes_request *request = reinterpret_cast<const server_get_live_nodes_request *>(data);
 			server_get_live_nodes_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			Stack<live_node_info> livenodes;
+			rv = gNodeManager->GetLiveNodes(
+					&livenodes,
+					request->maxcount,
+					request->has_input ? &request->inputformat : NULL,
+					request->has_output ? &request->outputformat : NULL,
+					request->has_name ? request->name : NULL,
+					request->require_kinds);
+			reply.count = livenodes.CountItems();
+			if (reply.count <= MAX_LIVE_INFO) {
+				for (int32 index = 0; index < reply.count; index++)
+					livenodes.Pop(&reply.live_info[index]);
+				reply.area = -1;
+			} else {
+				// we create an area here, and pass it to the library, where it will be deleted.
+				live_node_info *start_addr;
+				size_t size;
+				size = ((reply.count * sizeof(live_node_info)) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+				reply.area = create_area("get live nodes", reinterpret_cast<void **>(&start_addr), B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+				if (reply.area < B_OK) {
+					TRACE("SERVER_GET_LIVE_NODES: failed to create area, %#lx\n", reply.area);
+					reply.count = 0;
+					rv = B_ERROR;
+				} else {
+					for (int32 index = 0; index < reply.count; index++)
+						livenodes.Pop(&start_addr[index]);
+				}
+			}
+			rv = request->SendReply(rv, &reply, sizeof(reply));
+			if (rv != B_OK)
+				delete_area(reply.area); // if we couldn't send the message, delete the area
 			break;
 		}
 		
@@ -201,8 +231,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_get_node_for_request *request = reinterpret_cast<const server_get_node_for_request *>(data);
 			server_get_node_for_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->GetCloneForId(&reply.clone, request->nodeid, request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		
@@ -210,8 +240,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_release_node_request *request = reinterpret_cast<const server_release_node_request *>(data);
 			server_release_node_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->ReleaseNode(request->node, request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		
@@ -219,9 +249,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_register_node_request *request = reinterpret_cast<const server_register_node_request *>(data);
 			server_register_node_reply reply;
-			reply.nodeid = 1234;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->RegisterNode(&reply.nodeid, request->addon_id, request->addon_flavor_id, request->name, request->kinds, request->port, request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		
@@ -229,8 +258,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_unregister_node_request *request = reinterpret_cast<const server_unregister_node_request *>(data);
 			server_unregister_node_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->UnregisterNode(&reply.addon_id, request->nodeid, request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 
@@ -238,8 +267,21 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_publish_inputs_request *request = reinterpret_cast<const server_publish_inputs_request *>(data);
 			server_publish_inputs_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			if (request->count <= MAX_INPUTS) {
+				rv = gNodeManager->PublishInputs(request->node, request->inputs, request->count);
+			} else {
+				media_input *inputs;
+				area_id clone;
+				clone = clone_area("media_inputs clone", reinterpret_cast<void **>(&inputs), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
+				if (clone < B_OK) {
+					TRACE("SERVER_PUBLISH_INPUTS: failed to clone area, %#lx\n", clone);
+					rv = B_ERROR;
+				} else {
+					rv = gNodeManager->PublishInputs(request->node, inputs, request->count);
+					delete_area(clone);
+				}
+			}
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 		
@@ -247,8 +289,21 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_publish_outputs_request *request = reinterpret_cast<const server_publish_outputs_request *>(data);
 			server_publish_outputs_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			if (request->count <= MAX_OUTPUTS) {
+				rv = gNodeManager->PublishOutputs(request->node, request->outputs, request->count);
+			} else {
+				media_output *outputs;
+				area_id clone;
+				clone = clone_area("media_outputs clone", reinterpret_cast<void **>(&outputs), B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
+				if (clone < B_OK) {
+					TRACE("SERVER_PUBLISH_OUTPUTS: failed to clone area, %#lx\n", clone);
+					rv = B_ERROR;
+				} else {
+					rv = gNodeManager->PublishOutputs(request->node, outputs, request->count);
+					delete_area(clone);
+				}
+			}
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 
@@ -256,8 +311,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_get_node_request *request = reinterpret_cast<const server_get_node_request *>(data);
 			server_get_node_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->GetClone(&reply.node, reply.input_name, &reply.input_id, request->type, request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 
@@ -266,6 +321,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			const server_set_node_request *request = reinterpret_cast<const server_set_node_request *>(data);
 			server_set_node_reply reply;
 			// XXX do something here
+			debugger("SERVER_SET_NODE seems to be needed\n");
 			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
@@ -274,8 +330,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_get_dormant_node_for_request *request = reinterpret_cast<const server_get_dormant_node_for_request *>(data);
 			server_get_dormant_node_for_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->GetDormantNodeInfo(&reply.node_info, request->node);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 
@@ -283,8 +339,11 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		{
 			const server_get_instances_for_request *request = reinterpret_cast<const server_get_instances_for_request *>(data);
 			server_get_instances_for_reply reply;
-			// XXX do something here
-			request->SendReply(B_OK, &reply, sizeof(reply));
+			rv = gNodeManager->GetInstances(reply.node_id, &reply.count, min_c(request->maxcount, MAX_NODE_ID), request->addon_id, request->addon_flavor_id);
+			if (reply.count == MAX_NODE_ID && request->maxcount > MAX_NODE_ID) { // XXX might be fixed by using an area
+				TRACE("SERVER_GET_INSTANCES_FOR: WARNING! returning possibly truncated list of node id's\n");
+			}
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 

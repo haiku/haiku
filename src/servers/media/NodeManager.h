@@ -1,5 +1,7 @@
 #include "TList.h"
 #include "TMap.h"
+#include "TStack.h"
+#include "DataExchange.h"
 
 class BufferManager;
 
@@ -25,6 +27,20 @@ public:
 	status_t BroadcastMessage(long, void *, long, long long);
 	status_t LoadState();
 	status_t SaveState();
+
+
+	status_t RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team);
+	status_t UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team_id team);
+	status_t GetCloneForId(media_node *node, media_node_id nodeid, team_id team);
+	status_t GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team);
+	status_t ReleaseNode(const media_node &node, team_id team);
+	status_t PublishInputs(const media_node &node, const media_input *inputs, int32 count);
+	status_t PublishOutputs(const media_node &node, const media_output *outputs, int32 count);
+	status_t FindNodeId(media_node_id *nodeid, port_id port);
+	status_t GetLiveNodeInfo(live_node_info *live_info, const media_node &node);
+	status_t GetInstances(media_node_id *node_ids, int32* count, int32 maxcount, media_addon_id addon_id, int32 addon_flavor_id);
+	status_t GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, const media_format *inputformat = NULL, const media_format *outputformat = NULL, const char* name = NULL, uint64 require_kinds = 0);
+	status_t GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node);
 
 	/* Add media_node_id of all live nodes to the message
 	 * int32 "media_node_id" (multiple items)

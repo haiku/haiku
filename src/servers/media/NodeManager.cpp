@@ -22,6 +22,91 @@ NodeManager::~NodeManager()
 	delete fAddonPathMap;
 }
 
+
+status_t
+NodeManager::RegisterNode(media_node_id *nodeid, media_addon_id addon_id, int32 addon_flavor_id, const char *name, uint64 kinds, port_id port, team_id team)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::UnregisterNode(media_addon_id *addon_id, media_node_id nodeid, team_id team)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::GetCloneForId(media_node *node, media_node_id nodeid, team_id team)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_type type, team_id team)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::ReleaseNode(const media_node &node, team_id team)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::PublishInputs(const media_node &node, const media_input *inputs, int32 count)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::PublishOutputs(const media_node &node, const media_output *outputs, int32 count)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::FindNodeId(media_node_id *nodeid, port_id port)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::GetInstances(media_node_id *node_ids, int32* count, int32 maxcount, media_addon_id addon_id, int32 addon_flavor_id)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, const media_format *inputformat /* = NULL */, const media_format *outputformat /* = NULL */, const char* name /* = NULL */, uint64 require_kinds /* = 0 */)
+{
+	return B_OK;
+}
+
+
+status_t
+NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &node)
+{
+	return B_OK;
+}
+
+
 /* Add media_node_id of all live nodes to the message
  * int32 "media_node_id" (multiple items)
  */
