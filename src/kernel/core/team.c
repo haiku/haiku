@@ -21,6 +21,7 @@
 #include <elf.h>
 #include <atomic.h>
 #include <syscalls.h>
+#include <tls.h>
 
 
 struct team_key {
@@ -393,12 +394,12 @@ team_create_team2(void *args)
 {
 	int err;
 	struct thread *t;
-	struct team *p;
+	struct team *team;
 	struct team_arg *pargs = args;
 	char *path;
 	addr entry;
 	char ustack_name[128];
-	int tot_top_size;
+	uint32 totalSize;
 	char **uargs;
 	char **uenv;
 	char *udest;
@@ -407,25 +408,33 @@ team_create_team2(void *args)
 	unsigned int env_cnt;
 
 	t = thread_get_current_thread();
-	p = t->team;
+	team = t->team;
 
 	dprintf("team_create_team2: entry thread %ld\n", t->id);
 
 	// create an initial primary stack region
 
-	// ToDo: give the main thread a larger user stack (for gcc and friends, as in BeOS)
-	// ToDo: clean up the ENV_SIZE/STACK_SIZE/whatever mess (and maybe add TLS to it)
-	tot_top_size = STACK_SIZE + ENV_SIZE + PAGE_ALIGN(get_arguments_data_size(pargs->args, pargs->argc));
-	t->user_stack_base = ((USER_STACK_REGION - tot_top_size) + USER_STACK_REGION_SIZE);
-	sprintf(ustack_name, "%s_primary_stack", p->name);
-	t->user_stack_region_id = vm_create_anonymous_region(p->_aspace_id, ustack_name, (void **)&t->user_stack_base,
-		REGION_ADDR_EXACT_ADDRESS, tot_top_size, REGION_WIRING_LAZY, LOCK_RW);
+	// ToDo: make ENV_SIZE variable?
+	// ToDo: when B_BASE_ADDRESS is implemented, we could just allocate the stack from
+	//		the bottom of the USER_STACK_REGION.
+
+	totalSize = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
+		get_arguments_data_size(pargs->args, pargs->argc));
+	t->user_stack_base = USER_STACK_REGION + USER_STACK_REGION_SIZE - totalSize;
+		// the exact location at the end of the user stack region
+
+	sprintf(ustack_name, "%s_primary_stack", team->name);
+	t->user_stack_region_id = vm_create_anonymous_region(team->_aspace_id, ustack_name, (void **)&t->user_stack_base,
+		REGION_ADDR_EXACT_ADDRESS, totalSize, REGION_WIRING_LAZY, LOCK_RW);
 	if (t->user_stack_region_id < 0) {
 		panic("team_create_team2: could not create default user stack region\n");
 		return t->user_stack_region_id;
 	}
 
-	uspa  = (struct uspace_prog_args_t *)(t->user_stack_base + STACK_SIZE + ENV_SIZE);
+	// now that the TLS area is allocated, initialize TLS
+	arch_thread_init_tls(t);
+
+	uspa  = (struct uspace_prog_args_t *)(t->user_stack_base + STACK_SIZE + TLS_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
 	udest = (char  *)(uargs + pargs->argc + 1);
 //	dprintf("addr: stack base=0x%x uargs = 0x%x  udest=0x%x tot_top_size=%d \n\n",t->user_stack_base,uargs,udest,tot_top_size);
@@ -437,9 +446,9 @@ team_create_team2(void *args)
 	}
 	uargs[arg_cnt] = NULL;
 
-	p->user_env_base = t->user_stack_base + STACK_SIZE;
-	uenv  = (char **)p->user_env_base;
-	udest = (char *)p->user_env_base + ENV_SIZE - 1;
+	team->user_env_base = t->user_stack_base + STACK_SIZE + TLS_SIZE;
+	uenv  = (char **)team->user_env_base;
+	udest = (char *)team->user_env_base + ENV_SIZE - 1;
 //	dprintf("team_create_team2: envc: %d, envp: 0x%p\n", pargs->envc, (void *)pargs->envp);
 	for (env_cnt=0; env_cnt<pargs->envc; env_cnt++) {
 		udest -= (strlen(pargs->envp[env_cnt]) + 1);
@@ -448,7 +457,7 @@ team_create_team2(void *args)
 	}
 	uenv[env_cnt] = NULL;
 
-	user_memcpy(uspa->prog_name, p->name, sizeof(uspa->prog_name));
+	user_memcpy(uspa->prog_name, team->name, sizeof(uspa->prog_name));
 	user_memcpy(uspa->prog_path, pargs->path, sizeof(uspa->prog_path));
 	uspa->argc = arg_cnt;
 	uspa->argv = uargs;
@@ -463,8 +472,8 @@ team_create_team2(void *args)
 	path = pargs->path;
 	dprintf("team_create_team2: loading elf binary '%s'\n", path);
 
-	err = elf_load_uspace("/boot/libexec/rld.so", p, 0, &entry);
-	if(err < 0){
+	err = elf_load_uspace("/boot/libexec/rld.so", team, 0, &entry);
+	if (err < 0){
 		// XXX clean up team
 		return err;
 	}
@@ -475,10 +484,10 @@ team_create_team2(void *args)
 
 	dprintf("team_create_team2: loaded elf. entry = 0x%lx\n", entry);
 
-	p->state = TEAM_STATE_NORMAL;
+	team->state = TEAM_STATE_NORMAL;
 
 	// jump to the entry point in user space
-	arch_thread_enter_uspace(entry, uspa, t->user_stack_base + STACK_SIZE);
+	arch_thread_enter_uspace(t, entry, uspa);
 
 	// never gets here
 	return 0;
@@ -488,7 +497,7 @@ team_create_team2(void *args)
 team_id
 team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority)
 {
-	struct team *p;
+	struct team *team;
 	thread_id tid;
 	team_id pid;
 	int err;
@@ -498,15 +507,15 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 
 	dprintf("team_create_team: entry '%s', name '%s' args = %p argc = %d\n", path, name, args, argc);
 
-	p = create_team_struct(name, false);
-	if (p == NULL)
+	team = create_team_struct(name, false);
+	if (team == NULL)
 		return ENOMEM;
 
-	pid = p->id;
+	pid = team->id;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
-	hash_insert(team_hash, p);
+	hash_insert(team_hash, team);
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
@@ -527,22 +536,22 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	pargs->envc = envc;
 
 	// create a new io_context for this team
-	p->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
-	if (!p->io_context) {
+	team->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
+	if (!team->io_context) {
 		err = ENOMEM;
 		goto err3;
 	}
 
 	// create an address space for this team
-	p->_aspace_id = vm_create_aspace(p->name, USER_BASE, USER_SIZE, false);
-	if (p->_aspace_id < 0) {
-		err = p->_aspace_id;
+	team->_aspace_id = vm_create_aspace(team->name, USER_BASE, USER_SIZE, false);
+	if (team->_aspace_id < 0) {
+		err = team->_aspace_id;
 		goto err4;
 	}
-	p->aspace = vm_get_aspace_by_id(p->_aspace_id);
+	team->aspace = vm_get_aspace_by_id(team->_aspace_id);
 
 	// create a kernel thread, but under the context of the new team
-	tid = thread_create_kernel_thread_etc(name, team_create_team2, pargs, p);
+	tid = thread_create_kernel_thread_etc(name, team_create_team2, pargs, team);
 	if (tid < 0) {
 		err = tid;
 		goto err5;
@@ -553,10 +562,10 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	return pid;
 
 err5:
-	vm_put_aspace(p->aspace);
-	vm_delete_aspace(p->_aspace_id);
+	vm_put_aspace(team->aspace);
+	vm_delete_aspace(team->_aspace_id);
 err4:
-	vfs_free_io_context(p->io_context);
+	vfs_free_io_context(team->io_context);
 err3:
 	free(pargs->path);
 err2:
@@ -565,10 +574,10 @@ err1:
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
-	hash_remove(team_hash, p);
+	hash_remove(team_hash, team);
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	delete_team_struct(p);
+	delete_team_struct(team);
 //err:
 	return err;
 }
@@ -578,7 +587,7 @@ int
 team_kill_team(team_id id)
 {
 	int state;
-	struct team *p;
+	struct team *team;
 //	struct thread *t;
 	thread_id tid = -1;
 	int retval = 0;
@@ -586,16 +595,16 @@ team_kill_team(team_id id)
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	p = team_get_team_struct_locked(id);
-	if(p != NULL) {
-		tid = p->main_thread->id;
-	} else {
+	team = team_get_team_struct_locked(id);
+	if (team != NULL)
+		tid = team->main_thread->id;
+	else
 		retval = ERR_INVALID_HANDLE;
-	}
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	if(retval < 0)
+
+	if (retval < 0)
 		return retval;
 
 	// just kill the main thread in the team. The cleanup code there will
