@@ -13,6 +13,7 @@
 
 #include "ClipboardHandler.h"
 #include "EventQueue.h"
+#include "MessageDeliverer.h"
 #include "MessageEvent.h"
 #include "MessageRunnerManager.h"
 #include "MessagingService.h"
@@ -47,8 +48,7 @@ Registrar::Registrar(status_t *error)
 		   fMIMEManager(NULL),
 		   fEventQueue(NULL),
 		   fMessageRunnerManager(NULL),
-		   fSanityEvent(NULL),
-		   fMessagingService(NULL)
+		   fSanityEvent(NULL)
 {
 	FUNCTION_START();
 }
@@ -64,7 +64,6 @@ Registrar::~Registrar()
 	FUNCTION_START();
 	Lock();
 	fEventQueue->Die();
-	delete fMessagingService;
 	delete fMessageRunnerManager;
 	delete fEventQueue;
 	delete fSanityEvent;
@@ -216,6 +215,13 @@ Registrar::ReadyToRun()
 {
 	FUNCTION_START();
 
+	// create message deliverer
+	status_t error = MessageDeliverer::CreateDefault();
+	if (error != B_OK) {
+		FATAL(("Registrar::ReadyToRun(): Failed to create the message "
+			"deliverer: %s\n", strerror(error)));
+	}
+
 	// create event queue
 	fEventQueue = new EventQueue(kEventQueueName);
 
@@ -238,13 +244,10 @@ Registrar::ReadyToRun()
 	BRoster::Private().SetTo(be_app_messenger, BMessenger(NULL, fMIMEManager));
 
 	// create the messaging service
-	fMessagingService = new MessagingService;
-	status_t error = fMessagingService->Init();
+	error = MessagingService::CreateDefault();
 	if (error != B_OK) {
 		ERROR(("Registrar::ReadyToRun(): Failed to init messaging service "
 			"(that's by design when running under R5): %s\n", strerror(error)));
-		delete fMessagingService;
-		fMessagingService = NULL;
 	}
 
 	// create and schedule the sanity message event
