@@ -26,7 +26,7 @@ namespace agg
 		{
 //printf("DrawingModeCopy::blend_pixel()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
-			rgb_color color = fPatternHandler->ColorAt(x, y);
+			rgb_color color = fPatternHandler->R5ColorAt(x, y);
 //			int alpha = int(cover) * int(c.a);
 			int alpha = int(cover) * int(color.alpha);
 			if(alpha == 255*255)
@@ -69,7 +69,7 @@ namespace agg
 				int8u* p = m_rbuf->row(y) + (x << 2);
 				do
 				{
-					rgb_color color = fPatternHandler->ColorAt(x, y);
+					rgb_color color = fPatternHandler->R5ColorAt(x, y);
 					p[Order::R] = color.red;
 					p[Order::G] = color.green;
 					p[Order::B] = color.blue;
@@ -84,7 +84,7 @@ namespace agg
 				int8u* p = m_rbuf->row(y) + (x << 2);
 				do
 				{
-					rgb_color color = fPatternHandler->ColorAt(x, y);
+					rgb_color color = fPatternHandler->R5ColorAt(x, y);
 					int r = p[Order::R];
 					int g = p[Order::G];
 					int b = p[Order::B];
@@ -119,7 +119,7 @@ printf("DrawingModeCopy::blend_vline()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
 			do 
 			{
-				rgb_color color = fPatternHandler->ColorAt(x, y);
+				rgb_color color = fPatternHandler->R5ColorAt(x, y);
 //				int alpha = int(*covers++) * c.a;
 				int alpha = int(*covers++) * color.alpha;
 //int alpha = int(*covers++);
@@ -175,7 +175,7 @@ printf("DrawingModeCopy::blend_vline()\n");
 			int8u* p = m_rbuf->row(y) + (x << 2);
 			do 
 			{
-				rgb_color color = fPatternHandler->ColorAt(x, y);
+				rgb_color color = fPatternHandler->R5ColorAt(x, y);
 //				int alpha = int(*covers++) * c.a;
 				int alpha = int(*covers++) * color.alpha;
 //int alpha = int(*covers++);

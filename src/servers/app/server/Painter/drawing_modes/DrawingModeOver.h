@@ -26,7 +26,7 @@ namespace agg
 //printf("DrawingModeOver::blend_pixel()\n");
 			if (fPatternHandler->IsHighColor(x, y)) {
 				int8u* p = m_rbuf->row(y) + (x << 2);
-				rgb_color color = fPatternHandler->ColorAt(x, y);
+				rgb_color color = fPatternHandler->R5ColorAt(x, y);
 	//			int alpha = int(cover) * int(c.a);
 				int alpha = int(cover) * int(color.alpha);
 				if(alpha == 255*255)
@@ -121,7 +121,7 @@ printf("DrawingModeOver::blend_vline()\n");
 			do 
 			{
 				if (fPatternHandler->IsHighColor(x, y)) {
-					rgb_color color = fPatternHandler->ColorAt(x, y);
+					rgb_color color = fPatternHandler->R5ColorAt(x, y);
 	//				int alpha = int(*covers++) * c.a;
 					int alpha = int(*covers) * color.alpha;
 	//int alpha = int(*covers++);
@@ -173,7 +173,7 @@ printf("DrawingModeOver::blend_vline()\n");
 			do 
 			{
 				if (fPatternHandler->IsHighColor(x, y)) {
-					rgb_color color = fPatternHandler->ColorAt(x, y);
+					rgb_color color = fPatternHandler->R5ColorAt(x, y);
 	//				int alpha = int(*covers++) * c.a;
 					int alpha = int(*covers) * color.alpha;
 	//int alpha = int(*covers++);

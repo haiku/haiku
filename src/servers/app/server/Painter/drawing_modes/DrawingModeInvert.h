@@ -5,7 +5,7 @@
 
 #include "DrawingMode.h"
 
-#define BINARY 1
+#define BINARY 0
 
 namespace agg
 {
@@ -239,7 +239,46 @@ printf("DrawingModeInvert::blend_vline()\n");
 									   const int8u* covers,
 									   int8u cover)
 		{
-printf("DrawingModeInvert::blend_color_hspan()\n");
+//printf("DrawingModeInvert::blend_color_hspan()\n");
+			int8u* p = m_rbuf->row(y) + (x << 2);
+			rgb_color lowColor = fPatternHandler->LowColor().GetColor32();
+			do 
+			{
+				int alpha = colors->a * (covers ? int(*covers++) : int(cover));
+
+				if(alpha)
+				{
+//					if (colors->r != lowColor.red ||
+//						colors->g != lowColor.green ||
+//						colors->b != lowColor.blue) {
+	
+						p[Order::R] = 255 - p[Order::R];
+						p[Order::G] = 255 - p[Order::G];
+						p[Order::B] = 255 - p[Order::B];
+//					}
+/*					if(alpha == 255*255)
+					{
+						p[Order::R] = 255 - p[Order::R];
+						p[Order::G] = 255 - p[Order::G];
+						p[Order::B] = 255 - p[Order::B];
+//						p[Order::A] = 255 - p[Order::A];
+					}
+					else
+					{
+						int r = p[Order::R];
+						int g = p[Order::G];
+						int b = p[Order::B];
+//						int a = p[Order::A];
+						p[Order::R] = (int8u)(((((255 - r) - r) * alpha) + (r << 16)) >> 16);
+						p[Order::G] = (int8u)(((((255 - g) - g) * alpha) + (g << 16)) >> 16);
+						p[Order::B] = (int8u)(((((255 - b) - b) * alpha) + (b << 16)) >> 16);
+//						p[Order::A] = (int8u)(((alpha + (a << 8)) - ((alpha * a) >> 8)) >> 8);
+					}*/
+				}
+				p += 4;
+				++colors;
+			}
+			while(--len);
 		}
 
 
