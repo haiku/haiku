@@ -90,6 +90,20 @@ status_t SendToServer(BMessage *msg)
 	return rv;
 }
 
+
+status_t 
+QueryServer(BMessage &request, BMessage &reply)
+{
+	status_t status = MediaServerMessenger->SendMessage(&request, &reply, TIMEOUT, TIMEOUT);
+	if (status != B_OK) {
+		ERROR("QueryServer: SendMessage failed, error 0x%08lx (%s)\n", status, strerror(status));
+		DEBUG_ONLY(request.PrintToStream());
+		DEBUG_ONLY(reply.PrintToStream);
+	}
+	return status;
+}
+
+
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, command_data *msg, int size)
 {
