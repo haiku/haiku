@@ -221,28 +221,31 @@ error:
 }
 
 
-int
-team_wait_on_team(team_id id, int *retcode)
+status_t
+wait_for_team(team_id id, status_t *_returnCode)
 {
-	struct team *p;
-	thread_id tid;
-	int state;
+	struct team *team;
+	thread_id thread;
+	cpu_status state;
+
+	// find main thread and wait for that
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
-	p = team_get_team_struct_locked(id);
-	if (p && p->main_thread)
-		tid = p->main_thread->id;
+
+	team = team_get_team_struct_locked(id);
+	if (team && team->main_thread)
+		thread = team->main_thread->id;
 	else
-		tid = ERR_INVALID_HANDLE;
+		thread = ERR_INVALID_HANDLE;
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
-	if (tid < 0)
-		return tid;
+	if (thread < 0)
+		return thread;
 
-	return thread_wait_on_thread(tid, retcode);
+	return wait_for_thread(thread, _returnCode);
 }
 
 
@@ -389,7 +392,7 @@ get_arguments_data_size(char **args, int argc)
 }
 
 
-static int
+static int32
 team_create_team2(void *args)
 {
 	int err;
@@ -551,13 +554,13 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	team->aspace = vm_get_aspace_by_id(team->_aspace_id);
 
 	// create a kernel thread, but under the context of the new team
-	tid = thread_create_kernel_thread_etc(name, team_create_team2, teamArgs, team);
+	tid = spawn_kernel_thread_etc(team_create_team2, name, B_NORMAL_PRIORITY, teamArgs, team->id);
 	if (tid < 0) {
 		err = tid;
 		goto err5;
 	}
 
-	thread_resume_thread(tid);
+	resume_thread(tid);
 
 	return pid;
 
@@ -716,23 +719,25 @@ sys_setenv(const char *name, const char *value, int overwrite)
 	int rc = 0;
 	int i;
 	char *p;
-	
+
+	// ToDo: please put me out of the kernel into libroot.so!
+
 	dprintf("sys_setenv: entry (name=%s, value=%s)\n", name, value);
-	
+
 	if (strlen(name) + strlen(value) + 1 >= SYS_THREAD_STRING_LENGTH_MAX)
 		return -1;
-	
+
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
-	
+
 	strcpy(var, name);
 	strncat(var, "=", SYS_THREAD_STRING_LENGTH_MAX-1);
 	name_size = strlen(var);
 	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
-	
+
 	env_space = (addr)thread_get_current_thread()->team->user_env_base;
 	envp = (char **)env_space;
-	for (envc=0; envp[envc]; envc++) {
+	for (envc = 0; envp[envc]; envc++) {
 		if (!strncmp(envp[envc], var, name_size)) {
 			var_exists = true;
 			var_pos = envc;
@@ -740,37 +745,34 @@ sys_setenv(const char *name, const char *value, int overwrite)
 	}
 	if (!var_exists)
 		var_pos = envc;
+
 	dprintf("sys_setenv: variable does%s exist\n", var_exists ? "" : " not");
 	if ((!var_exists) || (var_exists && overwrite)) {
-		
 		// XXX- make a better allocator
 		if (var_exists) {
 			if (strlen(var) <= strlen(envp[var_pos])) {
 				strcpy(envp[var_pos], var);
-			}
-			else {
-				for (p=(char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
+			} else {
+				for (p = (char *)env_space + ENV_SIZE - 1, i = 0; envp[i]; i++)
 					if (envp[i] < p)
 						p = envp[i];
 				p -= (strlen(var) + 1);
 				if (p < (char *)env_space + (envc * sizeof(char *))) {
 					rc = -1;
-				}
-				else {
+				} else {
 					envp[var_pos] = p;
 					strcpy(envp[var_pos], var);
 				}
 			}
 		}
 		else {
-			for (p=(char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
+			for (p = (char *)env_space + ENV_SIZE - 1, i=0; envp[i]; i++)
 				if (envp[i] < p)
 					p = envp[i];
 			p -= (strlen(var) + 1);
 			if (p < (char *)env_space + ((envc + 1) * sizeof(char *))) {
 				rc = -1;
-			}
-			else {
+			} else {
 				envp[envc] = p;
 				strcpy(envp[envc], var);
 				envp[envc + 1] = NULL;
@@ -795,12 +797,14 @@ sys_getenv(const char *name, char **value)
 	int i;
 	int len = strlen(name);
 	int rc = -1;
+
+	// ToDo: please put me out of the kernel into libroot.so!
 	
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
 	envp = (char **)thread_get_current_thread()->team->user_env_base;
-	for (i=0; envp[i]; i++) {
+	for (i = 0; envp[i]; i++) {
 		if (!strncmp(envp[i], name, len)) {
 			p = envp[i] + len;
 			if (*p == '=') {
@@ -821,18 +825,18 @@ sys_getenv(const char *name, char **value)
 //	#pragma mark -
 
 
-int
-user_team_wait_on_team(team_id id, int *userReturnCode)
+status_t
+user_wait_for_team(team_id id, status_t *_userReturnCode)
 {
-	int returnCode;
-	int status;
+	status_t returnCode;
+	status_t status;
 
-	if (!CHECK_USER_ADDRESS(userReturnCode))
+	if (!CHECK_USER_ADDRESS(_userReturnCode))
 		return B_BAD_ADDRESS;
 
-	status = team_wait_on_team(id, &returnCode);
+	status = wait_for_team(id, &returnCode);
 	if (status >= B_OK) {
-		if (user_memcpy(userReturnCode, &returnCode, sizeof(returnCode)) < B_OK)
+		if (user_memcpy(_userReturnCode, &returnCode, sizeof(returnCode)) < B_OK)
 			return B_BAD_ADDRESS;
 	}
 
