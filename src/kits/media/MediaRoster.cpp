@@ -34,10 +34,14 @@ using namespace BPrivate::media;
 class _DefaultDeleter
 {
 public:
-	~_DefaultDeleter() { delete BMediaRoster::_sDefault; }
-};
-
-_DefaultDeleter _deleter;
+	~_DefaultDeleter()
+	{
+		if (BMediaRoster::_sDefault) {
+			BMediaRoster::_sDefault->Lock();
+			BMediaRoster::_sDefault->Quit();
+		}
+	}
+} _deleter;
 
 namespace BPrivate { namespace media { namespace mediaroster {
 
@@ -662,10 +666,10 @@ BMediaRoster::StartNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	node_start_command msg;
-	msg.performance_time = at_performance_time;
+	node_start_command command;
+	command.performance_time = at_performance_time;
 	
-	return write_port(node.port, NODE_START, &msg, sizeof(msg));
+	return SendToPort(node.port, NODE_START, &command, sizeof(command));
 }
 
 
@@ -678,11 +682,11 @@ BMediaRoster::StopNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	node_stop_command msg;
-	msg.performance_time = at_performance_time;
-	msg.immediate = immediate;
+	node_stop_command command;
+	command.performance_time = at_performance_time;
+	command.immediate = immediate;
 	
-	return write_port(node.port, NODE_STOP, &msg, sizeof(msg));
+	return SendToPort(node.port, NODE_STOP, &command, sizeof(command));
 }
 
 					   
@@ -695,11 +699,11 @@ BMediaRoster::SeekNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	node_seek_command msg;
-	msg.media_time = to_media_time;
-	msg.performance_time = at_performance_time;
+	node_seek_command command;
+	command.media_time = to_media_time;
+	command.performance_time = at_performance_time;
 	
-	return write_port(node.port, NODE_SEEK, &msg, sizeof(msg));
+	return SendToPort(node.port, NODE_SEEK, &command, sizeof(command));
 }
 
 
@@ -1933,13 +1937,21 @@ BMediaRoster::MediaFlags(media_flags cap,
 	return 0;
 }
 
-						 
 
 /* BLooper overrides */
 /* virtual */ void 
 BMediaRoster::MessageReceived(BMessage * message)
 {
-	UNIMPLEMENTED();
+	// media_server plays ping-pong with the BMediaRosters
+	// to detect dead teams. Normal communication uses ports.
+	static BMessage pong('PONG');
+	if (message->what == 'PING') {
+		message->SendReply(&pong, static_cast<BHandler *>(NULL), 2000000);
+		return;
+	}
+
+	printf("BMediaRoster::MessageReceived: unknown message!\n");
+	message->PrintToStream();
 }
 
 /* virtual */ bool 
@@ -1972,10 +1984,12 @@ BMediaRoster::GetSupportedSuites(BMessage *data)
 BMediaRoster::~BMediaRoster()
 {
 	CALLED();
-	BMessage msg(MEDIA_SERVER_UNREGISTER_APP);
-	BMessage reply;
-	msg.AddInt32("team",team);
-	QueryServer(&msg, &reply);
+	
+	// unregister this application with the media server
+	server_unregister_app_request request;
+	server_unregister_app_reply reply;
+	request.team = team;
+	QueryServer(SERVER_UNREGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
 }
 
 
@@ -2007,14 +2021,21 @@ status_t BMediaRoster::_Reserved_MediaRoster_7(void *) { return B_ERROR; }
 
 
 BMediaRoster::BMediaRoster() : 
-	BLooper("BMediaRoster looper",B_NORMAL_PRIORITY,B_LOOPER_PORT_DEFAULT_CAPACITY)
+	BLooper("_BMediaRoster_", B_URGENT_DISPLAY_PRIORITY, B_LOOPER_PORT_DEFAULT_CAPACITY)
 {
 	CALLED();
-	BMessage msg(MEDIA_SERVER_REGISTER_APP);
-	BMessage reply;
-	msg.AddInt32("team",team);
-	QueryServer(&msg,&reply);
+	
+	// start the looper
+	Run();
+	
+	// register this application with the media server
+	server_register_app_request request;
+	server_register_app_reply reply;
+	request.team = team;
+	request.messenger = BMessenger(NULL, this);
+	QueryServer(SERVER_REGISTER_APP, &request, sizeof(request), &reply, sizeof(reply));
 }
+
 
 /* static */ status_t
 BMediaRoster::ParseCommand(BMessage & reply)
@@ -2023,7 +2044,6 @@ BMediaRoster::ParseCommand(BMessage & reply)
 	return B_ERROR;
 }
 
-		
 
 status_t 
 BMediaRoster::GetDefaultInfo(media_node_id for_default,

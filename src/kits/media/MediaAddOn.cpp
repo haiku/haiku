@@ -8,8 +8,6 @@
 #include <malloc.h>
 #define DEBUG 3
 #include "debug.h"
-#include "PortPool.h"
-#include "ServerInterface.h"
 #include "DataExchange.h"
 
 /*
@@ -538,15 +536,10 @@ BMediaAddOn::NotifyFlavorChange()
 	CALLED();
 	if (fAddon == 0)
 		return B_ERROR;
-	
-	port_id port;
-	port = find_port("media_addon_server port");
-	if (port <= B_OK)
-		return B_ERROR;
 
-	addonserver_rescan_mediaaddon_flavors_command msg;
-	msg.addonid = fAddon;
-	return write_port(port, ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS, &msg, sizeof(msg));
+	addonserver_rescan_mediaaddon_flavors_command command;
+	command.addonid = fAddon;
+	return SendToAddonServer(ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS, &command, sizeof(command));
 }
 
 /*************************************************************

@@ -3,26 +3,38 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <List.h>
-#include <Locker.h>
+#include "TMap.h"
 
 class AppManager
 {
 public:
 	AppManager();
 	~AppManager();
-	bool HasTeam(team_id);
+
+	status_t RegisterAddonServer(team_id);
 	status_t RegisterTeam(team_id, BMessenger);
 	status_t UnregisterTeam(team_id);
-	void BroadcastMessage(BMessage *msg, bigtime_t timeout);
-	void HandleBroadcastError(BMessage *, BMessenger &, team_id team, bigtime_t timeout);
-	status_t LoadState();
-	status_t SaveState();
+	bool HasTeam(team_id);
+	void StartAddonServer();
+	void TerminateAddonServer();
+	
 private:
-	struct ListItem {
+	void CleanupTeam(team_id);
+	void CleanupAddonServer();
+	void TeamDied(team_id team);
+	void RestartAddonServer();
+	static int32 bigbrother(void *self);
+	void BigBrother();
+
+private:
+	team_id fAddonServer;
+	thread_id fBigBrother;
+	sem_id fQuit;
+
+	struct App {
 		team_id team;
 		BMessenger messenger;
 	};
-	BList 	mList;
-	BLocker	mLocker;
+	Map<team_id, App> * fAppMap;
+	BLocker	*fLocker;
 };

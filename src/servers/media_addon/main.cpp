@@ -23,6 +23,10 @@
 
 void DumpFlavorInfo(const flavor_info *info);
 
+namespace BPrivate { namespace media {
+	extern team_id team;
+} } // BPrivate::media
+
 class MediaAddonServer : BApplication
 {
 public:
@@ -34,7 +38,7 @@ public:
 	void WatchDir(BEntry *dir);
 	void AddOnAdded(const char *path, ino_t file_node);
 	void AddOnRemoved(ino_t file_node);
-	void HandleMessage(int32 code, void *data, size_t size);
+	void HandleMessage(int32 code, const void *data, size_t size);
 	static int32 controlthread(void *arg);
 	
 	void ScanAddOnFlavors(BMediaAddOn *addon);
@@ -76,30 +80,30 @@ MediaAddonServer::~MediaAddonServer()
 }
 
 void 
-MediaAddonServer::HandleMessage(int32 code, void *data, size_t size)
+MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 {
 	switch (code) {
 		case ADDONSERVER_INSTANTIATE_DORMANT_NODE:
 		{
-			const addonserver_instantiate_dormant_node_request *msg = (const addonserver_instantiate_dormant_node_request *)data;
+			const addonserver_instantiate_dormant_node_request *request = static_cast<const addonserver_instantiate_dormant_node_request *>(data);
 			addonserver_instantiate_dormant_node_reply reply;
 			status_t rv;
-			rv = mediaroster->InstantiateDormantNode(msg->info, &reply.node);
-			msg->SendReply(rv, &reply, sizeof(reply));
+			rv = mediaroster->InstantiateDormantNode(request->info, &reply.node);
+			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
 
 		case ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS:
 		{
-			const addonserver_rescan_mediaaddon_flavors_command *msg = (const addonserver_rescan_mediaaddon_flavors_command *)data;
+			const addonserver_rescan_mediaaddon_flavors_command *command = static_cast<const addonserver_rescan_mediaaddon_flavors_command *>(data);
 			BMediaAddOn *addon;
-			addon = _DormantNodeManager->GetAddon(msg->addonid);
+			addon = _DormantNodeManager->GetAddon(command->addonid);
 			if (!addon) {
-				printf("rescan flavors: Can't find a addon object for id %d\n",(int)msg->addonid);
+				printf("rescan flavors: Can't find a addon object for id %d\n",(int)command->addonid);
 				break;
 			}
 			ScanAddOnFlavors(addon);
-			_DormantNodeManager->PutAddon(msg->addonid);
+			_DormantNodeManager->PutAddon(command->addonid);
 			break;
 		}
 
@@ -126,8 +130,20 @@ MediaAddonServer::controlthread(void *arg)
 void 
 MediaAddonServer::ReadyToRun()
 {
-	node_ref nref;
+	// register with media_server
+	server_register_addonserver_request request;
+	server_register_addonserver_reply reply;
+	status_t result;
+	request.team = BPrivate::media::team;
+	result = QueryServer(SERVER_REGISTER_ADDONSERVER, &request, sizeof(request), &reply, sizeof(reply));
+	if (result != B_OK) {
+		printf("Communication with server failed. Terminating.\n");
+		PostMessage(B_QUIT_REQUESTED);
+		return;
+	}
 
+	// load dormant media nodes
+	node_ref nref;
 	BEntry e("/boot/beos/system/add-ons/media");
 	e.GetNodeRef(&nref);
 	DirNodeSystem = nref.node;

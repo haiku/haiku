@@ -9,6 +9,7 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 #include <MediaAddOn.h>
+#include <Messenger.h>
 #include <Entry.h>
 
 namespace BPrivate {
@@ -73,7 +74,12 @@ enum {
 
 // Raw port based communication
 enum {
+	ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS = 0x50,
+
 	SERVER_MESSAGE_START = 0x100,
+	SERVER_REGISTER_ADDONSERVER,
+	SERVER_REGISTER_APP,
+	SERVER_UNREGISTER_APP,
 	SERVER_GET_NODE,
 	SERVER_SET_NODE,
 	SERVER_PUBLISH_INPUTS,
@@ -623,13 +629,33 @@ struct consumer_seek_tag_requested_reply : public reply_data
 
 
 
+struct server_register_addonserver_request : public request_data
+{
+	team_id team;
+};
 
+struct server_register_addonserver_reply : public reply_data
+{
+};
 
+struct server_register_app_request : public request_data
+{
+	team_id team;
+	BMessenger messenger;
+};
 
+struct server_register_app_reply : public reply_data
+{
+};
 
+struct server_unregister_app_request : public request_data
+{
+	team_id team;
+};
 
-
-
+struct server_unregister_app_reply : public reply_data
+{
+};
 
 
 

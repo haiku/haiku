@@ -45,47 +45,13 @@ public:
 	ServerApp();
 	~ServerApp();
 
+	bool QuitRequested();
 	void HandleMessage(int32 code, void *data, size_t size);
 	static int32 controlthread(void *arg);
 
 	void GetSharedBufferArea(BMessage *msg);
 	void RegisterBuffer(BMessage *msg);
 	void UnregisterBuffer(BMessage *msg);
-
-	void GetNodeID(BMessage *);
-	void FindRunningInstances(BMessage *);
-	void BufferGroupReg(BMessage *);
-	void GetLatentInfo(BMessage *);
-	void GetDormantFileFormats(BMessage *);
-	void GetDormantFlavor(BMessage *);
-	void BroadcastMessage(BMessage *);
-	void ReleaseNodeReference(BMessage *);
-	void SetRealtimeFlags(BMessage *);
-	void GetRealtimeFlags(BMessage *);
-	void InstantiatePersistentNode(BMessage *);
-	void SniffFile(BMessage *);
-	void QueryLatents(BMessage *);
-	void RegisterApp(BMessage *);
-	void UnregisterApp(BMessage *);
-	void RegisterNode(BMessage *);
-	void UnregisterNode(BMessage *);
-	void SetDefault(BMessage *);
-	void AcquireNodeReference(BMessage *);
-	void SetOutputBuffers(BMessage *);
-	void ReclaimOutputBuffers(BMessage *);
-	void OrphanReclaimableBuffers(BMessage *);
-	void SetTimeSource(BMessage *);
-	void QueryNodes(BMessage *);
-	void GetDormantNode(BMessage *);
-	void FormatChanged(BMessage *);
-	void GetDefaultInfo(BMessage *);
-	void GetRunningDefault(BMessage *);
-	void SetRunningDefault(BMessage *);
-	void TypeItemOp(BMessage *);
-	void FormatOp(BMessage *);
-
-	void SetVolume(BMessage *);
-	void GetVolume(BMessage *);
 
 /* functionality not yet implemented
 00014a00 T _ServerApp::_ServerApp(void)
@@ -114,18 +80,13 @@ private:
 
 	BLocker *fLocker;
 	
-	float fVolumeLeft;
-	float fVolumeRight;
-
 	void MessageReceived(BMessage *msg);
 	typedef BApplication inherited;
 };
 
 ServerApp::ServerApp()
  	: BApplication(NEW_MEDIA_SERVER_SIGNATURE),
-	fLocker(new BLocker("server locker")),
-	fVolumeLeft(0.0),
-	fVolumeRight(0.0)
+	fLocker(new BLocker("server locker"))
 {
 	//load volume settings from config file
 	//mVolumeLeft = ???;
@@ -137,12 +98,15 @@ ServerApp::ServerApp()
 	gNodeManager = new NodeManager;
 
 	control_port = create_port(64,"media_server port");
-	control_thread = spawn_thread(controlthread,"media_server control",12,this);
+	control_thread = spawn_thread(controlthread, "media_server control", 105, this);
 	resume_thread(control_thread);
+	
+	gAppManager->StartAddonServer();
 }
 
 ServerApp::~ServerApp()
 {
+	printf("####ServerApp::~ServerApp()\n");
 	delete gNotificationManager;
 	delete gBufferManager;
 	delete gAppManager;
@@ -153,6 +117,13 @@ ServerApp::~ServerApp()
 	wait_for_thread(control_thread,&err);
 }
 
+bool
+ServerApp::QuitRequested()
+{
+	printf("####ServerApp::QuitRequested()\n");
+	gAppManager->TerminateAddonServer();
+	return true;
+}
 
 void 
 ServerApp::HandleMessage(int32 code, void *data, size_t size)
@@ -160,6 +131,33 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 	status_t rv;
 	printf("ServerApp::HandleMessage %#lx\n", code);
 	switch (code) {
+		case SERVER_REGISTER_ADDONSERVER:
+		{
+			const server_register_addonserver_request *request = reinterpret_cast<const server_register_addonserver_request *>(data);
+			server_register_addonserver_reply reply;
+			rv = gAppManager->RegisterAddonServer(request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+		
+		case SERVER_REGISTER_APP:
+		{
+			const server_register_app_request *request = reinterpret_cast<const server_register_app_request *>(data);
+			server_register_app_reply reply;
+			rv = gAppManager->RegisterTeam(request->team, request->messenger);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_UNREGISTER_APP:
+		{
+			const server_unregister_app_request *request = reinterpret_cast<const server_unregister_app_request *>(data);
+			server_unregister_app_reply reply;
+			rv = gAppManager->UnregisterTeam(request->team);
+			request->SendReply(rv, &reply, sizeof(reply));
+			break;
+		}
+	
 		case SERVER_GET_MEDIAADDON_REF:
 		{
 			server_get_mediaaddon_ref_request *msg = (server_get_mediaaddon_ref_request *)data;
@@ -505,206 +503,6 @@ ServerApp::UnregisterBuffer(BMessage *msg)
 	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
 }
 
-
-void ServerApp::GetNodeID(BMessage *msg)
-{
-}
-
-
-void ServerApp::FindRunningInstances(BMessage *msg)
-{
-}
-
-
-void ServerApp::BufferGroupReg(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetLatentInfo(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetDormantFileFormats(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetDormantFlavor(BMessage *msg)
-{
-}
-
-
-void ServerApp::BroadcastMessage(BMessage *msg)
-{
-}
-
-
-void ServerApp::ReleaseNodeReference(BMessage *msg)
-{
-}
-
-
-void ServerApp::SetRealtimeFlags(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetRealtimeFlags(BMessage *msg)
-{
-}
-
-
-void ServerApp::InstantiatePersistentNode(BMessage *msg)
-{
-}
-
-
-void ServerApp::SniffFile(BMessage *msg)
-{
-}
-
-
-void ServerApp::QueryLatents(BMessage *msg)
-{
-}
-
-
-void ServerApp::RegisterApp(BMessage *msg)
-{
-	team_id team;
-	msg->FindInt32("team", &team);
-	gAppManager->RegisterTeam(team, msg->ReturnAddress());
-
-	BMessage reply(B_OK);
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
-
-void ServerApp::UnregisterApp(BMessage *msg)
-{
-	team_id team;
-	msg->FindInt32("team", &team);
-	gAppManager->UnregisterTeam(team);
-
-	BMessage reply(B_OK);
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
-
-void ServerApp::RegisterNode(BMessage *msg)
-{
-}
-
-
-void ServerApp::UnregisterNode(BMessage *msg)
-{
-}
-
-
-void ServerApp::SetDefault(BMessage *msg)
-{
-}
-
-
-void ServerApp::AcquireNodeReference(BMessage *msg)
-{
-}
-
-
-void ServerApp::SetOutputBuffers(BMessage *msg)
-{
-}
-
-
-void ServerApp::ReclaimOutputBuffers(BMessage *msg)
-{
-}
-
-
-void ServerApp::OrphanReclaimableBuffers(BMessage *msg)
-{
-}
-
-
-void ServerApp::SetTimeSource(BMessage *msg)
-{
-}
-
-
-void ServerApp::QueryNodes(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetDormantNode(BMessage *msg)
-{
-}
-
-
-void ServerApp::FormatChanged(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetDefaultInfo(BMessage *msg)
-{
-}
-
-
-void ServerApp::GetRunningDefault(BMessage *msg)
-{
-}
-
-
-void ServerApp::SetRunningDefault(BMessage *msg)
-{
-}
-
-
-void ServerApp::TypeItemOp(BMessage *msg)
-{
-}
-
-
-void ServerApp::FormatOp(BMessage *msg)
-{
-}
-
-void ServerApp::SetVolume(BMessage *msg)
-{
-	float left;
-	float right;
-	msg->FindFloat("left", &left);
-	msg->FindFloat("right", &right);
-
-	fLocker->Lock();
-	fVolumeLeft = left;
-	fVolumeRight = right;
-	fLocker->Unlock();
-
-	//save volume settings to config file
-	// ??? = left;
-	// ??? = right;
-
-	BMessage reply(B_OK);
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
-void ServerApp::GetVolume(BMessage *msg)
-{
-	BMessage reply(B_OK);
-
-	fLocker->Lock();
-	reply.AddFloat("left", fVolumeLeft);
-	reply.AddFloat("right", fVolumeRight);
-	fLocker->Unlock();
-
-	msg->SendReply(&reply,(BHandler*)NULL,REPLY_TIMEOUT);
-}
-
-
 void ServerApp::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
@@ -714,41 +512,6 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
 		case MEDIA_SERVER_SEND_NOTIFICATIONS: gNotificationManager->EnqueueMessage(msg); break;
-	
-	
-		case MEDIA_SERVER_GET_NODE_ID: GetNodeID(msg); break;
-		case MEDIA_SERVER_FIND_RUNNING_INSTANCES: FindRunningInstances(msg); break;
-		case MEDIA_SERVER_BUFFER_GROUP_REG: BufferGroupReg(msg); break;
-		case MEDIA_SERVER_GET_LATENT_INFO: GetLatentInfo(msg); break;
-		case MEDIA_SERVER_GET_DORMANT_FILE_FORMATS: GetDormantFileFormats(msg); break;
-		case MEDIA_SERVER_GET_GETDORMANTFLAVOR: GetDormantFlavor(msg); break;
-		case MEDIA_SERVER_BROADCAST_MESSAGE: BroadcastMessage(msg); break;
-		case MEDIA_SERVER_RELEASE_NODE_REFERENCE: ReleaseNodeReference(msg); break;
-		case MEDIA_SERVER_SET_REALTIME_FLAGS: SetRealtimeFlags(msg); break;
-		case MEDIA_SERVER_GET_REALTIME_FLAGS: GetRealtimeFlags(msg); break;
-		case MEDIA_SERVER_INSTANTIATE_PERSISTENT_NODE: InstantiatePersistentNode(msg); break;
-		case MEDIA_SERVER_SNIFF_FILE: SniffFile(msg); break;
-		case MEDIA_SERVER_QUERY_LATENTS: QueryLatents(msg); break;
-		case MEDIA_SERVER_REGISTER_APP: RegisterApp(msg); break;
-		case MEDIA_SERVER_UNREGISTER_APP: UnregisterApp(msg); break;
-		case MEDIA_SERVER_REGISTER_NODE: RegisterNode(msg); break;
-		case MEDIA_SERVER_UNREGISTER_NODE: UnregisterNode(msg); break;
-		case MEDIA_SERVER_SET_DEFAULT: SetDefault(msg); break;
-		case MEDIA_SERVER_ACQUIRE_NODE_REFERENCE: AcquireNodeReference(msg); break;
-		case MEDIA_SERVER_SET_OUTPUT_BUFFERS: SetOutputBuffers(msg); break;
-		case MEDIA_SERVER_RECLAIM_OUTPUT_BUFFERS: ReclaimOutputBuffers(msg); break;
-		case MEDIA_SERVER_ORPHAN_RECLAIMABLE_BUFFERS: OrphanReclaimableBuffers(msg); break;
-		case MEDIA_SERVER_SET_TIME_SOURCE: SetTimeSource(msg); break;
-		case MEDIA_SERVER_QUERY_NODES: QueryNodes(msg); break;
-		case MEDIA_SERVER_GET_DORMANT_NODE: GetDormantNode(msg); break;
-		case MEDIA_SERVER_FORMAT_CHANGED: FormatChanged(msg); break;
-		case MEDIA_SERVER_GET_DEFAULT_INFO: GetDefaultInfo(msg); break;
-		case MEDIA_SERVER_GET_RUNNING_DEFAULT: GetRunningDefault(msg); break;
-		case MEDIA_SERVER_SET_RUNNING_DEFAULT: SetRunningDefault(msg); break;
-		case MEDIA_SERVER_TYPE_ITEM_OP: TypeItemOp(msg); break;
-		case MEDIA_SERVER_FORMAT_OP: FormatOp(msg); break;
-		case MEDIA_SERVER_SET_VOLUME: SetVolume(msg); break;
-		case MEDIA_SERVER_GET_VOLUME: GetVolume(msg); break;
 		default:
 			printf("\nnew media server: unknown message received\n");
 			msg->PrintToStream();
