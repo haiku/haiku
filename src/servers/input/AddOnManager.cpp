@@ -22,14 +22,6 @@
 #include "InputServer.h"
 
 
-#if DEBUG>=1
-	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
-	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
-#else
-	#define EXIT()		((void)0)
-	#define CALLED()	((void)0)
-#endif
-
 AddOnManager::AddOnManager()
 	:
  	fLock("add-on manager")
@@ -52,6 +44,8 @@ AddOnManager::LoadState()
 void
 AddOnManager::SaveState()
 {
+	CALLED();
+	UnregisterAddOns();
 }
 
 
@@ -102,7 +96,8 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 		}
 		
 		RegisterDevice(isd, ref, addon_image);
-	
+		
+		
 	} else if (pathString.FindFirst("input_server/filters")>0) {
 		BInputServerFilter *(*instantiate_func)();
 
@@ -188,6 +183,7 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 		device_info *pinfo;
 		for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
 			if (!strcmp(pinfo->ref.name, ref.name)) {
+				InputServer::StartStopDevices(pinfo->isd, false);
 				delete pinfo->isd;
 				delete pinfo->addon;
 				if (pinfo->addon_image >= B_OK)
@@ -259,10 +255,10 @@ AddOnManager::RegisterAddOns()
 	const directory_which directories[] = {
 		B_USER_ADDONS_DIRECTORY,
 		B_COMMON_ADDONS_DIRECTORY,
-		B_BEOS_ADDONS_DIRECTORY,
+//		B_BEOS_ADDONS_DIRECTORY,
 	};
 	const char subDirectories[][24] = {
-//		"input_server/devices",
+		"input_server/devices",
 		"input_server/filters",
 		"input_server/methods",
 	};
@@ -288,6 +284,54 @@ AddOnManager::RegisterAddOns()
 	//	&& (directory.GetNodeRef(&nref) == B_OK)) {
 	//	fHandler->AddDirectory(&nref);
 	//}
+}
+
+
+void
+AddOnManager::UnregisterAddOns()
+{
+	BMessenger messenger(fAddOnMonitor);
+	messenger.SendMessage(B_QUIT_REQUESTED);
+	int32 exit_value;
+	wait_for_thread(fAddOnMonitor->Thread(), &exit_value);
+	delete fHandler;
+	
+	BAutolock locker(fLock);
+	
+	// we have to stop manually the addons because the monitor doesn't disable them on exit
+	
+	{
+		device_info *pinfo;
+		for (fDeviceList.Rewind(); fDeviceList.GetNext(&pinfo);) {
+			InputServer::StartStopDevices(pinfo->isd, false);
+			delete pinfo->isd;
+			delete pinfo->addon;
+			if (pinfo->addon_image >= B_OK)
+				unload_add_on(pinfo->addon_image);
+			fDeviceList.RemoveCurrent();
+		}
+	}
+	
+	{
+		filter_info *pinfo;
+		for (fFilterList.Rewind(); fFilterList.GetNext(&pinfo);) {
+			delete pinfo->isf;
+			if (pinfo->addon_image >= B_OK)
+				unload_add_on(pinfo->addon_image);
+			fFilterList.RemoveCurrent();
+		}
+	}
+	
+	{
+		method_info *pinfo;
+		for (fMethodList.Rewind(); fMethodList.GetNext(&pinfo);) {
+				delete pinfo->ism;
+				delete pinfo->addon;
+				if (pinfo->addon_image >= B_OK)
+					unload_add_on(pinfo->addon_image);
+				fMethodList.RemoveCurrent();
+		}
+	}
 }
 
 
@@ -337,6 +381,10 @@ AddOnManager::RegisterFilter(BInputServerFilter *filter, const entry_ref &ref, i
 	info.isf = filter;
 
 	fFilterList.Insert(info);
+	
+	BAutolock lock2(InputServer::gInputFilterListLocker);
+	
+	InputServer::gInputFilterList.AddItem(filter);
 }
 
 
@@ -362,6 +410,10 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 	info.addon = new _BMethodAddOn_;
 
 	fMethodList.Insert(info);
+	
+	BAutolock lock2(InputServer::gInputMethodListLocker);
+	
+	InputServer::gInputMethodList.AddItem(method);
 }
 
 

@@ -48,6 +48,14 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
+#if DEBUG>=1
+	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
+	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
+#else
+	#define EXIT()		((void)0)
+	#define CALLED()	((void)0)
+#endif
+
 class BPortLink;
 
 class InputDeviceListItem
@@ -88,9 +96,9 @@ public:
 
 	void InitKeyboardMouseStates(void);
 	
-	void InitDevices(void);
-	void InitFilters(void);
-	void InitMethods(void);
+	//void InitDevices(void);
+	//void InitFilters(void);
+	//void InitMethods(void);
 
 	virtual bool QuitRequested(void);
 	virtual void ReadyToRun(void);
@@ -142,6 +150,7 @@ public:
 	bool MethodizeEvents(BList*, bool);
 
 	static status_t StartStopDevices(const char *, input_device_type, bool);
+	static status_t StartStopDevices(BInputServerDevice *isd, bool);
 	status_t ControlDevices(const char *, input_device_type, unsigned long, BMessage*);
 
 	bool DoMouseAcceleration(long*, long*);
@@ -154,12 +163,18 @@ public:
 	static BList   gInputDeviceList;
 	static BLocker gInputDeviceListLocker;
 	
+	static BList   gInputFilterList;
+	static BLocker gInputFilterListLocker;
+	
+	static BList   gInputMethodList;
+	static BLocker gInputMethodListLocker;
+	
 private:
-	void InitTestDevice();
+	/*void InitTestDevice();
 	
 	status_t AddInputServerDevice(const char* path);
 	status_t AddInputServerFilter(const char* path);
-	status_t AddInputServerMethod(const char* path);
+	status_t AddInputServerMethod(const char* path);*/
 	
 	bool 			sEventLoopRunning;
 	bool 			sSafeMode;
@@ -188,14 +203,16 @@ private:
 	
 	static bool doStartStopDevice(void*, void*);
 	
-	static BList mInputServerDeviceList;
-	static BList mInputServerFilterList;
-	static BList mInputServerMethodList;
+	//static BList mInputServerDeviceList;
+	//static BList mInputServerFilterList;
+	//static BList mInputServerMethodList;
 	
 	// added this to communicate via portlink
 	
-	BPortLink *serverlink;
-	AddOnManager *fAddOnManager;
+	BPortLink 		*serverlink;
+	AddOnManager 	*fAddOnManager;
+	
+	BList			fEventsCache;
 	
 	//fMouseState;
 };

@@ -31,7 +31,7 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-
+#include <Autolock.h>
 #include <InputServerDevice.h>
 #include "InputServer.h"
 
@@ -50,6 +50,29 @@ BInputServerDevice::BInputServerDevice()
  */
 BInputServerDevice::~BInputServerDevice()
 {
+	CALLED();
+	 // Lock this section of code so that access to the device list
+	// is serialized.  Be sure to release the lock before exitting.
+	//
+	InputServer::gInputDeviceListLocker.Lock();
+	
+	for (int i = InputServer::gInputDeviceList.CountItems() - 1; 
+		i >= 0 && i < InputServer::gInputDeviceList.CountItems(); i--) {
+	
+		PRINT(("%s Device #%d\n", __PRETTY_FUNCTION__, i));
+		InputDeviceListItem* item = (InputDeviceListItem*) InputServer::gInputDeviceList.ItemAt(i);
+		if (NULL != item && this == item->mIsd) {
+			if (item->mStarted) {
+				input_device_ref   dev = item->mDev;
+				PRINT(("  Stopping: %s\n", dev.name)); 
+				Stop(dev.name, dev.cookie);
+			}
+			InputServer::gInputDeviceList.RemoveItem(i++);
+			delete item;
+		}
+	}
+	
+	InputServer::gInputDeviceListLocker.Unlock();
 }
 
 
@@ -120,32 +143,32 @@ BInputServerDevice::Control(const char *device,
 status_t
 BInputServerDevice::RegisterDevices(input_device_ref **devices)
 {
-/*	
+	CALLED();
+
 	// Lock this section of code so that access to the device list
 	// is serialized.  Be sure to release the lock before exitting.
 	//
-	InputServer::gInputDeviceListLocker.Lock();
-	
-	bool has_pointing_device = false;
-	bool has_keyboard_device = false;
+	BAutolock lock(InputServer::gInputDeviceListLocker);
+
+	//bool has_pointing_device = false;
+	//bool has_keyboard_device = false;
 	
 	input_device_ref *device = NULL;
-	for (int i = 0; NULL != (device = devices[i]); i++)
-	{
+	for (int i = 0; NULL != (device = devices[i]); i++) {
 		// :TODO: Check to make sure that each device is valid and
 		// that it is not already registered.
 		// getDeviceIndex()
 		
-		InputServer::gInputDeviceList.AddItem(new InputDeviceListItem(this, device) );
+		InputServer::gInputDeviceList.AddItem(new InputDeviceListItem(this, *device) );
 		
-		has_pointing_device = has_pointing_device || (device->type == B_POINTING_DEVICE);
-		has_keyboard_device = has_keyboard_device || (device->type == B_KEYBOARD_DEVICE);
+		//has_pointing_device = has_pointing_device || (device->type == B_POINTING_DEVICE);
+		//has_keyboard_device = has_keyboard_device || (device->type == B_KEYBOARD_DEVICE);
 	}
 
 	// If the InputServer event loop is running, signal the InputServer
 	// to start all devices of the type managed by this InputServerDevice.
 	//
-	if (InputServer::EventLoopRunning() )
+	/*if (InputServer::EventLoopRunning() )
 	{
 		if (has_pointing_device)
 		{
@@ -155,10 +178,10 @@ BInputServerDevice::RegisterDevices(input_device_ref **devices)
 		{
 			InputServer::StartStopDevices(NULL, B_KEYBOARD_DEVICE, true);
 		}
-	}
+	}*/
 	
-	InputServer::gInputDeviceListLocker.Unlock();
-	*/
+	InputServer::StartStopDevices(this, true);
+	
 	return B_OK;
 }
 
@@ -170,9 +193,19 @@ BInputServerDevice::RegisterDevices(input_device_ref **devices)
 status_t
 BInputServerDevice::UnregisterDevices(input_device_ref **devices)
 {
-    status_t dummy;
+    CALLED();
+    
+    // Lock this section of code so that access to the device list
+	// is serialized.  Be sure to release the lock before exitting.
+	//
+	BAutolock lock(InputServer::gInputDeviceListLocker);
 
-    return dummy;
+	input_device_ref *device = NULL;
+	for (int i = 0; NULL != (device = devices[i]); i++) {
+	
+	}
+	
+    return B_OK;
 }
 
 
@@ -183,21 +216,6 @@ BInputServerDevice::UnregisterDevices(input_device_ref **devices)
 status_t
 BInputServerDevice::EnqueueMessage(BMessage *message)
 {
-/*	status_t  	err;
-	
-	ssize_t length = message->FlattenedSize();
-	char* buffer = new char[length];
-	if ((err = message->Flatten(buffer,length)) < 0) {
-	} else {
-		if((write_port(mEventPort, 0, buffer, length)) < 0) {
-		
-		}else {
-		free(buffer);
-		err = B_OK;
-		}
-	}
-	return err;
-	*/
 	return ((InputServer*)be_app)->EnqueueDeviceMessage(message);
 }
 

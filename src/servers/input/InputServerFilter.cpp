@@ -32,7 +32,8 @@
 /*****************************************************************************/
 
 
-#include "InputServerFilter.h"
+#include <InputServerFilter.h>
+#include "InputServer.h"
 
 /**
  *  Method: BInputServerFilter::BInputServerFilter()
@@ -40,6 +41,7 @@
  */
 BInputServerFilter::BInputServerFilter()
 {
+	CALLED();
 }
 
 
@@ -49,6 +51,7 @@ BInputServerFilter::BInputServerFilter()
  */
 BInputServerFilter::~BInputServerFilter()
 {
+	CALLED();
 }
 
 
@@ -59,6 +62,7 @@ BInputServerFilter::~BInputServerFilter()
 status_t
 BInputServerFilter::InitCheck()
 {
+	CALLED();
     return B_OK;
 }
 
@@ -70,7 +74,8 @@ BInputServerFilter::InitCheck()
 filter_result
 BInputServerFilter::Filter(BMessage *message,
                            BList *outList)
-{
+{	
+	CALLED();
     return B_DISPATCH_MESSAGE;
 }
 

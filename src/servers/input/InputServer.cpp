@@ -42,15 +42,6 @@
 #include <Path.h>
 #include <String.h>
 
-
-#if DEBUG>=1
-	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
-	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
-#else
-	#define EXIT()		((void)0)
-	#define CALLED()	((void)0)
-#endif
-
 #include "InputServer.h"
 #include "InputServerDeviceListEntry.h"
 #include "InputServerFilterListEntry.h"
@@ -76,9 +67,15 @@ extern "C" void RegisterDevices(input_device_ref** devices)
 BList   InputServer::gInputDeviceList;
 BLocker InputServer::gInputDeviceListLocker;
 
-BList InputServer::mInputServerDeviceList;
+BList   InputServer::gInputFilterList;
+BLocker InputServer::gInputFilterListLocker;
+
+BList   InputServer::gInputMethodList;
+BLocker InputServer::gInputMethodListLocker;
+
+/*BList InputServer::mInputServerDeviceList;
 BList InputServer::mInputServerFilterList;
-BList InputServer::mInputServerMethodList;
+BList InputServer::mInputServerMethodList;*/
 
 
 /*
@@ -122,7 +119,6 @@ InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_serv
 InputServer::~InputServer(void)
 {
 	CALLED();
-	fAddOnManager->SaveState();
 	delete fAddOnManager;
 }
 
@@ -170,7 +166,7 @@ InputServer::InitKeyboardMouseStates(void)
 
 }
 
-void
+/*void
 InputServer::InitTestDevice()
 {
 	CALLED();
@@ -216,13 +212,13 @@ InputServer::InitTestDevice()
 		}
 	}
 	EXIT();
-}
+}*/
 
 /*
  *  Method: InputServer::InitDevices()
  *   Descr: 
  */
-void
+/*void
 InputServer::InitDevices(void)
 {
 	CALLED();
@@ -257,14 +253,14 @@ InputServer::InitDevices(void)
 		}
 	}
 	EXIT();
-}
+}*/
 
 
 /*
  *  Method: InputServer::AddInputServerDevice()
  *   Descr: 
  */
-status_t
+/*status_t
 InputServer::AddInputServerDevice(const char* path)
 {
 	image_id addon_image= load_add_on(path);
@@ -289,7 +285,7 @@ InputServer::AddInputServerDevice(const char* path)
 						new InputServerDeviceListEntry(path, isd_status, isd) );
 				}
 				*/
-				mInputServerDeviceList.AddItem(
+				/*mInputServerDeviceList.AddItem(
 					new InputServerDeviceListEntry(path, B_NO_INIT, NULL) );
 			}
 		}
@@ -302,14 +298,14 @@ InputServer::AddInputServerDevice(const char* path)
 		}
 	}
 	return 0;
-}
+}*/
 
 
 /*
  *  Method: InputServer::InitFilters()
  *   Descr: 
  */
-void
+/*void
 InputServer::InitFilters(void)
 {
 	CALLED();
@@ -344,14 +340,14 @@ InputServer::InitFilters(void)
 		}
 	}
 	EXIT();
-}
+}*/
 
 
 /*
  *  Method: InputServer::AddInputServerFilter()
  *   Descr: 
  */
-status_t
+/*status_t
 InputServer::AddInputServerFilter(const char* path)
 {
 	image_id addon_image= load_add_on(path);
@@ -376,7 +372,7 @@ InputServer::AddInputServerFilter(const char* path)
 						new InputServerFilterListEntry(path, isf_status, isf );
 				}
 				*/
-				mInputServerFilterList.AddItem(
+				/*mInputServerFilterList.AddItem(
 					new InputServerFilterListEntry(path, B_NO_INIT, NULL) );
 			}
 		}
@@ -389,14 +385,14 @@ InputServer::AddInputServerFilter(const char* path)
 		}
 	}
 	return 0;
-}
+}*/
 
 
 /*
  *  Method: InputServer::InitMethods()
  *   Descr: 
  */
-void
+/*void
 InputServer::InitMethods(void)
 {
 	CALLED();
@@ -431,14 +427,14 @@ InputServer::InitMethods(void)
 		}
 	}
 	EXIT();
-}
+}*/
 
 
 /*
  *  Method: InputServer::AddInputServerMethod()
  *   Descr: 
  */
-status_t
+/*status_t
 InputServer::AddInputServerMethod(const char* path)
 {
 	image_id addon_image= load_add_on(path);
@@ -463,7 +459,7 @@ InputServer::AddInputServerMethod(const char* path)
 						new InputServerMethodListEntry(path, ism_status, ism) );
 				}
 				*/
-				mInputServerMethodList.AddItem(
+				/*mInputServerMethodList.AddItem(
 					new InputServerMethodListEntry(path, B_NO_INIT, NULL) );
 			}
 		}
@@ -476,7 +472,7 @@ InputServer::AddInputServerMethod(const char* path)
 		}
 	}
 	return 0;
-}
+}*/
 
 
 /*
@@ -487,6 +483,7 @@ bool
 InputServer::QuitRequested(void)
 {
 	CALLED();
+	fAddOnManager->SaveState();
 	
 	kill_thread(ISPortThread);
 	delete_port(EventLooperPort);
@@ -1017,8 +1014,15 @@ InputServer::HandleNodeMonitor(BMessage *message)
 status_t 
 InputServer::EnqueueDeviceMessage(BMessage *message)
 {
-	//return (write_port(fEventPort, (int32)message, NULL, 0));
-	return (write_port(EventLooperPort, (int32)message, NULL, 0));
+	CALLED();
+	
+	status_t  	err;
+	
+	ssize_t length = message->FlattenedSize();
+	char buffer[length];
+	if ((err = message->Flatten(buffer,length)) < B_OK)
+		return err;
+	return write_port(EventLooperPort, 0, buffer, length);
 }
 
 
@@ -1027,9 +1031,17 @@ InputServer::EnqueueDeviceMessage(BMessage *message)
  *   Descr: 
  */
 status_t
-InputServer::EnqueueMethodMessage(BMessage *)
+InputServer::EnqueueMethodMessage(BMessage *message)
 {
-	return 0;
+	CALLED();
+	
+	status_t  	err;
+	
+	ssize_t length = message->FlattenedSize();
+	char buffer[length];
+	if ((err = message->Flatten(buffer,length)) < B_OK)
+		return err;
+	return write_port(EventLooperPort, 0, buffer, length);
 }
 
 
@@ -1037,7 +1049,8 @@ InputServer::EnqueueMethodMessage(BMessage *)
  *  Method: InputServer::UnlockMethodQueue()
  *   Descr: 
  */
-status_t InputServer::UnlockMethodQueue(void)
+status_t 
+InputServer::UnlockMethodQueue(void)
 {
 	return 0;
 }
@@ -1047,7 +1060,8 @@ status_t InputServer::UnlockMethodQueue(void)
  *  Method: InputServer::LockMethodQueue()
  *   Descr: 
  */
-status_t InputServer::LockMethodQueue(void)
+status_t 
+InputServer::LockMethodQueue(void)
 {
 	return 0;
 }
@@ -1080,7 +1094,8 @@ InputServer::SetActiveMethod(_BMethodAddOn_ *)
  *  Method: InputServer::MethodReplicant()
  *   Descr: 
  */
-const BMessenger* InputServer::MethodReplicant(void)
+const BMessenger* 
+InputServer::MethodReplicant(void)
 {
 	return NULL;
 }
@@ -1109,7 +1124,8 @@ InputServer::EventLoop(void *)
  *  Method: InputServer::EventLoopRunning()
  *   Descr: 
  */
-bool InputServer::EventLoopRunning(void)
+bool 
+InputServer::EventLoopRunning(void)
 {
 	return true;
 }
@@ -1122,16 +1138,30 @@ bool InputServer::EventLoopRunning(void)
 bool
 InputServer::DispatchEvents(BList *eventList)
 {
-	BMessage *event;
+	CALLED();
 	
-	for ( int32 i = 0; NULL != (event = (BMessage *)eventList->ItemAt(i)); i++ ) {
-		// now we must send each event to the app_server
-		DispatchEvent(event);
+	CacheEvents(eventList);
+
+	if (fEventsCache.CountItems()>50) {
+
+		BMessage *event;
+		
+		for ( int32 i = 0; NULL != (event = (BMessage *)fEventsCache.ItemAt(i)); i++ ) {
+			// now we must send each event to the app_server
+			DispatchEvent(event);
+			
+			delete event;
+		}
+		
+		fEventsCache.MakeEmpty();
+		
 	}
 	return true;
 }// end DispatchEvents()
 
-int InputServer::DispatchEvent(BMessage *message)
+
+int 
+InputServer::DispatchEvent(BMessage *message)
 {
 	CALLED();
 	
@@ -1348,8 +1378,16 @@ int InputServer::DispatchEvent(BMessage *message)
  *  Method: InputServer::CacheEvents()
  *   Descr: 
  */
-bool InputServer::CacheEvents(BList *)
+bool 
+InputServer::CacheEvents(BList *eventsToCache)
 {
+	CALLED();
+	
+	FilterEvents(eventsToCache);
+
+	fEventsCache.AddList(eventsToCache);
+	eventsToCache->MakeEmpty();
+
 	return true;
 }
 
@@ -1358,7 +1396,8 @@ bool InputServer::CacheEvents(BList *)
  *  Method: InputServer::GetNextEvents()
  *   Descr: 
  */
-const BList* InputServer::GetNextEvents(BList *)
+const BList* 
+InputServer::GetNextEvents(BList *)
 {
 	return NULL;
 }
@@ -1375,6 +1414,8 @@ const BList* InputServer::GetNextEvents(BList *)
 bool
 InputServer::FilterEvents(BList *eventsToFilter)
 {
+	CALLED();
+	
 	if (NULL == eventsToFilter)
 		return false;
 	
@@ -1383,21 +1424,19 @@ InputServer::FilterEvents(BList *eventsToFilter)
 	int32               filter_index  = 0;
 	int32               event_index   = 0;
 
-	while (NULL != (current_filter = (BInputServerFilter*)mInputServerFilterList.ItemAt(filter_index) ) )
-	{
+	while (NULL != (current_filter = (BInputServerFilter*)gInputFilterList.ItemAt(filter_index) ) ) {
 		// Apply the current filter to all available event messages.
 		//		
-		while (NULL != (current_event = (BMessage*)eventsToFilter->ItemAt(event_index) ) )
-		{
+		while (NULL != (current_event = (BMessage*)eventsToFilter->ItemAt(event_index) ) ) {
 			// Storage for new event messages generated by the filter.
 			//
 			BList out_list;
 			
 			// Apply the current filter to the current event message.
 			//
+			PRINT(("InputServer::FilterEvents Filter called\n"));
 			filter_result result = current_filter->Filter(current_event, &out_list);
-			if (B_DISPATCH_MESSAGE == result)
-			{
+			if (B_DISPATCH_MESSAGE == result) {
 				// Use the result in current_message; ignore out_list.
 				//
 				event_index++;
@@ -1406,12 +1445,8 @@ InputServer::FilterEvents(BList *eventsToFilter)
 				//
 				void *out_item; 
 				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-				{
 					delete out_item;
-				}
-			}
-			else if (B_SKIP_MESSAGE == result)
-			{
+			} else if (B_SKIP_MESSAGE == result) {
 				// Use the result in out_list (if any); ignore current message.
 				//
 				eventsToFilter->RemoveItem(event_index);
@@ -1419,16 +1454,12 @@ InputServer::FilterEvents(BList *eventsToFilter)
 				event_index += out_list.CountItems();
 				
 				// NOTE: eventsToFilter now owns out_list's items.
-			}
-			else
-			{
+			} else {
 				// Error - Free resources associated with items in out_list and return.
 				//
-				void* out_item;
+				 void* out_item;
 				for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
-				{
 					delete out_item;
-				}
 				return false;
 			}
 			
@@ -1450,7 +1481,8 @@ InputServer::FilterEvents(BList *eventsToFilter)
  *  Method: InputServer::SanitizeEvents()
  *   Descr: 
  */
-bool InputServer::SanitizeEvents(BList *)
+bool 
+InputServer::SanitizeEvents(BList *)
 {
 	return true;
 }
@@ -1460,9 +1492,12 @@ bool InputServer::SanitizeEvents(BList *)
  *  Method: InputServer::MethodizeEvents()
  *   Descr: 
  */
-bool InputServer::MethodizeEvents(BList *,
+bool 
+InputServer::MethodizeEvents(BList *,
                              bool)
 {
+	CALLED();
+	
 	return true;
 }
 
@@ -1471,7 +1506,8 @@ bool InputServer::MethodizeEvents(BList *,
  *  Method: InputServer::StartStopDevices()
  *   Descr: 
  */
-status_t InputServer::StartStopDevices(const char*       deviceName,
+status_t 
+InputServer::StartStopDevices(const char*       deviceName,
                                        input_device_type deviceType,
                                        bool              doStart)
 {
@@ -1480,21 +1516,60 @@ status_t InputServer::StartStopDevices(const char*       deviceName,
 	{
 		PRINT(("Device #%d\n", i));
 		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
-		if (NULL != item)
+		if (NULL == item)
+			continue;
+			
+		BInputServerDevice* isd = item->mIsd;
+		input_device_ref   dev = item->mDev;
+		
+		PRINT(("Hey\n"));
+		
+		if (NULL != isd)
+			continue;
+			
+		if (deviceType == dev.type) {
+			if (doStart) {
+				PRINT(("  Starting: %s\n", dev.name));
+				isd->Start(dev.name, dev.cookie);
+				item->mStarted = true;
+			} else {
+				PRINT(("  Stopping: %s\n", dev.name));
+				isd->Stop(dev.name, dev.cookie);
+				item->mStarted = false;
+			}
+		}
+	}
+	EXIT();
+	
+	return B_OK;
+}
+
+
+/*
+ *  Method: InputServer::StartStopDevices()
+ *   Descr: 
+ */
+status_t 
+InputServer::StartStopDevices(BInputServerDevice *isd,
+                                       bool              doStart)
+{
+	CALLED();
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
+	{
+		PRINT(("%s Device #%d\n", __PRETTY_FUNCTION__, i));
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (NULL != item && isd == item->mIsd)
 		{
-			BInputServerDevice* isd = item->mIsd;
 			input_device_ref   dev = item->mDev;
-			PRINT(("Hey\n"));
-			if ( (NULL != isd) )
-			{
-				PRINT(("  Starting/stopping: %s\n", dev.name));
-				if (deviceType == dev.type)
-				{
-					if (doStart) 
-						isd->Start(dev.name, dev.cookie);
-					else
-						isd->Stop(dev.name, dev.cookie);
-				}
+			
+			if (doStart) {
+				PRINT(("  Starting: %s\n", dev.name));
+				isd->Start(dev.name, dev.cookie);
+				item->mStarted = true;
+			} else {
+				PRINT(("  Stopping: %s\n", dev.name));
+				isd->Stop(dev.name, dev.cookie);
+				item->mStarted = false;
 			}
 		}
 	}
@@ -1508,7 +1583,8 @@ status_t InputServer::StartStopDevices(const char*       deviceName,
  *  Method: InputServer::ControlDevices()
  *   Descr: 
  */
-status_t InputServer::ControlDevices(const char* deviceName,
+status_t 
+InputServer::ControlDevices(const char* deviceName,
                             input_device_type    deviceType,
                             unsigned long        command,
                             BMessage*            message)
@@ -1517,7 +1593,7 @@ status_t InputServer::ControlDevices(const char* deviceName,
 	
 	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
 	{
-		PRINT(("ControlDevice #%d\n", i));
+		PRINT(("%s Device #%d\n", __PRETTY_FUNCTION__, i));
 		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
 		if (NULL != item)
 		{
@@ -1546,7 +1622,8 @@ status_t InputServer::ControlDevices(const char* deviceName,
  *  Method: InputServer::DoMouseAcceleration()
  *   Descr: 
  */
-bool InputServer::DoMouseAcceleration(long *,
+bool 
+InputServer::DoMouseAcceleration(long *,
                                  long *)
 {
 	return true;
@@ -1557,7 +1634,8 @@ bool InputServer::DoMouseAcceleration(long *,
  *  Method: InputServer::SetMousePos()
  *   Descr: 
  */
-bool InputServer::SetMousePos(long *,
+bool 
+InputServer::SetMousePos(long *,
                          long *,
                          long,
                          long)
@@ -1570,7 +1648,8 @@ bool InputServer::SetMousePos(long *,
  *  Method: InputServer::SetMousePos()
  *   Descr: 
  */
-bool InputServer::SetMousePos(long *,
+bool 
+InputServer::SetMousePos(long *,
                          long *,
                          BPoint)
 {
@@ -1582,7 +1661,8 @@ bool InputServer::SetMousePos(long *,
  *  Method: InputServer::SetMousePos()
  *   Descr: 
  */
-bool InputServer::SetMousePos(long *,
+bool 
+InputServer::SetMousePos(long *,
                          long *,
                          float,
                          float)
@@ -1595,61 +1675,62 @@ bool InputServer::SetMousePos(long *,
  *  Method: InputServer::SafeMode()
  *   Descr: 
  */
-bool InputServer::SafeMode(void)
+bool
+InputServer::SafeMode(void)
 {
 	return true;
 }
 
-int32 InputServer::ISPortWatcher(void *arg)
+
+int32 
+InputServer::ISPortWatcher(void *arg)
 {
 	InputServer *self = (InputServer*)arg;
 	self->WatchPort();
-	return (B_NO_ERROR);
+	return B_NO_ERROR;
 }
 
-void InputServer::WatchPort()
-{
-	int32     	code;
-	ssize_t    	length;
-	char		*buffer;
-	status_t  	err;
 
+void 
+InputServer::WatchPort()
+{
+	
 	while (true) { 
 		// Block until we find the size of the next message
-		length = port_buffer_size(EventLooperPort);
-		buffer = (char*)malloc(length);
+		ssize_t    	length = port_buffer_size(EventLooperPort);
 		PRINT(("[Event Looper] BMessage Size = %lu\n", length));
-		//event = NULL;
-		BMessage *event = new BMessage();
-		err = read_port(EventLooperPort, &code, buffer, length);
+		
+		int32     	code;
+		char buffer[length];
+		
+		status_t err = read_port(EventLooperPort, &code, buffer, length);
 		if(err != length) {
 			if(err >= 0) {
-				printf("InputServer: failed to read full packet (read %lu of %lu)\n",err,length);
+				printf("InputServer: failed to read full packet (read %lu of %lu)\n", err, length);
 			} else {
-				printf("InputServer: read_port error: (0x%lx) %s\n",err,strerror(err));
+				printf("InputServer: read_port error: (0x%lx) %s\n", err, strerror(err));
 			}
-		} else {
-		
-			if ((err = event->Unflatten(buffer)) < 0) {
-				printf("[InputServer] Unflatten() error: (0x%lx) %s\n",err,strerror(err));
-			} else {
-				// This is where the message should be processed.	
-				PRINT_OBJECT(*event);
-	
-				HandleSetMousePosition(event, event);
-							
-				DispatchEvent(event);
-				
-				PRINT(("Event writen to port\n"));
-				delete(event);
-			}
-			
+			continue;
 		}
-		free(buffer);
-		if(event!=NULL) {
-			//delete(event);
-			event = NULL;  
-		} 
+		
+		BMessage *event = new BMessage;
+	
+		if ((err = event->Unflatten(buffer)) < 0) {
+			printf("[InputServer] Unflatten() error: (0x%lx) %s\n", err, strerror(err));
+			delete event;
+		} else {
+			// This is where the message should be processed.	
+			//PRINT_OBJECT(*event);
+
+			HandleSetMousePosition(event, event);
+						
+			//DispatchEvent(&event);
+			BList list;
+			list.AddItem(event);
+			DispatchEvents(&list);
+			
+			PRINT(("Event written to port\n"));
+		}
 	}
 
 }

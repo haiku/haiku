@@ -30,6 +30,7 @@ class AddOnManager {
 		status_t	RegisterAddOn(BEntry &entry);
 		status_t	UnregisterAddOn(BEntry &entry);
 		void		RegisterAddOns();
+		void		UnregisterAddOns();
 
 		void		RegisterDevice(BInputServerDevice *isd, const entry_ref &ref, image_id addon_image);
 		void		RegisterFilter(BInputServerFilter *isf, const entry_ref &ref, image_id addon_image);
