@@ -6,20 +6,29 @@
 #ifndef DISK_DEVICE_LIST_H
 #define DISK_DEVICE_LIST_H
 
-#include <Locker.h>
+#include <Messenger.h>
 #include <ObjectList.h>
+
+#include "MessageHandler.h"
+#include "RVolumeList.h"
 
 class BDirectory;
 class BEntry;
+class BLocker;
 
 class RDiskDevice;
 class RPartition;
 class RSession;
 
-class RDiskDeviceList {
+class RDiskDeviceList : public MessageHandler, public RVolumeListListener {
 public:
-	RDiskDeviceList();
+	RDiskDeviceList(BMessenger target, BLocker &lock, RVolumeList &volumeList);
 	~RDiskDeviceList();
+
+	virtual void HandleMessage(BMessage *message);
+
+	void RDiskDeviceList::VolumeMounted(const RVolume *volume);
+	void RDiskDeviceList::VolumeUnmounted(const RVolume *volume);
 
 	bool AddDevice(RDiskDevice *device);
 	bool RemoveDevice(int32 index);
@@ -59,7 +68,9 @@ private:
 	status_t _ScanDevice(const char *path);
 
 private:
-	BLocker						fLock;
+	mutable BLocker				&fLock;
+	BMessenger					fTarget;
+	RVolumeList					&fVolumeList;
 	BObjectList<RDiskDevice>	fDevices;		// sorted by ID
 	BObjectList<RSession>		fSessions;		//
 	BObjectList<RPartition>		fPartitions;	//

@@ -14,7 +14,7 @@
 #include <Directory.h>
 #include <Drivers.h>
 #include <Entry.h>
-//#include <ObjectLocker.h>
+#include <Locker.h>
 #include <Path.h>
 
 #include "RDiskDeviceList.h"
@@ -72,17 +72,51 @@ private:
 };
 
 // constructor
-RDiskDeviceList::RDiskDeviceList()
-	: fLock(),
+RDiskDeviceList::RDiskDeviceList(BMessenger target, BLocker &lock,
+								 RVolumeList &volumeList)
+	: MessageHandler(),
+	  RVolumeListListener(),
+	  fLock(lock),
+	  fTarget(target),
+	  fVolumeList(volumeList),
 	  fDevices(20, true),
 	  fSessions(40, false),
 	  fPartitions(80, false)
 {
+	fVolumeList.SetListener(this);
 }
 
 // destructor
 RDiskDeviceList::~RDiskDeviceList()
 {
+}
+
+// HandleMessage
+void
+RDiskDeviceList::HandleMessage(BMessage *message)
+{
+	if (Lock()) {
+		switch (message->what) {
+			default:
+				MessageHandler::HandleMessage(message);
+				break;
+		}
+		Unlock();
+	}
+}
+
+// VolumeMounted
+void
+RDiskDeviceList::VolumeMounted(const RVolume *volume)
+{
+	PRINT(("RDiskDeviceList::VolumeMounted(%ld)\n", volume->ID()));
+}
+
+// VolumeUnmounted
+void
+RDiskDeviceList::VolumeUnmounted(const RVolume *volume)
+{
+	PRINT(("RDiskDeviceList::VolumeUnmounted(%ld)\n", volume->ID()));
 }
 
 // AddDevice

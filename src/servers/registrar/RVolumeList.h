@@ -6,10 +6,14 @@
 #ifndef VOLUME_LIST_H
 #define VOLUME_LIST_H
 
-#include <Handler.h>
+#include <Messenger.h>
 #include <Node.h>
 #include <ObjectList.h>
 #include <VolumeRoster.h>
+
+#include "MessageHandler.h"
+
+class BLocker;
 
 // RVolume
 class RVolume {
@@ -32,14 +36,23 @@ private:
 	char	fDevicePath[B_FILE_NAME_LENGTH];
 };
 
-// RVolumeList
-class RVolumeList : public BHandler {
+// RVolumeListListener
+class RVolumeListListener {
 public:
-	RVolumeList();
+	RVolumeListListener();
+	virtual ~RVolumeListListener();
+
+	virtual void VolumeMounted(const RVolume *volume);
+	virtual void VolumeUnmounted(const RVolume *volume);
+};
+
+// RVolumeList
+class RVolumeList : public MessageHandler {
+public:
+	RVolumeList(BMessenger target, BLocker &lock);
 	virtual ~RVolumeList();
 
-	virtual void MessageReceived(BMessage *message);
-	virtual void SetNextHandler(BHandler *handler);
+	virtual void HandleMessage(BMessage *message);
 
 	status_t Rescan();
 
@@ -48,16 +61,21 @@ public:
 	bool Lock();
 	void Unlock();
 
+	void SetListener(RVolumeListListener *listener);
+
 	void Dump() const;
 
 private:
-	void _AddVolume(dev_t id);
+	RVolume *_AddVolume(dev_t id);
 	void _DeviceMounted(BMessage *message);
 	void _DeviceUnmounted(BMessage *message);
 
 private:
+	mutable BLocker			&fLock;
+	BMessenger				fTarget;
 	BObjectList<RVolume>	fVolumes;
 	BVolumeRoster			fRoster;
+	RVolumeListListener		*fListener;
 };
 
 #endif	// VOLUME_LIST_H

@@ -5,6 +5,7 @@
 
 #include <string.h>
 
+#include <Locker.h>
 #include <Message.h>
 #include <NodeMonitor.h>
 #include <Volume.h>
@@ -79,66 +80,84 @@ RVolume::Unset()
 }
 
 
+// RVolumeListListener
+
+// constructor
+RVolumeListListener::RVolumeListListener()
+{
+}
+
+// destructor
+RVolumeListListener::~RVolumeListListener()
+{
+}
+
+// VolumeMounted
+void
+RVolumeListListener::VolumeMounted(const RVolume *volume)
+{
+}
+
+// VolumeUnmounted
+void
+RVolumeListListener::VolumeUnmounted(const RVolume *volume)
+{
+}
+
+
 // RVolumeList
 
 // constructor
-RVolumeList::RVolumeList()
-	: BHandler(),
+RVolumeList::RVolumeList(BMessenger target, BLocker &lock)
+	: MessageHandler(),
+	  fLock(lock),
+	  fTarget(target),
 	  fVolumes(20, true),
-	  fRoster()
+	  fRoster(),
+	  fListener(NULL)
 {
+// TODO: Remove work-around. At this time R5 libbe's watching functions don't
+// work for us. We have an own implementation in `NodeMonitoring.cpp'.
+//		fRoster.StartWatching(BMessenger(this));
+		watch_node(NULL, B_WATCH_MOUNT, fTarget);
+		Rescan();
 }
 
 // destructor
 RVolumeList::~RVolumeList()
 {
-}
-
-// MessageReceived
-void
-RVolumeList::MessageReceived(BMessage *message)
-{
-	switch (message->what) {
-		case B_NODE_MONITOR:
-		{
-			int32 opcode = 0;
-			if (message->FindInt32("opcode", &opcode) == B_OK) {
-				switch (opcode) {
-					case B_DEVICE_MOUNTED:
-						_DeviceMounted(message);
-						break;
-					case B_DEVICE_UNMOUNTED:
-						_DeviceUnmounted(message);
-						break;
-				}
-			}
-			break;
-		}
-		default:
-			BHandler::MessageReceived(message);
-			break;
-	}
-}
-
-// SetNextHandler
-void
-RVolumeList::SetNextHandler(BHandler *handler)
-{
-	// stop watching volumes, if removed from looper
-	if (!handler) {
 // TODO: Remove work-around. At this time R5 libbe's watching functions don't
 // work for us. We have an own implementation in `NodeMonitoring.cpp'.
 //		fRoster.StopWatching();
-		stop_watching(BMessenger(this));
-	}
-	BHandler::SetNextHandler(handler);
-	// start watching volumes and rescan list, if added to looper
-	if (handler) {
-// TODO: Remove work-around. At this time R5 libbe's watching functions don't
-// work for us. We have an own implementation in `NodeMonitoring.cpp'.
-//		fRoster.StartWatching(BMessenger(this));
-		watch_node(NULL, B_WATCH_MOUNT, BMessenger(this));
-		Rescan();
+		stop_watching(fTarget);
+}
+
+// HandleMessage
+void
+RVolumeList::HandleMessage(BMessage *message)
+{
+	if (Lock()) {
+		switch (message->what) {
+			case B_NODE_MONITOR:
+			{
+				int32 opcode = 0;
+				if (message->FindInt32("opcode", &opcode) == B_OK) {
+					switch (opcode) {
+						case B_DEVICE_MOUNTED:
+							_DeviceMounted(message);
+							break;
+						case B_DEVICE_UNMOUNTED:
+							_DeviceUnmounted(message);
+							break;
+					}
+				}
+				break;
+			}
+			default:
+				MessageHandler::HandleMessage(message);
+				break;
+		}
+		Unlock();
 	}
 }
 
@@ -158,23 +177,37 @@ RVolumeList::Rescan()
 const RVolume *
 RVolumeList::VolumeForDevicePath(const char *devicePath) const
 {
-// TODO: ...
-	return NULL;
+	const RVolume *volume = NULL;
+	if (devicePath && fLock.Lock()) {
+		bool found = false;
+		int32 index = fVolumes.FindBinaryInsertionIndex(
+			CompareDevicePathPredicate(devicePath), &found);
+		if (found)
+			volume = fVolumes.ItemAt(index);
+		fLock.Unlock();
+	}
+	return volume;
 }
 
 // Lock
 bool
 RVolumeList::Lock()
 {
-// TODO: ...
-	return false;
+	return fLock.Lock();
 }
 
 // Unlock
 void
 RVolumeList::Unlock()
 {
-// TODO: ...
+	fLock.Unlock();
+}
+
+// SetListener
+void
+RVolumeList::SetListener(RVolumeListListener *listener)
+{
+	fListener = listener;
 }
 
 // Dump
@@ -189,21 +222,24 @@ RVolumeList::Dump() const
 }
 
 // _AddVolume
-void
+RVolume *
 RVolumeList::_AddVolume(dev_t id)
 {
-	if (RVolume *volume = new RVolume) {
+	RVolume *volume = new RVolume;
+	if (volume) {
 		status_t error = volume->SetTo(id);
 		if (error == B_OK) {
 			fVolumes.BinaryInsert(volume,
 				CompareDevicePathPredicate(volume->DevicePath()));
 		} else {
 			delete volume;
+			volume = NULL;
 			PRINT(("RVolumeList::_AddVolume(): initializing RVolume failed: "
 				   "%s\n", strerror(error)));
 		}
 	} else
 		PRINT(("RVolumeList::_AddVolume(): no memory!\n"));
+	return volume;
 }
 
 // _DeviceMounted
@@ -213,7 +249,10 @@ RVolumeList::_DeviceMounted(BMessage *message)
 	dev_t device;
 	if (message->FindInt32("new device", &device) == B_OK) {
 		PRINT(("RVolumeList::_DeviceMounted(%ld)\n", device));
-		_AddVolume(device);
+		if (RVolume *volume = _AddVolume(device)) {
+			if (fListener)
+				fListener->VolumeMounted(volume);
+		}
 	}
 }
 
@@ -224,8 +263,12 @@ RVolumeList::_DeviceUnmounted(BMessage *message)
 	dev_t device;
 	if (message->FindInt32("device", &device) == B_OK) {
 		PRINT(("RVolumeList::_DeviceUnmounted(%ld)\n", device));
-		if (RVolume *volume = fVolumes.FindIf(CompareIDPredicate(volume)))
-			fVolumes.RemoveItem(volume);
+		if (RVolume *volume = fVolumes.FindIf(CompareIDPredicate(device))) {
+			fVolumes.RemoveItem(volume, false);
+			if (fListener)
+				fListener->VolumeUnmounted(volume);
+			delete volume;
+		}
 	}
 }
 
