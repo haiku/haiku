@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-9 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.08-10 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -789,31 +789,45 @@ return nv_general_bios_to_powergraphics();
 	return B_OK;
 }
 
-status_t gx50_general_output_select()
+status_t nv_general_output_select(bool cross)
 {
 	/* make sure this call is warranted */
-	if ((si->ps.card_type != NV11) && (si->ps.card_type != NV17)) return B_ERROR;
-
-	/* choose primary analog outputconnector */
-	if ((si->ps.primary_dvi) && (si->ps.secondary_head) && (si->ps.tvout))
+	if (si->ps.secondary_head)
 	{
-		if (i2c_sec_tv_adapter() == B_OK)
+		/* NV11 cards can't switch heads */
+		if (si->ps.card_type != NV11)
 		{
-			LOG(4,("INIT: secondary TV-adapter detected, using primary connector\n"));
-//			DXIW(OUTPUTCONN,0x01); 
+			if (cross)
+			{
+				LOG(4,("INIT: switching outputs to be cross-connected\n"));
+
+				/* enable head 2 on connector 1 */
+				/* (b8 = select head for output,
+				 *  b0 = enable sync signals on output (if generated)) */
+				DACW(OUTPUT, 0x00000101);
+				/* enable head 1 on connector 2 */
+				DAC2W(OUTPUT, 0x00000001);
+			}
+			else
+			{
+				LOG(4,("INIT: switching outputs to be straight-through\n"));
+
+				/* enable head 1 on connector 1 */
+				DACW(OUTPUT, 0x00000001);
+				/* enable head 2 on connector 2 */
+				DAC2W(OUTPUT, 0x00000101);
+			}
 		}
 		else
 		{
-			LOG(4,("INIT: no secondary TV-adapter detected, using secondary connector\n"));
-//			DXIW(OUTPUTCONN,0x04); 
+			LOG(4,("INIT: NV11 outputs are hardwired to be straight-through\n"));
 		}
+		return B_OK;
 	}
 	else
 	{
-		LOG(4,("INIT: using primary connector\n"));
-//		DXIW(OUTPUTCONN,0x01); 
+		return B_ERROR;
 	}
-	return B_OK;
 }
 
 /*connect CRTC1 to the specified DAC*/

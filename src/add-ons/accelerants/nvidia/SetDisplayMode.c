@@ -182,31 +182,26 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		nv_crtc2_set_display_pitch ();
 
 		/*work out where the "right" screen starts*/
-		startadd_right=startadd+(target.timing.h_display * (colour_depth1 >> 3));
+		startadd_right = startadd + (target.timing.h_display * (colour_depth1 >> 3));
 
-		/* set the outputs */
-		switch (si->ps.card_type)
+		/* set the outputs if possible */
+		if (si->ps.secondary_head)
 		{
-		//fixme..
-		case G550:
 			switch (target.flags & DUALHEAD_BITS)
 			{
 			case DUALHEAD_ON:
 			case DUALHEAD_CLONE:
-				//fixme: set output connectors only
-				nv_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
+				/* connect outputs straight-through */
+				nv_general_output_select(false);
 				break;
 			case DUALHEAD_SWITCH:
-				//fixme: set output connectors only
-				nv_general_dac_select(DS_CRTC1MAVEN_CRTC2DAC);
+				/* cross-connect outputs */
+				nv_general_output_select(true);
 				break;
 			}
-			break;
-		default:
-			break;
 		}
 
-		/*Tell card what memory to display*/
+		/* Tell card what memory to display */
 		switch (target.flags & DUALHEAD_BITS)
 		{
 		case DUALHEAD_ON:
@@ -262,22 +257,11 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 		/* tell the card what memory to display */
 		nv_crtc_set_display_start(startadd,colour_depth1);
 
-		/* enable primary analog output */
-		switch (si->ps.card_type)
-		{
-		case NV11:
-//			nv_general_dac_select(DS_CRTC1DAC_CRTC2MAVEN);
-			break;
-		case NV17: 
-//			nv_general_dac_select(DS_CRTC1CON1_CRTC2CON2);
-//			gx50_general_output_select();
-			break;
-		default:
-			break;
-		}
-		
 		/* set the timing */
 		nv_crtc_set_timing(target);
+
+		/* connect outputs straight-through */
+		if (si->ps.secondary_head) nv_general_output_select(false);
 
 		//fixme: shut-off the videoPLL if it exists...
 	}

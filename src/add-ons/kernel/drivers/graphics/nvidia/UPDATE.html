@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.08-9, Rudolf)</h1></p>
+<p><h1>head (0.08-10, Rudolf)</h1></p>
 <ul>
 	<li>Fixed GeForceFX 5600 and FX 5700 monitor 'refresh out of range' / shutoff fault. nVidia changed the pixelPLL for the NV31 and NV36;
 	<li>Fixed acceleration engine restrictions code to adhere to GeForceFX 5600 restrictions: those are still NV20 style for this card;
@@ -16,11 +16,12 @@
 	<li>Added card recognition for GeForceFX 5700, FX 5950 and some other (older) cards;
 	<li>Added 256Mb RAM detection;
 	<li>Improved startup code: this should (could) fix random trouble on some cards like for instance hardcursor trouble on especially laptops; 
-	<li>Added dualhead support (use Mark Watson's 'G400 Dualhead Setup' from BeBits for now): Note that dualhead switch mode still has to be setup;
+	<li>Added dualhead support (use Mark Watson's 'G400 Dualhead Setup' from BeBits for now);
 	<li>Updated mode granularity and max virtual size checking/limiting to adhere to new CRTC setup for dualhead cards;
 	<li>Added dualhead support for 8- and 15bit colordepths;
 	<li>Fixed move_display distortions in virtualscreens especially visible in 8-bit colordepth (for both heads);
-	<li>Added 'overlay follows head' for dualhead stretch and switch modes: if more than half the overlay output is on a screen, that screen gets the overlay output.
+	<li>Added 'overlay follows head' for dualhead stretch and switch modes: if more than half the overlay output window is on a screen, that screen gets the overlay output;
+	<li>Added dualhead switch mode.
 </ul>
 <p><h1>nv_driver 0.07 (Rudolf)</h1></p>
 <ul>
