@@ -8,7 +8,7 @@
 
 #include "nv_std.h"
 
-status_t test_ram(void);
+static status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
 static status_t nv_general_bios_to_powergraphics(void);
 
@@ -603,7 +603,7 @@ status_t nv_general_powerup()
 	return status;
 }
 
-status_t test_ram()
+static status_t test_ram()
 {
 	uint32 value, offset;
 	status_t result = B_OK;

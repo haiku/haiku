@@ -456,24 +456,42 @@ status_t create_mode_list(void)
 		/* add flatpanel 1 native mode if it's found and when it's time */
 		if (pan1 && !pan1_added)
 		{
-			/* place panel mode before same H-res mode from src list in dst list so
-			 * widescreen panels are listed in order of total resolution (HxV) */
-			if (src->timing.h_display >= p1.timing.h_display)
+			/* only add modelines we don't already have (panels use VESA modelines) */
+			if ((src->timing.h_display == p1.timing.h_display) &&
+				(src->timing.v_display == p1.timing.v_display))
 			{
-				add_panel1_mode(p1, &dst);
 				pan1_added = true;
+			}
+			else
+			{
+				/* place panel mode before same H-res mode from src list in dst list so
+				 * widescreen panels are listed in order of total resolution (HxV) */
+				if (src->timing.h_display >= p1.timing.h_display)
+				{
+					add_panel1_mode(p1, &dst);
+					pan1_added = true;
+				}
 			}
 		}
 
 		/* add flatpanel 2 native mode if it's found and when it's time */
 		if (pan2 && !pan2_added)
 		{
-			/* place panel mode before same H-res mode from src list in dst list so
-			 * widescreen panels are listed in order of total resolution (HxV) */
-			if (src->timing.h_display >= p2.timing.h_display)
+			/* only add modelines we don't already have (panels use VESA modelines) */
+			if ((src->timing.h_display == p2.timing.h_display) &&
+				(src->timing.v_display == p2.timing.v_display))
 			{
-				add_panel2_mode(p2, &dst);
 				pan2_added = true;
+			}
+			else
+			{
+				/* place panel mode before same H-res mode from src list in dst list so
+				 * widescreen panels are listed in order of total resolution (HxV) */
+				if (src->timing.h_display >= p2.timing.h_display)
+				{
+					add_panel2_mode(p2, &dst);
+					pan2_added = true;
+				}
 			}
 		}
 
@@ -510,26 +528,23 @@ status_t create_mode_list(void)
 
 		/* advance to next mode */
 		src++;
+	}
 
-		/* (sort and) add flatpanel native mode(s) that are not added while we did
-		 * reach the end of the src list */
-		if (i == (MODE_COUNT - 1))
+	/* (sort and) add flatpanel native mode(s) that are not added while we did
+	 * reach the end of the src list */
+	if (pan1 && pan2 && !pan1_added && !pan2_added)
+	{
+		/* sort in total resolution order */
+		if ((p2.timing.h_display * p2.timing.v_display) <
+			(p1.timing.h_display * p1.timing.v_display))
 		{
-			if (pan1 && pan2 && !pan1_added && !pan2_added)
-			{
-				/* sort in total resolution order */
-				if ((p2.timing.h_display * p2.timing.v_display) <
-					(p1.timing.h_display * p1.timing.v_display))
-				{
-					display_mode temp = p1;
-					p1 = p2;
-					p2 = temp;
-				}
-			}
-			if (pan1 && !pan1_added) add_panel1_mode(p1, &dst);
-			if (pan2 && !pan2_added) add_panel2_mode(p2, &dst);
+			display_mode temp = p1;
+			p1 = p2;
+			p2 = temp;
 		}
 	}
+	if (pan1 && !pan1_added) add_panel1_mode(p1, &dst);
+	if (pan2 && !pan2_added) add_panel2_mode(p2, &dst);
 
 	return B_OK;
 }
