@@ -46,7 +46,7 @@ class areaManager // One of these per process
 		status_t munmap(void *addr,size_t len);
 
 		// Mutators
-		area *findArea(void *address);
+		area *findArea(const void *address);
 		area *findAreaLock(void *address);
 		area *findArea(char *address);
 		area *findArea(area_id id);
@@ -90,6 +90,9 @@ class areaManager // One of these per process
 		}
 		void lock() { acquire_sem(myLock); }
 		void unlock() {release_sem(myLock);}
+		long get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries);
+		long lock_memory(void *address, ulong numBytes, ulong flags);
+		long unlock_memory(void *address, ulong numBytes, ulong flags);
 		
 		// External methods for "server" type calls
 		bool fault(void *fault_address, bool writeError); // true = OK, false = panic.

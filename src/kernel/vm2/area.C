@@ -165,7 +165,7 @@ status_t area::getInfo(area_info *dest) {
 	return B_OK;
 	}
 
-bool area::contains(void *address) {
+bool area::contains(const void *address) {
 	unsigned long base=(unsigned long)(address); 
 //	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
 					
@@ -292,3 +292,46 @@ void area::dump(void) {
 		}
 	}
 
+long area::get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries) {
+	unsigned long vbase=(unsigned long)address;
+	long prevMem=0,tableEntry=-1;
+	// Cycle over each "page to find"; 
+	for (int byteOffset=0;byteOffset<=numBytes;byteOffset+=PAGE_SIZE) {
+		vpage search(vbase+byteOffset);
+		vpage *found=reinterpret_cast<vpage *>(vpages.find(&search));
+		if (!found) return B_ERROR;
+		unsigned long mem=found->getPhysPage()->getAddress();
+		if (mem!=prevMem+PAGE_SIZE) {
+			if (++tableEntry==numEntries)
+				return B_ERROR; // Ran out of places to fill in
+			prevMem=mem;
+			table[tableEntry].address=(void *)mem;
+			}
+		table[tableEntry].size+=PAGE_SIZE;
+		}
+	if (++tableEntry==numEntries)
+		return B_ERROR; // Ran out of places to fill in
+	table[tableEntry].size=0;
+}
+
+long area::lock_memory(void *address, ulong numBytes, ulong flags) {
+	unsigned long vbase=(unsigned long)address;
+	for (int byteOffset=0;byteOffset<=numBytes;byteOffset+=PAGE_SIZE) {
+		vpage search(vbase+byteOffset);
+		vpage *found=reinterpret_cast<vpage *>(vpages.find(&search));
+		if (!found) return B_ERROR;
+		if (!found->lock(flags)) return B_ERROR;
+		}
+	return B_OK;
+	}
+
+long area::unlock_memory(void *address, ulong numBytes, ulong flags) {
+	unsigned long vbase=(unsigned long)address;
+	for (int byteOffset=0;byteOffset<=numBytes;byteOffset+=PAGE_SIZE) {
+		vpage search(vbase+byteOffset);
+		vpage *found=reinterpret_cast<vpage *>(vpages.find(&search));
+		if (!found) return B_ERROR;
+		found->unlock(flags);
+		}
+	return B_OK;
+	}

@@ -83,7 +83,7 @@ area *areaManager::findArea(char *address) {
 }
 
 // Loops over our areas looking for the one whose virtual address matches the passed in address
-area *areaManager::findArea(void *address) {
+area *areaManager::findArea(const void *address) {
 	// THIS DOES NOT HAVE LOCKING - all callers must lock.
 //	error ("Finding area by void * address\n");
 	for (struct node *cur=areas.rock;cur;cur=cur->next)
@@ -327,3 +327,38 @@ status_t areaManager::munmap(void *addr,size_t len)
 		unlock();
 		return retVal;
 		}
+
+
+long areaManager::get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries) {
+	long retVal = B_ERROR; // Be pessimistic
+	lock();
+	// First, figure out what area we should be talking about...
+	area *myArea=findArea(address);
+	if (myArea) 
+		retVal =  myArea->get_memory_map(address, numBytes,table,numEntries);
+	unlock();
+	return retVal;
+}
+
+long areaManager::lock_memory(void *address, ulong numBytes, ulong flags) {
+	long retVal = B_ERROR; // Be pessimistic
+	lock();
+	// First, figure out what area we should be talking about...
+	area *myArea=findArea(address);
+	if (myArea) 
+		retVal =  myArea->lock_memory(address, numBytes,flags);
+	unlock();
+	return retVal;
+}
+
+long areaManager::unlock_memory(void *address, ulong numBytes, ulong flags) {
+	long retVal = B_ERROR; // Be pessimistic
+	lock();
+	// First, figure out what area we should be talking about...
+	area *myArea=findArea(address);
+	if (myArea) 
+		retVal =  myArea->unlock_memory(address, numBytes,flags);
+	unlock();
+	return retVal;
+}
+

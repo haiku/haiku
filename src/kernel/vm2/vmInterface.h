@@ -29,6 +29,14 @@ class vmInterface // This is the class that "owns" all of the managers.
 		void cleaner(void);
 		status_t writeCachedBlock(int fd, size_t offset, void *data);
 		status_t readCachedBlock(int fd, size_t offset, void *data);
+
+		// Driver Interface
+		long get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries);
+		long lock_memory(void *address, ulong numBytes, ulong flags);
+		long unlock_memory(void *address, ulong numBytes, ulong flags);
+		area_id map_physical_memory(const char *areaName, void *physAddress, size_t bytes, uint32 spec, uint32 protection, void **vaddress);
+
+
 		char getByte(unsigned long offset) {return getAM()->getByte(offset);} // This is for testing only
 		void setByte(unsigned long offset,char value) {getAM()->setByte(offset,value);} // This is for testing only
 		int getInt(unsigned long offset) {return getAM()->getInt(offset);} // This is for testing only

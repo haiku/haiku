@@ -39,6 +39,9 @@ class area : public node
 		void setAreaID(int id) {areaID=id;}
 		status_t setProtection(protectType prot);
 		status_t resize(size_t newSize);
+		long get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries);
+		long lock_memory(void *address, ulong numBytes, ulong flags);
+		long unlock_memory(void *address, ulong numBytes, ulong flags);
 		
 		// Accessors
 		status_t getInfo(area_info *dest);
@@ -59,7 +62,7 @@ class area : public node
 		// Comparisson with others
 		bool nameMatch(char *matchName) {return (strcmp(matchName,name)==0);}
 		bool couldAdd(unsigned long start,unsigned long end) { return ((end<start_address) || (start>end_address));}
-		bool contains(void *address);
+		bool contains(const void *address);
 		
 		// External methods for "server" type calls
 		void pager(int desperation);

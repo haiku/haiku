@@ -226,3 +226,26 @@ status_t vmInterface::munmap(void *addr, size_t len)
 	retVal = getAM()->munmap(addr,len);
 	return retVal;
 }
+
+// Driver Interface
+long vmInterface::get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries) {
+	getAM()->get_memory_map(address, numBytes,table,numEntries);
+	return B_OK;
+	}
+
+long vmInterface::lock_memory(void *address, ulong numBytes, ulong flags) {
+	return getAM()->lock_memory(address,numBytes,flags);
+}
+
+long vmInterface::unlock_memory(void *address, ulong numBytes, ulong flags) {
+	return getAM()->unlock_memory(address,numBytes,flags);
+}
+
+area_id vmInterface::map_physical_memory(const char *areaName, void *physAddress, size_t bytes, uint32 spec, uint32 protectionIn, void **vaddress) {
+	int pages=(bytes + (PAGE_SIZE) - 1)/PAGE_SIZE;
+	addressSpec as=(addressSpec) spec;
+	protectType pro=(protectType) protectionIn;
+	return getAM()->createArea((char *)areaName, pages, vaddress, as, LAZY, pro);
+
+}
+

@@ -44,4 +44,11 @@ enum pageState {FULL,CONTIGUOUS,LAZY,NO_LOCK,LOMEM};
 #define CACHE_BEGIN 0x90000000
 #define CACHE_END 0xe0000000
 
+#define B_DMA_IO       0x00000001
+#define B_READ_DEVICE  0x00000002  
+
+struct physical_entry  {void *address; 
+		ulong size; 
+		};
+
 #endif

@@ -13,6 +13,7 @@ class vpage : public node
 		protectType protection;
 		bool dirty;
 		bool swappable;
+		bool locked;
 		unsigned long start_address;
 		unsigned long end_address;
 	public:
@@ -27,6 +28,9 @@ class vpage : public node
 		void setProtection(protectType prot);
 		void flush(void); // write page to vnode, if necessary
 		void refresh(void); // Read page back in from vnode
+		bool lock(long flags); // lock this page into memory
+		void unlock(long flags); // unlock this page from memory
+
 
 		// Accessors
 		protectType getProtection(void) {return protection;}

@@ -34,7 +34,7 @@ void vpage::refresh(void) {
 	}
 
 // Simple, empty constructor
-vpage::vpage(void) : physPage(NULL),backingNode(NULL),protection(none),dirty(false),swappable(false),start_address(0),end_address(0) 
+vpage::vpage(void) : physPage(NULL),backingNode(NULL),protection(none),dirty(false),swappable(false),start_address(0),end_address(0), locked(false) 
 {
 }
 
@@ -137,6 +137,23 @@ bool vpage::fault(void *fault_address, bool writeError, int &in_count) {
 	return true;
 	}
 
+bool vpage::lock(long flags) {
+	locked=true;
+	if (!physPage) {
+		physPage=vmBlock->pageMan->getPage();
+		if (!physPage)
+			return false;
+		refresh();
+	}
+	return true;
+}
+
+void vpage::unlock(long flags) {
+	if ((flags & B_DMA_IO) || (!(flags & B_READ_DEVICE)))
+		dirty=true;
+	locked=false;
+}
+
 char vpage::getByte(unsigned long address,areaManager *manager) {
 //	error ("vpage::getByte: address = %ld\n",address );
 	if (!physPage)
@@ -180,10 +197,10 @@ bool vpage::pager(int desperation) {
 	error ("vpage::pager swappable\n");
 	switch (desperation) {
 		case 1: return false; break;
-		case 2: if (!physPage || protection!=readable)  return false;break;
-		case 3: if (!physPage || dirty)  return false;break;
-		case 4: if (!physPage)  return false;break;
-		case 5: if (!physPage)  return false;break;
+		case 2: if (!physPage || protection!=readable || locked)  return false;break;
+		case 3: if (!physPage || dirty || locked)  return false;break;
+		case 4: if (!physPage || locked)  return false;break;
+		case 5: if (!physPage || locked)  return false;break;
 		default: return false;break;
 		}
 	error ("vpage::pager flushing\n");

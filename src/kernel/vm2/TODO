@@ -1,5 +1,6 @@
-1) Change the architecture so that instead of multiple threads of tests, we have multiple apps of tests...
-2) Tests are not done. 
+1) Implement the sharing methodology of mmap (PRIVATE vs SHARED, etc)
+2) Change the architecture so that instead of multiple threads of tests, we have multiple apps of tests...
+3) Tests are not done. 
 	Test:
 		getNextAreaInfo
 		cloneArea
