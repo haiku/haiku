@@ -22,7 +22,6 @@
 #include <syscall_process_info.h>
 #include <tls.h>
 
-#include <sys/resource.h>
 #include <sys/wait.h>
 #include <string.h>
 #include <stdio.h>
@@ -1661,7 +1660,7 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info *info, size_t size)
 	cpu_status state;
 
 	if (size != sizeof(team_usage_info)
-		|| (who != RUSAGE_SELF && who != RUSAGE_CHILDREN))
+		|| (who != B_TEAM_USAGE_SELF && who != B_TEAM_USAGE_CHILDREN))
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
@@ -1678,7 +1677,7 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info *info, size_t size)
 	}
 
 	switch (who) {
-		case RUSAGE_SELF:
+		case B_TEAM_USAGE_SELF:
 		{
 			struct thread *thread = team->thread_list;
 
@@ -1692,7 +1691,7 @@ _get_team_usage_info(team_id id, int32 who, team_usage_info *info, size_t size)
 			break;
 		}
 
-		case RUSAGE_CHILDREN:
+		case B_TEAM_USAGE_CHILDREN:
 		{
 			struct team *child = team->children;
 			for (; child != NULL; child = child->siblings_next) {
