@@ -9,7 +9,7 @@ Addon PCL6\ Compatible : Print :
 	PCL6Entry.cpp
 	PCL6.cpp
 	PCL6Cap.cpp
-	jetlib.cpp
+	PCL6Writer.cpp
 ;
 
 ObjectC++Flags [ FGristFiles jetlib.o ] : -w ;

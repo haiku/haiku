@@ -73,6 +73,7 @@ const PaperSourceCap thridCassette("Thrid Cassette",  false,  JobData::kMiddle);
 const PaperSourceCap manualFeed("Manual Feed",  false,  JobData::kManual);
 const PaperSourceCap multiPurposeTray("Multi Purpose Tray",  false,  JobData::kCassette3);
 
+const ResolutionCap dpi150("150dpi",   true, 150,  150);
 const ResolutionCap dpi300("300dpi",   true, 300,  300);
 const ResolutionCap dpi600("600dpi",  false, 600,  600);
 const ResolutionCap dpi1200("1200dpi", false, 1200, 1200);
@@ -87,7 +88,8 @@ const PaperCap *papers[] = {
 	&b4,
 	&b5,
 	&letter,
-	&legal
+	&legal,
+	&japanese_postcard
 };
 
 const PaperSourceCap *papersources[] = {
@@ -102,6 +104,7 @@ const PaperSourceCap *papersources[] = {
 };
 
 const ResolutionCap *resolutions[] = {
+	&dpi150,
 	&dpi300,
 	&dpi600,
 	&dpi1200,

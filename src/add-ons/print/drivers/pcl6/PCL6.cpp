@@ -34,41 +34,40 @@ using namespace std;
 #define ENABLE_RLE_COMPRESSION       0 
 
 // Delta Row Compression
-#define ENABLE_DELTA_ROW_COMPRESSION 1
+#define ENABLE_DELTA_ROW_COMPRESSION 0
 
 // DeltaRowStreamCompressor writes the delta row directly to the 
 // in the contructor specified stream.
 class DeltaRowStreamCompressor : public AbstractDeltaRowCompressor
 {
 public:
-	DeltaRowStreamCompressor(int rowSize, uchar initialSeed, HP_StreamHandleType stream)
+	DeltaRowStreamCompressor(int rowSize, uchar initialSeed, PCL6Writer *writer)
 		: AbstractDeltaRowCompressor(rowSize, initialSeed)
-		, fStream(stream)
+		, fWriter(writer)
 	{
 		// nothing to do
 	}
 	
 protected:
 	void AppendByteToDeltaRow(uchar byte) {
-		HP_RawUByte(fStream, byte);
+		fWriter->Append(byte);
 	}
 	
 private:
-	HP_StreamHandleType fStream;	
+	PCL6Writer *fWriter;	
 };
 
 PCL6Driver::PCL6Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: GraphicsDriver(msg, printer_data, printer_cap)
 {
 	fHalftone = NULL;
-	fStream = NULL;
+	fWriter = NULL;
 }
 
-void PCL6Driver::FlushOutBuffer(HP_StreamHandleType pStream, unsigned long cookie, HP_pUByte pOutBuffer, HP_SInt32 currentBufferLen) 
+void PCL6Driver::writeData(const uint8 *data, uint32 size)
 {
-	writeSpoolData(pOutBuffer, currentBufferLen);
+	writeSpoolData(data, size);
 }
-
 
 bool PCL6Driver::startDoc()
 {
@@ -252,12 +251,12 @@ bool PCL6Driver::nextBand(BBitmap *bitmap, BPoint *offset)
 void PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int x, int y, int width, int height, int deltaRowSize)
 {
 	// choose the best compression method
-	int compressionMethod = HP_eNoCompression;
+	PCL6Writer::Compression compressionMethod = PCL6Writer::kNoCompression;
 	int dataSize = outSize;
 
 #if ENABLE_DELTA_ROW_COMPRESSION
 	if (deltaRowSize < dataSize) {
-		compressionMethod = HP_eDeltaRowCompression;
+		compressionMethod = PCL6Writer::kDeltaRowCompression;
 		dataSize = deltaRowSize;
 	}
 #endif
@@ -266,7 +265,7 @@ void PCL6Driver::writeBitmap(const uchar* buffer, int outSize, int rowSize, int 
 	HP_UInt32 compressedSize = 0;
 	HP_M2TIFF_CalcCompression((HP_pCharHuge)buffer, outSize, &compressedSize);
 	if (compressedSize < (uint32)dataSize) {
-		compressionMethod = HP_eRLECompression;
+		compressionMethod = PCL6Writer::kRLECompression;
 		dataSize = compressedSize;
 	}
 #endif
@@ -303,29 +302,31 @@ void PCL6Driver::jobStart()
 	                 "Comment Copyright (c) 2003, 2004 Haiku\n",
 	                 getJobData()->getXres());
 	// PCL6 begin
-	fStream = HP_NewStream(16 * 1024, this);
-	HP_BeginSession_2(fStream, getJobData()->getXres(), getJobData()->getYres(), HP_eInch, HP_eBackChAndErrPage);
-	HP_OpenDataSource_1(fStream, HP_eDefaultDataSource, HP_eBinaryLowByteFirst);
-	fMediaSide = HP_eFrontMediaSide;
+	fWriter = new PCL6Writer(this);
+	fWriter->BeginSession(getJobData()->getXres(), getJobData()->getYres(), PCL6Writer::kInch, PCL6Writer::kBackChAndErrPage);
+	fWriter->OpenDataSource();
+	fMediaSide = PCL6Writer::kFrontMediaSide;
 }
 
 bool PCL6Driver::startPage(int)
 {
-	HP_UByte orientation = HP_ePortraitOrientation;
+	PCL6Writer::Orientation orientation = PCL6Writer::kPortrait;
 	if (getJobData()->getOrientation() == JobData::kLandscape) {
-		orientation = HP_eLandscapeOrientation;
+		orientation = PCL6Writer::kLandscape;
 	}
 	
-	HP_UByte mediaSize = PCL6Driver::mediaSize(getJobData()->getPaper());
+	PCL6Writer::MediaSize mediaSize = PCL6Driver::mediaSize(getJobData()->getPaper());
+	PCL6Writer::MediaSource mediaSource = PCL6Driver::mediaSource(getJobData()->getPaperSource());
 	if (getJobData()->getPrintStyle() == JobData::kSimplex) {
-		HP_BeginPage_3(fStream, orientation, mediaSize, PCL6Driver::mediaSource(getJobData()->getPaperSource()));
+		fWriter->BeginPage(orientation, mediaSize, mediaSource);
 	} else if (getJobData()->getPrintStyle() == JobData::kDuplex) {
-		HP_BeginPage_5(fStream, orientation, mediaSize, HP_DuplexPageMode, fMediaSide);
+		fWriter->BeginPage(orientation, mediaSize, mediaSource, 
+			PCL6Writer::kDuplexHorizontalBinding, fMediaSide);
 
-		if (fMediaSide == HP_eFrontMediaSide) {
-			fMediaSide = HP_eBackMediaSide;
+		if (fMediaSide == PCL6Writer::kFrontMediaSide) {
+			fMediaSide = PCL6Writer::kBackMediaSide;
 		} else {
-			fMediaSide = HP_eFrontMediaSide;
+			fMediaSide = PCL6Writer::kFrontMediaSide;
 		}
 	} else {
 		return false;
@@ -335,24 +336,24 @@ bool PCL6Driver::startPage(int)
 	int x = 142 * getJobData()->getXres() / 600;
 	int y = 100 * getJobData()->getYres() / 600;
 	bool color = getJobData()->getColor() == JobData::kColor;
-	HP_SetPageOrigin_1(fStream, x, y);
-	HP_SetColorSpace_1(fStream, color ? HP_eRGB : HP_eGray);
-	HP_SetPaintTxMode_1(fStream, HP_eOpaque);
-	HP_SetSourceTxMode_1(fStream, HP_eOpaque);
-	HP_SetROP_1(fStream, 204);
+	fWriter->SetPageOrigin(x, y);
+	fWriter->SetColorSpace(color ? PCL6Writer::kRGB : PCL6Writer::kGray);
+	fWriter->SetPaintTxMode(PCL6Writer::kOpaque);
+	fWriter->SetSourceTxMode(PCL6Writer::kOpaque);
+	fWriter->SetROP(204);
 	return true;
 }
 
-void PCL6Driver::startRasterGraphics(int x, int y, int width, int height, int compressionMethod)
+void PCL6Driver::startRasterGraphics(int x, int y, int width, int height, PCL6Writer::Compression compressionMethod)
 {
 	bool color = getJobData()->getColor() == JobData::kColor;
-	HP_BeginImage_1(fStream, HP_eDirectPixel, color ? HP_e8Bit : HP_e1Bit, width, height, width, height);
-	HP_ReadImage_1(fStream, 0, height, compressionMethod);
+	fWriter->BeginImage(PCL6Writer::kDirectPixel, color ? PCL6Writer::k8Bit : PCL6Writer::k1Bit, width, height, width, height);
+	fWriter->ReadImage(compressionMethod, 0, height);
 }
 
 void PCL6Driver::endRasterGraphics()
 {
-	HP_EndImage_1(fStream);
+	fWriter->EndImage();
 }
 
 void PCL6Driver::rasterGraphics(
@@ -365,25 +366,26 @@ void PCL6Driver::rasterGraphics(
 )
 {
 	// write bitmap byte size
-	HP_EmbeddedDataPrefix32(fStream, dataSize);
+	fWriter->EmbeddedDataPrefix32(dataSize);
 	
 	// write data
-	if (compressionMethod == HP_eRLECompression) {
+	if (compressionMethod == PCL6Writer::kRLECompression) {
 		// use RLE compression
-		HP_UInt32 compressedSize = 0;
-		HP_M2TIFF_Compress(fStream, 0, (HP_pCharHuge)buffer, bufferSize, &compressedSize);
-	} else if (compressionMethod == HP_eDeltaRowCompression) {
+		// uint32 compressedSize = 0;
+		// HP_M2TIFF_Compress(fStream, 0, (HP_pCharHuge)buffer, bufferSize, &compressedSize);
+		return;
+	} else if (compressionMethod == PCL6Writer::kDeltaRowCompression) {
 		// use delta row compression
-		DeltaRowStreamCompressor compressor(rowSize, 0, fStream);
+		DeltaRowStreamCompressor compressor(rowSize, 0, fWriter);
 		if (compressor.InitCheck() != B_OK) {
 			return;
 		}
 		
-		const uchar* row = buffer;
+		const uint8* row = buffer;
 		for (int i = 0; i < height; i ++) {
 			// write row byte count
-			int size = compressor.CalculateSize(row);
-			HP_RawUInt16(fStream, size);
+			int32 size = compressor.CalculateSize(row);
+			fWriter->Append((uint16)size);
 			
 			if (size > 0) {
 				// write delta row
@@ -394,14 +396,14 @@ void PCL6Driver::rasterGraphics(
 		}
 	} else {
 		// write raw data
-		HP_RawUByteArray(fStream, (uchar*)buffer, bufferSize);
+		fWriter->Append(buffer, bufferSize);
 	}
 }
 
 bool PCL6Driver::endPage(int)
 {
 	try {
-		HP_EndPage_2(fStream, getJobData()->getCopies());
+		fWriter->EndPage(getJobData()->getCopies());
 		return true;
 	}
 	catch (TransportException &err) {
@@ -411,9 +413,11 @@ bool PCL6Driver::endPage(int)
 
 void PCL6Driver::jobEnd()
 {
-	HP_CloseDataSource_1(fStream);
-	HP_EndSession_1(fStream);
-	HP_FinishStream(fStream);
+	fWriter->CloseDataSource();
+	fWriter->EndSession();
+	fWriter->Flush();
+	delete fWriter;
+	fWriter = NULL;
 	// PJL footer
 	writeSpoolString("\033%%-12345X@PJL EOJ\n"
 	                 "\033%%-12345X");
@@ -421,55 +425,55 @@ void PCL6Driver::jobEnd()
 
 void PCL6Driver::move(int x, int y)
 {
-	HP_SetCursor_1(fStream, x, y);
+	fWriter->SetCursor(x, y);
 }
 
-HP_UByte PCL6Driver::mediaSize(JobData::Paper paper)
+PCL6Writer::MediaSize PCL6Driver::mediaSize(JobData::Paper paper)
 {
 	switch (paper) {
-		case JobData::kLetter:    return HP_eLetterPaper;
-		case JobData::kLegal:     return HP_eLegalPaper;
-		case JobData::kA4:        return HP_eA4Paper;
-		case JobData::kExecutive: return HP_eExecPaper;
-		case JobData::kLedger:    return HP_eLedgerPaper;
-		case JobData::kA3:        return HP_eA3Paper;
+		case JobData::kLetter:    return PCL6Writer::kLetterPaper;
+		case JobData::kLegal:     return PCL6Writer::kLegalPaper;
+		case JobData::kA4:        return PCL6Writer::kA4Paper;
+		case JobData::kExecutive: return PCL6Writer::kExecPaper;
+		case JobData::kLedger:    return PCL6Writer::kLedgerPaper;
+		case JobData::kA3:        return PCL6Writer::kA3Paper;
 /*
-		case : return HP_eCOM10Envelope;
-		case : return HP_eMonarchEnvelope;
-		case : return HP_eC5Envelope;
-		case : return HP_eDLEnvelope;
-		case : return HP_eJB4Paper;
-		case : return HP_eJB5Paper;
-		case : return HP_eB5Envelope;
-		case : return HP_eB5Paper;
-		case : return HP_eJPostcard;
-		case : return HP_eJDoublePostcard;
-		case : return HP_eA5Paper;
-		case : return HP_eA6Paper;
-		case : return HP_eJB6Paper;
-		case : return HP_eJIS8KPaper;
-		case : return HP_eJIS16KPaper;
-		case : return HP_eJISExecPaper;
+		case : return PCL6Writer::kCOM10Envelope;
+		case : return PCL6Writer::kMonarchEnvelope;
+		case : return PCL6Writer::kC5Envelope;
+		case : return PCL6Writer::kDLEnvelope;
+		case : return PCL6Writer::kJB4Paper;
+		case : return PCL6Writer::kJB5Paper;
+		case : return PCL6Writer::kB5Envelope;
+		case : return PCL6Writer::kB5Paper;
+		case : return PCL6Writer::kJPostcard;
+		case : return PCL6Writer::kJDoublePostcard;
+		case : return PCL6Writer::kA5Paper;
+		case : return PCL6Writer::kA6Paper;
+		case : return PCL6Writer::kJB6Paper;
+		case : return PCL6Writer::kJIS8KPaper;
+		case : return PCL6Writer::kJIS16KPaper;
+		case : return PCL6Writer::kJISExecPaper;
 */
 		default:
-			return HP_eLegalPaper;
+			return PCL6Writer::kLegalPaper;
 	}
 }
 
-HP_UByte PCL6Driver::mediaSource(JobData::PaperSource source)
+PCL6Writer::MediaSource PCL6Driver::mediaSource(JobData::PaperSource source)
 {
 	switch (source) {
-		case JobData::kAuto:       return HP_eAutoSelect;
-		case JobData::kCassette1:  return HP_eDefaultSource;
-		case JobData::kCassette2:  return HP_eEnvelopeTray;
-		case JobData::kLower:      return HP_eLowerCassette;
-		case JobData::kUpper:      return HP_eUpperCassette;
-		case JobData::kMiddle:     return HP_eThirdCassette;
-		case JobData::kManual:     return HP_eManualFeed;
-		case JobData::kCassette3:  return HP_eMultiPurposeTray;
+		case JobData::kAuto:       return PCL6Writer::kAutoSelect;
+		case JobData::kCassette1:  return PCL6Writer::kDefaultSource;
+		case JobData::kCassette2:  return PCL6Writer::kEnvelopeTray;
+		case JobData::kLower:      return PCL6Writer::kLowerCassette;
+		case JobData::kUpper:      return PCL6Writer::kUpperCassette;
+		case JobData::kMiddle:     return PCL6Writer::kThirdCassette;
+		case JobData::kManual:     return PCL6Writer::kManualFeed;
+		case JobData::kCassette3:  return PCL6Writer::kMultiPurposeTray;
 		
 		default:
-			return HP_eAutoSelect;
+			return PCL6Writer::kAutoSelect;
 	}
 }
 

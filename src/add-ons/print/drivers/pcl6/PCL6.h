@@ -7,19 +7,18 @@
 #ifndef __PCL6_H
 #define __PCL6_H
 
+
 #include "GraphicsDriver.h"
-#include "jetlib.h"
+#include "PCL6Writer.h"
 
 class Halftone;
 
-class PCL6Driver : public GraphicsDriver, private MJetlibClient {
+class PCL6Driver : public GraphicsDriver 
+{
 public:
 	PCL6Driver(BMessage *msg, PrinterData *printer_data, const PrinterCap *printer_cap);
 
-    virtual void FlushOutBuffer(HP_StreamHandleType pStream,
-                                unsigned long cookie,
-                                HP_pUByte pOutBuffer,
-                                HP_SInt32 currentBufferLen);
+	void writeData(const uint8 *data, uint32 size);
 
 protected:
 	virtual bool startDoc();
@@ -29,12 +28,12 @@ protected:
 	virtual bool endDoc(bool success);
 
 private:
-	HP_UByte mediaSize(JobData::Paper paper);
-	HP_UByte mediaSource(JobData::PaperSource source);
+	PCL6Writer::MediaSize mediaSize(JobData::Paper paper);
+	PCL6Writer::MediaSource mediaSource(JobData::PaperSource source);
 	void move(int x, int y);
 	void jobStart();
 	void writeBitmap(const uchar* buffer, int outSize, int rowSize, int x, int y, int width, int height, int deltaRowSize);
-	void startRasterGraphics(int x, int y, int width, int height, int compressionMethod);
+	void startRasterGraphics(int x, int y, int width, int height, PCL6Writer::Compression compressionMethod);
 	void endRasterGraphics();
 	void rasterGraphics(
 		const uchar *buffer,
@@ -45,9 +44,9 @@ private:
 		int compression_method);
 	void jobEnd();
 
-	HP_StreamHandleType  fStream;
-	Halftone            *fHalftone;
-	HP_UByte             fMediaSide; // side if in duplex mode
+	PCL6Writer            *fWriter;
+	PCL6Writer::MediaSide fMediaSide; // side if in duplex mode
+	Halftone              *fHalftone;
 };
 
 #endif	/* __PCL6_H */
