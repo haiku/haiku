@@ -10,9 +10,8 @@
 #include <fcntl.h>
 #include <errno.h>
 
-#include "syscalls.h"
+#include <syscalls.h>
 
-// ToDo: implement these for real - the VFS functions are still missing!
 
 #define RETURN_AND_SET_ERRNO(status) \
 	{ \
@@ -37,20 +36,19 @@ dev_for_path(const char *path)
 
 
 dev_t
-next_dev(int32 *pos)
+next_dev(int32 *_cookie)
 {
-	status_t status = B_ERROR;
-
-	RETURN_AND_SET_ERRNO(status)
+	return _kern_next_device(_cookie);
+		// For some reason, this one returns its error code directly
 }
 
 
 int
-fs_stat_dev(dev_t dev, fs_info *info)
+fs_stat_dev(dev_t device, fs_info *info)
 {
-	status_t status = B_ERROR;
+	status_t status = _kern_read_fs_info(device, info);
 
-	RETURN_AND_SET_ERRNO(status)
+	RETURN_AND_SET_ERRNO(status);
 }
 
 
