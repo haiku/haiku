@@ -262,7 +262,7 @@ bool ColorSet::ConvertFromMessage(const BMessage *msg)
 
 	if(msg->FindString("Name",&str)==B_OK)
 		name=str;
-	if(msg->FindData("Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
+	if(msg->FindData("Panel Background",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		panel_background=*col;
 	if(msg->FindData("Panel Text",(type_code)'RGBC',(const void**)&col,&size)==B_OK)
 		panel_text=*col;
@@ -357,7 +357,7 @@ RGBColor *ColorSet::StringToMember(const char *string)
 	if(!string)
 		return NULL;
 
-	if(strcmp(string,"Background")==0)
+	if(strcmp(string,"Panel Background")==0)
 		return &panel_background;
 	if(strcmp(string,"Panel Text")==0)
 		return &panel_text;
