@@ -1,10 +1,19 @@
 SubDir OBOS_TOP src add-ons kernel bus_managers pci ;
 
+UsePrivateHeaders [ FDirName kernel ] ;
+
 KernelMergeObject pci_bus_manager.o : 
-	<$(SOURCE_GRIST)>pci.c
+	kernel_cpp.cpp
+	<$(SOURCE_GRIST)>pci.cpp
+	<$(SOURCE_GRIST)>pci_info.cpp
+	<$(SOURCE_GRIST)>pci_module.c
 	:
 	-fno-pic -Wno-unused -D_KERNEL_MODE
 	;
+
+SEARCH on [ FGristFiles
+		kernel_cpp.cpp 
+	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
 
 KernelLd pci :
 	pci_bus_manager.o
