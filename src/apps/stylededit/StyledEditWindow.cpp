@@ -1130,8 +1130,8 @@ StyledEditWindow::Print(const char *documentname)
 		if (firstLineOnPage != 0) {
 			top = fTextView->TextHeight(0,firstLineOnPage-1);
 		}
-		float bottom = fTextView->TextHeight(0,printLine);
-		BRect textRect(0.0,top,printable_rect.Width(),bottom);
+		float bottom = fTextView->TextHeight(0,printLine-1);
+		BRect textRect(0.0,top+TEXT_INSET,printable_rect.Width(),bottom+TEXT_INSET);
 		printJob.DrawView(fTextView,textRect,BPoint(0.0,0.0));
 		printJob.SpoolPage();
 	}
