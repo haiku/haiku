@@ -767,8 +767,9 @@ resolve_symbol(image_t *image, struct Elf32_Sym *sym, addr_t *sym_addr)
 
 
 static void
-register_image(image_t *image, const char *path)
+register_image(image_t *image, int fd, const char *path)
 {
+	struct stat stat;
 	image_info info;
 
 	// ToDo: set these correctly
@@ -778,13 +779,20 @@ register_image(image_t *image, const char *path)
 	info.init_order = 0;
 	info.init_routine = (void *)image->init_routine;
 	info.term_routine = (void *)image->term_routine;
-	info.device = 0;
-	info.node = 0;
+	
+	if (_kern_read_stat(fd, &stat, sizeof(struct stat)) == B_OK) {
+		info.device = stat.st_dev;
+		info.node = stat.st_ino;
+	} else {
+		info.device = -1;
+		info.node = -1;
+	}
+
 	strlcpy(info.name, path, sizeof(info.name));
-	info.text = NULL;
-	info.text_size = 0;
-	info.data = NULL;
-	info.data_size = 0;
+	info.text = (void *)image->regions[0].vmstart;
+	info.text_size = image->regions[0].size;
+	info.data = (void *)image->regions[1].vmstart;
+	info.data_size = image->regions[1].size;
 	image->id = _kern_register_image(&info, sizeof(image_info));
 }
 
@@ -843,7 +851,7 @@ load_container(char const *path, char const *name, image_type type)
 
 	image->entry_point = eheader.e_entry + image->regions[0].delta;
 	image->type = type;
-	register_image(image, path);
+	register_image(image, fd, path);
 
 	_kern_close(fd);
 
