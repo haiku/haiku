@@ -15,9 +15,9 @@ namespace CppUnit {
 /// Check for a failed general assertion 
 void 
 TestAssert::assertImplementation( bool condition,
-                                  std::string conditionExpression,
+                                  string conditionExpression,
                                   long lineNumber,
-                                  std::string fileName )
+                                  string fileName )
 {
   Asserter::failIf( condition, 
                     conditionExpression, 
@@ -27,10 +27,10 @@ TestAssert::assertImplementation( bool condition,
 
 /// Reports failed equality
 void 
-TestAssert::assertNotEqualImplementation( std::string expected,
-                                          std::string actual,
+TestAssert::assertNotEqualImplementation( string expected,
+                                          string actual,
                                           long lineNumber,
-                                          std::string fileName )
+                                          string fileName )
 {
   Asserter::failNotEqual( expected, 
                           actual, 
@@ -44,7 +44,7 @@ TestAssert::assertEquals( double expected,
                           double actual, 
                           double delta,
                           long lineNumber,
-                          std::string fileName )
+                          string fileName )
 { 
   if (fabs (expected - actual) > delta) 
     assertNotEqualImplementation( assertion_traits<double>::toString(expected),

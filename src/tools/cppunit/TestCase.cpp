@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-BTestCase::BTestCase(std::string name)
+BTestCase::BTestCase(string name)
 	: CppUnit::TestCase(name)
 	, fValidCWD(false)
 	, fSubTestNum(0)

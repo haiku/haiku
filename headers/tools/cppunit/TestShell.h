@@ -48,13 +48,13 @@ typedef CppUnit::SynchronizedObject::SynchronizationObject SyncObject;
 */
 class BTestShell {
 public:
-	BTestShell(const std::string &description = "", SyncObject *syncObject = 0);	
+	BTestShell(const string &description = "", SyncObject *syncObject = 0);	
 	virtual ~BTestShell();
 	
 	// This function is used to add the tests for a given kit (as contained
 	// in a BTestSuite object) to the list of available tests. The shell assumes
 	// ownership of the BTestSuite object. Each test in the kit is added to
-	// the list of tests via a call to AddTest(std::string
+	// the list of tests via a call to AddTest(string
 	status_t AddSuite(BTestSuite *kit);
 
 	// This function is used to add test suites to the list of available
@@ -64,7 +64,7 @@ public:
 	// when the program is run with "--list" as an argument. Usually the
 	// given suite would be a test suite for an entire class, but that's
 	// not a requirement.
-	void AddTest(const std::string &name, CppUnit::Test* test);
+	void AddTest(const string &name, CppUnit::Test* test);
 
 	// This function loads all the test addons it finds in the given
 	// directory, returning the number of tests actually loaded.
@@ -104,18 +104,18 @@ public:
 	bool WasDebuggerCalled();
 
 protected:
-	typedef std::map<std::string, CppUnit::Test*> TestMap;
-	typedef std::map<std::string, BTestSuite*> SuiteMap;
+	typedef map<string, CppUnit::Test*> TestMap;
+	typedef map<string, BTestSuite*> SuiteMap;
 
 	VerbosityLevel fVerbosityLevel;
-	std::set<std::string> fTestsToRun;
-	std::set<std::string> fSuitesToRun;
+	set<string> fTestsToRun;
+	set<string> fSuitesToRun;
 	TestMap fTests;
 	SuiteMap fSuites;
-	std::set<std::string> fLibDirs;
+	set<string> fLibDirs;
 	CppUnit::TestResult fTestResults;
 	CppUnit::TestResultCollector fResultsCollector;
-	std::string fDescription;
+	string fDescription;
 	static BTestShell* fGlobalShell;
 	static const char indent[];
 	bool fListTestsAndExit;
@@ -149,7 +149,7 @@ protected:
 	bool ProcessArguments(int argc, char *argv[]);
 	
 	//! Processes a single argument, given by the \c arg parameter.
-	virtual bool ProcessArgument(std::string arg, int argc, char *argv[]);
+	virtual bool ProcessArgument(string arg, int argc, char *argv[]);
 
 	//! Makes any necessary pre-test preparations
 	void InitOutput();

@@ -33,7 +33,7 @@ TestCase::run( TestResult *result )
 	    Exception *copy = e.clone();
 	    result->addFailure( this, copy );
 	  }
-	  catch ( std::exception &e ) {
+	  catch ( exception &e ) {
 	    result->addError( this, new Exception( e.what() ) );
 	  }
 	  catch (...) {
@@ -77,7 +77,7 @@ TestCase::runTest()
 /** Constructs a test case.
  *  \param name the name of the TestCase.
  **/
-TestCase::TestCase( std::string name )
+TestCase::TestCase( string name )
     : m_name(name)
 {
 }
@@ -108,7 +108,7 @@ TestCase::countTestCases() const
 
 
 /// Returns the name of the test case
-std::string 
+string 
 TestCase::getName() const
 { 
   return m_name; 
@@ -116,13 +116,13 @@ TestCase::getName() const
 
 
 /// Returns the name of the test case instance
-std::string 
+string 
 TestCase::toString() const
 { 
-  std::string className;
+  string className;
 
 #if CPPUNIT_USE_TYPEINFO_NAME
-  const std::type_info& thisClass = typeid( *this );
+  const type_info& thisClass = typeid( *this );
   className = thisClass.name();
 #else
   className = "TestCase";

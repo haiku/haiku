@@ -14,7 +14,7 @@ RepeatedTest::countTestCases() const
 
 
 // Returns the name of the test instance. 
-std::string 
+string 
 RepeatedTest::toString() const
 { 
   return TestDecorator::toString () + " (repeated)"; 

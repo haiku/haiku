@@ -36,8 +36,8 @@ public:
    * \param encoding Encoding used in the XML file (default is Latin-1). 
    */
   XmlOutputter( TestResultCollector *result,
-                std::ostream &stream,
-                std::string encoding = "ISO-8859-1" );
+                ostream &stream,
+                string encoding = "ISO-8859-1" );
 
   /// Destructor.
   virtual ~XmlOutputter();
@@ -56,33 +56,33 @@ public:
   class CPPUNIT_API Node
   {
   public:
-    Node( std::string elementName,
-          std::string content ="" );
-    Node( std::string elementName,
+    Node( string elementName,
+          string content ="" );
+    Node( string elementName,
           int numericContent );
     virtual ~Node();
 
-    void addAttribute( std::string attributeName,
-                       std::string value );
-    void addAttribute( std::string attributeName,
+    void addAttribute( string attributeName,
+                       string value );
+    void addAttribute( string attributeName,
                        int numericValue );
     void addNode( Node *node );
 
-    std::string toString() const;
+    string toString() const;
 
   private:
-    typedef std::pair<std::string,std::string> Attribute;
+    typedef pair<string,string> Attribute;
 
-    std::string attributesAsString() const;
-    std::string escape( std::string value ) const;
-    static std::string asString( int value );
+    string attributesAsString() const;
+    string escape( string value ) const;
+    static string asString( int value );
 
   private:
-    std::string m_name;
-    std::string m_content;
-    typedef std::deque<Attribute> Attributes;
+    string m_name;
+    string m_content;
+    typedef deque<Attribute> Attributes;
     Attributes m_attributes;
-    typedef std::deque<Node *> Nodes;
+    typedef deque<Node *> Nodes;
     Nodes m_nodes;
   };
 
@@ -90,7 +90,7 @@ public:
   virtual void writeProlog();
   virtual void writeTestsResult();
 
-  typedef std::map<Test *,TestFailure*> FailedTests;
+  typedef map<Test *,TestFailure*> FailedTests;
   virtual Node *makeRootNode();
   virtual void addFailedTests( FailedTests &failedTests,
                                Node *rootNode );
@@ -111,8 +111,8 @@ protected:
 
 protected:
   TestResultCollector *m_result;
-  std::ostream &m_stream;
-  std::string m_encoding;
+  ostream &m_stream;
+  string m_encoding;
 
 private:
   /// Prevents the use of the copy constructor.

@@ -26,7 +26,7 @@ void
 TextTestResult::addFailure( const TestFailure &failure )
 {
   TestResultCollector::addFailure( failure );
-  std::cerr << ( failure.isError() ? "E" : "F" );
+  cerr << ( failure.isError() ? "E" : "F" );
 }
 
 
@@ -34,18 +34,18 @@ void
 TextTestResult::startTest( Test *test )
 {
   TestResultCollector::startTest (test);
-  std::cerr << ".";
+  cerr << ".";
 }
 
 
 void 
-TextTestResult::printFailures( std::ostream &stream )
+TextTestResult::printFailures( ostream &stream )
 {
   TestFailures::const_iterator itFailure = failures().begin();
   int failureNumber = 1;
   while ( itFailure != failures().end() ) 
   {
-    stream  <<  std::endl;
+    stream  <<  endl;
     printFailure( *itFailure++, failureNumber++, stream );
   }
 }
@@ -54,7 +54,7 @@ TextTestResult::printFailures( std::ostream &stream )
 void 
 TextTestResult::printFailure( TestFailure *failure,
                               int failureNumber,
-                              std::ostream &stream )
+                              ostream &stream )
 {
   printFailureListMark( failureNumber, stream );
   stream << ' ';
@@ -63,15 +63,15 @@ TextTestResult::printFailure( TestFailure *failure,
   printFailureType( failure, stream );
   stream << ' ';
   printFailureLocation( failure->sourceLine(), stream );
-  stream << std::endl;
+  stream << endl;
   printFailureDetail( failure->thrownException(), stream );
-  stream << std::endl;
+  stream << endl;
 }
 
 
 void 
 TextTestResult::printFailureListMark( int failureNumber,
-                                      std::ostream &stream )
+                                      ostream &stream )
 {
   stream << failureNumber << ")";
 }
@@ -79,7 +79,7 @@ TextTestResult::printFailureListMark( int failureNumber,
 
 void 
 TextTestResult::printFailureTestName( TestFailure *failure,
-                                      std::ostream &stream )
+                                      ostream &stream )
 {
   stream << "test: " << failure->failedTest()->getName();
 }
@@ -87,7 +87,7 @@ TextTestResult::printFailureTestName( TestFailure *failure,
 
 void 
 TextTestResult::printFailureType( TestFailure *failure,
-                                  std::ostream &stream )
+                                  ostream &stream )
 {
   stream << "("
          << (failure->isError() ? "E" : "F")
@@ -97,7 +97,7 @@ TextTestResult::printFailureType( TestFailure *failure,
 
 void 
 TextTestResult::printFailureLocation( SourceLine sourceLine,
-                                      std::ostream &stream )
+                                      ostream &stream )
 {
   if ( !sourceLine.isValid() )
     return;
@@ -109,17 +109,17 @@ TextTestResult::printFailureLocation( SourceLine sourceLine,
 
 void 
 TextTestResult::printFailureDetail( Exception *thrownException,
-                                    std::ostream &stream )
+                                    ostream &stream )
 {
   if ( thrownException->isInstanceOf( NotEqualException::type() ) )
   {
     NotEqualException *e = (NotEqualException*)thrownException;
-    stream << "expected: " << e->expectedValue() << std::endl
+    stream << "expected: " << e->expectedValue() << endl
            << "but was:  " << e->actualValue();
     if ( !e->additionalMessage().empty() )
     {
-      stream  << std::endl;
-      stream  <<  "additional message:"  <<  std::endl
+      stream  << endl;
+      stream  <<  "additional message:"  <<  endl
               <<  e->additionalMessage();
     }
   }
@@ -131,23 +131,23 @@ TextTestResult::printFailureDetail( Exception *thrownException,
 
 
 void 
-TextTestResult::print( std::ostream& stream ) 
+TextTestResult::print( ostream& stream ) 
 {
   printHeader( stream );
-  stream << std::endl;
+  stream << endl;
   printFailures( stream );
 }
 
 
 void 
-TextTestResult::printHeader( std::ostream &stream )
+TextTestResult::printHeader( ostream &stream )
 {
   if (wasSuccessful ())
-    stream << std::endl << "OK (" << runTests () << " tests)" 
-           << std::endl;
+    stream << endl << "OK (" << runTests () << " tests)" 
+           << endl;
   else
   {
-    stream << std::endl;
+    stream << endl;
     printFailureWarning( stream );
     printStatistics( stream );
   }
@@ -155,26 +155,26 @@ TextTestResult::printHeader( std::ostream &stream )
 
 
 void 
-TextTestResult::printFailureWarning( std::ostream &stream )
+TextTestResult::printFailureWarning( ostream &stream )
 {
-  stream  << "!!!FAILURES!!!" << std::endl;
+  stream  << "!!!FAILURES!!!" << endl;
 }
 
 
 void 
-TextTestResult::printStatistics( std::ostream &stream )
+TextTestResult::printStatistics( ostream &stream )
 {
-  stream  << "Test Results:" << std::endl;
+  stream  << "Test Results:" << endl;
 
   stream  <<  "Run:  "  <<  runTests()
           <<  "   Failures: "  <<  testFailures()
           <<  "   Errors: "  <<  testErrors()
-          <<  std::endl;
+          <<  endl;
 }
 
 
-std::ostream &
-operator <<( std::ostream &stream, 
+ostream &
+operator <<( ostream &stream, 
              TextTestResult &result )
 { 
   result.print (stream); return stream; 

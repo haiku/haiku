@@ -26,7 +26,7 @@ Equals(const A &a, const B &b, const C &c)
 }
 
 // Returns a string version of the given integer
-std::string IntToStr(int i);
+string IntToStr(int i);
 
 // Calls system() with the concatenated string of command and parameter.
 void ExecCommand(const char *command, const char *parameter);

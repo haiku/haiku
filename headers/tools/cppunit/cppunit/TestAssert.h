@@ -14,16 +14,16 @@ namespace CppUnit {
    *
    * \code
    * template<>
-   * struct assertion_traits<std::string>   // specialization for the std::string type
+   * struct assertion_traits<string>   // specialization for the string type
    * {
-   *   static bool equal( const std::string& x, const std::string& y )
+   *   static bool equal( const string& x, const string& y )
    *   {
    *     return x == y;
    *   }
    * 
-   *   static std::string toString( const std::string& x )
+   *   static string toString( const string& x )
    *   {
-   *     std::string text = '"' + x + '"';    // adds quote around the string to see whitespace
+   *     string text = '"' + x + '"';    // adds quote around the string to see whitespace
    *     OStringStream ost;
    *     ost << text;
    *     return ost.str();
@@ -39,7 +39,7 @@ namespace CppUnit {
           return x == y;
       }
 
-      static std::string toString( const T& x )
+      static string toString( const T& x )
       {
           OStringStream ost;
           ost << x;
@@ -52,21 +52,21 @@ namespace CppUnit {
   {
 #ifdef CPPUNIT_ENABLE_SOURCELINE_DEPRECATED
     void CPPUNIT_API assertImplementation( bool         condition, 
-                                           std::string  conditionExpression = "",
+                                           string  conditionExpression = "",
                                            long lineNumber,
-                                           std::string  fileName );
+                                           string  fileName );
 
-    void CPPUNIT_API assertNotEqualImplementation( std::string expected,
-                                                   std::string actual,
+    void CPPUNIT_API assertNotEqualImplementation( string expected,
+                                                   string actual,
                                                    long lineNumber,
-                                                   std::string fileName );
+                                                   string fileName );
       
 
     template <class T>
     void assertEquals( const T& expected,
                        const T& actual,
                        long lineNumber,
-                       std::string fileName )
+                       string fileName )
     {
       if ( !assertion_traits<T>::equal(expected,actual) ) // lazy toString conversion...
       {
@@ -81,7 +81,7 @@ namespace CppUnit {
                                    double actual, 
                                    double delta, 
                                    long lineNumber,
-                                   std::string fileName );
+                                   string fileName );
 
 #else   //                  using SourceLine
 
@@ -89,7 +89,7 @@ namespace CppUnit {
     void assertEquals( const T& expected,
                        const T& actual,
                        SourceLine sourceLine,
-                       const std::string &message ="" )
+                       const string &message ="" )
     {
       if ( !assertion_traits<T>::equal(expected,actual) ) // lazy toString conversion...
       {
@@ -166,7 +166,7 @@ namespace CppUnit {
  *
  * Requirement for \a expected and \a actual parameters:
  * - They are exactly of the same type
- * - They are serializable into a std::strstream using operator <<.
+ * - They are serializable into a strstream using operator <<.
  * - They can be compared using operator ==. 
  *
  * The last two requirements (serialization and comparison) can be
@@ -189,7 +189,7 @@ namespace CppUnit {
  *
  * Requirement for \a expected and \a actual parameters:
  * - They are exactly of the same type
- * - They are serializable into a std::strstream using operator <<.
+ * - They are serializable into a strstream using operator <<.
  * - They can be compared using operator ==. 
  *
  * The last two requirements (serialization and comparison) can be

@@ -3,7 +3,7 @@
 #include <cppunit/TestResult.h>
 
 // Default constructor
-BTestSuite::BTestSuite( std::string name )
+BTestSuite::BTestSuite( string name )
 	: fName(name)
 {
 }
@@ -17,7 +17,7 @@ BTestSuite::~BTestSuite() {
 // Deletes all tests in the suite.
 void 
 BTestSuite::deleteContents() {
-	for ( std::map<std::string, CppUnit::Test*>::iterator it = fTests.begin();
+	for ( map<string, CppUnit::Test*>::iterator it = fTests.begin();
 		   it != fTests.end();
 		     ++it)
 		delete it->second;
@@ -28,7 +28,7 @@ BTestSuite::deleteContents() {
 /// Runs the tests and collects their result in a TestResult.
 void 
 BTestSuite::run( CppUnit::TestResult *result ) {
-	for ( std::map<std::string, CppUnit::Test*>::iterator it = fTests.begin();
+	for ( map<string, CppUnit::Test*>::iterator it = fTests.begin();
     	   it != fTests.end();
 		     ++it )
 	{
@@ -46,7 +46,7 @@ int
 BTestSuite::countTestCases() const {
 	int count = 0;
 
-	for ( std::map<std::string, CppUnit::Test *>::const_iterator it = fTests.begin();
+	for ( map<string, CppUnit::Test *>::const_iterator it = fTests.begin();
 		   it != fTests.end();
 		     ++it )
 		count += it->second->countTestCases();
@@ -57,26 +57,26 @@ BTestSuite::countTestCases() const {
 
 // Adds a test to the suite. 
 void 
-BTestSuite::addTest(std::string name, CppUnit::Test *test) { 
+BTestSuite::addTest(string name, CppUnit::Test *test) { 
 	fTests[name] = test; 
 }
 
 
 // Returns a string representation of the test suite.
-std::string 
+string 
 BTestSuite::toString() const { 
 	return "suite " + getName();
 }
 
 
 // Returns the name of the test suite.
-std::string 
+string 
 BTestSuite::getName() const { 
 	return fName; 
 }
 
 
-const std::map<std::string, CppUnit::Test*> &
+const map<string, CppUnit::Test*> &
 BTestSuite::getTests() const {
 	return fTests;
 }

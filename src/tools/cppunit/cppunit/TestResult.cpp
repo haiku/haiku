@@ -120,7 +120,7 @@ void
 TestResult::removeListener ( TestListener *listener )
 {
   ExclusiveZone zone( m_syncObject ); 
-  m_listeners.erase( std::remove( m_listeners.begin(), 
+  m_listeners.erase( remove( m_listeners.begin(), 
                                   m_listeners.end(), 
                                   listener ),
                      m_listeners.end());

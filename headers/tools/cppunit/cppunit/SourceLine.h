@@ -32,7 +32,7 @@ class CPPUNIT_API SourceLine
 public:
   SourceLine();
 
-  SourceLine( const std::string &fileName,
+  SourceLine( const string &fileName,
               int lineNumber );
 
   /// Destructor.
@@ -42,13 +42,13 @@ public:
 
   int lineNumber() const;
 
-  std::string fileName() const;
+  string fileName() const;
 
   bool operator ==( const SourceLine &other ) const;
   bool operator !=( const SourceLine &other ) const;
 
 private:
-  std::string m_fileName;
+  string m_fileName;
   int m_lineNumber;
 };
 

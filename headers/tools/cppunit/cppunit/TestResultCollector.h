@@ -17,8 +17,8 @@ namespace CppUnit
 
 
 #if CPPUNIT_NEED_DLL_DECL
-  template class CPPUNIT_API std::deque<TestFailure *>;
-  template class CPPUNIT_API std::deque<Test *>;
+  template class CPPUNIT_API deque<TestFailure *>;
+  template class CPPUNIT_API deque<Test *>;
 #endif
 
 
@@ -38,8 +38,8 @@ namespace CppUnit
 class CPPUNIT_API TestResultCollector : public TestSucessListener
 {
 public:
-  typedef std::deque<TestFailure *> TestFailures;
-  typedef std::deque<Test *> Tests;
+  typedef deque<TestFailure *> TestFailures;
+  typedef deque<Test *> Tests;
 
 
   /*! Constructs a TestResultCollector object.

@@ -53,7 +53,7 @@ TestFailure::isError() const
 
 
 /// Gets the name of the failed test.
-std::string 
+string 
 TestFailure::failedTestName() const
 {
   return m_failedTest->getName();
@@ -61,7 +61,7 @@ TestFailure::failedTestName() const
 
 
 /// Returns a short description of the failure.
-std::string 
+string 
 TestFailure::toString() const 
 { 
   return m_failedTest->toString() + ": " + m_thrownException->what();

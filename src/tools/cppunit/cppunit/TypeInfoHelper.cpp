@@ -8,11 +8,11 @@
 
 namespace CppUnit {
 
-std::string 
-TypeInfoHelper::getClassName( const std::type_info &info )
+string 
+TypeInfoHelper::getClassName( const type_info &info )
 {
-    static std::string classPrefix( "class " );
-    std::string name( info.name() );
+    static const string classPrefix( "class " );
+    string name( info.name() );
 
     bool has_class_prefix = 0 ==
 #if CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST

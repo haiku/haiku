@@ -19,7 +19,7 @@ class TestFailure;
 class TestListener;
 
 #if CPPUNIT_NEED_DLL_DECL
-  template class CPPUNIT_API std::deque<TestListener *>;
+  template class CPPUNIT_API deque<TestListener *>;
 #endif
 
 /*! \brief Manages TestListener.
@@ -65,7 +65,7 @@ protected:
   void addFailure( const TestFailure &failure );
   
 protected:
-  typedef std::deque<TestListener *> TestListeners;
+  typedef deque<TestListener *> TestListeners;
   TestListeners m_listeners;
   bool m_stop;
 

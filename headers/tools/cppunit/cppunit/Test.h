@@ -42,7 +42,7 @@ public:
      * Each test has a name.  This name may be used to find the
      * test in a suite or registry of tests.
      */
-    virtual std::string           getName () const            = 0;
+    virtual string           getName () const            = 0;
 
     /*! \brief Description of the test, for diagnostic output.
      *
@@ -51,7 +51,7 @@ public:
      * suite named <tt>complex_add</tt> may be described as 
      * <tt>suite complex_add</tt>.
      */
-    virtual std::string           toString () const           = 0;
+    virtual string           toString () const           = 0;
 
 
 };

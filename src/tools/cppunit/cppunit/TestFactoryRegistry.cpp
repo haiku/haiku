@@ -1,6 +1,7 @@
 #include <cppunit/extensions/TestFactoryRegistry.h>
 #include <cppunit/TestSuite.h>
 #include <set>
+#include <string>
 
 
 #if CPPUNIT_USE_TYPEINFO_NAME
@@ -26,17 +27,17 @@ public:
 
   static NamedRegistries &getInstance();
 
-  TestFactoryRegistry &getRegistry( std::string name );
+  TestFactoryRegistry &getRegistry( string name );
 
   void wasDestroyed( TestFactory *factory );
 
   bool needDestroy( TestFactory *factory );
 
 private:
-  typedef std::map<std::string, TestFactoryRegistry *> Registries;
+  typedef map<string, TestFactoryRegistry *> Registries;
   Registries m_registries;
 
-  typedef std::set<TestFactory *> Factories;
+  typedef set<TestFactory *> Factories;
   Factories m_factoriesToDestroy;
   Factories m_destroyedFactories;
 };
@@ -63,13 +64,24 @@ NamedRegistries::getInstance()
 
 
 TestFactoryRegistry &
-NamedRegistries::getRegistry( std::string name )
+NamedRegistries::getRegistry( string name )
 {
   Registries::const_iterator foundIt = m_registries.find( name );
   if ( foundIt == m_registries.end() )
   {
     TestFactoryRegistry *factory = new TestFactoryRegistry( name );
+#if defined(__POWERPC__) && defined(__BEOS__)
+    m_registries.insert( 
+    	pair<
+  			const basic_string< char, char_traits< char>, allocator<char> >, 
+  			CppUnit::TestFactoryRegistry*
+    	>(
+    		name, factory 
+    	) 
+    );
+#else
     m_registries.insert( std::make_pair( name, factory ) );
+#endif
     m_factoriesToDestroy.insert( factory );
     return *factory;
   }
@@ -93,7 +105,7 @@ NamedRegistries::needDestroy( TestFactory *factory )
 
 
 
-TestFactoryRegistry::TestFactoryRegistry( std::string name ) :
+TestFactoryRegistry::TestFactoryRegistry( string name ) :
     m_name( name )
 {
 }
@@ -125,14 +137,14 @@ TestFactoryRegistry::getRegistry()
 
 
 TestFactoryRegistry &
-TestFactoryRegistry::getRegistry( const std::string &name )
+TestFactoryRegistry::getRegistry( const string &name )
 {
   return NamedRegistries::getInstance().getRegistry( name );
 }
 
 
 void 
-TestFactoryRegistry::registerFactory( const std::string &name,
+TestFactoryRegistry::registerFactory( const string &name,
                                       TestFactory *factory )
 {
   m_factories[name] = factory;

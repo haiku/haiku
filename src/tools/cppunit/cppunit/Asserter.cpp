@@ -11,7 +11,7 @@ namespace Asserter
 
 
 void 
-fail( std::string message, 
+fail( string message, 
       SourceLine sourceLine )
 {
   throw Exception( message, sourceLine );
@@ -20,7 +20,7 @@ fail( std::string message,
 
 void 
 failIf( bool shouldFail, 
-        std::string message, 
+        string message, 
         SourceLine location )
 {
   if ( shouldFail )
@@ -29,10 +29,10 @@ failIf( bool shouldFail,
 
 
 void 
-failNotEqual( std::string expected, 
-              std::string actual, 
+failNotEqual( string expected, 
+              string actual, 
               SourceLine sourceLine,
-              std::string additionalMessage )
+              string additionalMessage )
 {
   throw NotEqualException( expected, 
                            actual, 
@@ -43,10 +43,10 @@ failNotEqual( std::string expected,
 
 void 
 failNotEqualIf( bool shouldFail,
-                std::string expected, 
-                std::string actual, 
+                string expected, 
+                string actual, 
                 SourceLine sourceLine,
-                std::string additionalMessage )
+                string additionalMessage )
 {
   if ( shouldFail )
     failNotEqual( expected, actual, sourceLine, additionalMessage );

@@ -1,3 +1,4 @@
+#include <iostream>
 #include <map>
 #include <set>
 #include <string>
@@ -20,13 +21,12 @@
 
 #include <TestShell.h>
 #include <TestListener.h>
-
 #include <ElfSymbolPatcher.h>
 
 BTestShell *BTestShell::fGlobalShell = NULL;
 const char BTestShell::indent[] = "  ";
 
-BTestShell::BTestShell(const std::string &description, SyncObject *syncObject)
+BTestShell::BTestShell(const string &description, SyncObject *syncObject)
 	: fVerbosityLevel(v2)
 	, fTestResults(syncObject)
 	, fDescription(description)
@@ -72,7 +72,7 @@ BTestShell::AddSuite(BTestSuite *suite) {
 }
 
 void
-BTestShell::AddTest(const std::string &name, CppUnit::Test *test) {
+BTestShell::AddTest(const string &name, CppUnit::Test *test) {
 	if (test != NULL)
 		fTests[name] = test;
 	else
@@ -153,8 +153,8 @@ BTestShell::Run(int argc, char *argv[]) {
 			suite.addTest( i->second );
 			
 	} else {
-		std::set<std::string>::const_iterator i;
-		std::set<std::string> suitesToRemove;
+		set<string>::const_iterator i;
+		set<string> suitesToRemove;
 
 		// Add all the tests from any specified suites to the list of
 		// tests to run (since we use a set, this eliminates the concern
@@ -312,7 +312,7 @@ BTestShell::ProcessArguments(int argc, char *argv[]) {
 	// Handle each command line argument (skipping the first
 	// which is just the app name)
 	for (int i = 1; i < argc; i++) {
-		std::string str(argv[i]);
+		string str(argv[i]);
 		
 		if (!ProcessArgument(str, argc, argv))
 			return false;		
@@ -322,7 +322,7 @@ BTestShell::ProcessArguments(int argc, char *argv[]) {
 }
 
 bool
-BTestShell::ProcessArgument(std::string arg, int argc, char *argv[]) {
+BTestShell::ProcessArgument(string arg, int argc, char *argv[]) {
 	if (arg == "--help") {
 		PrintDescription(argc, argv);
 		PrintHelp();
@@ -419,7 +419,7 @@ BTestShell::LoadDynamicSuites() {
 		cout << "------------------------------------------------------------------------------" << endl;
 	}
 
-	std::set<std::string>::iterator i;
+	set<string>::iterator i;
 	for (i = fLibDirs.begin(); i != fLibDirs.end(); i++) {
 		BDirectory libDir((*i).c_str());
 		if (Verbosity() >= v3) 

@@ -36,7 +36,7 @@ namespace CppUnit
 #if CPPUNIT_USE_TYPEINFO_NAME
 #  define __CPPUNIT_SUITE_CTOR_ARGS( ATestFixtureType )
 #else
-#  define __CPPUNIT_SUITE_CTOR_ARGS( ATestFixtureType ) (std::string(#ATestFixtureType))
+#  define __CPPUNIT_SUITE_CTOR_ARGS( ATestFixtureType ) (string(#ATestFixtureType))
 #endif
 
 
@@ -196,13 +196,13 @@ namespace CppUnit
  * #include <vector>
  * class MyTest : public CppUnit::TestFixture {
  *   CPPUNIT_TEST_SUITE( MyTest );
- *   CPPUNIT_TEST_EXCEPTION( testVectorAtThrow, std::invalid_argument );
+ *   CPPUNIT_TEST_EXCEPTION( testVectorAtThrow, invalid_argument );
  *   CPPUNIT_TEST_SUITE_END();
  * public:
  *   void testVectorAtThrow()
  *   {
- *     std::vector<int> v;
- *     v.at( 1 );     // must throw exception std::invalid_argument
+ *     vector<int> v;
+ *     v.at( 1 );     // must throw exception invalid_argument
  *   }
  * };
  * \endcode
@@ -303,7 +303,7 @@ namespace CppUnit
  * \code
  * // MySuites.h
  * namespace MySuites {
- *   std::string math() { 
+ *   string math() { 
  *     return "Math";
  *   }
  * }

@@ -33,11 +33,11 @@ struct ExpectedExceptionTraits
   static void expectedException()
   {
 #if CPPUNIT_USE_TYPEINFO_NAME
-	  std::string message( "Expected exception of type " );
+	  string message( "Expected exception of type " );
 	  message += TypeInfoHelper::getClassName( typeid( ExceptionType ) );
 	  message += ", but got none";
 #else
-    std::string message( "Expected exception but got none" );
+    string message( "Expected exception but got none" );
 #endif
 	  throw Exception( message );
   }
@@ -111,7 +111,7 @@ public:
    * \param name name of this TestCaller
    * \param test the method this TestCaller calls in runTest()
    */
-  TestCaller( std::string name, TestMethod test ) :
+  TestCaller( string name, TestMethod test ) :
 	    TestCase( name ), 
 	    m_ownFixture( true ),
 	    m_fixture( new Fixture() ),
@@ -128,7 +128,7 @@ public:
    * \param test the method this TestCaller calls in runTest()
    * \param fixture the Fixture to invoke the test method on.
    */
-  TestCaller(std::string name, TestMethod test, Fixture& fixture) :
+  TestCaller(string name, TestMethod test, Fixture& fixture) :
 	    TestCase( name ), 
 	    m_ownFixture( false ),
 	    m_fixture( &fixture ),
@@ -145,7 +145,7 @@ public:
    * \param test the method this TestCaller calls in runTest()
    * \param fixture the Fixture to invoke the test method on.
    */
-  TestCaller(std::string name, TestMethod test, Fixture* fixture) :
+  TestCaller(string name, TestMethod test, Fixture* fixture) :
 	    TestCase( name ), 
 	    m_ownFixture( true ),
 	    m_fixture( fixture ),
@@ -182,7 +182,7 @@ protected:
 	  m_fixture->tearDown (); 
   }
 
-  std::string toString() const
+  string toString() const
   { 
   	return "TestCaller " + getName(); 
   }

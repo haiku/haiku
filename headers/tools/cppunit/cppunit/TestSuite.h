@@ -17,7 +17,7 @@ namespace CppUnit {
 class TestResult;
 
 #if CPPUNIT_NEED_DLL_DECL
-  template class CPPUNIT_API std::vector<Test *>;
+  template class CPPUNIT_API vector<Test *>;
 #endif
 
 
@@ -44,16 +44,16 @@ class TestResult;
 class CPPUNIT_API TestSuite : public Test
 {
 public:
-  TestSuite( std::string name = "" );
+  TestSuite( string name = "" );
   ~TestSuite();
 
   void run( TestResult *result );
   int countTestCases() const;
-  std::string getName() const;
-  std::string toString() const;
+  string getName() const;
+  string toString() const;
 
   void addTest( Test *test );
-  const std::vector<Test *> &getTests() const;
+  const vector<Test *> &getTests() const;
 
   virtual void deleteContents();
 
@@ -62,8 +62,8 @@ private:
   TestSuite &operator =( const TestSuite &other ); 
 
 private:
-  std::vector<Test *> m_tests;
-  const std::string m_name;
+  vector<Test *> m_tests;
+  const string m_name;
 };
 
 

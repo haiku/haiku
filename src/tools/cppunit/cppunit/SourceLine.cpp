@@ -10,7 +10,7 @@ SourceLine::SourceLine() :
 }
 
 
-SourceLine::SourceLine( const std::string &fileName,
+SourceLine::SourceLine( const string &fileName,
                         int lineNumber ) :
     m_fileName( fileName ),
     m_lineNumber( lineNumber )
@@ -37,7 +37,7 @@ SourceLine::lineNumber() const
 }
 
 
-std::string 
+string 
 SourceLine::fileName() const
 {
   return m_fileName;

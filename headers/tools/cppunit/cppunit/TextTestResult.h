@@ -25,29 +25,29 @@ public:
   virtual void addFailure( Test *test, Exception *e );
   virtual void addFailure( const TestFailure &failure );
   virtual void startTest( Test *test );
-  virtual void print( std::ostream &stream );
-  virtual void printFailures( std::ostream &stream );
-  virtual void printHeader( std::ostream &stream );
+  virtual void print( ostream &stream );
+  virtual void printFailures( ostream &stream );
+  virtual void printHeader( ostream &stream );
 
   virtual void printFailure( TestFailure *failure,
                              int failureNumber,
-                             std::ostream &stream );
+                             ostream &stream );
   virtual void printFailureListMark( int failureNumber,
-                                     std::ostream &stream );
+                                     ostream &stream );
   virtual void printFailureTestName( TestFailure *failure,
-                                     std::ostream &stream );
+                                     ostream &stream );
   virtual void printFailureType( TestFailure *failure,
-                                 std::ostream &stream );
+                                 ostream &stream );
   virtual void printFailureLocation( SourceLine sourceLine,
-                                     std::ostream &stream );
+                                     ostream &stream );
   virtual void printFailureDetail( Exception *thrownException,
-                                   std::ostream &stream );
-  virtual void printFailureWarning( std::ostream &stream );
-  virtual void printStatistics( std::ostream &stream );
+                                   ostream &stream );
+  virtual void printFailureWarning( ostream &stream );
+  virtual void printStatistics( ostream &stream );
 };
 
 /** insertion operator for easy output */
-std::ostream &operator <<( std::ostream &stream, 
+ostream &operator <<( ostream &stream, 
                            TextTestResult &result );
 
 } // namespace CppUnit

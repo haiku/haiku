@@ -4,7 +4,7 @@
 namespace CppUnit {
 
 /// Default constructor
-TestSuite::TestSuite( std::string name )
+TestSuite::TestSuite( string name )
     : m_name( name )
 {
 }
@@ -21,7 +21,7 @@ TestSuite::~TestSuite()
 void 
 TestSuite::deleteContents()
 {
-  for ( std::vector<Test *>::iterator it = m_tests.begin();
+  for ( vector<Test *>::iterator it = m_tests.begin();
         it != m_tests.end();
         ++it)
     delete *it;
@@ -33,7 +33,7 @@ TestSuite::deleteContents()
 void 
 TestSuite::run( TestResult *result )
 {
-  for ( std::vector<Test *>::iterator it = m_tests.begin();
+  for ( vector<Test *>::iterator it = m_tests.begin();
         it != m_tests.end();
         ++it )
   {
@@ -52,7 +52,7 @@ TestSuite::countTestCases() const
 {
   int count = 0;
 
-  for ( std::vector<Test *>::const_iterator it = m_tests.begin();
+  for ( vector<Test *>::const_iterator it = m_tests.begin();
         it != m_tests.end();
         ++it )
     count += (*it)->countTestCases();
@@ -70,7 +70,7 @@ TestSuite::addTest( Test *test )
 
 
 /// Returns a string representation of the test suite.
-std::string 
+string 
 TestSuite::toString() const
 { 
   return "suite " + getName();
@@ -78,14 +78,14 @@ TestSuite::toString() const
 
 
 /// Returns the name of the test suite.
-std::string 
+string 
 TestSuite::getName() const
 { 
   return m_name; 
 }
 
 
-const std::vector<Test *> &
+const vector<Test *> &
 TestSuite::getTests() const
 {
   return m_tests;

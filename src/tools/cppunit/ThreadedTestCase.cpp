@@ -3,7 +3,7 @@
 #include <Autolock.h>
 #include <stdio.h>	
 
-BThreadedTestCase::BThreadedTestCase(std::string name, std::string progressSeparator)
+BThreadedTestCase::BThreadedTestCase(string name, string progressSeparator)
 	: BTestCase(name)
 	, fProgressSeparator(progressSeparator)
 	, fUpdateLock(new BLocker())
@@ -15,7 +15,7 @@ BThreadedTestCase::~BThreadedTestCase() {
 	delete fUpdateLock;
 
 	// Clean up
-	for (std::map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.begin();
+	for (map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.begin();
 		   i != fNumberMap.end();
 		     i++)
 	{
@@ -31,13 +31,13 @@ BThreadedTestCase::NextSubTest() {
 	{
 		// Acquire the update lock
 		BAutolock lock(fUpdateLock);
-		std::map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.find(id);
+		map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.find(id);
 		if (i != fNumberMap.end() && i->second) {
 			// Handle multi-threaded case
 			ThreadSubTestInfo *info = i->second;
 			char num[32];
 			sprintf(num, "%ld", info->subTestNum++);
-			std::string str = std::string("[") + info->name + fProgressSeparator + num + "]";
+			string str = string("[") + info->name + fProgressSeparator + num + "]";
 			fUpdateList.push_back(str);
 			return;
 		}
@@ -72,16 +72,16 @@ BThreadedTestCase::Outputf(const char *str, ...) {
 			{
 				// Acquire the update lock and post our update
 				BAutolock lock(fUpdateLock);
-				fUpdateList.push_back(std::string(msg));
+				fUpdateList.push_back(string(msg));
 			}
 		}
 	}
 }
 
 void
-BThreadedTestCase::InitThreadInfo(thread_id id, std::string threadName) {
+BThreadedTestCase::InitThreadInfo(thread_id id, string threadName) {
 	BAutolock lock(fUpdateLock);	// Lock the number map
-	std::map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.find(id);
+	map<thread_id, ThreadSubTestInfo*>::iterator i = fNumberMap.find(id);
 	if (i != fNumberMap.end() && i->second) {
 		i->second->name = threadName;
 		i->second->subTestNum = 0;
@@ -108,7 +108,7 @@ BThreadedTestCase::UnregisterForUse() {
 	fInUse = false;
 }
 
-std::vector<std::string>&
+vector<string>&
 BThreadedTestCase::AcquireUpdateList() {
 	fUpdateLock->Lock();
 	return fUpdateList;

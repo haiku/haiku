@@ -21,7 +21,7 @@ namespace CppUnit {
      *         the "class" prefix. If the name is not prefixed
      *         by "class", it is returned as this.
      */
-    static std::string getClassName( const std::type_info &info );
+    static string getClassName( const type_info &info );
   };
 
 }  // namespace CppUnit

@@ -3,10 +3,10 @@
 namespace CppUnit {
 
 
-NotEqualException::NotEqualException( std::string expected,
-                                      std::string actual, 
+NotEqualException::NotEqualException( string expected,
+                                      string actual, 
                                       SourceLine sourceLine ,
-                                      std::string additionalMessage ) :
+                                      string additionalMessage ) :
     Exception( "Expected: " + expected + 
                    ", but was: " + actual + 
                    "." + additionalMessage ,
@@ -22,10 +22,10 @@ NotEqualException::NotEqualException( std::string expected,
 /*!
  * \deprecated Use other constructor instead.
  */
-NotEqualException::NotEqualException( std::string expected,
-                                      std::string actual,
+NotEqualException::NotEqualException( string expected,
+                                      string actual,
                                       long lineNumber, 
-                                      std::string fileName ) : 
+                                      string fileName ) : 
     Exception( "Expected: " + expected + ", but was: " + actual,
                lineNumber,
                fileName ),
@@ -87,21 +87,21 @@ NotEqualException::type()
 }
 
 
-std::string 
+string 
 NotEqualException::expectedValue() const
 {
   return m_expected;
 }
 
 
-std::string 
+string 
 NotEqualException::actualValue() const
 {
   return m_actual;
 }
 
 
-std::string 
+string 
 NotEqualException::additionalMessage() const
 {
   return m_additionalMessage;

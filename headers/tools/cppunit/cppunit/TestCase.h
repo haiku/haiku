@@ -28,15 +28,15 @@ class CPPUNIT_API TestCase : public Test,
 {
 public:
 
-    TestCase( std::string Name );
+    TestCase( string Name );
     //! \internal
     TestCase();
     ~TestCase();
     
     virtual void run(TestResult *result);
     virtual int countTestCases() const;
-    std::string getName() const;
-    std::string toString() const;
+    string getName() const;
+    string toString() const;
 
     //! FIXME: what is this for?
     virtual TestResult *run();
@@ -53,7 +53,7 @@ private:
     TestCase &operator=( const TestCase &other ); 
     
 private:
-    const std::string m_name;
+    const string m_name;
 };
 
 } // namespace CppUnit

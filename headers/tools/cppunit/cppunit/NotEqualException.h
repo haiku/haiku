@@ -19,16 +19,16 @@ public:
    * \param additionalMessage Additionnal information provided to further qualify
    *                          the inequality.
    */
-  NotEqualException( std::string expected,
-                     std::string actual, 
+  NotEqualException( string expected,
+                     string actual, 
                      SourceLine sourceLine = SourceLine(),
-                     std::string additionalMessage = "" );
+                     string additionalMessage = "" );
 
 #ifdef CPPUNIT_ENABLE_SOURCELINE_DEPRECATED
-  NotEqualException( std::string expected,
-                     std::string actual, 
+  NotEqualException( string expected,
+                     string actual, 
                      long lineNumber, 
-                     std::string fileName );
+                     string fileName );
 #endif
 
   NotEqualException( const NotEqualException &other );
@@ -36,11 +36,11 @@ public:
 
   virtual ~NotEqualException() throw();
 
-  std::string expectedValue() const;
+  string expectedValue() const;
 
-  std::string actualValue() const;
+  string actualValue() const;
 
-  std::string additionalMessage() const;
+  string additionalMessage() const;
 
   /*! Copy operator.
    * @param other Object to copy.
@@ -55,9 +55,9 @@ public:
   static Type type();
 
 private:
-  std::string m_expected;
-  std::string m_actual;
-  std::string m_additionalMessage;
+  string m_expected;
+  string m_actual;
+  string m_additionalMessage;
 };
 
 }  // namespace CppUnit

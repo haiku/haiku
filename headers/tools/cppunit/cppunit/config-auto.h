@@ -5,7 +5,7 @@
 /* config/config.h.  Generated automatically by configure.  */
 /* config/config.h.in.  Generated automatically from configure.in by autoheader.  */
 
-/* define if library uses std::string::compare(string,pos,n) */
+/* define if library uses string::compare(string,pos,n) */
 #ifndef CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST 
 #define CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST  1 
 #endif

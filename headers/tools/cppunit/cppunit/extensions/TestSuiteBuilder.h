@@ -38,7 +38,7 @@ namespace CppUnit {
       {
       }
 
-      TestSuiteBuilder(std::string name) : m_suite( new TestSuite(name) ) 
+      TestSuiteBuilder(string name) : m_suite( new TestSuite(name) ) 
       {
       }
 
@@ -57,7 +57,7 @@ namespace CppUnit {
         m_suite->addTest( test );
       }
 
-      void addTestCaller( std::string methodName, 
+      void addTestCaller( string methodName, 
                           TestMethod testMethod )
       {
           Test *test = 
@@ -66,7 +66,7 @@ namespace CppUnit {
           addTest( test );
       }
 
-      void addTestCaller( std::string methodName, 
+      void addTestCaller( string methodName, 
                           TestMethod testMethod, 
                           Fixture *fixture )
       {
@@ -78,7 +78,7 @@ namespace CppUnit {
       }
 
       template<typename ExceptionType>
-      void addTestCallerForException( std::string methodName, 
+      void addTestCallerForException( string methodName, 
                                       TestMethod testMethod, 
                                       Fixture *fixture,
                                       ExceptionType *dummyPointer )
@@ -91,13 +91,13 @@ namespace CppUnit {
       }
 
     
-      std::string makeTestName( const std::string &methodName )
+      string makeTestName( const string &methodName )
       {
         return m_suite->getName() + "." + methodName;
       }
 
     private:
-      std::auto_ptr<TestSuite> m_suite;
+      auto_ptr<TestSuite> m_suite;
   };
 
 }  // namespace CppUnit

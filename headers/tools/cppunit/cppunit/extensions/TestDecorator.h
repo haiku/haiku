@@ -25,8 +25,8 @@ public:
 
     void        run             (TestResult *result);
     int         countTestCases  () const;
-    std::string getName         () const;
-    std::string toString        () const;
+    string getName         () const;
+    string toString        () const;
 
 protected:
     Test        *m_test;
@@ -53,11 +53,11 @@ inline void TestDecorator::run (TestResult *result)
 { m_test->run (result); }
 
 
-inline std::string TestDecorator::toString () const
+inline string TestDecorator::toString () const
 { return m_test->toString (); }
 
 
-inline std::string TestDecorator::getName () const
+inline string TestDecorator::getName () const
 { return m_test->getName(); }
 
 } // namespace CppUnit

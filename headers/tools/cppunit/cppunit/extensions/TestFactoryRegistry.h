@@ -17,7 +17,7 @@ namespace CppUnit {
 class TestSuite;
 
 #if CPPUNIT_NEED_DLL_DECL
-  template class CPPUNIT_API std::map<std::string, TestFactory *>;
+  template class CPPUNIT_API map<string, TestFactory *>;
 #endif
 
 
@@ -79,7 +79,7 @@ public:
    * \param name Name of the registry. It is the name of TestSuite returned by
    *             makeTest().
    */
-  TestFactoryRegistry( std::string name = "All Tests" );
+  TestFactoryRegistry( string name = "All Tests" );
 
   /// Destructor.
   virtual ~TestFactoryRegistry();
@@ -104,7 +104,7 @@ public:
    * \return Registry. If the registry does not exist, it is created with the
    *         specified name.
    */
-  static TestFactoryRegistry &getRegistry( const std::string &name );
+  static TestFactoryRegistry &getRegistry( const string &name );
 
   /** Adds the registered tests to the specified suite.
    * \param suite Suite the tests are added to.
@@ -116,7 +116,7 @@ public:
    * \param factory Factory to register. 
    * \deprecated Use registerFactory( TestFactory *) instead.
    */
-  void registerFactory( const std::string &name,
+  void registerFactory( const string &name,
                         TestFactory *factory );
 
   /** Adds the specified TestFactory to the registry.
@@ -130,10 +130,10 @@ private:
   void operator =( const TestFactoryRegistry &copy );
 
 private:
-  typedef std::map<std::string, TestFactory *> Factories;
+  typedef map<string, TestFactory *> Factories;
   Factories m_factories;
 
-  std::string m_name;
+  string m_name;
 };
 
 

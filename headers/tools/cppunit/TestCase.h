@@ -8,7 +8,7 @@
 //! Base class for single threaded unit tests
 class BTestCase : public CppUnit::TestCase {
 public:
-	BTestCase(std::string Name = "");
+	BTestCase(string Name = "");
 	
 	//! Displays the next sub test progress indicator (i.e. [0][1][2][3]...).
 	virtual void NextSubTest();

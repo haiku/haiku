@@ -20,7 +20,7 @@ TestRunner::TestRunner( Outputter *outputter )
     , m_outputter( outputter )
 {
   if ( !m_outputter )
-    m_outputter = new TextOutputter( m_result, std::cout );
+    m_outputter = new TextOutputter( m_result, cout );
   m_eventManager->addListener( m_result );
 }
 
@@ -61,7 +61,7 @@ TestRunner::addTest( Test *test )
  *         failed or was not found.
  */
 bool
-TestRunner::run( std::string testName,
+TestRunner::run( string testName,
                      bool doWait,
                      bool doPrintResult,
                      bool doPrintProgress )
@@ -74,7 +74,7 @@ TestRunner::run( std::string testName,
 
 
 bool
-TestRunner::runTestByName( std::string testName,
+TestRunner::runTestByName( string testName,
                                bool doPrintProgress )
 {
   if ( testName.empty() )
@@ -84,7 +84,7 @@ TestRunner::runTestByName( std::string testName,
   if ( test != NULL )
     return runTest( test, doPrintProgress );
 
-  std::cout << "Test " << testName << " not found." << std::endl;
+  cout << "Test " << testName << " not found." << endl;
   return false;
 }
 
@@ -94,8 +94,8 @@ TestRunner::wait( bool doWait )
 {
   if ( doWait ) 
   {
-    std::cout << "<RETURN> to continue" << std::endl;
-    std::cin.get ();
+    cout << "<RETURN> to continue" << endl;
+    cin.get ();
   }
 }
 
@@ -103,16 +103,16 @@ TestRunner::wait( bool doWait )
 void 
 TestRunner::printResult( bool doPrintResult )
 {
-  std::cout << std::endl;
+  cout << endl;
   if ( doPrintResult )
     m_outputter->write();
 }
 
 
 Test * 
-TestRunner::findTestByName( std::string name ) const
+TestRunner::findTestByName( string name ) const
 {
-  for ( std::vector<Test *>::const_iterator it = m_suite->getTests().begin(); 
+  for ( vector<Test *>::const_iterator it = m_suite->getTests().begin(); 
         it != m_suite->getTests().end(); 
         ++it )
   {

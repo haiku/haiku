@@ -34,7 +34,7 @@ class TestResultCollector;
  *   // if command line contains "-selftest" then this is the post build check
  *   // => the output must be in the compiler error format.
  *   bool selfTest = (argc > 1)  &&  
- *                   (std::string("-selftest") == argv[1]);
+ *                   (string("-selftest") == argv[1]);
  *
  *   CppUnit::TextUi::TestRunner runner;
  *   runner.addTest( CppUnitTest::suite() );   // Add the top suite to the test runner
@@ -44,7 +44,7 @@ class TestResultCollector;
  *     // The test runner owns the new outputter.
  *     runner.setOutputter( CppUnit::CompilerOutputter::defaultOutputter( 
  *                                                        &runner.result(),
- *                                                         std::cerr ) );
+ *                                                         cerr ) );
  *   }
  * 
  *  // Run the test and don't wait a key if post build check.
@@ -61,7 +61,7 @@ public:
   /*! Constructs a CompilerOutputter object.
    */
   CompilerOutputter( TestResultCollector *result,
-                     std::ostream &stream );
+                     ostream &stream );
 
   /// Destructor.
   virtual ~CompilerOutputter();
@@ -69,7 +69,7 @@ public:
   /*! Creates an instance of an outputter that matches your current compiler.
    */
   static CompilerOutputter *defaultOutputter( TestResultCollector *result,
-                                              std::ostream &stream );
+                                              ostream &stream );
 
   void write();
 
@@ -84,7 +84,7 @@ public:
   virtual void printFailureMessage( TestFailure *failure );
   virtual void printNotEqualMessage( Exception *thrownException );
   virtual void printDefaultMessage( Exception *thrownException );
-  virtual std::string wrap( std::string message );
+  virtual string wrap( string message );
 
 private:
   /// Prevents the use of the copy constructor.
@@ -93,12 +93,12 @@ private:
   /// Prevents the use of the copy operator.
   void operator =( const CompilerOutputter &copy );
 
-  typedef std::vector<std::string> Lines;
-  static Lines splitMessageIntoLines( std::string message );
+  typedef vector<string> Lines;
+  static Lines splitMessageIntoLines( string message );
 
 private:
   TestResultCollector *m_result;
-  std::ostream &m_stream;
+  ostream &m_stream;
 };
 
 

@@ -51,7 +51,7 @@ namespace TextUi
  * runner.addTest( ExampleTestCase::suite() );
  * runner.setOutputter( CppUnit::CompilerOutputter::defaultOutputter( 
  *                          &runner.result(),
- *                          std::cerr ) );
+ *                          cerr ) );
  * MyCustomProgressTestListener progress;
  * runner.eventManager().addListener( &progress );
  * runner.run( "", true );    // Run all tests and wait
@@ -66,7 +66,7 @@ public:
 
   virtual ~TestRunner();
 
-  bool run( std::string testName ="",
+  bool run( string testName ="",
             bool doWait = false,
             bool doPrintResult = true,
             bool doPrintProgress = true );
@@ -82,12 +82,12 @@ public:
 protected:
   virtual bool runTest( Test *test,
                         bool doPrintProgress );
-  virtual bool runTestByName( std::string testName,
+  virtual bool runTestByName( string testName,
                               bool printProgress );
   virtual void wait( bool doWait );
   virtual void printResult( bool doPrintResult );
 
-  virtual Test *findTestByName( std::string name ) const;
+  virtual Test *findTestByName( string name ) const;
 
   TestSuite *m_suite;
   TestResultCollector *m_result;

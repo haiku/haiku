@@ -3,12 +3,13 @@
 #include <TestUtils.h>
 #include <TestShell.h>
 #include <stdio.h>
+#include <iostream>
 
 status_t DecodeResult(status_t result) {
 	if (!BTestShell::GlobalBeVerbose())
 		return result;
 
-	std::string str;
+	string str;
 	switch (result) {
 
 		case B_OK:
@@ -177,10 +178,10 @@ status_t DecodeResult(status_t result) {
 	return result;
 }
 
-std::string IntToStr(int i) {
+string IntToStr(int i) {
 	char num[32];
 	sprintf(num, "%d", i);
-	return std::string(num);
+	return string(num);
 }
 
 void ExecCommand(const char *command) {

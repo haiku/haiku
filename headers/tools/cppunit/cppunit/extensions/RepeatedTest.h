@@ -24,7 +24,7 @@ public:
 
     void run( TestResult *result );
     int countTestCases() const;
-    std::string toString() const;
+    string toString() const;
 
 private:
     RepeatedTest( const RepeatedTest & );

@@ -16,6 +16,11 @@
  */
 
 
+#if defined(__POWERPC__) && defined(__BEOS__)
+#define CPPUNIT_HAVE_SSTREAM 1
+#undef CPPUNIT_FUNC_STRING_COMPARE_STRING_FIRST
+#endif
+
 /* Define to 1 if you wish to have the old-style macros
    assert(), assertEqual(), assertDoublesEqual(), and assertLongsEqual() */
 #ifndef CPPUNIT_ENABLE_NAKED_ASSERT
@@ -45,13 +50,13 @@
 /* perform portability hacks */
 
 
-/* Define CPPUNIT_SSTREAM as a stream with a "std::string str()"
+/* Define CPPUNIT_SSTREAM as a stream with a "string str()"
  * method.
  */
 #if CPPUNIT_HAVE_SSTREAM
 #   include <sstream>
     namespace CppUnit {
-      class OStringStream : public std::ostringstream 
+      class OStringStream : public ostringstream 
       {
       };
     }
@@ -65,14 +70,14 @@
 #   endif
 
     namespace CppUnit {
-      class OStringStream : public std::ostrstream 
+      class OStringStream : public ostrstream 
       {
       public:
-          std::string str()
+          string str()
           {
             (*this) << '\0';
-            std::string msg(std::ostrstream::str());
-            std::ostrstream::freeze(false);
+            string msg(ostrstream::str());
+            ostrstream::freeze(false);
             return msg;
           }
       };

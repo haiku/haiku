@@ -11,7 +11,7 @@
 //! Base class for single threaded unit tests
 class BThreadedTestCase : public BTestCase {
 public:
-	BThreadedTestCase(std::string Name = "", std::string progressSeparator = ".");
+	BThreadedTestCase(string Name = "", string progressSeparator = ".");
 	virtual ~BThreadedTestCase();
 	
 	/*! \brief Displays the next sub test progress indicator for the
@@ -33,24 +33,24 @@ public:
 	
 	//! Restores the current working directory to last directory saved by a	call to SaveCWD().	
 	void RestoreCWD(const char *alternate = NULL);
-	void InitThreadInfo(thread_id id, std::string threadName);
+	void InitThreadInfo(thread_id id, string threadName);
 	bool RegisterForUse();
 	void UnregisterForUse();
 	
-	std::vector<std::string>& AcquireUpdateList();
+	vector<string>& AcquireUpdateList();
 	void ReleaseUpdateList();
 protected:
 	bool fInUse;
 
 //	friend class ThreadManager<BThreadedTestCase>;
-	std::string fProgressSeparator;
+	string fProgressSeparator;
 
 	struct ThreadSubTestInfo {
-		std::string name;
+		string name;
 		int32 subTestNum;	
 	};
-	std::map<thread_id, ThreadSubTestInfo*> fNumberMap;
-	std::vector<std::string> fUpdateList;
+	map<thread_id, ThreadSubTestInfo*> fNumberMap;
+	vector<string> fUpdateList;
 	BLocker *fUpdateLock;
 
 };

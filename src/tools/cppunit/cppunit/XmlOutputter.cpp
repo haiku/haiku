@@ -14,15 +14,15 @@ namespace CppUnit
 // //////////////////////////////////////////////////////////////////
 
 
-XmlOutputter::Node::Node( std::string elementName,
-                          std::string content ) :
+XmlOutputter::Node::Node( string elementName,
+                          string content ) :
     m_name( elementName ),
     m_content( content )
 {
 }
 
     
-XmlOutputter::Node::Node( std::string elementName,
+XmlOutputter::Node::Node( string elementName,
                           int numericContent ) :
     m_name( elementName )
 {
@@ -39,15 +39,15 @@ XmlOutputter::Node::~Node()
 
 
 void 
-XmlOutputter::Node::addAttribute( std::string attributeName,
-                                  std::string value  )
+XmlOutputter::Node::addAttribute( string attributeName,
+                                  string value  )
 {
   m_attributes.push_back( Attribute( attributeName, value ) );
 }
 
 
 void 
-XmlOutputter::Node::addAttribute( std::string attributeName,
+XmlOutputter::Node::addAttribute( string attributeName,
                                   int numericValue )
 {
   addAttribute( attributeName, asString( numericValue ) );
@@ -61,10 +61,10 @@ XmlOutputter::Node::addNode( Node *node )
 }
 
 
-std::string 
+string 
 XmlOutputter::Node::toString() const
 {
-  std::string element = "<";
+  string element = "<";
   element += m_name;
   element += " ";
   element += attributesAsString();
@@ -87,10 +87,10 @@ XmlOutputter::Node::toString() const
 }
 
 
-std::string 
+string 
 XmlOutputter::Node::attributesAsString() const
 {
-  std::string attributes;
+  string attributes;
   Attributes::const_iterator itAttribute = m_attributes.begin();
   while ( itAttribute != m_attributes.end() )
   {
@@ -104,10 +104,10 @@ XmlOutputter::Node::attributesAsString() const
 }
 
 
-std::string 
-XmlOutputter::Node::escape( std::string value ) const
+string 
+XmlOutputter::Node::escape( string value ) const
 {
-  std::string escaped;
+  string escaped;
   for ( int index =0; index < (int)value.length(); ++index )
   {
     char c = value[index ];
@@ -137,7 +137,7 @@ XmlOutputter::Node::escape( std::string value ) const
 }
 
 // should be somewhere else... Future CppUnit::String ?    
-std::string 
+string 
 XmlOutputter::Node::asString( int value )
 {
   OStringStream stream;
@@ -152,8 +152,8 @@ XmlOutputter::Node::asString( int value )
 // //////////////////////////////////////////////////////////////////
 
 XmlOutputter::XmlOutputter( TestResultCollector *result,
-                            std::ostream &stream,
-                            std::string encoding ) :
+                            ostream &stream,
+                            string encoding ) :
     m_result( result ),
     m_stream( stream ),
     m_encoding( encoding )
@@ -179,7 +179,7 @@ XmlOutputter::writeProlog()
 {
   m_stream  <<  "<?xml version=\"1.0\" "
                 "encoding='"  <<  m_encoding  << "' standalone='yes' ?>"
-            <<  std::endl;
+            <<  endl;
 }
 
 
@@ -216,7 +216,12 @@ XmlOutputter::fillFailedTestsMap( FailedTests &failedTests )
   while ( itFailure != failures.end() )
   {
     TestFailure *failure = *itFailure++;
-    failedTests.insert( std::make_pair(failure->failedTest(), failure ) );
+    failedTests.insert( 
+    	pair< CppUnit::Test* const, CppUnit::TestFailure*
+    	>(
+    		failure->failedTest(), failure 
+    	) 
+    );
   }
 }
 
