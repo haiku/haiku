@@ -21,6 +21,25 @@ void nv_bes_move_overlay()
 	/* abort if overlay is not active */
 	if (!si->overlay.active) return;
 
+	/* do 'overlay follow head' in dualhead modes on dualhead cards */
+	if (si->ps.secondary_head)
+	{
+		switch (si->dm.flags & DUALHEAD_BITS)
+		{
+		case DUALHEAD_ON:
+		case DUALHEAD_SWITCH:
+			if ((si->overlay.ow.h_start + (si->overlay.ow.width / 2)) <
+					(si->dm.h_display_start + si->dm.timing.h_display))
+				nv_bes_to_crtc(si->crtc_switch_mode);
+			else
+				nv_bes_to_crtc(!si->crtc_switch_mode);
+			break;
+		default:
+				nv_bes_to_crtc(si->crtc_switch_mode);
+			break;
+		}
+	}
+
 	/* the BES does not respect virtual_workspaces, but adheres to CRTC
 	 * constraints only */
 	crtc_hstart = si->dm.h_display_start;
