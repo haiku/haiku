@@ -54,6 +54,7 @@ KernelLd linkhack.so :
 
 SubInclude OBOS_TOP src kernel core addons ;
 SubInclude OBOS_TOP src kernel core arch ;
+SubInclude OBOS_TOP src kernel core device_manager ;
 SubInclude OBOS_TOP src kernel core disk_device_manager ;
 SubInclude OBOS_TOP src kernel core fs ;
 SubInclude OBOS_TOP src kernel core vm ;
