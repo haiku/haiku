@@ -21,6 +21,9 @@
 
 #include "Disc.h"
 
+#include <DiskDeviceDefs.h>
+#include <DiskDeviceTypes.h>
+
 #include "Debug.h"
 
 static const char *kModuleDebugName = "session";
@@ -355,7 +358,7 @@ Disc::Disc(int fd)
 		count = (header->length-2) / sizeof(cdrom_full_table_of_contents_entry);
 		
 		error = _ParseTableOfContents(entries, count);
-		Dump();
+//		Dump();
 		if (!error) {
 			_SortAndRemoveDuplicates();
 			error = _CheckForErrorsAndWarnings();
@@ -386,11 +389,10 @@ Disc::InitCheck()
 	
 	Returns \c B_ENTRY_NOT_FOUND if no such session exists.
 */
-status_t
-Disc::GetSessionInfo(int32 index)
+Session*
+Disc::GetSession(int32 index)
 {
-//	TRACE(("%s: Disc::GetSessionInfo(%ld, %ld, %p)\n", kModuleDebugName,
-//	       index, blockSize, sessionInfo));
+	DEBUG_INIT_ETC("Disc", ("index: %ld", index));
 	int32 counter = -1;
 	for (session *session = (struct session*)fSessionList->First();
 	       session;
@@ -403,22 +405,24 @@ Disc::GetSessionInfo(int32 index)
 				// track with the end of session.
 				track *track = (struct track*)session->track_list.First();
 				if (track) {
-					TRACE(("%s: found session #%ld info (audio session)\n", kModuleDebugName, index));
+					PRINT(("found session #%ld info (audio session)\n", index));
 
 					off_t start_lba = track->start_lba;
 					off_t end_lba = session->end_lba;
 					
-/*					sessionInfo->logical_block_size = blockSize;
-					sessionInfo->offset = start_lba * blockSize;
-					sessionInfo->size = (end_lba - start_lba) * blockSize;
-					sessionInfo->index = index;
-					sessionInfo->flags = 0;
-*/					
-					return B_OK;									
+					off_t offset = start_lba * kBlockSize;
+					off_t size = (end_lba - start_lba) * kBlockSize;
+					
+					Session *result = new Session(offset, size, kBlockSize,
+					                              index, B_PARTITION_READ_ONLY,
+					                              kPartitionTypeAudioSession);
+					if (!result) 
+						PRINT(("Error allocating new Session object; out of memory!\n"));
+					return result;
 				} else {
-					TRACE(("%s: Disc::GetSessionInfo: session #%ld is an audio "
-					       "session with no tracks\n", kModuleDebugName, index));
-					return B_ENTRY_NOT_FOUND;
+					PRINT(("Error: session #%ld is an audio "
+					       "session with no tracks!\n", index));
+					return NULL;
 				}			
 			}			
 		} else {
@@ -428,27 +432,29 @@ Disc::GetSessionInfo(int32 index)
 			{
 				counter++;
 				if (counter == index) {
-					TRACE(("%s: found session #%ld info (data session)\n", kModuleDebugName, index));
+					PRINT(("found session #%ld info (data session)\n", index));
 
 					off_t start_lba = track->start_lba;
 					off_t end_lba = track->next
 					                  ? ((struct track*)track->next)->start_lba
 					                    : session->end_lba;
 					
-/*
-					sessionInfo->logical_block_size = blockSize;
-					sessionInfo->offset = start_lba * blockSize;
-					sessionInfo->size = (end_lba - start_lba) * blockSize;
-					sessionInfo->index = index;
-					sessionInfo->flags = B_DATA_SESSION;
-*/					
-					return B_OK;														
+					off_t offset = start_lba * kBlockSize;
+					off_t size = (end_lba - start_lba) * kBlockSize;
+					
+					Session *result = new Session(offset, size, kBlockSize,
+					                              index, B_PARTITION_READ_ONLY,
+					                              kPartitionTypeDataSession);
+					if (!result) 
+						PRINT(("Error allocating new Session object; out of memory!\n"));
+					return result;
 				}			
 			}		
 		}		
 	}
 	
-	return B_ENTRY_NOT_FOUND;
+	PRINT(("no session #%ld found!\n", index));
+	return NULL;
 }
 
 /*! \brief Dumps a printout of the disc using TRACE.
@@ -483,7 +489,7 @@ Disc::Dump()
 status_t
 Disc::_ParseTableOfContents(cdrom_full_table_of_contents_entry entries[], uint32 count)
 {
-	TRACE(("%s: Disc::ParseTableOfContents(%p, %ld)\n", kModuleDebugName, entries, count));
+	DEBUG_INIT_ETC("Disc", ("entries: %p, count: %ld", entries, count));
 	for (uint32 i = 0; i < count; i++) {
 		// Find or create the appropriate session
 		uint8 session_index = entries[i].session;
@@ -733,6 +739,25 @@ Disc::_CheckForErrorsAndWarnings() {
 }
 
 //------------------------------------------------------------------------------
+// Session
+//------------------------------------------------------------------------------
+
+Session::Session(off_t offset, off_t size, uint32 blockSize, int32 index,
+                 uint32 flags, const char *type)
+	: fOffset(offset)
+	, fSize(size)
+	, fBlockSize(blockSize)
+	, fIndex(index)
+	, fFlags(flags)
+	, fType(strdup(type))
+{	
+}
+
+Session::~Session() {
+	free(fType);
+}
+
+//------------------------------------------------------------------------------
 // C functions
 //------------------------------------------------------------------------------
 
@@ -793,6 +818,7 @@ static
 void
 dump_full_table_of_contents(uchar *data, uint16 data_length)
 {
+	return;
 	cdrom_table_of_contents_header *header;
 	cdrom_full_table_of_contents_entry *entries;
 	int i, count;
@@ -853,8 +879,8 @@ read_table_of_contents(int deviceFD, uint32 first_session, uchar *buffer,
 	uchar sense_data[sense_data_length];
 	status_t error = buffer ? B_OK : B_BAD_VALUE;
 	
-	TRACE(("%s: read_table_of_contents: (%d, %p, %d)\n", kModuleDebugName,
-	       deviceFD, buffer, buffer_length));
+	DEBUG_INIT_ETC(NULL, ("fd: %d, buffer: %p, buffer_length: %d", 
+	               deviceFD, buffer, buffer_length));
 
 	if (error)
 		return error;
