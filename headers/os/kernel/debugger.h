@@ -29,7 +29,7 @@ extern "C" {
 ----- */
 
 extern status_t	install_default_debugger (port_id to_debugger_port);
-extern port_id		install_team_debugger (team_id team, port_id to_debugger_port);
+extern port_id	install_team_debugger (team_id team, port_id to_debugger_port);
 extern status_t	remove_team_debugger (team_id team);
 extern status_t	debug_thread (thread_id thread);
 
@@ -62,40 +62,27 @@ typedef enum {
 } db_why_stopped;
 #endif
 
-#if __arm__	/* FIXME!  This is probably neither complete, nor right.  Placeholder for now. */
+#if __INTEL__
 typedef enum {
 	B_THREAD_NOT_RUNNING,
 	B_DEBUGGER_CALL,
 	B_BREAKPOINT_HIT,
+	B_SNGLSTP,
 	B_NMI,
 	B_MACHINE_CHECK_EXCEPTION,
+	B_SEGMENT_VIOLATION,
+	B_ALIGNMENT_EXCEPTION,
+	B_DIVIDE_ERROR,
+	B_OVERFLOW_EXCEPTION,
+	B_BOUNDS_CHECK_EXCEPTION,
+	B_INVALID_OPCODE_EXCEPTION,
+	B_SEGMENT_NOT_PRESENT,
+	B_STACK_FAULT,
+	B_GENERAL_PROTECTION_FAULT,
+	B_FLOATING_POINT_EXCEPTION,
 	B_GET_PROFILING_INFO,
 	B_WATCHPOINT_HIT,
 	B_SYSCALL_HIT
-} db_why_stopped;
-#endif
-
-#if __INTEL__
-typedef enum {
-		B_THREAD_NOT_RUNNING,
-		B_DEBUGGER_CALL,
-		B_BREAKPOINT_HIT,
-		B_SNGLSTP,
-		B_NMI,
-		B_MACHINE_CHECK_EXCEPTION,
-		B_SEGMENT_VIOLATION,
-		B_ALIGNMENT_EXCEPTION,
-		B_DIVIDE_ERROR,
-		B_OVERFLOW_EXCEPTION,
-		B_BOUNDS_CHECK_EXCEPTION,
-		B_INVALID_OPCODE_EXCEPTION,
-		B_SEGMENT_NOT_PRESENT,
-		B_STACK_FAULT,
-		B_GENERAL_PROTECTION_FAULT,
-		B_FLOATING_POINT_EXCEPTION,
-		B_GET_PROFILING_INFO,
-		B_WATCHPOINT_HIT,
-		B_SYSCALL_HIT
 } db_why_stopped;
 #endif
 
@@ -225,31 +212,8 @@ typedef struct {
 	uint16  reserved5;
 } x86_cpu_state;
 
-typedef struct
-{
-	/* !!!XXX This is a placeholder and will need to be fixed */
-	int32 r0;
-	int32 r1;
-	int32 r2;
-	int32 r3;
-	int32 r4;
-	int32 r5;
-	int32 r6;
-	int32 r7;			/* WR - Thumb-state work register */
-	int32 r8;
-	int32 r9;			/* SB */
-	int32 r10;		/* SL */
-	int32 r11;		/* FP - ARM-state frame pointer */
-	int32 r12;		/* IP - intra-procedure-call scratch pointer */
-	int32 r13;		/* SP - stack pointer */
-	int32 r14;		/* LR - link register */
-	int32 r15;		/* PC */
-} arm_cpu_state;
-
 #if __INTEL__
 typedef x86_cpu_state cpu_state;
-#elif __arm__
-typedef arm_cpu_state cpu_state;
 #endif
 
 /* -----
@@ -356,9 +320,9 @@ typedef struct {
 
 typedef	enum
 {
-	PERFMON_USER_MODE	= 0,
-	PERFMON_KERNEL_MODE,
-	PERFMON_KERNEL_AND_USER_MODE
+	B_PERFMON_USER_MODE	= 0,
+	B_PERFMON_KERNEL_MODE,
+	B_PERFMON_KERNEL_AND_USER_MODE
 } perfmon_privilege;
 
 
@@ -457,26 +421,18 @@ typedef union {
 
 /* -----
 	messages passed to the external debugger
-
-	*** DANGER WILL ROBINSON!! *** Don't change the ordering/numbering
-	of these messages. Doing so will break 3rd party debuggers (i.e.,
-	MWDebug) between releases.
 ----- */
 
 enum debugger_message {
 	B_THREAD_STOPPED 	= 0,	/* thread stopped, here is its state */
 	B_TEAM_CREATED		= 1,	/* team was created */
 	B_TEAM_DELETED		= 2,	/* team was deleted */
-#if __ELF__
-	B_ELF_IMAGE_CREATED	= 3,	/* pe image was created */
-	B_ELF_IMAGE_DELETED	= 4,	/* pe image was deleted */
-#else
-	B_PEF_IMAGE_CREATED	= 3,	/* pef image was created */
-	B_PEF_IMAGE_DELETED	= 4,	/* pef image was deleted */
-#endif
+	B_IMAGE_CREATED		= 3,	/* image was created */
+	B_IMAGE_DELETED		= 4,	/* image was deleted */
 	B_THREAD_CREATED	= 5,	/* thread was created */
 	B_THREAD_DELETED	= 6,	/* thread was deleted */
-	B_SYSCALL_POST		= 7 	/* end of syscall */
+	B_SYSCALL_PRE		= 7, 	/* begin of syscall */
+	B_SYSCALL_POST		= 8, 	/* end of syscall */
 };
 
 /* ----------
@@ -506,12 +462,12 @@ typedef struct {
 	thread_id	thread;			/* id of thread that is loading the image */
 	image_info	info;			/* info for the image */
 	port_id		nub_port;		/* port to nub for this team */
-} db_pef_image_created_msg;
+} db_image_created_msg;
 
 typedef struct {
 	team_id		team;
 	image_info	info;			/* info for the image */
-} db_pef_image_deleted_msg;
+} db_image_deleted_msg;
 
 typedef struct {
 	thread_id	thread;			/* thread id */
@@ -531,11 +487,19 @@ typedef struct {
 	thread_id	thread;			/* thread id */
 	team_id		team;			/* team id */
 	bigtime_t	start_time;		/* time of syscall start */
+	uint32		syscall;		/* the syscall number */
+	uint32		args[16];		/* syscall args */
+} db_syscall_pre_msg;
+
+typedef struct {
+	thread_id	thread;			/* thread id */
+	team_id		team;			/* team id */
+	bigtime_t	start_time;		/* time of syscall start */
 	bigtime_t	end_time;		/* time of syscall completion */
 	uint32		rethi;			/* upper word of return value */
 	uint32		retlo;			/* lower word of return value */
 	uint32		syscall;		/* the syscall number */
-	uint32		args[8];		/* syscall args */
+	uint32		args[16];		/* syscall args */
 } db_syscall_post_msg;
 
 /* -----
@@ -546,8 +510,8 @@ typedef union {
 	db_thread_stopped_msg		thread_stopped;
 	db_team_created_msg			team_created;
 	db_team_deleted_msg			team_deleted;
-	db_pef_image_created_msg	pef_image_created;
-	db_pef_image_deleted_msg	pef_image_deleted;
+	db_image_created_msg		image_created;
+	db_image_deleted_msg		image_deleted;
 	db_thread_created_msg		thread_created;
 	db_thread_deleted_msg		thread_deleted;
 	db_get_profile_info_msg		get_profile_info;
@@ -560,12 +524,14 @@ typedef union {
  * Rest are used for user-level control by debuggers
  * using the debugging API. See nukernel/inc/thread.h.
  */
-#define DEBUG_USER_FLAGS_MASK		0xffff0000
+#define B_DEBUG_USER_FLAGS_MASK					0xffff0000
 
-#define DEBUG_syscall_tracing_only			0x00010000 /* used by _kstrace_init_ */
-#define DEBUG_syscall_fast_trace			0x00020000
-#define DEBUG_syscall_trace_through_spawns	0x00040000
-#define DEBUG_syscall_trace_whole_team		0x00080000
+#define B_DEBUG_SYSCALL_TRACING_ONLY			0x00010000
+#define B_DEBUG_SYSCALL_FAST_TRACE				0x00020000
+#define B_DEBUG_SYSCALL_TRACE_THROUGH_SPAWNS	0x00040000
+#define B_DEBUG_SYSCALL_TRACE_WHOLE_TEAM		0x00080000
+#define B_DEBUG_SYSCALL_TRACE_PRE				0x00100000
+#define B_DEBUG_SYSCALL_TRACE_POST				0x00200000
 
 #ifdef __cplusplus
 }
