@@ -56,6 +56,7 @@ template<typename _Key, typename _Value, typename Entry, typename Parent>
 #define _VECTOR_MAP_TEMPLATE_LIST template<typename Key, typename Value, \
 										   typename EntryStrategy>
 #define _VECTOR_MAP_CLASS_NAME VectorMap<Key, Value, EntryStrategy>
+#define _VECTOR_MAP_CLASS_TYPE typename VectorMap<Key, Value, EntryStrategy>
 
 /*!
 	\class VectorMap
@@ -84,10 +85,10 @@ public:
 															Entry;
 	typedef VectorMapEntry<KeyReference, const Value, const _Entry,
 						   const Class>						ConstEntry;
-	typedef VectorMapIterator<Entry, Class, ElementVector::Iterator>	
+	typedef VectorMapIterator<Entry, Class, typename ElementVector::Iterator>	
 															Iterator;
-	typedef VectorMapIterator<ConstEntry, const Class,
-							  ElementVector::ConstIterator>	ConstIterator;
+	typedef VectorMapIterator<ConstEntry, const Class, typename ElementVector::ConstIterator>	
+															ConstIterator;
 
 private:
 	static const size_t				kDefaultChunkSize = 10;
@@ -406,7 +407,7 @@ _VECTOR_MAP_CLASS_NAME::Remove(const Key &key)
 			(in this case including End()).
 */
 _VECTOR_MAP_TEMPLATE_LIST
-_VECTOR_MAP_CLASS_NAME::Iterator
+_VECTOR_MAP_CLASS_TYPE::Iterator
 _VECTOR_MAP_CLASS_NAME::Erase(const Iterator &iterator)
 {
 	return Iterator(this, fElements.Erase(iterator.GetIterator()));
@@ -456,7 +457,7 @@ _VECTOR_MAP_CLASS_NAME::MakeEmpty()
 */
 _VECTOR_MAP_TEMPLATE_LIST
 inline
-_VECTOR_MAP_CLASS_NAME::Iterator
+_VECTOR_MAP_CLASS_TYPE::Iterator
 _VECTOR_MAP_CLASS_NAME::Begin()
 {
 	return Iterator(this, fElements.Begin());
@@ -472,7 +473,7 @@ _VECTOR_MAP_CLASS_NAME::Begin()
 */
 _VECTOR_MAP_TEMPLATE_LIST
 inline
-_VECTOR_MAP_CLASS_NAME::ConstIterator
+_VECTOR_MAP_CLASS_TYPE::ConstIterator
 _VECTOR_MAP_CLASS_NAME::Begin() const
 {
 	return ConstIterator(this, fElements.Begin());
@@ -488,7 +489,7 @@ _VECTOR_MAP_CLASS_NAME::Begin() const
 */
 _VECTOR_MAP_TEMPLATE_LIST
 inline
-_VECTOR_MAP_CLASS_NAME::Iterator
+_VECTOR_MAP_CLASS_TYPE::Iterator
 _VECTOR_MAP_CLASS_NAME::End()
 {
 	return Iterator(this, fElements.End());
@@ -504,7 +505,7 @@ _VECTOR_MAP_CLASS_NAME::End()
 */
 _VECTOR_MAP_TEMPLATE_LIST
 inline
-_VECTOR_MAP_CLASS_NAME::ConstIterator
+_VECTOR_MAP_CLASS_TYPE::ConstIterator
 _VECTOR_MAP_CLASS_NAME::End() const
 {
 	return ConstIterator(this, fElements.End());
@@ -520,7 +521,7 @@ _VECTOR_MAP_CLASS_NAME::End() const
 */
 _VECTOR_MAP_TEMPLATE_LIST
 inline
-_VECTOR_MAP_CLASS_NAME::Iterator
+_VECTOR_MAP_CLASS_TYPE::Iterator
 _VECTOR_MAP_CLASS_NAME::Null()
 {
 	return Iterator(this, fElements.Null());
@@ -536,7 +537,7 @@ _VECTOR_MAP_CLASS_NAME::Null()
 */
 _VECTOR_MAP_TEMPLATE_LIST
 inline
-_VECTOR_MAP_CLASS_NAME::ConstIterator
+_VECTOR_MAP_CLASS_TYPE::ConstIterator
 _VECTOR_MAP_CLASS_NAME::Null() const
 {
 	return ConstIterator(this, fElements.Null());
@@ -550,7 +551,7 @@ _VECTOR_MAP_CLASS_NAME::Null() const
 			map doesn't contain any entry with the given value.
 */
 _VECTOR_MAP_TEMPLATE_LIST
-_VECTOR_MAP_CLASS_NAME::Iterator
+_VECTOR_MAP_CLASS_TYPE::Iterator
 _VECTOR_MAP_CLASS_NAME::Find(const Key &key)
 {
 	bool exists = false;
@@ -568,7 +569,7 @@ _VECTOR_MAP_CLASS_NAME::Find(const Key &key)
 			map doesn't contain any entry with the given value.
 */
 _VECTOR_MAP_TEMPLATE_LIST
-_VECTOR_MAP_CLASS_NAME::ConstIterator
+_VECTOR_MAP_CLASS_TYPE::ConstIterator
 _VECTOR_MAP_CLASS_NAME::Find(const Key &key) const
 {
 	bool exists = false;
@@ -602,7 +603,7 @@ _VECTOR_MAP_CLASS_NAME::Find(const Key &key) const
 			one according to \a less.
 */
 _VECTOR_MAP_TEMPLATE_LIST
-_VECTOR_MAP_CLASS_NAME::Iterator
+_VECTOR_MAP_CLASS_TYPE::Iterator
 _VECTOR_MAP_CLASS_NAME::FindClose(const Key &key, bool less)
 {
 	bool exists = false;
@@ -643,7 +644,7 @@ _VECTOR_MAP_CLASS_NAME::FindClose(const Key &key, bool less)
 			one according to \a less.
 */
 _VECTOR_MAP_TEMPLATE_LIST
-_VECTOR_MAP_CLASS_NAME::ConstIterator
+_VECTOR_MAP_CLASS_TYPE::ConstIterator
 _VECTOR_MAP_CLASS_NAME::FindClose(const Key &key, bool less) const
 {
 	bool exists = false;

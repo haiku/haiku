@@ -46,6 +46,7 @@ namespace VectorSetOrder {
 #define _VECTOR_SET_TEMPLATE_LIST template<typename Value, \
 										   typename ElementOrder>
 #define _VECTOR_SET_CLASS_NAME VectorSet<Value, ElementOrder>
+#define _VECTOR_SET_CLASS_TYPE typename VectorSet<Value, ElementOrder>
 
 /*!
 	\class VectorSet
@@ -186,7 +187,7 @@ _VECTOR_SET_CLASS_NAME::Remove(const Value &value)
 			(in this case including End()).
 */
 _VECTOR_SET_TEMPLATE_LIST
-_VECTOR_SET_CLASS_NAME::Iterator
+_VECTOR_SET_CLASS_TYPE::Iterator
 _VECTOR_SET_CLASS_NAME::Erase(const Iterator &iterator)
 {
 	return fElements.Erase(iterator);
@@ -236,7 +237,7 @@ _VECTOR_SET_CLASS_NAME::MakeEmpty()
 */
 _VECTOR_SET_TEMPLATE_LIST
 inline
-_VECTOR_SET_CLASS_NAME::Iterator
+_VECTOR_SET_CLASS_TYPE::Iterator
 _VECTOR_SET_CLASS_NAME::Begin()
 {
 	return fElements.Begin();
@@ -252,7 +253,7 @@ _VECTOR_SET_CLASS_NAME::Begin()
 */
 _VECTOR_SET_TEMPLATE_LIST
 inline
-_VECTOR_SET_CLASS_NAME::ConstIterator
+_VECTOR_SET_CLASS_TYPE::ConstIterator
 _VECTOR_SET_CLASS_NAME::Begin() const
 {
 	return fElements.Begin();
@@ -268,7 +269,7 @@ _VECTOR_SET_CLASS_NAME::Begin() const
 */
 _VECTOR_SET_TEMPLATE_LIST
 inline
-_VECTOR_SET_CLASS_NAME::Iterator
+_VECTOR_SET_CLASS_TYPE::Iterator
 _VECTOR_SET_CLASS_NAME::End()
 {
 	return fElements.End();
@@ -284,7 +285,7 @@ _VECTOR_SET_CLASS_NAME::End()
 */
 _VECTOR_SET_TEMPLATE_LIST
 inline
-_VECTOR_SET_CLASS_NAME::ConstIterator
+_VECTOR_SET_CLASS_TYPE::ConstIterator
 _VECTOR_SET_CLASS_NAME::End() const
 {
 	return fElements.End();
@@ -300,7 +301,7 @@ _VECTOR_SET_CLASS_NAME::End() const
 */
 _VECTOR_SET_TEMPLATE_LIST
 inline
-_VECTOR_SET_CLASS_NAME::Iterator
+_VECTOR_SET_CLASS_TYPE::Iterator
 _VECTOR_SET_CLASS_NAME::Null()
 {
 	return fElements.Null();
@@ -316,7 +317,7 @@ _VECTOR_SET_CLASS_NAME::Null()
 */
 _VECTOR_SET_TEMPLATE_LIST
 inline
-_VECTOR_SET_CLASS_NAME::ConstIterator
+_VECTOR_SET_CLASS_TYPE::ConstIterator
 _VECTOR_SET_CLASS_NAME::Null() const
 {
 	return fElements.Null();
@@ -330,7 +331,7 @@ _VECTOR_SET_CLASS_NAME::Null() const
 			set doesn't contain any element with the given value.
 */
 _VECTOR_SET_TEMPLATE_LIST
-_VECTOR_SET_CLASS_NAME::Iterator
+_VECTOR_SET_CLASS_TYPE::Iterator
 _VECTOR_SET_CLASS_NAME::Find(const Value &value)
 {
 	bool exists = false;
@@ -348,7 +349,7 @@ _VECTOR_SET_CLASS_NAME::Find(const Value &value)
 			set doesn't contain any element with the given value.
 */
 _VECTOR_SET_TEMPLATE_LIST
-_VECTOR_SET_CLASS_NAME::ConstIterator
+_VECTOR_SET_CLASS_TYPE::ConstIterator
 _VECTOR_SET_CLASS_NAME::Find(const Value &value) const
 {
 	bool exists = false;
@@ -382,7 +383,7 @@ _VECTOR_SET_CLASS_NAME::Find(const Value &value) const
 			one according to \a less.
 */
 _VECTOR_SET_TEMPLATE_LIST
-_VECTOR_SET_CLASS_NAME::Iterator
+_VECTOR_SET_CLASS_TYPE::Iterator
 _VECTOR_SET_CLASS_NAME::FindClose(const Value &value, bool less)
 {
 	bool exists = false;
@@ -423,7 +424,7 @@ _VECTOR_SET_CLASS_NAME::FindClose(const Value &value, bool less)
 			one according to \a less.
 */
 _VECTOR_SET_TEMPLATE_LIST
-_VECTOR_SET_CLASS_NAME::ConstIterator
+_VECTOR_SET_CLASS_TYPE::ConstIterator
 _VECTOR_SET_CLASS_NAME::FindClose(const Value &value, bool less) const
 {
 	bool exists = false;
