@@ -743,9 +743,17 @@
 #define CRTCW(A,B)(NV_REG16(NV16_CRTCIND) = ((NVCRTCX_##A) | ((B) << 8)))
 #define CRTCR(A)  (NV_REG8(NV8_CRTCIND) = (NVCRTCX_##A), NV_REG8(NV8_CRTCDAT))
 
+/* read and write from second CRTC indexed registers */
+#define CRTC2W(A,B)(NV_REG16(NV16_CRTC2IND) = ((NVCRTCX_##A) | ((B) << 8)))
+#define CRTC2R(A)  (NV_REG8(NV8_CRTC2IND) = (NVCRTCX_##A), NV_REG8(NV8_CRTC2DAT))
+
 /* read and write from ATTRIBUTE indexed registers */
 #define ATBW(A,B)(NV_REG8(NV8_INSTAT1), NV_REG8(NV8_ATTRINDW) = ((NVATBX_##A) | 0x20), NV_REG8(NV8_ATTRDATW) = (B))
 #define ATBR(A)  (NV_REG8(NV8_INSTAT1), NV_REG8(NV8_ATTRINDW) = ((NVATBX_##A) | 0x20), NV_REG8(NV8_ATTRDATR))
+
+/* read and write from ATTRIBUTE indexed registers */
+#define ATB2W(A,B)(NV_REG8(NV8_INSTAT1), NV_REG8(NV8_ATTR2INDW) = ((NVATBX_##A) | 0x20), NV_REG8(NV8_ATTR2DATW) = (B))
+#define ATB2R(A)  (NV_REG8(NV8_INSTAT1), NV_REG8(NV8_ATTR2INDW) = ((NVATBX_##A) | 0x20), NV_REG8(NV8_ATTR2DATR))
 
 /* read and write from SEQUENCER indexed registers */
 #define SEQW(A,B)(NV_REG16(NV16_SEQIND) = ((NVSEQX_##A) | ((B) << 8)))
@@ -765,7 +773,3 @@
 #define MAVW(A,B)   (i2c_maven_write(NVMAV_##A ,B))
 #define MAVRW(A)    (i2c_maven_read (NVMAV_##A )|(i2c_maven_read(NVMAV_##A +1)<<8))
 #define MAVWW(A,B)  (i2c_maven_write(NVMAV_##A ,B &0xFF),i2c_maven_write(NVMAV_##A +1,B >>8))
-
-/* read and write from second CRTC */
-#define CR2R(A)   (NV_REG32(NVCR2_##A))
-#define CR2W(A,B) (NV_REG32(NVCR2_##A)=B)
