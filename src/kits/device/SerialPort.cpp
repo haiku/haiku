@@ -22,8 +22,7 @@
 #define SERIAL_DIR "/dev/ports" 
 
 // Scans a directory and adds the entries it founds as strings to the
-// given list. TODO: It should be moved to another place, since it could be
-// used by BJoystick too. 
+// given list
 static int32
 scan_directory(const char *directory, BList *list)
 {
@@ -115,9 +114,11 @@ BSerialPort::Open(const char *portName)
 	ffd = open(buf, O_RDWR | O_NONBLOCK | O_EXCL); 
 	
 	if (ffd >= 0) {
-		//Setup the port
-		int ret = fcntl(ffd, F_GETFL);
-		fcntl(ffd, F_SETFL, ret & 0x7F);
+		// we used open() with O_NONBLOCK flag to let it return immediately,
+		// but we want read/write operations to block if needed,
+		// so we clear that bit here.
+		int flags = fcntl(ffd, F_GETFL);
+		fcntl(ffd, F_SETFL, flags & ~O_NONBLOCK);
 				
 		DriverControl();
 	}
