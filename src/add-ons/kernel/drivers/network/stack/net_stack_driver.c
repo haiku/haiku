@@ -70,6 +70,7 @@ typedef struct selecter {
 	uint32				event;
 	selectsync * 		sync;
 	uint32 				ref;
+	notify_select_event_function notify;
 } selecter;
 
 // the cookie we attach to each file descriptor opened on our driver entry
@@ -581,6 +582,8 @@ static status_t net_stack_select(void *cookie, uint8 event, uint32 ref, selectsy
 	s->event = event;
 	s->sync = sync;
 	s->ref = ref;
+	s->notify = nsc->notify;
+	nsc->notify = NULL;
 
 	// lock the selecters list	
 	status = acquire_sem(nsc->selecters_lock);
@@ -645,9 +648,6 @@ static status_t net_stack_deselect(void *cookie, uint8 event, selectsync *sync)
 		free(s);
 	};
 
-	nsc->notify = NULL;
-		// unset notification function
-	
 	if (nsc->selecters == NULL)
 		// selecters list is empty: no need to monitor socket events anymore
 		core->socket_set_event_callback(nsc->socket, NULL, NULL, event);
@@ -685,7 +685,7 @@ static void on_socket_event(void * socket, uint32 event, void * cookie)
 	s = nsc->selecters;
 	while (s) {
 		if (s->event == event)
-			nsc->notify(s->sync, s->ref);
+			s->notify(s->sync, s->ref);
 				// notify this selecter (thread/event pair)
 		s = s->next;
 	};
