@@ -32,25 +32,33 @@ typedef struct {
         bigtime_t       click_speed;
 } mouse_settings;
 
-class MouseSettings{
-public :
-	MouseSettings();
-	~MouseSettings();
-	status_t	InitCheck();
-	
-	BPoint WindowCorner() const { return fCorner; }
-	void SetWindowCorner(BPoint corner);
-	int32 MouseType() const { return fSettings.type; }
-	void SetMouseType(int32 type);
-	bigtime_t ClickSpeed() const { return -(fSettings.click_speed-1000000); } // -1000000 to correct the Sliders 0-100000 scale
-	void SetClickSpeed(bigtime_t click_speed);
-	int32 MouseSpeed() const { return fSettings.accel.speed; }
-	void SetMouseSpeed(int32 speed);
-	
-private:
-	status_t			fInitCheck;
-	BPoint				fCorner;
-	mouse_settings		fSettings;
+
+class MouseSettings {
+	public:
+		MouseSettings();
+		~MouseSettings();
+
+		status_t InitCheck();
+
+		BPoint WindowPosition() const { return fWindowPosition; }
+		void SetWindowPosition(BPoint corner);
+
+		int32 MouseType() const { return fSettings.type; }
+		void SetMouseType(int32 type);
+
+		bigtime_t ClickSpeed() const;
+		void SetClickSpeed(bigtime_t click_speed);
+
+		int32 MouseSpeed() const { return fSettings.accel.speed; }
+		void SetMouseSpeed(int32 speed);
+
+	private:
+		static status_t GetSettingsPath(BPath &path);
+		void RetrieveSettings();
+		status_t SaveSettings();
+
+		mouse_settings	fSettings, fOriginalSettings;
+		BPoint			fWindowPosition;
 };
 
 #endif
