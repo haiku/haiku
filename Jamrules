@@ -1217,7 +1217,7 @@ rule KernelFloppyImage
 # going on, at least in this early stage of development.
 actions KernelFloppyImage bind BOOT_BLOCK bind MAKE_FLOP
 {
-	"$(MAKE_FLOP)" "$(BOOT_BLOCK)" "$(2)" "$(1)" ;
+	"$(MAKE_FLOP)" "-p $(shell expr 18 \* 2 \* 512)" "$(BOOT_BLOCK)" "$(2)" "$(1)" ;
 
 	echo ""
 	echo "*************************************************"
