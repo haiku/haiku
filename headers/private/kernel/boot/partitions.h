@@ -10,26 +10,18 @@
 #include <disk_device_manager.h>
 
 
-class Partition : public partition_data, Node {
-	public:
-		Partition(int deviceFD);
-		virtual ~Partition();
-
-		virtual ssize_t ReadAt(void *cookie, off_t offset, void *buffer, size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t offset, const void *buffer, size_t bufferSize);
-
-	private:
-		int		fFD;
-};
-
 // DiskDeviceTypes we need/support in the boot loader
 #define kPartitionTypeAmiga "Amiga RDB"
 #define kPartitionTypeIntel "Intel"
+#define kPartitionTypeIntelExtended "Intel Extended"
 #define kPartitionTypeApple "Apple"
+
+#define kPartitionTypeBFS "BFS"
 
 struct partition_module_info;
 extern partition_module_info gAmigaPartitionModule;
-extern partition_module_info gIntelPartitionModule;
+extern partition_module_info gIntelPartitionMapModule;
+extern partition_module_info gIntelExtendedPartitionModule;
 extern partition_module_info gApplePartitionModule;
 
 #endif	/* KERNEL_BOOT_PARTITIONS_H */
