@@ -1,12 +1,11 @@
 /* 
-** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
 
 #include <unistd.h>
 #include <syscalls.h>
-#include <sys/ioctl.h>
 #include <stdarg.h>
 #include <errno.h>
 
@@ -23,12 +22,17 @@ int
 ioctl(int fd, ulong cmd, ...)
 {
 	va_list args;
-	int err;
+	void *argument;
+	size_t size;
+	int status;
 
 	va_start(args, cmd);
-	err = sys_ioctl(fd, cmd, args, IOCPARM_LEN(cmd));
+	argument = va_arg(args, void *);
+	size = va_arg(args, size_t);
 	va_end(args);
 
-	RETURN_AND_SET_ERRNO(err)
+	status = sys_ioctl(fd, cmd, argument, size);
+
+	RETURN_AND_SET_ERRNO(status)
 }
 
