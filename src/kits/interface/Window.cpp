@@ -2206,6 +2206,7 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
  	fLink->Attach<uint32>( workspace );
  	fLink->Attach<int32>( _get_object_token_(this) );
  	fLink->Attach<port_id>( receive_port );
+ 	fLink->Attach<port_id>( fMsgPort );
  	fLink->AttachString( title );
  	fLink->Flush();
  
