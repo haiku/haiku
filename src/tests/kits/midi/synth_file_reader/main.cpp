@@ -28,6 +28,7 @@ THE SOFTWARE.
 */
 
 #include "SynthFileReader.h"
+#include "SynthFile.h"
 #include <stdlib.h>
 #include <Application.h>
 
@@ -38,18 +39,26 @@ void start_be_app() {
 
 int main(int argc, char* argv[]) {
 	if (argc < 2) {
-		printf("%s <synth file> [play [instr]]\n", argv[0]);
+		printf("%s <synth file> [play [instr] | dump]\n", argv[0]);
 		return -1;
 	}
 	const char* fileName = argv[1];
 	bool        play     = argc >= 3 ? strcmp(argv[2], "play") == 0 : false;
+	bool        dump     = argc >= 3 ? strcmp(argv[2], "dump") == 0 : false;
 	uint32      instr    = argc >= 4 ? atol(argv[3]) : 0xffff;
-	
-	SynthFileReader reader(fileName);
-	if (reader.InitCheck()) {
-		start_be_app();
-		reader.Dump(play, instr);
+
+	if (dump) {
+		SSynthFile synth(fileName);
+		if (synth.InitCheck() == B_OK) {
+			synth.Dump();
+		}
 	} else {
-		printf("could not open '%s' or not a valid synth file!\n", fileName);
-	}	
+		SSynthFileReader reader(fileName);
+		if (reader.InitCheck() == B_OK) {
+			start_be_app();
+			reader.Dump(play, instr);
+		} else {
+			printf("could not open '%s' or not a valid synth file!\n", fileName);
+		}	
+	}
 }

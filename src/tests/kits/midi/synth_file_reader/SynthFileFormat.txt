@@ -9,16 +9,26 @@ chunks:
 -------
 next[4] | tag[4] 
 
-tag:
-----
+tags:
+-----
+
+'INST'
+'snd '
+'CACH'
+
+
+'INST'
+------
 'INST' | instr[4] | nameLen[1] | name[nameLen] | dataSize[4] | data[dataSize] 
-| sndId[2] | ???[10] | size[2] | ???[size*8+21] | rest[dataSize-...] |
+| sndId[2] | ???[10] | size[2] | insts[size*8+21] | rest[dataSize-...] |
 
-'snd ' | sndId[4] | nameLen[1] | name[nameLen] | dataSize[4] | [28] |
-rate[2] | ...
 
-data[dataSize]:
-----------------
+insts[size*8+21]:
+noteStart[1] | noteEnd[1] | sndId[2] | ??[4] | repeats number of size times
+??[21]
+
+rest[dataSize]:
+
 ADSR | [1] | [4] | [4] |
 LINE | [4] | [4] |
 SUST | [4] | [4] |
@@ -34,3 +44,12 @@ SPAN | [1] | [4] | [4] |
 TRIA | [4] | [4] |
 SQU2 | [8] |
 SQUA | [8] |
+
+
+
+'snd '
+------
+'snd ' | sndId[4] | nameLen[1] | name[nameLen] | dataSize[4] | [28] |
+rate[2] | ?[10] | 255 | drumId | ...
+
+

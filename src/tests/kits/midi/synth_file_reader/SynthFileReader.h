@@ -34,8 +34,11 @@ THE SOFTWARE.
 #include <SupportDefs.h>
 #include <String.h>
 
-class SynthFileReader {
-	FILE* fFile;
+class SSynthFile;
+
+class SSynthFileReader {
+private:
+	FILE*   fFile;
 
 	typedef char tag[4];
 
@@ -48,6 +51,14 @@ class SynthFileReader {
 	bool Read(uint16 &n);
 	bool Read(uint8  &n);
 	bool Skip(uint32 bytes);
+	uint32 Tell()            { return ftell(fFile); }
+	void   Seek(uint32 pos)  { fseek(fFile, pos, SEEK_SET); }
+	
+	bool ReadHeader(uint32& version, uint32& chunks, uint32& nextChunk);
+	bool NextChunk(tag& tag, uint32& nextChunk);
+	bool ReadInstHeader(uint16& inst, uint16& snd, uint16& snds, BString& name, uint32& size);
+	bool ReadSoundInRange(uint8& start, uint8& end, uint16& snd, uint32& size);
+	bool ReadSoundHeader(uint16& inst, BString& name, uint32& size);
 
 	// debugging support
 	void Print(tag tag);
@@ -55,9 +66,11 @@ class SynthFileReader {
 	void Play(uint16 rate, uint32 offset, uint32 size);
 	
 public:
-	SynthFileReader(const char* synthFile);
-	~SynthFileReader();
-	bool InitCheck() const;	
+	SSynthFileReader(const char* synthFile);
+	~SSynthFileReader();
+	status_t InitCheck() const;	
+
+	status_t Initialize(SSynthFile* synth);
 
 	void Dump(bool play, uint32 instrOnly);
 };

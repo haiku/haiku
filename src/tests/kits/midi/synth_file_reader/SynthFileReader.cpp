@@ -29,13 +29,14 @@ THE SOFTWARE.
 */
 
 #include "SynthFileReader.h"
+#include "SynthFile.h"
 #include <string.h>
 #include <ctype.h>
 
 #define DEBUG 1
 #include <Debug.h>
 
-SynthFileReader::SynthFileReader(const char* synthFile) {
+SSynthFileReader::SSynthFileReader(const char* synthFile) {
 	fFile = fopen(synthFile, "r+b");
 	tag tag;
 	if (fFile) {
@@ -47,29 +48,29 @@ SynthFileReader::SynthFileReader(const char* synthFile) {
 	
 }
 
-SynthFileReader::~SynthFileReader() {
+SSynthFileReader::~SSynthFileReader() {
 	if (fFile) {
 		fclose(fFile); fFile = NULL;
 	}
 }
 
-bool SynthFileReader::InitCheck() const {
-	return fFile != NULL;
+status_t SSynthFileReader::InitCheck() const {
+	return fFile != NULL ? B_OK : B_ERROR;
 }
 
-bool SynthFileReader::TagEquals(const char* tag1, const char* tag2) const {
+bool SSynthFileReader::TagEquals(const char* tag1, const char* tag2) const {
 	return strncmp(tag1, tag2, 4) == 0;
 }
 
-bool SynthFileReader::Read(void* data, uint32 size) {
+bool SSynthFileReader::Read(void* data, uint32 size) {
 	return 1 == fread(data, size, 1, fFile);
 }
 
-bool SynthFileReader::Read(tag &tag) {
+bool SSynthFileReader::Read(tag &tag) {
 	return Read((void*)tag, sizeof(tag));
 }
 
-bool SynthFileReader::Read(uint64 &n, uint32 size) {
+bool SSynthFileReader::Read(uint64 &n, uint32 size) {
 	uint8 number[8];
 	ASSERT(size <= sizeof(number));
 	if (Read((void*)number, size)) {
@@ -83,7 +84,7 @@ bool SynthFileReader::Read(uint64 &n, uint32 size) {
 	return false;	
 }
 
-bool SynthFileReader::Read(uint32 &n) {
+bool SSynthFileReader::Read(uint32 &n) {
 	uint64 num;
 	bool ok = Read(num, 4);
 	n = num;
@@ -91,7 +92,7 @@ bool SynthFileReader::Read(uint32 &n) {
 }
 
 
-bool SynthFileReader::Read(uint16 &n) {
+bool SSynthFileReader::Read(uint16 &n) {
 	uint64 num;
 	bool ok = Read(num, 2);
 	n = num;
@@ -99,11 +100,11 @@ bool SynthFileReader::Read(uint16 &n) {
 }
 
 
-bool SynthFileReader::Read(uint8 &n) {
+bool SSynthFileReader::Read(uint8 &n) {
 	return Read((void*)&n, 1);
 }
 
-bool SynthFileReader::Read(BString& s, uint32 len) {
+bool SSynthFileReader::Read(BString& s, uint32 len) {
 	char* str = s.LockBuffer(len+1);
 	str[len] = 0;
 	bool ok = Read((void*)str, len);
@@ -111,18 +112,115 @@ bool SynthFileReader::Read(BString& s, uint32 len) {
 	return ok;	
 }
 
-bool SynthFileReader::Skip(uint32 bytes) {
+bool SSynthFileReader::Skip(uint32 bytes) {
 	fseek(fFile, bytes, SEEK_CUR);
 	return true;
 }
 
+
+bool SSynthFileReader::ReadHeader(uint32& version, uint32& chunks, uint32& nextChunk) {
+	tag tag;
+	fseek(fFile, 0, SEEK_SET);
+	if (Read(tag) && TagEquals(tag, "IREZ") && Read(version) && Read(chunks)) {
+		nextChunk = ftell(fFile);
+		return true;
+	}
+	return false;
+}
+
+
+bool SSynthFileReader::NextChunk(tag& tag, uint32& nextChunk) {
+	fseek(fFile, nextChunk, SEEK_SET);
+	return Read(nextChunk) && Read(tag);
+}
+
+
+bool SSynthFileReader::ReadInstHeader(uint16& inst, uint16& snd, uint16& snds, BString& name, uint32& size) {
+	uint8 len;
+	
+	if (Skip(2) && Read(inst) && Read(len) && Read(name, len) && Read(size) && Read(snd) && Skip(10) && Read(snds)) {
+		size -= 14;
+		return true;
+	}
+	return false;
+}
+
+
+bool SSynthFileReader::ReadSoundInRange(uint8& start, uint8& end, uint16& snd, uint32& size) {
+	size -= 4;
+	return Read(start) && Read(end) && Read(snd) && Skip(4);
+}
+
+
+bool SSynthFileReader::ReadSoundHeader(uint16& inst, BString& name, uint32& size) {
+	uint8 len;
+	return Skip(2) && Read(inst) && Read(len) && Read(name, len) && Read(size);
+}
+
+
+status_t SSynthFileReader::Initialize(SSynthFile* synth) {
+	uint32   version;
+	uint32   chunks;
+	uint32   nextChunk;
+	tag      t;
+
+	if (ReadHeader(version, chunks, nextChunk)) {
+		for (uint32 chunk = 0; chunk < chunks; chunk ++) {
+			if (NextChunk(t, nextChunk)) {
+				if (TagEquals(t, "INST")) {
+					uint32  offset = Tell();
+					uint16  inst;
+					uint16  snd;
+					uint16  snds;
+					BString name;
+					uint32  size;
+					if (ReadInstHeader(inst, snd, snds, name, size)) {
+						SInstrument* instr = synth->GetInstrument(inst);
+						instr->SetOffset(offset);
+						instr->SetName(name.String());
+						instr->SetDefaultSound(synth->GetSound(snd));
+						for (int s = 0; s < snds; s ++) {
+							uint8 start, end;
+							if (ReadSoundInRange(start, end, snd, size)) {
+								instr->Sounds()->AddItem(new SSoundInRange(start, end, synth->GetSound(snd)));
+							} else {
+								return B_ERROR;
+							}
+						}
+					} else {
+						return B_ERROR;
+					}
+				} else if (TagEquals(t, "snd ")) {
+					uint32  offset = Tell();
+					uint16  inst;
+					BString name;
+					uint32  size; 
+					if (ReadSoundHeader(inst, name, size)) {
+						SSound* s = synth->GetSound(inst);
+						s->SetOffset(offset);
+						s->SetName(name.String());
+					} else {
+						return B_ERROR;
+					}
+				} else {
+					// skip
+				}
+			} else {
+				return B_ERROR;
+			}
+		}		
+		return B_OK;	
+	}
+	return B_ERROR;
+}
+
 // debugging
-void SynthFileReader::Print(tag tag) {
+void SSynthFileReader::Print(tag tag) {
 	printf("%.*s", 4, tag);
 }
 
 
-void SynthFileReader::Dump(uint32 bytes) {
+void SSynthFileReader::Dump(uint32 bytes) {
 	uint8 byte;
 	int   col = 0;
 	const int cols = 16;
@@ -141,7 +239,7 @@ void SynthFileReader::Dump(uint32 bytes) {
 	} 
 }
 
-void SynthFileReader::Dump(bool play, uint32 instrOnly) {
+void SSynthFileReader::Dump(bool play, uint32 instrOnly) {
 	tag    tag;
 	uint32 version;
 	uint32 nEntries;
@@ -164,7 +262,7 @@ void SynthFileReader::Dump(bool play, uint32 instrOnly) {
 			cur = ftell(fFile);
 			if (Read(tag)) {
 				Print(tag);
-				if (TagEquals(tag, "INST")) {
+				if (!play && TagEquals(tag, "INST")) {
 					uint32  inst;
 					uint8   len;
 					BString name;
@@ -207,7 +305,7 @@ void SynthFileReader::Dump(bool play, uint32 instrOnly) {
 							} else if (TagEquals(tag, "LAST")) {
 								s = 0;
 								if (rest > 0) {
-									SynthFileReader::tag tag2;
+									SSynthFileReader::tag tag2;
 									long pos = ftell(fFile);
 									Read(tag2);
 									fseek(fFile, pos, SEEK_SET);
@@ -291,7 +389,7 @@ void SynthFileReader::Dump(bool play, uint32 instrOnly) {
 #include <GameSoundDefs.h>
 #include <SimpleGameSound.h>
 
-void SynthFileReader::Play(uint16 rate, uint32 offset, uint32 size) {
+void SSynthFileReader::Play(uint16 rate, uint32 offset, uint32 size) {
 	uint8* samples = new uint8[size];
 	fseek(fFile, offset, SEEK_CUR);
 	Read((void*)samples, size);
