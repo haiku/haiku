@@ -90,28 +90,34 @@ status_t _user_read_fs_info(dev_t device, struct fs_info *info);
 status_t _user_write_fs_info(dev_t device, const struct fs_info *info, int mask);
 dev_t _user_next_device(int32 *_cookie);
 status_t _user_sync(void);
-status_t _user_dir_node_ref_to_path(dev_t device, ino_t inode, char *userPath, size_t pathLength);
+status_t _user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
+			char *userPath, size_t pathLength);
 int _user_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode);
-int _user_open(const char *path, int omode);
+int _user_open(int fd, const char *path, int omode);
 int _user_open_dir_node_ref(dev_t device, ino_t inode);
 int _user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname);
-int _user_open_dir(const char *path);
+int _user_open_dir(int fd, const char *path);
+int _user_open_parent_dir(int fd, char *name, size_t nameLength);
 status_t _user_fsync(int fd);
+status_t _user_read_stat(int fd, const char *path, bool traverseLink,
+			struct stat *stat, size_t statSize);
+status_t _user_write_stat(int fd, const char *path, bool traverseLink,
+			const struct stat *stat, size_t statSize, int statMask);
 off_t _user_seek(int fd, off_t pos, int seekType);
 int _user_create_entry_ref(dev_t device, ino_t inode, const char *uname, int omode, int perms);
 int _user_create(const char *path, int omode, int perms);
 status_t _user_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perms);
-status_t _user_create_dir(const char *path, int perms);
+status_t _user_create_dir(int fd, const char *path, int perms);
 status_t _user_remove_dir(const char *path);
-ssize_t _user_read_link(const char *path, char *buffer, size_t bufferSize);
+ssize_t _user_read_link(int fd, const char *path, char *buffer, size_t bufferSize);
 status_t _user_write_link(const char *path, const char *toPath);
-status_t _user_create_symlink(const char *path, const char *toPath, int mode);
+status_t _user_create_symlink(int fd, const char *path, const char *toPath,
+			int mode);
 status_t _user_create_link(const char *path, const char *toPath);
-status_t _user_unlink(const char *path);
-status_t _user_rename(const char *oldpath, const char *newpath);
+status_t _user_unlink(int fd, const char *path);
+status_t _user_rename(int oldFD, const char *oldpath, int newFD,
+			const char *newpath);
 status_t _user_access(const char *path, int mode);
-status_t _user_read_path_stat(const char *path, bool traverseLink, struct stat *stat, size_t statSize);
-status_t _user_write_path_stat(const char *path, bool traverseLink, const struct stat *stat, size_t statSize, int statMask);
 ssize_t _user_select(int numfds, fd_set *readSet, fd_set *writeSet, fd_set *errorSet,
 			bigtime_t timeout, const sigset_t *sigMask);
 ssize_t _user_poll(struct pollfd *fds, int numfds, bigtime_t timeout);
@@ -126,6 +132,8 @@ status_t _user_read_index_stat(dev_t device, const char *name, struct stat *stat
 status_t _user_remove_index(dev_t device, const char *name);
 status_t _user_getcwd(char *buffer, size_t size);
 status_t _user_setcwd(int fd, const char *path);
+int _user_open_query(dev_t device, const char *query, uint32 flags,
+			port_id port, int32 token);
 
 /* fd user prototypes (implementation located in fd.c)  */
 extern ssize_t _user_read(int fd, off_t pos, void *buffer, size_t bufferSize);
@@ -133,11 +141,11 @@ extern ssize_t _user_write(int fd, off_t pos, const void *buffer, size_t bufferS
 extern status_t _user_ioctl(int fd, ulong cmd, void *data, size_t length);
 extern ssize_t _user_read_dir(int fd, struct dirent *buffer, size_t bufferSize, uint32 maxCount);
 extern status_t _user_rewind_dir(int fd);
-extern status_t _user_read_stat(int fd, struct stat *stat, size_t statSize);
-extern status_t _user_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask);
 extern status_t _user_close(int fd);
 extern int _user_dup(int fd);
 extern int _user_dup2(int ofd, int nfd);
+extern status_t _user_lock_node(int fd);
+extern status_t _user_unlock_node(int fd);
 
 /* vfs entry points... */
 

@@ -149,6 +149,8 @@ static status_t common_read_stat(struct file_descriptor *, struct stat *);
 static status_t common_write_stat(struct file_descriptor *, const struct stat *, int statMask);
 
 static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
+static status_t fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink,
+	struct vnode **_vnode, bool kernel);
 static void inc_vnode_ref_count(struct vnode *vnode);
 static status_t dec_vnode_ref_count(struct vnode *vnode, bool reenter);
 static inline void put_vnode(struct vnode *vnode);
@@ -244,6 +246,84 @@ static struct fd_ops sIndexOps = {
 	NULL		// free_fd()
 };
 #endif
+
+
+// VNodePutter
+class VNodePutter {
+public:
+	VNodePutter(struct vnode *vnode = NULL) : fVNode(vnode) {}
+
+	~VNodePutter()
+	{
+		Put();
+	}
+
+	void SetTo(struct vnode *vnode)
+	{
+		Put();
+		fVNode = vnode;
+	}
+
+	void Put()
+	{
+		if (fVNode) {
+			put_vnode(fVNode);
+			fVNode = NULL;
+		}
+	}
+
+	struct vnode *Detach()
+	{
+		struct vnode *vnode = fVNode;
+		fVNode = NULL;
+		return vnode;
+	}
+
+private:
+	struct vnode *fVNode;
+};
+
+
+class FDCloser {
+public:
+	FDCloser() : fFD(-1), fKernel(true) {}
+
+	FDCloser(int fd, bool kernel) : fFD(fd), fKernel(kernel) {}
+
+	~FDCloser()
+	{
+		Close();
+	}
+
+	void SetTo(int fd, bool kernel)
+	{
+		Close();
+		fFD = fd;
+		fKernel = kernel;
+	}
+
+	void Close()
+	{
+		if (fFD >= 0) {
+			if (fKernel)
+				_kern_close(fFD);
+			else
+				_user_close(fFD);
+			fFD = -1;
+		}
+	}
+
+	int Detach()
+	{
+		int fd = fFD;
+		fFD = -1;
+		return fd;
+	}
+
+private:
+	int		fFD;
+	bool	fKernel;
+};
 
 
 static int
@@ -566,6 +646,49 @@ put_vnode(struct vnode *vnode)
 }
 
 
+/*!	\brief Gets the directory path and leaf name for a given path.
+
+	The supplied \a path is transformed to refer to the directory part of
+	the entry identified by the original path, and into the buffer \a filename
+	the leaf name of the original entry is written.
+	Neither the returned path nor the leaf name can be expected to be
+	canonical.
+
+	\param path The path to be analyzed. Must be able to store at least one
+		   additional character.
+	\param filename The buffer into which the leaf name will be written.
+		   Must be of size B_FILE_NAME_LENGTH at least.
+	\return \c B_OK, if everything went fine, \c B_NAME_TOO_LONG, if the leaf
+		   name is longer than \c B_FILE_NAME_LENGTH.
+*/
+static status_t
+get_dir_path_and_leaf(char *path, char *filename)
+{
+	char *p = strrchr(path, '/');
+		// '/' are not allowed in file names!
+
+	FUNCTION(("get_dir_path_and_leaf(path = %s)\n", path));
+
+	if (!p) {
+		// this path is single segment with no '/' in it
+		// ex. "foo"
+		if (strlcpy(filename, path, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
+			return B_NAME_TOO_LONG;
+		strcpy(path, ".");
+	} else {
+		// replace the filename portion of the path with a '.'
+		if (strlcpy(filename, ++p, B_FILE_NAME_LENGTH) >= B_FILE_NAME_LENGTH)
+			return B_NAME_TOO_LONG;
+
+		if (p[0] != '\0'){
+			p[0] = '.';
+			p[1] = '\0';
+		}
+	}
+	return B_OK;
+}
+
+
 static status_t
 entry_ref_to_vnode(mount_id mountID, vnode_id directoryID, const char *name, struct vnode **_vnode)
 {
@@ -794,26 +917,89 @@ path_to_vnode(char *path, bool traverseLink, struct vnode **_vnode, bool kernel)
 static status_t
 path_to_dir_vnode(char *path, struct vnode **_vnode, char *filename, bool kernel)
 {
-	char *p = strrchr(path, '/');
-		// '/' are not allowed in file names!
+	status_t status = get_dir_path_and_leaf(path, filename);
+	if (status != B_OK)
+		return status;
 
-	FUNCTION(("path_to_dir_vnode(path = %s)\n", path));
-
-	if (!p) {
-		// this path is single segment with no '/' in it
-		// ex. "foo"
-		strcpy(filename, path);
-		strcpy(path, ".");
-	} else {
-		// replace the filename portion of the path with a '.'
-		strcpy(filename, ++p);
-
-		if (p[0] != '\0'){
-			p[0] = '.';
-			p[1] = '\0';
-		}
-	}
 	return path_to_vnode(path, true, _vnode, kernel);
+}
+
+
+/*!	\brief Retrieves the directory vnode and the leaf name of an entry referred
+		   to by a FD + path pair.
+
+	\a path must be given in either case. \a fd might be omitted, in which
+	case \a path is either an absolute path or one relative to the current
+	directory. If both a supplied and \a path is relative it is reckoned off
+	of the directory referred to by \a fd. If \a path is absolute \a fd is
+	ignored.
+
+	The caller has the responsibility to call put_vnode() on the returned
+	directory vnode.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL. The buffer
+	       is modified by this function. It must have at least room for a
+	       string one character longer than the path it contains.
+	\param _vnode A pointer to a variable the directory vnode shall be written
+		   into.
+	\param filename A buffer of size B_FILE_NAME_LENGTH or larger into which
+		   the leaf name of the specified entry will be written.
+	\param kernel \c true, if invoked from inside the kernel, \c false if
+		   invoked from userland.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+static status_t
+fd_and_path_to_dir_vnode(int fd, char *path, struct vnode **_vnode,
+	char *filename, bool kernel)
+{
+	if (!path)
+		return B_BAD_VALUE;
+	if (fd < 0)
+		return path_to_dir_vnode(path, _vnode, filename, kernel);
+
+	status_t status = get_dir_path_and_leaf(path, filename);
+	if (status != B_OK)
+		return status;
+
+	return fd_and_path_to_vnode(fd, path, true, _vnode, kernel);
+}
+
+
+static status_t
+get_vnode_name(struct vnode *vnode, struct vnode *parent,
+	char *name, size_t nameSize)
+{
+	if (FS_CALL(vnode, get_vnode_name)) {
+		// The FS supports getting the name of a vnode.
+		return FS_CALL(vnode, get_vnode_name)(vnode->mount->cookie,
+			vnode->private_node, name, nameSize);
+	}
+	// The FS doesn't support getting the name of a vnode. So we search the
+	// parent directory for the vnode.
+	fs_cookie cookie;
+
+	status_t status = FS_CALL(parent, open_dir)(parent->mount->cookie,
+		parent->private_node, &cookie);
+	if (status >= B_OK) {
+		char buffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		struct dirent *dirent = (struct dirent *)buffer;
+		while (true) {
+			uint32 num = 1;
+			status = FS_CALL(parent, read_dir)(parent->mount->cookie,
+				parent->private_node, cookie, dirent, sizeof(buffer), &num);
+			if (status < B_OK)
+				break;
+			
+			if (vnode->id == dirent->d_ino)
+				// found correct entry!
+				if (strlcpy(name, dirent->d_name, nameSize) >= nameSize)
+					status = B_BUFFER_OVERFLOW;
+				break;
+		}
+		FS_CALL(vnode, close_dir)(vnode->mount->cookie, vnode->private_node, cookie);
+	}
+	return status;
 }
 
 
@@ -907,7 +1093,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		}
 
 		if (!FS_CALL(vnode, get_vnode_name)) {
-			// If we don't got the vnode's name yet, we have to search for it
+			// If we haven't got the vnode's name yet, we have to search for it
 			// in the parent directory now
 			fs_cookie cookie;
 
@@ -1025,12 +1211,12 @@ get_fd_and_vnode(int fd, struct vnode **_vnode, bool kernel)
 
 
 static struct vnode *
-get_vnode_from_fd(struct io_context *ioContext, int fd)
+get_vnode_from_fd(int fd, bool kernel)
 {
 	struct file_descriptor *descriptor;
 	struct vnode *vnode;
 
-	descriptor = get_fd(ioContext, fd);
+	descriptor = get_fd(get_current_io_context(kernel), fd);
 	if (descriptor == NULL)
 		return NULL;
 
@@ -1046,21 +1232,26 @@ get_vnode_from_fd(struct io_context *ioContext, int fd)
 static status_t
 fd_and_path_to_vnode(int fd, char *path, bool traverseLeafLink, struct vnode **_vnode, bool kernel)
 {
-	struct vnode *vnode;
+	if (fd < 0 && !path)
+		return B_BAD_VALUE;
 
-	if (fd != -1) {
-		struct file_descriptor *descriptor = get_fd_and_vnode(fd, &vnode, kernel);
-		if (descriptor == NULL)
+	status_t status;
+	struct vnode *vnode = NULL;
+	if (fd < 0 || path[0] == '/') {
+		// no FD or absolute path
+		status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
+	} else {
+		// FD only, or FD + relative path
+		vnode = get_vnode_from_fd(fd, kernel);
+		if (!vnode)
 			return B_FILE_ERROR;
-
-		inc_vnode_ref_count(vnode);
-		put_fd(descriptor);
-		
-		*_vnode = vnode;
-		return B_OK;
+		status = vnode_path_to_vnode(vnode, path, traverseLeafLink, 0, &vnode,
+			NULL);
 	}
 
-	return path_to_vnode(path, traverseLeafLink, _vnode, kernel);
+	if (status == B_OK)
+		*_vnode = vnode;
+	return status;
 }
 
 
@@ -1246,10 +1437,7 @@ vfs_set_cache_ptr(void *vnode, void *cache)
 int
 vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode)
 {
-	struct io_context *ioctx;
-
-	ioctx = get_current_io_context(kernel);
-	*vnode = get_vnode_from_fd(ioctx, fd);
+	*vnode = get_vnode_from_fd(fd, kernel);
 
 	if (*vnode == NULL)
 		return B_FILE_ERROR;
@@ -1287,7 +1475,7 @@ vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuff
 	size_t length;
 	char *path;
 
-	if (bufferSize == 0 || strlcpy(pathBuffer, basePath, bufferSize - 1) > bufferSize - 1)
+	if (bufferSize == 0 || strlcpy(pathBuffer, basePath, bufferSize) >= bufferSize)
 		return B_BUFFER_OVERFLOW;
 
 	status = path_to_vnode(pathBuffer, true, &dir, true);
@@ -1613,19 +1801,19 @@ vfs_bootstrap_file_systems(void)
 	_kern_setcwd(-1, "/");
 
 	// bootstrap the devfs
-	_kern_create_dir("/dev", 0755);
+	_kern_create_dir(-1, "/dev", 0755);
 	status = _kern_mount("/dev", NULL, "devfs", NULL);
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
-	_kern_create_dir("/pipe", 0755);
+	_kern_create_dir(-1, "/pipe", 0755);
 	status = _kern_mount("/pipe", NULL, "pipefs", NULL);
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
 	// bootstrap the bootfs (if possible)
-	_kern_create_dir("/boot", 0755);
+	_kern_create_dir(-1, "/boot", 0755);
 	status = _kern_mount("/boot", NULL, "bootfs", NULL);
 	if (status < B_OK) {
 		// this is no fatal exception at this point, as we may mount
@@ -1636,7 +1824,8 @@ vfs_bootstrap_file_systems(void)
 	// create some standard links on the rootfs
 
 	for (int32 i = 0; sPredefinedLinks[i].path != NULL; i++) {
-		_kern_create_symlink(sPredefinedLinks[i].path, sPredefinedLinks[i].target, 0);
+		_kern_create_symlink(-1, sPredefinedLinks[i].path,
+			sPredefinedLinks[i].target, 0);
 			// we don't care if it will succeed or not
 	}
 
@@ -1685,7 +1874,7 @@ vfs_mount_boot_file_system()
 		char path[B_FILE_NAME_LENGTH + 1];
 		snprintf(path, sizeof(path), "/%s", info.volume_name);
 
-		_kern_create_symlink(path, "/boot", 0);
+		_kern_create_symlink(-1, path, "/boot", 0);
 	}
 
 	return B_OK;
@@ -1919,19 +2108,22 @@ file_open_entry_ref(mount_id mountID, vnode_id directoryID, const char *name, in
 
 
 static int
-file_open(char *path, int omode, bool kernel)
+file_open(int fd, char *path, int omode, bool kernel)
 {
+	int status = B_OK;
+	bool traverse = ((omode & O_NOTRAVERSE) == 0);
+
+	FUNCTION(("file_open: fd: %d, entry path = '%s', omode %d, kernel %d\n", fd, path, omode, kernel));
+
+	// get the vnode matching the vnode + path combination
 	struct vnode *vnode = NULL;
-	int status;
-
-	FUNCTION(("file_open: entry. path = '%s', omode %d, kernel %d\n", path, omode, kernel));
-
-	// get the vnode matching the path
-	status = path_to_vnode(path, (omode & O_NOTRAVERSE) == 0, &vnode, kernel);
-	if (status < B_OK)
+	status = fd_and_path_to_vnode(fd, path, traverse, &vnode, kernel);
+	if (status != B_OK)
 		return status;
 
+	// open the vnode
 	status = open_vnode(vnode, omode, kernel);
+	// put only on error -- otherwise our reference was transferred to the FD
 	if (status < B_OK)
 		put_vnode(vnode);
 		
@@ -2056,7 +2248,7 @@ dir_create_entry_ref(mount_id mountID, vnode_id parentID, const char *name, int 
 
 
 static status_t
-dir_create(char *path, int perms, bool kernel)
+dir_create(int fd, char *path, int perms, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
 	struct vnode *vnode;
@@ -2065,9 +2257,11 @@ dir_create(char *path, int perms, bool kernel)
 
 	FUNCTION(("dir_create: path '%s', perms %d, kernel %d\n", path, perms, kernel));
 
-	status = path_to_dir_vnode(path, &vnode, filename, kernel);
+	status = fd_and_path_to_dir_vnode(fd, path, &vnode, filename, kernel);
 	if (status < 0)
 		return status;
+
+
 
 	if (FS_CALL(vnode, create_dir))
 		status = FS_CALL(vnode, create_dir)(vnode->mount->cookie, vnode->private_node, filename, perms, &newID);
@@ -2080,27 +2274,6 @@ dir_create(char *path, int perms, bool kernel)
 
 
 static int
-dir_open_node_ref(mount_id mountID, vnode_id directoryID, bool kernel)
-{
-	struct vnode *vnode;
-	int status;
-
-	FUNCTION(("dir_open_entry_ref()\n"));
-
-	// get the vnode matching the node_ref
-	status = get_vnode(mountID, directoryID, &vnode, false);
-	if (status < B_OK)
-		return status;
-
-	status = open_dir_vnode(vnode, kernel);
-	if (status < B_OK)
-		put_vnode(vnode);
-
-	return status;
-}
-
-
-static int
 dir_open_entry_ref(mount_id mountID, vnode_id parentID, const char *name, bool kernel)
 {
 	struct vnode *vnode;
@@ -2108,11 +2281,14 @@ dir_open_entry_ref(mount_id mountID, vnode_id parentID, const char *name, bool k
 
 	FUNCTION(("dir_open_entry_ref()\n"));
 
-	if (name == NULL || *name == '\0')
+	if (name && *name == '\0')
 		return B_BAD_VALUE;
 
-	// get the vnode matching the entry_ref
-	status = entry_ref_to_vnode(mountID, parentID, name, &vnode);
+	// get the vnode matching the entry_ref/node_ref
+	if (name)
+		status = entry_ref_to_vnode(mountID, parentID, name, &vnode);
+	else
+		status = get_vnode(mountID, parentID, &vnode, false);
 	if (status < B_OK)
 		return status;
 
@@ -2125,17 +2301,19 @@ dir_open_entry_ref(mount_id mountID, vnode_id parentID, const char *name, bool k
 
 
 static int
-dir_open(char *path, bool kernel)
+dir_open(int fd, char *path, bool kernel)
 {
-	struct vnode *vnode;
-	int status;
+	int status = B_OK;
 
-	FUNCTION(("dir_open: path = '%s', kernel %d\n", path, kernel));
+	FUNCTION(("dir_open: fd: %d, entry path = '%s', kernel %d\n", fd, path, kernel));
 
-	status = path_to_vnode(path, true, &vnode, kernel);
-	if (status < B_OK)
+	// get the vnode matching the vnode + path combination
+	struct vnode *vnode = NULL;
+	status = fd_and_path_to_vnode(fd, path, true, &vnode, kernel);
+	if (status != B_OK)
 		return status;
 
+	// open the dir
 	status = open_dir_vnode(vnode, kernel);
 	if (status < B_OK)
 		put_vnode(vnode);
@@ -2250,13 +2428,30 @@ common_sync(int fd, bool kernel)
 }
 
 
+static status_t
+common_lock_node(int fd, bool kernel)
+{
+	// TODO: Implement!
+	return EOPNOTSUPP;
+}
+
+
+static status_t
+common_unlock_node(int fd, bool kernel)
+{
+	// TODO: Implement!
+	return EOPNOTSUPP;
+}
+
+
 static ssize_t
-common_read_link(char *path, char *buffer, size_t bufferSize, bool kernel)
+common_read_link(int fd, char *path, char *buffer, size_t bufferSize,
+	bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
-	status = path_to_vnode(path, false, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, false, &vnode, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -2293,16 +2488,17 @@ common_write_link(char *path, char *toPath, bool kernel)
 
 
 static status_t
-common_create_symlink(char *path, const char *toPath, int mode, bool kernel)
+common_create_symlink(int fd, char *path, const char *toPath, int mode,
+	bool kernel)
 {
 	// path validity checks have to be in the calling function!
 	char name[B_FILE_NAME_LENGTH];
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("common_create_symlink(path = %s, toPath = %s, mode = %d, kernel = %d)\n", path, toPath, mode, kernel));
+	FUNCTION(("common_create_symlink(fd = %d, path = %s, toPath = %s, mode = %d, kernel = %d)\n", fd, path, toPath, mode, kernel));
 
-	status = path_to_dir_vnode(path, &vnode, name, kernel);
+	status = fd_and_path_to_dir_vnode(fd, path, &vnode, name, kernel);
 	if (status < B_OK)
 		return status;
 
@@ -2355,15 +2551,15 @@ err:
 
 
 static status_t
-common_unlink(char *path, bool kernel)
+common_unlink(int fd, char *path, bool kernel)
 {
 	char filename[SYS_MAX_NAME_LEN];
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("common_unlink: path '%s', kernel %d\n", path, kernel));
+	FUNCTION(("common_unlink: fd: %d, path '%s', kernel %d\n", fd, path, kernel));
 
-	status = path_to_dir_vnode(path, &vnode, filename, kernel);
+	status = fd_and_path_to_dir_vnode(fd, path, &vnode, filename, kernel);
 	if (status < 0)
 		return status;
 
@@ -2400,20 +2596,20 @@ common_access(char *path, int mode, bool kernel)
 
 
 static status_t
-common_rename(char *path, char *newPath, bool kernel)
+common_rename(int fd, char *path, int newFD, char *newPath, bool kernel)
 {
 	struct vnode *fromVnode, *toVnode;
 	char fromName[SYS_MAX_NAME_LEN];
 	char toName[SYS_MAX_NAME_LEN];
 	int status;
 
-	FUNCTION(("common_rename(path = %s, newPath = %s, kernel = %d)\n", path, newPath, kernel));
+	FUNCTION(("common_rename(fd = %d, path = %s, newFD = %d, newPath = %s, kernel = %d)\n", fd, path, newFD, newPath, kernel));
 
-	status = path_to_dir_vnode(path, &fromVnode, fromName, kernel);
+	status = fd_and_path_to_dir_vnode(fd, path, &fromVnode, fromName, kernel);
 	if (status < 0)
 		return status;
 
-	status = path_to_dir_vnode(newPath, &toVnode, toName, kernel);
+	status = fd_and_path_to_dir_vnode(newFD, newPath, &toVnode, toName, kernel);
 	if (status < 0)
 		goto err;
 
@@ -2460,14 +2656,15 @@ common_write_stat(struct file_descriptor *descriptor, const struct stat *stat, i
 
 
 static status_t
-common_path_read_stat(char *path, bool traverseLeafLink, struct stat *stat, bool kernel)
+common_path_read_stat(int fd, char *path, bool traverseLeafLink,
+	struct stat *stat, bool kernel)
 {
 	struct vnode *vnode;
 	status_t status;
 
-	FUNCTION(("common_path_read_stat: path '%s', stat %p,\n", path, stat));
+	FUNCTION(("common_path_read_stat: fd: %d, path '%s', stat %p,\n", fd, path, stat));
 
-	status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
 	if (status < 0)
 		return status;
 
@@ -2479,14 +2676,15 @@ common_path_read_stat(char *path, bool traverseLeafLink, struct stat *stat, bool
 
 
 static status_t
-common_path_write_stat(char *path, bool traverseLeafLink, const struct stat *stat, int statMask, bool kernel)
+common_path_write_stat(int fd, char *path, bool traverseLeafLink,
+	const struct stat *stat, int statMask, bool kernel)
 {
 	struct vnode *vnode;
 	int status;
 
-	FUNCTION(("common_write_stat: path '%s', stat %p, stat_mask %d, kernel %d\n", path, stat, statMask, kernel));
+	FUNCTION(("common_write_stat: fd: %d, path '%s', stat %p, stat_mask %d, kernel %d\n", fd, path, stat, statMask, kernel));
 
-	status = path_to_vnode(path, traverseLeafLink, &vnode, kernel);
+	status = fd_and_path_to_vnode(fd, path, traverseLeafLink, &vnode, kernel);
 	if (status < 0)
 		return status;
 
@@ -2581,7 +2779,7 @@ attr_create(int fd, const char *name, uint32 type, int openMode, bool kernel)
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
+	vnode = get_vnode_from_fd(fd, kernel);
 	if (vnode == NULL)
 		return B_FILE_ERROR;
 
@@ -2619,7 +2817,7 @@ attr_open(int fd, const char *name, int openMode, bool kernel)
 	if (name == NULL || *name == '\0')
 		return B_BAD_VALUE;
 
-	vnode = get_vnode_from_fd(get_current_io_context(kernel), fd);
+	vnode = get_vnode_from_fd(fd, kernel);
 	if (vnode == NULL)
 		return B_FILE_ERROR;
 
@@ -3467,7 +3665,7 @@ status_t
 _kern_mount(const char *path, const char *device, const char *fs_name, void *args)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
 	return fs_mount(pathBuffer, device, fs_name, args, true);
 }
@@ -3477,7 +3675,7 @@ status_t
 _kern_unmount(const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
 	return fs_unmount(pathBuffer, true);
 }
@@ -3521,29 +3719,54 @@ int
 _kern_open_entry_ref(dev_t device, ino_t inode, const char *name, int omode)
 {
 	char nameCopy[B_FILE_NAME_LENGTH];
-	strlcpy(nameCopy, name, sizeof(nameCopy) - 1);
+	strlcpy(nameCopy, name, sizeof(nameCopy));
 
 	return file_open_entry_ref(device, inode, nameCopy, omode, true);
 }
 
 
+/*!	\brief Opens a node specified by a FD + path pair.
+
+	At least one of \a fd and \a path must be specified.
+	If only \a fd is given, the function opens the node identified by this
+	FD. If only a path is given, this path is opened. If both are given and
+	the path is absolute, \a fd is ignored; a relative path is reckoned off
+	of the directory (!) identified by \a fd.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. May be \c NULL.
+	\param omode The open mode.
+	\return A FD referring to the newly opened node, or an error code,
+			if an error occurs.
+*/
 int
-_kern_open(const char *path, int omode)
+_kern_open(int fd, const char *path, int omode)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
-	return file_open(pathBuffer, omode, true);
+	return file_open(fd, pathBuffer, omode, true);
 }
 
 
-int
-_kern_open_dir_node_ref(dev_t device, ino_t inode)
-{
-	return dir_open_node_ref(device, inode, true);
-}
+/*!	\brief Opens a directory specified by entry_ref or node_ref.
 
+	The supplied name may be \c NULL, in which case directory identified
+	by \a device and \a inode will be opened. Otherwise \a device and
+	\a inode identify the parent directory of the directory to be opened
+	and \a name its entry name.
 
+	\param device If \a name is specified the ID of the device the parent
+		   directory of the directory to be opened resides on, otherwise
+		   the device of the directory itself.
+	\param inode If \a name is specified the node ID of the parent
+		   directory of the directory to be opened, otherwise node ID of the
+		   directory itself.
+	\param name The entry name of the directory to be opened. If \c NULL,
+		   the \a device + \a inode pair identify the node to be opened.
+	\return The FD of the newly opened directory or an error code, if
+			something went wrong.
+*/
 int
 _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 {
@@ -3551,13 +3774,26 @@ _kern_open_dir_entry_ref(dev_t device, ino_t inode, const char *name)
 }
 
 
+/*!	\brief Opens a directory specified by a FD + path pair.
+
+	At least one of \a fd and \a path must be specified.
+	If only \a fd is given, the function opens the directory identified by this
+	FD. If only a path is given, this path is opened. If both are given and
+	the path is absolute, \a fd is ignored; a relative path is reckoned off
+	of the directory (!) identified by \a fd.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. May be \c NULL.
+	\return A FD referring to the newly opened directory, or an error code,
+			if an error occurs.
+*/
 int
-_kern_open_dir(const char *path)
+_kern_open_dir(int fd, const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
-	return dir_open(pathBuffer, true);
+	return dir_open(fd, pathBuffer, true);
 }
 
 
@@ -3565,6 +3801,20 @@ status_t
 _kern_fsync(int fd)
 {
 	return common_sync(fd, true);
+}
+
+
+status_t
+_kern_lock_node(int fd)
+{
+	return common_lock_node(fd, true);
+}
+
+
+status_t
+_kern_unlock_node(int fd)
+{
+	return common_unlock_node(fd, true);
 }
 
 
@@ -3579,7 +3829,7 @@ int
 _kern_create(const char *path, int omode, int perms)
 {
 	char buffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(buffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(buffer, path, SYS_MAX_PATH_LEN);
 
 	return file_create(buffer, omode, perms, true);
 }
@@ -3592,13 +3842,28 @@ _kern_create_dir_entry_ref(dev_t device, ino_t inode, const char *name, int perm
 }
 
 
+
+/*!	\brief Creates a directory specified by a FD + path pair.
+
+	\a path must always be specified (it contains the name of the new directory
+	at least). If only a path is given, this path identifies the location at
+	which the directory shall be created. If both \a fd and \a path are given and
+	the path is absolute, \a fd is ignored; a relative path is reckoned off
+	of the directory (!) identified by \a fd.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL.
+	\param perms The access permissions the new directory shall have.
+	\return \c B_OK, if the directory has been created successfully, another
+			error code otherwise.
+*/
 status_t
-_kern_create_dir(const char *path, int perms)
+_kern_create_dir(int fd, const char *path, int perms)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
-	return dir_create(pathBuffer, perms, true);
+	return dir_create(fd, pathBuffer, perms, true);
 }
 
 
@@ -3606,19 +3871,39 @@ status_t
 _kern_remove_dir(const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
 	return dir_remove(pathBuffer, true);
 }
 
 
-ssize_t
-_kern_read_link(const char *path, char *buffer, size_t bufferSize)
-{
-	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+/*!	\brief Reads the contents of a symlink referred to by a FD + path pair.
 
-	return common_read_link(pathBuffer, buffer, bufferSize, true);
+	At least one of \a fd and \a path must be specified.
+	If only \a fd is given, the function the symlink to be read is the node
+	identified by this FD. If only a path is given, this path identifies the
+	symlink to be read. If both are given and the path is absolute, \a fd is
+	ignored; a relative path is reckoned off of the directory (!) identified
+	by \a fd.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. May be \c NULL.
+	\param buffer The buffer into which the contents of the symlink shall be
+		   written.
+	\param bufferSize The size of the supplied buffer.
+	\return A FD referring to the newly opened node, or an error code,
+			if an error occurs.
+*/
+ssize_t
+_kern_read_link(int fd, const char *path, char *buffer, size_t bufferSize)
+{
+	if (path) {
+		char pathBuffer[SYS_MAX_PATH_LEN + 1];
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
+		return common_read_link(fd, pathBuffer, buffer, bufferSize, true);
+	}
+
+	return common_read_link(fd, NULL, buffer, bufferSize, true);
 }
 
 
@@ -3629,8 +3914,8 @@ _kern_write_link(const char *path, const char *toPath)
 	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
-	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
+	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN);
 
 	status = check_path(toPathBuffer);
 	if (status < B_OK)
@@ -3640,21 +3925,35 @@ _kern_write_link(const char *path, const char *toPath)
 }
 
 
+/*!	\brief Creates a symlink specified by a FD + path pair.
+
+	\a path must always be specified (it contains the name of the new symlink
+	at least). If only a path is given, this path identifies the location at
+	which the symlink shall be created. If both \a fd and \a path are given and
+	the path is absolute, \a fd is ignored; a relative path is reckoned off
+	of the directory (!) identified by \a fd.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL.
+	\param mode The access permissions the new symlink shall have.
+	\return \c B_OK, if the symlink has been created successfully, another
+			error code otherwise.
+*/
 status_t
-_kern_create_symlink(const char *path, const char *toPath, int mode)
+_kern_create_symlink(int fd, const char *path, const char *toPath, int mode)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
 	status_t status;
 
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
-	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
+	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN);
 
 	status = check_path(toPathBuffer);
 	if (status < B_OK)
 		return status;
 
-	return common_create_symlink(pathBuffer, toPathBuffer, mode, true);
+	return common_create_symlink(fd, pathBuffer, toPathBuffer, mode, true);
 }
 
 
@@ -3664,33 +3963,64 @@ _kern_create_link(const char *path, const char *toPath)
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	char toPathBuffer[SYS_MAX_PATH_LEN + 1];
 	
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
-	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
+	strlcpy(toPathBuffer, toPath, SYS_MAX_PATH_LEN);
 
 	return common_create_link(pathBuffer, toPathBuffer, true);
 }
 
 
+/*!	\brief Removes an entry specified by a FD + path pair from its directory.
+
+	\a path must always be specified (it contains at least the name of the entry
+	to be deleted). If only a path is given, this path identifies the entry
+	directly. If both \a fd and \a path are given and the path is absolute,
+	\a fd is ignored; a relative path is reckoned off of the directory (!)
+	identified by \a fd.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL.
+	\return \c B_OK, if the entry has been removed successfully, another
+			error code otherwise.
+*/
 status_t
-_kern_unlink(const char *path)
+_kern_unlink(int fd, const char *path)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
-	return common_unlink(pathBuffer, true);
+	return common_unlink(fd, pathBuffer, true);
 }
 
 
+/*!	\brief Moves an entry specified by a FD + path pair to a an entry specified
+		   by another FD + path pair.
+
+	\a oldPath and \a newPath must always be specified (they contain at least
+	the name of the entry). If only a path is given, this path identifies the
+	entry directly. If both a FD and a path are given and the path is absolute,
+	the FD is ignored; a relative path is reckoned off of the directory (!)
+	identified by the respective FD.
+
+	\param oldFD The FD of the old location. May be < 0.
+	\param oldPath The absolute or relative path of the old location. Must not
+		   be \c NULL.
+	\param newFD The FD of the new location. May be < 0.
+	\param newPath The absolute or relative path of the new location. Must not
+		   be \c NULL.
+	\return \c B_OK, if the entry has been moved successfully, another
+			error code otherwise.
+*/
 status_t
-_kern_rename(const char *oldPath, const char *newPath)
+_kern_rename(int oldFD, const char *oldPath, int newFD, const char *newPath)
 {
 	char oldPathBuffer[SYS_MAX_PATH_LEN + 1];
 	char newPathBuffer[SYS_MAX_PATH_LEN + 1];
 
-	strlcpy(oldPathBuffer, oldPath, SYS_MAX_PATH_LEN - 1);
-	strlcpy(newPathBuffer, newPath, SYS_MAX_PATH_LEN - 1);
+	strlcpy(oldPathBuffer, oldPath, SYS_MAX_PATH_LEN);
+	strlcpy(newPathBuffer, newPath, SYS_MAX_PATH_LEN);
 
-	return common_rename(oldPathBuffer, newPathBuffer, true);
+	return common_rename(oldFD, oldPathBuffer, newFD, newPathBuffer, true);
 }
 
 
@@ -3698,24 +4028,41 @@ status_t
 _kern_access(const char *path, int mode)
 {
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
 	return common_access(pathBuffer, mode, true);
 }
 
 
+/*!	\brief Reads stat data of an entity specified by a FD + path pair.
+
+	If only \a fd is given, the stat operation associated with the type
+	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
+	given, this path identifies the entry for whose node to retrieve the
+	stat data. If both \a fd and \a path are given and the path is absolute,
+	\a fd is ignored; a relative path is reckoned off of the directory (!)
+	identified by \a fd and specifies the entry whose stat data shall be
+	retrieved.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL.
+	\param traverseLeafLink If \a path is given, \c true specifies that the
+		   function shall not stick to symlinks, but traverse them.
+	\param stat The buffer the stat data shall be written into.
+	\param statSize The size of the supplied stat buffer.
+	\return \c B_OK, if the the stat data have been read successfully, another
+			error code otherwise.
+*/
 status_t
-_kern_read_path_stat(const char *path, bool traverseLeafLink, struct stat *stat, size_t statSize)
+_kern_read_stat(int fd, const char *path, bool traverseLeafLink,
+	struct stat *stat, size_t statSize)
 {
 	struct stat completeStat;
 	struct stat *originalStat = NULL;
-	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 	status_t status;
 
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
-
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
 	// this supports different stat extensions
 	if (statSize < sizeof(struct stat)) {
@@ -3723,7 +4070,28 @@ _kern_read_path_stat(const char *path, bool traverseLeafLink, struct stat *stat,
 		stat = &completeStat;
 	}
 
-	status = common_path_read_stat(pathBuffer, traverseLeafLink, stat, true);
+	if (path) {
+		// path given: get the stat of the node referred to by (fd, path)
+		char pathBuffer[SYS_MAX_PATH_LEN + 1];
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
+
+		status = common_path_read_stat(fd, pathBuffer, traverseLeafLink, stat,
+			true);
+	} else {
+		// no path given: get the FD and use the FD operation
+		struct file_descriptor *descriptor
+			= get_fd(get_current_io_context(true), fd);
+		if (descriptor == NULL)
+			return B_FILE_ERROR;
+
+		if (descriptor->ops->fd_read_stat)
+			status = descriptor->ops->fd_read_stat(descriptor, stat);
+		else
+			status = EOPNOTSUPP;
+
+		put_fd(descriptor);
+	}
+
 	if (status == B_OK && originalStat != NULL)
 		memcpy(originalStat, stat, statSize);
 
@@ -3731,26 +4099,68 @@ _kern_read_path_stat(const char *path, bool traverseLeafLink, struct stat *stat,
 }
 
 
+/*!	\brief Writes stat data of an entity specified by a FD + path pair.
+
+	If only \a fd is given, the stat operation associated with the type
+	of the FD (node, attr, attr dir etc.) is performed. If only \a path is
+	given, this path identifies the entry for whose node to write the
+	stat data. If both \a fd and \a path are given and the path is absolute,
+	\a fd is ignored; a relative path is reckoned off of the directory (!)
+	identified by \a fd and specifies the entry whose stat data shall be
+	written.
+
+	\param fd The FD. May be < 0.
+	\param path The absolute or relative path. Must not be \c NULL.
+	\param traverseLeafLink If \a path is given, \c true specifies that the
+		   function shall not stick to symlinks, but traverse them.
+	\param stat The buffer containing the stat data to be written.
+	\param statSize The size of the supplied stat buffer.
+	\param statMask A mask specifying which parts of the stat data shall be
+		   written.
+	\return \c B_OK, if the the stat data have been written successfully,
+			another error code otherwise.
+*/
 status_t
-_kern_write_path_stat(const char *path, bool traverseLeafLink, const struct stat *stat, size_t statSize, int statMask)
+_kern_write_stat(int fd, const char *path, bool traverseLeafLink,
+	const struct stat *stat, size_t statSize, int statMask)
 {
 	struct stat completeStat;
-	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
 
-	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
-
 	// this supports different stat extensions
-
 	if (statSize < sizeof(struct stat)) {
 		memset((uint8 *)&completeStat + statSize, 0, sizeof(struct stat) - statSize);
 		memcpy(&completeStat, stat, statSize);
 		stat = &completeStat;
 	}
 
-	return common_path_write_stat(pathBuffer, traverseLeafLink, stat, statMask, true);
+	int status;
+
+	if (path) {
+		// path given: write the stat of the node referred to by (fd, path)
+		char pathBuffer[SYS_MAX_PATH_LEN + 1];
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
+
+		status = common_path_write_stat(fd, pathBuffer, traverseLeafLink,
+			stat, statMask, true);
+	} else {
+		// no path given: get the FD and use the FD operation
+		struct file_descriptor *descriptor
+			= get_fd(get_current_io_context(true), fd);
+		if (descriptor == NULL)
+			return B_FILE_ERROR;
+
+		if (descriptor->ops->fd_write_stat)
+			status = descriptor->ops->fd_write_stat(descriptor, stat, statMask);
+		else
+			status = EOPNOTSUPP;
+
+		put_fd(descriptor);
+	}
+
+	return status;
 }
 
 
@@ -3760,7 +4170,7 @@ _kern_open_attr_dir(int fd, const char *path)
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
 	if (fd == -1)
-		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
 	return attr_dir_open(fd, pathBuffer, true);
 }
@@ -3848,7 +4258,7 @@ _kern_setcwd(int fd, const char *path)
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
 
 	if (fd == -1)
-		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+		strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN);
 
 	return set_cwd(fd, pathBuffer, true);
 }
@@ -3972,10 +4382,9 @@ _user_sync(void)
 }
 
 
-// ToDo: this might be a temporary syscall, it's used to get the path to an entry_ref
-
 status_t
-_user_dir_node_ref_to_path(dev_t device, ino_t inode, char *userPath, size_t pathLength)
+_user_entry_ref_to_path(dev_t device, ino_t inode, const char *leaf,
+	char *userPath, size_t pathLength)
 {
 	char path[B_PATH_NAME_LENGTH + 1];
 	struct vnode *vnode;
@@ -3984,17 +4393,47 @@ _user_dir_node_ref_to_path(dev_t device, ino_t inode, char *userPath, size_t pat
 	if (!IS_USER_ADDRESS(userPath))
 		return B_BAD_ADDRESS;
 
-	// get the vnode matching the node_ref
-	status = get_vnode(device, inode, &vnode, false);
+	// copy the leaf name onto the stack
+	char stackLeaf[B_FILE_NAME_LENGTH];
+	if (leaf) {
+		if (!IS_USER_ADDRESS(leaf))
+			return B_BAD_ADDRESS;
+
+		status = user_strlcpy(stackLeaf, leaf, B_FILE_NAME_LENGTH);
+		if (status != B_OK)
+			return status;
+		leaf = stackLeaf;
+
+		// filter invalid leaf names
+		if (leaf[0] == '\0' || strchr(leaf, '/'))
+			return B_BAD_VALUE;
+	}
+
+	// get the vnode matching the dir's node_ref
+	if (leaf && (strcmp(leaf, ".") == 0 || strcmp(leaf, "..") == 0)) {
+		// special cases "." and "..": we can directly get the vnode of the
+		// referenced directory
+		status = entry_ref_to_vnode(device, inode, leaf, &vnode);
+		leaf = NULL;
+	} else
+		status = get_vnode(device, inode, &vnode, false);
 	if (status < B_OK)
 		return status;
 
+	// get the directory path
 	status = dir_vnode_to_path(vnode, path, sizeof(path));
 	put_vnode(vnode);
 		// we don't need the vnode anymore
-
 	if (status < B_OK)
 		return status;
+
+	// append the leaf name
+	if (leaf) {
+		if (strlcat(path, "/", sizeof(path)) >= sizeof(path)
+			|| strlcat(path, leaf, sizeof(path)) >= sizeof(path)) {
+			return B_NAME_TOO_LONG;
+		}
+	}
 
 	return user_strlcpy(userPath, path, pathLength);
 }
@@ -4009,7 +4448,7 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 	if (!IS_USER_ADDRESS(userName))
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(name, userName, sizeof(name) - 1);
+	status = user_strlcpy(name, userName, sizeof(name));
 	if (status < B_OK)
 		return status;
 
@@ -4018,7 +4457,7 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char *userName, int omode)
 
 
 int
-_user_open(const char *userPath, int omode)
+_user_open(int fd, const char *userPath, int omode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -4030,36 +4469,31 @@ _user_open(const char *userPath, int omode)
 	if (status < 0)
 		return status;
 
-	return file_open(path, omode, false);
-}
-
-
-int
-_user_open_dir_node_ref(dev_t device, ino_t inode)
-{
-	return dir_open_node_ref(device, inode, false);
+	return file_open(-1, path, omode, false);
 }
 
 
 int
 _user_open_dir_entry_ref(dev_t device, ino_t inode, const char *uname)
 {
-	char name[B_FILE_NAME_LENGTH];
-	int status;
+	if (uname) {
+		char name[B_FILE_NAME_LENGTH];
 
-	if (!IS_USER_ADDRESS(uname))
-		return B_BAD_ADDRESS;
+		if (!IS_USER_ADDRESS(uname))
+			return B_BAD_ADDRESS;
 
-	status = user_strlcpy(name, uname, sizeof(name));
-	if (status < B_OK)
-		return status;
+		int status = user_strlcpy(name, uname, sizeof(name));
+		if (status < B_OK)
+			return status;
 
-	return dir_open_entry_ref(device, inode, name, false);
+		return dir_open_entry_ref(device, inode, name, false);
+	}
+	return dir_open_entry_ref(device, inode, NULL, false);
 }
 
 
 int
-_user_open_dir(const char *userPath)
+_user_open_dir(int fd, const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -4071,7 +4505,41 @@ _user_open_dir(const char *userPath)
 	if (status < 0)
 		return status;
 
-	return dir_open(path, false);
+	return dir_open(fd, path, false);
+}
+
+
+int
+_user_open_parent_dir(int fd, char *userName, size_t nameLength)
+{
+	bool kernel = false;
+
+	if (!IS_USER_ADDRESS(userName))
+		return B_BAD_ADDRESS;
+
+	// open the parent dir
+	int parentFD = dir_open(fd, "..", kernel);
+	if (parentFD < 0)
+		return parentFD;
+	FDCloser fdCloser(parentFD, kernel);
+
+	// get the vnodes
+	struct vnode *parentVNode = get_vnode_from_fd(parentFD, kernel);
+	struct vnode *dirVNode = get_vnode_from_fd(fd, kernel);
+	VNodePutter parentVNodePutter(parentVNode);
+	VNodePutter dirVNodePutter(dirVNode);
+	if (!parentVNode || !dirVNode)
+		return B_FILE_ERROR;
+
+	// get the vnode name
+	char name[B_FILE_NAME_LENGTH];
+	status_t status = get_vnode_name(dirVNode, parentVNode,
+		name, sizeof(name));
+	if (status != B_OK)
+		return status;
+
+	status = user_strlcpy(userName, name, nameLength);
+	return (status == B_OK ? fdCloser.Detach() : status);
 }
 
 
@@ -4079,6 +4547,20 @@ status_t
 _user_fsync(int fd)
 {
 	return common_sync(fd, false);
+}
+
+
+status_t
+_user_lock_node(int fd)
+{
+	return common_lock_node(fd, false);
+}
+
+
+status_t
+_user_unlock_node(int fd)
+{
+	return common_unlock_node(fd, false);
 }
 
 
@@ -4134,7 +4616,7 @@ _user_create_dir_entry_ref(dev_t device, ino_t inode, const char *userName, int 
 
 
 status_t
-_user_create_dir(const char *userPath, int perms)
+_user_create_dir(int fd, const char *userPath, int perms)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	status_t status;
@@ -4146,7 +4628,7 @@ _user_create_dir(const char *userPath, int perms)
 	if (status < 0)
 		return status;
 
-	return dir_create(path, perms, false);
+	return dir_create(fd, path, perms, false);
 }
 
 
@@ -4168,24 +4650,30 @@ _user_remove_dir(const char *userPath)
 
 
 ssize_t
-_user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
+_user_read_link(int fd, const char *userPath, char *userBuffer, size_t bufferSize)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char buffer[SYS_MAX_PATH_LEN + 1];
 	int status;
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userBuffer))
+	if (!IS_USER_ADDRESS(userBuffer))
 		return B_BAD_ADDRESS;
 
-	status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
-	if (status < 0)
-		return status;
+	if (userPath) {
+		if (!IS_USER_ADDRESS(userPath))
+			return B_BAD_ADDRESS;
 
-	if (bufferSize > SYS_MAX_PATH_LEN)
-		bufferSize = SYS_MAX_PATH_LEN;
+		status = user_strlcpy(path, userPath, SYS_MAX_PATH_LEN);
+		if (status < 0)
+			return status;
 
-	status = common_read_link(path, buffer, bufferSize, false);
+		if (bufferSize > SYS_MAX_PATH_LEN)
+			bufferSize = SYS_MAX_PATH_LEN;
+
+		status = common_read_link(fd, path, buffer, bufferSize, false);
+	} else
+		status = common_read_link(fd, NULL, buffer, bufferSize, false);
+
 	if (status < B_OK)
 		return status;
 
@@ -4225,7 +4713,8 @@ _user_write_link(const char *userPath, const char *userToPath)
 
 
 status_t
-_user_create_symlink(const char *userPath, const char *userToPath, int mode)
+_user_create_symlink(int fd, const char *userPath, const char *userToPath,
+	int mode)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	char toPath[SYS_MAX_PATH_LEN + 1];
@@ -4247,7 +4736,7 @@ _user_create_symlink(const char *userPath, const char *userToPath, int mode)
 	if (status < B_OK)
 		return status;
 
-	return common_create_symlink(path, toPath, mode, false);
+	return common_create_symlink(fd, path, toPath, mode, false);
 }
 
 
@@ -4279,7 +4768,7 @@ _user_create_link(const char *userPath, const char *userToPath)
 
 
 status_t
-_user_unlink(const char *userPath)
+_user_unlink(int fd, const char *userPath)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	int status;
@@ -4291,12 +4780,13 @@ _user_unlink(const char *userPath)
 	if (status < 0)
 		return status;
 
-	return common_unlink(path, false);
+	return common_unlink(fd, path, false);
 }
 
 
 status_t
-_user_rename(const char *userOldPath, const char *userNewPath)
+_user_rename(int oldFD, const char *userOldPath, int newFD,
+	const char *userNewPath)
 {
 	char oldPath[SYS_MAX_PATH_LEN + 1];
 	char newPath[SYS_MAX_PATH_LEN + 1];
@@ -4313,7 +4803,7 @@ _user_rename(const char *userOldPath, const char *userNewPath)
 	if (status < 0)
 		return status;
 
-	return common_rename(oldPath, newPath, false);
+	return common_rename(oldFD, oldPath, newFD, newPath, false);
 }
 
 
@@ -4335,22 +4825,41 @@ _user_access(const char *userPath, int mode)
 
 
 status_t
-_user_read_path_stat(const char *userPath, bool traverseLink, struct stat *userStat,
-	size_t statSize)
+_user_read_stat(int fd, const char *userPath, bool traverseLink,
+	struct stat *userStat, size_t statSize)
 {
-	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
 	int status;
 
 	if (statSize > sizeof(struct stat))
 		return B_BAD_VALUE;
 
-	if (!IS_USER_ADDRESS(userPath)
-		|| !IS_USER_ADDRESS(userStat)
-		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
+	if (!IS_USER_ADDRESS(userStat))
 		return B_BAD_ADDRESS;
 
-	status = common_path_read_stat(path, traverseLink, &stat, false);
+	if (userPath) {
+		// path given: get the stat of the node referred to by (fd, path)
+		char path[SYS_MAX_PATH_LEN + 1];
+		if (!IS_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
+			return B_BAD_ADDRESS;
+
+		status = common_path_read_stat(fd, path, traverseLink, &stat, false);
+	} else {
+		// no path given: get the FD and use the FD operation
+		struct file_descriptor *descriptor
+			= get_fd(get_current_io_context(false), fd);
+		if (descriptor == NULL)
+			return B_FILE_ERROR;
+
+		if (descriptor->ops->fd_read_stat)
+			status = descriptor->ops->fd_read_stat(descriptor, &stat);
+		else
+			status = EOPNOTSUPP;
+
+		put_fd(descriptor);
+	}
+
 	if (status < B_OK)
 		return status;
 
@@ -4359,8 +4868,8 @@ _user_read_path_stat(const char *userPath, bool traverseLink, struct stat *userS
 
 
 status_t
-_user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct stat *userStat,
-	size_t statSize, int statMask)
+_user_write_stat(int fd, const char *userPath, bool traverseLeafLink,
+	const struct stat *userStat, size_t statSize, int statMask)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
@@ -4369,8 +4878,6 @@ _user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct 
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userStat)
-		|| !IS_USER_ADDRESS(userPath)
-		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK
 		|| user_memcpy(&stat, userStat, statSize) < B_OK)
 		return B_BAD_ADDRESS;
 
@@ -4378,7 +4885,32 @@ _user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct 
 	if (statSize < sizeof(struct stat))
 		memset((uint8 *)&stat + statSize, 0, sizeof(struct stat) - statSize);
 
-	return common_path_write_stat(path, traverseLeafLink, &stat, statMask, false);
+	status_t status;
+
+	if (userPath) {
+		// path given: write the stat of the node referred to by (fd, path)
+		if (!IS_USER_ADDRESS(userPath)
+			|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK)
+			return B_BAD_ADDRESS;
+
+		status = common_path_write_stat(fd, path, traverseLeafLink, &stat,
+			statMask, false);
+	} else {
+		// no path given: get the FD and use the FD operation
+		struct file_descriptor *descriptor
+			= get_fd(get_current_io_context(false), fd);
+		if (descriptor == NULL)
+			return B_FILE_ERROR;
+
+		if (descriptor->ops->fd_write_stat)
+			status = descriptor->ops->fd_write_stat(descriptor, &stat, statMask);
+		else
+			status = EOPNOTSUPP;
+
+		put_fd(descriptor);
+	}
+
+	return status;
 }
 
 
@@ -4551,3 +5083,11 @@ _user_setcwd(int fd, const char *userPath)
 	return set_cwd(fd, path, false);
 }
 
+
+int
+_user_open_query(dev_t device, const char *query, uint32 flags, port_id port,
+	int32 token)
+{
+	// TODO: Implement!
+	return B_ERROR;
+}
