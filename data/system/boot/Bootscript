@@ -27,6 +27,19 @@ launchscript() {
 	fi
 }
 
+# runprog <executable path>
+
+runprog() {
+	if [ -f "/boot/$1" ]
+	then
+		"/boot/$1"
+		return 1
+	else
+		echo There is no "$1"
+	fi
+	return 0
+}
+
 ##
 ## Main script starts here
 ##
@@ -40,6 +53,9 @@ exec >/dev/null 2>&1
 
 SCRIPTS=beos/system/boot
 launchscript $SCRIPTS/SetupEnvironment
+
+# Launch clockconfig
+runprog beos/bin/clockconfig
 
 # Launch consoled
 
