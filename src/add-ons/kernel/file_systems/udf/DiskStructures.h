@@ -692,6 +692,7 @@ private:
 	descriptor sequence, per UDF-2.50
 */
 extern const uint8 kMaxPartitionDescriptors;
+#define UDF_MAX_PARTITION_MAPS 2
 
 /*! \brief Partition Descriptor
 
@@ -842,6 +843,9 @@ struct udf_logical_descriptor {
 	void set_map_table_length(uint32 length) { _map_table_length = B_HOST_TO_LENDIAN_INT32(length); }
 	void set_partition_map_count(uint32 count) { _partition_map_count = B_HOST_TO_LENDIAN_INT32(count); }
 
+	// Other functions
+	udf_logical_descriptor& operator=(const udf_logical_descriptor &rhs);
+	
 private:
 	udf_tag _tag;
 	uint32 _vds_number;
@@ -896,10 +900,19 @@ private:
 	See also: ECMA-167 3/10.7.1
 */
 struct udf_generic_partition_map {
-	uint8 type;
-	uint8 length;
-	uint8 map_data[0];
-} __attribute__((packed));
+public:
+	uint8 type() const { return _type; }
+	uint8 length() const { return _length; }
+	uint8 *map_data() { return _map_data; }
+	const uint8 *map_data() const { return _map_data; }
+
+	void set_type(uint8 type) { _type = type; }
+	void set_length(uint8 length) { _length = length; }
+private:
+	uint8 _type;
+	uint8 _length;
+	uint8 _map_data[0];
+};// __attribute__((packed));
 
 
 /*! \brief Physical partition map (i.e. ECMA-167 Type 1 partition map)
@@ -907,22 +920,38 @@ struct udf_generic_partition_map {
 	See also: ECMA-167 3/10.7.2
 */
 struct udf_physical_partition_map {
-	uint8 type;
-	uint8 length;
-	uint16 volume_sequence_number;
-	uint16 partition_number;	
+public:
+	void dump();
+
+	uint8 type() const { return _type; }
+	uint8 length() const { return _length; }
+
+	uint16 volume_sequence_number() const {
+		return B_LENDIAN_TO_HOST_INT16(_volume_sequence_number); }
+	uint16 partition_number() const {
+		return B_LENDIAN_TO_HOST_INT16(_partition_number); }
+
+	void set_type(uint8 type) { _type = type; }
+	void set_length(uint8 length) { _length = length; }
+	void set_volume_sequence_number(uint16 number) {
+		_volume_sequence_number = B_HOST_TO_LENDIAN_INT16(number); }
+	void set_partition_number(uint16 number) {
+		_partition_number = B_HOST_TO_LENDIAN_INT16(number); }
+private:
+	uint8 _type;
+	uint8 _length;
+	uint16 _volume_sequence_number;
+	uint16 _partition_number;	
 } __attribute__((packed));
 
 
 /* ----UDF Specific---- */
-/*! \brief Virtual partition map (i.e. UDF Type 2 partition map)
+/*! \brief Virtual partition map 
 
-	Note that this differs from the ECMA-167 type 2 partition map,
-	but is of identical size.
+	Note that this map is a customization of the ECMA-167
+	type 2 partition map.
 	
 	See also: UDF-2.01 2.2.8
-	
-	\todo Handle UDF sparable partition maps as well (UDF-2.01 2.2.9)
 */
 struct udf_virtual_partition_map {
 	uint8 type;
@@ -940,6 +969,78 @@ struct udf_virtual_partition_map {
 	*/
 	uint16 partition_number;	
 	uint8 reserved2[24];
+} __attribute__((packed));
+
+
+/*! \brief Maximum number of redundant sparing tables found in
+	udf_sparable_partition_map structures.
+*/
+#define UDF_MAX_SPARING_TABLE_COUNT 4
+
+/* ----UDF Specific---- */
+/*! \brief Sparable partition map 
+
+	Note that this map is a customization of the ECMA-167
+	type 2 partition map.
+	
+	See also: UDF-2.01 2.2.9
+*/
+struct udf_sparable_partition_map {
+public:
+	void dump();
+
+	uint8 type() const { return _type; }
+	uint8 length() const { return _length; }
+
+	udf_entity_id& partition_type_id() { return _partition_type_id; }
+	const udf_entity_id& partition_type_id() const { return _partition_type_id; }
+
+	uint16 volume_sequence_number() const {
+		return B_LENDIAN_TO_HOST_INT16(_volume_sequence_number); }
+	uint16 partition_number() const {
+		return B_LENDIAN_TO_HOST_INT16(_partition_number); }
+	uint16 packet_length() const {
+		return B_LENDIAN_TO_HOST_INT16(_packet_length); }
+	uint8 sparing_table_count() const { return _sparing_table_count; }
+	uint32 sparing_table_size() const {
+		return B_LENDIAN_TO_HOST_INT32(_sparing_table_size); }
+	uint32 sparing_table_location(uint8 index) const {
+		return B_LENDIAN_TO_HOST_INT32(_sparing_table_locations[index]); }
+		
+
+	void set_type(uint8 type) { _type = type; }
+	void set_length(uint8 length) { _length = length; }
+	void set_volume_sequence_number(uint16 number) {
+		_volume_sequence_number = B_HOST_TO_LENDIAN_INT16(number); }
+	void set_partition_number(uint16 number) {
+		_partition_number = B_HOST_TO_LENDIAN_INT16(number); }
+	void set_packet_length(uint16 length) {
+		_packet_length = B_HOST_TO_LENDIAN_INT16(length); }
+	void set_sparing_table_count(uint8 count) {
+		_sparing_table_count = count; }
+	void set_sparing_table_size(uint32 size) {
+		_sparing_table_size = B_HOST_TO_LENDIAN_INT32(size); }
+	void set_sparing_table_location(uint8 index, uint32 location) {
+		_sparing_table_locations[index] = B_HOST_TO_LENDIAN_INT32(location); }
+private:
+	uint8 _type;
+	uint8 _length;
+	uint8 _reserved1[2];
+	
+	/*! - flags: 0
+	    - identifier: "*UDF Sparable Partition"
+	    - identifier_suffix: per UDF-2.01 2.1.5.3
+	*/
+	udf_entity_id _partition_type_id;
+	uint16 _volume_sequence_number;
+	
+	//! partition number of corresponding partition descriptor
+	uint16 _partition_number;
+	uint16 _packet_length;
+	uint8 _sparing_table_count;
+	uint8 _reserved2;
+	uint32 _sparing_table_size;
+	uint32 _sparing_table_locations[UDF_MAX_SPARING_TABLE_COUNT];
 } __attribute__((packed));
 
 

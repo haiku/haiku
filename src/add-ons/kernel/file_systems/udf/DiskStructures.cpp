@@ -400,6 +400,69 @@ udf_logical_descriptor::dump() const
 }
 
 
+udf_logical_descriptor&
+udf_logical_descriptor::operator=(const udf_logical_descriptor &rhs)
+{
+	_tag = rhs._tag;
+	_vds_number = rhs._vds_number;
+	_character_set = rhs._character_set;
+	_logical_volume_identifier = rhs._logical_volume_identifier;
+	_logical_block_size = rhs._logical_block_size;
+	_domain_id = rhs._domain_id;
+	_logical_volume_contents_use = rhs._logical_volume_contents_use;
+	_map_table_length = rhs._map_table_length;
+	_partition_map_count = rhs._partition_map_count;
+	_implementation_id = rhs._implementation_id;
+	_implementation_use = rhs._implementation_use;
+	_integrity_sequence_extent = rhs._integrity_sequence_extent;
+	// copy the partition maps one by one
+	uint8 *lhsMaps = partition_maps();
+	const uint8 *rhsMaps = rhs.partition_maps();
+	int offset = 0;
+	for (uint8 i = 0; i < rhs.partition_map_count(); i++) {
+		uint8 length = rhsMaps[offset+1];
+		memcpy(&lhsMaps[offset], &rhsMaps[offset], length);
+		offset += length;		
+	}
+	return *this;
+}
+
+
+//----------------------------------------------------------------------
+// udf_physical_partition_map 
+//----------------------------------------------------------------------
+
+void
+udf_physical_partition_map::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_physical_partition_map");
+	PRINT(("type: %d\n", type()));
+	PRINT(("length: %d\n", length()));
+	PRINT(("volume_sequence_number: %d\n", volume_sequence_number()));
+	PRINT(("partition_number: %d\n", partition_number()));
+}
+
+//----------------------------------------------------------------------
+// udf_sparable_partition_map 
+//----------------------------------------------------------------------
+
+void
+udf_sparable_partition_map::dump()
+{
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "udf_sparable_partition_map");
+	PRINT(("type: %d\n", type()));
+	PRINT(("length: %d\n", length()));
+	PRINT(("partition_type_id:"));
+	DUMP(partition_type_id());
+	PRINT(("volume_sequence_number: %d\n", volume_sequence_number()));
+	PRINT(("partition_number: %d\n", partition_number()));
+	PRINT(("sparing_table_count: %d\n", sparing_table_count()));
+	PRINT(("sparing_table_size: %ld\n", sparing_table_size()));
+	PRINT(("sparing_table_locations:"));
+	for (uint8 i = 0; i < sparing_table_count(); i++)
+		PRINT(("  %d: %ld\n", i, sparing_table_location(i)));
+}
+
 //----------------------------------------------------------------------
 // udf_unallocated_space_descriptor
 //----------------------------------------------------------------------
