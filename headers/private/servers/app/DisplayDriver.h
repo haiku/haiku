@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		DisplayDriver.h
-//	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//	Authors:		DarkWyrm <bpmagic@columbus.rr.com>
 //					Gabe Yoder <gyoder@stny.rr.com>
 //					Stephan Aßmus <superstippi@gmx.de>
 //
@@ -31,42 +31,31 @@
 #ifndef _DISPLAY_DRIVER_H_
 #define _DISPLAY_DRIVER_H_
 
-
 #include <Accelerant.h>
-#include <OS.h>
-
-#include <View.h>
 #include <Font.h>
-#include <Rect.h>
 #include <Locker.h>
-#include <Screen.h>
-#include "RGBColor.h"
-#include <Region.h>
-#include "PatternHandler.h"
+
 #include "CursorHandler.h"
-#include "DisplaySupport.h"
-#include "LayerData.h"
-#include "ServerBitmap.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
 
-#ifndef ROUND
-	#define ROUND(a)	( (long)(a+.5) )
-#endif
+class BPoint;
+class BRect;
+class BRegion;
 
-
+class DrawData;
+class RGBColor;
+class ServerBitmap;
 class ServerCursor;
 
 /*!
 	\brief Data structure for passing cursor information to hardware drivers.
 */
-typedef struct
+/*typedef struct
 {
 	uchar *xormask, *andmask;
 	int32 width, height;
 	int32 hotx, hoty;
 
-} cursor_data;
+} cursor_data;*/
 
 typedef struct
 {
@@ -76,7 +65,7 @@ typedef struct
 
 } LineArrayData;
 
-
+/*
 #ifndef HOOK_DEFINE_CURSOR
 
 #define HOOK_DEFINE_CURSOR		0
@@ -103,6 +92,7 @@ typedef void (DisplayDriver::* SetPixelFuncType)(int x, int y);
 typedef void (DisplayDriver::* SetHorizontalLineFuncType)(int xstart, int xend, int y);
 typedef void (DisplayDriver::* SetVerticalLineFuncType)(int x, int ystart, int yend);
 typedef void (DisplayDriver::* SetRectangleFuncType)(int left, int top, int right, int bottom);
+*/
 
 /*!
 	\class DisplayDriver DisplayDriver.h
@@ -125,178 +115,179 @@ class DisplayDriver {
 	// Graphics calls implemented in DisplayDriver
 	virtual	void				CopyBits(		const BRect &src,
 												const BRect &dest,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				CopyRegion(		BRegion *src,
-												const BPoint &lefttop);
+												const BPoint &lefttop) = 0;
 
-	virtual void				InvertRect(		const BRect &r);
+	virtual	void				CopyRegionList(	BList* list,
+												BList* pList,
+												int32 rCount,
+												BRegion* clipReg) = 0;
+
+	virtual void				InvertRect(		const BRect &r) = 0;
 
 	virtual	void				DrawBitmap(		BRegion *region,
 												ServerBitmap *bitmap,
 												const BRect &source,
 												const BRect &dest,
-												const DrawData *d);
-
-	virtual	void				CopyRegionList(	BList* list,
-												BList* pList,
-												int32 rCount,
-												BRegion* clipReg);
+												const DrawData *d) = 0;
 
 	virtual	void				FillArc(		const BRect &r,
 												const float &angle,
 												const float &span,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillBezier(		BPoint *pts,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillEllipse(	const BRect &r,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillPolygon(	BPoint *ptlist,
 												int32 numpts,
 												const BRect &bounds,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillRect(		const BRect &r,
-												const RGBColor &color);
+												const RGBColor &color) = 0;
 
 	virtual	void				FillRect(		const BRect &r,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillRegion(		BRegion &r,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillRoundRect(	const BRect &r,
 												const float &xrad,
 												const float &yrad,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillShape(		const BRect &bounds,
 												const int32 &opcount,
 												const int32 *oplist, 
 												const int32 &ptcount,
 												const BPoint *ptlist,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				FillTriangle(	BPoint *pts,
 												const BRect &bounds,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeArc(		const BRect &r,
 												const float &angle,
 												const float &span,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeBezier(	BPoint *pts,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeEllipse(	const BRect &r,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	// this version used by Decorator
 	virtual	void				StrokeLine(		const BPoint &start,
 												const BPoint &end,
-												const RGBColor &color);
+												const RGBColor &color) = 0;
 
 	virtual	void				StrokeLine(		const BPoint &start,
 												const BPoint &end,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	// this version used by Decorator
 	virtual	void				StrokePoint(	const BPoint &pt,
-												const RGBColor &color);
+												const RGBColor &color) = 0;
 
 	virtual	void				StrokePoint(	const BPoint &pt,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokePolygon(	BPoint *ptlist,
 												int32 numpts,
 												const BRect &bounds,
 												const DrawData *d,
-												bool is_closed=true);
+												bool is_closed=true) = 0;
 
 	// this version used by Decorator
 	virtual	void				StrokeRect(		const BRect &r,
-												const RGBColor &color);
+												const RGBColor &color) = 0;
 
 	virtual	void				StrokeRect(		const BRect &r,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeRegion(	BRegion &r,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeRoundRect(const BRect &r,
 												const float &xrad,
 												const float &yrad,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeShape(	const BRect &bounds,
 												const int32 &opcount,
 												const int32 *oplist, 
 												const int32 &ptcount,
 												const BPoint *ptlist,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual	void				StrokeTriangle(	BPoint *pts,
 												const BRect &bounds,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	// Font-related calls
 	
 	// DrawData is NOT const because this call updates the pen position in the passed DrawData
-	virtual	void				DrawString(const char *string,
-										   const int32 &length,
-										   const BPoint &pt,
-										   DrawData *d);
+	virtual	void				DrawString(		const char *string,
+												const int32 &length,
+												const BPoint &pt,
+												DrawData *d) = 0;
 
-	virtual	void				DrawString(const char *string,
-										   const int32 &length,
-										   const BPoint &pt,
-										   const RGBColor &color,
-										   escapement_delta *delta=NULL);
+	virtual	void				DrawString(		const char *string,
+												const int32 &length,
+												const BPoint &pt,
+												const RGBColor &color,
+												escapement_delta *delta=NULL) = 0;
 
-	virtual	float				StringWidth(const char *string,
-											int32 length,
-											const DrawData *d);
+	virtual	float				StringWidth(	const char *string,
+												int32 length,
+												const DrawData *d) = 0;
 
-	virtual	float				StringHeight(const char *string,
-											 int32 length,
-											 const DrawData *d);
+	virtual	float				StringHeight(	const char *string,
+												int32 length,
+												const DrawData *d) = 0;
 
 	virtual	void				GetBoundingBoxes(const char *string,
 												 int32 count,
 												 font_metric_mode mode, 
 												 escapement_delta *delta,
 												 BRect *rectarray,
-												 const DrawData *d);
+												 const DrawData *d) = 0;
 
-	virtual	void				GetEscapements(const char *string,
-											   int32 charcount,
-											   escapement_delta *delta, 
-											   escapement_delta *escapements,
-											   escapement_delta *offsets,
-											   const DrawData *d);
+	virtual	void				GetEscapements(	const char *string,
+												int32 charcount,
+												escapement_delta *delta, 
+												escapement_delta *escapements,
+												escapement_delta *offsets,
+												const DrawData *d) = 0;
 
-	virtual	void				GetEdges(const char *string,
-										 int32 charcount,
-										 edge_info *edgearray,
-										 const DrawData *d);
+	virtual	void				GetEdges(		const char *string,
+												int32 charcount,
+												edge_info *edgearray,
+												const DrawData *d) = 0;
 
-	virtual	void				GetHasGlyphs(const char *string,
-											 int32 charcount,
-											 bool *hasarray);
+	virtual	void				GetHasGlyphs(	const char *string,
+												int32 charcount,
+												bool *hasarray) = 0;
 
 	virtual	void				GetTruncatedStrings(const char **instrings,
 													const int32 &stringcount,
 													const uint32 &mode, 
 													const float &maxwidth,
-													char **outstrings);
+													char **outstrings) = 0;
 	
 	virtual	void				HideCursor();
 	virtual	bool				IsCursorHidden();
-	virtual	void				MoveCursorTo(const float &x, const float &y);
+	virtual	void				MoveCursorTo(	const float &x,
+												const float &y);
 	virtual	void				ShowCursor();
 	virtual	void				ObscureCursor();
 	virtual	void				SetCursor(ServerCursor *cursor);
@@ -305,152 +296,73 @@ class DisplayDriver {
 	
 	
 	// Virtual methods which need to be implemented by each subclass
-	virtual bool				Initialize(void);
-	virtual void				Shutdown(void);
+	virtual bool				Initialize();
+	virtual void				Shutdown();
 
 	// These two will rarely be implemented by subclasses,
 	// but it still needs to be possible
 	virtual bool				Lock(bigtime_t timeout = B_INFINITE_TIMEOUT);
-	virtual void				Unlock(void);
+	virtual void				Unlock();
 
 	// display mode access
 	virtual void				SetMode(const display_mode &mode);
-	virtual	void				GetMode(		display_mode *mode);
+			void				GetMode(display_mode *mode);
+	inline	const display_mode*	DisplayMode() const
+									{ return &fDisplayMode; }
 	
-	virtual bool				DumpToFile(const char *path);
-	virtual ServerBitmap*		DumpToBitmap(void);
+	virtual bool				DumpToFile(const char *path) = 0;
+	virtual ServerBitmap*		DumpToBitmap() = 0;
 
 	virtual void				StrokeLineArray(const int32 &numlines,
 												const LineArrayData *data,
-												const DrawData *d);
+												const DrawData *d) = 0;
 
 	virtual status_t			SetDPMSMode(const uint32 &state);
 	virtual uint32				DPMSMode() const;
 	virtual uint32				DPMSCapabilities() const;
-	virtual status_t			GetDeviceInfo(accelerant_device_info *info);
+	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
 
 	virtual status_t			GetModeList(display_mode **mode_list,
-											uint32 *count);
+											uint32 *count) = 0;
 
 	virtual status_t			GetPixelClockLimits(display_mode *mode,
 													uint32 *low,
-													uint32 *high);
+													uint32 *high) = 0;
 
-	virtual status_t			GetTimingConstraints(display_timing_constraints *dtc);
+	virtual status_t			GetTimingConstraints(display_timing_constraints *dtc) = 0;
 	virtual status_t			ProposeMode(display_mode *candidate,
 											const display_mode *low,
-											const display_mode *high);
+											const display_mode *high) = 0;
 
-	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
+	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
 
-protected:
-friend class Layer;
-friend class WinBorder;
-friend CursorHandler;
 
-			ServerCursor*		_GetCursor(void);
-
-	virtual void				HLinePatternThick(int32 x1, int32 x2, int32 y);
-
-	virtual void				VLinePatternThick(int32 x, int32 y1, int32 y2);
-
-	virtual void				SetThickPatternPixel(int x, int y);
-	
-			// Blit functions specific to FreeType2 glyph copying.
-			// These probably could be replaced with more generic functions,
-			// but these are written and can be replaced later.
-			void				BlitMono2RGB32(FT_Bitmap *src,
-											   const BPoint &pt,
-											   const DrawData *d);
-
-			void				BlitGray2RGB32(FT_Bitmap *src,
-											   const BPoint &pt,
-											   const DrawData *d);
-	
-			// Two functions for gaining direct access to the framebuffer
-			// of a child class. This removes the need for a set of
-			// glyph-blitting virtual functions for each driver.
-	virtual bool				AcquireBuffer(FBBitmap *bmp);
-	virtual void				ReleaseBuffer(void);
-	
-			// This is for drivers which are internally double buffered
-			// and calling this will cause the real framebuffer to be updated
-	virtual void				Invalidate(const BRect &r);
-	
-/*			void				FillBezier(BPoint *pts,
-										   DisplayDriver* driver,
-										   SetHorizontalLineFuncType setLine);
-
-			void				FillRegion(BRegion &r,
-										   DisplayDriver* driver,
-										   SetRectangleFuncType setRect);
-
-			void				StrokeArc(const BRect &r,
-										  const float &angle,
-										  const float &span,
-										  DisplayDriver* driver,
-										  SetPixelFuncType setPixel);
-
-			void				StrokeBezier(BPoint *pts,
-											 DisplayDriver* driver,
-											 SetPixelFuncType setPixel);
-
-			void				StrokeEllipse(const BRect &r,
-											  DisplayDriver* driver,
-											  SetPixelFuncType setPixel);
-
-			void				StrokeLine(const BPoint &start,
-										   const BPoint &end,
-										   DisplayDriver* driver,
-										   SetPixelFuncType setPixel);*/
-	
-	// Support functions for the rest of the driver
-	virtual void				Blit(const BRect &src,
-									 const BRect &dest,
-									 const DrawData *d);
-
-	virtual void				FillSolidRect(const BRect &rect,
-											  const RGBColor &color);
-
-	virtual void				FillPatternRect(const BRect &rect,
-												const DrawData *d);
-
-	virtual void				StrokeSolidLine(int32 x1, int32 y1,
-												int32 x2, int32 y2,
-												const RGBColor &color);
-
-	virtual void				StrokePatternLine(int32 x1, int32 y1,
-												  int32 x2, int32 y2,
-												  const DrawData *d);
-
-	virtual void				StrokeSolidRect(const BRect &rect,
-												const RGBColor &color);
-
+	// needed by CursorHandler
 	virtual void				CopyBitmap(ServerBitmap *bitmap,
 										   const BRect &source,
 										   const BRect &dest,
-										   const DrawData *d);
+										   const DrawData *d) = 0;
 
 	virtual void				CopyToBitmap(ServerBitmap *target,
-											 const BRect &source);
+											 const BRect &source) = 0;
 
-		// temporarily virtual - until clipping code is added in DisplayDriver
-	virtual	void				ConstrainClippingRegion(BRegion *reg);
+	// This is for drivers which are internally double buffered
+	// and calling this will cause the real framebuffer to be updated
+	// needed by CursorHandler, (Layer ?)
+	virtual void				Invalidate(const BRect &r) = 0;
 
-	PatternHandler fDrawPattern;
-	RGBColor fDrawColor;
-	int fLineThickness;
-	
-	BLocker *_locker;
+	// temporarily virtual - until clipping code is added in DisplayDriver
+	// needed by Layer
+	virtual	void				ConstrainClippingRegion(BRegion *reg) = 0;
 
-	uint32 fDPMSState;
-	uint32 fDPMSCaps;
-	accelerant_device_info fAccDeviceInfo;
-	display_mode fDisplayMode;
-	
-	CursorHandler fCursorHandler;
-	
-	DrawData fDrawData;
+ protected:
+			BLocker				fLocker;
+
+			CursorHandler		fCursorHandler;
+
+			display_mode		fDisplayMode;
+			uint32				fDPMSState;
+			uint32				fDPMSCaps;
 };
 
 #endif

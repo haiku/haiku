@@ -28,6 +28,7 @@
 #define CURSORHANDLER_H
 
 #include "GraphicsBuffer.h"
+#include "LayerData.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
 
@@ -48,7 +49,7 @@ public:
 	void SetCursor(ServerCursor *cursor);
 	ServerCursor *GetCursor(void) const { return fCursor; }
 	
-	void MoveTo(const BPoint &pt);
+	void MoveTo(BPoint pt);
 	BPoint GetPosition(void) const { return fPosition.LeftTop(); }
 	
 	void Hide(void);
@@ -70,6 +71,7 @@ private:
 	UtilityBitmap *fSavedData;
 	ServerCursor *fCursor;
 	int8 fHideLevel;
+	DrawData	fDrawData;
 	
 	bool fDriverHidden;
 	bool fIsObscured;
