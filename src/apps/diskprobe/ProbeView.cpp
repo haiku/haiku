@@ -1368,7 +1368,7 @@ ProbeView::AttachedToWindow()
 
 	subMenu = new BMenu("Font Size");
 	subMenu->SetRadioMode(true);
-	const int32 fontSizes[] = {9, 10, 12, 14, 18, 24, 36, 48};
+	const int32 fontSizes[] = {9, 10, 11, 12, 13, 14, 18, 24, 36, 48};
 	int32 fontSize = int32(fDataView->FontSize() + 0.5);
 	if (fDataView->FontSizeFitsBounds())
 		fontSize = 0;
