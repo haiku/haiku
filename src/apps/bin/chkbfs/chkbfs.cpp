@@ -11,6 +11,7 @@
 
 const char *gProgramName;
 int gDevice = -1;
+uint32 gErrors;
 
 
 static int
@@ -95,7 +96,11 @@ printError(const char *string, int32 &cookie)
 static void
 printUsage()
 {
-	printf("usage: %s <path-to-volume>\n", gProgramName);
+	printf("usage: %s [-nfe] <path-to-volume>\n"
+		"\t-n\tdo not modify anything, just check\n"
+		"\t-f\tdon't do anything right now, provided just for compatibility\n"
+		"\t-e\tfix other fixable errors\n",
+		gProgramName);
 }
 
 
@@ -117,6 +122,8 @@ main(int argc, char **argv)
 		return -1;
 	}
 
+	control.flags = BFS_FIX_BITMAP_ERRORS;
+
 	while (*++argv)
 	{
 		char *arg = *argv;
@@ -124,9 +131,18 @@ main(int argc, char **argv)
 		{
 			while (*++arg && isalpha(*arg))
 			{
-//				switch (*arg)
-//				{
-//				}
+				switch (*arg)
+				{
+					case 'n':
+						control.flags = 0;
+						break;
+					case 'f':
+						// whatever...
+						break;
+					case 'e':
+						control.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID;
+						break;
+				}
 			}
 		}
 		else
@@ -136,12 +152,6 @@ main(int argc, char **argv)
 	int device = openDevice(argv[0]);
 	if (device < 0)
 	    return -1;
-
-	puts("Please enhance me, so that I will fix errors!");
-//	if (argc > 2) {
-//		printf("will fix any severe errors!\n");
-//		control.flags |= BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID;
-//	}
 
 	// start checking
 
@@ -162,6 +172,8 @@ main(int argc, char **argv)
 		if (control.errors) {
 			int32 cookie = 0;
 			printf("%s (inode = %Ld): ", control.name, control.inode);
+
+			gErrors |= control.errors;
 
 			if (control.errors & BFS_MISSING_BLOCKS)
 				printError("some blocks weren't allocated", cookie);
@@ -204,8 +216,23 @@ main(int argc, char **argv)
 	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. dirs\t%Ld\n\tindices\t\t%Ld\n",
 		files, directories, attributes, attributeDirectories, indices);
 
-	if (control.flags & BFS_FIX_BITMAP_ERRORS)
-		printf("errors have been fixed\n");
+	// print some more information
+	if ((control.stats.missing > 0 || control.stats.freed > 0)
+		&& (control.flags & BFS_FIX_BITMAP_ERRORS) == 0)
+		printf("There were errors in the block bitmap - these will get fixed if you don't specify the -n option\n");
+	if (gErrors & BFS_BLOCKS_ALREADY_SET)
+		printf("Sorry, can't fix the \"blocks already set\" error - two files are claiming the same space\n");
+	if ((gErrors & BFS_WRONG_TYPE) != 0 && (control.flags & BFS_REMOVE_WRONG_TYPES) == 0)
+		printf("The wrong type errors can be fixed by specifying the -e option\n");
+	if ((gErrors & BFS_COULD_NOT_OPEN) != 0 && (control.flags & BFS_REMOVE_INVALID) == 0)
+		printf("Nodes that can't be opened will be removed when the -e option is specified\n");
+
+	if (control.status == B_ENTRY_NOT_FOUND
+		&&	((control.stats.missing > 0 || control.stats.freed > 0)
+				&& (control.flags & BFS_FIX_BITMAP_ERRORS) != 0
+			|| (gErrors & (BFS_WRONG_TYPE | BFS_COULD_NOT_OPEN)) != 0
+				&& (control.flags & (BFS_REMOVE_WRONG_TYPES | BFS_REMOVE_INVALID))))
+		printf("Errors have been fixed.\n");
 
 	close(device);
 	return 0;
