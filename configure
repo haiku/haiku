@@ -42,7 +42,7 @@ standard_gcc_settings()
 	# PLATFORM_LINKLIBS
 	gcclib=`gcc -print-libgcc-file-name`
 	gccdir=`dirname ${gcclib}`
-	gcc_version=`gcc --version`
+	gcc_version=`gcc -dumpversion`
 	if [ "x${PLATFORM_LINKLIBS}" == "x" ] ; then
 		PLATFORM_LINKLIBS="-L ${gccdir} -lgcc"
 	fi
@@ -101,7 +101,7 @@ cat << EOF > build/BuildConfig
 FLOPPY_PATH			?= "${floppy}" ;
 PLATFORM_LINKLIBS	?= ${PLATFORM_LINKLIBS} ;
 PLATFORM_HEADERS	?= ${PLATFORM_HEADERS} ;
-GCC_RAW_VERSION		?= ${gcc_version}
+GCC_RAW_VERSION		?= ${gcc_version} ;
 BOCHS_DEBUG_HACK	?= ${bochs_debug} ;
 EOF
 
