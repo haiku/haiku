@@ -162,6 +162,7 @@ int    in_canforward (struct in_addr);
 int    in_localaddr  (struct in_addr);
 void   in_socktrim   (struct sockaddr_in*);
 /*  uint16 in_cksum      (struct mbuf *, int); */
+struct mbuf;
 uint16 in_cksum(struct mbuf *m, int len, int off);
   
 #ifdef __cplusplus
