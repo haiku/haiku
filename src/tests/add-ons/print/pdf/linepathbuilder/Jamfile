@@ -2,11 +2,11 @@ SubDir OBOS_TOP src tests add-ons print pdf linepathbuilder ;
 
 SubDirHdrs $(OBOS_TOP) src add-ons print drivers pdf source ;
 
-AddResources LinePathBuilder : <$(SOURCE_GRIST)>Application.rsrc ;
+AddResources LinePathBuilder : LinePathBuilder.rsrc ;
 
 local sources =
-	Application.cpp
-	View.cpp
+	LPBApp.cpp
+	PathView.cpp
 	SubPath.cpp
 	LinePathBuilder.cpp
 ;
@@ -20,9 +20,4 @@ SimpleTest LinePathBuilder
 SEARCH on [ FGristFiles LinePathBuilder.cpp SubPath.cpp ]
 	= [ FDirName $(OBOS_TOP) src add-ons print drivers pdf source ] ;
 
-# Ugly hack: Prepend the dirs containing Be's Application.h/View.h to the list
-# of include search dirs. Otherwise they won't be found.
-# It is certainly a good idea to rename the local files.
-PrependObjectHdrs $(sources)
-	: /boot/develop/headers/be/app /boot/develop/headers/be/interface ;
 

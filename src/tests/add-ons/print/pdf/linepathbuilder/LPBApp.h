@@ -3,16 +3,16 @@
 
 #include <AppKit.h>
 #include <InterfaceKit.h>
-#include "View.h"
+#include "PathView.h"
 #include "MsgConsts.h"
 
-#define APPLICATION "Application"
+#define APPLICATION "LinePathBuilder"
 #define VERSION "1.0"
 
 class AppWindow : public BWindow {
 public:
 	BMenuBar *menubar;
-	View *view;
+	PathView *view;
 	AppWindow(BRect);
 	bool QuitRequested();
 	void AboutRequested();	

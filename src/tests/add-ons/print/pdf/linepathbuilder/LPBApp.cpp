@@ -1,4 +1,4 @@
-#include "Application.h"
+#include "LPBApp.h"
 
 BMessage* NewMessage(uint32 what, uint32 data)
 {
@@ -43,10 +43,10 @@ AppWindow::AppWindow(BRect aRect)
 	menubar->AddItem(menu);
 
 	AddChild(menubar);
-	// add view
+	// add path view
 	aRect.Set(0, menubar->Bounds().Height()+1, aRect.Width(), aRect.Height());
 	view = NULL;
-	AddChild(view = new View(aRect));
+	AddChild(view = new PathView(aRect));
 	// make window visible
 	Show();
 }
