@@ -60,7 +60,7 @@ class PPPProtocol {
 			{ return fConnectionStatus == PPP_TERMINATION_PHASE; }
 		
 		virtual status_t Send(mbuf *packet) = 0;
-		virtual status_t Receive(mbuf *packet) = 0;
+		virtual status_t Receive(mbuf *packet, uint16 protocol) = 0;
 		
 		virtual void Pulse();
 

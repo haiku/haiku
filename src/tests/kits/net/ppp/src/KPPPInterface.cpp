@@ -23,11 +23,8 @@
 
 
 // TODO:
-// - report module errors (when loading in ctor)
-//    (in InitCheck(), too)
-// - add free-list for driver_settings that were loaded by Control()
-// - implement timers
-// - maybe some protocols must go down instead of being reset -> add flag for this
+// - implement timers with support for settings next time instead of receiving timer
+//    events
 
 
 // needed for redial:
@@ -82,7 +79,7 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 	if(!value)
 		fDisconnectAfterIdleSince = 0;
 	else
-		fDisconnectAfterIdleSince = atoi(value);
+		fDisconnectAfterIdleSince = atoi(value) * 1000000;
 	
 	if(fDisconnectAfterIdleSince < 0)
 		fDisconnectAfterIdleSince = 0;
@@ -111,14 +108,18 @@ PPPInterface::PPPInterface(uint32 ID, driver_settings *settings,
 		// auto redial is disabled by default
 	
 	// load all protocols and the device
-	LoadModules(fSettings, 0, fSettings->parameter_count);
+	if(LoadModules(fSettings, 0, fSettings->parameter_count))
+		fInitStatus = B_OK;
+	else
+		fInitStatus = B_ERROR;
 }
 
 
 PPPInterface::~PPPInterface()
 {
-	fLock.Lock();
-		// make sure no thread wants to call Unlock() on fLock after it is deleted
+	if(fLock.Lock() != B_OK)
+		return;;
+			// make sure no thread wants to call Unlock() on fLock after it is deleted
 	
 	Report(PPP_DESTRUCTION_REPORT, 0, NULL, 0);
 		// tell all listeners that we are being destroyed
@@ -127,19 +128,24 @@ PPPInterface::~PPPInterface()
 	stop_ifq(InQueue());
 	wait_for_thread(fInQueueThread, &tmp);
 	
-	// TODO:
-	// kill (or wait for) fRedialThread
-	// remove our iface, so that nobody will access it:
-	//  go down if up
-	//  unregister from ppp_manager
-	//  delete children/remove from parent
-	// destroy and remove:
-	// device
-	// protocols
-	// encapsulators
-	// option handlers
+	Down();
+	UnregisterInterface();
 	
-	// put all modules (in fModules)
+	wait_for_thread(fRedialThread, &tmp);
+	
+	while(CountChildren())
+		ChildAt(0)->Delete();
+	
+	delete Device();
+	
+	while(CountProtocols())
+		delete ProtocolAt(0);
+	
+	while(FirstEncapsulator())
+		delete FirstEncapsulator();
+	
+	for(int32 index = 0; index < fModules.CountItems(); index++)
+		put_module((module_info**) &fModules.ItemAt(index));
 	
 	put_module((module_info**) &fManager);
 }
@@ -155,7 +161,7 @@ PPPInterface::Delete()
 status_t
 PPPInterface::InitCheck() const
 {
-	if(!fSettings || !fManager)
+	if(!fSettings || !fManager || fInitStatus != B_OK)
 		return B_ERROR;
 	
 	// sub-interfaces should have a device
@@ -188,7 +194,7 @@ PPPInterface::Control(uint32 op, void *data, size_t length)
 		// add:
 		// - routing Control() to encapsulators/protocols/option_handlers
 		//    (calling their Control() method)
-		// - adding modules in right mode
+		// - adding modules
 		// - setting AutoRedial and DialOnDemand
 		
 		
@@ -991,8 +997,6 @@ PPPInterface::Pulse()
 		StateMachine().CloseEvent();
 		return;
 	}
-	
-	StateMachine().TimerEvent();
 	
 	if(Device())
 		Device()->Pulse();

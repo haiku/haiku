@@ -9,14 +9,15 @@
 #define _K_PPP_CONFIGURE_PACKET__H
 
 #include <mbuf.h>
+#include <List.h>
 
 
-typedef struct configure_item {
+typedef struct ppp_configure_item {
 	uint8 type;
 	uint8 length;
 	int8 data[0];
 		// the data follows this structure
-} configure_item;
+} ppp_configure_item;
 
 
 class PPPConfigurePacket {
@@ -27,7 +28,7 @@ class PPPConfigurePacket {
 
 	public:
 		PPPConfigurePacket(uint8 code);
-		PPPConfigurePacket(mbuf *data);
+		PPPConfigurePacket(mbuf *packet);
 		~PPPConfigurePacket();
 		
 		bool SetCode(uint8 code);
@@ -39,16 +40,18 @@ class PPPConfigurePacket {
 		uint8 ID() const
 			{ return fID; }
 		
-		void AddItem(const configure_item *item);
-		bool RemoveItem(const configure_item *item);
-		int32 CountItems() const;
-		configure_item *ItemAt(int32 index) const;
+		bool AddItem(const ppp_configure_item *item, int32 index = -1);
+		bool RemoveItem(ppp_configure_item *item);
+		int32 CountItems() const
+			{ return fItems.CountItems(); }
+		ppp_configure_item *ItemAt(int32 index) const;
 		
-		mbuf *ToMbuf(uint32 reserve = 0, uint32 maxSize = 0);
+		mbuf *ToMbuf(uint32 reserve = 0);
 			// the user is responsible for freeing the mbuf
 
 	private:
 		uint8 fCode, fID;
+		List<ppp_configure_item*> fItems;
 };
 
 

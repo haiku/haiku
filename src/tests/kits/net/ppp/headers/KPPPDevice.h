@@ -53,7 +53,8 @@ class PPPDevice {
 			// how many bytes are waiting to be sent?
 		
 		virtual status_t Send(mbuf *packet) = 0;
-			// this should enqueue the packet and return immediately
+			// This should enqueue the packet and return immediately.
+			// The device is responsible for freeing the packet.
 		status_t PassToInterface(mbuf *packet);
 			// This will pass the packet to the interface's queue.
 			// Do not call Interface::ReceiveFromDevice directly

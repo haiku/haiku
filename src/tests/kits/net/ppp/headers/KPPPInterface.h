@@ -196,6 +196,8 @@ class PPPInterface {
 		List<ppp_module_info*> fModules;
 		
 		BLocker& fLock;
+		
+		status_t fInitStatus;
 };
 
 

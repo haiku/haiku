@@ -50,6 +50,14 @@ class PPPLCP : public PPPProtocol {
 		
 		uint32 AdditionalOverhead() const;
 			// the overhead caused by the target, the device, and the interface
+		
+		virtual bool Up();
+		virtual bool Down();
+		
+		virtual status_t Send(mbuf *packet);
+		virtual status_t Receive(mbuf *packet, uint16 protocol);
+		
+		virtual void Pulse();
 
 	private:
 		List<PPPOptionHandler*> fOptionHandlers;

@@ -10,12 +10,6 @@
 
 #define PPP_STATE_MACHINE_TIMEOUT			3000000
 
-// TODO:
-// do not forget to reset authentication status when:
-// - connection is lost
-// - reconfiguring?
-// - terminating
-// - ...
 
 PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	: fInterface(&interface), fPhase(PPP_DOWN_PHASE),
@@ -23,7 +17,6 @@ PPPStateMachine::PPPStateMachine(PPPInterface& interface)
 	fAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fPeerAuthenticationStatus(PPP_NOT_AUTHENTICATED),
 	fAuthenticationName(NULL), fPeerAuthenticationName(NULL),
-	fAuthenticatorIndex(-1), fPeerAuthenticatorIndex(-1),
 	fMaxTerminate(2), fMaxConfigure(10), fMaxNak(5),
 	fRequestID(0), fTerminateID(0), fNextTimeout(0)
 {
@@ -49,6 +42,7 @@ PPPStateMachine::NextID()
 void
 PPPStateMachine::NewState(PPP_STATE next)
 {
+	// maybe we do not need the timer anymore
 	if(next < PPP_CLOSING_STATE || next == PPP_OPENED_STATE)
 		fNextTimeout = 0;
 	
@@ -1385,10 +1379,12 @@ void
 PPPStateMachine::SendTerminateRequest()
 {
 	mbuf *m = m_gethdr(MT_DATA);
-	if(!request)
+	if(!m)
 		return;
 	
 	--fTerminateCounter;
+	
+	m->m_len = 4;
 	
 	// reserve some space for other protocols
 	m->m_data += LCP().AdditionalOverhead();
@@ -1423,8 +1419,6 @@ PPPStateMachine::SendCodeReject(mbuf *packet, uint16 protocol, uint8 type)
 	else
 		length = 4;
 	
-	M_PREPEND(packet, length + LCP().AdditionalOverhead());
-	
 	int32 adjust = 0;
 		// adjust packet size by this value if packet is too big
 	if(packet->m_flags & M_PKTHDR) {
@@ -1437,11 +1431,14 @@ PPPStateMachine::SendCodeReject(mbuf *packet, uint16 protocol, uint8 type)
 		m_adj(packet, adjust);
 	
 	lcp_packet *reject = mtod(packet, lcp_packet*);
-	data->code = type;
-	data->id = NextID();
-	data->length = (uint16) htons(reject->m_pkthdr.len);
+	reject->code = type;
+	reject->id = NextID();
+	if(packet->m_flags & M_PKTHDR)
+		reject->length = htons(packet->m_pkthdr.len);
+	else
+		reject->length = htons(packet->m_len);
 	
-	protocol = (uint16) htons(protocol);
+	protocol = htons(protocol);
 	if(type == PPP_PROTOCOL_REJECT)
 		memcpy(&data->data, &protocol, sizeof(protocol));
 	
