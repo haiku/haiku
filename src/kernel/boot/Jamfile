@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src kernel boot ;
 
-SystemMain bootmaker : bootmaker.c : $(OBOS_KERNEL) ;
+SystemMain bootmaker : bootmaker.c ;
 SystemMain bin2h : bin2h.c ;
 SystemMain bin2asm : bin2asm.c ;
-SystemMain makeflop : makeflop.c : $(OBOS_FLOPPY) ;
+SystemMain makeflop : makeflop.c ;
 
 SubInclude OBOS_TOP src kernel boot arch ;
