@@ -23,10 +23,11 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "rld_priv.h"
 
-//#define TRACE_RLD
+#define TRACE_RLD
 #ifdef TRACE_RLD
 #	define TRACE(x) dprintf x
 #else
@@ -816,7 +817,70 @@ register_image(image_t *image, int fd, const char *path)
 	info.data_size = image->regions[1].size;
 	image->id = _kern_register_image(&info, sizeof(image_info));
 }
+			
+static int
+search_container(char const *name, const char *paths)
+{
+	char *leaf_name;
+	char search_paths[PATH_MAX + 1];
+	char *path;
+	char *next_path_token = NULL;
+	char buffer[PATH_MAX + 1];
+	int fd = -1;
 
+	if (!name || !paths)
+		return B_ERROR;
+
+	leaf_name = strrchr(name, '/');
+	if (leaf_name != NULL)
+		leaf_name++;
+	else
+		leaf_name = (char *) name;
+	
+	// duplicate environment variable before screw it!
+	strncpy(search_paths, paths, PATH_MAX);
+	
+	dprintf("rld.so: search_container(%s (%s), %s)\n", name, leaf_name, paths);
+	
+	// TODO: when available, switch to thread-aware strtok_r() version 
+	path = strtok_r(search_paths, ":", &next_path_token);
+	while (path) {
+		if (strncmp(path, "%A/", 3) == 0) {
+			// Replace %A with current app folder path
+			// Maybe using first image info is better suited than gProgamArgs->program_path here...			
+			char *end_slash;
+			end_slash = strrchr(gProgramArgs->program_path, '/');
+			if (end_slash != NULL) {
+				strncpy(buffer, gProgramArgs->program_path, PATH_MAX);
+				strncat(end_slash, path + 2, PATH_MAX);
+			} else {
+				// FIXME: does _kern_open() resolve relative path?
+				// If not, call getcwd() instead here...
+				strncpy(buffer, ".", PATH_MAX);
+				strncat(buffer, path + 2, PATH_MAX);
+			}
+		} else
+			// Take the path AS-IS
+			// TODO: remove any lasting / in path
+			strncpy(buffer, path, PATH_MAX); 
+
+		strncat(buffer, "/", PATH_MAX);
+		strncat(buffer, leaf_name, PATH_MAX);
+
+		dprintf("rld.so: search_container(%s): trying %s\n", leaf_name, buffer);
+
+		fd = _kern_open(-1, buffer, 0);
+		if (fd >= 0) {
+			dprintf("rld.so: search_container(%s): found at %s\n", leaf_name, buffer);
+			break;	// Found!
+		}
+			
+		// Try next search path
+		path = strtok_r(NULL, ":", &next_path_token);
+	}
+	
+	return (fd < 0) ? B_NAME_NOT_FOUND : fd;
+}
 
 static image_t *
 load_container(char const *path, char const *name, image_type type)
@@ -840,7 +904,42 @@ load_container(char const *path, char const *name, image_type type)
 		return found;
 	}
 
+	// Try to load explicit image path first
 	fd = _kern_open(-1, path, 0);
+	if (fd < 0) {
+		const char *paths;
+
+		switch (type) {
+#if 0
+		case B_APP_IMAGE:		paths = getenv("PATH");	break;
+		case B_LIBRARY_IMAGE:	paths = getenv("LIBRARY_PATH"); break;
+		case B_ADD_ON_IMAGE:	paths = getenv("ADDON_PATH"); break;
+#else		
+		case B_APP_IMAGE:
+			paths = "/boot/home/config/bin:"
+					"/boot/apps:"
+					"/boot/preferences:"
+					"/boot/beos/apps:"
+					"/boot/beos/preferences:"
+					"/boot/develop/tools/gnupro/bin";
+			break;
+
+		case B_LIBRARY_IMAGE:
+			paths = "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
+			break;
+
+		case B_ADD_ON_IMAGE:
+			paths = "%A/lib:/boot/home/config/lib:/boot/beos/system/lib";
+			break;
+#endif			
+		default:
+			paths = NULL;
+		}
+		
+		if (paths)
+			// search container in these paths
+			fd = search_container(name, paths);
+	}
 	FATAL((fd < 0), "cannot open file %s\n", path);
 
 	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
@@ -887,7 +986,7 @@ load_dependencies(image_t *image)
 {
 	struct Elf32_Dyn *d = (struct Elf32_Dyn *)image->dynamic_ptr;
 	addr_t   needed_offset;
-	char   path[256];
+	// char   path[256];
 	uint32 i, j;
 
 	if (!d)
@@ -902,8 +1001,10 @@ load_dependencies(image_t *image)
 			case DT_NEEDED:
 				needed_offset = d[i].d_un.d_ptr;
 				// ToDo: ever heard of the LIBRARY_PATH env variable?
-				sprintf(path, "/boot/beos/system/lib/%s", STRING(image, needed_offset));
-				image->needed[j] = load_container(path, STRING(image, needed_offset), B_LIBRARY_IMAGE);
+				// sprintf(path, "/boot/beos/system/lib/%s", STRING(image, needed_offset));
+				// image->needed[j] = load_container(path, STRING(image, needed_offset), B_LIBRARY_IMAGE);
+				image->needed[j] = load_container(STRING(image, needed_offset),
+										STRING(image, needed_offset), B_LIBRARY_IMAGE);
 				j += 1;
 				break;
 
