@@ -10,17 +10,32 @@
 #include <View.h>
 #endif
 
-class SettingsView : public BView
+#include "CalendarView.h"
+#include "AnalogClock.h"
+#include "DateTimeEdit.h"
+
+class TSettingsView:public BView
 {
-public:
-						SettingsView(BRect frame);
-		virtual void	Draw(BRect frame);
-				void	changeRTCSetting();
+	public:
+		TSettingsView(BRect frame);
+		virtual void AttachedToWindow();
+		virtual void Draw(BRect frame);
+		virtual void MessageReceived(BMessage *message);
 		
-				
-private:
-		void			buildView();
+		void ChangeRTCSetting();
+	private:
+		void InitView();
+		void ReadFiles(); // reads RTC_time_settings
+		void UpdateDateTime(BMessage *message);
 		
+		BRect f_temp;
+		BRadioButton	*f_local;
+		BRadioButton	*f_gmt;
+		TDateEdit		*f_dateedit;
+		TTimeEdit		*f_timeedit;
+		TCalendarView 	*f_calendar;
+		TAnalogClock	*f_clock;
+		bool 			f_islocal; // local or gmt?
 };
 
 #endif

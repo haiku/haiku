@@ -7,21 +7,24 @@
 #include "SettingsView.h"
 #include "TimeSettings.h"
 #include "ZoneView.h"
+#include "BaseView.h"
 
-class TimeWindow : public BWindow 
+class TTimeWindow : public BWindow 
 {
-public:
-	TimeWindow();
-	~TimeWindow();
+	public:
+		TTimeWindow();
+		~TTimeWindow();
 	
-	bool QuitRequested();
-	void MessageReceived(BMessage *message);
-	void BuildViews();
-	
-private:
-	SettingsView 	*fTimeSettings;
-	ZoneView		*fTimeZones;
+		bool QuitRequested();
+		void MessageReceived(BMessage *message);
+
+	private:
+		void InitWindow();
+
+	private:
+		TTimeBaseView	*f_BaseView;
+		TSettingsView 	*fTimeSettings;
+		TZoneView		*fTimeZones;
 };
 
 #endif
-

@@ -24,7 +24,6 @@ const uint32 SET_TIME_ZONE				='SEti';
 //local and GMT settings
 const uint32 RTC_SETTINGS				='RTse';
 
+const uint32 OB_TIME_UPDATE 			='obTU';
+
 #endif //TIME_MESSAGES_H
-
-
-

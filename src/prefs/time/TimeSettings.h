@@ -17,6 +17,6 @@ private:
 
 };
 
-#endif
+#endif //TIME_SETTINGS_H_
 
 

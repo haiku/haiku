@@ -12,7 +12,7 @@
 
 TimeView::TimeView(BRect rect)
 	   	   : BBox(rect, "time_view",
-					B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
+					B_FOLLOW_ALL, B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
 					B_PLAIN_BORDER)
 {
 	BTabView	*fTabView;
@@ -24,12 +24,13 @@ TimeView::TimeView(BRect rect)
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	frame = Bounds();
-	
+	frame.top = 100;
 	fTabView = new BTabView(frame,"tab_view");
+
 
 	// Settings Tab...
 	fTab = new BTab();
-	fView = new BView(BRect(fTabView->Bounds()),"settings_view",B_FOLLOW_ALL,
+	fView = new BView(BRect(fTabView->Bounds().InsetByCopy(10, 10)),"settings_view",B_FOLLOW_ALL,
 						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
 	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTabView->AddTab(fView,fTab);
@@ -37,7 +38,7 @@ TimeView::TimeView(BRect rect)
 
 	// Time Zone Tab...
 	fTab = new BTab();		
-	fView = new BView(BRect(fTabView->Bounds()),"time_zone_view",B_FOLLOW_ALL,
+	fView = new BView(BRect(fTabView->Bounds().InsetByCopy(10, 10)),"time_zone_view",B_FOLLOW_ALL,
 						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
 	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fTabView->AddTab(fView,fTab);

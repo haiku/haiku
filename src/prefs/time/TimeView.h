@@ -18,8 +18,6 @@ public:
 		TimeView(BRect frame);
 		virtual void	Draw(BRect frame);
 
-private:
-		;
 };
 
 #endif

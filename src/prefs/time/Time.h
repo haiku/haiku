@@ -13,19 +13,15 @@ public:
 	virtual ~TimeApplication();
 	
 	void MessageReceived(BMessage *message);
-	BPoint WindowCorner() const {return fSettings->WindowCorner(); }
-	void SetWindowCorner(BPoint corner);
 
+	void ReadyToRun(void);
 	void AboutRequested(void);
 	
+	void SetWindowCorner(BPoint corner);
+	BPoint WindowCorner() const { return f_settings->WindowCorner(); }
 private:
-	
-	static const char kTimeApplicationSig[];
-
-	TimeSettings		*fSettings;
-
+	TimeSettings*		f_settings;
+	TTimeWindow*		f_window;
 };
 
-#endif
-
-
+#endif //TIME_H

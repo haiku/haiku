@@ -8,31 +8,31 @@
 #include <Screen.h>
 
 #include "Time.h"
-#include "TimeWindow.h"
 #include "TimeSettings.h"
 #include "TimeMessages.h"
 
-const char TimeApplication::kTimeApplicationSig[] = "application/x-vnd.OpenBeOS-TIME";
+#define OBOS_APP_SIGNATURE "application/x-vnd.OpenBeOS-TIME"
 
-int main(int, char**)
+int main()
 {
-	TimeApplication	myApplication;
+	new TimeApplication();
 
-	myApplication.Run();
+	be_app->Run();
 
+	delete be_app;
 	return(0);
 }
 
 TimeApplication::TimeApplication()
-					:BApplication(kTimeApplicationSig)
+		:BApplication(OBOS_APP_SIGNATURE)
 {
+	f_settings = new TimeSettings();
+	f_window = new TTimeWindow();
+}
 
-	TimeWindow		*window;
-	
-	fSettings = new TimeSettings();
-		
-	window = new TimeWindow();
-
+TimeApplication::~TimeApplication()
+{
+	delete f_settings;
 }
 
 void
@@ -53,21 +53,19 @@ TimeApplication::MessageReceived(BMessage *message)
 }
 
 void
-TimeApplication::SetWindowCorner(BPoint corner)
+TimeApplication::ReadyToRun(void)
 {
-	fSettings->SetWindowCorner(corner);
+	f_window->Show();
 }
 
 void
 TimeApplication::AboutRequested(void)
 {
-	(new BAlert("about", "...by Andrew Edward McCall", "Dig Deal"))->Go();
+	(new BAlert("about", "...by Andrew Edward McCall\n...Mike Berg too", "Big Deal"))->Go();
 }
 
-TimeApplication::~TimeApplication()
+void
+TimeApplication::SetWindowCorner(BPoint corner)
 {
-	delete fSettings;
+	f_settings->SetWindowCorner(corner);
 }
-
-
-

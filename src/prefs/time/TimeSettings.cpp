@@ -61,5 +61,3 @@ TimeSettings::SetWindowCorner(BPoint corner)
 {
 	fCorner=corner;
 }
-
-
