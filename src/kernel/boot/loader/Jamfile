@@ -8,6 +8,8 @@ UsePrivateHeaders [ FDirName storage ] ;
 {
 	local defines =
 		_BOOT_MODE
+		BOOT_ARCH=\\\"$(OBOS_ARCH)\\\"
+
 		BOOT_SUPPORT_PARTITION_AMIGA
 		BOOT_SUPPORT_PARTITION_APPLE
 		BOOT_SUPPORT_PARTITION_INTEL
@@ -27,6 +29,9 @@ KernelStaticLibrary boot_loader :
 	partitions.cpp
 	heap.cpp
 	stdio.cpp
+	#elf.cpp
+	menu.cpp
+	loader.cpp
 
 	# utils
 	list.c
