@@ -127,7 +127,7 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 			char textBuffer[256];
 			int32 textLength = 256;
 			int32 bytes = bytesRead;
-			while (textLength > 0) {
+			while ((textLength > 0) && (bytes > 0)) {
 				result = convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
 				if (result != B_OK) {
 					return result;
