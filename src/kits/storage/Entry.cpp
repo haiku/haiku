@@ -114,7 +114,7 @@ status_t entry_ref::set_name(const char *name)
 	if (name == NULL) {
 		this->name = NULL;
 	} else {
-		this->name = new(nothrow) char[strlen(name)+1];
+		this->name = new(std::nothrow) char[strlen(name)+1];
 		if (this->name == NULL)
 			return B_NO_MEMORY;
 		strcpy(this->name, name);
@@ -764,7 +764,7 @@ BEntry::Rename(const char *path, bool clobber)
 
 */
 status_t
-BEntry::MoveTo(BDirectory *dir, const char *path = NULL, bool clobber)
+BEntry::MoveTo(BDirectory *dir, const char *path, bool clobber)
 {
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
@@ -1047,7 +1047,7 @@ BEntry::set_name(const char *name)
 		delete [] fName;
 	}
 	
-	fName = new(nothrow) char[strlen(name)+1];
+	fName = new(std::nothrow) char[strlen(name)+1];
 	if (fName == NULL)
 		return B_NO_MEMORY;
 		

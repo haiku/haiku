@@ -14,7 +14,7 @@
 
 #include "LibBeAdapter.h"
 
-#include <algobase.h>
+#include <algorithm>
 #include <fsproto.h>
 #include <errno.h>		// errno
 #include <new>
@@ -253,32 +253,32 @@ BPrivate::Storage::sync( FileDescriptor file )
 //! /todo Get rid of DumpLock() at some point (it's only for debugging)
 void DumpLock(BPrivate::Storage::FileLock &lock)
 {
-	cout << endl;
-	cout << "type   == ";
+	std::cout << std::endl;
+	std::cout << "type   == ";
 	switch (lock.l_type) {
 		case F_RDLCK:
-			cout << "F_RDLCK";
+			std::cout << "F_RDLCK";
 			break;
 			
 		case F_WRLCK:
-			cout << "F_WRLCK";
+			std::cout << "F_WRLCK";
 			break;
 			
 		case F_UNLCK:
-			cout << "F_UNLCK";
+			std::cout << "F_UNLCK";
 			break;
 			
 		default:
-			cout << lock.l_type;
+			std::cout << lock.l_type;
 			break;
 	}
-	cout << endl;
+	std::cout << std::endl;
 
-	cout << "whence == " << lock.l_whence << endl;
-	cout << "start  == " << lock.l_start << endl;
-	cout << "len    == " << lock.l_len << endl;
-	cout << "pid    == " << lock.l_pid << endl;
-	cout << endl;
+	std::cout << "whence == " << lock.l_whence << std::endl;
+	std::cout << "start  == " << lock.l_start << std::endl;
+	std::cout << "len    == " << lock.l_len << std::endl;
+	std::cout << "pid    == " << lock.l_pid << std::endl;
+	std::cout << std::endl;
 }
 
 // As best I can tell, fcntl(fd, F_SETLK, lock) and fcntl(fd, F_GETLK, lock)
@@ -544,7 +544,7 @@ BPrivate::Storage::rename_attr(FileDescriptor file, const char *oldName,
 	char *data = NULL;
 	if (error == B_OK) {
 		// alloc at least one byte
-		data = new(nothrow) char[max(info.size, 1LL)];
+		data = new(std::nothrow) char[max(info.size, 1LL)];
 		if (data == NULL)
 			error = B_NO_MEMORY;		
 	}
@@ -1072,7 +1072,7 @@ BPrivate::Storage::get_canonical_path(const char *path, char *&result)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		result = new(nothrow) char[B_PATH_NAME_LENGTH];
+		result = new(std::nothrow) char[B_PATH_NAME_LENGTH];
 		if (!result)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {
@@ -1117,7 +1117,7 @@ BPrivate::Storage::get_canonical_dir_path(const char *path, char *&result)
 {
 	status_t error = (path ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
-		result = new(nothrow) char[B_PATH_NAME_LENGTH];
+		result = new(std::nothrow) char[B_PATH_NAME_LENGTH];
 		if (!result)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {

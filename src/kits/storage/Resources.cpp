@@ -39,7 +39,7 @@ BResources::BResources()
 			fResourceFile(NULL),
 			fReadOnly(false)
 {
-	fContainer = new(nothrow) ResourcesContainer;
+	fContainer = new(std::nothrow) ResourcesContainer;
 }
 
 // constructor
@@ -61,7 +61,7 @@ BResources::BResources(const BFile *file, bool clobber)
 			fResourceFile(NULL),
 			fReadOnly(false)
 {
-	fContainer = new(nothrow) ResourcesContainer;
+	fContainer = new(std::nothrow) ResourcesContainer;
 	SetTo(file, clobber);
 }
 
@@ -109,7 +109,7 @@ BResources::SetTo(const BFile *file, bool clobber)
 		}
 		if (error == B_OK) {
 			fReadOnly = !fFile.IsWritable();
-			fResourceFile = new(nothrow) ResourceFile;
+			fResourceFile = new(std::nothrow) ResourceFile;
 			if (fResourceFile)
 				error = fResourceFile->SetTo(&fFile, clobber);
 			else
@@ -148,7 +148,7 @@ BResources::Unset()
 	if (fContainer)
 		fContainer->MakeEmpty();
 	else
-		fContainer = new(nothrow) ResourcesContainer;
+		fContainer = new(std::nothrow) ResourcesContainer;
 	fReadOnly = false;
 }
 
@@ -383,7 +383,7 @@ BResources::WriteTo(BFile *file)
 	// set the new file, but keep the old container
 	if (error == B_OK) {
 		ResourcesContainer *container = fContainer;
-		fContainer = new(nothrow) ResourcesContainer;
+		fContainer = new(std::nothrow) ResourcesContainer;
 		if (fContainer) {
 			error = SetTo(file, false);
 			delete fContainer;
@@ -425,7 +425,7 @@ BResources::AddResource(type_code type, int32 id, const void *data,
 	if (error == B_OK)
 		error = (fReadOnly ? B_NOT_ALLOWED : B_OK);
 	if (error == B_OK) {
-		ResourceItem *item = new(nothrow) ResourceItem;
+		ResourceItem *item = new(std::nothrow) ResourceItem;
 		if (!item)
 			error = B_NO_MEMORY;
 		if (error == B_OK) {

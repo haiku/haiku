@@ -171,7 +171,7 @@ split_path(const char *fullPath, char **path, char **leaf)
 			memcpy(*leaf, fullPath + leafStart, len);
 			(*leaf)[len] = 0;
 		}
-	} catch (bad_alloc exception) {
+	} catch (std::bad_alloc exception) {
 		if (path)
 			delete[] *path;
 		if (leaf)
@@ -232,7 +232,7 @@ parse_first_path_component(const char *path, char *&component,
 	int32 length;
 	status_t error = parse_first_path_component(path, length, nextComponent);
 	if (error == B_OK) {
-		component = new(nothrow) char[length + 1];
+		component = new(std::nothrow) char[length + 1];
 		if (component) {
 			strncpy(component, path, length);
 			component[length] = '\0';
@@ -376,7 +376,7 @@ void escape_path(const char *str, char *result)
 void escape_path(char *str)
 {
 	if (str) {
-		char *copy = new(nothrow) char[strlen(str)+1];
+		char *copy = new(std::nothrow) char[strlen(str)+1];
 		if (copy) {
 			strcpy(copy, str);
 			escape_path(copy, str);

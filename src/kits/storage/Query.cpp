@@ -9,7 +9,7 @@
 #include <Query.h>
 
 #include <fs_query.h>
-#include <new.h>
+#include <new>
 #include <parsedate.h>
 #include <time.h>
 
@@ -95,7 +95,7 @@ BQuery::Clear()
 status_t
 BQuery::PushAttr(const char *attrName)
 {
-	return _PushNode(new(nothrow) AttributeNode(attrName), true);
+	return _PushNode(new(std::nothrow) AttributeNode(attrName), true);
 }
 
 // PushOp
@@ -129,13 +129,13 @@ BQuery::PushOp(query_op op)
 		case B_ENDS_WITH:
 		case B_AND:
 		case B_OR:
-			error = _PushNode(new(nothrow) BinaryOpNode(op), true);
+			error = _PushNode(new(std::nothrow) BinaryOpNode(op), true);
 			break;
 		case B_NOT:
-			error = _PushNode(new(nothrow) UnaryOpNode(op), true);
+			error = _PushNode(new(std::nothrow) UnaryOpNode(op), true);
 			break;
 		default:
-			error = _PushNode(new(nothrow) SpecialOpNode(op), true);
+			error = _PushNode(new(std::nothrow) SpecialOpNode(op), true);
 			break;
 	}
 	return error;
@@ -159,7 +159,7 @@ BQuery::PushOp(query_op op)
 status_t
 BQuery::PushUInt32(uint32 value)
 {
-	return _PushNode(new(nothrow) UInt32ValueNode(value), true);
+	return _PushNode(new(std::nothrow) UInt32ValueNode(value), true);
 }
 
 // PushInt32
@@ -180,7 +180,7 @@ BQuery::PushUInt32(uint32 value)
 status_t
 BQuery::PushInt32(int32 value)
 {
-	return _PushNode(new(nothrow) Int32ValueNode(value), true);
+	return _PushNode(new(std::nothrow) Int32ValueNode(value), true);
 }
 
 // PushUInt64
@@ -201,7 +201,7 @@ BQuery::PushInt32(int32 value)
 status_t
 BQuery::PushUInt64(uint64 value)
 {
-	return _PushNode(new(nothrow) UInt64ValueNode(value), true);
+	return _PushNode(new(std::nothrow) UInt64ValueNode(value), true);
 }
 
 // PushInt64
@@ -222,7 +222,7 @@ BQuery::PushUInt64(uint64 value)
 status_t
 BQuery::PushInt64(int64 value)
 {
-	return _PushNode(new(nothrow) Int64ValueNode(value), true);
+	return _PushNode(new(std::nothrow) Int64ValueNode(value), true);
 }
 
 // PushFloat
@@ -243,7 +243,7 @@ BQuery::PushInt64(int64 value)
 status_t
 BQuery::PushFloat(float value)
 {
-	return _PushNode(new(nothrow) FloatValueNode(value), true);
+	return _PushNode(new(std::nothrow) FloatValueNode(value), true);
 }
 
 // PushDouble
@@ -264,7 +264,7 @@ BQuery::PushFloat(float value)
 status_t
 BQuery::PushDouble(double value)
 {
-	return _PushNode(new(nothrow) DoubleValueNode(value), true);
+	return _PushNode(new(std::nothrow) DoubleValueNode(value), true);
 }
 
 // PushString
@@ -287,7 +287,7 @@ BQuery::PushDouble(double value)
 status_t
 BQuery::PushString(const char *value, bool caseInsensitive)
 {
-	return _PushNode(new(nothrow) StringNode(value, caseInsensitive), true);
+	return _PushNode(new(std::nothrow) StringNode(value, caseInsensitive), true);
 }
 
 // PushDate
@@ -319,7 +319,7 @@ BQuery::PushDate(const char *date)
 		}
 	}
 	if (error == B_OK)
-		error =  _PushNode(new(nothrow) DateNode(date), true);
+		error =  _PushNode(new(std::nothrow) DateNode(date), true);
 	return error;
 }
 
@@ -677,7 +677,7 @@ BQuery::_PushNode(QueryNode *node, bool deleteOnError)
 		error = B_NOT_ALLOWED;
 	// allocate the stack, if necessary
 	if (error == B_OK && !fStack) {
-		fStack = new(nothrow) QueryStack;
+		fStack = new(std::nothrow) QueryStack;
 		if (!fStack)
 			error = B_NO_MEMORY;
 	}
@@ -705,7 +705,7 @@ BQuery::_SetPredicate(const char *expression)
 	fPredicate = NULL;
 	// set the new one
 	if (expression) {
-		fPredicate = new(nothrow) char[strlen(expression) + 1];
+		fPredicate = new(std::nothrow) char[strlen(expression) + 1];
 		if (fPredicate)
 			strcpy(fPredicate, expression);
 		else

@@ -172,7 +172,7 @@ BVolumeRoster::StartWatching(BMessenger messenger)
 	status_t error = (messenger.IsValid() ? B_OK : B_ERROR);
 	// clone messenger
 	if (error == B_OK) {
-		fTarget = new(nothrow) BMessenger(messenger);
+		fTarget = new(std::nothrow) BMessenger(messenger);
 		if (!fTarget)
 			error = B_NO_MEMORY;
 	}

@@ -12,7 +12,6 @@
 #include <SymLink.h>
 #include <Directory.h>
 #include <Entry.h>
-#include <Entry.h>
 #include <Path.h>
 #include "kernel_interface.h"
 #include "storage_support.h"
@@ -26,7 +25,7 @@ namespace OpenBeOS {
 BSymLink::BSymLink()
 		: BNode()
 	// WORKAROUND
-		, fSecretEntry(new(nothrow) BEntry)
+		, fSecretEntry(new(std::nothrow) BEntry)
 {
 }
 
@@ -37,7 +36,7 @@ BSymLink::BSymLink()
 BSymLink::BSymLink(const BSymLink &link)
 		: BNode()
 	// WORKAROUND
-		, fSecretEntry(new(nothrow) BEntry)
+		, fSecretEntry(new(std::nothrow) BEntry)
 {
 	*this = link;
 }
@@ -50,7 +49,7 @@ BSymLink::BSymLink(const BSymLink &link)
 BSymLink::BSymLink(const entry_ref *ref)
 		: BNode()
 	// WORKAROUND
-		, fSecretEntry(new(nothrow) BEntry)
+		, fSecretEntry(new(std::nothrow) BEntry)
 {
 	SetTo(ref);
 }
@@ -63,7 +62,7 @@ BSymLink::BSymLink(const entry_ref *ref)
 BSymLink::BSymLink(const BEntry *entry)
 		: BNode()
 	// WORKAROUND
-		, fSecretEntry(new(nothrow) BEntry)
+		, fSecretEntry(new(std::nothrow) BEntry)
 {
 	SetTo(entry);
 }
@@ -76,7 +75,7 @@ BSymLink::BSymLink(const BEntry *entry)
 BSymLink::BSymLink(const char *path)
 		: BNode()
 	// WORKAROUND
-		, fSecretEntry(new(nothrow) BEntry)
+		, fSecretEntry(new(std::nothrow) BEntry)
 {
 	SetTo(path);
 }
@@ -91,7 +90,7 @@ BSymLink::BSymLink(const char *path)
 BSymLink::BSymLink(const BDirectory *dir, const char *path)
 		: BNode()
 	// WORKAROUND
-		, fSecretEntry(new(nothrow) BEntry)
+		, fSecretEntry(new(std::nothrow) BEntry)
 {
 	SetTo(dir, path);
 }

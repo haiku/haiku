@@ -99,7 +99,7 @@ BMimeType::SetTo(const char *mimeType)
 		fCStatus = B_BAD_VALUE;
 	} else {
 		Unset();
-		fType = new(nothrow) char[strlen(mimeType)+1];
+		fType = new(std::nothrow) char[strlen(mimeType)+1];
 		if (fType) {
 			strcpy(fType, mimeType);
 			fCStatus = B_OK;

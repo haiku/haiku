@@ -600,7 +600,7 @@ BPath::set_path(const char *path)
 	const char *oldPath = fName;
 	// set the new path
 	if (path) {
-		fName = new(nothrow) char[strlen(path) + 1];
+		fName = new(std::nothrow) char[strlen(path) + 1];
 		if (fName)
 			strcpy(fName, path);
 		else
