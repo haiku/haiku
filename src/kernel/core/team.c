@@ -62,8 +62,8 @@ _dump_team_info(struct team *p)
 	dprintf("num_threads: %d\n", p->num_threads);
 	dprintf("state:       %d\n", p->state);
 	dprintf("pending_signals: 0x%x\n", p->pending_signals);
-	dprintf("ioctx:       %p\n", p->ioctx);
-	dprintf("path:        '%s'\n", p->path);
+	dprintf("io_context:  %p\n", p->io_context);
+//	dprintf("path:        '%s'\n", p->path);
 	dprintf("aspace_id:   0x%lx\n", p->_aspace_id);
 	dprintf("aspace:      %p\n", p->aspace);
 	dprintf("kaspace:     %p\n", p->kaspace);
@@ -123,9 +123,9 @@ team_init(kernel_args *ka)
 		panic("could not create kernel team!\n");
 	kernel_team->state = TEAM_STATE_NORMAL;
 
-	kernel_team->ioctx = vfs_new_io_context(NULL);
-	if (kernel_team->ioctx == NULL)
-		panic("could not create ioctx for kernel team!\n");
+	kernel_team->io_context = vfs_new_io_context(NULL);
+	if (kernel_team->io_context == NULL)
+		panic("could not create io_context for kernel team!\n");
 
 	//XXX should initialize kernel_team->path here. Set it to "/"?
 
@@ -180,9 +180,8 @@ user_copy_strings_array(char **strings, int strc, char ***kstrings)
 		return ERR_VM_BAD_USER_MEMORY;
 
 	lstrings = (char **)malloc((strc + 1) * sizeof(char *));
-	if (lstrings == NULL){
-		return ENOMEM;
-	}
+	if (lstrings == NULL)
+		return B_NO_MEMORY;
 
 	// scan all strings and copy to kernel space
 
@@ -217,27 +216,6 @@ error:
 	kfree_strings_array(lstrings, cnt);
 	dprintf("user_copy_strings_array failed %d \n", err);
 	return err;
-}
-
-
-int
-user_team_wait_on_team(team_id id, int *uretcode)
-{
-	int retcode;
-	int rc, rc2;
-
-	if((addr)uretcode >= KERNEL_BASE && (addr)uretcode <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = team_wait_on_team(id, &retcode);
-	if(rc < 0)
-		return rc;
-
-	rc2 = user_memcpy(uretcode, &retcode, sizeof(int));
-	if(rc2 < 0)
-		return rc2;
-
-	return rc;
 }
 
 
@@ -365,8 +343,7 @@ create_team_struct(const char *name, bool kernel)
 	strncpy(&p->name[0], name, SYS_MAX_OS_NAME_LEN-1);
 	p->name[SYS_MAX_OS_NAME_LEN-1] = 0;
 	p->num_threads = 0;
-	p->ioctx = NULL;
-	p->path[0] = 0;
+	p->io_context = NULL;
 	p->_aspace_id = -1;
 	p->aspace = NULL;
 	p->kaspace = vm_get_kernel_aspace();
@@ -547,14 +524,12 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 	pargs->envp = envp;
 	pargs->envc = envc;
 
-	// create a new ioctx for this team
-	p->ioctx = vfs_new_io_context(thread_get_current_thread()->team->ioctx);
-	if (!p->ioctx) {
+	// create a new io_context for this team
+	p->io_context = vfs_new_io_context(thread_get_current_thread()->team->io_context);
+	if (!p->io_context) {
 		err = ENOMEM;
 		goto err3;
 	}
-
-	//XXX should set p->path to path(?) here.
 
 	// create an address space for this team
 	p->_aspace_id = vm_create_aspace(p->name, USER_BASE, USER_SIZE, false);
@@ -579,7 +554,7 @@ err5:
 	vm_put_aspace(p->aspace);
 	vm_delete_aspace(p->_aspace_id);
 err4:
-	vfs_free_io_context(p->ioctx);
+	vfs_free_io_context(p->io_context);
 err3:
 	free(pargs->path);
 err2:
@@ -594,54 +569,6 @@ err1:
 	delete_team_struct(p);
 //err:
 	return err;
-}
-
-
-team_id
-user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
-{
-	char path[SYS_MAX_PATH_LEN];
-	char name[SYS_MAX_OS_NAME_LEN];
-	char **kargs;
-	char **kenv;
-	int rc;
-
-	dprintf("user_team_create_team : argc=%d \n",argc);
-
-	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_copy_strings_array(args, argc, &kargs);
-	if (rc < 0)
-		goto error;
-	
-	if (envp == NULL) {
-		envp = (char **)thread_get_current_thread()->team->user_env_base;
-		for (envc = 0; envp && (envp[envc]); envc++);
-	}
-	rc = user_copy_strings_array(envp, envc, &kenv);
-	if (rc < 0)
-		goto error;
-
-	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
-	if (rc < 0)
-		goto error;
-
-	path[SYS_MAX_PATH_LEN-1] = 0;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if (rc < 0)
-		goto error;
-
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	return team_create_team(path, name, kargs, argc, kenv, envc, priority);
-error:
-	kfree_strings_array(kargs, argc);
-	kfree_strings_array(kenv, envc);
-	return rc;
 }
 
 
@@ -675,25 +602,31 @@ team_kill_team(team_id id)
 }
 
 
-status_t
-user_get_team_info(team_id id, team_info *info)
+static status_t
+fill_team_info(struct team *team, team_info *info, size_t size)
 {
-	team_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-		
-	rc = _get_team_info(id, &kinfo, sizeof(team_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
-	if (rc2 < 0)
-		return rc2;
-	
-	return rc;
+	if (size != sizeof(team_info))
+		return B_BAD_VALUE;
+
+	// ToDo: Set more informations for team_info
+	memset(info, 0, size);
+
+	info->team = team->id;
+	info->thread_count = team->num_threads;
+	//info->image_count = 
+	//info->area_count = 
+	//info->debugger_nub_thread = 
+	//info->debugger_nub_port = 
+	//info->argc = 
+	//info->args[64] = 
+	//info->uid = 
+	//info->gid = 
+
+	// ToDo: make this to return real argc/argv
+	strlcpy(info->args, team->name, sizeof(info->args));
+	info->argc = 1;
+
+	return B_OK;
 }
 
 
@@ -712,50 +645,12 @@ _get_team_info(team_id id, team_info *info, size_t size)
 		rc = B_BAD_TEAM_ID;
 		goto err;
 	}
-	// XXX- Set more informations for team_info
-	memset(info, 0, sizeof(team_info));
-	info->team = team->id;
-	info->thread_count = team->num_threads;
-	// XXX- make this to return real argc/argv
-	strncpy(info->args, team->path, 64);
-	info->args[63] = '\0';
-	info->argc = 1;
+
+	rc = fill_team_info(team, info, size);
+
 err:
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	
-	return rc;
-}
-
-
-status_t
-user_get_next_team_info(int32 *cookie, team_info *info)
-{
-	int32 kcookie;
-	team_info kinfo;
-	status_t rc = B_OK;
-	status_t rc2;
-	
-	if ((addr)cookie >= KERNEL_BASE && (addr)cookie <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	
-	rc2 = user_memcpy(&kcookie, cookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	
-	rc = _get_next_team_info(&kcookie, &kinfo, sizeof(team_info));
-	if (rc != B_OK)
-		return rc;
-	
-	rc2 = user_memcpy(cookie, &kcookie, sizeof(int32));
-	if (rc2 < 0)
-		return rc2;
-	
-	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
-	if (rc2 < 0)
-		return rc2;
 	
 	return rc;
 }
@@ -764,69 +659,30 @@ user_get_next_team_info(int32 *cookie, team_info *info)
 status_t
 _get_next_team_info(int32 *cookie, team_info *info, size_t size)
 {
-	int state;
-	int slot;
-	status_t rc = B_BAD_TEAM_ID;
+	status_t status = B_BAD_TEAM_ID;
 	struct team *team = NULL;
-	
-	state = disable_interrupts();
+	int32 slot = *cookie;
+
+	int state = disable_interrupts();
 	GRAB_TEAM_LOCK();
-	
-	if (*cookie == 0)
-		slot = 0;
-	else {
-		slot = *cookie;
-		if (slot >= next_team_id)
-			goto err;
-	}
+
+	if (slot >= next_team_id)
+		goto err;
+
+	// get next valid team
 	while ((slot < next_team_id) && !(team = team_get_team_struct_locked(slot)))
 		slot++;
+
 	if (team) {
-		memset(info, 0, sizeof(team_info));
-		// XXX- Set more informations for team_info
-		info->team = team->id;
-		info->thread_count = team->num_threads;
-		// XXX- make this to return real argc/argv
-		strncpy(info->args, team->path, 64);
-		info->args[63] = '\0';
-		info->argc = 1;
-		slot++;
-		*cookie = slot;
-		rc = B_OK;
+		status = fill_team_info(team, info, size);
+		*cookie = ++slot;
 	}
+
 err:
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
-	
-	return rc;
-}
 
-
-int
-user_setenv(const char *uname, const char *uvalue, int overwrite)
-{
-	char name[SYS_THREAD_STRING_LENGTH_MAX];
-	char value[SYS_THREAD_STRING_LENGTH_MAX];
-	int rc;
-
-	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if ((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if (rc < 0)
-		return rc;
-
-	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
-
-	rc = user_strncpy(value, uvalue, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if(rc < 0)
-		return rc;
-
-	value[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
-
-	return sys_setenv(name, value, overwrite);
+	return status;
 }
 
 
@@ -915,36 +771,6 @@ sys_setenv(const char *name, const char *value, int overwrite)
 
 
 int
-user_getenv(const char *uname, char **uvalue)
-{
-	char name[SYS_THREAD_STRING_LENGTH_MAX];
-	char *value;
-	int rc;
-
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-	if((addr)uvalue >= KERNEL_BASE && (addr)uvalue <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_THREAD_STRING_LENGTH_MAX-1);
-	if (rc < 0)
-		return rc;
-	
-	name[SYS_THREAD_STRING_LENGTH_MAX-1] = 0;
-	
-	rc = sys_getenv(name, &value);
-	if (rc < 0)
-		return rc;
-	
-	rc = user_memcpy(uvalue, &value, sizeof(char *));
-	if (rc < 0)
-		return rc;
-	
-	return 0;
-}
-
-
-int
 sys_getenv(const char *name, char **value)
 {
 	char **envp;
@@ -975,4 +801,167 @@ sys_getenv(const char *name, char **value)
 	return rc;
 }
 
+
+//	#pragma mark -
+
+
+int
+user_team_wait_on_team(team_id id, int *userReturnCode)
+{
+	int returnCode;
+	int status;
+
+	if (!CHECK_USER_ADDRESS(userReturnCode))
+		return B_BAD_ADDRESS;
+
+	status = team_wait_on_team(id, &returnCode);
+	if (status >= B_OK) {
+		if (user_memcpy(userReturnCode, &returnCode, sizeof(returnCode)) < B_OK)
+			return B_BAD_ADDRESS;
+	}
+
+	return status;
+}
+
+
+team_id
+user_team_create_team(const char *upath, const char *uname, char **args, int argc, char **envp, int envc, int priority)
+{
+	char path[SYS_MAX_PATH_LEN];
+	char name[SYS_MAX_OS_NAME_LEN];
+	char **kargs;
+	char **kenv;
+	int rc;
+
+	dprintf("user_team_create_team : argc=%d \n",argc);
+
+	if ((addr)upath >= KERNEL_BASE && (addr)upath <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	if ((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+
+	rc = user_copy_strings_array(args, argc, &kargs);
+	if (rc < 0)
+		goto error;
+	
+	if (envp == NULL) {
+		envp = (char **)thread_get_current_thread()->team->user_env_base;
+		for (envc = 0; envp && (envp[envc]); envc++);
+	}
+	rc = user_copy_strings_array(envp, envc, &kenv);
+	if (rc < 0)
+		goto error;
+
+	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN-1);
+	if (rc < 0)
+		goto error;
+
+	path[SYS_MAX_PATH_LEN-1] = 0;
+
+	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
+	if (rc < 0)
+		goto error;
+
+	name[SYS_MAX_OS_NAME_LEN-1] = 0;
+
+	return team_create_team(path, name, kargs, argc, kenv, envc, priority);
+error:
+	kfree_strings_array(kargs, argc);
+	kfree_strings_array(kenv, envc);
+	return rc;
+}
+
+
+status_t
+user_get_team_info(team_id id, team_info *info)
+{
+	team_info kinfo;
+	status_t rc = B_OK;
+	status_t rc2;
+	
+	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+		
+	rc = _get_team_info(id, &kinfo, sizeof(team_info));
+	if (rc != B_OK)
+		return rc;
+	
+	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
+	if (rc2 < 0)
+		return rc2;
+	
+	return rc;
+}
+
+
+status_t
+user_get_next_team_info(int32 *cookie, team_info *info)
+{
+	int32 kcookie;
+	team_info kinfo;
+	status_t rc = B_OK;
+	status_t rc2;
+	
+	if ((addr)cookie >= KERNEL_BASE && (addr)cookie <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	if ((addr)info >= KERNEL_BASE && (addr)info <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
+	
+	rc2 = user_memcpy(&kcookie, cookie, sizeof(int32));
+	if (rc2 < 0)
+		return rc2;
+	
+	rc = _get_next_team_info(&kcookie, &kinfo, sizeof(team_info));
+	if (rc != B_OK)
+		return rc;
+	
+	rc2 = user_memcpy(cookie, &kcookie, sizeof(int32));
+	if (rc2 < 0)
+		return rc2;
+	
+	rc2 = user_memcpy(info, &kinfo, sizeof(team_info));
+	if (rc2 < 0)
+		return rc2;
+	
+	return rc;
+}
+
+
+int
+user_getenv(const char *userName, char **_userValue)
+{
+	char name[SYS_THREAD_STRING_LENGTH_MAX];
+	char *value;
+	int rc;
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| !CHECK_USER_ADDRESS(_userValue)
+		|| user_strlcpy(name, userName, SYS_THREAD_STRING_LENGTH_MAX) < B_OK)
+		return B_BAD_ADDRESS;
+
+	rc = sys_getenv(name, &value);
+	if (rc < 0)
+		return rc;
+
+	if (user_memcpy(_userValue, &value, sizeof(char *)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return rc;
+}
+
+
+int
+user_setenv(const char *userName, const char *userValue, int overwrite)
+{
+	char name[SYS_THREAD_STRING_LENGTH_MAX];
+	char value[SYS_THREAD_STRING_LENGTH_MAX];
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| !CHECK_USER_ADDRESS(userValue)
+		|| user_strlcpy(name, userName, SYS_THREAD_STRING_LENGTH_MAX) < B_OK
+		|| user_strlcpy(value, userValue, SYS_THREAD_STRING_LENGTH_MAX) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return sys_setenv(name, value, overwrite);
+}
 
