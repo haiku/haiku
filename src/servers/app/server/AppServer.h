@@ -72,5 +72,6 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 
 extern CursorManager *cursormanager;
 extern BitmapManager *bitmapmanager;
+extern ColorSet gui_colorset;
 
 #endif

@@ -123,14 +123,14 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_decorator->SetTitle(name);
 	
 
-STRACE(("WinBorder %s:\n",_title->String()));
-STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
-STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
+	STRACE(("WinBorder %s:\n",_title->String()));
+	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
+	STRACE(("\tWindow %s\n",win?win->Title():"NULL"));
 }
 
 WinBorder::~WinBorder(void)
 {
-STRACE(("WinBorder %s:~WinBorder()\n",_title->String()));
+	STRACE(("WinBorder %s:~WinBorder()\n",_title->String()));
 	delete _title;
 }
 
@@ -160,33 +160,33 @@ void WinBorder::MouseDown(int8 *buffer)
 	{
 		case CLICK_MOVETOBACK:
 		{
-STRACE_CLICK(("Click: MoveToBack\n"));
+			STRACE_CLICK(("Click: MoveToBack\n"));
 			MakeTopChild();
 			break;
 		}
 		case CLICK_MOVETOFRONT:
 		{
-STRACE_CLICK(("Click: MoveToFront\n"));
+			STRACE_CLICK(("Click: MoveToFront\n"));
 			MakeBottomChild();
 			break;
 		}
 		case CLICK_CLOSE:
 		{
-STRACE_CLICK(("Click: Close\n"));
+			STRACE_CLICK(("Click: Close\n"));
 			_decorator->SetClose(true);
 			_decorator->DrawClose();
 			break;
 		}
 		case CLICK_ZOOM:
 		{
-STRACE_CLICK(("Click: Zoom\n"));
+			STRACE_CLICK(("Click: Zoom\n"));
 			_decorator->SetZoom(true);
 			_decorator->DrawZoom();
 			break;
 		}
 		case CLICK_MINIMIZE:
 		{
-STRACE_CLICK(("Click: Minimize\n"));
+			STRACE_CLICK(("Click: Minimize\n"));
 			_decorator->SetMinimize(true);
 			_decorator->DrawMinimize();
 			break;
@@ -195,21 +195,21 @@ STRACE_CLICK(("Click: Minimize\n"));
 		{
 			if(buttons==B_PRIMARY_MOUSE_BUTTON)
 			{
-STRACE_CLICK(("Click: Drag\n"));
+			STRACE_CLICK(("Click: Drag\n"));
 				MakeBottomChild();
 				set_is_moving_window(true);
 			}
 
 			if(buttons==B_SECONDARY_MOUSE_BUTTON)
 			{
-STRACE_CLICK(("Click: MoveToBack\n"));
+				STRACE_CLICK(("Click: MoveToBack\n"));
 				MakeTopChild();
 			}
 			break;
 		}
 		case CLICK_SLIDETAB:
 		{
-STRACE_CLICK(("Click: Slide Tab\n"));
+			STRACE_CLICK(("Click: Slide Tab\n"));
 			set_is_sliding_tab(true);
 			break;
 		}
@@ -217,7 +217,7 @@ STRACE_CLICK(("Click: Slide Tab\n"));
 		{
 			if(buttons==B_PRIMARY_MOUSE_BUTTON)
 			{
-STRACE_CLICK(("Click: Resize\n"));
+				STRACE_CLICK(("Click: Resize\n"));
 				set_is_resizing_window(true);
 			}
 			break;
@@ -268,7 +268,7 @@ void WinBorder::MouseMoved(int8 *buffer)
 
 	if(is_sliding_tab())
 	{
-STRACE_CLICK(("ClickMove: Slide Tab\n"));
+		STRACE_CLICK(("ClickMove: Slide Tab\n"));
 		float dx=pt.x-_mousepos.x;
 		float dy=pt.y-_mousepos.y;		
 
@@ -291,7 +291,7 @@ STRACE_CLICK(("ClickMove: Slide Tab\n"));
 		// We are moving the window. Because speed is of the essence, we need to handle a lot
 		// of stuff which we might otherwise not need to.
 
-STRACE_CLICK(("ClickMove: Drag\n"));
+		STRACE_CLICK(("ClickMove: Drag\n"));
 		float	dx	= pt.x - _mousepos.x,
 				dy	= pt.y - _mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
@@ -352,7 +352,7 @@ STRACE_CLICK(("ClickMove: Drag\n"));
 
 	if(is_resizing_window())
 	{
-STRACE_CLICK(("ClickMove: Resize\n"));
+		STRACE_CLICK(("ClickMove: Resize\n"));
 		float	dx	= pt.x - _mousepos.x,
 				dy	= pt.y - _mousepos.y;
 		if(buttons!=0 && (dx!=0 || dy!=0))
@@ -380,7 +380,8 @@ STRACE_CLICK(("ClickMove: Resize\n"));
 
 void WinBorder::MouseUp(int8 *buffer)
 {
-STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
+	STRACE_MOUSE(("WinBorder %s: MouseUp() \n",_title->String()));
+	
 	// buffer data:
 	// 1) int64 - time of mouse click
 	// 2) float - x coordinate of mouse click
@@ -498,20 +499,40 @@ void WinBorder::ResizeBy(float x, float y)
 */
 void WinBorder::UpdateColors(void)
 {
-STRACE(("WinBorder %s: UpdateColors unimplemented\n",_title->String()));
+	gui_colorset.Lock();
+	_decorator->SetColors(gui_colorset);
+	gui_colorset.Unlock();
+
+	// Tell the decorator to update all visible regions of the window border	
+	if(_visible)
+		for(int32 i=0; i<_visible->CountRects(); i++)
+			_decorator->Draw(_visible->RectAt(i));
 }
 
 void WinBorder::UpdateDecorator(void)
 {
-STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",_title->String()));
+	STRACE(("WinBorder %s: UpdateDecorator unimplemented\n",_title->String()));
+
+	// TODO: Implement
+	
+	// What needs done here is to delete the current decorator and do a lot of the
+	// decorator-related setup done in the constructor. This definitely needs to be
+	// done *after* all the silliness with figuring out the clipping code is taken care of
 }
 
 void WinBorder::UpdateFont(void)
 {
-STRACE(("WinBorder %s: UpdateFont unimplemented\n",_title->String()));
+	STRACE(("WinBorder %s: UpdateFont unimplemented\n",_title->String()));
+
+	// TODO: Implement
+	
+	// What needs done here is to first call _decorator->SetFont(). Following that, 
+	// GetFootprint() will need to be called to obtain changes in the decorator's size due to
+	// changes in the font, whether they are face, size, or whatever. Thus, the WinBorder will
+	// need to do some region-related recalculation, as well.
 }
 
 void WinBorder::UpdateScreen(void)
 {
-STRACE(("WinBorder %s: UpdateScreen unimplemented\n",_title->String()));
+	STRACE(("WinBorder %s: UpdateScreen unimplemented\n",_title->String()));
 }

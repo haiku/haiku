@@ -50,6 +50,7 @@
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "ServerConfig.h"
+#include "WinBorder.h"
 #include "LayerData.h"
 #include "Utils.h"
 
@@ -346,6 +347,49 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			fontserver->Lock();
 			fontserver->FontsUpdated();
 			fontserver->Unlock();
+			break;
+		}
+		case AS_UPDATE_COLORS:
+		{
+			ServerWindow *win;
+			BMessage msg(_COLORS_UPDATED);
+			
+			for(int32 i=0; i<_winlist->CountItems(); i++)
+			{
+				win=(ServerWindow*)_winlist->ItemAt(i);
+				win->Lock();
+				win->_winborder->UpdateColors();
+				win->SendMessageToClient(&msg);
+				win->Unlock();
+			}
+			break;
+		}
+		case AS_UPDATE_FONTS:
+		{
+			ServerWindow *win;
+			BMessage msg(_FONTS_UPDATED);
+			
+			for(int32 i=0; i<_winlist->CountItems(); i++)
+			{
+				win=(ServerWindow*)_winlist->ItemAt(i);
+				win->Lock();
+				win->_winborder->UpdateFont();
+				win->SendMessageToClient(&msg);
+				win->Unlock();
+			}
+			break;
+		}
+		case AS_UPDATE_DECORATOR:
+		{
+			ServerWindow *win;
+			
+			for(int32 i=0; i<_winlist->CountItems(); i++)
+			{
+				win=(ServerWindow*)_winlist->ItemAt(i);
+				win->Lock();
+				win->_winborder->UpdateDecorator();
+				win->Unlock();
+			}
 			break;
 		}
 		case AS_CREATE_WINDOW:

@@ -2150,13 +2150,15 @@ Layer* ServerWindow::FindLayer(const Layer* start, int32 token) const
 
 //-----------------------------------------------------------------------
 
-void ServerWindow::SendMessageToClient( const BMessage* msg ) const{
+void ServerWindow::SendMessageToClient( const BMessage* msg ) const
+{
 	ssize_t		size;
 	char		*buffer;
 	
 	size		= msg->FlattenedSize();
 	buffer		= new char[size];
-	if ( msg->Flatten( buffer, size ) == B_OK ){
+	if ( msg->Flatten( buffer, size ) == B_OK )
+	{
 		write_port( winLooperPort, msg->what, buffer, size );
 	}
 	else
