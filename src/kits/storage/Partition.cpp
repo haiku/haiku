@@ -439,7 +439,7 @@ BPartition::Mount(const char *mountPoint, uint32 mountFlags,
 	}
 
 	// mount the partition
-	error = fs_mount_volume(NULL, mountPoint, partitionPath.Path(), mountFlags,
+	error = fs_mount_volume(mountPoint, partitionPath.Path(), NULL, mountFlags,
 		parameters);
 
 	// delete the mount point on error, if we created it
