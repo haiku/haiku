@@ -92,6 +92,8 @@ BPrintJob::ConfigJob()
 void
 BPrintJob::CancelJob()
 {
+	// TODO: For real
+	stop_the_show = 1;
 }
 
 
@@ -117,9 +119,7 @@ BPrintJob::CanContinue()
 
 
 void
-BPrintJob::DrawView(BView *a_view,
-                    BRect a_rect,
-                    BPoint where)
+BPrintJob::DrawView(BView *view, BRect rect, BPoint where)
 {
 }
 
@@ -137,8 +137,14 @@ BPrintJob::Settings()
 
 
 void
-BPrintJob::SetSettings(BMessage *a_msg)
+BPrintJob::SetSettings(BMessage *message)
 {
+	if (message != NULL) {
+		HandlePageSetup(message);
+		HandlePrintSetup(message);
+		delete setup_msg;
+		setup_msg = message;
+	}
 }
 
 
@@ -165,7 +171,7 @@ BPrintJob::IsSettingsMessageValid(BMessage *message) const
 BRect
 BPrintJob::PaperRect()
 {
-    if (!paper_size.IsValid())
+    if (default_setup_msg == NULL)
     	LoadDefaultSettings();
     	
     return paper_size;
@@ -175,17 +181,39 @@ BPrintJob::PaperRect()
 BRect
 BPrintJob::PrintableRect()
 {
-	if (!usable_size.IsValid())
+	if (default_setup_msg == NULL)
     	LoadDefaultSettings();
     	
     return usable_size;
 }
 
+
 void
 BPrintJob::GetResolution(int32 *xdpi, int32 *ydpi)
 {
-	*xdpi = v_xres;
-	*ydpi = v_yres;
+	int32 xres = -1, yres = -1;
+	
+	const BMessage *message = NULL;
+	
+	if (setup_msg != NULL)
+		message = setup_msg;
+	else {
+		if (default_setup_msg == NULL)
+			LoadDefaultSettings();
+		message = default_setup_msg;
+	}
+	
+	if (message != NULL) {
+		if (message->HasInt32(PSRV_FIELD_XRES))
+			message->FindInt32(PSRV_FIELD_XRES, &xres);
+		if (message->HasInt32(PSRV_FIELD_YRES))
+			message->FindInt32(PSRV_FIELD_YRES, &yres);
+	}
+	
+	if (xdpi != NULL)
+		*xdpi = xres;
+	if (ydpi != NULL)
+		*ydpi = yres;
 }
 
 
@@ -194,6 +222,7 @@ BPrintJob::FirstPage()
 {
     return first_page;
 }
+
 
 int32
 BPrintJob::LastPage()
@@ -205,8 +234,19 @@ BPrintJob::LastPage()
 int32
 BPrintJob::PrinterType(void *) const
 {
-    return B_COLOR_PRINTER;
+    EnsureValidMessenger();
+    
+    BMessage message(PSRV_GET_ACTIVE_PRINTER);
+    BMessage reply;
+    
+    sPrintServer->SendMessage(&message, &reply);
+    
+    int32 type = B_COLOR_PRINTER;
+    reply.FindInt32("color", &type);
+    
+    return type;
 }
+
 
 #if 0
 #pragma mark ----- PRIVATE -----
@@ -229,12 +269,22 @@ BPrintJob::MangleName(char *filename)
 void
 BPrintJob::HandlePageSetup(BMessage *setup)
 {
+
 }
 
 
 bool
-BPrintJob::HandlePrintSetup(BMessage *setup)
+BPrintJob::HandlePrintSetup(BMessage *message)
 {
+    if (message->HasRect(PSRV_FIELD_PRINTABLE_RECT))
+    	message->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
+    if (message->HasRect(PSRV_FIELD_PAPER_RECT))
+    	message->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
+    if (message->HasInt32(PSRV_FIELD_FIRST_PAGE))
+    	message->FindInt32(PSRV_FIELD_FIRST_PAGE, &first_page);
+    if (message->HasInt32(PSRV_FIELD_LAST_PAGE))
+    	message->FindInt32(PSRV_FIELD_LAST_PAGE, &last_page);
+    	
     return true;
 }
 
@@ -286,14 +336,20 @@ BPrintJob::LoadDefaultSettings()
 	EnsureValidMessenger();
 	
 	BMessage message(PSRV_GET_DEFAULT_SETTINGS);
-    BMessage reply;
+    BMessage *reply = new BMessage;
     
-    sPrintServer->SendMessage(&message, &reply);
+    sPrintServer->SendMessage(&message, reply);
     
-    if (reply.HasRect("paper_rect"))
-    	reply.FindRect("paper_rect", &paper_size);
-    if (reply.HasRect("printable_rect"))
-    	reply.FindRect("printable_rect", &usable_size);
+    if (reply->HasRect(PSRV_FIELD_PAPER_RECT))
+    	reply->FindRect(PSRV_FIELD_PAPER_RECT, &paper_size);
+    if (reply->HasRect(PSRV_FIELD_PRINTABLE_RECT))
+    	reply->FindRect(PSRV_FIELD_PRINTABLE_RECT, &usable_size);
+    
+    // Should never happen, but anyway...
+    if (default_setup_msg != NULL)
+    	delete default_setup_msg;
+    	
+    default_setup_msg = reply;
 }
 
 
