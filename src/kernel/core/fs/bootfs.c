@@ -10,6 +10,7 @@
 #include <khash.h>
 #include <lock.h>
 #include <vm.h>
+#include <fs_info.h>
 
 #include <boot/bootdir.h>
 
@@ -469,6 +470,18 @@ bootfs_unmount(fs_volume _fs)
 
 
 static status_t
+bootfs_read_fs_info(fs_volume _fs, fs_info *info)
+{
+	strlcpy(info->volume_name, "OpenBeOS", B_FILE_NAME_LENGTH);
+	info->flags = B_FS_IS_PERSISTENT | B_FS_IS_READONLY;
+	info->total_blocks = 0;
+	info->free_blocks = 0;
+
+	return B_OK;
+}
+
+
+static status_t
 bootfs_sync(fs_volume fs)
 {
 	TRACE(("bootfs_sync: entry\n"));
@@ -909,8 +922,8 @@ bootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int statM
 static struct fs_ops bootfs_ops = {
 	&bootfs_mount,
 	&bootfs_unmount,
-	NULL,
-	NULL,
+	&bootfs_read_fs_info,
+	NULL,	// write_fs_info
 	&bootfs_sync,
 
 	&bootfs_lookup,
