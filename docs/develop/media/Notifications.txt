@@ -1,0 +1,49 @@
+Messages that can be gathered with BMediaRoster::StartWatching()
+
+for each registered handler, the first message always informs about all exiting nodes, like this:
+
+B_MEDIA_NODE_CREATED:
+BMessage: what = TRIA (0x54524941, or 1414678849)
+    entry  media_node_id, type='LONG', c=7, size= 4, data[0]: 0x1 (1, '')
+                                                     data[1]: 0x2 (2, '')
+                                                     data[2]: 0x3 (3, '')
+                                                     data[3]: 0x4 (4, '')
+                                                     data[4]: 0x5 (5, '')
+                                                     data[5]: 0x7 (7, '')
+                                                     data[6]: 0x8 (8, '')
+
+Creating, connection, disconnecting and deleting looks like this:
+
+B_MEDIA_NODE_CREATED:
+BMessage: what = TRIA (0x54524941, or 1414678849)
+    entry  media_node_id, type='LONG', c=1, size= 4, data[0]: 0x12 (18, '')
+                                                                                  
+B_MEDIA_CONNECTION_MADE:
+BMessage: what = TRIC (0x54524943, or 1414678851)
+    entry         output, type='RAWT', c=1, size=328,
+    entry          input, type='RAWT', c=1, size=328,
+    entry         format, type='RAWT', c=1, size=192,
+    entry    be:old_what, type='LONG', c=1, size= 4, data[0]: 0x54524943 (1414678851, 'TRIC')     
+
+B_MEDIA_CONNECTION_BROKEN:
+BMessage: what = TRID (0x54524944, or 1414678852)
+    entry         source, type='RAWT', c=1, size=16,
+    entry    destination, type='RAWT', c=1, size=16,
+    entry    be:old_what, type='LONG', c=1, size= 4, data[0]: 0x54524944 (1414678852, 'TRID')
+
+B_MEDIA_NODE_DELETED:
+BMessage: what = TRIB (0x54524942, or 1414678850)
+    entry  media_node_id, type='LONG', c=1, size= 4, data[0]: 0x12 (18, '')            
+
+The following notification is only received if you use the node specific StartWatching,
+and only if the node you are watching uses BroadcastParameterChange()
+
+B_MEDIA_NEW_PARAMETER_VALUE:
+BMessage: what = TRIL (0x5452494c, or 1414678860)
+    entry        be:node, type='RAWT', c=2, size=24,
+    entry   be:parameter, type='LONG', c=1, size= 4, data[0]: 0x2 (2, '')
+    entry        be:when, type='LLNG', c=1, size= 8, data[0]: 0x2388ad126 (9538556198, '')
+    entry       be:value, type='RAWT', c=1, size= 4,
+    entry    be:old_what, type='LONG', c=1, size= 4, data[0]: 0x5452494c (1414678860, 'TRIL')
+ 
+Other notifications have not been observed so far.
