@@ -152,7 +152,7 @@ status_t BStatusBar::Archive(BMessage *archive, bool deep) const
 	if (err != B_OK)
 		return err;
 
-	// TODO: Should we compare the color with (50, 150, 255) ?
+	// DW: I'm pretty sure we don't need to compare the color with (50, 150, 255) ?
 	err = archive->AddData("_bcolor", B_INT32_TYPE, &fBarColor, sizeof( int32 ));
 
 	if (err != B_OK)
