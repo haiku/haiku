@@ -1,0 +1,29 @@
+SubDir OBOS_TOP src add-ons accelerants skeleton ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics skeleton ] ;
+UseHeaders [ FDirName $(SUBDIR) engine ] ;
+
+
+Addon skel.accelerant : accelerants :
+	Acceleration.c
+	Cursor.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetDeviceInfo.c
+	GetModeInfo.c
+	GetTimingConstraints.c
+	InitAccelerant.c
+	Overlay.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: false : libnvidia_engine.a
+;
+
+Package haiku-skeleton-cvs :
+	skel.accelerant : 
+	boot home config add-ons accelerants ;
+
+Depends skel.accelerant : skel.driver ;
+
+SubInclude OBOS_TOP src add-ons accelerants skeleton engine ;

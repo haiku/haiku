@@ -1,0 +1,20 @@
+SubDir OBOS_TOP src add-ons accelerants skeleton engine ;
+
+UsePrivateHeaders graphics ;
+UsePrivateHeaders [ FDirName graphics skeleton ] ;
+
+StaticLibrary skeleton_engine :
+	acc.c
+	bes.c
+	brooktreetv.c
+	crtc.c
+	crtc2.c
+	dac.c
+	dac2.c
+	general.c
+	agp.c
+	globals.c
+	i2c.c
+	info.c
+	support.c
+	;
