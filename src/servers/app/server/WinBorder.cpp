@@ -287,7 +287,17 @@ void WinBorder::MouseMoved(PointerEvent& evt)
 			fDecorator->DrawMinimize();
 		}
 	}
-	
+
+	if (fTopLayer->fFullVisible.Contains(evt.where))
+	{
+		BMessage movemsg(B_MOUSE_MOVED);
+		movemsg.AddInt64("when",evt.when);
+		movemsg.AddPoint("where",evt.where);
+		movemsg.AddInt32("buttons",evt.buttons);
+			
+		Window()->SendMessageToClient(&movemsg);
+	}
+
 	fLastMousePosition = evt.where;
 }
 
@@ -348,6 +358,31 @@ void WinBorder::MouseUp(PointerEvent& evt)
 		if(action==DEC_MINIMIZE)
 			Window()->Minimize(true);
 		return;
+	}
+
+	if (fTopLayer->fFullVisible.Contains(evt.where))
+	{
+		BMessage upmsg(B_MOUSE_UP);
+		upmsg.AddInt64("when",evt.when);
+		upmsg.AddPoint("where",evt.where);
+		upmsg.AddInt32("modifiers",evt.modifiers);
+			
+		Window()->SendMessageToClient(&upmsg);
+	}
+}
+
+void WinBorder::MouseWheel(PointerEvent& evt, BPoint& ptWhere)
+{
+	if (fTopLayer->fFullVisible.Contains(ptWhere))
+	{
+		BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
+		wheelmsg.AddInt64("when",evt.when);
+		wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
+		wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
+
+		Window()->Lock();
+		Window()->SendMessageToClient(&wheelmsg);
+		Window()->Unlock();
 	}
 }
 

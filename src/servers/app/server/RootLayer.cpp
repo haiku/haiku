@@ -941,14 +941,9 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 
 			fMouseTarget->Window()->Lock();
 			fMouseTarget->MouseUp(evt);
-			
-			BMessage upmsg(B_MOUSE_UP);
-			upmsg.AddInt64("when",evt.when);
-			upmsg.AddPoint("where",evt.where);
-			upmsg.AddInt32("modifiers",evt.modifiers);
-			
-			fMouseTarget->Window()->SendMessageToClient(&upmsg);
 			fMouseTarget->Window()->Unlock();
+
+			fMouseTarget=NULL;
 
 			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
 
@@ -981,13 +976,6 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			
 			fMouseTarget->Window()->Lock();
 			fMouseTarget->MouseMoved(evt);
-			
-			BMessage movemsg(B_MOUSE_MOVED);
-			movemsg.AddInt64("when",evt.when);
-			movemsg.AddPoint("where",evt.where);
-			movemsg.AddInt32("buttons",evt.buttons);
-			
-			fMouseTarget->Window()->SendMessageToClient(&movemsg);
 			fMouseTarget->Window()->Unlock();
 
 			break;
@@ -1003,24 +991,11 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int64>(&evt.when);
 			msg.Read<float>(&evt.wheel_delta_x);
 			msg.Read<float>(&evt.wheel_delta_y);
-			
-			BMessage wheelmsg(B_MOUSE_WHEEL_CHANGED);
-			wheelmsg.AddInt64("when",evt.when);
-			wheelmsg.AddFloat("be:wheel_delta_x",evt.wheel_delta_x);
-			wheelmsg.AddFloat("be:wheel_delta_y",evt.wheel_delta_y);
-			
-			if(!fMouseTarget)
-			{
-				fMouseTarget = WinBorderAt(GetDisplayDriver()->GetCursorPosition());
-				
-				// We do nothing because there ain't a window to receive the message
-				if(!fMouseTarget)
-					break;
-			}
-			
-			fMouseTarget->Window()->Lock();
-			fMouseTarget->Window()->SendMessageToClient(&wheelmsg);
-			fMouseTarget->Window()->Unlock();
+
+			WinBorder	*target;
+			BPoint		cursorPos = GetDisplayDriver()->GetCursorPosition();
+			if ((target = WinBorderAt(cursorPos)))
+				target->MouseWheel(evt, cursorPos);
 			
 			break;
 		}

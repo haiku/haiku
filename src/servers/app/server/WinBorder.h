@@ -75,6 +75,7 @@ public:
 	void MouseDown(PointerEvent& evt, bool sendMessage);
 	void MouseMoved(PointerEvent& evt);
 	void MouseUp(PointerEvent& evt);
+	void MouseWheel(PointerEvent& evt, BPoint& ptWhere);
 	
 	void UpdateColors(void);
 	void UpdateDecorator(void);
