@@ -4,16 +4,13 @@
  *  DESCR: 
  ***********************************************************************/
 #include <TimeSource.h>
-#include "SoundPlayer.h"
 #include <MediaRoster.h>
+#include <ParameterWeb.h>
 #include <math.h>
 
 #include "debug.h"
 #include "SoundPlayNode.h"
-
-/* this is the normal volume DB range of 16 bit integer */
-const float minDB = -96;
-const float maxDB = 0;
+#include "SoundPlayer.h"
 
 /*************************************************************
  * public sound_error
