@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kits media ;
 
 UsePrivateHeaders media ;
+UsePrivateHeaders shared ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
