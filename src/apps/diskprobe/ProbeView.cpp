@@ -442,7 +442,7 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 
 	BRect rect = Bounds();
 	fStopButton = new BButton(BRect(0, 0, 20, 20), B_EMPTY_STRING, "Stop",
-						new BMessage(kMsgStopFind));
+						new BMessage(kMsgStopFind), B_FOLLOW_TOP | B_FOLLOW_RIGHT);
 	fStopButton->ResizeToPreferred();
 	fStopButton->MoveTo(rect.right - 5 - fStopButton->Bounds().Width(), 5);
 	fStopButton->Hide();
@@ -468,8 +468,8 @@ HeaderView::HeaderView(BRect frame, const entry_ref *ref, DataEditor &editor)
 	}
 	rect = stringView->Frame();
 	rect.left = rect.right;
-	rect.right = fStopButton->Frame().left - 1;
-	fPathView = new BStringView(rect, B_EMPTY_STRING, string.String());
+	rect.right = fStopButton->Frame().right - 1;
+	fPathView = new BStringView(rect, B_EMPTY_STRING, string.String(), B_FOLLOW_TOP | B_FOLLOW_LEFT_RIGHT);
 	fPathView->SetFont(&plainFont);
 	AddChild(fPathView);
 
@@ -773,10 +773,13 @@ HeaderView::MessageReceived(BMessage *message)
 			bool state;
 			if (message->FindBool("running", &state) == B_OK && fFileSize > fBlockSize) {
 				fPositionSlider->SetEnabled(!state);
-				if (state)
+				if (state) {
+					fPathView->ResizeBy(-fStopButton->Bounds().Width(), 0);
 					fStopButton->Show();
-				else
+				} else {
 					fStopButton->Hide();
+					fPathView->ResizeBy(fStopButton->Bounds().Width(), 0);
+				}
 			}
 
 			off_t position;
@@ -1096,10 +1099,10 @@ ProbeView::UpdateSizeLimits()
 
 		BRect frame = Window()->ConvertFromScreen(ConvertToScreen(fHeaderView->Frame()));
 
-		Window()->SetSizeLimits(200, width + B_V_SCROLL_BAR_WIDTH,
+		Window()->SetSizeLimits(250, width + B_V_SCROLL_BAR_WIDTH,
 			200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
 	} else
-		Window()->SetSizeLimits(200, 32768, 200, 32768);
+		Window()->SetSizeLimits(250, 32768, 200, 32768);
 
 #ifdef COMPILE_FOR_R5
 	BRect bounds = Window()->Bounds();
