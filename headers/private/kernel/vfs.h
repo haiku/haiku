@@ -76,6 +76,7 @@ status_t vfs_read_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs,
 status_t vfs_write_pages(void *vnode, void *cookie, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes);
 status_t vfs_get_vnode_cache(void *vnode, void **_cache);
 status_t vfs_get_file_map( void *_vnode, off_t offset, size_t size, struct file_io_vec *vecs, size_t *_count);
+status_t vfs_get_fs_node_from_path(mount_id mountID, const char *path, bool kernel, void **_node);
 
 /* special module convenience call */
 status_t vfs_get_module_path(const char *basePath, const char *moduleName, char *pathBuffer, size_t bufferSize);
