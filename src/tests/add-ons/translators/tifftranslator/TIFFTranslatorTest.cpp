@@ -61,7 +61,7 @@ void
 CheckBits_Tiff(translator_info *pti)
 {
 	CheckTranslatorInfo(pti, B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP,
-		0.4f, 0.6f, "Be Bitmap Format (TIFFTranslator)",
+		0.7f, 0.6f, "Be Bitmap Format (TIFFTranslator)",
 		"image/x-be-bitmap");
 }
 
@@ -69,7 +69,7 @@ void
 CheckTiff(translator_info *pti, const char *imageType)
 {
 	CheckTranslatorInfo(pti, B_TIFF_FORMAT, B_TRANSLATOR_BITMAP,
-		0.1f, 0.1f, imageType, "image/tiff");
+		0.7f, 0.6f, imageType, "image/tiff");
 }
 
 // coveniently group path of image with
@@ -426,7 +426,7 @@ translation_format gTIFFInputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		0.4f, // quality
+		0.7f, // quality
 		0.6f, // capability
 		"image/x-be-bitmap",
 		"Be Bitmap Format (TIFFTranslator)"
@@ -434,8 +434,8 @@ translation_format gTIFFInputFormats[] = {
 	{
 		B_TIFF_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		0.1f,
-		0.1f,
+		0.7f,
+		0.6f,
 		"image/tiff",
 		"TIFF image"
 	}
@@ -446,7 +446,7 @@ translation_format gTIFFOutputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		0.4f, // quality
+		0.7f, // quality
 		0.6f, // capability
 		"image/x-be-bitmap",
 		"Be Bitmap Format (TIFFTranslator)"
@@ -454,8 +454,8 @@ translation_format gTIFFOutputFormats[] = {
 	{
 		B_TIFF_FORMAT,
 		B_TRANSLATOR_BITMAP,
+		0.7f,
 		0.6f,
-		0.2f,
 		"image/tiff",
 		"TIFF image"
 	}
@@ -467,7 +467,8 @@ TIFFTranslatorTest::LoadAddOnTest()
 	TranslatorLoadAddOnTest("/boot/home/config/add-ons/Translators/TIFFTranslator",
 		this,
 		gTIFFInputFormats, sizeof(gTIFFInputFormats) / sizeof(translation_format),
-		gTIFFOutputFormats, sizeof(gTIFFOutputFormats) / sizeof(translation_format));
+		gTIFFOutputFormats, sizeof(gTIFFOutputFormats) / sizeof(translation_format),
+		B_TRANSLATION_MAKE_VER(1,0,0));
 }
 
 #endif // #if !TEST_R5

@@ -67,7 +67,7 @@ void
 CheckBits_Bmp(translator_info *pti)
 {
 	CheckTranslatorInfo(pti, B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP,
-		0.6f, 0.8f, "Be Bitmap Format (BMPTranslator)",
+		0.4f, 0.6f, "Be Bitmap Format (BMPTranslator)",
 		"image/x-be-bitmap");
 }
 
@@ -75,7 +75,7 @@ void
 CheckBmp(translator_info *pti, const char *imageType)
 {
 	CheckTranslatorInfo(pti, B_BMP_FORMAT, B_TRANSLATOR_BITMAP,
-		1.0f, 0.8f, imageType, "image/x-bmp");
+		0.4f, 0.8f, imageType, "image/x-bmp");
 }
 
 // coveniently group path of image with
@@ -1071,15 +1071,15 @@ translation_format gBMPInputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		0.6f, // quality
-		0.8f, // capability
+		0.4f, // quality
+		0.6f, // capability
 		"image/x-be-bitmap",
 		"Be Bitmap Format (BMPTranslator)"
 	},
 	{
 		B_BMP_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		1.0f,
+		0.4f,
 		0.8f,
 		"image/x-bmp",
 		"BMP image"
@@ -1091,16 +1091,16 @@ translation_format gBMPOutputFormats[] = {
 	{
 		B_TRANSLATOR_BITMAP,
 		B_TRANSLATOR_BITMAP,
-		0.6f, // quality
-		0.8f, // capability
+		0.4f, // quality
+		0.6f, // capability
 		"image/x-be-bitmap",
 		"Be Bitmap Format (BMPTranslator)"
 	},
 	{
 		B_BMP_FORMAT,
 		B_TRANSLATOR_BITMAP,
-		1.0f,
-		0.5f,
+		0.4f,
+		0.8f,
 		"image/x-bmp",
 		"BMP image (MS format)"
 	}
@@ -1112,7 +1112,8 @@ BMPTranslatorTest::LoadAddOnTest()
 	TranslatorLoadAddOnTest("/boot/home/config/add-ons/Translators/BMPTranslator",
 		this,
 		gBMPInputFormats, sizeof(gBMPInputFormats) / sizeof(translation_format),
-		gBMPOutputFormats, sizeof(gBMPOutputFormats) / sizeof(translation_format));
+		gBMPOutputFormats, sizeof(gBMPOutputFormats) / sizeof(translation_format),
+		B_TRANSLATION_MAKE_VER(1,0,0));
 }
 
 #endif // #if !TEST_R5
