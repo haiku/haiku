@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src apps bin compress ;
+
+SubDirCcFlags -DSACREDMEM=256000 -D_FPOS_T -DUSERMEM=2097152 -DBEOS=1 ;
+
+BinCommand compress : 
+	compress.c
+	;
