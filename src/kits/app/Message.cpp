@@ -1790,7 +1790,8 @@ status_t BMessage::_send_(port_id port, int32 token, bool preferred,
 	self->fReplyRequired     = reply_required;
 	self->fReplyTo.team      = reply_to.fTeam;
 	self->fReplyTo.port      = reply_to.fPort;
-	self->fReplyTo.target    = reply_to.fHandlerToken;
+	self->fReplyTo.target    = (reply_to.fPreferredTarget
+								? B_PREFERRED_TOKEN : reply_to.fHandlerToken);
 	self->fReplyTo.preferred = reply_to.fPreferredTarget;
 
 	char tmp[0x800];
@@ -1928,7 +1929,7 @@ static status_t handle_reply(port_id   reply_port,
 	}
 	else
 	{
-		pAllocd = new char[0x800];
+		pAllocd = new char[err];
 		pMem = pAllocd;
 	}
 	do
