@@ -12,3 +12,11 @@ Addon ich_ac97 : [ FDirName kernel drivers bin ] :
 ;
 
 LinkSharedOSLibs ich_ac97 : /boot/develop/lib/x86/_KERNEL_ ;
+
+# Link to kernel/drivers/dev/audio/multi
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev audio multi ] ;
+	local instDriver = <kernel!drivers!dev!audio!multi>ich_ac97 ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : ich_ac97 ;
+}
