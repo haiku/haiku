@@ -5,6 +5,7 @@
 #include <OS.h>
 #include <MediaNode.h>
 #include <MediaRoster.h>
+#include <TimeSource.h>
 #include <string.h>
 #include "DefaultManager.h"
 #include "NodeManager.h"
@@ -160,11 +161,11 @@ DefaultManager::RescanThread()
 	// We do not search for the system time source,
 	// it should already exist
 	ASSERT(fSystemTimeSource != -1);
-
-for (int i = 0; i < 10; i++) { // XXX ugly workaround
+/*
+//for (int i = 0; i < 10; i++) { // XXX ugly workaround
 	gNodeManager->UpdateNodeConnections(); // XXX ugly workaround
 	snooze(1000000); // XXX ugly workaround
-
+*/
 	if (fPhysicalVideoOut == -1)
 		FindPhysicalVideoOut();
 	if (fPhysicalVideoIn == -1)
@@ -175,7 +176,7 @@ for (int i = 0; i < 10; i++) { // XXX ugly workaround
 		FindPhysicalAudioIn();
 	if (fAudioMixer == -1)
 		FindAudioMixer();
-}
+//}
 
 	// The normal time source is searched for after the
 	// Physical Audio Out has been created.
@@ -187,6 +188,8 @@ for (int i = 0; i < 10; i++) { // XXX ugly workaround
 		fMixerConnected = B_OK == ConnectMixerToOutput();
 		if (!fMixerConnected)
 			FATAL("DefaultManager: failed to connect mixer and soundcard\n");
+	} else {
+		FATAL("DefaultManager: Did not try to connect mixer and soundcard\n");
 	}
 
 	printf("DefaultManager::RescanThread() leave\n");
@@ -334,11 +337,14 @@ status_t
 DefaultManager::ConnectMixerToOutput()
 {
 	BMediaRoster 		*roster;
+	media_node 			timesource;
 	media_node 			mixer;
 	media_node 			soundcard;
 	media_input 		input;
 	media_output 		output;
 	media_format 		format;
+	BTimeSource * 		ts;
+	bigtime_t 			start_at;
 	int32 				count;
 	status_t 			rv;
 	
@@ -382,6 +388,18 @@ DefaultManager::ConnectMixerToOutput()
 	if (rv != B_OK) {
 		printf("DefaultManager: connect failed\n");
 	}
+	
+	roster->GetTimeSource(&timesource);
+	roster->SetTimeSourceFor(mixer.node, timesource.node);
+	roster->SetTimeSourceFor(soundcard.node, timesource.node);
+	roster->PrerollNode(mixer);
+	roster->PrerollNode(soundcard);
+	
+	ts = roster->MakeTimeSourceFor(timesource);
+	start_at = ts->Now() + 50000;
+	roster->StartNode(mixer, start_at);
+	roster->StartNode(soundcard, start_at);
+	ts->Release();
 	
 finish:
 	roster->ReleaseNode(mixer);

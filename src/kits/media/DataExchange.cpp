@@ -6,10 +6,14 @@
 #include <OS.h>
 #include <Messenger.h>
 #include <string.h>
+#include <unistd.h>
 #include "debug.h"
 #include "PortPool.h"
+#include "MediaMisc.h"
 #include "DataExchange.h"
 #include "ServerInterface.h" // NEW_MEDIA_SERVER_SIGNATURE
+
+#define CRASH_ON_ERRROR 0
 
 #define TIMEOUT 15000000 // 15 seconds timeout!
 
@@ -26,6 +30,12 @@ static port_id MediaAddonServerPort;
 
 void find_media_server_port();
 void find_media_addon_server_port();
+
+#if CRASH_ON_ERRROR
+	#define crash_now() debugger("crash")
+#else
+	#define crash_now() ((void)0)
+#endif
 
 class initit
 {
@@ -53,7 +63,7 @@ void find_media_server_port()
 	MediaServerPort = find_port("media_server port");
 	if (MediaServerPort < 0) {
 		FATAL("couldn't find MediaServerPort\n");
-		MediaServerPort = -666; // make this a unique number
+		MediaServerPort = BAD_MEDIA_SERVER_PORT; // make this a unique number
 	}
 }
 
@@ -62,7 +72,7 @@ void find_media_addon_server_port()
 	MediaAddonServerPort = find_port("media_addon_server port");
 	if (MediaAddonServerPort < 0) {
 		FATAL("couldn't find MediaAddonServerPort\n");
-		MediaAddonServerPort = -555; // make this a unique number
+		MediaAddonServerPort = BAD_MEDIA_ADDON_SERVER_PORT; // make this a unique number
 	}
 }
 
@@ -81,8 +91,10 @@ status_t SendToServer(BMessage *msg)
 {
 	status_t rv;
 	rv = MediaServerMessenger->SendMessage(msg, static_cast<BHandler *>(NULL), TIMEOUT);
-	if (rv != B_OK)
+	if (rv != B_OK) {
 		FATAL("SendToServer: SendMessage failed\n");
+		crash_now();
+	}
 	return rv;
 }
 
@@ -125,11 +137,13 @@ status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size
 			find_media_addon_server_port();
 			sendport = MediaAddonServerPort;
 		} else {
+			crash_now();
 			return rv;
 		}
 		rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
 			FATAL("SendToPort: retrying write_port failed, port %ld, error %#lx (%s)\n", sendport, rv, strerror(rv));
+			crash_now();
 			return rv;
 		}
 	}
@@ -155,12 +169,14 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 			find_media_addon_server_port();
 			requestport = MediaAddonServerPort;
 		} else {
+			crash_now();
 			_PortPool->PutPort(request->reply_port);
 			return rv;
 		}
 		rv = write_port_etc(requestport, msgcode, request, requestsize, B_RELATIVE_TIMEOUT, TIMEOUT);
 		if (rv != B_OK) {
 			FATAL("QueryPort: retrying write_port failed, port %ld, error %#lx (%s)\n", requestport, rv, strerror(rv));
+			crash_now();
 			_PortPool->PutPort(request->reply_port);
 			return rv;
 		}
@@ -169,8 +185,10 @@ status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, in
 	rv = read_port_etc(request->reply_port, &code, reply, replysize, B_RELATIVE_TIMEOUT, TIMEOUT);
 	_PortPool->PutPort(request->reply_port);
 
-	if (rv < B_OK)
+	if (rv < B_OK) {
 		FATAL("QueryPort: read_port failed, port %ld, error %#lx (%s)\n", request->reply_port, rv, strerror(rv));
+		crash_now();
+	}
 	
 	return (rv < B_OK) ? rv : reply->result;
 }

@@ -998,7 +998,7 @@ NodeManager::Dump()
 				output->node.node, output->node.port, output->source.port, output->source.id, output->destination.port, output->destination.id, output->name);
 		}
 		if (rn->outputlist.IsEmpty())
-			printf("    media_input: none\n");
+			printf("    media_output: none\n");
 	}
 	printf("NodeManager: list end\n");
 	printf("\n");

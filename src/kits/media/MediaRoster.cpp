@@ -788,12 +788,16 @@ BMediaRoster::Disconnect(media_node_id source_nodeid,
 		if (B_OK == MediaRosterEx(this)->GetAllOutputs(sourcenode , &outlist))
 			MediaRosterEx(this)->PublishOutputs(sourcenode , &outlist);
 		ReleaseNode(sourcenode);
-	} else FATAL("BMediaRoster::Disconnect: source GetNodeFor failed\n");
+	} else {
+		FATAL("BMediaRoster::Disconnect: source GetNodeFor failed\n");
+	}
 	if (B_OK == GetNodeFor(destination_nodeid, &destnode)) {
 		if (B_OK == MediaRosterEx(this)->GetAllInputs(destnode , &inlist))
 			MediaRosterEx(this)->PublishInputs(destnode, &inlist);
 		ReleaseNode(destnode);
-	} else FATAL("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
+	} else {
+		FATAL("BMediaRoster::Disconnect: dest GetNodeFor failed\n");
+	}
 	
 
 	// send a notification
@@ -1561,13 +1565,13 @@ BMediaRosterEx::RegisterNode(BMediaNode * node, media_addon_id addonid, int32 fl
 	// no list any inputs
 	// XXX XXX XXX 
 	
-/*
+
 	BMessage msg(NODE_PUBLISH_CONNECTIONS);
 	media_node tempnode;
 	tempnode = node->Node();
 	msg.AddData("node", B_RAW_TYPE, &tempnode, sizeof(tempnode));
 	PostMessage(&msg);
-*/
+
 /*	
 	// register existing inputs and outputs with the
 	// media_server, this allows GetLiveNodes() to work
@@ -2477,7 +2481,8 @@ BMediaRoster::MessageReceived(BMessage * message)
 				List<media_output> outputlist;
 				if (B_OK == MediaRosterEx(this)->GetAllOutputs(node, &outputlist))
 					MediaRosterEx(this)->PublishOutputs(node, &outputlist);
-			} else if (node.kind & B_BUFFER_CONSUMER) {
+			}
+			if (node.kind & B_BUFFER_CONSUMER) {
 				List<media_input> inputlist;
 				if (B_OK == MediaRosterEx(this)->GetAllInputs(node, &inputlist))
 					MediaRosterEx(this)->PublishInputs(node, &inputlist);
