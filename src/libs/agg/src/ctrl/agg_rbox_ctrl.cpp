@@ -146,8 +146,8 @@ namespace agg
             m_text.start_point(m_xs1 + m_dy * 1.5, m_ys1 + m_dy / 2.0);
             m_text.size(m_text_height, m_text_width);
             m_text_poly.width(m_text_thickness);
-            m_text_poly.line_join(vcgen_stroke::round_join);
-            m_text_poly.line_cap(vcgen_stroke::round_cap);
+            m_text_poly.line_join(round_join);
+            m_text_poly.line_cap(round_cap);
             m_text_poly.rewind(0);
             break;
 

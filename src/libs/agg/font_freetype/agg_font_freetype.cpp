@@ -771,10 +771,10 @@ namespace agg
                     m_resolution,
                     m_height,
                     m_width,
-                    m_matrix.xx,
-                    m_matrix.xy,
-                    m_matrix.yx,
-                    m_matrix.yy,
+                    int(m_matrix.xx),
+                    int(m_matrix.xy),
+                    int(m_matrix.yx),
+                    int(m_matrix.yy),
                     int(m_hinting),
                     int(m_flip_y),
                     gamma_hash);
@@ -827,6 +827,7 @@ namespace agg
             {
             case glyph_ren_native_mono:
                 m_last_error = FT_Render_Glyph(m_cur_face->glyph, FT_RENDER_MODE_MONO);
+//printf("%i\n", m_last_error);
                 if(m_last_error == 0)
                 {
                     decompose_ft_bitmap_mono(m_cur_face->glyph->bitmap, 
@@ -1007,6 +1008,7 @@ namespace agg
         {
             switch(m_data_type)
             {
+            default: return;
             case glyph_data_mono:    m_scanlines_bin.serialize(data); break;
             case glyph_data_gray8:   m_scanlines_aa.serialize(data);  break;
             case glyph_data_outline: 
@@ -1019,6 +1021,7 @@ namespace agg
                     m_path16.serialize(data);
                 }
                 break;
+            case glyph_data_invalid: break;
             }
         }
     }

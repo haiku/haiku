@@ -160,7 +160,6 @@ class AGGView : public BView {
 
     virtual void    FrameResized(float width, float height)
                     {
-                        delete fBitmap;
                         BRect r(0.0, 0.0, width, height);
                         BBitmap* bitmap = new BBitmap(r, 0, B_RGBA32);
                         if (bitmap->IsValid()) {

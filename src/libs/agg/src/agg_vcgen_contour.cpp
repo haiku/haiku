@@ -26,15 +26,20 @@ namespace agg
     //------------------------------------------------------------------------
     vcgen_contour::vcgen_contour() :
         m_src_vertices(),
+        m_out_vertices(),
         m_width(1.0),
+        m_line_join(bevel_join),
+        m_inner_line_join(miter_join_revert),
+        m_approx_scale(1.0),
         m_abs_width(1.0),
         m_signed_width(1.0),
         m_miter_limit(4.0),
+        m_inner_miter_limit(1.0 + 1.0/64.0),
         m_status(initial),
         m_src_vertex(0),
         m_closed(0),
         m_orientation(0),
-        m_auto_detect(true)
+        m_auto_detect(false)
     {
     }
 
@@ -116,8 +121,8 @@ namespace agg
     //------------------------------------------------------------------------
     unsigned vcgen_contour::vertex(double* x, double* y)
     {
-        bool done = false;
-        while(!done)
+        unsigned cmd = path_cmd_line_to;
+        while(!is_stop(cmd))
         {
             switch(m_status)
             {
@@ -125,98 +130,62 @@ namespace agg
                 rewind(0);
 
             case ready:
-                if(m_src_vertices.size() <  3)
+                if(m_src_vertices.size() < 2 + unsigned(m_closed != 0))
                 {
-                    return path_cmd_stop;
+                    cmd = path_cmd_stop;
+                    break;
                 }
-                m_src_vertex = 0;
                 m_status = outline;
+                cmd = path_cmd_move_to;
+                m_src_vertex = 0;
+                m_out_vertex = 0;
 
             case outline:
                 if(m_src_vertex >= m_src_vertices.size())
                 {
                     m_status = end_poly;
-                    return path_cmd_end_poly | m_orientation | m_closed;
+                    break;
                 }
-                if(calc_miter(m_src_vertices.prev(m_src_vertex), 
-                              m_src_vertices.curr(m_src_vertex), 
-                              m_src_vertices.next(m_src_vertex)))
-                {
-                    m_status = add_point;
-                }
+                stroke_calc_join(m_out_vertices, 
+                                 m_src_vertices.prev(m_src_vertex), 
+                                 m_src_vertices.curr(m_src_vertex), 
+                                 m_src_vertices.next(m_src_vertex), 
+                                 m_src_vertices.prev(m_src_vertex).dist,
+                                 m_src_vertices.curr(m_src_vertex).dist,
+                                 m_signed_width, 
+                                 m_line_join,
+                                 m_inner_line_join,
+                                 m_miter_limit,
+                                 m_inner_miter_limit,
+                                 m_approx_scale);
                 ++m_src_vertex;
-                *x = m_x1;
-                *y = m_y1;
-                return ((m_src_vertex == 1) ? path_cmd_move_to : path_cmd_line_to);
+                m_status = out_vertices;
+                m_out_vertex = 0;
 
-            case add_point:
-                *x = m_x2;
-                *y = m_y2;
-                m_status = outline;
-                return path_cmd_line_to;
+            case out_vertices:
+                if(m_out_vertex >= m_out_vertices.size())
+                {
+                    m_status = outline;
+                }
+                else
+                {
+                    const point_type& c = m_out_vertices[m_out_vertex++];
+                    *x = c.x;
+                    *y = c.y;
+                    return cmd;
+                }
+                break;
 
             case end_poly:
-                done = true;
-                break;
+                if(!m_closed) return path_cmd_stop;
+                m_status = stop;
+                return path_cmd_end_poly | path_flags_close | path_flags_ccw;
+
+            case stop:
+                return path_cmd_stop;
             }
         }
-        return path_cmd_stop;
+        return cmd;
     }
-
-
-
-    //------------------------------------------------------------------------
-    bool vcgen_contour::calc_miter(const vertex_dist& v0, 
-                                   const vertex_dist& v1, 
-                                   const vertex_dist& v2)
-    {
-        double dx1, dy1, dx2, dy2;
-
-        dx1 = m_signed_width * (v1.y - v0.y) / v0.dist;
-        dy1 = m_signed_width * (v1.x - v0.x) / v0.dist;
-
-        dx2 = m_signed_width * (v2.y - v1.y) / v1.dist;
-        dy2 = m_signed_width * (v2.x - v1.x) / v1.dist;
-
-        double xi;
-        double yi;
-
-        if(!calc_intersection(v0.x + dx1, v0.y - dy1,
-                              v1.x + dx1, v1.y - dy1,
-                              v1.x + dx2, v1.y - dy2,
-                              v2.x + dx2, v2.y - dy2,
-                              &xi, &yi))
-        {
-            m_x1 = v1.x + dx1;
-            m_y1 = v1.y - dy1;
-            return false;
-        }
-        else
-        {
-            double d1 = calc_distance(v1.x, v1.y, xi, yi);
-            double lim = m_abs_width * m_miter_limit;
-            if(d1 > lim)
-            {
-                d1  = lim / d1;
-                m_x1 = v1.x + dx1;
-                m_y1 = v1.y - dy1;
-                m_x2 = v1.x + dx2;
-                m_y2 = v1.y - dy2;
-
-                m_x1 += (xi - m_x1) * d1;
-                m_y1 += (yi - m_y1) * d1;
-                m_x2 += (xi - m_x2) * d1;
-                m_y2 += (yi - m_y2) * d1;
-                return true;
-            }
-            else
-            {
-                m_x1 = xi;
-                m_y1 = yi;
-            }
-        }
-        return false;
-    }
-
 
 }

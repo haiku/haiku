@@ -26,6 +26,7 @@ namespace agg
         m_dx = 0.0;
         m_dy = 0.0;
         m_dl = 2.0;
+        m_ddl = 2.0;
         m_cmd = path_cmd_move_to;
     }
 
@@ -48,10 +49,13 @@ namespace agg
 
         unsigned cmd = m_cmd;
         m_cmd = path_cmd_line_to;
-        if(m_dl > 1.0)
+        if(m_dl >= 1.0 - m_ddl)
         {
             m_dl = 1.0;
             m_cmd = path_cmd_stop;
+            *x = m_x1 + m_dx;
+            *y = m_y1 + m_dy;
+            return cmd;
         }
         *x = m_x1 + m_dx * m_dl;
         *y = m_y1 + m_dy * m_dl;

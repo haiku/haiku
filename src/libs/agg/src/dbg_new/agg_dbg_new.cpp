@@ -123,7 +123,7 @@ namespace agg
         #ifdef _WIN32
         if(dbg_new_level == -1)
         {
-           FILE* fd = fopen("stdout.txt", "wt");
+           FILE* fd = fopen("stdout.txt", "w");
            fclose(fd);
         }
         #endif

@@ -234,7 +234,7 @@ namespace agg
                 x_ctrl = x0;
                 y_ctrl = y0;
             }
-            curve3(x_ctrl, x_ctrl, x_to, y_to);
+            curve3(x_ctrl, y_ctrl, x_to, y_to);
         }
     }
 
