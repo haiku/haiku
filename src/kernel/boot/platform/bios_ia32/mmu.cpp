@@ -127,6 +127,20 @@ add_page_table(addr_t base)
 }
 
 
+static void
+unmap_page(addr_t virtualAddress)
+{
+	TRACE(("unmap_page(virtualAddress = %p)\n", (void *)virtualAddress));
+
+	if (virtualAddress < KERNEL_BASE)
+		panic("unmap_page: asked to unmap invalid page %p!\n", (void *)virtualAddress);
+
+	sPageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
+
+	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
+}
+
+
 /** Creates an entry to map the specified virtualAddress to the given
  *	physicalAddress.
  *	If the mapping goes beyond the current page table, it will allocate
@@ -158,8 +172,6 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 	sPageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = physicalAddress | flags;
 
 	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
-		// should not be necessary (as we can't free memory yet),
-		// but it won't hurt either :)
 }
 
 
@@ -321,10 +333,37 @@ mmu_allocate(void *virtualAddress, size_t size)
 }
 
 
+/**	This will unmap the allocated chunk of memory from the virtual
+ *	address space. It might not actually free memory (as its implementation
+ *	is very simple), but it might.
+ */
+
 extern "C" void
 mmu_free(void *virtualAddress, size_t size)
 {
-	// ToDo: implement freeing a region (do we have to?)
+	TRACE(("mmu_free(virtualAddress = %p, size: %ld)\n", virtualAddress, size));
+
+	addr_t address = (addr_t)virtualAddress;
+	size = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		// get number of pages to map
+
+	// is the address within the valid range?
+	if (address < KERNEL_BASE
+		|| address + size >= KERNEL_BASE + kMaxKernelSize) {
+		panic("mmu_free: asked to unmap out of range region (%p, size %lx)\n",
+			address, size);
+	}
+
+	// unmap all pages within the range
+	for (uint32 i = 0; i < size; i++) {
+		unmap_page(address);
+		address += B_PAGE_SIZE;
+	}
+
+	if (address == sNextVirtualAddress) {
+		// we can actually reuse the virtual address space
+		sNextVirtualAddress -= size;
+	}
 }
 
 
