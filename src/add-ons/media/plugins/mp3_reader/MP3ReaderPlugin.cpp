@@ -187,6 +187,8 @@ mp3Reader::GetFileFormatInfo(media_file_format *mff)
 	int layer_index = (header[1] >> 1) & 0x03;
 	strcpy(mff->short_name,  name_table[mpeg_version_index][layer_index]);
 	strcpy(mff->pretty_name, name_table[mpeg_version_index][layer_index]);
+	
+	printf("mp3Reader: %s\n", name_table[mpeg_version_index][layer_index]);
 }
 
 	
@@ -354,6 +356,22 @@ mp3Reader::GetNextChunk(void *cookie,
 	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameRate;
 	mediaHeader->file_pos = data->position;
 
+#if 0
+// XXXX TEST
+	int size = min_c(MAX_CHUNK_SIZE - 16, maxbytes);
+	if (size != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer,size)) {
+		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
+		return B_ERROR;
+	}
+	data->position += size;
+	data->framePosition += data->framesPerFrame;
+	*chunkBuffer = data->chunkBuffer;
+	*chunkSize = size;
+	return B_OK;
+
+// XXXX TEST
+#else
+
 retry:
 	if (4 != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer, 4)) {
 		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
@@ -380,11 +398,21 @@ retry:
 		size = maxbytes;
 	if (size == 0)
 		return B_LAST_BUFFER_ERROR;
-		
-	if (size != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer + 4, size)) {
+
+	// XXX reads one byte more than needed to allow doing the check below		
+	if (size > Source()->ReadAt(fDataStart + data->position, data->chunkBuffer + 4, size + 1)) {
 		TRACE("mp3Reader::GetNextChunk: unexpected read error\n");
 		return B_ERROR;
 	}
+
+	// XXX I found two files that need this, either they are broken,
+	// XXX or the GetFrameLength() function is bad
+	uint8 *d = (uint8 *)data->chunkBuffer;
+	if (d[4 + size - 1] == 0xff && d[4 + size] != 0xff && ((d[4 + size] & 0xe0) == 0xe0)) {
+		TRACE("mp3Reader::GetNextChunk: frame at %Ld: reported length %d, real length %d\n", data->position, size + 4, size + 3);
+		size--;
+	} 
+	
 	data->position += size;
 	
 	data->framePosition += data->framesPerFrame;
@@ -398,6 +426,7 @@ retry:
 	}
 
 	return B_OK;
+#endif
 }
 
 bool
@@ -406,6 +435,8 @@ mp3Reader::ResynchronizeStream(mp3data *data)
 	// we are at data->position and that's not a valid frame header
 	
 	// XXX this is a hack and needs to be improved
+	
+	data->position -= 16;
 	
 	const int readmax = 16384;
 	uint8 buffer[readmax];
