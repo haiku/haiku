@@ -16,6 +16,7 @@ KernelMergeObject kernel_device_manager.o :
 	registration.c
 	root_node.c
 	scan.c
+	settings.cpp
 	:
 	-fno-pic -Wno-unused -D_KERNEL_MODE
 	;
