@@ -149,40 +149,6 @@ error:
 
 
 int
-arch_cpu_user_strcpy(char *to, const char *from, addr *fault_handler)
-{
-	*fault_handler = (addr)&&error;
-
-	while((*to++ = *from++) != '\0')
-		;
-
-	*fault_handler = 0;
-
-	return 0;
-error:
-	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
-}
-
-
-int
-arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *fault_handler)
-{
-	*fault_handler = (addr)&&error;
-
-	while(size-- && (*to++ = *from++) != '\0')
-		;
-
-	*fault_handler = 0;
-
-	return 0;
-error:
-	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
-}
-
-
-int
 arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
 {
 	char *xs = (char *) s;

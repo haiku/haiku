@@ -141,40 +141,6 @@ error:
 }
 
 
-int
-arch_cpu_user_strcpy(char *to, const char *from, addr *fault_handler)
-{
-	*fault_handler = (addr)&&error;
-
-	while ((*to++ = *from++) != '\0')
-		;
-
-	*fault_handler = 0;
-	return 0;
-
-error:
-	*fault_handler = 0;
-	return B_BAD_ADDRESS;
-}
-
-
-int
-arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *fault_handler)
-{
-	*fault_handler = (addr)&&error;
-
-	while(size-- && (*to++ = *from++) != '\0')
-		;
-
-	*fault_handler = 0;
-	return 0;
-
-error:
-	*fault_handler = 0;
-	return B_BAD_ADDRESS;
-}
-
-
 /**	\brief Copies at most (\a size - 1) characters from the string in \a from to
  *	the string in \a to, NULL-terminating the result.
  *
