@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  This software is part of the Haiku distribution and is covered 
+//  by the MIT license.
 //---------------------------------------------------------------------
 
 #include <DiskDeviceTypes.h>
@@ -34,6 +34,8 @@ const char *kPartitionTypeEXT2			= "EXT2 Filesystem";
 const char *kPartitionTypeEXT3			= "EXT3 Filesystem";
 const char *kPartitionTypeFAT12			= "FAT12 Filesystem";
 const char *kPartitionTypeFAT32			= "FAT32 Filesystem";
+const char *kPartitionTypeHFS			= "HFS Filesystem";
+const char *kPartitionTypeHFSPlus		= "HFS+ Filesystem";
 const char *kPartitionTypeISO9660		= "ISO9660 Filesystem";
 const char *kPartitionTypeReiser		= "Reiser Filesystem";
 const char *kPartitionTypeUDF			= "UDF Filesystem";
