@@ -1078,6 +1078,10 @@ MimeSnifferTest::ParserTest() {
 				cout << testCase.error << endl;
 			}
 */
+if (error != B_BAD_MIME_SNIFFER_RULE) {
+printf("rule: `%s'\n", testCase.rule);
+RES(error);
+}
 			CHK(error == B_BAD_MIME_SNIFFER_RULE);
 			CHK(parseError.FindLast(testCase.error) >= 0);
 		}
