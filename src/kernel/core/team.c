@@ -173,6 +173,9 @@ team_init(kernel_args *ka)
 	// stick it in the team hash
 	hash_insert(team_hash, kernel_team);
 
+	// B_SYSTEM_TEAM is reserved
+	next_team_id = B_SYSTEM_TEAM + 1;
+
 	add_debugger_command("team", &dump_team_info, "list info about a particular team");
 	return 0;
 }
@@ -287,7 +290,7 @@ user_copy_strings_array(char * const *userStrings, int32 count, char ***_strings
 error:
 	free_strings_array(strings, i);
 
-	TRACE(("user_copy_strings_array failed %d \n", err));
+	TRACE(("user_copy_strings_array failed %ld\n", err));
 	return err;
 }
 
@@ -841,7 +844,7 @@ team_create_thread_start(void *args)
 	argCount = teamArgs->arg_count;
 	envCount = teamArgs->env_count;
 
-	uspa = (struct uspace_program_args *)(t->user_stack_base + STACK_SIZE + TLS_SIZE + ENV_SIZE);
+	uspa = (struct uspace_program_args *)(t->user_stack_base + t->user_stack_size + TLS_SIZE + ENV_SIZE);
 	uargs = (char **)(uspa + 1);
 	udest = (char  *)(uargs + argCount + 1);
 
@@ -849,10 +852,14 @@ team_create_thread_start(void *args)
 		t->user_stack_base, uargs, udest, sizeLeft));
 
 	for (i = 0; i < argCount; i++) {
-		ssize_t length = user_strlcpy(udest, teamArgs->args[i], sizeLeft) + 1;
+		ssize_t length = user_strlcpy(udest, teamArgs->args[i], sizeLeft);
+		if (length < B_OK) {
+			argCount = 0;
+			break;
+		}
 
 		uargs[i] = udest;
-		udest += length;
+		udest += ++length;
 		sizeLeft -= length;
 	}
 	uargs[argCount] = NULL;
@@ -860,19 +867,25 @@ team_create_thread_start(void *args)
 	team->user_env_base = t->user_stack_base + t->user_stack_size + TLS_SIZE;
 	uenv = (char **)team->user_env_base;
 	udest = (char *)team->user_env_base + ENV_SIZE - 1;
-	path = teamArgs->args[0];
+		// the environment variables are copied from back to front
 
-	TRACE(("team_create_thread_start: envc: %d, envp: 0x%p\n", teamArgs->env_count, (void *)teamArgs->env));
+	TRACE(("team_create_thread_start: envc: %ld, env: %p\n", teamArgs->env_count, (void *)teamArgs->env));
 
 	for (i = 0; i < envCount; i++) {
-		ssize_t length = user_strlcpy(udest, teamArgs->env[i], sizeLeft) + 1;
-
+		ssize_t length = strlen(teamArgs->env[i]) + 1;
+		udest -= length;
 		uenv[i] = udest;
-		udest += length;
+
+		if (user_memcpy(udest, teamArgs->env[i], length) < B_OK) {
+			envCount = 0;
+			break;
+		}
+
 		sizeLeft -= length;
 	}
 	uenv[envCount] = NULL;
 
+	path = teamArgs->args[0];
 	user_memcpy(uspa->program_path, path, sizeof(uspa->program_path));
 	uspa->argc = argCount;
 	uspa->argv = uargs;
@@ -2077,7 +2090,7 @@ _user_load_image(int32 argCount, const char **userArgs, int32 envCount,
 	char **args = NULL;
 	char **env = NULL;
 
-	TRACE(("_user_load_image_etc: argc = %d\n", argCount));
+	TRACE(("_user_load_image_etc: argc = %ld\n", argCount));
 
 	if (argCount < 1 || userArgs == NULL || userEnv == NULL)
 		return B_BAD_VALUE;
