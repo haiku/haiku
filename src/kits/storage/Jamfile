@@ -1,19 +1,28 @@
-# This is $(TOP)/source/lib/Jamfile
+SubDir OBOS_TOP src kits storage ;
 
-SubDir TOP source lib ;
+# The adapter library we need.
 
-SharedFromSources $(TOP)/source/lib/libstorage.so :
-	ByteOrder.cpp
-	DataIO.cpp
+SharedLibrary beadapter :
+	LibBeAdapter.cpp
+;
+LinkSharedOSLibs libbeadapter.so :
+	be
+;
+
+
+# The library containing the storage kit classes.
+
+UsePrivateHeaders storage ;
+
+UsePublicHeaders [ FDirName os storage ] ;
+UsePublicHeaders [ FDirName os add-ons file_system ] ;
+
+SharedLibrary storage :
 	Directory.cpp
 	Entry.cpp
 	EntryList.cpp
 	File.cpp
 	FindDirectory.cpp
-	Flattenable.cpp
-	List.cpp
-	Locker.cpp
-	MallocIO.cpp
 	Mime.cpp
 	MimeType.cpp
 	Node.cpp
@@ -31,22 +40,11 @@ SharedFromSources $(TOP)/source/lib/libstorage.so :
 	SymLink.cpp
 	Volume.cpp
 	kernel_interface.POSIX.cpp
-	storage_support.cpp ;
-LinkSharedLibs $(TOP)/source/lib/libstorage.so :
-	$(TOP)/source/lib/libbeadapter.so
+	storage_support.cpp
 ;
-LinkSharedOSLibs $(TOP)/source/lib/libstorage.so :
-	/boot/develop/lib/x86/libbe.so
+LinkSharedOSLibs libstorage.so :
+	be
+	libbeadapter.so
+	stdc++.r4
 ;
 
-
-# Here come the rules for our adapter library.
-
-HDRS = ;
-
-SharedFromSources $(TOP)/source/lib/libbeadapter.so :
-	LibBeAdapter.cpp
-;
-LinkSharedOSLibs $(TOP)/source/lib/libbeadapter.so :
-	/boot/develop/lib/x86/libbe.so
-;
