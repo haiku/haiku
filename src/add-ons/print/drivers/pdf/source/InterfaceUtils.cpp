@@ -73,7 +73,7 @@ HWindow::MessageReceived(BMessage* msg)
 static const char* 
 kAbout =
 "PDF Writer for BeOS\n"
-"© 2001-2004 Haiku\n"
+B_UTF8_COPYRIGHT " 2001-2004 Haiku\n"
 "\n"
 "Philippe Houdoin\n"
 "\tProject Leader\n\n"
@@ -100,11 +100,11 @@ HWindow::AboutRequested()
 		char *text = (char*) v->Text();
 		char *s = text;
 
-		// set first line 20pt bold
+		// set first line 16pt bold
 		s = strchr(text, '\n');
-		BFont bold(be_bold_font);
-		bold.SetSize(20);
-		v->SetFontAndColor(0, s-text, &bold);
+		BFont font(be_bold_font);
+		font.SetSize(16); // font.SetFace(B_OUTLINED_FACE);
+		v->SetFontAndColor(0, s-text, &font);
 
 		// set all Be in blue and red
 		s = text;
@@ -114,12 +114,6 @@ HWindow::AboutRequested()
 			v->SetFontAndColor(i+2, i+4, NULL, 0, &red);
 			s += 2;
 		}
-		// first text line 
-		s = strchr(text, '\n');
-		BFont font;
-		v->GetFontAndColor(0, &font);
-		font.SetSize(12); // font.SetFace(B_OUTLINED_FACE);
-		v->SetFontAndColor(0, s-text+1, &font, B_FONT_SIZE);
 	};
 	about->Go();
 }
