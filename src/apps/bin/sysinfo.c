@@ -110,19 +110,22 @@ print_intel_cache_descriptors(cpuid_info *info)
 
 
 static void
-print_TLB(uint32 reg)
+print_TLB(uint32 reg, const char *pages)
 {
 	int num;
 	int entries[2];
 	int ways[2];
-	char *name[2] = { "Inst TLB:\t", "Data TLB:\t" };
+	char *name[2] = { "Inst TLB", "Data TLB" };
 
 	entries[0] = (reg & 0xff);
 	ways[0] = ((reg >> 8) & 0xff);
 	entries[1] = ((reg >> 16) & 0xff);
 	ways[1] = ((reg >> 24) & 0xff);
-	for (num=0; num < 2; num++) {
-		printf("\t%s %u entries, ", name[num], entries[num]);
+
+	for (num = 0; num < 2; num++) {
+		printf("\t%s: %s%s%u entries, ", name[num],
+			pages ? pages : "", pages ? " pages, " : "", entries[num]);
+
 		if (ways[num] == 0xff)
 			printf("fully associative\n");
 		else
@@ -132,39 +135,59 @@ print_TLB(uint32 reg)
 
 
 static void
-print_cache(uint32 reg, int code)
+print_level2_cache(uint32 reg, const char *name)
 {
-	int size;
-	int ways;
-	int lines_per_tag;
-	int linesize;
-	char *name[2] = { "L1 inst cache:", "L1 data cache:" };
+	uint32 size = (reg >> 16) & 0xffff;
+	uint32 ways = (reg >> 12) & 0xf;
+	uint32 lines_per_tag = (reg >> 8) & 0xf;
+	uint32 linesize = reg & 0xff;
 
-	size = ((reg >> 24) & 0xff);
-	ways = ((reg >> 16) & 0xff);
-	lines_per_tag = ((reg >> 8) & 0xff);
-	linesize = (reg & 0xff);
-	printf("\t%s %u KB,", name[code?1:0], size);
-	if (ways == 0xff)
+	printf("\t%s: %lu KB, ", name, size);
+	if (ways == 0xf)
 		printf("fully associative, ");
+	else if (ways == 0x1)
+		printf("direct-mapped, ");
 	else
-		printf("%u-way set associative, ", ways);
-	printf("%u lines/tag, %u bytes/line\n", lines_per_tag, linesize);
+		printf("%lu-way set associative, ", 1UL << (
+		ways / 2));
+	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
 }
 
 
 static void
-print_cache_descriptors(cpuid_info *info)
+print_level1_cache(uint32 reg, const char *name)
 {
-	putchar('\n');
-	if (info->regs.eax)
-		print_TLB(info->regs.eax);
-	if (info->regs.ebx)
-		print_TLB(info->regs.ebx);
-	if (info->regs.eax || info->regs.ebx)
+	uint32 size = (reg >> 24) & 0xff;
+	uint32 ways = (reg >> 16) & 0xff;
+	uint32 lines_per_tag = (reg >> 8) & 0xff;
+	uint32 linesize = reg & 0xff;
 
-	print_cache(info->regs.ecx, 0);
-	print_cache(info->regs.edx, 1);
+	printf("\t%s: %lu KB, ", name, size);
+	if (ways == 0xff)
+		printf("fully associative, ");
+	else
+		printf("%lu-way set associative, ", ways);
+	printf("%lu lines/tag, %lu bytes/line\n", lines_per_tag, linesize);
+}
+
+
+static void
+print_cache_descriptors(int32 cpu)
+{
+	cpuid_info info;
+	get_cpuid(&info, 0x80000005, cpu);
+
+	putchar('\n');
+	if (info.regs.eax)
+		print_TLB(info.regs.eax, info.regs.ebx ? "2M/4M-byte" : NULL);
+	if (info.regs.ebx)
+		print_TLB(info.regs.ebx, info.regs.eax ? "4K-byte" : NULL);
+
+	print_level1_cache(info.regs.ecx, "L1 inst cache");
+	print_level2_cache(info.regs.edx, "L1 data cache");
+
+	get_cpuid(&info, 0x80000006, cpu);
+	print_level2_cache(info.regs.ecx, "L2 cache");
 }
 
 
@@ -172,14 +195,10 @@ static void
 print_amd_features(uint32 features)
 {
 	static const char *kFeatures[32] = {
-		"FPU", "VME", "DE", "PSE",
-		"TSC", "MSR", "PAE", "MCE",
-		"CX8", "APIC", NULL, "SCE",
-		"MTRR", "PGE", "MCA", "CMOV",
-		"PAT", "PSE36", NULL, NULL,
-		NULL, NULL, "AMD-MMX", "MMX",
-		"FXSR", NULL, NULL, NULL,
-		NULL, NULL, "3DNow+", "3DNow!"
+		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+		NULL, NULL, NULL, "SCE", NULL, NULL, NULL, NULL,
+		NULL, NULL, NULL, NULL, "NX", NULL, "AMD-MMX", NULL,
+		NULL, "FFXSTR", NULL, NULL, NULL, "64", "3DNow+", "3DNow!"
 	};
 	int32 found = 0;
 	int32 i;
@@ -208,9 +227,9 @@ print_features(uint32 features)
 		"TSC", "MSR", "PAE", "MCE",
 		"CX8", "APIC", NULL, "SEP",
 		"MTRR", "PGE", "MCA", "CMOV",
-		"PAT", "PSE36", "PSN", "CFLSH",
+		"PAT", "PSE36", "PSN", "CFLUSH",
 		NULL, "DS", "ACPI", "MMX",
-		"FXSR", "SSE", "SSE2", "SS",
+		"FXSTR", "SSE", "SSE2", "SS",
 		NULL, "TM", NULL, NULL, 
 	};
 	int32 found = 0;
@@ -315,19 +334,18 @@ dump_cpu(system_info *info, int32 cpu)
 	if (max_extended_eax >= 1 && (info->cpu_type & B_CPU_x86_VENDOR_MASK) == B_CPU_AMD_x86) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
 		printf("\textended: generation %lu, model %lu, stepping %lu, features 0x%08lx\n",
-			(cpuInfo.regs.eax >> 8) & 0xff, (cpuInfo.regs.eax >> 4) & 0xff,
-			cpuInfo.regs.eax & 0xff, cpuInfo.regs.edx);
+			(cpuInfo.regs.eax >> 8) & 0xf, (cpuInfo.regs.eax >> 4) & 0xf,
+			cpuInfo.regs.eax & 0xf, cpuInfo.regs.edx);
 		print_amd_features(cpuInfo.regs.edx);
 	}
 
 	/* Cache/TLB descriptors */
 	if (max_extended_eax >= 5) {
-		get_cpuid(&cpuInfo, 0x80000005, cpu);
-
-		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12))
+		if (!strncmp(baseInfo.eax_0.vendor_id, "CyrixInstead", 12)) {
+			get_cpuid(&cpuInfo, 0x80000005, cpu);
 			print_intel_cache_descriptors(&cpuInfo);
-		else
-			print_cache_descriptors(&cpuInfo);
+		} else
+			print_cache_descriptors(cpu);
 	}
 
 	if (max_eax >= 2) {
