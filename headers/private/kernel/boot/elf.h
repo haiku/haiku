@@ -7,6 +7,7 @@
 
 
 #include <elf_priv.h>
+#include <boot/kernel_args.h>
 
 
 struct preloaded_image {
@@ -14,7 +15,7 @@ struct preloaded_image {
 	char		*name;
 	elf_region	text_region;
 	elf_region	data_region;
-	addr_t		dynamic_section;	// pointer to the dynamic section
+	addr_range	dynamic_section;	// pointer to the dynamic section
 	Elf32_Ehdr	elf_header;
 };
 
