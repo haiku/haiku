@@ -18,6 +18,7 @@ class BMultiChannelControl;
 
 class MediaView;
 class IconView;
+class AvailableViewArea;
 class AudioSettingsView;
 class AudioMixerView;
 
@@ -34,6 +35,7 @@ class MediaWindow : public BWindow
 		
 	    MediaView*				ptrMediaView;
 	    IconView*  				ptrIconView;
+	    AvailableViewArea*		ptrAvailableViewArea;
 	    AudioSettingsView*		ptrAudioSettingsView;
 	    AudioMixerView*         ptrAudioMixerView;
 	    

@@ -91,11 +91,14 @@ void MediaWindow::InitWindow(void)
 	// Create the OutlineView
 	BRect outlinerect(r.left+12,r.top+12,r.left+146,r.bottom-10);
 	BRect AvailableRect(r.left+160,r.top+12,r.right-10,r.bottom-10);
-	BRect AudioMixerRect(r.left+160,r.top+41,r.right-10,r.bottom-10);
+	BRect TitleRect(0,0,140,16);
+	BRect AudioMixerRect(0,30,470,400);
 	BOutlineListView *outline;
 	BListItem 		 *topmenu;
 	BListItem 		 *submenu;
 	BScrollView 	 *outlinesv;
+	BStringView 	 *stvAudioSettings;
+	BStringView 	 *stvAudioMixer;
 
 	outline = new BOutlineListView(outlinerect,"audio_list", B_SINGLE_SELECTION_LIST);
 	outline->AddItem(topmenu = new BStringItem("Audio Settings"));
@@ -108,15 +111,27 @@ void MediaWindow::InitWindow(void)
 	
 	BRect IconRect(0,0,16,16);
 	ptrIconView = new IconView(IconRect);
-	
 	topmenu->DrawItem(ptrIconView,IconRect,false);
+	
+	// StringViews
+	rgb_color TitleFontColor = { 0,0,0,0 };	
+	stvAudioSettings = new BStringView(TitleRect, "AudioSettings", "Audio Settings", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	stvAudioSettings->SetFont(be_bold_font);
+	stvAudioSettings->SetFontSize(12.0);
+	stvAudioSettings->SetHighColor(TitleFontColor);
+	stvAudioMixer = new BStringView(TitleRect, "AudioMixer", "Audio Mixer", B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	stvAudioMixer->SetFont(be_bold_font);
+	stvAudioMixer->SetFontSize(12.0);
+	stvAudioMixer->SetHighColor(TitleFontColor);
 	
 	// Setup the OutlineView 
 	outlinesv->SetBorderHighlighted(true);
 	
+	// Back and Fore ground Colours
 	outline->SetHighColor(0,0,0,0);
 	outline->SetLowColor(255,255,255,0);
 	
+	// Font Settings
 	BFont OutlineFont;
 	OutlineFont.SetSpacing(B_CHAR_SPACING);
 	OutlineFont.SetSize(12);
@@ -127,8 +142,11 @@ void MediaWindow::InitWindow(void)
 	
 	// Add Child(ren)
 	ptrMediaView->AddChild(outlinesv);
-	//AddChild(ptrAudioSettingsView = mew AudioSettingsView(AvailableRect));
-	ptrMediaView->AddChild(ptrAudioMixerView = new AudioMixerView(AudioMixerRect));
+	ptrMediaView->AddChild(ptrAvailableViewArea = new AvailableViewArea(AvailableRect));
+	ptrAvailableViewArea->AddChild(ptrAudioMixerView = new AudioMixerView(AudioMixerRect));
+	
+	// Add Child(ren) - Audio Mixer View
+	ptrAvailableViewArea->AddChild(stvAudioMixer);
 	ptrAudioMixerView->AddChild(paramView);
 }
 // ---------------------------------------------------------------------------------------------------------- //
