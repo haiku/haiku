@@ -143,7 +143,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 						* (fPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 						* fPreferredFormat.u.raw_audio.channel_count;
 	
-	PRINT_OBJECT(config);
+	PRINT_OBJECT(*config);
 		
 	fInitCheckStatus = B_OK;
 }
@@ -1903,7 +1903,7 @@ MultiAudioNode::GetConfigurationFor(BMessage * into_message)
 		}
 	}
 	
-	PRINT_OBJECT(into_message);
+	PRINT_OBJECT(*into_message);
 	
 	return B_OK;
 }
