@@ -950,6 +950,11 @@ bool FilterDeleter(void* filter)
 }
 //------------------------------------------------------------------------------
 
+int32 _get_object_token_(const BHandler *handler)
+{
+	return handler->fToken;
+}
+
 /*
  * $Log $
  *
