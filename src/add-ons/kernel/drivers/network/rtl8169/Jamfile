@@ -9,7 +9,6 @@ UsePrivateHeaders net ;
 R5KernelAddon rtl8169 : kernel drivers bin :
 	driver.c
 	device.c
-	timer.c
 	util.c
 	;
 
@@ -19,6 +18,9 @@ R5KernelAddon rtl8169 : kernel drivers bin :
 # Package openbeos-rtl8169-cvs :
 #	<kernel!drivers!dev!net>rtl8169 :
 #	boot home config add-ons kernel drivers dev net ;
+# Package openbeos-rtl8169-cvs :
+#	rtl8169.settings :
+#	boot home config settings kernel drivers sample ;
 
 Package openbeos-networkingkit-cvs :
 	rtl8169 :
@@ -26,6 +28,9 @@ Package openbeos-networkingkit-cvs :
 Package openbeos-networkingkit-cvs :
 	<kernel!drivers!dev!net>rtl8169 :
 	boot home config add-ons kernel drivers dev net ;
+Package openbeos-networkingkit-cvs :
+	rtl8169.settings :
+	boot home config settings kernel drivers sample ;
 
 # Link driver(s) to kernel/drivers/dev/net
 {
