@@ -82,20 +82,20 @@ waitForMessage(port_id port,const char *string,int32 op,char *name)
 		return bytes;
 	}
 	if (bytes < B_OK) {
-		printf("-> %s\n\n",strerror(bytes));
+		printf("-> %s\n\n", strerror(bytes));
 		return bytes;
 	}
 
 	BMessage message;
 	if (message.Unflatten(buffer) < B_OK) {
 		printf("could not unflatten message:\n");
-		dumpBlock(buffer,bytes);
+		dumpBlock(buffer, bytes);
 		return B_BAD_DATA;
 	}
 
 	if (message.what != B_QUERY_UPDATE
 		|| message.FindInt32("opcode") != op) {
-		printf("Expected what = %lx, opcode = %ld, got:",B_QUERY_UPDATE,op);
+		printf("Expected what = %x, opcode = %ld, got:", B_QUERY_UPDATE, op);
 		message.PrintToStream();
 		putchar('\n');
 		return message.FindInt32("opcode");
@@ -108,56 +108,60 @@ waitForMessage(port_id port,const char *string,int32 op,char *name)
 int
 main(int argc,char **argv)
 {
-	port_id port = create_port(100,"query port");
-	printf("port id = %ld\n",port);
-	printf("  B_ENTRY_REMOVED = %ld, B_ENTRY_CREATED = %ld\n\n",B_ENTRY_REMOVED,B_ENTRY_CREATED);
+	port_id port = create_port(100, "query port");
+	printf("port id = %ld\n", port);
+	printf("  B_ENTRY_REMOVED = %d, B_ENTRY_CREATED = %d\n\n", B_ENTRY_REMOVED, B_ENTRY_CREATED);
 
 	dev_t device = dev_for_path(".");
-	DIR *query = fs_open_live_query(device,"name=_query_test_*",B_LIVE_QUERY,port,12345);
+	DIR *query = fs_open_live_query(device, "name=_query_test_*", B_LIVE_QUERY, port, 12345);
 
 	createFile(1);
-	waitForMessage(port,"File 1 created:",B_ENTRY_CREATED,"_query_test_1");
+	waitForMessage(port, "File 1 created:", B_ENTRY_CREATED, "_query_test_1");
 
 	createFile(2);
-	waitForMessage(port,"File 2 created:",B_ENTRY_CREATED,"_query_test_2");
+	waitForMessage(port, "File 2 created:", B_ENTRY_CREATED, "_query_test_2");
 
 	BEntry *entry = getEntry(2);
 	if (entry->InitCheck() < B_OK) {
-		fprintf(stderr,"Could not get entry for file 2\n");
+		fprintf(stderr, "Could not get entry for file 2\n");
 		fs_close_query(query);
 		return -1;
 	}
 	entry->Rename("_some_other_name_");
-	waitForMessage(port,"File 2 renamed (should fall out of query):",B_ENTRY_REMOVED,NULL);
+	waitForMessage(port,"File 2 renamed (should fall out of query):", B_ENTRY_REMOVED, NULL);
 
 	entry->Rename("_some_other_");
-	waitForMessage(port,"File 2 renamed again (should time out):",B_TIMED_OUT,NULL);
+	waitForMessage(port,"File 2 renamed again (should time out):", B_TIMED_OUT, NULL);
 
 	entry->Rename("_query_test_2");
-	waitForMessage(port,"File 2 renamed back (should be added to query):",B_ENTRY_CREATED,"_query_test_2");
+	waitForMessage(port,"File 2 renamed back (should be added to query):",
+		B_ENTRY_CREATED, "_query_test_2");
 
 	entry->Rename("_query_test_2_and_more");
-	status_t status = waitForMessage(port,"File 2 renamed (should stay in query, time out):",B_TIMED_OUT,"_query_test_2_and_more");
-	if (status == B_ENTRY_REMOVED)
-		waitForMessage(port,"Received B_ENTRY_REMOVED, now expecting file 2 to be added again:",B_ENTRY_CREATED,NULL);
+	status_t status = waitForMessage(port,"File 2 renamed (should stay in query, time out):",
+							B_TIMED_OUT, "_query_test_2_and_more");
+	if (status == B_ENTRY_REMOVED) {
+		waitForMessage(port,"Received B_ENTRY_REMOVED, now expecting file 2 to be added again:",
+			B_ENTRY_CREATED, NULL);
+	}
 
 	entry->Remove();
 	delete entry;
-	waitForMessage(port,"File 2 removed:",B_ENTRY_REMOVED,NULL);
-	
+	waitForMessage(port,"File 2 removed:", B_ENTRY_REMOVED, NULL);
+
 	entry = getEntry(1);
 	if (entry->InitCheck() < B_OK) {
-		fprintf(stderr,"Could not get entry for file 1\n");
+		fprintf(stderr, "Could not get entry for file 1\n");
 		fs_close_query(query);
 		return -1;
 	}
 
 	entry->Rename("_some_other_name_");
-	waitForMessage(port,"File 1 renamed (should fall out of query):",B_ENTRY_REMOVED,NULL);
-		
+	waitForMessage(port, "File 1 renamed (should fall out of query):", B_ENTRY_REMOVED, NULL);
+
 	entry->Remove();
 	delete entry;
-	waitForMessage(port,"File 1 removed (should time out):",B_TIMED_OUT,NULL);
+	waitForMessage(port, "File 1 removed (should time out):", B_TIMED_OUT, NULL);
 
 	fs_close_query(query);
 
