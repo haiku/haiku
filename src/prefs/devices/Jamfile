@@ -2,7 +2,8 @@ SubDir OBOS_TOP src prefs devices ;
 
 AddResources Devices : Devices.rdef ;
 
-UsePrivateHeaders Devices ;
+#UsePrivateHeaders Devices ;
+UsePrivateHeaders [ FDirName kernel ] ;
 
 Preference Devices :
 	Devices.cpp
@@ -11,6 +12,7 @@ Preference Devices :
 	ModemWindow.cpp
 	cm_wrapper.c
 	DevicesInfo.cpp
+	ConfigurationWindow.cpp
 ;
 
 LinkSharedOSLibs Devices : be ;

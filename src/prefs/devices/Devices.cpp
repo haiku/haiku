@@ -1,20 +1,35 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003-2004, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        Devices.cpp
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Devices Preferences
+//  Created :    March 04, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-Devices by Sikosis
-
-(C)2003 OBOS
-
-*/
 
 // Includes -------------------------------------------------------------------------------------------------- //
 #include <Application.h>
-#include <Window.h>
-#include <View.h>
 
-#include "Devices.h"
 #include "DevicesWindows.h"
 
 #define APP_SIGNATURE "application/x-vnd.OBOS.Devices"  // Application Signature and Title
+
+class Devices : public BApplication
+{
+	public:
+    	Devices();
+	    virtual void MessageReceived(BMessage *message);
+	    
+	private:
+		
+};
 
 // ---------------------------------------------------------------------------------------------------------- //
 

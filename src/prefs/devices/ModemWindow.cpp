@@ -1,27 +1,33 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003-2004, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        ModemWindow.cpp
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Devices Preferences
+//  Created :    August 23, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-ModemWindow
-
-Author: Sikosis
-
-(C)2003 OBOS - Released under the MIT License
-
-*/
 
 // Includes ------------------------------------------------------------------------------------------ //
-#include <Application.h>
+//#include <Application.h>
 #include <Box.h>
 #include <Button.h>
 #include <MenuItem.h>
 #include <MenuField.h>
-#include <Path.h>
-#include <PopUpMenu.h>
+//#include <Path.h>
+//#include <PopUpMenu.h>
 #include <Screen.h>
-#include <stdio.h>
-#include <String.h>
+//#include <stdio.h>
+//#include <String.h>
 #include <TextView.h>
-#include <Window.h>
-#include <View.h>
+//#include <Window.h>
+//#include <View.h>
 
 #include "DevicesWindows.h"
 
@@ -29,17 +35,6 @@ Author: Sikosis
 const uint32 BTN_ADD = 'badd';
 const uint32 BTN_CANCEL = 'bcnl';
 
-// CenterWindowOnScreen -- Centers the BWindow to the Current Screen
-static void CenterWindowOnScreen(BWindow* w)
-{
-	BRect screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
-	BPoint pt;
-	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
-
-	if (screenFrame.Contains(pt))
-		w->MoveTo(pt);
-}
 // -------------------------------------------------------------------------------------------------- //
 
 
@@ -58,12 +53,12 @@ ModemWindow::ModemWindow(BRect frame, BMessenger messenger)
 // ModemWindow - Destructor
 ModemWindow::~ModemWindow()
 {
-	//exit(0);
 }
 // -------------------------------------------------------------------------------------------------- //
 
 // ModemWindow::InitWindow -- Initialization Commands here
-void ModemWindow::InitWindow(void)
+void 
+ModemWindow::InitWindow(void)
 {
 	BRect r;
 	r = Bounds();
@@ -133,7 +128,8 @@ void ModemWindow::InitWindow(void)
 
 
 // ModemWindow::MessageReceived -- receives messages
-void ModemWindow::MessageReceived (BMessage *message)
+void 
+ModemWindow::MessageReceived (BMessage *message)
 {
 	switch(message->what)
 	{
@@ -154,8 +150,3 @@ void ModemWindow::MessageReceived (BMessage *message)
 	}
 }
 // -------------------------------------------------------------------------------------------------- //
-
-
-
-
-

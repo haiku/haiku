@@ -1,26 +1,26 @@
-/*
-
-Devices - DevicesWindow by Sikosis
-
-(C)2003 OBOS
-
-*/
-
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003-2004, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        DevicesWindow.cpp
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Devices Preferences
+//  Created :    March 04, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 // Includes -------------------------------------------------------------------------------------------------- //
 #include <Alert.h>
 #include <Application.h>
-#include <Bitmap.h>
 #include <Box.h>
 #include <Button.h>
 #include <ClassInfo.h>
-#include <Directory.h>
-#include <Entry.h>
 #include <File.h>
-#include <FilePanel.h>
 #include <FindDirectory.h>
-#include <Node.h>
-#include <Path.h>
 #include <MenuBar.h>
 #include <Menu.h>
 #include <MenuItem.h>
@@ -28,16 +28,12 @@ Devices - DevicesWindow by Sikosis
 #include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
-#include <Shape.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <String.h>
 #include <StringView.h>
-#include <Window.h>
-#include <View.h>
 
-#include "Devices.h"
 #include "DevicesWindows.h"
 #include "DevicesInfo.h"
 
@@ -53,7 +49,7 @@ const uint32 SELECTION_CHANGED = 'slch';
 
 
 // CenterWindowOnScreen -- Centers the BWindow to the Current Screen
-static void CenterWindowOnScreen(BWindow* w)
+void CenterWindowOnScreen(BWindow* w)
 {
 	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
 	BPoint 	pt;
@@ -131,8 +127,6 @@ DevicesWindow::~DevicesWindow()
 // DevicesWindow::InitWindow -- Initialization Commands here
 void DevicesWindow::InitWindow(void)
 {	
-	int LeftMargin = 16;
-	int RightMargin = 246;
 	BRect r;
 	r = Bounds(); // the whole view
 	
@@ -165,8 +159,8 @@ void DevicesWindow::InitWindow(void)
 	mniRemoveJumperedDevice->SetEnabled(false);
 	
 	// Create the StringViews
-	stvDeviceName = new BStringView(BRect(LeftMargin, 16, 150, 40), "DeviceName", "Device Name");
-	stvCurrentState = new BStringView(BRect(RightMargin, 16, r.right-10, 40), "CurrentState", "Current State");
+	stvDeviceName = new BStringView(BRect(16, 16, 150, 40), "DeviceName", "Device Name");
+	stvCurrentState = new BStringView(BRect(248, 16, r.right-10, 40), "CurrentState", "Current State");
 	
 	float fCurrentHeight = 279;
 	float fCurrentGap = 15;
@@ -180,19 +174,20 @@ void DevicesWindow::InitWindow(void)
 	fCurrentHeight = fCurrentHeight + fCurrentGap;
 	
 	// Create the OutlineView
-	BRect outlinerect(r.left+12,r.top+45,r.right-29,r.top+262);
+	BRect outlinerect(r.left+14,r.top+45,r.right-28,r.top+262);
 	BScrollView      *outlinesv;
 
-	outline = new BOutlineListView(outlinerect,"devices_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM);
-	outline->AddItem(systemMenu = new BStringItem("System Devices"));
-	outline->AddItem(isaMenu = new BStringItem("ISA/Plug and Play Devices"));
-	outline->AddItem(pciMenu = new BStringItem("PCI Devices"));
-	outline->AddItem(jumperedMenu = new BStringItem("Jumpered Devices"));
+	outline = new BOutlineListView(outlinerect,"devices_list", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP_BOTTOM);
+	outline->AddItem(systemMenu = new DeviceItem(NULL, "System Devices"));
+	outline->AddItem(isaMenu = new DeviceItem(NULL, "ISA/Plug and Play Devices"));
+	outline->AddItem(pciMenu = new DeviceItem(NULL, "PCI Devices"));
+	outline->AddItem(jumperedMenu = new DeviceItem(NULL, "Jumpered Devices"));
 	
 	outline->SetSelectionMessage(new BMessage(SELECTION_CHANGED));
+	outline->SetInvocationMessage(new BMessage(BTN_CONFIGURE));
 	
 	// Add ScrollView to Devices Window
-	outlinesv = new BScrollView("scroll_devices", outline, B_FOLLOW_LEFT|B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
+	outlinesv = new BScrollView("scroll_devices", outline, B_FOLLOW_LEFT_RIGHT|B_FOLLOW_TOP_BOTTOM, 0, false, true, B_FANCY_BORDER);
 	
 	// Setup the OutlineView 
 	outline->AllAttached();
@@ -211,11 +206,11 @@ void DevicesWindow::InitWindow(void)
 	// Create BBox (or Frame)
 	BBox  *BottomFrame;
 	BRect BottomFrameRect(r.left+11,r.bottom-124,r.right-12,r.bottom-12);
-	BottomFrame = new BBox(BottomFrameRect, "BottomFrame", B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW, B_FANCY_BORDER);
+	BottomFrame = new BBox(BottomFrameRect, "BottomFrame", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW, B_FANCY_BORDER);
 	
 	// Create BButton - Configure
 	BRect ConfigureButtonRect(r.left+298,r.bottom-47,r.right-23,r.bottom-23);
-	btnConfigure = new BButton(ConfigureButtonRect,"btnConfigure","Configure", new BMessage(BTN_CONFIGURE), B_FOLLOW_LEFT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
+	btnConfigure = new BButton(ConfigureButtonRect,"btnConfigure","Configure", new BMessage(BTN_CONFIGURE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
 	btnConfigure->MakeDefault(true);
 	btnConfigure->SetEnabled(false);
 	
@@ -236,7 +231,10 @@ void DevicesWindow::InitWindow(void)
 	background->AddChild(BottomFrame);
 	
 	// Set Window Limits
-	SetSizeLimits(396,396,400,BScreen().Frame().Height());
+	float xsize = 396 + (be_plain_font->Size()-10)*40;
+	if (xsize > 443)
+		xsize = 443;
+	SetSizeLimits(xsize,xsize,400,BScreen().Frame().Height());
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -316,6 +314,17 @@ DevicesWindow::MessageReceived (BMessage *message)
 		case MODEM_ADDED:
 			{
 				
+			}
+			break;
+		case BTN_CONFIGURE:
+			{
+				DeviceItem *item = (DeviceItem *)outline->ItemAt(outline->CurrentSelection());
+				if (item && is_instance_of(item, DeviceItem) ) {
+					if (item->GetWindow()!=NULL)
+						item->GetWindow()->Activate();
+					else
+						new ConfigurationWindow(BRect(150,150,562,602), item);
+				}
 			}
 			break;
 		default:

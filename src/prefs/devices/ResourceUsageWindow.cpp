@@ -1,28 +1,27 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003-2004, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        ResourceUsageWindow.cpp
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Devices Preferences
+//  Created :    July 19, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-ResourceUsageWindow
-
-Author: Sikosis
-
-(C)2003 OBOS - Released under the MIT License
-
-*/
 
 // Includes ------------------------------------------------------------------------------------------ //
-#include <Application.h>
 #include <Box.h>
-#include <List.h>
-#include <ListView.h>
-#include <Path.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <stdio.h>
-#include <String.h>
+#include <strings.h>
 #include <TabView.h>
-#include <Window.h>
-#include <View.h>
 
-#include "Devices.h"
 #include "DevicesInfo.h"
 #include "DevicesWindows.h"
 
@@ -75,7 +74,11 @@ IRQDMAItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 		owner->SetLowColor(owner->ViewColor());
 	}
 	
-	BPoint point = itemRect.LeftTop() + BPoint(5, 10);
+	BFont font = be_plain_font;
+	font_height	finfo;
+	font.GetHeight(&finfo);
+	
+	BPoint point = BPoint(itemRect.left + 5, itemRect.bottom - finfo.descent + 1);
 	
 	owner->SetHighColor(kBlack);
 	owner->SetFont(be_plain_font);
@@ -141,7 +144,11 @@ RangeItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 		owner->SetLowColor(owner->ViewColor());
 	}
 	
-	BPoint point = itemRect.LeftTop() + BPoint(17, 10);
+	BFont font = be_plain_font;
+	font_height	finfo;
+	font.GetHeight(&finfo);
+	
+	BPoint point = BPoint(itemRect.left + 17, itemRect.bottom - finfo.descent + 1);
 	owner->SetFont(be_fixed_font);
 	owner->SetHighColor(kBlack);
 	owner->MovePenTo(point);
@@ -172,19 +179,7 @@ RangeItem::Compare(const void *firstArg, const void *secondArg)
 
 }
 
-// -------------------------------------------------------------------------------------------------- //
 
-// CenterWindowOnScreen -- Centers the BWindow to the Current Screen
-static void CenterWindowOnScreen(BWindow* w)
-{
-	BRect screenFrame = (BScreen().Frame());
-	BPoint pt;
-	pt.x = screenFrame.Width()/2 - w->Bounds().Width()/2;
-	pt.y = screenFrame.Height()/2 - w->Bounds().Height()/2;
-
-	if (screenFrame.Contains(pt))
-		w->MoveTo(pt);
-}
 // -------------------------------------------------------------------------------------------------- //
 
 
@@ -219,21 +214,21 @@ void ResourceUsageWindow::InitWindow(BList &list)
     rlist.bottom -= 47;
     
     // Create the TabView and Tabs
-	tabView = new BTabView(rtab,"resource_usage_tabview");
+	BTabView *tabView = new BTabView(rtab,"resource_usage_tabview");
 	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	
 	rtab = tabView->Bounds();
 	rtab.InsetBy(5,5);
 	
 	// Create the ListViews
-	BListView *IRQListView = new BListView(rlist, "IRQListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-						B_WILL_DRAW | B_NAVIGABLE);
-	BListView *DMAListView = new BListView(rlist, "DMAListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-						B_WILL_DRAW | B_NAVIGABLE);
-	BListView *IORangeListView = new BListView(rlist, "IORangeListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-						B_WILL_DRAW | B_NAVIGABLE);
-	BListView *memoryListView = new BListView(rlist, "memoryListView", B_SINGLE_SELECTION_LIST, B_FOLLOW_LEFT | B_FOLLOW_TOP,
-						B_WILL_DRAW | B_NAVIGABLE);
+	BListView *IRQListView = new BListView(rlist, "IRQListView", B_SINGLE_SELECTION_LIST, 
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	BListView *DMAListView = new BListView(rlist, "DMAListView", B_SINGLE_SELECTION_LIST, 
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	BListView *IORangeListView = new BListView(rlist, "IORangeListView", B_SINGLE_SELECTION_LIST, 
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
+	BListView *memoryListView = new BListView(rlist, "memoryListView", B_SINGLE_SELECTION_LIST, 
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
 						
 	BScrollView *IRQScrollView = new BScrollView("scroll_list1", IRQListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
 		0, false, true, B_FANCY_BORDER);
@@ -244,7 +239,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 	BScrollView *memoryScrollView = new BScrollView("scroll_list4", memoryListView, B_FOLLOW_LEFT|B_FOLLOW_TOP, 
 		0, false, true, B_FANCY_BORDER);
 	
-	tab = new BTab();
+	BTab *tab = new BTab();
 	tabView->AddTab(IRQScrollView, tab);
 	tab->SetLabel("IRQ");
 	tab = new BTab();
@@ -329,12 +324,34 @@ void ResourceUsageWindow::InitWindow(BList &list)
 				get_nth_resource_descriptor_of_type(current, k, B_IO_PORT_RESOURCE,
 						&r, sizeof(resource_descriptor));
 				
-				IORangeListView->AddItem(new RangeItem(r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetName()));
+				IORangeListView->AddItem(new RangeItem(r.d.r.minbase, 
+					r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetName()));
 			}
 		}
 	
 		IORangeListView->SortItems(&RangeItem::Compare);
 	}
+	
+	{
+		for (int32 j=0; j<list.CountItems(); j++) {
+			DevicesInfo *deviceInfo = (DevicesInfo *)list.ItemAt(j);
+			struct device_configuration *current = deviceInfo->GetCurrent();
+			resource_descriptor r;
+					
+			int32 num = count_resource_descriptors_of_type(current, B_MEMORY_RESOURCE);
+			
+			for (int32 k=0;k<num;k++) {
+				get_nth_resource_descriptor_of_type(current, k, B_MEMORY_RESOURCE,
+						&r, sizeof(resource_descriptor));
+				
+				memoryListView->AddItem(new RangeItem(r.d.r.minbase, 
+					r.d.r.minbase + r.d.r.len - 1, deviceInfo->GetName()));
+			}
+		}
+	
+		memoryListView->SortItems(&RangeItem::Compare);
+	}
+	
 	
 	BBox *background = new BBox(Bounds(), "background");
 	background->SetBorder(B_NO_BORDER);

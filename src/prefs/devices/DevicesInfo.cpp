@@ -1,3 +1,18 @@
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2004, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        DevicesInfo.cpp
+//  Author:      Jérôme Duval
+//  Description: Devices Preferences
+//  Created :    April 15, 2004
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 #include <strings.h>
 #include <GraphicsDefs.h>
 #include <String.h>
@@ -97,6 +112,8 @@ DevicesInfo::DevicesInfo(struct device_info *info,
 	fName = strdup((info->devtype.base < 13) 
 			? ( (s && s->name) ? s->name : base_desc[info->devtype.base]) 
 			: "Unknown");
+	fBaseString = strdup((info->devtype.base < 13) ? base_desc[info->devtype.base] : "Unknown");
+	fSubTypeString = strdup((s && s->name) ? s->name : "Unknown");	
 }
 
 
@@ -105,11 +122,15 @@ DevicesInfo::~DevicesInfo()
 	delete fInfo;
 	delete fCurrent;
 	delete fPossible;
+	delete fName;
+	delete fBaseString;
+	delete fSubTypeString;
 }
 
 DeviceItem::DeviceItem(DevicesInfo *info, const char* name)
 	: BListItem(),
-	fInfo(info)
+	fInfo(info),
+	fWindow(NULL)
 {
 	fName = strdup(name);
 }
@@ -144,23 +165,29 @@ DeviceItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 		owner->SetLowColor(owner->ViewColor());
 	}
 	
-	BPoint point = itemRect.LeftTop() + BPoint(5, 10);
+	BFont font = be_plain_font;
+	font_height	finfo;
+	font.GetHeight(&finfo);
+	
+	BPoint point = BPoint(itemRect.left + 4, itemRect.bottom - finfo.descent + 1);
 	
 	owner->SetHighColor(kBlack);
-	owner->SetFont(be_plain_font);
+	owner->SetFont(&font);
 	owner->MovePenTo(point);
 	owner->DrawString(fName);
 	
-	point += BPoint(223, 0);
-	BString string = "enabled";
-	if (!(fInfo->GetInfo()->flags & B_DEVICE_INFO_ENABLED))
-		switch (fInfo->GetInfo()->config_status) {
-			case B_DEV_RESOURCE_CONFLICT: 	string = "disabled by system"; break;
-			case B_DEV_DISABLED_BY_USER:	string = "disabled by user"; break;
-			default: 						string = "disabled for unknown reason"; break;
-		}
-		
-	owner->MovePenTo(point);
-	owner->DrawString(string.String());
+	if(fInfo) {
+		point += BPoint(222, 0);
+		BString string = "enabled";
+		if (!(fInfo->GetInfo()->flags & B_DEVICE_INFO_ENABLED))
+			switch (fInfo->GetInfo()->config_status) {
+				case B_DEV_RESOURCE_CONFLICT: 	string = "disabled by system"; break;
+				case B_DEV_DISABLED_BY_USER:	string = "disabled by user"; break;
+				default: 						string = "disabled for unknown reason"; break;
+			}
+			
+		owner->MovePenTo(point);
+		owner->DrawString(string.String());
+	}
 }
 

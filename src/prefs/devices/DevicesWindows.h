@@ -1,18 +1,34 @@
-/*
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003-2004, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        DevicesWindows.h
+//  Author:      Sikosis, Jérôme Duval
+//  Description: Devices Preferences
+//  Created :    March 04, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-Devices Windows Header by Sikosis
-
-(C)2003 OBOS
-
-*/
 
 #ifndef __DEVICESWINDOWS_H__
 #define __DEVICESWINDOWS_H__
 
-#include "Devices.h"
+#include <ListView.h>
+#include <Menu.h>
+#include <PopUpMenu.h>
+#include <Window.h>
+
+#include "DevicesInfo.h"
+
 #include "cm_wrapper.h"
 
 #define MODEM_ADDED 'moad'
+
+void CenterWindowOnScreen(BWindow* w);
 
 class ResourceUsageWindow : public BWindow
 {
@@ -23,8 +39,6 @@ class ResourceUsageWindow : public BWindow
 	    
 	private:
 		void InitWindow(BList &);
-	    BTabView		     *tabView;
-	    BTab			     *tab;
 };
 
 
@@ -37,6 +51,24 @@ class ModemWindow : public BWindow
 	private:
 		void InitWindow(void);
 	    BMessenger fMessenger;
+};
+
+class ConfigurationWindow : public BWindow
+{
+	public:
+		ConfigurationWindow(BRect frame, DeviceItem *item);
+	    ~ConfigurationWindow();
+    	virtual bool QuitRequested();
+	    virtual void MessageReceived(BMessage *message);
+	private:
+		void InitWindow(void);
+	    DeviceItem	*fItem;
+	    BMenu	*fConfigurationMenu;
+	    BPopUpMenu 	*fIRQMenu[3];
+	    BMenuField 	*fIRQField[3];
+	    BPopUpMenu	*fDMAMenu[3];
+	    BMenuField 	*fDMAField[3];
+	    BListView *ioListView, *memoryListView; 
 };
 
 
