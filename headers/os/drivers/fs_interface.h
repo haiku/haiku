@@ -7,8 +7,10 @@
 
 
 #include <OS.h>
+#include <Select.h>
 #include <module.h>
-#include <vfs_types.h>
+
+#include <sys/uio.h>
 
 
 struct dirent;

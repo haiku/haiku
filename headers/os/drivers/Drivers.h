@@ -5,6 +5,8 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <SupportDefs.h>
+#include <Select.h>
+
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,20 +15,6 @@ extern "C" {
 /* ---
 	these hooks are how the kernel accesses the device
 --- */
-
-struct selectsync;
-typedef struct selectsync selectsync;
-#ifndef B_SELECT_READ
-/* those were lacking for quite some time...
-   yes the select API will get deprecated, but for now that goes here. */
-#define B_SELECT_READ		1
-#define B_SELECT_WRITE		2
-#define B_SELECT_EXCEPTION	3
-// that's Be's prototype...
-//extern void notify_select_event(selectsync * sync, uint32 ref);
-// moved from current/headers/private/kernel/vfs.h
-extern status_t notify_select_event(struct selectsync *sync, uint32 ref, uint8 event);
-#endif
 
 typedef status_t (*device_open_hook) (const char *name, uint32 flags, void **cookie);
 typedef status_t (*device_close_hook) (void *cookie);
@@ -41,9 +29,9 @@ typedef status_t (*device_select_hook) (void *cookie, uint8 event, uint32 ref,
                                         selectsync *sync);
 typedef status_t (*device_deselect_hook) (void *cookie, uint8 event,
                                           selectsync *sync);
-typedef status_t (*device_read_pages_hook)(void *deviceCookie, off_t position, const iovec *vec,
+typedef status_t (*device_read_pages_hook)(void *cookie, off_t position, const iovec *vec,
 					size_t count, size_t *_numBytes);
-typedef status_t (*device_write_pages_hook) (void *deviceCookie, off_t position, const iovec *vec,
+typedef status_t (*device_write_pages_hook) (void *cookie, off_t position, const iovec *vec,
 					size_t count, size_t *_numBytes);
 
 #define	B_CUR_DRIVER_API_VERSION	2
