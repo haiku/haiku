@@ -1,0 +1,17 @@
+SubDir OBOS_TOP src kits midi ;
+
+UsePrivateHeaders midi ;
+
+UsePublicHeaders midi ;
+
+SharedLibrary midi :
+	Midi.cpp
+	MidiStore.cpp
+	MidiText.cpp
+	MidiEvent.cpp
+;
+
+LinkSharedOSLibs libmidi.so :
+	be
+	stdc++.r4
+;
