@@ -24,7 +24,6 @@
 #include "DString.h"
 #include "ExtentStream.h"
 #include "MemoryChunk.h"
-#include "MemoryStream.h"
 #include "UdfDebug.h"
 #include "Utils.h"
 
@@ -33,12 +32,6 @@ using Udf::check_size_error;
 
 //! Application identifier entity_id
 static const Udf::entity_id kApplicationId(0, "*OpenBeOS makeudfimage");
-
-//! Domain identifier
-static const Udf::entity_id kDomainId(0, "*OSTA UDF Compliant",
-                                      Udf::domain_id_suffix(0x0201,
-                                      Udf::DF_HARD_WRITE_PROTECT));
-
 
 static const Udf::logical_block_address kNullLogicalBlock(0, 0);
 static const Udf::extent_address kNullExtent(0, 0);
@@ -79,9 +72,12 @@ block_for_offset(off_t pos, std::list<Udf::long_address> &dataSpace, uint32 bloc
 }
 
 /*! \brief Creates a new UdfBuilder object.
+
+	\param udfRevision The UDF revision to write, formatted as in the UDF
+	       domain id suffix, i.e. UDF 2.50 is represented by 0x0250.
 */
 UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
-                       bool doIso, const char *udfVolumeName,
+                       const char *udfVolumeName, uint16 udfRevision, bool doIso, 
                        const char *isoVolumeName, const char *rootDirectory,
                        const ProgressListener &listener)
 	: fInitStatus(B_NO_INIT)
@@ -90,8 +86,11 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 	, fBlockSize(blockSize)
 	, fBlockShift(0)
 	, fDoUdf(doUdf)
-	, fDoIso(doIso)
 	, fUdfVolumeName(udfVolumeName)
+	, fUdfRevision(udfRevision)
+	, fUdfDescriptorVersion(udfRevision <= 0x0150 ? 2 : 3)
+	, fUdfDomainId(udfRevision == 0x0150 ? Udf::kDomainId150 : Udf::kDomainId201)
+	, fDoIso(doIso)
 	, fIsoVolumeName(isoVolumeName)
 	, fRootDirectory(rootDirectory ? rootDirectory : "")
 	, fRootDirectoryName(rootDirectory)
@@ -160,6 +159,14 @@ UdfBuilder::UdfBuilder(const char *outputFile, uint32 blockSize, bool doUdf,
 			}
 		}
 	}
+	// Check the udf revision
+	if (!error) {
+		error = _UdfRevision() == 0x0150 || _UdfRevision() == 0x0201
+		        ? B_OK : B_ERROR;
+		if (error) {
+			_PrintError("Invalid UDF revision 0x%04x", _UdfRevision());
+		}
+	}
 	// Check the root directory
 	if (!error) {
 		error = _RootDirectory().InitCheck();
@@ -217,7 +224,7 @@ UdfBuilder::Build()
 		
 	_OutputFile().Seek(0, SEEK_SET);
 	fListener.OnStart(fRootDirectoryName.c_str(), fOutputFilename.c_str(),
-	                  _UdfVolumeName().Utf8());
+	                  _UdfVolumeName().Utf8(), _UdfRevision());
 
 	_PrintUpdate(VERBOSITY_LOW, "Initializing volume");
 
@@ -274,7 +281,10 @@ UdfBuilder::Build()
 		}				
 		// Nsr
 		_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing nsr descriptor");
-		Udf::volume_structure_descriptor_header nsr(0, Udf::kVSDID_ECMA167_3, 1);
+		Udf::volume_structure_descriptor_header nsr(0, _UdfRevision() <= 0x0150
+		                                            ? Udf::kVSDID_ECMA167_2
+		                                            : Udf::kVSDID_ECMA167_3,
+		                                            1);
 		if (!error) {
 			_PrintUpdate(VERBOSITY_HIGH, "udf: Reserving space for nsr descriptor");
 			_Allocator().GetNextExtent(vrsBlockSize, true, extent);
@@ -359,7 +369,7 @@ UdfBuilder::Build()
 			anchor256.reserve_vds() = reserveVdsExtent;
 			Udf::descriptor_tag &tag = anchor256.tag();
 			tag.set_id(Udf::TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER);
-			tag.set_version(3);
+			tag.set_version(_UdfDescriptorVersion());
 			tag.set_serial_number(0);
 			tag.set_location(256);
 			tag.set_checksums(anchor256);
@@ -419,7 +429,7 @@ UdfBuilder::Build()
 			primary.set_flags(0);	// ToDo: maybe 1 is more appropriate?	       
 			memset(primary.reserved().data, 0, primary.reserved().size());
 			primary.tag().set_id(Udf::TAGID_PRIMARY_VOLUME_DESCRIPTOR);
-			primary.tag().set_version(3);
+			primary.tag().set_version(_UdfDescriptorVersion());
 			primary.tag().set_serial_number(0);
 				// note that the checksums haven't been set yet, since the
 				// location is dependent on which sequence (primary or reserve)
@@ -462,7 +472,9 @@ UdfBuilder::Build()
 			partition.set_vds_number(vdsNumber);
 			partition.set_partition_flags(1);
 			partition.set_partition_number(partitionNumber);
-			partition.partition_contents() = Udf::kPartitionContentsId;
+			partition.partition_contents() = _UdfRevision() <= 0x0150
+			                                 ? Udf::kPartitionContentsId1xx
+			                                 : Udf::kPartitionContentsId2xx;
 			memset(partition.partition_contents_use().data, 0,
 			       partition.partition_contents_use().size());
 			partition.set_access_type(Udf::ACCESS_READ_ONLY);
@@ -477,7 +489,7 @@ UdfBuilder::Build()
 			memset(partition.reserved().data, 0,
 			       partition.reserved().size());
 			partition.tag().set_id(Udf::TAGID_PARTITION_DESCRIPTOR);
-			partition.tag().set_version(3);
+			partition.tag().set_version(_UdfDescriptorVersion());
 			partition.tag().set_serial_number(0);
 				// note that the checksums haven't been set yet, since the
 				// location is dependent on which sequence (primary or reserve)
@@ -520,7 +532,7 @@ UdfBuilder::Build()
 			freespace.set_vds_number(vdsNumber);
 			freespace.set_allocation_descriptor_count(0);
 			freespace.tag().set_id(Udf::TAGID_UNALLOCATED_SPACE_DESCRIPTOR);
-			freespace.tag().set_version(3);
+			freespace.tag().set_version(_UdfDescriptorVersion());
 			freespace.tag().set_serial_number(0);
 				// note that the checksums haven't been set yet, since the
 				// location is dependent on which sequence (primary or reserve)
@@ -573,7 +585,7 @@ UdfBuilder::Build()
 				memcpy(logical.logical_volume_identifier().data, volumeIdField.String(),
 				       logical.logical_volume_identifier().size());
 				logical.set_logical_block_size(_BlockSize());
-				logical.domain_id() = kDomainId;
+				logical.domain_id() = _UdfDomainId();
 				memset(logical.logical_volume_contents_use().data, 0,
 				       logical.logical_volume_contents_use().size());			
 				// Allocate a block for the file set descriptor
@@ -608,7 +620,7 @@ UdfBuilder::Build()
 				map.set_partition_number(partitionNumber);
 				memcpy(logical.partition_maps(), &map, sizeof(map));
 				logical.tag().set_id(Udf::TAGID_LOGICAL_VOLUME_DESCRIPTOR);
-				logical.tag().set_version(3);
+				logical.tag().set_version(_UdfDescriptorVersion());
 				logical.tag().set_serial_number(0);
 					// note that the checksums haven't been set yet, since the
 					// location is dependent on which sequence (primary or reserve)
@@ -651,41 +663,54 @@ UdfBuilder::Build()
 			// build implementationUse descriptor
 	 		vdsNumber++;
 			implementationUse.set_vds_number(vdsNumber);
-			implementationUse.implementation_id() = Udf::kLogicalVolumeInfoId;
-			Udf::logical_volume_info &info = implementationUse.info();
-			info.character_set() = Udf::kCs0CharacterSet;
-			Udf::DString logicalVolumeId(_UdfVolumeName(),
-			                           	 info.logical_volume_id().size());
-			memcpy(info.logical_volume_id().data, logicalVolumeId.String(),
-			       info.logical_volume_id().size());
-			Udf::DString info1("Logical Volume Info #1",
-			                   info.logical_volume_info_1().size());
-			memcpy(info.logical_volume_info_1().data, info1.String(),
-			       info.logical_volume_info_1().size());
-			Udf::DString info2("Logical Volume Info #2",
-			                   info.logical_volume_info_2().size());
-			memcpy(info.logical_volume_info_2().data, info2.String(),
-			       info.logical_volume_info_2().size());
-			Udf::DString info3("Logical Volume Info #3",
-			                   info.logical_volume_info_3().size());
-			memcpy(info.logical_volume_info_3().data, info3.String(),
-			       info.logical_volume_info_3().size());
-			info.implementation_id() = Udf::kImplementationId;
-			memset(info.implementation_use().data, 0, info.implementation_use().size());
-			implementationUse.tag().set_id(Udf::TAGID_IMPLEMENTATION_USE_VOLUME_DESCRIPTOR);
-			implementationUse.tag().set_version(3);
-			implementationUse.tag().set_serial_number(0);
-				// note that the checksums haven't been set yet, since the
-				// location is dependent on which sequence (primary or reserve)
-				// the descriptor is currently being written to. Thus we have to
-				// recalculate the checksums for each sequence.
-			DUMP(implementationUse);
-			// write implementationUse descriptor to primary vds
-			implementationUse.tag().set_location(primaryVdsExtent.location()+vdsNumber);
-			implementationUse.tag().set_checksums(implementationUse);
-			ssize_t bytes = _OutputFile().WriteAt(implementationUse.tag().location() << _BlockShift(),
-			                              &implementationUse, sizeof(implementationUse));
-			error = check_size_error(bytes, sizeof(implementationUse));                              
+			switch (_UdfRevision()) {
+				case 0x0150:
+					implementationUse.implementation_id() = Udf::kLogicalVolumeInfoId150;
+					break;
+				case 0x0201:
+					implementationUse.implementation_id() = Udf::kLogicalVolumeInfoId201;
+					break;
+				default:
+					_PrintError("Invalid udf revision: 0x04x", _UdfRevision());
+					error = B_ERROR;
+			}
+			ssize_t bytes = 0;
+			if (!error) {					
+				Udf::logical_volume_info &info = implementationUse.info();
+				info.character_set() = Udf::kCs0CharacterSet;
+				Udf::DString logicalVolumeId(_UdfVolumeName(),
+				                           	 info.logical_volume_id().size());
+				memcpy(info.logical_volume_id().data, logicalVolumeId.String(),
+				       info.logical_volume_id().size());
+				Udf::DString info1("Logical Volume Info #1",
+				                   info.logical_volume_info_1().size());
+				memcpy(info.logical_volume_info_1().data, info1.String(),
+				       info.logical_volume_info_1().size());
+				Udf::DString info2("Logical Volume Info #2",
+				                   info.logical_volume_info_2().size());
+				memcpy(info.logical_volume_info_2().data, info2.String(),
+				       info.logical_volume_info_2().size());
+				Udf::DString info3("Logical Volume Info #3",
+				                   info.logical_volume_info_3().size());
+				memcpy(info.logical_volume_info_3().data, info3.String(),
+				       info.logical_volume_info_3().size());
+				info.implementation_id() = Udf::kImplementationId;
+				memset(info.implementation_use().data, 0, info.implementation_use().size());
+				implementationUse.tag().set_id(Udf::TAGID_IMPLEMENTATION_USE_VOLUME_DESCRIPTOR);
+				implementationUse.tag().set_version(_UdfDescriptorVersion());
+				implementationUse.tag().set_serial_number(0);
+					// note that the checksums haven't been set yet, since the
+					// location is dependent on which sequence (primary or reserve)
+					// the descriptor is currently being written to. Thus we have to
+					// recalculate the checksums for each sequence.
+				DUMP(implementationUse);
+				// write implementationUse descriptor to primary vds
+				implementationUse.tag().set_location(primaryVdsExtent.location()+vdsNumber);
+				implementationUse.tag().set_checksums(implementationUse);
+				bytes = _OutputFile().WriteAt(implementationUse.tag().location() << _BlockShift(),
+				                              &implementationUse, sizeof(implementationUse));
+				error = check_size_error(bytes, sizeof(implementationUse));
+			}
 			if (!error && bytes < ssize_t(_BlockSize())) {
 				ssize_t bytesLeft = _BlockSize() - bytes;
 				bytes = _OutputFile().ZeroAt((implementationUse.tag().location() << _BlockShift())
@@ -713,7 +738,7 @@ UdfBuilder::Build()
 	 		vdsNumber++;
 			Udf::terminating_descriptor terminator;
 			terminator.tag().set_id(Udf::TAGID_TERMINATING_DESCRIPTOR);
-			terminator.tag().set_version(3);
+			terminator.tag().set_version(_UdfDescriptorVersion());
 			terminator.tag().set_serial_number(0);
 			terminator.tag().set_location(integrityExtent.location()+1);
 			terminator.tag().set_checksums(terminator);
@@ -778,13 +803,13 @@ UdfBuilder::Build()
 		memset(fileset.abstract_file_id().data, 0,
 		       fileset.abstract_file_id().size());
 		fileset.root_directory_icb() = kNullAddress;
-		fileset.domain_id() = kDomainId;
+		fileset.domain_id() = _UdfDomainId();
 		fileset.next_extent() = kNullAddress;
 		fileset.system_stream_directory_icb() = kNullAddress;
 		memset(fileset.reserved().data, 0,
 		       fileset.reserved().size());
 		fileset.tag().set_id(Udf::TAGID_FILE_SET_DESCRIPTOR);
-		fileset.tag().set_version(3);
+		fileset.tag().set_version(_UdfDescriptorVersion());
 		fileset.tag().set_serial_number(0);
 		fileset.tag().set_location(filesetAddress.block());
 		fileset.tag().set_checksums(fileset);
@@ -894,11 +919,11 @@ UdfBuilder::Build()
 			lvid->implementation_id() = Udf::kImplementationId;
 			lvid->set_file_count(_Stats().Files());
 			lvid->set_directory_count(_Stats().Directories());
-			lvid->set_minimum_udf_read_revision(0x0201);
-			lvid->set_minimum_udf_write_revision(0x0201);
-			lvid->set_maximum_udf_write_revision(0x0201);
+			lvid->set_minimum_udf_read_revision(_UdfRevision());
+			lvid->set_minimum_udf_write_revision(_UdfRevision());
+			lvid->set_maximum_udf_write_revision(_UdfRevision());
 			lvid->tag().set_id(Udf::TAGID_LOGICAL_VOLUME_INTEGRITY_DESCRIPTOR);
-			lvid->tag().set_version(3);
+			lvid->tag().set_version(_UdfDescriptorVersion());
 			lvid->tag().set_serial_number(0);
 			lvid->tag().set_location(integrityExtent.location());
 			lvid->tag().set_checksums(*lvid, lvid->descriptor_size());
@@ -914,7 +939,7 @@ UdfBuilder::Build()
 			Udf::terminating_descriptor *terminator	=
 				reinterpret_cast<Udf::terminating_descriptor*>(chunk.Data());
 			terminator->tag().set_id(Udf::TAGID_TERMINATING_DESCRIPTOR);
-			terminator->tag().set_version(3);
+			terminator->tag().set_version(_UdfDescriptorVersion());
 			terminator->tag().set_serial_number(0);
 			terminator->tag().set_location(integrityExtent.location()+1);
 			terminator->tag().set_checksums(*terminator);
@@ -940,7 +965,7 @@ UdfBuilder::Build()
 			anchorN.reserve_vds() = reserveVdsExtent;
 			Udf::descriptor_tag &tag = anchorN.tag();
 			tag.set_id(Udf::TAGID_ANCHOR_VOLUME_DESCRIPTOR_POINTER);
-			tag.set_version(3);
+			tag.set_version(_UdfDescriptorVersion());
 			tag.set_serial_number(0);
 			tag.set_location(blockN);
 			tag.set_checksums(anchorN);
@@ -1249,7 +1274,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 						parent->icb().set_unique_id(uint32(_NextUniqueId()));
 					parent->set_implementation_use_length(0);
 					parent->tag().set_id(Udf::TAGID_FILE_ID_DESCRIPTOR);
-					parent->tag().set_version(3);
+					parent->tag().set_version(_UdfDescriptorVersion());
 					parent->tag().set_serial_number(0);
 					uint32 block;
 					error = block_for_offset(udfData->Position(), udfDataAddresses,
@@ -1304,6 +1329,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 						} else if (S_ISLNK(childStats.st_mode)) {
 							// Symlink
 							// For now, skip it
+							_Stats().AddSymlink();
 							_PrintWarning("No symlink support yet; skipping symlink: `%s'",
 							              childImagePath.c_str());
 							continue;
@@ -1335,7 +1361,7 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 								id->set_implementation_use_length(0);
 								memcpy(id->id(), udfName.Cs0(), udfNameLength);
 								id->tag().set_id(Udf::TAGID_FILE_ID_DESCRIPTOR);
-								id->tag().set_version(3);
+								id->tag().set_version(_UdfDescriptorVersion());
 								id->tag().set_serial_number(0);
 								uint32 block;
 								error = block_for_offset(udfData->Position(), udfDataAddresses,
@@ -1355,100 +1381,33 @@ UdfBuilder::_ProcessDirectory(BEntry &entry, const char *path, struct stat stats
 				}
 			}
 				
-			// Build udf icb
+			// Build and write udf icb
 			Udf::MemoryChunk chunk(_BlockSize());
 			if (!error)
 				error = chunk.InitCheck();
-				
-			Udf::extended_file_icb_entry *icb =
-				reinterpret_cast<Udf::extended_file_icb_entry*>(chunk.Data());
-//			Udf::file_icb_entry *icb =
-//				reinterpret_cast<Udf::file_icb_entry*>(chunk.Data());
 			if (!error) {
-				memset(icb, 0, _BlockSize());
-				Udf::icb_entry_tag &itag = icb->icb_tag();
-				itag.set_prior_recorded_number_of_direct_entries(0);
-				itag.set_strategy_type(Udf::ICB_STRATEGY_SINGLE);
-				memset(itag.strategy_parameters().data, 0,
-				       itag.strategy_parameters().size());
-				itag.set_entry_count(1);
-				itag.reserved() = 0;
-				itag.set_file_type(Udf::ICB_TYPE_DIRECTORY);
-				itag.parent_icb_location() = kNullLogicalBlock;
-				Udf::icb_entry_tag::flags_accessor &iflags = itag.flags_access();
-				// clear flags, then set those of interest
-				iflags.all_flags = 0;	
-				iflags.flags.descriptor_flags = Udf::ICB_DESCRIPTOR_TYPE_LONG;
-				iflags.flags.archive = 1;
-				icb->set_uid(0xffffffff);
-				icb->set_gid(0xffffffff);
-				icb->set_permissions(Udf::OTHER_EXECUTE | Udf::OTHER_READ
-				                    | Udf::GROUP_EXECUTE | Udf::GROUP_READ
-				                    | Udf::USER_EXECUTE | Udf::USER_READ);
-				icb->set_file_link_count(1 + attributeCount + childDirCount);
-				icb->set_record_format(0);
-				icb->set_record_display_attributes(0);
-				icb->set_record_length(0);
-//				icb->set_information_length(0);
-//				icb->set_logical_blocks_recorded(0);
-				icb->set_information_length(udfDataLength);
-				icb->set_object_size(udfDataLength);
-				icb->set_logical_blocks_recorded(_Allocator().BlocksFor(udfDataLength));
-				icb->access_date_and_time() = Udf::timestamp(stats.st_atime);
-				icb->modification_date_and_time() = Udf::timestamp(stats.st_mtime);
-				icb->creation_date_and_time() = Udf::timestamp(stats.st_crtime);
-				icb->attribute_date_and_time() = icb->creation_date_and_time();
-//				icb->attribute_date_and_time() = icb->modification_date_and_time();
-				icb->set_checkpoint(1);
-				icb->set_reserved(0);
-				icb->extended_attribute_icb() = kNullAddress;
-				icb->stream_directory_icb() = kNullAddress;
-				icb->implementation_id() = Udf::kImplementationId;
-				icb->set_unique_id(udfUniqueId);
-				icb->set_extended_attributes_length(0);
-				icb->set_allocation_descriptors_length(udfAllocationDescriptorsLength);				
-//				icb->set_allocation_descriptors_length(0);				
-				icb->tag().set_id(Udf::TAGID_EXTENDED_FILE_ENTRY);
-//				icb->tag().set_id(Udf::TAGID_FILE_ENTRY);
-				icb->tag().set_version(3);
-				icb->tag().set_serial_number(0);
-				icb->tag().set_location(icbAddress.block());
+				memset(chunk.Data(), 0, _BlockSize());
+				uint8 fileType = Udf::ICB_TYPE_DIRECTORY;
+				uint16 linkCount = 1 + attributeCount + childDirCount;
+				if (_UdfRevision() <= 0x0150) {
+					error = _WriteFileEntry(
+						reinterpret_cast<Udf::file_icb_entry*>(chunk.Data()),
+						fileType, linkCount, udfDataLength, udfDataLength,
+						stats, udfUniqueId, udfAllocationDescriptorsLength,
+						Udf::TAGID_FILE_ENTRY,
+						icbAddress, icbExtent, udfDataAddresses
+					);
+				} else {
+					error = _WriteFileEntry(
+						reinterpret_cast<Udf::extended_file_icb_entry*>(chunk.Data()),
+						fileType, linkCount, udfDataLength, udfDataLength,
+						stats, udfUniqueId, udfAllocationDescriptorsLength,
+						Udf::TAGID_EXTENDED_FILE_ENTRY,
+						icbAddress, icbExtent, udfDataAddresses
+					);
+				}
+			}				
 
-				// write allocation descriptors
-				std::list<Udf::long_address>::iterator a;
-				MemoryStream descriptorStream(icb->allocation_descriptors(),
-				                              udfAllocationDescriptorsLength);
-				error = descriptorStream.InitCheck();
-				if (!error) {                              
-					for (a = udfDataAddresses.begin();
-					       a != udfDataAddresses.end() && error == B_OK;
-					         a++)
-					{
-						PRINT(("Dumping address:\n"));
-						DUMP(*a);
-						Udf::long_address &address = *a;
-						ssize_t bytes = descriptorStream.Write(&address, sizeof(address));
-						error = check_size_error(bytes, sizeof(address));			                             
-		 			}
-		 		}
-
-				icb->tag().set_checksums(*icb, icb->descriptor_size());
-
-				PDUMP(icb);
-			}
-			
-			// Write udf icb
-			if (!error) {
-				_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing icb");
-				// write icb
-				_OutputFile().Seek(icbExtent.location() << _BlockShift(), SEEK_SET);
-				PRINT(("position, icbsize: %Ld, %ld\n", _OutputFile().Position(), sizeof(icb)));
-				ssize_t bytes = _OutputFile().Write(icb, _BlockSize());
-				PRINT(("position: %Ld\n", _OutputFile().Position()));
-				error = check_size_error(bytes, _BlockSize());
-				PRINT(("position: %Ld\n", _OutputFile().Position()));
-			}
-			
 			delete udfData;
 			udfData = NULL;
 		}
@@ -1467,10 +1426,16 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
                          node_data &node)
 {
 	DEBUG_INIT_ETC("UdfBuilder", ("path: `%s'", path));
-	uint32 udfDataLength = stats.st_size;
 	status_t error = entry.InitCheck() == B_OK && path ? B_OK : B_BAD_VALUE;	
+	uint32 udfDataLength = stats.st_size;
+	if (!error && stats.st_size > ULONG_MAX) {
+		_PrintError("File `%s' too large (filesize: %Lu bytes, max: %lu bytes)",
+		            path, stats.st_size, ULONG_MAX);
+		error = B_ERROR;	            
+	}
 	if (!error) {
-		_PrintUpdate(VERBOSITY_LOW, "Adding `%s'", path);
+		_PrintUpdate(VERBOSITY_LOW, "Adding `%s' (%s)", path,
+		             bytes_to_string(stats.st_size).c_str());
 		BFile file(&entry, B_READ_ONLY);
 		error = file.InitCheck();
 		if (!error) {
@@ -1549,97 +1514,34 @@ UdfBuilder::_ProcessFile(BEntry &entry, const char *path, struct stat stats,
 				error = check_size_error(bytes, udfDataLength);
 			}
 			
-			// Build udf icb
+			// Build and write udf icb
 			Udf::MemoryChunk chunk(_BlockSize());
 			if (!error)
-				error = chunk.InitCheck();				
-			Udf::extended_file_icb_entry *icb =
-				reinterpret_cast<Udf::extended_file_icb_entry*>(chunk.Data());
+				error = chunk.InitCheck();
 			if (!error) {
-				memset(icb, 0, _BlockSize());
-				Udf::icb_entry_tag &itag = icb->icb_tag();
-				itag.set_prior_recorded_number_of_direct_entries(0);
-				itag.set_strategy_type(Udf::ICB_STRATEGY_SINGLE);
-				memset(itag.strategy_parameters().data, 0,
-				       itag.strategy_parameters().size());
-				itag.set_entry_count(1);
-				itag.reserved() = 0;
-				itag.set_file_type(Udf::ICB_TYPE_REGULAR_FILE);
-				itag.parent_icb_location() = kNullLogicalBlock;
-				Udf::icb_entry_tag::flags_accessor &iflags = itag.flags_access();
-				// clear flags, then set those of interest
-				iflags.all_flags = 0;	
-				iflags.flags.descriptor_flags = Udf::ICB_DESCRIPTOR_TYPE_LONG;
-				iflags.flags.archive = 1;
-				icb->set_uid(0xffffffff);
-				icb->set_gid(0xffffffff);
-				icb->set_permissions(Udf::OTHER_EXECUTE | Udf::OTHER_READ
-				                    | Udf::GROUP_EXECUTE | Udf::GROUP_READ
-				                    | Udf::USER_EXECUTE | Udf::USER_READ);
-				icb->set_file_link_count(1 + attributeCount);
-				icb->set_record_format(0);
-				icb->set_record_display_attributes(0);
-				icb->set_record_length(0);
-//				icb->set_information_length(0);
-//				icb->set_logical_blocks_recorded(0);
-				icb->set_information_length(udfDataLength);
-				icb->set_object_size(udfDataLength);
-				icb->set_logical_blocks_recorded(_Allocator().BlocksFor(udfDataLength));
-				icb->access_date_and_time() = Udf::timestamp(stats.st_atime);
-				icb->modification_date_and_time() = Udf::timestamp(stats.st_mtime);
-				icb->creation_date_and_time() = Udf::timestamp(stats.st_crtime);
-				icb->attribute_date_and_time() = icb->creation_date_and_time();
-//				icb->attribute_date_and_time() = icb->modification_date_and_time();
-				icb->set_checkpoint(1);
-				icb->set_reserved(0);
-				icb->extended_attribute_icb() = kNullAddress;
-				icb->stream_directory_icb() = kNullAddress;
-				icb->implementation_id() = Udf::kImplementationId;
-				icb->set_unique_id(_NextUniqueId());
-				icb->set_extended_attributes_length(0);
-				icb->set_allocation_descriptors_length(udfAllocationDescriptorsLength);				
-//				icb->set_allocation_descriptors_length(0);				
-				icb->tag().set_id(Udf::TAGID_EXTENDED_FILE_ENTRY);
-//				icb->tag().set_id(Udf::TAGID_FILE_ENTRY);
-				icb->tag().set_version(3);
-				icb->tag().set_serial_number(0);
-				icb->tag().set_location(icbAddress.block());
+				memset(chunk.Data(), 0, _BlockSize());
+				uint8 fileType = Udf::ICB_TYPE_REGULAR_FILE;
+				uint16 linkCount = 1 + attributeCount;
+				uint64 uniqueId = _NextUniqueId();
+				if (_UdfRevision() <= 0x0150) {
+					error = _WriteFileEntry(
+						reinterpret_cast<Udf::file_icb_entry*>(chunk.Data()),
+						fileType, linkCount, udfDataLength, udfDataLength,
+						stats, uniqueId, udfAllocationDescriptorsLength,
+						Udf::TAGID_FILE_ENTRY,
+						icbAddress, icbExtent, udfDataAddresses
+					);
+				} else {
+					error = _WriteFileEntry(
+						reinterpret_cast<Udf::extended_file_icb_entry*>(chunk.Data()),
+						fileType, linkCount, udfDataLength, udfDataLength,
+						stats, uniqueId, udfAllocationDescriptorsLength,
+						Udf::TAGID_EXTENDED_FILE_ENTRY,
+						icbAddress, icbExtent, udfDataAddresses
+					);
+				}
+			}				
 
-				// write allocation descriptors
-				std::list<Udf::long_address>::iterator a;
-				MemoryStream descriptorStream(icb->allocation_descriptors(),
-				                              udfAllocationDescriptorsLength);
-				error = descriptorStream.InitCheck();
-				if (!error) {                              
-					for (a = udfDataAddresses.begin();
-					       a != udfDataAddresses.end() && error == B_OK;
-					         a++)
-					{
-						PRINT(("Dumping address:\n"));
-						DUMP(*a);
-						Udf::long_address &address = *a;
-						ssize_t bytes = descriptorStream.Write(&address, sizeof(address));
-						error = check_size_error(bytes, sizeof(address));			                             
-		 			}
-		 		}
-
-				icb->tag().set_checksums(*icb, icb->descriptor_size());
-
-				PDUMP(icb);
-			}
-			
-			// Write udf icb
-			if (!error) {
-				_PrintUpdate(VERBOSITY_MEDIUM, "udf: Writing icb");
-				// write icb
-				_OutputFile().Seek(icbExtent.location() << _BlockShift(), SEEK_SET);
-				PRINT(("position, icbsize: %Ld, %ld\n", _OutputFile().Position(), sizeof(icb)));
-				ssize_t bytes = _OutputFile().Write(icb, _BlockSize());
-				PRINT(("position: %Ld\n", _OutputFile().Position()));
-				error = check_size_error(bytes, _BlockSize());
-				PRINT(("position: %Ld\n", _OutputFile().Position()));
-			}
-			
 			delete udfData;
 			udfData = NULL;
 		}
