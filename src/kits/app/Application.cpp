@@ -226,6 +226,32 @@ BApplication::~BApplication()
 {
 	// unregister from the roster
 	BRoster::Private().RemoveApp(Team());
+
+	// tell all loopers(usualy windows) to quit. Also, wait for them.
+	BLooper*	Looper = NULL;
+	BList		looperList;
+	{
+		using namespace BPrivate;
+		BObjectLocker<BLooperList> ListLock(gLooperList);
+		if (ListLock.IsLocked())
+			gLooperList.GetLooperList(&looperList);
+	}
+
+	for (int32 i = 0; i < looperList.CountItems(); i++)
+	{
+		Looper	= dynamic_cast<BLooper*>((BLooper*)looperList.ItemAt(i));
+		if (Looper && Looper != this)
+		{
+			Looper->Lock();
+			Looper->Quit();
+		}
+	}
+
+	// tell app_server we're quiting...
+	PortLink		link(fServerFrom);
+	link.SetOpCode(B_QUIT_REQUESTED);
+	link.Flush();
+
 	// uninitialize be_app and be_app_messenger
 	be_app = NULL;
 // R5 doesn't uninitialize be_app_messenger.
@@ -831,14 +857,18 @@ void BApplication::connect_to_app_server()
 	
 			// Attach data:
 			// 1) port_id - receiver port of a regular app
-			// 2) int32 - handler ID token of the app
-			// 3) char * - signature of the regular app
+			// 2) port_id - looper port for this BApplication
+			// 3) team_id - team identification field
+			// 4) int32 - handler ID token of the app
+			// 5) char * - signature of the regular app
 			PortLink link(fServerFrom);
 			PortMessage pmsg;
 			
 			link.SetOpCode(AS_CREATE_APP);
 			link.Attach<port_id>(fServerTo);
-			link.Attach<port_id>(_get_object_token_(this));
+			link.Attach<port_id>(_get_looper_port_(this));
+			link.Attach<team_id>(Team());
+			link.Attach<int32>(_get_object_token_(this));
 			link.AttachString(fAppName);
 			link.FlushWithReply(&pmsg);
 
