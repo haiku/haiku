@@ -25,8 +25,8 @@ class BDataBuffer
 {
 	public:
 		BDataBuffer(size_t len);
-		BDataBuffer(void* data, size_t len, bool copy = false);
-		BDataBuffer(const BDataBuffer& rhs);
+		BDataBuffer(const void* data, size_t len, bool copy = false);
+		BDataBuffer(const BDataBuffer& rhs, bool copy = false);
 		~BDataBuffer();
 
 		BDataBuffer& operator=(const BDataBuffer& rhs);
@@ -45,12 +45,12 @@ class BDataBuffer
 				size_t	Size() const	{ return fSize; }
 				int32	Count()			{ return fCount; }
 
-				static void	Create(void* data, size_t len, BDataReference*& ref,
-								   bool copy = false);
+				static void	Create(const void* data, size_t len,
+								   BDataReference*& ref, bool copy = false);
 				static void Create(size_t len, BDataReference*& ref);
 
 			private:
-				BDataReference(void* data, size_t len, bool copy = false);
+				BDataReference(const void* data, size_t len, bool copy = false);
 				BDataReference(size_t len);
 				~BDataReference();
 

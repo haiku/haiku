@@ -49,14 +49,25 @@ BDataBuffer::BDataBuffer(size_t len)
 	BDataReference::Create(len, fDataRef);
 }
 //------------------------------------------------------------------------------
-BDataBuffer::BDataBuffer(void* data, size_t len, bool copy)
+BDataBuffer::BDataBuffer(const void* data, size_t len, bool copy)
 {
 	BDataReference::Create(data, len, fDataRef, copy);
 }
 //------------------------------------------------------------------------------
-BDataBuffer::BDataBuffer(const BDataBuffer& rhs)
+BDataBuffer::BDataBuffer(const BDataBuffer& rhs, bool copy)
 {
-	*this = rhs;
+	if (this != &rhs)
+	{
+		if (copy)
+		{
+			BDataReference::Create(rhs.Buffer(), rhs.BufferSize(),
+								   fDataRef, copy);
+		}
+		else
+		{
+			rhs.fDataRef->Acquire(fDataRef);
+		}
+	}
 }
 //------------------------------------------------------------------------------
 BDataBuffer::~BDataBuffer()
@@ -90,7 +101,7 @@ const void* BDataBuffer::Buffer() const
 
 
 //------------------------------------------------------------------------------
-void BDataBuffer::BDataReference::Create(void* data, size_t len,
+void BDataBuffer::BDataReference::Create(const void* data, size_t len,
 										 BDataReference*& ref, bool copy)
 {
 	BDataReference* temp = new BDataReference(data, len, copy);
@@ -119,7 +130,8 @@ void BDataBuffer::BDataReference::Release(BDataReference*& ref)
 	}
 }
 //------------------------------------------------------------------------------
-BDataBuffer::BDataReference::BDataReference(void* data, size_t len, bool copy)
+BDataBuffer::BDataReference::BDataReference(const void* data, size_t len,
+											bool copy)
 	:	fData(NULL), fSize(len), fCount(0)
 {
 	if (copy)
