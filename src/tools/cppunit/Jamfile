@@ -8,7 +8,7 @@ rule CppUnitLibrary
 	UseCppUnitHeaders ;
 	SetupObjectsDir ;
 	MakeLocateObjects [ FGristFiles $(<) ] ;
-	Main $(_lib) : $(<) ;
+	BuildPlatformMain $(_lib) : $(<) ;
 	MakeLocate $(_lib) : /boot/home/config/lib ;
 	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
 }
