@@ -2938,6 +2938,12 @@ common_fcntl(int fd, int op, uint32 argument, bool kernel)
 			status = descriptor->open_mode;
 			break;
 
+		case F_DUPFD:
+			status = new_fd_etc(get_current_io_context(kernel), descriptor, (int)argument);
+			if (status >= 0)
+				atomic_add(&descriptor->ref_count, 1);
+			break;
+
 		// ToDo: add support for more ops
 
 		default:

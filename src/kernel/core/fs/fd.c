@@ -1,8 +1,8 @@
 /* Operations on file descriptors
-** 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ *
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <OS.h>
@@ -62,14 +62,14 @@ alloc_fd(void)
 
 
 int
-new_fd(struct io_context *context, struct file_descriptor *descriptor)
+new_fd_etc(struct io_context *context, struct file_descriptor *descriptor, int firstIndex)
 {
 	int fd = -1;
 	uint32 i;
 
 	mutex_lock(&context->io_mutex);
 
-	for (i = 0; i < context->table_size; i++) {
+	for (i = firstIndex; i < context->table_size; i++) {
 		if (!context->fds[i]) {
 			fd = i;
 			break;
@@ -87,6 +87,13 @@ err:
 	mutex_unlock(&context->io_mutex);
 
 	return fd;
+}
+
+
+int
+new_fd(struct io_context *context, struct file_descriptor *descriptor)
+{
+	return new_fd_etc(context, descriptor, 0);
 }
 
 
@@ -124,7 +131,7 @@ get_fd(struct io_context *context, int fd)
 
 	if ((uint32)fd < context->table_size)
 		descriptor = context->fds[fd];
-	
+
 	if (descriptor != NULL) // fd is valid
 		atomic_add(&descriptor->ref_count, 1);
 
@@ -289,7 +296,7 @@ fd_is_valid(int fd, bool kernel)
 	struct file_descriptor *descriptor = get_fd(get_current_io_context(kernel), fd);
 	if (descriptor == NULL)
 		return false;
-	
+
 	put_fd(descriptor);
 	return true;
 }
