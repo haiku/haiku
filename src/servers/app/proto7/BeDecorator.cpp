@@ -1,4 +1,5 @@
 #include "DisplayDriver.h"
+#include <Window.h>
 #include <View.h>
 #include "LayerData.h"
 #include "ColorUtils.h"
@@ -41,7 +42,6 @@ printf("BeDecorator()\n");
 	_DoLayout();
 	
 	// This flag is used to determine whether or not we're moving the tab
-	slidetab=false;
 	solidhigh=0xFFFFFFFFFFFFFFFFLL;
 	solidlow=0;
 
@@ -58,7 +58,7 @@ printf("~BeDecorator()\n");
 
 click_type BeDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 {
-	if(closerect.Contains(pt))
+	if(closerect.Contains(pt) && (flags & B_NOT_CLOSABLE)==0)
 	{
 
 #ifdef DEBUG_DECOR
@@ -68,7 +68,7 @@ printf("BeDecorator():Clicked() - Close\n");
 		return CLICK_CLOSE;
 	}
 
-	if(zoomrect.Contains(pt))
+	if(zoomrect.Contains(pt) && (flags & B_NOT_ZOOMABLE)==0)
 	{
 
 #ifdef DEBUG_DECOR
@@ -78,7 +78,7 @@ printf("BeDecorator():Clicked() - Zoom\n");
 		return CLICK_ZOOM;
 	}
 	
-	if(resizerect.Contains(pt) && look==WLOOK_DOCUMENT)
+	if(resizerect.Contains(pt) && look==WLOOK_DOCUMENT && (flags & B_NOT_RESIZABLE)==0)
 	{
 
 #ifdef DEBUG_DECOR
@@ -89,8 +89,11 @@ printf("BeDecorator():Clicked() - Resize thumb\n");
 	}
 
 	// Clicking in the tab?
-	if(tabrect.Contains(pt))
+	if(tabrect.Contains(pt) && (flags & B_NOT_MOVABLE)==0)
 	{
+		if(buttons && (modifiers & B_SHIFT_KEY))
+			return CLICK_SLIDETAB;
+
 		// Here's part of our window management stuff
 		if(buttons==B_PRIMARY_MOUSE_BUTTON && !GetFocus())
 			return CLICK_MOVETOFRONT;
@@ -108,10 +111,11 @@ printf("BeDecorator():Clicked() - Resize thumb\n");
 #ifdef DEBUG_DECOR
 printf("BeDecorator():Clicked() - Drag\n");
 #endif		
-		if(resizerect.Contains(pt))
+		if(resizerect.Contains(pt) && (flags & B_NOT_RESIZABLE)==0)
 			return CLICK_RESIZE;
 		
-		return CLICK_DRAG;
+		if((flags & B_NOT_MOVABLE)==0)
+			return CLICK_DRAG;
 	}
 
 	// Guess user didn't click anything
@@ -197,6 +201,20 @@ void BeDecorator::MoveBy(BPoint pt)
 	zoomrect.OffsetBy(pt);
 }
 
+BPoint BeDecorator::SlideTab(float dx, float dy=0)
+{
+	// Check to see if we would slide it out of bounde
+	if( (tabrect.right+dx) > frame.right)
+		dx=frame.right-tabrect.right;
+	if( (tabrect.left+dx) < frame.left)
+		dx=frame.left-tabrect.left;
+
+	tabrect.OffsetBy(dx,0);
+	closerect.OffsetBy(dx,0);
+	zoomrect.OffsetBy(dx,0);
+	return BPoint(dx,0);
+}
+
 void BeDecorator::ResizeBy(float x, float y)
 {
 	ResizeBy(BPoint(x,y));
@@ -209,7 +227,7 @@ void BeDecorator::ResizeBy(BPoint pt)
 	_DoLayout();
 }
 
-BRegion * BeDecorator::GetFootprint(void)
+BRegion *BeDecorator::GetFootprint(void)
 {
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WindowBorder
@@ -325,9 +343,9 @@ void BeDecorator::_DrawTab(BRect r)
 	driver->FillRect(tabrect.InsetByCopy(1,1),&layerdata,(int8*)&solidhigh);
 
 	// Draw the buttons if we're supposed to	
-	if(!(flags & NOT_CLOSABLE))
+	if(!(flags & B_NOT_CLOSABLE))
 		_DrawClose(closerect);
-	if(!(flags & NOT_ZOOMABLE))
+	if(!(flags & B_NOT_ZOOMABLE))
 		_DrawZoom(zoomrect);
 }
 
@@ -443,7 +461,7 @@ void BeDecorator::_DrawFrame(BRect rect)
 	driver->StrokeRect(borderrect,&layerdata,(int8*)&solidhigh);
 
 	// Draw the resize thumb if we're supposed to
-	if(!(flags & NOT_RESIZABLE))
+	if(!(flags & B_NOT_RESIZABLE))
 	{
 		r=resizerect;
 
