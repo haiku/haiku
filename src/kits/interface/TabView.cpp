@@ -652,7 +652,6 @@ BRect BTabView::TabFrame(int32 tab_index) const
 		}
 		case B_WIDTH_FROM_WIDEST:
 		{
-			float x = 6.0f;
 			float width = 0.0f;
 
 			for (int32 i = 0; i < CountTabs(); i++)
