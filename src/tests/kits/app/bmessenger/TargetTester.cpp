@@ -96,6 +96,78 @@ void TargetTester::IsTargetLocalTest5()
 	// TODO: Implement.
 }
 
+/*
+	BHandler *Target(BLooper **looper) const
+	@case 1			this is uninitialized, looper is NULL
+	@results		should return NULL.
+ */
+void TargetTester::TargetTest1()
+{
+	BMessenger messenger;
+	CHK(messenger.Target(NULL) == NULL);
+}
+
+/*
+	BHandler *Target(BLooper **looper) const
+	@case 2			this is initialized to local target with preferred handler,
+					looper is NULL
+	@results		should return NULL.
+ */
+void TargetTester::TargetTest2()
+{
+	status_t result = B_OK;
+	BLooper *looper = new BLooper;
+	looper->Run();
+	LooperQuitter quitter(looper);
+	BMessenger messenger(NULL, looper, &result);
+	CHK(messenger.Target(NULL) == NULL);
+}
+
+/*
+	BHandler *Target(BLooper **looper) const
+	@case 3			this is initialized to local target with specific handler,
+					looper is NULL
+	@results		should return correct handler.
+ */
+void TargetTester::TargetTest3()
+{
+	// create looper and handler
+	status_t result = B_OK;
+	BLooper *looper = new BLooper;
+	looper->Run();
+	LooperQuitter quitter(looper);
+	BHandler *handler = new BHandler;
+	HandlerDeleter deleter(handler);
+	CHK(looper->Lock());
+	looper->AddHandler(handler);
+	looper->Unlock();
+	// create the messenger and do the checks
+	BMessenger messenger(handler, NULL, &result);
+	CHK(messenger.Target(NULL) == handler);
+}
+
+/*
+	BHandler *Target(BLooper **looper) const
+	@case 4			this is initialized to remote target with preferred
+					handler, looper is NULL
+	@results		should return NULL.
+ */
+void TargetTester::TargetTest4()
+{
+	// TODO: Implement.
+}
+
+/*
+	BHandler *Target(BLooper **looper) const
+	@case 5			this is initialized to remote target with specific handler,
+					looper is NULL
+	@results		should return NULL.
+ */
+void TargetTester::TargetTest5()
+{
+	// TODO: Implement.
+}
+
 
 Test* TargetTester::Suite()
 {
@@ -106,6 +178,12 @@ Test* TargetTester::Suite()
 	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest3);
 	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest4);
 	ADD_TEST(SuiteOfTests, TargetTester, IsTargetLocalTest5);
+
+	ADD_TEST(SuiteOfTests, TargetTester, TargetTest1);
+	ADD_TEST(SuiteOfTests, TargetTester, TargetTest2);
+	ADD_TEST(SuiteOfTests, TargetTester, TargetTest3);
+	ADD_TEST(SuiteOfTests, TargetTester, TargetTest4);
+	ADD_TEST(SuiteOfTests, TargetTester, TargetTest5);
 
 	return SuiteOfTests;
 }

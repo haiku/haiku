@@ -31,6 +31,12 @@ class TargetTester : public TestCase
 		void IsTargetLocalTest4();
 		void IsTargetLocalTest5();
 
+		void TargetTest1();
+		void TargetTest2();
+		void TargetTest3();
+		void TargetTest4();
+		void TargetTest5();
+
 		static Test* Suite();
 };
 
