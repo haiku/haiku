@@ -4246,7 +4246,10 @@ user_read_link(const char *userPath, char *userBuffer, size_t bufferSize)
 		return status;
 
 	// ToDo: think about buffer length and the return value at read_link()
-	return user_strlcpy(userBuffer, buffer, bufferSize);
+	status = user_strlcpy(userBuffer, buffer, bufferSize);
+	if (status >= 0)
+		status = B_OK;
+	return status;
 }
 
 
