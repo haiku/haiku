@@ -572,7 +572,8 @@ kb_device_added(const usb_device *dev, void **cookie)
 		protocol = intf->descr->interface_protocol;
 		DPRINTF_INFO ((MY_ID "interface %d: class %d, subclass %d, protocol %d\n",
 			ifno, class, subclass, protocol));
-		if (class == USB_CLASS_HID && subclass == 1)
+		if (class == USB_HID_DEVICE_CLASS 
+			&& subclass == USB_HID_INTERFACE_BOOT_SUBCLASS)
 			break;
 	}
 
@@ -588,7 +589,7 @@ kb_device_added(const usb_device *dev, void **cookie)
 	st = usb->send_request (dev, 
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
-		USB_DESCRIPTOR_HID << 8, ifno, desc_len, 
+		USB_HID_DESCRIPTOR_HID << 8, ifno, desc_len, 
 		hid_desc, desc_len, &desc_len);
 	DPRINTF_INFO ((MY_ID "get_hid_desc: st=%d, len=%d\n", 
 		(int) st, (int)desc_len));
@@ -604,7 +605,7 @@ kb_device_added(const usb_device *dev, void **cookie)
 	st = usb->send_request (dev, 
 		USB_REQTYPE_INTERFACE_IN | USB_REQTYPE_STANDARD,
 		USB_REQUEST_GET_DESCRIPTOR,
-		USB_DESCRIPTOR_HID_REPORT << 8, ifno, desc_len, 
+		USB_HID_DESCRIPTOR_REPORT << 8, ifno, desc_len, 
 		rep_desc, desc_len, &desc_len);
 	DPRINTF_INFO ((MY_ID "get_hid_rep_desc: st=%d, len=%d\n", 
 		(int) st, (int)desc_len));
@@ -736,7 +737,7 @@ static usb_notify_hooks my_notify_hooks =
 #define	SUPPORTED_DEVICES	1
 usb_support_descriptor my_supported_devices [SUPPORTED_DEVICES] =
 {
-	{ USB_CLASS_HID, 0, 0, 0, 0 },
+	{ USB_HID_DEVICE_CLASS, 0, 0, 0, 0 },
 };
 
 

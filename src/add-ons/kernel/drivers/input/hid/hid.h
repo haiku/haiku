@@ -32,6 +32,7 @@
 
 #include <drivers/Drivers.h>
 #include <drivers/USB.h>
+#include <drivers/usb/USB_hid.h>
 #include "hidparse.h"
 
 #if DEBUG
@@ -64,29 +65,6 @@ size_t cbuf_putn(cbuffer *, void *, size_t num_bytes);
 size_t cbuf_getn(cbuffer *, void *, size_t num_bytes);
 cpu_status cbuf_lock(cbuffer *);
 void cbuf_unlock(cbuffer *, cpu_status);
-
-/* HID class-specific definitions */
-
-#define	USB_CLASS_HID	3
-
-#define	USB_DESCRIPTOR_HID			0x21
-#define	USB_DESCRIPTOR_HID_REPORT	0x22
-
-#define	USB_REQUEST_HID_GET_REPORT	0x01
-
-typedef struct
-{
-	uint8	length;
-	uint8	descriptor_type;
-	uint16	hid_version;
-	uint8	country_code;
-	uint8	num_descriptors;
-	struct
-	{
-		uint8	descriptor_type;
-		uint16	descriptor_length;
-	} _PACKED descriptor_info [1];
-} _PACKED usb_hid_descriptor;
 
 /* driver specific definitions */
 
