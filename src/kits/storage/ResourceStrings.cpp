@@ -345,12 +345,12 @@ BResourceStrings::_FindString(int32 id)
 
 
 // FBC
-void BResourceStrings::_ReservedResourceStrings0() {}
-void BResourceStrings::_ReservedResourceStrings1() {}
-void BResourceStrings::_ReservedResourceStrings2() {}
-void BResourceStrings::_ReservedResourceStrings3() {}
-void BResourceStrings::_ReservedResourceStrings4() {}
-void BResourceStrings::_ReservedResourceStrings5() {}
+status_t BResourceStrings::_Reserved_ResourceStrings_0(void *) { return 0; }
+status_t BResourceStrings::_Reserved_ResourceStrings_1(void *) { return 0; }
+status_t BResourceStrings::_Reserved_ResourceStrings_2(void *) { return 0; }
+status_t BResourceStrings::_Reserved_ResourceStrings_3(void *) { return 0; }
+status_t BResourceStrings::_Reserved_ResourceStrings_4(void *) { return 0; }
+status_t BResourceStrings::_Reserved_ResourceStrings_5(void *) { return 0; }
 
 
 // _string_id_hash

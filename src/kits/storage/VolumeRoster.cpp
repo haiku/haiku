@@ -213,8 +213,8 @@ BVolumeRoster::Messenger() const
 }
 
 // FBC
-void BVolumeRoster::_ReservedVolumeRoster1() {}
-void BVolumeRoster::_ReservedVolumeRoster2() {}
+void BVolumeRoster::_SeveredVRoster1() {}
+void BVolumeRoster::_SeveredVRoster2() {}
 
 #ifdef USE_OPENBEOS_NAMESPACE
 }

@@ -642,12 +642,12 @@ BNode::Dup()
 
 
 /*! (currently unused) */
-void BNode::_ReservedNode1() { }
-void BNode::_ReservedNode2() { }
-void BNode::_ReservedNode3() { }
-void BNode::_ReservedNode4() { }
-void BNode::_ReservedNode5() { }
-void BNode::_ReservedNode6() { }
+void BNode::_RudeNode1() { }
+void BNode::_RudeNode2() { }
+void BNode::_RudeNode3() { }
+void BNode::_RudeNode4() { }
+void BNode::_RudeNode5() { }
+void BNode::_RudeNode6() { }
 
 /*!	\brief Sets the node's file descriptor.
 	Used by each implementation (i.e. BNode, BFile, BDirectory, etc.) to set

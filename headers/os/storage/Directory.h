@@ -78,12 +78,12 @@ public:
 	BDirectory &operator=(const BDirectory &dir);
 
 private:
-	virtual void _ReservedDirectory1();
-	virtual void _ReservedDirectory2();
-	virtual void _ReservedDirectory3();
-	virtual void _ReservedDirectory4();
-	virtual void _ReservedDirectory5();
-	virtual void _ReservedDirectory6();
+	virtual void _ErectorDirectory1();
+	virtual void _ErectorDirectory2();
+	virtual void _ErectorDirectory3();
+	virtual void _ErectorDirectory4();
+	virtual void _ErectorDirectory5();
+	virtual void _ErectorDirectory6();
 
 private:
 	virtual void close_fd();

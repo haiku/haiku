@@ -499,12 +499,12 @@ BFile::operator=(const BFile &file)
 
 
 // FBC
-void BFile::_ReservedFile1() {}
-void BFile::_ReservedFile2() {}
-void BFile::_ReservedFile3() {}
-void BFile::_ReservedFile4() {}
-void BFile::_ReservedFile5() {}
-void BFile::_ReservedFile6() {}
+void BFile::_PhiloFile1() {}
+void BFile::_PhiloFile2() {}
+void BFile::_PhiloFile3() {}
+void BFile::_PhiloFile4() {}
+void BFile::_PhiloFile5() {}
+void BFile::_PhiloFile6() {}
 
 
 // get_fd

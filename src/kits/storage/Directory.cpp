@@ -875,12 +875,12 @@ BDirectory::operator=(const BDirectory &dir)
 
 
 // FBC
-void BDirectory::_ReservedDirectory1() {}
-void BDirectory::_ReservedDirectory2() {}
-void BDirectory::_ReservedDirectory3() {}
-void BDirectory::_ReservedDirectory4() {}
-void BDirectory::_ReservedDirectory5() {}
-void BDirectory::_ReservedDirectory6() {}
+void BDirectory::_ErectorDirectory1() {}
+void BDirectory::_ErectorDirectory2() {}
+void BDirectory::_ErectorDirectory3() {}
+void BDirectory::_ErectorDirectory4() {}
+void BDirectory::_ErectorDirectory5() {}
+void BDirectory::_ErectorDirectory6() {}
 
 // close_fd
 //! Closes the BDirectory's file descriptor.

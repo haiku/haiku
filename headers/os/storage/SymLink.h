@@ -61,12 +61,12 @@ public:
 	BSymLink &operator=(const BSymLink &link);
 
 private:
-	virtual void _ReservedSymLink1();
-	virtual void _ReservedSymLink2();
-	virtual void _ReservedSymLink3();
-	virtual void _ReservedSymLink4();
-	virtual void _ReservedSymLink5();
-	virtual void _ReservedSymLink6();
+	virtual void _MissingSymLink1();
+	virtual void _MissingSymLink2();
+	virtual void _MissingSymLink3();
+	virtual void _MissingSymLink4();
+	virtual void _MissingSymLink5();
+	virtual void _MissingSymLink6();
 
 	// WORKAROUND
 	// fSecretEntry: Part of a work around until someone has an idea how to

@@ -39,8 +39,8 @@ public:
 	BMessenger Messenger() const;
 
 private:
-	virtual	void _ReservedVolumeRoster1();
-	virtual	void _ReservedVolumeRoster2();
+	virtual	void _SeveredVRoster1();
+	virtual	void _SeveredVRoster2();
 	
 	int32		fCookie;
 	BMessenger	*fTarget;

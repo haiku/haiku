@@ -473,14 +473,14 @@ BVolume::operator=(const BVolume &volume)
 
 
 // FBC 
-void BVolume::_ReservedVolume1() {} 
-void BVolume::_ReservedVolume2() {} 
-void BVolume::_ReservedVolume3() {} 
-void BVolume::_ReservedVolume4() {} 
-void BVolume::_ReservedVolume5() {} 
-void BVolume::_ReservedVolume6() {} 
-void BVolume::_ReservedVolume7() {} 
-void BVolume::_ReservedVolume8() {}
+void BVolume::_TurnUpTheVolume1() {} 
+void BVolume::_TurnUpTheVolume2() {} 
+void BVolume::_TurnUpTheVolume3() {} 
+void BVolume::_TurnUpTheVolume4() {} 
+void BVolume::_TurnUpTheVolume5() {} 
+void BVolume::_TurnUpTheVolume6() {} 
+void BVolume::_TurnUpTheVolume7() {} 
+void BVolume::_TurnUpTheVolume8() {}
 
 #ifdef USE_OPENBEOS_NAMESPACE
 }

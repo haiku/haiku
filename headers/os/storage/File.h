@@ -61,12 +61,12 @@ public:
 	BFile &operator=(const BFile &file);
 
 private:
-	virtual void _ReservedFile1();
-	virtual void _ReservedFile2();
-	virtual void _ReservedFile3();
-	virtual void _ReservedFile4();
-	virtual void _ReservedFile5();
-	virtual void _ReservedFile6();
+	virtual void _PhiloFile1();
+	virtual void _PhiloFile2();
+	virtual void _PhiloFile3();
+	virtual void _PhiloFile4();
+	virtual void _PhiloFile5();
+	virtual void _PhiloFile6();
 
 	uint32 _reservedData[8];
 

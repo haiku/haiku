@@ -105,12 +105,12 @@ private:
 	friend class BDirectory;
 	friend class BSymLink;
 
-	virtual void _ReservedNode1(); 	
-	virtual void _ReservedNode2();
-	virtual void _ReservedNode3();
-	virtual void _ReservedNode4();
-	virtual void _ReservedNode5();
-	virtual void _ReservedNode6();
+	virtual void _RudeNode1(); 	
+	virtual void _RudeNode2();
+	virtual void _RudeNode3();
+	virtual void _RudeNode4();
+	virtual void _RudeNode5();
+	virtual void _RudeNode6();
 
 	uint32 rudeData[4];
 

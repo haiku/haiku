@@ -79,12 +79,12 @@ private:
 	virtual _string_id_hash *_FindString(int32 id);
 
 	// FBC
-	virtual	void _ReservedResourceStrings0();
-	virtual	void _ReservedResourceStrings1();
-	virtual	void _ReservedResourceStrings2();
-	virtual	void _ReservedResourceStrings3();
-	virtual	void _ReservedResourceStrings4();
-	virtual	void _ReservedResourceStrings5();
+	virtual	status_t _Reserved_ResourceStrings_0(void *);
+	virtual	status_t _Reserved_ResourceStrings_1(void *);
+	virtual	status_t _Reserved_ResourceStrings_2(void *);
+	virtual	status_t _Reserved_ResourceStrings_3(void *);
+	virtual	status_t _Reserved_ResourceStrings_4(void *);
+	virtual	status_t _Reserved_ResourceStrings_5(void *);
 };
 
 #endif	// _RESOURCE_STRINGS_H

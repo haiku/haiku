@@ -65,14 +65,14 @@ public:
 private:
 //	friend class BVolumeRoster;
 
-	virtual void _ReservedVolume1();
-	virtual void _ReservedVolume2();
-	virtual void _ReservedVolume3();
-	virtual void _ReservedVolume4();
-	virtual void _ReservedVolume5();
-	virtual void _ReservedVolume6();
-	virtual void _ReservedVolume7();
-	virtual void _ReservedVolume8();
+	virtual void _TurnUpTheVolume1();
+	virtual void _TurnUpTheVolume2();
+	virtual void _TurnUpTheVolume3();
+	virtual void _TurnUpTheVolume4();
+	virtual void _TurnUpTheVolume5();
+	virtual void _TurnUpTheVolume6();
+	virtual void _TurnUpTheVolume7();
+	virtual void _TurnUpTheVolume8();
 
 	dev_t		fDevice;
 	status_t	fCStatus;

@@ -304,12 +304,12 @@ BSymLink::operator=(const BSymLink &link)
 }
 
 
-void BSymLink::_ReservedSymLink1() {}
-void BSymLink::_ReservedSymLink2() {}
-void BSymLink::_ReservedSymLink3() {}
-void BSymLink::_ReservedSymLink4() {}
-void BSymLink::_ReservedSymLink5() {}
-void BSymLink::_ReservedSymLink6() {}
+void BSymLink::_MissingSymLink1() {}
+void BSymLink::_MissingSymLink2() {}
+void BSymLink::_MissingSymLink3() {}
+void BSymLink::_MissingSymLink4() {}
+void BSymLink::_MissingSymLink5() {}
+void BSymLink::_MissingSymLink6() {}
 
 //! Returns the BSymLink's file descriptor.
 /*! To be used instead of accessing the BNode's private \c fFd member directly.
