@@ -10,13 +10,16 @@
 
 #include "Volume.h"
 #include "Stream.h"
+#include "BPlusTree.h"
 
 
 namespace BFS {
 
 class Directory : public ::Directory {
 	public:
-		Directory(BFS::Volume &volume, block_run run);
+		Directory(Volume &volume, block_run run);
+		Directory(Volume &volume, off_t id);
+		Directory(const Stream &stream);
 		virtual ~Directory();
 
 		status_t InitCheck();
@@ -26,11 +29,15 @@ class Directory : public ::Directory {
 
 		virtual Node *Lookup(const char *name, bool traverseLinks);
 
+		virtual status_t GetNextEntry(void *cookie, char *nameBuffer, size_t bufferSize);
 		virtual status_t GetNextNode(void *cookie, Node **_node);
 		virtual status_t Rewind(void *cookie);
 
+		virtual status_t GetName(char *name, size_t size) const;
+
 	private:
 		Stream		fStream;
+		BPlusTree	fTree;
 };
 
 }	// namespace BFS
