@@ -8,6 +8,7 @@ Preference Devices :
 	Devices.cpp
 	DevicesWindow.cpp
 	DevicesViews.cpp
+	ResourceUsageWindow.cpp
 ;
 
 LinkSharedOSLibs Devices : be ;
