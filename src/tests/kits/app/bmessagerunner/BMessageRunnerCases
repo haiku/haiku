@@ -1,0 +1,142 @@
+BMessageRunner(BMessenger target, const BMessage *message, bigtime_t interval,
+			   int32 count)
+case 1:	target is invalid, message is valid, interval > 0, count > 0 =>
+		InitCheck() should return B_OK. The message runner turns to unusable
+		as soon as the first message had to be sent.
+		GetInfo() should return B_OK.
+case 2:	target is valid, message is NULL, interval > 0, count > 0 =>
+		InitCheck() should return B_BAD_VALUE.
+		GetInfo() should return B_BAD_VALUE.
+case 3:	target is valid, message is valid, interval == 0, count > 0 =>
+		R5: InitCheck() should return B_ERROR.
+			GetInfo() should return B_BAD_VALUE.
+		OBOS: InitCheck() should return B_OK.
+			  GetInfo() should return B_OK.
+			  A minimal time interval is used (50000).
+case 4:	target is valid, message is valid, interval < 0, count > 0 =>
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK.
+		A minimal time interval is used (50000).
+case 5:	target is valid, message is valid, interval == LONGLONG_MAX,
+		count > 0 =>
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK.
+		No message should be delivered.
+case 6:	target is valid, message is valid, interval > 0, count == 0 =>
+		InitCheck() should return B_ERROR.
+		GetInfo() should return B_BAD_VALUE.
+case 7:	target is valid, message is valid, interval > 0, count < 0 =>
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK.
+		Unlimited number of messages.
+case 8:	target is valid, message is valid, interval > 0, count > 0 =>
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK.
+		count messages are sent.
+
+BMessageRunner(BMessenger target, const BMessage *message,
+			   bigtime_t interval, int32 count, BMessenger replyTo)
+cases 1-8 from first constructor
+case 9:	target is valid, message is valid, interval > 0, count > 0,
+		replyTo is invalid =>
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK.
+		count messages are sent. The replies go to the registrar!
+case 10:target is valid, message is valid, interval > 0, count > 0,
+		replyTo targets a different handler than be_app_messenger =>
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK.
+		count messages are sent. The replies go to the handler.
+
+status_t SetInterval(bigtime_t interval)
+case 1:	object is not properly initialized, interval > 0 =>
+		Should return B_BAD_VALUE.
+		InitCheck() should return B_ERROR.
+		GetInfo() should return B_BAD_VALUE.
+case 2:	object was properly initialized, but has already delivered all its
+		messages and thus became unusable, interval > 0 =>
+		Should return B_BAD_VALUE.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_BAD_VALUE.
+case 3:	object is properly initialized and has still one message to deliver,
+		interval > 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new interval.
+		The timer is reset. The last message arives after the time specified
+		by interval has passed.
+case 4:	object is properly initialized and has still some messages to deliver,
+		interval > 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new interval.
+		The timer is reset. The messages start to arive after the time
+		specified by interval.
+case 5:	object is properly initialized and has still an unlimited number of
+		messages to deliver, interval > 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new interval.
+		The timer is reset. The messages start to arive after the time
+		specified by interval.
+case 6:	object is properly initialized and has still some messages to deliver,
+		interval == 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		R5: GetInfo() should return B_BAD_VALUE.
+			All messages are delivered, but at weird times.
+		OBOS: GetInfo() should return B_OK and the minimal interval.
+			  The timer is reset. The messages start to arive after the time
+			  specified by the minimal interval.
+case 7:	object is properly initialized and has still some messages to deliver,
+		interval < 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		R5: GetInfo() should return B_BAD_VALUE.
+			All messages are delivered, but at weird times.
+		OBOS: GetInfo() should return B_OK and the minimal interval.
+			  The timer is reset. The messages start to arive after the time
+			  specified by the minimal interval.
+
+status_t SetCount(int32 count)
+case 1:	object is not properly initialized, count > 0 =>
+		Should return B_BAD_VALUE.
+		InitCheck() should return B_ERROR.
+		GetInfo() should return B_BAD_VALUE.
+case 2:	object was properly initialized, but has already delivered all its
+		messages and thus became unusable, count > 0 =>
+		Should return B_BAD_VALUE.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_BAD_VALUE.
+case 3:	object is properly initialized and has still one message to deliver,
+		count > 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new count.
+		The timer is NOT reset. count messages should arrive.
+case 4:	object is properly initialized and has still some messages to deliver,
+		count > 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new count.
+		The timer is NOT reset. count messages should arrive.
+case 5:	object is properly initialized and has still an unlimited number of
+		messages to deliver, count > 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new count.
+		The timer is NOT reset. count messages should arrive.
+case 6:	object is properly initialized and has still some messages to deliver,
+		count == 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		R5: GetInfo() should return B_OK and count 0!
+			The timer is NOT reset and a message arives after the time specified
+			by the interval!
+		OBOS: GetInfo() should return B_BAD_VALUE.
+case 7:	object is properly initialized and has still some messages to deliver,
+		count < 0 =>
+		Should return B_OK.
+		InitCheck() should return B_OK.
+		GetInfo() should return B_OK and the new count.
+		The timer is NOT reset. Unlimited number of messages.

@@ -6,6 +6,7 @@
 #include "bhandler/HandlerTest.h"
 #include "blooper/LooperTest.h"
 #include "bmessagequeue/MessageQueueTest.h"
+#include "bmessagerunner/MessageRunnerTest.h"
 #include "bmessenger/MessengerTest.h"
 #include "bpropertyinfo/PropertyInfoTest.h"
 #include "broster/RosterTest.h"
@@ -19,6 +20,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BHandler", HandlerTestSuite());
 	suite->addTest("BLooper", LooperTestSuite());
 	suite->addTest("BMessageQueue", MessageQueueTestSuite());
+	suite->addTest("BMessageRunner", MessageRunnerTestSuite());
 	suite->addTest("BMessenger", MessengerTestSuite());
 	suite->addTest("BPropertyInfo", PropertyInfoTestSuite());
 	suite->addTest("BRoster", RosterTestSuite());
