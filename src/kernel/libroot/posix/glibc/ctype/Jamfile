@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src kernel libroot posix glibc ctype ;
+
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
+
+KernelMergeObject posix_gnu_ctype.o :
+	ctype-info.c
+	: -fPIC -DPIC
+	;

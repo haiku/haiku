@@ -1,4 +1,4 @@
-/* Copyright (C) 1991,92,95,96,97,99,2000,02 Free Software Foundation, Inc.
+/* Copyright (C) 1991, 92, 95, 96, 97, 99, 2000 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -16,35 +16,29 @@
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
    02111-1307 USA.  */
 
-#define CTYPE_EXTERN_INLINE /* Define real functions for accessors.  */
 #include <ctype.h>
 #include <locale/localeinfo.h>
 
-__libc_tsd_define (, CTYPE_B)
-__libc_tsd_define (, CTYPE_TOLOWER)
-__libc_tsd_define (, CTYPE_TOUPPER)
-
-
-#include <shlib-compat.h>
-#if SHLIB_COMPAT (libc, GLIBC_2_0, GLIBC_2_3)
-
 /* Defined in locale/C-ctype.c.  */
-extern const char _nl_C_LC_CTYPE_class[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class32[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_toupper[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_tolower[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_upper[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_lower[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_alpha[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_digit[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_xdigit[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_space[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_print[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_graph[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_blank[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_cntrl[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_punct[] attribute_hidden;
-extern const char _nl_C_LC_CTYPE_class_alnum[] attribute_hidden;
+extern const char _nl_C_LC_CTYPE_class[];
+extern const char _nl_C_LC_CTYPE_class32[];
+extern const char _nl_C_LC_CTYPE_toupper[];
+extern const char _nl_C_LC_CTYPE_tolower[];
+extern const char _nl_C_LC_CTYPE_class_upper[];
+extern const char _nl_C_LC_CTYPE_class_lower[];
+extern const char _nl_C_LC_CTYPE_class_alpha[];
+extern const char _nl_C_LC_CTYPE_class_digit[];
+extern const char _nl_C_LC_CTYPE_class_xdigit[];
+extern const char _nl_C_LC_CTYPE_class_space[];
+extern const char _nl_C_LC_CTYPE_class_print[];
+extern const char _nl_C_LC_CTYPE_class_graph[];
+extern const char _nl_C_LC_CTYPE_class_blank[];
+extern const char _nl_C_LC_CTYPE_class_cntrl[];
+extern const char _nl_C_LC_CTYPE_class_punct[];
+extern const char _nl_C_LC_CTYPE_class_alnum[];
+extern const char _nl_C_LC_CTYPE_map_toupper[];
+extern const char _nl_C_LC_CTYPE_map_tolower[];
+extern const char _nl_C_LC_CTYPE_width[];
 
 #define b(t,x,o) (((const t *) _nl_C_LC_CTYPE_##x) + o)
 
@@ -54,12 +48,24 @@ const __int32_t *__ctype_tolower = b (__int32_t, tolower, 128);
 const __int32_t *__ctype_toupper = b (__int32_t, toupper, 128);
 const __uint32_t *__ctype32_tolower = b (__uint32_t, tolower, 128);
 const __uint32_t *__ctype32_toupper = b (__uint32_t, toupper, 128);
-
-compat_symbol (libc, __ctype_b, __ctype_b, GLIBC_2_0);
-compat_symbol (libc, __ctype_tolower, __ctype_tolower, GLIBC_2_0);
-compat_symbol (libc, __ctype_toupper, __ctype_toupper, GLIBC_2_0);
-compat_symbol (libc, __ctype32_b, __ctype32_b, GLIBC_2_0);
-compat_symbol (libc, __ctype32_tolower, __ctype32_tolower, GLIBC_2_2);
-compat_symbol (libc, __ctype32_toupper, __ctype32_toupper, GLIBC_2_2);
-
-#endif
+const char *__ctype32_wctype[12] =
+{
+  b(char, class_upper, 32),
+  b(char, class_lower, 32),
+  b(char, class_alpha, 32),
+  b(char, class_digit, 32),
+  b(char, class_xdigit, 32),
+  b(char, class_space, 32),
+  b(char, class_print, 32),
+  b(char, class_graph, 32),
+  b(char, class_blank, 32),
+  b(char, class_cntrl, 32),
+  b(char, class_punct, 32),
+  b(char, class_alnum, 32)
+};
+const char *__ctype32_wctrans[2] =
+{
+  b(char, map_toupper, 0),
+  b(char, map_tolower, 0)
+};
+const char *__ctype32_width = b (char, width, 0);
