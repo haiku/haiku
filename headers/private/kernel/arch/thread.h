@@ -27,8 +27,8 @@ void arch_thread_switch_kstack_and_call(struct thread *t, addr_t new_kstack, voi
 //		(those functions are "static inline" for x86 - since
 //		"extern inline" doesn't work for "gcc -g"...)
 #ifndef ARCH_x86
-static struct thread *arch_thread_get_current_thread(void);
-static void arch_thread_set_current_thread(struct thread *t);
+struct thread *arch_thread_get_current_thread(void);
+void arch_thread_set_current_thread(struct thread *t);
 #endif
 
 status_t arch_setup_signal_frame(struct thread *t, struct sigaction *sa, int sig, int sig_mask);
