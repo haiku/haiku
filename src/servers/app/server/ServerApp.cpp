@@ -27,12 +27,12 @@
 #include <AppDefs.h>
 #include <List.h>
 #include <String.h>
+#include <PortLink.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <PortLink.h>
 #include "CursorManager.h"
-//#include "Desktop.h"
+#include "Desktop.h"
 #include "DisplayDriver.h"
 #include "FontServer.h"
 #include "ServerApp.h"
@@ -80,8 +80,7 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, char *signature)
 	_appcursor=(defaultc)?new ServerCursor(defaultc):NULL;
 	_lock=create_sem(1,"ServerApp sem");
 
-	// TODO: uncomment this and include Desktop.h when the desktop classes are done
-//	_driver=get_gfxdriver();
+	_driver=GetGfxDriver();
 }
 
 //! Does all necessary teardown for application
@@ -357,8 +356,6 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 		}
 		case GFX_SET_SCREEN_MODE:
 		{
-			// TODO: Enable when we have Desktop.h
-/*
 			// Attached data
 			// 1) int32 workspace #
 			// 2) uint32 screen mode
@@ -366,20 +363,18 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			int32 workspace=*((int32*)index); index+=sizeof(int32);
 			uint32 mode=*((uint32*)index); index+=sizeof(uint32);
 
-			SetScreenSpace(workspace,mode,*((bool*)index));
-*/
+			SetSpace(workspace,mode,*((bool*)index));
+
 			break;
 		}
 		case GFX_ACTIVATE_WORKSPACE:
 		{
-			// TODO: Enable when we have Desktop.h
-/*
 			// Attached data
 			// 1) int32 workspace index
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
-			ActivateWorkspace(*((int32*)index));
-*/			break;
+			SetWorkspace(*((int32*)index));
+			break;
 		}
 		
 		// Theoretically, we could just call the driver directly, but we will

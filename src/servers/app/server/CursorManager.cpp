@@ -24,6 +24,8 @@
 //	Description:	Handles the system's cursor infrastructure
 //  
 //------------------------------------------------------------------------------
+#include "DisplayDriver.h"
+#include "Desktop.h"
 #include "CursorManager.h"
 #include "ServerCursor.h"
 #include <Errors.h>
@@ -147,9 +149,9 @@ void CursorManager::RemoveAppCursors(const char *signature)
 void CursorManager::ShowCursor(void)
 {
 	acquire_sem(_lock);
-	// TODO: enable this when Desktop.h is added to server
-//	DisplayDriver *driver=GetGfxDriver();
-//	driver->ShowCursor();
+
+	DisplayDriver *driver=GetGfxDriver();
+	driver->ShowCursor();
 	release_sem(_lock);
 }
 
@@ -157,9 +159,9 @@ void CursorManager::ShowCursor(void)
 void CursorManager::HideCursor(void)
 {
 	acquire_sem(_lock);
-	// TODO: enable this when Desktop.h is added to server
-//	DisplayDriver *driver=GetGfxDriver();
-//	driver->HideCursor();
+
+	DisplayDriver *driver=GetGfxDriver();
+	driver->HideCursor();
 	release_sem(_lock);
 }
 
@@ -167,9 +169,9 @@ void CursorManager::HideCursor(void)
 void CursorManager::ObscureCursor(void)
 {
 	acquire_sem(_lock);
-	// TODO: enable this when Desktop.h is added to server
-//	DisplayDriver *driver=GetGfxDriver();
-//	driver->ObscureCursor();
+
+	DisplayDriver *driver=GetGfxDriver();
+	driver->ObscureCursor();
 	release_sem(_lock);
 }
 
@@ -183,9 +185,8 @@ void CursorManager::SetCursor(int32 token)
 	ServerCursor *c=_FindCursor(token);
 	if(c)
 	{
-		// TODO: enable this when Desktop.h is added to server
-//		DisplayDriver *driver=GetGfxDriver();
-//		driver->SetCursor(c);
+		DisplayDriver *driver=GetGfxDriver();
+		driver->SetCursor(c);
 		_current_which=B_CURSOR_OTHER;
 	}
 	release_sem(_lock);
@@ -195,8 +196,7 @@ void CursorManager::SetCursor(cursor_which which)
 {
 	acquire_sem(_lock);
 
-	// TODO: enable this when Desktop.h is added to server
-/*	DisplayDriver *driver=GetGfxDriver();
+	DisplayDriver *driver=GetGfxDriver();
 	switch(which)
 	{
 		case B_CURSOR_DEFAULT:
@@ -256,7 +256,7 @@ void CursorManager::SetCursor(cursor_which which)
 		default:
 			break;
 	}
-*/
+
 	release_sem(_lock);
 }
 

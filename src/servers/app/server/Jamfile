@@ -25,6 +25,7 @@ Server app_server :
 	# Manager Classes
 	AppServer.cpp
 	CursorManager.cpp
+	Desktop.cpp
 	ServerApp.cpp
 
 	# Font Classes
@@ -36,6 +37,7 @@ Server app_server :
 	AccelerantDriver.cpp
 	Decorator.cpp
 	DisplayDriver.cpp
+	Layer.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
 ;
