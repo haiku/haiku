@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src prefs appearance ;
 
+UseFreeTypeHeaders ;
 UsePrivateHeaders app [ FDirName servers app ] ;
 AddResources Appearance : Appearance.rsrc ;
 
