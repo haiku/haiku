@@ -41,6 +41,14 @@ vorbisDecoder::~vorbisDecoder()
 }
 
 
+void
+vorbisDecoder::GetCodecInfo(media_codec_info &info)
+{
+	strcpy(info.short_name, "vorbis");
+	strcpy(info.pretty_name, "vorbis decoder, based on libvorbis");
+}
+
+
 status_t
 vorbisDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
@@ -87,8 +95,9 @@ vorbisDecoder::Setup(media_format *inputFormat,
 
 void vorbisDecoder::CopyInfoToEncodedFormat(media_format * format) {
 	format->type = B_MEDIA_ENCODED_AUDIO;
-	format->u.encoded_audio.encoding
-	 = (media_encoded_audio_format::audio_encoding)'vorb';
+// ToDo: this won't work any longer
+//	format->u.encoded_audio.encoding
+//	 = (media_encoded_audio_format::audio_encoding)'vorb';
 	if (fInfo.bitrate_nominal > 0) {
 		format->u.encoded_audio.bit_rate = fInfo.bitrate_nominal;
 	} else if (fInfo.bitrate_upper > 0) {
@@ -224,10 +233,19 @@ vorbisDecoderPlugin::NewDecoder()
 
 
 status_t
-vorbisDecoderPlugin::RegisterPlugin()
+vorbisDecoderPlugin::RegisterDecoder()
 {
-	PublishDecoder("audiocodec/vorbis", "vorbis", "vorbis decoder, based on libvorbis");
-	return B_OK;
+	media_format_description description;
+	// ToDo: what about B_OGG_FORMAT_FAMILY?
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'ogg ';
+	description.u.misc.codec = 'vorb';
+
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+
+	return BMediaFormats().MakeFormatFor(&description, 1, &format);
 }
 
 

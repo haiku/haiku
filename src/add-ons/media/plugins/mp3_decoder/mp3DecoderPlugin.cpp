@@ -82,6 +82,15 @@ mp3Decoder::~mp3Decoder()
 }
 
 
+void 
+mp3Decoder::GetCodecInfo(media_codec_info &info)
+{
+	strcpy(info.short_name, "mp3");
+	strcpy(info.pretty_name, "MPEG 1/2.5 audio layer 1/2/3 decoder, based on mpeg123 mpglib");
+		// ToDo: could alter the above string depending on the real format
+}
+
+
 status_t
 mp3Decoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
@@ -334,18 +343,32 @@ mp3DecoderPlugin::NewDecoder()
 
 
 status_t
-mp3DecoderPlugin::RegisterPlugin()
+mp3DecoderPlugin::RegisterDecoder()
 {
-	PublishDecoder("audiocodec/mpeg1layer1", "mp3", "MPEG 1 audio layer 1 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg1layer2", "mp3", "MPEG 1 audio layer 2 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg1layer3", "mp3", "MPEG 1 audio layer 3 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2layer1", "mp3", "MPEG 2 audio layer 1 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2layer2", "mp3", "MPEG 2 audio layer 2 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2layer3", "mp3", "MPEG 2 audio layer 3 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2.5layer1", "mp3", "MPEG 2.5 audio layer 1 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2.5layer2", "mp3", "MPEG 2.5 audio layer 2 decoder, based on mpeg123 mpglib");
-	PublishDecoder("audiocodec/mpeg2.5layer3", "mp3", "MPEG 2.5 audio layer 3 decoder, based on mpeg123 mpglib");
-	return B_OK;
+	const mpeg_id ids[] = {
+		B_MPEG_1_AUDIO_LAYER_1,
+		B_MPEG_1_AUDIO_LAYER_2,
+		B_MPEG_1_AUDIO_LAYER_3,		//	"MP3"
+		B_MPEG_2_AUDIO_LAYER_1,
+		B_MPEG_2_AUDIO_LAYER_2,
+		B_MPEG_2_AUDIO_LAYER_3,
+		B_MPEG_2_5_AUDIO_LAYER_1,
+		B_MPEG_2_5_AUDIO_LAYER_2,
+		B_MPEG_2_5_AUDIO_LAYER_3,
+	};
+	const size_t numIDs = sizeof(ids) / sizeof(mpeg_id);
+
+	media_format_description descriptions[numIDs];
+	for (size_t i = 0; i < numIDs; i++) {
+		descriptions[i].family = B_MPEG_FORMAT_FAMILY;
+		descriptions[i].u.mpeg.id = ids[i];
+	}
+
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+
+	return BMediaFormats().MakeFormatFor(descriptions, numIDs, &format);
 }
 
 

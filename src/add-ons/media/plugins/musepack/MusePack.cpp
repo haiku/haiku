@@ -22,10 +22,19 @@ MusePackPlugin::NewDecoder()
 }
 
 status_t 
-MusePackPlugin::RegisterPlugin()
+MusePackPlugin::RegisterDecoder()
 {
-	PublishDecoder("audiocodec/musepack", "musepack", "musepack decoder");
-	return B_OK;
+	media_format_description description;
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'mpc ';
+	description.u.misc.codec = 'MPC7';
+		// 7 is the most recent stream version
+
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+
+	return BMediaFormats().MakeFormatFor(&description, 1, &format);
 }
 
 

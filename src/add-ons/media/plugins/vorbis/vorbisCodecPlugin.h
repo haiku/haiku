@@ -8,6 +8,7 @@ public:
 				vorbisDecoder();
 				~vorbisDecoder();
 	
+	void		GetCodecInfo(media_codec_info &info);
 	status_t	Setup(media_format *inputFormat,
 					  const void *infoBuffer, int32 infoSize);
 
@@ -39,5 +40,5 @@ class vorbisDecoderPlugin : public DecoderPlugin
 {
 public:
 	Decoder *	NewDecoder();
-	status_t	RegisterPlugin();
+	status_t	RegisterDecoder();
 };

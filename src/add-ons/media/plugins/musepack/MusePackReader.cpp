@@ -41,11 +41,12 @@ MusePackReader::Sniff(int32 *_streamCount)
 	int error = fInfo.ReadStreamInfo(file);
 	if (error > B_OK) {
 		// error came from engine
-		printf("MusePack: ReadStreamInfo() engine error %d\n", error);
+		printf("MusePackReader: ReadStreamInfo() engine error %d\n", error);
 		return B_ERROR;
 	} else if (error < B_OK)
 		return error;
 
+	printf("MusePackReader: recognized MPC file\n");
 	*_streamCount = 1;
 	return B_OK;
 }
@@ -87,10 +88,13 @@ MusePackReader::GetStreamInfo(void *cookie, int64 *_frameCount, bigtime_t *_dura
 
 	media_format_description description;
 	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'mpc ';
 	description.u.misc.codec = 'MPC7';
-		// ToDo: does this make any sense? BTW '7' is the most recent stream version...
-	BMediaFormats formats;
-	formats.GetFormatFor(description, format);
+		// 7 is the most recent stream version
+
+	status_t status = BMediaFormats().GetFormatFor(description, format);
+	if (status < B_OK)
+		return status;
 
 	// allocate and initialize internal decoder
 	MPC_decoder *decoder = new MPC_decoder(static_cast<BPositionIO *>(Source()));

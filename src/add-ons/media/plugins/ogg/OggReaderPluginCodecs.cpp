@@ -123,8 +123,9 @@ GetVorbisCodecStreamInfo(std::vector<ogg_packet> * packets,
 	format->type = B_MEDIA_ENCODED_AUDIO;
 	format->user_data_type = B_CODEC_TYPE_INFO;
 	strncpy((char*)format->user_data, "vorb", 4);
-	format->u.encoded_audio.encoding
-      = (media_encoded_audio_format::audio_encoding)'vorb';
+	// ToDo: that won't work any longer
+	//format->u.encoded_audio.encoding
+    //  = (media_encoded_audio_format::audio_encoding)'vorb';
 	if (info.bitrate_nominal > 0) {
 		format->u.encoded_audio.bit_rate = info.bitrate_nominal;
 	} else if (info.bitrate_upper > 0) {
@@ -205,8 +206,9 @@ GetSpeexCodecStreamInfo(std::vector<ogg_packet> * packets,
 	format->type = B_MEDIA_ENCODED_AUDIO;
 	format->user_data_type = B_CODEC_TYPE_INFO;
 	strncpy((char*)format->user_data,"Spee",4);
-	format->u.encoded_audio.encoding
-       = (media_encoded_audio_format::audio_encoding)'Spee';
+	// ToDo: that won't work any longer
+	//format->u.encoded_audio.encoding
+    //   = (media_encoded_audio_format::audio_encoding)'Spee';
 	if (header->bitrate > 0) {
 		format->u.encoded_audio.bit_rate = header->bitrate;
 	} else {
@@ -301,10 +303,11 @@ GetTobiasCodecStreamInfo(std::vector<ogg_packet> * packets,
 	format->type = B_MEDIA_ENCODED_VIDEO;
 	format->user_data_type = B_CODEC_TYPE_INFO;
 	strncpy((char*)format->user_data,header->subtype,4);
-	int32 encoding = header->subtype[0] << 24 | header->subtype[1] << 16 
-                   | header->subtype[2] <<  8 | header->subtype[3];
-	format->u.encoded_video.encoding
-	   = (media_encoded_video_format::video_encoding)encoding;
+	//int32 encoding = header->subtype[0] << 24 | header->subtype[1] << 16 
+    //               | header->subtype[2] <<  8 | header->subtype[3];
+	// ToDo: that won't work any longer
+	//format->u.encoded_video.encoding
+	//   = (media_encoded_video_format::video_encoding)encoding;
 	format->u.encoded_video.frame_size
 	   = header->video.width * header->video.height;
 	format->u.encoded_video.output.display.line_width = header->video.width;

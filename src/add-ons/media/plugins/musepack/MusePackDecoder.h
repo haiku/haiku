@@ -16,7 +16,9 @@ class MusePackDecoder : public Decoder {
 	public:
 		MusePackDecoder();
 		~MusePackDecoder();
-	
+
+		void GetCodecInfo(media_codec_info &info);
+
 		status_t Setup(media_format *ioEncodedFormat,
 					const void *infoBuffer, int32 infoSize);
 

@@ -9,7 +9,8 @@ class speexDecoder : public Decoder
 public:
 				speexDecoder();
 				~speexDecoder();
-	
+
+	void		GetCodecInfo(media_codec_info &info);
 	status_t	Setup(media_format *inputFormat,
 					  const void *infoBuffer, int32 infoSize);
 
@@ -44,5 +45,5 @@ class speexDecoderPlugin : public DecoderPlugin
 {
 public:
 	Decoder *	NewDecoder();
-	status_t	RegisterPlugin();
+	status_t	RegisterDecoder();
 };

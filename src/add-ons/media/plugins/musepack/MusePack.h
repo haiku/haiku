@@ -15,7 +15,7 @@ class MusePackPlugin : public ReaderPlugin, public DecoderPlugin {
 		Reader *NewReader();
 
 		Decoder *NewDecoder();
-		status_t RegisterPlugin();
+		status_t RegisterDecoder();
 };
 
 #endif	/* MUSEPACK_PLUGIN_H */

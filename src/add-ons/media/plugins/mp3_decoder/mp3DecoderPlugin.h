@@ -8,6 +8,8 @@ public:
 				mp3Decoder();
 				~mp3Decoder();
 	
+	void		GetCodecInfo(media_codec_info &codecInfo);
+
 	status_t	Setup(media_format *ioEncodedFormat,
 					  const void *infoBuffer, int32 infoSize);
 
@@ -45,5 +47,5 @@ class mp3DecoderPlugin : public DecoderPlugin
 {
 public:
 	Decoder *	NewDecoder();
-	status_t	RegisterPlugin();
+	status_t	RegisterDecoder();
 };

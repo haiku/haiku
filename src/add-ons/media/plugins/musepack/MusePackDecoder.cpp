@@ -21,6 +21,14 @@ MusePackDecoder::~MusePackDecoder()
 }
 
 
+void
+MusePackDecoder::GetCodecInfo(media_codec_info &info)
+{
+	strcpy(info.short_name, "musepack");
+	strcpy(info.pretty_name, "MusePack audio codec based on mpcdec by Andree Buschmann");
+}
+
+
 status_t 
 MusePackDecoder::Setup(media_format *ioEncodedFormat, const void *infoBuffer, int32 infoSize)
 {

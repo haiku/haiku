@@ -42,6 +42,14 @@ speexDecoder::~speexDecoder()
 }
 
 
+void
+speexDecoder::GetCodecInfo(media_codec_info &info)
+{
+	strcpy(info.short_name, "speex");
+	strcpy(info.pretty_name, "speex decoder, based on libspeex");
+}
+
+
 status_t
 speexDecoder::Setup(media_format *inputFormat,
 				  const void *infoBuffer, int32 infoSize)
@@ -225,7 +233,7 @@ speexDecoder::Seek(uint32 seekTo,
 				 bigtime_t seekTime, bigtime_t *time)
 {
 	TRACE("speexDecoder::Seek\n");
-	int ignore = 0;
+//	int ignore = 0;
 //	speex_decoder_ctl(fDecoderState, SPEEX_RESET_STATE, &ignore);
 	return B_OK;
 }
@@ -309,10 +317,19 @@ speexDecoderPlugin::NewDecoder()
 
 
 status_t
-speexDecoderPlugin::RegisterPlugin()
+speexDecoderPlugin::RegisterDecoder()
 {
-	PublishDecoder("audiocodec/speex", "speex", "speex decoder, based on libspeex");
-	return B_OK;
+	// ToDo: what about B_OGG_FORMAT_FAMILY?
+	media_format_description description;
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.misc.file_format = 'ogg ';
+	description.u.misc.codec = 'spee';
+
+	media_format format;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+
+	return BMediaFormats().MakeFormatFor(&description, 1, &format);
 }
 
 

@@ -20,6 +20,19 @@ AudioBufferSize(int32 channel_count, uint32 sample_format, float frame_rate, big
 	return (sample_format & 0xf) * channel_count * (size_t)((frame_rate * buffer_duration) / 1000000.0);
 }
 
+
+void
+RawDecoder::GetCodecInfo(media_codec_info &info)
+{
+	strcpy(info.short_name, "raw");
+
+	if (fInputFormat.IsAudio())
+		strcpy(info.pretty_name, "Raw audio decoder");
+	else
+		strcpy(info.pretty_name, "Raw video decoder");
+}
+
+
 status_t
 RawDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
@@ -471,11 +484,30 @@ RawDecoderPlugin::NewDecoder()
 }
 
 status_t
-RawDecoderPlugin::RegisterPlugin()
+RawDecoderPlugin::RegisterDecoder()
 {
-	PublishDecoder("audiocodec/raw", "raw", "RAW audio decoder");
-	PublishDecoder("videocodec/raw", "raw", "RAW video decoder");
-	return B_OK;
+	BMediaFormats formats;
+	media_format_description description;
+	media_format format;
+
+	// audio decoder
+
+	description.family = B_MISC_FORMAT_FAMILY;
+	description.u.beos.format = B_BEOS_FORMAT_RAW_AUDIO;
+	format.type = B_MEDIA_ENCODED_AUDIO;
+	format.u.encoded_audio = media_encoded_audio_format::wildcard;
+
+	status_t status = formats.MakeFormatFor(&description, 1, &format);
+	if (status < B_OK)
+		return status;
+
+	// video decoder
+
+	description.u.beos.format = B_BEOS_FORMAT_RAW_VIDEO;
+	format.type = B_MEDIA_ENCODED_VIDEO;
+	format.u.encoded_video = media_encoded_video_format::wildcard;
+
+	return formats.MakeFormatFor(&description, 1, &format);
 }
 
 MediaPlugin *instantiate_plugin()
