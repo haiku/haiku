@@ -36,15 +36,14 @@ dbg_stack_trace(int argc, char **argv)
 	}
 
 	dprintf("stack trace for thread 0x%lx '%s'\n", t->id, t->name);
-	dprintf("frame     \tcaller:<base function+offset>\n");
-	dprintf("-------------------------------\n");
+	dprintf("frame      caller     <image>:function + offset\n");
 
 	read_ebp(ebp);
 	for (;;) {
 		bool is_iframe = false;
 		// see if the ebp matches the iframe
 		for (i = 0; i < t->arch_info.iframe_ptr; i++) {
-			if (ebp == ((uint32) t->arch_info.iframes[i] - 8)) {
+			if (ebp == ((uint32)t->arch_info.iframes[i] - 8)) {
 				// it's an iframe
 				is_iframe = true;
 			}
@@ -66,20 +65,32 @@ dbg_stack_trace(int argc, char **argv)
  			ebp = frame->ebp;
 		} else {
 			uint32 eip = *((uint32 *)ebp + 1);
-			char symname[256];
-			addr base_address;
+			const char *symbol, *image;
+			addr baseAddress;
+			bool exactMatch;
 
 			if (eip == 0 || ebp == 0)
 				break;
 
-			if (elf_lookup_symbol_address(eip, &base_address, symname, sizeof(symname)) >= 0)
-				dprintf("%p\t%p:<%p+%p>\t'%s'\n", (void *)ebp, (void *)eip, (void *)base_address, (void *)(eip - base_address), symname);
-			else
-				dprintf("%p\t%p\n", (void *)ebp, (void *)eip);
+			if (elf_lookup_symbol_address(eip, &baseAddress, &symbol,
+					&image, &exactMatch) == B_OK) {
+				if (symbol != NULL) {
+					dprintf("%08lx   %08lx   <%s>:%s + 0x%04lx%s\n", ebp, eip,
+						image, symbol, eip - baseAddress, exactMatch ? "" : " (nearest)");
+				} else {
+					dprintf("%08lx   %08lx   <%s@%p>:unknown + 0x%04lx\n", ebp, eip,
+						image, (void *)baseAddress, eip - baseAddress);
+				}
+			} else
+				dprintf("%08lx   %08lx\n", ebp, eip);
 
 			ebp = *(uint32 *)ebp;
 		}
+
+		if (ebp == 0)
+			break;
 	}
+
 	return 0;
 }
 
