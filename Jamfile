@@ -5,8 +5,9 @@ InstallFloppy installfloppy : $(OBOS_FLOPPY) ;
 NotFile alltests ;
 Depends alltests : r5tests obostests ;
 
-NotFile net_stack ;
-Depends net_stack :
+# Pseudo-target to build the network kit only
+NotFile NetworkingKit ;
+Depends NetworkingKit :
 	net_stack_driver net_server_driver
 	core
 	ethernet loopback 
