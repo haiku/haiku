@@ -107,7 +107,15 @@ private:
 //	status_t UpdateMetaMime(const char *path, bool force,
 //							uint32 *changesMask) const;
 //	bool IsApp();
-//	status_t GetMetaMime(BMimeType *meta) const;
+	status_t GetMetaMime(BMimeType *meta) const;
+
+	status_t _ReadData(const char *name, int32 id, type_code type,
+					   void *buffer, size_t bufferSize,
+					   size_t &bytesRead, void **allocatedBuffer = NULL) const;
+	status_t _WriteData(const char *name, int32 id, type_code type,
+						const void *buffer, size_t bufferSize,
+						bool findID = false);
+	status_t _RemoveData(const char *name, type_code type);
 
 	BResources		*fResources;
 	info_location	fWhere;
