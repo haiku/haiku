@@ -2,6 +2,7 @@ SubDir OBOS_TOP src tests add-ons translators ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bmptranslator ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) pngtranslator ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) stxttranslator ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tgatranslator ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) tifftranslator ] ;
@@ -9,6 +10,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) tifftranslator ] ;
 CommonTestLib libtranslatorstest.so
 	: TranslatorTestAddOn.cpp
 		BMPTranslatorTest.cpp
+		PNGTranslatorTest.cpp
 		STXTTranslatorTest.cpp
 		TGATranslatorTest.cpp
 		TIFFTranslatorTest.cpp
