@@ -504,19 +504,19 @@ mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len)
 		case MS_READ:
 			TRACE(("MS_READ\n"));	
 			return ps2_mouse_read(pos);
-		case MS_SETTYPE:
-			TRACE(("MS_SETTYPE not implemented\n"));
+		case MS_SET_TYPE:
+			TRACE(("MS_SET_TYPE not implemented\n"));
 			return EINVAL;
-		case MS_SETMAP:
-			TRACE(("MS_SETMAP (set mouse mapping) not implemented\n"));
+		case MS_SET_MAP:
+			TRACE(("MS_SET_MAP (set mouse mapping) not implemented\n"));
 			return EINVAL;
-		case MS_GETA:
-			TRACE(("MS_GETA (get mouse acceleration) not implemented\n"));
+		case MS_GET_ACCEL:
+			TRACE(("MS_GET_ACCEL (get mouse acceleration) not implemented\n"));
 			return EINVAL;
-		case MS_SETA:
-			TRACE(("MS_SETA (set mouse acceleration) not implemented\n"));
+		case MS_SET_ACCEL:
+			TRACE(("MS_SET_ACCEL (set mouse acceleration) not implemented\n"));
 			return EINVAL;
-		case MS_SETCLICK:
+		case MS_SET_CLICKSPEED:
 			TRACE(("MS_SETCLICK (set click speed)\n"));
 			sClickSpeed = *(bigtime_t *)buf;
 			return B_OK;
