@@ -8,6 +8,7 @@
 //
 //	Author:			Marcus Overhagen <Marcus@Overhagen.de>
 //					Ingo Weinhold <bonefish@users.sf.net>
+//					Axel Doerfler <axeld@pinc-software.de>
 // ----------------------------------------------------------------------
 
 #include <fcntl.h>
@@ -23,6 +24,7 @@
 
 #include "lock.h"
 #include "virtualdrive.h"
+#include "virtualdrive_icon.h"
 
 /*
 [2:07] <geist> when you open the file in the driver, use stat() to see if it's a file. if it is, call ioctl 10000 on the underlying file
@@ -46,7 +48,7 @@ static int dev_index_for_path(const char *path);
 	null-terminated array of device names supported by this driver
 ----- */
 
-static const char *virtualdrive_name[] = {
+static const char *sVirtualDriveName[] = {
 	VIRTUAL_DRIVE_DIRECTORY_REL "/0",
 	VIRTUAL_DRIVE_DIRECTORY_REL "/1",
 	VIRTUAL_DRIVE_DIRECTORY_REL "/2",
@@ -62,11 +64,12 @@ static const char *virtualdrive_name[] = {
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
+extern device_hooks sVirtualDriveHooks;
 
 lock driverlock;
 
 typedef struct device_info {
-	int32			opencount;
+	int32			open_count;
 	int				fd;
 	off_t			size;
 	bool			unused;
@@ -87,6 +90,7 @@ static int			gControlDeviceFD	= -1;
 static thread_id	gLockOwner			= -1;
 static int32		gLockOwnerNesting	= 0;
 
+
 // lock_driver
 void
 lock_driver()
@@ -98,6 +102,7 @@ lock_driver()
 	}
 	gLockOwnerNesting++;
 }
+
 
 // unlock_driver
 void
@@ -119,6 +124,7 @@ is_valid_device_index(int32 index)
 	return (index >= 0 && index < kDeviceCount);
 }
 
+
 // is_valid_data_device_index
 static inline
 bool
@@ -127,22 +133,39 @@ is_valid_data_device_index(int32 index)
 	return (is_valid_device_index(index) && index != kControlDevice);
 }
 
+
+// dev_index_for_path
+static
+int
+dev_index_for_path(const char *path)
+{
+	int i;
+	for (i = 0; i < kDeviceCount; i++) {
+		if (!strcmp(path, gDeviceInfos[i].device_path))
+			return i;
+	}
+	return -1;
+}
+
+
 // clear_device_info
 static
 void
 clear_device_info(int32 index)
 {
-TRACE("virtualdrive: clear_device_info(%ld)\n", index);
+	TRACE("virtualdrive: clear_device_info(%ld)\n", index);
+
 	device_info &info = gDeviceInfos[index];
-	info.opencount = 0;
+	info.open_count = 0;
 	info.fd = -1;
 	info.size = 0;
 	info.unused = (index != kDeviceCount - 1);
 	info.registered = !info.unused;
 	info.file[0] = '\0';
-	info.device_path = virtualdrive_name[index];
+	info.device_path = sVirtualDriveName[index];
 	info.geometry.read_only = true;
 }
+
 
 // init_device_info
 static
@@ -151,29 +174,28 @@ init_device_info(int32 index, virtual_drive_info *initInfo)
 {
 	if (!is_valid_data_device_index(index) || !initInfo)
 		return B_BAD_VALUE;
+
 	device_info &info = gDeviceInfos[index];
 	if (!info.unused)
 		return B_BAD_VALUE;
+
 	bool readOnly = (initInfo->use_geometry && initInfo->geometry.read_only);
+
 	// open the file
 	int fd = open(initInfo->file_name, (readOnly ? O_RDONLY : O_RDWR));
 	if (fd < 0)
 		return errno;
-	// disable caching for underlying file! (else this driver will deadlock)
+
 	status_t error = B_OK;
-	if (ioctl(fd, 10000) != 0) {
-		error = errno;
-		TRACE("virtualdrive: disable caching ioctl failed\n");
-	}
+
 	// get the file size
 	off_t fileSize = 0;
-	if (error == B_OK) {
-		struct stat st;
-		if (fstat(fd, &st) == 0)
-			fileSize = st.st_size;
-		else
-			error = errno;
-	}
+	struct stat st;
+	if (fstat(fd, &st) == 0)
+		fileSize = st.st_size;
+	else
+		error = errno;
+
 	// If we shall use the supplied geometry, we enlarge the file, if
 	// necessary. Otherwise we fill in the geometry according to the size of the file.
 	off_t size = 0;
@@ -218,22 +240,37 @@ init_device_info(int32 index, virtual_drive_info *initInfo)
 				* info.geometry.head_count;
 		}
 	}
+
+	if (error == B_OK) {
+		// Disable caching for underlying file! (else this driver will deadlock)
+		// We probably cannot resize the file once the cache has been disabled!
+
+		// This is a special reserved ioctl() opcode not defined anywhere in
+		// the Be headers.
+		if (ioctl(fd, 10000) != 0) {
+			TRACE("virtualdrive: disable caching ioctl failed\n");
+			return errno;
+		}
+	}
+
 	// fill in the rest of the device_info structure
 	if (error == B_OK) {
-		info.opencount = 0;
+		// open_count doesn't have to be changed here (virtualdrive_open() will do that for us)
 		info.fd = fd;
 		info.size = size;
 		info.unused = false;
 		info.registered = true;
 		strcpy(info.file, initInfo->file_name);
-		info.device_path = virtualdrive_name[index];
+		info.device_path = sVirtualDriveName[index];
 	} else {
 		// cleanup on error
 		close(fd);
-		clear_device_info(index);
+		if (info.open_count == 0)
+			clear_device_info(index);
 	}
 	return error;
 }
+
 
 // uninit_device_info
 static
@@ -242,31 +279,31 @@ uninit_device_info(int32 index)
 {
 	if (!is_valid_data_device_index(index))
 		return B_BAD_VALUE;
+
 	device_info &info = gDeviceInfos[index];
 	if (info.unused)
 		return B_BAD_VALUE;
+
 	close(info.fd);
 	clear_device_info(index);
 	return B_OK;
 }
 
-/* ----------
-	init_hardware - called once the first time the driver is loaded
------ */
+
+//	#pragma mark -
+//	public driver API
+
+
 status_t
-init_hardware (void)
+init_hardware(void)
 {
 	TRACE("virtualdrive: init_hardware\n");
 	return B_OK;
 }
 
 
-/* ----------
-	init_driver - optional function - called every time the driver
-	is loaded.
------ */
 status_t
-init_driver (void)
+init_driver(void)
 {
 	TRACE("virtualdrive: init\n");
 
@@ -280,35 +317,47 @@ init_driver (void)
 }
 
 
-/* ----------
-	uninit_driver - optional function - called every time the driver
-	is unloaded
------ */
 void
-uninit_driver (void)
+uninit_driver(void)
 {
 	TRACE("virtualdrive: uninit\n");
 	free_lock(&driverlock);
 }
 
-	
-/* ----------
-	virtualdrive_open - handle open() calls
------ */
+
+const char **
+publish_devices(void)
+{
+	TRACE("virtualdrive: publish_devices\n");
+	return sVirtualDriveName;
+}
+
+
+device_hooks *
+find_device(const char* name)
+{
+	TRACE("virtualdrive: find_device(%s)\n", name);
+	return &sVirtualDriveHooks;
+}
+
+
+//	#pragma mark -
+//	the device hooks
+
 
 static status_t
-virtualdrive_open (const char *name, uint32 flags, void** cookie)
+virtualdrive_open(const char *name, uint32 flags, void **cookie)
 {
 	TRACE("virtualdrive: open %s\n",name);
 
-	*cookie = (void *) -1;
-	
+	*cookie = (void *)-1;
+
 	lock_driver();
-	
+
 	int32 devIndex = dev_index_for_path(name);
 
 	TRACE("virtualdrive: devIndex %ld!\n", devIndex);
-	
+
 	if (!is_valid_device_index(devIndex)) {
 		TRACE("virtualdrive: wrong index!\n");
 		unlock_driver();
@@ -328,21 +377,17 @@ virtualdrive_open (const char *name, uint32 flags, void** cookie)
 	}
 
 	// store index in cookie
-	*cookie = (void *) devIndex;
+	*cookie = (void *)devIndex;
 
-	gDeviceInfos[devIndex].opencount++;
+	gDeviceInfos[devIndex].open_count++;
 
 	unlock_driver();
 	return B_OK;
 }
 
 
-/* ----------
-	virtualdrive_close - handle close() calls
------ */
-
 static status_t
-virtualdrive_close (void* cookie)
+virtualdrive_close(void *cookie)
 {
 	TRACE("virtualdrive: close\n");
 	
@@ -353,25 +398,21 @@ virtualdrive_close (void* cookie)
 		return B_OK;
 
 	lock_driver();
-	
-	gDeviceInfos[devIndex].opencount--;
-	if (gDeviceInfos[devIndex].opencount == 0 && !gDeviceInfos[devIndex].registered) {
+
+	gDeviceInfos[devIndex].open_count--;
+	if (gDeviceInfos[devIndex].open_count == 0 && !gDeviceInfos[devIndex].registered) {
 		// The last FD is closed and the device has been unregistered. Free its info.
 		uninit_device_info(devIndex);
 	}
-	
+
 	unlock_driver();
 
 	return B_OK;
 }
 
 
-/* ----------
-	virtualdrive_read - handle read() calls
------ */
-
 static status_t
-virtualdrive_read (void* cookie, off_t position, void *buffer, size_t* numBytes)
+virtualdrive_read(void *cookie, off_t position, void *buffer, size_t *numBytes)
 {
 	TRACE("virtualdrive: read pos = 0x%08Lx, bytes = 0x%08lx\n",position,*numBytes);
 	// check parameters
@@ -401,12 +442,8 @@ virtualdrive_read (void* cookie, off_t position, void *buffer, size_t* numBytes)
 }
 
 
-/* ----------
-	virtualdrive_write - handle write() calls
------ */
-
 static status_t
-virtualdrive_write(void* cookie, off_t position, const void* buffer, size_t* numBytes)
+virtualdrive_write(void *cookie, off_t position, const void *buffer, size_t *numBytes)
 {
 	TRACE("virtualdrive: write pos = 0x%08Lx, bytes = 0x%08lx\n",position,*numBytes);
 	// check parameters
@@ -436,18 +473,14 @@ virtualdrive_write(void* cookie, off_t position, const void* buffer, size_t* num
 }
 
 
-/* ----------
-	virtualdrive_control - handle ioctl calls
------ */
-
 static status_t
-virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
+virtualdrive_control(void *cookie, uint32 op, void *arg, size_t len)
 {
 	TRACE("virtualdrive: ioctl\n");
 
 	int devIndex = (int)cookie;
 	device_info &info = gDeviceInfos[devIndex];
-	
+
 	if (devIndex == kControlDevice || info.unused) {
 		// control device or unused data device
 		switch (op) {
@@ -473,35 +506,66 @@ virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
 			case B_GET_NEXT_OPEN_DEVICE:
 				TRACE("virtualdrive: another ioctl: %lx (%lu)\n", op, op);
 				return B_BAD_VALUE;
+
 			case VIRTUAL_DRIVE_REGISTER_FILE:
 			{
 				TRACE("virtualdrive: VIRTUAL_DRIVE_REGISTER_FILE\n");
-				if (devIndex != kControlDevice || !arg)
+
+				virtual_drive_info *driveInfo = (virtual_drive_info *)arg;
+				if (devIndex != kControlDevice || driveInfo == NULL
+					|| driveInfo->magic != VIRTUAL_DRIVE_MAGIC
+					|| driveInfo->drive_info_size != sizeof(virtual_drive_info))
 					return B_BAD_VALUE;
-				// find an unused data device and initialize it
-				virtual_drive_info *driveInfo = (virtual_drive_info*)arg;
+
 				status_t error = B_ERROR;
-				lock_driver();
-				for (int32 i = 0; i < kDataDeviceCount; i++) {
-					if (gDeviceInfos[i].unused) {
-						error = init_device_info(i, driveInfo);
-						if (error == B_OK) {
-							// return the device path
-							strcpy(driveInfo->device_name, "/dev/");
-							strcat(driveInfo->device_name,
-								   gDeviceInfos[i].device_path);
-							// on the first registration we need to open the
-							// control device to stay loaded
-							if (gRegistrationCount++ == 0) {
-								char path[B_PATH_NAME_LENGTH];
-								strcpy(path, "/dev/");
-								strcat(path, info.device_path);
-								gControlDeviceFD = open(path, O_RDONLY);
-							}
-						}
+				int32 i;
+
+				lock_driver();				
+
+				// first, look if we already have opened that file and see
+				// if it's available to us which happens when it has been
+				// halted but is still in use by other components
+				for (i = 0; i < kDataDeviceCount; i++) {
+					if (!gDeviceInfos[i].unused
+						&& gDeviceInfos[i].fd == -1
+						&& !gDeviceInfos[i].registered
+						&& !strcmp(gDeviceInfos[i].file, driveInfo->file_name)) {
+						// mark device as unused, so that init_device_info() will succeed
+						gDeviceInfos[i].unused = true;
+						error = B_OK;
 						break;
 					}
 				}
+
+				if (error != B_OK) {
+					// find an unused data device
+					for (i = 0; i < kDataDeviceCount; i++) {
+						if (gDeviceInfos[i].unused) {
+							error = B_OK;
+							break;
+						}
+					}
+				}
+
+				if (error == B_OK) {
+					// we found a device slot, let's initialize it
+					error = init_device_info(i, driveInfo);
+					if (error == B_OK) {
+						// return the device path
+						strcpy(driveInfo->device_name, "/dev/");
+						strcat(driveInfo->device_name, gDeviceInfos[i].device_path);
+
+						// on the first registration we need to open the
+						// control device to stay loaded
+						if (gRegistrationCount++ == 0) {
+							char path[B_PATH_NAME_LENGTH];
+							strcpy(path, "/dev/");
+							strcat(path, info.device_path);
+							gControlDeviceFD = open(path, O_RDONLY);
+						}
+					}
+				}
+
 				unlock_driver();
 				return error;
 			}
@@ -509,7 +573,9 @@ virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
 			case VIRTUAL_DRIVE_GET_INFO:
 				TRACE("virtualdrive: VIRTUAL_DRIVE_UNREGISTER_FILE/"
 					  "VIRTUAL_DRIVE_GET_INFO\n");
+				// these are called on used data files only!
 				return B_BAD_VALUE;
+
 			default:
 				TRACE("virtualdrive: unknown ioctl: %lx (%lu)\n", op, op);
 				return B_BAD_VALUE;
@@ -541,8 +607,19 @@ virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
 				return B_OK;
 
 			case B_GET_ICON:
+			{
 				TRACE("virtualdrive: B_GET_ICON\n");
+				device_icon *icon = (device_icon *)arg;
+
+				if (icon->icon_size == kPrimaryImageWidth) {
+					memcpy(icon->icon_data, kPrimaryImageBits, kPrimaryImageWidth * kPrimaryImageHeight);
+				} else if (icon->icon_size == kSecondaryImageWidth) {
+					memcpy(icon->icon_data, kSecondaryImageBits, kSecondaryImageWidth * kSecondaryImageHeight);
+				} else
+					return B_ERROR;
+
 				return B_OK;
+			}
 
 			case B_GET_GEOMETRY:
 				TRACE("virtualdrive: B_GET_GEOMETRY\n");
@@ -595,6 +672,7 @@ virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
 			case B_GET_NEXT_OPEN_DEVICE:
 				TRACE("virtualdrive: another ioctl: %lx (%lu)\n", op, op);
 				return B_BAD_VALUE;
+
 			case VIRTUAL_DRIVE_REGISTER_FILE:
 				TRACE("virtualdrive: VIRTUAL_DRIVE_REGISTER_FILE (data)\n");
 				return B_BAD_VALUE;
@@ -602,30 +680,52 @@ virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
 			{
 				TRACE("virtualdrive: VIRTUAL_DRIVE_UNREGISTER_FILE\n");
 				lock_driver();
-				bool wasRegistered = gDeviceInfos[devIndex].registered;
-				gDeviceInfos[devIndex].registered = false;
+
+				bool immediately = (bool)arg;
+				bool wasRegistered = info.registered;
+
+				info.registered = false;
+
 				// on the last unregistration we need to close the
 				// control device
 				if (wasRegistered && --gRegistrationCount == 0) {
 					close(gControlDeviceFD);
 					gControlDeviceFD = -1;
 				}
+
+				// if we "immediately" is true, we will stop our service immediately
+				// and close the underlying file, open it for other uses
+				if (immediately) {
+					TRACE("virtualdrive: close file descriptor\n");
+					// we cannot use uninit_device_info() here, since that does
+					// a little too much and would open the device for other
+					// uses.
+					close(info.fd);
+					info.fd = -1;
+				}
+
 				unlock_driver();
 				return B_OK;
 			}
 			case VIRTUAL_DRIVE_GET_INFO:
 			{
 				TRACE("virtualdrive: VIRTUAL_DRIVE_GET_INFO\n");
-				if (!arg)
+
+				virtual_drive_info *driveInfo = (virtual_drive_info *)arg;
+				if (driveInfo == NULL
+					|| driveInfo->magic != VIRTUAL_DRIVE_MAGIC
+					|| driveInfo->drive_info_size != sizeof(virtual_drive_info))
 					return B_BAD_VALUE;
-				virtual_drive_info *driveInfo = (virtual_drive_info*)arg;
+
 				strcpy(driveInfo->file_name, info.file);
 				strcpy(driveInfo->device_name, "/dev/");
 				strcat(driveInfo->device_name, info.device_path);
 				driveInfo->geometry = info.geometry;
 				driveInfo->use_geometry = true;
+				driveInfo->halted = info.fd == -1;
 				return B_OK;
 			}
+
 			default:
 				TRACE("virtualdrive: unknown ioctl: %lx (%lu)\n", op, op);
 				return B_BAD_VALUE;
@@ -635,12 +735,8 @@ virtualdrive_control (void* cookie, uint32 op, void* arg, size_t len)
 }
 
 
-/* -----
-	virtualdrive_free - called after the last device is closed, and after
-	all i/o is complete.
------ */
 static status_t
-virtualdrive_free (void* cookie)
+virtualdrive_free(void *cookie)
 {
 	TRACE("virtualdrive: free\n");
 	return B_OK;
@@ -651,7 +747,7 @@ virtualdrive_free (void* cookie)
 	function pointers for the device hooks entry points
 ----- */
 
-device_hooks virtualdrive_hooks = {
+device_hooks sVirtualDriveHooks = {
 	virtualdrive_open, 			/* -> open entry point */
 	virtualdrive_close, 		/* -> close entry point */
 	virtualdrive_free,			/* -> free cookie */
@@ -659,41 +755,4 @@ device_hooks virtualdrive_hooks = {
 	virtualdrive_read,			/* -> read entry point */
 	virtualdrive_write			/* -> write entry point */
 };
-
-/* ----------
-	publish_devices - return a null-terminated array of devices
-	supported by this driver.
------ */
-
-const char**
-publish_devices()
-{
-	TRACE("virtualdrive: publish_devices\n");
-	return virtualdrive_name;
-}
-
-/* ----------
-	find_device - return ptr to device hooks structure for a
-	given device name
------ */
-
-device_hooks*
-find_device(const char* name)
-{
-	TRACE("virtualdrive: find_device(%s)\n", name);
-	return &virtualdrive_hooks;
-}
-
-// dev_index_for_path
-static
-int
-dev_index_for_path(const char *path)
-{
-	int i;
-	for (i = 0; i < kDeviceCount; i++) {
-		if (!strcmp(path, gDeviceInfos[i].device_path))
-			return i;
-	}
-	return -1;
-}
 
