@@ -125,7 +125,7 @@ Unlock() is used to unlock the BClipboard and allow other threads in the applica
 </P></LI>
 
 <LI><P><B>Checking lock status:</B>
-IsLocked() returns true if the BClipboard is locked, and false if it is not locked.
+IsLocked() returns true if the BClipboard is locked by the current thread, and false if it is not lockedi or is locked by another thread.
 </P></LI>
 
 <LI><P><B>Checking clipboard name:</B>
