@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-9/2004
+   Rudolf Cornelissen 10/2002-12/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -90,7 +90,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.31 running.\n"));
+	LOG(1,("POWERUP: Haiku nVidia Accelerant 0.32 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -136,7 +136,6 @@ status_t nv_general_powerup()
 	case 0x004010de: /* Nvidia GeForce FX 6800 Ultra */
 	case 0x004110de: /* Nvidia GeForce FX 6800 */
 	case 0x004210de: /* Nvidia GeForce FX 6800LE */
-	case 0x004510de: /* Nvidia GeForce FX 6800 GT */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 (NV40)\n"));
@@ -148,10 +147,17 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x004510de: /* Nvidia GeForce FX 6800 GT */
+		si->ps.card_type = NV40;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6800 GT (NV40)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x004d10de: /* Nvidia Quadro FX 4400 */
 	case 0x004e10de: /* Nvidia Quadro FX 4000 */
 		si->ps.card_type = NV40;
 		si->ps.card_arch = NV40A;
-		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000 (NV40)\n"));
+		LOG(4,("POWERUP: Detected Nvidia Quadro FX 4000/4400 (NV40)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00a010de: /* Nvidia Aladdin TNT2 */
@@ -162,9 +168,16 @@ status_t nv_general_powerup()
 		break;
 	case 0x00c010de: /* Nvidia unknown FX */
 	case 0x00c110de: /* Nvidia unknown FX */
+	case 0x00c210de: /* Nvidia unknown FX */
 		si->ps.card_type = NV41;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia unknown FX (NV41)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x00f110de: /* Nvidia GeForce FX 6600 GT AGP */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 GT AGP (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x00f810de: /* Nvidia Quadro FX 3400 PCIe(?) */
@@ -250,10 +263,25 @@ status_t nv_general_powerup()
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
+	case 0x014410de: /* Nvidia GeForce FX 6600 Go */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 Go (NV43)\n"));
+		status = nvxx_general_powerup();
+		break;
 	case 0x014510de: /* Nvidia GeForce FX 6610 XL */
 		si->ps.card_type = NV43;
 		si->ps.card_arch = NV40A;
 		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6610 XL (NV43)\n"));
+		status = nvxx_general_powerup();
+		break;
+	case 0x014610de: /* Nvidia GeForce FX 6600 TE Go / 6200 TE Go */
+	case 0x014810de: /* Nvidia GeForce FX 6600 Go */
+		si->ps.card_type = NV43;
+		si->ps.card_arch = NV40A;
+		si->ps.laptop = true;
+		LOG(4,("POWERUP: Detected Nvidia GeForce FX 6600 Go / 6200 Go (NV43)\n"));
 		status = nvxx_general_powerup();
 		break;
 	case 0x014e10de: /* Nvidia Quadro FX 540 */
@@ -348,6 +376,7 @@ status_t nv_general_powerup()
 		break;
 	case 0x018a10de: /* Nvidia Quadro4 280 NVS AGP8X */
 	case 0x018b10de: /* Nvidia Quadro4 380 XGL */
+	case 0x018c10de: /* Nvidia Quadro4 NVS 50 PCI */
 		si->ps.card_type = NV18;
 		si->ps.card_arch = NV10A;
 		LOG(4,("POWERUP: Detected Nvidia Quadro4 (NV18)\n"));
