@@ -357,7 +357,6 @@ private:
 		BMediaAddOn 		*fAddOn;
 		int32				fId;
 
-		//media_input 		input;
 		BList				fInputs;
 		
 		bigtime_t 			fLatency;
@@ -378,8 +377,6 @@ private:
 		
 		MultiAudioDevice 	*fDevice;
 		
-		//int					fd; 			//file descriptor for hw driver
-		//char				device_name[32];
 		//multi_description	MD;
 		//multi_format_info 	MFI;
 		//multi_buffer_list 	MBL;

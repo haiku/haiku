@@ -126,15 +126,6 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 	AddNodeKind( B_PHYSICAL_OUTPUT );
 	AddNodeKind( B_PHYSICAL_INPUT );
 		
-	// don't overwrite available space, and be sure to terminate
-	//strncpy(input.name,"MultiAudioNode Input",B_MEDIA_NAME_LENGTH-1);
-	//input.name[B_MEDIA_NAME_LENGTH-1] = '\0';
-	// initialize the input
-	//input.node = media_node::null;               // until registration
-	//input.source = media_source::null; 
-	//input.destination = media_destination::null; // until registration
-	//GetFormat(&input.format);
-		
 	// initialize our preferred format object
 	fPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	fPreferredFormat.u.raw_audio.format = MultiAudioDevice::convert_multiaudio_format_to_media_format(fDevice->MFI.output.format);
@@ -146,10 +137,6 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 	fPreferredFormat.u.raw_audio.buffer_size = fDevice->MBL.return_record_buffer_size 
 						* (fPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 						* fPreferredFormat.u.raw_audio.channel_count;
-	
-	// we're not connected yet
-	//fOutput.destination = media_destination::null;
-	//fOutput.format = fPreferredFormat;
 	
 	config->PrintToStream();
 		
@@ -254,11 +241,6 @@ void MultiAudioNode::NodeRegistered(void)
 		}
 		currentInput->fInput.format.u.raw_audio.format = media_raw_audio_format::wildcard.format;
 	}
-	
-	/*input.destination.port = ControlPort();
-	input.destination.id = 0;
-	input.node = Node();
-	::strcpy(input.name, "Channels 1/2");*/
 	
 	node_output *currentOutput = NULL;
 	currentId = 0;
@@ -534,6 +516,10 @@ status_t MultiAudioNode::Connected(
 	channel->fInput.source = producer;
 	channel->fInput.format = with_format;
 	*out_input = channel->fInput;
+	
+	// we are sure the thread is started
+	StartThread();
+	
 	return B_OK;
 }
 
@@ -552,10 +538,7 @@ void MultiAudioNode::Disconnected(
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
-	/*if ( RunState() == B_STARTED ) {
-		StopThread();
-	}*/
-	
+		
 	channel->fInput.source = media_source::null;
 	channel->fInput.format = channel->fPreferredFormat;
 	FillWithZeros(*channel);
@@ -842,6 +825,9 @@ MultiAudioNode::Connect(status_t error, const media_source& source, const media_
 	// method.
 	if (!channel->fBufferGroup) 
 		AllocateBuffers(*channel);
+		
+	// we are sure the thread is started
+	StartThread();
 }
 
 void 
@@ -1519,7 +1505,8 @@ MultiAudioNode::RunThread()
 					input->fBuffer = NULL;
 				} else {
 					// put zeros in current buffer
-					WriteZeros(*input, input->fBufferCycle);
+					if(input->fInput.source != media_source::null)
+						WriteZeros(*input, input->fBufferCycle);
 					//PRINT(("MultiAudioNode::Runthread WriteZeros\n"));
 				}
 				
@@ -1553,7 +1540,8 @@ MultiAudioNode::RunThread()
 							buffer->Recycle();
 						} else {
 							// track how much media we've delivered so far
-							size_t nSamples = output->fOutput.format.u.raw_audio.buffer_size / sizeof(int16);
+							size_t nSamples = output->fOutput.format.u.raw_audio.buffer_size
+								/ output->fOutput.format.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK;
 							output->fSamplesSent += nSamples;
 						}
 					}
@@ -1761,6 +1749,10 @@ status_t
 MultiAudioNode::StartThread()
 {
 	CALLED();
+	// the thread is already started ?
+	if(fThread > B_OK)
+		return B_OK;
+	
 	//allocate buffer free semaphore
 	fBuffer_free = create_sem( NB_BUFFERS - 1, "multi_audio out buffer free" );
 	
@@ -1840,11 +1832,11 @@ MultiAudioNode::FillNextBuffer(multi_buffer_info &MBI, node_output &channel)
 		return NULL;
 	
 	if(fDevice==NULL)
-		PRINT(("fDevice NULL\n"));
+		fprintf(stderr,"fDevice NULL\n");
 	if(buffer->Header()==NULL)
-		PRINT(("buffer->Header() NULL\n"));
+		fprintf(stderr,"buffer->Header() NULL\n");
 	if(TimeSource()==NULL)
-		PRINT(("TimeSource() NULL\n"));
+		fprintf(stderr,"TimeSource() NULL\n");
 	
 	// now fill it with data, continuing where the last buffer left off
 	memcpy( buffer->Data(), 
