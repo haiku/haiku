@@ -5,20 +5,36 @@
 # This script will compile all files needed to create a bootable Haiku image,
 # create such an image, and copy the files to the correct location.
 #
-# You need the Userland FS Server package from Ingo Weinhold to successfully
-# create the image, and you also need to have the UserlandFSServer running
-# in the background when you start the script (as long as you don't use
-# the target directory mode). The package is available here:
-#   http://tfs.cs.tu-berlin.de/~bonefish/download/userlandfs.zip
-#
 # If you don't specify the image, $sourceDir/haiku.image will be used. In
 # the current default configuration, you have to start this script in the
-# "current" directory of the Haiku tree. A 40 MB image will be created there.
+# "current" directory of the Haiku tree. A 60 MB image will be created there.
 #
 # If you specify a target directory, no image is going to be created at
-# all, and also the Userland FS Server is not needed.
+# all.
 #
-# You may want to change it to suit your needs. Have fun!
+# The image is populated using the bfs_shell which is created from the sources.
+# The bfs_shell emulates a mini-kernel evironment with a mounted BFS. The
+# program fs_shell_command is used to deliver commands to it. Due to this
+# setup a few things need to be kept in mind, if you intend to modify the
+# script and want it to still work.
+#
+# All commands that modify the target (directory or image) are to be called
+# through variables (defined after the jam invocation block). This ensures
+# that both applications (creating and image and just installing the stuff in
+# a target directory) do still work. Additionally there's a variable `sPrefix'
+# defined, which has to be prepended to every source path, when passing the
+# path to such a command.
+#
+# A further particularity to consider is changing the current working
+# directory. When the shell command `cd' is invoked here, it affects only
+# the shell which executes this script; the bfs_shell will know nothing of
+# it. Hence, if you want the bfs_shell to know of a changed directory, you
+# must tell it. There are two commands bound to variables: `$cd' should be
+# used, when you want to change into a target directory, `$scd' when the
+# source directory shall be changed. In the latter case you usually invoke
+# first a normal shell `cd' and then the `$scd', so that both, the shell and
+# the bfs_shell know about the new dir (depending on what you intend to do
+# one may be enough, though).
 
 
 # path of the checked out Haiku sources
@@ -42,8 +58,8 @@ imageSize=60
 	# 60 MB: cylinders=122, heads=16, spt=63
 	# 100 MB: cylinders=204, heads=16, spt=63
 
-# ufs_mount path
-ufsMount=ufs_mount
+# the architecture; ToDo: set correctly (using uname?)
+arch=x86
 
 # build everything needed
 previousDir=`pwd`
@@ -58,8 +74,10 @@ else
 fi
 
 # paths of helper commands
-rc=$sourceDir/distro/x86.R1/beos/bin/rc
-resattr=$sourceDir/objects/x86.R1/tools/resattr/resattr
+rc=$sourceDir/distro/${arch}.R1/beos/bin/rc
+resattr=$sourceDir/objects/${arch}.R1/tools/resattr/resattr
+fsShellCommand=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/fs_shell/fs_shell_command
+bfsShell=$sourceDir/objects/${arch}.R1/tests/add-ons/kernel/file_systems/bfs/bfs_shell/bfs_shell
 
 export RUN_WITHOUT_APP_SERVER=1
 export TARGET_PLATFORM=haiku
@@ -93,7 +111,29 @@ jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader config_manage
 	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA $BEOS_ADD_ONS_INPUT_DEVICES\
 	libnet.so dprintf null zero random ps2_hid \<driver\>tty console \
 	\<driver\>config vga_text timezone_files keymap_files \
+	bfs_shell fs_shell_command \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
+
+
+# map the shell commands
+if [ $alreadyMounted ]; then
+	sPrefix=
+	cd=cd
+	scd=:
+	cp="copyattr -d"
+	ln=ln
+	mkdir=mkdir
+	rm=rm
+else
+	sPrefix=:
+	cd="$fsShellCommand cd"
+	scd="$fsShellCommand cd"
+	cp="$fsShellCommand xcp"
+	ln="$fsShellCommand ln"
+	mkdir="$fsShellCommand mkdir"
+	rm="$fsShellCommand rm"
+fi
+
 
 # create the image and the directory structure
 
@@ -102,175 +142,203 @@ if [ ! $alreadyMounted ]; then
 	echo "Creating image..."
 	dd if=/dev/zero of=$imagePath bs=1M count=$imageSize
 	mkbfs $imagePath Haiku >/dev/null
-	mkdir -p $targetDir
-	sync
-	$ufsMount obfs $imagePath $targetDir || exit 1
+	targetDir=/myfs
+	$bfsShell -n $imagePath > /dev/null &
+	sleep 1
 fi
 
-cd $targetDir
+$cd $targetDir
 
 echo
 echo "Creating directory structure..."
 
-mkdir -p beos/bin
-mkdir -p beos/etc
-mkdir -p beos/system/add-ons/kernel/boot
-mkdir -p beos/system/add-ons/kernel/bus_managers
-mkdir -p beos/system/add-ons/kernel/busses/ide
-mkdir -p beos/system/add-ons/kernel/drivers/bin
-mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
-mkdir -p beos/system/add-ons/kernel/drivers/dev/input
-mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
-mkdir -p beos/system/add-ons/kernel/file_systems
-mkdir -p beos/system/add-ons/kernel/console
-mkdir -p beos/system/add-ons/kernel/generic
-mkdir -p beos/system/add-ons/kernel/partitioning_systems
-mkdir -p beos/system/add-ons/Translators
-mkdir -p beos/system/add-ons/media
-mkdir -p beos/system/add-ons/input_server/devices
-mkdir -p beos/system/boot
-mkdir -p beos/system/lib
-mkdir -p beos/system/servers
-mkdir -p home/config
-mkdir -p home/config/settings/kernel/drivers
-mkdir -p var/tmp
+$mkdir -p beos/bin
+$mkdir -p beos/etc
+$mkdir -p beos/system/add-ons/kernel/boot
+$mkdir -p beos/system/add-ons/kernel/bus_managers
+$mkdir -p beos/system/add-ons/kernel/busses/ide
+$mkdir -p beos/system/add-ons/kernel/drivers/bin
+$mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
+$mkdir -p beos/system/add-ons/kernel/drivers/dev/input
+$mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
+$mkdir -p beos/system/add-ons/kernel/file_systems
+$mkdir -p beos/system/add-ons/kernel/console
+$mkdir -p beos/system/add-ons/kernel/generic
+$mkdir -p beos/system/add-ons/kernel/partitioning_systems
+$mkdir -p beos/system/add-ons/Translators
+$mkdir -p beos/system/add-ons/media
+$mkdir -p beos/system/add-ons/input_server/devices
+$mkdir -p beos/system/boot
+$mkdir -p beos/system/lib
+$mkdir -p beos/system/servers
+$mkdir -p home/config
+$mkdir -p home/config/settings/kernel/drivers
+$mkdir -p var/tmp
 
 # modules
 
 echo "Installing kernel modules..."
 
-cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel
 
 for f in bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa \
 		file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter \
 		generic/locked_pool generic/scsi_periph partitioning_systems/intel \
 		console/vga_text bus_managers/pci; do
-	cp $f $targetDir/beos/system/add-ons/kernel/$f
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/$f
 done
 
 for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
 	name=drivers/bin/$(basename $f)
-	cp $name $targetDir/beos/system/add-ons/kernel/$name
+	$cp ${sPrefix}$name $targetDir/beos/system/add-ons/kernel/$name
 done
 
-cd $sourceDir/objects/x86.R1/add-ons/kernel
+cd $sourceDir/objects/${arch}.R1/add-ons/kernel
+$scd ${sPrefix}$sourceDir/objects/${arch}.R1/add-ons/kernel
 
 for f in bus_managers/config_manager; do
 	name=$(basename $f)
-	cp $f/$name $targetDir/beos/system/add-ons/kernel/$f
+	$cp ${sPrefix}$f/$name $targetDir/beos/system/add-ons/kernel/$f
 done
 
 
 # drivers
-for f in drivers/arch/x86/keyboard/keyboard; do
-	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
+for f in drivers/arch/${arch}/keyboard/keyboard; do
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
-cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel/drivers/bin
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/bin
 for f in ps2_hid; do
-	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
-cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel/drivers/dev
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/dev
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/kernel/drivers/dev
 for f in misc/config console tty random dprintf null zero; do
-	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
 
 # kernel
 echo "Installing kernel..."
-cp $sourceDir/objects/x86.R1/kernel/kernel $targetDir/beos/system/kernel_x86
+$cp ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/kernel $targetDir/beos/system/kernel_${arch}
 
 
 # libs
 echo "Installing libraries..."
-cd $sourceDir/distro/x86.R1/beos/system/lib
-cp $BEOS_SYSTEM_LIB $targetDir/beos/system/lib/
-cd $sourceDir/objects/x86.R1/kernel/
-cp rld.so libroot.so $targetDir/beos/system/lib/
+cd $sourceDir/distro/${arch}.R1/beos/system/lib
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/lib
+for f in $BEOS_SYSTEM_LIB; do
+	$cp ${sPrefix}$f $targetDir/beos/system/lib/
+done
+
+cd $sourceDir/objects/${arch}.R1/kernel/
+$scd ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/
+$cp ${sPrefix}rld.so ${sPrefix}libroot.so $targetDir/beos/system/lib/
 
 
 # servers
 echo "Installing servers..."
-cd $sourceDir/distro/x86.R1/beos/system/servers
-copyattr -d $BEOS_SYSTEM_SERVERS $targetDir/beos/system/servers/
+cd $sourceDir/distro/${arch}.R1/beos/system/servers
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/servers
+for f in $BEOS_SYSTEM_SERVERS; do
+	$cp ${sPrefix}$f $targetDir/beos/system/servers/
+done
 
 
 # apps
 echo "Installing apps..."
 
-cd $sourceDir/objects/x86.R1/kernel
+cd $sourceDir/objects/${arch}.R1/kernel
+$scd ${sPrefix}$sourceDir/objects/${arch}.R1/kernel
 for f in fortune; do
-	cp kernel_$f $targetDir/beos/bin/$f
+	$cp ${sPrefix}kernel_$f $targetDir/beos/bin/$f
 done
 
-cd $sourceDir/distro/x86.R1/beos/bin
-cp ../apps/consoled $BEOS_BIN $targetDir/beos/bin/
-cd $targetDir/beos/bin
+cd $sourceDir/distro/${arch}.R1/beos/bin
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/bin
+for f in ../apps/consoled $BEOS_BIN; do
+	$cp ${sPrefix}$f $targetDir/beos/bin/
+done
+$cd $targetDir/beos/bin
 
 
 # scripts and data files
 echo "Installing scripts and data files..."
 cd $sourceDir
-cp data/system/boot/Bootscript data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
-cp data/etc/profile data/etc/termcap $targetDir/beos/etc/
-cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
-cp -R distro/x86.R1/beos/etc $targetDir/beos/
-cp data/settings/kernel/drivers/kernel $targetDir/home/config/settings/kernel/drivers/
-ln -sf /boot/beos/etc/timezones/Europe/Paris $targetDir/home/config/settings/timezone
-cp distro/x86.R1/beos/etc/Keymap/US-International $targetDir/home/config/settings/Key_map
+$scd ${sPrefix}$sourceDir
+$cp ${sPrefix}data/system/boot/Bootscript \
+	${sPrefix}data/system/boot/SetupEnvironment $targetDir/beos/system/boot/
+$cp ${sPrefix}data/etc/profile ${sPrefix}data/etc/termcap $targetDir/beos/etc/
+$cp ${sPrefix}src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
+$cp -r ${sPrefix}distro/${arch}.R1/beos/etc $targetDir/beos/
+$cp ${sPrefix}data/settings/kernel/drivers/kernel \
+	$targetDir/home/config/settings/kernel/drivers/
+$ln -sf /boot/beos/etc/timezones/Europe/Paris \
+	$targetDir/home/config/settings/timezone
+$cp ${sPrefix}distro/${arch}.R1/beos/etc/Keymap/US-International \
+	$targetDir/home/config/settings/Key_map
 
 
 # boot loader
 echo "Installing boot loader..."
-cd $targetDir/beos/system
-objcopy -O binary $sourceDir/objects/x86.R1/kernel/boot_loader zbeos
+cd $sourceDir/objects/${arch}.R1/kernel/
+rm -f zbeos
+objcopy -O binary boot_loader zbeos
+$cd $targetDir/beos/system
+$cp ${sPrefix}$sourceDir/objects/${arch}.R1/kernel/zbeos .
 
 
 # boot module links
 echo "Creating boot module links..."
-cd $targetDir/beos/system/add-ons/kernel/boot
+$cd $targetDir/beos/system/add-ons/kernel/boot
 for f in bus_managers/config_manager bus_managers/pci bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
-	ln -fs /boot/beos/system/add-ons/kernel/$f $(basename $f)
+	$ln -fs /boot/beos/system/add-ons/kernel/$f $(basename $f)
 done
 for f in drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
-	ln -fs /boot/beos/system/add-ons/kernel/drivers/bin/$(basename $f) .
+	$ln -fs /boot/beos/system/add-ons/kernel/drivers/bin/$(basename $f) .
 done
 
 
 # driver links
 echo "Creating driver links..."
-cd $targetDir/beos/system/add-ons/kernel
+$cd $targetDir/beos/system/add-ons/kernel
 for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/misc/config drivers/dev/tty drivers/dev/zero \
 		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd \
-		drivers/dev/misc/config drivers/dev/input/ps2_hid drivers/dev/console; do
+		drivers/dev/misc/config drivers/dev/input/ps2_hid \
+		drivers/dev/console; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
 		relName=$(dirname $relName)
 		linkName=../$linkName
 	done
-	(cd $(dirname $f); ln -fs $linkName .)
+	$ln -fs $linkName $(dirname $f)
 done
 
 
 # add-ons
 echo "Copying add-ons..."
 
-cd $sourceDir/distro/x86.R1/beos/system/add-ons/Translators
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/Translators
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/Translators
 for f in $BEOS_ADD_ONS_TRANSLATORS; do
-	copyattr -d $f $targetDir/beos/system/add-ons/Translators/
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/Translators/
 done
 
-cd $sourceDir/distro/x86.R1/beos/system/add-ons/media
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/media
+$scd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/media
 for f in $BEOS_ADD_ONS_MEDIA; do
-	copyattr -d $f $targetDir/beos/system/add-ons/media/
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/media/
 done
 
-cd $sourceDir/distro/x86.R1/beos/system/add-ons/input_server/devices/
+cd $sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/devices/
+$cd ${sPrefix}$sourceDir/distro/${arch}.R1/beos/system/add-ons/input_server/devices/
 for f in keyboard; do
-	copyattr -d $f $targetDir/beos/system/add-ons/input_server/devices/
+	$cp ${sPrefix}$f $targetDir/beos/system/add-ons/input_server/devices/
 done
 
 
@@ -280,8 +348,8 @@ mimeDBDest=$targetDir/home/config/settings/beos_mime
 
 echo "Deleting old MIME database..."
 
-rm -rf $mimeDBDest
-mkdir -p $mimeDBDest
+$rm -rf $mimeDBDest
+$mkdir -p $mimeDBDest
 
 echo "Installing MIME database..."
 
@@ -289,14 +357,14 @@ for inSuperFile in $mimeDBSource/*.super; do
 	superType=$(basename $inSuperFile .super)
 	outSuperDir=$mimeDBDest/$superType
 
-	# create super type dir
-	mkdir -p $outSuperDir
-
 	# compile rdef to rsrc file and the rsrc file to attributes
 	tmpFile=/tmp/mimedb$$.rsrc
+	tmpFile2=/tmp/mimedb$$.mime
 	$rc -o $tmpFile $inSuperFile
-	$resattr -O -o $outSuperDir $tmpFile
-	rm -f $tmpFile
+	mkdir -p $tmpFile2
+	$resattr -O -o $tmpFile2 $tmpFile
+	$cp -r ${sPrefix}$tmpFile2 $outSuperDir
+	rm -rf $tmpFile $tmpFile2
 
 	# iterate through the sub types
 	for inSubFile in $mimeDBSource/$superType/*; do
@@ -307,9 +375,11 @@ for inSuperFile in $mimeDBSource/*.super; do
 
 			# compile rdef to rsrc file and the rsrc file to attributes
 			tmpFile=/tmp/mimedb$$.rsrc
+			tmpFile2=/tmp/mimedb$$.mime
 			$rc -o $tmpFile $inSubFile
-			$resattr -O -o $outSubFile $tmpFile
-			rm -f $tmpFile
+			$resattr -O -o $tmpFile2 $tmpFile
+			$cp ${sPrefix}$tmpFile2 $outSubFile
+			rm -f $tmpFile $tmpFile2
 		fi
 	done
 done
@@ -320,12 +390,7 @@ sync
 
 if [ ! $alreadyMounted ]; then
 	echo Unmounting ...
-	sleep 1
-	unmount $targetDir
-	sleep 1
-	sync
-	rmdir $targetDir
-	sync
+	$fsShellCommand quit
 fi
 
 if [ $archive ]; then
