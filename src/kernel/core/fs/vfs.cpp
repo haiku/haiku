@@ -5457,7 +5457,7 @@ _user_open(int fd, const char *userPath, int openMode)
 	if (status < 0)
 		return status;
 
-	return file_open(-1, path, openMode, false);
+	return file_open(fd, path, openMode, false);
 }
 
 
