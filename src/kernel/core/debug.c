@@ -34,8 +34,8 @@ static int debugger_on_cpu = -1;
 struct debugger_command
 {
 	struct debugger_command *next;
-	void (*func)(int, char **);
-	const char *cmd;
+	int (*func)(int, char **);
+	const char *name;
 	const char *description;
 };
 
@@ -204,7 +204,7 @@ static void kernel_debugger_loop()
 	debugger_on_cpu = smp_get_current_cpu();
 
 	for(;;) {
-		dprintf("> ");
+		dprintf("kdebug> ");
 		debug_read_line(line_buf[cur_line], LINE_BUF_SIZE);
 		debug_parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
 		if(argc <= 0)
@@ -214,8 +214,9 @@ static void kernel_debugger_loop()
 
 		cmd = commands;
 		while(cmd != NULL) {
-			if(strcmp(args[0], cmd->cmd) == 0) {
+			if(strcmp(args[0], cmd->name) == 0) {
 				cmd->func(argc, args);
+				break;
 			}
 			cmd = cmd->next;
 		}
@@ -225,10 +226,16 @@ static void kernel_debugger_loop()
 	}
 }
 
-void kernel_debugger()
+void kernel_debugger(const char * message)
 {
 	dbg_save_registers(&(dbg_register_file[smp_get_current_cpu()][0]));
 
+	if (message) {
+		dprintf(message);
+		dprintf("\n");
+	};
+		
+	dprintf("Welcome to Kernel Debugging Land...\n");
 	kernel_debugger_loop();
 }
 
@@ -257,7 +264,7 @@ int panic(const char *fmt, ...)
 		smp_send_broadcast_ici(SMP_MSG_CPU_HALT, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 
-	kernel_debugger();
+	kernel_debugger(NULL);
 
 	int_restore_interrupts(state);
 	return ret;
@@ -308,17 +315,17 @@ void dbg_puts(const char *s)
 	int_restore_interrupts(flags);
 }
 
-int dbg_add_command(void (*func)(int, char **), const char *name, const char *desc)
+int add_debugger_command(const char * name, int (*func)(int, char **), const char * desc)
 {
 	int flags;
 	struct debugger_command *cmd;
 
-	cmd = (struct debugger_command *)kmalloc(sizeof(struct debugger_command));
-	if(cmd == NULL)
+	cmd = (struct debugger_command *) kmalloc(sizeof(struct debugger_command));
+	if (cmd == NULL)
 		return ENOMEM;
 
 	cmd->func = func;
-	cmd->cmd = name;
+	cmd->name = name;
 	cmd->description = desc;
 
 	flags = int_disable_interrupts();
@@ -333,21 +340,62 @@ int dbg_add_command(void (*func)(int, char **), const char *name, const char *de
 	return B_NO_ERROR;
 }
 
-static void cmd_reboot(int argc, char **argv)
+int remove_debugger_command(const char * name, int (*func)(int, char **))
 {
-	reboot();
+	int flags;
+	struct debugger_command *cmd;
+	struct debugger_command *prev;
+
+	flags = int_disable_interrupts();
+	acquire_spinlock(&dbg_spinlock);
+
+	prev = NULL;
+	cmd = commands;
+	while (cmd) {
+		if (strcmp(cmd->name, name) == 0 &&
+			cmd->func == func)
+			break;
+		prev = cmd;
+		cmd = cmd->next;
+	};
+	
+	if (cmd) {
+		if (cmd == commands)
+			commands = cmd->next;
+		else
+			prev->next = cmd->next;
+	};  
+
+	release_spinlock(&dbg_spinlock);
+	int_restore_interrupts(flags);
+
+	if (cmd) {
+		kfree(cmd);
+		return B_NO_ERROR;
+	};
+	
+	return B_NAME_NOT_FOUND;
 }
 
-static void cmd_help(int argc, char **argv)
+
+static int cmd_reboot(int argc, char **argv)
+{
+	reboot();
+	return 0;  // I'll be really suprised if this line ever run! ;-)
+}
+
+static int cmd_help(int argc, char **argv)
 {
 	struct debugger_command *cmd;
 
 	dprintf("debugger commands:\n");
 	cmd = commands;
 	while(cmd != NULL) {
-		dprintf("%-32s\t\t%s\n", cmd->cmd, cmd->description);
+		dprintf(" %-32s\t\t%s\n", cmd->name, cmd->description);
 		cmd = cmd->next;
 	}
+	
+	return 0;
 }
 
 int dbg_init(kernel_args *ka)
@@ -359,9 +407,9 @@ int dbg_init(kernel_args *ka)
 
 int dbg_init2(kernel_args *ka)
 {
-	dbg_add_command(&cmd_help, "help", "List all debugger commands");
-	dbg_add_command(&cmd_reboot, "reboot", "Reboot");
-	dbg_add_command(&cmd_gdb, "gdb", "Connect to remote gdb");
+	add_debugger_command("help", &cmd_help, "List all debugger commands");
+	add_debugger_command("reboot", &cmd_reboot, "Reboot");
+	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
 
 	return B_NO_ERROR;
 }

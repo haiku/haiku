@@ -522,11 +522,11 @@ gdb_state_machine(void)
 	return 0;
 }
 
-void
+int
 cmd_gdb(int argc, char **argv)
 {
 	(void)(argc);
 	(void)(argv);
 
-	gdb_state_machine();
+	return gdb_state_machine();
 }

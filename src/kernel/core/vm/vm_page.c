@@ -40,8 +40,8 @@ static spinlock_t page_lock;
 
 static sem_id modified_pages_available;
 
-void dump_page_stats(int argc, char **argv);
-void dump_free_page_table(int argc, char **argv);
+static int dump_page_stats(int argc, char **argv);
+static int dump_free_page_table(int argc, char **argv);
 static int vm_page_set_state_nolock(vm_page *page, int page_state);
 static void clear_page(addr pa);
 static int page_scrubber(void *);
@@ -251,8 +251,8 @@ int vm_page_init2(kernel_args *ka)
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "page_structures", &null, REGION_ADDR_EXACT_ADDRESS,
 		PAGE_ALIGN(num_pages * sizeof(vm_page)), REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-	dbg_add_command(&dump_page_stats, "page_stats", "Dump statistics about page usage");
-	dbg_add_command(&dump_free_page_table, "free_pages", "Dump list of free pages");
+	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
+	add_debugger_command("free_pages", &dump_free_page_table, "Dump list of free pages");
 
 	return 0;
 }
@@ -620,12 +620,13 @@ addr vm_page_num_free_pages()
 	return page_free_queue.count + page_clear_queue.count;
 }
 
-void dump_free_page_table(int argc, char **argv)
+static int dump_free_page_table(int argc, char **argv)
 {
 	dprintf("not finished\n");
+	return 0;
 }
 
-void dump_page_stats(int argc, char **argv)
+static int dump_page_stats(int argc, char **argv)
 {
 	unsigned int page_types[8];
 	addr i;
@@ -641,11 +642,12 @@ void dump_page_stats(int argc, char **argv)
 		page_types[PAGE_STATE_ACTIVE], page_types[PAGE_STATE_INACTIVE], page_types[PAGE_STATE_BUSY], page_types[PAGE_STATE_UNUSED]);
 	dprintf("modified: %d\nfree: %d\nclear: %d\nwired: %d\n",
 		page_types[PAGE_STATE_MODIFIED], page_types[PAGE_STATE_FREE], page_types[PAGE_STATE_CLEAR], page_types[PAGE_STATE_WIRED]);
+	return 0;
 }
 
 
 #if 0
-static void dump_free_page_table(int argc, char **argv)
+static int dump_free_page_table(int argc, char **argv)
 {
 	unsigned int i = 0;
 	unsigned int free_start = END_OF_LIST;
@@ -689,6 +691,7 @@ static void dump_free_page_table(int argc, char **argv)
 		dprintf("%d->%d ", i, free_page_table[i]);
 	}
 */
+	return 0;
 }
 #endif
 static addr vm_alloc_vspace_from_ka_struct(kernel_args *ka, unsigned int size)

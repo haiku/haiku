@@ -39,9 +39,9 @@ struct port_entry {
 };
 
 // internal API
-void dump_port_list(int argc, char **argv);
+static int dump_port_list(int argc, char **argv);
+static int dump_port_info(int argc, char **argv);
 static void _dump_port_info(struct port_entry *port);
-static void dump_port_info(int argc, char **argv);
 
 
 // MAX_PORTS must be power of 2
@@ -80,15 +80,15 @@ int port_init(kernel_args *ka)
 		ports[i].id = -1;
 
 	// add debugger commands
-	dbg_add_command(&dump_port_list, "ports", "Dump a list of all active ports");
-	dbg_add_command(&dump_port_info, "port", "Dump info about a particular port");
+	add_debugger_command("ports", &dump_port_list, "Dump a list of all active ports");
+	add_debugger_command("port", &dump_port_info, "Dump info about a particular port");
 
 	ports_active = true;
 
 	return 0;
 }
 
-void dump_port_list(int argc, char **argv)
+int dump_port_list(int argc, char **argv)
 {
 	int i;
 
@@ -97,6 +97,7 @@ void dump_port_list(int argc, char **argv)
 			dprintf("%p\tid: 0x%x\t\tname: '%s'\n", &ports[i], ports[i].id, ports[i].name);
 		}
 	}
+	return 0;
 }
 
 static void _dump_port_info(struct port_entry *port)
@@ -114,13 +115,13 @@ static void _dump_port_info(struct port_entry *port)
 	dprintf("write_sem: %d\n", cnt);
 }
 
-static void dump_port_info(int argc, char **argv)
+static int dump_port_info(int argc, char **argv)
 {
 	int i;
 
 	if(argc < 2) {
 		dprintf("port: not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
@@ -131,15 +132,15 @@ static void dump_port_info(int argc, char **argv)
 			// XXX semi-hack
 			// one can use either address or a port_id, since KERNEL_BASE > MAX_PORTS assumed
 			_dump_port_info((struct port_entry *)num);
-			return;
+			return 0;
 		} else {
 			unsigned slot = num % MAX_PORTS;
 			if(ports[slot].id != (int)num) {
 				dprintf("port 0x%lx doesn't exist!\n", num);
-				return;
+				return 0;
 			}
 			_dump_port_info(&ports[slot]);
-			return;
+			return 0;
 		}
 	}
 
@@ -148,7 +149,7 @@ static void dump_port_info(int argc, char **argv)
 		if (ports[i].name != NULL)
 			if(strcmp(argv[1], ports[i].name) == 0) {
 				_dump_port_info(&ports[i]);
-				return;
+				return 0;
 			}
 	}
 }

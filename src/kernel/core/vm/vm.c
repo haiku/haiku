@@ -1066,7 +1066,7 @@ int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr)
 	return err;
 }
 
-static void display_mem(int argc, char **argv)
+static int display_mem(int argc, char **argv)
 {
 	int item_size;
 	int display_width;
@@ -1077,7 +1077,7 @@ static void display_mem(int argc, char **argv)
 
 	if(argc < 2) {
 		dprintf("not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	address = atoul(argv[1]);
@@ -1099,7 +1099,7 @@ static void display_mem(int argc, char **argv)
 		display_width = 4;
 	} else {
 		dprintf("display_mem called in an invalid way!\n");
-		return;
+		return 0;
 	}
 
 	dprintf("[0x%lx] '", address);
@@ -1139,9 +1139,10 @@ static void display_mem(int argc, char **argv)
 		}
 	}
 	dprintf("\n");
+	return 0;
 }
 
-static void dump_cache_ref(int argc, char **argv)
+static int dump_cache_ref(int argc, char **argv)
 {
 	addr address;
 	vm_region *region;
@@ -1149,11 +1150,11 @@ static void dump_cache_ref(int argc, char **argv)
 
 	if(argc < 2) {
 		dprintf("cache_ref: not enough arguments\n");
-		return;
+		return 0;
 	}
 	if(strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
 		dprintf("cache_ref: invalid argument, pass address\n");
-		return;
+		return 0;
 	}
 
 	address = atoul(argv[1]);
@@ -1172,6 +1173,7 @@ static void dump_cache_ref(int argc, char **argv)
 		dprintf("lock = 0x%x\n", region->lock);
 	}
 	dprintf("ref_count: %d\n", cache_ref->ref_count);
+	return 0;
 }
 
 static const char *page_state_to_text(int state)
@@ -1198,7 +1200,7 @@ static const char *page_state_to_text(int state)
 	}
 }
 
-static void dump_cache(int argc, char **argv)
+static int dump_cache(int argc, char **argv)
 {
 	addr address;
 	vm_cache *cache;
@@ -1206,11 +1208,11 @@ static void dump_cache(int argc, char **argv)
 
 	if(argc < 2) {
 		dprintf("cache: not enough arguments\n");
-		return;
+		return 0;
 	}
 	if(strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
 		dprintf("cache: invalid argument, pass address\n");
-		return;
+		return 0;
 	}
 
 	address = atoul(argv[1]);
@@ -1235,6 +1237,7 @@ static void dump_cache(int argc, char **argv)
 		else
 			dprintf(" %p UNKNOWN PAGE type %d\n", page, page->type);
 	}
+	return 0;
 }
 
 static void _dump_region(vm_region *region)
@@ -1254,14 +1257,14 @@ static void _dump_region(vm_region *region)
 	dprintf("cache_prev: %p\n", region->cache_prev);
 }
 
-static void dump_region(int argc, char **argv)
+static int dump_region(int argc, char **argv)
 {
 //	int i;
 	vm_region *region;
 
 	if(argc < 2) {
 		dprintf("region: not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
@@ -1275,7 +1278,7 @@ static void dump_region(int argc, char **argv)
 		} else {
 			_dump_region(region);
 		}
-		return;
+		return 0;
 	} else {
 		// walk through the region list, looking for the arguments as a name
 		struct hash_iterator iter;
@@ -1287,6 +1290,7 @@ static void dump_region(int argc, char **argv)
 			}
 		}
 	}
+	return 0;
 }
 
 region_id find_region_by_address (addr vaddress)
@@ -1319,7 +1323,7 @@ region_id find_region_by_name(const char *name)
 	return B_NAME_NOT_FOUND;
 }
 
-static void dump_region_list(int argc, char **argv)
+static int dump_region_list(int argc, char **argv)
 {
 	vm_region *region;
 	struct hash_iterator iter;
@@ -1332,6 +1336,7 @@ static void dump_region_list(int argc, char **argv)
 			region, region->id, region->name, region->base, region->size, region->lock, region->wiring);
 	}
 	hash_close(region_table, &iter, false);
+	return 0;
 }
 
 static void _dump_aspace(vm_address_space *aspace)
@@ -1360,14 +1365,14 @@ static void _dump_aspace(vm_address_space *aspace)
 	}
 }
 
-static void dump_aspace(int argc, char **argv)
+static int dump_aspace(int argc, char **argv)
 {
 //	int i;
 	vm_address_space *aspace;
 
 	if(argc < 2) {
 		dprintf("aspace: not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
@@ -1381,7 +1386,7 @@ static void dump_aspace(int argc, char **argv)
 		} else {
 			_dump_aspace(aspace);
 		}
-		return;
+		return 0;
 	} else {
 		// walk through the aspace list, looking for the arguments as a name
 		struct hash_iterator iter;
@@ -1393,9 +1398,10 @@ static void dump_aspace(int argc, char **argv)
 			}
 		}
 	}
+	return 0;
 }
 
-static void dump_aspace_list(int argc, char **argv)
+static int dump_aspace_list(int argc, char **argv)
 {
 	vm_address_space *as;
 	struct hash_iterator iter;
@@ -1408,6 +1414,7 @@ static void dump_aspace_list(int argc, char **argv)
 			as, as->id, as->name, as->virtual_map.base, as->virtual_map.size);
 	}
 	hash_close(aspace_table, &iter, false);
+	return 0;
 }
 
 vm_address_space *vm_get_kernel_aspace(void)
@@ -1730,16 +1737,16 @@ int vm_init(kernel_args *ka)
 	arch_vm_init_endvm(ka);
 
 	// add some debugger commands
-	dbg_add_command(&dump_region_list, "regions", "Dump a list of all regions");
-	dbg_add_command(&dump_region, "region", "Dump info about a particular region");
-	dbg_add_command(&dump_aspace_list, "aspaces", "Dump a list of all address spaces");
-	dbg_add_command(&dump_aspace, "aspace", "Dump info about a particular address space");
-	dbg_add_command(&dump_cache_ref, "cache_ref", "Dump cache_ref data structure");
-	dbg_add_command(&dump_cache, "cache", "Dump cache_ref data structure");
-//	dbg_add_command(&display_mem, "dl", "dump memory long words (64-bit)");
-	dbg_add_command(&display_mem, "dw", "dump memory words (32-bit)");
-	dbg_add_command(&display_mem, "ds", "dump memory shorts (16-bit)");
-	dbg_add_command(&display_mem, "db", "dump memory bytes (8-bit)");
+	add_debugger_command("regions", &dump_region_list, "Dump a list of all regions");
+	add_debugger_command("region", &dump_region, "Dump info about a particular region");
+	add_debugger_command("aspaces", &dump_aspace_list, "Dump a list of all address spaces");
+	add_debugger_command("aspace", &dump_aspace, "Dump info about a particular address space");
+	add_debugger_command("cache_ref", &dump_cache_ref, "Dump cache_ref data structure");
+	add_debugger_command("cache", &dump_cache, "Dump cache_ref data structure");
+//	add_debugger_command("dl", &display_mem, "dump memory long words (64-bit)");
+	add_debugger_command("dw", &display_mem, "dump memory words (32-bit)");
+	add_debugger_command("ds", &display_mem, "dump memory shorts (16-bit)");
+	add_debugger_command("db", &display_mem, "dump memory bytes (8-bit)");
 
 	dprintf("vm_init: exit\n");
 

@@ -763,7 +763,7 @@ int cbuf_truncate_tail(cbuf *buf, size_t trunc_bytes)
 	return B_NO_ERROR;
 }
 
-static void dbg_dump_cbuf_freelists(int argc, char **argv)
+static int dbg_dump_cbuf_freelists(int argc, char **argv)
 {
 	cbuf *buf;
 
@@ -776,6 +776,7 @@ static void dbg_dump_cbuf_freelists(int argc, char **argv)
 	for(buf = cbuf_free_noblock_list; buf; buf = buf->next)
 		dprintf("%p ", buf);
 	dprintf("\n");
+	return 0;
 }
 
 void cbuf_test()
@@ -832,7 +833,7 @@ int cbuf_init()
 	cbuf_lowlevel_spinlock = 0;
 
 	// add the debug command
-	dbg_add_command(&dbg_dump_cbuf_freelists, "cbuf_freelist", "Dumps the cbuf free lists");
+	add_debugger_command("cbuf_freelist", &dbg_dump_cbuf_freelists, "Dumps the cbuf free lists");
 
 	free_list_sem = create_sem(1, "cbuf_free_list_sem");
 	if(free_list_sem < 0) {

@@ -160,12 +160,14 @@ image_id dev_load_dev_module(const char *name, const char *dirpath)
 	if (keep_loaded)
 		return id;
 	
-	/* If the fucntion gets here then the following has happenned...
+	/* If the function gets here then the following has happenned...
 	 * - the driver has been loaded
 	 * - it has appeared valid
 	 * - init_hardware has returned saying it should be used
 	 * - init_driver has been run OK
-	 * - devfs_publish_devices has for some reason failed.
+	 * - publish_devices return empty paths list or
+	 *   devfs_publish_device has for some reason failed on each path.
+	 * 
 	 * The error value we're about to return is 0, which probably
 	 * means we're loosing error information here :(
 	 * XXX - what error code should we be returning

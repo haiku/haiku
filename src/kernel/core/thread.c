@@ -646,7 +646,7 @@ static void _dump_proc_info(struct proc *p)
 	dprintf("thread_list: %p\n", p->thread_list);
 }
 
-static void dump_proc_info(int argc, char **argv)
+static int dump_proc_info(int argc, char **argv)
 {
 	struct proc *p;
 	int id = -1;
@@ -655,7 +655,7 @@ static void dump_proc_info(int argc, char **argv)
 
 	if(argc < 2) {
 		dprintf("proc: not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
@@ -664,7 +664,7 @@ static void dump_proc_info(int argc, char **argv)
 		if(num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
 			_dump_proc_info((struct proc*)num);
-			return;
+			return 0;
 		} else {
 			id = num;
 		}
@@ -679,6 +679,7 @@ static void dump_proc_info(int argc, char **argv)
 		}
 	}
 	hash_close(proc_hash, &i, false);
+	return 0;
 }
 
 
@@ -743,7 +744,7 @@ static void _dump_thread_info(struct thread *t)
 	last_thread_dumped = t;
 }
 
-static void dump_thread_info(int argc, char **argv)
+static int dump_thread_info(int argc, char **argv)
 {
 	struct thread *t;
 	int id = -1;
@@ -752,7 +753,7 @@ static void dump_thread_info(int argc, char **argv)
 
 	if(argc < 2) {
 		dprintf("thread: not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
@@ -761,7 +762,7 @@ static void dump_thread_info(int argc, char **argv)
 		if(num > vm_get_kernel_aspace()->virtual_map.base) {
 			// XXX semi-hack
 			_dump_thread_info((struct thread *)num);
-			return;
+			return 0;
 		} else {
 			id = num;
 		}
@@ -776,9 +777,10 @@ static void dump_thread_info(int argc, char **argv)
 		}
 	}
 	hash_close(thread_hash, &i, false);
+	return 0;
 }
 
-static void dump_thread_list(int argc, char **argv)
+static int dump_thread_list(int argc, char **argv)
 {
 	struct thread *t;
 	struct hash_iterator i;
@@ -799,15 +801,16 @@ static void dump_thread_list(int argc, char **argv)
 		dprintf("\t0x%lx\n", t->kernel_stack_base);
 	}
 	hash_close(thread_hash, &i, false);
+	return 0;
 }
 
-static void dump_next_thread_in_q(int argc, char **argv)
+static int dump_next_thread_in_q(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
 	if(t == NULL) {
 		dprintf("no thread previously dumped. Examine a thread first.\n");
-		return;
+		return 0;
 	}
 
 	dprintf("next thread in queue after thread @ %p\n", t);
@@ -816,15 +819,16 @@ static void dump_next_thread_in_q(int argc, char **argv)
 	} else {
 		dprintf("NULL\n");
 	}
+	return 0;
 }
 
-static void dump_next_thread_in_all_list(int argc, char **argv)
+static int dump_next_thread_in_all_list(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
 	if(t == NULL) {
 		dprintf("no thread previously dumped. Examine a thread first.\n");
-		return;
+		return 0;
 	}
 
 	dprintf("next thread in global list after thread @ %p\n", t);
@@ -833,15 +837,16 @@ static void dump_next_thread_in_all_list(int argc, char **argv)
 	} else {
 		dprintf("NULL\n");
 	}
+	return 0;
 }
 
-static void dump_next_thread_in_proc(int argc, char **argv)
+static int dump_next_thread_in_proc(int argc, char **argv)
 {
 	struct thread *t = last_thread_dumped;
 
 	if(t == NULL) {
 		dprintf("no thread previously dumped. Examine a thread first.\n");
-		return;
+		return 0;
 	}
 
 	dprintf("next thread in proc after thread @ %p\n", t);
@@ -850,6 +855,7 @@ static void dump_next_thread_in_proc(int argc, char **argv)
 	} else {
 		dprintf("NULL\n");
 	}
+	return 0;
 }
 
 static int get_death_stack(void)
@@ -1016,12 +1022,12 @@ int thread_init(kernel_args *ka)
 	death_stack_sem = create_sem(num_death_stacks, "death_stack_noavail_sem");
 
 	// set up some debugger commands
-	dbg_add_command(dump_thread_list, "threads", "list all threads");
-	dbg_add_command(dump_thread_info, "thread", "list info about a particular thread");
-	dbg_add_command(dump_next_thread_in_q, "next_q", "dump the next thread in the queue of last thread viewed");
-	dbg_add_command(dump_next_thread_in_all_list, "next_all", "dump the next thread in the global list of the last thread viewed");
-	dbg_add_command(dump_next_thread_in_proc, "next_proc", "dump the next thread in the process of the last thread viewed");
-	dbg_add_command(dump_proc_info, "proc", "list info about a particular process");
+	add_debugger_command("threads", &dump_thread_list, "list all threads");
+	add_debugger_command("thread", &dump_thread_info, "list info about a particular thread");
+	add_debugger_command("next_q", &dump_next_thread_in_q, "dump the next thread in the queue of last thread viewed");
+	add_debugger_command("next_all", &dump_next_thread_in_all_list, "dump the next thread in the global list of the last thread viewed");
+	add_debugger_command("next_proc", &dump_next_thread_in_proc, "dump the next thread in the process of the last thread viewed");
+	add_debugger_command("proc", &dump_proc_info, "list info about a particular process");
 
 	return 0;
 }

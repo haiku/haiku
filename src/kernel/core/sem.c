@@ -56,7 +56,7 @@ struct sem_timeout_args {
 	int sem_count;
 };
 
-static void dump_sem_list(int argc, char **argv)
+static int dump_sem_list(int argc, char **argv)
 {
 	int i;
 
@@ -65,6 +65,7 @@ static void dump_sem_list(int argc, char **argv)
 			dprintf("%p\tid: 0x%x\t\tname: '%s'\n", &sems[i], sems[i].id, sems[i].name);
 		}
 	}
+	return 0;
 }
 
 static void _dump_sem_info(struct sem_entry *sem)
@@ -76,13 +77,13 @@ static void _dump_sem_info(struct sem_entry *sem)
 	dprintf("queue: head %p tail %p\n", sem->q.head, sem->q.tail);
 }
 
-static void dump_sem_info(int argc, char **argv)
+static int dump_sem_info(int argc, char **argv)
 {
 	int i;
 
 	if(argc < 2) {
 		dprintf("sem: not enough arguments\n");
-		return;
+		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
@@ -92,15 +93,15 @@ static void dump_sem_info(int argc, char **argv)
 		if(num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
 			_dump_sem_info((struct sem_entry *)num);
-			return;
+			return 0;
 		} else {
 			unsigned slot = num % MAX_SEMS;
 			if(sems[slot].id != (int)num) {
 				dprintf("sem 0x%lx doesn't exist!\n", num);
-				return;
+				return 0;
 			}
 			_dump_sem_info(&sems[slot]);
-			return;
+			return 0;
 		}
 	}
 
@@ -109,7 +110,7 @@ static void dump_sem_info(int argc, char **argv)
 		if (sems[i].name != NULL)
 			if(strcmp(argv[1], sems[i].name) == 0) {
 				_dump_sem_info(&sems[i]);
-				return;
+				return 0;
 			}
 	}
 }
@@ -132,8 +133,8 @@ int sem_init(kernel_args *ka)
 		sems[i].id = -1;
 
 	// add debugger commands
-	dbg_add_command(&dump_sem_list, "sems", "Dump a list of all active semaphores");
-	dbg_add_command(&dump_sem_info, "sem", "Dump info about a particular semaphore");
+	add_debugger_command("sems", &dump_sem_list, "Dump a list of all active semaphores");
+	add_debugger_command("sem", &dump_sem_info, "Dump info about a particular semaphore");
 
 	dprintf("sem_init: exit\n");
 

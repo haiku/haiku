@@ -87,7 +87,7 @@ static void dump_bin(int bin_index)
 	dprintf("NULL\n");
 }
 
-static void dump_bin_list(int argc, char **argv)
+static int dump_bin_list(int argc, char **argv)
 {
 	int i;
 
@@ -96,6 +96,7 @@ static void dump_bin_list(int argc, char **argv)
 	for(i=0; i<bin_count; i++) {
 		dump_bin(i);
 	}
+	return 0;
 }
 
 // called from vm_init. The heap should already be mapped in at this point, we just
@@ -117,7 +118,7 @@ int heap_init(addr new_heap_base, unsigned int new_heap_size)
 	heap_lock.count = 0;
 
 	// set up some debug commands
-	dbg_add_command(&dump_bin_list, "heap_bindump", "dump stats about bin usage");
+	add_debugger_command("heap_bindump", &dump_bin_list, "dump stats about bin usage");
 
 	return 0;
 }
