@@ -1343,6 +1343,9 @@ DirectoryTest::EntryIterationTest()
 void
 DirectoryTest::EntryCreationTest()
 {
+#ifdef TEST_R5
+	Outputf("(test currently omitted due to build errors related to BSymLink::SetTo())\n");
+#else
 	const char *existingFile = existingFilename;
 	const char *existing = existingDirname;
 	const char *testDir1 = testDirname1;
@@ -1682,6 +1685,7 @@ DirectoryTest::EntryCreationTest()
 	NextSubTest();
 	CPPUNIT_ASSERT( dir.CreateSymLink(entryName.c_str(), existingFile, NULL)
 					== B_FILE_EXISTS );
+#endif // ifndef TEST_R5
 }
 
 // AssignmentTest

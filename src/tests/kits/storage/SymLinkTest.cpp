@@ -318,6 +318,9 @@ SymLinkTest::InitTest1()
 void
 SymLinkTest::InitTest2()
 {
+#ifdef TEST_R5
+	Outputf("(test currently omitted due to build errors related to BSymLink::SetTo() and BSymLink::Unset())\n");
+#else
 	const char *dirLink = dirLinkname;
 	const char *dirSuperLink = dirSuperLinkname;
 	const char *dirRelLink = dirRelLinkname;
@@ -487,12 +490,16 @@ SymLinkTest::InitTest2()
 	CPPUNIT_ASSERT( pathDir.SetTo(fileSuperDirname) == B_OK );
 	CPPUNIT_ASSERT( link.SetTo(&pathDir, fileRelDirname) == B_ENTRY_NOT_FOUND );
 	CPPUNIT_ASSERT( link.InitCheck() == B_ENTRY_NOT_FOUND );
+#endif
 }
 
 // ReadLinkTest
 void
 SymLinkTest::ReadLinkTest()
 {
+#ifdef TEST_R5
+	Outputf("(test currently omitted due to build errors related to BSymLink::SetTo())\n");
+#else
 	const char *dirLink = dirLinkname;
 	const char *fileLink = fileLinkname;
 	const char *badLink = badLinkname;
@@ -561,12 +568,17 @@ SymLinkTest::ReadLinkTest()
 	CPPUNIT_ASSERT( link.SetTo(fileLink) == B_OK );
 	CPPUNIT_ASSERT( equals(link.ReadLink(NULL, sizeof(buffer)), B_BAD_ADDRESS,
 						   B_BAD_VALUE) );
+#endif
 }
 
 // MakeLinkedPathTest
 void
 SymLinkTest::MakeLinkedPathTest()
 {
+#ifdef TEST_R5
+	Outputf("(test currently omitted due to build errors related to "
+	        "BSymLink::SetTo() and BSymLink::Unset())\n");
+#else
 	const char *dirLink = dirLinkname;
 	const char *fileLink = fileLinkname;
 	const char *relDirLink = relDirLinkname;
@@ -789,12 +801,17 @@ SymLinkTest::MakeLinkedPathTest()
 	link.Unset();
 	path.Unset();
 	dir.Unset();
+#endif // ifdef TEST_R5 else
 }
 
 // IsAbsoluteTest
 void
 SymLinkTest::IsAbsoluteTest()
 {
+#ifdef TEST_R5
+	Outputf("(test currently omitted due to build errors "
+            "related to BSymLink::SetTo() and BSymLink::Unset())\n");
+#else
 	const char *dirLink = dirLinkname;
 	const char *relFileLink = relFileLinkname;
 	const char *existingDir = existingDirname;
@@ -831,12 +848,16 @@ SymLinkTest::IsAbsoluteTest()
 	CPPUNIT_ASSERT( link.SetTo(existingFile) == B_OK );
 	CPPUNIT_ASSERT( link.IsAbsolute() == false );
 	link.Unset();
+#endif // ifdef TEST_R5 else
 }
 
 // AssignmentTest
 void
 SymLinkTest::AssignmentTest()
 {
+#ifdef TEST_R5
+	Outputf("(test currently omitted due to build errors related to BSymLink::operator=())\n");
+#else
 	const char *dirLink = dirLinkname;
 	const char *fileLink = fileLinkname;
 	// 1. copy constructor
@@ -900,6 +921,7 @@ SymLinkTest::AssignmentTest()
 		link2 = link;
 		CPPUNIT_ASSERT( link2.InitCheck() == B_OK );
 	}
+#endif // ifdef TEST_R5 else
 }
 
 
