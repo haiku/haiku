@@ -100,7 +100,8 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 		} else {
 			// disk system doesn't identify the partition or worse than our
 			// current favorite
-			diskSystem->FreeIdentifyCookie(partition, cookie);
+			if (priority >= 0)
+				diskSystem->FreeIdentifyCookie(partition, cookie);
 			diskSystem->Unload();
 		}
 	}
@@ -109,6 +110,7 @@ KScanPartitionJob::_ScanPartition(KPartition *partition)
 	if (bestDiskSystem) {
 		DBG(OUT("  scanning with: %s\n", bestDiskSystem->Name()));
 		error = bestDiskSystem->Scan(partition, bestCookie);
+		bestDiskSystem->FreeIdentifyCookie(partition, bestCookie);
 		if (error == B_OK) {
 			partition->SetDiskSystem(bestDiskSystem);
 			for (int32 i = 0; KPartition *child = partition->ChildAt(i); i++)
