@@ -34,8 +34,11 @@ opendir(const char *path)
 		return NULL;
 
 	/* allocate the memory for the DIR structure */
-	if ((dir = (DIR*)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL)
+	if ((dir = (DIR*)malloc(sizeof(DIR) + BUFFER_SIZE)) == NULL) {
+		errno = B_NO_MEMORY;
+		sys_close(fd);
 		return NULL;
+	}
 
 	dir->fd = fd;
 
