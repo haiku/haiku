@@ -12,10 +12,10 @@ class DrawingModeFactory {
 								DrawingModeFactory() {}
 	virtual						~DrawingModeFactory() {}
 
-	static	agg::DrawingMode*		DrawingModeFor(drawing_mode mode,
-												   source_alpha alphaSrcMode,
-												   alpha_function alphaFncMode,
-												   bool solid = false);
+	static	DrawingMode*		DrawingModeFor(drawing_mode mode,
+											   source_alpha alphaSrcMode,
+											   alpha_function alphaFncMode,
+											   bool solid = false);
 };
 
 #endif // DRAWING_MODE_FACTORY_H

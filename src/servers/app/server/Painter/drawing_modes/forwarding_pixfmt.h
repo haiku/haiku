@@ -13,259 +13,238 @@
 #include "DrawingMode.h"
 #include "PatternHandler.h"
 
-namespace agg
-{
+template<class Order>
+class forwarding_pixel_format {
+ public:
+	typedef agg::rgba8 color_type;
+	typedef Order order_type;
+	typedef agg::rendering_buffer::row_data row_data;
 
-	//====================================================forwarding_pixel_format
-	template<class Order>
-	class forwarding_pixel_format
+	// constructor
+	forwarding_pixel_format(agg::rendering_buffer& rb, const PatternHandler* handler)
+		: fBuffer(&rb),
+		  fDrawingMode(NULL),
+		  fPatternHandler(handler)
 	{
-	public:
-		typedef rgba8 color_type;
-		typedef Order order_type;
-		typedef rendering_buffer::row_data row_data;
+	}
 
-		//--------------------------------------------------------------------
-		forwarding_pixel_format(rendering_buffer& rb, const PatternHandler* handler)
-			: fBuffer(&rb),
-			  fDrawingMode(NULL),
-			  fPatternHandler(handler)
-		{
-		}
+	~forwarding_pixel_format()
+	{
+		delete fDrawingMode;
+	}
 
-		~forwarding_pixel_format()
-		{
+	// set_drawing_mode
+	void set_drawing_mode(DrawingMode* mode)
+	{
+		if (fDrawingMode != mode) {
+			// delete old DrawingMode
 			delete fDrawingMode;
-		}
-
-		//--------------------------------------------------------------------
-		void set_drawing_mode(DrawingMode* mode)
-		{
-//printf("forwarding_pixel_format::set_drawing_mode()\n");
-			if (fDrawingMode != mode) {
-				// delete old DrawingMode
-				delete fDrawingMode;
-				// attach new DrawingMode
-				fDrawingMode = mode;
-				if (fDrawingMode) {
-					fDrawingMode->set_rendering_buffer(fBuffer);
-					fDrawingMode->set_pattern_handler(fPatternHandler);
-				}
+			// attach new DrawingMode
+			fDrawingMode = mode;
+			if (fDrawingMode) {
+				fDrawingMode->set_rendering_buffer(fBuffer);
+				fDrawingMode->set_pattern_handler(fPatternHandler);
 			}
 		}
+	}
 
-		//--------------------------------------------------------------------
-		void set_pattern(const PatternHandler* handler)
-		{
-			fPatternHandler = handler;
-		}
+	// set_pattern
+	void set_pattern(const PatternHandler* handler)
+	{
+		fPatternHandler = handler;
+	}
 
-		//--------------------------------------------------------------------
-		unsigned width()  const { return fBuffer->width();  }
-		unsigned height() const { return fBuffer->height(); }
+	// width
+	unsigned width()  const { return fBuffer->width();  }
+	// height
+	unsigned height() const { return fBuffer->height(); }
 
-		//--------------------------------------------------------------------
-		color_type pixel(int x, int y) const
-		{
+	// pixel
+	color_type pixel(int x, int y) const
+	{
 printf("forwarding_pixel_format::pixel()\n");
-			int8u* p = fBuffer->row(y) + (x << 2);
-			return color_type(p[Order::R], p[Order::G], p[Order::B], p[Order::A]);
-		}
+		uint8* p = fBuffer->row(y) + (x << 2);
+		return color_type(p[Order::R], p[Order::G], p[Order::B], p[Order::A]);
+	}
 
-		//--------------------------------------------------------------------
-		row_data span(int x, int y) const
-		{
+	// span
+	row_data span(int x, int y) const
+	{
 printf("forwarding_pixel_format::span()\n");
-			return row_data(x, width() - 1, fBuffer->row(y) + (x << 2));
-		}
+		return row_data(x, width() - 1, fBuffer->row(y) + (x << 2));
+	}
 
-		//--------------------------------------------------------------------
-		void copy_pixel(int x, int y, const color_type& c)
-		{
+	// copy_pixel
+	void copy_pixel(int x, int y, const color_type& c)
+	{
 printf("forwarding_pixel_format::copy_pixel()\n");
-			int8u* p = fBuffer->row(y) + (x << 2);
-			p[Order::R] = (int8u)c.r;
-			p[Order::G] = (int8u)c.g;
-			p[Order::B] = (int8u)c.b;
-			p[Order::A] = (int8u)c.a;
-		}
+		uint8* p = fBuffer->row(y) + (x << 2);
+		p[Order::R] = (uint8)c.r;
+		p[Order::G] = (uint8)c.g;
+		p[Order::B] = (uint8)c.b;
+		p[Order::A] = (uint8)c.a;
+	}
 
-		//--------------------------------------------------------------------
-		void blend_pixel(int x, int y, const color_type& c, int8u cover)
-		{
-//printf("forwarding_pixel_format::blend_pixel()\n");
-			fDrawingMode->blend_pixel(x, y, c, cover);
-		}
+	// blend_pixel
+	void blend_pixel(int x, int y, const color_type& c, uint8 cover)
+	{
+		fDrawingMode->blend_pixel(x, y, c, cover);
+	}
 
-		//--------------------------------------------------------------------
-		void copy_hline(int x, int y, unsigned len, const color_type& c)
-		{
+	// copy_hline
+	void copy_hline(int x, int y, unsigned len, const color_type& c)
+	{
 printf("forwarding_pixel_format::copy_hline()\n");
-			int32u v;
-			int8u* p8 = (int8u*)&v;
-			p8[Order::R] = (int8u)c.r;
-			p8[Order::G] = (int8u)c.g;
-			p8[Order::B] = (int8u)c.b;
-			p8[Order::A] = (int8u)c.a;
-			int32u* p32 = (int32u*)(fBuffer->row(y)) + x;
-			do
-			{
-				*p32++ = v;
-			}
-			while(--len);
+		uint32 v;
+		uint8* p8 = (uint8*)&v;
+		p8[Order::R] = (uint8)c.r;
+		p8[Order::G] = (uint8)c.g;
+		p8[Order::B] = (uint8)c.b;
+		p8[Order::A] = (uint8)c.a;
+		uint32* p32 = (uint32*)(fBuffer->row(y)) + x;
+		do {
+			*p32++ = v;
 		}
+		while(--len);
+	}
 
-		//--------------------------------------------------------------------
-		void copy_vline(int x, int y, unsigned len, const color_type& c)
-		{
+	// copy_vline
+	void copy_vline(int x, int y, unsigned len, const color_type& c)
+	{
 printf("forwarding_pixel_format::copy_vline()\n");
-			int32u v;
-			int8u* p8 = (int8u*)&v;
-			p8[Order::R] = (int8u)c.r;
-			p8[Order::G] = (int8u)c.g;
-			p8[Order::B] = (int8u)c.b;
-			p8[Order::A] = (int8u)c.a;
-			int8u* p = fBuffer->row(y) + (x << 2);
-			do
-			{
-				*(int32u*)p = v; 
-				p += fBuffer->stride();
-			}
-			while(--len);
+		uint32 v;
+		uint8* p8 = (uint8*)&v;
+		p8[Order::R] = (uint8)c.r;
+		p8[Order::G] = (uint8)c.g;
+		p8[Order::B] = (uint8)c.b;
+		p8[Order::A] = (uint8)c.a;
+		uint8* p = fBuffer->row(y) + (x << 2);
+		do {
+			*(uint32*)p = v; 
+			p += fBuffer->stride();
 		}
+		while(--len);
+	}
 
-		//--------------------------------------------------------------------
-		void blend_hline(int x, int y, unsigned len, 
-						 const color_type& c, int8u cover)
-		{
-//printf("forwarding_pixel_format::blend_hline()\n");
-			fDrawingMode->blend_hline(x, y, len, c, cover);
-		}
+	// blend_hline
+	void blend_hline(int x, int y, unsigned len, 
+					 const color_type& c, uint8 cover)
+	{
+		fDrawingMode->blend_hline(x, y, len, c, cover);
+	}
 
-		//--------------------------------------------------------------------
-		void blend_vline(int x, int y, unsigned len, 
-						 const color_type& c, int8u cover)
-		{
+	// blend_vline
+	void blend_vline(int x, int y, unsigned len, 
+					 const color_type& c, uint8 cover)
+	{
 printf("forwarding_pixel_format::blend_vline()\n");
-			fDrawingMode->blend_vline(x, y, len, c, cover);
-		}
+		fDrawingMode->blend_vline(x, y, len, c, cover);
+	}
 
 
-		//--------------------------------------------------------------------
-		void copy_from(const rendering_buffer& from, 
-					   int xdst, int ydst,
-					   int xsrc, int ysrc,
-					   unsigned len)
-		{
+	// copy_from
+	void copy_from(const agg::rendering_buffer& from, 
+				   int xdst, int ydst,
+				   int xsrc, int ysrc,
+				   unsigned len)
+	{
 printf("forwarding_pixel_format::copy_from()\n");
-			memmove(fBuffer->row(ydst) + xdst * 4, 
-					(const void*)(from.row(ysrc) + xsrc * 4), len * 4);
-		}
+		memmove(fBuffer->row(ydst) + xdst * 4, 
+				(const void*)(from.row(ysrc) + xsrc * 4), len * 4);
+	}
 
 
 
-		//--------------------------------------------------------------------
-		template<class SrcPixelFormatRenderer>
-		void blend_from(const SrcPixelFormatRenderer& from, 
-						const int8u* psrc,
-						int xdst, int ydst,
-						int xsrc, int ysrc,
-						unsigned len)
-		{
+	// blend_from
+	template<class SrcPixelFormatRenderer>
+	void blend_from(const SrcPixelFormatRenderer& from, 
+					const uint8* psrc,
+					int xdst, int ydst,
+					int xsrc, int ysrc,
+					unsigned len)
+	{
 printf("forwarding_pixel_format::blend_from()\n");
-			typedef typename SrcPixelFormatRenderer::order_type src_order;
+		typedef typename SrcPixelFormatRenderer::order_type src_order;
 
-			int8u* pdst = fBuffer->row(ydst) + (xdst << 2);
-			int incp = 4;
-			if(xdst > xsrc)
-			{
-				psrc += (len-1) << 2;
-				pdst += (len-1) << 2;
-				incp = -4;
-			}
-			do 
-			{
-				int alpha = psrc[src_order::A];
+		uint8* pdst = fBuffer->row(ydst) + (xdst << 2);
+		int incp = 4;
+		if (xdst > xsrc) {
+			psrc += (len-1) << 2;
+			pdst += (len-1) << 2;
+			incp = -4;
+		}
+		do {
+			int alpha = psrc[src_order::A];
 
-				if(alpha)
-				{
-					if(alpha == 255)
-					{
-						pdst[Order::R] = psrc[src_order::R];
-						pdst[Order::G] = psrc[src_order::G];
-						pdst[Order::B] = psrc[src_order::B];
-						pdst[Order::A] = psrc[src_order::A];
-					}
-					else
-					{
-						int r = pdst[Order::R];
-						int g = pdst[Order::G];
-						int b = pdst[Order::B];
-						int a = pdst[Order::A];
-						pdst[Order::R] = (int8u)((((psrc[src_order::R] - r) * alpha) + (r << 8)) >> 8);
-						pdst[Order::G] = (int8u)((((psrc[src_order::G] - g) * alpha) + (g << 8)) >> 8);
-						pdst[Order::B] = (int8u)((((psrc[src_order::B] - b) * alpha) + (b << 8)) >> 8);
-						pdst[Order::A] = (int8u)((alpha + a) - ((alpha * a) >> 8));
-					}
+			if (alpha) {
+				if (alpha == 255) {
+					pdst[Order::R] = psrc[src_order::R];
+					pdst[Order::G] = psrc[src_order::G];
+					pdst[Order::B] = psrc[src_order::B];
+					pdst[Order::A] = psrc[src_order::A];
+				} else {
+					int r = pdst[Order::R];
+					int g = pdst[Order::G];
+					int b = pdst[Order::B];
+					int a = pdst[Order::A];
+					pdst[Order::R] = (uint8)((((psrc[src_order::R] - r) * alpha) + (r << 8)) >> 8);
+					pdst[Order::G] = (uint8)((((psrc[src_order::G] - g) * alpha) + (g << 8)) >> 8);
+					pdst[Order::B] = (uint8)((((psrc[src_order::B] - b) * alpha) + (b << 8)) >> 8);
+					pdst[Order::A] = (uint8)((alpha + a) - ((alpha * a) >> 8));
 				}
-				psrc += incp;
-				pdst += incp;
 			}
-			while(--len);
-		}
+			psrc += incp;
+			pdst += incp;
+		} while(--len);
+	}
 
 
 
 
-		//--------------------------------------------------------------------
-		void blend_solid_hspan(int x, int y, unsigned len, 
-							   const color_type& c, const int8u* covers)
-		{
-//printf("forwarding_pixel_format::blend_solid_hspan()\n");
-			fDrawingMode->blend_solid_hspan(x, y, len, c, covers);
-		}
+	// blend_solid_hspan
+	void blend_solid_hspan(int x, int y, unsigned len, 
+						   const color_type& c, const uint8* covers)
+	{
+		fDrawingMode->blend_solid_hspan(x, y, len, c, covers);
+	}
 
 
 
-		//--------------------------------------------------------------------
-		void blend_solid_vspan(int x, int y, unsigned len, 
-							   const color_type& c, const int8u* covers)
-		{
-//printf("forwarding_pixel_format::blend_solid_vspan()\n");
-			fDrawingMode->blend_solid_vspan(x, y, len, c, covers);
-		}
+	// blend_solid_vspan
+	void blend_solid_vspan(int x, int y, unsigned len, 
+						   const color_type& c, const uint8* covers)
+	{
+		fDrawingMode->blend_solid_vspan(x, y, len, c, covers);
+	}
 
 
-		//--------------------------------------------------------------------
-		void blend_color_hspan(int x, int y, unsigned len, 
-							   const color_type* colors, 
-							   const int8u* covers,
-							   int8u cover)
-		{
-//printf("forwarding_pixel_format::blend_color_hspan()\n");
-			fDrawingMode->blend_color_hspan(x, y, len, colors, covers, cover);
-		}
+	// blend_color_hspan
+	void blend_color_hspan(int x, int y, unsigned len, 
+						   const color_type* colors, 
+						   const uint8* covers,
+						   uint8 cover)
+	{
+		fDrawingMode->blend_color_hspan(x, y, len, colors, covers, cover);
+	}
 
 
-		//--------------------------------------------------------------------
-		void blend_color_vspan(int x, int y, unsigned len, 
-							   const color_type* colors, 
-							   const int8u* covers,
-							   int8u cover)
-		{
+	// blend_color_vspan
+	void blend_color_vspan(int x, int y, unsigned len, 
+						   const color_type* colors, 
+						   const uint8* covers,
+						   uint8 cover)
+	{
 printf("forwarding_pixel_format::blend_color_vspan()\n");
-			fDrawingMode->blend_color_vspan(x, y, len, colors, covers, cover);
-		}
+		fDrawingMode->blend_color_vspan(x, y, len, colors, covers, cover);
+	}
 
-	private:
-		rendering_buffer*		fBuffer;
+private:
+	agg::rendering_buffer*	fBuffer;
 
-		DrawingMode*			fDrawingMode;
-		const PatternHandler*	fPatternHandler;
+	DrawingMode*			fDrawingMode;
+	const PatternHandler*	fPatternHandler;
 
-	};
-
-}
+};
 
 #endif // FORWARDING_PIXFMT_H
 

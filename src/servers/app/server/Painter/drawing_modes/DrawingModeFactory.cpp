@@ -21,7 +21,7 @@
 #include "DrawingModeFactory.h"
 
 // DrawingModeFor
-agg::DrawingMode*
+DrawingMode*
 DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 								   source_alpha alphaSrcMode,
 								   alpha_function alphaFncMode,
@@ -31,16 +31,16 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		// these drawing modes discard source pixels
 		// which have the current low color
 		case B_OP_OVER:
-			return new agg::DrawingModeBGRA32Over();
+			return new DrawingModeBGRA32Over();
 			break;
 		case B_OP_ERASE:
-			return new agg::DrawingModeBGRA32Erase();
+			return new DrawingModeBGRA32Erase();
 			break;
 		case B_OP_INVERT:
-			return new agg::DrawingModeBGRA32Invert();
+			return new DrawingModeBGRA32Invert();
 			break;
 		case B_OP_SELECT:
-			return new agg::DrawingModeBGRA32Select();
+			return new DrawingModeBGRA32Select();
 			break;
 
 		// in these drawing modes, the current high
@@ -48,24 +48,24 @@ DrawingModeFactory::DrawingModeFor(drawing_mode mode,
 		case B_OP_COPY:
 			if (solid) {
 printf("DrawingModeBGRA32CopySolid()\n");
-				return new agg::DrawingModeBGRA32CopySolid();
+				return new DrawingModeBGRA32CopySolid();
 			} else
-				return new agg::DrawingModeBGRA32Copy();
+				return new DrawingModeBGRA32Copy();
 			break;
 		case B_OP_ADD:
-			return new agg::DrawingModeBGRA32Add();
+			return new DrawingModeBGRA32Add();
 			break;
 		case B_OP_SUBTRACT:
-			return new agg::DrawingModeBGRA32Subtract();
+			return new DrawingModeBGRA32Subtract();
 			break;
 		case B_OP_BLEND:
-			return new agg::DrawingModeBGRA32Blend();
+			return new DrawingModeBGRA32Blend();
 			break;
 		case B_OP_MIN:
-			return new agg::DrawingModeBGRA32Min();
+			return new DrawingModeBGRA32Min();
 			break;
 		case B_OP_MAX:
-			return new agg::DrawingModeBGRA32Max();
+			return new DrawingModeBGRA32Max();
 			break;
 
 		// this drawing mode is the only one considering
@@ -79,22 +79,22 @@ printf("DrawingModeBGRA32CopySolid()\n");
 		case B_OP_ALPHA:
 			if (alphaSrcMode == B_CONSTANT_ALPHA) {
 				if (alphaFncMode == B_ALPHA_OVERLAY) {
-					return new agg::DrawingModeBGRA32AlphaCO();
+					return new DrawingModeBGRA32AlphaCO();
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
-					return new agg::DrawingModeBGRA32AlphaCC();
+					return new DrawingModeBGRA32AlphaCC();
 				}
 			} else if (alphaSrcMode == B_PIXEL_ALPHA){
 				if (alphaFncMode == B_ALPHA_OVERLAY) {
-					return new agg::DrawingModeBGRA32AlphaPO();
+					return new DrawingModeBGRA32AlphaPO();
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
-					return new agg::DrawingModeBGRA32AlphaPC();
+					return new DrawingModeBGRA32AlphaPC();
 				}
 			}
 			break;
 
 		default:
 fprintf(stderr, "DrawingModeFactory::DrawingModeFor() - drawing_mode not implemented\n");
-			return new agg::DrawingModeBGRA32Copy();
+			return new DrawingModeBGRA32Copy();
 	}
 	return NULL;
 }

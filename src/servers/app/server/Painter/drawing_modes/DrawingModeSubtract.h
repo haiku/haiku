@@ -8,202 +8,191 @@
 #include "DrawingMode.h"
 #include "PatternHandler.h"
 
-// blend_subtract
-inline void
-blend_subtract(uint8* d1, uint8* d2, uint8* d3, uint8* da,
-			   uint8 s1, uint8 s2, uint8 s3, uint8 a)
-{
-	s1 = max_c(0, *d1 - s1);
-	s2 = max_c(0, *d2 - s2);
-	s3 = max_c(0, *d3 - s3);
-
-	blend(d1, d2, d3, da, s1, s2, s3, a);
+// BLEND_SUBTRACT
+#define BLEND_SUBTRACT(d1, d2, d3, da, s1, s2, s3, a) \
+{ \
+	uint8 t1 = max_c(0, (d1) - (s1)); \
+	uint8 t2 = max_c(0, (d2) - (s2)); \
+	uint8 t3 = max_c(0, (d3) - (s3)); \
+	BLEND(d1, d2, d3, da, t1, t2, t3, a); \
 }
 
-// assign_subtract
-inline void
-assign_subtract(uint8* d1, uint8* d2, uint8* d3, uint8* da,
-				uint8 s1, uint8 s2, uint8 s3)
-{
-	*d1 = max_c(0, *d1 - s1);
-	*d2 = max_c(0, *d2 - s2);
-	*d3 = max_c(0, *d3 - s3);
-	*da = 255;
+// ASSIGN_SUBTRACT
+#define ASSIGN_SUBTRACT(d1, d2, d3, da, s1, s2, s3) \
+{ \
+	(d1) = max_c(0, (d1) - (s1)); \
+	(d2) = max_c(0, (d2) - (s2)); \
+	(d3) = max_c(0, (d3) - (s3)); \
+	(da) = 255; \
 }
 
 
-namespace agg
-{
-	template<class Order>
-	class DrawingModeSubtract : public DrawingMode
+template<class Order>
+class DrawingModeSubtract : public DrawingMode {
+ public:
+	// constructor
+	DrawingModeSubtract()
+		: DrawingMode()
 	{
-	public:
-		typedef Order order_type;
+	}
 
-		// constructor
-		DrawingModeSubtract()
-			: DrawingMode()
-		{
+	// blend_pixel
+	virtual	void blend_pixel(int x, int y, const color_type& c, uint8 cover)
+	{
+		uint8* p = fBuffer->row(y) + (x << 2);
+		rgb_color color = fPatternHandler->R5ColorAt(x, y);
+		if (cover == 255) {
+			ASSIGN_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+							color.red, color.green, color.blue);
+		} else {
+			BLEND_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+						   color.red, color.green, color.blue, cover);
 		}
+	}
 
-		// blend_pixel
-		virtual	void blend_pixel(int x, int y, const color_type& c, int8u cover)
-		{
-			int8u* p = m_rbuf->row(y) + (x << 2);
-			rgb_color color = fPatternHandler->R5ColorAt(x, y);
-			if (cover == 255) {
-				assign_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-								color.red, color.green, color.blue);
-			} else {
-				blend_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-							   color.red, color.green, color.blue, cover);
-			}
-		}
-
-		// blend_hline
-		virtual	void blend_hline(int x, int y, unsigned len, 
-								 const color_type& c, int8u cover)
-		{
-			int8u* p = m_rbuf->row(y) + (x << 2);
-			if (cover == 255) {
-				do {
-					rgb_color color = fPatternHandler->R5ColorAt(x, y);
-
-					assign_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-									color.red, color.green, color.blue);
-
-					p += 4;
-					x++;
-				} while(--len);
-			} else {
-				do {
-					rgb_color color = fPatternHandler->R5ColorAt(x, y);
-
-					blend_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-								   color.red, color.green, color.blue, cover);
-
-					x++;
-					p += 4;
-				}
-				while(--len);
-			}
-		}
-
-		// blend_vline
-		virtual	void blend_vline(int x, int y, unsigned len, 
-								 const color_type& c, int8u cover)
-		{
-printf("DrawingModeSubtract::blend_vline()\n");
-		}
-
-		// blend_solid_hspan
-		virtual	void blend_solid_hspan(int x, int y, unsigned len, 
-									   const color_type& c, const int8u* covers)
-		{
-			int8u* p = m_rbuf->row(y) + (x << 2);
+	// blend_hline
+	virtual	void blend_hline(int x, int y, unsigned len, 
+							 const color_type& c, uint8 cover)
+	{
+		uint8* p = fBuffer->row(y) + (x << 2);
+		if (cover == 255) {
 			do {
 				rgb_color color = fPatternHandler->R5ColorAt(x, y);
+
+				ASSIGN_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+								color.red, color.green, color.blue);
+
+				p += 4;
+				x++;
+			} while(--len);
+		} else {
+			do {
+				rgb_color color = fPatternHandler->R5ColorAt(x, y);
+
+				BLEND_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+							   color.red, color.green, color.blue, cover);
+
+				x++;
+				p += 4;
+			}
+			while(--len);
+		}
+	}
+
+	// blend_vline
+	virtual	void blend_vline(int x, int y, unsigned len, 
+							 const color_type& c, uint8 cover)
+	{
+printf("DrawingModeSubtract::blend_vline()\n");
+	}
+
+	// blend_solid_hspan
+	virtual	void blend_solid_hspan(int x, int y, unsigned len, 
+								   const color_type& c, const uint8* covers)
+	{
+		uint8* p = fBuffer->row(y) + (x << 2);
+		do {
+			rgb_color color = fPatternHandler->R5ColorAt(x, y);
+			if (*covers) {
+				if (*covers == 255) {
+					ASSIGN_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+									color.red, color.green, color.blue);
+				} else {
+					BLEND_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+								   color.red, color.green, color.blue, *covers);
+				}
+			}
+			covers++;
+			p += 4;
+			x++;
+		} while(--len);
+	}
+
+
+
+	// blend_solid_vspan
+	virtual	void blend_solid_vspan(int x, int y, unsigned len, 
+								   const color_type& c, const uint8* covers)
+	{
+		uint8* p = fBuffer->row(y) + (x << 2);
+		do {
+			rgb_color color = fPatternHandler->R5ColorAt(x, y);
+			if (*covers) {
+				if (*covers == 255) {
+					ASSIGN_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+									color.red, color.green, color.blue);
+				} else {
+					BLEND_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+								   color.red, color.green, color.blue, *covers);
+				}
+			}
+			covers++;
+			p += fBuffer->stride();
+			y++;
+		} while(--len);
+	}
+
+
+	// blend_color_hspan
+	virtual	void blend_color_hspan(int x, int y, unsigned len, 
+								   const color_type* colors, 
+								   const uint8* covers,
+								   uint8 cover)
+	{
+		uint8* p = fBuffer->row(y) + (x << 2);
+		if (covers) {
+			// non-solid opacity
+			do {
 				if (*covers) {
 					if (*covers == 255) {
-						assign_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-										color.red, color.green, color.blue);
+						ASSIGN_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+										colors->r, colors->g, colors->b);
 					} else {
-						blend_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-									   color.red, color.green, color.blue, *covers);
+						BLEND_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+									   colors->r, colors->g, colors->b, *covers);
 					}
 				}
 				covers++;
 				p += 4;
-				x++;
+				++colors;
 			} while(--len);
-		}
-
-
-
-		// blend_solid_vspan
-		virtual	void blend_solid_vspan(int x, int y, unsigned len, 
-									   const color_type& c, const int8u* covers)
-		{
-			int8u* p = m_rbuf->row(y) + (x << 2);
-			do {
-				rgb_color color = fPatternHandler->R5ColorAt(x, y);
-				if (*covers) {
-					if (*covers == 255) {
-						assign_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-										color.red, color.green, color.blue);
-					} else {
-						blend_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-									   color.red, color.green, color.blue, *covers);
-					}
-				}
-				covers++;
-				p += m_rbuf->stride();
-				y++;
-			} while(--len);
-		}
-
-
-		// blend_color_hspan
-		virtual	void blend_color_hspan(int x, int y, unsigned len, 
-									   const color_type* colors, 
-									   const int8u* covers,
-									   int8u cover)
-		{
-			int8u* p = m_rbuf->row(y) + (x << 2);
-			if (covers) {
-				// non-solid opacity
+		} else {
+			// solid full opcacity
+			if (cover == 255) {
 				do {
-					if (*covers) {
-						if (*covers == 255) {
-							assign_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-											colors->r, colors->g, colors->b);
-						} else {
-							blend_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-										   colors->r, colors->g, colors->b, *covers);
-						}
-					}
-					covers++;
+					ASSIGN_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+									colors->r, colors->g, colors->b);
 					p += 4;
 					++colors;
 				} while(--len);
-			} else {
-				// solid full opcacity
-				if (cover == 255) {
-					do {
-						assign_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-										colors->r, colors->g, colors->b);
-						p += 4;
-						++colors;
-					} while(--len);
-				// solid partial opacity
-				} else if (cover) {
-					do {
-						blend_subtract(&p[Order::R], &p[Order::G], &p[Order::B], &p[Order::A],
-									   colors->r, colors->g, colors->b, cover);
-						p += 4;
-						++colors;
-					} while(--len);
-				}
+			// solid partial opacity
+			} else if (cover) {
+				do {
+					BLEND_SUBTRACT(p[Order::R], p[Order::G], p[Order::B], p[Order::A],
+								   colors->r, colors->g, colors->b, cover);
+					p += 4;
+					++colors;
+				} while(--len);
 			}
 		}
+	}
 
 
-		// blend_color_vspan
-		virtual	void blend_color_vspan(int x, int y, unsigned len, 
-									   const color_type* colors, 
-									   const int8u* covers,
-									   int8u cover)
-		{
+	// blend_color_vspan
+	virtual	void blend_color_vspan(int x, int y, unsigned len, 
+								   const color_type* colors, 
+								   const uint8* covers,
+								   uint8 cover)
+	{
 printf("DrawingModeSubtract::blend_color_vspan()\n");
-		}
+	}
 
-	};
+};
 
-	typedef DrawingModeSubtract<order_rgba32> DrawingModeRGBA32Subtract; //----DrawingModeRGBA32Subtract
-	typedef DrawingModeSubtract<order_argb32> DrawingModeARGB32Subtract; //----DrawingModeARGB32Subtract
-	typedef DrawingModeSubtract<order_abgr32> DrawingModeABGR32Subtract; //----DrawingModeABGR32Subtract
-	typedef DrawingModeSubtract<order_bgra32> DrawingModeBGRA32Subtract; //----DrawingModeBGRA32Subtract
-}
+typedef DrawingModeSubtract<agg::order_rgba32> DrawingModeRGBA32Subtract;
+typedef DrawingModeSubtract<agg::order_argb32> DrawingModeARGB32Subtract;
+typedef DrawingModeSubtract<agg::order_abgr32> DrawingModeABGR32Subtract;
+typedef DrawingModeSubtract<agg::order_bgra32> DrawingModeBGRA32Subtract;
 
 #endif // DRAWING_MODE_SUBTRACT_H
 
