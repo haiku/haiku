@@ -1,0 +1,74 @@
+BFS - ToDo, June 5th, 2002
+-----
+
+BlockAllocator
+
+ - the BlockAllocator is only slightly optimized and probably slow
+ - the first free and the largest range are currently not correctly maintained (only efficiency suffers - it does work correctly)
+ - the allocation policies will have to stand against some real world tests
+ - the access to the block bitmap is currently managed using a global lock
+
+
+DataStream
+
+ - growing/shrinking the stream size is not implemented for the double indirect range
+ - only files are trimmed back (in bfs_close()), but every inode has a preallocated stream...
+ - merging of block_runs doesn't work between range/block boundaries
+
+
+Queries
+
+ - There shouldn't be any cases where you can speed up a query with reordering the query expression - test it
+ - Check permissions of the parent directories
+ - Add protection against crashing applications which had a query open - at least the original BeOS kernel does not free the cookie (which throws some memory away *and* prevents unmounting the disk)
+
+
+Journal
+
+ - Check if there are any standard and often-happening cases for a transaction to fail, and if so, start the transaction only when necessary
+ - if the system crashes between bfs_unlink() and bfs_remove_vnode(), the inode can be removed from the tree, but its memory is still allocated - this can happen if the inode is still in use by someone (and that's what the "chkbfs" utility is for, mainly).
+ - add delayed index updating (+ delete actions to solve the issue above)
+ - multiple log files, parallel transactions?
+ - variable sized log file
+ - as long as we have a fixed-sized log file, it should be possible to reserve space for a transaction to be able to decide if batching it is possible
+
+
+BPlusTree
+
+ - BPlusTree::Remove() could trigger CachedNode::Free() to go through the free nodes list and free all pages at the end of the data stream
+ - updating the TreeIterators doesn't work yet for duplicates (which may be a problem if a duplicate node will go away after a remove)
+ - BPlusTree::RemoveDuplicate() could spread the contents of duplicate node with only a few entries to save some space (right now, only empty nodes are freed)
+
+
+Inode
+
+ - sometimes the inode's last modified time seems to be wrong, and is therefore not found in the b+tree (assuming that the b+tree is working correctly, what I do)
+ - Inode::FillGapWithZeros() currently disabled; apart from being slow, it really shouldn't be executed while a transaction is running, because that stops all other threads from doing anything (which can be a long time for a 100 MB file)
+
+
+Indices
+
+
+
+Attributes
+
+ - bfs_write_attr() doesn't check if the attribute data may fit into the small_data region if there already is that attribute as an attribute file
+
+
+Volume
+
+
+kernel_interface
+
+ - missing functions, maybe they are not all needed (but most of them are): bfs_rename_attr(), bfs_rename_index(), bfs_initialize(), bfs_setflags(), bfs_link()
+ - bfs_rename() currently doesn't respect any permissions
+
+
+general stuff
+
+ - There are also some comments with a leading "ToDo:" directly in the code which may not be mentioned here.
+
+
+-----
+Axel Dörfler
+axeld@pinc-software.de
