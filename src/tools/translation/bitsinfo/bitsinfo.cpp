@@ -39,7 +39,6 @@
 #include <string.h>
 #include <ByteOrder.h>
 #include <File.h>
-#include <StorageDefs.h>
 #include <TranslatorFormats.h>
 
 struct ColorSpaceName { 
@@ -48,8 +47,10 @@ struct ColorSpaceName {
 };
 #define COLORSPACENAME(id) {id, #id}
 
+const char *kpixels = "-pixels";
+
 void
-PrintBitsInfo(const char *filepath)
+PrintBitsInfo(const char *filepath, bool bdumppixels)
 {
 	BFile file(filepath, B_READ_ONLY);
 	
@@ -60,20 +61,21 @@ PrintBitsInfo(const char *filepath)
 		// read in the rest of the header
 		ssize_t size = sizeof(TranslatorBitmap);
 		if (file.Read(reinterpret_cast<uint8 *> (&header), size) != size) {
-			printf("Error: Unable to read the Be bitmap header.\n");
+			printf("\nError: Unable to read the Be bitmap header.\n");
 			return;
 		}
-		file.Unset();
+		if (!bdumppixels)
 			// I don't need the file anymore
+			file.Unset();
 
 		// convert to host byte order
 		if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
 			B_SWAP_BENDIAN_TO_HOST) != B_OK) {
-			printf("Error: Unable to swap byte order\n");
+			printf("\nError: Unable to swap byte order\n");
 			return;
 		}
 		
-		printf("Be bitmap (\"bits\") header for: %s\n\n", filepath);
+		printf("\nBe bitmap (\"bits\") header for: %s\n\n", filepath);
 	
 		const uint32 kbitsmagic = 0x62697473UL;
 			// in ASCII, this number looks like "bits"
@@ -156,6 +158,51 @@ PrintBitsInfo(const char *filepath)
 			
 		printf("data size: %u\n",
 			static_cast<unsigned int>(header.dataSize));
+			
+		if (bdumppixels) {
+			const char *components = NULL;
+			int32 ncomponents = 0;
+			switch (header.colors) {
+				case B_RGB24:
+					components = "BGR";
+					ncomponents = 3;
+					break;
+				case B_RGB32:
+					components = "BGR-";
+					ncomponents = 4;
+					break;
+				case B_RGBA32:
+					components = "BGRA";
+					ncomponents = 4;
+					break;
+				
+				default:
+					printf("Sorry, %s isn't supported yet"
+						" for this color space\n", kpixels);
+					return;
+			}
+			uint8 *prow = new uint8[header.rowBytes];
+			if (!prow) {
+				printf("Error: Not enough memory for row buffer\n");
+				return;
+			}
+			ssize_t ret, n;
+			uint32 totalbytes = 0;
+			printf("pixel data (%s):\n", components);
+			while ((ret = file.Read(prow, header.rowBytes)) > 0) {
+				n = 0;
+				while (n < ret) {
+					if (n && !(n % ncomponents))
+						printf(" ");
+					printf("%.2X", prow[n]);
+					n++;
+					totalbytes++;
+					if (!(totalbytes % (uint32) ret))
+						printf("\n\n");
+				}
+			}
+		}			
+		
 	} else
 		printf("Error opening %s\n", filepath);
 }
@@ -163,16 +210,27 @@ PrintBitsInfo(const char *filepath)
 int
 main(int argc, char **argv)
 {
+	if (argc == 1) {
+		printf("\nbitsinfo - reports information about a Be bitmap (\"bits\") image\n");
+		printf("\nUsage:\n");
+		printf("bitsinfo [options] filename.bits\n\n");
+		printf("Options:\n\n");
+		printf("\t%s \t print RGB color for each pixel\n", kpixels);
+	}
+	else {
+		int32 first = 1;
+		bool bdumppixels = false;
+		if (strcmp(argv[1], kpixels) == 0) {
+			bdumppixels = true;
+			first = 2;
+		}
+
+		for (int32 i = first; i < argc; i++)
+			PrintBitsInfo(argv[i], bdumppixels);
+	}
+	
 	printf("\n");
 	
-	if (argc == 2)
-		PrintBitsInfo(argv[1]);
-	else {
-		printf("bitsinfo - reports information about a Be bitmap (\"bits\") image\n");
-		printf("\nUsage:\n");
-		printf("bitsinfo filename.bits\n\n");	
-	}
-
 	return 0;
 }
 
