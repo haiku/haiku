@@ -8,13 +8,13 @@ pci_irq_init(void)
 
 
 uint8
-pci_read_irq(uint8 bus, uint8 device, uint8 function, uint8 line)
+pci_read_irq(uint8 bus, uint8 device, uint8 function, uint8 pin)
 {
 	return 0;
 }
 
 
 void
-pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 line, uint8 irq)
+pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 pin, uint8 irq)
 {
 }

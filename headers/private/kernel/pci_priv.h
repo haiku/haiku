@@ -1,5 +1,8 @@
-#include <BeBuild.h>
-#include <SupportDefs.h>
+#include <KernelExport.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 status_t 	pci_config_init(void);
 uint32		pci_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 size);
@@ -15,15 +18,16 @@ uint32		pci_read_io_32(int mapped_io_addr);
 void		pci_write_io_32(int mapped_io_addr, uint32 value);
 
 status_t	pci_irq_init(void);
-uint8		pci_read_irq(uint8 bus, uint8 device, uint8 function, uint8 line);
-void		pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 line, uint8 irq);
+uint8		pci_read_irq(uint8 bus, uint8 device, uint8 function, uint8 pin);
+void		pci_write_irq(uint8 bus, uint8 device, uint8 function, uint8 pin, uint8 irq);
 
+extern spinlock	gConfigLock;
 extern int	gMaxBusDevices;
 extern bool gIrqRouterAvailable;
 
-#define PCI_LOCK_CONFIG(status) \
+#define PCI_LOCK_CONFIG(cpu_status) \
 { \
-	status = disable_interrupts(); \
+	cpu_status = disable_interrupts(); \
 	acquire_spinlock(&gConfigLock); \
 }
 
@@ -32,3 +36,7 @@ extern bool gIrqRouterAvailable;
 	release_spinlock(&gConfigLock); \
 	restore_interrupts(cpu_status); \
 }
+
+#ifdef __cplusplus
+}
+#endif
