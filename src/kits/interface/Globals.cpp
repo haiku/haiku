@@ -35,7 +35,7 @@
 #include <Roster.h>
 #include <TextView.h>
 
-//#include <WidthBuffer.h>
+#include <WidthBuffer.h>
 
 // Private definitions not placed in public headers
 extern "C" void _init_global_fonts();
@@ -418,7 +418,7 @@ _init_interface_kit_()
 		return widthSem;
 	BTextView::sWidthSem = widthSem;
 	BTextView::sWidthAtom = 0;
-	//sWidthBuffer = BTextView::sWidths = new _BWidthBuffer_;
+	BTextView::sWidths = new _BWidthBuffer_;
 		
 	status_t result = get_menu_info(&BMenu::sMenuInfo);
 	if (result != B_OK)  
