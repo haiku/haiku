@@ -86,6 +86,7 @@ ether_ifattach(struct ifnet *ifp, const uint8 *etheraddr)
 	ifp->if_input = ether_input;
 
 	ifp->if_rcv_sem = create_sem(0, "ifp->if_rcv_sem");
+	set_sem_owner(ifp->if_rcv_sem, B_SYSTEM_TEAM);
 	
 	TRACE("calling if_init...\n");
 	ifp->if_init(ifp->if_softc);

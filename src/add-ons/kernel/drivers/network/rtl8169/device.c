@@ -340,16 +340,18 @@ rtl8169_open(const char *name, uint32 flags, void** cookie)
 	device->closed = false;
 	
 	device->rxSpinlock = 0;
-	device->rxReadySem = create_sem(0, "rtl8169 rx ready");
 	device->rxNextIndex = 0;
 	device->rxIntIndex = 0;
 	device->rxFree = RX_DESC_COUNT;
+	device->rxReadySem = create_sem(0, "rtl8169 rx ready");
+	set_sem_owner(device->rxReadySem, B_SYSTEM_TEAM);
 	
 	device->txSpinlock = 0;
-	device->txFreeSem = create_sem(TX_DESC_COUNT, "rtl8169 tx free");
 	device->txNextIndex = 0;
 	device->txIntIndex = 0;
 	device->txUsed = 0;
+	device->txFreeSem = create_sem(TX_DESC_COUNT, "rtl8169 tx free");
+	set_sem_owner(device->txFreeSem, B_SYSTEM_TEAM);
 	
 	// enable busmaster and memory mapped access, disable io port access
 	val = gPci->read_pci_config(device->pciInfo->bus, device->pciInfo->device, device->pciInfo->function, PCI_command, 2);
