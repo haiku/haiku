@@ -5,12 +5,14 @@
 #ifndef _KERNEL_ELF_PRIV_H
 #define _KERNEL_ELF_PRIV_H
 
+
+#include <ktypes.h>
 #include <elf32.h>
 #include <image.h>
 
 
 struct elf_region {
-	region_id id;
+	area_id id;
 	addr start;
 	addr size;
 	long delta;
