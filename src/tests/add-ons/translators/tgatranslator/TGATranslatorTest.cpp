@@ -555,6 +555,12 @@ TGATranslatorTest::ConfigMessageTest()
 	bool brle;
 	CPPUNIT_ASSERT(msg.FindBool("tga /rle", &brle) == B_OK);
 	CPPUNIT_ASSERT(brle == true || brle == false);
+	
+	// "tga /ignore_alpha"
+	NextSubTest();
+	bool balpha;
+	CPPUNIT_ASSERT(msg.FindBool("tga /ignore_alpha", &balpha) == B_OK);
+	CPPUNIT_ASSERT(balpha == true || balpha == false);
 }
 
 #if !TEST_R5
