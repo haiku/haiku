@@ -58,4 +58,4 @@ private:
 
 using BPrivate::DiskDevice::KPath;
 
-#endif _K_PATH_H
+#endif	/* _K_PATH_H */
