@@ -971,8 +971,6 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 		}
 	} visitor;
 	device->VisitEachDescendant(&visitor);
-	if (device->ShadowPartition())
-		device->ShadowPartition()->VisitEachDescendant(&visitor);
 	// Iterate through all job queues and all jobs scheduled or in
 	// progress and mark their scope busy.
 	for (int32 cookie = 0;
@@ -989,8 +987,6 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 			if (!partition || partition->Device() != device)
 				continue;
 			partition->AddFlags(B_PARTITION_BUSY);
-			if (KPartition *shadow = partition->ShadowPartition())
-				shadow->AddFlags(B_PARTITION_BUSY);
 		}
 	}
 	// mark all anscestors of busy partitions descendant busy and all
@@ -1016,8 +1012,6 @@ KDiskDeviceManager::_UpdateBusyPartitions(KDiskDevice *device)
 		}
 	} visitor2;
 	device->VisitEachDescendant(&visitor2);
-	if (device->ShadowPartition())
-		device->ShadowPartition()->VisitEachDescendant(&visitor2);
 	return B_OK;
 }
 
