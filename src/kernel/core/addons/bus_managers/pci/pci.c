@@ -78,7 +78,7 @@ static void write_pci_config (uchar, uchar, uchar, uchar, uchar, uint32);
 #define PCI_PRODUCT_INTEL_82443BX        0x7190
 #define PCI_PRODUCT_INTEL_82443BX_AGP    0x7191
 #define PCI_PRODUCT_INTEL_82443BX_NOAGP  0x7192
-
+#define PCI_PRODUCT_INTEL_82845_AGP      0x1a31
 
 /* Config space locking!
  * We need to make sure we only have one access at a time into the config space,
@@ -504,10 +504,12 @@ static int pci_set_power_state(uint8 bus, uint8 dev, uint8 func, int state)
 	return 0;
 }
 
-/* Borrowed from NetBSD.
- * Some Host bridges need to have fixes applied.
+/* This used to be fixup_host_bridges, but some PCI-PCI bridges need
+ * to be adjusted as well so I'll make it more general.
+ *
+ * Partially borrowed from NetBSD.
  */
-static void fixup_host_bridge(uint8 bus, uint8 dev, uint8 func)
+static void fixup_bridge(uint8 bus, uint8 dev, uint8 func)
 {
 	uint16 vendor, device;
 	
@@ -533,6 +535,20 @@ static void fixup_host_bridge(uint8 bus, uint8 dev, uint8 func)
 						write_pci_config(bus, dev, func, 0x76, 2, bcreg);
 					}
 					break;
+				}
+				case PCI_PRODUCT_INTEL_82845_AGP: {
+					/* Foward accesses to VGA memory onto the AGP card
+					 *
+					 * This is very experimental! Added to see if this will
+					 * fix Marcus's problem with this device.
+					 */
+					uint8 ctrl = read_pci_config(bus, dev, func, 0x3e, 1);
+					
+					if ((ctrl & 0x04) != 0x04) {
+						dprintf("Enabling VGA_EN1 for Intel 82845 AGP Bridge\n");
+						ctrl |= 0x04;
+						write_pci_config(bus, dev, func, 0x3e, 1, ctrl);
+					}
 				}
 			}
 	}
@@ -925,8 +941,7 @@ static void pci_device_probe(uint8 bus, uint8 dev, uint8 func)
 	sub_class  = read_pci_config(bus, dev, func, PCI_class_sub, 1);
 
 	if (base_class == PCI_bridge) {
-		if (sub_class == PCI_host)
-			fixup_host_bridge(bus, dev, func);
+		fixup_bridge(bus, dev, func);
 		if (sub_class == PCI_pci) {
 			pci_bridge(bus, dev, func);
 			return;
