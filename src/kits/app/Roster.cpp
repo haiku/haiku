@@ -516,14 +516,74 @@ BRoster::ActivateApp(team_id team) const
 }
 
 // Launch
+/*!	\brief Launches the application associated with the supplied MIME type.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	\a initialMessage is a message to be sent to the application "on launch",
+	i.e. before ReadyToRun() is invoked on the BApplication object. The
+	caller retains ownership of the supplied BMessage. In case the method
+	fails with \c B_ALREADY_RUNNING the message is delivered to the already
+	running instance.
+
+	\param mimeType MIME type for which the application shall be launched.
+	\param initialMessage Optional message to be sent to the application
+		   "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- \c B_ALREADY_RUNNING: The application's app flags specify
+	  \c B_SINGLE_LAUNCH or B_EXCLUSIVE_LAUNCH and the application (the very
+	  same (single) or at least one with the same signature (exclusive)) is
+	  already running.
+	- other error codes
+*/
 status_t
-BRoster::Launch(const char *mimeType, BMessage *initialMsgs,
+BRoster::Launch(const char *mimeType, BMessage *initialMesssage,
 				team_id *appTeam) const
 {
 	return NOT_IMPLEMENTED; // not implemented
 }
 
 // Launch
+/*!	\brief Launches the application associated with the supplied MIME type.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	\a messageList contains messages to be sent to the application
+	"on launch", i.e. before ReadyToRun() is invoked on the BApplication
+	object. The caller retains ownership of the supplied BList and the
+	contained BMessages. In case the method fails with \c B_ALREADY_RUNNING
+	the messages are delivered to the already running instance.
+
+	\param mimeType MIME type for which the application shall be launched.
+	\param messageList Optional list of messages to be sent to the application
+		   "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- other error codes
+*/
 status_t
 BRoster::Launch(const char *mimeType, BList *messageList,
 				team_id *appTeam) const
@@ -532,6 +592,35 @@ BRoster::Launch(const char *mimeType, BList *messageList,
 }
 
 // Launch
+/*!	\brief Launches the application associated with the supplied MIME type.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	The supplied \a argc and \a args are (if containing at least one argument)
+	put into a \c B_ARGV_RECEIVED message and sent to the launched application
+	"on launch". The caller retains ownership of the supplied \a args.
+	In case the method fails with \c B_ALREADY_RUNNING the message is
+	delivered to the already running instance.
+
+	\param mimeType MIME type for which the application shall be launched.
+	\param argc Specifies the number of elements in \a args.
+	\param args An array of C-strings to be sent as B_ARGV_RECEIVED messaged
+		   to the launched application.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a mimeType
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- other error codes
+*/
 status_t
 BRoster::Launch(const char *mimeType, int argc, char **args,
 				team_id *appTeam) const
@@ -540,6 +629,44 @@ BRoster::Launch(const char *mimeType, int argc, char **args,
 }
 
 // Launch
+/*!	\brief Launches the application associated with the entry referred to by
+		   the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message.
+
+	\a initialMessage is a message to be sent to the application "on launch",
+	i.e. before ReadyToRun() is invoked on the BApplication object. The
+	caller retains ownership of the supplied BMessage. In case the method
+	fails with \c B_ALREADY_RUNNING the message is delivered to the already
+	running instance. The same applies to the \c B_REFS_RECEIVED message.
+
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched.
+	\param initialMessage Optional message to be sent to the application
+		   "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- \c B_ALREADY_RUNNING: The application's app flags specify
+	  \c B_SINGLE_LAUNCH or B_EXCLUSIVE_LAUNCH and the application (the very
+	  same (single) or at least one with the same signature (exclusive)) is
+	  already running.
+	- other error codes
+*/
 status_t
 BRoster::Launch(const entry_ref *ref, const BMessage *initialMessage,
 				team_id *app_team) const
@@ -548,6 +675,41 @@ BRoster::Launch(const entry_ref *ref, const BMessage *initialMessage,
 }
 
 // Launch
+/*!	\brief Launches the application associated with the entry referred to by
+		   the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message.
+
+	\a messageList contains messages to be sent to the application
+	"on launch", i.e. before ReadyToRun() is invoked on the BApplication
+	object. The caller retains ownership of the supplied BList and the
+	contained BMessages. In case the method fails with \c B_ALREADY_RUNNING
+	the messages are delivered to the already running instance. The same
+	applies to the \c B_REFS_RECEIVED message.
+
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched.
+	\param messageList Optional list of messages to be sent to the application
+		   "on launch". May be \c NULL.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- other error codes
+*/
 status_t
 BRoster::Launch(const entry_ref *ref, const BList *messageList,
 				team_id *appTeam) const
@@ -556,6 +718,45 @@ BRoster::Launch(const entry_ref *ref, const BList *messageList,
 }
 
 // Launch
+/*!	\brief Launches the application associated with the entry referred to by
+		   the supplied entry_ref.
+
+	The application to be started is searched the same way FindApp() does it.
+
+	If \a ref does refer to an application executable, that application is
+	launched. Otherwise the respective application is searched and launched,
+	and \a ref is sent to it in a \c B_REFS_RECEIVED message, unless other
+	arguments are passed via \a argc and \a args -- then the entry_ref is
+	converted into a path (C-string) and added to the argument vector.
+
+	The supplied \a argc and \a args are (if containing at least one argument)
+	put into a \c B_ARGV_RECEIVED message and sent to the launched application
+	"on launch". The caller retains ownership of the supplied \a args.
+	In case the method fails with \c B_ALREADY_RUNNING the message is
+	delivered to the already running instance. The same applies to the
+	\c B_REFS_RECEIVED message, if no arguments are supplied via \a argc and
+	\args.
+
+	\param ref entry_ref referring to the file for which an application shall
+		   be launched.
+	\param argc Specifies the number of elements in \a args.
+	\param args An array of C-strings to be sent as B_ARGV_RECEIVED messaged
+		   to the launched application.
+	\param appTeam Pointer to a pre-allocated team_id variable to be set to
+		   the team ID of the launched application.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: \c NULL \a ref
+	- \c B_LAUNCH_FAILED_NO_PREFERRED_APP: Neither with the supplied type nor 
+	  with its supertype (if the supplied isn't a supertype itself) a
+	  preferred application is associated.
+	- \c B_LAUNCH_FAILED_APP_NOT_FOUND: The supplied type is not installed or
+	  its preferred application could not be found.
+	- \c B_LAUNCH_FAILED_APP_IN_TRASH: The supplied type's preferred
+	  application is in trash.
+	- \c B_LAUNCH_FAILED_EXECUTABLE: The found application is not executable.
+	- other error codes
+*/
 status_t
 BRoster::Launch(const entry_ref *ref, int argc, const char * const *args,
 				team_id *appTeam) const
