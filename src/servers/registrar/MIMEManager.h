@@ -13,6 +13,7 @@ public:
 
 	virtual void MessageReceived(BMessage *message);
 private:
+	void HandleSetParam(BMessage *message);
 	BPrivate::MimeDatabase fMimeDatabase;
 };
 
