@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -6,6 +9,10 @@
 #define KERNEL_ARCH_THREAD_H
 
 #include <thread.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 int arch_team_init_team_struct(struct team *t, bool kernel);
 int arch_thread_init_thread_struct(struct thread *t);
@@ -30,5 +37,9 @@ void arch_check_syscall_restart(struct thread *t);
 
 // for any inline overrides
 #include <arch_thread.h>
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* KERNEL_ARCH_THREAD_H */
