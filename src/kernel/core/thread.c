@@ -166,8 +166,7 @@ create_thread_struct(const char *name)
 			goto err;
 	}
 
-	strncpy(&t->name[0], name, SYS_MAX_OS_NAME_LEN-1);
-	t->name[SYS_MAX_OS_NAME_LEN-1] = 0;
+	strlcpy(t->name, name, B_OS_NAME_LENGTH);
 
 	t->id = atomic_add(&next_thread_id, 1);
 	t->team = NULL;
@@ -767,7 +766,7 @@ thread_exit(void)
 			// cycle through and signal kill on each of the threads
 			// XXX this can be optimized. There's got to be a better solution.
 			struct thread *temp_thread;
-			char death_sem_name[SYS_MAX_OS_NAME_LEN];
+			char death_sem_name[B_OS_NAME_LENGTH];
 
 			sprintf(death_sem_name, "team %ld death sem", team->id);
 			team->death_sem = create_sem(0, death_sem_name);
@@ -1212,21 +1211,23 @@ send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
 
 
 status_t
-receive_data(thread_id *sender, void *buffer, size_t buffer_size)
+receive_data(thread_id *sender, void *buffer, size_t bufferSize)
 {
 	struct thread *t = thread_get_current_thread();
-	status_t rv;
+	status_t status;
 	size_t size;
 	int32 code;
 
-	acquire_sem(t->msg.read_sem);
+	status = acquire_sem_etc(t->msg.read_sem, 1, B_CAN_INTERRUPT, 0);
+	if (status < B_OK)
+		return status;
 
-	size = min(buffer_size, t->msg.size);
-	rv = cbuf_user_memcpy_from_chain(buffer, t->msg.buffer, 0, size);
-	if (rv < 0) {
+	size = min(bufferSize, t->msg.size);
+	status = cbuf_user_memcpy_from_chain(buffer, t->msg.buffer, 0, size);
+	if (status < B_OK) {
 		cbuf_free_chain(t->msg.buffer);
 		release_sem(t->msg.write_sem);
-		return rv;
+		return status;
 	}
 
 	*sender = t->msg.sender;
@@ -1251,107 +1252,107 @@ has_data(thread_id thread)
 }
 
 
-status_t
-_get_thread_info(thread_id id, thread_info *info, size_t size)
+/** Fills the thread_info structure with information from the specified
+ *	thread.
+ *	The thread lock must be held when called.
+ */
+
+static void
+fill_thread_info(struct thread *thread, thread_info *info, size_t size)
 {
-	cpu_status state;
-	status_t rc = B_OK;
-	struct thread *t;
+	info->thread = thread->id;
+	info->team = thread->team->id;
 
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
+	strlcpy(info->name, thread->name, B_OS_NAME_LENGTH);
 
-	t = thread_get_thread_struct_locked(id);
-	if (!t) {
-		rc = B_BAD_VALUE;
-		goto err;
-	}
-	info->thread = t->id;
-	info->team = t->team->id;
-	strncpy(info->name, t->name, B_OS_NAME_LENGTH);
-	info->name[B_OS_NAME_LENGTH - 1] = '\0';
-	if (t->state == B_THREAD_WAITING) {
-		if (t->sem_blocking == gSnoozeSem)
+	if (thread->state == B_THREAD_WAITING) {
+		if (thread->sem_blocking == gSnoozeSem)
 			info->state = B_THREAD_ASLEEP;
-		else if (t->sem_blocking == t->msg.read_sem)
+		else if (thread->sem_blocking == thread->msg.read_sem)
 			info->state = B_THREAD_RECEIVING;
 		else
 			info->state = B_THREAD_WAITING;
 	} else
-		info->state = t->state;
-	info->priority = t->priority;
-	info->sem = t->sem_blocking;
-	info->user_time = t->user_time;
-	info->kernel_time = t->kernel_time;
-	info->stack_base = (void *)t->user_stack_base;
-	info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
+		info->state = thread->state;
 
-err:
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-
-	return rc;
+	info->priority = thread->priority;
+	info->sem = thread->sem_blocking;
+	info->user_time = thread->user_time;
+	info->kernel_time = thread->kernel_time;
+	info->stack_base = (void *)thread->user_stack_base;
+	info->stack_end = (void *)(thread->user_stack_base + STACK_SIZE);
 }
 
 
 status_t
-_get_next_thread_info(team_id tid, int32 *cookie, thread_info *info, size_t size)
+_get_thread_info(thread_id id, thread_info *info, size_t size)
 {
+	status_t status = B_OK;
+	struct thread *thread;
 	cpu_status state;
-	int slot;
-	status_t rc = B_BAD_VALUE;
-	struct team *team;
-	struct thread *t = NULL;
 
-	if (tid == 0)
-		tid = team_get_current_team_id();
-	team = team_get_team_struct(tid);
-	if (!team)
+	if (info == NULL || size != sizeof(thread_info) || id < B_OK)
 		return B_BAD_VALUE;
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	if (*cookie == 0)
-		slot = 0;
-	else {
-		slot = *cookie;
-		if (slot >= next_thread_id)
-			goto err;
+	thread = thread_get_thread_struct_locked(id);
+	if (thread == NULL) {
+		status = B_BAD_VALUE;
+		goto err;
 	}
 
-	while ((slot < next_thread_id) && (!(t = thread_get_thread_struct_locked(slot)) || (t->team->id != tid)))
-		slot++;
+	fill_thread_info(thread, info, size);
 
-	if ((t) && (t->team->id == tid)) {
-		info->thread = t->id;
-		info->team = t->team->id;
-		strncpy(info->name, t->name, B_OS_NAME_LENGTH);
-		info->name[B_OS_NAME_LENGTH - 1] = '\0';
-		if (t->state == B_THREAD_WAITING) {
-			if (t->sem_blocking == gSnoozeSem)
-				info->state = B_THREAD_ASLEEP;
-			else if (t->sem_blocking == t->msg.read_sem)
-				info->state = B_THREAD_RECEIVING;
-			else
-				info->state = B_THREAD_WAITING;
-		} else
-			info->state = t->state;
-		info->priority = t->priority;
-		info->sem = t->sem_blocking;
-		info->user_time = t->user_time;
-		info->kernel_time = t->kernel_time;
-		info->stack_base = (void *)t->user_stack_base;
-		info->stack_end = (void *)(t->user_stack_base + STACK_SIZE);
-		slot++;
-		*cookie = slot;
-		rc = B_OK;
-	}
 err:
 	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
 
-	return rc;
+	return status;
+}
+
+
+status_t
+_get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t size)
+{
+	status_t status = B_BAD_VALUE;
+	struct thread *thread = NULL;
+	cpu_status state;
+	int slot;
+
+	if (info == NULL || size != sizeof(thread_info) || team < B_OK)
+		return B_BAD_VALUE;
+
+	if (team == B_CURRENT_TEAM)
+		team = team_get_current_team_id();
+	else if (!team_is_valid(team))
+		return B_BAD_VALUE;
+
+	slot = *_cookie;
+
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	if (slot >= next_thread_id)
+		goto err;
+
+	while (slot < next_thread_id
+		&& (!(thread = thread_get_thread_struct_locked(slot)) || thread->team->id != team))
+		slot++;
+
+	if (thread != NULL && thread->team->id == team) {
+		fill_thread_info(thread, info, size);
+
+		*_cookie = slot + 1;
+		status = B_OK;
+	}
+
+err:
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return status;
 }
 
 
@@ -1577,11 +1578,11 @@ user_set_thread_priority(thread_id thread, int32 newPriority)
 thread_id
 user_spawn_thread(thread_func entry, const char *userName, int32 priority, void *data1, void *data2)
 {
-	char name[SYS_MAX_OS_NAME_LEN];
+	char name[B_OS_NAME_LENGTH];
 
 	if (!IS_USER_ADDRESS(entry) || entry == NULL
 		|| !IS_USER_ADDRESS(userName)
-		|| user_strlcpy(name, userName, SYS_MAX_OS_NAME_LEN) < B_OK)
+		|| user_strlcpy(name, userName, B_OS_NAME_LENGTH) < B_OK)
 		return B_BAD_ADDRESS;
 
 	return create_thread(name, thread_get_current_thread()->team->id, entry, data1, data2, priority, false);
