@@ -399,8 +399,12 @@ void BSlider::DrawSlider()
 {
 	// TODO: Draw into fOffScreenView and draw fOffScreenBits on the view
 	//		 Write drawing code for a vertical slider
+	
+	SetHighColor(ViewColor());
+	FillRect(Bounds());
+	
 	DrawBar();
-	//DrawHashMarks();
+	DrawHashMarks();
 	DrawThumb();
 
 	if (IsFocus())
@@ -457,7 +461,46 @@ void BSlider::DrawBar()
 //------------------------------------------------------------------------------
 void BSlider::DrawHashMarks()
 {
-	// TODO: Draw them
+	BRect frame = HashMarksFrame();
+	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
+		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
+		darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
+
+	if (fHashMarks & B_HASH_MARKS_TOP)
+	{
+		float pos = _MinPosition();
+		float factor = (_MaxPosition() - pos) / (fHashMarkCount - 1);
+
+		for (int32 i = 0; i < fHashMarkCount; i++)
+		{
+			SetHighColor(darken2);
+			StrokeLine(BPoint(pos, frame.top),
+				BPoint(pos, frame.top + 5));
+			SetHighColor(lightenmax);
+			StrokeLine(BPoint(pos + 1, frame.top),
+				BPoint(pos + 1, frame.top + 5));
+
+			pos += factor;
+		}
+	}
+
+	if (fHashMarks & B_HASH_MARKS_BOTTOM)
+	{
+		float pos = _MinPosition();
+		float factor = (_MaxPosition() - pos) / (fHashMarkCount - 1);
+
+		for (int32 i = 0; i < fHashMarkCount; i++)
+		{
+			SetHighColor(darken2);
+			StrokeLine(BPoint(pos, frame.bottom - 5),
+				BPoint(pos, frame.bottom));
+			SetHighColor(lightenmax);
+			StrokeLine(BPoint(pos + 1, frame.bottom - 5),
+				BPoint(pos + 1, frame.bottom));
+
+			pos += factor;
+		}
+	}
 }
 //------------------------------------------------------------------------------
 void BSlider::DrawThumb()
@@ -552,8 +595,12 @@ BRect BSlider::BarFrame() const
 //------------------------------------------------------------------------------
 BRect BSlider::HashMarksFrame() const
 {
-	// TODO: return the correct frame
-	return Frame();
+	BRect frame(BarFrame());
+
+	frame.top -= 6.0f;
+	frame.bottom += 6.0f;
+
+	return frame;
 }
 //------------------------------------------------------------------------------
 BRect BSlider::ThumbFrame() const
@@ -863,18 +910,36 @@ void BSlider::_DrawTriangleThumb()
 	BRect frame = ThumbFrame();
 
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
-		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT);
+		lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 //		lighten2 = tint_color(no_tint, B_LIGHTEN_2_TINT),
 //		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
 //		darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
-//		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
+		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
 //		darken3 = tint_color(no_tint, B_DARKEN_3_TINT),
-//		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
+		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
 	SetHighColor(lighten1);
-	FillTriangle(BPoint(frame.left + 3.0f, frame.bottom - 3.0f),
-		BPoint(frame.left + 9.0f, frame.bottom - 9.0f),
-		BPoint(frame.left + 15.0f, frame.bottom - 3.0f));
+	FillTriangle(BPoint(frame.left + 3.0f, frame.bottom - 1.0f),
+		BPoint(frame.left + 9.0f, frame.bottom - 7.0f),
+		BPoint(frame.left + 15.0f, frame.bottom - 1.0f));
+
+	SetHighColor(darkenmax);
+	StrokeLine(BPoint(frame.left + 15.0f, frame.bottom),
+		BPoint(frame.left + 3.0f, frame.bottom));
+	StrokeLine(BPoint(frame.left + 15.0f, frame.bottom - 1.0f),
+		BPoint(frame.left + 9.0f, frame.bottom - 7.0f));
+
+	SetHighColor(darken2);
+	StrokeLine(BPoint(frame.left + 14.0f, frame.bottom - 1.0f),
+		BPoint(frame.left + 3.0f, frame.bottom - 1.0f));
+	StrokeLine(BPoint(frame.left + 3.0f, frame.bottom - 1.0f),
+		BPoint(frame.left + 8.0f, frame.bottom - 6.0f));
+
+	SetHighColor(no_tint);
+	StrokeLine(BPoint(frame.left + 13.0f, frame.bottom - 2.0f),
+		BPoint(frame.left + 6.0f, frame.bottom - 2.0f));
+	StrokeLine(BPoint(frame.left + 12.0f, frame.bottom - 3.0f),
+		BPoint(frame.left + 9.0f, frame.bottom - 6.0f));
 }
 //------------------------------------------------------------------------------
 BPoint BSlider::_Location() const
