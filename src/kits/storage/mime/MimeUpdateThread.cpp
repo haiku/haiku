@@ -10,9 +10,11 @@
 #include "mime/MimeUpdateThread.h"
 
 #include <Directory.h>
+#include <kernel_interface.h>
 #include <Message.h>
 #include <Path.h>
 #include <RegistrarDefs.h>
+#include <Volume.h>
 
 #include <stdio.h>
 
@@ -60,6 +62,7 @@ MimeUpdateThread::MimeUpdateThread(const char *name, int32 priority, BMessenger 
 */
 MimeUpdateThread::~MimeUpdateThread()
 {
+	// delete our acquired BMessage
 	if (InitCheck() == B_OK)
 		delete fReplyee;
 }
@@ -110,6 +113,53 @@ MimeUpdateThread::ThreadFunction()
 		find_thread(NULL), err));
 }
 
+// DeviceSupportsAttributes
+/*! \brief Returns true if the given device supports attributes, false
+	if not (or if an error occurs while determining).
+	
+	Device numbers and their corresponding support info are cached in
+	a std::list to save unnecessarily \c statvfs()ing devices that have
+	already been statvfs()ed (which might otherwise happen quite often
+	for a device that did in fact support attributes).
+
+	\return
+	- \c true: The device supports attributes
+	- \c false: The device does not support attributes, or there was an
+	            error while determining
+*/
+bool
+MimeUpdateThread::DeviceSupportsAttributes(dev_t device)
+{
+	// See if an entry for this device already exists
+	std::list< std::pair<dev_t,bool> >::iterator i;
+	for (i = fAttributeSupportList.begin();
+		   i != fAttributeSupportList.end();
+		     i++)
+	{
+		if (i->first == device)
+			return i->second;
+	}
+	
+	bool result = false;
+
+	// If we get here, no such device is yet in our list,
+	// so we attempt to remedy the situation
+	BVolume volume;
+	status_t err = volume.SetTo(device);
+	if (!err) {
+		result = volume.KnowsAttr();
+		// devices supporting attributes are likely to be queried
+		// again, devices not supporting attributes are not
+		std::pair<dev_t,bool> p(device, result);
+		if (result)
+			fAttributeSupportList.push_front(p);
+		else
+			fAttributeSupportList.push_back(p);
+	}
+	
+	return result;		
+}
+
 // UpdateEntry
 /*! \brief Updates the given entry and then recursively updates all the entry's child
 	entries	if the entry is a directory and \c fRecursive is true.
@@ -120,39 +170,47 @@ MimeUpdateThread::UpdateEntry(const entry_ref *ref)
 	status_t err = ref ? B_OK : B_BAD_VALUE;
 	bool entryIsDir = false;
 	
-	// Update this entry
-	if (!err) {
-		DoMimeUpdate(ref, &entryIsDir);
-//		err = DoMimeUpdate(ref, &entryIsDir);
-/*		BPath path(ref);
-		printf("Updating '%s'... ", path.Path());
-		fflush(stdout);
-		printf("0x%lx\n", DoMimeUpdate(ref, &entryIsDir));
-*/
-	}
 	// Look to see if we're being terminated
 	if (!err && fShouldExit)
 		err = B_CANCELED;
-	// If we're recursing and this is a directory, update
-	// each of the directory's children as well
-	if (!err && fRecursive && entryIsDir) {		
-		BDirectory dir;		
-		err = dir.SetTo(ref);
+		
+	// Before we update, make sure this entry lives on a device that supports
+	// attributes. If not, we skip it and any of its children for
+	// updates (we don't signal an error, however).
+
+//BPath path(ref);
+//printf("Updating '%s' (%s)... \n", path.Path(),
+//	(DeviceSupportsAttributes(ref->device) ? "yes" : "no"));
+	
+	if (!err
+	      && (device_is_root_device(ref->device)
+	            || DeviceSupportsAttributes(ref->device))) {	
+		// Update this entry
 		if (!err) {
-			entry_ref childRef;
-			while (!err) {
-				err = dir.GetNextRef(&childRef);
-				if (err) {
-					// If we've come to the end of the directory listing,
-					// it's not an error.
-					if (err == B_ENTRY_NOT_FOUND)
-					 	err = B_OK;
-					break;
-				} else {
-					err = UpdateEntry(&childRef);				
-				}			
-			}		
-		}			
+			// R5 appears to ignore whether or not the update succeeds.
+			DoMimeUpdate(ref, &entryIsDir);
+		}
+		// If we're recursing and this is a directory, update
+		// each of the directory's children as well
+		if (!err && fRecursive && entryIsDir) {		
+			BDirectory dir;		
+			err = dir.SetTo(ref);
+			if (!err) {
+				entry_ref childRef;
+				while (!err) {
+					err = dir.GetNextRef(&childRef);
+					if (err) {
+						// If we've come to the end of the directory listing,
+						// it's not an error.
+						if (err == B_ENTRY_NOT_FOUND)
+						 	err = B_OK;
+						break;
+					} else {
+						err = UpdateEntry(&childRef);				
+					}			
+				}		
+			}			
+		}
 	}
 	return err;			  
 }

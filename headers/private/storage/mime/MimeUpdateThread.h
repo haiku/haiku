@@ -14,6 +14,9 @@
 #include <RegistrarThread.h>
 #include <SupportDefs.h>
 
+#include <list>
+#include <pair.h>
+
 struct entry_ref;
 class BMessage;
 
@@ -37,8 +40,12 @@ protected:
 	const bool fRecursive;
 	const bool fForce;
 	BMessage *fReplyee;
+	
+	bool DeviceSupportsAttributes(dev_t device);
 
 private:
+	std::list< std::pair<dev_t, bool> > fAttributeSupportList;
+
 	status_t UpdateEntry(const entry_ref *ref);
 	
 	status_t fStatus;
