@@ -337,11 +337,12 @@ std_ops(int32 op, ...)
 // intel_identify
 static
 bool
-intel_identify(int deviceFD, off_t sessionOffset, off_t sessionSize,
-			   const uchar *block, int32 blockSize)
+intel_identify(int deviceFD, const session_info *sessionInfo,
+			   const uchar *block)
 {
 	const partition_table_sector *pts = (const partition_table_sector*)block;
 	bool result = true;
+	int32 blockSize = sessionInfo->logical_block_size;
 	TRACE(("intel: identify(%d, %lld, %lld, %p, %ld)\n", deviceFD,
 		   sessionOffset, sessionSize, block, blockSize));
 	// check block size
@@ -364,15 +365,17 @@ intel_identify(int deviceFD, off_t sessionOffset, off_t sessionSize,
 // intel_get_nth_info
 static
 status_t
-intel_get_nth_info(int deviceFD, off_t sessionOffset, off_t sessionSize,
-				   const uchar *block, int32 blockSize, int32 index,
+intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
+				   const uchar *block, int32 index,
 				   extended_partition_info *partitionInfo)
 {
 	status_t error = B_ENTRY_NOT_FOUND;
+	off_t sessionOffset = sessionInfo->offset;
+	off_t sessionSize = sessionInfo->size;
+	int32 blockSize = sessionInfo->logical_block_size;
 	TRACE(("intel: get_nth_info(%d, %lld, %lld, %p, %ld, %ld)\n", deviceFD,
 		   sessionOffset, sessionSize, block, blockSize, index));
-	if (intel_identify(deviceFD, sessionOffset, sessionSize, block,
-					   blockSize)) {
+	if (intel_identify(deviceFD, sessionInfo, block)) {
 		if (index >= 0) {
 			partition_spec *partitionList = NULL;
 			error = parse_partition_map(deviceFD, sessionOffset, sessionSize,
