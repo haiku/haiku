@@ -599,16 +599,20 @@ BParameterWeb::Unflatten(type_code c,
 						 const void *buf,
 						 ssize_t size)
 {	
-	if(!this->AllowsTypeCode(c))
+	if(!this->AllowsTypeCode(c)) {
+		FATAL("BParameterWeb::Unflatten wrong type code\n");
 		return B_BAD_TYPE;
-	
-	if(buf == NULL)
+	}
+	if(buf == NULL) {
+		FATAL("BParameterWeb::Unflatten NULL buffer pointer\n");
 		return B_NO_INIT;
+	}
 	
 	//if the buffer is smaller than the size needed to read the
 	//signature field, the mystery field, the group count, and the Node, then there is a problem
 	if(size < static_cast<ssize_t>(sizeof(int32) + sizeof(int32) + sizeof(ssize_t) + sizeof(media_node)) )
 	{
+		FATAL("BParameterWeb::Unflatten size to small\n");
 		return B_ERROR;
 	}
 
@@ -618,6 +622,7 @@ BParameterWeb::Unflatten(type_code c,
 	//being read in the correct byte order.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 0x010300506)
 	{
+		FATAL("BParameterWeb::Unflatten magic 1 wrong\n");
 		return B_BAD_TYPE;
 	}
 	CurrentPos += sizeof(int32);
@@ -626,6 +631,7 @@ BParameterWeb::Unflatten(type_code c,
 	//being read in the correct byte order.  THIS SURELY HAS SOME MEANING I'M NOT AWARE OF.
 	if( *(reinterpret_cast<const int32 *>(CurrentPos)) != 1)
 	{
+		FATAL("BParameterWeb::Unflatten magic 2 wrong\n");
 		return B_ERROR;
 	}
 	CurrentPos += sizeof(int32);
@@ -702,6 +708,7 @@ BParameterWeb::Unflatten(type_code c,
 		
 		if(RetVal != B_OK)
 		{
+			FATAL("BParameterWeb::Unflatten sub.grup Unflatten failed\n");
 			delete NewSubGroup;
 			//don't return, because we should still fix references...
 			break;

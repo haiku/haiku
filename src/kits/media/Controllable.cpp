@@ -5,7 +5,9 @@
  ***********************************************************************/
 #include <OS.h>
 #include <Controllable.h>
+#include <ParameterWeb.h>
 #include "debug.h"
+#include "DataExchange.h"
 #include "Notifications.h"
 
 /*************************************************************
@@ -17,6 +19,8 @@ BControllable::~BControllable()
 	CALLED();
 	if (fSem > 0)
 		delete_sem(fSem);
+	if (fWeb)
+		delete fWeb;
 }
 
 /*************************************************************
@@ -66,7 +70,7 @@ BControllable::UnlockParameterWeb()
 
 
 BControllable::BControllable() :
-	BMediaNode("XXX fixme"),
+	BMediaNode("this one is never called"),
 	fWeb(0),
 	fSem(create_sem(0, "BControllable lock")),
 	fBen(0)
@@ -88,18 +92,59 @@ BControllable::SetParameterWeb(BParameterWeb *web)
 	UnlockParameterWeb();
 	if (old != web && web != 0)
 		BPrivate::media::notifications::WebChanged(Node());
-
+	if (old)
+		delete old;
 	return B_OK;
 }
 
 
 status_t
-BControllable::HandleMessage(int32 message,
-							 const void *data,
-							 size_t size)
+BControllable::HandleMessage(int32 message, const void *data, size_t size)
 {
 	INFO("BControllable::HandleMessage %#lx, node %ld\n", message, ID());
 
+	status_t rv;
+	switch (message) {
+		case CONTROLLABLE_GET_PARAMETER_WEB:
+		{
+			const controllable_get_parameter_web_request *request = static_cast<const controllable_get_parameter_web_request *>(data);
+			controllable_get_parameter_web_reply reply;
+			bool waslocked = LockParameterWeb();
+			if (fWeb != NULL && fWeb->FlattenedSize() > request->maxsize) {
+				reply.code = 0;
+				reply.size = -1; // parameter web too large
+				rv = B_OK;
+			} else if (fWeb != NULL && fWeb->FlattenedSize() <= request->maxsize) {
+				void *buffer;
+				area_id area;
+				area = clone_area("cloned parameter web", &buffer, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
+				if (area < B_OK) {
+					FATAL("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB clone_area failed\n");
+					rv = B_ERROR;
+				} else {
+					reply.code = fWeb->TypeCode();
+					reply.size = fWeb->FlattenedSize();
+					rv = fWeb->Flatten(buffer, reply.size);
+					if (rv != B_OK) {
+						FATAL("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB Flatten failed\n");
+					} else {
+						printf("BControllable::HandleMessage CONTROLLABLE_GET_PARAMETER_WEB %ld bytes, 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",
+							reply.size, ((uint32*)buffer)[0], ((uint32*)buffer)[1], ((uint32*)buffer)[2], ((uint32*)buffer)[3]);
+					}
+					delete_area(area);
+				}
+			} else {
+				reply.code = 0;
+				reply.size = 0; // no parameter web
+				rv = B_OK;
+			}
+			if (waslocked)
+				UnlockParameterWeb();
+			request->SendReply(rv, &reply, sizeof(reply));
+			return B_OK;
+		}
+				
+	}
 	return B_ERROR;
 }
 

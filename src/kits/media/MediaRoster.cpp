@@ -1692,10 +1692,69 @@ status_t
 BMediaRoster::GetParameterWebFor(const media_node & node, 
 								 BParameterWeb ** out_web)
 {
-	UNIMPLEMENTED();
-//	return B_ERROR;
-	*out_web = new BParameterWeb;
-	return B_OK;
+	CALLED();
+	if (out_web == NULL)
+		return B_BAD_VALUE;	
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+	if ((node.kind & B_CONTROLLABLE) == 0)
+		return B_MEDIA_BAD_NODE;
+		
+	controllable_get_parameter_web_request request;
+	controllable_get_parameter_web_reply reply;
+	int32 requestsize[] = {B_PAGE_SIZE, 4*B_PAGE_SIZE, 16*B_PAGE_SIZE, 64*B_PAGE_SIZE, 128*B_PAGE_SIZE, 256*B_PAGE_SIZE, 0};
+	int32 size;
+	
+	// XXX it might be better to query the node for the (current) parameter size first
+	for (int i = 0; (size = requestsize[i]) != 0; i++) {
+		status_t rv;
+		area_id area;
+		void *data;
+		area = create_area("parameter web data", &data, B_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (area < B_OK) {
+			FATAL("BMediaRoster::GetParameterWebFor couldn't create area of size %ld\n", size);
+			return B_ERROR;
+		}
+		request.maxsize = size;
+		request.area = area;
+		rv = QueryPort(node.port, CONTROLLABLE_GET_PARAMETER_WEB, &request, sizeof(request), &reply, sizeof(reply));
+		if (rv != B_OK) {
+			FATAL("BMediaRoster::GetParameterWebFor CONTROLLABLE_GET_PARAMETER_WEB failed\n");
+			delete_area(area);
+			return B_ERROR;
+		}
+		if (reply.size == 0) {
+			// no parameter web available
+			// XXX should we return an error?
+			FATAL("BMediaRoster::GetParameterWebFor node %ld has no parameter web\n", node.node);
+			*out_web = new BParameterWeb();
+			delete_area(area);
+			return B_OK;
+		}
+		if (reply.size > 0) {
+			// we got a flattened parameter web!
+			*out_web = new BParameterWeb();
+			
+			printf("BMediaRoster::GetParameterWebFor Unflattening %ld bytes, 0x%08x, 0x%08x, 0x%08x, 0x%08x\n",
+				reply.size, ((uint32*)data)[0], ((uint32*)data)[1], ((uint32*)data)[2], ((uint32*)data)[3]);
+			
+			rv = (*out_web)->Unflatten(reply.code, data, reply.size);
+			if (rv != B_OK) {
+				FATAL("BMediaRoster::GetParameterWebFor Unflatten failed, %s\n", strerror(rv));
+				delete_area(area);
+				delete *out_web;
+				return B_ERROR;
+			}
+			delete_area(area);
+			return B_OK;
+		}
+		delete_area(area);
+		ASSERT(reply.size == -1);
+		// parameter web data was too large
+		// loop and try a larger size
+	}
+	FATAL("BMediaRoster::GetParameterWebFor node %ld has no parameter web larger than %ld\n", node.node, size);
+	return B_ERROR;
 }
 
 								 
