@@ -7,12 +7,15 @@
 #include "bios.h"
 
 #include <boot/platform.h>
+#include <boot/partitions.h>
 #include <boot/stdio.h>
 
 #include <string.h>
 
 
+// exported from shell.S
 extern uint8 gBootDriveID;
+extern uint32 gBootPartitionOffset;
 
 // int 0x13 definitions
 #define BIOS_GET_DRIVE_PARAMETERS		0x0800
@@ -316,12 +319,18 @@ status_t
 platform_get_boot_partition(struct stage2_args *args, NodeList *list,
 	boot::Partition **_partition)
 {
+	printf("boot partition offset: %lu\n", gBootPartitionOffset);
+
 	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
-		// ToDo: just take the first partition for now
-		*_partition = partition;
-		return B_OK;
+		// search for the partition that contains the partition
+		// offset as reported by the BFS boot block
+		if (gBootPartitionOffset >= partition->offset
+			&& gBootPartitionOffset < partition->offset + partition->size) {
+			*_partition = partition;
+			return B_OK;
+		}
 	}
 
 	return B_ENTRY_NOT_FOUND;
