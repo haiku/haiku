@@ -48,7 +48,7 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 	// the DMA buffer, we have to grant access for all apps
 	gart->buffer.area = create_area( "Radeon PCI GART buffer", 
 		&gart->buffer.ptr, B_ANY_KERNEL_ADDRESS, 
-		size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA );
+		size, B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
 	if( gart->buffer.area < 0 ) {
 		SHOW_ERROR( 1, "cannot create PCI GART buffer (%s)", 
 			strerror( gart->buffer.area ));
@@ -80,7 +80,7 @@ static status_t createGARTBuffer( GART_info *gart, size_t size )
 	// question: is this necessary for a PCI GART because of bus snooping?
 	gart->buffer.unaligned_area = create_area( "Radeon PCI GART buffer", 
 		&unaligned_addr, B_ANY_KERNEL_ADDRESS, 
-		2 * size, B_CONTIGUOUS/*B_FULL_LOCK*/, B_READ_AREA | B_WRITE_AREA );
+		2 * size, B_CONTIGUOUS/*B_FULL_LOCK*/, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
 	if( gart->buffer.unaligned_area < 0 ) {
 		SHOW_ERROR( 1, "cannot create PCI GART buffer (%s)", 
 			strerror( gart->buffer.unaligned_area ));
@@ -139,7 +139,7 @@ static status_t initGATT( GART_info *gart )
 	gart->GATT.area = create_area( "Radeon GATT", (void **)&gart->GATT.ptr, 
 		B_ANY_KERNEL_ADDRESS, 
 		(num_pages * sizeof( uint32 ) + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1), 
-		B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA );
+		B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA | B_USER_CLONEABLE_AREA );
 		
 	if( gart->GATT.area < 0 ) {
 		SHOW_ERROR( 1, "cannot create GATT table (%s)", 

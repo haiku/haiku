@@ -401,6 +401,8 @@ static status_t initRingBuffer( device_info *di, int aring_size )
 	OUTREG( regs, RADEON_CP_RB_WPTR, 0 );
 	//*cp->ring.head = 0;
 	cp->ring.tail = 0;
+	
+	return B_OK;
 }
 
 static void uninitRingBuffer( device_info *di )
@@ -455,6 +457,8 @@ static status_t initCPFeedback( device_info *di )
 	*(uint32 *)MEM2CPU( cp->feedback.mem_type, cp->feedback.head_mem_offset) = 0;
 	memset( MEM2CPU( cp->feedback.mem_type, cp->feedback.scratch_mem_offset), 0, 0x40 );
 	//*cp->ring.head = 0;
+	
+	return B_OK;
 }
 
 static void uninitCPFeedback( device_info *di )

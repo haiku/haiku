@@ -67,7 +67,7 @@ status_t Radeon_MapDevice( device_info *di, bool mmio_only )
 		di->pcii.u.h0.base_register_sizes[regs],
 		B_ANY_KERNEL_ADDRESS,
 		/*// for "poke" debugging
-		B_READ_AREA + B_WRITE_AREA*/0,
+		B_READ_AREA + B_WRITE_AREA*/ B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA,
 		(void **)&(di->regs));
 	if( si->regs_area < 0 ) 
 		return si->regs_area;
@@ -204,7 +204,7 @@ status_t Radeon_FirstOpen( device_info *di )
 		(void **)&(di->si), 
 		B_ANY_KERNEL_ADDRESS, 
 		(sizeof(shared_info) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1), 
-		B_FULL_LOCK, 0);
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (di->shared_area < 0) {
 		result = di->shared_area;
 		goto err8;
@@ -257,7 +257,7 @@ status_t Radeon_FirstOpen( device_info *di )
 		(void **)&(di->vc), 
 		B_ANY_KERNEL_ADDRESS, 
 		(sizeof(virtual_card) + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1), 
-		B_FULL_LOCK, 0);
+		B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_USER_CLONEABLE_AREA);
 	if (di->virtual_card_area < 0) {
 		result = di->virtual_card_area;
 		goto err7;
