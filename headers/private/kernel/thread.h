@@ -51,11 +51,15 @@ struct thread *thread_get_thread_struct(thread_id id);
 #ifdef NEW_SCHEDULER
 struct thread *thread_get_thread_struct_locked(thread_id id);
 #endif /* NEW_SCHEDULER */
-thread_id thread_get_current_thread_id(void);
 
-extern inline thread_id thread_get_current_thread_id(void) {
-	struct thread *t = thread_get_current_thread(); return t ? t->id : 0;
+static thread_id thread_get_current_thread_id(void);
+static inline thread_id
+thread_get_current_thread_id(void)
+{
+	struct thread *t = thread_get_current_thread();
+	return t ? t->id : 0;
 }
+
 int thread_wait_on_thread(thread_id id, int *retcode);
 
 thread_id thread_create_user_thread(char *name, team_id tid, addr entry, void *args);

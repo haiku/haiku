@@ -13,12 +13,8 @@ extern "C" {
 
 typedef uint16 mode_t;
 typedef int    pid_t;
-typedef int32  thread_id;
 typedef int32  region_id;
 typedef int32  aspace_id;
-typedef int32  team_id;
-typedef int32  sem_id;
-typedef int32  port_id;
 typedef int32  image_id;
 typedef uint32 dev_t;
 typedef uint64 ino_t;

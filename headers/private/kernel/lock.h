@@ -5,6 +5,7 @@
 #ifndef _KERNEL_LOCK_H
 #define _KERNEL_LOCK_H
 
+#include <OS.h>
 #include <kernel.h>
 #include <debug.h>
 
