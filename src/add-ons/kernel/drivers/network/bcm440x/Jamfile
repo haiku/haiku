@@ -25,27 +25,14 @@ Package haiku-networkingkit-cvs :
 	RelSymLink $(instDriver) : bcm440x ;
 }
 
-
-rule InstallSiS900
-{
-	Depends $(<) : $(>) ;
-}
-
-actions ignore InstallSiS900
-{
-	cp $(>) /boot/home/config/add-ons/kernel/drivers/bin/
-}
-
-#InstallSiS900 install : sis900 ;
-
 # Installation
 
 OBOSInstall install-networking : /boot/home/config/add-ons/kernel/drivers/bin : 
- 	sis900 
+ 	bcm440x 
 ;
 
 OBOSInstallRelSymLink install-networking : /boot/home/config/add-ons/kernel/drivers/dev/net : 
-	<installed>sis900 : 
+	<installed>bcm440x : 
 	installed-symlink 
 ;
 
