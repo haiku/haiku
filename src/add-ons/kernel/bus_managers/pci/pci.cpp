@@ -32,6 +32,8 @@ PCI::PCI()
 	fRootBus.child = 0;
 	
 	DiscoverBus(&fRootBus);
+
+	RefreshDeviceInfo(&fRootBus);
 }
 
 
@@ -247,7 +249,7 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 					&dev->info.u.h1.base_registers_pci[i],
 					&dev->info.u.h1.base_register_sizes[i],
 					&dev->info.u.h1.base_register_flags[i]);
-				dev->info.u.h1.base_registers[i] = (ulong)pci_ram_address((void *)dev->info.u.h0.base_registers_pci[i]);
+				dev->info.u.h1.base_registers[i] = (ulong)pci_ram_address((void *)dev->info.u.h1.base_registers_pci[i]);
 			}
 			dev->info.u.h1.primary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_primary_bus, 1);
 			dev->info.u.h1.secondary_bus = pci_read_config(dev->bus, dev->dev, dev->func, PCI_secondary_bus, 1);
@@ -273,5 +275,17 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 		default:
 			dprintf("PCI: Header type unknown (%d)\n", dev->info.header_type);
 			break;
+	}
+}
+
+
+void
+PCI::RefreshDeviceInfo(PCIBus *bus)
+{
+	for (PCIDev *dev = bus->child; dev; dev = dev->next) {
+		ReadPciBasicInfo(dev);
+		ReadPciHeaderInfo(dev);
+		if (dev->child)
+			RefreshDeviceInfo(dev->child);
 	}
 }

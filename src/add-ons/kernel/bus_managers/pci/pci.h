@@ -48,6 +48,8 @@ private:
 	status_t GetNthPciInfo(PCIBus *bus, long *curindex, long wantindex, pci_info *outInfo);
 	void ReadPciBasicInfo(PCIDev *dev);
 	void ReadPciHeaderInfo(PCIDev *dev);
+
+	void RefreshDeviceInfo(PCIBus *bus);
 	
 	uint32 BarSize(uint32 bits, uint32 mask);
 	void GetBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size = 0, uint8 *flags = 0);
