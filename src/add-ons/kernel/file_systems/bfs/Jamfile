@@ -11,16 +11,13 @@ oldOPTIM = $(OPTIM) ;
 		#BFS_BIG_ENDIAN_ONLY
 		;
 
-	# Force the API version to be the R5 one even when compiling
-	# under Dano/Zeta
-	if $(COMPILE_FOR_R5) {
-		defines += COMPILE_FOR_R5 ;
-	} else if $(COMPILE_FOR_ZETA) {
+	# By default, the R5 API version is used unless you define this
+	if $(COMPILE_FOR_ZETA) {
 		defines += COMPILE_FOR_ZETA ;
 	}
-	
+
 	# Enable OpenBFS to be compiled as a full BFS replacement. Will
-	# report itself as "bfs" instead of "obfs"
+	# report itself as "bfs" instead of "obfs" (only R5 version)
 	if $(BFS_REPLACEMENT) {
 		defines += BFS_REPLACEMENT ;
 		bfsAddOnName = bfs ;
@@ -40,7 +37,7 @@ oldOPTIM = $(OPTIM) ;
 
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
-R5KernelAddon $(bfsAddOnName) : [ FDirName kernel file_systems ] :
+KernelStaticLibrary libbfs :
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	kernel_cpp.cpp
@@ -48,11 +45,20 @@ R5KernelAddon $(bfsAddOnName) : [ FDirName kernel file_systems ] :
 	Index.cpp
 	Inode.cpp
 	Journal.cpp
-	kernel_interface.cpp
 	Query.cpp
 	Utility.cpp
 	Volume.cpp
 	BufferPool.cpp
+	;
+
+KernelAddon bfs : kernel file_systems :
+	kernel_interface.cpp
+	: libbfs.a
+	;
+
+R5KernelAddon $(bfsAddOnName)_r5 : kernel file_systems :
+	kernel_interface_r5.cpp
+	: libbfs.a
 	;
 
 SEARCH on [ FGristFiles
