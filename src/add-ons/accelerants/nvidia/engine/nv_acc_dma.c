@@ -586,9 +586,17 @@ status_t nv_acc_init_dma()
 	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n",
 		((uint32)(si->engine.dma.cmdbuffer))));
 
-	/* init FIFO via DMA command buffer: */
-	/* set number of cmd words (b18 - ??) and FIFO offset for first cmd word (b0 - 17) */
+	/* init FIFO via DMA command buffer. */
+	/* NV_FIFO_DMA_OPCODE: set number of cmd words (b18 - 28); set FIFO offset for
+	 * first cmd word (b2 - 15); set DMA opcode = method (b29 - 31).
+	 * a 'NOP' is the opcode word $00000000. */
 	/* note:
+	 * possible DMA opcodes:
+	 * b'000' is 'method' (execute cmd);
+	 * b'001' is 'jump';
+	 * b'002' is 'noninc method' (execute buffer wrap-around);
+	 * b'003' is 'call': return is executed by opcode word $00020000 (b17 = 1). */
+	/* note also:
 	 * this system uses auto-increments for the FIFO offset adresses. Make sure
 	 * to set new adresses if jumps are needed. */
 	si->engine.dma.cmdbuffer[0x00] = (1 << 18) | 0x00000;
@@ -631,6 +639,10 @@ status_t nv_acc_init_dma()
 	/* the current first free adress in the DMA buffer is at offset 16 */
 	si->engine.dma.current = 16;
 	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size) */
+	/* note:
+	 * one word is reserved at the end of the DMA buffer to be able to instruct the
+	 * engine to do a buffer wrap-around!
+	 * (DMA opcode 'noninc method': issue word $20000000.) */
 	/*si->dma.*/max = 8191;
 	/* note the current free space we have left in the DMA buffer */
 	/*si->dma.*/free = /*si->dma.*/max - si->engine.dma.current + 1;
@@ -651,6 +663,8 @@ static void nv_start_dma(void)
 	if (si->engine.dma.current != si->engine.dma.put)
 	{
 		si->engine.dma.put = si->engine.dma.current;
+		/* fixme: is this actually needed? (force some flush somewhere) */
+		ISAWB(0x03d0, 0x00);
 		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
 		 * we know for sure the DMA command buffer received all data. */
 		dummy = *((char *)(si->framebuffer));
