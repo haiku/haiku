@@ -189,6 +189,11 @@ arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
 
 	// make sure the fpu is in a good state
 	asm("fninit");
+	
+	// access the new stack to make sure the memory page is present
+	// while interrupts are disabled.
+	// XXX does this belong there, should caller take care of it?
+	*(uint32 *)(ustack_top - 8) = 0;
 
 	disable_interrupts();
 
