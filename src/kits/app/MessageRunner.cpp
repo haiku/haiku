@@ -152,10 +152,14 @@ BMessageRunner::SetCount(int32 count)
 // GetInfo
 /*!	\brief Returns the time interval between two messages and the number of
 		   times the message has still to be sent.
+
+	Both parameters (\a interval and \a count) may be \c NULL.
+
 	\param interval Pointer to a pre-allocated bigtime_t variable to be set
-		   to the time interval.
+		   to the time interval. May be \c NULL.
 	\param count Pointer to a pre-allocated int32 variable to be set
 		   to the number of times the message has still to be sent.
+		   May be \c NULL.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: The message runner is not longer valid. All the
@@ -277,6 +281,27 @@ BMessageRunner::InitData(BMessenger target, const BMessage *message,
 }
 
 // SetParams
+/*!	\brief Sets the message runner's interval and count parameters.
+
+	The parameters \a resetInterval and \a resetCount specify whether
+	the interval or the count parameter respectively shall be reset.
+
+	At least one parameter must be set, otherwise the methods returns
+	\c B_BAD_VALUE.
+
+	\param resetInterval \c true, if the interval shall be reset, \c false
+		   otherwise -- then \a interval is ignored.
+	\param interval The new interval in microseconds.
+	\param resetCount \c true, if the count shall be reset, \c false
+		   otherwise -- then \a count is ignored.
+	\param count Specifies how many times the message shall be sent.
+		   A value less than \c 0 for an unlimited number of repetitions.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_BAD_VALUE: The message runner is not longer valid. All the
+	  messages that had to be sent have already been sent. Or both
+	  \a resetInterval and \a resetCount are \c false.
+*/
 status_t
 BMessageRunner::SetParams(bool resetInterval, bigtime_t interval,
 						  bool resetCount, int32 count)
