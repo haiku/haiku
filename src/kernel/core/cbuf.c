@@ -441,7 +441,9 @@ cbuf_user_memcpy_to_chain(cbuf *chain, size_t offset, const void *_source, size_
 			return B_ERROR;
 		}
 		toCopy = min(length, buffer->length - bufferOffset);
-		if ((err = user_memcpy((char *)buffer->data + bufferOffset, source, toCopy) < 0))
+
+		err = user_memcpy((char *)buffer->data + bufferOffset, source, toCopy);
+		if (err < 0)
 			break; // memory exception
 
 		bufferOffset = 0;
@@ -565,7 +567,9 @@ cbuf_user_memcpy_from_chain(void *_dest, cbuf *chain, size_t offset, size_t leng
 		}
 
 		toCopy = min(length, buffer->length - bufferOffset);
-		if ((err = user_memcpy(dest, (char *)buffer->data + bufferOffset, toCopy) < 0))
+
+		err = user_memcpy(dest, (char *)buffer->data + bufferOffset, toCopy);
+		if (err < 0)
 			break;
 
 		bufferOffset = 0;
