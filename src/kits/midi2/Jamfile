@@ -5,15 +5,15 @@ UsePrivateHeaders midi ;
 UsePublicHeaders midi2 ;
 
 SharedLibrary midi2 :
-	MidiRoster.cpp
-	MidiEndpoint.cpp
 	MidiConsumer.cpp
+	MidiEndpoint.cpp
 	MidiLocalConsumer.cpp
-	MidiProducer.cpp
 	MidiLocalProducer.cpp
+	MidiProducer.cpp
+	MidiRoster.cpp
+	MidiRosterLooper.cpp
 ;
 
 LinkSharedOSLibs libmidi2.so :
-	be root
+	be 
 ;
-

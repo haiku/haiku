@@ -8,6 +8,4 @@ Server midi_server :
 
 LinkSharedOSLibs midi_server : 
 	be 
-	root 
 ;
-

@@ -1,64 +1,93 @@
 /**
  * @file MidiProducer.cpp
  *
+ * Implementation of the BMidiProducer class.
+ *
  * @author Matthijs Hollemans
- * @author Jerome Leveque
  */
 
 #include "debug.h"
+#include "MidiConsumer.h"
 #include "MidiProducer.h"
-#include "MidiEndpoint.h"
+#include "MidiRoster.h"
+#include "MidiRosterLooper.h"
+#include "protocol.h"
 
 //------------------------------------------------------------------------------
 
-status_t BMidiProducer::Connect(BMidiConsumer* toObject)
+status_t BMidiProducer::Connect(BMidiConsumer* cons)
 {
-/*
-	if (toObject != NULL)
+	if (cons == NULL)
 	{
-		if (fConnections->Add(toObject) == true)
-		{
-			fConnectionCount++;
-		}
+		WARN("Connect() does not accept a NULL consumer")
+		return B_BAD_VALUE;
 	}
-	BMidiRoster *roster = BMidiRoster::MidiRoster();
-	return roster->Connect(this, toObject);
-*/
-	return B_ERROR;
+	else if (!IsValid() || !cons->IsValid())
+	{
+		return B_ERROR;
+	}
+	else
+	{
+		return SendConnectRequest(cons, true);
+	}
 }
 
 //------------------------------------------------------------------------------
 
-status_t BMidiProducer::Disconnect(BMidiConsumer* toObject)
+status_t BMidiProducer::Disconnect(BMidiConsumer* cons)
 {
-/*
-	if (toObject != NULL)
+	if (cons == NULL)
 	{
-		if (fConnections->Remove(toObject) == true)
-		{
-			fConnectionCount--;
-			BMidiRoster *roster = BMidiRoster::MidiRoster();
-			return roster->Disconnect(this, toObject);
-		}
+		WARN("Disconnect() does not accept a NULL consumer")
+		return B_BAD_VALUE;
 	}
-*/
-	return B_ERROR;
+	else if (!IsValid() || !cons->IsValid())
+	{
+		return B_ERROR;
+	}
+	else
+	{
+		return SendConnectRequest(cons, false);
+	}
 }
 
 //------------------------------------------------------------------------------
 
-bool BMidiProducer::IsConnected(BMidiConsumer* toObject) const
+bool BMidiProducer::IsConnected(BMidiConsumer* cons) const
 {
-//	return fConnections->IsIn(toObject);
-	return false;
+	bool isConnected = false;
+
+	if (cons != NULL)
+	{
+		if (LockProducer())
+		{
+			isConnected = connections->HasItem(cons);
+			UnlockProducer();
+		}
+	}
+	
+	return isConnected;
 }
 
 //------------------------------------------------------------------------------
 
 BList* BMidiProducer::Connections() const
 {
-//	return fConnections;
-	return NULL;
+	BList* list = new BList();
+
+	if (LockProducer())
+	{
+		for (int32 t = 0; t < CountConsumers(); ++t)
+		{
+			BMidiConsumer* cons = ConsumerAt(t);
+			cons->Acquire();
+			list->AddItem(cons);
+		}
+
+		UnlockProducer();
+	}
+
+	return list;
 }
 
 //------------------------------------------------------------------------------
@@ -66,18 +95,17 @@ BList* BMidiProducer::Connections() const
 BMidiProducer::BMidiProducer(const char* name)
 	: BMidiEndpoint(name)
 {
-/*
-	fConnections = new BMidiList();
-	fConnectionCount = 1;
-	fLock = BLocker("BMidiProducer Lock");
-*/
+	isConsumer = false;
+	connections = new BList;
+	locker = new BLocker();
 }
 
 //------------------------------------------------------------------------------
 
 BMidiProducer::~BMidiProducer()
 {
-	UNIMPLEMENTED
+	delete connections;
+	delete locker;
 }
 
 //------------------------------------------------------------------------------
@@ -93,3 +121,124 @@ void BMidiProducer::_Reserved8() { }
 
 //------------------------------------------------------------------------------
 
+status_t BMidiProducer::SendConnectRequest(
+	BMidiConsumer* cons, bool mustConnect)
+{
+	ASSERT(cons != NULL)
+
+	BMessage msg, reply;
+
+	if (mustConnect)
+	{
+		msg.what = MSG_CONNECT_ENDPOINTS;
+	}
+	else
+	{
+		msg.what = MSG_DISCONNECT_ENDPOINTS;
+	}
+
+	msg.AddInt32("midi:producer", ID());
+	msg.AddInt32("midi:consumer", cons->ID());
+
+	status_t err = BMidiRoster::MidiRoster()->SendRequest(&msg, &reply);
+	if (err != B_OK) { return err; }
+
+	status_t res;
+	if (reply.FindInt32("midi:result", &res) == B_OK) 
+	{ 
+		if (res == B_OK)
+		{
+			if (mustConnect)
+			{
+				ConnectionMade(cons);
+			}
+			else
+			{
+				ConnectionBroken(cons);
+			}
+
+			#ifdef DEBUG
+			BMidiRoster::MidiRoster()->looper->DumpEndpoints();
+			#endif
+		}
+
+		return res;
+	}
+
+	return B_ERROR;
+}
+
+//------------------------------------------------------------------------------
+
+void BMidiProducer::ConnectionMade(BMidiConsumer* cons)
+{
+	ASSERT(cons != NULL)
+
+	if (LockProducer())
+	{
+		ASSERT(!connections->HasItem(cons))
+
+		connections->AddItem(cons);
+		UnlockProducer();
+	}
+
+	if (IsLocal())
+	{
+		((BMidiLocalProducer*) this)->Connected(cons);
+	}
+}
+
+//------------------------------------------------------------------------------
+
+bool BMidiProducer::ConnectionBroken(BMidiConsumer* cons)
+{
+	ASSERT(cons != NULL)
+
+	bool wasConnected = false;
+
+	if (LockProducer())
+	{
+		wasConnected = connections->RemoveItem(cons);
+		UnlockProducer();
+	}
+
+	if (wasConnected && IsLocal())
+	{
+		((BMidiLocalProducer*) this)->Disconnected(cons);
+	}
+
+	return wasConnected;
+}
+
+//------------------------------------------------------------------------------
+
+int32 BMidiProducer::CountConsumers() const
+{
+	return connections->CountItems();
+}
+
+//------------------------------------------------------------------------------
+
+BMidiConsumer* BMidiProducer::ConsumerAt(int32 index) const
+{
+	ASSERT(connections != NULL)
+	ASSERT(index >= 0 && index < CountConsumers())
+
+	return (BMidiConsumer*) connections->ItemAt(index);
+}
+
+//------------------------------------------------------------------------------
+
+bool BMidiProducer::LockProducer() const
+{
+	return locker->Lock();
+}
+
+//------------------------------------------------------------------------------
+
+void BMidiProducer::UnlockProducer() const
+{
+	locker->Unlock();
+}
+
+//------------------------------------------------------------------------------

@@ -1,19 +1,28 @@
 /**
  * @file MidiConsumer.cpp
  *
+ * Implementation of the BMidiConsumer class.
+ *
  * @author Matthijs Hollemans
- * @author Jerome Leveque
  */
 
 #include "debug.h"
 #include "MidiConsumer.h"
-#include "MidiEndpoint.h"
+#include "protocol.h"
 
 //------------------------------------------------------------------------------
 
 bigtime_t BMidiConsumer::Latency() const
 {
-	return fLatency;
+	bigtime_t res = 0LL;
+
+	if (LockLooper()) 
+	{ 
+		res = latency; 
+		UnlockLooper(); 
+	}
+
+	return res;
 }
 
 //------------------------------------------------------------------------------
@@ -21,15 +30,16 @@ bigtime_t BMidiConsumer::Latency() const
 BMidiConsumer::BMidiConsumer(const char* name)
 	: BMidiEndpoint(name)
 {
-	fLatency = 0;
+	isConsumer = true;
+	latency = 0LL;
+	port = 0;
 }
 
 //------------------------------------------------------------------------------
 
 BMidiConsumer::~BMidiConsumer()
 {
-	if (fEventPort != B_NO_MORE_PORTS)
-		delete_port(fEventPort);
+	// Do nothing.
 }
 
 //------------------------------------------------------------------------------
@@ -44,4 +54,3 @@ void BMidiConsumer::_Reserved7() { }
 void BMidiConsumer::_Reserved8() { }
 
 //------------------------------------------------------------------------------
-

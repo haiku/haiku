@@ -1,40 +1,57 @@
 /**
  * @file MidiLocalProducer.cpp
  *
+ * Implementation of the BMidiLocalProducer class.
+ *
  * @author Matthijs Hollemans
- * @author Jerome Leveque
  */
 
 #include "debug.h"
+#include "MidiConsumer.h"
 #include "MidiProducer.h"
+#include "MidiRoster.h"
+#include "protocol.h"
 
 //------------------------------------------------------------------------------
 
 BMidiLocalProducer::BMidiLocalProducer(const char* name)
 	: BMidiProducer(name)
 {
-	fFlags |= 0x10;
+	TRACE(("BMidiLocalProducer::BMidiLocalProducer"))
+
+	isLocal = true;
+	refCount = 1;
+
+	BMidiRoster::MidiRoster()->CreateLocal(this);
 }
 
 //------------------------------------------------------------------------------
 
 BMidiLocalProducer::~BMidiLocalProducer()
 {
-	UNIMPLEMENTED
+	TRACE(("BMidiLocalProducer::~BMidiLocalProducer"))
+
+	BMidiRoster::MidiRoster()->DeleteLocal(this);
 }
 
 //------------------------------------------------------------------------------
 
-void BMidiLocalProducer::Connected(BMidiConsumer* dest)
+void BMidiLocalProducer::Connected(BMidiConsumer* cons)
 {
-	UNIMPLEMENTED
+	ASSERT(cons != NULL)
+	TRACE(("Connected() %ld to %ld", ID(), cons->ID()))
+
+	// Do nothing.
 }
 
 //------------------------------------------------------------------------------
 
-void BMidiLocalProducer::Disconnected(BMidiConsumer* dest)
+void BMidiLocalProducer::Disconnected(BMidiConsumer* cons)
 {
-	UNIMPLEMENTED
+	ASSERT(cons != NULL)
+	TRACE(("Disconnected() %ld from %ld", ID(), cons->ID()))
+
+	// Do nothing.
 }
 
 //------------------------------------------------------------------------------
@@ -136,14 +153,6 @@ void BMidiLocalProducer::SprayTempoChange(
 
 //------------------------------------------------------------------------------
 
-void BMidiLocalProducer::SprayEvent(
-	BMidiEvent* event, size_t length) const
-{
-	UNIMPLEMENTED
-}
-
-//------------------------------------------------------------------------------
-
 void BMidiLocalProducer::_Reserved1() { }
 void BMidiLocalProducer::_Reserved2() { }
 void BMidiLocalProducer::_Reserved3() { }
@@ -154,4 +163,3 @@ void BMidiLocalProducer::_Reserved7() { }
 void BMidiLocalProducer::_Reserved8() { }
 
 //------------------------------------------------------------------------------
-

@@ -1,48 +1,80 @@
 /**
  * @file MidiLocalConsumer.cpp
  *
+ * Implementation of the BMidiLocalConsumer class.
+ *
  * @author Matthijs Hollemans
- * @author Jerome Leveque
  */
 
 #include "debug.h"
 #include "MidiConsumer.h"
+#include "MidiRoster.h"
+#include "protocol.h"
 
 //------------------------------------------------------------------------------
 
 BMidiLocalConsumer::BMidiLocalConsumer(const char* name)
 	: BMidiConsumer(name)
 {
-	fFlags |= 0x10;
+	TRACE(("BMidiLocalConsumer::BMidiLocalConsumer"))
+
+	isLocal = true;
+	refCount = 1;
+
+	BMidiRoster::MidiRoster()->CreateLocal(this);
 }
 
 //------------------------------------------------------------------------------
 
 BMidiLocalConsumer::~BMidiLocalConsumer()
 {
-	UNIMPLEMENTED
+	TRACE(("BMidiLocalConsumer::~BMidiLocalConsumer"))
+
+	BMidiRoster::MidiRoster()->DeleteLocal(this);
 }
 
 //------------------------------------------------------------------------------
 
-void BMidiLocalConsumer::SetLatency(bigtime_t latency)
+void BMidiLocalConsumer::SetLatency(bigtime_t latency_)
 {
-	fLatency = latency;
+	if (latency_ < 0)
+	{
+		WARN("SetLatency() does not accept negative values");
+		return;
+	}
+	else if (!IsValid())
+	{
+		return;
+	}
+	else if (latency != latency_)
+	{
+		BMessage msg;
+		msg.AddInt64("midi:latency", latency_);
+
+		if (SendChangeRequest(&msg) == B_OK)
+		{
+			if (LockLooper())
+			{
+				latency = latency_;
+				UnlockLooper();
+			}
+		}
+	}
 }
 
 //------------------------------------------------------------------------------
 
 int32 BMidiLocalConsumer::GetProducerID(void)
 {
-return fCurrentProducer;
+	UNIMPLEMENTED
+	return 0;
 }
 
 //------------------------------------------------------------------------------
 
 void BMidiLocalConsumer::SetTimeout(bigtime_t when, void* data)
 {
-	fTimeout = when;
-	fTimeoutData = data;
+	UNIMPLEMENTED
 }
 
 //------------------------------------------------------------------------------
@@ -165,4 +197,3 @@ void BMidiLocalConsumer::_Reserved7() { }
 void BMidiLocalConsumer::_Reserved8() { }
 
 //------------------------------------------------------------------------------
-
