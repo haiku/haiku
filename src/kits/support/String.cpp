@@ -28,12 +28,13 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <algobase.h>
-#include <assert.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // System Includes -------------------------------------------------------------
+#include <Debug.h>
+#define DEBUG 1
 #include <String.h>
 
 // Temporary Includes
@@ -531,7 +532,9 @@ BString::MoveInto(char *into, int32 from, int32 length)
 
 
 /*---- Compare functions ---------------------------------------------------*/
-// Implemented inline in the header file
+
+// These are implemented inline in the header file
+
 /*---- strcmp-style compare functions --------------------------------------*/
 int
 BString::Compare(const BString &string) const
@@ -768,6 +771,9 @@ BString::Replace(char replaceThis, char withThis, int32 maxReplaceCount, int32 f
 	int32 replaceCount = 0;
 	char tmp[2] = { replaceThis, '\0' };
 	
+	if (maxReplaceCount <= 0)
+		return *this;
+		
 	while ((pos = _FindAfter(tmp, fromOffset, -1)) >= 0) {
 		_privateData[pos] = withThis;
 		fromOffset += pos;
@@ -831,7 +837,7 @@ BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOff
 	int32 difference = len - strlen(replaceThis);
 	
 	int32 pos; 
-	while ((pos = _FindAfter(replaceThis, fromOffset, -1))>= 0) {
+	while ((pos = _FindAfter(replaceThis, fromOffset, -1)) >= 0) {
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
@@ -847,7 +853,25 @@ BString::ReplaceAll(const char *replaceThis, const char *withThis, int32 fromOff
 BString&
 BString::Replace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	//TODO: Implement
+	if (replaceThis == NULL || maxReplaceCount <= 0)
+		return *this;
+	
+	int32 replaceCount = 0;	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos; 
+	while ((pos = _FindAfter(replaceThis, fromOffset, -1)) >= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+		fromOffset += pos;
+		
+		if (++replaceCount == maxReplaceCount)
+			break;
+	}
 	return *this;
 }
 
@@ -893,7 +917,20 @@ BString::IReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 BString&
 BString::IReplace(char replaceThis, char withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	//TODO: Implement
+	int32 pos = B_ERROR;
+	int32 replaceCount = 0;
+	char tmp[2] = { replaceThis, '\0' };
+	
+	if (_privateData == NULL || maxReplaceCount <= 0)
+		return *this;
+		
+	while ((pos = _FindAfter(tmp, fromOffset, -1)) >= 0) {
+		_privateData[pos] = withThis;
+		fromOffset += pos;
+		
+		if (++replaceCount == maxReplaceCount)
+			break;
+	}
 	return *this;
 }
 
@@ -903,12 +940,12 @@ BString::IReplaceFirst(const char *replaceThis, const char *withThis)
 {
 	if (replaceThis == NULL)
 		return *this;
-	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - strlen(replaceThis);
-	
+		
 	int32 pos = _IFindAfter(replaceThis, 0, -1);
 	if (pos >= 0) {
+		int32 len = (withThis ? strlen(withThis) : 0);
+		int32 difference = len - strlen(replaceThis);
+		
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
@@ -925,12 +962,12 @@ BString::IReplaceLast(const char *replaceThis, const char *withThis)
 {
 	if (replaceThis == NULL)
 		return *this;
-	
-	int32 len = (withThis ? strlen(withThis) : 0);
-	int32 difference = len - strlen(replaceThis);
-	
+		
 	int32 pos = _FindBefore(replaceThis, Length(), -1);
 	if (pos >= 0) {
+		int32 len = (withThis ? strlen(withThis) : 0);
+		int32 difference = len - strlen(replaceThis);
+		
 		if (difference > 0)
 			_OpenAtBy(pos, difference);
 		else if (difference < 0)
@@ -968,7 +1005,25 @@ BString::IReplaceAll(const char *replaceThis, const char *withThis, int32 fromOf
 BString&
 BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplaceCount, int32 fromOffset)
 {
-	//TODO: Implement
+	if (replaceThis == NULL || maxReplaceCount <= 0)
+		return *this;
+	
+	int32 replaceCount = 0;	
+	int32 len = (withThis ? strlen(withThis) : 0);
+	int32 difference = len - strlen(replaceThis);
+	
+	int32 pos; 
+	while ((pos = _IFindAfter(replaceThis, fromOffset, -1)) >= 0) {
+		if (difference > 0)
+			_OpenAtBy(pos, difference);
+		else if (difference < 0)
+			_ShrinkAtBy(pos, -difference);
+		memcpy(_privateData + pos, withThis, len);
+		fromOffset += pos;
+		
+		if (++replaceCount == maxReplaceCount)
+			break;
+	}
 	return *this;
 }
 
@@ -976,8 +1031,9 @@ BString::IReplace(const char *replaceThis, const char *withThis, int32 maxReplac
 BString&
 BString::ReplaceSet(const char *setOfChars, char with)
 {
-	int32 pos = Length();
-	while ((pos = strcspn(String(), setOfChars)) < Length())
+	int32 pos;
+	int32 length = Length();
+	while ((pos = strcspn(String(), setOfChars)) < length)
 		_privateData[pos] = with;
 	return *this;
 }
@@ -991,12 +1047,24 @@ BString::ReplaceSet(const char *setOfChars, const char *with)
 }
 
 
+/*---- Unchecked char access -----------------------------------------------*/
+char &
+BString::operator[](int32 index)
+{
+	return _privateData[index];
+}
+
+
 /*---- Fast low-level manipulation -----------------------------------------*/
 char*
 BString::LockBuffer(int32 maxLength)
 {
-	if (maxLength > Length())
-		_privateData = _GrowBy(maxLength - Length());
+	_SetUsingAsCString(true); //debug
+	
+	int32 len = Length();
+	
+	if (maxLength > len)
+		_privateData = _GrowBy(maxLength - len);
 
 	return _privateData;
 }
@@ -1005,6 +1073,8 @@ BString::LockBuffer(int32 maxLength)
 BString&
 BString::UnlockBuffer(int32 length)
 {
+	_SetUsingAsCString(false); //debug
+	
 	int32 len = length;
 
 	if (len < 0)
@@ -1065,7 +1135,8 @@ BString::CapitalizeEachWord()
 	int32 count = 0;
 	int32 length = Length();
 		
-	do {	
+	do {
+		// Find the first alphabetical character	
 		for(; count < length; count++) {
 			if (isalpha(_privateData[count])) {
 				_privateData[count] = toupper(_privateData[count]);
@@ -1073,6 +1144,8 @@ BString::CapitalizeEachWord()
 				break;
 			}
 		}
+		// Find the first non-alphabetical character,
+		// and meanwhile, turn to lowercase all the alphabetical ones
 		for(; count < length; count++) {
 			if (isalpha(_privateData[count]))
 				_privateData[count] = tolower(_privateData[count]);
@@ -1089,23 +1162,9 @@ BString::CapitalizeEachWord()
 BString&
 BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith)
 {
-	if (original == NULL || setOfCharsToEscape == NULL || _privateData == NULL)
-		return *this;
+	SetTo(original);
+	CharacterEscape(setOfCharsToEscape, escapeWith);
 	
-	_DoAssign(original, strlen(original));
-	
-	int32 pos, offset = 0;
-	
-	for(;;) {
-		pos = strcspn(_privateData + offset, setOfCharsToEscape);
-		offset += pos;
-		if (offset >= Length())
-			break;
-		_OpenAtBy(offset, 1);
-		memset(_privateData + offset, escapeWith, 1);
-		offset+=2;
-	}
-		
 	return *this;
 }
 
@@ -1125,7 +1184,7 @@ BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 			break;
 		_OpenAtBy(offset, 1);
 		memset(_privateData + offset, escapeWith, 1);
-		offset+=2;
+		offset += 2;
 	}
 		
 	return *this;
@@ -1135,13 +1194,8 @@ BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 BString&
 BString::CharacterDeescape(const char *original, char escapeChar)
 {
-	if (original == NULL || _privateData == NULL)
-		return *this;
-	
-	_DoAssign(original, strlen(original));
-	
-	char tmp[2] = { escapeChar, '\0' };
-	RemoveAll(tmp);
+	SetTo(original);	
+	CharacterDeescape(escapeChar);
 		
 	return *this;
 }
@@ -1261,7 +1315,7 @@ BString::operator<<(float f)
 void
 BString::_Init(const char* str, int32 len)
 {
-	assert(str != NULL);
+	ASSERT(str != NULL);
 	_privateData = _GrowBy(len);
 	memcpy(_privateData, str, len);
 }
@@ -1270,7 +1324,7 @@ BString::_Init(const char* str, int32 len)
 void
 BString::_DoAssign(const char *str, int32 len)
 {
-	assert(str != NULL);	
+	ASSERT(str != NULL);	
 	int32 curLen = Length();
 	
 	if (len != curLen)
@@ -1283,7 +1337,7 @@ BString::_DoAssign(const char *str, int32 len)
 void
 BString::_DoAppend(const char *str, int32 len)
 {
-	assert(str != NULL);
+	ASSERT(str != NULL);
 	
 	int32 length = Length();
 	_privateData = _GrowBy(len);
@@ -1295,7 +1349,7 @@ char*
 BString::_GrowBy(int32 size)
 {		
 	int32 curLen = Length(); 	
-	assert(curLen + size >= 0);
+	ASSERT(curLen + size >= 0);
 	
 	if (_privateData) {
 		_privateData -= sizeof(int32);
@@ -1316,13 +1370,16 @@ BString::_GrowBy(int32 size)
 char*
 BString::_OpenAtBy(int32 offset, int32 length)
 {
-	assert(offset >= 0);
+	ASSERT(offset >= 0);
 			
 	int32 oldLength = Length();
+	
 	if (_privateData != NULL)
 		_privateData -= sizeof(int32);
+	
 	_privateData = (char*)realloc(_privateData , oldLength + length + sizeof(int32) + 1);
 	_privateData += sizeof(int32);
+	
 	memmove(_privateData + offset + length, _privateData + offset,
 			oldLength - offset);
 	
@@ -1336,7 +1393,8 @@ BString::_OpenAtBy(int32 offset, int32 length)
 char*
 BString::_ShrinkAtBy(int32 offset, int32 length)
 {
-	assert(offset + length <= Length());
+	ASSERT(offset + length <= Length());
+	
 	int32 oldLength = Length();
 	
 	memmove(_privateData + offset, _privateData + offset + length,
@@ -1356,7 +1414,7 @@ BString::_ShrinkAtBy(int32 offset, int32 length)
 void
 BString::_DoPrepend(const char *str, int32 count)
 {
-	assert(str != NULL);
+	ASSERT(str != NULL);
 	_privateData = _OpenAtBy(0, count);
 	memcpy(_privateData, str, count);
 }
@@ -1399,9 +1457,9 @@ BString::_IFindAfter(const char *str, int32 offset, int32 ) const
 
 
 int32
-BString::_ShortFindAfter(const char *str, int32 ) const
+BString::_ShortFindAfter(const char *str, int32) const
 {
-	assert(str != NULL);
+	ASSERT(str != NULL);
 	//TODO: Implement?
 	return B_ERROR;
 }
@@ -1467,10 +1525,17 @@ BString::_SetLength(int32 length)
 
 
 #if DEBUG
-// TODO: Implement?
 // AFAIK, these are not implemented in BeOS R5
-BString::_SetUsingAsCString(bool) {}
-BString::_AssertNotUsingAsCString() {}
+void
+BString::_SetUsingAsCString(bool state)
+{
+}
+
+
+void
+BString::_AssertNotUsingAsCString() const
+{
+}
 #endif
 
 
