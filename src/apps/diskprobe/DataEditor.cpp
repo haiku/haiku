@@ -954,10 +954,46 @@ DataEditor::UpdateIfNeeded(bool *_updated = NULL)
 status_t 
 DataEditor::ForceUpdate()
 {
+	BAutolock locker(this);
+
 	status_t status = B_OK;
+
+	off_t newSize = fSize;
+	if (IsAttribute()) {
+		// update attribute size (we ignore the type for now)
+		attr_info info;
+		status = fFile.GetAttrInfo(fAttribute, &info);
+		if (status != B_OK) {
+			// The attribute may have just been removed before
+			// it gets rewritten, so we don't do anything
+			// else here (we just set the file size to 0)
+			newSize = 0;
+		} else
+			newSize = info.size;
+	} else if (!IsDevice()) {
+		// update file size
+
+		if (fFile.GetSize(&newSize) != B_OK)
+			return B_ERROR;
+	}
+
+	if (fSize != newSize) {
+		fSize = newSize;
+
+		// update observers
+		BMessage update;
+		update.AddInt64("file_size", newSize);
+		SendNotices(kMsgDataEditorParameterChange, &update);
+	}
 
 	if (fView == NULL)
 		status = SetViewOffset(fViewOffset);
+	else {
+		BMessage update;
+		update.AddInt64("offset", fViewOffset);
+		update.AddInt64("size", fViewSize);
+		SendNotices(kMsgDataEditorUpdate, &update);
+	}
 
 	if (status == B_OK)
 		status = Update();

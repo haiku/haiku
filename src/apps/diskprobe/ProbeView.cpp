@@ -122,6 +122,8 @@ class HeaderView : public BView, public BInvoker {
 		uint32 BlockSize() const { return fBlockSize; }
 		void SetTo(off_t position, uint32 blockSize);
 
+		void UpdateIcon();
+
 	private:
 		void FormatValue(char *buffer, size_t bufferSize, off_t value);
 		void UpdatePositionViews(bool all = true);
@@ -590,6 +592,13 @@ HeaderView::GetPreferredSize(float *_width, float *_height)
 		*_width = Bounds().Width();
 	if (_height)
 		*_height = fPositionSlider->Frame().bottom + 2;
+}
+
+
+void 
+HeaderView::UpdateIcon()
+{
+	fIconView->UpdateIcon();
 }
 
 
@@ -1721,14 +1730,32 @@ ProbeView::MessageReceived(BMessage *message)
 		case B_NODE_MONITOR:
 		{
 			switch (message->FindInt32("opcode")) {
+				case B_STAT_CHANGED:
+					fEditor.ForceUpdate();
+					break;
 				case B_ATTR_CHANGED:
 				{
-					BMenuBar *bar = Window()->KeyMenuBar();
-					if (bar != NULL) {
-						BMenuItem *item = bar->FindItem("Attributes");
-						if (item != NULL && item->Submenu() != NULL)
-							UpdateAttributesMenu(item->Submenu());
+					const char *name;
+					if (message->FindString("attr", &name) != B_OK)
+						break;
+
+					if (fEditor.IsAttribute()) {
+						if (!strcmp(name, fEditor.Attribute()))
+							fEditor.ForceUpdate();
+					} else {
+						BMenuBar *bar = Window()->KeyMenuBar();
+						if (bar != NULL) {
+							BMenuItem *item = bar->FindItem("Attributes");
+							if (item != NULL && item->Submenu() != NULL)
+								UpdateAttributesMenu(item->Submenu());
+						}
 					}
+
+					// There might be a new icon
+					if (!strcmp(name, "BEOS:TYPE")
+						|| !strcmp(name, "BEOS:M:STD_ICON")
+						|| !strcmp(name, "BEOS:L:STD_ICON"))
+						fHeaderView->UpdateIcon();
 					break;
 				}
 			}

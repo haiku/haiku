@@ -137,8 +137,6 @@ DataView::UpdateFromEditor(BMessage *message)
 		// ToDo: copy only the relevant part
 		memcpy(fData, data, fDataSize);
 
-	fEditor.Unlock();
-
 	InvalidateRange(start, end);
 
 	// we notify our selection listeners also if the
@@ -175,6 +173,8 @@ DataView::MessageReceived(BMessage *message)
 				fData = (uint8 *)realloc(fData, fDataSize);
 				UpdateScroller();
 			}
+			if (message->FindInt64("file_size", &offset) == B_OK)
+				UpdateFromEditor();
 			break;
 		}
 
