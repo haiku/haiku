@@ -372,27 +372,30 @@ read_file(const char *filename, string_list* list)
 		result = !0;
 		while (result && fgets(buffer, sizeof(buffer) - 1, file)) {
 			char* line = buffer;
+			int len = 0;
+			char *string = 0;
 			// skip leading white spaces
 			while (*line == ' ' || *line == '\t' || *line == '\n')
 				line++;
-			// copy the line, if not empty or a comment line
-			if (*line && *line != '#') {
-				int len = strlen(line);
-				char *string = 0;
-				// make sure, the line ends in a LF
-				if (line[len - 1] != '\n') {
-					line[len] = '\n';
-					len++;
-					line[len] = '\0';
-				}
-				// copy it
-				string = (char*)malloc(len + 1);
-				if (string) {
-					strcpy(string, line);
-					result = push_string(list, string);
-				} else
-					result = 0;
+			// make empty and comment lines simple new-line lines
+			if (!*line || *line == '#') {
+				line[0] = '\n';
+				line[1] = '\0';
 			}
+			len = strlen(line);
+			// make sure, the line ends in a LF
+			if (line[len - 1] != '\n') {
+				line[len] = '\n';
+				len++;
+				line[len] = '\0';
+			}
+			// copy it
+			string = (char*)malloc(len + 1);
+			if (string) {
+				strcpy(string, line);
+				result = push_string(list, string);
+			} else
+				result = 0;
 		}
 		// close the file
 		fclose(file);
