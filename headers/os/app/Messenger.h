@@ -93,16 +93,9 @@ public:
 	class Private;
 
 private:
-	friend class BRoster;
-	friend class BPrivate::TRoster;
-	friend class BMessage;
 	friend class Private;
-	friend inline void _set_message_reply_(BMessage *, BMessenger);
-	friend status_t swap_data(type_code, void *, size_t, swap_action);
-	friend bool operator<(const BMessenger &a, const BMessenger &b);
-	friend bool operator!=(const BMessenger &a, const BMessenger &b);
 				
-	BMessenger(team_id team, port_id port, int32 token, bool preferred);
+	void SetTo(team_id team, port_id port, int32 token, bool preferred);
 
 	void InitData(const char *signature, team_id team, status_t *result);
 
