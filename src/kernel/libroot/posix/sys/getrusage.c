@@ -1,5 +1,5 @@
 /*
-** Copyright 2004, JérômDuval, jerome.duval@free.fr.
+** Copyright 2004, Jérôme Duval, jerome.duval@free.fr.
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the MIT License.
 */
