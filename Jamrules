@@ -144,6 +144,12 @@ KEEPOBJS = true ;
 
 AR = ar r ;
 
+# under BeOS use copyattr instead of cp
+if $(OS) = BEOS
+{
+	CP = copyattr --data ;
+}
+
 # If no OBOS_OBJECT_TARGET is not defined yet, use our default directory and
 # include our "OBOS_TARGET" as subdirectory in there (to prevent different
 # builds mixing objects from different targets).
@@ -1166,7 +1172,7 @@ rule RelSymLink
 
 rule AbsSymLink
 {
-	# RelSymLink <link> : <link target> : <link dir>
+	# AbsSymLink <link> : <link target> : <link dir>
 	# Creates an absolute symbolic link from <link> to <link target>.
 	# <link> and <link target> must be usual targets. If <link dir> is
 	# given, then it is set as LOCATE directory on <link>.
@@ -1189,6 +1195,78 @@ actions AbsSymLink
 	esac
 	$(RM) "$(1)" && $(LN) -s "$target" "$(1)"
 }
+
+rule OBOSInstall
+{
+	# Usage: OBOSInstall <[ install [ and uninstall ] pseudotarget ]>
+	#					 : <directory> : <sources to install>
+	#					 : [ <installgrist> ] : [ <install rule> ] ;
+	local install = $(1[1]) ;
+	install ?= install ;
+	local uninstall = $(1[2]) ;
+	uninstall ?= un$(install) ;
+	local dir = $(2) ;
+	local sources = $(3) ;
+	local installgrist = $(4) ;
+	installgrist ?= $(INSTALLGRIST) ;
+	local installRule = $(5) ;
+	installRule ?= Install ;
+	local targets = $(sources:G=$(installgrist)) ;
+
+	Depends $(install) : $(targets) ;
+	Clean $(uninstall) : $(targets) ;
+
+	SEARCH on $(sources) += $(SEARCH_SOURCE) ;
+	MakeLocate $(targets) : $(dir) ;
+
+	local source ;
+	for source in $(sources) {
+		local target = $(source:G=$(installgrist)) ;
+
+		Depends $(target) : $(source) ;
+		$(installRule) $(target) : $(source) ;
+
+		if [ on $(target) return $(MODE) ] {
+			Chmod $(target) ;
+		}
+
+		if $(OWNER) && $(CHOWN) { 
+			Chown $(target) ;
+			OWNER on $(target) = $(OWNER) ;
+		}
+
+		if $(GROUP) && $(CHGRP) { 
+			Chgrp $(target) ;
+			GROUP on $(target) = $(GROUP) ;
+		}
+	}
+}
+
+rule OBOSInstallAbsSymLink
+{
+	# Usage: OBOSInstallAbsSymLink <[ install [ and uninstall ] pseudotarget ]>
+	#							   : <directory> : <sources to install>
+	#							   : [ <installgrist> ] ;
+	OBOSInstall $(1) : $(2) : $(3) : $(4) : AbsSymLink ;
+}
+
+rule InstallRelSymLinkAdapter
+{
+	# InstallRelSymLinkAdapter <link> : <link target>
+	if ! [ on $(2) return $(TARGET) ] {
+		TARGET on $(2) = [ on $(2) return $(SEARCH) ] ;
+	}
+	RelSymLink $(1) : $(2) ;
+}
+
+rule OBOSInstallRelSymLink
+{
+	# Usage: OBOSInstallRelSymLink <[ install [ and uninstall ] pseudotarget ]>
+	#							   : <directory> : <sources to install>
+	#							   : [ <installgrist> ] ;
+	OBOSInstall $(1) : $(2) : $(3) : $(4) : InstallRelSymLinkAdapter ;
+}
+
 
 #-------------------------------------------------------------------------------
 # Low-level OBOS utility rules
