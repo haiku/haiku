@@ -13,41 +13,6 @@
 #include <stdio.h>
 
 
-#if 0
-static unsigned long simple_strtoul(const char *cp,char **endp,unsigned int base)
-{
-	unsigned long result = 0,value;
-
-	if (!base) {
-		base = 10;
-		if (*cp == '0') {
-			base = 8;
-			cp++;
-			if ((*cp == 'x') && isxdigit(cp[1])) {
-				cp++;
-				base = 16;
-			}
-		}
-	}
-	while (isxdigit(*cp) && (value = isdigit(*cp) ? *cp-'0' : (islower(*cp)
-	    ? toupper(*cp) : *cp)-'A'+10) < base) {
-		result = result*base + value;
-		cp++;
-	}
-	if (endp)
-		*endp = (char *)cp;
-	return result;
-}
-
-static long simple_strtol(const char *cp,char **endp,unsigned int base)
-{
-	if(*cp=='-')
-		return -simple_strtoul(cp+1,endp,base);
-	return simple_strtoul(cp,endp,base);
-}
-#endif
-
-
 static int
 skip_atoi(const char **s)
 {
@@ -161,8 +126,9 @@ put_character(char **_buffer, int32 *_bytesLeft, char c)
 }
 
 
-static char *
-number(char *str, long long num, unsigned base, int size, int precision, int type)
+static void
+number(char **_string, int32 *_bytesLeft, int64 num, uint32 base, int size,
+	int precision, int type)
 {
 	const char *digits = "0123456789abcdefghijklmnopqrstuvwxyz";
 	char c, sign, tmp[66];
@@ -173,7 +139,7 @@ number(char *str, long long num, unsigned base, int size, int precision, int typ
 	if (type & LEFT)
 		type &= ~ZEROPAD;
 	if (base < 2 || base > 36)
-		return 0;
+		return;
 
 	c = (type & ZEROPAD) ? '0' : ' ';
 	sign = 0;
@@ -206,33 +172,32 @@ number(char *str, long long num, unsigned base, int size, int precision, int typ
 		precision = i;
 	size -= precision;
 
-	if (!(type&(ZEROPAD + LEFT))) {
-		while (size-- > 0)
-			*str++ = ' ';
+	if (!(type & (ZEROPAD + LEFT))) {
+		put_padding(_string, _bytesLeft, size);
+		size = 0;
 	}
 	if (sign)
-		*str++ = sign;
+		put_character(_string, _bytesLeft, sign);
 
 	if (type & SPECIAL) {
 		if (base == 8)
-			*str++ = '0';
+			put_character(_string, _bytesLeft, '0');
 		else if (base == 16) {
-			*str++ = '0';
-			*str++ = digits[33];
+			put_character(_string, _bytesLeft, '0');
+			put_character(_string, _bytesLeft, digits[33]);
 		}
 	}
 
-	if (!(type & LEFT))
+	if (!(type & LEFT)) {
 		while (size-- > 0)
-			*str++ = c;
+			put_character(_string, _bytesLeft, c);
+	}
 	while (i < precision--)
-		*str++ = '0';
+		put_character(_string, _bytesLeft, '0');
 	while (i-- > 0)
-		*str++ = tmp[i];
-	while (size-- > 0)
-		*str++ = ' ';
+		put_character(_string, _bytesLeft, tmp[i]);
 
-	return str;
+	put_padding(_string, _bytesLeft, size);
 }
 
 
@@ -356,10 +321,9 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 					flags |= ZEROPAD;
 				}
 
-				// ToDo: fix me!
-				string[0] = '0';
-				string[1] = 'x';
-				string = number(string + 2, (uint32)va_arg(args, void *), 16,
+				if (!put_string(&string, &bytesLeft, "0x", 2))
+					goto out;
+				number(&string, &bytesLeft, (uint32)va_arg(args, void *), 16,
 						fieldWidth, precision, flags);
 				continue;
 
@@ -416,8 +380,7 @@ vsnprintf(char *buffer, size_t bufferSize, const char *format, va_list args)
 		else
 			num = va_arg(args, unsigned int);
 
-		// ToDo: fix me!
-		string = number(string, num, base, fieldWidth, precision, flags);
+		number(&string, &bytesLeft, num, base, fieldWidth, precision, flags);
 	}
 
 out:
