@@ -188,7 +188,7 @@ void
 PCI::GetRomBarInfo(PCIDev *dev, uint8 offset, uint32 *address, uint32 *size, uint8 *flags)
 {
 	uint32 oldvalue = pci_read_config(dev->bus, dev->dev, dev->func, offset, 4);
-	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, 0xffffffff);
+	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, 0xfffffffe); // LSB must be 0
 	uint32 newvalue = pci_read_config(dev->bus, dev->dev, dev->func, offset, 4);
 	pci_write_config(dev->bus, dev->dev, dev->func, offset, 4, oldvalue);
 	
@@ -229,7 +229,7 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 			dev->info.u.h0.cardbus_cis = pci_read_config(dev->bus, dev->dev, dev->func, PCI_cardbus_cis, 4);
 			dev->info.u.h0.subsystem_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_id, 2);
 			dev->info.u.h0.subsystem_vendor_id = pci_read_config(dev->bus, dev->dev, dev->func, PCI_subsystem_vendor_id, 2);
-			GetRomBarInfo(dev, PCI_bridge_rom_base, &dev->info.u.h0.rom_base_pci, &dev->info.u.h0.rom_size);
+			GetRomBarInfo(dev, PCI_rom_base, &dev->info.u.h0.rom_base_pci, &dev->info.u.h0.rom_size);
 			dev->info.u.h0.rom_base = (ulong)pci_ram_address((void *)dev->info.u.h0.rom_base_pci);
 			for (int i = 0; i < 6; i++) {
 				GetBarInfo(dev, PCI_base_registers + 4*i,
