@@ -6,7 +6,9 @@ App ShowImage : ShowImageApp.cpp
 	ShowImageConstants.cpp
 	ShowImageStatusView.cpp
 	ShowImageView.cpp
-	ShowImageWindow.cpp ;
+	ShowImageWindow.cpp
+	PrintOptionsWindow.cpp
+	;
 
 LinkSharedOSLibs ShowImage : be tracker translation ;
 
