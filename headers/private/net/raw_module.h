@@ -6,15 +6,12 @@
 
 #include "net_module.h"
 
-#ifdef _KERNEL_MODE
 #include <KernelExport.h>
-#define RAW_MODULE_PATH	      "network/protocol/raw"
-#else
-#define RAW_MODULE_PATH       "modules/protocols/raw"
-#endif
+#define NET_RAW_MODULE_NAME	"network/protocols/raw"
 
 struct raw_module_info {
 	struct kernel_net_module_info info;
+
 	void (*input)(struct mbuf *, int);
 };
 

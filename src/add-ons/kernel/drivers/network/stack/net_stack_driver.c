@@ -207,9 +207,9 @@ _EXPORT status_t init_driver(void)
 	dprintf(LOGID "init_driver, built %s %s\n", __DATE__, __TIME__);
 #endif
 
-	rv = get_module(CORE_MODULE_PATH, (module_info **) &core);
+	rv = get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 	if (rv < 0) {
-		dprintf(LOGID ERR "Argh, can't load " CORE_MODULE_PATH " module: %d\n", rv);
+		dprintf(LOGID ERR "Argh, can't load " NET_CORE_MODULE_NAME " module: %d\n", rv);
 		return rv;
 	}
 	
@@ -239,7 +239,7 @@ _EXPORT void uninit_driver(void)
 		// shutdown the network stack
 		core->stop();
 #endif
-		put_module(CORE_MODULE_PATH);
+		put_module(NET_CORE_MODULE_NAME);
 	};
 }
 

@@ -151,10 +151,6 @@ struct core_module_info {
 	int (*socket_set_event_callback)(struct socket *so, socket_event_callback, void *, int);
 };
 
-#ifdef _KERNEL_MODE
-#define CORE_MODULE_PATH	"network/core"
-#else
-#define CORE_MODULE_PATH    "modules/core"
-#endif
+#define NET_CORE_MODULE_NAME	"network/core/v1"
 
 #endif /* OBOS_CORE_MODULE_H */
