@@ -20,7 +20,7 @@
 #define MGACFG_SUBSYSIDW    0x4c // >= MYST
 #define MGACFG_OPTION2      0x50 // >= G100
 #define MGACFG_OPTION3      0x54 // >= G400
-#define MGACFG_OPTION4      0x58 // >= G400
+#define MGACFG_OPTION4      0x58 // >= G450
 #define MGACFG_PM_IDENT     0xdc // >= G100
 #define MGACFG_PM_CSR       0xe0 // >= G100
 #define MGACFG_AGP_IDENT    0xf0 // >= MIL2
@@ -101,7 +101,6 @@
 #define MGADXI_PIXPLLSTAT      0x4F
 #define MGADXI_CURCOLEXT       0x60   /*sequential from CURCOL3->15, RGB*/
 
-//rudolf: missing registers!
 /*(D)AC (X) (I)ndexed registers (>= g200) */
 #define	MGADXI_KEYOPMODE	   0x51
 #define	MGADXI_COLMSK0RED 	   0x52
@@ -110,6 +109,18 @@
 #define	MGADXI_COLKEY0RED	   0x55
 #define	MGADXI_COLKEY0GREEN    0x56
 #define	MGADXI_COLKEY0BLUE 	   0x57
+
+/*(D)AC (X) (I)ndexed registers (>= g450?) */
+#define MGADXI_TVO_IDX         0x87
+#define MGADXI_TVO_DATA        0x88
+#define MGADXI_OUTPUTCONN      0x8A
+#define MGADXI_SYNCCTRL        0x8B
+#define MGADXI_VIDPLLSTAT      0x8C
+#define MGADXI_VIDPLLP         0x8D
+#define MGADXI_VIDPLLM         0x8E
+#define MGADXI_VIDPLLN         0x8F
+#define MGADXI_PWRCTRL         0xA0
+#define MGADXI_PANMODE         0xA2
 
 /*MGA 1st CRTC registers */
 #define MGACR1_VCOUNT        0x1E20

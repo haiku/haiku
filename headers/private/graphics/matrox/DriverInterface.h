@@ -169,28 +169,14 @@ typedef struct {
 	};
 	struct
 	{
-		/*specialised registers for initialisation*/
-		//will be deleted, will be replaced by new Pins implementation:
-		//these are nolonger used by G100.
-		uint32 mem_ctl;
-		uint32 mem_type;
-		uint8 membuf;				/*memory buffer type*/
-		uint32 mem_rd;
-		uint32 mem_rfhcnt;
-
-		/*temporary extra info for G450*/
-		//will be deleted, will be replaced by new Pins implementation:
-		uint32 option;
-		uint32 option2;
-		uint32 option4;
-		uint32 maccess;
+		/* specialised registers for card initialisation read from MGA BIOS (pins) */
 
 		/* general card information */
 		uint32 card_type;           /* see card_type enum above */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
 		bool sdram;					/* TRUE if SDRAM card: needed info for 2D acceleration */
 
-		/* newly implemented PINS: will replace most of the above.. */
+		/* PINS */
 		float f_ref;				/* PLL reference-oscillator frequency (Mhz) */
 		uint32 max_system_vco;		/* graphics engine PLL VCO limits (Mhz) */
 		uint32 min_system_vco;
@@ -218,9 +204,15 @@ typedef struct {
 		bool secondary_dvi;
 		uint32 memory_size;			/* memory (Mb) */
 		uint32 mctlwtst_reg;		/* memory control waitstate register */
+		uint32 memrdbk_reg;			/* memory readback register */
 		uint32 option_reg;			/* option register */
+		uint32 option2_reg;			/* option2 register */
+		uint32 option3_reg;			/* option3 register */
+		uint32 option4_reg;			/* option4 register */
+		uint8 v3_option2_reg;		/* pins v3 option2 register, not used for G100 */
 		uint8 v3_clk_div;			/* pins v3 memory and system clock division factors */
 		uint8 v3_mem_type;			/* pins v3 memory type info */
+		uint16 v5_mem_type;			/* pins v5 memory type info */
 	} ps;
 
   /*mirror of the ROM (copied in driver, because may not be mapped permanently - only over fb)*/
