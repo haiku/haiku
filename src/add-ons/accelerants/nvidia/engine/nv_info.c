@@ -24,6 +24,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
+static status_t	nv_crtc_setup_fifo(void);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -222,6 +223,9 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		NV_REG32(0x00001800 + NVCFG_ROMSHADOW) |= 0x00000001;
+
+		//temporary: should be called from setmode probably..
+		nv_crtc_setup_fifo();
 	}
 	else
 	{
@@ -237,7 +241,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 }
 
 /* This routine is complete for pre-NV10. It's tested on a Elsa Erazor III with TNT2
- * (NV05), which coldstarts perfectly. */
+ * (NV05) and on a no-name TNT2-M64. Both cards coldstart perfectly. */
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab)
 {
 	status_t result = B_OK;
@@ -786,11 +790,31 @@ static void	setup_ram_config(uint8* rom, uint16 ram_tab)
 	 * set to 128bits width while we should be set to 64bits width, so correct. */
 	if (((uint32 *)si->framebuffer)[3] != data)
 	{
-		LOG(8,("INFO: ---RAM width tested: width is 64bits, correcting settings\n"));
+		LOG(8,("INFO: ---RAM width tested: width is 64bits, correcting settings.\n"));
 		NV_REG32(NV32_NV4STRAPINFO) &= ~0x00000004;
+	}
+	else
+	{
+		LOG(8,("INFO: ---RAM width tested: access is OK.\n"));
 	}
 
 	//fixme?: do RAM size test
+}
+
+//fixme: move to crtc sourcefile, also setup for crtc2(?)
+static status_t	nv_crtc_setup_fifo()
+{
+	/* enable access to primary head */
+	set_crtc_owner(0);
+
+	//fixme: setup according to colordepth and RAM bus width...
+	/* set CRTC FIFO burst size to 256 */
+	CRTCW(FIFO, 0x03);
+
+	/* set CRTC FIFO low watermark to 32 */
+	CRTCW(FIFO_LWM, 0x20);
+
+	return B_OK;
 }
 
 /* fake_pins presumes the card was coldstarted by it's BIOS */
