@@ -23,7 +23,7 @@ enum menu_item_type {
 	MENU_ITEM_SEPARATOR,
 };
 
-class MenuItem {
+class MenuItem : public DoublyLinkedListLinkImpl<MenuItem> {
 	public:
 		MenuItem(const char *label = NULL, Menu *subMenu = NULL);
 		~MenuItem();
@@ -52,8 +52,6 @@ class MenuItem {
 		const char *Label() const { return fLabel; }
 		Menu *Submenu() const { return fSubMenu; }
 
-		DoublyLinked::Link fLink;
-
 	private:
 		friend class Menu;
 		void SetMenu(Menu *menu);
@@ -69,8 +67,8 @@ class MenuItem {
 		const char		*fHelpText;
 };
 
-typedef DoublyLinked::List<MenuItem> MenuItemList;
-typedef DoublyLinked::Iterator<MenuItem> MenuItemIterator;
+typedef DoublyLinkedList<MenuItem> MenuItemList;
+typedef MenuItemList::Iterator MenuItemIterator;
 
 enum menu_type {
 	MAIN_MENU = 1,
@@ -90,7 +88,7 @@ class Menu {
 		void Show() { fIsHidden = false; }
 		bool IsHidden() const { return fIsHidden; }
 
-		MenuItemIterator ItemIterator() { return fItems.Iterator(); }
+		MenuItemIterator ItemIterator() { return fItems.GetIterator(); }
 		MenuItem *ItemAt(int32 index);
 		int32 IndexOf(MenuItem *item);
 		int32 CountItems() const;

@@ -155,7 +155,8 @@ Menu::~Menu()
 	// take all remaining items with us
 
 	MenuItem *item;
-	while ((item = fItems.RemoveHead()) != NULL) {
+	while ((item = fItems.Head()) != NULL) {
+		fItems.Remove(item);
 		delete item;
 	}
 }
