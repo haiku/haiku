@@ -5,5 +5,6 @@ Server input_server :
 	InputServerDevice.cpp
 	InputServerFilter.cpp
 	InputServerMethod.cpp
+	PortLink.cpp
 ;
 LinkSharedOSLibs input_server : be root ;
