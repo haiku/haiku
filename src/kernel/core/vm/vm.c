@@ -1319,13 +1319,10 @@ vm_copy_on_write_area(vm_region *area)
 	map->ops->lock(map);
 	map->ops->unmap(map, area->base, area->base + area->size - 1);
 
-	// ToDo: it seems to make more sense to attach the pages to the vm_cache
-	//	instead of the vm_cache_ref object - this way, we would not need to
-	//	move the pages around (just remap them)
-
 	for (page = lowerCache->page_list; page; page = page->cache_next) {
 		map->ops->map(map, area->base + page->offset, page->ppn * B_PAGE_SIZE, protection);
 	}
+
 	map->ops->unlock(map);
 
 	mutex_unlock(&lowerCacheRef->lock);
