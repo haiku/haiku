@@ -1,4 +1,5 @@
-/* Copyright (c) 1991, 1993
+/*-
+ * Copyright (c) 1991, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -28,20 +29,19 @@
  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
+ *
+ * $FreeBSD: src/lib/libc/i386/gen/isinf.c,v 1.6 1999/08/27 23:59:21 peter Exp $
  */
 
-#include <sys/types.h>
+
 #include <math.h>
 
-/* ToDo: on BeOS/x86, these are defined as __isnan(), and __isinf() - the
- * isnan()/isinf() are only macros - we will have to reflect this here.
- */
 
-int isnan(double);
-int isinf(double);
+// double
+
 
 int
-isnan(double d)
+__isnan(double d)
 {
 	register struct IEEEdp {
 		unsigned manl : 32;
@@ -55,14 +55,51 @@ isnan(double d)
 
 
 int
-isinf(double d)
+__isinf(double d)
 {
 	register struct IEEEdp {
-		u_int manl : 32;
-		u_int manh : 20;
-		u_int  exp : 11;
-		u_int sign :  1;
+		unsigned manl : 32;
+		unsigned manh : 20;
+		unsigned  exp : 11;
+		unsigned sign :  1;
 	} *p = (struct IEEEdp *)&d;
 
 	return p->exp == 2047 && !p->manh && !p->manl;
+}
+
+
+//	#pragma mark -
+//	float
+
+
+int
+__isnanf(float f)
+{
+	// ToDo: fix implementation!
+	return __isnan((double)f);
+}
+
+
+int
+__isinff(float f)
+{
+	return __isinf((double)f);
+}
+
+
+//	#pragma mark -
+//	long double
+
+
+int
+__isnanl(long double d)
+{
+	return __isnan((double)d);
+}
+
+
+int
+__isinfl(long double d)
+{
+	return __isinf((double)d);
 }
