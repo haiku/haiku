@@ -796,8 +796,9 @@ TIFFTranslator::decode_huffman(StreamBuffer *pstreambuf, TiffDetails &details,
 	DecodeTree *ptrees[2] = {fpwhiteTree, fpblackTree};
 	uint8 currentcolor = 0;
 	uint8 *pcurrentpixel = pbits;
-	while (pixelswrit < details.width) {
-		status_t value = ptrees[currentcolor]->GetValue(stream);
+	status_t value = 0;
+	while (pixelswrit < details.width || value >= 64) {
+		value = ptrees[currentcolor]->GetValue(stream);
 		if (value < 0) {
 			debugger("value < 0");
 			return B_ERROR;
