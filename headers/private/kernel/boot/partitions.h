@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef KERNEL_BOOT_PARTITIONS_H
@@ -60,6 +60,8 @@ class Partition : public Node, public partition_data {
 #define kPartitionTypeEXT3		"EXT3 Filesystem"
 #define kPartitionTypeFAT12		"FAT12 Filesystem"
 #define kPartitionTypeFAT32		"FAT32 Filesystem"
+#define kPartitionTypeHFS		"HFS Filesystem"
+#define kPartitionTypeHFSPlus	"HFS+ Filesystem"
 #define kPartitionTypeISO9660	"ISO9660 Filesystem"
 #define kPartitionTypeReiser	"Reiser Filesystem"
 #define kPartitionTypeUDF		"UDF Filesystem"
