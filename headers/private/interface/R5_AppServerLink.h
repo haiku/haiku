@@ -7,7 +7,7 @@
 #include <BeBuild.h>
 #include <SupportDefs.h>
 #include <OS.h>
-#include "Session.h"
+#include <R5_Session.h>
 
 class _BAppServerLink_ {
 
