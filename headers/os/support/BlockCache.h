@@ -58,12 +58,7 @@ private:
 				BBlockCache(const BBlockCache &);
 	BBlockCache	&operator=(const BBlockCache &);
 
-	struct _FreeBlock
-	{
-		uint32		magic1;
-		_FreeBlock *next;
-		uint32		magic2;
-	};
+	struct _FreeBlock;
 
 	_FreeBlock *fFreeList;
 	size_t		fBlockSize;

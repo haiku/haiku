@@ -29,6 +29,13 @@
 #define MAGIC1		0x9183f4d9
 #define MAGIC2		0xa6b3c87d
 
+struct BBlockCache::_FreeBlock {
+	DEBUG_ONLY(	uint32		magic1;	)
+				_FreeBlock *next;
+	DEBUG_ONLY(	uint32		magic2;	)
+};
+
+
 // The requirements set by the BeBook's description of the destructor,
 // as well as Get() function, allowing the caller to dispose of the
 // memory, do not allow to allocate one large block to be used as pool.
