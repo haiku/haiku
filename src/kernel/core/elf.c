@@ -667,6 +667,8 @@ error:
 image_id
 elf_load_kspace(const char *path, const char *sym_prepend)
 {
+	bool ro_segment_handled = false;
+	bool rw_segment_handled = false;
 	struct Elf32_Ehdr *eheader;
 	struct Elf32_Phdr *pheaders;
 	struct elf_image_info *image;
@@ -749,8 +751,6 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 
 	for (i = 0; i < eheader->e_phnum; i++) {
 		char region_name[64];
-		bool ro_segment_handled = false;
-		bool rw_segment_handled = false;
 		int image_region;
 		int protection;
 
@@ -787,8 +787,9 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 			ro_segment_handled = true;
 			image_region = 0;
 			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
-				// ToDo: why is this? Right now, the kernel crashes without
-				//	it, so go, investigate!
+				// We need to read in the contents of this area later,
+				// so it has to be writeable at this point;
+				// ToDo: we should change the area protection later.
 
 			sprintf(region_name, "%s_ro", path);
 		} else {
