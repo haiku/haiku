@@ -173,6 +173,12 @@ void gfx_conv_yuv411p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 	gfx_conv_null_c(in, out, width, height);
 }
 
+// Macro to limit the signed a into range 0-255, first one seems to be fastest
+#define SATURATE(a) if (0xffffff00 & (uint32)a) { if (a < 0) a = 0; else a = 255; }
+// #define SATURATE(a) if (0xffffff00 & (uint32)a) { if (0x80000000 & (uint32)a) a = 0; else a = 0xff; }
+// #define SATURATE(a) if (a < 0) a = 0; else if (a > 255) a = 255;
+// #define SATURATE(a) if (a < 0) a = 0; else if (a & 0xffffff00) a = 255;
+// #define SATURATE(a) if (a < 0) a = 0; if (a & 0xffffff00) a = 255;
 
 void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 {
@@ -215,19 +221,19 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 			Y1 = (((G & 0x0000ff00) >> 8) - 16) * 38142;
 			
 			R = (Y0 + Cr_R) >> 15;
-			if (R < 0) R = 0; else if (R > 255) R = 255;
+			SATURATE(R);
 			G = (Y0 + Cr_G + Cb_G) >> 15;
-			if (G < 0) G = 0; else if (G > 255) G = 255;
+			SATURATE(G);
 			B = (Y0 + Cb_B) >> 15;
-			if (B < 0) B = 0; else if (B > 255) B = 255;
+			SATURATE(B);
 			poutEven[j] = (R << 16) | (G << 8) | B;
 			
 			R = (Y1 + Cr_R) >> 15;
-			if (R < 0) R = 0; else if (R > 255) R = 255;
+			SATURATE(R);
 			G = (Y1 + Cr_G + Cb_G) >> 15;
-			if (G < 0) G = 0; else if (G > 255) G = 255;
+			SATURATE(G);
 			B = (Y1 + Cb_B) >> 15;
-			if (B < 0) B = 0; else if (B > 255) B = 255;
+			SATURATE(B);
 			poutEven[j + 1] = (R << 16) | (G << 8) | B;
 
 			G = *(uint16 *)pi1Odd;
@@ -236,19 +242,19 @@ void gfx_conv_yuv420p_rgb32_c(AVFrame *in, AVFrame *out, int width, int height)
 			Y1 = (((G & 0x0000ff00) >> 8) - 16) * 38142;
 
 			R = (Y0 + Cr_R) >> 15;
-			if (R < 0) R = 0; else if (R > 255) R = 255;
+			SATURATE(R);
 			G = (Y0 + Cr_G + Cb_G) >> 15;
-			if (G < 0) G = 0; else if (G > 255) G = 255;
+			SATURATE(G);
 			B = (Y0 + Cb_B) >> 15;
-			if (B < 0) B = 0; else if (B > 255) B = 255;
+			SATURATE(B);
 			poutOdd[j] = (R << 16) | (G << 8) | B;
 			
 			R = (Y1 + Cr_R) >> 15;
-			if (R < 0) R = 0; else if (R > 255) R = 255;
+			SATURATE(R);
 			G = (Y1 + Cr_G + Cb_G) >> 15;
-			if (G < 0) G = 0; else if (G > 255) G = 255;
+			SATURATE(G);
 			B = (Y1 + Cb_B) >> 15;
-			if (B < 0) B = 0; else if (B > 255) B = 255;
+			SATURATE(B);
 			poutOdd[j + 1] = (R << 16) | (G << 8) | B;
 		}
 		poutEven = (uint32 *)(poutInc + (uint8 *)poutEven);
