@@ -52,6 +52,12 @@
 
 #define MAX_SYM_LINKS SYMLINKS_MAX
 
+const static uint32 kMaxUnusedVnodes = 512;
+	// This is the maximum number of unused vnodes that the system
+	// will keep around.
+	// It may be chosen with respect to the available memory or enhanced
+	// by some timestamp/frequency heurism.
+
 static struct {
 	const char *path;
 	const char *target;
@@ -69,6 +75,7 @@ struct vnode {
 	struct vm_cache	*cache;
 	mount_id		device;
 	list_link		mount_link;
+	list_link		unused_link;
 	vnode_id		id;
 	fs_vnode		private_node;
 	struct fs_mount	*mount;
@@ -160,6 +167,8 @@ static mutex sVnodeMutex;
 
 #define VNODE_HASH_TABLE_SIZE 1024
 static hash_table *sVnodeTable;
+static list sUnusedVnodeList;
+static uint32 sUnusedVnodes = 0;
 static struct vnode *sRoot;
 
 #define MOUNTS_HASH_TABLE_SIZE 16
@@ -563,6 +572,37 @@ create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 }
 
 
+/**	Frees the vnode and all resources it has acquired.
+ *	Will also make sure that any cache modifications are written back.
+ */
+
+static void
+free_vnode(struct vnode *vnode, bool reenter)
+{
+	ASSERT(vnode->ref_count == 0 && vnode->busy);
+
+	// write back any changes in this vnode's cache (if present)
+
+	if (vnode->cache && !vnode->delete_me)
+		vm_cache_write_modified((vm_cache_ref *)vnode->cache);
+
+	if (vnode->delete_me)
+		FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+	else
+		FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+
+	// if we have a vm_cache attached, remove it
+	if (vnode->cache)
+		vm_cache_release_ref((vm_cache_ref *)vnode->cache);
+
+	vnode->cache = NULL;
+
+	remove_vnode_from_mount_list(vnode, vnode->mount);
+
+	free(vnode);
+}
+
+
 /**	\brief Decrements the reference counter of the given vnode and deletes it,
  *	if the counter dropped to 0.
  *
@@ -579,52 +619,47 @@ create_new_vnode(struct vnode **_vnode, mount_id mountID, vnode_id vnodeID)
 static status_t
 dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 {
-	int err;
-	int old_ref;
+	int32 oldRefCount;
 
 	mutex_lock(&sVnodeMutex);
 
-	if (vnode->busy == true)
+	if (vnode->busy)
 		panic("dec_vnode_ref_count called on vnode that was busy! vnode %p\n", vnode);
 
-	old_ref = atomic_add(&vnode->ref_count, -1);
+	oldRefCount = atomic_add(&vnode->ref_count, -1);
 
 	PRINT(("dec_vnode_ref_count: vnode %p, ref now %ld\n", vnode, vnode->ref_count));
 
-	if (old_ref == 1) {
-		vnode->busy = true;
+	if (oldRefCount == 1) {
+		bool freeNode = false;
+
+		// Just insert the vnode into an unused list if we don't need
+		// to delete it
+		if (vnode->delete_me) {
+			hash_remove(sVnodeTable, vnode);
+			vnode->busy = true;
+			freeNode = true;
+		} else {
+			list_add_item(&sUnusedVnodeList, vnode);
+			if (++sUnusedVnodes > kMaxUnusedVnodes) {
+				// there are too many unused vnodes so we free the oldest one
+				// ToDo: evaluate this mechanism
+				vnode = (struct vnode *)list_remove_head_item(&sUnusedVnodeList);
+
+				hash_remove(sVnodeTable, vnode);
+				vnode->busy = true;
+				freeNode = true;
+			}
+		}
 
 		mutex_unlock(&sVnodeMutex);
 
-		// write back any changes in this vnode's cache (if present)
-		if (vnode->cache)
-			vm_cache_write_modified((vm_cache_ref *)vnode->cache);
-
-		if (vnode->delete_me)
-			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
-		else
-			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
-
-		// if we have a vm_cache attached, remove it
-		if (vnode->cache)
-			vm_cache_release_ref((vm_cache_ref *)vnode->cache);
-
-		vnode->cache = NULL;
-
-		remove_vnode_from_mount_list(vnode, vnode->mount);
-
-		mutex_lock(&sVnodeMutex);
-		hash_remove(sVnodeTable, vnode);
+		if (freeNode)
+			free_vnode(vnode, reenter);
+	} else
 		mutex_unlock(&sVnodeMutex);
 
-		free(vnode);
-
-		err = 1;
-	} else {
-		mutex_unlock(&sVnodeMutex);
-		err = 0;
-	}
-	return err;
+	return B_OK;
 }
 
 
@@ -644,15 +679,16 @@ inc_vnode_ref_count(struct vnode *vnode)
 
 
 /**	\brief Looks up a vnode by mount and node ID in the sVnodeTable.
+ *
+ *	The caller must hold the sVnodeMutex.
+ *
+ *	\param mountID the mount ID.
+ *	\param vnodeID the node ID.
+ *
+ *	\return The vnode structure, if it was found in the hash table, \c NULL
+ *			otherwise.
+ */
 
-	The caller must hold the sVnodeMutex.
-
-	\param mountID the mount ID.
-	\param vnodeID the node ID.
-
-	\return The vnode structure, if it was found in the hash table, \c NULL
-			otherwise.
-*/
 static struct vnode *
 lookup_vnode(mount_id mountID, vnode_id vnodeID)
 {
@@ -666,19 +702,20 @@ lookup_vnode(mount_id mountID, vnode_id vnodeID)
 
 
 /**	\brief Retrieves a vnode for a given mount ID, node ID pair.
+ *
+ *	If the node is not yet in memory, it will be loaded.
+ *
+ *	The caller must not hold the sVnodeMutex or the sMountMutex.
+ *
+ *	\param mountID the mount ID.
+ *	\param vnodeID the node ID.
+ *	\param _vnode Pointer to a vnode* variable into which the pointer to the
+ *		   retrieved vnode structure shall be written.
+ *	\param reenter \c true, if this function is called (indirectly) from within
+ *		   a file system.
+ *	\return \c B_OK, if everything when fine, an error code otherwise.
+ */
 
-	If the node is not yet in memory, it will be loaded.
-
-	The caller must not hold the sVnodeMutex or the sMountMutex.
-
-	\param mountID the mount ID.
-	\param vnodeID the node ID.
-	\param _vnode Pointer to a vnode* variable into which the pointer to the
-		   retrieved vnode structure shall be written.
-	\param reenter \c true, if this function is called (indirectly) from within
-		   a file system.
-	\return \c B_OK, if everything when fine, an error code otherwise.
-*/
 static status_t
 get_vnode(mount_id mountID, vnode_id vnodeID, struct vnode **_vnode, int reenter)
 {
@@ -702,6 +739,10 @@ restart:
 	status_t status;
 
 	if (vnode) {
+		if (vnode->ref_count == 0) {
+			// this vnode has been unused before
+			list_remove_item(&sUnusedVnodeList, vnode);
+		}
 		inc_vnode_ref_count(vnode);
 	} else {
 		// we need to create a new vnode and read it in
@@ -2300,20 +2341,17 @@ vfs_mount_boot_file_system(kernel_args *args)
 status_t
 vfs_init(kernel_args *args)
 {
-	{
-		struct vnode *v;
-		sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, (addr_t)&v->next - (addr_t)v,
-			&vnode_compare, &vnode_hash);
-		if (sVnodeTable == NULL)
-			panic("vfs_init: error creating vnode hash table\n");
-	}
-	{
-		struct fs_mount *mount;
-		sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, (addr_t)&mount->next - (addr_t)mount,
-			&mount_compare, &mount_hash);
-		if (sMountsTable == NULL)
-			panic("vfs_init: error creating mounts hash table\n");
-	}
+	sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, offsetof(struct vnode, next),
+		&vnode_compare, &vnode_hash);
+	if (sVnodeTable == NULL)
+		panic("vfs_init: error creating vnode hash table\n");
+
+	list_init_etc(&sUnusedVnodeList, offsetof(struct vnode, unused_link));
+
+	sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, offsetof(struct fs_mount, next),
+		&mount_compare, &mount_hash);
+	if (sMountsTable == NULL)
+		panic("vfs_init: error creating mounts hash table\n");
 
 	node_monitor_init();
 
