@@ -98,7 +98,7 @@ static ssize_t _keyboard_read(void *_buf, size_t len)
 retry:
 	// block here until data is ready
 	rc = acquire_sem_etc(keyboard_sem, 1, B_CAN_INTERRUPT, 0);
-	if(rc == ERR_SEM_INTERRUPTED) {
+	if(rc == EINTR) {
 		return 0;
 	}
 
@@ -264,7 +264,7 @@ static ssize_t keyboard_read(void * cookie, off_t pos, void *buf, size_t *len)
 
 static ssize_t keyboard_write(void * cookie, off_t pos, const void *buf,  size_t *len)
 {
-	return ERR_VFS_READONLY_FS;
+	return EROFS;
 }
 
 static int keyboard_ioctl(void * cookie, uint32 op, void *buf, size_t len)
