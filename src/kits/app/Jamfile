@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src kits app ;
 
 
+UsePrivateHeaders interface ;
