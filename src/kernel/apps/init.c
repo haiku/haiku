@@ -21,7 +21,7 @@ setup_io(void)
 		close(i);
 	}
 
-	open("/dev/console", O_RDONLY, 0); /* stdin  */
+	open("/dev/keyboard", O_RDONLY, 0); /* stdin  */
 	open("/dev/console", O_WRONLY, 0); /* stdout */
 	open("/dev/console", O_WRONLY, 0); /* stderr */
 }
@@ -32,10 +32,10 @@ main(int argc, char **argv)
 {
 	setup_io();
 
-	printf("Welcome to Haiku!\n");
+	printf("Welcome to Haiku!\r\n");
 
 	{
-		const char *args[] = {"fortune", NULL};
+		const char *args[] = {"consoled", NULL};
 		thread_id thread;
 
 		thread = load_image(1, args, (const char **)environ);
@@ -44,21 +44,6 @@ main(int argc, char **argv)
 			wait_for_thread(thread, &returnCode);
 		} else
 			printf("Failed to create a team for fortune.\n");
-	}
-
-	while (1) {
-		const char *args[] = {"shell", NULL};
-		thread_id thread;
-
-		thread = load_image(1, args, (const char **)environ);
-		if (thread >= B_OK) {
-			status_t returnCode;
-
-			printf("init: spawned shell, pid 0x%lx\n", thread);
-			wait_for_thread(thread, &returnCode);
-			printf("init: shell exited with return code %ld\n", returnCode);
-		} else
-			printf("Failed to start a shell :(\n");
 	}
 
 	printf("init exiting\n");
