@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel bus_managers isa ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon isa : kernel bus_managers :
+	isa.c
+	;
+
