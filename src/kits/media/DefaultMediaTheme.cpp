@@ -165,6 +165,7 @@ DynamicScrollView::DynamicScrollView(const char *name, BView *target)
 {
 	fContentBounds.Set(-1, -1, -1, -1);
 	SetViewColor(fTarget->ViewColor());
+	target->MoveTo(B_ORIGIN);
 	AddChild(target);
 }
 
