@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyTestcase.cpp,v 1.3 2002/09/28 00:19:49 shatty Exp $
+	$Id: PropertyTestcase.cpp,v 1.4 2004/11/21 20:59:09 shatty Exp $
 	
 	This file implements the first test for the OpenBeOS BPropertyInfo code.
 	It tests the Construction use cases.  It does so by doing the following:
@@ -168,7 +168,7 @@ const uint32 PropertyTestcase::wildcardSpecifierTests[] = { uniqueSpecifier,
 		char bflat_data[768];
 	} property_tests;
 	
-	struct property_info prop1[] = { 0 };
+	struct property_info prop1[] = { { 0 } };
 	struct property_info prop2[] = {
 		{ "test1", {B_GET_PROPERTY, B_SET_PROPERTY, B_EXECUTE_PROPERTY,
 		            B_DELETE_PROPERTY, B_CREATE_PROPERTY, B_COUNT_PROPERTIES, 7,
@@ -199,14 +199,14 @@ const uint32 PropertyTestcase::wildcardSpecifierTests[] = { uniqueSpecifier,
 		           {0, B_DIRECT_SPECIFIER},
 		           "test4: Test wildcard command and specifier",
 		           3},
-        0 // terminate list
+        { 0 } // terminate list
     };
     
-	struct value_info value1[] = { 0 };
+	struct value_info value1[] = { { 0 } };
 	struct value_info value2[] = {
 		{ "Value1", 5, B_COMMAND_KIND, "This is the usage", 0 },
 		{ "Value2", 6, B_TYPE_CODE_KIND, "This is the usage", 1 },
-		0 // terminate list
+		{ 0 } // terminate list
 	};
 	
 	static property_tests theTests[] = {
@@ -579,7 +579,7 @@ const uint32 PropertyTestcase::wildcardSpecifierTests[] = { uniqueSpecifier,
 	property_info *propPtr;
 	value_info *valuePtr;
 
-	for (i=0; i < sizeof(theTests) / sizeof(theTests[0]); i++) {
+	for (i=0; (unsigned)i < sizeof(theTests) / sizeof(theTests[0]); i++) {
 		propTest = new BPropertyInfo(theTests[i].props, theTests[i].values);
 		TestProperty(propTest, theTests[i].props, theTests[i].values,
 					 theTests[i].prop_count, theTests[i].value_count,

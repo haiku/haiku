@@ -30,8 +30,10 @@
 
 //------------------------------------------------------------------------------
 
+#ifndef TEST_R5
 static const char *kTesterSignature
 	= "application/x-vnd.obos-messagerunner-getinfo-test";
+#endif
 
 static const bigtime_t kMinTimeInterval = 50000;
 
