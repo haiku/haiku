@@ -417,7 +417,7 @@ notify_dynamic_consumer(pnp_node_info *node, const char *pattern,
 	TRACE(("notify_dynamic_consumer(pattern=%s, has_normal_driver=%d)\n",
 		pattern, *has_normal_driver));
 
-	// we need three buffers - allocate them at once for simpliness	
+	// we need three buffers - allocate them at once for simplicity
 	buffers = malloc(3 * (PATH_MAX + 1));
 	if (buffers == NULL)
 		return B_NO_MEMORY;
