@@ -65,8 +65,8 @@ public:
 	
 	RGBColor MakeBlendColor(const RGBColor &color, const float &position);
 	
-	RGBColor & operator=(const RGBColor &col);
-	RGBColor & operator=(const rgb_color &col);
+	const RGBColor & operator=(const RGBColor &col);
+	const RGBColor & operator=(const rgb_color &col);
 	bool operator==(const rgb_color &col);
 	bool operator==(const RGBColor &col);
 protected:
