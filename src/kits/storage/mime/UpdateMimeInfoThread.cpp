@@ -41,6 +41,8 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 
 	if (!err)
 		err = node.SetTo(entry);
+	if (!err && entryIsDir)
+		*entryIsDir = node.IsDirectory();
 	if (!err && !fForce) {
 		// If not forced, only update if the entry has no file type attribute
 		attr_info info;
@@ -62,8 +64,6 @@ UpdateMimeInfoThread::DoMimeUpdate(const entry_ref *entry, bool *entryIsDir)
 				err = (bytes != len ? B_FILE_ERROR : B_OK);
 		}			
 	}
-	if (!err && entryIsDir)
-		*entryIsDir = node.IsDirectory();
 	return err;
 }
 
