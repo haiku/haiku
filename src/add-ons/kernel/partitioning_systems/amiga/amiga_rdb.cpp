@@ -24,7 +24,7 @@
 #endif
 
 
-static const char *kPartitionModuleName = "partitioning_systems/amiga/rdb/v1";
+static const char *kPartitionModuleName = "partitioning_systems/amiga_rdb/v1";
 
 #if TRACE_AMIGA_RDB
 static char *
@@ -69,18 +69,21 @@ get_next_partition(int fd, rigid_disk_block &rdb, uint32 &cookie, partition_bloc
 
 
 bool
-search_rdb(int fd, rigid_disk_block *_rdb)
+search_rdb(int fd, rigid_disk_block **_rdb)
 {
-	rigid_disk_block *rdb;
-	uint8 buffer[512];
+	TRACE(("search_rdb()\n"));
 
 	for (int32 sector = 0; sector < RDB_LOCATION_LIMIT; sector++) {
-		ssize_t bytesRead = read(fd, buffer, sizeof(buffer));
-		if (bytesRead < (ssize_t)sizeof(buffer))
+		uint8 buffer[512];
+		ssize_t bytesRead = read_pos(fd, sector * 512, buffer, sizeof(buffer));
+		if (bytesRead < (ssize_t)sizeof(buffer)) {
+			TRACE(("search_rdb: read error: %ld\n", bytesRead));
 			return false;
+		}
 
-		rdb = (rigid_disk_block *)buffer;
-		if (rdb->id == RDB_DISK_ID && rdb->summed_longs == sizeof(rigid_disk_block) / sizeof(uint32)) {
+		rigid_disk_block *rdb = (rigid_disk_block *)buffer;
+		if (rdb->id == RDB_DISK_ID
+			&& rdb->summed_longs == sizeof(rigid_disk_block) / sizeof(uint32)) {
 			// check checksum
 			uint32 *longs = (uint32 *)buffer;
 			uint32 sum = 0;
@@ -88,11 +91,15 @@ search_rdb(int fd, rigid_disk_block *_rdb)
 				sum += longs[i];
 
 			if (sum != 0) {
-				TRACE(("amiga_rdb: check sum is incorrect!\n"));
+				TRACE(("search_rdb: check sum is incorrect!\n"));
 				return false;
 			}
 
-			*_rdb = *rdb;
+			// copy the RDB to a new piece of memory
+			rdb = new rigid_disk_block();
+			memcpy(rdb, buffer, sizeof(rigid_disk_block));
+
+			*_rdb = rdb;
 			return true;
 		}
 	}
@@ -121,12 +128,13 @@ amiga_rdb_std_ops(int32 op, ...)
 static float
 amiga_rdb_identify_partition(int fd, partition_data *partition, void **_cookie)
 {
-	rigid_disk_block *rdb = new rigid_disk_block();
-	if (!search_rdb(fd, rdb)) {
-		delete rdb;
-		return B_ERROR;
-	}
+	TRACE(("amiga_rdb_identify_partition()\n"));
 
+	rigid_disk_block *rdb;
+	if (!search_rdb(fd, &rdb))
+		return B_ERROR;
+
+	TRACE(("amiga_rdb: found rdb!\n"));
 	*_cookie = (void *)rdb;
 	return 0.5f;
 }
