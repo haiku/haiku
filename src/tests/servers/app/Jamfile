@@ -1,3 +1,4 @@
 SubDir OBOS_TOP src tests servers app ;
 
 SubInclude OBOS_TOP src tests servers app painter ;
+SubInclude OBOS_TOP src tests servers app windows ;

@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src tests servers app windows ;
+
+UseHeaders [ FDirName os app ] ;
+UseHeaders [ FDirName os interface ] ;
+
+SimpleTest Window :
+	main.cpp
+	: libopenbeos.so ;
+
