@@ -66,8 +66,10 @@ ExpanderThread::ThreadStartup()
 	
 	if ((status = GetDataStore()->FindRef("srcRef", &srcRef))!=B_OK)
 		return status;
-	if ((status = GetDataStore()->FindRef("destRef", &destRef))!=B_OK)
-		return status;
+	if ((status = GetDataStore()->FindRef("destRef", &destRef))==B_OK) {
+		BPath path(&destRef);
+		chdir(path.Path());
+	}
 	if ((status = GetDataStore()->FindString("cmd", &cmd))!=B_OK)
 		return status;
 	
@@ -78,10 +80,7 @@ ExpanderThread::ThreadStartup()
 	pathString.Append("\""); 
 	cmd.ReplaceAll("%s", pathString.String());
 	
-	path.SetTo(&destRef);
-	chdir(path.Path());
-	
-	int32  argc  =  3;
+	int32 argc = 3;
 	const char ** argv = new const char * [argc + 1];
 	
 	argv[0]	=	strdup("/bin/sh");
