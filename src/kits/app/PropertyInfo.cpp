@@ -30,8 +30,11 @@
 #include <PropertyInfo.h>
 #include <Message.h>
 #include <Errors.h>
+#include <ByteOrder.h>
+#include <DataIO.h>
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -48,9 +51,7 @@ BPropertyInfo::BPropertyInfo(property_info *p, value_info *ci,
 		fValueInfo(ci),
 		fPropCount(0),
 		fInHeap(free_on_delete),
-		fOldInHeap(false),
-		fValueCount(0),
-		fOldPropInfo(NULL)
+		fValueCount(0)
 {
 	if (fPropInfo)
 	{
@@ -67,14 +68,7 @@ BPropertyInfo::BPropertyInfo(property_info *p, value_info *ci,
 //------------------------------------------------------------------------------
 BPropertyInfo::~BPropertyInfo()
 {
-	if (fInHeap)
-	{
-		if (fPropInfo)
-			delete fPropInfo;
-
-		if (fValueInfo)
-			delete fValueInfo;
-	}
+	FreeMem();
 }
 //------------------------------------------------------------------------------
 int32 BPropertyInfo::FindMatch(BMessage *msg, int32 index, BMessage *spec,
@@ -85,37 +79,12 @@ int32 BPropertyInfo::FindMatch(BMessage *msg, int32 index, BMessage *spec,
 	while ((fPropInfo != NULL) && (fPropInfo[property_index].name)) {
 		property_info *propInfo = fPropInfo + property_index;
 
-		if (strcmp(propInfo->name, prop) == 0) {
-			int32 specifier_index = 0;
-			bool wildcardSpecifier = (propInfo->specifiers[0] == 0);
-			bool wildcardCommand = (propInfo->commands[0] == 0);
-			bool foundSpecifier = false;
-			bool foundCommand = false;
-
-			for (int32 i = 0; i < 10 && propInfo->specifiers[i] != 0; i++) {
-				if (propInfo->specifiers[i] == form) {
-					foundSpecifier = true;
-					break;
-				}
-			}
-			
-			for (int32 j = 0; j < 10 && propInfo->commands[j] != 0; j++) {
-				if (propInfo->commands[j] == msg->what) {
-					foundCommand = true;
-					break;
-				}
-			}
-			
-			if (((index == 0) &&
-				 (wildcardSpecifier || foundSpecifier) &&
-				 (wildcardCommand || foundCommand)) ||
-				((index != 0) &&
-				 (wildcardSpecifier || foundSpecifier) &&
-				 (wildcardCommand))) {
-				if (data)
-					*((uint32*)data) = propInfo->extra_data;
-				return property_index;
-			}
+		if ((strcmp(propInfo->name, prop) == 0) &&
+		    (FindCommand(msg->what, index, propInfo)) &&
+		    (FindSpecifier(form, propInfo))) {
+			if (data)
+				*((uint32*)data) = propInfo->extra_data;
+			return property_index;
 		}
 		property_index++;
 	}
@@ -212,91 +181,83 @@ status_t BPropertyInfo::Flatten(void *buffer, ssize_t numBytes) const
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	union
-	{
-		char	*charPtr;
-		uint32	*intPtr;
-		uint16	*wrdPtr;
-	};
-
-	charPtr = (char*)buffer;
-
-	*(charPtr++) = 0;
-	*(intPtr++) = CountProperties();
-	*(intPtr++) = 0x01 | (fValueInfo ? 0x2 : 0x0);
-
-	if (fPropInfo)
-	{
-		// Main chunks
-		for (int32 pi = 0; fPropInfo[pi].name != NULL; pi++)
-		{
-			strcpy(charPtr, fPropInfo[pi].name);
-			charPtr += strlen(fPropInfo[pi].name) + 1;
-
-			if (fPropInfo[pi].usage)
-			{
-				strcpy(charPtr, fPropInfo[pi].usage);
-				charPtr += strlen(fPropInfo[pi].usage) + 1;
+	BMemoryIO flatData(buffer, numBytes);
+	
+	char tmpChar = B_HOST_IS_BENDIAN;
+	int32 tmpInt;
+	
+	flatData.Write(&tmpChar, sizeof(tmpChar));
+	flatData.Write(&fPropCount, sizeof(fPropCount));
+	tmpInt = 0x01 | (fValueInfo ? 0x2 : 0x0);
+	flatData.Write(&tmpInt, sizeof(tmpInt));
+	
+	if (fPropInfo) { // Main chunks
+		for (int32 pi = 0; fPropInfo[pi].name != NULL; pi++) {
+			flatData.Write(fPropInfo[pi].name, strlen(fPropInfo[pi].name) + 1);
+			if (fPropInfo[pi].usage != NULL) {
+				flatData.Write(fPropInfo[pi].usage, strlen(fPropInfo[pi].usage) + 1);
 			}
-			else
-				*(charPtr++) = 0;
+			else {
+				tmpChar = 0;
+				flatData.Write(&tmpChar, sizeof(tmpChar));
+			}
+			
+			flatData.Write(&fPropInfo[pi].extra_data, sizeof(fPropInfo[pi].extra_data));
 
-			*(intPtr++) = fPropInfo[pi].extra_data;
-
-			for (int32 i = 0; i < 10 && fPropInfo[pi].commands[i] != 0; i++)
-				*(intPtr++) = fPropInfo[pi].commands[i];
-			*(intPtr++) = 0;
-
-			for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++)
-				*(intPtr++) = fPropInfo[pi].specifiers[i];
-			*(intPtr++) = 0;
+			for (int32 i = 0; i < 10 && fPropInfo[pi].commands[i] != 0; i++) {
+				flatData.Write(&fPropInfo[pi].commands[i], sizeof(fPropInfo[pi].commands[i]));
+			}
+			tmpInt = 0;
+			flatData.Write(&tmpInt, sizeof(tmpInt));
+			
+			for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++) {
+				flatData.Write(&fPropInfo[pi].specifiers[i], sizeof(fPropInfo[pi].specifiers[i]));
+			}
+			tmpInt = 0;
+			flatData.Write(&tmpInt, sizeof(tmpInt));
 		}
-
+		
 		// Type chunks
-		for (int32 pi = 0; fPropInfo[pi].name != NULL; pi++)
-		{
-			for (int32 i = 0; i < 10 && fPropInfo[pi].types[i] != 0; i++)
-				*(intPtr++) = fPropInfo[pi].types[i];
-			*(intPtr++) = 0;
+		for (int32 pi = 0; fPropInfo[pi].name != NULL; pi++) {
+			for (int32 i = 0; i < 10 && fPropInfo[pi].types[i] != 0; i++) {
+				flatData.Write(&fPropInfo[pi].types[i], sizeof(fPropInfo[pi].types[i]));
+			}
+			tmpInt = 0;
+			flatData.Write(&tmpInt, sizeof(tmpInt));
 
-			for (int32 i = 0; i < 3 && fPropInfo[pi].ctypes[i].pairs[0].name != 0; i++)
-			{
-				for (int32 j = 0; j < 5 && fPropInfo[pi].ctypes[i].pairs[j].name != 0; j++)
-				{
-					strcpy(charPtr, fPropInfo[pi].ctypes[i].pairs[j].name);
-					charPtr += strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1;
-					*(intPtr++) = fPropInfo[pi].ctypes[i].pairs[j].type;
+			for (int32 i = 0; i < 3 && fPropInfo[pi].ctypes[i].pairs[0].name != 0; i++) {
+				for (int32 j = 0; j < 5 && fPropInfo[pi].ctypes[i].pairs[j].name != 0; j++) {
+					flatData.Write(fPropInfo[pi].ctypes[i].pairs[j].name,
+					               strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1);
+					flatData.Write(&fPropInfo[pi].ctypes[i].pairs[j].type,
+					               sizeof(fPropInfo[pi].ctypes[i].pairs[j].type));
 				}
-				*(intPtr++) = 0;
+				tmpInt = 0;
+				flatData.Write(&tmpInt, sizeof(tmpInt));
 			}
-			*(intPtr++) = 0;
+			tmpInt = 0;
+			flatData.Write(&tmpInt, sizeof(tmpInt));
 		}
 	}
-
-	if (fValueInfo)
-	{
-		// Chunks
-	    *(wrdPtr++) = CountValues();
-		for (int32 vi = 0; fValueInfo[vi].name != NULL; vi++)
-		{
-			*(intPtr++) = fValueInfo[vi].kind;
-			*(intPtr++) = fValueInfo[vi].value;
-
-			strcpy(charPtr, fValueInfo[vi].name);
-			charPtr += strlen(fValueInfo[vi].name) + 1;
-
-			if (fValueInfo[vi].usage)
-			{
-				strcpy(charPtr, fValueInfo[vi].usage);
-				charPtr += strlen(fValueInfo[vi].usage) + 1;
+	
+	if (fValueInfo) {
+		// Value Chunks
+		flatData.Write(&fValueCount, sizeof(fValueCount));
+		for (int32 vi = 0; fValueInfo[vi].name != NULL; vi++) {
+			flatData.Write(&fValueInfo[vi].kind, sizeof(fValueInfo[vi].kind));
+			flatData.Write(&fValueInfo[vi].value, sizeof(fValueInfo[vi].value));
+			flatData.Write(fValueInfo[vi].name, strlen(fValueInfo[vi].name) + 1);
+			if (fValueInfo[vi].usage) {
+				flatData.Write(fValueInfo[vi].usage, strlen(fValueInfo[vi].usage) + 1);
 			}
-			else
-				*(charPtr++) = 0;
-
-			*(intPtr++) = fValueInfo[vi].extra_data;
+			else {
+				tmpChar = 0;
+				flatData.Write(&tmpChar, sizeof(tmpChar));
+			}
+			flatData.Write(&fValueInfo[vi].extra_data, sizeof(fValueInfo[vi].extra_data));
 		}
 	}
-
+	
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -308,101 +269,124 @@ bool BPropertyInfo::AllowsTypeCode(type_code code) const
 status_t BPropertyInfo::Unflatten(type_code code, const void *buffer,
 								  ssize_t numBytes)
 {
-	FreeMem();
-
 	if (!AllowsTypeCode(code))
 		return B_BAD_TYPE;
 
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	union
-	{
-		char	*charPtr;
-		uint32	*intPtr;
-		uint16	*wrdPtr;
-	};
+	FreeMem();
+	
+	BMemoryIO flatData(buffer, numBytes);
+	char tmpChar = B_HOST_IS_BENDIAN;
+	int32 tmpInt;
 
-	charPtr = ((char*)(buffer))+1;
-
-	fPropCount = *(intPtr++);
-	int32 flags = *(intPtr++);
-
-	if (flags & 1)
-	{
-		fPropInfo = new property_info[fPropCount + 1];
+	flatData.Read(&tmpChar, sizeof(tmpChar));
+	bool swapRequired = (tmpChar != B_HOST_IS_BENDIAN);
+	
+	flatData.Read(&fPropCount, sizeof(fPropCount));
+	
+	int32 flags;
+	flatData.Read(&flags, sizeof(flags));
+	if (swapRequired) {
+		fPropCount = B_SWAP_INT32(fPropCount);
+		flags = B_SWAP_INT32(flags);
+	}
+	
+	if (flags & 1) {
+		fPropInfo = static_cast<property_info *>(malloc(sizeof(property_info) * (fPropCount + 1)));
 		memset(fPropInfo, 0, (fPropCount + 1) * sizeof(property_info));
 
 		// Main chunks
-		for (int32 pi = 0; pi < fPropCount; pi++)
-		{
-			fPropInfo[pi].name = strdup(charPtr);
-			charPtr += strlen(fPropInfo[pi].name) + 1;
+		for (int32 pi = 0; pi < fPropCount; pi++) {
+			fPropInfo[pi].name = strdup(static_cast<char *>(buffer) + flatData.Position());
+			flatData.Seek(strlen(fPropInfo[pi].name) + 1, SEEK_CUR);
+			
+			fPropInfo[pi].usage = strdup(static_cast<char *>(buffer) + flatData.Position());
+			flatData.Seek(strlen(fPropInfo[pi].usage) + 1, SEEK_CUR);
 
-			if (*charPtr)
-			{
-				fPropInfo[pi].usage = strdup(charPtr);
-				charPtr += strlen(fPropInfo[pi].usage) + 1;
+			flatData.Read(&fPropInfo[pi].extra_data, sizeof(fPropInfo[pi].extra_data));
+			if (swapRequired) {
+				fPropInfo[pi].extra_data = B_SWAP_INT32(fPropInfo[pi].extra_data);
 			}
-			else
-				charPtr++;
-
-			fPropInfo[pi].extra_data = *(intPtr++);
-
-			for (int32 i = 0; i < 10 && *intPtr; i++)
-				fPropInfo[pi].commands[i] = *(intPtr++);
-			intPtr++;
-
-			for (int32 i = 0; i < 10 && *intPtr; i++)
-				fPropInfo[pi].specifiers[i] = *(intPtr++);
-			intPtr++;
+			
+			flatData.Read(&tmpInt, sizeof(tmpInt));
+			for (int32 i = 0; tmpInt != 0; i++) {
+				if (swapRequired) {
+					tmpInt = B_SWAP_INT32(tmpInt);
+				}
+				fPropInfo[pi].commands[i] = tmpInt;
+				flatData.Read(&tmpInt, sizeof(tmpInt));
+			}
+			
+			flatData.Read(&tmpInt, sizeof(tmpInt));
+			for (int32 i = 0; tmpInt != 0; i++) {
+				if (swapRequired) {
+					tmpInt = B_SWAP_INT32(tmpInt);
+				}
+				fPropInfo[pi].specifiers[i] = tmpInt;
+				flatData.Read(&tmpInt, sizeof(tmpInt));
+			}
 		}
 
 		// Type chunks
-		for (int32 pi = 0; pi < fPropCount; pi++)
-		{
-			for (int32 i = 0; i < 10 && *intPtr; i++)
-				fPropInfo[pi].types[i] = *(intPtr++);
-			intPtr++;
-
-			for (int32 i = 0; i < 3 && *intPtr; i++)
-			{
-				for (int32 j = 0; j < 5 && *intPtr; j++)
-				{
-					fPropInfo[pi].ctypes[i].pairs[j].name = strdup(charPtr);
-					charPtr += strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1;
-					fPropInfo[pi].ctypes[i].pairs[j].type = *(intPtr++);
+		for (int32 pi = 0; pi < fPropCount; pi++) {
+			flatData.Read(&tmpInt, sizeof(tmpInt));
+			for (int32 i = 0; tmpInt != 0; i++) {
+				if (swapRequired) {
+					tmpInt = B_SWAP_INT32(tmpInt);
 				}
-				intPtr++;
+				fPropInfo[pi].types[i] = tmpInt;
+				flatData.Read(&tmpInt, sizeof(tmpInt));
 			}
-			intPtr++;
+
+			flatData.Read(&tmpInt, sizeof(tmpInt));
+			for (int32 i = 0; tmpInt != 0; i++) {
+				for (int32 j = 0; tmpInt != 0; j++) {
+					flatData.Seek(-sizeof(tmpInt), SEEK_CUR);
+					fPropInfo[pi].ctypes[i].pairs[j].name =
+									strdup(static_cast<char *>(buffer) + flatData.Position());
+					flatData.Seek(strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1, SEEK_CUR);
+									
+					flatData.Read(&fPropInfo[pi].ctypes[i].pairs[j].type,
+					              sizeof(fPropInfo[pi].ctypes[i].pairs[j].type));
+					if (swapRequired) {
+						fPropInfo[pi].ctypes[i].pairs[j].type =
+										B_SWAP_INT32(fPropInfo[pi].ctypes[i].pairs[j].type);
+					}
+					flatData.Read(&tmpInt, sizeof(tmpInt));
+				}
+				flatData.Read(&tmpInt, sizeof(tmpInt));
+			}
 		}
 	}
 
-	if (flags & 2)
-	{
-		fValueCount = (int16)*(wrdPtr++);
+	if (flags & 2) {
+		flatData.Read(&fValueCount, sizeof(fValueCount));
+		if (swapRequired) {
+			fValueCount = B_SWAP_INT16(fValueCount);
+		}
 
-		fValueInfo = new value_info[fValueCount + 1];
+		fValueInfo = static_cast<value_info *>(malloc(sizeof(value_info) * (fValueCount + 1)));
 		memset(fValueInfo, 0, (fValueCount + 1) * sizeof(value_info));
 
 		for (int32 vi = 0; vi < fValueCount; vi++)
 		{
-			fValueInfo[vi].kind = (value_kind)*(intPtr++);
-			fValueInfo[vi].value = *(intPtr++);
+			flatData.Read(&fValueInfo[vi].kind, sizeof(fValueInfo[vi].kind));
+			flatData.Read(&fValueInfo[vi].value, sizeof(fValueInfo[vi].value));
 
-			fValueInfo[vi].name = strdup(charPtr);
-			charPtr += strlen(fValueInfo[vi].name) + 1;
-
-			if (*charPtr)
-			{
-				fValueInfo[vi].usage = strdup(charPtr);
-				charPtr += strlen(fValueInfo[vi].usage) + 1;
-			}
-			else
-				charPtr++;
+			fValueInfo[vi].name = strdup(static_cast<char *>(buffer) + flatData.Position());
+			flatData.Seek(strlen(fValueInfo[vi].name) + 1, SEEK_CUR);
 			
-			fValueInfo[vi].extra_data = *(intPtr++);
+			fValueInfo[vi].usage = strdup(static_cast<char *>(buffer) + flatData.Position());
+			flatData.Seek(strlen(fValueInfo[vi].usage) + 1, SEEK_CUR);
+			
+			flatData.Read(&fValueInfo[vi].extra_data, sizeof(fValueInfo[vi].extra_data));
+			if (swapRequired) {
+				fValueInfo[vi].kind = static_cast<value_kind>(B_SWAP_INT32(fValueInfo[vi].kind));
+				fValueInfo[vi].value = B_SWAP_INT32(fValueInfo[vi].value);
+				fValueInfo[vi].extra_data = B_SWAP_INT32(fValueInfo[vi].extra_data);
+			}
 		}
 	}
 
@@ -466,27 +450,38 @@ void BPropertyInfo::PrintToStream() const
 	}
 }
 //------------------------------------------------------------------------------
-bool BPropertyInfo::FindCommand(uint32 what, int32, property_info *p)
+bool BPropertyInfo::FindCommand(uint32 what, int32 index, property_info *p)
 {
-	//TODO: What's the second int32?
-	for (int32 i = 0; i < 10 && p->commands[i] != 0; i++)
-	{
-		if (p->commands[i] == what)
-			return true;
+	bool result = false;
+	
+	if (p->commands[0] == 0) {
+		result = true;
+	} else if (index == 0) {
+		for (int32 i = 0; i < 10 && p->commands[i] != 0; i++) {
+			if (p->commands[i] == what) {
+				result = true;
+			}
+		}
 	}
 
-	return false;
+	return(result);
 }
 //------------------------------------------------------------------------------
 bool BPropertyInfo::FindSpecifier(uint32 form, property_info *p)
 {
-	for (int32 i = 0; i < 10 && p->specifiers[i] != 0; i++)
-	{
-		if (p->specifiers[i] == form)
-			return true;
+	bool result = false;
+	
+	if (p->specifiers[0] == 0) {
+		result = true;
+	} else {
+		for (int32 i = 0; i < 10 && p->specifiers[i] != 0; i++) {
+			if (p->specifiers[i] == form) {
+				result = true;
+			}
+		}
 	}
 
-	return false;
+	return(result);
 }
 //------------------------------------------------------------------------------
 void BPropertyInfo::_ReservedPropertyInfo1() {}
@@ -505,90 +500,53 @@ BPropertyInfo &BPropertyInfo::operator=(const BPropertyInfo &)
 //------------------------------------------------------------------------------
 void BPropertyInfo::FreeMem()
 {
-	//TODO: Does this free all members from the class?
-	if (fInHeap && fPropInfo)
-	{
-		delete fPropInfo;
+	int i, j, k;
+	
+	if (!fInHeap) {
+		return;
+	}
+	
+	if (fPropInfo != NULL) {
+		for(i = 0; i < fPropCount; i++) {
+			if (fPropInfo[i].name != NULL) {
+				free(fPropInfo[i].name);
+			}
+			if (fPropInfo[i].usage != NULL) {
+				free(fPropInfo[i].usage);
+			}
+			for(j = 0; j < 3; j++) {
+				for(k = 0; k < 5; k++) {
+					if (fPropInfo[i].ctypes[j].pairs[k].name == NULL) {
+						break;
+					} else {
+						free(fPropInfo[i].ctypes[j].pairs[k].name);
+					}
+				}
+				if (fPropInfo[i].ctypes[j].pairs[0].name == NULL) {
+					break;
+				}
+			}
+		}
+		free(fPropInfo);
+		fPropInfo = NULL;
 		fPropCount = 0;
 	}
-
-	if (fInHeap && fValueInfo)
-	{
-		delete fValueInfo;
+	
+	if (fValueInfo != NULL) {
+		for(i = 0; i < fValueCount; i++) {
+			if (fValueInfo[i].name != NULL) {
+				free(fValueInfo[i].name);
+			}
+			if (fValueInfo[i].usage != NULL) {
+				free(fValueInfo[i].usage);
+			}
+		}
+		free(fValueInfo);
+		fValueInfo = NULL;
 		fValueCount = 0;
 	}
-
+	
 	fInHeap = false;
-}
-//------------------------------------------------------------------------------
-void BPropertyInfo::FreeInfoArray(property_info *p, int32)
-{
-	//TODO: Do we just have to delete the given ptr? What int32?
-	delete p;
-}
-//------------------------------------------------------------------------------
-void BPropertyInfo::FreeInfoArray(value_info *p, int32)
-{
-	//TODO: Do we just have to delete the given ptr? What int32?
-	delete p;
-}
-//------------------------------------------------------------------------------
-void BPropertyInfo::FreeInfoArray(_oproperty_info_ *p, int32)
-{
-}
-//------------------------------------------------------------------------------
-property_info *BPropertyInfo::ConvertToNew(const _oproperty_info_ *p)
-{
-	return NULL;
-}
-//------------------------------------------------------------------------------
-_oproperty_info_ *BPropertyInfo::ConvertFromNew(const property_info *p)
-{
-	return NULL;
-}
-//------------------------------------------------------------------------------
-const property_info *BPropertyInfo::PropertyInfo() const
-{
-	return fPropInfo;
-}
-//------------------------------------------------------------------------------
-BPropertyInfo::BPropertyInfo(property_info *p, bool free_on_delete)
-	:	fPropInfo(p),
-		fValueInfo(NULL),
-		fPropCount(0),
-		fInHeap(free_on_delete),
-		fOldInHeap(false),
-		fValueCount(0),
-		fOldPropInfo(NULL)
-{
-	if (fPropInfo)
-	{
-		while (fPropInfo[fPropCount].name)
-			fPropCount++;
-	}
-}
-//------------------------------------------------------------------------------
-bool BPropertyInfo::MatchCommand(uint32 what, int32, property_info *p)
-{
-	//TODO: What's the second int32?
-	for (int32 i = 0; i < 10 && p->commands[i] != 0; i++)
-	{
-		if (p->commands[i] == what)
-			return true;
-	}
-
-	return false;
-}
-//------------------------------------------------------------------------------
-bool BPropertyInfo::MatchSpecifier(uint32 form, property_info *p)
-{
-	for (int32 i = 0; i < 10 && p->specifiers[i] != 0; i++)
-	{
-		if (p->specifiers[i] == form)
-			return true;
-	}
-
-	return false;
 }
 //------------------------------------------------------------------------------
 

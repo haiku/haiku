@@ -5,6 +5,7 @@
 /	Description:	Utility class for maintain scripting information
 /
 /	Copyright 1997-98, Be Incorporated, All Rights Reserved
+/   Modified for use with OpenBeOS.
 /
 *******************************************************************************/
 
@@ -16,11 +17,27 @@
 #include <Flattenable.h>
 #include <TypeConstants.h>	/* For convenience */
 
+/*
+ * The following define is used to turn off a number of member functions 
+ * and member variables in BPropertyInfo which are only there to faciliate
+ * BeOS R3 compatibility.  Be changed the property_info structure between
+ * R3 and R4 and these functions ensure that BPropertyInfo is backward
+ * compatible.  However, between R3 and R4, Be changed the Intel executable
+ * format so R4 was not backward compatible with R3.
+ *
+ * Because OpenBeOS is only targetting Intel platform compatibility at this
+ * time, there is no need for R3 compatibility in OpenBeOS.  By default
+ * these members will be turned off with the R3_COMPATIBLE define.
+ */
+#undef R3_COMPATIBLE
+
+#ifdef R3_COMPATIBLE
+struct _oproperty_info_;
+#endif
+
+
 /*----------------------------------------------------------------*/
 /*----- the property_info structure ------------------------------*/
-
-
-struct _oproperty_info_;
 
 struct compound_type {
 	struct field_pair {
@@ -103,29 +120,30 @@ virtual	void					_ReservedPropertyInfo4();
 							BPropertyInfo(const BPropertyInfo &);
 		BPropertyInfo		&operator=(const BPropertyInfo &);
 		void				FreeMem();
-		void				FreeInfoArray(property_info *p, int32);
-		void				FreeInfoArray(value_info *p, int32);
-		void				FreeInfoArray(_oproperty_info_ *p, int32);
-static	property_info		*ConvertToNew(const _oproperty_info_ *p);
-static	_oproperty_info_	*ConvertFromNew(const property_info *p);
 
 		property_info		*fPropInfo;
 		value_info			*fValueInfo;
 		int32				fPropCount;
 		bool				fInHeap;
-		bool				fOldInHeap;
 		uint16				fValueCount;
+#ifndef R3_COMPATIBLE
+		uint32				_reserved[4];
+#else
 		_oproperty_info_	*fOldPropInfo;
+		bool				fOldInHeap;
 		uint32				_reserved[2]; /* was 4 */
 
 		/* Deprecated */
 private:
+static	property_info		*ConvertToNew(const _oproperty_info_ *p);
+static	_oproperty_info_	*ConvertFromNew(const property_info *p);
 		const property_info		*PropertyInfo() const;
 								BPropertyInfo(property_info *p,
 												bool free_on_delete);
 static	bool					MatchCommand(uint32, int32, property_info *);
 static	bool					MatchSpecifier(uint32, property_info *);
 
+#endif
 };
 
 /*-------------------------------------------------------------*/

@@ -64,6 +64,38 @@ virtual void		_ReservedPositionIO4();
 		int32		_reserved[2];
 };
 
+
+class BMemoryIO : public BPositionIO {
+public:
+					BMemoryIO(void *p, size_t len);
+					BMemoryIO(const void *p, size_t len);
+virtual				~BMemoryIO();
+
+virtual	ssize_t		ReadAt(off_t pos, void *buffer, size_t size);
+virtual	ssize_t		WriteAt(off_t pos, const void *buffer, size_t size);
+
+virtual	off_t		Seek(off_t pos, uint32 seek_mode);
+virtual off_t		Position() const;
+
+virtual	status_t	SetSize(off_t size);
+
+/*----- Private or reserved ---------------*/
+private:
+virtual	void		_ReservedMemoryIO1();
+virtual	void		_ReservedMemoryIO2();
+
+					BMemoryIO(const BMemoryIO &);
+		BMemoryIO	&operator=(const BMemoryIO &);
+
+		bool		fReadOnly;
+		char		*fBuf;
+		size_t		fLen;
+		size_t		fPhys;
+		size_t		fPos;
+
+		int32		_reserved[1];
+};
+
 /*-------------------------------------------------------------*/
 /*-------------------------------------------------------------*/
 
