@@ -173,7 +173,8 @@ BMenu::BMenu(BMessage *archive)
 }
 
 
-BArchivable *BMenu::Instantiate(BMessage *data)
+BArchivable *
+BMenu::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenu"))
 		return new BMenu(data);
@@ -872,7 +873,7 @@ BMenu::ScreenLocation()
 		point = superItem->Frame().LeftBottom() + BPoint(0.0f, 1.0f);
 	
 	superMenu->ConvertToScreen(&point);
-
+	
 	return point;
 }
 
@@ -1121,10 +1122,11 @@ BMenu::LayoutItems(int32 index)
 	CalcTriggers();
 
 	float width, height;
-
 	ComputeLayout(index, true, true, &width, &height);
 
 	ResizeTo(width, height);
+	
+	Invalidate();
 }
 
 
@@ -1318,9 +1320,13 @@ BMenu::DeleteMenuWindow()
 BMenuItem *
 BMenu::HitTestItems(BPoint where, BPoint slop) const
 {
-	for (int i = 0; i < CountItems(); i++)
-		if (ItemAt(i)->fBounds.Contains(where))
-			return ItemAt(i);
+	// TODO: Take "slop" into account ?
+	int32 itemCount = CountItems();
+	for (int32 i = 0; i < itemCount; i++) {
+		BMenuItem *item = ItemAt(i);
+		if (item->fBounds.Contains(where))
+			return item;
+	}
 
 	return NULL;
 }
@@ -1345,7 +1351,7 @@ BMenu::CacheFontInfo()
 	GetFontHeight(&fh);
 	fAscent = fh.ascent;
 	fDescent = fh.descent;
-	fFontHeight = (float)ceil(fh.ascent + fh.descent + 0.5f);
+	fFontHeight = (float)ceil(fh.ascent + fh.descent + fh.leading);
 }
 
 

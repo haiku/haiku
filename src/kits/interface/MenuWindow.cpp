@@ -30,10 +30,13 @@
 
 #include <MenuWindow.h>
 
+// TODO: taken from Deskbar's WindowMenu.cpp.
+// this should go to some private header.
+const window_feel kMenuWindowFeel = (window_feel)1025;
 
 BMenuWindow::BMenuWindow(BRect frame, BMenu *menu)
 	:
-	BWindow(frame, "Menu", B_NO_BORDER_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+	BWindow(frame, "Menu", B_NO_BORDER_WINDOW_LOOK, kMenuWindowFeel,
 			B_NOT_ZOOMABLE)
 {
 	fMenu = menu;
