@@ -31,17 +31,26 @@
 // Local Includes --------------------------------------------------------------
 #include "RGBColor.h"
 #include "SystemPalette.h"
+#include <ColorUtils.h>
 
 /*!
-	\fn RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
+	\brief Create an RGBColor from specified values
+	\param red
+	\param green
+	\param blue
+	\param alpha, defaults to 255
 */
-RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
+RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a)
 {
 	SetColor(r,g,b,a);
 }
 
 /*!
-	\fn RGBColor::RGBColor(int r, int g, int b, int a=255)
+	\brief Create an RGBColor from specified values
+	\param red
+	\param green
+	\param blue
+	\param alpha, defaults to 255
 */
 RGBColor::RGBColor(int r, int g, int b, int a=255)
 {
@@ -49,7 +58,8 @@ RGBColor::RGBColor(int r, int g, int b, int a=255)
 }
 
 /*!
-	\fn RGBColor::RGBColor(const rgb_color &col)
+	\brief Create an RGBColor from an rgb_color
+	\param color to initialize from
 */
 RGBColor::RGBColor(const rgb_color &col)
 {
@@ -57,7 +67,8 @@ RGBColor::RGBColor(const rgb_color &col)
 }
 
 /*!
-	\fn RGBColor::RGBColor(uint16 col)
+	\brief Create an RGBColor from a 16-bit RGBA color
+	\param color to initialize from
 */
 RGBColor::RGBColor(uint16 col)
 {
@@ -65,7 +76,8 @@ RGBColor::RGBColor(uint16 col)
 }
 
 /*!
-	\fn RGBColor::RGBColor(uint8 col)
+	\brief Create an RGBColor from an index color
+	\param color to initialize from
 */
 RGBColor::RGBColor(uint8 col)
 {
@@ -73,7 +85,8 @@ RGBColor::RGBColor(uint8 col)
 }
 
 /*!
-	\fn RGBColor::RGBColor(const RGBColor &col)
+	\brief Copy Contructor
+	\param color to initialize from
 */
 RGBColor::RGBColor(const RGBColor &col)
 {
@@ -83,7 +96,7 @@ RGBColor::RGBColor(const RGBColor &col)
 }
 
 /*!
-	\fn RGBColor::RGBColor(void)
+	\brief Create an RGBColor with the values(0,0,0,0)
 */
 RGBColor::RGBColor(void)
 {
@@ -91,7 +104,7 @@ RGBColor::RGBColor(void)
 }
 
 /*!
-	\fn uint8 RGBColor::GetColor8(void)
+	\brief Returns the color as the closest 8-bit color in the palette
 	\return The palette index for the current color
 */
 uint8 RGBColor::GetColor8(void)
@@ -100,7 +113,7 @@ uint8 RGBColor::GetColor8(void)
 }
 
 /*!
-	\fn uint16 RGBColor::GetColor16(void)
+	\brief Returns the color as the closest 16-bit color
 	\return 16-bit value of the current color, including alpha
 */
 uint16 RGBColor::GetColor16(void)
@@ -109,8 +122,8 @@ uint16 RGBColor::GetColor16(void)
 }
 
 /*!
-	\fn rgb_color RGBColor::GetColor32(void)
-	\return current color
+	\brief Returns the color as a 32-bit color
+	\return current color, including alpha
 */
 rgb_color RGBColor::GetColor32(void)
 {
@@ -118,7 +131,11 @@ rgb_color RGBColor::GetColor32(void)
 }
 
 /*!
-	\fn void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
+	\brief Set the object to specified values
+	\param red
+	\param green
+	\param blue
+	\param alpha, defaults to 255
 */
 void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 {
@@ -129,7 +146,11 @@ void RGBColor::SetColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
 }
 
 /*!
-	\fn void RGBColor::SetColor(int r, int g, int b, int a=255)
+	\brief Set the object to specified values
+	\param red
+	\param green
+	\param blue
+	\param alpha, defaults to 255
 */
 void RGBColor::SetColor(int r, int g, int b, int a=255)
 {
@@ -140,42 +161,41 @@ void RGBColor::SetColor(int r, int g, int b, int a=255)
 }
 
 /*!
-	\fn void RGBColor::SetColor(uint16 col16)
+	\brief Set the object to specified value
+	\param color to copy
 */
 void RGBColor::SetColor(uint16 col16)
 {
 	color16=col16;
-	
-	// TODO: convert and set the 32-bit and 8-bit values
+	SetRGBColor(&color32,col16);
+	color8=FindClosestColor(system_palette,color32);
 }
 
 /*!
-	\fn void RGBColor::SetColor(uint8 col8)
+	\brief Set the object to specified index in the palette
+	\param color to copy
 */
 void RGBColor::SetColor(uint8 col8)
 {
-	// Pared-down version from what is used in the app_server to
-	// eliminate some dependencies
 	color8=col8;
-	
-	// TODO: convert and set the 32-bit and 16-bit values
+	color32=system_palette[col8];
+	color16=FindClosestColor16(color32);
 }
 
 /*!
-	\fn void RGBColor::SetColor(const rgb_color &color)
+	\brief Set the object to specified color
+	\param color to copy
 */
 void RGBColor::SetColor(const rgb_color &color)
 {
-	// Pared-down version from what is used in the app_server to
-	// eliminate some dependencies
 	color32=color;
-
-	
-	// TODO: convert and set the 16-bit and 8-bit values
+	color16=FindClosestColor16(color32);
+	color8=FindClosestColor(system_palette,color32);
 }
 
 /*!
-	\fn void RGBColor::SetColor(const RGBColor &col)
+	\brief Set the object to specified color
+	\param color to copy
 */
 void RGBColor::SetColor(const RGBColor &col)
 {
@@ -185,7 +205,8 @@ void RGBColor::SetColor(const RGBColor &col)
 }
 
 /*!
-	\fn RGBColor & RGBColor::operator=(const RGBColor &col)
+	\brief Set the object to specified color
+	\param color to copy
 */
 RGBColor & RGBColor::operator=(const RGBColor &col)
 {
@@ -196,22 +217,28 @@ RGBColor & RGBColor::operator=(const RGBColor &col)
 }
 
 /*!
-	\fn RGBColor & RGBColor::operator=(const rgb_color &col)
+	\brief Set the object to specified color
+	\param color to copy
 */
 RGBColor & RGBColor::operator=(const rgb_color &col)
 {
 	color32=col;
+	color16=FindClosestColor16(color32);
+	color8=FindClosestColor(system_palette,color32);
 
-	// TODO: convert and set the 16-bit and 8-bit values
 	return *this;
 }
 
-/*!	\brief Returns a color blended between the object's value and 
+/*!
+	\brief Returns a color blended between the object's value and 
 	another color.
 	
 	\param The other color to be blended with.
 	\param A weighted percentage of the second color to use. 0 <= value <= 1.0
 	\return The blended color
+	
+	If the position passed to this function is invalid, the starting
+	color will be returned.
 */
 RGBColor RGBColor::MakeBlendColor(RGBColor color, float position)
 {
@@ -222,7 +249,7 @@ RGBColor RGBColor::MakeBlendColor(RGBColor color, float position)
 	float mod=0;
 	int16 delta;
 	if(position<0 || position>1)
-		return newcol;
+		return *this;
 
 	delta=int16(col2.red)-int16(col.red);
 	mod=col.red + (position * delta);
@@ -260,7 +287,7 @@ RGBColor RGBColor::MakeBlendColor(RGBColor color, float position)
 }
 
 /*!
-	\fn void RGBColor::PrintToStream(void)
+	\brief Prints the 32-bit values of the color to standard out
 */
 void RGBColor::PrintToStream(void)
 {
@@ -268,21 +295,22 @@ void RGBColor::PrintToStream(void)
 }
 
 /*!
-	\fn bool RGBColor::operator==(const rgb_color &col)
+	\brief Overloaded comaparison
 	\return true if all color elements are exactly equal
 */
 bool RGBColor::operator==(const rgb_color &col)
 {
 	return (color32.red==col.red && color32.green==col.green
-		&& color32.blue==col.blue)?true:false;
+		&& color32.blue==col.blue && color32.alpha==col.alpha)?true:false;
 }
 
 /*!
-	\fn bool RGBColor::operator==(const RGBColor &col)
+	\brief Overloaded comaparison
 	\return true if all color elements are exactly equal
 */
 bool RGBColor::operator==(const RGBColor &col)
 {
 	return (color32.red==col.color32.red && color32.green==col.color32.green
-		&& color32.blue==col.color32.blue)?true:false;
+		&& color32.blue==col.color32.blue 
+		&& color32.alpha==col.color32.alpha)?true:false;
 }
