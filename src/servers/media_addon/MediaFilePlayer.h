@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2003-2004, Marcus Overhagen <marcus@overhagen.de>
+ * Copyright (c) 2004, Marcus Overhagen <marcus@overhagen.de>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
@@ -22,27 +22,9 @@
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef __SYSTEM_TIME_SOURCE_H
-#define __SYSTEM_TIME_SOURCE_H
- 
-#include <TimeSource.h>
+#ifndef _MEDIA_FILE_PLAYER_H
+#define _MEDIA_FILE_PLAYER_H
 
-class SystemTimeSource : public BTimeSource
-{
-public:
-	SystemTimeSource();
-	~SystemTimeSource();
-	
-	void NodeRegistered();
-	
-	BMediaAddOn* AddOn(int32 * internal_id) const;
-	status_t TimeSourceOp(const time_source_op_info & op, void * _reserved);
-	
-	
-	static int32 _ControlThreadStart(void *arg);
-	void ControlThread();
-	
-	thread_id fControlThread;
-};
+void PlayMediaFile(const char *media_type, const char *media_name);
 
-#endif // __SYSTEM_TIME_SOURCE_H
+#endif
