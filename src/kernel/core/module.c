@@ -21,7 +21,18 @@
 #include <string.h>
 #include <errno.h>
 
+
+//#define TRACE_MODULE
+#ifdef TRACE_MODULE
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+#define FATAL(x) dprintf x
+
+
 #define MODULE_HASH_SIZE 16
+#define SUPPORT_BOOTFS
 
 /** The modules referenced by this structure are built-in
  *	modules that can't be loaded from disk.
@@ -48,15 +59,6 @@ static module_info *sBuiltInModules[] = {
 	&gPipeFileSystem,
 	NULL
 };
-
-//#define TRACE_MODULE
-#ifdef TRACE_MODULE
-#	define TRACE(x) dprintf x
-#else
-#	define TRACE(x) ;
-#endif
-#define FATAL(x) dprintf x
-
 
 typedef enum {
 	MODULE_QUERIED = 0,
@@ -141,16 +143,19 @@ static recursive_lock sModulesLock;
 /* These are the standard base paths where we start to look for modules
  * to load. Order is important, the last entry here will be searched
  * first.
- * ToDo: these are not yet BeOS compatible (because the current bootfs is very limited)
+ * ToDo: the first entry is only there for bootfs compatibility
  * ToDo: these should probably be retrieved by using find_directory().
  */
 static const char * const sModulePaths[] = {
+#ifdef SUPPORT_BOOTFS
 	"/boot/addons/kernel",
+#endif
+	"/boot/beos/system/add-ons/kernel",
 	"/boot/home/config/add-ons/kernel",
 };
 
 #define NUM_MODULE_PATHS (sizeof(sModulePaths) / sizeof(sModulePaths[0]))
-#define USER_MODULE_PATHS 1		/* first user path */
+#define FIRST_USER_MODULE_PATH (NUM_MODULE_PATHS - 1)	/* first user path */
 
 /* we store the loaded modules by directory path, and all known modules by module name
  * in a hash table for quick access
@@ -562,28 +567,30 @@ search_module(const char *name)
 
 	TRACE(("search_module(%s)\n", name));
 
-	// ToDo: As Ingo found out, BeOS uses the module name to locate the module
-	//		on disk. We now have the vfs_get_module_path() call to achieve this.
-	//		As soon as we boot from a file system other than bootfs, we should
-	//		change the loading behaviour to only use that function (bootfs has
-	//		a very low maximum path length, which makes it unable to contain
-	//		the standard module directories).
-	//		The call to vfs_get_module_path() is only for testing purposes
-
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
-		if (sDisableUserAddOns && i >= USER_MODULE_PATHS)
+		char path[B_FILE_NAME_LENGTH];
+
+		if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
 			return NULL;
 
-		{
-			char path[B_FILE_NAME_LENGTH];
-			if (vfs_get_module_path(sModulePaths[i], name, path, sizeof(path)) < B_OK) {
-				TRACE(("vfs_get_module_path() failed for \"%s\"\n", name));
-			} else {
-				TRACE(("vfs_get_module_path(): found \"%s\" (for \"%s\")\n", path, name));
-			}
+		// let's the VFS find that module for us
+
+		status = vfs_get_module_path(sModulePaths[i], name, path, sizeof(path));
+		if (status == B_OK) {
+			status = check_module_image(path, name);
+			if (status == B_OK)
+				break;
 		}
+
+#ifdef SUPPORT_BOOTFS
+		// BeOS uses the module name to locate the module on disk. We now have the
+		// above vfs_get_module_path() call to achieve this.
+		// "bootfs" has a very low maximum path length, which makes it unable to
+		// contain the standard module directories).
+
 		if ((status = recurse_directory(sModulePaths[i], name)) == B_OK)
 			break;
+#endif
 	}
 
 	if (status != B_OK)
@@ -1114,7 +1121,7 @@ open_module_list(const char *prefix)
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
 		const char *path;
 
-		if (sDisableUserAddOns && i >= USER_MODULE_PATHS)
+		if (sDisableUserAddOns && i >= FIRST_USER_MODULE_PATH)
 			break;
 
 		path = strdup(sModulePaths[i]);
