@@ -1006,7 +1006,7 @@ bootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_
 //	#pragma mark -
 
 
-static struct fs_calls bootfs_calls = {
+static struct fs_ops bootfs_ops = {
 	&bootfs_mount,
 	&bootfs_unmount,
 	NULL,
@@ -1082,6 +1082,6 @@ bootstrap_bootfs(void)
 
 	dprintf("bootstrap_bootfs: found bootdir at %p\n", bootdir);
 
-	return vfs_register_filesystem("bootfs", &bootfs_calls);
+	return vfs_register_filesystem("bootfs", &bootfs_ops);
 }
 

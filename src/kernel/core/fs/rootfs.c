@@ -922,7 +922,7 @@ rootfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_
 //	#pragma mark -
 
 
-static struct fs_calls rootfs_calls = {
+static struct fs_ops rootfs_ops = {
 	&rootfs_mount,
 	&rootfs_unmount,
 	NULL,
@@ -983,5 +983,5 @@ bootstrap_rootfs(void)
 {
 	dprintf("bootstrap_rootfs: entry\n");
 
-	return vfs_register_filesystem("rootfs", &rootfs_calls);
+	return vfs_register_filesystem("rootfs", &rootfs_ops);
 }

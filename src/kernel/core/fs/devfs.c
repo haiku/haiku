@@ -60,7 +60,7 @@ struct devfs_stream {
 		} dir;
 		struct stream_dev {
 			void *ident;
-			device_hooks *calls;
+			device_hooks *ops;
 			struct devfs_part_map *part_map;
 		} dev;
 		struct stream_symlink {
@@ -368,13 +368,13 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 	part_node = devfs_create_vnode(fs, part_name);
 	
 	if (part_node == NULL) {
-		res = ENOMEM;
+		res = B_NO_MEMORY;
 		goto err2;
 	}
 
 	part_node->stream.type = STREAM_TYPE_DEVICE;
 	part_node->stream.u.dev.ident = v->stream.u.dev.ident;
-	part_node->stream.u.dev.calls = v->stream.u.dev.calls;
+	part_node->stream.u.dev.ops = v->stream.u.dev.ops;
 	part_node->stream.u.dev.part_map = part_map;
 
 	hash_insert(fs->vnode_list_hash, part_node);
@@ -645,7 +645,7 @@ devfs_open(fs_volume _fs, fs_vnode _v, int oflags, fs_cookie *_cookie)
 	if (vnode->stream.type != STREAM_TYPE_DEVICE)
 		return EINVAL;
 
-	status = vnode->stream.u.dev.calls->open(vnode->name, oflags, &cookie->u.dev.dcookie);
+	status = vnode->stream.u.dev.ops->open(vnode->name, oflags, &cookie->u.dev.dcookie);
 	*_cookie = cookie;
 
 	return status;
@@ -662,7 +662,7 @@ devfs_close(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		// pass the call through to the underlying device
-		return vnode->stream.u.dev.calls->close(cookie->u.dev.dcookie);
+		return vnode->stream.u.dev.ops->close(cookie->u.dev.dcookie);
 	}
 
 	return B_OK;
@@ -679,7 +679,7 @@ devfs_free_cookie(fs_volume _fs, fs_vnode _v, fs_cookie _cookie)
 
 	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		// pass the call through to the underlying device
-		vnode->stream.u.dev.calls->free(cookie->u.dev.dcookie);
+		vnode->stream.u.dev.ops->free(cookie->u.dev.dcookie);
 	}
 
 	if (cookie)
@@ -725,7 +725,7 @@ devfs_read(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, void *buffe
 	}
 
 	// pass the call through to the device
-	return vnode->stream.u.dev.calls->read(cookie->u.dev.dcookie, pos, buffer, length);
+	return vnode->stream.u.dev.ops->read(cookie->u.dev.dcookie, pos, buffer, length);
 }
 
 
@@ -752,7 +752,7 @@ devfs_write(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, const void
 			pos += part_map->offset;
 		}
 
-		written = vnode->stream.u.dev.calls->write(cookie->u.dev.dcookie, pos, buf, len);
+		written = vnode->stream.u.dev.ops->write(cookie->u.dev.dcookie, pos, buf, len);
 		return written;
 	}
 	return EINVAL;
@@ -888,7 +888,7 @@ devfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf, 
 				return devfs_set_partition(fs, v, cookie, buf, len);
 		}
 
-		return v->stream.u.dev.calls->control(cookie->u.dev.dcookie, op, buf, len);
+		return v->stream.u.dev.ops->control(cookie->u.dev.dcookie, op, buf, len);
 	}
 	return EINVAL;
 }
@@ -902,9 +902,9 @@ static int devfs_canpage(fs_volume _fs, fs_vnode _v)
 	TRACE(("devfs_canpage: vnode 0x%x\n", v));
 
 	if(v->stream.type == STREAM_TYPE_DEVICE) {
-		if(!v->stream.u.dev.calls->dev_canpage)
+		if(!v->stream.u.dev.ops->dev_canpage)
 			return 0;
-		return v->stream.u.dev.calls->dev_canpage(v->stream.u.dev.ident);
+		return v->stream.u.dev.ops->dev_canpage(v->stream.u.dev.ident);
 	} else {
 		return 0;
 	}
@@ -919,7 +919,7 @@ static ssize_t devfs_readpage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t po
 	if(v->stream.type == STREAM_TYPE_DEVICE) {
 		struct devfs_part_map *part_map = v->stream.u.dev.part_map;
 			
-		if(!v->stream.u.dev.calls->dev_readpage)
+		if(!v->stream.u.dev.ops->dev_readpage)
 			return ERR_NOT_ALLOWED;
 			
 		if( part_map ) {
@@ -934,7 +934,7 @@ static ssize_t devfs_readpage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t po
 			pos += part_map->offset;
 		}
 
-		return v->stream.u.dev.calls->dev_readpage(v->stream.u.dev.ident, vecs, pos);
+		return v->stream.u.dev.ops->dev_readpage(v->stream.u.dev.ident, vecs, pos);
 	} else {
 		return ERR_NOT_ALLOWED;
 	}
@@ -949,7 +949,7 @@ static ssize_t devfs_writepage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t p
 	if(v->stream.type == STREAM_TYPE_DEVICE) {
 		struct devfs_part_map *part_map = v->stream.u.dev.part_map;
 
-		if(!v->stream.u.dev.calls->dev_writepage)
+		if(!v->stream.u.dev.ops->dev_writepage)
 			return ERR_NOT_ALLOWED;
 
 		if( part_map ) {
@@ -964,7 +964,7 @@ static ssize_t devfs_writepage(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t p
 			pos += part_map->offset;
 		}
 
-		return v->stream.u.dev.calls->dev_writepage(v->stream.u.dev.ident, vecs, pos);
+		return v->stream.u.dev.ops->dev_writepage(v->stream.u.dev.ident, vecs, pos);
 	} else {
 		return ERR_NOT_ALLOWED;
 	}
@@ -1045,7 +1045,7 @@ devfs_write_stat(fs_volume _fs, fs_vnode _v, const struct stat *stat, int stat_m
 //	#pragma mark -
 
 
-static struct fs_calls devfs_calls = {
+static struct fs_ops devfs_ops = {
 	&devfs_mount,
 	&devfs_unmount,
 	NULL,
@@ -1107,12 +1107,12 @@ bootstrap_devfs(void)
 
 	TRACE(("bootstrap_devfs: entry\n"));
 
-	return vfs_register_filesystem("devfs", &devfs_calls);
+	return vfs_register_filesystem("devfs", &devfs_ops);
 }
 
 
 status_t
-devfs_publish_device(const char *path, void *ident, device_hooks *calls)
+devfs_publish_device(const char *path, void *ident, device_hooks *ops)
 {
 	int err = 0;
 	int i, last;
@@ -1121,9 +1121,9 @@ devfs_publish_device(const char *path, void *ident, device_hooks *calls)
 	struct devfs_vnode *v;
 	bool at_leaf;
 
-	TRACE(("devfs_publish_device: entry path '%s', ident %p, hooks %p\n", path, ident, calls));
+	TRACE(("devfs_publish_device: entry path '%s', ident %p, hooks %p\n", path, ident, ops));
 
-	if (calls == NULL || path == NULL) {
+	if (ops == NULL || path == NULL) {
 		panic("devfs_publish_device called with NULL pointer!\n");
 		return EINVAL;
 	}
@@ -1189,7 +1189,7 @@ devfs_publish_device(const char *path, void *ident, device_hooks *calls)
 			// this is the last component
 			v->stream.type = STREAM_TYPE_DEVICE;
 			v->stream.u.dev.ident = ident;
-			v->stream.u.dev.calls = calls;
+			v->stream.u.dev.ops = ops;
 		} else {
 			// this is a dir
 			v->stream.type = STREAM_TYPE_DIR;

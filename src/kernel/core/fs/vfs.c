@@ -85,18 +85,18 @@ struct vnode_hash_key {
 
 typedef struct file_system {
 	struct file_system	*next;
-	struct fs_calls		*calls;
+	struct fs_ops		*ops;
 	const char			*name;
 	image_id			image;
 	int32				ref_count;
 } file_system;
 
-#define FS_CALL(vnode,call) (vnode->mount->fs->calls->call)
+#define FS_CALL(vnode, op) (vnode->mount->fs->ops->op)
 
 struct fs_mount {
 	struct fs_mount	*next;
 	file_system		*fs;
-	mount_id			id;
+	mount_id		id;
 	void			*cookie;
 	char			*mount_point;
 	recursive_lock	rlock;
@@ -233,7 +233,7 @@ mount_hash(void *_m, const void *_key, unsigned int range)
  */
 
 static file_system *
-new_file_system(const char *name, struct fs_calls *calls)
+new_file_system(const char *name, struct fs_ops *ops)
 {
 	file_system *fs;
 
@@ -244,7 +244,7 @@ new_file_system(const char *name, struct fs_calls *calls)
 		return NULL;
 
 	fs->name = name;
-	fs->calls = calls;
+	fs->ops = ops;
 	fs->image = -1;
 	fs->ref_count = 0;
 
@@ -281,8 +281,9 @@ static file_system *
 load_file_system(const char *name)
 {
 	char path[SYS_MAX_PATH_LEN];
-	struct fs_calls **calls;
-	uint32 *version;
+	file_system *fs;
+	struct fs_ops **ops;
+	int32 *version;
 	void (*init)();
 	image_id image;
 
@@ -299,10 +300,28 @@ load_file_system(const char *name)
 		return NULL;
 
 	init = (void *)elf_lookup_symbol(image, "init_file_system");
-	if (!init)
+	version = (int32 *)elf_lookup_symbol(image, "api_version");
+	ops = (fs_ops **)elf_lookup_symbol(image, "fs_entry");
+	if (init == NULL || version == NULL || ops == NULL) {
+		dprintf("vfs: add-on \"%s\" doesn't export all necessary symbols.\n", name);
+		goto err;
+	}
+
+	if (*version != B_CURRENT_FS_API_VERSION) {
+		dprintf("vfs: add-on \"%s\" supports unknown API version %ld\n", name, *version);
+		goto err;
+	}
+
+	fs = new_file_system(name, *ops);
+	if (fs == NULL)
 		goto err;
 
+	fs->image = image;
+
+	// initialize file system add-on
 	init();
+
+	return fs;
 
 err:
 	elf_unload_kspace(path);
@@ -1625,17 +1644,17 @@ vfs_bootstrap_all_filesystems(void)
 
 
 int
-vfs_register_filesystem(const char *name, struct fs_calls *calls)
+vfs_register_filesystem(const char *name, struct fs_ops *ops)
 {
 	status_t status = B_OK;
 	file_system *fs;
 
-	if (name == NULL || *name == '\0' || calls == NULL)
+	if (name == NULL || *name == '\0' || ops == NULL)
 		return B_BAD_VALUE;
 
 	mutex_lock(&gFileSystemsMutex);
 
-	fs = new_file_system(name, calls);
+	fs = new_file_system(name, ops);
 	if (fs == NULL)
 		status = B_NO_MEMORY;
 
@@ -2660,7 +2679,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 			goto err3;
 		}
 
-		err = mount->fs->calls->mount(mount->id, device, NULL, &mount->cookie, &root_id);
+		err = mount->fs->ops->mount(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0) {
 			err = ERR_VFS_GENERAL;
 			goto err3;
@@ -2688,7 +2707,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		mount->covers_vnode = covered_vnode;
 
 		// mount it
-		err = mount->fs->calls->mount(mount->id, device, NULL, &mount->cookie, &root_id);
+		err = mount->fs->ops->mount(mount->id, device, NULL, &mount->cookie, &root_id);
 		if (err < 0)
 			goto err4;
 	}
@@ -2716,7 +2735,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 	return 0;
 
 err5:
-	mount->fs->calls->unmount(mount->cookie);
+	mount->fs->ops->unmount(mount->cookie);
 err4:
 	if (mount->covers_vnode)
 		put_vnode(mount->covers_vnode);
@@ -2807,7 +2826,7 @@ fs_unmount(char *path, bool kernel)
 
 	mutex_unlock(&gMountOpMutex);
 
-	mount->fs->calls->unmount(mount->cookie);
+	mount->fs->ops->unmount(mount->cookie);
 
 	// release the file system
 	put_file_system(mount->fs);
@@ -2837,7 +2856,7 @@ fs_sync(void)
 
 	hash_open(gMountsTable, &iter);
 	while ((mount = hash_next(gMountsTable, &iter))) {
-		mount->fs->calls->sync(mount->cookie);
+		mount->fs->ops->sync(mount->cookie);
 	}
 	hash_close(gMountsTable, &iter, false);
 
@@ -2862,8 +2881,8 @@ fs_read_info(dev_t device, struct fs_info *info)
 		goto error;
 	}
 
-	if (mount->fs->calls->read_fs_info)
-		status = mount->fs->calls->read_fs_info(mount->cookie, info);
+	if (mount->fs->ops->read_fs_info)
+		status = mount->fs->ops->read_fs_info(mount->cookie, info);
 	else
 		status = EOPNOTSUPP;
 
@@ -2891,8 +2910,8 @@ fs_write_info(dev_t device, const struct fs_info *info, int mask)
 		goto error;
 	}
 
-	if (mount->fs->calls->write_fs_info)
-		status = mount->fs->calls->write_fs_info(mount->cookie, info, mask);
+	if (mount->fs->ops->write_fs_info)
+		status = mount->fs->ops->write_fs_info(mount->cookie, info, mask);
 	else
 		status = EROFS;
 
