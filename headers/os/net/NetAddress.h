@@ -28,8 +28,8 @@
  *=--------------------------------------------------------------------------=*
  */
 
-#ifndef NETADDRESS_H
-#define NETADDRESS_H
+#ifndef _NETADDRESS_H
+#define _NETADDRESS_H
 
 #include <Archivable.h>
 #include <Errors.h>
@@ -99,7 +99,7 @@ inline NLAddress* BNetAddress::GetImpl( void ) const
     return NULL; // Cheeky, yes; but no Nettle stuff is allowed...
 }
 
-#endif // <-- #ifndef NETADDRESS_H
+#endif // <-- #ifndef _NETADDRESS_H
 
 
 /*=------------------------------------------------------------------- End -=*/

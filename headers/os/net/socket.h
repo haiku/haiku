@@ -11,4 +11,4 @@
  */
 #define B_UDP_MAX_SIZE (65536 - 1024) 
 
-#endif /* _SOCKET_H */
+#endif /* _NET_SOCKET_H */

@@ -3,4 +3,4 @@
 
 #include <netdb.h> /* should include the posix netdb.h */
 
-#endif /* _NETDB_H */
+#endif /* _NET_NETDB_H */
