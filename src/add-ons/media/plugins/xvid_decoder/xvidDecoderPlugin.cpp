@@ -67,13 +67,6 @@ xvidDecoder::Setup(media_format *ioEncodedFormat,
 				  const void *infoBuffer, int32 infoSize)
 {
 	int xerr;
-	static BLocker locker;
-	static bool initdone = false;
-	BAutolock lock(locker);
-	if (initdone) {
-		TRACE("xvidDecoder::Setup called twice\n");
-		return B_ERROR;
-	}
 
 	if (ioEncodedFormat->type != B_MEDIA_ENCODED_VIDEO) {
 		TRACE("xvidDecoder::Setup not called with encoded video");
