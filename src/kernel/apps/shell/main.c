@@ -80,6 +80,12 @@ main(int argc, char *argv[])
 			exit(0);
 	}
 
+	if (gCommandToExecute) {
+		if (strlen(gCommandToExecute) > 0)
+			parse_string(gCommandToExecute);
+		exit(0);
+	}
+
 	printf("Welcome to the Haiku shell\n");
 
 	for (;;) {
