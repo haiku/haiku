@@ -129,6 +129,7 @@ private:
 	};
 	void InitPatterns();
 	void RotatePatterns();
+	void RemoveSelection(bool bToClipboard);
 	bool HasSelection() { return fHasSelection; }
 	void SetHasSelection(bool bHasSelection);
 	void AnimateSelection(bool a);

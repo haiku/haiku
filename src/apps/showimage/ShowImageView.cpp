@@ -1595,18 +1595,36 @@ ShowImageView::AddWhiteRect(BRect &rect)
 }
 
 void
+ShowImageView::RemoveSelection(bool bToClipboard)
+{
+	if (HasSelection()) {
+		BRect rect = fSelectionRect;
+		bool bCutBackground = (fSelBitmap) ? false : true;
+		BBitmap *selection, *restore = NULL;
+		selection = CopySelection();
+	
+		if (bToClipboard)
+			CopySelectionToClipboard();
+		SetHasSelection(false);
+		
+		if (bCutBackground) {
+			// If the user hasn't dragged the selection,
+			// paint a white rectangle where the selection was
+			restore = CopyFromRect(rect);
+			AddWhiteRect(rect);
+		}
+		
+		fUndo.SetTo(rect, restore, selection);
+		Invalidate();
+	}
+}
+
+void
 ShowImageView::Cut()
 {
-	BRect rect = fSelectionRect;
-	bool bCutBackground = (fSelBitmap) ? false : true;
-	
-	CopySelectionToClipboard();
-	ClearSelection();
-	
-	if (bCutBackground)
-		// If the user hasn't dragged the selection,
-		// paint a white rectangle where the selection was
-		AddWhiteRect(rect);
+	// Copy the selection to the clipboard,
+	// then remove it
+	RemoveSelection(true);
 }
 
 void
@@ -1661,10 +1679,9 @@ ShowImageView::SelectAll()
 void
 ShowImageView::ClearSelection()
 {
-	if (HasSelection()) {
-		SetHasSelection(false);
-		Invalidate();
-	}
+	// Remove the selection,
+	// DON'T copy it to the clipboard
+	RemoveSelection(false);
 }
 
 void
