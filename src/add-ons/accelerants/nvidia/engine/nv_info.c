@@ -413,14 +413,12 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			LOG(8,("cmd 'RD 8bit ISA I/O REG $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				reg, and_out, or_in));
-			//fixme? this is for ISA I/O registers. Looks like they are in mapped range
-			//       as well (confirm or update code!)
 			if (exec)
 			{
-				byte = NV_REG8(/*0x00601000 + */reg);
+				byte = ISARB(reg);
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				NV_REG8(/*0x00601000 + */reg) = byte;
+				ISAWB(reg, byte);
 			}
 			break;
 		case 0x6e:
@@ -521,17 +519,15 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size)
 			adress += 1;
 			LOG(8,("cmd 'RD 8bit idx ISA I/O REG $%02x via $%04x, AND-out = $%02x, OR-in = $%02x, WR-bk'\n",
 				index, reg, and_out, or_in));
-			//fixme? this is for ISA I/O registers. Looks like they are in mapped range
-			//       as well (confirm or update code!)
 			if (exec)
 			{
-				safe = NV_REG8(/*0x00601000 + */reg);
-				NV_REG8(/*0x00601000 + */reg) = index;
-				byte = NV_REG8(/*0x00601000 + */reg + 1);
+				safe = ISARB(reg);
+				ISAWB(reg, index);
+				byte = ISARB(reg + 1);
 				byte &= (uint8)and_out;
 				byte |= (uint8)or_in;
-				NV_REG8(/*0x00601000 + */reg + 1) = byte;
-				NV_REG8(/*0x00601000 + */reg) = safe;
+				ISAWB((reg + 1), byte);
+				ISAWB(reg, safe);
 			}
 			break;
 		case 0x79:

@@ -8,6 +8,7 @@ extern area_id my_mode_list_area;
 extern int accelerantIsClone;
 
 extern nv_get_set_pci nv_pci_access;
+extern nv_in_out_isa nv_isa_access;
 
 
 typedef status_t (*crtc_validate_timing)(uint16*, uint16*, uint16*, uint16*, uint16*, uint16*, uint16*, uint16*);

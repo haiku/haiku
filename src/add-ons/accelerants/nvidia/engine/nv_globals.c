@@ -3,7 +3,8 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Mark Watson
+	Mark Watson,
+	Rudolf Cornelissen 8/2004
 */
 
 #include "nv_std.h"
@@ -22,5 +23,13 @@ nv_get_set_pci nv_pci_access=
 		NV_PRIVATE_DATA_MAGIC,
 		0,
 		4,
+		0
+	};
+
+nv_in_out_isa nv_isa_access=
+	{
+		NV_PRIVATE_DATA_MAGIC,
+		0,
+		1,
 		0
 	};
