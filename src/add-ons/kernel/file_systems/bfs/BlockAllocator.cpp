@@ -728,12 +728,30 @@ BlockAllocator::StopChecking(check_control *control)
 		// Should we fix errors? Were there any errors we can fix?
 		if (control->flags & BFS_FIX_BITMAP_ERRORS
 			&& (control->stats.freed != 0 || control->stats.missing != 0)) {
-			// if so, write the check bitmap back over the original one
+			// if so, write the check bitmap back over the original one,
+			// and use transactions here to play safe - we even use several
+			// transactions, so that we don't blow the maximum log size
+			// on large disks; since we don't need to make this atomic
 			fVolume->SuperBlock().used_blocks = usedBlocks;
-			ssize_t written = cached_write(fVolume->Device(), 1, fCheckBitmap, fNumGroups * fBlocksPerGroup, fVolume->BlockSize());
+			
+			int32 blocksInBitmap = fNumGroups * fBlocksPerGroup;
+			int32 blockSize = fVolume->BlockSize();
 
-			if (written != size)
-				PRINT(("write bitmap failed: %ld, %s\n", written, strerror(written)));
+			for (int32 i = 0; i < blocksInBitmap; i += 512) {
+				Transaction transaction(fVolume, 1 + i);
+				
+				int32 blocksToWrite = 512;
+				if (blocksToWrite + i > blocksInBitmap)
+					blocksToWrite = blocksInBitmap - i;
+
+				status_t status = transaction.WriteBlocks(1 + i,
+					(uint8 *)fCheckBitmap + i * blockSize, blocksToWrite);
+				if (status < B_OK) {
+					FATAL(("error writing bitmap: %s\n", strerror(status)));
+					break;
+				}
+				transaction.Done();
+			}
 		}
 	} else
 		FATAL(("BlockAllocator::CheckNextNode() didn't run through\n"));
