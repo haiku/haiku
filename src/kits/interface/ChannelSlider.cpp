@@ -3,46 +3,75 @@
  * Distributed under the terms of the MIT License.
  */
 
-
+#include <Bitmap.h>
 #include <ChannelSlider.h>
-#include <Message.h>
+#include <Debug.h>
+#include <PropertyInfo.h>
 
+
+static property_info
+sPropertyInfo[] = {
+	{ "Orientation",
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ B_DIRECT_SPECIFIER, 0 }, "" },
+	
+	{ "ChannelCount",
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ B_DIRECT_SPECIFIER, 0 }, "" },
+	
+	{ "CurrentChannel",
+	{ B_GET_PROPERTY, B_SET_PROPERTY, 0 },
+	{ B_DIRECT_SPECIFIER, 0 }, "" },
+	
+	{0}
+};
+	
 
 BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
 	BMessage *model, int32 channels, uint32 resizeMode, uint32 flags)
 	: BChannelControl(area, name, label, model, channels, resizeMode, flags)
 {
+	InitData();
 }
 
 
 BChannelSlider::BChannelSlider(BRect area, const char *name, const char *label,
 	BMessage *model, orientation o, int32 channels, uint32 resizeMode, uint32 flags)
 	: BChannelControl(area, name, label, model, channels, resizeMode, flags)
+
 {
+	InitData();
+	SetOrientation(o);
 }
 
 
 BChannelSlider::BChannelSlider(BMessage *archive)
 	: BChannelControl(archive)
 {
+	// TODO: Implement
 }
 
 
 BChannelSlider::~BChannelSlider()
 {
+	delete fInitialValues;
 }
 
 
 BArchivable *
 BChannelSlider::Instantiate(BMessage *archive)
 {
-	return NULL;
+	if (validate_instantiation(archive, "BChannelSlider"))
+		return new BChannelSlider(archive);
+	else
+		return NULL;
 }
 
 
 status_t
 BChannelSlider::Archive(BMessage *into, bool deep) const
 {
+	// TODO: Implement
 	return B_ERROR;
 }
 
@@ -50,20 +79,25 @@ BChannelSlider::Archive(BMessage *into, bool deep) const
 orientation
 BChannelSlider::Orientation() const
 {
-	return B_VERTICAL;
+	return _m_vertical ? B_VERTICAL : B_HORIZONTAL;
 }
 
 
 void
-BChannelSlider::SetOrientation(orientation o)
+BChannelSlider::SetOrientation(orientation _orientation)
 {
+	bool isVertical = _orientation == B_VERTICAL;
+	if (isVertical != Vertical()) {
+		_m_vertical = isVertical;
+		Invalidate(Bounds());
+	}	
 }
 
 
 int32
 BChannelSlider::MaxChannelCount() const
 {
-	return -1;
+	return 32;
 }
 
 
@@ -77,108 +111,146 @@ BChannelSlider::SupportsIndividualLimits() const
 void
 BChannelSlider::AttachedToWindow()
 {
+	BView *parent = Parent();
+	if (parent != NULL)
+		SetViewColor(parent->ViewColor());
+	
+	inherited::AttachedToWindow();
 }
 
 
 void
 BChannelSlider::AllAttached()
 {
+	BControl::AllAttached();
 }
 
 
 void
 BChannelSlider::DetachedFromWindow()
 {
+	inherited::DetachedFromWindow();
 }
 
 
 void
 BChannelSlider::AllDetached()
 {
+	BControl::AllDetached();
 }
 
 
 void
-BChannelSlider::MessageReceived(BMessage *msg)
+BChannelSlider::MessageReceived(BMessage *message)
 {
+	inherited::MessageReceived(message);
 }
 
 
 void
-BChannelSlider::Draw(BRect area)
+BChannelSlider::Draw(BRect updateRect)
 {
+	UpdateFontDimens();
+	DrawThumbs();
+	
+	BRect bounds(Bounds());
+	float labelWidth = StringWidth(Label());
+	
+	MovePenTo((bounds.Width() - labelWidth) / 2, 10);
+	DrawString(Label());
+	
+	// TODO: Respect label limits !!!	
 }
 
 
 void
 BChannelSlider::MouseDown(BPoint where)
 {
+	// TODO: Implement
 }
 
 
 void
-BChannelSlider::MouseUp(BPoint pt)
+BChannelSlider::MouseUp(BPoint where)
 {
+	// TODO: Implement
 }
 
 
 void
-BChannelSlider::MouseMoved(BPoint pt, uint32 code, const BMessage *message)
+BChannelSlider::MouseMoved(BPoint where, uint32 code, const BMessage *message)
 {
+	if (IsEnabled() && IsTracking())
+		MouseMovedCommon(where, B_ORIGIN);
+	else
+		BControl::MouseMoved(where, code, message);
 }
 
 
 void
 BChannelSlider::WindowActivated(bool state)
 {
+	BControl::WindowActivated(state);
 }
 
 
 void
 BChannelSlider::KeyDown(const char *bytes, int32 numBytes)
 {
+	// TODO: Implement
 }
 
 
 void
 BChannelSlider::KeyUp(const char *bytes, int32 numBytes)
 {
+	BView::KeyUp(bytes, numBytes);
 }
 
 
 void
-BChannelSlider::FrameResized(float width, float height)
+BChannelSlider::FrameResized(float newWidth, float newHeight)
 {
+	inherited::FrameResized(newWidth, newHeight);
+	Invalidate(Bounds());
 }
 
 
 void
 BChannelSlider::SetFont(const BFont *font, uint32 mask)
 {
+	inherited::SetFont(font, mask);
 }
 
 
 void
 BChannelSlider::MakeFocus(bool focusState)
 {
+	if (focusState && !IsFocus())
+		fFocusChannel = -1;
+	BControl::MakeFocus(focusState);
 }
 
 
 void
 BChannelSlider::SetEnabled(bool on)
 {
+	BControl::SetEnabled(on);
 }
 
 
 void
 BChannelSlider::GetPreferredSize(float *width, float *height)
 {
+	// TODO: Implement
 }
 
 
 BHandler *
-BChannelSlider::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier, int32 form, const char *property)
+BChannelSlider::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
+								int32 form, const char *property)
 {
+	// TODO: Implement
 	return NULL;
 }
 
@@ -186,102 +258,211 @@ BChannelSlider::ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier
 status_t
 BChannelSlider::GetSupportedSuites(BMessage *data)
 {
-	return B_ERROR;
+	if (data == NULL)
+		return B_BAD_VALUE;
+	
+	data->AddString("suites", "suite/vnd.Be-channel-slider");
+
+	BPropertyInfo propInfo(sPropertyInfo);
+	data->AddFlat("messages", &propInfo, 1);
+	
+	return inherited::GetSupportedSuites(data);
 }
 
 
 void
 BChannelSlider::DrawChannel(BView *into, int32 channel, BRect area, bool pressed)
 {
+	// TODO: Implement
 }
 
 
+
 void
-BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint tl, BPoint br)
+BChannelSlider::DrawGroove(BView *into, int32 channel, BPoint topLeft, BPoint bottomRight)
 {
+	// TODO: Implement
 }
 
 
 void
 BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed)
 {
+	ASSERT(into != NULL);
+		
+	const BBitmap *thumb = ThumbFor(channel, pressed);
+	
+	BRect bitmapBounds = thumb->Bounds();
+	where.x -= bitmapBounds.right / 2;
+	where.y -= bitmapBounds.bottom / 2;
+	
+	into->DrawBitmapAsync(thumb, where);
+		
+	if (pressed) {
+		into->PushState();
+	
+		into->SetDrawingMode(B_OP_ALPHA);
+		BRect rect(where, where);
+		rect.right += bitmapBounds.right;
+		rect.bottom += bitmapBounds.bottom;
+		into->SetHighColor(tint_color(ViewColor(), B_DARKEN_4_TINT));
+		into->FillRect(rect);
+
+		into->PopState();
+	}
 }
 
 
 const BBitmap *
 BChannelSlider::ThumbFor(int32 channel, bool pressed)
 {
-	return NULL;
+	// TODO: Implement
 }
 
 
-BRect 
+BRect
 BChannelSlider::ThumbFrameFor(int32 channel)
 {
-	return BRect();
+	UpdateFontDimens();
+	
+	BRect frame(0, 0, 0, 0);
+	const BBitmap *thumb = ThumbFor(channel, false);
+	if (thumb != NULL) {
+		frame = thumb->Bounds();
+		if (Vertical())
+			frame.OffsetBy(0, _m_linefeed * 2);
+		else
+			frame.OffsetBy(_m_linefeed, _m_linefeed);
+	}
+	
+	return frame;	
 }
 
 
-float 
+float
 BChannelSlider::ThumbDeltaFor(int32 channel)
 {
-	return 0.0f;
+	float delta = 0;
+	if (channel >= 0 && channel < MaxChannelCount()) {
+		float range = ThumbRangeFor(channel);
+		int32 limitRange = MaxLimitList()[channel] - MinLimitList()[channel];
+		delta = ValueList()[channel] * range / limitRange;  
+			
+		if (Vertical())
+			delta = range - delta;
+	}
+	
+	return delta;	
 }
 
 
-float 
+float
 BChannelSlider::ThumbRangeFor(int32 channel)
 {
-	return 0.0f;
+	UpdateFontDimens();
+	
+	float range = 0;
+	
+	BRect bounds = Bounds();
+	BRect frame = ThumbFrameFor(channel);
+	if (Vertical())
+		range = bounds.Height() - frame.Height() - _m_linefeed * 4;
+	else
+		range = bounds.Width() - frame.Width() - _m_linefeed * 2;
+	
+	return range; 
 }
 
 
-void 
+void
 BChannelSlider::InitData()
 {
+	UpdateFontDimens();
+	
+	_m_left_knob = NULL;
+	_m_mid_knob = NULL;
+	_m_right_knob = NULL;
+	_m_backing = NULL;
+	_m_backing_view = NULL;
+	_m_vertical = Bounds().Width() / Bounds().Height() < 1;
+	_m_click_delta = B_ORIGIN;
+	
+	fCurrentChannel = -1;
+	fAllChannels = false;
+	fInitialValues = NULL;
+	fMinpoint = 0;
+	fFocusChannel = -1;
+	
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	// TODO: Set initial values ?
 }
 
 
-void 
+void
 BChannelSlider::FinishChange()
 {
+	if (fInitialValues != NULL) {
+		if (fAllChannels) {
+			// TODO: Iterate through the list of channels, and invoke only
+			// for changed values
+			
+			InvokeChannel();
+			
+		} else {
+			if (ValueList()[fCurrentChannel] != fInitialValues[fCurrentChannel]) {
+				SetValueFor(fCurrentChannel, ValueList()[fCurrentChannel]);
+				Invoke();
+			}	
+		}
+	}
+	
+	SetTracking(false);
+	Redraw();
 }
 
 
-void 
+void
 BChannelSlider::UpdateFontDimens()
 {
+	font_height height;
+	GetFontHeight(&height);
+	_m_baseline = height.ascent + height.leading;
+	_m_linefeed = _m_baseline + height.descent;
 }
 
 
-void 
+void
 BChannelSlider::DrawThumbs()
-{
+{	
 }
 
 
-void 
+void
 BChannelSlider::DrawThumbFrame(BView *where, const BRect &area)
 {
 }
 
 
-bool 
+bool
 BChannelSlider::Vertical()
 {
-	return false;
+	return _m_vertical;
 }
 
 
-void 
+void
 BChannelSlider::Redraw()
 {
+	Invalidate(Bounds());
+	Flush();
 }
 
 
-void 
-BChannelSlider::MouseMovedCommon(BPoint, BPoint)
+void
+BChannelSlider::MouseMovedCommon(BPoint , BPoint )
 {
+	// TODO: Implement
 }
 
 
@@ -293,4 +474,3 @@ void BChannelSlider::_Reserved_BChannelSlider_4(void *, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_5(void *, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_6(void *, ...) {}
 void BChannelSlider::_Reserved_BChannelSlider_7(void *, ...) {}
-

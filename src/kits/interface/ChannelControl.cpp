@@ -10,8 +10,23 @@
 
 BChannelControl::BChannelControl(BRect frame, const char *name, const char *label,
 	BMessage *model, int32 channel_count, uint32 resizeMode, uint32 flags)
-	: BControl(frame, name, label, model, resizeMode, flags)
+	: BControl(frame, name, label, model, resizeMode, flags),
+	_m_channel_count(channel_count),
+	_m_value_channel(0),
+	_m_channel_min(NULL),
+	_m_channel_max(NULL),
+	_m_channel_val(NULL),
+	_m_multi_labels(NULL),
+	fModificationMsg(NULL)
 {
+	_m_channel_min = new int32[channel_count];
+	memset(_m_channel_min, 0, sizeof(int32) * channel_count);
+	
+	_m_channel_max = new int32[channel_count];
+	memset(_m_channel_max, 64, sizeof(int32) * channel_count);
+	
+	_m_channel_val = new int32[channel_count];
+	memset(_m_channel_val, 0, sizeof(int32) * channel_count);
 }
 
 
@@ -23,6 +38,9 @@ BChannelControl::BChannelControl(BMessage *archive)
 
 BChannelControl::~BChannelControl()
 {
+	delete[] _m_channel_min;
+	delete[] _m_channel_max;
+	delete[] _m_channel_val;
 }
 
 
@@ -36,36 +54,44 @@ BChannelControl::Archive(BMessage *into, bool deep) const
 void
 BChannelControl::FrameResized(float width, float height)
 {
+	BView::FrameResized(width, height);
 }
 
 
 void
 BChannelControl::SetFont(const BFont *font, uint32 mask)
 {
+	BView::SetFont(font, mask);
 }
 
 
 void
 BChannelControl::AttachedToWindow()
 {
+	BControl::AttachedToWindow();
 }
 
 
 void
 BChannelControl::DetachedFromWindow()
 {
+	BControl::DetachedFromWindow();
 }
 
 
 void
 BChannelControl::ResizeToPreferred()
 {
+	float width, height;
+	GetPreferredSize(&width, &height);
+	ResizeTo(width, height);
 }
 
 
 void
 BChannelControl::MessageReceived(BMessage *message)
 {
+	BControl::MessageReceived(message);
 }
 
 
@@ -87,13 +113,15 @@ BChannelControl::GetSupportedSuites(BMessage *data)
 void
 BChannelControl::SetModificationMessage(BMessage *message)
 {
+	delete fModificationMsg;
+	fModificationMsg = message;
 }
 
 
 BMessage *
 BChannelControl::ModificationMessage() const
 {
-	return NULL;
+	return fModificationMsg;
 }
 
 
@@ -116,48 +144,99 @@ status_t
 BChannelControl::InvokeNotifyChannel(BMessage *msg, uint32 kind,
 	int32 fromChannel, int32 channelCount, const bool *inMask)
 {
-	return B_ERROR;
+	BeginInvokeNotify(kind);
+	status_t status = InvokeChannel(msg, fromChannel, channelCount, inMask);
+	EndInvokeNotify();
+	
+	return status;
 }
 
 
 void
 BChannelControl::SetValue(int32 value)
 {
+	// Get real
+	if (value > _m_channel_max[_m_value_channel])
+		value = _m_channel_max[_m_value_channel];
+	
+	if (value < _m_channel_min[_m_value_channel]);
+		value = _m_channel_min[_m_value_channel];
+		
+	if (value != _m_channel_val[_m_value_channel]) {
+		StuffValues(_m_value_channel, 1, &value);
+		BControl::SetValue(value);
+	}
 }
 
 
 status_t
 BChannelControl::SetCurrentChannel(int32 channel)
 {
-	return B_ERROR;
+	if (channel < 0 || channel >= _m_channel_count)
+		return B_BAD_INDEX;
+		
+	if (channel != _m_value_channel) {
+		_m_value_channel = channel;
+		BControl::SetValue(_m_channel_val[_m_value_channel]);
+	}
+	
+	return B_OK;	
 }
 
 
 int32
 BChannelControl::CurrentChannel() const
 {
-	return -1;
+	return _m_value_channel;
 }
 
 
 int32
 BChannelControl::CountChannels() const
 {
-	return -1;
+	return _m_channel_count;
 }
 
 
 status_t
 BChannelControl::SetChannelCount(int32 channel_count)
 {
-	return B_ERROR;
+	if (channel_count < 0 || channel_count >= MaxChannelCount())
+		return B_BAD_VALUE;
+	
+	// TODO: Currently we only grow the buffer. Test what BeOS does
+	if (channel_count > _m_channel_count) {
+		int32 *newMin = new int32[channel_count];
+		int32 *newMax = new int32[channel_count];
+		int32 *newVal = new int32[channel_count];
+		
+		memcpy(newMin, _m_channel_min, _m_channel_count);
+		memcpy(newMax, _m_channel_max, _m_channel_count);
+		memcpy(newVal, _m_channel_val, _m_channel_count);
+		
+		delete[] _m_channel_min;
+		delete[] _m_channel_max;
+		delete[] _m_channel_val;
+		
+		_m_channel_min = newMin;
+		_m_channel_max = newMax;
+		_m_channel_val = newVal;
+	}
+	
+	_m_channel_count = channel_count;
+	
+	return B_OK;
 }
 
 
 int32
 BChannelControl::ValueFor(int32 channel) const
 {
-	return -1;
+	int32 value = 0;
+	if (GetValue(&value, channel, 1) <= 0)
+		return -1;
+	
+	return value;
 }
 
 
@@ -165,14 +244,18 @@ int32
 BChannelControl::GetValue(int32 *outValues, int32 fromChannel,
 	int32 channelCount) const
 {
-	return -1;
+	int32 i = 0;
+	for (i = 0; i < channelCount; i++)
+		outValues[i] = _m_channel_val[fromChannel + i];
+
+	return i;
 }
 
 
 status_t
 BChannelControl::SetValueFor(int32 channel, int32 value)
 {
-	return B_ERROR;
+	return SetValue(channel, 1, &value);
 }
 
 
@@ -180,7 +263,7 @@ status_t
 BChannelControl::SetValue(int32 fromChannel, int32 channelCount,
 	const int32 *inValues)
 {
-	return B_ERROR;
+	return StuffValues(fromChannel, channelCount, inValues);
 }
 
 
@@ -304,4 +387,3 @@ void BChannelControl::_Reserverd_ChannelControl_8(void *, ...) {}
 void BChannelControl::_Reserverd_ChannelControl_9(void *, ...) {}
 void BChannelControl::_Reserverd_ChannelControl_10(void *, ...) {}
 void BChannelControl::_Reserverd_ChannelControl_11(void *, ...) {}
-
