@@ -7,6 +7,7 @@
 	MIME sniffer rule implementation
 */
 
+#include <sniffer/Err.h>
 #include <sniffer/Expr.h>
 #include <sniffer/Rule.h>
 #include <DataIO.h>
@@ -28,12 +29,13 @@ Rule::InitCheck() const {
 	return fExprList ? B_OK : B_NO_INIT;
 }
 
-
+//! Returns the priority of the rule. 0.0 <= priority <= 1.0.
 double
 Rule::Priority() const {
 	return fPriority;
 }
 
+//! Sniffs the given data stream. Returns true if the rule matches, false if not.
 bool
 Rule::Sniff(BPositionIO *data) const {
 	if (InitCheck() != B_OK)
@@ -56,10 +58,14 @@ Rule::Unset() {
 	}
 }
 
+//! Called by Parser::Parse() after successfully parsing a sniffer rule.
 void
 Rule::SetTo(double priority, std::vector<Expr*>* list) {
 	Unset();
-	fPriority = priority;
+	if (0.0 <= priority && priority <= 1.0)
+		fPriority = priority;
+	else
+		throw new Err("Sniffer pattern error: invalid priority", -1);
 	fExprList = list;
 }
 

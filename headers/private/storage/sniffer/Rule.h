@@ -18,6 +18,9 @@ namespace Sniffer {
 
 class Expr;
 
+/*! \brief A priority and a list of expressions to be used for sniffing out the
+	type of an untyped file.
+*/
 class Rule {
 public:
 	Rule();
