@@ -5,7 +5,6 @@ status_t gx50_general_output_select(void);
 status_t gx00_general_dac_select(int);
 status_t gx00_general_wait_retrace(void);
 status_t gx00_general_validate_pic_size (display_mode *target, uint32 *bytes_per_row, bool *acc_mode);
-//status_t gx00_general_bios_to_powergraphics(void);
 
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \
@@ -122,6 +121,7 @@ status_t gx00_acc_wait_idle(void);
 
 /*backend scaler functions*/
 status_t check_overlay_capability(uint32 feature);
+void gx00_bes_move_overlay(void);
 status_t gx00_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
 status_t gx00_release_bes(void);
