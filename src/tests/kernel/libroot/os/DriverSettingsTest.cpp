@@ -20,7 +20,7 @@ const char *kSettings[] = {
 
 	"keyA {\ndisabled\n}\n",
 
-	"keyA = b { keyC d e { keyE f ; keyF g } }"
+	"keyA = b { keyB=d =e { keyC \"f g\"; keyD h } }"
 };
 
 
