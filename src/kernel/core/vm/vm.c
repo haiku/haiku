@@ -18,7 +18,7 @@
 #include <vm_store_anonymous_noswap.h>
 #include <vm_store_device.h>
 #include <vm_store_null.h>
-#include <vm_store_vnode.h>
+#include <file_cache.h>
 #include <memheap.h>
 #include <debug.h>
 #include <console.h>
@@ -1014,7 +1014,7 @@ vm_create_vnode_cache(void *vnode, void **_cache)
 	vm_store *store;
 
 	// create a vnode store object
-	store = vm_store_create_vnode(vnode);
+	store = vm_create_vnode_store(vnode);
 	if (store == NULL) {
 		dprintf("vm_create_vnode_cache: couldn't create vnode store\n");
 		return B_NO_MEMORY;
