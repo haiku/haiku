@@ -511,15 +511,26 @@ search_module(const char *name)
 
 	TRACE(("search_module(%s)\n", name));
 
-	// ToDo: this could take parts of the module name to check there for
-	//		the module first, since module names are usually path/name/version
-	//		anyway.
-	//		It might even be the convention to do so on BeOS! Please check!
+	// ToDo: As Ingo found out, BeOS uses the module name to locate the module
+	//		on disk. We now have the vfs_get_module_path() call to achieve this.
+	//		As soon as we boot from a file system other than bootfs, we should
+	//		change the loading behaviour to only use that function (bootfs has
+	//		a very low maximum path length, which makes it unable to contain
+	//		the standard module directories).
+	//		The call to vfs_get_module_path() is only for testing purposes
 
 	for (i = 0; i < NUM_MODULE_PATHS; i++) {
 		if (modules_disable_user_addons && i >= USER_MODULE_PATHS)
 			return NULL;
 
+		{
+			char path[B_FILE_NAME_LENGTH];
+			if (vfs_get_module_path(gModulePaths[i], name, path, sizeof(path)) < B_OK) {
+				TRACE(("vfs_get_module_path() failed for \"%s\"\n", name));
+			} else {
+				TRACE(("vfs_get_module_path(): found \"%s\" (for \"%s\")\n", path, name));
+			}
+		}
 		if ((status = recurse_directory(gModulePaths[i], name)) == B_OK)
 			break;
 	}
