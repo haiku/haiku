@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src servers app drawing Painter ;
+
+UseLibraryHeaders agg ;
+UsePrivateHeaders app interface [ FDirName servers app ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
+UseFreeTypeHeaders ;
+
+StaticLibrary painter :
+	Painter.cpp
+	ShapeConverter.cpp
+	Transformable.cpp
+	drawing_modes/DrawingModeFactory.cpp
+	font_support/agg_font_freetype.cpp
+	font_support/AGGTextRenderer.cpp
+	font_support/FontManager.cpp
+	font_support/TextRenderer.cpp
+;
