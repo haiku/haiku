@@ -2,7 +2,9 @@
 	Copyright 1999, Be Incorporated.   All Rights Reserved.
 	This file may be used under the terms of the Be Sample Code License.
 
-	Modified to work with the Matrox G400 - Mark Watson
+	Other authors:
+	Mark Watson;
+	Rudolf Cornelissen 3/2002.
 */
 
 /* standard kernel driver stuff */
@@ -92,16 +94,17 @@ static device_hooks graphics_device_hooks = {
 #define VENDOR_ID			0x102b	/* Matrox graphics inc. */
 
 static uint16 gx00_device_list[] = {
-	0x2527,/*G550AGP*/
-	0x0525,/*G400AGP*/
-	0x0520,/*G200PCI*/
-	0x0521,/*G200AGP*/
-	0x1000,/*G100PCI*/
-	0x1001,/*G100AGP*/
-	0x051F,/*MGA-2164 AGP Millennium 2*/
-	0x051B,/*MGA-2164 PCI Millennium 2*/
-	0x051A,/*MGA-1054 PCI Mystic*/
-	0x0519,/*MGA-2064 PCI Millennium*/
+	0x2527, /* G450AGP, G550AGP */
+	0x0525, /* G400AGP */
+	0x0520, /* G200PCI */
+	0x0521, /* G200AGP */
+	0x1000, /* G100PCI */
+	0x1001, /* G100AGP */
+	0x051B, /* MGA-2164 PCI Millennium 2 */
+	0x051F, /* MGA-2164 AGP Millennium 2 */
+	0x0519, /* MGA-2064 PCI Millennium 1 */
+//fixme? only support Mystique once we are sure we actually support it...
+//	0x051A, /* MGA-1064 PCI Mystique 170/220 */
 	0
 };
 
@@ -122,6 +125,7 @@ static settings current_settings = { // see comments in mga.settings
 	0,          // memory
 	false,      // usebios
 	false,      // hardcursor
+	false,		// greensync
 };
 
 static void dumprom (void *rom, size_t size)
@@ -231,6 +235,7 @@ init_driver(void) {
 
 		current_settings.hardcursor = get_driver_boolean_parameter (settings_handle, "hardcursor", false, false);
 		current_settings.usebios = get_driver_boolean_parameter (settings_handle, "usebios", false, false);
+		current_settings.greensync = get_driver_boolean_parameter (settings_handle, "greensync", false, false);
 
 		unload_driver_settings (settings_handle);
 	}
@@ -281,12 +286,8 @@ void uninit_driver(void) {
 	put_module(B_PCI_MODULE_NAME);
 }
 
-static status_t map_device(device_info *di) {
-	/* frame buffer in [0], control regs in [1], pseudo_dma in [2] */
-	int frame_buffer = 0;
-	int registers = 1;
-	int pseudo_dma = 2;
-
+static status_t map_device(device_info *di)
+{
 	char buffer[B_OS_NAME_LENGTH]; /*memory for device name*/
 	shared_info *si = di->si;
 	uint32	tmpUlong;
@@ -298,9 +299,22 @@ static status_t map_device(device_info *di) {
 //	#define G400_DMA_BUFFER_SIZE 1024*1024
 
 	/*variables for making copy of ROM*/
-	int i;
 	char * rom_temp;
 	area_id rom_area;
+
+	/* MIL1 has frame_buffer in [1], control_regs in [0], and nothing in [2], while
+	 * MIL2 and later have frame_buffer in [0], control_regs in [1], pseudo_dma in [2] */
+	int frame_buffer = 0;
+	int registers = 1;
+	int pseudo_dma = 2;
+
+	/* correct layout for MIL1 */
+	//fixme: checkout Mystique 170 and 220...
+	if (di->pcii.device_id == 0x0519)
+	{
+		frame_buffer = 1;
+		registers = 0;
+	}
 
 	/* enable memory mapped IO, disable VGA I/O - this is standard*/
 	tmpUlong = get_pci(PCI_command, 4);
@@ -371,54 +385,59 @@ static status_t map_device(device_info *di) {
 	set_pci(PCI_rom_base,4,0);
 	delete_area(rom_area);
 
-	/* work out a name for the pseudo dma mapping*/
-	sprintf(buffer, DEVICE_FORMAT " pseudodma",
-		di->pcii.vendor_id, di->pcii.device_id,
-		di->pcii.bus, di->pcii.device, di->pcii.function);
+	/* (pseudo)DMA does not exist on MIL1 */
+	//fixme: checkout Mystique 170 and 220...
+	if (di->pcii.device_id != 0x0519)
+	{
+		/* work out a name for the pseudo dma mapping*/
+		sprintf(buffer, DEVICE_FORMAT " pseudodma",
+			di->pcii.vendor_id, di->pcii.device_id,
+			di->pcii.bus, di->pcii.device, di->pcii.function);
 
-	/* map the pseudo dma into vmem (write-only)*/
-	si->pseudo_dma_area = map_physical_memory(
-		buffer,
-		(void *) di->pcii.u.h0.base_registers[pseudo_dma],
-		di->pcii.u.h0.base_register_sizes[pseudo_dma],
-		B_ANY_KERNEL_ADDRESS,
-		B_WRITE_AREA,
-		&(si->pseudo_dma));
+		/* map the pseudo dma into vmem (write-only)*/
+		si->pseudo_dma_area = map_physical_memory(
+			buffer,
+			(void *) di->pcii.u.h0.base_registers[pseudo_dma],
+			di->pcii.u.h0.base_register_sizes[pseudo_dma],
+			B_ANY_KERNEL_ADDRESS,
+			B_WRITE_AREA,
+			&(si->pseudo_dma));
 
-	/* if there was an error, delete our other areas and pass on error*/
-	if (si->pseudo_dma_area < 0) {
-		delete_area(si->regs_area);
-		si->regs_area = -1;
-		return si->pseudo_dma_area;
+		/* if there was an error, delete our other areas and pass on error*/
+		if (si->pseudo_dma_area < 0) {
+			delete_area(si->regs_area);
+			si->regs_area = -1;
+			return si->pseudo_dma_area;
+		}
+
+		/* work out a name for the a dma buffer*/
+//		sprintf(buffer, DEVICE_FORMAT " dmabuffer",
+//			di->pcii.vendor_id, di->pcii.device_id,
+//			di->pcii.bus, di->pcii.device, di->pcii.function);
+
+		/* create an area for the dma buffer*/
+//		si->dma_buffer_area = create_area(
+//			buffer,
+//			&si->dma_buffer,
+//			B_ANY_ADDRESS,
+//			G400_DMA_BUFFER_SIZE,
+//			B_FULL_LOCK|B_CONTIGUOUS,
+//			B_READ_AREA|B_WRITE_AREA);
+
+		/* if there was an error, delete our other areas and pass on error*/
+//		if (si->dma_buffer_area < 0) {
+//			delete_area(si->pseudo_dma_area);
+//			si->pseudo_dma_area = -1;
+//			delete_area(si->regs_area);
+//			si->regs_area = -1;
+//			return si->dma_buffer_area;
+//		}
+
+		/*find where it is in real memory*/
+//		get_memory_map(si->dma_buffer,4,physical_memory,1);
+//		si->dma_buffer_pci = physical_memory[0].address; /*addr from PCI space*/ 
 	}
 
-	/* work out a name for the a dma buffer*/
-//	sprintf(buffer, DEVICE_FORMAT " dmabuffer",
-//		di->pcii.vendor_id, di->pcii.device_id,
-//		di->pcii.bus, di->pcii.device, di->pcii.function);
-
-	/* create an area for the dma buffer*/
-//	si->dma_buffer_area = create_area(
-//		buffer,
-//		&si->dma_buffer,
-//		B_ANY_ADDRESS,
-//		G400_DMA_BUFFER_SIZE,
-//		B_FULL_LOCK|B_CONTIGUOUS,
-//		B_READ_AREA|B_WRITE_AREA);
-
-	/* if there was an error, delete our other areas and pass on error*/
-//	if (si->dma_buffer_area < 0) {
-//		delete_area(si->pseudo_dma_area);
-//		si->pseudo_dma_area = -1;
-//		delete_area(si->regs_area);
-//		si->regs_area = -1;
-//		return si->dma_buffer_area;
-//	}
-
-	/*find where it is in real memory*/
-//	get_memory_map(si->dma_buffer,4,physical_memory,1);
-//	si->dma_buffer_pci = physical_memory[0].address; /*addr from PCI space*/ 
-   
 	/* work out a name for the framebuffer mapping*/
 	sprintf(buffer, DEVICE_FORMAT " framebuffer",
 		di->pcii.vendor_id, di->pcii.device_id,
@@ -445,11 +464,17 @@ static status_t map_device(device_info *di) {
 	}
 		
 	/* if there was an error, delete our other areas and pass on error*/
-	if (si->fb_area < 0) {
-		delete_area(si->dma_buffer_area);
-		si->dma_buffer_area = -1;
-		delete_area(si->pseudo_dma_area);
-		si->pseudo_dma_area = -1;
+	if (si->fb_area < 0)
+	{
+		/* (pseudo)DMA does not exist on MIL1 */
+		//fixme: checkout Mystique 170 and 220...
+		if (di->pcii.device_id != 0x0519)
+		{
+			delete_area(si->dma_buffer_area);
+			si->dma_buffer_area = -1;
+			delete_area(si->pseudo_dma_area);
+			si->pseudo_dma_area = -1;
+		}
 		delete_area(si->regs_area);
 		si->regs_area = -1;
 		return si->fb_area;
@@ -477,6 +502,17 @@ static void unmap_device(device_info *di) {
 	if (si->regs_area >= 0) delete_area(si->regs_area);
 	if (si->fb_area >= 0) delete_area(si->fb_area);
 	si->regs_area = si->fb_area = -1;
+
+	/* (pseudo)DMA does not exist on MIL1 */
+	//fixme: checkout Mystique 170 and 220...
+	if (di->pcii.device_id != 0x0519)
+	{
+		delete_area(si->dma_buffer_area);
+		si->dma_buffer_area = -1;
+		delete_area(si->pseudo_dma_area);
+		si->pseudo_dma_area = -1;
+	}
+
 	si->framebuffer = NULL;
 	di->regs = NULL;
 }
@@ -647,11 +683,16 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	/* disable and clear any pending interrupts */
 	disable_vbi(regs);
 
-	/* If there is an interrupt line then set up interrupts*/
-	if ((di->pcii.u.h0.interrupt_pin == 0x00) || (di->pcii.u.h0.interrupt_line == 0xff)){
-		/*interrupt does not exist so DIE*/
+	/* If there is a valid interrupt line assigned then set up interrupts */
+	if ((di->pcii.u.h0.interrupt_pin == 0x00) ||
+	    (di->pcii.u.h0.interrupt_line == 0xff) || /* no IRQ assigned */
+	    (di->pcii.u.h0.interrupt_line <= 0x02))   /* system IRQ assigned */
+	{
+		/* interrupt does not exist so exit without installing our handler */
 		goto delete_the_sem;
-	} else {
+	}
+	else
+	{
 		/* otherwise install our interrupt handler */
 		result = install_io_interrupt_handler(di->pcii.u.h0.interrupt_line, gx00_interrupt, (void *)di, 0);
 		/* bail if we couldn't install the handler */

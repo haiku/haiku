@@ -5,7 +5,7 @@
 #
 
 # mga.driver parameters
-#accelerant "mga.accelerant"
+# accelerant "mga.accelerant"
 
 # mga.accelerant parameters
 usebios    false			# if true rely on bios to coldstart the card instead of driver
@@ -17,9 +17,6 @@ hardcursor false			# if true use on-chip cursor capabilities
 #logmask   0x08000604	# log overlay use in full
 #logmask 	0xffffffff		# log everything
 dumprom    false        		# dump bios rom in ~/mga.rom
+greensync	false			# if true generate sync on green output signal
 
-# not yet, ?never implemented
-#gamma     1.0
-#dualhead  true
-#mode    31500,640,648,744,840,480,481,500,500,0
-#--------- that's all
+#--------- that's all.
