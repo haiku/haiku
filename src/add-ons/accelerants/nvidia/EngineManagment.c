@@ -4,7 +4,7 @@
 
 	other authors:
 	Mark Watson
-	Rudolf Cornelissen 3/2004-12/2004
+	Rudolf Cornelissen 3/2004-1/2005
 */
 
 /*
@@ -37,6 +37,8 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	/* make sure all needed engine cmd's are mapped to the FIFO */
 	if (si->ps.card_arch < NV40A)
 		nv_acc_assert_fifo();
+	else
+		nv_acc_assert_fifo_dma();
 
 	/* return an engine token */
 	*et = &nv_engine_token;

@@ -115,6 +115,7 @@ status_t nv_acc_video_blit(uint16 xs,uint16 ys,uint16 ws, uint16 hs,
 status_t nv_acc_wait_idle(void);
 /* DMA versions */
 status_t nv_acc_init_dma(void);
+void nv_acc_assert_fifo_dma(void);
 status_t nv_acc_setup_blit_dma(void);
 status_t nv_acc_blit_dma(uint16,uint16,uint16, uint16,uint16,uint16 );
 status_t nv_acc_setup_rectangle_dma(uint32 color);

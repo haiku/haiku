@@ -651,7 +651,8 @@ status_t nv_acc_init()
 		}
 		ACCW(PR_CTX1_D, 0x00000c02); /* format is X16RGB16, LSB mono */
 		break;
-	case B_RGB32_LITTLE:case B_RGBA32_LITTLE:
+	case B_RGB32_LITTLE:
+	case B_RGBA32_LITTLE:
 		/* acc engine */
 		ACCW(FORMATS, 0x000070e5);
 		if (si->ps.card_arch < NV30A)
