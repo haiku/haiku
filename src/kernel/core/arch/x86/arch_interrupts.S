@@ -1,7 +1,13 @@
-/* 
+/*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
+** Copyright 2002, Michael Noisternig. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+#include <arch/x86/descriptors.h>
+
+#define FUNCTION(x) .global x; .type x,@function; x
+
 .text
 
 #define TRAP_ERRC(name, vector) \
@@ -10,7 +16,7 @@
 name: \
 	pushl	$vector; \
 	jmp		int_bottom
-	
+
 #define TRAP(name, vector) \
 .globl name; \
 .align 8; \
@@ -64,7 +70,7 @@ TRAP(trap253, 253)
 TRAP(trap254, 254)
 TRAP(trap255, 255)
 
-.align 8
+.align 16
 .globl int_bottom
 int_bottom:
 	pusha
@@ -72,9 +78,14 @@ int_bottom:
 	push	%es
 	push	%fs
 	push	%gs
-	movw	$0x10,%ax
-	movw	%ax,%ds
+	movl	$KERNEL_DATA_SEG,%eax
 	cld
+	movl	%eax,%ds
+	movl	%ss,%ebx
+	movl	%esp,%esi
+	cmpl	%eax,%ebx  // check if we changed the stack
+	jne		custom_stack
+  kernel_stack:
 	call	i386_handle_trap
 	pop		%gs
 	pop		%fs
@@ -83,3 +94,60 @@ int_bottom:
 	popa
 	addl	$8,%esp
 	iret
+
+	// custom stack -> copy registers to kernel stack and switch there
+  custom_stack:
+	movl	%dr3,%edx  // get_current_thread
+	movl	%eax,%es
+	addl	_interrupt_stack_offset,%edx
+	lss		(%edx),%esp
+	movl	%ebx,%ds
+	subl	$84,%esp
+	movl	%esp,%edi
+	movl	$19,%ecx
+	rep		movsl
+	movl	%eax,%ds
+	subl	$76,%esi
+	movl	%esi,(%edi)  // save custom stack address
+	movl	%ebx,4(%edi)
+	call	i386_handle_trap
+	lss		76(%esp),%esp  // reload custom stack address
+	pop		%gs
+	pop		%fs
+	pop		%es
+	pop		%ds
+	popa
+	addl	$8,%esp
+	iret
+
+_interrupt_stack_offset:
+.long	0
+
+// void	i386_stack_init(struct farcall *interrupt_stack_offset)
+	/* setup in arch_thread.c: arch_thread_init_thread_struct() */
+FUNCTION(i386_stack_init):
+	movl	4(%esp),%eax
+	movl	%eax,_interrupt_stack_offset
+	ret
+
+// void i386_stack_switch(struct farcall new_stack)
+FUNCTION(i386_stack_switch):
+	movl	%dr3,%eax  // get_current_thread
+	movl	(%esp),%edx
+	pushf
+	popl	%ecx
+	addl	_interrupt_stack_offset,%eax
+	cli
+	pushl	%ss
+	cmpl	$KERNEL_DATA_SEG,(%esp)
+	je		kernel_stack2
+		popl	%eax
+		jmp		switch
+  kernel_stack2:
+	popl	4(%eax)
+	movl	%esp,(%eax)
+  switch:
+	lss		4(%esp),%esp
+	pushl	%ecx
+	popf
+	jmp		*%edx

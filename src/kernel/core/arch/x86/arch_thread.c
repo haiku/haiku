@@ -17,12 +17,17 @@ int arch_proc_init_proc_struct(struct proc *p, bool kernel)
 	return 0;
 }
 
+// from arch_interrupts.S
+extern void	i386_stack_init( struct farcall *interrupt_stack_offset );
+
 int arch_thread_init_thread_struct(struct thread *t)
 {
-	t->arch_info.esp = NULL;
+	// set up an initial state (stack & fpu)
+	memset(&t->arch_info, 0, sizeof(t->arch_info));
 
-	// set up an initial fpu state
-	memset(&t->arch_info.fpu_state[0], 0, sizeof(t->arch_info.fpu_state));
+	// let the asm function know the offset to the interrupt stack within struct thread
+	// I know no better ( = static) way to tell the asm function the offset
+	i386_stack_init( &((struct thread*)0)->arch_info.interrupt_stack );
 
 	return 0;
 }
@@ -62,8 +67,9 @@ int arch_thread_initialize_kthread_stack(struct thread *t, int (*start_func)(voi
 		*kstack_top = 0;
 	}
 
-	// save the esp
-	t->arch_info.esp = kstack_top;
+	// save the stack position
+	t->arch_info.current_stack.esp = kstack_top;
+	t->arch_info.current_stack.ss = (int *)KERNEL_DATA_SEG;
 
 	return 0;
 }
@@ -79,10 +85,11 @@ void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 #if 0
 	int i;
 
-	dprintf("arch_thread_context_switch: cpu %d 0x%x -> 0x%x, aspace 0x%x -> 0x%x, &old_esp = 0x%p, esp = 0x%p\n",
+	dprintf("arch_thread_context_switch: cpu %d 0x%x -> 0x%x, aspace 0x%x -> 0x%x, old stack = 0x%x:0x%x, stack = 0x%x:0x%x\n",
 		smp_get_current_cpu(), t_from->id, t_to->id,
 		t_from->proc->aspace, t_to->proc->aspace,
-		&t_from->arch_info.esp, t_to->arch_info.esp);
+		t_from->arch_info.current_stack.ss, t_from->arch_info.current_stack.esp,
+		t_to->arch_info.current_stack.ss, t_to->arch_info.current_stack.esp);
 #endif
 #if 0
 	for(i=0; i<11; i++)
@@ -120,7 +127,7 @@ void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 
 #if 0
 {
-	int a = *(int *)(t_to->arch_info.esp - 4);
+	int a = *(int *)(t_to->arch_info.current_stack.esp - 4);
 }
 #endif
 
@@ -128,14 +135,15 @@ void arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);
-	i386_context_switch(&t_from->arch_info.esp, t_to->arch_info.esp, new_pgdir);
+	i386_context_switch(&t_from->arch_info, &t_to->arch_info, new_pgdir);
 }
 
 void arch_thread_dump_info(void *info)
 {
 	struct arch_thread *at = (struct arch_thread *)info;
 
-	dprintf("\tesp: %p\n", at->esp);
+	dprintf("\tesp: %p\n", at->current_stack.esp);
+	dprintf("\tss: %p\n", at->current_stack.ss);
 	dprintf("\tfpu_state at %p\n", at->fpu_state);
 }
 

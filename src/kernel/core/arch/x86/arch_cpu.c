@@ -9,6 +9,7 @@
 #include <vm.h>
 #include <debug.h>
 #include <smp.h>
+#include <arch/x86/selector.h>
 #include <Errors.h>
 #include <kerrors.h>
 
@@ -51,6 +52,8 @@ arch_cpu_init2(kernel_args *ka)
 	gdt = (unsigned int *)ka->arch_args.vir_gdt;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "gdt", (void **)&gdt,
 		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
+
+	i386_selector_init( gdt );  // pass the new gdt
 
 	tss = kmalloc(sizeof(struct tss *) * ka->num_cpus);
 	if (tss == NULL) {

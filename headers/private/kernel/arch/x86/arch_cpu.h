@@ -7,12 +7,9 @@
 
 /* ??? why include this as we're normally included from that file! */
 #include <arch/cpu.h>
+#include <arch/x86/thread_struct.h>
+#include <arch/x86/descriptors.h>
 
-#define KERNEL_CODE_SEG 0x8
-#define KERNEL_DATA_SEG 0x10
-#define USER_CODE_SEG 0x1b
-#define USER_DATA_SEG 0x23
-#define TSS 0x28
 #define PAGE_SIZE 4096
 
 #define _BIG_ENDIAN 0
@@ -88,7 +85,7 @@ typedef struct pdentry {
 #define nop() __asm__ ("nop"::)
 
 void setup_system_time(unsigned int cv_factor);
-void i386_context_switch(unsigned int **old_esp, unsigned int *new_esp, addr new_pgdir);
+void i386_context_switch(struct arch_thread *old_state, struct arch_thread *new_state, addr new_pgdir);
 void i386_enter_uspace(addr entry, void *args, addr ustack_top);
 void i386_set_kstack(addr kstack);
 void i386_switch_stack_and_call(addr stack, void (*func)(void *), void *arg);
