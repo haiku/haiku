@@ -888,27 +888,6 @@ struct server_removeitem_reply : public reply_data
 {
 };
 
-struct server_get_format_for_description_request : public request_data
-{
-	media_format_description description;
-};
-
-struct server_get_format_for_description_reply : public reply_data
-{
-	media_format format;
-};
-
-struct server_get_description_for_format_request : public request_data
-{
-	media_format format;
-	media_format_family family;
-};
-
-struct server_get_description_for_format_reply : public reply_data
-{
-	media_format_description description;
-};
-
 struct server_get_decoder_for_format_request : public request_data
 {
 	media_format format;
