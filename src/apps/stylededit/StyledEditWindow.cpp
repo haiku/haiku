@@ -1036,22 +1036,20 @@ StyledEditWindow::RevertToSaved()
 status_t
 StyledEditWindow::PageSetup(const char *documentname)
 {
-	status_t result= B_ERROR;
+	status_t result = B_OK;
 		
 	BPrintJob printJob(documentname);
 		
-	if (fPrintSettings!= NULL)
+	if (fPrintSettings != NULL) {
 		printJob.SetSettings(fPrintSettings);
-	//else
-		//; ///??
+	}
+	
+	result = printJob.ConfigPage();
 		
-	result= printJob.ConfigPage();
-		
-	if (result== B_NO_ERROR){
-//		delete fPrintSettings;
-		fPrintSettings= printJob.Settings();
+	if (result == B_NO_ERROR) {
+		fPrintSettings = printJob.Settings();
 	}	
-				
+
 	return result;
 }/***StyledEditWindow::PageSetup()***/
 	
@@ -1059,17 +1057,16 @@ void
 StyledEditWindow::Print(const char *documentname)
 {
 	status_t result = B_OK;
-	BPrintJob printJob(documentname);
-														
+	
 	if (fPrintSettings == NULL) {
-		result = PageSetup(fTextView->Window()->Title());
-		if (result != B_NO_ERROR) {
+		result = PageSetup(documentname);
+		if (result != B_OK) {
 			return;
 		}
-	} else {
-		printJob.SetSettings(fPrintSettings);
-	}
+	} 
 	
+	BPrintJob printJob(documentname);
+	printJob.SetSettings(fPrintSettings);
 	result = printJob.ConfigJob();
 	if (result != B_OK) {
 		return;
