@@ -1,0 +1,37 @@
+JPEG2000 Translator v1.0
+©2003 by Marcin 'Shard' Konicki
+shard@beosjournal.org
+http://shard.beosjournal.org
+
+TranslationKit add-on for JPEG 2000 files.
+
+It's based on JasPer library (http://www.ece.uvic.ca/~mdadams/jasper/). I used ImageMagick jp2 codec as a kind of tutorial for how to implement library (http://www.imagemagick.org/).
+
+
+A little explanation ("what is what"):
+
+To install translator drag & drop "JPEG2000Translator" file onto "Drag JPEG2000Translator here" folder.
+
+When You run DataTranslations application and go to JPEG2000 translator settings, You'll see 3 tabs:
+- Write
+- Read
+- About
+
+Write tab shows settings used for writing jpeg 2000 files:
+
+Output quality let's You chose how much output image will be similar to original image. Less quality means worse output image. There is a scale from 1 to 100 but from i've seen so far 25-35 is superb quality, more percent only will make output file bigger without any noticable image quality changes.
+
+Write Black&White images as RGB24 tells translator to write B_GRAY1 images as rgb jpeg. If it's turned off, translator will write them as greyscale.
+
+Output only codestream (.jpc) tells translator to write jpeg 2000 codestream to file instead of jp2 structure (jp2, except codestream, also includes color space type for example).
+
+
+Read tab shows settings used for reading jpeg files:
+
+Read Greyscale images as RGB32 makes translator to read greyscale images as they have been color. Most applications on BeOS can't "understand" greyscale images from translation properly (i've tried ShowImage, ViewImage, Gobe Productive 2, NetPositive, and ArtPaint - only NetPositive can understand them).
+
+
+About tab shows info about this translator.
+
+
+Shard
