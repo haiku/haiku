@@ -182,6 +182,8 @@ public:
 	static DeviceManager	gDeviceManager;
 	
 private:
+	status_t 	LoadKeymap();
+
 	bool 			sEventLoopRunning;
 	bool 			sSafeMode;
 	port_id 		sEventPort;
@@ -193,9 +195,9 @@ private:
 	MouseSettings		fMouseSettings;
 
 	key_info		s_key_info;		// current key info
-	key_map			s_key_map;		// current key_map
-	char			*sChars;		// current keymap chars
-	int32			sCharCount;		// current keymap char count
+	key_map			fKeys;			// current key_map
+	char			*fChars;		// current keymap chars
+	uint32			fCharsSize;		// current keymap char count
 	
 	port_id			ISPort;
 	port_id      	EventLooperPort;

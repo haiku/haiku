@@ -49,6 +49,7 @@ BInputServerMethod::BInputServerMethod(const char *name,
  */
 BInputServerMethod::~BInputServerMethod()
 {
+	delete fOwner;
 }
 
 

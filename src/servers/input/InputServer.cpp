@@ -34,6 +34,7 @@
 #include <Debug.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <File.h>
 #include <FindDirectory.h>
 #include <Locker.h>
 #include <Message.h>
@@ -55,6 +56,9 @@ extern "C" void RegisterDevices(input_device_ref** devices)
 {
 	CALLED();
 };
+
+// i don't know the exact signature but this one works
+extern "C" status_t _kget_safemode_option_(char* name, uint8 *p1, uint32 *p2);
 
 
 // Static InputServer member variables.
@@ -87,14 +91,23 @@ int main()
  *  Method: InputServer::InputServer()
  *   Descr: 
  */
-InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE)
+InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
+	sSafeMode(false)
 {
 	CALLED();
 	void *pointer=NULL;
 	
 	EventLoop(pointer);
-
+	
+	uint8 p1;
+	uint32 p2 = 1;
+		
+	if (_kget_safemode_option_("safemode", &p1, &p2) == B_OK)
+		sSafeMode = true;
+	
 	gDeviceManager.LoadState();
+	
+	InitKeyboardMouseStates();
 	
 	fAddOnManager = new AddOnManager();
 	fAddOnManager->LoadState();
@@ -145,15 +158,55 @@ void
 InputServer::InitKeyboardMouseStates(void)
 {
 	CALLED();
-	// This is where we read in the preferences data for the mouse and keyboard as well as
-	// determine the screen resolution from the app_server and find the center of the screen
+	// This is where we determine the screen resolution from the app_server and find the center of the screen
 	// sMousePos is then set to the center of the screen.
 
 	sMousePos.x = 200;
 	sMousePos.y = 200;
 
+	LoadKeymap();
 }
 
+
+status_t
+InputServer::LoadKeymap()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return B_BAD_VALUE;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+
+	status_t err;
+	
+	BFile file(&ref, B_READ_ONLY);
+	if ((err = file.InitCheck()) != B_OK) {
+		printf("error %s\n", strerror(err));
+		return err;
+	}
+	
+	if (file.Read(&fKeys, sizeof(fKeys)) < (ssize_t)sizeof(fKeys)) {
+		return B_BAD_VALUE;
+	}
+	
+	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+	
+	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
+		return B_BAD_VALUE;
+	}
+	
+	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
+	if (!fChars)
+		delete[] fChars;
+	fChars = new char[fCharsSize];
+	err = file.Read(fChars, fCharsSize);
+	
+	return B_OK;
+}
 
 /*
  *  Method: InputServer::QuitRequested()
@@ -203,7 +256,7 @@ InputServer::MessageReceived(BMessage *message)
 	CALLED();
 	
 	BMessage reply;
-	status_t status;
+	status_t status = B_OK;
 	
 	switch(message->what)
 	{
@@ -597,11 +650,11 @@ InputServer::HandleGetSetKeyMap(BMessage *message,
 {
 	status_t status;
 	if (message->what == IS_GET_KEY_MAP) {
-		status = reply->AddData("keymap", B_ANY_TYPE, &s_key_map, sizeof(s_key_map));
+		status = reply->AddData("keymap", B_ANY_TYPE, &fKeys, sizeof(fKeys));
 		if (status == B_OK)
-			status = reply->AddData("key_buffer", B_ANY_TYPE, sChars, sCharCount);
+			status = reply->AddData("key_buffer", B_ANY_TYPE, fChars, fCharsSize);
 	} else {
-		// TODO : reload keymap
+		LoadKeymap();
 		
 		status = ControlDevices(NULL, B_KEYBOARD_DEVICE, B_KEY_MAP_CHANGED, NULL);
 	}
@@ -1361,7 +1414,7 @@ InputServer::SetMousePos(long *,
 bool
 InputServer::SafeMode(void)
 {
-	return true;
+	return sSafeMode;
 }
 
 
