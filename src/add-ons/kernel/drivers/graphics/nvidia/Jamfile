@@ -1,7 +1,7 @@
 SubDir OBOS_TOP src add-ons kernel drivers graphics nvidia ;
 
 UsePrivateHeaders graphics ;
-UsePrivateHeaders graphics nvidia ;
+UsePrivateHeaders [ FDirName graphics nvidia ] ;
 
 R5KernelAddon nv.driver : kernel drivers bin :
 	driver.c
