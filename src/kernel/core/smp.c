@@ -25,6 +25,13 @@
 #include <string.h>
 
 #define DEBUG_SPINLOCKS 1
+#define TRACE_SMP 0
+
+#if TRACE_SMP
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
 #if __INTEL__
   #define PAUSE() asm volatile ("rep; nop;")
@@ -148,7 +155,7 @@ find_free_message(struct smp_msg **msg)
 {
 	int state;
 
-//	dprintf("find_free_message: entry\n");
+	TRACE(("find_free_message: entry\n"));
 
 retry:
 	while (free_msg_count <= 0) 
@@ -170,7 +177,7 @@ retry:
 
 	release_spinlock(&free_msg_spinlock);
 
-//	dprintf("find_free_message: returning msg 0x%x\n", *msg);
+	TRACE(("find_free_message: returning msg %p\n", *msg));
 
 	return state;
 }
@@ -179,7 +186,8 @@ retry:
 static void
 return_free_message(struct smp_msg *msg)
 {
-//	dprintf("return_free_message: returning msg 0x%x\n", msg);
+	TRACE(("return_free_message: returning msg %p\n", msg));
+
 	acquire_spinlock_nocheck(&free_msg_spinlock);
 	msg->next = free_msgs;
 	free_msgs = msg;
@@ -198,7 +206,7 @@ smp_check_for_message(int curr_cpu, int *source_mailbox)
 	if (msg != NULL) {
 		smp_msgs[curr_cpu] = msg->next;
 		release_spinlock(&cpu_msg_spinlock[curr_cpu]);
-//		dprintf(" found msg 0x%x in cpu mailbox\n", msg);
+		TRACE((" found msg %p in cpu mailbox\n", msg));
 		*source_mailbox = MAILBOX_LOCAL;
 	} else {
 		// try getting one from the broadcast mailbox
@@ -220,7 +228,7 @@ smp_check_for_message(int curr_cpu, int *source_mailbox)
 			break;
 		}
 		release_spinlock(&broadcast_msg_spinlock);
-//		dprintf(" found msg 0x%x in broadcast mailbox\n", msg);
+		TRACE((" found msg %p in broadcast mailbox\n", msg));
 	}
 	return msg;
 }
@@ -252,7 +260,7 @@ smp_finish_message_processing(int curr_cpu, struct smp_msg *msg, int source_mail
 
 		acquire_spinlock_nocheck(spinlock);
 
-//		dprintf("cleaning up message 0x%x\n", msg);
+		TRACE(("cleaning up message %p\n", msg));
 
 		if (msg == *mbox) {
 			(*mbox) = msg->next;
@@ -305,7 +313,8 @@ smp_process_pending_ici(int curr_cpu)
 	if (msg == NULL)
 		return retval;
 
-//	dprintf("  message = %d\n", msg->message);
+	TRACE(("  message = %d\n", msg->message));
+
 	switch (msg->message) {
 		case SMP_MSG_INVL_PAGE_RANGE:
 			arch_cpu_invalidate_TLB_range((addr)msg->data, (addr)msg->data2);
@@ -348,11 +357,11 @@ smp_intercpu_int_handler(void)
 	int retval;
 	int curr_cpu = smp_get_current_cpu();
 
-//	dprintf("smp_intercpu_int_handler: entry on cpu %d\n", curr_cpu);
+	TRACE(("smp_intercpu_int_handler: entry on cpu %d\n", curr_cpu));
 
 	retval = smp_process_pending_ici(curr_cpu);
 
-//	dprintf("smp_intercpu_int_handler: done\n");
+	TRACE(("smp_intercpu_int_handler: done\n"));
 
 	return retval;
 }
@@ -363,8 +372,8 @@ smp_send_ici(int target_cpu, int message, uint32 data, uint32 data2, uint32 data
 {
 	struct smp_msg *msg;
 
-//	dprintf("smp_send_ici: target 0x%x, mess 0x%x, data 0x%x, data2 0x%x, data3 0x%x, ptr 0x%x, flags 0x%x\n",
-//		target_cpu, message, data, data2, data3, data_ptr, flags);
+	TRACE(("smp_send_ici: target 0x%x, mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
+		target_cpu, message, data, data2, data3, data_ptr, flags));
 
 	if (ici_enabled) {
 		int state;
@@ -383,8 +392,8 @@ smp_send_ici(int target_cpu, int message, uint32 data, uint32 data2, uint32 data
 		// set up the message
 		msg->message = message;
 		msg->data = data;
-		msg->data = data2;
-		msg->data = data3;
+		msg->data2 = data2;
+		msg->data3 = data3;
 		msg->data_ptr = data_ptr;
 		msg->ref_count = 1;
 		msg->flags = flags;
@@ -421,8 +430,8 @@ smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, voi
 {
 	struct smp_msg *msg;
 
-//	dprintf("smp_send_broadcast_ici: cpu %d mess 0x%x, data 0x%x, data2 0x%x, data3 0x%x, ptr 0x%x, flags 0x%x\n",
-//		smp_get_current_cpu(), message, data, data2, data3, data_ptr, flags);
+	TRACE(("smp_send_broadcast_ici: cpu %d mess 0x%x, data 0x%lx, data2 0x%lx, data3 0x%lx, ptr %p, flags 0x%x\n",
+		smp_get_current_cpu(), message, data, data2, data3, data_ptr, flags));
 
 	if (ici_enabled) {
 		int state;
@@ -443,7 +452,8 @@ smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, voi
 		msg->proc_bitmap = SET_BIT(0, curr_cpu);
 		msg->done = false;
 
-//		dprintf("smp_send_broadcast_ici%d: inserting msg 0x%x into broadcast mbox\n", smp_get_current_cpu(), msg);
+		TRACE(("smp_send_broadcast_ici%d: inserting msg %p into broadcast mbox\n",
+			smp_get_current_cpu(), msg));
 
 		// stick it in the appropriate cpu's mailbox
 		acquire_spinlock_nocheck(&broadcast_msg_spinlock);
@@ -453,18 +463,21 @@ smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, voi
 
 		arch_smp_send_broadcast_ici();
 
-//		dprintf("smp_send_broadcast_ici: sent interrupt\n");
+		TRACE(("smp_send_broadcast_ici: sent interrupt\n"));
 
 		if (flags == SMP_MSG_FLAG_SYNC) {
 			// wait for the other cpus to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
-//			dprintf("smp_send_broadcast_ici: waiting for ack\n");
+			TRACE(("smp_send_broadcast_ici: waiting for ack\n"));
+
 			while (msg->done == false) {
 				smp_process_pending_ici(curr_cpu);
 				PAUSE();
 			}
-//			dprintf("smp_send_broadcast_ici: returning message to free list\n");
+
+			TRACE(("smp_send_broadcast_ici: returning message to free list\n"));
+
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
 			return_free_message(msg);
@@ -472,7 +485,8 @@ smp_send_broadcast_ici(int message, uint32 data, uint32 data2, uint32 data3, voi
 
 		restore_interrupts(state);
 	}
-//	dprintf("smp_send_broadcast_ici: done\n");
+
+	TRACE(("smp_send_broadcast_ici: done\n"));
 }
 
 
@@ -519,7 +533,7 @@ smp_init(kernel_args *ka)
 	struct smp_msg *msg;
 	int i;
 
-	dprintf("smp_init: entry\n");
+	TRACE(("smp_init: entry\n"));
 
 	if (ka->num_cpus > 1) {
 		free_msgs = NULL;
@@ -537,7 +551,8 @@ smp_init(kernel_args *ka)
 		}
 		smp_num_cpus = ka->num_cpus;
 	}
-	dprintf("smp_init: calling arch_smp_init\n");
+	TRACE(("smp_init: calling arch_smp_init\n"));
+
 	return arch_smp_init(ka);
 }
 
