@@ -25,5 +25,8 @@ shutdown(bool reboot)
 status_t
 _user_shutdown(bool reboot)
 {
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
 	return shutdown(reboot);
 }
+

@@ -57,7 +57,7 @@ rtc_hw_to_system(void)
 
 
 bigtime_t
-rtc_system_time_offset(void)
+rtc_boot_time(void)
 {
 	return sRealTimeData->system_time_offset;
 }
@@ -141,7 +141,6 @@ real_time_clock(void)
 bigtime_t
 real_time_clock_usecs(void)
 {
-	// ToDo: implement me - they might be used directly from libroot/os/time.c
 	return sRealTimeData->system_time_offset + system_time();
 }
 
@@ -176,12 +175,12 @@ _user_set_timezone(time_t timezoneOffset, bool daylightSavingTime)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
-	TRACE(("old system_time_offset %Ld\n", sRealTimeData->system_time_offset));
+	TRACE(("old system_time_offset %Ld old %Ld new %Ld gmt %d\n", sRealTimeData->system_time_offset, sTimezoneOffset, offset, sIsGMT));
 
 	// We only need to update our time offset if the hardware clock
 	// does not run in the local timezone.
 	// Since this is shared data, we need to update it atomically.
-	if (sIsGMT)
+	if (!sIsGMT)
 		atomic_add64(&sRealTimeData->system_time_offset, sTimezoneOffset - offset);
 
 	sTimezoneOffset = offset;

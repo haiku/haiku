@@ -38,7 +38,7 @@ _get_system_info(system_info *info, size_t size)
 	// - max_teams
 	// - used_teams
 
-	info->boot_time = rtc_system_time_offset();
+	info->boot_time = rtc_boot_time();
 	info->cpu_count = smp_get_num_cpus();
 	info->used_ports = port_used_ports();
 	info->max_ports = port_max_ports();
