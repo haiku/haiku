@@ -10,9 +10,10 @@
 #include <new>
 #include <stdlib.h>
 
+#if _KERNEL_MODE
 
 using namespace std;
-
+extern const nothrow_t std::nothrow;
 
 // Oh no! C++ in the kernel! Are you nuts?
 //
@@ -72,5 +73,6 @@ operator delete[](void *ptr) throw ()
 // we're using virtuals
 extern "C" void __pure_virtual();
 
+#endif	// #if _KERNEL_MODE
 
 #endif	/* CPP_H */
