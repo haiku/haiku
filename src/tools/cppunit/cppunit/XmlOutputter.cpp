@@ -108,7 +108,7 @@ std::string
 XmlOutputter::Node::escape( std::string value ) const
 {
   std::string escaped;
-  for ( int index =0; index < value.length(); ++index )
+  for ( int index =0; index < (int)value.length(); ++index )
   {
     char c = value[index ];
     switch ( c )    // escape all predefined XML entity (safe?)
@@ -229,7 +229,7 @@ XmlOutputter::addFailedTests( FailedTests &failedTests,
   rootNode->addNode( testsNode );
 
   const TestResultCollector::Tests &tests = m_result->tests();
-  for ( int testNumber = 0; testNumber < tests.size(); ++testNumber )
+  for ( int testNumber = 0; testNumber < (int)tests.size(); ++testNumber )
   {
     Test *test = tests[testNumber];
     if ( failedTests.find( test ) != failedTests.end() )
@@ -246,7 +246,7 @@ XmlOutputter::addSucessfulTests( FailedTests &failedTests,
   rootNode->addNode( testsNode );
 
   const TestResultCollector::Tests &tests = m_result->tests();
-  for ( int testNumber = 0; testNumber < tests.size(); ++testNumber )
+  for ( int testNumber = 0; testNumber < (int)tests.size(); ++testNumber )
   {
     Test *test = tests[testNumber];
     if ( failedTests.find( test ) == failedTests.end() )

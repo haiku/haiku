@@ -163,12 +163,12 @@ CompilerOutputter::wrap( std::string message )
     std::string line( *it );
     const int maxLineLength = 80;
     int index =0;
-    while ( index < line.length() )
+    while ( index < (int)line.length() )
     {
       std::string line( line.substr( index, maxLineLength ) );
       wrapped += line;
       index += maxLineLength;
-      if ( index < line.length() )
+      if ( index < (int)line.length() )
         wrapped += "\n";
     }
     wrapped += '\n';

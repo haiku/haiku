@@ -237,11 +237,13 @@ status_t BMessageBody::Flatten(BDataIO* stream) const
 status_t BMessageBody::Unflatten(const char* flat_buffer)
 {
 	// TODO: implement
+	return B_ERROR;
 }
 //------------------------------------------------------------------------------
 status_t BMessageBody::Unflatten(BDataIO* stream)
 {
 	// TODO: implement
+	return B_ERROR;
 }
 //------------------------------------------------------------------------------
 status_t BMessageBody::AddData(const char* name, type_code type,

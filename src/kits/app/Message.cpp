@@ -199,6 +199,7 @@ BMessage& BMessage::operator=(const BMessage& msg)
 	fHasSpecifiers = msg.fHasSpecifiers;
 
 	*fBody = *(msg.fBody);
+	return *this;
 }
 //------------------------------------------------------------------------------
 void BMessage::init_data()
@@ -1925,7 +1926,7 @@ static status_t handle_reply(port_id   reply_port,
 		return err;
 	}
 
-	if (*pCode = 'PUSH')
+	if (*pCode == 'PUSH')
 	{
 		return B_ERROR;
 	}

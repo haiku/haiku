@@ -20,8 +20,8 @@ const char BTestShell::indent[] = "  ";
 
 BTestShell::BTestShell(const std::string &description, SyncObject *syncObject)
 	: fVerbosityLevel(v2)
-	, fDescription(description)
 	, fTestResults(syncObject)
+	, fDescription(description)
 	, fListTestsAndExit(false)
 	, fTestDir(NULL)
 {
@@ -42,7 +42,6 @@ BTestShell::AddSuite(BTestSuite *suite) {
 		fSuites[suite->getName()] = suite;
 		
 		// Add its tests
-		bool first = true;
 		const TestMap &map = suite->getTests();
 		for (TestMap::const_iterator i = map.begin();
 			   i != map.end();
@@ -378,7 +377,7 @@ BTestShell::LoadDynamicSuites() {
 		BDirectory libDir((*i).c_str());
 		if (Verbosity() >= v3) 
 			cout << "Checking " << *i << endl;
-		int count = LoadSuitesFrom(&libDir);
+/*		int count =*/ LoadSuitesFrom(&libDir);
 		if (Verbosity() >= v3) {			
 //			cout << "Loaded " << count << " suite" << (count == 1 ? "" : "s");
 //			cout << " from " << *i << endl;

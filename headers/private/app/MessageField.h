@@ -66,8 +66,9 @@ class BMessageField
 		static const char*			sNullData;
 
 		BMessageField(const std::string& name, type_code t)
-			:	fName(name), fType(t)
+			:	fType(t), fName(name)
 		{;}
+		virtual ~BMessageField() {}
 		virtual const std::string&	Name() const { return fName; }
 		virtual type_code			Type() const { return fType; }
 		virtual bool				FixedSize() const { return true; }
@@ -169,6 +170,7 @@ class BMessageFieldImpl : public BMessageField
 				fMaxSize(0),
 				fFlags(MSG_FLAG_ALL)
 		{;}
+		virtual ~BMessageFieldImpl() {}
 
 		virtual bool		FixedSize() const
 			{ return fFlags & MSG_FLAG_FIXED_SIZE; }
@@ -397,7 +399,7 @@ template<> struct BMessageFieldPrintPolicy<float>
 };
 template<> struct BMessageFieldPrintPolicy<double>
 {
-	static void PrintData(const double& d) { std::printf("%.8lf", d); }
+	static void PrintData(const double& d) { std::printf("%.8f", d); }
 };
 template<> struct BMessageFieldPrintPolicy<BString>
 {

@@ -14,10 +14,10 @@ namespace TextUi {
  * \param outputter used to print text result. Owned by the runner.
  */
 TestRunner::TestRunner( Outputter *outputter ) 
-    : m_outputter( outputter )
-    , m_suite( new TestSuite( "All Tests" ) )
+    : m_suite( new TestSuite( "All Tests" ) )
     , m_result( new TestResultCollector() )
     , m_eventManager( new TestResult() )
+    , m_outputter( outputter )
 {
   if ( !m_outputter )
     m_outputter = new TextOutputter( m_result, std::cout );

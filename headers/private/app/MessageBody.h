@@ -215,7 +215,7 @@ status_t BMessageBody::ReplaceData(const char *name, int32 index,
 		{
 			debugger("\n\n\tyou \033[44;1;37mB\033[41;1;37me\033[m screwed\n\n");
 		}
-		if (index < RItem->Data().Size())
+		if (index < (int32)RItem->Data().Size())
 		{
 			RItem->Data()[index] = data;
 		}
