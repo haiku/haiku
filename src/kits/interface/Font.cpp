@@ -1,6 +1,6 @@
 #include <Rect.h>
 #include <stdio.h>
-#include "BFont.h"
+#include "Font.h"
 
 class BFontPrivate
 {
