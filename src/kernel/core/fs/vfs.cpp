@@ -1,10 +1,10 @@
 /* 
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* Virtual File System and File System Interface Layer */
 
@@ -2217,7 +2217,7 @@ vfs_bootstrap_file_systems(void)
 
 
 status_t
-vfs_mount_boot_file_system()
+vfs_mount_boot_file_system(kernel_args *args)
 {
 	// make the boot partition (and probably others) available
 	KDiskDeviceManager::CreateDefault();
@@ -2238,11 +2238,40 @@ vfs_mount_boot_file_system()
 	if ((bootfs = get_file_system("bootfs")) == NULL) {
 		// no bootfs there, yet
 
-		// ToDo: do this for real!
-		status_t status = _kern_mount("/boot", "/dev/disk/scsi/0/0/0/raw",
-			"bfs", 0, NULL);
-		if (status < B_OK)
-			panic("could not get boot device: %s!\n", strerror(status));
+		// ToDo: do this for real! It will currently only use the partition offset;
+		//	it does not yet use the disk_identifier information.
+		//	It does also only search the first level.
+
+		KPartition *bootPartition = NULL;
+
+		KDiskDevice *device;
+		int32 cookie = 0;
+		while ((device = manager->NextDevice(&cookie)) != NULL) {
+			if (device->ContainsFileSystem()
+				&& device->Offset() == args->boot_disk.partition_offset) {
+				bootPartition = device;
+				break;
+			}
+
+			for (int32 i = device->CountChildren(); i-- > 0; ) {
+				KPartition *partition = device->ChildAt(i);
+
+				if (partition->Offset() == args->boot_disk.partition_offset
+					&& partition->ContainsFileSystem()) {
+					bootPartition = partition;
+					break;
+				}
+			}
+
+			if (bootPartition != NULL)
+				break;
+		}
+
+		KPath path;
+		if (bootPartition == NULL
+			|| bootPartition->GetPath(&path) != B_OK
+			|| _kern_mount("/boot", path.Path(), "bfs", 0, NULL) < B_OK)
+			panic("could not get boot device!\n");
 	} else
 		put_file_system(bootfs);
 
