@@ -69,12 +69,6 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 
 	// web links
 	if (settings->FindBool("create_web_links", &fCreateLinks) != B_OK) fCreateLinks = false;
-/*
-	cb = new BCheckBox(BRect(x, y, x+w-10, y+14), "create_links", "Create links for URLs", new BMessage(CREATE_LINKS_MSG));
-	panel->AddChild(cb);
-	cb->SetValue(fCreateLinks ? B_CONTROL_ON : B_CONTROL_OFF);
-	y += cb->Bounds().Height() + 5;
-*/
 
 	BMenuItem* item;
 	if (settings->FindFloat("link_border_width", &fLinkBorderWidth)) fLinkBorderWidth = 1;
@@ -99,12 +93,6 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	// bookmarks
 
 	if (settings->FindBool("create_bookmarks", &fCreateBookmarks) != B_OK) fCreateBookmarks = false;
-/*
-	cb = new BCheckBox(BRect(x, y, x+w-10, y+14), "create_bookmarks", "Create bookmarks", new BMessage(CREATE_BOOKMARKS_MSG));
-	cb->SetValue(fCreateBookmarks ? B_CONTROL_ON : B_CONTROL_OFF);
-	panel->AddChild(cb);
-	y += cb->Bounds().Height() + 5;
-*/
 
 	m = new BPopUpMenu("definition");
 	m->SetRadioMode(true);
@@ -134,12 +122,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 
 	// cross references
 	if (settings->FindBool("create_xrefs", &fCreateXRefs) != B_OK) fCreateXRefs = false;
-/*
-	cb = new BCheckBox(BRect(x, y, x+w-10, y+14), "create_xrefs", "Create cross references", new BMessage(CREATE_XREFS_MSG));
-	cb->SetValue(fCreateXRefs ? B_CONTROL_ON : B_CONTROL_OFF);
-	panel->AddChild(cb);
-	y += cb->Bounds().Height() + 5;
-*/
+
 	m = new BPopUpMenu("cross references");
 	m->SetRadioMode(true);
 	mf = new BMenuField(BRect(x, y, x+w-10, y+14), "xrefs_menu", "Cross References File:", m);
