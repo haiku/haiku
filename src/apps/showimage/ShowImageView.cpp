@@ -1925,9 +1925,7 @@ ShowImageView::SetTrackerSelectionToCurrent()
 bool
 ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, bool rewind)
 {
-	// shamelessly stolen, I mean copied from BeMail!
-	// XXX rewind is not implemented yet => slide show will stop with last image
-
+	// Based on similar function from BeMail!
 	if (!fTrackerMessenger.IsValid())
 		return false;
 
@@ -1937,32 +1935,37 @@ ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *ref, bool next, b
 	//	image is found.
 	//
 	entry_ref nextRef = *in_current;
-	bool foundRef = false;
+	bool foundRef = false;	
 	while (!foundRef)
 	{
 		BMessage request(B_GET_PROPERTY);
 		BMessage spc;
-		if (next)
+		if (rewind)
+			spc.what = B_DIRECT_SPECIFIER;
+		else if (next)
 			spc.what = 'snxt';
 		else
 			spc.what = 'sprv';
-
 		spc.AddString("property", "Entry");
-		spc.AddRef("data", &nextRef);
-
+		if (rewind)
+			// if rewinding, ask for the ref to the
+			// first item in the directory
+			spc.AddInt32("data", 0);
+		else
+			spc.AddRef("data", &nextRef);
 		request.AddSpecifier(&spc);
+		
 		BMessage reply;
-		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK) {
+		if (fTrackerMessenger.SendMessage(&request, &reply) != B_OK)
 			return false;
-		}
-		
-		if (reply.FindRef("result", &nextRef) != B_OK) {
+		if (reply.FindRef("result", &nextRef) != B_OK)
 			return false;
-		}
-		
-		if (IsImage(&nextRef)) {
+			
+		if (IsImage(&nextRef))
 			foundRef = true;
-		}
+		
+		rewind = false;
+			// stop asking for the first ref in the directory
 	}
 
 	*ref = nextRef;
