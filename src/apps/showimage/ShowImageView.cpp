@@ -1033,14 +1033,15 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 void
 ShowImageView::MouseWheelChanged(BMessage *msg)
 {
+	const float kscrollBy = 40;
 	float dy, dx;
 	float x, y;
 	x = 0; y = 0; 
 	if (msg->FindFloat("be:wheel_delta_x", &dx) == B_OK) {
-		x = dx > 0 ? 20 : -20;
+		x = dx * kscrollBy;
 	}
 	if (msg->FindFloat("be:wheel_delta_y", &dy) == B_OK) {
-		y = dy > 0 ? 20 : -20;
+		y = dy * kscrollBy;
 	}
 	ScrollRestrictedBy(x, y);
 }
