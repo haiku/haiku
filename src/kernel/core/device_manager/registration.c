@@ -98,7 +98,7 @@ is_device_redetected(pnp_node_info *node, pnp_node_info *parent, bool *redetecte
 	{
 		char *connection, *device_identifier;
 
-		// get connection and devide id of us...
+		// get our connection and device id...
 		if (pnp_expand_pattern_attr(node, PNP_DRIVER_CONNECTION, &connection) != B_OK)
 			connection = strdup("");
 

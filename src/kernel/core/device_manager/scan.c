@@ -17,7 +17,6 @@
 
 
 #include "device_manager_private.h"
-#include "pnp_bus.h"
 
 #include <KernelExport.h>
 #include <string.h>

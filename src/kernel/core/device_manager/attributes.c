@@ -11,7 +11,6 @@
 
 #include "device_manager_private.h"
 #include "dl_list.h"
-#include <pnp_bus.h>
 
 #include <TypeConstants.h>
 

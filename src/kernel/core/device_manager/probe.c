@@ -78,7 +78,9 @@ status_t notify_probe_by_file(pnp_node_info *node, const char *consumer_name)
 		goto err;
 	}
 
-	module_name = pnp_boot_safe_realpath(consumer_name, resolved_path);
+	// ToDo: do something about this; realpath() doesn't exist in the kernel!
+	//module_name = pnp_boot_safe_realpath(consumer_name, resolved_path);
+	module_name = NULL;
 	if (module_name == NULL) {
 		// broken link or something
 		dprintf("Cannot resolve driver file name: %s\n", consumer_name);

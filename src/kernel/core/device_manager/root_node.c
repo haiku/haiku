@@ -55,7 +55,7 @@ pnp_root_init_root(void)
 		{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_ROOT_MODULE_NAME }},
 		{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: PNP_ROOT_TYPE_NAME }},
 
-		// well - connection is actually pointless as there is on other root node
+		// well - connection is actually pointless as there is no other root node
 		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "pnp_root" }},
 		{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "pnp_root" }},
 
