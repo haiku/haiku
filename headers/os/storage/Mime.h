@@ -41,6 +41,15 @@ enum icon_size {
 }
 #endif
 
+// OpenBeOS only!
+#ifdef __cplusplus
+
+class BBitmap;
+
+status_t get_device_icon(const char *dev, BBitmap *icon, icon_size which);
+
+#endif
+
 // include the C++ API
 #ifdef __cplusplus
 #include <MimeType.h>
