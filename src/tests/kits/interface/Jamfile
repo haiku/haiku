@@ -2,6 +2,7 @@ SubDir OBOS_TOP src tests kits interface ;
 
 # Let Jam know where to find some of our source files
 SEARCH_SOURCE += [ FDirName $(SUBDIR) bbitmap ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bdeskbar ] ;
 
 UsePublicHeaders interface support ;
 SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
@@ -14,6 +15,10 @@ CommonTestLib libinterfacetest.so
 		BitmapTest.cpp
 		BBitmapTester.cpp
 		SetBitsTester.cpp
+
+		# BDeskbar
+		DeskbarTest.cpp
+		DeskbarGetItemTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4

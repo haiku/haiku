@@ -3,12 +3,14 @@
 
 // ##### Include headers for your tests here #####
 #include "bbitmap/BitmapTest.h"
+#include "bdeskbar/DeskbarTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Interface");
 
 	// ##### Add test suites here #####
 	suite->addTest("BBitmap", BitmapTestSuite());
+	suite->addTest("BDeskbar", DeskbarTestSuite());
 	
 	return suite;
 }
