@@ -36,7 +36,7 @@
  * Shared functions for accessing and configuring the MAC
  */
 
-#include <dev/em/if_em_hw.h>
+#include "if_em_hw.h"
 
 static int32_t em_set_phy_type(struct em_hw *hw);
 static void em_phy_init_script(struct em_hw *hw);
@@ -2112,7 +2112,8 @@ em_check_for_link(struct em_hw *hw)
     else if((hw->media_type == em_media_type_internal_serdes) &&
             !(E1000_TXCW_ANE & E1000_READ_REG(hw, TXCW))) {
         /* SYNCH bit and IV bit are sticky. */
-        usec_delay(10);
+//        usec_delay(10);
+		spin(10);
         if(E1000_RXCW_SYNCH & E1000_READ_REG(hw, RXCW)) {
             if(!(rxcw & E1000_RXCW_IV)) {
                 hw->serdes_link_down = FALSE;
@@ -2243,7 +2244,8 @@ em_raise_mdi_clk(struct em_hw *hw,
      */
     E1000_WRITE_REG(hw, CTRL, (*ctrl | E1000_CTRL_MDC));
     E1000_WRITE_FLUSH(hw);
-    usec_delay(10);
+//    usec_delay(10);
+	spin(10);
 }
 
 /******************************************************************************
@@ -2261,7 +2263,8 @@ em_lower_mdi_clk(struct em_hw *hw,
      */
     E1000_WRITE_REG(hw, CTRL, (*ctrl & ~E1000_CTRL_MDC));
     E1000_WRITE_FLUSH(hw);
-    usec_delay(10);
+//    usec_delay(10);
+	spin(10);
 }
 
 /******************************************************************************
@@ -2305,7 +2308,8 @@ em_shift_out_mdi_bits(struct em_hw *hw,
         E1000_WRITE_REG(hw, CTRL, ctrl);
         E1000_WRITE_FLUSH(hw);
 
-        usec_delay(10);
+        //usec_delay(10);
+        spin(10);
 
         em_raise_mdi_clk(hw, &ctrl);
         em_lower_mdi_clk(hw, &ctrl);
@@ -2423,7 +2427,8 @@ em_read_phy_reg_ex(struct em_hw *hw,
 
         /* Poll the ready bit to see if the MDI read completed */
         for(i = 0; i < 64; i++) {
-            usec_delay(50);
+//            usec_delay(50);
+			spin(50);
             mdic = E1000_READ_REG(hw, MDIC);
             if(mdic & E1000_MDIC_READY) break;
         }
@@ -2527,7 +2532,8 @@ em_write_phy_reg_ex(struct em_hw *hw,
 
         /* Poll the ready bit to see if the MDI read completed */
         for(i = 0; i < 640; i++) {
-            usec_delay(5);
+//            usec_delay(5);
+			spin(5);
             mdic = E1000_READ_REG(hw, MDIC);
             if(mdic & E1000_MDIC_READY) break;
         }

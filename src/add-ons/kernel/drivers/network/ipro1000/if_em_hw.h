@@ -39,7 +39,7 @@
 #ifndef _EM_HW_H_
 #define _EM_HW_H_
 
-#include <dev/em/if_em_osdep.h>
+#include "if_em_osdep.h"
 
 
 /* Forward declarations of structures used by the shared code */
