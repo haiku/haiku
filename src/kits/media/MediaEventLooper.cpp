@@ -222,14 +222,12 @@ BMediaEventLooper::ControlLoop()
 			// only the scheduling latency). 
 
 			latency = fEventLatency + fSchedulingLatency;
-//			printf("node %02d, latency %Ld\n", ID(), latency);
-
 			if (fEventQueue.HasEvents() && (TimeSource()->Now() - latency) >= fEventQueue.FirstEventTime()) {
 //				printf("node %02d waiting for %12Ld that has already happened, now %12Ld\n", ID(), fEventQueue.FirstEventTime(), system_time());
 				is_realtime = false;
 				break;
 			}
-			if (fRealTimeQueue.HasEvents() && (TimeSource()->RealTimeFor(TimeSource()->Now(),fSchedulingLatency)) >= fRealTimeQueue.FirstEventTime()) {
+			if (fRealTimeQueue.HasEvents() && (TimeSource()->RealTime() - fSchedulingLatency) >= fRealTimeQueue.FirstEventTime()) {
 				latency = fSchedulingLatency;
 				is_realtime = true;
 				break;
