@@ -338,6 +338,7 @@ static void udp_init(void)
 	udb.inp_prev = udb.inp_next = &udb;
 	udp_sendspace = 9216; /* default size */
 	udp_recvspace = 41600; /* default size */
+	udp_in.sin_family = AF_INET;
 	udp_in.sin_len = sizeof(udp_in);
 	memset(&udpstat, 0, sizeof(udpstat));
 		
