@@ -83,12 +83,12 @@ CheckPlain(translator_info *pti)
 
 void
 IdentifyTests(STXTTranslatorTest *ptest, BTranslatorRoster *proster,
-	const char **paths, bool bplain)
+	const char **paths, int32 len, bool bplain)
 {
 	translator_info ti;
 	printf(" [%d] ", (int) bplain);
 	
-	for (int32 i = 0; i < sizeof(paths) / sizeof(const char *); i++) {
+	for (int32 i = 0; i < len; i++) {
 		ptest->NextSubTest();
 		BFile file;
 		printf(" [%s] ", paths[i]);
@@ -182,7 +182,7 @@ STXTTranslatorTest::IdentifyTest()
 		"../src/tests/kits/translation/data/text/one_length.txt",
 		"../src/tests/kits/translation/data/text/sentence.txt",
 		"../src/tests/kits/translation/data/text/symbols.txt",
-		"../src/tests/kits/translation/data/text/zero_length.txt",
+		"../src/tests/kits/translation/data/text/zero_length.txt"
 	};
 	const char *aStyledFiles[] = {
 		"../src/tests/kits/translation/data/text/ascii.stxt",
@@ -192,9 +192,12 @@ STXTTranslatorTest::IdentifyTest()
 		"../src/tests/kits/translation/data/text/sentence.stxt",
 		"../src/tests/kits/translation/data/text/symbols.stxt",
 		"../src/tests/kits/translation/data/text/zero_length.stxt",
+		"../src/tests/kits/translation/data/text/zero_length_styl.stxt"
 	};
-	IdentifyTests(this, proster, aPlainFiles, true);
-	IdentifyTests(this, proster, aStyledFiles, false);
+	IdentifyTests(this, proster, aPlainFiles,
+		sizeof(aPlainFiles) / sizeof(const char *), true);
+	IdentifyTests(this, proster, aStyledFiles,
+		sizeof(aStyledFiles) / sizeof(const char *), false);
 }
 
 void
