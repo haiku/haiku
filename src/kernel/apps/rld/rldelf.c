@@ -504,27 +504,23 @@ map_image(int fd, char const *path, image_t *image, bool fixed)
 				 * but only the first segment gets a free ride
 				 */
 				load_address = 0;
-				addr_specifier = REGION_ADDR_ANY_ADDRESS;
+				addr_specifier = B_ANY_ADDRESS;
 			} else {
 				load_address = image->regions[i].vmstart + image->regions[i-1].delta;
-				addr_specifier = REGION_ADDR_EXACT_ADDRESS;
+				addr_specifier = B_EXACT_ADDRESS;
 			}
 		} else {
 			/*
 			 * not relocatable, put it where it asks or die trying
 			 */
 			load_address = image->regions[i].vmstart;
-			addr_specifier = REGION_ADDR_EXACT_ADDRESS;
+			addr_specifier = B_EXACT_ADDRESS;
 		}
 
 		if (image->regions[i].flags & RFLAG_ANON) {
-			image->regions[i].id = sys_vm_create_anonymous_region(
-				region_name,
-				(void **)&load_address,
-				addr_specifier,
-				image->regions[i].vmsize,
-				REGION_WIRING_LAZY,
-				LOCK_RW);
+			image->regions[i].id = _kern_create_area(region_name, (void **)&load_address,
+				addr_specifier, image->regions[i].vmsize, B_NO_LOCK,
+				B_READ_AREA | B_WRITE_AREA);
 
 			if (image->regions[i].id < 0)
 				goto error;
@@ -582,7 +578,7 @@ unmap_image(image_t *image)
 	unsigned i;
 
 	for (i = 0; i < image->num_regions; i++) {
-		sys_vm_delete_region(image->regions[i].id);
+		_kern_delete_area(image->regions[i].id);
 
 		image->regions[i].id = -1;
 	}

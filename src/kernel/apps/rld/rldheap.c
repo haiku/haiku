@@ -35,13 +35,9 @@ static char      *rld_ptr;
 void
 rldheap_init(void)
 {
-	rld_region = sys_vm_create_anonymous_region(
-		(char *)names[sys_get_current_team_id() % (sizeof(names) / sizeof(names[0]))],
-		(void **)&rld_base,
-		REGION_ADDR_ANY_ADDRESS,
-		RLD_SCRATCH_SIZE,
-		REGION_WIRING_LAZY,
-		LOCK_RW);
+	rld_region = _kern_create_area((char *)names[sys_get_current_team_id() % (sizeof(names) / sizeof(names[0]))],
+		(void **)&rld_base, B_ANY_ADDRESS, RLD_SCRATCH_SIZE,
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
 	/*
 	 * Fill in the gap upto RLD_PROGRAM_BASE,
@@ -51,12 +47,9 @@ rldheap_init(void)
 	 * Not doing these leads to some funny troubles with some
 	 * libraries.
 	 */
-	rld_region_2 = sys_vm_create_anonymous_region("RLD_padding",
-		(void **)&rld_base_2,
-		REGION_ADDR_ANY_ADDRESS,
-		RLD_PROGRAM_BASE - (uint32)(rld_base + RLD_SCRATCH_SIZE),
-		REGION_WIRING_LAZY,
-		LOCK_RW);
+	rld_region_2 = _kern_create_area("RLD_padding", (void **)&rld_base_2,
+		B_ANY_ADDRESS, RLD_PROGRAM_BASE - (uint32)(rld_base + RLD_SCRATCH_SIZE),
+		B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 
 	rld_ptr = rld_base;
 }

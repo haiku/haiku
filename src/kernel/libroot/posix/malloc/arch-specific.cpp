@@ -78,12 +78,13 @@ int hoardGetNumProcessors (void)
 static region_id heap_region = -1;
 static addr brk;
 
-int __heap_init()
+int
+__heap_init()
 {
 	// XXX do something better here
-	if(heap_region < 0) {
-		heap_region = sys_vm_create_anonymous_region("heap", (void **)&brk,
-			REGION_ADDR_ANY_ADDRESS, 4*1024*1024, REGION_WIRING_LAZY, LOCK_RW);
+	if (heap_region < 0) {
+		heap_region = create_area("heap", (void **)&brk,
+			B_ANY_ADDRESS, 4*1024*1024, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	}
 	return 0;
 }
