@@ -1,12 +1,12 @@
-/* Semaphore code. Lots of "todo" items */
-
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+/* Semaphore code */
 
 #include <OS.h>
 
@@ -282,13 +282,6 @@ create_sem(int32 count, const char *name)
 status_t
 delete_sem(sem_id id)
 {
-	return delete_sem_etc(id, 0, false);
-}
-
-
-status_t
-delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
-{
 	int slot;
 	int state;
 	struct thread *t;
@@ -319,8 +312,7 @@ delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
 	// free any threads waiting for this semaphore
 	while ((t = thread_dequeue(&gSems[slot].u.used.q)) != NULL) {
 		t->state = B_THREAD_READY;
-		t->sem_errcode = interrupted ? B_INTERRUPTED : B_BAD_SEM_ID;
-		t->sem_deleted_retcode = return_code;
+		t->sem_errcode = B_BAD_SEM_ID;
 		t->sem_count = 0;
 		thread_enqueue(t, &release_queue);
 		released_threads++;
@@ -464,7 +456,6 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		t->sem_acquire_count = count;
 		t->sem_count = min(-gSems[slot].u.used.count, count);
 			// store the count we need to restore upon release
-		t->sem_deleted_retcode = 0;
 		t->sem_errcode = B_NO_ERROR;
 		thread_enqueue(t, &gSems[slot].u.used.q);
 
@@ -584,7 +575,6 @@ release_sem_etc(sem_id id, int32 count, uint32 flags)
 				t->state = B_THREAD_READY;
 				released_threads++;
 				t->sem_count = 0;
-				t->sem_deleted_retcode = 0;
 			}
 		}
 
@@ -961,13 +951,6 @@ status_t
 _user_delete_sem(sem_id id)
 {
 	return delete_sem(id);
-}
-
-
-status_t
-_user_delete_sem_etc(sem_id id, status_t return_code, bool interrupted)
-{
-	return delete_sem_etc(id, return_code, interrupted);
 }
 
 
