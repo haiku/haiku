@@ -8,6 +8,7 @@ INTERFACE_KIT_SOURCE =
 	Control.cpp
 	Deskbar.cpp
 	Font.cpp
+	Picture.cpp
 	PictureButton.cpp
 	Point.cpp
 	Polygon.cpp
@@ -18,6 +19,7 @@ INTERFACE_KIT_SOURCE =
 	StringView.cpp
 	TextControl.cpp
 	TextInput.cpp
+	TPicture.cpp
 	View.cpp
 	Window.cpp
 
