@@ -146,7 +146,7 @@ void Desktop::InitMode(void)
 		
 		RootLayer	*rl = new RootLayer(name, 4, this, GetDisplayDriver());
 		rl->SetScreens(screens, 1, 1);
-		rl->RebuildFullRegion();
+		rl->RunThread();
 		
 		fRootLayerList.AddItem(rl);
 	}
@@ -188,9 +188,6 @@ void Desktop::SetActiveRootLayer(RootLayer* rl)
 		return;
 
 	fActiveRootLayer	= rl;
-	
-	// TODO: hide mouse in the old ActiveRootLayer & show it in the new ActiveRootLayer
-	fActiveRootLayer->FullInvalidate(fActiveRootLayer->Bounds());
 }
 
 RootLayer* Desktop::ActiveRootLayer(void) const
