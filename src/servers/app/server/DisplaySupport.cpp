@@ -7,6 +7,7 @@ BezierCurve::BezierCurve(BPoint* pts)
 	pointArray = NULL;
 	for (i=0; i<4; i++)
 		points.AddItem(new BPoint(pts[i]));
+	GenerateFrame(pts);
 	GeneratePoints(0);
 }
 
@@ -33,6 +34,25 @@ BPoint* BezierCurve::GetPointArray()
 			pointArray[i] = *((BPoint*)points.ItemAt(i));
 	}
 	return pointArray;
+}
+
+void BezierCurve::GenerateFrame(BPoint *pts)
+{
+	// shamelessly stolen from Marc's BPolygon code and tweaked to fit. :P
+	
+	fFrame = BRect(pointArray[0], pointArray[0]);
+
+	for (int32 i = 1; i < 4; i++)
+	{
+		if (pts[i].x < fFrame.left)
+			fFrame.left = pts[i].x;
+		if (pts[i].y < fFrame.top)
+			fFrame.top = pts[i].y;
+		if (pts[i].x > fFrame.right)
+			fFrame.right = pts[i].x;
+		if (pts[i].y > fFrame.bottom)
+			fFrame.bottom = pts[i].y;
+	}
 }
 
 int BezierCurve::GeneratePoints(int startPos)

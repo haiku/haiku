@@ -1854,9 +1854,7 @@ void ServerWindow::DispatchMessage(int32 code)
 				for(int i=0;i<3;i++)
 					pts[i]=cl->ConvertToTop(pts[i]);
 				
-				// TODO: modify DisplayDriver::StrokeTriangle to utilize a boundary BRect
-				desktop->GetDisplayDriver()->StrokeTriangle(pts,cl->fLayerData);
-//				desktop->GetDisplayDriver()->StrokeTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
+				desktop->GetDisplayDriver()->StrokeTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
 			}
 			break;
 		}
@@ -1876,10 +1874,172 @@ void ServerWindow::DispatchMessage(int32 code)
 				for(int i=0;i<3;i++)
 					pts[i]=cl->ConvertToTop(pts[i]);
 				
-				// TODO: modify DisplayDriver::FillTriangle to utilize a boundary BRect
-				desktop->GetDisplayDriver()->FillTriangle(pts,cl->fLayerData);
-//				desktop->GetDisplayDriver()->FillTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
+				desktop->GetDisplayDriver()->FillTriangle(pts,cl->ConvertToTop(rect),cl->fLayerData);
 			}
+			break;
+		}
+		case AS_STROKE_POLYGON:
+		{
+			BRect polyframe;
+			bool isclosed;
+			int32 pointcount;
+			BPoint *pointlist;
+			
+			fSession->Read<BRect>(&polyframe);
+			fSession->Read<bool>(&isclosed);
+			fSession->Read<int32>(&pointcount);
+			
+			pointlist=new BPoint[pointcount];
+			
+			for(int32 i=0; i<pointcount; i++)
+				pointlist[i]=cl->ConvertToTop(pointlist[i]);
+			
+			// TODO: modify DisplayDriver::StrokePolygon to utilize a boundary BRect
+			desktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,
+					cl->fLayerData,isclosed);
+			
+			delete [] pointlist;
+			
+			break;
+		}
+		case AS_FILL_POLYGON:
+		{
+			BRect polyframe;
+			bool isclosed;
+			int32 pointcount;
+			BPoint *pointlist;
+			
+			fSession->Read<BRect>(&polyframe);
+			fSession->Read<bool>(&isclosed);
+			fSession->Read<int32>(&pointcount);
+			
+			pointlist=new BPoint[pointcount];
+			
+			fSession->Read(pointlist, sizeof(BPoint)*pointcount);
+			
+			for(int32 i=0; i<pointcount; i++)
+				pointlist[i]=cl->ConvertToTop(pointlist[i]);
+			
+			// TODO: modify DisplayDriver::FillPolygon to utilize a boundary BRect
+			desktop->GetDisplayDriver()->StrokePolygon(pointlist,pointcount,polyframe,cl->fLayerData);
+			
+			delete [] pointlist;
+			
+			break;
+		}
+		case AS_STROKE_SHAPE:
+		{
+			BRect shaperect;
+			int32 opcount;
+			int32 ptcount;
+			int32 *oplist;
+			BPoint *ptlist;
+			
+			fSession->Read<BRect>(&shaperect);
+			fSession->Read<int32>(&opcount);
+			fSession->Read<int32>(&ptcount);
+			
+			oplist=new int32[opcount];
+			ptlist=new BPoint[ptcount];
+			
+			fSession->Read(oplist,sizeof(int32)*opcount);
+			fSession->Read(ptlist,sizeof(BPoint)*ptcount);
+			
+			for(int32 i=0; i<ptcount; i++)
+				ptlist[i]=cl->ConvertToTop(ptlist[i]);
+			
+			desktop->GetDisplayDriver()->StrokeShape(shaperect, opcount, oplist, ptcount, ptlist, cl->fLayerData);
+			delete oplist;
+			delete ptlist;
+			
+			break;
+		}
+		case AS_FILL_SHAPE:
+		{
+			BRect shaperect;
+			int32 opcount;
+			int32 ptcount;
+			int32 *oplist;
+			BPoint *ptlist;
+			
+			fSession->Read<BRect>(&shaperect);
+			fSession->Read<int32>(&opcount);
+			fSession->Read<int32>(&ptcount);
+			
+			oplist=new int32[opcount];
+			ptlist=new BPoint[ptcount];
+			
+			fSession->Read(oplist,sizeof(int32)*opcount);
+			fSession->Read(ptlist,sizeof(BPoint)*ptcount);
+			
+			for(int32 i=0; i<ptcount; i++)
+				ptlist[i]=cl->ConvertToTop(ptlist[i]);
+			
+			desktop->GetDisplayDriver()->FillShape(shaperect, opcount, oplist, ptcount, ptlist, cl->fLayerData);
+
+			delete oplist;
+			delete ptlist;
+			
+			break;
+		}
+		case AS_FILL_REGION:
+		{
+			// TODO: Implement AS_FILL_REGION
+			int32 rectcount;
+			BRect *rectlist;
+			
+			fSession->Read<int32>(&rectcount);
+			
+			rectlist=new BRect[rectcount];
+			
+			fSession->Read(rectlist, sizeof(BRect)*rectcount);
+			
+			// Between the client-side conversion to BRects from clipping_rects to the overhead
+			// in repeatedly calling FillRect(), this is definitely in need of optimization. At
+			// least it works for now. :)
+			for(int32 i=0; i<rectcount; i++)
+				desktop->GetDisplayDriver()->FillRect(cl->ConvertToTop(cl->ConvertToTop(rectlist[i])),cl->fLayerData);
+			
+			delete [] rectlist;
+			
+			// TODO: create support for clipping_rect usage for faster BRegion display.
+			// Tweaks to DisplayDriver are necessary along with conversion routines in Layer
+			
+			break;
+		}
+		case AS_STROKE_LINEARRAY:
+		{
+			// TODO: Implement AS_STROKE_LINEARRAY
+			break;
+		}
+		case AS_MOVEPENBY:
+		{
+			// TODO: Implement AS_MOVEPENBY
+			break;
+		}
+		case AS_MOVEPENTO:
+		{
+			// TODO: Implement AS_MOVEPENTO
+			break;
+		}
+		case AS_SETPENSIZE:
+		{
+			// TODO: Implement AS_SETPENSIZE
+			break;
+		}
+		case AS_DRAW_STRING:
+		{
+			// TODO: Implement AS_DRAW_STRING
+			break;
+		}
+		case AS_SET_FONT:
+		{
+			// TODO: Implement AS_SET_FONT
+			break;
+		}
+		case AS_SET_FONT_SIZE:
+		{
+			// TODO: Implement AS_SET_FONT_SIZE
 			break;
 		}
 		default:
@@ -1888,138 +2048,6 @@ void ServerWindow::DispatchMessage(int32 code)
 			break;
 		}
 	}
-}
-//------------------------------------------------------------------------------
-/*!
-	\brief Iterator for graphics update messages
-	\param msgsize Size of the buffer containing the graphics messages
-	\param msgbuffer Buffer containing the graphics message
-*/
-void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
-{
-/*	Layer *layer;
-	LayerData *layerdata;
-	int32 code;
-	int32 view_token;
-	uint32 sizeRemaining = (uint32)msgsize;
-	BRegion WindowClipRegion;
-	BRegion LayerClipRegion;
-//	Layer *sibling;
-	int32 numRects = 0;
-	
-	if (!msgsize || !msgbuffer)
-		return;
-	if (IsHidden())
-		return;
-		
-	// TODO: fix sibling-related clipping calculations in DispatchGraphicsMessage
-//	WindowClipRegion.Set(fWinBorder->Frame());
-//	sibling = fWinBorder->UpperSibling();
-//	while (sibling)
-//	{
-//		WindowClipRegion.Exclude(sibling->Frame());
-//		sibling = sibling->UpperSibling();
-//	}
-
-
-	if (!WindowClipRegion.Frame().IsValid())
-		return;
-	
-	// We need to decide whether coordinates are specified in view or root coordinates.
-	// For now, we assume root level coordinates.
-	code = AS_BEGIN_UPDATE;
-	while ((sizeRemaining > 2*sizeof(int32)) && (code != AS_END_UPDATE))
-	{
-		code = read_from_buffer<int32>(&msgbuffer);
-		view_token = read_from_buffer<int32>(&msgbuffer);
-		
-		//TODO: fix code to find a layer based on a view token in DispatchGraphicsMessage
-		layer = NULL;//fWorkspace->GetRoot()->FindLayer(view_token);
-		
-		if (layer)
-		{
-			layerdata = layer->fLayerData;
-			LayerClipRegion.Set(layer->Frame());
-			LayerClipRegion.IntersectWith(&WindowClipRegion);
-			numRects = LayerClipRegion.CountRects();
-		}
-		else
-		{
-			layerdata = NULL;
-			STRACE(("ServerWindow %s received invalid view token %lx",fTitle.String(),view_token));
-		}
-		
-		switch (code)
-		{
-			case AS_STROKE_LINEARRAY:
-			{
-				// TODO: Implement AS_STROKE_LINEARRAY
-				break;
-			}
-			case AS_STROKE_POLYGON:
-			{
-				// TODO: Implement AS_STROKE_POLYGON
-				break;
-			}
-			case AS_STROKE_SHAPE:
-			{
-				// TODO: Implement AS_STROKE_SHAPE
-				break;
-			}
-			case AS_FILL_POLYGON:
-			{
-				// TODO: Implement AS_FILL_POLYGON
-				break;
-			}
-			case AS_FILL_REGION:
-			{
-				// TODO: Implement AS_FILL_REGION
-				break;
-			}
-			case AS_FILL_SHAPE:
-			{
-				// TODO: Implement AS_FILL_SHAPE
-				break;
-			}
-			case AS_MOVEPENBY:
-			{
-				// TODO: Implement AS_MOVEPENBY
-				break;
-			}
-			case AS_MOVEPENTO:
-			{
-				// TODO: Implement AS_MOVEPENTO
-				break;
-			}
-			case AS_SETPENSIZE:
-			{
-				// TODO: Implement AS_SETPENSIZE
-				break;
-			}
-			case AS_DRAW_STRING:
-			{
-				// TODO: Implement AS_DRAW_STRING
-				break;
-			}
-			case AS_SET_FONT:
-			{
-				// TODO: Implement AS_SET_FONT
-				break;
-			}
-			case AS_SET_FONT_SIZE:
-			{
-				// TODO: Implement AS_SET_FONT_SIZE
-				break;
-			}
-			default:
-			{
-				sizeRemaining -= sizeof(int32);
-				printf("ServerWindow %s received unexpected graphics code %lx",fTitle.String(),code);
-				break;
-			}
-		}
-	}
-*/
 }
 //------------------------------------------------------------------------------
 /*!

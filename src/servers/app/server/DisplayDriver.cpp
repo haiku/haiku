@@ -98,8 +98,14 @@ void DisplayDriver::Shutdown(void)
 	
 	If the destination is not the same size as the source, the source should be scaled to fit.
 */
-void DisplayDriver::CopyBits(const BRect &src, const BRect &dest)
+void DisplayDriver::CopyBits(const BRect &src, const BRect &dest, const DrawData *d)
 {
+	if(!d)
+		return;
+	
+	Lock();
+	Blit(src,dest,d);
+	Unlock();
 }
 
 /*!
@@ -109,6 +115,7 @@ void DisplayDriver::CopyBits(const BRect &src, const BRect &dest)
 */
 void DisplayDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
+	// TODO: Implement DisplayDriver;:CopyRegion
 }
 
 /*!
@@ -566,8 +573,7 @@ void DisplayDriver::DrawString(const char *string, const int32 &length, const BP
 		previous=glyph_index;
 	}
 
-	// TODO: implement properly
-	// calculate the invalid rectangle
+	// TODO: implement calculation of invalid rectangle in DisplayDriver::DrawString properly
 	BRect r;
 	r.left=MIN(point.x,pen.x>>6);
 	r.right=MAX(point.x,pen.x>>6);
@@ -670,6 +676,8 @@ void DisplayDriver::BlitMono2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		destindex+=destinc;
 	}
 	ReleaseBuffer();
+	
+	// TODO: test to see if Invalidate calls should be made in DisplayDriver::BlitMono2RGB32
 	Invalidate(BRect(pt.x, pt.y, pt.x + srcwidth, pt.y + srcheight));
 }
 
@@ -792,6 +800,7 @@ void DisplayDriver::BlitGray2RGB32(FT_Bitmap *src, const BPoint &pt, const DrawD
 		destindex+=destinc;
 	}
 	ReleaseBuffer();
+	// TODO: test to see if Invalidate calls should be made in DisplayDriver::BlitGray2RGB32
 	Invalidate(BRect(pt.x, pt.y, pt.x + srcwidth, pt.y + srcheight));
 }
 
@@ -1164,6 +1173,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 			}
 		}
 	}
+	Invalidate(r);
 	Unlock();
 }
 
@@ -1527,6 +1537,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 			}
 		}
 	}
+	Invalidate(r);
 	Unlock();
 }
 
@@ -1535,7 +1546,7 @@ void DisplayDriver::FillBezier(BPoint *pts, const RGBColor &color)
 	Lock();
 
 	BezierCurve curve(pts);
-	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), color);
+	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), curve.Frame(), color);
 
 	Unlock();
 }
@@ -1551,7 +1562,7 @@ void DisplayDriver::FillBezier(BPoint *pts, const DrawData *d)
 	Lock();
 
 	BezierCurve curve(pts);
-	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), d);
+	FillPolygon(curve.GetPointArray(), curve.points.CountItems(), curve.Frame(), d);
 
 	Unlock();
 }
@@ -1685,6 +1696,7 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
                	StrokeLine(BPoint(xc-x,yc-y),BPoint(xc+x,yc-y),&data);
                 StrokeLine(BPoint(xc-x,yc+y),BPoint(xc+x,yc+y),&data);
 	}
+	Invalidate(r);
 	Unlock();
 }
 
@@ -1694,7 +1706,7 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
 	\param numpts Number of points in the BPoint array.
 	\param color  The color of the polygon
 */
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &color)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color)
 {
 	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
 	   the y-value of a point not in the segment, split the segment into 2 segments.
@@ -1721,7 +1733,8 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &co
 	maxX = ROUND(ptlist[0].x);
 	minY = ROUND(ptlist[0].y);
 	maxY = ROUND(ptlist[0].y);
-	/* Generate the segment list */
+	
+	// Generate the segment list
 	currentPoint = ptlist;
 	currentIndex = 0;
 	nextPoint = &ptlist[1];
@@ -1776,7 +1789,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &co
 		}
 	}
 
-	/* Selection sort the segments.  Probably should replace this later. */
+	// Selection sort the segments.  Probably should replace this later.
 	for (i=0; i<numSegments; i++)
 	{
 		bestIndex = i;
@@ -1791,7 +1804,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &co
 			segmentArray[i].Swap(segmentArray[bestIndex]);
 	}
 
-	/* Draw the lines */
+	// Draw the lines
 	for (y=minY; y<=maxY; y++)
 	{
 		i = 0;
@@ -1824,6 +1837,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &co
 	}
 
 	delete[] segmentArray;
+	Invalidate(bounds);
 	Unlock();
 
 }
@@ -1834,7 +1848,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &co
 	\param numpts Number of points in the BPoint array.
 	\param d      The 50 bazillion drawing options (inluding clip region)
 */
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const DrawData *d)
 {
 	/* Here's the plan.  Record all line segments in polygon.  If a line segments crosses
 	   the y-value of a point not in the segment, split the segment into 2 segments.
@@ -1861,7 +1875,8 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 	maxX = ROUND(ptlist[0].x);
 	minY = ROUND(ptlist[0].y);
 	maxY = ROUND(ptlist[0].y);
-	/* Generate the segment list */
+	
+	// Generate the segment list
 	currentPoint = ptlist;
 	currentIndex = 0;
 	nextPoint = &ptlist[1];
@@ -1916,7 +1931,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 		}
 	}
 
-	/* Selection sort the segments.  Probably should replace this later. */
+	// Selection sort the segments.  Probably should replace this later.
 	for (i=0; i<numSegments; i++)
 	{
 		bestIndex = i;
@@ -1933,7 +1948,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 
 	if ( !d->clipReg )
 	{
-		/* Draw the lines */
+		// Draw the lines
 		for (y=minY; y<=maxY; y++)
 		{
 			i = 0;
@@ -1985,7 +2000,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 			yStart = MAX(minY,ROUND(clipRect.top));
 			yEnd = MIN(maxY,ROUND(clipRect.bottom));
 
-			/* Draw the lines */
+			// Draw the lines
 			for (y=yStart; y<=yEnd; y++)
 			{
 				i = 0;
@@ -2035,6 +2050,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 		}
 	}
 	delete[] segmentArray;
+	Invalidate(bounds);
 	Unlock();
 }
 
@@ -2077,6 +2093,7 @@ void DisplayDriver::FillRect(const BRect &r, const DrawData *d)
 	}
 	else
 		FillPatternRect(r,d);
+	Invalidate(r);
 	Unlock();
 }
 
@@ -2094,7 +2111,7 @@ void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
 	numRects = r.CountRects();
 	for(int32 i=0; i<numRects;i++)
 		FillSolidRect(r.RectAt(i),color);
-
+	Invalidate(r.Frame());
 	Unlock();
 }
 
@@ -2131,7 +2148,7 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 		for(int32 i=0; i<numRects;i++)
 			FillPatternRect(r.RectAt(i),d);
 	}
-
+	Invalidate(r.Frame());
 	Unlock();
 }
 
@@ -2150,6 +2167,7 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 		StrokeSolidLine(ROUND(r.left+xrad-arc_x), ROUND(r.bottom-yrad+i), ROUND(r.right-xrad+arc_x), ROUND(r.bottom-yrad+i),color);
 	}
 	FillSolidRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),color);
+	Invalidate(r);
 	Unlock();
 }
 
@@ -2209,14 +2227,18 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 		}
 	}
 	FillPatternRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad),d);
+	Invalidate(r);
 	Unlock();
 }
 
-//void DisplayDriver::FillShape(SShape *sh, const DrawData *d, const Pattern &pat)
-//{
-//}
+void DisplayDriver::FillShape(const BRect &bounds, const int32 &opcount, const int32 *oplist, 
+		const int32 &ptcount, const BPoint *ptlist, const DrawData *d)
+{
+	// TODO: Implement DisplayDriver::FillShape. How, though? AGG backend?
+	printf("DisplayDriver::FillShape unimplemented\n");
+}
 
-void DisplayDriver::FillTriangle(BPoint *pts, const RGBColor &color)
+void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
 {
 	if ( !pts )
 		return;
@@ -2306,7 +2328,9 @@ void DisplayDriver::FillTriangle(BPoint *pts, const RGBColor &color)
 
 	for(i=(int32)second.y; i<=third.y; i++)
 		StrokeSolidLine(ROUND(lineC.GetX(i)), i, ROUND(lineB.GetX(i)), i, color);
-
+	
+	Invalidate(bounds);
+	
 	Unlock();
 }
 
@@ -2315,7 +2339,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const RGBColor &color)
 	\param pts Array of 3 BPoints. Always non-NULL.
 	\param setLine Horizontal line drawing routine which handles things like color and pattern.
 */
-void DisplayDriver::FillTriangle(BPoint *pts, const DrawData *d)
+void DisplayDriver::FillTriangle(BPoint *pts, const BRect &bounds, const DrawData *d)
 {
 	if ( !pts )
 		return;
@@ -2326,7 +2350,7 @@ void DisplayDriver::FillTriangle(BPoint *pts, const DrawData *d)
 	{
 		// For now, cop out and use FillPolygon
 		// Need to investigate if Triangle specific code would save processing time
-		FillPolygon(pts,3,d);
+		FillPolygon(pts,3,bounds,d);
 	}
 	else
 	{
@@ -2415,7 +2439,9 @@ void DisplayDriver::FillTriangle(BPoint *pts, const DrawData *d)
 		for(i=(int32)second.y; i<=third.y; i++)
 			StrokePatternLine(ROUND(lineC.GetX(i)), i, ROUND(lineB.GetX(i)), i, d);
 	}
-
+	
+	Invalidate(bounds);
+	
 	Unlock();
 }
 
@@ -2775,7 +2801,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			StrokePoint(BPoint(xc+x,yc+y),color);
 	}
-
+	Invalidate(r);
 	Unlock();
 }
 
@@ -2938,7 +2964,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 		     (shortspan && (startQuad == 4) && (x >= startx) && (x <= endx)) ) 
 			StrokePoint(BPoint(xc+x,yc+y),d);
 	}
-
+	Invalidate(r);
 	Unlock();
 }
 
@@ -2957,6 +2983,7 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
 	numLines = curve.points.CountItems()-1;
 	for (i=0; i<numLines; i++)
 		StrokeLine(*((BPoint*)curve.points.ItemAt(i)),*((BPoint*)curve.points.ItemAt(i+1)),color);
+	Invalidate(curve.Frame());
 	Unlock();
 }
 
@@ -2975,6 +3002,7 @@ void DisplayDriver::StrokeBezier(BPoint *pts, const DrawData *d)
 	numLines = curve.points.CountItems()-1;
 	for (i=0; i<numLines; i++)
 		StrokeLine(*((BPoint*)curve.points.ItemAt(i)),*((BPoint*)curve.points.ItemAt(i+1)),d);
+	Invalidate(curve.Frame());
 	Unlock();
 }
 
@@ -3045,7 +3073,7 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
 		StrokeLine(BPoint(xc-lastx,yc+lasty),BPoint(xc-x,yc+y),color);
 		StrokeLine(BPoint(xc+lastx,yc+lasty),BPoint(xc+x,yc+y),color);
 	}
-
+	Invalidate(r);
 	Unlock();
 }
 
@@ -3116,7 +3144,7 @@ void DisplayDriver::StrokeEllipse(const BRect &r, const DrawData *d)
 		StrokeLine(BPoint(xc-lastx,yc+lasty),BPoint(xc-x,yc+y),d);
 		StrokeLine(BPoint(xc+lastx,yc+lasty),BPoint(xc+x,yc+y),d);
 	}
-
+	Invalidate(r);
 	Unlock();
 }
 
@@ -3130,6 +3158,7 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const RGB
 {
 	Lock();
 	StrokeSolidLine(ROUND(start.x),ROUND(start.y),ROUND(end.x),ROUND(end.y),color);
+	Invalidate(BRect(start,end));
 	Unlock();
 }
 
@@ -3234,9 +3263,10 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const Dra
 				corners[3].x += xoffset;
 				corners[3].y += yoffset;
 			}
-			FillPolygon(corners,4,d);
+			FillPolygon(corners,4,BRect(start,end),d);
 		}
 	}
+	Invalidate(BRect(start,end));
 	Unlock();
 }
 
@@ -3273,19 +3303,22 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDr
 		y += yInc;
 		(driver->*setPixel)(ROUND(x),ROUND(y));
 	}
+	Invalidate(BRect(start,end));
 }
 
 void DisplayDriver::StrokePoint(const BPoint& pt, const RGBColor &color)
 {
 	StrokeLine(pt, pt, color);
+	Invalidate(BRect(pt,pt));
 }
 
 void DisplayDriver::StrokePoint(const BPoint& pt, const DrawData *d)
 {
 	StrokeLine(pt, pt, d);
+	Invalidate(BRect(pt,pt));
 }
 
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const RGBColor &color, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const RGBColor &color, bool is_closed)
 {
 	if(!ptlist)
 		return;
@@ -3295,6 +3328,7 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const RGBColor &
 		StrokeLine(ptlist[i],ptlist[i+1],color);
 	if(is_closed)
 		StrokeLine(ptlist[numpts-1],ptlist[0],color);
+	Invalidate(bounds);
 	Unlock();
 }
 
@@ -3304,7 +3338,7 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const RGBColor &
 	\param numpts Number of points in the BPoint array.
 	\param d      DrawData containing all of the other options
 */
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *d, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const BRect &bounds, const DrawData *d, bool is_closed)
 {
 	if(!ptlist)
 		return;
@@ -3314,6 +3348,7 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *
 		StrokeLine(ptlist[i],ptlist[i+1],d);
 	if(is_closed)
 		StrokeLine(ptlist[numpts-1],ptlist[0],d);
+	Invalidate(bounds);
 	Unlock();
 }
 
@@ -3326,10 +3361,8 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *
 void DisplayDriver::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	Lock();
-	StrokeLine(r.LeftTop(),r.RightTop(),color);
-	StrokeLine(r.LeftTop(),r.LeftBottom(),color);
-	StrokeLine(r.RightTop(),r.RightBottom(),color);
-	StrokeLine(r.LeftBottom(),r.RightBottom(),color);
+	StrokeSolidRect(r,color);
+	Invalidate(r);
 	Unlock();
 }
 
@@ -3340,6 +3373,7 @@ void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 	StrokeLine(r.LeftTop(),r.LeftBottom(),d);
 	StrokeLine(r.RightTop(),r.RightBottom(),d);
 	StrokeLine(r.LeftBottom(),r.RightBottom(),d);
+	Invalidate(r);
 	Unlock();
 }
 
@@ -3356,7 +3390,7 @@ void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
 
 	for(int32 i=0; i<r.CountRects();i++)
 		StrokeRect(r.RectAt(i),color);
-
+	Invalidate(r.Frame());
 	Unlock();
 }
 
@@ -3366,7 +3400,7 @@ void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 
 	for(int32 i=0; i<r.CountRects();i++)
 		StrokeRect(r.RectAt(i),d);
-
+	Invalidate(r.Frame());
 	Unlock();
 }
 
@@ -3397,6 +3431,7 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, color);
 	StrokeLine(BPoint(r.right, vBottom), BPoint(r.right, vTop), color);
+	Invalidate(r);
 	Unlock();
 }
 
@@ -3434,34 +3469,39 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 
 	StrokeArc(BRect(bRight,bBottom,r.right,r.bottom), 270, 90, d);
 	StrokeLine(BPoint(r.right, vBottom), BPoint(r.right, vTop), d);
+	Invalidate(r);
 	Unlock();
 }
 
-//void DisplayDriver::StrokeShape(SShape *sh, const DrawData *d, const Pattern &pat)
-//{
-//}
+void DisplayDriver::StrokeShape(const BRect &bounds, const int32 &opcount, const int32 *oplist, 
+		const int32 &ptcount, const BPoint *ptlist, const DrawData *d)
+{
+	// TODO: Implement DisplayDriver::StrokeShape. ShapeIterator subclass?
+	printf("DisplayDriver::StrokeShape unimplemented\n");
+}
 
 /*!
 	\brief Called for all BView::StrokeTriangle calls
 	\param pts Array of 3 BPoints. Always non-NULL.
-	\param pensize The line thickness
 	\param color The color of the lines
 */
-void DisplayDriver::StrokeTriangle(BPoint *pts, const RGBColor &color)
+void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const RGBColor &color)
 {
 	Lock();
 	StrokeLine(pts[0],pts[1],color);
 	StrokeLine(pts[1],pts[2],color);
 	StrokeLine(pts[2],pts[0],color);
+	Invalidate(bounds);
 	Unlock();
 }
 
-void DisplayDriver::StrokeTriangle(BPoint *pts, const DrawData *d)
+void DisplayDriver::StrokeTriangle(BPoint *pts, const BRect &bounds, const DrawData *d)
 {
 	Lock();
 	StrokeLine(pts[0],pts[1],d);
 	StrokeLine(pts[1],pts[2],d);
 	StrokeLine(pts[2],pts[0],d);
+	Invalidate(bounds);
 	Unlock();
 }
 
@@ -3485,6 +3525,8 @@ void DisplayDriver::StrokeLineArray(BPoint *pts, const int32 &numlines, const Dr
 		data.highcolor = colors[i];
 		StrokeLine(pts[i<<1],pts[i<<1+1],&data);
 	}
+	
+	// TODO: calculate invalid region for DisplayDriver::StrokeLineArray
 	
 	Unlock();
 }
@@ -3699,6 +3741,7 @@ float DisplayDriver::StringHeight(const char *string, int32 length, const DrawDa
 void DisplayDriver::GetBoundingBoxes(const char *string, int32 count, 
 		font_metric_mode mode, escapement_delta *delta, BRect *rectarray, const DrawData *d)
 {
+	// TODO: Implement DisplayDriver::GetBoundingBoxes
 }
 
 /*!
@@ -3717,6 +3760,7 @@ void DisplayDriver::GetBoundingBoxes(const char *string, int32 count,
 void DisplayDriver::GetEscapements(const char *string, int32 charcount, 
 		escapement_delta *delta, escapement_delta *escapements, escapement_delta *offsets, const DrawData *d)
 {
+	// TODO: Implement DisplayDriver::GetEscapements
 }
 
 /*!
@@ -3730,6 +3774,7 @@ void DisplayDriver::GetEscapements(const char *string, int32 charcount,
 */
 void DisplayDriver::GetEdges(const char *string, int32 charcount, edge_info *edgearray, const DrawData *d)
 {
+	// TODO: Implement DisplayDriver::GetEdges
 }
 
 /*!
@@ -3742,6 +3787,7 @@ void DisplayDriver::GetEdges(const char *string, int32 charcount, edge_info *edg
 */
 void DisplayDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasarray)
 {
+	// TODO: Implement DisplayDriver::GetHasGlyphs
 }
 
 /*!
@@ -3758,6 +3804,7 @@ void DisplayDriver::GetHasGlyphs(const char *string, int32 charcount, bool *hasa
 void DisplayDriver::GetTruncatedStrings(const char **instrings,const int32 &stringcount, 
 	const uint32 &mode, const float &maxwidth, char **outstrings)
 {
+	// TODO: Implement DisplayDriver::GetTruncatedStrings
 }
 
 /*!
@@ -4043,7 +4090,7 @@ void DisplayDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, cons
 {
 }
 
-/* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */
+// Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds
 void DisplayDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
 }

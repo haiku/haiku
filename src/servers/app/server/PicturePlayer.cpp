@@ -28,6 +28,7 @@
 
 #include "PicturePlayer.h"
 #include "PictureProtocol.h"
+#include "Utils.h"
 #include "DisplayDriver.h"
 #include <ServerBitmap.h>
 #include <stdio.h>
@@ -202,7 +203,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
 				bool isClosed = GetBool();
-				fdriver->StrokePolygon(points,numPoints,&fldata,isClosed);
+				fdriver->StrokePolygon(points,numPoints,CalculatePolygonBounds(points,numPoints),&fldata,isClosed);
 				delete points;
 				break;
 			}
@@ -211,7 +212,7 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				int32 numPoints = GetInt32();
 				BPoint *points = new BPoint[numPoints];
 				GetData(points, numPoints * sizeof(BPoint));
-				fdriver->FillPolygon(points,numPoints,&fldata);
+				fdriver->FillPolygon(points,numPoints,CalculatePolygonBounds(points,numPoints),&fldata);
 				delete points;
 				break;
 			}

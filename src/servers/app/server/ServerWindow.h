@@ -126,7 +126,6 @@ private:
 
 	// message handle methods.
 	void DispatchMessage(int32 code);
-	void DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer);
 	static int32 MonitorWin(void *data);
 
 

@@ -31,6 +31,7 @@ SharedLibrary appserver :
 	SysCursor.cpp
 	SystemPalette.cpp
 	TokenHandler.cpp
+	Utils.cpp
 ;
 
 LinkSharedOSLibs libappserver.so : root be 							  
@@ -43,7 +44,6 @@ Server app_server :
 	FMWList.cpp
 	PicturePlayer.cpp
 	PNGDump.cpp
-	Utils.cpp
 
 	# Manager Classes
 	AppServer.cpp
