@@ -5,3 +5,4 @@ SubInclude OBOS_TOP src add-ons translators jpegtranslator ;
 SubInclude OBOS_TOP src add-ons translators jpeg2000translator ;
 SubInclude OBOS_TOP src add-ons translators stxttranslator ;
 SubInclude OBOS_TOP src add-ons translators tgatranslator ;
+SubInclude OBOS_TOP src add-ons translators tifftranslator ;
