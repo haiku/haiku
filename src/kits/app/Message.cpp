@@ -1486,6 +1486,7 @@ status_t BMessage::flatten_hdr(BDataIO* stream) const
 	status_t err = B_OK;
 	int32 data = MSG_FIELD_VERSION;
 
+	// Write the version of the binary data format
 	write_helper(stream, (const void*)&data, sizeof (data), err);
 	if (!err)
 	{
@@ -1494,11 +1495,13 @@ status_t BMessage::flatten_hdr(BDataIO* stream) const
 	}
 	if (!err)
 	{
+		// Write the flattened size of the entire message
 		data = fBody->FlattenedSize() + calc_hdr_size(0);
 		write_helper(stream, (const void*)&data, sizeof (data), err);
 	}
 	if (!err)
 	{
+		// Write the 'what' member
 		write_helper(stream, (const void*)&what, sizeof (what), err);
 	}
 
@@ -1523,15 +1526,20 @@ status_t BMessage::flatten_hdr(BDataIO* stream) const
 		flags |= MSG_FLAG_INCL_REPLY;
 	}
 
-	write_helper(stream, (const void*)&flags, sizeof (flags), err);
+	if (!err)
+	{
+		// Write the header flags
+		write_helper(stream, (const void*)&flags, sizeof (flags), err);
+	}
 
-	// Write targeting and reply info if necessary
+	// Write targeting info if necessary
 	if (!err && (flags & MSG_FLAG_INCL_TARGET))
 	{
 		data = fPreferred ? B_PREFERRED_TOKEN : fTarget;
 		write_helper(stream, (const void*)&data, sizeof (data), err);
 	}
 
+	// Write reply info if necessary
 	if (!err && (flags & MSG_FLAG_INCL_REPLY))
 	{
 		write_helper(stream, (const void*)&fReplyTo.port,
