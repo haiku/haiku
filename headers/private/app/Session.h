@@ -34,6 +34,8 @@
 #include <Point.h>
 #include <ServerProtocol.h>
 
+#define SESSION_BUFFER_SIZE 1024
+
 class BSession
 {
 public:
@@ -89,10 +91,8 @@ public:
 	void	WriteData(const void* data, int32 size);
 	
 	void	Sync();
-	void	Close();
 
-	// if possible, do not use
-	void	SetMsgCode(int32 code);
+	// Deprecated. Do not use.
 	void	CopyToSendBuffer(void* buffer, int32 count);
 
 private:

@@ -21,7 +21,7 @@
 //
 //	File Name:		PortLink.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class for low-overhead port-based messaging
+//	Description:	Class for low-overhead packet-style port-based messaging
 //  
 //------------------------------------------------------------------------------
 #ifndef _PORTLINK_H
@@ -29,6 +29,7 @@
 
 #include <BeBuild.h>
 #include <OS.h>
+#include "Session.h"
 
 class PortMessage;
 
@@ -55,7 +56,7 @@ public:
 	{
 		int32 size	= sizeof(Type);
 
-		if (4096 - fSendPosition > size){
+		if ( (SESSION_BUFFER_SIZE*4) - fSendPosition > size){
 			memcpy(fSendBuffer + fSendPosition, &data, size);
 			fSendPosition += size;
 			*fDataSize+=size;
@@ -65,7 +66,7 @@ public:
 	}
 	
 private:
-	bool port_ok;
+	bool fPortValid;
 	port_id	fSendPort;
 	port_id fReceivePort;
 	char	*fSendBuffer;
