@@ -2,6 +2,7 @@
 
 #include <new>
 #include <stdio.h>
+#include <string.h>
 
 #include "HWInterface.h"
 
@@ -51,6 +52,7 @@ void
 UpdateQueue::AddRect(const BRect& rect)
 {
 //	Lock();
+//printf("UpdateQueue::AddRect()\n");
 	fUpdateRegion.Include(rect);
 	_Reschedule();
 //	Unlock();
@@ -71,17 +73,21 @@ UpdateQueue::_ExecuteUpdates()
 	bool running = true;
 	while (running) {
 		status_t err = acquire_sem_etc(fThreadControl, 1, B_RELATIVE_TIMEOUT,
-									   40000);
+									   20000);
 		switch (err) {
 			case B_OK:
 			case B_TIMED_OUT:
 				// execute updates
-				if (fInterface->LockWithTimeout(20000) >= B_OK) {
+				if (fInterface->LockWithTimeout(5000) >= B_OK) {
 					int32 count = fUpdateRegion.CountRects();
-					for (int32 i = 0; i < count; i++) {
-						fInterface->CopyBackToFront(fUpdateRegion.RectAt(i));
+//printf("%ld copy dirty region\n", find_thread(NULL));
+					if (count > 0) {
+printf("%ld rects\n", count);
+						for (int32 i = 0; i < count; i++) {
+							fInterface->CopyBackToFront(fUpdateRegion.RectAt(i));
+						}
+						fUpdateRegion.MakeEmpty();
 					}
-					fUpdateRegion.MakeEmpty();
 					fInterface->Unlock();
 				}
 				break;
@@ -89,6 +95,9 @@ UpdateQueue::_ExecuteUpdates()
 				running = false;
 				break;
 			default:
+printf("other error: %s\n", strerror(err));
+running = false;
+				snooze(20000);
 				break;
 		}
 	}
@@ -102,8 +111,7 @@ void
 UpdateQueue::_Reschedule()
 {
 	if (fStatus == B_OK) {
-		if (fUpdateRegion.Frame().IsValid())
-			release_sem(fThreadControl);
+		release_sem(fThreadControl);
 	}
 }
 
