@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src add-ons translators giftranslator ;
+
+Translator GIFTranslator :
+	# Main Source
+	GIFTranslator.cpp
+	GIFView.cpp
+	GIFWindow.cpp
+	Prefs.cpp
+
+	# Real Work
+	GIFLoad.cpp
+	LoadPalette.cpp
+	GIFSave.cpp
+	SavePalette.cpp
+	SFHash.cpp
+ ;
+
+LinkSharedOSLibs GIFTranslator : be translation ;
