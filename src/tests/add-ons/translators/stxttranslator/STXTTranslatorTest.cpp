@@ -406,8 +406,22 @@ STXTTranslatorTest::ConfigMessageTest()
 	// GetConfigurationMessage
 	NextSubTest();
 	BMessage msg;
-	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_ERROR);
-	CPPUNIT_ASSERT(msg.IsEmpty());
+	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_OK);
+	CPPUNIT_ASSERT(!msg.IsEmpty());
+	
+	// B_TRANSLATOR_EXT_HEADER_ONLY
+	NextSubTest();
+	bool bheaderonly = true;
+	CPPUNIT_ASSERT(
+		msg.FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly) == B_OK);
+	CPPUNIT_ASSERT(bheaderonly == false);
+	
+	// B_TRANSLATOR_EXT_DATA_ONLY
+	NextSubTest();
+	bool bdataonly = true;
+	CPPUNIT_ASSERT(
+		msg.FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly) == B_OK);
+	CPPUNIT_ASSERT(bdataonly == false);
 }
 
 #if !TEST_R5
