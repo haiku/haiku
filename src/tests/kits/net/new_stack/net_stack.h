@@ -13,10 +13,10 @@
 extern "C" {
 #endif
 
-// Networking data chunk(s) definition
-typedef struct net_data net_data;
-typedef struct net_data_queue net_data_queue;
-typedef void (*data_node_free_func)(void * arg1, ...); // data node free callback prototype
+// Networking buffer(s) definition
+typedef struct net_buffer net_buffer;
+typedef struct net_buffer_queue net_buffer_queue;
+typedef void (*buffer_chunk_free_func)(void * arg1, ...); // buffer chunk free callback prototype
 
 // Networking timers definitions
 typedef struct net_timer net_timer;
@@ -53,33 +53,37 @@ struct net_stack_module_info {
 	status_t (*unregister_interface)(ifnet_t *ifnet);
 
 	/*
-	 * Data chunk(s) support
+	 * Buffer(s) support
 	 */
 
-	net_data *		(*new_data)(void);
-	status_t 		(*delete_data)(net_data *nd, bool interrupt_safe);
+	net_buffer *	(*new_buffer)(void);
+	status_t 		(*delete_buffer)(net_buffer *buffer, bool interrupt_safe);
 
-	net_data *		(*duplicate_data)(net_data *from);
-	net_data *		(*clone_data)(net_data *from);
+	net_buffer *	(*duplicate_buffer)(net_buffer *from);
+	net_buffer *	(*clone_buffer)(net_buffer *from);
+	net_buffer *	(*split_buffer)(net_buffer *from, uint32 offset);
+
+
+	// specials offsets for add_to_buffer()	
+	#define BUFFER_BEGIN 0
+	#define BUFFER_END 	 0xFFFFFFFF
+	status_t		(*add_to_buffer)(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes, buffer_chunk_free_func freethis);
+	status_t		(*remove_from_buffer)(net_buffer *buffer, uint32 offset, uint32 bytes);
+
+	status_t 		(*attach_buffer_free_element)(net_buffer *buffer, void *arg1, void *arg2, buffer_chunk_free_func freethis);
+
+	uint32 			(*read_buffer)(net_buffer *buffer, uint32 offset, void *data, uint32 bytes);
+	uint32 			(*write_buffer)(net_buffer *buffer, uint32 offset, const void *data, uint32 bytes);
 	
-	status_t		(*prepend_data)(net_data *nd, const void *data, uint32 bytes, data_node_free_func freethis);
-	status_t		(*append_data)(net_data *nd, const void *data, uint32 bytes, data_node_free_func freethis);
-	status_t		(*insert_data)(net_data *nd, uint32 offset, const void *data, uint32 bytes, data_node_free_func freethis);
-	status_t		(*remove_data)(net_data *nd, uint32 offset, uint32 bytes);
+	void			(*dump_buffer)(net_buffer *buffer);
 
-	status_t 		(*add_data_free_node)(net_data *nd, void *arg1, void *arg2, data_node_free_func freethis);
+	// Buffer queues support
+	net_buffer_queue * (*new_buffer_queue)(size_t max_bytes);
+	status_t 		(*delete_buffer_queue)(net_buffer_queue *queue);
 
-	uint32 			(*copy_from_data)(net_data *nd, uint32 offset, void *copyinto, uint32 bytes);
-	
-	void			(*dump_data)(net_data *nd);
-
-	// Data queues support
-	net_data_queue * (*new_data_queue)(size_t max_bytes);
-	status_t 		(*delete_data_queue)(net_data_queue *queue);
-
-	status_t		(*empty_data_queue)(net_data_queue *queue);
-	status_t 		(*enqueue_data)(net_data_queue *queue, net_data *data);
-	size_t  		(*dequeue_data)(net_data_queue *queue, net_data **data, bigtime_t timeout, bool peek); 
+	status_t		(*empty_buffer_queue)(net_buffer_queue *queue);
+	status_t 		(*enqueue_buffer)(net_buffer_queue *queue, net_buffer *buffer);
+	size_t  		(*dequeue_buffer)(net_buffer_queue *queue, net_buffer **buffer, bigtime_t timeout, bool peek); 
 
 	// Timers support
 	
@@ -87,7 +91,7 @@ struct net_stack_module_info {
 	status_t	(*delete_timer)(net_timer *timer);
 	status_t	(*start_timer)(net_timer *timer, net_timer_func func, void *cookie, bigtime_t period);
 	status_t	(*cancel_timer)(net_timer *timer);
-	status_t	(*get_timer_appointment)(net_timer *timer, bigtime_t *period, bigtime_t *when);
+	status_t	(*timer_appointment)(net_timer *timer, bigtime_t *period, bigtime_t *when);
 	
 	// Lockers
 	

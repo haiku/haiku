@@ -11,7 +11,7 @@
 extern "C" {
 #endif
 
-struct net_data;
+struct net_buffer;
 
 typedef struct if_data { 
         /* generic interface information */
@@ -101,8 +101,8 @@ struct net_interface_module_info {
 	status_t (*up)(ifnet_t *ifnet);
 	status_t (*down)(ifnet_t *ifnet);
 
-	status_t (*send_data)(ifnet_t *ifnet, struct net_data *data);
-	status_t (*receive_data)(ifnet_t *ifnet, struct net_data **data);
+	status_t (*send_buffer)(ifnet_t *ifnet, struct net_buffer *buffer);
+	status_t (*receive_buffer)(ifnet_t *ifnet, struct net_buffer **buffer);
 	
 	status_t (*control)(ifnet_t *ifnet, int opcode, void *arg);
 	
