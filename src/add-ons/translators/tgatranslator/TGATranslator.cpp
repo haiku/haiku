@@ -863,7 +863,7 @@ copy_rle_packet(uint8 *ptga, uint32 pixel, uint8 count,
 	memcpy(ptga, &packethead, 1);
 	ptga++;
 
-	return pix_bits_to_tga(reinterpret_cast<uint8 *> &pixel,
+	return pix_bits_to_tga(reinterpret_cast<uint8 *> (&pixel),
 		ptga, fromspace, 1, pmap, bitsBytesPerPixel) + 1;
 }
 
@@ -905,7 +905,7 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	pbits += bitsBytesPerPixel;
 	if (width == 1) {
 		result = copy_raw_packet(ptga,
-			reinterpret_cast<uint8 *> &current, 1,
+			reinterpret_cast<uint8 *> (&current), 1,
 			fromspace, pmap, bitsBytesPerPixel);
 						
 		ptga += result;
