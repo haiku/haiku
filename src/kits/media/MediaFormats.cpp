@@ -383,8 +383,10 @@ BMediaFormats::GetFormatFor(const media_format_description &description,
 	meta_format other(description);
 	const meta_format *metaFormat = sFormats.BinarySearch(other, meta_format::CompareDescriptions);
 	printf("meta format == %p\n", metaFormat);
-	if (metaFormat == NULL)
+	if (metaFormat == NULL) {
+		memset(_format, 0, sizeof(*_format)); // clear to widlcard
 		return B_MEDIA_BAD_FORMAT;
+	}
 
 	// found it!
 	*_format = metaFormat->format;
