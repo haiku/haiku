@@ -29,6 +29,7 @@
 #include <Picture.h>
 #include <FilePanel.h>
 #include <StringView.h>
+#include <Cursor.h>
 #include "BackgroundImage.h"
 
 #define SETTINGS_FILE					"Backgrounds_settings"
@@ -84,6 +85,7 @@ class PreView : public BControl {
 		PreView(BRect frame, const char *name, int32 resize, int32 flags);
 		BPoint fPoint;
 		BRect fImageBounds;
+		
 	protected:
 		void MouseDown(BPoint point);
 		void MouseUp(BPoint point);
@@ -93,6 +95,8 @@ class PreView : public BControl {
 		BPoint fOldPoint;
 		float x_ratio,y_ratio;
 		display_mode mode;
+		
+		BCursor fMoveHandCursor;
 };
 
 

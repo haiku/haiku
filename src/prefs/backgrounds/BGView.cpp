@@ -52,6 +52,45 @@
 
 void SetRGBColor(rgb_color *col,uint8 r, uint8 g, uint8 b, uint8 a=255);
 
+uint8 hand_cursor_data[68] =
+{
+		16,1,2,2,
+        
+        0,0,		// 0000000000000000
+        7,128,		// 0000011110000000
+        61,112,		// 0011110101110000
+        37,40,		// 0010010100101000
+        36,168,		// 0010010010101000
+        18,148,		// 0001001010010100
+        18,84,		// 0001001001010100
+        9,42,		// 0000100100101010
+        8,1,		// 0000100000000001
+        60,1,		// 0011110000000001
+        76,1,		// 0100110000000001
+        66,1,		// 0100001000000001
+        48,1,		// 0011000000000001
+        12,1,		// 0000110000000001
+        2,0,		// 0000001000000000
+        1,0,		// 0000000100000000
+        
+        0,0,		// 0000000000000000
+        7,128,		// 0000011110000000
+        63,240,		// 0011111111110000
+        63,248,		// 0011111111111000
+        63,248,		// 0011111111111000
+        31,252,		// 0001111111111100
+        31,252,		// 0001111111111100
+        15,254,		// 0000111111111110
+        15,255,		// 0000111111111111
+        63,255,		// 0011111111111111
+        127,255,	// 0111111111111111
+        127,255,	// 0111111111111111
+        63,255,		// 0011111111111111
+        15,255,		// 0000111111111111
+        3,254,		// 0000001111111110
+        1,248		// 0000000111111000
+};
+
 BGView::BGView(BRect frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags),
 		fCurrent(NULL),
@@ -807,7 +846,8 @@ BGView::UpdatePreview()
 			fPreView->fImageBounds = BRect(bitmap->Bounds());
 			fCurrent->Show(info, fPreView);		
 		}
-	}
+	} else
+		fPreView->SetEnabled(false);
 	fPreView->SetViewColor(fPicker->ValueAsColor());
 	fPreView->Invalidate();
 }
@@ -1018,7 +1058,8 @@ BGView::AddItem(BGImageMenuItem *item)
 
 
 PreView::PreView(BRect frame, const char *name, int32 resize, int32 flags)
-	:BControl(frame,name,NULL, NULL, resize,flags)
+	:BControl(frame,name,NULL, NULL, resize,flags),
+	fMoveHandCursor(hand_cursor_data)
 {
 	
 }
@@ -1062,7 +1103,9 @@ PreView::MouseUp(BPoint point)
 void
 PreView::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 {
-	if(IsEnabled())
+	if(IsEnabled()) 
+		SetViewCursor(&fMoveHandCursor);
+	else
 		SetViewCursor(B_CURSOR_SYSTEM_DEFAULT);
 	if(IsTracking())
 	{
