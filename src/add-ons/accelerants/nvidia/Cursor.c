@@ -4,21 +4,10 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 4/2003-8/2003
+	Rudolf Cornelissen 4/2003-1/2004
 */
 
 #define MODULE_BIT 0x20000000
-
-/*DUALHEAD notes - 
-	No hardware cursor possible on the secondary head :( 
-		Reasons:
-		CRTC1 has a cursor, can be displayed on DAC or MAVEN
-		CRTC2 has no cursor
-		Can not switch CRTC in one vblank (has to resync)
-		CRTC2 does not support split screen
-		app_server does not support some modes with and some without cursor
-	virtual not supported, because of MAVEN blanking issues
-*/
 
 #include "acc_std.h"
 
@@ -38,6 +27,8 @@ status_t SET_CURSOR_SHAPE(uint16 width, uint16 height, uint16 hot_x, uint16 hot_
 	else
 	{
 		nv_crtc_cursor_define(andMask,xorMask);
+		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+			nv_crtc2_cursor_define(andMask,xorMask);
 
 		/* Update cursor variables appropriately. */
 		si->cursor.width = width;
@@ -155,6 +146,8 @@ void MOVE_CURSOR(uint16 x, uint16 y)
 
 	/* position the cursor on the display */
 	nv_crtc_cursor_position(x,y);
+//	if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+		nv_crtc2_cursor_position(x,y);
 }
 
 void SHOW_CURSOR(bool is_visible) 
@@ -163,7 +156,15 @@ void SHOW_CURSOR(bool is_visible)
 	si->cursor.is_visible = is_visible;
 
 	if (is_visible)
+	{
 		nv_crtc_cursor_show();
+//		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+			nv_crtc2_cursor_show();
+	}
 	else
+	{
 		nv_crtc_cursor_hide();
+//		if ((si->dm.flags & DUALHEAD_BITS) != DUALHEAD_OFF)
+			nv_crtc2_cursor_hide();
+	}
 }

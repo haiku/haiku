@@ -176,6 +176,7 @@ status_t INIT_ACCELERANT(int the_fd) {
 
 	/* initialise various cursor stuff*/
 	nv_crtc_cursor_init();
+	if (si->ps.secondary_head) nv_crtc2_cursor_init();
 
 	/* ensure cursor state */
 	SHOW_CURSOR(false);

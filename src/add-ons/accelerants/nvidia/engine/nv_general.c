@@ -789,6 +789,12 @@ status_t nv_general_bios_to_powergraphics()
 	/* unlock card registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+//fixme: verify if this works..
+	if (si->ps.secondary_head)
+	{
+		CRTC2W(LOCK, 0x57);
+		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
+	}
 
 	/* turn off both displays and the hardcursor (also disables transfers) */
 	nv_crtc_dpms(false, false, false);

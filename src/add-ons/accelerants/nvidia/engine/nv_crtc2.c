@@ -378,35 +378,15 @@ status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 //		}
 //	}
 
-//	if (si->ps.card_arch == NV04A)
-//	{
-		/* upto 32Mb RAM adressing: must be used this way on pre-NV10! */
+	/* upto 4Gb RAM adressing: must be used on NV10 and later! */
+	/* NOTE:
+	 * While this register also exists on pre-NV10 cards, it will
+	 * wrap-around at 16Mb boundaries!! */
 
-		/* set standard registers */
-		/* (NVidia: startadress in 32bit words (b2 - b17) */
-//		CRTC2W(FBSTADDL, ((startadd & 0x000003fc) >> 2));
-//		CRTC2W(FBSTADDH, ((startadd & 0x0003fc00) >> 10));
+	/* 30bit adress in 32bit words */
+	NV_REG32(NV32_NV10FB2STADD32) = (startadd & 0xfffffffc);
 
-		/* set extended registers */
-		/* NV4 extended bits: (b18-22) */
-//		temp = (CRTC2R(REPAINT0) & 0xe0);
-//		CRTC2W(REPAINT0, (temp | ((startadd & 0x007c0000) >> 18)));
-		/* NV4 extended bits: (b23-24) */
-//		temp = (CRTC2R(HEB) & 0x9f);
-//		CRTC2W(HEB, (temp | ((startadd & 0x01800000) >> 18)));
-//	}
-//	else
-	{
-		/* upto 4Gb RAM adressing: must be used on NV10 and later! */
-		/* NOTE:
-		 * While this register also exists on pre-NV10 cards, it will
-		 * wrap-around at 16Mb boundaries!! */
-
-		/* 30bit adress in 32bit words */
-		NV_REG32(NV32_NV10FB2STADD32) = (startadd & 0xfffffffc);
-	}
-
-	/* set NV4/NV10 byte adress: (b0 - 1) */
+	/* set byte adress: (b0 - 1) */
 	temp = (ATB2R(HORPIXPAN) & 0xf9);
 	ATB2W(HORPIXPAN, (temp | ((startadd & 0x00000003) << 1)));
 
