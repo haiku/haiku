@@ -757,16 +757,29 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 	if (vnode == NULL || buffer == NULL)
 		return EINVAL;
 
+	// we don't use get_vnode() here because this call is more
+	// efficient and does all we need from get_vnode()
 	inc_vnode_ref_count(vnode);
 
 	path[--insert] = '\0';
 	
 	while (true) {
-		char name[B_FILE_NAME_LENGTH];
-		vnode_id parentId;
+		// the name buffer is also used for fs_read_dir()
+		char nameBuffer[sizeof(struct dirent) + B_FILE_NAME_LENGTH];
+		char *name = &((struct dirent *)nameBuffer)->d_name[0];
+		vnode_id parentId, id;
 
 		// lookup the parent vnode
 		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->priv_vnode,"..",&parentId);
+
+		// Does the file system support getting the name of a vnode?
+		// If so, get it here...
+		if (status == B_OK && FS_CALL(vnode,fs_get_vnode_name))
+			status = FS_CALL(vnode,fs_get_vnode_name)(vnode->mount->cookie,vnode->priv_vnode,name,B_FILE_NAME_LENGTH);
+
+		// ... if not, find it out later (by iterating through
+		// the parent directory, searching for the id)
+		id = vnode->vnid;
 
 		// release the current vnode, we only need its parent from now on
 		put_vnode(vnode);
@@ -789,29 +802,31 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		if (status < B_OK)
 			return status;
 
-		// okay, we got the parent node, so we can now paste its name
-		// in front of our working path - but we don't know the name yet...
-
-		// does the file system support getting the name of a vnode?
-		if (FS_CALL(vnode,fs_get_vnode_name))
-			status = FS_CALL(vnode,fs_get_vnode_name)(vnode->mount->cookie,vnode->priv_vnode,name,sizeof(name));
-		else {
+		if (!FS_CALL(vnode,fs_get_vnode_name)) {
+			// If we don't got the vnode's name yet, we have to search for it
+			// in the parent directory now
 			file_cookie cookie;
 
 			status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie,vnode->priv_vnode,&cookie);
 			if (status >= B_OK) {
-				// ToDo: implement fall-back - iterate through the directory
-				// and find the correct entry...
-				// Does need some more stack space...
-				/* ... */
+				struct dirent *dirent = (struct dirent *)nameBuffer;
+				while (true) {
+					uint32 num = 1;
+					status = FS_CALL(vnode,fs_read_dir)(vnode->mount->cookie,vnode->priv_vnode,cookie,dirent,sizeof(nameBuffer),&num);
+					if (status < B_OK)
+						break;
+					
+					if (id == dirent->d_ino)
+						// found correct entry!
+						break;
+				}
 				FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->priv_vnode,cookie);
 			}
 
-			status = B_ERROR;
-		}
-		if (status < B_OK) {
-			put_vnode(vnode);
-			return status;
+			if (status < B_OK) {
+				put_vnode(vnode);
+				return status;
+			}
 		}
 
 		// add the name infront of the current path
@@ -823,7 +838,7 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			return ENOBUFS;
 		}
 		memcpy(path + insert, name, length);
-		path[--insert] == '/';
+		path[--insert] = '/';
 	}
 
 	// add the mountpoint
@@ -832,7 +847,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		return ENOBUFS;
 
 	memcpy(buffer, vnode->mount->mount_point, length);
-	memcpy(buffer + length, path + insert, sizeof(path) - insert);
+	if (insert != sizeof(path))
+		memcpy(buffer + length, path + insert, sizeof(path) - insert);
 
 	return B_OK;
 }
@@ -1459,11 +1475,12 @@ vfs_unlink(char *path, bool kernel)
 	FUNCTION(("vfs_unlink: path '%s', kernel %d\n", path, kernel));
 
 	err = path_to_dir_vnode(path, &v, filename, kernel);
-	if(err < 0)
+	if (err < 0)
 		goto err;
 
 	err = v->mount->fs->calls->fs_unlink(v->mount->cookie, v->priv_vnode, filename);
 	dec_vnode_ref_count(v, true, false);
+
 err:
 	return err;
 }

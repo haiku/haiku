@@ -184,11 +184,11 @@ insert_cookie_in_jar(struct devfs_vnode *dir, struct devfs_cookie *cookie)
 static void
 remove_cookie_from_jar(struct devfs_vnode *dir, struct devfs_cookie *cookie)
 {
-	if(cookie->u.dir.next)
+	if (cookie->u.dir.next)
 		cookie->u.dir.next->u.dir.prev = cookie->u.dir.prev;
-	if(cookie->u.dir.prev)
+	if (cookie->u.dir.prev)
 		cookie->u.dir.prev->u.dir.next = cookie->u.dir.next;
-	if(dir->stream.u.dir.jar_head == cookie)
+	if (dir->stream.u.dir.jar_head == cookie)
 		dir->stream.u.dir.jar_head = cookie->u.dir.next;
 
 	cookie->u.dir.prev = cookie->u.dir.next = NULL;
@@ -281,7 +281,7 @@ devfs_is_dir_empty(struct devfs_vnode *dir)
 
 static int
 devfs_get_partition_info( struct devfs *fs, struct devfs_vnode *v, 
-		struct devfs_cookie *cookie, void *buf, size_t len)
+	struct devfs_cookie *cookie, void *buf, size_t len)
 {
 	devfs_partition_info *info = (devfs_partition_info *)buf;
 	struct devfs_part_map *part_map = v->stream.u.dev.part_map;
@@ -297,12 +297,14 @@ devfs_get_partition_info( struct devfs *fs, struct devfs_vnode *v,
 
 	// XXX: todo - create raw device name out of raw_vnode 
 	//             we need vfs support for that (see vfs_get_cwd)
-	strcpy( info->raw_device, "something_raw" );
+	strcpy(info->raw_device, "something_raw");
 	
 	return B_NO_ERROR;
 }
 
-static int devfs_set_partition( struct devfs *fs, struct devfs_vnode *v, 
+
+static int
+devfs_set_partition( struct devfs *fs, struct devfs_vnode *v, 
 	struct devfs_cookie *cookie, void *buf, size_t len)
 {
 	struct devfs_part_map *part_map;
@@ -531,7 +533,6 @@ devfs_lookup(fs_cookie _fs, fs_vnode _dir, const char *name, vnode_id *id)
 err:
 	mutex_unlock(&fs->lock);
 
-	INSANE(("--devfs_lookup: returns %d\n",err));
 	return err;
 }
 
@@ -631,19 +632,11 @@ devfs_open(fs_cookie _fs, fs_vnode _v, file_cookie *_cookie, int oflags)
 	if (cookie == NULL)
 		return ENOMEM;
 
-	INSANE(("zulu: calls = %p\n",vnode->stream.u.dev.calls));
-	if (vnode->stream.u.dev.calls)
-		INSANE(("hellacious: open = %p!\n",vnode->stream.u.dev.calls->open));
-
-	if (vnode->stream.type != STREAM_TYPE_DEVICE) {
-		INSANE(("bye bye!\n"));
+	if (vnode->stream.type != STREAM_TYPE_DEVICE)
 		return EINVAL;
-	}
-	INSANE(("got here.\n"));
 
 	status = vnode->stream.u.dev.calls->open(vnode->name, oflags, &cookie->u.dev.dcookie);
 	*_cookie = cookie;
-	INSANE(("cool!\n"));
 
 	return status;
 }
@@ -700,16 +693,15 @@ devfs_read(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, void *buffer, off_t 
 	struct devfs_vnode *vnode = _v;
 	struct devfs_cookie *cookie = _cookie;
 	struct devfs_part_map *part_map;
-	int status;
 
 	TRACE(("devfs_read: vnode %p, cookie %p, pos %Ld, len %p\n", vnode, cookie, pos, length));
 
-INSANE(("juchu, buffer = %p!\n",buffer));
-//	if (cookie->stream->type != STREAM_TYPE_DEVICE)
-//		return EINVAL;
+	// Whoa! If the next to lines are uncommented, our kernel crashes at some point
+	// I haven't yet found the time to investigate, but I'll doubtlessly have to do
+	// that at some point -- axeld.
+	//if (cookie->stream->type != STREAM_TYPE_DEVICE)
+	//	return EINVAL;
 
-INSANE((":%p:%p:%p:%p\n",vnode->all_next,vnode->name,vnode->redir_vnode,vnode->parent));
-INSANE(("name = %s\n",vnode->name));
 	part_map = vnode->stream.u.dev.part_map;
 	if (part_map) {
 		if (pos < 0)
@@ -723,11 +715,7 @@ INSANE(("name = %s\n",vnode->name));
 	}
 
 	// pass the call through to the device
-	INSANE(("calls = %p\n",vnode->stream.u.dev.calls));
-	status = vnode->stream.u.dev.calls->read(cookie->u.dev.dcookie, pos, buffer, length);
-	INSANE(("hulu: calls = %p\n",vnode->stream.u.dev.calls));
-	INSANE((":%p:%p:%p:%p\n",vnode->all_next,vnode->name,vnode->redir_vnode,vnode->parent));
-	return status;
+	return vnode->stream.u.dev.calls->read(cookie->u.dev.dcookie, pos, buffer, length);
 }
 
 
@@ -739,7 +727,6 @@ devfs_write(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, const void *buf,
 	struct devfs_cookie *cookie = _cookie;
 	
 	TRACE(("devfs_write: vnode %p, cookie %p, pos %Ld, len %p\n", vnode, cookie, pos, len));
-	INSANE((":%p:%p:%p:%p\n",vnode->all_next,vnode->name,vnode->redir_vnode,vnode->parent));
 
 	if (vnode->stream.type == STREAM_TYPE_DEVICE) {
 		struct devfs_part_map *part_map = vnode->stream.u.dev.part_map;
@@ -756,10 +743,7 @@ devfs_write(fs_cookie _fs, fs_vnode _v, file_cookie _cookie, const void *buf,
 			pos += part_map->offset;
 		}
 
-	INSANE(("hela: name = \"%s\", calls = %p\n",vnode->name,vnode->stream.u.dev.calls));
 		written = vnode->stream.u.dev.calls->write(cookie->u.dev.dcookie, pos, buf, len);
-	INSANE(("helu: calls = %p\n",vnode->stream.u.dev.calls));
-	INSANE((":%p:%p:%p:%p\n",vnode->all_next,vnode->name,vnode->redir_vnode,vnode->parent));
 		return written;
 	}
 	return EINVAL;
@@ -1026,7 +1010,6 @@ devfs_read_stat(fs_cookie _fs, fs_vnode _v, struct stat *stat)
 	struct devfs_vnode *vnode = _v;
 
 	TRACE(("devfs_rstat: vnode %p (%Ld), stat %p\n", vnode, vnode->id, stat));
-	INSANE(("-> calls = %p\n",vnode->stream.u.dev.calls));
 
 	stat->st_ino = vnode->id;
 	stat->st_mode = DEFFILEMODE;
