@@ -55,26 +55,26 @@ public:
 		- \c B_ERROR if the buffer is not allocated in an area
 		- area_id for the buffer
 	*/
-	area_id Area(void) { return _area; }
+	area_id Area(void) const { return _area; }
 	
 	// Returns the offset of the bitmap in its area
 	int32 AreaOffset(void) { return _offset; }
 	
 	//! Returns the bitmap's buffer
-	uint8 *Bits(void) { return _buffer; }
-	uint32 BitsLength(void);
+	uint8 *Bits(void) const { return _buffer; }
+	uint32 BitsLength(void) const;
 
 	//! Returns the size of the bitmap
-	BRect Bounds() { return BRect(0,0,_width-1,_height-1); };
+	BRect Bounds() const { return BRect(0,0,_width-1,_height-1); };
 	
 	//! Returns the number of bytes in each row, including padding
-	int32 BytesPerRow(void) { return _bytesperrow; };
+	int32 BytesPerRow(void) const { return _bytesperrow; };
 	
 	//! Returns the pixel color depth
-	uint8 BitsPerPixel(void) { return _bpp; } 
+	uint8 BitsPerPixel(void) const { return _bpp; } 
 	
 	//! Returns the color space of the bitmap
-	color_space ColorSpace(void) { return _space; }
+	color_space ColorSpace(void) const { return _space; }
 	
 	//! Returns the width of the bitmap
 	int32 Width(void) const { return _width; }
@@ -83,10 +83,10 @@ public:
 	int32 Height(void) const { return _height; }
 
 	//! Returns whether the bitmap is valid
-	bool InitCheck(void) { return _initialized; }
+	bool InitCheck(void) const { return _initialized; }
 
 	//! Returns the identifier token for the bitmap
-	int32 Token(void) { return _token; }
+	int32 Token(void) const { return _token; }
 	
 protected:
 	friend class BitmapManager;
@@ -113,6 +113,15 @@ protected:
 	int _bpp;
 	int32 _token;
 	int32 _offset;
+};
+
+class UtilityBitmap : public ServerBitmap
+{
+public:
+	UtilityBitmap(BRect rect,color_space space, int32 flags,
+		int32 bytesperline=-1, screen_id screen=B_MAIN_SCREEN_ID);
+	UtilityBitmap(const ServerBitmap *bmp);
+	~UtilityBitmap(void);
 };
 
 #endif

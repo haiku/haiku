@@ -315,12 +315,13 @@ protected:
 	bool _is_cursor_obscured;
 
 	ServerCursor *_cursor;
-	ServerBitmap *_cursorsave;
+	UtilityBitmap *_cursorsave;
 
 	uint32 _dpms_state;
 	uint32 _dpms_caps;
 	accelerant_device_info _acc_device_info;
-
+	display_mode _displaymode;
+	
 	BRect oldcursorframe, cursorframe, saveframe;
 	DrawData _drawdata;
 };
