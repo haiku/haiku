@@ -4,13 +4,17 @@
 **
 ** Author: Zousar Shaker
 **         Axel Dörfler, axeld@pinc-software.de
+**         Marcus Overhagen
 **
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
 
 #include <ParameterWeb.h>
+#include <MediaNode.h>
 #include <string.h>
+#include "DataExchange.h"
+#include "MediaMisc.h"
 
 // for now!
 #ifdef DEBUG
@@ -1328,11 +1332,64 @@ BParameter::Flags() const
 status_t
 BParameter::GetValue(void *buffer, size_t *ioSize, bigtime_t *when)
 {
-	UNIMPLEMENTED();
-	/*
-	 * XXX ToDo: call BControllable::GetControlValue() here.
-	 */
-	return B_BAD_VALUE;
+	CALLED();
+
+	controllable_get_parameter_data_request request;
+	controllable_get_parameter_data_reply reply;
+	media_node node;
+	area_id area;
+	status_t rv;
+	void *data;
+
+	if (buffer == 0 || ioSize == 0)
+		return B_BAD_VALUE;
+	if (*ioSize <= 0)
+		return B_NO_MEMORY;
+		
+	if (mWeb == 0) {
+		FATAL("BParameter::GetValue: no parent BParameterWeb\n");
+		return B_NO_INIT;
+	}
+	
+	node = mWeb->Node();
+	if (IS_INVALID_NODE(node)) {
+		FATAL("BParameter::GetValue: the parent BParameterWeb is not assigned to a BMediaNode\n");
+		return B_NO_INIT;
+	}
+	
+	if (*ioSize > MAX_PARAMETER_DATA) {
+		// create an area if large data needs to be transfered
+		area = create_area("get parameter data", &data, B_ANY_ADDRESS, ROUND_UP_TO_PAGE(*ioSize), B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
+		if (area < B_OK) {
+			FATAL("BParameter::GetValue can't create area of %ld bytes\n", *ioSize);
+			return B_NO_MEMORY;
+		}
+	} else {
+		area = -1;
+		data = reply.rawdata;
+	}
+
+	request.parameter_id = mID;
+	request.requestsize = *ioSize;
+	request.area = area;
+	
+	rv = QueryPort(node.port, CONTROLLABLE_GET_PARAMETER_DATA, &request, sizeof(request), &reply, sizeof(reply));
+	
+	if (rv == B_OK) {
+		// we don't care about the reported data size and copy the full buffer
+		memcpy(buffer, data, *ioSize);
+		// store reported data size
+		*ioSize = reply.size;
+		// store last update time if when != NULL
+		if (when != 0)
+			*when = reply.last_change;
+	} else
+		FATAL("BParameter::GetValue querying node failed\n");
+
+	if (area != -1)
+		delete_area(area);
+	
+	return rv;
 }
 
 

@@ -132,6 +132,34 @@ BControllable::HandleMessage(int32 message, const void *data, size_t size)
 
 	status_t rv;
 	switch (message) {
+		case CONTROLLABLE_GET_PARAMETER_DATA:
+		{
+			const controllable_get_parameter_data_request *request = static_cast<const controllable_get_parameter_data_request *>(data);
+			controllable_get_parameter_data_reply reply;
+			area_id area;
+			void *data;
+			
+			if (request->area == -1) {
+				// small data transfer uses buffer in reply
+				area = -1;
+				data = reply.rawdata;
+			} else {
+				// large data transfer, clone area
+				area = clone_area("get parameter data clone", &data, B_ANY_ADDRESS, B_READ_AREA | B_WRITE_AREA, request->area);
+				if (area < B_OK) {
+					FATAL("CONTROLLABLE_GET_PARAMETER_DATA cloning area failed\n");
+					request->SendReply(B_NO_MEMORY, &reply, sizeof(reply));
+					return B_OK;
+				}
+			}
+			reply.size = request->requestsize;
+			rv = GetParameterValue(request->parameter_id, &reply.last_change, data, &reply.size);
+			if (area != -1)
+				delete_area(area);
+			request->SendReply(rv, &reply, sizeof(reply));
+			return B_OK;
+		}
+	
 		case CONTROLLABLE_GET_PARAMETER_WEB:
 		{
 			const controllable_get_parameter_web_request *request = static_cast<const controllable_get_parameter_web_request *>(data);
