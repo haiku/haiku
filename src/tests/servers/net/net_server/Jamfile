@@ -8,3 +8,5 @@ SimpleTest net_server :
 	net_server.cpp
 	: be
 ;
+
+SubInclude OBOS_TOP src tests servers net net_server add-ons ;
