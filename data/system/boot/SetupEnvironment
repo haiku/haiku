@@ -11,7 +11,7 @@ export GROUP=users
 BUILDHOME=/boot/develop
 
 case `uname -m` in
-BePC)
+BePC|Intel)
 	BE_HOST_CPU=x86
 	BETOOLS="$BUILDHOME/bin"
 	BELIBRARIES="$BUILDHOME/lib/$BE_HOST_CPU"
