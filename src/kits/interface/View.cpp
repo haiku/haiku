@@ -2292,7 +2292,7 @@ void BView::DrawString(const char* aString, int32 length, escapement_delta* delt
 void BView::DrawString(const char* aString, int32 length, BPoint location,
 		escapement_delta* delta)
 {
-	if ( !aString )
+	if ( !aString || length<1)
 		return;
 
 	if (owner)
@@ -2300,6 +2300,7 @@ void BView::DrawString(const char* aString, int32 length, BPoint location,
 		check_lock();
 		
 		owner->fLink->StartMessage( AS_DRAW_STRING );
+		owner->fLink->Attach<int32>( length );
 		owner->fLink->Attach<BPoint>( location );
 		
 		// Quite often delta will be NULL, so we have to accomodate this.
