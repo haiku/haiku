@@ -185,6 +185,7 @@ extern status_t		_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
 // time functions
 extern status_t		_kern_set_real_time_clock(uint32 time);
 extern status_t		_kern_set_tzspecs(int32 timezone_offset, bool dst_observed);
+extern status_t		_kern_set_tzfilename(const char *filename, size_t length, bool isGMT);
 
 // area functions
 area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
