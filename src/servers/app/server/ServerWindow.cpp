@@ -634,19 +634,42 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 	int32 code;
 	int32 view_token;
 	uint32 sizeRemaining = (uint32)msgsize;
+	BRegion WindowClipRegion;
+	BRegion LayerClipRegion;
+	Layer *sibling;
+	int32 numRects;
 	
 	if ( !msgsize || !msgbuffer )
+		return;
+	if ( IsHidden() )
+		return;
+
+	WindowClipRegion.Set(_winborder->Frame());
+	sibling = _winborder->GetUpperSibling();
+	while ( sibling )
+	{
+		WindowClipRegion.Exclude(sibling->Frame());
+		sibling = sibling->GetUpperSibling();
+	}
+
+	if ( !WindowClipRegion.Frame().IsValid() )
 		return;
 	
 	// We need to decide whether coordinates are specified in view or root coordinates.
 	// For now, we assume root level coordinates.
-	while (sizeRemaining > 2*sizeof(int32))
+	code = AS_BEGIN_UPDATE;
+	while ((sizeRemaining > 2*sizeof(int32)) && (code != AS_END_UPDATE))
 	{
 		code = read_from_buffer<int32>(&msgbuffer);
 		view_token = read_from_buffer<int32>(&msgbuffer);
 		layer = _workspace->GetRoot()->FindLayer(view_token);
 		if ( layer )
+		{
 			layerdata = layer->GetLayerData();
+			LayerClipRegion.Set(layer->Frame());
+			LayerClipRegion.IntersectWith(&WindowClipRegion);
+			numRects = LayerClipRegion.CountRects();
+		}
 		else
 		{
 			layerdata = NULL;
@@ -999,7 +1022,6 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 			case AS_FILL_RECT:
 			{
-				// TODO:: Add clipping
 				if ( sizeRemaining >= AS_FILL_RECT_MSG_SIZE )
 				{
 					float left, top, right, bottom;
@@ -1010,8 +1032,15 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
 					BRect rect(left,top,right,bottom);
-					if ( layerdata )
-						_app->_driver->FillRect(rect,layerdata,pattern);
+					if ( layerdata && numRects )
+						if ( numRects == 1 )
+							_app->_driver->FillRect(rect,layerdata,pattern);
+						else
+						{
+							int i;
+							for (i=0; i<numRects; i++)
+								_app->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
+						}
 					sizeRemaining -= AS_FILL_RECT_MSG_SIZE;
 				}
 				else

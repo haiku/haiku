@@ -64,6 +64,8 @@ public:
 	void MakeBottomChild(void);
 	Layer *FindLayer(int32 token);
 	Layer *GetChildAt(BPoint pt, bool recursive=false);
+	Layer *GetUpperSibling() { return _uppersibling; }
+	Layer *GetLowerSibling() { return _lowersibling; }
 	PortLink *GetLink(void);
 	const char *GetName(void) { return (_name)?_name->String():NULL; }
 	LayerData *GetLayerData(void) { return _layerdata; }
