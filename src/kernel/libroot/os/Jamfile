@@ -1,5 +1,7 @@
 SubDir OBOS_TOP src kernel libroot os ;
 
+SubDirHdrs [ FCurrentObjectsDir ] ;
+
 KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>area.c
 	<$(SOURCE_GRIST)>atomic.c
@@ -8,7 +10,7 @@ KernelMergeObject os_main.o :
 	<$(SOURCE_GRIST)>fs_attr.c
 	<$(SOURCE_GRIST)>fs_index.c
 	<$(SOURCE_GRIST)>fs_info.c
-	<$(SOURCE_GRIST)>fs_query.c
+	<$(SOURCE_GRIST)>fs_query.cpp
 	<$(SOURCE_GRIST)>image.c
 	<$(SOURCE_GRIST)>parsedate.cpp
 	<$(SOURCE_GRIST)>port.c
@@ -21,6 +23,9 @@ KernelMergeObject os_main.o :
 	:
 	-fPIC -DPIC
 	;
+
+# We need to specify the dependency on the generated syscalls file explicitly.
+Depends [ FGristFiles syscalls.o ] : <syscalls>syscalls.S.inc ;
 
 MergeObjectFromObjects kernel_os_main.o :
 	<$(SOURCE_GRIST)>driver_settings.o

@@ -45,6 +45,9 @@ KernelMergeObject kernel_core.o :
 	-fno-pic -D_KERNEL_MODE
 	;
 
+# We need to specify the dependency on the generated syscalls file explicitly.
+Includes [ FGristFiles syscalls.c ] : <syscalls>syscall_dispatcher.h ;
+
 KernelLd linkhack.so :
 	<$(SOURCE_GRIST)>linkhack.o
 	:
