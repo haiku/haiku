@@ -6,7 +6,9 @@
 #ifndef KMESSAGE_H
 #define KMESSAGE_H
 
-#include <SupportDefs.h>
+#include <string.h>
+
+#include <OS.h>
 #include <TypeConstants.h>
 
 namespace BPrivate {
@@ -117,7 +119,6 @@ private:
 	FieldHeader *_FirstFieldHeader() const;
 	FieldHeader *_LastFieldHeader() const;
 	FieldHeader *_FieldHeaderForOffset(int32 offset) const;
-//	FieldHeader *_NextFieldHeader(FieldHeader *fieldHeader) const;
 	status_t _AddField(const char *name, type_code type, int32 elementSize,
 		KMessageField *field);
 	status_t _AddFieldData(KMessageField *field, const void *data,
