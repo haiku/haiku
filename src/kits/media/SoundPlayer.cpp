@@ -7,6 +7,7 @@
 #include <MediaRoster.h>
 #include <ParameterWeb.h>
 #include <math.h>
+#include <string.h>
 
 #include "debug.h"
 #include "SoundPlayNode.h"

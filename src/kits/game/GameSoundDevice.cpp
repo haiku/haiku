@@ -26,8 +26,9 @@
 //					this time. Use at your own risk.
 //------------------------------------------------------------------------------
 
-#include <stdio.h>
 #include <malloc.h>
+#include <stdio.h>
+#include <string.h>
 
 #include <List.h>
 #include <MediaRoster.h>

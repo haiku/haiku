@@ -49,6 +49,7 @@
 #include "debug.h"
 
 #include <stdio.h>
+#include <string.h>
 
 const char * multi_string[] =
 {

@@ -1,3 +1,4 @@
+#include <string.h>
 #include <Application.h>
 #include <MediaRoster.h>
 #include <TimeSource.h>
