@@ -394,10 +394,15 @@ OpenDMLFile::AviMainHeader()
 }
 
 const wave_format_ex *
-OpenDMLFile::AudioFormat(int stream_index)
+OpenDMLFile::AudioFormat(int stream_index, size_t *size /* = 0*/)
 {
-	return (fStreamData[stream_index].info->is_audio && fStreamData[stream_index].info->audio_format_valid) ?
-		&fStreamData[stream_index].info->audio_format : 0;
+	if (!fStreamData[stream_index].info->is_audio)
+		return 0;
+	if (!fStreamData[stream_index].info->audio_format)
+		return 0;
+	if (size)
+		*size = fStreamData[stream_index].info->audio_format_size;
+	return fStreamData[stream_index].info->audio_format;
 }
 
 const bitmap_info_header *

@@ -21,7 +21,7 @@ public:
 
 	const avi_main_header *AviMainHeader();
 
-	const wave_format_ex *		AudioFormat(int stream_index);
+	const wave_format_ex *		AudioFormat(int stream_index, size_t *size = 0);
 	const bitmap_info_header *	VideoFormat(int stream_index);
 	const avi_stream_header *	StreamFormat(int stream_index);
 	

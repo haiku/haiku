@@ -182,6 +182,16 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		// this doesn't seem to work (it's not even a fourcc)
 		format->user_data_type = B_CODEC_TYPE_INFO;
 		*(uint32 *)format->user_data = audio_format->format_tag; format->user_data[4] = 0;
+		
+		// put the wave_format_ex struct, including extra data, into the format meta data.
+		size_t size;
+		const void *data = fFile->AudioFormat(cookie->stream, &size);
+		format->SetMetaData(data, size);
+		
+		uint8 *p = 18 + (uint8 *)data;
+		printf("extra_data: %d: %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
+			size - 18, p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8], p[9]);
+	
 		return B_OK;
 	}
 

@@ -34,6 +34,7 @@ OpenDMLParser::OpenDMLParser()
 
 OpenDMLParser::~OpenDMLParser()
 {
+	// XXX free memory here!
 }
 
 int
@@ -92,7 +93,7 @@ OpenDMLParser::CreateNewStreamInfo()
 	info->is_audio = false;
 	info->is_video = false;
 	info->stream_header_valid = false;
-	info->audio_format_valid = false;
+	info->audio_format = 0;
 	info->video_format_valid = false;
 	info->odml_index_start = 0;
 	info->odml_index_size = 0;
@@ -397,7 +398,7 @@ OpenDMLParser::ParseChunk_strh(uint64 start, uint32 size)
 void
 OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 {
-	TRACE("OpenDMLParser::ParseChunk_strf\n");
+	TRACE("OpenDMLParser::ParseChunk_strf, size %lu\n", size);
 
 	if (fCurrentStream == 0) {
 		TRACE("OpenDMLParser::ParseChunk_strf: error, no Stream info\n");
@@ -406,43 +407,47 @@ OpenDMLParser::ParseChunk_strf(uint64 start, uint32 size)
 	
 	if (fCurrentStream->is_audio) {
 
-		if (fCurrentStream->audio_format_valid) {
+		if (fCurrentStream->audio_format) {
 			TRACE("OpenDMLParser::ParseChunk_strf: error, already have audio format header\n");
 			return;
 		}
-	
+
 //		if (size < sizeof(fCurrentStream->audio_format)) {
 //			TRACE("OpenDMLParser::ParseChunk_strf: warning, avi audio header chunk too small\n");
 //		}
-	
-		memset(&fCurrentStream->audio_format, 0, sizeof(fCurrentStream->audio_format));
-	
-		size = min_c(size, sizeof(fCurrentStream->audio_format));
-		if ((ssize_t)size != fSource->ReadAt(start, &fCurrentStream->audio_format, size)) {
+
+		// if size to read is less then	sizeof(wave_format_ex), allocate
+		// a full wave_format_ex and fill reminder with zero bytes
+		fCurrentStream->audio_format_size = max_c(sizeof(wave_format_ex), size);
+		fCurrentStream->audio_format = (wave_format_ex *) new char[fCurrentStream->audio_format_size];
+		memset(size + (char *)fCurrentStream->audio_format, 0, fCurrentStream->audio_format_size - size);
+
+		if ((ssize_t)size != fSource->ReadAt(start, fCurrentStream->audio_format, size)) {
 			TRACE("OpenDMLParser::ParseChunk_strf: read error at pos %llu\n", start);
+			delete [] fCurrentStream->audio_format;
+			fCurrentStream->audio_format_size = 0;
+			fCurrentStream->audio_format = 0;
 			return;
 		}
 		
 		#if B_HOST_IS_BENDIAN
-			B_SWAP_INT16(&fCurrentStream->audio_format.format_tag);
-			B_SWAP_INT16(&fCurrentStream->audio_format.channels);
-			B_SWAP_INT32(&fCurrentStream->audio_format.frames_per_sec);
-			B_SWAP_INT32(&fCurrentStream->audio_format.avg_bytes_per_sec);
-			B_SWAP_INT32(&fCurrentStream->audio_format.block_align);
-			B_SWAP_INT32(&fCurrentStream->audio_format.bits_per_sample);
-			B_SWAP_INT32(&fCurrentStream->audio_format.extra_size);
+			B_SWAP_INT16(&fCurrentStream->audio_format->format_tag);
+			B_SWAP_INT16(&fCurrentStream->audio_format->channels);
+			B_SWAP_INT32(&fCurrentStream->audio_format->frames_per_sec);
+			B_SWAP_INT32(&fCurrentStream->audio_format->avg_bytes_per_sec);
+			B_SWAP_INT32(&fCurrentStream->audio_format->block_align);
+			B_SWAP_INT32(&fCurrentStream->audio_format->bits_per_sample);
+			B_SWAP_INT32(&fCurrentStream->audio_format->extra_size);
 		#endif
 
-		fCurrentStream->audio_format_valid = true;
-		
 		TRACE("audio_format:\n");
-		TRACE("format_tag        = 0x%x\n", fCurrentStream->audio_format.format_tag);
-		TRACE("channels          = %u\n", fCurrentStream->audio_format.channels);
-		TRACE("frames_per_sec    = %lu\n", fCurrentStream->audio_format.frames_per_sec);
-		TRACE("avg_bytes_per_sec = %lu\n", fCurrentStream->audio_format.avg_bytes_per_sec);
-		TRACE("block_align       = %u\n", fCurrentStream->audio_format.block_align);
-		TRACE("bits_per_sample   = %u\n", fCurrentStream->audio_format.bits_per_sample);
-		TRACE("extra_size        = %u\n", fCurrentStream->audio_format.extra_size);
+		TRACE("format_tag        = 0x%x\n", fCurrentStream->audio_format->format_tag);
+		TRACE("channels          = %u\n", fCurrentStream->audio_format->channels);
+		TRACE("frames_per_sec    = %lu\n", fCurrentStream->audio_format->frames_per_sec);
+		TRACE("avg_bytes_per_sec = %lu\n", fCurrentStream->audio_format->avg_bytes_per_sec);
+		TRACE("block_align       = %u\n", fCurrentStream->audio_format->block_align);
+		TRACE("bits_per_sample   = %u\n", fCurrentStream->audio_format->bits_per_sample);
+		TRACE("extra_size        = %u\n", fCurrentStream->audio_format->extra_size);
 		
 		// XXX read extra data
 	

@@ -11,8 +11,8 @@ struct stream_info
 	bool				is_video;
 	bool				stream_header_valid;
 	avi_stream_header	stream_header;
-	bool 				audio_format_valid;
-	wave_format_ex		audio_format;
+	wave_format_ex		*audio_format;
+	size_t				audio_format_size;
 	bool 				video_format_valid;
 	bitmap_info_header	video_format;
 	int64				odml_index_start;
