@@ -220,7 +220,7 @@ void ScopeView::DrawPlaying()
 		SetHighColor(255, 0, 130);
 		SetLowColor(0, 130, 0);
 		#define N 16
-		int32 x, y, sx = 0, f = (height << N) / 65535, dy = height / 2;
+		int32 x, y, sx = 0, f = (height << N) / 65535, dy = height / 2 + 1;
 		for (int32 i = 0; i < width; i++)
 		{
 			x = sx / width;
