@@ -47,6 +47,7 @@
 #define PSRV_SHOW_PAGE_SETUP				'pgst'
 #define PSRV_SHOW_PRINT_SETUP				'ppst'
 #define PSRV_PRINT_SPOOLED_JOB				'psns'
+#define PSRV_GET_DEFAULT_CONFIGURATION      'pdef'
 
 // mime file types
 #define PSRV_PRINTER_FILETYPE		"application/x-vnd.Be.printer"
