@@ -140,16 +140,16 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 			*call_ret = user_rename((const char *)arg0, (const char *)arg1);
 			break;
 		case SYSCALL_READ_PATH_STAT:
-			*call_ret = user_read_path_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2);
+			*call_ret = _user_read_path_stat((const char *)arg0, (bool)arg1, (struct stat *)arg2, (size_t)arg3);
 			break;
 		case SYSCALL_WRITE_PATH_STAT:
-			*call_ret = user_write_path_stat((const char *)arg0, (bool)arg1, (const struct stat *)arg2, (int)arg3);
+			*call_ret = _user_write_path_stat((const char *)arg0, (bool)arg1, (const struct stat *)arg2, (size_t)arg3, (int)arg4);
 			break;
 		case SYSCALL_READ_STAT:
-			*call_ret = user_read_stat((int)arg0, (struct stat*)arg1);
+			*call_ret = _user_read_stat((int)arg0, (struct stat *)arg1, (size_t)arg2);
 			break;
 		case SYSCALL_WRITE_STAT:
-			*call_ret = user_write_stat((int)arg0, (const struct stat *)arg1, (int)arg2);
+			*call_ret = _user_write_stat((int)arg0, (const struct stat *)arg1, (size_t)arg2, (int)arg3);
 			break;
 		case SYSCALL_ACCESS:
 			*call_ret = user_access((const char *)arg0, (int)arg1);

@@ -3731,21 +3731,51 @@ sys_access(const char *path, int mode)
 }
 
 
-int
-sys_read_path_stat(const char *path, bool traverseLeafLink, struct stat *stat)
+status_t
+_kern_read_path_stat(const char *path, bool traverseLeafLink, struct stat *stat, size_t statSize)
 {
+	struct stat completeStat;
+	struct stat *originalStat = NULL;
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+	status_t status;
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
+
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
 
-	return common_path_read_stat(pathBuffer, traverseLeafLink, stat, true);
+	// this supports different stat extensions
+	if (statSize < sizeof(struct stat)) {
+		originalStat = stat;
+		stat = &completeStat;
+	}
+
+	status = common_path_read_stat(pathBuffer, traverseLeafLink, stat, true);
+	if (status == B_OK && originalStat != NULL)
+		memcpy(originalStat, stat, statSize);
+
+	return status;
 }
 
 
-int
-sys_write_path_stat(const char *path, bool traverseLeafLink, const struct stat *stat, int statMask)
+status_t
+_kern_write_path_stat(const char *path, bool traverseLeafLink, const struct stat *stat, size_t statSize, int statMask)
 {
+	struct stat completeStat;
 	char pathBuffer[SYS_MAX_PATH_LEN + 1];
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
+
 	strlcpy(pathBuffer, path, SYS_MAX_PATH_LEN - 1);
+
+	// this supports different stat extensions
+
+	if (statSize < sizeof(struct stat)) {
+		memset((uint8 *)&completeStat + statSize, 0, sizeof(struct stat) - statSize);
+		memcpy(&completeStat, stat, statSize);
+		stat = &completeStat;
+	}
 
 	return common_path_write_stat(pathBuffer, traverseLeafLink, stat, statMask, true);
 }
@@ -4281,12 +4311,16 @@ user_access(const char *userPath, int mode)
 }
 
 
-int
-user_read_path_stat(const char *userPath, bool traverseLink, struct stat *userStat)
+status_t
+_user_read_path_stat(const char *userPath, bool traverseLink, struct stat *userStat,
+	size_t statSize)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
 	int status;
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userPath)
 		|| !IS_USER_ADDRESS(userStat)
@@ -4294,24 +4328,32 @@ user_read_path_stat(const char *userPath, bool traverseLink, struct stat *userSt
 		return B_BAD_ADDRESS;
 
 	status = common_path_read_stat(path, traverseLink, &stat, false);
-	if (status < 0)
+	if (status < B_OK)
 		return status;
 
-	return user_memcpy(userStat, &stat, sizeof(struct stat));
+	return user_memcpy(userStat, &stat, statSize);
 }
 
 
-int
-user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct stat *userStat, int statMask)
+status_t
+_user_write_path_stat(const char *userPath, bool traverseLeafLink, const struct stat *userStat,
+	size_t statSize, int statMask)
 {
 	char path[SYS_MAX_PATH_LEN + 1];
 	struct stat stat;
 
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
+
 	if (!IS_USER_ADDRESS(userStat)
 		|| !IS_USER_ADDRESS(userPath)
 		|| user_strlcpy(path, userPath, SYS_MAX_PATH_LEN) < B_OK
-		|| user_memcpy(&stat, userStat, sizeof(struct stat)) < B_OK)
+		|| user_memcpy(&stat, userStat, statSize) < B_OK)
 		return B_BAD_ADDRESS;
+
+	// clear additional stat fields
+	if (statSize < sizeof(struct stat))
+		memset((uint8 *)&stat + statSize, 0, sizeof(struct stat) - statSize);
 
 	return common_path_write_stat(path, traverseLeafLink, &stat, statMask, false);
 }

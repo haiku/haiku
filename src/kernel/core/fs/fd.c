@@ -448,11 +448,14 @@ user_rewind_dir(int fd)
 }
 
 
-int
-user_read_stat(int fd, struct stat *userStat)
+status_t
+_user_read_stat(int fd, struct stat *userStat, size_t statSize)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
 
 	/* This is a user_function, so abort if we have a kernel address */
 	CHECK_USER_ADDR(userStat)
@@ -461,7 +464,7 @@ user_read_stat(int fd, struct stat *userStat)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("user_read_stat(descriptor = %p)\n", descriptor));
+	TRACE(("_user_read_stat(descriptor = %p)\n", descriptor));
 
 	if (descriptor->ops->fd_read_stat) {
 		// we're using the stat buffer on the stack to not have to
@@ -470,7 +473,7 @@ user_read_stat(int fd, struct stat *userStat)
 
 		status = descriptor->ops->fd_read_stat(descriptor, &stat);
 		if (status >= 0)
-			status = user_memcpy(userStat, &stat, sizeof(stat));
+			status = user_memcpy(userStat, &stat, statSize);
 	} else
 		status = EOPNOTSUPP;
 
@@ -479,11 +482,14 @@ user_read_stat(int fd, struct stat *userStat)
 }
 
 
-int
-user_write_stat(int fd, const struct stat *userStat, int statMask)
+status_t
+_user_write_stat(int fd, const struct stat *userStat, size_t statSize, int statMask)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
 
 	CHECK_USER_ADDR(userStat)
 
@@ -491,13 +497,16 @@ user_write_stat(int fd, const struct stat *userStat, int statMask)
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("user_write_stat(descriptor = %p)\n", descriptor));
+	TRACE(("_user_write_stat(descriptor = %p)\n", descriptor));
 
 	if (descriptor->ops->fd_write_stat) {
 		// we're using the stat buffer on the stack to not have to
 		// lock the given stat buffer in memory
 		struct stat stat;
-		status = user_memcpy(&stat, userStat, sizeof(stat));
+		if (sizeof(struct stat) != statSize)
+			memset((uint8 *)&stat + statSize, 0, sizeof(struct stat) - statSize);
+
+		status = user_memcpy(&stat, userStat, statSize);
 		if (status == B_OK)
 			status = descriptor->ops->fd_write_stat(descriptor, &stat, statMask);
 	} else
@@ -678,21 +687,35 @@ sys_rewind_dir(int fd)
 }
 
 
-int
-sys_read_stat(int fd, struct stat *stat)
+status_t
+_kern_read_stat(int fd, struct stat *stat, size_t statSize)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("sys_read_stat(descriptor = %p)\n", descriptor));
+	TRACE(("_kern_read_stat(descriptor = %p)\n", descriptor));
 
-	if (descriptor->ops->fd_read_stat)
+	if (descriptor->ops->fd_read_stat) {
+		// this supports different stat extensions
+		struct stat completeStat;
+		struct stat *originalStat = NULL;
+
+		if (statSize < sizeof(struct stat)) {
+			originalStat = stat;
+			stat = &completeStat;
+		}
 		status = descriptor->ops->fd_read_stat(descriptor, stat);
-	else
+
+		if (originalStat != NULL)
+			memcpy(originalStat, stat, statSize);
+	} else
 		status = EOPNOTSUPP;
 
 	put_fd(descriptor);
@@ -700,21 +723,32 @@ sys_read_stat(int fd, struct stat *stat)
 }
 
 
-int
-sys_write_stat(int fd, const struct stat *stat, int statMask)
+status_t
+_kern_write_stat(int fd, const struct stat *stat, size_t statSize, int statMask)
 {
 	struct file_descriptor *descriptor;
 	status_t status;
+
+	if (statSize > sizeof(struct stat))
+		return B_BAD_VALUE;
 
 	descriptor = get_fd(get_current_io_context(true), fd);
 	if (descriptor == NULL)
 		return B_FILE_ERROR;
 
-	TRACE(("sys_write_stat(descriptor = %p)\n", descriptor));
+	TRACE(("_kern_write_stat(descriptor = %p)\n", descriptor));
 
-	if (descriptor->ops->fd_write_stat)
+	if (descriptor->ops->fd_write_stat) {
+		// this supports different stat extensions
+		struct stat completeStat;
+
+		if (statSize < sizeof(struct stat)) {
+			memset((uint8 *)&completeStat + statSize, 0, sizeof(struct stat) - statSize);
+			memcpy(&completeStat, stat, statSize);
+			stat = &completeStat;
+		}
 		status = descriptor->ops->fd_write_stat(descriptor, stat, statMask);
-	else
+	} else
 		status = EOPNOTSUPP;
 
 	put_fd(descriptor);
