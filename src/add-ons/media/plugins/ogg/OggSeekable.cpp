@@ -155,6 +155,7 @@ OggSeekable::ReadPage(ogg_page * page, int read_size)
 	}
 	BAutolock autolock(fPositionLock);
 	// align to page boundary
+align:
 	int offset;
 	while ((offset = ogg_sync_pageseek(&fSync, page)) <= 0) {
 		if (offset == 0) {
@@ -204,9 +205,8 @@ OggSeekable::ReadPage(ogg_page * page, int read_size)
 		}
 		if (result == -1) {
 			TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
-			TRACE("OggSeekable::ReadPage: ogg_sync_pageout: not synced!\n");
-			debugger("lost sync");
-			return B_ERROR;
+			TRACE("OggSeekable::ReadPage: ogg_sync_pageout: not synced... attempt resync\n");
+			goto align;
 		}
 		if (ogg_page_version(page) != 0) {
 			TRACE("OggSeekable::ReadPage (%llu)\n", fPosition);
