@@ -145,7 +145,7 @@ const uint32 at_keycode_map[] = {
 	0x65,	// KP .
 	0x00,	// UNMAPPED
 	0x00,	// UNMAPPED
-	0x00,	// UNMAPPED
+	0x69,	// <
 	0x0c,	// F11
 	0x0d,	// F12
 	0x00,   // UNMAPPED
@@ -242,7 +242,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x23,   // KP /
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x0e,   // Print Screen
 	0x5f,   // Right Alt
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -257,7 +257,7 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x7f,   // Break
 	0x20,   // Home
 	0x57,	// Up Arrow
 	0x21,   // Page Up
@@ -278,9 +278,9 @@ const uint32 at_keycode_map[] = {
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
-	0x00,   // UNMAPPED
+	0x66,   // Left Gui
+	0x67,   // Right Gui
+	0x68,   // Menu
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
 	0x00,   // UNMAPPED
@@ -605,7 +605,7 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 			if (at_kbd->scancode>0)
 				keycode = at_keycode_map[at_kbd->scancode-1];	
 
-			LOG("kGetNextKey : %Ld, %02x, %02x, %02lx\n", at_kbd->timestamp, at_kbd->scancode, at_kbd->is_keydown, keycode);
+			LOG("kGetNextKey : %Ld, %02x, %02x, %02lx, %02x\n", at_kbd->timestamp, at_kbd->scancode, at_kbd->is_keydown, keycode, at_kbd->scancode & 0x80);
 
 			if (at_kbd->is_keydown)
 				states[(keycode)>>3] |= (1 << (7 - ((keycode) & 0x7)));
