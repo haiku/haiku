@@ -1,3 +1,7 @@
 SubDir OBOS_TOP src kernel apps cpuinfo ;
 
-KernelObjects <$(SOURCE_GRIST)>main.c : -fpic ;
+KernelObjects
+	<$(SOURCE_GRIST)>main.c
+	:
+	-fpic
+	;

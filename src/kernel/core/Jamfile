@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src kernel core ;
 
-KernelObjects 
+KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>cbuf.c
 	<$(SOURCE_GRIST)>console.c
 	<$(SOURCE_GRIST)>cpu.c
