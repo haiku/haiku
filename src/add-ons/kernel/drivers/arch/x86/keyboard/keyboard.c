@@ -31,6 +31,16 @@ enum keycodes {
 	NUM_LOCK	= 69,
 	SCR_LOCK	= 70,
 	SYS_REQ		= 55,
+	LCONTROL	= 29,
+	RCONTROL	= 29,	// dunno what it really is
+
+	CURSOR_LEFT		= 75,
+	CURSOR_RIGHT	= 77,
+	CURSOR_UP		= 72,
+	CURSOR_DOWN		= 80,
+
+	HOME			= 71,
+	END				= 79,
 
 	F1			= 0x3b,
 	F2, F3, F4, F5, F6,
@@ -46,13 +56,16 @@ enum keycodes {
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
-static bool shift;
+static bool shift, sControl;
 static int leds;
 static sem_id keyboard_sem;
 static mutex keyboard_read_mutex;
 static char keyboard_buf[1024];
 static unsigned int head, tail;
 static isa_module_info *gISA;
+
+// begins with HOME, end with CURSOR_DOWN
+static const char sControlKeys[] = {'@', 'A', 0, 0, 'D', 0, 'C', 0, '[', 'B'};
 
 // stolen from nujeffos
 const char unshifted_keymap[128] = {
@@ -138,6 +151,8 @@ handle_keyboard_interrupt(void *data)
 		// key up
 		if (key == LSHIFT + 0x80 || key == RSHIFT + 0x80)
 			shift = false;
+		if (key == LCONTROL + 0x80 || key == RCONTROL + 0x80)
+			sControl = false;
 
 		return B_HANDLED_INTERRUPT;
 	}
@@ -146,6 +161,10 @@ handle_keyboard_interrupt(void *data)
 		case LSHIFT:
 		case RSHIFT:
 			shift = true;
+			break;
+		case LCONTROL:
+		//case RCONTROL:
+			sControl = true;
 			break;
 		case CAPS_LOCK:
 			if (leds & LED_CAPS)
@@ -190,10 +209,22 @@ handle_keyboard_interrupt(void *data)
 			reboot();
 			break;
 
+		case HOME:
+		case END:
+		case CURSOR_DOWN:
+		case CURSOR_UP:
+		case CURSOR_LEFT:
+		case CURSOR_RIGHT:
+			insert_in_buf(0x1b);
+			insert_in_buf('[');
+			insert_in_buf(sControlKeys[key - HOME]);
+			retval = B_INVOKE_SCHEDULER;
+			break;
+
 		default: {
 			char ascii;
 
-			if (shift)
+			if (shift || sControl)
 				ascii = shifted_keymap[key];
 			else {
 				if (leds & LED_CAPS)
@@ -201,6 +232,9 @@ handle_keyboard_interrupt(void *data)
 				else
 					ascii = unshifted_keymap[key];
 			}
+
+			if (sControl && ascii >= 64 && ascii < 96)
+				ascii -= 0100;
 
 			TRACE(("ascii = 0x%x, '%c'\n", ascii, ascii));
 
@@ -380,7 +414,8 @@ init_driver()
 	if (mutex_init(&keyboard_read_mutex, "keyboard_read_mutex") < 0)
 		panic("could not create keyboard read mutex!\n");
 
-	shift = 0;
+	shift = false;
+	sControl = false;
 	leds = 0;
 
 	// have the scroll lock reflect the state of serial debugging
