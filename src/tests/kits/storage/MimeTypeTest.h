@@ -46,6 +46,7 @@ public:
 	void ShortDescriptionTest();
 	void PreferredAppTest();
 	void SupportingAppsTest();
+	void SupportedTypesTest();
 	void WildcardAppsTest();
 	
 	void InitTest();

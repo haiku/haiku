@@ -30,7 +30,7 @@ status_t get_icon(const char *type, BBitmap *icon, icon_size size);
 status_t get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 			icon_size which);
 status_t get_preferred_app(const char *type, char *signature, app_verb verb);
-status_t get_sniffer_rule(BString *result);
+status_t get_sniffer_rule(const char *type, BString *result);
 status_t get_supported_types(const char *type, BMessage *types);
 
 bool is_installed(const char *type);

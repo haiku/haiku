@@ -89,44 +89,39 @@ MIMEManager::MessageReceived(BMessage *message)
 		
 		case B_REG_MIME_GET_INSTALLED_TYPES:
 		{
-			BMessage types;
 			const char *supertype;
 			err = message->FindString("supertype", &supertype);
 			if (err == B_NAME_NOT_FOUND) 
-				err = fDatabase.GetInstalledTypes(&types);
+				err = fDatabase.GetInstalledTypes(&reply);
 			else if (!err) 
-				err = fDatabase.GetInstalledTypes(supertype, &types);
+				err = fDatabase.GetInstalledTypes(supertype, &reply);
 				
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			reply.AddMessage("types", &types);
 			message->SendReply(&reply, this);				
 			break;
 		}
 		
 		case B_REG_MIME_GET_INSTALLED_SUPERTYPES:
 		{
-			BMessage types;
-			err = fDatabase.GetInstalledSupertypes(&types);
+			err = fDatabase.GetInstalledSupertypes(&reply);
 				
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			reply.AddMessage("types", &types);
 			message->SendReply(&reply, this);				
 			break;
 		}
 
 		case B_REG_MIME_GET_SUPPORTING_APPS:
 		{
-			BMessage apps;
+			BMessage reply;
 			const char *type;
 			err = message->FindString("type", &type);
 			if (!err) 
-				err = fDatabase.GetSupportingApps(type, &apps);
+				err = fDatabase.GetSupportingApps(type, &reply);
 				
 			reply.what = B_REG_RESULT;
 			reply.AddInt32("result", err);
-			reply.AddMessage("signatures", &apps);
 			message->SendReply(&reply, this);				
 			break;
 		}
@@ -228,7 +223,16 @@ MIMEManager::HandleSetParam(BMessage *message)
 				if (!err)
 					err = fDatabase.SetPreferredApp(type, signature, (app_verb)verb);			
 				break;
-			}			
+			}
+			
+			case B_REG_MIME_SNIFFER_RULE:
+			{
+				const char *rule;
+				err = message->FindString("sniffer rule", &rule);
+				if (!err)
+					err = fDatabase.SetSnifferRule(type, rule);
+				break;
+			}
 				
 			case B_REG_MIME_SUPPORTED_TYPES:
 			{
@@ -324,8 +328,13 @@ MIMEManager::HandleDeleteParam(BMessage *message)
 				break;			
 
 			case B_REG_MIME_SUPPORTED_TYPES:
-				err = fDatabase.DeleteSupportedTypes(type);
-				break;			
+			{
+				bool fullSync;
+				err = message->FindBool("full sync", &fullSync);
+				if (!err)
+					err = fDatabase.DeleteSupportedTypes(type, fullSync);
+				break;
+			}	
 
 			default:
 				err = B_BAD_VALUE;

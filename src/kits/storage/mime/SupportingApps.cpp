@@ -18,6 +18,7 @@
 
 #include <new>
 #include <stdio.h>
+#include <iostream>
 
 #define DBG(x) x
 //#define DBG(x)
@@ -114,14 +115,34 @@ SupportingApps::GetSupportingApps(const char *type, BMessage *apps)
 }
 
 // SetSupportedTypes
-/*! \brief Sets the list of supported types for the given application.
+/*! \brief Sets the list of supported types for the given application and
+	updates the supporting apps mappings.
+	
+	All types listed as being supported types will including the given
+	app signature in their list of supporting apps following this call.
+	
+	If \a fullSync is true, all types previously but no longer supported
+	by this application with no longer list this application as a
+	supporting app.
+	
+	If \a fullSync is false, said previously supported types will be
+	saved to a "stranded types" mapping and appropriately synchronized
+	the next time SetSupportedTypes() is called with a \c true \a fullSync
+	parameter.
+	
+	The stranded types mapping is properly maintained even in the event
+	of types being removed and then re-added to the list of supporting
+	types with consecutive \c false \a fullSync parameters.
+
 	\param app The application whose supported types you are setting
 	\param types Pointer to a \c BMessage containing an array of supported
-	             mime types in its \c Mime::kTypesField field.
+	             mime types in its \c Mime::kTypesField field.	             
 	\param fullSync If \c true, \c app is removed as a supporting application
-	                of any types for which it is no longer a supporting application
-	                as of this call to SetSupportedTypes(). If \c false, said
-	                mappings are not updated.
+	                for any types for which it is no longer a supporting application
+	                (including types which were removed as supporting types with
+	                previous callsto SetSupportedTypes(..., false)). If \c false,
+	                said mappings are not updated until the next SetSupportedTypes(..., true)
+	                call.
 */
 status_t
 SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool fullSync)
@@ -132,9 +153,11 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 		
 	std::set<std::string> oldTypes;
 	std::set<std::string> &newTypes = fSupportedTypes[app];
+	std::set<std::string> &strandedTypes = fStrandedTypes[app];
 	// Make a copy of the previous types if we're doing a full sync
-	if (!err && fullSync)
+	if (!err)
 		oldTypes = newTypes;
+
 	if (!err) {
 		// Read through the list of new supported types, creating the new
 		// supported types list and adding the app as a supporting app for
@@ -148,19 +171,49 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 			AddSupportingApp(type, app);
 		}
 		
+		// Update the list of stranded types by removing any types that are newly
+		// re-supported and adding any types that are newly un-supported
+		for (std::set<std::string>::const_iterator i = newTypes.begin();
+			   i != newTypes.end();
+			     i++)
+		{
+			strandedTypes.erase(*i);
+		}
+		for (std::set<std::string>::const_iterator i = oldTypes.begin();
+			   i != oldTypes.end();
+			     i++)
+		{
+			if (newTypes.find(*i) == newTypes.end())
+				strandedTypes.insert(*i);
+		}					
+				
 		// Now, if we're doing a full sync, remove the app as a supporting
-		// app for any types it no longer supports
-		if (fullSync) {
-			for (std::set<std::string>::iterator i = oldTypes.begin();
-				   i != oldTypes.end();
+		// app for any of its stranded types and then clear said list of
+		// stranded types.
+		if (fullSync) {		
+			for (std::set<std::string>::const_iterator i = strandedTypes.begin();
+				   i != strandedTypes.end();
 				     i++)
 			{
-				if (newTypes.find(*i) == newTypes.end())			
-					RemoveSupportingApp((*i).c_str(), app);
-			}		
-		}	
+				RemoveSupportingApp((*i).c_str(), app);
+			}
+			strandedTypes.clear();
+		} 			
 	}	
 	return err;
+}
+
+// DeleteSupportedTypes
+/*! \brief Clears the given application's supported types list and optionally
+	removes the application from each of said types' supporting apps list.
+	\param app The application whose supported types you are clearing
+	\param fullSync See SupportingApps::SetSupportedTypes()
+*/
+status_t
+SupportingApps::DeleteSupportedTypes(const char *app, bool fullSync)
+{
+	BMessage types;
+	return SetSupportedTypes(app, &types, fullSync);
 }
 
 // AddSupportingApp
@@ -210,6 +263,7 @@ SupportingApps::BuildSupportingAppsTable()
 {
 	fSupportedTypes.clear();
 	fSupportingApps.clear();
+	fStrandedTypes.clear();
 	
 	BDirectory dir;
 	status_t err = dir.SetTo(kApplicationDatabaseDir.c_str());

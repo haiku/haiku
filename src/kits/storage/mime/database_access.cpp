@@ -307,6 +307,28 @@ get_preferred_app(const char *type, char *signature, app_verb verb = B_OPEN)
 	return err >= 0 ? B_OK : err ;
 }
 
+// get_sniffer_rule
+/*! \brief Fetches the sniffer rule for the given MIME type.
+	\param type The MIME type of interest
+	\param result Pointer to a pre-allocated BString into which the type's
+	              sniffer rule is copied.
+	\return
+	- \c B_OK: Success
+	- \c B_ENTRY_NOT_FOUND: No such preferred application exists
+	- "error code": Failure
+*/
+status_t
+get_sniffer_rule(const char *type, BString *result)
+{
+	BNode node;	
+	status_t err = result ? B_OK : B_BAD_VALUE;
+	if (!err) 
+		err = open_type(type, &node);
+	if (!err)
+		err = node.ReadAttrString(kSnifferRuleAttr, result);
+	return err;	
+}
+
 // get_supported_types
 status_t
 get_supported_types(const char *type, BMessage *types)

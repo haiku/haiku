@@ -49,7 +49,7 @@ public:
 	status_t SetIconForType(const char *type, const char *fileType, const void *data,
 							size_t dataSize, icon_size which);
 	status_t SetPreferredApp(const char *type, const char *signature, app_verb verb = B_OPEN);
-//	status_t SetSnifferRule(const char *);
+	status_t SetSnifferRule(const char *type, const char *rule);
 	status_t SetSupportedTypes(const char *type, const BMessage *types, bool fullSync);
 
 	// Non-atomic Get()
@@ -80,7 +80,7 @@ public:
 	status_t DeleteIconForType(const char *type, const char *fileType, icon_size which);
 	status_t DeletePreferredApp(const char *type, app_verb verb = B_OPEN);
 	status_t DeleteSnifferRule(const char *type);
-	status_t DeleteSupportedTypes(const char *type);
+	status_t DeleteSupportedTypes(const char *type, bool fullSync);
 
 private:	
 	status_t SendInstallNotification(const char *type);

@@ -1037,7 +1037,7 @@ Parser::Parse(const char *rule, Rule *result, BString *parseError) {
 		if (parseError)
 			parseError->SetTo(ErrorMessage(err, rule).c_str());
 		delete err;
-		return B_BAD_MIME_SNIFFER_RULE;
+		return rule ? B_BAD_MIME_SNIFFER_RULE : B_BAD_VALUE;
 	}
 }
 
