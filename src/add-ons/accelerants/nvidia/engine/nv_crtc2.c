@@ -117,8 +117,8 @@ status_t nv_crtc2_set_timing(display_mode target)
 			target.timing.h_display)) & 0xfff8;
 
 		target.timing.h_total =
-			((uint16)((p2.timing.h_total / ((float)p2.timing.h_display)) *
-			target.timing.h_display)) & 0xfff8;
+			(((uint16)((p2.timing.h_total / ((float)p2.timing.h_display)) *
+			target.timing.h_display)) & 0xfff8) - 8;
 
 		if (target.timing.h_sync_start == target.timing.h_display)
 			target.timing.h_sync_start += 8;

@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-20 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-21 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -1033,7 +1033,7 @@ static status_t nv_general_bios_to_powergraphics()
 		 * bit 12: overlay engine	(all cards),
 		 * bit  9: TVout chip #2	(confirmed on NV18, NV25, NV28),
 		 * bit  8: TVout chip #1	(all cards),
-		 * bit  4: DDC channel		(all cards) */
+		 * bit  4: both I2C busses	(all cards) */
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
 		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
 	}
