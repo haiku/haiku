@@ -316,6 +316,10 @@ BString&
 BString::Insert(const char *str, int32 pos)
 {
 	if (str) {
+		if (pos < 0) {
+			str -= pos;
+			pos = 0;
+		}
 		_privateData = _OpenAtBy(pos, strlen(str));
 		memcpy(_privateData + pos, str, strlen(str));
 	}
@@ -327,6 +331,10 @@ BString&
 BString::Insert(const char *str, int32 length, int32 pos)
 {
 	if (str) {
+		if (pos < 0) {
+			str -= pos;
+			pos = 0;
+		}
 		int32 len = (int32)strlen(str);
 		len = min(len, length);
 		_privateData = _OpenAtBy(pos, len);
@@ -341,7 +349,7 @@ BString::Insert(const char *str, int32 fromOffset, int32 length, int32 pos)
 {
 	if (str) {
 		int32 len = (int32)strlen(str);
-		len = min(len, length);
+		len = min(len - fromOffset, length);
 		_privateData = _OpenAtBy(pos, len);
 		memcpy(_privateData + pos, str + fromOffset, len);
 	}
@@ -1023,7 +1031,7 @@ BString::ToLower()
 
 BString&
 BString::ToUpper()
-{	
+{			
 	int32 length = Length();
 	for (int32 count = 0; count < length; count++)
 			_privateData[count] = toupper(_privateData[count]);
@@ -1035,6 +1043,9 @@ BString::ToUpper()
 BString&
 BString::Capitalize()
 {
+	if (_privateData == NULL)
+		return *this;
+		
 	_privateData[0] = toupper(_privateData[0]);
 	int32 length = Length();
 		
@@ -1078,7 +1089,23 @@ BString::CapitalizeEachWord()
 BString&
 BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, char escapeWith)
 {
-	//TODO: Implement
+	if (original == NULL || setOfCharsToEscape == NULL || _privateData == NULL)
+		return *this;
+	
+	_DoAssign(original, strlen(original));
+	
+	int32 pos, offset = 0;
+	
+	for(;;) {
+		pos = strcspn(_privateData + offset, setOfCharsToEscape);
+		offset += pos;
+		if (offset > Length())
+			break;
+		_OpenAtBy(offset, 1);
+		memset(_privateData + offset, escapeWith, 1);
+		offset+=2;
+	}
+		
 	return *this;
 }
 
@@ -1086,7 +1113,21 @@ BString::CharacterEscape(const char *original, const char *setOfCharsToEscape, c
 BString&
 BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 {
-	//TODO: Implement
+	if (setOfCharsToEscape == NULL || _privateData == NULL)
+		return *this;
+	
+	int32 pos, offset = 0;
+	
+	for(;;) {
+		pos = strcspn(_privateData + offset, setOfCharsToEscape);
+		offset += pos;
+		if (offset > Length())
+			break;
+		_OpenAtBy(offset, 1);
+		memset(_privateData + offset, escapeWith, 1);
+		offset+=2;
+	}
+		
 	return *this;
 }
 
@@ -1094,7 +1135,14 @@ BString::CharacterEscape(const char *setOfCharsToEscape, char escapeWith)
 BString&
 BString::CharacterDeescape(const char *original, char escapeChar)
 {
-	//TODO: Implement
+	if (original == NULL || _privateData == NULL)
+		return *this;
+	
+	_DoAssign(original, strlen(original));
+	
+	char tmp[2] = { escapeChar, '\0' };
+	RemoveAll(tmp);
+		
 	return *this;
 }
 
@@ -1102,7 +1150,12 @@ BString::CharacterDeescape(const char *original, char escapeChar)
 BString&
 BString::CharacterDeescape(char escapeChar)
 {
-	//TODO: Implement
+	if (_privateData == NULL)
+		return *this;
+		
+	char tmp[2] = { escapeChar, '\0' };
+	RemoveAll(tmp);
+	
 	return *this;
 }
 
@@ -1263,6 +1316,8 @@ BString::_GrowBy(int32 size)
 char*
 BString::_OpenAtBy(int32 offset, int32 length)
 {
+	assert(offset >= 0);
+			
 	int32 oldLength = Length();
 	if (_privateData != NULL)
 		_privateData -= sizeof(int32);
