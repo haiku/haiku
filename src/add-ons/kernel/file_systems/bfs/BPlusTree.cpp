@@ -1369,7 +1369,7 @@ BPlusTree::RemoveKey(bplustree_node *node,uint16 index)
 	uint8 *key = node->KeyAt(index,&length);
 	if (key + length + sizeof(off_t) + sizeof(uint16) > (uint8 *)node + fNodeSize
 		|| length > BPLUSTREE_MAX_KEY_LENGTH) {
-		FATAL(("Key length to long: %s, %u (inode at %ld,%u [%s])\n",key,length,fStream->BlockRun().allocation_group,fStream->BlockRun().start,fStream->Name()));
+		FATAL(("Key length to long: %s, %u (inode at %ld,%u)\n", key, length, fStream->BlockRun().allocation_group, fStream->BlockRun().start));
 		fStream->GetVolume()->Panic();
 		return;
 	}
