@@ -29,7 +29,7 @@ extern "C" {
 
 int vfs_init(kernel_args *ka);
 int vfs_bootstrap_all_filesystems(void);
-int vfs_register_filesystem(const char *name, struct fs_calls *calls);
+int vfs_register_filesystem(const char *name, struct fs_ops *calls);
 void *vfs_new_io_context(void *parent_ioctx);
 int vfs_free_io_context(void *ioctx);
 int vfs_test(void);
@@ -37,8 +37,6 @@ int vfs_test(void);
 struct rlimit;
 int vfs_getrlimit(int resource, struct rlimit * rlp);
 int vfs_setrlimit(int resource, const struct rlimit * rlp);
-
-image_id vfs_load_fs_module(const char *path);
 
 /* calls needed by fs internals */
 int vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *v);
