@@ -13,6 +13,13 @@
 
 class DataEditor;
 
+static const uint32 kMsgBaseType = 'base';
+
+enum base_type {
+	kHexBase,
+	kDecimalBase
+};
+
 enum view_focus {
 	kNoFocus,
 	kHexFocus,
@@ -45,6 +52,9 @@ class DataView : public BView {
 		void GetSelection(int32 &start, int32 &end);
 		void InvalidateRange(int32 start, int32 end);
 
+		base_type Base() const { return fBase; }
+		void SetBase(base_type type);
+
 	private:
 		BRect SelectionFrame(view_focus which, int32 start, int32 end);
 		int32 PositionAt(view_focus focus, BPoint point, view_focus *_newFocus = NULL);
@@ -66,6 +76,7 @@ class DataView : public BView {
 		int32		fFontHeight;
 		float		fCharWidth;
 		view_focus	fFocus;
+		base_type	fBase;
 		bool		fIsActive;
 		int32		fStart, fEnd;
 		int32		fMouseSelectionStart;

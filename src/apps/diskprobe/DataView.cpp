@@ -7,7 +7,6 @@
 #include "DataView.h"
 #include "DataEditor.h"
 
-//#include <Messenger.h>
 #include <Looper.h>
 #include <ScrollBar.h>
 
@@ -25,6 +24,7 @@ DataView::DataView(BRect rect, DataEditor &editor)
 	: BView(rect, "dataView", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE | B_FRAME_EVENTS),
 	fEditor(editor),
 	fFocus(kHexFocus),
+	fBase(kHexBase),
 	fIsActive(true)
 {
 	fPositionLength = 4;
@@ -95,6 +95,16 @@ DataView::MessageReceived(BMessage *message)
 			break;
 		}
 
+		case kMsgBaseType:
+		{
+			int32 type;
+			if (message->FindInt32("base", &type) != B_OK)
+				break;
+
+			SetBase((base_type)type);
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 	}
@@ -104,7 +114,8 @@ DataView::MessageReceived(BMessage *message)
 void
 DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size)
 {
-	line += sprintf(line, "%0*Lx:  ", (int)fPositionLength, offset);
+	line += sprintf(line, fBase == kHexBase ? "%0*Lx:  " : "%0*Ld:  ",
+				(int)fPositionLength, offset);
 
 	for (uint32 i = 0; i < kBlockSize; i++) {
 		if (i >= size) {
@@ -450,6 +461,17 @@ DataView::InvalidateRange(int32 start, int32 end)
 	rect.bottom++;
 	rect.right++;
 	Invalidate(rect);
+}
+
+
+void 
+DataView::SetBase(base_type type)
+{
+	if (fBase == type)
+		return;
+
+	fBase = type;
+	Invalidate();
 }
 
 
