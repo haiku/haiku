@@ -1279,29 +1279,90 @@ private:
 
 /*! \brief Logical volume integrity descriptor
 
-	See also: ECMA-167 3/10.10
+	See also: ECMA-167 3/10.10, UDF-2.50 2.2.6
 */
 struct logical_volume_integrity_descriptor {
-	descriptor_tag  tag;
-	timestamp recording_time;
-	uint32 integrity_type;
-	extent_address next_integrity_extent;
-	array<uint8, 32> logical_volume_contents_use;
-	uint32 partition_count;
-	uint32 implementation_use_length;
+public:
+	void dump() const; 
+
+	descriptor_tag& tag() { return _tag; }
+	const descriptor_tag& tag() const { return _tag; }
+
+	timestamp& recording_time() { return _recording_time; }
+	const timestamp& recording_time() const { return _recording_time; }
+	
+	uint32 integrity_type() const { return B_LENDIAN_TO_HOST_INT32(_integrity_type); }
+
+	extent_address& next_integrity_extent() { return _next_integrity_extent; }
+	const extent_address& next_integrity_extent() const { return _next_integrity_extent; }
+
+	array<uint8, 32>& logical_volume_contents_use() { return _logical_volume_contents_use; }
+	const array<uint8, 32>& logical_volume_contents_use() const { return _logical_volume_contents_use; }
+	
+	uint32 partition_count() const { return B_LENDIAN_TO_HOST_INT32(_partition_count); }
+	uint32 implementation_use_length() const { return B_LENDIAN_TO_HOST_INT32(_implementation_use_length); }
 
 	/*! \todo double-check the pointer arithmetic here. */
-	uint32* free_space_table() { return (uint32*)(this+80); }
-	uint32* size_table() { return (uint32*)(free_space_table()+partition_count*sizeof(uint32)); }
-	uint8* implementation_use() { return (uint8*)(size_table()+partition_count*sizeof(uint32)); }	
+	uint32* free_space_table() { return reinterpret_cast<uint32*>(this+80); }
+	const uint32* free_space_table() const { return reinterpret_cast<const uint32*>(this+80); }
+	uint32* size_table() { return reinterpret_cast<uint32*>(free_space_table()+partition_count()*sizeof(uint32)); }
+	const uint32* size_table() const { return reinterpret_cast<const uint32*>(free_space_table()+partition_count()*sizeof(uint32)); }
+	uint8* implementation_use() { return reinterpret_cast<uint8*>(size_table()+partition_count()*sizeof(uint32)); }	
+	const uint8* implementation_use() const { return reinterpret_cast<const uint8*>(size_table()+partition_count()*sizeof(uint32)); }	
+
+	// accessors for fields stored in implementation_use() field per UDF-2.50 2.2.6.4
+	entity_id& id() { return _accessor().id; }
+	const entity_id& id() const { return _accessor().id; }
+	uint32 file_count() const { return B_LENDIAN_TO_HOST_INT32(_accessor().file_count); }
+	uint32 directory_count() const { return B_LENDIAN_TO_HOST_INT32(_accessor().directory_count); }
+	uint16 minimum_udf_read_revision() const { return B_LENDIAN_TO_HOST_INT16(_accessor().minimum_udf_read_revision); }
+	uint16 minimum_udf_write_revision() const { return B_LENDIAN_TO_HOST_INT16(_accessor().minimum_udf_write_revision); }
+	uint16 maximum_udf_write_revision() const { return B_LENDIAN_TO_HOST_INT16(_accessor().maximum_udf_write_revision); }
+		
+	// set functions
+	void set_integrity_type(uint32 type) { _integrity_type = B_HOST_TO_LENDIAN_INT32(type); }
+	void set_partition_count(uint32 count) { _partition_count = B_HOST_TO_LENDIAN_INT32(count); }
+	void set_impelementation_use_length(uint32 length) { _implementation_use_length = B_HOST_TO_LENDIAN_INT32(length); }
 	
+	// set functions for fields stored in implementation_use() field per UDF-2.50 2.2.6.4
+	void set_file_count(uint32 count) { _accessor().file_count = B_HOST_TO_LENDIAN_INT32(count); }
+	void set_directory_count(uint32 count) { _accessor().directory_count = B_HOST_TO_LENDIAN_INT32(count); }
+	void set_minimum_udf_read_revision(uint16 revision) { _accessor().minimum_udf_read_revision = B_HOST_TO_LENDIAN_INT16(revision); }
+	void set_minimum_udf_write_revision(uint16 revision) { _accessor().minimum_udf_write_revision = B_HOST_TO_LENDIAN_INT16(revision); }
+	void set_maximum_udf_write_revision(uint16 revision) { _accessor().maximum_udf_write_revision = B_HOST_TO_LENDIAN_INT16(revision); }
+		
+private:
+	struct _lvid_implementation_use_accessor {
+		entity_id id;
+		uint32 file_count;
+		uint32 directory_count;
+		uint16 minimum_udf_read_revision;
+		uint16 minimum_udf_write_revision;
+		uint16 maximum_udf_write_revision;
+	};
+	
+	_lvid_implementation_use_accessor& _accessor() {
+		return *reinterpret_cast<_lvid_implementation_use_accessor*>(implementation_use());
+	}
+	const _lvid_implementation_use_accessor& _accessor() const {
+		return *reinterpret_cast<const _lvid_implementation_use_accessor*>(implementation_use());
+	}
+
+	descriptor_tag  _tag;
+	timestamp _recording_time;
+	uint32 _integrity_type;
+	extent_address _next_integrity_extent;
+	array<uint8, 32> _logical_volume_contents_use;
+	uint32 _partition_count;
+	uint32 _implementation_use_length;
+
 } __attribute__((packed));
 
 /*! \brief Logical volume integrity types
 */
 enum {
-	LVIT_OPEN = 1,
-	LVIT_CLOSED,
+	INTEGRITY_OPEN = 0,
+	INTEGRITY_CLOSED = 1,
 };
 
 //----------------------------------------------------------------------

@@ -820,6 +820,65 @@ file_set_descriptor::dump() const
 	DUMP(system_stream_directory_icb());
 }
 
+//----------------------------------------------------------------------
+// logical_volume_integrity_descriptor
+//----------------------------------------------------------------------
+
+void
+logical_volume_integrity_descriptor::dump() const
+{
+	DUMP_INIT("logical_volume_integrity_descriptor");
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("recording_time:\n"));
+	DUMP(recording_time());
+	PRINT(("integrity_type:             "));
+	switch (integrity_type()) {
+		case INTEGRITY_OPEN:
+			SIMPLE_PRINT(("open\n"));
+			break;
+		case INTEGRITY_CLOSED:
+			SIMPLE_PRINT(("closed\n"));
+			break;
+		default:
+			SIMPLE_PRINT(("invalid integrity type (%ld)", integrity_type()));
+			break;
+	}
+	PRINT(("next_integrity_extent:\n"));
+	DUMP(next_integrity_extent());
+	PRINT(("logical_volume_contents_use:\n"));
+	DUMP(logical_volume_contents_use());
+	PRINT(("partition_count:            %ld\n", partition_count()));
+	PRINT(("implementation_use_length:  %ld\n", implementation_use_length()));
+	if (partition_count() > 0) {
+		PRINT(("free_space_table:\n"));
+		for (uint32 i = 0; i < partition_count(); i++) {
+			PRINT(("%ld: %ld free blocks\n", i, free_space_table()[i]));
+		}
+		PRINT(("size_table:\n"));
+		for (uint32 i = 0; i < partition_count(); i++) {
+			PRINT(("%ld: %ld blocks large\n", i, size_table()[i]));
+		}
+	}
+		
+	if (implementation_use_length() >= 46) {
+		PRINT(("id:\n"));
+		DUMP(id());
+		PRINT(("file_count:                 %ld\n", file_count()));
+		PRINT(("directory_count:            %ld\n", directory_count()));
+		PRINT(("minimum_udf_read_revision:  %d\n", minimum_udf_read_revision()));
+		PRINT(("minimum_udf_write_revision: %d\n", minimum_udf_write_revision()));
+		PRINT(("maximum_udf_write_revision: %d\n", maximum_udf_write_revision()));	
+	} else {
+		PRINT(("NOTE: implementation_use() field of insufficient length to contain \n"));
+		PRINT(("      appropriate UDF-2.50 2.2.6.4 fields.\n"));
+	}	
+}
+
+//----------------------------------------------------------------------
+// file_id_descriptor
+//----------------------------------------------------------------------
+
 void
 file_id_descriptor::dump() const
 {
@@ -839,6 +898,10 @@ file_id_descriptor::dump() const
 	String fileId(id());
 	PRINT(("id: `%s'", fileId.Utf8()));
 }
+
+//----------------------------------------------------------------------
+// icb_entry_tag
+//----------------------------------------------------------------------
 
 void
 icb_entry_tag::dump() const
@@ -885,6 +948,10 @@ icb_entry_tag::dump() const
 
 }
 
+//----------------------------------------------------------------------
+// icb_header
+//----------------------------------------------------------------------
+
 void
 icb_header::dump() const
 {
@@ -896,6 +963,10 @@ icb_header::dump() const
 	DUMP(icb_tag());
 	
 }
+
+//----------------------------------------------------------------------
+// file_icb_entry
+//----------------------------------------------------------------------
 
 void
 file_icb_entry::dump() const
@@ -960,6 +1031,10 @@ file_icb_entry::dump() const
 			break;
 	}
 }
+
+//----------------------------------------------------------------------
+// extended_file_icb_entry
+//----------------------------------------------------------------------
 
 void
 extended_file_icb_entry::dump() const
