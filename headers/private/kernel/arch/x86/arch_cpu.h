@@ -11,11 +11,6 @@
 
 #define PAGE_SIZE 4096
 
-#define _BIG_ENDIAN 0
-#define _LITTLE_ENDIAN 1
-
-#define FUNCTION_CALL_PARAMETER_ALIGNMENT_TYPE	uint32
-
 struct tss {
 	uint16 prev_task;
 	uint16 unused0;
