@@ -54,7 +54,7 @@ alloc_fd(void)
 	if (descriptor == NULL)
 		return NULL;
 
-	descriptor->vnode = NULL;
+	descriptor->u.vnode = NULL;
 	descriptor->cookie = NULL;
 	descriptor->ref_count = 1;
 	descriptor->open_mode = 0;
