@@ -1798,7 +1798,7 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 			}
 		} else {
 			dprintf("vm_page_fault: killing team 0x%lx\n", thread_get_current_thread()->team->id);
-			team_kill_team(thread_get_current_thread()->team->id);
+			kill_team(team_get_current_team_id());
 		}
 	}
 
