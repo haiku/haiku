@@ -6,15 +6,10 @@
 #include "View.h"
 #include "Window.h"
 
-// main
-int
-main(int argc, char** argv)
+void
+show_window(BRect frame, const char* name)
 {
-	BApplication* app = new BApplication("application/x.vnd-Haiku.windows_test");
-
-	BRect bounds(50.0, 50.0, 200.0, 150.0);
-
-	BWindow* window = new BWindow(bounds, "Test",
+	BWindow* window = new BWindow(frame, name,
 								  B_TITLED_WINDOW,
 								  B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE);
 
@@ -23,7 +18,22 @@ main(int argc, char** argv)
 	window->AddChild(view);
 
 	window->Show();
+}
+
+// main
+int
+main(int argc, char** argv)
+{
+	BApplication* app = new BApplication("application/x.vnd-Haiku.windows_test");
+
+	BRect frame(50.0, 50.0, 200.0, 150.0);
+	show_window(frame, "Window #1");
+
+	frame.Set(80.0, 100.0, 250.0, 200.0);
+	show_window(frame, "Window #2");
+
 	app->Run();
+
 	delete app;
 	return 0;
 }
