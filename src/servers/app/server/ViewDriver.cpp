@@ -51,6 +51,13 @@
 #include "LayerData.h"
 #include "PNGDump.h"
 
+#ifdef DEBUG_DRIVER_MODULE
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
+
 enum
 {
 VDWIN_CLEAR=100,
@@ -653,10 +660,8 @@ void ViewDriver::CopyBits(BRect src, BRect dest)
 
 void ViewDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ViewDriver:: CopyRegion not completely tested\n");
-#endif
-
+STRACE(("ViewDriver:: CopyRegion not completely tested\n"));
+	
 	screenwin->Lock();
 	framebuffer->Lock();
 
@@ -748,9 +753,7 @@ printf("Overlap\n");
 
 void ViewDriver::DrawBitmap(ServerBitmap *bitmap, BRect src, BRect dest)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ViewDriver:: DrawBitmap unimplemented()\n");
-#endif
+STRACE(("ViewDriver:: DrawBitmap unimplemented()\n"));
 }
 
 void ViewDriver::DrawChar(char c, BPoint pt, LayerData *d)
@@ -763,9 +766,7 @@ void ViewDriver::DrawChar(char c, BPoint pt, LayerData *d)
 /*
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,pt.y);
-#endif
+STRACE(("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,pt.y));
 	if(!d)
 		return;
 	BRect r;

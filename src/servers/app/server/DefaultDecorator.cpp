@@ -39,9 +39,11 @@
 #define USE_VIEW_FILL_HACK
 
 //#define DEBUG_DECORATOR
-
 #ifdef DEBUG_DECORATOR
-#include <stdio.h>
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
 #endif
 
 DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
@@ -68,18 +70,16 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	// This flag is used to determine whether or not we're moving the tab
 	slidetab=false;
 
-	#ifdef DEBUG_DECORATOR
-	printf("DefaultDecorator:\n");
-	printf("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom);
-	#endif
+//	tab_highcol=_colors->window_tab;
+//	tab_lowcol=_colors->window_tab;
+
+STRACE(("DefaultDecorator:\n"));
+STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",rect.left,rect.top,rect.right,rect.bottom));
 }
 
 DefaultDecorator::~DefaultDecorator(void)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("DefaultDecorator: ~DefaultDecorator()\n");
-	#endif
-
+STRACE(("DefaultDecorator: ~DefaultDecorator()\n"));
 	delete [] framecolors;
 }
 
@@ -170,10 +170,7 @@ click_type DefaultDecorator::Clicked(BPoint pt, int32 buttons, int32 modifiers)
 
 void DefaultDecorator::_DoLayout(void)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("DefaultDecorator: Do Layout\n");
-	#endif
-
+STRACE(("DefaultDecorator: Do Layout\n"));
 	// Here we determine the size of every rectangle that we use
 	// internally when we are given the size of the client rectangle.
 
@@ -281,10 +278,7 @@ void DefaultDecorator::MoveBy(float x, float y)
 
 void DefaultDecorator::MoveBy(BPoint pt)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y);
-	#endif
-
+STRACE(("DefaultDecorator: Move By (%.1f, %.1f)\n",pt.x,pt.y));
 	// Move all internal rectangles the appropriate amount
 	_frame.OffsetBy(pt);
 	_closerect.OffsetBy(pt);
@@ -301,10 +295,7 @@ void DefaultDecorator::MoveBy(BPoint pt)
 
 BRegion * DefaultDecorator::GetFootprint(void)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("DefaultDecorator: Get Footprint\n");
-	#endif
-
+STRACE(("DefaultDecorator: Get Footprint\n"));
 	// This function calculates the decorator's footprint in coordinates
 	// relative to the layer. This is most often used to set a WinBorder
 	// object's visible region.
@@ -321,10 +312,7 @@ BRect DefaultDecorator::SlideTab(float dx, float dy=0){
 
 void DefaultDecorator::_DrawTitle(BRect r)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
-	#endif
-
+STRACE(("_DrawTitle(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Designed simply to redraw the title when it has changed on
 	// the client side.
 	_layerdata.highcolor=_colors->window_tab_text;
@@ -373,9 +361,7 @@ void DefaultDecorator::_SetFocus(void)
 
 void DefaultDecorator::Draw(BRect update)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom);
-	#endif
+STRACE(("DefaultDecorator: Draw(%.1f,%.1f,%.1f,%.1f)\n",update.left,update.top,update.right,update.bottom));
 	// We need to draw a few things: the tab, the resize thumb, the borders,
 	// and the buttons
 
@@ -394,10 +380,7 @@ void DefaultDecorator::Draw(void)
 
 void DefaultDecorator::_DrawZoom(BRect r)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
-	#endif
-
+STRACE(("_DrawZoom(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If this has been implemented, then the decorator has a Zoom button
 	// which should be drawn based on the state of the member zoomstate
 	BRect zr( r );
@@ -414,20 +397,14 @@ void DefaultDecorator::_DrawZoom(BRect r)
 
 void DefaultDecorator::_DrawClose(BRect r)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
-	#endif
-
+STRACE(("_DrawClose(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// Just like DrawZoom, but for a close button
 	DrawBlendedRect( r, GetClose());
 }
 
 void DefaultDecorator::_DrawTab(BRect r)
 {
-	#ifdef DEBUG_DECORATOR
-	printf("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom);
-	#endif
-	
+STRACE(("_DrawTab(%f,%f,%f,%f)\n", r.left, r.top, r.right, r.bottom));
 	// If a window has a tab, this will draw it and any buttons which are
 	// in it.
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
@@ -547,7 +524,8 @@ void DefaultDecorator::DrawBlendedRect(BRect r, bool down)
 
 void DefaultDecorator::_DrawFrame(BRect invalid)
 {
-
+STRACE(("_DrawFrame(%f,%f,%f,%f)\n", invalid.left, invalid.top,
+									 invalid.right, invalid.bottom));
 	// We need to test each side to determine whether or not it needs drawn. Additionally,
 	// we must clip the lines drawn by this function to the invalid rectangle we are given
 	

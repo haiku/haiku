@@ -51,6 +51,12 @@
 #include "Utils.h"
 
 //#define DEBUG_SERVERAPP
+#ifdef DEBUG_SERVERAPP
+#	include <stdio.h>
+#	define STRACE(x) printf x
+#else
+#	define STRACE(x) ;
+#endif
 
 /*!
 	\brief Constructor
@@ -94,19 +100,15 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_driver=GetGfxDriver(ActiveScreen());
 	_cursorhidden=false;
 
-	#ifdef DEBUG_SERVERAPP
-		printf("ServerApp %s:\n",_signature.String());
-		printf("\tBApp port: %ld\n",_sender);
-		printf("\tReceiver port: %ld\n",_receiver);
-	#endif
+STRACE(("ServerApp %s:\n",_signature.String()));
+STRACE(("\tBApp port: %ld\n",_sender));
+STRACE(("\tReceiver port: %ld\n",_receiver));
 }
 
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
-	#ifdef DEBUG_SERVERAPP
-		printf("ServerApp %s:~ServerApp()\n",_signature.String());
-	#endif
+STRACE(("ServerApp %s:~ServerApp()\n",_signature.String()));
 	int32 i;
 	
 	ServerWindow *tempwin;
@@ -235,9 +237,7 @@ int32 ServerApp::MonitorApp(void *data)
 			switch (msgCode){
 				case AS_QUIT_APP:
 				{
-					#ifdef DEBUG_SERVERAPP
-						printf("ServerApp %s:Server shutdown notification received\n",app->_signature.String());
-					#endif
+					STRACE(("ServerApp %s:Server shutdown notification received\n",app->_signature.String()));
 					// If we are using the real, accelerated version of the
 					// DisplayDriver, we do NOT want the user to be able shut down
 					// the server. The results would NOT be pretty
@@ -281,9 +281,7 @@ int32 ServerApp::MonitorApp(void *data)
 				}
 				default:
 				{
-					#ifdef DEBUG_SERVERAPP
-						printf("ServerApp %s: Got a Message to dispatch\n",app->_signature.String());
-					#endif
+					STRACE(("ServerApp %s: Got a Message to dispatch\n",app->_signature.String()));
 					app->_DispatchMessage(msgCode, NULL);
 					break;
 				}
@@ -352,9 +350,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			ses->ReadData( &sendPort, sizeof(port_id) );
 			title		= ses->ReadString();
 
-			#ifdef DEBUG_SERVERAPP
-				printf("ServerApp %s: Got 'New Window' message, trying to do smething...\n");
-			#endif
+			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",
+					_signature.String()));
 
 				// ServerWindow constructor will reply with port_id of a newly created port
 			ServerWindow *newwin	= new ServerWindow( frame, title,
@@ -363,10 +360,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			//AddWindowToDesktop( newwin, workspace, ActiveScreen() );
 			
 
-			#ifdef DEBUG_SERVERAPP
-				printf("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
-					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom);
-			#endif
+			STRACE(("ServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
+					_signature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
 			delete	title;
 
@@ -386,9 +381,7 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 				w=(ServerWindow*)_winlist->ItemAt(i);
 				if(w->_token==winid)
 				{
-					#ifdef DEBUG_SERVERAPP
-						printf("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title());
-					#endif
+					STRACE(("ServerApp %s: Deleting window %s\n",_signature.String(),w->Title()));
 					_winlist->RemoveItem(w);
 					delete w;
 					break;
@@ -425,10 +418,10 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			s.id=*((int32*)index);
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
-			#ifdef DEBUG_SERVERAPP
-				printf("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
-						_signature.String(),r.left,r.top,r.right,r.bottom);
-			#endif
+
+			STRACE(("ServerApp %s: Create Bitmap (%.1f,%.1f,%.1f,%.1f)\n",
+						_signature.String(),r.left,r.top,r.right,r.bottom));
+
 			if(sbmp)
 			{
 				// list for doing faster lookups for a bitmap than what the BitmapManager
@@ -463,9 +456,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			ServerBitmap *sbmp=_FindBitmap(*((int32*)index));
 			if(sbmp)
 			{
-				#ifdef DEBUG_SERVERAPP
-					printf("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),*((int32*)index));
-				#endif
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),*((int32*)index)));
+
 				_bmplist->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
 				write_port(replyport,SERVER_TRUE,NULL,0);
@@ -478,33 +470,29 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		case AS_CREATE_PICTURE:
 		{
 			// TODO: Implement
-			#ifdef DEBUG_SERVERAPP
-			printf("ServerApp %s: Create Picture unimplemented\n",_signature.String());
-			#endif
+			STRACE(("ServerApp %s: Create Picture unimplemented\n",_signature.String()));
+
 			break;
 		}
 		case AS_DELETE_PICTURE:
 		{
 			// TODO: Implement
-			#ifdef DEBUG_SERVERAPP
-			printf("ServerApp %s: Delete Picture unimplemented\n",_signature.String());
-			#endif
+			STRACE(("ServerApp %s: Delete Picture unimplemented\n",_signature.String()));
+
 			break;
 		}
 		case AS_CLONE_PICTURE:
 		{
 			// TODO: Implement
-			#ifdef DEBUG_SERVERAPP
-			printf("ServerApp %s: Clone Picture unimplemented\n",_signature.String());
-			#endif
+			STRACE(("ServerApp %s: Clone Picture unimplemented\n",_signature.String()));
+
 			break;
 		}
 		case AS_DOWNLOAD_PICTURE:
 		{
 			// TODO; Implement
-			#ifdef DEBUG_SERVERAPP
-			printf("ServerApp %s: Download Picture unimplemented\n",_signature.String());
-			#endif
+			STRACE(("ServerApp %s: Download Picture unimplemented\n",_signature.String()));
+
 			break;
 		}
 		case AS_SET_SCREEN_MODE:
@@ -663,9 +651,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		}
 		default:
 		{
-			#ifdef DEBUG_SERVERAPP
-				printf("ServerApp %s received unhandled message code offset %lx\n",_signature.String(),MsgCodeToString(code));
-			#endif
+			STRACE(("ServerApp %s received unhandled message code offset %s\n",_signature.String(),MsgCodeToString(code)));
+
 			break;
 		}
 	}
