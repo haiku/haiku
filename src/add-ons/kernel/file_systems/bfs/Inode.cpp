@@ -770,7 +770,7 @@ Inode::CreateAttribute(Transaction *transaction,const char *name,uint32 type,Ino
 {
 	// do we need to create the attribute directory first?
 	if (Attributes().IsZero()) {
-		status_t status = Inode::Create(transaction,this,NULL,S_ATTR_DIR | 0666,0,0,NULL);
+		status_t status = Inode::Create(transaction, this, NULL, S_ATTR_DIR | 0666, 0, 0, NULL);
 		if (status < B_OK)
 			RETURN_ERROR(status);
 	}
@@ -779,9 +779,8 @@ Inode::CreateAttribute(Transaction *transaction,const char *name,uint32 type,Ino
 	if (vnode.Get(&attributes) < B_OK)
 		return B_ERROR;
 
-	// Inode::Create() locks the inode if we provide the "id" parameter
-	vnode_id id;
-	return Inode::Create(transaction,attributes,name,S_ATTR | 0666,0,type,&id,attribute);
+	// Inode::Create() locks the inode for us
+	return Inode::Create(transaction, attributes, name, S_ATTR | 0666, 0, type, NULL, attribute);
 }
 
 
@@ -801,7 +800,7 @@ Inode::GetTree(BPlusTree **tree)
 		return B_OK;
 	}
 
-	if (IsDirectory()) {
+	if (IsContainer()) {
 		fTree = new BPlusTree(this);
 		if (!fTree)
 			RETURN_ERROR(B_NO_MEMORY);
@@ -1284,8 +1283,10 @@ Inode::GrowStream(Transaction *transaction, off_t size)
 						return B_IO_ERROR;
 				} while ((index % runsPerArray) != 0 && run.length);
 
-				if (++indirectIndex % runsPerBlock == 0)
+				if (++indirectIndex % runsPerBlock == 0) {
 					array = NULL;
+					index = 0;
+				}
 			}
 
 			data->max_double_indirect_range += runLength << fVolume->BlockShift();
@@ -1623,13 +1624,13 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	if (inode->Flags() & INODE_NO_CACHE)
 		return B_NOT_ALLOWED;
 
-	// Inode::IsDirectory() is true also for indices (furthermore, the S_IFDIR
+	// Inode::IsContainer() is true also for indices (furthermore, the S_IFDIR
 	// bit is set for indices in BFS, not for attribute directories) - but you
 	// should really be able to do whatever you want with your indices
 	// without having to remove all files first :)
 	if (!inode->IsIndex()) {
 		// if it's not of the correct type, don't delete it!
-		if (inode->IsDirectory() != isDirectory)
+		if (inode->IsContainer() != isDirectory)
 			return isDirectory ? B_NOT_A_DIRECTORY : B_IS_A_DIRECTORY;
 
 		// only delete empty directories
@@ -1653,7 +1654,7 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	// are updated here (name, size, & last_modified)
 
 	Index index(fVolume);
-	if ((inode->Mode() & (S_ATTR_DIR | S_ATTR | S_INDEX_DIR)) == 0) {
+	if (inode->IsRegularNode()) {
 		index.RemoveName(transaction, name, inode);
 			// If removing from the index fails, it is not regarded as a
 			// fatal error and will not be reported back!
@@ -1661,7 +1662,8 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 	}
 	
 	if ((inode->Mode() & (S_FILE | S_SYMLINK)) != 0) {
-		index.RemoveSize(transaction, inode);
+		if (inode->IsFile())
+			index.RemoveSize(transaction, inode);
 		index.RemoveLastModified(transaction, inode);
 	}
 
@@ -1679,31 +1681,32 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
  *	to the super block.
  *	It will also create the initial B+tree for the inode if it's a directory
  *	of any kind.
- *	If the "id" variable is given to store the inode's ID, the inode stays
- *	locked - you have to call put_vnode() if you don't use it anymore.
+ *	If the "_id" or "_inode" variable is given and non-NULL to store the inode's
+ *	ID, the inode stays locked - you have to call put_vnode() if you don't use it
+ *	anymore.
  */
 
 status_t 
 Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 mode,
 	int omode, uint32 type, off_t *_id, Inode **_inode)
 {
-	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0,0,0);
+	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0, 0, 0);
 	Volume *volume = transaction->GetVolume();
 	BPlusTree *tree = NULL;
 
-	if (parent && (mode & S_ATTR_DIR) == 0 && parent->IsDirectory()) {
+	if (parent && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
 		// check if the file already exists in the directory
 		if (parent->GetTree(&tree) != B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
 
 		// does the file already exist?
 		off_t offset;
-		if (tree->Find((uint8 *)name,(uint16)strlen(name),&offset) == B_OK) {
+		if (tree->Find((uint8 *)name, (uint16)strlen(name), &offset) == B_OK) {
 			// return if the file should be a directory or opened in exclusive mode
 			if (mode & S_DIRECTORY || omode & O_EXCL)
 				return B_FILE_EXISTS;
 
-			Vnode vnode(volume,offset);
+			Vnode vnode(volume, offset);
 			Inode *inode;
 			status_t status = vnode.Get(&inode);
 			if (status < B_OK) {
@@ -1724,18 +1727,19 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 			if (omode & O_TRUNC) {
 				WriteLocked locked(inode->Lock());
 
-				status_t status = inode->SetFileSize(transaction,0);
+				status_t status = inode->SetFileSize(transaction, 0);
 				if (status < B_OK)
 					return status;
 			}
 
-			// only keep the vnode in memory if the vnode_id pointer is provided
-			if (_id) {
+			if (_id)
 				*_id = offset;
-				vnode.Keep();
-			}
 			if (_inode)
 				*_inode = inode;
+
+			// only keep the vnode in memory if the _id or _inode pointer is provided
+			if (_id == NULL && _inode == NULL)
+				vnode.Keep();
 
 			return B_OK;
 		}
@@ -1746,7 +1750,7 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 	InodeAllocator allocator(transaction);
 	block_run run;
 	Inode *inode;
-	status_t status = allocator.New(&parentRun,mode,run,&inode);
+	status_t status = allocator.New(&parentRun, mode, run, &inode);
 	if (status < B_OK)
 		return status;
 
@@ -1774,28 +1778,33 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 
 	// only add the name to regular files, directories, or symlinks
 	// don't add it to attributes, or indices
-	if (tree && (mode & (S_INDEX_DIR | S_ATTR_DIR | S_ATTR)) == 0
-		&& inode->SetName(transaction,name) < B_OK)
+	if (tree && inode->IsRegularNode() && inode->SetName(transaction, name) < B_OK)
 		return B_ERROR;
 
 	// initialize b+tree if it's a directory (and add "." & ".." if it's
 	// a standard directory for files - not for attributes or indices)
-	if (mode & (S_DIRECTORY | S_ATTR_DIR | S_INDEX_DIR)) {
-		BPlusTree *tree = inode->fTree = new BPlusTree(transaction,inode);
+	if (inode->IsContainer()) {
+		// force S_STR_INDEX to be set, if no type is set
+		if ((mode & S_INDEX_TYPES) == 0)
+			node->mode |= S_STR_INDEX;
+
+		BPlusTree *tree = inode->fTree = new BPlusTree(transaction, inode);
 		if (tree == NULL || tree->InitCheck() < B_OK)
 			return B_ERROR;
 
-		if ((mode & (S_INDEX_DIR | S_ATTR_DIR)) == 0) {
-			if (tree->Insert(transaction,".",inode->BlockNumber()) < B_OK
-				|| tree->Insert(transaction,"..",volume->ToBlock(inode->Parent())) < B_OK)
+		if (inode->IsRegularNode()) {
+			if (tree->Insert(transaction, ".", inode->BlockNumber()) < B_OK
+				|| tree->Insert(transaction, "..", volume->ToBlock(inode->Parent())) < B_OK)
 				return B_ERROR;
 		}
 	}
 
 	// update the main indices (name, size & last_modified)
+
 	Index index(volume);
-	if ((mode & (S_ATTR_DIR | S_ATTR | S_INDEX_DIR)) == 0) {
-		status = index.InsertName(transaction,name,inode);
+	if (inode->IsRegularNode()) {
+		// the name index only contains regular files
+		status = index.InsertName(transaction, name, inode);
 		if (status < B_OK && status != B_BAD_INDEX)
 			return status;
 	}
@@ -1804,35 +1813,39 @@ Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 m
 
 	// The "size" & "last_modified" indices don't contain directories
 	if ((mode & (S_FILE | S_SYMLINK)) != 0) {
-		// if adding to these indices fails, the inode creation will not be harmed
-		index.InsertSize(transaction,inode);
-		index.InsertLastModified(transaction,inode);
+		// if adding to these indices fails, the inode creation will not be harmed;
+		// they are considered less important than the "name" index
+		if (inode->IsFile())
+			index.InsertSize(transaction, inode);
+		index.InsertLastModified(transaction, inode);
 	}
 
 	if ((status = inode->WriteBack(transaction)) < B_OK)
 		return status;
 
-	if (new_vnode(volume->ID(),inode->ID(),inode) != B_OK)
+	if (new_vnode(volume->ID(), inode->ID(), inode) != B_OK)
 		return B_ERROR;
 
 	// add a link to the inode from the parent, depending on its type
-	if (tree && tree->Insert(transaction,name,volume->ToBlock(run)) < B_OK) {
-		put_vnode(volume->ID(),inode->ID());
+	if (tree && tree->Insert(transaction, name, volume->ToBlock(run)) < B_OK) {
+		put_vnode(volume->ID(), inode->ID());
 		RETURN_ERROR(B_ERROR);
 	} else if (parent && mode & S_ATTR_DIR) {
 		parent->Attributes() = run;
 		parent->WriteBack(transaction);
 	}
 
+	// everything worked well, so we want to keep the inode
 	allocator.Keep();
 
 	if (_id != NULL)
 		*_id = inode->ID();
-	else
-		put_vnode(volume->ID(),inode->ID());
-
 	if (_inode != NULL)
 		*_inode = inode;
+
+	// if either _id or _inode is passed, we will keep the inode locked
+	if (_id == NULL && _inode == NULL)
+		put_vnode(volume->ID(), inode->ID());
 
 	return B_OK;
 }
@@ -1856,7 +1869,7 @@ AttributeIterator::AttributeIterator(Inode *inode)
 AttributeIterator::~AttributeIterator()
 {
 	if (fAttributes)
-		put_vnode(fAttributes->GetVolume()->ID(),fAttributes->ID());
+		put_vnode(fAttributes->GetVolume()->ID(), fAttributes->ID());
 
 	delete fIterator;
 	fInode->RemoveIterator(this);
