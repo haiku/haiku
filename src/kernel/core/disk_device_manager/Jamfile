@@ -6,6 +6,10 @@ SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
+UsePrivateHeaders kernel ;
+	# This line must come before the "kernel arch $(OBOS_ARCH)" line, else
+	# the "arch/vm.h" file will be included instead of "vm.h"
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
