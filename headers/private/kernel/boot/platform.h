@@ -21,7 +21,7 @@ extern void panic(const char *format, ...);
 extern void dprintf(const char *format, ...);
 
 /* heap functions */
-extern void platform_release_heap(void *base);
+extern void platform_release_heap(struct stage2_args *args, void *base);
 extern status_t platform_init_heap(struct stage2_args *args, void **_base, void **_top);
 
 /* misc functions */
