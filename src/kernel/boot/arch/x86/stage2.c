@@ -60,8 +60,8 @@ static uint32 *pgtable = 0;
 // function decls for this module
 static void sort_addr_range(addr_range *range, int count);
 static void calculate_cpu_conversion_factor(void);
-static void load_elf_image(void *data, uint32 *next_paddr, addr_range *ar0,
-	addr_range *ar1, uint32 *start_addr, addr_range *dynamic_section);
+static void load_elf_image(void *data, uint32 *next_paddr, struct preloaded_image *image,
+	uint32 *start_addr);
 static int mmu_init(kernel_args *ka, uint32 *next_paddr);
 static void mmu_map_page(uint32 vaddr, uint32 paddr);
 static int check_cpu(void);
@@ -157,12 +157,15 @@ _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
 
 	// load the kernel (3rd entry in the bootdir)
 	load_elf_image((void *)(bootdir[2].be_offset * PAGE_SIZE + BOOTDIR_ADDR), &next_paddr,
-			&ka->kernel_seg0_addr, &ka->kernel_seg1_addr, &kernel_entry, &ka->kernel_dynamic_section_addr);
+			&ka->kernel_image, &kernel_entry);
 
-	if (ka->kernel_seg1_addr.size > 0)
-		next_vaddr = ROUNDUP(ka->kernel_seg1_addr.start + ka->kernel_seg1_addr.size, PAGE_SIZE);
-	else
-		next_vaddr = ROUNDUP(ka->kernel_seg0_addr.start + ka->kernel_seg0_addr.size, PAGE_SIZE);
+	if (ka->kernel_image.data_region.size > 0) {
+		next_vaddr = ROUNDUP(ka->kernel_image.data_region.start
+			+ ka->kernel_image.data_region.size, PAGE_SIZE);
+	} else {
+		next_vaddr = ROUNDUP(ka->kernel_image.text_region.start
+			+ ka->kernel_image.text_region.size, PAGE_SIZE);
+	}
 
 	// map in a kernel stack
 	ka->cpu_kstack[0].start = next_vaddr;
@@ -388,28 +391,29 @@ _start(uint32 memSize, ext_memory *extMemoryBlock, uint32 extMemoryCount,
 
 
 static void
-load_elf_image(void *data, uint32 *next_paddr, addr_range *ar0, addr_range *ar1,
-	uint32 *start_addr, addr_range *dynamic_section)
+load_elf_image(void *data, uint32 *next_paddr, struct preloaded_image *image,
+	uint32 *start_addr)
 {
-	struct Elf32_Ehdr *imageHeader = (struct Elf32_Ehdr*) data;
-	struct Elf32_Phdr *segments = (struct Elf32_Phdr*)(imageHeader->e_phoff + (unsigned) imageHeader);
+	struct Elf32_Ehdr *imageHeader = (struct Elf32_Ehdr *)data;
+	struct Elf32_Phdr *segments = (struct Elf32_Phdr *)(imageHeader->e_phoff + (unsigned) imageHeader);
 	int segmentIndex;
 	int foundSegmentIndex = 0;
 
-	ar0->size = 0;
-	ar1->size = 0;
-	dynamic_section->size = 0;
+	memset(image, 0, sizeof(struct preloaded_image));
+	memcpy(&image->elf_header, imageHeader, sizeof(struct Elf32_Ehdr));
 
 	for (segmentIndex = 0; segmentIndex < imageHeader->e_phnum; segmentIndex++) {
 		struct Elf32_Phdr *segment = &segments[segmentIndex];
+		struct elf_region *region;
+		uint32 size, virtualAddress;
 		uint32 segmentOffset;
 
 		switch (segment->p_type) {
 			case PT_LOAD:
 				break;
 			case PT_DYNAMIC:
-				dynamic_section->start = segment->p_vaddr;
-				dynamic_section->size = segment->p_memsz;
+				image->dynamic_section.start = segment->p_vaddr;
+				image->dynamic_section.size = segment->p_memsz;
 			default:
 				continue;
 		}
@@ -418,46 +422,54 @@ load_elf_image(void *data, uint32 *next_paddr, addr_range *ar0, addr_range *ar1,
 		PRINT(("p_vaddr 0x%x p_paddr 0x%x p_filesz 0x%x p_memsz 0x%x\n",
 			segment->p_vaddr, segment->p_paddr, segment->p_filesz, segment->p_memsz));
 
-		/* Map initialized portion */
-		for (segmentOffset = 0;
-			segmentOffset < ROUNDUP(segment->p_filesz, PAGE_SIZE);
-			segmentOffset += PAGE_SIZE) {
+		size = ROUNDUP(segment->p_filesz, PAGE_SIZE);
+		virtualAddress = ROUNDOWN(segment->p_vaddr, PAGE_SIZE);
 
-			mmu_map_page(segment->p_vaddr + segmentOffset, *next_paddr);
-			memcpy((void *)ROUNDOWN(segment->p_vaddr + segmentOffset, PAGE_SIZE),
-				(void *)ROUNDOWN((unsigned)data + segment->p_offset + segmentOffset, PAGE_SIZE), PAGE_SIZE);
+		/* Map initialized portion */
+		for (segmentOffset = 0; segmentOffset < size; segmentOffset += PAGE_SIZE) {
+			mmu_map_page(virtualAddress + segmentOffset, *next_paddr);
+			memcpy((void *)(virtualAddress + segmentOffset),
+				(void *)ROUNDOWN((uint32)data + segment->p_offset + segmentOffset, PAGE_SIZE),
+				PAGE_SIZE);
 			(*next_paddr) += PAGE_SIZE;
 		}
 
 		/* Clean out the leftover part of the last page */
 		if (segment->p_filesz % PAGE_SIZE > 0) {
-			PRINT(("memsetting 0 to va 0x%x, size %d\n", (void*)((unsigned)segment->p_vaddr + segment->p_filesz), PAGE_SIZE  - (segment->p_filesz % PAGE_SIZE)));
-			memset((void*)((unsigned)segment->p_vaddr + segment->p_filesz), 0, PAGE_SIZE
+			PRINT(("memsetting 0 to va 0x%x, size %d\n", (void *)((unsigned)segment->p_vaddr + segment->p_filesz), PAGE_SIZE  - (segment->p_filesz % PAGE_SIZE)));
+			memset((void *)((unsigned)segment->p_vaddr + segment->p_filesz), 0, PAGE_SIZE
 				- (segment->p_filesz % PAGE_SIZE));
 		}
 
+		size = ROUNDUP(segment->p_memsz, PAGE_SIZE);
+
 		/* Map uninitialized portion */
-		for (; segmentOffset < ROUNDUP(segment->p_memsz, PAGE_SIZE); segmentOffset += PAGE_SIZE) {
+		for (; segmentOffset < size; segmentOffset += PAGE_SIZE) {
 			PRINT(("mapping zero page at va 0x%x\n", segment->p_vaddr + segmentOffset));
-			mmu_map_page(segment->p_vaddr + segmentOffset, *next_paddr);
-			memset((void *)(segment->p_vaddr + segmentOffset), 0, PAGE_SIZE);
+			mmu_map_page(virtualAddress + segmentOffset, *next_paddr);
+			memset((void *)(virtualAddress + segmentOffset), 0, PAGE_SIZE);
 			(*next_paddr) += PAGE_SIZE;
 		}
 
-		switch (foundSegmentIndex) {
-			case 0:
-				ar0->start = segment->p_vaddr;
-				ar0->size = segment->p_memsz;
-				break;
-			case 1:
-				ar1->start = segment->p_vaddr;
-				ar1->size = segment->p_memsz;
-				break;
-			default:
-				;
-		}
+		if (foundSegmentIndex == 0)
+			region = &image->text_region;
+		else
+			region = &image->data_region;
+
+		region->start = segment->p_vaddr;
+		region->size = size;
+		region->delta = -region->start;
+
 		foundSegmentIndex++;
 	}
+
+	// initialize the region pointers to the allocated region
+	// (text region comes first)
+	image->data_region.start = image->text_region.start + image->text_region.size;
+
+	image->data_region.delta += image->data_region.start;
+	image->text_region.delta += image->text_region.start;
+
 	*start_addr = imageHeader->e_entry;
 }
 
