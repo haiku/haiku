@@ -40,7 +40,7 @@ Server net_server :
 
 LinkSharedOSLibs net_server : 
 	be 
-	socket
-	bind
+	libsocket.so
+	libbind.so
 	libppp.a
 ;
