@@ -405,7 +405,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 			String << Other->Label();
 			
-			String.Truncate(7);
+			int32 point = String.FindFirst('z');
+			String.Truncate(point + 1);
 			
 			fRefreshMenu->Superitem()->SetLabel(String.String());
 			
@@ -435,17 +436,18 @@ ScreenWindow::MessageReceived(BMessage* message)
 			
 			if (fInitialRefresh == Other)
 			{
-				BString string;
-				
+				BString string;			
 				string << fInitialRefreshN;
-			
-				string.Truncate(4);
+				
+				int32 point = string.FindFirst('.');
+				string.Truncate(point + 2);
 			
 				string << " Hz/Other...";
 			
 				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(string.String());
 			
-				string.Truncate(7);
+				point = string.FindFirst('/');
+				string.Truncate(point);
 			
 				fRefreshMenu->Superitem()->SetLabel(string.String());
 			}
@@ -469,10 +471,15 @@ ScreenWindow::MessageReceived(BMessage* message)
 			BString menuLabel = fResolutionMenu->FindMarked()->Label();
 			int32 space = menuLabel.FindFirst(' ');
 			menuLabel.MoveInto(string, 0, space);
-			menuLabel.Remove(0, 3);		
+			menuLabel.Remove(0, 3);
+					
 			width = atoi(string.String());
 			height = atoi(menuLabel.String());
-			refresh = atof(fRefreshMenu->FindMarked()->Label());
+			
+			if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
+				refresh = fCustomRefresh;
+			else
+				refresh = atof(fRefreshMenu->FindMarked()->Label());
 			
 			for(uint32 c = 0; c < fTotalModes; c++)
 			{
@@ -482,12 +489,8 @@ ScreenWindow::MessageReceived(BMessage* message)
 				mode = &fSupportedModes[c];
 			}
 							
-			if (fRefreshMenu->FindMarked() == fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG))
-				mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * fCustomRefresh / 1000);
-			else
-				mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * refresh / 1000);
-			
-			
+			mode->timing.pixel_clock = (uint32)((mode->timing.h_total * mode->timing.v_total) * refresh / 1000);
+					
 			
 			if (fColorsMenu->FindMarked() == fColorsMenu->FindItem("8 Bits/Pixel"))
 			{	
@@ -510,12 +513,11 @@ ScreenWindow::MessageReceived(BMessage* message)
 			mode->v_display_start = 0;
 
 			if (fWorkspaceMenu->FindMarked() == fWorkspaceMenu->FindItem("All Workspaces"))
-			{
-				int32 button;
-			
+			{			
 				BAlert *WorkspacesAlert = new BAlert("WorkspacesAlert", "Change all workspaces? 
-This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
- 				button = WorkspacesAlert->Go();
+					This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+ 				
+ 				int32 button = WorkspacesAlert->Go();
  				
  				if (button == 1)
  					break;
@@ -556,17 +558,17 @@ This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WAR
 			{	
 				Other->SetMarked(true);
 				
-				BString String;
-				
+				BString String;		
 				String << fInitialRefreshN;
-			
-				String.Truncate(4);
+				int32 point = String.FindFirst('.');
+				String.Truncate(point + 2);
 			
 				String << " Hz/Other...";
 			
 				fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(String.String());
 			
-				String.Truncate(7);
+				point = String.FindFirst('/');
+				String.Truncate(point);
 			
 				fRefreshMenu->Superitem()->SetLabel(String.String());
 			}
@@ -584,17 +586,17 @@ This action cannot be reverted", "Okay", "Cancel", NULL, B_WIDTH_AS_USUAL, B_WAR
 				
 			Other->SetMarked(true);
 				
-			BString String;
-				
+			BString String;			
 			String << fCustomRefresh;
-			
-			String.Truncate(4);
+			int32 point = String.FindFirst('.');
+			String.Truncate(point + 2);
 			
 			String << " Hz/Other...";
 			
 			fRefreshMenu->FindItem(POP_OTHER_REFRESH_MSG)->SetLabel(String.String());
 			
-			String.Truncate(7);
+			point = String.FindFirst('z');
+			String.Truncate(point + 1);
 			
 			fRefreshMenu->Superitem()->SetLabel(String.String());
 			

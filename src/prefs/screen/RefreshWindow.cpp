@@ -20,6 +20,8 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	AddChild(fRefreshView);
 	
 	BRect SliderRect;
+	BString maxRefresh;
+	maxRefresh << gMaxRefresh;
 	
 	SliderRect.Set(10.0, 35.0, 299.0, 60.0);
 	
@@ -27,7 +29,7 @@ RefreshWindow::RefreshWindow(BRect frame, int32 value)
 	
 	fRefreshSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fRefreshSlider->SetHashMarkCount(10);
-	fRefreshSlider->SetLimitLabels("45.0", "90.0");
+	fRefreshSlider->SetLimitLabels("45.0", maxRefresh.String());
 	fRefreshSlider->SetKeyIncrementValue(1);
 	fRefreshSlider->SetValue(value);
 	fRefreshSlider->SetSnoozeAmount(1);

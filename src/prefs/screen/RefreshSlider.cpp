@@ -2,17 +2,17 @@
 #include <Window.h>
 #include <Locker.h>
 #include <Slider.h>
-#include <String.h>
 
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 
 #include "RefreshSlider.h"
 #include "Constants.h"
 
 RefreshSlider::RefreshSlider(BRect frame)
-	: BSlider(frame, "Screen", "Refresh Rate:", new BMessage(SLIDER_INVOKE_MSG), 450, 900),
-	fStatus(new char[64])
+	: BSlider(frame, "Screen", "Refresh Rate:", new BMessage(SLIDER_INVOKE_MSG), 450, gMaxRefresh * 10),
+	fStatus(new char[32])
 {	
 }
 
@@ -77,18 +77,7 @@ RefreshSlider::UpdateText() const
 {
 	if (fStatus && Window()->Lock())
 	{
-		BString String;
-	
-		String << Value();
-		String.CopyInto(fStatus, 0, String.Length() + 1);
-		
-		char Last = fStatus[2];
-				
-		String.Truncate(2);		
-		String << "." << Last << " Hz";
-		
-		String.CopyInto(fStatus, 0, String.Length() + 1);
-		
+		sprintf(fStatus, "%.1f Hz", (float)Value() / 10);
 		return fStatus;
 	}
 	else

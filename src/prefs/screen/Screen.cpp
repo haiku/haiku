@@ -38,34 +38,12 @@ ScreenApplication::MessageReceived(BMessage* message)
 	switch(message->what)
 	{
 		case SET_INITIAL_MODE_MSG:
-		{
-			fScreenWindow->PostMessage(new BMessage(SET_INITIAL_MODE_MSG));
-			
-			break;
-		}
-		
 		case SET_CUSTOM_REFRESH_MSG:
-		{
-			BMessage message(SET_CUSTOM_REFRESH_MSG);
-			
-			float Value;
-		
-			message.FindFloat("refresh", &Value);
-		
-			message.AddFloat("refresh", Value);
-		
-			fScreenWindow->PostMessage(&message);
-			
-			break;
-		}
-		
 		case MAKE_INITIAL_MSG:
 		{
-			fScreenWindow->PostMessage(new BMessage(MAKE_INITIAL_MSG));
-		
+			fScreenWindow->PostMessage(message);	
 			break;
 		}
-	
 		default:
 			BApplication::MessageReceived(message);			
 			break;

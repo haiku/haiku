@@ -8,16 +8,12 @@ rgb_color whiteColor = { 255, 255, 255, 255 };
 rgb_color redColor = { 228, 0, 0, 255 };
 	
 float round(float n, int32 max)
-{
-	float result;
-	int32 tmp;
-	max *= 10;
+{	
+	max = (int32)pow(10, (float)max);
 	
 	n *= max;
 	n += 0.5;
 	
-	tmp = (int32)floor(n);
-	result = (float)tmp / (max);
-	
-	return result;
+	int32 tmp = (int32)floor(n);
+	return (float)tmp / (max);
 }
