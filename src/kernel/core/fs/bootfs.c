@@ -3,25 +3,22 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
+
+#include <KernelExport.h>
 #include <vfs.h>
 #include <debug.h>
 #include <khash.h>
-#include <malloc.h>
 #include <lock.h>
 #include <vm.h>
-#include <Errors.h>
-#include <kerrors.h>
-#include <arch/cpu.h>
-#include <sys/stat.h>
-#include <KernelExport.h>
 
 #include <boot/bootdir.h>
 
+#include <sys/stat.h>
+#include <malloc.h>
 #include <string.h>
 #include <stdio.h>
 
-#include "bootfs.h"
+#include "builtin_fs.h"
 
 
 #define BOOTFS_TRACE 0
