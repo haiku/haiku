@@ -33,6 +33,7 @@
 #include <user_atomic.h>
 #include <safemode.h>
 #include <arch/system_info.h>
+#include <messaging.h>
 
 #include <malloc.h>
 #include <string.h>
