@@ -5,11 +5,13 @@
 status_t ichaudio_attach(audio_drv_t *drv, void **cookie);
 status_t ichaudio_powerctl(audio_drv_t *drv, void *cookie);
 status_t ichaudio_detach(audio_drv_t *drv, void *cookie);
-status_t ichaudio_stream_attach(audio_drv_t *drv, void *cookie, int stream);
-status_t ichaudio_stream_detach(audio_drv_t *drv, void *cookie, int stream);
-status_t ichaudio_stream_control(audio_drv_t *drv, void *cookie, int stream, int op);
-status_t ichaudio_stream_set_buffers(audio_drv_t *drv, void *cookie, int stream, uint32 *buffer_size, stream_buffer_desc_t *desc);
-status_t ichaudio_stream_set_frame_rate(audio_drv_t *drv, void *cookie, int stream, uint32 *frame_rate);
+status_t ichaudio_stream_attach(audio_drv_t *drv, void *cookie, int stream_id);
+status_t ichaudio_stream_detach(audio_drv_t *drv, void *cookie, int stream_id);
+status_t ichaudio_stream_control(audio_drv_t *drv, void *cookie, int stream_id, int op);
+status_t ichaudio_stream_set_buffers(audio_drv_t *drv, void *cookie, int stream_id, uint32 *buffer_size, stream_buffer_desc_t *desc);
+status_t ichaudio_stream_set_frame_rate(audio_drv_t *drv, void *cookie, int stream_id, uint32 *frame_rate);
+
+void stream_reset(ichaudio_cookie *cookie, uint32 regbase);
 
 
 pci_id_table_t ichaudio_id_table[] = {
@@ -46,6 +48,8 @@ enum {
 	STREAM_PO = 0,
 	STREAM_PI = 1,
 };
+const uint32 STREAM_REGBASE[2] = { ICH_REG_PO_BASE, ICH_REG_PI_BASE };
+
 
 stream_info_t po_stream = {
 	.flags				= B_PLAYBACK_STREAM | B_BUFFER_SIZE_EXPONETIAL | B_SAMPLE_TYPE_INT16,
@@ -296,16 +300,16 @@ ichaudio_powerctl(audio_drv_t *drv, void *_cookie)
 }
 
 void
-stream_reset(ichaudio_cookie *cookie, int stream)
+stream_reset(ichaudio_cookie *cookie, uint32 regbase)
 {
 	int i;
 
-	ich_reg_write_8(cookie, cookie->stream[stream].regbase + ICH_REG_X_CR, 0);
-	ich_reg_read_8(cookie, cookie->stream[stream].regbase + ICH_REG_X_CR); // force PCI-to-PCI bridge cache flush
+	ich_reg_write_8(cookie, regbase + ICH_REG_X_CR, 0);
+	ich_reg_read_8(cookie, regbase + ICH_REG_X_CR); // force PCI-to-PCI bridge cache flush
 	snooze(10000); // 10 ms
-	ich_reg_write_8(cookie, cookie->stream[stream].regbase + ICH_REG_X_CR, CR_RR);
+	ich_reg_write_8(cookie, regbase + ICH_REG_X_CR, CR_RR);
 	for (i = 0; i < 100; i++) {
-		uint8 cr = ich_reg_read_8(cookie, cookie->stream[stream].regbase + ICH_REG_X_CR);
+		uint8 cr = ich_reg_read_8(cookie, regbase + ICH_REG_X_CR);
 		if (cr == 0) {
 			LOG(("channel reset finished, %d\n",i));
 			return;
@@ -316,32 +320,31 @@ stream_reset(ichaudio_cookie *cookie, int stream)
 }
 
 status_t
-ichaudio_stream_attach(audio_drv_t *drv, void *_cookie, int stream)
+ichaudio_stream_attach(audio_drv_t *drv, void *_cookie, int stream_id)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *) _cookie;
+	ichaudio_stream *stream = &cookie->stream[stream_id];
 	void *bd_virt_base;
 	void *bd_phys_base;
 	int i;
 	
-	uint32 stream_regbase[2] = { ICH_REG_PO_BASE, ICH_REG_PI_BASE };
+	stream->regbase = STREAM_REGBASE[stream_id];
+	stream->lastindex = 0;
+	stream->processed_samples = 0;
 	
-	cookie->stream[stream].regbase = stream_regbase[stream];
-	cookie->stream[stream].lastindex = 0;
-	cookie->stream[stream].processed_samples = 0;
-	
-	stream_reset(cookie);
+	stream_reset(cookie, stream->regbase);
 
 	// allocate memory for buffer descriptors
-	cookie->bd_area = alloc_mem(&bd_virt_base, &bd_phys_base, ICH_BD_COUNT * sizeof(ich_bd), 0, "ich_ac97 buffer descriptor");
-	if (cookie->bd_area < B_OK)
+	stream->bd_area = alloc_mem(&bd_virt_base, &bd_phys_base, ICH_BD_COUNT * sizeof(ich_bd), 0, "ich_ac97 buffer descriptor");
+	if (stream->bd_area < B_OK)
 		goto err;
 
 	// set physical buffer descriptor base address
-	ich_reg_write_32(cookie->[stream].regbase, (uint32)bd_phys_base);
+	ich_reg_write_32(cookie, stream->regbase, (uint32)bd_phys_base);
 
 	// setup descriptor pointers
 	for (i = 0; i < ICH_BD_COUNT; i++)
-		cookie->bd[i] = (ich_bd *) ((char *)bd_virt_base + i * sizeof(ich_bd));
+		stream->bd[i] = (ich_bd *) ((char *)bd_virt_base + i * sizeof(ich_bd));
 		
 	return B_OK;
 	
@@ -351,29 +354,31 @@ err:
 
 
 status_t
-ichaudio_stream_detach(audio_drv_t *drv, void *_cookie, int stream)
+ichaudio_stream_detach(audio_drv_t *drv, void *_cookie, int stream_id)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
+	ichaudio_stream *stream = &cookie->stream[stream_id];
 
-	stream_reset(cookie);
+	stream_reset(cookie, stream->regbase);
 
-	if (cookie->[stream].buffer_area > 0) delete_area(cookie->[stream].buffer_area);
-	if (cookie->[stream].bd_area > 0) delete_area(cookie->[stream].bd_area);
+	if (stream->buffer_area > 0) delete_area(stream->buffer_area);
+	if (stream->bd_area > 0) delete_area(stream->bd_area);
 	
 	return B_OK;
 }
 
 
 status_t
-ichaudio_stream_control(audio_drv_t *drv, void *_cookie, int stream, int op)
+ichaudio_stream_control(audio_drv_t *drv, void *_cookie, int stream_id, int op)
 {
 }
 
 
 status_t
-ichaudio_stream_set_buffers(audio_drv_t *drv, void *_cookie, int stream, uint32 *buffer_size, stream_buffer_desc_t *desc)
+ichaudio_stream_set_buffers(audio_drv_t *drv, void *_cookie, int stream_id, uint32 *buffer_size, stream_buffer_desc_t *desc)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)_cookie;
+	ichaudio_stream *stream = &cookie->stream[stream_id];
 
 	void *buffer_virt_base;
 	void *buffer_phys_base;
@@ -394,22 +399,22 @@ ichaudio_stream_set_buffers(audio_drv_t *drv, void *_cookie, int stream, uint32 
 
 	// initalize buffer descriptors
 	for (i = 0; i < ICH_BD_COUNT; i++) {
-		cookie->bd[i].buffer = (uint32)buffer_phy_base + (i % 2) * *buffer_size;
-		cookie->bd[i].length = *buffer_size / GET_HW_SAMPLE_SIZE(cookie);
-		cookie->bd[i].flags = ICH_BDC_FLAG_IOC;
+		stream->bd[i]->buffer = (uint32)buffer_phys_base + (i % 2) * *buffer_size;
+		stream->bd[i]->length = *buffer_size / GET_HW_SAMPLE_SIZE(cookie);
+		stream->bd[i]->flags = ICH_BDC_FLAG_IOC;
 	}
 
 	// free old buffer memory	
-	if (cookie->buffer_area > 0)
-		delete_area(cookie->[stream].buffer_area);
+	if (stream->buffer_area > 0)
+		delete_area(stream->buffer_area);
 		
-	cookie->[stream].buffer_area = buffer_area;
+	stream->buffer_area = buffer_area;
 	return B_OK;
 }
 
 
 status_t
-ichaudio_stream_set_frame_rate(audio_drv_t *drv, void *_cookie, int stream, uint32 *frame_rate)
+ichaudio_stream_set_frame_rate(audio_drv_t *drv, void *_cookie, int stream_id, uint32 *frame_rate)
 {
 }
 
