@@ -21,7 +21,7 @@
 
 struct daemon {
 	list_link	link;
-	void		(*function)(void *, int);
+	daemon_hook	function;
 	void		*arg;
 	int32		frequency;
 	int32		offset;
@@ -56,7 +56,7 @@ kernel_daemon(void *data)
 
 
 status_t
-unregister_kernel_daemon(void (*function)(void *, int), void *arg)
+unregister_kernel_daemon(daemon_hook function, void *arg)
 {
 	struct daemon *daemon = NULL;
 
@@ -80,7 +80,7 @@ unregister_kernel_daemon(void (*function)(void *, int), void *arg)
 
 
 status_t
-register_kernel_daemon(void (*function)(void *, int), void *arg, int frequency)
+register_kernel_daemon(daemon_hook function, void *arg, int frequency)
 {
 	struct daemon *daemon;
 
