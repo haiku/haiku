@@ -1246,6 +1246,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			int8 keystates[16];
 			int32 raw_char;
 			int32 repeatcount;
+			int8 strlength;
 			
 			*((int32*)utf)=0;
 			
@@ -1255,9 +1256,12 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&repeatcount);
 			msg.Read<int32>(&modifiers);
 			msg.Read(utf, sizeof(utf));
+			msg.Read<int8>(&strlength);
 			msg.ReadString(&string);
 			msg.Read(keystates,sizeof(int8)*16);
-	
+			
+			STRACE(("Key Down: 0x%lx\n",scancode));
+			
 			if(DISPLAYDRIVER==HWDRIVER)
 			{
 				// Check for workspace change or safe video mode
@@ -1275,19 +1279,19 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 							break;
 						}
 					}
-				}
-			
-				if(modifiers & B_CONTROL_KEY)
-				{
-					STRACE(("Set Workspace %ld\n",scancode-1));
 					
-					//TODO: SetWorkspace in KeyboardEventHandler
-					//SetWorkspace(scancode-2);
-					if (string)
-						free(string);
-					break;
-				}	
-
+					if(modifiers & B_CONTROL_KEY)
+					{
+						STRACE(("Set Workspace %ld\n",scancode-1));
+						
+						//TODO: SetWorkspace in KeyboardEventHandler
+						//SetWorkspace(scancode-2);
+						if (string)
+							free(string);
+						break;
+					}	
+				}
+				
 				// Tab key
 				if(scancode==0x26 && (modifiers & B_CONTROL_KEY))
 				{
@@ -1405,7 +1409,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 				{
 					BMessage keymsg(B_KEY_DOWN);
 					keymsg.AddInt64("when",time);
-//					keymsg.AddInt32("modifiers",modifiers);
+					keymsg.AddInt32("modifiers",modifiers);
 					keymsg.AddInt32("key",scancode);
 					if(repeatcount>1)
 						keymsg.AddInt32("be:key_repeat",repeatcount);
@@ -1416,7 +1420,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 							keymsg.AddInt8("byte",utf[i]);
 					}
 					keymsg.AddString("bytes",string);
-//					keymsg.AddInt32("raw_char",raw_char);
+					keymsg.AddInt32("raw_char",raw_char);
 
 					win->SendMessageToClient(&keymsg, B_NULL_TOKEN, true);
 				}
@@ -1445,6 +1449,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			char *string = NULL;
 			int8 keystates[16];
 			int32 raw_char;
+			int8 strlength;
 			
 			*((int32*)utf)=0;
 			
@@ -1453,6 +1458,7 @@ void RootLayer::KeyboardEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&raw_char);
 			msg.Read<int32>(&modifiers);
 			msg.Read(utf, sizeof(utf));
+			msg.Read<int8>(&strlength);
 			msg.ReadString(&string);
 			msg.Read(keystates,sizeof(int8)*16);
 	
