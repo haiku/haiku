@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -37,9 +37,13 @@ struct disk_probe_settings {
 	BRect	window_frame;
 	int32	base_type;
 	int32	font_size;
-	int32	unknown;
+	int32	flags;
 };
 
+enum disk_probe_flags {
+	kCaseSensitive	= 0x01,	// this flag alone is R5 DiskProbe settings compatible
+	kHexFindMode	= 0x02,
+};
 
 class Settings {
 	public:
@@ -95,6 +99,8 @@ Settings::Settings()
 	fMessage.AddRect("window_frame", BRect(50, 50, 550, 500));
 	fMessage.AddInt32("base_type", kHexBase);
 	fMessage.AddFloat("font_size", 12.0f);
+	fMessage.AddBool("case_sensitive", true);
+	fMessage.AddInt8("find_mode", kAsciiMode);
 
 	BFile file;
 	if (Open(&file, B_READ_ONLY) != B_OK)
@@ -123,6 +129,9 @@ Settings::Settings()
 			fMessage.ReplaceInt32("base_type", B_LENDIAN_TO_HOST_INT32(settings.base_type));
 		if (settings.font_size >= 0 && settings.font_size <= 72)
 			fMessage.ReplaceFloat("font_size", float(B_LENDIAN_TO_HOST_INT32(settings.font_size)));
+
+		fMessage.ReplaceBool("case_sensitive", settings.flags & kCaseSensitive);
+		fMessage.ReplaceInt8("find_mode", settings.flags & kHexFindMode ? kHexMode : kAsciiMode);
 	}
 }
 
@@ -150,8 +159,8 @@ Settings::~Settings()
 
 	settings.base_type = B_HOST_TO_LENDIAN_INT32(fMessage.FindInt32("base_type"));
 	settings.font_size = B_HOST_TO_LENDIAN_INT32(int32(fMessage.FindFloat("font_size") + 0.5f));
-	settings.unknown = 1;
-		// That's what DiskProbe R5 puts in there
+	settings.flags = B_HOST_TO_LENDIAN_INT32((fMessage.FindBool("case_sensitive") ? kCaseSensitive : 0)
+		| (fMessage.FindInt8("find_mode") == kHexMode ? kHexFindMode : 0));
 
 	file.Write(&settings, sizeof(settings));
 }
@@ -184,6 +193,14 @@ Settings::UpdateFrom(BMessage *message)
 	float fontSize;
 	if (message->FindFloat("font_size", &fontSize) == B_OK)
 		fMessage.ReplaceFloat("font_size", fontSize);
+
+	bool caseSensitive;
+	if (message->FindBool("case_sensitive", &caseSensitive) == B_OK)
+		fMessage.ReplaceBool("case_sensitive", caseSensitive);
+
+	int8 findMode;
+	if (message->FindInt8("find_mode", &findMode) == B_OK)
+		fMessage.ReplaceInt8("find_mode", findMode);
 
 	fUpdated = true;
 }
@@ -387,7 +404,8 @@ DiskProbe::MessageReceived(BMessage *message)
 
 			if (fFindWindow == NULL) {
 				// open it!
-				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80), *message, target);
+				fFindWindow = new FindWindow(fWindowFrame.OffsetByCopy(80, 80), *message,
+										target, &fSettings.Message());
 				fFindWindow->Show();
 			} else
 				fFindWindow->Activate();
@@ -409,12 +427,12 @@ DiskProbe::MessageReceived(BMessage *message)
 }
 
 
-void 
+void
 DiskProbe::AboutRequested()
 {
 	BAlert *alert = new BAlert("about", "DiskProbe\n"
 		"\twritten by Axel Dörfler\n"
-		"\tCopyright 2004, OpenBeOS.\n\n"
+		"\tCopyright 2004, Haiku.\n\n"
 		"original Be version by Robert Polic\n", "Ok");
 	BTextView *view = alert->TextView();
 	BFont font;

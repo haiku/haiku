@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef FIND_WINDOW_H
 #define FIND_WINDOW_H
@@ -13,9 +13,16 @@ class FindTextView;
 class BCheckBox;
 
 
+enum find_mode {
+	kAsciiMode,
+	kHexMode
+};
+
+
 class FindWindow : public BWindow {
 	public:
-		FindWindow(BRect rect, BMessage &previous, BMessenger &target);
+		FindWindow(BRect rect, BMessage &previous, BMessenger &target,
+			const BMessage *settings = NULL);
 		virtual ~FindWindow();
 
 		virtual void WindowActivated(bool active);

@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -21,11 +21,6 @@
 #include <stdio.h>
 #include <string.h>
 
-
-enum find_mode {
-	kAsciiMode,
-	kHexMode
-};
 
 static const uint32 kMsgFindMode = 'FMde';
 static const uint32 kMsgStartFind = 'SFnd';
@@ -369,7 +364,8 @@ FindTextView::GetData(BMessage &message)
 //	#pragma mark -
 
 
-FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
+FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target,
+	const BMessage *settings)
 	: BWindow(rect, "Find", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS),
 	fTarget(target)
 {
@@ -378,7 +374,8 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	AddChild(view);
 
 	int8 mode = kAsciiMode;
-	previous.FindInt8("find_mode", &mode);
+	if (previous.FindInt8("find_mode", &mode) != B_OK && settings != NULL)
+		settings->FindInt8("find_mode", &mode);
 
 	// add the top widgets
 
@@ -416,8 +413,10 @@ FindWindow::FindWindow(BRect rect, BMessage &previous, BMessenger &target)
 	fCaseCheckBox->ResizeToPreferred();
 	fCaseCheckBox->MoveTo(5, button->Frame().top);
 	bool caseSensitive;
-	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK)
-		caseSensitive = true;
+	if (previous.FindBool("case_sensitive", &caseSensitive) != B_OK) {
+		if (settings == NULL || settings->FindBool("case_sensitive", &caseSensitive) != B_OK)
+			caseSensitive = true;
+	}
 	fCaseCheckBox->SetValue(caseSensitive);
 	view->AddChild(fCaseCheckBox);
 
@@ -495,6 +494,12 @@ FindWindow::MessageReceived(BMessage *message)
 bool 
 FindWindow::QuitRequested()
 {
+	// update the application's settings
+	BMessage update(kMsgSettingsChanged);
+	update.AddBool("case_sensitive", fCaseCheckBox->Value() != 0);
+	update.AddInt8("find_mode", fTextView->Mode());
+	be_app_messenger.SendMessage(&update);
+
 	be_app_messenger.SendMessage(kMsgFindWindowClosed);
 	return true;
 }
