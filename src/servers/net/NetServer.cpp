@@ -5,11 +5,12 @@
 //  Copyright (c) 2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 
+#include "NetServer.h"
 #include <Application.h>
 #include <Alert.h>
 
 
-static const char *kSignature = "application/x-obos.net_server";
+static const char *kSignature = NET_SERVER_SIGNATURE;
 
 
 class NetServerApplication : public BApplication {

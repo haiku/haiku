@@ -9,6 +9,7 @@
 #define _PPP_SERVER__H
 
 #include <Handler.h>
+#include <PPPInterfaceListener.h>
 
 class SimpleMessageFilter;
 
@@ -22,7 +23,14 @@ class PPPServer : public BHandler {
 			// the SimpleMessageFilter routes ppp_server messages to this handler
 
 	private:
+		void InitInterfaces();
+		bool AskBeforeDialing(ppp_interface_id id);
+		
+		void HandleReportMessage(BMessage *message);
+
+	private:
 		SimpleMessageFilter *fFilter;
+		PPPInterfaceListener *fListener;
 };
 
 
