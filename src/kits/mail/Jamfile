@@ -52,21 +52,9 @@ LinkSharedOSLibs libmail.so :
 ;
 
 if $(TARGET_PLATFORM) = r5 {
-	LinkSharedOSLibs libmail.so :
-		be
-		textencoding
-		tracker
-		stdc++.r4
-		net
-	;
+	LinkSharedOSLibs libmail.so : net ;
 } else {
-	LinkSharedOSLibs libmail.so :
-		be
-		textencoding
-		tracker
-		stdc++.r4
-		socket
-	;
+	LinkSharedOSLibs libmail.so : socket ;
 }
 
 MakeLocate <develop>libmail.so : $(OBOS_STLIB_DIR) ;
