@@ -81,6 +81,7 @@ extern status_t		_kern_wait_for_thread(thread_id thread, status_t *_returnCode);
 extern bool			_kern_has_data(thread_id thread);
 extern status_t		_kern_send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
 extern status_t		_kern_receive_data(thread_id *_sender, void *buffer, size_t buffer_size);
+extern int64		_kern_restore_signal_frame();
 
 extern status_t		_kern_get_thread_info(thread_id id, thread_info *info);
 extern status_t		_kern_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
