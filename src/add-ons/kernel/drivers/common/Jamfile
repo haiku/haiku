@@ -12,3 +12,6 @@ KernelAddon zero : kernel drivers dev :
 	zero.c
 	;
 
+KernelAddon console : kernel drivers dev :
+	console.cpp
+	;
