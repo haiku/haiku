@@ -34,6 +34,7 @@
 
 #include "AppInfoList.h"
 #include "RecentApps.h"
+#include "RecentEntries.h"
 #include "WatchingService.h"
 
 class BMessage;
@@ -101,6 +102,8 @@ private:
 	uint32 _NextToken();
 	void _ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info);
 
+	void _HandleGetRecentEntries(BMessage *request);
+
 private:
 	AppInfoList		fRegisteredApps;
 	AppInfoList		fEarlyPreRegisteredApps;
@@ -108,6 +111,8 @@ private:
 	RosterAppInfo	*fActiveApp;
 	WatchingService	fWatchingService;
 	RecentApps		fRecentApps;
+	RecentEntries	fRecentDocuments;
+	RecentEntries	fRecentFolders;
 	uint32			fLastToken;
 };
 

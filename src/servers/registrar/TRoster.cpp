@@ -25,10 +25,11 @@
 //					running applications.
 //------------------------------------------------------------------------------
 
-#include <new.h>
+#include <new>
 
 #include <Application.h>
 #include <AppMisc.h>
+#include <storage_support.h>
 
 #include "Debug.h"
 #include "RegistrarDefs.h"
@@ -774,6 +775,7 @@ TRoster::HandleStopWatching(BMessage *request)
 void TRoster::HandleGetRecentDocuments(BMessage *request)
 {
 	FUNCTION_START();
+	_HandleGetRecentEntries(request);
 	FUNCTION_END();
 }
 
@@ -783,6 +785,9 @@ void TRoster::HandleGetRecentDocuments(BMessage *request)
 */
 void TRoster::HandleGetRecentFolders(BMessage *request)
 {
+	FUNCTION_START();
+	_HandleGetRecentEntries(request);
+	FUNCTION_END();
 }
 
 // HandleGetRecentApps
@@ -801,10 +806,10 @@ void TRoster::HandleGetRecentApps(BMessage *request)
 	int32 maxCount;
 	BMessage reply(B_REG_RESULT);
 
-	status_t err = request->FindInt32("max count", &maxCount);
-	if (!err)
-		err = fRecentApps.Get(maxCount, &reply);
-	reply.AddInt32("result", err);
+	status_t error = request->FindInt32("max count", &maxCount);
+	if (!error)
+		error = fRecentApps.Get(maxCount, &reply);
+	reply.AddInt32("result", error);
 	request->SendReply(&reply);	
 
 	FUNCTION_END();
@@ -827,13 +832,13 @@ void TRoster::HandleAddToRecentDocuments(BMessage *request)
 	const char *appSig;
 	BMessage reply(B_REG_RESULT);
 
-	status_t err = request->FindRef("ref", &ref);
-	if (!err)
-		err = request->FindString("app sig", &appSig);
-//	if (!err)
-//		err = fRecentDocuments.Add(&ref, appSig);
-	err = B_ERROR;
-	reply.AddInt32("result", err);
+	status_t error = request->FindRef("ref", &ref);
+	if (!error)
+		error = request->FindString("app sig", &appSig);
+	if (!error)
+		error = fRecentDocuments.Add(&ref, appSig);
+	error = B_ERROR;
+	reply.AddInt32("result", error);
 	request->SendReply(&reply);	
 
 	FUNCTION_END();
@@ -856,13 +861,13 @@ void TRoster::HandleAddToRecentFolders(BMessage *request)
 	const char *appSig;
 	BMessage reply(B_REG_RESULT);
 
-	status_t err = request->FindRef("ref", &ref);
-	if (!err)
-		err = request->FindString("app sig", &appSig);
-//	if (!err)
-//		err = fRecentFolders.Add(&ref, appSig);
-	err = B_ERROR;
-	reply.AddInt32("result", err);
+	status_t error = request->FindRef("ref", &ref);
+	if (!error)
+		error = request->FindString("app sig", &appSig);
+	if (!error)
+		error = fRecentFolders.Add(&ref, appSig);
+	error = B_ERROR;
+	reply.AddInt32("result", error);
 	request->SendReply(&reply);	
 
 	FUNCTION_END();
@@ -1207,4 +1212,93 @@ PRINT(("_ReplyToIAPRRequest(): pre-registered: %d\n", preRegistered));
 		_AddMessageAppInfo(&reply, info);
 	request->SendReply(&reply);
 }
+
+// _HandleGetRecentEntries
+/*! \brief Handles requests for both GetRecentDocuments() and
+	GetRecentFolders().
+*/
+void
+TRoster::_HandleGetRecentEntries(BMessage *request)
+{
+	FUNCTION_START();
+	if (!request) {
+		D(PRINT(("WARNING: TRoster::HandleGetRecentFolders(NULL) called\n")));
+		return;
+	}
+
+	int32 maxCount;
+	BMessage reply(B_REG_RESULT);
+	char **fileTypes = NULL;
+	int32 fileTypesCount = 0;
+	char *appSig = NULL;
+
+	status_t error = request->FindInt32("max count", &maxCount);
+	// Look for optional file type(s)
+	if (!error) {
+		type_code typeFound;		
+		status_t typeError = request->GetInfo("file type", &typeFound, &fileTypesCount);
+		if (!typeError)
+			typeError = typeFound == B_STRING_TYPE ? B_OK : B_BAD_TYPE;
+		if (!typeError) {
+			fileTypes = new(nothrow) char*[fileTypesCount];
+			typeError = fileTypes ? B_OK : B_NO_MEMORY;
+		}
+		if (!typeError) {
+			for (int i = 0; !error && i < fileTypesCount; i++) {
+				const char *type;
+				if (request->FindString("file type", i, &type) == B_OK) {
+					fileTypes[i] = new(nothrow) char[B_MIME_TYPE_LENGTH];
+					error = fileTypes[i] ? B_OK : B_NO_MEMORY;
+						// Yes, I do mean to use "error" here, not "typeError"
+					BPrivate::Storage::to_lower(type, fileTypes[i]);
+						// Types are expected to be lowercase
+				}
+			}
+		}
+	}
+	// Look for optional app sig
+	if (!error) {
+		const char *sig;
+		error = request->FindString("app sig", &sig);
+		if (!error) {
+			appSig = new(nothrow) char[B_MIME_TYPE_LENGTH];
+			error = appSig ? B_OK : B_NO_MEMORY;
+			BPrivate::Storage::to_lower(sig, appSig);
+		} else if (error == B_NAME_NOT_FOUND)
+			error = B_OK;
+	}
+	if (!error) {
+		switch (request->what) {
+			case B_REG_GET_RECENT_DOCUMENTS:
+				error = fRecentDocuments.Get(maxCount, (const char**)fileTypes,
+		   	                                 fileTypesCount, appSig, &reply);
+				D(fRecentDocuments.Print());
+		   	    break;
+		   	    
+			case B_REG_GET_RECENT_FOLDERS:
+				error = fRecentFolders.Get(maxCount, (const char**)fileTypes,
+			                               fileTypesCount, appSig, &reply);
+				D(fRecentFolders.Print());
+			    break;
+			
+			default:
+				D(PRINT(("WARNING: TRoster::_HandleGetRecentEntries(): unexpected "
+				         "request->what value of 0x%lx\n", request->what)));
+				error = B_BAD_VALUE;         
+				break; 
+		}
+	}
+	reply.AddInt32("result", error);
+	// Clean up before sending a reply
+	delete [] appSig;
+	if (fileTypes) {
+		for (int i = 0; i < fileTypesCount; i++)
+			delete [] fileTypes[i];
+		delete fileTypes;
+		fileTypes = NULL;
+	}
+	request->SendReply(&reply);	
+
+	FUNCTION_END();
+} 
 
