@@ -61,28 +61,30 @@ bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
 	msg->FindRect("windowframe",&windowFrame);
 	msg->FindBool("lockenable",&lockenable);
 	msg->FindString("lockmethod",&strPtr);
-	isNetworkPWD=(strcmp("custom",strPtr));
-	 // Get the password. Either from the settings file or the networking file.
-	if (isNetworkPWD) {
-		status_t found=find_directory(B_USER_SETTINGS_DIRECTORY,&path);
-		if (found==B_OK) {
-			FILE *networkFile=NULL;
-			char buffer[512],*start;
-			strncpy(pathAndFile,path.Path(),B_PATH_NAME_LENGTH-1);
-			strncat(pathAndFile,"/network",B_PATH_NAME_LENGTH-1);
-			// This ugly piece opens the networking file and reads the password, if it exists.
-			if ((networkFile=fopen(pathAndFile,"r")))
-				while (buffer==fgets(buffer,512,networkFile))
-					if ((start=strstr(buffer,"PASSWORD =")))
-						strncpy(password, start+10,strlen(start-11));
+	if (strPtr) {
+		isNetworkPWD=(strcmp("custom",strPtr));
+		 // Get the password. Either from the settings file or the networking file.
+		if (isNetworkPWD) {
+			status_t found=find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+			if (found==B_OK) {
+				FILE *networkFile=NULL;
+				char buffer[512],*start;
+				strncpy(pathAndFile,path.Path(),B_PATH_NAME_LENGTH-1);
+				strncat(pathAndFile,"/network",B_PATH_NAME_LENGTH-1);
+				// This ugly piece opens the networking file and reads the password, if it exists.
+				if ((networkFile=fopen(pathAndFile,"r")))
+					while (buffer==fgets(buffer,512,networkFile))
+						if ((start=strstr(buffer,"PASSWORD =")))
+							strncpy(password, start+10,strlen(start-11));
+				}
 			}
-		}
-	else {
-		msg->FindString("lockpassword",&strPtr);
-		if (strPtr)
-			strncpy(password,strPtr,B_PATH_NAME_LENGTH-1);
-		}
-		
+		else {
+			msg->FindString("lockpassword",&strPtr);
+			if (strPtr)
+				strncpy(password,strPtr,B_PATH_NAME_LENGTH-1);
+			}
+	} else 
+		password[0]='\0';
 	if (B_OK != msg->FindString("modulename",&strPtr)) 
 		blankTime=-1; // If the module doesn't exist, never blank.
 	if (strPtr)
@@ -96,8 +98,8 @@ bool ScreenSaverPrefs::parseSettings (BMessage *msg) {
 	return true;
 }
 
-void ScreenSaverPrefs::SaveSettings (void) {
-	BMessage msg;
+BMessage *ScreenSaverPrefs::GetSettings (void) {
+	msg.MakeEmpty();
 	msg.AddRect("windowframe",windowFrame);
 	msg.AddInt32("windowtab",windowTab);
 	msg.AddInt32("timeflags",timeFlags);
@@ -113,9 +115,15 @@ void ScreenSaverPrefs::SaveSettings (void) {
 	BString stateMsgName("modulesettings_");
 	stateMsgName+=moduleName;
 	msg.AddMessage(stateMsgName.String(),&stateMsg);	
+	return &msg;
+}
+
+void ScreenSaverPrefs::SaveSettings (void) {
+	GetSettings();
   	BPath path;
   	find_directory(B_USER_SETTINGS_DIRECTORY,&path);
-  	path.Append("OBOS_Screen_Saver",true);
+  	path.Append("ScreenSaver_settings",true);
   	BFile file(path.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-  	msg.Flatten(&file);
+	if ((file.InitCheck()!=B_OK) || (msg.Flatten(&file)!=B_OK))
+		printf ("Problem with saving preferences file!\n");
 }

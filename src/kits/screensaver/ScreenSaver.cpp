@@ -125,3 +125,13 @@ void
 BScreenSaver::_ReservedScreenSaver8() {
 }
 
+extern "C" {
+void  ReservedScreenSaver1__12BScreenSaver () {}
+void  ReservedScreenSaver2__12BScreenSaver () {}
+void  ReservedScreenSaver3__12BScreenSaver () {}
+void  ReservedScreenSaver4__12BScreenSaver () {}
+void  ReservedScreenSaver5__12BScreenSaver () {}
+void  ReservedScreenSaver6__12BScreenSaver () {}
+void  ReservedScreenSaver7__12BScreenSaver () {}
+void  ReservedScreenSaver8__12BScreenSaver () {}
+}
