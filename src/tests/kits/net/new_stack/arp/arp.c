@@ -42,10 +42,20 @@ status_t enable(net_layer *me, bool enable)
 
 status_t input_buffer(net_layer *me, net_buffer *buffer)
 {
+//	uint16 *protocol;
+
 	if (!buffer)
 		return B_ERROR;
-		
+/*		
+	if (g_stack->find_buffer_attribut(buffer, "ethernet:protocol", &protocol) != B_OK)
+		return B_ERROR;
+
+	if (protocol != 0x0806)
+		// Not an ARP packet
+		return B_ERROR;
+*/
 	// TODO!
+
 	return B_OK;
 }
 

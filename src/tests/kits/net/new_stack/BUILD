@@ -1,11 +1,11 @@
 Jampfiles should replace these BeIDE projects files in the future.
 But, beware:
-- the net_server binary should be symlinked as _APP_ in each sub-drectories, so 
+- the net_stack_server binary should be symlinked as _APP_ in each sub-drectories, so 
   each module can be linked against it to find the kernel module API exported in this app.
-- the net_server will try to load the modules from a local add-ons folder, which should
+- the net_stack_server will try to load the modules from a local add-ons folder, which should
   be setup by hands today: please symlink each module like this:
 
-  net_server
+  net_stack_server
   add-ons\
     generic\
       memory_pool -> ../../memory_pool/memory_pool
