@@ -125,6 +125,8 @@ VorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 	// that will be output; this can be different if you 
 	// specified any wildcards.
 	//
+	// Be R5 behavior seems to be that we can never fail.  If we
+	// don't support the requested format, just return one we do.
 	media_format format = vorbis_decoded_media_format();
 	format.u.raw_audio.frame_rate = (float)fInfo.rate;
 	format.u.raw_audio.channel_count = fInfo.channels;
@@ -133,12 +135,7 @@ VorbisDecoder::NegotiateOutputFormat(media_format *ioDecodedFormat)
 		format.u.raw_audio.buffer_size = AudioBufferSize(&format.u.raw_audio);
 	}
 	if (!format_is_compatible(format,*ioDecodedFormat)) {
-#ifdef NegotiateOutputFormat_AS_BEBOOK_SPEC
-		return B_ERROR;
-#else
-		// Be R5 behavior: never fail (?) => nuke the input format
 		*ioDecodedFormat = format;
-#endif
 	}
 	ioDecodedFormat->SpecializeTo(&format);
 	// setup output variables
