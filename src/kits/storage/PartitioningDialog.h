@@ -18,7 +18,13 @@ public:
 	PartitioningDialog(BRect dialogCenter);
 	virtual ~PartitioningDialog();
 
+	virtual void MessageReceived(BMessage *message);
+	virtual bool QuitRequested();
+
 	status_t Go(BDiskScannerParameterEditor *editor, bool *cancelled);
+
+private:
+	status_t _Init(BDiskScannerParameterEditor *editor);
 
 private:
 	BDiskScannerParameterEditor	*fEditor;
