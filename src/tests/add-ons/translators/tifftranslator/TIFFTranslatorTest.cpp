@@ -17,6 +17,7 @@
 #include <DataIO.h>
 #include <Errors.h>
 #include <OS.h>
+#include "TranslatorTestAddOn.h"
 
 // Suite
 CppUnit::Test *
@@ -229,6 +230,86 @@ TIFFTranslatorTest::IdentifyTest()
 	proster = NULL;
 }
 
+// coveniently group path of tiff image with
+// path of bits image that it should translate to
+struct TranslatePaths {
+	const char *tiffPath;
+	const char *bitsPath;
+};
+
+void
+TranslateTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
+	const TranslatePaths *paths, int32 len)
+{
+	// Perform translations on every file in the array
+	for (int32 i = 0; i < len; i++) {
+		// Setup input files	
+		ptest->NextSubTest();
+		BFile tiff_file, bits_file;
+		CPPUNIT_ASSERT(tiff_file.SetTo(paths[i].tiffPath, B_READ_ONLY) == B_OK);
+		CPPUNIT_ASSERT(bits_file.SetTo(paths[i].bitsPath, B_READ_ONLY) == B_OK);
+		printf(" [%s] ", paths[i].tiffPath);
+		
+		BMallocIO mallio, dmallio;
+		
+		// Convert to B_TRANSLATOR_ANY_TYPE (should be B_TRANSLATOR_BITMAP)
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&tiff_file, NULL, NULL, &mallio,
+			B_TRANSLATOR_ANY_TYPE) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, bits_file) == true);
+		
+		// Convert to B_TRANSLATOR_BITMAP
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&tiff_file, NULL, NULL, &mallio,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, bits_file) == true);
+		
+		// Convert bits mallio to B_TRANSLATOR_BITMAP dmallio
+		/* Not Supported Yet
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(dmallio, bits_file) == true);
+		*/
+		
+		// Convert to B_TIFF_FORMAT
+		/* Not Supported Yet
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(mallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(mallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&tiff_file, NULL, NULL, &mallio,
+			B_TIFF_FORMAT) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(mallio, tiff_file) == true);
+		*/
+		
+		// Convert TIFF mallio to B_TRANSLATOR_BITMAP dmallio
+		/* Not Ready Yet
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(dmallio, bits_file) == true);
+		*/
+		
+		// Convert TIFF mallio to B_TIFF_FORMAT dmallio
+		/* Not Ready Yet
+		ptest->NextSubTest();
+		CPPUNIT_ASSERT(dmallio.Seek(0, SEEK_SET) == 0);
+		CPPUNIT_ASSERT(dmallio.SetSize(0) == B_OK);
+		CPPUNIT_ASSERT(proster->Translate(&mallio, NULL, NULL, &dmallio,
+			B_TIFF_FORMAT) == B_OK);
+		CPPUNIT_ASSERT(CompareStreams(dmallio, tiff_file) == true);
+		*/
+	}
+}
+
 void
 TIFFTranslatorTest::TranslateTest()
 {
@@ -270,6 +351,67 @@ TIFFTranslatorTest::TranslateTest()
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
 	CPPUNIT_ASSERT(output.GetSize(&filesize) == B_OK);
 	CPPUNIT_ASSERT(filesize == 0);
+	
+	// Translate TIFF images to bits
+	const TranslatePaths aPaths[] = {
+		{ "/boot/home/resources/tiff/beer_rgb_nocomp.tif",
+			"/boot/home/resources/tiff/beer.bits" },
+		{ "/boot/home/resources/tiff/beer_rgb_nocomp_big.tif",
+			"/boot/home/resources/tiff/beer.bits" },
+		{ "/boot/home/resources/tiff/blocks_rgb_nocomp.tif",
+			"/boot/home/resources/tiff/blocks.bits" },
+		{ "/boot/home/resources/tiff/hills_bw_huffman.tif",
+			"/boot/home/resources/tiff/hills_bw.bits" },
+		{ "/boot/home/resources/tiff/hills_cmyk_nocomp.tif",
+			"/boot/home/resources/tiff/hills_cmyk.bits" },
+		{ "/boot/home/resources/tiff/hills_cmyk_nocomp_big.tif",
+			"/boot/home/resources/tiff/hills_cmyk.bits" },
+		{ "/boot/home/resources/tiff/hills_rgb_nocomp.tif",
+			"/boot/home/resources/tiff/hills_rgb.bits" },
+		{ "/boot/home/resources/tiff/hills_rgb_packbits.tif",
+			"/boot/home/resources/tiff/hills_rgb.bits" },
+		{ "/boot/home/resources/tiff/homes_bw_huffman.tif",
+			"/boot/home/resources/tiff/homes_bw.bits" },
+		{ "/boot/home/resources/tiff/homes_bw_nocomp.tif",
+			"/boot/home/resources/tiff/homes_bw.bits" },
+		{ "/boot/home/resources/tiff/homes_bw_nocomp_big.tif",
+			"/boot/home/resources/tiff/homes_bw.bits" },
+		{ "/boot/home/resources/tiff/homes_bw_packbits.tif",
+			"/boot/home/resources/tiff/homes_bw.bits" },
+		{ "/boot/home/resources/tiff/homes_cmap4_nocomp.tif",
+			"/boot/home/resources/tiff/homes_cmap4.bits" },
+		{ "/boot/home/resources/tiff/homes_cmap4_nocomp_big.tif",
+			"/boot/home/resources/tiff/homes_cmap4.bits" },
+		{ "/boot/home/resources/tiff/homes_cmap4_packbits.tif",
+			"/boot/home/resources/tiff/homes_cmap4.bits" },
+		{ "/boot/home/resources/tiff/homes_gray8_nocomp.tif",
+			"/boot/home/resources/tiff/homes_gray8.bits" },
+		{ "/boot/home/resources/tiff/homes_gray8_nocomp_big.tif",
+			"/boot/home/resources/tiff/homes_gray8.bits" },
+		{ "/boot/home/resources/tiff/homes_gray8_packbits.tif",
+			"/boot/home/resources/tiff/homes_gray8.bits" },
+		{ "/boot/home/resources/tiff/logo_cmap4_nocomp.tif",
+			"/boot/home/resources/tiff/logo_cmap4.bits" },
+		{ "/boot/home/resources/tiff/logo_cmap4_nocomp_big.tif",
+			"/boot/home/resources/tiff/logo_cmap4.bits" },
+		{ "/boot/home/resources/tiff/logo_cmap4_packbits.tif",
+			"/boot/home/resources/tiff/logo_cmap4.bits" },
+		{ "/boot/home/resources/tiff/logo_cmap8_nocomp.tif",
+			"/boot/home/resources/tiff/logo_rgb.bits" },
+		{ "/boot/home/resources/tiff/logo_cmap8_nocomp_big.tif",
+			"/boot/home/resources/tiff/logo_rgb.bits" },
+		{ "/boot/home/resources/tiff/logo_cmap8_packbits.tif",
+			"/boot/home/resources/tiff/logo_rgb.bits" },
+		{ "/boot/home/resources/tiff/logo_cmyk_nocomp.tif",
+			"/boot/home/resources/tiff/logo_cmyk.bits" },
+		{ "/boot/home/resources/tiff/vsmall_cmap4_nocomp.tif",
+			"/boot/home/resources/tiff/vsmall.bits" },
+		{ "/boot/home/resources/tiff/vsmall_rgb_nocomp.tif",
+			"/boot/home/resources/tiff/vsmall.bits" }
+	};
+	
+	TranslateTests(this, proster, aPaths,
+		sizeof(aPaths) / sizeof(TranslatePaths));
 	
 	delete proster;
 	proster = NULL;
