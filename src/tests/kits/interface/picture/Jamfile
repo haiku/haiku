@@ -25,11 +25,11 @@ LinkSharedOSLibs DumpPrintJob :
 	libprint.a
 	;
 
-SimpleTest Preview :
+SimpleTest ShowPrintJob :
 	Preview.cpp
 	;
 
-LinkSharedOSLibs Preview :
+LinkSharedOSLibs ShowPrintJob :
 	be
 	root
 	libprint.a
