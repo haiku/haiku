@@ -42,7 +42,7 @@
 #include "CLaylaDspCommObject.h"
 
 #include "Layla20DSP.c"
-#include "LaylaAsic.c"
+#include "LaylaASIC.c"
 
 //
 // The ASIC files for Layla20 are always this size
