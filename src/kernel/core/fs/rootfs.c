@@ -698,22 +698,22 @@ rootfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf,
 }
 
 
-static status_t
+static bool
 rootfs_can_page(fs_volume _fs, fs_vnode _v)
 {
-	return -1;
+	return false;
 }
 
 
-static ssize_t
-rootfs_read_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static status_t
+rootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }
 
 
-static ssize_t
-rootfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static status_t
+rootfs_write_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	return EPERM;
 }
@@ -938,6 +938,8 @@ file_system_info gRootFileSystem = {
 	&rootfs_can_page,
 	&rootfs_read_pages,
 	&rootfs_write_pages,
+
+	NULL,	// get_file_map()
 
 	/* common */
 	&rootfs_ioctl,

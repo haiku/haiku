@@ -810,7 +810,7 @@ bootfs_ioctl(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, ulong op, void *buf,
 }
 
 
-static status_t
+static bool
 bootfs_can_page(fs_volume _fs, fs_vnode _v)
 {
 	struct bootfs_vnode *v = _v;
@@ -818,44 +818,46 @@ bootfs_can_page(fs_volume _fs, fs_vnode _v)
 	TRACE(("bootfs_canpage: vnode %p\n", v));
 
 	if (v->stream.type == S_IFREG)
-		return 1;
-	else
-		return 0;
+		return true;
+
+	return false;
 }
 
 
-static ssize_t
-bootfs_read_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static status_t
+bootfs_read_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	struct bootfs_vnode *v = _v;
 	unsigned int i;
 
 	TRACE(("bootfs_readpage: fs_cookie %p vnode %p, vecs %p, pos 0x%Ld\n", _fs, v, vecs, pos));
 
-	for (i = 0; i < vecs->num; i++) {
+	for (i = 0; i < count; i++) {
 		if (pos >= v->stream.u.file.len) {
-			memset(vecs->vec[i].iov_base, 0, vecs->vec[i].iov_len);
-			pos += vecs->vec[i].iov_len;
+			memset(vecs[i].iov_base, 0, vecs[i].iov_len);
+			pos += vecs[i].iov_len;
 		} else {
 			unsigned int copy_len;
 
-			copy_len = min(vecs->vec[i].iov_len, v->stream.u.file.len - pos);
+			copy_len = min(vecs[i].iov_len, v->stream.u.file.len - pos);
 
-			memcpy(vecs->vec[i].iov_base, v->stream.u.file.start + pos, copy_len);
+			memcpy(vecs[i].iov_base, v->stream.u.file.start + pos, copy_len);
 
-			if (copy_len < vecs->vec[i].iov_len)
-				memset((char *)vecs->vec[i].iov_base + copy_len, 0, vecs->vec[i].iov_len - copy_len);
+			if (copy_len < vecs[i].iov_len) {
+				memset((char *)vecs[i].iov_base + copy_len, 0, vecs[i].iov_len - copy_len);
+				*_numBytes = v->stream.u.file.len - pos;
+			}
 
-			pos += vecs->vec[i].iov_len;
+			pos += vecs[i].iov_len;
 		}
 	}
 
-	return EPERM;
+	return B_OK;
 }
 
 
-static ssize_t
-bootfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+static status_t
+bootfs_write_pages(fs_volume _fs, fs_vnode _v, off_t pos, const iovec *vecs, size_t count, size_t *_numBytes)
 {
 	TRACE(("bootfs_writepage: fs_cookie %p vnode %p, vecs %p, pos %Ld \n", _fs, _v, vecs, pos));
 
@@ -969,6 +971,8 @@ file_system_info gBootFileSystem = {
 	&bootfs_can_page,
 	&bootfs_read_pages,
 	&bootfs_write_pages,
+	
+	NULL,	// get_file_map()
 
 	/* common */
 	&bootfs_ioctl,
