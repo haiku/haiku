@@ -63,18 +63,18 @@ area_id alloc_mem(void **phy, void **log, size_t size, const char *name)
 	area_id areaid;
 	status_t rv;
 	
-	TRACE(("allocating %d bytes for %s\n",size,name));
+	LOG(("allocating %d bytes for %s\n",size,name));
 
 	size = round_to_pagesize(size);
 	areaid = create_area(name, &logadr, B_ANY_KERNEL_ADDRESS,size,B_FULL_LOCK | B_CONTIGUOUS, B_READ_AREA | B_WRITE_AREA);
 	if (areaid < B_OK) {
-		TRACE(("couldn't allocate area %s\n",name));
+		PRINT(("couldn't allocate area %s\n",name));
 		return B_ERROR;
 	}
 	rv = get_memory_map(logadr,size,&pe,1);
 	if (rv < B_OK) {
 		delete_area(areaid);
-		TRACE(("couldn't map %s\n",name));
+		PRINT(("couldn't map %s\n",name));
 		return B_ERROR;
 	}
 	memset(logadr,0,size);
@@ -82,7 +82,7 @@ area_id alloc_mem(void **phy, void **log, size_t size, const char *name)
 		*log = logadr;
 	if (phy)
 		*phy = pe.address;
-	TRACE(("area = %d, size = %d, log = %#08X, phy = %#08X\n",areaid,size,logadr,pe.address));
+	LOG(("area = %d, size = %d, log = %#08X, phy = %#08X\n",areaid,size,logadr,pe.address));
 	return areaid;
 }
 

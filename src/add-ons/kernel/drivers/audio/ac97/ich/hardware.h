@@ -88,20 +88,26 @@ enum REG_GLOB_CNT_BITS
 /* ICH_REG_GLOB_STA (Global Status Register) Bits */
 enum REG_GLOB_STA_BITS
 {
-	STA_GSCI			= 0x00000001,
-	STA_MIINT			= 0x00000002,
-	STA_MOINT			= 0x00000004,
-	STA_PIINT			= 0x00000020,
-	STA_POINT			= 0x00000040,
-	STA_MINT			= 0x00000080,
-	STA_PCR				= 0x00000100,
-	STA_SCR				= 0x00000200,
-	STA_PRI				= 0x00000400,
-	STA_SRI				= 0x00000800,
-	STA_RCS				= 0x00008000,
+	STA_GSCI			= 0x00000001, /* GPI Status Change Interrupt */
+	STA_MIINT			= 0x00000002, /* Modem In Interrupt */
+	STA_MOINT			= 0x00000004, /* Modem Out Interrupt */
+	STA_PIINT			= 0x00000020, /* PCM In Interrupt */
+	STA_POINT			= 0x00000040, /* PCM Out Interrupt */
+	STA_MINT			= 0x00000080, /* Mic In Interrupt */
+	STA_PCR				= 0x00000100, /* AC_SDIN0 Codec Ready */
+	STA_SCR				= 0x00000200, /* AC_SDIN1 Codec Ready */
+	STA_PRI				= 0x00000400, /* AC_SDIN0 Resume Interrupt */
+	STA_SRI				= 0x00000800, /* AC_SDIN1 Resume Interrupt */
+	STA_RCS				= 0x00008000, /* Read Completition Status */
 	STA_AD3				= 0x00010000,
 	STA_MD3				= 0x00020000,
-	STA_INTMASK			= (STA_MIINT | STA_MOINT | STA_PIINT | STA_POINT | STA_MINT | STA_PRI | STA_SRI)
+	STA_M2INT			= 0x01000000,	/* Microphone 2 In Interrupt */
+	STA_P2INT			= 0x02000000,	/* PCM In 2 Interrupt */
+	STA_SPINT			= 0x04000000,	/* S/PDIF Interrupt */
+	STA_BCS				= 0x08000000,	/* Bit Clock Stopped */
+	STA_S2CR			= 0x10000000,	/* AC_SDIN2 Codec Ready */
+	STA_S2RI			= 0x20000000,	/* AC_SDIN2 Resume Interrupt */
+	STA_INTMASK			= (STA_MIINT | STA_MOINT | STA_PIINT | STA_POINT | STA_MINT | STA_PRI | STA_SRI | STA_M2INT | STA_P2INT | STA_SPINT | STA_S2RI)
 };
 
 #define ICH_BD_COUNT	32

@@ -59,12 +59,12 @@ status_t probe_device(void)
 	uint32 value;
 
 	if (get_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME,(module_info **)&configmodule) < 0) {
-		dprintf(DRIVER_NAME " ERROR: couldn't load config manager module\n");
+		PRINT(("ERROR: couldn't load config manager module\n"));
 		return B_ERROR; 
 	}
 
 	if (get_module(B_PCI_MODULE_NAME,(module_info **)&pcimodule) < 0) {
-		dprintf(DRIVER_NAME " ERROR: couldn't load pci module\n");
+		PRINT(("ERROR: couldn't load pci module\n"));
 		put_module(B_CONFIG_MANAGER_FOR_DRIVER_MODULE_NAME);
 		return B_ERROR; 
 	}
@@ -128,29 +128,33 @@ status_t probe_device(void)
 			free(dinfo);
 			continue;
 		}
-		TRACE(("found %s\n",config->name));
-		TRACE(("revision = %d\n",pciinfo->revision));
+		LOG(("found %s\n",config->name));
+		LOG(("revision = %d\n",pciinfo->revision));
 
 		#if DEBUG
-			TRACE(("bus = %#x, device = %#x, function = %#x\n",pciinfo->bus, pciinfo->device, pciinfo->function));
+			LOG(("bus = %#x, device = %#x, function = %#x\n",pciinfo->bus, pciinfo->device, pciinfo->function));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x00, 2);
-			TRACE(("VID = %#04x\n",value));
+			LOG(("VID = %#04x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x02, 2);
-			TRACE(("DID = %#04x\n",value));
+			LOG(("DID = %#04x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x08, 1);
-			TRACE(("RID = %#02x\n",value));
+			LOG(("RID = %#02x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x04, 2);
-			TRACE(("PCICMD = %#04x\n",value));
+			LOG(("PCICMD = %#04x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x06, 2);
-			TRACE(("PCISTS = %#04x\n",value));
+			LOG(("PCISTS = %#04x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x10, 4);
-			TRACE(("NAMBAR = %#08x\n",value));
+			LOG(("NAMBAR = %#08x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
-			TRACE(("NABMBAR = %#08x\n",value));
+			LOG(("NABMBAR = %#08x\n",value));
+			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x18, 4);
+			LOG(("MMBAR = %#08x\n",value));
+			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x1C, 4);
+			LOG(("MBBAR = %#08x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3c, 1);
-			TRACE(("INTR_LN = %#02x\n",value));
+			LOG(("INTR_LN = %#02x\n",value));
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3d, 1);
-			TRACE(("INTR_PN = %#02x\n",value));
+			LOG(("INTR_PN = %#02x\n",value));
 		#endif
 
 		/*
@@ -162,11 +166,11 @@ status_t probe_device(void)
 			value |= PCI_PCICMD_MSE | PCI_PCICMD_BME;
 		else
 			value |= PCI_PCICMD_IOS | PCI_PCICMD_BME;
-		pcimodule->write_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x04, 2, value);
+		pcimodule->write_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2, value);
 		
 		#if DEBUG
 			value = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, PCI_PCICMD, 2);
-			TRACE(("PCICMD = %#04x\n",value));
+			LOG(("PCICMD = %#04x\n",value));
 		#endif
 		
 		config->irq = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3C, 1);
@@ -175,10 +179,10 @@ status_t probe_device(void)
 			uint8 pin;
 			uint8 irq;
 			pin = pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x3d, 1);
-			TRACE(("IRQ not assigned to pin %d\n",pin));
-			TRACE(("Searching for IRQ...\n"));
+			LOG(("IRQ not assigned to pin %d\n",pin));
+			LOG(("Searching for IRQ...\n"));
 			if (B_OK == find_pci_pin_irq(pin, &irq)) {
-				TRACE(("Assigning IRQ %d to pin %d\n",irq,pin));
+				LOG(("Assigning IRQ %d to pin %d\n",irq,pin));
 				config->irq = irq;
 			} else {
 				config->irq = 0; // always 0, not 0xff if no irq assigned
@@ -195,21 +199,21 @@ status_t probe_device(void)
 			config->nabmbar = 0xfffffffe & pcimodule->read_pci_config(pciinfo->bus, pciinfo->device, pciinfo->function, 0x14, 4);
 		}
 
-		TRACE(("irq     = %d\n",config->irq));
-		TRACE(("nambar  = %#08x\n",config->nambar));
-		TRACE(("nabmbar = %#08x\n",config->nabmbar));
-		TRACE(("mmbar   = %#08x\n",config->mmbar));
-		TRACE(("mbbar   = %#08x\n",config->mbbar));
+		LOG(("irq     = %d\n",config->irq));
+		LOG(("nambar  = %#08x\n",config->nambar));
+		LOG(("nabmbar = %#08x\n",config->nabmbar));
+		LOG(("mmbar   = %#08x\n",config->mmbar));
+		LOG(("mbbar   = %#08x\n",config->mbbar));
 
 		free(dinfo);
 		result = B_OK;
 	}
 
 	if (result != B_OK)
-		TRACE(("probe_device() hardware not found\n"));
+		LOG(("probe_device() hardware not found\n"));
 //config->irq = 0;
 	if (config->irq == 0) {
-		dprintf(DRIVER_NAME ": WARNING: no interrupt configured\n");
+		PRINT(("WARNING: no interrupt configured\n"));
 		/*
 		 * we can continue without an interrupt, as another 
 		 * workaround to handle this is also implemented
@@ -217,12 +221,12 @@ status_t probe_device(void)
 	}
 	/* the ICH4 uses memory mapped IO */
 	if ((config->type & TYPE_ICH4) != 0 && ((config->mmbar == 0) || (config->mbbar == 0))) {
-		dprintf(DRIVER_NAME " ERROR: memory mapped IO not configured\n");
+		PRINT(("ERROR: memory mapped IO not configured\n"));
 		result = B_ERROR;
 	}
 	/* all other ICHs use programmed IO */
 	if ((config->type & TYPE_ICH4) == 0 && ((config->nambar == 0) || (config->nabmbar == 0))) {
-		dprintf(DRIVER_NAME " ERROR: IO space not configured\n");
+		PRINT(("ERROR: IO space not configured\n"));
 		result = B_ERROR;
 	}
 
@@ -245,7 +249,7 @@ status_t find_pci_pin_irq(uint8 pin, uint8 *irq)
 	long index;
 
 	if (get_module(B_PCI_MODULE_NAME,(module_info **)&module) < 0) {
-		dprintf(DRIVER_NAME " ERROR: couldn't load pci module\n");
+		PRINT(("ERROR: couldn't load pci module\n"));
 		return B_ERROR; 
 	}
 
@@ -253,7 +257,7 @@ status_t find_pci_pin_irq(uint8 pin, uint8 *irq)
 	for (index = 0; B_OK == module->get_nth_pci_info(index, &info); index++) {
 		uint8 pciirq = module->read_pci_config(info.bus, info.device, info.function, PCI_interrupt_line, 1);
 		uint8 pcipin = module->read_pci_config(info.bus, info.device, info.function, PCI_interrupt_pin, 1);
-		TRACE(("pin %d, irq %d\n",pcipin,pciirq));
+		LOG(("pin %d, irq %d\n",pcipin,pciirq));
 		if (pcipin == pin && pciirq != 0 && pciirq != 0xff) {
 			*irq = pciirq;
 			result = B_OK;
@@ -263,7 +267,7 @@ status_t find_pci_pin_irq(uint8 pin, uint8 *irq)
 
 	#if DEBUG 
 		if (result != B_OK) {
-			TRACE(("Couldn't find IRQ for pin %d\n",pin));
+			LOG(("Couldn't find IRQ for pin %d\n",pin));
 		}
 	#endif
 

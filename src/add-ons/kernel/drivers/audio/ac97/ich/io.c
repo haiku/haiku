@@ -133,7 +133,7 @@ ich_codec_read(int regno)
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
 	rv = ich_codec_wait();
 	if (rv != B_OK)
-		dprintf(DRIVER_NAME " semaphore timeout reading register %#x\n",regno);
+		PRINT(("semaphore timeout reading register %#x\n",regno));
 	if (config->type & TYPE_ICH4) 
 		return *(uint16 *)(((char *)config->log_mmbar) + regno);
 	else
@@ -148,7 +148,7 @@ ich_codec_write(int regno, uint16 value)
 	ASSERT(((config->type & TYPE_ICH4) != 0 && regno <= 511) || regno <= 255);
 	rv = ich_codec_wait();
 	if (rv != B_OK)
-		dprintf(DRIVER_NAME " semaphore timeout writing register %#x\n",regno);
+		PRINT(("semaphore timeout writing register %#x\n",regno));
 	if (config->type & TYPE_ICH4) 
 		*(uint16 *)(((char *)config->log_mmbar) + regno) = value;
 	else

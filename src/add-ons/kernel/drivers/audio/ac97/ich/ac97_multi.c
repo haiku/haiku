@@ -99,9 +99,9 @@ static status_t get_description(multi_description *data)
 	// channel, second, third, ..., followed by output bus
 	// channels and input bus channels and finally auxillary channels, 
 
-	TRACE(("request_channel_count = %d\n",data->request_channel_count));
+	LOG(("request_channel_count = %d\n",data->request_channel_count));
 	if (data->request_channel_count >= (int)(sizeof(chans) / sizeof(chans[0]))) {
-		TRACE(("copying data\n"));
+		LOG(("copying data\n"));
 		memcpy(data->channels,&chans,sizeof(chans));
 	}
 
@@ -154,19 +154,19 @@ static status_t get_global_format(multi_format_info *data)
 
 static status_t get_buffers(multi_buffer_list *data)
 {
-	TRACE(("flags = %#x\n",data->flags));
-	TRACE(("request_playback_buffers = %#x\n",data->request_playback_buffers));
-	TRACE(("request_playback_channels = %#x\n",data->request_playback_channels));
-	TRACE(("request_playback_buffer_size = %#x\n",data->request_playback_buffer_size));
-	TRACE(("request_record_buffers = %#x\n",data->request_record_buffers));
-	TRACE(("request_record_channels = %#x\n",data->request_record_channels));
-	TRACE(("request_record_buffer_size = %#x\n",data->request_record_buffer_size));
+	LOG(("flags = %#x\n",data->flags));
+	LOG(("request_playback_buffers = %#x\n",data->request_playback_buffers));
+	LOG(("request_playback_channels = %#x\n",data->request_playback_channels));
+	LOG(("request_playback_buffer_size = %#x\n",data->request_playback_buffer_size));
+	LOG(("request_record_buffers = %#x\n",data->request_record_buffers));
+	LOG(("request_record_channels = %#x\n",data->request_record_channels));
+	LOG(("request_record_buffer_size = %#x\n",data->request_record_buffer_size));
 
 	if (data->request_playback_buffers < 2 ||
 		data->request_playback_channels < 2 ||
 		data->request_record_buffers < 2 ||
 		data->request_record_channels < 2) {
-		TRACE(("not enough channels/buffers\n"));
+		LOG(("not enough channels/buffers\n"));
 	}
 
 	ASSERT(BUFFER_COUNT == 2);
@@ -298,69 +298,69 @@ status_t multi_control(void *cookie, uint32 op, void *data, size_t length)
 {
     switch (op) {
 		case B_MULTI_GET_DESCRIPTION: 
-			TRACE(("B_MULTI_GET_DESCRIPTION\n"));
+			LOG(("B_MULTI_GET_DESCRIPTION\n"));
 			return get_description((multi_description *)data);
 		case B_MULTI_GET_EVENT_INFO:
-			TRACE(("B_MULTI_GET_EVENT_INFO\n"));
+			LOG(("B_MULTI_GET_EVENT_INFO\n"));
 			return B_ERROR;
 		case B_MULTI_SET_EVENT_INFO:
-			TRACE(("B_MULTI_SET_EVENT_INFO\n"));
+			LOG(("B_MULTI_SET_EVENT_INFO\n"));
 			return B_ERROR;
 		case B_MULTI_GET_EVENT:
-			TRACE(("B_MULTI_GET_EVENT\n"));
+			LOG(("B_MULTI_GET_EVENT\n"));
 			return B_ERROR;
 		case B_MULTI_GET_ENABLED_CHANNELS:
-			TRACE(("B_MULTI_GET_ENABLED_CHANNELS\n"));
+			LOG(("B_MULTI_GET_ENABLED_CHANNELS\n"));
 			return get_enabled_channels((multi_channel_enable *)data);
 		case B_MULTI_SET_ENABLED_CHANNELS:
-			TRACE(("B_MULTI_SET_ENABLED_CHANNELS\n"));
+			LOG(("B_MULTI_SET_ENABLED_CHANNELS\n"));
 			return B_OK; break;
 		case B_MULTI_GET_GLOBAL_FORMAT:
-			TRACE(("B_MULTI_GET_GLOBAL_FORMAT\n"));
+			LOG(("B_MULTI_GET_GLOBAL_FORMAT\n"));
 			return get_global_format((multi_format_info *)data);
 		case B_MULTI_SET_GLOBAL_FORMAT:
-			TRACE(("B_MULTI_SET_GLOBAL_FORMAT\n"));
+			LOG(("B_MULTI_SET_GLOBAL_FORMAT\n"));
 			return B_OK; /* XXX BUG! we *MUST* return B_OK, returning B_ERROR will prevent 
 						  * BeOS to accept the format returned in B_MULTI_GET_GLOBAL_FORMAT
 						  */
 		case B_MULTI_GET_CHANNEL_FORMATS:
-			TRACE(("B_MULTI_GET_CHANNEL_FORMATS\n"));
+			LOG(("B_MULTI_GET_CHANNEL_FORMATS\n"));
 			return B_ERROR;
 		case B_MULTI_SET_CHANNEL_FORMATS:	/* only implemented if possible */
-			TRACE(("B_MULTI_SET_CHANNEL_FORMATS\n"));
+			LOG(("B_MULTI_SET_CHANNEL_FORMATS\n"));
 			return B_ERROR;
 		case B_MULTI_GET_MIX:
-			TRACE(("B_MULTI_GET_MIX\n"));
+			LOG(("B_MULTI_GET_MIX\n"));
 			return B_ERROR;
 		case B_MULTI_SET_MIX:
-			TRACE(("B_MULTI_SET_MIX\n"));
+			LOG(("B_MULTI_SET_MIX\n"));
 			return B_ERROR;
 		case B_MULTI_LIST_MIX_CHANNELS:
-			TRACE(("B_MULTI_LIST_MIX_CHANNELS\n"));
+			LOG(("B_MULTI_LIST_MIX_CHANNELS\n"));
 			return list_mix_channels((multi_mix_channel_info *)data);
 		case B_MULTI_LIST_MIX_CONTROLS:
-			TRACE(("B_MULTI_LIST_MIX_CONTROLS\n"));
+			LOG(("B_MULTI_LIST_MIX_CONTROLS\n"));
 			return list_mix_controls((multi_mix_control_info *)data);
 		case B_MULTI_LIST_MIX_CONNECTIONS:
-			TRACE(("B_MULTI_LIST_MIX_CONNECTIONS\n"));
+			LOG(("B_MULTI_LIST_MIX_CONNECTIONS\n"));
 			return list_mix_connections((multi_mix_connection_info *)data);
 		case B_MULTI_GET_BUFFERS:			/* Fill out the struct for the first time; doesn't start anything. */
-			TRACE(("B_MULTI_GET_BUFFERS\n"));
+			LOG(("B_MULTI_GET_BUFFERS\n"));
 			return get_buffers(data);
 		case B_MULTI_SET_BUFFERS:			/* Set what buffers to use, if the driver supports soft buffers. */
-			TRACE(("B_MULTI_SET_BUFFERS\n"));
+			LOG(("B_MULTI_SET_BUFFERS\n"));
 			return B_ERROR; /* we do not support soft buffers */
 		case B_MULTI_SET_START_TIME:			/* When to actually start */
-			TRACE(("B_MULTI_SET_START_TIME\n"));
+			LOG(("B_MULTI_SET_START_TIME\n"));
 			return B_ERROR;
 		case B_MULTI_BUFFER_EXCHANGE:		/* stop and go are derived from this being called */
 //			dprintf("B_MULTI_BUFFER_EXCHANGE\n");
 			return buffer_exchange((multi_buffer_info *)data);
 		case B_MULTI_BUFFER_FORCE_STOP:		/* force stop of playback */
-			TRACE(("B_MULTI_BUFFER_FORCE_STOP\n"));
+			LOG(("B_MULTI_BUFFER_FORCE_STOP\n"));
 			return buffer_force_stop();
 	}
-	TRACE(("ERROR: unknown multi_control %#x\n",op));
+	LOG(("ERROR: unknown multi_control %#x\n",op));
 	return B_ERROR;
 }
 

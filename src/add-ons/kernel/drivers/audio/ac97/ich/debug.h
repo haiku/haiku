@@ -28,28 +28,35 @@
 #ifndef _DEBUG_H_
 #define _DEBUG_H_
 
-/* DEBUG == 0, no debugging
- * DEBUG == 1, dprintf & LOG
- * DEBUG == 2, dprintf with snooze & LOG
- * DEBUG == 5, only LOG
+/*
+ * PRINT() executes dprintf if DEBUG = 0 (disabled), or expands to LOG() when DEBUG > 0
+ * TRACE() executes dprintf if DEBUG > 0
+ * LOG()   executes dprintf and writes to the logfile if DEBUG > 0
  */
 
+/* DEBUG == 0, no debugging, PRINT writes to syslog
+ * DEBUG == 1, TRACE & LOG, PRINT 
+ * DEBUG == 2, TRACE & LOG, PRINT with snooze()
+ */
 #ifndef DEBUG
-	#define DEBUG 5
+	#define DEBUG 0
 #endif
 
+#undef PRINT
 #undef TRACE
 #undef ASSERT
 
 #if DEBUG > 0
+	#define PRINT(a)		log_printf a
 	#define TRACE(a) 		debug_printf a
-	#define ASSERT(a)		if (a) {} else TRACE(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
 	#define LOG(a)			log_printf a
 	#define LOG_CREATE()	log_create()
+	#define ASSERT(a)		if (a) {} else LOG(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
 	void log_create();
 	void log_printf(const char *text,...);
 	void debug_printf(const char *text,...);
 #else
+	#define PRINT(a)	debug_printf a
 	#define TRACE(a)	((void)(0))
 	#define ASSERT(a)	((void)(0))
 	#define LOG(a)		((void)(0))

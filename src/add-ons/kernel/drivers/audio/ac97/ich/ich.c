@@ -63,21 +63,21 @@ int32 		int_thread(void *data);
 void dump_chan(ich_chan *chan)
 {
 	int i;
-	TRACE(("chan->regbase = %#08x\n",chan->regbase));
-	TRACE(("chan->buffer_ready_sem = %#08x\n",chan->buffer_ready_sem));
+	LOG(("chan->regbase = %#08x\n",chan->regbase));
+	LOG(("chan->buffer_ready_sem = %#08x\n",chan->buffer_ready_sem));
 
-	TRACE(("chan->buffer_log_base = %#08x\n",chan->buffer_log_base));
-	TRACE(("chan->buffer_phy_base = %#08x\n",chan->buffer_phy_base));
-	TRACE(("chan->bd_phy_base = %#08x\n",chan->bd_phy_base));
-	TRACE(("chan->bd_log_base = %#08x\n",chan->bd_log_base));
+	LOG(("chan->buffer_log_base = %#08x\n",chan->buffer_log_base));
+	LOG(("chan->buffer_phy_base = %#08x\n",chan->buffer_phy_base));
+	LOG(("chan->bd_phy_base = %#08x\n",chan->bd_phy_base));
+	LOG(("chan->bd_log_base = %#08x\n",chan->bd_log_base));
 	for (i = 0; i < ICH_BD_COUNT; i++) {
-		TRACE(("chan->buffer[%d] = %#08x\n",i,chan->buffer[i]));
+		LOG(("chan->buffer[%d] = %#08x\n",i,chan->buffer[i]));
 	}
 	for (i = 0; i < ICH_BD_COUNT; i++) {
-		TRACE(("chan->bd[%d] = %#08x\n",i,chan->bd[i]));
-		TRACE(("chan->bd[%d]->buffer = %#08x\n",i,chan->bd[i]->buffer));
-		TRACE(("chan->bd[%d]->length = %#08x\n",i,chan->bd[i]->length));
-		TRACE(("chan->bd[%d]->flags = %#08x\n",i,chan->bd[i]->flags));
+		LOG(("chan->bd[%d] = %#08x\n",i,chan->bd[i]));
+		LOG(("chan->bd[%d]->buffer = %#08x\n",i,chan->bd[i]->buffer));
+		LOG(("chan->bd[%d]->length = %#08x\n",i,chan->bd[i]->length));
+		LOG(("chan->bd[%d]->flags = %#08x\n",i,chan->bd[i]->flags));
 	}
 }
 #endif
@@ -86,7 +86,7 @@ void init_chan(ich_chan *chan)
 {
 	int i;
 	ASSERT(BUFFER_COUNT <= ICH_BD_COUNT);
-	TRACE(("init chan\n"));
+	LOG(("init chan\n"));
 
 	chan->lastindex = 0;
 	chan->played_frames_count = 0;
@@ -107,7 +107,7 @@ void init_chan(ich_chan *chan)
 	// set physical buffer descriptor base address
 	ich_reg_write_32(chan->regbase, (uint32)chan->bd_phy_base);
 
-	TRACE(("init chan finished\n"));
+	LOG(("init chan finished\n"));
 }
 
 void start_chan(ich_chan *chan)
@@ -150,12 +150,12 @@ void reset_chan(ich_chan *chan)
 	for (i = 0; i < 10000; i++) {
 		cr = ich_reg_read_8(chan->regbase + ICH_REG_X_CR);
 		if (cr == 0) {
-			TRACE(("channel reset finished, %d\n",i));
+			LOG(("channel reset finished, %d\n",i));
 			return;
 		}
 		snooze(1);
 	}
-	TRACE(("channel reset failed after 10ms\n"));
+	LOG(("channel reset failed after 10ms\n"));
 }
 
 bool interrupt_test(void)
@@ -165,7 +165,7 @@ bool interrupt_test(void)
 	bigtime_t duration;
 	int i;
 
-	TRACE(("testing if interrupt is working\n"));
+	LOG(("testing if interrupt is working\n"));
 	
 	// our stack is not mapped in interrupt context, we must use malloc
 	// to have a valid pointer inside the interrupt handler
@@ -202,10 +202,8 @@ bool interrupt_test(void)
 
 	#if DEBUG
 		if (result) {
-			TRACE(("got interrupt after %Lu us\n",duration));
 			LOG(("got interrupt after %Lu us\n",duration));
 		} else {
-			TRACE(("no interrupt, timeout after %Lu us\n",duration));
 			LOG(("no interrupt, timeout after %Lu us\n",duration));
 		}
 	#endif
@@ -262,14 +260,12 @@ status_t map_io_memory(void)
 	
 	config->area_mmbar = map_physical_memory("ich_ac97 mmbar io",(void *)config->mmbar, B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &config->log_mmbar);
 	if (config->area_mmbar <= B_OK) {
-		TRACE(("mapping of mmbar io failed\n"));
 		LOG(("mapping of mmbar io failed, error = %#x\n",config->area_mmbar));
 		return B_ERROR;
 	}
 	LOG(("mapping of mmbar: area %#x, phys %#x, log %#x\n", config->area_mmbar, config->mmbar, config->log_mmbar));
 	config->area_mbbar = map_physical_memory("ich_ac97 mbbar io",(void *)config->mbbar, B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &config->log_mbbar);
 	if (config->area_mbbar <= B_OK) {
-		TRACE(("mapping of mbbar io failed\n"));
 		LOG(("mapping of mbbar io failed, error = %#x\n",config->area_mbbar));
 		delete_area(config->area_mmbar);
 		config->area_mmbar = -1;
@@ -304,57 +300,77 @@ int32 int_thread(void *data)
 status_t
 init_hardware(void)
 {
+	LOG_CREATE();
 	if (B_OK == probe_device()) {
-		dprintf("ALL YOUR BASE ARE BELONG TO US\n");
+		PRINT(("ALL YOUR BASE ARE BELONG TO US\n"));
 		return B_OK;
+	} else {
+		LOG(("hardware not found\n"));
+		return B_ERROR;
 	}
-	return B_ERROR;
 }
 
+
+void 
+dump_hardware_regs()
+{
+	LOG(("GLOB_CNT = %#08x\n",ich_reg_read_32(ICH_REG_GLOB_CNT)));
+	LOG(("GLOB_STA = %#08x\n",ich_reg_read_32(ICH_REG_GLOB_STA)));
+	LOG(("PI ICH_REG_X_BDBAR = %#x\n",ich_reg_read_32(ICH_REG_X_BDBAR + ICH_REG_PI_BASE)));
+	LOG(("PI ICH_REG_X_CIV = %#x\n",ich_reg_read_8(ICH_REG_X_CIV + ICH_REG_PI_BASE)));
+	LOG(("PI ICH_REG_X_LVI = %#x\n",ich_reg_read_8(ICH_REG_X_LVI + ICH_REG_PI_BASE)));
+	LOG(("PI ICH_REG_X_SR = %#x\n",ich_reg_read_16(ICH_REG_X_SR + ICH_REG_PI_BASE)));
+	LOG(("PI ICH_REG_X_PICB = %#x\n",ich_reg_read_16(ICH_REG_X_PICB + ICH_REG_PI_BASE)));
+	LOG(("PI ICH_REG_X_PIV = %#x\n",ich_reg_read_8(ICH_REG_X_PIV + ICH_REG_PI_BASE)));
+	LOG(("PI ICH_REG_X_CR = %#x\n",ich_reg_read_8(ICH_REG_X_CR + ICH_REG_PI_BASE)));
+	LOG(("PO ICH_REG_X_BDBAR = %#x\n",ich_reg_read_32(ICH_REG_X_BDBAR + ICH_REG_PO_BASE)));
+	LOG(("PO ICH_REG_X_CIV = %#x\n",ich_reg_read_8(ICH_REG_X_CIV + ICH_REG_PO_BASE)));
+	LOG(("PO ICH_REG_X_LVI = %#x\n",ich_reg_read_8(ICH_REG_X_LVI + ICH_REG_PO_BASE)));
+	LOG(("PO ICH_REG_X_SR = %#x\n",ich_reg_read_16(ICH_REG_X_SR + ICH_REG_PO_BASE)));
+	LOG(("PO ICH_REG_X_PICB = %#x\n",ich_reg_read_16(ICH_REG_X_PICB + ICH_REG_PO_BASE)));
+	LOG(("PO ICH_REG_X_PIV = %#x\n",ich_reg_read_8(ICH_REG_X_PIV + ICH_REG_PO_BASE)));
+	LOG(("PO ICH_REG_X_CR = %#x\n",ich_reg_read_8(ICH_REG_X_CR + ICH_REG_PO_BASE)));
+}
 
 status_t
 init_driver(void)
 {
 	status_t rv;
 	bigtime_t start;
-	
-	TRACE(("init_driver\n"));
+
 	LOG_CREATE();
+	
+	LOG(("init_driver\n"));
 	
 	ASSERT(sizeof(ich_bd) == 8);
 	
 	rv = probe_device();
 	if (rv != B_OK) {
 		LOG(("No supported audio hardware found.\n"));
-		TRACE(("hardware not found\n"));
 		return B_ERROR;
 	}
 
-	dprintf("ich-ac97: " VERSION "\n");
-	dprintf("ich-ac97: found %s, IRQ = %ld, NAMBAR = %#lX, NABMBAR = %#lX, MMBAR = %#lX, MBBAR = %#lX\n",config->name,config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar);
-	LOG(("Found %s\nIRQ = %ld\nNAMBAR = %#lX\nNABMBAR = %#lX\nMMBAR = %#lX\nMBBAR = %#lX\n",config->name,config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar));
+	PRINT((VERSION "\n"));
+	PRINT(("found %s\n", config->name));
+	PRINT(("IRQ = %ld, NAMBAR = %#lX, NABMBAR = %#lX, MMBAR = %#lX, MBBAR = %#lX\n",config->irq,config->nambar,config->nabmbar,config->mmbar,config->mbbar));
 
 	/* before doing anything else, map the IO memory */
 	rv = map_io_memory();
 	if (rv != B_OK) {
-		dprintf("ich-ac97: mapping of memory IO space failed\n");
-		LOG(("mapping of memory IO space failed\n"));
+		PRINT(("mapping of memory IO space failed\n"));
 		return B_ERROR;
 	}
 	
-	TRACE(("GLOB_CNT = %#08x\n",ich_reg_read_32(ICH_REG_GLOB_CNT)));
-	TRACE(("GLOB_STA = %#08x\n",ich_reg_read_32(ICH_REG_GLOB_STA)));
-	TRACE(("PO ICH_REG_X_LVI = %d\n",ich_reg_read_8(ICH_REG_X_LVI)));
-
+	dump_hardware_regs();
+	
 	/* do a cold reset */
-	TRACE(("cold reset\n"));
+	LOG(("cold reset\n"));
 	ich_reg_write_32(ICH_REG_GLOB_CNT, 0);
 	snooze(50000); // 50 ms
 	ich_reg_write_32(ICH_REG_GLOB_CNT, CNT_COLD | CNT_PRIE);
-	TRACE(("cold reset finished\n"));
+	LOG(("cold reset finished\n"));
 	rv = ich_reg_read_32(ICH_REG_GLOB_CNT);
 	if ((rv & CNT_COLD) == 0) {
-		TRACE(("cold reset failed\n"));
 		LOG(("cold reset failed\n"));
 	}
 
@@ -367,10 +383,8 @@ init_driver(void)
 		snooze(50000);
 	}
 	if ((rv & STA_PCR)) {
-		TRACE(("primary codec ready after %Ld us\n",(system_time() - start)));
 		LOG(("primary codec ready after %Ld us\n",(system_time() - start)));
 	} else {
-		TRACE(("primary codec not ready after %Ld us\n",(system_time() - start)));
 		LOG(("primary codec not ready after %Ld us\n",(system_time() - start)));
 	}
 	while ((system_time() - start) < 1000000) {
@@ -380,22 +394,40 @@ init_driver(void)
 		snooze(50000);
 	}
 	if ((rv & STA_SCR)) {
-		TRACE(("secondary codec ready after %Ld us\n",(system_time() - start)));
 		LOG(("secondary codec ready after %Ld us\n",(system_time() - start)));
 	} else {
-		TRACE(("secondary codec not ready after %Ld us\n",(system_time() - start)));
 		LOG(("secondary codec not ready after %Ld us\n",(system_time() - start)));
 	}
-	if ((rv & (STA_PCR | STA_SCR)) == 0) {
-		dprintf("ich-ac97: compatible chipset found, but no codec ready!\n");
+	while ((system_time() - start) < 1000000) {
+		rv = ich_reg_read_32(ICH_REG_GLOB_STA);
+		if ((rv & STA_S2CR) != 0)
+			break;
+		snooze(50000);
+	}
+	if ((rv & STA_S2CR)) {
+		LOG(("tertiary codec ready after %Ld us\n",(system_time() - start)));
+	} else {
+		LOG(("tertiary codec not ready after %Ld us\n",(system_time() - start)));
+	}
+
+	dump_hardware_regs();
+
+	if ((rv & (STA_PCR | STA_SCR | STA_S2CR)) == 0) {
+		PRINT(("compatible chipset found, but no codec ready!\n"));
 		unmap_io_memory();
 		return B_ERROR;
 	}
-	if ((rv & STA_PCR) == 0 && (rv & STA_SCR) != 0) {
-		TRACE(("using secondary codec!\n"));
+	if ((rv & STA_PCR) == 0 && (rv & STA_S2CR) != 0) {
+		LOG(("using tertiary codec!\n"));
+		config->nambar += 0x100;
+		config->log_mmbar += 0x100; /* ICH 4 */
+	} else if ((rv & STA_PCR) == 0 && (rv & STA_SCR) != 0) {
 		LOG(("using secondary codec!\n"));
 		config->nambar += 0x80;
+		config->log_mmbar += 0x80; /* ICH 4 */
 	}
+
+	dump_hardware_regs();
 
 	/* allocate memory for channel info struct */
 	chan_pi = (ich_chan *) malloc(sizeof(ich_chan));
@@ -403,8 +435,7 @@ init_driver(void)
 	chan_mc = (ich_chan *) malloc(sizeof(ich_chan));
 
 	if (0 == chan_pi || 0 == chan_po || 0 == chan_mc) {
-		dprintf("ich-ac97: couldn't allocate memory for channel descriptors!\n");
-		LOG(("couldn't allocate memory for channel descriptors!\n"));
+		PRINT(("couldn't allocate memory for channel descriptors!\n"));
 		chan_free_resources();
 		unmap_io_memory();
 		return B_ERROR;	
@@ -426,8 +457,7 @@ init_driver(void)
 	if (  chan_po->bd_area < B_OK || chan_po->buffer_area < B_OK || chan_po->userbuffer_area < B_OK ||
 		  chan_pi->bd_area < B_OK || chan_pi->buffer_area < B_OK || chan_pi->userbuffer_area < B_OK ||
 		  chan_mc->bd_area < B_OK || chan_mc->buffer_area < B_OK || chan_mc->userbuffer_area < B_OK) {
-		dprintf("ich-ac97: couldn't allocate memory for DMA buffers!\n");
-		LOG(("ich-ac97: couldn't allocate memory for DMA buffers!\n"));
+		PRINT(("couldn't allocate memory for DMA buffers!\n"));
 		chan_free_resources();
 		unmap_io_memory();
 		return B_ERROR;	
@@ -439,8 +469,7 @@ init_driver(void)
 	chan_mc->buffer_ready_sem = create_sem(0,"mc buffer ready");			/* 0 available mic in buffers */
 	
 	if (chan_po->buffer_ready_sem < B_OK || chan_pi->buffer_ready_sem < B_OK || chan_mc->buffer_ready_sem < B_OK) {
-		dprintf("ich-ac97: couldn't create semaphores!\n");
-		LOG(("ich-ac97: couldn't create semaphores!\n"));
+		PRINT(("couldn't create semaphores!\n"));
 		chan_free_resources();
 		unmap_io_memory();
 		return B_ERROR;	
@@ -452,7 +481,7 @@ init_driver(void)
 	chan_mc->regbase = ICH_REG_MC_BASE;
 
 	/* reset the (primary?) codec */	
-	TRACE(("codec reset\n"));
+	LOG(("codec reset\n"));
 	ich_codec_write(0x00, 0x0000);
 	snooze(50000); // 50 ms
 
@@ -475,7 +504,6 @@ init_driver(void)
 	
 	/* first test if interrupts are working, on some Laptops they don't work :-( */
 	if (config->irq != 0 && false == interrupt_test()) {
-		TRACE(("interrupt not working, using a kernel thread for polling\n"));
 		LOG(("interrupt not working, using a kernel thread for polling\n"));
 		config->irq = 0; /* don't use interrupts */
 	}
@@ -509,19 +537,16 @@ init_driver(void)
 	/* ich_codec_write(0x1E, 0x0000); */
 #endif
 
-	TRACE(("init_driver finished!\n"));
+	LOG(("init_driver finished!\n"));
 	return B_OK;
 }
 
 void
 uninit_driver(void)
 {
-	TRACE(("uninit_driver()\n"));
+	LOG(("uninit_driver()\n"));
 
 	#if DEBUG
-		if (chan_po) TRACE(("chan_po frames_count = %Ld\n",chan_po->played_frames_count));
-		if (chan_pi) TRACE(("chan_pi frames_count = %Ld\n",chan_pi->played_frames_count));
-		if (chan_mc) TRACE(("chan_mc frames_count = %Ld\n",chan_mc->played_frames_count));
 		if (chan_po) LOG(("chan_po frames_count = %Ld\n",chan_po->played_frames_count));
 		if (chan_pi) LOG(("chan_pi frames_count = %Ld\n",chan_pi->played_frames_count));
 		if (chan_mc) LOG(("chan_mc frames_count = %Ld\n",chan_mc->played_frames_count));
@@ -557,7 +582,7 @@ uninit_driver(void)
 	/* the very last thing to do is unmap the io memory */
 	unmap_io_memory();
 
-	TRACE(("uninit_driver() finished\n"));
+	LOG(("uninit_driver() finished\n"));
 }
 
 int32 ich_test_int(void *check)
@@ -681,14 +706,14 @@ int32 ich_int(void *unused)
 static status_t
 ich_open(const char *name, uint32 flags, void** cookie)
 {
-	TRACE(("open()\n"));
+	LOG(("open()\n"));
 	return B_OK;
 }
 
 static status_t
 ich_close(void* cookie)
 {
-	TRACE(("close()\n"));
+	LOG(("close()\n"));
 	return B_OK;
 }
 
