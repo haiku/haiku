@@ -3,10 +3,13 @@
  * Distributed under the terms of the MIT License.
  */
 
+// TODO: Currently tested only with a single channel slider.
+
 #include <Bitmap.h>
 #include <ChannelSlider.h>
 #include <Debug.h>
 #include <PropertyInfo.h>
+#include <Window.h>
 
 const static unsigned char
 kVerticalKnobData[] = {
@@ -208,14 +211,85 @@ BChannelSlider::Draw(BRect updateRect)
 void
 BChannelSlider::MouseDown(BPoint where)
 {
-	// TODO: Implement
+	if (!IsEnabled())
+		BControl::MouseDown(where);
+	else {
+		fCurrentChannel = -1;
+		fMinpoint = 0;
+		
+		// Search the channel on which the mouse was over
+		int32 numChannels = CountChannels();	
+		for (int32 channel = 0; channel < numChannels; channel++) {
+			BRect frame = ThumbFrameFor(channel);
+			frame.OffsetBy(fClickDelta);
+			
+			float range = ThumbRangeFor(channel);
+			
+			if (Vertical()) {
+				frame.bottom += range;
+				fMinpoint = frame.Height();
+			} else {
+				frame.right += range;
+				fMinpoint = frame.Width();
+			}
+			
+			// Found. Now set the initial values
+			if (frame.Contains(where)) {
+				uint32 buttons = 0;
+				BMessage *currentMessage = Window()->CurrentMessage();
+				if (currentMessage != NULL)
+					currentMessage->FindInt32("buttons", (int32 *)&buttons);
+				
+				fAllChannels = (buttons & B_SECONDARY_MOUSE_BUTTON);
+				fCurrentChannel = channel;
+				
+				if (fInitialValues != NULL && fAllChannels) {
+					delete[] fInitialValues;
+					fInitialValues = NULL;
+				}
+				
+				if (fInitialValues == NULL)
+					fInitialValues = new int32[CountChannels()];
+				
+				if (fAllChannels) {
+					for (int32 i = 0; i < CountChannels(); i++)
+						fInitialValues[i] = ValueFor(i);
+				} else
+					fInitialValues[fCurrentChannel] = ValueFor(fCurrentChannel);								
+				
+				if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
+					if (!IsTracking()) {
+						SetTracking(true);
+						DrawThumbs();
+						Flush();	
+					}
+					
+					MouseMovedCommon(where, B_ORIGIN);
+					SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+				
+				} else {
+					debugger("BChannelSlider::MouseDown(): SYNCHRONOUS CONTROLS NOT YET SUPPORTED");
+				}
+						
+				break;
+			}
+		}
+	}
 }
 
 
 void
 BChannelSlider::MouseUp(BPoint where)
 {
-	// TODO: Implement
+	if (IsEnabled() && IsTracking()) {
+		FinishChange();
+		SetTracking(false);
+		fAllChannels = false;
+		fCurrentChannel = -1;
+		fMinpoint = 0;
+	} else
+		BControl::MouseUp(where);
+	
 }
 
 
@@ -239,7 +313,7 @@ BChannelSlider::WindowActivated(bool state)
 void
 BChannelSlider::KeyDown(const char *bytes, int32 numBytes)
 {
-	// TODO: Implement
+	BControl::KeyDown(bytes, numBytes);
 }
 
 
@@ -348,10 +422,15 @@ BChannelSlider::DrawThumb(BView *into, int32 channel, BPoint where, bool pressed
 		into->PushState();
 	
 		into->SetDrawingMode(B_OP_ALPHA);
+		
+		rgb_color color = tint_color(ViewColor(), B_DARKEN_4_TINT);
+		color.alpha = 128;
+		into->SetHighColor(color);
+		
 		BRect rect(where, where);
 		rect.right += bitmapBounds.right;
 		rect.bottom += bitmapBounds.bottom;
-		into->SetHighColor(tint_color(ViewColor(), B_DARKEN_4_TINT));
+		
 		into->FillRect(rect);
 
 		into->PopState();
@@ -522,7 +601,15 @@ BChannelSlider::Redraw()
 void
 BChannelSlider::MouseMovedCommon(BPoint point, BPoint point2)
 {
-	// TODO: Implement
+	float value = fMinpoint;
+	
+	if (Vertical())
+		value -= point.y;		
+	else
+		value = ThumbRangeFor(fCurrentChannel) - value + point.x;
+			
+	SetValueFor(fCurrentChannel, value);
+	InvokeNotifyChannel(ModificationMessage());
 }
 
 
