@@ -8,6 +8,14 @@ if $(RUN_WITHOUT_REGISTRAR) {
 	SubDirC++Flags $(defines) ;
 }
 
+# If defined allows to run applications without the app server
+# -- needed until the app server runs on our kernel.
+if $(RUN_WITHOUT_APP_SERVER) {
+	local defines = [ FDefines RUN_WITHOUT_APP_SERVER ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
 # Collect libopenbeos.so sources.
 subdirs = app interface support storage ;
 for subdir in $(subdirs) {

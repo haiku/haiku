@@ -830,6 +830,9 @@ BBitmap::~BBitmap()
 	// TODO: don't free fBasePtr, as it's owned by the app_server
 	// should probably decrement an associated reference count, though,
 	// so the app_server knows this bitmap isn't used anymore
+#ifdef RUN_WITHOUT_APP_SERVER
+	free(fBasePtr);
+#endif	// RUN_WITHOUT_APP_SERVER
 }
 
 // unarchiving constructor
@@ -2158,13 +2161,18 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 {
 	status_t error = B_OK;
 
+#ifndef RUN_WITHOUT_APP_SERVER
 	BPrivate::BAppServerLink link;
+#endif	// RUN_WITHOUT_APP_SERVER
 
 	// clean up
 	if (fBasePtr) {
-//		free(fBasePtr);
+#ifdef RUN_WITHOUT_APP_SERVER
+		free(fBasePtr);
+#endif	// RUN_WITHOUT_APP_SERVER
 		fBasePtr = NULL;
 
+#ifndef RUN_WITHOUT_APP_SERVER
 		// AS_DELETE_BITMAP:
 		// Attached Data: 
 		//	1) int32 server token
@@ -2183,6 +2191,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 		fBasePtr=NULL;
 		fArea=-1;
 		fServerToken=-1;
+#endif	// RUN_WITHOUT_APP_SERVER
 	}
 	// check params
 	if (!bounds.IsValid() || !is_supported(colorSpace))
@@ -2197,8 +2206,17 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 	// allocate the bitmap buffer
 	if (error == B_OK) {
 		int32 size = bytesPerRow * (bounds.IntegerHeight() + 1);
-//		fBasePtr = malloc(size);
-
+#ifdef RUN_WITHOUT_APP_SERVER
+		fBasePtr = malloc(size);
+		if (fBasePtr) {
+			fSize = size;
+			fColorSpace = colorSpace;
+			fBounds = bounds;
+			fBytesPerRow = bytesPerRow;
+			fFlags = flags;
+		} else
+			error = B_NO_MEMORY;
+#else
 		// Ask the server (via our owning application) to create a bitmap.
 
 		// Attach Data: 
@@ -2262,6 +2280,7 @@ BBitmap::InitObject(BRect bounds, color_space colorSpace, uint32 flags,
 			
 			error = B_NO_MEMORY;
 		}
+#endif	// RUN_WITHOUT_APP_SERVER
 		fWindow = NULL;
 		fToken = -1;
 		fOrigArea = -1;

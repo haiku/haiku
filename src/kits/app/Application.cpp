@@ -251,10 +251,12 @@ BApplication::~BApplication()
 	// unregister from the roster
 	BRoster::Private().RemoveApp(Team());
 
+#ifndef RUN_WITHOUT_APP_SERVER
 	// tell app_server we're quitting...
 	BPortLink link(fServerFrom);
 	link.StartMessage(B_QUIT_REQUESTED);
 	link.Flush();
+#endif	// RUN_WITHOUT_APP_SERVER
 
 	// uninitialize be_app and be_app_messenger
 	be_app = NULL;
@@ -853,6 +855,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 
 	// TODO: Not completely sure about the order, but this should be close.
 	
+#ifndef RUN_WITHOUT_APP_SERVER
 	// An app_server connection is necessary for a lot of stuff, so get that first.
 	if (fInitError == B_OK)
 		connect_to_app_server();
@@ -860,6 +863,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 		setup_server_heaps();
 	if (fInitError == B_OK)
 		get_scs();
+#endif	// RUN_WITHOUT_APP_SERVER
 
 	
 	// init be_app and be_app_messenger
@@ -868,10 +872,12 @@ void BApplication::InitData(const char* signature, status_t* error)
 		be_app_messenger = BMessenger(NULL, this);
 	}
 	
+#ifndef RUN_WITHOUT_APP_SERVER
 	// Initialize the IK after we have set be_app because of a construction of a
 	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
 	if (fInitError == B_OK)
 		fInitError = _init_interface_kit_();
+#endif	// RUN_WITHOUT_APP_SERVER
 	// set the BHandler's name
 	if (fInitError == B_OK)
 		SetName(ref.name);
@@ -882,10 +888,12 @@ void BApplication::InitData(const char* signature, status_t* error)
 			create_app_meta_mime(path.Path(), false, true, false);
 	}
 
+#ifndef RUN_WITHOUT_APP_SERVER
 	// create global system cursors
 	// ToDo: these could have a predefined server token to safe the communication!
 	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
 	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
+#endif	// RUN_WITHOUT_APP_SERVER
 
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
