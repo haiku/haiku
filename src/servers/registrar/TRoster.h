@@ -69,6 +69,8 @@ public:
 	void RemoveApp(RosterAppInfo *info);
 	void ActivateApp(RosterAppInfo *info);
 
+	void CheckSanity();
+
 private:
 	// hook functions
 	void _AppAdded(RosterAppInfo *info);

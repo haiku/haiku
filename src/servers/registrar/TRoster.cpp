@@ -61,6 +61,9 @@
 	pre-registered applications.
 */
 
+//! The maximal period of time an app may be early pre-registered (60 s).
+const bigtime_t kMaximalEarlyPreRegistrationPeriod = 60000000LL;
+
 // constructor
 /*!	\brief Creates a new roster.
 
@@ -729,6 +732,42 @@ TRoster::ActivateApp(RosterAppInfo *info)
 			info = fActiveApp;
 			_AppActivated(info);
 		}
+	}
+}
+
+// CheckSanity
+/*!	\brief Checks whether the (pre-)registered applications are still running.
+
+	This is necessary, since killed applications don't unregister properly.
+*/
+void
+TRoster::CheckSanity()
+{
+	// not early (pre-)registered applications
+	AppInfoList obsoleteApps;
+	for (AppInfoList::Iterator it = fRegisteredApps.It(); it.IsValid(); ++it) {
+		team_info teamInfo;
+		if (get_team_info((*it)->team, &teamInfo) != B_OK)
+			obsoleteApps.AddInfo(*it);
+	}
+	// remove the apps
+	for (AppInfoList::Iterator it = obsoleteApps.It(); it.IsValid(); ++it) {
+		RemoveApp(*it);
+		delete *it;
+	}
+	// early pre-registered applications
+	obsoleteApps.MakeEmpty();
+	bigtime_t timeLimit = system_time() - kMaximalEarlyPreRegistrationPeriod;
+	for (AppInfoList::Iterator it = fEarlyPreRegisteredApps.It();
+		 it.IsValid();
+		 ++it) {
+		if ((*it)->registration_time < timeLimit)
+			obsoleteApps.AddInfo(*it);
+	}
+	// remove the apps
+	for (AppInfoList::Iterator it = obsoleteApps.It(); it.IsValid(); ++it) {
+		fEarlyPreRegisteredApps.RemoveInfo(*it);
+		delete *it;
 	}
 }
 
