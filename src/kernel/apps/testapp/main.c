@@ -60,7 +60,7 @@ int main(int argc, char **argv)
 		printf("arg %d = %s \n",cnt,argv[cnt]);
 	}
 
-	printf("my thread id is %d\n", find_thread(NULL));
+	printf("my thread id is %ld\n", find_thread(NULL));
 #if 0
 	{
 		char c;
@@ -341,7 +341,7 @@ int main(int argc, char **argv)
 
 			id = sys_create_team("/boot/bin/true", "true", NULL, 0, NULL, 0, 20);
 			if(id <= 0x2) {
-				printf("new team returned 0x%x!\n", id);
+				printf("new team returned 0x%lx!\n", id);
 				return -1;
 			}
 			sys_wait_on_team(id, NULL);
@@ -433,13 +433,13 @@ static void port_test(void)
 	test_p4 = sys_port_create(1024, "test port #4");
 
 	printf("porttest: port_find()\n");
-	printf("'test port #1' has id %d (should be %d)\n", sys_port_find("test port #1"), test_p1);
+	printf("'test port #1' has id %ld (should be %ld)\n", sys_port_find("test port #1"), test_p1);
 
 	printf("porttest: port_write() on 1, 2 and 3\n");
 	sys_port_write(test_p1, 1, &testdata, sizeof(testdata));
 	sys_port_write(test_p2, 666, &testdata, sizeof(testdata));
 	sys_port_write(test_p3, 999, &testdata, sizeof(testdata));
-	printf("porttest: port_count(test_p1) = %d\n", sys_port_count(test_p1));
+	printf("porttest: port_count(test_p1) = %ld\n", sys_port_count(test_p1));
 
 	printf("porttest: port_write() on 1 with timeout of 1 sec (blocks 1 sec)\n");
 	sys_port_write_etc(test_p1, 1, &testdata, sizeof(testdata), B_TIMEOUT, 1000000);
@@ -482,19 +482,19 @@ static void port_test(void)
 
 static int32 port_test_thread_func(void* arg)
 {
-	int msg_code;
+	int32 msg_code;
 	int n;
 	char buf[5];
 
 	printf("porttest: port_test_thread_func()\n");
 
 	n = sys_port_read(test_p1, &msg_code, &buf, 3);
-	printf("port_read #1 code %d len %d buf %3s\n", msg_code, n, buf);
+	printf("port_read #1 code %ld len %d buf %3s\n", msg_code, n, buf);
 	n = sys_port_read(test_p1, &msg_code, &buf, 4);
-	printf("port_read #1 code %d len %d buf %4s\n", msg_code, n, buf);
+	printf("port_read #1 code %ld len %d buf %4s\n", msg_code, n, buf);
 	buf[4] = 'X';
 	n = sys_port_read(test_p1, &msg_code, &buf, 5);
-	printf("port_read #1 code %d len %d buf %5s\n", msg_code, n, buf);
+	printf("port_read #1 code %ld len %d buf %5s\n", msg_code, n, buf);
 
 	printf("porttest: testing delete p1 from other thread\n");
 	sys_port_delete(test_p1);
