@@ -1,11 +1,17 @@
-// Copyright 2003 Stefano Ceccherini (burton666@libero.it)
+/* 
+ * Copyright 2003-2004,
+ * Stefano Ceccherini (burton666@libero.it).
+ * Carwyn Jones (turok2@currantbun.com)
+ * All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 #include <DirectWindow.h>
-
 #include <clipping.h>
 
 #include <R5_AppServerLink.h>
 #include <R5_Session.h>
+
 
 // TODO: We'll want to move this to a private header,
 // accessible by the app server.
@@ -20,6 +26,7 @@ struct dw_sync_data
 // TODO: This commands are used by the BeOS R5 app_server.
 // Change this when our app_server supports BDirectWindow
 #define DW_GET_SYNC_DATA 0x880
+#define DW_SET_FULLSCREEN 0x881
 #define DW_SUPPORTS_WINDOW_MODE 0xF2C
 
 
@@ -274,7 +281,16 @@ status_t
 BDirectWindow::SetFullScreen(bool enable)
 {
 	status_t status = B_ERROR;
-	//TODO: Implement	
+	if (Lock()) {
+		a_session->swrite_l(DW_SET_FULLSCREEN);
+		a_session->swrite_l(server_token);
+		a_session->swrite_l(enable);
+		Flush();
+
+		// TODO: read back status from the app server,
+		// and set the full_screen_enable variable accordingly
+		Unlock();
+	}
 	return status;
 }
 
@@ -398,7 +414,7 @@ BDirectWindow::InitData()
 		a_session->sread(sizeof(sync_data), &sync_data);
 		
 		status_t status;
-		a_session->sread(4, &status);
+		a_session->sread(sizeof(status), &status);
 		
 		Unlock();
 		
@@ -472,7 +488,12 @@ BDirectWindow::DisposeData()
 status_t
 BDirectWindow::DriverSetup() const
 {
-	//Unimplemented
+	// XXX :Unimplemented in R5.
+	// This function is probably here because they wanted, in a future time,
+	// to implement graphic acceleration within BDirectWindow
+	// (in fact, there is also a BDirectDriver member in BDirectWindow,
+	// though it's not used, and the Lock/UnlockDirect functions are not used either).
+
 	return B_OK;
 }
 
