@@ -779,7 +779,7 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 	// get a pointer to the attribute in question
 	union value value;
 	uint8 *buffer;
-	
+
 	// first, check if we are matching for a live query and use that value
 	if (attributeName != NULL && !strcmp(fAttribute,attributeName)) {
 		if (key == NULL) {
@@ -807,7 +807,7 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 		// then for attributes in the small_data section, and finally for the
 		// real attributes
 		Inode *attribute;
-		
+
 		inode->SmallDataLock().Lock();
 		small_data *smallData = inode->FindSmallData(fAttribute);
 		if (smallData != NULL) {
@@ -823,10 +823,10 @@ Equation::Match(Inode *inode,const char *attributeName,int32 type,const uint8 *k
 				buffer = (uint8 *)&value;
 				type = attribute->Node()->type;
 				size = attribute->Size();
-	
+
 				if (size > INODE_FILE_NAME_LENGTH)
 					size = INODE_FILE_NAME_LENGTH;
-	
+
 				if (attribute->ReadAt(0,buffer,&size) < B_OK) {
 					inode->ReleaseAttribute(attribute);
 					return B_IO_ERROR;
@@ -870,7 +870,7 @@ Equation::CalculateScore(Index &index)
 			// least one character to set your index to
 			fScore = 5;
 	}
-	
+
 	// take index size into account (1024 is the current node size
 	// in our B+trees)
 	// 2048 * 2048 == 4194304 is the maximum score (for an empty
@@ -884,7 +884,7 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 {
 	type_code type;
 	status_t status = index.SetTo(fAttribute);
-	
+
 	// special case for OP_UNEQUAL - it will always operate through the whole index
 	// but we need the call to the original index to get the correct type
 	if (status < B_OK || fOp == OP_UNEQUAL) {
@@ -895,7 +895,7 @@ Equation::PrepareQuery(Volume */*volume*/, Index &index, TreeIterator **iterator
 
 		if (index.SetTo("name") < B_OK)
 			return B_ENTRY_NOT_FOUND;
-		
+
 		fHasIndex = false;
 	} else {
 		fHasIndex = true;
@@ -1045,7 +1045,15 @@ Equation::GetNextMatching(Volume *volume, TreeIterator *iterator,
 			dirent->d_pdev = volume->ID();
 			dirent->d_pino = volume->ToVnode(inode->Parent());
 			strcpy(dirent->d_name,inode->Name());
+
+#ifdef KEEP_WRONG_DIRENT_RECLEN
+			// ToDo: The available file systems in BeOS apparently don't set the
+			// correct d_reclen - we are copying that behaviour if requested, but
+			// if it doesn't break compatibility, we will remove it.
 			dirent->d_reclen = strlen(dirent->d_name);
+#else
+			dirent->d_reclen = sizeof(struct dirent) + strlen(dirent->d_name);
+#endif
 		}
 
 		put_vnode(volume->ID(), inode->ID());

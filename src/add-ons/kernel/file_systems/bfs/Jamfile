@@ -1,7 +1,16 @@
 SubDir OBOS_TOP src add-ons kernel file_systems bfs ;
 
-if $(DEBUG) {
-	local defines = [ FDefines DEBUG ] ;
+# set some additional defines
+{
+	local defines =
+		KEEP_WRONG_DIRENT_RECLEN
+		;
+
+	if $(DEBUG) {
+		defines += DEBUG ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
 	SubDirC++Flags $(defines) ;
 }

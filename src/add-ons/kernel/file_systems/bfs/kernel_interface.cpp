@@ -1403,7 +1403,12 @@ bfs_read_dir(void *_ns, void *_node, void *_cookie, long *num,
 
 	dirent->d_dev = volume->ID();
 	dirent->d_ino = id;
+
+#ifdef KEEP_WRONG_DIRENT_RECLEN
 	dirent->d_reclen = length;
+#else
+	dirent->d_reclen = sizeof(struct dirent) + length;
+#endif
 
 	*num = 1;
 	return B_OK;
@@ -1526,7 +1531,11 @@ bfs_read_attrdir(void *_ns, void *node, void *_cookie, long *num, struct dirent 
 	Volume *volume = (Volume *)_ns;
 
 	dirent->d_dev = volume->ID();
+#ifdef KEEP_WRONG_DIRENT_RECLEN
 	dirent->d_reclen = length;
+#else
+	dirent->d_reclen = sizeof(struct dirent) + length;
+#endif
 
 	*num = 1;
 	return B_OK;
