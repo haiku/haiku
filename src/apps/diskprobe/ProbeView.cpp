@@ -528,7 +528,7 @@ HeaderView::UpdateFileSizeView()
 {
 	char buffer[64];
 	strcpy(buffer, "of ");
-	FormatValue(buffer + 3, sizeof(buffer) - 3, fFileSize / fBlockSize);
+	FormatValue(buffer + 3, sizeof(buffer) - 3, (fFileSize + fBlockSize - 1) / fBlockSize);
 	fSizeView->SetText(buffer);
 }
 
