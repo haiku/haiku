@@ -101,6 +101,9 @@ typedef struct {
 	uint16	vendor_id;	/* PCI vendor ID, from pci_info */
 	uint16	device_id;	/* PCI device ID, from pci_info */
 	uint8	revision;	/* PCI device revsion, from pci_info */
+	uint8	bus;		/* PCI bus number, from pci_info */
+	uint8	device;		/* PCI device number on bus, from pci_info */
+	uint8	function;	/* PCI function number in device, from pci_info */
 
   /* bug workaround for 4.5.0 */
 	uint32 use_clone_bugfix;	/*for 4.5.0, cloning of physical memory does not work*/

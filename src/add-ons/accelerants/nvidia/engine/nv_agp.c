@@ -70,7 +70,11 @@ status_t nv_agp_setup(void)
 		LOG(4,("AGP: AGP capable device #%d:\n", (index + 1)));
 
 		/* see if we are this one */
-		if (((((uint32)(nai.agpi.device_id)) << 16) | nai.agpi.vendor_id) == CFGR(DEVID))
+		if ((nai.agpi.device_id == si->device_id) &&
+			(nai.agpi.vendor_id == si->vendor_id) &&
+			(nai.agpi.bus == si->bus) &&
+			(nai.agpi.device == si->device) &&
+			(nai.agpi.function == si->function))
 		{
 			LOG(4,("AGP: (this is the device this accelerant controls)\n"));
 			agp = true;

@@ -779,6 +779,9 @@ static status_t open_hook (const char* name, uint32 flags, void** cookie) {
 	si->vendor_id = di->pcii.vendor_id;
 	si->device_id = di->pcii.device_id;
 	si->revision = di->pcii.revision;
+	si->bus = di->pcii.bus;
+	si->device = di->pcii.device;
+	si->function = di->pcii.function;
 
 	/* map the device */
 	result = map_device(di);
