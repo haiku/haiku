@@ -1,13 +1,16 @@
+/* Realtek RTL8169 Family Driver
+ * Copyright (C) 2004 Marcus Overhagen <marcus@overhagen.de>. All rights reserved.
+ */
 #ifndef __DEVICE_H
 #define __DEVICE_H
 
 #include <PCI.h>
 #include "hardware.h"
 
-#define TX_TIMEOUT		250000
-#define FRAME_SIZE		1536	// must be multiple of 8
-#define TX_DESC_COUNT	42		// must be <= 1024
-#define RX_DESC_COUNT	42		// must be <= 1024
+#define TX_TIMEOUT		6000000		// 6 seconds
+#define FRAME_SIZE		1536		// must be multiple of 8
+#define TX_DESC_COUNT	256			// must be <= 1024
+#define RX_DESC_COUNT	256			// must be <= 1024
 
 extern pci_module_info *gPci;
 
@@ -22,21 +25,26 @@ typedef struct {
 	int 				devId;
 	pci_info *			pciInfo;
 
-	volatile uint32		blockFlag;
+	volatile bool		nonblocking;
 	volatile bool		closed;
 	
-	sem_id				rxReadySem;
+	spinlock			txSpinlock;
 	sem_id				txFreeSem;
+	volatile int32		txNextIndex;	// next descriptor that will be used for writing
+	volatile int32		txIntIndex;		// current descriptor that needs be checked
+	volatile int32		txUsed;
+	
+	spinlock			rxSpinlock;
+	sem_id				rxReadySem;
+	volatile int32		rxNextIndex;	// next descriptor that will be used for reading
+	volatile int32		rxIntIndex;		// current descriptor that needs be checked
+	volatile int32		rxFree;
 
-	volatile int32		txIndex;
-	volatile int32		rxIndex;
 
-	volatile tx_desc *	txDesc;
-	volatile tx_desc *	txPrioDesc;
-	volatile rx_desc *	rxDesc;
+	volatile buf_desc *	txDesc;
+	volatile buf_desc *	rxDesc;
 	
 	area_id				txDescArea;
-	area_id				txPrioDescArea;
 	area_id				rxDescArea;
 	area_id				txBufArea;
 	area_id				rxBufArea;
@@ -46,13 +54,18 @@ typedef struct {
 	
 	void *				regAddr;
 	area_id				refArea;
-	uint8				irq;
 
+	uint8				irq;
 	uint8				macaddr[6];
+	int					mac_version;
+	int					phy_version;
 } rtl8169_device;
 
-#define REG8(offset)	((volatile uint8 *)((char *)(device->regAddr) + (offset)))
-#define REG16(offset)	((volatile uint16 *)((char *)(device->regAddr) + (offset)))
-#define REG32(offset)	((volatile uint32 *)((char *)(device->regAddr) + (offset)))
+#define read8(offset)			(*(volatile uint8 *) ((char *)(device->regAddr) + (offset)))
+#define read16(offset)			(*(volatile uint16 *)((char *)(device->regAddr) + (offset)))
+#define read32(offset)			(*(volatile uint32 *)((char *)(device->regAddr) + (offset)))
+#define write8(offset, value)	(*(volatile uint8 *) ((char *)(device->regAddr) + (offset)) = value)
+#define write16(offset, value)	(*(volatile uint16 *)((char *)(device->regAddr) + (offset)) = value)
+#define write32(offset, value)	(*(volatile uint32 *)((char *)(device->regAddr) + (offset)) = value)
 
 #endif
