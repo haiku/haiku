@@ -24,6 +24,13 @@ struct bios_regs {
 };
 
 #define CARRY_FLAG	0x01
+#define ZERO_FLAG	0x40
+
+#define ADDRESS_SEGMENT(address) ((addr_t)(address) >> 4)
+#define ADDRESS_OFFSET(address) ((addr_t)(address) & 0xf)
+#define LINEAR_ADDRESS(segment, offset) (((addr_t)(segment) << 4) + (addr_t)(offset))
+#define SEGMENTED_TO_LINEAR(segmented) \
+	LINEAR_ADDRESS((addr_t)(segmented) >> 16, (addr_t)(segmented) & 0xffff)
 
 static const addr_t kDataSegmentScratch = 0x10020;	// about 768 bytes
 static const addr_t kDataSegmentBase = 0x10000;
