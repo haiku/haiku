@@ -134,6 +134,8 @@ private:
 	void _Unset();
 
 	bool _IsShadow() const;
+	partition_id _ShadowID() const;
+	disk_system_id _DiskSystem() const;
 
 	int32 _Level() const;
 	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
@@ -141,6 +143,7 @@ private:
 									 int32 level = -1);
 
 	friend class BDiskDevice;
+	friend class BDiskSystem;
 
 	BDiskDevice				*fDevice;
 	BPartition				*fParent;

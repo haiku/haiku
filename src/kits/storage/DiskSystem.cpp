@@ -3,8 +3,9 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
-#include <DiskSystem.h>
 #include <ddm_userland_interface.h>
+#include <DiskSystem.h>
+#include <Partition.h>
 
 // constructor
 BDiskSystem::BDiskSystem()
@@ -46,8 +47,11 @@ bool
 BDiskSystem::SupportsDefragmenting(BPartition *partition,
 								   bool *whileMounted) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsFileSystem()
+			&& partition && partition->_IsShadow()
+			&& partition->_DiskSystem() == fID
+			&& _kern_supports_defragmenting_partition(fID,
+					partition->_ShadowID(), whileMounted));
 }
 
 // SupportsRepairing
@@ -55,48 +59,65 @@ bool
 BDiskSystem::SupportsRepairing(BPartition *partition, bool checkOnly,
 							   bool *whileMounted) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK
+			&& partition && partition->_IsShadow()
+			&& partition->_DiskSystem() == fID
+			&& _kern_supports_repairing_partition(fID, partition->_ShadowID(),
+												  checkOnly, whileMounted));
 }
 
 // SupportsResizing
 bool
 BDiskSystem::SupportsResizing(BPartition *partition, bool *whileMounted) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK
+			&& partition && partition->_IsShadow()
+			&& partition->_DiskSystem() == fID
+			&& _kern_supports_resizing_partition(fID, partition->_ShadowID(),
+												 whileMounted));
 }
 
 // SupportsResizingChild
 bool
 BDiskSystem::SupportsResizingChild(BPartition *child) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& child && child->_IsShadow() && child->Parent()
+			&& child->Parent()->_DiskSystem() == fID
+			&& _kern_supports_resizing_child_partition(fID,
+													   child->_ShadowID()));
 }
 
 // SupportsMoving
 bool
 BDiskSystem::SupportsMoving(BPartition *partition, bool *whileMounted) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK
+			&& partition && partition->_IsShadow()
+			&& partition->_DiskSystem() == fID
+			&& _kern_supports_moving_partition(fID, partition->_ShadowID(),
+											   whileMounted));
 }
 
 // SupportsMovingChild
 bool
 BDiskSystem::SupportsMovingChild(BPartition *child) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& child && child->_IsShadow() && child->Parent()
+			&& child->Parent()->_DiskSystem() == fID
+			&& _kern_supports_moving_child_partition(fID, child->_ShadowID()));
 }
 
 // SupportsSettingName
 bool
 BDiskSystem::SupportsSettingName(BPartition *partition) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& partition && partition->_IsShadow() && partition->Parent()
+			&& partition->Parent()->_DiskSystem() == fID
+			&& _kern_supports_setting_partition_name(fID,
+													 partition->_ShadowID()));
 }
 
 // SupportsSettingContentName
@@ -104,40 +125,66 @@ bool
 BDiskSystem::SupportsSettingContentName(BPartition *partition,
 										bool *whileMounted) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK
+			&& partition && partition->_IsShadow()
+			&& partition->_DiskSystem() == fID
+			&& _kern_supports_setting_partition_content_name(fID,
+					partition->_ShadowID(), whileMounted));
 }
 
 // SupportsSettingType
 bool
 BDiskSystem::SupportsSettingType(BPartition *partition) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& partition && partition->_IsShadow() && partition->Parent()
+			&& partition->Parent()->_DiskSystem() == fID
+			&& _kern_supports_setting_partition_type(fID,
+													 partition->_ShadowID()));
 }
 
 // SupportsCreatingChild
 bool
 BDiskSystem::SupportsCreatingChild(BPartition *partition) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& partition && partition->_IsShadow()
+			&& partition->_DiskSystem() == fID
+			&& _kern_supports_creating_child_partition(fID,
+					partition->_ShadowID()));
 }
 
-// SupportsParentSystem
+// SupportsDeletingChild
 bool
-BDiskSystem::SupportsParentSystem(BPartition *child, const char *system) const
+BDiskSystem::SupportsDeletingChild(BPartition *child) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK && IsPartitioningSystem()
+			&& child && child->_IsShadow() && child->Parent()
+			&& child->Parent()->_DiskSystem() == fID
+			&& _kern_supports_deleting_child_partition(fID,
+													   child->_ShadowID()));
 }
 
-// SupportsChildSystem
+// SupportsInitializing
 bool
-BDiskSystem::SupportsChildSystem(BPartition *child, const char *system) const
+BDiskSystem::SupportsInitializing(BPartition *partition) const
 {
-	// not implemented
-	return false;
+	return (InitCheck() == B_OK
+			&& partition && partition->_IsShadow()
+			&& _kern_supports_initializing_partition(fID,
+				partition->_ShadowID()));
+}
+
+// SupportsInitializingChild
+bool
+BDiskSystem::SupportsInitializingChild(BPartition *child,
+									   const char *diskSystem) const
+{
+	return (InitCheck() == B_OK && IsPartitioningSystem() && diskSystem
+			&& child && child->_IsShadow() && child->Parent()
+			&& child->Parent()->_DiskSystem() == fID
+			&& _kern_supports_initializing_child_partition(fID,
+					child->_ShadowID(), diskSystem));
 }
 
 // ValidateResize
@@ -148,17 +195,17 @@ BDiskSystem::ValidateResize(BPartition *partition, off_t *size) const
 	return B_ERROR;
 }
 
-// ValidateMove
+// ValidateResizeChild
 status_t
-BDiskSystem::ValidateMove(BPartition *partition, off_t *start) const
+BDiskSystem::ValidateResizeChild(BPartition *partition, off_t *size) const
 {
 	// not implemented
 	return B_ERROR;
 }
 
-// ValidateResizeChild
+// ValidateMove
 status_t
-BDiskSystem::ValidateResizeChild(BPartition *partition, off_t *size) const
+BDiskSystem::ValidateMove(BPartition *partition, off_t *start) const
 {
 	// not implemented
 	return B_ERROR;
@@ -190,7 +237,7 @@ BDiskSystem::ValidateSetContentName(BPartition *partition, char *name) const
 
 // ValidateSetType
 status_t
-BDiskSystem::ValidateSetType(BPartition *partition, char *type) const
+BDiskSystem::ValidateSetType(BPartition *partition, const char *type) const
 {
 	// not implemented
 	return B_ERROR;

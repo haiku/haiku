@@ -451,6 +451,20 @@ BPartition::_IsShadow() const
 	return (fPartitionData && fPartitionData->shadow_id >= 0);
 }
 
+// _ShadowID
+partition_id
+BPartition::_ShadowID() const
+{
+	return (fPartitionData ? fPartitionData->shadow_id : -1);
+}
+
+// _DiskSystem
+disk_system_id
+BPartition::_DiskSystem() const
+{
+	return (fPartitionData ? fPartitionData->disk_system : -1);
+}
+
 // _Level
 int32
 BPartition::_Level() const

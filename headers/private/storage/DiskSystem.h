@@ -35,19 +35,26 @@ public:
 									bool *whileMounted) const;
 	bool SupportsSettingType(BPartition *partition) const;
 	bool SupportsCreatingChild(BPartition *partition) const;
-	bool SupportsParentSystem(BPartition *child, const char *system) const;
+	bool SupportsDeletingChild(BPartition *child) const;
+	bool SupportsInitializing(BPartition *partition) const;
+	bool SupportsInitializingChild(BPartition *child,
+								   const char *diskSystem) const;
+
+	bool SupportsParentSystem(BPartition *child) const;
+	bool SupportsParentSystem(const char *system) const;
 		// True in most cases. NULL == raw device.
 	bool SupportsChildSystem(BPartition *child, const char *system) const;
+	bool SupportsChildSystem(const char *system) const;
 		// False for most file systems, true for most partitioning
 		// systems.
 
 	status_t ValidateResize(BPartition *partition, off_t *size) const;
-	status_t ValidateMove(BPartition *partition, off_t *start) const;
 	status_t ValidateResizeChild(BPartition *partition, off_t *size) const;
+	status_t ValidateMove(BPartition *partition, off_t *start) const;
 	status_t ValidateMoveChild(BPartition *partition, off_t *start) const;
 	status_t ValidateSetName(BPartition *partition, char *name) const;
 	status_t ValidateSetContentName(BPartition *partition, char *name) const;
-	status_t ValidateSetType(BPartition *partition, char *type) const;
+	status_t ValidateSetType(BPartition *partition, const char *type) const;
 	status_t ValidateCreateChild(BPartition *partition, off_t *start,
 								 off_t *size, const char *type,
 								 const char *parameters) const;
