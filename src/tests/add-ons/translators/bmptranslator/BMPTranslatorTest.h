@@ -28,6 +28,7 @@ public:
 	void BTranslatorBasicTest();
 	void BTranslatorIdentifyErrorTest();
 	void BTranslatorIdentifyTest();
+	void BTranslatorTranslateTest();
 #endif
 
 	void DummyTest();

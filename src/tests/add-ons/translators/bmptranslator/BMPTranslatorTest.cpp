@@ -36,6 +36,9 @@ BMPTranslatorTest::Suite()
 	suite->addTest(
 		new TC("BMPTranslator BTranslatorIdentifyTest",
 			&BMPTranslatorTest::BTranslatorIdentifyTest));
+	suite->addTest(
+		new TC("BMPTranslator BTranslatorTranslateTest",
+			&BMPTranslatorTest::BTranslatorTranslateTest));
 #endif
 		
 	return suite;
@@ -822,6 +825,128 @@ BMPTranslatorTest::BTranslatorIdentifyErrorTest()
 		CPPUNIT_ASSERT(mallmscolors.Write(&fheader.dataOffset, 4) == 4);
 		CPPUNIT_ASSERT(mallmscolors.Write(&msheader, 40) == 40);
 		CPPUNIT_ASSERT(ptran->Identify(&mallmscolors, NULL, NULL, &outinfo, 0) == B_NO_TRANSLATOR);
+	}
+	
+	// . Release should return NULL because Release has been called
+	// as many times as it has been acquired
+	NextSubTest();
+	CPPUNIT_ASSERT(ptran->Release() == NULL);
+	
+	// . Unload Add-on
+	NextSubTest();
+	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+}
+
+bool
+AreIdentical(BPositionIO *pA, BPositionIO *pB)
+{
+	if (!pA || !pB)
+		return false;
+	
+	pA->Seek(0, SEEK_SET);
+	pB->Seek(0, SEEK_SET);
+	
+	const int32 kbufsize = 512;
+	uint8 bufA[kbufsize], bufB[kbufsize];
+	
+	ssize_t amtA = pA->Read(bufA, kbufsize);
+	ssize_t amtB = pB->Read(bufB, kbufsize);
+	while (amtA == amtB && amtA > 0) {
+		if (memcmp(bufA, bufB, amtA))
+			return false;	
+		amtA = pA->Read(bufA, kbufsize);
+		amtB = pB->Read(bufB, kbufsize);
+	}
+	
+	if (amtA == amtB)
+		return true;
+	else {
+		printf(" {amtA: %d amtB: %d} ", (int) amtA, (int) amtB);
+		return false;
+	}
+}
+
+void
+BMPTranslatorTest::BTranslatorTranslateTest()
+{
+	// . Make sure the add_on loads
+	NextSubTest();
+	const char *path = "/boot/home/config/add-ons/Translators/BMPTranslator";
+	image_id image = load_add_on(path);
+	CPPUNIT_ASSERT(image >= 0);
+	
+	// . Load in function to make the object
+	NextSubTest();
+	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
+	status_t err = get_image_symbol(image, "make_nth_translator",
+		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
+	CPPUNIT_ASSERT(!err);
+
+	// . Make sure the function returns a pointer to a BTranslator
+	NextSubTest();
+	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
+	CPPUNIT_ASSERT(ptran);
+	
+	// . Make sure the function only returns one BTranslator
+	NextSubTest();
+	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
+	
+	const char *resourcepath = "/boot/home/Desktop/resources/";
+	const char *bmpinimages[] = {
+		"blocks_24bit.bmp", "blocks_4bit_rle.bmp", "blocks_8bit_rle.bmp",
+		"color_scribbles_24bit.bmp", "color_scribbles_24bit_os2.bmp",
+		"color_scribbles_8bit.bmp", "color_scribbles_8bit_os2.bmp", "color_scribbles_8bit_rle.bmp",  
+		"color_scribbles_4bit.bmp", "color_scribbles_4bit_os2.bmp", "color_scribbles_4bit_rle.bmp", 
+		"color_scribbles_1bit_os2.bmp", "color_scribbles_1bit.bmp",
+		"vsmall_24bit.bmp", "vsmall_24bit_os2.bmp",
+		"vsmall_8bit.bmp", "vsmall_8bit_os2.bmp", "vsmall_8bit_rle.bmp",
+		"vsmall_4bit.bmp", "vsmall_4bit_os2.bmp", "vsmall_4bit_rle.bmp",
+		"vsmall_1bit.bmp", "vsmall_1bit_os2.bmp",    
+		"gnome_beer_24bit.bmp"
+	};
+	const int32 knbmpinimages = sizeof(bmpinimages) / sizeof(const char *);
+	struct BitsCompare {
+		uint32 nbmps;
+		const char *bitsimage;
+	};
+	BitsCompare bitscomps[] = {
+		{3, "blocks.bits"},
+		{7, "color_scribbles_24bit.bits"},
+		{1, "color_scribbles_4bit_rle.bits"},
+		{2, "color_scribbles_1bit.bits"},
+		{10, "vsmall.bits"},
+		{1, "gnome_beer.bits"}
+	};
+	const int32 knbitscomps = sizeof(bitscomps) / sizeof(BitsCompare);
+	// NOTE: this loop is destructive, it destroys the resuability
+	// of the bitscomps variable
+	int32 iin = 0;
+	for (int32 i = 0; i < knbitscomps; i++) {
+		char bmppath[512], bitspath[512];
+		strcpy(bitspath, resourcepath);
+		strcat(bitspath, bitscomps[i].bitsimage);
+		printf(" |bits: %s| ", bitspath);
+		BFile bitsfile;
+		CPPUNIT_ASSERT(bitsfile.SetTo(bitspath, B_READ_ONLY) == B_OK);
+		while (bitscomps[i].nbmps > 0 && iin < knbmpinimages) {
+			NextSubTest();
+			bitscomps[i].nbmps--;
+			strcpy(bmppath, resourcepath);
+			strcat(bmppath, bmpinimages[iin]);
+			printf(" |bmp: %s| ", bmppath);
+			BFile bmpfile;
+			CPPUNIT_ASSERT(bmpfile.SetTo(bmppath, B_READ_ONLY) == B_OK);
+			BMallocIO mallio;
+			mallio.Seek(0, SEEK_SET);
+			CPPUNIT_ASSERT(ptran->Translate(&bmpfile, NULL, NULL, B_TRANSLATOR_BITMAP, &mallio) == B_OK);
+			bool bresult = AreIdentical(&bitsfile, &mallio);
+			if (!bresult) {
+				BFile dbgout("/boot/home/trantest.bits", B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+				dbgout.Write(mallio.Buffer(), mallio.BufferLength());				
+			}
+			CPPUNIT_ASSERT(bresult);
+			iin++;
+		}
 	}
 	
 	// . Release should return NULL because Release has been called
