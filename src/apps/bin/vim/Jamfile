@@ -1,4 +1,10 @@
 SubDir OBOS_TOP src apps bin vim ;
 
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes -Wsign-compare ] ;
+
 SubInclude OBOS_TOP src apps bin vim src ;
 
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
