@@ -19,7 +19,40 @@
 #include <Errors.h>
 #include <OS.h>
 #include "TranslatorTestAddOn.h"
-#include "../../../../add-ons/translators/bmptranslator/BMPTranslator.h"
+
+#define BMP_NO_COMPRESS 0
+#define BMP_RLE8_COMPRESS 1
+#define BMP_RLE4_COMPRESS 2
+
+struct BMPFileHeader {
+	// for both MS and OS/2 BMP formats
+	uint16 magic;			// = 'BM'
+	uint32 fileSize;		// file size in bytes
+	uint32 reserved;		// equals 0
+	uint32 dataOffset;		// file offset to actual image
+};
+
+struct MSInfoHeader {
+	uint32 size;			// size of this struct (40)
+	uint32 width;			// bitmap width
+	uint32 height;			// bitmap height
+	uint16 planes;			// number of planes, always 1?
+	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16 or 24)
+	uint32 compression;		// type of compression
+	uint32 imagesize;		// size of image data if compressed
+	uint32 xpixperm;		// horizontal pixels per meter
+	uint32 ypixperm;		// vertical pixels per meter
+	uint32 colorsused;		// number of actually used colors
+	uint32 colorsimportant;	// number of important colors, zero = all
+};
+
+struct OS2InfoHeader {
+	uint32 size;			// size of this struct (12)
+	uint16 width;			// bitmap width
+	uint16 height;			// bitmap height
+	uint16 planes;			// number of planes, always 1?
+	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16 or 24)
+};
 
 // Suite
 CppUnit::Test *
@@ -1060,8 +1093,22 @@ BMPTranslatorTest::ConfigMessageTest()
 	// GetConfigurationMessage
 	NextSubTest();
 	BMessage msg;
-	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_ERROR);
-	CPPUNIT_ASSERT(msg.IsEmpty());
+	CPPUNIT_ASSERT(proster->GetConfigurationMessage(tid, &msg) == B_OK);
+	CPPUNIT_ASSERT(!msg.IsEmpty());
+	
+	// B_TRANSLATOR_EXT_HEADER_ONLY
+	NextSubTest();
+	bool bheaderonly = true;
+	CPPUNIT_ASSERT(
+		msg.FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly) == B_OK);
+	CPPUNIT_ASSERT(bheaderonly == false);
+	
+	// B_TRANSLATOR_EXT_DATA_ONLY
+	NextSubTest();
+	bool bdataonly = true;
+	CPPUNIT_ASSERT(
+		msg.FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly) == B_OK);
+	CPPUNIT_ASSERT(bdataonly == false);
 }
 
 #if !TEST_R5
