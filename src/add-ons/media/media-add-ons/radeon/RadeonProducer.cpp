@@ -1081,6 +1081,8 @@ CRadeonProducer::finalizeFormat( media_format *format )
 		return res;	
 
 	setFormatFlags( format );
+
+	return B_OK;
 }
 
 
