@@ -487,6 +487,71 @@ err1:
 
 
 static status_t
+publish_directory(struct devfs *fs, const char *path)
+{
+	ASSERT_LOCKED_MUTEX(&fs->lock);
+
+	// copy the path over to a temp buffer so we can munge it
+	KPath tempPath(path);
+	char *temp = tempPath.LockBuffer();
+
+	// create the path leading to the device
+	// parse the path passed in, stripping out '/'
+
+	struct devfs_vnode *dir = fs->root_vnode;
+	struct devfs_vnode *vnode = NULL;
+	status_t status = B_OK;
+	int32 i = 0, last = 0;
+
+	for (;temp[last] ;) {
+		if (temp[i] == '/') {
+			temp[i] = '\0';
+			i++;
+		} else if (temp[i] != '\0') {
+			i++;
+			continue;
+		}
+
+		TRACE(("\tpath component '%s'\n", &temp[last]));
+
+		// we have a path component
+		vnode = devfs_find_in_dir(dir, &temp[last]);
+		if (vnode) {
+			if (S_ISDIR(vnode->stream.type)) {
+				last = i;
+				dir = vnode;
+				continue;
+			}
+
+			// we hit something on our path that's not a directory
+			status = B_FILE_EXISTS;
+			goto out;
+		} else {
+			vnode = devfs_create_vnode(fs, dir, &temp[last]);
+			if (!vnode) {
+				status = B_NO_MEMORY;
+				goto out;
+			}
+		}
+
+		// set up the new directory
+		vnode->stream.type = S_IFDIR | 0755;
+		vnode->stream.u.dir.dir_head = NULL;
+		vnode->stream.u.dir.jar_head = NULL;
+
+		hash_insert(sDeviceFileSystem->vnode_list_hash, vnode);
+		devfs_insert_in_dir(dir, vnode);
+
+		last = i;
+		dir = vnode;
+	}
+
+out:
+	return status;
+}
+
+
+static status_t
 publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 {
 	ASSERT_LOCKED_MUTEX(&fs->lock);
@@ -505,10 +570,10 @@ publish_node(struct devfs *fs, const char *path, struct devfs_vnode **_node)
 	bool atLeaf = false;
 
 	for (;;) {
-		if (temp[i] == 0) {
+		if (temp[i] == '\0') {
 			atLeaf = true; // we'll be done after this one
 		} else if (temp[i] == '/') {
-			temp[i] = 0;
+			temp[i] = '\0';
 			i++;
 		} else {
 			i++;
@@ -1754,5 +1819,17 @@ extern "C" status_t
 devfs_publish_device(const char *path, void *obsolete, device_hooks *ops)
 {
 	return publish_device(sDeviceFileSystem, path, NULL, NULL, ops);
+}
+
+
+extern "C" status_t
+devfs_publish_directory(const char *path)
+{
+	mutex_lock(&sDeviceFileSystem->lock);
+
+	status_t status = publish_directory(sDeviceFileSystem, path);
+
+	mutex_unlock(&sDeviceFileSystem->lock);
+	return status;
 }
 
