@@ -1589,9 +1589,24 @@ status_t
 BMediaRoster::GetDormantNodeFor(const media_node & node,
 								dormant_node_info * out_info)
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (out_info == NULL)
+		return B_BAD_VALUE;	
+	if (node.node <= 0)
+		return B_MEDIA_BAD_NODE;
+
+	server_get_dormant_node_for_request request;
+	server_get_dormant_node_for_reply reply;
+	status_t rv;
 	
-	return B_ERROR;
+	request.node = node;
+	
+	rv = QueryAddonServer(SERVER_GET_DORMANT_NODE_FOR, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK)
+		return rv;
+	
+	*out_info = reply.node_info;
+	return B_OK;
 }
 
 
@@ -1827,11 +1842,32 @@ BMediaRoster::GetInstancesFor(media_addon_id addon,
 							  media_node_id * out_id,
 							  int32 * io_count)
 {
-	UNIMPLEMENTED();
-	// flavor
-	return B_ERROR;
-}
+	CALLED();
+	if (out_id == NULL || io_count == NULL)
+		return B_BAD_VALUE;
+	if (*io_count <= 0)
+		return B_BAD_VALUE;
 
+	server_get_instances_for_request request;
+	server_get_instances_for_reply reply;
+	status_t rv;
+
+	request.maxcount = *io_count;
+	request.addon_id = addon;
+	request.addon_flavor_id = flavor;
+
+	rv = QueryServer(SERVER_GET_INSTANCES_FOR, &request, sizeof(request), &reply, sizeof(reply));
+	if (rv != B_OK) {
+		TRACE("BMediaRoster::GetLiveNodes failed\n");
+		return rv;
+	}
+
+	*io_count = reply.count;
+	if (reply.count > 0)
+		memcpy(out_id, reply.node_id, sizeof(media_node_id) * reply.count);
+
+	return B_OK;
+}
 
 
 status_t 

@@ -78,6 +78,8 @@ enum {
 	SERVER_RELEASE_NODE,
 	SERVER_REGISTER_NODE,
 	SERVER_UNREGISTER_NODE,
+	SERVER_GET_DORMANT_NODE_FOR,
+	SERVER_GET_INSTANCES_FOR,
 	CONSUMER_GET_NEXT_INPUT = 0x2000,
 	CONSUMER_DISPOSE_INPUT_COOKIE,
 	CONSUMER_ACCEPT_FORMAT,
@@ -115,6 +117,12 @@ enum
 enum
 {
 	MAX_LIVE_INFO = 62,
+};
+
+// used by SERVER_GET_INSTANCES_FOR
+enum
+{
+	MAX_NODE_ID = 4000,
 };
 
 struct addonserver_instantiate_dormant_node_request : public request_data
@@ -391,6 +399,29 @@ struct server_release_node_request : public request_data
 
 struct server_release_node_reply : public reply_data
 {
+};
+
+struct server_get_dormant_node_for_request : public request_data
+{
+	media_node node;
+};
+
+struct server_get_dormant_node_for_reply : public reply_data
+{
+	dormant_node_info node_info;
+};
+
+struct server_get_instances_for_request : public request_data
+{
+	int32 maxcount;
+	media_addon_id addon_id;
+	int32 addon_flavor_id;
+};
+
+struct server_get_instances_for_reply : public reply_data
+{
+	int32 count;
+	media_node_id node_id[MAX_NODE_ID]; // no area here, MAX_NODE_ID is really large
 };
 
 

@@ -269,6 +269,24 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 			request->SendReply(B_OK, &reply, sizeof(reply));
 			break;
 		}
+		
+		case SERVER_GET_DORMANT_NODE_FOR:
+		{
+			const server_get_dormant_node_for_request *request = reinterpret_cast<const server_get_dormant_node_for_request *>(data);
+			server_get_dormant_node_for_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_GET_INSTANCES_FOR:
+		{
+			const server_get_instances_for_request *request = reinterpret_cast<const server_get_instances_for_request *>(data);
+			server_get_instances_for_reply reply;
+			// XXX do something here
+			request->SendReply(B_OK, &reply, sizeof(reply));
+			break;
+		}
 
 		case SERVER_REGISTER_MEDIAADDON:
 		{
