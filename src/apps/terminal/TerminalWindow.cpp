@@ -231,6 +231,8 @@ TerminalWindow::InitWindow(int32 id, entry_ref * settingsRef)
 	fLogToFilePanel = 0;
 	fWriteSelectionPanel = 0;
 	fSaveAsSettingsFilePanel = 0;
+
+	return B_OK;
 }
 
 status_t

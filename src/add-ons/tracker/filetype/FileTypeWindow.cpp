@@ -45,7 +45,7 @@ FileTypeWindow::~FileTypeWindow()
 {
 	if (fEntryList != 0) {
 		for (int32 i = 0 ; (i < fEntryList->CountItems()) ; i++) {
-			delete fEntryList->ItemAt(i);
+			delete static_cast<BEntry*>(fEntryList->ItemAt(i));
 		}
 		fEntryList->MakeEmpty();
 		delete fEntryList;
