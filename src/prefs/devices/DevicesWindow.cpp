@@ -207,9 +207,11 @@ void DevicesWindow::InitWindow(void)
 	BBox  *BottomFrame;
 	BRect BottomFrameRect(r.left+11,r.bottom-124,r.right-12,r.bottom-12);
 	BottomFrame = new BBox(BottomFrameRect, "BottomFrame", B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW, B_FANCY_BORDER);
+	BRect bottomFrameBounds = BottomFrame->Bounds();
 	
 	// Create BButton - Configure
-	BRect ConfigureButtonRect(r.left+298,r.bottom-47,r.right-23,r.bottom-23);
+	BRect ConfigureButtonRect(bottomFrameBounds.left+290, bottomFrameBounds.bottom-37,
+			bottomFrameBounds.right-13, bottomFrameBounds.bottom-13);
 	btnConfigure = new BButton(ConfigureButtonRect,"btnConfigure","Configure", new BMessage(BTN_CONFIGURE), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM, B_WILL_DRAW | B_NAVIGABLE);
 	btnConfigure->MakeDefault(true);
 	btnConfigure->SetEnabled(false);
@@ -218,17 +220,17 @@ void DevicesWindow::InitWindow(void)
 	BBox *background = new BBox(Bounds(), "background", B_FOLLOW_ALL_SIDES, B_WILL_DRAW, B_PLAIN_BORDER);
 	AddChild(background);
 	
-	// Add Child(ren)	
-	background->AddChild(menubar);
+	// Add Child(ren)	- in reverse order to avoid one control overwriting another
+	background->AddChild(BottomFrame);
+	BottomFrame->AddChild(btnConfigure);
+	background->AddChild(outlinesv);
+	background->AddChild(stvMemoryRanges);
+	background->AddChild(stvIORanges);
+	background->AddChild(stvDMA);
+	background->AddChild(stvIRQ);
 	background->AddChild(stvDeviceName);
 	background->AddChild(stvCurrentState);
-	background->AddChild(stvIRQ);
-	background->AddChild(stvDMA);
-	background->AddChild(stvIORanges);
-	background->AddChild(stvMemoryRanges);
-	background->AddChild(outlinesv);
-	background->AddChild(btnConfigure);
-	background->AddChild(BottomFrame);
+	background->AddChild(menubar);
 	
 	// Set Window Limits
 	float xsize = 396 + (be_plain_font->Size()-10)*40;
@@ -318,12 +320,12 @@ DevicesWindow::MessageReceived (BMessage *message)
 			break;
 		case BTN_CONFIGURE:
 			{
-				DeviceItem *item = (DeviceItem *)outline->ItemAt(outline->CurrentSelection());
-				if (item && is_instance_of(item, DeviceItem) ) {
-					if (item->GetWindow()!=NULL)
-						item->GetWindow()->Activate();
+				DeviceItem *devItem = dynamic_cast<DeviceItem *>(outline->ItemAt(outline->CurrentSelection()));
+				if (devItem && devItem->GetInfo()) {
+					if (devItem->GetWindow()!=NULL)
+						devItem->GetWindow()->Activate();
 					else
-						new ConfigurationWindow(BRect(150,150,562,602), item);
+						new ConfigurationWindow(BRect(150,150,562,602), devItem);
 				}
 			}
 			break;
@@ -331,6 +333,7 @@ DevicesWindow::MessageReceived (BMessage *message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+	UpdateIfNeeded();
 }
 // ---------------------------------------------------------------------------------------------------------- //
 
@@ -396,106 +399,116 @@ DevicesWindow::InitDevices(bus_type bus)
 void 
 DevicesWindow::UpdateDeviceInfo()
 {
-	DeviceItem *item = (DeviceItem *)outline->ItemAt(outline->CurrentSelection());
-	if (item && is_instance_of(item, DeviceItem) ) {
+	DeviceItem *item = dynamic_cast<DeviceItem *>(outline->ItemAt(outline->CurrentSelection()));
+	if (item) {
 		DevicesInfo *deviceInfo = item->GetInfo();
-		struct device_configuration *current = deviceInfo->GetCurrent();
-		resource_descriptor r;
-		
-		{
-			BString text = "IRQs: ";
-			bool first = true;
-			int32 num = count_resource_descriptors_of_type(current, B_IRQ_RESOURCE);
+		if (deviceInfo) {
+			struct device_configuration *current = deviceInfo->GetCurrent();
+			resource_descriptor r;
 			
-			for (int32 i=0;i<num;i++) {
-				get_nth_resource_descriptor_of_type(current, i, B_IRQ_RESOURCE,
-						&r, sizeof(resource_descriptor));
-				uint32 mask = r.d.m.mask;
-				int i = 0;
-				if (!mask)
-					continue;
+			{
+				BString text = "IRQs: ";
+				bool first = true;
+				int32 num = count_resource_descriptors_of_type(current, B_IRQ_RESOURCE);
 				
-				for (;mask;mask>>=1,i++)
-					if (mask & 1) {
-						char value[50];
-						sprintf(value, "%s%d", first ? "" : ",", i);
-						text += value;
-						first = false;
-					}
+				for (int32 i=0;i<num;i++) {
+					get_nth_resource_descriptor_of_type(current, i, B_IRQ_RESOURCE,
+							&r, sizeof(resource_descriptor));
+					uint32 mask = r.d.m.mask;
+					int i = 0;
+					if (!mask)
+						continue;
+					
+					for (;mask;mask>>=1,i++)
+						if (mask & 1) {
+							char value[50];
+							sprintf(value, "%s%d", first ? "" : ",", i);
+							text += value;
+							first = false;
+						}
+				}
+				stvIRQ->SetText(text.String());
 			}
-			stvIRQ->SetText(text.String());
-		}
-		
-		{
-			BString text = "DMAs: ";
-			bool first = true;
-			int32 num = count_resource_descriptors_of_type(current, B_DMA_RESOURCE);
 			
-			for (int32 i=0;i<num;i++) {
-				get_nth_resource_descriptor_of_type(current, i, B_DMA_RESOURCE,
-						&r, sizeof(resource_descriptor));
-				uint32 mask = r.d.m.mask;
-				int i = 0;
-				if (!mask)
-					continue;
+			{
+				BString text = "DMAs: ";
+				bool first = true;
+				int32 num = count_resource_descriptors_of_type(current, B_DMA_RESOURCE);
 				
-				for (;mask;mask>>=1,i++)
-					if (mask & 1) {
-						char value[50];
-						sprintf(value, "%s%d", first ? "" : ",", i);
-						text += value;
-						first = false;
-					}
+				for (int32 i=0;i<num;i++) {
+					get_nth_resource_descriptor_of_type(current, i, B_DMA_RESOURCE,
+							&r, sizeof(resource_descriptor));
+					uint32 mask = r.d.m.mask;
+					int i = 0;
+					if (!mask)
+						continue;
+					
+					for (;mask;mask>>=1,i++)
+						if (mask & 1) {
+							char value[50];
+							sprintf(value, "%s%d", first ? "" : ",", i);
+							text += value;
+							first = false;
+						}
+				}
+				stvDMA->SetText(text.String());
 			}
-			stvDMA->SetText(text.String());
-		}
-		
-		{
-			BString text = "IO Ranges: ";
-			bool first = true;
-			int32 num = count_resource_descriptors_of_type(current, B_IO_PORT_RESOURCE);
 			
-			for (int32 i=0;i<num;i++) {
-				get_nth_resource_descriptor_of_type(current, i, B_IO_PORT_RESOURCE,
-						&r, sizeof(resource_descriptor));
-				char value[50];
-				sprintf(value, "%s0x%04lx - 0x%04lx", first ? "" : ", ", r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1);
-				text += value;
-				first = false;
+			{
+				BString text = "IO Ranges: ";
+				bool first = true;
+				int32 num = count_resource_descriptors_of_type(current, B_IO_PORT_RESOURCE);
+				
+				for (int32 i=0;i<num;i++) {
+					get_nth_resource_descriptor_of_type(current, i, B_IO_PORT_RESOURCE,
+							&r, sizeof(resource_descriptor));
+					char value[50];
+					sprintf(value, "%s0x%04lx - 0x%04lx", first ? "" : ", ", r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1);
+					text += value;
+					first = false;
+				}
+				if (text.Length()>70) {
+					text.Truncate(70);
+					text += "...";
+				}
+				stvIORanges->SetText(text.String());
 			}
-			if (text.Length()>70) {
-				text.Truncate(70);
-				text += "...";
-			}
-			stvIORanges->SetText(text.String());
-		}
-		
-		{
-			BString text = "Memory Ranges: ";
-			bool first = true;
-			int32 num = count_resource_descriptors_of_type(current, B_MEMORY_RESOURCE);
 			
-			for (int32 i=0;i<num;i++) {
-				get_nth_resource_descriptor_of_type(current, i, B_MEMORY_RESOURCE,
-						&r, sizeof(resource_descriptor));
-				char value[50];
-				sprintf(value, "%s0x%06lx - 0x%06lx", first ? "" : ", ", r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1);
-				text += value;
-				first = false;
+			{
+				BString text = "Memory Ranges: ";
+				bool first = true;
+				int32 num = count_resource_descriptors_of_type(current, B_MEMORY_RESOURCE);
+				
+				for (int32 i=0;i<num;i++) {
+					get_nth_resource_descriptor_of_type(current, i, B_MEMORY_RESOURCE,
+							&r, sizeof(resource_descriptor));
+					char value[50];
+					sprintf(value, "%s0x%06lx - 0x%06lx", first ? "" : ", ", r.d.r.minbase, r.d.r.minbase + r.d.r.len - 1);
+					text += value;
+					first = false;
+				}
+				if (text.Length()>70) {
+					text.Truncate(70);
+					text += "...";
+				}
+				stvMemoryRanges->SetText(text.String());
 			}
-			if (text.Length()>70) {
-				text.Truncate(70);
-				text += "...";
-			}
-			stvMemoryRanges->SetText(text.String());
+			
+			btnConfigure->SetEnabled(true);
+		} else {
+			BlankDeviceInfoBox();
 		}
-		
-		btnConfigure->SetEnabled(true);
 	} else {
-		stvIRQ->SetText("IRQs: ");
-		stvDMA->SetText("DMAs: ");
-		stvIORanges->SetText("IO Ranges: ");
-		stvMemoryRanges->SetText("Memory Ranges: ");
-		btnConfigure->SetEnabled(false);
+		BlankDeviceInfoBox();
 	}
+}
+
+void
+DevicesWindow::BlankDeviceInfoBox()
+{
+	stvIRQ->SetText("IRQs: ");
+	stvDMA->SetText("DMAs: ");
+	stvIORanges->SetText("IO Ranges: ");
+	stvMemoryRanges->SetText("Memory Ranges: ");
+	btnConfigure->SetEnabled(false);
 }

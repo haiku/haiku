@@ -85,6 +85,7 @@ class DevicesWindow : public BWindow
 		void LoadSettings(BMessage *msg);
 		void SaveSettings(void);
 		void UpdateDeviceInfo();
+		void BlankDeviceInfoBox();
 		
 		ResourceUsageWindow*	ptrResourceUsageWindow;
 		ModemWindow* 			ptrModemWindow;
@@ -105,5 +106,4 @@ class DevicesWindow : public BWindow
 };
 
 #endif
-
 
