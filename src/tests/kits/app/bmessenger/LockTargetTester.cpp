@@ -15,6 +15,7 @@
 #include <Messenger.h>
 
 // Project Includes ------------------------------------------------------------
+#include <TestUtils.h>
 #include <ThreadedTestCaller.h>
 #include <cppunit/TestSuite.h>
 
@@ -23,7 +24,6 @@
 #include "LockTargetTester.h"
 
 // Local Defines ---------------------------------------------------------------
-#define CHK	CPPUNIT_ASSERT
 
 // Globals ---------------------------------------------------------------------
 
@@ -232,17 +232,17 @@ Test* LockTargetTester::Suite()
 	ADD_TEST(testSuite, LockTargetTester, LockTargetTest3);
 	// test4
 	LockTargetTester *test4
-		= new LockTargetTester("BMessenger::LockTarget Test");
+		= new LockTargetTester("LockTargetTest4");
 	test4->fLooper = new BLooper;
 	test4->fLooper->Run();
 	// test4 test caller
-	TC *caller4 = new TC("BMessenger::LockTarget Test 4", test4);
+	TC *caller4 = new TC("LockTargetTest4", test4);
 	caller4->addThread("A", &LockTargetTester::LockTargetTest4A);
 	caller4->addThread("B", &LockTargetTester::LockTargetTest4B);
 	testSuite->addTest(caller4);	
 	// test5
 	LockTargetTester *test5
-		= new LockTargetTester("BMessenger::LockTarget Test");
+		= new LockTargetTester("LockTargetTest5");
 	// create looper and handler
 	test5->fLooper = new BLooper;
 	test5->fLooper->Run();
@@ -253,7 +253,7 @@ Test* LockTargetTester::Suite()
 	} else
 		printf("ERROR: Can't init LockTargetTester test5!\n");
 	// test5 test caller
-	TC *caller5 = new TC("BMessenger::LockTarget Test 5", test5);
+	TC *caller5 = new TC("LockTargetTest5", test5);
 	caller5->addThread("A", &LockTargetTester::LockTargetTest5A);
 	caller5->addThread("B", &LockTargetTester::LockTargetTest5B);
 	testSuite->addTest(caller5);	
