@@ -10,5 +10,5 @@ SharedLibrary netapi :
 ;
 
 LinkSharedOSLibs libnetapi.so :
-	root
+	root net
 ;
