@@ -64,9 +64,9 @@ namespace agg
 		{
 //printf("DrawingModeCopy::blend_hline()\n");
 			int alpha = int(cover) * int(c.a);
+			int8u* p = m_rbuf->row(y) + (x << 2);
 			if(alpha == 255*255)
 			{
-				int8u* p = m_rbuf->row(y) + (x << 2);
 				do
 				{
 					rgb_color color = fPatternHandler->R5ColorAt(x, y);
@@ -81,7 +81,6 @@ namespace agg
 			}
 			else
 			{
-				int8u* p = m_rbuf->row(y) + (x << 2);
 				do
 				{
 					rgb_color color = fPatternHandler->R5ColorAt(x, y);
