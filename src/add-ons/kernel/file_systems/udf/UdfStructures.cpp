@@ -5,12 +5,12 @@
 //  Copyright (c) 2003 Tyler Dauwalder, tyler@dauwalder.net
 //----------------------------------------------------------------------
 
-/*! \file DiskStructures.cpp
+/*! \file UdfStructures.cpp
 
 	UDF on-disk data structure definitions
 */
 
-#include "DiskStructures.h"
+#include "UdfStructures.h"
 
 #include <string.h>
 
@@ -191,6 +191,12 @@ entity_id::matches(const entity_id &id) const
 //----------------------------------------------------------------------
 // extent_address
 //----------------------------------------------------------------------
+
+extent_address::extent_address(uint32 location, uint32 length)
+{
+	set_location(location);
+	set_length(length);
+}
 
 void
 extent_address::dump() const

@@ -17,7 +17,7 @@
 
 #include "Array.h"
 
-/*! \file DiskStructures.h
+/*! \file UdfStructures.h
 
 	\brief UDF on-disk data structure declarations
 	
@@ -245,6 +245,8 @@ extern const char* kVSDID_ECMA168;
 */
 struct extent_address {
 public:
+	extent_address(uint32 location = 0, uint32 length = 0);
+
 	void dump() const;
 
 	uint32 length() const { return B_LENDIAN_TO_HOST_INT32(_length); }	
