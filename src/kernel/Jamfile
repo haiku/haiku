@@ -321,18 +321,6 @@ KernelLd obos_shell :
 	bin/shell
 	;
 
-KernelLd cpuinfo :
-	libglue2.o
-	<$(SOURCE_GRIST)!apps!cpuinfo>main.o
-	libroot.so
-	:
-	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
-	:
-	:
-	:
-	bin/cpuinfo
-	;
-
 KernelLd testapp :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!testapp>main.o
