@@ -363,12 +363,7 @@ DBG(OUT("BMessenger::SendMessage2(%.4s)\n", (char*)&message->what));
 	status_t error = (message ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		BMessenger replyMessenger(replyTo);
-		// If the reply messenger is invalid use the app messenger.
-		if (!replyMessenger.IsValid())
-			replyMessenger = be_app_messenger;
-		bool wantsReply = replyMessenger.IsValid();
-		error = message->_send_(fPort, fHandlerToken, fPreferredTarget,
-								timeout, wantsReply, replyMessenger);
+		error = SendMessage(message, replyMessenger, timeout);
 	}
 DBG(OUT("BMessenger::SendMessage2() done: %lx\n", error));
 	return error;
@@ -403,9 +398,8 @@ BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 		// If the reply messenger is invalid use the app messenger.
 		if (!replyTo.IsValid())
 			replyTo = be_app_messenger;
-		bool wantsReply = replyTo.IsValid();
 		error = message->_send_(fPort, fHandlerToken, fPreferredTarget,
-								timeout, wantsReply, replyTo);
+								timeout, false, replyTo);
 	}
 	return error;
 }
