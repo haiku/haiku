@@ -29,16 +29,16 @@ public:
 	String(const char *utf8);
 	String(const char *cs0, uint32 length);
 	template <uint32 length>	
-		String(const array<char, length> &cs0);		
+		String(const array<char, length> &dString);		
 	~String();
 	
 	void SetTo(const char *utf8);
 	void SetTo(const char *cs0, uint32 length);
 	template <uint32 length>
-		void SetTo(const array<char, length> &cs0);
+		void SetTo(const array<char, length> &dString);
 		
 	template <uint32 length>
-		String& operator=(const array<char, length> &cs0); 
+		String& operator=(const array<char, length> &dString); 
 	
 	const char* Cs0() const { return fCs0String; }
 	const char* Utf8() const { return fUtf8String; }
@@ -53,34 +53,48 @@ private:
 	char *fUtf8String;
 };
 
-/*! \brief Creates a new String object from the given Cs0 string.
+/*! \brief Creates a new String object from the given d-string.
 */
 template <uint32 length>
-String::String(const array<char, length> &cs0)
+String::String(const array<char, length> &dString)
 	: fCs0String(NULL)
 	, fUtf8String(NULL)
 {
-	DEBUG_INIT_ETC("String", ("cs0.length(): %ld", cs0.length()));	
-
-	SetTo(cs0);
+	DEBUG_INIT_ETC("String", ("dString.length(): %ld", dString.length()));
+	
+	SetTo(dString);
 }
 
-/*! \brief Assignment from a Cs0 string.
+/*! \brief Assignment from a d-string.
+
+	The last byte of a d-string specifies the data length of the
+	enclosed Cs0 string.
 */
 template <uint32 length>
 void
-String::SetTo(const array<char, length> &cs0)
+String::SetTo(const array<char, length> &dString)
 {
-	SetTo(reinterpret_cast<const char*>(cs0.data), length);
+	uint8 dataLength = dString.length() == 0
+	                   ? 0
+	                   : reinterpret_cast<const uint8*>(dString.data)[dString.length()-1];
+	if (dataLength == 0
+        || dataLength == 1 /* technically illegal, but... */)
+	{
+		SetTo(NULL);
+	} else {
+		if (dataLength > dString.length()-1)
+			dataLength = dString.length()-1;
+		SetTo(reinterpret_cast<const char*>(dString.data), dataLength);
+	}
 }
 
-/*! \brief Assignment from a Cs0 string.
+/*! \brief Assignment from a d-string.
 */
 template <uint32 length>
 String&
-String::operator=(const array<char, length> &cs0)
+String::operator=(const array<char, length> &dString)
 {
-	SetTo(cs0);
+	SetTo(dString);
 	return *this;
 }
 

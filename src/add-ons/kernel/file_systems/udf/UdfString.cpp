@@ -226,6 +226,8 @@ String::SetTo(const char *cs0, uint32 length)
 	DEBUG_INIT_ETC("String", ("cs0: %p, length: %ld", cs0, length));	
 
 	_Clear();
+	if (length == 0)
+		return;
 	if (!cs0) {
 		PRINT(("passed NULL cs0 string\n"));
 		return;
@@ -235,6 +237,7 @@ String::SetTo(const char *cs0, uint32 length)
 	fCs0String = new(nothrow) char[length];
 	if (fCs0String) {
 		memcpy(fCs0String, cs0, length);
+		fCs0Length = length;
 	} else {
 		PRINT(("new fCs0String[%ld] allocation failed\n", length));
 		return;
