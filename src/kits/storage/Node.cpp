@@ -569,7 +569,7 @@ BNode::ReadAttrString(const char *name, BString *result) const
 	// Null terminate the new string just to be sure (since it *is*
 	// possible to read and write non-NULL-terminated strings)
 	data[bytes] = 0;		
-	result->UnlockBuffer(bytes+1);	
+	result->UnlockBuffer();
 	return error;
 }
 
