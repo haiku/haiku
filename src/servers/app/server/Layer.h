@@ -90,11 +90,6 @@ public:
 	
 	const char *GetName(void) const { return (fName)?fName->String():NULL; }
 	
-	void FullInvalidate(const BRect &rect);
-	void FullInvalidate(const BRegion &region);
-	void Invalidate(const BRegion &region);
-	void RebuildAndForceRedraw( const BRegion& reg, Layer *target);
-	
 	virtual	void RebuildFullRegion(void);
 	void StartRebuildRegions( const BRegion& reg, Layer *target, uint32 action, BPoint& pt);
 	void RebuildRegions( const BRegion& reg, uint32 action, BPoint pt, BPoint ptOffset);
@@ -154,12 +149,15 @@ public:
 protected:
 	friend class RootLayer;
 	friend class WinBorder;
-	friend class Screen;
 	friend class ServerWindow;
 	friend class Workspace;
 
 			void				move_layer(float x, float y);
 			void				resize_layer(float x, float y);
+
+			void				FullInvalidate(const BRect &rect);
+			void				FullInvalidate(const BRegion &region);
+			void				Invalidate(const BRegion &region);
 
 	BRect fFrame;
 	BPoint fBoundsLeftTop;
