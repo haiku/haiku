@@ -78,12 +78,14 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_SEEK:
 			*call_ret = user_seek((int)arg0, (off_t)INT32TOINT64(arg1, arg2), (int)arg3);
 			break;
+		case SYSCALL_READ_DIR:
+			*call_ret = user_read_dir((int)arg0, (struct dirent *)arg1, (size_t)arg2, (uint32)arg3);
+			break;
+		case SYSCALL_REWIND_DIR:
+			*call_ret = user_rewind_dir((int)arg0);
+			break;
 		case SYSCALL_IOCTL:
-			// ToDo: this is not correct; IOCPARM is only valid for calls to the networking stack
-			// The socket/fd_ioctl should do this, but I think we have to pass 0 here -- axeld.
-			// currently ignoring arg3 (which is supposed to be the length, but currently
-			// always 0 - in libc/system/wrappers.c
-			*call_ret = user_ioctl((int)arg0, (ulong)arg1, (void *)arg2, (size_t)IOCPARM_LEN((ulong)arg1));
+			*call_ret = user_ioctl((int)arg0, (ulong)arg1, (void *)arg2, (size_t)arg3);
 			break;
 		case SYSCALL_CREATE:
 			*call_ret = user_create((const char *)arg0, (stream_type)arg1);
