@@ -3,6 +3,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+
 #include <kernel.h>
 #include <vm.h>
 #include <malloc.h>
@@ -12,11 +13,20 @@
 #include <kerrors.h>
 #include <KernelExport.h>
 
-static void anonymous_destroy(struct vm_store *store)
+#ifndef TRACE_VM
+#	define TRACE_VM 0
+#endif
+#if TRACE_VM
+#	define TRACE(x) dprintf(x)
+#else
+#	define TRACE(x) ;
+#endif
+
+
+static void
+anonymous_destroy(struct vm_store *store)
 {
-	if(store) {
-		free(store);
-	}
+	free(store);
 }
 
 /* anonymous_commit
@@ -67,15 +77,16 @@ static vm_store_ops anonymous_ops = {
 /* vm_store_create_anonymous
  * Create a new vm_store that uses anonymous noswap memory
  */
-vm_store *vm_store_create_anonymous_noswap()
+vm_store *
+vm_store_create_anonymous_noswap()
 {
 	vm_store *store;
 	
 	store = malloc(sizeof(vm_store));
-	if(store == NULL)
+	if (store == NULL)
 		return NULL;
 
-dprintf("vm_store_create_anonymous (%p)\n", store);
+	TRACE(("vm_store_create_anonymous (%p)\n", store));
 
 	store->ops = &anonymous_ops;
 	store->cache = NULL;
