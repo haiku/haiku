@@ -1087,7 +1087,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'execute fixed VGA BIOS routine #$%02x at adress $%04x'\n",
 				byte, offset32));
 			//fixme: impl. if it turns out this function is used.. (didn't see that yet)
-			LOG(8,("\n\n 'INFO: WARNING: function not yet implemented, skipping!\n\n"));
+			LOG(8,("\n\nINFO: WARNING: function not yet implemented, skipping!\n\n"));
 			if (*exec)
 			{
 				switch(byte)
@@ -1843,7 +1843,7 @@ static status_t translate_ISA_PCI(uint32* reg)
 		*reg = NV8_CRTCIND;
 		break;
 	default:
-		LOG(8,("\n\n 'INFO: WARNING: ISA->PCI register adress translation failed!\n\n"));
+		LOG(8,("\n\nINFO: WARNING: ISA->PCI register adress translation failed!\n\n"));
 		return B_ERROR;
 		break;
 	}
