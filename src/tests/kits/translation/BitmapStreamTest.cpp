@@ -1,7 +1,7 @@
 /*****************************************************************************/
 // OpenBeOS Translation Kit Test
-// Author: Brian Matzon <brian@matzon.dk>
-// Version: 0.1.0
+// Authors: Brian Matzon <brian@matzon.dk>, Michael Wilber
+// Version:
 //
 // This is the Test application for BBitmapStream
 //
@@ -61,13 +61,23 @@ BitmapStreamTest::Suite()
 {
 	/* create our suite */
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite("BitmapStream");
+	typedef CppUnit::TestCaller<BitmapStreamTest> TC;
 		
-	/* add suckers */
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Constructor Test", &BitmapStreamTest::ConstructorTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::DetachBitmap Test", &BitmapStreamTest::DetachBitmapTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::ReadWrite Test", &BitmapStreamTest::ReadWriteTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::Seek Test", &BitmapStreamTest::SeekTest));
-	suite->addTest(new CppUnit::TestCaller<BitmapStreamTest>("BitmapStreamTest::SetSize Test", &BitmapStreamTest::SetSizeTest));
+	/* add tests */
+	suite->addTest(new TC("BitmapStreamTest::Constructor Test",
+		&BitmapStreamTest::ConstructorTest));
+		
+	suite->addTest(new TC("BitmapStreamTest::DetachBitmap Test",
+		&BitmapStreamTest::DetachBitmapTest));
+
+	suite->addTest(new TC("BitmapStreamTest::ReadWrite Test",
+		&BitmapStreamTest::ReadWriteTest));
+		
+	suite->addTest(new TC("BitmapStreamTest::Seek Test",
+		&BitmapStreamTest::SeekTest));
+		
+	suite->addTest(new TC("BitmapStreamTest::SetSize Test",
+		&BitmapStreamTest::SetSizeTest));
 
 	return suite;
 }
@@ -79,7 +89,10 @@ BitmapStreamTest::Suite()
 void
 BitmapStreamTest::ConstructorTest()
 {
-	//BBitmapStream with a blank bitmap
+	BApplication
+		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+
+	//BBitmapStream with no bitmap supplied
 	NextSubTest();
 	BBitmapStream streamEmpty;
 	BBitmap *pbits = NULL;
@@ -88,7 +101,27 @@ BitmapStreamTest::ConstructorTest()
 	CPPUNIT_ASSERT(streamEmpty.DetachBitmap(&pbits) == B_ERROR);
 	CPPUNIT_ASSERT(pbits == NULL);
 	
-	//constructor is created with a value in DetachBitmapTest()
+	//BBitmapStream with an empty BBitmap
+	NextSubTest();
+	pbits = new BBitmap(BRect(0,0,5,5), B_RGB32);
+	CPPUNIT_ASSERT(pbits);
+	
+	BBitmapStream *pstreamWithBits;
+	pstreamWithBits = new BBitmapStream(pbits);
+	CPPUNIT_ASSERT(pstreamWithBits);
+	CPPUNIT_ASSERT(pstreamWithBits->Position() == 0);
+	CPPUNIT_ASSERT(pstreamWithBits->Size() == 176);
+	BBitmap *poutbits = NULL;
+	CPPUNIT_ASSERT(pstreamWithBits->DetachBitmap(&poutbits) == B_OK);
+	CPPUNIT_ASSERT(pbits == poutbits);
+	
+	delete pstreamWithBits;
+	pstreamWithBits = NULL;
+	
+	delete pbits;
+	pbits = NULL;
+	
+	//constructor is also created with a value in DetachBitmapTest()
 }
 
 /**
