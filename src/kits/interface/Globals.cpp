@@ -47,6 +47,26 @@ extern status_t _control_input_server_(BMessage *command, BMessage *reply);
 using namespace BPrivate;
 
 
+// patterns
+const pattern B_SOLID_HIGH = {{0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}};
+const pattern B_MIXED_COLORS = {{0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55}};
+const pattern B_SOLID_LOW = {{0, 0, 0, 0, 0, 0, 0, 0}};
+
+// colors
+const rgb_color B_TRANSPARENT_COLOR = {0x77, 0x74, 0x77, 0x00};
+const rgb_color B_TRANSPARENT_32_BIT = {0x77, 0x74, 0x77, 0x00};
+const uint8 B_TRANSPARENT_8_BIT = 0xff;
+
+const uint8 B_TRANSPARENT_MAGIC_CMAP8 = 0xff;
+const uint16 B_TRANSPARENT_MAGIC_RGBA15 = 0x39ce;
+const uint16 B_TRANSPARENT_MAGIC_RGBA15_BIG = 0xce39;
+const uint32 B_TRANSPARENT_MAGIC_RGBA32 = 0x00777477;
+const uint32 B_TRANSPARENT_MAGIC_RGBA32_BIG = 0x77747700;
+
+// misc.
+const struct screen_id B_MAIN_SCREEN_ID = {0};
+
+
 // InterfaceDefs.h
 
 _IMPEXP_BE const color_map *
