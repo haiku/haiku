@@ -18,6 +18,7 @@ CppUnitLibrary
 	TestCase.cpp
 	TestListener.cpp
 	TestShell.cpp
+	TestSuite.cpp
 	ThreadedTestCase.cpp
 	cppunit/Asserter.cpp
 	cppunit/CompilerOutputter.cpp
