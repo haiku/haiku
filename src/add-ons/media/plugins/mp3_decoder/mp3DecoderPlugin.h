@@ -21,7 +21,10 @@ public:
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
 					   
+private:
 	status_t	DecodeNextChunk();
+	bool		IsValidStream(uint8 *buffer, int size);
+	int			GetFrameLength(void *header);	
 	
 private:
 	struct mpstr	fMpgLibPrivate;
@@ -34,6 +37,7 @@ private:
 	int				fBitRate;
 	int				fChannelCount;
 	int				fOutputBufferSize;
+	bool			fNeedSync;
 };
 
 

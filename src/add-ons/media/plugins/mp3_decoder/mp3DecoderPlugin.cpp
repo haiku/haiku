@@ -14,6 +14,45 @@
 
 #define DECODE_BUFFER_SIZE	(32 * 1024)
 
+// bit_rate_table[mpeg_version_index][layer_index][bitrate_index]
+static const int bit_rate_table[4][4][16] =
+{
+	{ // mpeg version 2.5
+		{ }, // undefined layer
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 }, // layer 3
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 }, // layer 2
+		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, 0 } // layer 1
+	},
+	{ // undefined version
+		{ },
+		{ },
+		{ },
+		{ }
+	},
+	{ // mpeg version 2
+		{ },
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 },
+		{ 0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, 0 },
+		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, 0 }
+	},
+	{ // mpeg version 1
+		{ },
+		{ 0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0 },
+		{ 0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, 0 },
+		{ 0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, 0}
+	}
+};
+
+// frame_rate_table[mpeg_version_index][sampling_rate_index]
+static const int frame_rate_table[4][4] =
+{
+	{ 11025, 12000, 8000, 0},	// mpeg version 2.5
+	{ 0, 0, 0, 0 },
+	{ 22050, 24000, 16000, 0},	// mpeg version 2
+	{ 44100, 48000, 32000, 0}	// mpeg version 1
+};
+
+
 mp3Decoder::mp3Decoder()
 {
 	InitMP3(&fMpgLibPrivate);
@@ -26,6 +65,7 @@ mp3Decoder::mp3Decoder()
 	fBitRate = 0;
 	fChannelCount = 0;
 	fOutputBufferSize = 0;
+	fNeedSync = false;
 }
 
 
@@ -99,6 +139,7 @@ mp3Decoder::Seek(uint32 seekTo,
 	ExitMP3(&fMpgLibPrivate);
 	InitMP3(&fMpgLibPrivate);
 	fResidualBytes = 0;
+	fNeedSync = true;
 	return B_OK;
 }
 
@@ -147,18 +188,43 @@ mp3Decoder::DecodeNextChunk()
 	void *chunkBuffer;
 	int32 chunkSize;
 	media_header mh;
+	int outsize;
+	int result;
 	status_t err;
+
+	// decode residual data that is still in the decoder first
+	result = decodeMP3(&fMpgLibPrivate, 0, 0, (char *)fDecodeBuffer, DECODE_BUFFER_SIZE, &outsize);
+	if (result == MP3_OK) {
+		fResidualBuffer = fDecodeBuffer;
+		fResidualBytes = outsize;
+		return B_OK;
+	}
+	
+	// get another chunk and push it to the decoder
 
 	err = GetNextChunk(&chunkBuffer, &chunkSize, &mh);
 	if (err != B_OK)
 		return err;
+
+	// resync after a seek		
+	if (fNeedSync) {
+		while (chunkSize > 100) {
+			if (IsValidStream((uint8 *)chunkBuffer, chunkSize))
+				break;
+			chunkBuffer = (uint8 *)chunkBuffer + 1;
+			chunkSize--;
+		}
+		if (chunkSize <= 100) {
+			TRACE("mp3Decoder::Decode: Sync failed\n");
+			return B_ERROR;
+		}
+		fNeedSync = false;
+	}
 	
 	fStartTime = mh.start_time;
 
 	//TRACE("mp3Decoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
 
-	int outsize;
-	int result;
 	result = decodeMP3(&fMpgLibPrivate, (char *)chunkBuffer, chunkSize, (char *)fDecodeBuffer, DECODE_BUFFER_SIZE, &outsize);
 	if (result == MP3_ERR) {
 		TRACE("mp3Decoder::Decode: decodeMP3 returned MP3_ERR\n");
@@ -171,6 +237,74 @@ mp3Decoder::DecodeNextChunk()
 	fResidualBytes = outsize;
 	
 	return B_OK;
+}
+
+bool
+mp3Decoder::IsValidStream(uint8 *buffer, int size)
+{
+	// check 3 consecutive frame headers to make sure
+	// that the length encoded in the header is correct,
+	// and also that mpeg version and layer do not change
+	int length1 = GetFrameLength(buffer);
+	if (length1 < 0 || (length1 + 4) > size)
+		return false;
+	int version_index1 = (buffer[1] >> 3) & 0x03;
+	int layer_index1 = (buffer[1] >> 1) & 0x03;
+	int length2 = GetFrameLength(buffer + length1);
+	if (length2 < 0 || (length1 + length2 + 4) > size)
+		return false;
+	int version_index2 = (buffer[length1 + 1] >> 3) & 0x03;
+	int layer_index2 = (buffer[length1 + 1] >> 1) & 0x03;
+	if (version_index1 != version_index2 || layer_index1 != layer_index1)
+		return false;
+	int length3 = GetFrameLength(buffer + length1 + length2);
+	if (length3 < 0)
+		return false;
+	int version_index3 = (buffer[length1 + length2 + 1] >> 3) & 0x03;
+	int layer_index3 = (buffer[length1 + length2 + 1] >> 1) & 0x03;
+	if (version_index2 != version_index3 || layer_index2 != layer_index3)
+		return false;
+	return true;
+}
+
+int
+mp3Decoder::GetFrameLength(void *header)
+{
+	uint8 *h = (uint8 *)header;
+
+	if (h[0] != 0xff)
+		return -1;
+	if ((h[1] & 0xe0) != 0xe0)
+		return -1;
+	
+	int mpeg_version_index = (h[1] >> 3) & 0x03;
+	int layer_index = (h[1] >> 1) & 0x03;
+	int bitrate_index = (h[2] >> 4) & 0x0f;
+	int sampling_rate_index = (h[2] >> 2) & 0x03;
+	int padding = (h[2] >> 1) & 0x01;
+	/* not interested in the other bits */
+	
+	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
+	int framerate = frame_rate_table[mpeg_version_index][sampling_rate_index];
+	
+	if (!bitrate || !framerate)
+		return -1;
+
+	int length;	
+	if (layer_index == 3) // layer 1
+		length = ((144 * 1000 * bitrate) / framerate) + (padding * 4);
+	else // layer 2 & 3
+		length = ((144 * 1000 * bitrate) / framerate) + padding;
+
+#if 0
+	TRACE("%s %s, %s crc, bit rate %d, frame rate %d, padding %d, frame length %d\n",
+		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
+		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
+		(h[1] & 0x01) ? "no" : "has",
+		bitrate, framerate, padding, length);
+#endif
+
+	return length;
 }
 
 
