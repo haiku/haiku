@@ -190,46 +190,46 @@ void BTab::DrawTab(BView *owner, BRect frame, tab_position position, bool full)
 {
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
-		darken2 = tint_color(no_tint, B_DARKEN_2_TINT),
+		darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
 	owner->SetHighColor(darkenmax);
 	owner->SetLowColor(no_tint);
 	DrawLabel(owner, frame);
 
-	owner->BeginLineArray(12); 
+	owner->BeginLineArray(12);
 
 	if (position != B_TAB_ANY)
 	{
-		owner->AddLine(BPoint(frame.left - 3.0f, frame.bottom),
-			BPoint(frame.left - 2.0f, frame.bottom - 1.0f), lightenmax);
-		owner->AddLine(BPoint(frame.left - 1.0f, frame.bottom - 2.0f),
-			BPoint(frame.left - 1.0f, frame.bottom - 3.0f), lightenmax);
+		owner->AddLine(BPoint(frame.left - 2.0f, frame.bottom),
+			BPoint(frame.left - 1.0f, frame.bottom - 1.0f), lightenmax);
+		owner->AddLine(BPoint(frame.left, frame.bottom - 2.0f),
+			BPoint(frame.left, frame.bottom - 3.0f), lightenmax);
 	}
 
-	owner->AddLine(BPoint(frame.left, frame.bottom - 4.0f),
-		BPoint(frame.left, frame.top + 4.0f), lightenmax);
-	owner->AddLine(BPoint(frame.left + 1.0f, frame.top + 3.0f),
-		BPoint(frame.left + 1.0f, frame.top + 2.0f), lightenmax);
-	owner->AddLine(BPoint(frame.left + 2.0f, frame.top + 1.0f),
-		BPoint(frame.left + 3.0f, frame.top + 1.0f), lightenmax);
-	owner->AddLine(BPoint(frame.left + 4.0f, frame.top),
+	owner->AddLine(BPoint(frame.left + 1.0f, frame.bottom - 4.0f),
+		BPoint(frame.left + 1.0f, frame.top + 5.0f), lightenmax);
+	owner->AddLine(BPoint(frame.left + 1.0f, frame.top + 4.0f),
+		BPoint(frame.left + 2.0f, frame.top + 2.0f), lightenmax);
+	owner->AddLine(BPoint(frame.left + 3.0f, frame.top + 1.0f),
+		BPoint(frame.left + 4.0f, frame.top + 1.0f), lightenmax);
+	owner->AddLine(BPoint(frame.left + 5.0f, frame.top),
 		BPoint(frame.right - 5.0f, frame.top), lightenmax);
 
 	owner->AddLine(BPoint(frame.right - 4.0f, frame.top + 1.0f),
 		BPoint(frame.right - 3.0f, frame.top + 1.0f), lightenmax);
 
 	owner->AddLine(BPoint(frame.right - 2.0f, frame.top + 2.0f),
-		BPoint(frame.right - 2.0f, frame.top + 3.0f), darken2);
+		BPoint(frame.right - 2.0f, frame.top + 3.0f), darken4);
 	owner->AddLine(BPoint(frame.right - 1.0f, frame.top + 4.0f),
-		BPoint(frame.right - 1.0f, frame.bottom - 4.0f), darken2);
+		BPoint(frame.right - 1.0f, frame.bottom - 4.0f), darken4);
 
 	if (full)
 	{ 
 		owner->AddLine(BPoint(frame.right, frame.bottom - 3.0f),
-			BPoint(frame.right, frame.bottom - 2.0f), darken2);
+			BPoint(frame.right, frame.bottom - 2.0f), darken4);
 		owner->AddLine(BPoint(frame.right + 1.0f, frame.bottom - 1.0f),
-			BPoint(frame.right + 2.0f, frame.bottom), darken2);
+			BPoint(frame.right + 2.0f, frame.bottom), darken4);
 	}
 
 	owner->EndLineArray();
@@ -398,9 +398,8 @@ void BTabView::AttachedToWindow()
 	BView::AttachedToWindow();
 
 	// TODO: check if this color is set in the BeOS implementation
-	//if (Parent())
-    //  SetViewColor(Parent()->ViewColor ());
-    SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	if (Parent())
+      SetViewColor(Parent()->ViewColor ());
 
 	Select(0);
 }
@@ -581,7 +580,7 @@ void BTabView::DrawBox(BRect selTabRect)
 		B_LIGHTEN_MAX_TINT));
 
 	StrokeLine(BPoint(0.0f, rect.bottom), BPoint(0.0f, selTabRect.bottom));
-	StrokeLine(BPoint(selTabRect.left - 4.0f, selTabRect.bottom));
+	StrokeLine(BPoint(selTabRect.left - 3.0f, selTabRect.bottom));
 	StrokeLine(BPoint(selTabRect.right + 3.0f, selTabRect.bottom),
 		BPoint(rect.right - 1.0f, selTabRect.bottom));
 
@@ -595,8 +594,44 @@ void BTabView::DrawBox(BRect selTabRect)
 //------------------------------------------------------------------------------
 BRect BTabView::TabFrame(int32 tab_index) const
 {
-	return BRect((float)(7 + tab_index * 100), 0,
-		(float)(7 + tab_index * 100 + 99), fTabHeight);
+	switch (fTabWidthSetting)
+	{
+		case B_WIDTH_FROM_LABEL:
+		{
+			float x = 6.0f;
+
+			for (int32 i = 0; i < tab_index; i++)
+				x += StringWidth(TabAt(i)->Label()) + 20.0f;
+
+			return BRect(x, 0.0f,
+				x + StringWidth(TabAt(tab_index)->Label()) + 20.0f, fTabHeight);
+			break;
+		}
+		case B_WIDTH_FROM_WIDEST:
+		{
+			float x = 6.0f;
+			float width = 0.0f;
+
+			for (int32 i = 0; i < CountTabs(); i++)
+			{
+				float tabWidth = StringWidth(TabAt(i)->Label()) + 20.0f;
+				
+				if (tabWidth > width)
+					width = tabWidth;
+			}
+
+			return BRect((6.0f + tab_index * width), 0.0f,
+				(6.0f + tab_index * width + width), fTabHeight);
+			break;
+		}
+		case B_WIDTH_AS_USUAL:
+		default:
+		{
+			return BRect((6.0f + tab_index * 100.0f), 0.0f,
+				(6.0f + tab_index * 100.0f + 100.0f), fTabHeight);
+			break;
+		}
+	}
 }
 //------------------------------------------------------------------------------
 void BTabView::SetFlags(uint32 flags)
