@@ -9,6 +9,7 @@
 #include <lock.h>
 #include <memheap.h>
 #include <sys/stat.h>
+#include <team.h>
 
 
 #ifdef __cplusplus

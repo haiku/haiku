@@ -8,14 +8,15 @@
 #ifndef _THREAD_H
 #define _THREAD_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <OS.h>
 #include <thread_types.h>
 #include <arch/thread.h>
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 void scheduler_reschedule(void);
 void start_scheduler(void);
@@ -53,24 +54,7 @@ thread_get_current_thread_id(void)
 
 thread_id spawn_kernel_thread_etc(thread_func, const char *name, int32 priority, void *args, team_id team);
 
-int team_init(kernel_args *ka);
-struct team *team_get_kernel_team(void);
-team_id team_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
-status_t wait_for_team(team_id id, status_t *returnCode);
-void team_remove_team_from_hash(struct team *team);
-team_id team_get_kernel_team_id(void);
-team_id team_get_current_team_id(void);
-char **user_team_get_arguments(void);
-int user_team_get_arg_count(void);
-bool team_is_valid(team_id id);
-struct team *team_get_team_struct_locked(team_id id);
-
 // used in syscalls.c
-team_id _user_create_team(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
-status_t _user_wait_for_team(team_id id, status_t *_returnCode);
-status_t _user_kill_team(thread_id thread);
-team_id _user_get_current_team(void);
-
 status_t _user_set_thread_priority(thread_id thread, int32 newPriority);
 status_t _user_suspend_thread(thread_id thread);
 status_t _user_resume_thread(thread_id thread);
@@ -85,16 +69,10 @@ status_t _user_receive_data(thread_id *_sender, void *buffer, size_t buffer_size
 thread_id _user_find_thread(const char *name);
 status_t _user_get_thread_info(thread_id id, thread_info *info);
 status_t _user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
-status_t _user_get_team_info(team_id id, team_info *info);
-status_t _user_get_next_team_info(int32 *cookie, team_info *info);
 
 // ToDo: these don't belong here
 int _user_getrlimit(int resource, struct rlimit * rlp);
 int _user_setrlimit(int resource, const struct rlimit * rlp);
-
-// ToDo: please move the "env" setter/getter out of the kernel!
-int user_setenv(const char *name, const char *value, int overwrite);
-int user_getenv(const char *name, char **value);
 
 #if 1
 // XXX remove later
