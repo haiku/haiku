@@ -243,6 +243,21 @@ Painter::SetFont(const BFont& font)
 	_UpdateFont();
 }
 
+// SetFont
+void
+Painter::SetFont(const ServerFont& font)
+{
+	// NOTE: this is just a transitional function
+	// to help integrate Painter with app_server later
+	fFont.SetFamilyAndStyle(font.GetFamily(), font.GetStyle());
+	fFont.SetSpacing(font.Spacing());
+	fFont.SetShear(font.Shear());
+	fFont.SetRotation(font.Rotation());
+	fFont.SetSize(font.Size());
+	
+	_UpdateFont();
+}
+
 // #pragma mark -
 
 // StrokeLine
@@ -540,18 +555,38 @@ Painter::FillArc(BPoint center, float xRadius, float yRadius,
 
 // #pragma mark -
 
-// DrawString
+// DrawChar
 void
-Painter::DrawString(const char* utf8String, const escapement_delta* delta)
+Painter::DrawChar(char aChar)
 {
 	// TODO: to be moved elsewhere
-	DrawString(utf8String, fPenLocation, delta);
+	DrawChar(aChar, fPenLocation);
+}
+
+// DrawChar
+void
+Painter::DrawChar(char aChar, BPoint baseLine)
+{
+	// TODO: to be moved elsewhere
+	char wrapper[2];
+	wrapper[0] = aChar;
+	wrapper[1] = 0;
+	DrawString(wrapper, 1, baseLine);
 }
 
 // DrawString
 void
-Painter::DrawString(const char* utf8String, BPoint baseLine,
+Painter::DrawString(const char* utf8String, uint32 length,
 					const escapement_delta* delta)
+{
+	// TODO: to be moved elsewhere
+	DrawString(utf8String, length, fPenLocation, delta);
+}
+
+// DrawString
+void
+Painter::DrawString(const char* utf8String, uint32 length,
+					BPoint baseLine, const escapement_delta* delta)
 {
 	fPatternHandler->SetPattern(B_SOLID_HIGH);
 
@@ -564,6 +599,7 @@ Painter::DrawString(const char* utf8String, BPoint baseLine,
 	transform.TranslateBy(fOrigin);
 
 	fTextRenderer->RenderString(utf8String,
+								length,
 								fFontRendererSolid,
 								fFontRendererBin,
 								transform,
@@ -574,6 +610,23 @@ Painter::DrawString(const char* utf8String, BPoint baseLine,
 	transform.RotateBy(B_ORIGIN, -fFont.Rotation());
 	transform.TranslateBy(baseLine);
 	transform.Transform(&fPenLocation);
+}
+
+// DrawString
+void
+Painter::DrawString(const char* utf8String, const escapement_delta* delta)
+{
+	// TODO: to be moved elsewhere
+	DrawString(utf8String, strlen(utf8String), fPenLocation, delta);
+}
+
+// DrawString
+void
+Painter::DrawString(const char* utf8String, BPoint baseLine,
+					const escapement_delta* delta)
+{
+	// TODO: to be moved elsewhere
+	DrawString(utf8String, strlen(utf8String), baseLine, delta);
 }
 
 // #pragma mark -
@@ -933,7 +986,29 @@ Painter::_DrawBitmap(const agg::rendering_buffer& srcBuffer, color_space format,
 			_DrawBitmap32(srcBuffer, actualBitmapRect, bitmapRect, viewRect);
 			break;
 		default:
-fprintf(stderr, "Painter::DrawBitmap() - unsupported colorspace: %d\n", format);
+fprintf(stderr, "Painter::_DrawBitmap() - non-native colorspace: %d\n", format);
+#ifdef __HAIKU__
+			// TODO: this is only a temporary implementation,
+			// to really handle other colorspaces, one would
+			// rather do the conversion with much less overhead,
+			// for example in the nn filter (hm), or in the
+			// scanline generator
+			BBitmap temp(actualBitmapRect, 0, B_RGB32);
+			status_t err = temp.ImportBits(srcBuffer.buf(),
+										   srcBuffer.height() * srcBuffer.stride(),
+										   srcBuffer.stride(),
+										   0, format);
+			if (err >= B_OK) {
+				agg::rendering_buffer convertedBuffer;
+				convertedBuffer.attach((uint8*)temp.Bits(),
+									   (uint32)actualBitmapRect.IntegerWidth() + 1,
+									   (uint32)actualBitmapRect.IntegerHeight() + 1,
+									   temp.BytesPerRow());
+				_DrawBitmap32(convertedBuffer, actualBitmapRect, bitmapRect, viewRect);
+			} else {
+fprintf(stderr, "Painter::_DrawBitmap() - colorspace conversion failed: %s\n", strerror(err));
+			}
+#endif // __HAIKU__
 			break;
 	}
 }
