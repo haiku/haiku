@@ -6,7 +6,7 @@
 */
 
 #include <kernel.h>
-#include <stage2.h>
+#include <boot/stage2.h>
 #include <dev.h>
 #include <vfs.h>
 #include <debug.h>
