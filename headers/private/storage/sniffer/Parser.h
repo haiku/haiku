@@ -53,7 +53,7 @@ public:
 	void Unset();
 	status_t InitCheck() const;
 	bool IsEmpty() const;
-	ssize_t Pos() const;
+	size_t Pos() const;
 	const std::string& String() const;
 	
 	char Get();
@@ -61,8 +61,7 @@ public:
 
 private:
 	std::string fString;
-	ssize_t fPos;
-//	ssize_t fLen;
+	size_t fPos;
 	status_t fCStatus;
 	
 	CharStream(const CharStream &ref);
@@ -99,6 +98,7 @@ const char* tokenTypeToString(TokenType type);
 class Token {
 public:
 	Token(TokenType type = EmptyToken, const ssize_t pos = -1);
+	virtual ~Token();
 	TokenType Type() const;
 	virtual const std::string& String() const;
 	virtual int32 Int() const;
@@ -118,6 +118,7 @@ protected:
 class StringToken : public Token {
 public:
 	StringToken(const std::string &str, const ssize_t pos);
+	virtual ~StringToken();
 	virtual const std::string& String() const;
 protected:
 	std::string fString;
@@ -131,6 +132,7 @@ protected:
 class IntToken : public Token {
 public:
 	IntToken(const int32 value, const ssize_t pos);
+	virtual ~IntToken();
 	virtual int32 Int() const;
 	virtual double Float() const;
 protected:
@@ -144,6 +146,7 @@ protected:
 class FloatToken : public Token {
 public:
 	FloatToken(const double value, const ssize_t pos);
+	virtual ~FloatToken();
 	virtual double Float() const;
 protected:
 	double fValue;
@@ -185,9 +188,9 @@ private:
 	void AddFloat(const char *str, ssize_t pos);
 
 	std::vector<Token*> fTokenList;
+	status_t fCStatus;
 	int fPos;
 	int fStrLen;
-	status_t fCStatus;
 
 
 	TokenStream(const TokenStream &ref);

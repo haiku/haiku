@@ -67,7 +67,6 @@ BPrivate::Storage::Sniffer::parse(const char *rule, Rule *result, BString *parse
 CharStream::CharStream(const std::string &string)
 	: fString(string)
 	, fPos(0)
-//	, fLen(-1)
 	, fCStatus(B_OK)		
 {
 }
@@ -108,7 +107,7 @@ CharStream::IsEmpty() const {
 	return fPos >= fString.length();
 }
 
-ssize_t
+size_t
 CharStream::Pos() const {
 	return fPos;
 }
@@ -150,6 +149,9 @@ Token::Token(TokenType type, const ssize_t pos)
 {
 //	if (type != EmptyToken)
 //		cout << "New Token, fType == " << tokenTypeToString(fType) << endl;
+}
+
+Token::~Token() {
 }
 
 TokenType
@@ -235,6 +237,9 @@ StringToken::StringToken(const std::string &str, const ssize_t pos)
 {
 }
 
+StringToken::~StringToken() {
+}
+
 const std::string&
 StringToken::String() const {
 	return fString;
@@ -248,6 +253,9 @@ IntToken::IntToken(const int32 value, const ssize_t pos)
 	: Token(Integer, pos)
 	, fValue(value)
 {
+}
+
+IntToken::~IntToken() {
 }
 
 int32
@@ -269,6 +277,10 @@ FloatToken::FloatToken(const double value, const ssize_t pos)
 	, fValue(value)
 {
 }
+
+FloatToken::~FloatToken() {
+}
+
 
 double
 FloatToken::Float() const {
@@ -314,7 +326,6 @@ TokenStream::SetTo(const std::string &string) {
 		tsssZeroX,
 		tsssOneHex,
 		tsssTwoHex,
-		tsssHexStringEnd,
 		tsssIntOrFloat,
 		tsssFloat,
 		tsssLonelyDecimalPoint,
@@ -328,18 +339,17 @@ TokenStream::SetTo(const std::string &string) {
 		tsssEscapeOneOctal,
 		tsssEscapeTwoOctal,
 		tsssEscapeOneHex,
-		tsssEscapeTwoHex
 	};
 	
 	TokenStreamScannerState state = tsssStart;
-	TokenStreamScannerState escapedState;
+	TokenStreamScannerState escapedState = tsssStart;
 		// Used to remember which state to return to from an escape sequence
 
-	std::string charStr;	// Used to build up character strings
-	char lastChar;			// For two char lookahead
-	char lastLastChar;		// For three char lookahead (have I mentioned I hate octal?)
+	std::string charStr = "";	// Used to build up character strings
+	char lastChar = 0;			// For two char lookahead
+	char lastLastChar = 0;		// For three char lookahead (have I mentioned I hate octal?)
 	bool keepLooping = true;
-	ssize_t startPos;
+	ssize_t startPos = 0;
 	while (keepLooping) {
 		ssize_t pos = stream.Pos();
 		char ch = stream.Get();
@@ -749,7 +759,7 @@ const Token*
 TokenStream::Get() {
 	if (fCStatus != B_OK)
 		throw new Err("Sniffer parser error: TokenStream::Get() called on uninitialized TokenStream object", -1);
-	if (fPos < fTokenList.size()) 
+	if (fPos < (ssize_t)fTokenList.size()) 
 		return fTokenList[fPos++];
 	else {
 		throw new Err("Sniffer pattern error: unterminated rule", EndPos());
@@ -802,7 +812,7 @@ TokenStream::CondRead(TokenType type) {
 
 ssize_t
 TokenStream::Pos() const {
-	return fPos < fTokenList.size() ? fTokenList[fPos]->Pos() : fStrLen;
+	return fPos < (ssize_t)fTokenList.size() ? fTokenList[fPos]->Pos() : fStrLen;
 }
 
 ssize_t
@@ -812,7 +822,7 @@ TokenStream::EndPos() const {
 
 bool
 TokenStream::IsEmpty() const {
-	return fCStatus != B_OK || fPos >= fTokenList.size();
+	return fCStatus != B_OK || fPos >= (ssize_t)fTokenList.size();
 }
 
 void
@@ -1036,7 +1046,7 @@ Parser::ErrorMessage(Err *err, const char *rule) {
 	const char* msg = (err && err->Msg())
     	                ? err->Msg()
     	                  : "Sniffer parser error: Unexpected error with no supplied error message";
-    size_t pos = err && (err->Pos() >= 0) ? err->Pos() : 0;
+    ssize_t pos = err && (err->Pos() >= 0) ? err->Pos() : 0;
     std::string str = std::string(rule ? rule : "") + "\n";
     for (int i = 0; i < pos; i++)
     	str += " ";
@@ -1192,7 +1202,6 @@ Parser::ParsePatternList(Range range) {
 		// LeftParen
 		stream.Read(LeftParen);
 		// [Flag] Pattern, (Divider, [Flag] Pattern)*
-		bool keepLooping = true;
 		while (true) {
 			// [Flag]
 			if (stream.CondRead(CaseInsensitiveFlag))
@@ -1223,7 +1232,6 @@ Parser::ParseRPatternList() {
 		// LeftParen
 		stream.Read(LeftParen);
 		// [Flag] RPattern, (Divider, [Flag] RPattern)*
-		bool keepLooping = true;
 		while (true) {
 			// [Flag]
 			if (stream.CondRead(CaseInsensitiveFlag))
