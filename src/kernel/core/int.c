@@ -63,8 +63,6 @@ long install_interrupt_handler(long vector, interrupt_handler handler,
 	struct io_handler *io = NULL; 
 	int state;
 
-	dprintf("install_interrupt_handler: vector %ld\n", vector);
-	
 	/* find the chain of handlers for this irq.
 	 * NB there can be multiple handlers for the same IRQ, especially for
 	 * PCI drivers. Where we have multiple handlers we will call each in turn
@@ -101,9 +99,7 @@ long install_io_interrupt_handler(long irq, interrupt_handler handler,
                                  void* data, ulong flags) 
 { 
 	long vector = irq + 0x20;
-	long rv;
-	dprintf("install_io_interrupt_handler: irq %ld\n", irq);
-	rv = install_interrupt_handler(vector, handler, data);
+	long rv = install_interrupt_handler(vector, handler, data);
 	
 	if (rv != 0)
 		return rv;
@@ -125,7 +121,8 @@ long remove_interrupt_handler(long vector, interrupt_handler handler,
                               void* data) 
 { 
 	struct io_handler *io = NULL; 
-
+	long rv = EINVAL;
+	
 	/* lock the structures down so it is not modified while we search */
 	int state = int_disable_interrupts(); 
 	acquire_spinlock(&io_vectors[vector].vector_lock); 
@@ -134,25 +131,25 @@ long remove_interrupt_handler(long vector, interrupt_handler handler,
 	 * We go forward through the list but this means we start with the 
 	 * most recently added handlers.
 	 */
-	io = io_vectors[vector].handler_list.next; 
 	for (io = io_vectors[vector].handler_list.next;
 	     io != &io_vectors[vector].handler_list;
 	     io = io->next) { 
 		/* we have to match both function and data */ 
-		if (io->func == handler && io->data == data) 
-			break; 
+		if (io->func == handler && io->data == data) {
+			remque(io);
+			kfree(io);
+			rv = 0;
+			break;
+		}
 	} 
 
-	if (io) {
-		remque(io);
-		kfree(io); 
-	}
-	
-	// release our lock as we're done with the vector 
+	/* to finish we need to release our locks and return
+	 * the value rv
+	 */
 	release_spinlock(&io_vectors[vector].vector_lock); 
 	int_restore_interrupts(state); 
 
-	return (io != NULL) ? 0 : EINVAL; 
+	return rv; 
 } 
 
 /* remove_io_interrupt_handler
