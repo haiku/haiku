@@ -5,6 +5,8 @@
 
 #include <string>
 
+using namespace std;
+
 // Exception
 struct Exception : exception {
 	Exception()
@@ -17,9 +19,9 @@ struct Exception : exception {
 	{
 	}
 
-	virtual ~Exception() {}
+	virtual ~Exception() throw() {}
 
-	virtual const char *what() const
+	virtual const char *what() const throw()
 	{
 		return fMessage.c_str();
 	}
@@ -32,24 +34,21 @@ private:
 struct EOFException : public Exception {
 	EOFException() {}
 	EOFException(const string &message) : Exception(message) {}
-	virtual ~EOFException() {}
+	virtual ~EOFException() throw() {}
 };
 
 // IOException
 struct IOException : public Exception {
 	IOException() {}
 	IOException(const string &message) : Exception(message) {}
-	virtual ~IOException() {}
+	virtual ~IOException() throw() {}
 };
 
 // ParseException
 struct ParseException : public Exception {
 	ParseException() {}
 	ParseException(const string &message) : Exception(message) {}
-	virtual ~ParseException() {}
+	virtual ~ParseException() throw() {}
 };
-
-
-
 
 #endif	// _GEN_SYSCALLS_COMMON_H

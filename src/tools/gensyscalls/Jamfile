@@ -3,7 +3,7 @@ SubDir OBOS_TOP src tools gensyscalls ;
 # build gensyscallinfos
 
 BuildPlatformMain gensyscallinfos : gensyscallinfos.cpp ;
-LinkSharedOSLibs gensyscallinfos : stdc++.r4 ;
+LinkSharedOSLibs gensyscallinfos : $(BUILD_LIBSTDC++) ;
 
 
 # generate the syscall infos source file
@@ -33,6 +33,7 @@ GenSyscallInfos $(syscallInfos) : $(syscallsHeaderPP) ;
 
 # build gensyscalls
 
+UsePublicHeaders os support ;
 BuildPlatformMain gensyscalls : gensyscalls.cpp $(syscallInfos:S=$(SUFOBJ)) ;
 LinkSharedOSLibs gensyscalls : stdc++.r4 ;
 UsePrivateObjectHeaders gensyscalls.cpp : kernel ;
