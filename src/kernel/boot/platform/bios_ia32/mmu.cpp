@@ -148,7 +148,7 @@ sort_addr_range(addr_range *range, int count)
 static uint32
 get_memory_map(extended_memory **_extendedMemory)
 {
-	extended_memory *block = (extended_memory *)0x2000;
+	extended_memory *block = (extended_memory *)kExtraSegmentScratch;
 	bios_regs regs = { 0, 0, sizeof(extended_memory), 0, 0, (uint32)block, 0, 0};
 	uint32 count = 0;
 
