@@ -70,6 +70,7 @@ PPPStateMachine::AuthenticationRequested()
 	
 	fAuthenticationStatus = PPP_AUTHENTICATING;
 	free(fAuthenticationName);
+	fAuthenticationName = NULL;
 }
 
 
@@ -111,6 +112,7 @@ PPPStateMachine::PeerAuthenticationRequested()
 	
 	fPeerAuthenticationStatus = PPP_AUTHENTICATING;
 	free(fPeerAuthenticationName);
+	fPeerAuthenticationName = NULL;
 }
 
 
@@ -156,20 +158,27 @@ PPPStateMachine::UpFailedEvent(PPPInterface *interface)
 void
 PPPStateMachine::UpEvent(PPPInterface *interface)
 {
-	if(Phase() < PPP_ESTABLISHMENT_PHASE) {
-		Interface()->UnregisterInterface();
+	LockerHelper locker(fLock);
+	
+	if(Phase() <= PPP_TERMINATION_PHASE || State() != PPP_STARTING_STATE) {
+		interface->Down();
 		return;
 	}
 	
-	if(Interface()->IsMultilink() && !Interface()->Parent())
-		Interface()->RegisterInterface();
+	NewState(PPP_OPENED_STATE);
+	if(Phase() == PPP_ESTABLISHMENT_PHASE) {
+		NewPhase(PPP_AUTHENTICATION_PHASE);
+		ThisLayerUp();
+	}
 }
 
 
 void
 PPPStateMachine::DownEvent(PPPInterface *interface)
 {
-	// when all children are down we should not be registered
+	LockerHelper locker(fLock);
+	
+	// when all children are down we should not be running
 	if(Interface()->IsMultilink() && !Interface()->Parent()) {
 		uint32 count = 0;
 		PPPInterface *child;
@@ -180,8 +189,8 @@ PPPStateMachine::DownEvent(PPPInterface *interface)
 				++count;
 		}
 		
-		if(count == 0)
-			Interface()->UnregisterInterface();
+		if(count == 0 && Interface()->Ifnet())
+			Interface()->Ifnet()->if_flags &= ~IFF_RUNNING;
 	}
 }
 
@@ -315,7 +324,7 @@ PPPStateMachine::UpEvent()
 	
 	LockerHelper locker(fLock);
 	
-	if(!Device()->IsUp())
+	if(!Interface()->Device() || !Interface()->Device->IsUp())
 		return;
 			// it is not our device that went up...
 	
@@ -364,23 +373,18 @@ PPPStateMachine::DownEvent()
 {
 	LockerHelper locker(fLock);
 	
-	// TODO:
-	// ResetProtocols();
-	// ResetEncapsulators();
-	// ResetOptionHandlers();
+	NewPhase(PPP_DOWN_PHASE);
 	
 	switch(State()) {
 		case PPP_CLOSED_STATE:
 		case PPP_CLOSING_STATE:
 			NewState(PPP_INITIAL_STATE);
-			NewPhase(PPP_DOWN_PHASE);
 		break;
 		
 		case PPP_STOPPED_STATE:
 			// The RFC says we should reconnect, but our implementation
 			// will only do this if auto-redial is enabled (only clients).
 			NewStatus(PPP_STARTING_STATE);
-			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -392,7 +396,6 @@ PPPStateMachine::DownEvent()
 		
 		case PPP_STOPPING_STATE:
 			NewStatus(PPP_STARTING_STATE);
-			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -403,7 +406,6 @@ PPPStateMachine::DownEvent()
 		case PPP_ACK_RCVD_STATE:
 		case PPP_ACK_SENT_STATE:
 			NewStatus(PPP_STARTING_STATE);
-			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -413,7 +415,6 @@ PPPStateMachine::DownEvent()
 		case PPP_OPENED_STATE:
 			// tld/1
 			NewStatus(PPP_STARTING_STATE);
-			NewPhase(PPP_DOWN_PHASE);
 			
 			// TODO:
 			// report that we lost the connection
@@ -423,6 +424,11 @@ PPPStateMachine::DownEvent()
 		default:
 			IllegalEvent(PPP_DOWN_EVENT);
 	}
+	
+	// TODO:
+	// DownProtocols();
+	// DownEncapsulators();
+	// ResetOptionHandlers();
 	
 	// maybe we need to redial
 	if(State() == PPP_STARTING_STATE) {
@@ -449,8 +455,14 @@ PPPStateMachine::OpenEvent()
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 			NewState(PPP_STARTING_STATE);
-			locker.UnlockNow();
-			ThisLayerStarted();
+			if(Interface()->IsMultilink() && !Interface()->Parent()) {
+				NewPhase(PPP_ESTABLISHMENT_PHASE);
+				for(int32 i = 0; i < Interface()->CountChildren(); i++)
+					Interface()->ChildAt(i)->Up();
+			} else {
+				locker.UnlockNow();
+				ThisLayerStarted();
+			}
 		break;
 		
 		case PPP_CLOSED_STATE:
@@ -477,6 +489,18 @@ PPPStateMachine::CloseEvent()
 {
 	LockerHelper locker(fLock);
 	
+	if(Interface()->IsMultilink() && !Interface()->Parent()) {
+		NewState(PPP_INITIAL_STATE);
+		NewPhase(PPP_DOWN_PHASE);
+		
+		ThisLayerDown();
+		
+		for(int32 i = 0; i < Interface()->CountChildren(); i++)
+			Interface()->ChildAt(i)->Down();
+		
+		return;
+	}
+	
 	switch(State()) {
 		case PPP_OPENED_STATE:
 			ThisLayerDown();
@@ -494,10 +518,9 @@ PPPStateMachine::CloseEvent()
 		case PPP_STARTING_STATE:
 			NewState(PPP_INITIAL_STATE);
 			
-			// if Device()->TLS() has not been called
 			// TLSNotify() will know that we were faster because we
 			// are in PPP_INITIAL_STATE now
-			if(Phase() == PPP_ESTABLISHMENT_PHASE) {
+			if(Phase() == PPP_ESTABLISHMENT_PHASE && Interface()->Parent()) {
 				// the device is already up
 				NewPhase(PPP_DOWN_PHASE);
 					// this says the following DownEvent() was not caused by
@@ -582,9 +605,6 @@ PPPStateMachine::RCRGoodEvent(mbuf *packet)
 {
 	LockerHelper locker(fLock);
 	
-	if(fRequestID == mtod(packet, lcp_packet*)->id)
-		fRequestID -= 128;
-	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
 		case PPP_STARTING_STATE:
@@ -619,6 +639,8 @@ PPPStateMachine::RCRGoodEvent(mbuf *packet)
 		case PPP_OPENED_STATE:
 			// tld,scr,sca/8
 			NewState(PPP_ACK_SENT_STATE);
+			NewPhase(PPP_ESTABLISHMENT_PHASE);
+				// tell handlers that we are reconfiguring
 			locker.UnlockNow();
 			SendConfigureRequest();
 			SendConfigureAck(packet);
@@ -633,10 +655,6 @@ void
 PPPStateMachine::RCRBadEvent(mbuf *nak, mbuf *reject)
 {
 	LockerHelper locker(fLock);
-	
-	// we should not use the same ID as the peer
-	if(fRequestID == mtod(packet, lcp_packet*)->id)
-		fRequestID -= 128;
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -805,8 +823,8 @@ PPPStateMachine::RTREvent(mbuf *packet)
 	LockerHelper locker(fLock);
 	
 	// we should not use the same ID as the peer
-	if(fTerminateID == mtod(packet, lcp_packet*)->id)
-		fTerminateID -= 128;
+	if(fID == mtod(packet, lcp_packet*)->id)
+		fID -= 128;
 	
 	switch(State()) {
 		case PPP_INITIAL_STATE:
@@ -884,7 +902,7 @@ PPPStateMachine::RTAEvent(mbuf *packet)
 
 // receive unknown code
 void
-PPPStateMachine::RUCEvent(mbuf *packet, uint16 protocol, uint8 type)
+PPPStateMachine::RUCEvent(mbuf *packet, uint16 protocol, uint8 type = PPP_PROTOCOL_REJECT)
 {
 	LockerHelper locker(fLock);
 	
@@ -1022,6 +1040,10 @@ PPPStateMachine::RCREvent(mbuf *packet)
 		reject(PPP_CONFIGURE_REJECT);
 	PPPOptionHandler *handler;
 	
+	// we should not use the same id as the peer
+	if(fID == mtod(packet, lcp_packet*)->id)
+		fID -= 128;
+	
 	nak.SetID(request.ID());
 	reject.SetID(request.ID());
 	
@@ -1073,10 +1095,13 @@ PPPStateMachine::RXJEvent(mbuf *packet)
 {
 	lcp_packet *reject mtod(packet, lcp_packet*);
 	
-	if(reject->code == PPP_CODE_REJECT)
-		RXJBadEvent(packet);
-			// we only have basic codes, so there must be something wrong
-	else if(reject->code == PPP_PROTOCOL_REJECT) {
+	if(reject->code == PPP_CODE_REJECT) {
+		// we only have basic codes, so there must be something wrong
+		if(Interface()->IsMultilink() && !Interface()->Parent())
+			CloseEvent();
+		else
+			RXJBadEvent(packet);
+	} else if(reject->code == PPP_PROTOCOL_REJECT) {
 		// disable all handlers for rejected protocol type
 		uint16 rejected = *((uint16*) reject->data);
 			// rejected protocol number
@@ -1141,8 +1166,6 @@ PPPStateMachine::ThisLayerDown()
 	// TODO:
 	// DownProtocols();
 	// DownEncapsulators();
-	// ResetProtocols();
-	// ResetEncapsulators();
 	// If there are protocols/encapsulators with PPP_DOWN_NEEDED flag
 	// wait until they report a DownEvent() (or until all of them are down).
 }
@@ -1160,8 +1183,8 @@ void
 PPPStateMachine::ThisLayerFinished()
 {
 	// TODO:
-	// ResetProtocols();
-	// ResetEncapsulators();
+	// DownProtocols();
+	// DownEncapsulators();
 	
 	if(Interface()->Device())
 		Interface()->Device()->Down();
@@ -1313,6 +1336,8 @@ PPPStateMachine::BringHandlersUp()
 			
 			// TODO:
 			// Report(PPP_CONNECTION_REPORT, PPP_UP_SUCCESSFUL, NULL, 0);
+			if(Interface()->Ifnet())
+				Interface()->Ifnet()->if_flags |= IFF_RUNNING;
 		} else
 			NewPhase(Phase() + 1);
 	}

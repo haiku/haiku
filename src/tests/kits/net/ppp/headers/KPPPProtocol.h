@@ -42,10 +42,14 @@ class PPPProtocol {
 		
 		virtual bool Up() = 0;
 		virtual bool Down() = 0;
-		virtual bool Reset() = 0;
-			// reset to initial (down) state without sending something
 		bool IsUp() const
-			{ return fIsUp; }
+			{ return fConnectionStatus == PPP_ESTABLISHED_PHASE; }
+		bool IsDown const
+			{ return fConectionStatus == PPP_DOWN_PHASE; }
+		bool IsGoingUp() const
+			{ return fConnectionStatus == PPP_ESTABLISHMENT_PHASE; }
+		bool IsGoingDown() const
+			{ return fConnectionStatus == PPP_TERMINATION_PHASE; }
 		
 		virtual status_t Send(mbuf *packet) = 0;
 		virtual status_t Receive(mbuf *packet) = 0;
@@ -69,7 +73,7 @@ class PPPProtocol {
 		
 		bool fEnabled;
 		bool fUpRequested;
-		bool fIsUp;
+		PPP_PHASE fConnectionStatus;
 };
 
 

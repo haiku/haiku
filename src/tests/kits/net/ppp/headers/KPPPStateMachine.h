@@ -93,7 +93,7 @@ class PPPStateMachine {
 		void RCNEvent(mbuf *packet);
 		void RTREvent(mbuf *packet);
 		void RTAEvent(mbuf *packet);
-		void RUCEvent(mbuf *packet, uint16 protocol, uint8 type);
+		void RUCEvent(mbuf *packet, uint16 protocol, uint8 type = PPP_PROTOCOL_REJECT);
 		void RXJGoodEvent(mbuf *packet);
 		void RXJBadEvent(mbuf *packet);
 		void RXREvent(mbuf *packet);

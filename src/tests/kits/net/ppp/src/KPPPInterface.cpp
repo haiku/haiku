@@ -75,12 +75,11 @@ PPPInterface::PPPInterface(driver_settings *settings, PPPInterface *parent = NUL
 
 PPPInterface::~PPPInterface()
 {
-	put_module((module_info**) &fManager);
-	
 	// TODO:
 	// remove our iface, so that nobody will access it:
 	//  go down if up
 	//  unregister from ppp_manager
+	//  delete children
 	// destroy and remove:
 	// device
 	// protocols
@@ -88,6 +87,8 @@ PPPInterface::~PPPInterface()
 	// option handlers
 	
 	// put all modules (in fModules)
+	
+	put_module((module_info**) &fManager);
 }
 
 
@@ -405,7 +406,7 @@ PPPInterface::RemoveChild(PPPInterface *child)
 	child->SetParent(NULL);
 	
 	// parents cannot exist without their children
-	if(CountChildren() == 0 && fManager)
+	if(CountChildren() == 0 && fManager && Ifnet())
 		fManager->delete_interface(this);
 	
 	CalculateMRU();
@@ -479,6 +480,12 @@ PPPInterface::Down()
 	// TODO:
 	// Add one-time connection report request.
 	
+	
+	
+	// All attempts to connect have failed.
+	if(!DoesDialOnDemand())
+		fManager->delete_interface(this);
+	
 	return false;
 }
 
@@ -488,13 +495,7 @@ PPPInterface::IsUp() const
 {
 	LockerHelper locker(fGeneralLock);
 	
-	
-	
-	// set running flag if successful
-	if(Ifnet())
-		return Ifnet()->if_flags & IFF_RUNNING;
-	
-	return false;
+	return StateMachine().Phase() == PPP_ESTABLISHED_PHASE;
 }
 
 
