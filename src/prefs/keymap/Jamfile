@@ -8,4 +8,4 @@ Preference Keymap :
 	KeymapListItem.cpp
 	Keymap.cpp
 	KeymapTextView.cpp
-	: be ;
+	: be tracker ;

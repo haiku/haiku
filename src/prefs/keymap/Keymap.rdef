@@ -116,11 +116,11 @@ resource file_types message
 	"types" = "application/x-vnd.Be-kmap"
 };
 
-resource app_signature "application/x-vnd.OBOS.Keymap";
+resource app_signature "application/x-vnd.haiku-Keymap";
 
 resource app_version
 {
-	short_info = "OBOS-Keymap", 
+	short_info = "Haiku-Keymap", 
     long_info  = "Haiku version of Keymap"
 };
 

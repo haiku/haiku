@@ -17,6 +17,7 @@
 #define KEYMAP_WINDOW_H
 
 #include <Control.h>
+#include <FilePanel.h>
 #include <Window.h>
 #include <MenuBar.h>
 #include "KeymapTextView.h"
@@ -44,6 +45,7 @@ public:
 	void MouseDown(BPoint point);
 	void MouseUp(BPoint point);
 	void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
+	
 private:	
 	key_info fOldKeyInfo;
 	BRect fKeysRect[128];
@@ -54,13 +56,14 @@ private:
 	Keymap				*fCurrentMap;
 	KeymapTextView		*fTextView;
 	uint32 fCurrentMouseKey;
-	
+	uint8 fActiveDeadKey;		// 0 : none, 1 : acute , ...
 };
 
 
 class KeymapWindow : public BWindow {
 public:
 			KeymapWindow( BRect frame );
+			~KeymapWindow();
 	bool	QuitRequested();
 	void	MessageReceived( BMessage* message );
 
@@ -78,12 +81,15 @@ protected:
 	void				AddMaps(BView *placeholderView);
 	void				UseKeymap();
 	
-	void FillSystemMaps();
-	void FillUserMaps();
+	void 				FillSystemMaps();
+	void 				FillUserMaps();
 	
 	BEntry* 			CurrentMap();
 		
 	Keymap				fCurrentMap;
+	
+	BFilePanel 			*fOpenPanel;		// the file panel to open
+	BFilePanel 			*fSavePanel;		// the file panel to save
 };
 
 #endif // KEYMAP_WINDOW_H

@@ -56,7 +56,6 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, char **chars, int32 *numBytes
 {
 	int32 offset = 0;
 	switch (modifiers & 0xff) {
-		case 0: offset = fKeys.normal_map[keyCode]; break;
 		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; break;
 		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; break;
 		case B_CAPS_LOCK|B_SHIFT_KEY: offset = fKeys.caps_shift_map[keyCode]; break;
@@ -65,6 +64,7 @@ Keymap::GetChars(uint32 keyCode, uint32 modifiers, char **chars, int32 *numBytes
 		case B_OPTION_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_map[keyCode]; break;
 		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_shift_map[keyCode]; break;
 		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
+		default: offset = fKeys.normal_map[keyCode]; break;
 	}
 
 	*numBytes = fChars[offset++];
@@ -127,16 +127,51 @@ Keymap::Load(entry_ref &ref)
 	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
 		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
 	
-	uint32 chars_size;
-	if (file.Read(&chars_size, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
+	if (file.Read(&fCharsSize, sizeof(uint32)) < (ssize_t)sizeof(uint32)) {
 		return B_BAD_VALUE;
 	}
 	
-	chars_size = B_BENDIAN_TO_HOST_INT32(chars_size);
+	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
 	if (!fChars)
 		delete[] fChars;
-	fChars = new char[chars_size];
-	file.Read(fChars, chars_size);
+	fChars = new char[fCharsSize];
+	err = file.Read(fChars, fCharsSize);
+	
+	return B_OK;
+}
+
+
+status_t 
+Keymap::Save(entry_ref &ref)
+{
+	status_t err;
+	
+	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+	if ((err = file.InitCheck()) != B_OK) {
+		printf("error %s\n", strerror(err));
+		return err;
+	}
+	
+	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+		((uint32*)&fKeys)[i] = B_HOST_TO_BENDIAN_INT32(((uint32*)&fKeys)[i]);
+		
+	if ((err = file.Write(&fKeys, sizeof(fKeys))) < (ssize_t)sizeof(fKeys)) {
+		return err;
+	}
+	
+	for (uint32 i=0; i<sizeof(fKeys)/4; i++)
+		((uint32*)&fKeys)[i] = B_BENDIAN_TO_HOST_INT32(((uint32*)&fKeys)[i]);
+	
+	fCharsSize = B_HOST_TO_BENDIAN_INT32(fCharsSize);
+	
+	if ((err = file.Write(&fCharsSize, sizeof(uint32))) < (ssize_t)sizeof(uint32)) {
+		return B_BAD_VALUE;
+	}
+	
+	fCharsSize = B_BENDIAN_TO_HOST_INT32(fCharsSize);
+	
+	if ((err = file.Write(fChars, fCharsSize)) < (ssize_t)fCharsSize)
+		return err;
 	
 	return B_OK;
 }
@@ -158,4 +193,197 @@ Keymap::IsModifierKey(uint32 keyCode)
 		|| (keyCode == fKeys.menu_key))
 			return true;
 	return false;
+}
+
+
+uint8
+Keymap::IsDeadKey(uint32 keyCode, uint32 modifiers)
+{
+	int32 offset;
+	uint32 tableMask = 0;
+	
+	switch (modifiers & 0xff) {
+		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; tableMask = B_SHIFT_TABLE; break;
+		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; tableMask = B_CAPS_TABLE; break;
+		case B_CAPS_LOCK|B_SHIFT_KEY: offset = fKeys.caps_shift_map[keyCode]; tableMask = B_CAPS_SHIFT_TABLE; break;
+		case B_OPTION_KEY: offset = fKeys.option_map[keyCode]; tableMask = B_OPTION_TABLE; break;
+		case B_OPTION_KEY|B_SHIFT_KEY: offset = fKeys.option_shift_map[keyCode]; tableMask = B_OPTION_SHIFT_TABLE; break;
+		case B_OPTION_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_map[keyCode]; tableMask = B_OPTION_CAPS_TABLE; break;
+		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_shift_map[keyCode]; tableMask = B_OPTION_CAPS_SHIFT_TABLE; break;
+		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; tableMask = B_CONTROL_TABLE; break;
+		default: offset = fKeys.normal_map[keyCode]; tableMask = B_NORMAL_TABLE; break;
+	}
+	
+	if (offset<=0)
+		return 0;	
+	uint32 numBytes = fChars[offset];
+	
+	if (!numBytes)
+		return 0;
+		
+	char chars[4];	
+	strncpy(chars, &(fChars[offset+1]), numBytes );
+	chars[numBytes] = 0; 
+	
+	int32 deadOffsets[] = {
+		fKeys.acute_dead_key[1],
+		fKeys.grave_dead_key[1],
+		fKeys.circumflex_dead_key[1],
+		fKeys.dieresis_dead_key[1],
+		fKeys.tilde_dead_key[1]
+	}; 
+	
+	uint32 deadTables[] = {
+		fKeys.acute_tables,
+		fKeys.grave_tables,
+		fKeys.circumflex_tables,
+		fKeys.dieresis_tables,
+		fKeys.tilde_tables
+	};
+	
+	for (int32 i=0; i<5; i++) {
+		if ((deadTables[i] & tableMask) == 0)
+			continue;
+		
+		if (offset == deadOffsets[i])
+			return i+1;
+			
+		uint32 deadNumBytes = fChars[deadOffsets[i]];
+		
+		if (!deadNumBytes)
+			continue;
+			
+		if (strncmp(chars, &(fChars[deadOffsets[i]+1]), deadNumBytes ) == 0) {
+			return i+1;
+		}
+	}
+	return 0;
+}
+
+
+bool
+Keymap::IsDeadSecondKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey)
+{
+	if (!activeDeadKey)
+		return false;
+	
+	int32 offset;
+	
+	switch (modifiers & 0xff) {
+		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; break;
+		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; break;
+		case B_CAPS_LOCK|B_SHIFT_KEY: offset = fKeys.caps_shift_map[keyCode]; break;
+		case B_OPTION_KEY: offset = fKeys.option_map[keyCode]; break;
+		case B_OPTION_KEY|B_SHIFT_KEY: offset = fKeys.option_shift_map[keyCode]; break;
+		case B_OPTION_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_map[keyCode]; break;
+		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_shift_map[keyCode]; break;
+		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
+		default: offset = fKeys.normal_map[keyCode]; break;
+	}
+	
+	uint32 numBytes = fChars[offset];
+	
+	if (!numBytes)
+		return false;
+		
+	char chars[4];	
+	strncpy(chars, &(fChars[offset+1]), numBytes );
+	chars[numBytes] = 0; 
+	
+	int32* deadOffsets[] = {
+		fKeys.acute_dead_key,
+		fKeys.grave_dead_key,
+		fKeys.circumflex_dead_key,
+		fKeys.dieresis_dead_key,
+		fKeys.tilde_dead_key
+	};
+	
+	int32 *deadOffset = deadOffsets[activeDeadKey-1]; 
+	
+	for (int32 i=0; i<32; i++) {
+		if (offset == deadOffset[i])
+			return i+1;
+			
+		uint32 deadNumBytes = fChars[deadOffset[i]+1];
+		
+		if (!deadNumBytes)
+			continue;
+			
+		if (strncmp(chars, &(fChars[deadOffset[i]]), deadNumBytes ) == 0) {
+			return true;
+		}
+		i++;
+	}
+	return false;
+}
+
+
+void
+Keymap::DeadKey(uint32 keyCode, uint32 modifiers, uint8 activeDeadKey, char** chars, int32* numBytes)
+{
+	int32 offset;
+	
+	*numBytes = 0;
+	
+	switch (modifiers & 0xff) {
+		case B_SHIFT_KEY: offset = fKeys.shift_map[keyCode]; break;
+		case B_CAPS_LOCK: offset = fKeys.caps_map[keyCode]; break;
+		case B_CAPS_LOCK|B_SHIFT_KEY: offset = fKeys.caps_shift_map[keyCode]; break;
+		case B_OPTION_KEY: offset = fKeys.option_map[keyCode]; break;
+		case B_OPTION_KEY|B_SHIFT_KEY: offset = fKeys.option_shift_map[keyCode]; break;
+		case B_OPTION_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_map[keyCode]; break;
+		case B_OPTION_KEY|B_SHIFT_KEY|B_CAPS_LOCK: offset = fKeys.option_caps_shift_map[keyCode]; break;
+		case B_CONTROL_KEY: offset = fKeys.control_map[keyCode]; break;
+		default: offset = fKeys.normal_map[keyCode]; break;
+	}
+	
+	uint32 numBytes2 = fChars[offset];
+	
+	if (!numBytes2)
+		return;
+	
+	char chars2[4];	
+	strncpy(chars2, &(fChars[offset+1]), numBytes2 );
+	chars2[numBytes2] = 0; 
+	
+	int32 *dead_key;
+	switch(activeDeadKey) {
+		case 1: dead_key = fKeys.acute_dead_key; break;
+		case 2: dead_key = fKeys.grave_dead_key; break;
+		case 3: dead_key = fKeys.circumflex_dead_key; break;
+		case 4: dead_key = fKeys.dieresis_dead_key; break;
+		case 5: dead_key = fKeys.tilde_dead_key; break;
+		//default: return;
+	}
+
+	for (int32 i=0; i<32; i++) {
+		if (strncmp(chars2, &(fChars[dead_key[i]+1]), numBytes2 ) == 0) {
+			*numBytes = fChars[dead_key[i+1]];
+		
+			switch( *numBytes ) {
+				case 0:
+					// Not mapped
+					*chars = NULL; 
+					break; 
+				default:
+					// 1-, 2-, 3-, or 4-byte UTF-8 character 
+				{ 
+					char *str = *chars = new char[*numBytes + 1]; 
+					strncpy(str, &fChars[dead_key[i+1]+1], *numBytes );
+					str[*numBytes] = 0; 
+				} 
+					break; 
+			}
+			break;
+		}		
+		i++;
+	}
+}
+
+status_t _restore_key_map_();
+
+status_t
+Keymap::Use()
+{
+	return _restore_key_map_();
 }

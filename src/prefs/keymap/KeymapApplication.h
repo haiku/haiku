@@ -18,7 +18,7 @@
 
 #include <storage/Entry.h>
 
-#define APP_SIGNATURE		"application/x-vnd.OpenBeOS-Keymap"
+#define APP_SIGNATURE		"application/x-vnd.haiku-Keymap"
 
 class KeymapWindow;
 

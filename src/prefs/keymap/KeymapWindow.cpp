@@ -29,6 +29,7 @@
 #include <StringView.h>
 #include <TextView.h>
 #include <View.h>
+#include <string.h>
 #include "KeymapWindow.h"
 #include "KeymapListItem.h"
 #include "KeymapApplication.h"
@@ -68,6 +69,7 @@ KeymapWindow::KeymapWindow( BRect frame )
 	
 	fMapView = new MapView(BRect(150,9,600,189), "mapView", &fCurrentMap);
 	placeholderView->AddChild(fMapView);
+	SetPulseRate(10000);
 	
 	BMenuItem *item = fFontMenu->FindMarked();
 	if (item) {
@@ -84,8 +86,25 @@ KeymapWindow::KeymapWindow( BRect frame )
 		new BMessage( REVERT ));
 	placeholderView->AddChild( fRevertButton );
 	
+	BPath path;
+	find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	path.Append("Keymap");
+	
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+		
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, new BMessenger(this), &ref, 
+		B_FILE_NODE, false, NULL);
+	fSavePanel = new BFilePanel(B_SAVE_PANEL, new BMessenger(this), &ref, 
+		B_FILE_NODE, false, NULL);
 }
 
+
+KeymapWindow::~KeymapWindow(void)
+{
+	delete fOpenPanel;
+	delete fSavePanel;
+}
 
 
 BMenuBar *
@@ -198,9 +217,6 @@ KeymapWindow::AddMaps(BView *placeholderView)
 	FillSystemMaps();
 	
 	FillUserMaps();
-	
-	fUserListView->Select(0);
-	fCurrentMap.Load(((KeymapListItem*)fUserListView->FirstItem())->KeymapEntry());
 }
 
 
@@ -218,23 +234,50 @@ void
 KeymapWindow::MessageReceived( BMessage* message )
 {
 	switch( message->what ) {
+		case B_SIMPLE_DATA:
+		case B_REFS_RECEIVED: 
+		{
+			entry_ref ref;
+			int32 i = 0;
+			while (message->FindRef("refs", i++, &ref) == B_OK) {
+				fCurrentMap.Load(ref);
+			}
+			fMapView->Invalidate();
+			fSystemListView->DeselectAll();
+			fUserListView->DeselectAll();
+		}	
+			break;
+		case B_SAVE_REQUESTED:
+		{
+			entry_ref ref;
+			const char *name;
+			if ((message->FindRef("directory", &ref) == B_OK)
+				&& (message->FindString("name", &name) == B_OK)) {
+				
+				BDirectory directory(&ref);
+				BEntry entry(&directory, name);
+				entry.GetRef(&ref);
+				fCurrentMap.Save(ref);
+				
+				FillUserMaps();
+			}
+		}	
+			break;
 		case MENU_FILE_OPEN:
+			fOpenPanel->Show();
 			break;
 		case MENU_FILE_SAVE:
 			break;
 		case MENU_FILE_SAVE_AS:
+			fSavePanel->Show();
 			break;
 		case MENU_EDIT_UNDO:
-			break;
 		case MENU_EDIT_CUT:
-			break;
 		case MENU_EDIT_COPY:
-			break;
 		case MENU_EDIT_PASTE:
-			break;
 		case MENU_EDIT_CLEAR:
-			break;
 		case MENU_EDIT_SELECT_ALL:
+			fMapView->MessageReceived(message);
 			break;
 		case MENU_FONT_CHANGED:
 		{
@@ -286,13 +329,33 @@ KeymapWindow::MessageReceived( BMessage* message )
 void 
 KeymapWindow::UseKeymap()
 {
-	//TODO 
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+
+	status_t err;
+	if ((err = fCurrentMap.Save(ref)) != B_OK) {
+		printf("error when saving : %s", strerror(err));
+		return;
+	}
+	fCurrentMap.Use();
+	
+	fUserListView->Select(0);
 }
 
 
 void
 KeymapWindow::FillSystemMaps()
 {
+	BListItem *item;
+	while ((item = fSystemListView->RemoveItem((int32)0)))
+		delete item;
+
 	BPath path;
 	if (find_directory(B_BEOS_ETC_DIRECTORY, &path)!=B_OK)
 		return;
@@ -312,6 +375,10 @@ KeymapWindow::FillSystemMaps()
 void 
 KeymapWindow::FillUserMaps()
 {
+	BListItem *item;
+	while ((item = fUserListView->RemoveItem((int32)0)))
+		delete item;
+
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
 		return;
@@ -334,6 +401,8 @@ KeymapWindow::FillUserMaps()
 		while( directory.GetNextRef(&ref) == B_OK ) {
 			fUserListView->AddItem(new KeymapListItem(ref));
 		}
+	
+	fUserListView->Select(0);
 }
 
 
@@ -345,7 +414,7 @@ KeymapWindow::CurrentMap()
 
 
 MapView::MapView(BRect rect, const char *name, Keymap* keymap)
-	: BControl(rect, name, NULL, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW),
+	: BControl(rect, name, NULL, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW|B_PULSE_NEEDED),
 		fCurrentFont(*be_plain_font),
 		fCurrentMap(keymap),
 		fCurrentMouseKey(0)
@@ -716,17 +785,15 @@ MapView::MapView(BRect rect, const char *name, Keymap* keymap)
 		
 	fKeysVertical[0x5e] = true;
 	
-	
-	
+	fActiveDeadKey = 0;
 }
 
 
 void
 MapView::AttachedToWindow()
 {
-	SetEventMask(B_KEYBOARD_EVENTS, B_NO_POINTER_HISTORY);
+	SetEventMask(B_KEYBOARD_EVENTS, 0);
 	fTextView->SetViewColor(255,255,255);
-	fTextView->SetStylable(true);
 	BView::AttachedToWindow();
 }
 
@@ -1049,43 +1116,56 @@ MapView::DrawKey(uint32 keyCode)
 	
 	bool pressed = (fOldKeyInfo.key_states[keyCode>>3] & (1 << (7 - keyCode%8))) || (keyCode == fCurrentMouseKey);
 	bool vertical = fKeysVertical[keyCode];
+	int32 deadKey = fCurrentMap->IsDeadKey(keyCode, fOldKeyInfo.modifiers);
+	bool secondDeadKey = fCurrentMap->IsDeadSecondKey(keyCode, fOldKeyInfo.modifiers, fActiveDeadKey);
 	
 	if (!pressed) {
 		r.InsetBySelf(1,1);
-		SetHighColor(64,64,64);
-		StrokeRect(r);
-		SetHighColor(200,200,200);
-		StrokeLine(BPoint(r.left, r.bottom-1), r.LeftTop());
-		StrokeLine(BPoint(r.left+3, r.top));
-		SetHighColor(184,184,184);
-		StrokeLine(BPoint(r.left+6, r.top));
-		SetHighColor(168,168,168);
-		StrokeLine(BPoint(r.left+9, r.top));
-		SetHighColor(152,152,152);
-		StrokeLine(BPoint(r.right-1, r.top));
-		
-		r.InsetBySelf(1,1);
-		SetHighColor(255,255,255);
-		StrokeRect(r);
-		SetHighColor(160,160,160);
-		StrokeLine(r.LeftBottom(), r.LeftBottom());
-		SetHighColor(96,96,96);
-		StrokeLine(r.RightBottom());
-		SetHighColor(64,64,64);
-		StrokeLine(BPoint(r.right, r.bottom-1));
-		SetHighColor(96,96,96);
-		StrokeLine(BPoint(r.right, r.top-1));
-		SetHighColor(160,160,160);
-		StrokeLine(r.RightTop());
-	
-		SetHighColor(255,255,255);
-		StrokeLine(BPoint(r.left+1, r.bottom-1), BPoint(r.left+2, r.bottom-1));
-		SetHighColor(200,200,200);
-		StrokeLine(BPoint(r.right-1, r.bottom-1));
-		SetHighColor(160,160,160);
-		StrokeLine(BPoint(r.right-1, r.bottom-2));
-		SetHighColor(200,200,200);
-		StrokeLine(BPoint(r.right-1, r.top+1));
+		if (secondDeadKey) {
+			SetHighColor(255,0,0);
+			StrokeRect(r);
+			r.InsetBySelf(1,1);
+			StrokeRect(r);
+		} else if (deadKey>0) {
+			SetHighColor(255,255,0);
+			StrokeRect(r);
+			r.InsetBySelf(1,1);
+			StrokeRect(r);
+		} else {
+			
+			SetHighColor(64,64,64);
+			StrokeRect(r);
+			
+			BeginLineArray(14);
+			rgb_color color1 = {200,200,200};
+			AddLine(BPoint(r.left, r.bottom-1), r.LeftTop(), color1);
+			AddLine(r.LeftTop(), BPoint(r.left+3, r.top), color1);
+			rgb_color color2 = {184,184,184};
+			AddLine(BPoint(r.left+3, r.top), BPoint(r.left+6, r.top), color2);
+			rgb_color color3 = {168,168,168};
+			AddLine(BPoint(r.left+6, r.top), BPoint(r.left+9, r.top), color3);
+			rgb_color color4 = {152,152,152};
+			AddLine(BPoint(r.left+9, r.top), BPoint(r.right-1, r.top), color4);
+			
+			r.InsetBySelf(1,1);
+			SetHighColor(255,255,255);
+			StrokeRect(r);
+			
+			rgb_color color6 = {96,96,96};	
+			AddLine(r.LeftBottom(), r.RightBottom(), color6);
+			rgb_color color5 = {160,160,160};	
+			AddLine(r.LeftBottom(), r.LeftBottom(), color5);
+			rgb_color color7 = {64,64,64};
+			AddLine(r.RightBottom(), BPoint(r.right, r.bottom-1), color7);
+			AddLine(BPoint(r.right, r.bottom-1), BPoint(r.right, r.top-1), color6);	
+			AddLine(BPoint(r.right, r.top-1), r.RightTop(), color5);
+			rgb_color color8 = {255,255,255};
+			AddLine(BPoint(r.left+1, r.bottom-1), BPoint(r.left+2, r.bottom-1), color8);
+			AddLine(BPoint(r.left+2, r.bottom-1), BPoint(r.right-1, r.bottom-1), color1);
+			AddLine(BPoint(r.right-1, r.bottom-1), BPoint(r.right-1, r.bottom-2), color5);
+			AddLine(BPoint(r.right-1, r.bottom-2), BPoint(r.right-1, r.top+1), color1);
+			EndLineArray();
+		}
 		
 		r.InsetBySelf(1,1);
 		r.bottom -= 1;
@@ -1127,28 +1207,41 @@ MapView::DrawKey(uint32 keyCode)
 		}
 	} else {
 		r.InsetBySelf(1,1);
-		SetHighColor(48,48,48);
-		StrokeRect(r);
 		
-		BeginLineArray(2);
-		rgb_color color1 = {136,136,136};
-		AddLine(BPoint(r.left+1, r.bottom), r.RightBottom(), color1);
-		AddLine(r.RightBottom(), BPoint(r.right, r.top+1), color1);
-		EndLineArray();
-		
-		r.InsetBySelf(1,1);
-		SetHighColor(72,72,72);
-		StrokeRect(r);
-		
-		BeginLineArray(4);
-		rgb_color color2 = {48,48,48};
-		AddLine(r.LeftTop(), r.LeftTop(), color2);
-		rgb_color color3 = {152,152,152};
-		AddLine(BPoint(r.left+1, r.bottom), r.RightBottom(), color3);
-		AddLine(r.RightBottom(), r.RightTop(), color3);
-		rgb_color color4 = {160,160,160};
-		AddLine(r.RightTop(), r.RightTop(), color4);
-		EndLineArray();
+		if (secondDeadKey) {
+			SetHighColor(255,0,0);
+			StrokeRect(r);
+			r.InsetBySelf(1,1);
+			StrokeRect(r);
+		} else if (deadKey>0) {
+			SetHighColor(255,255,0);
+			StrokeRect(r);
+			r.InsetBySelf(1,1);
+			StrokeRect(r);
+		} else {
+			SetHighColor(48,48,48);
+			StrokeRect(r);
+			
+			BeginLineArray(2);
+			rgb_color color1 = {136,136,136};
+			AddLine(BPoint(r.left+1, r.bottom), r.RightBottom(), color1);
+			AddLine(r.RightBottom(), BPoint(r.right, r.top+1), color1);
+			EndLineArray();
+			
+			r.InsetBySelf(1,1);
+			SetHighColor(72,72,72);
+			StrokeRect(r);
+			
+			BeginLineArray(4);
+			rgb_color color2 = {48,48,48};
+			AddLine(r.LeftTop(), r.LeftTop(), color2);
+			rgb_color color3 = {152,152,152};
+			AddLine(BPoint(r.left+1, r.bottom), r.RightBottom(), color3);
+			AddLine(r.RightBottom(), r.RightTop(), color3);
+			rgb_color color4 = {160,160,160};
+			AddLine(r.RightTop(), r.RightTop(), color4);
+			EndLineArray();
+		}
 		
 		r.InsetBySelf(1,1);
 		SetHighColor(112,112,112);
@@ -1163,7 +1256,19 @@ MapView::DrawKey(uint32 keyCode)
 	fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str, &numBytes);
 	if (str) {
 		bool hasGlyphs;
-		fCurrentFont.GetHasGlyphs(str, 1, &hasGlyphs);
+		if (deadKey>0) {
+			delete str;
+			hasGlyphs = true;
+			switch (deadKey) {
+				case 1: str = strdup("'"); break;
+				case 2: str = strdup("`"); break;
+				case 3: str = strdup("^"); break;
+				case 4: str = strdup("\""); break;
+				case 5: str = strdup("~"); break;
+			}
+		} else
+			fCurrentFont.GetHasGlyphs(str, 1, &hasGlyphs);
+		
 		if (hasGlyphs) {
 			SetFont(&fCurrentFont);
 			SetDrawingMode(B_OP_COPY);
@@ -1175,6 +1280,7 @@ MapView::DrawKey(uint32 keyCode)
 			DrawString(str, point);
 			SetDrawingMode(B_OP_OVER);
 		}
+		delete str;
 	}	
 }
 
@@ -1198,6 +1304,24 @@ void
 MapView::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
+		case MENU_EDIT_UNDO:
+			fTextView->Undo(be_clipboard);
+			break;
+		case MENU_EDIT_CUT:
+			fTextView->Cut(be_clipboard);
+			break;
+		case MENU_EDIT_COPY:
+			fTextView->Copy(be_clipboard);
+			break;
+		case MENU_EDIT_PASTE:
+			fTextView->Paste(be_clipboard);
+			break;
+		case MENU_EDIT_CLEAR:
+			fTextView->Clear();
+			break;
+		case MENU_EDIT_SELECT_ALL:
+			fTextView->SelectAll();
+			break;
 		case B_KEY_DOWN:
 		case B_KEY_UP:
 		case B_UNMAPPED_KEY_DOWN:
@@ -1207,50 +1331,77 @@ MapView::MessageReceived(BMessage *msg)
 			const uint8 *states;
 			ssize_t size;
 			
-			if ((msg->FindData("states", 'UBYT', (const void **)&states, &size)==B_OK)
-				&& (msg->FindInt32("modifiers", (int32 *)&info.modifiers) == B_OK)) {
-				if (fOldKeyInfo.modifiers != info.modifiers) {
-					fOldKeyInfo.modifiers = info.modifiers;
-					for (int8 i=0; i<16; i++) 
+			//msg->PrintToStream();
+			
+			if ((msg->FindData("states", 'UBYT', (const void **)&states, &size)!=B_OK)
+				|| (msg->FindInt32("modifiers", (int32 *)&info.modifiers)!=B_OK))
+				break;
+				
+			if (fOldKeyInfo.modifiers != info.modifiers) {
+				fOldKeyInfo.modifiers = info.modifiers;
+				for (int8 i=0; i<16; i++) 
+					fOldKeyInfo.key_states[i] = states[i];
+				Invalidate();
+			} else {
+								
+				int32 keyCode = -1;
+				for (int8 i=0; i<16; i++)
+					if (fOldKeyInfo.key_states[i] != states[i]) {
+						uint8 stbits = fOldKeyInfo.key_states[i] ^ states[i];
 						fOldKeyInfo.key_states[i] = states[i];
-					Invalidate();
-				} else {
-					int32 keyCode = -1;
-					for (int8 i=0; i<16; i++)
-						if (fOldKeyInfo.key_states[i] != states[i]) {
-							uint8 stbits = fOldKeyInfo.key_states[i] ^ states[i];
-							fOldKeyInfo.key_states[i] = states[i];
-							for (int8 j=7; stbits; j--,stbits>>=1)
-								if (stbits & 1) {
-									keyCode = i*8 + j;
-									DrawKey(keyCode);
-								}
-														
-						} 
-					
-					if (keyCode<0) 
-						for (int8 i=0; i<16; i++) {
-							uint8 stbits = states[i];
-							for (int8 j=7; stbits; j--,stbits>>=1)
-								if (stbits & 1) {
-									keyCode = i*8 + j;
-									if (!fCurrentMap->IsModifierKey(keyCode)) {
-										i = 16;
-										break;
-									}
-								}			
-						}
-					
-					if (Window()->IsActive() 
-						&& msg->what == B_KEY_DOWN) {
-						fTextView->MakeFocus();
-						char *str;
-						int32 numBytes;
-						fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str, &numBytes);
-						if (numBytes>0)
-							fTextView->FakeKeyDown(str, numBytes);
+						for (int8 j=7; stbits; j--,stbits>>=1)
+							if (stbits & 1) {
+								keyCode = i*8 + j;
+								DrawKey(keyCode);
+							}
+													
 					}
-				}											
+				
+				if (fActiveDeadKey) {
+					
+				}
+				//
+				
+				
+				if (keyCode<0) 
+					for (int8 i=0; i<16; i++) {
+						uint8 stbits = states[i];
+						for (int8 j=7; stbits; j--,stbits>>=1)
+							if (stbits & 1) {
+								keyCode = i*8 + j;
+								if (!fCurrentMap->IsModifierKey(keyCode)) {
+									i = 16;
+									break;
+								}
+							}			
+					}
+				
+										
+				if (Window()->IsActive()
+					&& msg->what == B_KEY_DOWN) {
+					fTextView->MakeFocus();
+					char *str;
+					int32 numBytes;
+					if (fActiveDeadKey) {
+						fCurrentMap->DeadKey(keyCode, fOldKeyInfo.modifiers, fActiveDeadKey, &str, &numBytes);
+						if (numBytes>0) {
+							fTextView->FakeKeyDown(str, numBytes);
+						}
+						fActiveDeadKey = 0;
+						Invalidate();
+					} else {		
+						fCurrentMap->GetChars(keyCode, fOldKeyInfo.modifiers, &str, &numBytes);
+						fActiveDeadKey = fCurrentMap->IsDeadKey(keyCode, fOldKeyInfo.modifiers);
+						if (fActiveDeadKey)
+							Invalidate();
+						else if (numBytes>0) {
+							fTextView->FakeKeyDown(str, numBytes);
+						}
+					}
+					delete str;
+					
+				}
+														
 			}
 			
 			break;
@@ -1287,11 +1438,13 @@ MapView::MouseDown(BPoint point)
 			if (fKeysRect[i].Contains(point)) {
 				fCurrentMouseKey = i;
 				DrawKey(fCurrentMouseKey);
-				char *str;
+				char *str = NULL;
 				int32 numBytes;
 				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, &str, &numBytes);
-				if (numBytes>0)
+				if (numBytes>0) {
 					fTextView->FakeKeyDown(str, numBytes);
+					delete str;
+				}
 				SetTracking(true);
 				SetMouseEventMask(B_POINTER_EVENTS,
 					B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
@@ -1321,11 +1474,13 @@ MapView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 				fCurrentMouseKey = i;
 				DrawKey(value);
 				DrawKey(fCurrentMouseKey);
-				char *str;
+				char *str = NULL;
 				int32 numBytes;
 				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, &str, &numBytes);
-				if (numBytes>0)
+				if (numBytes>0) {
 					fTextView->FakeKeyDown(str, numBytes);
+					delete str;
+				}
 				break;
 			}
 		}
@@ -1333,9 +1488,10 @@ MapView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 	BControl::MouseMoved(point, transit, msg);
 }
 
+
 void 
 MapView::SetFontFamily(const font_family family) 
 {
 	fCurrentFont.SetFamilyAndStyle(family, NULL); 
-	fTextView->SetFont(&fCurrentFont);
+	fTextView->SetFontAndColor(&fCurrentFont);
 };
