@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -498,7 +498,7 @@ invalidate_tlb(void)
 
 	addr_t address = 0;
 	for (uint32 i = 0; i < 0x100000; i++) {
-		asm volatile("tlbie %0" :: "r" (address));
+		asm volatile("tlbie %0" : : "r" (address));
 		address += B_PAGE_SIZE;
 	}
 	tlbsync();
