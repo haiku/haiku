@@ -449,198 +449,161 @@ void BAlert::_ReservedAlert3()
 	;
 }
 //------------------------------------------------------------------------------
-void BAlert::InitObject(const char* text, const char* button0,
-						const char* button1, const char* button2,
-						button_width width, button_spacing spacing,
-						alert_type type)
+float width_from_label(BButton *button)
+{
+	// BButton::GetPreferredSize() does not return the minimum width
+	// required to fit the label. Thus, the width is computed here.
+	return button->StringWidth(button->Label()) + 20.0f;
+}
+
+//------------------------------------------------------------------------------
+void 
+BAlert::InitObject(const char* text, const char* button0, const char* button1,
+	const char* button2, button_width width, button_spacing spacing,
+	alert_type type)
 {
 	BAutolock Autolock(this);
-	if (Autolock.IsLocked())
-	{
-		fInvoker = NULL;
-		fAlertSem = -1;
-		fAlertVal = -1;
-		fButtons[0] = fButtons[1] = fButtons[2] = NULL;
-		fTextView = NULL;
-		fKeys[0] = fKeys[1] = fKeys[2] = 0;
-		fMsgType = type;
-		fButtonWidth = width;
-	
-		// Set up the "_master_" view
-		TAlertView* MasterView = new TAlertView(Bounds());
-		AddChild(MasterView);
-		MasterView->SetBitmap(InitIcon());
-	
-		// Set up the buttons
-		int buttonCount = 0;
-	
-		// Have to have at least one button
-		if (button0 == NULL)
-		{
-			debugger("BAlert's must have at least one button.");
-			button0 = "";
-		}
-	
-		BMessage ProtoMsg(kAlertButtonMsg);
-		ProtoMsg.AddInt32("which", 0);
-		fButtons[0] = new BButton(BRect(0, 0, 0, 0), "_b0_", button0,
-								  new BMessage(ProtoMsg),
-								  B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-		++buttonCount;
-	
-		if (button1)
-		{
-			ProtoMsg.ReplaceInt32("which", 1);
-			fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b1_", button1,
-												new BMessage(ProtoMsg),
-												B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-			++buttonCount;
-		}
-	
-		if (button2)
-		{
-			ProtoMsg.ReplaceInt32("which", 2);
-			fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b2_", button2,
-												new BMessage(ProtoMsg),
-												B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-			++buttonCount;
-		}
-	
-		SetDefaultButton(fButtons[buttonCount - 1]);
-
-		float buttonWidth = 0;
-		float buttonHeight = 0;
-		for (int i = 0; i < buttonCount; ++i)
-		{
-			float temp;
-			fButtons[i]->GetPreferredSize(&temp, &buttonHeight);
-			buttonWidth = max(buttonWidth, temp);
-		}
-	
-		// Add first, because the buttons will ResizeToPreferred()
-		// in AttachedToWindow()
-		for (int i = 0; i < buttonCount; ++i)
-		{
-			MasterView->AddChild(fButtons[i]);
-		}
-
-		for (int i = buttonCount - 1; i >= 0; --i)
-		{
-			switch (fButtonWidth)
-			{
-				case B_WIDTH_FROM_WIDEST:
-					fButtons[i]->ResizeTo(buttonWidth, buttonHeight);
-					break;
-					
-				case B_WIDTH_FROM_LABEL:
-					fButtons[i]->GetPreferredSize(&buttonWidth, &buttonHeight);
-					// GetPreferredSize() does not return the minimum width required to
-					// fit the label. Thus, the width is computed here.
-					buttonWidth = fButtons[i]->StringWidth(fButtons[i]->Label()) + 20.0f;
-					fButtons[i]->ResizeTo(buttonWidth, buttonHeight);
-					break;
-	
-				default:	// B_WIDTH_AS_USUAL
-					fButtons[i]->GetPreferredSize(&buttonWidth, &buttonHeight);
-					buttonWidth = max(buttonWidth, kButtonUsualWidth);
-					fButtons[i]->ResizeTo(buttonWidth, buttonHeight);
-					break;
-			}
-
-			float buttonX;
-			float buttonY;
-			float temp;
-
-			fButtons[i]->GetPreferredSize(&temp, &buttonHeight);
-			buttonY = Bounds().bottom - buttonHeight;
-
-			if (i == buttonCount - 1)	// the right-most button
-			{
-				buttonX = Bounds().right - fButtons[i]->Frame().Width() -
-						  kButtonRightOffset;
-				buttonY -= kDefButtonBottomOffset;
-			}
-			else
-			{
-				buttonX = fButtons[i + 1]->Frame().left -
-						  fButtons[i]->Frame().Width() -
-						  kButtonSpaceOffset;
-	
-				if (i == 0)
-				{
-					if (spacing == B_OFFSET_SPACING)
-					{
-						buttonX -= kButtonOffsetSpaceOffset;
-					}
-					else if (buttonCount == 3)
-					{
-						buttonX -= 3;
-					}
-				}
-				buttonY -= kButtonBottomOffset;
-			}
-	
-			fButtons[i]->MoveTo(buttonX, buttonY);
-		}
-	
-	
-		// Resize the window, if necessary
-		float totalWidth = kButtonRightOffset;
-		totalWidth += fButtons[buttonCount - 1]->Frame().right -
-					  fButtons[0]->Frame().left;
-		if (MasterView->Bitmap())
-		{
-			totalWidth += kIconStripeWidth + kWindowIconOffset;
-		}
-		else
-		{
-			totalWidth += kWindowMinOffset;
-		}
-
-		if (spacing == B_OFFSET_SPACING)
-		{
-			totalWidth = max(kWindowOffsetMinWidth, totalWidth);
-		}
-		else
-		{
-			totalWidth += 5;
-			totalWidth = max(kWindowMinWidth, totalWidth);
-		}
-		ResizeTo(totalWidth, Bounds().Height());
-	
-		// Set up the text view
-		BRect TextViewRect(kTextLeftOffset, kTextTopOffset,
-						   Bounds().right - kTextRightOffset,
-						   Bounds().bottom - kTextBottomOffset);
-		if (MasterView->Bitmap())
-		{
-			TextViewRect.left = kTextIconOffset;
-		}
-	
-		fTextView = new BTextView(TextViewRect, "_tv_",
-								  TextViewRect,
-								  B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
- 		MasterView->AddChild(fTextView);
+	if (!Autolock.IsLocked())
+		// Bail out if a lock can't be acquired
+		return;
 		
-		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		fTextView->SetText(text, strlen(text));
-		fTextView->MakeEditable(false);
-		fTextView->MakeSelectable(false);
-		fTextView->SetWordWrap(true);
-	
-		// Now resize the window vertically so that all the text is visible
-		float textHeight = fTextView->TextHeight(0, fTextView->CountLines());
-		TextViewRect.OffsetTo(0, 0);
-		textHeight -= TextViewRect.Height();
-		ResizeBy(0, textHeight);
-		fTextView->ResizeBy(0, textHeight);
-		TextViewRect.bottom += textHeight;
-		fTextView->SetTextRect(TextViewRect);
-	
-		AddCommonFilter(new _BAlertFilter_(this));
+	fInvoker = NULL;
+	fAlertSem = -1;
+	fAlertVal = -1;
+	fButtons[0] = fButtons[1] = fButtons[2] = NULL;
+	fTextView = NULL;
+	fKeys[0] = fKeys[1] = fKeys[2] = 0;
+	fMsgType = type;
+	fButtonWidth = width;
 
-		MoveTo(AlertPosition(Frame().Width(), Frame().Height()));
+	// Set up the "_master_" view
+	TAlertView* MasterView = new TAlertView(Bounds());
+	AddChild(MasterView);
+	MasterView->SetBitmap(InitIcon());
+
+	// Must have at least one button
+	if (button0 == NULL) {
+		debugger("BAlert's must have at least one button.");
+		button0 = "";
 	}
+
+	BMessage ProtoMsg(kAlertButtonMsg);
+	ProtoMsg.AddInt32("which", 0);
+	// Set up the buttons
+	int buttonCount = 0;
+	fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b0_", button0,
+		new BMessage(ProtoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+	MasterView->AddChild(fButtons[buttonCount]);
+	++buttonCount;
+
+	if (button1) {
+		ProtoMsg.ReplaceInt32("which", 1);
+		fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b1_", button1,
+			new BMessage(ProtoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+
+		MasterView->AddChild(fButtons[buttonCount]);
+		++buttonCount;
+	}
+	if (button2) {
+		ProtoMsg.ReplaceInt32("which", 2);
+		fButtons[buttonCount] = new BButton(BRect(0, 0, 0, 0), "_b2_", button2,
+			new BMessage(ProtoMsg), B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
+
+		MasterView->AddChild(fButtons[buttonCount]);
+		++buttonCount;
+	}
+
+	SetDefaultButton(fButtons[buttonCount - 1]);
+
+	// Find the widest button only if the widest value needs to be known.
+	float maxWidth = 0;
+	if (fButtonWidth == B_WIDTH_FROM_WIDEST) {
+		for (int i = 0; i < buttonCount; ++i) {
+			float temp = width_from_label(fButtons[i]);
+			maxWidth = max(maxWidth, temp);
+		}
+	}
+
+	for (int i = buttonCount - 1; i >= 0; --i) {
+		// Determine the button's size		
+		float buttonWidth = 0, buttonHeight = 0;
+		fButtons[i]->GetPreferredSize(&buttonWidth, &buttonHeight);
+		if (fButtonWidth == B_WIDTH_FROM_WIDEST)
+			buttonWidth = maxWidth;
+		else if (fButtonWidth == B_WIDTH_FROM_LABEL)
+			buttonWidth = width_from_label(fButtons[i]);
+		else // B_WIDTH_AS_USUAL
+			buttonWidth = max(buttonWidth, kButtonUsualWidth);
+		fButtons[i]->ResizeTo(buttonWidth, buttonHeight);
+
+		// Determine the button's placement
+		float buttonX, buttonY;
+		buttonY = Bounds().bottom - buttonHeight;
+		if (i == buttonCount - 1) {
+			// The right-most button
+			buttonX = Bounds().right - fButtons[i]->Frame().Width() -
+				kButtonRightOffset;
+			buttonY -= kDefButtonBottomOffset;
+		} else {
+			buttonX = fButtons[i + 1]->Frame().left -
+				fButtons[i]->Frame().Width() - kButtonSpaceOffset;
+			buttonY -= kButtonBottomOffset;
+			if (i == 0) {
+				if (spacing == B_OFFSET_SPACING)
+					buttonX -= kButtonOffsetSpaceOffset;
+				else if (buttonCount == 3)
+					buttonX -= 3;
+			}
+		}
+		fButtons[i]->MoveTo(buttonX, buttonY);
+	} // for (int i = buttonCount - 1; i >= 0; --i)
+
+	// Adjust the window's width, if necessary
+	float totalWidth = kButtonRightOffset;
+	totalWidth += fButtons[buttonCount - 1]->Frame().right -
+		fButtons[0]->Frame().left;
+	if (MasterView->Bitmap())
+		totalWidth += kIconStripeWidth + kWindowIconOffset;
+	else
+		totalWidth += kWindowMinOffset;
+
+	if (spacing == B_OFFSET_SPACING)
+		totalWidth = max(kWindowOffsetMinWidth, totalWidth);
+	else {
+		totalWidth += 5;
+		totalWidth = max(kWindowMinWidth, totalWidth);
+	}
+	ResizeTo(totalWidth, Bounds().Height());
+
+	// Set up the text view
+	BRect TextViewRect(kTextLeftOffset, kTextTopOffset,
+		Bounds().right - kTextRightOffset,
+		Bounds().bottom - kTextBottomOffset);
+	if (MasterView->Bitmap())
+		TextViewRect.left = kTextIconOffset;
+
+	fTextView = new BTextView(TextViewRect, "_tv_", TextViewRect,
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
+	MasterView->AddChild(fTextView);
+	
+	fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTextView->SetText(text, strlen(text));
+	fTextView->MakeEditable(false);
+	fTextView->MakeSelectable(false);
+	fTextView->SetWordWrap(true);
+
+	// Now resize the window vertically so that all the text is visible
+	float textHeight = fTextView->TextHeight(0, fTextView->CountLines());
+	TextViewRect.OffsetTo(0, 0);
+	textHeight -= TextViewRect.Height();
+	ResizeBy(0, textHeight);
+	fTextView->ResizeBy(0, textHeight);
+	TextViewRect.bottom += textHeight;
+	fTextView->SetTextRect(TextViewRect);
+
+	AddCommonFilter(new _BAlertFilter_(this));
+
+	MoveTo(AlertPosition(Frame().Width(), Frame().Height()));
 }
 //------------------------------------------------------------------------------
 BBitmap* BAlert::InitIcon()
