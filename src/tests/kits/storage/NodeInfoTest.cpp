@@ -13,6 +13,7 @@
 #include <NodeInfo.h>
 #include <Path.h>
 #include <TypeConstants.h>
+#include <MimeTypes.h>
 
 #include <cppunit/Test.h>
 #include <cppunit/TestCaller.h>
@@ -810,6 +811,32 @@ TestTrackerIcon(BNodeInfo &nodeInfo, entry_ref *ref, icon_size size,
 	}
 }
 
+
+static void
+TestTrackerIcon(const char *path, const char *type)
+{
+	// preparation for next tests: get icons for specified type
+	BBitmap miniIcon(BRect(0, 0, 15, 15), B_CMAP8);
+	BBitmap largeIcon(BRect(0, 0, 31, 31), B_CMAP8);
+	BMimeType mimeType(type);
+	CHK(mimeType.GetIcon(&miniIcon, B_MINI_ICON) == B_OK);
+	CHK(mimeType.GetIcon(&largeIcon, B_LARGE_ICON) == B_OK);
+
+	BNode node(path);
+	CHK(node.InitCheck() == B_OK);
+	BEntry entry(path);
+	CHK(entry.InitCheck() == B_OK);
+	entry_ref ref;
+	CHK(entry.GetRef(&ref) == B_OK);
+	BNodeInfo info(&node);
+	CHK(info.InitCheck() == B_OK);
+
+	// test GetTrackerIcon()
+	TestTrackerIcon(info, &ref, B_MINI_ICON, &miniIcon);
+	TestTrackerIcon(info, &ref, B_LARGE_ICON, &largeIcon);
+}
+
+
 // TrackerIconTest
 void
 NodeInfoTest::TrackerIconTest()
@@ -818,7 +845,7 @@ NodeInfoTest::TrackerIconTest()
 	CHK(get_ref_for_path(testFile1, &testRef1) == B_OK);
 	BBitmap octetMIcon(BRect(0, 0, 15, 15), B_CMAP8);
 	BBitmap octetLIcon(BRect(0, 0, 31, 31), B_CMAP8);
-	BMimeType octetType("application/octet-stream");
+	BMimeType octetType(B_FILE_MIME_TYPE);
 	CHK(octetType.GetIcon(&octetMIcon, B_MINI_ICON) == B_OK);
 	CHK(octetType.GetIcon(&octetLIcon, B_LARGE_ICON) == B_OK);
 
@@ -993,6 +1020,18 @@ NodeInfoTest::TrackerIconTest()
 	{
 		TestTrackerIcon(nodeInfo, &testRef1, B_MINI_ICON, &octetMIcon);
 		TestTrackerIcon(nodeInfo, &testRef1, B_LARGE_ICON, &octetLIcon);
+	}
+
+	// Test GetTrackerIcon() for different types (without type set)
+	NextSubTest();
+	{
+		TestTrackerIcon(testDir, B_DIRECTORY_MIME_TYPE);
+		TestTrackerIcon("/", B_VOLUME_MIME_TYPE);
+		TestTrackerIcon("/system", B_SYMLINK_MIME_TYPE);
+
+		chmod(testFile4, 0755);
+		TestTrackerIcon(testFile4, B_APP_MIME_TYPE);
+		chmod(testFile4, 0644);
 	}
 }
 
