@@ -1047,7 +1047,7 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 	}
 
 // XXX SOMETHING IS VERY WRONG HERE
-//	printf("Error: BMediaRoster::InstantiateDormantNode in_info.flavor_flags = %#08lx, flags = %#08lx\n", in_info.flavor_flags, flags);
+	printf("Error: BMediaRoster::InstantiateDormantNode addon_id %d, flavor_id %d, flags %#08lx\n", in_info.addon, in_info.flavor_id, flags);
 
 	return B_ERROR;
 }

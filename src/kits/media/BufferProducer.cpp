@@ -27,7 +27,7 @@ BBufferProducer::~BBufferProducer()
 /* static */ status_t
 BBufferProducer::ClipDataToRegion(int32 format,
 								  int32 size,
-								  const void *request,
+								  const void *data,
 								  BRegion *region)
 {
 	CALLED();
@@ -35,7 +35,7 @@ BBufferProducer::ClipDataToRegion(int32 format,
 	if (format != B_CLIP_SHORT_RUNS)
 		return B_MEDIA_BAD_CLIP_FORMAT;
 	
-	return clip_shorts_to_region((const int16 *)request, size / sizeof(int16), region);
+	return clip_shorts_to_region((const int16 *)data, size / sizeof(int16), region);
 }
 
 media_type
@@ -540,7 +540,7 @@ status_t BBufferProducer::_Reserved_BufferProducer_15(void *) { return B_ERROR; 
 
 
 status_t
-BBufferProducer::clip_shorts_to_region(const int16 *request,
+BBufferProducer::clip_shorts_to_region(const int16 *data,
 									   int count,
 									   BRegion *output)
 {
@@ -552,7 +552,7 @@ BBufferProducer::clip_shorts_to_region(const int16 *request,
 
 status_t
 BBufferProducer::clip_region_to_shorts(const BRegion *input,
-									   int16 *request,
+									   int16 *data,
 									   int max_count,
 									   int *out_count)
 {

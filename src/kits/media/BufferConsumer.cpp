@@ -43,7 +43,7 @@ BBufferConsumer::ConsumerType()
 BBufferConsumer::RegionToClipData(const BRegion *region,
 								  int32 *format,
 								  int32 *ioSize,
-								  void *request)
+								  void *data)
 {
 	CALLED();
 	
@@ -51,7 +51,7 @@ BBufferConsumer::RegionToClipData(const BRegion *region,
 	int count;
 
 	count = *ioSize / sizeof(int16);
-	rv = BBufferProducer::clip_region_to_shorts(region, (int16 *)request, count, &count);
+	rv = BBufferProducer::clip_region_to_shorts(region, (int16 *)data, count, &count);
 	*ioSize	= count * sizeof(int16);
 	*format = BBufferProducer::B_CLIP_SHORT_RUNS;
 	
