@@ -19,3 +19,6 @@ LinkSharedOSLibs libmidi.so :
 	be
 	midi2
 ;
+
+MakeLocate <develop>libmidi.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libmidi.so : libmidi.so ;

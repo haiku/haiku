@@ -11,3 +11,6 @@ SharedLibrary screensaver :
 LinkSharedOSLibs libscreensaver.so :
 	be game
 ;
+
+MakeLocate <develop>libscreensaver.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libscreensaver.so : libscreensaver.so ;
