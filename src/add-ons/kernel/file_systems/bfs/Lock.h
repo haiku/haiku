@@ -11,6 +11,7 @@
 
 #include <KernelExport.h>
 #include "Utility.h"
+#include "Debug.h"
 
 
 // Configure here if and when real benaphores should be used
@@ -92,8 +93,9 @@ class Locker {
 			: fLock(lock)
 		{
 			fStatus = lock.Lock();
+			ASSERT(fStatus == B_OK);
 		}
-		
+
 		~Locker()
 		{
 			if (fStatus == B_OK)
