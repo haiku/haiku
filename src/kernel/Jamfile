@@ -54,11 +54,11 @@ KernelLd kernel :
 	kernel_cache.o
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
+	kernel_util.o
 
 	libbus.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
-	libkernel_util.a
 
 	linkhack.so
 
@@ -83,11 +83,11 @@ KernelLd kernel.so :
 	kernel_cache.o
 	kernel_device_manager.o
 	kernel_disk_device_manager.o
+	kernel_util.o
 
 	libbus.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
-	libkernel_util.a
 
 	linkhack.so
 

@@ -1,8 +1,8 @@
 SubDir OBOS_TOP src kernel core util ;
 
-KernelStaticLibrary libkernel_util : 
-	<$(SOURCE_GRIST)>list.c
-	<$(SOURCE_GRIST)>kernel_cpp.cpp
-	:
-	-fno-pic -Wno-unused -D_KERNEL_MODE
+KernelMergeObject kernel_util.o :
+	list.c
+	kernel_cpp.cpp
+
+	: -fno-pic -Wno-unused -D_KERNEL_MODE
 	;
