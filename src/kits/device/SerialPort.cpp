@@ -105,7 +105,7 @@ BSerialPort::Open(const char *portName)
 		// A name like "/dev/ports/serial2" was passed
 		snprintf(buf, 64, "%s", portName);
 		
-	if (ffd > 0) //If this port is already open, close it
+	if (ffd >= 0) //If this port is already open, close it
 		close(ffd);
  
 	// TODO: BeOS don't use O_EXCL, and this seems to lead
