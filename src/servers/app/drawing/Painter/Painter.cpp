@@ -1158,7 +1158,9 @@ template<class VertexSource>
 void
 Painter::_StrokePath(VertexSource& path, const pattern& p) const
 {
-	fPatternHandler->SetPattern(p);
+// We're now used by app_server and SetDrawData() was called prior to
+// this and it means the pattern is already set
+//	fPatternHandler->SetPattern(p);
 //	_SetPattern(p);
 
 #if ALIASED_DRAWING
@@ -1183,7 +1185,9 @@ template<class VertexSource>
 void
 Painter::_FillPath(VertexSource& path, const pattern& p) const
 {
-	fPatternHandler->SetPattern(p);
+// We're now used by app_server and SetDrawData() was called prior to
+// this and it means the pattern is already set
+//	fPatternHandler->SetPattern(p);
 //	_SetPattern(p);
 
 	fRasterizer->add_path(path);
