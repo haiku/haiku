@@ -385,7 +385,7 @@ message fields:
 	B_REG_MIME_ICON_FOR_TYPE	"file type": B_STRING_TYPE,
 								"icon data": B_RAW_TYPE,
 								"icon size": B_INT32_TYPE
-	B_REG_MIME_SUPPORTED_TYPES:	"types": B_STRING_TYPE[]
+	B_REG_MIME_SUPPORTED_TYPES:	"types": B_MESSAGE_TYPE
 	
 reply fields:
 - "result":
