@@ -5,11 +5,14 @@
 #include <TranslationUtils.h>
 #include <Node.h>
 #include <stdio.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+#include <UTF8.h>
 
 #include "StyledEditView.h"
 #include "Constants.h"
-#include "CharacterSet.h"
-#include "UTF8.h"
+
+using namespace BPrivate;
 
 StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds, BHandler *handler)
 	: BTextView(viewFrame, "textview", textBounds, 
@@ -74,15 +77,10 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		int32 encoding;
 		bytesRead = node->ReadAttr("be:encoding",0,0,&encoding,sizeof(encoding));
 		if (bytesRead > 0) {
-			CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
-			if (result != B_OK) {
-				fSuppressChanges = false;
-				return result;
-			}
 			if (encoding == 65535) {
 				fEncoding = 0;
 			} else {
-				const CharacterSet * cs = roster->FindCharacterSetByConversionID(encoding);
+				const BCharacterSet * cs = BCharacterSetRoster::GetCharacterSetByConversionID(encoding);
 				if (cs != 0) {
 					fEncoding = cs->GetFontID();			
 				}
@@ -114,31 +112,28 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 	if (fEncoding != 0) {
 		int32 length = stream->Seek(0,SEEK_END);
 		text_run_array * run_array = RunArray(0,length);
-		CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
-		if (result == B_OK) {
-			uint32 id = roster->FindCharacterSetByFontID(fEncoding)->GetConversionID();
-			SetText("");
-			char inBuffer[256];
-			off_t location = 0;
-			int32 textOffset = 0;
-			int32 state = 0;
-			int32 bytesRead;
-			while ((bytesRead = stream->ReadAt(location,inBuffer,256)) > 0) {
-				char * inPtr = inBuffer;
-				char textBuffer[256];
-				int32 textLength = 256;
-				int32 bytes = bytesRead;
-				while (textLength > 0) {
-					convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
-					InsertText(textBuffer,textLength,textOffset);
-					textOffset += textLength;
-					inPtr += bytes;
-					location += bytes;
-					bytesRead -= bytes;
-					bytes = bytesRead;
-					if (textLength > 0) {
-						textLength = 256;
-					}
+		uint32 id = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding)->GetConversionID();
+		SetText("");
+		char inBuffer[256];
+		off_t location = 0;
+		int32 textOffset = 0;
+		int32 state = 0;
+		int32 bytesRead;
+		while ((bytesRead = stream->ReadAt(location,inBuffer,256)) > 0) {
+			char * inPtr = inBuffer;
+			char textBuffer[256];
+			int32 textLength = 256;
+			int32 bytes = bytesRead;
+			while (textLength > 0) {
+				convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
+				InsertText(textBuffer,textLength,textOffset);
+				textOffset += textLength;
+				inPtr += bytes;
+				location += bytes;
+				bytesRead -= bytes;
+				bytes = bytesRead;
+				if (textLength > 0) {
+					textLength = 256;
 				}
 			}
 		}
@@ -168,27 +163,26 @@ StyledEditView::WriteStyledEditFile(BFile * file)
 		if (result != B_OK) {
 			return result;
 		}
-		CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
-		if (result != B_OK) {
-			return result;
-		}
-		uint32 id = roster->FindCharacterSetByFontID(fEncoding)->GetConversionID();
-		const char * outText = Text();
-		int32 sourceLength = TextLength();
-		int32 state = 0;
-		char buffer[256];
-		while (sourceLength > 0) {
-			int32 length = sourceLength;
-			int32 written = 256;
-			result = convert_from_utf8(id,outText,&length,buffer,&written,&state);
-			if (result != B_OK) {
-				return result;
+		const BCharacterSet * cs = BCharacterSetRoster::GetCharacterSetByFontID(fEncoding);
+		if (cs != 0) {
+			uint32 id = cs->GetConversionID();
+			const char * outText = Text();
+			int32 sourceLength = TextLength();
+			int32 state = 0;
+			char buffer[256];
+			while (sourceLength > 0) {
+				int32 length = sourceLength;
+				int32 written = 256;
+				result = convert_from_utf8(id,outText,&length,buffer,&written,&state);
+				if (result != B_OK) {
+					return result;
+				}
+				file->Write(buffer,written);
+				sourceLength -= length;
+				outText += length;
 			}
-			file->Write(buffer,written);
-			sourceLength -= length;
-			outText += length;
+			file->WriteAttr("be:encoding",B_INT32_TYPE,0,&id,sizeof(id));
 		}
-		file->WriteAttr("be:encoding",B_INT32_TYPE,0,&id,sizeof(id));
 	} 
 
 	alignment align = Alignment();

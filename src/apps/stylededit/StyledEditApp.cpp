@@ -2,10 +2,13 @@
 #include <Autolock.h>
 #include <Path.h>
 #include <MenuItem.h>
-#include "CharacterSet.h"
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 #include "Constants.h"
 #include "StyledEditApp.h"
 #include "StyledEditWindow.h"
+
+using namespace BPrivate;
 
 BRect windowRect(7,26,507,426);
 
@@ -24,23 +27,21 @@ StyledEditApp::StyledEditApp()
 	fOpenPanelEncodingMenu->SetRadioMode(true);
 
 	status_t status = B_OK;
-	CharacterSetRoster * roster = CharacterSetRoster::Roster(&status);
-	if (status == B_OK) {
-		for (int index = 0; (index < roster->GetCharacterSetCount()) ; index++) {
-			const CharacterSet * cs = roster->GetCharacterSet(index);
-			BString name(cs->GetPrintName());
-			const char * mime = cs->GetMIMEName();
-			if (mime) {
-				name.Append(" (");
-				name.Append(mime);
-				name.Append(")");
-			}
-			BMenuItem * item = new BMenuItem(name.String(),new BMessage(OPEN_AS_ENCODING));
-			item->SetTarget(this);
-			fOpenPanelEncodingMenu->AddItem(item);
-			if (index == fOpenAsEncoding) {
-				item->SetMarked(true);
-			}
+	BCharacterSetRoster roster;
+	BCharacterSet charset;
+	while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+		BString name(charset.GetPrintName());
+		const char * mime = charset.GetMIMEName();
+		if (mime) {
+			name.Append(" (");
+			name.Append(mime);
+			name.Append(")");
+		}
+		BMenuItem * item = new BMenuItem(name.String(),new BMessage(OPEN_AS_ENCODING));
+		item->SetTarget(this);
+		fOpenPanelEncodingMenu->AddItem(item);
+		if (charset.GetFontID() == fOpenAsEncoding) {
+			item->SetMarked(true);
 		}
 	}
 	

@@ -1,18 +1,26 @@
 SubDir OBOS_TOP src apps stylededit ;
 
+UsePrivateHeaders support ;
+
 AddResources StyledEdit :
 	StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef
 	;
 
 App StyledEdit :
-	CharacterSet.cpp
 	ColorMenuItem.cpp
 	FindWindow.cpp
 	ReplaceWindow.cpp
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
+	# OBOS textencodings
+	CharacterSet.cpp
+	CharacterSetRoster.cpp
+	character_sets.cpp
 	;
 
-LinkSharedOSLibs StyledEdit : be translation tracker textencoding ;
+SEARCH on <src!apps!stylededit>CharacterSet.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
+SEARCH on <src!apps!stylededit>CharacterSetRoster.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
+SEARCH on <src!apps!stylededit>character_sets.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 
+LinkSharedOSLibs StyledEdit : be translation tracker textencoding ;

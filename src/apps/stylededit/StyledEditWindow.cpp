@@ -15,9 +15,10 @@
 #include <TextControl.h>
 #include <TranslationUtils.h>
 #include <Window.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 
 //****** Application defined header files************/.
-#include "CharacterSet.h"
 #include "Constants.h"
 #include "ColorMenuItem.h"
 #include "FindWindow.h"
@@ -25,6 +26,8 @@
 #include "StyledEditApp.h"
 #include "StyledEditView.h"
 #include "StyledEditWindow.h"
+
+using namespace BPrivate;
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 	: BWindow(frame,"untitled",B_DOCUMENT_WINDOW,0)
@@ -866,23 +869,22 @@ StyledEditWindow::SaveAs()
 		fSavePanelEncodingMenu->SetRadioMode(true);
 
 		status_t status = B_OK;
-		CharacterSetRoster * roster = CharacterSetRoster::Roster(&status);
-		if (status == B_OK) {
-			for (int index = 0; (index < roster->GetCharacterSetCount()) ; index++) {
-				const CharacterSet * cs = roster->GetCharacterSet(index);
-				BString name(cs->GetPrintName());
-				const char * mime = cs->GetMIMEName();
-				if (mime) {
-					name.Append(" (");
-					name.Append(mime);
-					name.Append(")");
-				}
-				BMenuItem * item = new BMenuItem(name.String(),new BMessage(SAVE_AS_ENCODING));
-				item->SetTarget(this);
-				fSavePanelEncodingMenu->AddItem(item);
-				if (index == fTextView->GetEncoding()) {
-					item->SetMarked(true);
-				}
+		BCharacterSetRoster roster;
+		BCharacterSet charset;
+		int index = 0;
+		while (roster.GetNextCharacterSet(&charset) == B_NO_ERROR) {
+			BString name(charset.GetPrintName());
+			const char * mime = charset.GetMIMEName();
+			if (mime) {
+				name.Append(" (");
+				name.Append(mime);
+				name.Append(")");
+			}
+			BMenuItem * item = new BMenuItem(name.String(),new BMessage(SAVE_AS_ENCODING));
+			item->SetTarget(this);
+			fSavePanelEncodingMenu->AddItem(item);
+			if (charset.GetFontID() == fTextView->GetEncoding()) {
+				item->SetMarked(true);
 			}
 		}
 	}
