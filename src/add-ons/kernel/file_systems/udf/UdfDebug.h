@@ -31,9 +31,16 @@
 	void dbg_printf(const char *format,...);
 	void initialize_debugger(const char *filename);
 #else
-#	include <stdio.h>
-#	include <malloc.h>
-#	define __out printf
+#	ifdef USER 
+#		include <stdio.h> 
+#		define __out printf 
+#	else 
+#		include <null.h> 
+#		define __out dprintf
+#	endif
+//#	include <stdio.h>
+//#	include <malloc.h>
+//#	define __out printf
 #endif
 
 #include "kernel_cpp.h"
