@@ -45,11 +45,12 @@ public:
 	void MouseDown(BPoint point);
 	void MouseUp(BPoint point);
 	void MouseMoved(BPoint point, uint32 transit, const BMessage *msg);
-	
+	void InvalidateKeys();
 private:	
 	key_info fOldKeyInfo;
 	BRect fKeysRect[128];
 	bool fKeysVertical[128];
+	bool fKeysToDraw[128];
 	uint8 fKeyState[16];
 	BFont fCurrentFont;
 	
