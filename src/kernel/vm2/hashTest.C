@@ -27,7 +27,7 @@ bool isEqual (node &a,node &b) {
 int main(int argc,char **argv) {
 	// Test 1 - Try to add to foo without setting an isLessThan function
 	try {
-		hashTable foo(10);
+		hashTable foo(40);
 		node tmp;
 		foo.add(&tmp);
 		}
@@ -68,7 +68,7 @@ int main(int argc,char **argv) {
 	bar.setIsEqual(isEqual);
 	for (int a=0;a<100;a++)
 		bar.add(new hashTest(a));
-	for (int a=1000;a>=100;a--)
+	for (int a=999;a>=100;a--)
 		bar.add(new hashTest(a));
 	bar.dump();
 
@@ -79,7 +79,7 @@ int main(int argc,char **argv) {
 	foo.remove(&second);
 	foo.dump();
 
-	error ("Setting up middle case (readding 1 and 2)\n");
+	error ("Setting up middle case (reading 1 and 2)\n");
 	foo.add(&first);
 	foo.add(&second);
 	foo.dump();
@@ -103,5 +103,16 @@ int main(int argc,char **argv) {
 	error ("ensuringSane on smaller (foo) = %s\n",((foo.ensureSane())?"OK":"BAD!"));
 	error ("ensuringSane on larger (bar) = %s\n",((bar.ensureSane())?"OK":"BAD!"));
 
+	
+	int count=0;
+	for (hashIterate hi(bar);node *next=hi.get();) {
+		count++;
+		if (next==NULL)
+			error ("Found a NULL at %d\n",count);
+		}
+	if (count==1000)
+		error ("found 1000, as expected!\n");
+	else
+		error ("did NOT find 1000, as expected, found %d!\n",count);
 	return 0;
 }

@@ -73,7 +73,7 @@ vmInterface::vmInterface(int pages)
 			error ("pageManager::pageManager: No memory!\n");
 			exit(1);
 			}
-		//error ("Allocated an area. Address = %x\n",vmBlock);
+		error ("Allocated an area. Address = %x\n",vmBlock);
 		// Figure out how many pages we need
 		int pageCount = (sizeof(poolarea)+sizeof(poolvpage)+sizeof(poolvnode)+sizeof(pageManager)+sizeof(swapFileManager)+sizeof(cacheManager)+sizeof(vmHeaderBlock)+PAGE_SIZE-1)/PAGE_SIZE;
 		if (pageCount >=pages)
@@ -81,24 +81,29 @@ vmInterface::vmInterface(int pages)
 			error ("Hey! Go buy some ram! Trying to create a VM with fewer pages than the setup will take!\n");
 			exit(1);
 			}
-		//error ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		error ("Need %d pages, creation calls for %d\n",pageCount,pages);
 		void *currentAddress = addToPointer(vmBlock,sizeof(struct vmHeaderBlock));
+		vmBlock->pageMan = new (currentAddress) pageManager;
+		currentAddress=addToPointer(currentAddress,sizeof(pageManager));
+		vmBlock->pageMan->setup(addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
+		error ("Set up Page Man\n");
 		vmBlock->areaPool = new (currentAddress) poolarea;
 		currentAddress=addToPointer(currentAddress,sizeof(poolarea));
 		vmBlock->vpagePool = new (currentAddress) poolvpage;
 		currentAddress=addToPointer(currentAddress,sizeof(poolvpage));
 		vmBlock->vnodePool = new (currentAddress) poolvnode;
 		currentAddress=addToPointer(currentAddress,sizeof(poolvnode));
-		vmBlock->pageMan = new (currentAddress) pageManager;
-		currentAddress=addToPointer(currentAddress,sizeof(pageManager));
 		vmBlock->swapMan = new (currentAddress) swapFileManager;
 		currentAddress=addToPointer(currentAddress,sizeof(swapFileManager));
 		vmBlock->cacheMan = new (currentAddress) cacheManager;
 		currentAddress=addToPointer(currentAddress,sizeof(cacheManager));
-		//error ("Need %d pages, creation calls for %d\n",pageCount,pages);
-		//error ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
-		vmBlock->pageMan->setup(addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
+		error ("Need %d pages, creation calls for %d\n",pageCount,pages);
+		error ("vmBlock is at %x, end of structures is at %x, pageMan called with address %x, pages = %d\n",vmBlock,currentAddress,addToPointer(vmBlock,PAGE_SIZE*pageCount),pages-pageCount);
 	    }
+	else
+		{
+		error ("Area found!\n");
+		}
 
 	resume_thread(tid_cleaner=spawn_thread(cleanerThread,"cleanerThread",0,(vmBlock->pageMan)));
 	resume_thread(tid_saver=spawn_thread(saverThread,"saverThread",0,getAM()));
@@ -213,11 +218,4 @@ status_t vmInterface::munmap(void *addr, size_t len)
 	int retVal;
 	retVal = getAM()->munmap(addr,len);
 	return retVal;
-}
-
-void vmInterface::suspendAll(void)
-{
-	suspend_thread(tid_cleaner);
-	suspend_thread(tid_saver);
-	suspend_thread(tid_pager);
 }

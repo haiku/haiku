@@ -3,6 +3,8 @@
 #ifndef _VM_TYPES
 #define _VM_TYPES
 const int PAGE_SIZE = 4096;
+const int BITS_IN_PAGE_SIZE = 12;
+const int AREA_HASH_TABLE_SIZE = 40;
 struct vnode : public node
 {
 	int fd;

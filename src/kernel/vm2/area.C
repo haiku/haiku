@@ -9,29 +9,24 @@
 
 extern vmHeaderBlock *vmBlock;
 
-bool vpageIsLessThan(void *a,void *b)
-{
-	return (((reinterpret_cast<vpage *>(a))->getStartAddress()) < (reinterpret_cast<vpage *>(b))->getStartAddress());
-}
+ulong vpageHash (node &vp) {return reinterpret_cast <vpage &>(vp).hash();}
+bool vpageisEqual (node &vp,node &vp2) {return reinterpret_cast <vpage &>(vp)==reinterpret_cast <vpage &>(vp2);}
 
-area::area(void)
-	{
-	vpages.setIsLessThan(vpageIsLessThan);
+area::area(void) : vpages(AREA_HASH_TABLE_SIZE) {
+	vpages.setHash(vpageHash);
+	vpages.setIsEqual(vpageisEqual);
 	}
 
-void area::setup (areaManager *myManager)
-	{
+void area::setup (areaManager *myManager) {
 	//error ("area::setup setting up new area\n");
 	manager=myManager;
 	//error ("area::setup done setting up new area\n");
 	}
 
-unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int pageCount)
-{
+unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int pageCount) {
 	// We will lock in the callers
 	unsigned long base,requested=(unsigned long)req;
-	switch (type)
-		{
+	switch (type) {
 		case EXACT: 
 			base=manager->getNextAddress(pageCount,requested); 
 			if (base!=requested)
@@ -54,8 +49,9 @@ unsigned long area::mapAddressSpecToAddress(addressSpec type,void * req,int page
 	return base;
 }
 
-status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL /* For clone only*/)
-{
+status_t area::createAreaGuts( char *inName, int pageCount, void **address, addressSpec type, pageState inState, protectType protect, bool inFinalWrite, int fd, size_t offset, area *originalArea=NULL /* For clone only*/) {
+	error ("area::createAreaGuts : name = %s, pageCount = %d, address = %ld, addressSpec = %d, pageState = %d, protection = %d, inFinalWrite = %d, fd = %d, offset = %d,originalArea=%ld\n",
+					inName,pageCount,address,type,inState,protect,inFinalWrite,fd,offset,originalArea);
 	strcpy(name,inName);
 	vpage *newPage;
 
@@ -67,53 +63,50 @@ status_t area::createAreaGuts( char *inName, int pageCount, void **address, addr
 	end_address=base+(pageCount*PAGE_SIZE)-1;
 	*address=(void *)base;
 	finalWrite=inFinalWrite;
-	if (!originalArea)
-		for (int i=0;i<pageCount;i++)
-			{
+	if (originalArea==NULL) // Not for cloning
+		for (int i=0;i<pageCount;i++) {
 			newPage=new (vmBlock->vpagePool->get()) vpage;
-			if (fd)
-				{
-				vnode *newVnode=new (vmBlock->vnodePool->get()) vnode;
+			if (fd) {
+//				vnode *newVnode=new (vmBlock->vnodePool->get()) vnode;
+				void *currentMemoryLocation;
+				// A future implementation vnode *newVnode=vmBlock->vnodePool->getNode(fd,offset,PAGE_SIZE*i,true,currentMemoryLocation);
+				vnode *newVnode=vmBlock->vnodePool->get();
 				newVnode->fd=fd;
-				newVnode->offset=offset+PAGE_SIZE*i;
-				newVnode->valid=true;
+				newVnode->offset=offset;
 				newPage->setup(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 				}
 			else
 				newPage->setup(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
 			vpages.add(newPage);
 			}
-	else
-		for (struct node *cur=originalArea->vpages.rock;cur;cur=cur->next)
-			{
+	else // cloned
+			// Need to lock other area, here, just in case...
+			
+		for (hashIterate hi(vpages);node *cur=hi.get();) {
 			vpage *page=(vpage *)cur;
 			newPage=new (vmBlock->vpagePool->get()) vpage;	
 			newPage->setup(base,page->getBacking(),page->getPhysPage(),protect,inState);// Cloned area has the same physical page and backing store...
 			vpages.add(newPage);
 			base+=PAGE_SIZE;
 			}
+	dump();
 	return B_OK;
 }
 
-status_t area::createAreaMappingFile(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset)
-	{
+status_t area::createAreaMappingFile(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect,int fd,size_t offset) {
 	return createAreaGuts(inName,pageCount,address,type,inState,protect,true,fd,offset);
 	}
 
-status_t area::createArea(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect)
-	{
+status_t area::createArea(char *inName, int pageCount,void **address, addressSpec type,pageState inState,protectType protect) {
 	return createAreaGuts(inName,pageCount,address,type,inState,protect,false,0,0);
 	}
 
-status_t area::cloneArea(area *origArea, char *inName, void **address, addressSpec type,pageState inState,protectType protect)
-	{
-	if (type==CLONE)			
-		{
+status_t area::cloneArea(area *origArea, char *inName, void **address, addressSpec type,pageState inState,protectType protect) {
+	if (type==CLONE)			{
 		*address=(void *)(origArea->getStartAddress());
 		type=EXACT;
 		}
-	if (origArea->getAreaManager()!=manager)
-		{
+	if (origArea->getAreaManager()!=manager) {
 		origArea->getAreaManager()->lock(); // This is just begging for a deadlock...
 		status_t retVal = createAreaGuts(inName,origArea->getPageCount(),address,type,inState,protect,false,0,0,origArea);
 		origArea->getAreaManager()->unlock(); 
@@ -123,14 +116,12 @@ status_t area::cloneArea(area *origArea, char *inName, void **address, addressSp
 		return createAreaGuts(inName,origArea->getPageCount(),address,type,inState,protect,false,0,0,origArea);
 	}
 
-void area::freeArea(void)
-	{
+void area::freeArea(void) {
 //error ("area::freeArea: starting \n");
 
 //	vpages.dump();
 	node *cur;
-	while ((cur=vpages.next())!=NULL)
-		{
+	for (hashIterate hi(vpages);node *cur=hi.get();) {
 //error ("area::freeArea: wasting a page: %x\n",cur);
 		vpage *page=reinterpret_cast<vpage *>(cur);
 		if (finalWrite) 
@@ -144,8 +135,7 @@ void area::freeArea(void)
 //error ("area::freeArea: ending \n");
 	}
 
-status_t area::getInfo(area_info *dest)
-	{
+status_t area::getInfo(area_info *dest) {
 	dest->area=areaID;
 	strcpy(dest->name,name);
 	dest->size=end_address-start_address;
@@ -156,8 +146,7 @@ status_t area::getInfo(area_info *dest)
 	dest->in_count=0;
 	dest->out_count=0;
 	dest->copy_count=0;
-	for (struct node *cur=vpages.rock;cur;cur=cur->next)
-		{
+	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
 		if (page->isMapped())
 			dest->ram_size+=PAGE_SIZE;
@@ -169,40 +158,40 @@ status_t area::getInfo(area_info *dest)
 	return B_OK;
 	}
 
-bool area::contains(void *address)
-	{
+bool area::contains(void *address) {
 	unsigned long base=(unsigned long)(address); 
 //	error ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
 					
 	return ((start_address<=base) && (base<=end_address));
 	}
 
-status_t area::resize(size_t newSize)
-	{
+status_t area::resize(size_t newSize) {
 	size_t oldSize =end_address-start_address;
 	if (newSize==oldSize)
 		return B_OK;
-	if (newSize>oldSize)
-		{
+	if (newSize>oldSize) {
 		int pageCount = (newSize - oldSize + PAGE_SIZE - 1) / PAGE_SIZE;
 		vpage *newPage;
-		for (int i=0;i<pageCount;i++)
-			{
+		for (int i=0;i<pageCount;i++) {
 			newPage=new (vmBlock->vpagePool->get()) vpage;
 			newPage->setup(end_address+PAGE_SIZE*i-1,NULL,NULL,protection,state);
 			vpages.add(newPage);
 			}
 		end_address+=start_address+newSize;
 		}
-	else
-		{
+	else {
 		int pageCount = (oldSize - newSize + PAGE_SIZE - 1) / PAGE_SIZE;
 		vpage *oldPage;
 		struct node *cur;
-		for (int i=0;i<pageCount;i++) // This is probably really slow. Adding an "end" to list would be faster.
-			{
-			for (cur=vpages.rock;cur->next;cur=cur->next); // INTENTIONAL - find the last one;
-			oldPage=(vpage *)cur;
+		for (int i=0;i<pageCount;i++) { // This is probably really slow. OTOH, how often do people shrink their allocations?
+			node *max;
+			void *maxAddress=NULL,*curAddress;
+			for (hashIterate hi(vpages);node *cur=hi.get();) 
+				if ((curAddress=(reinterpret_cast<vpage *>(cur))->getStartAddress()) > maxAddress) {
+					maxAddress=curAddress;
+					max=cur;
+					}
+			oldPage=reinterpret_cast<vpage *>(max);
 			vpages.remove(cur);
 			if (finalWrite) 
 				oldPage->flush(); 
@@ -213,10 +202,8 @@ status_t area::resize(size_t newSize)
 	return B_OK;
 	}
 
-status_t area::setProtection(protectType prot)
-	{
-	for (struct node *cur=vpages.rock;cur;cur=cur->next)
-		{
+status_t area::setProtection(protectType prot) {
+	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
 		page->setProtection(prot);
 		}
@@ -224,21 +211,12 @@ status_t area::setProtection(protectType prot)
 	return B_OK;
 	}
 
-vpage *area::findVPage(unsigned long address)
-	{
-	for (struct node *cur=vpages.rock;cur;cur=cur->next)
-		{
-		vpage *page=(vpage *)cur;
-		//error ("Examining following vpage, looking for address %lx\n",address);
-		//page->dump();
-		if (page->contains(address))
-			return page;
-		}
-	return NULL;
+vpage *area::findVPage(unsigned long address) {
+	vpage findMe(address);
+	return reinterpret_cast <vpage *>(vpages.find(&findMe));
 	}
 
-bool area::fault(void *fault_address, bool writeError) // true = OK, false = panic.
-	{
+bool area::fault(void *fault_address, bool writeError) { // true = OK, false = panic.  
 	vpage *page=findVPage((unsigned long)fault_address);
 	if (page)
 		return page->fault(fault_address,writeError);
@@ -246,8 +224,7 @@ bool area::fault(void *fault_address, bool writeError) // true = OK, false = pan
 		return false;
 	}
 
-char area::getByte(unsigned long address) // This is for testing only
-	{
+char area::getByte(unsigned long address) { // This is for testing only 
 	vpage *page=findVPage(address);
 	if (page)
 		return page->getByte(address,manager);
@@ -255,15 +232,13 @@ char area::getByte(unsigned long address) // This is for testing only
 		return 0;
 	}
 
-void area::setByte(unsigned long address,char value) // This is for testing only
-	{
+void area::setByte(unsigned long address,char value) { // This is for testing only
 	vpage *page=findVPage(address);
 	if (page)
 		page->setByte(address,value,manager);
 	}
 
-int area::getInt(unsigned long address) // This is for testing only
-	{
+int area::getInt(unsigned long address) { // This is for testing only
 	vpage *page=findVPage(address);
 	if (page)
 		return page->getInt(address,manager);
@@ -271,36 +246,30 @@ int area::getInt(unsigned long address) // This is for testing only
 		return 0;
 	}
 
-void area::setInt(unsigned long address,int value) // This is for testing only
-	{
+void area::setInt(unsigned long address,int value) { // This is for testing only
 	vpage *page=findVPage(address);
 	if (page)
 		page->setInt(address,value,manager);
 	}
 
-void area::pager(int desperation)
-	{
-	for (struct node *cur=vpages.rock;cur;cur=cur->next)
-		{
+void area::pager(int desperation) {
+	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
 		page->pager(desperation);
 		}
 	}
 
-void area::saver(void)
-	{
-	for (struct node *cur=vpages.rock;cur;cur=cur->next)
-		{
+void area::saver(void) {
+	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
 		page->saver();
 		}
 	}
 
-void area::dump(void) 
-	{ 
+void area::dump(void) { 
 	error ("area::dump: size = %ld, lock = %d, address = %lx\n",end_address-start_address,state,start_address); 
-	for (struct node *cur=vpages.rock;cur;)
-		{
+	vpages.dump();
+	for (hashIterate hi(vpages);node *cur=hi.get();) {
 		vpage *page=(vpage *)cur;
 		page->dump();
 		cur=cur->next;

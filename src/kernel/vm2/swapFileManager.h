@@ -13,13 +13,18 @@ class swapFileManager {
 	sem_id lockFreeList;
 
 	public:
+		// Constructors and Destructors and related
 	swapFileManager (void);
-	vnode &findNode(void); // Get an unused node
 	void freeVNode(vnode &); // Free a node
+
+		// Mutators
+	vnode &findNode(void); // Get an unused node
 	void write_block(vnode &node,void *loc,unsigned long size);
 	void read_block(vnode &node,void *loc,unsigned long size);
 	void lock() {acquire_sem(lockFreeList);}
 	void unlock() {release_sem(lockFreeList);}
+
+		// Accessors
 	int getFD(void) {return swapFile;}
 };
 #endif

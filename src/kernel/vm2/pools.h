@@ -12,27 +12,21 @@ class poolTYPE
 		list unused;
 		sem_id inUse;
 	public:
-		poolTYPE(void)
-			{
-			inUse = create_sem(1,"TYPEpool");
+		poolTYPE(void) { inUse = create_sem(1,"TYPEpool");
 			}
-		TYPE *get(void)
-			{
+		TYPE *get(void) {
 			TYPE *ret=NULL;
-			if (unused.count())
-				{
+			if (unused.count()) {
 				error ("poolTYPE::get: Getting an unused one!\n");
 				acquire_sem(inUse);
 				ret=(TYPE *)unused.next();
 				release_sem(inUse);
 				}
-			if (ret)
-				{
+			if (ret) {
 				error ("poolTYPE::get: Returning address:%x \n",ret);
 				return ret;
 				}
-			else
-				{
+			else {
 				error ("poolTYPE::get: Getting a new page!\n");
 				page *newPage=vmBlock->pageMan->getPage();
 				if (!newPage)
@@ -46,12 +40,11 @@ class poolTYPE
 				return (get()); // A little cheat - call self again to get the first one from stack...
 				}
 			}
-		void put(TYPE *in)
-			{
+
+		void put(TYPE *in) {
 			acquire_sem(inUse);
 			unused.add(in);
 			release_sem(inUse);
 			}
-
 };
 */

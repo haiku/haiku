@@ -39,18 +39,8 @@ int createFillAndTest(int pages,char *name)
 	}
 	catch (const char *t)
 	{
-		vm.suspendAll();
-		thread_id me=find_thread(NULL);
-		suspend_thread(clone1);
-		suspend_thread(mmap1);
-		suspend_thread(info1);
-		if (loop1!=me)
-			suspend_thread(loop1);
-		if (loop2!=me)
-			suspend_thread(loop2);
-		if (loop3!=me)
-			suspend_thread(loop3);
-		debugger(t);
+		error ("Exception thrown! %s\n",t);
+		exit(1);
 	}
 	catch (...)
 	{
@@ -86,6 +76,11 @@ int32 loopTest(void *parameters)
 		vm.freeArea(area1);
 		snooze(params->loopSnooze);
 		}
+	}
+	catch (const char *t)
+	{
+		error ("Exception thrown! %s\n",t);
+		exit(1);
 	}
 	catch (...)
 	{
@@ -125,6 +120,11 @@ int32 getInfoTest(void *parameters)
 		snooze(params->loopSnooze);
 		}
 	}
+	catch (const char *t)
+	{
+		error ("Exception thrown! %s\n",t);
+		exit(1);
+	}
 	catch (...)
 	{
 		error ("Exception thrown!\n");
@@ -159,6 +159,11 @@ int32 mmapTest (void *parameters)
 		close(fd);
 		error ("Closed file, fd = %d\n",fd);
 		}
+	}
+	catch (const char *t)
+	{
+		error ("Exception thrown! %s\n",t);
+		exit(1);
 	}
 	catch (...)
 	{
@@ -207,9 +212,10 @@ int main(int argc,char **argv)
 	loopTestParameters mmap1Params={"mmap",500000,8192,400000,1000000};
 	loopTestParameters clone1Params={"clone1",200000,2,300000,400000};
 
-	resume_thread(loop1=spawn_thread(loopTest,"area test 1",0,&area1Params));
-	resume_thread(loop2=spawn_thread(loopTest,"area test 2",0,&area2Params));
-	resume_thread(loop3=spawn_thread(loopTest,"area test 3",0,&area3Params));
+	error ("Starting Threads!\n");
+	//resume_thread(loop1=spawn_thread(loopTest,"area test 1",0,&area1Params));
+	//resume_thread(loop2=spawn_thread(loopTest,"area test 2",0,&area2Params));
+	//resume_thread(loop3=spawn_thread(loopTest,"area test 3",0,&area3Params));
 	resume_thread(info1=spawn_thread(getInfoTest,"info test 1",0,&info1Params));
 	//resume_thread(mmap1=spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
 	//resume_thread(clone1=spawn_thread(cloneTest,"clone test 1",0,&clone1Params));

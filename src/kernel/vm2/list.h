@@ -12,14 +12,15 @@ struct node
 
 class list {
 	public:
+		// Constructors and Destructors and related
 		list(void){nodeCount=0;rock=NULL;} 
+
+		// Mutators
 		void add (node *newNode) {
 			newNode->next=rock;
 			rock=newNode;
 			nodeCount++;
 			}
-		//int count(void) {error ("list::count: About to return %d\n",nodeCount);return nodeCount;}
-		int count(void) {return nodeCount;}
 		node *next(void) {
 			//dump();
 			node *n=rock;
@@ -49,11 +50,16 @@ class list {
 			//error ("list::remove ending: \n");
 			//dump();	
 			}
+
+		// Accessors
+		int count(void) {return nodeCount;}
+		node *top(void) {return rock;} // Intentionally non-destructive ; works like peek() on a queue
+
+		// Debugging
 		void dump(void) {
 			for (struct node *cur=rock;cur;cur=cur->next)
 				{ error ("list::dump: At %p, next = %p\n",cur,cur->next); }
 			}
-
 		bool ensureSane (void) {
 			int temp=nodeCount;
 			for (struct node *cur=rock;cur && --temp;cur=cur->next) ; // Intentional to have no body

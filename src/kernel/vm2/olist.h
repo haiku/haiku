@@ -10,27 +10,24 @@ static bool throwException (void *foo, void *bar)
 class orderedList : public list
 {
 	public:
+		// Constructors and Destructors and related
 	orderedList(void) {nodeCount=0;rock=NULL; isLessThan=throwException; }
 	
+		// Mutators
 	void setIsLessThan (bool (*iLT)(void *,void *)) { isLessThan=iLT; }
-
-	void add(node *in)
-		{
+	void add(node *in) {
 		nodeCount++;
 		//error ("orderedList::add starting\n");
-		if (!rock || isLessThan(in,rock))
-			{ // special case - this will be the first one
+		if (!rock || isLessThan(in,rock)) { // special case - this will be the first one
 			//error ("orderedList::specialCase starting\n");
 			in->next=rock;
 			rock=in;
 			}
-		else
-			{
+		else {
 			//error ("orderedList::Normal Case starting\n");
 			bool done=false;
 			for (struct node *cur=rock;cur && !done;cur=cur->next)
-				if (!(cur->next) || isLessThan(in,cur->next))
-					{ // If we have found our niche, *OR* this is the last element, insert here. 
+				if (!(cur->next) || isLessThan(in,cur->next)) { // If we have found our niche, *OR* this is the last element, insert here. 
 					//error ("orderedList::Normal Case Adding Start\n");
 					in->next=cur->next;
 					cur->next=in;
@@ -40,20 +37,15 @@ class orderedList : public list
 			//error ("orderedList::Normal Case ending\n");
 			}
 		}
-
-	void remove(node *toNuke)
-		{
-		if (rock==toNuke)
-			{
+	void remove(node *toNuke) {
+		if (rock==toNuke) {
 			rock=rock->next;
 			nodeCount--;
 			}
-		else
-			{
+		else {
 			bool done=false;
 			for (struct node *cur=rock;!done && (cur->next);cur=cur->next)
-				if (cur->next==toNuke)
-					{
+				if (cur->next==toNuke) {
 					cur->next=toNuke->next;
 					nodeCount--;
 					done=true;
