@@ -477,7 +477,7 @@ static int
 elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 {
 	int res = B_NO_ERROR;
-	int i;
+
 	PRINT(("top of elf_relocate\n"));
 
 	// deal with the rels first
@@ -498,12 +498,13 @@ elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 	}
 
 	if (image->rela) {
-		dprintf("RELA relocations not supported\n");
 #if ELF_TRACE
+		int i;
 		for(i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
 			dprintf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
 		}
 #endif
+		dprintf("RELA relocations not supported\n");
 		return EPERM;
 	}
 	return res;
