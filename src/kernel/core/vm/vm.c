@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -175,6 +175,11 @@ _vm_create_area_struct(vm_address_space *aspace, const char *name, uint32 wiring
 }
 
 
+/**	Finds a reserved area that covers the region spanned by \a start and
+ *	\a size, inserts the \a area into that region and makes sure that
+ *	there are reserved regions for the remaining parts.
+ */
+
 static status_t
 find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area)
 {
@@ -186,7 +191,7 @@ find_reserved_area(vm_virtual_map *map, addr_t start, addr_t size, vm_area *area
 			// this area covers the requested range
 			if (next->id != RESERVED_REGION_ID) {
 				// but it's not reserved space, it's a real area
-				return ERR_VM_NO_REGION_SLOT;
+				return B_BAD_VALUE;
 			}
 
 			break;
@@ -272,7 +277,7 @@ find_and_insert_area_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t
 	if (addressSpec == B_EXACT_ADDRESS) {
 		// search for a reserved area
 		status_t status = find_reserved_area(map, start, size, area);
-		if (status == B_OK || status == ERR_VM_NO_REGION_SLOT)
+		if (status == B_OK || status == B_BAD_VALUE)
 			return status;
 
 		// there was no reserved area, and the slot doesn't seem to be used already
@@ -390,7 +395,7 @@ second_chance:
 	}
 
 	if (!foundspot)
-		return ERR_VM_NO_REGION_SLOT;
+		return addressSpec == B_EXACT_ADDRESS ? B_BAD_VALUE : B_NO_MEMORY;
 
 	area->size = size;
 	if (last) {
@@ -618,6 +623,9 @@ vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, add
 	vm_address_space *addressSpace;
 	vm_area *area;
 	status_t status = B_OK;
+
+	if (size == 0)
+		return B_BAD_VALUE;
 
 	addressSpace = vm_get_aspace_by_id(aid);
 	if (addressSpace == NULL)
