@@ -45,7 +45,7 @@ public:
     ~BitmapStreamTest();
     
 	/* cppunit suite function prototype */    
-    static CppUnit::Test* Suite();    
+    static CppUnit::Test *Suite();    
     
     //actual tests
     void InitializeTest();
@@ -58,10 +58,6 @@ public:
 	void WriteAtTest();
 	void SizeTest();
 private:
-	/** default roster used when performing tests */
-    BTranslatorRoster* roster;
-    
-    /** File to read from */
-    BFile* file;
 };
+
 #endif

@@ -44,17 +44,21 @@
 /**
  * Default constructor - no work
  */
-BitmapStreamTest::BitmapStreamTest(std::string name) : BTestCase(name) {
+BitmapStreamTest::BitmapStreamTest(std::string name)
+	: BTestCase(name)
+{
 }
 
 /**
  * Default destructor - no work
  */
-BitmapStreamTest::~BitmapStreamTest() {
+BitmapStreamTest::~BitmapStreamTest()
+{
 }
 
-CppUnit::Test*
-BitmapStreamTest::Suite() {
+CppUnit::Test *
+BitmapStreamTest::Suite()
+{
 	/* create our suite */
 	CppUnit::TestSuite *suite = new CppUnit::TestSuite("BitmapStream");
 		
@@ -75,82 +79,133 @@ BitmapStreamTest::Suite() {
 /**
  * Initializes the test
  */
-void BitmapStreamTest::InitializeTest() {
-	//aquire default roster
-	NextSubTest();
-	roster = BTranslatorRoster::Default();
-	CPPUNIT_ASSERT(roster != NULL);
+void
+BitmapStreamTest::InitializeTest()
+{
 }
 
 /**
  * Tests:
  * BBitmapStream(BBitmap *map = NULL)
  */
-void BitmapStreamTest::ConstructorTest() {
+void
+BitmapStreamTest::ConstructorTest()
+{
+	//BBitmapStream with a blank bitmap
+	NextSubTest();
+	BBitmapStream streamEmpty;
+	BBitmap *pbits = NULL;
+	CPPUNIT_ASSERT(streamEmpty.Position() == 0);
+	CPPUNIT_ASSERT(streamEmpty.Size() == 0);
+	CPPUNIT_ASSERT(streamEmpty.DetachBitmap(&pbits) == B_ERROR);
+	CPPUNIT_ASSERT(pbits == NULL);
+	
+	//constructor is created with a value in DetachBitmapTest()
 }
 
 /**
  * Tests:
  * status_t DetachBitmap(BBitmap **outMap)
  */
-void BitmapStreamTest::DetachBitmapTest() {
-	BApplication app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
+void
+BitmapStreamTest::DetachBitmapTest()
+{
+	BApplication
+		app("application/x-vnd.OpenBeOS-translationkit_bitmapstreamtest");
 	
 	NextSubTest();
-	BFile file("../src/tests/kits/translation/data/images/image.jpg", B_READ_ONLY);
+	BFile file("../src/tests/kits/translation/data/images/image.jpg",
+		B_READ_ONLY);
 	CPPUNIT_ASSERT(file.InitCheck() == B_OK);
 
+	//translate a file into a BBitmapStream
 	NextSubTest();
-	BBitmapStream stream;
-	BBitmap* result = NULL;
-	roster = BTranslatorRoster::Default();
-	CPPUNIT_ASSERT(roster->Translate(&file, NULL, NULL, &stream, B_TRANSLATOR_BITMAP) == B_OK);
-	CPPUNIT_ASSERT(stream.DetachBitmap(&result) == B_NO_ERROR);
+	BBitmapStream *pstream = new BBitmapStream;
+	BBitmap *pbits = NULL;
+	BTranslatorRoster *proster = BTranslatorRoster::Default();
+	CPPUNIT_ASSERT(proster->Translate(&file, NULL, NULL, pstream,
+		B_TRANSLATOR_BITMAP) == B_OK);
+	CPPUNIT_ASSERT(pstream->DetachBitmap(&pbits) == B_NO_ERROR);
+	CPPUNIT_ASSERT(pbits);
+	CPPUNIT_ASSERT(pbits->IsValid());
 	
-	CPPUNIT_ASSERT(result != NULL);
-	if(result != NULL) {
-		delete result;
-	}
+	//B_BAD_VALUE
+	NextSubTest();
+	CPPUNIT_ASSERT(pstream->DetachBitmap(NULL) == B_BAD_VALUE);
+	
+	//make sure that deleting the stream
+	//does not destroy the detached BBitmap
+	NextSubTest();
+	delete pstream;
+	pstream = NULL;
+	CPPUNIT_ASSERT(pbits->IsValid());
+	
+	//create a new stream using the BBitmap
+	//created by the first stream
+	NextSubTest();
+	BBitmapStream *pfullstream = new BBitmapStream(pbits);
+	CPPUNIT_ASSERT(pfullstream->Position() == 0);
+	CPPUNIT_ASSERT(pfullstream->Size() ==
+		pbits->BitsLength() + sizeof(TranslatorBitmap));
+		
+	//deleting pfullstream should also destroy
+	//the bitmap attached to it (pbits)
+	NextSubTest();
+	delete pfullstream;
+	pfullstream = NULL;
+	CPPUNIT_ASSERT(pbits->BitsLength() == 0);
 }
 
 /**
  * Tests:
  * off_t Position() const
  */
-void BitmapStreamTest::PositionTest() {
+void
+BitmapStreamTest::PositionTest()
+{
 }
 
 /**
  * Tests:
  * ssize_t ReadAt(off_t pos, void *buffer, size_t *size)
  */
-void BitmapStreamTest::ReadAtTest() {
+void
+BitmapStreamTest::ReadAtTest()
+{
 }
 
 /**
  * Tests:
  * off_t Seek(off_t position, uint32 whence)
  */
-void BitmapStreamTest::SeekTest() {
+void
+BitmapStreamTest::SeekTest()
+{
 }
 
 /**
  * Tests:
  * status_t SetSize(off_t size) const
  */
-void BitmapStreamTest::SetSizeTest() {
+void
+BitmapStreamTest::SetSizeTest()
+{
 }
 
 /**
  * Tests:
  * ssize_t WriteAt(off_t pos, const void *data, size_t *size)
  */
-void BitmapStreamTest::WriteAtTest() {
+void
+BitmapStreamTest::WriteAtTest()
+{
 }
 
 /**
  * Tests:
  * off_t Size() const
  */
-void BitmapStreamTest::SizeTest() {
+void
+BitmapStreamTest::SizeTest()
+{
 }
