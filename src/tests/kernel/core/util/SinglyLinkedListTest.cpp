@@ -63,9 +63,11 @@ SinglyLinkedListTest::TestList(List &list, typename List::ValueType *values, int
 		CHK(list.Count() == i+1);
 	}
 	
+{
 	// Prefix increment
 	int preIndex = valueCount-1;
-	for (typename List::Iterator iterator = list.Begin(); iterator != list.End(); --preIndex) {
+	typename List::Iterator iterator;
+	for (iterator = list.Begin(); iterator != list.End(); --preIndex) {
 		NextSubTest();
 // 		printf("(%p, %ld) %s (%p, %ld)\n", iterator->next, iterator->data, ((*iterator == values[preIndex]) ? "==" : "!="), values[preIndex].next, values[preIndex].data);
 		CHK(*iterator == values[preIndex]);
@@ -74,7 +76,7 @@ SinglyLinkedListTest::TestList(List &list, typename List::ValueType *values, int
 		CHK(copy != ++iterator);
 	}
 	CHK(preIndex == -1);
-	
+}	
 	list.MakeEmpty();	
 
 	// PushBack
@@ -102,7 +104,7 @@ SinglyLinkedListTest::TestList(List &list, typename List::ValueType *values, int
 //! Test using the User strategy with the default NextMember.
 void
 SinglyLinkedListTest::UserDefaultTest() {
-	SinglyLinkedList<User<Link> > list;
+	SinglyLinkedList<Link, User<Link> > list;
 	const int valueCount = 10;
 	Link values[valueCount];
 	for (int i = 0; i < valueCount; i++) {
@@ -117,7 +119,7 @@ SinglyLinkedListTest::UserDefaultTest() {
 //! Test using the User strategy with a custom NextMember.
 void
 SinglyLinkedListTest::UserCustomTest() {
-	SinglyLinkedList<User<MyLink, &MyLink::mynext> > list;
+	SinglyLinkedList<MyLink, User<MyLink, &MyLink::mynext> > list;
 	const int valueCount = 10;
 	MyLink values[valueCount];
 	for (int i = 0; i < valueCount; i++) {
@@ -132,7 +134,7 @@ SinglyLinkedListTest::UserCustomTest() {
 //! Test using the Auto strategy.
 void
 SinglyLinkedListTest::AutoTest() {
-	SinglyLinkedList<Auto<long> > list;
+	SinglyLinkedList<long> list;
 	const int valueCount = 10;
 	long values[valueCount];
 	for (int i = 0; i < valueCount; i++) {

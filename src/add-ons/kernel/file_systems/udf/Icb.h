@@ -116,7 +116,7 @@ private:
 	CachedBlock fData;
 	status_t fInitStatus;
 	vnode_id fId;
-	SinglyLinkedList<Strategy::SinglyLinkedList::Auto<DirectoryIterator*> > fIteratorList;
+	SinglyLinkedList<DirectoryIterator*> fIteratorList;
 	FileEntry<udf_file_icb_entry> fFileEntry;
 	FileEntry<udf_extended_file_icb_entry> fExtendedEntry;	
 };
