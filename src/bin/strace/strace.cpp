@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 #include <map>
 #include <string>
@@ -63,6 +64,8 @@ static const char *kUsage =
 "  -T             - Trace all threads of the supplied or loaded executable's\n"
 "                   team. If an ID is supplied, it is interpreted as a team\n"
 "                   ID.\n"
+"  -o <file>      - directs output into the specified file.\n"
+"  -S             - prints output to serial debug line.\n"
 ;
 
 // terminal color escape sequences
@@ -298,22 +301,40 @@ init_syscalls()
 	}
 }
 
+// print_to_string
+static
+void
+print_to_string(char **_buffer, int32 *_length, const char *format, ...)
+{
+	va_list list;
+	va_start(list, format);
+	ssize_t length = vsnprintf(*_buffer, *_length, format, list);
+	va_end(list);
+
+	*_buffer += length;
+	*_length -= length;
+}
+
 // print_syscall
 static
 void
-print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
-	bool printArguments, bool getContents, bool printReturnValue,
-	bool colorize)
+print_syscall(FILE *outputFile, debug_post_syscall &message,
+	MemoryReader &memoryReader, bool printArguments, bool getContents,
+	bool printReturnValue, bool colorize)
 {
+	char buffer[4096], *string = buffer;
+	int32 length = (int32)sizeof(buffer);
 	int32 syscallNumber = message.syscall;
 	Syscall *syscall = sSyscallVector[syscallNumber];
 
 	// print syscall name
 	if (colorize) {
-		printf("[%6ld] %s%s%s(", message.origin.thread, kTerminalTextRed,
-			syscall->Name().c_str(), kTerminalTextNormal);
+		print_to_string(&string, &length, "[%6ld] %s%s%s(",
+			message.origin.thread, kTerminalTextRed, syscall->Name().c_str(),
+			kTerminalTextNormal);
 	} else {
-		printf("[%6ld] %s(", message.origin.thread, syscall->Name().c_str());
+		print_to_string(&string, &length, "[%6ld] %s(",
+			message.origin.thread, syscall->Name().c_str());
 	}
 
 	// print arguments
@@ -323,40 +344,42 @@ print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
 			// get the value
 			Parameter *parameter = syscall->ParameterAt(i);
 			TypeHandler *handler = parameter->Handler();
-			string value = handler->GetParameterValue(
+			::string value = handler->GetParameterValue(
 				(char*)message.args + parameter->Offset(), getContents,
 				memoryReader);
 
-			printf((i > 0 ? ", %s" : "%s"), value.c_str());
+			print_to_string(&string, &length, (i > 0 ? ", %s" : "%s"),
+				value.c_str());
 		}
 	}
 
-	printf(")");
+	print_to_string(&string, &length, ")");
 
 	// print return value
 	if (printReturnValue) {
 		Type *returnType = syscall->ReturnType();
 		TypeHandler *handler = returnType->Handler();
-		string value = handler->GetReturnValue(message.return_value,
+		::string value = handler->GetReturnValue(message.return_value,
 			getContents, memoryReader);
 		if (value.length() > 0) {
-			printf(" = %s", value.c_str());
+			print_to_string(&string, &length, " = %s", value.c_str());
 
 			// if the return type is status_t or ssize_t, print human-readable
 			// error codes
 			if (returnType->TypeName() == "status_t"
 				|| returnType->TypeName() == "ssize_t"
 					&& message.return_value < 0) {
-				printf(" %s", strerror(message.return_value));
+				print_to_string(&string, &length, " %s", strerror(message.return_value));
 			}
 		}
 	}
 
 	if (colorize) {
-		printf(" %s(%lld us)%s\n", kTerminalTextMagenta,
+		print_to_string(&string, &length, " %s(%lld us)%s\n", kTerminalTextMagenta,
 			message.end_time - message.start_time, kTerminalTextNormal);
 	} else {
-		printf(" (%lld us)\n", message.end_time - message.start_time);
+		print_to_string(&string, &length, " (%lld us)\n",
+			message.end_time - message.start_time);
 	}
 
 //for (int32 i = 0; i < 16; i++) {
@@ -370,6 +393,11 @@ print_syscall(debug_post_syscall &message, MemoryReader &memoryReader,
 //}
 //printf("\n");
 
+	// output either to file or serial debug line
+	if (outputFile != NULL)
+		fwrite(buffer, sizeof(buffer) - length, 1, outputFile);
+	else
+		_kern_debug_output(buffer);
 }
 
 
@@ -390,11 +418,14 @@ main(int argc, const char *const *argv)
 	bool printReturnValues = true;
 	bool traceChildThreads = false;
 	bool traceTeam = false;
+	bool serialOutput = false;
+	FILE *outputFile = stdout;
 
 	// parse arguments
 	for (int argi = 1; argi < argc; argi++) {
 		const char *arg = argv[argi];
 		if (arg[0] == '-') {
+			// ToDo: improve option parsing so that ie. "-rsf" would also work
 			if (strcmp(arg, "-h") == 0 || strcmp(arg, "--help") == 0) {
 				print_usage_and_exit(false);
 			} else if (strcmp(arg, "-a") == 0) {
@@ -411,6 +442,28 @@ main(int argc, const char *const *argv)
 				traceChildThreads = true;
 			} else if (strcmp(arg, "-T") == 0) {
 				traceTeam = true;
+			} else if (strcmp(arg, "-S") == 0) {
+				serialOutput = true;
+				outputFile = NULL;
+			} else if (strncmp(arg, "-o", 2) == 0) {
+				// read filename
+				const char *filename = NULL;
+				if (arg[2] == '=') {
+					// name follows
+					filename = arg + 3;
+				} else if (arg[2] == '\0'
+					&& argi + 1 < argc && argv[argi + 1][0] != '-') {
+					// next arg is name
+					filename = argv[++argi];
+				} else
+					print_usage_and_exit(true);
+
+				outputFile = fopen(filename, "w+");
+				if (outputFile == NULL) {
+					fprintf(stderr, "Could not open `%s': %s\n", filename,
+						strerror(errno));
+					exit(1);
+				}
 			} else {
 				print_usage_and_exit(true);
 			}
@@ -429,7 +482,10 @@ main(int argc, const char *const *argv)
 	init_syscalls();
 
 	// don't colorize the output, if we don't have a terminal
-	colorize = colorize && isatty(STDOUT_FILENO);
+	if (outputFile == stdout)
+		colorize = colorize && isatty(STDOUT_FILENO);
+	else if (outputFile)
+		colorize = false;
 
 	// get thread/team to be debugged
 	thread_id thread = -1;
@@ -512,7 +568,7 @@ main(int argc, const char *const *argv)
 		switch (code) {
 			case B_DEBUGGER_MESSAGE_POST_SYSCALL:
 			{
-				print_syscall(message.post_syscall, memoryReader,
+				print_syscall(outputFile, message.post_syscall, memoryReader,
 					printArguments, !fastMode, printReturnValues, colorize);
 
 				break;
@@ -543,6 +599,9 @@ main(int argc, const char *const *argv)
 		if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
 			continue_thread(message.origin.nub_port, message.origin.thread);
 	}
-	
+
+	if (outputFile != NULL && outputFile != stdout)
+		fclose(outputFile);
+
 	return 0;
 }
