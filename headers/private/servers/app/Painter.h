@@ -5,6 +5,8 @@
 
 #include <Font.h>
 #include <Rect.h>
+#include <FontServer.h>
+#include <ServerFont.h>
 
 #include "defines.h"
 #include "forwarding_pixfmt.h"
@@ -205,15 +207,6 @@ class Painter {
 												uint32 length,
 												const BPoint& baseLine) const;
 
-			// MISSING (?):
-/*
-
-
-								// "screen blits"
-			void				CopyBits(		BRect src, BRect dst);
-*/
-
-
  private:
 			void				_MakeEmpty();
 
@@ -228,7 +221,7 @@ class Painter {
 
 			void				_RebuildClipping();
 
-			void				_UpdateFont(const char* pathToFontFile = NULL);
+			void				_UpdateFont();
 			void				_UpdateLineWidth();
 
 								// drawing functions stroke/fill
@@ -306,7 +299,7 @@ class Painter {
 	BPoint						fPenLocation;
 	PatternHandler*				fPatternHandler;
 
-	BFont						fFont;
+	ServerFont					fFont;
 	// a class handling rendering and caching of glyphs
 	// it is setup to load from a specific Freetype supported
 	// font file, it uses the FontManager to locate a file

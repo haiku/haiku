@@ -5,6 +5,7 @@
 
 #include <Entry.h>
 #include <Path.h>
+#include <ServerFont.h>
 
 #include "FontManager.h"
 
@@ -108,7 +109,7 @@ TextRenderer::SetTo(const TextRenderer* other)
 	fAdvanceScale = other->fAdvanceScale;
 	fLineSpacingScale = other->fLineSpacingScale;
 
-	SetFont(other->fFontFilePath);
+	strcpy(fFontFilePath, other->fFontFilePath);
 
 	Update();
 }
@@ -148,26 +149,23 @@ TextRenderer::Archive(BMessage* into, bool deep) const
 bool
 TextRenderer::SetFontRef(const entry_ref* ref)
 {
-//printf("TextRenderer::SetFontRef(%s)\n", ref ? ref->name : "no ref!");
+	// TODO: Remove this, as we do font loading in FontServer
+	/*printf("TextRenderer::SetFontRef(%s)\n", ref ? ref->name : "no ref!");
 	if (ref) {
 		BPath path(ref);
 		if (path.InitCheck() >= B_OK)
 			return SetFont(path.Path());
-	}
+		return true;
+	}*/
 	return false;
 }
 
 // SetFont
 bool
-TextRenderer::SetFont(const char* pathToFontFile)
+TextRenderer::SetFont(const ServerFont &font)
 {
-//printf("TextRenderer::SetFont(%s)\n", pathToFontFile ? pathToFontFile : "no path!");
-	if (pathToFontFile) {
-		sprintf(fFontFilePath, "%s", pathToFontFile);
-//printf("font: %s\n", fFontFilePath);
-		return true;
-	}
-	return false;
+	sprintf(fFontFilePath, "%s", font.GetPath());
+	return true;
 }
 
 // Unset

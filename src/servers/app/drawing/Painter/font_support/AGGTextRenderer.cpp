@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <FontServer.h>
 #include <Bitmap.h>
 #include <ByteOrder.h>
 #include <Entry.h>
@@ -45,7 +46,7 @@ rect_to_int(BRect r,
 // constructor
 AGGTextRenderer::AGGTextRenderer()
 	: TextRenderer(),
-	  fFontEngine(),
+	  fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
 	  fContour(fCurves)
@@ -57,7 +58,7 @@ AGGTextRenderer::AGGTextRenderer()
 
 AGGTextRenderer::AGGTextRenderer(BMessage* archive)
 	: TextRenderer(archive),
-	  fFontEngine(),
+	  fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
 	  fContour(fCurves)
@@ -66,15 +67,12 @@ AGGTextRenderer::AGGTextRenderer(BMessage* archive)
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
 	fFontEngine.flip_y(true);
-
-	if (fFontFilePath)
-		SetFont(fFontFilePath);
 }
 
 // constructor
 AGGTextRenderer::AGGTextRenderer(const AGGTextRenderer& from)
 	: TextRenderer(from),
-	  fFontEngine(),
+	  fFontEngine(ftlib),
 	  fFontManager(fFontEngine),
 	  fCurves(fFontManager.path_adaptor()),
 	  fContour(fCurves)
@@ -82,9 +80,6 @@ AGGTextRenderer::AGGTextRenderer(const AGGTextRenderer& from)
 	fCurves.approximation_scale(2.0);
 	fContour.auto_detect_orientation(false);
 	fFontEngine.flip_y(true);
-
-	if (fFontFilePath)
-		SetFont(fFontFilePath);
 }
 
 // destructor
@@ -116,17 +111,13 @@ AGGTextRenderer::Archive(BMessage* into, bool deep) const
 
 // SetFont
 bool
-AGGTextRenderer::SetFont(const char* pathToFontFile)
+AGGTextRenderer::SetFont(const ServerFont &font)
 {
-	if (pathToFontFile) {
-		if (fFontEngine.load_font(pathToFontFile, 0, agg::glyph_ren_outline)) {
-//		if (fFontEngine.load_font(pathToFontFile, 0, agg::glyph_ren_native_gray8)) {			
-
-			return TextRenderer::SetFont(pathToFontFile);
-		} else {
-			fprintf(stderr, "%s : is not a font file or could not be opened\n",
-					pathToFontFile);
-		}
+//	if (fFontEngine.load_font(font, agg::glyph_ren_native_gray8)) {			
+	if (fFontEngine.load_font(font, agg::glyph_ren_outline)) {
+		return TextRenderer::SetFont(font);
+	} else {
+		fprintf(stderr, "font could not be loaded\n");
 	}
 	return false;
 }

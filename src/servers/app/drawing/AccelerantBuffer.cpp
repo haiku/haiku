@@ -76,8 +76,9 @@ AccelerantBuffer::Bits() const
 	if (InitCheck() != B_OK)
 		return NULL;
 	
-	if (fFrameBufferConfig.frame_buffer_dma)
-		return fFrameBufferConfig.frame_buffer_dma;
+	// TODO: Enable this if we can ensure that frame_buffer_dma is valid
+	/*if (fFrameBufferConfig.frame_buffer_dma)
+		return fFrameBufferConfig.frame_buffer_dma;*/
 	
 	return fFrameBufferConfig.frame_buffer;
 }

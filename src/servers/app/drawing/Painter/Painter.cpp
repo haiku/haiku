@@ -62,10 +62,12 @@ Painter::Painter()
 	  fAlphaFncMode(B_ALPHA_OVERLAY),
 	  fPenLocation(0.0, 0.0),
 	  fPatternHandler(new PatternHandler()),
-	  fFont(be_plain_font),
 	  fTextRenderer(new AGGTextRenderer()),
 	  fLastFamilyAndStyle(0)
 {
+	if (fontserver)
+		fFont = *fontserver->GetSystemPlain();
+	
 	_UpdateFont();
 	_UpdateLineWidth();
 }
@@ -262,7 +264,12 @@ Painter::SetPenLocation(const BPoint& location)
 void
 Painter::SetFont(const BFont& font)
 {
-	fFont = font;
+	//fFont.SetFamilyAndStyle(font.GetFamily(), font.GetStyle());
+	fFont.SetSpacing(font.Spacing());
+	fFont.SetShear(font.Shear());
+	fFont.SetRotation(font.Rotation());
+	fFont.SetSize(font.Size());
+	
 	_UpdateFont();
 }
 
@@ -270,18 +277,8 @@ Painter::SetFont(const BFont& font)
 void
 Painter::SetFont(const ServerFont& font)
 {
-	// NOTE: this is just a transitional function
-	// to help integrate Painter with app_server later
-	fFont.SetFamilyAndStyle(font.GetFamily(), font.GetStyle());
-	fFont.SetSpacing(font.Spacing());
-	fFont.SetShear(font.Shear());
-	fFont.SetRotation(font.Rotation());
-	fFont.SetSize(font.Size());
-
-	if (fLastFamilyAndStyle != font.GetFamilyAndStyle()) {
-		fLastFamilyAndStyle = font.GetFamilyAndStyle();
-		_UpdateFont(font.GetPath());
-	}
+	fFont = font;
+	_UpdateFont();
 }
 
 // #pragma mark -
@@ -1052,27 +1049,17 @@ Painter::_RebuildClipping()
 
 // _UpdateFont
 void
-Painter::_UpdateFont(const char* pathToFontFile)
+Painter::_UpdateFont()
 {
-	bool success = false;
-	if (pathToFontFile) {
-		success = fTextRenderer->SetFont(pathToFontFile);
+	if (fLastFamilyAndStyle != fFont.GetFamilyAndStyle()) {
+		fLastFamilyAndStyle = fFont.GetFamilyAndStyle();
+		
+		bool success = false;
+		success = fTextRenderer->SetFont(fFont);
 		if (!success)
-			fprintf(stderr, "unable to set '%s'\n", pathToFontFile);
-	} else {
-		font_family family;
-		font_style style;
-		fFont.GetFamilyAndStyle(&family, &style);
+			fprintf(stderr, "unable to set font\n");
+	}
 	
-		success = fTextRenderer->SetFamilyAndStyle(family, style);
-		if (!success)
-			fprintf(stderr, "unable to set '%s' + '%s'\n", family, style);
-	}
-	if (!success) {
-		fprintf(stderr, "font is still: '%s' + '%s'\n",
-						fTextRenderer->Family(), fTextRenderer->Style());
-	}
-
 	fTextRenderer->SetPointSize(fFont.Size());
 }
 

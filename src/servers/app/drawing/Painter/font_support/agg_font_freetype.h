@@ -34,6 +34,8 @@
 #include "agg_trans_affine.h"
 #include "agg_font_cache_manager.h"
 
+class ServerFont;
+
 namespace agg
 {
 
@@ -50,12 +52,12 @@ namespace agg
 
         //--------------------------------------------------------------------
         ~font_engine_freetype_base();
-        font_engine_freetype_base(bool flag32, unsigned max_faces = 32);
+        font_engine_freetype_base(bool flag32, FT_Library library, unsigned max_faces = 32);
 
         // Set font parameters
         //--------------------------------------------------------------------
         void resolution(unsigned dpi);
-        bool load_font(const char* font_name, unsigned face_index, glyph_rendering ren_type);
+        bool load_font(const ServerFont &font, glyph_rendering ren_type);
         bool attach(const char* file_name);
         bool char_map(FT_Encoding map);
         bool height(double h);
@@ -76,7 +78,7 @@ namespace agg
         //--------------------------------------------------------------------
         int         last_error()   const { return m_last_error; }
         unsigned    resolution()   const { return m_resolution; }
-        const char* name()         const { return m_name;       }
+        unsigned    cur_id()       const { return m_cur_id;     }
         unsigned    num_faces()    const;
         FT_Encoding char_map()     const { return m_char_map;   }
         double      height()       const { return double(m_height) / 64.0; }
@@ -108,13 +110,12 @@ namespace agg
         void update_char_size();
         void update_signature();
         void update_transform();
-        int  find_face(const char* face_name) const;
+        int  find_face(unsigned face_id) const;
 
         bool            m_flag32;
         int             m_change_stamp;
         int             m_last_error;
-        char*           m_name;
-        unsigned        m_name_len;
+        unsigned        m_cur_id;
         unsigned        m_face_index;
         FT_Encoding     m_char_map;
         char*           m_signature;
@@ -126,7 +127,7 @@ namespace agg
         bool            m_library_initialized;
         FT_Library      m_library;    // handle to library    
         FT_Face*        m_faces;      // A pool of font faces
-        char**          m_face_names; 
+        unsigned*       m_face_ids; 
         unsigned        m_num_faces;
         unsigned        m_max_faces;
         FT_Face         m_cur_face;  // handle to the current face object
@@ -167,8 +168,8 @@ namespace agg
         typedef font_engine_freetype_base::scanlines_aa_type  scanlines_aa_type;
         typedef font_engine_freetype_base::scanlines_bin_type scanlines_bin_type;
 
-        font_engine_freetype_int16(unsigned max_faces = 32) : 
-            font_engine_freetype_base(false, max_faces) {}
+        font_engine_freetype_int16(FT_Library library, unsigned max_faces = 32) : 
+            font_engine_freetype_base(false, library, max_faces) {}
     };
 
     //------------------------------------------------font_engine_freetype_int32
@@ -185,8 +186,8 @@ namespace agg
         typedef font_engine_freetype_base::scanlines_aa_type  scanlines_aa_type;
         typedef font_engine_freetype_base::scanlines_bin_type scanlines_bin_type;
 
-        font_engine_freetype_int32(unsigned max_faces = 32) : 
-            font_engine_freetype_base(true, max_faces) {}
+        font_engine_freetype_int32(FT_Library library, unsigned max_faces = 32) : 
+            font_engine_freetype_base(true, library, max_faces) {}
     };
 
 

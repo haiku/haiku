@@ -11,6 +11,8 @@
 
 #include "TextRenderer.h"
 
+class ServerFont;
+
 class AGGTextRenderer : public TextRenderer {
  public:
 								AGGTextRenderer();
@@ -22,7 +24,7 @@ class AGGTextRenderer : public TextRenderer {
 
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 
-	virtual	bool				SetFont(const char* pathToFontFile);
+	virtual	bool				SetFont(const ServerFont &font);
 	virtual	void				Unset();
 
 	virtual	const char*			Family() const;

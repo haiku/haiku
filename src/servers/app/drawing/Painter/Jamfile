@@ -14,8 +14,10 @@ StaticLibrary painter :
 	drawing_modes/DrawingModeFactory.cpp
 
 	# is contained within libagg.a,
-	# but we might need a modified version later
-	# font_support/agg_font_freetype.cpp
+	# but we need a modified version that
+	# uses the FontServer
+	font_support/agg_font_freetype.cpp
+	
 	font_support/AGGTextRenderer.cpp
 	font_support/FontManager.cpp
 	font_support/TextRenderer.cpp

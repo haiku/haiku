@@ -241,8 +241,9 @@ AccelerantHWInterface::SetupDefaultHooks()
 	
 	if (!fAccAcquireEngine || !fAccReleaseEngine || !fAccGetFrameBufferConfig
 		|| !fAccGetModeCount || !fAccGetModeList || !fAccSetDisplayMode
-		|| !fAccGetPixelClockLimits)
+		|| !fAccGetPixelClockLimits) {
 		return B_ERROR;
+	}
 	
 	// optional
 	fAccGetTimingConstraints = (get_timing_constraints)fAccelerantHook(B_GET_TIMING_CONSTRAINTS, NULL);
@@ -331,7 +332,7 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 		// NOTE: backbuffer is always B_RGBA32, this simplifies the
 		// drawing backend implementation tremendously for the time
 		// being. The color space conversion is handled in CopyBackToFront()
-		BRect bounds(0, 0, fDisplayMode.virtual_width, fDisplayMode.virtual_height);
+		BRect bounds(0, 0, fDisplayMode.virtual_width - 1, fDisplayMode.virtual_height - 1);
 		BBitmap *backBitmap = new BBitmap(bounds, 0, B_RGBA32);
 		
 		delete fBackBuffer;
@@ -504,6 +505,9 @@ AccelerantHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
 RenderingBuffer *
 AccelerantHWInterface::FrontBuffer() const
 {
+	if (!fModeList)
+		return NULL;
+	
 	return fFrontBuffer;
 }
 
@@ -511,6 +515,9 @@ AccelerantHWInterface::FrontBuffer() const
 RenderingBuffer *
 AccelerantHWInterface::BackBuffer() const
 {
+	if (!fModeList)
+		return NULL;
+	
 	return fBackBuffer;
 }
 

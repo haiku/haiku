@@ -8,6 +8,7 @@
 struct entry_ref;
 
 class BBitmap;
+class ServerFont;
 
 class TextRenderer : public BArchivable {
  public:
@@ -21,7 +22,7 @@ class TextRenderer : public BArchivable {
 	virtual	status_t			Archive(BMessage* into, bool deep = true) const;
 
 			bool				SetFontRef(const entry_ref* ref);
-	virtual	bool				SetFont(const char* pathToFontFile);
+	virtual	bool				SetFont(const ServerFont &font);
 	virtual	void				Unset();
 
 			bool				SetFamilyAndStyle(const char* family,
