@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <syscalls.h>
@@ -47,6 +47,18 @@ add_fork_hook(fork_hook **_hooks, fork_hook **_lastHook, void (*function)(void))
 			*_lastHook = hook;
 		} else {
 			// any other item
+#if 0
+			if (*_lastHook == NULL) {
+				// search for last hook (need if an item was added to the beginning only --
+				// this can only be the case if this function is called directly, though)
+				fork_hook *last = *_hooks;
+				while (last->next)
+					last = last->next;
+
+				*_lastHook = last;
+			}
+#endif
+
 			(*_lastHook)->next = hook;
 			*_lastHook = hook;
 		}
