@@ -8,9 +8,7 @@
 #include <ktypes.h>
 #include <defines.h>
 #include <sys/resource.h>
-#include <vfs_types.h>
-#include <vm_types.h>
-#include <thread_types.h>
+#include <vfs.h>
 #include <OS.h>
 #include <image.h>
 #include <sys/stat.h>
@@ -70,16 +68,16 @@ int sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
 bigtime_t sys_set_alarm(bigtime_t time, uint32 mode);
 
 // image functions
-image_id sys_register_image(image_info *info, size_t size);
-status_t sys_unregister_image(image_id id);
-status_t sys_get_image_info(image_id id, image_info *info, size_t size);
-status_t sys_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
+image_id _kern_register_image(image_info *info, size_t size);
+status_t _kern_unregister_image(image_id id);
+status_t _kern_get_image_info(image_id id, image_info *info, size_t size);
+status_t _kern_get_next_image_info(team_id team, int32 *cookie, image_info *info, size_t size);
 
 // node monitor functions
-status_t sys_stop_notifying(port_id port, uint32 token);
-status_t sys_start_watching(dev_t device, ino_t node, uint32 flags,
+status_t _kern_stop_notifying(port_id port, uint32 token);
+status_t _kern_start_watching(dev_t device, ino_t node, uint32 flags,
 			port_id port, uint32 token);
-status_t sys_stop_watching(dev_t device, ino_t node, uint32 flags,
+status_t _kern_stop_watching(dev_t device, ino_t node, uint32 flags,
 			port_id port, uint32 token);
 
 // time functions
