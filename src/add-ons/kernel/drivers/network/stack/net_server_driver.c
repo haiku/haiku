@@ -39,7 +39,7 @@ extern void notify_select_event(selectsync * sync, uint32 ref);
 // Debug output
 //*****************************************************/
 
-#define DEBUG_PREFIX "net_driver: "
+#define DEBUG_PREFIX "net_server_driver: "
 #define __out dprintf
 
 #define DEBUG 1
@@ -138,7 +138,7 @@ static status_t execute_command(net_stack_cookie *nsc, int32 op, void *data, uin
  */
 
 const char * g_device_names_list[] = {
-        NET_STACK_DRIVER_DEV,
+        "net/server",
         NULL
 };
 
