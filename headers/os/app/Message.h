@@ -21,6 +21,7 @@
 //
 //	File Name:		Message.h
 //	Author(s):		Erik Jaesler (erik@cgsoftware.com)
+//					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	BMessage class creates objects that store data and that
 //					can be processed in a message loop.  BMessage objects
 //					are also used as data containers by the archiving and 
@@ -348,7 +349,6 @@ virtual	void		_ReservedMessage3();
 								BMessage *reply,
 								bigtime_t send_timeout,
 								bigtime_t reply_timeout) const;
-
 		enum		{ sNumReplyPorts = 3 };
 static	port_id		sReplyPorts[sNumReplyPorts];
 static	long		sReplyPortInUse[sNumReplyPorts];
@@ -378,6 +378,9 @@ static	BBlockCache	*sMsgCache;
 			char	fData[1];
 		};
 
+		entry_hdr 	*entry_find(const char *name, uint32 type,status_t *result=NULL) const;
+		void 		entry_remove(entry_hdr *entry);
+		
 		void		*da_create(int32 header_size, int32 chunk_size,
 								bool fixed, int32 nchunks);
 		status_t	da_add_data(dyn_array **da, const void *data, int32 size);
@@ -407,6 +410,9 @@ static	BBlockCache	*sMsgCache;
 		int32		da_total_size(dyn_array *da) const
 						{ return (int32)sizeof(dyn_array) + da->fEntryHdrSize +
 											da->fPhysicalBytes; }
+		int32		da_total_logical_size(dyn_array *da) const
+						{ return (int32)sizeof(dyn_array) + da->fEntryHdrSize +
+											da->fLogicalBytes; }
 		char		*da_start_of_data(dyn_array *da) const
 						{ return ((char *) da) + (sizeof(dyn_array) +
 											da->fEntryHdrSize); }
