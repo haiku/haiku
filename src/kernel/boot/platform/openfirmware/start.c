@@ -5,7 +5,9 @@
 
 
 #include <SupportDefs.h>
+#include <boot/stage2.h>
 #include <boot/heap.h>
+#include <platform_arch.h>
 
 #include <string.h>
 
@@ -13,9 +15,11 @@
 #include "console.h"
 
 
+#define HEAP_SIZE 32768
+
+
 void _start(uint32 _unused1, uint32 _unused2, void *openFirmwareEntry);
 void start(void *openFirmwareEntry);
-int main(stage2_args *args);
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -59,10 +63,15 @@ _start(uint32 _unused1, uint32 _unused3, void *openFirmwareEntry)
 void
 start(void *openFirmwareEntry)
 {
+	// stage2 args - might be set via the command line one day
+	stage2_args args;
+	args.heap_size = HEAP_SIZE;
+
 	of_init(openFirmwareEntry);
 	console_init();
+	//arch_mmu_init();
 
-	main(NULL);
+	main(&args);
 		// if everything wents fine, main() never returns
 
 	of_exit();
