@@ -80,11 +80,11 @@ struct Elf32_Shdr {
 
 struct Elf32_Phdr {
 	Elf32_Word		p_type;
-	Elf32_Off		p_offset;
-	Elf32_Addr		p_vaddr;
+	Elf32_Off		p_offset;	/* offset from the beginning of the file of the segment */
+	Elf32_Addr		p_vaddr;	/* virtual address for the segment in memory */
 	Elf32_Addr		p_paddr;
-	Elf32_Word		p_filesz;
-	Elf32_Word		p_memsz;
+	Elf32_Word		p_filesz;	/* the size of the segment in the file */
+	Elf32_Word		p_memsz;	/* the size of the segment in memory */
 	Elf32_Word		p_flags;
 	Elf32_Word		p_align;
 } ;
