@@ -77,6 +77,7 @@ void set_is_resizing_window(bool state);
 void set_active_winborder(WinBorder *win);
 WinBorder * get_active_winborder(void);
 void set_is_resizing_window(bool state);
+void set_is_sliding_tab(bool state);
 bool is_sliding_tab(void);
 
 #endif

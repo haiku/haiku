@@ -41,7 +41,7 @@
 #include "TokenHandler.h"
 #include "Utils.h"
 
-#define DEBUG_SERVERWINDOW
+//#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -51,6 +51,9 @@
 
 //! Handler to get BWindow tokens from
 TokenHandler win_token_handler;
+
+//! Active winborder - used for tracking windows during moves, resizes, and tab slides
+WinBorder *active_winborder=NULL;
 
 /*!
 	\brief Contructor
@@ -1185,7 +1188,7 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			BPoint pt(x,y);
 
 			// If we have clicked on a window, 			
-			_winborder=(WinBorder*)root->GetChildAt(pt);
+			active_winborder=_winborder=(WinBorder*)root->GetChildAt(pt);
 			if(_winborder)
 			{
 				mousewin=_winborder->Window();
@@ -1208,8 +1211,11 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 //			int32 modifiers=*((int32*)index);
 			BPoint pt(x,y);
 			
+			set_is_sliding_tab(false);
 			set_is_moving_window(false);
+			set_is_resizing_window(false);
 			_winborder=(WinBorder*)root->GetChildAt(pt);
+			active_winborder=NULL;
 			if(_winborder)
 			{
 				mousewin=_winborder->Window();
@@ -1231,23 +1237,20 @@ printf("ServerWindow::HandleMouseEvent unimplemented\n");
 			index+=sizeof(int64);
 			float x=*((float*)index); index+=sizeof(float);
 			float y=*((float*)index); index+=sizeof(float);
-//			uint32 buttons=*((uint32*)index);
 			BPoint pt(x,y);
 
-			// TODO: Fix
-/*			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
+			if(is_moving_window() || is_resizing_window() || is_sliding_tab())
 			{
-				mousewin=active_serverwindow;
-				mousewin->_winborder->MouseMoved(pt,buttons,0);
+				active_winborder->MouseMoved(buffer);
 			}
 			else
 			{
-*/				_winborder=(WinBorder*)root->GetChildAt(pt);
+				_winborder=(WinBorder*)root->GetChildAt(pt);
 				if(_winborder)
 				{
 					mousewin=_winborder->Window();
 					_winborder->MouseMoved(buffer);
-//				}
+				}
 			}				
 			break;
 		}
