@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-1/2005.
+	Rudolf Cornelissen 10/2002-2/2005.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -245,6 +245,7 @@ typedef struct {
 		NV40,
 		NV41,
 		NV43,
+		NV44,
 		NV45
 	};
 	enum
