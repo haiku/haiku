@@ -21,15 +21,19 @@
 //
 //	File Name:		Window.h
 //	Author:			Erik Jaesler (erik@cgsoftware.com)
-//					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	BWindow is the base class for all windows (graphic areas
 //					displayed on-screen).
+//
+//
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//	NOTE(!!!)		All private non virtual functions are to be renamed following
+//					this scheme: word_another_third <-> wordAnotherThird
+//	OBOS Team:	If you use one of BWindow's private functions, please addapt to this code
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //------------------------------------------------------------------------------
 
 #ifndef	_WINDOW_H
 #define	_WINDOW_H
-
-class PortLink;
 
 // Standard Includes -----------------------------------------------------------
 
@@ -116,7 +120,7 @@ enum {
 
 //----------------------------------------------------------------
 
-class _BSession_;
+class PortLink;
 class BButton;
 class BMenuBar;
 class BMenuItem;
@@ -133,142 +137,142 @@ struct _view_attr_;
 class BWindow : public BLooper {
 
 public:
-						BWindow(BRect frame,
+						BWindow(BRect frame,										//done
 								const char* title, 
 								window_type type,
 								uint32 flags,
 								uint32 workspace = B_CURRENT_WORKSPACE);
-						BWindow(BRect frame,
+						BWindow(BRect frame,										//done, but must be maintained - call InitData(...)
 								const char* title, 
 								window_look look,
 								window_feel feel,
 								uint32 flags,
 								uint32 workspace = B_CURRENT_WORKSPACE);
-virtual					~BWindow();
+virtual					~BWindow();													//done
 
-						BWindow(BMessage* data);
-static	BArchivable		*Instantiate(BMessage* data);
-virtual	status_t		Archive(BMessage* data, bool deep = true) const;
+						BWindow(BMessage* data);									//done
+static	BArchivable		*Instantiate(BMessage* data);								//done
+virtual	status_t		Archive(BMessage* data, bool deep = true) const;			//done
 
-virtual	void			Quit();
+virtual	void			Quit();														//done
 		void			Close(); // Synonym of Quit()
 
-		void			AddChild(BView* child, BView* before = NULL);
-		bool			RemoveChild(BView* child);
-		int32			CountChildren() const;
-		BView			*ChildAt(int32 index) const;
+		void			AddChild(BView* child, BView* before = NULL);				//done
+		bool			RemoveChild(BView* child);									//done
+		int32			CountChildren() const;										//done
+		BView			*ChildAt(int32 index) const;								//done
 
-virtual	void			DispatchMessage(BMessage* message, BHandler* handler);
-virtual	void			MessageReceived(BMessage* message);
-virtual	void			FrameMoved(BPoint new_position);
-virtual void			WorkspacesChanged(uint32 old_ws, uint32 new_ws);
-virtual void			WorkspaceActivated(int32 ws, bool state);
-virtual	void			FrameResized(float new_width, float new_height);
-virtual void			Minimize(bool minimize);
-virtual void			Zoom(	BPoint rec_position,
+virtual	void			DispatchMessage(BMessage* message, BHandler* handler);		//done
+virtual	void			MessageReceived(BMessage* message);							//done
+virtual	void			FrameMoved(BPoint new_position);							//done
+virtual void			WorkspacesChanged(uint32 old_ws, uint32 new_ws);			//done
+virtual void			WorkspaceActivated(int32 ws, bool state);					//done
+virtual	void			FrameResized(float new_width, float new_height);			//done
+virtual void			Minimize(bool minimize);									//done
+virtual void			Zoom(	BPoint rec_position,								//done
 								float rec_width,
 								float rec_height);
-		void			Zoom();
-		void			SetZoomLimits(float max_h, float max_v);
-virtual void			ScreenChanged(BRect screen_size, color_space depth);
-		void			SetPulseRate(bigtime_t rate);
-		bigtime_t		PulseRate() const;
-		void			AddShortcut(	uint32 key,
+		void			Zoom();														//done
+		void			SetZoomLimits(float maxWidth, float maxHeight);				//done	// changed from: SetZoomLimits(float max_h, float max_v);
+virtual void			ScreenChanged(BRect screen_size, color_space depth);		//done
+		void			SetPulseRate(bigtime_t rate);								//done
+		bigtime_t		PulseRate() const;											//done
+		void			AddShortcut(	uint32 key,									//done
 										uint32 modifiers,
 										BMessage* msg);
-		void			AddShortcut(	uint32 key,
+		void			AddShortcut(	uint32 key,									//done
 										uint32 modifiers,
 										BMessage* msg,
 										BHandler* target);
-		void			RemoveShortcut(uint32 key, uint32 modifiers);
-		void			SetDefaultButton(BButton* button);
-		BButton			*DefaultButton() const;
-virtual	void			MenusBeginning();
-virtual	void			MenusEnded();
-		bool			NeedsUpdate() const;
-		void			UpdateIfNeeded();
-		BView			*FindView(const char* view_name) const;
-		BView			*FindView(BPoint) const;
-		BView			*CurrentFocus() const;
-		void			Activate(bool = true);
-virtual	void			WindowActivated(bool state);
-		void			ConvertToScreen(BPoint* pt) const;
-		BPoint			ConvertToScreen(BPoint pt) const;
-		void			ConvertFromScreen(BPoint* pt) const;
-		BPoint			ConvertFromScreen(BPoint pt) const;
-		void			ConvertToScreen(BRect* rect) const;
-		BRect			ConvertToScreen(BRect rect) const;
-		void			ConvertFromScreen(BRect* rect) const;
-		BRect			ConvertFromScreen(BRect rect) const;
-		void			MoveBy(float dx, float dy);
-		void			MoveTo(BPoint);
-		void			MoveTo(float x, float y);
-		void			ResizeBy(float dx, float dy);
-		void			ResizeTo(float width, float height);
-virtual	void			Show();
-virtual	void			Hide();
-		bool			IsHidden() const;
-		bool			IsMinimized() const;
+		void			RemoveShortcut(uint32 key, uint32 modifiers);				//done
+		void			SetDefaultButton(BButton* button);							//done
+		BButton			*DefaultButton() const;										//done
+virtual	void			MenusBeginning();											//done
+virtual	void			MenusEnded();												//done
+		bool			NeedsUpdate() const;										//done
+		void			UpdateIfNeeded();											//done
+		BView			*FindView(const char* viewName) const;						//done	// changed from: FindView( const char* view_name );
+		BView			*FindView(BPoint) const;									//done
+		BView			*CurrentFocus() const;										//done
+		void			Activate(bool = true);										//done
+virtual	void			WindowActivated(bool state);								//done
+		void			ConvertToScreen(BPoint* pt) const;							//done
+		BPoint			ConvertToScreen(BPoint pt) const;							//done
+		void			ConvertFromScreen(BPoint* pt) const;						//done
+		BPoint			ConvertFromScreen(BPoint pt) const;							//done
+		void			ConvertToScreen(BRect* rect) const;							//done
+		BRect			ConvertToScreen(BRect rect) const;							//done
+		void			ConvertFromScreen(BRect* rect) const;						//done
+		BRect			ConvertFromScreen(BRect rect) const;						//done
+		void			MoveBy(float dx, float dy);									//done
+		void			MoveTo(BPoint);												//done
+		void			MoveTo(float x, float y);									//done
+		void			ResizeBy(float dx, float dy);								//done
+		void			ResizeTo(float width, float height);						//done
+virtual	void			Show();														//done
+virtual	void			Hide();														//done
+		bool			IsHidden() const;											//done
+		bool			IsMinimized() const;										//done
 
-		void			Flush() const;
-		void			Sync() const;
+		void			Flush() const;												//done
+		void			Sync() const;												//done
 
-		status_t		SendBehind(const BWindow* window);
+		status_t		SendBehind(const BWindow* window);							//done
 
-		void			DisableUpdates();
-		void			EnableUpdates();
+		void			DisableUpdates();											//done
+		void			EnableUpdates();											//done
 
-		void			BeginViewTransaction();
-		void			EndViewTransaction();
+		void			BeginViewTransaction();										//done	// referred as OpenViewTransaction() in BeBook
+		void			EndViewTransaction();										//done	// referred as CommitViewTransaction() in BeBook
 
-		BRect			Bounds() const;
-		BRect			Frame() const;
-		const char		*Title() const;
-		void			SetTitle(const char* title);
-		bool			IsFront() const;
-		bool			IsActive() const;
-		void			SetKeyMenuBar(BMenuBar* bar);
-		BMenuBar		*KeyMenuBar() const;
-		void			SetSizeLimits(	float min_h,
-										float max_h,
-										float min_v,
-										float max_v);
-		void			GetSizeLimits(	float* min_h,
-										float* max_h,
-										float* min_v,
-										float* max_v);
-		uint32			Workspaces() const;
-		void			SetWorkspaces(uint32);
-		BView			*LastMouseMovedView() const;
+		BRect			Bounds() const;												//done
+		BRect			Frame() const;												//done
+		const char		*Title() const;												//done
+		void			SetTitle(const char* title);								//done
+		bool			IsFront() const;											//done
+		bool			IsActive() const;											//done
+		void			SetKeyMenuBar(BMenuBar* bar);								//done
+		BMenuBar		*KeyMenuBar() const;										//done
+		void			SetSizeLimits(	float minWidth,								//done // changed from: SetSizeLimits(float min_h, float max_h, float min_v, float max_v);
+										float maxWidth,
+										float minHeight,
+										float maxHeight);
+		void			GetSizeLimits(	float *minWidth,							//done // changed from: SetSizeLimits(float* min_h, float* max_h, float* min_v, float* max_v);
+										float *maxWidth, 
+										float *minHeight,
+										float *maxHeight);
+		uint32			Workspaces() const;											//done
+		void			SetWorkspaces(uint32);										//done
+		BView			*LastMouseMovedView() const;								//done
 
-virtual BHandler		*ResolveSpecifier(BMessage* msg,
+virtual BHandler		*ResolveSpecifier(BMessage* msg,							//done
 										int32 index,
 										BMessage* specifier,
 										int32 form,
 										const char* property);
-virtual status_t		GetSupportedSuites(BMessage* data);
+virtual status_t		GetSupportedSuites(BMessage* data);							//done
 
-		status_t		AddToSubset(BWindow* window);
-		status_t		RemoveFromSubset(BWindow* window);
+		status_t		AddToSubset(BWindow* window);								//done
+		status_t		RemoveFromSubset(BWindow* window);							//done
 
-virtual status_t		Perform(perform_code d, void* arg);
+virtual status_t		Perform(perform_code d, void* arg);							//done
 
-		status_t		SetType(window_type type);
-		window_type		Type() const;
+		status_t		SetType(window_type type);									//done
+		window_type		Type() const;												//done
 
-		status_t		SetLook(window_look look);
-		window_look		Look() const;
+		status_t		SetLook(window_look look);									//done
+		window_look		Look() const;												//done
 
-		status_t		SetFeel(window_feel feel);
-		window_feel		Feel() const;
+		status_t		SetFeel(window_feel feel);									//done
+		window_feel		Feel() const;												//done
 
-		status_t		SetFlags(uint32);
-		uint32			Flags() const;
+		status_t		SetFlags(uint32);											//done
+		uint32			Flags() const;												//done
 
-		bool			IsModal() const;
-		bool			IsFloating() const;
+		bool			IsModal() const;											//done
+		bool			IsFloating() const;											//done
 
-		status_t		SetWindowAlignment(window_alignment mode,
+		status_t		SetWindowAlignment(window_alignment mode,					//done
 											int32 h,
 											int32 hOffset = 0,
 											int32 width = 0,
@@ -277,7 +281,7 @@ virtual status_t		Perform(perform_code d, void* arg);
 											int32 vOffset = 0,
 											int32 height = 0,
 											int32 heightOffset = 0);
-		status_t		GetWindowAlignment(window_alignment* mode = NULL,
+		status_t		GetWindowAlignment(window_alignment* mode = NULL,			//done
 											int32* h = NULL,
 											int32* hOffset = NULL,
 											int32* width = NULL,
@@ -287,8 +291,8 @@ virtual status_t		Perform(perform_code d, void* arg);
 											int32* height = NULL,
 											int32* heightOffset = NULL) const;
 
-virtual	bool			QuitRequested();
-virtual thread_id		Run();
+virtual	bool			QuitRequested();											//done
+virtual thread_id		Run();														//done
 
 // Private or reserved ---------------------------------------------------------
 private:
@@ -303,7 +307,8 @@ friend class BMenuItem;
 friend class BWindowScreen;
 friend class BDirectWindow;
 friend class BFilePanel;
-friend class _CEventPort_;
+friend class BHandler;
+friend class _BEventMask_;
 friend void _set_menu_sem_(BWindow* w, sem_id sem);
 friend status_t _safe_get_server_token_(const BLooper* , int32* );
 
@@ -320,18 +325,18 @@ virtual	void			_ReservedWindow8();
 					BWindow(BWindow&);
 		BWindow		&operator=(BWindow&);
 					
-					BWindow(BRect frame, color_space depth,
-							uint32 bitmapFlags, int32 rowBytes);
+					BWindow(BRect frame, color_space depth,				// I'm realllly curious in the things that this funtion does
+							uint32 bitmapFlags, int32 rowBytes);		// I think it's called from every constructor and sends its server counterpart (ServerWindow) the message for creating a surface(BBitmap) with certain parameters.
 		void		InitData(BRect frame,
-							const char* title, 
+							const char* title,
 							window_look look,
 							window_feel feel,
 							uint32 flags,
 							uint32 workspace);
-		status_t	ArchiveChildren(BMessage* data, bool deep) const;
-		status_t	UnarchiveChildren(BMessage* data);
+		status_t	ArchiveChildren(BMessage* data, bool deep) const;	// call made from within Archive
+		status_t	UnarchiveChildren(BMessage* data);		// Instantiate(BMessage* data)->BWindow(BMessage)->UnarchiveChildren(BMessage* data)
 		void		BitmapClose();
-virtual	void		task_looper();
+virtual	void		task_looper();							// thread function - it's here where app_server messages are received and converted to BMessages
 		void		start_drag(	BMessage* msg,
 								int32 token,
 								BPoint offset,
@@ -343,15 +348,15 @@ virtual	void		task_looper();
 								int32 bitmap_token,
 								drawing_mode dragMode,
 								BHandler* reply_to);
-		void		view_builder(BView* a_view);
-		void		attach_builder(BView* a_view);
-		void		detach_builder(BView* a_view);
+		void		view_builder(BView* a_view);						// It passes needed parameters to a BView allready created.
+		void		attach_builder(BView* a_view);						// Attaches the view
+		void		detach_builder(BView* a_view);						// Detaches the view
 		int32		get_server_token() const;
 		BMessage	*extract_drop(BMessage* an_event, BHandler* *target);
 		void		movesize(uint32 opcode, float h, float v);
 		
-		BMessage* 	ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT);
-		int32		MessagesWaiting();
+		BMessage* 	ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT);	// reads a message from receive_port and passes it along with the message body to CreateMessage(void*, int32) function
+		int32		MessagesWaiting();											// (?)# of messages waiting in the port queue
 
 		void		handle_activate(BMessage* an_event);
 		void		do_view_frame(BMessage* an_event);
@@ -362,10 +367,10 @@ virtual	void		task_looper();
 		void		do_key_up(BMessage* an_event, BHandler* handler);
 		void		do_menu_event(BMessage* an_event);
 		void		do_draw_views();
-virtual BMessage	*ConvertToMessage(void* raw, int32 code);
+virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function - it convers PortLink messages into BMessage messages
 		_cmd_key_	*allocShortcut(uint32 key, uint32 modifiers);
 		_cmd_key_	*FindShortcut(uint32 key, uint32 modifiers);
-		void		AddShortcut(uint32 key,
+		void		AddShortcut(uint32 key,										// !!! - and menu shortcuts to list when a menu is added
 								uint32 modifiers,
 								BMenuItem* item);
 		void		post_message(BMessage* message);
@@ -374,68 +379,93 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		BHandler	*determine_target(BMessage* msg, BHandler* target, bool pref);
 		void		kb_navigate();
 		void		navigate_to_next(int32 direction, bool group = false);
-		void		set_focus(BView* focus, bool notify_input_server);
+		void		set_focus(BView* focus, bool notify_input_server);		// what does notify_input_server mean??? why???
 		bool		InUpdate();
 		void		DequeueAll();
 		bool		find_token_and_handler(BMessage* msg,
 											int32* token,
 											BHandler* *handler);
-		window_type	compose_type(window_look look, 
+		window_type	composeType(window_look look,						// changed from: compose_type(...)
 								 window_feel feel) const;
-		void		decompose_type(window_type type, 
+		void		decomposeType(window_type type,						// changed from: decompose_type(...)
 								   window_look* look,
 								   window_feel* feel) const;
 
-		void		SetIsFilePanel(bool panel);
+		void		SetIsFilePanel(bool yes);
 		bool		IsFilePanel() const;
+// OBOS BWindow's addon functions
+		uint32		WindowLookToInteger(window_look wl);
+		uint32		WindowFeelToInteger(window_feel wf);
+		BView*		buildTopView();
+		void		attachTopView();
+		void		detachTopView();
+		void		setFocus(BView *focusView, bool notifyIputServer);
+
+		bool		handleBWindowKeys( BString, uint32);
+
+						// message: B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
+		void		sendMessageUsingEventMask( int32 message, BPoint where ); 
+		void		sendWillingBViewsPulseMsg( BView* );
+		int32		findShortcut(int32 key, int32 modifiers);
+		bool		findHandler( BView* start, BHandler* handler );
+		BView*		findView(BView* aView, const char* viewName) const;
+		BView*		findView(BView* aView, BPoint point) const;
+		BView*		findView(BView* aView, int32 token);
+
+		void		drawAllViews(BView* aView);
+// END: OBOS addon functions
 
 		// 3 deprecated calls
 		void			AddFloater(BWindow* a_floating_window);
 		void			RemoveFloater(BWindow* a_floating_window);
 		window_type		WindowType() const;
 
-		char			*fTitle;
+		char			*fTitle;					// set
 		int32			server_token;
-		char			fInUpdate;
-		char			f_active;
+		bool			fInTransaction;				// set		// changed from: char			fInUpdate;
+		bool			fActive;								// changed from: char			f_active;
 		short			fShowLevel;
-		uint32			fFlags;
+		uint32			fFlags;						// set
 
-		port_id			send_port;
-		port_id			receive_port;
+		port_id			send_port;					// set
+		port_id			receive_port;				// set
 
 		BView			*top_view;
 		BView			*fFocus;
-		BView			*fLastMouseMovedView;
-		PortLink		*serverlink;
-		BMenuBar		*fKeyMenuBar;
-		BButton			*fDefaultButton;
-		BList			accelList;
-		int32			top_view_token;
-		bool			pulse_enabled;
+		BView			*fLastMouseMovedView;		// set
+		PortLink		*serverLink;
+		BMenuBar		*fKeyMenuBar;				// set
+		BButton			*fDefaultButton;			// set
+		BList			accelList;					// set
+		int32			fTopViewToken;				//			// changed from: int32			top_view_token;
+		bool			fPulseEnabled;				//			// changed from: bool			pulse_enabled;
 		bool			fViewsNeedPulse;
 		bool			fIsFilePanel;
 		bool			fUnused1;
-		bigtime_t		pulse_rate;
+		bigtime_t		fPulseRate;					//			// changed from: bigtime_t		pulse_rate;
 		bool			fWaitingForMenu;
-		bool			fOffscreen;
+		bool			fMinimized;					//			// changed from: bool			fOffscreen;
 		sem_id			fMenuSem;
-		float			fMaxZoomH;
-		float			fMaxZoomV;
-		float			fMinWindH;
-		float			fMinWindV;
-		float			fMaxWindH;
-		float			fMaxWindV;
-		BRect			fFrame;
-		window_look		fLook;
+		float			fMaxZoomHeight;				// set		// changed from: float			fMaxZoomH;
+		float			fMaxZoomWidth;				// set		// changed from: float			fMaxZoomV;
+		float			fMinWindHeight;				// set		// changed from: float			fMinWindH;
+		float			fMinWindWidth;				// set		// changed from: float			fMinWindV;
+		float			fMaxWindHeight;				// set		// changed from: float			fMaxWindH;
+		float			fMaxWindWidth;				// set		// changed from: float			fMaxWindV;
+		BRect			fFrame;						// set
+		window_look		fLook;						// set
 		_view_attr_		*fCurDrawViewState;
-		window_feel		fFeel;
+		window_feel		fFeel;						// set
 		int32			fLastViewToken;
-		_CEventPort_* 	fEventPort;
+		_BEventMask_* 	fEventMask;					// changed from: _CEventPort_* 	fEventPort;
 		BMessageRunner	*fPulseRunner;
 		BRect			fCurrentFrame;
 
-		uint32			_reserved[2];	// was 8
+		// dedicated for graphic calls
+		PortLink		*srvGfxLink;				// set
+		uint32			_reserved;
+		
+//		uint32			_reserved[2];	// was 8
 #if !_PR3_COMPATIBLE_
 		uint32			_more_reserved[4];
 #endif
