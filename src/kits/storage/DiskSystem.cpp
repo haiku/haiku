@@ -225,7 +225,7 @@ BDiskSystem::GetNextSupportedType(BPartition *partition, int32 *cookie,
 		|| !IsPartitioningSystem()) {
 		return B_BAD_VALUE;
 	}
-	return _kern_get_next_supported_partition_type(fID, partition->_ShadowID(),
+	return _kern_get_next_supported_partition_type(partition->_ShadowID(),
 												   cookie, type);
 }
 
