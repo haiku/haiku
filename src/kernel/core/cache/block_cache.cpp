@@ -1,5 +1,5 @@
-/* 
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -444,22 +444,29 @@ write_cached_block(block_cache *cache, cached_block *block, bool deleteTransacti
 	cache_transaction *previous = block->previous_transaction;
 	int32 blockSize = cache->block_size;
 
+	void *data = previous && block->original ? block->original : block->data;
+		// we first need to write back changes from previous transactions
+
 	TRACE(("write_cached_block(block %Ld)\n", block->block_number));
 
-	ssize_t written = write_pos(cache->fd, block->block_number * blockSize, block->data, blockSize);
+	ssize_t written = write_pos(cache->fd, block->block_number * blockSize, data, blockSize);
 
 	if (written < blockSize) {
-		dprintf("could not write back block %Ld (errno = %d (%s))\n", block->block_number, errno, strerror(errno));
+		dprintf("could not write back block %Ld (%s)\n", block->block_number, strerror(errno));
 		return B_IO_ERROR;
 	}
 
-	block->is_dirty = false;
+	if (data == block->data)
+		block->is_dirty = false;
 
 	if (previous != NULL) {
 		previous->blocks.Remove(block);
 		block->previous_transaction = NULL;
 
+		// Has the previous transation been finished with that write?
 		if (--previous->num_blocks == 0) {
+			TRACE(("cache transaction %ld finished!\n", previous->id));
+
 			if (previous->notification_hook != NULL)
 				previous->notification_hook(previous->id, previous->notification_data);
 
