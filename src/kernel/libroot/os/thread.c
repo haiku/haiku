@@ -1,7 +1,7 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <OS.h>
@@ -95,8 +95,7 @@ void
 exit_thread(status_t status)
 {
 	_thread_do_exit_notification();
-
-	_kern_exit(status);
+	_kern_exit_thread(status);
 }
 
 
