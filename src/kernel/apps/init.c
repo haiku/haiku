@@ -49,7 +49,7 @@ int main()
 		pid = sys_create_team("/boot/bin/shell", "/boot/bin/shell", NULL, 0, NULL, 0, 5);
 		if(pid >= 0) {
 			int retcode;
-			printf("init: spawned shell, pid 0x%x\n", pid);
+			printf("init: spawned shell, pid 0x%lx\n", pid);
 			sys_wait_on_team(pid, &retcode);
 			printf("init: shell exited with return code %d\n", retcode);
 		} else {
