@@ -20,7 +20,7 @@ class BThreadManager {
 public:
 	typedef void (TestClass::*ThreadMethod)();
 	
-	BThreadManager(std::string threadName, TestClass *object, ThreadMethod method);
+	BThreadManager(std::string threadName, TestClass *object, ThreadMethod method, sem_id &threadSem);
 	~BThreadManager();
 	
     status_t LaunchThread(CppUnit::TestResult *result);
@@ -38,6 +38,7 @@ protected:
 	ThreadMethod fMethod;
 	thread_id fID;
 	CppUnit::TestResult *fTestResult;
+	sem_id &fThreadSem;
 	
 	static long EntryFunction(BThreadManager<TestClass, ExpectedException>* manager);
 	void Run();	
@@ -48,13 +49,15 @@ template <class TestClass, class ExpectedException>
 BThreadManager<TestClass, ExpectedException>::BThreadManager(
 	std::string threadName,
 	TestClass *object,
-	ThreadMethod method
+	ThreadMethod method,
+	sem_id &threadSem
 )
 	: fName(threadName)
 	, fObject(object)
 	, fMethod(method)
 	, fID(0)
 	, fTestResult(NULL)
+	, fThreadSem(threadSem)
 {
 }
 	
@@ -118,6 +121,9 @@ BThreadManager<TestClass, ExpectedException>::LaunchThread(CppUnit::TestResult *
 		err = fID;
 		fID = 0;
 	} else {
+		// Aquire the semaphore, then start the thread.
+		if (acquire_sem(fThreadSem) != B_OK)
+			throw CppUnit::Exception("BThreadManager::LaunchThread() -- Error acquiring thread semaphore");
 		err = resume_thread(fID);
 	}
 	return err;
@@ -185,7 +191,9 @@ BThreadManager<TestClass, ExpectedException>::Run(void) {
 		);
 		fTestResult->addError( fObject, threadException );
 	}
-  	
+	
+	// Release the semaphore we acquired earlier
+	release_sem(fThreadSem);  	
 }
 	
 

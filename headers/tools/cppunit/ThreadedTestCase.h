@@ -6,6 +6,7 @@
 #include <TestCase.h>
 #include <map>
 #include <string>
+#include <vector>
 
 //! Base class for single threaded unit tests
 class BThreadedTestCase : public BTestCase {
@@ -23,7 +24,14 @@ public:
 	//! Restores the current working directory to last directory saved by a	call to SaveCWD().	
 	void RestoreCWD(const char *alternate = NULL);
 	void InitThreadInfo(thread_id id, std::string threadName);
+	bool RegisterForUse();
+	void UnregisterForUse();
+	
+	std::vector<std::string>& AcquireUpdateList();
+	void ReleaseUpdateList();
 protected:
+	bool fInUse;
+
 //	friend class ThreadManager<BThreadedTestCase>;
 	std::string fProgressSeparator;
 
@@ -32,7 +40,9 @@ protected:
 		int32 subTestNum;	
 	};
 	std::map<thread_id, ThreadSubTestInfo*> fNumberMap;
-	BLocker *fNumberMapLock;
+	std::vector<std::string> fUpdateList;
+	BLocker *fUpdateLock;
+
 };
 
 #endif // _beos_threaded_test_case_h_

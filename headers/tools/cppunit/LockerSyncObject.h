@@ -1,5 +1,5 @@
-#ifndef _beos_synchronization_object_h_
-#define _beos_synchronization_object_h_
+#ifndef _beos_locker_sync_object_h_
+#define _beos_locker_sync_object_h_
 
 #include <cppunit/SynchronizedObject.h>
 #include <Locker.h>

@@ -22,7 +22,7 @@ BTestCase::NextSubTest() {
 
 void
 BTestCase::NextSubTestBlock() {
-//	printf("\n");
+	printf("\n");
 }
 
 /*! To return to the last saved working directory, call RestoreCWD(). */

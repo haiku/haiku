@@ -37,7 +37,10 @@ protected:
 
 	bool fOwnObject;
 	TestClass *fObject;
-	ThreadManagerMap fThreads;    
+	ThreadManagerMap fThreads;
+	
+	sem_id fThreadSem;
+	
 };
 
 
@@ -46,6 +49,7 @@ BThreadedTestCaller<TestClass, ExpectedException>::BThreadedTestCaller(std::stri
 	: TestCase(name)
 	, fOwnObject(true)
 	, fObject(new TestClass())
+	, fThreadSem(-1)
 {
 }
 
@@ -54,6 +58,7 @@ BThreadedTestCaller<TestClass, ExpectedException>::BThreadedTestCaller(std::stri
 	: TestCase(name)
 	, fOwnObject(false)
 	, fObject(&object)
+	, fThreadSem(-1)
 {
 }
 
@@ -62,6 +67,7 @@ BThreadedTestCaller<TestClass, ExpectedException>::BThreadedTestCaller(std::stri
 	: TestCase(name)
 	, fOwnObject(true)
 	, fObject(object)
+	, fThreadSem(-1)
 {
 }
 
@@ -73,13 +79,14 @@ BThreadedTestCaller<TestClass, ExpectedException>::~BThreadedTestCaller() {
 		delete it->second;
 	}
 }
+	
 
 template <class TestClass, class ExpectedException>
 void
 BThreadedTestCaller<TestClass, ExpectedException>::addThread(std::string threadName, ThreadMethod method) {
 	if (fThreads.find(threadName) == fThreads.end()) {
 		// Unused name, go ahead and add
-		fThreads[threadName] = new BThreadManager<TestClass, ExpectedException>(threadName, fObject, method);		
+		fThreads[threadName] = new BThreadManager<TestClass, ExpectedException>(threadName, fObject, method, fThreadSem);		
 	} else {
 		// Duplicate name, throw an exception
 		throw CppUnit::Exception("BThreadedTestCaller::addThread() - Attempt to add thread under duplicated name ('"
@@ -91,6 +98,9 @@ template <class TestClass, class ExpectedException>
 void
 BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *result) {
 	result->startTest(this);
+	
+	if (fThreads.size() <= 0)
+		throw CppUnit::Exception("BThreadedTestCaller::run() -- No threads added to BThreadedTestCaller()");
 
 	try {    
 		setUp();
@@ -101,10 +111,18 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 		// handles exceptions for its respective thread, so as not
 		// to disrupt the others.
 		try {
-
-			// Verify we have a valid object first.
-			if (!fObject)
-				throw CppUnit::Exception("BThreadedTestCaller::runTest() -- NULL fObject pointer");
+			// Create our thread semaphore. This semaphore is used to
+			// determine when all the threads have finished executing,
+			// while still allowing *this* thread to handle printing
+			// out NextSubTest() info (since other threads don't appear
+			// to be able to output text while the main thread is
+			// blocked; their output appears later...).
+			//
+			// Each thread will acquire the semaphore once when launched,
+			// thus the initial thread count is equal the number of threads.		
+			fThreadSem = create_sem(fThreads.size(), "ThreadSem");
+			if (fThreadSem < B_OK)
+				throw CppUnit::Exception("BThreadedTestCaller::run() -- Error creating fThreadSem");		
 
 			// Launch all the threads.
 			for (ThreadManagerMap::iterator i = fThreads.begin();
@@ -117,6 +135,44 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 //				printf("Launch(%s)\n", i->second->getName().c_str());
 			}
 			
+			// Now we loop. Before you faint, there is a reason for this:
+			// Calls to NextSubTest() from other threads don't actually
+			// print anything while the main thread is blocked waiting
+			// for another thread. Thus, we have NextSubTest() add the
+			// information to be printed into a queue. The main thread
+			// (this code right here), blocks on a semaphore that it
+			// can only acquire after all the test threads have terminated.
+			// If it times out, it checks the NextSubTest() queue, prints
+			// any pending updates, and tries to acquire the semaphore
+			// again. When it finally manages to acquire it, all the
+			// test threads have terminated, and it's safe to clean up.
+			
+			status_t err;
+			do {
+				// Try to acquire the semaphore
+				err = acquire_sem_etc(fThreadSem, fThreads.size(), B_RELATIVE_TIMEOUT,	500000);
+				
+				// Empty the UpdateList				
+				std::vector<std::string> &list = fObject->AcquireUpdateList();
+				for (std::vector<std::string>::iterator i = list.begin();
+					   i != list.end();
+					     i++)
+				{
+					printf("%s", (*i).c_str());
+					fflush(stdout);
+				}
+				list.clear();
+				fObject->ReleaseUpdateList();				
+				
+			} while (err != B_OK);
+			
+			// If we get this far, we actually managed to acquire the semaphore,
+			// so we should release it now.
+			release_sem_etc(fThreadSem, fThreads.size(), 0);
+/*			
+			
+			
+			
 			// Wait for them all to finish, then clean up
 			for (ThreadManagerMap::iterator i = fThreads.begin();
 				  i != fThreads.end ();
@@ -128,6 +184,8 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 //				printf("done\n");
 				delete i->second;
 			}
+*/
+
 			fThreads.clear();
 			
 		} catch ( CppUnit::Exception &e ) {
@@ -171,6 +229,12 @@ BThreadedTestCaller<TestClass, ExpectedException>::run(CppUnit::TestResult *resu
 template <class TestClass, class ExpectedException>
 void
 BThreadedTestCaller<TestClass, ExpectedException>::setUp() {
+	// Verify we have a valid object that's not currently in use first.
+	if (!fObject)
+		throw CppUnit::Exception("BThreadedTestCaller::runTest() -- NULL fObject pointer");
+	if (!fObject->RegisterForUse())
+		throw CppUnit::Exception("BThreadedTestCaller::runTest() -- Attempt to reuse ThreadedTestCase object already in use");
+		
 	fObject->setUp();
 }
 
