@@ -28,9 +28,12 @@
 #define DESKTOP_H_
 
 #include <Window.h>
+#include <ScrollBar.h>
+#include <Menu.h>
 #include <GraphicsDefs.h>
 
 class ServerWindow;
+class Screen;
 class DisplayDriver;
 class Layer;
 
@@ -47,6 +50,7 @@ void SetWorkspace(int32 workspace);
 void SetScreen(screen_id id);
 int32 CountScreens(void);
 screen_id ActiveScreen(void);
+Screen *GetActiveScreen(void);
 DisplayDriver *GetGfxDriver(screen_id screen);
 status_t SetSpace(int32 index, int32 res, screen_id screen, bool stick=true);
 
@@ -59,6 +63,15 @@ Layer *GetRootLayer(int32 workspace, screen_id screen);
 void set_drag_message(int32 size, int8 *flattened);
 int8* get_drag_message(int32 *size);
 void empty_drag_message(void);
+
+scroll_bar_info GetScrollBarInfo(void);
+void SetScrollBarInfo(const scroll_bar_info &info);
+
+menu_info GetMenuInfo(void);
+void SetMenuInfo(const menu_info &info);
+
+int16 GetFFMouse(void);
+void SetFFMouse(const int16 &value);
 
 void lock_layers(void);
 void unlock_layers(void);

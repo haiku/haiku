@@ -47,15 +47,23 @@
 #include <stdio.h>
 #endif
 
+bool ReadOBOSWorkspaceData(void);
+bool ReadR5WorkspaceData(void);
+void SaveWorkspaceData(void);
+
 //! This namespace encapsulates all globals specifically for the desktop
 namespace desktop_private {
 	int8 *dragmessage=NULL;
 	int32 dragmessagesize=0;
 	BLocker draglock,
 			layerlock,
-			workspacelock;
+			workspacelock,
+			optlock;
 	BList *screenlist=NULL;
 	Screen *activescreen=NULL;
+	scroll_bar_info scrollbarinfo;
+	menu_info menuinfo;
+	int16 ffm;
 }
 
 //! locks layer access
@@ -111,7 +119,7 @@ printf("Desktop: InitWorkspace\n");
 printf("\t NULL display driver. OK. We crash now. :P\n");
 #endif
 	}
-#else
+#else // end if not TEST_MODE
 
 #if DISPLAYDRIVER == SCREENDRIVER
 	tdriver=new ScreenDriver;
@@ -383,6 +391,15 @@ screen_id ActiveScreen(void)
 }
 
 /*!
+	\brief Returns the active screen.
+	\return The currently active screen
+*/
+Screen *GetActiveScreen(void)
+{
+	return desktop_private::activescreen;
+}
+
+/*!
 	\brief Obtains the DisplayDriver object used for the specified screen.
 	\param screen ID of the screen to get the DisplayDriver for.
 	\return The DisplayDriver or NULL if not available for that screen ID
@@ -489,7 +506,7 @@ printf("Desktop: SetActiveWindow(%s)\n",win?win->GetTitle():"NULL");
 #endif
 	lock_workspaces();
 	Workspace *w=desktop_private::activescreen->GetActiveWorkspace();
-	if(win->GetWorkspace()!=w)
+	if(win && win->GetWorkspace()!=w)
 	{
 		desktop_private::workspacelock.Unlock();
 		return;
@@ -583,3 +600,200 @@ void empty_drag_message(void)
 	unlock_dragdata();
 }
 
+
+/*!
+	\brief Thread-safe way of obtaining the current scrollbar behavior info
+	\return Current scroll behavior data
+*/
+scroll_bar_info GetScrollBarInfo(void)
+{
+	scroll_bar_info sbi;
+	desktop_private::optlock.Lock();
+	sbi=desktop_private::scrollbarinfo;
+	desktop_private::optlock.Unlock();
+	return sbi;
+}
+
+/*!
+	\brief Thread-safe way of setting the current scrollbar behavior info
+	\param info Behavior data structure
+*/
+void SetScrollBarInfo(const scroll_bar_info &info)
+{
+	desktop_private::optlock.Lock();
+	desktop_private::scrollbarinfo=info;
+	desktop_private::optlock.Unlock();
+}
+
+/*!
+	\brief Thread-safe way of obtaining the current menu behavior info
+	\return Current menu behavior data
+*/
+menu_info GetMenuInfo(void)
+{
+	menu_info mi;
+	desktop_private::optlock.Lock();
+	mi=desktop_private::menuinfo;
+	desktop_private::optlock.Unlock();
+	return mi;
+}
+
+/*!
+	\brief Thread-safe way of setting the current menu behavior info
+	\param info Behavior data structure
+*/
+void SetMenuInfo(const menu_info &info)
+{
+	desktop_private::optlock.Lock();
+	desktop_private::menuinfo=info;
+	desktop_private::optlock.Unlock();
+}
+
+/*!
+	\brief Thread-safe way of obtaining the current focus-follows-mouse behavior
+	\return Current menu behavior data
+*/
+int16 GetFFMouse(void)
+{
+	int16 value;
+	desktop_private::optlock.Lock();
+	value=desktop_private::ffm;
+	desktop_private::optlock.Unlock();
+	return value;
+}
+
+/*!
+	\brief Thread-safe way of setting the current focus-follows-mouse behavior
+	\param info Behavior data structure
+*/
+void SetFFMouse(const int16 &value)
+{
+	desktop_private::optlock.Lock();
+	desktop_private::ffm=value;
+	desktop_private::optlock.Unlock();
+}
+
+/*!
+	\brief Read in settings from R5's workspace settings file in ~/config/settings
+	\return True if successful, false unable to read and parse file.
+*/
+bool ReadR5WorkspaceData(void)
+{
+	//TODO: Add read checks for fscsnf calls
+	
+	// Should there be multiple graphics devices, I assume that we'd probably need to loop through
+	// each device and read the workspace data for each. For now, we just assume that there is
+	// just one.
+	
+	FILE *file=fopen("/boot/home/config/settings/app_server_settings",B_READ_ONLY);
+	if(!file)
+		return false;
+	
+	char devicepath[B_PATH_NAME_LENGTH];
+	as_workspace_data wdata;
+	int workspace_count=3;
+	
+	Screen *active=GetActiveScreen();
+	
+	// read in device
+	// Device <devpath>
+	fscanf(file,"Device %s",devicepath);
+	
+	// read workspace count
+	// Workspaces # {
+	fscanf(file,"Workspaces %d {",&workspace_count);
+	
+	// read workspace config for all 32 (0-31)
+	
+	for(int i=0; i<32;i++)
+	{
+		// Workspace # {
+		fscanf(file,"Workspace %d {",&wdata.index);
+	
+		// timing: display_timing struct in Accelerant.h
+		fscanf(file,"timing %lu %u %u %u %u %u %u %u %u %lu",&wdata.timing.pixel_clock,
+		(unsigned int*)&(wdata.timing.h_display),(unsigned int*)&(wdata.timing.h_sync_start),
+		(unsigned int*)&(wdata.timing.h_sync_end),(unsigned int*)&(wdata.timing.h_total),
+		(unsigned int*)&(wdata.timing.v_display),(unsigned int*)&(wdata.timing.v_sync_start),
+		(unsigned int*)&(wdata.timing.v_sync_end),(unsigned int*)&(wdata.timing.v_total),
+		&wdata.timing.flags);
+		
+		// colorspace: member of color_space struct, like RGB15, RGB32, etc.
+		fscanf(file,"colorspace %lx",(long*)&wdata.space);
+		
+		// virtual width height
+		fscanf(file,"virtual %d %d",&wdata.res_w, &wdata.res_h);
+		
+		// flags:
+		fscanf(file,"flags %lx",&wdata.flags);
+		
+		// color: RGB hexcode
+		fscanf(file,"color %lx",&wdata.bgcolor);
+		// }
+		
+		// Create a workspace and add it to the active screen.
+		Workspace *w=new Workspace(&wdata,active);
+		active->AddWorkspace(w);
+	}
+	
+	scroll_bar_info sbi;
+	
+	// read interface block
+	// Interface {
+	// read scrollbars block
+	// Scrollbars {
+	int bflag;
+	
+	// get the four scrollbar values
+	// proportional 1
+	fscanf(file,"proportional %d",&bflag);
+	sbi.proportional=(bflag==1)?true:false;
+
+	// arrows 2
+	fscanf(file,"arrows %d",&bflag);
+	sbi.double_arrows=(bflag==2)?true:false;
+	
+	// knobtype 0
+	fscanf(file,"knobtype %ld",&sbi.knob);
+
+	// knobsize 15
+	fscanf(file,"knobsize %ld",&sbi.min_knob_size);
+	// }
+	
+	// read options block
+	// Options {
+	
+	// get focus-follows-mouse block
+	// ffm #
+	// FFM values:
+	// 0: Disabled
+	// 1: Enabled
+	// 2: Warping
+	// 3: Instant Warping
+	int ffm;
+	fscanf(file,"ffm %d",&ffm);
+	SetFFMouse(ffm);
+	
+	// skip decor listing
+	fclose(file);
+	
+	return true;
+}
+
+/*!
+	\brief Reads in workspace config data using the regular system file
+	\return True if settings were successfully loaded. False if not
+	
+	The file's location is defined in ServerConfig.h - SERVER_SETTINGS_DIR/WORKSPACE_SETTINGS_NAME.	
+*/
+bool ReadOBOSWorkspaceData(void)
+{
+	//TODO: Implement
+	return false;
+}
+
+//! Saves workspace config to SERVER_SETTINGS_DIR/WORKSPACE_SETTINGS_NAME as defined in ServerConfig.h
+void SaveWorkspaceData(void)
+{
+	//TODO: Implement
+}

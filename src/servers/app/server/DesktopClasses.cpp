@@ -25,10 +25,15 @@
 //	Description:	Classes for managing workspaces and screens
 //  
 //------------------------------------------------------------------------------
+#include <File.h>
+#include <Message.h>
+#include <stdio.h>
+#include <string.h>
 #include "DesktopClasses.h"
 #include "TokenHandler.h"
 #include "ServerWindow.h"
 #include "WinBorder.h"
+#include "Desktop.h"
 
 //#define DEBUG_WORKSPACE
 //#define DEBUG_SCREEN
@@ -62,6 +67,14 @@ Workspace::Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &
 #ifdef DEBUG_WORKSPACE
 printf("Workspace::Workspace(%s)\n",_rootlayer->GetName());
 #endif
+}
+
+/*!
+	\brief Constructor to accept data from reading R5's settings
+*/
+Workspace::Workspace(as_workspace_data *data, Screen *screen)
+{
+	//TODO: Implement
 }
 
 /*!
@@ -204,11 +217,15 @@ printf("Screen::Screen(%s,%u)\n",gfxmodule?"driver":"NULL",workspaces);
 			_workspacelist->AddItem(new Workspace(_gcinfo,_fbinfo,this));
 		}
 		_resolution=_driver->GetMode();
-		_currentworkspace=0;
-		_activeworkspace=(Workspace*)_workspacelist->ItemAt(0);
-		_workspacecount=workspaces;
-		_activeworkspace->GetRoot()->Show();
-		_activeworkspace->GetRoot()->RequestDraw();
+		
+		if(workspaces>0)
+		{
+			_currentworkspace=0;
+			_activeworkspace=(Workspace*)_workspacelist->ItemAt(0);
+			_workspacecount=workspaces;
+			_activeworkspace->GetRoot()->Show();
+			_activeworkspace->GetRoot()->RequestDraw();
+		}
 	}
 }
 
@@ -242,6 +259,22 @@ printf("Screen::AddWorkspace(%ld)\n",index+1);
 #endif
 	Workspace *workspace = new Workspace(_gcinfo,_fbinfo,this);
 	if ( (index == -1) || !_workspacelist->AddItem(workspace,index) )
+		_workspacelist->AddItem(workspace);
+}
+
+/*!
+	\brief Adds a workspace object to the screen
+	\param workspace The workspace to add.
+	\param index Optional index to insert workspace at. Defaults to adding to end of list.
+	
+	This function will do nothing if workspace is NULL.
+*/
+void Screen::AddWorkspace(Workspace *workspace,int32 index)
+{
+#ifdef DEBUG_SCREEN
+printf("Screen::AddWorkspace(%s)\n",(workspace && workspace->GetRoot())?workspace->GetRoot()->GetName():"NULL");
+#endif
+	if ( (index==-1) || !_workspacelist->AddItem(workspace,index) )
 		_workspacelist->AddItem(workspace);
 }
 
@@ -430,7 +463,21 @@ ServerWindow *Screen::ActiveWindow(void)
 */
 void Screen::SetActiveWindow(ServerWindow *win)
 {
-	//TODO: Implement
+	if(win)
+	{
+		if(win->GetWorkspace()==NULL)
+		{
+			// has not been added to desktop
+			AddWindowToDesktop(win,win->GetWorkspaceIndex(),_id);
+		}
+		Workspace *wksp=win->GetWorkspace();
+		if(wksp->GetScreen()!=this)
+			return;
+		set_active_winborder(win->_winborder);
+	}
+	else
+		set_active_winborder(NULL);
+	_activewin=win;
 }
 
 /*!

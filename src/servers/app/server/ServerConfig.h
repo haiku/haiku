@@ -57,6 +57,9 @@
 // name of the file containing the current UI color settings
 #define COLOR_SETTINGS_NAME "system_colors"
 
+// name of the file containing the config data for the desktop
+#define WORKSPACE_SETTINGS_NAME "workspace_data"
+
 // Folder for additional window decorators
 #define DECORATORS_DIR "/boot/home/config/add-ons/decorators/"
 

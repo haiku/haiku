@@ -29,6 +29,8 @@
 #define DESKTOPCLASSES_H
 
 #include <SupportDefs.h>
+#include <Accelerant.h>
+#include <GraphicsDefs.h>
 #include <GraphicsCard.h>
 #include <Window.h>	// for workspace defs
 #include "RootLayer.h"
@@ -45,10 +47,22 @@ class Screen;
 	Doesn't actually do a whole lot except to couple some associated data with a 
 	RootLayer.
 */
+typedef struct
+{
+	int index;
+	display_timing timing;
+	color_space space;
+	int res_w;
+	int res_h;
+	int32 flags;
+	int32 bgcolor;
+} as_workspace_data;
+
 class Workspace
 {
 public:
 	Workspace(const graphics_card_info &gcinfo, const frame_buffer_info &fbinfo, Screen *screen);
+	Workspace(as_workspace_data *data, Screen *screen);
 	~Workspace(void);
 	void SetBGColor(const RGBColor &c);
 	RGBColor BGColor();
@@ -78,6 +92,7 @@ public:
 	Screen(DisplayDriver *gfxmodule, uint8 workspaces);
 	~Screen(void);
 	void AddWorkspace(int32 index=-1);
+	void AddWorkspace(Workspace *workspace,int32 index=-1);
 	void DeleteWorkspace(int32 index);
 	int32 CountWorkspaces(void);
 	void SetWorkspaceCount(int32 count);
