@@ -302,7 +302,15 @@ bool BLooper::IsMessageWaiting() const
 //------------------------------------------------------------------------------
 void BLooper::AddHandler(BHandler* handler)
 {
-	AssertLocked();
+	if (!handler)
+	{
+		return;
+	}
+
+	if (!IsLocked())
+	{
+		debugger("Looper must be locked before calling AddHandler.");
+	}
 
 	if (handler->Looper() == NULL)
 	{
