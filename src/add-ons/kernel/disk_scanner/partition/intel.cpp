@@ -305,6 +305,9 @@ bool
 intel_identify(int deviceFD, const session_info *sessionInfo,
 			   const uchar *block)
 {
+	TRACE(("intel: identify(%d, %lld, %lld, %p, %ld)\n", deviceFD,
+		   sessionInfo->offset, sessionInfo->size, block,
+		   sessionInfo->logical_block_size));
 	PartitionMap map;
 	return read_partition_map(deviceFD, sessionInfo, block, &map);
 }
@@ -342,7 +345,6 @@ intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
 			}
 			partitionInfo->partition_name[0] = '\0';
 			partition->GetTypeString(partitionInfo->partition_type);
-			partitionInfo->partition_code = partition->Type();
 		} else
 			error = B_ENTRY_NOT_FOUND;
 	} else	// couldn't read partition map -- we shouldn't be in get_nth_info()

@@ -67,7 +67,6 @@ typedef struct partition_module_info {
 	* flags
 	* partition_name
 	* partition_type
-	* partition_code
 
 	params:
 	deviceFD: a device FD
