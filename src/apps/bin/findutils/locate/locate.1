@@ -1,0 +1,78 @@
+.TH LOCATE 1L \" -*- nroff -*-
+.SH NAME
+locate \- list files in databases that match a pattern
+.SH SYNOPSIS
+.B locate
+[\-d path] [\-\-database=path] [\-\-version] [\-\-help] pattern...
+.SH DESCRIPTION
+This manual page
+documents the GNU version of
+.BR locate .
+For each given pattern,
+.B locate
+searches one or more databases of file names and displays the
+file names that contain the pattern.  Patterns can contain shell-style
+metacharacters: `*', `?', and `[]'.  The metacharacters do not treat
+`/' or `.'  specially.  Therefore, a pattern `foo*bar' can match a
+file name that contains `foo3/bar', and a pattern `*duck*' can match a
+file name that contains `lake/.ducky'.  Patterns that contain
+metacharacters should be quoted to protect them from expansion by the
+shell.
+.P
+If a pattern is a plain string \(em it contains no metacharacters \(em
+.B locate
+displays all file names in the database that contain that string
+anywhere.  If a pattern does contain metacharacters,
+.B locate
+only displays file names that match the pattern exactly.  As a result,
+patterns that contain metacharacters should usually begin with a `*',
+and will most often end with one as well.  The exceptions are patterns
+that are intended to explicitly match the beginning or end of a file
+name.
+.P
+The file name databases contain lists of files that were on the system
+when the databases were last updated.  The system administrator can
+choose the file name of the default database, the frequency with which
+the databases are updated, and the directories for which they contain
+entries; see \fBupdatedb\fP(1L).
+.SH OPTIONS
+.TP
+.I "\-d \fIpath\fP, \-\-database=\fIpath\fP"
+Instead of searching the default file name database, search the file
+name databases in \fIpath\fP, which is a colon-separated list of
+database file names.  You can also use the environment variable
+.B LOCATE_PATH
+to set the list of database files to search.
+The option overrides the environment variable if both are used.
+.P
+The file name database format changed starting with GNU
+.B find
+and
+.B locate
+version 4.0 to allow machines with diffent byte orderings to share
+the databases.  This version of
+.B locate
+can automatically recognize and read databases produced for older
+versions of GNU
+.B locate
+or Unix versions of
+.B locate
+or
+.BR find .
+.TP
+.I "\-\-help"
+Print a summary of the options to
+.B locate
+and exit.
+.TP
+.I "\-\-version"
+Print the version number of
+.B locate
+and exit.
+.SH ENVIRONMENT
+.TP
+.B LOCATE_PATH
+Colon-separated list of databases to search.
+.SH "SEE ALSO"
+\fBfind\fP(1L), \fBlocatedb\fP(5L), \fBupdatedb\fP(1L), \fBxargs\fP(1L)
+\fBFinding Files\fP (on-line in Info, or printed)

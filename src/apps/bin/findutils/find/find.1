@@ -1,0 +1,455 @@
+.TH FIND 1L \" -*- nroff -*-
+.SH NAME
+find \- search for files in a directory hierarchy
+.SH SYNOPSIS
+.B find
+[path...] [expression]
+.SH DESCRIPTION
+This manual page
+documents the GNU version of
+.BR find .
+.B find
+searches the directory tree rooted at each given file name by
+evaluating the given expression from left to right, according to the
+rules of precedence (see section OPERATORS), until the outcome is
+known (the left hand side is false for \fIand\fR operations, true for
+\fIor\fR), at which point
+.B find
+moves on to the next file name.
+.PP
+The first argument that begins with `\-', `(', `)', `,', or `!' is taken
+to be the beginning of the expression; any arguments before it are
+paths to search, and any arguments after it are the rest of the
+expression.  If no paths are given, the current directory is used.  If
+no expression is given, the expression `\-print' is used.
+.PP
+.B find
+exits with status 0 if all files are processed successfully, greater
+than 0 if errors occur.
+.SH EXPRESSIONS
+.P
+The expression is made up of options (which affect overall operation
+rather than the processing of a specific file, and always return true),
+tests (which return a true or false value), and actions (which have side
+effects and return a true or false value), all separated by operators.
+\-and is assumed where the operator is omitted.  If the expression contains
+no actions other than \-prune, \-print is performed on all files
+for which the expression is true.
+.SS OPTIONS
+.P
+All options always return true.  They always take effect, rather than
+being processed only when their place in the expression is reached.
+Therefore, for clarity, it is best to place them at the beginning of
+the expression.
+.IP \-daystart
+Measure times (for \-amin, \-atime, \-cmin, \-ctime, \-mmin, and \-mtime)
+from the beginning of today rather than from 24 hours ago.
+.IP \-depth
+Process each directory's contents before the directory itself.
+.IP \-follow
+Dereference symbolic links.  Implies \-noleaf.
+.IP "\-help, \-\-help"
+Print a summary of the command-line usage of
+.B find
+and exit.
+.IP "\-maxdepth \fIlevels\fR"
+Descend at most \fIlevels\fR (a non-negative integer) levels of
+directories below the command line arguments.  `\-maxdepth 0' means
+only apply the tests and actions to the command line arguments.
+.IP "\-mindepth \fIlevels\fR"
+Do not apply any tests or actions at levels less than \fIlevels\fR (a
+non-negative integer).  `\-mindepth 1' means process all files except
+the command line arguments.
+.IP \-mount
+Don't descend directories on other filesystems.  An alternate name for
+\-xdev, for compatibility with some other versions of
+.BR find .
+.IP "\-noleaf"
+Do not optimize by assuming that directories contain 2 fewer
+subdirectories than their hard link count.  This option is needed when
+searching filesystems that do not follow the Unix directory-link
+convention, such as CD-ROM or MS-DOS filesystems or AFS volume mount
+points.  Each directory on a normal Unix filesystem has at least 2
+hard links: its name and its `.'  entry.  Additionally, its
+subdirectories (if any) each have a `..'  entry linked to that
+directory.  When
+.B find
+is examining a directory, after it has statted 2 fewer subdirectories
+than the directory's link count, it knows that the rest of the entries
+in the directory are non-directories (`leaf' files in the directory
+tree).  If only the files' names need to be examined, there is no need
+to stat them; this gives a significant increase in search speed.
+.IP "\-version, \-\-version"
+Print the \fBfind\fR version number and exit.
+.IP \-xdev
+Don't descend directories on other filesystems.
+.SS TESTS
+.P
+Numeric arguments can be specified as
+.IP \fI+n\fP
+for greater than
+.IR n ,
+.IP \fI\-n\fP
+for less than
+.IR n ,
+.IP \fIn\fP
+for exactly
+.IR n .
+.IP "\-amin \fIn\fR"
+File was last accessed \fIn\fR minutes ago.
+.IP "\-anewer \fIfile\fR"
+File was last accessed more recently than \fIfile\fR was modified.
+\-anewer is affected by \-follow only if \-follow comes before
+\-anewer on the command line.
+.IP "\-atime \fIn\fR"
+File was last accessed \fIn\fR*24 hours ago.
+.IP "\-cmin \fIn\fR"
+File's status was last changed \fIn\fR minutes ago.
+.IP "\-cnewer \fIfile\fR"
+File's status was last changed more recently than \fIfile\fR was modified.
+\-cnewer is affected by \-follow only if \-follow comes before
+\-cnewer on the command line.
+.IP "\-ctime \fIn\fR"
+File's status was last changed \fIn\fR*24 hours ago.
+.IP \-empty
+File is empty and is either a regular file or a directory.
+.IP \-false
+Always false.
+.IP "\-fstype \fItype\fR"
+File is on a filesystem of type \fItype\fR.  The valid filesystem
+types vary among different versions of Unix; an incomplete list of
+filesystem types that are accepted on some version of Unix or another
+is: ufs, 4.2, 4.3, nfs, tmp, mfs, S51K, S52K.  You can use \-printf
+with the %F directive to see the types of your filesystems.
+.IP "\-gid \fIn\fR"
+File's numeric group ID is \fIn\fR.
+.IP "\-group \fIgname\fR"
+File belongs to group \fIgname\fR (numeric group ID allowed).
+.IP "\-ilname \fIpattern\fR"
+Like \-lname, but the match is case insensitive.
+.IP "\-iname \fIpattern\fR"
+Like \-name, but the match is case insensitive.  For example, the
+patterns `fo*' and `F??' match the file names `Foo', `FOO', `foo',
+`fOo', etc.
+.IP "\-inum \fIn\fR"
+File has inode number \fIn\fR.
+.IP "\-ipath \fIpattern\fR"
+Like \-path, but the match is case insensitive.
+.IP "\-iregex \fIpattern\fR"
+Like \-regex, but the match is case insensitive.
+.IP "\-links \fIn\fR"
+File has \fIn\fR links.
+.IP "\-lname \fIpattern\fR"
+File is a symbolic link whose contents match shell pattern
+\fIpattern\fR.  The metacharacters do not treat `/' or `.' specially.
+.IP "\-mmin \fIn\fR"
+File's data was last modified \fIn\fR minutes ago.
+.IP "\-mtime \fIn\fR"
+File's data was last modified \fIn\fR*24 hours ago.
+.IP "\-name \fIpattern\fR"
+Base of file name (the path with the leading directories removed)
+matches shell pattern \fIpattern\fR.  The metacharacters (`*', `?',
+and `[]') do not match a `.' at the start of the base name.  To ignore
+a directory and the files under it, use \-prune; see an example in the
+description of \-path.
+.IP "\-newer \fIfile\fR"
+File was modified more recently than \fIfile\fR.
+\-newer is affected by \-follow only if \-follow comes before
+\-newer on the command line.
+.IP \-nouser
+No user corresponds to file's numeric user ID.
+.IP \-nogroup
+No group corresponds to file's numeric group ID.
+.IP "\-path \fIpattern\fR"
+File name matches shell pattern \fIpattern\fR.  The metacharacters do
+not treat `/' or `.' specially; so, for example,
+.br
+.in +1i
+find . \-path './sr*sc'
+.br
+.in -1i
+will print an entry for a directory called './src/misc' (if one
+exists).  To ignore a whole directory tree, use \-prune rather than
+checking every file in the tree.  For example, to skip the
+directory `src/emacs' and all files and directories under it, and
+print the names of the other files found, do something like this:
+.br
+.in +1i
+find . \-path './src/emacs' -prune -o -print
+.br
+.in -1i
+.IP "\-perm \fImode\fR"
+File's permission bits are exactly \fImode\fR (octal or symbolic).
+Symbolic modes use mode 0 as a point of departure.
+.IP "\-perm \-\fImode\fR"
+All of the permission bits \fImode\fR are set for the file.
+.IP "\-perm +\fImode\fR"
+Any of the permission bits \fImode\fR are set for the file.
+.IP "\-regex \fIpattern\fR"
+File name matches regular expression \fIpattern\fR.  This is a match
+on the whole path, not a search.  For example, to match a file named
+`./fubar3', you can use the regular expression `.*bar.' or `.*b.*3',
+but not `b.*r3'.
+.IP "\-size \fIn\fR[bckw]"
+File uses \fIn\fP units of space.  The units are 512-byte blocks by
+default or if `b' follows \fIn\fP, bytes if `c' follows \fIn\fP,
+kilobytes if `k' follows \fIn\fP, or 2-byte words if `w' follows \fIn\fP.
+The size does not count indirect blocks, but it does count blocks in
+sparse files that are not actually allocated.
+.IP \-true
+Always true.
+.IP "\-type \fIc\fR"
+File is of type \fIc\fR:
+.RS
+.IP b
+block (buffered) special
+.IP c
+character (unbuffered) special
+.IP d
+directory
+.IP p
+named pipe (FIFO)
+.IP f
+regular file
+.IP l
+symbolic link
+.IP s
+socket
+.RE
+.IP "\-uid \fIn\fR"
+File's numeric user ID is \fIn\fR.
+.IP "\-used \fIn\fR"
+File was last accessed \fIn\fR days after its status was last changed.
+.IP "\-user \fIuname\fR"
+File is owned by user \fIuname\fR (numeric user ID allowed).
+.IP "\-xtype \fIc\fR"
+The same as \-type unless the file is a symbolic link.  For symbolic
+links: if \-follow has not been given, true if the file is a link to a
+file of type \fIc\fR; if \-follow has been given, true if \fIc\fR is
+`l'.  In other words, for symbolic links, \-xtype checks the type of
+the file that \-type does not check.
+.SS ACTIONS
+.IP "\-exec \fIcommand\fR ;"
+Execute \fIcommand\fR; true if 0 status is returned.  All following
+arguments to
+.B find
+are taken to be arguments to the command until an argument consisting
+of `;' is encountered.  The string `{}' is replaced by the current
+file name being processed everywhere it occurs in the arguments to the
+command, not just in arguments where it is alone, as in some versions
+of
+.BR find .
+Both of these constructions might need to be escaped (with a `\e') or
+quoted to protect them from expansion by the shell.  The command is
+executed in the starting directory.
+.IP "\-fls \fIfile\fR"
+True; like \-ls but write to \fIfile\fR like \-fprint.
+.IP "\-fprint \fIfile\fR"
+True; print the full file name into file \fIfile\fR.  If \fIfile\fR
+does not exist when \fBfind\fR is run, it is created; if it does
+exist, it is truncated.  The file names ``/dev/stdout'' and
+``/dev/stderr'' are handled specially; they refer to the standard
+output and standard error output, respectively.
+.IP "\-fprint0 \fIfile\fR"
+True; like \-print0 but write to \fIfile\fR like \-fprint.
+.IP "\-fprintf \fIfile\fR \fIformat\fR"
+True; like \-printf but write to \fIfile\fR like \-fprint.
+.IP "\-ok \fIcommand\fR ;"
+Like \-exec but ask the user first (on the standard input); if the
+response does not start with `y' or `Y', do not run the command, and
+return false.
+.IP \-print
+True; print the full file name on the standard output, followed by a newline.
+.IP \-print0
+True; print the full file name on the standard output, followed by a
+null character.  This allows file names that contain newlines to be
+correctly interpreted by programs that process the \fBfind\fR output.
+.IP "\-printf \fIformat\fR"
+True; print \fIformat\fR on the standard output, interpreting `\e'
+escapes and `%' directives.  Field widths and precisions can be
+specified as with the `printf' C function.  Unlike \-print, \-printf
+does not add a newline at the end of the string.  The escapes and
+directives are:
+.RS
+.IP \ea
+Alarm bell.
+.IP \eb
+Backspace.
+.IP \ec
+Stop printing from this format immediately and flush the output.
+.IP \ef
+Form feed.
+.IP \en
+Newline.
+.IP \er
+Carriage return.
+.IP \et
+Horizontal tab.
+.IP \ev
+Vertical tab.
+.IP \e\e
+A literal backslash (`\e').
+.PP
+A `\e' character followed by any other character is treated as an
+ordinary character, so they both are printed.
+.IP %%
+A literal percent sign.
+.IP %a
+File's last access time in the format returned by the C `ctime' function.
+.IP %A\fIk\fP
+File's last access time in the format specified by \fIk\fR, which is
+either `@' or a directive for the C `strftime' function.  The possible
+values for \fIk\fR are listed below; some of them might not be
+available on all systems, due to differences in `strftime' between
+systems.
+.RS
+.IP @
+seconds since Jan. 1, 1970, 00:00 GMT.
+.PP
+Time fields:
+.IP H
+hour (00..23)
+.IP I
+hour (01..12)
+.IP k
+hour ( 0..23)
+.IP l
+hour ( 1..12)
+.IP M
+minute (00..59)
+.IP p
+locale's AM or PM
+.IP r
+time, 12-hour (hh:mm:ss [AP]M)
+.IP S
+second (00..61)
+.IP T
+time, 24-hour (hh:mm:ss)
+.IP X
+locale's time representation (H:M:S)
+.IP Z
+time zone (e.g., EDT), or nothing if no time zone is determinable
+.PP
+Date fields:
+.IP a
+locale's abbreviated weekday name (Sun..Sat)
+.IP A
+locale's full weekday name, variable length (Sunday..Saturday)
+.IP b
+locale's abbreviated month name (Jan..Dec)
+.IP B
+locale's full month name, variable length (January..December)
+.IP c
+locale's date and time (Sat Nov 04 12:02:33 EST 1989)
+.IP d
+day of month (01..31)
+.IP D
+date (mm/dd/yy)
+.IP h
+same as b
+.IP j
+day of year (001..366)
+.IP m
+month (01..12)
+.IP U
+week number of year with Sunday as first day of week (00..53)
+.IP w
+day of week (0..6)
+.IP W
+week number of year with Monday as first day of week (00..53)
+.IP x
+locale's date representation (mm/dd/yy)
+.IP y
+last two digits of year (00..99)
+.IP Y
+year (1970...)
+.RE
+.IP %b
+File's size in 512-byte blocks (rounded up).
+.IP %c
+File's last status change time in the format returned by the C `ctime'
+function.
+.IP %C\fIk\fP
+File's last status change time in the format specified by \fIk\fR,
+which is the same as for %A.
+.IP %d
+File's depth in the directory tree; 0 means the file is a command line
+argument.
+.IP %f
+File's name with any leading directories removed (only the last element).
+.IP %F
+Type of the filesystem the file is on; this value can be used for
+\-fstype.
+.IP %g
+File's group name, or numeric group ID if the group has no name.
+.IP %G
+File's numeric group ID.
+.IP %h
+Leading directories of file's name (all but the last element).
+.IP %H
+Command line argument under which file was found.
+.IP %i
+File's inode number (in decimal).
+.IP %k
+File's size in 1K blocks (rounded up).
+.IP %l
+Object of symbolic link (empty string if file is not a symbolic link).
+.IP %m
+File's permission bits (in octal).
+.IP %n
+Number of hard links to file.
+.IP %p
+File's name.
+.IP %P
+File's name with the name of the command line argument under which
+it was found removed.
+.IP %s
+File's size in bytes.
+.IP %t
+File's last modification time in the format returned by the C `ctime'
+function.
+.IP %T\fIk\fP
+File's last modification time in the format specified by \fIk\fR, 
+which is the same as for %A.
+.IP %u
+File's user name, or numeric user ID if the user has no name.
+.IP %U
+File's numeric user ID.
+.PP
+A `%' character followed by any other character is discarded (but the
+other character is printed).
+.RE
+.IP \-prune
+If \-depth is not given, true; do not descend the current directory.
+.br
+If \-depth is given, false; no effect.
+.IP \-ls
+True; list current file in `ls \-dils' format on standard output.
+The block counts are of 1K blocks, unless the environment variable
+POSIXLY_CORRECT is set, in which case 512-byte blocks are used.
+.SS OPERATORS
+.P
+Listed in order of decreasing precedence:
+.IP "( \fIexpr\fR )"
+Force precedence.
+.IP "! \fIexpr\fR"
+True if \fIexpr\fR is false.
+.IP "\-not \fIexpr\fR"
+Same as ! \fIexpr\fR.
+.IP "\fIexpr1 expr2\fR"
+And (implied); \fIexpr2\fR is not evaluated if \fIexpr1\fR is false.
+.IP "\fIexpr1\fR \-a \fIexpr2\fR"
+Same as \fIexpr1 expr2\fR.
+.IP "\fIexpr1\fR \-and \fIexpr2\fR"
+Same as \fIexpr1 expr2\fR.
+.IP "\fIexpr1\fR \-o \fIexpr2\fR"
+Or; \fIexpr2\fR is not evaluated if \fIexpr1\fR is true.
+.IP "\fIexpr1\fR \-or \fIexpr2\fR"
+Same as \fIexpr1\fR \-o \fIexpr2\fR.
+.IP "\fIexpr1\fR , \fIexpr2\fR"
+List; both \fIexpr1\fR and \fIexpr2\fR are always evaluated.
+The value of \fIexpr1\fR is discarded; the value of the list is the
+value of \fIexpr2\fR.
+.SH "SEE ALSO"
+\fBlocate\fP(1L), \fBlocatedb\fP(5L), \fBupdatedb\fP(1L), \fBxargs\fP(1L)
+\fBFinding Files\fP (on-line in Info, or printed)

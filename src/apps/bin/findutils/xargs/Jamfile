@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src apps bin findutils xargs ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H ;
+}
+
+BinCommand xargs :
+	xargs.c
+	: libfindutils.a : findutils.rdef ;
+
+SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;

@@ -1,0 +1,32 @@
+SubDir OBOS_TOP src apps bin findutils lib ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H ;
+}
+
+
+StaticLibrary findutils : 
+	regex.c
+	dirname.c
+	error.c
+	filemode.c
+	getopt.c
+	getopt1.c
+	idcache.c
+	listfile.c
+	modechange.c
+	nextelem.c
+	savedir.c
+	xmalloc.c
+	getline.c
+	xstrdup.c
+	xgetcwd.c
+	fnmatch.c
+	fileblocks.c
+	version.c
+;
+
+SEARCH on [ FGristFiles version.c ] = [ FDirName $(SUBDIR) $(DOTDOT) find ] ;

@@ -1,0 +1,63 @@
+SubDir OBOS_TOP src apps bin findutils locate ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H -DLOCATE_DB='\"/var/locatedb\"' ;
+}
+
+BinCommand locate :
+	locate.c
+	: libfindutils.a : findutils.rdef ;
+
+SEARCH on [ FGristFiles findutils.rdef ] = [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+
+BinCommand bigram :
+	bigram.c
+	: libfindutils.a : findutils.rdef ;
+
+MakeLocate bigram : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
+
+BinCommand frcode :
+	frcode.c
+	: libfindutils.a : findutils.rdef ;
+
+MakeLocate frcode : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
+
+BinCommand code :
+	code.c
+	: libfindutils.a : findutils.rdef ;
+
+MakeLocate code : [ FDirName $(OBOS_ETC_DIR) libexec locate ] ;
+
+rule MkUpdateDb
+{
+	SetupObjectsDir ;
+	SEARCH on $(>) = $(SEARCH_SOURCE) ;
+	MakeLocate $(<) : $(LOCATE_TARGET) ;
+	Depends $(<) : $(>) ;
+	MkUpdateDb1 $(<) : $(>) ;
+	LocalClean clean : $(<) ;
+}
+
+actions MkUpdateDb1
+{
+	sed \
+	-e "s,@bindir@,/bin," \
+	-e "s,@libexecdir@,/etc/libexec/locate," \
+	-e "s,@LOCATE_DB@,/var/locatedb," \
+	-e "s,@version@,`sed -e '/version_string/!d' -e 's/[^0-9.]*\([0-9.]*\).*/\1/' -e q $(2[2])`," \
+	-e "s,@find@,find," \
+	-e "s,@frcode@,frcode," \
+	-e "s,@bigram@,bigram," \
+	-e "s,@code@,code," \
+	 $(2[1]) > $(1) ;
+}
+
+MkUpdateDb updatedb : updatedb.sh [ FGristFiles version.c ] ;
+MakeLocate <bin>updatedb : $(OBOS_BIN_DIR) ;
+Shell <bin>updatedb : updatedb ;
+
+SEARCH on [ FGristFiles version.c ] = [ FDirName $(SUBDIR) $(DOTDOT) find ] ;

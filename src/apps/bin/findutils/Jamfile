@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src apps bin findutils ;
+
+SubInclude OBOS_TOP src apps bin findutils lib ;
+SubInclude OBOS_TOP src apps bin findutils find ;
+SubInclude OBOS_TOP src apps bin findutils locate ;
+SubInclude OBOS_TOP src apps bin findutils xargs ;

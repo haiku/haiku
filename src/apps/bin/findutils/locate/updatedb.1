@@ -1,0 +1,78 @@
+.TH UPDATEDB 1L \" -*- nroff -*-
+.SH NAME
+updatedb \- update a file name database
+.SH SYNOPSIS
+.B updatedb [\fIoptions\fP]
+.SH DESCRIPTION
+This manual page
+documents the GNU version of
+.BR updatedb ,
+which updates file name databases used by GNU
+.BR locate .
+The file name databases contain lists of files that were in
+particular directory trees when the databases were last updated.
+The file name of the default database is determined when \fBlocate\fP
+and \fBupdatedb\fP are configured and installed.  The frequency with
+which the databases are updated and the directories for which they
+contain entries depend on how often \fBupdatedb\fP is run, and with
+which arguments.
+.P
+In networked environments, it often makes sense to build a database at
+the root of each filesystem, containing the entries for that filesystem.
+.B updatedb
+is then run for each filesystem on the fileserver where that
+filesystem is on a local disk, to prevent thrashing the network.
+Users can select which databases \fBlocate\fP searches using an
+environment variable or command line option; see \fBlocate\fP(1L).
+Databases can not be concatenated together.
+.P
+The file name database format changed starting with GNU
+.B find
+and
+.B locate
+version 4.0 to allow machines with diffent byte orderings to share
+the databases.  The new GNU
+.B locate
+can read both the old and new database formats.
+However, old versions of
+.B locate
+and
+.B find
+produce incorrect results if given a new-format database.
+.SH OPTIONS
+.TP
+.B \-\-localpaths='\fIpath1 path2...\fP'
+Non-network directories to put in the database.
+Default is /.
+.TP
+.B \-\-netpaths='\fIpath1 path2...\fP'
+Network (NFS, AFS, RFS, etc.) directories to put in the database.
+Default is none.
+.TP
+.B \-\-prunepaths='\fIpath1 path2...\fP'
+Directories to not put in the database, which would otherwise be.
+Default is /tmp /usr/tmp /var/tmp /afs.
+.TP
+.B \-\-output=\fIdbfile\fP
+The database file to build.
+Default is system-dependent, but typically /usr/local/var/locatedb.
+.TP
+.B \-\-netuser=\fIuser\fP
+The user to search network directories as, using \fBsu\fP(1).
+Default is \fBdaemon\fP.
+.TP
+.B \-\-old\-format
+Create the database in the old format instead of the new one.
+.TP
+.B \-\-version
+Print the version number of
+.B updatedb
+and exit.
+.TP
+.I "\-\-help"
+Print a summary of the options to
+.B updatedb
+and exit.
+.SH "SEE ALSO"
+\fBfind\fP(1L), \fBlocate\fP(1L), \fBlocatedb\fP(5L), \fBxargs\fP(1L)
+\fBFinding Files\fP (on-line in Info, or printed)
