@@ -58,6 +58,7 @@ _start(kernel_args *oldka, int cpu_num)
 	kernel_startup = true;
 
 	memcpy(&ka, oldka, sizeof(kernel_args));
+		// the passed in kernel args are in a non-allocated range of memory
 
 	smp_set_num_cpus(ka.num_cpus);
 
