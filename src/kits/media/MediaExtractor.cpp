@@ -201,10 +201,11 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 	if (res != B_OK) {
 		printf("MediaExtractor::CreateDecoder Setup failed for stream %ld: %ld (%s)\n",
 			stream, res, strerror(res));
+		return res;
 	}
-	
+
 	(*decoder)->GetCodecInfo(mci);
 	
-	return res;
+	return B_OK;
 }
 
