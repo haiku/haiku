@@ -12,7 +12,6 @@ KernelMergeObject posix_unistd.o :
 	_exit.c
 	fcntl.c
 	fork.c
-	getopt.c
 	hostname.c
 	ioctl.c
 	link.c
