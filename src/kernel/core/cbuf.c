@@ -3,16 +3,9 @@
  */
 
 
-#include <kernel.h>
-#include <memheap.h>
 #include <OS.h>
-#include <smp.h>
-#include <arch/int.h>
-#include <arch/debug.h>
+#include <KernelExport.h>
 #include <cbuf.h>
-#include <arch/cpu.h>
-#include <debug.h>
-#include <int.h>
 #include <vm.h>
 
 #include <string.h>
