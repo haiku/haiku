@@ -6,7 +6,8 @@ UseLibraryHeaders agg ;
 SubDirCcFlags -w ;
 SubDirC++Flags -w ;
 
-SharedLibrary agg : 
+#SharedLibrary agg : 
+StaticLibrary agg : 
 	font_freetype/agg_font_freetype.cpp
 	src/agg_arc.cpp
 	src/agg_arrowhead.cpp
@@ -35,19 +36,20 @@ SharedLibrary agg :
 	src/agg_vpgen_clip_polygon.cpp
 	src/agg_vpgen_clip_polyline.cpp
 	src/agg_vpgen_segmentator.cpp
-	src/ctrl/agg_bezier_ctrl.cpp
-	src/ctrl/agg_cbox_ctrl.cpp
-	src/ctrl/agg_gamma_ctrl.cpp
-	src/ctrl/agg_gamma_spline.cpp
-	src/ctrl/agg_polygon_ctrl.cpp
-	src/ctrl/agg_rbox_ctrl.cpp
-	src/ctrl/agg_scale_ctrl.cpp
-	src/ctrl/agg_slider_ctrl.cpp
-	src/ctrl/agg_spline_ctrl.cpp
+	# the following are just GUI controls for the interactive agg demos
+	#src/ctrl/agg_bezier_ctrl.cpp
+	#src/ctrl/agg_cbox_ctrl.cpp
+	#src/ctrl/agg_gamma_ctrl.cpp
+	#src/ctrl/agg_gamma_spline.cpp
+	#src/ctrl/agg_polygon_ctrl.cpp
+	#src/ctrl/agg_rbox_ctrl.cpp
+	#src/ctrl/agg_scale_ctrl.cpp
+	#src/ctrl/agg_slider_ctrl.cpp
+	#src/ctrl/agg_spline_ctrl.cpp
 	
 	# uncomment this line to enable the General Polygon Clipper
 	# see the license in gpc.c for usage information
 	#gpc/gpc.c
 ;
 
-LinkSharedOSLibs libagg.so : root be libfreetype.so ;
+#LinkSharedOSLibs libagg.so : root be libfreetype.so ;
