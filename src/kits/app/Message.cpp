@@ -30,6 +30,11 @@
 
 #define USING_TEMPLATE_MADNESS
 
+// debugging
+//#define DBG(x) x
+#define DBG(x)	;
+#define PRINT(x)	DBG({ printf("[%6ld] ", find_thread(NULL)); printf x; })
+
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 
@@ -1778,6 +1783,8 @@ status_t BMessage::_send_(port_id port, int32 token, bool preferred,
 						  bigtime_t timeout, bool reply_required,
 						  BMessenger& reply_to) const
 {
+PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
+"what: %lx (%.4s)\n", port, token, preferred, what, (char*)&what));
 	BMessage tmp_msg;
 	tmp_msg.fPreferred     = fPreferred;
 	tmp_msg.fTarget        = fTarget;
@@ -1812,6 +1819,7 @@ status_t BMessage::_send_(port_id port, int32 token, bool preferred,
 	self->fReplyRequired = tmp_msg.fReplyRequired;
 	self->fReplyTo       = tmp_msg.fReplyTo;
 	tmp_msg.init_data();
+PRINT(("BMessage::_send_() done: %lx\n", err));
 	return err;
 }
 //------------------------------------------------------------------------------
@@ -1910,6 +1918,7 @@ static status_t handle_reply(port_id   reply_port,
                              bigtime_t timeout,
                              BMessage* reply)
 {
+PRINT(("handle_reply(port: %ld)\n", reply_port));
 	status_t err;
 	do
 	{
@@ -1917,6 +1926,7 @@ static status_t handle_reply(port_id   reply_port,
 	} while (err == B_INTERRUPTED);
 	if (err < 0)
 	{
+		PRINT(("handle_reply() error 1: %lx\n", err));
 		return err;
 	}
 	// The API lied. It really isn't an error code, but the message size...
@@ -1939,16 +1949,20 @@ static status_t handle_reply(port_id   reply_port,
 
 	if (err < 0)
 	{
+		PRINT(("handle_reply() error 2: %lx\n", err));
 		return err;
 	}
 
 	if (*pCode == 'PUSH')
 	{
+		PRINT(("handle_reply() error 3: %x\n", B_ERROR));
 		return B_ERROR;
 	}
 	if (*pCode != 'pjpp')
 	{
-		return B_OK;
+		PRINT(("handle_reply() error 4: port message code not 'pjpp' but "
+			"'%lx'\n", *pCode));
+		return B_ERROR;
 	}
 
 	err = reply->Unflatten(pMem);
@@ -1959,6 +1973,7 @@ static status_t handle_reply(port_id   reply_port,
 	{
 		delete[] pAllocd;
 	}
+PRINT(("handle_reply() done: %lx\n", err));
 	return err;
 }
 //------------------------------------------------------------------------------
