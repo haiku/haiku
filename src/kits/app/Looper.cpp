@@ -83,6 +83,8 @@ using BPrivate::BLooperList;
 port_id _get_looper_port_(const BLooper* looper);
 bool _use_preferred_target_(BMessage* msg) { return msg->fPreferred; }
 int32 _get_message_target_(BMessage* msg) { return msg->fTarget; }
+void _set_message_target_(BMessage* msg, int32 token, bool pref)
+	{ msg->fTarget = token; msg->fPreferred = pref; }
 
 uint32			BLooper::sLooperID = (uint32)B_ERROR;
 team_id			BLooper::sTeamID = (team_id)B_ERROR;
