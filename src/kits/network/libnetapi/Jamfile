@@ -3,12 +3,12 @@ SubDir OBOS_TOP src kits net libnetapi ;
 UsePrivateHeaders net ;
 
 SharedLibrary netapi :
-	NetEndpoint.cpp
+#	NetEndpoint.cpp
 	NetAddress.cpp 
 	NetBuffer.cpp
 	NetDebug.cpp
 ;
 
 LinkSharedOSLibs libnetapi.so :
-	root net
+	root be libnet.so
 ;

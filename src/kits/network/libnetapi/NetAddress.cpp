@@ -8,7 +8,7 @@
  *       host byte order.
  *     * In all mutators, address and port are converted from host to
  *       network byte order.
- *     * Michael, no trouts were harmed during the creation of this class.
+ *     * No trouts were harmed during the development of this class.
  *=--------------------------------------------------------------------------=*
  * Copyright (c) 2002, The OpenBeOS project.
  *
@@ -35,8 +35,11 @@
 
 #include <string.h>
 #include <netdb.h>
-#include <arpa/inet.h>  // STM: #include <ByteOrder.h>???
+#include <arpa/inet.h>
 #include <netinet/in.h>
+#include <Message.h>
+
+#include <ByteOrder.h>
 #include <NetAddress.h>
 
 /*
@@ -197,7 +200,7 @@ BNetAddress::~BNetAddress( void )
  *     Hostname and/or port can be NULL; although having them both NULL would
  *     be a pointless waste of CPU cycles.  ;-)
  *
- *     The hostname output parameter can be a variety of things, but it this
+ *     The hostname output parameter can be a variety of things, but in this
  *     method we convert the IP address to a string.  See the relevant
  *     documentation about inet_ntoa() for details.
  *
@@ -249,8 +252,9 @@ status_t BNetAddress::GetAddr( char* hostname, unsigned short* port ) const
  *
  * Remarks:
  *     This method fills in the sin_addr, sin_family, and sin_port fields of
- *     the output parameter, all other fields are untouched.  All numeric
- *     values are in network byte order.
+ *     the output parameter, all other fields are untouched so we can work
+ *     with both POSIX and non-POSIX versions of said struct.  The port and
+ *     address values added to the output parameter are in network byte order.
  */
 status_t BNetAddress::GetAddr( struct sockaddr_in& sa ) const
 {
@@ -309,7 +313,7 @@ status_t BNetAddress::GetAddr( in_addr& addr, unsigned short* port ) const
  * Returns:
  *     B_OK if this instance is initialized, B_ERROR if not.
  */
-status_t BNetAddress::InitCheck( void ) const
+status_t BNetAddress::InitCheck( void )
 {
     return ( fInitialized == B_OK ) ? B_OK : B_ERROR;
 }
@@ -336,10 +340,6 @@ status_t BNetAddress::Archive( BMessage* into, bool deep ) const
     {
         return B_NO_INIT;
     }
-
-    //STM: When storing, should we store some kind of class name too...
-    //STM: Is there any way to deal with a complete failure here?  (into
-    //     not completely filled).
 
     if ( into->AddInt8( "bnaddr_family", fFamily ) != B_OK )
     {
@@ -433,7 +433,6 @@ status_t BNetAddress::SetTo( const char* hostname, unsigned short port )
             }
             else
             {
-                //STM: Print and/or log an error message?
                 return B_ERROR;
             }
         }
@@ -546,10 +545,9 @@ status_t BNetAddress::SetTo( const char* hostname, const char* protocol,
     ServiceEntry = getservbyname( service, protocol );
     if ( ServiceEntry == NULL )
     {
-        //STM: Print and/or log an error message?
         return B_ERROR;
     }
-    endservent( );
+    // endservent( );
 
     return SetTo( hostname, ServiceEntry->s_port );
 }
@@ -581,4 +579,3 @@ status_t BNetAddress::clone( const BNetAddress& RefParam )
 }
 
 /*=------------------------------------------------------------------- End -=*/
-
