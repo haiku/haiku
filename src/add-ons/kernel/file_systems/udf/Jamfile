@@ -27,7 +27,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 
 R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	cpp.cpp
-	vfs_interface.cpp
+	udf.cpp
 
 	CS0String.cpp
 	DirectoryIterator.cpp
