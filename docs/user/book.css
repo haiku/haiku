@@ -1,0 +1,184 @@
+H1 {
+	text-align: center;
+	font-family: Arial, Helvetica, sans-serif;
+}
+H2 {
+	font-family: Arial, Helvetica, sans-serif;
+}
+CAPTION { font-weight: bold }
+DIV.qindex { width: 100%;
+			 font-family: Arial, Helvetica, sans-serif;
+             background-color: white;
+             border: 1px solid black;
+			 padding: 2px;
+             text-align: center;
+             margin-bottom: 2px
+}
+A.qindex { text-decoration: none; font-weight: bold; color: #2222aa }
+A.qindex:visited { text-decoration: none; font-weight: bold; color: #2222aa }
+A.qindex:hover { text-decoration: none; background-color: #f0f0e0 }
+A.qindexHL { text-decoration: underlined; font-weight: bold;
+             background-color: #e0e0d0 /*#111199;*/
+             color: black; /*#cccccc*/
+           }
+A.qindexHL:hover { text-decoration: none; background-color: #111199; color: #ffffff }
+/*A.qindexHL:visited { text-decoration: none; color: #000060 }*/
+A.el { text-decoration: underline; font-weight: bold; color: #2222aa }
+A.elRef { font-weight: bold }
+A { text-decoration: underline; color: #2222aa }
+A.codeRef { text-decoration: underline; font-weight: normal; color: #2222aa }
+A:hover { text-decoration: underline; background-color: #e0e0d0 }
+A.el:visited { text-decoration: underline; color: #000060 }
+DL.el { margin-left: -1cm }
+DIV.fragment {
+	width: 98%;
+	border: 1px solid #CCCCCC;
+	background-color: #f5f5f5;
+	padding-left: 4px;
+	margin: 4px;
+}
+DIV.ah { background-color: black; font-weight: bold; color: #ffffff; margin-bottom: 3px; margin-top: 3px }
+TD.md { background-color: #ffffff; font-weight: bold; }
+TD.mdname1 { background-color: #ffffff; font-weight: bold; color: #602020; }
+TD.mdname { background-color: #ffffff; font-weight: bold; color: #602020; width: 600px; }
+DIV.groupHeader { margin-left: 16px; margin-top: 12px; margin-bottom: 6px; font-weight: bold }
+DIV.groupText { margin-left: 16px; font-style: italic; font-size: smaller }
+BODY {
+ 	font-family: Arial, Helvetica, sans-serif;
+	background: white;
+	color: black;
+	margin-right: 20px;
+	margin-left: 20px;
+}
+TD.indexkey { 
+   background-color: white;
+   font-weight: bold; 
+   padding-right  : 10px; 
+   padding-top    : 2px; 
+   padding-left   : 10px; 
+   padding-bottom : 2px; 
+   margin-left    : 0px; 
+   margin-right   : 0px; 
+   margin-top     : 2px; 
+   margin-bottom  : 2px  
+}
+TD.indexvalue { 
+   background-color: white;
+   font-style: italic; 
+   padding-right  : 10px; 
+   padding-top    : 2px; 
+   padding-left   : 10px; 
+   padding-bottom : 2px; 
+   margin-left    : 0px; 
+   margin-right   : 0px; 
+   margin-top     : 2px; 
+   margin-bottom  : 2px  
+}
+TR.memlist {
+   background-color: #f0f0f0; 
+}
+P.formulaDsp { text-align: center; }
+IMG.formulaDsp { }
+IMG.formulaInl { vertical-align: middle; }
+SPAN.keyword       { color: #008000 }
+SPAN.keywordtype   { color: #604020 }
+SPAN.keywordflow   { color: #e08000 }
+SPAN.comment       { color: #800000 }
+SPAN.preprocessor  { color: #806020 }
+SPAN.stringliteral { color: #002080 }
+SPAN.charliteral   { color: #008080 }
+
+/* this violates anything which is good style - but it seem to work... */
+EM.none { font-style: italic; }
+EM, SPAN.var { 
+	font-weight: bold; 
+	font-family: Arial, sans-serif; 
+	font-style: italic; 
+	color: #602020; 
+}
+CODE { color: #3333aa; }
+
+.mdTable {
+	border: 4px ridge #868686;
+	background-color: #ffffff;
+}
+.mdRow {
+	padding: 8px 20px;
+}
+.mdescLeft {
+	font-size: smaller;
+	font-family: Arial, Helvetica, sans-serif;
+	background-color: #FAFAFA;
+	padding-left: 8px;
+	border-top: 1px none #E0E0E0;
+	border-right: 1px none #E0E0E0;
+	border-bottom: 1px none #E0E0E0;
+	border-left: 1px none #E0E0E0;
+	margin: 0px;
+}
+.mdescRight {
+	font-size: smaller;
+	font-family: Arial, Helvetica, sans-serif;
+	font-style: italic;
+	background-color: #FAFAFA;
+	padding-left: 4px;
+	border-top: 1px none #E0E0E0;
+	border-right: 1px none #E0E0E0;
+	border-bottom: 1px none #E0E0E0;
+	border-left: 1px none #E0E0E0;
+	margin: 0px;
+	padding-bottom: 0px;
+	padding-right: 8px;
+}
+.memItemLeft {
+	padding: 1px 0px 0px 8px;
+	margin: 4px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-top-color: #E0E0E0;
+	border-right-color: #E0E0E0;
+	border-bottom-color: #E0E0E0;
+	border-left-color: #E0E0E0;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	background-color: #FAFAFA;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.memItemRight {
+	padding: 1px 0px 0px 8px;
+	margin: 4px;
+	border-top-width: 1px;
+	border-right-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-top-style: solid;
+	border-top-color: #E0E0E0;
+	border-right-color: #E0E0E0;
+	border-bottom-color: #E0E0E0;
+	border-left-color: #E0E0E0;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	background-color: #FAFAFA;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 13px;
+}
+.search     { color: #0000ee;
+              font-weight: bold;
+}
+FORM.search {
+              margin-bottom: 0px;
+              margin-top: 0px;
+}
+INPUT.search { font-size: 75%;
+               color: #000080;
+               font-weight: normal;
+               background-color: #eeeeff;
+}
+TD.tiny      { font-size: 75%;
+}
