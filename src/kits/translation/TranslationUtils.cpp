@@ -184,9 +184,9 @@ BTranslationUtils::GetBitmap(uint32 type, int32 id, BTranslatorRoster *roster)
 	BMemoryIO memio(kpRawData, bitmapSize);
 		// Put the pointer to the raw image data into a BMemoryIO object
 		// so that it can be used with BTranslatorRoster->Translate() in
-		// the TranslateToBitmap() function
+		// the GetBitmap(BPositionIO *, BTranslatorRoster *) function
 	
-	return TranslateToBitmap(&memio, roster);
+	return GetBitmap(&memio, roster);
 		// Translate the data in memio using the BTranslatorRoster roster
 }
 
@@ -230,7 +230,7 @@ BTranslationUtils::GetBitmap(uint32 type, const char *kName,
 		// Put the pointer to the raw image data into a BMemoryIO object so
 		// that it can be used with BTranslatorRoster->Translate() 
 	
-	return TranslateToBitmap(&memio, roster);
+	return GetBitmap(&memio, roster);
 		// Translate the data in memio using the BTranslatorRoster roster
 }
 
@@ -258,7 +258,7 @@ BTranslationUtils::GetBitmapFile(const char *kName, BTranslatorRoster *roster)
 	if (bitmapFile.InitCheck() != B_OK)
 		return NULL;
 
-	return TranslateToBitmap(&bitmapFile, roster);
+	return GetBitmap(&bitmapFile, roster);
 		// Translate the data in memio using the BTranslatorRoster roster
 }
 
@@ -286,7 +286,7 @@ BTranslationUtils::GetBitmap(const entry_ref *kRef, BTranslatorRoster *roster)
 	if (bitmapFile.InitCheck() != B_OK)
 		return NULL;
 
-	return TranslateToBitmap(&bitmapFile, roster);
+	return GetBitmap(&bitmapFile, roster);
 		// Translate the data in bitmapFile using the BTranslatorRoster roster
 }
 
@@ -294,7 +294,9 @@ BTranslationUtils::GetBitmap(const entry_ref *kRef, BTranslatorRoster *roster)
 // GetBitmap
 //
 // Returns a BBitmap object from the BPositionIO *stream. The
-// user must delete the returned object
+// user must delete the returned object. This GetBitmap function
+// is used by the other GetBitmap functions to do all of the
+// "real" work.
 //
 // Preconditions:
 //
@@ -304,13 +306,35 @@ BTranslationUtils::GetBitmap(const entry_ref *kRef, BTranslatorRoster *roster)
 // Postconditions:
 //
 // Returns: NULL, if the stream couldn't be translated to a BBitmap
-//          BBitmap * to the bitmap file named kName
+//          BBitmap * for the bitmap data from pio if successful
 // ---------------------------------------------------------------
 BBitmap *
 BTranslationUtils::GetBitmap(BPositionIO *stream, BTranslatorRoster *roster)
-{	
-	return TranslateToBitmap(stream, roster);
-		// Translate the data in memio using the BTranslatorRoster roster
+{
+	if (stream == NULL)
+		return NULL;
+	
+	// Use default Translator if none is specified 
+	if (roster == NULL) {
+		roster = BTranslatorRoster::Default();
+		if (roster == NULL)
+			return NULL;
+	}
+
+	// Translate the file from whatever format it is in the file
+	// to the type format so that it can be stored in a BBitmap
+	BBitmapStream bitmapStream;
+	if (roster->Translate(stream, NULL, NULL, &bitmapStream,
+		B_TRANSLATOR_BITMAP) < B_OK)
+		return NULL;
+	
+	// Detach the BBitmap from the BBitmapStream so the user
+	// of this function can do what they please with it.
+	BBitmap *pBitmap = NULL;
+	if (bitmapStream.DetachBitmap(&pBitmap) == B_NO_ERROR)
+		return pBitmap;
+	else
+		return NULL;
 }
 
 // ---------------------------------------------------------------
@@ -911,55 +935,3 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 	delete[] ids;
 	return B_OK;
 }
-
-// ---------------------------------------------------------------
-// TranslateToBitmap
-//
-// Translates the image data from pio to the type type using the
-// supplied BTranslatorRoster. If BTranslatorRoster is not supplied 
-// the default BTranslatorRoster is used. This function is used
-// indirectly by the GetBitmap functions
-//
-// Preconditions:
-//
-// Parameters: pio, the stream to get the bitmap from
-//             type, the type of data in the stream
-//             roster, BTranslatorRoster used to do the
-//                     translation, if NULL the default
-//                     translators are used
-//
-// Postconditions:
-//
-// Returns: NULL, if anything went wrong
-//          BBitmap * for the bitmap data from pio if successful
-// ---------------------------------------------------------------
-BBitmap *
-BTranslationUtils::TranslateToBitmap(BPositionIO *pio,
-	BTranslatorRoster *roster)
-{
-	if (pio == NULL)
-		return NULL;
-	
-	// Use default Translator if none is specified 
-	if (roster == NULL) {
-		roster = BTranslatorRoster::Default();
-		if (roster == NULL)
-			return NULL;
-	}
-
-	// Translate the file from whatever format it is in the file
-	// to the type format so that it can be stored in a BBitmap
-	BBitmapStream bitmapStream;
-	if (roster->Translate(pio, NULL, NULL, &bitmapStream,
-		B_TRANSLATOR_BITMAP) < B_OK)
-		return NULL;
-	
-	// Detach the BBitmap from the BBitmapStream so the user
-	// of this function can do what they please with it.
-	BBitmap *pBitmap = NULL;
-	if (bitmapStream.DetachBitmap(&pBitmap) == B_NO_ERROR)
-		return pBitmap;
-	else
-		return NULL;
-}
-
