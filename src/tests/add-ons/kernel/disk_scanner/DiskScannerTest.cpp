@@ -27,7 +27,7 @@ get_nth_session_info(int deviceFD, int32 index, session_info *sessionInfo)
 	disk_scanner_module_info *disk_scanner = NULL;
 	// get the partition scanner module
 	if (error == B_OK)
-		error = get_module(PARTSCAN_MODULE_NAME, (module_info**)&disk_scanner);
+		error = get_module(DISK_SCANNER_MODULE_NAME, (module_info**)&disk_scanner);
 	// get the session info
 	if (error == B_OK)
 		error = disk_scanner->get_nth_session_info(deviceFD, index, sessionInfo);
@@ -61,7 +61,7 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 	disk_scanner_module_info *disk_scanner = NULL;
 	// get the partition scanner module
 	if (error == B_OK)
-		error = get_module(PARTSCAN_MODULE_NAME, (module_info**)&disk_scanner);
+		error = get_module(DISK_SCANNER_MODULE_NAME, (module_info**)&disk_scanner);
 	// get the session info
 	if (error == B_OK) {
 		error = disk_scanner->get_nth_session_info(deviceFD, sessionIndex,
