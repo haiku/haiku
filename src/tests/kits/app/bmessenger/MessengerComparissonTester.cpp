@@ -29,6 +29,48 @@
 
 //------------------------------------------------------------------------------
 
+struct FakeMessenger {
+	port_id	fPort;
+	int32	fHandlerToken;
+	team_id	fTeam;
+	int32	extra0;
+	int32	extra1;
+	bool	fPreferredTarget;
+	bool	extra2;
+	bool	extra3;
+	bool	extra4;
+};
+
+static
+bool
+operator<(const FakeMessenger& a, const FakeMessenger& b)
+{
+	// significance:
+	// * fPort
+	// * fHandlerToken
+	// * fPreferredTarget
+	// fTeam is insignificant
+	return (a.fPort < b.fPort
+			|| a.fPort == b.fPort
+				&& (a.fHandlerToken < b.fHandlerToken
+					|| a.fHandlerToken == b.fHandlerToken
+						&& !a.fPreferredTarget && b.fPreferredTarget));
+}
+
+static
+bool
+operator!=(const FakeMessenger& a, const FakeMessenger& b)
+{
+	return (a < b || b < a);
+}
+
+static
+bool
+operator==(const FakeMessenger& a, const FakeMessenger& b)
+{
+	return !(a != b);
+}
+
 // constructor
 MessengerComparissonTester::MessengerComparissonTester()
 	: BThreadedTestCase(),
@@ -172,6 +214,77 @@ void MessengerComparissonTester::ComparissonTest3()
 	}
 }
 
+// Compare
+//
+// Helper function for LessTest1().
+static inline
+void
+Compare(const FakeMessenger &fake1, const FakeMessenger &fake2,
+		const BMessenger &messenger1, const BMessenger &messenger2)
+{
+	CHK((messenger1 == messenger2) == (fake1 == fake2));
+	CHK((messenger1 != messenger2) == (fake1 != fake2));
+	CHK((messenger1 < messenger2) == (fake1 < fake2));
+}
+
+/*
+	bool operator<(const BMessenger &a, const BMessenger &b)
+	@case 1			set fields of a and b manually
+	@results		should return whatever the reference implementation
+					returns.
+ */
+void MessengerComparissonTester::LessTest1()
+{
+	port_id ports[] = { -1, 0, 1 } ;
+	int32 tokens[] = { -1, 0, 1 } ;
+	team_id teams[] = { -1, 0, 1 } ;
+	bool preferreds[] = { false, true } ;
+	int32 portCount = sizeof(ports) / sizeof(port_id);
+	int32 tokenCount = sizeof(tokens) / sizeof(int32);
+	int32 teamCount = sizeof(teams) / sizeof(team_id);
+	int32 preferredCount = 2;
+	for (int32 p1 = 0; p1 < portCount; p1++) {
+		port_id port1 = ports[p1];
+		for (int32 to1 = 0; to1 < tokenCount; to1++) {
+			int32 token1 = tokens[to1];
+			for (int32 te1 = 0; te1 < teamCount; te1++) {
+				team_id team1 = teams[te1];
+				for (int32 pr1 = 0; pr1 < preferredCount; pr1++) {
+					bool preferred1 = preferreds[pr1];
+					FakeMessenger fake1;
+					fake1.fPort = port1;
+					fake1.fHandlerToken = token1;
+					fake1.fTeam = team1;
+					fake1.fPreferredTarget = preferred1;
+					BMessenger &messenger1 = *(BMessenger*)&fake1;
+					for (int32 p2 = 0; p2 < portCount; p2++) {
+						port_id port2 = ports[p2];
+						for (int32 to2 = 0; to2 < tokenCount; to2++) {
+							int32 token2 = tokens[to2];
+							for (int32 te2 = 0; te2 < teamCount; te2++) {
+								team_id team2 = teams[te2];
+								for (int32 pr2 = 0; pr2 < preferredCount;
+									 pr2++) {
+									bool preferred2 = preferreds[pr2];
+									FakeMessenger fake2;
+									fake2.fPort = port2;
+									fake2.fHandlerToken = token2;
+									fake2.fTeam = team2;
+									fake2.fPreferredTarget = preferred2;
+									BMessenger &messenger2
+										= *(BMessenger*)&fake2;
+									Compare(fake1, fake2, messenger1,
+											messenger2);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 
 Test* MessengerComparissonTester::Suite()
 {
@@ -182,6 +295,7 @@ Test* MessengerComparissonTester::Suite()
 	ADD_TEST(testSuite, MessengerComparissonTester, ComparissonTest1);
 	ADD_TEST(testSuite, MessengerComparissonTester, ComparissonTest2);
 	ADD_TEST(testSuite, MessengerComparissonTester, ComparissonTest3);
+	ADD_TEST(testSuite, MessengerComparissonTester, LessTest1);
 
 	return testSuite;
 }

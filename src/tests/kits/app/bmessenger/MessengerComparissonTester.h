@@ -33,6 +33,7 @@ public:
 	void ComparissonTest1();
 	void ComparissonTest2();
 	void ComparissonTest3();
+	void LessTest1();
 
 	static Test* Suite();
 
