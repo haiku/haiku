@@ -110,7 +110,6 @@ OpenWindow::MessageReceived(BMessage *message)
 		}
 
 		default:
-			message->PrintToStream();
 			BWindow::MessageReceived(message);
 			break;
 	}
