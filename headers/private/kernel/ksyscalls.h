@@ -147,6 +147,7 @@ enum {
 	SYSCALL_ATOMIC_AND64,			/* 135 */
 	SYSCALL_ATOMIC_OR64,
 	SYSCALL_ATOMIC_GET64,
+	SYSCALL_SET_REAL_TIME_CLOCK,
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);
