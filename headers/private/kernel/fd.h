@@ -36,6 +36,7 @@ struct fd_ops {
 struct file_descriptor {
 	int32	type;               /* descriptor type */
 	int32	ref_count;
+	int32	open_count;
 	struct fd_ops *ops;
 	union {
 		struct vnode *vnode;

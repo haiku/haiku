@@ -54,6 +54,7 @@ alloc_fd(void)
 	descriptor->u.vnode = NULL;
 	descriptor->cookie = NULL;
 	descriptor->ref_count = 1;
+	descriptor->open_count = 1;
 	descriptor->open_mode = 0;
 	descriptor->pos = 0;
 
@@ -108,9 +109,7 @@ put_fd(struct file_descriptor *descriptor)
 
 	// free the descriptor if we don't need it anymore
 	if (atomic_add(&descriptor->ref_count, -1) == 1) {
-		// close the underlying object (and free any resources allocated there)
-		if (descriptor->ops->fd_close)
-			descriptor->ops->fd_close(descriptor);
+		// free the underlying object
 		if (descriptor->ops->fd_free)
 			descriptor->ops->fd_free(descriptor);
 
@@ -141,17 +140,16 @@ get_fd(struct io_context *context, int fd)
 }
 
 
-/**	Removes the file descriptor in the specified slot, and
- *	reduces its reference counter.
+/**	Removes the file descriptor in the specified slot.
  */
 
-static void
+static struct file_descriptor *
 remove_fd(struct io_context *context, int fd)
 {
 	struct file_descriptor *descriptor = NULL;
 
 	if (fd < 0)
-		return;
+		return NULL;
 
 	mutex_lock(&context->io_mutex);
 
@@ -165,8 +163,7 @@ remove_fd(struct io_context *context, int fd)
 
 	mutex_unlock(&context->io_mutex);
 
-	if (descriptor)
-		put_fd(descriptor);
+	return descriptor;
 }
 
 
@@ -299,6 +296,32 @@ fd_is_valid(int fd, bool kernel)
 
 	put_fd(descriptor);
 	return true;
+}
+
+
+static status_t
+common_close(int fd, bool kernel)
+{
+	struct io_context *io = get_current_io_context(kernel);
+	struct file_descriptor *descriptor = remove_fd(io, fd);
+
+	if (descriptor == NULL)
+		return B_FILE_ERROR;
+
+	#ifdef TRACE_FD
+		if (!kernel)
+			TRACE(("_user_close(descriptor = %p)\n", descriptor));
+	#endif
+
+	if (atomic_add(&descriptor->open_count, -1) == 1) {
+		if (descriptor->ops->fd_close)
+			descriptor->ops->fd_close(descriptor);
+	}
+
+	put_fd(descriptor);
+		// the reference associated with the slot
+
+	return B_OK;
 }
 
 
@@ -592,18 +615,7 @@ _user_rewind_dir(int fd)
 status_t
 _user_close(int fd)
 {
-	struct io_context *io = get_current_io_context(false);
-	struct file_descriptor *descriptor = get_fd(io, fd);
-
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	TRACE(("user_close(descriptor = %p)\n", descriptor));
-
-	remove_fd(io, fd);
-
-	put_fd(descriptor);
-	return B_OK;
+	return common_close(fd, true);
 }
 
 
@@ -856,16 +868,7 @@ _kern_rewind_dir(int fd)
 status_t
 _kern_close(int fd)
 {
-	struct io_context *io = get_current_io_context(true);
-	struct file_descriptor *descriptor = get_fd(io, fd);
-
-	if (descriptor == NULL)
-		return B_FILE_ERROR;
-
-	remove_fd(io, fd);
-
-	put_fd(descriptor);
-	return B_OK;
+	return common_close(fd, true);
 }
 
 
