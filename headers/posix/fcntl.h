@@ -20,11 +20,7 @@
 #define F_UNLCK         0x0200
 #define F_WRLCK         0x0400
 
-#if __GNUC__
-#	define FD_CLOEXEC	1	/* Close on exec.  */
-#else
-#	define FD_CLOEXEC      0x0800
-#endif
+#define FD_CLOEXEC		1	/* Close on exec.  */
 
 /* flags for open() */
 #define O_RDONLY		0	/* read only */
@@ -48,9 +44,10 @@
 #define O_NOFOLLOW		0x00010000
 	/* should we implement this? it's similar to O_NOTRAVERSE but will fail on symlinks */
 #define O_NOCACHE		0x00020000	/* doesn't use the file system cache if possible */
-#define O_DIRECT		O_DIRECT
+#define O_DIRECT		O_NOCACHE
 #define O_SHLOCK		0x00040000
 #define O_EXLOCK		0x00080000
+#define O_MOUNT			0x00100000	/* for file systems */
 #define O_FSYNC			0x10000000
 
 

@@ -62,7 +62,6 @@ extern "C" {
 #	define SEEK_END 2
 #endif
 
-// ToDo: unimplemented functions are commented out
 
 /* file functions */
 extern int		access(const char *path, int accessMode);
@@ -71,7 +70,7 @@ extern int		chdir(const char *path);
 extern int		fchdir(int fd);
 extern char		*getcwd(char *buffer, size_t size);
 
-//extern int		pipe(int fildes[2]);
+extern int		pipe(int fildes[2]);
 extern int		dup(int fd);
 extern int		dup2(int fd1, int fd2);
 extern int		close(int fd);
@@ -94,14 +93,14 @@ extern ssize_t  write_pos(int fd, off_t pos, const void *buffer,size_t count);
 extern ssize_t	pwrite(int fd, const void *buffer, size_t count, off_t pos);
 extern off_t	lseek(int fd, off_t offset, int whence);
 
-//extern int		sync(void);
-//extern int		fsync(int fd);
+extern int		sync(void);
+extern int		fsync(int fd);
 
 extern int		chown(const char *path, uid_t owner, gid_t group);
 extern int		fchown(int fd, uid_t owner, gid_t group);
 extern int		lchown(const char *path, uid_t owner, gid_t group);
 
-//extern int		mknod(const char *name, mode_t mode, dev_t dev);
+extern int		mknod(const char *name, mode_t mode, dev_t dev);
 
 /* mount flags */
 #define B_MOUNT_READ_ONLY		1
@@ -117,36 +116,36 @@ extern long		fpathconf(int fd, int name);
 extern long		pathconf(const char *path, int name);
 
 /* process functions */
-//extern pid_t	fork(void);
-//extern int		execve(const char *path, char * const argv[], char * const envp[]);
-//extern int		execl(const char *path, const char *arg, ...);
-//extern int		execv(const char *path, char *const *argv);
-//extern int		execlp(const char *file, const char *arg, ...);
-//extern int		execle(const char *path, const char *arg , ... /*, char **envp */);
-//extern int		exect(const char *path, char *const *argv);
-//extern int		execvp(const char *file, char *const *argv);
+extern pid_t	fork(void);
+extern int		execve(const char *path, char * const argv[], char * const envp[]);
+extern int		execl(const char *path, const char *arg, ...);
+extern int		execv(const char *path, char *const *argv);
+extern int		execlp(const char *file, const char *arg, ...);
+extern int		execle(const char *path, const char *arg , ... /*, char **envp */);
+extern int		exect(const char *path, char *const *argv);
+extern int		execvp(const char *file, char *const *argv);
 
-//extern void		_exit(int status);
+extern void		_exit(int status);
 
-//extern int		system(const char *string);
-//extern pid_t	tcgetpgrp(int fd);
-//extern int		tcsetpgrp(int fd, pid_t pgrpid);
-//extern void		*sbrk(long incr);
+extern int		system(const char *string);
+extern pid_t	tcgetpgrp(int fd);
+extern int		tcsetpgrp(int fd, pid_t pgrpid);
+extern void		*sbrk(long incr);
 
-//extern uint		alarm(unsigned int seconds);
-//extern uint		ualarm(unsigned int microSeconds);
+extern uint		alarm(unsigned int seconds);
+extern uint		ualarm(unsigned int microSeconds);
 extern uint 	sleep(unsigned int seconds);
 extern int		usleep(unsigned int microSeconds);
-//extern clock_t	clock(void);
-//extern int 		pause(void);
+extern clock_t	clock(void);
+extern int 		pause(void);
 
 /* process */
-//extern pid_t	getpgrp(void);
-//extern pid_t	getpid(void);
-//extern pid_t	getppid(void);
+extern pid_t	getpgrp(void);
+extern pid_t	getpid(void);
+extern pid_t	getppid(void);
 
-//extern pid_t	setsid(void);
-//extern int		setpgid(pid_t pid, pid_t pgid);
+extern pid_t	setsid(void);
+extern int		setpgid(pid_t pid, pid_t pgid);
 
 /* access permissions */				
 extern gid_t	getegid(void);
@@ -167,13 +166,13 @@ extern int		sethostname(const char *hostName, size_t nameSize);
 extern int		gethostname(char *hostName, size_t nameSize);
 
 /* tty */
-//extern int		isatty(int fd);
-//extern char		*ttyname(int fd);
-//extern int		ttyname_r(int fd, char *buffer, size_t bufferSize);
-//extern char		*ctermid(char *s);
+extern int		isatty(int fd);
+extern char		*ttyname(int fd);
+extern int		ttyname_r(int fd, char *buffer, size_t bufferSize);
+extern char		*ctermid(char *s);
 
 /* misc */
-//extern char 	*crypt(const char *key, const char *salt);
+extern char 	*crypt(const char *key, const char *salt);
 extern int		getopt(int argc, char *const *argv, const char *shortOpts);
 
 /* getopt() related external variables */
