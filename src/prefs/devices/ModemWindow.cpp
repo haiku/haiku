@@ -10,6 +10,7 @@ Author: Sikosis
 
 // Includes ------------------------------------------------------------------------------------------ //
 #include <Application.h>
+#include <Box.h>
 #include <Button.h>
 #include <Path.h>
 #include <Screen.h>
@@ -63,15 +64,16 @@ void ModemWindow::InitWindow(void)
 	BRect r;
 	r = Bounds();
 	
-	BRect CancelButtonRect(27,r.bottom-35,103,r.bottom-15);
+	BRect CancelButtonRect(24,r.bottom-37,100,r.bottom-13);
 	btnCancel = new BButton(CancelButtonRect,"btnCancel","Cancel",
 				 	new BMessage(BTN_CANCEL), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 				 	B_WILL_DRAW | B_NAVIGABLE);
 	
-	BRect AddButtonRect(110,r.bottom-35,186,r.bottom-15);
+	BRect AddButtonRect(115,r.bottom-37,r.right - 10,r.bottom-13);
 	btnAdd = new BButton(AddButtonRect,"btnAdd","Add",
 				 	new BMessage(BTN_ADD), B_FOLLOW_LEFT | B_FOLLOW_TOP,
 				 	B_WILL_DRAW | B_NAVIGABLE);
+	btnAdd->MakeDefault(true);			 	
 		
 	// Create the Views
 	AddChild(ptrModemView = new ModemView(r));
