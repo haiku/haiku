@@ -36,7 +36,7 @@ MediaWindow   *ptrMediaWindow;
 Media::Media() : BApplication (APP_SIGNATURE)
 {
 	// Default Window Size - even though we centre the form to the current screen size
-	BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
+	//BRect	screenFrame = (BScreen(B_MAIN_SCREEN_ID).Frame());
 	
 	float FormTopDefault = 0;
 	float FormLeftDefault = 0;

@@ -6,5 +6,6 @@ Preference Media :
 	Media.cpp
 	MediaWindow.cpp
 	MediaViews.cpp
+;
 
 LinkSharedOSLibs Media : be libmedia.so ;
