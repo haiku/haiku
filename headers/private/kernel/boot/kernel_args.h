@@ -13,7 +13,12 @@
 #include <arch_kernel_args.h>
 
 
+#define CURRENT_KERNEL_ARGS_VERSION 1
+
 typedef struct kernel_args {
+	uint32		kernel_args_size;
+	uint32		version;
+
 	uint32		cons_line;
 	char		*str;
 	addr_range	bootdir_addr;
