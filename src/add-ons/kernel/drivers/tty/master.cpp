@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 
-#define MASTER_TRACE
+//#define MASTER_TRACE
 #ifdef MASTER_TRACE
 #	define TRACE(x) dprintf x
 #else
@@ -42,7 +42,10 @@ static status_t
 master_open(const char *name, uint32 flags, void **_cookie)
 {
 	int32 index = get_tty_index(name);
-	dprintf("TTY index = %ld (name = %s)\n", index, name);
+	if (index >= (int32)kNumTTYs)
+		return B_ERROR;
+
+	TRACE(("master_open: TTY index = %ld (name = %s)\n", index, name));
 
 	if (atomic_or(&gMasterTTYs[index].open_count, 1) != 0) {
 		// we're already open!

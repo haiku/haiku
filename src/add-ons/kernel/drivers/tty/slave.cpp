@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 
-#define SLAVE_TRACE
+//#define SLAVE_TRACE
 #ifdef SLAVE_TRACE
 #	define TRACE(x) dprintf x
 #else
@@ -31,6 +31,10 @@ static status_t
 slave_open(const char *name, uint32 flags, void **_cookie)
 {
 	int32 index = get_tty_index(name);
+	if (index >= (int32)kNumTTYs)
+		return B_ERROR;
+
+	TRACE(("slave_open: TTY index = %ld (name = %s)\n", index, name));
 
 	// we may only be used if our master has already been opened
 	if (gMasterTTYs[index].open_count == 0)
