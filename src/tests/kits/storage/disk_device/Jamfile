@@ -14,6 +14,7 @@ SimpleTest DiskDeviceTest
 	  # instead, we couldn't use any GUI. At least not at this time.
 	  #
 	  DiskDevice.cpp
+	  DiskDeviceList.cpp
 	  DiskDevicePrivate.cpp
 	  DiskDeviceRoster.cpp
 	  DiskDeviceVisitor.cpp

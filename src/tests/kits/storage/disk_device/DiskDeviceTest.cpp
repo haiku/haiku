@@ -8,6 +8,7 @@
 
 #include <Application.h>
 #include <DiskDevice.h>
+#include <DiskDeviceList.h>
 #include <DiskDeviceRoster.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -374,12 +375,127 @@ private:
 	BObjectList<BDiskDevice>	fDevices;
 };
 
+class MyDeviceList : public BDiskDeviceList {
+public:
+	MyDeviceList(bool useOwnLocker)
+		: BDiskDeviceList(useOwnLocker)
+	{
+	}
+
+	virtual void MountPointMoved(BPartition *partition)
+	{
+		printf("MountPointMoved()\n");
+		DumpVisitor().Visit(partition);
+	}
+
+	virtual void PartitionMounted(BPartition *partition)
+	{
+		printf("PartitionMounted()\n");
+		DumpVisitor().Visit(partition);
+	}
+
+	virtual void PartitionUnmounted(BPartition *partition)
+	{
+		printf("PartitionUnmounted()\n");
+		DumpVisitor().Visit(partition);
+	}
+
+	virtual void PartitionChanged(BPartition *partition)
+	{
+		printf("PartitionChanged()\n");
+		DumpVisitor().Visit(partition);
+	}
+
+	virtual void PartitionAdded(BPartition *partition)
+	{
+		printf("PartitionAdded()\n");
+		DumpVisitor().Visit(partition);
+	}
+
+	virtual void PartitionRemoved(BPartition *partition)
+	{
+		printf("PartitionRemoved()\n");
+		DumpVisitor().Visit(partition);
+	}
+
+	virtual void SessionAdded(BSession *session)
+	{
+		printf("SessionAdded()\n");
+		DumpVisitor().Visit(session);
+	}
+
+	virtual void SessionRemoved(BSession *session)
+	{
+		printf("SessionRemoved()\n");
+		DumpVisitor().Visit(session);
+	}
+
+	virtual void MediaChanged(BDiskDevice *device)
+	{
+		printf("MediaChanged()\n");
+		DumpVisitor().Visit(device);
+	}
+
+	virtual void DeviceAdded(BDiskDevice *device)
+	{
+		printf("DeviceAdded()\n");
+		DumpVisitor().Visit(device);
+	}
+
+	virtual void DeviceRemoved(BDiskDevice *device)
+	{
+		printf("DeviceRemoved()\n");
+		DumpVisitor().Visit(device);
+	}
+};
+
+
+// TestApp2
+class TestApp2 : public BApplication {
+public:
+	TestApp2(const char *signature)
+		: BApplication(signature),
+		  fDeviceList(false)
+	{
+		printf("dumping empty list...\n");
+		DumpVisitor visitor;
+		fDeviceList.Traverse(&visitor);
+		printf("dumping done\n");
+		printf("fetching\n");
+		status_t error = fDeviceList.Fetch();
+		if (error == B_OK)
+			fDeviceList.Traverse(&visitor);
+		else
+			printf("fetching failed: %s\n", strerror(error));
+		printf("unset\n");
+		fDeviceList.Unset();
+		printf("dumping empty list...\n");
+		fDeviceList.Traverse(&visitor);
+		printf("dumping done\n");
+		AddHandler(&fDeviceList);
+		error = fDeviceList.Fetch();
+		if (error != B_OK)
+			printf("fetching failed: %s\n", strerror(error));
+	}
+
+	~TestApp2()
+	{
+		Lock();
+		RemoveHandler(&fDeviceList);
+		Unlock();
+	}
+
+private:
+	MyDeviceList	fDeviceList;
+};
+
 // main
 int
 main()
 {
 	init_roster();
 	// -----------
+/*
 	TestApp app("application/x-vnd.obos-disk-device-test");
 	BDiskDeviceRoster roster;
 	DumpVisitor visitor;
@@ -393,6 +509,9 @@ main()
 	error = roster.StopWatching(BMessenger(&app));
 	if (error != B_OK)
 		printf("stop watching failed: %s\n", strerror(error));
+*/
+	TestApp2 app("application/x-vnd.obos-disk-device-test");
+	app.Run();
 	return 0;
 }
 
