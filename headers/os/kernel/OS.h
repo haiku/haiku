@@ -7,6 +7,8 @@
 #define _OS_H
 
 
+#include <stdarg.h>
+
 #include <SupportDefs.h>
 #include <StorageDefs.h>
 
@@ -107,8 +109,8 @@ typedef struct port_info {
 
 extern port_id	create_port(int32 capacity, const char *name);
 extern port_id	find_port(const char *name);
-extern status_t read_port(port_id port, int32 *code, void *buffer, size_t bufferSize);
-extern status_t read_port_etc(port_id port, int32 *code, void *buffer, size_t bufferSize,
+extern ssize_t	read_port(port_id port, int32 *code, void *buffer, size_t bufferSize);
+extern ssize_t	read_port_etc(port_id port, int32 *code, void *buffer, size_t bufferSize,
 					uint32 flags, bigtime_t timeout);
 extern status_t write_port(port_id port, int32 code, const void *buffer, size_t bufferSize);
 extern status_t write_port_etc(port_id port, int32 code, const void *buffer, size_t bufferSize,
@@ -360,6 +362,10 @@ extern void	debugger(const char *message);
    to re-enable the default debugger pass a zero.
 */   
 extern const int disable_debugger(int state);
+
+// TODO: Remove. Temporary debug helper.
+extern void debug_printf(const char *format, ...);
+extern void debug_vprintf(const char *format, va_list args);
 
 
 /*-------------------------------------------------------------*/
