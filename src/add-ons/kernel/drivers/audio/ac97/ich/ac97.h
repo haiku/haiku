@@ -67,6 +67,12 @@ enum AC97_REGISTER {
 	AC97_VENDOR_ID1			= 0x7C,
 	AC97_VENDOR_ID2			= 0x7E,
 	
+	/* Analog Devices */
+	AC97_AD_SERIAL_CONFIG	= 0x74,
+	AC97_AD_MISC_CONTROL	= 0x76,
+	AC97_AD_SAMPLE_RATE_0	= 0x78,
+	AC97_AD_SAMPLE_RATE_1	= 0x7a,
+	
 	/* Realtek ALC650 */
 	AC97_ALC650_SPDIF_INPUT_CHAN_STATUS_LO = 0x60, /* only ALC650 Rev. E and later */
 	AC97_ALC650_SPDIF_INPUT_CHAN_STATUS_HI = 0x62, /* only ALC650 Rev. E and later */
@@ -176,6 +182,8 @@ typedef struct ac97_dev ac97_dev;
 typedef void	(* codec_init)(ac97_dev * dev);
 typedef	uint16	(* codec_reg_read)(void * /*cookie*/, uint8 /*reg*/);
 typedef	void	(* codec_reg_write)(void * /*cookie*/, uint8 /*reg*/, uint16 /*value*/);
+typedef bool	(* codec_set_rate)(ac97_dev *dev, uint8 reg, uint32 rate);
+typedef bool	(* codec_get_rate)(ac97_dev *dev, uint8 reg, uint32 *rate);
 
 struct ac97_dev {
 	uint16				reg_cache[0x7f];
@@ -189,6 +197,8 @@ struct ac97_dev {
 	codec_init			init;
 	codec_reg_read		reg_read;
 	codec_reg_write		reg_write;
+	codec_set_rate		set_rate;
+	codec_get_rate		get_rate;
 	
 	uint32 				clock;
 	uint64				capabilities;

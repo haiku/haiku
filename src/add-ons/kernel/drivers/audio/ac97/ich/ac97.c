@@ -91,6 +91,9 @@ void wm9701_init(ac97_dev *dev);
 void wm9703_init(ac97_dev *dev);
 void wm9704_init(ac97_dev *dev);
 
+bool ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate);
+bool ad1819_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate);
+
 typedef struct
 {
 	uint32 id;
@@ -101,7 +104,7 @@ typedef struct
 
 codec_table codecs[] = 
 {
-	{ CODEC_ID_AD1819,	0xffffffff, ad1819_init,	"Analog Devices AD1819B SoundPort"B_UTF8_REGISTERED },
+	{ CODEC_ID_AD1819,	0xffffffff, ad1819_init,	"Analog Devices AD1819A, AD1819B SoundPort"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1881,	0xffffffff, ad1881_init,	"Analog Devices AD1881 SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1881A,	0xffffffff, ad1881_init,	"Analog Devices AD1881A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1885,	0xffffffff, ad1885_init,	"Analog Devices AD1885 SoundMAX"B_UTF8_REGISTERED },
@@ -194,6 +197,8 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	codec = find_codec_table(dev->codec_id);
 	dev->codec_info = codec->info;
 	dev->init = codec->init;
+	dev->set_rate = 0;
+	dev->get_rate = 0;
 	dev->clock = 48000; /* default clock on non-broken motherboards */
 	dev->reversed_eamp_polarity = false;
 
@@ -311,6 +316,9 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 {
 	uint32 value;
 	uint32 old;
+	
+	if (dev->set_rate)
+		return dev->set_rate(dev, reg, rate);
 
 	value = (uint32)((rate * (uint64)dev->clock) / 48000); /* use 64 bit calculation for rates 96000 or higher */
 
@@ -338,9 +346,18 @@ bool
 ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 {
 	uint32 value;
+
+	if (dev->get_rate)
+		return dev->get_rate(dev, reg, rate);
+
 	value = ac97_reg_cached_read(dev, reg);
 	if (value == 0)
 		return false;
+
+	/* if double rate audio is currently enabled, multiply value by 2 */
+	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
+		value *= 2;
+
 	*rate = (value * 48000) / dev->clock;
 	return true;
 }
@@ -606,6 +623,55 @@ void ac97_amp_enable(ac97_dev *dev, bool yesno)
 	}
 }
 
+bool
+ad1819_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
+{
+	uint32 value;
+	
+	value = (uint32)((rate * (uint64)dev->clock) / 48000); /* use 64 bit calculation for rates 96000 or higher */
+
+	LOG(("ad1819_set_rate: clock = %d, rate = %d, value = %d\n", dev->clock, rate, value));
+	
+	if (value < 0x1B58 || value > 0xBB80)
+		return false;
+
+	switch (reg) {
+		case AC97_PCM_FRONT_DAC_RATE:
+			ac97_reg_cached_write(dev, AC97_AD_SAMPLE_RATE_0, value);
+			return true;
+		
+		case AC97_PCM_L_R_ADC_RATE:
+			ac97_reg_cached_write(dev, AC97_AD_SAMPLE_RATE_1, value);
+			return true;
+
+		default:
+			return false;
+	}
+}
+
+bool
+ad1819_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
+{
+	uint32 value;
+	
+	switch (reg) {
+		case AC97_PCM_FRONT_DAC_RATE:
+			value = ac97_reg_cached_read(dev, AC97_AD_SAMPLE_RATE_0);
+			break;
+		
+		case AC97_PCM_L_R_ADC_RATE:
+			value = ac97_reg_cached_read(dev, AC97_AD_SAMPLE_RATE_1);
+			break;
+
+		default:
+			return false;
+	}
+
+	*rate = (value * 48000) / dev->clock;
+	return true;
+}
+
+
 void default_init(ac97_dev *dev)
 {
 	LOG(("default_init\n"));
@@ -614,6 +680,23 @@ void default_init(ac97_dev *dev)
 void ad1819_init(ac97_dev *dev)
 {
 	LOG(("ad1819_init\n"));
+
+	/* Default config for system with single AD1819 codec */
+	ac97_reg_cached_write(dev, AC97_AD_SERIAL_CONFIG, 0x7000);
+
+	/* The AD1819 chip has proprietary  sample rate controls
+	 * Setup sample rate 0 generator for DAC,
+	 * Setup sample rate 1 generator for ADC,
+	 * also enable DAC zero fill
+	 * ARSR=1, DRSR=0, ALSR=1, DLSR=0, DACZ=1
+	 */
+	ac97_reg_cached_write(dev, AC97_AD_MISC_CONTROL, 0x8101);
+	/* connect special rate set/get functions */
+	dev->set_rate = ad1819_set_rate;
+	dev->get_rate = ad1819_get_rate;
+	ac97_detect_rates(dev);
+	ac97_set_rate(dev, AC97_PCM_FRONT_DAC_RATE, 48000);
+	ac97_set_rate(dev, AC97_PCM_L_R_ADC_RATE, 48000);
 }
 
 void ad1881_init(ac97_dev *dev)
