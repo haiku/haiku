@@ -1,6 +1,7 @@
 SubDir OBOS_TOP src kernel apps ;
 
 KernelObjects
+	exec_test.c
 	false_main.c
 	fibo_main.c
 	init.c
