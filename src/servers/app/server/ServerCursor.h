@@ -30,6 +30,8 @@
 #include <Point.h>
 #include "ServerBitmap.h"
 
+class ServerApp;
+
 /*!
 	\class ServerCursor ServerCursor.h
 	\brief Class to handle all cursor capabilities for the system
@@ -50,8 +52,11 @@ public:
 	//! Returns the cursor's hot spot
 	BPoint GetHotSpot(void);
 	void SetHotSpot(BPoint pt);
+	const char *GetAppSignature(void) { return _app_signature; }
 private:
+	friend ServerApp;
 	BPoint _hotspot;
+	char *_app_signature;
 };
 
 #endif
