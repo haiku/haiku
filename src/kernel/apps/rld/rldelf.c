@@ -18,6 +18,7 @@
 #include <elf32.h>
 #include <user_runtime.h>
 #include <syscalls.h>
+#include <vm_types.h>
 #include <arch/cpu.h>
 #include <sem.h>
 
@@ -79,7 +80,7 @@ struct elf_region_t {
 
 typedef struct image_t {
 	// image identification
-	char				name[SYS_MAX_OS_NAME_LEN];
+	char				name[B_OS_NAME_LENGTH];
 	image_id			id;
 	image_type			type;
 
