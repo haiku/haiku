@@ -168,6 +168,7 @@ SharedLibrary "bind" :
 	ethers.c
 	linkaddr.c
 	pthread_emu.c
+	res_resultcodes.c
 	strsep.c
 ;
 

@@ -16,9 +16,7 @@ Porting issues:
 	As long as we do not have a working kernel this should be #define'd. When we can do a real OpenBeOS port we should #undef it again.
 
 Added sources for compatibility:
-	arc4random.c
-	ethers.c
-	pthread_emu.c
+	src/res_resultcodes.c: BONE's host command wants _res_resultcodes to be defined
 
 Changes made to the sources and headers:
 	netdb.h and resolv.h: simplified by removing unneeded checks for other platforms
