@@ -11,11 +11,19 @@
 #include <KPPPOptionHandler.h>
 
 #include <LockerHelper.h>
-#include <KernelExport.h>
 
 #include <netinet/in.h>
 #include <core_funcs.h>
 #include <sys/socket.h>
+
+
+#ifdef _KERNEL_MODE
+	#include <KernelExport.h>
+	#define spawn_thread spawn_kernel_thread
+	#define printf dprintf
+#else
+	#include <cstdio>
+#endif
 
 
 PPPLCP::PPPLCP(PPPInterface& interface)
@@ -219,7 +227,7 @@ PPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 		return B_ERROR;
 	
 	if(protocolNumber != PPP_LCP_PROTOCOL) {
-		dprintf("PPPLCP::Receive(): wrong protocol number!\n");
+		printf("PPPLCP::Receive(): wrong protocol number!\n");
 		return PPP_UNHANDLED;
 	}
 	
