@@ -22,7 +22,8 @@
 #endif
 
 // Which debugger should be used when?
-// The DEBUGGER() macro actually has no effect if DEBUG is not defined... 
+// The DEBUGGER() macro actually has no effect if DEBUG is not defined,
+// use the DIE() macro if you really want to die.
 #ifdef DEBUG
 #	ifdef USER
 #		define DEBUGGER(x) debugger x
@@ -31,6 +32,12 @@
 #	endif
 #else
 #	define DEBUGGER(x) ;
+#endif
+
+#ifdef USER
+#	define DIE(x) debugger x
+#else
+#	define DIE(x) kernel_debugger x
 #endif
 
 // Short overview over the debug output macros:
@@ -58,6 +65,7 @@
 	#define FUNCTION() ;
 //	#define FUNCTION_START(x) ;
 	#define D(x) {x;};
+	#define ASSERT(x) { if (!(x)) DEBUGGER(("bfs: assert failed: " #x "\n")); }
 #else
 	#define PRINT(x) ;
 	#define REPORT_ERROR(status) ;
@@ -67,6 +75,7 @@
 	#define FUNCTION() ;
 	#define FUNCTION_START(x) ;
 	#define D(x) ;
+	#define ASSERT(x) ;
 #endif
 
 #ifdef DEBUG
