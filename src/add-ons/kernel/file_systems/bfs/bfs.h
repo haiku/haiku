@@ -2,10 +2,10 @@
 #define BFS_H
 /* bfs - BFS definitions and helper functions
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
 ** Parts of this code is based on work previously done by Marcus Overhagen
 **
-** Copyright 2001 pinc Software. All Rights Reserved.
+** Copyright 2001, pinc Software. All Rights Reserved.
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
@@ -19,6 +19,8 @@
 #	define B_BAD_DATA B_ERROR
 #endif
 
+// ToDo: temporary fix! (missing but public ioctls)
+#define IOCTL_FILE_UNCACHED_IO	10000
 
 struct block_run {
 	int32		allocation_group;

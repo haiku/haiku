@@ -1,6 +1,6 @@
 /* Query - query parsing and evaluation
 **
-** Initial version by Axel Dörfler, axeld@pinc-software.de
+** Copyright 2001-2004, Axel Dörfler, axeld@pinc-software.de
 ** The pattern matching is roughly based on code originally written
 ** by J. Kercheval, and on code written by Kenneth Almquist, though
 ** it shares no code.
@@ -20,6 +20,7 @@
 
 #include <util/kernel_cpp.h>
 #include <SupportDefs.h>
+#include <NodeMonitor.h>
 #include <TypeConstants.h>
 #include <AppDefs.h>
 #include <fs_query.h>
