@@ -35,7 +35,7 @@ class FontStyle;
 class ServerFont
 {
 public:
-	ServerFont(){ ServerFont(NULL); }
+	ServerFont(void);
 	ServerFont(FontStyle *fstyle, float fsize=12.0, float frotation=0.0, float fshear=90.0,
 			uint16 flags=0, uint8 spacing=B_CHAR_SPACING);
 	ServerFont(const ServerFont &font);

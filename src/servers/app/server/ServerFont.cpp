@@ -55,6 +55,21 @@ ServerFont::ServerFont(FontStyle *style, float size, float rotation, float shear
 		fstyle->AddDependent();
 }
 
+ServerFont::ServerFont(void)
+{
+	fstyle=NULL;
+	fsize=0.0;
+	frotation=0.0;
+	fshear=90.0;
+	fflags=0;
+	fspacing=B_STRING_SPACING;
+	fdirection=B_FONT_LEFT_TO_RIGHT;
+	fface=B_REGULAR_FACE;
+	ftruncate=B_TRUNCATE_END;
+	fencoding=B_UNICODE_UTF8;
+	fbounds.Set(0,0,0,0);
+}
+
 /*! 
 	\brief Copy Constructor
 	\param font ServerFont to copy
