@@ -9,6 +9,8 @@
 
 #include <Window.h>
 #include <ScrollBar.h>
+#include <Clipboard.h>
+#include <Mime.h>
 
 
 static const uint32 kBlockSize = 16;
@@ -18,6 +20,31 @@ static const uint32 kVerticalSpace = 4;
 static const uint32 kBlockSpace = 3;
 static const uint32 kHexByteWidth = 3;
 	// these are determined by the implementation of DataView::ConvertLine()
+
+
+/** This function checks if the buffer contains a valid ASCII
+ *	string, following the convention from the DataView::ConvertLine()
+ *	method: everything that's not replaced by a '.' there will be
+ *	accepted.
+ */
+
+bool
+is_valid_ascii(uint8 *data, size_t size)
+{
+	for (size_t i = 0; i < size; i++) {
+		// accept a terminating null byte
+		if (i == size - 1 && data[0] == '\0')
+			return true;
+
+		if (data[i] < ' ' || data[i] == 0x7f || data[i] & 0x80)
+			return false;
+	}
+
+	return true;
+}
+
+
+//	#pragma mark -
 
 
 DataView::DataView(BRect rect, DataEditor &editor)
@@ -74,6 +101,8 @@ DataView::UpdateFromEditor(BMessage */*message*/)
 			memcpy(fData, data, fDataSize);
 
 		fEditor.Unlock();
+
+		Invalidate();
 	}
 }
 
@@ -82,18 +111,10 @@ void
 DataView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case B_OBSERVER_NOTICE_CHANGE: {
-			int32 what;
-			if (message->FindInt32(B_OBSERVE_WHAT_CHANGE, &what) != B_OK)
-				break;
-
-			switch (what) {
-				case kDataEditorUpdate:
-					UpdateFromEditor(message);
-					break;
-			}
+		case kMsgUpdateData:
+		case kMsgDataEditorUpdate:
+			UpdateFromEditor(message);
 			break;
-		}
 
 		case kMsgBaseType:
 		{
@@ -104,6 +125,37 @@ DataView::MessageReceived(BMessage *message)
 			SetBase((base_type)type);
 			break;
 		}
+
+		case B_SELECT_ALL:
+			SetSelection(0, fDataSize - 1);
+			break;
+
+		case B_COPY:
+		{
+			if (!be_clipboard->Lock())
+				break;
+
+			be_clipboard->Clear();
+
+			BMessage *clip;
+			if ((clip = be_clipboard->Data()) != NULL) {
+				uint8 *data = fData + fStart;
+				size_t length = fEnd + 1 - fStart;
+
+				clip->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, length);
+
+				if (is_valid_ascii(data, length))
+					clip->AddData("text/plain", B_MIME_TYPE, data, length);
+
+				be_clipboard->Commit();
+			}
+
+			be_clipboard->Unlock();
+			break;
+		}
+
+		case B_PASTE:
+			break;
 
 		default:
 			BView::MessageReceived(message);
@@ -156,7 +208,7 @@ DataView::Draw(BRect updateRect)
 	BPoint location(kHorizontalSpace, kVerticalSpace + fAscent);
 
 	for (uint32 i = 0; i < fDataSize; i += kBlockSize) {
-		ConvertLine(line, fOffset + i, fData + i, fDataSize - i);
+		ConvertLine(line, /*fOffset + */i, fData + i, fDataSize - i);
 		DrawString(line, location);
 
 		location.y += fFontHeight;
@@ -448,6 +500,11 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 		update.AddInt64("position", start);
 		SendNotices(kDataViewCursorPosition, &update);
 	}
+
+	BMessage update;
+	update.AddInt64("start", start);
+	update.AddInt64("end", end);
+	SendNotices(kDataViewSelection, &update);
 
 	// remove old selection
 	// ToDo: this could be drastically improved if only the changed
