@@ -24,6 +24,43 @@ enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
+// do_mime_update
+//! Helper function that contacts the registrar for mime update calls
+status_t do_mime_update(int32 what, const char *path, int recursive,
+	int synchronous, int force)
+{
+	BEntry root;
+	entry_ref ref;
+		
+	status_t err = root.SetTo(path ? path : "/");
+	if (!err)
+		err = root.GetRef(&ref);
+	if (!err) {
+		BMessage msg(what);
+		BMessage reply;
+		status_t result;
+		
+		// Build and send the message, read the reply
+		if (!err)
+			err = msg.AddRef("entry", &ref);
+		if (!err)
+			err = msg.AddBool("recursive", recursive);
+		if (!err)
+			err = msg.AddBool("synchronous", synchronous);
+		if (!err)
+			err = msg.AddBool("force", force);
+		if (!err) 
+			err = _send_to_roster_(&msg, &reply, true);
+		if (!err)
+			err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+		if (!err)
+			err = reply.FindInt32("result", &result);
+		if (!err) 
+			err = result;
+	}
+	return err;
+}
+
 // update_mime_info
 /*!	\brief Updates the MIME information (i.e MIME type) for one or more files.
 	If \a path points to a file, the MIME information for this file are
@@ -45,43 +82,12 @@ enum {
 int
 update_mime_info(const char *path, int recursive, int synchronous, int force)
 {
-	BEntry root;
-	entry_ref ref; 
+	// Force recursion when given a NULL path
 	if (!path)
 		recursive = true;
-		
-	status_t err = root.SetTo(path ? path : "/");
-	if (!err)
-		err = root.GetRef(&ref);
-	if (!err) {
-		// If the call is to be synchronous, handle it locally,
-		// otherwise pass it off to the registrar
-		if (synchronous) {
-			err = BPrivate::Storage::Mime::update_mime_info(&ref, recursive, force);
-		} else {
-			BMessage msg(B_REG_MIME_UPDATE_MIME_INFO_ASYNC);
-			BMessage reply;
-			status_t result;
-			const char *str;
-			
-			// Build and send the message, read the reply
-			if (!err)
-				err = msg.AddRef("entry", &ref);
-			if (!err)
-				err = msg.AddBool("recursive", recursive);
-			if (!err)
-				err = msg.AddBool("force", force);
-			if (!err) 
-				err = _send_to_roster_(&msg, &reply, true);
-			if (!err)
-				err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
-			if (!err)
-				err = reply.FindInt32("result", &result);
-			if (!err) 
-				err = result;
-		}
-	}
-	return err;
+
+	return do_mime_update(B_REG_MIME_UPDATE_MIME_INFO, path, recursive,
+		synchronous, force);	
 }
 
 // create_app_meta_mime
@@ -104,7 +110,11 @@ status_t
 create_app_meta_mime(const char *path, int recursive, int synchronous,
 					 int force)
 {
-	return NOT_IMPLEMENTED;
+	// If path is NULL, we are recursive, otherwise no.
+	recursive = !path;
+	
+	return do_mime_update(B_REG_MIME_CREATE_APP_META_MIME, path, recursive,
+		synchronous, force);
 }
 
 // get_device_icon
