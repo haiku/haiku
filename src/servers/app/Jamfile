@@ -4,10 +4,12 @@ Depends app_server : install_fonts ;
 
 AddResources app_server : app_server.rdef ;
 
-UseLibraryHeaders png zlib ;
+UseLibraryHeaders agg png zlib ;
 UsePrivateHeaders app interface [ FDirName servers app ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing ] ;
 UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter drawing_modes ] ;
+UseHeaders [ FDirName $(OBOS_TOP) src servers app drawing Painter font_support ] ;
 UseFreeTypeHeaders ;
 
 SharedLibrary appserver :
@@ -65,6 +67,12 @@ Server app_server :
 	drawing/DirectDriver.cpp
 	# We'll just remove this from the build for a little while...
 	#drawing/ScreenDriver.cpp
+	# Painter based DisplayDriver Classes
+	drawing/BitmapBuffer.cpp
+	drawing/DisplayDriverPainter.cpp
+	drawing/HWInterface.cpp
+	drawing/UpdateQueue.cpp
+	drawing/ViewHWInterface.cpp
 
 	DefaultDecorator.cpp
 	Layer.cpp
@@ -81,7 +89,7 @@ LINKFLAGS on app_server += -lbe ;
 
 LinkSharedOSLibs app_server : root game translation libz.so libpng.so libappserver.so
 							  libpainter.a <boot!home!config!lib>libopenbeos.so 
-							  libagg.a libfreetype.so ;
+							  libagg.a libfreetype.so textencoding ;
 
 SubInclude OBOS_TOP src servers app fonts ;
 SubInclude OBOS_TOP src servers app drawing Painter ;
