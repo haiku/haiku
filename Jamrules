@@ -187,7 +187,7 @@ rule UnitTest
 	DEPENDS $(target) : libcppunit.so ;
 	DEPENDS obostests : $(target) ;
 	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
-	UsePublicHeaders $(headerDirs) : $(sources) ;
+	UsePublicObjectHeaders $(sources) : $(headerDirs) ;
 	ObjectDefines $(sources) : TEST_OBOS ;
 
 	# Turn debugging on. That is usually desired for test code.
@@ -259,7 +259,7 @@ rule Addon
 {
 	# Addon <name> : <relpath> : <sources> ;	
 	
-	SetupIncludes ;
+#	SetupIncludes ;
 	SetupObjectsDir ;
 	Main $(1) : $(3) ;
 
@@ -367,98 +367,138 @@ rule AddResources
 	}
 }
 
-rule UsePublicHeaders
+rule PublicHeaders
 {
-	# UsePublicHeaders <group list> [ <sources_or_objects> ] ;
+	# PublicHeaders <group list>
 	#
-	# Adds the public C header dirs given by <group list> to the header search
-	# dirs of the subdirectory or of <sources_or_objects>, if given.
-	# NOTE: Currently the latter doesn't work, since Cc seems to be
-	# buggy: It sets the HDRS variable to $(SUBDIRHDRS) instead of adding it.
+	# Returns the directory names for the public header dirs identified by
+	# <group list>.
 
 	local list = $(1) ;
-	local targets = $(2) ;
-
-	local headers ;
-
+	local dirs ;
 	for i in $(list) {
-		headers += [ FDirName $(OBOS_TOP) headers $(i) ] ;
+		dirs += [ FDirName $(OBOS_TOP) headers os $(i) ] ;
 	}
+	return $(dirs) ;
+}
 
-	UseHeaders $(headers) : $(targets) ;
+rule PrivateHeaders
+{
+	# PrivateHeaders <group list>
+	#
+	# Returns the directory names for the private header dirs identified by
+	# <group list>.
+
+	local list = $(1) ;
+	local dirs ;
+	for i in $(list) {
+		dirs += [ FDirName $(OBOS_TOP) headers private $(i) ] ;
+	}
+	return $(dirs) ;
+}
+
+rule ArchHeaders
+{
+	# usage: ArchHeaders <arch> ;
+	#
+	# <arch> specifies the architecture (e.g. x86).
+
+	return [ FDirName $(OBOS_TOP) headers private kernel arch $(1) ] ;
+}
+
+rule UsePublicHeaders
+{
+	# UsePublicHeaders <group list> ;
+	#
+	# Adds the public C header dirs given by <group list> to the header search
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	UseHeaders [ PublicHeaders $(1) ] ;
+}
+
+rule UsePublicObjectHeaders
+{
+	# UsePublicObjectHeaders <sources_or_objects> : <group list> ;
+	#
+	# Adds the public C header dirs given by <group list> to the header search
+	# dirs of <sources_or_objects>.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	ObjectHdrs $(1) : [ PublicHeaders $(2) ] ;
 }
 
 rule UsePrivateHeaders
 {
-	# UsePrivateHeaders <group list> [ <sources_or_objects> ] ;
+	# UsePrivateHeaders <group list> ;
 	#
 	# Adds the private C header dirs given by <group list> to the header search
-	# dirs of the subdirectory or of <sources_or_objects>, if given.
-	# NOTE: Currently the latter doesn't work, since Cc seems to be
-	# buggy: It sets the HDRS variable to $(SUBDIRHDRS) instead of adding it.
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
 
-	local list = $(1) ;
-	local targets = $(2) ;
+	UseHeaders [ PrivateHeaders $(1) ] ;
+}
 
-	local headers ;
+rule UsePrivateObjectHeaders
+{
+	# UsePrivateObjectHeaders <sources_or_objects> : <group list> ;
+	#
+	# Adds the private C header dirs given by <group list> to the header search
+	# dirs of <sources_or_objects>.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
 
-	for i in $(list) {
-		headers += [ FDirName $(OBOS_TOP) headers private $(i) ] ;
-	}
-
-	UseHeaders $(headers) : $(targets) ;
+	ObjectHdrs $(1) : [ PrivateHeaders $(2) ] ;
 }
 
 rule UseHeaders
 {
-	# UseHeaders <headers> [ <sources_or_objects> ] ;
+	# UseHeaders <headers> ;
 	#
 	# Adds the C header dirs <headers> to the header search
-	# dirs of the subdirectory or of <sources_or_objects>, if given.
-	# NOTE: Currently the latter doesn't work, since Cc seems to be
-	# buggy: It sets the HDRS variable to $(SUBDIRHDRS) instead of adding it.
+	# dirs of the subdirectory.
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
 
-	local headers = $(1) ;
-	local targets = $(2) ;
-
-	if $(targets) {
-		ObjectHdrs $(targets) : $(headers) ;
-	} else {
-		# Note: Unlike ObjectHdrs SubDirHdrs expects only one dir given as
-		# path component list.
-		for header in $(headers) {
-			SubDirHdrs $(header) ;
-		}
+	local header ;
+	for header in $(1) {
+		SubDirHdrs $(header) ;
 	}
 }
 
 rule UseCppUnitHeaders
 {
-	local opt = -I [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
-
-	SubDirCcFlags $(opt) ;
-	SubDirC++Flags $(opt) ;
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
 }
 
 rule UseArchHeaders
 {
-	# usage: UseArchHeaders <arch> : [ <sources_or_objects> ] ;
+	# usage: UseArchHeaders <arch> ;
+	#
 	# <arch> specifies the architecture (e.g. x86).
-	# <sources_or_objects> Source or object files.
-	local headers = [ FDirName $(OBOS_TOP) headers private kernel arch $(1) ] ;
-	local targets = $(2) ;
+	# NOTE: This rule must be invoked *before* the rule that builds the objects.
+
+	local headers = [ ArchHeaders $(1) ] ;
 	local opt = -D$(OBOS_TARGET_DEFINE) ;
 
-	if $(targets) {
-		ObjectCcFlags $(targets) : $(opt)  ;
-		ObjectC++Flags $(targets) : $(opt)  ;
-		ObjectHdrs $(targets) : $(headers) ;
-	} else {
-		SubDirCcFlags $(opt)  ;
-		SubDirC++Flags $(opt)  ;
-		SubDirHdrs $(headers) ;
-	}
+	SubDirCcFlags $(opt)  ;
+	SubDirC++Flags $(opt)  ;
+	SubDirHdrs $(headers) ;
+}
 
+rule UseArchObjectHeaders
+{
+	# usage: UseArchObjectHeaders <sources_or_objects> : <arch> ;
+	#
+	# <arch> specifies the architecture (e.g. x86).
+	# <sources_or_objects> Source or object files.
+	# NOTE: This rule must be invoked *after* the rule that builds the objects.
+
+	local targets = $(1) ;
+	local headers = [ ArchHeaders $(2) ] ;
+	local opt = -D$(OBOS_TARGET_DEFINE) ;
+
+	ObjectCcFlags $(targets) : $(opt)  ;
+	ObjectC++Flags $(targets) : $(opt)  ;
+	ObjectHdrs $(targets) : $(headers) ;
 }
 
 rule SplitPath
