@@ -333,8 +333,14 @@ aviReader::Seek(void *cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
+	TRACE("aviReader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
+		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
+		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
+		(seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) ? " B_MEDIA_SEEK_CLOSEST_FORWARD" : "",
+		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
+		*time, *frame);
 
-	return B_OK;
+	return B_ERROR;
 }
 
 
