@@ -258,6 +258,8 @@ Journal::WriteLogEntry()
 
 	CachedBlock cached(fVolume);
 	for (int32 i = 0;i < array->count;i++) {
+		// ToDo: combine blocks if possible (using iovecs)!
+
 		uint8 *block = cached.SetTo(array->values[i]);
 		if (block == NULL)
 			return B_IO_ERROR;
@@ -368,8 +370,15 @@ Journal::TransactionDone(bool success)
 {
 	if (!success && fTransactionsInEntry == 0) {
 		// we can safely abort the transaction
-		// ToDo: abort the transaction
-		PRINT(("should abort transaction...\n"));
+		sorted_array *array = fArray.Array();
+		if (array != NULL) {
+			// release the lock for all blocks in the array (we don't need
+			// to be notified when they are actually written to disk)
+			for (int32 i = 0; i < array->count; i++)
+				release_block(fVolume->Device(), array->values[i]);
+		}
+
+		return B_OK;
 	}
 
 	// Up to a maximum size, we will just batch several
@@ -396,8 +405,17 @@ Journal::LogBlocks(off_t blockNumber, const uint8 *buffer, size_t numBlocks)
 	int32 blockSize = fVolume->BlockSize();
 
 	for (;numBlocks-- > 0; blockNumber++, buffer += blockSize) {
-		if (fArray.Find(blockNumber) >= 0)
+		if (fArray.Find(blockNumber) >= 0) {
+			// The block is already in the log, so just update its data
+			// Note, this is only necessary if this method is called with a buffer
+			// different from the cached block buffer - which is unlikely but
+			// we'll make sure this way (costs one cache lookup, though).
+			status_t status = cached_write(fVolume->Device(), blockNumber, buffer, 1, blockSize);
+			if (status < B_OK)
+				return status;
+
 			continue;
+		}
 
 		// Insert the block into the transaction's array, and write the changes
 		// back into the locked cache buffer
