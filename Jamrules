@@ -1644,7 +1644,7 @@ rule SetupKernel
 	local _objs = [ FGristFiles $(1:S=$(SUFOBJ)) ] ;
 
 	#Setup Kernel header directories
-	local public_kernel_includes = add-ons/file_system add-ons/graphics device drivers kernel storage support ;
+	local public_kernel_includes = add-ons/file_system add-ons/graphics app device drivers kernel storage support ;
 	local private_kernel_includes = kernel libroot kernel/boot/platform/$(OBOS_BOOT_PLATFORM) ;
 	# Use posix headers directory
 	HDRS = [ FDirName $(OBOS_TOP) headers posix ] ;
