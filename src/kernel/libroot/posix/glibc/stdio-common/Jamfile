@@ -1,9 +1,11 @@
 SubDir OBOS_TOP src kernel libroot posix glibc stdio-common ;
 
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
-SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
+
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc libio ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include arch $(OBOS_ARCH) ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc include ;
+SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc stdio-common ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc locale ;
 SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
 
@@ -11,7 +13,7 @@ SubDirHdrs $(OBOS_TOP) src kernel libroot posix glibc ;
 
 KernelMergeObject posix_gnu_stdio.o : #_common.o :
 	<$(SOURCE_GRIST)>_itoa.c
-#	<$(SOURCE_GRIST)>_itowa.c
+	<$(SOURCE_GRIST)>_itowa.c
 	<$(SOURCE_GRIST)>asprintf.c
 	<$(SOURCE_GRIST)>dprintf.c
 	<$(SOURCE_GRIST)>fprintf.c
@@ -20,11 +22,12 @@ KernelMergeObject posix_gnu_stdio.o : #_common.o :
 	<$(SOURCE_GRIST)>getw.c
 	<$(SOURCE_GRIST)>itoa-digits.c
 	<$(SOURCE_GRIST)>itoa-udigits.c
-#	<$(SOURCE_GRIST)>itowa-digits.c
+	<$(SOURCE_GRIST)>itowa-digits.c
 	<$(SOURCE_GRIST)>perror.c
-	<$(SOURCE_GRIST)>printf-parse.c
+	<$(SOURCE_GRIST)>printf-prs.c
 	<$(SOURCE_GRIST)>printf.c
 	<$(SOURCE_GRIST)>printf_fp.c
+	<$(SOURCE_GRIST)>printf_fphex.c
 #	<$(SOURCE_GRIST)>printf_size.c
 	<$(SOURCE_GRIST)>putw.c
 	<$(SOURCE_GRIST)>reg-printf.c

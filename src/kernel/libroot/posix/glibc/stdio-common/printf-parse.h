@@ -1,5 +1,5 @@
 /* Internal header for parsing printf format strings.
-   Copyright (C) 1995-1999, 2000, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2000 Free Software Foundation, Inc.
    This file is part of th GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -87,27 +87,28 @@ read_int (const UCHAR_T * *pstr)
 }
 
 
+
 /* Find the next spec in FORMAT, or the end of the string.  Returns
    a pointer into FORMAT, to a '%' or a '\0'.  */
 static inline const UCHAR_T *
-//#ifdef COMPILE_WPRINTF
+#ifdef COMPILE_WPRINTF
 find_spec (const UCHAR_T *format)
-//#else
-//find_spec (const UCHAR_T *format, mbstate_t *ps)
-//#endif
+#else
+find_spec (const UCHAR_T *format, mbstate_t *ps)
+#endif
 {
 #ifdef COMPILE_WPRINTF
   return (const UCHAR_T *) __wcschrnul ((const CHAR_T *) format, L'%');
 #else
   while (*format != L_('\0') && *format != L_('%'))
     {
-//      int len;
+      int len;
 
       /* Remove any hints of a wrong encoding.  */
-//      ps->__count = 0;
-//      if (! isascii (*format) && (len = __mbrlen (format, MB_CUR_MAX, ps)) > 0)
-//	format += len;
-//      else
+      ps->__count = 0;
+      if (! isascii (*format) && (len = __mbrlen (format, MB_CUR_MAX, ps)) > 0)
+	format += len;
+      else
 	++format;
     }
   return format;
@@ -116,8 +117,8 @@ find_spec (const UCHAR_T *format)
 
 
 /* These are defined in reg-printf.c.  */
-extern printf_arginfo_function **__printf_arginfo_table attribute_hidden;
-extern printf_function **__printf_function_table attribute_hidden;
+extern printf_arginfo_function *__printf_arginfo_table[];
+extern printf_function **__printf_function_table;
 
 
 /* FORMAT must point to a '%' at the beginning of a spec.  Fills in *SPEC
@@ -126,13 +127,13 @@ extern printf_function **__printf_function_table attribute_hidden;
    the number of args consumed by this spec; *MAX_REF_ARG is updated so it
    remains the highest argument index used.  */
 static inline size_t
-//#ifdef COMPILE_WPRINTF
+#ifdef COMPILE_WPRINTF
 parse_one_spec (const UCHAR_T *format, size_t posn, struct printf_spec *spec,
 		size_t *max_ref_arg)
-//#else
-//parse_one_spec (const UCHAR_T *format, size_t posn, struct printf_spec *spec,
-//		size_t *max_ref_arg, mbstate_t *ps)
-//#endif
+#else
+parse_one_spec (const UCHAR_T *format, size_t posn, struct printf_spec *spec,
+		size_t *max_ref_arg, mbstate_t *ps)
+#endif
 {
   unsigned int n;
   size_t nargs = 0;
@@ -353,7 +354,7 @@ parse_one_spec (const UCHAR_T *format, size_t posn, struct printf_spec *spec,
 
   /* Get the format specification.  */
   spec->info.spec = (wchar_t) *format++;
-  if (__builtin_expect (__printf_function_table != NULL, 0)
+  if (__printf_function_table != NULL
       && spec->info.spec <= UCHAR_MAX
       && __printf_arginfo_table[spec->info.spec] != NULL)
     /* We don't try to get the types for all arguments if the format
@@ -442,11 +443,11 @@ parse_one_spec (const UCHAR_T *format, size_t posn, struct printf_spec *spec,
     {
       /* Find the next format spec.  */
       spec->end_of_fmt = format;
-//#ifdef COMPILE_WPRINTF
+#ifdef COMPILE_WPRINTF
       spec->next_fmt = find_spec (format);
-//#else
-//      spec->next_fmt = find_spec (format, ps);
-//#endif
+#else
+      spec->next_fmt = find_spec (format, ps);
+#endif
     }
 
   return nargs;

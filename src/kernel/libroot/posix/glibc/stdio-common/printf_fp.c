@@ -1,5 +1,5 @@
 /* Floating point output for `printf'.
-   Copyright (C) 1995-1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+   Copyright (C) 1995-1999, 2000, 2001 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
 
@@ -21,10 +21,11 @@
 /* The gmp headers need some configuration frobs.  */
 #define HAVE_ALLOCA 1
 
-#include <stdio_private.h>
-// ToDo: implement this function for real
-#include <printf.h>
-#if 0
+#ifdef USE_IN_LIBIO
+#  include <libioP.h>
+#else
+#  include <stdio.h>
+#endif
 #include <alloca.h>
 #include <ctype.h>
 #include <float.h>
@@ -36,6 +37,7 @@
 #include <locale/localeinfo.h>
 #include <limits.h>
 #include <math.h>
+#include <printf.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -50,7 +52,7 @@
    the GNU I/O library.	 */
 #ifdef USE_IN_LIBIO
 # define PUT(f, s, n) _IO_sputn (f, s, n)
-# define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : INTUSE(_IO_padn) (f, c, n))
+# define PAD(f, c, n) (wide ? _IO_wpadn (f, c, n) : _IO_padn (f, c, n))
 /* We use this file GNU C library and GNU I/O library.	So make
    names equal.	 */
 # undef putc
@@ -118,8 +120,7 @@ ssize_t __printf_pad __P ((FILE *, char pad, int n)); /* In vfprintf.c.  */
 #define MPN_GE(u,v) \
   (u##size > v##size || (u##size == v##size && __mpn_cmp (u, v, u##size) >= 0))
 
-extern int __isinfl_internal (long double) attribute_hidden;
-extern int __isnanl_internal (long double) attribute_hidden;
+extern int __isinfl (long double), __isnanl (long double);
 
 extern mp_size_t __mpn_extract_double (mp_ptr res_ptr, mp_size_t size,
 				       int *expt, int *is_neg,
@@ -210,7 +211,8 @@ __printf_fp (FILE *fp,
       else if (scalesize == 0)
 	{
 	  hi = frac[fracsize - 1];
-	  frac[fracsize - 1] = __mpn_mul_1 (frac, frac, fracsize - 1, 10);
+	  cy = __mpn_mul_1 (frac, frac, fracsize - 1, 10);
+	  frac[fracsize - 1] = cy;
 	}
       else
 	{
@@ -234,11 +236,9 @@ __printf_fp (FILE *fp,
 		}
 	    }
 
-		{
-			mp_limb_t _cy = __mpn_mul_1 (frac, frac, fracsize, 10);
-			if (_cy != 0)
-				frac[fracsize++] = _cy;
-		}
+	  cy = __mpn_mul_1 (frac, frac, fracsize, 10);
+	  if (cy != 0)
+	    frac[fracsize++] = cy;
 	}
 
       return L'0' + hi;
@@ -304,7 +304,7 @@ __printf_fp (FILE *fp,
 	       multibyte representation for the thousands separator,
 	       we must ensure the wide character thousands separator
 	       is available, even if it is fake.  */
-	    thousands_sepwc = (wchar_t)0xfffffffe;
+	    thousands_sepwc = 0xfffffffe;
 	}
     }
   else
@@ -363,7 +363,6 @@ __printf_fp (FILE *fp,
       /* Check for special values: not a number or infinity.  */
       if (__isnan (fpnum.dbl))
 	{
-	  is_neg = 0;
 	  if (isupper (info->spec))
 	    {
 	      special = "NAN";
@@ -374,10 +373,10 @@ __printf_fp (FILE *fp,
 	      special = "nan";
 	      wspecial = L"nan";
 	    }
+	  is_neg = 0;
 	}
       else if (__isinf (fpnum.dbl))
 	{
-	  is_neg = fpnum.dbl < 0;
 	  if (isupper (info->spec))
 	    {
 	      special = "INF";
@@ -388,6 +387,7 @@ __printf_fp (FILE *fp,
 	      special = "inf";
 	      wspecial = L"inf";
 	    }
+	  is_neg = fpnum.dbl < 0;
 	}
       else
 	{
@@ -493,9 +493,6 @@ __printf_fp (FILE *fp,
 			      &__tens[powers->arrayoff],
 			      tmpsize * sizeof (mp_limb_t));
 		      MPN_ZERO (tmp, _FPIO_CONST_SHIFT);
-		      /* Adjust exponent, as scaleexpo will be this much
-			 bigger too.  */
-		      exponent += _FPIO_CONST_SHIFT * BITS_PER_MP_LIMB;
 		    }
 		  else
 #endif
@@ -809,12 +806,10 @@ __printf_fp (FILE *fp,
 	dig_max = INT_MAX;		/* Unlimited.  */
 	significant = 1;		/* Does not matter here.  */
       }
-    else if (_tolower (info->spec) == 'f')
+    else if (info->spec == 'f')
       {
 	type = 'f';
 	fracdig_min = fracdig_max = info->prec < 0 ? 6 : info->prec;
-	dig_max = INT_MAX;		/* Unlimited.  */
-	significant = 1;		/* Does not matter here.  */
 	if (expsign == 0)
 	  {
 	    intdig_max = exponent + 1;
@@ -826,6 +821,8 @@ __printf_fp (FILE *fp,
 	    intdig_max = 1;
 	    chars_needed = 1 + 1 + fracdig_max;
 	  }
+	dig_max = INT_MAX;		/* Unlimited.  */
+	significant = 1;		/* Does not matter here.  */
       }
     else
       {
@@ -869,7 +866,7 @@ __printf_fp (FILE *fp,
        it is possible that we need two more characters in front of all the
        other output.  If the amount of memory we have to allocate is too
        large use `malloc' instead of `alloca'.  */
-    buffer_malloced = ! __libc_use_alloca (chars_needed * 2 * sizeof (wchar_t));
+    buffer_malloced = chars_needed > 5000;
     if (buffer_malloced)
       {
 	wbuffer = (wchar_t *) malloc ((2 + chars_needed) * sizeof (wchar_t));
@@ -911,7 +908,7 @@ __printf_fp (FILE *fp,
       {
 	++fracdig_no;
 	*wcp = hack_digit ();
-	if (*wcp++ != L'0')
+	if (*wcp != L'0')
 	  significant = 1;
 	else if (significant == 0)
 	  {
@@ -919,6 +916,7 @@ __printf_fp (FILE *fp,
 	    if (fracdig_min > 0)
 	      ++fracdig_min;
 	  }
+	++wcp;
       }
 
     /* Do rounding.  */
@@ -1144,7 +1142,6 @@ __printf_fp (FILE *fp,
   }
   return done;
 }
-libc_hidden_def (__printf_fp)
 
 /* Return the number of extra grouping characters that will be inserted
    into a number with INTDIG_MAX integer digits.  */
@@ -1229,11 +1226,4 @@ group_number (wchar_t *buf, wchar_t *bufend, unsigned int intdig_no,
   while (p > buf);
 
   return bufend + ngroups;
-}
-#endif
-
-int
-__printf_fp(FILE *fp, const struct printf_info *info, const void * const *args)
-{
-	return fputs("NaN-FIXME", fp);
 }
