@@ -349,6 +349,18 @@ err:
 
 
 static int
+rootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
+{
+	struct rootfs_vnode *vnode = (struct rootfs_vnode *)_vnode;
+
+	TRACE(("devfs_get_vnode_name: vnode = %p\n",vnode));
+	
+	strlcpy(buffer,vnode->name,bufferSize);
+	return B_OK;
+}
+
+
+static int
 rootfs_get_vnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 {
 	struct rootfs *fs = (struct rootfs *)_fs;
@@ -801,6 +813,7 @@ static struct fs_calls rootfs_calls = {
 	&rootfs_sync,
 
 	&rootfs_lookup,
+	&rootfs_get_vnode_name,
 
 	&rootfs_get_vnode,
 	&rootfs_put_vnode,

@@ -523,6 +523,18 @@ err:
 
 
 static int
+bootfs_get_vnode_name(fs_cookie _fs, fs_vnode _vnode, char *buffer, size_t bufferSize)
+{
+	struct bootfs_vnode *vnode = (struct bootfs_vnode *)_vnode;
+
+	TRACE(("devfs_get_vnode_name: vnode = %p\n",vnode));
+	
+	strlcpy(buffer,vnode->name,bufferSize);
+	return B_OK;
+}
+
+
+static int
 bootfs_getvnode(fs_cookie _fs, vnode_id id, fs_vnode *v, bool r)
 {
 	struct bootfs *fs = (struct bootfs *)_fs;
@@ -998,6 +1010,7 @@ static struct fs_calls bootfs_calls = {
 	&bootfs_sync,
 
 	&bootfs_lookup,
+	&bootfs_get_vnode_name,
 
 	&bootfs_getvnode,
 	&bootfs_putvnode,

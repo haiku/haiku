@@ -23,8 +23,9 @@
 #include <Errors.h>
 #include <kerrors.h>
 #include <atomic.h>
-#include <OS.h>
 #include <fd.h>
+
+#include <OS.h>
 
 #include <rootfs.h>
 
@@ -46,6 +47,10 @@
 #	define FUNCTION(x) ;
 #endif
 
+// ToDo: remove this and include StorageDefs.h once it's there...
+#ifndef B_FILE_NAME_LENGTH
+#	define B_FILE_NAME_LENGTH 256
+#endif
 
 struct vnode {
 	struct vnode    *next;
@@ -123,6 +128,8 @@ static int vfs_open(char *path, int omode, bool kernel);
 static int vfs_open_dir(char *path, bool kernel);
 static int vfs_create(char *path, int omode, int perms, bool kernel);
 static int vfs_create_dir(char *path, int perms, bool kernel);
+
+static status_t dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize);
 
 struct fd_ops file_ops = {
 	"file",
@@ -369,7 +376,7 @@ lookup_vnode(fs_id fsid, vnode_id vnid)
 
 
 static int
-get_vnode(fs_id fsid, vnode_id vnid, struct vnode **outv, int r)
+get_vnode(fs_id fsid, vnode_id vnid, struct vnode **outv, int reenter)
 {
 	struct vnode *v;
 	int err;
@@ -414,7 +421,7 @@ get_vnode(fs_id fsid, vnode_id vnid, struct vnode **outv, int r)
 
 		add_vnode_to_mount_list(v, v->mount);
 
-		err = FS_CALL(v,fs_get_vnode)(v->mount->cookie, vnid, &v->priv_vnode, r);
+		err = FS_CALL(v,fs_get_vnode)(v->mount->cookie, vnid, &v->priv_vnode, reenter);
 
 		if (err < 0)
 			remove_vnode_from_mount_list(v, v->mount);
@@ -724,119 +731,111 @@ path_to_dir_vnode(char *path, struct vnode **v, char *filename, bool kernel)
 }
 
 
-//////////////////////////////////////////////////////////////////////////////////
-//
-// XXX -- Warning: horrible hack, just ahead!
-//
-// the following code implements a version of vnode_to_path()
-// which takes an arbitrary vnode and generates the full file path string.
-// this is used by vfs_get_cwd() so that the user shell can implement 'pwd'
-//
-// however...
-//
-// the method used is to peek into the private vnodes of the filesystem modules.
-// this is *BAD MOJO* and only works because all of the current filesystems
-// were implemented with a common structure, mimicked by the struct below.
-//
-// the hack was required because the VFS layer, as it was forked from NewOS,
-// did not have a means of acquiring the path info thru a standard method.
-// Once we have our own proper implementation of the VFS layer, then the
-// gross hack below can be removed...
-// 
+/**	Gets the full path to a given directory vnode.
+ *	It uses the fs_get_vnode_name() call to get the name of a vnode; if a
+ *	file system doesn't support this call, it will fall back to iterating
+ *	through the parent directory to get the name of the child.
+ *
+ *	To detect circular loops, it supports a maximum tree depth
+ *	of 256 levels.
+ *
+ *	Note that the path may not be correct the time this function returns!
+ *	It doesn't use any locking to prevent returning the correct path, as
+ *	paths aren't safe anyway: the path to a file can change at any time.
+ */
 
-int vnode_to_path(struct vnode *, char *, int);
-
-
-typedef struct generic_vnode {
-	struct generic_vnode *all_next;
-	vnode_id              id;
-	char                 *name;
-	void                 *redir_vnode;
-	struct generic_vnode *parent;
-	struct generic_vnode *dir_next;
-}
-generic_vnode;
-
-
-int
-vnode_to_path(struct vnode *v, char *buf, int buflen)
+status_t
+dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 {
-	int rc;  // return code
+	/* this implementation is currently bound to SYS_MAX_PATH_LEN */
+	char path[SYS_MAX_PATH_LEN];
+	int32 insert = sizeof(path);
+	int32 maxLevel = 256;
+	int32 length;
+	status_t status;
 
-	if ((v == NULL) || (buf == NULL) || (buflen <= 0))
+	if (vnode == NULL || buffer == NULL)
 		return EINVAL;
+
+	inc_vnode_ref_count(vnode);
+
+	path[--insert] = '\0';
 	
-	//
-	// ask the filesystem containing the given vnode to fetch
-	// its local vnode structure for us (returned in v->priv_vnode).
-	// this fs vnode contains the leaf name and parent link required
-	//
-	rc = FS_CALL(v,fs_get_vnode)(v->mount->cookie, v->vnid, &v->priv_vnode, true);
-	if (rc < 0)
-		return rc;
-	else {
-		//
-		// construct the full path, which is:
-		// {mount_point}/{relative_path}
-		//
-		// the mount point has already been stored,
-		// but the relative path has to be generated on-the-fly
-		//
-		generic_vnode *g = (generic_vnode *) v->priv_vnode;
+	while (true) {
+		char name[B_FILE_NAME_LENGTH];
+		vnode_id parentId;
 
-		char *mpoint     = v->mount->mount_point;
-		int   mpointlen  = strlen (mpoint);
-		
-		char rpath[SYS_MAX_NAME_LEN];  // buffer to hold relative path
-		int  i = sizeof rpath;         // current insertion point
-		int  rpathlen = 0;
-		int  len;
+		// lookup the parent vnode
+		status = FS_CALL(vnode,fs_lookup)(vnode->mount->cookie,vnode->priv_vnode,"..",&parentId);
 
-		//
-		// generate relative path:
-		// start with given leaf vnode and back up to mount point,
-		// copying leaf names into buffer (right to left) as we go
-		//
-		rpath[--i] = '\0';
-		
-		for (; g; g = g->parent) {
-			// 
-			if (g->name[0]) {
-				len = strlen (g->name);
-				i -= len;
-				memcpy (rpath+i, g->name, len);
-				rpathlen += len;
-			}
-			if (g->parent) {
-				if (g->parent->id == g->id)
-					// hit mount point
-					break;
-				
-				rpath[--i] = '/';
-				++rpathlen;
-			}
+		// release the current vnode, we only need its parent from now on
+		put_vnode(vnode);
+
+		if (status < B_OK)
+			return status;
+
+		// don't go deeper as 'maxLevel' to prevent circular loops
+		if (maxLevel-- < 0)
+			return ELOOP;
+
+		if (parentId == vnode->vnid) {
+			// we have reached the root level directory of this file system
+			break;
 		}
-		
-		if ((mpointlen + rpathlen) > buflen)
+
+		// Get the parent vnode. The parent of the vnode may have already
+		// changed, though, which would result in an incorrect path
+		status = get_vnode(vnode->mount->id,parentId,&vnode,0);
+		if (status < B_OK)
+			return status;
+
+		// okay, we got the parent node, so we can now paste its name
+		// in front of our working path - but we don't know the name yet...
+
+		// does the file system support getting the name of a vnode?
+		if (FS_CALL(vnode,fs_get_vnode_name))
+			status = FS_CALL(vnode,fs_get_vnode_name)(vnode->mount->cookie,vnode->priv_vnode,name,sizeof(name));
+		else {
+			file_cookie cookie;
+
+			status = FS_CALL(vnode,fs_open_dir)(vnode->mount->cookie,vnode->priv_vnode,&cookie);
+			if (status >= B_OK) {
+				// ToDo: implement fall-back - iterate through the directory
+				// and find the correct entry...
+				// Does need some more stack space...
+				/* ... */
+				FS_CALL(vnode,fs_close_dir)(vnode->mount->cookie,vnode->priv_vnode,cookie);
+			}
+
+			status = B_ERROR;
+		}
+		if (status < B_OK) {
+			put_vnode(vnode);
+			return status;
+		}
+
+		// add the name infront of the current path
+		name[B_FILE_NAME_LENGTH - 1] = '\0';
+		length = strlen(name);
+		insert -= length;
+		if (insert <= 0) {
+			put_vnode(vnode);
 			return ENOBUFS;
-		
-		//
-		// copy results to output buffer
-		//
-		strcpy (buf, mpoint);
-		if (rpathlen > 0)
-			strcat (buf, rpath+i);
-		
-		return B_OK;
+		}
+		memcpy(path + insert, name, length);
+		path[--insert] == '/';
 	}
+
+	// add the mountpoint
+	length = strlen(vnode->mount->mount_point);
+	if (bufferSize - (sizeof(path) - insert) < length + 1)
+		return ENOBUFS;
+
+	memcpy(buffer, vnode->mount->mount_point, length);
+	memcpy(buffer + length, path + insert, sizeof(path) - insert);
+
+	return B_OK;
 }
-
-
-//
-//
-// XXX - end of the vnode_to_path() hack
-//
-//////////////////////////////////////////////////////////////////////////////////
 
 
 /** Sets up a new io_control structure, and inherits the properties
@@ -1623,10 +1622,6 @@ vfs_write_page(void *_v, iovecs *vecs, off_t pos)
 }
 
 
-//
-// XXX -- Fixme: uses vnode_to_path() hack
-//
-
 static int
 vfs_get_cwd(char *buffer, size_t size, bool kernel)
 {
@@ -1636,16 +1631,7 @@ vfs_get_cwd(char *buffer, size_t size, bool kernel)
 	FUNCTION(("vfs_get_cwd: buf %p, size %ld\n", buffer, size));
 
 	if (cwd)
-		//
-		// vnode_to_path() takes the cwd vnode and computes
-		// a full path string from it, which is then copied
-		// into the given buffer.
-		//
-		// WARNING: the current version of this function
-		// utilizes a gross hack and will be removed and/or
-		// replaced in the future...
-		//
-		return vnode_to_path(cwd, buffer, size);
+		return dir_vnode_to_path(cwd, buffer, size);
 
 	return B_ERROR; 
 }
@@ -2010,10 +1996,8 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 	if ((addr)ufs_name >= KERNEL_BASE && (addr)ufs_name <= KERNEL_TOP)
 		return ERR_VM_BAD_USER_MEMORY;
 
-	if (udevice) {
-		if((addr)udevice >= KERNEL_BASE && (addr)udevice <= KERNEL_TOP)
-			return ERR_VM_BAD_USER_MEMORY;
-	}
+	if (udevice != NULL && (addr)udevice >= KERNEL_BASE && (addr)udevice <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
 
 	rc = user_strncpy(path, upath, SYS_MAX_PATH_LEN);
 	if (rc < 0)
@@ -2027,12 +2011,11 @@ user_mount(const char *upath, const char *udevice, const char *ufs_name, void *a
 
 	if (udevice) {
 		rc = user_strncpy(device, udevice, SYS_MAX_PATH_LEN);
-		if(rc < 0)
+		if (rc < 0)
 			return rc;
 		device[SYS_MAX_PATH_LEN] = 0;
-	} else {
+	} else
 		device[0] = 0;
-	}
 
 	return vfs_mount(path, device, fs_name, args, false);
 }
@@ -2248,28 +2231,27 @@ user_write_stat(const char *upath, struct stat *ustat, int stat_mask)
 
 
 int
-user_getcwd(char *buf, size_t size)
+user_getcwd(char *buffer, size_t size)
 {
 	char path[SYS_MAX_PATH_LEN];
-	int rc, rc2;
+	int status;
 
-	PRINT(("user_getcwd: buf %p, %ld\n", buf, size));
+	PRINT(("user_getcwd: buf %p, %ld\n", buffer, size));
 
 	// Check if userspace address is inside "shared" kernel space
-	if((addr)buf >= KERNEL_BASE && (addr)buf <= KERNEL_TOP)
-		return NULL; //ERR_VM_BAD_USER_MEMORY;
+	if ((addr)buffer >= KERNEL_BASE && (addr)buffer <= KERNEL_TOP)
+		return ERR_VM_BAD_USER_MEMORY;
 
 	// Call vfs to get current working directory
-	rc = vfs_get_cwd(path, SYS_MAX_PATH_LEN-1, false);
-	if(rc < 0)
-		return rc;
+	status = vfs_get_cwd(path, sizeof(path), false);
+	if (status < 0)
+		return status;
 
 	// Copy back the result
-	rc2 = user_strncpy(buf, path, size);
-	if(rc2 < 0)
-		return rc2;
+	if (user_strncpy(buffer, path, size) < 0)
+		return ERR_VM_BAD_USER_MEMORY;
 
-	return rc;
+	return status;
 }
 
 
