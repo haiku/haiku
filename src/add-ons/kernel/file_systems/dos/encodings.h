@@ -22,7 +22,7 @@ status_t munge_short_name1(uchar nshort[11], int iteration, int encoding);
 status_t generate_short_name(const uchar *name, const uchar *uni,
 		uint32 unilen, uchar nshort[11], int *encoding);
 
-status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len);
+status_t msdos_to_utf8(uchar *msdos, uchar *utf8, uint32 utf8len, bool toLower);
 
 #ifdef __cplusplus
 }
