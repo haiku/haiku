@@ -22,13 +22,16 @@ uname(struct utsname *info)
 
 	get_system_info(&sinfo);
 
-	strcpy(info->sysname, "Haiku");
-	strlcpy(info->version, sinfo.kernel_build_date, B_OS_NAME_LENGTH);
-	strlcat(info->version, sinfo.kernel_build_time, B_OS_NAME_LENGTH);
-	sprintf(info->release, "%lld", sinfo.kernel_version);
+	strlcpy(info->sysname, "Haiku", sizeof(info->sysname));
+	strlcpy(info->version, sinfo.kernel_build_date, sizeof(info->version));
+	strlcat(info->version, sinfo.kernel_build_time, sizeof(info->version));
+	snprintf(info->release, sizeof(info->release), "%lld", sinfo.kernel_version);
 
+	// TODO fill machine field...
+	strlcpy(info->machine, "unknown", sizeof(info->machine));
+	
 	// TODO fill nodename field when we have hostname info
-	strcpy(info->nodename, "unknown");
+	strlcpy(info->nodename, "unknown", sizeof(info->nodename));
 
 	return 0;
 }
