@@ -6,7 +6,7 @@
 #ifndef _PARTITIONING_INFO_H
 #define _PARTITIONING_INFO_H
 
-class BPartition;
+#include <SupportDefs.h>
 
 class BPartitioningInfo {
 public:
@@ -14,11 +14,9 @@ public:
 									 off_t *size) const;
 	int32 CountPartitionableSpaces() const;
 
-	BPartition *Parent() const;	// needed?
-
 private:
-	off_t	*fOffsetArray;
-	off_t	*fSizeArray;
+	off_t	*fOffsets;
+	off_t	*fSizes;
 	int32	fCount;
 };
 

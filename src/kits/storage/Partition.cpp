@@ -3,12 +3,16 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <new>
+
 #include <Partition.h>
+
 #include <DiskDevice.h>
+#include <DiskDeviceVisitor.h>
 #include <Message.h>
-#include <Mime.h>
-#include <Session.h>
 #include <Volume.h>
+
+#include "ddm_userland_interface.h"
 
 /*!	\class BPartition
 	\brief A BPartition object represent a partition and provides a lot of
@@ -20,31 +24,20 @@
 	(\see IsEmpty()).
 */
 
+// constructor
+BPartition::BPartition()
+	: fDevice(NULL),
+	  fParent(NULL),
+	  fPartitionData(NULL)
+{
+}
+
 // destructor
 /*!	\brief Frees all resources associated with this object.
 */
 BPartition::~BPartition()
 {
-}
-
-// Session
-/*!	\brief Returns the session this partition resides on.
-	\return The session this partition resides on.
-*/
-BSession *
-BPartition::Session() const
-{
-	return fSession;
-}
-
-// Device
-/*!	\brief Returns the device this partition resides on.
-	\return The device this partition resides on.
-*/
-BDiskDevice *
-BPartition::Device() const
-{
-	return (fSession ? fSession->Device() : NULL);
+	Unset();
 }
 
 // Offset
@@ -56,7 +49,7 @@ BPartition::Device() const
 off_t
 BPartition::Offset() const
 {
-	return fInfo.info.offset;
+	return (fPartitionData ? fPartitionData->offset : 0);
 }
 
 // Size
@@ -66,17 +59,17 @@ BPartition::Offset() const
 off_t
 BPartition::Size() const
 {
-	return fInfo.info.size;
+	return (fPartitionData ? fPartitionData->size : 0);
 }
 
 // BlockSize
 /*!	\brief Returns the block size of the device.
 	\return The block size of the device in bytes.
 */
-int32
+uint32
 BPartition::BlockSize() const
 {
-	return (fSession ? fSession->BlockSize() : 0);
+	return (fPartitionData ? fPartitionData->block_size : 0);
 }
 
 // Index
@@ -87,7 +80,59 @@ BPartition::BlockSize() const
 int32
 BPartition::Index() const
 {
-	return fIndex;
+	return (fPartitionData ? fPartitionData->index : -1);
+}
+
+// Status
+uint32
+BPartition::Status() const
+{
+	return (fPartitionData ? fPartitionData->status : 0);
+}
+
+// IsMountable
+bool
+BPartition::IsMountable() const
+{
+	return (fPartitionData
+			&& (fPartitionData->flags & B_PARTITION_MOUNTABLE));
+}
+
+// IsPartitionable
+bool
+BPartition::IsPartitionable() const
+{
+	return (fPartitionData
+			&& (fPartitionData->flags & B_PARTITION_PARTITIONABLE));
+}
+
+// IsDevice
+bool
+BPartition::IsDevice() const
+{
+	return (fPartitionData
+			&& (fPartitionData->flags & B_PARTITION_IS_DEVICE));
+}
+
+// IsReadOnly
+bool
+BPartition::IsReadOnly() const
+{
+	return (fPartitionData
+			&& (fPartitionData->flags & B_PARTITION_READ_ONLY));
+}
+
+// IsMounted
+/*!	\brief Returns whether the volume is mounted.
+	\return \c true, if the volume is mounted, \c false otherwise.
+*/
+bool
+BPartition::IsMounted() const
+{
+	return (fPartitionData
+			&& (fPartitionData->flags & B_PARTITION_MOUNTED));
+	// alternatively:
+	// return (fPartitionData && fPartitionData->volume >= 0);
 }
 
 // Flags
@@ -107,54 +152,7 @@ BPartition::Index() const
 uint32
 BPartition::Flags() const
 {
-	return fInfo.flags;
-}
-
-// IsHidden
-/*!	\brief Returns whether the partition can contain a file system.
-	\see Flags().
-	\return \c true, if the partition can't contain a file system, \c false
-			otherwise.
-*/
-bool
-BPartition::IsHidden() const
-{
-	return (fInfo.flags & B_HIDDEN_PARTITION);
-}
-
-// IsVirtual
-/*!	\brief Returns whether the object doesn't represents an on-disk partition.
-	\see Flags().
-	\return \c true, if the object doesn't represent an on-disk partition,
-			\c false otherwise.
-*/
-bool
-BPartition::IsVirtual() const
-{
-	return (fInfo.flags & B_VIRTUAL_PARTITION);
-}
-
-// IsEmpty
-/*!	\brief Returns whether the partition is empty.
-	\see Flags().
-	\return \c true, if the partition is empty, \c false otherwise.
-*/
-bool
-BPartition::IsEmpty() const
-{
-	return (fInfo.flags & B_EMPTY_PARTITION);
-}
-
-// ContainsFileSystem
-/*!	\brief Returns whether the partition contains a file system recognized by
-		   the system.
-	\return \c true, if the partition contains a file system recognized by
-			the system, \c false otherwise.
-*/
-bool
-BPartition::ContainsFileSystem() const
-{
-	return (fInfo.file_system_short_name[0] != '\0');
+	return (fPartitionData ? fPartitionData->flags : 0);
 }
 
 // Name
@@ -169,7 +167,14 @@ BPartition::ContainsFileSystem() const
 const char *
 BPartition::Name() const
 {
-	return (fInfo.partition_name[0] != '\0' ? fInfo.partition_name : NULL);
+	return (fPartitionData ? fPartitionData->name : NULL);
+}
+
+// ContentName
+const char *
+BPartition::ContentName() const
+{
+	return (fPartitionData ? fPartitionData->content_name : NULL);
 }
 
 // Type
@@ -179,86 +184,14 @@ BPartition::Name() const
 const char *
 BPartition::Type() const
 {
-	return fInfo.partition_type;
+	return (fPartitionData ? fPartitionData->type : NULL);
 }
 
-// FileSystemShortName
-/*!	\brief Returns a short string identifying the file system on the partition.
-
-	If the partition doesn't contain a recognized file system
-	(\see ContainsFileSystem()), \c NULL is returned.
-
-	\return A short string identifying the file system on the partition,
-			or \c NULL, if the partition doesn't contain a recognized file
-			system.
-*/
+// ContentType
 const char *
-BPartition::FileSystemShortName() const
+BPartition::ContentType() const
 {
-	return (ContainsFileSystem() ? fInfo.file_system_short_name : NULL);
-}
-
-// FileSystemLongName
-/*!	\brief Returns a longer description of the file system on the partition.
-
-	If the partition doesn't contain a recognized file system
-	(\see ContainsFileSystem()), \c NULL is returned.
-
-	\return A longer description of the file system on the partition,
-			or \c NULL, if the partition doesn't contain a recognized file
-			system.
-*/
-const char *
-BPartition::FileSystemLongName() const
-{
-	return (ContainsFileSystem() ? fInfo.file_system_long_name : NULL);
-}
-
-// VolumeName
-/*!	\brief Returns the name of the volume.
-
-	If the partition doesn't contain a recognized file system
-	(\see ContainsFileSystem()), \c NULL is returned.
-
-	\return The name of the volume, or \c NULL, if the partition doesn't
-			contain a recognized file system.
-*/
-const char *
-BPartition::VolumeName() const
-{
-	return (ContainsFileSystem() ? fInfo.volume_name : NULL);
-}
-
-// FileSystemFlags
-/*!	\brief Returns the file system flags for the volume.
-
-	If the partition doesn't contain a recognized file system
-	(\see ContainsFileSystem()), the return value is undefined.
-
-	Note, that, if the volume is mounted, the returned flags are identical
-	with the ones fs_stat_dev() reports. If not mounted they describe merely
-	the file system's capabilities. E.g. if the file system supports
-	writing and the device is not read-only, the B_FS_IS_READONLY is not set,
-	but it will be set, when the volume is mounted read-only. The same applies
-	to other capabilities that can be disabled at mount time.
-
-	\return The file system flags of the volume, if the partition contains
-			a recognized file system.
-*/
-uint32
-BPartition::FileSystemFlags() const
-{
-	return fInfo.file_system_flags;
-}
-
-// IsMounted
-/*!	\brief Returns whether the volume is mounted.
-	\return \c true, if the volume is mounted, \c false otherwise.
-*/
-bool
-BPartition::IsMounted() const
-{
-	return (fVolumeID >= 0);
+	return (fPartitionData ? fPartitionData->content_type : NULL);
 }
 
 // UniqueID
@@ -274,7 +207,23 @@ BPartition::IsMounted() const
 int32
 BPartition::UniqueID() const
 {
-	return fUniqueID;
+	return (fPartitionData ? fPartitionData->id : -1);
+}
+
+// GetDiskSystem
+status_t
+BPartition::GetDiskSystem(BDiskSystem *diskSystem) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// GetPath
+status_t
+BPartition::GetPath(BPath *path) const
+{
+	// not implemented
+	return B_ERROR;
 }
 
 // GetVolume
@@ -290,9 +239,9 @@ BPartition::UniqueID() const
 status_t
 BPartition::GetVolume(BVolume *volume) const
 {
-	status_t error = (volume ? B_OK : B_BAD_VALUE);
+	status_t error = (fPartitionData && volume ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
-		error = volume->SetTo(fVolumeID);
+		error = volume->SetTo(fPartitionData->volume);
 	return error;
 }
 
@@ -312,6 +261,7 @@ BPartition::GetVolume(BVolume *volume) const
 status_t
 BPartition::GetIcon(BBitmap *icon, icon_size which) const
 {
+/*
 	status_t error = (icon ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		if (IsMounted()) {
@@ -331,6 +281,9 @@ BPartition::GetIcon(BBitmap *icon, icon_size which) const
 		}
 	}
 	return error;
+*/
+	// not implemented
+	return B_ERROR;
 }
 
 // Mount
@@ -362,6 +315,124 @@ BPartition::Unmount()
 {
 	return B_ERROR;	// not implemented
 }
+
+// Device
+/*!	\brief Returns the device this partition resides on.
+	\return The device this partition resides on.
+*/
+BDiskDevice *
+BPartition::Device() const
+{
+	return fDevice;
+}
+
+// Parent
+BPartition *
+BPartition::Parent() const
+{
+	return fParent;
+}
+
+// ChildAt
+BPartition *
+BPartition::ChildAt(int32 index) const
+{
+	if (!fPartitionData || index < 0 || index >= fPartitionData->child_count)
+		return NULL;
+	return (BPartition*)fPartitionData->children[index]->user_data;
+}
+
+// CountChildren
+int32
+BPartition::CountChildren() const
+{
+	return (fPartitionData ? fPartitionData->child_count : 0);
+}
+
+// GetPartitioningInfo
+status_t
+BPartition::GetPartitioningInfo(BPartitioningInfo *info) const
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// VisitEachChild
+BPartition *
+BPartition::VisitEachChild(BDiskDeviceVisitor *visitor)
+{
+	if (visitor) {
+		for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
+			if (visitor->Visit(child))
+				return child;
+		}
+	}
+	return NULL;
+}
+
+// VisitEachDescendent
+BPartition *
+BPartition::VisitEachDescendent(BDiskDeviceVisitor *visitor)
+{
+	if (visitor) {
+		if (visitor->Visit(this))
+			return this;
+		for (int32 i = 0; BPartition *child = ChildAt(i); i++) {
+			if (BPartition *result = child->VisitEachDescendent(visitor))
+				return result;
+		}
+	}
+	return NULL;
+}
+
+// SetTo
+status_t
+BPartition::SetTo(BDiskDevice *device, BPartition *parent,
+				  user_partition_data *data)
+{
+	Unset();
+	if (!device || !data)
+		return B_BAD_VALUE;
+	fPartitionData = data;
+	fDevice = device;
+	fParent = parent;
+	fPartitionData->user_data = this;
+	// create and init children
+	status_t error = B_OK;
+	for (int32 i = 0; error == B_OK && i < fPartitionData->child_count; i++) {
+		BPartition *child = new(nothrow) BPartition;
+		if (child) {
+			error = child->SetTo(fDevice, this, fPartitionData->children[i]);
+			if (error != B_OK)
+				delete child;
+		} else
+			error = B_NO_MEMORY;
+	}
+	// cleanup on error
+	if (error != B_OK)
+		Unset();
+	return error;
+}
+
+// Unset
+void
+BPartition::Unset()
+{
+	// delete children
+	if (fPartitionData) {
+		for (int32 i = 0; i < fPartitionData->child_count; i++) {
+			if (BPartition *child = ChildAt(i))
+				delete child;
+		}
+		fPartitionData->user_data = NULL;
+	}
+	fDevice = NULL;
+	fParent = NULL;
+	fPartitionData = NULL;
+}
+
+
+#if 0
 
 // GetInitializationParameters
 /*!	\brief Asks the user to set the parameters for initializing this partition.
@@ -454,7 +525,6 @@ BPartition::BPartition()
 	: fSession(NULL),
 	  fUniqueID(-1),
 	  fChangeCounter(0),
-	  fIndex(-1),
 	  fVolumeID(-1)
 {
 	fInfo.info.offset = 0;
@@ -580,3 +650,4 @@ BPartition::_SetSession(BSession *session)
 	fSession = session;
 }
 
+#endif	// 0

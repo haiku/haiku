@@ -6,8 +6,8 @@
 #ifndef _DISK_DEVICE_PRIVATE_H
 #define _DISK_DEVICE_PRIVATE_H
 
+#include <DiskDeviceDefs.h>
 #include <DiskDeviceVisitor.h>
-#include <SupportDefs.h>
 
 class BMessenger;
 
@@ -45,13 +45,10 @@ private:
 	partition_id		fID;
 };
 
-status_t get_disk_device_messenger(BMessenger *messenger);
-
 }	// namespace BPrivate
 
 using BPrivate::PartitionFilter;
 using BPrivate::PartitionFilterVisitor;
 using BPrivate::IDFinderVisitor;
-using BPrivate::get_disk_device_messenger;
 
 #endif	// _DISK_DEVICE_PRIVATE_H

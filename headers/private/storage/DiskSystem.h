@@ -6,6 +6,10 @@
 #ifndef _DISK_SYSTEM_H
 #define _DISK_SYSTEM_H
 
+#include <DiskDeviceDefs.h>
+
+class BPartition;
+
 class BDiskSystem {
 public:
 	const char *Name() const;
@@ -18,9 +22,9 @@ public:
 	bool SupportsMoving(BPartition *partition, bool *whileMounted) const;
 	bool SupportsMovingChild(BPartition *child) const;
 	bool SupportsCreatingChild(BPartition *partition) const;
-	bool SupportsParentSystem(KPartition *child, const char *system) const;
+	bool SupportsParentSystem(BPartition *child, const char *system) const;
 		// True in most cases. NULL == raw device.
-	bool SupportsChildSystem(KPartition *child, const char *system) const;
+	bool SupportsChildSystem(BPartition *child, const char *system) const;
 		// False for most file systems, true for most partitioning
 		// systems.
 

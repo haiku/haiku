@@ -8,17 +8,17 @@
 
 #include <image.h>
 
-#include <DiskDeviceVisitor.h>
+#include <DiskDeviceDefs.h>
 #include <Messenger.h>
 #include <SupportDefs.h>
 
 class BDirectory;
 class BDiskDevice;
 class BDiskDeviceJob;
+class BDiskDeviceVisitor;
 class BDiskScannerPartitionAddOn;
 class BDiskSystem;
 class BPartition;
-class BSession;
 
 namespace BPrivate {
 	class AddOnImage;
@@ -98,10 +98,10 @@ public:
 	status_t GetNextActiveJob(BDiskDeviceJob *job);
 	status_t RewindActiveJobs();
 
-	partition_id RegisterDeviceFile(const char *filename);
+	partition_id RegisterFileDevice(const char *filename);
 		// publishes: /dev/disk/virtual/files/<disk device ID>/raw
-	status_t UnregisterDeviceFile(const char *filename);
-	status_t UnregisterDeviceFile(partition_id device);
+	status_t UnregisterFileDevice(const char *filename);
+	status_t UnregisterFileDevice(partition_id device);
 // TODO: Add the respective syscalls. Also for Get{Device,Partition}ForPath()
 
 	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
@@ -138,9 +138,11 @@ public:
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
 	status_t StartWatchingJob(BDiskDeviceJob *job, BMessenger target,
 	                          uint32 eventMask = B_DEVICE_REQUEST_JOB_COMPLETE_PROGRESS);
+		// TODO: Maybe better a BDiskDeviceJob::{Start,Stop}Watching()?
 	status_t StopWatching(BMessenger target);
 
 private:
+#if 0
 	status_t _GetObjectWithID(const char *fieldName, partition_id id,
 							  BDiskDevice *device) const;
 
@@ -159,14 +161,13 @@ private:
 	static status_t _LoadPartitionAddOn(const char *partitioningSystem,
 										BPrivate::AddOnImage *image,
 										BDiskScannerPartitionAddOn **addOn);
-
+#endif	// 0
 private:
-	BMessenger	fManager;
 	int32		fCookie;
-	BDirectory	*fPartitionAddOnDir;
-	BDirectory	*fFSAddOnDir;
-	int32		fPartitionAddOnDirIndex;
-	int32		fFSAddOnDirIndex;
+//	BDirectory	*fPartitionAddOnDir;
+//	BDirectory	*fFSAddOnDir;
+//	int32		fPartitionAddOnDirIndex;
+//	int32		fFSAddOnDirIndex;
 };
 
 #endif	// _DISK_DEVICE_ROSTER_H

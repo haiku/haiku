@@ -1,39 +1,32 @@
 SubDir OBOS_TOP src kits storage ;
 
 UsePrivateHeaders $(DOT) ;
-UsePrivateHeaders app ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ]
-				 [ FDirName $(OBOS_TOP) src kits app ]
-				 [ FDirName $(OBOS_TOP) src kits storage ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
 
 # We need to keep the DiskDevice API out of libopenbeos as long as the
 # Interface Kit is not fully functional (at least the part we are using).
 # So, we build a separate library.
 #
-#SharedLibrary diskdevice
-#	: AddOnImage.cpp
-#	  DiskDevice.cpp
+SharedLibrary diskdevice
+	: #AddOnImage.cpp
+	  DiskDevice.cpp
+	  DiskDeviceJob.cpp
 #	  DiskDeviceList.cpp
-#	  DiskDevicePrivate.cpp
-#	  DiskDeviceRoster.cpp
-#	  DiskDeviceVisitor.cpp
+	  DiskDevicePrivate.cpp
+	  DiskDeviceRoster.cpp
+	  DiskDeviceTypes.cpp
+	  DiskDeviceVisitor.cpp
 #	  DiskScannerAddOn.cpp
-#	  Mime.cpp
-#	  Partition.cpp
+	  DiskSystem.cpp
+	  Partition.cpp
 #	  PartitioningDialog.cpp
-#	  RegistrarDefs.cpp
-##	  Roster.cpp
-#	  RosterPrivate.cpp
-#	  Session.cpp
-#
-#	  # from libroot
-#	  #
-#	  disk_scanner.cpp
-#
-#	: <boot!home!config!lib>libkernelland_emu.so be
-#;
-#AbsSymLink <boot!home!config!lib>libdiskdevice.so : libdiskdevice.so
-#	: /boot/home/config/lib ;
+	  PartitioningInfo.cpp
+
+	: <boot!home!config!lib>libdisk_device_manager.so be
+;
+AbsSymLink <boot!home!config!lib>libdiskdevice.so : libdiskdevice.so
+	: /boot/home/config/lib ;

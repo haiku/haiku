@@ -3,6 +3,8 @@
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 
+#include <DiskDevice.h>
+
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -13,12 +15,12 @@
 #include <unistd.h>
 
 #include <DiskDevice.h>
-#include <DiskDevicePrivate.h>
+#include <DiskDeviceVisitor.h>
 #include <Drivers.h>
 #include <Message.h>
-#include <Partition.h>
-#include <RegistrarDefs.h>
-#include <Session.h>
+#include <Path.h>
+
+#include "ddm_userland_interface.h"
 
 /*!	\class BDiskDevice
 	\brief A BDiskDevice object represents a storage device.
@@ -28,18 +30,8 @@
 /*!	\brief Creates an uninitialized BDiskDevice object.
 */
 BDiskDevice::BDiskDevice()
-	: fSessions(10, true),
-	  fUniqueID(-1),
-	  fChangeCounter(0),
-	  fMediaStatus(B_ERROR),
-	  fSize(0),
-	  fBlockSize(0),
-	  fType(0),
-	  fReadOnly(false),
-	  fRemovable(false)//,
-//	  fIsFloppy(false)
+	: fDeviceData(NULL)
 {
-	fPath[0] = '\0';
 }
 
 // destructor
@@ -49,77 +41,253 @@ BDiskDevice::~BDiskDevice()
 {
 }
 
+// IsRemovable
+/*!	\brief Returns whether the device media are removable.
+	\return \c true, if the device media are removable, \c false otherwise.
+*/
+bool
+BDiskDevice::IsRemovable() const
+{
+	return (fDeviceData
+			&& fDeviceData->device_flags & B_DISK_DEVICE_REMOVABLE);
+}
+
+// HasMedia
+/*!	\brief Returns whether the device contains a media.
+	\return \c true, if the device contains a media, \c false otherwise.
+*/
+bool
+BDiskDevice::HasMedia() const
+{
+	return (fDeviceData
+			&& fDeviceData->device_flags & B_DISK_DEVICE_HAS_MEDIA);
+}
+
+// Eject
+/*!	\brief Eject the device's media.
+
+	The device media must, of course, be removable, and the device must
+	support ejecting the media.
+
+	\param update If \c true, Update() is invoked after successful ejection.
+	\return
+	- \c B_OK: Everything went fine.
+	- \c B_NO_INIT: The device is not properly initialized.
+	- \c B_BAD_VALUE: The device media is not removable.
+	- other error codes
+*/
+status_t
+BDiskDevice::Eject(bool update)
+{
+/*	// get path
+	const char *path = Path();
+	status_t error = (path ? B_OK : B_NO_INIT);
+	// check whether the device media is removable
+	if (error == B_OK && !IsRemovable())
+		error = B_BAD_VALUE;
+	// open, eject and close the device
+	if (error == B_OK) {
+		int fd = open(path, O_RDONLY);
+		if (fd < 0 || ioctl(fd, B_EJECT_DEVICE) != 0)
+			error = errno;
+		if (fd >= 0)
+			close(fd);
+	}
+	if (error == B_OK && update)
+		error = Update();
+	return error;
+*/
+	// not implemented
+	return B_ERROR;
+}
+
+// Update
+/*!	\brief Updates the object to reflect the latest changes to the device.
+
+	Note, that subobjects (BSessions, BPartitions) may be deleted during this
+	operation. It is also possible, that the device doesn't exist anymore --
+	e.g. if it is hot-pluggable. Then an error is returned and the object is
+	uninitialized.
+
+	\param updated Pointer to a bool variable which shall be set to \c true,
+		   if the object needed to be updated and to \c false otherwise.
+		   May be \c NULL. Is not touched, if the method fails.
+	\return \c B_OK, if the update went fine, another error code otherwise.
+*/
+status_t
+BDiskDevice::Update(bool *updated)
+{
+/*
+	// get a messenger for the disk device manager
+// TODO: Cache the messenger? Maybe add a global variable?
+	BMessenger manager;
+	status_t error = get_disk_device_messenger(&manager);
+	// compose request message
+	BMessage request(B_REG_UPDATE_DISK_DEVICE);
+	if (error == B_OK)
+		error = request.AddInt32("device_id", fUniqueID);
+	if (error == B_OK)
+		error = request.AddInt32("change_counter", fChangeCounter);
+	if (error == B_OK)
+		error = request.AddInt32("update_policy", B_REG_DEVICE_UPDATE_CHANGED);
+	// send request
+	BMessage reply;
+	if (error == B_OK)
+		error = manager.SendMessage(&request, &reply);
+	// analyze reply
+	bool upToDate = true;
+	if (error == B_OK) {
+		// result
+		status_t result = B_OK;
+		error = reply.FindInt32("result", &result);
+		if (error == B_OK)
+			error = result;
+		if (error == B_OK)
+			error = reply.FindBool("up_to_date", &upToDate);
+	}
+	// get the archived device, if not up to date
+	if (error == B_OK && !upToDate) {
+		BMessage archive;
+		error = reply.FindMessage("device", &archive);
+		if (error == B_OK)
+			error = _Update(&archive);
+	}
+	// set result / cleanup on error
+	if (error == B_OK) {
+		if (updated)
+			*updated = !upToDate;
+	} else
+		Unset();
+	return error;
+*/
+	// not implemented
+	return B_ERROR;
+}
+
 // Unset
 void
 BDiskDevice::Unset()
 {
-	fSessions.MakeEmpty();
-	fUniqueID = -1;
-	fChangeCounter = 0;
-	fMediaStatus = B_ERROR;
-	fSize = 0;
-	fBlockSize = 0;
-	fType = 0;
-	fReadOnly = false;
-	fRemovable = false;
-//	fIsFloppy = false;
-	fPath[0] = '\0';
+	free(fDeviceData);
+	fDeviceData = NULL;
 }
 
-// Size
-/*!	\brief Returns the size of the device.
-	\return The size of the device in bytes.
-*/
-off_t
-BDiskDevice::Size() const
+// GetPath
+status_t
+BDiskDevice::GetPath(BPath *path) const
 {
-	return fSize;
+	if (!path || !fDeviceData)
+		return B_BAD_VALUE;
+	return path->SetTo(fDeviceData->path);
 }
 
-// BlockSize
-/*!	\brief Returns the block size of the device.
-	\return The block size of the device in bytes.
-*/
-int32
-BDiskDevice::BlockSize() const
+// VisitEachDescendent
+BPartition *
+BDiskDevice::VisitEachDescendent(BDiskDeviceVisitor *visitor)
 {
-	return fBlockSize;
+	if (!visitor)
+		return NULL;
+	if (visitor->Visit(this))
+		return this;
+	return BPartition::VisitEachDescendent(visitor);
 }
 
-// CountSessions
-/*!	\brief Returns the number of sessions on this device.
-	\return The number of sessions on this device.
-*/
-int32
-BDiskDevice::CountSessions() const
+// IsModified
+bool
+BDiskDevice::IsModified() const
 {
-	return fSessions.CountItems();
+	// not implemented
+	return false;
 }
 
-// SessionAt
-/*!	\brief Returns a contained session by index.
-	\param index The index of the session to be returned.
-	\return The session with the requested index, or \c NULL, if \a index
-			is out of range.
-*/
-BSession *
-BDiskDevice::SessionAt(int32 index) const
+// PrepareModifications
+status_t
+BDiskDevice::PrepareModifications()
 {
-	return fSessions.ItemAt(index);
+	// not implemented
+	return B_ERROR;
 }
 
-// CountPartitions
-/*!	\brief Returns the number of partitions on this device.
-	\return The number of partitions on this device.
-*/
-int32
-BDiskDevice::CountPartitions() const
+// CommitModifications
+status_t
+BDiskDevice::CommitModifications(bool synchronously,
+								 BMessenger progressMessenger,
+								 bool receiveCompleteProgressUpdates)
 {
-	int32 count = 0;
-	for (int32 i = 0; BSession *session = SessionAt(i); i++)
-		count += session->CountPartitions();
-	return count;
+	// not implemented
+	return B_ERROR;
 }
+
+// CancelModifications
+status_t
+BDiskDevice::CancelModifications()
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// SetTo
+status_t
+BDiskDevice::SetTo(partition_id id, size_t neededSize)
+{
+	Unset();
+	// get the device data
+	void *buffer = NULL;
+	size_t bufferSize = 0;
+	if (neededSize > 0) {
+		// allocate initial buffer
+		buffer = malloc(neededSize);
+		if (!buffer)
+			return B_NO_MEMORY;
+		bufferSize = neededSize;
+	}
+	status_t error = B_OK;
+	do {
+		error = _kern_get_disk_device_data(id, false,
+										   (user_disk_device_data*)buffer,
+										   bufferSize, &neededSize);
+		if (error == B_BUFFER_OVERFLOW) {
+			// buffer to small re-allocate it
+			if (buffer)
+				free(buffer);
+			buffer = malloc(neededSize);
+			if (buffer)
+				bufferSize = neededSize;
+			else
+				error = B_NO_MEMORY;
+		}
+	} while (error == B_BUFFER_OVERFLOW);
+	// set the data
+	if (error == B_OK)
+		error = SetTo((user_disk_device_data*)buffer);
+	// cleanup on error
+	if (error != B_OK)
+		free(buffer);
+	return error;
+}
+
+// SetTo
+status_t
+BDiskDevice::SetTo(user_disk_device_data *data)
+{
+	Unset();
+	if (!data)
+		return B_BAD_VALUE;
+	fDeviceData = data;
+	status_t error = BPartition::SetTo(this, NULL,
+									   &fDeviceData->device_partition_data);
+	if (error != B_OK) {
+		// Don't call Unset() here. If SetTo() fails, the caller retains
+		// ownership of the supplied data.
+		// TODO: Maybe introduce a _Unset() to avoid potential future
+		// problems.
+		fDeviceData = NULL;
+	}
+	return error;
+}
+
+
+#if 0
 
 // Path
 /*!	\brief Returns the path to the device.
@@ -268,26 +436,6 @@ BDiskDevice::IsReadOnly() const
 	return fReadOnly;
 }
 
-// IsRemovable
-/*!	\brief Returns whether the device media are removable.
-	\return \c true, if the device media are removable, \c false otherwise.
-*/
-bool
-BDiskDevice::IsRemovable() const
-{
-	return fRemovable;
-}
-
-// HasMedia
-/*!	\brief Returns whether the device contains a media.
-	\return \c true, if the device contains a media, \c false otherwise.
-*/
-bool
-BDiskDevice::HasMedia() const
-{
-	return (fMediaStatus == B_OK);
-}
-
 // IsFloppy
 /*!	\brief Returns whether the device is a floppy device.
 	\return \c true, if the device is a floppy device, \c false otherwise.
@@ -337,41 +485,6 @@ BDiskDevice::UniqueID() const
 	return fUniqueID;
 }
 
-// Eject
-/*!	\brief Eject the device's media.
-
-	The device media must, of course, be removable, and the device must
-	support ejecting the media.
-
-	\param update If \c true, Update() is invoked after successful ejection.
-	\return
-	- \c B_OK: Everything went fine.
-	- \c B_NO_INIT: The device is not properly initialized.
-	- \c B_BAD_VALUE: The device media is not removable.
-	- other error codes
-*/
-status_t
-BDiskDevice::Eject(bool update)
-{
-	// get path
-	const char *path = Path();
-	status_t error = (path ? B_OK : B_NO_INIT);
-	// check whether the device media is removable
-	if (error == B_OK && !IsRemovable())
-		error = B_BAD_VALUE;
-	// open, eject and close the device
-	if (error == B_OK) {
-		int fd = open(path, O_RDONLY);
-		if (fd < 0 || ioctl(fd, B_EJECT_DEVICE) != 0)
-			error = errno;
-		if (fd >= 0)
-			close(fd);
-	}
-	if (error == B_OK && update)
-		error = Update();
-	return error;
-}
-
 // LowLevelFormat
 /*!	\brief Low level formats the device.
 	\return \c B_OK, if everything went fine, another error code otherwise.
@@ -380,65 +493,6 @@ status_t
 BDiskDevice::LowLevelFormat()
 {
 	return B_ERROR;	// not implemented
-}
-
-// Update
-/*!	\brief Updates the object to reflect the latest changes to the device.
-
-	Note, that subobjects (BSessions, BPartitions) may be deleted during this
-	operation. It is also possible, that the device doesn't exist anymore --
-	e.g. if it is hot-pluggable. Then an error is returned and the object is
-	uninitialized.
-
-	\param updated Pointer to a bool variable which shall be set to \c true,
-		   if the object needed to be updated and to \c false otherwise.
-		   May be \c NULL. Is not touched, if the method fails.
-	\return \c B_OK, if the update went fine, another error code otherwise.
-*/
-status_t
-BDiskDevice::Update(bool *updated)
-{
-	// get a messenger for the disk device manager
-// TODO: Cache the messenger? Maybe add a global variable?
-	BMessenger manager;
-	status_t error = get_disk_device_messenger(&manager);
-	// compose request message
-	BMessage request(B_REG_UPDATE_DISK_DEVICE);
-	if (error == B_OK)
-		error = request.AddInt32("device_id", fUniqueID);
-	if (error == B_OK)
-		error = request.AddInt32("change_counter", fChangeCounter);
-	if (error == B_OK)
-		error = request.AddInt32("update_policy", B_REG_DEVICE_UPDATE_CHANGED);
-	// send request
-	BMessage reply;
-	if (error == B_OK)
-		error = manager.SendMessage(&request, &reply);
-	// analyze reply
-	bool upToDate = true;
-	if (error == B_OK) {
-		// result
-		status_t result = B_OK;
-		error = reply.FindInt32("result", &result);
-		if (error == B_OK)
-			error = result;
-		if (error == B_OK)
-			error = reply.FindBool("up_to_date", &upToDate);
-	}
-	// get the archived device, if not up to date
-	if (error == B_OK && !upToDate) {
-		BMessage archive;
-		error = reply.FindMessage("device", &archive);
-		if (error == B_OK)
-			error = _Update(&archive);
-	}
-	// set result / cleanup on error
-	if (error == B_OK) {
-		if (updated)
-			*updated = !upToDate;
-	} else
-		Unset();
-	return error;
 }
 
 // VisitEachSession
@@ -746,3 +800,4 @@ BDiskDevice::_AddSession(BSession *session)
 	return result;
 }
 
+#endif	//0

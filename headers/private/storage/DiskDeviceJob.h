@@ -6,6 +6,7 @@
 #ifndef _DISK_DEVICE_JOB_H
 #define _DISK_DEVICE_JOB_H
 
+#include <DiskDeviceDefs.h>
 #include <String.h>
 
 // disk device job types
@@ -42,21 +43,24 @@ enum {
 	B_DISK_DEVICE_JOB_CAN_CANCEL			= 0x01,
 	B_DISK_DEVICE_JOB_STOP_ON_CANCEL		= 0x02,
 	B_DISK_DEVICE_JOB_REVERSE_ON_CANCEL		= 0x04,
+	B_DISK_DEVICE_JOB_CAN_PAUSE				= 0x08,
 };
 
 class BDiskDeviceJob {
 public:
 	disk_job_id ID() const;
 	uint32 Type() const;	
+	partition_id PartitionID() const;
+
 	float Progress() const;		// [0.0, 1.0]
 	uint32 Status() const;	
 	const char *Description() const;
-	status_t GetProgressInfo(disk_devive_progress_info *info) const;
-	uint32 CancelProperties() const;
-// TODO: Add Cancel() and Pause(), SupportsPause().
-	
-	partition_id PartitionID() const;
+	status_t GetProgressInfo(disk_device_progress_info *info) const;
+	uint32 InterruptProperties() const;
 
+	status_t Cancel();
+	status_t Pause();
+	
 private:
 	disk_job_id		fJobID;
 	uint32			fType;

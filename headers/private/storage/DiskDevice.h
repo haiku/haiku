@@ -6,8 +6,15 @@
 #ifndef _DISK_DEVICE_H
 #define _DISK_DEVICE_H
 
+#include <Partition.h>
+
+struct user_disk_device_data;
+
 class BDiskDevice : public BPartition {
 public:
+	BDiskDevice();
+	virtual ~BDiskDevice();
+
 	bool IsRemovable() const;
 	bool HasMedia() const;
 
@@ -15,21 +22,26 @@ public:
 
 	status_t Update(bool *updated = NULL);
 	void Unset();
+
+	virtual status_t GetPath(BPath *path) const;
+
+	virtual BPartition *VisitEachDescendent(BDiskDeviceVisitor *visitor);
 	
 	bool IsModified() const;
+	status_t PrepareModifications();
 	status_t CommitModifications(bool synchronously = true,
 		BMessenger progressMessenger = BMessenger(),
-		bool receiveCompleteProgressUpdates = true,
-		BMessage *template = NULL);
+		bool receiveCompleteProgressUpdates = true);
+	status_t CancelModifications();
+
 private:
 	friend class BDiskDeviceList;
 	friend class BDiskDeviceRoster;
 
-	char		fDeviceType[B_FILE_NAME_LENGTH];
-	char		fPath[B_FILE_NAME_LENGTH];
+	status_t SetTo(partition_id id, size_t neededSize = 0);
+	status_t SetTo(user_disk_device_data *data);
 
-	bool		fIsRemovable;
-	status_t	fMediaStatus;
-}
+	user_disk_device_data	*fDeviceData;
+};
 
 #endif	// _DISK_DEVICE_H

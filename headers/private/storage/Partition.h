@@ -6,16 +6,25 @@
 #ifndef _PARTITION_H
 #define _PARTITION_H
 
-#include <ObjectList.h>
+#include <DiskDeviceDefs.h>
+#include <Messenger.h>
+#include <Mime.h>
 
+class BBitmap;
 class BDiskDevice;
+class BDiskDeviceVisitor;
+class BPartitioningInfo;
+class BDiskScannerParameterEditor;	// TODO: Rename!
+class BDiskSystem;
+class BVolume;
+struct user_partition_data;
 
 // partition statuses
 enum {
 	B_PARTITION_VALID,
 	B_PARTITION_CORRUPT,
 	B_PARTITION_UNRECOGNIZED,
-}
+};
 
 class BPartition {
 public:
@@ -33,17 +42,19 @@ public:
 	bool IsDevice() const;
 	bool IsReadOnly() const;
 	bool IsMounted() const;
-	
-	const char* Name() const;
-	const char* ContentName() const;
-	const char* Type() const;			// See DiskDeviceTypes.h
-	const char* ContentType() const;	// See DiskDeviceTypes.h
-	partition_id UniqueID() const;
+
 	uint32 Flags() const;		
+	
+	const char *Name() const;
+	const char *ContentName() const;
+	const char *Type() const;			// See DiskDeviceTypes.h
+	const char *ContentType() const;	// See DiskDeviceTypes.h
+	partition_id UniqueID() const;
+		// TODO: just ID() ?
 
 	status_t GetDiskSystem(BDiskSystem *diskSystem) const;
 	
-	status_t GetPath(BPath *path) const;
+	virtual status_t GetPath(BPath *path) const;
 	status_t GetVolume(BVolume *volume) const;
 	status_t GetIcon(BBitmap *icon, icon_size which) const;
 
@@ -57,17 +68,13 @@ public:
 	BPartition *ChildAt(int32 index) const;
 	int32 CountChildren() const;
 
-	BPartitioningInfo* GetPartitioningInfo() const;
+	status_t GetPartitioningInfo(BPartitioningInfo *info) const;
 	
-	BPartition* VisitEachChild(BDiskDeviceVisitor *visitor);
-	BPartition* VisitEachDescendent(BDiskDeviceVisitor *visitor);
+	BPartition *VisitEachChild(BDiskDeviceVisitor *visitor);
+	virtual BPartition *VisitEachDescendent(BDiskDeviceVisitor *visitor);
 
 	// Self Modification
 
-	bool IsLocked() const;
-	status_t Lock();	// to be non-blocking
-	status_t Unlock();
-	
 	bool CanDefragment(bool *whileMounted = NULL) const;
 	status_t Defragment() const;
 	
@@ -108,30 +115,20 @@ public:
 	bool CanDeleteChild(int32 index) const;
 	status_t DeleteChild(int32 index);
 	
-protected:
-	off_t					fOffset;
-	off_t					fSize;
-	uint32					fBlockSize;
-	int32					fIndex;
-	uint32					fStatus;
+private:
+	BPartition();
+	BPartition(const Partition &);
+	virtual ~BPartition();
 
-	bool					fIsMountable;
-	bool					fIsPartitionable;
+	status_t SetTo(BDiskDevice *device, BPartition *parent,
+				   user_partition_data *data);
+	void Unset();
 
-	bool					fIsDevice;
-	bool					fIsReadOnly;
-	bool					fIsMounted;
-	
-	char					fName[B_FILE_NAME_LENGTH];
-	char					fType[B_FILE_NAME_LENGTH];
-	char					fContentType[B_FILE_NAME_LENGTH];
+	friend class BDiskDevice;
 
-	partition_id			fUniqueID;
-	uint32 					fFlags;
-
-	BObjectList<BPartition>	fChildren;
-
-	int32					fChangeCounter;
-}
+	BDiskDevice				*fDevice;
+	BPartition				*fParent;
+	user_partition_data		*fPartitionData;
+};
 
 #endif	// _PARTITION_H
