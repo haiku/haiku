@@ -269,8 +269,10 @@ BPlusTree::~BPlusTree()
 }
 
 
+/** Create a new B+Tree on the specified stream */
+
 status_t
-BPlusTree::SetTo(Transaction *transaction,Inode *stream,int32 nodeSize)
+BPlusTree::SetTo(Transaction *transaction, Inode *stream, int32 nodeSize)
 {
 	// initializes in-memory B+Tree
 
@@ -280,7 +282,7 @@ BPlusTree::SetTo(Transaction *transaction,Inode *stream,int32 nodeSize)
 	fHeader = fCachedHeader.SetToHeader();
 	if (fHeader == NULL) {
 		// allocate space for new header + node!
-		fStatus = stream->SetFileSize(transaction,nodeSize * 2);
+		fStatus = stream->SetFileSize(transaction, nodeSize * 2);
 		if (fStatus < B_OK)
 			RETURN_ERROR(fStatus);
 		
@@ -429,7 +431,8 @@ BPlusTree::ModeToKeyType(mode_t mode)
 
 
 void
-BPlusTree::UpdateIterators(off_t offset,off_t nextOffset,uint16 keyIndex,uint16 splitAt,int8 change)
+BPlusTree::UpdateIterators(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 splitAt,
+	int8 change)
 {
 	// Although every iterator which is affected by this update currently
 	// waits on a semaphore, other iterators could be added/removed at
@@ -439,7 +442,7 @@ BPlusTree::UpdateIterators(off_t offset,off_t nextOffset,uint16 keyIndex,uint16 
 
 	TreeIterator *iterator = NULL;
 	while ((iterator = fIterators.Next(iterator)) != NULL)
-		iterator->Update(offset,nextOffset,keyIndex,splitAt,change);
+		iterator->Update(offset, nextOffset, keyIndex, splitAt, change);
 
 	fIteratorLock.Unlock();
 }
@@ -497,12 +500,13 @@ BPlusTree::CompareKeys(const void *key1, int keyLength1, const void *key2, int k
 	    	type = B_DOUBLE_TYPE;
 	    	break;
 	}
-   	return compareKeys(type,key1,keyLength1,key2,keyLength2);
+   	return compareKeys(type, key1, keyLength1, key2, keyLength2);
 }
 
 
 status_t
-BPlusTree::FindKey(bplustree_node *node,const uint8 *key,uint16 keyLength,uint16 *index,off_t *next)
+BPlusTree::FindKey(bplustree_node *node, const uint8 *key, uint16 keyLength, uint16 *index,
+	off_t *next)
 {
 	if (node->all_key_count == 0)
 	{
@@ -529,7 +533,7 @@ BPlusTree::FindKey(bplustree_node *node,const uint8 *key,uint16 keyLength,uint16
 			RETURN_ERROR(B_BAD_DATA);
 		}
 
-		int32 cmp = CompareKeys(key,keyLength,searchKey,searchLength);
+		int32 cmp = CompareKeys(key, keyLength, searchKey, searchLength);
 		if (cmp < 0)
 		{
 			last = i - 1;
@@ -568,7 +572,7 @@ BPlusTree::FindKey(bplustree_node *node,const uint8 *key,uint16 keyLength,uint16
  */
 
 status_t
-BPlusTree::SeekDown(Stack<node_and_key> &stack,const uint8 *key,uint16 keyLength)
+BPlusTree::SeekDown(Stack<node_and_key> &stack, const uint8 *key, uint16 keyLength)
 {
 	// set the root node to begin with
 	node_and_key nodeAndKey;
@@ -587,7 +591,7 @@ BPlusTree::SeekDown(Stack<node_and_key> &stack,const uint8 *key,uint16 keyLength
 		}
 
 		off_t nextOffset;
-		status_t status = FindKey(node,key,keyLength,&nodeAndKey.keyIndex,&nextOffset);
+		status_t status = FindKey(node, key, keyLength, &nodeAndKey.keyIndex, &nextOffset);
 		
 		if (status == B_ENTRY_NOT_FOUND && nextOffset == nodeAndKey.nodeOffset)
 			RETURN_ERROR(B_ERROR);
@@ -602,7 +606,8 @@ BPlusTree::SeekDown(Stack<node_and_key> &stack,const uint8 *key,uint16 keyLength
 
 
 status_t
-BPlusTree::FindFreeDuplicateFragment(bplustree_node *node,CachedNode *cached,off_t *_offset,bplustree_node **_fragment,uint32 *_index)
+BPlusTree::FindFreeDuplicateFragment(bplustree_node *node, CachedNode *cached, off_t *_offset,
+	bplustree_node **_fragment, uint32 *_index)
 {
 	off_t *values = node->Values();
 	for (int32 i = 0;i < node->all_key_count;i++) {
@@ -610,7 +615,7 @@ BPlusTree::FindFreeDuplicateFragment(bplustree_node *node,CachedNode *cached,off
 		if (bplustree_node::LinkType(values[i]) != BPLUSTREE_DUPLICATE_FRAGMENT)
 			continue;
 
-		bplustree_node *fragment = cached->SetTo(bplustree_node::FragmentOffset(values[i]),false);
+		bplustree_node *fragment = cached->SetTo(bplustree_node::FragmentOffset(values[i]), false);
 		if (fragment == NULL) {
 			FATAL(("Could not get duplicate fragment at %Ld\n",values[i]));
 			continue;
@@ -634,7 +639,8 @@ BPlusTree::FindFreeDuplicateFragment(bplustree_node *node,CachedNode *cached,off
 
 
 status_t
-BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree_node *node,uint16 index,off_t value)
+BPlusTree::InsertDuplicate(Transaction *transaction, CachedNode *cached, bplustree_node *node,
+	uint16 index, off_t value)
 {
 	CachedNode cachedDuplicate(this);
 	off_t *values = node->Values();
@@ -684,7 +690,8 @@ BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree
 					// copy the array from the fragment node to the duplicate node
 					// and free the old entry (by zero'ing all values)
 					newDuplicate->overflow_link = array->count;
-					memcpy(&newDuplicate->all_key_count,&array->values[0],array->count * sizeof(off_t));
+					memcpy(&newDuplicate->all_key_count, &array->values[0],
+						array->count * sizeof(off_t));
 					memset(array,0,(NUM_FRAGMENT_VALUES + 1) * sizeof(off_t));
 	
 					array = newDuplicate->DuplicateArray();
@@ -698,7 +705,7 @@ BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree
 				}
 
 				// update the main pointer to link to a duplicate node
-				values[index] = bplustree_node::MakeLink(BPLUSTREE_DUPLICATE_NODE,offset);
+				values[index] = bplustree_node::MakeLink(BPLUSTREE_DUPLICATE_NODE, offset);
 				if ((status = cached->WriteBack(transaction)) < B_OK)
 					return status;
 			}
@@ -716,17 +723,18 @@ BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree
 		off_t duplicateOffset;
 		do {
 			duplicateOffset = bplustree_node::FragmentOffset(oldValue);
-			duplicate = cachedDuplicate.SetTo(duplicateOffset,false);
+			duplicate = cachedDuplicate.SetTo(duplicateOffset, false);
 			if (duplicate == NULL)
 				return B_IO_ERROR;
 
 			array = duplicate->DuplicateArray();
-			if (array->count > NUM_DUPLICATE_VALUES
-				|| array->count < 0) {
-				FATAL(("removeDuplicate: Invalid array size in duplicate %Ld == %Ld!\n",duplicateOffset,array->count));
+			if (array->count > NUM_DUPLICATE_VALUES || array->count < 0) {
+				FATAL(("removeDuplicate: Invalid array size in duplicate %Ld == %Ld!\n",
+					duplicateOffset,array->count));
 				return B_BAD_DATA;
 			}
-		} while (array->count >= NUM_DUPLICATE_VALUES && (oldValue = duplicate->right_link) != BPLUSTREE_NULL);
+		} while (array->count >= NUM_DUPLICATE_VALUES
+				&& (oldValue = duplicate->right_link) != BPLUSTREE_NULL);
 
 		if (array->count < NUM_DUPLICATE_VALUES) {
 			array->Insert(value);
@@ -735,7 +743,7 @@ BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree
 
 			CachedNode cachedNewDuplicate(this);
 			bplustree_node *newDuplicate;
-			status = cachedNewDuplicate.Allocate(transaction,&newDuplicate,&offset);
+			status = cachedNewDuplicate.Allocate(transaction, &newDuplicate, &offset);
 			if (status < B_OK)
 				return status;
 
@@ -761,12 +769,12 @@ BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree
 
 	uint32 fragmentIndex = 0;
 	bplustree_node *fragment;
-	if (FindFreeDuplicateFragment(node,&cachedDuplicate,&offset,&fragment,&fragmentIndex) < B_OK) {
+	if (FindFreeDuplicateFragment(node, &cachedDuplicate, &offset, &fragment, &fragmentIndex) < B_OK) {
 		// allocate a new duplicate fragment node
-		if ((status = cachedDuplicate.Allocate(transaction,&fragment,&offset)) < B_OK)
+		if ((status = cachedDuplicate.Allocate(transaction, &fragment, &offset)) < B_OK)
 			return status;
 
-		memset(fragment,0,fNodeSize);
+		memset(fragment, 0, fNodeSize);
 	}
 	duplicate_array *array = fragment->FragmentAt(fragmentIndex);
 	array->Insert(oldValue);
@@ -775,14 +783,15 @@ BPlusTree::InsertDuplicate(Transaction *transaction,CachedNode *cached,bplustree
 	if ((status = cachedDuplicate.WriteBack(transaction)) < B_OK)
 		return status;
 
-	values[index] = bplustree_node::MakeLink(BPLUSTREE_DUPLICATE_FRAGMENT,offset,fragmentIndex);
+	values[index] = bplustree_node::MakeLink(BPLUSTREE_DUPLICATE_FRAGMENT, offset, fragmentIndex);
 
 	return cached->WriteBack(transaction);
 }
 
 
 void
-BPlusTree::InsertKey(bplustree_node *node,uint16 index,uint8 *key,uint16 keyLength,off_t value)
+BPlusTree::InsertKey(bplustree_node *node, uint16 index, uint8 *key, uint16 keyLength,
+	off_t value)
 {
 	// should never happen, but who knows?
 	if (index > node->all_key_count)
@@ -817,12 +826,13 @@ BPlusTree::InsertKey(bplustree_node *node,uint16 index,uint8 *key,uint16 keyLeng
 	if (size > 0)
 		memmove(keys + newKeyLengths[index],keys + newKeyLengths[index] - keyLength,size);
 
-	memcpy(keys + keyStart,key,keyLength);
+	memcpy(keys + keyStart, key, keyLength);
 }
 
 
 status_t
-BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other,off_t otherOffset,uint16 *_keyIndex,uint8 *key,uint16 *_keyLength,off_t *_value)
+BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other,
+	off_t otherOffset, uint16 *_keyIndex, uint8 *key, uint16 *_keyLength, off_t *_value)
 {
 	if (*_keyIndex > node->all_key_count + 1)
 		return B_BAD_VALUE;
@@ -840,7 +850,7 @@ BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other
 	// "bytes" is the number of bytes written for the new key,
 	// "bytesBefore" are the bytes before that key
 	// "bytesAfter" are the bytes after the new key, if any
-	int32 bytes = 0,bytesBefore = 0,bytesAfter = 0;
+	int32 bytes = 0, bytesBefore = 0, bytesAfter = 0;
 
 	size_t size = fNodeSize >> 1;
 	int32 out,in;
@@ -884,23 +894,23 @@ BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other
 
 	if (bytesBefore) {
 		// copy the keys
-		memcpy(outKeys,inKeys,bytesBefore);
-		memcpy(outKeyLengths,inKeyLengths,keys * sizeof(uint16));
-		memcpy(outKeyValues,inKeyValues,keys * sizeof(off_t));
+		memcpy(outKeys, inKeys, bytesBefore);
+		memcpy(outKeyLengths, inKeyLengths, keys * sizeof(uint16));
+		memcpy(outKeyValues, inKeyValues, keys * sizeof(off_t));
 	}
 	if (bytes) {
 		// copy the newly inserted key
-		memcpy(outKeys + bytesBefore,key,bytes);
+		memcpy(outKeys + bytesBefore, key, bytes);
 		outKeyLengths[keyIndex] = bytes + bytesBefore;
 		outKeyValues[keyIndex] = *_value;
 
 		if (bytesAfter) {
 			// copy the keys after the new key
-			memcpy(outKeys + bytesBefore + bytes,inKeys + bytesBefore,bytesAfter);
+			memcpy(outKeys + bytesBefore + bytes, inKeys + bytesBefore, bytesAfter);
 			keys = out - keyIndex - 1;
 			for (int32 i = 0;i < keys;i++)
 				outKeyLengths[keyIndex + i + 1] = inKeyLengths[keyIndex + i] + bytes;
-			memcpy(outKeyValues + keyIndex + 1,inKeyValues + keyIndex,keys * sizeof(off_t));
+			memcpy(outKeyValues + keyIndex + 1, inKeyValues + keyIndex, keys * sizeof(off_t));
 		}
 	}
 
@@ -1002,24 +1012,24 @@ BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other
 	keyIndex -= skip;
 
 	if (bytesBefore)
-		memmove(inKeys,inKeys + total,bytesBefore);
+		memmove(inKeys, inKeys + total, bytesBefore);
 	if (bytesAfter)
-		memmove(inKeys + bytesBefore + bytes,inKeys + total + bytesBefore,bytesAfter);
+		memmove(inKeys + bytesBefore + bytes, inKeys + total + bytesBefore, bytesAfter);
 
 	if (bytesBefore)
-		memmove(outKeyLengths,inKeyLengths + skip,keys * sizeof(uint16));
+		memmove(outKeyLengths, inKeyLengths + skip, keys * sizeof(uint16));
 	in = out - keyIndex - 1;
 	if (bytesAfter)
-		memmove(outKeyLengths + keyIndex + 1,inKeyLengths + skip + keyIndex,in * sizeof(uint16));
+		memmove(outKeyLengths + keyIndex + 1, inKeyLengths + skip + keyIndex, in * sizeof(uint16));
 
 	if (bytesBefore)
-		memmove(outKeyValues,inKeyValues + skip,keys * sizeof(off_t));
+		memmove(outKeyValues, inKeyValues + skip, keys * sizeof(off_t));
 	if (bytesAfter)
-		memmove(outKeyValues + keyIndex + 1,inKeyValues + skip + keyIndex,in * sizeof(off_t));
+		memmove(outKeyValues + keyIndex + 1, inKeyValues + skip + keyIndex, in * sizeof(off_t));
 
 	if (bytes) {
 		// finally, copy the newly inserted key (don't overwrite anything)
-		memcpy(inKeys + bytesBefore,key,bytes);
+		memcpy(inKeys + bytesBefore, key, bytes);
 		outKeyLengths[keyIndex] = bytes + bytesBefore;
 		outKeyValues[keyIndex] = *_value;
 	}
@@ -1029,7 +1039,7 @@ BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other
 	// If it's the dropped key, "newKey" was already set earlier.
 
 	if (newKey == NULL)
-		newKey = other->KeyAt(other->all_key_count - 1,&newLength);
+		newKey = other->KeyAt(other->all_key_count - 1, &newLength);
 
 	memcpy(key,newKey,newLength);
 	*_keyLength = newLength;
@@ -1043,7 +1053,7 @@ BPlusTree::SplitNode(bplustree_node *node,off_t nodeOffset,bplustree_node *other
 
 
 status_t
-BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off_t value)
+BPlusTree::Insert(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value)
 {
 	if (keyLength < BPLUSTREE_MIN_KEY_LENGTH || keyLength > BPLUSTREE_MAX_KEY_LENGTH)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -1072,9 +1082,9 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 			// is this a duplicate entry?
 			if (status == B_OK) {
 				if (fAllowDuplicates)
-					return InsertDuplicate(transaction,&cached,node,nodeAndKey.keyIndex,value);
-				else
-					RETURN_ERROR(B_NAME_IN_USE);
+					return InsertDuplicate(transaction, &cached, node, nodeAndKey.keyIndex, value);
+
+				RETURN_ERROR(B_NAME_IN_USE);
 			}
 		}
 
@@ -1082,8 +1092,8 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 		if (int32(round_up(sizeof(bplustree_node) + node->all_key_length + keyLength)
 			+ (node->all_key_count + 1) * (sizeof(uint16) + sizeof(off_t))) < fNodeSize)
 		{
-			InsertKey(node,nodeAndKey.keyIndex,keyBuffer,keyLength,value);
-			UpdateIterators(nodeAndKey.nodeOffset,BPLUSTREE_NULL,nodeAndKey.keyIndex,0,1);
+			InsertKey(node, nodeAndKey.keyIndex, keyBuffer, keyLength, value);
+			UpdateIterators(nodeAndKey.nodeOffset, BPLUSTREE_NULL, nodeAndKey.keyIndex, 0, 1);
 
 			return cached.WriteBack(transaction);
 		} else {
@@ -1095,7 +1105,7 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 			off_t newRoot = BPLUSTREE_NULL;
 			if (nodeAndKey.nodeOffset == fHeader->root_node_pointer) {
 				bplustree_node *root;
-				status_t status = cachedNewRoot.Allocate(transaction,&root,&newRoot);
+				status_t status = cachedNewRoot.Allocate(transaction, &root, &newRoot);
 				if (status < B_OK) {
 					// The tree is most likely corrupted!
 					// But it's still sane at leaf level - we could set
@@ -1110,16 +1120,17 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 			// reserve space for the other node
 			bplustree_node *other;
 			off_t otherOffset;
-			status_t status = cachedOther.Allocate(transaction,&other,&otherOffset);
+			status_t status = cachedOther.Allocate(transaction, &other, &otherOffset);
 			if (status < B_OK) {
-				cachedNewRoot.Free(transaction,newRoot);
+				cachedNewRoot.Free(transaction, newRoot);
 				RETURN_ERROR(status);
 			}
 
-			if (SplitNode(node,nodeAndKey.nodeOffset,other,otherOffset,&nodeAndKey.keyIndex,keyBuffer,&keyLength,&value) < B_OK) {
+			if (SplitNode(node, nodeAndKey.nodeOffset, other, otherOffset,
+					&nodeAndKey.keyIndex, keyBuffer, &keyLength, &value) < B_OK) {
 				// free root node & other node here
-				cachedNewRoot.Free(transaction,newRoot);
-				cachedOther.Free(transaction,otherOffset);					
+				cachedNewRoot.Free(transaction, newRoot);
+				cachedOther.Free(transaction, otherOffset);					
 
 				RETURN_ERROR(B_ERROR);
 			}
@@ -1130,7 +1141,8 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 				|| cachedOther.WriteBack(transaction) < B_OK)
 				RETURN_ERROR(B_ERROR);
 
-			UpdateIterators(nodeAndKey.nodeOffset,otherOffset,nodeAndKey.keyIndex,node->all_key_count,1);
+			UpdateIterators(nodeAndKey.nodeOffset, otherOffset, nodeAndKey.keyIndex,
+				node->all_key_count, 1);
 
 			// update the right link of the node in the left of the new node
 			if ((other = cachedOther.SetTo(other->left_link)) != NULL) {
@@ -1143,7 +1155,7 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 			if (newRoot != BPLUSTREE_NULL) {
 				bplustree_node *root = cachedNewRoot.Node();
 
-				InsertKey(root,0,keyBuffer,keyLength,node->left_link);
+				InsertKey(root, 0, keyBuffer, keyLength, node->left_link);
 				root->overflow_link = nodeAndKey.nodeOffset;
 
 				if (cachedNewRoot.WriteBack(transaction) < B_OK)
@@ -1162,7 +1174,8 @@ BPlusTree::Insert(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 
 
 status_t
-BPlusTree::RemoveDuplicate(Transaction *transaction,bplustree_node *node,CachedNode *cached,uint16 index,off_t value)
+BPlusTree::RemoveDuplicate(Transaction *transaction, bplustree_node *node, CachedNode *cached,
+	uint16 index, off_t value)
 {
 	CachedNode cachedDuplicate(this);
 	off_t *values = node->Values();
@@ -1170,7 +1183,7 @@ BPlusTree::RemoveDuplicate(Transaction *transaction,bplustree_node *node,CachedN
 	status_t status;
 
 	off_t duplicateOffset = bplustree_node::FragmentOffset(oldValue);
-	bplustree_node *duplicate = cachedDuplicate.SetTo(duplicateOffset,false);
+	bplustree_node *duplicate = cachedDuplicate.SetTo(duplicateOffset, false);
 	if (duplicate == NULL)
 		return B_IO_ERROR;
 
@@ -1393,7 +1406,7 @@ BPlusTree::RemoveKey(bplustree_node *node,uint16 index)
  */
 
 status_t
-BPlusTree::Remove(Transaction *transaction,const uint8 *key,uint16 keyLength,off_t value)
+BPlusTree::Remove(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value)
 {
 	if (keyLength < BPLUSTREE_MIN_KEY_LENGTH || keyLength > BPLUSTREE_MAX_KEY_LENGTH)
 		RETURN_ERROR(B_BAD_VALUE);
@@ -1447,8 +1460,13 @@ BPlusTree::Remove(Transaction *transaction,const uint8 *key,uint16 keyLength,off
 			if (cached.WriteBack(transaction) < B_OK)
 				return B_IO_ERROR;
 
-			fHeader->max_number_of_levels = 1;
-			return fCachedHeader.WriteBack(transaction);
+			// if we've cleared the root node, reset the maximum
+			// number of levels in the header
+			if (nodeAndKey.nodeOffset == fHeader->root_node_pointer) {
+				fHeader->max_number_of_levels = 1;
+				return fCachedHeader.WriteBack(transaction);
+			}
+			return B_OK;
 		}
 
 		// if there is only one key left, we don't have to remove
@@ -1493,7 +1511,7 @@ BPlusTree::Remove(Transaction *transaction,const uint8 *key,uint16 keyLength,off
  */
 
 status_t
-BPlusTree::Replace(Transaction *transaction,const uint8 *key,uint16 keyLength,off_t value)
+BPlusTree::Replace(Transaction *transaction, const uint8 *key, uint16 keyLength, off_t value)
 {
 	if (keyLength < BPLUSTREE_MIN_KEY_LENGTH || keyLength > BPLUSTREE_MAX_KEY_LENGTH
 		|| key == NULL)
@@ -1512,7 +1530,7 @@ BPlusTree::Replace(Transaction *transaction,const uint8 *key,uint16 keyLength,of
 	while ((node = cached.SetTo(nodeOffset)) != NULL) {
 		uint16 keyIndex = 0;
 		off_t nextOffset;
-		status_t status = FindKey(node,key,keyLength,&keyIndex,&nextOffset);
+		status_t status = FindKey(node, key, keyLength, &keyIndex, &nextOffset);
 
 		if (node->overflow_link == BPLUSTREE_NULL) {
 			if (status == B_OK) {
@@ -1543,7 +1561,7 @@ BPlusTree::Replace(Transaction *transaction,const uint8 *key,uint16 keyLength,of
  */
 
 status_t
-BPlusTree::Find(const uint8 *key,uint16 keyLength,off_t *_value)
+BPlusTree::Find(const uint8 *key, uint16 keyLength, off_t *_value)
 {
 	if (keyLength < BPLUSTREE_MIN_KEY_LENGTH || keyLength > BPLUSTREE_MAX_KEY_LENGTH
 		|| key == NULL)
@@ -1562,7 +1580,7 @@ BPlusTree::Find(const uint8 *key,uint16 keyLength,off_t *_value)
 	while ((node = cached.SetTo(nodeOffset)) != NULL) {
 		uint16 keyIndex = 0;
 		off_t nextOffset;
-		status_t status = FindKey(node,key,keyLength,&keyIndex,&nextOffset);
+		status_t status = FindKey(node, key, keyLength, &keyIndex, &nextOffset);
 
 		if (node->overflow_link == BPLUSTREE_NULL) {
 			if (status == B_OK && _value != NULL)
@@ -1656,7 +1674,8 @@ TreeIterator::Goto(int8 to)
  */
 
 status_t
-TreeIterator::Traverse(int8 direction,void *key,uint16 *keyLength,uint16 maxLength,off_t *value,uint16 *duplicate)
+TreeIterator::Traverse(int8 direction, void *key, uint16 *keyLength, uint16 maxLength,
+	off_t *value, uint16 *duplicate)
 {
 	if (fTree == NULL)
 		return B_INTERRUPTED;
@@ -1681,7 +1700,7 @@ TreeIterator::Traverse(int8 direction,void *key,uint16 *keyLength,uint16 maxLeng
 		// cause any problems
 
 		if (!fIsFragment || fDuplicate < fNumDuplicates)
-			node = cached.SetTo(bplustree_node::FragmentOffset(fDuplicateNode),false);
+			node = cached.SetTo(bplustree_node::FragmentOffset(fDuplicateNode), false);
 		else
 			node = NULL;
 
@@ -1692,15 +1711,15 @@ TreeIterator::Traverse(int8 direction,void *key,uint16 *keyLength,uint16 maxLeng
 				// if the node is out of duplicates, we go directly to the next one
 				fDuplicateNode = node->right_link;
 				if (fDuplicateNode != BPLUSTREE_NULL
-					&& (node = cached.SetTo(fDuplicateNode,false)) != NULL)
+					&& (node = cached.SetTo(fDuplicateNode, false)) != NULL)
 				{
-					fNumDuplicates = node->CountDuplicates(fDuplicateNode,false);
+					fNumDuplicates = node->CountDuplicates(fDuplicateNode, false);
 					fDuplicate = 0;
 				}
 			}
 			if (fDuplicate < fNumDuplicates)
 			{
-				*value = node->DuplicateAt(fDuplicateNode,fIsFragment,fDuplicate++);
+				*value = node->DuplicateAt(fDuplicateNode, fIsFragment, fDuplicate++);
 				if (duplicate)
 					*duplicate = 2;
 				return B_OK;
@@ -1780,10 +1799,10 @@ TreeIterator::Traverse(int8 direction,void *key,uint16 *keyLength,uint16 maxLeng
 
 		fIsFragment = type == BPLUSTREE_DUPLICATE_FRAGMENT;
 
-		fNumDuplicates = node->CountDuplicates(offset,fIsFragment);
+		fNumDuplicates = node->CountDuplicates(offset, fIsFragment);
 		if (fNumDuplicates)
 		{
-			offset = node->DuplicateAt(offset,fIsFragment,0);
+			offset = node->DuplicateAt(offset, fIsFragment, 0);
 			fDuplicate = 1;
 			if (duplicate)
 				*duplicate = 1;
@@ -1825,7 +1844,7 @@ TreeIterator::Find(const uint8 *key, uint16 keyLength)
 	while ((node = cached.SetTo(nodeOffset)) != NULL) {
 		uint16 keyIndex = 0;
 		off_t nextOffset;
-		status_t status = fTree->FindKey(node,key,keyLength,&keyIndex,&nextOffset);
+		status_t status = fTree->FindKey(node, key, keyLength, &keyIndex, &nextOffset);
 
 		if (node->overflow_link == BPLUSTREE_NULL) {
 			fCurrentNodeOffset = nodeOffset;
@@ -1850,7 +1869,7 @@ TreeIterator::SkipDuplicates()
 
 
 void 
-TreeIterator::Update(off_t offset,off_t nextOffset,uint16 keyIndex,uint16 splitAt,int8 change)
+TreeIterator::Update(off_t offset, off_t nextOffset, uint16 keyIndex, uint16 splitAt, int8 change)
 {
 	if (offset != fCurrentNodeOffset)
 		return;
@@ -1909,7 +1928,7 @@ bplustree_node::Initialize()
 
 
 uint8 *
-bplustree_node::KeyAt(int32 index,uint16 *keyLength) const
+bplustree_node::KeyAt(int32 index, uint16 *keyLength) const
 {
 	if (index < 0 || index > all_key_count)
 		return NULL;
@@ -1926,7 +1945,7 @@ bplustree_node::KeyAt(int32 index,uint16 *keyLength) const
 
 
 uint8
-bplustree_node::CountDuplicates(off_t offset,bool isFragment) const
+bplustree_node::CountDuplicates(off_t offset, bool isFragment) const
 {
 	// the duplicate fragment handling is currently hard-coded to a node size
 	// of 1024 bytes - with future versions of BFS, this may be a problem
@@ -1941,7 +1960,7 @@ bplustree_node::CountDuplicates(off_t offset,bool isFragment) const
 
 
 off_t
-bplustree_node::DuplicateAt(off_t offset,bool isFragment,int8 index) const
+bplustree_node::DuplicateAt(off_t offset, bool isFragment, int8 index) const
 {
 	uint32 start;
 	if (isFragment)
