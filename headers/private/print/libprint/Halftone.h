@@ -30,7 +30,7 @@ typedef union {
 } ColorRGB32;
 
 class Halftone;
-typedef int (Halftone::*PFN_dither)(uchar *dst, const uchar *src, int x, int y, int width);
+typedef void (Halftone::*PFN_dither)(uchar *dst, const uchar *src, int x, int y, int width);
 typedef uint (*PFN_gray)(ColorRGB32 c);
 
 class Halftone {
@@ -59,7 +59,7 @@ public:
 	~Halftone();
 	void setPlanes(Planes planes);
 	void setBlackValue(BlackValue blackValue);
-	int dither(uchar *dst, const uchar *src, int x, int y, int width);
+	void dither(uchar *dst, const uchar *src, int x, int y, int width);
 	int getPixelDepth() const;
 	const uchar *getPattern() const;
 	void setPattern(const uchar *pattern);
@@ -74,13 +74,13 @@ protected:
 	void initElements(int x, int y, uchar *elements);
 	uint getDensity(ColorRGB32 c) const;
 	uchar convertUsingBlackValue(uchar byte) const;
-	int ditherRGB32(uchar *dst, const uchar *src, int x, int y, int width);
+	void ditherRGB32(uchar *dst, const uchar *src, int x, int y, int width);
 
 	void initFloydSteinberg();
 	void deleteErrorTables();
 	void uninitFloydSteinberg();
 	void setupErrorBuffer(int x, int y, int width);
-	int ditherFloydSteinberg(uchar *dst, const uchar* src, int x, int y, int width);
+	void ditherFloydSteinberg(uchar *dst, const uchar* src, int x, int y, int width);
 
 	Halftone(const Halftone &);
 	Halftone &operator = (const Halftone &);

@@ -135,15 +135,13 @@ void Halftone::initElements(int x, int y, uchar *elements)
 	}
 }
 
-int Halftone::dither(
+void Halftone::dither(
 	uchar *dst,
 	const uchar *src,
 	int x,
 	int y,
 	int width)
 {
-	int result;
-	
 	if (fPlanes == kPlaneRGB1) {
 		switch (fCurrentPlane) {
 			case 0: 
@@ -160,14 +158,13 @@ int Halftone::dither(
 		ASSERT(fGray == &gray);
 	}
 
-	result = (this->*fDither)(dst, src, x, y, width);
+	(this->*fDither)(dst, src, x, y, width);
 
 	// next plane
 	fCurrentPlane ++;
 	if (fCurrentPlane >= fNumberOfPlanes) {
 		fCurrentPlane = 0;
 	}
-	return result;
 }
 
 void Halftone::setGrayFunction(GrayFunction grayFunction)
@@ -186,7 +183,7 @@ void Halftone::setGrayFunction(GrayFunction grayFunction)
 	setGrayFunction(function);
 }
 
-int Halftone::ditherRGB32(
+void Halftone::ditherRGB32(
 	uchar *dst,
 	const uchar *a_src,
 	int x,
@@ -249,8 +246,6 @@ int Halftone::ditherRGB32(
 		}
 		*dst++ = convertUsingBlackValue(cur);
 	}
-
-	return widthByte;
 }
 
 // Floyd-Steinberg dithering
@@ -288,7 +283,7 @@ void Halftone::setupErrorBuffer(int x, int y, int width)
 	}	
 }
 
-int Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y, int width)
+void Halftone::ditherFloydSteinberg(uchar *dst, const uchar* a_src, int x, int y, int width)
 {
 	if (fErrorTables[fCurrentPlane] == NULL || fX != x || fCurrentPlane == 0 && fY != y - 1 || fCurrentPlane > 0 && fY != y || fWidth != width) {
 		setupErrorBuffer(x, y, width);
