@@ -117,6 +117,11 @@ struct thread {
 	region_id		user_stack_region_id;
 	addr			user_stack_base;
 
+	addr			user_local_storage;
+		// usually allocated at the safe side of the stack
+	int				kernel_errno;
+		// kernel "errno" differs from its userspace alter ego
+
 	bigtime_t		user_time;
 	bigtime_t		kernel_time;
 	bigtime_t		last_time;
