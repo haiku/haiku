@@ -5,6 +5,7 @@ SubDirHdrs [ FDirName $(OBOS_TOP) headers private print libprint ] ;
 AddResources PCL6\ Compatible : PCL6.rsrc ;
 
 Addon PCL6\ Compatible : Print :
+	DeltaRowCompression.cpp
 	PCL6Entry.cpp
 	PCL6.cpp
 	PCL6Cap.cpp
