@@ -106,6 +106,14 @@ set_system_gate(int n, void *addr)
 
 
 void
+x86_set_task_gate(int32 n, int32 segment)
+{
+	idt[n].a = (segment << 16);
+	idt[n].b = 0x8000 | (0 << 13) | (0x5 << 8); // present, dpl 0, type 5
+}
+
+
+void
 arch_int_enable_io_interrupt(int irq)
 {
 	if (irq < 0 || irq >= 0x10)
@@ -324,7 +332,7 @@ arch_int_init(kernel_args *args)
 	set_intr_gate(5,  &trap5);
 	set_intr_gate(6,  &trap6);
 	set_intr_gate(7,  &trap7);
-	set_intr_gate(8,  &trap8);
+	// trap8 (double fault) is set in arch_cpu.c
 	set_intr_gate(9,  &trap9);
 	set_intr_gate(10,  &trap10);
 	set_intr_gate(11,  &trap11);

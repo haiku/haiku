@@ -11,6 +11,7 @@
 #include <vm.h>
 #include <smp.h>
 #include <arch/x86/selector.h>
+#include <arch/x86/interrupts.h>
 #include <tls.h>
 #include <boot/kernel_args.h>
 
@@ -18,13 +19,39 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
-void reboot(void);
+extern void reboot(void);
+	// from arch_x86.S
 
 static struct tss **sTSS;
 static int *sIsTSSLoaded;
 
 segment_descriptor *gGDT = NULL;
+
+/* Some specials for the double fault handler */
+static struct tss sDoubleFaultTSS;
+static uint32 sDoubleFaultStack[1024];
+
+
+static void
+init_double_fault(void)
+{
+	/* set up the double fault tss */
+	memset(&sDoubleFaultTSS, 0, sizeof(struct tss));
+	sDoubleFaultTSS.sp0 = (uint32)sDoubleFaultStack + sizeof(sDoubleFaultStack);
+	sDoubleFaultTSS.ss0 = KERNEL_DATA_SEG;
+	read_cr3(sDoubleFaultTSS.cr3); // copy the current cr3 to the double fault cr3
+	sDoubleFaultTSS.eip = (uint32)&trap8;
+	sDoubleFaultTSS.es = KERNEL_DATA_SEG;
+	sDoubleFaultTSS.cs = KERNEL_CODE_SEG;
+	sDoubleFaultTSS.ss = KERNEL_DATA_SEG;
+	sDoubleFaultTSS.ds = KERNEL_DATA_SEG;
+	sDoubleFaultTSS.fs = KERNEL_DATA_SEG;
+	sDoubleFaultTSS.gs = KERNEL_DATA_SEG;
+	sDoubleFaultTSS.ldt_seg_selector = KERNEL_DATA_SEG;
+
+	set_tss_descriptor(&gGDT[DOUBLE_FAULT_TSS_SEGMENT], (addr_t)&sDoubleFaultTSS, sizeof(struct tss));
+	x86_set_task_gate(8, DOUBLE_FAULT_TSS_SEGMENT << 3);
+}
 
 
 status_t
@@ -101,16 +128,16 @@ arch_cpu_init_post_vm(kernel_args *args)
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
 
-	return 0;
+	init_double_fault();
+	return B_OK;
 }
 
 
 void
 i386_set_tss_and_kstack(addr_t kstack)
 {
-	int currentCPU = smp_get_current_cpu();
+	int32 currentCPU = smp_get_current_cpu();
 
-//	dprintf("i386_set_kstack: kstack 0x%x, cpu %d\n", kstack, currentCPU);
 	if (!sIsTSSLoaded[currentCPU]) {
 		short seg = ((TSS_BASE_SEGMENT + currentCPU) << 3) | DPL_KERNEL;
 		asm("movw  %0, %%ax;"
@@ -119,7 +146,6 @@ i386_set_tss_and_kstack(addr_t kstack)
 	}
 
 	sTSS[currentCPU]->sp0 = kstack;
-//	dprintf("done\n");
 }
 
 
