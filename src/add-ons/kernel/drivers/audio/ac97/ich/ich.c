@@ -324,7 +324,7 @@ init_hardware(void)
 }
 
 
-void 
+static void 
 dump_hardware_regs()
 {
 	LOG(("GLOB_CNT = %#08x\n",ich_reg_read_32(ICH_REG_GLOB_CNT)));
@@ -345,19 +345,19 @@ dump_hardware_regs()
 	LOG(("PO ICH_REG_X_CR = %#x\n",ich_reg_read_8(ICH_REG_X_CR + ICH_REG_PO_BASE)));
 }
 
-uint16
+static uint16
 ac97_reg_read(void *cookie, uint8 reg)
 {
 	return ich_codec_read(config->codecoffset + reg);
 }
 
-void
+static void
 ac97_reg_write(void *cookie, uint8 reg, uint16 value)
 {
 	ich_codec_write(config->codecoffset + reg, value);
 }
 
-uint32
+static uint32
 ich_clock_get()
 {
 	uint32 civ1, civ2, picb;
@@ -402,7 +402,7 @@ ich_clock_get()
 	return rate;
 }
 
-void
+static void
 ich_clock_calibrate()
 {
 	uint32 rate;

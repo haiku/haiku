@@ -24,6 +24,8 @@
 # define __vsnprintf(s, l, f, a) _IO_vsnprintf (s, l, f, a)
 #endif
 
+int __snprintf(char *s, size_t maxlen, const char *format, ...);
+
 /* Write formatted output into S, according to the format
    string FORMAT, writing no more than MAXLEN characters.  */
 /* VARARGS3 */

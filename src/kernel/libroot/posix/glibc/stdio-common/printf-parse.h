@@ -101,7 +101,7 @@ find_spec (const UCHAR_T *format)
 #else
   while (*format != L_('\0') && *format != L_('%'))
     {
-      int len;
+//      int len;
 
       /* Remove any hints of a wrong encoding.  */
 //      ps->__count = 0;

@@ -98,7 +98,7 @@ typedef struct floppy_cookie {
 } floppy_cookie;
 
 
-static int motor_off_daemon(void *t, int tim);
+static void motor_off_daemon(void *t, int tim);
 
 
 status_t
@@ -521,7 +521,7 @@ flo_control(floppy_cookie *cookie, uint32 op, void *data, size_t len)
 }
 
 
-static int
+static void
 motor_off_daemon(void *t, int tim)
 {
 	int i;
@@ -535,7 +535,6 @@ motor_off_daemon(void *t, int tim)
 			}
 		}
 	}
-	return 0;
 }
 
 

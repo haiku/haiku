@@ -135,6 +135,10 @@
 # define uint64_t uintmax_t
 #endif
 
+int __path_search(char *tmpl, size_t tmpl_len, const char *dir,
+				  const char *pfx, int try_tmpdir);
+int __gen_tempname(char *tmpl, int kind);
+
 /* Return nonzero if DIR is an existent directory.  */
 static int
 direxists(const char *dir)

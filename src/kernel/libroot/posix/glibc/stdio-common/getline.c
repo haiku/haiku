@@ -19,6 +19,7 @@
 #include <stddef.h>
 #include <stdio.h>
 
+ssize_t __getline(char **lineptr, size_t *n, FILE *stream);
 
 /** Like getdelim, but always looks for a newline. */
 

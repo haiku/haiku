@@ -28,8 +28,10 @@
 #include "libioP.h"
 #include <stdio.h>
 
+int __fcloseall(void);
+
 int
-__fcloseall ()
+__fcloseall (void)
 {
   /* Close all streams.  */
   return _IO_cleanup ();

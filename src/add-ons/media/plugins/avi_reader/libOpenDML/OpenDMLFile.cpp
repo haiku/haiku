@@ -179,8 +179,10 @@ OpenDMLFile::InitData()
 				fStreamData[stream].odml_superindex_entry_pos = 0;
 			}
 			for (int i = 0; i < fStreamData[stream].odml_superindex_entry_count; i++) {
+#ifdef TRACE_ODML_FILE
 				odml_superindex_entry *entry = (odml_superindex_entry *) (fStreamData[stream].odml_superindex + i * fStreamData[stream].odml_superindex_entry_size);
 				TRACE("odml_superindex entry %d: start %10Ld, size %8ld, duration %lu\n", i, entry->start, entry->size, entry->duration);
+#endif
 			}
 		} else {
 			// this stream has no superindex, as it doesn't have an opendml index :=)

@@ -30,6 +30,8 @@
 
 #undef getc_unlocked
 
+int __getc_unlocked(FILE *fp);
+
 int
 __getc_unlocked (FILE *fp)
 {
