@@ -46,7 +46,8 @@ public:
 
 	status_t Flush(bigtime_t timeout = B_INFINITE_TIMEOUT);
 	status_t FlushWithReply(PortMessage *msg,bigtime_t timeout=B_INFINITE_TIMEOUT);
-	
+	status_t FlushToSession();
+
 	void MakeEmpty();
 	status_t Attach(const void *data, size_t size);
 	status_t AttachString(const char *string);
