@@ -8,7 +8,9 @@
 #include <boot/platform.h>
 #include <util/kernel_cpp.h>
 
-#include <stdio.h>
+#ifdef HEAP_TEST
+#	include <stdio.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -218,7 +220,7 @@ grow_heap(uint32 bytes)
 }
 #endif
 
-
+#ifdef HEAP_TEST
 void
 dump_chunks(void)
 {
@@ -230,7 +232,7 @@ dump_chunks(void)
 		chunk = chunk->next;
 	}
 }
-
+#endif
 
 int32
 heap_available(void)
