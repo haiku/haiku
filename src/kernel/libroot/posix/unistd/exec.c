@@ -49,10 +49,31 @@ copy_arguments(va_list list, const char **args, const char *arg)
 
 
 int
-execve(const char *path, char * const argv[], char * const envp[])
+execve(const char *path, char * const argv[], char * const environment[])
 {
-	// ToDo: implement me for real!
-	fprintf(stderr, "execve(): NOT IMPLEMENTED\n");
+	int32 argc = 0, envCount = 0;
+
+	// count argument/environment list entries here, we don't want
+	// to do this in the kernel
+	while (argv[argc] != NULL)
+		argc++;
+	while (environment[envCount] != NULL)
+		envCount++;
+
+	if (argc == 0) {
+		// we need some more info on what to do...
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	// "argv[0]" and "path" should be identical here, but they don't have
+	// to. Instead of worrying and needing to copy the array, we just
+	// don't care and pass everything to the kernel - it will have to
+	// do the right thing :)
+
+	errno = _kern_exec(path, argc, argv, envCount, environment);
+		// if this call returns, something definitely went wrong
+
 	return -1;
 }
 
