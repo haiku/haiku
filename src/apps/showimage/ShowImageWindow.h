@@ -88,7 +88,8 @@ private:
 	void SaveAs(BMessage *pmsg);
 		// Handle Save As submenu choice
 	void SaveToFile(BMessage *pmsg);
-		// Handle save file panel message		
+		// Handle save file panel message
+	bool ClosePrompt();
 	bool CanQuit();
 		// returns true if the window can be closed safely, false if not
 	void ToggleFullScreen();
@@ -106,6 +107,7 @@ private:
 	BMenu *fSlideShowDelay;
 	ShowImageView *fImageView;
 	ShowImageStatusView *fStatusView;
+	bool fModified;
 	bool fFullScreen;
 	BRect fWindowFrame;
 	bool fShowCaption;

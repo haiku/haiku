@@ -1093,6 +1093,9 @@ ShowImageView::MergeSelection()
 		
 		DeleteBitmap();
 		fBitmap = bitmap;
+		
+		BMessenger msgr(Window());
+		msgr.SendMessage(MSG_MODIFIED);
 	} else
 		delete bitmap;
 }
@@ -1469,6 +1472,9 @@ ShowImageView::AddWhiteRect(BRect &rect)
 		
 		DeleteBitmap();
 		fBitmap = bitmap;
+		
+		BMessenger msgr(Window());
+		msgr.SendMessage(MSG_MODIFIED);
 	} else
 		delete bitmap;
 }

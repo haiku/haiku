@@ -97,6 +97,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
 	fSavePanel = NULL;
+	fModified = false;
 	fFullScreen = false;
 	fShowCaption = true;
 	fPrintSettings = NULL;
@@ -470,6 +471,11 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 {
 	ShowImageSettings* settings;
 	switch (pmsg->what) {
+		case MSG_MODIFIED:
+			// If image has been modified due to a Cut or Paste
+			fModified = true;
+			break;
+			
 		case MSG_OUTPUT_TYPE:
 			// User clicked Save As then choose an output format
 			if (!fSavePanel)
@@ -592,23 +598,30 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 			
 		case MSG_PAGE_FIRST:
-			fImageView->FirstPage();
+			if (ClosePrompt())
+				fImageView->FirstPage();
 			break;
 			
 		case MSG_PAGE_LAST:
-			fImageView->LastPage();
+			if (ClosePrompt())
+				fImageView->LastPage();
 			break;
 			
 		case MSG_PAGE_NEXT:
-			fImageView->NextPage();
+			if (ClosePrompt())
+				fImageView->NextPage();
 			break;
 			
 		case MSG_PAGE_PREV:
-			fImageView->PrevPage();
+			if (ClosePrompt())
+				fImageView->PrevPage();
 			break;
 			
 		case MSG_GOTO_PAGE:
 			{
+				if (!ClosePrompt())
+					break;
+
 				int32 curPage, newPage, pages;
 				if (pmsg->FindInt32("page", &newPage) == B_OK) {
 					curPage = fImageView->CurrentPage();
@@ -640,11 +653,13 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			break;
 
 		case MSG_FILE_PREV:
-			fImageView->PrevFile();
+			if (ClosePrompt())
+				fImageView->PrevFile();
 			break;
 			
 		case MSG_FILE_NEXT:
-			fImageView->NextFile();
+			if (ClosePrompt())
+				fImageView->NextFile();
 			break;
 		
 		case MSG_ROTATE_90:
@@ -663,11 +678,21 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			fImageView->Invert();
 			break;
 		case MSG_SLIDE_SHOW:
-			if (ToggleMenuItem(pmsg->what)) {
-				fImageView->StartSlideShow();
-			} else {
-				fImageView->StopSlideShow();
+			{
+				BMenuItem *item;
+				item = fBar->FindItem(pmsg->what);
+				if (!item)
+					break;
+				if (item->IsMarked()) {
+					item->SetMarked(false);
+					fImageView->StopSlideShow();
+				} else if (ClosePrompt()) {
+					item->SetMarked(true);
+					fImageView->StartSlideShow();
+				}
 			}
+			break;
+			
 		case MSG_SLIDE_SHOW_DELAY:
 			{
 				float value;
@@ -786,12 +811,40 @@ ShowImageWindow::SaveToFile(BMessage *pmsg)
 		&file, outType) != B_OK) {
 		BAlert *palert = new BAlert(NULL, "Error writing image file.", "Ok");
 		palert->Go();
-	}
+	} else
+		fModified = false;
 	
 	BBitmap *pout = NULL;
 	stream.DetachBitmap(&pout);
 		// bitmap used by stream still belongs to the view,
 		// detach so it doesn't get deleted
+}
+
+bool
+ShowImageWindow::ClosePrompt()
+{
+	if (!fModified)
+		return true;
+	else {
+		int32 page, count;
+		count = fImageView->PageCount();
+		page = fImageView->CurrentPage();
+		BString prompt, name;
+		fImageView->GetName(&name);
+		prompt << "The document '" << name << "'";
+		if (count > 1)
+			prompt << " (page " << page << ")";
+		prompt << " has been changed. "
+		       << "Do you want to close the document?";
+		BAlert *pAlert = new BAlert("Close document", prompt.String(),
+			"Cancel", "Close");
+		if (pAlert->Go() == 0)
+			// Cancel
+			return false;
+		else
+			// Close
+			return true;
+	}
 }
 
 bool
@@ -801,7 +854,7 @@ ShowImageWindow::CanQuit()
 		// Don't allow this window to be closed if a save panel is open
 		return false;
 	else
-		return true;	
+		return ClosePrompt();	
 }
 
 void
