@@ -1,7 +1,3 @@
-/* Virtual File System and
-** File System Interface Layer
-*/
-
 /* 
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
@@ -9,6 +5,8 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+/* Virtual File System and File System Interface Layer */
 
 #include <OS.h>
 #include <StorageDefs.h>
@@ -2098,18 +2096,18 @@ vfs_mount_boot_file_system()
 
 
 status_t
-vfs_init(kernel_args *ka)
+vfs_init(kernel_args *args)
 {
 	{
 		struct vnode *v;
-		sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, (addr)&v->next - (addr)v,
+		sVnodeTable = hash_init(VNODE_HASH_TABLE_SIZE, (addr_t)&v->next - (addr_t)v,
 			&vnode_compare, &vnode_hash);
 		if (sVnodeTable == NULL)
 			panic("vfs_init: error creating vnode hash table\n");
 	}
 	{
 		struct fs_mount *mount;
-		sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, (addr)&mount->next - (addr)mount,
+		sMountsTable = hash_init(MOUNTS_HASH_TABLE_SIZE, (addr_t)&mount->next - (addr_t)mount,
 			&mount_compare, &mount_hash);
 		if (sMountsTable == NULL)
 			panic("vfs_init: error creating mounts hash table\n");

@@ -15,18 +15,18 @@
 #include <vm_page.h>
 
 bool trimming_cycle;
-static addr free_memory_low_water;
-static addr free_memory_high_water;
+static addr_t free_memory_low_water;
+static addr_t free_memory_high_water;
 
 
 static void
-scan_pages(vm_address_space *aspace, addr free_target)
+scan_pages(vm_address_space *aspace, addr_t free_target)
 {
 	vm_region *first_region;
 	vm_region *region;
 	vm_page *page;
-	addr va;
-	addr pa;
+	addr_t va;
+	addr_t pa;
 	uint32 flags, flags2;
 //	int err;
 	int quantum = PAGE_SCAN_QUANTUM;
@@ -58,7 +58,7 @@ scan_pages(vm_address_space *aspace, addr free_target)
 		// scan the pages in this region
 		mutex_lock(&region->cache_ref->lock);
 		if (!region->cache_ref->cache->scan_skip) {
-			for(va = region->base; va < (region->base + region->size); va += PAGE_SIZE) {
+			for(va = region->base; va < (region->base + region->size); va += B_PAGE_SIZE) {
 				aspace->translation_map.ops->lock(&aspace->translation_map);
 				aspace->translation_map.ops->query(&aspace->translation_map, va, &pa, &flags);
 				if ((flags & PAGE_PRESENT) == 0) {
@@ -66,7 +66,7 @@ scan_pages(vm_address_space *aspace, addr free_target)
 					continue;
 				}
 
-				page = vm_lookup_page(pa / PAGE_SIZE);
+				page = vm_lookup_page(pa / B_PAGE_SIZE);
 				if (!page) {
 					aspace->translation_map.ops->unlock(&aspace->translation_map);
 					continue;
@@ -83,7 +83,7 @@ scan_pages(vm_address_space *aspace, addr free_target)
 					// look for a page we can steal
 					if (!(flags & PAGE_ACCESSED) && page->state == PAGE_STATE_ACTIVE) {
 						// unmap the page
-						aspace->translation_map.ops->unmap(&aspace->translation_map, va, va + PAGE_SIZE);
+						aspace->translation_map.ops->unmap(&aspace->translation_map, va, va + B_PAGE_SIZE);
 
 						// flush the tlbs of all cpus
 						aspace->translation_map.ops->flush(&aspace->translation_map);
@@ -137,8 +137,8 @@ page_daemon(void *unused)
 	struct hash_iterator i;
 	vm_address_space *old_aspace;
 	vm_address_space *aspace;
-	addr mapped_size;
-	addr free_memory_target;
+	addr_t mapped_size;
+	addr_t free_memory_target;
 	int faults_per_second;
 	bigtime_t now;
 

@@ -214,7 +214,7 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
 		new_pgdir = i386_translation_map_get_pgdir(&t_to->team->aspace->translation_map);
 	}
 
-	if (((uint32)new_pgdir % PAGE_SIZE) != 0)
+	if (((uint32)new_pgdir % B_PAGE_SIZE) != 0)
 		panic("arch_thread_context_switch: bad pgdir 0x%lx\n", new_pgdir);
 
 	i386_fsave_swap(t_from->arch_info.fpu_state, t_to->arch_info.fpu_state);

@@ -77,7 +77,7 @@ arch_cpu_init2(kernel_args *ka)
 
 		sprintf(tss_name, "tss%d", i);
 		rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), tss_name, (void **)&tss[i],
-			B_ANY_KERNEL_ADDRESS, PAGE_SIZE, B_FULL_LOCK,
+			B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK,
 			B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (rid < 0) {
 			panic("arch_cpu_init2: unable to create region for tss\n");
@@ -124,10 +124,10 @@ i386_set_tss_and_kstack(addr_t kstack)
 void
 arch_cpu_invalidate_TLB_range(addr_t start, addr_t end)
 {
-	int num_pages = end/PAGE_SIZE - start/PAGE_SIZE;
+	int num_pages = end / B_PAGE_SIZE - start / B_PAGE_SIZE;
 	while (num_pages-- >= 0) {
 		invalidate_TLB(start);
-		start += PAGE_SIZE;
+		start += B_PAGE_SIZE;
 	}
 }
 

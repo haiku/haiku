@@ -1,5 +1,3 @@
-/* Contains the ELF loader */
-
 /*
 ** Copyright 2002-2004, The Haiku Team. All rights reserved.
 ** Distributed under the terms of the Haiku License.
@@ -8,6 +6,7 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+/* Contains the ELF loader */
 
 #include <OS.h>
 #include <elf.h>
@@ -1077,16 +1076,16 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 		if (pheaders[i].p_type != PT_LOAD)
 			continue;
 
-		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
+		regionAddress = (char *)ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
 		if (pheaders[i].p_flags & PF_WRITE) {
 			/*
 			 * rw/data segment
 			 */
-			uint32 memUpperBound = (pheaders[i].p_vaddr % PAGE_SIZE) + pheaders[i].p_memsz;
-			uint32 fileUpperBound = (pheaders[i].p_vaddr % PAGE_SIZE) + pheaders[i].p_filesz;
+			uint32 memUpperBound = (pheaders[i].p_vaddr % B_PAGE_SIZE) + pheaders[i].p_memsz;
+			uint32 fileUpperBound = (pheaders[i].p_vaddr % B_PAGE_SIZE) + pheaders[i].p_filesz;
 
-			memUpperBound = ROUNDUP(memUpperBound, PAGE_SIZE);
-			fileUpperBound = ROUNDUP(fileUpperBound, PAGE_SIZE);
+			memUpperBound = ROUNDUP(memUpperBound, B_PAGE_SIZE);
+			fileUpperBound = ROUNDUP(fileUpperBound, B_PAGE_SIZE);
 
 			sprintf(regionName, "%s_seg%drw", baseName, i);
 
@@ -1095,7 +1094,7 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 				B_EXACT_ADDRESS,
 				fileUpperBound,
 				B_READ_AREA | B_WRITE_AREA, REGION_PRIVATE_MAP,
-				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
+				path, ROUNDOWN(pheaders[i].p_offset, B_PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error allocating region: %s!\n", strerror(id));
 				err = B_NOT_AN_EXECUTABLE;
@@ -1106,10 +1105,10 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			// at least parts of it are the bss and have to be zeroed)
 			{
 				uint32 start = (uint32)regionAddress
-					+ (pheaders[i].p_vaddr % PAGE_SIZE)
+					+ (pheaders[i].p_vaddr % B_PAGE_SIZE)
 					+ pheaders[i].p_filesz;
 				uint32 amount = fileUpperBound
-					- (pheaders[i].p_vaddr % PAGE_SIZE)
+					- (pheaders[i].p_vaddr % B_PAGE_SIZE)
 					- (pheaders[i].p_filesz);
 				memset((void *)start, 0, amount);
 			}
@@ -1140,9 +1139,9 @@ elf_load_user_image(const char *path, struct team *p, int flags, addr_t *entry)
 			id = vm_map_file(p->aspace->id, regionName,
 				(void **)&regionAddress,
 				B_EXACT_ADDRESS,
-				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE),
+				ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE),
 				B_READ_AREA | B_EXECUTE_AREA, REGION_PRIVATE_MAP,
-				path, ROUNDOWN(pheaders[i].p_offset, PAGE_SIZE));
+				path, ROUNDOWN(pheaders[i].p_offset, B_PAGE_SIZE));
 			if (id < 0) {
 				dprintf("error mapping text!\n");
 				err = B_NOT_AN_EXECUTABLE;
@@ -1318,7 +1317,7 @@ load_kernel_add_on(const char *path)
 		// ToDo: this won't work if the on-disk order of the sections doesn't
 		//		fit the in-memory order...
 		region->start = start;
-		region->size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
+		region->size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % B_PAGE_SIZE), B_PAGE_SIZE);
 		region->id = create_area(regionName, (void **)&region->start, B_EXACT_ADDRESS,
 			region->size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		if (region->id < 0) {
@@ -1326,13 +1325,13 @@ load_kernel_add_on(const char *path)
 			err = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
-		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
+		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, B_PAGE_SIZE);
 		start += region->size;
 
 		TRACE(("elf_load_kspace: created a region at %p\n", (void *)region->start));
 
 		len = _kern_read(fd, pheaders[i].p_offset,
-			(void *)(region->start + (pheaders[i].p_vaddr % PAGE_SIZE)),
+			(void *)(region->start + (pheaders[i].p_vaddr % B_PAGE_SIZE)),
 			pheaders[i].p_filesz);
 		if (len < 0) {
 			err = len;

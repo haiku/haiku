@@ -653,7 +653,7 @@ devfs_mount(mount_id id, const char *devfs, void *args, fs_volume *_fs, vnode_id
 	if (err < B_OK)
 		goto err1;
 
-	fs->vnode_list_hash = hash_init(BOOTFS_HASH_SIZE, (addr)&v->all_next - (addr)v,
+	fs->vnode_list_hash = hash_init(BOOTFS_HASH_SIZE, (addr_t)&v->all_next - (addr_t)v,
 		&devfs_vnode_compare_func, &devfs_vnode_hash_func);
 	if (fs->vnode_list_hash == NULL) {
 		err = B_NO_MEMORY;

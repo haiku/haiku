@@ -73,11 +73,11 @@ static spinlock tmap_list_lock;
 #define ADDR_SHIFT(x) ((x)>>12)
 #define ADDR_REVERSE_SHIFT(x) ((x)<<12)
 
-#define VADDR_TO_PDENT(va) (((va) / PAGE_SIZE) / 1024)
-#define VADDR_TO_PTENT(va) (((va) / PAGE_SIZE) % 1024)
+#define VADDR_TO_PDENT(va) (((va) / B_PAGE_SIZE) / 1024)
+#define VADDR_TO_PTENT(va) (((va) / B_PAGE_SIZE) % 1024)
 
 #define FIRST_USER_PGDIR_ENT    (VADDR_TO_PDENT(USER_BASE))
-#define NUM_USER_PGDIR_ENTS     (VADDR_TO_PDENT(ROUNDUP(USER_SIZE, PAGE_SIZE * 1024)))
+#define NUM_USER_PGDIR_ENTS     (VADDR_TO_PDENT(ROUNDUP(USER_SIZE, B_PAGE_SIZE * 1024)))
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
 
@@ -137,7 +137,7 @@ early_query(addr_t va, addr_t *out_physical)
 		return ERR_VM_PAGE_NOT_PRESENT;
 	}
 
-	pentry = page_hole + va / PAGE_SIZE;
+	pentry = page_hole + va / B_PAGE_SIZE;
 	if (pentry->present == 0) {
 		// page mapping not valid
 		return ERR_VM_PAGE_NOT_PRESENT;
@@ -278,11 +278,11 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 
 /*
 	dprintf("pgdir at 0x%x\n", pgdir);
-	dprintf("index is %d\n", va / PAGE_SIZE / 1024);
-	dprintf("final at 0x%x\n", &pgdir[va / PAGE_SIZE / 1024]);
-	dprintf("value is 0x%x\n", *(int *)&pgdir[va / PAGE_SIZE / 1024]);
-	dprintf("present bit is %d\n", pgdir[va / PAGE_SIZE / 1024].present);
-	dprintf("addr is %d\n", pgdir[va / PAGE_SIZE / 1024].addr);
+	dprintf("index is %d\n", va / B_PAGE_SIZE / 1024);
+	dprintf("final at 0x%x\n", &pgdir[va / B_PAGE_SIZE / 1024]);
+	dprintf("value is 0x%x\n", *(int *)&pgdir[va / B_PAGE_SIZE / 1024]);
+	dprintf("present bit is %d\n", pgdir[va / B_PAGE_SIZE / 1024].present);
+	dprintf("addr is %d\n", pgdir[va / B_PAGE_SIZE / 1024].addr);
 */
 	pd = map->arch_data->pgdir_virt;
 
@@ -298,7 +298,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 		// mark the page WIRED 
 		vm_page_set_state(page, PAGE_STATE_WIRED);
 
-		pgtable = page->ppn * PAGE_SIZE;
+		pgtable = page->ppn * B_PAGE_SIZE;
 
 		TRACE(("map_tmap: asked for free page for pgtable. 0x%lx\n", pgtable));
 
@@ -342,8 +342,8 @@ unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 	int index;
 	int err;
 
-	start = ROUNDOWN(start, PAGE_SIZE);
-	end = ROUNDUP(end, PAGE_SIZE);
+	start = ROUNDOWN(start, B_PAGE_SIZE);
+	end = ROUNDUP(end, B_PAGE_SIZE);
 
 	TRACE(("unmap_tmap: asked to free pages 0x%lx to 0x%lx\n", start, end));
 
@@ -354,7 +354,7 @@ restart:
 	index = VADDR_TO_PDENT(start);
 	if (pd[index].present == 0) {
 		// no pagetable here, move the start up to access the next page table
-		start = ROUNDUP(start + 1, PAGE_SIZE);
+		start = ROUNDUP(start + 1, B_PAGE_SIZE);
 		goto restart;
 	}
 
@@ -362,7 +362,7 @@ restart:
 		err = get_physical_page_tmap(ADDR_REVERSE_SHIFT(pd[index].addr), (addr_t *)&pt, PHYSICAL_PAGE_NO_WAIT);
 	} while (err < 0);
 
-	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end); index++, start += PAGE_SIZE) {
+	for (index = VADDR_TO_PTENT(start); (index < 1024) && (start < end); index++, start += B_PAGE_SIZE) {
 		if (pt[index].present == 0) {
 			// page mapping not valid
 			continue;
@@ -520,13 +520,13 @@ map_iospace_chunk(addr_t va, addr_t pa)
 	addr_t ppn;
 	int state;
 
-	pa &= ~(PAGE_SIZE - 1); // make sure it's page aligned
-	va &= ~(PAGE_SIZE - 1); // make sure it's page aligned
+	pa &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
+	va &= ~(B_PAGE_SIZE - 1); // make sure it's page aligned
 	if (va < IOSPACE_BASE || va >= (IOSPACE_BASE + IOSPACE_SIZE))
 		panic("map_iospace_chunk: passed invalid va 0x%lx\n", va);
 
 	ppn = ADDR_SHIFT(pa);
-	pt = &iospace_pgtables[(va - IOSPACE_BASE)/PAGE_SIZE];
+	pt = &iospace_pgtables[(va - IOSPACE_BASE) / B_PAGE_SIZE];
 	for (i = 0; i < 1024; i++) {
 		init_ptentry(&pt[i]);
 		pt[i].addr = ppn + i;
@@ -536,8 +536,8 @@ map_iospace_chunk(addr_t va, addr_t pa)
 	}
 
 	state = disable_interrupts();
-	arch_cpu_invalidate_TLB_range(va, va + (IOSPACE_CHUNK_SIZE - PAGE_SIZE));
-	smp_send_broadcast_ici(SMP_MSG_INVL_PAGE_RANGE, va, va + (IOSPACE_CHUNK_SIZE - PAGE_SIZE), 0,
+	arch_cpu_invalidate_TLB_range(va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE));
+	smp_send_broadcast_ici(SMP_MSG_INVL_PAGE_RANGE, va, va + (IOSPACE_CHUNK_SIZE - B_PAGE_SIZE), 0,
 		NULL, SMP_MSG_FLAG_SYNC);
 	restore_interrupts(state);
 
@@ -754,7 +754,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	// page hole set up in stage2
 	page_hole = (ptentry *)args->arch_args.page_hole;
 	// calculate where the pgdir would be
-	page_hole_pgdir = (pdentry *)(((unsigned int)args->arch_args.page_hole) + (PAGE_SIZE * 1024 - PAGE_SIZE));
+	page_hole_pgdir = (pdentry *)(((unsigned int)args->arch_args.page_hole) + (B_PAGE_SIZE * 1024 - B_PAGE_SIZE));
 	// clear out the bottom 2 GB, unmap everything
 	memset(page_hole_pgdir + FIRST_USER_PGDIR_ENT, 0, sizeof(pdentry) * NUM_USER_PGDIR_ENTS);
 
@@ -771,7 +771,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	virtual_pmappings = (paddr_chunk_desc **)vm_alloc_from_kernel_args(args,
 		sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	iospace_pgtables = (ptentry *)vm_alloc_from_kernel_args(args,
-		PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)), B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	TRACE(("paddr_desc %p, virtual_pmappings %p, iospace_pgtables %p\n",
 		paddr_desc, virtual_pmappings, iospace_pgtables));
@@ -781,7 +781,7 @@ arch_vm_translation_map_init(kernel_args *args)
 	memset(virtual_pmappings, 0, sizeof(paddr_chunk_desc *) * num_virtual_chunks);
 	first_free_vmapping = 0;
 	queue_init(&mapped_paddr_lru);
-	memset(iospace_pgtables, 0, PAGE_SIZE * (IOSPACE_SIZE / (PAGE_SIZE * 1024)));
+	memset(iospace_pgtables, 0, B_PAGE_SIZE * (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)));
 	iospace_mutex.sem = -1;
 	iospace_mutex.holder = -1;
 	iospace_full_sem = -1;
@@ -797,9 +797,9 @@ arch_vm_translation_map_init(kernel_args *args)
 		int i;
 
 		virt_pgtable = (addr_t)iospace_pgtables;
-		for (i = 0; i < (IOSPACE_SIZE / (PAGE_SIZE * 1024)); i++, virt_pgtable += PAGE_SIZE) {
+		for (i = 0; i < (IOSPACE_SIZE / (B_PAGE_SIZE * 1024)); i++, virt_pgtable += B_PAGE_SIZE) {
 			early_query(virt_pgtable, &phys_pgtable);
-			e = &page_hole_pgdir[(IOSPACE_BASE / (PAGE_SIZE * 1024)) + i];
+			e = &page_hole_pgdir[(IOSPACE_BASE / (B_PAGE_SIZE * 1024)) + i];
 			put_pgtable_in_pgdir(e, phys_pgtable, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 		}
 	}
@@ -838,12 +838,12 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 
 	temp = (void *)paddr_desc;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "physical_page_mapping_descriptors", &temp,
-		B_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc) * 1024, PAGE_SIZE),
+		B_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc) * 1024, B_PAGE_SIZE),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)virtual_pmappings;
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "iospace_virtual_chunk_descriptors", &temp,
-		B_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, PAGE_SIZE),
+		B_EXACT_ADDRESS, ROUNDUP(sizeof(paddr_chunk_desc *) * num_virtual_chunks, B_PAGE_SIZE),
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	temp = (void *)iospace_pgtables;
@@ -884,7 +884,7 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 		// we need to allocate a pgtable
 		pgtable = get_free_page(args);
 		// pgtable is in pages, convert to physical address
-		pgtable *= PAGE_SIZE;
+		pgtable *= B_PAGE_SIZE;
 
 		TRACE(("early_map: asked for free page for pgtable. 0x%lx\n", pgtable));
 
@@ -893,10 +893,10 @@ arch_vm_translation_map_early_map(kernel_args *args, addr_t va, addr_t pa,
 		put_pgtable_in_pgdir(e, pgtable, attributes);
 
 		// zero it out in it's new mapping
-		memset((unsigned int *)((unsigned int)page_hole + (va / PAGE_SIZE / 1024) * PAGE_SIZE), 0, PAGE_SIZE);
+		memset((unsigned int *)((unsigned int)page_hole + (va / B_PAGE_SIZE / 1024) * B_PAGE_SIZE), 0, B_PAGE_SIZE);
 	}
 	// now, fill in the pentry
-	put_ptentry_in_pgtable(page_hole + va / PAGE_SIZE, pa, attributes);
+	put_ptentry_in_pgtable(page_hole + va / B_PAGE_SIZE, pa, attributes);
 
 	arch_cpu_invalidate_TLB_range(va, va);
 

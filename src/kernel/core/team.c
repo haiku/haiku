@@ -143,7 +143,7 @@ team_init(kernel_args *ka)
 	struct process_group *group;
 
 	// create the team hash table
-	team_hash = hash_init(15, (addr)&kernel_team->next - (addr)kernel_team,
+	team_hash = hash_init(15, (addr_t)&kernel_team->next - (addr_t)kernel_team,
 		&team_struct_compare, &team_struct_hash);
 
 	// create initial session and process groups
@@ -802,7 +802,7 @@ team_create_thread_start(void *args)
 	struct team *team;
 	struct team_arg *teamArgs = args;
 	const char *path;
-	addr entry;
+	addr_t entry;
 	char ustack_name[128];
 	uint32 sizeLeft;
 	char **uargs;
@@ -1688,7 +1688,7 @@ sys_setenv(const char *name, const char *value, int overwrite)
 {
 	char var[SYS_THREAD_STRING_LENGTH_MAX];
 	int state;
-	addr env_space;
+	addr_t env_space;
 	char **envp;
 	int envc;
 	bool var_exists = false;
@@ -1713,7 +1713,7 @@ sys_setenv(const char *name, const char *value, int overwrite)
 	name_size = strlen(var);
 	strncat(var, value, SYS_THREAD_STRING_LENGTH_MAX-1);
 
-	env_space = (addr)thread_get_current_thread()->team->user_env_base;
+	env_space = (addr_t)thread_get_current_thread()->team->user_env_base;
 	envp = (char **)env_space;
 	for (envc = 0; envp[envc]; envc++) {
 		if (!strncmp(envp[envc], var, name_size)) {

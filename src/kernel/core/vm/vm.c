@@ -1645,7 +1645,9 @@ dump_region(int argc, char **argv)
 }
 
 
-region_id
+// ToDo: fix these and move them to find_area() and area_for()!
+
+static region_id
 find_region_by_address(addr_t address)
 {
 	vm_address_space *aspace;
@@ -1667,7 +1669,7 @@ find_region_by_address(addr_t address)
 }
 
 
-region_id
+static region_id
 find_region_by_name(const char *name)
 {
 	vm_region *region;

@@ -1,3 +1,12 @@
+/*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
+** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+** Distributed under the terms of the NewOS License.
+*/
+
+
 /* This file contains the cbuf functions. Cbuf is a memory allocator,
  * currently not used for anything in kernel land other than ports.
  */
@@ -28,7 +37,7 @@ struct cbuf {
 				2*sizeof(int) - sizeof(void *) - sizeof(int)];
 };
 
-#define ALLOCATE_CHUNK (PAGE_SIZE * 16)
+#define ALLOCATE_CHUNK (B_PAGE_SIZE * 16)
 #define CBUF_REGION_SIZE (4*1024*1024)
 #define CBUF_BITMAP_SIZE (CBUF_REGION_SIZE / CBUF_LENGTH)
 
@@ -774,7 +783,7 @@ cbuf_ones_cksum16(cbuf *buffer, size_t offset, size_t length)
 
 	// start checksumming
 	while (buffer && length > 0) {
-		void *ptr = (void *)((addr)buffer->data + offset);
+		void *ptr = (void *)((addr_t)buffer->data + offset);
 		size_t plen = min(length, buffer->length - offset);
 
 		sum = ones_sum16(sum, ptr, plen);

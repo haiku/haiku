@@ -199,7 +199,7 @@ read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, s
 		vm_cache_insert_page(ref->cache, page, offset + pos);
 
 		addr_t virtualAddress;
-		vm_get_physical_page(page->ppn * PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
 		// ToDo: check if the array is large enough!
@@ -268,7 +268,7 @@ write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, si
 		vm_cache_insert_page(ref->cache, page, offset + pos);
 
 		addr_t virtualAddress;
-		vm_get_physical_page(page->ppn * PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+		vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
 
 		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
 		// ToDo: check if the array is large enough!
