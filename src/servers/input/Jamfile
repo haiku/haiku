@@ -4,11 +4,22 @@ AddResources input_server : input_server.rdef ;
 
 UsePrivateHeaders app ;
 UsePrivateHeaders input ;
+UsePrivateHeaders storage ;
 
 Server input_server :
 	InputServer.cpp
 	InputServerDevice.cpp
 	InputServerFilter.cpp
 	InputServerMethod.cpp
+
+	# storage
+	AddOnMonitor.cpp
+	AddOnMonitorHandler.cpp
+	NodeMonitorHandler.cpp
+
+	: be <boot!home!config!lib>libopenbeos.so
 ;
-LinkSharedOSLibs input_server : be root <boot!home!config!lib>libopenbeos.so ;
+
+SEARCH on [ FGristFiles AddOnMonitor.cpp
+	AddOnMonitorHandler.cpp
+	NodeMonitorHandler.cpp ] += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) kits storage ] ;

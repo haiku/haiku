@@ -43,6 +43,14 @@
 #include <Debug.h>
 #include <String.h>
 
+#if DEBUG>=1
+	#define EXIT()		printf("EXIT %s\n", __PRETTY_FUNCTION__)
+	#define CALLED()	printf("CALLED %s\n", __PRETTY_FUNCTION__)
+#else
+	#define EXIT()		((void)0)
+	#define CALLED()	((void)0)
+#endif
+
 #include "InputServerDeviceListEntry.h"
 #include "InputServerFilterListEntry.h"
 #include "InputServerMethodListEntry.h"
@@ -59,7 +67,7 @@
 
 extern "C" void RegisterDevices(input_device_ref** devices)
 {
-	printf("RegisterDevices\n");
+	CALLED();
 };
 
 
@@ -94,6 +102,7 @@ int main()
  */
 InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_server")
 {
+	CALLED();
 	void *pointer=NULL;
 	
 	EventLoop(pointer);
@@ -111,6 +120,7 @@ InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_serv
  */
 InputServer::~InputServer(void)
 {
+	CALLED();
 }
 
 
@@ -121,10 +131,11 @@ InputServer::~InputServer(void)
 void
 InputServer::ArgvReceived(int32 argc, char** argv)
 {
+	CALLED();
 	if (2 == argc) {
 		if (0 == strcmp("-q", argv[1]) ) {
 			// :TODO: Shutdown and restart the InputServer.
-			printf("InputServer::ArgvReceived - Restarting . . .\n");
+			printf("InputServer::ArgvReceived - Restarting ...\n");
 			status_t   quit_status;
 			//BMessenger msgr = BMessenger("application/x-vnd.OpenBeOS-input_server", -1, &quit_status);
 			BMessenger msgr = BMessenger("application/x-vnd.OBOS-input_server", -1, &quit_status);
@@ -146,6 +157,7 @@ InputServer::ArgvReceived(int32 argc, char** argv)
 void
 InputServer::InitKeyboardMouseStates(void)
 {
+	CALLED();
 	// This is where we read in the preferences data for the mouse and keyboard as well as
 	// determine the screen resolution from the app_server and find the center of the screen
 	// sMousePos is then set to the center of the screen.
@@ -158,7 +170,8 @@ InputServer::InitKeyboardMouseStates(void)
 void
 InputServer::InitTestDevice()
 {
-	printf("InputServer::InitTestDevice - Enter\n");
+	CALLED();
+	
 	const char* path = "/boot/home/Projects/InputServer/ISD/nervous/nervous";
 	printf("InputServer::InitTestDevice - Loading add-on . . .\n");
 	image_id addon_image = load_add_on(path);
@@ -199,7 +212,7 @@ InputServer::InitTestDevice()
 			//unload_add_on(addon_image);
 		}
 	}
-	printf("InputServer::InitTestDevice - Exit\n");
+	EXIT();
 }
 
 /*
@@ -209,6 +222,8 @@ InputServer::InitTestDevice()
 void
 InputServer::InitDevices(void)
 {
+	CALLED();
+	
 	BDirectory  dir;
 	BPath       addon_dir;
 	BPath       addon_path;
@@ -221,8 +236,6 @@ InputServer::InitDevices(void)
 	            };
 	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
 
-	printf("InputServer::InitDevices - Enter\n");
-	
 	// Find all Input Server Devices in each of the predefined
 	// addon directories.
 	//
@@ -240,7 +253,7 @@ InputServer::InitDevices(void)
 			}
 		}
 	}
-	printf("InputServer::InitDevices - Exit\n");
+	EXIT();
 }
 
 
@@ -296,6 +309,8 @@ InputServer::AddInputServerDevice(const char* path)
 void
 InputServer::InitFilters(void)
 {
+	CALLED();
+	
 	BDirectory  dir;
 	BPath       addon_dir;
 	BPath       addon_path;
@@ -308,8 +323,6 @@ InputServer::InitFilters(void)
 	            };
 	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
 
-	printf("InputServer::InitFilters - Enter\n");
-	
 	// Find all Input Filters in each of the predefined
 	// addon directories.
 	//
@@ -327,7 +340,7 @@ InputServer::InitFilters(void)
 			}
 		}
 	}
-	printf("InputServer::InitFilters - Exit\n");
+	EXIT();
 }
 
 
@@ -383,6 +396,8 @@ InputServer::AddInputServerFilter(const char* path)
 void
 InputServer::InitMethods(void)
 {
+	CALLED();
+	
 	BDirectory  dir;
 	BPath       addon_dir;
 	BPath       addon_path;
@@ -395,8 +410,6 @@ InputServer::InitMethods(void)
 	            };
 	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
 
-	printf("InputServer::InitMethods - Enter\n");
-	
 	// Find all Input Methods in each of the predefined
 	// addon directories.
 	//
@@ -414,7 +427,7 @@ InputServer::InitMethods(void)
 			}
 		}
 	}
-	printf("InputServer::InitMethods - Exit\n");
+	EXIT();
 }
 
 
@@ -470,6 +483,8 @@ InputServer::AddInputServerMethod(const char* path)
 bool
 InputServer::QuitRequested(void)
 {
+	CALLED();
+	
 	kill_thread(ISPortThread);
 	delete_port(EventLooperPort);
 	EventLooperPort = -1;
@@ -490,6 +505,7 @@ InputServer::QuitRequested(void)
 // ---------------------------------------------------------------
 void InputServer::ReadyToRun(void)
 {
+	CALLED();
 }
 
 
@@ -500,6 +516,8 @@ void InputServer::ReadyToRun(void)
 void
 InputServer::MessageReceived(BMessage *message)
 {
+	CALLED();
+	
 	BMessage *reply = NULL;
 	
 	switch(message->what)
@@ -610,7 +628,7 @@ InputServer::MessageReceived(BMessage *message)
 			break;*/
 		default:
 		{
-			printf("Default message . . .\n");
+			PRINT(("Default message ...\n"));
 			BMessenger app_server("application/x-vnd.Be-APPS", -1, NULL);
 			if (app_server.IsValid()) {
 				//app_server->SendMessage(message);
@@ -762,7 +780,7 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 		  yValue;
     
     message->FindInt32("x",xValue);
-    printf("[HandleSetMousePosition] x = %lu:\n",xValue);
+    PRINT(("[HandleSetMousePosition] x = %lu:\n",xValue));
 	
    	switch(message->what){
    		case B_MOUSE_MOVED:{
@@ -1039,7 +1057,7 @@ const BMessenger* InputServer::MethodReplicant(void)
 status_t
 InputServer::EventLoop(void *)
 {
-	printf("Starting event loop . . .\n");
+	CALLED();
 	EventLooperPort = create_port(100, "obos_is_event_port");
 	if(EventLooperPort < 0) {
 		_sPrintf("OBOS InputServer: create_port error: (0x%x) %s\n",EventLooperPort,strerror(EventLooperPort));
@@ -1079,13 +1097,15 @@ InputServer::DispatchEvents(BList *eventList)
 
 int InputServer::DispatchEvent(BMessage *message)
 {
+	CALLED();
+	
 	// variables
 	int32 xValue, 
 		  yValue;
     uint32 buttons = 0;
     
     message->FindInt32("x",xValue);
-    printf("[DispatchEvent] x = %lu:\n",xValue);
+    PRINT(("[DispatchEvent] x = %lu:\n", xValue));
 	
 	port_id pid = find_port(SERVER_INPUT_PORT);
    	BPortLink *appsvrlink = new BPortLink(pid);
@@ -1101,7 +1121,7 @@ int InputServer::DispatchEvent(BMessage *message)
     			message->FindInt32("buttons",buttons);
     			appsvrlink->Attach(&buttons,sizeof(int32));
     			appsvrlink->Flush();
-    			printf("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",xValue,yValue,time,buttons);
+    			PRINT(("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",xValue,yValue,time,buttons));
     			}
     		break;
     		}
@@ -1412,19 +1432,19 @@ status_t InputServer::StartStopDevices(const char*       deviceName,
                                        input_device_type deviceType,
                                        bool              doStart)
 {
-	printf("StartStopDevice: Enter\n");
+	CALLED();
 	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
 	{
-		printf("Device #%d\n", i);
+		PRINT(("Device #%d\n", i));
 		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
 		if (NULL != item)
 		{
 			BInputServerDevice* isd = item->mIsd;
 			input_device_ref*   dev = item->mDev;
-			printf("Hey\n");
+			PRINT(("Hey\n"));
 			if ( (NULL != isd) && (NULL != dev) )
 			{
-				printf("  Starting/stopping: %s\n", dev->name);
+				PRINT(("  Starting/stopping: %s\n", dev->name));
 				if (deviceType == dev->type)
 				{
 					if (doStart) isd->Start(dev->name, dev->cookie);
@@ -1433,7 +1453,7 @@ status_t InputServer::StartStopDevices(const char*       deviceName,
 			}
 		}
 	}
-	printf("StartStopDevice: Exit\n");
+	EXIT();
 	
 	return B_OK;
 }
@@ -1452,7 +1472,7 @@ status_t InputServer::ControlDevices(const char* deviceName,
 	
 	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
 	{
-		printf("ControlDevice #%d\n", i);
+		PRINT(("ControlDevice #%d\n", i));
 		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
 		if (NULL != item)
 		{
@@ -1460,7 +1480,7 @@ status_t InputServer::ControlDevices(const char* deviceName,
 			input_device_ref*   dev = item->mDev;
 			if ( (NULL != isd) && (NULL != dev) )
 			{
-				printf("  Controlling: %s\n", dev->name);
+				PRINT(("  Controlling: %s\n", dev->name));
 				if (deviceType == dev->type)
 				{
 					// :TODO: Descriminate based on Device Name also.
@@ -1553,7 +1573,7 @@ void InputServer::WatchPort()
 		// Block until we find the size of the next message
 		length = port_buffer_size(EventLooperPort);
 		buffer = (char*)malloc(length);
-		printf("[Event Looper] BMessage Size = %lu\n", length);
+		PRINT(("[Event Looper] BMessage Size = %lu\n", length));
 		//event = NULL;
 		BMessage *event = new BMessage();
 		err = read_port(EventLooperPort, &code, buffer, length);
@@ -1563,20 +1583,20 @@ void InputServer::WatchPort()
 			} else {
 				printf("InputServer: read_port error: (0x%lx) %s\n",err,strerror(err));
 			}
-		}else{
+		} else {
 		
 			if ((err = event->Unflatten(buffer)) < 0) {
 				printf("[InputServer] Unflatten() error: (0x%lx) %s\n",err,strerror(err));
 			} else {
-			// This is where the message should be processed.	
-			event->PrintToStream();
-
-			HandleSetMousePosition(event, event);
-						
-			DispatchEvent(event);
-			
-			//printf("Event writen to port\n");
-			delete(event);
+				// This is where the message should be processed.	
+				PRINT_OBJECT(*event);
+	
+				HandleSetMousePosition(event, event);
+							
+				DispatchEvent(event);
+				
+				PRINT(("Event writen to port\n"));
+				delete(event);
 			}
 			
 		}
