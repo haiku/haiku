@@ -1,32 +1,73 @@
 /* 
 ** Copyright 2003-2004, Stefano Ceccherini (burton666@libero.it). All rights reserved.
+**           2004, Michael Pfeiffer (laplace@users.sourceforge.net).
 ** Distributed under the terms of the OpenBeOS License.
+**
+** History
+** 2003-2004  Initial implementation by Stefano Ceccerini.
+** 2004/08/03 Testing, bug fixing and implementation of quick sort by Michael Pfeiffer.
 */
 
-// TODO: we need to include this as _PointerList_ is declared there.
-// I wonder if we should add a PointerList.h file, then ObjectList.h would contain
-// a copy of the declaration
-#include <ObjectList.h>
+// TODO: Implement quick sort
 
-#include <stdlib.h>
+// Note: Method Owning() is inlined in header file ObjectList.h
 
-// TODO: I used bubble sort, which is notably the slowest possible sorting algorithm
-// Why ? Laziness. Fix that!
-// Test the class.
+#include <List.h>
 
 
-typedef int (* GenericCompareFunction)(const void *, const void *);
-typedef int (* GenericCompareFunctionWithState)(const void *, const void *, void *);
+// Declaration of class _PointerList_ is inlined to be independet of the
+// header file ObjectList.h
 
+#ifndef __OBJECT_LIST__
+class _PointerList_ : public BList {
+public:
+	_PointerList_(const _PointerList_ &list);
+	_PointerList_(int32 itemsPerBlock = 20, bool owning = false);
+	~_PointerList_();
 	
-static void *BSearch(const void *key, const void *start,
-					size_t numItems, size_t size,
-					GenericCompareFunction compareFunc);
+	typedef void *(* GenericEachFunction)(void *, void *);
+	typedef int (* GenericCompareFunction)(const void *, const void *);
+	typedef int (* GenericCompareFunctionWithState)(const void *, const void *,
+		void *);
+	typedef int (* UnaryPredicateGlue)(const void *, void *);
 
-static void *BSearchWithState(const void *key, const void *start,
-							size_t numItems, size_t size,
-							GenericCompareFunctionWithState compareFunc, void *state);
+	void *EachElement(GenericEachFunction, void *);
+	void SortItems(GenericCompareFunction);
+	void SortItems(GenericCompareFunctionWithState, void *state);
+	void HSortItems(GenericCompareFunction);
+	void HSortItems(GenericCompareFunctionWithState, void *state);
+	
+	void *BinarySearch(const void *, GenericCompareFunction) const;
+	void *BinarySearch(const void *, GenericCompareFunctionWithState, void *state) const;
 
+	int32 BinarySearchIndex(const void *, GenericCompareFunction) const;
+	int32 BinarySearchIndex(const void *, GenericCompareFunctionWithState, void *state) const;
+	int32 BinarySearchIndexByPredicate(const void *, UnaryPredicateGlue) const;
+
+	bool Owning() const;
+	bool ReplaceItem(int32, void *);
+
+protected:
+	bool owning;
+
+};
+#endif
+
+
+// Forward declarations
+
+static void *BinarySearch(const void *key, const void **items,
+					int32 numItems,
+					_PointerList_::GenericCompareFunction compareFunc,
+					int32& index);
+
+static void *BinarySearch(const void *key, const void **items,
+					int32 numItems,
+					_PointerList_::GenericCompareFunctionWithState compareFunc, void *state,
+					int32& index);
+
+
+// Implementation of class _PointerList_
 
 _PointerList_::_PointerList_(int32 itemsPerBlock, bool own)
 	:
@@ -72,6 +113,7 @@ _PointerList_::EachElement(GenericEachFunction function, void *arg)
 void
 _PointerList_::SortItems(GenericCompareFunction compareFunc)
 {
+
 	if (compareFunc) {
 		int32 numItems = CountItems();
 		if (numItems > 1) {
@@ -85,7 +127,6 @@ _PointerList_::SortItems(GenericCompareFunction compareFunc)
 					}	
 				}
 			}
-
 		}
 	}
 }
@@ -107,7 +148,6 @@ _PointerList_::SortItems(GenericCompareFunctionWithState compareFunc, void *stat
 					}	
 				}
 			}
-
 		}
 	}
 }
@@ -116,23 +156,42 @@ _PointerList_::SortItems(GenericCompareFunctionWithState compareFunc, void *stat
 void
 _PointerList_::HSortItems(GenericCompareFunction sortFunction)
 {
-	//TODO: Does "H" stand for "Heap" ? Should we use Heap Sort here ?
+	const bool hasItems = !IsEmpty();
+	void* firstItem = NULL;
+	if (hasItems) {
+		// append first item after sorting the list
+		firstItem = ItemAt(0);
+		RemoveItem((int32)0);
+	}
 	SortItems(sortFunction);
+	if (hasItems) {
+		AddItem(firstItem);
+	}
 }
 
 
 void
 _PointerList_::HSortItems(GenericCompareFunctionWithState sortFunc, void *state)
 {
-	//TODO: Same as above
+	const bool hasItems = !IsEmpty();
+	void* firstItem = NULL;
+	if (hasItems) {
+		// append first item after sorting the list
+		firstItem = ItemAt(0);
+		RemoveItem((int32)0);
+	}
 	SortItems(sortFunc, state);
+	if (hasItems) {
+		AddItem(firstItem);
+	}
 }
 
 
 void *
 _PointerList_::BinarySearch(const void *key, GenericCompareFunction compareFunc) const
 {
-	return BSearch(key, Items(), CountItems(), sizeof(void *), compareFunc);
+	int32 index;
+	return ::BinarySearch(key, (const void **)Items(), CountItems(), compareFunc, index);
 }
 
 
@@ -140,19 +199,17 @@ void *
 _PointerList_::BinarySearch(const void *key,
 			GenericCompareFunctionWithState compareFunc, void *state) const
 {
-	return BSearchWithState(key, Items(), CountItems(), sizeof(void *), compareFunc, state);
+	int32 index;
+	return ::BinarySearch(key, (const void**)Items(), CountItems(), compareFunc, state, index);
 }
 
 
 int32
 _PointerList_::BinarySearchIndex(const void *key, GenericCompareFunction compareFunc) const
 {
-	void *item = BSearch(key, Items(), CountItems(), sizeof(void *), compareFunc);
-	
-	if (item)
-		return IndexOf(item);
-
-	return -1;
+	int32 index;
+	::BinarySearch(key, (const void**)Items(), CountItems(), compareFunc, index);
+	return index;
 }
 
 
@@ -160,30 +217,39 @@ int32
 _PointerList_::BinarySearchIndex(const void *key,
 			GenericCompareFunctionWithState compareFunc, void *state) const
 {
-	void *item = BSearchWithState(key, Items(), CountItems(),
-									sizeof(void *), compareFunc, state);
-	
-	if (item)
-		return IndexOf(item);
-
-	return -1;
+	int32 index;
+	::BinarySearch(key, (const void**)Items(), CountItems(), compareFunc, state, index);
+	return index;
 }
 
 
 int32
 _PointerList_::BinarySearchIndexByPredicate(const void *key, UnaryPredicateGlue predicate) const
 {
-	int32 numItems = CountItems();
-	int32 result = -1;
-	for (int32 index = 0; index < numItems; index++) {
-		result = predicate(ItemAtFast(index), (void *)key);
-		if (result)
-			break;
+	void** items = (void**)Items();
+	int32 low = 0;
+	int32 high = CountItems()-1;
+	int result = 0;
+	int index = 0;
+	while (low <= high) {
+		index = (low + high) / 2;
+		const void* item = items[index];
+		result = predicate(item, (void*)key);
+		if (result > 0) {
+			high = index - 1;
+		} else if (result < 0) {
+			low = index + 1;
+		} else {
+			return index;
+		}
 	}
-	
-	return result;
-}
 
+	if (result < 0) {
+		index ++;
+	}
+
+	return -(index+1);
+}
 
 bool
 _PointerList_::ReplaceItem(int32 index, void *newItem)
@@ -197,67 +263,60 @@ _PointerList_::ReplaceItem(int32 index, void *newItem)
 	return true;
 }
 
+// Implementation of static functions
 
-static void *
-BSearch(const void *key, const void *start,
-					size_t numItems, size_t size,
-					GenericCompareFunction compareFunc)
-
+static void * BinarySearch(const void* key, const void** items, int32 numItems,
+	_PointerList_::GenericCompareFunction compareFunc, int32& index)
 {
-	const char *base = (const char *)start;
-	const void *p;
-
-	int low;
-	int high;
-	int result;
-	size_t i;
-	for (low = -1, high = numItems; high - low > 1;) {
-		i = (high + low) >> 1;
-		p = (void *)(base + (i * size));
-		
-		result = compareFunc(key, *(void **)p);
-		if (result == 0)
-			break;
-		else if (result < 0)
-			high = i;
-        else
-			low  = i;
-    }
-    
-	if (result == 0)
-		return *(void **)p;
-
+	int32 low = 0;
+	int32 high = numItems-1;
+	int result = 0;
+	index = 0;
+	while (low <= high) {
+		index = (low + high) / 2;
+		const void* item = items[index];
+		result = compareFunc(key, item);
+		if (result < 0) {
+			high = index - 1;
+		} else if (result > 0) {
+			low = index + 1;
+		} else {
+			return (void*)item;
+		}
+	}
+	
+	if (result > 0) {
+		index ++;
+	}
+	
+	index = -(index+1);
 	return NULL;
 }
-
-
-static void *
-BSearchWithState(const void *key, const void *start,
-							size_t numItems, size_t size,
-							GenericCompareFunctionWithState compareFunc, void *state)
+							
+static void * BinarySearch(const void* key, const void** items, int32 numItems,
+	_PointerList_::GenericCompareFunctionWithState compareFunc, void* state, int32& index)
 {
-		const char *base = (const char *)start;
-	const void *p;
+	int32 low = 0;
+	int32 high = numItems-1;
+	int result = 0;
+	index = 0;
+	while (low <= high) {
+		index = (low + high) / 2;
+		const void* item = items[index];
+		result = compareFunc(key, item, state);
+		if (result < 0) {
+			high = index - 1;
+		} else if (result > 0) {
+			low = index + 1;
+		} else {
+			return (void*)item;
+		}
+	}
 
-	int low;
-	int high;
-	int result;
-	size_t i;
-	for (low = -1, high = numItems; high - low > 1;) {
-		i = (high + low) >> 1;
-		p = (void *)(base + (i * size));
-		
-		result = compareFunc(key, *(void **)p, state);
-		if (result == 0)
-			break;
-		else if (result < 0)
-			high = i;
-        else
-			low  = i;
-    }
-    
-	if (result == 0)
-		return *(void **)p;
+	if (result > 0) {
+		index ++;
+	}
 
+	index = -(index+1);
 	return NULL;
 }
