@@ -1612,6 +1612,23 @@ rule BuildPlatformMain
 	C++FLAGS = $(oldC++FLAGS) ;
 }
 
+rule BuildPlatformTest
+{
+	# Usage BuildPlatformTest <target> : <sources> ;
+
+	local target = $(1) ;
+	local sources = $(2) ;
+
+	BuildPlatformMain $(target) : $(sources) ;
+	local relPath ;
+	if [ FIsPrefix src tests : $(SUBDIR_TOKENS) ] {
+		relPath = $(SUBDIR_TOKENS[3-]) ;
+	} else {
+		relPath = $(SUBDIR_TOKENS[2-]) ;
+	}
+	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(relPath) ] ;
+}
+
 rule KernelConfigSection
 {
 	# KernelConfigSection <section> : <type> : <file>  ;
