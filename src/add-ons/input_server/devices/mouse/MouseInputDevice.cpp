@@ -75,7 +75,7 @@ MouseInputDevice::MouseInputDevice()
 	fFd = open("dev/input/mouse/ps2/0", O_RDWR);
 	if (fFd >= 0)
 		fThread = spawn_thread(DeviceWatcher, "mouse watcher thread",
-			B_NORMAL_PRIORITY, this);
+			B_FIRST_REAL_TIME_PRIORITY+4, this);
 
 #if DEBUG
 	sLogFile = fopen("/var/log/mouse_device_log.log", "w");
@@ -218,7 +218,7 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		ioctl(dev->fFd, kGetMouseMovements, &movements);
 		
 		// TODO: send B_MOUSE_UP/B_MOUSE_DOWN messages
-		int32 buttons = dev->fButtons - movements.buttons;
+		uint32 buttons = dev->fButtons ^ movements.buttons;
 	
 		snprintf(log, 128, "buttons: %ld, x: %ld, y: %ld\n", 
 				movements.buttons, movements.xdelta, movements.ydelta);
@@ -230,22 +230,20 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		// for some reason. Check if they reach the input server.
 		if (buttons != 0) {
 			message = new BMessage;				
-			if (buttons < 0) {
-				buttons = -buttons;
+			if (buttons & movements.buttons > 0) {
 				message->what = B_MOUSE_DOWN;
 				LOG("B_MOUSE_DOWN\n");
 				
-			} else if (buttons > 0) {
+			} else {
 				message->what = B_MOUSE_UP;
 				LOG("B_MOUSE_UP\n");
 			}
 			
 			message->AddInt64("when", movements.mouse_time);
-			message->AddInt32("buttons", buttons);
+			message->AddInt32("buttons", movements.buttons);
 			message->AddInt32("clicks", movements.click_count);
-			// TODO: do we need to add the "where" field ? 
-			// I guess not, as the input server will probably know the
-			// cursor position
+			message->AddInt32("x", movements.xdelta);
+			message->AddInt32("y", movements.ydelta);
 			
 			dev->EnqueueMessage(message);
 						
