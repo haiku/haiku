@@ -39,6 +39,7 @@ class Inode {
 		bfs_inode *Node() { return (bfs_inode *)1; }
 
 		off_t Size() const { return fSize; }
+		bool IsContainer() const { return true; }
 		bool IsDirectory() const { return true; }
 
 	private:
