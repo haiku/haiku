@@ -1,46 +1,41 @@
 /* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <fs_query.h>
 
 #include <stdlib.h>
+#include <string.h>
 #include <fcntl.h>
 #include <errno.h>
 
 #include "syscalls.h"
 
-#define RETURN_AND_SET_ERRNO(status) \
-	{ \
-		if (status < 0) { \
-			errno = status; \
-			return -1; \
-		} \
-		return status; \
-	}
 
 // for the DIR structure
 #define BUFFER_SIZE 2048
 
 
-DIR *
-fs_open_query(dev_t device, const char *query, uint32 flags)
+static DIR *
+open_query_etc(dev_t device, const char *query,
+	uint32 flags, port_id port, int32 token)
 {
-	// check parameters
-	if (device < 0 || !query) {
+	if (device < 0 || query == NULL || query[0] == '\0') {
 		errno = B_BAD_VALUE;
 		return NULL;
 	}
+
 	// open
-	int fd = _kern_open_query(device, query, flags, -1, -1);
+	int fd = _kern_open_query(device, query, strlen(query), flags, port, token);
 	if (fd < 0) {
 		errno = fd;
 		return NULL;
 	}
+
 	// allocate a DIR
-	DIR *dir = (DIR*)malloc(BUFFER_SIZE);
+	DIR *dir = (DIR *)malloc(BUFFER_SIZE);
 	if (!dir) {
 		_kern_close(fd);
 		errno = B_NO_MEMORY;
@@ -48,6 +43,13 @@ fs_open_query(dev_t device, const char *query, uint32 flags)
 	}
 	dir->fd = fd;
 	return dir;
+}
+
+
+DIR *
+fs_open_query(dev_t device, const char *query, uint32 flags)
+{
+	return open_query_etc(device, query, flags, -1, -1);
 }
 
 
@@ -56,51 +58,41 @@ fs_open_live_query(dev_t device, const char *query,
 	uint32 flags, port_id port, int32 token)
 {
 	// check parameters
-	if (device < 0 || !query || port < 0) {
+	if (port < 0) {
 		errno = B_BAD_VALUE;
 		return NULL;
 	}
-	flags |= B_LIVE_QUERY;
-	// open
-	int fd = _kern_open_query(device, query, flags, port, token);
-	if (fd < 0) {
-		errno = fd;
-		return NULL;
-	}
-	// allocate a DIR
-	DIR *dir = (DIR*)malloc(BUFFER_SIZE);
-	if (!dir) {
-		_kern_close(fd);
-		errno = B_NO_MEMORY;
-		return NULL;
-	}
-	dir->fd = fd;
-	return dir;
+
+	return open_query_etc(device, query, flags | B_LIVE_QUERY, port, token);
 }
 
 
 int
-fs_close_query(DIR *d)
+fs_close_query(DIR *dir)
 {
-	if (!d)
-		RETURN_AND_SET_ERRNO(B_BAD_VALUE);
-	int fd = d->fd;
-	free(d);
+	if (dir == NULL) {
+		errno = B_BAD_VALUE;
+		return -1;
+	}
+
+	int fd = dir->fd;
+	free(dir);
 	return _kern_close(fd);
 }
 
 
 struct dirent *
-fs_read_query(DIR *d)
+fs_read_query(DIR *dir)
 {
 	// check parameters
-	if (!d) {
+	if (dir == NULL) {
 		errno = B_BAD_VALUE;
 		return NULL;
 	}
+
 	// read
-	int32 bufferSize = BUFFER_SIZE - ((uint8*)&d->ent - (uint8*)d);
-	ssize_t result = _kern_read_dir(d->fd, &d->ent, bufferSize, 1);
+	int32 bufferSize = BUFFER_SIZE - ((uint8 *)&dir->ent - (uint8 *)dir);
+	ssize_t result = _kern_read_dir(dir->fd, &dir->ent, bufferSize, 1);
 	if (result < 0) {
 		errno = result;
 		return NULL;
@@ -109,16 +101,17 @@ fs_read_query(DIR *d)
 		errno = B_ENTRY_NOT_FOUND;
 		return NULL;
 	}
-	return &d->ent;
+	return &dir->ent;
 }
 
 
 status_t
-get_path_for_dirent(struct dirent *dent, char *buf, size_t len)
+get_path_for_dirent(struct dirent *dent, char *buffer, size_t length)
 {
-	if (!dent || !buf)
+	if (dent == NULL || buffer == NULL)
 		return B_BAD_VALUE;
+
 	return _kern_entry_ref_to_path(dent->d_pdev, dent->d_pino, dent->d_name,
-		buf, len);
+		buffer, length);
 }
 
