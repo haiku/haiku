@@ -21,12 +21,15 @@
 //
 //	File Name:		Window.h
 //	Author:			Erik Jaesler (erik@cgsoftware.com)
+//					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	BWindow is the base class for all windows (graphic areas
 //					displayed on-screen).
 //------------------------------------------------------------------------------
 
 #ifndef	_WINDOW_H
 #define	_WINDOW_H
+
+class PortLink;
 
 // Standard Includes -----------------------------------------------------------
 
@@ -404,7 +407,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);
 		BView			*top_view;
 		BView			*fFocus;
 		BView			*fLastMouseMovedView;
-		_BSession_		*a_session;
+		PortLink		*serverlink;
 		BMenuBar		*fKeyMenuBar;
 		BButton			*fDefaultButton;
 		BList			accelList;
