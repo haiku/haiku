@@ -1,6 +1,6 @@
 /*
- * Copyright 2004 Haiku, Inc.
- * Distributed under the terms of the Haiku License.
+ * Copyright 2004-2005 Haiku, Inc.
+ * Distributed under the terms of the MIT License.
  *
  * keyboard.c:
  * PS/2 keyboard device driver
@@ -183,7 +183,7 @@ keyboard_read(void *cookie, off_t pos, void *buffer, size_t *_length)
 {
 	TRACE(("keyboard read()\n"));
 	*_length = 0;
-	return EROFS;
+	return B_NOT_ALLOWED;
 }
 
 
@@ -192,7 +192,7 @@ keyboard_write(void *cookie, off_t pos, const void *buf,  size_t *len)
 {
 	TRACE(("keyboard write()\n"));
 	*len = 0;
-	return EROFS;
+	return B_NOT_ALLOWED;
 }
 
 

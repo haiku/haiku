@@ -1,6 +1,6 @@
 /*
  * Copyright 2001-2005 Haiku, Inc.
- * Distributed under the terms of the Haiku License.
+ * Distributed under the terms of the MIT License.
  *
  * ps2mouse.c:
  * PS/2 mouse device driver
@@ -374,7 +374,7 @@ status_t
 mouse_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
 	*len = 0;
-	return EROFS;
+	return B_NOT_ALLOWED;
 }
 
 
@@ -382,7 +382,7 @@ status_t
 mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 {
 	*len = 0;
-	return EROFS;
+	return B_NOT_ALLOWED;
 }
 
 
