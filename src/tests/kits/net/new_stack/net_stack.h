@@ -39,6 +39,7 @@ typedef struct net_layer_module_info {
 	status_t (*init)(net_layer *me);
 	status_t (*uninit)(net_layer *me);
 	status_t (*enable)(net_layer *me, bool enable);
+	status_t (*control)(net_layer *me, int opcode, ...);
 	status_t (*input_buffer)(net_layer *me, struct net_buffer *buffer);
 	status_t (*output_buffer)(net_layer *me, struct net_buffer *buffer);
 } net_layer_module_info;
@@ -80,20 +81,22 @@ struct net_stack_module_info {
 	 * Net layers handling
 	 */
 	
-	status_t (*register_layer)(const char *name, net_layer_module_info *module, void *cookie, net_layer **me);
-	status_t (*unregister_layer)(net_layer *layer);
+	status_t 	(*register_layer)(const char *name, net_layer_module_info *module, void *cookie, net_layer **me);
+	status_t 	(*unregister_layer)(net_layer *layer);
+	net_layer *	(*find_layer)(const char *name);
 
-	status_t (*add_layer_attribut)(net_layer *layer, const char *name, int type, ...);
-	status_t (*remove_layer_attribut)(net_layer *layer, const char *name);
-	status_t (*find_layer_attribut)(net_layer *layer, const char *name,
+	status_t 	(*add_layer_attribut)(net_layer *layer, const char *name, int type, ...);
+	status_t 	(*remove_layer_attribut)(net_layer *layer, const char *name);
+	status_t 	(*find_layer_attribut)(net_layer *layer, const char *name,
 					int *type, void **attribut, size_t *size);
 	
-	status_t  (*push_buffer_up)(net_layer *me, net_buffer *buffer);
-	status_t  (*push_buffer_down)(net_layer *me, net_buffer *buffer);
+	status_t  	(*push_buffer_up)(net_layer *me, net_buffer *buffer);
+	status_t  	(*push_buffer_down)(net_layer *me, net_buffer *buffer);
 
 	/*
 	 * Buffer(s) support
 	 */
+
 
 	net_buffer *	(*new_buffer)(void);
 	status_t 		(*delete_buffer)(net_buffer *buffer, bool interrupt_safe);
