@@ -32,6 +32,7 @@
 #include "ServerApp.h"
 #include "ServerConfig.h"
 #include "ServerProtocol.h"
+#include "ServerWindow.h"
 
 /*!
 	\brief Constructor
@@ -167,8 +168,7 @@ int32 AppServer::PollerThread(void *data)
 				{
 					if(!msgbuffer)
 						break;
-					// TODO: Uncomment when we have ServerWindow.h
-					//ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
 					break;
 				}
 				
@@ -195,9 +195,7 @@ int32 AppServer::PollerThread(void *data)
 					index+=sizeof(float);
 
 					appserver->_driver->MoveCursorTo(tempx,tempy);
-
-					// TODO: Uncomment when we have ServerWindow.h
-					//ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
+					ServerWindow::HandleMouseEvent(msgcode,msgbuffer);
 					break;
 				}
 				case B_KEY_DOWN:

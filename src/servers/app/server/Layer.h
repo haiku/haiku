@@ -21,8 +21,7 @@
 //
 //	File Name:		Layer.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Class used for rendering to the frame buffer. One layer per 
-//					view on screen and also for window decorators
+//	Description:	Shadow BView class
 //  
 //------------------------------------------------------------------------------
 #ifndef _LAYER_H_
@@ -39,6 +38,14 @@
 class ServerWindow;
 class PortLink;
 
+/*!
+	\class Layer Layer.h
+	\brief Shadow BView class
+	
+	Layers provide all sorts of functionality. They are the shadow class for BViews, 
+	but they also provide the base class for other classes which handle drawing to 
+	the frame buffer, like RootLayer and WindowBorder.
+*/
 class Layer
 {
 public:

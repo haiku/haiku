@@ -36,7 +36,7 @@
 #include "DisplayDriver.h"
 #include "FontServer.h"
 #include "ServerApp.h"
-//#include "ServerWindow.h"
+#include "ServerWindow.h"
 #include "ServerCursor.h"
 #include "ServerBitmap.h"
 #include "ServerProtocol.h"
@@ -89,7 +89,7 @@ ServerApp::~ServerApp(void)
 	int32 i;
 	
 	// TODO: Enable this when we have ServerWindow implemented
-/*	ServerWindow *tempwin;
+	ServerWindow *tempwin;
 	for(i=0;i<_winlist->CountItems();i++)
 	{
 		tempwin=(ServerWindow*)_winlist->ItemAt(i);
@@ -98,7 +98,7 @@ ServerApp::~ServerApp(void)
 	}
 	_winlist->MakeEmpty();
 	delete _winlist;
-*/
+
 	ServerBitmap *tempbmp;
 	for(i=0;i<_bmplist->CountItems();i++)
 	{
@@ -303,8 +303,6 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 		}
 		case CREATE_WINDOW:
 		{
-			// TODO: Uncomment when ServerWindow has been implemented
-/*
 			// Create the ServerWindow to node monitor a new OBWindow
 			
 			// Attached data:
@@ -328,7 +326,7 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 
 			// Create the ServerWindow object for this window
 			ServerWindow *newwin=new ServerWindow(rect,(const char *)index,
-				winlook, winfeel, winflags,this,win_port,workspace);
+				winlook, winfeel, winflags,workspace,this,win_port);
 			_winlist->AddItem(newwin);
 
 			// Window looper is waiting for our reply. Send back the
@@ -339,12 +337,10 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			replylink->Flush();
 
 			delete replylink;
-*/			break;
+			break;
 		}
 		case DELETE_WINDOW:
 		{
-			// TODO: Uncomment when ServerWindow has been implemented
-/*
 			// Received from a ServerWindow when its window quits
 			
 			// Attached data:
@@ -354,14 +350,14 @@ void ServerApp::DispatchMessage(int32 code, int8 *buffer)
 			for(int32 i=0;i<_winlist->CountItems();i++)
 			{
 				w=(ServerWindow*)_winlist->ItemAt(i);
-				if(w->thread==winid)
+				if(w->_monitorthread==winid)
 				{
 					_winlist->RemoveItem(w);
 					delete w;
 					break;
 				}
 			}
-*/			break;
+			break;
 		}
 		case GFX_SET_SCREEN_MODE:
 		{

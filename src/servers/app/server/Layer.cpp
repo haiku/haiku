@@ -25,20 +25,33 @@
 //					view on screen and also for window decorators
 //  
 //------------------------------------------------------------------------------
-#include "Layer.h"
-#include "RectUtils.h"
-//#include "ServerWindow.h"
-#include "PortLink.h"
+#include <View.h>
 #include <string.h>
 #include <stdio.h>
+#include "Layer.h"
+#include "RectUtils.h"
+#include "ServerWindow.h"
+#include "PortLink.h"
+#include "TokenHandler.h"
 
+//! TokenHandler object used to provide IDs for all Layers and, thus, BViews
+TokenHandler view_token_handler;
+
+/*!
+	\brief Constructor
+	\param frame Size and placement of the Layer
+	\param name Name of the layer
+	\param resize Resizing flags as defined in View.h
+	\param flags BView flags as defined in View.h
+	\param win ServerWindow to which the Layer belongs
+*/
 Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWindow *win)
 {
-/*	// frame is in _parent layer's coordinates
+	// frame is in _parent layer's coordinates
 	if(frame.IsValid())
 		_frame=frame;
 	else
-		_frame.Set(0,0,1,1);
+		_frame.Set(0,0,5,5);
 
 	_name=new BString(name);
 
@@ -55,8 +68,8 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 
 	_serverwin=win;
 	
-	// TODO: Can't remember why we have these... Find out why
-	_view_token=0;
+	// We have view tokens to be able to identify BViews
+	_view_token=view_token_handler.GetToken();
 
 	_flags=flags;
 
@@ -66,12 +79,12 @@ Layer::Layer(BRect frame, const char *name, int32 resize, int32 flags,ServerWind
 
 	_level=0;
 	_layerdata=new LayerData;
-*/
 }
 
+//! Destructor frees all allocated heap space
 Layer::~Layer(void)
 {
-/*	if(_visible)
+	if(_visible)
 	{
 		delete _visible;
 		_visible=NULL;
@@ -96,16 +109,21 @@ Layer::~Layer(void)
 		delete _layerdata;
 		_layerdata=NULL;
 	}
-*/
 }
 
-// Tested for adding children with 1 and 2 child cases, but not more
+/*!
+	\brief Adds a child to the back of the a layer's child stack.
+	\param layer The layer to add as a child
+	\param before Add the child in front of this layer
+	\param rebuild Flag to fully rebuild all visibility regions
+*/
 void Layer::AddChild(Layer *layer, Layer *before=NULL, bool rebuild)
 {
-/*	// Adds a layer to the top of the layer's children
+	// TODO: Add before support
+
 	if(layer->_parent!=NULL)
 	{
-		printf("ERROR: AddChild(): View already has a _parent\n");
+		printf("ERROR: AddChild(): Layer already has a _parent\n");
 		return;
 	}
 	layer->_parent=this;
@@ -151,21 +169,26 @@ void Layer::AddChild(Layer *layer, Layer *before=NULL, bool rebuild)
 		_bottomchild=layer;
 	_topchild=layer;
 	layer->_level=_level+1;
-*/
+
+	if(rebuild)
+		RebuildRegions(true);
 }
 
-// Tested for cases with 1 and 2 children, but no more than that
+/*!
+	\brief Removes a layer from the child stack
+	\param layer The layer to remove
+	\param rebuild Flag to rebuild all visibility regions
+*/
 void Layer::RemoveChild(Layer *layer, bool rebuild)
 {
-/*	// Remove a layer from the tree
 	if(layer->_parent==NULL)
 	{
-		printf("ERROR: RemoveChild(): View doesn't have a _parent\n");
+		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
 		return;
 	}
 	if(layer->_parent!=this)
 	{
-		printf("ERROR: RemoveChild(): View is not a child of this layer\n");
+		printf("ERROR: RemoveChild(): Layer is not a child of this layer\n");
 		return;
 	}
 
@@ -191,30 +214,43 @@ void Layer::RemoveChild(Layer *layer, bool rebuild)
 	layer->_uppersibling=NULL;
 	layer->_lowersibling=NULL;
 
-	RebuildRegions();
-*/
+	if(rebuild)
+		RebuildRegions(true);
 }
 
+/*!
+	\brief Removes the layer from its parent's child stack
+	\param rebuild Flag to rebuild visibility regions
+*/
 void Layer::RemoveSelf(bool rebuild)
 {
-/*	// A Layer removes itself from the tree (duh)
+	// A Layer removes itself from the tree (duh)
 	if(_parent==NULL)
 	{
-		printf("ERROR: RemoveSelf(): View doesn't have a _parent\n");
+		printf("ERROR: RemoveSelf(): Layer doesn't have a _parent\n");
 		return;
 	}
+	Layer *p=_parent;
 	_parent->RemoveChild(this);
-*/
+	
+	if(rebuild)
+		p->RebuildRegions(true);
 }
 
+/*!
+	\brief Finds the first child at a given point.
+	\param pt Point to look for a child
+	\param recursive Flag to look for the bottom-most child
+	\return non-NULL if found, NULL if not
+
+	Find out which child gets hit if we click at a certain spot. Returns NULL
+	if there are no _visible children or if the click does not hit a child layer
+	If recursive==true, then it will continue to call until it reaches a layer
+	which has no children, i.e. a layer that is at the top of its 'branch' in
+	the layer tree
+*/
 Layer *Layer::GetChildAt(BPoint pt, bool recursive=false)
 {
-/*	// Find out which child gets hit if we click at a certain spot. Returns NULL
-	// if there are no _visible children or if the click does not hit a child layer
-	// If recursive==true, then it will continue to call until it reaches a layer
-	// which has no children, i.e. a layer that is at the top of its 'branch' in
-	// the layer tree
-	
 	Layer *child;
 	if(recursive)
 	{
@@ -236,29 +272,38 @@ Layer *Layer::GetChildAt(BPoint pt, bool recursive=false)
 		{
 			if(child->_hidecount>0)
 				continue;
-//			if(child->_visible && child->_visible->Contains(ConvertFromTop(pt)))
-//				printf("child hit by mouse. News at 11\n");
 			if(child->_frame.Contains(pt))
 				return child;
 		}
 	}
-*/	return NULL;
+	return NULL;
 }
 
+/*!
+	\brief Returns the size of the layer
+	\return the size of the layer
+*/
 BRect Layer::Bounds(void)
 {
 	return _frame.OffsetToCopy(0,0);
 }
 
+/*!
+	\brief Returns the layer's size and position in its parent coordinates
+	\return The layer's size and position in its parent coordinates
+*/
 BRect Layer::Frame(void)
 {
 	return _frame;
 }
 
+/*!
+	\brief recursively deletes all children (and grandchildren, etc) of the layer
+
+	This is mostly used for server shutdown or deleting a workspace
+*/
 void Layer::PruneTree(void)
 {
-/*	// recursively deletes all children (and grandchildren, etc) of the passed layer
-	// This is mostly used for server shutdown or deleting a workspace
 	Layer *lay,*nextlay;
 
 	lay=_topchild;
@@ -268,7 +313,6 @@ void Layer::PruneTree(void)
 	{
 		if(lay->_topchild!=NULL)
 		{
-//			lay->_topchild->PruneTree();
 			lay->PruneTree();
 		}
 		nextlay=lay->_lowersibling;
@@ -277,12 +321,15 @@ void Layer::PruneTree(void)
 		lay=nextlay;
 	}
 	// Man, this thing is short. Elegant, ain't it? :P
-*/
 }
 
+/*!
+	\brief Finds a layer based on its token ID
+	\return non-NULL if found, NULL if not
+*/
 Layer *Layer::FindLayer(int32 token)
 {
-/*	// recursive search for a layer based on its view token
+	// recursive search for a layer based on its view token
 	Layer *lay, *trylay;
 
 	// Search child layers first
@@ -301,13 +348,19 @@ Layer *Layer::FindLayer(int32 token)
 	}
 	
 	// Well, we got this far in the function, so apparently there is no match to be found
-*/	return NULL;
+	return NULL;
 }
 
-// Tested
+/*!
+	\brief Sets a region as invalid and, thus, needing to be drawn
+	\param The region to invalidate
+	
+	All children of the layer also receive this call, so only 1 Invalidate call is 
+	needed to set a section as invalid on the screen.
+*/
 void Layer::Invalidate(BRegion region)
 {
-/*	int32 i;
+	int32 i;
 	BRect r;
 
 	// See if the region intersects with our current area
@@ -342,23 +395,24 @@ void Layer::Invalidate(BRegion region)
 			delete reg;
 		}
 	}
-*/
 }
 
-// Tested
+/*!
+	\brief Sets a rectangle as invalid and, thus, needing to be drawn
+	\param The rectangle to invalidate
+	
+	All children of the layer also receive this call, so only 1 Invalidate call is 
+	needed to set a section as invalid on the screen.
+*/
 void Layer::Invalidate(BRect rect)
 {
-/*	// Make our own section dirty and pass it on to any children, if necessary....
+	// Make our own section dirty and pass it on to any children, if necessary....
 	// YES, WE ARE SHARING DIRT! Mudpies anyone? :D
-//	if(Frame().Intersects(rect) || Frame().Contains(rect))
 	if(TestRectIntersection(Frame(),rect))
 	{
 		// Clip the rectangle to the _visible region of the layer
-//		if(_visible->Intersects(rect))
 		if(TestRegionIntersection(_visible,rect))
 		{
-//			BRegion reg(rect);
-//			reg.IntersectWith(_visible);
 			BRegion reg(*_visible);
 			IntersectRegionWith(&reg,rect);
 			if(reg.CountRects()>0)
@@ -379,9 +433,12 @@ void Layer::Invalidate(BRect rect)
 	}	
 	for(Layer *lay=_topchild;lay!=NULL; lay=lay->_lowersibling)
 		lay->Invalidate(lay->ConvertFromParent(rect));
-*/
 }
 
+/*!
+	\brief Ask the layer's BView to draw itself
+	\param r The area that needs to be drawn
+*/
 void Layer::RequestDraw(const BRect &r)
 {
 	// TODO: Implement and fix
@@ -406,15 +463,19 @@ void Layer::RequestDraw(const BRect &r)
 */
 }
 
+/*!
+	\brief Determines whether the layer needs to be redrawn
+	\return True if the layer needs to be redrawn, false if not
+*/
 bool Layer::IsDirty(void) const
 {
-//	return _is_dirty;
 	return (!_invalid)?true:false;
 }
 
+//! Show the layer. Operates just like the BView call with the same name
 void Layer::Show(void)
 {
-/*	if(_hidecount==0)
+	if(_hidecount==0)
 		return;
 
 	_hidecount--;
@@ -429,12 +490,12 @@ void Layer::Show(void)
 	Layer *child;
 	for(child=_topchild; child!=NULL; child=child->_lowersibling)
 		child->Show();
-*/
 }
 
+//! Hide the layer. Operates just like the BView call with the same name
 void Layer::Hide(void)
 {
-/*	if(_hidecount==0)
+	if(_hidecount==0)
 	{
 		BRegion *reg=new BRegion(ConvertToParent(_visible));
 		_parent->_visible->Include(reg);
@@ -447,13 +508,15 @@ void Layer::Hide(void)
 	Layer *child;
 	for(child=_topchild; child!=NULL; child=child->_lowersibling)
 		child->Hide();
-*/
 }
 
-// Tested
+/*!
+	\brief Counts the number of children the layer has
+	\return the number of children the layer has, not including grandchildren
+*/
 uint32 Layer::CountChildren(void)
 {
-/*	uint32 i=0;
+	uint32 i=0;
 	Layer *lay=_topchild;
 	while(lay!=NULL)
 	{
@@ -461,12 +524,16 @@ uint32 Layer::CountChildren(void)
 		i++;
 	}
 	return i;
-*/	return 0;
 }
 
+/*!
+	\brief Moves a layer in its parent coordinate space
+	\param x X offset
+	\param y Y offset
+*/
 void Layer::MoveBy(float x, float y)
 {
-/*	BRect oldframe(_frame);
+	BRect oldframe(_frame);
 	_frame.OffsetBy(x,y);
 
 	if(_parent)
@@ -480,31 +547,42 @@ void Layer::MoveBy(float x, float y)
 //	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
 //		lay->MoveBy(x,y);
 //	Invalidate(Frame());
-*/
 }
 
+/*!
+	\brief Resizes the layer.
+	\param x X offset
+	\param y Y offset
+	
+	This resizes the layer itself and resizes any children based on their resize
+	flags.
+*/
 void Layer::ResizeBy(float x, float y)
 {
-/*	BRect oldframe=_frame;
+	// TODO: Implement and test child resizing based on flags
+	
+	BRect oldframe=_frame;
 	_frame.right+=x;
 	_frame.bottom+=y;
 
-	if(_parent)
-		_parent->RebuildRegions();
-	else
-		RebuildRegions();
-
 //	for(Layer *lay=_topchild; lay!=NULL; lay=lay->_lowersibling)
 //		lay->ResizeBy(x,y);
+
+	if(_parent)
+		_parent->RebuildRegions(true);
+	else
+		RebuildRegions(true);
 	if(x<0 || y<0)
 		_parent->Invalidate(oldframe);
-//	Invalidate(Frame());
-*/
 }
 
+/*!
+	\brief Rebuilds visibility regions
+	\param include_children Flag to rebuild all children and subchildren
+*/
 void Layer::RebuildRegions(bool include_children=true)
 {
-/*	BRegion *reg,*reg2;
+	BRegion *reg,*reg2;
 	if(_full)
 		_full->Include(Bounds());
 	else
@@ -562,9 +640,9 @@ void Layer::RebuildRegions(bool include_children=true)
 				lay->RebuildRegions(true);
 		}
 	}
-*/
 }
 
+//! Prints all relevant layer data to stdout
 void Layer::PrintToStream(void)
 {
 	printf("-----------\nLayer %s\n",_name->String());
@@ -606,6 +684,7 @@ void Layer::PrintToStream(void)
 	printf("Is updating = %s\n",(_is_updating)?"yes":"no");
 }
 
+//! Prints hierarchy data to stdout
 void Layer::PrintNode(void)
 {
 	printf("-----------\nLayer %s\n",_name->String());
@@ -637,13 +716,21 @@ void Layer::PrintNode(void)
 		printf("Visible Areas: NULL\n");
 }
 
-// Tested
+/*!
+	\brief Converts the rectangle to the layer's parent coordinates
+	\param the rectangle to convert
+	\return the converted rectangle
+*/
 BRect Layer::ConvertToParent(BRect rect)
 {
 	return (rect.OffsetByCopy(_frame.LeftTop()));
 }
 
-// Tested
+/*!
+	\brief Converts the region to the layer's parent coordinates
+	\param the region to convert
+	\return the converted region
+*/
 BRegion Layer::ConvertToParent(BRegion *reg)
 {
 	BRegion newreg;
@@ -652,13 +739,21 @@ BRegion Layer::ConvertToParent(BRegion *reg)
 	return BRegion(newreg);
 }
 
-// Tested
+/*!
+	\brief Converts the rectangle from the layer's parent coordinates
+	\param the rectangle to convert
+	\return the converted rectangle
+*/
 BRect Layer::ConvertFromParent(BRect rect)
 {
 	return (rect.OffsetByCopy(_frame.left*-1,_frame.top*-1));
 }
 
-// Tested
+/*!
+	\brief Converts the region from the layer's parent coordinates
+	\param the region to convert
+	\return the converted region
+*/
 BRegion Layer::ConvertFromParent(BRegion *reg)
 {
 	BRegion newreg;
@@ -667,7 +762,11 @@ BRegion Layer::ConvertFromParent(BRegion *reg)
 	return BRegion(newreg);
 }
 
-// Tested
+/*!
+	\brief Converts the region to screen coordinates
+	\param the region to convert
+	\return the converted region
+*/
 BRegion Layer::ConvertToTop(BRegion *reg)
 {
 	BRegion newreg;
@@ -676,7 +775,11 @@ BRegion Layer::ConvertToTop(BRegion *reg)
 	return BRegion(newreg);
 }
 
-// Tested
+/*!
+	\brief Converts the rectangle to screen coordinates
+	\param the rectangle to convert
+	\return the converted rectangle
+*/
 BRect Layer::ConvertToTop(BRect rect)
 {
 	if (_parent!=NULL)
@@ -685,7 +788,11 @@ BRect Layer::ConvertToTop(BRect rect)
 		return(rect);
 }
 
-// Tested
+/*!
+	\brief Converts the region from screen coordinates
+	\param the region to convert
+	\return the converted region
+*/
 BRegion Layer::ConvertFromTop(BRegion *reg)
 {
 	BRegion newreg;
@@ -694,7 +801,11 @@ BRegion Layer::ConvertFromTop(BRegion *reg)
 	return BRegion(newreg);
 }
 
-// Tested
+/*!
+	\brief Converts the rectangle from screen coordinates
+	\param the rectangle to convert
+	\return the converted rectangle
+*/
 BRect Layer::ConvertFromTop(BRect rect)
 {
 	if (_parent!=NULL)

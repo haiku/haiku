@@ -21,6 +21,7 @@ Server app_server :
 	CursorManager.cpp
 	Desktop.cpp
 	ServerApp.cpp
+	ServerWindow.cpp
 
 	# Font Classes
 	FontFamily.cpp
