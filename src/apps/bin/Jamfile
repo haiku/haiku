@@ -21,6 +21,11 @@ StdBinCommands
 	yes.cpp
 	: be ;
 
+#UsePrivateHeaders kernel ;
+#StdBinCommands
+#	factor.cpp
+#	: be ;	
+
 StdBinCommands
 	translate.cpp
 	: be translation ;
