@@ -50,7 +50,6 @@
 #include "Utils.h"
 #include "DisplayDriver.h"
 #include "ServerPicture.h"
-#include "CursorManager.h"
 #include "Workspace.h"
 
 //#define DEBUG_SERVERWINDOW
@@ -1020,14 +1019,14 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		}
 		case AS_LAYER_CURSOR:
 		{
-			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s\n",fTitle.String(), cl->fName->String()));
+			DTRACE(("ServerWindow %s: Message AS_LAYER_CURSOR: Layer: %s - NOT IMPLEMENTED\n",fTitle.String(), cl->fName->String()));
 			int32 token;
 
 			link.Read<int32>(&token);
-			
-printf("AS_LAYER_CURSOR: not yet available\n");
-//			cursormanager->SetCursor(token);
 
+			// TODO: implement; I think each Layer should have a member pointing
+			// to this requested cursor.
+			
 			break;
 		}
 		case AS_LAYER_SET_FLAGS:

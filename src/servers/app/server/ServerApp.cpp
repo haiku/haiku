@@ -113,8 +113,11 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, port_id clientLooperPort
 	fIsActive=false;
 	
 	fSharedMem=new AreaPool;
-	
-	ServerCursor *defaultc=cursormanager->GetCursor(B_CURSOR_DEFAULT);
+
+	// although this isn't pretty, ATM we have only one RootLayer.
+	// there should be a way that this ServerApp be attached to a particular
+	// RootLayer to know which RootLayer's cursor to modify.
+	ServerCursor *defaultc=desktop->ActiveRootLayer()->GetCursorManager().GetCursor(B_CURSOR_DEFAULT);
 	
 	fAppCursor=(defaultc)?new ServerCursor(defaultc):NULL;
 	fAppCursor->SetOwningTeam(fClientTeamID);
@@ -169,7 +172,10 @@ ServerApp::~ServerApp(void)
 //	if(fAppCursor)
 //		delete fAppCursor;
 
-	cursormanager->RemoveAppCursors(fClientTeamID);
+	// although this isn't pretty, ATM we have only one RootLayer.
+	// there should be a way that this ServerApp be attached to a particular
+	// RootLayer to know which RootLayer's cursor to modify.
+	desktop->ActiveRootLayer()->GetCursorManager().RemoveAppCursors(fClientTeamID);
 	delete_sem(fLockSem);
 	
 	STRACE(("#ServerApp %s:~ServerApp()\n",fSignature.String()));
@@ -278,13 +284,11 @@ void ServerApp::Activate(bool value)
 //! Sets the cursor to the application cursor, if any.
 void ServerApp::SetAppCursor(void)
 {
-debugger("ServerApp::SetAppCursor() not yet available\n");
-/*
+	// although this isn't pretty, ATM we have only one RootLayer.
+	// there should be a way that this ServerApp be attached to a particular
+	// RootLayer to know which RootLayer's cursor to modify.
 	if(fAppCursor)
-		cursormanager->SetCursor(fAppCursor->ID());
-	else
-		cursormanager->SetCursor(B_CURSOR_DEFAULT);
-*/
+		desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
 }
 
 /*!
@@ -767,24 +771,30 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 		case AS_SHOW_CURSOR:
 		{
 			STRACE(("ServerApp %s: Show Cursor\n",fSignature.String()));
-printf("AS_SHOW_CURSOR: not yet available\n");
-//			cursormanager->ShowCursor();
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			desktop->ActiveRootLayer()->GetDisplayDriver()->ShowCursor();
 			fCursorHidden=false;
 			break;
 		}
 		case AS_HIDE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Hide Cursor\n",fSignature.String()));
-printf("AS_HIDE_CURSOR: not yet available\n");
-//			cursormanager->HideCursor();
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			desktop->ActiveRootLayer()->GetDisplayDriver()->HideCursor();
 			fCursorHidden=true;
 			break;
 		}
 		case AS_OBSCURE_CURSOR:
 		{
 			STRACE(("ServerApp %s: Obscure Cursor\n",fSignature.String()));
-printf("AS_OBSCURE_CURSOR: not yet available\n");
-//			cursormanager->ObscureCursor();
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			desktop->ActiveRootLayer()->GetDisplayDriver()->ObscureCursor();
 			break;
 		}
 		case AS_QUERY_CURSOR_HIDDEN:
@@ -813,14 +823,16 @@ printf("AS_OBSCURE_CURSOR: not yet available\n");
 			// otherwise be easy to crash the server by calling SetCursor a
 			// sufficient number of times
 			if(fAppCursor)
-				cursormanager->DeleteCursor(fAppCursor->ID());
+				desktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(fAppCursor->ID());
 
 			fAppCursor=new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
-			cursormanager->AddCursor(fAppCursor);
-printf("AS_SET_CURSOR_DATA: not yet available\n");
-//			cursormanager->SetCursor(fAppCursor->ID());
+			desktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(fAppCursor);
 			break;
 		}
 		case AS_SET_CURSOR_BCURSOR:
@@ -839,8 +851,12 @@ printf("AS_SET_CURSOR_DATA: not yet available\n");
 			if(sync)
 				msg.Read<int32>(&replyport);
 			
-printf("AS_SET_CURSOR_BCURSOR: not yet available\n");
-//			cursormanager->SetCursor(ctoken);
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			ServerCursor	*cursor;
+			if ((cursor = desktop->ActiveRootLayer()->GetCursorManager().FindCursor(ctoken)))
+				desktop->ActiveRootLayer()->GetDisplayDriver()->SetCursor(cursor);
 			
 			if(sync)
 			{
@@ -868,7 +884,10 @@ printf("AS_SET_CURSOR_BCURSOR: not yet available\n");
 			fAppCursor=new ServerCursor(cdata);
 			fAppCursor->SetOwningTeam(fClientTeamID);
 			fAppCursor->SetAppSignature(fSignature.String());
-			cursormanager->AddCursor(fAppCursor);
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			desktop->ActiveRootLayer()->GetCursorManager().AddCursor(fAppCursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
 			replylink.SetSendPort(replyport);
@@ -888,7 +907,10 @@ printf("AS_SET_CURSOR_BCURSOR: not yet available\n");
 			if(fAppCursor && fAppCursor->ID()==ctoken)
 				fAppCursor=NULL;
 			
-			cursormanager->DeleteCursor(ctoken);
+			// although this isn't pretty, ATM we have only one RootLayer.
+			// there should be a way that this ServerApp be attached to a particular
+			// RootLayer to know which RootLayer's cursor to modify.
+			desktop->ActiveRootLayer()->GetCursorManager().DeleteCursor(ctoken);
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:
