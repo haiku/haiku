@@ -65,7 +65,9 @@ swap_int16(void *buffer, size_t bytecount)
 	//          output operand outputting to an unused dummy variable.
 	uint32 dummy1;
 	uint32 dummy2;
-	asm (
+	 // GCC is way too smart and will remove the complete asm statement
+	 // if we do not specify it as __volatile__. Don't remove that!
+	__asm__ __volatile__ (
 	"pushl	%%ebx	\n\t"
 	"movl	%%eax, %%ebx	\n\t"
 	"movl	%%edx, %%eax	\n\t"
