@@ -13,6 +13,7 @@
 #include <Messenger.h>
 #include <Partition.h>
 #include <Path.h>
+#include <ObjectList.h>
 #include <OS.h>
 #include <Session.h>
 
@@ -78,6 +79,15 @@ public:
 	virtual bool Visit(BDiskDevice *device)
 	{
 		printf("device `%s'\n", device->Path());
+		BString name;
+		if (device->GetName(&name, false, false) == B_OK)
+			printf("  name(0,0):     `%s'\n", name.String());
+		if (device->GetName(&name, false, true) == B_OK)
+			printf("  name(0,1):     `%s'\n", name.String());
+		if (device->GetName(&name, true, false) == B_OK)
+			printf("  name(1,0):     `%s'\n", name.String());
+		if (device->GetName(&name, true, true) == B_OK)
+			printf("  name(1,1):     `%s'\n", name.String());
 		printf("  size:          %lld\n", device->Size());
 		printf("  block size:    %ld\n", device->BlockSize());
 		printf("  read-only:     %d\n", device->IsReadOnly());
@@ -117,12 +127,40 @@ public:
 	}
 };
 
+// print_time
+void
+print_time(const char *format, bigtime_t &time)
+{
+	bigtime_t lastTime = time;
+	time = system_time();
+	printf("%lld: %s took: %lld us\n", time, format, time - lastTime);
+}
+
 // TestApp
 class TestApp : public BApplication {
 public:
 	TestApp(const char *signature)
-		: BApplication(signature)
+		: BApplication(signature),
+		  fDevices(20, true)
 	{
+		BDiskDeviceRoster roster;
+		bool done = false;
+		do {
+			BDiskDevice *device = new BDiskDevice;
+			done = (roster.GetNextDevice(device) != B_OK);
+			if (done)
+				delete device;
+			else
+				fDevices.AddItem(device);
+		} while (!done);
+	}
+
+	~TestApp()
+	{
+		for (int32 i = 0; BDiskDevice *device = fDevices.ItemAt(i); i++) {
+			status_t error = device->Eject(true);
+			printf("eject device `%s': %s\n", device->Path(), strerror(error));
+		}
 	}
 
 	virtual void MessageReceived(BMessage *message)
@@ -248,8 +286,31 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 	// MediaChanged
 	void MediaChanged(BMessage *message)
 	{
+bigtime_t time = system_time();
 		printf("TestApp::MediaChanged()\n");
 		PrintDeviceInfo(message);
+print_time("PrintDeviceInfo()", time);
+		int32 id;
+		if (message->FindInt32("device_id", &id) == B_OK) {
+			for (int32 i = 0; BDiskDevice *device = fDevices.ItemAt(i); i++) {
+				if (device->UniqueID() == id) {
+					bool updated;
+print_time("finding device", time);
+					status_t error = device->Update(&updated);
+print_time("updating device", time);
+					printf("updated: %d\n", updated);
+					if (error == B_OK) {
+						DumpVisitor visitor;
+						device->Traverse(&visitor);
+print_time("dumping device", time);
+					} else {
+						printf("device->Update() failed: %s\n",
+							   strerror(error));
+					}
+					break;
+				}
+			}
+		}
 	}
 
 	// DeviceAdded
@@ -305,15 +366,24 @@ printf("TestApp::MessageReceived(%.4s)\n", (char*)&message->what);
 	// PrintDeviceInfo
 	void PrintDeviceInfo(BMessage *message)
 	{
+bigtime_t time = system_time();
 		int32 deviceID;
 		if (message->FindInt32("device_id", &deviceID) == B_OK) {
+print_time("finding device_id", time);
 			BDiskDeviceRoster roster;
+print_time("creating roster", time);
 			BDiskDevice device;
 			if (roster.GetDeviceWithID(deviceID, &device) == B_OK)
+{
+print_time("getting device", time);
 				DumpVisitor().Visit(&device);
+print_time("dumping device", time);
+}
 		}
 	}
 
+private:
+	BObjectList<BDiskDevice>	fDevices;
 };
 
 // main
