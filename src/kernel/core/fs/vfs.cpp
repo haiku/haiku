@@ -158,6 +158,8 @@ static struct vnode *sRoot;
 static hash_table *sMountsTable;
 static mount_id sNextMountID = 1;
 
+mode_t __gUmask = 022;
+
 // This can be used by other code to see if there is a boot file system already
 dev_t gBootDevice = -1;
 
