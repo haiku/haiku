@@ -693,6 +693,23 @@ BTranslationUtils::WriteStyledEditFile(BTextView *fromView, BFile *intoFile)
 	amtWritten = intoFile->WriteAttr("BEOS:TYPE", 'MIMS', 0, "text/plain", 11);
 	if ((size_t) amtWritten != 11)
 		return B_ERROR;
+		
+	// wrap
+	// word wrap setting, turned on by default
+	int32 nwrap = ((fromView->DoesWordWrap()) ? 1 : 0);
+	amtWritten = intoFile->WriteAttr("wrap", B_INT32_TYPE, 0,
+		&nwrap, sizeof(int32));
+	if (amtWritten != sizeof(int32))
+		return B_ERROR;
+		
+	// alignment
+	// alignment, either B_ALIGN_LEFT, B_ALIGN_RIGHT or B_ALIGN_CENTER,
+	// default is B_ALIGN_LEFT
+	int32 nalignment = fromView->Alignment();
+	amtWritten = intoFile->WriteAttr("alignment", B_INT32_TYPE, 0,
+		&nalignment, sizeof(int32));
+	if (amtWritten != sizeof(int32))
+		return B_ERROR;
 	
 	text_run_array *pRunArray = fromView->RunArray(0, fromView->TextLength());
 	if (pRunArray == NULL)
