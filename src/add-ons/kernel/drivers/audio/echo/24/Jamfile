@@ -10,7 +10,7 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 # set some additional defines
 {
 	SubDirCcFlags -DECHO_BEOS -DECHO24_FAMILY ;
-	SubDirC++Flags -DECHO_BEOS -DECHO24_FAMILY ;
+	SubDirC++Flags -DECHO_BEOS -DECHO24_FAMILY -fno-rtti ;
 }
 
 R5KernelAddon echo24 : kernel drivers bin :
