@@ -21,9 +21,9 @@
 
 struct avi_cookie
 {
-	int 		stream;
+	unsigned	stream;
 	char *		buffer;
-	int			buffer_size;
+	unsigned	buffer_size;
 
 	int64		frame_count;
 	bigtime_t 	duration;
@@ -258,7 +258,7 @@ aviReader::AllocateCookie(int32 streamNumber, void **_cookie)
 		}
 
 		cookie->frame_count = stream_header->length;
-		cookie->duration = ((int64)cookie->frame_count * (int64)cookie->frames_per_sec_rate * 1000000LL) / cookie->frames_per_sec_scale;
+		cookie->duration = (cookie->frame_count * (int64)cookie->frames_per_sec_scale * 1000000LL) / cookie->frames_per_sec_rate;
 		
 		TRACE("frame_count %Ld\n", cookie->frame_count);
 		TRACE("duration %.6f (%Ld)\n", cookie->duration / 1E6, cookie->duration);
@@ -372,7 +372,7 @@ aviReader::GetNextChunk(void *_cookie,
 
 	*chunkBuffer = cookie->buffer;
 	*chunkSize = size;
-	return size == fFile->Source()->ReadAt(start, cookie->buffer, size) ? B_OK : B_LAST_BUFFER_ERROR;
+	return (int)size == fFile->Source()->ReadAt(start, cookie->buffer, size) ? B_OK : B_LAST_BUFFER_ERROR;
 }
 
 
