@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, Haiku
+//	Copyright (c) 2001-2005, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -43,12 +43,11 @@
 extern "C" void _init_global_fonts();
 extern "C" status_t _fini_interface_kit_();
 
-#include "InputServerTypes.h"
-extern status_t _control_input_server_(BMessage *command, BMessage *reply);
+#include <InputServerTypes.h>
+#include <input_globals.h>
 
 using namespace BPrivate;
 
-// InterfaceDefs.h
 
 _IMPEXP_BE const color_map *
 system_colors()
@@ -597,6 +596,23 @@ tint_color(rgb_color color, float tint)
 }
 
 
+static status_t
+load_menu_settings(menu_info &into)
+{
+	// TODO: Load settings from the settings file,
+	// and only if it fails, fallback to the defaults
+
+	into.font_size = be_plain_font->Size();
+	be_plain_font->GetFamilyAndStyle(&into.f_family, &into.f_style);
+	into.background_color = ui_color(B_MENU_BACKGROUND_COLOR);
+	into.separator = 0;
+	into.click_to_open = false;
+	into.triggers_always_shown = false;
+
+	return B_OK;
+}
+
+
 extern "C" status_t
 _init_interface_kit_()
 {
@@ -607,13 +623,11 @@ _init_interface_kit_()
 	BTextView::sWidthAtom = 0;
 	BTextView::sWidths = new _BWidthBuffer_;
 	
-	// TODO: get_menu_info() copies the BMenu::sMenuInfo struct
-	// to the passed menu_info, so we can't use it here.
-	// We should probably load the ui settings from the disk	
+	status_t status = load_menu_settings(BMenu::sMenuInfo);
 
 	// TODO: fill the other static members
 		
-	return B_OK;
+	return status;
 }
 
 
