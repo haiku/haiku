@@ -11,4 +11,4 @@ Addon <userland>ipcp : userland obos_network ppp :
 	Protocol.cpp
 ;
 
-LinkSharedOSLibs <userland>ipcp : <userland>libkernelppp.a <installed>net_stack_tester be net ;
+LinkSharedOSLibs <userland>ipcp : <userland>libkernelppp.a <installed>net_stack_tester be bind ;
