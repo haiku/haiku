@@ -112,6 +112,10 @@ class DisplayDriver {
 								DisplayDriver();
 	virtual						~DisplayDriver();
 
+	// when implementing, be sure to call the inherited version
+	virtual bool				Initialize();
+	virtual void				Shutdown();
+
 	// Graphics calls implemented in DisplayDriver
 	virtual	void				CopyBits(		const BRect &src,
 												const BRect &dest,
@@ -296,8 +300,6 @@ class DisplayDriver {
 	
 	
 	// Virtual methods which need to be implemented by each subclass
-	virtual bool				Initialize();
-	virtual void				Shutdown();
 
 	// These two will rarely be implemented by subclasses,
 	// but it still needs to be possible
