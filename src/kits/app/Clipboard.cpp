@@ -63,8 +63,8 @@ BClipboard::BClipboard(const char *name, bool transient = false)
     BMessage handlerMessage(B_REG_ADD_CLIPBOARD), handlerReply;
     int32 result;
     if ( (handlerMessage.AddString("name",fName) == B_OK) &&
-         (fClipHandler.SendMessage(&message, &reply) == B_OK) )
-      reply.FindInt32("result",&result);
+         (fClipHandler.SendMessage(&handlerMessage, &handlerReply) == B_OK) )
+      handlerReply.FindInt32("result",&result);
   }
 }
 //------------------------------------------------------------------------------
@@ -106,7 +106,11 @@ status_t BClipboard::StartWatching(BMessenger target)
   if ( (message.AddString("name",fName) == B_OK) &&
        (message.AddMessenger("target", target ) == B_OK) &&
        (fClipHandler.SendMessage(&message, &reply) == B_OK) )
-    return B_OK;
+  {
+    int32 result;
+    reply.FindInt32("result",&result);
+    return result;
+  }
   return B_ERROR;
 }
 //------------------------------------------------------------------------------
@@ -116,7 +120,11 @@ status_t BClipboard::StopWatching(BMessenger target)
   if ( (message.AddString("name",fName) == B_OK) &&
        (message.AddMessenger("target", target ) == B_OK) &&
        (fClipHandler.SendMessage(&message, &reply) == B_OK) )
-    return B_OK;
+  {
+    int32 result;
+    reply.FindInt32("result",&result);
+    return result;
+  }
   return B_ERROR;
 }
 //------------------------------------------------------------------------------
