@@ -374,6 +374,11 @@ AudioMixer::FormatChanged(const media_source &producer, const media_destination 
 	
 	if (consumer.port != ControlPort() || consumer.id == 0)
 		return B_MEDIA_BAD_DESTINATION;
+
+	if (fCore->Settings()->RefuseInputFormatChange()) {
+		TRACE("AudioMixer::FormatChanged: input format change refused\n");
+		return B_ERROR;
+	}
 	
 	// XXX we should not apply the format change at this point
 
@@ -437,12 +442,15 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	// another format, we need to check if the format is acceptable and
 	// remove any wildcards before returning OK.
 	
-	return B_ERROR;
-	
-	fCore->Lock();
-	
 	TRACE("AudioMixer::FormatChangeRequested\n");
-	
+
+	if (fCore->Settings()->RefuseOutputFormatChange()) {
+		TRACE("AudioMixer::FormatChangeRequested: output format change refused\n");
+		return B_ERROR;
+	}
+
+	fCore->Lock();
+
 	MixerOutput *output = fCore->Output();
 	if (!output) {
 		ERROR("AudioMixer::FormatChangeRequested: no output\n");
@@ -1011,13 +1019,14 @@ AudioMixer::Gain_to_dB(float gain)
 #define PARAM_DST_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x6)
 #define PARAM_MUTE(id)						(((id) << 16) | 0x7)
 #define PARAM_GAIN(id)						(((id) << 16) | 0x8)
-#define PARAM_STR1(id)						(((id) << 16) | 0x9)
-#define PARAM_STR2(id)						(((id) << 16) | 0xa)
-#define PARAM_STR3(id)						(((id) << 16) | 0xb)
-#define PARAM_STR4(id)						(((id) << 16) | 0xc)
-#define PARAM_STR5(id)						(((id) << 16) | 0xd)
-#define PARAM_STR6(id)						(((id) << 16) | 0xe)
-#define PARAM_STR7(id)						(((id) << 16) | 0xf)
+#define PARAM_BALANCE(id)					(((id) << 16) | 0x9)
+#define PARAM_STR1(id)						(((id) << 16) | ((1) << 10) | 0xa)
+#define PARAM_STR2(id)						(((id) << 16) | ((2) << 10) | 0xa)
+#define PARAM_STR3(id)						(((id) << 16) | ((3) << 10) | 0xa)
+#define PARAM_STR4(id)						(((id) << 16) | ((4) << 10) | 0xa)
+#define PARAM_STR5(id)						(((id) << 16) | ((5) << 10) | 0xa)
+#define PARAM_STR6(id)						(((id) << 16) | ((6) << 10) | 0xa)
+#define PARAM_STR7(id)						(((id) << 16) | ((7) << 10) | 0xa)
 
 #define PARAM(id)							((id) >> 16)
 #define ETC(id)								((id) >> 16)
@@ -1030,6 +1039,7 @@ AudioMixer::Gain_to_dB(float gain)
 #define PARAM_IS_ETC(id)					(((id) & 0xf) == 0x4)
 #define PARAM_IS_MUTE(id)					(((id) & 0xf) == 0x7)
 #define PARAM_IS_GAIN(id)					(((id) & 0xf) == 0x8)
+#define PARAM_IS_BALANCE(id)				(((id) & 0xf) == 0x9)
 
 
 status_t 
@@ -1087,7 +1097,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		}
 	} else if (param == 0) {
 		MixerOutput *output = fCore->Output();
-		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id)))
+		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id) && !PARAM_IS_BALANCE(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// output mute control
@@ -1098,11 +1108,30 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// output gain control
-			if (*ioSize < output->GetOutputChannelCount() * sizeof(float))
+			if (fCore->Settings()->UseBalanceControl() && output->GetOutputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+				// single channel control + balance
+				if (*ioSize < sizeof(float))
+					goto err;
+				*ioSize = sizeof(float);
+				static_cast<float *>(value)[0] = GAIN_TO_DB((output->GetOutputChannelGain(0) + output->GetOutputChannelGain(1)) / 2);
+			} else {
+				// multi channel control
+				if (*ioSize < output->GetOutputChannelCount() * sizeof(float))
+					goto err;
+				*ioSize = output->GetOutputChannelCount() * sizeof(float);
+				for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
+					static_cast<float *>(value)[chan] = GAIN_TO_DB(output->GetOutputChannelGain(chan));
+			}
+		}
+		if (PARAM_IS_BALANCE(id)) {
+			float l = output->GetOutputChannelGain(0);
+			float r = output->GetOutputChannelGain(1);
+			float v = r / (l+r);
+			TRACE("balance l %1.3f, r %1.3f, v %1.3f\n",l,r,v);
+			if (*ioSize < sizeof(float))
 				goto err;
-			*ioSize = output->GetOutputChannelCount() * sizeof(float);
-			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-				static_cast<float *>(value)[chan] = GAIN_TO_DB(output->GetOutputChannelGain(chan));
+			*ioSize = sizeof(float);
+			static_cast<float *>(value)[0] = v * 100;
 		}
 		if (PARAM_IS_SRC_ENABLE(id)) {
 			if (*ioSize < sizeof(int32))
@@ -1240,7 +1269,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		}
 	} else if (param == 0) {
 		MixerOutput *output = fCore->Output();
-		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id)))
+		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id) && !PARAM_IS_BALANCE(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// output mute control
@@ -1250,10 +1279,34 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// output gain control
-			if (size < output->GetOutputChannelCount() * sizeof(float))
-				goto err;
-			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
-				output->SetOutputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+			if (fCore->Settings()->UseBalanceControl() && output->GetOutputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+				// single channel control + balance
+				float l = output->GetOutputChannelGain(0);
+				float r = output->GetOutputChannelGain(1);
+				float m = (l + r) / 2;	// master volume
+				float v = DB_TO_GAIN(static_cast<const float *>(value)[0]);
+				float f = v / m;		// factor for both channels
+				TRACE("gain set l %1.3f, r %1.3f, m %1.3f, v %1.3f, f %1.3f\n",l,r,m,v,f);
+				output->SetOutputChannelGain(0, output->GetOutputChannelGain(0) * f);
+				output->SetOutputChannelGain(1, output->GetOutputChannelGain(1) * f);
+			} else {
+				// multi channel control
+				if (size < output->GetOutputChannelCount() * sizeof(float))
+					goto err;
+				for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
+					output->SetOutputChannelGain(chan, DB_TO_GAIN(static_cast<const float *>(value)[chan]));
+			}
+		}
+		if (PARAM_IS_BALANCE(id)) {
+			float l = output->GetOutputChannelGain(0);
+			float r = output->GetOutputChannelGain(1);
+			float m = (l + r) / 2;	// master volume
+			float v = static_cast<const float *>(value)[0] / 100; // current balance value
+			float fl = 2 * (1 - v);	// left channel factor of master volume
+			float fr = 2 * v;		// right channel factor of master volume
+			TRACE("balance set l %1.3f, r %1.3f, m %1.3f, v %1.3f, fl %1.3f, fr %1.3f\n",l,r,m,v,fl,fr);
+			output->SetOutputChannelGain(0, m * fl);
+			output->SetOutputChannelGain(1, m * fr);
 		}
 		if (PARAM_IS_SRC_ENABLE(id)) {
 			if (size != sizeof(int32))
@@ -1357,8 +1410,15 @@ AudioMixer::UpdateParameterWeb()
 	} else {
 		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, StringForFormat(buf, out), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
-		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
-									   ->SetChannelCount(out->GetOutputChannelCount()); 
+		if (fCore->Settings()->UseBalanceControl() && out->GetOutputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+			// single channel control + balance
+			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1);
+			group->MakeContinuousParameter(PARAM_BALANCE(0), B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
+		} else {
+			// multi channel control
+			group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", DB_MIN, DB_MAX, 0.1)
+										   ->SetChannelCount(out->GetOutputChannelCount()); 
+		}
 		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
 	}
 
@@ -1371,12 +1431,26 @@ AudioMixer::UpdateParameterWeb()
 		//     as you don't know what channel each slider controls. Tooltips might help...
 		if (fCore->Settings()->InputGainControls() == 0) {
 			// Physical input channels
-			group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1) 
-										   ->SetChannelCount(in->GetInputChannelCount()); 
+			if (fCore->Settings()->UseBalanceControl() && in->GetInputChannelCount() == 2 && 1 /*channel mask is stereo */) {
+				// single channel control + balance
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1);
+				group->MakeContinuousParameter(PARAM_BALANCE(in->ID()), B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
+			} else {
+				// multi channel control
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1) 
+											   ->SetChannelCount(in->GetInputChannelCount());
+			}
 		} else {
 			// Virtual output channels
-			group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1) 
-										   ->SetChannelCount(in->GetMixerChannelCount()); 
+			if (fCore->Settings()->UseBalanceControl() && in->GetMixerChannelCount() == 2 && 1 /*channel mask is stereo */) {
+				// single channel control + balance
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1);
+				group->MakeContinuousParameter(PARAM_BALANCE(in->ID()), B_MEDIA_RAW_AUDIO, "", B_BALANCE, "", 0, 100, 1);
+			} else {
+				// multi channel control
+				group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", DB_MIN, DB_MAX, 0.1) 
+											   ->SetChannelCount(in->GetMixerChannelCount());
+			}
 		}
 		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
