@@ -28,6 +28,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) mime ] ;
 
 SharedLibrary storage :
 	# storage
+	AppFileInfo.cpp
 	Directory.cpp
 	Entry.cpp
 	EntryList.cpp
@@ -36,7 +37,7 @@ SharedLibrary storage :
 	Mime.cpp
 	MimeType.cpp
 	Node.cpp
-	#NodeInfo.cpp
+	NodeInfo.cpp
 	OffsetFile.cpp
 	Path.cpp
 	Query.cpp
