@@ -8,6 +8,7 @@
 #include "FindDirectoryTest.h"
 #include "MimeTypeTest.h"
 #include "NodeTest.h"
+#include "ParserTest.h"
 #include "PathTest.h"
 #include "QueryTest.h"
 #include "ResourcesTest.h"
@@ -29,6 +30,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BResourceStrings", ResourceStringsTest::Suite());
 	suite->addTest("BSymLink", SymLinkTest::Suite());
 	suite->addTest("FindDirectory", FindDirectoryTest::Suite());
+	suite->addTest("SnifferParser", ParserTest::Suite());
 	
 	return suite;
 }

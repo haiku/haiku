@@ -11,6 +11,7 @@ CommonTestLib libstoragetest.so
 		FileTest.cpp
 		MimeTypeTest.cpp
 		NodeTest.cpp
+		ParserTest.cpp
 		PathTest.cpp
 		QueryTest.cpp
 		ResourcesTest.cpp
