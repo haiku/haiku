@@ -667,37 +667,45 @@ status_t nv_acc_init_dma()
 	si->engine.dma.free = /*si->dma.*/max - si->engine.dma.current /*+ 1*/;
 
 	/*** init FIFO via DMA command buffer. ***/
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH0, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH0 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(0x80000000 | si->engine.fifo.handle[0]); /* Raster OPeration */
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH1, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH1 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(0x80000000 | si->engine.fifo.handle[1]); /* Clip */
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH2, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH2 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(0x80000000 | si->engine.fifo.handle[2]); /* Pattern */
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH3, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH3 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(0x80000000 | si->engine.fifo.handle[3]); /* 2D Surface */
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH4, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH4 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(0x80000000 | si->engine.fifo.handle[4]); /* Blit */
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH5, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH5 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		(0x80000000 | si->engine.fifo.handle[5]); /* Bitmap */
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH6, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH6 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
 //		(0x80000000 | si->engine.fifo.handle[6]); /* Line (not used or 3D only?) */
 		(0x80000000 | si->engine.fifo.handle[0]);
 
-	nv_acc_cmd_dma(NV_GENERAL_FIFO_CH7, NV_GENERAL_CMDHANDLE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(NV_GENERAL_FIFO_CH7 | (1 << 18));
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
 //		(0x80000000 | si->engine.fifo.handle[7]); /* Textured Triangle (3D only) */
@@ -862,27 +870,33 @@ void nv_acc_assert_fifo_dma(void)
 		}
 
 		/* program new FIFO assignments */
-		nv_acc_cmd_dma(NV_GENERAL_FIFO_CH0, NV_GENERAL_CMDHANDLE, 1);
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			(NV_GENERAL_FIFO_CH0 | (1 << 18));
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[0]); /* Raster OPeration */
 
-		nv_acc_cmd_dma(NV_GENERAL_FIFO_CH1, NV_GENERAL_CMDHANDLE, 1);
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			(NV_GENERAL_FIFO_CH1 | (1 << 18));
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[1]); /* Clip */
 
-		nv_acc_cmd_dma(NV_GENERAL_FIFO_CH2, NV_GENERAL_CMDHANDLE, 1);
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			(NV_GENERAL_FIFO_CH2 | (1 << 18));
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[2]); /* Pattern */
 
-		nv_acc_cmd_dma(NV_GENERAL_FIFO_CH3, NV_GENERAL_CMDHANDLE, 1);
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			(NV_GENERAL_FIFO_CH3 | (1 << 18));
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[3]); /* 2D Surface */
 
-		nv_acc_cmd_dma(NV_GENERAL_FIFO_CH4, NV_GENERAL_CMDHANDLE, 1);
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			(NV_GENERAL_FIFO_CH4 | (1 << 18));
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[4]); /* Blit */
 
-		nv_acc_cmd_dma(NV_GENERAL_FIFO_CH5, NV_GENERAL_CMDHANDLE, 1);
+		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+			(NV_GENERAL_FIFO_CH5 | (1 << 18));
 		si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 			(0x80000000 | si->engine.fifo.handle[5]); /* Bitmap */
 
