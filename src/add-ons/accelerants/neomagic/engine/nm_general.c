@@ -306,13 +306,6 @@ uint8 nm_general_output_read()
 	return output;
 }
 
-/*busy wait until retrace!*/
-status_t nm_general_wait_retrace()
-{
-	while (!(ACCR(STATUS)&0x8));
-	return B_OK;
-}
-
 /* basic change of card state from VGA to powergraphics -> should work from BIOS init state*/
 static 
 status_t nm_general_bios_to_powergraphics()

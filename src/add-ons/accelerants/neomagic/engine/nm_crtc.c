@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-8/2003
+   Rudolf Cornelissen 4/2003-1/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -31,7 +31,7 @@ status_t nm_crtc_validate_timing(
 	/* NOTE: keep horizontal timing at multiples of 8! */
 	/* confine to a reasonable width */
 	if (*hd_e < 640) *hd_e = 640;
-	if (*hd_e > 2000) *hd_e = 2000;
+	if (*hd_e > si->ps.max_crtc_width) *hd_e = si->ps.max_crtc_width;
 
 	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
@@ -63,7 +63,7 @@ status_t nm_crtc_validate_timing(
 
 	/* confine to a reasonable height */
 	if (*vd_e < 480) *vd_e = 480;
-	/* (max height was already confined in a reasonable way above) */
+	if (*vd_e > si->ps.max_crtc_height) *vd_e = si->ps.max_crtc_height;
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);

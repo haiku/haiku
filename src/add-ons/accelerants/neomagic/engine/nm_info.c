@@ -1,6 +1,6 @@
 /* setup initialisation information for card */
 /* Authors:
-   Rudolf Cornelissen 4/2003-5/2003
+   Rudolf Cornelissen 4/2003-1/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -23,7 +23,7 @@ static void set_nm2070(void)
 	si->ps.memory_size = 896;
 	si->ps.curmem_size = 2048;
 	si->ps.max_crtc_width = 1024;
-	si->ps.max_crtc_height = 1024;
+	si->ps.max_crtc_height = 1000;
 	si->ps.std_engine_clock = 0;
 }
 
@@ -42,7 +42,7 @@ static void set_nm2090_nm2093(void)
 	si->ps.memory_size = 1152;
 	si->ps.curmem_size = 2048;
 	si->ps.max_crtc_width = 1024;
-	si->ps.max_crtc_height = 1024;
+	si->ps.max_crtc_height = 1000;
 	si->ps.std_engine_clock = 0;
 }
 
@@ -61,7 +61,7 @@ static void set_nm2097(void)
 	si->ps.memory_size = 1152;
 	si->ps.curmem_size = 1024;
 	si->ps.max_crtc_width = 1024;
-	si->ps.max_crtc_height = 1024;
+	si->ps.max_crtc_height = 1000;
 	si->ps.std_engine_clock = 0;
 }
 
@@ -80,7 +80,7 @@ static void set_nm2160(void)
 	si->ps.memory_size = 2048;
 	si->ps.curmem_size = 1024;
 	si->ps.max_crtc_width = 1024;
-	si->ps.max_crtc_height = 1024;
+	si->ps.max_crtc_height = 1000;
 	si->ps.std_engine_clock = 0;
 }
 
