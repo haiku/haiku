@@ -17,7 +17,7 @@ Email:	jerl1@caramail.com
 #include <File.h>
 #include <MidiStore.h>
 #include <MidiPort.h>
-//#include <MidiSynth.h>
+#include <MidiSynth.h>
 #include <MidiSynthFile.h>
 
 //----------------------------------------------------------
@@ -210,7 +210,7 @@ entry_ref ref;
 				PostMessage(msg, fStandartView);
 				break;
 //--------------
-/*		case OUTPUT_CHANGE_TO_BEOS_SYNTH :
+		case OUTPUT_CHANGE_TO_BEOS_SYNTH :
 				if (fOutputType == BEOS_SYNTH)
 					break;
 				fOutputType = BEOS_SYNTH;
@@ -244,7 +244,7 @@ entry_ref ref;
 				PostMessage(msg, fStandartView);
 				break;
 //--------------
-*/		case OUTPUT_CHANGE_TO_MIDIPORT :
+		case OUTPUT_CHANGE_TO_MIDIPORT :
 				if (fOutputType == MIDIPORT)
 					break;
 				fOutputType = MIDIPORT;
@@ -280,14 +280,14 @@ entry_ref ref;
 				PostMessage(msg, fStandartView);
 				break;
 //--------------
-/*		case VIEW_CHANGE_TO_SCOPE :
+		case VIEW_CHANGE_TO_SCOPE :
 				if (fDisplayType == SCOPE)
 					break;
 				fDisplayType = SCOPE;
 				PostMessage(msg, fStandartView);
 				break;
 //--------------
-*/		case VIEW_CHANGE_TO_ACTIVITY :
+		case VIEW_CHANGE_TO_ACTIVITY :
 				if (fDisplayType == ACTIVITY)
 					break;
 				fDisplayType = ACTIVITY;
@@ -422,7 +422,7 @@ entry_ref ref;
 //--------------
 //Message from the BeOS Synth
 //--------------
-/*		case CHANGE_BEOS_SYNTH_FILE:
+		case CHANGE_BEOS_SYNTH_FILE:
 				if (fOutputFilePanel)
 				{
 					msg->FindRef("refs", &fOutputFile);
@@ -545,7 +545,7 @@ entry_ref ref;
 //--------------
 //For the drag and drop function
 //--------------
-*/		case B_SIMPLE_DATA : //A file had been dropped into application
+		case B_SIMPLE_DATA : //A file had been dropped into application
 				if (msg->FindRef("refs", &ref) == B_OK)
 				{
 					message = BMessage(INPUT_CHANGE_TO_FILE);
