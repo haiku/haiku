@@ -208,15 +208,18 @@ mp3Decoder::DecodeNextChunk()
 
 	// resync after a seek		
 	if (fNeedSync) {
-		while (chunkSize > 100) {
-			if (IsValidStream((uint8 *)chunkBuffer, chunkSize))
-				break;
-			chunkBuffer = (uint8 *)chunkBuffer + 1;
-			chunkSize--;
-		}
-		if (chunkSize <= 100) {
-			TRACE("mp3Decoder::Decode: Sync failed\n");
-			return B_ERROR;
+		if (chunkSize > 5200) { // mp3 reader always delivers synced frames smaller than 5200 bytes
+			// wav reader and others don't do that
+			while (chunkSize > 100) {
+				if (IsValidStream((uint8 *)chunkBuffer, chunkSize))
+					break;
+				chunkBuffer = (uint8 *)chunkBuffer + 1;
+				chunkSize--;
+			}
+			if (chunkSize <= 100) {
+				TRACE("mp3Decoder::Decode: Sync failed\n");
+				return B_ERROR;
+			}
 		}
 		fNeedSync = false;
 	}

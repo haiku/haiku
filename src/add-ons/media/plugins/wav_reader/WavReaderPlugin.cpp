@@ -13,7 +13,7 @@
   #define TRACE(a...)
 #endif
 
-#define BUFFER_SIZE	16384
+#define BUFFER_SIZE	16384 // must be > 5200 for mp3 decoder to work
 
 #define FOURCC(a,b,c,d)	((((uint32)(d)) << 24) | (((uint32)(c)) << 16) | (((uint32)(b)) << 8) | ((uint32)(a)))
 #define UINT16(a) 		((uint16)B_LENDIAN_TO_HOST_INT16((a)))
