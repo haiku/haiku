@@ -3,6 +3,7 @@
 PDF Writer printer driver.
 
 Copyright (c) 2001, 2002 OpenBeOS. 
+Copyright (c) 2005 Haiku.
 
 Authors: 
 	Philippe Houdoin
