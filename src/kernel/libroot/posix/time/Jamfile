@@ -1,0 +1,11 @@
+SubDir OBOS_TOP src kernel libroot posix time ;
+
+KernelMergeObject posix_time.o :
+	<$(SOURCE_GRIST)>time.c
+	:
+	-fPIC -DPIC
+	;
+
+MergeObjectFromObjects kernel_posix_time.o :
+	<$(SOURCE_GRIST)>time.o
+	;
