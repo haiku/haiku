@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons kernel partitioning_systems intel ;
+
+#UsePrivateHeaders $(DOT) ;
+UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+
+# For now build a userland version only.
+Addon <partitioning_system>intel : userland partitioning_systems :
+	intel.cpp
+	PartitionMap.cpp
+;
+
+LinkSharedOSLibs <partitioning_system>intel :
+	libkernelland_emu.so
+	libdisk_device_manager.so
+;
