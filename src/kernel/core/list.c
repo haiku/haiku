@@ -134,6 +134,28 @@ list_get_prev_item(struct list *list, void *item)
 }
 
 
+/** Adds an item to the end of the list.
+ *	Similar to list_add_link_to_tail() but works on the item, not the link.
+ */
+
+void
+list_add_item(struct list *list, void *item)
+{
+	list_add_link_to_tail(list, GET_LINK(list, item));
+}
+
+
+/** Removes an item from the list.
+ *	Similar to list_remove_link() but works on the item, not the link.
+ */
+
+void
+list_remove_item(struct list *list, void *item)
+{
+	list_remove_link(GET_LINK(list, item));
+}
+
+
 /** Removes the first item in the list and returns it.
  *	Returns NULL if the list is empty.
  */
