@@ -54,7 +54,7 @@ rtc_print(void)
 	currentTime = (sBootTime + system_time()) / 1000000;
 	dprintf("system_time:  %Ld\n", system_time());
 	dprintf("boot_time:    %Ld\n", sBootTime);
-	dprintf("current_time: %u\n", currentTime);
+	dprintf("current_time: %lu\n", currentTime);
 }
 
 
