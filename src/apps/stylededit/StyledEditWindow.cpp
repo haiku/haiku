@@ -910,7 +910,22 @@ StyledEditWindow::OpenFile(entry_ref *ref)
 		result = fTextView->GetStyledText(&file); //he he he :)
 
 		if (result != B_OK) {
-			// TODO: notify user?
+			BEntry entry(ref, true);
+			char name[B_FILE_NAME_LENGTH];
+			entry.GetName(name);
+			BAlert *loadFailedAlert;
+			BString alertText;
+			if (result == B_TRANSLATION_ERROR_BASE) {
+				alertText.SetTo("Translation error loading \"");
+			} else {
+				alertText.SetTo("Unknown error loading \"");
+			}			
+			alertText<< name;
+			alertText<<"\".";
+			loadFailedAlert= new BAlert("loadFailedAlert",alertText.String(), "Bummer", 0, 0, 
+				B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_STOP_ALERT);
+			loadFailedAlert->Go();
+			return;
 		}
 
 		// update alignment

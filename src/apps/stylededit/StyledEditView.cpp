@@ -60,8 +60,13 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 {
 	status_t result = B_OK;
 	fSuppressChanges = true;	
+	
 	result = BTranslationUtils::GetStyledText(stream, this, NULL);
-			
+	if (result != B_OK) {
+		fSuppressChanges = false;
+		return result;
+	}
+
 	BNode * node = dynamic_cast<BNode*>(stream);
 	if (node != 0) {
 		ssize_t bytesRead;
@@ -71,6 +76,7 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 		if (bytesRead > 0) {
 			CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
 			if (result != B_OK) {
+				fSuppressChanges = false;
 				return result;
 			}
 			if (encoding == 65535) {
