@@ -637,6 +637,54 @@ TRoster::HandleActivateApp(BMessage *request)
 	FUNCTION_END();
 }
 
+// HandleBroadcast
+/*!	\brief Handles a Broadcast() request.
+	\param request The request message
+*/
+void
+TRoster::HandleBroadcast(BMessage *request)
+{
+	FUNCTION_START();
+
+	status_t error = B_OK;
+	// get the parameters
+	team_id team;
+	BMessage message;
+	BMessenger replyTarget;
+	if (request->FindInt32("team", &team) != B_OK)
+		team = -1;
+	if (error == B_OK && request->FindMessage("message", &message) != B_OK)
+		error = B_BAD_VALUE;
+	if (error == B_OK
+		&& request->FindMessenger("reply_target", &replyTarget) != B_OK) {
+		error = B_BAD_VALUE;
+	}
+	// reply to the request -- do this first, don't let the inquirer wait
+	if (error == B_OK) {
+		BMessage reply(B_REG_SUCCESS);
+		request->SendReply(&reply);
+	} else {
+		BMessage reply(B_REG_ERROR);
+		reply.AddInt32("error", error);
+		request->SendReply(&reply);
+	}
+	// broadcast the message
+	team_id registrarTeam = BPrivate::current_team();
+	if (error == B_OK) {
+		for (AppInfoList::Iterator it = fRegisteredApps.It();
+			 it.IsValid();
+			 ++it) {
+			// don't send the message to the requesting team or the registrar
+			if ((*it)->team != team && (*it)->team != registrarTeam) {
+				BMessenger messenger((*it)->team, (*it)->port, 0, true);
+				messenger.SendMessage(&message, replyTarget, 0);
+			}
+		}
+	}
+
+	FUNCTION_END();
+}
+
 // Init
 /*!	\brief Initializes the roster.
 

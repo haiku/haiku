@@ -62,6 +62,7 @@ public:
 	void HandleGetAppInfo(BMessage *request);
 	void HandleGetAppList(BMessage *request);
 	void HandleActivateApp(BMessage *request);
+	void HandleBroadcast(BMessage *request);
 
 	status_t Init();
 

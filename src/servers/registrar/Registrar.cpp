@@ -128,6 +128,9 @@ Registrar::MessageReceived(BMessage *message)
 		case B_REG_ACTIVATE_APP:
 			fRoster->HandleActivateApp(message);
 			break;
+		case B_REG_BROADCAST:
+			fRoster->HandleBroadcast(message);
+			break;
 		// message runner requests
 		case B_REG_REGISTER_MESSAGE_RUNNER:
 			fMessageRunnerManager->HandleRegisterRunner(message);
