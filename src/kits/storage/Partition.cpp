@@ -406,9 +406,9 @@ BPartition::VisitEachDescendant(BDiskDeviceVisitor *visitor)
 bool
 BPartition::CanDefragment(bool *whileMounted) const
 {
-	return (fPartitionData && _DiskSystem() >= 0
-			&& _kern_supports_defragmenting_partition(_DiskSystem(),
-					_ShadowID(), whileMounted));
+	return (fPartitionData && _IsShadow()
+			&& _kern_supports_defragmenting_partition(_ShadowID(),
+													  whileMounted));
 }
 
 // Defragment
@@ -423,9 +423,9 @@ BPartition::Defragment() const
 bool
 BPartition::CanRepair(bool checkOnly, bool *whileMounted) const
 {
-	return (fPartitionData && _DiskSystem() >= 0
-			&& _kern_supports_repairing_partition(_DiskSystem(), _ShadowID(),
-					checkOnly, whileMounted));
+	return (fPartitionData && _IsShadow()
+			&& _kern_supports_repairing_partition(_ShadowID(), checkOnly,
+												  whileMounted));
 }
 
 // Repair
@@ -438,31 +438,25 @@ BPartition::Repair(bool checkOnly) const
 
 // CanResize
 bool
-BPartition::CanResize(bool *whileMounted) const
+BPartition::CanResize(bool *canResizeContents, bool *whileMounted) const
 {
-	if (!fPartitionData || IsDevice() || !Parent() || _DiskSystem() < 0
-		|| Parent()->_DiskSystem() < 0) {
-		return false;
-	}
-	if (!_kern_supports_resizing_partition(_DiskSystem(), _ShadowID(),
-										   whileMounted)) {
-		return false;
-	}
-	return _kern_supports_resizing_child_partition(Parent()->_DiskSystem(),
-												   _ShadowID());
+	return (fPartitionData && !IsDevice() && Parent() && _IsShadow()
+			&& _kern_supports_resizing_partition(_ShadowID(),
+					canResizeContents, whileMounted));
 }
 
 // ValidateResize
 status_t
-BPartition::ValidateResize(off_t *size) const
+BPartition::ValidateResize(off_t *size, bool resizeContents) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow() || !size)
+		return B_BAD_VALUE;
+	return _kern_validate_resize_partition(_ShadowID(), size, resizeContents);
 }
 
 // Resize
 status_t
-BPartition::Resize(off_t size)
+BPartition::Resize(off_t size, bool resizeContents)
 {
 	// not implemented
 	return B_ERROR;
@@ -470,23 +464,56 @@ BPartition::Resize(off_t size)
 
 // CanMove
 bool
-BPartition::CanMove(bool *whileMounted) const
+BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
+					bool *whileMounted) const
 {
-	// not implemented
-	return false;
+	// check parameters
+	if (!unmovableDescendants || !fPartitionData || IsDevice() || !Parent()
+		|| !_IsShadow()) {
+		return false;
+	}
+	// count descendants and allocate a partition_id array large enough
+	int32 descendantCount = _CountDescendants();
+	partition_id *descendants = NULL;
+	if (descendantCount > 0) {
+		descendants = new(nothrow) partition_id[descendantCount];
+		if (!descendants)
+			return false;
+		for (int32 i = 0; i < descendantCount; i++)
+			descendants[i] = -1;
+	}
+	// get the info
+	bool result = _kern_supports_moving_partition(_ShadowID(), descendants,
+						descendantCount, whileMounted);
+	if (result) {
+		// find BPartition objects for returned IDs
+		for (int32 i = 0; i < descendantCount && descendants[i] != -1; i++) {
+			BPartition *descendant = FindDescendant(descendants[i]);
+			if (!descendant || !unmovableDescendants->AddItem(descendant)) {
+				result = false;
+				break;
+			}
+		}
+	}
+	// cleanup and return
+	delete[] descendants;
+	return result;
 }
 
 // ValidateMove
 status_t
-BPartition::ValidateMove(off_t *offset) const
+BPartition::ValidateMove(off_t *newOffset, bool force) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow()
+		|| !newOffset) {
+		return B_BAD_VALUE;
+	}
+	return _kern_validate_move_partition(_ShadowID(), newOffset, force);
 }
 
 // Move
 status_t
-BPartition::Move(off_t offset)
+BPartition::Move(off_t newOffset, bool force)
 {
 	// not implemented
 	return B_ERROR;
@@ -496,17 +523,17 @@ BPartition::Move(off_t offset)
 bool
 BPartition::CanSetName() const
 {
-	return (fPartitionData && Parent() && Parent()->_DiskSystem() >= 0
-			&& _kern_supports_setting_partition_name(Parent()->_DiskSystem(),
-					_ShadowID()));
+	return (fPartitionData && Parent() && _IsShadow()
+			&& _kern_supports_setting_partition_name(_ShadowID()));
 }
 
 // ValidateSetName
 status_t
 BPartition::ValidateSetName(char *name) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow())
+		return B_BAD_VALUE;
+	return _kern_validate_set_partition_name(_ShadowID(), name);
 }
 
 // SetName
@@ -521,17 +548,18 @@ BPartition::SetName(const char *name)
 bool
 BPartition::CanSetContentName(bool *whileMounted) const
 {
-	return (fPartitionData && _DiskSystem() >= 0
-			&& _kern_supports_setting_partition_content_name(_DiskSystem(),
-					_ShadowID(), whileMounted));
+	return (fPartitionData && _IsShadow()
+			&& _kern_supports_setting_partition_content_name(_ShadowID(),
+															 whileMounted));
 }
 
 // ValidateSetContentName
 status_t
 BPartition::ValidateSetContentName(char *name) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || !_IsShadow())
+		return B_BAD_VALUE;
+	return _kern_validate_set_partition_content_name(_ShadowID(), name);
 }
 
 // SetContentName
@@ -546,17 +574,17 @@ BPartition::SetContentName(const char *name)
 bool
 BPartition::CanSetType() const
 {
-	return (fPartitionData && Parent() && Parent()->_DiskSystem() >= 0
-			&& _kern_supports_setting_partition_type(Parent()->_DiskSystem(),
-					_ShadowID()));
+	return (fPartitionData && Parent() && _IsShadow()
+			&& _kern_supports_setting_partition_type(_ShadowID()));
 }
 
 // ValidateSetType
 status_t
 BPartition::ValidateSetType(const char *type) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow() || !type)
+		return B_BAD_VALUE;
+	return _kern_validate_set_partition_type(_ShadowID(), type);
 }
 
 // SetType
@@ -569,16 +597,15 @@ BPartition::SetType(const char *type)
 
 // CanEditParameters
 bool
-BPartition::CanEditParameters(bool *whileMounted) const
+BPartition::CanEditParameters() const
 {
-	// not implemented
-	return false;
+	return (fPartitionData && Parent() && _IsShadow()
+			&& _kern_supports_setting_partition_parameters(_ShadowID()));
 }
 
 // GetParameterEditor
 status_t
-BPartition::GetParameterEditor(BDiskDeviceParameterEditor **editor,
-							   BDiskDeviceParameterEditor **contentEditor)
+BPartition::GetParameterEditor(BDiskDeviceParameterEditor **editor)
 {
 	// not implemented
 	return B_ERROR;
@@ -586,8 +613,32 @@ BPartition::GetParameterEditor(BDiskDeviceParameterEditor **editor,
 
 // SetParameters
 status_t
-BPartition::SetParameters(const char *parameters,
-						  const char *contentParameters)
+BPartition::SetParameters(const char *parameters)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// CanEditContentParameters
+bool
+BPartition::CanEditContentParameters(bool *whileMounted) const
+{
+	return (fPartitionData && _IsShadow()
+			&& _kern_supports_setting_partition_content_parameters(
+					_ShadowID(), whileMounted));
+}
+
+// GetContentParameterEditor
+status_t
+BPartition::GetContentParameterEditor(BDiskDeviceParameterEditor **editor)
+{
+	// not implemented
+	return B_ERROR;
+}
+
+// SetParameters
+status_t
+BPartition::SetContentParameters(const char *parameters)
 {
 	// not implemented
 	return B_ERROR;
@@ -597,8 +648,8 @@ BPartition::SetParameters(const char *parameters,
 bool
 BPartition::CanInitialize(const char *diskSystem) const
 {
-	// not implemented
-	return false;
+	return (fPartitionData && diskSystem && _IsShadow()
+			&& _kern_supports_initializing_partition(_ShadowID(), diskSystem));
 }
 
 // GetInitializationParameterEditor
@@ -615,8 +666,10 @@ status_t
 BPartition::ValidateInitialize(const char *diskSystem, char *name,
 							   const char *parameters)
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || !_IsShadow() || !diskSystem)
+		return B_BAD_VALUE;
+	return _kern_validate_initialize_partition(_ShadowID(), diskSystem, name,
+											   parameters);
 }
 
 // Initialize
@@ -632,8 +685,8 @@ BPartition::Initialize(const char *diskSystem, const char *name,
 bool
 BPartition::CanCreateChild() const
 {
-	// not implemented
-	return false;
+	return (fPartitionData && _IsShadow()
+			&& _kern_supports_creating_child_partition(_ShadowID()));
 }
 
 // GetChildCreationParameterEditor
@@ -647,11 +700,13 @@ BPartition::GetChildCreationParameterEditor(const char *system,
 
 // ValidateCreateChild
 status_t
-BPartition::ValidateCreateChild(off_t *start, off_t *size, const char *type,
+BPartition::ValidateCreateChild(off_t *offset, off_t *size, const char *type,
 								const char *parameters) const
 {
-	// not implemented
-	return B_ERROR;
+	if (!fPartitionData || !_IsShadow() || !offset || !size || !type)
+		return B_BAD_VALUE;
+	return _kern_validate_create_child_partition(_ShadowID(), offset, size,
+												 type, parameters);
 }
 
 // CreateChild
@@ -667,8 +722,9 @@ BPartition::CreateChild(off_t start, off_t size, const char *type,
 bool
 BPartition::CanDeleteChild(int32 index) const
 {
-	// not implemented
-	return false;
+	BPartition *child = ChildAt(index);
+	return (child && child->_IsShadow()
+			&& _kern_supports_deleting_child_partition(child->_ShadowID()));
 }
 
 // DeleteChild
@@ -760,6 +816,16 @@ disk_system_id
 BPartition::_DiskSystem() const
 {
 	return (fPartitionData ? fPartitionData->disk_system : -1);
+}
+
+// _CountDescendants
+int32
+BPartition::_CountDescendants() const
+{
+	int32 count = 1;
+	for (int32 i = 0; BPartition *child = ChildAt(i); i++)
+		count += child->_CountDescendants();
+	return count;
 }
 
 // _Level

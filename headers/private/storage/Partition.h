@@ -9,6 +9,7 @@
 #include <DiskDeviceDefs.h>
 #include <Messenger.h>
 #include <Mime.h>
+#include <ObjectList.h>
 
 class BBitmap;
 class BDiskDevice;
@@ -75,13 +76,14 @@ public:
 	bool CanRepair(bool checkOnly, bool *whileMounted = NULL) const;
 	status_t Repair(bool checkOnly) const;
 
-	bool CanResize(bool *whileMounted = NULL) const;
-	status_t ValidateResize(off_t *size) const;
-	status_t Resize(off_t size);
+	bool CanResize(bool *canResizeContents, bool *whileMounted = NULL) const;
+	status_t ValidateResize(off_t *size, bool resizeContents = true) const;
+	status_t Resize(off_t size, bool resizeContents = true);
 
-	bool CanMove(bool *whileMounted = NULL) const;
-	status_t ValidateMove(off_t *offset) const;
-	status_t Move(off_t offset);
+	bool CanMove(BObjectList<BPartition> *unmovableDescendants,
+				 bool *whileMounted = NULL) const;
+	status_t ValidateMove(off_t *newOffset, bool force = false) const;
+	status_t Move(off_t newOffset, bool force = false);
 
 	bool CanSetName() const;
 	status_t ValidateSetName(char *name) const;
@@ -99,12 +101,13 @@ public:
 		// returns.
 	status_t SetType(const char *type);
 
-	bool CanEditParameters(bool *whileMounted = NULL) const;
-	status_t GetParameterEditor(
-               BDiskDeviceParameterEditor **editor,
-               BDiskDeviceParameterEditor **contentEditor);
-    status_t SetParameters(const char *parameters,
-    					   const char *contentParameters);
+	bool CanEditParameters() const;
+	status_t GetParameterEditor(BDiskDeviceParameterEditor **editor);
+    status_t SetParameters(const char *parameters);
+
+	bool CanEditContentParameters(bool *whileMounted = NULL) const;
+	status_t GetContentParameterEditor(BDiskDeviceParameterEditor **editor);
+    status_t SetContentParameters(const char *parameters);
 
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
@@ -141,6 +144,7 @@ private:
 	partition_id _ShadowID() const;
 	disk_system_id _DiskSystem() const;
 
+	int32 _CountDescendants() const;
 	int32 _Level() const;
 	virtual bool _AcceptVisitor(BDiskDeviceVisitor *visitor, int32 level);
 	BPartition *_VisitEachDescendant(BDiskDeviceVisitor *visitor,
