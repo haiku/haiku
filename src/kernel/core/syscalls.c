@@ -313,19 +313,19 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = user_setrlimit((int)arg0, (const struct rlimit *)arg1);
 			break;
 		case SYSCALL_ATOMIC_ADD:
-			*call_ret = user_atomic_add((int *)arg0, (int)arg1);
+			*call_ret = user_atomic_add((int32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_ATOMIC_AND:
-			*call_ret = user_atomic_and((int *)arg0, (int)arg1);
+			*call_ret = user_atomic_and((int32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_ATOMIC_OR:
-			*call_ret = user_atomic_or((int *)arg0, (int)arg1);
+			*call_ret = user_atomic_or((int32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_ATOMIC_SET:
-			*call_ret = user_atomic_set((int *)arg0, (int)arg1);
+			*call_ret = user_atomic_set((int32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_TEST_AND_SET:
-			*call_ret = user_test_and_set((int *)arg0, (int)arg1, (int)arg2);
+			*call_ret = user_test_and_set((int32 *)arg0, (int32)arg1, (int32)arg2);
 			break;
 		case SYSCALL_SYSCTL:
 			*call_ret = user_sysctl((int *)arg0, (uint)arg1, (void *)arg2, 

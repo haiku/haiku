@@ -26,7 +26,7 @@
 #include <beos.h>
 #include <devs.h>
 #include <bus.h>
-#include <module.h>
+#include <kmodule.h>
 #include <int.h>
 
 #include <string.h>
@@ -150,8 +150,8 @@ static int main2(void *unused)
 	{
 		team_id pid;
 		pid = team_create_team("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
-		if(pid < 0)
-			kprintf("error starting 'init' error = %d \n",pid);
+		if (pid < 0)
+			kprintf("error starting 'init' error = %ld \n", pid);
 	}
 
 	return 0;

@@ -42,7 +42,7 @@ struct elf_image_info {
 	struct elf_image_info *next;
 	char *name;
 	image_id id;
-	int ref_count;
+	int32 ref_count;
 	void *vnode;
 	struct elf_region regions[2]; // describes the text and data regions
 	addr dynamic_ptr; // pointer to the dynamic section
@@ -280,9 +280,9 @@ dump_image_info(struct elf_image_info *image)
 
 	dprintf("elf_image_info at %p:\n", image);
 	dprintf(" next %p\n", image->next);
-	dprintf(" id 0x%x\n", image->id);
+	dprintf(" id 0x%lx\n", image->id);
 	for (i = 0; i < 2; i++) {
-		dprintf(" regions[%d].id 0x%x\n", i, image->regions[i].id);
+		dprintf(" regions[%d].id 0x%lx\n", i, image->regions[i].id);
 		dprintf(" regions[%d].start 0x%lx\n", i, image->regions[i].start);
 		dprintf(" regions[%d].size 0x%lx\n", i, image->regions[i].size);
 		dprintf(" regions[%d].delta %ld\n", i, image->regions[i].delta);
@@ -662,7 +662,7 @@ elf_load_uspace(const char *path, struct team *p, int flags, addr *entry)
 		goto error;
 	}
 
-	dprintf("reading in program headers at 0x%x, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
+	dprintf("reading in program headers at 0x%lx, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize);
 	len = sys_read(fd, eheader.e_phoff, pheaders, eheader.e_phnum * eheader.e_phentsize);
 	if (len < 0) {
 		err = len;
@@ -880,7 +880,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 				image->dynamic_ptr = pheaders[i].p_vaddr;
 				continue;
 			default:
-				dprintf("unhandled pheader type 0x%x\n", pheaders[i].p_type);
+				dprintf("unhandled pheader type 0x%lx\n", pheaders[i].p_type);
 				continue;
 		}
 
@@ -907,7 +907,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 			lock = LOCK_RW|LOCK_KERNEL;
 			sprintf(region_name, "%s_ro", path);
 		} else {
-			dprintf("weird program header flags 0x%x\n", pheaders[i].p_flags);
+			dprintf("weird program header flags 0x%lx\n", pheaders[i].p_flags);
 			continue;
 		}
 

@@ -171,7 +171,7 @@ context_switch(struct thread *t_from, struct thread *t_to)
 }
 
 
-static int
+static int32
 reschedule_event(timer *unused)
 {
 	// this function is called as a result of the timer event set by the scheduler
@@ -213,7 +213,7 @@ resched(void)
 			break;
 		case B_THREAD_SUSPENDED:
 #ifndef NEW_SCHEDULER
-			dprintf("suspending thread 0x%x\n", old_thread->id);
+			dprintf("suspending thread 0x%lx\n", old_thread->id);
 #else /* NEW_SCHEDULER */
 			dprintf("resched(): suspending thread 0x%x\n", old_thread->id);
 #endif /* NEW_SCHEDULER */

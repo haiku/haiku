@@ -6,7 +6,7 @@
 */
 
 #include <kernel.h>
-#include <module.h>
+#include <kmodule.h>
 #include <lock.h>
 #include <Errors.h>
 #include <arch/cpu.h>
@@ -216,7 +216,7 @@ load_module_file(const char *path)
 	
 	if (file_image < 0 ) {
 		SHOW_FLOW( 3, "couldn't load image %s (%s)\n", path, strerror(file_image));
-		dprintf("load_module_file failed! returned %d\n", file_image);
+		dprintf("load_module_file failed! returned %ld\n", file_image);
 		return NULL;
 	}
 
@@ -880,7 +880,7 @@ open_module_list(const char *prefix)
  * Returns 0 if a module was available.
  */
 
-int
+status_t
 read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 {
 	module_iterator *iter = (module_iterator *)cookie;
@@ -920,7 +920,8 @@ read_next_module_name(void *cookie, char *buf, size_t *bufsize)
 }
 
 
-int close_module_list(void *cookie)
+status_t
+close_module_list(void *cookie)
 {
 	module_iterator *iter = (module_iterator *)cookie;
 	
@@ -941,7 +942,8 @@ int close_module_list(void *cookie)
 /* module_init
  * setup module structures and data for use
  */
-int module_init( kernel_args *ka, module_info **sys_module_headers )
+status_t
+module_init(kernel_args *ka, module_info **sys_module_headers)
 {
 	SHOW_FLOW0( 0, "\n" );
 	recursive_lock_create( &modules_lock );
@@ -966,8 +968,8 @@ int module_init( kernel_args *ka, module_info **sys_module_headers )
 }
 
 
-/* BeOS Compatibility... */
-int	get_module(const char *path, module_info **vec)
+status_t
+get_module(const char *path, module_info **vec)
 {
 	module *m = (module *)hash_get(modules_list, path, strlen(path));
 	loaded_module *lm;
@@ -1031,7 +1033,9 @@ int	get_module(const char *path, module_info **vec)
 	return res;
 }
 
-int put_module(const char *path)
+
+status_t
+put_module(const char *path)
 {
 	module *m = (module *)hash_get(modules_list, path, strlen(path));
 	

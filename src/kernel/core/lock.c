@@ -131,7 +131,7 @@ mutex_lock(mutex *mutex)
 	thread_id me = thread_get_current_thread_id();
 
 	if (me == mutex->holder)
-		panic("mutex_lock failure: mutex %p acquired twice by thread 0x%x\n", mutex, me);
+		panic("mutex_lock failure: mutex %p acquired twice by thread 0x%lx\n", mutex, me);
 
 	acquire_sem(mutex->sem);
 	mutex->holder = me;
@@ -144,7 +144,7 @@ mutex_unlock(mutex *mutex)
 	thread_id me = thread_get_current_thread_id();
 
 	if (me != mutex->holder)
-		panic("mutex_unlock failure: thread 0x%x is trying to release mutex %p (current holder 0x%x)\n",
+		panic("mutex_unlock failure: thread 0x%lx is trying to release mutex %p (current holder 0x%lx)\n",
 			me, mutex, mutex->holder);
 
 	mutex->holder = -1;
