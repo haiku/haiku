@@ -306,6 +306,7 @@ typedef struct {
 #define NV_IMAGE_PATTERN_SETCOLOR0				0x0310
 #define NV_IMAGE_BLIT_SOURCEORG					0x0300
 //fixme note: non-DMA acc is still using NV3_GDI_RECTANGLE_TEXT...
+//which is just as fast as NV4_GDI_RECTANGLE_TEXT, but has a hardware fault for DMA!
 #define NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT	0x0300
 #define NV4_GDI_RECTANGLE_TEXT_COLOR1A			0x03fc
 #define NV4_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP		0x0400
