@@ -32,6 +32,7 @@ StdBinCommands
 	rmattr.cpp
 	safemode.c
 	sleep.cpp
+	strace.cpp
 	sysinfo.c
 	unchop.c
 	unmount.c
