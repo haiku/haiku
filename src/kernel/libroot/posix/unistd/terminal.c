@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <stdio.h>
@@ -42,3 +42,21 @@ ctermid(char *s)
 	return strcpy(s, name ? name : "");
 }
 
+
+int
+tcsetpgrp(int fd, pid_t pgrpid)
+{
+	return ioctl(fd, TIOCSPGRP, &pgrpid);
+}
+
+
+pid_t
+tcgetpgrp(int fd)
+{
+	pid_t foregroundProcess;
+	int status = ioctl(fd, TIOCGPGRP, &foregroundProcess);
+	if (status == 0)
+		return foregroundProcess;
+
+	return -1;
+}

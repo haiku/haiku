@@ -1,6 +1,7 @@
-/* 
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef _TERMIOS_H_
 #define _TERMIOS_H_
 
@@ -210,8 +211,6 @@ extern int		tcsendbreak(int fd, int duration);
 extern int		tcdrain(int fd);
 extern int		tcflow(int fd, int action);
 extern int		tcflush(int fd, int queueSelector);
-extern int		tcsetpgrp(int fd, pid_t pgrpid);
-extern pid_t	tcgetpgrp(int fd);
 
 #ifdef __cplusplus
 }

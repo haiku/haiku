@@ -1,8 +1,9 @@
-/* 
-** Copyright 2003, Daniel Reinhold, danielre@users.sf.net. All rights reserved.
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003, Daniel Reinhold, danielre@users.sf.net. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include <termios.h>
@@ -134,20 +135,3 @@ cfsetospeed(struct termios *termios, speed_t speed)
 	return 0;
 }
 
-
-int
-tcsetpgrp(int fd, pid_t pgrpid)
-{
-	// ToDo: Implement!
-	errno = EINVAL;
-	return -1;
-}
-
-
-pid_t
-tcgetpgrp(int fd)
-{
-	// ToDo: Implement!
-	errno = EINVAL;
-	return -1;
-}
