@@ -795,8 +795,12 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			
 			// TODO: it is NOT "bytes" field you should pass to KeyDown(), it is "byte" field.
 			if ( !handleKeyDown( raw_char, (uint32)modifiers) )
-				if(fFocus && string)
+			{
+				if(fFocus)
 					fFocus->KeyDown( string, strlen(string)-1 );
+				else
+					BLooper::DispatchMessage(msg, target);
+			}
 			break;
 		}
 		case B_KEY_UP:
@@ -804,33 +808,43 @@ void BWindow::DispatchMessage(BMessage *msg, BHandler *target)
 			const char		*string=NULL;
 	
 			msg->FindString( "bytes", &string );
-			if(fFocus && string)
+			if(fFocus)
 				fFocus->KeyUp( string, strlen(string)-1 );
+			else
+				BLooper::DispatchMessage(msg, target);
+
 			break;
 		}
 		case B_UNMAPPED_KEY_DOWN:
 		{
 			if (fFocus)
 				fFocus->MessageReceived( msg );
+			else
+				BLooper::DispatchMessage(msg, target);
 			break;
 		}
 		case B_UNMAPPED_KEY_UP:
 		{
 			if (fFocus)
 				fFocus->MessageReceived( msg );
+			else
+				BLooper::DispatchMessage(msg, target);
 			break;
 		}
 		case B_MODIFIERS_CHANGED:
 		{
 			if (fFocus)
 				fFocus->MessageReceived( msg );
+			else
+				BLooper::DispatchMessage(msg, target);
 			break;
 		}
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			BView *wheelView=LastMouseMovedView();
-			if(wheelView)
-				wheelView->MessageReceived( msg );
+			if (fFocus)
+				fFocus->MessageReceived( msg );
+			else
+				BLooper::DispatchMessage(msg, target);
 			break;
 		}
 		case B_MOUSE_DOWN:
