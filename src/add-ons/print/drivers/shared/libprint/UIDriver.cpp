@@ -24,7 +24,7 @@ UIDriver::~UIDriver()
 BMessage *UIDriver::configPage()
 {
 	BMessage *clone_msg = new BMessage(*fMsg);
-	JobData *job_data = new JobData(clone_msg, fPrinterCap);
+	JobData *job_data = new JobData(clone_msg, fPrinterCap, JobData::kPageSettings);
 
 	if (doPageSetup(job_data,fPrinterData, fPrinterCap) < 0) {
 		delete clone_msg;
@@ -40,7 +40,7 @@ BMessage *UIDriver::configPage()
 BMessage *UIDriver::configJob()
 {
 	BMessage *clone_msg = new BMessage(*fMsg);
-	JobData *job_data = new JobData(clone_msg, fPrinterCap);
+	JobData *job_data = new JobData(clone_msg, fPrinterCap, JobData::kJobSettings);
 
 	if (doJobSetup(job_data, fPrinterData, fPrinterCap) < 0) {
 		delete clone_msg;

@@ -57,7 +57,7 @@ void GraphicsDriver::setupData(BFile *spool_file, long page_count)
 {
 	BMessage *msg = new BMessage();
 	msg->Unflatten(spool_file);
-	fOrgJobData = new JobData(msg, fPrinterCap);
+	fOrgJobData = new JobData(msg, fPrinterCap, JobData::kJobSettings);
 	DUMP_BMESSAGE(msg);
 	delete msg;
 
