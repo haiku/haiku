@@ -11,6 +11,7 @@
 #include "BufferManager.h"
 #include "NodeManager.h"
 #include "AppManager.h"
+#include "MediaMisc.h"
 #include "media_server.h"
 #include "debug.h"
 
@@ -158,7 +159,7 @@ ServerApp::StartSystemTimeSource()
 
 	// register a dummy node 
 	media_node node;
-	rv = gNodeManager->RegisterNode(&node.node, -1, 0, "System Clock", B_TIME_SOURCE, -1, BPrivate::media::team);	
+	rv = gNodeManager->RegisterNode(&node.node, -1, 0, "System Clock", B_TIME_SOURCE, SYSTEM_TIMESOURCE_CONTROL_PORT, BPrivate::media::team);	
 	ASSERT(rv == B_OK);
 
 	printf("StartSystemTimeSource setting as default\n");

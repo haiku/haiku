@@ -24,6 +24,12 @@ public:
 
 	void CleanupTeam(team_id team);
 	
+	static int32 rescan_thread(void *arg);
+	void RescanThread();
+	
 private:
 	media_node_id fSystemTimeSource;
+	media_node_id fDefaultVideoOut;
+	media_node_id fDefaultVideoIn;
+	
 };

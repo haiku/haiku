@@ -265,7 +265,7 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 	status_t status;
 	media_node_id id;
 
-	FATAL("NodeManager::GetClone enter: team %ld, type %d (%s)\n", team, type, get_node_type(type));
+	TRACE("NodeManager::GetClone enter: team %ld, type %d (%s)\n", team, type, get_node_type(type));
 	
 	status = GetDefaultNode(&id, input_name, input_id, type);
 	if (status != B_OK) {
@@ -283,7 +283,7 @@ NodeManager::GetClone(media_node *node, char *input_name, int32 *input_id, node_
 	}
 	ASSERT(id == node->node);
 
-	FATAL("NodeManager::GetClone leave: node id %ld, node port %ld, node kind %#lx\n", node->node, node->port, node->kind);
+	TRACE("NodeManager::GetClone leave: node id %ld, node port %ld, node kind %#lx\n", node->node, node->port, node->kind);
 
 	return B_OK;
 }
