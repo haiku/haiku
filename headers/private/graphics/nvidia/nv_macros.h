@@ -432,6 +432,7 @@
 #define NVACC_HT_VALUE_17	0x007100bc
 
 /* acc engine fifo setup registers (for function_register 'mappings') */
+#define	NVACC_FIFO			0x00800000
 #define	NVACC_FIFO_00800000	0x00800000
 #define	NVACC_FIFO_00802000	0x00802000
 #define	NVACC_FIFO_00804000	0x00804000

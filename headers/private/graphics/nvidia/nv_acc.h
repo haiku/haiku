@@ -9,8 +9,8 @@
 
 typedef struct {
 	uint32 reserved00[0x0004];
-	uint16 FifoFree;	/* little endian */
-	uint16 Nop;			/* little endian */
+	uint16 FifoFree;	/* little endian (FIFO internal register) */
+	uint16 Nop;			/* little endian (FIFO internal register) */
 	uint32 reserved01[0x00bb];
 	uint32 Rop3;		/* b0-7 is ROP3, b8-31 are not used */
 } cmd_nv_rop5_solid;

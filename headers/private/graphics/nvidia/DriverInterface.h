@@ -186,16 +186,10 @@ typedef struct {
 	struct {
 		uint32		count;		/* last dwgsync slot used */
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
-		benaphore	lock;		/* for serializing access to the acceleration engine */
+		benaphore	lock;		/* for serializing access to the acc engine */
 		struct {
-			uint32		ch0;	/* handles to engine commands active in FIFO channels */
-			uint32		ch1;
-			uint32		ch2;
-			uint32		ch3;
-			uint32		ch4;
-			uint32		ch5;
-			uint32		ch6;
-			uint32		ch7;
+			uint32	handle[0x08];	/* FIFO channel's cmd handle for the owning cmd */
+			uint32	ch_ptr[0x20];	/* cmd handle's ptr to it's assigned FIFO ch (if any) */
 		} fifo;
 	} engine;
 
