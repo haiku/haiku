@@ -163,34 +163,7 @@ KPartition::Open(int flags, int *fd)
 status_t
 KPartition::PublishDevice()
 {
-	// prepare a partition_info
-	// ToDo!
-#if 0
-	partition_info info;
-	info.offset = Offset();
-	info.size = Size();
-	info.logical_block_size = BlockSize();
-	info.session = 0;
-	info.partition = ID();
-	if (strlen(Device()->Path()) >= 256)
-		return B_NAME_TOO_LONG;
-	strcpy(info.device, Device()->Path());
-	// get the entry path
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
-	if (error != B_OK)
-		return error;
-	// create the entry
-	int fd = creat(path, 0666);
-	if (fd < 0)
-		return errno;
-	// set the partition info
-	error = B_OK;
-	if (ioctl(fd, B_SET_PARTITION, &info) < 0)
-		error = errno;
-	close(fd);
-	return error;
-#endif
+	// we're just a stupid base class, what do we know?
 	return B_ERROR;
 }
 
@@ -198,18 +171,7 @@ KPartition::PublishDevice()
 status_t
 KPartition::UnpublishDevice()
 {
-	return B_OK;
-#if 0
-	// get the entry path
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = GetPath(path);
-	if (error != B_OK)
-		return error;
-	// remove the entry
-	if (remove(path) < 0)
-		return errno;
-	return B_OK;
-#endif
+	return B_ERROR;
 }
 
 // SetBusy
