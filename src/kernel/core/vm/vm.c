@@ -75,7 +75,9 @@ static int region_compare(void *_r, const void *key)
 		return -1;
 }
 
-static unsigned int region_hash(void *_r, const void *key, unsigned int range)
+
+static uint32
+region_hash(void *_r, const void *key, uint32 range)
 {
 	vm_region *r = _r;
 	const region_id *id = key;
@@ -86,7 +88,9 @@ static unsigned int region_hash(void *_r, const void *key, unsigned int range)
 		return (*id % range);
 }
 
-static int aspace_compare(void *_a, const void *key)
+
+static int
+aspace_compare(void *_a, const void *key)
 {
 	vm_address_space *aspace = _a;
 	const aspace_id *id = key;
@@ -97,7 +101,9 @@ static int aspace_compare(void *_a, const void *key)
 		return -1;
 }
 
-static unsigned int aspace_hash(void *_a, const void *key, unsigned int range)
+
+static uint32
+aspace_hash(void *_a, const void *key, uint32 range)
 {
 	vm_address_space *aspace = _a;
 	const aspace_id *id = key;

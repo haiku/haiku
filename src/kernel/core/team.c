@@ -45,7 +45,7 @@ spinlock team_spinlock = 0;
 static struct team *create_team_struct(const char *name, bool kernel);
 static void delete_team_struct(struct team *p);
 static int team_struct_compare(void *_p, const void *_key);
-static unsigned int team_struct_hash(void *_p, const void *_key, unsigned int range);
+static uint32 team_struct_hash(void *_p, const void *_key, uint32 range);
 static void kfree_strings_array(char **strings, int strc);
 static int user_copy_strings_array(char **strings, int strc, char ***kstrings);
 static void _dump_team_info(struct team *p);
@@ -301,21 +301,23 @@ team_struct_compare(void *_p, const void *_key)
 	struct team *p = _p;
 	const struct team_key *key = _key;
 
-	if(p->id == key->id) return 0;
-	else return 1;
+	if (p->id == key->id)
+		return 0;
+
+	return 1;
 }
 
 
-static unsigned int
-team_struct_hash(void *_p, const void *_key, unsigned int range)
+static uint32
+team_struct_hash(void *_p, const void *_key, uint32 range)
 {
 	struct team *p = _p;
 	const struct team_key *key = _key;
 
 	if (p != NULL)
-		return (p->id % range);
+		return p->id % range;
 
-	return (key->id % range);
+	return key->id % range;
 }
 
 
