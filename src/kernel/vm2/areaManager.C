@@ -1,8 +1,9 @@
 #include "areaManager.h"
 
 areaManager::areaManager(void)
-{
+{  
 	team=0; // should be proc_get_current_proc_id()
+	myLock=0;
 	myLock=create_sem(1,"Area Manager Semaphore"); // Should have team name in it.
 }
 

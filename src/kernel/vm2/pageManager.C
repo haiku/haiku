@@ -6,6 +6,7 @@ void *addOffset(void *base,unsigned long offset)
 {
 	return (void *)(((unsigned long)base+offset));
 }
+
 pageManager::pageManager(int pages)
 	{
 // This is compatability for in BeOS usage only...
@@ -16,9 +17,17 @@ pageManager::pageManager(int pages)
 		exit(1);
 		}
 	printf ("Allocated an area. Address = %x\n",area);
-	for (int i=0;i<pages;i++)
-		unused.add(new page(addOffset(area,i*PAGE_SIZE)));
-//		unused.add(new page((void *)(i*PAGE_SIZE)));
+	// Calculate the number of pages that we will need to hold the page structures
+	int pageOverhead=((pages*sizeof(page))+(PAGE_SIZE-1))/PAGE_SIZE;
+	for (int i=0;i<pages-pageOverhead;i++)
+		{
+		page *newPage=(page *)(addOffset(area,i*sizeof(page)));
+		newPage->setup(addOffset(area,(i+pageOverhead)*PAGE_SIZE));
+		printf ("newPage = %x, setup = %x\n",newPage,addOffset(area,(i+pageOverhead)*PAGE_SIZE));
+		printf ("i = %d, sizeof(page) = %x, pageOverhead = %d\n",i,sizeof(page),pageOverhead);
+		newPage->dump();
+		unused.add(addOffset(area,i*sizeof(page)));
+		}
 
 	cleanLock=create_sem (1,"clean_lock");
 	unusedLock=create_sem (1,"unused_lock");

@@ -1,3 +1,4 @@
+#include <new.h>
 #include "area.h"
 #include "areaManager.h"
 #include "vpage.h"
@@ -52,11 +53,11 @@ status_t area::createAreaMappingFile(char *inName, int pageCount,void **address,
 	unsigned long base=mapAddressSpecToAddress(type,requested,pageCount);
 	for (int i=0;i<pageCount;i++)
 		{
-		vnode *newVnode=vnodePool.get();
+		vnode *newVnode=new (vnodePool.get()) vnode;
 		newVnode->fd=fd;
 		newVnode->offset=offset+PAGE_SIZE*i;
 		newVnode->valid=true;
-		newPage=vpagePool.get();
+		newPage=new (vpagePool.get()) vpage;
 		newPage->setup(base+PAGE_SIZE*i,newVnode,NULL,protect,inState);
 		vpages.add(newPage);
 //		printf ("New vnode with fd %d, offset = %d\n",fd,newVnode->offset);
@@ -86,7 +87,7 @@ status_t area::createArea(char *inName, int pageCount,void **address, addressSpe
 	for (int i=0;i<pageCount;i++)
 		{
 		//printf ("in area::createArea: creating page = %d\n",i);
-		newPage=vpagePool.get();
+		newPage=new (vpagePool.get()) vpage;
 		newPage->setup(base+PAGE_SIZE*i,NULL,NULL,protect,inState);
 		vpages.add(newPage);
 		}
@@ -118,7 +119,7 @@ status_t area::cloneArea(area *origArea, char *inName, void **address, addressSp
 		{
 		vpage *newPage,*page=(vpage *)cur;
 		// Cloned area has the same physical page and backing store...
-		newPage=vpagePool.get();	
+		newPage=new (vpagePool.get()) vpage;	
 		newPage->setup(base,page->getBacking(),page->getPhysPage(),protect,inState);
 		vpages.add(newPage);
 		base+=PAGE_SIZE;
@@ -202,7 +203,7 @@ status_t area::resize(size_t newSize)
 		vpage *newPage;
 		for (int i=0;i<pageCount;i++)
 			{
-			newPage=vpagePool.get();
+			newPage=new (vpagePool.get()) vpage;
 			newPage->setup(end_address+PAGE_SIZE*i-1,NULL,NULL,protection,state);
 			vpages.add(newPage);
 			}

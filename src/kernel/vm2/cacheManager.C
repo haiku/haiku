@@ -1,3 +1,4 @@
+#include <new.h>
 #include <cacheManager.h>
 #include <vpagePool.h>
 
@@ -36,7 +37,7 @@ void *cacheManager::createBlock(vnode *target,bool readOnly)
 				}
 	lock();
 	// Create a vnode here
-	vpage *newPage = vpagePool.get();
+	vpage *newPage = new (vpagePool.get()) vpage;
 	newPage->setup(begin,target,NULL,((readOnly)?readable:writable),NO_LOCK);
 	vpages.add(newPage); 
 	cacheMembers.add(newPage);

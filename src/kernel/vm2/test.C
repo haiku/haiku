@@ -153,12 +153,12 @@ int main(int argc,char **argv)
 	loopTestParameters mmap1Params={"mmap",500000,8192,400000,1000000};
 	loopTestParameters clone1Params={"clone1",200000,2,300000,400000};
 
-	//resume_thread(spawn_thread(loopTest,"area test 1",0,&area1Params));
-	//resume_thread(spawn_thread(loopTest,"area test 2",0,&area2Params));
-	//resume_thread(spawn_thread(loopTest,"area test 3",0,&area3Params));
-	//resume_thread(spawn_thread(getInfoTest,"info test 1",0,&info1Params));
+	resume_thread(spawn_thread(loopTest,"area test 1",0,&area1Params));
+	resume_thread(spawn_thread(loopTest,"area test 2",0,&area2Params));
+	resume_thread(spawn_thread(loopTest,"area test 3",0,&area3Params));
+	resume_thread(spawn_thread(getInfoTest,"info test 1",0,&info1Params));
 	resume_thread(spawn_thread(mmapTest,"mmap test 1",0,&mmap1Params));
-	//resume_thread(spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
+	resume_thread(spawn_thread(cloneTest,"clone test 1",0,&clone1Params));
 
 	snooze(1000000000);
 

@@ -1,5 +1,6 @@
 #include "vmInterface.h"
 //#include "areaManager.h"
+#include <new.h>
 #include "mman.h"
 #include "area.h"
 #include "areaPool.h"
@@ -85,7 +86,7 @@ status_t vmInterface::resizeArea(int Area,size_t size)
 
 int vmInterface::createArea(char *AreaName,int pageCount,void **address, addressSpec addType,pageState state,protectType protect)
 	{
-	area *newArea = areaPool.get();
+	area *newArea = new (areaPool.get()) area;
 	newArea->setup(getAM());
 	newArea->createArea(AreaName,pageCount,address,addType,state,protect);
 	newArea->setAreaID(nextAreaID++); // THIS IS NOT  THREAD SAFE
@@ -139,7 +140,7 @@ int vmInterface::getAreaByName(char *name)
 
 int vmInterface::cloneArea(int newAreaID,char *AreaName,void **address, addressSpec addType=ANY, pageState state=NO_LOCK, protectType prot=writable)
 	{
-	area *newArea = areaPool.get();
+	area *newArea = new (areaPool.get()) area;
 	newArea->setup(getAM());
 	area *oldArea=getAM()->findArea(newAreaID);
 	newArea->cloneArea(oldArea,AreaName,address,addType,state,prot);
@@ -190,7 +191,7 @@ void *vmInterface::mmap(void *addr, size_t len, int prot, int flags, int fd, off
 		return addr;
 		}
 
-	area *newArea = areaPool.get();
+	area *newArea = new (areaPool.get()) area;
 	newArea->setup(getAM());
 	//printf ("area = %x, start = %x\n",newArea, newArea->getStartAddress());
 	newArea->createAreaMappingFile(name,(int)((len+PAGE_SIZE-1)/PAGE_SIZE),&addr,addType,LAZY,protType,fd,offset);

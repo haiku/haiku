@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <new.h>
 #include <vnodePool.h>
 
 extern poolvnode vnodePool;
@@ -47,7 +48,7 @@ vnode &swapFileManager::findNode(void)
 	Unlock();
 	if (!newNode)
 		{
-		newNode=vnodePool.get();
+		newNode=new (vnodePool.get()) vnode;
 		newNode->fd=swapFile;
 		newNode->offset=maxNode+=PAGE_SIZE; 
 		//printf (" New One: %d\n",newNode->offset);

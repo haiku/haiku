@@ -18,6 +18,12 @@ void vpage::refresh(void)
 
 vpage::vpage(void)
 {
+	physPage=NULL;
+	backingNode=NULL;
+	protection=none;
+	dirty=false;
+	swappable=false;
+	start_address=end_address=0;
 }
 
 // backing and/or physMem can be NULL/0.
