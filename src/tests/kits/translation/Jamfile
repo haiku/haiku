@@ -4,8 +4,11 @@ CommonTestLib libtranslationtest.so
 	: TranslationKitTestAddon.cpp
 		TranslatorRosterTest.cpp
 		BitmapStreamTest.cpp
+		TranslationUtilsTest.cpp
 	: libtranslation.so be stdc++.r4
 	: translation be stdc++.r4
 	:
 	: translation
 ;
+
+XRes libtranslationtest.so : test_translation.rsrc ;
