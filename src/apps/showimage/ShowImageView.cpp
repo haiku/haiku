@@ -1033,6 +1033,11 @@ ShowImageView::KeyDown (const char * bytes, int32 numBytes)
 void
 ShowImageView::MouseWheelChanged(BMessage *msg)
 {
+	// The BeOS driver does not currently support
+	// X wheel scrolling, therefore, dx is zero.
+	// |dy| is the number of notches scrolled up or down.
+	// When the wheel is scrolled down (towards the user) dy > 0
+	// When the wheel is scrolled up (away from the user) dy < 0
 	const float kscrollBy = 40;
 	float dy, dx;
 	float x, y;
