@@ -532,7 +532,7 @@ usb_callback(void *cookie, uint32 status,
 */
 
 static status_t 
-kb_device_added(const usb_device *dev, void **cookie)
+hid_device_added(const usb_device *dev, void **cookie)
 {
 	my_device_info *my_dev;
 	const usb_device_descriptor *dev_desc;
@@ -709,7 +709,7 @@ kb_device_added(const usb_device *dev, void **cookie)
 }
 
 static status_t 
-kb_device_removed (void *cookie)
+hid_device_removed (void *cookie)
 {
 	my_device_info *my_dev = cookie;
 
@@ -731,7 +731,7 @@ kb_device_removed (void *cookie)
 
 static usb_notify_hooks my_notify_hooks =
 {
-	kb_device_added, kb_device_removed
+	hid_device_added, hid_device_removed
 };
 
 #define	SUPPORTED_DEVICES	1
@@ -746,7 +746,7 @@ usb_support_descriptor my_supported_devices [SUPPORTED_DEVICES] =
 ----- */
 
 static status_t 
-my_device_open(const char *name, uint32 flags,
+hid_device_open(const char *name, uint32 flags,
 	driver_cookie **out_cookie)
 {
 	driver_cookie *cookie;
@@ -776,11 +776,11 @@ my_device_open(const char *name, uint32 flags,
 
 
 /* ----------
-	my_device_read - handle read() calls
+	hid_device_read - handle read() calls
 ----- */
 
 static status_t 
-my_device_read(driver_cookie *cookie, off_t position,
+hid_device_read(driver_cookie *cookie, off_t position,
 	void *buf,	size_t *num_bytes)
 {
 	return B_ERROR;
@@ -788,22 +788,22 @@ my_device_read(driver_cookie *cookie, off_t position,
 
 
 /* ----------
-	my_device_write - handle write() calls
+	hid_device_write - handle write() calls
 ----- */
 
 static status_t 
-my_device_write(driver_cookie *cookie, off_t position,
+hid_device_write(driver_cookie *cookie, off_t position,
 	const void *buf, size_t *num_bytes)
 {
 	return B_ERROR;
 }
 
 /* ----------
-	my_device_control - handle ioctl calls
+	hid_device_control - handle ioctl calls
 ----- */
 
 static status_t 
-my_device_control(driver_cookie *cookie, uint32 op,
+hid_device_control(driver_cookie *cookie, uint32 op,
 		void *arg, size_t len)
 {
 	status_t err = B_ERROR;
@@ -844,11 +844,11 @@ my_device_control(driver_cookie *cookie, uint32 op,
 
 
 /* ----------
-	my_device_close - handle close() calls
+	hid_device_close - handle close() calls
 ----- */
 
 static status_t 
-my_device_close(driver_cookie *cookie)
+hid_device_close(driver_cookie *cookie)
 {
 	my_device_info *my_dev;
 
@@ -878,11 +878,11 @@ my_device_close(driver_cookie *cookie)
 
 
 /* -----
-	my_device_free - called after the last device is closed, and after
+	hid_device_free - called after the last device is closed, and after
 	all i/o is complete.
 ----- */
 static status_t 
-my_device_free(driver_cookie *cookie)
+hid_device_free(driver_cookie *cookie)
 {
 	my_device_info *my_dev;
 
@@ -908,13 +908,13 @@ my_device_free(driver_cookie *cookie)
 	function pointers for the device hooks entry points
 ----- */
 
-static device_hooks my_device_hooks = {
-	(device_open_hook)    my_device_open,
-	(device_close_hook)   my_device_close,
-	(device_free_hook)    my_device_free,
-	(device_control_hook) my_device_control,
-	(device_read_hook)    my_device_read,
-	(device_write_hook)   my_device_write,
+static device_hooks hid_device_hooks = {
+	(device_open_hook) hid_device_open,
+	(device_close_hook) hid_device_close,
+	(device_free_hook) hid_device_free,
+	(device_control_hook) hid_device_control,
+	(device_read_hook) hid_device_read,
+	(device_write_hook) hid_device_write,
 	NULL, NULL, NULL, NULL
 };
 
@@ -1004,6 +1004,6 @@ find_device(const char *name)
 	DPRINTF_INFO ((MY_ID "find_device(%s)\n", name));
 	if (search_device_info(name) == NULL)
 		return NULL;
-	return &my_device_hooks;
+	return &hid_device_hooks;
 }
 
