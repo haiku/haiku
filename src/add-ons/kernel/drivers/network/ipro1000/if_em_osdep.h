@@ -31,44 +31,34 @@ POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
-/*$FreeBSD: /repoman/r/ncvs/src/sys/dev/em/if_em_osdep.h,v 1.1.2.13 2003/11/18 17:25:53 pdeuskar Exp $*/
+#ifndef _IF_EM_OSDEP_H_
+#define _IF_EM_OSDEP_H_
 
-#ifndef _FREEBSD_OS_H_
-#define _FREEBSD_OS_H_
-
+#include <OS.h>
+#include <KernelExport.h>
 #include <sys/types.h>
-#include <sys/param.h>
-#include <sys/systm.h>
-#include <sys/mbuf.h>
-#include <sys/protosw.h>
-#include <sys/socket.h>
-#include <sys/malloc.h>
-#include <sys/kernel.h>
-#include <sys/bus.h>
-#include <machine/bus.h>
-#include <sys/rman.h>
-#include <machine/resource.h>
-#include <vm/vm.h>
-#include <vm/pmap.h>
-#include <machine/clock.h>
-#include <pci/pcivar.h>
-#include <pci/pcireg.h>
+#include <malloc.h>
+#include <ByteOrder.h>
+#include <string.h>
+#include "driver.h"
+#include "device.h"
+#include "debug.h"
 
+#define DBG 0
 
-#define ASSERT(x) if(!(x)) panic("EM: x")
+#define ASSERT(x) if(!(x)) panic("ipro1000: " #x)
 
-/* The happy-fun DELAY macro is defined in /usr/src/sys/i386/include/clock.h */
-#define usec_delay(x) DELAY(x)
-#define msec_delay(x) DELAY(1000*(x))
+#define usec_delay(x) snooze(x)
+#define msec_delay(x) snooze(1000*(x))
 
-#define MSGOUT(S, A, B)     printf(S "\n", A, B)
+#define MSGOUT(S, A, B)     dprintf("ipro1000: " S "\n", A, B)
 #define DEBUGFUNC(F)        DEBUGOUT(F);
 #if DBG
-	#define DEBUGOUT(S)         printf(S "\n")
-	#define DEBUGOUT1(S,A)      printf(S "\n",A)
-	#define DEBUGOUT2(S,A,B)    printf(S "\n",A,B)
-	#define DEBUGOUT3(S,A,B,C)  printf(S "\n",A,B,C)
-	#define DEBUGOUT7(S,A,B,C,D,E,F,G)  printf(S "\n",A,B,C,D,E,F,G)
+	#define DEBUGOUT(S)         dprintf("ipro1000: " S "\n")
+	#define DEBUGOUT1(S,A)      dprintf("ipro1000: " S "\n",A)
+	#define DEBUGOUT2(S,A,B)    dprintf("ipro1000: " S "\n",A,B)
+	#define DEBUGOUT3(S,A,B,C)  dprintf("ipro1000: " S "\n",A,B,C)
+	#define DEBUGOUT7(S,A,B,C,D,E,F,G)  dprintf("ipro1000: " S "\n",A,B,C,D,E,F,G)
 #else
 	#define DEBUGOUT(S)
 	#define DEBUGOUT1(S,A)
@@ -77,32 +67,143 @@ POSSIBILITY OF SUCH DAMAGE.
 	#define DEBUGOUT7(S,A,B,C,D,E,F,G)
 #endif
 
+#define printf dprintf
+
+// no longer used in FreeBSD
+#define splx(s)
+#define splimp() 0
+
+#define bzero(d,c)		memset(d,0,c)
+#define bcopy(s,d,c)    memmove(d,s,c)
+
+#define TUNABLE_INT(a, b)	/* ignored */
+
 #define FALSE               0
 #define TRUE                1
-#define CMD_MEM_WRT_INVALIDATE          0x0010  /* BIT_4 */
-#define PCI_COMMAND_REGISTER            PCIR_COMMAND
+
+#define hz					1000000LL
+
+typedef uint64	u_int64_t;
+typedef uint32	u_int32_t;
+typedef uint16	u_int16_t;
+typedef uint8	u_int8_t;
+typedef uint64	uint64_t;
+typedef uint32	uint32_t;
+typedef uint16	uint16_t;
+typedef uint8	uint8_t;
+typedef int64	int64_t;
+typedef int32	int32_t;
+typedef int16	int16_t;
+typedef int8	int8_t;
+typedef bool	boolean_t;
+typedef unsigned long vm_offset_t;
+
 
 struct em_osdep
 {
-	bus_space_tag_t    mem_bus_space_tag;
-	bus_space_handle_t mem_bus_space_handle;
-	struct device     *dev;
+	ipro1000_device *dev;
 };
 
-#define E1000_WRITE_FLUSH(a) E1000_READ_REG(a, STATUS)
+typedef ipro1000_device * device_t;
+
+#define PCIR_COMMAND			PCI_command
+#define PCIR_REVID				PCI_revision
+#define PCIR_SUBVEND_0			PCI_subsystem_vendor_id
+#define PCIR_SUBDEV_0			PCI_subsystem_id
+#define PCIM_CMD_IOEN			0x0001
+#define PCIM_CMD_MEMEN			0x0002
+#define PCIM_CMD_BUSMASTEREN	0x0004
+#define CMD_MEM_WRT_INVALIDATE          0x0010  /* BIT_4 */
+
+#define pci_read_config(dev, offset, size) \
+	gPci->read_pci_config(dev->pciBus, dev->pciDev, dev->pciFunc, offset, size)
+
+#define pci_write_config(dev, offset, value, size) \
+	gPci->write_pci_config(dev->pciBus, dev->pciDev, dev->pciFunc, offset, size, value)
+
+#define pci_get_vendor(dev) \
+	gPci->read_pci_config(dev->pciBus, dev->pciDev, dev->pciFunc, PCI_vendor_id, 2)
+
+#define pci_get_device(dev) \
+	gPci->read_pci_config(dev->pciBus, dev->pciDev, dev->pciFunc, PCI_device_id, 2)
+
+#define inl(port) \
+	gPci->read_io_32(port)
+
+#define outl(port, value) \
+	gPci->write_io_32(port, value)
+
+
+void *contigmalloc(int size, int p1, int p2, int p3, int p4, int p5, int p6);
+void contigfree(void *p, int p1, int p2);
+
+static inline unsigned long vtophys(unsigned long virtual_addr)
+{
+	physical_entry pe;
+	if (get_memory_map((void *)virtual_addr, 2048, &pe, 1) < 0) {
+		TRACE("get_memory_map failed for %p\n", virtual_addr);
+		return 0;
+	}
+	return (unsigned long) pe.address;
+}
+
+#define M_DEVBUF 1
+#define M_NOWAIT 2
+#define PAGE_SIZE 4096
+
+
+typedef void (*timeout_func)(void *);
+
+struct callout_handle
+{
+	struct timer t; // must be on top
+	timeout_func func;
+	void *cookie;
+};
+
+void callout_handle_init(struct callout_handle *handle);
+struct callout_handle timeout(timeout_func func, void *cookie, bigtime_t timeout);
+void untimeout(timeout_func func, void *cookie, struct callout_handle handle);
+
+
+// resource management
+struct resource * bus_alloc_resource(device_t dev, int type, int *rid, int d, int e, int f, int g);
+void bus_release_resource(device_t dev, int type, int reg, struct resource *res);
+uint32 rman_get_start(struct resource *res);
+
+#define	bus_generic_detach(dev)
+
+#define SYS_RES_IOPORT	0x01
+#define SYS_RES_MEMORY	0x02
+#define SYS_RES_IRQ		0x04
+#define RF_SHAREABLE 0
+#define RF_ACTIVE 0
+
+
+#define INTR_TYPE_NET 0
+int bus_setup_intr(device_t dev, struct resource *res, int p3, interrupt_handler int_func, void *cookie, void **tag);
+void bus_teardown_intr(device_t dev, struct resource *res, void *tag);
+
+
+#undef malloc
+#define malloc driver_malloc
+#undef free
+#define free driver_free
+
+void *driver_malloc(int size, int p2, int p3);
+void  driver_free(void *p, int p2);
+
+				  			   
+#define E1000_WRITE_FLUSH(a) \
+	do { volatile uint32 dummy = E1000_READ_REG(a, STATUS); } while (0)
 
 /* Read from an absolute offset in the adapter's memory space */
 #define E1000_READ_OFFSET(hw, offset) \
-    bus_space_read_4( ((struct em_osdep *)(hw)->back)->mem_bus_space_tag, \
-                      ((struct em_osdep *)(hw)->back)->mem_bus_space_handle, \
-                      offset)
+	(*(volatile uint32 *)((char *)(((struct em_osdep *)(hw)->back)->dev->regAddr) + offset))
 
 /* Write to an absolute offset in the adapter's memory space */
 #define E1000_WRITE_OFFSET(hw, offset, value) \
-    bus_space_write_4( ((struct em_osdep *)(hw)->back)->mem_bus_space_tag, \
-                       ((struct em_osdep *)(hw)->back)->mem_bus_space_handle, \
-                       offset, \
-                       value)
+	(*(volatile uint32 *)((char *)(((struct em_osdep *)(hw)->back)->dev->regAddr) + offset) = value)
 
 /* Convert a register name to its offset in the adapter's memory space */
 #define E1000_REG_OFFSET(hw, reg) \
@@ -120,6 +221,7 @@ struct em_osdep
 #define E1000_WRITE_REG_ARRAY(hw, reg, index, value) \
     E1000_WRITE_OFFSET(hw, E1000_REG_OFFSET(hw, reg) + ((index) << 2), value)
 
+// used only for multicast setup, fix later...
+#define TAILQ_FOREACH(a, b, c) for (a = 0; a != 0; a = 0)
 
-#endif  /* _FREEBSD_OS_H_ */
-
+#endif
