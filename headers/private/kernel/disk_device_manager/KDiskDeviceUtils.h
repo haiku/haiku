@@ -169,6 +169,11 @@ public:
 		SetTo(&lockable, alreadyLocked);
 	}
 
+	inline void Unset()
+	{
+		_Unlock();
+	}
+
 	inline AutoLocker<Lockable, Locking> &operator=(Lockable *lockable)
 	{
 		SetTo(lockable);
@@ -211,6 +216,7 @@ class KDiskDevice;
 class KDiskDeviceManager;
 class KDiskSystem;
 class KPartition;
+//typedef struct disk_device_data disk_device_data;
 
 typedef AutoLocker<KDiskDevice, AutoLockerReadLocking<KDiskDevice> >
 		DeviceReadLocker;
@@ -255,6 +261,44 @@ public:
 typedef AutoLocker<KDiskSystem, AutoLockerDiskSystemLoading<> >
 	DiskSystemLoader;
 
+/*
+// AutoLockerDeviceStructReadLocker
+template<const int dummy = 0>
+class AutoLockerDeviceStructReadLocker {
+public:
+	inline bool Lock(disk_device_data *device)
+	{
+		return read_lock_disk_device(device->id);
+	}
+
+	inline void Unlock(disk_device_data *device)
+	{
+		read_unlock_disk_device(device->id);
+	}
+};
+
+typedef AutoLocker<disk_device_data, AutoLockerDeviceStructReadLocker<> >
+	DeviceStructReadLocker;
+
+// AutoLockerDeviceStructWriteLocker
+template<const int dummy = 0>
+class AutoLockerDeviceStructWriteLocker {
+public:
+	inline bool Lock(disk_device_data *device)
+	{
+		return write_lock_disk_device(device->id);
+	}
+
+	inline void Unlock(disk_device_data *device)
+	{
+		write_unlock_disk_device(device->id);
+	}
+};
+
+typedef AutoLocker<disk_device_data, AutoLockerDeviceStructWriteLocker<> >
+	DeviceStructWriteLocker;
+*/
+
 } // namespace DiskDevice
 } // namespace BPrivate
 
@@ -265,5 +309,7 @@ using BPrivate::DiskDevice::DeviceWriteLocker;
 using BPrivate::DiskDevice::ManagerLocker;
 using BPrivate::DiskDevice::PartitionRegistrar;
 using BPrivate::DiskDevice::DiskSystemLoader;
+//using BPrivate::DiskDevice::DeviceStructReadLocker;
+//using BPrivate::DiskDevice::DeviceStructReadLocker;
 
 #endif	// _K_DISK_DEVICE_H
