@@ -3,6 +3,7 @@
 
 class MixerCore;
 class ByteSwap;
+class Resampler;
 
 class MixerInput
 {
@@ -17,7 +18,7 @@ public:
 	media_input & MediaInput();
 	
 	uint32 GetMixerChannelCount();
-	void GetMixerChannelInfo(int channel, const float **buffer, uint32 *sample_offset, int *type, float *gain);
+	void GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 	void SetMixerChannelGain(int channel, float gain);
 	float GetMixerChannelGain(int channel);
 	
@@ -30,7 +31,7 @@ public:
 
 protected:
 	friend class MixerCore;
-	void SetMixBufferFormat(float samplerate, int32 frames, bigtime_t starttime);
+	void SetMixBufferFormat(int32 framerate, int32 frames, bigtime_t starttime);
 	
 private:
 	void UpdateChannelDesignations();
@@ -62,9 +63,11 @@ private:
 
 	float 			*fMixBuffer;
 	
-	float 			fMixBufferSampleRate;
-	uint32			fMixBufferFrames;
+	float 			fMixBufferFrameRate;
+	uint32			fMixBufferFrameCount;
 	bigtime_t		fMixBufferStartTime;
+	
+	Resampler		**fResampler; // array
 
 	bool			fUserOverridesChannelDesignations;
 };

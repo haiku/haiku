@@ -28,11 +28,11 @@ public:
 	
 	void BufferReceived(BBuffer *buffer, bigtime_t lateness);
 	
-	void InputFormatChanged(int32 inputID, const media_format *format);
-	void OutputFormatChanged(const media_format *format);
+	void InputFormatChanged(int32 inputID, const media_multi_audio_format &format);
+	void OutputFormatChanged(const media_multi_audio_format &format);
 
 	void SetOutputBufferGroup(BBufferGroup *group);
-	void SetTimeSource(media_node_id id);
+	void SetTimeSource(BTimeSource *ts);
 	void EnableOutput(bool enabled);
 	void Start(bigtime_t time);
 	void Stop();
@@ -43,7 +43,6 @@ public:
 	uint32 OutputChannelCount();
 
 private:
-	void OutputBufferLengthChanged(bigtime_t length);
 		// handle mixing in separate thread
 		// not implemented (yet)
 		
@@ -54,15 +53,21 @@ private:
 private:
 	BLocker *fLocker;
 	
-	bigtime_t	fOutputBufferLength;
-	bigtime_t	fInputBufferLength;
-	float		fMixFrameRate;
-	bigtime_t	fMixStartTime;
-	
 	BList		*fInputs;
 	MixerOutput	*fOutput;
 	int32		fNextInputID;
 	bool		fRunning;
+	
+	float		*fMixBuffer;
+	int32		fMixBufferFrameRate;
+	int32		fMixBufferFrameCount;
+	int32		fMixBufferChannelCount;
+	int32		*fMixBufferChannelTypes; //array
+	bool		fDoubleRateMixing;
+	bigtime_t	fLastMixStartTime;
+	
+	BBufferGroup *fBufferGroup;
+	BTimeSource	*fTimeSource;
 };
 
 
@@ -77,4 +82,3 @@ inline void MixerCore::Unlock()
 }
 
 #endif
-

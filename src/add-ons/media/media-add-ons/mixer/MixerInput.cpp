@@ -1,11 +1,15 @@
 #include <MediaNode.h>
 #include <Buffer.h>
 #include <RealtimeAlloc.h>
+#include <string.h>
 #include "MixerInput.h"
 #include "MixerCore.h"
 #include "MixerUtils.h"
+#include "Resampler.h"
 #include "ByteSwap.h"
 #include "debug.h"
+
+template<class t> const t & max(const t &t1, const t &t2) { return (t1 > t2) ?  t1 : t2; }
 
 MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampleRate, int32 mixFramesCount, bigtime_t mixStartTime)
  :	fCore(core),
@@ -17,9 +21,10 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampl
 	fMixerChannelInfo(0),
 	fMixerChannelCount(0),
 	fMixBuffer(0),
-	fMixBufferSampleRate(0),
-	fMixBufferFrames(0),
+	fMixBufferFrameRate(0),
+	fMixBufferFrameCount(0),
 	fMixBufferStartTime(0),
+	fResampler(0),
 	fUserOverridesChannelDesignations(false)
 {
 	fix_multiaudio_format(&fInput.format.u.raw_audio);
@@ -47,6 +52,11 @@ MixerInput::MixerInput(MixerCore *core, const media_input &input, float mixSampl
 		fInputChannelInfo[i].designations = 0;	// will be set by UpdateChannelDesignations()
 		fInputChannelInfo[i].gain = 1.0;
 	}
+
+	// create resamplers
+	fResampler = new Resampler * [fInputChannelCount];
+	for (int i = 0; i < fInputChannelCount; i++)
+		fResampler[i] = new Resampler(fInput.format.u.raw_audio.format, media_raw_audio_format::B_AUDIO_FLOAT);
 	
 	// fMixerChannelInfo and fMixerChannelCount will be initialized by UpdateMixerChannels()
 
@@ -69,6 +79,11 @@ MixerInput::~MixerInput()
 		rtm_free(fMixBuffer);
 	delete [] fInputChannelInfo;
 	delete [] fMixerChannelInfo;
+
+	// delete resamplers
+	for (int i = 0; i < fInputChannelCount; i++)
+		delete fResampler[i];
+	delete [] fResampler;
 }
 	
 void
@@ -88,8 +103,54 @@ MixerInput::BufferReceived(BBuffer *buffer)
 	if (fInputByteSwap)
 		fInputByteSwap->Swap(data, size);
 
+	int32 offset = frames_for_duration(fMixBufferFrameRate, start - fMixBufferStartTime) % fMixBufferFrameCount;
+
+	printf("MixerInput::BufferReceived:  mix buffer start %14Ld, buffer start %14Ld, offset %6d\n", fMixBufferStartTime, start, offset);
+
+	int in_frames = frames_per_buffer(fInput.format.u.raw_audio); // XXX use size
+	int out_frames = (int)((in_frames * fMixBufferFrameRate) / fInput.format.u.raw_audio.frame_rate); // XXX losing fractions
 	
-	printf("mix buffer start %14Ld, buffer start %14Ld\n", fMixBufferStartTime, start);
+	if (offset + out_frames > fMixBufferFrameCount) {
+
+		int out_frames1 = fMixBufferFrameCount - offset;
+		int out_frames2 = out_frames - out_frames1;
+		int in_frames1 = (out_frames1 * in_frames) / out_frames;
+		int in_frames2 = in_frames - in_frames1;
+
+		printf("  in_frames %5d, out_frames %5d, in_frames1 %5d, out_frames1 %5d, in_frames2 %5d, out_frames2 %5d\n",
+			   in_frames, out_frames, in_frames1, out_frames1, in_frames2, out_frames2);
+		
+		for (int i = 0; i < fInputChannelCount; i++) {
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_frame(fInput.format.u.raw_audio),
+									fInputChannelCount * bytes_per_frame(fInput.format.u.raw_audio),
+									in_frames1,
+									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base) + (offset * sizeof(float) * fInputChannelCount),
+									fInputChannelCount * sizeof(float),
+									out_frames1,
+									fInputChannelInfo[i].gain);
+									
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_frame(fInput.format.u.raw_audio),
+									fInputChannelCount * bytes_per_frame(fInput.format.u.raw_audio),
+									in_frames2,
+									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base),
+									fInputChannelCount * sizeof(float),
+									out_frames2,
+									fInputChannelInfo[i].gain);
+		}
+	} else {
+
+		printf("  in_frames %5d, out_frames %5d\n", in_frames, out_frames);
+
+		for (int i = 0; i < fInputChannelCount; i++) {
+			fResampler[i]->Resample(reinterpret_cast<char *>(data) + i * bytes_per_frame(fInput.format.u.raw_audio),
+									fInputChannelCount * bytes_per_frame(fInput.format.u.raw_audio),
+									in_frames,
+									reinterpret_cast<char *>(fInputChannelInfo[i].buffer_base) + (offset * sizeof(float) * fInputChannelCount),
+									fInputChannelCount * sizeof(float),
+									out_frames,
+									fInputChannelInfo[i].gain);
+		}
+	}
 }
 
 media_input &
@@ -303,11 +364,12 @@ MixerInput::GetMixerChannelCount()
 }
 
 void
-MixerInput::GetMixerChannelInfo(int channel, const float **buffer, uint32 *sample_offset, int *type, float *gain)
+MixerInput::GetMixerChannelInfo(int channel, int64 framepos, const float **buffer, uint32 *sample_offset, int *type, float *gain)
 {
 	ASSERT(fMixBuffer);
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
-	*buffer = fMixerChannelInfo[channel].buffer_base;
+	int32 offset = framepos % fMixBufferFrameCount;
+	*buffer = reinterpret_cast<float *>(reinterpret_cast<char *>(fMixerChannelInfo[channel].buffer_base) + (offset * sizeof(float) * fInputChannelCount));
 	*sample_offset = sizeof(float) * fInputChannelCount;
 	*type = fMixerChannelInfo[channel].type;
 	*gain = fMixerChannelInfo[channel].gain;
@@ -332,16 +394,35 @@ MixerInput::GetMixerChannelGain(int channel)
 }
 
 void
-MixerInput::SetMixBufferFormat(float samplerate, int32 frames, bigtime_t starttime)
+MixerInput::SetMixBufferFormat(int32 framerate, int32 frames, bigtime_t starttime)
 {
-	fMixBufferSampleRate = samplerate;
-	fMixBufferFrames = frames;
+	fMixBufferFrameRate = framerate;
 	fMixBufferStartTime = starttime;
 
+	printf("MixerInput::SetMixBufferFormat: framerate %ld, frames %ld, starttime %Ld\n", framerate, frames, starttime);
+
+	// make fMixBufferFrameCount an integral multiple of frames,
+	// but at least 3 times duration of our input buffer
+	// and at least 2 times duration of the output buffer
+	bigtime_t inputBufferLength  = duration_for_frames(fInput.format.u.raw_audio.frame_rate, frames_per_buffer(fInput.format.u.raw_audio));
+	bigtime_t outputBufferLength = duration_for_frames(framerate, frames);
+	bigtime_t mixerBufferLength = max_c(3 * inputBufferLength, 2 * outputBufferLength);
+	int temp = frames_for_duration(framerate, mixerBufferLength);
+	fMixBufferFrameCount = ((temp / frames) + 1) * frames;
+	
+	printf("  inputBufferLength  %10Ld\n", inputBufferLength);
+	printf("  outputBufferLength %10Ld\n", outputBufferLength);
+	printf("  mixerBufferLength  %10Ld\n", mixerBufferLength);
+	printf("  fMixBufferFrameCount   %10ld\n", fMixBufferFrameCount);
+	
 	if (fMixBuffer)
 		rtm_free(fMixBuffer);
-	fMixBuffer = (float *)rtm_alloc(NULL, sizeof(float) * fInputChannelCount * fMixBufferFrames);
+	int size = sizeof(float) * fInputChannelCount * fMixBufferFrameCount;
+	fMixBuffer = (float *)rtm_alloc(NULL, size);
+	ASSERT(fMixBuffer);
+	
+	memset(fMixBuffer, 0, size); 
 
 	for (int i = 0; i < fInputChannelCount; i++)
-		fInputChannelInfo[i].buffer_base = &fMixBuffer[i * fMixBufferFrames];
+		fInputChannelInfo[i].buffer_base = &fMixBuffer[i];
 }

@@ -334,7 +334,7 @@ AudioMixer::FormatChanged(const media_source &producer, const media_destination 
 
 	// tell core about format change
 	fCore->Lock();
-	fCore->InputFormatChanged(consumer.id, &format);
+	fCore->InputFormatChanged(consumer.id, format.u.raw_audio);
 	fCore->Unlock();
 	
 	return B_OK;
@@ -420,7 +420,7 @@ AudioMixer::FormatChangeRequested(const media_source &source, const media_destin
 	
 	// apply format change
 	fCore->Lock();
-	fCore->OutputFormatChanged(io_format);
+	fCore->OutputFormatChanged(io_format->u.raw_audio);
 	fCore->Unlock();
 	
 	return B_OK;
@@ -617,7 +617,7 @@ AudioMixer::Connect(status_t error, const media_source &source, const media_dest
 	fCore->Output()->MediaOutput().destination = dest;
 
 	fCore->EnableOutput(true);
-	fCore->SetTimeSource(TimeSource()->ID());
+	fCore->SetTimeSource(TimeSource());
 	fCore->SetOutputBufferGroup(fBufferGroup);
 	fCore->Unlock();
 }
@@ -710,7 +710,7 @@ AudioMixer::SetTimeSource(BTimeSource * time_source)
 {
 	printf("AudioMixer::SetTimeSource: timesource is now %ld\n", time_source->ID());
 	fCore->Lock();
-	fCore->SetTimeSource(time_source->ID());
+	fCore->SetTimeSource(time_source);
 	fCore->Unlock();
 }
 
