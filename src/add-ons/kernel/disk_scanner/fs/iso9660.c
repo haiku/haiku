@@ -1,4 +1,34 @@
-// iso9660.c
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2003, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		iso9660.c
+//	Author:			Tyler Dauwalder (tyler@dauwalder.net)
+//	Description:	disk_scanner filesystem module for iso9660 CD-ROM filesystems
+//------------------------------------------------------------------------------
+
+/*!
+	\file iso9660.c
+	disk_scanner filesystem module for iso9660 CD-ROM filesystems
+*/
+
 
 #include <errno.h>
 #include <stdlib.h>
@@ -199,8 +229,10 @@ iso9660_fs_identify(int deviceFD, struct extended_partition_info *partitionInfo,
 						if (primary->volume_identifier[i] != 0x20)
 							break;
 					}
-					if (partitionInfo->volume_name)
+					if (partitionInfo->volume_name) {
 						strncpy(partitionInfo->volume_name, primary->volume_identifier, i+1);
+						partitionInfo->volume_name[i+1] = 0;
+					}
 
 					if (priority)
 						*priority = 0;
