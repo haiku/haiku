@@ -427,6 +427,7 @@ void MidiPlayerWindow::LoadFile(entry_ref* ref)
 	{
 		scopeView->SetPlaying(false);
 		scopeView->Invalidate();
+		UpdateIfNeeded();
 	
 		StopSynth();
 	}
@@ -513,7 +514,10 @@ void MidiPlayerWindow::OnPlayStop()
 	if (playing)
 	{
 		playButton->SetEnabled(false);
-
+		scopeView->SetPlaying(false);
+		scopeView->Invalidate();
+		UpdateIfNeeded();
+		
 		StopSynth();
 	}
 	else
@@ -549,13 +553,9 @@ void MidiPlayerWindow::OnInputChanged(BMessage* msg)
 		//   be_synth->LoadInstruments(all)
 	
 		// if id != -1
-		//   if playing -> Stop()
 		//   connect SynthBridge (from MidiUtil) to producer endpoint
 		// else if SynthBridge still connected
-		//   disconnect SynthBridge
-		
-		// NOTE: we should also disconnect SynthBridge when launching
-		// a MIDI file!!! (successfull or not)
+		//   disconnect SynthBridge	
 	}
 }
 
