@@ -198,51 +198,13 @@
 #define NMCR1_22CURFGCOLOR   	0x1010
 #define NMCR1_22CURADDRESS		0x1014
 
-//old:
-/* NM ACCeleration registers */
-#define NMACC_DWGCTL          0x1C00
-#define NMACC_MACCESS         0x1C04
-#define NMACC_MCTLWTST        0x1C08
-#define NMACC_ZORG            0x1C0C
-#define NMACC_PLNWT           0x1C1C
-#define NMACC_BCOL            0x1C20
-#define NMACC_FCOL            0x1C24
-#define NMACC_XYSTRT          0x1C40
-#define NMACC_XYEND           0x1C44
-#define NMACC_SGN             0x1C58
-#define NMACC_LEN             0x1C5C
-#define NMACC_AR0             0x1C60
-#define NMACC_AR3             0x1C6C
-#define NMACC_AR5             0x1C74
-#define NMACC_CXBNDRY         0x1C80
-#define NMACC_FXBNDRY         0x1C84
-#define NMACC_YDSTLEN         0x1C88
-#define NMACC_PITCH           0x1C8C
-#define NMACC_YDST            0x1C90
-#define NMACC_YDSTORG         0x1C94
-#define NMACC_YTOP            0x1C98
-#define NMACC_YBOT            0x1C9C
-#define NMACC_CXLEFT          0x1CA0
-#define NMACC_CXRIGHT         0x1CA4
-#define NMACC_FXLEFT          0x1CA8
-#define NMACC_FXRIGHT         0x1CAC
-#define NMACC_STATUS          0x1E14
-#define NMACC_ICLEAR          0x1E18 /* required for interrupt stuff */
-#define NMACC_IEN             0x1E1C /* required for interrupt stuff */
-#define NMACC_RST             0x1E40
-#define NMACC_MEMRDBK         0x1E44
-#define NMACC_OPMODE          0x1E54
-#define NMACC_PRIMADDRESS     0x1E58
-#define NMACC_PRIMEND         0x1E5C
-#define NMACC_TEXORG          0x2C24 // >= G100 
-#define NMACC_DWGSYNC         0x2C4C // >= G200
-#define NMACC_TEXORG1         0x2CA4 // >= G200
-#define NMACC_TEXORG2         0x2CA8 // >= G200 
-#define NMACC_TEXORG3         0x2CAC // >= G200 
-#define NMACC_TEXORG4         0x2CB0 // >= G200 
-#define NMACC_SRCORG          0x2CB4 // >= G200
-#define NMACC_DSTORG          0x2CB8 // >= G200
-//end old.
+/* NeoMagic PCI acceleration registers */
+#define NMACC_STATUS			0x0000
+#define NMACC_BLTCNTL			0x0004
+#define NMACC_SRCSTARTOFF		0x0024
+#define NMACC_DSTSTARTOFF		0x002c
+#define NMACC_XYEXT				0x0030
+
 
 /* Macros for convenient accesses to the NM chips */
 
@@ -259,12 +221,9 @@
 #define CFGR(A)   (nm_pci_access.offset=NMCFG_##A, ioctl(fd,NM_GET_PCI, &nm_pci_access,sizeof(nm_pci_access)), nm_pci_access.value)
 #define CFGW(A,B) (nm_pci_access.offset=NMCFG_##A, nm_pci_access.value = B, ioctl(fd,NM_SET_PCI,&nm_pci_access,sizeof(nm_pci_access)))
 
-//old:
-/* read and write from the powergraphics registers */
-#define ACCR(A)    (NM_REG32(NMACC_##A))
-#define ACCW(A,B)  (NM_REG32(NMACC_##A)=B)
-#define ACCGO(A,B) (NM_REG32(NMACC_##A + 0x0100)=B)
-//end old.
+/* read and write from acceleration engine */
+#define ACCR(A)   (NM_REG32(NMACC_##A))
+#define ACCW(A,B) (NM_REG32(NMACC_##A) = (B))
 
 /* read and write from first CRTC (mapped) */
 #define CR1R(A)   (NM_REG32(NMCR1_##A))

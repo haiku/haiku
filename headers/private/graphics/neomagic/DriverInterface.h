@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-
+	Rudolf Cornelissen 4/2003-3/2004
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -155,6 +155,7 @@ typedef struct {
 		uint32		count;		/* last dwgsync slot used */
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
 		benaphore	lock;		/* for serializing access to the acceleration engine */
+		uint32		control;	/* colordepth, memory pitch and other config stuff */
 	} engine;
 
   /* card info - information gathered from PINS (and other sources) */
