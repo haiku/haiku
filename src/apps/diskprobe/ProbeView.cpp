@@ -36,6 +36,7 @@
 
 static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
+static const uint32 kMsgLastPosition = 'lpos';
 
 
 class IconView : public BView {
@@ -99,15 +100,18 @@ class HeaderView : public BView, public BInvoker {
 
 	private:
 		void FormatValue(char *buffer, size_t bufferSize, off_t value);
-		void UpdatePositionViews(off_t position);
-		void UpdateOffsetViews(off_t position, bool all = true);
+		void UpdatePositionViews();
+		void UpdateOffsetViews(bool all = true);
 		void UpdateFileSizeView();
+		void NotifyTarget();
 
 		const char		*fAttribute;
 		off_t			fFileSize;
 		uint32			fBlockSize;
 		off_t			fOffset;
 		base_type		fBase;
+		off_t			fPosition;
+		off_t			fLastPosition;
 
 		BTextControl	*fPositionControl;
 		BStringView		*fPathView;
@@ -330,7 +334,9 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 	fFileSize(editor.FileSize()),
 	fBlockSize(editor.BlockSize()),
 	fOffset(0),
-	fBase(kHexBase)
+	fBase(kHexBase),
+	fPosition(0),
+	fLastPosition(0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
@@ -400,7 +406,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 	fOffsetView = new BStringView(rect, B_EMPTY_STRING, "0x0");
 	fOffsetView->SetFont(&plainFont);
 	AddChild(fOffsetView);
-	UpdateOffsetViews(0LL, false);
+	UpdateOffsetViews(false);
 
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
@@ -476,26 +482,26 @@ HeaderView::FormatValue(char *buffer, size_t bufferSize, off_t value)
 
 
 void
-HeaderView::UpdatePositionViews(off_t position)
+HeaderView::UpdatePositionViews()
 {
 	char buffer[64];
-	FormatValue(buffer, sizeof(buffer), position / fBlockSize);
+	FormatValue(buffer, sizeof(buffer), fPosition / fBlockSize);
 	fPositionControl->SetText(buffer);
 
-	FormatValue(buffer, sizeof(buffer), position + fOffset);
+	FormatValue(buffer, sizeof(buffer), fPosition + fOffset);
 	fFileOffsetView->SetText(buffer);
 }
 
 
 void 
-HeaderView::UpdateOffsetViews(off_t position, bool all)
+HeaderView::UpdateOffsetViews(bool all)
 {
 	char buffer[64];
 	FormatValue(buffer, sizeof(buffer), fOffset);
 	fOffsetView->SetText(buffer);
 
 	if (all) {
-		FormatValue(buffer, sizeof(buffer), position + fOffset);
+		FormatValue(buffer, sizeof(buffer), fPosition + fOffset);
 		fFileOffsetView->SetText(buffer);
 	}
 }
@@ -519,10 +525,18 @@ HeaderView::SetBase(base_type type)
 
 	fBase = type;
 
-	off_t position = fPositionSlider->Position();
-	UpdatePositionViews(position);
-	UpdateOffsetViews(position, false);
+	UpdatePositionViews();
+	UpdateOffsetViews(false);
 	UpdateFileSizeView();
+}
+
+
+void
+HeaderView::NotifyTarget()
+{
+	BMessage update(kMsgPositionUpdate);
+	update.AddInt64("position", fPosition);
+	Messenger().SendMessage(&update);
 }
 
 
@@ -540,7 +554,7 @@ HeaderView::MessageReceived(BMessage *message)
 					off_t offset;
 					if (message->FindInt64("position", &offset) == B_OK) {
 						fOffset = offset;
-						UpdateOffsetViews(fPositionSlider->Position());
+						UpdateOffsetViews();
 					}
 					break;
 			}
@@ -549,30 +563,50 @@ HeaderView::MessageReceived(BMessage *message)
 
 		case kMsgSliderUpdate:
 		{
-			off_t position = fPositionSlider->Position();
+			if (fPosition == fPositionSlider->Position())
+				break;
+
+			fLastPosition = fPosition;
+			fPosition = fPositionSlider->Position();
 
 			// update position text control
-			UpdatePositionViews(position);
+			UpdatePositionViews();
 
 			// notify our target
-			BMessage update(kMsgPositionUpdate);
-			update.AddInt64("position", position);
-			Messenger().SendMessage(&update);
+			NotifyTarget();
 			break;
 		}
 
 		case kMsgPositionUpdate:
 		{
-			off_t position = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
+			fLastPosition = fPosition;
+
+			int32 delta;
+			if (message->FindInt32("delta", &delta) != B_OK)
+				fPosition = strtoll(fPositionControl->Text(), NULL, 0) * fBlockSize;
+			else
+				fPosition += delta * fBlockSize;
 
 			// update views
-			UpdatePositionViews(position);
-			fPositionSlider->SetPosition(position);
+			UpdatePositionViews();
+			fPositionSlider->SetPosition(fPosition);
 
 			// notify our target
-			BMessage update(kMsgPositionUpdate);
-			update.AddInt64("position", position);
-			Messenger().SendMessage(&update);
+			NotifyTarget();
+			break;
+		}
+
+		case kMsgLastPosition:
+		{
+			fPosition = fLastPosition;
+			fLastPosition = fPositionSlider->Position();
+
+			// update views
+			UpdatePositionViews();
+			fPositionSlider->SetPosition(fPosition);
+
+			// notify our target
+			NotifyTarget();
 			break;
 		}
 
@@ -681,6 +715,7 @@ ProbeView::AttachedToWindow()
 	}
 
 	BMenu *menu = new BMenu("Edit");
+	BMenuItem *item;
 	menu->AddItem(new BMenuItem("Undo", NULL, 'Z', B_COMMAND_KEY));
 	menu->AddItem(new BMenuItem("Redo", NULL, 'Z', B_COMMAND_KEY | B_SHIFT_KEY));
 	menu->AddSeparatorItem();
@@ -693,15 +728,22 @@ ProbeView::AttachedToWindow()
 	bar->AddItem(menu);
 
 	menu = new BMenu("Block");
-	menu->AddItem(new BMenuItem("Next", NULL, B_RIGHT_ARROW, B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Previous", NULL, B_LEFT_ARROW, B_COMMAND_KEY));
-	menu->AddItem(new BMenuItem("Back", NULL, 'J', B_COMMAND_KEY));
+	BMessage *message = new BMessage(kMsgPositionUpdate);
+	message->AddInt32("delta", 1);
+	menu->AddItem(item = new BMenuItem("Next", message, B_RIGHT_ARROW, B_COMMAND_KEY));
+	item->SetTarget(fHeaderView);
+	message = new BMessage(kMsgPositionUpdate);
+	message->AddInt32("delta", -1);
+	menu->AddItem(item = new BMenuItem("Previous", message, B_LEFT_ARROW, B_COMMAND_KEY));
+	item->SetTarget(fHeaderView);
+	menu->AddItem(item = new BMenuItem("Back", new BMessage(kMsgLastPosition), 'J', B_COMMAND_KEY));
+	item->SetTarget(fHeaderView);
 
 	BMenu *subMenu = new BMenu("Selection");
 	menu->AddItem(new BMenuItem(subMenu));
 	menu->AddSeparatorItem();
 
-	menu->AddItem(new BMenuItem("Write", NULL, 'J', B_COMMAND_KEY));
+	menu->AddItem(new BMenuItem("Write", NULL, 'W', B_COMMAND_KEY));
 	menu->AddSeparatorItem();
 
 	subMenu = new BMenu("Bookmarks");
@@ -713,8 +755,7 @@ ProbeView::AttachedToWindow()
 
 	menu = new BMenu("View");
 	subMenu = new BMenu("Base");
-	BMenuItem *item;
-	BMessage *message = new BMessage(kMsgBaseType);
+	message = new BMessage(kMsgBaseType);
 	message->AddInt32("base", kDecimalBase);
 	subMenu->AddItem(item = new BMenuItem("Decimal", message, 'D', B_COMMAND_KEY));
 	item->SetTarget(this);
