@@ -2644,8 +2644,6 @@ BWindow::determine_target(BMessage *msg, BHandler *target, bool pref)
 	// to determine what BHandler will dispatch the message and what filters
 	// should be checked before doing so.
 	
-	printf("determine_target: %x, %x, %s\n", msg, target, pref ? "true" : "false");
-	
 	switch (msg->what) {
 		case B_KEY_DOWN:
 		case B_KEY_UP:
