@@ -252,16 +252,16 @@ KernelLd sig_test :
 	bin/sig_test
 	;
 
-KernelLd select_test :
+KernelLd tls_test :
 	libglue2.o
-	<$(SOURCE_GRIST)!apps>select_test.o
+	<$(SOURCE_GRIST)!apps>tls_test.o
 	libroot.so
 	:
 	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
 	:
 	:
 	:
-	bin/select_test
+	bin/tls_test
 	;
 
 KernelLd fortune :
