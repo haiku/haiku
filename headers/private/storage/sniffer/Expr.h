@@ -9,15 +9,15 @@
 #ifndef _sk_sniffer_expr_h_
 #define _sk_sniffer_expr_h_
 
-namespace Sniffer {
+class BPositionIO;
 
-class BFile;
+namespace Sniffer {
 
 //! Abstract class definining an interface for sniffing BFile objects
 class Expr {
 public:
 	virtual ~Expr() {}
-	virtual bool Sniff(BFile *file) = 0;
+	virtual bool Sniff(BPositionIO *data) const = 0;
 };
 
 }
