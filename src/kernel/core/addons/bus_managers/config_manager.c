@@ -89,7 +89,7 @@ static char *decode_device(uint16 dev)
 	}
 }
 
-static void show_pci_details(struct pci_info *p)
+static void show_pci_details(struct pci_info *p, pci_module_info *pcim)
 {
 	dprintf("PCI device found:\n");
 	dprintf("\tvendor id   : %02x [%s]\n", p->vendor_id, decode_vendor(p->vendor_id));
@@ -103,12 +103,19 @@ static void show_pci_details(struct pci_info *p)
 	dprintf("\tclass_api   : %02x\n", p->class_api);
 	dprintf("\tclass_sub   : %02x\n", p->class_sub);
 #endif
-
 	dprintf("\tclass_base  : %02x [%s]\n", p->class_base, decode_class_base(p->class_base));
 
 #if THE_FULL_MONTY
+	dprintf("\tstatus      : %04x\n", 
+	        pcim->read_pci_config(p->bus, p->device, p->function, PCI_status, 2));
+	dprintf("\tcommand     : %04x\n", 
+	        pcim->read_pci_config(p->bus, p->device, p->function, PCI_command, 2));
+	dprintf("\tbase address: %08lx\n", 
+	        pcim->read_pci_config(p->bus, p->device, p->function, PCI_base_registers, 4));
+
 	dprintf("\tline_size   : %02x\n", p->line_size);
 	dprintf("\theader_type : %02x\n", p->header_type);
+	dprintf("\tbist        : %02x\n", p->bist);
 	
 	if (p->header_type == 0) {
 		dprintf("Header Type 0\n");
@@ -117,9 +124,17 @@ static void show_pci_details(struct pci_info *p)
 		dprintf("\tsubsystem_vendor_id : %04x [%s]\n", p->u.h0.subsystem_vendor_id, 
 		        decode_vendor(p->u.h0.subsystem_vendor_id));
 		dprintf("\trom_base_pci        : %08lx\n", p->u.h0.rom_base_pci);
+		dprintf("\tinterrupt_line      : %02x\n", p->u.h0.interrupt_line);
+		dprintf("\tinterrupt_pin       : %02x\n", p->u.h0.interrupt_pin);
+		
 	} else if (p->header_type == 1) {
 		dprintf("Header Type 1 (PCI-PCI bridge)\n");
 		dprintf("\trom_base_pci        : %08lx\n", p->u.h1.rom_base_pci);
+		dprintf("\tinterrupt_line      : %02x\n", p->u.h1.interrupt_line);
+		dprintf("\tinterrupt_pin       : %02x\n", p->u.h1.interrupt_pin);
+		dprintf("\t2ndry status        : %04x\n", p->u.h1.secondary_status);
+		dprintf("\tmemory_base         : %04x\n", p->u.h1.memory_base);
+		dprintf("\tbridge control      : %02x\n", p->u.h1.bridge_control);
 	}
 #endif
 }
@@ -136,7 +151,7 @@ static status_t test_me(void)
 	}
 
 	while (pcim->get_nth_pci_info(index++, &apci) == 0) {
-		show_pci_details(&apci);
+		show_pci_details(&apci, pcim);
 	}
 			
 	put_module(B_PCI_MODULE_NAME);

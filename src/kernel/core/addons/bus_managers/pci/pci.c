@@ -228,20 +228,39 @@ static void scan_pci(void)
 	
 	/* We can have up to 255 busses */
 	for(bus = 0; bus < 255; bus++) {
-		/* Each bus can have up to 32 devices on it */
-		for(dev = 0; dev < bus_max_devices; dev++) {
+		/* Each bus can have up to 'bus_max_devices' devices on it */
+		for(dev = 0; dev <= bus_max_devices; dev++) {
 			/* Each device can have up to 8 functions */
+			uint16 sv_vendor_id = 0, sv_device_id = 0;
+			
 			for (func = 0; func < 8; func++) {
 				pci_info *pcii = NULL;
 				struct found_pci_device *npcid = NULL;
-				uint16 val = read_pci_config(bus, dev, func, 0, 2);
-				/* If we get 0xffff then there is noe device here. As there can't
+				uint16 vendor_id = read_pci_config(bus, dev, func, 0, 2);
+				uint16 device_id;
+				uint8 int_line = 0, int_pin = 0;
+				/* If we get 0xffff then there is no device here. As there can't
 				 * be any gaps in function allocation this tells us that we
 				 * can move onto the next device/bus
 				 */
-				if (val == 0xffff)
+				if (vendor_id == 0xffff)
 					break;
 
+				device_id = read_pci_config(bus, dev, func, PCI_device_id, 2);
+
+				/* Is this a new device? As we're scanning the functions here, many devices
+				 * will supply identical information for all 8 accesses! Try to catch this and
+				 * simply move past duplicates. We need to continue scanning in case we miss
+				 * a different device at the end.
+				 * XXX - is this correct????
+				 */
+				if (vendor_id == sv_vendor_id && sv_device_id == device_id) {
+					/* It's a duplicate */
+					continue;
+				}
+				sv_vendor_id = vendor_id;
+				sv_device_id = device_id;
+				
 				/* At present we will add a device to our list if we get here,
 				 * but we may want to review if we need to add 8 version of the
 				 * same device if only the functions differ?
@@ -256,8 +275,9 @@ static void scan_pci(void)
 					return;
 				}
 
-				pcii->vendor_id = val;
-				pcii->device_id =   read_pci_config(bus, dev, func, PCI_device_id, 2);
+				/* basic header */
+				pcii->vendor_id = vendor_id;
+				pcii->device_id = device_id;
 				pcii->bus = bus;
 				pcii->device = dev;
 				pcii->function = func;
@@ -268,17 +288,38 @@ static void scan_pci(void)
 				pcii->line_size =   read_pci_config(bus, dev, func, PCI_line_size, 1);
 				pcii->latency =     read_pci_config(bus, dev, func, PCI_latency, 1);
 				pcii->header_type = read_pci_config(bus, dev, func, PCI_header_type, 1);			        
-
+				pcii->bist =        read_pci_config(bus, dev, func, PCI_bist, 1);
+				
+				int_line =          read_pci_config(bus, dev, func, PCI_interrupt_line, 1);
+				int_pin =           read_pci_config(bus, dev, func, PCI_interrupt_pin, 1);
+				
+				/* device type specific headers based on header_type declared */
 				if (pcii->header_type == 0) {
 					/* header type 0 */
 					pcii->u.h0.cardbus_cis =         read_pci_config(bus, dev, func, PCI_cardbus_cis, 4);
 					pcii->u.h0.subsystem_id =        read_pci_config(bus, dev, func, PCI_subsystem_id, 2);
 					pcii->u.h0.subsystem_vendor_id = read_pci_config(bus, dev, func, PCI_subsystem_vendor_id, 2);
 					pcii->u.h0.rom_base_pci =        read_pci_config(bus, dev, func, PCI_rom_base, 4);
+					pcii->u.h0.interrupt_line =      int_line;
+					pcii->u.h0.interrupt_pin =       int_pin;					
 				} else if (pcii->header_type == 1) {
 					/* header_type 1 */
-					/* bridge */
+					/* PCI-PCI bridge - may be used for AGP */
 					pcii->u.h1.rom_base_pci =        read_pci_config(bus, dev, func, PCI_bridge_rom_base, 4);
+					pcii->u.h1.primary_bus =         read_pci_config(bus, dev, func, PCI_primary_bus, 1);
+					pcii->u.h1.secondary_bus =       read_pci_config(bus, dev, func, PCI_secondary_bus, 1);
+					pcii->u.h1.secondary_latency =   read_pci_config(bus, dev, func, PCI_secondary_latency, 1);
+					pcii->u.h1.secondary_status =    read_pci_config(bus, dev, func, PCI_secondary_status, 2);
+					pcii->u.h1.subordinate_bus =     read_pci_config(bus, dev, func, PCI_subordinate_bus, 1);
+					pcii->u.h1.io_base =             read_pci_config(bus, dev, func, PCI_io_base, 1);
+					pcii->u.h1.io_limit =            read_pci_config(bus, dev, func, PCI_io_limit, 1);
+					pcii->u.h1.memory_base =         read_pci_config(bus, dev, func, PCI_memory_base, 2);
+					pcii->u.h1.memory_limit =        read_pci_config(bus, dev, func, PCI_memory_limit, 2);
+					pcii->u.h1.prefetchable_memory_base =  read_pci_config(bus, dev, func, PCI_prefetchable_memory_base, 2);
+					pcii->u.h1.prefetchable_memory_limit = read_pci_config(bus, dev, func, PCI_prefetchable_memory_limit, 2);
+					pcii->u.h1.bridge_control =      read_pci_config(bus, dev, func, PCI_bridge_control, 1);
+					pcii->u.h1.interrupt_line =      int_line;
+					pcii->u.h1.interrupt_pin =       int_pin;
 				} else if (pcii->header_type == 0x80) {
 					/* ??? */
 				}
@@ -287,7 +328,9 @@ static void scan_pci(void)
 				/* Add the device to the list */
 				insque(npcid, &pci_dev_list);
 			}
+		/* next device */	
 		}
+	/* next bus */
 	}
 }
 

@@ -26,7 +26,7 @@ int general_protection_fault(int errorcode)
 {
 	panic("GENERAL PROTECTION FAULT: errcode 0x%x. Killing system.\n", errorcode);
 
-	return INT_NO_RESCHEDULE;
+	return B_HANDLED_INTERRUPT;
 }
 
 static const char *fpu_fault_to_str(enum fpu_faults fpu_fault)
@@ -52,13 +52,13 @@ int fpu_fault(int fpu_fault)
 {	
 	panic("FPU FAULT: errcode 0x%x (%s), Killing system.\n", fpu_fault, fpu_fault_to_str(fpu_fault));
 
-	return INT_NO_RESCHEDULE;
+	return B_HANDLED_INTERRUPT;
 }
 
 int fpu_disable_fault(void)
 {
 	panic("FPU DISABLE FAULT: Killing system.\n");
 
-	return INT_NO_RESCHEDULE;
+	return B_HANDLED_INTERRUPT;
 }
 

@@ -1480,7 +1480,7 @@ static int reschedule_event(void *unused)
 	// this function is called as a result of the timer event set by the scheduler
 	// returning this causes a reschedule on the timer event
 	thread_get_current_thread()->cpu->info.preempted= 1;
-	return INT_RESCHEDULE;
+	return B_INVOKE_SCHEDULER;
 }
 
 // NOTE: expects thread_spinlock to be held

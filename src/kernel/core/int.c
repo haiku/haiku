@@ -17,18 +17,18 @@
 #define NUM_IO_VECTORS 256 
 
 struct io_handler { 
-	struct io_handler *next; 
-	int (*func)(void*); 
+	struct io_handler *next;
+	struct io_handler *prev;
+	interrupt_handler func; 
 	void* data; 
 }; 
 
 struct io_vector { 
-	struct io_handler *handler_list; 
-	spinlock_t vector_lock; 
+	struct io_handler handler_list; 
+	spinlock_t        vector_lock; 
 }; 
 
-static struct io_vector *io_vectors = NULL; 
-
+static struct io_vector *io_vectors = NULL;
 
 int
 int_init(kernel_args *ka) 
@@ -52,75 +52,90 @@ int_init2(kernel_args *ka)
 } 
 
 
-int
-int_set_io_interrupt_handler(int vector, int (*func)(void*), void* data) 
+/* install_io_interrupt_handler
+ * install a handler to be called when an interrupt is triggered
+ * for the given irq with data as the argument
+ */
+long install_io_interrupt_handler(long irq, interrupt_handler handler,
+                                 void* data, ulong flags) 
 { 
-	struct io_handler *io; 
+	struct io_handler *io = NULL; 
 	int state; 
 
-	// insert this io handler in the chain of interrupt 
-	// handlers registered for this io interrupt 
-
+	/* find the chain of handlers for this irq.
+	 * NB there can be multiple handlers for the same IRQ, especially for
+	 * PCI drivers. Where we have multiple handlers we will call each in turn
+	 * until one returns a value other than B_UNHANDLED_INTERRUPT.
+	 */
 	io = (struct io_handler *)kmalloc(sizeof(struct io_handler)); 
 	if (io == NULL) 
 		return ENOMEM; 
-	io->func = func; 
+	io->func = handler; 
 	io->data = data; 
 
-	state = int_disable_interrupts(); 
-	acquire_spinlock(&io_vectors[vector].vector_lock); 
-	io->next = io_vectors[vector].handler_list; 
-	io_vectors[vector].handler_list = io; 
-	release_spinlock(&io_vectors[vector].vector_lock); 
+	/* Make sure our list is init'd or bad things will happen */
+	if (io_vectors[irq].handler_list.next == NULL) {
+		io_vectors[irq].handler_list.next = &io_vectors[irq].handler_list;
+		io_vectors[irq].handler_list.prev = &io_vectors[irq].handler_list;
+	}
+	
+	/* Disable the interrupts, get the spinlock for this irq only
+	 * and then insert the handler */
+	state = int_disable_interrupts();
+	acquire_spinlock(&io_vectors[irq].vector_lock); 
+	insque(io, &io_vectors[irq].handler_list);
+	release_spinlock(&io_vectors[irq].vector_lock); 
 	int_restore_interrupts(state); 
 
-	arch_int_enable_io_interrupt(vector); 
+	/* If we were passed the bit-flag B_NO_ENABLE_COUNTER then 
+	 * we're being asked to not alter whether the interrupt is set
+	 * regardless of setting.
+	 */
+	if ((flags & B_NO_ENABLE_COUNTER) == 0)
+		arch_int_enable_io_interrupt(irq); 
 
 	return 0; 
 }
 
-
-int
-int_remove_io_interrupt_handler(int vector, int (*func)(void*), void* data) 
+/* remove_io_interrupt_handler
+ * remove an interrupt handler previously inserted
+ */
+long remove_io_interrupt_handler(long irq, interrupt_handler handler, 
+                                     void* data) 
 { 
-	struct io_handler *io, *prev = NULL; 
+	struct io_handler *io = NULL; 
 	int state; 
 
 	// lock the structures down so it is not modified while we search 
 	state = int_disable_interrupts(); 
-	acquire_spinlock(&io_vectors[vector].vector_lock); 
+	acquire_spinlock(&io_vectors[irq].vector_lock); 
 
-	// start at the beginning 
-	io = io_vectors[vector].handler_list; 
-
-	// while not at end 
-	while (io != NULL) { 
-		// see if we match both the function & data 
-		if (io->func == func && io->data == data) 
+	/* loop through the available handlers and try to find a match.
+	 * We go forward through the list but this means we start with the 
+	 * most recently added handlers.
+	 */
+	io = io_vectors[irq].handler_list.next; 
+	while (io != &io_vectors[irq].handler_list) { 
+		/* we have to match both function and data */ 
+		if (io->func == handler && io->data == data) 
 			break; 
-
-		// Store our backlink and move to next 
-		prev = io; 
 		io = io->next; 
 	} 
 
-	// If we found it 
-	if (io != NULL) { 
-		// unlink it, taking care of the change it was the first in line 
-		if (prev != NULL) 
-			prev->next = io->next; 
-		else 
-			io_vectors[vector].handler_list = io->next; 
-	} 
-
+	if (io) 
+		remque(io);
+	
 	// release our lock as we're done with the vector 
-	release_spinlock(&io_vectors[vector].vector_lock); 
+	release_spinlock(&io_vectors[irq].vector_lock); 
 	int_restore_interrupts(state); 
 
 	// and disable the IRQ if nothing left 
 	if (io != NULL) { 
-		if (prev == NULL && io->next == NULL) 
-			arch_int_disable_io_interrupt(vector); 
+		/* we still have handlers left if the next handler doesn't point back
+		 * to the head of the list.
+		 */
+		if (io_vectors[irq].handler_list.next != &io_vectors[irq].handler_list) 
+			arch_int_disable_io_interrupt(irq); 
 	
 		kfree(io); 
 	} 
@@ -128,26 +143,34 @@ int_remove_io_interrupt_handler(int vector, int (*func)(void*), void* data)
 	return (io != NULL) ? 0 : EINVAL; 
 } 
 
-
-int
-int_io_interrupt_handler(int vector) 
+/* int_io_interrupt_handler
+ * actually process an interrupt via the handlers registered for that
+ * vector (irq)
+ */
+int int_io_interrupt_handler(int vector) 
 { 
-	int ret = INT_NO_RESCHEDULE; 
+	int ret = B_UNHANDLED_INTERRUPT; 
 	
 	acquire_spinlock(&io_vectors[vector].vector_lock); 
 	
-	if (io_vectors[vector].handler_list == NULL) { 
+	if (io_vectors[vector].handler_list.next == &io_vectors[vector].handler_list) { 
 		dprintf("unhandled io interrupt %d\n", vector); 
 	} else { 
 		struct io_handler *io; 
-		int temp_ret; 
-
-		io = io_vectors[vector].handler_list; 
-		while (io != NULL) { 
-			temp_ret = io->func(io->data); 
-			if (temp_ret == INT_RESCHEDULE) 
-				ret = INT_RESCHEDULE; 
-			io = io->next; 
+		/* Loop through the list of handlers. 
+		 * each handler returns as follows...
+		 * - B_UNHANDLED_INTERRUPT, the interrupt wasn't processed by the
+		 *                          fucntion, so try the next available.
+		 * - B_HANDLED_INTERRUPT, the interrupt has been handled and no further
+		 *                        attention is required
+		 * - B_INVOKE_SCHEDULER, the interrupt has been handled, but the function wants
+		 *                       the scheduler to be invoked
+		 */
+		for (io = io_vectors[vector].handler_list.next; 
+		     io != &io_vectors[vector].handler_list;
+		     io = io->next) {
+			if ((ret = io->func(io->data)) != B_UNHANDLED_INTERRUPT)
+				break;
 		} 
 	} 
 

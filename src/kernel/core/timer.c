@@ -57,7 +57,7 @@ int timer_interrupt()
 	struct timer_event *event;
 	spinlock_t *spinlock;
 	int curr_cpu = smp_get_current_cpu();
-	int rc = INT_NO_RESCHEDULE;
+	int rc = B_HANDLED_INTERRUPT;
 
 //	dprintf("timer_interrupt: time 0x%x 0x%x, cpu %d\n", system_time(), smp_get_current_cpu());
 
@@ -80,8 +80,9 @@ restart_scan:
 		// note: if the event is not periodic, it is ok
 		// to delete the event structure inside the callback
 		if(event->func != NULL) {
-			if(event->func(event->data) == INT_RESCHEDULE)
-				rc = INT_RESCHEDULE;
+			rc = event->func(event->data);
+//			if (event->func(event->data) == INT_RESCHEDULE)
+//				rc = INT_RESCHEDULE;
 		}
 
 		acquire_spinlock(spinlock);

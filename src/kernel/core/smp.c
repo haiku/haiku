@@ -243,7 +243,7 @@ static int smp_process_pending_ici(int curr_cpu)
 	struct smp_msg *msg;
 	bool halt = false;
 	int source_mailbox = 0;
-	int retval = INT_NO_RESCHEDULE;
+	int retval = B_HANDLED_INTERRUPT;
 
 	msg = smp_check_for_message(curr_cpu, &source_mailbox);
 	if(msg == NULL)
@@ -261,7 +261,7 @@ static int smp_process_pending_ici(int curr_cpu)
 			arch_cpu_global_TLB_invalidate();
 			break;
 		case SMP_MSG_RESCHEDULE:
-			retval = INT_RESCHEDULE;
+			retval = B_INVOKE_SCHEDULER;
 			break;
 		case SMP_MSG_CPU_HALT:
 			halt = true;

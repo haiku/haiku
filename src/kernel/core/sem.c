@@ -291,7 +291,7 @@ static int sem_timeout(void *data)
 
 	t = thread_get_thread_struct(args->blocked_thread);
 	if(t == NULL)
-		return INT_NO_RESCHEDULE;
+		return B_HANDLED_INTERRUPT;
 	slot = args->blocked_sem_id % MAX_SEMS;
 
 	state = int_disable_interrupts();
@@ -319,7 +319,7 @@ static int sem_timeout(void *data)
 
 	int_restore_interrupts(state);
 
-	return INT_RESCHEDULE;
+	return B_INVOKE_SCHEDULER;
 }
 
 

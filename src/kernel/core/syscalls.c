@@ -313,5 +313,5 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 
 //	dprintf("syscall_dispatcher: done with syscall 0x%x\n", call_num);
 
-	return INT_RESCHEDULE;
+	return B_INVOKE_SCHEDULER;
 }
