@@ -1,10 +1,10 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_ARCH_CPU_H
 #define _KERNEL_ARCH_CPU_H
 
@@ -22,7 +22,7 @@ extern "C" {
 status_t arch_cpu_preboot_init(kernel_args *args);
 status_t arch_cpu_init(kernel_args *args);
 status_t arch_cpu_init_post_vm(kernel_args *args);
-void reboot(void);
+status_t arch_cpu_shutdown(bool reboot);
 
 void arch_cpu_invalidate_TLB_range(addr_t start, addr_t end);
 void arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages);
@@ -42,4 +42,3 @@ void arch_cpu_sync_icache(void *address, size_t length);
 #include <arch_cpu.h>
 
 #endif /* _KERNEL_ARCH_CPU_H */
-
