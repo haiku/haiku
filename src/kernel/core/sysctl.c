@@ -2,7 +2,6 @@
 //	It is not part of the POSIX spec.
 
 #include <kernel.h>
-#include <ktypes.h>
 #include <string.h>
 #include <errno.h>
 #include <vm.h>
