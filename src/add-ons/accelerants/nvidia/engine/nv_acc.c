@@ -681,15 +681,6 @@ status_t nv_acc_init()
 	/* setup some extra stuff for NV30A and later */
 	if (si->ps.card_arch >= NV30A)
 	{
-/*
-	fixme: Does not belong here (and not needed?)
-	if(!chip->flatPanel)
-	{
-    	chip->PRAMDAC0[0x0578/4] = state->vpllB;	//0x00680578 = ??? never modified!
-    	chip->PRAMDAC0[0x057C/4] = state->vpll2B;	//0x0068057c = ??? never modified!
-	}
-*/
-
 		/* activate Zcullflush(?) */
 		ACCW(DEBUG3, (ACCR(DEBUG3) | 0x00000001));
 		/* unknown */
@@ -763,11 +754,6 @@ status_t nv_acc_init()
 	/*** setup tile and pipe stuff ***/
 	if (si->ps.card_arch >= NV10A)
 	{
-/*
-	fixme: setup elsewhere (does not belong here):
-	chip->PRAMDAC[0x00000404/4] |= (1 << 25);//0x00680404 = ???
-*/
-
 		/* setup acc engine tile stuff: */
 		/* reset tile adresses */
 		ACCW(NV10_FBTIL0AD, 0);

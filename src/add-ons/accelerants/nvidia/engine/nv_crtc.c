@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 11/2002-9/2004
+   Rudolf Cornelissen 11/2002-1/2005
 */
 
 #define MODULE_BIT 0x00040000
@@ -701,6 +701,10 @@ status_t nv_crtc_cursor_init()
 	/* select 32x32 pixel, 16bit color cursorbitmap, no doublescan */
 	NV_REG32(NV32_CURCONF) = 0x02000100;
 
+	/* activate hardware-sync between cursor updates and vertical retrace */
+	if (si->ps.card_arch >= NV10A)
+		DACW(NV10_CURSYNC, (DACR(NV10_CURSYNC) | 0x02000000));
+
 	/* activate hardware cursor */
 	nv_crtc_cursor_show();
 
@@ -790,7 +794,7 @@ status_t nv_crtc_cursor_define(uint8* andMask,uint8* xorMask)
 /* position the cursor */
 status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 {
-	uint16 yhigh;
+//	uint16 yhigh;
 
 	/* make sure we are beyond the first line of the cursorbitmap being drawn during
 	 * updating the position to prevent distortions: no double buffering feature */
@@ -798,29 +802,29 @@ status_t nv_crtc_cursor_position(uint16 x, uint16 y)
 	 * we need to return as quick as possible or some apps will exhibit lagging.. */
 
 	/* read the old cursor Y position */
-	yhigh = ((DACR(CURPOS) & 0x0fff0000) >> 16); 
+//	yhigh = ((DACR(CURPOS) & 0x0fff0000) >> 16); 
 	/* make sure we will wait until we are below both the old and new Y position:
 	 * visible cursorbitmap drawing needs to be done at least... */
-	if (y > yhigh) yhigh = y;
+//	if (y > yhigh) yhigh = y;
 
-	if (yhigh < (si->dm.timing.v_display - 16))
-	{
+//	if (yhigh < (si->dm.timing.v_display - 16))
+//	{
 		/* we have vertical lines below old and new cursorposition to spare. So we
 		 * update the cursor postion 'mid-screen', but below that area. */
-		while (((uint16)(NV_REG32(NV32_RASTER) & 0x000007ff)) < (yhigh + 16))
-		{
-			snooze(10);
-		}
-	}
-	else
-	{
+//		while (((uint16)(NV_REG32(NV32_RASTER) & 0x000007ff)) < (yhigh + 16))
+//		{
+//			snooze(10);
+//		}
+//	}
+//	else
+//	{
 		/* no room to spare, just wait for retrace (is relatively slow) */
-		while ((NV_REG32(NV32_RASTER) & 0x000007ff) < si->dm.timing.v_display)
-		{
+//		while ((NV_REG32(NV32_RASTER) & 0x000007ff) < si->dm.timing.v_display)
+//		{
 			/* don't snooze much longer or retrace might get missed! */
-			snooze(10);
-		}
-	}
+//			snooze(10);
+//		}
+//	}
 
 	/* update cursorposition */
 	DACW(CURPOS, ((x & 0x0fff) | ((y & 0x0fff) << 16)));
