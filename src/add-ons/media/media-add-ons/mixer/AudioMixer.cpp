@@ -1026,6 +1026,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			} else {
 				input->RemoveInputChannelDestination(PARAM_CHAN(id), PARAM_DST(id));
 			}
+			// XXX this is really annoying
 			// The slider count of the gain control needs to be changed,
 			// but calling SetChannelCount(input->GetMixerChannelCount())
 			// on it has no effect on remove parameter webs in other apps.
