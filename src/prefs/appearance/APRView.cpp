@@ -12,6 +12,7 @@
 #include <Path.h>
 #include <Entry.h>
 #include <File.h>
+#include <Screen.h>	// for settings Desktop color
 #include <stdio.h>
 
 #include "APRView.h"
@@ -606,9 +607,11 @@ printf("Couldn't open file %s for read\n",path.String());
 	{
 		settings.FindString("name",colorset_name);
 		SetColorSetName(colorset_name->String());
-//		BString namestr("Color Set: ");
-//		namestr+=colorset_name->String();
-//		colorset_label->SetText(namestr.String());
+
+		BScreen screen;
+		rgb_color col=screen.GetDesktopColor();
+		settings.ReplaceData("DESKTOP",(type_code)'RGBC',
+		&col,sizeof(rgb_color));
 
 		picker->SetValue(GetColorFromMessage(&settings,attrstring.String()));
 		colorwell->SetColor(picker->ValueAsColor());
@@ -678,7 +681,36 @@ void APRView::NotifyServer(void)
 	// done. Extract all the colors from the settings BMessage, attach them
 	// to a PortLink message and fire it off to the server.
 	
-	// Name taken from ServerProtocol.h
+	// For now, we do not have the OBOS app_server, so we simply do what
+	// we can with tbe R5 server
+
+	rgb_color col;
+
+	// Set menu color
+	menu_info minfo;
+	get_menu_info(&minfo);
+	col=GetColorFromMessage(&settings,"MENU_BACKGROUND");
+	if(col.alpha==0 && col.red==0 && col.green==0 && col.blue==0)
+	{
+		// do nothing
+	}
+	else
+	{
+		minfo.background_color=col;
+		set_menu_info(&minfo);
+	}
+	
+	// Set desktop color
+	BScreen screen;
+	col=GetColorFromMessage(&settings,"DESKTOP");
+	if(col.alpha==0 && col.red==0 && col.green==0 && col.blue==0)
+	{
+		// do nothing
+	}
+	else
+		screen.SetDesktopColor(col);
+	
+/*	// Name taken from ServerProtocol.h
 	port_id serverport=find_port("OBappserver");
 
 	if(serverport==B_NAME_NOT_FOUND)
@@ -704,11 +736,13 @@ void APRView::NotifyServer(void)
 	pl->Attach(&col,sizeof(rgb_color));
 	col=GetColorFromMessage(&settings,"KEYBOARD_NAVIGATION");
 	pl->Attach(&col,sizeof(rgb_color));
-	col=GetColorFromMessage(&settings,"DESKTOP_COLOR");
+	col=GetColorFromMessage(&settings,"DESKTOP");
 	pl->Attach(&col,sizeof(rgb_color));
 
 	pl->Flush();
 	delete pl;
+*/
+
 }
 
 rgb_color APRView::GetColorFromMessage(BMessage *msg, const char *name, int32 index=0)
@@ -716,14 +750,10 @@ rgb_color APRView::GetColorFromMessage(BMessage *msg, const char *name, int32 in
 	// Simple function to do the dirty work of getting an rgb_color from
 	// a message
 	rgb_color *col,rcolor={0,0,0,0};
-	uint8 *ptr;
 	ssize_t size;
 
-	if(msg->FindData(name,(type_code)'RGBC',index,(const void**)&ptr,&size)==B_OK)
-	{
-		col=(rgb_color*)ptr;
+	if(msg->FindData(name,(type_code)'RGBC',index,(const void**)&col,&size)==B_OK)
 		rcolor=*col;
-	}
 	return rcolor;
 }
 
@@ -753,7 +783,7 @@ const char *APRView::AttributeToString(const color_which &attr)
 			return "KEYBOARD_NAVIGATION";
 			break;
 		default:
-			return "DESKTOP_COLOR";
+			return "DESKTOP";
 			break;
 	}
 }
@@ -784,7 +814,7 @@ const char *APRView::SelectionToString(int32 index)
 			return "KEYBOARD_NAVIGATION";
 			break;
 		default:
-			return "DESKTOP_COLOR";
+			return "DESKTOP";
 			break;
 	}
 }
