@@ -448,7 +448,6 @@ _EXPORT status_t std_ops(int32 op, ...)
 				get_module(NET_CORE_MODULE_NAME, (module_info **) &core);
 			if (!core)
 				return B_ERROR;
-			load_driver_symbols("icmp");
 			return B_OK;
 
 		case B_MODULE_UNINIT:

@@ -165,11 +165,8 @@ _EXPORT status_t init_hardware(void)
 	void * sfmptr;
 
 #if SERIAL_DEBUGGING	
-	int rv;
-
 	// XXX - switch on/off at top of file...
 	set_dprintf_enabled(true);
-	rv = load_driver_symbols(DRIVER_NAME);
 #endif
 
 	// get a pointer to the driver settings...

@@ -1019,7 +1019,6 @@ _EXPORT status_t std_ops(int32 op, ...)
 	switch(op) {
 		case B_MODULE_INIT:
 			printf("core: B_MODULE_INIT\n");
-			load_driver_symbols("core");
 			break;
 
 		case B_MODULE_UNINIT:
