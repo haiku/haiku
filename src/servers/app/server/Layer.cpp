@@ -39,7 +39,6 @@
 #include "ServerCursor.h"
 #include "CursorManager.h"
 #include "TokenHandler.h"
-#include "RectUtils.h"
 #include "RootLayer.h"
 #include "DisplayDriver.h"
 #include "Desktop.h"
@@ -233,14 +232,10 @@ void Layer::RemoveSelf()
 /*!
 	\brief Finds the first child at a given point.
 	\param pt Point to look for a child
-	\param recursive Flag to look for the bottom-most child
 	\return non-NULL if found, NULL if not
 
 	Find out which child gets hit if we click at a certain spot. Returns NULL
 	if there are no _visible children or if the click does not hit a child layer
-	If recursive==true, then it will continue to call until it reaches a layer
-	which has no children, i.e. a layer that is at the top of its 'branch' in
-	the layer tree
 */
 Layer* Layer::GetLayerAt(const BPoint &pt)
 {
