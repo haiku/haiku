@@ -10,7 +10,7 @@ for subdir in $(subdirs) {
 	SEARCH_SOURCE += $(dir) ;
 }
 
-UsePrivateHeaders shared app ;
+UsePrivateHeaders shared app [ FDirName servers app ] ;
 
 # Add subsubdirs to the SEARCH_SOURCE.
 SEARCH_SOURCE += [ FDirName $(SUBDIR) interface BTextView ] ;
