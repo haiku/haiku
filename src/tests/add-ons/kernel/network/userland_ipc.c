@@ -203,7 +203,7 @@ connection_runner(void *_cookie)
 
 			case NET_STACK_GETSOCKOPT:
 			case NET_STACK_SETSOCKOPT:
-				if (command->op == NET_STACK_GETSOCKOPT) {
+				if (command->op == (int32) NET_STACK_GETSOCKOPT) {
 					status = core->socket_getsockopt(cookie->socket, args->u.sockopt.level, args->u.sockopt.option, 
 						convert_to_local(&command->area[1], &area[1], args->u.sockopt.optval),
 						(size_t *) &args->u.sockopt.optlen);
@@ -479,7 +479,7 @@ connection_opener(void *_unused)
 		if (bytes < B_OK)
 			return bytes;
 
-		if (msg == NET_STACK_NEW_CONNECTION) {
+		if (msg == (int32) NET_STACK_NEW_CONNECTION) {
 			net_connection connection;
 			connection_cookie *cookie;
 
