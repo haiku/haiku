@@ -34,19 +34,19 @@ static spinlock page_cache_table_lock;
 
 struct page_lookup_key {
 	off_t offset;
-	vm_cache_ref *ref;
+	vm_cache *cache;
 };
 
 
 static int
 page_compare_func(void *_p, const void *_key)
 {
-	vm_page *p = _p;
+	vm_page *page = _p;
 	const struct page_lookup_key *key = _key;
 
-	TRACE(("page_compare_func: p 0x%x, key 0x%x\n", p, key));
+	TRACE(("page_compare_func: p 0x%x, key 0x%x\n", page, key));
 
-	if (p->cache_ref == key->ref && p->offset == key->offset)
+	if (page->cache == key->cache && page->offset == key->offset)
 		return 0;
 
 	return -1;
@@ -56,7 +56,7 @@ page_compare_func(void *_p, const void *_key)
 static uint32
 page_hash_func(void *_p, const void *_key, uint32 range)
 {
-	vm_page *p = _p;
+	vm_page *page = _p;
 	const struct page_lookup_key *key = _key;
 #if 0
 	if(p)
@@ -66,10 +66,10 @@ page_hash_func(void *_p, const void *_key, uint32 range)
 #endif
 #define HASH(offset, ref) ((unsigned int)(offset >> 12) ^ ((unsigned int)(ref)>>4))
 
-	if (p)
-		return HASH(p->offset, p->cache_ref) % range;
+	if (page)
+		return HASH(page->offset, page->cache) % range;
 
-	return HASH(key->offset, key->ref) % range;
+	return HASH(key->offset, key->cache) % range;
 }
 
 
@@ -211,7 +211,7 @@ vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
 	struct page_lookup_key key;
 
 	key.offset = offset;
-	key.ref = cache_ref;
+	key.cache = cache_ref->cache;
 
 	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
@@ -241,7 +241,7 @@ vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 	page->cache_prev = NULL;
 	cache_ref->cache->page_list = page;
 
-	page->cache_ref = cache_ref;
+	page->cache = cache_ref->cache;
 
 	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
@@ -285,7 +285,7 @@ vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 		if (page->cache_next != NULL)
 			page->cache_next->cache_prev = page->cache_prev;
 	}
-	page->cache_ref = NULL;
+	page->cache = NULL;
 }
 
 

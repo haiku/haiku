@@ -1165,11 +1165,11 @@ _vm_delete_region(vm_address_space *aspace, region_id rid)
 }
 
 
-int
+status_t
 vm_delete_region(aspace_id aid, region_id rid)
 {
 	vm_address_space *aspace;
-	int err;
+	status_t err;
 
 	aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
@@ -1254,12 +1254,146 @@ vm_put_region(vm_region *region)
 }
 
 
-int
+static status_t
+vm_copy_on_write_area(vm_region *area)
+{
+	vm_store *store;
+	vm_cache *upperCache, *lowerCache;
+	vm_cache_ref *upperCacheRef, *lowerCacheRef;
+	vm_translation_map *map;
+	vm_page *page;
+	uint32 protection;
+	status_t status;
+
+	// We need to separate the vm_cache from its vm_cache_ref: the area
+	// and its cache_ref goes into a new layer on top of the old one.
+	// So the old cache gets a new cache_ref and the area a new cache.
+
+	upperCacheRef = area->cache_ref;
+	lowerCache = upperCacheRef->cache;
+
+	// create an anonymous store object
+	store = vm_store_create_anonymous_noswap();
+	if (store == NULL)
+		return B_NO_MEMORY;
+
+	upperCache = vm_cache_create(store);
+	if (upperCache == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
+
+	lowerCacheRef = vm_cache_ref_create(lowerCache);
+	if (lowerCacheRef == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
+	// The area must be readable in the same way it was previously writable
+	protection = B_KERNEL_READ_AREA;
+	if (area->lock & B_READ_AREA)
+		protection |= B_READ_AREA;
+
+	// we need to hold the cache_ref lock when we want to switch its cache
+	mutex_lock(&upperCacheRef->lock);
+	mutex_lock(&lowerCacheRef->lock);
+
+	// ToDo: add a child counter to vm_cache - so that we can collapse a
+	//		cache layer when possible (ie. "the other" area was deleted)
+	upperCache->temporary = 1;
+	upperCache->scan_skip = lowerCache->scan_skip;
+	upperCache->source = lowerCache;
+	upperCacheRef->cache = upperCache;
+
+	// we need to manually alter the ref_count
+	lowerCacheRef->ref_count = upperCacheRef->ref_count;
+	upperCacheRef->ref_count = 1;
+
+	// grab a ref to the cache object we're now linked to as a source
+	vm_cache_acquire_ref(lowerCacheRef, true);
+
+	// We now need to remap all pages from the area read-only, so that
+	// a copy will be created on next write access
+
+	map = &area->aspace->translation_map;
+	map->ops->lock(map);
+	map->ops->unmap(map, area->base, area->base + area->size - 1);
+
+	// ToDo: it seems to make more sense to attach the pages to the vm_cache
+	//	instead of the vm_cache_ref object - this way, we would not need to
+	//	move the pages around (just remap them)
+
+	for (page = lowerCache->page_list; page; page = page->cache_next) {
+		map->ops->map(map, area->base + page->offset, page->ppn * B_PAGE_SIZE, protection);
+	}
+	map->ops->unlock(map);
+
+	mutex_unlock(&lowerCacheRef->lock);
+	mutex_unlock(&upperCacheRef->lock);
+
+	return B_OK;
+
+err2:
+	free(upperCache);
+err1:
+	store->ops->destroy(store);
+	return status;
+}
+
+
+area_id
+vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32 addressSpec,
+	uint32 protection, area_id sourceID)
+{
+	vm_address_space *addressSpace;
+	vm_cache_ref *cacheRef;
+	vm_region *target, *source;
+	status_t status;
+
+	if ((protection & B_KERNEL_PROTECTION) == 0)
+		protection |= B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+
+	if ((source = vm_get_region_by_id(sourceID)) == NULL)
+		return B_BAD_VALUE;
+
+	addressSpace = vm_get_aspace_by_id(addressSpaceID);
+	cacheRef = source->cache_ref;
+
+	if (addressSpec == B_CLONE_ADDRESS)
+		*_address = (void *)source->base;
+
+	// First, create a cache on top of the source area
+
+	status = map_backing_store(addressSpace, cacheRef->cache->store, _address,
+		source->cache_offset, source->size, addressSpec, source->wiring, protection,
+		protection & (B_KERNEL_WRITE_AREA | B_WRITE_AREA) ? REGION_PRIVATE_MAP : REGION_NO_PRIVATE_MAP,
+		&target, name);
+
+	if (status < B_OK)
+		goto err;
+
+	// If the source area is writable, we need to move it one layer up as well
+
+	if ((source->lock & (B_KERNEL_WRITE_AREA | B_WRITE_AREA)) != 0)
+		vm_copy_on_write_area(source);
+
+	// we want to return the ID of the newly created area
+	status = target->id;
+
+err:
+	vm_put_aspace(addressSpace);
+	vm_put_region(source);
+
+	return status;
+}
+
+
+status_t
 vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 {
 	vm_address_space *aspace;
 	uint32 null_flags;
-	int err;
+	status_t err;
 
 	aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
@@ -1267,6 +1401,7 @@ vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr)
 
 	err = aspace->translation_map.ops->query(&aspace->translation_map,
 		vaddr, paddr, &null_flags);
+
 	vm_put_aspace(aspace);
 	return err;
 }
@@ -2025,7 +2160,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		mutex_lock(&cache_ref->lock);
 
 		// if we inserted a dummy page into this cache, we have to remove it now
-		if (dummy_page.state == PAGE_STATE_BUSY && dummy_page.cache_ref == cache_ref) {
+		if (dummy_page.state == PAGE_STATE_BUSY && dummy_page.cache == cache_ref->cache) {
 			vm_cache_remove_page(cache_ref, &dummy_page);
 			dummy_page.state = PAGE_STATE_INACTIVE;
 		}
@@ -2035,7 +2170,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		if (dummy_page.state == PAGE_STATE_BUSY) {
 			// we had inserted the dummy cache in another cache, so let's remove it from there
-			vm_cache_ref *temp_cache = dummy_page.cache_ref;
+			vm_cache_ref *temp_cache = dummy_page.cache->ref;
 			mutex_lock(&temp_cache->lock);
 			vm_cache_remove_page(temp_cache, &dummy_page);
 			mutex_unlock(&temp_cache->lock);
@@ -2048,7 +2183,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 	TRACEPFAULT;
 
-	if (page->cache_ref != top_cache_ref && isWrite) {
+	if (page->cache != top_cache_ref->cache && isWrite) {
 		// now we have a page that has the data we want, but in the wrong cache object
 		// so we need to copy it and stick it into the top cache
 		vm_page *src_page = page;
@@ -2080,7 +2215,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// Insert the new page into our cache, and replace it with the dummy page if necessary
 
 		// if we inserted a dummy page into this cache, we have to remove it now
-		if (dummy_page.state == PAGE_STATE_BUSY && dummy_page.cache_ref == top_cache_ref) {
+		if (dummy_page.state == PAGE_STATE_BUSY && dummy_page.cache == top_cache_ref->cache) {
 			vm_cache_remove_page(top_cache_ref, &dummy_page);
 			dummy_page.state = PAGE_STATE_INACTIVE;
 		}
@@ -2090,7 +2225,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 
 		if (dummy_page.state == PAGE_STATE_BUSY) {
 			// we had inserted the dummy cache in another cache, so let's remove it from there
-			vm_cache_ref *temp_cache = dummy_page.cache_ref;
+			vm_cache_ref *temp_cache = dummy_page.cache->ref;
 			mutex_lock(&temp_cache->lock);
 			vm_cache_remove_page(temp_cache, &dummy_page);
 			mutex_unlock(&temp_cache->lock);
@@ -2121,7 +2256,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 		// If the page doesn't reside in the area's cache, we need to make sure it's
 		// mapped in read-only, so that we cannot overwrite someone else's data (copy-on-write)
 		int new_lock = region->lock;
-		if (page->cache_ref != top_cache_ref && !isWrite)
+		if (page->cache != top_cache_ref->cache && !isWrite)
 			new_lock &= ~(isUser ? B_WRITE_AREA : B_KERNEL_WRITE_AREA);
 
 		atomic_add(&page->ref_count, 1);
@@ -2140,7 +2275,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 	if (dummy_page.state == PAGE_STATE_BUSY) {
 		// We still have the dummy page in the cache - that happens if we didn't need
 		// to allocate a new page before, but could use one in another cache
-		vm_cache_ref *temp_cache = dummy_page.cache_ref;
+		vm_cache_ref *temp_cache = dummy_page.cache->ref;
 		mutex_lock(&temp_cache->lock);
 		vm_cache_remove_page(temp_cache, &dummy_page);
 		mutex_unlock(&temp_cache->lock);
@@ -2184,14 +2319,14 @@ vm_virtual_map_lookup(vm_virtual_map *map, addr_t address)
 }
 
 
-int
-vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags)
+status_t
+vm_get_physical_page(addr_t paddr, addr_t *_vaddr, int flags)
 {
-	return (*kernel_aspace->translation_map.ops->get_physical_page)(paddr, vaddr, flags);
+	return (*kernel_aspace->translation_map.ops->get_physical_page)(paddr, _vaddr, flags);
 }
 
 
-int
+status_t
 vm_put_physical_page(addr_t vaddr)
 {
 	return (*kernel_aspace->translation_map.ops->put_physical_page)(vaddr);
@@ -2492,8 +2627,8 @@ map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
 
 
 area_id
-clone_area(const char *name, void **_address, uint32 addressSpec, uint32 protection, 
-	area_id source_area)
+clone_area(const char *name, void **_address, uint32 addressSpec, uint32 protection,
+	area_id source)
 {
 	return B_ERROR;
 }
