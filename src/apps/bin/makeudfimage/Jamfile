@@ -2,8 +2,10 @@ SubDir OBOS_TOP src apps bin makeudfimage ;
 
 BinCommand makeudfimage 
 	: makeudfimage.cpp
+	  ConsoleListener.cpp
 	  Debug.cpp
 	  Shell.cpp
+	  UdfBuilder.cpp
 	: stdc++.r4
 	
 ;
