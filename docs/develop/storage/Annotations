@@ -509,6 +509,13 @@ Description: Returns B_ENTRY_NOT_FOUND when the file's signature is not
 
 OS:          BeOS R5
 Module:      BAppFileInfo
+Location:    SetSupportedTypes()
+Description: Don't check whether the supplied types are valid MIME types. And
+             don't fail, if they are not. OBOS checks them.
+             
+
+OS:          BeOS R5
+Module:      BAppFileInfo
 Location:    GetIcon(), GetIconForType()
 Description: Crashes when getting B_LARGE_ICON and passing a BBitmap with
              B_RGB32 color space. B_MINI_ICON works just fine.
