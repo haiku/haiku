@@ -42,7 +42,7 @@
 	// registration directory of pnp root drivers
 	// (put all drivers under "universal" and use unique connection names)
 
-#define PNP_ROOT_MODULE_NAME PNP_DIR"sys/pnp_root/v1"
+#define PNP_ROOT_MODULE_NAME "sys/pnp_root/v1"
 
 
 static pnp_node_handle sRootNode;
@@ -59,7 +59,9 @@ pnp_root_init_root(void)
 		{ PNP_DRIVER_CONNECTION, B_STRING_TYPE, { string: "pnp_root" }},
 		{ PNP_DRIVER_DEVICE_IDENTIFIER, B_STRING_TYPE, { string: "pnp_root" }},
 
-		// directory for root drivers		
+		// directory for root drivers
+		// ToDo: temporary hack to get things started!
+		{ PNP_DRIVER_FIXED_CONSUMER, B_STRING_TYPE, { string: "bus_managers/isa/root" }},
 		{ PNP_DRIVER_DYNAMIC_CONSUMER, B_STRING_TYPE, { string: PNP_ROOT_DRIVERS_DIR "/" }},
 
 		{ NULL }
