@@ -1371,6 +1371,7 @@ em_local_timer(void *arg)
 	em_update_stats_counters(adapter);   
 	if (em_display_debug_stats && ifp->if_flags & IFF_RUNNING) {
 		em_print_hw_stats(adapter);
+		em_print_debug_info(adapter);
 	}
 	em_smartspeed(adapter);
 
@@ -2792,6 +2793,7 @@ em_print_debug_info(struct adapter *adapter)
 	dprintf("ipro1000/%d: CleanTxInterrupts = %ld\n", unit, 
 	       adapter->clean_tx_interrupts);
 #endif
+	snooze(10000); // give syslog reader some time to catchup
 	dprintf("ipro1000/%d: fifo workaround = %Ld, fifo_reset = %Ld\n", unit, 
 	       (long long)adapter->tx_fifo_wrk, 
 	       (long long)adapter->tx_fifo_reset);
@@ -2810,6 +2812,7 @@ em_print_debug_info(struct adapter *adapter)
 	       adapter->mbuf_cluster_failed);
 	dprintf("ipro1000/%d: Driver dropped packets = %ld\n", unit, 
 	       adapter->dropped_pkts);
+	snooze(10000); // give syslog reader some time to catchup
 
 	return;
 }
@@ -2827,6 +2830,7 @@ em_print_hw_stats(struct adapter *adapter)
 	       (long long)adapter->stats.sec);
 	dprintf("ipro1000/%d: Defer count = %Ld\n", unit, 
 	       (long long)adapter->stats.dc);
+	snooze(10000); // give syslog reader some time to catchup
 
 	dprintf("ipro1000/%d: Missed Packets = %Ld\n", unit, 
 	       (long long)adapter->stats.mpc);
@@ -2842,6 +2846,7 @@ em_print_hw_stats(struct adapter *adapter)
 	       (long long)adapter->stats.algnerrc);
 	dprintf("ipro1000/%d: Carrier extension errors = %Ld\n", unit,
 	       (long long)adapter->stats.cexterr);
+	snooze(10000); // give syslog reader some time to catchup
 
 	dprintf("ipro1000/%d: XON Rcvd = %Ld\n", unit, 
 	       (long long)adapter->stats.xonrxc);
@@ -2851,6 +2856,7 @@ em_print_hw_stats(struct adapter *adapter)
 	       (long long)adapter->stats.xoffrxc);
 	dprintf("ipro1000/%d: XOFF Xmtd = %Ld\n", unit, 
 	       (long long)adapter->stats.xofftxc);
+	snooze(10000); // give syslog reader some time to catchup
 
 	dprintf("ipro1000/%d: Good Packets Rcvd = %Ld\n", unit,
 	       (long long)adapter->stats.gprc);
