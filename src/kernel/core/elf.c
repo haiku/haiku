@@ -29,30 +29,31 @@
 #include <string.h>
 #include <stdio.h>
 
-#define ELF_TRACE 0
-#if ELF_TRACE
-#	define PRINT(x) dprintf x
+//#define TRACE_ELF
+#ifdef TRACE_ELF
 #	define TRACE(x) dprintf x
 #else
-#	define PRINT(x) ;
 #	define TRACE(x) ;
 #endif
 
+
+// ToDo: this shall contain a list of linked images (one day)
+//	this is a preparation for shared libraries in the kernel
+//	and not yet used.
+#if 0
+typedef struct elf_linked_image {
+	struct elf_linked_image *next;
+	struct elf_image_info *image;
+} elf_linked_image;
+#endif
 
 #define IMAGE_HASH_SIZE 16
 
 static hash_table *sImagesHash;
 
-// XXX TK this shall contain a list of linked images
-//        (don't know enough about ELF how to get this list)
-typedef struct elf_linked_image {
-	struct elf_linked_image *next;
-	struct elf_image_info *image;
-} elf_linked_image;
-
-static struct elf_image_info *kernel_image = NULL;
-static mutex image_lock;
-static mutex image_load_lock;
+static struct elf_image_info *sKernelImage = NULL;
+static mutex sImageMutex;
+static mutex sImageLoadMutex;
 
 static status_t elf_unload_image(struct elf_image_info *image);
 
@@ -124,9 +125,9 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 	uint32 i;
 	int j,rv;
 
-	PRINT(("looking up %p\n",(void *)address));
+	TRACE(("looking up %p\n",(void *)address));
 
-	mutex_lock(&image_lock);
+	mutex_lock(&sImageMutex);
 	hash_open(sImagesHash, &iterator);
 
 	found_sym = 0;
@@ -134,19 +135,19 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 	found_delta = 0x7fffffff;
 
 	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-		PRINT((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
+		TRACE((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
 		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
 			continue;
 
-		PRINT((" searching...\n"));
+		TRACE((" searching...\n"));
 		found_image = image;
 		for (i = 0; i < HASHTABSIZE(image); i++) {
 			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
 				long d;
 				sym = &image->syms[j];
 
-				PRINT(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),(void *)sym->st_value));
-				PRINT(("  symbol: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
+				TRACE(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),(void *)sym->st_value));
+				TRACE(("  symbol: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
 
 				if ((ELF32_ST_TYPE(sym->st_info) != STT_FUNC) || (ELF32_ST_BIND(sym->st_info) != STB_GLOBAL))
 					continue;
@@ -162,9 +163,9 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 	}
 
 	if (found_sym != 0) {
-		PRINT(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
-		PRINT(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
-		PRINT(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
+		TRACE(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
+		TRACE(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
+		TRACE(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
 
 		strlcpy(text, SYMNAME(found_image, found_sym), length);
 		
@@ -173,13 +174,13 @@ elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t le
 
 		rv = B_OK;
 	} else {
-		PRINT(("symbol not found!\n"));
+		TRACE(("symbol not found!\n"));
 		strlcpy(text, "symbol not found", length);
 		rv = B_ENTRY_NOT_FOUND;
 	}
 
 	hash_close(sImagesHash, &iterator, false);
-	mutex_unlock(&image_lock);
+	mutex_unlock(&sImageMutex);
 
 	return rv;
 }
@@ -217,7 +218,7 @@ find_image_by_vnode(void *vnode)
 	struct hash_iterator iterator;
 	struct elf_image_info *image;
 
-	mutex_lock(&image_lock);
+	mutex_lock(&sImageMutex);
 	hash_open(sImagesHash, &iterator);
 
 	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
@@ -226,7 +227,7 @@ find_image_by_vnode(void *vnode)
 	}
 
 	hash_close(sImagesHash, &iterator, false);
-	mutex_unlock(&image_lock);
+	mutex_unlock(&sImageMutex);
 
 	return image;
 }
@@ -244,7 +245,6 @@ create_image_struct()
 	image->regions[0].id = -1;
 	image->regions[1].id = -1;
 	image->ref_count = 1;
-	image->linked_images = NULL;
 
 	return image;
 }
@@ -330,8 +330,10 @@ dump_image(int argc, char **argv)
 }
 
 
-/* XXX - Currently unused
-static void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
+// Currently unused
+#if 0
+static
+void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 {
 
 	dprintf("symbol at %p, in image %p\n", sym, image);
@@ -343,7 +345,8 @@ static void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 	dprintf(" st_other 0x%x\n", sym->st_other);
 	dprintf(" st_shndx %d\n", sym->st_shndx);
 }
-*/
+#endif
+
 
 static struct Elf32_Sym *
 elf_find_symbol(struct elf_image_info *image, const char *name)
@@ -370,7 +373,7 @@ elf_lookup_symbol(image_id id, const char *symbol)
 	struct elf_image_info *image;
 	struct Elf32_Sym *sym;
 
-	PRINT(("elf_lookup_symbol: %s\n", symbol));
+	TRACE(("elf_lookup_symbol: %s\n", symbol));
 
 	image = find_image(id);
 	if (!image)
@@ -383,7 +386,7 @@ elf_lookup_symbol(image_id id, const char *symbol)
 	if (sym->st_shndx == SHN_UNDEF)
 		return 0;
 
-	PRINT(("found: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, 
+	TRACE(("found: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, 
 		sym->st_value, image->regions[0].delta));
 
 	return sym->st_value + image->regions[0].delta;
@@ -397,7 +400,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	int i;
 	int needed_offset = -1;
 
-	PRINT(("top of elf_parse_dynamic_section\n"));
+	TRACE(("top of elf_parse_dynamic_section\n"));
 
 	image->symhash = 0;
 	image->syms = 0;
@@ -452,7 +455,7 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	if (!image->symhash || !image->syms || !image->strtab)
 		return B_ERROR;
 
-	PRINT(("needed_offset = %d\n", needed_offset));
+	TRACE(("needed_offset = %d\n", needed_offset));
 
 	if (needed_offset >= 0)
 		image->needed = STRING(image, needed_offset);
@@ -492,7 +495,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 			}
 
 			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
-				PRINT(("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname));
+				TRACE(("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname));
 				return B_MISSING_SYMBOL;
 			}
 
@@ -503,7 +506,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 			return B_NO_ERROR;
 		case SHN_COMMON:
 			// ToDo: finish this
-			PRINT(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
+			TRACE(("elf_resolve_symbol: COMMON symbol, finish me!\n"));
 			return B_ERROR;
 		default:
 			// standard symbol
@@ -520,13 +523,13 @@ elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 {
 	int status = B_NO_ERROR;
 
-	PRINT(("top of elf_relocate\n"));
+	TRACE(("top of elf_relocate\n"));
 
 	// deal with the rels first
 	if (image->rel) {
 		TRACE(("total %i relocs\n", image->rel_len / (int)sizeof(struct Elf32_Rel)));
 
-		status = arch_elf_relocate_rel(image, sym_prepend, kernel_image, image->rel, image->rel_len);
+		status = arch_elf_relocate_rel(image, sym_prepend, sKernelImage, image->rel, image->rel_len);
 		if (status < B_OK)
 			return status;
 	}
@@ -535,15 +538,15 @@ elf_relocate(struct elf_image_info *image, const char *sym_prepend)
 		TRACE(("total %i plt-relocs\n", image->pltrel_len / (int)sizeof(struct Elf32_Rel)));
 
 		if (image->pltrel_type == DT_REL)
-			status = arch_elf_relocate_rel(image, sym_prepend, kernel_image, image->pltrel, image->pltrel_len);
+			status = arch_elf_relocate_rel(image, sym_prepend, sKernelImage, image->pltrel, image->pltrel_len);
 		else
-			status = arch_elf_relocate_rela(image, sym_prepend, kernel_image, (struct Elf32_Rela *)image->pltrel, image->pltrel_len);
+			status = arch_elf_relocate_rela(image, sym_prepend, sKernelImage, (struct Elf32_Rela *)image->pltrel, image->pltrel_len);
 		if (status < B_OK)
 			return status;
 	}
 
 	if (image->rela) {
-		status = arch_elf_relocate_rela(image, sym_prepend, kernel_image, image->rela, image->rela_len);
+		status = arch_elf_relocate_rela(image, sym_prepend, sKernelImage, image->rela, image->rela_len);
 		if (status < B_OK)
 			return status;
 	}
@@ -744,7 +747,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	int i;
 	ssize_t len;
 
-	PRINT(("elf_load_kspace: entry path '%s'\n", path));
+	TRACE(("elf_load_kspace: entry path '%s'\n", path));
 
 	fd = sys_open(path, 0);
 	if (fd < 0)
@@ -756,7 +759,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 
 	// XXX awful hack to keep someone else from trying to load this image
 	// probably not a bad thing, shouldn't be too many races
-	mutex_lock(&image_load_lock);
+	mutex_lock(&sImageLoadMutex);
 
 	// make sure it's not loaded already. Search by vnode
 	image = find_image_by_vnode(vnode);
@@ -802,15 +805,15 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		goto error2;
 	}
 
-	PRINT(("reading in program headers at 0x%x, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
+	TRACE(("reading in program headers at 0x%x, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
 	len = sys_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
 	if (len < 0) {
 		err = len;
-		PRINT(("error reading in program headers\n"));
+		TRACE(("error reading in program headers\n"));
 		goto error3;
 	}
 	if (len != eheader->e_phnum * eheader->e_phentsize) {
-		PRINT(("short read while reading in program headers\n"));
+		TRACE(("short read while reading in program headers\n"));
 		err = -1;
 		goto error3;
 	}
@@ -820,7 +823,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		int image_region;
 		int protection;
 
-		PRINT(("looking at program header %d\n", i));
+		TRACE(("looking at program header %d\n", i));
 
 		switch (pheaders[i].p_type) {
 			case PT_LOAD:
@@ -874,7 +877,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		}
 		image->regions[image_region].delta = image->regions[image_region].start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
 
-		PRINT(("elf_load_kspace: created a region at %p\n", (void *)image->regions[image_region].start));
+		TRACE(("elf_load_kspace: created a region at %p\n", (void *)image->regions[image_region].start));
 
 		len = sys_read(fd, pheaders[i].p_offset,
 			(void *)(image->regions[image_region].start + (pheaders[i].p_vaddr % PAGE_SIZE)),
@@ -913,7 +916,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 	register_elf_image(image);
 
 done:
-	mutex_unlock(&image_load_lock);
+	mutex_unlock(&sImageLoadMutex);
 	
 	return image->id;
 
@@ -929,7 +932,7 @@ error2:
 error1:
 	free(eheader);
 error:
-	mutex_unlock(&image_load_lock);
+	mutex_unlock(&sImageLoadMutex);
 error0:
 	if (vnode)
 		vfs_put_vnode_ptr(vnode);
@@ -938,7 +941,7 @@ error0:
 	return err;
 }
 
-
+#if 0
 static int
 elf_unlink_relocs(struct elf_image_info *image)
 {
@@ -952,7 +955,7 @@ elf_unlink_relocs(struct elf_image_info *image)
 	
 	return B_NO_ERROR;
 }
-
+#endif
 
 static void
 elf_unload_image_final(struct elf_image_info *image)
@@ -980,7 +983,8 @@ elf_unload_image(struct elf_image_info *image)
 	if (atomic_add(&image->ref_count, -1) > 0)
 		return B_NO_ERROR;
 
-	elf_unlink_relocs(image);
+	//elf_unlink_relocs(image);
+		// not yet used
 	elf_unload_image_final(image);
 
 	return B_NO_ERROR;
@@ -1003,7 +1007,7 @@ elf_unload_kspace(const char *path)
 	if (err < 0)
 		goto error0;
 
-	mutex_lock(&image_load_lock);
+	mutex_lock(&sImageLoadMutex);
 
 	image = find_image_by_vnode(vnode);
 	if (!image) {
@@ -1015,7 +1019,7 @@ elf_unload_kspace(const char *path)
 	err = elf_unload_image(image);
 
 error:
-	mutex_unlock(&image_load_lock);
+	mutex_unlock(&sImageLoadMutex);
 error0:
 	if(vnode)
 		vfs_put_vnode_ptr(vnode);
@@ -1083,8 +1087,8 @@ elf_init(kernel_args *ka)
 
 	image_init();
 
-	mutex_init(&image_lock, "kimages_lock");
-	mutex_init(&image_load_lock, "kimages_load_lock");
+	mutex_init(&sImageMutex, "kimages_lock");
+	mutex_init(&sImageLoadMutex, "kimages_load_lock");
 
 	sImagesHash = hash_init(IMAGE_HASH_SIZE, 0, image_compare, image_hash);
 	if (sImagesHash == NULL)
@@ -1093,36 +1097,36 @@ elf_init(kernel_args *ka)
 	// Build a image structure for the kernel, which has already been loaded.
 	// The VM has created areas for it under a known name already
 
-	kernel_image = create_image_struct();
-	kernel_image->name = strdup("kernel");
+	sKernelImage = create_image_struct();
+	sKernelImage->name = strdup("kernel");
 
 	// text segment
-	kernel_image->regions[0].id = find_area("kernel_ro");
-	if (kernel_image->regions[0].id < 0)
+	sKernelImage->regions[0].id = find_area("kernel_ro");
+	if (sKernelImage->regions[0].id < 0)
 		panic("elf_init: could not look up kernel text segment region\n");
 
-	get_area_info(kernel_image->regions[0].id, &areaInfo);
-	kernel_image->regions[0].start = (addr)areaInfo.address;
-	kernel_image->regions[0].size = areaInfo.size;
+	get_area_info(sKernelImage->regions[0].id, &areaInfo);
+	sKernelImage->regions[0].start = (addr)areaInfo.address;
+	sKernelImage->regions[0].size = areaInfo.size;
 
 	// data segment
-	kernel_image->regions[1].id = find_area("kernel_rw");
-	if (kernel_image->regions[1].id < 0)
+	sKernelImage->regions[1].id = find_area("kernel_rw");
+	if (sKernelImage->regions[1].id < 0)
 		panic("elf_init: could not look up kernel data segment region\n");
 
-	get_area_info(kernel_image->regions[1].id, &areaInfo);
-	kernel_image->regions[1].start = (addr)areaInfo.address;
-	kernel_image->regions[1].size = areaInfo.size;
+	get_area_info(sKernelImage->regions[1].id, &areaInfo);
+	sKernelImage->regions[1].start = (addr)areaInfo.address;
+	sKernelImage->regions[1].size = areaInfo.size;
 
 	// we know where the dynamic section is
-	kernel_image->dynamic_ptr = (addr)ka->kernel_dynamic_section_addr.start;
+	sKernelImage->dynamic_ptr = (addr)ka->kernel_dynamic_section_addr.start;
 
 	// parse the dynamic section
-	if (elf_parse_dynamic_section(kernel_image) < 0)
+	if (elf_parse_dynamic_section(sKernelImage) < 0)
 		dprintf("elf_init: WARNING elf_parse_dynamic_section couldn't find dynamic section.\n");
 
 	// insert it first in the list of kernel images loaded
-	register_elf_image(kernel_image);
+	register_elf_image(sKernelImage);
 
 	// Build image structures for all preloaded images.
 	// Again, the VM has already created areas for them.
