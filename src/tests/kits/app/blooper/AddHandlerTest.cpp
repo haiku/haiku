@@ -3,12 +3,11 @@
 //
 //------------------------------------------------------------------------------
 /**
-	@note	Most of AddHandler()'s functionality is indirectly exercises
-			indirectly by the tests for RemoveHandler(), CountHandler(),
-			HandlerAt() and IndexOf().  If AddHandler() isn't working correctly,
-			it will show up there.  I do wonder if I should replicate those
-			tests here anyway so that any problem specifically show up in this
-			test suite.
+	@note	Most of AddHandler()'s functionality is indirectly exercised
+			by the tests for RemoveHandler(), CountHandler(), HandlerAt() and
+			IndexOf().  If AddHandler() isn't working correctly, it will show up
+			there.  I do wonder if I should replicate those tests here anyway so
+			that any problem specifically show up in this test suite.
  */
 
 // Standard Includes -----------------------------------------------------------

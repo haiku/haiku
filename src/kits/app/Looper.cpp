@@ -92,6 +92,35 @@ team_id			BLooper::sTeamID = B_ERROR;
 
 static property_info gLooperPropInfo[] =
 {
+	{
+		"Handler"
+			{},
+			{B_INDEX_SPECIFIER, B_REVERSE_INDEX_SPECIFIER},
+			// TODO: what is the extra_data for?
+			NULL, 1,
+			{},
+			{},
+			{}
+	},
+	{
+		"Handlers"
+			{B_GET_PROPERTY},
+			{B_DIRECT_SPECIFIER},
+			NULL, 0,
+			{B_MESSENGER_TYPE},
+			{},
+			{}
+	},
+	{
+		"Handler"
+			{B_COUNT_PROPERTIES},
+			{B_DIRECT_SPECIFIER},
+			NULL, 0,
+			{B_INT32_TYPE},
+			{},
+			{}
+	},
+	{}
 };
 
 struct _loop_data_
@@ -109,6 +138,12 @@ BLooper::BLooper(const char* name, int32 priority, int32 port_capacity)
 //------------------------------------------------------------------------------
 BLooper::~BLooper()
 {
+	if (fRunCalled && !fTerminating)
+	{
+		debugger("You can't call delete on a BLooper object "
+				 "once it is running.");
+	}
+
 	Lock();
 	kill_thread(fTaskID);
 	delete fQueue;
@@ -383,8 +418,6 @@ int32 BLooper::IndexOf(BHandler* handler) const
 		debugger("Looper must be locked before calling IndexOf.");
 	}
 
-	// TODO: test
-	// ensure the B_ERROR gets returned if the handler isn't in the list
 	return fHandlers.IndexOf(handler);
 }
 //------------------------------------------------------------------------------
@@ -412,9 +445,7 @@ thread_id BLooper::Run()
 	if (fRunCalled)
 	{
 		// Not allowed to call Run() more than once
-		// TODO: test
-		// find out what message is actually here
-		debugger("");
+		debugger("can't call BLooper::Run twice!");
 	}
 
 	fTaskID = spawn_thread(_task0_, Name(), fInitPriority, this);
@@ -648,6 +679,11 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 	{
 		return this;
 	}
+	else
+	{
+		return BHandler::ResolveSpecifier(msg, index, specifier, form,
+										  property);
+	}
 
 	BMessage Reply(B_MESSAGE_NOT_UNDERSTOOD);
 	Reply.AddInt32("error", B_BAD_SCRIPT_SYNTAX);
@@ -659,7 +695,27 @@ BHandler* BLooper::ResolveSpecifier(BMessage* msg, int32 index,
 //------------------------------------------------------------------------------
 status_t BLooper::GetSupportedSuites(BMessage* data)
 {
-	// TODO: implement
+	status_t err;
+	if (!data)
+	{
+		err = B_BAD_VALUE;
+	}
+
+	if (!err)
+	{
+		err = data->AddString("Suites", "suite/vnd.Be-handler");
+		if (!err)
+		{
+			BPropertyInfo PropertyInfo(gLooperPropInfo);
+			err = data->AddFlat("message", &PropertyInfo);
+			if (!err)
+			{
+				err = BHandler::GetSupportedSuites(data);
+			}
+		}
+	}
+
+	return err;
 }
 //------------------------------------------------------------------------------
 void BLooper::AddCommonFilter(BMessageFilter* filter)
@@ -980,14 +1036,12 @@ void BLooper::InitData(const char* name, int32 priority, int32 port_capacity)
 //------------------------------------------------------------------------------
 void BLooper::AddMessage(BMessage* msg)
 {
-	// TODO: implement
-	// Why is this here?
+	// NOTE: Why is this here?
 }
 //------------------------------------------------------------------------------
 void BLooper::_AddMessagePriv(BMessage* msg)
 {
-	// TODO: implement
-	// No, really; why the hell is this here??
+	// NOTE: No, really; why the hell is this here??
 }
 //------------------------------------------------------------------------------
 status_t BLooper::_task0_(void* arg)
@@ -1294,7 +1348,7 @@ BHandler* BLooper::apply_filters(BList* list, BMessage* msg, BHandler* target)
 //------------------------------------------------------------------------------
 void BLooper::check_lock()
 {
-	// TODO: implement
+	// NOTE: any use for this?
 }
 //------------------------------------------------------------------------------
 BHandler* BLooper::resolve_specifier(BHandler* target, BMessage* msg)

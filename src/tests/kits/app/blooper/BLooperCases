@@ -62,7 +62,11 @@ case 5: handler is valid, looper is unlocked
 
 PreferredHandler() const;
 SetPreferredHandler(BHandler* handler);
+
 Run();
+--------------
+case 1: Attempt to call Run() twice
+
 Quit();
 QuitRequested();
 Lock();

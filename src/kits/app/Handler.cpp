@@ -154,9 +154,9 @@ static property_info gHandlerPropInfo[] =
 		// name
 		"Suites",
 		// commands
-		{B_GET_PROPERTY},
+		{ B_GET_PROPERTY },
 		// specifiers
-		{B_DIRECT_SPECIFIER},
+		{ B_DIRECT_SPECIFIER },
 		// usage
 		NULL,
 		// extra data
@@ -195,8 +195,8 @@ static property_info gHandlerPropInfo[] =
 	},
 	{
 		"Messenger",
-			{B_GET_PROPERTY},
-			{B_DIRECT_SPECIFIER},
+			{ B_GET_PROPERTY },
+			{ B_DIRECT_SPECIFIER },
 			NULL, 0,
 			{ B_MESSENGER_TYPE },
 			{},
@@ -204,8 +204,8 @@ static property_info gHandlerPropInfo[] =
 	},
 	{
 		"InternalName",
-			{B_GET_PROPERTY},
-			{B_DIRECT_SPECIFIER},
+			{ B_GET_PROPERTY },
+			{ B_DIRECT_SPECIFIER },
 			NULL, 0,
 			{ B_STRING_TYPE },
 			{},
@@ -675,7 +675,7 @@ BMessage: what =  (0x0, or 0)
 
 	if (!err)
 	{
-		err = data->AddString("Suites", "suite/vnd.Be-handler");
+		err = data->AddString("suites", "suite/vnd.Be-handler");
 		if (!err)
 		{
 			BPropertyInfo PropertyInfo(gHandlerPropInfo);
