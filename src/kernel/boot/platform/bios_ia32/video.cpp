@@ -21,6 +21,14 @@
 #include <string.h>
 
 
+//#define TRACE_VIDEO
+#ifdef TRACE_VIDEO
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 struct video_mode {
 	list_link	link;
 	uint16		mode;
@@ -117,14 +125,14 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 		if (mode == 0xffff)
 			break;
 
-		dprintf("  %lx: ", mode);
+		TRACE(("  %lx: ", mode));
 
 		struct vbe_mode_info modeInfo;
 		if (vesa_get_mode_info(mode, &modeInfo) == B_OK) {
-			dprintf("%ld x %ld x %ld (a = %ld, mem = %ld, phy = %lx, p = %ld, b = %ld)\n",
+			TRACE(("%ld x %ld x %ld (a = %ld, mem = %ld, phy = %lx, p = %ld, b = %ld)\n",
 				modeInfo.width, modeInfo.height, modeInfo.bits_per_pixel, modeInfo.attributes,
 				modeInfo.memory_model, modeInfo.physical_base, modeInfo.num_planes,
-				modeInfo.num_banks);
+				modeInfo.num_banks));
 
 			const uint32 requiredAttributes = MODE_ATTR_AVAILABLE | MODE_ATTR_GRAPHICS_MODE
 								| MODE_ATTR_COLOR_MODE | MODE_ATTR_LINEAR_BUFFER;
@@ -150,15 +158,15 @@ vesa_init(vbe_info_block *info, video_mode **_standardMode)
 					standardMode = videoMode;
 				else if (standardMode != NULL) {
 					// switch to the one with the higher resolution
-					// ToDo: is that always a good idea?
-					if (modeInfo.width > standardMode->width)
+					// ToDo: is that always a good idea? for now we'll use 800x600
+					if (modeInfo.width > standardMode->width && modeInfo.width <= 800)
 						standardMode = videoMode;
 				}
 
 				list_add_item(&sModeList, videoMode);
 			}
 		} else
-			dprintf("(failed)\n");
+			TRACE(("(failed)\n"));
 	}
 
 	if (standardMode == NULL) {
@@ -373,11 +381,12 @@ platform_init_video(void)
 
 	sVesaCompatible = vesa_init(&sInfo, &sMode) == B_OK;
 	if (!sVesaCompatible) {
-		dprintf("No VESA compatible graphics!\n");
+		TRACE(("No VESA compatible graphics!\n"));
 		return B_ERROR;
 	}
 
-	dprintf("VESA compatible graphics!\n");
+	TRACE(("VESA compatible graphics!\n"));
+
 	return B_OK;
 }
 
