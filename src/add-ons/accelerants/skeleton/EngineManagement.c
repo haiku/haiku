@@ -12,7 +12,7 @@
 #include "acc_std.h"
 
 
-static engine_token nv_engine_token = { 1, B_2D_ACCELERATION, NULL };
+static engine_token eng_engine_token = { 1, B_2D_ACCELERATION, NULL };
 
 uint32 ACCELERANT_ENGINE_COUNT(void)
 {
@@ -28,7 +28,7 @@ status_t ACQUIRE_ENGINE(uint32 capabilities, uint32 max_wait, sync_token *st, en
 	if (st) SYNC_TO_TOKEN(st);
 
 	/* return an engine token */
-	*et = &nv_engine_token;
+	*et = &eng_engine_token;
 	return B_OK;
 }
 

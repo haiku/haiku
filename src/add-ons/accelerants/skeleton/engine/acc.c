@@ -37,7 +37,7 @@ status_t eng_acc_init()
 	uint16 cnt;
 
 	/* setup PTIMER: */
-	//fixme? how about NV28 setup as just after coldstarting? (see nv_info.c)
+	//fixme? how about NV28 setup as just after coldstarting? (see eng_info.c)
 	/* set timer numerator to 8 (in b0-15) */
 	ACCW(PT_NUMERATOR, 0x00000008);
 	/* set timer denominator to 3 (in b0-15) */

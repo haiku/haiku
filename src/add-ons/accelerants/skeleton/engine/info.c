@@ -2634,7 +2634,7 @@ static void pinsnv4_fake(void)
 	si->ps.max_dac2_clock_32 = 0;
 	/* 'failsave' values */
 	si->ps.max_dac2_clock_32dh = 0;
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
+	//fixme: primary & secondary_dvi should be overrule-able via skel.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	/* not used (yet) because no coldstart will be attempted (yet) */
@@ -2668,7 +2668,7 @@ static void pinsnv5_nv5m64_fake(void)
 	si->ps.max_dac2_clock_32 = 0;
 	/* 'failsave' values */
 	si->ps.max_dac2_clock_32dh = 0;
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
+	//fixme: primary & secondary_dvi should be overrule-able via skel.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	/* not used (yet) because no coldstart will be attempted (yet) */
@@ -2702,7 +2702,7 @@ static void pinsnv6_fake(void)
 	si->ps.max_dac2_clock_32 = 0;
 	/* 'failsave' values */
 	si->ps.max_dac2_clock_32dh = 0;
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
+	//fixme: primary & secondary_dvi should be overrule-able via skel.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	/* not used (yet) because no coldstart will be attempted (yet) */
@@ -2754,7 +2754,7 @@ static void pinsnv10_arch_fake(void)
 		si->ps.max_dac2_clock_32 = 280;
 		si->ps.max_dac2_clock_32dh = 250;
 	}
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
+	//fixme: primary & secondary_dvi should be overrule-able via skel.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	/* not used (yet) because no coldstart will be attempted (yet) */
@@ -2790,7 +2790,7 @@ static void pinsnv20_arch_fake(void)
 	si->ps.max_dac2_clock_24 = 320;
 	si->ps.max_dac2_clock_32 = 280;
 	si->ps.max_dac2_clock_32dh = 250;
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
+	//fixme: primary & secondary_dvi should be overrule-able via skel.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	/* not used (yet) because no coldstart will be attempted (yet) */
@@ -2840,7 +2840,7 @@ static void pinsnv30_arch_fake(void)
 	si->ps.max_dac2_clock_24 = 320;
 	si->ps.max_dac2_clock_32 = 280;
 	si->ps.max_dac2_clock_32dh = 250;
-	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
+	//fixme: primary & secondary_dvi should be overrule-able via skel.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
 	/* not used (yet) because no coldstart will be attempted (yet) */

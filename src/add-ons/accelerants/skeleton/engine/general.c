@@ -12,7 +12,7 @@ static status_t test_ram(void);
 static status_t nvxx_general_powerup (void);
 static status_t eng_general_bios_to_powergraphics(void);
 
-static void nv_dump_configuration_space (void)
+static void eng_dump_configuration_space (void)
 {
 #define DUMP_CFG(reg, type) if (si->ps.card_type >= type) do { \
 	uint32 value = CFGR(reg); \
@@ -137,7 +137,7 @@ static status_t test_ram()
  * This routine *has* to be done *after* SetDispplayMode has been executed,
  * or test results will not be representative!
  * (CAS latency is dependant on NV setup on some (DRAM) boards) */
-status_t nv_set_cas_latency()
+status_t eng_set_cas_latency()
 {
 	status_t result = B_ERROR;
 	uint8 latency = 0;
@@ -317,7 +317,7 @@ static status_t nvxx_general_powerup()
 	dump_pins();
 
 	/* dump config space as it is after a possible coldstart attempt */
-	if (si->settings.logmask & 0x80000000) nv_dump_configuration_space();
+	if (si->settings.logmask & 0x80000000) eng_dump_configuration_space();
 
 	/* setup CRTC and DAC functions access: determined in fake_panel_start */
 	setup_virtualized_heads(si->ps.crtc2_prim);
@@ -409,7 +409,7 @@ static status_t eng_general_bios_to_powergraphics()
 	NV_REG32(NV32_PWRUPCTRL) = 0x13110011;
 	snooze(1000);
 
-	/* power-up all nvidia hardware function blocks */
+	/* power-up all hardware function blocks */
 	/* bit 28: OVERLAY ENGINE (BES),
 	 * bit 25: CRTC2, (> NV04A)
 	 * bit 24: CRTC1,

@@ -1,6 +1,6 @@
 /* general card functions */
 status_t eng_general_powerup(void);
-status_t nv_set_cas_latency(void);
+status_t eng_set_cas_latency(void);
 void setup_virtualized_heads(bool);
 void set_crtc_owner(bool);
 status_t eng_general_output_select(bool);
@@ -13,17 +13,17 @@ status_t eng_agp_setup(void);
 
 /* apsed: logging macros */
 #define MSG(args) do { /* if needed or si->settings with si NULL */ \
-	nv_log args; \
+	eng_log args; \
 } while (0)
 #define LOG(level_bit, args) do { \
 	uint32 mod = (si->settings.logmask &  0xfffffff0) & MODULE_BIT; \
 	uint32 lev = (si->settings.logmask & ~0xfffffff0) & level_bit; \
-	if (mod && lev) nv_log args; \
+	if (mod && lev) eng_log args; \
 } while (0)
 
 /* support functions */
 void delay(bigtime_t i);
-void nv_log(char *format, ...);
+void eng_log(char *format, ...);
 
 /* i2c functions */
 int i2c_maven_read(unsigned char address);
@@ -118,9 +118,9 @@ status_t check_overlay_capability(uint32 feature);
 void eng_bes_move_overlay(void);
 status_t eng_bes_to_crtc(bool crtc);
 status_t eng_bes_init(void);
-status_t nv_configure_bes
+status_t eng_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow,const overlay_view *ov, int offset);
-status_t nv_release_bes(void);
+status_t eng_release_bes(void);
 
 /* I2C functions */
 status_t i2c_sec_tv_adapter(void);

@@ -18,7 +18,7 @@ static status_t init_common(int the_fd);
 /* Initialization code shared between primary and cloned accelerants */
 static status_t init_common(int the_fd) {
 	status_t result;
-	nv_get_private_data gpd;
+	eng_get_private_data gpd;
 	
 	// LOG not available from here to next LOG: NULL si
 
@@ -220,7 +220,7 @@ Return the info required to clone the device.  void *data points to
 a buffer at least ACCELERANT_CLONE_INFO_SIZE() bytes in length.
 */
 void GET_ACCELERANT_CLONE_INFO(void *data) {
-	nv_device_name dn;
+	eng_device_name dn;
 	status_t result;
 
 	/* call the kernel driver to get the device name */	

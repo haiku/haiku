@@ -197,7 +197,7 @@ const overlay_buffer *ALLOCATE_OVERLAY_BUFFER(color_space cs, uint16 width, uint
 		/* NOTE to app programmers:
 		 * For testing app behaviour regarding workspace switches or screen prefs changes to settings
 		 * that do not have enough cardRAM left for allocation of overlay bitmaps, you need a card with
-		 * a low amount of RAM. Or you can set in the file nv.settings for example:
+		 * a low amount of RAM. Or you can set in the file skel.settings for example:
 		 * memory 8 #8Mb RAM on card
 		 * and reboot (this simulates 8Mb RAM on the card).
 		 *
@@ -529,7 +529,7 @@ status_t RELEASE_OVERLAY(overlay_token ot)
 	/* call is for real */
 	{
 
-		nv_release_bes();
+		eng_release_bes();
 
 		LOG(4,("succesfull\n"));
 
@@ -597,7 +597,7 @@ status_t CONFIGURE_OVERLAY
 			LOG(4,("succesfull, switching to buffer %d\n", offset));
 
 			/* program overlay hardware */
-			nv_configure_bes(ob, ow, ov, offset);
+			eng_configure_bes(ob, ow, ov, offset);
 
 			return B_OK;
 		}

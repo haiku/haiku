@@ -18,7 +18,7 @@ display_mode *my_mode_list;
 area_id	my_mode_list_area;
 int accelerantIsClone;
 
-nv_get_set_pci nv_pci_access=
+eng_get_set_pci eng_pci_access=
 	{
 		NV_PRIVATE_DATA_MAGIC,
 		0,
@@ -26,7 +26,7 @@ nv_get_set_pci nv_pci_access=
 		0
 	};
 
-nv_in_out_isa nv_isa_access=
+eng_in_out_isa eng_isa_access=
 	{
 		NV_PRIVATE_DATA_MAGIC,
 		0,

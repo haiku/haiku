@@ -12,10 +12,10 @@ static void eng_agp_list_active(uint32 cmd);
 
 status_t eng_agp_setup(void)
 {
-	nv_nth_agp_info nai;
-	nv_cmd_agp nca;
+	eng_nth_agp_info nai;
+	eng_cmd_agp nca;
 	uint8 index;
-	agp_info nv_ai;
+	agp_info eng_ai;
 	bool agp = false;
 
 	/* first try to enable FW support on our card if user requested this
@@ -36,7 +36,7 @@ status_t eng_agp_setup(void)
 		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", NV_REG32(NV32_NVSTRAPINFO2)));
 	}
 
-	/* set the magic number so the nvidia kerneldriver knows we're for real */
+	/* set the magic number so the skeleton kerneldriver knows we're for real */
 	nca.magic = nai.magic = NV_PRIVATE_DATA_MAGIC;
 
 	/* contact driver and get a pointer to the registers and shared data */
@@ -78,7 +78,7 @@ status_t eng_agp_setup(void)
 			LOG(4,("AGP: (this is the device this accelerant controls)\n"));
 			agp = true;
 			/* remember our info */
-			nv_ai = nai.agpi;
+			eng_ai = nai.agpi;
 		}
 
 		/* log capabilities */
@@ -104,8 +104,8 @@ status_t eng_agp_setup(void)
 
 	if (si->settings.force_pci)
 	{
-		/* set PCI mode if specified by user in nv.settings */
-		LOG(4,("AGP: forcing PCI mode (specified in nv.settings)\n"));
+		/* set PCI mode if specified by user in skel.settings */
+		LOG(4,("AGP: forcing PCI mode (specified in skel.settings)\n"));
 
 		/* let the AGP busmanager setup PCI mode.
 		 * (the AGP speed scheme is of no consequence now) */
@@ -120,13 +120,13 @@ status_t eng_agp_setup(void)
 		/* let the AGP busmanager worry about what mode to set.. */
 		nca.cmd = 0xfffffff7;
 		/* ..but we do need to select the right speed scheme fetched from our card */
-		if (nv_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
+		if (eng_ai.interface.agp_stat & AGP_rate_rev) nca.cmd |= AGP_rate_rev;
 		ioctl(fd, NV_ENABLE_AGP, &nca, sizeof(nca));
 	}
 
 	/* list mode now activated,
 	 * make sure we have the correct speed scheme for logging */
-	eng_agp_list_active(nca.cmd | (nv_ai.interface.agp_stat & AGP_rate_rev));
+	eng_agp_list_active(nca.cmd | (eng_ai.interface.agp_stat & AGP_rate_rev));
 
 	/* extra check */
 	LOG(4,("AGP: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));

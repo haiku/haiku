@@ -15,7 +15,7 @@ void delay(bigtime_t i)
 }
 
 /*debug logging*/
-void nv_log(char *fmt, ...)
+void eng_log(char *fmt, ...)
 {
 	char     buffer[1024];
 	char     fname[64];

@@ -19,7 +19,7 @@
 */
 static void interrupt_enable(bool flag) {
 	status_t result;
-	nv_set_bool_state sbs;
+	eng_set_bool_state sbs;
 
 	/* set the magic number so the driver knows we're for real */
 	sbs.magic = NV_PRIVATE_DATA_MAGIC;
@@ -323,7 +323,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 //	head1_mem_priority(colour_depth1);
 
 	/* Tune RAM CAS-latency if needed. Must be done *here*! */
-	nv_set_cas_latency();
+	eng_set_cas_latency();
 
 	return B_OK;
 }

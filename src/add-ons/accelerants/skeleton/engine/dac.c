@@ -148,7 +148,7 @@ status_t eng_dac_set_pix_pll(display_mode target)
 	//fixme: when VESA DDC EDID stuff is implemented, this option can be deleted...
 	if (si->ps.tmds1_active && !si->settings.pgm_panel)
 	{
-		LOG(4,("DAC: Not programming DFP refresh (specified in nv.settings)\n"));
+		LOG(4,("DAC: Not programming DFP refresh (specified in skel.settings)\n"));
 		return B_OK;
 	}
 

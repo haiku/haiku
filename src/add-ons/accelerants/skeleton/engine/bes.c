@@ -421,7 +421,7 @@ status_t eng_bes_init()
 	return B_OK;
 }
 
-status_t nv_configure_bes
+status_t eng_configure_bes
 	(const overlay_buffer *ob, const overlay_window *ow, const overlay_view *ov, int offset)
 {
 	/* yuy2 (4:2:2) colorspace calculations */
@@ -848,7 +848,7 @@ status_t nv_configure_bes
 	return B_OK;
 }
 
-status_t nv_release_bes()
+status_t eng_release_bes()
 {
 	if (si->ps.card_arch < NV10A)
 	{
