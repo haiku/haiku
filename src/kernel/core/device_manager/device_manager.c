@@ -25,7 +25,6 @@
 #endif
 
 
-benaphore node_lock;
 pnp_node_info *node_list;
 
 bool disable_useraddons;
