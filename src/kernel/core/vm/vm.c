@@ -40,8 +40,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#define TRACE_VM 0
-#if TRACE_VM
+//#define TRACE_VM
+#ifdef TRACE_VM
 #	define TRACE(x) dprintf x
 #else
 #	define TRACE(x) ;
@@ -504,7 +504,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
 
 	int err;
 
-	TRACE(("map_backing_store: aspace 0x%x, store 0x%x, *vaddr 0x%x, offset 0x%Lx, size %d, addr_type %d, wiring %d, lock %d, _region 0x%x, region_name '%s'\n",
+	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addr_type %d, wiring %d, lock %d, _region %p, region_name '%s'\n",
 		aspace, store, *vaddr, offset, size, addr_type, wiring, lock, _region, region_name));
 
 	region = _vm_create_region_struct(aspace, region_name, wiring, lock);
@@ -920,7 +920,7 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 
 	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %d,"
 		" size = %lu, lock = %d, phys = %p)\n",
-		aid, name, address, addr_type, size, lock, (void *)phys_addr));
+		aid, name, _address, addr_type, size, lock, (void *)phys_addr));
 
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
