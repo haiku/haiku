@@ -595,7 +595,7 @@ DBG(OUT("  ... done: %lx\n", err));
 		int32 temp;
 		do
 		{
-DBG(OUT("  wait_for_thread(%lx)...\n", tid));
+DBG(OUT("  wait_for_thread(%ld)...\n", tid));
 			err = wait_for_thread(tid, &temp);
 		} while (err == B_INTERRUPTED);
 	}
@@ -1197,7 +1197,6 @@ DBG(OUT("LOOPER: locking looper...\n"));
 	{
 DBG(OUT("LOOPER: looper locked\n"));
 		obj->task_looper();
-		obj->fTerminating = true;
 		delete obj;
 	}
 
