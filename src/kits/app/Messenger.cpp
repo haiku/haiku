@@ -316,7 +316,7 @@ BMessenger::LockTargetWithTimeout(bigtime_t timeout) const
 // SendMessage
 /*! \brief Delivers a BMessage synchronously to the messenger's target.
 
-	The method does not wait for a reply. It is sent asynchronously.
+	The method does not wait for a reply. The message is sent asynchronously.
 
 	\param command The what field of the message to deliver.
 	\param replyTo The handler to which a reply to the message shall be sent.
@@ -339,7 +339,7 @@ BMessenger::SendMessage(uint32 command, BHandler *replyTo) const
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
 
-	The method does not wait for a reply. It is sent asynchronously.
+	The method does not wait for a reply. The message is sent asynchronously.
 
 	\param message The message to be sent.
 	\param replyTo The handler to which a reply to the message shall be sent.
@@ -359,11 +359,13 @@ BMessenger::SendMessage(BMessage *message, BHandler *replyTo,
 						bigtime_t timeout) const
 {
 DBG(OUT("BMessenger::SendMessage2(%.4s)\n", (char*)&message->what));
-	// TODO: Verify the reply behavior.
 	status_t error = (message ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		BMessenger replyMessenger(replyTo);
-		bool wantsReply = replyTo;
+		// If the reply messenger is invalid use the app messenger.
+		if (!replyMessenger.IsValid())
+			replyMessenger = be_app_messenger;
+		bool wantsReply = replyMessenger.IsValid();
 		error = message->_send_(fPort, fHandlerToken, fPreferredTarget,
 								timeout, wantsReply, replyMessenger);
 	}
@@ -377,7 +379,7 @@ DBG(OUT("BMessenger::SendMessage2() done: %lx\n", error));
 	A copy of the supplied message is sent and the caller retains ownership
 	of \a message.
 
-	The method does not wait for a reply. It is sent asynchronously.
+	The method does not wait for a reply. The message is sent asynchronously.
 
 	\param message The message to be sent.
 	\param replyTo A messenger specifying the target for a reply to \a message.
@@ -395,11 +397,14 @@ status_t
 BMessenger::SendMessage(BMessage *message, BMessenger replyTo,
 						bigtime_t timeout) const
 {
-	// TODO: Verify the reply behavior.
 	status_t error = (message ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
+		// If the reply messenger is invalid use the app messenger.
+		if (!replyTo.IsValid())
+			replyTo = be_app_messenger;
+		bool wantsReply = replyTo.IsValid();
 		error = message->_send_(fPort, fHandlerToken, fPreferredTarget,
-								timeout, true, replyTo);
+								timeout, wantsReply, replyTo);
 	}
 	return error;
 }
