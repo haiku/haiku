@@ -8,12 +8,17 @@
 
 #include <Looper.h>
 
+#include "RDiskDeviceList.h"
+
 class DiskDeviceManager : public BLooper {
 public:
 	DiskDeviceManager();
 	virtual ~DiskDeviceManager();
 
 	virtual void MessageReceived(BMessage *message);
+
+private:
+	RDiskDeviceList	fDeviceList;
 };
 
 #endif	// DISK_DEVICE_MANAGER_H
