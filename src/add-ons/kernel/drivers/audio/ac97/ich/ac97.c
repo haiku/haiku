@@ -38,6 +38,7 @@ void ac97_amp_enable(ac97_dev *dev, bool onoff);
 void ac97_dump_capabilities(ac97_dev *dev);
 void ac97_detect_capabilities(ac97_dev *dev);
 void ac97_detect_rates(ac97_dev *dev);
+void ac97_update_register_cache(ac97_dev *dev);
 
 const char * stereo_enhancement_technique[] =
 {
@@ -112,10 +113,10 @@ codec_table codecs[] =
 	{ CODEC_ID_AD1886A,	0xffffffff, ad1881_init,	"Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1887,	0xffffffff, ad1881_init,	"Analog Devices AD1887 SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1980,	0xffffffff, ad1980_init,	"Analog Devices AD1980 SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445371,		0xffffffff, default_init,	"Analog Devices 0x41445371 (???)" },
+	{ 0x41445372,		0xffffffff, default_init,	"Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1981B,	0xffffffff, default_init,	"Analog Devices AD1981B SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AD1985,	0xffffffff, default_init,	"Analog Devices AD1985 SoundMAX"B_UTF8_REGISTERED },
-	{ 0x41445371,		0xffffffff, default_init,	"Analog Devices 0x41445371 (???)" },
-	{ 0x41445372,		0xffffffff, ad1881_init,	"Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ CODEC_ID_AK4540,	0xffffffff, default_init,	"Asahi Kasei AK4540" },
 	{ CODEC_ID_AK4542,	0xffffffff, default_init,	"Asahi Kasei AK4542" },
 	{ 0x414b4d02,		0xffffffff, default_init,	"Asahi Kasei AK4543" },
@@ -185,7 +186,6 @@ find_codec_table(uint32 codecid)
 void
 ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write, void *cookie)
 {
-	int reg;
 	ac97_dev *dev;
 	codec_table *codec;
 	
@@ -200,11 +200,12 @@ ac97_attach(ac97_dev **_dev, codec_reg_read reg_read, codec_reg_write reg_write,
 	dev->set_rate = 0;
 	dev->get_rate = 0;
 	dev->clock = 48000; /* default clock on non-broken motherboards */
+	dev->min_vsr = 0x0001;	
+	dev->max_vsr = 0xffff;
 	dev->reversed_eamp_polarity = false;
 
 	/* setup register cache */
-	for (reg = 0; reg <= 0x7e; reg += 2)
-		dev->reg_cache[reg] = ac97_reg_uncached_read(dev, reg);
+	ac97_update_register_cache(dev);
 
 	/* reset the codec */	
 	LOG(("codec reset\n"));
@@ -311,6 +312,14 @@ ac97_reg_update_bits(ac97_dev *dev, uint8 reg, uint16 mask, uint16 value)
 	return true;
 }
 
+void
+ac97_update_register_cache(ac97_dev *dev)
+{
+	int reg;
+	for (reg = 0; reg <= 0x7e; reg += 2)
+		dev->reg_cache[reg] = ac97_reg_uncached_read(dev, reg);
+}
+
 bool
 ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 {
@@ -328,7 +337,7 @@ ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate)
 	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
 		value /= 2;
 		
-	if (value > 0xffff)
+	if (value < dev->min_vsr || value > dev->max_vsr)
 		return false;
 
 	old = ac97_reg_cached_read(dev, reg);
@@ -358,7 +367,7 @@ ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate)
 	if (ac97_reg_cached_read(dev, AC97_EXTENDED_STAT_CTRL) & 0x0002)
 		value *= 2;
 
-	*rate = (value * 48000) / dev->clock;
+	*rate = (value * 48000ULL) / dev->clock; /* use 64 bit calculation to avoid overflow*/
 	return true;
 }
 
@@ -683,14 +692,14 @@ void ad1819_init(ac97_dev *dev)
 
 	/* Default config for system with single AD1819 codec */
 	ac97_reg_cached_write(dev, AC97_AD_SERIAL_CONFIG, 0x7000);
+	ac97_update_register_cache(dev);
 
 	/* The AD1819 chip has proprietary  sample rate controls
 	 * Setup sample rate 0 generator for DAC,
 	 * Setup sample rate 1 generator for ADC,
-	 * also enable DAC zero fill
-	 * ARSR=1, DRSR=0, ALSR=1, DLSR=0, DACZ=1
+	 * ARSR=1, DRSR=0, ALSR=1, DLSR=0
 	 */
-	ac97_reg_cached_write(dev, AC97_AD_MISC_CONTROL, 0x8101);
+	ac97_reg_cached_write(dev, AC97_AD_MISC_CONTROL, 0x0101);
 	/* connect special rate set/get functions */
 	dev->set_rate = ad1819_set_rate;
 	dev->get_rate = ad1819_get_rate;
@@ -702,21 +711,54 @@ void ad1819_init(ac97_dev *dev)
 void ad1881_init(ac97_dev *dev)
 {
 	LOG(("ad1881_init\n"));
+	
+	/* Default config for system with single AD1819 codec,
+	 * BROKEN on systems with master & slave codecs */
+	ac97_reg_cached_write(dev, AC97_AD_SERIAL_CONFIG, 0x7000);
+	ac97_update_register_cache(dev);
+
+	/* Setup DAC and ADC rate generator assignments compatible with AC97 */
+	ac97_reg_cached_write(dev, AC97_AD_MISC_CONTROL, 0x0404);
+
+	/* Setup variable frame rate limits */
+	dev->min_vsr = 0x1B58;	/*  7kHz */
+	dev->max_vsr = 0xBB80;	/* 48kHz */
 }
 
 void ad1885_init(ac97_dev *dev)
 {
 	LOG(("ad1885_init\n"));
+	ad1881_init(dev);
+	
+	/* disable jack sense 0 and 1 (JS0, JS1) to turn off automatic mute */
+	ac97_reg_cached_write(dev, AC97_AD_JACK_SENSE, ac97_reg_cached_read(dev, AC97_AD_JACK_SENSE) | 0x0300);
 }
 
 void ad1886_init(ac97_dev *dev)
 {
 	LOG(("ad1886_init\n"));
+	ad1881_init(dev);
+	
+	/* disable jack sense */
+	ac97_reg_cached_write(dev, AC97_AD_JACK_SENSE, ac97_reg_cached_read(dev, AC97_AD_JACK_SENSE) | 0x0100);
 }
 
 void ad1980_init(ac97_dev *dev)
 {
 	LOG(("ad1980_init\n"));
+
+	/* Select only master codec,
+	 * SPDIF and DAC are linked
+	 */
+	ac97_reg_cached_write(dev, AC97_AD_SERIAL_CONFIG, 0x1001);
+	ac97_update_register_cache(dev);
+	
+	/* Select Line-out driven with mixer data (not surround data)
+	 * Select Headphone-out driven with mixer data (not surround data),
+	 * LOSEL = 0, HPSEL = 1
+	 * XXX this one needs to be changed to support surround	out
+	 */
+	ac97_reg_cached_write(dev, AC97_AD_MISC_CONTROL, 0x0400);
 }
 
 void alc650_init(ac97_dev *dev)

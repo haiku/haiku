@@ -68,6 +68,7 @@ enum AC97_REGISTER {
 	AC97_VENDOR_ID2			= 0x7E,
 	
 	/* Analog Devices */
+	AC97_AD_JACK_SENSE		= 0x72,
 	AC97_AD_SERIAL_CONFIG	= 0x74,
 	AC97_AD_MISC_CONTROL	= 0x76,
 	AC97_AD_SAMPLE_RATE_0	= 0x78,
@@ -199,7 +200,9 @@ struct ac97_dev {
 	codec_reg_write		reg_write;
 	codec_set_rate		set_rate;
 	codec_get_rate		get_rate;
-	
+
+	uint32				max_vsr;	
+	uint32				min_vsr;	
 	uint32 				clock;
 	uint64				capabilities;
 	bool				reversed_eamp_polarity;	
