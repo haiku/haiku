@@ -280,6 +280,13 @@ status_t device_reader(void *args)
 			
 			printf("%s: input buffer:\n", me->name);
 			g_stack->dump_buffer(buffer);
+/*			
+			g_stack->add_buffer_attribut(buffer, "ethernet:to", FROM_BUFFER, 0, 6);
+			g_stack->add_buffer_attribut(buffer, "ethernet:from", FROM_BUFFER, 6, 6);
+			g_stack->add_buffer_attribut(buffer, "ethernet:protocol", FROM_BUFFER | NTOH_ORDER, 12, 2);
+*/
+			// strip ethernet header
+			g_stack->remove_from_buffer(buffer, 0, 14);
 
 			if (g_stack->push_buffer_up(me, buffer) != B_OK)
 				// nobody above us *eat* this buffer, so we drop it ourself :-(
