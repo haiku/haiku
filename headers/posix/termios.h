@@ -172,6 +172,8 @@ struct termios {
 #define TIOCGWINSZ			(TCGETA + 12)	/* pass in a struct winsize */
 #define TIOCSWINSZ			(TCGETA + 13)	/* pass in a struct winsize */
 #define TCVTIME				(TCGETA + 14)	/* pass in bigtime_t, old value saved */
+#define TIOCGPGRP			(TCGETA + 15)	/* Gets the process group ID of the TTY device */
+#define TIOCSPGRP			(TCGETA + 16)	/* Sets the process group ID ('pgid' in BeOS) */
 
 /* Event codes.  Returned from TCWAITEVENT */
 #define EV_RING			0x0001
