@@ -23,7 +23,7 @@
 #include "builtin_fs.h"
 
 // ToDo: handles file names suboptimally - it has all file names
-//	in a single linked list, no hash lookups or whatever.
+//	in a singly linked list, no hash lookups or whatever.
 
 #define PIPEFS_TRACE 0
 
@@ -1208,7 +1208,7 @@ pipefs_read_stat(fs_volume _volume, fs_vnode _node, struct stat *stat)
 
 	stat->st_dev = volume->ID();
 	stat->st_ino = inode->ID();
-	stat->st_size = 0;	// ToDo: oughta get me!
+	stat->st_size = cbuf_get_length(fBufferChain);
 	stat->st_mode = inode->Type() | 0777;
 
 	return 0;
