@@ -46,7 +46,7 @@
 
 #include "BeUtils.h"
 
-BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP) {
+BBitmap* LoadBitmap(const char* name, uint32 type_code) {
 	if (type_code == B_TRANSLATOR_BITMAP) {
 		return BTranslationUtils::GetBitmap(type_code, name);
 	} else {
