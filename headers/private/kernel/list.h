@@ -48,6 +48,8 @@ extern void list_add_link_to_tail(struct list *list, void *_link);
 extern void list_remove_link(void *_link);
 extern void *list_get_next_item(struct list *list, void *item);
 extern void *list_get_prev_item(struct list *list, void *item);
+extern void list_add_item(struct list *list, void *item);
+extern void list_remove_item(struct list *list, void *item);
 extern void *list_remove_head_item(struct list *list);
 extern void *list_remove_tail_item(struct list *list);
 
