@@ -68,6 +68,10 @@ FormatManager::GetDescriptionForFormat(media_format_description *out_description
 			case B_MPEG_FORMAT_FAMILY:
 				strcpy(out_description->u.meta.description, "audiocodec/mpeg1layer3");
 				break;
+
+			case 'vorb':
+				strcpy(out_description->u.meta.description, "audiocodec/vorbis");
+				break;
 	
 			default:
 				return B_ERROR;
