@@ -71,7 +71,7 @@ void PSDriver::setupCTM() {
 	writeSpoolString("0 %f translate\n", getJobData()->getPaperRect().Height());
 	// y values increase from top to bottom
 	// units of measure is dpi
-	writeSpoolString("72 %d div 72 -%d div scale\n", 2*getJobData()->getXres(), 2*getJobData()->getYres());
+	writeSpoolString("72 %d div 72 -%d div scale\n", getJobData()->getXres(), getJobData()->getYres());
 }
 
 bool PSDriver::endDoc(bool)
