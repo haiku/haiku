@@ -5,14 +5,11 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <kernel.h>
+
 #include <OS.h>
 #include <lock.h>
 #include <int.h>
 #include <debug.h>
-#include <arch/cpu.h>
-#include <Errors.h>
-#include <atomic.h>
 #include <thread.h>
 
 
@@ -28,17 +25,25 @@ recursive_lock_get_recursion(recursive_lock *lock)
 }
 
 
-int
-recursive_lock_create(recursive_lock *lock)
+status_t
+recursive_lock_init(recursive_lock *lock, const char *name)
 {
 	if (lock == NULL)
-		return EINVAL;
+		return B_BAD_VALUE;
+
+	if (name == NULL)
+		name = "recursive lock";
 
 	lock->holder = -1;
 	lock->recursion = 0;
-	lock->sem = create_sem(1, "recursive_lock_sem");
+	lock->sem = create_sem(1, name);
 
-	return B_NO_ERROR;
+	if (lock->sem >= B_OK) {
+		//set_sem_owner(lock->sem, B_SYSTEM_TEAM);
+		return B_OK;
+	}
+
+	return lock->sem;
 }
 
 
@@ -48,8 +53,7 @@ recursive_lock_destroy(recursive_lock *lock)
 	if (lock == NULL)
 		return;
 
-	if (lock->sem > 0)
-		delete_sem(lock->sem);
+	delete_sem(lock->sem);
 	lock->sem = -1;
 }
 
@@ -62,7 +66,7 @@ recursive_lock_lock(recursive_lock *lock)
 
 	if (!kernel_startup && !are_interrupts_enabled())
 		panic("recursive_lock_lock: called with interrupts disabled for lock %p, sem %#lx\n", lock, lock->sem);
-	
+
 	if (thid != lock->holder) {
 		acquire_sem(lock->sem);
 		
@@ -82,7 +86,7 @@ recursive_lock_unlock(recursive_lock *lock)
 
 	if (thid != lock->holder)
 		panic("recursive_lock %p unlocked by non-holder thread!\n", lock);
-	
+
 	if (--lock->recursion == 0) {
 		lock->holder = -1;
 		release_sem(lock->sem);
@@ -92,26 +96,27 @@ recursive_lock_unlock(recursive_lock *lock)
 }
 
 
-int
-mutex_init(mutex *m, const char *in_name)
-{
-	const char *name;
+//	#pragma mark -
 
+
+status_t
+mutex_init(mutex *m, const char *name)
+{
 	if (m == NULL)
 		return EINVAL;
 
-	if (in_name == NULL)
+	if (name == NULL)
 		name = "mutex_sem";
-	else
-		name = in_name;
 
 	m->holder = -1;
 
 	m->sem = create_sem(1, name);
-	if (m->sem < 0)
-		return m->sem;
+	if (m->sem >= B_OK) {
+		//set_sem_owner(m->sem, B_SYSTEM_TEAM);
+		return B_OK;
+	}
 
-	return 0;
+	return m->sem;
 }
 
 
@@ -156,5 +161,93 @@ mutex_unlock(mutex *mutex)
 
 	mutex->holder = -1;
 	release_sem(mutex->sem);
+}
+
+
+//	#pragma mark -
+
+
+status_t
+benaphore_init(benaphore *ben, const char *name)
+{
+	if (ben == NULL || name == NULL)
+		return B_BAD_VALUE;
+
+	ben->count = 1;
+	ben->sem = create_sem(0, name);
+	if (ben->sem >= B_OK) {
+		set_sem_owner(ben->sem, B_SYSTEM_TEAM);
+		return B_OK;
+	}
+
+	return ben->sem;
+}
+
+
+void
+benaphore_destroy(benaphore *ben)
+{
+	delete_sem(ben->sem);
+	ben->sem = -1;
+}
+
+
+//	#pragma mark -
+
+
+status_t
+rw_lock_init(rw_lock *lock, const char *name)
+{
+	if (lock == NULL)
+		return B_BAD_VALUE;
+
+	if (name == NULL)
+		name = "r/w lock";
+
+	lock->sem = create_sem(RW_MAX_READERS, name);
+	if (lock->sem >= B_OK) {
+		set_sem_owner(lock->sem, B_SYSTEM_TEAM);
+		return B_OK;
+	}
+
+	return lock->sem;
+}
+
+
+void
+rw_lock_destroy(rw_lock *lock)
+{
+	if (lock == NULL)
+		return;
+
+	delete_sem(lock->sem);
+}
+
+
+status_t
+rw_lock_read_lock(rw_lock *lock)
+{
+	return acquire_sem(lock->sem);
+}
+
+
+status_t
+rw_lock_read_unlock(rw_lock *lock)
+{
+	return release_sem(lock->sem);
+}
+
+
+status_t
+rw_lock_write_lock(rw_lock *lock)
+{
+	return acquire_sem_etc(lock->sem, RW_MAX_READERS, 0, 0);
+}
+
+
+status_t
+rw_lock_write_unlock(rw_lock *lock)
+{
+	release_sem_etc(lock->sem, RW_MAX_READERS, 0);
 }
 
