@@ -53,6 +53,8 @@ main(stage2_args *args)
 		if (mount_file_systems(args) < B_OK)
 			panic("Could not locate any supported boot devices!\n");
 
+		// ToDo: check if there is only one bootable volume!
+
 		mountedAllVolumes = true;
 
 		if (user_menu(&volume) < B_OK) {
