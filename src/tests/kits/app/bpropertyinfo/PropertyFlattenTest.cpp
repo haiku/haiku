@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyFlattenTest.cpp,v 1.2 2002/08/18 04:14:22 jrand Exp $
+	$Id: PropertyFlattenTest.cpp,v 1.3 2002/08/22 03:15:35 jrand Exp $
 	
 	This file implements the flatten test for the OpenBeOS BPropertyInfo code.
 	This class tests the following usecases:
@@ -13,6 +13,7 @@
 
 
 #include "PropertyFlattenTest.h"
+#include <ByteOrder.h>
 
 
 /*
@@ -48,7 +49,8 @@
 	    int32 prop_count,
 	    int32 value_count,
 	    ssize_t flat_size,
-	    const char *flat_data)
+	    const char *lflat_data,
+	    const char *bflat_data)
 {
 	char buffer[768];
 	
@@ -58,8 +60,12 @@
 	assert(!propTest->AllowsTypeCode(B_TIME_TYPE));
 	assert(propTest->FlattenedSize() == flat_size);
 	assert(propTest->Flatten(buffer, sizeof(buffer)/ sizeof(buffer[0])) == B_OK);
-	assert(memcmp(buffer, flat_data, propTest->FlattenedSize()) == 0);
+	if (B_HOST_IS_BENDIAN) {
+		assert(memcmp(buffer, bflat_data, propTest->FlattenedSize()) == 0);
+	} else {
+		assert(memcmp(buffer, lflat_data, propTest->FlattenedSize()) == 0);
 	}
+}
 
 
 /*

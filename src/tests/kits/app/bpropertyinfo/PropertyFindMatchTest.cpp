@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyFindMatchTest.cpp,v 1.2 2002/08/18 04:14:22 jrand Exp $
+	$Id: PropertyFindMatchTest.cpp,v 1.3 2002/08/22 03:15:35 jrand Exp $
 	
 	This file implements the FindMatch test for the OpenBeOS BPropertyInfo
 	code.  This class tests the following usecases:
@@ -48,7 +48,8 @@
 	    int32 prop_count,
 	    int32 value_count,
 	    ssize_t flat_size,
-	    const char *flat_data)
+	    const char *lflat_data,
+	    const char *bflat_data)
 {
 	const uint32 *commands;
 	const uint32 *specifiers;

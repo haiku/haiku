@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyFindMatchTest.h,v 1.1 2002/08/18 03:44:21 jrand Exp $
+	$Id: PropertyFindMatchTest.h,v 1.2 2002/08/22 03:15:35 jrand Exp $
 	
 	This file defines a class for performing one test of BPropertyInfo
 	functionality.
@@ -33,7 +33,8 @@ protected:
 	                  int32 prop_count,
 	                  int32 value_count,
 	                  ssize_t flat_size,
-	                  const char *flat_data);
+	                  const char *lflat_data,
+	                  const char *bflat_data);
 	                   
 public:
 	static Test *suite(void);

@@ -1,5 +1,5 @@
 /*
-	$Id: PropertyTestcase.h,v 1.1 2002/08/18 03:44:21 jrand Exp $
+	$Id: PropertyTestcase.h,v 1.2 2002/08/22 03:15:35 jrand Exp $
 	
 	This file defines a base class for performing all tests of BPropertyInfo
 	functionality.
@@ -29,7 +29,8 @@ protected:
 	                          int32 prop_count,
 	                          int32 value_count,
 	                          ssize_t flat_size,
-	                          const char *flat_data) = 0;
+	                          const char *lflat_data,
+	                          const char *bflat_data) = 0;
 	    
 	static const char *uniquePropName;
 	static const uint32 uniqueCommand;
