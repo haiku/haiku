@@ -36,6 +36,16 @@ class TBMessengerTester : public TestCase
 		void BMessenger9();
 		void BMessenger10();
 
+		void BMessengerD1();
+		void BMessengerD2();
+		void BMessengerD3();
+		void BMessengerD4();
+		void BMessengerD5();
+		void BMessengerD6();
+		void BMessengerD7();
+		void BMessengerD8();
+		void BMessengerD9();
+
 		static Test* Suite();
 };
 

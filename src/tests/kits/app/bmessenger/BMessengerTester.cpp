@@ -7,25 +7,23 @@
 #include <stdio.h>
 
 // System Includes -------------------------------------------------------------
-#include <be/app/Message.h>
-#include <be/kernel/OS.h>
-
-//#ifdef SYSTEM_TEST
-//#include <be/app/Handler.h>
-//#include <be/app/Looper.h>
-//#include <be/app/Messenger.h>
-//#else
+#include <Application.h>
 #include <Handler.h>
 #include <Looper.h>
+#include <Message.h>
 #include <Messenger.h>
-//#endif
+#include <OS.h>
 
 #define CHK	CPPUNIT_ASSERT
 
 // Project Includes ------------------------------------------------------------
+#include <TestShell.h>
+#include <TestUtils.h>
+#include <cppunit/TestAssert.h>
 
 // Local Includes --------------------------------------------------------------
 #include "BMessengerTester.h"
+#include "AppRunner.h"
 #include "Helpers.h"
 
 // Local Defines ---------------------------------------------------------------
@@ -33,6 +31,34 @@
 // Globals ---------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
+
+// check_messenger
+static
+void
+check_messenger(const BMessenger &messenger, bool valid, bool local,
+				team_id team, BLooper *looper = NULL, BHandler *handler = NULL,
+				team_id altTeam = -1)
+{
+	CHK(messenger.IsValid() == valid);
+	CHK(messenger.IsTargetLocal() == local);
+	BLooper *resultLooper = NULL;
+	CHK(messenger.Target(&resultLooper) == handler);
+	CHK(resultLooper == looper);
+	if (altTeam >= 0)
+		CHK(messenger.Team() == team || messenger.Team() == altTeam);
+	else
+{
+if (messenger.Team() != team)
+printf("team is %ld, but should be %ld\n", messenger.Team(), team);
+		CHK(messenger.Team() == team);
+}
+}
+
+static const char *kRunTestApp1Signature
+	= "application/x-vnd.obos-app-run-testapp1";
+//static const char *kBMessengerTestApp1Signature
+//	= "application/x-vnd.obos-bmessenger-testapp1";
+
 
 /*
 	BMessenger()
@@ -311,6 +337,264 @@ void TBMessengerTester::BMessenger10()
 }
 
 
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 1			signature is NULL, team is -1, result is (not) NULL
+	@results		IsValid() and IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return -1.
+					(result should be set to B_BAD_TYPE.)
+ */
+void TBMessengerTester::BMessengerD1()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote app
+	AppRunner runner(true);
+	CHK(runner.Run("AppRunTestApp1") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(NULL, -1, NULL);
+	check_messenger(messenger1, false, false, -1);
+	status_t error;
+	BMessenger messenger2(NULL, -1, &error);
+	check_messenger(messenger2, false, false, -1);
+	CHK(error == B_BAD_TYPE);
+	// quit the remote app
+	runner.WaitFor(true);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 2			signature is not NULL, but identifies no running
+					application, team is -1, result is (not) NULL
+	@results		IsValid() and IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return -1.
+					(result should be set to B_BAD_VALUE.)
+ */
+void TBMessengerTester::BMessengerD2()
+{
+	// create and check the messengers
+	BMessenger messenger1(kRunTestApp1Signature, -1, NULL);
+	check_messenger(messenger1, false, false, -1);
+	status_t error;
+	BMessenger messenger2(kRunTestApp1Signature, -1, &error);
+	check_messenger(messenger2, false, false, -1);
+	CHK(error == B_BAD_VALUE);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 3			signature is NULL, team is > 0, but identifies no running
+					application, result is (not) NULL
+	@results		IsValid() and IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return -1.
+					(result should be set to B_BAD_TEAM_ID.)
+ */
+void TBMessengerTester::BMessengerD3()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote app
+	AppRunner runner(true);
+	CHK(runner.Run("AppRunTestApp1") == B_OK);
+	team_id team = runner.Team();
+	// quit the remote app
+	runner.WaitFor(true);
+	snooze(10000);
+	// create and check the messengers
+	BMessenger messenger1(NULL, team, NULL);
+	check_messenger(messenger1, false, false, -1);
+	status_t error;
+	BMessenger messenger2(NULL, team, &error);
+	check_messenger(messenger2, false, false, -1);
+	CHK(error == B_BAD_TEAM_ID);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 4			signature is not NULL and identifies a running B_ARGV_ONLY
+					application, team is -1, result is (not) NULL
+	@results		IsValid() and IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return the remote app's team ID.
+					(result should be set to B_BAD_TYPE.)
+ */
+void TBMessengerTester::BMessengerD4()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote app
+	AppRunner runner(true);
+	CHK(runner.Run("AppRunTestApp1") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(kRunTestApp1Signature, -1, NULL);
+	check_messenger(messenger1, false, false, runner.Team());
+	status_t error;
+	BMessenger messenger2(kRunTestApp1Signature, -1, &error);
+	check_messenger(messenger2, false, false, runner.Team());
+	CHK(error == B_BAD_TYPE);
+	// quit the remote app
+	runner.WaitFor(true);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 5			signature is NULL,
+					team is > 0 and identifies a running B_ARGV_ONLY
+					application, result is (not) NULL
+	@results		IsValid() and IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return the remote app's team ID.
+					(result should be set to B_BAD_TYPE.)
+ */
+void TBMessengerTester::BMessengerD5()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote app
+	AppRunner runner(true);
+	CHK(runner.Run("AppRunTestApp1") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(NULL, runner.Team(), NULL);
+	check_messenger(messenger1, false, false, runner.Team());
+	status_t error;
+	BMessenger messenger2(NULL, runner.Team(), &error);
+	check_messenger(messenger2, false, false, runner.Team());
+	CHK(error == B_BAD_TYPE);
+	// quit the remote app
+	runner.WaitFor(true);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 6			signature is not NULL and identifies a "normal" running
+					application, team is -1, result is (not) NULL
+	@results		IsValid() should return true
+					IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return the team ID of the remote application.
+					(result should be set to B_OK.)
+ */
+void TBMessengerTester::BMessengerD6()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote apps
+	AppRunner runner1(true);
+	AppRunner runner2(true);
+	CHK(runner1.Run("AppRunTestApp2") == B_OK);
+	CHK(runner2.Run("AppRunTestApp2") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(kRunTestApp1Signature, -1, NULL);
+	check_messenger(messenger1, true, false, runner1.Team(), NULL, NULL,
+					runner2.Team());
+	status_t error;
+	BMessenger messenger2(kRunTestApp1Signature, -1, &error);
+	check_messenger(messenger2, true, false, runner1.Team(), NULL, NULL,
+					runner2.Team());
+	CHK(error == B_OK);
+	// quit the remote apps
+	runner1.WaitFor(true);
+	runner2.WaitFor(true);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 7			signature is NULL,
+					team is > 0 and identifies a "normal" running application,
+					result is (not) NULL
+	@results		IsValid() should return true
+					IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return the team ID of the remote application (team).
+					(result should be set to B_OK.)
+ */
+void TBMessengerTester::BMessengerD7()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote apps
+	AppRunner runner1(true);
+	AppRunner runner2(true);
+	CHK(runner1.Run("AppRunTestApp2") == B_OK);
+	CHK(runner2.Run("AppRunTestApp2") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(NULL, runner1.Team(), NULL);
+	check_messenger(messenger1, true, false, runner1.Team());
+	status_t error;
+	BMessenger messenger2(NULL, runner1.Team(), &error);
+	check_messenger(messenger2, true, false, runner1.Team());
+	CHK(error == B_OK);
+	// quit the remote apps
+	runner1.WaitFor(true);
+	runner2.WaitFor(true);
+	snooze(10000);
+	// check the messengers again
+	check_messenger(messenger1, false, false, runner1.Team());
+	check_messenger(messenger2, false, false, runner1.Team());
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 8			signature is not NULL and team is > 0, but both identify
+					different applications, result is (not) NULL
+	@results		IsValid() and IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return -1.
+					(result should be set to B_MISMATCHED_VALUES.)
+ */
+void TBMessengerTester::BMessengerD8()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote apps
+	AppRunner runner1(true);
+	AppRunner runner2(true);
+	CHK(runner1.Run("BMessengerTestApp1") == B_OK);
+	CHK(runner2.Run("AppRunTestApp2") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(kRunTestApp1Signature, runner1.Team(), NULL);
+	check_messenger(messenger1, false, false, -1);
+	status_t error;
+	BMessenger messenger2(kRunTestApp1Signature, runner1.Team(), &error);
+	check_messenger(messenger2, false, false, -1);
+	CHK(error == B_MISMATCHED_VALUES);
+	// quit the remote apps
+	runner1.WaitFor(true);
+	runner2.WaitFor(true);
+}
+
+/*
+	BMessenger(const char *signature, team_id team, status_t *result)
+	@case 9			signature is not NULL, team is > 0 and both identify the
+					same application (more than one app with the given
+					signature are running), result is (not) NULL
+	@results		IsValid() should return true
+					IsTargetLocal() should return false
+					Target() should return NULL and NULL for looper.
+					Team() should return the team ID of the remote application (team).
+					(result should be set to B_OK.)
+ */
+void TBMessengerTester::BMessengerD9()
+{
+	BApplication app("application/x-vnd.obos-bmessenger-test");
+	// run the remote apps
+	AppRunner runner1(true);
+	AppRunner runner2(true);
+	CHK(runner1.Run("AppRunTestApp2") == B_OK);
+	CHK(runner2.Run("AppRunTestApp2") == B_OK);
+	// create and check the messengers
+	BMessenger messenger1(kRunTestApp1Signature, runner1.Team(), NULL);
+	check_messenger(messenger1, true, false, runner1.Team());
+	status_t error;
+	BMessenger messenger2(kRunTestApp1Signature, runner1.Team(), &error);
+	check_messenger(messenger2, true, false, runner1.Team());
+	CHK(error == B_OK);
+	BMessenger messenger3(kRunTestApp1Signature, runner2.Team(), NULL);
+	check_messenger(messenger3, true, false, runner2.Team());
+	BMessenger messenger4(kRunTestApp1Signature, runner2.Team(), &error);
+	check_messenger(messenger4, true, false, runner2.Team());
+	CHK(error == B_OK);
+	// quit the remote apps
+	runner1.WaitFor(true);
+	runner2.WaitFor(true);
+}
+
 
 Test* TBMessengerTester::Suite()
 {
@@ -326,6 +610,15 @@ Test* TBMessengerTester::Suite()
 	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger8);
 	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger9);
 	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessenger10);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD1);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD2);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD3);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD4);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD5);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD6);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD7);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD8);
+	ADD_TEST4(BMessenger, SuiteOfTests, TBMessengerTester, BMessengerD9);
 
 	return SuiteOfTests;
 }

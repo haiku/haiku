@@ -57,7 +57,65 @@ case 2:	from is properly initialized to a local target =>
 		Team() should return this team.
 
 BMessenger(const char *signature, team_id team, status_t *result)
-TODO
+case 1:	signature is NULL, team is -1, result is (not) NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		(result should be set to B_BAD_TYPE.)
+case 2:	signature is not NULL, but identifies no running application,
+		team is -1, result is (not) NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		(result should be set to B_BAD_VALUE.)
+case 3:	signature is NULL, team is > 0, but identifies no running application,
+		result is (not) NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		(result should be set to B_BAD_TEAM_ID.)
+case 4:	signature is not NULL and identifies a running B_ARGV_ONLY application,
+		team is -1, result is (not) NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return the remote app's team ID.
+		(result should be set to B_BAD_TYPE.)
+case 5:	signature is NULL,
+		team is > 0 and identifies a running B_ARGV_ONLY application,
+		result is (not) NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return the remote app's team ID.
+		(result should be set to B_BAD_TYPE.)
+case 6:	signature is not NULL and identifies a "normal" running application,
+		team is -1, result is (not) NULL =>
+		IsValid() should return true
+		IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return the team ID of the remote application.
+		(result should be set to B_OK.)
+case 7:	signature is NULL,
+		team is > 0 and identifies a "normal" running application,
+		result is (not) NULL =>
+		IsValid() should return true, false after the app terminated
+		IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return the team ID of the remote application (team).
+		(result should be set to B_OK.)
+case 8:	signature is not NULL and team is > 0, but both identify different
+		applications, result is (not) NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		(result should be set to B_MISMATCHED_VALUES.)
+case 9:	signature is not NULL,
+		team is > 0 and both identify the same application (more than one
+		app with the given signature are running), result is (not) NULL =>
+		IsValid() should return true
+		IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return the team ID of the remote application (team).
+		(result should be set to B_OK.)
 
 bool IsTargetLocal() const
 case 1:	this is uninitialized =>
