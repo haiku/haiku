@@ -57,7 +57,6 @@ static int32 rtl8139_interrupt(void *data);    /* interrupt handler */
 enum registers {
 	IDR0 = 0x0 ,
 	Command = 0x37 ,
-	ChipVersion = 0x43 ,
 	TxConfig = 0x40 ,
 	RxConfig = 0x44 ,
 	Config1 = 0x52 , 
@@ -139,7 +138,7 @@ enum BMCR_Commands {
 	Restart_Auto_Negotiation = 0x400
 };
 
-typedef enum chiptype { RTL_8139_C } chiptype;
+typedef enum chiptype { RTL_8139_C , RTL_8139_D } chiptype;
 
 /* ----------
 	structure that stores internal data
@@ -285,6 +284,7 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	rtl8139_properties_t *data;
 	uint8 temp8;
 	uint16 temp16;
+	uint32 temp32;
 	unsigned char cmd;
 
 	dprintf( "rtl8139_nielx open_hook()\n" );
@@ -330,30 +330,34 @@ open_hook(const char *name, uint32 flags, void** cookie)
 	cmd = cmd | PCI_command_io | PCI_command_master | PCI_command_memory;
 	m_pcimodule->write_pci_config(data->pcii->bus, data->pcii->device, data->pcii->function, PCI_command, 2, cmd );
 	
-	// Check for the chipversion
-	/*
-		Please note the following:
-		According to the documentation only some bits are set
-		for the version. I will ignore this for now.
-	*/
-	temp8 = m_pcimodule->read_io_8( data->reg_base + ChipVersion );
+	// Check for the chipversion -- The version bits are bits 31-27 and 24-23
+	temp32 = m_pcimodule->read_io_32( data->reg_base + TxConfig );
 	
-	switch ( temp8 )
+	if ( temp32 == 0xFFFFFF )
 	{
-	case 0xFF:
 		dprintf( "rtl8139_nielx open_hook(): Faulty chip\n" );
 		m_isopen = 0;
+		put_module( B_PCI_MODULE_NAME );
 		return EIO;
+	}
+	
+	temp32 = temp32 & 0x7cc00000;
 
-	case 0x74:
+	switch( temp32 )
+	{
+	case 0x74000000:
 		dprintf( "rtl8139_nielx open_hook(): Chip is the 8139 C\n" );
 		data->chip_type = RTL_8139_C;
+		break;
+	
+	case 0x74400000:
+		dprintf( "rtl8139_niels open_hook(): Chip is the 8139 D\n" );
+		data->chip_type = RTL_8139_D;
 		break;
 	
 	default:
 		dprintf( "rtl8139_nielx open_hook(): Unknown chip, assuming 8139 C\n" );
 		data->chip_type = RTL_8139_C;
-		break;
 	}
 
 	/* TODO: Linux driver does power management here... */
@@ -540,16 +544,6 @@ read_hook (void* cookie, off_t position, void *buf, size_t* num_bytes)
 	}
 	
 	dprintf( "rtl8139_nielx read_hook(): Packet size: %u Receiveheader: %u Buffer size: %lu\n" , packet_header->length , packet_header->bits , *num_bytes );
-	
-	// Check if the packet goes beyond the buffer
-	/*
-	if ( bufferoffset + packet_header.length > 1024 * 16 + 16 )
-	{
-		dprintf( "rtl8139_nielx read_hook(): Packet goes beyond end of buffer!\n" );
-		//Taken from sample code, I have no idea whether it works
-		memcpy( data->receivebufferlog + 1024 * 16 + 16 , data->receivebufferlog , (bufferoffset + packet_header.length - 1024 * 16 + 16 ) );
-	}
-	*/
 	
 	//Copy the packet
 	*num_bytes = packet_header->length - 4;

@@ -1,4 +1,5 @@
 - A major code cleanup
 - Confirm to the Opentracker coding guidelines
+- Handle receive errors
 - Support other card types
 - Implement support for more than one card
