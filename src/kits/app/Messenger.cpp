@@ -47,6 +47,7 @@
 // Project Includes ------------------------------------------------------------
 #include <AppMisc.h>
 #include <MessageUtils.h>
+#include "ObjectLocker.h"
 #include "TokenSpace.h"
 
 // Local Includes --------------------------------------------------------------
@@ -56,6 +57,9 @@
 // Globals ---------------------------------------------------------------------
 
 using BPrivate::gDefaultTokens;
+using BPrivate::gLooperList;
+using BPrivate::BLooperList;
+using BPrivate::BObjectLocker;
 
 enum {
 	NOT_IMPLEMENTED	= B_ERROR,
@@ -131,23 +135,17 @@ BMessenger::BMessenger(const BHandler *handler, const BLooper *looper,
 				if (looper == NULL)
 					error = B_MISMATCHED_VALUES;
 			}
-			// set port, token,...
-			if (error == B_OK) {
-				fPort = looper->fMsgPort;
-				fHandlerToken = _get_object_token_(handler);
-				fPreferredTarget = false;
-			}
-		} else {	// handler == NULL (=> looper != NULL)
-			fPort = looper->fMsgPort;
-			fHandlerToken = false;
-			fPreferredTarget = true;
 		}
-		// get and set the team ID
+		// set port, token,...
 		if (error == B_OK) {
-			thread_info info;
-			error = get_thread_info(find_thread(NULL), &info);
-			if (error == B_OK)
-				fTeam = info.team;
+			BObjectLocker<BLooperList> locker(gLooperList);
+			if (locker.IsLocked() && gLooperList.IsLooperValid(looper)) {
+				fPort = looper->fMsgPort;
+				fHandlerToken = (handler ? _get_object_token_(handler) : -1);
+				fPreferredTarget = !handler;
+				fTeam = looper->Team();
+			} else
+				error = B_BAD_VALUE;
 		}
 	}
 	if (result)
