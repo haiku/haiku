@@ -30,6 +30,8 @@
 #include <stdio.h>
 #include <Window.h>
 #include <List.h>
+#include <Message.h>
+#include <File.h>
 
 #include "Globals.h"
 #include "RootLayer.h"
@@ -40,6 +42,7 @@
 #include "ServerWindow.h"
 #include "ServerApp.h"
 #include "Desktop.h"
+#include "ServerConfig.h"
 #include "FMWList.h"
 #include "DisplayDriver.h"
 
@@ -66,6 +69,10 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fRows = 0;
 	fColumns = 0;
 	
+	// TODO: this should eventually be replaced by a method to convert the monitor
+	// number to an index in the name, i.e. workspace_settings_1 for screen #1
+	ReadWorkspaceData(WORKSPACE_DATA_LIST);
+
 	// TODO: read these 3 from a configuration file.
 	fScreenXResolution = 0;
 	fScreenYResolution = 0;
@@ -74,90 +81,11 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	fViewToken = 0; // is this used for WinBorders?
 	fHidden	= false;
 	
-	SetWorkspaceCount(workspaceCount);
 }
 
 RootLayer::~RootLayer()
 {
 	// RootLayer object just uses Screen objects, it is not allowed to delete them.
-}
-
-void RootLayer::Draw(const BRect &r)
-{
-	// REMOVEME: This method is here because of DisplayDriver testing ONLY. 
-	// It should be removed when testing is finished
-
-	STRACE(("*RootLayer(%s)::Draw(r)\n", GetName()));
-	
-	RGBColor		c(51,102,152);
-	fDriver->FillRect(r, c);
-	
-	STRACE(("#RootLayer(%s)::Draw(r) END\n", GetName()));
-	
-#ifdef DISPLAYDRIVER_TEST_HACK
-	DisplayDriver	*_driver = fDriver;
-	int8 pattern[8];
-	int8 pattern2[8];
-	memset(pattern,255,8);
-	memset(pattern2,128+64+32+16,8);
-	BRect r1(100,100,1500,1100);
-	BPoint pts[4];
-	pts[0].x = 200;
-	pts[0].y = 200;
-	pts[1].x = 400;
-	pts[1].y = 1000;
-	pts[2].x = 600;
-	pts[2].y = 400;
-	pts[3].x = 1200;
-	pts[3].y = 800;
-	BPoint triangle[3];
-	BRect triangleRect(100,100,400,300);
-	triangle[0].x = 100;
-	triangle[0].y = 100;
-	triangle[1].x = 100;
-	triangle[1].y = 300;
-	triangle[2].x = 400;
-	triangle[2].y = 300;
-	BPoint polygon[6];
-	BRect polygonRect(100,100,300,400);
-	polygon[0].x = 100;
-	polygon[0].y = 100;
-	polygon[1].x = 100;
-	polygon[1].y = 400;
-	polygon[2].x = 200;
-	polygon[2].y = 300;
-	polygon[3].x = 300;
-	polygon[3].y = 400;
-	polygon[4].x = 300;
-	polygon[4].y = 100;
-	polygon[5].x = 200;
-	polygon[5].y = 200;
-	
-	fLayerData->highcolor.SetColor(255,0,0,255);
-	fLayerData->lowcolor.SetColor(255,255,255,255);
-	_driver->FillRect(r1,fLayerData,pattern);
-	
-	fLayerData->highcolor.SetColor(255,255,0,255);
-	_driver->StrokeLine(BPoint(100,100),BPoint(1500,1100),fLayerData,pattern);
-	
-	fLayerData->highcolor.SetColor(0,0,255,255);
-	_driver->StrokeBezier(pts,fLayerData,pattern);
-	_driver->StrokeArc(BRect(200,300,400,600),30,270,fLayerData,pattern);
-	_driver->StrokeEllipse(BRect(200,700,400,900),fLayerData,pattern);
-	_driver->StrokeRect(BRect(650,1000,750,1090),fLayerData,pattern);
-	_driver->StrokeRoundRect(BRect(200,1000,600,1090),30,40,fLayerData,pattern);
-//	_driver->StrokePolygon(polygon,6,polygonRect,fLayerData,pattern);
-//	_driver->StrokeTriangle(triangle,triangleRect,fLayerData,pattern);
-	fLayerData->highcolor.SetColor(255,0,255,255);
-	_driver->FillArc(BRect(1250,300,1450,600),30,270,fLayerData,pattern);
-//	_driver->FillBezier(pts,fLayerData,pattern);
-	_driver->FillEllipse(BRect(800,300,1200,600),fLayerData,pattern);
-	_driver->FillRoundRect(BRect(800,1000,1200,1090),30,40,fLayerData,pattern2);
-	_driver->FillPolygon(polygon,6,polygonRect,fLayerData,pattern);
-//	_driver->FillTriangle(triangle,triangleRect,fLayerData,pattern);
-	
-#endif // end DISPLAYDRIVER_TEST_HACK
-
 }
 
 void RootLayer::MoveBy(float x, float y)
@@ -187,6 +115,99 @@ Layer* RootLayer::VirtualUpperSibling() const
 Layer* RootLayer::VirtualBottomChild() const
 {
 	return fActiveWorkspace->GoToBottomItem();
+}
+
+void RootLayer::ReadWorkspaceData(const char *path)
+{
+	BMessage msg, settings;
+	BFile file(path,B_READ_ONLY);
+	char string[20];
+	
+	if(file.InitCheck()==B_OK && msg.Unflatten(&file)==B_OK)
+	{
+		int32 count;
+		
+		if(msg.FindInt32("workspace_count",&count)!=B_OK)
+			count=9;
+		
+		SetWorkspaceCount(count);
+		
+		for(int32 i=0; i<count; i++)
+		{
+			Workspace *ws=(Workspace*)fWorkspaceList.ItemAt(i);
+			if(!ws)
+				continue;
+			
+			sprintf(string,"workspace %ld",i);
+			
+			if(msg.FindMessage(string,&settings)==B_OK)
+			{
+				ws->GetSettings(settings);
+				settings.MakeEmpty();
+			}
+			else
+				ws->GetDefaultSettings();
+		}
+	}
+	else
+	{
+		SetWorkspaceCount(9);
+		
+		for(int32 i=0; i<9; i++)
+		{
+			Workspace *ws=(Workspace*)fWorkspaceList.ItemAt(i);
+			if(!ws)
+				continue;
+			
+			ws->GetDefaultSettings();
+		}
+	}
+}
+
+void RootLayer::SaveWorkspaceData(const char *path)
+{
+	BMessage msg,dummy;
+	BFile file(path,B_READ_WRITE | B_CREATE_FILE);
+	
+	if(file.InitCheck()!=B_OK)
+	{
+		printf("ERROR: Couldn't save workspace data in RootLayer\n");
+		return;
+	}
+	
+	char string[20];
+	int32 count=fWorkspaceList.CountItems();
+
+	if(msg.Unflatten(&file)==B_OK)
+	{
+		// if we were successful in unflattening the file, it means we're
+		// going to need to save over the existing data
+		for(int32 i=0; i<count; i++)
+		{
+			sprintf(string,"workspace %ld",i);
+			if(msg.FindMessage(string,&dummy)==B_OK)
+				msg.RemoveName(string);
+		}
+	}
+		
+	for(int32 i=0; i<count; i++)
+	{
+		sprintf(string,"workspace %ld",i);
+
+		Workspace *ws=(Workspace*)fWorkspaceList.ItemAt(i);
+		
+		if(!ws)
+		{
+			dummy.MakeEmpty();
+			ws->PutSettings(&dummy,i);
+			msg.AddMessage(string,&dummy);
+		}
+		else
+		{
+			// We're not supposed to have this happen, but we'll suck it up, anyway. :P
+			Workspace::PutDefaultSettings(&msg,i);
+		}
+	}
 }
 
 void RootLayer::AddWinBorderToWorkspaces(WinBorder* winBorder, uint32 wks)
@@ -567,7 +588,7 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 	
 	for(int i=0; i < count; i++)
 	{
-		workspacePtr	= fWSPtrList.ItemAt(i);
+		workspacePtr	= fWorkspaceList.ItemAt(i);
 		if (workspacePtr)
 			newWSPtrList.AddItem(workspacePtr);
 		else
@@ -579,10 +600,10 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 	}
 	
 	// delete other Workspace objects if the count is smaller than current one.
-	for (int j=count; j < fWSPtrList.CountItems(); j++)
+	for (int j=count; j < fWorkspaceList.CountItems(); j++)
 	{
 		Workspace	*ws = NULL;
-		ws = static_cast<Workspace*>(fWSPtrList.ItemAt(j));
+		ws = static_cast<Workspace*>(fWorkspaceList.ItemAt(j));
 		if (ws)
 			delete ws;
 		else
@@ -592,7 +613,7 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 		}
 	}
 	
-	fWSPtrList = newWSPtrList;
+	fWorkspaceList = newWSPtrList;
 
 	fMainLock.Unlock();
 	STRACE(("*RootLayer::SetWorkspaceCount(%ld) - main lock released\n", count));
@@ -609,13 +630,13 @@ void RootLayer::SetWorkspaceCount(const int32 count)
 
 int32 RootLayer::WorkspaceCount() const
 {
-	return fWSPtrList.CountItems();
+	return fWorkspaceList.CountItems();
 }
 
 Workspace* RootLayer::WorkspaceAt(const int32 index) const
 {
 	Workspace *ws = NULL;
-	ws = static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
+	ws = static_cast<Workspace*>(fWorkspaceList.ItemAt(index-1));
 	
 	return ws;
 }
@@ -623,7 +644,7 @@ Workspace* RootLayer::WorkspaceAt(const int32 index) const
 void RootLayer::SetActiveWorkspaceByIndex(const int32 index)
 {
 	Workspace *ws = NULL;
-	ws = static_cast<Workspace*>(fWSPtrList.ItemAt(index-1));
+	ws = static_cast<Workspace*>(fWorkspaceList.ItemAt(index-1));
 	if (ws)
 		SetActiveWorkspace(ws);
 }
@@ -679,10 +700,10 @@ void RootLayer::PrintToStream()
 	printf("Screen rows: %ld\nScreen columns: %ld\n", fRows, fColumns);
 	printf("Resolution for all Screens: %ldx%ldx%ld\n", fScreenXResolution, fScreenYResolution, fColorSpace);
 	printf("Workspace list:\n");
-	for(int32 i=0; i<fWSPtrList.CountItems(); i++)
+	for(int32 i=0; i<fWorkspaceList.CountItems(); i++)
 	{
-		printf("\t~~~Workspace: %ld\n", ((Workspace*)fWSPtrList.ItemAt(i))->ID());
-		((Workspace*)fWSPtrList.ItemAt(i))->PrintToStream();
+		printf("\t~~~Workspace: %ld\n", ((Workspace*)fWorkspaceList.ItemAt(i))->ID());
+		((Workspace*)fWorkspaceList.ItemAt(i))->PrintToStream();
 		printf("~~~~~~~~\n");
 	}
 	printf("Active Workspace: %ld\n", fActiveWorkspace? fActiveWorkspace->ID(): -1);

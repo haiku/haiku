@@ -34,6 +34,7 @@
 #include "RGBColor.h"
 #include "RectUtils.h"
 #include <stdio.h>
+#include "FontServer.h"
 
 
 //#define USE_VIEW_FILL_HACK
@@ -52,7 +53,12 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 
 	taboffset=0;
 	titlepixelwidth=0;
-
+	
+	SetFont(fontserver->GetSystemBold());
+	_drawdata.font.SetSize(14);
+	_drawdata.font.SetFlags(B_FORCE_ANTIALIASING);
+	_drawdata.font.SetSpacing(B_STRING_SPACING);
+	
 	framecolors=new RGBColor[6];
 	framecolors[0].SetColor(152,152,152);
 	framecolors[1].SetColor(255,255,255);
@@ -60,7 +66,9 @@ DefaultDecorator::DefaultDecorator(BRect rect, int32 wlook, int32 wfeel, int32 w
 	framecolors[3].SetColor(136,136,136);
 	framecolors[4].SetColor(152,152,152);
 	framecolors[5].SetColor(96,96,96);
-
+	
+	
+	
 	// Set appropriate colors based on the current focus value. In this case, each decorator
 	// defaults to not having the focus.
 	_SetFocus();
@@ -365,7 +373,7 @@ void DefaultDecorator::_DrawTitle(BRect r)
 		titlestr+="...";
 		titlecount+=2;
 	}
-	
+		
 	// The text position needs tweaked when working as a floating window because the closerect placement
 	// is a little different. If it isn't moved, title placement looks really funky
 	if(_look==B_FLOATING_WINDOW_LOOK)

@@ -350,15 +350,17 @@ void WinBorder::MouseUp(PortMessage *msg)
 
 void WinBorder::HighlightDecorator(const bool &active)
 {
-printf("Decorator->Highlight\n");
+	STRACE(("Decorator->Highlight\n"));
 	fDecorator->SetFocus(active);
 }
 
 void WinBorder::Draw(const BRect &r)
 {
-	STRACE(("WinBorder(%s)::Draw()\n", GetName()));
-printf("WinBorder::DRAW\n");
-r.PrintToStream();
+	#ifdef DEBUG_WINBORDER
+	printf("WinBorder(%s)::Draw() : ", GetName()));
+	r.PrintToStream();
+	#endif
+	
 	// if we have a visible region, it is decorator's one.
 	if(fDecorator)
 	{
@@ -371,10 +373,11 @@ r.PrintToStream();
 */		
 		fDecorator->Draw(fUpdateReg.Frame());
 	}
+
 	// clear background, *only IF* our view color is different to B_TRANSPARENT_COLOR!
 	// TODO: DO That!
-	// TODO: UNcomment!!!
-// TODO !!! UPDATE  code !!!
+	// TODO: UNcomment
+	// TODO: UPDATE  code 
 	/*
 	BMessage msg;
 	msg.what = _UPDATE_;

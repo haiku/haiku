@@ -378,8 +378,8 @@ void Layer::FullInvalidate(const BRegion& region)
 {
 	STRACE(("Layer(%s)::FullInvalidate():\n", GetName()));
 	#ifdef DEBUG_LAYER
-	 region.PrintToStream();
-	 printf("\n");
+	region.PrintToStream();
+	printf("\n");
 	#endif
 
 	BPoint pt(0,0);
@@ -394,8 +394,8 @@ void Layer::Invalidate(const BRegion& region)
 {
 	STRACE(("Layer(%s)::Invalidate():\n", GetName()));
 	#ifdef DEBUG_LAYER
-	 region.PrintToStream();
-	 printf("\n");
+	region.PrintToStream();
+	printf("\n");
 	#endif
 	
 	gRedrawReg	= region;
@@ -440,7 +440,7 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 			Draw(fUpdateReg.Frame());
 			fDriver->ConstrainClippingRegion(NULL);
 
-// TODO: (WARNING!): For the Update code is MUST NOT be emptied!!!
+	// TODO: WARNING: For the Update code is MUST NOT be emptied
 			fUpdateReg.MakeEmpty();
 		}
 	}
@@ -465,9 +465,11 @@ void Layer::RequestDraw(const BRegion &reg, Layer *startFrom)
 void Layer::Draw(const BRect &r)
 {
 	// TODO/NOTE: this should be an empty method! the next lines are for testing only
-printf("Layer::Draw\n");
-r.PrintToStream();	
-	STRACE(("Layer::Draw() Called\n"));
+
+#ifdef DEBUG_LAYER
+printf("Layer::Draw: ");
+r.PrintToStream();
+#endif	
 /*
 	RGBColor	col(152,102,51);
 	fDriver->FillRect(fUpdateReg.Frame(), col);
@@ -547,7 +549,7 @@ void Layer::RebuildFullRegion( )
 	else
 		fFull.Set( fFrame );
 	
-	// TODO: restrict to screen coordinates!!!
+	// TODO: restrict to screen coordinates
 	// TODO: Convert to screen coordinates!
 	LayerData *ld;
 	ld = fLayerData;
@@ -942,7 +944,6 @@ void Layer::MoveBy(float x, float y)
 	BRect rect(fFull.Frame().OffsetByCopy(pt));
 	
 	fParent->StartRebuildRegions(BRegion(rect), this, B_LAYER_MOVE, pt);
-	
 	fDriver->CopyRegionList(&gCopyRegList, &gCopyList, gCopyRegList.CountItems(), &fFullVisible);
 	fParent->Redraw(gRedrawReg, this);
 	

@@ -54,31 +54,31 @@ public:
 	// Methods for multiple monitors.
 	Screen *ScreenAt(int32 index) const;
 	int32 ScreenCount(void) const;
-	Screen* ActiveScreen(void) const;
+	Screen *ActiveScreen(void) const;
 	
 	void SetActiveRootLayerByIndex(int32 listIndex);
-	void SetActiveRootLayer(RootLayer* rl);
-	RootLayer* RootLayerAt(int32 index);
-	RootLayer* ActiveRootLayer(void) const;
+	void SetActiveRootLayer(RootLayer *rl);
+	RootLayer *RootLayerAt(int32 index);
+	RootLayer *ActiveRootLayer(void) const;
 	int32 ActiveRootLayerIndex(void) const;
 	int32 CountRootLayers(void) const;
-	DisplayDriver*		GetDisplayDriver(void) const;
+	DisplayDriver *GetDisplayDriver(void) const;
 	
 	// Methods for layer(WinBorder) manipulation.
-	void AddWinBorder(WinBorder* winBorder);
-	void RemoveWinBorder(WinBorder* winBorder);
-	bool HasWinBorder(WinBorder* winBorder);
-	void SetFrontWinBorder(WinBorder* winBorder);
-	void SetFocusWinBorder(WinBorder* winBorder);
-	WinBorder* FrontWinBorder(void) const;
-	WinBorder* FocusWinBorder(void) const;
+	void AddWinBorder(WinBorder *winBorder);
+	void RemoveWinBorder(WinBorder *winBorder);
+	bool HasWinBorder(WinBorder *winBorder);
+	void SetFrontWinBorder(WinBorder *winBorder);
+	void SetFocusWinBorder(WinBorder *winBorder);
+	WinBorder *FrontWinBorder(void) const;
+	WinBorder *FocusWinBorder(void) const;
 	
 	// Input related methods
 	void MouseEventHandler(PortMessage *msg);
 	void KeyboardEventHandler(PortMessage *msg);
 	
-	void SetDragMessage(BMessage* msg);
-	BMessage* DragMessage(void) const;
+	void SetDragMessage(BMessage *msg);
+	BMessage *DragMessage(void) const;
 	
 	// Methods for various desktop stuff handled by the server
 	void SetScrollBarInfo(const scroll_bar_info &info);
@@ -93,16 +93,13 @@ public:
 	void SetFFMouseMode(const mode_mouse &value);
 	mode_mouse FFMouseMode(void) const;
 	
-	bool ReadWorkspaceData(void);
-	void SaveWorkspaceData(void);
-	
 	// Debugging methods
 	void PrintToStream(void);
 	void PrintVisibleInRootLayerNo(int32 no);
 	
 	// "Private" to app_server :-) - means they should not be used very much
-	void RemoveSubsetWindow(WinBorder* wb);
-	WinBorder* FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID);
+	void RemoveSubsetWindow(WinBorder *wb);
+	WinBorder *FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID);
 	
 	BLocker fGeneralLock;
 	BLocker fLayerLock;
@@ -112,16 +109,16 @@ private:
 	BMessage *fDragMessage;
 	
 	BList fRootLayerList;
-	RootLayer* fActiveRootLayer;
-	WinBorder* fFrontWinBorder;
-	WinBorder* fFocusWinBorder;
-	WinBorder* fMouseTarget;
+	RootLayer *fActiveRootLayer;
+	WinBorder *fFrontWinBorder;
+	WinBorder *fFocusWinBorder;
+	WinBorder *fMouseTarget;
 	
 	BList fScreenList;
 
 	// '1' or 'n' Screen(s). Not sure it's needed though.
 	int32 fScreenMode;
-	Screen* fActiveScreen;
+	Screen *fActiveScreen;
 	
 	scroll_bar_info fScrollBarInfo;
 	menu_info fMenuInfo;
@@ -130,6 +127,6 @@ private:
 	int32 fScreenShotIndex;
 };
 
-extern Desktop* desktop;
+extern Desktop *desktop;
 
 #endif // _DESKTOP_H_

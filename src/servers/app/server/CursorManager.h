@@ -62,22 +62,22 @@ public:
 	void ChangeCursor(cursor_which which, int32 token);
 	void SetDefaults(void);
 private:
-	ServerCursor *_FindCursor(int32 token);
+	ServerCursor *FindCursor(int32 token);
 
-	BList *_cursorlist;
-	TokenHandler _tokenizer;
+	BList *fCursorList;
+	TokenHandler fTokenizer;
 
 	// System cursor members
-	ServerCursor 	*_defaultcsr,
-					*_textcsr,
-					*_movecsr,
-					*_dragcsr,
-					*_resizecsr,
-					*_resize_nwse_csr,
-					*_resize_nesw_csr,
-					*_resize_ns_csr,
-					*_resize_ew_csr;
-	cursor_which _current_which;
+	ServerCursor 	*fDefaultCursor,
+					*fTextCursor,
+					*fMoveCursor,
+					*fDragCursor,
+					*fResizeCursor,
+					*fNWSECursor,
+					*fNESWCursor,
+					*fNSCursor,
+					*fEWCursor;
+	cursor_which fCurrentWhich;
 };
 
 extern CursorManager *cursormanager;

@@ -199,8 +199,8 @@ void Desktop::SetActiveRootLayer(RootLayer* rl)
 
 	fActiveRootLayer	= rl;
 
-// TODO: fix!!!!!!!!!!!!!!!!!!!!!!!! or not?
-		// also set the new front and focus
+// TODO: fix... or not?
+// also set the new front and focus
 //	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
 //	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
 	
@@ -362,7 +362,7 @@ WinBorder* Desktop::FocusWinBorder(void) const
 //---------------------------------------------------------------------------
 void Desktop::MouseEventHandler(PortMessage *msg)
 {
-// TODO: locking mechanism needs SERIOUS rethought!!!!
+	// TODO: locking mechanism needs SERIOUS rethought
 	switch(msg->Code())
 	{
 		case B_MOUSE_DOWN:
@@ -420,7 +420,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 					invalidRegion.Include(&(activeFocus->fFull));
 					invalidRegion.Include(&(activeFocus->fTopLayer->fFull));
 					activeFocus->fParent->FullInvalidate(invalidRegion);
-// TODO: this is a hack!!! Should be something like this:
+// TODO: this is a hack! Should be something like this:
 // void Layer::RebuildAndForceRedraw(invalidReg, target){
 // 	BPoint pt(0,0);
 //	StartRebuildRegions(invalidRegion, NULL, B_LAYER_NONE, pt);
@@ -873,19 +873,6 @@ void Desktop::SetFFMouseMode(const mode_mouse &value)
 mode_mouse Desktop::FFMouseMode(void) const
 {
 	return fMouseMode;
-}
-
-bool Desktop::ReadWorkspaceData(void)
-{
-	// TODO: implement
-	STRACE(("Desktop::ReadWorkspaceData unimplemented\n"));
-	return true;
-}
-
-void Desktop::SaveWorkspaceData(void)
-{
-	// TODO: implement
-	STRACE(("Desktop::ReadWorkspaceData unimplemented\n"));
 }
 
 void Desktop::RemoveSubsetWindow(WinBorder* wb)

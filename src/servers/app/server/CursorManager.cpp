@@ -42,47 +42,47 @@ CursorManager *cursormanager;
 //! Initializes the CursorManager
 CursorManager::CursorManager(void)
 {
-	_cursorlist=new BList(0);
+	fCursorList=new BList(0);
 
 	// Error code for AddCursor
-	_tokenizer.ExcludeValue(B_ERROR);
+	fTokenizer.ExcludeValue(B_ERROR);
 
 	// Set system cursors to "unassigned"
 	ServerCursor *cdefault=new ServerCursor(default_cursor_data);
 	AddCursor(cdefault);
-	_defaultcsr=cdefault;
+	fDefaultCursor=cdefault;
 	
 	ServerCursor *ctext=new ServerCursor(default_text_data);
 	AddCursor(ctext);
-	_textcsr=ctext;
+	fTextCursor=ctext;
 
 	ServerCursor *cmove=new ServerCursor(default_move_data);
 	AddCursor(cmove);
-	_movecsr=cmove;
+	fMoveCursor=cmove;
 
 	ServerCursor *cdrag=new ServerCursor(default_drag_data);
 	AddCursor(cdrag);
-	_dragcsr=cdrag;
+	fDragCursor=cdrag;
 
 	ServerCursor *cresize=new ServerCursor(default_resize_data);
 	AddCursor(cresize);
-	_resizecsr=cresize;
+	fResizeCursor=cresize;
 
 	ServerCursor *cresizenwse=new ServerCursor(default_resize_nwse_data);
 	AddCursor(cresizenwse);
-	_resize_nwse_csr=cresizenwse;
+	fNWSECursor=cresizenwse;
 
 	ServerCursor *cresizenesw=new ServerCursor(default_resize_nesw_data);
 	AddCursor(cresizenesw);
-	_resize_nesw_csr=cresizenesw;
+	fNESWCursor=cresizenesw;
 
 	ServerCursor *cresizens=new ServerCursor(default_resize_ns_data);
 	AddCursor(cresizens);
-	_resize_ns_csr=cresizens;
+	fNSCursor=cresizens;
 
 	ServerCursor *cresizeew=new ServerCursor(default_resize_ew_data);
 	AddCursor(cresizeew);
-	_resize_ew_csr=cresizeew;
+	fEWCursor=cresizeew;
 
 }
 
@@ -90,14 +90,14 @@ CursorManager::CursorManager(void)
 CursorManager::~CursorManager(void)
 {
 	ServerCursor *temp;
-	for(int32 i=0; i<_cursorlist->CountItems();i++)
+	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
-		temp=(ServerCursor*)_cursorlist->ItemAt(i);
+		temp=(ServerCursor*)fCursorList->ItemAt(i);
 		if(temp)
 			delete temp;
 	}
-	_cursorlist->MakeEmpty();
-	delete _cursorlist;
+	fCursorList->MakeEmpty();
+	delete fCursorList;
 	
 	// Note that it is not necessary to remove and delete the system
 	// cursors. These cursors are kept in the list with a NULL application
@@ -117,8 +117,8 @@ int32 CursorManager::AddCursor(ServerCursor *sc)
 		return B_ERROR;
 	
 	Lock();
-	_cursorlist->AddItem(sc);
-	int32 value=_tokenizer.GetToken();
+	fCursorList->AddItem(sc);
+	int32 value=fTokenizer.GetToken();
 	sc->_token=value;
 	Unlock();
 	
@@ -136,12 +136,12 @@ void CursorManager::DeleteCursor(int32 token)
 	Lock();
 
 	ServerCursor *temp;
-	for(int32 i=0; i<_cursorlist->CountItems();i++)
+	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
-		temp=(ServerCursor*)_cursorlist->ItemAt(i);
+		temp=(ServerCursor*)fCursorList->ItemAt(i);
 		if(temp && temp->_token==token)
 		{
-			_cursorlist->RemoveItem(i);
+			fCursorList->RemoveItem(i);
 			delete temp;
 			break;
 		}
@@ -161,13 +161,13 @@ void CursorManager::RemoveAppCursors(const char *signature)
 	Lock();
 
 	ServerCursor *temp;
-	for(int32 i=0; i<_cursorlist->CountItems();i++)
+	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
-		temp=(ServerCursor*)_cursorlist->ItemAt(i);
+		temp=(ServerCursor*)fCursorList->ItemAt(i);
 		if(temp && temp->GetAppSignature() && 
 			strcmp(signature, temp->GetAppSignature())==0)
 		{
-			_cursorlist->RemoveItem(i);
+			fCursorList->RemoveItem(i);
 			delete temp;
 			break;
 		}
@@ -212,12 +212,12 @@ void CursorManager::ObscureCursor(void)
 void CursorManager::SetCursor(int32 token)
 {
 	Lock();
-	ServerCursor *c=_FindCursor(token);
+	ServerCursor *c=FindCursor(token);
 	if(c)
 	{
 		DisplayDriver *driver = desktop->ActiveScreen()->DDriver();
 		driver->SetCursor(c);
-		_current_which=B_CURSOR_OTHER;
+		fCurrentWhich=B_CURSOR_OTHER;
 	}
 	Unlock();
 }
@@ -231,56 +231,56 @@ void CursorManager::SetCursor(cursor_which which)
 	{
 		case B_CURSOR_DEFAULT:
 		{
-			driver->SetCursor(_defaultcsr);
-			_current_which=which;
+			driver->SetCursor(fDefaultCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_TEXT:
 		{
-			driver->SetCursor(_textcsr);
-			_current_which=which;
+			driver->SetCursor(fTextCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_MOVE:
 		{
-			driver->SetCursor(_movecsr);
-			_current_which=which;
+			driver->SetCursor(fMoveCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_DRAG:
 		{
-			driver->SetCursor(_dragcsr);
-			_current_which=which;
+			driver->SetCursor(fDragCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_RESIZE:
 		{
-			driver->SetCursor(_resizecsr);
-			_current_which=which;
+			driver->SetCursor(fResizeCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
 		{
-			driver->SetCursor(_resize_nwse_csr);
-			_current_which=which;
+			driver->SetCursor(fNWSECursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
 		{
-			driver->SetCursor(_resize_nesw_csr);
-			_current_which=which;
+			driver->SetCursor(fNESWCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
 		{
-			driver->SetCursor(_resize_ns_csr);
-			_current_which=which;
+			driver->SetCursor(fNSCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
 		{
-			driver->SetCursor(_resize_ew_csr);
-			_current_which=which;
+			driver->SetCursor(fEWCursor);
+			fCurrentWhich=which;
 			break;
 		}
 		default:
@@ -309,65 +309,65 @@ void CursorManager::SetCursorSet(const char *path)
 	
 	if(cs.FindCursor(B_CURSOR_DEFAULT,&csr)==B_OK)
 	{
-		if(_defaultcsr)
-			delete _defaultcsr;
-		_defaultcsr=csr;
+		if(fDefaultCursor)
+			delete fDefaultCursor;
+		fDefaultCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_TEXT,&csr)==B_OK)
 	{
-		if(_textcsr)
-			delete _textcsr;
-		_textcsr=csr;
+		if(fTextCursor)
+			delete fTextCursor;
+		fTextCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_MOVE,&csr)==B_OK)
 	{
-		if(_movecsr)
-			delete _movecsr;
-		_movecsr=csr;
+		if(fMoveCursor)
+			delete fMoveCursor;
+		fMoveCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_DRAG,&csr)==B_OK)
 	{
-		if(_dragcsr)
-			delete _dragcsr;
-		_dragcsr=csr;
+		if(fDragCursor)
+			delete fDragCursor;
+		fDragCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_RESIZE,&csr)==B_OK)
 	{
-		if(_resizecsr)
-			delete _resizecsr;
-		_resizecsr=csr;
+		if(fResizeCursor)
+			delete fResizeCursor;
+		fResizeCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_RESIZE_NWSE,&csr)==B_OK)
 	{
-		if(_resize_nwse_csr)
-			delete _resize_nwse_csr;
-		_resize_nwse_csr=csr;
+		if(fNWSECursor)
+			delete fNWSECursor;
+		fNWSECursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_RESIZE_NESW,&csr)==B_OK)
 	{
-		if(_resize_nesw_csr)
-			delete _resize_nesw_csr;
-		_resize_nesw_csr=csr;
+		if(fNESWCursor)
+			delete fNESWCursor;
+		fNESWCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_RESIZE_NS,&csr)==B_OK)
 	{
-		if(_resize_ns_csr)
-			delete _resize_ns_csr;
-		_resize_ns_csr=csr;
+		if(fNSCursor)
+			delete fNSCursor;
+		fNSCursor=csr;
 	}
 	
 	if(cs.FindCursor(B_CURSOR_RESIZE_EW,&csr)==B_OK)
 	{
-		if(_resize_ew_csr)
-			delete _resize_ew_csr;
-		_resize_ew_csr=csr;
+		if(fEWCursor)
+			delete fEWCursor;
+		fEWCursor=csr;
 	}
 	Unlock();
 	
@@ -389,47 +389,47 @@ ServerCursor *CursorManager::GetCursor(cursor_which which)
 	{
 		case B_CURSOR_DEFAULT:
 		{
-			temp=_defaultcsr;
+			temp=fDefaultCursor;
 			break;
 		}
 		case B_CURSOR_TEXT:
 		{
-			temp=_textcsr;
+			temp=fTextCursor;
 			break;
 		}
 		case B_CURSOR_MOVE:
 		{
-			temp=_movecsr;
+			temp=fMoveCursor;
 			break;
 		}
 		case B_CURSOR_DRAG:
 		{
-			temp=_dragcsr;
+			temp=fDragCursor;
 			break;
 		}
 		case B_CURSOR_RESIZE:
 		{
-			temp=_resizecsr;
+			temp=fResizeCursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
 		{
-			temp=_resize_nwse_csr;
+			temp=fNWSECursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
 		{
-			temp=_resize_nesw_csr;
+			temp=fNESWCursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
 		{
-			temp=_resize_ns_csr;
+			temp=fNSCursor;
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
 		{
-			temp=_resize_ew_csr;
+			temp=fEWCursor;
 			break;
 		}
 		default:
@@ -449,7 +449,7 @@ cursor_which CursorManager::GetCursorWhich(void)
 	cursor_which temp;
 	
 	Lock();
-	temp=_current_which;
+	temp=fCurrentWhich;
 	Unlock();
 	return temp;
 }
@@ -468,7 +468,7 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 	Lock();
 
 	// Find the cursor, based on the token
-	ServerCursor *cursor=_FindCursor(token);
+	ServerCursor *cursor=FindCursor(token);
 	
 	// Did we find a cursor with this token?
 	if(!cursor)
@@ -482,111 +482,111 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 	{
 		case B_CURSOR_DEFAULT:
 		{
-			if(_defaultcsr)
-				delete _defaultcsr;
+			if(fDefaultCursor)
+				delete fDefaultCursor;
 
-			_defaultcsr=cursor;
+			fDefaultCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
 
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_TEXT:
 		{
-			if(_textcsr)
-				delete _textcsr;
+			if(fTextCursor)
+				delete fTextCursor;
 
-			_textcsr=cursor;
+			fTextCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_MOVE:
 		{
-			if(_movecsr)
-				delete _movecsr;
+			if(fMoveCursor)
+				delete fMoveCursor;
 
-			_movecsr=cursor;
+			fMoveCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_DRAG:
 		{
-			if(_dragcsr)
-				delete _dragcsr;
+			if(fDragCursor)
+				delete fDragCursor;
 
-			_dragcsr=cursor;
+			fDragCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE:
 		{
-			if(_resizecsr)
-				delete _resizecsr;
+			if(fResizeCursor)
+				delete fResizeCursor;
 
-			_resizecsr=cursor;
+			fResizeCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NWSE:
 		{
-			if(_resize_nwse_csr)
-				delete _resize_nwse_csr;
+			if(fNWSECursor)
+				delete fNWSECursor;
 
-			_resize_nwse_csr=cursor;
+			fNWSECursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NESW:
 		{
-			if(_resize_nesw_csr)
-				delete _resize_nesw_csr;
+			if(fNESWCursor)
+				delete fNESWCursor;
 
-			_resize_nesw_csr=cursor;
+			fNESWCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_NS:
 		{
-			if(_resize_ns_csr)
-				delete _resize_ns_csr;
+			if(fNSCursor)
+				delete fNSCursor;
 
-			_resize_ns_csr=cursor;
+			fNSCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		case B_CURSOR_RESIZE_EW:
 		{
-			if(_resize_ew_csr)
-				delete _resize_ew_csr;
+			if(fEWCursor)
+				delete fEWCursor;
 
-			_resize_ew_csr=cursor;
+			fEWCursor=cursor;
 
 			if(cursor->GetAppSignature())
 				cursor->SetAppSignature("");
-			_cursorlist->RemoveItem(cursor);
+			fCursorList->RemoveItem(cursor);
 			break;
 		}
 		default:
@@ -601,12 +601,12 @@ void CursorManager::ChangeCursor(cursor_which which, int32 token)
 	\param token ID of the cursor to find
 	\return The cursor or NULL if not found
 */
-ServerCursor *CursorManager::_FindCursor(int32 token)
+ServerCursor *CursorManager::FindCursor(int32 token)
 {
 	ServerCursor *temp;
-	for(int32 i=0; i<_cursorlist->CountItems();i++)
+	for(int32 i=0; i<fCursorList->CountItems();i++)
 	{
-		temp=(ServerCursor*)_cursorlist->ItemAt(i);
+		temp=(ServerCursor*)fCursorList->ItemAt(i);
 		if(temp && temp->_token==token)
 			return temp;
 	}

@@ -49,20 +49,22 @@ Decorator::Decorator(BRect rect, int32 wlook, int32 wfeel, int32 wflags)
 	_title_string=new BString;
 	_driver=NULL;
 	
-		/// xxx.Set(0,0,1,1) produces a rectangle 2 pixels wide, that
-		// WILL be drawn on screen. We so not want that... so...
-		// [ A BRect when instantiated is made invalid, so, no need for: ]
-/*	_closerect.Set( 0, 0, -1, -1);
+	/// xxx.Set(0,0,1,1) produces a rectangle 2 pixels wide, that
+	// WILL be drawn on screen. We so not want that... so...
+	// [ A BRect when instantiated is made invalid, so, no need for: ]
+/*
+	_closerect.Set( 0, 0, -1, -1);
 	_zoomrect.Set( 0, 0, -1, -1);
 	_minimizerect.Set( 0, 0, -1, -1);
 	_resizerect.Set( 0, 0, -1, -1);
 */
 	_frame=rect;
-		// !!! rect rectangle MUST remain intact - it is top_view's area !!!
-		// Decorator drawing MUST be done arround that area !!!
+
+	// rect rectangle MUST remain intact - it is top_view's area
+	// Decorator drawing MUST be done arround that area
 	//_tabrect.Set(rect.left,rect.top,rect.right, rect.top+((rect.bottom-rect.top)/4));
-		// [ A BRect when instantiated is made invalid, so, no need for: ]	
-/*	_tabrect.Set( 0, 0, -1, -1 ); */
+	// [ A BRect when instantiated is made invalid, so, no need for: ]	
+//	_tabrect.Set( 0, 0, -1, -1 );
 
 	_look=wlook;
 	_feel=wfeel;
@@ -594,7 +596,3 @@ void Decorator::_DoLayout(void)
 {
 	
 }
-/*
- @log
- 	* changed SetFont to acomodate(eng?) with LayerData's 'font' member witch is now allocated on stack.
-*/

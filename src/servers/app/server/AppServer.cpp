@@ -821,7 +821,6 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 {
 	Decorator *dec=NULL;
 
-	dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
 	if(!app_server->make_decorator)
 		dec=new DefaultDecorator(rect,wlook,wfeel,wflags);
 	else
@@ -830,7 +829,6 @@ Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel
 	gui_colorset.Lock();
 	dec->SetDriver(ddriver);
 	dec->SetColors(gui_colorset);
-	dec->SetFont(fontserver->GetSystemPlain());
 	dec->SetTitle(title);
 	gui_colorset.Unlock();
 	

@@ -56,7 +56,6 @@ public:
 			DisplayDriver *driver);
 	virtual	~RootLayer(void);
 	
-	virtual	void Draw(const BRect &r);
 	virtual	void MoveBy(float x, float y);
 	virtual	void ResizeBy(float x, float y);
 	
@@ -65,6 +64,9 @@ public:
 	virtual	Layer *VirtualLowerSibling(void) const;
 	virtual	Layer *VirtualUpperSibling(void) const;
 	virtual	Layer *VirtualBottomChild(void) const;
+
+	void ReadWorkspaceData(const char *path);
+	void SaveWorkspaceData(const char *path);
 	
 	void AddWinBorder(WinBorder *winBorder);
 	void RemoveWinBorder(WinBorder *winBorder);
@@ -108,7 +110,7 @@ private:
 	int32 fScreenYResolution;
 	uint32 fColorSpace;
 	
-	BList fWSPtrList;
+	BList fWorkspaceList;
 	Workspace *fActiveWorkspace;
 };
 

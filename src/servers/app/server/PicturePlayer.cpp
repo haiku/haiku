@@ -224,11 +224,14 @@ status_t PicturePlayer::Play(int32 tableEntries,void *userData, LayerData *d)
 				char *string = new char[len + 1];
 				GetData(string, len);
 				string[len] = '\0';
-//				float deltax = GetFloat();
-//				float deltay = GetFloat();
+				float deltax = GetFloat();
+				float deltay = GetFloat();
 				
-				// TODO: The deltas given are escapements. Find out how they translate into
-				// escapement_delta units.
+				// TODO: The deltas given are escapements. They seem to be called deltax and deltay
+				// despite the fact that they are space and non-space escapements. Find out which is which when possible.
+				// My best guess is that deltax corresponds to escapement_delta.nonspace.
+				fldata.edelta.nonspace=deltax;
+				fldata.edelta.space=deltay;
 				
 				fdriver->DrawString(string,len,fldata.penlocation,&fldata);
 				delete string;

@@ -215,14 +215,9 @@ ServerWindow::~ServerWindow(void)
 	
 	cl = NULL;
 	
-	STRACE(("#ServerWindow(%s) will exit NOW!!!\n", fTitle.String()));
+	STRACE(("#ServerWindow(%s) will exit NOW\n", fTitle.String()));
 }
-//5700 - fara servo , fara cas
-//6300 - 1,4
-//6700 - 1,6
-//7100 - 1,4
-//7500 - 1,6
-//------------------------------------------------------------------------------
+
 //! Forces the window border to update its decorator
 void ServerWindow::ReplaceDecorator(void)
 {
