@@ -470,6 +470,7 @@ void BAlert::InitObject(const char* text, const char* button0,
 	
 		// Set up the "_master_" view
 		TAlertView* MasterView = new TAlertView(Bounds());
+		AddChild(MasterView);
 		MasterView->SetBitmap(InitIcon());
 	
 		// Set up the buttons
@@ -522,7 +523,7 @@ void BAlert::InitObject(const char* text, const char* button0,
 		// in AttachedToWindow()
 		for (int i = 0; i < buttonCount; ++i)
 		{
-			AddChild(fButtons[i]);
+			MasterView->AddChild(fButtons[i]);
 		}
 
 		for (int i = buttonCount - 1; i >= 0; --i)
@@ -617,8 +618,7 @@ void BAlert::InitObject(const char* text, const char* button0,
 		fTextView = new BTextView(TextViewRect, "_tv_",
 								  TextViewRect,
 								  B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW);
- 		AddChild(MasterView);
- 		AddChild(fTextView);
+ 		MasterView->AddChild(fTextView);
 		
 		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fTextView->SetText(text, strlen(text));
