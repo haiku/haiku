@@ -15,9 +15,11 @@ UsePrivateHeaders net ;
 	SubDirC++Flags $(defines) ;
 }
 
-SharedLibrary socket :
+SharedLibrary socket : 
 	socket.c
 	select.c 
+
+	: root
 ;
 
 # Installation -- in the test directory for the time being

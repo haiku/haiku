@@ -176,6 +176,7 @@ SharedLibrary "bind" :
 ;
 
 LinkSharedOSLibs libbind.so :
+	root 
 	be # BeOS defines syslog in libbe.so
 	libsocket.so ;
 

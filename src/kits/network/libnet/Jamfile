@@ -58,10 +58,9 @@ SharedLibrary net :
 	res_random.c
 	res_send.c
 	sethostent.c
-;
 
-LinkSharedOSLibs libnet.so :
-	root ;
+	: root
+;
 
 OBOSInstall install_network_etc_files : [ FDirName $(OBOS_ETC_DIR) ] :
 	resolv.conf
