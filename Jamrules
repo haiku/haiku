@@ -1400,7 +1400,7 @@ rule SetupKernel
 {
 	# Usage SetupKernel <sources_or_objects> : <extra_cc_flags>;
 
-	local _objs = $(1:S=$(SUFOBJ)) ;
+	local _objs = [ FGristFiles $(1:S=$(SUFOBJ)) ] ;
 
 	#Setup Kernel header directories
 	local public_kernel_includes = add-ons/file_system add-ons/graphics device drivers kernel storage support ;
