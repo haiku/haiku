@@ -1754,19 +1754,21 @@ vm_thread_dump_max_commit(void *unused)
 static void
 unmap_and_free_physical_pages(vm_translation_map *map, addr_t start, addr_t end)
 {
+	addr_t current = start;
+
 	// free all physical pages behind the specified range
 
-	while (start < end) {
+	while (current < end) {
 		addr_t physicalAddress;
 		uint32 flags;
 
-		if (map->ops->query(map, start, &physicalAddress, &flags) == B_OK) {
-			vm_page *page = vm_lookup_page(start / B_PAGE_SIZE);
+		if (map->ops->query(map, current, &physicalAddress, &flags) == B_OK) {
+			vm_page *page = vm_lookup_page(current / B_PAGE_SIZE);
 			if (page != NULL)
 				vm_page_set_state(page, PAGE_STATE_FREE);
 		}
 
-		start += B_PAGE_SIZE;
+		current += B_PAGE_SIZE;
 	}
 
 	// unmap the memory
@@ -1782,7 +1784,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 	addr_t lastEnd = start;
 	vm_region *area;
 
-	dprintf("free kernel args: asked to free %p - %p\n", (void *)start, (void *)end);
+	TRACE(("vm_free_unused_boot_loader_range(): asked to free %p - %p\n", (void *)start, (void *)end));
 
 	// The areas are sorted in virtual address space order, so
 	// we just have to find the holes between them that fall
@@ -1794,6 +1796,9 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 		addr_t areaStart = area->base;
 		addr_t areaEnd = areaStart + area->size;
 
+		if (area->id == RESERVED_REGION_ID)
+			continue;
+
 		if (areaEnd >= end) {
 			// we are done, the areas are already beyond of what we have to free
 			lastEnd = end;
@@ -1802,7 +1807,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 		if (areaStart > lastEnd) {
 			// this is something we can free
-			dprintf("free kernel args: get rid of %p - %p\n", (void *)lastEnd, (void *)areaStart);
+			TRACE(("free boot range: get rid of %p - %p\n", (void *)lastEnd, (void *)areaStart));
 			unmap_and_free_physical_pages(map, lastEnd, areaStart);
 		}
 
@@ -1811,7 +1816,7 @@ vm_free_unused_boot_loader_range(addr_t start, addr_t size)
 
 	if (lastEnd < end) {
 		// we can also get rid of some space at the end of the region
-		dprintf("free kernel args: also remove %p - %p\n", (void *)lastEnd, (void *)end);
+		TRACE(("free boot range: also remove %p - %p\n", (void *)lastEnd, (void *)end));
 		unmap_and_free_physical_pages(map, lastEnd, end);
 	}
 
@@ -1851,6 +1856,8 @@ create_preloaded_image_areas(struct preloaded_image *image)
 }
 
 
+// ToDo: have a vm_free_kernel_args() called!
+
 static void
 allocate_kernel_args(kernel_args *args)
 {
@@ -1858,9 +1865,10 @@ allocate_kernel_args(kernel_args *args)
 
 	TRACE(("allocate_kernel_args()\n"));
 
-	for (i = 0; i < args->num_virtual_allocated_ranges; i++) {
-		void *address = (void *)args->virtual_allocated_range[i].start;
-		create_area("kernel args", &address, B_EXACT_ADDRESS, args->virtual_allocated_range[i].size,
+	for (i = 0; i < args->num_kernel_args_ranges; i++) {
+		void *address = (void *)args->kernel_args_range[i].start;
+
+		create_area("_kernel args_", &address, B_EXACT_ADDRESS, args->kernel_args_range[i].size,
 			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 }
@@ -1901,11 +1909,11 @@ reserve_boot_loader_ranges(kernel_args *args)
 status_t
 vm_init(kernel_args *args)
 {
-	int err = 0;
-	unsigned int i;
 	struct preloaded_image *image;
 	addr_t heap_base;
 	void *address;
+	status_t err = 0;
+	uint32 i;
 
 	TRACE(("vm_init: entry\n"));
 	err = arch_vm_translation_map_init(args);
@@ -1963,21 +1971,18 @@ vm_init(kernel_args *args)
 
 	// allocate kernel stacks
 	for (i = 0; i < args->num_cpus; i++) {
-		char temp[64];
+		char name[64];
 
-		sprintf(temp, "idle_thread%d_kstack", i);
+		sprintf(name, "idle_thread%lu_kstack", i);
 		address = (void *)args->cpu_kstack[i].start;
-		vm_create_anonymous_region(vm_get_kernel_aspace_id(), temp, &address, B_EXACT_ADDRESS,
-			args->cpu_kstack[i].size, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		create_area(name, &address, B_EXACT_ADDRESS, args->cpu_kstack[i].size,
+			B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	}
 	{
 		void *null;
 		vm_map_physical_memory(vm_get_kernel_aspace_id(), "bootdir", &null, B_ANY_KERNEL_ADDRESS,
 			args->bootdir_addr.size, B_KERNEL_READ_AREA, args->bootdir_addr.start);
 	}
-
-	arch_vm_init_end(args);
-	unreserve_boot_loader_ranges(args);
 
 	// add some debugger commands
 	add_debugger_command("regions", &dump_region_list, "Dump a list of all regions");
@@ -2000,14 +2005,21 @@ vm_init_post_sem(kernel_args *args)
 {
 	vm_region *region;
 
+	// This frees all unused boot loader resources and makes its space available again
+	arch_vm_init_end(args);
+	unreserve_boot_loader_ranges(args);
+
 	// fill in all of the semaphores that were not allocated before
 	// since we're still single threaded and only the kernel address space exists,
 	// it isn't that hard to find all of the ones we need to create
+
 	arch_vm_translation_map_init_post_sem(args);
 	vm_aspace_init_post_sem();
-	recursive_lock_init(&kernel_aspace->translation_map.lock, "vm translation rlock");
 
 	for (region = kernel_aspace->virtual_map.region_list; region; region = region->aspace_next) {
+		if (region->id == RESERVED_REGION_ID)
+			continue;
+
 		if (region->cache_ref->lock.sem < 0)
 			mutex_init(&region->cache_ref->lock, "cache_ref_mutex");
 	}
@@ -2648,6 +2660,9 @@ _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
 
 	for (area = addressSpace->virtual_map.region_list; area; area = area->aspace_next) {
+		if (area->id == RESERVED_REGION_ID)
+			continue;
+
 		if (area->base > nextBase)
 			break;
 	}
