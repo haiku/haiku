@@ -16,6 +16,7 @@
 #ifndef KEYMAP_WINDOW_H
 #define KEYMAP_WINDOW_H
 
+#include <Control.h>
 #include <Window.h>
 #include <MenuBar.h>
 #include "KeymapTextView.h"
@@ -28,12 +29,12 @@
 class KeymapListItem;
 class KeymapApplication;
 
-class MapView : public BView
+class MapView : public BControl
 {
 public:
 	MapView(BRect rect, const char *name, Keymap *keymap);
 	void Draw(BRect rect);
-	void DrawKey(int32 keyCode);
+	void DrawKey(uint32 keyCode);
 	void DrawBorder(BRect borderRect);
 	void AttachedToWindow();
 	void KeyDown(const char* bytes, int32 numBytes);
@@ -52,6 +53,8 @@ private:
 	
 	Keymap				*fCurrentMap;
 	KeymapTextView		*fTextView;
+	uint32 fCurrentMouseKey;
+	
 };
 
 

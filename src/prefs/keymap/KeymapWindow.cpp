@@ -345,9 +345,10 @@ KeymapWindow::CurrentMap()
 
 
 MapView::MapView(BRect rect, const char *name, Keymap* keymap)
-	: BView(rect, name, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW),
+	: BControl(rect, name, NULL, NULL, B_FOLLOW_LEFT|B_FOLLOW_TOP, B_WILL_DRAW),
 		fCurrentFont(*be_plain_font),
-		fCurrentMap(keymap)
+		fCurrentMap(keymap),
+		fCurrentMouseKey(0)
 {
 	BRect frameRect = BRect(14, 16, Bounds().right-12, 30);
 	BRect textRect = frameRect;
@@ -1040,13 +1041,13 @@ MapView::Draw(BRect rect)
 
 
 void
-MapView::DrawKey(int32 keyCode)
+MapView::DrawKey(uint32 keyCode)
 {
 	BRect r = fKeysRect[keyCode];
 	SetHighColor(0,0,0);
 	StrokeRect(r);
 	
-	bool pressed = (fOldKeyInfo.key_states[keyCode>>3] & (1 << (7 - keyCode%8)));
+	bool pressed = (fOldKeyInfo.key_states[keyCode>>3] & (1 << (7 - keyCode%8))) || (keyCode == fCurrentMouseKey);
 	bool vertical = fKeysVertical[keyCode];
 	
 	if (!pressed) {
@@ -1278,19 +1279,58 @@ MapView::KeyUp(const char* bytes, int32 numBytes)
 void
 MapView::MouseDown(BPoint point)
 {
-	
+	uint32 buttons;
+	GetMouse(&point, &buttons);
+	if(buttons & B_PRIMARY_MOUSE_BUTTON) {
+		fCurrentMouseKey = 0;
+		for (int32 i=0; i<128; i++) {
+			if (fKeysRect[i].Contains(point)) {
+				fCurrentMouseKey = i;
+				DrawKey(fCurrentMouseKey);
+				char *str;
+				int32 numBytes;
+				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, &str, &numBytes);
+				if (numBytes>0)
+					fTextView->FakeKeyDown(str, numBytes);
+				SetTracking(true);
+				SetMouseEventMask(B_POINTER_EVENTS,
+					B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+				break;
+			}
+		}
+	}
 }
 
 void
 MapView::MouseUp(BPoint point)
 {
-
+	if (IsTracking())
+		SetTracking(false);
+	uint32 value = fCurrentMouseKey;
+	fCurrentMouseKey = 0;
+	DrawKey(value);
 }
 
 void
 MapView::MouseMoved(BPoint point, uint32 transit, const BMessage *msg)
 {
-
+	if (IsTracking()) {
+		uint32 value = fCurrentMouseKey;
+		for (int32 i=0; i<128; i++) {
+			if (fKeysRect[i].Contains(point) && !fKeysRect[value].Contains(point)) {
+				fCurrentMouseKey = i;
+				DrawKey(value);
+				DrawKey(fCurrentMouseKey);
+				char *str;
+				int32 numBytes;
+				fCurrentMap->GetChars(fCurrentMouseKey, fOldKeyInfo.modifiers, &str, &numBytes);
+				if (numBytes>0)
+					fTextView->FakeKeyDown(str, numBytes);
+				break;
+			}
+		}
+	}
+	BControl::MouseMoved(point, transit, message);
 }
 
 void 
