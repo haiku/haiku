@@ -16,7 +16,7 @@
 extern "C" void *heap_malloc(size_t size);
 extern "C" void heap_free(void *buffer);
 extern void dump_chunks(void);
-extern int32 heap_available(void);
+extern uint32 heap_available(void);
 
 
 const int32	kHeapSize = 32 * 1024;
@@ -25,7 +25,7 @@ int32 gVerbosity = 1;
 
 
 void 
-platform_release_heap(void *base)
+platform_release_heap(struct stage2_args *args, void *base)
 {
 	free(base);
 }
@@ -141,6 +141,7 @@ main(int argc, char **argv)
 
 	stage2_args args;
 	memset(&args, 0, sizeof(args));
+	args.heap_size = kHeapSize;
 
 	if (heap_init(&args) < B_OK) {
 		fprintf(stderr, "Could not initialize heap.\n");
@@ -243,7 +244,7 @@ main(int argc, char **argv)
 		}
 	}
 
-	heap_release();
+	heap_release(&args);
 	return 0;
 }
 
