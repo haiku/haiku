@@ -5,6 +5,6 @@
 #include <Directory.h>
 #include <Message.h>
 
-extern "C" BDataIO* instanciate_transport(BDirectory* printe, BMessage* msg);
+extern "C" BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg);
 
 #endif PRINT_TRANSPORT_ADD_ON_H
