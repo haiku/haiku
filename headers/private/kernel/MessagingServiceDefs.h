@@ -29,7 +29,7 @@ struct messaging_area_header {
 struct messaging_command {
 	int32	next_command;
 	uint32	command;
-	int32	size;
+	int32	size;			// == sizeof(messaging_command) + dataSize
 	char	data[0];
 };
 
