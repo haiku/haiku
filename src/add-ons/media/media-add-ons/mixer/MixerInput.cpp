@@ -267,6 +267,7 @@ MixerInput::GetInputChannelType(int channel)
 	return GetChannelType(channel, fInputChannelMask);
 }
 
+/*
 void
 MixerInput::SetInputChannelGain(int channel, float gain)
 {
@@ -287,6 +288,7 @@ MixerInput::GetInputChannelGain(int channel)
 		return 0.0f;
 	return fInputChannelInfo[channel].gain;
 }
+*/
 
 void
 MixerInput::UpdateInputChannelDestinationMask()
@@ -396,7 +398,7 @@ MixerInput::UpdateInputChannelDestinations()
 
 	TRACE("UpdateInputChannelDestinations: leave\n");
 }
-
+/*
 void
 MixerInput::SetInputChannelDestinationGain(int channel, int destination_type, float gain)
 {
@@ -430,6 +432,35 @@ MixerInput::GetInputChannelDestinationGain(int channel, int destination_type)
 	if (destination_type < 0 || destination_type >= MAX_CHANNEL_TYPES)
 		return 0.0f;
 	return fChannelTypeGain[destination_type];
+}
+*/
+
+void
+MixerInput::SetMixerChannelGain(int mixer_channel, float gain)
+{
+	if (mixer_channel < 0 || mixer_channel >= fMixerChannelCount)
+		return;
+	if (gain < 0.0f)
+		gain = 0.0f;
+
+	fMixerChannelInfo[mixer_channel].destination_gain = gain;
+	fChannelTypeGain[fMixerChannelInfo[mixer_channel].destination_type] = gain;
+}
+
+float
+MixerInput::GetMixerChannelGain(int mixer_channel)
+{
+	if (mixer_channel < 0 || mixer_channel >= fMixerChannelCount)
+		return 0.0;
+	return fMixerChannelInfo[mixer_channel].destination_gain;
+}
+
+int
+MixerInput::GetMixerChannelType(int mixer_channel)
+{
+	if (mixer_channel < 0 || mixer_channel >= fMixerChannelCount)
+		return -1;
+	return fMixerChannelInfo[mixer_channel].destination_type;
 }
 
 void

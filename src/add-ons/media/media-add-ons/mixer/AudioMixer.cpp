@@ -854,7 +854,7 @@ AudioMixer::CreateBufferGroup()
 #define PARAM_SRC_ENABLE(id, chan, src)		(((id) << 16) | ((chan) << 10) | ((src) << 4) | 0x1)
 #define PARAM_SRC_GAIN(id, chan, src)		(((id) << 16) | ((chan) << 10) | ((src) << 4) | 0x2)
 #define PARAM_DST_ENABLE(id, chan, dst)		(((id) << 16) | ((chan) << 10) | ((dst) << 4) | 0x3)
-#define PARAM_DST_GAIN(id, chan, dst)		(((id) << 16) | ((chan) << 10) | ((dst) << 4) | 0x4)
+
 #define PARAM_SRC_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x5)
 #define PARAM_DST_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x6)
 #define PARAM_MUTE(id)						(((id) << 16) | 0x7)
@@ -874,7 +874,6 @@ AudioMixer::CreateBufferGroup()
 #define PARAM_IS_SRC_ENABLE(id)				(((id) & 0xf) == 0x1)
 #define PARAM_IS_SRC_GAIN(id)				(((id) & 0xf) == 0x2)
 #define PARAM_IS_DST_ENABLE(id)				(((id) & 0xf) == 0x3)
-#define PARAM_IS_DST_GAIN(id)				(((id) & 0xf) == 0x4)
 #define PARAM_IS_MUTE(id)					(((id) & 0xf) == 0x7)
 #define PARAM_IS_GAIN(id)					(((id) & 0xf) == 0x8)
 
@@ -922,7 +921,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		for (int i = 0; (input = fCore->Input(i)); i++)
 			if (input->ID() == param)
 				break;
-		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id) && !PARAM_IS_DST_GAIN(id)))
+		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
@@ -933,23 +932,17 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
-			if (*ioSize < input->GetInputChannelCount() * sizeof(float))
+			if (*ioSize < input->GetMixerChannelCount() * sizeof(float))
 				goto err;
-			*ioSize = input->GetInputChannelCount() * sizeof(float);
-			for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
-				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetInputChannelGain(chan));
+			*ioSize = input->GetMixerChannelCount() * sizeof(float);
+			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+				static_cast<float *>(value)[chan] = DB_TO_GAIN(input->GetMixerChannelGain(chan));
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
 			if (*ioSize < sizeof(int32))
 				goto err;
 			*ioSize = sizeof(int32);
 			static_cast<int32 *>(value)[0] = input->HasInputChannelDestination(PARAM_CHAN(id), PARAM_DST(id));
-		}
-		if (PARAM_IS_DST_GAIN(id)) {
-			if (*ioSize < sizeof(float))
-				goto err;
-			*ioSize = sizeof(float);
-			static_cast<float *>(value)[0] = GAIN_TO_PERCENT(input->GetInputChannelDestinationGain(PARAM_CHAN(id), PARAM_DST(id)));
 		}
 	}
 	*last_change = TimeSource()->Now(); // XXX we could do better
@@ -965,6 +958,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 							  const void *value, size_t size)
 {
 	TRACE("SetParameterValue: id 0x%08x, size %ld\n", id, size);
+	bool update = false;
 	int param = PARAM(id);
 	fCore->Lock();
 	if (param == 0) {
@@ -1003,7 +997,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		for (int i = 0; (input = fCore->Input(i)); i++)
 			if (input->ID() == param)
 				break;
-		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id) && !PARAM_IS_DST_GAIN(id)))
+		if (!input || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_DST_ENABLE(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// input mute control
@@ -1013,10 +1007,10 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 		}
 		if (PARAM_IS_GAIN(id)) {
 			// input gain control
-			if (size < input->GetInputChannelCount() * sizeof(float))
+			if (size < input->GetMixerChannelCount() * sizeof(float))
 				goto err;
-			for (int chan = 0; chan < input->GetInputChannelCount(); chan++)
-				input->SetInputChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
+			for (int chan = 0; chan < input->GetMixerChannelCount(); chan++)
+				input->SetMixerChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
 		}
 		if (PARAM_IS_DST_ENABLE(id)) {
 			if (size != sizeof(int32))
@@ -1032,24 +1026,21 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 			} else {
 				input->RemoveInputChannelDestination(PARAM_CHAN(id), PARAM_DST(id));
 			}
-		}
-		if (PARAM_IS_DST_GAIN(id)) {
-			if (size != sizeof(float))
-				goto err;
-			input->SetInputChannelDestinationGain(PARAM_CHAN(id), PARAM_DST(id), PERCENT_TO_GAIN(static_cast<const float *>(value)[0]));
-			// We have an ugly display where each destination gain slider
-			// is diplayed for each input channel.
-			// Update all other sliders for this destination type
-			for (int chan = 0; chan < input->GetInputChannelCount(); chan++) {
-				if (PARAM_CHAN(id) == chan)
-					continue;
-				BroadcastNewParameterValue(when, PARAM_DST_GAIN(PARAM(id), chan, PARAM_DST(id)), const_cast<void *>(value), size);
-			}
+			// The slider count of the gain control needs to be changed,
+			// but calling SetChannelCount(input->GetMixerChannelCount())
+			// on it has no effect on remove parameter webs in other apps.
+			// BroadcastChangedParameter() should be correct, but doesn't work
+			BroadcastChangedParameter(PARAM_GAIN(PARAM(id)));
+			// We trigger a complete ParameterWeb update as workaround
+			// but it will change the fokus from tab 3 to tab 1
+			update = true;
 		}
 	}
 	BroadcastNewParameterValue(when, id, const_cast<void *>(value), size);
 err:
 	fCore->Unlock();
+	if (update)
+		UpdateParameterWeb();
 }
 
 void
@@ -1087,9 +1078,11 @@ AudioMixer::UpdateParameterWeb()
 		group = top->MakeGroup("");
 		group->MakeNullParameter(PARAM_STR1(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_WEB_BUFFER_INPUT); 
 		group->MakeNullParameter(PARAM_STR2(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(buf, in), B_GENERIC);
-		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
+		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE);
+		// XXX the gain control is ugly once you have more than two channels,
+		//     as you don't know what channel each slider controls. Tooltips might help...
 		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
-									   ->SetChannelCount(in->GetInputChannelCount()); 
+									   ->SetChannelCount(in->GetMixerChannelCount()); 
 		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
 
@@ -1119,11 +1112,9 @@ AudioMixer::UpdateParameterWeb()
 	
 	top = web->MakeGroup("Input Mapping"); // top level group
 	inputchannels = top->MakeGroup("");
-//	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
-	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations (PREVIEW; DISPLAYS ONLY ONE CONNECTED INPUT)", B_GENERIC);
+	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
 
-//	for (int i = 0; (in = fCore->Input(i)); i++) {
-	if ((in = fCore->Input(1)) || (in = fCore->Input(0))) { // XXX limited to input 1 or 0 to aviod BSlider problems
+	for (int i = 0; (in = fCore->Input(i)); i++) {
 		group = inputchannels->MakeGroup("");
 		group->MakeNullParameter(PARAM_STR4(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC); 
 		group = group->MakeGroup("");
@@ -1133,10 +1124,7 @@ AudioMixer::UpdateParameterWeb()
 			subgroup->MakeNullParameter(PARAM_DST_STR(in->ID(), chan), B_MEDIA_RAW_AUDIO,
 										StringForChannelType(buf, in->GetInputChannelType(chan)), B_GENERIC);
 			for (int dst = 0; dst < MAX_CHANNEL_TYPES; dst++) {
-				subsubgroup = subgroup->MakeGroup("");
-				subsubgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO, "", B_ENABLE); 
-				subsubgroup->MakeContinuousParameter(PARAM_DST_GAIN(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO,
-													 StringForChannelType(buf, dst), B_GAIN, "%", 0.0, 100.0, 1.0);
+				subgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO, StringForChannelType(buf, dst), B_ENABLE); 
 			}
 				
 		}

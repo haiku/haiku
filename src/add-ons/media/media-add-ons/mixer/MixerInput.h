@@ -24,22 +24,27 @@ public:
 	// The physical input channels
 	uint32	GetInputChannelCount();
 	int		GetInputChannelType(int channel);
-	void	SetInputChannelGain(int channel, float gain);
-	float	GetInputChannelGain(int channel);
+//	void	SetInputChannelGain(int channel, float gain);
+//	float	GetInputChannelGain(int channel);
 
 	// The destinations for each channel
 	void 	AddInputChannelDestination(int channel, int destination_type);
 	void 	RemoveInputChannelDestination(int channel, int destination_type);
-	void 	SetInputChannelDestinationGain(int channel, int destination_type, float gain);
-	float	GetInputChannelDestinationGain(int channel, int destination_type);
+//	void 	SetInputChannelDestinationGain(int channel, int destination_type, float gain);
+//	float	GetInputChannelDestinationGain(int channel, int destination_type);
 	bool 	HasInputChannelDestination(int channel, int destination_type);
 	int 	GetInputChannelForDestination(int destination_type); // returns -1 if not found
+	
+	// The virtual mixer channels that are generated from destinations
+	uint32 GetMixerChannelCount();
+	void 	SetMixerChannelGain(int mixer_channel, float gain);
+	float	GetMixerChannelGain(int mixer_channel);
+	int		GetMixerChannelType(int mixer_channel);
 	
 	void SetEnabled(bool yesno);
 	bool IsEnabled();
 
 	// only for use by MixerCore
-	uint32 GetMixerChannelCount();
 	bool GetMixerChannelInfo(int mixer_channel, int64 framepos, bigtime_t time, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 
 protected:
