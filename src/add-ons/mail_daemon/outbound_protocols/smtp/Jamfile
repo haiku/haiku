@@ -3,6 +3,11 @@ SubDir OBOS_TOP src add-ons mail_daemon outbound_protocols smtp ;
 UsePrivateHeaders mail ;
 SubDirHdrs [ FDirName $(OBOS_TOP) headers os add-ons mail_daemon ] ;
 
+if $(USESSL) {
+	SubDirC++Flags -DUSESSL ;
+	SubDirHdrs [ FDirName / boot home config include ] ;
+}
+
 if $(BONE_COMPATIBLE) {
 	SubDirC++Flags -DBONE ;
 } else {
@@ -14,6 +19,10 @@ Addon SMTP : mail_daemon outbound_protocols :
 	md5c.c ;
 
 LinkSharedOSLibs SMTP : be libmail.so $(NETWORK_LIBS) ;
+
+if $(USESSL) {
+	LinkSharedOSLibs SMTP : ssl crypto ;
+}
 
 Package haiku-maildaemon-cvs :
 	SMTP : 

@@ -49,7 +49,7 @@ documentation and/or software.
 #define S43 15
 #define S44 21
 
-static void MD5Transform PROTO_LIST ((UINT4 [4], unsigned char [64]));
+static void MD5_Transform PROTO_LIST ((UINT4 [4], unsigned char [64]));
 static void Encode PROTO_LIST
   ((unsigned char *, UINT4 *, unsigned int));
 static void Decode PROTO_LIST
@@ -100,7 +100,7 @@ Rotation is separate from addition to prevent recomputation.
 
 /* MD5 initialization. Begins an MD5 operation, writing a new context.
  */
-void MD5Init (MD5_CTX *context)
+void MD5_Init (MD5_CTX *context)
                                         /* context */
 {
   context->count[0] = context->count[1] = 0;
@@ -116,7 +116,7 @@ void MD5Init (MD5_CTX *context)
   operation, processing another message block, and updating the
   context.
  */
-void MD5Update (MD5_CTX *context, unsigned char *input, unsigned int inputLen)
+void MD5_Update (MD5_CTX *context, unsigned char *input, unsigned int inputLen)
                                         /* context */
                                 /* input block */
                      /* length of input block */
@@ -139,10 +139,10 @@ void MD5Update (MD5_CTX *context, unsigned char *input, unsigned int inputLen)
   if (inputLen >= partLen) {
  MD5_memcpy
    ((POINTER)&context->buffer[index], (POINTER)input, partLen);
- MD5Transform (context->state, context->buffer);
+ MD5_Transform (context->state, context->buffer);
 
  for (i = partLen; i + 63 < inputLen; i += 64)
-   MD5Transform (context->state, &input[i]);
+   MD5_Transform (context->state, &input[i]);
 
  index = 0;
   }
@@ -158,7 +158,7 @@ void MD5Update (MD5_CTX *context, unsigned char *input, unsigned int inputLen)
 /* MD5 finalization. Ends an MD5 message-digest operation, writing the
   the message digest and zeroizing the context.
  */
-void MD5Final (unsigned char digest[16], MD5_CTX *context)
+void MD5_Final (unsigned char digest[16], MD5_CTX *context)
                          /* message digest */
                                        /* context */
 {
@@ -172,10 +172,10 @@ void MD5Final (unsigned char digest[16], MD5_CTX *context)
 */
   index = (unsigned int)((context->count[0] >> 3) & 0x3f);
   padLen = (index < 56) ? (56 - index) : (120 - index);
-  MD5Update (context, PADDING, padLen);
+  MD5_Update (context, PADDING, padLen);
 
   /* Append length (before padding) */
-  MD5Update (context, bits, 8);
+  MD5_Update (context, bits, 8);
   /* Store state in digest */
   Encode (digest, context->state, 16);
 
@@ -186,7 +186,7 @@ void MD5Final (unsigned char digest[16], MD5_CTX *context)
 
 /* MD5 basic transformation. Transforms state based on block.
  */
-static void MD5Transform (UINT4 state[4], unsigned char block[64])
+static void MD5_Transform (UINT4 state[4], unsigned char block[64])
 {
   UINT4 a = state[0], b = state[1], c = state[2], d = state[3], x[16];
 
@@ -320,91 +320,4 @@ static void MD5_memset (POINTER output, int value, unsigned int len)
 
   for (i = 0; i < len; i++)
  ((char *)output)[i] = (char)value;
-}
-
-/*
-** Function: md5_hmac
-** taken from the file rfc2104.txt
-** written by Martin Schaaf <mascha@ma-scha.de>
-*/
-void
-MD5Hmac(unsigned char *digest,
-	 const unsigned char* text, int text_len,
-	 const unsigned char* key, int key_len)
-{
-	MD5_CTX context;
-	unsigned char k_ipad[64];    /* inner padding -
-				      * key XORd with ipad
-				      */
-	unsigned char k_opad[64];    /* outer padding -
-				      * key XORd with opad
-				      */
-	/* unsigned char tk[16]; */
-	int i;
-
-	/* start out by storing key in pads */
-	memset(k_ipad, 0, sizeof k_ipad);
-	memset(k_opad, 0, sizeof k_opad);
-	if (key_len > 64) {
-		/* if key is longer than 64 bytes reset it to key=MD5(key) */
-		MD5_CTX tctx;
-
-		MD5Init(&tctx);
-		MD5Update(&tctx, (unsigned char*)key, key_len);
-		MD5Final(k_ipad, &tctx);
-		MD5Final(k_opad, &tctx);
-	} else {
-		memcpy(k_ipad, key, key_len);
-		memcpy(k_opad, key, key_len);
-	}
-
-	/*
-	 * the HMAC_MD5 transform looks like:
-	 *
-	 * MD5(K XOR opad, MD5(K XOR ipad, text))
-	 *
-	 * where K is an n byte key
-	 * ipad is the byte 0x36 repeated 64 times
-	 * opad is the byte 0x5c repeated 64 times
-	 * and text is the data being protected
-	 */
-
-
-	/* XOR key with ipad and opad values */
-	for (i = 0; i < 64; i++) {
-		k_ipad[i] ^= 0x36;
-		k_opad[i] ^= 0x5c;
-	}
-
-	/*
-	 * perform inner MD5
-	 */
-	MD5Init(&context);		      /* init context for 1st
-					       * pass */
-	MD5Update(&context, k_ipad, 64);     /* start with inner pad */
-	MD5Update(&context, (unsigned char*)text, text_len); /* then text of datagram */
-	MD5Final(digest, &context);	      /* finish up 1st pass */
-	/*
-	 * perform outer MD5
-	 */
-	MD5Init(&context);		      /* init context for 2nd
-					       * pass */
-	MD5Update(&context, k_opad, 64);     /* start with outer pad */
-	MD5Update(&context, digest, 16);     /* then results of 1st
-					       * hash */
-	MD5Final(digest, &context);	      /* finish up 2nd pass */
-}
-
-
-void
-MD5HexHmac(char *hexdigest,
-	     const unsigned char* text, int text_len,
-	     const unsigned char* key, int key_len)
-{
-	unsigned char digest[16];
-	int i;
-
-	MD5Hmac(digest, text, text_len, key, key_len);
-	for (i = 0; i < 16; i++)
-		sprintf(hexdigest + 2 * i, "%02x", digest[i]);
 }

@@ -25,7 +25,9 @@
 #include <unistd.h>
 
 #include "smtp.h"
+#ifndef USESSL
 #include "md5.h"
+#endif
 
 #include <MDRLanguage.h>
 
@@ -43,6 +45,93 @@
 #else
 #	define D(x) ;
 #endif
+
+/*
+** Function: md5_hmac
+** taken from the file rfc2104.txt
+** written by Martin Schaaf <mascha@ma-scha.de>
+*/
+void
+MD5Hmac(unsigned char *digest,
+	 const unsigned char* text, int text_len,
+	 const unsigned char* key, int key_len)
+{
+	MD5_CTX context;
+	unsigned char k_ipad[64];    /* inner padding -
+				      * key XORd with ipad
+				      */
+	unsigned char k_opad[64];    /* outer padding -
+				      * key XORd with opad
+				      */
+	/* unsigned char tk[16]; */
+	int i;
+
+	/* start out by storing key in pads */
+	memset(k_ipad, 0, sizeof k_ipad);
+	memset(k_opad, 0, sizeof k_opad);
+	if (key_len > 64) {
+		/* if key is longer than 64 bytes reset it to key=MD5(key) */
+		MD5_CTX tctx;
+
+		MD5_Init(&tctx);
+		MD5_Update(&tctx, (unsigned char*)key, key_len);
+		MD5_Final(k_ipad, &tctx);
+		MD5_Final(k_opad, &tctx);
+	} else {
+		memcpy(k_ipad, key, key_len);
+		memcpy(k_opad, key, key_len);
+	}
+
+	/*
+	 * the HMAC_MD5 transform looks like:
+	 *
+	 * MD5(K XOR opad, MD5(K XOR ipad, text))
+	 *
+	 * where K is an n byte key
+	 * ipad is the byte 0x36 repeated 64 times
+	 * opad is the byte 0x5c repeated 64 times
+	 * and text is the data being protected
+	 */
+
+
+	/* XOR key with ipad and opad values */
+	for (i = 0; i < 64; i++) {
+		k_ipad[i] ^= 0x36;
+		k_opad[i] ^= 0x5c;
+	}
+
+	/*
+	 * perform inner MD5
+	 */
+	MD5_Init(&context);		      /* init context for 1st
+					       * pass */
+	MD5_Update(&context, k_ipad, 64);     /* start with inner pad */
+	MD5_Update(&context, (unsigned char*)text, text_len); /* then text of datagram */
+	MD5_Final(digest, &context);	      /* finish up 1st pass */
+	/*
+	 * perform outer MD5
+	 */
+	MD5_Init(&context);		      /* init context for 2nd
+					       * pass */
+	MD5_Update(&context, k_opad, 64);     /* start with outer pad */
+	MD5_Update(&context, digest, 16);     /* then results of 1st
+					       * hash */
+	MD5_Final(digest, &context);	      /* finish up 2nd pass */
+}
+
+
+void
+MD5HexHmac(char *hexdigest,
+	     const unsigned char* text, int text_len,
+	     const unsigned char* key, int key_len)
+{
+	unsigned char digest[16];
+	int i;
+
+	MD5Hmac(digest, text, text_len, key, key_len);
+	for (i = 0; i < 16; i++)
+		sprintf(hexdigest + 2 * i, "%02x", digest[i]);
+}
 
 
 // Authentication types recognized. Not all methods are implemented.
@@ -71,6 +160,7 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 		if (fStatus < B_OK) {
 			error_msg << MDR_DIALECT_CHOICE ("POP3 authentification failed. The server said:\n","POP3認証に失敗しました\n") << fLog;
 			runner->ShowError(error_msg.String());
+                        runner->Stop(true);
 			return;
 		}
 	}
@@ -89,6 +179,7 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 			error_msg << MDR_DIALECT_CHOICE (": Connection refused or host not found.","；接続が拒否されたかサーバーが見つかりません");
 
 		runner->ShowError(error_msg.String());
+                runner->Stop(true);
 		return;
 	}
 
@@ -105,6 +196,7 @@ SMTPProtocol::SMTPProtocol(BMessage *message, BMailChainRunner *run)
 		error_msg << MDR_DIALECT_CHOICE ("Error while logging in to ","ログイン中にエラーが発生しました\n") << fSettings->FindString("server") 
 			<< MDR_DIALECT_CHOICE (". The server said:\n","サーバーエラー\n") << fLog;
 		runner->ShowError(error_msg.String());
+                runner->Stop(true);
 	}
 }
 
@@ -164,9 +256,19 @@ status_t
 SMTPProtocol::Open(const char *address, int port, bool esmtp)
 {
 	runner->ReportProgress(0, 0, MDR_DIALECT_CHOICE ("Connecting to server...","接続中..."));
-
-	if (port <= 0)
-		port = 25;
+        
+        #ifdef USESSL
+		use_ssl = (fSettings->FindInt32("flavor") == 1);
+		ssl = NULL;
+		ctx = NULL;
+	#endif
+                
+        if (port <= 0)
+		#ifdef USESSL
+			port = use_ssl ? 25 : 465;
+		#else
+			port = 25;
+		#endif
 	
 	uint32 hostIP = inet_addr(address);  // first see if we can parse it as a numeric address
 	if ((hostIP == 0)||(hostIP == (uint32)-1)) {
@@ -201,6 +303,41 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 	} else {
 		return errno;
 	}
+
+#ifdef USESSL
+	if (use_ssl) {
+		SSL_library_init();
+    	SSL_load_error_strings();
+    	RAND_seed(this,sizeof(SMTPProtocol));
+    	/*--- Because we're an add-on loaded at an unpredictable time, all
+    	      the memory addresses and things contained in ourself are
+    	      esssentially random. */
+    	
+    	ctx = SSL_CTX_new(SSLv23_method());
+    	ssl = SSL_new(ctx);
+    	sbio=BIO_new_socket(_fd,BIO_NOCLOSE);
+    	SSL_set_bio(ssl,sbio,sbio);
+    	
+    	if (SSL_connect(ssl) <= 0) {
+    		BString error;
+			error << "Could not connect to SMTP server " << fSettings->FindString("server");
+			if (port != 465)
+				error << ":" << port;
+			error << ". (SSL Connection Error)";
+			runner->ShowError(error.String());
+			SSL_CTX_free(ctx);
+			#ifdef BONE
+				close(_fd);
+			#else
+				closesocket(_fd);
+			#endif
+                        _fd = -1;
+			runner->Stop(true);
+			return B_OK;
+		}
+	}
+	
+    #endif
 
 	BString line;
 	ReceiveResponse(line);
@@ -432,6 +569,16 @@ SMTPProtocol::Close()
 	if (SendCommand(cmd.String()) != B_OK) {
 		// Error
 	}
+
+#ifdef USESSL
+        if (use_ssl)  {
+                if (ssl)
+                        SSL_shutdown(ssl);
+                if (ctx)
+                        SSL_CTX_free(ctx);
+        }
+#endif
+
 #ifdef BONE
 	close(_fd);
 #else
@@ -518,6 +665,15 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
 			if (data[i] == '\r' && data[i+1] == '\n' && data[i+2] == '.') {
 				foundCRLFPeriod = true;
 				// Send data up to the CRLF, and include the period too.
+                        #ifdef USESSL
+                                if (use_ssl) {
+                                        if (SSL_write(ssl,data,i + 3) < 0) {
+                                            amountUnread = 0; // Stop when an error happens.
+                                            bufferLen = 0;
+                                            break;
+                                        }
+                                } else
+                        #endif
 				if (send (_fd,data, i + 3,0) < 0) {
 					amountUnread = 0; // Stop when an error happens.
 					bufferLen = 0;
@@ -535,6 +691,11 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
 		if (!foundCRLFPeriod) {
 			if (amountUnread <= 0) { // No more data, all we have is in the buffer.
 				if (bufferLen > 0) {
+                            #ifdef USESSL
+                                    if (use_ssl)
+                                            SSL_write(ssl,data,bufferLen);
+                                    else
+                            #endif
 					send (_fd,data, bufferLen,0);
 					runner->ReportProgress (bufferLen,0);
 					if (bufferLen >= 2)
@@ -547,6 +708,12 @@ SMTPProtocol::Send(const char *to, const char *from, BPositionIO *message)
 			// Send most of the buffer, except a few characters to overlap with
 			// the next read, in case the CRLFPeriod is split between reads.
 			if (bufferLen > 3) {
+                        #ifdef USESSL
+                            if (use_ssl) {
+                                    if (SSL_write(ssl,data,bufferLen - 3) < 0)
+                                        break;
+                            } else
+                        #endif
 				if (send (_fd,data, bufferLen - 3,0) < 0)
 					break; // Stop when an error happens.
 				runner->ReportProgress (bufferLen - 3,0);
@@ -590,12 +757,23 @@ SMTPProtocol::ReceiveResponse(BString &out)
 	
 	/* Set the socket in the mask. */ 
 	FD_SET(_fd, &fds); 
-	int result = select(32, &fds, NULL, NULL, &tv);
+        int result = -1;
+#ifdef USESSL
+        if ((use_ssl) && (SSL_pending(ssl)))
+            result = 1;
+        else
+#endif
+            result = select(32, &fds, NULL, NULL, &tv);
 	if (result < 0)
 		return errno;
 	
 	if (result > 0) {
 		while (1) {
+                 #ifdef USESSL
+			if (use_ssl)
+				r = SSL_read(ssl,buf,SMTP_RESPONSE_SIZE - 1);
+			else
+		  #endif
 			r = recv(_fd,buf, SMTP_RESPONSE_SIZE - 1,0);
 			if (r <= 0)
 				break;
@@ -620,7 +798,13 @@ SMTPProtocol::SendCommand(const char *cmd)
 {
 	D(bug("C:%s\n", cmd));
 
-	if (send(_fd,cmd, ::strlen(cmd),0) == B_ERROR)
+#ifdef USESSL
+	if (use_ssl) {
+		if (SSL_write(ssl,cmd,::strlen(cmd)) < 0)
+                    return B_ERROR;
+	} else
+#endif
+	if (send(_fd,cmd, ::strlen(cmd),0) < 0)
 		return B_ERROR;
 
 	fLog = "";
@@ -662,7 +846,15 @@ instantiate_mailfilter(BMessage *settings, BMailChainRunner *status)
 BView *
 instantiate_config_panel(BMessage *settings, BMessage *)
 {
-	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME);
+	BMailProtocolConfigView *view = new BMailProtocolConfigView(B_MAIL_PROTOCOL_HAS_AUTH_METHODS | B_MAIL_PROTOCOL_HAS_USERNAME | B_MAIL_PROTOCOL_HAS_PASSWORD | B_MAIL_PROTOCOL_HAS_HOSTNAME
+       
+         #ifdef USESSL
+            | B_MAIL_PROTOCOL_HAS_FLAVORS);
+        view->AddFlavor("Unencrypted");
+        view->AddFlavor("SSL");
+	#else
+            );
+	#endif
 
 	view->AddAuthMethod(MDR_DIALECT_CHOICE ("None","無し"), false);
 	view->AddAuthMethod(MDR_DIALECT_CHOICE ("ESMTP","ESMTP"));

@@ -10,6 +10,10 @@
 
 #include <MailAddon.h>
 
+#ifdef USESSL
+	#include <openssl/ssl.h>
+	#include <openssl/rand.h>
+#endif
 
 class SMTPProtocol : public BMailFilter {
 	public:
@@ -37,6 +41,14 @@ class SMTPProtocol : public BMailFilter {
 		BMessage *fSettings;
 		BMailChainRunner *runner;
 		int32 fAuthType;
+                
+                #ifdef USESSL
+			SSL_CTX *ctx;
+			SSL *ssl;
+			BIO *sbio;
+			
+			bool use_ssl;
+		#endif
 
 		status_t fStatus;
 };
