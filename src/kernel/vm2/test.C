@@ -4,67 +4,41 @@
 unsigned long addr;
 vmInterface vm(10);
 
-void writeByte(unsigned int offset, char value)
-{
-	//printf ("writeByte: writing %d to offset %d\n",value,offset);
-	vm.setByte(addr+offset,value);
-}
+void writeByte(unsigned int offset, char value) { vm.setByte(addr+offset,value); }
 
-unsigned char readByte(unsigned int offset )
+unsigned char readByte(unsigned int offset ) { char value=vm.getByte(addr+offset); return value; }
+
+int createFillAndTest(int pages)
 {
-	char value=vm.getByte(addr+offset);
-	//printf ("readByte: read %d from offset %d\n",value,offset);
-	return value;
+	int area1;
+	area1=vm.createArea("Mine",pages,(void **)(&addr));
+	for (int i=0;i<pages*PAGE_SIZE;i++)
+		writeByte(i,i%256);
+	for (int i=0;i<pages*PAGE_SIZE;i++)
+		if (i%256!=readByte(i))
+				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
+	return area1;
 }
 
 int main(int argc,char **argv)
 {
 	int area1,area2;
-	area1=vm.createArea("Mine",2,(void **)(&addr));
-	writeByte(0,99);
-	readByte(0);
-	printf ("\n\n\n\n\n");
-	writeByte(4097,99);
-	readByte(4097);
-	printf ("\n\n\n\n\n");
-	for (int i=0;i<8192;i++)
-		writeByte(i,i%256);
-	for (int i=0;i<8192;i++)
-		if (i%256!=readByte(i))
-				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
+	printf ("Creating a new area1\n");
+	area1=createFillAndTest(2);
 	snooze(5000000);
-	area2=vm.createArea("Mine2",2,(void **)(&addr));
-	writeByte(0,99);
-	readByte(0);
-	printf ("\n\n\n\n\n");
-	writeByte(4097,99);
-	readByte(4097);
-	printf ("\n\n\n\n\n");
-	for (int i=0;i<8192;i++)
-		writeByte(i,i%256);
-	for (int i=0;i<8192;i++)
-		if (i%256!=readByte(i))
-				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
+	printf ("Creating a new area2\n");
+	area2=createFillAndTest(2);
 	snooze(500000);
 	printf ("Freeing area1\n");
 	vm.freeArea(area1);
+	snooze(500000);
 	printf ("Freeing area2\n");
 	vm.freeArea(area2);
 	printf ("Done Freeing area2\n");
 	snooze(20000000);
 
 	printf ("Creating a new area\n");
-	area1=vm.createArea("Mine",2,(void **)(&addr));
-	writeByte(0,99);
-	readByte(0);
-	printf ("\n\n\n\n\n");
-	writeByte(4097,99);
-	readByte(4097);
-	printf ("\n\n\n\n\n");
-	for (int i=0;i<8192;i++)
-		writeByte(i,i%256);
-	for (int i=0;i<8192;i++)
-		if (i%256!=readByte(i))
-				printf ("ERROR! Byte at offset %d does not match: expected: %d, found: %d\n",i,i%256,readByte(i));
+	area1=createFillAndTest(2);
+	vm.freeArea(area1);
 	return 0;
 }
