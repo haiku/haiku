@@ -40,5 +40,7 @@ SubInclude OBOS_TOP src apps bin ifconfig ;
 SubInclude OBOS_TOP src apps bin ping ;
 SubInclude OBOS_TOP src apps bin route ;
 SubInclude OBOS_TOP src apps bin traceroute ;
+SubInclude OBOS_TOP src apps bin unzip ;
+SubInclude OBOS_TOP src apps bin zip ;
 
 
