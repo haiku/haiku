@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps bin tar lib ;
 
-SubDirHdrs $(OBOS_TOP) src apps bin tar ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 # set some additional defines
 {
