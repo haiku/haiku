@@ -127,6 +127,21 @@ GetChannelMask(int channel, uint32 all_channel_masks)
 	}
 }
 
+int ChannelMaskToChannelType(uint32 mask)
+{
+	for (int i = 0; i < 32; i++)
+		if (mask & (1 << i))
+			return i;
+	return -1;
+}
+
+uint32 ChannelTypeToChannelMask(int type)
+{
+	if (type < 0 || type > 31)
+		return 0;
+	return 1 << type;
+}
+
 void
 CopySamples(float *_dst, int32 _dst_sample_offset,
 			const float *_src, int32 _src_sample_offset,

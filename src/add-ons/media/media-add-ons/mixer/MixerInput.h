@@ -16,7 +16,7 @@ public:
 	media_input & MediaInput();
 	
 	uint32 GetMixerChannelCount();
-	void GetMixerChannelInfo(int channel, const float **buffer, uint32 *sample_offset, uint32 *type, float *gain);
+	void GetMixerChannelInfo(int channel, const float **buffer, uint32 *sample_offset, int *type, float *gain);
 	void SetMixerChannelGain(int channel, float gain);
 	float GetMixerChannelGain(int channel);
 	
@@ -43,7 +43,7 @@ private:
 	};	
 	struct mixer_chan_info {
 		float *buffer_base;
-		uint32 designation;		// only one bit is set
+		int type;
 		float gain;
 	};
 	

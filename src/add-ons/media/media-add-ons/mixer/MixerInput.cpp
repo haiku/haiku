@@ -233,7 +233,7 @@ MixerInput::UpdateMixerChannels()
 	for (int i  = 0, mask = 1; i < fMixerChannelCount; i++) {
 		while (mask != 0 && (all_bits & mask) == 0)
 			mask <<= 1;
-		fMixerChannelInfo[i].designation = mask;
+		fMixerChannelInfo[i].type = ChannelMaskToChannelType(mask);
 		mask <<= 1;
 	}
 
@@ -241,7 +241,7 @@ MixerInput::UpdateMixerChannels()
 	for (int i  = 0; i < fMixerChannelCount; i++) {
 		int j;
 		for (j = 0; j < fInputChannelCount; j++) {
-			if (fInputChannelInfo[j].designations & fMixerChannelInfo[i].designation) {
+			if (fInputChannelInfo[j].designations & ChannelTypeToChannelMask(fMixerChannelInfo[i].type)) {
 				fMixerChannelInfo[i].buffer_base = &fMixBuffer[j];
 				break;
 			}
@@ -256,7 +256,7 @@ MixerInput::UpdateMixerChannels()
 	if (old_mixer_channel_info != 0) {
 		for (int i  = 0; i < fMixerChannelCount; i++) {
 			for (int j = 0; j < old_mixer_channel_count; j++) {
-				if (fMixerChannelInfo[i].designation == old_mixer_channel_info[j].designation) {
+				if (fMixerChannelInfo[i].type == old_mixer_channel_info[j].type) {
 					fMixerChannelInfo[i].gain = old_mixer_channel_info[j].gain;
 					break;
 				}
@@ -267,7 +267,7 @@ MixerInput::UpdateMixerChannels()
 	}
 
 	for (int i = 0; i < fMixerChannelCount; i++)
-		printf("UpdateMixerChannels: mixer channel %d, designation  0x%08X, base %p, gain %.3f\n", i, fMixerChannelInfo[i].designation, fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].gain);
+		printf("UpdateMixerChannels: mixer channel %d, type %2d, des 0x%08X, base %p, gain %.3f\n", i, fMixerChannelInfo[i].type, ChannelTypeToChannelMask(fMixerChannelInfo[i].type), fMixerChannelInfo[i].buffer_base, fMixerChannelInfo[i].gain);
 
 	printf("UpdateMixerChannels: leave\n");
 }
@@ -279,13 +279,13 @@ MixerInput::GetMixerChannelCount()
 }
 
 void
-MixerInput::GetMixerChannelInfo(int channel, const float **buffer, uint32 *sample_offset, uint32 *type, float *gain)
+MixerInput::GetMixerChannelInfo(int channel, const float **buffer, uint32 *sample_offset, int *type, float *gain)
 {
 	ASSERT(fMixBuffer);
 	ASSERT(channel >= 0 && channel < fMixerChannelCount);
 	*buffer = fMixerChannelInfo[channel].buffer_base;
 	*sample_offset = sizeof(float) * fInputChannelCount;
-	*type = fMixerChannelInfo[channel].designation;
+	*type = fMixerChannelInfo[channel].type;
 	*gain = fMixerChannelInfo[channel].gain;
 }
 

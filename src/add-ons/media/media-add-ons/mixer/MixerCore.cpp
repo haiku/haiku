@@ -10,6 +10,11 @@
 
 #define ASSERT_LOCKED()		if (fLocker->IsLocked()) {} else debugger("core not locked, meltdown occurred")
 
+/* Mixer channels are identified by a type number, each type number corresponds
+ * to the one of the channel masks of enum media_multi_channels.
+ */
+
+
 MixerCore::MixerCore()
  :	fLocker(new BLocker),
 	fOutputBufferLength(MAX_OUTPUT_BUFFER_LENGTH),

@@ -20,3 +20,6 @@ inline int64 frames_for_duration(double framerate, bigtime_t duration)
 {
 	return (int64) ceil(framerate * double(duration) / 1000000.0);
 }
+
+int ChannelMaskToChannelType(uint32 mask);
+uint32 ChannelTypeToChannelMask(int type);
