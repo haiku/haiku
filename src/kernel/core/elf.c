@@ -28,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <ctype.h>
 
 //#define TRACE_ELF
 #ifdef TRACE_ELF
@@ -112,21 +113,50 @@ register_elf_image(struct elf_image_info *image)
 }
 
 
-static int 
-print_address_info(int argc, char **argv)
+/**	Note, you must lock the image mutex when you call this function. */
+
+static struct elf_image_info *
+find_image_at_address(addr_t address)
 {
-	char text[128];
-	long address;
+	struct hash_iterator iterator;
+	struct elf_image_info *image;
+
+	ASSERT_LOCKED_MUTEX(&sImageMutex);
+
+	hash_open(sImagesHash, &iterator);
+
+	// get image that may contain the address
+
+	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+		if (address >= image->regions[0].start
+			&& address <= (image->regions[0].start + image->regions[0].size))
+			break;
+	}
+
+	hash_close(sImagesHash, &iterator, false);
+	return image;
+}
+
+
+static int 
+dump_address_info(int argc, char **argv)
+{
+	const char *symbol, *imageName;
+	bool exactMatch;
+	addr_t address;
 
 	if (argc < 2) {
 		dprintf("not enough arguments\n");
 		return 0;
 	}
 
-	address = atoul(argv[1]);
+	address = strtoul(argv[1], NULL, 16);
 
-	elf_lookup_symbol_address(address, NULL, text, sizeof(text));
-	dprintf("%p = %s\n",(void *)address,text);
+	if (elf_lookup_symbol_address(address, NULL, &symbol, &imageName, &exactMatch) == B_OK)
+		dprintf("%p = %s (%s)%s\n", (void *)address, symbol, imageName, exactMatch ? "" : " (nearest)");
+	else
+		dprintf("lookup failed\n");
+
 	return 0;
 }
 
@@ -192,6 +222,120 @@ elf_hash(const unsigned char *name)
 }
 
 
+static const char *
+get_symbol_type_string(struct Elf32_Sym *symbol)
+{
+	switch (ELF32_ST_TYPE(symbol->st_info)) {
+		case STT_FUNC:
+			return "func";
+		case STT_OBJECT:
+			return " obj";
+		case STT_FILE:
+			return "file";
+		default:
+			return "----";
+	}
+}
+
+
+static const char *
+get_symbol_bind_string(struct Elf32_Sym *symbol)
+{
+	switch (ELF32_ST_BIND(symbol->st_info)) {
+		case STB_LOCAL:
+			return "loc ";
+		case STB_GLOBAL:
+			return "glob";
+		case STB_WEAK:
+			return "weak";
+		default:
+			return "----";
+	}
+}
+
+
+static int
+dump_symbols(int argc, char **argv)
+{
+	struct elf_image_info *image = NULL;
+	struct hash_iterator iterator;
+	uint32 i;
+
+	// if the argument looks like a hex number, treat it as such
+	if (argc > 1) {
+		if (isdigit(argv[1][0])) {
+			uint32 num = strtoul(argv[1], NULL, 0);
+	
+			if (IS_KERNEL_ADDRESS(num)) {
+				// find image at address
+
+				hash_open(sImagesHash, &iterator);
+				while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+					if (image->regions[0].start <= num
+						&& image->regions[0].start + image->regions[0].size >= num)
+						break;
+				}
+				hash_close(sImagesHash, &iterator, false);
+	
+				if (image == NULL)
+					dprintf("No image covers 0x%lx in the kernel!\n", num);
+			} else {
+				image = hash_lookup(sImagesHash, (void *)num);
+				if (image == NULL)
+					dprintf("image 0x%lx doesn't exist in the kernel!\n", num);
+			}
+		} else {
+			// look for image by name
+			hash_open(sImagesHash, &iterator);
+			while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
+				if (!strcmp(image->name, argv[1]))
+					break;
+			}
+			hash_close(sImagesHash, &iterator, false);
+
+			if (image == NULL)
+				dprintf("No image \"%s\" found in kernel!\n", argv[1]);
+		}
+	} else {
+		dprintf("usage: %s image_name/image_id/address_in_image\n", argv[0]);
+		return 0;
+	}
+
+	if (image == NULL)
+		return -1;
+
+	// dump symbols
+
+	dprintf("Symbols of image %ld \"%s\":\nAddress  Type       Size Name\n", image->id, image->name);
+
+	if (image->num_debug_symbols > 0) {
+		// search extended debug symbol table (contains static symbols)
+		for (i = 0; i < image->num_debug_symbols; i++) {
+			struct Elf32_Sym *symbol = &image->debug_symbols[i];
+
+			dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
+				get_symbol_type_string(symbol), get_symbol_bind_string(symbol), symbol->st_size,
+				image->debug_string_table + symbol->st_name);
+		}
+	} else {
+		int32 j;
+
+		// search standard symbol lookup table
+		for (i = 0; i < HASHTABSIZE(image); i++) {
+			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+				struct Elf32_Sym *symbol = &image->syms[j];
+
+				dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
+					get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
+					symbol->st_size, SYMNAME(image, symbol));
+			}
+		}
+	}
+
+	return 0;
+}
+
+
 static void
 dump_image_info(struct elf_image_info *image)
 {
@@ -217,6 +361,8 @@ dump_image_info(struct elf_image_info *image)
 	dprintf(" rela_len 0x%x\n", image->rela_len);
 	dprintf(" pltrel %p\n", image->pltrel);
 	dprintf(" pltrel_len 0x%x\n", image->pltrel_len);
+	
+	dprintf(" debug_symbols %p (%ld)\n", image->debug_symbols, image->num_debug_symbols);
 }
 
 
@@ -557,6 +703,10 @@ insert_preloaded_image(struct preloaded_image *preloadedImage)
 	if (status < B_OK)
 		goto error2;
 
+	image->debug_symbols = preloadedImage->debug_symbols;
+	image->num_debug_symbols = preloadedImage->num_debug_symbols;
+	image->debug_string_table = preloadedImage->debug_string_table;
+
 	register_elf_image(image);
 	preloadedImage->id = image->id;
 		// modules_init() uses this information to get the preloaded images
@@ -606,8 +756,8 @@ get_image_symbol(image_id id, const char *name, int32 sclass, void **_symbol)
 
 	// ToDo: support the "sclass" parameter!
 
-	TRACE(("found: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, 
-		sym->st_value, image->regions[0].delta));
+	TRACE(("found: %lx (%lx + %lx)\n", symbol->st_value + image->regions[0].delta, 
+		symbol->st_value, image->regions[0].delta));
 
 	*_symbol = (void *)(symbol->st_value + image->regions[0].delta);
 
@@ -621,76 +771,127 @@ done:
 //	kernel private API
 
 
-status_t
-elf_lookup_symbol_address(addr address, addr *baseAddress, char *text, size_t length)
-{
-	struct hash_iterator iterator;
-	struct elf_image_info *image;
-	struct Elf32_Sym *sym;
-	struct elf_image_info *found_image;
-	struct Elf32_Sym *found_sym;
-	long found_delta;
-	uint32 i;
-	int j,rv;
+/**	Looks up a symbol by address in all images loaded in kernel space.
+ *	Note, if you need to call this function outside a debugger, make
+ *	sure you fix the way it returns its information, first!
+ */
 
-	TRACE(("looking up %p\n",(void *)address));
+status_t
+elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_symbolName,
+	const char **_imageName, bool *_exactMatch)
+{
+	struct elf_image_info *image;
+	struct Elf32_Sym *symbolFound = NULL;
+	const char *symbolName = NULL;
+	addr_t deltaFound = INT_MAX;
+	bool exactMatch = false;
+	status_t status;
+
+	TRACE(("looking up %p\n", (void *)address));
 
 	mutex_lock(&sImageMutex);
-	hash_open(sImagesHash, &iterator);
+	
+	image = find_image_at_address(address);
+		// get image that may contain the address
 
-	found_sym = 0;
-	found_image = 0;
-	found_delta = 0x7fffffff;
+	if (image != NULL) {
+		addr_t symbolDelta;
+		uint32 i;
+		int32 j;
 
-	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-		TRACE((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
-		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
-			continue;
+		TRACE((" image %p, base = %p, size = %p\n", image,
+			(void *)image->regions[0].start, (void *)image->regions[0].size));
 
-		TRACE((" searching...\n"));
-		found_image = image;
-		for (i = 0; i < HASHTABSIZE(image); i++) {
-			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
-				long d;
-				sym = &image->syms[j];
+		if (image->debug_symbols != NULL) {
+			// search extended debug symbol table (contains static symbols)
 
-				TRACE(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),(void *)sym->st_value));
-				TRACE(("  symbol: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
+			TRACE((" searching debug symbols...\n"));
 
-				if ((ELF32_ST_TYPE(sym->st_info) != STT_FUNC) || (ELF32_ST_BIND(sym->st_info) != STB_GLOBAL))
+			for (i = 0; i < image->num_debug_symbols; i++) {
+				struct Elf32_Sym *symbol = &image->debug_symbols[i];
+
+				if (ELF32_ST_TYPE(symbol->st_info) != STT_FUNC)
 					continue;
 
-				d = (long)address - (long)(sym->st_value + image->regions[0].delta);
-				if ((d >= 0) && (d < found_delta)) {
-					found_delta = d;
-					found_sym = sym;
+				symbolDelta = address - (symbol->st_value + image->regions[0].delta);
+				if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
+					exactMatch = true;
+
+				if (exactMatch || symbolDelta < deltaFound) {
+					deltaFound = symbolDelta;
+					symbolFound = symbol;
+					symbolName = image->debug_string_table + symbol->st_name;
+
+					if (exactMatch)
+						break;
 				}
 			}
+		} else {
+			// search standard symbol lookup table
+
+			TRACE((" searching standard symbols...\n"));
+
+			for (i = 0; i < HASHTABSIZE(image); i++) {
+				for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
+					struct Elf32_Sym *symbol = &image->syms[j];
+
+					if (ELF32_ST_TYPE(symbol->st_info) != STT_FUNC)
+						continue;
+
+					symbolDelta = address - (long)(symbol->st_value + image->regions[0].delta);
+					if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
+						exactMatch = true;
+
+					if (exactMatch || symbolDelta < deltaFound) {
+						deltaFound = symbolDelta;
+						symbolFound = symbol;
+						symbolName = SYMNAME(image, symbol);
+
+						if (exactMatch)
+							goto loop_end;
+					}
+				}
+			}
+		loop_end:
 		}
-		break;
 	}
 
-	if (found_sym != 0) {
-		TRACE(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
-		TRACE(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
-		TRACE(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
+	if (symbolFound != NULL) {
+		if (_symbolName)
+			*_symbolName = symbolName;
+		if (_imageName)
+			*_imageName = image->name;
+		if (_baseAddress)
+			*_baseAddress = symbolFound->st_value + image->regions[0].delta;
+		if (_exactMatch)
+			*_exactMatch = exactMatch;
 
-		strlcpy(text, SYMNAME(found_image, found_sym), length);
-		
-		if (baseAddress)
-			*baseAddress = found_sym->st_value + found_image->regions[0].delta;
-
-		rv = B_OK;
-	} else {
+		status = B_OK;
+	} else if (image != NULL) {
 		TRACE(("symbol not found!\n"));
-		strlcpy(text, "symbol not found", length);
-		rv = B_ENTRY_NOT_FOUND;
+
+		if (_symbolName)
+			*_symbolName = NULL;
+		if (_imageName)
+			*_imageName = image->name;
+		if (_baseAddress)
+			*_baseAddress = image->regions[0].start;
+		if (_exactMatch)
+			*_exactMatch = false;
+
+		status = B_OK;
+	} else {
+		TRACE(("image not found!\n"));
+		status = B_ENTRY_NOT_FOUND;
 	}
 
-	hash_close(sImagesHash, &iterator, false);
+	// Note, theoretically, all information we return back to our caller
+	// would have to be locked - but since this function is only called
+	// from the debugger, it's safe to do it this way
+
 	mutex_unlock(&sImageMutex);
 
-	return rv;
+	return status;
 }
 
 
@@ -925,7 +1126,7 @@ load_kernel_add_on(const char *path)
 		goto error2;
 	}
 
-	TRACE(("reading in program headers at 0x%x, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
+	TRACE(("reading in program headers at 0x%lx, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
 	len = sys_read(fd, eheader->e_phoff, pheaders, eheader->e_phnum * eheader->e_phentsize);
 	if (len < 0) {
 		err = len;
@@ -1140,7 +1341,8 @@ elf_init(kernel_args *ka)
 		insert_preloaded_image(image);
 	}
 
-	add_debugger_command("ls", &print_address_info, "lookup symbol for a particular address");
+	add_debugger_command("ls", &dump_address_info, "lookup symbol for a particular address");
+	add_debugger_command("symbols", &dump_symbols, "dump symbols for image");
 	add_debugger_command("image", &dump_image, "dump image info");
 	return B_OK;
 }
