@@ -1,0 +1,8 @@
+SubDir OBOS_TOP src add-ons kernel bus_managers pci arch x86 ;
+
+KernelStaticLibrary pci_arch_x86_bus_manager :
+	bios.c
+	pci_config.c
+	pci_io.c
+	pci_irq.c
+;

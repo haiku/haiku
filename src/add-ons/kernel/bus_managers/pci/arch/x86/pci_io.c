@@ -1,53 +1,51 @@
 #include "pci_priv.h"
+#include "arch_cpu.h"
 
 status_t
 pci_io_init()
 {
+	// nothing to do on x86 hardware
 	return B_OK;
 }
 
 
 uint8
-read_io_8(int mapped_io_addr)
+pci_read_io_8(int mapped_io_addr)
 {
-	return 0;
+	return in8(mapped_io_addr);
 }
 
 
 void
-write_io_8(int mapped_io_addr, uint8 value)
+pci_write_io_8(int mapped_io_addr, uint8 value)
 {
+	out8(value, mapped_io_addr);
 }
 
 
 uint16
-read_io_16(int mapped_io_addr)
+pci_read_io_16(int mapped_io_addr)
 {
-	return 0;
+	return in16(mapped_io_addr);
 }
 
 
 void
-write_io_16(int mapped_io_addr, uint16 value)
+pci_write_io_16(int mapped_io_addr, uint16 value)
 {
+	out16(value, mapped_io_addr);
 }
 
 
 uint32
-read_io_32(int mapped_io_addr)
+pci_read_io_32(int mapped_io_addr)
 {
-	return 0;
+	return in32(mapped_io_addr);
 }
 
 
 void
-write_io_32(int mapped_io_addr, uint32 value)
+pci_write_io_32(int mapped_io_addr, uint32 value)
 {
-}
-
-
-void *
-ram_address(const void *physical_address_in_system_memory)
-{
-	return 0;
+	out32(value, mapped_io_addr);
 }
