@@ -589,10 +589,15 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 	if (team < 0) {
 		if (signature) {
 			team = be_roster->TeamFor(signature);
-			if (team < 0)
+			if (team < 0) {
 				error = team;
+				// B_ERROR means that no application with the given signature
+				// is running. But we are supposed to return B_BAD_VALUE.
+				if (error == B_ERROR)
+					error = B_BAD_VALUE;
+			}
 		} else
-			error = B_BAD_VALUE;
+			error = B_BAD_TYPE;
 	}
 	// get the app_info of the team
 	app_info info;
@@ -600,10 +605,14 @@ BMessenger::InitData(const char *signature, team_id team, status_t *result)
 		error = be_roster->GetRunningAppInfo(team, &info);
 	// check, whether the signature is correct
 	if (error == B_OK && signature && strcmp(signature, info.signature) != 0)
-		error = B_BAD_VALUE;
+		error = B_MISMATCHED_VALUES;
 	// check whether it the app flags say B_ARGV_ONLY
-	if (error == B_OK && (info.flags & B_ARGV_ONLY))
+	if (error == B_OK && (info.flags & B_ARGV_ONLY)) {
 		error = B_BAD_TYPE;
+		// Set the team ID nevertheless -- that's what Be's implementation
+		// does. Don't know, if that is a bug, but at least it doesn't harm.
+		fTeam = team;
+	}
 	// init our members
 	if (error == B_OK) {
 		fTeam = team;
