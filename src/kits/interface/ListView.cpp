@@ -152,7 +152,7 @@ status_t BListView::Archive(BMessage *archive, bool deep) const
 		int32 i = 0;
 		BListItem *item;
 
-		while (item = ItemAt(i++))
+		while ((item = ItemAt(i++)))
 		{
 			BMessage subData;
 
@@ -174,8 +174,6 @@ status_t BListView::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BListView::Draw(BRect updateRect)
 {
-	int index = 0;
-
 	for (int i = 0; i < CountItems(); i++)
 	{
 		BRect item_frame = ItemFrame(i);
@@ -241,8 +239,6 @@ void BListView::MessageReceived ( BMessage *msg )
 				case 4:
 				{
 					BMessage reply ( B_REPLY );
-
-					int32 count = 0;
 
 					for ( int32 i = 0; i < CountItems (); i++ )
 						if ( ItemAt ( i )->IsSelected () )
@@ -733,7 +729,7 @@ int32 BListView::CurrentSelection(int32 index) const
 	if (fFirstSelected == -1)
 		return -1;
 
-	if (index = 0)
+	if (index == 0)
 		return fFirstSelected;
 
 	for (int32 i = fFirstSelected; i <= fLastSelected; i++)
@@ -812,8 +808,10 @@ void BListView::DeselectExcept(int32 start, int32 finish)
 {
 	if (fFirstSelected == -1 || finish < start)
 		return;
+		
+	int32 index;
 
-    for (int32 index = fFirstSelected; index < start; ++index)
+    for (index = fFirstSelected; index < start; ++index)
     {
 		if (!ItemAt(index)->IsSelected())
 		{
@@ -1297,9 +1295,9 @@ bool BListView::DoSwapItems(int32 a, int32 b)
 	Invalidate(ItemFrame(a));
 	Invalidate(ItemFrame(b));
 
-	if (fAnchorIndex = a)
+	if (fAnchorIndex == a)
 		fAnchorIndex = b;
-	else if (fAnchorIndex = b)
+	else if (fAnchorIndex == b)
 		fAnchorIndex = a;
 
 	RescanSelection(a, b);
@@ -1362,8 +1360,10 @@ void BListView::RescanSelection(int32 from, int32 to)
 
 	if (to > fFirstSelected && to > fLastSelected)
 		return;*/
+		
+	int32 i;
 
-	for (int32 i = from; i <= to; i++)
+	for (i = from; i <= to; i++)
 	{
 		if (ItemAt(i)->IsSelected())
 		{
