@@ -2,6 +2,7 @@
 //
 //	authors, in order of contribution:
 //	jonas.sundstrom@kirilla.com
+//	revol@free.fr
 //
 
 // std C includes
@@ -15,15 +16,17 @@
 #include <TypeConstants.h>
 
 void	print_help	(void);
-void	print_index_stat (const index_info * const a_index_info);
-void	print_index_type (const index_info * const a_index_info);
+void	print_index_stat_r5style (const index_info * const a_index_info, char *name);
+void	print_index_stat (const index_info * const a_index_info, char *name);
+const char	*print_index_type (const index_info * const a_index_info, bool as_mkindex);
 
 int	main (int32 argc, char **argv)
 {
 	dev_t		vol_device			=	dev_for_path(".");
 	DIR		*	dev_index_dir		=	NULL;
 	bool		verbose				=	false;
-	bool		mkindex_output			=	false; /* mkindexi-ready output */
+	bool		long_listing		=	false;
+	bool		mkindex_output		=	false; /* mkindexi-ready output */
 	
 	for (int i = 1;  i < argc;  i++)
 	{
@@ -37,6 +40,8 @@ int	main (int32 argc, char **argv)
 		{
 			if 	(! strcmp(argv[i], "--verbose"))
 				verbose =	true;
+			else if 	(! strcmp(argv[i], "-l"))
+				long_listing = true;
 			else if 	(! strcmp(argv[i], "--mkindex"))
 				mkindex_output =	true;
 			else
@@ -86,7 +91,7 @@ int	main (int32 argc, char **argv)
 		}
 
 
-		if (verbose || mkindex_output)
+		if (verbose || long_listing || mkindex_output)
 		{
 			index_info	i_info;
 			status_t	status	=	B_OK;
@@ -99,18 +104,11 @@ int	main (int32 argc, char **argv)
 				return (errno);
 			}
 			if (verbose) {
-				printf("%s", index_entry->d_name);
-
-				if (strlen(index_entry->d_name) < 8)
-					printf("  ");
-
-				printf("\t");
-				print_index_stat (& i_info);
-
+				print_index_stat (& i_info, index_entry->d_name);
+			} else if (long_listing) { /* R5 long output */
+				print_index_stat_r5style (& i_info, index_entry->d_name);
 			} else { /* mkindex_output */
-				printf("mkindex -t ");
-				print_index_type(& i_info);
-				printf(" '%s'\n", index_entry->d_name);
+				printf("mkindex -t %s '%s'\n", print_index_type(& i_info, true), index_entry->d_name);
 			}	
 		}
 		else
@@ -127,39 +125,45 @@ int	main (int32 argc, char **argv)
 void print_help (void)
 {
 	fprintf (stderr, 
-		"Usage: lsindex [--help | --verbose | --mkindex] [volume path]\n"
+		"Usage: lsindex [--help | --verbose | --mkindex | -l] [volume path]\n"
 		"   --verbose gives index type, dates and owner,\n"
 		"   --mkindex outputs mkindex commands to recreate all the indices,\n"
+		"   -l outputs long listing, R5 style,\n"
 		"   If no volume is specified, the volume of the current directory is assumed.\n");
 }
 
-void print_index_type (const index_info * const a_index_info)
+const char *print_index_type (const index_info * const a_index_info, bool as_mkindex)
 {
+	static char buff[30];
 	// type
 	switch (a_index_info->type)
 	{
 		case B_INT32_TYPE:
-			printf("int");
-			break;
+			return(as_mkindex?"int":"Int-32");
 		case B_INT64_TYPE:
-			printf("llong");
-			break;
+			return(as_mkindex?"llong":"Int-64");
 		case B_STRING_TYPE:
-			printf("string");
-			break;
+			return(as_mkindex?"string":"Text");
 		case B_FLOAT_TYPE:
-			printf("float");
-			break;
+			return(as_mkindex?"float":"Float");
 		case B_DOUBLE_TYPE:
-			printf("double");
-			break;
+			return(as_mkindex?"double":"Double");
 		default:
-			printf("0x%08lx", (unsigned) a_index_info->type);
+			sprintf(buff, as_mkindex?"0x%08lx":"Unknown type (0x%x)", (unsigned) a_index_info->type);
+			return buff;
 	}
 }
 
-void print_index_stat (const index_info * const a_index_info)
+void print_index_stat_r5style (const index_info * const a_index_info, char *name)
 {
+	char modified[30];
+	strftime(modified, 30, "%m/%d/%y %I:%M %p", localtime(& a_index_info->modification_time));
+	printf("%16s  %s  %8Ld %s\n", print_index_type(a_index_info, false), modified, a_index_info->size, name);
+}
+
+void print_index_stat (const index_info * const a_index_info, char *name)
+{
+	printf("%-10s\t", name);
 	// type
 	switch (a_index_info->type)
 	{
