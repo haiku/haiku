@@ -1237,7 +1237,7 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 		region->base + (region->size - 1));
 	(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 
-	// now we can give up the last ref to the aspace
+	// now we can give up the area's reference to the address space
 	vm_put_aspace(aspace);
 
 	free(region->name);
@@ -1710,6 +1710,8 @@ vm_delete_areas(struct vm_address_space *aspace)
 
 	TRACE(("vm_delete_areas: called on aspace 0x%lx\n", aspace->id));
 
+	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
+
 	// delete all the regions in this aspace
 
 	for (area = aspace->virtual_map.region_list; area; area = next) {
@@ -1721,9 +1723,12 @@ vm_delete_areas(struct vm_address_space *aspace)
 			continue;
 		}
 
-		// decrement the ref on this region, may actually push the ref < 0, but that's okay
+		// decrement the ref on this region, may actually push the ref < 0, if there
+		// is a concurrent delete_area() on that specific area, but that's ok here
 		_vm_put_region(area, true);
 	}
+
+	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
 	return B_OK;
 }
@@ -2497,6 +2502,24 @@ find_area(const char *name)
 }
 
 
+static void
+fill_area_info(struct vm_region *area, area_info *info, size_t size)
+{
+	strlcpy(info->name, area->name, B_OS_NAME_LENGTH);
+	info->area = area->id;
+	info->address = (void *)area->base;
+	info->size = area->size;
+	info->protection = area->lock & B_USER_PROTECTION;
+	info->lock = B_FULL_LOCK;
+	info->team = 1;
+	info->ram_size = area->size;
+	info->copy_count = 0;
+	info->in_count = 0;
+	info->out_count = 0;
+		// ToDo: retrieve real values here!
+}
+
+
 status_t
 _get_area_info(area_id area, area_info *info, size_t size)
 {
@@ -2509,19 +2532,7 @@ _get_area_info(area_id area, area_info *info, size_t size)
 	if (region == NULL)
 		return B_BAD_VALUE;
 
-	strlcpy(info->name, region->name, B_OS_NAME_LENGTH);
-	info->area = region->id;
-	info->address = (void *)region->base;
-	info->size = region->size;
-	info->protection = region->lock & B_USER_PROTECTION;
-	info->lock = B_FULL_LOCK;
-	info->team = 1;
-	info->ram_size = region->size;
-	info->copy_count = 0;
-	info->in_count = 0;
-	info->out_count = 0;
-		// ToDo: retrieve real values here!
-
+	fill_area_info(region, info, size);
 	vm_put_region(region);
 
 	return B_OK;
@@ -2531,8 +2542,46 @@ _get_area_info(area_id area, area_info *info, size_t size)
 status_t
 _get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
 {
-	// ToDo: implement get_next_area_info()
-	return B_ERROR;
+	addr_t nextBase = *(addr_t *)cookie;
+	vm_address_space *addressSpace;
+	vm_region *area;
+
+	// we're already through the list
+	if (nextBase == (addr_t)-1)
+		return B_ENTRY_NOT_FOUND;
+
+	if (team == B_CURRENT_TEAM)
+		team = team_get_current_team_id();
+
+	if (!team_is_valid(team)
+		|| team_get_address_space(team, &addressSpace) != B_OK)
+		return B_BAD_VALUE;
+
+	acquire_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0, 0);
+
+	for (area = addressSpace->virtual_map.region_list; area; area = area->aspace_next) {
+		if (area->base > nextBase)
+			break;
+	}
+
+	// make sure this area won't go away
+	if (area != NULL)
+		area = vm_get_region_by_id(area->id);
+
+	release_sem_etc(addressSpace->virtual_map.sem, READ_COUNT, 0);
+	vm_put_aspace(addressSpace);
+
+	if (area == NULL) {
+		nextBase = (addr_t)-1;
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	fill_area_info(area, info, size);
+	*cookie = (int32)(area->base + area->size);
+
+	vm_put_region(area);
+
+	return B_OK;
 }
 
 
@@ -2730,10 +2779,26 @@ _user_get_area_info(area_id area, area_info *userInfo)
 
 
 status_t
-_user_get_next_area_info(team_id team, int32 *cookie, area_info *info)
+_user_get_next_area_info(team_id team, int32 *userCookie, area_info *userInfo)
 {
-	// ToDo: implement get_next_area_info()
-	return B_ERROR;
+	status_t status;
+	area_info info;
+	int32 cookie;
+
+	if (!IS_USER_ADDRESS(userCookie)
+		|| !IS_USER_ADDRESS(userInfo)
+		|| user_memcpy(&cookie, userCookie, sizeof(int32)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	status = _get_next_area_info(team, &cookie, &info, sizeof(area_info));
+	if (status != B_OK)
+		return status;
+
+	if (user_memcpy(userCookie, &cookie, sizeof(int32)) < B_OK
+		|| user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
