@@ -13,6 +13,29 @@
 #include <fcntl.h>
 
 
+class Descriptor {
+	public:
+		Descriptor(Node *node, void *cookie);
+		~Descriptor();
+
+		ssize_t Read(off_t pos, void *buffer, size_t bufferSize);
+		ssize_t Read(void *buffer, size_t bufferSize);
+		ssize_t Write(off_t pos, const void *buffer, size_t bufferSize);
+		ssize_t Write(const void *buffer, size_t bufferSize);
+
+		off_t Offset() const { return fOffset; }
+		int32 RefCount() const { return fRefCount; }
+
+		status_t Acquire();
+		status_t Release();
+
+	private:
+		Node	*fNode;
+		void	*fCookie;
+		off_t	fOffset;
+		int32	fRefCount;
+};
+
 #define MAX_VFS_DESCRIPTORS 32
 
 list gBootDevices;
