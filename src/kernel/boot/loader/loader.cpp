@@ -1,7 +1,7 @@
 /*
-** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "loader.h"
@@ -25,10 +25,6 @@
 
 #define KERNEL_IMAGE	"kernel_" BOOT_ARCH
 #define KERNEL_PATH		"beos/system/" KERNEL_IMAGE
-
-
-// temp. VFS API
-extern Node *get_node_from(int fd);
 
 
 static const char *sPaths[] = {
