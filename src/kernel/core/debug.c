@@ -62,9 +62,9 @@ debug_read_line(char *buf, int max_len)
 	bool done = false;
 	int cur_history_spot = cur_line;
 
-	while(!done) {
+	while (!done) {
 		c = arch_dbg_con_read();
-		switch(c) {
+		switch (c) {
 			case '\n':
 			case '\r':
 				buf[ptr++] = '\0';
@@ -72,7 +72,7 @@ debug_read_line(char *buf, int max_len)
 				done = true;
 				break;
 			case 8: // backspace
-				if(ptr > 0) {
+				if (ptr > 0) {
 					dbg_puts("\x1b[1D"); // move to the left one
 					dbg_putch(' ');
 					dbg_puts("\x1b[1D"); // move to the left one
@@ -82,13 +82,13 @@ debug_read_line(char *buf, int max_len)
 			case 27: // escape sequence
 				c = arch_dbg_con_read(); // should be '['
 				c = arch_dbg_con_read();
-				switch(c) {
+				switch (c) {
 					case 67: // right arrow acts like space
 						buf[ptr++] = ' ';
 						dbg_putch(' ');
 						break;
 					case 68: // left arrow acts like backspace
-						if(ptr > 0) {
+						if (ptr > 0) {
 							dbg_puts("\x1b[1D"); // move to the left one
 							dbg_putch(' ');
 							dbg_puts("\x1b[1D"); // move to the left one
@@ -102,20 +102,19 @@ debug_read_line(char *buf, int max_len)
 
 //						dprintf("1c %d h %d ch %d\n", cur_line, history_line, cur_history_spot);
 
-						if(c == 65) {
+						if (c == 65) {
 							// up arrow
 							history_line = cur_history_spot - 1;
-							if(history_line < 0)
+							if (history_line < 0)
 								history_line = HISTORY_SIZE - 1;
 						} else {
 							// down arrow
-							if(cur_history_spot != cur_line) {
+							if (cur_history_spot != cur_line) {
 								history_line = cur_history_spot + 1;
 								if(history_line >= HISTORY_SIZE)
 									history_line = 0;
-							} else {
+							} else
 								break; // nothing to do here
-							}
 						}
 
 //						dprintf("2c %d h %d ch %d\n", cur_line, history_line, cur_history_spot);
@@ -141,7 +140,7 @@ debug_read_line(char *buf, int max_len)
 				 * If we get a $ at the beginning of the line
 				 * we assume we are talking with GDB
 				 */
-				if(ptr == 0) {
+				if (ptr == 0) {
 					strcpy(buf, "gdb");
 					ptr= 4;
 					done= true;
@@ -153,7 +152,7 @@ debug_read_line(char *buf, int max_len)
 				buf[ptr++] = c;
 				dbg_putch(c);
 		}
-		if(ptr >= max_len - 2) {
+		if (ptr >= max_len - 2) {
 			buf[ptr++] = '\0';
 			dbg_puts("\n");
 			done = true;
@@ -174,22 +173,21 @@ debug_parse_line(char *buf, char **argv, int *argc, int max_args)
 	if (!isspace(parse_line[0])) {
 		argv[0] = parse_line;
 		*argc = 1;
-	} else {
+	} else
 		*argc = 0;
-	}
 
 	while (parse_line[pos] != '\0') {
 		if (isspace(parse_line[pos])) {
 			parse_line[pos] = '\0';
 			// scan all of the whitespace out of this
-			while(isspace(parse_line[++pos]))
+			while (isspace(parse_line[++pos]))
 				;
-			if(parse_line[pos] == '\0')
+			if (parse_line[pos] == '\0')
 				break;
 			argv[*argc] = &parse_line[pos];
 			(*argc)++;
 
-			if(*argc >= max_args - 1)
+			if (*argc >= max_args - 1)
 				break;
 		}
 		pos++;
@@ -214,21 +212,24 @@ kernel_debugger_loop()
 		dprintf("kdebug> ");
 		debug_read_line(line_buf[cur_line], LINE_BUF_SIZE);
 		debug_parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
-		if(argc <= 0)
+		if (argc <= 0)
 			continue;
 
 		debugger_on_cpu = smp_get_current_cpu();
 
 		cmd = commands;
-		while(cmd != NULL) {
-			if(strcmp(args[0], cmd->name) == 0) {
+		while (cmd != NULL) {
+			if (strcmp(args[0], cmd->name) == 0) {
 				cmd->func(argc, args);
 				break;
 			}
 			cmd = cmd->next;
 		}
+		if (cmd == NULL)
+			dprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
+
 		cur_line++;
-		if(cur_line >= HISTORY_SIZE)
+		if (cur_line >= HISTORY_SIZE)
 			cur_line = 0;
 	}
 }
@@ -267,7 +268,7 @@ panic(const char *fmt, ...)
 
 	dprintf("PANIC%d: %s", smp_get_current_cpu(), temp);
 
-	if(debugger_on_cpu != smp_get_current_cpu()) {
+	if (debugger_on_cpu != smp_get_current_cpu()) {
 		// halt all of the other cpus
 
 		// XXX need to flush current smp mailbox to make sure this goes
@@ -289,7 +290,7 @@ dprintf(const char *fmt, ...)
 	char temp[512];
 	int ret = 0;
 
-	if(serial_debug_on) {
+	if (serial_debug_on) {
 		va_start(args, fmt);
 		ret = vsprintf(temp, fmt, args);
 		va_end(args);
@@ -307,7 +308,7 @@ dbg_putch(char c)
 	int flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
-	if(serial_debug_on)
+	if (serial_debug_on)
 		ret = arch_dbg_con_putch(c);
 	else
 		ret = c;
@@ -325,7 +326,7 @@ dbg_puts(const char *s)
 	int flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
-	if(serial_debug_on)
+	if (serial_debug_on)
 		arch_dbg_con_puts(s);
 
 	release_spinlock(&dbg_spinlock);
@@ -334,12 +335,12 @@ dbg_puts(const char *s)
 
 
 int
-add_debugger_command(const char * name, int (*func)(int, char **), const char * desc)
+add_debugger_command(const char *name, int (*func)(int, char **), const char *desc)
 {
 	int flags;
 	struct debugger_command *cmd;
 
-	cmd = (struct debugger_command *) kmalloc(sizeof(struct debugger_command));
+	cmd = (struct debugger_command *)kmalloc(sizeof(struct debugger_command));
 	if (cmd == NULL)
 		return ENOMEM;
 
@@ -378,14 +379,14 @@ remove_debugger_command(const char * name, int (*func)(int, char **))
 			break;
 		prev = cmd;
 		cmd = cmd->next;
-	};
+	}
 	
 	if (cmd) {
 		if (cmd == commands)
 			commands = cmd->next;
 		else
 			prev->next = cmd->next;
-	};  
+	}
 
 	release_spinlock(&dbg_spinlock);
 	restore_interrupts(flags);
@@ -393,7 +394,7 @@ remove_debugger_command(const char * name, int (*func)(int, char **))
 	if (cmd) {
 		kfree(cmd);
 		return B_NO_ERROR;
-	};
+	}
 	
 	return B_NAME_NOT_FOUND;
 }
@@ -414,11 +415,11 @@ cmd_help(int argc, char **argv)
 
 	dprintf("debugger commands:\n");
 	cmd = commands;
-	while(cmd != NULL) {
+	while (cmd != NULL) {
 		dprintf(" %-32s\t\t%s\n", cmd->name, cmd->description);
 		cmd = cmd->next;
 	}
-	
+
 	return 0;
 }
 
@@ -439,9 +440,7 @@ dbg_init2(kernel_args *ka)
 	add_debugger_command("reboot", &cmd_reboot, "Reboot");
 	add_debugger_command("gdb", &cmd_gdb, "Connect to remote gdb");
 
-	dbg_init(ka);
-
-	return B_NO_ERROR;
+	return arch_dbg_init(ka);
 }
 
 
