@@ -1,8 +1,7 @@
-/* OS.h - kernel specific structures and functions
+/* Kernel specific structures and functions
 **
 ** Distributed under the terms of the OpenBeOS License.
 */
-
 #ifndef _OS_H
 #define _OS_H
  

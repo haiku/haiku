@@ -1,9 +1,7 @@
-/* fs_info.h
+/* General File System informations/capabilities
 **
-** functions/definitions for general file system information.
 ** Distributed under the terms of the OpenBeOS License.
 */
-
 #ifndef _FS_INFO_H
 #define	_FS_INFO_H
 

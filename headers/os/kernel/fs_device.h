@@ -1,17 +1,15 @@
-//----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//---------------------------------------------------------------------
-/*!
-	\file fs_devices.h
+/* Disk device iteration and information
+**
+** Distributed under the terms of the OpenBeOS License.
 */
-
 #ifndef _FS_DEVICE_H
 #define _FS_DEVICE_H
+
 
 #include <Drivers.h>
 #include <OS.h>
 #include <SupportDefs.h>
+
 
 // session flags
 enum {
@@ -49,6 +47,7 @@ typedef struct extended_partition_info {
 	uint32	file_system_flags;			/* same as fs_info::flags */
 } extended_partition_info;
 
+
 #ifdef  __cplusplus
 extern "C" {
 #endif
@@ -78,9 +77,8 @@ status_t get_fs_initialization_parameters(int deviceFD, int32 sessionIndex,
 status_t initialize_volume(const char *where, const char *fileSystem, 
 						   const char *volumeName, const char *parameters);
 
-
 #ifdef  __cplusplus
 }
 #endif
 
-#endif _FS_DEVICE_H
+#endif	/* _FS_DEVICE_H */

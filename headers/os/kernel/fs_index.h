@@ -1,11 +1,10 @@
-/* fs_index.h
+/* File System indices
 **
-** functions/definitions for file system indices.
 ** Distributed under the terms of the OpenBeOS License.
 */
-
 #ifndef _FS_INDEX_H
 #define	_FS_INDEX_H
+
 
 #include <OS.h>
 #include <dirent.h>

@@ -1,11 +1,10 @@
-/* fs_attr.h
+/* File System attributes
 **
-** functions/definitions for retrieving and setting attribute information.
 ** Distributed under the terms of the OpenBeOS License.
 */
-
 #ifndef _FS_ATTR_H
 #define	_FS_ATTR_H
+
 
 #include <OS.h>
 #include <dirent.h>
