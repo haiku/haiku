@@ -568,7 +568,7 @@ public:
 };
 
 /*
-	status_t FindApp(entry_ref *ref, entry_ref *app) const
+	status_t FindApp(const char *mimeType, entry_ref *app) const
 	@case 3			FindApp(const char*, entry_ref*) cases 3-16
 					(== common cases 1-14)
 */
@@ -803,20 +803,20 @@ Test* FindAppTester::Suite()
 {
 	TestSuite* SuiteOfTests = new TestSuite;
 
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestA1);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestA2);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestA3);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestA1);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestA2);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestA3);
 
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB1);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB2);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB3);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB4);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB5);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB6);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB7);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB8);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB9);
-	ADD_TEST4(BApplication, SuiteOfTests, FindAppTester, FindAppTestB10);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB1);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB2);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB3);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB4);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB5);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB6);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB7);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB8);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB9);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB10);
 
 	return SuiteOfTests;
 }
