@@ -9,6 +9,7 @@ KernelObjects
 	sig_test.c
 	select_test.c
 	tls_test.c
+	on_exit_thread.c
 	;
 
 SubInclude OBOS_TOP src kernel apps cpuinfo ;
