@@ -12,6 +12,7 @@
 #include "debug.h"
 #include "device.h"
 #include "driver.h"
+#include "setup.h"
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
 
@@ -51,14 +52,14 @@ init_driver(void)
 	int index;
 	int cards;
 	
-	dprintf(INFO1"\n");
-	dprintf(INFO2"\n");
-	dprintf(INFO3"\n");
-	
 #ifdef DEBUG	
 	set_dprintf_enabled(true);
 	load_driver_symbols("rtl8169");
 #endif
+
+	dprintf(INFO1"\n");
+	dprintf(INFO2"\n");
+	dprintf(INFO3"\n");
 
 	item = (pci_info *)malloc(sizeof(pci_info));
 	if (!item)
