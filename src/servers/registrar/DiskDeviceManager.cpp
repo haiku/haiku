@@ -9,8 +9,11 @@
 
 // constructor
 DiskDeviceManager::DiskDeviceManager()
-	: BLooper("disk device manager")
+	: BLooper("disk device manager"),
+	  fDeviceList()
 {
+	fDeviceList.Rescan();
+	fDeviceList.Dump();
 }
 
 // destructor
