@@ -25,7 +25,6 @@
 //	Description:	BPopUpMenu represents a menu that pops up when you
 //                  activate it.
 //------------------------------------------------------------------------------
-
 #include <Application.h>
 #include <Looper.h>
 #include <MenuItem.h>
@@ -43,9 +42,9 @@ struct popup_menu_data
 	BRect rect;
 	
 	bool async;
-	bool auto_invoke;
-	bool start_opened;
-	bool use_rect;
+	bool autoInvoke;
+	bool startOpened;
+	bool useRect;
 	
 	sem_id lock;
 };
@@ -252,7 +251,7 @@ BPopUpMenu::ScreenLocation()
 {
 	if (fUseWhere)
 		return fWhere;
-
+	
 	BMenuItem *item = Superitem();
 	BMenu *menu = Supermenu();
 	BMenuItem *selectedItem = FindItem(item->Label());
@@ -295,6 +294,9 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	BLooper *looper = BLooper::LooperForThread(find_thread(NULL));
 	BWindow *window = dynamic_cast<BWindow *>(looper);
 	
+	if (window == NULL)
+		return NULL;
+	
 	popup_menu_data *data = new popup_menu_data;
 	sem_id sem = create_sem(0, "window close lock");
 	
@@ -306,13 +308,13 @@ BPopUpMenu::_go(BPoint where, bool autoInvoke, bool startOpened,
 	} 
 	
 	data->object = this;
-	data->auto_invoke = autoInvoke;
-	data->use_rect = _specialRect != NULL;
+	data->autoInvoke = autoInvoke;
+	data->useRect = _specialRect != NULL;
 	if (_specialRect != NULL)
 		data->rect = *_specialRect;
 	data->async = async;
 	data->where = where;
-	data->start_opened = startOpened;
+	data->startOpened = startOpened;
 	data->window = NULL;
 	data->selected = selected;
 	data->lock = sem;
@@ -363,14 +365,14 @@ BPopUpMenu::entry(void *arg)
 	
 	BPoint where = data->where;
 	BRect *rect = NULL;
-	bool auto_invoke = data->auto_invoke;
-	bool start_opened = data->start_opened;
+	bool autoInvoke = data->autoInvoke;
+	bool startOpened = data->startOpened;
 		
-	if (data->use_rect)
+	if (data->useRect)
 		rect = &data->rect;
 	
-	BMenuItem *selected = menu->start_track(where, auto_invoke,
-								start_opened, rect);
+	BMenuItem *selected = menu->start_track(where, autoInvoke,
+								startOpened, rect);
 	
 	// Put the selected item in the shared struct.
 	data->selected = selected;
