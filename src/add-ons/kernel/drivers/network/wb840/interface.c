@@ -51,43 +51,7 @@
 
 #define MII_DELAY(x)	read32(x->reg_base + WB_SIO)
 	
-		
-void
-wb_eeprom_putbyte(wb_device *device, int addr)
-{
-	int	d, i;
-	int delay;
-	
-	d = addr | WB_EECMD_READ;
-
-	/*
-	 * Feed in each bit and strobe the clock.
-	 */
-	for (i = 0x400; i; i >>= 1) {
-		if (d & i) {
-			SIO_SET(WB_SIO_EE_DATAIN);
-		} else {
-			SIO_CLR(WB_SIO_EE_DATAIN);
-		}
-		for (delay = 0; delay < 100; delay++)
-			MII_DELAY(device);
-		
-		SIO_SET(WB_SIO_EE_CLK);
-		
-		for (delay = 0; delay < 150; delay++)
-			MII_DELAY(device);		
-		
-		SIO_CLR(WB_SIO_EE_CLK);
-		
-		for (delay = 0; delay < 100; delay++)
-			MII_DELAY(device);
-		
-	}
-
-	return;
-}
-
-		
+				
 static void
 mii_sync(struct wb_device *device)
 {
@@ -269,7 +233,7 @@ wb_miibus_readreg(wb_device *device, int phy, int reg)
 	frame.mii_regaddr = reg;
 	wb_mii_readreg(device, &frame);
 
-	return(frame.mii_data);
+	return frame.mii_data;
 }
 
 
@@ -298,6 +262,42 @@ wb_miibus_statchg(wb_device *device)
 
 
 #define EEPROM_DELAY(x)	read32(x->reg_base + WB_SIO)
+
+void
+wb_eeprom_putbyte(wb_device *device, int addr)
+{
+	int	d, i;
+	int delay;
+	
+	d = addr | WB_EECMD_READ;
+
+	/*
+	 * Feed in each bit and strobe the clock.
+	 */
+	for (i = 0x400; i; i >>= 1) {
+		if (d & i) {
+			SIO_SET(WB_SIO_EE_DATAIN);
+		} else {
+			SIO_CLR(WB_SIO_EE_DATAIN);
+		}
+		for (delay = 0; delay < 100; delay++)
+			MII_DELAY(device);
+		
+		SIO_SET(WB_SIO_EE_CLK);
+		
+		for (delay = 0; delay < 150; delay++)
+			MII_DELAY(device);		
+		
+		SIO_CLR(WB_SIO_EE_CLK);
+		
+		for (delay = 0; delay < 100; delay++)
+			MII_DELAY(device);
+		
+	}
+
+	return;
+}
+
 		
 static void
 wb_eeprom_askdata(wb_device *device, int addr)

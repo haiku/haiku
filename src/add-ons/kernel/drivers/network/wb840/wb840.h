@@ -197,17 +197,13 @@ enum interruptMaskBits {
 	WB_IMR_ABNORMAL = 0x00008000,
 	WB_IMR_NORMAL = 0x00010000,
 };
+
 #define WB_INTRS	\
 	(WB_IMR_RX_OK|WB_IMR_RX_IDLE|WB_IMR_RX_ERR|WB_IMR_TX_OK| \
 	WB_IMR_RX_NOBUF|WB_IMR_RX_ERR|WB_IMR_RX_EARLY|	\
 	WB_IMR_TX_NOBUF|WB_IMR_TX_UNDERRUN|WB_IMR_BUS_ERR|		\
 	WB_IMR_ABNORMAL|WB_IMR_NORMAL|WB_IMR_TX_EARLY)
 
-/*#define WB_INTRS	\
-	(WB_IMR_RX_OK|WB_IMR_TX_OK|WB_IMR_RX_ERR|	\
-	WB_IMR_TX_UNDERRUN|WB_IMR_BUS_ERR|		\
-	WB_IMR_ABNORMAL|WB_IMR_NORMAL|WB_IMR_TX_EARLY)
-*/
 /*
  * Serial I/O (EEPROM/ROM) bits.
  */
@@ -300,11 +296,12 @@ struct wb_desc {
 #define WB_MAX_FRAMELEN		1536
 
 #define WB_UNSENT	0x1234
-#define WB_BUFBYTES	(1024 * sizeof(uint32))
+#define WB_BUFBYTES 2048
 
 /* Ethernet defines */
 #define CRC_SIZE 4
 #define ETHER_TRANSMIT_TIMEOUT ((bigtime_t)5000000)  /* five seconds */
+#define WB_TIMEOUT		1000
 
 typedef struct wb_mii_frame wb_mii_frame;
 struct wb_mii_frame {
@@ -355,9 +352,15 @@ struct wb_device {
 	int16 txInterruptIndex;
 	int16 txSent;
 	
+	struct mii_phy *firstPHY;
+	struct mii_phy *currentPHY;
+	uint16 phy;
+	bool autoNegotiationComplete;
+	bool link;
+	uint16 fixedMode;
+	
 	volatile int32 blockFlag;
-	ether_address_t myaddr;		/* my ethernet address */
-	//volatile int interrupted;   /* interrupted system call */
+	ether_address_t myaddr;
 	
 	spinlock intLock;
 	const char* deviceName;
@@ -366,7 +369,99 @@ struct wb_device {
 	int wb_cachesize;
 };
 
-#define WB_TIMEOUT		1000
+
+
+
+/* MII Interface */
+
+struct mii_phy {
+	struct mii_phy *next;
+	uint16	id0, id1;
+	uint16	address;
+	uint8	types;
+};
+
+// taken from Axel's Sis900 driver
+enum MII_address {
+	// standard registers
+	MII_CONTROL		= 0x00,
+	MII_STATUS		= 0x01,
+	MII_PHY_ID0		= 0x02,
+	MII_PHY_ID1		= 0x03,
+	MII_AUTONEG_ADV				= 0x04,
+	MII_AUTONEG_LINK_PARTNER	= 0x05,
+	MII_AUTONEG_EXT				= 0x06
+
+	// SiS900 specific registers
+	/*MII_CONFIG1		= 0x10,
+	MII_CONFIG2		= 0x11,
+	MII_LINK_STATUS	= 0x12,
+	MII_MASK		= 0x13,
+	MII_RESERVED	= 0x14*/
+};
+
+enum MII_control {
+	MII_CONTROL_RESET			= 0x8000,
+	MII_CONTROL_RESET_AUTONEG	= 0x0200,
+	MII_CONTROL_AUTO			= 0x1000,
+	MII_CONTROL_FULL_DUPLEX		= 0x0100,
+	MII_CONTROL_ISOLATE			= 0x0400
+};
+
+enum MII_commands {
+	MII_CMD_READ		= 0x6000,
+	MII_CMD_WRITE		= 0x5002,
+
+	MII_PHY_SHIFT		= 7,
+	MII_REG_SHIFT		= 2,
+};
+
+enum MII_status_bits {
+	MII_STATUS_EXT			= 0x0001,
+	MII_STATUS_JAB			= 0x0002,
+	MII_STATUS_LINK			= 0x0004,
+	MII_STATUS_CAN_AUTO		= 0x0008,
+	MII_STATUS_FAULT		= 0x0010,
+	MII_STATUS_AUTO_DONE	= 0x0020,
+	MII_STATUS_CAN_T		= 0x0800,
+	MII_STATUS_CAN_T_FDX	= 0x1000,
+	MII_STATUS_CAN_TX		= 0x2000,
+	MII_STATUS_CAN_TX_FDX	= 0x4000,
+	MII_STATUS_CAN_T4		= 0x8000
+};
+
+enum MII_auto_negotiation {
+	MII_NWAY_NODE_SEL	= 0x001f,
+	MII_NWAY_CSMA_CD	= 0x0001,
+	MII_NWAY_T			= 0x0020,
+	MII_NWAY_T_FDX		= 0x0040,
+	MII_NWAY_TX			= 0x0080,
+	MII_NWAY_TX_FDX		= 0x0100,
+	MII_NWAY_T4			= 0x0200,
+	MII_NWAY_PAUSE		= 0x0400,
+	MII_NWAY_RF			= 0x2000,
+	MII_NWAY_ACK		= 0x4000,
+	MII_NWAY_NP			= 0x8000
+};
+
+
+enum MII_link_status {
+	MII_LINK_FAIL			= 0x4000,
+	MII_LINK_100_MBIT		= 0x0080,
+	MII_LINK_FULL_DUPLEX	= 0x0040
+};
+
+enum link_modes {
+	LINK_HALF_DUPLEX	= 0x0100,
+	LINK_FULL_DUPLEX	= 0x0200,
+	LINK_DUPLEX_MASK	= 0xff00,
+
+	LINK_SPEED_HOME		= 1,
+	LINK_SPEED_10_MBIT	= 10,
+	LINK_SPEED_100_MBIT	= 100,
+	LINK_SPEED_DEFAULT	= LINK_SPEED_100_MBIT,
+	LINK_SPEED_MASK		= 0x00ff
+};
 
 /*
  * Vendor and Card IDs
@@ -387,13 +482,24 @@ struct wb_device {
 
 // Prototypes
 extern int32 wb_interrupt(void *arg);
-extern status_t wb_create_semaphores(struct wb_device *device);
-extern status_t wb_create_rings(struct wb_device *device);
+extern status_t wb_create_semaphores(wb_device *device);
+extern status_t wb_create_rings(wb_device *device);
 extern void wb_delete_rings(wb_device *device);
+
+extern void wb_init(wb_device *device);
 extern void wb_reset(wb_device *device);
+
+extern status_t wb_initPHYs(wb_device *device);
+
 extern void wb_disable_interrupts(wb_device *device);
 extern void wb_enable_interrupts(wb_device *device);
+
+extern void wb_set_mode(wb_device *device, int mode);
+extern int32 wb_read_mode(wb_device *device);
+
 extern int32 wb_tick(timer *arg);
 extern void wb_free_rx_descriptor(wb_desc *desc);
+
+extern void print_address(ether_address_t *addr);
 
 #endif //__WB840_H

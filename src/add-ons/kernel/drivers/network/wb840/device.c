@@ -67,14 +67,13 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 	LOG(("wb840: reg_base=%x\n", (int)data->reg_base));
 		
 	wb_read_eeprom(data, &data->myaddr, 0, 3, 0);
-	print_address((void*)&data->myaddr);
 	
 	data->wb_cachesize = gPci->read_pci_config(data->pciInfo->bus, data->pciInfo->device,
 			data->pciInfo->function, PCI_line_size, sizeof (PCI_line_size)) & 0xff;
 		
 	if (wb_create_semaphores(data) == B_OK) {		
-		/* reset the card */
-		wb_reset(data);
+		wb_initPHYs(data);
+		wb_init(data);
 		
 		/* Setup interrupts */
 		data->irq = data->pciInfo->u.h0.interrupt_line;
@@ -87,15 +86,9 @@ wb840_open(const char *name, uint32 flags, void** cookie)
 		WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_RX_ON);
 		write32(data->reg_base + WB_RXSTART, 0xFFFFFFFF);
 		WB_SETBIT(data->reg_base + WB_NETCFG, WB_NETCFG_TX_ON);
-		//write32(data->reg_base + WB_TXSTART, 0xFFFFFFFF);
-		
-		//dump_registers(data);
 		
 		add_timer(&data->timer, wb_tick, 1000000LL, B_PERIODIC_TIMER);
 		
-#if DEBUG
-		dump_registers(data);
-#endif
 		return B_OK; // Everything after this line is an error
 		
 	} else
@@ -149,11 +142,13 @@ wb840_read(void* cookie, off_t position, void *buf, size_t* num_bytes)
 		*num_bytes = 0;
 	} else {
 		size = WB_RXBYTES(check);
+		size -= CRC_SIZE;
 		LOG((DEVICE_NAME": received %d bytes\n", (int)size));
 		if (size > WB_MAX_FRAMELEN || size > *num_bytes) {
 			LOG(("ERROR: Bad frame size: %d", (int)size));
 			size = *num_bytes;
 		}
+		*num_bytes = size;
 		memcpy(buf, (void *)device->rxBuffer[current], size);
 	}
 	

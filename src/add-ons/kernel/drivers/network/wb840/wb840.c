@@ -18,6 +18,40 @@
 
 #define ROUND_TO_PAGE_SIZE(x) (((x) + (B_PAGE_SIZE) - 1) & ~((B_PAGE_SIZE) - 1))
 
+// MII chip info table
+
+#define PHY_ID0_WB840_INTERNAL 	0x0181
+#define PHY_ID1_WB840_INTERNAL	0xb800
+#define	MII_HOME	0x0001
+#define MII_LAN		0x0002
+
+const static struct mii_chip_info
+{
+	const char *name;
+	uint16 id0, id1;
+	uint8  types;
+}
+
+gMIIChips[] = {
+	{"WB840 Internal MII PHY", PHY_ID0_WB840_INTERNAL, PHY_ID1_WB840_INTERNAL, MII_LAN},
+	{NULL,0,0,0}
+};
+
+
+static int
+mii_readstatus(wb_device *device)
+{
+	// status bit has to be retrieved 2 times
+	int i = 0;
+	int status;
+	
+	while (i++ < 2)
+		status = wb_miibus_readreg(device, device->phy, MII_STATUS);
+	
+	return status;
+}
+
+
 static uint32
 physicalAddress(volatile void *addr, uint32 length)
 {
@@ -85,35 +119,117 @@ wb_disable_interrupts(struct wb_device *device)
 
 
 void
-wb_reset(wb_device *device)
+wb_selectPHY(wb_device *device)
 {
-	int i = 0;
-	cpu_status status;
+	uint16 status;
 	
-	LOG((DEVICE_NAME": reset()\n"));
+	// ToDo: need to be changed, select PHY in relation to the link mode
+	device->currentPHY = device->firstPHY;
+	device->phy = device->currentPHY->address;
+	status = wb_miibus_readreg(device, device->phy, MII_CONTROL);
+	status &= ~MII_CONTROL_ISOLATE;
+
+	wb_miibus_writereg(device, device->phy, MII_CONTROL, status);
+}
+
+
+uint16
+wb_resetPHY(wb_device *device)
+{
+	uint16 status = mii_readstatus(device);
+	dprintf("wb_resetPHY: %d\n", status);
+	wb_miibus_writereg(device, device->phy, MII_CONTROL, MII_CONTROL_RESET);
 	
-	status = disable_interrupts();
+	return status;
+}
+
+
+status_t
+wb_initPHYs(wb_device *device)
+{
+	uint16 phy;
+	// search for total of 32 possible MII PHY addresses
+	for (phy = 0; phy < 32; phy++) {
+		struct mii_phy *mii;
+		uint16 status;
+		int i = 0;
 	
-	device->wb_txthresh = WB_TXTHRESH_INIT;
+		status = wb_miibus_readreg(device, phy, MII_STATUS);
+		status = wb_miibus_readreg(device, phy, MII_STATUS);
+		
+		if (status == 0xffff || status == 0x0000)
+			// this MII is not accessable
+			continue;
+
+		mii = (struct mii_phy *)malloc(sizeof(struct mii_phy));
+		if (mii == NULL)
+			return B_NO_MEMORY;
+
+		mii->address = phy;
+		mii->id0 = wb_miibus_readreg(device, phy, MII_PHY_ID0);
+		mii->id1 = wb_miibus_readreg(device, phy, MII_PHY_ID1);
+		mii->types = MII_HOME;
+		mii->next = device->firstPHY;
+		device->firstPHY = mii;
 	
-	write32(device->reg_base + WB_NETCFG, 0L);
-	write32(device->reg_base + WB_BUSCTL, 0L);
-	write32(device->reg_base + WB_TXADDR, 0L);
-	write32(device->reg_base + WB_RXADDR, 0L);
-	
-	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BUSCTL_RESET);
-	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BUSCTL_RESET);
-	
-	for (i = 0; i < WB_TIMEOUT; i++) {
-		if (!(read32(device->reg_base + WB_BUSCTL) & WB_BUSCTL_RESET))
-			break;
+		while (gMIIChips[i].name != NULL) {
+			if (gMIIChips[i].id0 == mii->id0 && gMIIChips[i].id1 == (mii->id1 & 0xfff0)) {				
+				dprintf("Found MII PHY: %s\n", gMIIChips[i].name);
+				mii->types = gMIIChips[i].types;
+				break;
+			}
+			i++;
+		}
+		if (gMIIChips[i].name == NULL)
+			dprintf("Unknown MII PHY transceiver: id = (%x, %x).\n",mii->id0, mii->id1);
+	}
+
+	if (device->firstPHY == NULL) {
+		dprintf("No MII PHY transceiver found!\n");
+		return B_ENTRY_NOT_FOUND;
 	}
 	
-	if (i == WB_TIMEOUT)
-		LOG(("reset hasn't completed!!!"));
+	wb_selectPHY(device);
+
+	// if the internal PHY is selected, reset it
+	if (device->currentPHY->id0 == PHY_ID0_WB840_INTERNAL
+			&& (device->currentPHY->id1 & 0xfff0) == PHY_ID1_WB840_INTERNAL) {
+		if (wb_resetPHY(device) & MII_STATUS_LINK) {
+			uint16 poll = MII_STATUS_LINK;
+			while (poll) {
+				poll ^= wb_miibus_readreg(device, device->phy, MII_STATUS) & poll;
+			}
+		}
+	}
+/*
+	// workaround for ICS1893 PHY
+	if (info->currentPHY->id0 == PHY_ID0_ICS_1893
+		&& (info->currentPHY->id1 & 0xfff0) == PHY_ID1_ICS_1893)
+		mdio_write(info, 0x0018, 0xD200);
+
+	// SiS 630E has some bugs on default value of PHY registers
+	if (info->pciInfo->revision == SiS900_REVISION_SiS630E) {
+		mdio_write(info, MII_AUTONEG_ADV, 0x05e1);
+		mdio_write(info, MII_CONFIG1, 0x22);
+		mdio_write(info, MII_CONFIG2, 0xff00);
+		mdio_write(info, MII_MASK, 0xffc0);
+	}
+	*/
 	
-	write32(device->reg_base + WB_BUSCTL, WB_BUSCTL_MUSTBEONE|WB_BUSCTL_ARBITRATION);
-	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BURSTLEN_16LONG);
+	device->link = mii_readstatus(device) & MII_STATUS_LINK;
+
+	return B_OK;
+}
+
+
+void
+wb_init(wb_device *device)
+{
+	LOG((DEVICE_NAME": init()\n"));
+	
+	wb_reset(device);
+	
+	device->wb_txthresh = WB_TXTHRESH_INIT;
 	
 	switch(device->wb_cachesize) {
 		case 32:
@@ -130,6 +246,9 @@ wb_reset(wb_device *device)
 			WB_SETBIT(device->reg_base + WB_BUSCTL, WB_CACHEALIGN_NONE);
 			break;
 	}
+	
+	write32(device->reg_base + WB_BUSCTL, WB_BUSCTL_MUSTBEONE|WB_BUSCTL_ARBITRATION);
+	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BURSTLEN_16LONG);
 	
 	write32(device->reg_base + WB_BUSCTL_SKIPLEN, WB_SKIPLEN_4LONG);
 	
@@ -150,7 +269,36 @@ wb_reset(wb_device *device)
 		
 	//Disable capture broadcast
 	WB_CLRBIT(device->reg_base + WB_NETCFG, WB_NETCFG_RX_BROAD);
-				
+}
+
+
+void
+wb_reset(wb_device *device)
+{
+	int i = 0;
+	cpu_status status;
+	
+	LOG((DEVICE_NAME": reset()\n"));
+	
+	status = disable_interrupts();
+	// XXX: What about a spinlock here ?
+	
+	write32(device->reg_base + WB_NETCFG, 0L);
+	write32(device->reg_base + WB_BUSCTL, 0L);
+	write32(device->reg_base + WB_TXADDR, 0L);
+	write32(device->reg_base + WB_RXADDR, 0L);
+	
+	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BUSCTL_RESET);
+	WB_SETBIT(device->reg_base + WB_BUSCTL, WB_BUSCTL_RESET);
+	
+	for (i = 0; i < WB_TIMEOUT; i++) {
+		if (!(read32(device->reg_base + WB_BUSCTL) & WB_BUSCTL_RESET))
+			break;
+	}
+	
+	if (i == WB_TIMEOUT)
+		LOG(("reset hasn't completed!!!"));
+					
 	restore_interrupts(status);
 	
 	/* Wait a bit while the chip reorders his toughts */
@@ -159,9 +307,42 @@ wb_reset(wb_device *device)
 	//XXX Initialize MII interface
 }
 
+
 void
 wb_updateLink(struct wb_device *device)
-{	
+{
+	if (!device->autoNegotiationComplete) {
+		int32 mode = wb_read_mode(device);
+		if (mode)
+			wb_set_mode(device, mode);
+
+		return;
+	}
+
+	if (device->link)	{	// link lost
+		uint16 status = mii_readstatus(device);
+
+		if ((status & MII_STATUS_LINK) == 0) {
+			device->link = false;
+			dprintf(DEVICE_NAME ": link lost\n");
+
+			// if it's the internal SiS900 MII PHY, reset it
+			//if (device->currentPHY->id0 == PHY_ID0_SiS900_INTERNAL
+			//	&& (device->currentPHY->id1 & 0xfff0) == PHY_ID1_SiS900_INTERNAL)
+			//	sis900_resetPHY(device);
+		}
+	}
+	if (!device->link) {	// new link established
+		uint16 status;
+
+		wb_selectPHY(device);
+
+		status = mii_readstatus(device);
+		if (status & MII_STATUS_LINK) {
+			//sis900_checkMode(device);
+			device->link = true;
+		}
+	}
 }
 
 
@@ -362,17 +543,19 @@ wb_create_semaphores(struct wb_device *device)
 {	
 	device->rxSem = create_sem(0, "wb840 receive");
 	if (device->rxSem < B_OK) {
-		LOG(("Couldn't create sem, sem_id %d\n", (int)device->rxSem));
+		LOG(("Couldn't create sem, sem_id %ld\n", device->rxSem));
 		return device->rxSem;
 	}
+	
 	set_sem_owner(device->rxSem, B_SYSTEM_TEAM);		
 	
 	device->txSem = create_sem(WB_TX_LIST_CNT, "wb840 transmit");
 	if (device->txSem < B_OK) {
-		LOG(("Couldn't create sem, sem_id %d\n", (int)device->txSem));
+		LOG(("Couldn't create sem, sem_id %ld\n", device->txSem));
 		delete_sem(device->rxSem);
 		return device->txSem;
 	}
+	
 	set_sem_owner(device->txSem, B_SYSTEM_TEAM);
 	
 	device->rxLock = 0;
@@ -387,9 +570,10 @@ wb_create_rings(struct wb_device *device)
 {
 	int i;
 		
-	if ((device->rxArea = create_area("wb840 rx buffer", (void **)&device->rxBuffer[0],
+	device->rxArea = create_area("wb840 rx buffer", (void **)&device->rxBuffer[0],
 			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_RX_LIST_CNT),
-			B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA)) < B_OK)
+			B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);	
+	if (device->rxArea < B_OK)
 		return device->rxArea;
 	
 	for (i = 1; i < WB_RX_LIST_CNT; i++)
@@ -404,9 +588,10 @@ wb_create_rings(struct wb_device *device)
 	device->rxFree = WB_RX_LIST_CNT;
 	device->rxDescriptor[WB_RX_LIST_CNT - 1].wb_ctl |= WB_RXCTL_RLAST;
 	
-	if ((device->txArea = create_area("wb840 tx buffer", (void **)&device->txBuffer[0],
+	device->txArea = create_area("wb840 tx buffer", (void **)&device->txBuffer[0],
 			B_ANY_KERNEL_ADDRESS, ROUND_TO_PAGE_SIZE(WB_BUFBYTES * WB_TX_LIST_CNT),
-			B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA)) < B_OK) {
+			B_FULL_LOCK, B_READ_AREA | B_WRITE_AREA);
+	if (device->txArea < B_OK) {
 		delete_area(device->rxArea);
 		return device->txArea;
 	}
@@ -443,4 +628,80 @@ wb_delete_rings(struct wb_device *device)
 {
 	delete_area(device->rxArea);
 	delete_area(device->txArea);
+}
+
+
+int32
+wb_read_mode(wb_device *info)
+{
+	uint16 autoAdv, autoLinkPartner;
+	int32 speed, duplex;
+
+	uint16 status = mii_readstatus(info);
+	if (!(status & MII_STATUS_LINK)) {
+		//dprintf(DEVICE_NAME ": no link detected (status = %x)\n", status);
+		return 0;
+	}
+
+	// auto negotiation completed
+	autoAdv = wb_miibus_readreg(info, info->phy, MII_AUTONEG_ADV);
+	autoLinkPartner = wb_miibus_readreg(info, info->phy, MII_AUTONEG_LINK_PARTNER);
+	status = autoAdv & autoLinkPartner;
+
+	speed = status & (MII_NWAY_TX | MII_NWAY_TX_FDX) ? LINK_SPEED_100_MBIT : LINK_SPEED_10_MBIT;
+	duplex = status & (MII_NWAY_TX_FDX | MII_NWAY_T_FDX) ? LINK_FULL_DUPLEX : LINK_HALF_DUPLEX;
+	
+	dprintf("status: 0x%x\n", status);
+	info->autoNegotiationComplete = true;
+
+	// workaround for Realtek RTL8201 PHY issue
+	/*if (phy->id0 == PHY_ID0_REALTEK_8201 && (phy->id1 & 0xFFF0) == PHY_ID1_REALTEK_8201) {
+		if (mdio_read(info, MII_CONTROL) & MII_CONTROL_FULL_DUPLEX)
+			duplex = LINK_FULL_DUPLEX;
+		if (mdio_read(info, 0x0019) & 0x01)
+			speed = LINK_SPEED_100_MBIT;
+	}
+*/
+	//dprintf(DEVICE_NAME ": linked, 10%s MBit, %s duplex\n",
+		//		speed == LINK_SPEED_100_MBIT ? "0" : "",
+		//		duplex == LINK_FULL_DUPLEX ? "full" : "half");
+
+	return speed | duplex;
+}
+
+
+void
+wb_set_mode(wb_device *info, int mode)
+{
+	/*uint32 address = (uint32)info->registers + SiS900_MAC_CONFIG;
+	uint32 txFlags = SiS900_Tx_AUTO_PADDING | SiS900_Tx_FILL_THRES;
+	uint32 rxFlags = 0;
+	int32 speed = mode & LINK_SPEED_MASK;
+
+	if (read32(address) & SiS900_MAC_CONFIG_EDB_MASTER) {
+		TRACE((DEVICE_NAME ": EDB master is set!\n"));
+		txFlags |= 5 << SiS900_DMA_SHIFT;
+		rxFlags = 5 << SiS900_DMA_SHIFT;
+	}
+
+	// link speed FIFO thresholds
+
+	if (speed == LINK_SPEED_HOME || speed == LINK_SPEED_10_MBIT) {
+		rxFlags |= SiS900_Rx_10_MBIT_DRAIN_THRES;
+		txFlags |= SiS900_Tx_10_MBIT_DRAIN_THRES;
+	} else {
+		rxFlags |= SiS900_Rx_100_MBIT_DRAIN_THRES;
+		txFlags |= SiS900_Tx_100_MBIT_DRAIN_THRES;
+	}
+
+	// duplex mode
+
+	if ((mode & LINK_DUPLEX_MASK) == LINK_FULL_DUPLEX) {
+		txFlags |= SiS900_Tx_CS_IGNORE | SiS900_Tx_HB_IGNORE;
+		rxFlags |= SiS900_Rx_ACCEPT_Tx_PACKETS;
+	}
+
+	write32((uint32)info->registers + SiS900_MAC_Tx_CONFIG, txFlags);
+	write32((uint32)info->registers + SiS900_MAC_Rx_CONFIG, rxFlags);
+*/
 }
