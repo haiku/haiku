@@ -34,8 +34,8 @@ private:
 	static const int kMaxUpdateStringLength = 1024;
 
 	OutputFile& _OutputFile() { return fOutputFile; }
-	uint32 _BlockSize() const { return fBlockSize; }	
-	uint32 _BlockShift() const { return fBlockShift; }	
+	uint32 _BlockSize() const { return fBlockSize; }
+	uint32 _BlockShift() const { return fBlockShift; }
 	bool _DoUdf() const { return fDoUdf; }
 	bool _DoIso() const { return fDoIso; }
 	Udf::String& _UdfVolumeName() { return fUdfVolumeName; }
