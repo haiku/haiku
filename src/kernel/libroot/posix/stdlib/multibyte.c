@@ -33,43 +33,46 @@
 
 #include <stdlib.h>
 
+
 /*
  * Stub multibyte character functions.
  * This cheezy implementation is fixed to the native single-byte
  * character set.
  */
 
+
+
 int
-mblen(s, n)
-	const char *s;
-	size_t n;
+mblen(const char *s, size_t n)
 {
 	if (s == NULL || *s == '\0')
 		return 0;
+	
 	if (n == 0)
 		return -1;
+
 	return 1;
 }
 
-/*ARGSUSED*/
+
 int
-mbtowc(pwc, s, n)
-	int *pwc;
-	const char *s;
-	size_t n;
+mbtowc(wchar_t *pwc, const char *s, size_t n)
 {
 	if (s == NULL)
 		return 0;
+	
 	if (n == 0)
 		return -1;
+	
 	if (pwc)
-		*pwc = (int) *s;
+		*pwc = (wchar_t) *s;
+	
 	return (*s != '\0');
 }
 
-/*ARGSUSED*/
+
 int
-wctomb(char *s, int wchar)
+wctomb(char *s, wchar_t wchar)
 {
 	if (s == NULL)
 		return 0;
@@ -78,18 +81,15 @@ wctomb(char *s, int wchar)
 	return 1;
 }
 
-/*ARGSUSED*/
+
 size_t
-mbstowcs(pwcs, s, n)
-	int *pwcs;
-	const char *s;
-	size_t n;
+mbstowcs(wchar_t *pwcs, const char *s, size_t n)
 {
 	int count = 0;
 
 	if (n != 0) {
 		do {
-			if ((*pwcs++ = (int) *s++) == 0)
+			if ((*pwcs++ = (wchar_t) *s++) == 0)
 				break;
 			count++;
 		} while (--n != 0);
@@ -98,12 +98,9 @@ mbstowcs(pwcs, s, n)
 	return count;
 }
 
-/*ARGSUSED*/
+
 size_t
-wcstombs(s, pwcs, n)
-	char *s;
-	const int *pwcs;
-	size_t n;
+wcstombs(char *s, const wchar_t *pwcs, size_t n)
 {
 	int count = 0;
 
