@@ -309,7 +309,7 @@ main(int, char **argv)
 				const char *name=scratch;
 				if (db.GetItemInfo(i, &name) >= B_OK) {
 					found++;
-					printf("Item %d: '%s'\n", i, name);
+					printf("Item %ld: '%s'\n", i, name);
 					free((void *)name); /* INTENDED */
 				}
 			}
@@ -319,13 +319,13 @@ main(int, char **argv)
 		if (strcmp(argv[i], "--remove") == 0) {
 			BDeskbar db;
 			int32 found = 0;
-			int32 count = db.CountItems();
+			uint32 count = db.CountItems();
 			/* BDeskbar is definitely doomed ! */
 			while ((db.RemoveItem("DeskButton") == B_OK) && (db.CountItems() < count)) {
 				count = db.CountItems();
 				found++;
 			}
-			printf("removed %d items.\n", found);
+			printf("removed %ld items.\n", found);
 			return 0;
 		}
 		

@@ -35,8 +35,8 @@ DeskButton::DeskButton(BRect frame, entry_ref *entry_ref, const char *name, BLis
 		uint32 resizeMask, uint32 flags)
 	:	BView(frame, name, resizeMask, flags),
 		ref(*entry_ref),
-		titleList(titles),
-		actionList(actions)
+		actionList(actions),
+		titleList(titles)
 {
 	// Background Color
 	SetViewColor(184,184,184);
