@@ -1004,8 +1004,8 @@ status_t get_next_file_format(int32 *cookie, media_file_format *mfi)
  *************************************************************/
 
 // final & verified
-const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.OpenBeOS-media-server";
-const char * B_MEDIA_ADDON_SERVER_SIGNATURE = "application/x-vnd.OpenBeOS-addon-host";
+const char * B_MEDIA_SERVER_SIGNATURE = "application/x-vnd.Be.media-server";
+const char * B_MEDIA_ADDON_SERVER_SIGNATURE = "application/x-vnd.Be.addon-host";
 
 const type_code B_CODEC_TYPE_INFO = 0x040807b2;
 

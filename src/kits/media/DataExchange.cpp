@@ -11,7 +11,7 @@
 #include "PortPool.h"
 #include "MediaMisc.h"
 #include "DataExchange.h"
-#include "ServerInterface.h" // NEW_MEDIA_SERVER_SIGNATURE
+#include "ServerInterface.h"
 
 #define TIMEOUT 15000000 // 15 seconds timeout!
 
@@ -30,7 +30,7 @@ void find_media_server_port();
 void find_media_addon_server_port();
 
 static BMessenger * GetMediaServerMessenger() {
-	static BMessenger * messenger = new BMessenger(NEW_MEDIA_SERVER_SIGNATURE);
+	static BMessenger * messenger = new BMessenger(B_MEDIA_SERVER_SIGNATURE);
 	return MediaServerMessenger = messenger;
 }
 
