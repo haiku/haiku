@@ -28,7 +28,7 @@ OBOSInstallRelSymLink install-networking
 	: libsocket.so
 	: installed-networking-test ;
 
-Package openbeos-networkingkit-cvs :
+Package haiku-networkingkit-cvs :
 	libsocket.so :
 #	boot home config lib ;
 	boot home Desktop openbeos-networkingkit lib ;
