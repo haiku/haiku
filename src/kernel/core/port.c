@@ -47,7 +47,7 @@ struct port_entry {
 	const char	*name;
 	sem_id		read_sem;
 	sem_id		write_sem;
-	int32		total_count;
+	int32		total_count;	// messages read from port since creation
 	struct list	msg_queue;
 };
 
@@ -230,15 +230,17 @@ dump_port_list(int argc, char **argv)
 static void
 _dump_port_info(struct port_entry *port)
 {
-	int32 cnt;
-	dprintf("PORT:   %p\n", port);
-	dprintf("name:  '%s'\n", port->name);
-	dprintf("owner: 0x%lx\n", port->owner);
-	dprintf("capacity: %ld\n", port->capacity);
- 	get_sem_count(port->read_sem, &cnt);
- 	dprintf("read_sem:  %ld\n", cnt);
- 	get_sem_count(port->write_sem, &cnt);
-	dprintf("write_sem: %ld\n", cnt);
+	int32 count;
+
+	dprintf("PORT: %p\n", port);
+	dprintf(" name:            \"%s\"\n", port->name);
+	dprintf(" owner:           %#lx\n", port->owner);
+	dprintf(" capacity:        %ld\n", port->capacity);
+ 	get_sem_count(port->read_sem, &count);
+ 	dprintf(" read sem count:  %ld\n", count);
+ 	get_sem_count(port->write_sem, &count);
+	dprintf(" write sem count: %ld\n", count);
+	dprintf(" total count:     %ld\n", port->total_count);
 }
 
 
