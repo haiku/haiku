@@ -1,6 +1,19 @@
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        HEventItem.cpp
+//  Author:      Jérôme Duval, Oliver Ruiz Dorantes, Atsushi Takamatsu
+//  Description: Sounds Preferences
+//  Created :    November 24, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 #include "HEventItem.h"
-#include "ResourceUtils.h"
-#include <Bitmap.h>
 #include <View.h>
 #include <NodeInfo.h>
 #include <Path.h>
@@ -11,16 +24,10 @@
 /***********************************************************
  * Constructor
  ***********************************************************/
-HEventItem::HEventItem(const char* name,const char* path)
-	:CLVEasyItem(0,false,false,20)
-	,fName(name)
+HEventItem::HEventItem(const char* name, const char* path)
+	: BListItem(),
+		fName(name)
 {
-	//BBitmap* bitmap = new BBitmap(BRect(0,0,15,15),B_COLOR_8_BIT);
-	BBitmap *bitmap = ResourceUtils().GetBitmapResource('BBMP',"Sound Bitmap");
-	SetColumnContent(0,bitmap,false);
-	SetColumnContent(1,fName.String(),false,false);
-	SetColumnContent(2,"",false,false);
-	delete bitmap;
 	SetPath(path);
 }
 
@@ -38,45 +45,53 @@ void
 HEventItem::SetPath(const char* in_path)
 {
 	fPath = in_path;
-	BPath path(in_path);
-	BPath parent;
-	BMediaFiles mfiles;
-	entry_ref ref;
-	
-	if(path.InitCheck() == B_OK)
-	{
-		SetColumnContent(2,path.Leaf(),false,false);
-		::get_ref_for_path(path.Path(),&ref);
-		if(mfiles.SetRefFor(BMediaFiles::B_SOUNDS,Name(),ref) != B_OK)
-			(new BAlert("","Error","OK"))->Go();
-		path.GetParent(&parent);
-		SetColumnContent(3,parent.Path(),false,false);// falta
-	}else{
-		SetColumnContent(2,"<none>",false,false);
-		//if(mfiles.RemoveRefFor(BMediaFiles::B_SOUNDS,Name(),ref) != B_OK)
-		//	(new BAlert("","Entry not found","OK"))->Go();
-		mfiles.RemoveItem(BMediaFiles::B_SOUNDS,Name());
-		::add_system_beep_event(Name());
-		SetColumnContent(3,"<none>",false,false);// falta	
-	}
 }
+
 
 /***********************************************************
  * Remove
  ***********************************************************/
 void
-HEventItem::Remove()
+HEventItem::Remove(const char *type)
 {
-	BMediaFiles mfiles;
-	
-	mfiles.RemoveItem(BMediaFiles::B_SOUNDS,Name());
+	BMediaFiles().RemoveItem(type, Name());
 }
 
+
 /***********************************************************
- *
+ * DrawItem
  ***********************************************************/
-const char*
-HEventItem::Path() const
+void 	
+HEventItem::DrawItem(BView *owner, BRect itemRect, bool complete)
 {
-	return fPath.String();
+	rgb_color kBlack = { 0,0,0,0 };
+	rgb_color kHighlight = { 206,207,206,0 };
+		
+	if (IsSelected() || complete) {
+		rgb_color color;
+		if (IsSelected())
+			color = kHighlight;
+		else
+			color = owner->ViewColor();
+		
+		owner->SetHighColor(color);
+		owner->SetLowColor(color);
+		owner->FillRect(itemRect);
+		owner->SetHighColor(kBlack);
+		
+	} else {
+		owner->SetLowColor(owner->ViewColor());
+	}
+	
+	BPoint point = itemRect.LeftTop() + BPoint(5, 10);
+	
+	owner->SetHighColor(kBlack);
+	owner->SetFont(be_plain_font);
+	owner->MovePenTo(point);
+	owner->DrawString(Name());
+	
+	point += BPoint(100, 0);
+	BPath path(Path());
+	owner->MovePenTo(point);
+	owner->DrawString(path.Leaf() ? path.Leaf() : "<none>");
 }

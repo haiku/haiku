@@ -1,3 +1,18 @@
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        HWindow.h
+//  Author:      Jérôme Duval, Oliver Ruiz Dorantes, Atsushi Takamatsu
+//  Description: Sounds Preferences
+//  Created :    November 24, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+
 #ifndef __HWINDOW_H__
 #define __HWINDOW_H__
 
@@ -30,10 +45,8 @@ protected:
 		virtual void	DispatchMessage(BMessage *message
 										,BHandler *handler);
 				void	InitGUI();
-				void	InitMenu();
 				void	SetupMenuField();
 				void	Pulse();
-				void	RemoveEvent();
 private:
 			//HTypeList*	fTypeList;
 			HEventList*	fEventList;
