@@ -57,7 +57,8 @@ add_to_iovec(iovec *vecs, int32 &index, int32 max, addr_t address, size_t size)
 
 
 static status_t
-read_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
+readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count,
+	size_t *_numBytes, bool doWrite)
 {
 	TRACE(("read_pages: ref = %p, offset = %Ld, size = %lu\n", ref, offset, *_numBytes));
 
@@ -85,7 +86,10 @@ read_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count, s
 	if (size > numBytes)
 		size = numBytes;
 
-	status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
+	if (doWrite)
+		status = vfs_write_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
+	else
+		status = vfs_read_pages(ref->device, ref->cookie, fileVecs[0].offset, vecs, count, &size);
 	if (status < B_OK)
 		return status;
 
@@ -138,12 +142,15 @@ read_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count, s
 			size += tempVecs[tempCount].iov_len = vecs[i].iov_len;
 		}
 
-		size_t readSize = size;
-		status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &readSize);
+		size_t bytes = size;
+		if (doWrite)
+			status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
+		else
+			status = vfs_read_pages(ref->device, ref->cookie, fileVec.offset, tempVecs, tempCount, &bytes);
 		if (status < B_OK)
 			return status;
 
-		if (size != readSize) {
+		if (size != bytes) {
 			// there are no more bytes, let's bail out
 			*_numBytes = size + totalSize;
 			return B_OK;
@@ -156,9 +163,9 @@ read_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t count, s
 
 
 static status_t
-read_request(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
+read_from_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
 {
-	TRACE(("read_request: ref = %p, offset = %Ld, size = %lu\n", ref, offset, bufferSize));
+	TRACE(("read_from_cache: ref = %p, offset = %Ld, size = %lu\n", ref, offset, bufferSize));
 
 	iovec vecs[MAX_IO_VECS];
 	int32 vecCount = 0;
@@ -190,7 +197,7 @@ read_request(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size
 	}
 
 	// read file into reserved pages
-	status_t status = read_pages(ref, offset, vecs, vecCount, &size);
+	status_t status = readwrite_pages(ref, offset, vecs, vecCount, &size, false);
 	if (status < B_OK) {
 		// ToDo: remove allocated pages...
 		panic("file_cache: remove allocated pages! read pages failed: %s\n", strerror(status));
@@ -204,7 +211,7 @@ read_request(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size
 		size_t size = vecs[i].iov_len;
 
 		// copy to user buffer if necessary
-		if (buffer != NULL) {
+		if (bufferSize != 0) {
 			size_t bytes = min_c(bufferSize, size - pageOffset);
 
 			user_memcpy((void *)buffer, (void *)(base + pageOffset), bytes);
@@ -221,6 +228,172 @@ read_request(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size
 		pages[i]->state = PAGE_STATE_ACTIVE;
 
 	return B_OK;
+}
+
+
+static status_t
+write_to_cache(file_cache_ref *ref, off_t offset, size_t size, addr_t buffer, size_t bufferSize)
+{
+	TRACE(("write_to_cache: ref = %p, offset = %Ld, size = %lu\n", ref, offset, bufferSize));
+
+	iovec vecs[MAX_IO_VECS];
+	int32 vecCount = 0;
+
+	// make sure "offset" is page aligned - but also remember the page offset
+	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
+	size = PAGE_ALIGN(size + pageOffset);
+	offset -= pageOffset;
+
+	vm_page *pages[32];
+	int32 pageIndex = 0;
+
+	// ToDo: fix this
+	if (size > 32 * B_PAGE_SIZE)
+		panic("cannot handle large I/O - fix me!\n");
+
+	// allocate pages for the cache and mark them busy
+	for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE) {
+		vm_page *page = pages[pageIndex++] = vm_page_allocate_page(PAGE_STATE_FREE);
+		page->state = PAGE_STATE_BUSY;
+
+		vm_cache_insert_page(ref->cache, page, offset + pos);
+
+		addr_t virtualAddress;
+		vm_get_physical_page(page->ppn * PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT);
+
+		add_to_iovec(vecs, vecCount, MAX_IO_VECS, virtualAddress, B_PAGE_SIZE);
+		// ToDo: check if the array is large enough!
+
+		size_t bytes = min_c(bufferSize, size_t(B_PAGE_SIZE - pageOffset));
+		if (bytes != B_PAGE_SIZE) {
+			// This is only a partial write, so we have to read the rest of the page
+			// from the file to have consistent data in the cache
+			size_t bytesRead = B_PAGE_SIZE;
+			iovec readVec = { (void *)virtualAddress, B_PAGE_SIZE };
+
+			readwrite_pages(ref, offset + pos, &readVec, 1, &bytesRead, false);
+			// ToDo: handle errors!
+		}
+
+		// copy data from user buffer if necessary
+		if (bufferSize != 0) {
+			user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, bytes);
+			buffer += bytes;
+			bufferSize -= bytes;
+		}
+	}
+
+#if 0
+	// write cached pages back to the file if we were asked to do that
+	status_t status = readwrite_pages(ref, offset, vecs, vecCount, &size, true);
+	if (status < B_OK) {
+		// ToDo: remove allocated pages...
+		panic("file_cache: remove allocated pages! write pages failed: %s\n", strerror(status));
+		return status;
+	}
+#endif
+
+	// unmap the pages again
+
+	for (int32 i = 0; i < vecCount; i++) {
+		addr_t base = (addr_t)vecs[i].iov_base;
+		size_t size = vecs[i].iov_len;
+		for (size_t pos = 0; pos < size; pos += B_PAGE_SIZE, base += B_PAGE_SIZE)
+			vm_put_physical_page(base);
+	}
+
+	// make the pages accessible in the cache
+	for (int32 i = pageIndex; i-- > 0;)
+		pages[i]->state = PAGE_STATE_ACTIVE;
+
+	return B_OK;
+}
+
+
+static status_t
+readwrite(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool doWrite)
+{
+	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+	vm_cache_ref *cache = ref->cache;
+	off_t fileSize = ((vnode_store *)cache->cache->store)->size;
+
+	TRACE(("readwrite(ref = %p, offset = %Ld, buffer = %p, size = %lu, %s\n",
+		ref, offset, bufferBase, *_size, doWrite ? "write" : "read"));
+
+	// out of bounds access?
+	if (offset >= fileSize || offset < 0) {
+		*_size = 0;
+		return B_OK;
+	}
+
+	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
+	size_t size = *_size + pageOffset;
+	offset -= pageOffset;
+
+	addr_t buffer = bufferBase;
+	if (offset + size > fileSize) {
+		// adapt size to be within the file's offsets
+		size = fileSize - offset;
+		*_size = size;
+	}
+
+	size_t bytesLeft = size;
+
+	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
+		// check if this page is already in memory
+		addr_t virtualAddress;
+	restart:
+		vm_page *page = vm_cache_lookup_page(cache, offset);
+		if (page != NULL && page->state == PAGE_STATE_BUSY) {
+			// ToDo: don't wait forever!
+			mutex_unlock(&cache->lock);
+			snooze(20000);
+			mutex_lock(&cache->lock);
+			goto restart;
+		}
+
+		TRACE(("lookup page from offset %Ld: %p\n", offset, page));
+		if (page != NULL
+			&& vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
+			// it is, so let's satisfy in the first part of the request
+			if (bufferBase != buffer) {
+				size_t requestSize = buffer - (addr_t)bufferBase;
+				if ((doWrite && write_to_cache(ref, offset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)
+					|| (!doWrite && read_from_cache(ref, offset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
+					vm_put_physical_page(virtualAddress);
+					return B_IO_ERROR;
+				}
+			}
+
+			// and copy the contents of the page already in memory
+			if (doWrite)
+				user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, min_c(B_PAGE_SIZE, bytesLeft) - pageOffset);
+			else
+				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), min_c(B_PAGE_SIZE, bytesLeft) - pageOffset);
+
+			vm_put_physical_page(virtualAddress);
+
+			bufferBase += B_PAGE_SIZE;
+			pageOffset = 0;
+
+			if (bytesLeft <= B_PAGE_SIZE) {
+				// we've read the last page, so we're done!
+				return B_OK;
+			}
+		}
+
+		if (bytesLeft <= B_PAGE_SIZE)
+			break;
+
+		buffer += B_PAGE_SIZE;
+		bytesLeft -= B_PAGE_SIZE;
+	}
+
+	// fill the last remainding bytes of the request
+	if (doWrite)
+		return write_to_cache(ref, offset, bytesLeft, bufferBase, bytesLeft);
+
+	return read_from_cache(ref, offset, bytesLeft, bufferBase, bytesLeft);
 }
 
 
@@ -291,16 +464,16 @@ file_cache_read_pages(void *_cacheRef, off_t offset, const iovec *vecs, size_t c
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
 
-	return read_pages(ref, offset, vecs, count, _numBytes);
+	return readwrite_pages(ref, offset, vecs, count, _numBytes, false);
 }
 
 
 extern "C" status_t
 file_cache_write_pages(void *_cacheRef, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes)
 {
-	//file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-	//return write_pages(ref, offset, vecs, count, _numBytes);
-	return B_ERROR;
+	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+
+	return readwrite_pages(ref, offset, vecs, count, _numBytes, true);
 }
 
 
@@ -308,84 +481,23 @@ extern "C" status_t
 file_cache_read(void *_cacheRef, off_t offset, void *bufferBase, size_t *_size)
 {
 	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
-	vm_cache_ref *cache = ref->cache;
-	off_t fileSize = ((vnode_store *)cache->cache->store)->size;
 
-	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu\n", ref, offset, bufferBase, *_size));
+	TRACE(("file_cache_read(ref = %p, offset = %Ld, buffer = %p, size = %lu\n",
+		ref, offset, bufferBase, *_size));
 
-	// out of bounds read?
-	if (offset >= fileSize || offset < 0) {
-		*_size = 0;
-		return B_OK;
-	}
-
-	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
-	size_t size = *_size + pageOffset;
-	offset -= pageOffset;
-
-	addr_t buffer = (addr_t)bufferBase;
-	if (offset + size > fileSize) {
-		// adapt size to be within the file's offsets
-		size = fileSize - offset;
-		*_size = size;
-	}
-
-	size_t bytesLeft = size;
-
-	for (; bytesLeft > 0; offset += B_PAGE_SIZE) {
-		// check if this page is already in memory
-		addr_t virtualAddress;
-	restart:
-		vm_page *page = vm_cache_lookup_page(cache, offset);
-		if (page != NULL && page->state == PAGE_STATE_BUSY) {
-			// ToDo: don't wait forever!
-			mutex_unlock(&cache->lock);
-			snooze(20000);
-			mutex_lock(&cache->lock);
-			goto restart;
-		}
-
-		TRACE(("lookup page from offset %Ld: %p\n", offset, page));
-		if (page != NULL && vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
-			// it is, so let's read in the first part of the request
-			// ToDo: if the page is busy, we've got to wait here!
-			if ((addr_t)bufferBase != buffer) {
-				size_t requestSize = buffer - (addr_t)bufferBase;
-				if (read_request(ref, offset + pageOffset, requestSize, (addr_t)bufferBase, requestSize) != B_OK) {
-					vm_put_physical_page(virtualAddress);
-					return B_IO_ERROR;
-				}
-			}
-
-			// and copy the contents of the page already in memory
-			user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), min_c(B_PAGE_SIZE, bytesLeft) - pageOffset);
-			vm_put_physical_page(virtualAddress);
-
-			bufferBase = (void *)(buffer + B_PAGE_SIZE);
-			pageOffset = 0;
-			
-			if (bytesLeft <= B_PAGE_SIZE) {
-				// we've read the last page, so we're done!
-				return B_OK;
-			}
-		}
-
-		if (bytesLeft <= B_PAGE_SIZE)
-			break;
-
-		buffer += B_PAGE_SIZE;
-		bytesLeft -= B_PAGE_SIZE;
-	}
-
-	// fill the last remainding bytes of the request
-	return read_request(ref, offset, bytesLeft, (addr_t)bufferBase, bytesLeft);
+	return readwrite(ref, offset, (addr_t)bufferBase, _size, false);
 }
 
 
 extern "C" status_t
 file_cache_write(void *_cacheRef, off_t offset, const void *buffer, size_t *_size)
 {
-	return EOPNOTSUPP;
+	file_cache_ref *ref = (file_cache_ref *)_cacheRef;
+
+	TRACE(("file_cache_write(ref = %p, offset = %Ld, buffer = %p, size = %lu\n",
+		ref, offset, bufferBase, *_size));
+
+	return readwrite(ref, offset, (addr_t)const_cast<void *>(buffer), _size, false);
 }
 
 
