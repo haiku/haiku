@@ -97,6 +97,7 @@ switch $(TARGET_CPU) {
 	case x86 :
 	{
 		# nothing special to do here...
+		DEFINES += __INTEL__ ;
 		OBOS_BOOT_PLATFORM = bios_ia32 ;
 	}
 	case * :
