@@ -47,7 +47,6 @@ CommonTestLib libsupporttest.so
 		MallocSeekTest.cpp
 		MallocWriteTest.cpp
 		#MallocReadTest.cpp
-		#MallocSetSizeTest.cpp
 		MallocBufferLengthTest.cpp
 		
 		#BString
