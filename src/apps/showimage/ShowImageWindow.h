@@ -54,7 +54,7 @@ public:
 	virtual void Quit();
 	
 	status_t InitCheck();
-	ShowImageView *GetShowImageView() const { return fpImageView; }
+	ShowImageView *GetShowImageView() const { return fImageView; }
 	
 	void UpdateTitle();
 	void BuildViewMenu(BMenu *menu);
@@ -66,7 +66,7 @@ private:
 		long unsigned int msg, char shortcut, uint32 modifier,
 		char target, bool enabled);
 
-	BMenuItem* AddDelayItem(BMenu *pmenu, char *caption, float value, bool marked);
+	BMenuItem* AddDelayItem(BMenu *pmenu, char *caption, float value);
 	void UpdateRecentDocumentsMenu();
 	
 	bool ToggleMenuItem(uint32 what);
@@ -82,18 +82,20 @@ private:
 	bool CanQuit();
 		// returns true if the window can be closed safely, false if not
 	void ToggleFullScreen();
+	void LoadSettings();
+	void SavePrintOptions();
 	bool PageSetup();
 	void PrepareForPrint();
 	void Print(BMessage *msg);
 
-	BFilePanel *fpSavePanel;
-	BMenuBar *fpBar;
-	BMenu *fpOpenMenu;
-	BMenu *fpBrowseMenu;
-	BMenu *fpGoToPageMenu;
-	BMenu *fpSlideShowDelay;
-	ShowImageView *fpImageView;
-	ShowImageStatusView *fpStatusView;
+	BFilePanel *fSavePanel;
+	BMenuBar *fBar;
+	BMenu *fOpenMenu;
+	BMenu *fBrowseMenu;
+	BMenu *fGoToPageMenu;
+	BMenu *fSlideShowDelay;
+	ShowImageView *fImageView;
+	ShowImageStatusView *fStatusView;
 	bool fFullScreen;
 	BRect fWindowFrame;
 	bool fShowCaption;

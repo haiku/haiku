@@ -42,7 +42,8 @@ public:
 		kZoomFactor,
 		kDPI,
 		kWidth,
-		kHeight
+		kHeight,
+		kNumberOfOptions
 	};
 
 	PrintOptions();

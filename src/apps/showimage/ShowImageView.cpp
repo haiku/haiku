@@ -49,6 +49,7 @@
 #include <PopUpMenu.h>
 
 
+#include "ShowImageApp.h"
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
 #include "ShowImageWindow.h"
@@ -151,8 +152,10 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	uint32 flags)
 	: BView(rect, name, resizingMode, flags)
 {
-	InitPatterns();
+	ShowImageSettings* settings;
+	settings = my_app->Settings();
 	
+	InitPatterns();
 	fBitmap = NULL;
 	fSelBitmap = NULL;
 	fDocumentIndex = 1;
@@ -165,12 +168,20 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fHAlignment = B_ALIGN_LEFT;
 	fVAlignment = B_ALIGN_TOP;
 	fSlideShow = false;
-	SetSlideShowDelay(3); // 3 seconds
+	fSlideShowDelay = 3 * 10; // 3 seconds
 	fShowCaption = false;
 	fZoom = 1.0;
 	fMovesImage = false;
 	fScaleBilinear = false;
 	fScaler = NULL;
+
+	if (settings->Lock()) {
+		fShrinkToBounds = settings->GetBool("ShrinkToBounds", fShrinkToBounds);
+		fZoomToBounds = settings->GetBool("ZoomToBounds", fZoomToBounds);
+		fSlideShowDelay = settings->GetInt32("SlideShowDelay", fSlideShowDelay);
+		fScaleBilinear = settings->GetBool("ScaleBilinear", fScaleBilinear);
+		settings->Unlock();
+	}
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -322,6 +333,7 @@ void
 ShowImageView::SetShrinkToBounds(bool enable)
 {
 	if (fShrinkToBounds != enable) {
+		SettingsSetBool("ShrinkToBounds", enable);
 		fShrinkToBounds = enable;
 		FixupScrollBars();
 		Invalidate();
@@ -332,6 +344,7 @@ void
 ShowImageView::SetZoomToBounds(bool enable)
 {
 	if (fZoomToBounds != enable) {
+		SettingsSetBool("ZoomToBounds", enable);
 		fZoomToBounds = enable;
 		FixupScrollBars();
 		Invalidate();
@@ -406,6 +419,7 @@ void
 ShowImageView::SetScaleBilinear(bool s)
 {
 	if (fScaleBilinear != s) {
+		SettingsSetBool("ScaleBilinear", s);
 		fScaleBilinear = s; Invalidate();
 	}
 }
@@ -1248,6 +1262,17 @@ ShowImageView::ShowPopUpMenu(BPoint screen)
 }
 
 void
+ShowImageView::SettingsSetBool(const char* name, bool value)
+{
+	ShowImageSettings* settings;
+	settings = my_app->Settings();
+	if (settings->Lock()) {
+		settings->SetBool(name, value);
+		settings->Unlock();
+	}
+}
+
+void
 ShowImageView::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
@@ -1595,7 +1620,13 @@ ShowImageView::ZoomOut()
 void
 ShowImageView::SetSlideShowDelay(float seconds)
 {
+	ShowImageSettings* settings;
 	fSlideShowDelay = (int)(seconds * 10.0);
+	settings = my_app->Settings();
+	if (settings->Lock()) {
+		settings->SetInt32("SlideShowDelay", fSlideShowDelay);
+		settings->Unlock();
+	}
 }
 
 void

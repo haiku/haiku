@@ -38,6 +38,8 @@ FilterThread::FilterThread(Filter* filter, int i)
 	fWorkerThread = spawn_thread(worker_thread, "filter", suggest_thread_priority(B_STATUS_RENDERING), this);
 	if (fWorkerThread >= 0) {
 		resume_thread(fWorkerThread);
+	} else {
+		delete this;
 	}	
 }
 
@@ -122,7 +124,7 @@ Filter::Stop()
 		// tell FilterThreads to stop calculations
 		fIsRunning = false;
 		// wait for threads to exit
-		acquire_sem_etc(fWaitForThreads, fCPUCount, 0, 0);
+		while (acquire_sem_etc(fWaitForThreads, fCPUCount, 0, 0) == B_INTERRUPTED);
 		// ready to start again
 		fStarted = false;
 	}

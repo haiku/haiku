@@ -48,8 +48,8 @@ int main(int, char **)
 ShowImageApp::ShowImageApp()
 	: BApplication(APP_SIG)
 {
-	fbPulseStarted = false;
-	fpOpenPanel = new BFilePanel(B_OPEN_PANEL);
+	fPulseStarted = false;
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL);
 }
 
 void
@@ -64,7 +64,7 @@ void
 ShowImageApp::ReadyToRun()
 {
 	if (CountWindows() == WINDOWS_TO_IGNORE)
-		fpOpenPanel->Show();
+		fOpenPanel->Show();
 	else
 		// If image windows are already open
 		// (paths supplied on the command line)
@@ -78,10 +78,10 @@ ShowImageApp::ReadyToRun()
 void
 ShowImageApp::StartPulse()
 {
-	if (!fbPulseStarted) {
+	if (!fPulseStarted) {
 		// Tell the app to begin checking
 		// for the number of open windows
-		fbPulseStarted = true;
+		fPulseStarted = true;
 		SetPulseRate(250000);
 			// Set pulse to every 1/4 second
 	}
@@ -121,7 +121,7 @@ ShowImageApp::MessageReceived(BMessage *pmsg)
 {
 	switch (pmsg->what) {
 		case MSG_FILE_OPEN:
-			fpOpenPanel->Show();
+			fOpenPanel->Show();
 			break;
 			
 		case MSG_WINDOW_QUIT:

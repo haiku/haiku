@@ -92,6 +92,7 @@ public:
 	bool NextFile();
 	bool PrevFile();
 	void SetSlideShowDelay(float seconds);
+	float GetSlideShowDelay() const { return fSlideShowDelay / 10.0; }
 	bool SlideShowStarted() const { return fSlideShow; }
 	void StartSlideShow();
 	void StopSlideShow();
@@ -163,6 +164,7 @@ private:
 	void ScrollRestrictedBy(float x, float y);
 	void MouseWheelChanged(BMessage* msg);
 	void ShowPopUpMenu(BPoint screen);
+	void SettingsSetBool(const char* name, bool value);
 	
 	entry_ref fCurrentRef; // of the image
 	int32 fDocumentIndex;  // of the image in the file

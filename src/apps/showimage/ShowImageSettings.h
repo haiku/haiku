@@ -1,8 +1,8 @@
 /*****************************************************************************/
-// ShowImageApp
-// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
+// ShowImageSettings
+// Written by Michael Pfeiffer
 //
-// ShowImageApp.h
+// ShowImageSettings.cpp
 //
 //
 // Copyright (c) 2003 OpenBeOS Project
@@ -26,40 +26,38 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#ifndef _ShowImageApp_h
-#define _ShowImageApp_h
+#ifndef _ShowImageSettings_H
+#define _ShowImageSettings_H
 
-#include <Application.h>
+#include <Message.h>
+#include <Locker.h>
 
-#include "ShowImageSettings.h"
-
-class ShowImageApp : public BApplication {
+class ShowImageSettings
+{
 public:
-	ShowImageApp();
+	ShowImageSettings();
+	~ShowImageSettings();
 
-public:
-	virtual void AboutRequested();
-	virtual void ArgvReceived(int32 argc, char **argv);
-	virtual void MessageReceived(BMessage *pmsg);
-	virtual void ReadyToRun();
-	virtual void Pulse();
-	virtual void RefsReceived(BMessage *pmsg);
-	virtual void Quit();
-
-	ShowImageSettings* Settings() { return &fSettings; }
-
+	bool Lock();
+	bool GetBool(const char* name, bool defaultValue);
+	int32 GetInt32(const char* name, int32 defaultValue);
+	float GetFloat(const char* name, float defaultValue);
+	BRect GetRect(const char* name, BRect defaultValue);
+	const char* GetString(const char* name, const char* defaultValue);
+	void SetBool(const char* name, bool value);
+	void SetInt32(const char* name, int32 value);
+	void SetFloat(const char* name, float value);
+	void SetRect(const char* name, BRect value);
+	void SetString(const char* name, const char* value);
+	void Unlock();
+	
 private:
-	void StartPulse();
-	void Open(const entry_ref *pref);
-	void BroadcastToWindows(uint32 what);
-	void BroadcastToWindows(BMessage *pmsg);
-	void CheckClipboard();
+	bool OpenSettingsFile(BFile* file, bool forReading);
+	void Load();
+	void Save();
 
-	BFilePanel *fOpenPanel;
-	bool fPulseStarted;
-	ShowImageSettings fSettings;
+	BLocker fLock;
+	BMessage fSettings;
 };
 
-#define my_app dynamic_cast<ShowImageApp*>(be_app)
-
-#endif /* _ShowImageApp_h */
+#endif
