@@ -13,4 +13,4 @@ KernelStaticLibrary libdrivers :
 	;
 
 #SubInclude OBOS_TOP src kernel drivers arch ;
-SubInclude OBOS_TOP src kernel drivers common ;
+#SubInclude OBOS_TOP src kernel drivers common ;
