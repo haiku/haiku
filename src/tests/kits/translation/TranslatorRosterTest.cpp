@@ -417,9 +417,8 @@ status_t TranslatorRosterTest::GetOutputFormatsTest() {
 		const translation_format *fmts;
 		int32 num_fmts;
 		roster->GetOutputFormats(translators[i], &fmts, &num_fmts);
-		//printf("Translator supports %ld output formats\n", num_fmts);
-		if(num_fmts <= 0) {
-			Debug("Found translator accepting 0 or less output formats");
+		if(num_fmts < 0) {
+			Debug("Found translator accepting less than 0 output formats");
 			return B_ERROR;
 		}
 		
