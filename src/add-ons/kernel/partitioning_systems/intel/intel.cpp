@@ -754,7 +754,7 @@ status_t
 ep_scan_partition(int fd, partition_data *partition, void *cookie)
 {
 	// check parameters
-	if (fd < 0 || !partition || !cookie || !partition->cookie)
+	if (fd < 0 || !partition || !partition->cookie)
 		return B_ERROR;
 	partition_data *parent = get_parent_partition(partition->id);
 	if (!parent)
@@ -773,6 +773,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		LogicalPartition *logical = primary->LogicalPartitionAt(i);
 		partition_data *child = create_child_partition(partition->id,
 													   index, -1);
+		index++;
 		if (!child) {
 			// something went wrong
 			error = B_ERROR;
