@@ -1,0 +1,19 @@
+SubDir OBOS_TOP src add-ons media plugins matroska ;
+
+UsePrivateHeaders media ;
+
+SubDirHdrs [ FDirName $(SUBDIR) libmatroska ] ;
+
+Addon matroska : media plugins :
+	matroska_reader.cpp
+	:
+	false
+	:
+	libebml.a
+	libmatroska.a
+;
+
+LinkSharedOSLibs matroska : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins matroska libebml ;
+SubInclude OBOS_TOP src add-ons media plugins matroska libmatroska ;

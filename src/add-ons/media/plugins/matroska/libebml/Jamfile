@@ -1,0 +1,25 @@
+SubDir OBOS_TOP src add-ons media plugins matroska libebml ;
+
+StaticLibrary ebml :
+	Debug.cpp
+	EbmlBinary.cpp
+	EbmlContexts.cpp
+	EbmlCrc32.cpp
+	EbmlDate.cpp
+	EbmlDummy.cpp
+	EbmlElement.cpp
+	EbmlFloat.cpp
+	EbmlHead.cpp
+	EbmlMaster.cpp
+	EbmlSInteger.cpp
+	EbmlStream.cpp
+	EbmlString.cpp
+	EbmlSubHead.cpp
+	EbmlUInteger.cpp
+	EbmlUnicodeString.cpp
+	EbmlVersion.cpp
+	EbmlVoid.cpp
+	IOCallback.cpp
+	MemIOCallback.cpp
+	StdIOCallback.cpp   
+;
