@@ -94,7 +94,7 @@ RecentDocumentsMenu::AddDynamicItem(add_state s)
 // Implementation of ShowImageWindow
 
 ShowImageWindow::ShowImageWindow(const entry_ref *pref)
-	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
+	: BWindow(BRect(5, 24, 350, 250), "", B_DOCUMENT_WINDOW, 0)
 {
 	fSavePanel = NULL;
 	fModified = false;
