@@ -9,9 +9,8 @@ UsePrivateHeaders app interface [ FDirName servers app ] ;
 UseFreeTypeHeaders ;
 
 SharedLibrary appserver :
-	areafunc.c
 	Angle.cpp
-	bget.c
+	BGet++.cpp
 	BitmapManager.cpp
 	ColorSet.cpp
 	Decorator.cpp

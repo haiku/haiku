@@ -27,33 +27,10 @@
 #include "BitmapManager.h"
 #include "ServerBitmap.h"
 #include <stdio.h>
+#include "BGet++.h"
 
 //! The bitmap allocator for the server. Memory is allocated/freed by the AppServer class
 BitmapManager *bitmapmanager=NULL;
-
-//! BGET function calls - defined here because of C++ name mangling causing link problems
-typedef long bufsize;
-extern "C" void	bpool(void *buffer, bufsize len);
-extern "C" void *bget(bufsize size);
-extern "C" void *bgetz(bufsize size);
-extern "C" void *bgetr(void *buffer, bufsize newsize);
-extern "C" void	brel(void *buf);
-extern "C" void	bectl(int (*compact)(bufsize sizereq, int sequence),
-		       void *(*acquire)(bufsize size),
-		       void (*release)(void *buf), bufsize pool_incr);
-extern "C" void	bstats(bufsize *curalloc, bufsize *totfree, bufsize *maxfree,
-		       long *nget, long *nrel);
-extern "C" void	bstatse(bufsize *pool_incr, long *npool, long *npget,
-		       long *nprel, long *ndget, long *ndrel);
-extern "C" void	bufdump(void *buf);
-extern "C" void	bpoold(void *pool, int dumpalloc, int dumpfree);
-extern "C" int	bpoolv(void *pool);
-
-/*!
-	\brief This is a call which makes BGET use a couple of home-grown functions which
-	manage the buffer via area functions
-*/
-extern "C" void set_area_buffer_management(void);
 
 //! Number of bytes to allocate to each area used for bitmap storage
 #define BITMAP_AREA_SIZE	B_PAGE_SIZE * 2
@@ -61,6 +38,7 @@ extern "C" void set_area_buffer_management(void);
 //! Sets up stuff to be ready to allocate space for bitmaps
 BitmapManager::BitmapManager(void)
 {
+	fMemPool=new AreaPool;
 	bmplist=new BList(0);
 
 	// When create_area is passed the B_ANY_ADDRESS flag, the address of the area
@@ -76,8 +54,7 @@ BitmapManager::BitmapManager(void)
 	if(lock<0)
 		printf("PANIC: BitmapManager couldn't allocate locking semaphore!!\n");
 	
-	set_area_buffer_management();
-	bpool(buffer,BITMAP_AREA_SIZE);
+	fMemPool->AddToPool(buffer,BITMAP_AREA_SIZE);
 }
 
 //! Deallocates everything associated with the manager
@@ -92,12 +69,13 @@ BitmapManager::~BitmapManager(void)
 			tbmp=(ServerBitmap*)bmplist->RemoveItem(0L);
 			if(tbmp)
 			{
-				brel(tbmp->_buffer);
+				fMemPool->ReleaseBuffer(tbmp->_buffer);
 				delete tbmp;
 				tbmp=NULL;
 			}
 		}
 	}
+	delete fMemPool;
 	delete bmplist;
 	delete_area(bmparea);
 	delete_sem(lock);
@@ -120,7 +98,7 @@ ServerBitmap * BitmapManager::CreateBitmap(BRect bounds, color_space space, int3
 	
 	// Server version of this code will also need to handle such things as
 	// bitmaps which accept child views by checking the flags.
-	uint8 *bmpbuffer=(uint8 *)bget(bmp->BitsLength());
+	uint8 *bmpbuffer=(uint8 *)fMemPool->GetBuffer(bmp->BitsLength());
 
 	if(!bmpbuffer)
 	{
@@ -158,7 +136,7 @@ void BitmapManager::DeleteBitmap(ServerBitmap *bitmap)
 	}
 
 	// Server code will require a check to ensure bitmap doesn't have its own area		
-	brel(tbmp->_buffer);
+	fMemPool->ReleaseBuffer(tbmp->_buffer);
 	delete tbmp;
 
 	release_sem(lock);
