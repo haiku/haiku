@@ -189,6 +189,8 @@ class TMessageItemTest : public TestCase, public TypePolicy<Type>
 		void MessageItemTest8();
 		void MessageItemTest9();
 		void MessageItemTest10();
+		void MessageItemTest11();
+		void MessageItemTest12();
 
 		static TestSuite* Suite();
 
@@ -335,9 +337,9 @@ MessageItemTest5()
 	TypePtr pout;
 	ssize_t size;
 	
-	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
+	for (uint32 ii = 0; ii < InitPolicy::Size(in); ++ii)
 	{
-		CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in[i]) == B_OK);
+		CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in[ii]) == B_OK);
 	}
 
 	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
@@ -522,6 +524,87 @@ template
 	class AssertPolicy,
 	class ComparePolicy
 >
+void 
+TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
+MessageItemTest11()
+{
+	BMessage msg;
+	Type in = InitPolicy::Test1();
+	CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in) == B_OK);
+	
+	ssize_t flatSize = msg.FlattenedSize();
+	char* buf = new(nothrow) char[flatSize];
+	CPPUNIT_ASSERT(buf);
+
+	CPPUNIT_ASSERT(msg.Flatten(buf, flatSize) == B_OK);
+	
+	BMessage msg2;
+	Type out = InitPolicy::Zero();
+	CPPUNIT_ASSERT(msg2.Unflatten(buf) == B_OK);
+	CPPUNIT_ASSERT(FuncPolicy::ShortFind(msg, "item", &out) == B_OK);
+	CPPUNIT_ASSERT(ComparePolicy::Compare(in, out));
+
+	delete[] buf;
+}
+//------------------------------------------------------------------------------
+template
+<
+	class Type,
+	type_code TypeCode,
+	class FuncPolicy,
+	class InitPolicy,
+	class AssertPolicy,
+	class ComparePolicy
+>
+void 
+TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
+MessageItemTest12()
+{
+	BMessage msg;
+	ArrayType in = InitPolicy::Array();
+	
+	for (uint32 ii = 0; ii < InitPolicy::Size(in); ++ii)
+	{
+		CPPUNIT_ASSERT(FuncPolicy::Add(msg, "item", in[ii]) == B_OK);
+	}
+	
+	ssize_t flatSize = msg.FlattenedSize();
+	char* buf = new(nothrow) char[flatSize];
+	CPPUNIT_ASSERT(buf);
+
+	CPPUNIT_ASSERT(msg.Flatten(buf, flatSize) == B_OK);
+	
+	BMessage msg2;
+	Type out = InitPolicy::Zero();
+	TypePtr pout;
+	ssize_t size;
+	CPPUNIT_ASSERT(msg2.Unflatten(buf) == B_OK);
+
+	for (uint32 i = 0; i < InitPolicy::Size(in); ++i)
+	{
+		CPPUNIT_ASSERT(FuncPolicy::Has(msg, "item", i));
+		CPPUNIT_ASSERT(ComparePolicy::Compare(FuncPolicy::QuickFind(msg, "item", i),
+											  in[i]));
+		CPPUNIT_ASSERT(FuncPolicy::Find(msg, "item", i, &out) == B_OK);
+		CPPUNIT_ASSERT(ComparePolicy::Compare(out, in[i]));
+		CPPUNIT_ASSERT(FuncPolicy::FindData(msg, "item", TypeCode, i,
+											(const void**)&pout, &size) == B_OK);
+		CPPUNIT_ASSERT(ComparePolicy::Compare(Dereference(pout), in[i]));
+		CPPUNIT_ASSERT(AssertPolicy::Size(size, Dereference(pout)));
+	}
+
+	delete[] buf;
+}
+//------------------------------------------------------------------------------
+template
+<
+	class Type,
+	type_code TypeCode,
+	class FuncPolicy,
+	class InitPolicy,
+	class AssertPolicy,
+	class ComparePolicy
+>
 TestSuite* 
 TMessageItemTest<Type, TypeCode, FuncPolicy, InitPolicy, AssertPolicy, ComparePolicy>::
 Suite()
@@ -540,6 +623,8 @@ Suite()
 	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest9);
 	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest10);
 #endif
+	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest11);
+	ADD_TEMPLATE_TEST(BMessage, suite, TMessageItemTest TEMPLATE_TEST_PARAMS, MessageItemTest12);
 
 	return suite;
 }
