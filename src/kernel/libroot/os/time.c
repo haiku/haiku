@@ -5,9 +5,9 @@
 
 
 #include <OS.h>
+#include <string.h>
 #include "syscalls.h"
 
-static area_id	sCloneRtcArea;
 static volatile bigtime_t *sBootTime = NULL;
 
 
@@ -15,17 +15,21 @@ status_t
 setup_rtc_area()
 {
 	area_id rtcArea = find_area("rtc_region");
+	area_info info;
+	status_t err;
+	
 	if (rtcArea < 0) {
 		printf("setup_rtc_area: error finding rtc_region %s\n",
 			strerror(rtcArea));
+		return rtcArea;
 	}
-	sCloneRtcArea = clone_area("cloned_rtc_region", (void**)&sBootTime,
-		B_ANY_ADDRESS, B_READ_AREA, rtcArea);
-	if (sCloneRtcArea < 0) {
-		printf("setup_rtc_area: error cloning rtc_region\n");
-		return sCloneRtcArea;
+
+	err = get_area_info(rtcArea, &info);
+	if (err < B_OK) {
+		printf("setup_rtc_area: error getting rtc_region info\n");
+		return err;
 	}
-	
+	sBootTime = (bigtime_t *)info.address;
 	return B_OK;	
 }
 
@@ -33,10 +37,9 @@ setup_rtc_area()
 uint32
 real_time_clock(void)
 {
-	if (!sBootTime)
-		setup_rtc_area();
-	//return (*sBootTime + system_time()) / 1000000;
-	return 0;
+	if (!sBootTime && (setup_rtc_area()!=B_OK))
+		return 0;
+	return (*sBootTime + system_time()) / 1000000;
 }
 
 
@@ -50,10 +53,9 @@ set_real_time_clock(uint32 secs)
 bigtime_t
 real_time_clock_usecs(void)
 {
-	if (!sBootTime)
-		setup_rtc_area();
-	//return *sBootTime + system_time();
-	return 0;
+	if (!sBootTime && (setup_rtc_area() != B_OK))
+		return 0;
+	return *sBootTime + system_time();
 }
 
 
