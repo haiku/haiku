@@ -9,7 +9,6 @@ App ShowImage : ShowImageApp.cpp
 	ShowImageWindow.cpp
 	PrintOptionsWindow.cpp
 	Filter.cpp
-	Scale.cpp
 	;
 
 LinkSharedOSLibs ShowImage : be tracker translation ;
