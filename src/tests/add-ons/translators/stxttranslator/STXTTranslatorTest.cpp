@@ -18,6 +18,7 @@
 #include <Errors.h>
 #include <OS.h>
 #include "../../../../add-ons/translators/stxttranslator/STXTTranslator.h"
+#include "TranslatorTestAddOn.h"
 
 // Suite
 CppUnit::Test *
@@ -198,40 +199,6 @@ STXTTranslatorTest::IdentifyTest()
 		sizeof(aPlainFiles) / sizeof(const char *), true);
 	IdentifyTests(this, proster, aStyledFiles,
 		sizeof(aStyledFiles) / sizeof(const char *), false);
-}
-
-bool
-CompareStreams(BPositionIO &a, BPositionIO &b)
-{
-	off_t alen = 0, blen = 0;
-	uint8 *abuf = NULL, *bbuf = NULL;
-	
-	a.Seek(0, SEEK_END);
-	alen = a.Position();
-	b.Seek(0, SEEK_END);
-	blen = b.Position();
-	
-	if (alen != blen)
-		return false;
-
-	bool bresult = false;		
-	abuf = new uint8[alen];
-	bbuf = new uint8[blen];
-	if (a.ReadAt(0, abuf, alen) == alen) {
-		if (b.ReadAt(0, bbuf, blen) == blen) {
-			if (memcmp(abuf, bbuf, alen) == 0)
-				bresult = true;
-			else
-				bresult = false;
-		}
-	}
-		
-	delete[] abuf;
-	abuf = NULL;
-	delete[] bbuf;
-	bbuf = NULL;
-	
-	return bresult;
 }
 
 void
