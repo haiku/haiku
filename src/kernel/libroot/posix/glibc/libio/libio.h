@@ -329,6 +329,12 @@ typedef struct _IO_FILE _IO_FILE;
 
 struct _IO_FILE_plus;
 
+#if defined(_G_IO_IO_FILE_VERSION) && _G_IO_IO_FILE_VERSION == 0x20001
+#define _IO_stdin_ _IO_2_1_stdin_
+#define _IO_stdout_ _IO_2_1_stdout_
+#define _IO_stderr_ _IO_2_1_stderr_
+#endif
+
 extern struct _IO_FILE_plus _IO_2_1_stdin_;
 extern struct _IO_FILE_plus _IO_2_1_stdout_;
 extern struct _IO_FILE_plus _IO_2_1_stderr_;
