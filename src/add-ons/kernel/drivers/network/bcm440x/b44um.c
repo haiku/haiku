@@ -97,7 +97,7 @@ void uninit_driver(void) {
 		
 		delete_area(pUmDevice->mem_base);
 		
-		free(dev_list[j]);
+		free((void *)dev_list[j]);
 	}
 	
 	mempool_exit();
@@ -174,7 +174,7 @@ status_t b44_ioctl(void *cookie,uint32 op,void *data,size_t len) {
 			memcpy(data,pUmDevice->lm_dev.NodeAddress,6);
 			return B_OK;
 		case ETHER_NONBLOCK:
-			pUmDevice->block = *((uint8 *)(data));
+			pUmDevice->block = !*((uint8 *)(data));
 			return B_OK;
 		case ETHER_ADDMULTI:
 			return (b44_LM_MulticastAdd(&pUmDevice->lm_dev,(PLM_UINT8)(data)) == LM_STATUS_SUCCESS) ? B_OK : B_ERROR;
@@ -238,8 +238,10 @@ status_t b44_read(void *cookie,off_t pos,void *data,size_t *numBytes) {
 	release_spinlock(&pUmDevice->lock);
 	restore_interrupts(cpu);
 	
-	if (pPacket == 0)
+	if (pPacket == 0) {
+		*numBytes = -1;
 		return B_ERROR;
+	}
 	
 	pUmPacket = (struct B_UM_PACKET *) pPacket;
 	if ((pPacket->PacketStatus != LM_STATUS_SUCCESS) ||
