@@ -49,7 +49,6 @@ struct ssnd_chunk
 	// samples[]
 } _PACKED;
 
-#if DEBUG
 inline const char * string_for_compression(uint32 compression)
 {
 	static char s[64];
@@ -80,6 +79,5 @@ inline const char * string_for_compression(uint32 compression)
 			return s;
 	}
 }
-#endif
 
 #endif
