@@ -1,7 +1,10 @@
-/*
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+/* 
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 #ifndef _KERNEL_VM_TYPES_H
 #define _KERNEL_VM_TYPES_H
 
@@ -138,7 +141,7 @@ typedef struct vm_store_ops {
 	bool (*has_page)(struct vm_store *backing_store, off_t offset);
 	status_t (*read)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
 	status_t (*write)(struct vm_store *backing_store, off_t offset, const iovec *vecs, size_t count, size_t *_numBytes);
-	int (*fault)(struct vm_store *backing_store, struct vm_address_space *aspace, off_t offset);
+	status_t (*fault)(struct vm_store *backing_store, struct vm_address_space *aspace, off_t offset);
 	void (*acquire_ref)(struct vm_store *backing_store);
 	void (*release_ref)(struct vm_store *backing_store);
 } vm_store_ops;
@@ -152,8 +155,8 @@ enum {
 
 enum {
 	// ToDo: these are here only temporarily - it's a private
-	//	addition to the BeOS create_area() flags
-	B_ALREADY_WIRED = 6
+	//	addition to the BeOS create_area() lock flags
+	B_ALREADY_WIRED	= 6,
 };
 
 enum {
@@ -166,14 +169,21 @@ enum {
 // its best, but create_area() will fail if it has to.
 // Of course, the exact behaviour will be documented somewhere...
 #define B_EXECUTE_AREA			4
-	// "execute" protection is not available on x86 - but defining it
-	// doesn't hurt too much, either :-)
-	// (but don't use it right now, it's not yet supported at all)
-#define B_KERNEL_READ_AREA		8
-#define B_KERNEL_WRITE_AREA		16
-#define B_KERNEL_EXECUTE_AREA	32
+#define B_STACK_AREA			8
+	// "stack" protection is not available on most platforms - it's used
+	// to only commit memory as needed, and have guard pages at the
+	// bottom of the stack.
+	// "execute" protection is currently ignored, but nevertheless, you
+	// should use it if you require to execute code in that area.
 
-#define B_USER_PROTECTION		(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA)
-#define B_KERNEL_PROTECTION		(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA)
+#define B_KERNEL_READ_AREA		16
+#define B_KERNEL_WRITE_AREA		32
+#define B_KERNEL_EXECUTE_AREA	64
+#define B_KERNEL_STACK_AREA		128
+
+#define B_USER_PROTECTION \
+	(B_READ_AREA | B_WRITE_AREA | B_EXECUTE_AREA | B_STACK_AREA)
+#define B_KERNEL_PROTECTION \
+	(B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_KERNEL_EXECUTE_AREA | B_KERNEL_STACK_AREA)
 
 #endif	/* _KERNEL_VM_TYPES_H */
