@@ -311,7 +311,7 @@ KernelLd fortune :
 
 KernelConfigSection etc/fortunes : data : $(SUBDIR)/apps/fortune/fortunes ;
 
-KernelLd ls :
+KernelLd kernel_ls :
 	libglue2.o
 	<$(SOURCE_GRIST)!apps!ls>main.o
 	libroot.so
