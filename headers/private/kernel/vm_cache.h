@@ -1,4 +1,7 @@
 /* 
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -16,7 +19,7 @@ struct kernel_args;
 extern "C" {
 #endif
 
-status_t vm_cache_init(struct kernel_args *ka);
+status_t vm_cache_init(struct kernel_args *args);
 vm_cache *vm_cache_create(vm_store *store);
 vm_cache_ref *vm_cache_ref_create(vm_cache *cache);
 void vm_cache_acquire_ref(vm_cache_ref *cache_ref, bool acquire_store_ref);
@@ -26,8 +29,8 @@ void vm_cache_insert_page(vm_cache_ref *cacheRef, vm_page *page, off_t offset);
 void vm_cache_remove_page(vm_cache_ref *cacheRef, vm_page *page);
 status_t vm_cache_set_minimal_commitment(vm_cache_ref *ref, off_t commitment);
 status_t vm_cache_resize(vm_cache_ref *cacheRef, size_t newSize);
-status_t vm_cache_insert_region(vm_cache_ref *cacheRef, vm_region *region);
-status_t vm_cache_remove_region(vm_cache_ref *cacheRef, vm_region *region);
+status_t vm_cache_insert_area(vm_cache_ref *cacheRef, vm_area *area);
+status_t vm_cache_remove_area(vm_cache_ref *cacheRef, vm_area *area);
 
 #ifdef __cplusplus
 }

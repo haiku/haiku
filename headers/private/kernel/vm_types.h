@@ -54,7 +54,7 @@ typedef struct vm_cache_ref {
 	struct vm_cache		*cache;
 	mutex				lock;
 
-	struct vm_region	*region_list;
+	struct vm_area		*areas;
 
 	int32				ref_count;
 } vm_cache_ref;
@@ -70,31 +70,31 @@ typedef struct vm_cache {
 	uint32				scan_skip : 1;
 } vm_cache;
 
-// vm region
-typedef struct vm_region {
+// vm area
+typedef struct vm_area {
 	char				*name;
-	region_id			id;
+	area_id				id;
 	addr_t				base;
 	addr_t				size;
-	int					lock;
-	int					wiring;
+	uint32				protection;
+	uint32				wiring;
 	int32				ref_count;
 
 	struct vm_cache_ref	*cache_ref;
 	off_t				cache_offset;
 
 	struct vm_address_space *aspace;
-	struct vm_region	*aspace_next;
+	struct vm_area	*aspace_next;
 	struct vm_virtual_map *map;
-	struct vm_region	*cache_next;
-	struct vm_region	*cache_prev;
-	struct vm_region	*hash_next;
-} vm_region;
+	struct vm_area	*cache_next;
+	struct vm_area	*cache_prev;
+	struct vm_area	*hash_next;
+} vm_area;
 
 // virtual map (1 per address space)
 typedef struct vm_virtual_map {
-	vm_region			*region_list;
-	vm_region			*region_hint;
+	vm_area				*areas;
+	vm_area				*area_hint;
 	int					change_count;
 	sem_id				sem;
 	struct vm_address_space *aspace;

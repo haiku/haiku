@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -50,18 +50,18 @@ status_t delete_area_etc(struct team *team, area_id area);
 
 status_t vm_unreserve_address_range(aspace_id aid, void *address, addr_t size);
 status_t vm_reserve_address_range(aspace_id aid, void **_address, uint32 addressSpec, addr_t size);
-region_id vm_create_anonymous_region(aspace_id aid, const char *name, void **address, int addr_type,
-	addr_t size, int wiring, int lock);
-region_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, int addr_type,
-	addr_t size, int lock, addr_t phys_addr);
-region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
-	addr_t size, int lock, int mapping, const char *path, off_t offset);
-region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr_t size);
+area_id vm_create_anonymous_area(aspace_id aid, const char *name, void **address, uint32 addressSpec,
+	addr_t size, uint32 wiring, uint32 protection);
+area_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, uint32 addressSpec,
+	addr_t size, uint32 protection, addr_t phys_addr);
+area_id vm_map_file(aspace_id aid, char *name, void **address, uint32 addressSpec,
+	addr_t size, uint32 protection, uint32 mapping, const char *path, off_t offset);
+area_id vm_create_null_area(aspace_id aid, char *name, void **address, uint32 addressSpec, addr_t size);
 area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32 addressSpec,
 			uint32 protection, area_id sourceID);
-region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
-	region_id source_region, int mapping, int lock);
-status_t vm_delete_region(aspace_id aid, region_id id);
+area_id vm_clone_area(aspace_id aid, char *name, void **address, uint32 addressSpec,
+	uint32 protection, uint32 mapping, area_id sourceArea);
+status_t vm_delete_area(aspace_id aid, area_id id);
 status_t vm_create_vnode_cache(void *vnode, void **_cache);
 
 status_t vm_get_page_mapping(aspace_id aid, addr_t vaddr, addr_t *paddr);
@@ -71,7 +71,7 @@ status_t vm_put_physical_page(addr_t vaddr);
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);
-region_id _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
+area_id _user_vm_map_file(const char *uname, void **uaddress, int addr_type,
 			addr_t size, int lock, int mapping, const char *upath, off_t offset);
 area_id _user_area_for(void *address);
 area_id _user_find_area(const char *name);
