@@ -1790,10 +1790,19 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, DisplayDriver* d
 */
 void DisplayDriver::StrokeRect(const BRect &r, RGBColor &color)
 {
+	Lock();
+	StrokeSolidRect(r,color);
+	Unlock();
 }
 
 void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 {
+	Lock();
+	StrokePatternLine(r.LeftTop(),r.RightTop(),d);
+	StrokePatternLine(r.LeftTop(),r.LeftBottom(),d);
+	StrokePatternLine(r.RightTop(),r.RightBottom(),d);
+	StrokePatternLine(r.LeftBottom(),r.RightBottom(),d);
+	Unlock();
 }
 
 void DisplayDriver::StrokeRect(const BRect &r, DisplayDriver* driver, SetHorizontalLineFuncType setHLine, SetVerticalLineFuncType setVLine)
