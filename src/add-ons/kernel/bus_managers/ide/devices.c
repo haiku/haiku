@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 /*
@@ -208,7 +208,9 @@ scan_device_int(ide_device_info *device, bool atapi)
 	}
 
 	// do a short wait first - if there's no device at all we could wait forever
-	if (acquire_sem_etc(bus->sync_wait_sem, 1, B_RELATIVE_TIMEOUT, 1000/*100000*/) == B_TIMED_OUT) {
+	// ToDo: have a look at this; if it times out (when the time is too short),
+	//		the kernel seems to crash a little later)!
+	if (acquire_sem_etc(bus->sync_wait_sem, 1, B_RELATIVE_TIMEOUT, 100000) == B_TIMED_OUT) {
 		bool cont;
 
 		SHOW_FLOW0( 3, "no fast response to inquiry" );
@@ -239,7 +241,7 @@ scan_device_int(ide_device_info *device, bool atapi)
 		acquire_sem(bus->sync_wait_sem);
 	}
 
-	// cancel the timeout manually; usuall this is done by wait_for_sync(), but
+	// cancel the timeout manually; usually this is done by wait_for_sync(), but
 	// we've used the wait semaphore directly	
 	cancel_irq_timeout(bus);
 
