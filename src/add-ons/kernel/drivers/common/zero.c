@@ -5,8 +5,10 @@
 
 
 #include <Drivers.h>
-#include <vm.h>
+#include <KernelExport.h>
+
 #include <string.h>
+
 
 #define DEVICE_NAME "zero"
 
@@ -63,7 +65,7 @@ zero_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 
 
 status_t
-init_hardware()
+init_hardware(void)
 {
 	return B_OK;
 }
@@ -108,14 +110,14 @@ find_device(const char *name)
 
 
 status_t
-init_driver()
+init_driver(void)
 {
 	return B_OK;
 }
 
 
 void
-uninit_driver()
+uninit_driver(void)
 {
 }
 
