@@ -130,8 +130,8 @@ status_t nv_crtc2_set_timing(display_mode target)
 	/* prevent memory adress counter from being reset (linecomp may not occur) */
 	linecomp = target.timing.v_display;
 
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* Note for laptop and DVI flatpanels:
 	 * CRTC timing has a seperate set of registers from flatpanel timing.
@@ -396,8 +396,8 @@ status_t nv_crtc2_depth(int mode)
 		genctrl = 0x00101130;
 		break;
 	}
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	CRTC2W(PIXEL, ((CRTC2R(PIXEL) & 0xfc) | viddelay));
 	DAC2W(GENCTRL, genctrl);
@@ -411,8 +411,8 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 
 	LOG(4,("CRTC2: setting DPMS: "));
 
-	/* enable access to CRTC2 (and SEQUENCER2) */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* start synchronous reset: required before turning screen off! */
 	SEQW(RESET, 0x01);
@@ -467,8 +467,8 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 
 status_t nv_crtc2_dpms_fetch(bool *display, bool *h, bool *v)
 {
-	/* enable access to CRTC2 (and SEQUENCER2) */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	*display = !(SEQR(CLKMODE) & 0x20);
 	*h = !(CRTC2R(REPAINT1) & 0x80);
@@ -496,8 +496,8 @@ status_t nv_crtc2_set_display_pitch()
 
 	LOG(2,("CRTC2: offset register set to: $%04x\n", offset));
 
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* program the card */
 	CRTC2W(PITCHL, (offset & 0x00ff));
@@ -526,8 +526,8 @@ status_t nv_crtc2_set_display_start(uint32 startadd,uint8 bpp)
 		timeout++;
 	}
 
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* upto 4Gb RAM adressing: must be used on NV10 and later! */
 	/* NOTE:
@@ -550,8 +550,8 @@ status_t nv_crtc2_cursor_init()
 	/* cursor bitmap will be stored at the start of the framebuffer */
 	const uint32 curadd = 0;
 
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* set cursor bitmap adress ... */
 	if (si->ps.laptop)
@@ -599,8 +599,8 @@ status_t nv_crtc2_cursor_show()
 {
 	LOG(4,("CRTC2: enabling cursor\n"));
 
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* b0 = 1 enables cursor */
 	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) | 0x01));
@@ -612,8 +612,8 @@ status_t nv_crtc2_cursor_hide()
 {
 	LOG(4,("CRTC2: disabling cursor\n"));
 
-	/* enable access to CRTC2 */
-	CRTC2W(OWNER, 0x03);
+	/* enable access to secondary head */
+	set_crtc_owner(1);
 
 	/* b0 = 0 disables cursor */
 	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) & 0xfe));

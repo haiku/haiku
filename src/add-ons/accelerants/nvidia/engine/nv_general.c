@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-15 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-16 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -770,6 +770,35 @@ void setup_virtualized_heads(bool cross)
 	}
 }
 
+void set_crtc_owner(bool head)
+{
+	if (si->ps.secondary_head)
+	{
+		if (!head)
+		{
+			/* note: 'OWNER' is a non-standard register in behaviour(!) on NV11's,
+			 * while non-NV11 cards behave normally.
+			 *
+			 * Double-write action needed on those strange NV11 cards: */
+			/* RESET: needed on NV11 */
+			CRTCW(OWNER, 0xff);
+			/* enable access to CRTC1, SEQ1, GRPH1, ATB1, ??? */
+			CRTCW(OWNER, 0x00);
+		}
+		else
+		{
+			/* note: 'OWNER' is a non-standard register in behaviour(!) on NV11's,
+			 * while non-NV11 cards behave normally.
+			 *
+			 * Double-write action needed on those strange NV11 cards: */
+			/* RESET: needed on NV11 */
+			CRTC2W(OWNER, 0xff);
+			/* enable access to CRTC2, SEQ2, GRPH2, ATB2, ??? */
+			CRTC2W(OWNER, 0x03);
+		}
+	}
+}
+
 static status_t nvxx_general_powerup()
 {
 	status_t result;
@@ -973,13 +1002,16 @@ static status_t nv_general_bios_to_powergraphics()
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
 
-	/* unlock card registers for R/W access */
-	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+	/* enable access to primary head */
+	set_crtc_owner(0);
+	/* unlock head's registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 	if (si->ps.secondary_head)
 	{
-		CRTC2W(OWNER, 0x03);
+		/* enable access to secondary head */
+		set_crtc_owner(1);
+		/* unlock head's registers for R/W access */
 		CRTC2W(LOCK, 0x57);
 		CRTC2W(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 	}
@@ -1006,7 +1038,7 @@ static status_t nv_general_bios_to_powergraphics()
 
 	/* enable 'enhanced' mode on primary head: */
 	/* enable access to primary head */
-	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+	set_crtc_owner(0);
 	/* note: 'BUFFER' is a non-standard register in behaviour(!) on most
 	 * NV11's like the GeForce2 MX200, while the MX400 and non-NV11 cards
 	 * behave normally.
@@ -1036,8 +1068,8 @@ static status_t nv_general_bios_to_powergraphics()
 	/* enable 'enhanced' mode on secondary head: */
 	if (si->ps.secondary_head)
 	{
-		/* enable access to secondary head (is SEQ2, GRPH2, CRTC2, ATB2, etc!!) */
-		CRTC2W(OWNER, 0x03);
+		/* enable access to secondary head */
+		set_crtc_owner(1);
 		/* select colormode CRTC2 registers base adresses */
 		NV_REG8(NV8_MISCW) = 0xcb;
 		/* note: 'BUFFER' is a non-standard register in behaviour(!) on most

@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.10-15), (Rudolf)</h1></p>
+<p><h1>head (0.10-16), (Rudolf)</h1></p>
 <ul>
 	<li>Implemented laptop internal flatpanel presence and native resolution detection;
 	<li>Implemented external DVI flatpanel(s) presence and native resolution detection;
@@ -27,7 +27,8 @@
 	<li>Added dualhead switch mode for NV11 (works via virtualized head access implemented now);
 	<li>Modified dualhead switch mode for all other cards to work via the virtualized head access also;
 	<li>Modified overlay to work correctly with the virtualized setup;
-	<li>Added output-devices/heads matrix setup: the driver now selects the right head for primary output and dualhead should work for all cards with all monitor-types now (fixme: NV11 setup is yet incomplete).
+	<li>Added output-devices/heads matrix setup: the driver now selects the right head for primary output and dualhead should work for all cards with all monitor-types now;
+	<li>Updated head selection code for register programming: NV11 needs a special treatment (again); NV11 dualhead modes are finally OK now, including switch mode.
 </ul>
 <p><h1>nv_driver 0.09, (Rudolf)</h1></p>
 <ul>

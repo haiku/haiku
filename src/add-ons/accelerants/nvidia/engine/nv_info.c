@@ -270,10 +270,10 @@ static void detect_panels()
 	bool tvout1 = false, tvout2 = false;
 
 	/* check primary head: */
-	/* enable access to CRTC1 on dualhead cards */
-	if (si->ps.secondary_head) CRTCW(OWNER, 0x00);
+	/* enable access to primary head */
+	set_crtc_owner(0);
 
-	/* unlock CRTC1 */
+	/* unlock head's registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 
@@ -293,9 +293,9 @@ static void detect_panels()
 	if (si->ps.secondary_head)
 	{
 		/* check secondary head: */
-		/* enable access to CRTC2 */
-		CRTC2W(OWNER, 0x03);
-		/* unlock CRTC2 */
+		/* enable access to secondary head */
+		set_crtc_owner(1);
+		/* unlock head's registers for R/W access */
 		CRTC2W(LOCK, 0x57);
 		CRTC2W(VSYNCE ,(CRTC2R(VSYNCE) & 0x7f));
 
