@@ -13,6 +13,7 @@
 extern "C" {
 #endif
 	
+extern status_t arch_set_callback(void);
 extern void *arch_mmu_allocate(void *address, size_t size, uint8 protection);
 extern status_t arch_mmu_free(void *address, size_t size);
 extern status_t arch_mmu_init(void);
