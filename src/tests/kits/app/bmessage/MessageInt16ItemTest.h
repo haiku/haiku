@@ -35,6 +35,7 @@ struct TInt16InitPolicy : public ArrayTypeBase<int16>
 	inline static int16 Zero()	{ return 0; }
 	inline static int16 Test1()	{ return 1234; }
 	inline static int16 Test2()	{ return 5678; }
+	inline static size_t SizeOf(const int16&)	{ return sizeof (int16); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -45,11 +46,11 @@ struct TInt16InitPolicy : public ArrayTypeBase<int16>
 	}
 };
 
-struct TInt16AssertPolicy
-{
-	inline static int16 Zero()		{ return 0; }
-	inline static int16 Invalid()	{ return 0;}
-};
+typedef TMessageItemAssertPolicy
+<
+	int16
+>
+TInt16AssertPolicy;
 
 typedef TMessageItemTest
 <

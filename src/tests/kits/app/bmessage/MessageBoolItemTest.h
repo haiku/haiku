@@ -80,6 +80,7 @@ struct TBoolInitPolicy : public ArrayTypeBase<bool>
 	inline static bool Zero()	{ return false; }
 	inline static bool Test1()	{ return true; }
 	inline static bool Test2()	{ return false; }
+	inline static size_t SizeOf(const bool&)	{ return sizeof (bool); }
 	inline static ArrayType Array()
 	{
 		static bool array[] = { true, true, true };
@@ -87,11 +88,18 @@ struct TBoolInitPolicy : public ArrayTypeBase<bool>
 	}
 };
 
-struct TBoolAssertPolicy
-{
-	inline static bool Zero()		{ return false; }
-	inline static bool Invalid()	{ return false;}
-};
+//struct TBoolAssertPolicy
+//{
+//	inline static bool Zero()		{ return false; }
+//	inline static bool Invalid()	{ return false;}
+//};
+typedef TMessageItemAssertPolicy
+<
+	bool//,
+//	false,
+//	false
+>
+TBoolAssertPolicy;
 
 typedef TMessageItemTest
 <

@@ -35,6 +35,7 @@ struct TBRectInitPolicy : public ArrayTypeBase<BRect>
 	inline static BRect Zero()		{ return BRect(0, 0, 0, 0); }
 	inline static BRect Test1()	{ return BRect(1, 2, 3, 4); }
 	inline static BRect Test2()	{ return BRect(5, 6, 7, 8); }
+	inline static size_t SizeOf(const BRect&)	{ return sizeof (BRect); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -49,6 +50,8 @@ struct TBRectAssertPolicy
 {
 	inline static BRect Zero() { return BRect(0, 0, 0, 0); }
 	inline static BRect Invalid() { return BRect(0, 0, -1, -1); }
+	inline static bool  Size(size_t size, BRect& r)
+		{ return size == sizeof (r); }
 };
 
 typedef TMessageItemTest

@@ -35,6 +35,7 @@ struct TPointInitPolicy : public ArrayTypeBase<BPoint>
 	inline static BPoint Zero()		{ return BPoint(0.0, 0.0); }
 	inline static BPoint Test1()	{ return BPoint(10.0, 10.0); }
 	inline static BPoint Test2()	{ return BPoint(20.0, 20.0); }
+	inline static size_t SizeOf(const BPoint&)	{ return sizeof (BPoint); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -48,7 +49,9 @@ struct TPointInitPolicy : public ArrayTypeBase<BPoint>
 struct TPointAssertPolicy
 {
 	inline static BPoint Zero()		{ return BPoint(0.0, 0.0); }
-	inline static BPoint Invalid()	{ return BPoint(0.0, 0.0);}
+	inline static BPoint Invalid()	{ return BPoint(0.0, 0.0); }
+	inline static bool   Size(size_t size, BPoint& p)
+		{ return size == sizeof (p); }	
 };
 
 typedef TMessageItemTest

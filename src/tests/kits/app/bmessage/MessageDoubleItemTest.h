@@ -35,6 +35,7 @@ struct TDoubleInitPolicy : public ArrayTypeBase<double>
 	inline static double Zero()	{ return 0; }
 	inline static double Test1()	{ return 1.234; }
 	inline static double Test2()	{ return 5.678; }
+	inline static size_t SizeOf(const double&)	{ return sizeof (double); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -48,7 +49,9 @@ struct TDoubleInitPolicy : public ArrayTypeBase<double>
 struct TDoubleAssertPolicy
 {
 	inline static double Zero()		{ return 0; }
-	inline static double Invalid()	{ return 0;}
+	inline static double Invalid()	{ return 0; }
+	inline static bool   Size(size_t size, double& d)
+		{ return size == sizeof (d); }
 };
 
 typedef TMessageItemTest

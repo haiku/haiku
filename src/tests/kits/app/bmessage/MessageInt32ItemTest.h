@@ -38,6 +38,7 @@ struct TInt32InitPolicy : public ArrayTypeBase<int32>
 	inline static int32 Zero()	{ return 0; }
 	inline static int32 Test1()	{ return 1234; }
 	inline static int32 Test2()	{ return 5678; }
+	inline static size_t SizeOf(const int32&)	{ return sizeof (int32); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -48,11 +49,11 @@ struct TInt32InitPolicy : public ArrayTypeBase<int32>
 	}
 };
 
-struct TInt32AssertPolicy
-{
-	inline static int32 Zero()		{ return 0; }
-	inline static int32 Invalid()	{ return 0;}
-};
+typedef TMessageItemAssertPolicy
+<
+	int32
+>
+TInt32AssertPolicy;
 
 typedef TMessageItemTest
 <

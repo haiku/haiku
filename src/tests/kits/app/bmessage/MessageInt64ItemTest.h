@@ -35,6 +35,7 @@ struct TInt64InitPolicy : public ArrayTypeBase<int64>
 	inline static int64 Zero()	{ return 0; }
 	inline static int64 Test1()	{ return 1234; }
 	inline static int64 Test2()	{ return 5678; }
+	inline static size_t SizeOf(const int64&)	{ return sizeof (int64); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -45,11 +46,11 @@ struct TInt64InitPolicy : public ArrayTypeBase<int64>
 	}
 };
 
-struct TInt64AssertPolicy
-{
-	inline static int64 Zero()		{ return 0; }
-	inline static int64 Invalid()	{ return 0;}
-};
+typedef TMessageItemAssertPolicy
+<
+	int64
+>
+TInt64AssertPolicy;
 
 typedef TMessageItemTest
 <

@@ -35,6 +35,7 @@ struct TFloatInitPolicy : public ArrayTypeBase<float>
 	inline static float Zero()	{ return 0; }
 	inline static float Test1()	{ return 1.234; }
 	inline static float Test2()	{ return 5.678; }
+	inline static size_t SizeOf(const float&)	{ return sizeof (float); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -48,7 +49,9 @@ struct TFloatInitPolicy : public ArrayTypeBase<float>
 struct TFloatAssertPolicy
 {
 	inline static float Zero()		{ return 0; }
-	inline static float Invalid()	{ return 0;}
+	inline static float Invalid()	{ return 0; }
+	inline static bool  Size(size_t size, float& f)
+		{ return size == sizeof (f); }
 };
 
 typedef TMessageItemTest

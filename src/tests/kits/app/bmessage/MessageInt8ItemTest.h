@@ -35,6 +35,7 @@ struct TInt8InitPolicy : public ArrayTypeBase<int8>
 	inline static int8 Zero()	{ return 0; }
 	inline static int8 Test1()	{ return 16; }
 	inline static int8 Test2()	{ return 32; }
+	inline static size_t SizeOf(const int8&)	{ return sizeof (int8); }
 	inline static ArrayType Array()
 	{
 		ArrayType array;
@@ -45,11 +46,11 @@ struct TInt8InitPolicy : public ArrayTypeBase<int8>
 	}
 };
 
-struct TInt8AssertPolicy
-{
-	inline static int8 Zero()		{ return 0; }
-	inline static int8 Invalid()	{ return 0;}
-};
+typedef TMessageItemAssertPolicy
+<
+	int8
+>
+TInt8AssertPolicy;
 
 typedef TMessageItemTest
 <

@@ -3,6 +3,7 @@
 #include "../common.h"
 #include "MessageConstructTest.h"
 #include "MessageOpAssignTest.h"
+#include "MessageEasyFindTest.h"
 #include "MessageBoolItemTest.h"
 #include "MessageInt8ItemTest.h"
 #include "MessageInt16ItemTest.h"
@@ -10,10 +11,12 @@
 #include "MessageInt64ItemTest.h"
 #include "MessageBRectItemTest.h"
 #include "MessageBPointItemTest.h"
-#include "MessageEasyFindTest.h"
 #include "MessageFloatItemTest.h"
 #include "MessageDoubleItemTest.h"
+#include "MessageMessageItemTest.h"
+//#ifdef TEST_OBOS
 #include "MessageRefItemTest.h"
+//#endif
 
 Test* MessageTestSuite()
 {
@@ -21,6 +24,7 @@ Test* MessageTestSuite()
 
 	tests->addTest(TMessageConstructTest::Suite());
 	tests->addTest(TMessageOpAssignTest::Suite());
+	tests->addTest(TMessageEasyFindTest::Suite());
 	tests->addTest(TMessageBoolItemTest::Suite());
 	tests->addTest(TMessageInt8ItemTest::Suite());
 	tests->addTest(TMessageInt16ItemTest::Suite());
@@ -28,10 +32,12 @@ Test* MessageTestSuite()
 	tests->addTest(TMessageInt64ItemTest::Suite());
 	tests->addTest(TMessageBRectItemTest::Suite());
 	tests->addTest(TMessageBPointItemTest::Suite());
-	tests->addTest(TMessageEasyFindTest::Suite());
 	tests->addTest(TMessageFloatItemTest::Suite());
 	tests->addTest(TMessageDoubleItemTest::Suite());
+	tests->addTest(TMessageMessageItemTest::Suite());
+//#ifdef TEST_OBOS
 	tests->addTest(TMessageRefItemTest::Suite());
+//#endif
 
 	return tests;
 }
