@@ -717,7 +717,7 @@ wait_for_reply(sock, from, sent)
 	return (cc);
 }
 
-void
+static void
 dump_packet()
 {
 	u_char *p;
@@ -816,7 +816,7 @@ send_probe(seq, ttl, iflag, to)
 /*
  * Convert an ICMP "type" field to a printable string.
  */
-char *
+static char *
 pr_type(t)
 	u_char t;
 {
