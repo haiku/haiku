@@ -78,10 +78,10 @@ device_hooks gals_hooks = {
 	gals_control, 		/* -> control entry point */
 	gals_read,			/* -> read entry point */
 	gals_write,			/* -> write entry point */
-	NULL,				/* start select */
-	NULL,				/* stop select */
-	NULL,				/* scatter-gather read from the device */
-	NULL				/* scatter-gather write to the device */
+	gals_start,			/* start select */
+	gals_select,		/* stop select */
+	gals_vector_read,	/* scatter-gather read from the device */
+	gals_vector_write	/* scatter-gather write to the device */
 };
 
 
