@@ -48,12 +48,6 @@
 #ifndef _KERNEL_ARCH_x86_PS2MOUSE_H
 #define _KERNEL_ARCH_x86_PS2MOUSE_H
 
-#include <kernel.h>
-#include <memheap.h>
-#include <int.h>
-#include <debug.h>
-#include <devfs.h>
-#include <arch/int.h>
 #include <OS.h>
 #include <string.h>
 
@@ -64,7 +58,14 @@
 #define PS2_PORT_DATA            0x60
 #define PS2_PORT_CTRL            0x64
 
+// data port bits
+#define PS2_OBUF_FULL			 0x01
+#define PS2_IBUF_FULL			 0x02
+#define PS2_MOUSE_OBUF_FULL 	 0x20
+#define PS2_TIMEOUT				 0x40
+
 // control words
+#define PS2_CTRL_READ_CMD		 0x20
 #define PS2_CTRL_WRITE_CMD       0x60
 #define PS2_CTRL_WRITE_AUX       0xD4
 
@@ -73,32 +74,49 @@
 #define PS2_CMD_ENABLE_MOUSE     0xF4
 #define PS2_CMD_DISABLE_MOUSE    0xF5
 #define PS2_CMD_RESET_MOUSE      0xFF
+#define PS2_CMD_TEST_PASSED		 0xAA
 
 #define PS2_RES_ACK              0xFA
 #define PS2_RES_RESEND           0xFE
+#define PS2_ERROR				 0xFC
 
 // interrupts
 #define INT_PS2_MOUSE            0x0C
 
-#define PACKET_SIZE              3
+// other stuff
+#define PS2_PACKET_SIZE              3
+#define MOUSE_HISTORY_SIZE		 256
+
+
+// TODO: Move these to another file, which will be
+// included by every mouse driver, and also by the mouse
+// input server addon. At least, that's the idea.
+
+// ioctls
+enum {
+	MOUSE_GET_MOVEMENTS = 0x2773,
+	MOUSE_GET_EVENTS_COUNT = 0x2774,
+	MOUSE_GET_ACCELERATION = 0x2775,
+	MOUSE_SET_ACCELERATION = 0x2776,
+	MOUSE_SET_TYPE = 0x2778,
+	MOUSE_SET_MAP = 0x277A,
+	MOUSE_SET_CLICK_SPEED = 0x277C
+} ioctls;
 
 /*
- * mouse_data:
- * Holds the data read from the PS/2 auxiliary device.
+ * mouse_movements:
+ * Passed as parameter of the MOUSE_GET_MOVEMENTS ioctl() call.
+ * (compatible with the R5 mouse addon/driver)
  */
-typedef struct {
-	char status;
-	char delta_x;
-	char delta_y;
-} mouse_data; // mouse_data
-
-#ifdef _PS2MOUSE_
-  static mouse_data md_int;
-  static mouse_data md_read;
-  static sem_id     mouse_sem;
-  static bool       in_read;
-#endif
-
-int mouse_dev_init(kernel_args *ka);
+typedef struct mouse_movement mouse_movement;
+struct mouse_movement {
+  int32 ser_fd_index;
+  int32 buttons;
+  int32 xdelta;
+  int32 ydelta;
+  int32 click_count;
+  int32 mouse_mods;
+  int64 mouse_time;
+};
 
 #endif /* _KERNEL_ARCH_x86_PS2MOUSE_H */

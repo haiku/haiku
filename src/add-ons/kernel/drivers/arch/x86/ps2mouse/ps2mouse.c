@@ -1,9 +1,10 @@
 /*
+ * Copyright 2001-2004 Haiku, Inc.
  * ps2mouse.c:
- * PS/2 mouse device driver for NewOS and OpenBeOS.
- * Author:     Elad Lahav (elad@eldarshany.com)
- * Created:    21.12.2001
- * Modified:   11.1.2002
+ * PS/2 mouse device driver
+ * Authors (in chronological order):
+ * 		Elad Lahav (elad@eldarshany.com)
+ *		Stefano Ceccherini (burton666@libero.it)
  */
 
 /*
@@ -47,20 +48,258 @@
  * byte, on the second the X offset, and on the 3rd the Y offset.
  */
 
-#include <kernel.h>
+#include <Drivers.h>
 #include <Errors.h>
-#include <memheap.h>
-#include <int.h>
-#include <debug.h>
-#include <devfs.h>
-#include <arch/int.h>
+#include <ISA.h>
+#include <KernelExport.h>
+
 #include <string.h>
 
-#define _PS2MOUSE_
 #include "ps2mouse.h"
 
-#define DEVICE_NAME "ps2mouse"
-int32	api_version = B_CUR_DRIVER_API_VERSION;
+#define DEVICE_NAME "input/mouse/ps2/0"
+
+#define TRACE_PS2MOUSE
+#ifdef TRACE_PS2MOUSE
+	#define TRACE(x) dprintf x
+#else
+	#define TRACE(x)
+#endif
+
+#ifdef COMPILE_FOR_R5
+	 #include "cbuf_adapter.h"
+#else
+	#include <cbuf.h>
+#endif
+
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
+static isa_module_info *sIsa = NULL;
+
+static sem_id sMouseSem;
+static int32 sSync;
+static cbuf *sMouseChain;
+static bigtime_t sLastClickTime;
+static bigtime_t sClickSpeed;
+static uint32 sClickCount;
+static uint32 sButtonsState;
+
+/////////////////////////////////////////////////////////////////////////
+// ps2 protocol stuff
+
+/** Wait until the control port is ready to be written. This requires that
+ *	the "Input buffer full" and "Output buffer full" bits will both be set
+ *	to 0. Returns true if the control port is ready to be written, false
+ *	if 10ms have passed since the function has been called, and the control
+ *	port is still busy.
+ */
+
+static bool 
+wait_write_ctrl()
+{
+	int8 read;
+	int32 tries = 100;
+	TRACE(("wait_write_ctrl()\n"));
+	do {
+		read = sIsa->read_io_8(PS2_PORT_CTRL);
+		spin(100);
+	} while ((read & (PS2_IBUF_FULL | PS2_OBUF_FULL)) && tries-- > 0);
+		
+	return tries > 0;
+}
+
+
+/** Wait until the data port is ready to be written. This requires that
+ *	the "Input buffer full" bit will be set to 0.
+ */
+
+static bool 
+wait_write_data()
+{
+	int8 read;
+	int32 tries = 100;
+	TRACE(("wait_write_data()\n"));
+	do {
+		read = sIsa->read_io_8(PS2_PORT_CTRL);
+		spin(100);
+	} while ((read & PS2_IBUF_FULL) && tries-- > 0);
+		
+	return tries > 0;
+}
+
+
+/** Wait until the data port can be read from. This requires that the
+ *	"Output buffer full" bit will be set to 1.
+ */
+
+static bool 
+wait_read_data()
+{
+	int8 read;
+	int32 tries = 100;
+	TRACE(("wait_read_data()\n"));
+	do {
+		read = sIsa->read_io_8(PS2_PORT_CTRL);
+		spin(100);
+	} while (!(read & PS2_OBUF_FULL) && tries-- > 0);
+			
+	return tries > 0;
+}
+
+
+/** Writes a command byte to the data port of the PS/2 controller.
+ *	Parameters:
+ *	unsigned char, byte to write
+ */
+
+static void 
+write_command_byte(unsigned char cmd)
+{
+	TRACE(("write_command_byte()\n"));
+	if (wait_write_ctrl())
+		sIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_WRITE_CMD);
+	if (wait_write_data())
+		sIsa->write_io_8(PS2_PORT_DATA, cmd);
+}
+
+
+/** Writes a byte to the mouse device. Uses the control port to indicate
+ *	that the byte is sent to the auxiliary device (mouse), instead of the
+ *	keyboard.
+ *	Parameters:
+ *	unsigned char, byte to write
+ */
+
+static void 
+write_aux_byte(unsigned char cmd)
+{
+	TRACE(("write_aux_byte()\n"));
+	if (wait_write_ctrl())
+		sIsa->write_io_8(PS2_PORT_CTRL, PS2_CTRL_WRITE_AUX);
+	if (wait_write_data())
+		sIsa->write_io_8(PS2_PORT_DATA, cmd);
+}
+
+
+/** Reads a single byte from the data port.
+ *	Return value:
+ *	unsigned char, byte read
+ */
+
+static uint8
+read_data_byte()
+{
+	TRACE(("read_data_byte()\n"));
+	if (wait_read_data()) {
+		TRACE(("read_data_byte(): ok\n"));
+		return sIsa->read_io_8(PS2_PORT_DATA);
+	} 
+	
+	TRACE(("read_data_byte(): timeout\n"));
+	return 0;
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+// mouse functions
+
+/*
+static status_t
+ps2_reset_mouse()
+{
+	int8 read;
+	
+	TRACE(("ps2_reset_mouse()\n"));
+	read = read_data_byte();
+	
+	write_aux_byte(PS2_CMD_RESET_MOUSE);
+	read = read_data_byte();
+	
+	return B_OK;	
+}
+*/
+
+
+/** Enables or disables mouse reporting for the ps2 port.
+ */
+
+static status_t
+ps2_enable_mouse(bool enable)
+{
+	int32 tries = 2;
+	uint8 read;
+	
+	do {
+		write_aux_byte(enable ? PS2_CMD_ENABLE_MOUSE : PS2_CMD_DISABLE_MOUSE);
+		read = read_data_byte();
+		if (read == PS2_RES_ACK)
+			break;
+		spin(100);
+	} while (read == PS2_RES_RESEND && tries-- > 0);
+	
+	if (read != PS2_RES_ACK)
+		return B_ERROR;
+	
+	return B_OK;
+}
+
+
+/** Converts a packet received by the mouse to a "movement".
+ */  
+static void
+packet_to_movement(uint8 packet[], mouse_movement *movement)
+{
+	uint32 buttons = packet[0] & 7;
+	int32 xDelta = ((packet[0] & 0x10) ? 0xFFFFFF00 : 0) | packet[1];
+	int32 yDelta = ((packet[0] & 0x20) ? 0xFFFFFF00 : 0) | packet[2];
+  	bigtime_t currentTime = system_time();
+	
+  	if (buttons != 0) {
+  		if (sButtonsState == 0) {
+  			if (sLastClickTime + sClickSpeed > currentTime)
+  				sClickCount++;
+  			else
+  				sClickCount = 1;
+  		}
+  	}
+  	
+  	sLastClickTime = currentTime;
+  	sButtonsState = buttons;
+  	
+  	if (movement) {
+		movement->xdelta = xDelta;
+		movement->ydelta = yDelta;
+		movement->buttons = buttons;
+		movement->click_count = sClickCount;
+		movement->mouse_mods = 0;
+		movement->mouse_time = currentTime;
+	}
+}
+
+
+/** Read a mouse event from the mouse events chain buffer.
+ */
+static status_t
+ps2_mouse_read(mouse_movement *movement)
+{
+	status_t status;
+	uint8 packet[PS2_PACKET_SIZE];
+		
+	TRACE(("ps2_mouse_read()\n"));
+	status = acquire_sem_etc(sMouseSem, 1, B_CAN_INTERRUPT, 0);
+	if (status < B_OK)
+		return status;
+	
+	status = cbuf_memcpy_from_chain(packet, sMouseChain, 0, PS2_PACKET_SIZE);	
+	if (status < B_OK) {
+		TRACE(("error copying buffer\n"));
+		return status;
+	}
+	
+  	packet_to_movement(packet, movement);
+  		
+	return B_OK;		
+}
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -73,45 +312,36 @@ int32	api_version = B_CUR_DRIVER_API_VERSION;
  *	by read() operations. The full data is obtained using 3 consecutive
  *	calls to the handler, each holds a different byte on the data port.
  */
-
 static int32 
 handle_mouse_interrupt(void* data)
 {
-	char c;
-	static int next_input = 0;
-
-	// read port
-	c = in8(PS2_PORT_DATA);
-
-	// put port contents in the appropriate data member, according to
-	// current cycle
-	switch (next_input) {
-	// status byte
-	case 0:
-		md_int.status = c;
-		break;
-
-	// x-axis change
-	case 1:
-		md_int.delta_x += c;
-		break;
-
-	// y-axis change
-	case 2:
-		md_int.delta_y += c;
-
-		// check if someone is waiting to read data
-		if (in_read) {
-		   // copy data to read structure, and release waiting process
-         memcpy(&md_read, &md_int, sizeof(mouse_data));
-			memset(&md_int, 0, sizeof(mouse_data));
-			in_read = false;
-	      release_sem_etc(mouse_sem, 1, B_DO_NOT_RESCHEDULE);
-		} // if
-		break;
-	} // switch
-
-	next_input = (next_input + 1) % 3;
+	int8 read;
+	TRACE(("mouse interrupt occurred!!!\n"));
+	
+	read = sIsa->read_io_8(PS2_PORT_CTRL);
+	TRACE(("PS2_PORT_CTRL: %02x\n", read));
+	
+	if (read < 0) {
+		TRACE(("Interrupt was not generated by the ps2 mouse\n"));
+		return B_UNHANDLED_INTERRUPT;
+	}
+	
+	read = read_data_byte();
+	cbuf_memcpy_to_chain(sMouseChain, 0, &read, sizeof(read));
+	
+	if (sSync == 0 && !(read & 8)) {
+		TRACE(("mouse resynched, bad data\n"));
+		return B_HANDLED_INTERRUPT;
+	}
+		
+	if (sSync++ == 2) {
+		TRACE(("mouse synched\n"));
+		sSync = 0;
+		release_sem_etc(sMouseSem, 1, B_DO_NOT_RESCHEDULE);
+		
+		return B_INVOKE_SCHEDULER;
+	}
+	
 	return B_HANDLED_INTERRUPT;
 }
 
@@ -123,14 +353,35 @@ handle_mouse_interrupt(void* data)
 static status_t 
 mouse_open(const char *name, uint32 flags, void **cookie)
 {
+	status_t status;	
+	TRACE(("mouse_open()\n"));	
+	
 	*cookie = NULL;
-	return B_OK;
+		
+	write_command_byte(PS2_CMD_DEV_INIT);	
+	status = ps2_enable_mouse(true);
+	if (status < B_OK) {
+		TRACE(("mouse_open(): cannot enable PS/2 mouse\n"));	
+		return B_ERROR;
+	}
+		
+	TRACE(("mouse_open(): mouse succesfully enabled\n"));
+		
+	// register interrupt handler
+	status = install_io_interrupt_handler(INT_PS2_MOUSE, handle_mouse_interrupt, NULL, 0);
+
+	return status;
 }
 
 
 static status_t 
 mouse_close(void * cookie)
 {
+	TRACE(("mouse_close()\n"));
+	ps2_enable_mouse(false);
+	
+	remove_io_interrupt_handler(INT_PS2_MOUSE, &handle_mouse_interrupt, NULL);
+	
 	return B_OK;
 }
 
@@ -153,29 +404,8 @@ mouse_freecookie(void * cookie)
 static status_t
 mouse_read(void *cookie, off_t pos, void *buf, size_t *len)
 {
-	// inform interrupt handler that data is being waited for
-	in_read = true;
-
-	// wait until there is data to read
-	if (acquire_sem_etc(mouse_sem, 1, B_CAN_INTERRUPT, 0) == B_INTERRUPTED) {
-		*len = 0;
-		return B_OK;
-	}
-
-	// verify user's buffer is of the right size
-	if (*len < PACKET_SIZE) {
-		*len = 0;
-		/* XXX - should return an error here */
-		return B_OK;
-	}
-
-	// copy data to user's buffer
-	((char*)buf)[0] = md_read.status;
-	((char*)buf)[1] = md_read.delta_x;
-	((char*)buf)[2] = md_read.delta_y;
-
-	*len = PACKET_SIZE;
-	return B_OK;
+	*len = 0;
+	return EROFS;
 }
 
 
@@ -188,9 +418,25 @@ mouse_write(void * cookie, off_t pos, const void *buf, size_t *len)
 
 
 static status_t 
-mouse_ioctl(void * cookie, uint32 op, void *buf, size_t len)
+mouse_ioctl(void *cookie, uint32 op, void *buf, size_t len)
 {
-	return EINVAL;
+	mouse_movement *movement = (mouse_movement *)buf;
+	switch (op) {
+		case MOUSE_GET_EVENTS_COUNT:
+		{
+			int32 count;
+			TRACE(("PS2_GET_EVENT_COUNT\n"));
+			get_sem_count(sMouseSem, &count);
+			return count;
+		}
+		case MOUSE_GET_MOVEMENTS:
+			TRACE(("PS2_GET_MOUSE_MOVEMENTS\n"));	
+			return ps2_mouse_read(movement);
+		
+		default:
+			TRACE(("unknown opcode: %ld\n", op));
+			return EINVAL;
+	}
 }
 
 /*
@@ -214,93 +460,10 @@ device_hooks ps2_mouse_hooks = {
 // initialization
 
 
-/** Wait until the control port is ready to be written. This requires that
- *	the "Input buffer full" and "Output buffer full" bits will both be set
- *	to 0.
- */
-
-static void 
-wait_write_ctrl()
-{
-	while (in8(PS2_PORT_CTRL) & 0x3);
-}
-
-
-/** Wait until the data port is ready to be written. This requires that
- *	the "Input buffer full" bit will be set to 0.
- */
-
-static void 
-wait_write_data()
-{
-	while (in8(PS2_PORT_CTRL) & 0x2);
-}
-
-
-/** Wait until the data port can be read from. This requires that the
- *	"Output buffer full" bit will be set to 1.
- */
-
-static void 
-wait_read_data()
-{
-	while ((in8(PS2_PORT_CTRL) & 0x1) == 0);
-}
-
-
-/** Writes a command byte to the data port of the PS/2 controller.
- *	Parameters:
- *	unsigned char, byte to write
- */
-
-static void 
-write_command_byte(unsigned char b)
-{
-	wait_write_ctrl();
-	out8(PS2_CTRL_WRITE_CMD, PS2_PORT_CTRL);
-	wait_write_data();
-	out8(b, PS2_PORT_DATA);
-}
-
-
-/** Writes a byte to the mouse device. Uses the control port to indicate
- *	that the byte is sent to the auxiliary device (mouse), instead of the
- *	keyboard.
- *	Parameters:
- *	unsigned char, byte to write
- */
-
-static void 
-write_aux_byte(unsigned char b)
-{
-	wait_write_ctrl();
-	out8(PS2_CTRL_WRITE_AUX, PS2_PORT_CTRL);
-	wait_write_data();
-	out8(b, PS2_PORT_DATA);
-}
-
-
-/** Reads a single byte from the data port.
- *	Return value:
- *	unsigned char, byte read
- */
-
-static unsigned char 
-read_data_byte()
-{
-	wait_read_data();
-	return in8(PS2_PORT_DATA);
-}
-
-
 status_t 
 init_hardware()
 {
-	/* XXX this driver does not have enough source code to 
-	 * disable the mouse hardware again, so I can't add
-	 * the detection here 
-	 */
-	dprintf("Should detect PS/2 mouse here, always assuming we have it\n");
+	/* Mouse is detected in init_hardware */
 	return B_OK;
 }
 
@@ -316,6 +479,7 @@ publish_devices(void)
 	return devices;
 }
 
+
 device_hooks *
 find_device(const char *name)
 {
@@ -325,37 +489,47 @@ find_device(const char *name)
 	return NULL;
 }
 
+
 status_t 
 init_driver()
 {
-	/* XXX parts of this do belong into init_hardware */
-
-	dprintf("Initializing PS/2 mouse\n");
-
-	// init device driver
-	memset(&md_int, 0, sizeof(mouse_data));
-
-	// enable auxilary device, IRQs and PS/2 mouse
-	write_command_byte(PS2_CMD_DEV_INIT);
-	write_aux_byte(PS2_CMD_ENABLE_MOUSE);
-
-	// controller should send ACK if mouse was detected
-	if (read_data_byte() != PS2_RES_ACK) {
-		dprintf("No PS/2 mouse found\n");
-		return -1;
+	status_t status;
+	
+	status = get_module(B_ISA_MODULE_NAME, (module_info **)&sIsa);
+	if (status < B_OK) {
+		TRACE(("Failed getting isa module: %s\n", strerror(status)));	
+		return status;
 	}
+	
+	// Check if there's a mouse, and disable it
+	status = ps2_enable_mouse(false);
+	if (status < B_OK) {
+		TRACE(("can't find a ps2 mouse\n"));
+		put_module(B_ISA_MODULE_NAME);
+		return B_ERROR;
+	}
+		
+	TRACE(("A PS/2 mouse has been successfully detected\n"));
 
-	dprintf("A PS/2 mouse has been successfully detected\n");
-
+	sMouseChain = cbuf_get_chain(MOUSE_HISTORY_SIZE);
+	if (sMouseChain == NULL) {
+		TRACE(("can't allocate cbuf chain\n"));
+		put_module(B_ISA_MODULE_NAME);
+		return B_ERROR;
+	}
+	
 	// create the mouse semaphore, used for synchronization between
-	// the interrupt handler and the read() operation
-	mouse_sem = create_sem(0, "ps2_mouse_sem");
-	if (mouse_sem < 0)
-		panic("failed to create PS/2 mouse semaphore!\n");
-
-	// register interrupt handler
-	install_io_interrupt_handler(INT_PS2_MOUSE, &handle_mouse_interrupt, NULL, 0);
-
+	// the interrupt handler and the read operation
+	sMouseSem = create_sem(0, "ps2_mouse_sem");
+	if (sMouseSem < 0) {
+		TRACE(("failed creating PS/2 mouse semaphore!\n"));
+		cbuf_free_chain(sMouseChain);
+		put_module(B_ISA_MODULE_NAME);
+		return sMouseSem;
+	}
+	
+	set_sem_owner(sMouseSem, B_SYSTEM_TEAM);
+	
 	return B_OK;
 }
 
@@ -363,6 +537,7 @@ init_driver()
 void 
 uninit_driver()
 {
-	remove_io_interrupt_handler(INT_PS2_MOUSE, &handle_mouse_interrupt, NULL);
-	dprintf("removed PS/2 mouse interrupt handler\n");
+	cbuf_free_chain(sMouseChain);
+	delete_sem(sMouseSem);
+	put_module(B_ISA_MODULE_NAME);	
 }
