@@ -1,5 +1,6 @@
 INTERFACE_KIT_SOURCE =
 	Alert.cpp
+	Bitmap.cpp
 	Box.cpp
 	Button.cpp
 	CheckBox.cpp
