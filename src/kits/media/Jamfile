@@ -82,3 +82,5 @@ LinkSharedOSLibs libmedia.so :
 	be
 ;
 
+MakeLocate <develop>libmedia.so : $(OBOS_STLIB_DIR) ;
+RelSymLink <develop>libmedia.so : libmedia.so ;
