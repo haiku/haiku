@@ -1,5 +1,13 @@
 SubDir OBOS_TOP src add-ons input_server filters screensaver ;
 
+# XXX: Move the ScreenSaverPrefs.h header to
+# headers/private/servers/screensaver, remove the following line and
+# uncomment the next one.
+#
+SubDirHdrs [ FDirName $(OBOS_TOP) src servers screensaver ] ;
+# PrivateHeaders servers/screensaver ;
+
 Addon screen_saver : input_server/filters : SSInputFilter.cpp ;
 
-LinkSharedOSLibs screen_saver : be ../../../../../distro/x86.R1/beos/system/lib/libscreensaver.so _APP_ ;
+LinkSharedOSLibs screen_saver
+	: be libscreensaver.so /system/servers/input_server ;
