@@ -5,6 +5,7 @@
 
 
 #include "console.h"
+#include "cpu.h"
 #include "mmu.h"
 
 #include <SupportDefs.h>
@@ -55,7 +56,7 @@ platform_user_menu_requested(void)
 void
 platform_start_kernel(void)
 {
-	struct kernel_args *args = &gKernelArgs;
+	static struct kernel_args *args = &gKernelArgs;
 		// something goes wrong when we pass &gKernelArgs directly
 		// to the assembler inline below - might be a bug in GCC
 		// or I don't see something important...
@@ -63,7 +64,7 @@ platform_start_kernel(void)
 	mmu_init_for_kernel();
 	//cpu_boot_other_cpus();
 
-	printf("kernel entry at %lx\n", gKernelEntry);
+	printf("kernel entry at %lx\n", gKernelArgs.kernel_image.elf_header.e_entry);
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -73,7 +74,7 @@ platform_start_kernel(void)
 		"pushl 	$0x0;"					// dummy retval for call to main
 		"pushl 	%1;	"					// this is the start address
 		"ret;		"					// jump.
-		: : "g" (args), "g" (gKernelEntry));
+		: : "g" (args), "g" (gKernelArgs.kernel_image.elf_header.e_entry));
 }
 
 

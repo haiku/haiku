@@ -81,7 +81,7 @@ determine_machine(void)
 void
 platform_start_kernel(void)
 {
-	printf("kernel entry at %p\n", (void *)gKernelEntry);
+	printf("kernel entry at %p\n", (void *)gKernelArgs.kernel_image.elf_header.e_entry);
 	of_exit();
 }
 
