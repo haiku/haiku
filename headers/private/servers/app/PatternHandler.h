@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -21,47 +21,65 @@
 //
 //	File Name:		PatternHandler.h
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class for easy calculation and use of patterns
 //  
 //------------------------------------------------------------------------------
-#ifndef PATTERNHADLER_H
-#define PATTERNHADLER_H
+#ifndef PATTERNHANDLER_H
+#define PATTERNHANDLER_H
 
-#include <SupportDefs.h>
+#include <string.h>
+#include <GraphicsDefs.h>
 #include "RGBColor.h"
 
-class Pattern
-{
-public:
+class Pattern {
+ public:
 
-	Pattern(void) {} 
+								Pattern(void) {} 
 
-	Pattern(const uint64 &pat) { _pat.type64=pat; }
+								Pattern(const uint64& p)
+									{ fPattern.type64 = p; }
 
-	Pattern(int8 *pat) { _pat.type64=*((uint64*)pat); }
+								Pattern(const int8* p)
+									{ fPattern.type64 = *((const uint64*)p); }
 	
-	Pattern(const Pattern &src) { _pat.type64=src._pat.type64; }
+								Pattern(const Pattern& src)
+									{ fPattern.type64 = src.fPattern.type64; }
 
-	const int8 *GetInt8(void) const { return _pat.type8; }
+			const int8*			GetInt8(void) const
+									{ return fPattern.type8; }
 
-	uint64 GetInt64(void) const { return _pat.type64; }
+			uint64				GetInt64(void) const
+									{ return fPattern.type64; }
 
-	void Set(int8 *pat) { _pat.type64=*((uint64*)pat); }
+			void				Set(const int8* p)
+									{ fPattern.type64 = *((const uint64*)p); }
 
-	void Set(const uint64 &pat) { _pat.type64=pat; }
+			void				Set(const uint64& p)
+									{ fPattern.type64 = p; }
 
-	Pattern & operator=(const Pattern &from) { _pat.type64=from._pat.type64; return *this; }
-	Pattern & operator=(const int64 &from) { _pat.type64=from; return *this; }
-private:
+			Pattern&			operator=(const Pattern& from)
+									{ fPattern.type64 = from.fPattern.type64; return *this; }
+
+			Pattern&			operator=(const int64 &from)
+									{ fPattern.type64 = from; return *this; }
+
+			Pattern&			operator=(const pattern &from)
+									{ memcpy(&fPattern.type64, &from, sizeof(pattern)); return *this; }
+ private:
 
 	typedef union
 	{
-		uint64 type64;
-		int8 type8[8];
+		uint64	type64;
+		int8	type8[8];
 	} pattern_union;
 
-	pattern_union _pat;
+			pattern_union		fPattern;
 };
+
+extern const Pattern kSolidHigh;
+extern const Pattern kSolidLow;
+extern const Pattern kMixedColors;
 
 /*!
 	\brief Class for easy calculation and use of patterns
@@ -71,30 +89,70 @@ private:
 	SetTarget, and then merely retrieving the value for the coordinates 
 	specified. 
 */
-class PatternHandler
-{
-public:
-	PatternHandler(void);
-	PatternHandler(int8 *pat);
-	PatternHandler(const uint64 &pat);
-	PatternHandler(const Pattern &pat);
-	~PatternHandler(void);
-	void SetTarget(int8 *pat);
-	void SetTarget(const uint64 &pat);
-	void SetTarget(const Pattern &pat);
-	void SetColors(const RGBColor &high, const RGBColor &low);
-	RGBColor GetColor(const BPoint &pt);
-	RGBColor GetColor(const float &x, const float &y);
-	bool GetValue(const float &x, const float &y);
-	bool GetValue(const BPoint &pt);
-	pattern *GetR5Pattern(void) { return (pattern*)_pat.GetInt8(); }
-private:
-	Pattern _pat;
-	RGBColor *_high,*_low;
+class PatternHandler {
+ public:
+								PatternHandler(void);
+								PatternHandler(const int8* p);
+								PatternHandler(const uint64& p);
+								PatternHandler(const Pattern& p);
+								PatternHandler(const PatternHandler& other);
+			virtual				~PatternHandler(void);
+
+			void				SetPattern(const int8* p);
+			void				SetPattern(const uint64& p);
+			void				SetPattern(const Pattern& p);
+			void				SetPattern(const pattern& p);
+			void				SetColors(const RGBColor& high, const RGBColor& low);
+			void				SetHighColor(const RGBColor& color);
+			void				SetLowColor(const RGBColor& color);
+
+			RGBColor			HighColor() const
+									{ return fHighColor; }
+			RGBColor			LowColor() const
+									{ return fLowColor; }
+
+			RGBColor			ColorAt(const BPoint& pt) const;
+			RGBColor			ColorAt(float x, float y) const;
+	inline	RGBColor			ColorAt(int x, int y) const;
+
+			bool				IsHighColor(const BPoint& pt) const;
+	inline	bool				IsHighColor(int x, int y) const;
+
+			const pattern*		GetR5Pattern(void) const
+									{ return (const pattern*)fPattern.GetInt8(); }
+ private:
+			Pattern				fPattern;
+			RGBColor			fHighColor;
+			RGBColor			fLowColor;
 };
 
-extern const Pattern pat_solidhigh;
-extern const Pattern pat_solidlow;
-extern const Pattern pat_mixedcolors;
+/*!
+	\brief Obtains the color in the pattern at the specified coordinates
+	\param x X coordinate to get the color for
+	\param y Y coordinate to get the color for
+	\return Color for the coordinates
+*/
+inline	RGBColor
+PatternHandler::ColorAt(int x, int y) const
+{
+	return IsHighColor(x, y) ? fHighColor : fLowColor;
+}
+
+/*!
+	\brief Obtains the value of the pattern at the specified coordinates
+	\param pt Coordinates to get the value for
+	\return Value for the coordinates - true if high, false if low.
+*/
+inline	bool
+PatternHandler::IsHighColor(int x, int y) const
+{
+	// TODO: Does this work correctly for
+	// negative coordinates?!?
+	const int8* ptr = fPattern.GetInt8();
+	int32 value = ptr[y % 8] & (1 << (7 - (x % 8)) );
+	
+	return (value == 0) ? false : true;
+	
+}
 
 #endif
