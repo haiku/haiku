@@ -26,22 +26,6 @@ enum {
 	NOT_IMPLEMENTED	= B_ERROR,
 };
 
-
-// ===========================================================================
-// Hack to get a BMessenger's port and token.
-
-class _TRoster_ {
-public:
-	static inline void get_messenger_port_token(const BMessenger &messenger,
-												port_id &port, int32 &token)
-	{
-		port = messenger.fPort;
-		token = messenger.fHandlerToken;
-	}
-};
-// ===========================================================================
-
-
 // BQuery
 
 // constructor
@@ -406,7 +390,8 @@ BQuery::SetTarget(BMessenger messenger)
 	if (error == B_OK && _HasFetched())
 		error = B_NOT_ALLOWED;
 	if (error == B_OK) {
-		_TRoster_::get_messenger_port_token(messenger, fPort, fToken);
+		fPort = messenger.fPort;
+		fToken = messenger.fHandlerToken;
 		fLive = true;
 	}
 	return error;
