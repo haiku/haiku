@@ -80,6 +80,7 @@ benaphore_lock(benaphore *ben)
 	return B_OK;
 }
 
+
 static inline status_t
 benaphore_unlock(benaphore *ben)
 {

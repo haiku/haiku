@@ -2298,6 +2298,7 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 	aspace_id areaSpace;
 
 	switch (addressSpec) {
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_EXACT_KERNEL_ADDRESS:
 			areaSpace = vm_get_kernel_aspace_id();
@@ -2307,6 +2308,7 @@ create_area(const char *name, void **address, uint32 addressSpec, size_t size, u
 			break;
 	}
 	switch (addressSpec) {
+		case B_ANY_KERNEL_BLOCK_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_ADDRESS:
 			addressSpec = REGION_ADDR_ANY_ADDRESS;

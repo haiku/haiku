@@ -161,7 +161,7 @@ enum {
 
 	// ToDo: these are here only temporarily - it's a private
 	//	addition to the BeOS create_area() flags
-	B_EXACT_KERNEL_ADDRESS = 5
+	B_EXACT_KERNEL_ADDRESS = 6
 };
 
 enum {
