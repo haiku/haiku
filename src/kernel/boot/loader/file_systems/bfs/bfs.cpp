@@ -18,6 +18,14 @@
 #include <stdio.h>
 
 
+#define TRACE_BFS 0
+#if TRACE_BFS
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
 using namespace BFS;
 
 
@@ -45,13 +53,14 @@ Volume::Volume(boot::Partition *partition)
 #endif
 	}
 
-	printf("we do have a valid BFS super block (name = %s)!\n", fSuperBlock.name);
+	TRACE(("bfs: we do have a valid super block (name = %s)!\n", fSuperBlock.name));
 
 	fRootNode = new BFS::Directory(*this, Root());
 	if (fRootNode == NULL)
 		return;
 
 	if (fRootNode->InitCheck() < B_OK) {
+		TRACE(("bfs: init check for root node failed\n"));
 		delete fRootNode;
 		fRootNode = NULL;
 		return;
@@ -102,7 +111,7 @@ Volume::ValidateBlockRun(block_run run)
 		|| run.Start() > (1UL << AllocationGroupShift())
 		|| run.length == 0
 		|| uint32(run.Length() + run.Start()) > (1UL << AllocationGroupShift())) {
-		panic("bfs: invalid run(%ld,%d,%d)\n", run.AllocationGroup(), run.Start(), run.Length());
+		dprintf("bfs: invalid run(%ld,%d,%d)\n", run.AllocationGroup(), run.Start(), run.Length());
 		return B_BAD_DATA;
 	}
 	return B_OK;
