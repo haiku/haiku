@@ -65,6 +65,15 @@ typedef struct
 
 } cursor_data;
 
+typedef struct
+{
+	BPoint pt1;
+	BPoint pt2;
+	rgb_color color;
+
+} LineArrayData;
+
+
 #ifndef HOOK_DEFINE_CURSOR
 
 #define HOOK_DEFINE_CURSOR		0
@@ -202,7 +211,7 @@ public:
 	virtual bool DumpToFile(const char *path);
 	virtual ServerBitmap *DumpToBitmap(void);
 	virtual void InvertRect(const BRect &r);
-	virtual void StrokeLineArray(BPoint *pts, const int32 &numlines, const DrawData *d, RGBColor *colors);
+	virtual void StrokeLineArray(const int32 &numlines, const LineArrayData *data, const DrawData *d);
 
 	virtual status_t SetDPMSMode(const uint32 &state);
 	virtual uint32 DPMSMode(void) const;
