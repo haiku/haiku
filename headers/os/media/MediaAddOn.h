@@ -109,7 +109,7 @@ virtual	status_t GetConfigurationFor(
 				BMessage * into_message);
 virtual	bool WantsAutoStart();
 virtual	status_t AutoStart(
-				int in_count,
+				int in_index,
 				BMediaNode ** out_node,
 				int32 * out_internal_id,
 				bool * out_has_more);

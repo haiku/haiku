@@ -55,6 +55,17 @@ static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@O
 
 void DumpFlavorInfo(const flavor_info *info);
 
+struct AddOnInfo
+{
+	media_addon_id id;
+	bool wants_autostart;
+	int32 flavor_count;
+	
+	List<media_node> active_flavors;
+
+	BMediaAddOn *addon; // if != NULL, need to call _DormantNodeManager->PutAddon(id)
+};
+
 class MediaAddonServer : BApplication
 {
 public:
@@ -68,11 +79,16 @@ public:
 	void AddOnRemoved(ino_t file_node);
 	void HandleMessage(int32 code, const void *data, size_t size);
 	static int32 controlthread(void *arg);
+
+	void PutAddonIfPossible(AddOnInfo *info);
+	void InstantiatePhysialInputsAndOutputs(AddOnInfo *info);
+	void InstantiateAutostartFlavors(AddOnInfo *info);
+	void DestroyInstantiatedFlavors(AddOnInfo *info);
 	
 	void ScanAddOnFlavors(BMediaAddOn *addon);
 
 	Map<ino_t, media_addon_id> *filemap;
-	Map<media_addon_id, int32> *flavorcountmap;
+	Map<media_addon_id, AddOnInfo> *infomap;
 
 	BMediaRoster *mediaroster;
 	ino_t		DirNodeSystem;
@@ -88,9 +104,9 @@ MediaAddonServer::MediaAddonServer(const char *sig) :
 {
 	mediaroster = BMediaRoster::Roster();
 	filemap = new Map<ino_t, media_addon_id>;
-	flavorcountmap = new Map<media_addon_id, int32>;
-	control_port = create_port(64,"media_addon_server port");
-	control_thread = spawn_thread(controlthread,"media_addon_server control",12,this);
+	infomap = new Map<media_addon_id, AddOnInfo>;
+	control_port = create_port(64, "media_addon_server port");
+	control_thread = spawn_thread(controlthread, "media_addon_server control", 12, this);
 	resume_thread(control_thread);
 }
 
@@ -106,7 +122,7 @@ MediaAddonServer::~MediaAddonServer()
 		_DormantNodeManager->UnregisterAddon(*id);
 	
 	delete filemap;
-	delete flavorcountmap;
+	delete infomap;
 }
 
 void 
@@ -160,6 +176,10 @@ MediaAddonServer::controlthread(void *arg)
 void 
 MediaAddonServer::ReadyToRun()
 {
+	// the control thread is already running at this point,
+	// so we can talk to the media server and also receive
+	// commands for instantiation
+
 	// register with media_server
 	server_register_addonserver_request request;
 	server_register_addonserver_reply reply;
@@ -172,7 +192,13 @@ MediaAddonServer::ReadyToRun()
 		return;
 	}
 
-	fStartup = true;
+	ASSERT(fStartup == true);
+
+	// During startup, first all add-ons are loaded, then all
+	// nodes (flavors) representing physical inputs and outputs
+	// are instantiated. Next, all add-ons that need autostart
+	// will be autostarted. Finally, add-ons that don't have
+	// any active nodes (flavors) will be unloaded.
 
 	// load dormant media nodes
 	node_ref nref;
@@ -191,7 +217,21 @@ MediaAddonServer::ReadyToRun()
 	WatchDir(&e2);
 	
 	fStartup = false;
+	
+	AddOnInfo *info;
+	
+	infomap->Rewind();
+	while (infomap->GetNext(&info))
+		InstantiatePhysialInputsAndOutputs(info);
 
+	infomap->Rewind();
+	while (infomap->GetNext(&info))
+		InstantiateAutostartFlavors(info);
+
+	infomap->Rewind();
+	while (infomap->GetNext(&info))
+		PutAddonIfPossible(info);
+	
 	server_rescan_defaults_command cmd;
 	SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
 }
@@ -199,7 +239,7 @@ MediaAddonServer::ReadyToRun()
 void 
 MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 {
-	int32 *flavorcount;
+	AddOnInfo *info;
 	int32 oldflavorcount;
 	int32 newflavorcount;
 	media_addon_id addon_id;
@@ -223,11 +263,11 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 	addon_id = addon->AddonID();
 	
 	// update the cached flavor count, get oldflavorcount and newflavorcount
-	b = flavorcountmap->Get(addon->AddonID(), &flavorcount);
+	b = infomap->Get(addon_id, &info);
 	ASSERT(b);
-	oldflavorcount = *flavorcount;
+	oldflavorcount = info->flavor_count;
 	newflavorcount = addon->CountFlavors();
-	*flavorcount = newflavorcount;
+	info->flavor_count = newflavorcount;
 	
 	TRACE("%ld old flavors, %ld new flavors\n", oldflavorcount, newflavorcount);
 
@@ -296,6 +336,8 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 		return;
 	}
 	
+	TRACE("MediaAddonServer::AddOnAdded: loading addon %d now...\n", id);
+
 	addon = _DormantNodeManager->GetAddon(id);
 	if (addon == NULL) {
 		FATAL("MediaAddonServer::AddOnAdded: failed to get add-on %s\n", path);
@@ -305,73 +347,142 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 
 	TRACE("MediaAddonServer::AddOnAdded: loading finished, id %ld\n", id);
 
+	// put file's inode and addon's id into map
 	filemap->Insert(file_node, id);
-	flavorcountmap->Insert(id, 0);
-
-	ScanAddOnFlavors(addon);
 	
-	if (addon->WantsAutoStart())
+	// also create AddOnInfo struct and get a pointer so
+	// we can modify it
+	AddOnInfo tempinfo;
+	infomap->Insert(id, tempinfo);
+	AddOnInfo *info;
+	infomap->Get(id, &info);
+
+	// setup
+	info->id = id;
+	info->wants_autostart = false; // temporary default
+	info->flavor_count = 0;
+	info->addon = addon; 
+
+	// scan the flavors
+	ScanAddOnFlavors(addon);
+
+	// need to call BMediaNode::WantsAutoStart()
+	// after the flavors have been scanned
+	info->wants_autostart = addon->WantsAutoStart();
+	
+	if (info->wants_autostart)
 		FATAL("#### add-on %ld WantsAutoStart!\n", id);
 
-/*
- * the mixer (which we can't load because of unresolved symbols)
- * is the only node that uses autostart (which is not implemented yet)
- */
+	// During startup, first all add-ons are loaded, then all
+	// nodes (flavors) representing physical inputs and outputs
+	// are instantiated. Next, all add-ons that need autostart
+	// will be autostarted. Finally, add-ons that don't have
+	// any active nodes (flavors) will be unloaded.
 
-/*
-loading BMediaAddOn from /boot/beos/system/add-ons/media/mixer.media_addon
-adding media add-on -1
-1 flavors:
-flavor 0:
-  internal_id = 0
-  name = Be Audio Mixer
-  info = The system-wide sound mixer of the future.
-  flavor_flags = 0x0
-  kinds = 0x40003 B_BUFFER_PRODUCER B_BUFFER_CONSUMER B_SYSTEM_MIXER
-  in_format_count = 1
-  out_format_count = 1
-#### WantsAutoStart!
-*/
-
-/*
-	if (addon->WantsAutoStart()) {
-		for (int32 index = 0; ;index++) {
-			BMediaNode *outNode;
-			int32 outInternalID;
-			bool outHasMore;
-			rv = addon->AutoStart(index, &outNode, &outInternalID, &outHasMore);
-			if (rv == B_OK) {
-				printf("started node %ld\n",index);
-				rv = mediaroster->RegisterNode(outNode);
-				if (rv != B_OK)
-					printf("failed to register node %ld\n",index);
-				if (!outHasMore)
-//					break;
-					return;
-			} else if (rv == B_MEDIA_ADDON_FAILED && outHasMore) {
-				continue;
-			} else {
-				break;
-			}
-		}
-		return;
-	}
-*/
-
+	// After startup is done, we simply do it for each new
+	// loaded add-on, too.
 	if (!fStartup) {
+		InstantiatePhysialInputsAndOutputs(info);
+		InstantiateAutostartFlavors(info);
+		PutAddonIfPossible(info);
+
+		// since something might have changed
 		server_rescan_defaults_command cmd;
-		SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));
+		SendToServer(SERVER_RESCAN_DEFAULTS, &cmd, sizeof(cmd));	
 	}
 
-	_DormantNodeManager->PutAddon(id);
+	// we do not call _DormantNodeManager->PutAddon(id)
+	// since it is done by PutAddonIfPossible()
 }
 
+void
+MediaAddonServer::DestroyInstantiatedFlavors(AddOnInfo *info)
+{
+	printf("MediaAddonServer::DestroyInstantiatedFlavors");
+}
+
+void
+MediaAddonServer::PutAddonIfPossible(AddOnInfo *info)
+{
+	if (info->addon && info->active_flavors.IsEmpty()) {
+		_DormantNodeManager->PutAddon(info->id);
+		info->addon = NULL;
+	}
+}
+
+void
+MediaAddonServer::InstantiatePhysialInputsAndOutputs(AddOnInfo *info)
+{
+	int count = info->addon->CountFlavors();
+	for (int i = 0; i < count; i++) {
+		const flavor_info *flavorinfo;
+		if (B_OK != info->addon->GetFlavorAt(i, &flavorinfo)) {
+			FATAL("MediaAddonServer::InstantiatePhysialInputsAndOutputs GetFlavorAt failed for index %d!\n", i);
+			continue;
+		}
+		if (flavorinfo->kinds & (B_PHYSICAL_INPUT | B_PHYSICAL_OUTPUT)) {
+			media_node node;
+			status_t rv;
+
+			dormant_node_info dni;
+			dni.addon = info->id;
+			dni.flavor_id = flavorinfo->internal_id;
+			strcpy(dni.name, flavorinfo->name);
+			
+			printf("MediaAddonServer::InstantiatePhysialInputsAndOutputs: \"%s\" is a physical input/output\n", flavorinfo->name);
+			rv = mediaroster->InstantiateDormantNode(dni, &node);
+			if (rv != B_OK) {
+				printf("Couldn't instantiate node\n");
+			} else {
+				printf("Node created!\n");
+				info->active_flavors.Insert(node);
+			}
+		}
+	}
+}
+
+void
+MediaAddonServer::InstantiateAutostartFlavors(AddOnInfo *info)
+{
+	if (!info->wants_autostart)
+		return;
+		
+	for (int32 index = 0; ;index++) {
+		BMediaNode *outNode;
+		int32 outInternalID;
+		bool outHasMore;
+		status_t rv;
+		printf("trying autostart of node %ld, index %ld\n", info->id, index);
+		rv = info->addon->AutoStart(index, &outNode, &outInternalID, &outHasMore);
+		if (rv == B_OK) {
+			printf("started node\n",index);
+
+			// XXX IncrementAddonFlavorInstancesCount
+
+			rv = MediaRosterEx(mediaroster)->RegisterNode(outNode, info->id, outInternalID);
+			if (rv != B_OK) {
+				printf("failed to register node %ld\n",index);
+				// XXX DecrementAddonFlavorInstancesCount
+			}
+			
+			info->active_flavors.Insert(outNode->Node());
+			
+			if (!outHasMore)
+				return;
+		} else if (rv == B_MEDIA_ADDON_FAILED && outHasMore) {
+			continue;
+		} else {
+			break;
+		}
+	}
+}
 
 void
 MediaAddonServer::AddOnRemoved(ino_t file_node)
 {	
 	media_addon_id *tempid;
 	media_addon_id id;
+	AddOnInfo *info;
 	int32 *tempflavorcount;
 	int32 oldflavorcount;
 	// XXX locking?
@@ -383,14 +494,22 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 	id = *tempid; // tempid pointer is invalid after Removing() it from the map
 	filemap->Remove(file_node);
 	
-	if (!flavorcountmap->Get(id, &tempflavorcount)) {
-		FATAL("MediaAddonServer::AddOnRemoved: couldn't get flavor count for add-on %ld\n", id);
+	if (!infomap->Get(id, &info)) {
+		FATAL("MediaAddonServer::AddOnRemoved: couldn't get addon info for add-on %ld\n", id);
 		oldflavorcount = 1000;
 	} else {
-		oldflavorcount = *tempflavorcount; //same reason as above
-	}
-	flavorcountmap->Remove(id);
+		oldflavorcount = info->flavor_count; //same reason as above
 	
+		DestroyInstantiatedFlavors(info);
+		PutAddonIfPossible(info);
+	
+		if (info->addon) {
+			FATAL("MediaAddonServer::AddOnRemoved: couldn't unload addon %ld since flavors are in use\n", id);
+		}
+	}
+
+		
+	infomap->Remove(id);
 	_DormantNodeManager->UnregisterAddon(id);
 	
 	BPrivate::media::notifications::FlavorsChanged(id, 0, oldflavorcount);

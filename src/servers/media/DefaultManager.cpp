@@ -6,15 +6,18 @@
 #include <MediaNode.h>
 #include <MediaRoster.h>
 #include <string.h>
-#include <String.h>
 #include "DefaultManager.h"
+#include "NodeManager.h"
 #include "debug.h"
+
+extern NodeManager *gNodeManager;
 
 /* no locking used in this file, we assume that the caller (NodeManager) does it.
  */
 
 DefaultManager::DefaultManager()
- :	fPhysicalVideoOut(-1),
+ :	fMixerConnected(false),
+ 	fPhysicalVideoOut(-1),
 	fPhysicalVideoIn(-1),
 	fPhysicalAudioOut(-1),
 	fPhysicalAudioIn(-1),
@@ -153,11 +156,15 @@ void
 DefaultManager::RescanThread()
 {
 	printf("DefaultManager::RescanThread() enter\n");
-
+	
 	// We do not search for the system time source,
 	// it should already exist
 	ASSERT(fSystemTimeSource != -1);
-	
+
+for (int i = 0; i < 10; i++) { // XXX ugly workaround
+	gNodeManager->UpdateNodeConnections(); // XXX ugly workaround
+	snooze(1000000); // XXX ugly workaround
+
 	if (fPhysicalVideoOut == -1)
 		FindPhysicalVideoOut();
 	if (fPhysicalVideoIn == -1)
@@ -168,10 +175,19 @@ DefaultManager::RescanThread()
 		FindPhysicalAudioIn();
 	if (fAudioMixer == -1)
 		FindAudioMixer();
+}
+
 	// The normal time source is searched for after the
 	// Physical Audio Out has been created.
 	if (fTimeSource == -1)
 		FindTimeSource();
+
+	// Connect the mixer and physical audio out (soundcard)
+	if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
+		fMixerConnected = B_OK == ConnectMixerToOutput();
+		if (!fMixerConnected)
+			FATAL("DefaultManager: failed to connect mixer and soundcard\n");
+	}
 
 	printf("DefaultManager::RescanThread() leave\n");
 }
@@ -179,133 +195,198 @@ DefaultManager::RescanThread()
 void
 DefaultManager::FindPhysicalVideoOut()
 {
-	dormant_node_info info;
+	live_node_info info;
 	media_format input; /* a physical video output has a logical data input */
-	media_node node;
 	int32 count;
 	status_t rv;
 
 	memset(&input, 0, sizeof(input));
 	input.type = B_MEDIA_RAW_VIDEO;
 	count = 1;
-	rv = BMediaRoster::Roster()->GetDormantNodes(&info, &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
 	if (rv != B_OK || count != 1) {
 		printf("Couldn't find physical video output node\n");
 		return;
 	}
-	rv = BMediaRoster::Roster()->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
-	if (rv != B_OK) {
-		printf("Couldn't instantiate physical video output node\n");
-	} else {
-		printf("Default physical video output created!\n");
-		fPhysicalVideoOut = node.node;
-	}
+	printf("Default physical video output created!\n");
+	fPhysicalVideoOut = info.node.node;
 }
 
 void
 DefaultManager::FindPhysicalVideoIn()
 {
-	dormant_node_info info;
+	live_node_info info;
 	media_format output; /* a physical video input has a logical data output */
-	media_node node;
 	int32 count;
 	status_t rv;
 
 	memset(&output, 0, sizeof(output));
 	output.type = B_MEDIA_RAW_VIDEO;
 	count = 1;
-	rv = BMediaRoster::Roster()->GetDormantNodes(&info, &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
 	if (rv != B_OK || count != 1) {
 		printf("Couldn't find physical video input node\n");
 		return;
 	}
-	rv = BMediaRoster::Roster()->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
-	if (rv != B_OK) {
-		printf("Couldn't instantiate physical video input node\n");
-	} else {
-		printf("Default physical video input created!\n");
-		fPhysicalVideoIn = node.node;
-	}
+	printf("Default physical video input created!\n");
+	fPhysicalVideoIn = info.node.node;
 }
 
 void
 DefaultManager::FindPhysicalAudioOut()
 {
-	dormant_node_info info;
+	live_node_info info[2];
 	media_format input; /* a physical audio output has a logical data input */
-	media_node node;
 	int32 count;
 	status_t rv;
 
 	memset(&input, 0, sizeof(input));
 	input.type = B_MEDIA_RAW_AUDIO;
-	count = 1;
-	rv = BMediaRoster::Roster()->GetDormantNodes(&info, &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
-	if (rv != B_OK || count != 1) {
+	count = 2;
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, &input, NULL, NULL, B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
+	if (rv != B_OK || count < 1) {
 		printf("Couldn't find physical audio output node\n");
 		return;
 	}
-	rv = BMediaRoster::Roster()->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
-	if (rv != B_OK) {
-		printf("Couldn't instantiate physical audio output node\n");
-	} else {
+	for (int i = 0; i < count; i++)
+		printf("info[%d].name %s\n", i, info[i].name);
+	
+	for (int i = 0; i < count; i++) {
+		if (0 == strcmp(info[i].name, "None Out")) // skip the Null audio driver
+			continue;
 		printf("Default physical audio output created!\n");
-		fPhysicalAudioOut = node.node;
+		fPhysicalAudioOut = info[i].node.node;
+		return;
 	}
 }
 
 void
 DefaultManager::FindPhysicalAudioIn()
 {
-	dormant_node_info info;
+	live_node_info info[2];
 	media_format output; /* a physical audio input has a logical data output */
-	media_node node;
 	int32 count;
 	status_t rv;
 
 	memset(&output, 0, sizeof(output));
 	output.type = B_MEDIA_RAW_AUDIO;
-	count = 1;
-	rv = BMediaRoster::Roster()->GetDormantNodes(&info, &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
-	if (rv != B_OK || count != 1) {
+	count = 2;
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, NULL, &output, NULL, B_BUFFER_PRODUCER | B_PHYSICAL_INPUT);
+	if (rv != B_OK || count < 1) {
 		printf("Couldn't find physical audio input node\n");
 		return;
 	}
-	rv = BMediaRoster::Roster()->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
-	if (rv != B_OK) {
-		printf("Couldn't instantiate physical audio input node\n");
-	} else {
+	for (int i = 0; i < count; i++)
+		printf("info[%d].name %s\n", i, info[i].name);
+	
+	for (int i = 0; i < count; i++) {
+		if (0 == strcmp(info[i].name, "None In")) // skip the Null audio driver
+			continue;
 		printf("Default physical audio input created!\n");
-		fPhysicalAudioIn = node.node;
+		fPhysicalAudioIn = info[i].node.node;
+		return;
 	}
 }
 
 void
 DefaultManager::FindTimeSource()
 {
+	live_node_info info;
+	media_format input; /* a physical audio output has a logical data input (DAC)*/
+	int32 count;
+	status_t rv;
+	
+	/* We try to use the default physical audio out node,
+	 * as it most likely is a timesource.
+	 * XXX if that fails, we might use other audio or video clock timesources
+	 */
+
+	memset(&input, 0, sizeof(input));
+	input.type = B_MEDIA_RAW_AUDIO;
+	count = 1;
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, &input, NULL, NULL, B_TIME_SOURCE | B_PHYSICAL_OUTPUT);
+	if (rv != B_OK || count != 1) {
+		printf("Couldn't find DAC timesource node\n");
+		return;
+	}
+	fTimeSource = info.node.node;
+	printf("Default DAC timesource created!\n");
 }
 
 void
 DefaultManager::FindAudioMixer()
 {
-	dormant_node_info info;
-	media_node node;
+	live_node_info info;
 	int32 count;
 	status_t rv;
 
 	count = 1;
-	rv = BMediaRoster::Roster()->GetDormantNodes(&info, &count, NULL, NULL, NULL, B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER);
+	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, NULL, NULL, NULL, B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER);
 	if (rv != B_OK || count != 1) {
 		printf("Couldn't find audio mixer node\n");
 		return;
 	}
-	rv = BMediaRoster::Roster()->InstantiateDormantNode(info, &node, B_FLAVOR_IS_GLOBAL);
+	fAudioMixer = info.node.node;
+	printf("Default audio mixer node created\n");
+}
+
+status_t
+DefaultManager::ConnectMixerToOutput()
+{
+	BMediaRoster 		*roster;
+	media_node 			mixer;
+	media_node 			soundcard;
+	media_input 		input;
+	media_output 		output;
+	media_format 		format;
+	int32 				count;
+	status_t 			rv;
+	
+	roster = BMediaRoster::Roster();
+
+	// XXX this connects to *any* physical output, but not it's default logical input
+	rv = roster->GetNodeFor(fPhysicalAudioOut, &soundcard);
 	if (rv != B_OK) {
-		printf("Couldn't instantiate audio mixer node\n");
-	} else {
-		printf("Default audio mixer created!\n");
-		fAudioMixer = node.node;
+		printf("DefaultManager: failed to find soundcard (physical audio output)\n");
+		return B_ERROR;
 	}
+
+	rv = roster->GetNodeFor(fAudioMixer, &mixer);
+	if (rv != B_OK) {
+		roster->ReleaseNode(soundcard);
+		printf("DefaultManager: failed to find mixer\n");
+		return B_ERROR;
+	}
+
+	// we now have the mixer and soundcard nodes,
+	// find a free input/output and connect them
+
+	rv = roster->GetFreeOutputsFor(mixer, &output, 1, &count, B_MEDIA_RAW_AUDIO);
+	if (rv != B_OK || count != 1) {
+		printf("DefaultManager: can't find free mixer output\n");
+		rv = B_ERROR;
+		goto finish;
+	}
+
+	rv = roster->GetFreeInputsFor(soundcard, &input, 1, &count, B_MEDIA_RAW_AUDIO);
+	if (rv != B_OK || count != 1) {
+		printf("DefaultManager: can't find free soundcard input\n");
+		rv = B_ERROR;
+		goto finish;
+	}
+
+	memset(&format, 0, sizeof(format));
+	format.type = B_MEDIA_RAW_AUDIO;
+
+	rv = roster->Connect(output.source, input.destination, &format, &output, &input);
+	if (rv != B_OK) {
+		printf("DefaultManager: connect failed\n");
+	}
+	
+finish:
+	roster->ReleaseNode(mixer);
+	roster->ReleaseNode(soundcard);
+	return rv;
 }
 
 void
@@ -317,3 +398,4 @@ void
 DefaultManager::CleanupTeam(team_id team)
 {
 }
+

@@ -35,14 +35,17 @@ private:
 	void FindAudioMixer();
 	void FindTimeSource();
 	
+	status_t ConnectMixerToOutput();
+	
 private:
-	media_node_id fPhysicalVideoOut;
-	media_node_id fPhysicalVideoIn;
-	media_node_id fPhysicalAudioOut;
-	media_node_id fPhysicalAudioIn;
-	media_node_id fSystemTimeSource;
-	media_node_id fTimeSource;
-	media_node_id fAudioMixer;
-	int32 fPhysicalAudioOutInputID;
+	volatile bool fMixerConnected;
+	volatile media_node_id fPhysicalVideoOut;
+	volatile media_node_id fPhysicalVideoIn;
+	volatile media_node_id fPhysicalAudioOut;
+	volatile media_node_id fPhysicalAudioIn;
+	volatile media_node_id fSystemTimeSource;
+	volatile media_node_id fTimeSource;
+	volatile media_node_id fAudioMixer;
+	volatile int32 fPhysicalAudioOutInputID;
 	char fPhysicalAudioOutInputName[B_MEDIA_NAME_LENGTH];
 };

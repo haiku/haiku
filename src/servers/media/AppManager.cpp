@@ -105,6 +105,16 @@ status_t AppManager::UnregisterTeam(team_id team)
 	return is_removed ? B_OK : B_ERROR;
 }
 
+status_t
+AppManager::SendMessage(team_id team, BMessage *msg)
+{
+	BAutolock lock(fLocker);
+	App *app;
+	if (!fAppMap->Get(team, &app))
+		return B_ERROR;
+	return app->messenger.SendMessage(msg);
+}
+
 void AppManager::RestartAddonServer()
 {
 	static bigtime_t restart_period = 0;

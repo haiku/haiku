@@ -10,10 +10,7 @@
 #define _TIME_SOURCE_OBJECT_H_
 
 #include <TimeSource.h>
-
-#define NODE_KIND_USER_MASK 			0x00000000FFFFFFFFLL
-#define NODE_KIND_SHADOW_TIMESOURCE		0x0000000100000000LL
-#define NODE_KIND_SYSTEM_TIMESOURCE		0x0000000200000000LL
+#include "MediaMisc.h"
 
 namespace BPrivate { namespace media {
 

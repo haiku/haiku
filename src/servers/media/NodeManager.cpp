@@ -43,6 +43,7 @@ static char __copyright[] = "Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@O
 #include "NodeManager.h"
 #include "DefaultManager.h"
 #include "AppManager.h"
+#include "MediaMisc.h"
 
 extern AppManager *gAppManager;
 
@@ -411,7 +412,7 @@ NodeManager::GetDormantNodeInfo(dormant_node_info *node_info, const media_node &
 				return B_ERROR;
 			}
 			ASSERT(node.port == rn->port);
-			ASSERT(node.kind == rn->kinds);
+			ASSERT((node.kind & NODE_KIND_COMPARE_MASK) == (rn->kinds & NODE_KIND_COMPARE_MASK));
 			node_info->addon = rn->addon_id;
 			node_info->flavor_id = rn->addon_flavor_id;
 			strcpy(node_info->name, rn->name);
@@ -431,7 +432,7 @@ NodeManager::GetLiveNodeInfo(live_node_info *live_info, const media_node &node)
 	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
 		if (rn->nodeid == node.node) {
 			ASSERT(node.port == rn->port);
-			ASSERT(node.kind == rn->kinds);
+			ASSERT((node.kind & NODE_KIND_COMPARE_MASK) == (rn->kinds & NODE_KIND_COMPARE_MASK));
 			live_info->node = node;
 			live_info->hint_point = BPoint(0, 0);
 			strcpy(live_info->name, rn->name);
@@ -468,6 +469,9 @@ NodeManager::GetLiveNodes(Stack<live_node_info> *livenodes,	int32 maxcount, cons
 	BAutolock lock(fLocker);
 	registered_node *rn;
 	int namelen;
+	
+	TRACE("NodeManager::GetLiveNodes: maxcount %d, in-format %p, out-format %p, name %s, require_kinds 0x%x\n",
+		  maxcount, inputformat, outputformat, (name ? name : "NULL"), require_kinds);
 
 	// determine the count of byte to compare when checking for a name with(out) wildcard
 	if (name) {
@@ -538,6 +542,28 @@ NodeManager::GetLiveNodes(BMessage *msg)
 	}
 	return B_OK;
 }
+
+void
+NodeManager::UpdateNodeConnections()
+{
+	// XXX this is only a workaround because the multi_audio
+	// XXX addon does not publish inputs right after creation :(
+	BAutolock lock(fLocker);
+
+	registered_node *rn;
+	for (fRegisteredNodeMap->Rewind(); fRegisteredNodeMap->GetNext(&rn); ) {
+	
+		BMessage msg(NODE_PUBLISH_CONNECTIONS);
+		media_node tempnode;
+		tempnode.node = rn->nodeid;
+		tempnode.port = rn->port;
+		tempnode.kind = rn->kinds;
+		msg.AddData("node", B_RAW_TYPE, &tempnode, sizeof(tempnode));
+
+		gAppManager->SendMessage(rn->team, &msg);
+	}
+}
+
 
 /**********************************************************************
  * Registration of BMediaAddOns
@@ -964,11 +990,15 @@ NodeManager::Dump()
 			printf("    media_input: node-id %ld, node-port %ld, source-port %ld, source-id  %ld, dest-port %ld, dest-id %ld, name \"%s\"\n",
 				input->node.node, input->node.port, input->source.port, input->source.id, input->destination.port, input->destination.id, input->name);
 		}
+		if (rn->inputlist.IsEmpty())
+			printf("    media_input: none\n");
 		media_output *output;
 		for (rn->outputlist.Rewind(); rn->outputlist.GetNext(&output); ) {
 			printf("    media_output: node-id %ld, node-port %ld, source-port %ld, source-id  %ld, dest-port %ld, dest-id %ld, name \"%s\"\n",
 				output->node.node, output->node.port, output->source.port, output->source.id, output->destination.port, output->destination.id, output->name);
 		}
+		if (rn->outputlist.IsEmpty())
+			printf("    media_input: none\n");
 	}
 	printf("NodeManager: list end\n");
 	printf("\n");

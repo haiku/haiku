@@ -19,6 +19,8 @@ public:
 	void TerminateAddonServer();
 	team_id AddonServer();
 	
+	status_t SendMessage(team_id team, BMessage *msg);
+	
 	void Dump();	
 	
 private:
