@@ -121,10 +121,12 @@ switch $(TARGET_PLATFORM)
 	}
 }
 if $(BONE_COMPATIBLE) {
-	NETWORK_LIBS = libsocket.so libbind.so ;
+	# FIXME: we don't have our own "libbnetapi.so" yet :-(
+	# NETWORK_LIBS = libsocket.so libbind.so libbnetapi.so ;
+	NETWORK_LIBS = libsocket.so libbind.so bnetapi ;
 	SELECT_UNAME_ETC_LIB = libroot.so ;
 } else {
-	NETWORK_LIBS = libnet.so ;
+	NETWORK_LIBS = libnet.so libnetapi.so ;
 	SELECT_UNAME_ETC_LIB = libnet.so ;
 }
 
