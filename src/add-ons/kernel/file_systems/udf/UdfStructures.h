@@ -428,7 +428,7 @@ struct descriptor_tag  {
 public:
 	void dump() const;	
 
-	status_t init_check(uint32 block, bool calculateCrc = true);
+	status_t init_check(uint32 block, bool calculateCrc = true);	
 
 	uint16 id() const { return B_LENDIAN_TO_HOST_INT16(_id); }
 	uint16 version() const { return B_LENDIAN_TO_HOST_INT16(_version); }
@@ -446,6 +446,44 @@ public:
 	void set_crc_length(uint16 crc_length) { _crc_length = B_HOST_TO_LENDIAN_INT16(crc_length); }
 	void set_location(uint32 location) { _location = B_HOST_TO_LENDIAN_INT32(location); }
 	
+	/*! \brief Calculates and sets the crc length, crc checksumm, and
+		checksum for the tag.
+		
+		This function should not be called until all member variables in
+		the descriptor_tag's enclosing descriptor and all member variables
+		in the descriptor_tag itself other than crc_length, crc, and checksum
+		have been set (since the checksum is based off of values in the
+		descriptor_tag, and the crc is based off the values in and the
+		size of the	enclosing descriptor).
+	
+		\param The tag's enclosing descriptor.
+		\param The size of the tag's enclosing descriptor (including the
+		       tag); only necessary if different from sizeof(Descriptor).
+	*/
+	template <class Descriptor>
+	void
+	set_checksums(Descriptor &descriptor, uint16 size = sizeof(Descriptor))
+	{
+
+		// check that this tag is actually owned by
+		// the given descriptor
+		if (this == &descriptor.tag())
+		{
+			// crc_length, based off provided descriptor
+			set_crc_length(size - sizeof(descriptor_tag));
+			// crc
+			uint16 crc = Udf::calculate_crc(reinterpret_cast<uint8*>(this)
+			               + sizeof(descriptor_tag), crc_length());
+			set_crc(crc);
+			// checksum (which depends on the other two values)
+			uint32 sum = 0;
+			for (int i = 0; i <= 3; i++)
+				sum += reinterpret_cast<uint8*>(this)[i];
+			for (int i = 5; i <= 15; i++)
+				sum += reinterpret_cast<uint8*>(this)[i];
+			set_checksum(sum % 256);
+		}
+	}
 private:
 	uint16 _id;
 	uint16 _version;

@@ -306,8 +306,6 @@ descriptor_tag::dump() const
 	             location, not the mapped physical disk block.
 	\param calculateCrc Whether or not to perform the crc calculation
 	                    on the descriptor data following the tag.                
-	
-	\todo Calc the CRC.
 */
 status_t 
 descriptor_tag::init_check(uint32 block, bool calculateCrc)
@@ -325,14 +323,15 @@ descriptor_tag::init_check(uint32 block, bool calculateCrc)
 	}
 	PRINT(("crc        (in structure) == %d\n", crc()));
 	PRINT(("crc_length (in structure) == %d\n", crc_length()));
+	// location
 	status_t error = (block == location()) ? B_OK : B_NO_INIT;
 	// checksum
 	if (!error) {
 		uint32 sum = 0;
 		for (int i = 0; i <= 3; i++)
-			sum += ((uint8*)this)[i];
+			sum += reinterpret_cast<uint8*>(this)[i];
 		for (int i = 5; i <= 15; i++)
-			sum += ((uint8*)this)[i];
+			sum += reinterpret_cast<uint8*>(this)[i];
 		error = sum % 256 == checksum() ? B_OK : B_NO_INIT;
 	}
 	// crc
@@ -341,10 +340,8 @@ descriptor_tag::init_check(uint32 block, bool calculateCrc)
 		               + sizeof(descriptor_tag), crc_length());
 		error = _crc == crc() ? B_OK : B_NO_INIT;
 	}	
-	RETURN(error);
-	
+	RETURN(error);	
 }
-
 
 //----------------------------------------------------------------------
 // primary_volume_descriptor
