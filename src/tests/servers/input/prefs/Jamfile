@@ -35,7 +35,7 @@ SEARCH on [ FGristFiles
 	Keymap.rdef ]
 	= [ FDirName $(OBOS_TOP) src prefs keymap ] ;
 
-AddResources KeyboardTest : Keyboard.rsrc ;
+AddResources KeyboardTest : Keyboard.rdef ;
 
 Preference KeyboardTest : 
 	Keyboard.cpp 
@@ -57,7 +57,7 @@ SEARCH on [ FGristFiles
 	KeyboardSettings.cpp 
 	KeyboardView.cpp 
 	KeyboardWindow.cpp 
-	Keyboard.rsrc ]
+	Keyboard.rdef ]
 	= [ FDirName $(OBOS_TOP) src prefs keyboard ] ;
 
 AddResources MouseTest : Mouse.rdef ;
