@@ -533,6 +533,18 @@ rule R5KernelAddon
 	LinkSharedOSLibs $(1) : /boot/develop/lib/x86/_KERNEL_ ;
 }
 
+rule Translator
+{
+	# Translator <name> : <sources> ;
+	SetupObjectsDir ;
+	Main $(1) : $(2) ;
+
+	# Create output dir path for translator
+	local targetdir;
+	targetdir = [ FDirName $(OBOS_ADDON_DIR) translators ] ;
+	MakeLocate $(1) : $(targetdir) ;
+}
+
 rule MakeLocateObjects
 {
 	# MakeLocateObjects <gristed_sources_or_objects> ;
