@@ -10,7 +10,7 @@
  |                                                                           |
  *---------------------------------------------------------------------------*/
 
-/* $Id: pdflib.h,v 1.2 2003/03/22 08:47:20 laplace Exp $
+/* $Id: pdflib.h,v 1.3 2003/09/18 20:20:45 laplace Exp $
  *
  * PDFlib public function and constant declarations
  *
@@ -29,8 +29,11 @@
 
 #ifdef WIN32
 
+#if !defined(PDFLIB_CALL)
 #define PDFLIB_CALL	__cdecl
+#endif
 
+#if !defined(PDFLIB_API)
 #ifdef PDFLIB_EXPORTS
 #define PDFLIB_API __declspec(dllexport) /* prepare a DLL (internal use only) */
 
@@ -41,6 +44,7 @@
 #define PDFLIB_API /* */	/* default: generate or use static library */
 
 #endif	/* !PDFLIB_DLL */
+#endif /* !PDFLIB_API */
 
 #else	/* !WIN32 */
 
@@ -58,18 +62,23 @@
 
 #endif	/* !WIN32 */
 
+
 /* export all symbols for a shared library on the Mac */
 #if defined(__MWERKS__) && defined(PDFLIB_EXPORTS)
 #pragma export on
 #endif
+
 
 /* Make our declarations C++ compatible */
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+
 /* Define the basic PDF type. This is used opaquely at the API level. */
+#if !defined(PDF) || defined(ACTIVEX)
 typedef struct PDF_s PDF;
+#endif /* !PDF */
 
 /* The API structure with function pointers. */
 typedef struct PDFlib_api_s PDFlib_api;
@@ -82,8 +91,8 @@ typedef struct PDFlib_api_s PDFlib_api;
 /* do not change this (version.sh will do it for you :) */
 #define PDFLIB_MAJORVERSION	5	/* PDFlib major version number */
 #define PDFLIB_MINORVERSION	0	/* PDFlib minor version number */
-#define PDFLIB_REVISION		0	/* PDFlib revision number */
-#define PDFLIB_VERSIONSTRING	"5.0.0b2"	/* The whole bunch */
+#define PDFLIB_REVISION		2	/* PDFlib revision number */
+#define PDFLIB_VERSIONSTRING	"5.0.2"	/* The whole bunch */
 
 
 /* {{{ p_annots.c: file attachments, notes, and links
@@ -164,7 +173,7 @@ PDF_boot(void);
 PDFLIB_API void PDFLIB_CALL
 PDF_close(PDF *p);
 
-/* Delete the PDF object, and free all internal resources. */
+/* Delete the PDFlib object, and free all internal resources. */
 PDFLIB_API void PDFLIB_CALL
 PDF_delete(PDF *p);
 
@@ -178,10 +187,24 @@ PDF_end_page(PDF *p);
 PDFLIB_API const PDFlib_api * PDFLIB_CALL
 PDF_get_api(void);
 
+/* Get the name of the API function which threw the last exception or failed. */
+PDFLIB_API const char * PDFLIB_CALL
+PDF_get_apiname(PDF *p);
+
 /* Get the contents of the PDF output buffer. The result must be used by
  * the client before calling any other PDFlib function. */
 PDFLIB_API const char * PDFLIB_CALL
 PDF_get_buffer(PDF *p, long *size);
+
+/* Get the descriptive text of the last thrown exception, or the reason of
+ * a failed function call. */
+PDFLIB_API const char * PDFLIB_CALL
+PDF_get_errmsg(PDF *p);
+
+/* Get the number of the last thrown exception, or the reason of a failed
+ * function call. */
+PDFLIB_API int PDFLIB_CALL
+PDF_get_errnum(PDF *p);
 
 /* Depreceated: use PDF_get_value() */
 PDFLIB_API int PDFLIB_CALL
@@ -195,12 +218,12 @@ PDF_get_minorversion(void);
 PDFLIB_API void * PDFLIB_CALL
 PDF_get_opaque(PDF *p);
 
-/* Create a new PDF object, using default error handling and memory
+/* Create a new PDFlib object, using default error handling and memory
  management. */
 PDFLIB_API PDF * PDFLIB_CALL
 PDF_new(void);
 
-/* Create a new PDF object with client-supplied error handling and memory
+/* Create a new PDFlib object with client-supplied error handling and memory
  * allocation routines. */
 typedef void  (*errorproc_t)(PDF *p1, int errortype, const char *msg);
 typedef void* (*allocproc_t)(PDF *p2, size_t size, const char *caller);
@@ -238,7 +261,7 @@ PDF_shutdown(void);
 
 #define PDF_MemoryError    1
 #define PDF_IOError        2
-#define PDF_RuntimeError   3 
+#define PDF_RuntimeError   3
 #define PDF_IndexError     4
 #define PDF_TypeError      5
 #define PDF_DivisionByZero 6
@@ -282,7 +305,8 @@ PDF_fill_textblock(PDF *p, int page, const char *blockname,
 PDFLIB_API int PDFLIB_CALL
 PDF_makespotcolor(PDF *p, const char *spotname, int reserved);
 
-/* Set the current color space and color. fstype is "fill", "stroke", or "both".
+/* Set the current color space and color. fstype is "fill", "stroke",
+or "fillstroke".
  */
 PDFLIB_API void PDFLIB_CALL
 PDF_setcolor(PDF *p, const char *fstype, const char *colorspace,
@@ -425,7 +449,7 @@ PDF_get_glyphid(PDF *p, int font, int code);
 
 /* Open and search a font, and prepare it for later use. */
 PDFLIB_API int PDFLIB_CALL
-PDF_load_font(PDF *p, const char *fontname, int reserved,
+PDF_load_font(PDF *p, const char *fontname, int len,
     const char *encoding, const char *optlist);
 
 /* Set the current font in the given size, using a font handle returned by
@@ -794,6 +818,12 @@ PDFLIB_API int PDFLIB_CALL
 PDF_show_boxed(PDF *p, const char *text, float left, float top,
     float width, float height, const char *hmode, const char *feature);
 
+/* Same as PDF_show_boxed() but with explicit string length.
+   (unsupported) */
+PDFLIB_API int PDFLIB_CALL
+PDF_show_boxed2(PDF *p, const char *text, int len, float left, float top,
+    float width, float height, const char *hmode, const char *feature);
+
 /* Print text in the current font at (x, y). */
 PDFLIB_API void PDFLIB_CALL
 PDF_show_xy(PDF *p, const char *text, float x, float y);
@@ -900,7 +930,10 @@ struct PDFlib_api_s {
     void (PDFLIB_CALL * PDF_delete)(PDF *);
     void (PDFLIB_CALL * PDF_end_page)(PDF *p);
     const PDFlib_api * (PDFLIB_CALL * PDF_get_api)(void);
+    const char * (PDFLIB_CALL * PDF_get_apiname) (PDF *p);
     const char * (PDFLIB_CALL * PDF_get_buffer)(PDF *p, long *size);
+    const char * (PDFLIB_CALL * PDF_get_errmsg) (PDF *p);
+    int (PDFLIB_CALL * PDF_get_errnum) (PDF *p);
     int  (PDFLIB_CALL * PDF_get_majorversion)(void);
     int  (PDFLIB_CALL * PDF_get_minorversion)(void);
     void * (PDFLIB_CALL * PDF_get_opaque)(PDF *p);
@@ -973,7 +1006,7 @@ struct PDFlib_api_s {
     int  (PDFLIB_CALL * PDF_findfont)(PDF *p, const char *fontname,
 			    const char *encoding, int embed);
     int (PDFLIB_CALL * PDF_load_font)(PDF *p, const char *fontname,
-		int reserved, const char *encoding, const char *optlist);
+		int len, const char *encoding, const char *optlist);
     void (PDFLIB_CALL * PDF_setfont)(PDF *p, int font, float fontsize);
     /* }}} */
 
@@ -1064,9 +1097,9 @@ struct PDFlib_api_s {
     void (PDFLIB_CALL * PDF_fit_pdi_page) (PDF *p, int page, float x,
 	    float y, const char *optlist);
     const char * (PDFLIB_CALL * PDF_get_pdi_parameter)(PDF *p,
-		    const char *key, int doc, int page, int idx, int *len);
+		    const char *key, int doc, int page, int reserved, int *len);
     float (PDFLIB_CALL * PDF_get_pdi_value)(PDF *p, const char *key,
-					    int doc, int page, int idx);
+					    int doc, int page, int reserved);
     int  (PDFLIB_CALL * PDF_open_pdi)(PDF *p, const char *filename,
 				const char *optlist, int reserved);
     int (PDFLIB_CALL * PDF_open_pdi_callback) (PDF *p, void *opaque,
@@ -1114,8 +1147,8 @@ struct PDFlib_api_s {
     void (PDFLIB_CALL * PDF_show)(PDF *p, const char *text);
     void (PDFLIB_CALL * PDF_show2)(PDF *p, const char *text, int len);
     int  (PDFLIB_CALL * PDF_show_boxed)(PDF *p, const char *text,
-			float left, float top, float width, float height,
-			const char *hmode, const char *feature);
+                        float left, float top, float width, float height,
+                        const char *hmode, const char *feature);
     void (PDFLIB_CALL * PDF_show_xy)(PDF *p, const char *text, float x,
     			float y);
     void (PDFLIB_CALL * PDF_show_xy2)(PDF *p, const char *text,
@@ -1139,14 +1172,6 @@ struct PDFlib_api_s {
     /* {{{ p_xgstate.c: explicit graphic states */
     int (PDFLIB_CALL * PDF_create_gstate) (PDF *p, const char *optlist);
     void (PDFLIB_CALL * PDF_set_gstate) (PDF *p, int gstate);
-    /* }}} */
-
-    /* {{{ exception handling */
-    int (PDFLIB_CALL * PDF_get_errnum) (PDF *p);
-
-    const char * (PDFLIB_CALL * PDF_get_errmsg) (PDF *p);
-
-    const char * (PDFLIB_CALL * PDF_get_apiname) (PDF *p);
     /* }}} */
 
     /* this is considered private */
@@ -1194,30 +1219,17 @@ struct PDFlib_api_s {
 
 /* Set up an exception handling frame; must always be paired with PDF_CATCH().*/
 
-#define PDF_TRY(pdf)		if (pdf) { if (setjmp(pdf_jbuf(pdf)->jbuf) == 0)
+#define PDF_TRY(p)		if (p) { if (setjmp(pdf_jbuf(p)->jbuf) == 0)
 
 /* Inform the exception machinery that a PDF_TRY() will be left without
    entering the corresponding PDF_CATCH( ) clause. */
-#define PDF_EXIT_TRY(pdf)	pdf_exit_try(pdf)
+#define PDF_EXIT_TRY(p)		pdf_exit_try(p)
 
 /* Catch an exception; must always be paired with PDF_TRY(). */
-#define PDF_CATCH(pdf)		} if (pdf_catch(pdf))
+#define PDF_CATCH(p)		} if (pdf_catch(p))
 
 /* Re-throw an exception to another handler. */
-#define PDF_RETHROW(pdf)	pdf_rethrow(pdf)
-
-/* Get the number of the last thrown exception. */
-PDFLIB_API int PDFLIB_CALL
-PDF_get_errnum(PDF *p);
-
-/* Get the descriptive text of the last thrown exception. */
-PDFLIB_API const char * PDFLIB_CALL
-PDF_get_errmsg(PDF *p);
-
-/* Get the name of the API function which threw the last exception. */
-PDFLIB_API const char * PDFLIB_CALL
-PDF_get_apiname(PDF *p);
-
+#define PDF_RETHROW(p)		pdf_rethrow(p)
 
 /*
  * ----------------------------------------------------------------------
