@@ -697,6 +697,8 @@ set_command_areas(net_command *command)
 			break;
 		}
 
+/*
+	TODO/FIXME: phoudoin: where are these opcodes defined!?!
 		case OSIOCGIFCONF:
 		case SIOCGIFCONF:
 		{
@@ -705,6 +707,7 @@ set_command_areas(net_command *command)
 			get_area_from_address(&command->area[1],ifc->ifc_buf);
 			break;
 		}
+*/
 	}	
 }
 

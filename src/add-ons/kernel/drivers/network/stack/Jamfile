@@ -4,13 +4,13 @@ UsePrivateHeaders net ;
 
 # a) Userland stack version:
 
-# R5KernelAddon net_stack_driver : kernel drivers bin :
-#	net_userstack_driver.c
-# ;
+R5KernelAddon net_server_driver : kernel drivers bin :
+	net_server_driver.c
+;
 
 # For OpenBeOS we should be building the driver objects this way.
 #KernelObjects
-#	net_userstack_driver.c
+#	net_server_driver.c
 #	:
 #	-fno-pic -D_KERNEL_MODE
 #	;
@@ -28,11 +28,15 @@ R5KernelAddon net_stack_driver : kernel drivers bin :
 #	-fno-pic -D_KERNEL_MODE
 #	;
 
-
-# Link to kernel/drivers/dev/net
+# Link driver(s) to kernel/drivers/dev/net
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev net ] ;
+
 	local instDriver = <kernel!drivers!dev!net>net_stack_driver ;
 	MakeLocate $(instDriver) : $(dir) ;
 	RelSymLink $(instDriver) : net_stack_driver ;
+
+	local instDriver = <kernel!drivers!dev!net>net_server_driver ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : net_server_driver ;
 }
