@@ -83,20 +83,20 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 		if (get_image_symbol(addon_image, "instantiate_input_device",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
-			PRINT(("AddOnManager::RegisterAddOn(): can't find instantiate_input_device in \"%s\"\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): can't find instantiate_input_device in \"%s\"\n",
 				path.Path()));
 			goto exit_error;
 		}
 	
 		BInputServerDevice *isd = (*instantiate_func)();
 		if (isd == NULL) {
-			PRINT(("AddOnManager::RegisterAddOn(): instantiate_input_device in \"%s\" returned NULL\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): instantiate_input_device in \"%s\" returned NULL\n",
 				path.Path()));
 			goto exit_error;
 		}
 		status_t status = isd->InitCheck();
 		if (status != B_OK) {
-			PRINT(("AddOnManager::RegisterAddOn(): BInputServerDevice.InitCheck in \"%s\" returned %s\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): BInputServerDevice.InitCheck in \"%s\" returned %s\n",
 				path.Path(), strerror(status)));
 			delete isd;
 			goto exit_error;
@@ -110,20 +110,20 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 		if (get_image_symbol(addon_image, "instantiate_input_filter",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
-			PRINT(("AddOnManager::RegisterAddOn(): can't find instantiate_input_filter in \"%s\"\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): can't find instantiate_input_filter in \"%s\"\n",
 				path.Path()));
 			goto exit_error;
 		}
 	
 		BInputServerFilter *isf = (*instantiate_func)();
 		if (isf == NULL) {
-			PRINT(("AddOnManager::RegisterAddOn(): instantiate_input_filter in \"%s\" returned NULL\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): instantiate_input_filter in \"%s\" returned NULL\n",
 				path.Path()));
 			goto exit_error;
 		}
 		status_t status = isf->InitCheck();
 		if (status != B_OK) {
-			PRINT(("AddOnManager::RegisterAddOn(): BInputServerFilter.InitCheck in \"%s\" returned %s\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): BInputServerFilter.InitCheck in \"%s\" returned %s\n",
 				path.Path(), strerror(status)));
 			delete isf;
 			goto exit_error;
@@ -136,21 +136,21 @@ AddOnManager::RegisterAddOn(BEntry &entry)
 
 		if (get_image_symbol(addon_image, "instantiate_input_method",
 				B_SYMBOL_TYPE_TEXT, (void **)&instantiate_func) < B_OK) {
-			PRINT(("AddOnManager::RegisterAddOn(): can't find instantiate_input_method in \"%s\"\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): can't find instantiate_input_method in \"%s\"\n",
 				path.Path()));
 			goto exit_error;
 		}
 	
 		BInputServerMethod *ism = (*instantiate_func)();
 		if (ism == NULL) {
-			PRINT(("AddOnManager::RegisterAddOn(): instantiate_input_method in \"%s\" returned NULL\n",
+			PRINTERR(("AddOnManager::RegisterAddOn(): instantiate_input_method in \"%s\" returned NULL\n",
 				path.Path()));
 			goto exit_error;
 		}
 		status_t status = ism->InitCheck();
 		if (status != B_OK) {
-			printf("AddOnManager::RegisterAddOn(): BInputServerMethod.InitCheck in \"%s\" returned %s\n",
-				path.Path(), strerror(status));
+			PRINTERR(("AddOnManager::RegisterAddOn(): BInputServerMethod.InitCheck in \"%s\" returned %s\n",
+				path.Path(), strerror(status)));
 			delete ism;
 			goto exit_error;
 		}
@@ -225,6 +225,11 @@ AddOnManager::UnregisterAddOn(BEntry &entry)
 			// we remove the method replicant
 			BDeskbar().RemoveItem(REPLICANT_CTL_NAME);
 			((InputServer*)be_app)->SetMethodReplicant(NULL);
+		} else {
+			BMessage msg(IS_REMOVE_METHOD);
+			msg.AddInt32("cookie", (uint32)pinfo->ism);
+			if (((InputServer*)be_app)->MethodReplicant())
+				((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
 		}
 	} 
 
@@ -463,6 +468,16 @@ AddOnManager::RegisterMethod(BInputServerMethod *method, const entry_ref &ref, i
 				}
 			}
 		}
+
+		if (((InputServer*)be_app)->MethodReplicant()) {
+			_BMethodAddOn_ *addon = InputServer::gKeymapMethod.fOwner;
+                	addon->AddMethod();
+		}
+	}
+
+	if (((InputServer*)be_app)->MethodReplicant()) {
+		_BMethodAddOn_ *addon = method->fOwner;
+		addon->AddMethod();
 	}
 }
 

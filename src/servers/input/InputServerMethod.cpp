@@ -33,7 +33,7 @@
 #include <Messenger.h>
 #include "InputServer.h"
 #include "InputServerTypes.h"
-
+#include "remote_icon.h"
 /**
  *  Method: BInputServerMethod::BInputServerMethod()
  *   Descr: 
@@ -173,52 +173,100 @@ _BMethodAddOn_::~_BMethodAddOn_()
 status_t
 _BMethodAddOn_::SetName(const char* name)
 {
+	CALLED();
 	if (fName)
 		free(fName);
 	if (name)
 		fName = strdup(name);
 
 	BMessage msg(IS_UPDATE_NAME);
-	msg.AddInt32("cookie", (uint32)this);
+	msg.AddInt32("cookie", (uint32)fMethod);
 	msg.AddString("name", name);
-	return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	if (((InputServer*)be_app)->MethodReplicant())
+		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	else
+		return B_ERROR;
 }
 
 
 status_t
 _BMethodAddOn_::SetIcon(const uchar* icon)
-{
+{	
+	CALLED();
 	memcpy(fIcon, icon, 16*16*1);
 
 	BMessage msg(IS_UPDATE_ICON);
-	msg.AddInt32("cookie", (uint32)this);
+	msg.AddInt32("cookie", (uint32)fMethod);
 	msg.AddData("icon", B_RAW_TYPE, icon, 16*16*1);
-	return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	if (((InputServer*)be_app)->MethodReplicant())
+		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	else
+		return B_ERROR;
 }
 
 
 status_t
 _BMethodAddOn_::SetMenu(const BMenu *menu, const BMessenger &messenger)
 {
-	if (fMenu)
-		delete fMenu;
+	CALLED();
 	fMenu = menu;
 	fMessenger = messenger;
-	
+
 	BMessage msg(IS_UPDATE_MENU);
-	msg.AddInt32("cookie", (uint32)this);
+	msg.AddInt32("cookie", (uint32)fMethod);
 	BMessage menuMsg;
-	menu->Archive(&menuMsg);
+	if (menu)
+		menu->Archive(&menuMsg);
 	msg.AddMessage("menu", &menuMsg);
 	msg.AddMessenger("target", messenger);
-	return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	if (((InputServer*)be_app)->MethodReplicant())
+		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	else
+		return B_ERROR;
 }
 
 
 status_t
 _BMethodAddOn_::MethodActivated(bool activate)
 {
-	if (fMethod)
+	CALLED();
+	if (fMethod) {
+		PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, fMethod));
+		if (activate && ((InputServer*)be_app)->MethodReplicant()) {
+			BMessage msg(IS_UPDATE_METHOD);
+        		msg.AddInt32("cookie", (uint32)fMethod);
+                	((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+		}
 		return fMethod->MethodActivated(activate);
+	}
 	return B_ERROR;
 }
+
+
+status_t
+_BMethodAddOn_::AddMethod()
+{
+	PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, fMethod));
+	BMessage msg(IS_ADD_METHOD);
+	msg.AddInt32("cookie", (uint32)fMethod);
+	msg.AddString("name", fName);
+	msg.AddData("icon", B_RAW_TYPE, fIcon, 16*16*1);
+	if (((InputServer*)be_app)->MethodReplicant())
+		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
+	else
+		return B_ERROR;
+}
+
+
+KeymapMethod::KeymapMethod()
+        : BInputServerMethod("Roman", kRemoteBits)
+{
+
+}
+
+
+KeymapMethod::~KeymapMethod()
+{
+
+}
+

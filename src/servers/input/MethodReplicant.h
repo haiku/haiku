@@ -55,6 +55,8 @@ private:
 	void UpdateMethodIcon(BMessage *);
 	void UpdateMethodMenu(BMessage *);
 	void UpdateMethodName(BMessage *);
+	void AddMethod(BMessage *message);
+	void RemoveMethod(BMessage *message);
 	MethodMenuItem *FindItemByCookie(int32 cookie);
 };
 

@@ -76,6 +76,8 @@ BLocker InputServer::gInputMethodListLocker("is_method_queue_sem");
 
 DeviceManager InputServer::gDeviceManager;
 
+KeymapMethod InputServer::gKeymapMethod;
+
 #if DEBUG == 2
 FILE *InputServer::sLogFile = NULL;
 #endif
@@ -168,8 +170,6 @@ InputServer::InputServer(void) : BApplication(INPUTSERVER_SIGNATURE),
 	fAddOnManager = new AddOnManager(SafeMode());
 	fAddOnManager->LoadState();
 
-	//BDeskbar().AddItem(new ::MethodReplicant);
-
 	BMessenger messenger(this);
 	BRoster().StartWatching(messenger, B_REQUEST_LAUNCHED);
 }
@@ -237,6 +237,8 @@ InputServer::InitKeyboardMouseStates(void)
 		
 	BMessage *msg = new BMessage(B_MOUSE_MOVED);
 	HandleSetMousePosition(msg, msg);
+
+	fActiveMethod = &gKeymapMethod;
 }
 
 
@@ -506,10 +508,12 @@ InputServer::MessageReceived(BMessage *message)
 void
 InputServer::HandleSetMethod(BMessage *message)
 {
-	int32 cookie;
-	if (message->FindInt32("cookie", &cookie) == B_OK) {
-		_BMethodAddOn_ *addon = (_BMethodAddOn_*)cookie;
-		SetActiveMethod(addon);
+	CALLED();
+	uint32 cookie;
+	if (message->FindInt32("cookie", (int32*)&cookie) == B_OK) {
+		BInputServerMethod *method = (BInputServerMethod*)cookie;
+		PRINT(("%s cookie %p\n", __PRETTY_FUNCTION__, method));
+		SetActiveMethod(method);
 	}
 }
 
@@ -928,13 +932,13 @@ InputServer::EnqueueMethodMessage(BMessage *message)
 {
 	CALLED();
 	
-	status_t  	err;
-	
-	ssize_t length = message->FlattenedSize();
-	char buffer[length];
-	if ((err = message->Flatten(buffer,length)) < B_OK)
-		return err;
-	return write_port(fEventLooperPort, 0, buffer, length);
+	LockMethodQueue();
+
+	fMethodQueue.AddItem(message);
+
+	UnlockMethodQueue();
+
+	return B_OK;
 }
 
 
@@ -981,14 +985,16 @@ InputServer::SetNextMethod(bool)
  *   Descr: 
  */
 void
-InputServer::SetActiveMethod(_BMethodAddOn_ *addon)
+InputServer::SetActiveMethod(BInputServerMethod *method)
 {
+	CALLED();
 	if (fActiveMethod)
-		fActiveMethod->MethodActivated(false);
-	fActiveMethod = addon;
+		fActiveMethod->fOwner->MethodActivated(false);
+	fActiveMethod = method;
 	
-	if (fActiveMethod)
-                fActiveMethod->MethodActivated(true);
+	if (fActiveMethod) {
+                fActiveMethod->fOwner->MethodActivated(true);
+	}
 }
 
 
@@ -1292,6 +1298,8 @@ bool
 InputServer::CacheEvents(BList *eventsToCache)
 {
 	CALLED();
+
+	MethodizeEvents(eventsToCache, true);
 	
 	FilterEvents(eventsToCache);
 
@@ -1403,11 +1411,37 @@ InputServer::SanitizeEvents(BList *)
  *   Descr: 
  */
 bool 
-InputServer::MethodizeEvents(BList *,
+InputServer::MethodizeEvents(BList *events,
                              bool)
 {
 	CALLED();
 	
+	if (fActiveMethod) {
+
+		BList newList;
+		for (int32 i=0; i<events->CountItems(); i++) {
+			BMessage *item = (BMessage *)events->ItemAt(i);
+			BList filterList;
+			filter_result res = fActiveMethod->Filter(item, &filterList);
+			switch (res) {
+				case B_SKIP_MESSAGE:
+					delete item;
+				case B_DISPATCH_MESSAGE:
+					if (filterList.CountItems()>0) {
+						newList.AddList(&filterList);
+						delete item;
+					} else
+						newList.AddItem(item);
+			}
+
+			newList.AddList(&fMethodQueue);
+			fMethodQueue.MakeEmpty();
+		}
+
+		events->MakeEmpty();
+		events->AddList(&newList);
+	}
+
 	return true;
 }
 

@@ -87,6 +87,7 @@ class _BMethodAddOn_
 		status_t SetIcon(const uchar *icon);
 		status_t SetMenu(const BMenu *menu, const BMessenger &messenger);
 		status_t MethodActivated(bool activate);
+		status_t AddMethod();
 	private:	
 		BInputServerMethod *fMethod;
 		char *fName;
@@ -94,6 +95,15 @@ class _BMethodAddOn_
 		const BMenu *fMenu;
 		BMessenger fMessenger;
 };
+
+
+class KeymapMethod : public BInputServerMethod
+{
+public:
+        KeymapMethod();
+        ~KeymapMethod();
+};
+
 
 /*****************************************************************************/
 // InputServer
@@ -114,7 +124,6 @@ public:
 
 	virtual bool QuitRequested(void);
 	virtual void ReadyToRun(void);
-	//thread_id Run(void);
 	virtual void MessageReceived(BMessage*); 
 
 	void HandleSetMethod(BMessage*);
@@ -139,7 +148,7 @@ public:
 	status_t UnlockMethodQueue(void);
 	status_t LockMethodQueue(void);
 	status_t SetNextMethod(bool);
-	void SetActiveMethod(_BMethodAddOn_*);
+	void SetActiveMethod(BInputServerMethod*);
 	const BMessenger* MethodReplicant(void);
 	void SetMethodReplicant(const BMessenger *);
 	status_t EventLoop();
@@ -174,6 +183,8 @@ public:
 	static BLocker gInputMethodListLocker;
 	
 	static DeviceManager	gDeviceManager;
+
+	static KeymapMethod gKeymapMethod;
 
 	BRect& ScreenFrame() { return fFrame;};
 private:
@@ -210,7 +221,8 @@ private:
 	BScreen			fScreen;
 	BRect			fFrame;
 
-	_BMethodAddOn_		*fActiveMethod;
+	BInputServerMethod	*fActiveMethod;
+	BList			fMethodQueue;
 	const BMessenger	*fReplicantMessenger;
 
 #ifndef COMPILE_FOR_R5	
