@@ -1185,7 +1185,7 @@ TRACE(("install_team_debugger(team: %ld, port: %ld, default: %d, "
 	if (error == B_OK) {
 		snprintf(nameBuffer, sizeof(nameBuffer), "team %ld debug task", teamID);
 		nubThread = spawn_kernel_thread_etc(debug_nub_thread, nameBuffer,
-			B_NORMAL_PRIORITY, NULL, teamID);
+			B_NORMAL_PRIORITY, NULL, teamID, -1);
 		if (nubThread < 0)
 			error = nubThread;
 	}
