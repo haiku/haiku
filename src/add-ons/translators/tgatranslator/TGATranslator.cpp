@@ -34,6 +34,7 @@
 #include "TGAView.h"
 #include "StreamBuffer.h"
 #include <SupportDefs.h>
+#include <OS.h>
 	// for min()/max()
 
 // The input formats that this translator supports.
@@ -2329,12 +2330,13 @@ translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 			// if the user only wants the header, 
 			// bail before it is written
 			return result;
-			
-		uint8 buf[1024];
-		ssize_t rd = inSource->Read(buf, rd);
+		
+		const int32 kbuflen = 1024;
+		uint8 buf[kbuflen];
+		ssize_t rd = inSource->Read(buf, kbuflen);
 		while (rd > 0) {
 			outDestination->Write(buf, rd);
-			rd = inSource->Read(buf, rd);
+			rd = inSource->Read(buf, kbuflen);
 		}
 		if (rd == 0)
 			return B_OK;
