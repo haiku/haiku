@@ -9,9 +9,9 @@
 int RLD_STARTUP(void *args)
 {
 #if DEBUG_RLD
-	sys_close(0); open("/dev/console", 0); /* stdin   */
-	sys_close(1); open("/dev/console", 0); /* stdout  */
-	sys_close(2); open("/dev/console", 0); /* stderr  */
+	close(0); open("/dev/console", 0); /* stdin   */
+	close(1); open("/dev/console", 0); /* stdout  */
+	close(2); open("/dev/console", 0); /* stderr  */
 #endif
 	return rldmain(args);
 }

@@ -97,7 +97,7 @@ cmd_mkdir(int argc, char *argv[])
 		return 0;
 	}
 
-	rc = sys_create_dir(argv[1],0755);
+	rc = _kern_create_dir(argv[1],0755);
 	if (rc < 0) {
 		printf("sys_mkdir() returned error: %s\n", strerror(rc));
 	} else {

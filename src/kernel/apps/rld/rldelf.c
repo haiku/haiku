@@ -811,10 +811,10 @@ load_container(char const *path, char const *name, image_type type)
 		return found;
 	}
 
-	fd = sys_open(path, 0);
+	fd = _kern_open(path, 0);
 	FATAL((fd < 0), "cannot open file %s\n", path);
 
-	len = sys_read(fd, 0, &eheader, sizeof(eheader));
+	len = _kern_read(fd, 0, &eheader, sizeof(eheader));
 	FATAL((len != sizeof(eheader)), "troubles reading ELF header\n");
 
 	if (parse_elf_header(&eheader, &pheaderSize, &sheaderSize) < B_OK) {
@@ -823,7 +823,7 @@ load_container(char const *path, char const *name, image_type type)
 	// ToDo: what to do about this restriction??
 	FATAL((pheaderSize > (int)sizeof(ph_buff)), "cannot handle Program headers bigger than %lu\n", (long unsigned)sizeof(ph_buff));
 
-	len = sys_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
+	len = _kern_read(fd, eheader.e_phoff, ph_buff, pheaderSize);
 	FATAL((len != pheaderSize), "troubles reading Program headers\n");
 
 	num_regions = count_regions(ph_buff, eheader.e_phnum, eheader.e_phentsize);
@@ -845,7 +845,7 @@ load_container(char const *path, char const *name, image_type type)
 	image->type = type;
 	register_image(image, path);
 
-	sys_close(fd);
+	_kern_close(fd);
 
 	enqueue_image(&gLoadedImages, image);
 

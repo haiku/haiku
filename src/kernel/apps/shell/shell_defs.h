@@ -1,6 +1,7 @@
 #ifndef _shell_defs_h_
 #define _shell_defs_h_
 
+#include <SupportDefs.h>
 #include "script.h"
 
 #define NAME_VAR_PATH  "path"

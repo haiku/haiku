@@ -1,8 +1,9 @@
 #include <string.h>
 #include <ctype.h>
-#include <syscalls.h>
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "parse.h"
 #include "commands.h"
@@ -485,7 +486,8 @@ void parse_vars_in_string(const char *string,char *out,int max_len)
 }
 
 
-static int launch(int (*cmd)(int, char **), int argc, char **argv, char *r_in, char *r_out)
+static int
+launch(int (*cmd)(int, char **), int argc, char **argv, char *r_in, char *r_out)
 {
 	int saved_in;
 	int saved_out;
@@ -495,11 +497,11 @@ static int launch(int (*cmd)(int, char **), int argc, char **argv, char *r_in, c
 	int err;
 
 	if (strcmp(r_in, "")!= 0) {
-		new_in = sys_open(r_in, 0);
+		new_in = open(r_in, 0);
 		if (new_in < 0)
-			new_in = sys_create(r_in, 0, 0644);
+			new_in = creat(r_in, 0644);
 	} else {
-		new_in = sys_dup(0);
+		new_in = dup(0);
 	}
 	if (new_in < 0) {
 		err = new_in;
@@ -507,36 +509,36 @@ static int launch(int (*cmd)(int, char **), int argc, char **argv, char *r_in, c
 	}
 
 	if (strcmp(r_out, "")!= 0) {
-		new_out = sys_open(r_out, 0);
+		new_out = open(r_out, 0);
 		if (new_out < 0)
-			new_out = sys_create(r_out, 0, 0644);
+			new_out = creat(r_out, 0644);
 	} else {
-		new_out = sys_dup(1);
+		new_out = dup(1);
 	}
 	if (new_out < 0) {
 		err = new_out;
 		goto err_2;
 	}
 
-	saved_in = sys_dup(0);
-	saved_out= sys_dup(1);
+	saved_in = dup(0);
+	saved_out= dup(1);
 
-	sys_dup2(new_in, 0);
-	sys_dup2(new_out, 1);
-	sys_close(new_in);
-	sys_close(new_out);
+	dup2(new_in, 0);
+	dup2(new_out, 1);
+	close(new_in);
+	close(new_out);
 
-	retval= cmd(argc, argv);
+	retval = cmd(argc, argv);
 
-	sys_dup2(saved_in, 0);
-	sys_dup2(saved_out, 1);
-	sys_close(saved_in);
-	sys_close(saved_out);
+	dup2(saved_in, 0);
+	dup2(saved_out, 1);
+	close(saved_in);
+	close(saved_out);
 
 	return 0;
 
 err_2:
-	sys_close(new_in);
+	close(new_in);
 err_1:
 	return err;
 }
