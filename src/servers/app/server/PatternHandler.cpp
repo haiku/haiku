@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, Haiku, Inc.
+//	Copyright (c) 2001-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -21,15 +21,19 @@
 //
 //	File Name:		PatternHandler.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
+//					Stephan Aßmus <superstippi@gmx.de>
 //	Description:	Class for easy calculation and use of patterns
 //  
 //------------------------------------------------------------------------------
 #include <Point.h>
 #include "PatternHandler.h"
 
-const Pattern pat_solidhigh(0xFFFFFFFFFFFFFFFFLL);
-const Pattern pat_solidlow((uint64)0);
-const Pattern pat_mixedcolors(0xAAAAAAAAAAAAAAAALL);
+const Pattern kSolidHigh(0xFFFFFFFFFFFFFFFFLL);
+const Pattern kSolidLow((uint64)0);
+const Pattern kMixedColors(0xAAAAAAAAAAAAAAAALL);
+
+const rgb_color kBlack = (rgb_color){ 0, 0, 0, 255 };
+const rgb_color kWhite = (rgb_color){ 255, 255, 255, 255 };
 
 /*!
 	\brief Void constructor
@@ -38,10 +42,10 @@ const Pattern pat_mixedcolors(0xAAAAAAAAAAAAAAAALL);
 	low color is set to white.
 */
 PatternHandler::PatternHandler(void)
+	: fPattern(kSolidHigh),
+	  fHighColor(kBlack),
+	  fLowColor(kWhite)
 {
-	_pat=0xFFFFFFFFFFFFFFFFLL;
-	_high=new RGBColor(0,0,0,255);
-	_low=new RGBColor(255,255,255,255);
 }
 
 /*!
@@ -51,15 +55,11 @@ PatternHandler::PatternHandler(void)
 	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
 	is NULL. High color is set to black, and low color is set to white.
 */
-PatternHandler::PatternHandler(int8 *pat)
+PatternHandler::PatternHandler(const int8* pat)
+	: fPattern(pat ? Pattern(pat) : Pattern(kSolidHigh)),
+	  fHighColor(kBlack),
+	  fLowColor(kWhite)
 {
-	if(pat)
-		_pat.Set(pat);
-	else
-		_pat=0xFFFFFFFFFFFFFFFFLL;
-
-	_high=new RGBColor(0,0,0,255);
-	_low=new RGBColor(255,255,255,255);
 }
 
 /*!
@@ -69,25 +69,43 @@ PatternHandler::PatternHandler(int8 *pat)
 	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
 	is NULL. High color is set to black, and low color is set to white.
 */
-PatternHandler::PatternHandler(const uint64 &pat)
+PatternHandler::PatternHandler(const uint64& pat)
+	: fPattern(pat),
+	  fHighColor(kBlack),
+	  fLowColor(kWhite)
 {
-	_pat=pat;
-	_high=new RGBColor(0,0,0,255);
-	_low=new RGBColor(255,255,255,255);
 }
 
-PatternHandler::PatternHandler(const Pattern &pat)
+/*!
+	\brief Constructor initializes to given pattern
+	\param pat Pattern to use.
+	
+	This initializes to the given Pattern.
+	High color is set to black, and low color is set to white.
+*/
+PatternHandler::PatternHandler(const Pattern& pat)
+	: fPattern(pat),
+	  fHighColor(kBlack),
+	  fLowColor(kWhite)
 {
-	_pat=pat;
-	_high=new RGBColor(0,0,0,255);
-	_low=new RGBColor(255,255,255,255);
 }
 
-//! Destructor frees internal color variables
+/*!
+	\brief Constructor initializes to given PatternHandler
+	\param other PatternHandler to copy.
+	
+	Copy constructor.
+*/
+PatternHandler::PatternHandler(const PatternHandler& other)
+	: fPattern(other.fPattern),
+	  fHighColor(other.fHighColor),
+	  fLowColor(other.fLowColor)
+{
+}
+
+//! Destructor does nothing
 PatternHandler::~PatternHandler(void)
 {
-	delete _high;
-	delete _low;
 }
 
 /*!
@@ -97,30 +115,39 @@ PatternHandler::~PatternHandler(void)
 	This initializes to the given pattern or B_SOLID_HIGH if the pattern 
 	is NULL.
 */
-void PatternHandler::SetTarget(int8 *pat)
+void PatternHandler::SetPattern(const int8* pat)
 {
-	if(pat)
-		_pat.Set(pat);
+	if (pat)
+		fPattern.Set(pat);
 	else
-		_pat=0xFFFFFFFFFFFFFFFFLL;
+		fPattern = kSolidHigh;
 }
 
 /*!
 	\brief Sets the pattern for the handler to the one given
 	\param pat Pattern to use.
 */
-void PatternHandler::SetTarget(const uint64 &pat)
+void PatternHandler::SetPattern(const uint64& pat)
 {
-	_pat=pat;
+	fPattern = pat;
 }
 
 /*!
 	\brief Sets the pattern for the handler to the one given
 	\param pat Pattern to use.
 */
-void PatternHandler::SetTarget(const Pattern &pat)
+void PatternHandler::SetPattern(const Pattern& pat)
 {
-	_pat=pat;
+	fPattern = pat;
+}
+
+/*!
+	\brief Sets the pattern for the handler to the one given
+	\param pat R5 style pattern to use.
+*/
+void PatternHandler::SetPattern(const pattern& pat)
+{
+	fPattern = pat;
 }
 
 /*!
@@ -128,10 +155,28 @@ void PatternHandler::SetTarget(const Pattern &pat)
 	\param high High color for the handler
 	\param low Low color for the handler
 */
-void PatternHandler::SetColors(const RGBColor &high, const RGBColor &low)
+void PatternHandler::SetColors(const RGBColor& high, const RGBColor& low)
 {
-	*_high=high;
-	*_low=low;
+	fHighColor = high;
+	fLowColor = low;
+}
+
+/*!
+	\brief Set the high color for the pattern to use
+	\param color High color for the handler
+*/
+void PatternHandler::SetHighColor(const RGBColor& color)
+{
+	fHighColor = color;
+}
+
+/*!
+	\brief Set the low color for the pattern to use
+	\param color Low color for the handler
+*/
+void PatternHandler::SetLowColor(const RGBColor& color)
+{
+	fLowColor = color;
 }
 
 /*!
@@ -139,9 +184,10 @@ void PatternHandler::SetColors(const RGBColor &high, const RGBColor &low)
 	\param pt Coordinates to get the color for
 	\return Color for the coordinates
 */
-RGBColor PatternHandler::GetColor(const BPoint &pt)
+RGBColor
+PatternHandler::ColorAt(const BPoint &pt) const
 {
-	return GetColor(pt.x,pt.y);
+	return ColorAt(pt.x, pt.y);
 }
 
 /*!
@@ -150,26 +196,10 @@ RGBColor PatternHandler::GetColor(const BPoint &pt)
 	\param y Y coordinate to get the color for
 	\return Color for the coordinates
 */
-RGBColor PatternHandler::GetColor(const float &x, const float &y)
+RGBColor
+PatternHandler::ColorAt(float x, float y) const
 {
-	const int8 *ptr=_pat.GetInt8();
-	int32 value=ptr[(uint32)y%8] & (1 << (7-((uint32)x%8)) );
-
-	return (value==0)?*_low:*_high;
-}
-
-/*!
-	\brief Obtains the value of the pattern at the specified coordinates
-	\param x X coordinate to get the value for
-	\param y Y coordinate to get the value for
-	\return Value for the coordinates - true if high, false if low.
-*/
-bool PatternHandler::GetValue(const float &x, const float &y)
-{
-	const int8 *ptr=_pat.GetInt8();
-	int32 value=ptr[(uint32)y%8] & (1 << (7-((uint32)x%8)) );
-
-	return (value==0)?false:true;
+	return ColorAt(int(x), int(y));
 }
 
 /*!
@@ -177,8 +207,8 @@ bool PatternHandler::GetValue(const float &x, const float &y)
 	\param pt Coordinates to get the value for
 	\return Value for the coordinates - true if high, false if low.
 */
-bool PatternHandler::GetValue(const BPoint &pt)
+bool PatternHandler::IsHighColor(const BPoint &pt) const
 {
-	return GetValue(pt.x,pt.y);
+	return IsHighColor((int)pt.x, (int)pt.y);
 }
 

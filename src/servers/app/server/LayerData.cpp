@@ -36,7 +36,7 @@ DrawData::DrawData(void)
 	highcolor.SetColor(0, 0, 0, 255);
 	lowcolor.SetColor(255, 255, 255, 255);
 
-	patt=pat_solidhigh;
+	patt=kSolidHigh;
 	draw_mode=B_OP_COPY;
 	
 	lineCap	=B_BUTT_CAP;

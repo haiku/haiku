@@ -340,7 +340,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
 					fb += bytes_per_row;
 				}
 			} break;
@@ -351,7 +351,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -362,7 +362,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -376,7 +376,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 				{
 					for (x=left; x<=right; x++)
 					{
-						color = fDrawPattern.GetColor(x,y).GetColor32();
+						color = fDrawPattern.ColorAt(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
@@ -414,7 +414,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
 					fb += bytes_per_row;
 				}
 			} break;
@@ -424,7 +424,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -434,7 +434,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -447,7 +447,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 				{
 					for (x=x1; x<=x2; x++)
 					{
-						color = fDrawPattern.GetColor(x,y).GetColor32();
+						color = fDrawPattern.ColorAt(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
@@ -485,7 +485,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
 					fb += bytes_per_row;
 				}
 			} break;
@@ -495,7 +495,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -505,7 +505,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -518,7 +518,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 				{
 					for (x=x1; x<=x2; x++)
 					{
-						color = fDrawPattern.GetColor(x,y).GetColor32();
+						color = fDrawPattern.ColorAt(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
@@ -760,7 +760,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor8();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor8();
 					fb += bytes_per_row;
 				}
 			} break;
@@ -771,7 +771,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor15();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor15();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -782,7 +782,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
-						fb[x] = fDrawPattern.GetColor(x,y).GetColor16();
+						fb[x] = fDrawPattern.ColorAt(x,y).GetColor16();
 					fb = (uint16 *)((uint8 *)fb + bytes_per_row);
 				}
 			} break;
@@ -796,7 +796,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 				{
 					for (x=left; x<=right; x++)
 					{
-						color = fDrawPattern.GetColor(x,y).GetColor32();
+						color = fDrawPattern.ColorAt(x,y).GetColor32();
 						fb[x] = (color.alpha << 24) | (color.red << 16) | (color.green << 8) | (color.blue);
 					}
 					fb = (uint32 *)((uint8 *)fb + bytes_per_row);
