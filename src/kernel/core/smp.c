@@ -26,6 +26,12 @@
 
 #define DEBUG_SPINLOCKS 1
 
+#if __INTEL__
+  #define PAUSE() asm volatile ("rep; nop;")
+#else
+  #define PAUSE()
+#endif
+
 #define MSG_POOL_SIZE (SMP_MAX_CPUS * 4)
 
 struct smp_msg {
@@ -71,8 +77,10 @@ acquire_spinlock(spinlock *lock)
 		if (are_interrupts_enabled())
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 		while (1) {
-			while (*lock != 0)
+			while (*lock != 0) {
 				smp_process_pending_ici(curr_cpu);
+				PAUSE();
+			}
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
@@ -85,7 +93,7 @@ acquire_spinlock(spinlock *lock)
 		#endif
 	}
 }
-
+ 
 
 static void
 acquire_spinlock_nocheck(spinlock *lock)
@@ -97,7 +105,7 @@ acquire_spinlock_nocheck(spinlock *lock)
 		#endif
 		while (1) {
 			while(*lock != 0)
-				;
+				PAUSE();
 			if (atomic_set((int32 *)lock, 1) == 0)
 				break;
 		}
@@ -143,8 +151,8 @@ find_free_message(struct smp_msg **msg)
 //	dprintf("find_free_message: entry\n");
 
 retry:
-	while(free_msg_count <= 0)
-		;
+	while (free_msg_count <= 0) 
+		PAUSE();
 	state = disable_interrupts();
 	acquire_spinlock(&free_msg_spinlock);
 
@@ -394,8 +402,10 @@ smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long data
 			// wait for the other cpu to finish processing it
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
-			while (msg->done == false)
+			while (msg->done == false) {
 				smp_process_pending_ici(curr_cpu);
+				PAUSE();
+			}
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
 			return_free_message(msg);
@@ -450,8 +460,10 @@ smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2, uns
 			// the interrupt handler will ref count it to <0
 			// if the message is sync after it has removed it from the mailbox
 //			dprintf("smp_send_broadcast_ici: waiting for ack\n");
-			while (msg->done == false)
+			while (msg->done == false) {
 				smp_process_pending_ici(curr_cpu);
+				PAUSE();
+			}
 //			dprintf("smp_send_broadcast_ici: returning message to free list\n");
 			// for SYNC messages, it's our responsibility to put it
 			// back into the free list
