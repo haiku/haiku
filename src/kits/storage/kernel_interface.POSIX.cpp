@@ -67,6 +67,19 @@ BPrivate::Storage::open( const char *path, OpenFlags flags, FileDescriptor &resu
 	return (result == -1) ? errno : B_OK ;
 }
 
+status_t
+BPrivate::Storage::open( const char *path, OpenFlags flags,
+						 FileDescriptor &result, bool fallBackToReadOnly )
+{
+	status_t error = open(path, flags, result);
+	if (error == B_READ_ONLY_DEVICE || error == B_PERMISSION_DENIED
+		&& fallBackToReadOnly && (flags & O_RWMASK == O_RDWR)) {
+		flags = flags & ~O_RWMASK | O_RDONLY;
+		error = open(path, flags, result);
+	}
+	return error;
+}
+
 /*! Same as the other version of open() except the file is created with the
 	permissions given by creationFlags if it doesn't exist. */
 status_t
@@ -81,6 +94,20 @@ BPrivate::Storage::open( const char *path, OpenFlags flags,
 	// Open/Create the file and return the proper error code
 	result = ::open(path, flags | O_CREAT, creationFlags);
 	return (result == -1) ? errno : B_OK ;
+}
+
+status_t
+BPrivate::Storage::open( const char *path, OpenFlags flags,
+				  CreationFlags creationFlags, FileDescriptor &result,
+				  bool fallBackToReadOnly )
+{
+	status_t error = open(path, flags, creationFlags, result);
+	if (error == B_READ_ONLY_DEVICE || error == B_PERMISSION_DENIED
+		&& fallBackToReadOnly && (flags & O_RWMASK == O_RDWR)) {
+		flags = flags & ~O_RWMASK | O_RDONLY;
+		error = open(path, flags, creationFlags, result);
+	}
+	return error;
 }
 
 status_t

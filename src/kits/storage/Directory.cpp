@@ -249,7 +249,7 @@ BDirectory::SetTo(const char *path)
 		// open_dir() does always traverse those. Therefore we open the FD for
 		// BNode (without the O_NOTRAVERSE flag).
 		BPrivate::Storage::FileDescriptor fd = BPrivate::Storage::NullFd;
-		result = BPrivate::Storage::open(path, O_RDWR, fd);
+		result = BPrivate::Storage::open(path, O_RDWR, fd, true);
 		if (result == B_OK) {
 			result = set_fd(fd);
 			if (result != B_OK)

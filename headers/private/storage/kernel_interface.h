@@ -68,10 +68,24 @@ status_t stat_dev(dev_t dev, fs_info* info);
 	it doesn't already exist). */
 status_t open(const char *path, OpenFlags flags, FileDescriptor &result);
 
-/*! \brief Same as the other version of open() except the file is created with the
+/*!	\brief Same as the first version, but tries to open read-only, if
+		   first the attempt failed with B_READ_ONLY_DEVICE or
+		   B_PERMISSION_DENIED and \a fallBackToReadOnly is \c true.
+*/
+status_t open(const char *path, OpenFlags flags, FileDescriptor &result,
+			  bool fallBackToReadOnly);
+
+/*! \brief Same as the first version of open() except the file is created with the
 	permissions given by creationFlags if it doesn't exist. */
 status_t open(const char *path, OpenFlags flags, CreationFlags creationFlags,
 	FileDescriptor &result);
+
+/*!	\brief Same as the third version, but tries to open read-only, if
+		   first the attempt failed with B_READ_ONLY_DEVICE or
+		   B_PERMISSION_DENIED and \a fallBackToReadOnly is \c true.
+*/
+status_t open(const char *path, OpenFlags flags, CreationFlags creationFlags,
+			  FileDescriptor &result, bool fallBackToReadOnly);
 
 /*! \brief Closes a previously open()ed file. */
 status_t close( FileDescriptor file );

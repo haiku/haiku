@@ -247,8 +247,10 @@ status_t
 BNode::SetTo(const char *path)
 {
 	Unset();	
-	if (path != NULL) 
-		fCStatus = BPrivate::Storage::open(path, O_RDWR | O_NOTRAVERSE, fFd);
+	if (path != NULL) {
+		fCStatus = BPrivate::Storage::open(path, O_RDWR | O_NOTRAVERSE, fFd,
+										   true);
+	}
 	return fCStatus;
 }
 
