@@ -35,6 +35,7 @@
 #include <Window.h>
 #include <View.h>
 #include <MenuBar.h>
+#include <MenuItem.h>
 #include <String.h>
 #include <Screen.h>
 #include <Button.h>
@@ -1093,23 +1094,34 @@ void BWindow::SetPulseRate(bigtime_t rate){
 
 //------------------------------------------------------------------------------
 
-bigtime_t BWindow::PulseRate() const{
+bigtime_t
+BWindow::PulseRate() const
+{
 	return fPulseRate;
 }
 
-//------------------------------------------------------------------------------
 
-void BWindow::AddShortcut(	uint32 key,	uint32 modifiers, BMessage* msg){
-	AddShortcut( key, modifiers, msg, this);
+void
+BWindow::AddShortcut(uint32 key, uint32 modifiers, BMenuItem *item)
+{
+	AddShortcut(key, modifiers, item->Message(), this);
 }
 
-//------------------------------------------------------------------------------
 
-void BWindow::AddShortcut(	uint32 key,	uint32 modifiers, BMessage* msg, BHandler* target){
+void
+BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg)
+{
+	AddShortcut(key, modifiers, msg, this);
+}
+
+
+void
+BWindow::AddShortcut(uint32 key, uint32 modifiers, BMessage *msg, BHandler *target)
+{
 /*
 	NOTE: I'm not sure if it is OK to use 'key'
 */
-	if ( !msg )
+	if (msg == NULL)
 		return;
 
 	int64				when;
