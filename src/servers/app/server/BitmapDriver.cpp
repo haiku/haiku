@@ -750,7 +750,7 @@ void BitmapDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 {
 }
 
-void BitmapDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
 }
 
@@ -758,7 +758,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
 }
 
-void BitmapDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+void BitmapDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 }
 
@@ -766,7 +766,7 @@ void BitmapDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, con
 {
 }
 
-void BitmapDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+void BitmapDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
 }
 

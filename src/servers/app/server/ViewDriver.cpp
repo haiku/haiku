@@ -553,103 +553,6 @@ void ViewDriver::SetMode(const display_mode &mode)
 	screenwin->Unlock();
 }
 
-/*
-void ViewDriver::CopyRegion(BRegion *src, const BPoint &lefttop)
-{
-	if(!is_initialized)
-		return;
-		
-STRACE(("ViewDriver:: CopyRegion not completely tested\n"));
-	
-	screenwin->Lock();
-	framebuffer->Lock();
-
-	// Check for cases where the region is only 1 rectangle and call CopyBits in
-	// such a case. While in this particular case CopyBits is not HW-accelerated, 
-	// other DisplayDriver derivatives, like AccelerantDriver, can take advantage of
-	// such things, cutting speed significantly in such cases
-	if(src->CountRects()==1)
-	{
-		BRect srect(src->RectAt(0)),drect(src->RectAt(0).OffsetToCopy(lefttop));
-		drawview->CopyBits(srect,drect);
-		drawview->Sync();
-		screenwin->view->Invalidate(srect);
-		screenwin->view->Invalidate(drect);
-		framebuffer->Unlock();
-		screenwin->Unlock();
-		return;
-	}
-	
-
-	// Check for overlap
-	bool overlap=false;
-
-	BRect regframe=src->Frame();
-	regframe.OffsetTo(lefttop);
-	
-	BRegion inverse;
-	int8 *savebuffer=NULL,*srcindex=NULL,*destindex=NULL,
-		*framebufferstart=NULL;
-	int32 buffer_row_size=0,i;
-
-	if(TestRectIntersection(regframe,src->Frame()) && src->CountRects()>1)
-		overlap=true;
-
-	if(overlap)
-	{
-printf("Overlap\n");
-
-		// If overlap, get the inverse of the region passed to us and save the
-		// inverse region's frame
-		inverse=src->Frame();
-		inverse.Exclude(src);
-		
-		buffer_row_size=inverse.Frame().IntegerWidth() * 4;
-		destindex=savebuffer=new int8[ buffer_row_size * inverse.Frame().IntegerHeight()];
-		framebufferstart=srcindex=(int8*)framebuffer->Bits()+
-				(framebuffer->BytesPerRow()* int32(inverse.Frame().top));
-		srcindex+=int32(inverse.Frame().left)*4;
-		
-		for(i=int32(inverse.Frame().top);i<int32(inverse.Frame().bottom); i++)
-		{
-			memcpy(destindex,srcindex,buffer_row_size);
-			srcindex+=framebuffer->BytesPerRow();
-			destindex+=buffer_row_size;
-		}
-	}
-	
-	// Copy all rectangles in the region to the new offset
-	BRect srcrect,destrect;
-	for(i=0; i<src->CountRects(); i++)
-	{
-		srcrect=destrect=src->RectAt(i);
-		destrect.OffsetTo(lefttop);
-		drawview->CopyBits(srcrect,destrect);
-	}
-	drawview->Sync();
-	
-	if(overlap)
-	{
-		// Copy all saved rectangles back to the screen and clean up
-		srcindex=savebuffer;
-		destindex=framebufferstart;
-		
-		for(i=int32(inverse.Frame().top);i<int32(inverse.Frame().bottom); i++)
-		{
-			memcpy(destindex,srcindex,buffer_row_size);
-			srcindex+=framebuffer->BytesPerRow();
-			destindex+=buffer_row_size;
-		}
-
-		delete savebuffer;
-	}
-	
-	screenwin->view->Invalidate(src->Frame());
-	screenwin->view->Invalidate(regframe);
-	framebuffer->Unlock();
-	screenwin->Unlock();
-}
-*/
 
 void ViewDriver::DrawBitmap(ServerBitmap *bitmap, const BRect &src, const BRect &dest, const DrawData *d)
 {
@@ -732,7 +635,7 @@ void ViewDriver::InvertRect(const BRect &r)
 	screenwin->Unlock();
 }
 
-void ViewDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+void ViewDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
 	if(!is_initialized)
 		return;
@@ -766,7 +669,7 @@ void ViewDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 	screenwin->Unlock();
 }
 
-void ViewDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const DrawData *d)
+void ViewDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d)
 {
 	if(!d)
 		return;
@@ -778,14 +681,14 @@ void ViewDriver::StrokePatternLine(const BPoint &start, const BPoint &end, const
 	framebuffer->Lock();
 	drawview->SetHighColor(d->highcolor.GetColor32());
 	drawview->SetLowColor(d->lowcolor.GetColor32());
-	drawview->StrokeLine(start,end,*((pattern*)d->patt.GetInt8()));
+	drawview->StrokeLine(BPoint(x1,y1),BPoint(x2,y2),*((pattern*)d->patt.GetInt8()));
 	drawview->Sync();
-	screenwin->view->Invalidate(BRect(start,end));
+	screenwin->view->Invalidate(BRect(x1, y1, x2, y2));
 	framebuffer->Unlock();
 	screenwin->Unlock();
 }
 
-void ViewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+void ViewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 	if(!is_initialized)
 		return;
@@ -800,7 +703,7 @@ void ViewDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColo
 	screenwin->Unlock();
 }
 
-void ViewDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+void ViewDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
 	if(!is_initialized)
 		return;

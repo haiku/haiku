@@ -81,11 +81,11 @@ protected:
 	virtual void ReleaseBuffer(void);
 
 	virtual void Blit(const BRect &src, const BRect &dest, const DrawData *d);
-	virtual void FillSolidRect(const BRect &rect, RGBColor &color);
+	virtual void FillSolidRect(const BRect &rect, const RGBColor &color);
 	virtual void FillPatternRect(const BRect &rect, const DrawData *d);
-	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color);
+	virtual void StrokeSolidLine(const BPoint &start, const BPoint &end, const RGBColor &color);
 	virtual void StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, const DrawData *d);
-	virtual void StrokeSolidRect(const BRect &rect, RGBColor &color);
+	virtual void StrokeSolidRect(const BRect &rect, const RGBColor &color);
 	virtual void CopyBitmap(ServerBitmap *bitmap, const BRect &source, const BRect &dest, const DrawData *d);
 	virtual void CopyToBitmap(ServerBitmap *target, const BRect &source);
 

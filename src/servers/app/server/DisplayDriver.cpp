@@ -440,7 +440,7 @@ void DisplayDriver::CopyRegionList(BList* list, BList* pList, int32 rCount, BReg
 //	ConstrainClippingRegion(NULL);
 }
 
-void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, RGBColor &color, escapement_delta *delta)
+void DisplayDriver::DrawString(const char *string, const int32 &length, const BPoint &pt, const RGBColor &color, escapement_delta *delta)
 {
 	DrawData d;
 	d.highcolor=color;
@@ -843,7 +843,7 @@ void DisplayDriver::Invalidate(const BRect &r)
 {
 }
 
-void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, RGBColor &color)
+void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
 {
 }
 
@@ -1208,7 +1208,7 @@ void DisplayDriver::FillArc(const BRect &r, const float &angle, const float &spa
 
 }
 
-void DisplayDriver::FillBezier(BPoint *pts, RGBColor &color)
+void DisplayDriver::FillBezier(BPoint *pts, const RGBColor &color)
 {
 }
 
@@ -1296,7 +1296,7 @@ void DisplayDriver::FillBezier(BPoint *pts, DisplayDriver* driver, SetHorizontal
 	*/
 }
 
-void DisplayDriver::FillEllipse(const BRect &r, RGBColor &color)
+void DisplayDriver::FillEllipse(const BRect &r, const RGBColor &color)
 {
 }
 
@@ -1365,7 +1365,7 @@ void DisplayDriver::FillEllipse(const BRect &r, const DrawData *d)
 	Unlock();
 }
 
-void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, RGBColor &color)
+void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const RGBColor &color)
 {
 }
 
@@ -1498,7 +1498,7 @@ void DisplayDriver::FillPolygon(BPoint *ptlist, int32 numpts, const DrawData *d)
 	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
 	\param color The color used to fill the rectangle
 */
-void DisplayDriver::FillRect(const BRect &r, RGBColor &color)
+void DisplayDriver::FillRect(const BRect &r, const RGBColor &color)
 {
 	Lock();
 	FillSolidRect(r,color);
@@ -1524,7 +1524,7 @@ void DisplayDriver::FillRect(const BRect &r, const DrawData *d)
 	\param r BRegion to be filled
 	\param color The color used to fill the region
 */
-void DisplayDriver::FillRegion(BRegion& r, RGBColor &color)
+void DisplayDriver::FillRegion(BRegion& r, const RGBColor &color)
 {
 	Lock();
 
@@ -1554,7 +1554,7 @@ void DisplayDriver::FillRegion(BRegion& r, const DrawData *d)
 	Unlock();
 }
 
-void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, RGBColor &color)
+void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
 {
 }
 
@@ -1587,7 +1587,7 @@ void DisplayDriver::FillRoundRect(const BRect &r, const float &xrad, const float
 //{
 //}
 
-void DisplayDriver::FillTriangle(BPoint *pts, RGBColor &color)
+void DisplayDriver::FillTriangle(BPoint *pts, const RGBColor &color)
 {
 }
 
@@ -1885,7 +1885,7 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 	Unlock();
 }
 
-void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &span, RGBColor &color)
+void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &span, const RGBColor &color)
 {
 }
 
@@ -2051,7 +2051,7 @@ void DisplayDriver::StrokeArc(const BRect &r, const float &angle, const float &s
 }
 
 
-void DisplayDriver::StrokeBezier(BPoint *pts, RGBColor &color)
+void DisplayDriver::StrokeBezier(BPoint *pts, const RGBColor &color)
 {
 }
 
@@ -2118,7 +2118,7 @@ void DisplayDriver::StrokeBezier(BPoint *pts, DisplayDriver* driver, SetPixelFun
 	}
 }
 
-void DisplayDriver::StrokeEllipse(const BRect &r, RGBColor &color)
+void DisplayDriver::StrokeEllipse(const BRect &r, const RGBColor &color)
 {
 }
 
@@ -2193,16 +2193,22 @@ void DisplayDriver::StrokeEllipse(const BRect &r, DisplayDriver* driver, SetPixe
 	}
 }
 
-void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, RGBColor &color)
+void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
 	Lock();
-	//Not quite that simple bub
-	//StrokeSolidLine(start,end,color);
+	//Not quite that simple bub - REDO!!!
+	StrokeSolidLine(start,end,color);
 	Unlock();
 }
 
 void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, const DrawData *d)
 {
+// IMPLEMENT!!! This is TEMPORALY!!!
+	Lock();
+	//Not quite that simple bub - REDO!!!
+	RGBColor		c = d->highcolor;
+	StrokeSolidLine(start,end,c);
+	Unlock();
 }
 
 /*!
@@ -2240,12 +2246,12 @@ void DisplayDriver::StrokeLine(const BPoint &start, const BPoint &end, DisplayDr
 	}
 }
 
-void DisplayDriver::StrokePoint(BPoint& pt, RGBColor &color)
+void DisplayDriver::StrokePoint(BPoint& pt, const RGBColor &color)
 {
 	StrokeLine(pt, pt, color);
 }
 
-void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, RGBColor &color, bool is_closed)
+void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const RGBColor &color, bool is_closed)
 {
 	if(!ptlist)
 		return;
@@ -2285,7 +2291,7 @@ void DisplayDriver::StrokePolygon(BPoint *ptlist, int32 numpts, const DrawData *
 	\param pensize Thickness of the lines
 	\param color The color of the rectangle
 */
-void DisplayDriver::StrokeRect(const BRect &r, RGBColor &color)
+void DisplayDriver::StrokeRect(const BRect &r, const RGBColor &color)
 {
 	Lock();
 	StrokeSolidRect(r,color);
@@ -2309,7 +2315,7 @@ void DisplayDriver::StrokeRect(const BRect &r, const DrawData *d)
 	\param pat 8-byte array containing the const Pattern &to use. Always non-NULL.
 
 */
-void DisplayDriver::StrokeRegion(BRegion& r, RGBColor &color)
+void DisplayDriver::StrokeRegion(BRegion& r, const RGBColor &color)
 {
 	Lock();
 
@@ -2329,7 +2335,7 @@ void DisplayDriver::StrokeRegion(BRegion& r, const DrawData *d)
 	Unlock();
 }
 
-void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, RGBColor &color)
+void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const float &yrad, const RGBColor &color)
 {
 }
 
@@ -2380,7 +2386,7 @@ void DisplayDriver::StrokeRoundRect(const BRect &r, const float &xrad, const flo
 	\param pensize The line thickness
 	\param color The color of the lines
 */
-void DisplayDriver::StrokeTriangle(BPoint *pts, RGBColor &color)
+void DisplayDriver::StrokeTriangle(BPoint *pts, const RGBColor &color)
 {
 	Lock();
 	StrokeLine(pts[0],pts[1],color);
@@ -2950,7 +2956,7 @@ void DisplayDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 {
 }
 
-void DisplayDriver::FillSolidRect(const BRect &rect, RGBColor &color)
+void DisplayDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
 }
 
@@ -2959,8 +2965,9 @@ void DisplayDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 }
 
 /* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */
-void DisplayDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, RGBColor &color)
+void DisplayDriver::StrokeSolidLine(const BPoint &start, const BPoint &end, const RGBColor &color)
 {
+debugger("DD:StrokeSolidLine()\n");
 }
 
 /* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */
@@ -2968,7 +2975,7 @@ void DisplayDriver::StrokePatternLine(int32 x1, int32 y1, int32 x2, int32 y2, co
 {
 }
 
-void DisplayDriver::StrokeSolidRect(const BRect &rect, RGBColor &color)
+void DisplayDriver::StrokeSolidRect(const BRect &rect, const RGBColor &color)
 {
 }
 
