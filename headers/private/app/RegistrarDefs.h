@@ -64,6 +64,7 @@ enum {
 	B_REG_MIME_DELETE					= 'rgdl',
 	B_REG_MIME_GET_INSTALLED_TYPES		= 'rgit',
 	B_REG_MIME_GET_INSTALLED_SUPERTYPES	= 'rgis',
+	B_REG_MIME_UNSUPPORT_TYPES			= 'rgut',
 };
 
 // B_REG_MIME_SET_PARAM "which" constants 
