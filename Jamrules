@@ -170,7 +170,7 @@ KERNEL_CCFLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
 KERNEL_CCFLAGS += -fno-builtin -D$(OBOS_TARGET_DEFINE) ;
 KERNEL_CCFLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 KERNEL_C++FLAGS ?= -Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc ;
-KERNEL_C++FLAGS += -fno-builtin -fno-exceptions -fno-rtti -D$(OBOS_TARGET_DEFINE) ;
+KERNEL_C++FLAGS += -fno-builtin -fno-exceptions -D$(OBOS_TARGET_DEFINE) ;
 KERNEL_C++FLAGS += -DBOCHS_DEBUG_HACK=$(BOCHS_DEBUG_HACK) -D_KERNEL_MODE ;
 if $(GCC_VERSION[1]) >= 3 {
 	KERNEL_C++FLAGS += -fno-use-cxa-atexit ;
@@ -782,8 +782,7 @@ rule R5KernelAddon
 
 	Addon $(1) : $(2) : $(3) ;
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
-	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
-								-fno-exceptions -fno-rtti ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) /boot/develop/lib/x86/_KERNEL_ ;
 }
@@ -869,8 +868,7 @@ rule R5KernelStaticLibrary
 	MakeLocateObjects $(sources) ;
 	Library $(lib) : $(sources) ;
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
-	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
-								-fno-exceptions -fno-rtti ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 }
 
 rule MergeObjectFromObjects
@@ -1777,8 +1775,7 @@ rule KernelAddon
 	SetupKernel $(3) ;
 	Addon $(1) : $(2) : $(3) ;
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
-	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
-								-fno-exceptions -fno-rtti ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
 		# ToDo this has to be changed!
