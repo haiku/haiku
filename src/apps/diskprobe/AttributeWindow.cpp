@@ -235,13 +235,13 @@ AttributeWindow::MessageReceived(BMessage *message)
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
 				"Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\n"
-				"The contents of the attribute will get lost if you click on \"Remove\".",
+				"You cannot undo this action.",
 				fAttribute, Ref().name);
 
 			int32 chosen = (new BAlert("DiskProbe request",
-				buffer, "Remove", "Cancel", NULL,
+				buffer, "Cancel", "Remove", NULL,
 				B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go();
-			if (chosen == 0) {
+			if (chosen == 1) {
 				BNode node(&Ref());
 				if (node.InitCheck() == B_OK)
 					node.RemoveAttr(fAttribute);
