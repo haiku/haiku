@@ -144,7 +144,7 @@ dump_address_info(int argc, char **argv)
 {
 	const char *symbol, *imageName;
 	bool exactMatch;
-	addr_t address;
+	addr_t address, baseAddress;
 
 	if (argc < 2) {
 		dprintf("not enough arguments\n");
@@ -153,9 +153,10 @@ dump_address_info(int argc, char **argv)
 
 	address = strtoul(argv[1], NULL, 16);
 
-	if (elf_lookup_symbol_address(address, NULL, &symbol, &imageName, &exactMatch) == B_OK)
-		dprintf("%p = %s (%s)%s\n", (void *)address, symbol, imageName, exactMatch ? "" : " (nearest)");
-	else
+	if (elf_lookup_symbol_address(address, &baseAddress, &symbol, &imageName, &exactMatch) == B_OK) {
+		dprintf("%p = %s + 0x%lx (%s)%s\n", (void *)address, symbol, address - baseAddress,
+			imageName, exactMatch ? "" : " (nearest)");
+	} else
 		dprintf("There is no image loaded at this address!\n");
 
 	return 0;
