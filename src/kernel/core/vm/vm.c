@@ -2146,15 +2146,15 @@ vm_virtual_map_lookup(vm_virtual_map *map, addr address)
 
 	// check the region_list region first
 	region = map->region_hint;
-	if(region && region->base <= address && (region->base + region->size) > address)
+	if (region && region->base <= address && (region->base + region->size) > address)
 		return region;
 
-	for(region = map->region_list; region != NULL; region = region->aspace_next) {
-		if(region->base <= address && (region->base + region->size) > address)
+	for (region = map->region_list; region != NULL; region = region->aspace_next) {
+		if (region->base <= address && (region->base + region->size) > address)
 			break;
 	}
 
-	if(region)
+	if (region)
 		map->region_hint = region;
 	return region;
 }
@@ -2245,10 +2245,12 @@ long
 get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries)
 {
 	vm_address_space *addressSpace;
+	addr_t virtualAddress = (addr_t)address;
+	addr_t pageOffset = virtualAddress & (B_PAGE_SIZE - 1);
 	addr_t physicalAddress;
 	status_t status = B_OK;
 	int32 index = -1;
-	addr_t offset;
+	addr_t offset = 0;
 	int flags;
 
 	TRACE(("get_memory_map(%p, %lu bytes, %ld entries)\n", address, numBytes, numEntries));
@@ -2257,7 +2259,7 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 		return B_BAD_VALUE;
 
 	// in which address space is the address to be found?	
-	if ((addr_t)address < KERNEL_BASE)
+	if (virtualAddress < KERNEL_BASE)
 		addressSpace = vm_get_current_user_aspace();
 	else
 		addressSpace = vm_get_kernel_aspace();
@@ -2267,13 +2269,19 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 
 	(*addressSpace->translation_map.ops->lock)(&addressSpace->translation_map);
 
-	for (offset = 0; offset < numBytes; offset += B_PAGE_SIZE) {
+	while (offset < numBytes) {
 		addr_t bytes = min(numBytes - offset, B_PAGE_SIZE);
 
 		status = (*addressSpace->translation_map.ops->query)(&addressSpace->translation_map,
 					(addr_t)address + offset, &physicalAddress, &flags);
 		if (status < 0)
 			break;
+
+		if (index < 0 && pageOffset > 0) {
+			physicalAddress += pageOffset;
+			if (bytes > B_PAGE_SIZE - pageOffset)
+				bytes = B_PAGE_SIZE - pageOffset;
+		}
 
 		// need to switch to the next physical_entry?
 		if (index < 0 || (addr_t)table[index].address != physicalAddress - table[index].size) {
@@ -2288,6 +2296,8 @@ get_memory_map(const void *address, ulong numBytes, physical_entry *table, long 
 			// page does fit in current entry
 			table[index].size += bytes;
 		}
+
+		offset += bytes;
 	}
 	(*addressSpace->translation_map.ops->unlock)(&addressSpace->translation_map);
 
