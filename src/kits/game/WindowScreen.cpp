@@ -20,14 +20,15 @@
 // WindowScreen commands
 #define WS_PROPOSE_MODE			0x00000102
 #define WS_MOVE_DISPLAY			0x00000108
+#define WS_SET_FULLSCREEN 		0x00000881
 #define WS_GET_FRAMEBUFFER 		0x00000eed
 #define WS_GET_ACCELERANT_NAME 	0x00000ef4
 #define WS_GET_DRIVER_NAME 		0x00000ef5
-#define WS_GET_DISPLAY_MODE 	0x00000efd
 #define WS_DISPLAY_UTILS		0x00000ef9
+#define WS_SET_LOCK_STATE		0x00000efb
+#define WS_GET_DISPLAY_MODE 	0x00000efd
 #define WS_SWITCH_WORKSPACE 	0x00000f26
 #define WS_SET_PALETTE			0x00000f27
-#define WS_SET_FULLSCREEN 		0x00000881
 
 
 static const uint32 WS_SET_MOUSE_POSITION = 'Ismp';
@@ -298,8 +299,10 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space, status_t *error, b
 	uint32 attributes = 0;
 	if (debug_enable)
 		attributes |= B_ENABLE_DEBUGGER;
-		
-	*error = InitData(space, attributes);
+	
+	status_t status = InitData(space, attributes);	
+	if (error)
+		*error = status;
 }
 
 
@@ -310,7 +313,9 @@ BWindowScreen::BWindowScreen(const char *title, uint32 space, uint32 attributes,
 		B_CURRENT_WORKSPACE)
 {
 	CALLED();
-	*error = InitData(space, attributes);
+	status_t status = InitData(space, attributes);	
+	if (error)
+		*error = status;
 }
 
 
@@ -747,8 +752,8 @@ BWindowScreen::InitData(uint32 space, uint32 attributes)
 	debug_first = true;
 	
 	debug_sem = create_sem(1, "WindowScreen debug sem");
-	old_space = (display_mode *)calloc(0x1, sizeof(display_mode));
-	new_space = (display_mode *)calloc(0x1, sizeof(display_mode));
+	old_space = (display_mode *)calloc(1, sizeof(display_mode));
+	new_space = (display_mode *)calloc(1, sizeof(display_mode));
 	
 	screen.GetModeList(&mode_list, &mode_count);
 	
@@ -826,7 +831,7 @@ BWindowScreen::SetActiveState(int32 state)
 			be_app->ShowCursor();				
 			if (activate_state) {
 				_BAppServerLink_ link;
-				link.fSession->swrite_l(0xF27);
+				link.fSession->swrite_l(WS_SET_PALETTE);
 				link.fSession->swrite_l(screen_index);
 				link.fSession->swrite_l(0);
 				link.fSession->swrite_l(255);
@@ -855,7 +860,7 @@ BWindowScreen::SetLockState(int32 state)
 	}
 	
 	_BAppServerLink_ link;
-	link.fSession->swrite_l(0x00000efb);
+	link.fSession->swrite_l(WS_SET_LOCK_STATE);
 	link.fSession->swrite_l(screen_index);
 	link.fSession->swrite_l(state);
 	link.fSession->swrite_l(server_token);
@@ -936,7 +941,7 @@ BWindowScreen::GetCardInfo()
 	card_info.flags = 0;
 	
 	if (mode.flags & B_SCROLL)
-		card_info.flags = B_FRAME_BUFFER_CONTROL;
+		card_info.flags |= B_FRAME_BUFFER_CONTROL;
 	if (mode.flags & B_PARALLEL_ACCESS)
 		card_info.flags |= B_PARALLEL_BUFFER_ACCESS;
 	
@@ -1069,8 +1074,8 @@ BWindowScreen::InitClone()
 	
 	// now get the symbol for GetAccelerantHook m_gah
 	if (get_image_symbol(addon_image, "get_accelerant_hook",
-		B_SYMBOL_TYPE_ANY, (void **)&m_gah) < 0)
-			return B_ERROR;
+						B_SYMBOL_TYPE_ANY, (void **)&m_gah) < 0)
+		return B_ERROR;
 	
 	// now use m_gah to get a pointer to the accelerant's clone accelerant
 	clone_accelerant clone = (clone_accelerant)m_gah(B_CLONE_ACCELERANT, 0);
