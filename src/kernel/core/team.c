@@ -1642,6 +1642,18 @@ err:
 }
 
 
+status_t
+_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size)
+{
+	if (size != sizeof(team_usage_info))
+		return B_BAD_VALUE;
+
+	// implement me!
+
+	return B_ERROR;
+}
+
+
 pid_t
 getpid(void)
 {
@@ -2194,6 +2206,26 @@ team_id
 _user_get_current_team(void)
 {
 	return team_get_current_team_id();
+}
+
+
+status_t
+_user_get_team_usage_info(team_id team, int32 who, team_usage_info *userInfo, size_t size)
+{
+	team_usage_info info;
+	status_t status;
+
+	if (!IS_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+
+	status = _get_team_usage_info(team, who, &info, size);
+	if (status != B_OK)
+		return status;
+
+	if (user_memcpy(userInfo, &info, size) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
 }
 
 
