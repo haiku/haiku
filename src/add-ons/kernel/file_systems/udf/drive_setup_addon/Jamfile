@@ -1,0 +1,69 @@
+SubDir OBOS_TOP src add-ons kernel file_systems udf drive_setup_addon ;
+
+# save original optimization level
+oldOPTIM = $(OPTIM) ;
+
+# set some additional defines
+{
+	local defines =
+		KEEP_WRONG_DIRENT_RECLEN
+		USER
+		DRIVE_SETUP_ADDON
+		;
+
+	if $(COMPILE_FOR_R5) {
+		defines += COMPILE_FOR_R5 ;
+	}
+
+	if $(DEBUG) {
+		#defines += DEBUG ;
+	} else {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
+}
+
+UsePrivateHeaders [ FDirName kernel util ] ;
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
+
+# Note that the add-on is named "i-udf-ds" to put it alphabetically
+# before the standard iso9660 add-on, thus giving it first dibs at
+# iso9660/UDF hybrid discs.
+Addon i-udf-ds : [ FDirName drive_setup fs ] :
+	udf-ds.cpp
+	CS0String.cpp
+	DiskStructures.cpp
+	PartitionMap.cpp
+	UdfDebug.cpp
+	Utils.cpp
+	Volume.cpp
+	
+	: false
+	:
+;
+
+SEARCH on [ FGristFiles
+		vfs_interface.cpp 
+		CS0String.cpp DirectoryIterator.cpp DiskStructures.cpp Icb.cpp
+		PartitionMap.cpp UdfDebug.cpp Utils.cpp Volume.cpp 
+	] = [ FDirName $(OBOS_TOP) src add-ons kernel file_systems udf ] ;
+
+rule InstallUDFDS
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore InstallUDFDS
+{
+	cp $(>) /boot/beos/system/add-ons/drive_setup/fs/
+}
+
+InstallUDFDS install : i-udf-ds ;
+
+# restore original optimization level
+OPTIM = $(oldOPTIM) ;
+
