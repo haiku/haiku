@@ -67,11 +67,12 @@ private:
 
 	_FreeBlock *fFreeList;
 	size_t		fBlockSize;
-	int32		fExcessBlocks;
+	int32		fFreeBlocks;
+	int32		fBlockCount;
 	BLocker		fLocker;
 	void *		(*fAlloc)(size_t size);
 	void		(*fFree)(void *pointer);
-	uint32		_reserved[3];
+	uint32		_reserved[2];
 };
 
 #endif /* _BLOCK_CACHE_H */

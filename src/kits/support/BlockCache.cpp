@@ -33,16 +33,15 @@
 // as well as Get() function, allowing the caller to dispose of the
 // memory, do not allow to allocate one large block to be used as pool.
 // Thus we need to create multiple small ones.
-// We maintain a list of free blocks. If more blocks with a size of blockSize
-// are allocated than available, the variable fExcessBlocks is used to avoid
-// growing the pool of free buffers
+// We maintain a list of free blocks.
 
 BBlockCache::BBlockCache(uint32 blockCount,
 						 size_t blockSize,
 						 uint32 allocationType)
  :	fFreeList(0),
  	fBlockSize(blockSize),
- 	fExcessBlocks(0),
+ 	fFreeBlocks(blockCount),
+ 	fBlockCount(blockCount),
 	fLocker("some BBlockCache lock"),
 	fAlloc(0),
 	fFree(0) 
@@ -107,13 +106,9 @@ BBlockCache::Get(size_t blockSize)
 		ASSERT(fFreeList->magic2 == MAGIC2 + (uint32)fFreeList->next);
 		pointer = fFreeList;
 		fFreeList = fFreeList->next;
+		fFreeBlocks--;
 		DEBUG_ONLY(memset(pointer, 0xCC, sizeof(_FreeBlock)));
 	} else {
-		// we need to allocate a new block
-		if (blockSize == fBlockSize) {
-			// we now have one more block than wanted
-			fExcessBlocks++;
-		}
 		if (blockSize < sizeof(_FreeBlock))
 			blockSize = sizeof(_FreeBlock);
 		pointer = fAlloc(blockSize);
@@ -128,19 +123,15 @@ BBlockCache::Save(void *pointer, size_t blockSize)
 {
 	if (!fLocker.Lock())
 		return;
-	if (blockSize == fBlockSize && fExcessBlocks <= 0) {
+	if (blockSize == fBlockSize && fFreeBlocks < fBlockCount) {
 		// the block needs to be returned to the cache
 		_FreeBlock *block = reinterpret_cast<_FreeBlock *>(pointer);
 		block->next = fFreeList;
 		fFreeList = block;
+		fFreeBlocks++;
 		DEBUG_ONLY(block->magic1 = MAGIC1);
 		DEBUG_ONLY(block->magic2 = MAGIC2 + (uint32)block->next);
 	} else {
-		// the block needs to be deallocated
-		if (blockSize == fBlockSize) {
-			fExcessBlocks--;
-			ASSERT(fExcessBlocks >= 0);
-		}
 		DEBUG_ONLY(memset(pointer, 0xCC, sizeof(_FreeBlock)));
 		fFree(pointer);
 	}
