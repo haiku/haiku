@@ -36,28 +36,14 @@ MediaWriterAddOn::~MediaWriterAddOn()
 }
 
 MediaWriterAddOn::MediaWriterAddOn(image_id image) :
-	BMediaAddOn(image)
+	AbstractFileInterfaceAddOn(image)
 {
 	fprintf(stderr,"MediaWriterAddOn::MediaWriterAddOn\n");
-	refCount = 0;
 }
-	
+
 // -------------------------------------------------------- //
 // BMediaAddOn impl
 // -------------------------------------------------------- //
-
-status_t MediaWriterAddOn::InitCheck(
-	const char ** out_failure_text)
-{
-	fprintf(stderr,"MediaWriterAddOn::InitCheck\n");
-	return B_OK;
-}
-
-int32 MediaWriterAddOn::CountFlavors()
-{
-	fprintf(stderr,"MediaWriterAddOn::CountFlavors\n");
-	return 1;
-}
 
 status_t MediaWriterAddOn::GetFlavorAt(
 	int32 n,
@@ -72,7 +58,10 @@ status_t MediaWriterAddOn::GetFlavorAt(
 		fprintf(stderr,"<- B_BAD_INDEX\n");
 		return B_BAD_INDEX;
 	}
-	return MediaWriter::GetFlavor(n,out_info);
+	flavor_info * infos = new flavor_info[1];
+	MediaWriter::GetFlavor(&infos[0],n);
+	(*out_info) = infos;
+	return B_OK;
 }
 
 BMediaNode * MediaWriterAddOn::InstantiateNodeFor(
@@ -87,9 +76,10 @@ BMediaNode * MediaWriterAddOn::InstantiateNodeFor(
 	}
 	size_t defaultChunkSize = size_t(8192); // XXX: read from add-on's attributes
 	float defaultBitRate = 800000;
-	MediaWriter * node = new MediaWriter(defaultChunkSize,
-										 defaultBitRate,
-										 info,config,this);
+	MediaWriter * node
+		= new MediaWriter(defaultChunkSize,
+						  defaultBitRate,
+						  info,config,this);
 	if (node == 0) {
 		*out_error = B_NO_MEMORY;
 		fprintf(stderr,"<- B_NO_MEMORY\n");
@@ -108,7 +98,8 @@ status_t MediaWriterAddOn::GetConfigurationFor(
 		fprintf(stderr,"<- B_BAD_VALUE\n");
 		return B_BAD_VALUE; // we refuse to crash because you were stupid
 	}	
-	MediaWriter * node = dynamic_cast<MediaWriter*>(your_node);
+	MediaWriter * node
+		= dynamic_cast<MediaWriter*>(your_node);
 	if (node == 0) {
 		fprintf(stderr,"<- B_BAD_TYPE\n");
 		return B_BAD_TYPE;
@@ -116,66 +107,18 @@ status_t MediaWriterAddOn::GetConfigurationFor(
 	return node->GetConfigurationFor(into_message);
 }
 
-bool MediaWriterAddOn::WantsAutoStart()
-{
-	fprintf(stderr,"MediaWriterAddOn::WantsAutoStart\n");
-	return false;
-}
-
-status_t MediaWriterAddOn::AutoStart(
-				int in_count,
-				BMediaNode ** out_node,
-				int32 * out_internal_id,
-				bool * out_has_more)
-{
-	fprintf(stderr,"MediaWriterAddOn::AutoStart\n");
-	return B_OK;
-}
-
 // -------------------------------------------------------- //
 // BMediaAddOn impl for B_FILE_INTERFACE nodes
 // -------------------------------------------------------- //
 
-status_t MediaWriterAddOn::SniffRef(
-				const entry_ref & file,
-				BMimeType * io_mime_type,
-				float * out_quality,
-				int32 * out_internal_id)
-{
-	fprintf(stderr,"MediaWriterAddOn::SniffRef\n");
-	if ((io_mime_type == 0) || (out_quality == 0) || (out_internal_id == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
-	*out_internal_id = 0; // only one flavor
-	char mime_string[B_MIME_TYPE_LENGTH+1];
-	status_t status =  MediaWriter::StaticSniffRef(file,mime_string,out_quality);
-	io_mime_type->SetTo(mime_string);
-	return status;
-}
-
-// even though I implemented SniffTypeKind below and this shouldn't get called,
-// I am going to implement it anyway.  I'll use it later anyhow.
-status_t MediaWriterAddOn::SniffType(
-				const BMimeType & type,
-				float * out_quality,
-				int32 * out_internal_id)
-{
-	fprintf(stderr,"MediaWriterAddOn::SniffType\n");
-	if ((out_quality == 0) || (out_internal_id == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}	
-	*out_quality = 1.0;
-	*out_internal_id = 0;
-	return B_OK;	
-}
-
 // This function treats null pointers slightly differently than the others.
 // This is because a program could reasonably call this function with just
-// about any junk, get the out_read_items and then use that to create an
-// array of sufficient size to hold the result, and then recall.  Also, a
-// stupid program could not supply an out_read_items, but actually supply
+// about any junk, get the out_read_items or out_write_items and then use
+// that to create an array of sufficient size to hold the result, and then
+// call us again.  So we won't punish them if they supply us with null
+// pointers the first time around.
+//
+// A stupid program might not supply an out_read_items, but actually supply
 // an out_readable_formats and then try to do something useful with it. As
 // an extreme gesture of nicety we will fill the out_readable_formats with
 // a valid entry, although they could easily read into garbage after that...
@@ -203,11 +146,10 @@ status_t MediaWriterAddOn::GetFileFormatList(
 	if (out_read_items != 0) {
 		*out_read_items = 1;
 	}
-	// see null check comment above
 	if (out_readable_formats != 0) {
 		// don't go off the end
-		if (in_read_items > 0) {
-			out_readable_formats[0] = MediaWriter::GetFileFormat();
+		if (in_write_items > 0) {
+			out_writable_formats[0] = *MediaWriter::GetFileFormat();
 		}
 	}
 	return B_OK;
@@ -220,21 +162,11 @@ status_t MediaWriterAddOn::SniffTypeKind(
 				int32 * out_internal_id,
 				void * _reserved)
 {
-	fprintf(stderr,"MediaWriterAddOn::SniffTypeKind\n");
-	if ((out_quality == 0) || (out_internal_id == 0)) {
-		fprintf(stderr,"<- B_BAD_VALUE\n");
-		return B_BAD_VALUE; // we refuse to crash because you were stupid
-	}
-	if (in_kinds & (B_BUFFER_CONSUMER | B_FILE_INTERFACE | B_CONTROLLABLE)) {
-		return SniffType(type,out_quality,out_internal_id);
-	} else {
-		// They asked for some kind we don't supply.  We set the output
-		// just in case they try to do something with it anyway (!)
-		*out_quality = 0;
-		*out_internal_id = -1; 
-		fprintf(stderr,"<- B_BAD_TYPE\n");
-		return B_BAD_TYPE;
-	}
+	fprintf(stderr,"MediaReaderAddOn::SniffTypeKind\n");
+	return AbstractFileInterfaceAddOn::SniffTypeKind(type,in_kinds,
+													 B_BUFFER_CONSUMER,
+													 out_quality,out_internal_id,
+													 _reserved);
 }
 
 // -------------------------------------------------------- //

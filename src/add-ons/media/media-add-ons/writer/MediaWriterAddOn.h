@@ -12,9 +12,10 @@
 
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
+#include "../AbstractFileInterfaceAddOn.h"
 
 class MediaWriterAddOn :
-    public BMediaAddOn
+    public AbstractFileInterfaceAddOn
 {
 public:
 	virtual ~MediaWriterAddOn(void);
@@ -23,9 +24,6 @@ public:
 /**************************/
 /* begin from BMediaAddOn */
 public:
-virtual	status_t InitCheck(
-				const char ** out_failure_text);
-virtual	int32 CountFlavors(void);
 virtual	status_t GetFlavorAt(
 				int32 n,
 				const flavor_info ** out_info);
@@ -36,23 +34,8 @@ virtual	BMediaNode * InstantiateNodeFor(
 virtual	status_t GetConfigurationFor(
 				BMediaNode * your_node,
 				BMessage * into_message);
-virtual	bool WantsAutoStart(void);
-virtual	status_t AutoStart(
-				int in_count,
-				BMediaNode ** out_node,
-				int32 * out_internal_id,
-				bool * out_has_more);
 
 /* only implement if you have a B_FILE_INTERFACE node */
-virtual	status_t SniffRef(
-				const entry_ref & file,
-				BMimeType * io_mime_type,
-				float * out_quality,
-				int32 * out_internal_id);
-virtual	status_t SniffType(					//	This is broken if you deal with producers 
-				const BMimeType & type,		//	and consumers both. Use SniffTypeKind instead.
-				float * out_quality,		//	If you implement SniffTypeKind, this doesn't
-				int32 * out_internal_id);	//	get called.
 virtual	status_t GetFileFormatList(
 				int32 flavor_id,			//	for this node flavor (if it matters)
 				media_file_format * out_writable_formats, 	//	don't write here if NULL
@@ -69,7 +52,6 @@ virtual	status_t SniffTypeKind(				//	Like SniffType, but for the specific kind(
 				int32 * out_internal_id,
 				void * _reserved);
 
-
 /* end from BMediaAddOn */
 /************************/
 
@@ -79,8 +61,6 @@ private:
 				const MediaWriterAddOn & clone);
 		MediaWriterAddOn & operator=(
 				const MediaWriterAddOn & clone);				
-
-		int32 refCount;
 
 		/* Mmmh, stuffing! */
 virtual		status_t _Reserved_MediaWriterAddOn_0(void *);
