@@ -17,12 +17,13 @@
 //#define CHANGE_BORDER_TEST
 //#define SIZE_TEST
 
+uint32 gNumWindows = 0;
+
 
 class Window : public BWindow {
 	public:
 		Window();
-		virtual ~Window();
-		
+
 		virtual bool QuitRequested();
 };
 
@@ -99,18 +100,65 @@ Window::Window()
 #ifdef SIZE_TEST
 	printf("sizeof = %lu (R5 == 212)\n", sizeof(BScrollView));
 #endif
-}
 
-
-Window::~Window()
-{
+	gNumWindows++;
 }
 
 
 bool
 Window::QuitRequested()
 {
-	be_app->PostMessage(B_QUIT_REQUESTED);
+	if (--gNumWindows <= 0)
+		be_app->PostMessage(B_QUIT_REQUESTED);
+	return true;
+}
+
+
+//	#pragma mark -
+
+
+class KnobWindow : public BWindow {
+	public:
+		KnobWindow(bool horiz, bool vert);
+
+		virtual bool QuitRequested();
+};
+
+
+KnobWindow::KnobWindow(bool horiz, bool vert)
+	: BWindow(BRect(200, 200, 400, 400), "Scroll Knob",
+			B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+{
+	BRect frame = Bounds();
+
+	if (horiz) {
+		MoveBy(50, 50);
+		frame.bottom -= B_H_SCROLL_BAR_HEIGHT;
+	}
+	if (vert) {
+		MoveBy(100, 100);
+		frame.right -= B_V_SCROLL_BAR_WIDTH;
+	}
+
+	BView *view = new BView(frame, "main view", B_FOLLOW_ALL, B_WILL_DRAW);
+	view->SetViewColor(200, 200, 21);
+	BView *inner = new BView(frame.OffsetToCopy(B_ORIGIN).InsetBySelf(3, 3),
+						"inner", B_FOLLOW_ALL, B_WILL_DRAW);
+	inner->SetViewColor(200, 42, 42);
+	view->AddChild(inner);
+
+	BScrollView *scroller = new BScrollView("scroller", view, B_FOLLOW_ALL, 0, horiz, vert);
+	AddChild(scroller);
+
+	gNumWindows++;
+}
+
+
+bool 
+KnobWindow::QuitRequested()
+{
+	if (--gNumWindows <= 0)
+		be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
 }
 
@@ -135,7 +183,16 @@ Application::Application()
 void
 Application::ReadyToRun(void)
 {
-	Window *window = new Window();
+	BWindow *window = new Window();
+	window->Show();
+
+	window = new KnobWindow(true, false);
+	window->Show();
+
+	window = new KnobWindow(false, true);
+	window->Show();
+
+	window = new KnobWindow(true, true);
 	window->Show();
 }
 
