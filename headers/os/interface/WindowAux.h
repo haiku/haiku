@@ -49,6 +49,7 @@ struct  _BCmdKey{
 	uint32		modifiers;
 	BMessage*	message;
 	BHandler*	target;
+	int32		targetToken;
 };
 
 #endif // _WINDOWAUX_H

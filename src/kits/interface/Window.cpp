@@ -29,6 +29,8 @@
 
 // System Includes -------------------------------------------------------------
 #include <BeBuild.h>
+#include <stdio.h>
+#include <math.h>
 
 // Project Includes ------------------------------------------------------------
 #include <AppMisc.h>
@@ -47,9 +49,12 @@
 #include <ServerProtocol.h>
 #include <AppServerLink.h>
 #include <MessageQueue.h>
+#include <MessageRunner.h>
+#include <Roster.h>
 
 // Local Includes --------------------------------------------------------------
 #include "WindowAux.h"
+#include <TokenSpace.h>
 #include "MessageUtils.h"
 
 // Local Defines ---------------------------------------------------------------
@@ -119,13 +124,14 @@ BWindow::BWindow(BRect frame,
 				window_type type,
 				uint32 flags,
 				uint32 workspace = B_CURRENT_WORKSPACE)
+			: BLooper( title )
 {
 	window_look look;
 	window_feel feel;
 	
 	decomposeType(type, &look, &feel);
 
-	BWindow(frame, title, look, feel, flags, workspace);
+	InitData( frame, title, look, feel, flags, workspace);
 }
 
 //------------------------------------------------------------------------------
@@ -138,67 +144,7 @@ BWindow::BWindow(BRect frame,
 				uint32 workspace = B_CURRENT_WORKSPACE)
 			: BLooper( title )
 {
-	if ( be_app == NULL ){
-		//debugger("You need a valid BApplication object before interacting with the app_server");
-		return;
-	}
-	fTitle=NULL;
 	InitData( frame, title, look, feel, flags, workspace );
-
-	receive_port	= create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,
-						"OBOS: BWindow - receivePort");
-	if (receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS){
-		//debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
-		return;
-	}
-	
-
-		// let app_server to know that a window has been created.
-	BPrivate::BAppServerLink *baslink=new BPrivate::BAppServerLink;
-	baslink->Init();
-	baslink->portlink->SetOpCode(AS_CREATE_WINDOW);
-	baslink->portlink->Attach(fFrame);
-	baslink->portlink->Attach((int32)WindowLookToInteger(fLook));
-	baslink->portlink->Attach((int32)WindowFeelToInteger(fFeel));
-	baslink->portlink->Attach((int32)fFlags);
-	baslink->portlink->Attach((int32)workspace);	
-	baslink->portlink->Attach(_get_object_token_(this));
-	baslink->portlink->Attach(&receive_port,sizeof(port_id));
-		// We add one so that the string will end up NULL-terminated.
-	baslink->portlink->Attach( (char*)title, strlen(title)+1 );
-	
-		// Send and wait for ServerWindow port. Necessary here so we can respond to
-		// messages as soon as Show() is called.
-	PortLink::ReplyData replyData;
-	status_t replyStat;
-
-		// HERE we are in BApplication's thread, so for locking we use be_app variable
-		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
-	be_app->Lock();
-	
-	replyStat		= baslink->portlink->FlushWithReply( &replyData );
-	if ( replyStat != B_OK ){
-		//debugger("First reply from app_server was not received.");
-		return;
-	}
-	delete baslink;
-	
-		// unlock, so other threads can do their job.
-	be_app->Unlock();
-	
-	send_port		= *((port_id*)replyData.buffer);
-
-		// Set the port on witch app_server will listen for us	
-	serverLink = new PortLink(send_port);
-		// Initialize a PortLink object for use with graphic calls.
-		// They need to be sent separately because of the speed reasons.
-	srvGfxLink		= new PortLink( send_port );	
-	
-		// Create and attach the top view
-	top_view			= buildTopView();
-		// Here we will register the top view with app_server
-// TODO: implement the following function
-	attachTopView( );
 }
 
 //------------------------------------------------------------------------------
@@ -206,22 +152,56 @@ BWindow::BWindow(BRect frame,
 BWindow::BWindow(BMessage* data)
 	: BLooper(data)
 {
-// TODO: implement correctly
-	BMessage msg;
-	BArchivable *obj;
+	BMessage		msg;
+	BArchivable		*obj;
+	const char		*title;
+	window_look		look;
+	window_feel		feel;
+	uint32			type;
+	uint32			workspaces;
 
-// TODO: Instantiate BWindow's data members
-		//	like: data->FindInt32("MyClass::Property1", &property1);
+	status_t		retval;
 
+	data->FindRect("_frame", &fFrame);
+	data->FindString("_title", &title);
+	data->FindInt32("_wlook", (int32*)&look);
+	data->FindInt32("_wfeel", (int32*)&feel);
+	if ( data->FindInt32("_flags", (int32*)&fFlags) == B_OK )
+		{ }
+	else
+		fFlags		= 0;
+	data->FindInt32("_wspace", (int32*)&workspaces);
 
-		// I still have doubts about instantiating childrens in this way,
-		// but I REALLY think it's OK
-	if (data->FindMessage("children", &msg) == B_OK){
+	if ( data->FindInt32("_type", (int32*)&type) == B_OK ){
+		decomposeType( (window_type)type, &fLook, &fFeel );
+	}
+
+		// connect to app_server and initialize data
+	InitData( fFrame, title, look, feel, fFlags, workspaces );
+
+	if ( data->FindFloat("_zoom", 0, &fMaxZoomWidth) == B_OK )
+		if ( data->FindFloat("_zoom", 1, &fMaxZoomHeight) == B_OK)
+			SetZoomLimits( fMaxZoomWidth, fMaxZoomHeight );
+
+	if (data->FindFloat("_sizel", 0, &fMinWindWidth) == B_OK )
+		if (data->FindFloat("_sizel", 1, &fMinWindHeight) == B_OK )
+			if (data->FindFloat("_sizel", 2, &fMaxWindWidth) == B_OK )
+				if (data->FindFloat("_sizel", 3, &fMaxWindHeight) == B_OK )
+					SetSizeLimits(	fMinWindWidth, fMaxWindWidth,
+									fMinWindHeight, fMaxWindHeight );
+
+	if (data->FindInt64("_pulse", &fPulseRate) == B_OK )
+		SetPulseRate( fPulseRate );
+
+	int				i = 0;
+	while ( data->FindMessage("_views", i++, &msg) == B_OK){ 
 		obj			= instantiate_object(&msg);
-//		top_view	= dynamic_cast<BView *>(obj);
 
-//		top_view->Instantiate( &msg );
-	} 
+		BView		*child;
+		child		= dynamic_cast<BView *>(obj);
+		if (child)
+			AddChild( child ); 
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -245,8 +225,8 @@ BWindow::~BWindow(){
 	
 // TODO: release other dinamicaly alocated objects
 
-		// topView has already been detached by BWindow::Quit()
-	delete		top_view;
+		// disable pulsing
+	SetPulseRate( 0 );
 
 	delete		srvGfxLink;
 	delete		serverLink;
@@ -256,9 +236,9 @@ BWindow::~BWindow(){
 //------------------------------------------------------------------------------
 
 BArchivable* BWindow::Instantiate(BMessage* data){
+
    if ( !validate_instantiation( data , "BWindow" ) ) 
       return NULL; 
-
    return new BWindow(data); 
 }
 
@@ -266,64 +246,88 @@ BArchivable* BWindow::Instantiate(BMessage* data){
 
 status_t BWindow::Archive(BMessage* data, bool deep = true) const{
 
-// TODO: implement correctly
 	status_t		retval;
-	retval			= B_OK;
 
-	BLooper::Archive( data, deep );
+	retval		= BLooper::Archive( data, deep );
+	if (retval != B_OK)
+		return retval;
 
-// TODO: add BWindow's members to *data
+	data->AddRect("_frame", fFrame);
+	data->AddString("_title", fTitle);
+	data->AddInt32("_wlook", fLook);
+	data->AddInt32("_wfeel", fFeel);
+	if (fFlags)
+		data->AddInt32("_flags", fFlags);
+	data->AddInt32("_wspace", (uint32)Workspaces());
+
+	if ( !composeType(fLook, fFeel) )
+		data->AddInt32("_type", (uint32)Type());
+
+	if (fMaxZoomWidth != 32768.0 || fMaxZoomHeight != 32768.0)
+	{
+		data->AddFloat("_zoom", fMaxZoomWidth);
+		data->AddFloat("_zoom", fMaxZoomHeight);
+	}
+
+	if (fMinWindWidth != 0.0	 || fMinWindHeight != 0.0 ||
+		fMaxWindWidth != 32768.0 || fMaxWindHeight != 32768.0)
+	{
+		data->AddFloat("_sizel", fMinWindWidth);
+		data->AddFloat("_sizel", fMinWindHeight);
+		data->AddFloat("_sizel", fMaxWindWidth);
+		data->AddFloat("_sizel", fMaxWindHeight);
+	}
+
+	if (fPulseRate != 500000)
+		data->AddInt64("_pulse", fPulseRate);
 
 	if (deep)
 	{
-		BMessage		childArchive;
+		int32		noOfViews = CountChildren();
+		for (int i=0; i<noOfViews; i++){
+			BMessage		childArchive;
 
-		retval			= top_view->Archive( &childArchive, deep);
-		if (retval != B_OK)
-			return retval;
-
-		data->AddMessage( "children", &childArchive );
+			retval			= ChildAt(i)->Archive( &childArchive, deep );
+			if (retval == B_OK)
+				data->AddMessage( "_views", &childArchive );
+		}
 	}
 
-
-		// SHOULD WE ADD THIS ??????????
-		//   in disassembly code this isn't called - that makes no sense
-		//   because BWindow::Instantiate( BMessage* ) calls support kit's
-		//   validate_instantiation( BMessage*, "BWindow" ). and if we do not
-		//   put the following line, validate_instantiation(...) would not
-		//   find "BWindow" in the message's "class" field
-		// TODO: ask someone that works on Support Kit
-	data->AddString("class", "BWindow");
-
-
-		// SHOULD WE ADD THIS ??????????
-		//   if we do, what is BWindow's signature???
-	data->AddString("add_on", "application/Be-window");
-	
-	return retval;
+	return B_OK;
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::Quit(){
-/*
-	Quit() removes the window from the screen(1), deletes all the BViews in its view
- 		hierarchy(2), destroys the window thread(3), removes the window's connection
-		to the Application Server(4), and deletes the BWindow object(5). 
-*/
-		//		1
+
+	if (!IsLocked())
+	{
+		const char* name = Name();
+		if (!name)
+			name = "no-name";
+
+		printf("ERROR - you must Lock a looper before calling Quit(), "
+			   "team=%ld, looper=%s\n", Team(), name);
+	}
+
+		// Try to lock
+	if (!Lock()){
+			// We're toast already
+		return;
+	}
+
 	while (!IsHidden())	{ Hide(); }
 
-		//		2, 4
-	detachTopView();	// AND kills app_server connection
+		// ... also its children
+	detachTopView();
 
-		//		3
-	Lock();
+		// tell app_server, this window will finish execution
+	stopConnection();
+
+	if (fFlags & B_QUIT_ON_WINDOW_CLOSE)
+		be_app->PostMessage( B_QUIT_REQUESTED );
+
 	BLooper::Quit();
-
-		//		5
-	delete this;		// is it good?? I have to check!
-
 }
 
 //------------------------------------------------------------------------------
@@ -359,28 +363,24 @@ void BWindow::Minimize(bool minimize){
 	if (IsFloating())
 		return;		
 
-	serverLink->SetOpCode( B_MINIMIZE );
+	serverLink->SetOpCode( AS_WINDOW_MINIMIZE );
 	serverLink->Attach( minimize );
 
 	Lock();
 	serverLink->Flush( );
 	Unlock();
-
-	fMinimized		= minimize;
-	
-	if (minimize == false)
-		Activate();
 }
 //------------------------------------------------------------------------------
 
 status_t BWindow::SendBehind(const BWindow* window){
 
+	if (!window)
+		return B_ERROR;
+
 	PortLink::ReplyData		replyData;
 	
 	serverLink->SetOpCode( AS_SEND_BEHIND );
-// TODO: check the order of the next 2 lines	
-	//serverLink->Attach( getServerToken() );
-	//serverLink->Attach( window->getServerToken() );	
+	serverLink->Attach( _get_object_token_(window) );	
 
 	Lock();
 	serverLink->FlushWithReply( &replyData );
@@ -437,7 +437,7 @@ void BWindow::EnableUpdates(){
 
 void BWindow::BeginViewTransaction(){
 	if ( !fInTransaction ){
-		srvGfxLink->SetOpCode( AS_BEGIN_UPDATE );
+		srvGfxLink->SetOpCode( AS_BEGIN_TRANSACTION );
 		fInTransaction		= true;
 	}
 }
@@ -446,7 +446,8 @@ void BWindow::BeginViewTransaction(){
 
 void BWindow::EndViewTransaction(){
 	if ( fInTransaction ){
-		srvGfxLink->Attach( (int32)AS_END_UPDATE );
+// !!!!!!!!! if not '(int32)AS_END_TRANSACTION' we receive an error ?????
+		srvGfxLink->Attach( (int32)AS_END_TRANSACTION );
 		fInTransaction		= false;
 		Flush();
 	}
@@ -473,6 +474,8 @@ void BWindow::MessageReceived( BMessage *msg )
 	const char*			prop;
 	int32				index;
 	status_t			err;
+
+	if (msg->HasSpecifiers()){
 
 	err = msg->GetCurrentSpecifier(&index, &specifier, &what, &prop);
 	if (err == B_OK)
@@ -516,12 +519,10 @@ void BWindow::MessageReceived( BMessage *msg )
 			}break;
 
 		case B_SET_PROPERTY:{
-// TODO: check if msg->FindInt32 affects our data!
-//			we need a uint32 !!!		
 				if (strcmp(prop, "Feel") ==0 )
 				{
-					int32			newFeel;
-					if (msg->FindInt32( "data", &newFeel ) == B_OK){
+					uint32			newFeel;
+					if (msg->FindInt32( "data", (int32*)&newFeel ) == B_OK){
 						SetFeel( (window_feel)newFeel );
 						
 						replyMsg.what		= B_NO_ERROR;
@@ -536,8 +537,8 @@ void BWindow::MessageReceived( BMessage *msg )
 				
 				else if (strcmp(prop, "Flags") ==0 )
 				{
-					int32			newFlags;
-					if (msg->FindInt32( "data", &newFlags ) == B_OK){
+					uint32			newFlags;
+					if (msg->FindInt32( "data", (int32*)&newFlags ) == B_OK){
 						SetFlags( newFlags );
 						
 						replyMsg.what		= B_NO_ERROR;
@@ -555,19 +556,6 @@ void BWindow::MessageReceived( BMessage *msg )
 					BRect			newFrame;
 					if (msg->FindRect( "data", &newFrame ) == B_OK){
 						MoveTo( newFrame.LeftTop() );
-						
-						if ( newFrame.right < fMinWindWidth )
-							newFrame.right			= fMinWindWidth;
-
-						if ( newFrame.bottom < fMinWindHeight )
-							newFrame.bottom		= fMinWindHeight;
-
-						if ( newFrame.right > fMaxWindWidth )
-							newFrame.right			= fMaxWindWidth;
-
-						if ( newFrame.bottom > fMaxWindHeight )
-							newFrame.bottom		= fMaxWindHeight;
-							
 						ResizeTo( newFrame.right, newFrame.bottom);
 						
 						replyMsg.what		= B_NO_ERROR;
@@ -612,8 +600,8 @@ void BWindow::MessageReceived( BMessage *msg )
 				
 				else if (strcmp(prop, "Look") ==0 )
 				{
-					int32			newLook;
-					if (msg->FindInt32( "data", &newLook ) == B_OK){
+					uint32			newLook;
+					if (msg->FindInt32( "data", (int32*)&newLook ) == B_OK){
 						SetLook( (window_look)newLook );
 						
 						replyMsg.what		= B_NO_ERROR;
@@ -645,8 +633,8 @@ void BWindow::MessageReceived( BMessage *msg )
 				
 				else if (strcmp(prop, "Workspaces") ==0 )
 				{
-					int32			newWorkspaces;
-					if (msg->FindInt32( "data", &newWorkspaces ) == B_OK){
+					uint32			newWorkspaces;
+					if (msg->FindInt32( "data", (int32*)&newWorkspaces ) == B_OK){
 						SetWorkspaces( newWorkspaces );
 						
 						replyMsg.what		= B_NO_ERROR;
@@ -670,214 +658,215 @@ void BWindow::MessageReceived( BMessage *msg )
 		
 		msg->SendReply( &replyMsg );
 	}
+
+	} // END: if (msg->HasSpecifiers())
+	else
+		BLooper::MessageReceived( msg );
 } 
 
 //------------------------------------------------------------------------------
 
 void BWindow::DispatchMessage(BMessage *msg, BHandler *target) 
 {
-		// should ve call Lock()???
-	//Lock();
+	if (!msg){
+		BLooper::DispatchMessage( msg, target );
+		return;
+	}
+
 	switch ( msg->what ) { 
-	case B_ZOOM:
+	case B_ZOOM:{
 		Zoom();
-		break;
+		break;}
 
 	case B_MINIMIZE:{
-		bool minimize;
+		bool			minimize;
+
 		msg->FindBool("minimize", &minimize);
+
+		fMinimized		= minimize;
 		Minimize( minimize );
-		break;
-		}
+		break;}
+
 	case B_WINDOW_RESIZED:{
-		int32 width;
-		int32 height;
+		BPoint			offset;
+		int32			width, height;
+
 		msg->FindInt32("width", &width);
 		msg->FindInt32("height", &height);
-		FrameResized( width, height );
-		break;
-		}
+		offset.x		= width;
+		offset.y		= height;
+
+		fFrame.SetRightBottom( fFrame.LeftTop() + offset );
+		FrameResized( offset.x, offset.y );
+		break;}
+
 	case B_WINDOW_MOVED:{
-		BPoint origin;
+		BPoint			origin;
+
 		msg->FindPoint("where", &origin);
+
+		fFrame.OffsetTo( origin );
 		FrameMoved( origin );
-		break;
-		}
+		break;}
+
+		// this is NOT an app_server message and we have to be cautious
 	case B_WINDOW_MOVE_BY:{
-		MessageReceived( msg );
-		break;
-		}
+		BPoint			offset;
+
+		if (msg->FindPoint("data", &offset) == B_OK)
+			MoveBy( offset.x, offset.y );
+		else
+			msg->SendReply( B_MESSAGE_NOT_UNDERSTOOD );
+		break;}
+
+		// this is NOT an app_server message and we have to be cautious
 	case B_WINDOW_MOVE_TO:{
-		MessageReceived( msg );
-		break;
-		}
+		BPoint			origin;
+
+		if (msg->FindPoint("data", &origin) == B_OK)
+			MoveTo( origin );
+		else
+			msg->SendReply( B_MESSAGE_NOT_UNDERSTOOD );
+		break;}
+
 	case B_WINDOW_ACTIVATED:{
-		bool activated;
-		msg->FindBool("active", &activated);
-		WindowActivated( activated );
-// TODO: send this message to all attached BViews
-		top_view->WindowActivated( activated );
-		break;
-		}
+		bool			active;
+
+		msg->FindBool("active", &active);
+
+		fActive			= active; 
+		handleActivation( active );
+		break;}
+
 	case B_SCREEN_CHANGED:{
-		BRect frame;
-		int32 mode;
+		BRect			frame;
+		uint32			mode;
+
 		msg->FindRect("frame", &frame);
-		msg->FindInt32("mode", &mode);
+		msg->FindInt32("mode", (int32*)&mode);
 		ScreenChanged( frame, (color_space)mode );
-		break;
-		}
+		break;}
+
 	case B_WORKSPACE_ACTIVATED:{
-		int32 workspace;
-		bool active;
-		msg->FindInt32( "workspace", &workspace );
+		uint32			workspace;
+		bool			active;
+
+		msg->FindInt32( "workspace", (int32*)&workspace );
 		msg->FindBool( "active", &active );
 		WorkspaceActivated( workspace, active );
-		break;
-		}
+		break;}
+
 	case B_WORKSPACES_CHANGED:{
-		int32 oldWorkspace;
-		int32 newWorkspace;
-		msg->FindInt32( "old", &oldWorkspace );
-		msg->FindInt32( "new", &newWorkspace );
+		uint32			oldWorkspace;
+		uint32			newWorkspace;
+
+		msg->FindInt32( "old", (int32*)&oldWorkspace );
+		msg->FindInt32( "new", (int32*)&newWorkspace );
 		WorkspacesChanged( oldWorkspace, newWorkspace );
-		break;
-		}
+		break;}
+
 	case B_KEY_DOWN:{
-		int32		keyRepeat;
-		int32		modifiers;
-		BString		string;
+		uint32			modifiers;
+		int32			raw_char;
+		const char		*string;
 
-		msg->FindInt32( "be:key_repeat", &keyRepeat );
-		msg->FindInt32( "modifiers", &modifiers );
+		msg->FindInt32( "modifiers", (int32*)&modifiers );
+		msg->FindInt32( "raw_char", &raw_char );
 		msg->FindString( "bytes", &string );
 
-// TODO: !!! Implement handleBWindowKeys(...)
-		if ( !handleBWindowKeys( string, modifiers) )
-			fFocus->KeyDown( string.String(), keyRepeat );
-		break;
-		}
+		if ( !handleKeyDown( raw_char, (uint32)modifiers) )
+			fFocus->KeyDown( string, strlen(string)-1 );
+		break;}
+
 	case B_KEY_UP:{
-		int32		keyRepeat;
-		BString		string;
+		int32			keyRepeat;
+		const char		*string;
 
-		msg->FindInt32( "be:key_repeat", &keyRepeat );
 		msg->FindString( "bytes", &string );
+		fFocus->KeyUp( string, strlen(string)-1 );
+		break;}
 
-		fFocus->KeyUp( string.String(), keyRepeat );
-		break;
-		}
+	case B_UNMAPPED_KEY_DOWN:{
+		if (fFocus)
+			fFocus->MessageReceived( msg );
+		break;}
+
+	case B_UNMAPPED_KEY_UP:{
+		if (fFocus)
+			fFocus->MessageReceived( msg );
+		break;}
+
+	case B_MODIFIERS_CHANGED:{
+		if (fFocus)
+			fFocus->MessageReceived( msg );
+		break;}
+
+	case B_MOUSE_WHEEL_CHANGED:{
+		if (fFocus)
+			fFocus->MessageReceived( msg );
+		break;}
+
 	case B_MOUSE_DOWN:{
-		BPoint		where;
-		int32		modifiers;
-		int32		buttons;
-		int32		clicks;
+		BPoint			where;
+		uint32			modifiers;
+		uint32			buttons;
+		int32			clicks;
 
 		msg->FindPoint( "where", &where );
-		msg->FindInt32( "modifiers", &modifiers );
-		msg->FindInt32( "buttons", &buttons );
+		msg->FindInt32( "modifiers", (int32*)&modifiers );
+		msg->FindInt32( "buttons", (int32*)&buttons );
 		msg->FindInt32( "clicks", &clicks );
-		
-// TODO: find the view for witch this message was sent!
-// TODO: !!! change Focus !!!
-// TODO: !!! Implement sendMessageUsingEventMask(...) !!!
+
 		sendMessageUsingEventMask( B_MOUSE_DOWN, where );
-		break;
-		}
+		break;}
+
 	case B_MOUSE_UP:{
-		BPoint		where;
-		int32		modifiers;
+		BPoint			where;
+		uint32			modifiers;
 
 		msg->FindPoint( "where", &where );
-		msg->FindInt32( "modifiers", &modifiers );
+		msg->FindInt32( "modifiers", (int32*)&modifiers );
 		
-// TODO: !!! Implement sendMessageUsingEventMask(...) !!!
 		sendMessageUsingEventMask( B_MOUSE_UP, where );
-		break;
-		}
+		break;}
+
 	case B_MOUSE_MOVED:{
-		BPoint		where;
-		int32		buttons;
+		BPoint			where;
+		uint32			buttons;
 
 		msg->FindPoint( "where", &where );
-		msg->FindInt32( "buttons", &buttons );
+		msg->FindInt32( "buttons", (int32*)&buttons );
 		
-// TODO: !!! Implement sendMessageUsingEventMask(...) !!!
 		sendMessageUsingEventMask( B_MOUSE_MOVED, where );
-		break;
-		}
-	case B_VIEW_RESIZED:{
-		int32 width;
-		int32 height;
+		break;}
 
-		msg->FindInt32("width", &width);
-		msg->FindInt32("height", &height);
-
-// TODO: find the view for witch this message was sent!
-		top_view->FrameResized( width, height );
-		break;
-		}
-	case B_VIEW_MOVED:{
-		BPoint origin;
-
-		msg->FindPoint("where", &origin);
-
-// TODO: find the view for witch this message was sent!
-		top_view->FrameMoved( origin );
-		break;
-		}
-	case B_VALUE_CHANGED:{
-		int32		newScrollValue;
-
-		msg->FindInt32( "value" , &newScrollValue );
-
-// TODO: make a research to see what is this all about!
-		// oh shit... what scrollbar??? of an active BView???  have to make some tests!!!
-		// call hook function BScrollBar::ValueChanged( (float)newScrollValue );
-		break;
-		}
-/*
-Note:	The next four messages are sent by handleBWindowKeys(...) function
-			when it finds key combinations like Command+q, Command+c, Command+v, ...
-			
-*/
-	case B_CUT:{
-// TODO: find the view for witch this message was sent!
-		top_view->MessageReceived( msg );
-		break;
-		}
-	case B_COPY:{
-// TODO: find the view for witch this message was sent!
-		top_view->MessageReceived( msg );
-		break;
-		}
-	case B_PASTE:{
-// TODO: find the view for witch this message was sent!
-		top_view->MessageReceived( msg );
-	break;
-		}
-	case B_SELECT_ALL:{
-// TODO: find the view for witch this message was sent!
-		top_view->MessageReceived( msg );
-		break;
-		}
 	case B_PULSE:{
+		if (fPulseEnabled)
+			sendPulse( top_view );
+		break;}
 
-		sendWillingBViewsPulseMsg( top_view );
-		break;
-		}
 	case B_QUIT_REQUESTED:{
-		Quit();
-		break;
-		}
+		if (QuitRequested())
+			Quit();
+		break;}
+
+	case _UPDATE_:{
+		BView			*view;
+		int32			token;
+		BRect			frame;
+
+		msg->FindInt32("token", &token);
+		msg->FindRect("frame", &frame);
+		view			= findView( top_view, token );
+
+		drawView( view, frame );
+		break;}
+
 	default:{
-		MessageReceived( msg );
-		//Unlock();
 		BLooper::DispatchMessage(msg, target); 
-		break; 
-		}
+		break;}
    }
-   //Unlock();
+   Flush();
 } 
 
 //------------------------------------------------------------------------------
@@ -926,12 +915,33 @@ void BWindow::MenusEnded(){
 
 void BWindow::SetSizeLimits(float minWidth, float maxWidth, 
 							float minHeight, float maxHeight){
-	fMinWindHeight		= minHeight;
-	fMinWindWidth		= minWidth;
-	fMaxWindHeight		= maxHeight;
-	fMaxWindWidth		= maxWidth;
-	
-// TODO: we should send those to app_server	
+
+	if (minWidth > maxWidth)
+		return;
+	if (minHeight > maxHeight)
+		return;
+
+	PortLink::ReplyData		replyData;
+
+	serverLink->SetOpCode( AS_SET_SIZE_LIMITS );
+	serverLink->Attach( fMinWindWidth );
+	serverLink->Attach( fMaxWindWidth );
+	serverLink->Attach( fMinWindHeight );
+	serverLink->Attach( fMaxWindHeight );
+		
+	Lock();
+	serverLink->FlushWithReply( &replyData );
+	Unlock();
+
+	delete replyData.buffer;
+
+	if (replyData.code == SERVER_TRUE){
+		fMinWindHeight		= minHeight;
+		fMinWindWidth		= minWidth;
+		fMaxWindHeight		= maxHeight;
+		fMaxWindWidth		= maxWidth;
+	}
+
 }
 
 //------------------------------------------------------------------------------
@@ -947,10 +957,15 @@ void BWindow::GetSizeLimits(float *minWidth, float *maxWidth,
 //------------------------------------------------------------------------------
 
 void BWindow::SetZoomLimits(float maxWidth, float maxHeight){
-	fMaxZoomWidth		= maxWidth;
-	fMaxZoomHeight		= maxHeight;
-	
-// TODO: we should send those to app_server		
+	if (maxWidth > fMaxWindWidth)
+		maxWidth	= fMaxWindWidth;
+	else
+		fMaxZoomWidth		= maxWidth;
+
+	if (maxHeight > fMaxWindHeight)
+		maxHeight	= fMaxWindHeight;
+	else
+		fMaxZoomHeight		= maxHeight;
 }
 
 //------------------------------------------------------------------------------
@@ -971,7 +986,7 @@ void BWindow::Zoom(){
 /*	from BeBook:
 	However, if the window's rectangle already matches these "zoom" dimensions
 	(give or take a few pixels), Zoom() passes the window's previous
-	("non-zoomed") size and location. 
+	("non-zoomed") size and location. (??????)
 */
 	if (Frame().Width() == fMaxZoomWidth && Frame().Height() == fMaxZoomHeight) {
 		BPoint position( Frame().left, Frame().top);
@@ -999,18 +1014,40 @@ void BWindow::Zoom(){
 	Zoom( Frame().LeftTop(), minWidth, minHeight );
 }
 
+//------------------------------------------------------------------------------
+
 void BWindow::ScreenChanged(BRect screen_size, color_space depth){
 	// Hook function
 	// does nothing
 }
 
+//------------------------------------------------------------------------------
+
 void BWindow::SetPulseRate(bigtime_t rate){
-	if (fPulseEnabled){
+	if ( rate < 0 )
+		return;
+
+	if (fPulseRate == 0 && !fPulseEnabled){
+		fPulseRunner	= new BMessageRunner(	BMessenger(this),
+												new BMessage( B_PULSE ),
+												rate);
 		fPulseRate		= rate;
+		fPulseEnabled	= true;
 
-// TODO: notify somebudy that we want to receive pulsing messages!!!
-
+		return;
 	}
+
+	if (rate == 0 && fPulseEnabled){
+		delete			fPulseRunner;
+		fPulseRunner	= NULL;
+
+		fPulseRate		= rate;
+		fPulseEnabled	= false;
+
+		return;
+	}
+
+	fPulseRunner->SetInterval( rate );
 }
 
 //------------------------------------------------------------------------------
@@ -1028,20 +1065,14 @@ void BWindow::AddShortcut(	uint32 key,	uint32 modifiers, BMessage* msg){
 //------------------------------------------------------------------------------
 
 void BWindow::AddShortcut(	uint32 key,	uint32 modifiers, BMessage* msg, BHandler* target){
+/*
+	NOTE: I'm not sure if it is OK to use 'key'
+*/
+	if ( !msg )
+		return;
+
 	int64				when;
 	_BCmdKey			*cmdKey;
-
-		// if target is NULL, the focus view will receive the message
-		//		if there is no focus view, I thought, BWindow should receive the message
-		//		I have not tested this, but I think it is a good idea to do so.
-	if (target == NULL)
-		if (fFocus)
-			target		= fFocus;
-		else
-			target		= this;
-	
-	if ( !findHandler( top_view, target ) )
-		return;
 
 	when				= real_time_clock_usecs();
 	msg->AddInt64("when", when);
@@ -1054,7 +1085,10 @@ void BWindow::AddShortcut(	uint32 key,	uint32 modifiers, BMessage* msg, BHandler
 	cmdKey->key			= key;
 	cmdKey->modifiers	= modifiers;
 	cmdKey->message		= msg;
-	cmdKey->target		= target;
+	if (target == NULL)
+		cmdKey->targetToken	= B_ANY_TOKEN;
+	else
+		cmdKey->targetToken	= _get_object_token_(target);
 
 		// removes the shortcut from accelList if it exists!
 	RemoveShortcut( key, modifiers );
@@ -1094,7 +1128,7 @@ BButton* BWindow::DefaultButton() const{
 void BWindow::SetDefaultButton(BButton* button){
 /*
 Note: for developers!
-	He he, if you realy want to understand what is happens here, take a piece of
+	He he, if you really want to understand what is happens here, take a piece of
 		paper and start taking possible values and then walk with them through
 		the code.
 */
@@ -1107,7 +1141,7 @@ Note: for developers!
 		aux				= fDefaultButton;
 		fDefaultButton	= NULL;
 		aux->MakeDefault( false );
-		aux->Draw( aux->Bounds() );
+		aux->Invalidate();
 	}
 	
 	if ( button == NULL ){
@@ -1117,7 +1151,7 @@ Note: for developers!
 	
 	fDefaultButton			= button;
 	fDefaultButton->MakeDefault( true );
-	fDefaultButton->Draw( aux->Bounds() );
+	fDefaultButton->Invalidate();
 }
 
 //------------------------------------------------------------------------------
@@ -1139,8 +1173,11 @@ bool BWindow::NeedsUpdate() const{
 //------------------------------------------------------------------------------
 
 void BWindow::UpdateIfNeeded(){
-	if (Thread() != B_ERROR)
+		// works only from this thread
+	if (find_thread(NULL) == Thread()){
+		Flush();
 		drawAllViews( top_view );
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -1165,12 +1202,12 @@ BView* BWindow::CurrentFocus() const{
 
 //------------------------------------------------------------------------------
 
-void BWindow::Activate(bool yes = true){
+void BWindow::Activate(bool active = true){
 	if (IsHidden())
 		return;
 
-	serverLink->SetOpCode( B_WINDOW_ACTIVATED );
-	serverLink->Attach( yes );
+	serverLink->SetOpCode( AS_ACTIVATE_WINDOW );
+	serverLink->Attach( active );
 	
 	Lock();
 	serverLink->Flush( );
@@ -1307,20 +1344,22 @@ void BWindow::SetTitle(const char* title){
 	strcpy(threadName, "w>");
 	strncat(threadName, fTitle, (length>=29) ? 29: length);
 
+		// if the message loop has been started...
 	if (Thread() != B_ERROR ){
 		SetName( threadName );
 		rename_thread( Thread(), threadName );
+
+			// we notify the app_server so we can actually see the change
+		serverLink->SetOpCode( AS_WINDOW_TITLE);
+		serverLink->Attach( fTitle, strlen(fTitle)+1 );
+	
+		Lock();
+		serverLink->Flush( );
+		Unlock();
 	}
 	else
 		SetName( threadName );
 
-		// we notify the app_server so we can actualy see the change
-	serverLink->SetOpCode( AS_WINDOW_TITLE);
-	serverLink->Attach( fTitle, strlen(fTitle)+1 );
-	
-	Lock();
-	serverLink->Flush( );
-	Unlock();
 }
 
 //------------------------------------------------------------------------------
@@ -1332,8 +1371,7 @@ bool BWindow::IsActive() const{
 //------------------------------------------------------------------------------
 
 void BWindow::SetKeyMenuBar(BMenuBar* bar){
-// TODO: Do a research on menus and see what else you have to do
-	fKeyMenuBar				= bar;
+	fKeyMenuBar			= bar;
 }
 
 //------------------------------------------------------------------------------
@@ -1345,7 +1383,6 @@ BMenuBar* BWindow::KeyMenuBar() const{
 //------------------------------------------------------------------------------
 
 bool BWindow::IsModal() const{
-// TODO: check this behavior in BeOS
 	if ( fFeel == B_MODAL_SUBSET_WINDOW_FEEL)
 		return true;
 	if ( fFeel == B_MODAL_APP_WINDOW_FEEL)
@@ -1360,7 +1397,6 @@ bool BWindow::IsModal() const{
 //------------------------------------------------------------------------------
 
 bool BWindow::IsFloating() const{
-// TODO: check this behavior in BeOS
 	if ( fFeel == B_FLOATING_SUBSET_WINDOW_FEEL)
 		return true;
 	if ( fFeel == B_FLOATING_APP_WINDOW_FEEL)
@@ -1374,14 +1410,16 @@ bool BWindow::IsFloating() const{
 //------------------------------------------------------------------------------
 
 status_t BWindow::AddToSubset(BWindow* window){
+	if ( !window )
+			return B_ERROR;
+
 	if (window->Feel() == B_MODAL_SUBSET_WINDOW_FEEL ||
 		window->Feel() == B_FLOATING_SUBSET_WINDOW_FEEL){
 		
 		PortLink::ReplyData		replyData;
 
 		serverLink->SetOpCode( AS_ADD_TO_SUBSET );
-// TODO: when IK Team decides about server tokens, update the following line 
-		serverLink->Attach( (int32)window );
+		serverLink->Attach( _get_object_token_(window) );
 		
 		Lock();
 		serverLink->FlushWithReply( &replyData );
@@ -1398,12 +1436,13 @@ status_t BWindow::AddToSubset(BWindow* window){
 //------------------------------------------------------------------------------
 
 status_t BWindow::RemoveFromSubset(BWindow* window){
+	if ( !window )
+			return B_ERROR;
 
 	PortLink::ReplyData		replyData;
 
 	serverLink->SetOpCode( AS_REM_FROM_SUBSET );
-// TODO: when IK Team decides about server tokens, update the following line 
-	serverLink->Attach( (int32)window );
+	serverLink->Attach( _get_object_token_(window) );
 		
 	Lock();
 	serverLink->FlushWithReply( &replyData );
@@ -1437,6 +1476,7 @@ window_type	BWindow::Type() const{
 //------------------------------------------------------------------------------
 
 status_t BWindow::SetLook(window_look look){
+
 	uint32					uintLook;
 	PortLink::ReplyData		replyData;
 	
@@ -1468,6 +1508,10 @@ window_look	BWindow::Look() const{
 //------------------------------------------------------------------------------
 
 status_t BWindow::SetFeel(window_feel feel){
+
+/* TODO:	See what happens when a window that is part of a subset, changes its
+			feel!? should it be removed from the subset???
+*/
 	uint32					uintFeel;
 	PortLink::ReplyData		replyData;
 	
@@ -1532,6 +1576,26 @@ status_t BWindow::SetWindowAlignment(window_alignment mode,
 											int32 v = 0, int32 vOffset = 0,
 											int32 height = 0, int32 heightOffset = 0)
 {
+	if ( !(	(mode && B_BYTE_ALIGNMENT) ||
+			(mode && B_PIXEL_ALIGNMENT) ) )
+	{
+		return B_ERROR;
+	}
+
+	if ( 0 <= hOffset && hOffset <=h )
+		return B_ERROR;
+
+	if ( 0 <= vOffset && vOffset <=v )
+		return B_ERROR;
+
+	if ( 0 <= widthOffset && widthOffset <=width )
+		return B_ERROR;
+
+	if ( 0 <= heightOffset && heightOffset <=height )
+		return B_ERROR;
+
+// TODO: test if hOffset = 0 and set it to 1 if true.
+
 	PortLink::ReplyData		replyData;
 
 	serverLink->SetOpCode( AS_SET_ALIGNMENT );
@@ -1567,7 +1631,7 @@ status_t BWindow::GetWindowAlignment(window_alignment* mode = NULL,
 											int32* height = NULL, int32* heightOffset = NULL) const
 {
 	PortLink::ReplyData		replyData;
-	int8						*rb;		// short for: replybuffer
+	int8					*rb;		// short for: replybuffer
 
 	serverLink->SetOpCode( AS_GET_ALIGNMENT );
 	
@@ -1577,16 +1641,24 @@ status_t BWindow::GetWindowAlignment(window_alignment* mode = NULL,
 	
 	if (replyData.code == SERVER_TRUE){
 		rb				= replyData.buffer;
-
-		*mode			= *((window_alignment*)*((int32*)rb));	rb += sizeof(int32);
-		*h				= *((int32*)rb);		rb += sizeof(int32);
-		*hOffset		= *((int32*)rb);		rb += sizeof(int32);
-		*width			= *((int32*)rb);		rb += sizeof(int32);
-		*widthOffset	= *((int32*)rb);		rb += sizeof(int32);
-		*v				= *((int32*)rb);		rb += sizeof(int32);
-		*vOffset		= *((int32*)rb);		rb += sizeof(int32);
-		*height			= *((int32*)rb);		rb += sizeof(int32);
-		*heightOffset	= *((int32*)rb);
+		if (mode)
+			*mode			= *((window_alignment*)*((int32*)rb));	rb += sizeof(int32);
+		if (h)
+			*h				= *((int32*)rb);		rb += sizeof(int32);
+		if (hOffset)
+			*hOffset		= *((int32*)rb);		rb += sizeof(int32);
+		if (width)
+			*width			= *((int32*)rb);		rb += sizeof(int32);
+		if (widthOffset)
+			*widthOffset	= *((int32*)rb);		rb += sizeof(int32);
+		if (v)
+			*v				= *((int32*)rb);		rb += sizeof(int32);
+		if (vOffset)
+			*vOffset		= *((int32*)rb);		rb += sizeof(int32);
+		if (height)
+			*height			= *((int32*)rb);		rb += sizeof(int32);
+		if (heightOffset)
+			*heightOffset	= *((int32*)rb);
 
 		delete replyData.buffer;
 
@@ -1622,16 +1694,17 @@ uint32 BWindow::Workspaces() const{
 //------------------------------------------------------------------------------
 
 void BWindow::SetWorkspaces(uint32 workspaces){
-	PortLink::ReplyData			replyData;
+//	PortLink::ReplyData			replyData;
 
 	serverLink->SetOpCode( AS_SET_WORKSPACES );
 	serverLink->Attach( (int32)workspaces );
 	
 	Lock();
-	serverLink->FlushWithReply( &replyData );
+	serverLink->Flush( );
+//	serverLink->FlushWithReply( &replyData );
 	Unlock();
 
-	delete replyData.buffer;
+//	delete replyData.buffer;
 /*
 Note:	In future versions of OBOS we should make SetWorkspaces(uint32) return
 			a status value! The following code should be added
@@ -1653,16 +1726,9 @@ BView* BWindow::LastMouseMovedView() const{
 
 void BWindow::MoveBy(float dx, float dy){
 
-	serverLink->SetOpCode( B_WINDOW_MOVE_BY );
-	serverLink->Attach( dx );
-	serverLink->Attach( dy );
-	
-	Lock();
-	serverLink->Flush();
-	Unlock();
+	BPoint			offset( dx, dy );
 
-	fFrame.left			+= dx;
-	fFrame.top			+= dy;
+	MoveTo( fFrame.LeftTop() + offset );
 }
 
 //------------------------------------------------------------------------------
@@ -1675,48 +1741,47 @@ void BWindow::MoveTo( BPoint point ){
 
 void BWindow::MoveTo(float x, float y){
 
-	serverLink->SetOpCode( B_WINDOW_MOVE_TO );
+	serverLink->SetOpCode( AS_WINDOW_MOVE );
 	serverLink->Attach( x );
 	serverLink->Attach( y );
 	
 	Lock();
 	serverLink->Flush();
 	Unlock();
-
-	fFrame.left			= x;
-	fFrame.top			= y;
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::ResizeBy(float dx, float dy){
 
-	serverLink->SetOpCode( AS_WINDOW_RESIZEBY );
-	serverLink->Attach( dx );
-	serverLink->Attach( dy );
-	
-	Lock();
-	serverLink->Flush();
-	Unlock();
+		// stay in minimum & maximum frame limits
+	(fFrame.Width() + dx) < fMinWindWidth ? fMinWindWidth : fFrame.Width() + dx;
+	(fFrame.Width() + dx) > fMaxWindWidth ? fMaxWindWidth : fFrame.Width() + dx;
 
-	fFrame.right		+= dx;
-	fFrame.bottom		+= dy;
+	(fFrame.Height() + dy) < fMinWindHeight ? fMinWindHeight : fFrame.Height() + dy;
+	(fFrame.Height() + dy) > fMaxWindHeight ? fMaxWindHeight : fFrame.Height() + dy;
+
+	ResizeTo( fFrame.Width() + dx, fFrame.Height() + dy );
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::ResizeTo(float width, float height){
 
-	serverLink->SetOpCode( AS_WINDOW_RESIZETO );
+		// stay in minimum & maximum frame limits
+	width < fMinWindWidth ? fMinWindWidth : width;
+	width > fMaxWindWidth ? fMaxWindWidth : width;
+
+	height < fMinWindHeight ? fMinWindHeight : height;
+	height > fMaxWindHeight ? fMaxWindHeight : height;
+
+	serverLink->SetOpCode( AS_WINDOW_RESIZE );
 	serverLink->Attach( width );
 	serverLink->Attach( height );
 	
 	Lock();
 	serverLink->Flush( );
 	Unlock();
-
-	fFrame.right		= width;
-	fFrame.bottom		= height;
 }
 
 //------------------------------------------------------------------------------
@@ -1758,7 +1823,6 @@ bool BWindow::IsHidden() const{
 //------------------------------------------------------------------------------
 
 bool BWindow::QuitRequested(){
-// TODO: see if there is anything else to do there
 	return BLooper::QuitRequested();
 }
 
@@ -1832,7 +1896,7 @@ BHandler* BWindow::ResolveSpecifier(BMessage* msg, int32 index,	BMessage* specif
 				return NULL;
 			}
 		case 15:
-			// we will NOT pop the current specifier
+				// we will NOT pop the current specifier
 			return top_view;
 			
 		case 16:
@@ -1853,81 +1917,173 @@ void BWindow::InitData(	BRect frame,
 						uint32 flags,
 						uint32 workspace){
 
-	fFrame			= frame;
-	
-	if(fTitle)
-	{
-		delete fTitle;
-		fTitle=NULL;
+	if ( be_app == NULL ){
+		//debugger("You need a valid BApplication object before interacting with the app_server");
+		return;
 	}
 
-	if(title)
-	{
-		fTitle=new char[strlen(title)];
-		strcpy( fTitle, title );
-	}
+// TODO: what should I do if frame rect is invalid?
+	if ( frame.IsValid() )
+		fFrame			= frame;
+	else
+		frame.Set( frame.left, frame.top, frame.left+320, frame.top+240 );
+	
+	if (title)
+		SetTitle( title );
+	else
+		SetTitle( "no_name_window" );
+
 	fFeel			= feel;
 	fLook			= look;
 	fFlags			= flags;
 	
+
+	fInTransaction	= false;
+	fActive			= false;
 	fShowLevel		= 1;
 
-// TODO: set size an zoom limits
+	top_view		= NULL;
+	fFocus			= NULL;
+	fLastMouseMovedView	= NULL;
+	fKeyMenuBar		= NULL;
+	fDefaultButton	= NULL;
 
-// TODO: initialize accelList
+//	accelList		= new BList( 10 );
+	AddShortcut('X', B_COMMAND_KEY, new BMessage(B_CUT), NULL);
+	AddShortcut('C', B_COMMAND_KEY, new BMessage(B_COPY), NULL);
+	AddShortcut('V', B_COMMAND_KEY, new BMessage(B_PASTE), NULL);
+	AddShortcut('A', B_COMMAND_KEY, new BMessage(B_SELECT_ALL), NULL);
+	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 
-// TODO: Add the 5(6) know shortcuts to window's shortcuts list
+	fPulseEnabled	= false;
+	fPulseRate		= 0;
+	fPulseRunner	= NULL;
 
-// TODO: Other stuff
+// TODO: is this correct??? should the thread loop be started???
+	SetPulseRate( 500000 );
+
+// TODO:  see if you can use 'fViewsNeedPulse'
+
+	fIsFilePanel	= false;
+
+// TODO: see WHEN is this used!
+	fMaskActivated	= false;
+
+// TODO: see WHEN is this used!
+	fWaitingForMenu	= false;
+
+	fMinimized		= false;
+
+// TODO:  see WHERE you can use 'fMenuSem'
+
+	fMaxZoomHeight	= 32768.0;
+	fMaxZoomWidth	= 32768.0;
+	fMinWindHeight	= 0.0;
+	fMinWindWidth	= 0.0;
+	fMaxWindHeight	= 32768.0;
+	fMaxWindWidth	= 32768.0;
+
+// TODO: other initializations!
+
+/*
+	Here, we will contact app_server and let him that a window has been created
+*/
+	receive_port	= create_port( B_LOOPER_PORT_DEFAULT_CAPACITY ,
+						"w_rcv_port");
+	if (receive_port==B_BAD_VALUE || receive_port==B_NO_MORE_PORTS){
+		//debugger("Could not create BWindow's receive port, used for interacting with the app_server!");
+		return;
+	}
+	
+
+		// let app_server to know that a window has been created.
+	serverLink		= new PortLink(be_app->fServerTo);
+	status_t		replyStat;
+	PortLink::ReplyData		replyData;
+
+	serverLink->SetOpCode(AS_CREATE_WINDOW);
+	serverLink->Attach(fFrame);
+	serverLink->Attach((int32)WindowLookToInteger(fLook));
+	serverLink->Attach((int32)WindowFeelToInteger(fFeel));
+	serverLink->Attach((int32)fFlags);
+	serverLink->Attach((int32)workspace);
+	serverLink->Attach((int32)_get_object_token_(this));
+	serverLink->Attach(&receive_port,sizeof(port_id));
+		// We add one so that the string will end up NULL-terminated.
+	serverLink->Attach( (char*)title, strlen(title)+1 );
+
+		// HERE we are in BApplication's thread, so for locking we use be_app variable
+		// we'll lock the be_app to be sure we're the only one writing at BApplication's server port
+	be_app->Lock();
+
+		// Send and wait for ServerWindow port. Necessary here so we can respond to
+		// messages as soon as Show() is called.
+	replyStat		= serverLink->FlushWithReply( &replyData );
+	if ( replyStat != B_OK ){
+		//debugger("First reply from app_server was not received.");
+		return;
+	}
+		// unlock, so other threads can do their job.
+	be_app->Unlock();
+	
+	send_port		= *((port_id*)replyData.buffer);
+
+		// Set the port on witch app_server will listen for us	
+	serverLink->SetPort(send_port);
+		// Initialize a PortLink object for use with graphic calls.
+		// They need to be sent separately because of the speed reasons.
+	srvGfxLink		= new PortLink( send_port );	
+	
+	delete replyData.buffer;
+
+		// Create and attach the top view
+	top_view			= buildTopView();
+		// Here we will register the top view with app_server
+// TODO: implement the following function
+	attachTopView( );
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::task_looper(){
-// Code more or less pasted from BLooper's task_looper so that I can debug the app_server.
-// Otherwise, when run, Show() causes a crash. --DW
 
 	//	Check that looper is locked (should be)
 	AssertLocked();
-	//	Unlock the looper
+
 	Unlock();
+	
+	using namespace BPrivate;
+	bool		dispatchNextMessage = false;
+	BMessage	*msg;
 
 	//	loop: As long as we are not terminating.
 	while (!fTerminating)
 	{
-		// TODO: timeout determination algo
-		//	Read from message port (how do we determine what the timeout is?)
-		BMessage* msg = MessageFromPort();
 
-		//	Did we get a message?
-		if (msg)
-		{
-			//	Add to queue
+		// get BMessages from app_server
+		while ( msg = ReadMessageFromPort(0) ){
+			fQueue->Lock();
 			fQueue->AddMessage(msg);
-		}
-		//	Get message count from port
-		int32 msgCount = port_count(fMsgPort);
-		for (int32 i = 0; i < msgCount; ++i)
-		{
-			//	Read 'count' messages from port (so we will not block)
-			//	We use zero as our timeout since we know there is stuff there
-			msg = MessageFromPort(0);
-			//	Add messages to queue
-			if (msg)
-			{
-				fQueue->AddMessage(msg);
-			}
+			fQueue->Unlock();
+			dispatchNextMessage = true;
 		}
 
-		//	loop: As long as there are messages in the queue and the port is
-		//		  empty... and we are not terminating, of course.
-		bool dispatchNextMessage = true;
+		// get BMessages from BLooper port
+		while ( msg = MessageFromPort(0) ){
+			fQueue->Lock();
+			fQueue->AddMessage(msg);
+			fQueue->Unlock();
+			dispatchNextMessage = true;
+		}
+
+		//	loop: As long as there are messages in the queue and
+		//		  and we are not terminating.
 		while (!fTerminating && dispatchNextMessage)
 		{
-			//	Get next message from queue (assign to fLastMessage)
-			fLastMessage = fQueue->NextMessage();
+			fQueue->Lock();
+			fLastMessage		= fQueue->NextMessage();
+			fQueue->Unlock();
 
-			//	Lock the looper
 			Lock();
 			if (!fLastMessage)
 			{
@@ -1938,53 +2094,36 @@ void BWindow::task_looper(){
 			else
 			{
 				//	Get the target handler
-				//	Use BMessage friend functions to determine if we are using the
-				//	preferred handler, or if a target has been specified
 				BHandler* handler;
 				if (_use_preferred_target_(fLastMessage))
-				{
 					handler = fPreferred;
-				}
 				else
-				{
-					/**
-						@note	Here is where all the token stuff starts to
-								make sense.  How, exactly, do we determine
-								what the target BHandler is?  If we look at
-								BMessage, we see an int32 field, fTarget.
-								Amazingly, we happen to have a global mapping
-								of BHandler pointers to int32s!
-					 */
-				}
+					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
+					 						 B_HANDLER_TOKEN,
+					 						 (void**)&handler);
 
 				if (!handler)
-				{
 					handler = this;
-				}
 
-				//	Is this a scripting message? (BMessage::HasSpecifiers())
+				//	Is this a scripting message?
 				if (fLastMessage->HasSpecifiers())
 				{
 					int32 index = 0;
 					// Make sure the current specifier is kosher
 					if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
-					{
 						handler = resolve_specifier(handler, fLastMessage);
-					}
 				}
-
+				
 				if (handler)
 				{
 					//	Do filtering
 					handler = top_level_filter(fLastMessage, handler);
+
 					if (handler && handler->Looper() == this)
-					{
 						DispatchMessage(fLastMessage, handler);
-					}
 				}
 			}
 
-			//	Unlock the looper
 			Unlock();
 
 			//	Delete the current message (fLastMessage)
@@ -1993,15 +2132,58 @@ void BWindow::task_looper(){
 				delete fLastMessage;
 				fLastMessage = NULL;
 			}
-
-			//	Are any messages on the port?
-			if (port_count(fMsgPort) > 0)
-			{
-				//	Do outer loop
-				dispatchNextMessage = false;
-			}
 		}
 	}
+
+}
+
+//------------------------------------------------------------------------------
+
+BMessage* BWindow::ReadMessageFromPort(bigtime_t tout = B_INFINITE_TIMEOUT){
+	int32			msgcode;
+	BMessage*		msg;
+	uint8*			msgbuffer;
+
+	msgbuffer		= ReadRawFromPort(&msgcode, tout);
+
+	if (msgcode != B_ERROR)
+		msg			= ConvertToMessage(msgbuffer, msgcode);
+
+	if (msgbuffer)
+		delete msgbuffer;
+
+	return msg;
+}
+
+//------------------------------------------------------------------------------
+
+uint8* BWindow::ReadRawFromPort(int32* code, bigtime_t tout = B_INFINITE_TIMEOUT){
+
+	uint8*			msgbuffer = NULL;
+	ssize_t			buffersize;
+	ssize_t			bytesread;
+
+		// we NEVER have to use B_INFINITE_TIMEOUT
+	if (tout == B_INFINITE_TIMEOUT)
+		tout		= 0;
+
+	buffersize = port_buffer_size_etc(receive_port, B_TIMEOUT, tout);
+	if (buffersize == B_TIMED_OUT || buffersize == B_BAD_PORT_ID ||
+		buffersize == B_WOULD_BLOCK)
+	{
+		*code = B_ERROR;
+		return NULL;
+	}
+
+
+	if (buffersize > 0){
+		msgbuffer = new uint8[buffersize];
+
+		read_port_etc(	receive_port, code, msgbuffer,
+						buffersize, B_TIMEOUT, tout);
+	}
+
+	return msgbuffer;
 }
 
 //------------------------------------------------------------------------------
@@ -2146,18 +2328,10 @@ BView* BWindow::buildTopView(){
 	topView->attached		= true;
 	topView->top_level_view	= true;
 
-// TODO: to be changed later after IK Team agrees on server tokening
-		// why do we need this memeber? for cacheing?
-	fTopViewToken	= topView->server_token;	
-
-/*
-Note:
-		I don't think setting BView::parent is a good idea!
-		Same goes for adding top_view to BLooper's list of eligible handlers.
-		I'll have to think about those!
+/* Note:
+		I don't think adding top_view to BLooper's list
+		of eligible handlers is a good idea!
 */
-
-// TODO: other initializations
 
 	return topView;
 }
@@ -2168,29 +2342,73 @@ void BWindow::attachTopView(){
 
 // TODO: implement after you have a messaging protocol with app_server
 
-/*
-	serverLink->SetOpCode( AS_ROOT_LAYER );
-	serverLink->Attach( ... );
-	serverLink->Flush();
+	serverLink->SetOpCode( AS_LAYER_CREATE_ROOT );
+	serverLink->Attach( _get_object_token_( top_view ) ); // no need for that!
+/*	serverLink->Attach( top_view->Name() );
+	serverLink->Attach( fCachedBounds.OffsetToCopy( origin_h, origin_v ) );
+	serverLink->Attach( ...ResizeMode... );
+	serverLink->Attach( top_view->fFlags );
+	serverLink->Attach( top_view->fShowLevel );
 */
+	Lock();
+	serverLink->Flush();
+	Unlock();
+
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::detachTopView(){
 
-	RemoveChild( top_view );
+// TODO: detach all views
 
-	serverLink->SetOpCode( AS_QUIT_WINDOW );
-
-// TODO: wait until IK Team decides about server tokening
-	//serverLink->Attach( &server_token, sizeof(int32) );
+	serverLink->SetOpCode( AS_LAYER_DELETE_ROOT );
+	serverLink->Attach( _get_object_token_( top_view ) ); // no need for that!
 
 	Lock();
-	serverLink->Flush( );
+	serverLink->Flush();
 	Unlock();
+
+	delete top_view;
 }
 
+//------------------------------------------------------------------------------
+
+void BWindow::stopConnection(){
+	PortLink::ReplyData		replyData;
+
+	serverLink->SetOpCode( AS_QUIT_WINDOW );
+	
+	Lock();
+	serverLink->FlushWithReply( &replyData );
+	Unlock();
+	
+	delete replyData.buffer;
+}
+
+//------------------------------------------------------------------------------
+
+void BWindow::prepareView(BView *aView){
+
+// TODO: implement
+
+}
+
+//------------------------------------------------------------------------------
+
+void BWindow::attachView(BView *aView){
+
+// TODO: implement
+
+}
+
+//------------------------------------------------------------------------------
+
+void BWindow::detachView(BView *aView){
+
+// TODO: implement
+
+}
 //------------------------------------------------------------------------------
 
 void BWindow::setFocus(BView *focusView, bool notifyInputServer){
@@ -2209,97 +2427,242 @@ void BWindow::setFocus(BView *focusView, bool notifyInputServer){
 
 //------------------------------------------------------------------------------
 
-bool BWindow::handleBWindowKeys( BString string, uint32 modifiers){
+void BWindow::handleActivation( bool active ){
 
-// TODO: Handle key combinations like: Command+q, Command+c,...
-
-// TODO: Handle shortcuts
-
-// TODO: if we have a defalut button, send him a message when the user hits the Enter key
-/*
-Note: I might be doing this by constructing a BMessage with the msg->what=B_MOUSE_DOWN
-		then send it to BWindow::MessageReceived( BMessage* ); Don't forget about the
-		server token associated with this BButton!!!
-*/
-	return true;
-}
-
-//------------------------------------------------------------------------------
-
-	// messages: B_MOUSE_UP, B_MOUSE_DOWN, B_MOUSE_MOVED
-void BWindow::sendMessageUsingEventMask( int32 message, BPoint where ){
-
-// TODO: Add code for Event Masks
-
-// TODO: change after IK Team decides about server tokening; in the mean time...
-	switch( message ){
-		case B_MOUSE_DOWN:{
-			BView		*destView;
-
-			destView	= FindView( where );
-			if (!destView)
-				return;
-
-			destView->MouseDown( destView->ConvertFromScreen( where ) );
-			break;}
-
-		case B_MOUSE_UP:{
-			BView		*destView;
-
-			destView	= FindView( where );
-			if (!destView)
-				return;
-
-			destView->MouseUp( destView->ConvertFromScreen( where ) );
-			break;}
-
-		case B_MOUSE_MOVED:{
-			BView		*destView;
-			BMessage	*dragMessage;
-
-			destView	= FindView( where );
-			if (!destView)
-				return;
-
-				// for now...
-			dragMessage	= NULL;
-
-			if (destView != fLastMouseMovedView){
-				fLastMouseMovedView->MouseMoved( destView->ConvertFromScreen( where ), B_EXITED_VIEW , dragMessage);
-				destView->MouseMoved( destView->ConvertFromScreen( where ), B_ENTERED_VIEW, dragMessage);
-				fLastMouseMovedView		= destView;
-			}
-			else{
-				destView->MouseMoved( destView->ConvertFromScreen( where ), B_INSIDE_VIEW , dragMessage);
-			}
-
-				// I'm guessing that B_OUTSIDE_VIEW is given to the view that has focus, I'll have to check
-				// Do a research on mouse capturing, maybe it has something to do with this
-			fFocus->MouseMoved( destView->ConvertFromScreen( where ), B_OUTSIDE_VIEW , dragMessage);
-			break;}
+	if (active){
+// TODO: talk to Ingo to make BWindow a friend for BRoster	
+//		be_roster->UpdateActiveApp( be_app->Team() );
 	}
+
+	WindowActivated( active );
+
+		// recursively call hook function 'WindowActivated(bool)'
+		//    for all views attached to this window.
+	activateView( top_view, active );
 }
 
 //------------------------------------------------------------------------------
 
-void BWindow::sendWillingBViewsPulseMsg( BView* aView ){
-	BView *child; 
-	if ( child = aView->ChildAt(0) ){
-		while ( child ) { 
-			if ( child->Flags() | B_PULSE_NEEDED ) child->Pulse();
-			sendWillingBViewsPulseMsg( child );
-			child = child->NextSibling(); 
+void BWindow::activateView( BView *aView, bool active ){
+
+	aView->WindowActivated( active );
+
+	BView		*child;
+	if ( child = aView->first_child ){
+		while ( child ) {
+			activateView( child, active );
+			child 		= child->next_sibling; 
 		}
 	}
 }
 
 //------------------------------------------------------------------------------
 
-BMessage* BWindow::ReadMessageFromPort(bigtime_t tout)
-{
+bool BWindow::handleKeyDown( int32 raw_char, uint32 modifiers){
 
-// TODO: see what you must do here! Talk to Erik!
-	return NULL;
+// TODO: ask people if using 'raw_char' is OK ?
+
+		// handle BMenuBar key
+	if ( (raw_char == B_ESCAPE) && (modifiers & B_COMMAND_KEY)
+		&& fKeyMenuBar)
+	{
+
+// TODO: ask Marc about 'fWaitingForMenu' member!
+
+		// fWaitingForMenu		= true;
+		fKeyMenuBar->StartMenuBar(0, true, false, NULL);
+		return true;
+	}
+
+		// Command+q has been pressed, so, we will quit
+	if ( (raw_char == 'Q' || raw_char == 'q') && modifiers & B_COMMAND_KEY){
+		be_app->PostMessage(B_QUIT_REQUESTED); 
+		return true;
+	}
+
+		// Keyboard navigation through views!!!!
+	if ( raw_char == B_TAB){
+
+			// even if we have no focus view, we'll say that we will handle TAB key
+		if (!fFocus)
+			return true;
+
+		BView			*nextFocus;
+
+		if (modifiers & B_CONTROL_KEY & B_SHIFT_KEY){
+			nextFocus		= findPrevView( fFocus, B_NAVIGABLE_JUMP );
+		}
+		else
+			if (modifiers & B_CONTROL_KEY){
+				nextFocus		= findNextView( fFocus, B_NAVIGABLE_JUMP );
+			}
+			else
+				if (modifiers & B_SHIFT_KEY){
+					nextFocus		= findPrevView( fFocus, B_NAVIGABLE );
+				}
+				else
+					nextFocus		= findNextView( fFocus, B_NAVIGABLE );
+
+		if ( nextFocus )
+			setFocus( nextFocus, false );
+
+		return true;
+	}
+
+		// Handle shortcuts
+	int			index;
+	if ( (index = findShortcut(raw_char, modifiers)) >=0){
+		_BCmdKey		*cmdKey;
+
+		cmdKey			= (_BCmdKey*)accelList.ItemAt( index );
+
+			// we'll give the message to the focus view
+		if (cmdKey->targetToken == B_ANY_TOKEN){
+			fFocus->MessageReceived( cmdKey->message );
+			return true;
+		}
+		else{
+			BHandler		*handler;
+			BHandler		*aHandler;
+			int				noOfHandlers;
+
+				// search for a match through BLooper's list of eligible handlers
+			handler			= NULL;
+			noOfHandlers	= CountHandlers();
+			for( int i=0; i < noOfHandlers; i++ )
+					// do we have a match?
+				if ( _get_object_token_( aHandler = HandlerAt(i) )
+					 == cmdKey->targetToken)
+				{
+						// yes, we do.
+					handler		= aHandler;
+					break;
+				}
+
+			if ( handler )
+				handler->MessageReceived( cmdKey->message );
+			else
+					// if no handler was found, BWindow will handle the message
+				MessageReceived( cmdKey->message );
+		}
+		return true;
+	}
+
+		// if <ENTER> is pressed and we have a default button
+	if (DefaultButton() && (raw_char == B_ENTER)){
+		const char		*chars;		// just to be sure
+		CurrentMessage()->FindString("bytes", &chars);
+
+		DefaultButton()->KeyDown( chars, strlen(chars)-1 );
+		return true;
+	}
+
+
+	return false;
+}
+
+//------------------------------------------------------------------------------
+
+BView* BWindow::sendMessageUsingEventMask2( BView* aView, int32 message, BPoint where ){
+
+	BView		*destView;
+	destView	= NULL;
+
+	if ( aView->fCachedBounds.Contains( aView->ConvertFromScreen(where) ) &&
+		 !aView->first_child ){
+		return aView;
+	}
+
+		// Code for Event Masks
+	BView *child; 
+	if ( child = aView->first_child ){
+		while ( child ) { 
+				// see if a BView registered for mouse events and it's not the current focus view
+			if ( child->fEventMask & B_POINTER_EVENTS &&
+				 aView != fFocus ){
+				switch (message){
+					case B_MOUSE_DOWN:{
+						child->MouseDown( child->ConvertFromScreen( where ) );
+					}
+					break;
+					
+					case B_MOUSE_UP:{
+						child->MouseUp( child->ConvertFromScreen( where ) );
+					}
+					break;
+					
+					case B_MOUSE_MOVED:{
+						BMessage	*dragMessage;
+
+// TODO: get the dragMessage if any
+							// for now...
+						dragMessage	= NULL;
+
+/* TODO: after you have an example working, see if a view that registered for such events,
+			does reveive B_MOUSE_MOVED with other options than B_OUTDIDE_VIEW !!!
+					like: B_INSIDE_VIEW, B_ENTERED_VIEW, B_EXITED_VIEW
+*/
+						child->MouseMoved( ConvertFromScreen(where), B_OUTSIDE_VIEW , dragMessage);
+					}
+					break;
+				}
+			}
+			if (destView == NULL)
+				destView = sendMessageUsingEventMask2( child, message, where );
+			else
+				sendMessageUsingEventMask2( child, message, where );
+			child = child->next_sibling; 
+		}
+	}
+	
+	return destView;
+}
+
+//------------------------------------------------------------------------------
+
+void BWindow::sendMessageUsingEventMask( int32 message, BPoint where ){
+	BView*			destView;
+
+	destView		= sendMessageUsingEventMask2(top_view, message, where);
+	
+		// I'm SURE this is NEVER going to happen, but, durring development of BWindow, it may slip a NULL value
+	if (!destView){
+		// debugger("There is no BView under the mouse;");
+		return;
+	}
+	
+	switch( message ){
+		case B_MOUSE_DOWN:{
+			setFocus( destView );
+			destView->MouseDown( destView->ConvertFromScreen( where ) );
+			break;}
+
+		case B_MOUSE_UP:{
+			destView->MouseUp( destView->ConvertFromScreen( where ) );
+			break;}
+
+		case B_MOUSE_MOVED:{
+			BMessage	*dragMessage;
+
+// TODO: add code for drag and drop
+				// for now...
+			dragMessage	= NULL;
+
+			if (destView != fLastMouseMovedView){
+				fLastMouseMovedView->MouseMoved( destView->ConvertFromScreen( where ), B_EXITED_VIEW , dragMessage);
+				destView->MouseMoved( ConvertFromScreen( where ), B_ENTERED_VIEW, dragMessage);
+				fLastMouseMovedView		= destView;
+			}
+			else{
+				destView->MouseMoved( ConvertFromScreen( where ), B_INSIDE_VIEW , dragMessage);
+			}
+
+				// I'm guessing that B_OUTSIDE_VIEW is given to the view that has focus, I'll have to check
+// TODO: Do a research on mouse capturing, maybe it has something to do with this
+			if (fFocus != destView)
+				fFocus->MouseMoved( ConvertFromScreen( where ), B_OUTSIDE_VIEW , dragMessage);
+			break;}
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -2317,10 +2680,8 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 	uint8		*raw;
 	raw			= (uint8*)raw1;
 
-// TODO: use an uint32 from BWindow's members, as the current server token.
-
-	int32		serverToken;
-	int64		when;	// time since 01/01/70
+		// time since 01/01/70
+	int64		when;
 
 	msg			= new BMessage();
 
@@ -2337,6 +2698,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 			break;}
 
+// TODO: this might be sent by app_server as a BMessage! Anyway, this won't be a problem.
 		case B_QUIT_REQUESTED:{
 
 			msg->what	= B_QUIT_REQUESTED;
@@ -2363,11 +2725,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			UTF8_3			= *((int8*)raw);	raw += sizeof(int8);
 			ASCIIcode		= *((int32*)raw);	raw += sizeof(int32);
 
-			int32			length;
-			length			= strlen( (char*)raw );
-			bytes			= new char[length+1];
-			strcpy( bytes, (char*)raw );
-
+			bytes			= strdup( (char*)raw );
 
 			msg->what		= B_KEY_DOWN;
 			msg->AddInt64("when", when);
@@ -2400,11 +2758,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			UTF8_3			= *((int8*)raw);	raw += sizeof(int8);
 			ASCIIcode		= *((int32*)raw);	raw += sizeof(int32);
 
-			int32			length;
-			length			= strlen( (char*)raw );
-			bytes			= new char[length+1];
-			strcpy( bytes, (char*)raw );
-
+			bytes			= strdup( (char*)raw );
 
 			msg->what		= B_KEY_UP;
 			msg->AddInt64("when", when);
@@ -2494,7 +2848,6 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			BPoint			where;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
-			serverToken		= *((int32*)raw);	raw += sizeof(int32);
 			mouseLocationX	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
 			mouseLocationY	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
 			modifiers		= *((int32*)raw);	raw += sizeof(int32);
@@ -2521,7 +2874,6 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			BPoint			where;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
-			serverToken		= *((int32*)raw);	raw += sizeof(int32);
 			mouseLocationX	= *((float*)raw);	raw += sizeof(float);	// windows's coordinate system
 			mouseLocationY	= *((float*)raw);	raw += sizeof(float);	// windows's coordinate system
 			modifiers		= *((int32*)raw);	raw += sizeof(int32);	// added by OBOS Team
@@ -2533,26 +2885,21 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddInt64("when", when);
 			msg->AddPoint("where", where);
 			msg->AddInt32("buttons", buttons);
+// TODO Add "modifiers" field !
 
-			break;}
-
-// TODO: check out documentation
-		case B_MOUSE_ENTER_EXIT:{
-				// is this its place???
 			break;}
 
 		case B_MOUSE_UP:{
 			float			mouseLocationX,
 							mouseLocationY;
-			int32			modifiers;
-
-// TODO: ask  IK Team if we should add a field with the states of mouse buttons
+			int32			modifiers,
+							buttons;
 			BPoint			where;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
-			serverToken		= *((int32*)raw);	raw += sizeof(int32);
 			mouseLocationX	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
 			mouseLocationY	= *((float*)raw);	raw += sizeof(float);	// view's coordinate system
+			buttons			= *((int32*)raw);	raw += sizeof(int32);
 			modifiers		= *((int32*)raw);
 
 			where.Set( mouseLocationX, mouseLocationY );
@@ -2561,6 +2908,7 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddInt64("when", when);
 			msg->AddPoint("where", where);
 			msg->AddInt32("modifiers", modifiers);
+			msg->AddInt32("buttons", buttons);
 
 			break;}
 
@@ -2578,19 +2926,6 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddFloat("be:wheel_delta_y", whellChangeY);
 
 			break;}
-
-/*		case B_PULSE:{
-
-			msg->what		= B_PULSE;
-
-			break;}
-*/
-
-// TODO: find out what there 2 messages do, and where they come form.
-		case B_RELEASE_OVERLAY_LOCK:{	//
-			break;}						//	are these for BWindow??? ...I... think so...
-		case B_ACQUIRE_OVERLAY_LOCK:{	//
-			break;}						//
 
 		case B_SCREEN_CHANGED:{
 			float			top,
@@ -2616,26 +2951,14 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 			break;}
 
-		case B_VALUE_CHANGED:{
-			int32			value;
-
-			when			= *((int64*)raw);	raw += sizeof(int64);
-			serverToken		= *((int32*)raw);	raw += sizeof(int32);
-			value			= *((int32*)raw);
-
-			msg->what		= B_VALUE_CHANGED;
-			msg->AddInt64("when", when);
-			msg->AddInt32("value", value);
-
-			break;}
-
 		case B_VIEW_MOVED:{
 			float			xAxisNewOrigin,
 							yAxisNewOrigin;
 			BPoint			where;
+			int32			token;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
-			serverToken		= *((int32*)raw);	raw += sizeof(int32);
+			token			= *((int32*)raw);	raw += sizeof(int32);
 			xAxisNewOrigin	= *((float*)raw);	raw += sizeof(float);
 			yAxisNewOrigin	= *((float*)raw);
 
@@ -2644,6 +2967,8 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->what		= B_VIEW_MOVED;
 			msg->AddInt64("when", when);
 			msg->AddPoint("where", where);
+
+			_set_message_target_( msg, token, false);
 			
 			break;}
 
@@ -2653,9 +2978,10 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			float			xAxisNewOrigin,
 							yAxisNewOrigin;
 			BPoint			where;
+			int32			token;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
-			serverToken		= *((int32*)raw);	raw += sizeof(int32);
+			token			= *((int32*)raw);	raw += sizeof(int32);
 			newWidth		= *((int32*)raw);	raw += sizeof(int32);
 			newHeight		= *((int32*)raw);	raw += sizeof(int32);
 			xAxisNewOrigin	= *((float*)raw);	raw += sizeof(float);
@@ -2667,8 +2993,29 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddInt64("when", when);
 			msg->AddInt32("width", newWidth);
 			msg->AddInt32("height", newHeight);
-			msg->AddPoint("where", where);		// it can always be ignored
-												// you'll hear about it in a separate B_VIEW_MOVED
+			msg->AddPoint("where", where);
+
+			_set_message_target_( msg, token, false);
+
+			break;}
+
+		case _UPDATE_:{
+			int32			token;
+			float			left, top,
+							right, bottom;
+			BRect			frame;
+
+			token			= *((int32*)raw);	raw += sizeof(int32);
+			left			= *((float*)raw);	raw += sizeof(float);
+			top				= *((float*)raw);	raw += sizeof(float);
+			right			= *((float*)raw);	raw += sizeof(float);
+			bottom			= *((float*)raw);
+
+			frame.Set( left, top, right, bottom );
+
+			msg->what		= _UPDATE_;
+			msg->AddInt32("token", token);
+			msg->AddRect("frame", frame);
 
 			break;}
 
@@ -2692,7 +3039,6 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 		case B_WINDOW_RESIZED:{
 			int32			newWidth,
 							newHeight;
-			BPoint			where;
 
 			when			= *((int64*)raw);	raw += sizeof(int64);
 			newWidth		= *((int32*)raw);	raw += sizeof(int32);
@@ -2743,9 +3089,12 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 			msg->AddInt64("when", when);
 
 			break;}
-
+		
 		default:{
 			// there is no need for default, but, just in case...
+			printf("There is a message from app_server that I don't undersand: '%c%c%c%c'\n",
+				(code & 0xFF000000) >> 24, (code & 0x00FF0000) >> 16,
+				(code & 0x0000FF00) >> 8, code & 0x000000FF );
 			}
 	}
 	
@@ -2754,10 +3103,20 @@ BMessage* BWindow::ConvertToMessage(void* raw1, int32 code){
 
 //------------------------------------------------------------------------------
 
-int32 BWindow::findShortcut( int32 key, int32 modifiers ){
+void BWindow::sendPulse( BView* aView ){
+	BView *child; 
+	if ( child = aView->first_child ){
+		while ( child ) { 
+			if ( child->Flags() & B_PULSE_NEEDED ) child->Pulse();
+			sendPulse( child );
+			child = child->next_sibling; 
+		}
+	}
+}
 
-// TODO: Optimize;
+//------------------------------------------------------------------------------
 
+int32 BWindow::findShortcut( uint32 key, int32 modifiers ){
 	int32			index,
 					noOfItems;
 
@@ -2779,40 +3138,19 @@ int32 BWindow::findShortcut( int32 key, int32 modifiers ){
 
 //------------------------------------------------------------------------------
 
-bool BWindow::findHandler( BView* start, BHandler* handler ) {
-
-// TODO: Optimize;
-
-	if (((BHandler*)start) == handler)
-		return true;
-
-	int32			noOfChildren;
-
-	noOfChildren	= start->CountChildren();
-	for ( int i = 0; i<noOfChildren; i++ ) {
-		if ( findHandler( start->ChildAt(i), handler ) )
-			return true;
-	}
-
-	return false;
-}
-
-//------------------------------------------------------------------------------
-
 BView* BWindow::findView(BView* aView, int32 token){
 
-// TODO: Optimize;
-
-	if ( aView->server_token == token )
+	if ( _get_object_token_(aView) == token )
 		return aView;
 
-	int32			noOfChildren;
-
-	noOfChildren	= aView->CountChildren();
-	for ( int i = 0; i<noOfChildren; i++ ) {
-		BView*		view;
-		if ( (view = findView( aView->ChildAt(i), token )) )
-			return view;
+	BView			*child;
+	if ( child = aView->first_child ){
+		while ( child ) {
+			BView*		view;
+			if ( view = findView( child, token ) )
+				return view;
+			child 		= child->next_sibling; 
+		}
 	}
 
 	return NULL;
@@ -2822,18 +3160,17 @@ BView* BWindow::findView(BView* aView, int32 token){
 
 BView* BWindow::findView(BView* aView, const char* viewName) const{
 
-// TODO: Optimize;
-
-	if ( strcmp( viewName, aView->Name() ) == 0)		// check!
+	if ( strcmp( viewName, aView->Name() ) == 0)
 		return aView;
 
-	int32			noOfChildren;
-
-	noOfChildren	= aView->CountChildren();
-	for ( int i = 0; i<noOfChildren; i++ ) {
-		BView*		view;
-		if ( (view = findView( aView->ChildAt(i), viewName )) )
-			return view;
+	BView			*child;
+	if ( child = aView->first_child ){
+		while ( child ) {
+			BView*		view;
+			if ( view = findView( child, viewName ) )
+				return view;
+			child 		= child->next_sibling; 
+		}
 	}
 
 	return NULL;
@@ -2843,18 +3180,18 @@ BView* BWindow::findView(BView* aView, const char* viewName) const{
 
 BView* BWindow::findView(BView* aView, BPoint point) const{
 
-// TODO: Optimize;
-
-	int32			noOfChildren;
-	noOfChildren	= aView->CountChildren();
-
-	if ( aView->Bounds().Contains(point) && noOfChildren == 0 )
+	if ( aView->Bounds().Contains(point) &&
+		 !aView->first_child )
 		return aView;
 
-	for ( int i = 0; i<noOfChildren; i++ ) {
-		BView*		view;
-		if ( (view = findView( aView->ChildAt(i), point )) )
-			return view;
+	BView			*child;
+	if ( child = aView->first_child ){
+		while ( child ) {
+			BView*		view;
+			if ( view = findView( child, point ) )
+				return view;
+			child 		= child->next_sibling; 
+		}
 	}
 
 	return NULL;
@@ -2862,24 +3199,188 @@ BView* BWindow::findView(BView* aView, BPoint point) const{
 
 //------------------------------------------------------------------------------
 
+BView* BWindow::findNextView( BView *focus, uint32 flags){
+	bool		found;
+	found		= false;
+
+	BView		*nextFocus;
+	nextFocus	= focus;
+
+		/*	Ufff... this toked me some time... this is the best form I've reached.
+				This algorithm searches the tree for BViews that accept focus.
+		*/
+	while (!found){
+		if (nextFocus->first_child)
+			nextFocus		= nextFocus->first_child;
+		else	
+			if (nextFocus->next_sibling)
+				nextFocus		= nextFocus->next_sibling;
+			else{
+				while( !nextFocus->next_sibling && nextFocus->parent ){
+					nextFocus		= nextFocus->parent;
+				}
+
+				if (nextFocus == top_view)
+					nextFocus		= nextFocus->first_child;
+				else
+					nextFocus		= nextFocus->next_sibling;
+			}
+
+		if (nextFocus->Flags() & flags)
+			found = true;
+
+			/*	It means that the hole tree has been searched and there is no
+				view with B_NAVIGABLE_JUMP flag set!
+			*/
+		if (nextFocus == focus)
+			return NULL;
+	}
+
+	return nextFocus;
+}
+
+//------------------------------------------------------------------------------
+
+BView* BWindow::findPrevView( BView *focus, uint32 flags){
+	bool		found;
+	found		= false;
+
+	BView		*prevFocus;
+	prevFocus	= focus;
+
+	BView		*aView;
+
+	while (!found){
+		if ( (aView = findLastChild(prevFocus)) )
+			prevFocus		= aView;
+		else	
+			if (prevFocus->prev_sibling)
+				prevFocus		= prevFocus->prev_sibling;
+			else{
+				while( !prevFocus->prev_sibling && prevFocus->parent ){
+					prevFocus		= prevFocus->parent;
+				}
+
+				if (prevFocus == top_view)
+					prevFocus		= findLastChild( prevFocus );
+				else
+					prevFocus		= prevFocus->prev_sibling;
+			}
+
+		if (prevFocus->Flags() & flags)
+			found = true;
+
+
+			/*	It means that the hole tree has been searched and there is no
+				view with B_NAVIGABLE_JUMP flag set!
+			*/
+		if (prevFocus == focus)
+			return NULL;
+	}
+
+	return prevFocus;
+}
+
+//------------------------------------------------------------------------------
+
+BView* BWindow::findLastChild(BView *parent){
+	BView		*aView;
+	if ( (aView = parent->first_child) ){
+		while (aView->next_sibling)
+			aView		= aView->next_sibling;
+
+		return aView;
+	}
+	else
+		return NULL;
+}
+
+//------------------------------------------------------------------------------
+
 void BWindow::drawAllViews(BView* aView){
 
-// TODO: Optimize;
+	BMessageQueue	*queue;
+	BMessage		*msg;
 
-	aView->Draw( fFocus->Bounds() );
+	queue			= MessageQueue();
 
-	int32			noOfChildren;
+		// process all update BMessages from message queue
+	queue->Lock();
+	while ( (msg = queue->FindMessage( (uint32)_UPDATE_ )) )
+	{
+		Lock();
+		DispatchMessage( msg, this );
+		Unlock();
 
-	noOfChildren	= aView->CountChildren();
-	for ( int i = 0; i<noOfChildren; i++ )
-		drawAllViews( aView->ChildAt(i) );
+		queue->RemoveMessage( msg );
+	}
+	queue->Unlock();
+
+		// we'll send a message to app_server, tell him that we want all our views updated
+	serverLink->SetOpCode( AS_UPDATE_IF_NEEDED );
+
+	Lock();
+	serverLink->Flush();
+	Unlock();
+	
+		// process all update messages from receive port queue
+	bool			over = false;
+	while (!over)
+	{
+		msg			= ReadMessageFromPort(0);
+		if (msg){
+			switch (msg->what){
+			
+			case _ALL_UPDATED_:{
+				over		= true;
+				}break;
+
+			case _UPDATE_:{
+				Lock();
+				DispatchMessage( msg, this );
+				Unlock();
+				}break;
+
+			default:{
+				queue->Lock();
+				queue->AddMessage(msg);
+				queue->Unlock();
+				}break;
+			}
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+
+void BWindow::drawView(BView* aView, BRect area){
+
+/* TODO: Drawing during an Update
+			These settings are temporary. When the update is over, all graphics
+			  parameters are reset to their initial values
+*/
+	aView->Draw( area );
+
+	BView			*child;
+	if ( child = aView->first_child ){
+		while ( child ) {
+			if ( area.Intersects( child->Frame() ) ){
+				BRect			newArea;
+
+				newArea			= area & child->Frame();
+				child->ConvertFromParent( &newArea );
+				child->Invalidate( newArea );
+			}
+			child 		= child->next_sibling; 
+		}
+	}
 }
 
 //------------------------------------------------------------------------------
 
 void BWindow::SetIsFilePanel(bool yes){
 
-// TODO: I think this is not enough
+// TODO: is this not enough?
 	fIsFilePanel	= yes;
 }
 
@@ -2909,24 +3410,15 @@ void BWindow::_ReservedWindow7() { }
 //------------------------------------------------------------------------------
 void BWindow::_ReservedWindow8() { }
 
-/*
-BWindow::Error(char *errMsg){
-	printf("Error: %s\n", errMsg);
-}
-*/
-
-/* ATTENTION
-	1) Currently, FrameMoved() is also called when a hidden window is shown on-screen. 
- 
-
-*/
 
 /*
 TODO list:
 
-	1) add code for menus
-	2) at B_KEY_DOWN check shortcuts
-	3) talk to Erik about BLooper, how can I still use BLooper::task_looper(), and
-		still read messages sent by app_server. If I override task_looper(), I would
-		have to implement BLooper facilities beside my code.
+	*) take care of temporarely events mask!!!
+	*) what's with this flag B_ASYNCHRONOUS_CONTROLS ?
+	*) what should I do if frame rect is invalid?
+	*) AddInt32("ccc", (uint32));
+	*) test arguments for SetWindowAligment
+	*) call hook functions: MenusBeginning, MenusEnded. Add menu activation code.
+
 */
