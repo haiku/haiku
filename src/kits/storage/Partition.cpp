@@ -823,6 +823,19 @@ BPartition::Initialize(const char *diskSystem, const char *name,
 	return error;
 }
 
+// Uninitialize
+status_t
+BPartition::Uninitialize()
+{
+	if (!fPartitionData || !_IsShadow())
+		return B_BAD_VALUE;
+	status_t error = _kern_uninitialize_partition(_ShadowID(),
+												  _ChangeCounter());
+	if (error == B_OK)
+		error = Device()->Update();
+	return error;
+}
+
 // CanCreateChild
 bool
 BPartition::CanCreateChild() const

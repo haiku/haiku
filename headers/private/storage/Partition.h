@@ -118,6 +118,7 @@ public:
 								const char *parameters);
 	status_t Initialize(const char *diskSystem, const char *name,
 						const char *parameters);
+	status_t Uninitialize();
 	
 	// Modification of child partitions
 
