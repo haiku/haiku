@@ -78,7 +78,7 @@ typedef enum {
 	B_POST_SYSCALL_HIT,			// thread finished a syscall
 	B_SINGLE_STEP,				// thread is being single stepped
 
-	B_NMI,						// non-masked interrupt
+	B_NMI,						// non-maskable interrupt
 	B_MACHINE_CHECK_EXCEPTION,
 	B_SEGMENT_VIOLATION,
 	B_ALIGNMENT_EXCEPTION,
