@@ -21,7 +21,7 @@ ObjectReferences
 	<src!add-ons!print!transports!shared>DbgMsg.o
 ;
 
-LinkSharedOSLibs IPP : be libsocket.so libbind.so stdc++.r4  ;
+LinkSharedOSLibs IPP : be libsocket.so libbind.so libnet.so stdc++.r4  ;
 
 Package haiku-printingkit-cvs :
 	IPP :

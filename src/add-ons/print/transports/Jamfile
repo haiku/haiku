@@ -2,10 +2,10 @@ SubDir OBOS_TOP src add-ons print transports ;
 
 # shared must be included first, since its objects are used by the others.
 SubInclude OBOS_TOP src add-ons print transports shared ;
-SubInclude OBOS_TOP src add-ons print transports ipp ;
-SubInclude OBOS_TOP src add-ons print transports lpr ;
 SubInclude OBOS_TOP src add-ons print transports parallel_port ;
 SubInclude OBOS_TOP src add-ons print transports print_to_file ;
 SubInclude OBOS_TOP src add-ons print transports serial_port ;
 SubInclude OBOS_TOP src add-ons print transports usb_port ;
 SubInclude OBOS_TOP src add-ons print transports hp_jetdirect ;
+SubInclude OBOS_TOP src add-ons print transports ipp ;
+SubInclude OBOS_TOP src add-ons print transports lpr ;
