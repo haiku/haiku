@@ -62,8 +62,5 @@ public:
 	void IdentifyTest();
 	void MakeConfigurationViewTest();
 	void TranslateTest();
-private:
-	/** default roster used when performing tests */
-    BTranslatorRoster* roster;
 };
 #endif
