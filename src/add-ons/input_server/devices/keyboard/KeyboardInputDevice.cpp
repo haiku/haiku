@@ -35,17 +35,8 @@
 #include <unistd.h>
 
 #if DEBUG
-	inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
-		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
-	#define LOG_ERR(text...) LOG(text)
-
 FILE *KeyboardInputDevice::sLogFile = NULL;
-#else
-	#define LOG(text...)
-	#define LOG_ERR(text...) fprintf(stderr, text)
 #endif
-
-#define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
 const static uint32 kSetLeds = 0x2711;
 const static uint32 kSetRepeatingKey = 0x2712;
@@ -365,6 +356,7 @@ instantiate_input_device()
 
 
 KeyboardInputDevice::KeyboardInputDevice()
+	: fTMWindow(NULL)
 {
 	
 #if DEBUG
@@ -385,6 +377,17 @@ KeyboardInputDevice::~KeyboardInputDevice()
 #if DEBUG	
 	fclose(sLogFile);
 #endif
+}
+
+
+status_t 
+KeyboardInputDevice::SystemShuttingDown()
+{
+	CALLED();
+	if (fTMWindow) {
+		fTMWindow->PostMessage(SYSTEM_SHUTTING_DOWN);
+	}
+	return B_OK;
 }
 
 
@@ -477,6 +480,9 @@ KeyboardInputDevice::Stop(const char *name, void *cookie)
 		status_t dummy;
 		wait_for_thread(device->device_watcher, &dummy);
 	}
+	
+	if (fTMWindow)
+		fTMWindow->PostMessage(B_QUIT_REQUESTED);
 	
 	return B_OK;
 }
@@ -666,8 +672,14 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				&& (states[0x5c >> 3] & (1 << (7 - (0x5c & 0x7))))
 				&& (states[0x5d >> 3] & (1 << (7 - (0x5d & 0x7))))) {
 				
+				LOG("TeamMonitor called\n");
+				
 				// show the team monitor
 				// argh we don't have one !
+				if (!dev->owner->fTMWindow)
+					dev->owner->fTMWindow = new TMWindow();
+				
+				dev->owner->fTMWindow->Enable();
 				
 				// cancel timer only for R5
 				if (ioctl(dev->fd, kCancelTimer, NULL) == B_OK)
@@ -776,12 +788,12 @@ KeyboardInputDevice::GetShortName(const char *longName)
 	BString name;
 	
 	int32 slash = string.FindLast("/");
-	int32 previousSlash = string.FindLast("/", slash) + 1;
-	string.CopyInto(name, slash, string.Length() - slash);
+	string.CopyInto(name, slash + 1, string.Length() - slash);
+	int32 index = atoi(name.String()) + 1;
 	
-	int32 deviceIndex = atoi(name.String()) + 1;
-	string.CopyInto(name, previousSlash, slash - previousSlash); 
-	name << " Keyboard " << deviceIndex;
+	int32 previousSlash = string.FindLast("/", slash);
+	string.CopyInto(name, previousSlash + 1, slash - previousSlash - 1); 
+	name << " Keyboard " << index;
 		
 	return strdup(name.String());
 }

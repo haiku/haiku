@@ -5,6 +5,10 @@ UsePrivateHeaders input ;
 Addon <input>keyboard : input_server/devices : 
 	KeyboardInputDevice.cpp
 	Keymap.cpp
+
+	TMWindow.cpp
+	TMListItem.cpp
+
 	: false 
 	: be <nogrist>input_server ;
 

@@ -28,6 +28,7 @@
 #define __KEYBOARDINPUTDEVICE_H
 
 #include "Keymap.h"
+#include "TMWindow.h"
 #include <InputServerDevice.h>
 #include <List.h>
 #include <stdio.h>
@@ -60,6 +61,8 @@ public:
 	
 	virtual status_t Control(const char *name, void *cookie,
 							 uint32 command, BMessage *message);
+							 
+	virtual status_t SystemShuttingDown();
 #ifdef DEBUG							 
 	static FILE *sLogFile;
 #endif
@@ -78,9 +81,21 @@ private:
 	
 	BList fDevices;
 	Keymap	fKeymap;
+	TMWindow *fTMWindow;
 };
 
 extern "C" BInputServerDevice *instantiate_input_device();
+
+#if DEBUG
+	inline void LOG(const char *fmt, ...) { char buf[1024]; va_list ap; va_start(ap, fmt); vsprintf(buf, fmt, ap); va_end(ap); \
+		fputs(buf, KeyboardInputDevice::sLogFile); fflush(KeyboardInputDevice::sLogFile); }
+	#define LOG_ERR(text...) LOG(text)
+#else
+	#define LOG(text...)
+	#define LOG_ERR(text...) fprintf(stderr, text)
+#endif
+
+#define CALLED() LOG("%s\n", __PRETTY_FUNCTION__)
 
 #endif
 
