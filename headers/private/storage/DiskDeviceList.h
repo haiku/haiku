@@ -28,8 +28,8 @@ public:
 	bool Lock();
 	void Unlock();
 
-	uint32 CountDevices() const;
-	BDiskDevice *DeviceAt(uint32 index) const;
+	int32 CountDevices() const;
+	BDiskDevice *DeviceAt(int32 index) const;
 
 	BDiskDevice *VisitEachDevice(BDiskDeviceVisitor *visitor);
 	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
@@ -39,8 +39,8 @@ public:
 	BPartition *VisitEachMountablePartition(BDiskDeviceVisitor *visitor);
 	BPartition *VisitEachInitializablePartition(BDiskDeviceVisitor *visitor);
 
-	BDiskDevice *DeviceWithID(uint32 id) const;
-	BPartition *PartitionWithID(uint32 id) const;
+	BDiskDevice *DeviceWithID(partition_id id) const;
+	BPartition *PartitionWithID(partition_id id) const;
 
 	virtual void MountPointMoved(BPartition *partition);
 	virtual void PartitionMounted(BPartition *partition);

@@ -36,13 +36,13 @@ private:
 // IDFinderVisitor
 class IDFinderVisitor : public BDiskDeviceVisitor {
 public:
-	IDFinderVisitor(uint32 id);
+	IDFinderVisitor(partition_id id);
 
 	virtual bool Visit(BDiskDevice *device);
 	virtual bool Visit(BPartition *partition);
 
 private:
-	uint32				fID;
+	partition_id		fID;
 };
 
 status_t get_disk_device_messenger(BMessenger *messenger);

@@ -8,6 +8,7 @@
 
 class BDiskSystem {
 public:
+	const char *ShortName() const;
 	const char *Name() const;
 
 	bool SupportsDefragmenting(BPartition *partition, bool *whileMounted) const;

@@ -24,7 +24,7 @@ public:
 	off_t Offset() const;		// 0 for devices
 	off_t Size() const;
 	uint32 BlockSize() const;
-	uint32 Index() const;		// 0 for devices
+	int32 Index() const;		// 0 for devices
 	uint32 Status() const;
 	
 	bool IsMountable() const;
@@ -35,9 +35,10 @@ public:
 	bool IsMounted() const;
 	
 	const char* Name() const;
+	const char* ContentName() const;
 	const char* Type() const;   		// See DiskDeviceTypes.h
 	const char* ContentType() const;	// See DiskDeviceTypes.h
-	uint32 UniqueID() const;
+	partition_id UniqueID() const;
 	uint32 Flags() const;		
 	
 	status_t GetPath(BPath *path) const;
@@ -49,10 +50,10 @@ public:
 	
 	// Hierarchy Info
 
-	BDiskDevice* Device() const;
-	BPartition* Parent() const;
-	BPartition* ChildAt(uint32 index) const;
-	uint32 CountChildren() const;
+	BDiskDevice *Device() const;
+	BPartition *Parent() const;
+	BPartition *ChildAt(int32 index) const;
+	int32 CountChildren() const;
 
 	BPartitioningInfo* GetPartitioningInfo() const;
 	
@@ -85,6 +86,8 @@ public:
                BDiskScannerParameterEditor **contentEditor);
     status_t SetParameters(const char *parameters, const char *contentParameters);
 
+// TODO: Add name/content name editing methods, Also in BDiskSystem.
+
 	bool CanInitialize(const char *diskSystem) const;
 	status_t GetInitializationParameterEditor(const char *system,       
                BDiskScannerParameterEditor **editor) const;
@@ -101,14 +104,14 @@ public:
 	status_t CreateChild(off_t start, off_t size, const char *parameters,
 	           BPartition** child = NULL);
 	
-	bool CanDeleteChild(uint32 index) const;
-	status_t DeleteChild(uint32 index);
+	bool CanDeleteChild(int32 index) const;
+	status_t DeleteChild(int32 index);
 	
 protected:
 	off_t					fOffset;
 	off_t					fSize;
 	uint32					fBlockSize;
-	uint32					fIndex;
+	int32					fIndex;
 	uint32					fStatus;
 
 	bool					fIsMountable;
@@ -122,12 +125,12 @@ protected:
 	char					fType[B_FILE_NAME_LENGTH];
 	char					fContentType[B_FILE_NAME_LENGTH];
 
-	uint32					fUniqueID;
+	partition_id			fUniqueID;
 	uint32 					fFlags;
 
 	BObjectList<BPartition>	fChildren;
 
-	uint32					fChangeCounter;
+	int32					fChangeCounter;
 }
 
 #endif	// _PARTITION_H

@@ -98,6 +98,12 @@ public:
 	status_t GetNextActiveJob(BDiskDeviceJob *job);
 	status_t RewindActiveJobs();
 
+	partition_id RegisterDeviceFile(const char *filename);
+		// publishes: /dev/disk/virtual/files/<disk device ID>/raw
+	status_t UnregisterDeviceFile(const char *filename);
+	status_t UnregisterDeviceFile(partition_id device);
+// TODO: Add the respective syscalls. Also for Get{Device,Partition}ForPath()
+
 	bool VisitEachDevice(BDiskDeviceVisitor *visitor,
 						 BDiskDevice *device = NULL);
 	bool VisitEachPartition(BDiskDeviceVisitor *visitor,
@@ -118,9 +124,15 @@ public:
 									 BDiskDevice *device = NULL,
 									 BPartition **partition = NULL);
 									 
-	status_t GetDeviceWithID(uint32 id, BDiskDevice *device) const;
-	status_t GetPartitionWithID(uint32 id, BDiskDevice *device,
+	status_t GetDeviceWithID(partition_id id, BDiskDevice *device) const;
+	status_t GetPartitionWithID(partition_id id, BDiskDevice *device,
 								BPartition **partition) const;
+
+	partition_id GetDeviceForPath(const char *filename, BDiskDevice *device,
+								  bool registerIfFile = false);
+	partition_id GetPartitionForPath(const char *filename, BDiskDevice *device,
+									 BPartition **partition,
+									 bool registerIfFile = false);
 
 	status_t StartWatching(BMessenger target,
 						   uint32 eventMask = B_DEVICE_REQUEST_ALL);
@@ -129,19 +141,19 @@ public:
 	status_t StopWatching(BMessenger target);
 
 private:
-	status_t _GetObjectWithID(const char *fieldName, uint32 id,
+	status_t _GetObjectWithID(const char *fieldName, partition_id id,
 							  BDiskDevice *device) const;
 
 	// TODO: Introduce iterators instead of these functions.
 
-	static status_t _GetNextAddOn(BDirectory **directory, uint32 *index,
+	static status_t _GetNextAddOn(BDirectory **directory, int32 *index,
 								  const char *subdir,
 								  BPrivate::AddOnImage *image);
 	static status_t _GetNextAddOn(BDirectory *directory,
 								  BPrivate::AddOnImage *image);
-	static status_t _GetNextAddOnDir(BPath *path, uint32 *index,
+	static status_t _GetNextAddOnDir(BPath *path, int32 *index,
 									 const char *subdir);
-	static status_t _GetNextAddOnDir(BDirectory **directory, uint32 *index,
+	static status_t _GetNextAddOnDir(BDirectory **directory, int32 *index,
 									 const char *subdir);
 
 	static status_t _LoadPartitionAddOn(const char *partitioningSystem,
@@ -150,11 +162,11 @@ private:
 
 private:
 	BMessenger	fManager;
-	uint32		fCookie;
+	int32		fCookie;
 	BDirectory	*fPartitionAddOnDir;
 	BDirectory	*fFSAddOnDir;
-	uint32		fPartitionAddOnDirIndex;
-	uint32		fFSAddOnDirIndex;
+	int32		fPartitionAddOnDirIndex;
+	int32		fFSAddOnDirIndex;
 };
 
 #endif	// _DISK_DEVICE_ROSTER_H

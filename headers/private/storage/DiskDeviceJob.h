@@ -29,21 +29,38 @@ enum {
 	B_DISK_DEVICE_JOB_CANCELED,
 };
 
+// disk device job progress info
+struct disk_device_progress_info {
+	int32	task_count;
+	int32	completed_tasks;
+	float	current_task_progress;
+	char	current_task_description[256];
+};
+
+// disk device job cancel properties
+enum {
+	B_DISK_DEVICE_JOB_CAN_CANCEL			= 0x01,
+	B_DISK_DEVICE_JOB_STOP_ON_CANCEL		= 0x02,
+	B_DISK_DEVICE_JOB_REVERSE_ON_CANCEL		= 0x04,
+};
+
 class BDiskDeviceJob {
 public:
-	uint32 ID() const;
+	disk_job_id ID() const;
 	uint32 Type() const;	
 	float Progress() const;		// [0.0, 1.0]
 	uint32 Status() const;	
 	const char *Description() const;
+	status_t GetProgressInfo(disk_devive_progress_info *info) const;
+	uint32 CancelProperties() const;
 	
-	BPartition* Partition() const;
+	partition_id PartitionID() const;
+
 private:
-	uint32 fJobID;
-	uint32 fType;
-	uint32 fPartitionID;
-	uint32 fStatus;
-	BString fDescription;
+	disk_job_id		fJobID;
+	uint32			fType;
+	partition_id	fPartitionID;
+	BString			fDescription;
 };
 
 #endif	// _DISK_DEVICE_JOB_H

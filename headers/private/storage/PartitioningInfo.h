@@ -10,14 +10,16 @@ class BPartition;
 
 class BPartitioningInfo {
 public:
-	status_t GetPartitionableSpaceAt(uint32 index, off_t *Offset, off_t *Size) const;
-	uint32 CountPartitionableSpaces() const;
+	status_t GetPartitionableSpaceAt(int32 index, off_t *offset,
+									 off_t *size) const;
+	int32 CountPartitionableSpaces() const;
 
-	BPartition* Parent() const;
+	BPartition *Parent() const;	// needed?
+
 private:
-	off_t *fOffsetArray;
-	off_t *fSizeArray;
-	uint32 fCount;
+	off_t	*fOffsetArray;
+	off_t	*fSizeArray;
+	int32	fCount;
 };
 
 #endif	// _PARTITIONING_INFO_H

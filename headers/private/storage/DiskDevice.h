@@ -17,7 +17,7 @@ public:
 	void Unset();
 	
 	bool IsModified() const;
-	uint32 CommitModifications(bool synchronously = true,
+	status_t CommitModifications(bool synchronously = true,
 		BMessenger progressMessenger = BMessenger(),
 		bool receiveCompleteProgressUpdates = true,
 		BMessage *template = NULL);
