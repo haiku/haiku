@@ -314,6 +314,7 @@ static nv_settings current_settings = { // see comments in nv.settings
 	false,		// force_pci
 	false,		// unhide_fw
 	true,		// pgm_panel
+	false,		// dma_acc
 };
 
 static void dumprom (void *rom, uint32 size)
@@ -449,6 +450,7 @@ init_driver(void) {
 		current_settings.force_pci = get_driver_boolean_parameter (settings_handle, "force_pci", false, false);
 		current_settings.unhide_fw = get_driver_boolean_parameter (settings_handle, "unhide_fw", false, false);
 		current_settings.pgm_panel = get_driver_boolean_parameter (settings_handle, "pgm_panel", false, false);
+		current_settings.dma_acc = get_driver_boolean_parameter (settings_handle, "dma_acc", false, false);
 
 		unload_driver_settings (settings_handle);
 	}
