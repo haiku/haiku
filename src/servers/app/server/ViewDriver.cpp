@@ -52,6 +52,10 @@
 #include "LayerData.h"
 #include "PNGDump.h"
 
+// TODO: remove later!!!!!!!
+#include <Cursor.h>
+#include "CursorData.h"
+
 #ifdef DEBUG_DRIVER_MODULE
 #	include <stdio.h>
 #	define STRACE(x) printf x
@@ -508,10 +512,14 @@ bool VDWindow::QuitRequested(void)
 void VDWindow::WindowActivated(bool active)
 {
 	// This is just to hide the regular system cursor so we can see our own
-	if(active)
+// TODO: REactivate later!!!!
+/*	if(active)
 		be_app->HideCursor();
 	else
 		be_app->ShowCursor();
+*/
+	BCursor	cursor(default_cursor_data);
+	view->SetViewCursor(&cursor, true);
 }
 
 //-----------------------------------------------------------------------
@@ -805,7 +813,7 @@ void ViewDriver::DrawChar(char c, BPoint pt, LayerData *d)
 	str[1]='\0';
 	DrawString(str, 1, pt, d);
 }
-/*
+
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL)
 {
 STRACE(("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x,pt.y));
@@ -836,7 +844,7 @@ STRACE(("ViewDriver:: DrawString(\"%s\",%ld,BPoint(%f,%f))\n",string,length,pt.x
 	screenwin->Unlock();
 	
 }
-*/
+
 
 bool ViewDriver::DumpToFile(const char *path)
 {
@@ -1657,7 +1665,7 @@ float ViewDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	returnval=ascent+descent;
 	return returnval;
 }
-
+/*
 void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta)
 {
 	if(!string || !d )
@@ -1801,7 +1809,7 @@ void ViewDriver::DrawString(const char *string, int32 length, BPoint pt, LayerDa
 
 	FT_Done_Face(face);
 }
-
+*/
 void ViewDriver::BlitMono2RGB32(FT_Bitmap *src, BPoint pt, LayerData *d)
 {
 	rgb_color color=d->highcolor.GetColor32();
