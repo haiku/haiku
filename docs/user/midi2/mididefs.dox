@@ -1,7 +1,7 @@
 /*!
 \page midi2defs Midi Kit definitions (Midi2Defs.h)
 
-\subsection channelmasks Channel message masks
+\section channelmasks Channel message masks
 
 <TABLE BORDER="1">
 <TR><TD>B_NOTE_OFF</TD><TD>0x80</TD></TR>
@@ -13,7 +13,7 @@
 <TR><TD>B_PITCH_BEND</TD><TD>0xe0</TD></TR>
 </TABLE>
 
-\subsection systemmessages System messages
+\section systemmessages System messages
 
 <TABLE BORDER="1">
 <TR><TD>B_SYS_EX_START</TD><TD>0xf0</TD></TR>
@@ -31,7 +31,7 @@
 <TR><TD>B_SYSTEM_RESET</TD><TD>0xff</TD></TR>
 </TABLE>
 
-\subsection controllernumbers Controller numbers
+\section controllernumbers Controller numbers
 
 <TABLE BORDER="1">
 <TR><TD>B_MODULATION</TD><TD>0x01</TD></TR>
@@ -73,7 +73,7 @@
 <TR><TD>B_POLY_MODE_ON</TD><TD>0x7f</TD></TR>
 </TABLE>
 
-\subsection bmidiop BMidiOp
+\section bmidiop BMidiOp
 
 <TABLE BORDER="1">
 <TR><TD>B_MIDI_NO_OP</TD></TR>
