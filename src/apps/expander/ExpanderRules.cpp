@@ -59,10 +59,12 @@ ExpanderRule::ExpanderRule(const char*  mimetype, const char*  filenameExtension
 ExpanderRules::ExpanderRules()
 {
 	fList.AddItem(new ExpanderRule("", 								".tar.gz", 	"zcat %s | tar -tvf -", 		"zcat %s | tar -xvf -"));
+	fList.AddItem(new ExpanderRule("", 								".tar.bz2", "bzcat %s | tar -tvf -", 		"bzcat %s | tar -xvf -"));
 	fList.AddItem(new ExpanderRule("", 								".tar.Z", 	"zcat %s | tar -tvf -", 		"zcat %s | tar -xvf -"));
 	fList.AddItem(new ExpanderRule("", 								".tgz", 	"zcat %s | tar -tvf -", 		"zcat %s | tar -xvf -"));
 	fList.AddItem(new ExpanderRule("application/x-tar", 			".tar", 	"tar -tvf %s", 					"tar -xf %s"));
 	fList.AddItem(new ExpanderRule("application/x-gzip",			".gz", 		"echo %s | sed 's/.gz$//g'", 	"gunzip %s"));
+	fList.AddItem(new ExpanderRule("application/x-bzip2",				".bz2", 	"echo %s | sed 's/.bz2$//g'", 	"bunzip2 %s"));
 	fList.AddItem(new ExpanderRule("application/zip", 				".zip", 	"unzip -l %s", 					"unzip -o %s"));
 	fList.AddItem(new ExpanderRule("application/x-zip-compressed", 	".zip", 	"unzip -l %s", 					"unzip -o %s"));
 	

@@ -102,3 +102,4 @@ SubInclude OBOS_TOP src apps bin traceroute ;
 SubInclude OBOS_TOP src apps bin unzip ;
 SubInclude OBOS_TOP src apps bin zip ;
 SubInclude OBOS_TOP src apps bin gzip ;
+SubInclude OBOS_TOP src apps bin bzip2 ;

@@ -1,0 +1,42 @@
+SubDir OBOS_TOP src apps bin bzip2 ;
+
+# set some additional defines
+{
+	SubDirCcFlags -Wall -Winline -O2 -fomit-frame-pointer -fno-strength-reduce -D_FILE_OFFSET_BITS=64 ;
+}
+
+BinCommand bzip2 :
+	blocksort.c
+	huffman.c
+	crctable.c
+	randtable.c
+	compress.c
+	decompress.c
+	bzlib.c
+	bzip2.c
+;
+
+BinCommand bzip2recover :
+	bzip2recover.c
+;
+
+{
+	MakeLocate bunzip2 : $(OBOS_BIN_DIR) ;
+	RelSymLink bunzip2 : bzip2 ;
+	MakeLocate bzcat : $(OBOS_BIN_DIR) ;
+	RelSymLink bzcat : bzip2 ;
+	MakeLocate <bin>bzdiff : $(OBOS_BIN_DIR) ;
+	Shell <bin>bzdiff : bzdiff ;
+	MakeLocate bzcmp : $(OBOS_BIN_DIR) ;
+	RelSymLink bzcmp : <bin>bzdiff ;
+	MakeLocate <bin>bzgrep : $(OBOS_BIN_DIR) ;
+	Shell <bin>bzgrep : bzgrep ;
+	MakeLocate bzegrep : $(OBOS_BIN_DIR) ;
+	RelSymLink bzegrep : <bin>bzgrep ;
+	MakeLocate bzfgrep : $(OBOS_BIN_DIR) ;
+	RelSymLink bzfgrep : <bin>bzgrep ;
+	MakeLocate <bin>bzmore : $(OBOS_BIN_DIR) ;
+	Shell <bin>bzmore : bzmore ;
+	MakeLocate bzless : $(OBOS_BIN_DIR) ;
+	RelSymLink bzless : <bin>bzmore ;
+}
