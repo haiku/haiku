@@ -8,6 +8,7 @@ KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdio>kvsprintf.o
 
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>atof.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>heapsort.o
@@ -20,6 +21,7 @@ KernelStaticLibraryObjects libkern.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoul.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoll.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoull.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtod.o
 
 	<$(SOURCE_GRIST)!libroot!posix!sys>chmod.o
 	<$(SOURCE_GRIST)!libroot!posix!sys>stat.o
@@ -258,7 +260,8 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdio>wsetup.o
 
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>abs.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o	
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>atof.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>div.o
@@ -403,7 +406,8 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdio>wsetup.o
 
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>abs.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o	
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>assert.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>atof.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>bsearch.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>div.o
@@ -421,6 +425,7 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoul.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoll.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoull.o
+	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtod.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o

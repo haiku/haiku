@@ -2,7 +2,8 @@ SubDir OBOS_TOP src kernel libroot posix stdlib ;
 
 KernelObjects 
 	<$(SOURCE_GRIST)>abs.c
-	<$(SOURCE_GRIST)>assert.c 
+	<$(SOURCE_GRIST)>assert.c
+	<$(SOURCE_GRIST)>atoi.c 
 	<$(SOURCE_GRIST)>atoi.c 
 	<$(SOURCE_GRIST)>bsearch.c
 	<$(SOURCE_GRIST)>div.c 
