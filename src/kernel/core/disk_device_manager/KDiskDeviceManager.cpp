@@ -650,6 +650,7 @@ KDiskDeviceManager::AddJobQueue(KDiskDeviceJobQueue *jobQueue)
 			return error;
 		}
 	}
+	// TODO: mark the concerned partitions busy /descendant busy
 	// start its execution
 	error = jobQueue->Execute();
 	if (error != B_OK)
@@ -694,6 +695,13 @@ KDiskDeviceManager::NextJobQueue(int32 *cookie)
 	if (!cookie || *cookie < 0 || *cookie >= CountJobQueues())
 		return NULL;
 	return fJobQueues->ElementAt((*cookie)++);
+}
+
+// JobFactory
+KDiskDeviceJobFactory *
+KDiskDeviceManager::JobFactory() const
+{
+	return fJobFactory;
 }
 
 // FindDiskSystem

@@ -87,6 +87,8 @@ public:
 	int32 CountJobQueues();
 	KDiskDeviceJobQueue *NextJobQueue(int32 *cookie);
 
+	KDiskDeviceJobFactory *JobFactory() const;
+
 	// Disk Systems
 
 	// manager must be locked
