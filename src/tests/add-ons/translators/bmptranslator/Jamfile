@@ -1,0 +1,28 @@
+SubDir OBOS_TOP src tests add-ons translators bmptranslator ;
+
+CommonTestLib libbmptranslatortest.so
+	: BMPTranslatorTestAddOn.cpp
+		BMPTranslatorTest.cpp
+	: <$(SOURCE_GRIST)>libtranslation.so be stdc++.r4
+	: be stdc++.r4
+	:
+	: bmptranslator
+;
+
+# To run the tests the libraries must be around.
+{
+	local libdir = [ on UnitTester FDirName $(LOCATE[1]) lib ] ;
+	MakeLocate <$(SOURCE_GRIST)>libtranslation.so : $(libdir) ;
+	RelSymLink <$(SOURCE_GRIST)>libtranslation.so : libtranslation.so ;
+	Includes <$(SOURCE_GRIST)>libtranslation.so
+		: ;
+}
+
+# To run the tests some test files must be around.
+#{
+#	local resdir = <storage!kit!test!files>resources ;
+#	MakeLocate $(resdir) : [ on UnitTester return $(LOCATE[1]) ] ;
+#	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] ;
+#	DEPENDS libstoragetest.so : $(resdir) ;
+#}
+
