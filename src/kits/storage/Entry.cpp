@@ -524,15 +524,8 @@ BEntry::GetPath(BPath *path) const
 
 	if (path == NULL)
 		return B_BAD_VALUE;
-		
-	entry_ref ref;
-	status_t status;
-	
-	status = GetRef(&ref);
-	if (status != B_OK)
-		return status;
-		
-	return path->SetTo(&ref);
+
+	return path->SetTo(this);
 }
 
 /*! \brief Gets the parent of the BEntry as another BEntry.
