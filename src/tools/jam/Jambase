@@ -1498,7 +1498,7 @@ rule Yacc
 {
 	local _h ;
 
-	_h = [ FGristFiles $(<:BS=.h) ] ;
+	_h = $(<:S=.h) ;
 
 	# Some places don't have a yacc.
 

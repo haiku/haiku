@@ -848,7 +848,7 @@ const char *jambase[] = {
 "rule Yacc\n",
 "{\n",
 "local _h ;\n",
-"_h = $(<:BS=.h) ;\n",
+"_h = $(<:S=.h) ;\n",
 "MakeLocate $(<) $(_h) : $(LOCATE_SOURCE) ;\n",
 "if $(YACC)\n",
 "{\n",
