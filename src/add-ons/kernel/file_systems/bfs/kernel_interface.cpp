@@ -700,7 +700,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 int 
 bfs_setflags(void *_ns, void *_node, void *_cookie, int flags)
 {
-	FUNCTION_START(("node = %p, flags = %d", node, flags));
+	FUNCTION_START(("node = %p, flags = %d", _node, flags));
 
 	file_cookie *cookie = (file_cookie *)_cookie;
 	cookie->open_mode = (cookie->open_mode & ~O_APPEND) | (flags & O_APPEND);
