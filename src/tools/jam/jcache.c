@@ -336,8 +336,9 @@ static
 jcache_entry*
 find_jcache_entry(jamfile_cache* cache, char* filename)
 {
-	jcache_entry _entry = { filename };
+	jcache_entry _entry;
 	jcache_entry* entry = &_entry;
+	entry->filename = filename;
 	if (!hashcheck(cache->entries, (HASHDATA**)&entry))
 		entry = 0;
 	return entry;
