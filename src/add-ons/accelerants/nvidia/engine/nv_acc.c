@@ -156,6 +156,19 @@ status_t nv_acc_init()
 	ACCW(PF_CACHES, 0x00000001);
 
 	/*** PRAMIN ***/
+	/* first clear the entire RAMHT (hash-table) space to a defined state. It turns
+	 * out at least NV11 will keep the previously programmed handles over resets and
+	 * power-outages upto about 15 seconds!! Faulty entries might well hang the
+	 * engine (confirmed on NV11).
+	 * Note:
+	 * this behaviour is not very strange: even very old DRAM chips are known to be
+	 * able to do this, even though you should refresh them every few milliseconds or
+	 * so. (Large memory cell capacitors, though different cells vary a lot in their
+	 * capacity.)
+	 * Of course data valitidy is not certain by a long shot over this large
+	 * amount of time.. */
+	for(cnt = 0; cnt < 0x0400; cnt++)
+		NV_REG32(NVACC_HT_HANDL_00 + (cnt << 2)) = 0;
 	/* RAMHT space (hash-table) SETUP FIFO HANDLES */
 	/* note:
 	 * 'instance' tells you where the engine command is stored in 'PR_CTXx_x' sets
