@@ -101,10 +101,10 @@ area_id map_mem(void **log, void *phy, size_t size, const char *name)
 	dprintf("mapping physical address %p with %#lx bytes for %s\n",phy,size,name);
 
 	offset = (uint32)phy & (B_PAGE_SIZE - 1);
-	phyadr = phy - offset;
+	phyadr = (void *) ( (uint32)phy - offset );
 	size = round_to_pagesize(size + offset);
 	area = map_physical_memory(name, phyadr, size, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &mapadr);
-	*log = mapadr + offset;
+	*log = (void *) ( (uint32)mapadr + offset );
 
 	dprintf("physical = %p, logical = %p, offset = %#lx, phyadr = %p, mapadr = %p, size = %#lx, area = %#lx\n",
 		phy, *log, offset, phyadr, mapadr, size, area);
