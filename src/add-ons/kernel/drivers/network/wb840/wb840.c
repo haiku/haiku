@@ -2,7 +2,6 @@
  * Stefano Ceccherini <burton666@libero.it>. All rights reserved.
  */
 
-#define DEBUG 1
 #include "device.h"
 #include "driver.h"
 #include "debug.h"
@@ -266,6 +265,7 @@ wb_tick(timer *arg)
 	
 	return B_OK;
 }
+
 
 /***************** Interrupt handling ******************************/
 static status_t
