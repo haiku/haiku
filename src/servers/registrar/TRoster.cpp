@@ -31,6 +31,7 @@
 #include <AppMisc.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <MessengerPrivate.h>
 #include <Path.h>
 #include <storage_support.h>
 
@@ -733,7 +734,9 @@ TRoster::HandleBroadcast(BMessage *request)
 			 ++it) {
 			// don't send the message to the requesting team or the registrar
 			if ((*it)->team != team && (*it)->team != registrarTeam) {
-				BMessenger messenger((*it)->team, (*it)->port, 0, true);
+				BMessenger messenger;
+				BMessenger::Private messengerPrivate(messenger);
+				messengerPrivate.SetTo((*it)->team, (*it)->port, 0, true);
 				messenger.SendMessage(&message, replyTarget, 0);
 			}
 		}
@@ -1045,7 +1048,8 @@ TRoster::Init()
 		error = get_app_ref(&ref);
 	// init and add the info
 	if (error == B_OK) {
-		info->Init(be_app->Thread(), be_app->Team(), be_app_messenger.fPort,
+		info->Init(be_app->Thread(), be_app->Team(),
+				   BMessenger::Private(be_app_messenger).Port(),
 				   B_EXCLUSIVE_LAUNCH, &ref, kRegistrarSignature);
 		info->state = APP_STATE_REGISTERED;
 		info->registration_time = system_time();
@@ -1199,7 +1203,9 @@ TRoster::_AppActivated(RosterAppInfo *info)
 		if (info->state == APP_STATE_REGISTERED
 			|| info->state == APP_STATE_PRE_REGISTERED) {
 			// send B_APP_ACTIVATED to the app
-			BMessenger messenger(info->team, info->port, 0, true);
+			BMessenger messenger;
+			BMessenger::Private messengerPrivate(messenger);
+			messengerPrivate.SetTo(info->team, info->port, 0, true);
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", true);
 			messenger.SendMessage(&message);
@@ -1223,7 +1229,9 @@ TRoster::_AppDeactivated(RosterAppInfo *info)
 		if (info->state == APP_STATE_REGISTERED
 			|| info->state == APP_STATE_PRE_REGISTERED) {
 			// send B_APP_ACTIVATED to the app
-			BMessenger messenger(info->team, info->port, 0, true);
+			BMessenger messenger;
+			BMessenger::Private messengerPrivate(messenger);
+			messengerPrivate.SetTo(info->team, info->port, 0, true);
 			BMessage message(B_APP_ACTIVATED);
 			message.AddBool("active", false);
 			messenger.SendMessage(&message);
