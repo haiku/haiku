@@ -6,6 +6,8 @@
 
 
 #include "Stream.h"
+#include "Directory.h"
+#include "File.h"
 
 #include <stdlib.h>
 #include <unistd.h>
@@ -107,6 +109,15 @@ Stream::Stream(Volume &volume, block_run run)
 }
 
 
+Stream::Stream(Volume &volume, off_t id)
+	:
+	fVolume(volume)
+{
+	if (read_pos(volume.Device(), volume.ToOffset(id), this, sizeof(bfs_inode)) != sizeof(bfs_inode))
+		return;
+}
+
+
 Stream::~Stream()
 {
 }
@@ -116,6 +127,42 @@ status_t
 Stream::InitCheck()
 {
 	return bfs_inode::InitCheck(&fVolume);
+}
+
+
+status_t
+Stream::GetNextSmallData(const small_data **_smallData) const
+{
+	const small_data *smallData = *_smallData;
+
+	// begin from the start?
+	if (smallData == NULL)
+		smallData = small_data_start;
+	else
+		smallData = smallData->Next();
+
+	// is already last item?
+	if (smallData->IsLast(this))
+		return B_ENTRY_NOT_FOUND;
+
+	*_smallData = smallData;
+
+	return B_OK;
+}
+
+
+status_t 
+Stream::GetName(char *name, size_t size) const
+{
+	const small_data *smallData = NULL;
+	while (GetNextSmallData(&smallData) == B_OK) {
+		if (*smallData->Name() == FILE_NAME_NAME
+			&& smallData->NameSize() == FILE_NAME_NAME_LENGTH) {
+			strlcpy(name, (const char *)smallData->Data(), size);
+			return B_OK;
+		}
+	}
+	return B_ERROR;
 }
 
 
@@ -315,7 +362,7 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 		if (partial) {
 			// if the last block was read only partially, point block_run
 			// to the remaining part
-			run.start += run.length;
+			run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + run.Length());
 			run.length = 1;
 			offset = pos;
 		} else if (FindBlockRun(pos, run, offset) < B_OK) {
@@ -326,6 +373,20 @@ Stream::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	*_length = bytesRead;
 	return B_NO_ERROR;
+}
+
+
+Node *
+Stream::NodeFactory(Volume &volume, off_t id)
+{
+	Stream stream(volume, id);
+	if (stream.InitCheck() != B_OK)
+		return NULL;
+
+	if (stream.IsContainer())
+		return new Directory(stream);
+
+	return new File(stream);
 }
 
 
