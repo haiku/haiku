@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <Drivers.h>
 
-void dump_dev_size(int dev)
+static void dump_dev_size(int dev)
 {
 	size_t sz;
 	if (ioctl(dev, B_GET_DEVICE_SIZE, &sz, sizeof(sz)) < 0) {
@@ -14,7 +15,7 @@ void dump_dev_size(int dev)
 	puts("");
 }
 
-void dump_bios_id(int dev)
+static void dump_bios_id(int dev)
 {
 	uint8 id;
 	if (ioctl(dev, B_GET_BIOS_DRIVE_ID, &id, sizeof(id)) < 0) {
@@ -25,7 +26,7 @@ void dump_bios_id(int dev)
 	puts("");
 }
 
-void dump_media_status(int dev)
+static void dump_media_status(int dev)
 {
 	uint32 st;
 	if (ioctl(dev, B_GET_MEDIA_STATUS, &st, sizeof(st)) < 0) {
@@ -36,7 +37,7 @@ void dump_media_status(int dev)
 	puts("");
 }
 
-const char *device_type(uint32 type)
+static const char *device_type(uint32 type)
 {
 	if (type == B_DISK) return "disk";
 	if (type == B_TAPE) return "tape";
@@ -51,7 +52,7 @@ const char *device_type(uint32 type)
 	return "<unknown>";
 }
 
-void dump_geom(int dev, bool bios)
+static void dump_geom(int dev, bool bios)
 {
 	device_geometry geom;
 	
