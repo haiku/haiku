@@ -597,7 +597,7 @@ BTextControl::InitData(const char *label, const char *initial_text,
 
 	int32 flags = 0;
 
-	BFont font(be_bold_font);
+	BFont font(be_plain_font);
 
 	if (!data || !data->HasString("_fname"))
 		flags |= B_FONT_FAMILY_AND_STYLE;
