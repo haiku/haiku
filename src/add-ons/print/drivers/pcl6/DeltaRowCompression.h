@@ -76,8 +76,6 @@ private:
 	int CompressRaw(const uchar* row, bool updateSeedRow, bool updateDeltaRow);
 
 	// write byte to delta row and calculate size of delta row
-	// If a client overrides this method and wants to calculate the
-	// size of the delta row the method must be called.
 	void Put(uchar byte) {
 		if (fUpdateDeltaRow) {
 			AppendByteToDeltaRow(byte);
