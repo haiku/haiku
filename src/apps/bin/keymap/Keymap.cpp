@@ -712,10 +712,10 @@ Keymap::SaveAsHeader(entry_ref &ref)
 	status_t err;
 
 	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
-        if ((err = file.InitCheck()) != B_OK) {
-                printf("error %s\n", strerror(err));
-                return;
-        }
+	if ((err = file.InitCheck()) != B_OK) {
+	        printf("error %s\n", strerror(err));
+	        return;
+	}
 
 	int fd = file.Dup();
 	FILE * f = fdopen(fd, "w");
@@ -818,7 +818,7 @@ Keymap::SaveAsHeader(entry_ref &ref)
 	
 	fprintf(f, "const char sSystemKeyChars[] = {\n");
 	for (uint32 i=0; i<fCharsSize; i++)
-		fprintf(f, "\t0x%hx,\n", fChars[i]);
+		fprintf(f, "\t%hhd,\n", fChars[i]);
 	fprintf(f, "};\n");
 }
 
