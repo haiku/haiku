@@ -1893,11 +1893,9 @@ status_t BMessage::_send_(port_id port, int32 token, bool preferred,
 {
 PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
 "what: %lx (%.4s)\n", port, token, preferred, what, (char*)&what));
-	BMessage tmp_msg;
-	tmp_msg.fPreferred     = fPreferred;
-	tmp_msg.fTarget        = fTarget;
-	tmp_msg.fReplyRequired = fReplyRequired;
-	tmp_msg.fReplyTo       = fReplyTo;
+	bool oldPreferred = fPreferred;
+	int32 oldTarget = fTarget;
+	reply_to_info oldReplyTo = fReplyTo;
 
 	if (!reply_to.IsValid()) {
 		BMessenger::Private(reply_to).SetTo(fReplyTo.team, fReplyTo.port, fReplyTo.target, fReplyTo.preferred);
@@ -1929,11 +1927,12 @@ PRINT(("BMessage::_send_(port: %ld, token: %ld, preferred: %d): "
 	{
 		delete[] p;
 	}
-	self->fPreferred     = tmp_msg.fPreferred;
-	self->fTarget        = tmp_msg.fTarget;
-	self->fReplyRequired = false; //tmp_msg.fReplyRequired;
-	self->fReplyTo       = tmp_msg.fReplyTo;
-	tmp_msg.init_data();
+	self->fPreferred     = oldPreferred;
+	self->fTarget        = oldTarget;
+	self->fReplyRequired = false;	// To this copy, no reply is required.
+									// Only relevant when forwarding anyway.
+	self->fReplyTo       = oldReplyTo;
+
 PRINT(("BMessage::_send_() done: %lx\n", err));
 	return err;
 }
