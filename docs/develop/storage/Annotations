@@ -163,17 +163,21 @@ Location:    FindEntry()
 Description: Crashs when passing a NULL BEntry.
 
 
-OS:          BeOS R5
+OS:          BeOS R5 (OBOS)
 Module:      BDirectory
-Location:    Contains()
-Description: If the BDirectory is uninitialized, the const char* version
-             returns true for existing entries, whereas the const BEntry*
-             version returns false.
+Location:    Contains(const char*, int32)
+Description: If the supplied path is absolute and refers to an existing
+             entry, true is returned, even if the directory does not contain
+             the entry or is not even initialized.
+             (The OBOS implementation makes the behavior more consistent
+             with the BEntry* version, which returns false when the
+             directory is not initialized and true only if the directory
+             actually contains the entry.)
 
 
 OS:          BeOS R5
 Module:      BDirectory
-Location:    Contains(const BEntry*, bool)
+Location:    Contains(const BEntry*, int32)
 Description: Crashs when passing a NULL BEntry.
 
 
