@@ -55,6 +55,7 @@ mp3Decoder::Seek(uint32 seekTo,
 {
 	ExitMP3(&fMpgLibPrivate);
 	InitMP3(&fMpgLibPrivate);
+	fResidualBytes = 0;
 	return B_OK;
 }
 
@@ -81,7 +82,7 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 		int32 chunkSize;
 		if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, mediaHeader)) {
 			TRACE("mp3Decoder::Decode: GetNextChunk failed\n");
-				return B_ERROR;
+			return B_ERROR;
 		}
 
 		int outsize;
