@@ -242,8 +242,11 @@ ShowImageWindow::BuildViewMenu(BMenu *pmenu)
 	AddItemMenu(pmenu, "Shrink to Window", MSG_SHRINK_TO_WINDOW, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Zoom to Window", MSG_ZOOM_TO_WINDOW, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
+	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, 'F', 0, 'W', true);
 	MarkMenuItem(pmenu, MSG_FULL_SCREEN, fFullScreen);
+	BMessage *pFullScreen = new BMessage(MSG_FULL_SCREEN);
+	AddShortcut(B_ENTER, 0, pFullScreen);
+	
 	AddItemMenu(pmenu, "Show Caption in Full Screen Mode", MSG_SHOW_CAPTION, 0, 0, 'W', true);
 	MarkMenuItem(pmenu, MSG_SHOW_CAPTION, fShowCaption);
 
