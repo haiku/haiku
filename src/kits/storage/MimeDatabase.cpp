@@ -2,6 +2,7 @@
 
 #include <Application.h>
 #include <Bitmap.h>
+#include <DataIO.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <Message.h>
@@ -34,7 +35,6 @@ namespace BPrivate {
 //const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/beos_mime";
 const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/obos_mime";
 
-// attribute names
 #define ATTR_PREFIX "META:"
 #define MINI_ICON_ATTR_PREFIX ATTR_PREFIX "M:"
 #define LARGE_ICON_ATTR_PREFIX ATTR_PREFIX "L:"
@@ -42,13 +42,34 @@ const char* MimeDatabase::kDefaultDatabaseDir = "/boot/home/config/settings/obos
 const char *MimeDatabase::kMiniIconAttrPrefix	= MINI_ICON_ATTR_PREFIX;
 const char *MimeDatabase::kLargeIconAttrPrefix	= LARGE_ICON_ATTR_PREFIX; 
 
+// attribute names
+const char *MimeDatabase::kFileTypeAttr			= "BEOS:TYPE";
 const char *MimeDatabase::kTypeAttr				= ATTR_PREFIX "TYPE";
-const char *MimeDatabase::kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
 const char *MimeDatabase::kAppHintAttr			= ATTR_PREFIX "PPATH";
-const char *MimeDatabase::kMiniIconAttr			= MINI_ICON_ATTR_PREFIX "STD_ICON";
-const char *MimeDatabase::kLargeIconAttr		= LARGE_ICON_ATTR_PREFIX "STD_ICON";
+const char *MimeDatabase::kAttrInfoAttr			= ATTR_PREFIX "ATTR_INFO";
 const char *MimeDatabase::kShortDescriptionAttr	= ATTR_PREFIX "S:DESC";
 const char *MimeDatabase::kLongDescriptionAttr	= ATTR_PREFIX "L:DESC";
+const char *MimeDatabase::kFileExtensionsAttr	= ATTR_PREFIX "EXTENS";
+const char *MimeDatabase::kMiniIconAttr			= MINI_ICON_ATTR_PREFIX "STD_ICON";
+const char *MimeDatabase::kLargeIconAttr		= LARGE_ICON_ATTR_PREFIX "STD_ICON";
+const char *MimeDatabase::kPreferredAppAttr		= ATTR_PREFIX "PREF_APP";
+const char *MimeDatabase::kSnifferRuleAttr		= ATTR_PREFIX "SNIFF_RULE";
+const char *MimeDatabase::kSupportedTypesAttr	= ATTR_PREFIX "FILE_TYPES";
+
+// attribute data types (as used in the R5 database)
+const int32 MimeDatabase::kFileTypeType			= 'MIMS';	// B_MIME_STRING_TYPE
+const int32 MimeDatabase::kTypeType				= B_STRING_TYPE;
+const int32 MimeDatabase::kAppHintType			= 'MPTH';
+const int32 MimeDatabase::kAttrInfoType			= B_MESSAGE_TYPE;
+const int32 MimeDatabase::kShortDescriptionType	= 'MSDC';
+const int32 MimeDatabase::kLongDescriptionType	= 'MLDC';
+const int32 MimeDatabase::kFileExtensionsType	= B_MESSAGE_TYPE;
+const int32 MimeDatabase::kMiniIconType			= B_MINI_ICON_TYPE;
+const int32 MimeDatabase::kLargeIconType		= B_LARGE_ICON_TYPE;
+const int32 MimeDatabase::kPreferredAppType		= 'MSIG';
+const int32 MimeDatabase::kSnifferRuleType		= B_STRING_TYPE;
+const int32 MimeDatabase::kSupportedTypesType	= B_MESSAGE_TYPE;
+
 
 #undef ATTR_PREFIX 
 #undef MINI_ICON_ATTR_PREFIX
@@ -208,10 +229,35 @@ status_t
 MimeDatabase::GetPreferredApp(const char *type, char *signature, app_verb verb = B_OPEN) const
 {
 	// Since B_OPEN is the currently the only app_verb, it is essentially ignored
-	ssize_t err = ReadMimeAttr(type, kPreferredAppAttr, signature, B_MIME_TYPE_LENGTH, B_RAW_TYPE);
+	ssize_t err = ReadMimeAttr(type, kPreferredAppAttr, signature, B_MIME_TYPE_LENGTH, kPreferredAppType);
 	return err >= 0 ? B_OK : err ;
 }
 
+// GetAttrInfo
+/*! \brief Fetches from the MIME database a BMessage describing the attributes
+	typically associated with files of the given MIME type
+	
+	The attribute information is returned in a pre-allocated BMessage pointed to by
+	the \c info parameter (note that the any prior contents of the message
+	will be destroyed). Please see BMimeType::SetAttrInfo() for a description
+	of the expected format of such a message.
+		
+	\param info Pointer to a pre-allocated BMessage into which information about
+	            the MIME type's associated file attributes is stored.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure
+*/
+status_t
+MimeDatabase::GetAttrInfo(const char *type, BMessage *info) const
+{
+	status_t err = ReadMimeAttrMessage(type, kAttrInfoAttr, info);
+	if (!err) {
+		info->what = 233;	// Don't know why, but that's what R5 does.
+		err = info->AddString("type", type);
+	}
+	return err;	
+}
 
 // GetShortDescription
 //!	Fetches the short description for the given MIME type.
@@ -233,7 +279,7 @@ status_t
 MimeDatabase::GetShortDescription(const char *type, char *description) const
 {
 ///	DBG(OUT("MimeDatabase::GetShortDescription()\n"));
-	ssize_t err = ReadMimeAttr(type, kShortDescriptionAttr, description, B_MIME_TYPE_LENGTH, B_RAW_TYPE);
+	ssize_t err = ReadMimeAttr(type, kShortDescriptionAttr, description, B_MIME_TYPE_LENGTH, kShortDescriptionType);
 	return err >= 0 ? B_OK : err ;
 }
 
@@ -256,8 +302,32 @@ MimeDatabase::GetShortDescription(const char *type, char *description) const
 status_t
 MimeDatabase::GetLongDescription(const char *type, char *description) const {
 //	DBG(OUT("MimeDatabase::GetLongDescription()\n"));
-	ssize_t err = ReadMimeAttr(type, kLongDescriptionAttr, description, B_MIME_TYPE_LENGTH, B_RAW_TYPE);
+	ssize_t err = ReadMimeAttr(type, kLongDescriptionAttr, description, B_MIME_TYPE_LENGTH, kLongDescriptionType);
 	return err >= 0 ? B_OK : err ;
+}
+
+// GetFileExtensions
+//! Fetches a BMessage describing the MIME type's associated filename extensions
+/*! The list of extensions is returned in a pre-allocated BMessage pointed to by
+	the \c extensions parameter (note that the any prior contents of the message
+	will be destroyed). Please see BMimeType::GetFileExtensions() for a description
+	of the message format.
+	  
+	\param extensions Pointer to a pre-allocated BMessage into which the MIME
+	                  type's associated file extensions will be stored.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure
+*/
+status_t
+MimeDatabase::GetFileExtensions(const char *type, BMessage *extensions) const
+{
+	status_t err = ReadMimeAttrMessage(type, kFileExtensionsAttr, extensions);
+	if (!err) {
+		extensions->what = 234;	// Don't know why, but that's what R5 does.
+		err = extensions->AddString("type", type);
+	}
+	return err;	
 }
 
 //! Sets the icon for the given mime type
@@ -293,9 +363,60 @@ MimeDatabase::SetPreferredApp(const char *type, const char *signature, app_verb 
 	DBG(OUT("MimeDatabase::SetPreferredApp()\n"));	
 	status_t err = (type && signature && strlen(signature) < B_MIME_TYPE_LENGTH) ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = WriteMimeAttr(type, kPreferredAppAttr, signature, strlen(signature)+1, B_RAW_TYPE);
+		err = WriteMimeAttr(type, kPreferredAppAttr, signature, strlen(signature)+1, kPreferredAppType);
 	if (!err)
-		err = SendMonitorUpdate(B_PREFERRED_APP_CHANGED, type);
+		err = SendMonitorUpdate(B_PREFERRED_APP_CHANGED, type, B_META_MIME_MODIFIED);
+	return err;
+}
+
+// SetAttrInfo
+/*! \brief Stores a BMessage describing the format of attributes typically associated with
+	files of the given MIME type
+	
+	See BMimeType::SetAttrInfo() for description of the expected message format.
+
+	The \c BMessage::what value is ignored.
+	
+	\param info Pointer to a pre-allocated and properly formatted BMessage containing 
+	            information about the file attributes typically associated with the
+	            MIME type.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure
+*/
+status_t
+MimeDatabase::SetAttrInfo(const char *type, const BMessage *info)
+{
+	DBG(OUT("MimeDatabase::SetAttrInfo()\n"));	
+	status_t err = (type && info) ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = WriteMimeAttrMessage(type, kAttrInfoAttr, info);
+	if (!err)
+		err = SendMonitorUpdate(B_ATTR_INFO_CHANGED, type, B_META_MIME_MODIFIED);
+	return err;
+}
+
+// SetFileExtensions
+//! Sets the list of filename extensions associated with the MIME type
+/*! The list of extensions is given in a pre-allocated BMessage pointed to by
+	the \c extensions parameter. Please see BMimeType::SetFileExtensions()
+	for a description of the expected message format.
+	  
+	\param extensions Pointer to a pre-allocated, properly formatted BMessage containing
+	                  the new list of file extensions to associate with this MIME type.
+	\return
+	- \c B_OK: Success
+	- "error code": Failure
+*/
+status_t
+MimeDatabase::SetFileExtensions(const char *type, const BMessage *extensions)
+{
+	DBG(OUT("MimeDatabase::SetFileExtensions()\n"));	
+	status_t err = (type && extensions) ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = WriteMimeAttrMessage(type, kFileExtensionsAttr, extensions);
+	if (!err)
+		err = SendMonitorUpdate(B_FILE_EXTENSIONS_CHANGED, type, B_META_MIME_MODIFIED);
 	return err;
 }
 
@@ -310,9 +431,9 @@ MimeDatabase::SetShortDescription(const char *type, const char *description)
 	DBG(OUT("MimeDatabase::SetShortDescription()\n"));	
 	status_t err = (type && description && strlen(description) < B_MIME_TYPE_LENGTH) ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = WriteMimeAttr(type, kShortDescriptionAttr, description, strlen(description)+1, B_RAW_TYPE);
+		err = WriteMimeAttr(type, kShortDescriptionAttr, description, strlen(description)+1, kShortDescriptionType);
 	if (!err)
-		err = SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type);
+		err = SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type, B_META_MIME_MODIFIED);
 	return err;
 }
 
@@ -327,9 +448,9 @@ MimeDatabase::SetLongDescription(const char *type, const char *description)
 	DBG(OUT("MimeDatabase::SetLongDescription()\n"));
 	status_t err = (type && description && strlen(description) < B_MIME_TYPE_LENGTH) ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = WriteMimeAttr(type, kLongDescriptionAttr, description, strlen(description)+1, B_RAW_TYPE);
+		err = WriteMimeAttr(type, kLongDescriptionAttr, description, strlen(description)+1, kLongDescriptionType);
 	if (!err)
-		err = SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type);
+		err = SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type, B_META_MIME_MODIFIED);
 	return err;
 }
 
@@ -353,7 +474,7 @@ MimeDatabase::GetAppHint(const char *type, entry_ref *ref) const
 	BEntry entry;
 	ssize_t err = ref ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = ReadMimeAttr(type, kAppHintAttr, path, B_MIME_TYPE_LENGTH, B_RAW_TYPE);
+		err = ReadMimeAttr(type, kAppHintAttr, path, B_MIME_TYPE_LENGTH, kAppHintType);
 	if (err >= 0)
 		err = entry.SetTo(path);
 	if (!err)
@@ -376,9 +497,9 @@ MimeDatabase::SetAppHint(const char *type, const entry_ref *ref)
 	if (!err)
 		err = path.SetTo(ref);
 	if (!err)	
-		err = WriteMimeAttr(type, kAppHintAttr, path.Path(), strlen(path.Path())+1, B_RAW_TYPE);
+		err = WriteMimeAttr(type, kAppHintAttr, path.Path(), strlen(path.Path())+1, kAppHintType);
 	if (!err)
-		err = SendMonitorUpdate(B_APP_HINT_CHANGED, type);
+		err = SendMonitorUpdate(B_APP_HINT_CHANGED, type, B_META_MIME_MODIFIED);
 	return err;
 }
 
@@ -553,6 +674,106 @@ MimeDatabase::StopWatching(BMessenger target)
 	return err;	
 }
 
+status_t
+MimeDatabase::DeleteAppHint(const char *type)
+{
+	status_t err = DeleteAttribute(type, kAppHintAttr);
+	if (!err)
+		err = SendMonitorUpdate(B_APP_HINT_CHANGED, type, B_META_MIME_DELETED);
+	return err;
+}
+
+status_t
+MimeDatabase::DeleteAttrInfo(const char *type)
+{
+	status_t err = DeleteAttribute(type, kAttrInfoAttr);
+	if (!err)
+		err = SendMonitorUpdate(B_ATTR_INFO_CHANGED, type, B_META_MIME_DELETED);
+	return err;
+}
+
+status_t
+MimeDatabase::DeleteShortDescription(const char *type)
+{
+	status_t err = DeleteAttribute(type, kShortDescriptionAttr);
+	if (!err)
+		err = SendMonitorUpdate(B_SHORT_DESCRIPTION_CHANGED, type, B_META_MIME_DELETED);
+	return err;
+}
+
+status_t
+MimeDatabase::DeleteLongDescription(const char *type)
+{
+	status_t err = DeleteAttribute(type, kLongDescriptionAttr);
+	if (!err)
+		err = SendMonitorUpdate(B_LONG_DESCRIPTION_CHANGED, type, B_META_MIME_DELETED);
+	return err;
+}
+
+status_t
+MimeDatabase::DeleteFileExtensions(const char *type)
+{
+	status_t err = DeleteAttribute(type, kFileExtensionsAttr);
+	if (!err)
+		err = SendMonitorUpdate(B_FILE_EXTENSIONS_CHANGED, type, B_META_MIME_DELETED);
+	return err;
+}
+
+status_t
+MimeDatabase::DeleteIcon(const char *type, icon_size which)
+{
+	const char *attr = which == B_MINI_ICON ? kMiniIconAttr : kLargeIconAttr;
+	status_t err = DeleteAttribute(type, attr);
+	if (!err)
+		err = SendMonitorUpdate(B_ICON_CHANGED, type, which, B_META_MIME_DELETED);
+	return err;
+}
+	
+status_t
+MimeDatabase::DeleteIconForType(const char *type, const char *fileType, icon_size which)
+{
+	std::string attr;
+	status_t err = fileType ? B_OK : B_BAD_VALUE;
+	if (!err) {
+		attr = (which == B_MINI_ICON ? kMiniIconAttrPrefix : kLargeIconAttrPrefix) + ToLower(fileType);
+		err = DeleteAttribute(type, attr.c_str());
+	}
+	if (!err)
+		err = SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
+		                          which == B_LARGE_ICON, B_META_MIME_DELETED);
+	return err;
+}
+
+status_t
+MimeDatabase::DeletePreferredApp(const char *type, app_verb verb = B_OPEN)
+{
+	status_t err;
+	switch (verb) {
+		case B_OPEN:
+			err = DeleteAttribute(type, kPreferredAppAttr);
+			break;
+				
+		default:
+			err = B_BAD_VALUE;
+			break;
+	}
+	/*! \todo The R5 monitor makes no note of which app_verb value was updated. If
+		additional app_verb values besides \c B_OPEN are someday added, the format
+		of the MIME monitor messages will need to be augmented.
+	*/
+	if (!err)
+		err = SendMonitorUpdate(B_PREFERRED_APP_CHANGED, type, B_META_MIME_DELETED);
+}
+
+status_t
+MimeDatabase::DeleteSnifferRule(const char *type)
+{
+	status_t err = DeleteAttribute(type, kSnifferRuleAttr);
+	if (!err)
+		err = SendMonitorUpdate(B_SNIFFER_RULE_CHANGED, type, B_META_MIME_DELETED);
+	return err;
+}
+
 // GetIconData
 /*! \brief Returns properly formatted raw bitmap data, ready to be shipped off to the hacked
 	up 4-parameter version of MimeDatabase::SetIcon()
@@ -699,6 +920,46 @@ MimeDatabase::ReadMimeAttr(const char *type, const char *attr, void *data,
 	return err;
 }
 
+// ReadMimeAttrMessage
+/*! \brief Reads a flattened BMessage from the given attribute of the given
+	MIME type.
+	
+	If no entry for the given type exists in the database, or if the data
+	stored in the attribute is not a flattened BMessage, the function fails
+	and the contents of \c msg are undefined.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param data Pointer to a pre-allocated BMessage into which the attribute
+			    data is unflattened.
+*/
+status_t
+MimeDatabase::ReadMimeAttrMessage(const char *type, const char *attr, BMessage *msg) const
+{
+	BNode node;
+	attr_info info;
+	char *buffer = NULL;
+	ssize_t err = (type && attr && msg ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = OpenType(type, &node);
+	if (!err)
+		err = node.GetAttrInfo(attr, &info);
+	if (!err)
+		err = info.type == B_MESSAGE_TYPE ? B_OK : B_BAD_VALUE;
+	if (!err) {		
+		buffer = new char[info.size];
+		if (!buffer)
+			err = B_NO_MEMORY;
+	}
+	if (!err) 
+		err = node.ReadAttr(attr, B_MESSAGE_TYPE, 0, buffer, info.size);
+	if (err >= 0)
+		err = err == info.size ? B_OK : B_FILE_ERROR;
+	if (!err)
+		err = msg->Unflatten(buffer);
+	delete [] buffer;
+	return err;
+}
 
 // WriteMimeAttr
 /*! \brief Writes \c len bytes of the given data to the given attribute
@@ -727,6 +988,38 @@ MimeDatabase::WriteMimeAttr(const char *type, const char *attr, const void *data
 		else
 			err = (bytes != len ? B_FILE_ERROR : B_OK);
 	}
+	return err;
+}
+
+// WriteMimeAttr
+/*! \brief Flattens the given \c BMessage and writes it to the given attribute
+	       of the given MIME type.
+	
+	If no entry for the given type exists in the database, it is created.
+	       
+	\param type The MIME type
+	\param attr The attribute name
+	\param msg The BMessage to flatten and write
+*/
+status_t
+MimeDatabase::WriteMimeAttrMessage(const char *type, const char *attr, const BMessage *msg)
+{
+	BNode node;
+	BMallocIO data;
+	ssize_t bytes;
+	ssize_t err = (type && attr && msg ? B_OK : B_BAD_VALUE);
+	if (!err)
+		err = data.SetSize(msg->FlattenedSize());
+	if (!err)
+		err = msg->Flatten(&data, &bytes);
+	if (!err)
+		err = bytes == msg->FlattenedSize() ? B_OK : B_ERROR;
+	if (!err)
+		err = OpenOrCreateType(type, &node);	
+	if (!err) 
+		err = node.WriteAttr(attr, B_MESSAGE_TYPE, 0, data.Buffer(), data.BufferLength());
+	if (err >= 0)
+		err = err == data.BufferLength() ? B_OK : B_FILE_ERROR;
 	return err;
 }
 
@@ -810,7 +1103,7 @@ MimeDatabase::TypeToFilename(const char *type) const
 		   small icon was updated
 */
 status_t
-MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extraType, bool largeIcon) {
+MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extraType, bool largeIcon, int32 action) {
 	BMessage msg(B_META_MIME_CHANGED);
 	status_t err;
 		
@@ -821,6 +1114,8 @@ MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extra
 		err = msg.AddString("be:extra_type", extraType);
 	if (!err)
 		err = msg.AddBool("be:large_icon", largeIcon);
+	if (!err)
+		err = msg.AddInt32("be:action", action);
 	if (!err)
 		err = SendMonitorUpdate(msg);
 	return err;
@@ -834,7 +1129,7 @@ MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extra
 	\param extraType The MIME type to which the change is applies
 */
 status_t
-MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extraType) {
+MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extraType, int32 action) {
 	BMessage msg(B_META_MIME_CHANGED);
 	status_t err;
 		
@@ -843,6 +1138,8 @@ MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extra
 		err = msg.AddString("be:type", type);
 	if (!err)
 		err = msg.AddString("be:extra_type", extraType);
+	if (!err)
+		err = msg.AddInt32("be:action", action);
 	if (!err)
 		err = SendMonitorUpdate(msg);
 	return err;
@@ -857,7 +1154,7 @@ MimeDatabase::SendMonitorUpdate(int32 which, const char *type, const char *extra
 		   small icon was updated
 */
 status_t
-MimeDatabase::SendMonitorUpdate(int32 which, const char *type, bool largeIcon) {
+MimeDatabase::SendMonitorUpdate(int32 which, const char *type, bool largeIcon, int32 action) {
 	BMessage msg(B_META_MIME_CHANGED);
 	status_t err;
 		
@@ -866,6 +1163,8 @@ MimeDatabase::SendMonitorUpdate(int32 which, const char *type, bool largeIcon) {
 		err = msg.AddString("be:type", type);
 	if (!err)
 		err = msg.AddBool("be:large_icon", largeIcon);
+	if (!err)
+		err = msg.AddInt32("be:action", action);
 	if (!err)
 		err = SendMonitorUpdate(msg);
 	return err;
@@ -878,13 +1177,15 @@ MimeDatabase::SendMonitorUpdate(int32 which, const char *type, bool largeIcon) {
 	\param which Bitmask describing which attribute was updated
 */
 status_t
-MimeDatabase::SendMonitorUpdate(int32 which, const char *type) {
+MimeDatabase::SendMonitorUpdate(int32 which, const char *type, int32 action) {
 	BMessage msg(B_META_MIME_CHANGED);
 	status_t err;
 		
 	err = msg.AddInt32("be:which", which);
 	if (!err)
 		err = msg.AddString("be:type", type);
+	if (!err)
+		err = msg.AddInt32("be:action", action);
 	if (!err)
 		err = SendMonitorUpdate(msg);
 	return err;
@@ -936,12 +1237,12 @@ MimeDatabase::GetIcon(const char *type, const char *attr, BBitmap *icon, icon_si
 		switch (which) {
 			case B_MINI_ICON:
 				bounds.Set(0, 0, 15, 15);
-				attrType = B_MINI_ICON_TYPE;
+				attrType = kMiniIconType;
 				attrSize = 16 * 16;
 				break;
 			case B_LARGE_ICON:
 				bounds.Set(0, 0, 31, 31);
-				attrType = B_LARGE_ICON_TYPE;
+				attrType = kLargeIconType;
 				attrSize = 32 * 32;
 				break;
 			default:
@@ -1011,11 +1312,11 @@ MimeDatabase::SetIcon(const char *type, const char *attr, const void *data, size
 	if (!err) {
 		switch (which) {
 			case B_MINI_ICON:
-				attrType = B_MINI_ICON_TYPE;
+				attrType = kMiniIconType;
 				attrSize = 16 * 16;
 				break;
 			case B_LARGE_ICON:
-				attrType = B_LARGE_ICON_TYPE;
+				attrType = kLargeIconType;
 				attrSize = 32 * 32;
 				break;
 			default:

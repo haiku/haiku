@@ -39,10 +39,12 @@ extern const char *B_FILE_MIME_TYPE;	// "application/octet-stream"
 
 /* ------------------------------------------------------------- */
 
+// MIME Monitor BMessage::what value
 enum {
 	B_META_MIME_CHANGED = 'MMCH'
 };
 
+// MIME Monitor "be:which" values
 enum {
 	B_ICON_CHANGED					= 0x00000001,
 	B_PREFERRED_APP_CHANGED			= 0x00000002,
@@ -57,6 +59,12 @@ enum {
 	B_SNIFFER_RULE_CHANGED			= 0x00000400,
 
 	B_EVERYTHING_CHANGED			= (int)0xFFFFFFFF
+};
+
+// MIME Monitor "be:action" values
+enum {
+	B_META_MIME_MODIFIED	= 'MMMD',
+	B_META_MIME_DELETED 	= 'MMDL',
 };
 
 /* ------------------------------------------------------------- */

@@ -19,7 +19,9 @@
 #include <Drivers.h>		// B_GET_ICON, device_icon
 #include <Message.h>
 #include <Mime.h>
-#include <MimeDatabase.h>
+#if !TEST_R5
+	#include <MimeDatabase.h>
+#endif
 #include <MimeTypeTest.h>
 #include <Path.h>			// Only needed for entry_ref dumps
 #include <StorageKit.h>
@@ -848,29 +850,51 @@ MimeTypeTest::AttrInfoTest() {
 	// NULL params
 	NextSubTest();
 	{
-		BMimeType mime(testType);
+#if !TEST_R5
 		BMessage msg;
-		
+		BMimeType mime(testType);
 		CHK(mime.InitCheck() == B_OK);
 		// Make sure the type isn't installed
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
-		
-		// Non-installed
 		CHK(!mime.IsInstalled());
-		CHK(mime.GetAttrInfo(NULL) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
+		CHK(mime.DeleteAttrInfo() != B_OK);		
 		CHK(!mime.IsInstalled());
-#if !TEST_R5
-		CHK(RES(mime.SetAttrInfo(NULL)) != B_OK);		// R5 == CRASH!!!
-#endif
-		
-		// Installed
-		NextSubTest();
-		CHK(mime.Install() == B_OK);
+		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
+		CHK(mime.SetAttrInfo(&msg1) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(mime.GetAttrInfo(NULL) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
+		CHK(msg != msg1);
+		CHK(mime.GetAttrInfo(&msg) == B_OK);	
+		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
+		CHK(msg == msg1);
+		CHK(mime.SetAttrInfo(NULL) == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetAttrInfo(&msg) != B_OK);	
+#endif
+	}
+	// Delete test
+	NextSubTest();
+	{
 #if !TEST_R5
-		CHK(RES(mime.SetAttrInfo(NULL)) != B_OK);		// R5 == CRASH!!!
+		BMessage msg;
+		BMimeType mime(testType);
+		CHK(mime.InitCheck() == B_OK);
+		// Make sure the type isn't installed
+		if (mime.IsInstalled())
+			CHK(mime.Delete() == B_OK);
+		CHK(!mime.IsInstalled());
+		CHK(mime.DeleteAttrInfo() != B_OK);		
+		CHK(!mime.IsInstalled());
+		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
+		CHK(mime.SetAttrInfo(&msg1) == B_OK);
+		CHK(mime.IsInstalled());
+		CHK(msg != msg1);
+		CHK(mime.GetAttrInfo(&msg) == B_OK);	
+		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
+		CHK(msg == msg1);
+		CHK(mime.DeleteAttrInfo() == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetAttrInfo(&msg) != B_OK);	
 #endif
 	}
 	
@@ -1067,8 +1091,8 @@ MimeTypeTest::AttrInfoTest() {
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 #if !TEST_R5
-		CHK(RES(mime.SetAttrInfo(NULL)) == B_OK);		// R5 == CRASH! despite what one might think should happen
-		CHK(RES(mime.GetAttrInfo(&msg)) != B_OK);
+		CHK(mime.SetAttrInfo(NULL) == B_OK);		// R5 == CRASH! despite what one might think should happen
+		CHK(mime.GetAttrInfo(&msg) != B_OK);
 		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" fields as GFE() does
 		CHK(msg2.AddString(typeField, testType) == B_OK);
 		CHK(msg != msg1);
@@ -1116,28 +1140,51 @@ MimeTypeTest::FileExtensionsTest() {
 	// NULL params
 	NextSubTest();
 	{
-		BMessage msg(WHAT);
+#if !TEST_R5
+		BMessage msg;
 		BMimeType mime(testType);
-		
 		CHK(mime.InitCheck() == B_OK);
 		// Make sure the type isn't installed
 		if (mime.IsInstalled())
 			CHK(mime.Delete() == B_OK);
 		CHK(!mime.IsInstalled());
-		// Not installed
-		CHK(mime.GetFileExtensions(NULL) != B_OK);	// R5 == B_BAD_VALUE
+		CHK(mime.DeleteFileExtensions() != B_OK);		
 		CHK(!mime.IsInstalled());
-#if !TEST_R5
-		CHK(RES(mime.SetFileExtensions(NULL)) == B_OK);	// R5 == CRASH!
+		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
+		CHK(mime.SetFileExtensions(&msg1) == B_OK);
 		CHK(mime.IsInstalled());
-		CHK(RES(mime.GetFileExtensions(&msg)) != B_OK);	// R5 == B_ENTRY_NOT_FOUND
-		// Installed
-/*		CHK(mime.GetFileExtensions(NULL) != B_OK);	// R5 == B_BAD_VALUE
-		CHK(mime.SetFileExtensions(helper.Bitmap1()) == B_OK);
-		CHK(mime.GetFileExtensions(bmp) == B_OK);
-		CHK(*bmp == *helper.Bitmap1());
-		CHK(mime.SetFileExtensions(NULL) == B_OK);
-		CHK(mime.GetFileExtensions(bmp) != B_OK);	// R5 == B_ENTRY_NOT_FOUND*/
+		CHK(msg != msg1);
+		CHK(mime.GetFileExtensions(&msg) == B_OK);	
+		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
+		CHK(msg == msg1);
+		CHK(mime.SetFileExtensions(NULL) == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetFileExtensions(&msg) != B_OK);	
+#endif
+	}
+	// Delete test
+	NextSubTest();
+	{
+#if !TEST_R5
+		BMessage msg;
+		BMimeType mime(testType);
+		CHK(mime.InitCheck() == B_OK);
+		// Make sure the type isn't installed
+		if (mime.IsInstalled())
+			CHK(mime.Delete() == B_OK);
+		CHK(!mime.IsInstalled());
+		CHK(mime.DeleteFileExtensions() != B_OK);		
+		CHK(!mime.IsInstalled());
+		msg1.RemoveName(typeField);						// Clear "type" field, since SAI() just adds another
+		CHK(mime.SetFileExtensions(&msg1) == B_OK);
+		CHK(mime.IsInstalled());
+		CHK(msg != msg1);
+		CHK(mime.GetFileExtensions(&msg) == B_OK);	
+		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" field as GAI() does
+		CHK(msg == msg1);
+		CHK(mime.DeleteFileExtensions() == B_OK);		
+		CHK(mime.IsInstalled());
+		CHK(mime.GetFileExtensions(&msg) != B_OK);	
 #endif
 	}
 	// Set() with empty message
@@ -1255,8 +1302,8 @@ MimeTypeTest::FileExtensionsTest() {
 		CHK(msg != msg1);
 		CHK(msg != msg2);
 #if !TEST_R5
-		CHK(RES(mime.SetFileExtensions(NULL)) == B_OK);		// R5 == CRASH! despite what the BeBook says
-		CHK(RES(mime.GetFileExtensions(&msg)) != B_OK);
+		CHK(mime.SetFileExtensions(NULL) == B_OK);		// R5 == CRASH! despite what the BeBook says
+		CHK(mime.GetFileExtensions(&msg) != B_OK);
 		CHK(msg1.AddString(typeField, testType) == B_OK);	// Add in "type" fields as GFE() does
 		CHK(msg2.AddString(typeField, testType) == B_OK);
 		CHK(msg != msg1);
@@ -2169,6 +2216,8 @@ void FillWithMimeTypes(ContainerAdapter &container, BMessage &typeMessage, const
 	int32 count;
 	status_t err;
 			
+//	typeMessage.PrintToStream();		
+	
 	// Get a count of types in the message
 	err = typeMessage.GetInfo(fieldName, &type, &count);
 	if (err == B_NAME_NOT_FOUND)
@@ -2982,6 +3031,8 @@ MimeTypeTest::MonitoringTest()
 	// icon for type
 	CHK(type.SetIconForType("text/plain", iconHelperLarge.Bitmap2(),
 							B_LARGE_ICON) == B_OK);
+	CHK(type.SetIconForType("text/plain", NULL,
+							B_LARGE_ICON) == B_OK);
 	CHK(type.SetIconForType("text/plain", iconHelperMini.Bitmap2(),
 							B_MINI_ICON) == B_OK);
 	// app hint
@@ -3005,6 +3056,7 @@ MimeTypeTest::MonitoringTest()
 			NM(B_FILE_EXTENSIONS_CHANGED, testType),
 			NM(B_LONG_DESCRIPTION_CHANGED, testType),
 			NM(B_SHORT_DESCRIPTION_CHANGED, testType),
+			NM(B_ICON_FOR_TYPE_CHANGED, testType, "text/plain", true),
 			NM(B_ICON_FOR_TYPE_CHANGED, testType, "text/plain", true),
 			NM(B_ICON_FOR_TYPE_CHANGED, testType, "text/plain", false),
 			NM(B_APP_HINT_CHANGED, testType),
@@ -3398,6 +3450,25 @@ public:
 				error = resources.AddResource(MINI_ICON_TYPE, 101, miniIcon,
 											  256, "BEOS:M:STD_ICON");
 			}
+			// file types
+/*			if (error == B_OK) {
+				BMessage msg;
+				char *buffer = NULL;
+				error = msg.AddString("types", "text/x-email");
+				if (!error)
+					error = msg.AddString("types", "video/mpeg");
+				if (!error) {
+					buffer = new char[msg.FlattenedSize()];
+					if (!buffer)
+						error = B_NO_MEMORY;
+				}
+				if (!error) 
+					error = msg.Flatten(buffer, msg.FlattenedSize());
+				if (!error)
+					error = resources.AddResource(B_MESSAGE_TYPE, 1, buffer,
+													msg.FlattenedSize(), "BEOS:FILE_TYPES");
+				delete [] buffer;
+			}*/
 		}
 		return error;
 	}
@@ -3441,6 +3512,7 @@ CheckAppMetaMime(AppMimeTestFile &file)
 	// META:PPATH
 	BNode typeFile;
 	string typeFilename(string(mimeDatabaseDir) + "/" + file.signature);
+//	cout << "typeFilename == '" << typeFilename << "'" << endl;
 	CHK(typeFile.SetTo(typeFilename.c_str()) == B_OK);
 	char filePath[B_PATH_NAME_LENGTH + 1];
 	CHK(typeFile.ReadAttr("META:PPATH", B_STRING_TYPE, 0, filePath,

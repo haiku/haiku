@@ -470,7 +470,7 @@ BMimeType::GetPreferredApp(char *signature, app_verb verb) const
 status_t
 BMimeType::GetAttrInfo(BMessage *info) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetAttrInfo(Type(), info);
 }
 
 // GetFileExtensions
@@ -504,7 +504,7 @@ BMimeType::GetAttrInfo(BMessage *info) const
 status_t
 BMimeType::GetFileExtensions(BMessage *extensions) const
 {
-	return NOT_IMPLEMENTED;
+	return fMimeDatabase->GetFileExtensions(Type(), extensions);
 }
 
 // GetShortDescription
@@ -729,7 +729,28 @@ BMimeType::SetPreferredApp(const char *signature, app_verb verb)
 status_t
 BMimeType::SetAttrInfo(const BMessage *info)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = InitCheck();	
+
+	BMessage msg(info ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_ATTR_INFO);
+	if (!err && info) 
+		err = msg.AddMessage("attr info", info);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // SetFileExtensions
@@ -765,7 +786,28 @@ BMimeType::SetAttrInfo(const BMessage *info)
 status_t
 BMimeType::SetFileExtensions(const BMessage *extensions)
 {
-	return NOT_IMPLEMENTED;
+	status_t err = InitCheck();	
+
+	BMessage msg(extensions ? B_REG_MIME_SET_PARAM : B_REG_MIME_DELETE_PARAM);
+	BMessage reply;
+	status_t result;
+	
+	// Build and send the message, read the reply
+	if (!err)
+		err = msg.AddString("type", Type());
+	if (!err) 
+		err = msg.AddInt32("which", B_REG_MIME_FILE_EXTENSIONS);
+	if (!err && extensions) 
+		err = msg.AddMessage("extensions", extensions);
+	if (!err) 
+		err = _send_to_roster_(&msg, &reply, true);
+	if (!err)
+		err = reply.what == B_REG_RESULT ? B_OK : B_BAD_VALUE;
+	if (!err)
+		err = reply.FindInt32("result", &result);
+	if (!err) 
+		err = result;	
+	return err;	
 }
 
 // SetShortDescription
@@ -930,7 +972,11 @@ BMimeType::GetInstalledTypes(const char *super_type, BMessage *subtypes)
 status_t
 BMimeType::GetWildcardApps(BMessage *wild_ones)
 {
-	return NOT_IMPLEMENTED;
+	BMimeType mime;
+	status_t err = mime.SetTo("application/octet-stream");
+	if (!err)
+		err = mime.GetSupportingApps(wild_ones);
+	return err;
 }
 
 // IsValid
