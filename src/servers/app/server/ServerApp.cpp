@@ -522,10 +522,10 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
-			new ServerWindow(frame, title, look, feel, flags, this,
-				sendPort, looperPort, replyport, wkspaces, token);
-			// ServerWindow constructor has added 'newwin' to the Desktop.
-			// We don't have to do anything here...
+			ServerWindow		*sw = NULL;
+			sw		= new ServerWindow(frame, title, look, feel, flags, this,
+						sendPort, looperPort, replyport, wkspaces, token);
+			sw->Init();
 
 			STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
