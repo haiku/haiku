@@ -123,6 +123,7 @@ uint32
 pci_mech1_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 size)
 {
 	uint32 result;
+	cpu_status status;
 	if (device > 31 || function > 7 || (size != 1 && size != 2 && size != 4)
 		|| (size == 2 && (offset & 3) == 3) || (size == 4 && (offset & 3) != 0)) {
 		dprintf("PCI: mech1 can't read config for bus %u, device %u, function %u, offset %u, size %u\n",
@@ -130,6 +131,7 @@ pci_mech1_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uin
 		return 0xffffffff;
 	}
 	
+	PCI_LOCK_CONFIG(status);
 	out32(PCI_MECH1_REQ_DATA(bus, device, function, offset), PCI_MECH1_REQ_PORT);
 	switch (size) {
 		case 1:
@@ -144,6 +146,7 @@ pci_mech1_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uin
 		default:
 			result = 0xffffffff;
 	}
+	PCI_UNLOCK_CONFIG(status);
 	return result;
 }
 
@@ -151,6 +154,7 @@ pci_mech1_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uin
 void
 pci_mech1_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value)
 {
+	cpu_status status;
 	if (device > 31 || function > 7 || (size != 1 && size != 2 && size != 4)
 		|| (size == 2 && (offset & 3) == 3) || (size == 4 && (offset & 3) != 0)) {
 		dprintf("PCI: mech1 can't write config for bus %u, device %u, function %u, offset %u, size %u\n",
@@ -158,6 +162,7 @@ pci_mech1_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, ui
 		return;
 	}
 	
+	PCI_LOCK_CONFIG(status);
 	out32(PCI_MECH1_REQ_DATA(bus, device, function, offset), PCI_MECH1_REQ_PORT);
 	switch (size) {
 		case 1:
@@ -170,6 +175,7 @@ pci_mech1_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, ui
 			out32(value, PCI_MECH1_DATA_PORT);
 			break;
 	}
+	PCI_UNLOCK_CONFIG(status);
 }
 
 
@@ -177,12 +183,14 @@ uint32
 pci_mech2_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 size)
 {
 	uint32 result;
+	cpu_status status;
 	if (device > 15 || function > 7 || (size != 1 && size != 2 && size != 4)) {
 		dprintf("PCI: mech2 can't read config for bus %u, device %u, function %u, offset %u, size %u\n",
 			 bus, device, function, offset, size);
 		return 0xffffffff;
 	}
 	
+	PCI_LOCK_CONFIG(status);
 	out8((uint8)(0xf0 | (function << 1)), PCI_MECH2_ENABLE_PORT);
 	out8(bus, PCI_MECH2_FORWARD_PORT);
 	switch (size) {
@@ -199,6 +207,7 @@ pci_mech2_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uin
 			result = 0xffffffff;
 	}
 	out8(0, PCI_MECH2_ENABLE_PORT);
+	PCI_UNLOCK_CONFIG(status);
 	return result;
 }
 
@@ -206,12 +215,14 @@ pci_mech2_read_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uin
 void
 pci_mech2_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, uint8 size, uint32 value)
 {
+	cpu_status status;
 	if (device > 15 || function > 7 || (size != 1 && size != 2 && size != 4)) {
 		dprintf("PCI: mech2 can't write config for bus %u, device %u, function %u, offset %u, size %u\n",
 			 bus, device, function, offset, size);
 		return;
 	}
 
+	PCI_LOCK_CONFIG(status);
 	out8((uint8)(0xf0 | (function << 1)), PCI_MECH2_ENABLE_PORT);
 	out8(bus, PCI_MECH2_FORWARD_PORT);
 	switch (size) {
@@ -226,6 +237,7 @@ pci_mech2_write_config(uint8 bus, uint8 device, uint8 function, uint8 offset, ui
 			break;
 	}
 	out8(0, PCI_MECH2_ENABLE_PORT);
+	PCI_UNLOCK_CONFIG(status);
 }
 
 
