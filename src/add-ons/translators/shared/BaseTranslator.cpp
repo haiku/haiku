@@ -685,3 +685,14 @@ BaseTranslator::NewConfigView(TranslatorSettings *settings)
 	return NULL;
 }
 
+void
+translate_direct_copy(BPositionIO *inSource, BPositionIO *outDestination)
+{
+	const size_t kbufsize = 2048;
+	uint8 buffer[kbufsize];
+	ssize_t ret = inSource->Read(buffer, kbufsize);
+	while (ret > 0) {
+		outDestination->Write(buffer, ret);
+		ret = inSource->Read(buffer, kbufsize);
+	}
+}

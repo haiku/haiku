@@ -278,18 +278,6 @@ PNGTranslator::DerivedIdentify(BPositionIO *inSource,
 	return identify_png_header(inSource, outInfo);
 }
 
-void
-translate_direct_copy(BPositionIO *inSource, BPositionIO *outDestination)
-{
-	const size_t kbufsize = 2048;
-	uint8 buffer[kbufsize];
-	ssize_t ret = inSource->Read(buffer, kbufsize);
-	while (ret > 0) {
-		outDestination->Write(buffer, ret);
-		ret = inSource->Read(buffer, kbufsize);
-	}
-}
-
 status_t
 PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 	BPositionIO *outDestination)
