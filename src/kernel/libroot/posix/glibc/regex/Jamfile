@@ -1,0 +1,10 @@
+SubDir OBOS_TOP src kernel libroot posix glibc regex ;
+
+SubDirHdrs $(OBOS_TOP) headers ;
+
+KernelMergeObject posix_gnu_regex.o :
+	<$(SOURCE_GRIST)>regex.c
+	:
+	-fPIC -DPIC
+	;
+
