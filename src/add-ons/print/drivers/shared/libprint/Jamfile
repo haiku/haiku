@@ -11,6 +11,7 @@ StaticLibrary print :
 	GraphicsDriver.cpp
 	Halftone.cpp
 	HalftoneView.cpp
+	JSDSlider.cpp
 	JobData.cpp
 	JobSetupDlg.cpp
 	PackBits.cpp
