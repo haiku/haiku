@@ -84,7 +84,9 @@ DecView::DecView(BRect frame, const char *name, int32 resize, int32 flags)
 	}
 
 	// Set up list of color attributes
-	cvrect.Set(10,10,preview->Frame().left-20-B_V_SCROLL_BAR_WIDTH, preview->Frame().bottom);
+	float top=preview->Frame().bottom+15;
+
+	cvrect.Set(10,top,Bounds().right-10-B_V_SCROLL_BAR_WIDTH, top+125);
 	declist=new BListView(cvrect,"DecoratorList");
 	
 	scrollview=new BScrollView("ScrollView",declist, B_FOLLOW_LEFT |
@@ -379,7 +381,7 @@ STRACE(("LoadDecorator(%s): Couldn't get version symbol\n",path));
 //		unload_add_on(decorator_id);
 	}
 	decorator_id=addon;
-	decorator=pcreatefunc(BRect(50,50,150,150),B_TITLED_WINDOW_LOOK,
+	decorator=pcreatefunc(BRect(25,25,125,125),B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL,0);
 	decorator->SetDriver(driver);
 	decorator->SetFocus(true);

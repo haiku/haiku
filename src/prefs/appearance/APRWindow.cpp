@@ -31,30 +31,51 @@
 #include "DecView.h"
 #include "CurView.h"
 #include "defs.h"
+#include <ScrollView.h>
+#include <ListItem.h>
 
 APRWindow::APRWindow(BRect frame)
 	: BWindow(frame, "Appearance", B_TITLED_WINDOW,
 	  B_NOT_RESIZABLE | B_NOT_ZOOMABLE, B_ALL_WORKSPACES )
 {
-	tabview=new BTabView(Bounds(),"TabView");
-
-	BTab *tab=NULL;
+	BView *topview=new BView(Bounds(),"topview",B_FOLLOW_ALL,B_WILL_DRAW);
+	topview->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AddChild(topview);
 	
+	BRect r(10,10,110,Bounds().Height()-10);
+
+	listview=new BListView(r,"prefslist");
+	topview->AddChild(listview);
+	listview->SetSelectionMessage(new BMessage(PREFS_CHOSEN));
+	
+	listview->AddItem(new BStringItem("Colors"));
+	listview->AddItem(new BStringItem("Cursors"));
+	listview->AddItem(new BStringItem("Decorators"));
+	
+	
+	r.Set(100,100,385,445);
+	r.OffsetTo(listview->Bounds().Width()+20,0);
+	r.right=Bounds().right;
+
+	colors=new APRView(r,"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
+	topview->AddChild(colors);
+	colors->Hide();
+
 	// TODO: Finish CurView
-	cursors=new CurView(Bounds(),"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(cursors);
-	tabview->AddTab(cursors,tab);
+	cursors=new CurView(r,"Cursors",B_FOLLOW_ALL, B_WILL_DRAW);
+	topview->AddChild(cursors);
+	cursors->Hide();
 
-	colors=new APRView(Bounds(),"Colors",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(colors);
-	tabview->AddTab(colors,tab);
-
-	decorators=new DecView(Bounds(),"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
-	tab=new BTab(decorators);
-	tabview->AddTab(decorators,tab);
-
-	AddChild(tabview);
+	decorators=new DecView(r,"Decorator",B_FOLLOW_ALL, B_WILL_DRAW);
+	topview->AddChild(decorators);
+	decorators->Hide();
 	decorators->SetColors(*colors->currentset);
+	
+	prefsviews[0]=colors;
+	prefsviews[1]=cursors;
+	prefsviews[2]=decorators;
+	
+	listview->Select(0);
 }
 
 bool APRWindow::QuitRequested()
@@ -63,20 +84,34 @@ bool APRWindow::QuitRequested()
 	return(true);
 }
 
-void APRWindow::WorkspaceActivated(int32 wkspc, bool is_active)
-{
-	if(is_active)
-	{
-		BMessenger notifier(colors);
-		notifier.SendMessage(new BMessage(B_WORKSPACE_ACTIVATED));
-	}
-}
-
-#include <stdio.h>
 void APRWindow::MessageReceived(BMessage *msg)
 {
-	if(msg->what==SET_UI_COLORS)
-		decorators->SetColors(*colors->currentset);
-	else
-		BWindow::MessageReceived(msg);
+	switch(msg->what)
+	{
+		case SET_UI_COLORS:
+		{
+			decorators->SetColors(*colors->currentset);
+			break;
+		}
+		case PREFS_CHOSEN:
+		{
+
+			int32 selectionindex=listview->CurrentSelection();
+			if(selectionindex==-1)
+				break;
+			
+			for(int32 i=0; i<3; i++)
+			{
+				BView *v=prefsviews[i];
+
+				if(i!=selectionindex && !v->IsHidden())
+					v->Hide();
+			}
+			prefsviews[selectionindex]->Show();
+			break;
+		}
+		default:
+			BWindow::MessageReceived(msg);
+			break;
+	}
 }

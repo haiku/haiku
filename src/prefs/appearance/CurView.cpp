@@ -56,7 +56,7 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	
 	cursorset=new CursorSet("Default");
 	
-	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
+/*	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
 	settings_menu=new BMenu("Settings");
 	settings_menu->AddItem(new BMenuItem("Save Cursor Set",new BMessage(SAVE_CURSORSET),'S'));
@@ -74,18 +74,32 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 		mb->AddItem(cursorset_menu);
 	}
 	AddChild(mb);
-
+*/
 	BRect wellrect(0,0,20,20);
 	wellrect.OffsetTo(10,25);
 	wellrect.right=wellrect.left+50;
-	cursorset_label=new BStringView(wellrect,"cursorset_label","Cursor Set: ");
-	AddChild(cursorset_label);
-	cursorset_label->ResizeToPreferred();
-	cursorset_name="<untitled>";
+//	cursorset_label=new BStringView(wellrect,"cursorset_label","Cursor Set: ");
+//	AddChild(cursorset_label);
+//	cursorset_label->ResizeToPreferred();
+//	cursorset_name="<untitled>";
 
 
 	// Set up list of cursor attributes
-	BRect rect(10,60,200,160);
+	BRect cvrect;
+	BRect rect;
+
+	cvrect.Set(0,0,75,75);
+	
+	bmpview=new BitmapView(BPoint(10,10),new BMessage(CURSOR_UPDATED),this);
+	bmpview->MoveTo( (Bounds().Width()-bmpview->Bounds().Width())/2,30);
+	AddChild(bmpview);
+
+
+	rect.left=(Bounds().Width()-200)/2;
+	rect.right=rect.left+190;
+	rect.top=bmpview->Frame().bottom+30;
+	rect.bottom=rect.top+100;
+	
 	attrlist=new BListView(rect,"AttributeList");
 	
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
@@ -105,11 +119,9 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	attrlist->AddItem(new CursorWhichItem(B_CURSOR_RESIZE_NS));
 	attrlist->AddItem(new CursorWhichItem(B_CURSOR_RESIZE_EW));
 
-	BRect cvrect;
 	
-	cvrect.Set(0,0,50,25);
-	cvrect.OffsetBy(scrollview->Frame().right+20,
-		scrollview->Frame().bottom-cvrect.Height());
+	cvrect.Set(0,0,60,30);
+	cvrect.OffsetTo( (Bounds().Width()-200)/2,scrollview->Frame().bottom+20);
 
 	defaults=new BButton(cvrect,"DefaultsButton","Defaults",
 		new BMessage(DEFAULT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
@@ -130,19 +142,10 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	AddChild(apply);
 	apply->SetEnabled(false);
 
-	cvrect.Set(0,0,75,75);
-	BPoint pt;
-	pt.x=scrollview->Frame().right+(Bounds().right-scrollview->Frame().right-cvrect.Width())/2;
-	pt.y=mb->Frame().bottom+(apply->Frame().top-mb->Frame().bottom-cvrect.Height())/2;
-	
-	bmpview=new BitmapView(pt,new BMessage(CURSOR_UPDATED),this);
-	AddChild(bmpview);
-
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
 	entry.GetRef(&ref);
-	savepanel=new BFilePanel(B_SAVE_PANEL, NULL,
-		&ref, 0, false);
+//	savepanel=new BFilePanel(B_SAVE_PANEL, NULL,&ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="Background";
@@ -152,7 +155,7 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 CurView::~CurView(void)
 {
-	delete savepanel;
+//	delete savepanel;
 	delete cursorset;
 }
 
@@ -163,11 +166,11 @@ void CurView::AllAttached(void)
 	apply->SetTarget(this);
 	defaults->SetTarget(this);
 	revert->SetTarget(this);
-	settings_menu->SetTargetForItems(this);
-	cursorset_menu->SetTargetForItems(this);
+//	settings_menu->SetTargetForItems(this);
+//	cursorset_menu->SetTargetForItems(this);
 	bmpview->SetTarget(this);
 	BMessenger msgr(this);
-	savepanel->SetTarget(msgr);
+//	savepanel->SetTarget(msgr);
 }
 
 void CurView::MessageReceived(BMessage *msg)
@@ -203,6 +206,7 @@ void CurView::MessageReceived(BMessage *msg)
 	}
 }
 
+/*
 BMenu *CurView::LoadCursorSets(void)
 {
 #ifdef DEBUG_CURSORSET
@@ -323,6 +327,7 @@ void CurView::SetCursorSetName(const char *name)
 	cursorset_label->ResizeToPreferred();
 	cursorset_label->Invalidate();
 }
+*/
 
 void CurView::SaveSettings(void)
 {
@@ -336,7 +341,7 @@ printf("SaveSettings: %s\n",path.String());
 #endif
 	cursorset->Save(path.String(),B_CREATE_FILE|B_ERASE_FILE);
 	
-	prev_set_name=cursorset_name;
+//	prev_set_name=cursorset_name;
 	revert->SetEnabled(false);
 }
 
@@ -374,9 +379,9 @@ printf("Couldn't open file %s for read\n",path.String());
 		return;
 	}
 
-	settings.FindString("name",&cursorset_name);
-	SetCursorSetName(cursorset_name.String());
-	prev_set_name=cursorset_name;
+//	settings.FindString("name",&cursorset_name);
+//	SetCursorSetName(cursorset_name.String());
+//	prev_set_name=cursorset_name;
 	return;
 }
 

@@ -75,8 +75,8 @@ public:
 	void SetDefaults(void);
 protected:
 	friend APRWindow;
-	BMenu *LoadCursorSets(void);
-	void SetCursorSetName(const char *name);
+//	BMenu *LoadCursorSets(void);
+//	void SetCursorSetName(const char *name);
 
 	BButton *apply,*revert,*defaults;
 	BListView *attrlist;
@@ -84,11 +84,11 @@ protected:
 	BMessage settings;
 	BString attrstring;
 	BScrollView *scrollview;
-	BStringView *cursorset_label;
-	BMenu *cursorset_menu,*settings_menu;
-	BFilePanel *savepanel;
-	BString cursorset_name;
-	BString prev_set_name;
+//	BStringView *cursorset_label;
+//	BMenu *cursorset_menu,*settings_menu;
+//	BFilePanel *savepanel;
+//	BString cursorset_name;
+//	BString prev_set_name;
 	CursorSet *cursorset;
 	BitmapView *bmpview;
 };

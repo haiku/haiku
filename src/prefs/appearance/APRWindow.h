@@ -31,7 +31,7 @@
 #include <Application.h>
 #include <Window.h>
 #include <Message.h>
-#include <TabView.h>
+#include <ListView.h>
 
 class APRView;
 class DecView;
@@ -42,12 +42,12 @@ class APRWindow : public BWindow
 public:
 	APRWindow(BRect frame); 
 	virtual	bool QuitRequested();
-	virtual void WorkspaceActivated(int32 wkspc, bool is_active);
 	virtual void MessageReceived(BMessage *msg);
-	BTabView *tabview;
+	BListView *listview;
 	APRView *colors;
 	DecView *decorators;
 	CurView *cursors;
+	BView *prefsviews[3];
 };
 
 #endif

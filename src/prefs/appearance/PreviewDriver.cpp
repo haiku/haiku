@@ -58,7 +58,7 @@
 #include "LayerData.h"
 #include "ColorSet.h"
 
-BRect preview_bounds(0,0,200,200);;
+BRect preview_bounds(0,0,150,150);;
 
 PVView::PVView(BRect bounds)
 	: BView(bounds,"previewdriver_view",B_FOLLOW_NONE, B_WILL_DRAW)

@@ -27,4 +27,5 @@
 #define GET_DECORATOR 'gdec'
 
 #define SET_UI_COLORS 'suic'
+#define PREFS_CHOSEN 'prch'
 #endif

@@ -48,7 +48,7 @@
 #include "ColorWhichItem.h"
 #include "ServerConfig.h"
 
-#define DEBUG_COLORSET
+//#define DEBUG_COLORSET
 
 #ifdef DEBUG_COLORSET
 #define STRACE(a) printf a
@@ -56,9 +56,9 @@
 #define STRACE(A) /* nothing */
 #endif
 
-#define SAVE_COLORSET 'svcs'
-#define DELETE_COLORSET 'dlcs'
-#define LOAD_COLORSET 'ldcs'
+//#define SAVE_COLORSET 'svcs'
+//#define DELETE_COLORSET 'dlcs'
+//#define LOAD_COLORSET 'ldcs'
 #define COLOR_DROPPED 'cldp'
 
 APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags)
@@ -69,7 +69,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	currentset=new ColorSet;
 	prevset=NULL;
 	
-	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
+/*	BMenuBar *mb=new BMenuBar(BRect(0,0,Bounds().Width(),16),"menubar");
 
 	settings_menu=new BMenu("Settings");
 	settings_menu->AddItem(new BMenuItem("Save Color Set",new BMessage(SAVE_COLORSET),'S'));
@@ -87,7 +87,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 		mb->AddItem(colorset_menu);
 	}
 	AddChild(mb);
-
+*/
 	BRect wellrect(0,0,20,20);
 	wellrect.OffsetTo(Bounds().Width()-(wellrect.Width()+10),25);
 
@@ -96,12 +96,12 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 	wellrect.OffsetTo(10,25);
 	wellrect.right=colorwell->Frame().left - 20;
-	colorset_label=new BStringView(wellrect,"colorset_label","Color Set: ");
-	AddChild(colorset_label);
-	colorset_label->ResizeToPreferred();
+//	colorset_label=new BStringView(wellrect,"colorset_label","Color Set: ");
+//	AddChild(colorset_label);
+//	colorset_label->ResizeToPreferred();
 
 	// Set up list of color attributes
-	BRect rect(10,60,200,160);
+	BRect rect(10,10,200,100);
 	attrlist=new BListView(rect,"AttributeList");
 	
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
@@ -137,15 +137,18 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_COLOR));
 	attrlist->AddItem(new ColorWhichItem((color_which)B_INACTIVE_WINDOW_TAB_TEXT_COLOR));
 
-	picker=new BColorControl(BPoint(scrollview->Frame().right+20,scrollview->Frame().top),B_CELLS_32x8,5.0,"Picker",
+	picker=new BColorControl(BPoint(10,scrollview->Frame().bottom+20),B_CELLS_32x8,5.0,"Picker",
 		new BMessage(UPDATE_COLOR));
 	AddChild(picker);
 	
 	BRect cvrect;
 	
-	cvrect.Set(0,0,50,25);
-	cvrect.OffsetBy(scrollview->Frame().right+20,
-		scrollview->Frame().bottom-cvrect.Height());
+	cvrect=picker->Frame();
+	cvrect.right=cvrect.left+60;
+	cvrect.bottom=cvrect.top+30;
+	
+	// 40 is 10 pixel space between buttons and other objects, such as the edge or another button
+	cvrect.OffsetTo( (Bounds().Width()-((cvrect.Width()*3)+40))/2,picker->Frame().bottom+10);
 
 	defaults=new BButton(cvrect,"DefaultsButton","Defaults",
 		new BMessage(DEFAULT_SETTINGS),B_FOLLOW_LEFT |B_FOLLOW_TOP,
@@ -170,7 +173,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 	BEntry entry(COLOR_SET_DIR);
 	entry_ref ref;
 	entry.GetRef(&ref);
-	savepanel=new BFilePanel(B_SAVE_PANEL, NULL, &ref, 0, false);
+//	savepanel=new BFilePanel(B_SAVE_PANEL, NULL, &ref, 0, false);
 
 	attribute=B_PANEL_BACKGROUND_COLOR;
 	attrstring="Panel Background";
@@ -179,7 +182,7 @@ APRView::APRView(const BRect &frame, const char *name, int32 resize, int32 flags
 
 APRView::~APRView(void)
 {
-	delete savepanel;
+//	delete savepanel;
 	if(currentset)
 		delete currentset;
 	if(prevset)
@@ -194,12 +197,12 @@ void APRView::AllAttached(void)
 	apply->SetTarget(this);
 	defaults->SetTarget(this);
 	revert->SetTarget(this);
-	settings_menu->SetTargetForItems(this);
-	colorset_menu->SetTargetForItems(this);
+//	settings_menu->SetTargetForItems(this);
+//	colorset_menu->SetTargetForItems(this);
 	colorwell->SetTarget(this);
 
 	BMessenger msgr(this);
-	savepanel->SetTarget(msgr);
+//	savepanel->SetTarget(msgr);
 	picker->SetValue(currentset->StringToColor(attrstring.String()).GetColor32());
 }
 
@@ -219,7 +222,7 @@ void APRView::MessageReceived(BMessage *msg)
 
 	switch(msg->what)
 	{
-		case DELETE_COLORSET:
+/*		case DELETE_COLORSET:
 		{
 			// We can't delete the Default set
 			if(currentset->name.Compare("Default")==0)
@@ -290,7 +293,7 @@ void APRView::MessageReceived(BMessage *msg)
 			SaveColorSet(name);
 			break;
 		}
-		case UPDATE_COLOR:
+*/		case UPDATE_COLOR:
 		{
 			// Received from the color picker when its color changes
 			if(!prevset)
@@ -317,7 +320,7 @@ void APRView::MessageReceived(BMessage *msg)
 			if(!revert->IsEnabled())
 				revert->SetEnabled(true);
 			
-			SetColorSetName("<untitled>");
+//			SetColorSetName("<untitled>");
 			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
@@ -376,7 +379,7 @@ void APRView::MessageReceived(BMessage *msg)
 				defaults->SetEnabled(false);
 			revert->SetEnabled(false);
 			
-			SetColorSetName(currentset->name.String());
+//			SetColorSetName(currentset->name.String());
 			Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
@@ -479,7 +482,7 @@ BMenu *APRView::LoadColorSets(void)
 		return menu;
 	}
 
-	int32 count=dir.CountEntries();
+/*	int32 count=dir.CountEntries();
 
 	BMessage *msg;
 	for(int32 i=0;i<count;i++)
@@ -494,7 +497,7 @@ BMenu *APRView::LoadColorSets(void)
 		msg->AddString("name",name);
 		menu->AddItem(new BMenuItem(name.String(),msg));
 	}
-	
+*/	
 	return menu;
 }	
 
@@ -528,11 +531,12 @@ void APRView::LoadColorSet(const BString &name)
 		return;
 	}
 	currentset->ConvertFromMessage(&settings);
-	SetColorSetName(currentset->name.String());
+//	SetColorSetName(currentset->name.String());
 	
 	UpdateControlsFromAttr(attrstring.String());
 }
 
+/*
 void APRView::SaveColorSet(const BString &name)
 {
 
@@ -589,7 +593,7 @@ void APRView::SetColorSetName(const char *name)
 	colorset_label->ResizeToPreferred();
 	colorset_label->Invalidate();
 }
-
+*/
 void APRView::SaveSettings(void)
 {
 	// Save the current GUI color settings to the GUI colors file in the 
@@ -663,7 +667,7 @@ void APRView::LoadSettings(void)
 		currentset->ConvertFromMessage(&settings);
 //	}
 
-	SetColorSetName(currentset->name.String());
+//	SetColorSetName(currentset->name.String());
 	
 	UpdateControlsFromAttr(attrstring.String());
 	
@@ -678,7 +682,7 @@ void APRView::SetDefaults(void)
 	currentset->name.SetTo("Default");
 
 	currentset->SetToDefaults();
-	SetColorSetName("Default");
+//	SetColorSetName("Default");
 }
 
 void APRView::NotifyServer(void)
