@@ -616,7 +616,7 @@ load_menu_settings(menu_info &into)
 extern "C" status_t
 _init_interface_kit_()
 {
-	sem_id widthSem = create_sem(1, "TextView WidthBuffer Sem");
+	sem_id widthSem = create_sem(0, "BTextView WidthBuffer Sem");
 	if (widthSem < 0)
 		return widthSem;
 	BTextView::sWidthSem = widthSem;
