@@ -1,5 +1,10 @@
 SubDir OBOS_TOP src kernel ;
 
+KernelLd boot_loader :
+	boot_loader.a
+	boot_platform_$(OBOS_BOOT_PLATFORM).o
+	;
+
 KernelLd stage2 :
 	boot_arch_stage2.o
 
