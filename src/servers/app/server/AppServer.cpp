@@ -47,6 +47,7 @@
 #include "Utils.h"
 #include "FontServer.h"
 #include "Desktop.h"
+#include "RootLayer.h"
 
 //#define DEBUG_KEYHANDLING
 //#define DEBUG_SERVER
@@ -131,9 +132,6 @@ AppServer::AppServer(void)
 
 	InitDecorators();
 
-	// Create the cursor manager. Object declared in CursorManager.cpp
-	cursormanager= new CursorManager();
-		
 	// Set up the Desktop
 	desktop= new Desktop();
 	desktop->Init();
@@ -180,7 +178,6 @@ AppServer::~AppServer(void)
 	release_sem(fAppListLock);
 
 	delete bitmapmanager;
-	delete cursormanager;
 
 	delete desktop;
 
@@ -681,7 +678,10 @@ void AppServer::DispatchMessage(int32 code, BPortLink &msg)
 		}
 		case AS_SET_SYSCURSOR_DEFAULTS:
 		{
-			cursormanager->SetDefaults();
+			// although this isn't pretty, ATM we only have RootLayer.
+			// this messages should be handled somewhere into a RootLayer
+			// specific area - this set is intended for a RootLayer.
+			desktop->ActiveRootLayer()->GetCursorManager().SetDefaults();
 			break;
 		}
 		default:

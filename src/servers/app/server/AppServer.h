@@ -77,7 +77,6 @@ private:
 Decorator *new_decorator(BRect rect, const char *title, int32 wlook, int32 wfeel,
 	int32 wflags, DisplayDriver *ddriver);
 
-extern CursorManager *cursormanager;
 extern BitmapManager *bitmapmanager;
 extern ColorSet gui_colorset;
 extern AppServer *app_server;
