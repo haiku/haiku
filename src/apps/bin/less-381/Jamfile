@@ -16,5 +16,8 @@ BinCommand lesskey : lesskey.c version.c : : less.rdef ;
 
 BinCommand lessecho : lessecho.c version.c : : less.rdef ;
 
+MakeLocate more : $(OBOS_BIN_DIR) ;
+RelSymLink more : less ;
+
 # restore CCFLAGS
 CCFLAGS = $(originalCCFlags) ;
