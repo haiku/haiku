@@ -139,6 +139,10 @@ vorbisDecoder::Seek(uint32 seekTo,
 				 bigtime_t seekTime, bigtime_t *time)
 {
 	TRACE("vorbisDecoder::Seek\n");
+	float **pcm;
+	// throw the old samples away!
+	int samples = vorbis_synthesis_pcmout(&fDspState,&pcm);
+	vorbis_synthesis_read(&fDspState,samples);
 	return B_OK;
 }
 
