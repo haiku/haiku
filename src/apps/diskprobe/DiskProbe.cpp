@@ -1,7 +1,7 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "DiskProbe.h"
@@ -76,7 +76,7 @@ class DiskProbe : public BApplication {
 		virtual bool QuitRequested();
 
 	private:
-		status_t Probe(entry_ref &ref, const char *attribute = NULL);
+		status_t Probe(BEntry &entry, const char *attribute = NULL);
 
 		Settings	fSettings;
 		BFilePanel	*fFilePanel;
@@ -247,9 +247,14 @@ DiskProbe::ReadyToRun()
  */
 
 status_t 
-DiskProbe::Probe(entry_ref &ref, const char *attribute)
+DiskProbe::Probe(BEntry &entry, const char *attribute)
 {
 	int32 probeWindows = 0;
+
+	entry_ref ref;
+	status_t status = entry.GetRef(&ref);
+	if (status < B_OK)
+		return status;
 
 	// Do we already have that window open?
 	for (int32 i = CountWindows(); i-- > 0; ) {
@@ -265,21 +270,10 @@ DiskProbe::Probe(entry_ref &ref, const char *attribute)
 	}
 
 	// Does the file really exist?
-	BEntry entry;
-	status_t status = entry.SetTo(&ref, true);
-	if (status < B_OK)
-		return status;
 	if (!entry.Exists())
 		return B_ENTRY_NOT_FOUND;
 
 	entry.GetRef(&ref);
-
-	// If it's a directory, we won't handle it, but we would accept a volume
-	if (entry.IsDirectory()) {
-		BDirectory directory(&entry);
-		if (directory.InitCheck() != B_OK || !directory.IsRootDirectory())
-			return B_IS_A_DIRECTORY;
-	}
 
 	// cascade window
 	BRect rect = fWindowFrame;
@@ -301,13 +295,31 @@ DiskProbe::Probe(entry_ref &ref, const char *attribute)
 void 
 DiskProbe::RefsReceived(BMessage *message)
 {
+	bool traverseLinks = (modifiers() & B_SHIFT_KEY) == 0;
+	int32 directories = 0;
+
 	int32 index = 0;
 	entry_ref ref;
 	while (message->FindRef("refs", index++, &ref) == B_OK) {
 		const char *attribute = NULL;
-		message->FindString("attributes", index - 1, &attribute);
+		if (message->FindString("attributes", index - 1, &attribute) == B_OK)
+			traverseLinks = false;
 
-		status_t status = Probe(ref, attribute);
+		BEntry entry;
+		status_t status = entry.SetTo(&ref, traverseLinks);
+
+		// If it's a directory, we won't handle it, but we would accept a volume
+		if (status == B_OK && traverseLinks && entry.IsDirectory()) {
+			BDirectory directory(&entry);
+			if (directory.InitCheck() != B_OK || !directory.IsRootDirectory()) {
+				directories++;
+				continue;
+			}
+		}
+
+		if (status == B_OK)
+			status = Probe(entry, attribute);
+
 		if (status != B_OK) {
 			char buffer[1024];
 			snprintf(buffer, sizeof(buffer),
@@ -319,6 +331,12 @@ DiskProbe::RefsReceived(BMessage *message)
 				buffer, "Ok", NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 		}
+	}
+
+	if (directories > 0) {
+		(new BAlert("DiskProbe request",
+			"Sorry, only regular files and volumes can be opened.\n", "Ok", NULL, NULL,
+			B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
 	}
 }
 
@@ -332,6 +350,8 @@ DiskProbe::ArgvReceived(int32 argc, char **argv)
 	if (message)
 		currentDirectory.SetTo(message->FindString("cwd"));
 
+	BMessage refs;
+
 	for (int i = 1 ; i < argc ; i++) {
 		BPath path;
 		if (argv[i][0] == '/')
@@ -339,20 +359,20 @@ DiskProbe::ArgvReceived(int32 argc, char **argv)
 		else
 			path.SetTo(&currentDirectory, argv[i]);
 
-		BEntry entry(path.Path());
-		entry_ref ref;
 		status_t status;
-		if ((status = entry.InitCheck()) != B_OK
-			|| (status = entry.GetRef(&ref)) != B_OK
-			|| (status = Probe(ref)) != B_OK) {
-			char buffer[512];
-			snprintf(buffer, sizeof(buffer), "Could not open file \"%s\": %s",
-				argv[i], strerror(status));
-			(new BAlert("DiskProbe", buffer, "Ok", NULL, NULL,
-				B_WIDTH_AS_USUAL, B_STOP_ALERT))->Go();
+		entry_ref ref;		
+		BEntry entry;
+
+		if ((status = entry.SetTo(path.Path(), false)) != B_OK
+			|| (status = entry.GetRef(&ref)) != B_OK) {
+			fprintf(stderr, "Could not open file \"%s\": %s\n", path.Path(), strerror(status));
 			continue;
 		}
+
+		refs.AddRef("refs", &ref);
 	}
+
+	RefsReceived(&refs);
 }
 
 
