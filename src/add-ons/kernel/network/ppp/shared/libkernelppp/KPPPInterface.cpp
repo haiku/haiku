@@ -190,14 +190,6 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 		fMode = PPP_CLIENT_MODE;
 		// we are a client by default
 	
-	SetDialOnDemand(
-		get_boolean_value(
-		get_settings_value(PPP_DIAL_ON_DEMAND_KEY, fSettings),
-		false)
-		);
-		// dial on demand is disabled by default
-	
-	
 	SetAutoRedial(
 		get_boolean_value(
 		get_settings_value(PPP_AUTO_REDIAL_KEY, fSettings),
@@ -1323,14 +1315,12 @@ KPPPInterface::Receive(struct mbuf *packet, uint16 protocolNumber)
 	if(!packet)
 		return B_ERROR;
 	
-	fIdleSince = real_time_clock();
-	
 	int32 result = PPP_REJECTED;
 		// assume we have no handler
 	
 	// Set our interface as the receiver.
 	// The real netstack protocols (IP, IPX, etc.) might get confused if our
-	// interface is a main interface and at the same time is not registered
+	// interface is a main interface and at the same time not registered
 	// because then there is no receiver interface.
 	// PPP NCPs should be aware of that!
 	if(packet->m_flags & M_PKTHDR && Ifnet() != NULL)
@@ -1415,9 +1405,15 @@ KPPPInterface::Pulse()
 	for(; protocol; protocol = protocol->NextProtocol())
 		protocol->Pulse();
 	
+	uint32 currentTime = real_time_clock();
+	if(fUpdateIdleSince) {
+		fIdleSince = currentTime;
+		fUpdateIdleSince = false;
+	}
+	
 	// check our idle time and disconnect if needed
 	if(fDisconnectAfterIdleSince > 0 && fIdleSince != 0
-			&& fIdleSince - real_time_clock() >= fDisconnectAfterIdleSince)
+			&& fIdleSince - currentTime >= fDisconnectAfterIdleSince)
 		StateMachine().CloseEvent();
 }
 

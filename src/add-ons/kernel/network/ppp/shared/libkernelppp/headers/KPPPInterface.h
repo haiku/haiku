@@ -85,6 +85,8 @@ class KPPPInterface : public KPPPLayer {
 			{ return fRedialDelay; }
 		
 		// idle handling
+		void UpdateIdleSince()
+			{ fUpdateIdleSince = true; }
 		uint32 IdleSince() const
 			{ return fIdleSince; }
 		uint32 DisconnectAfterIdleSince() const
@@ -231,6 +233,7 @@ class KPPPInterface : public KPPPLayer {
 		ppp_interface_module_info *fManager;
 		
 		uint32 fIdleSince, fDisconnectAfterIdleSince;
+		bool fUpdateIdleSince;
 		uint32 fMRU, fInterfaceMTU, fHeaderLength;
 		
 		KPPPInterface *fParent;
