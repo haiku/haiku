@@ -11,8 +11,8 @@
 #include <smp.h>
 #include <arch/x86/selector.h>
 #include <Errors.h>
-#include <TLS.h>
 #include <kerrors.h>
+#include <tls.h>
 
 #include <stage2.h>
 
@@ -62,18 +62,17 @@ arch_cpu_init2(kernel_args *ka)
 	tss = malloc(sizeof(struct tss *) * ka->num_cpus);
 	if (tss == NULL) {
 		panic("arch_cpu_init2: could not allocate buffer for tss pointers\n");
-		return ENOMEM;
+		return B_NO_MEMORY;
 	}
 
 	tss_loaded = malloc(sizeof(int) * ka->num_cpus);
 	if (tss == NULL) {
 		panic("arch_cpu_init2: could not allocate buffer for tss booleans\n");
-		return ENOMEM;
+		return B_NO_MEMORY;
 	}
 	memset(tss_loaded, 0, sizeof(int) * ka->num_cpus);
 
 	for (i = 0; i < ka->num_cpus; i++) {
-		struct segment_descriptor *tss_d;
 		char tss_name[16];
 		region_id rid;
 
@@ -82,7 +81,7 @@ arch_cpu_init2(kernel_args *ka)
 			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
 		if (rid < 0) {
 			panic("arch_cpu_init2: unable to create region for tss\n");
-			return ENOMEM;
+			return B_NO_MEMORY;
 		}
 
 		// initialize TSS
@@ -96,7 +95,7 @@ arch_cpu_init2(kernel_args *ka)
 	// setup TLS descriptors (one for every CPU)
 
 	for (i = 0; i < ka->num_cpus; i++) {
-		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_MAX_KEYS * sizeof(void *),
+		set_segment_descriptor(&gGDT[TLS_BASE_SEGMENT + i], 0, TLS_SIZE,
 			DT_DATA_WRITEABLE, DPL_USER);
 	}
 
@@ -110,11 +109,11 @@ i386_set_tss_and_kstack(addr kstack)
 	int currentCPU = smp_get_current_cpu();
 
 //	dprintf("i386_set_kstack: kstack 0x%x, cpu %d\n", kstack, currentCPU);
-	if (tss_loaded[currentCPU] == 0) {
+	if (!tss_loaded[currentCPU]) {
 		short seg = ((TSS_BASE_SEGMENT + currentCPU) << 3) | DPL_KERNEL;
 		asm("movw  %0, %%ax;"
 			"ltr %%ax;" : : "r" (seg) : "eax");
-		tss_loaded[currentCPU] = 1;
+		tss_loaded[currentCPU] = true;
 	}
 
 	tss[currentCPU]->sp0 = kstack;
