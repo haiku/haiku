@@ -14,8 +14,13 @@
 
 struct extended_partition_info;
 
+struct fs_buffer_cache;
+typedef status_t (*fs_get_buffer)(struct fs_buffer_cache *cache,
+	off_t offset, size_t size, void **buffer, size_t *actualSize);
+
 typedef bool (*fs_identify_hook)(int deviceFD,
-	struct extended_partition_info *partitionInfo, float *priority);
+	struct extended_partition_info *partitionInfo, float *priority,
+	fs_get_buffer get_buffer, struct fs_buffer_cache *cache);
 
 typedef struct fs_module_info {
 	module_info			module;
