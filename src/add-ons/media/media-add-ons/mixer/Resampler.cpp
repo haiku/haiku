@@ -73,56 +73,101 @@ Resampler::InitCheck()
 }
 
 void
-Resampler::float_to_float(const void *src, int32 src_sample_offset, int32 src_sample_count,
-						  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::float_to_float(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
+{
+	register const char * src = (const char *) _src;
+	register char * dst = (char *) _dst;
+	register int32 count = dst_sample_count;
+	register float gain = _gain;
+	
+	if (src_sample_count == dst_sample_count) {
+		// optimized case for no resampling
+		while (count--) {
+			*(float *)dst = *(const float *)src * gain;
+			src += src_sample_offset;
+			dst += dst_sample_offset;
+		}
+		return;
+	}
+
+	register double delta = double(src_sample_count) / double(dst_sample_offset);
+	register float current = 0.0f;
+
+	if (delta < 1.0) {
+		// upsample
+		while (count--) {
+			*(float *)dst = *(const float *)src * gain;
+			dst += dst_sample_offset;
+			current += delta;
+			if (current > 1.0f) {
+				current -= 1.0f;
+				src += src_sample_offset;
+			}
+		}
+	} else {
+		// downsample
+		while (count--) {
+			*(float *)dst = *(const float *)src * gain;
+			src += src_sample_offset;
+			current += delta; // delta is always > 1.0
+			if (current < 2.0f) {
+				current -= 1.0f;
+				dst += dst_sample_offset;
+			} else {
+				int32 inc_count = (int32) current;
+				current -= (float) inc_count;
+				dst += inc_count * dst_sample_offset;
+			}
+		}
+	}
+}
+
+void
+Resampler::int32_to_float(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
-Resampler::int32_to_float(const void *src, int32 src_sample_offset, int32 src_sample_count,
-						  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::int16_to_float(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
-Resampler::int16_to_float(const void *src, int32 src_sample_offset, int32 src_sample_count,
-						  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::int8_to_float(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+				  		 void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
-Resampler::int8_to_float(const void *src, int32 src_sample_offset, int32 src_sample_count,
-				  		 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::uint8_to_float(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
-Resampler::uint8_to_float(const void *src, int32 src_sample_offset, int32 src_sample_count,
-						  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::float_to_int32(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
-Resampler::float_to_int32(const void *src, int32 src_sample_offset, int32 src_sample_count,
-						  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
-{
-}
-
-void
-Resampler::float_to_int16(const void *src, int32 src_sample_offset, int32 src_sample_count,
-				  		  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::float_to_int16(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+				  		  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
 Resampler::float_to_int8(const void *src, int32 src_sample_offset, int32 src_sample_count,
-			 			 void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+			 			 void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
 void
-Resampler::float_to_uint8(const void *src, int32 src_sample_offset, int32 src_sample_count,
-						  void *dst, int32 dst_sample_offset, int32 dst_sample_count, float gain)
+Resampler::float_to_uint8(const void *_src, int32 src_sample_offset, int32 src_sample_count,
+						  void *_dst, int32 dst_sample_offset, int32 dst_sample_count, float _gain)
 {
 }
 
