@@ -39,7 +39,7 @@ PortLink::PortLink(port_id port)
 	fSendCode=0;
 	fSendBuffer=new char[4096];
 	fSendPosition=8;
-	fDataSize=(int32*)fSendBuffer+sizeof(int32);
+	fDataSize=(int32*)(fSendBuffer+sizeof(int32));
 	*fDataSize=0;
 }
 
@@ -53,7 +53,7 @@ PortLink::PortLink( const PortLink &link )
 	fSendCode			= 0;
 	fSendBuffer=new char[4096];
 	fSendPosition		= 8;
-	fDataSize=(int32*)fSendBuffer+sizeof(int32);
+	fDataSize=(int32*)(fSendBuffer+sizeof(int32));
 	*fDataSize=0;
 }
 
