@@ -64,6 +64,8 @@ public:
 	static void SetWindowFrame(BRect frame);
 
 private:
+	BPictureButton* AddPictureButton(BView* panel, BRect frame, const char* name, const char* on, const char* off, uint32 what);
+	void AddStringView(BView* panel, BRect frame, const char* text);
 	void PrinterForMimeType();
 	void SetupPrintersMenu(BMenu* menu);
 	void UpdateAppSettings(const char* mime, const char* printer);
@@ -85,8 +87,8 @@ private:
 	sem_id      fFinished;
 
 	BMenuField* fPrinters;
-	BButton*    fPageSetup;
-	BButton*    fJobSetup;
+	BPictureButton*    fPageSetup;
+	BPictureButton*    fJobSetup;
 	BButton*    fOk;
 };
 

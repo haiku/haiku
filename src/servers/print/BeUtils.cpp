@@ -36,7 +36,10 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
+#include <Application.h>
+#include <Bitmap.h>
 #include <Messenger.h>
+#include <Resources.h>
 #include <Roster.h>
 #include <String.h>
 
@@ -107,4 +110,43 @@ bool AddFields(BMessage* to, const BMessage* from) {
 			}
 		}
 	}
+}
+
+BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP) {
+	if (type_code == B_TRANSLATOR_BITMAP) {
+		return BTranslationUtils::GetBitmap(type_code, name);
+	} else {
+		BResources *res = BApplication::AppResources();
+		if (res != NULL) {
+			BMessage m;
+			size_t length;
+			const void *bits = res->LoadResource(type_code, name, &length);
+			if (bits && m.Unflatten((char*)bits) == B_OK) {
+				return (BBitmap*)BBitmap::Instantiate(&m);
+			}
+		}
+		return NULL;
+	}
+}
+
+BPicture *BitmapToPicture(BView* view, BBitmap *bitmap) {
+	if (bitmap) {
+		view->BeginPicture(new BPicture());
+		view->DrawBitmap(bitmap);
+		return view->EndPicture();
+	}
+	return NULL;
+}
+
+BPicture *BitmapToGrayedPicture(BView* view, BBitmap *bitmap) {
+	if (bitmap) {
+		BRect rect(bitmap->Bounds());
+		view->BeginPicture(new BPicture());
+		view->DrawBitmap(bitmap);
+		view->SetHighColor(255, 255, 255, 128);
+		view->SetDrawingMode(B_OP_ALPHA);
+		view->FillRect(rect);
+		return view->EndPicture();
+	}
+	return NULL;
 }

@@ -42,6 +42,10 @@
 #include <FindDirectory.h>
 #include <Path.h>
 #include <SupportDefs.h>
+#include <Picture.h>
+#include <PictureButton.h>
+#include <TranslatorFormats.h>
+#include <TranslationUtils.h>
 
 status_t TestForAddonExistence(const char* name, directory_which which,
 							   const char* section, BPath& outPath);
@@ -86,6 +90,12 @@ public:
 
 // mimetype from sender
 bool MimeTypeForSender(BMessage* sender, BString& mime);
+// adds fields to message or replaces existing fields
 bool AddFields(BMessage* to, const BMessage* from);
-
+// load bitmap from application resources
+BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP);
+// convert bitmap to picture; view must be attached to a window!
+// returns NULL if bitmap is NULL
+BPicture *BitmapToPicture(BView* view, BBitmap *bitmap);
+BPicture *BitmapToGrayedPicture(BView* view, BBitmap *bitmap);
 #endif

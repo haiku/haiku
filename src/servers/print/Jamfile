@@ -28,5 +28,6 @@ LinkSharedOSLibs
 	print_server 
 	: 
 	be 
-	root 
+	root
+	translation 
 	;

@@ -64,8 +64,9 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 
 	AddChild(panel);
 	
-	float left = 10, top = 5, width;
+	float left = 10, top = 5;
 	BRect r(left, top, 160, 15);
+	BStringView* string;
 
 		// print selection popup menu
 	BPopUpMenu* menu = new BPopUpMenu("Select a Printer");
@@ -75,25 +76,24 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	fPrinters->SetDivider(40);
 	panel->AddChild(fPrinters);
 	top += fPrinters->Bounds().Height() + 10;
-	width = fPrinters->Bounds().Width();
 	
 		// page format button
 	r.OffsetTo(left, top);
-	fPageSetup = new BButton(r, "Page Format", "Page Format", new BMessage(MSG_PAGE_SETUP));
-	panel->AddChild(fPageSetup);
-	fPageSetup->ResizeToPreferred();
+	fPageSetup = AddPictureButton(panel, r, "Page Format", "PAGE_SETUP_ON", "PAGE_SETUP_OFF", MSG_PAGE_SETUP);
+		// add description to button
+	r.OffsetTo(left + fPageSetup->Bounds().Width() + 5, top + fPageSetup->Bounds().Height()/2-5);
+	AddStringView(panel, r, "Setup page format");
 	top += fPageSetup->Bounds().Height() + 5;
-	if (fPageSetup->Bounds().Width() > width) width = fPageSetup->Bounds().Width();
 	
 		// page selection button
 	fJobSetup = NULL;
 	if (kind == kJobSetup) {
 		r.OffsetTo(left, top);
-		fJobSetup = new BButton(r, "Page Selection", "Page Selection", new BMessage(MSG_JOB_SETUP));
-		panel->AddChild(fJobSetup);
-		fJobSetup->ResizeToPreferred();
+		fJobSetup = AddPictureButton(panel, r, "Page Selection", "JOB_SETUP_ON", "JOB_SETUP_OFF", MSG_JOB_SETUP);
+			// add description to button
+		r.OffsetTo(left + fJobSetup->Bounds().Width() + 5, top + fJobSetup->Bounds().Width()/2-5);
+		AddStringView(panel, r, "Setup print job");
 		top += fJobSetup->Bounds().Height() + 5;
-		if (fJobSetup->Bounds().Width() > width) width = fJobSetup->Bounds().Width();
 	}
 	top += 5;
 	
@@ -117,11 +117,6 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter, BMes
 	panel->AddChild(fOk);
 	fOk->ResizeToPreferred();
 	top += fOk->Bounds().Height() + 10;
-
-		// resize buttons to equal width	
-	float height = fOk->Bounds().Height();
-	fPageSetup->ResizeTo(width, height);
-	if (fJobSetup) fJobSetup->ResizeTo(width, height);
 	
 		// resize window	
 	ResizeTo(fOk->Frame().right + 10, top);
@@ -237,6 +232,45 @@ void ConfigWindow::SetWindowFrame(BRect r) {
 	if (lock.IsLocked()) {
 		Settings::GetSettings()->SetConfigWindowFrame(r);
 	}
+}
+
+BPictureButton* ConfigWindow::AddPictureButton(BView* panel, BRect frame, const char* name, const char* on, const char* off, uint32 what) {
+	BBitmap* onBM = LoadBitmap(on);
+	BBitmap* offBM = LoadBitmap(off);
+	
+	BPicture* onPict = BitmapToPicture(panel, onBM);
+	BPicture* offPict = BitmapToPicture(panel, offBM);
+
+	BPictureButton* button = NULL;
+	
+	if (onPict != NULL && offPict != NULL) {	
+		button = new BPictureButton(frame, name, onPict, offPict, new BMessage(what));
+		button->SetViewColor(B_TRANSPARENT_COLOR);
+		panel->AddChild(button);
+		onBM->Lock();
+		button->ResizeTo(onBM->Bounds().Width(), onBM->Bounds().Height());
+		onBM->Unlock();
+		
+		BPicture* disabled = BitmapToGrayedPicture(panel, offBM);
+		button->SetDisabledOn(disabled);
+		delete disabled;
+		
+		disabled = BitmapToGrayedPicture(panel, onBM);
+		button->SetDisabledOff(disabled);
+		delete disabled;
+	}	
+	
+	delete onPict; delete offPict;	
+	delete onBM; delete offBM;
+	
+	return button;
+}
+
+void ConfigWindow::AddStringView(BView* panel, BRect frame, const char* text) {
+	BStringView* string = new BStringView(frame, "", text);
+	string->SetViewColor(panel->ViewColor());
+	string->SetLowColor(panel->ViewColor());
+ 	panel->AddChild(string);
 }
 
 void ConfigWindow::PrinterForMimeType() {
