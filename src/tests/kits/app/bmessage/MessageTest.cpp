@@ -13,7 +13,7 @@
 #include "MessageEasyFindTest.h"
 #include "MessageFloatItemTest.h"
 #include "MessageDoubleItemTest.h"
-//#include "MessageRefItemTest.h"
+#include "MessageRefItemTest.h"
 
 Test* MessageTestSuite()
 {
@@ -31,7 +31,7 @@ Test* MessageTestSuite()
 	tests->addTest(TMessageEasyFindTest::Suite());
 	tests->addTest(TMessageFloatItemTest::Suite());
 	tests->addTest(TMessageDoubleItemTest::Suite());
-//	tests->addTest(TMessageRefItemTest::Suite());
+	tests->addTest(TMessageRefItemTest::Suite());
 
 	return tests;
 }

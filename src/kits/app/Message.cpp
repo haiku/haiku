@@ -825,12 +825,7 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 			break;
 		case B_REF_TYPE:
 		{
-			entry_ref ref;
-			uchar* dp = (uchar*)data;
-			ref.device = *(dev_t*)dp; dp += sizeof (dev_t);
-			ref.directory = *(ino_t*)dp; dp += sizeof (ino_t);
-			ref.set_name((const char*)dp);
-			err = AddRef(name, &ref);
+			err = AddRef(name, (entry_ref*)data);
 			break;
 		}
 		case B_MESSAGE_TYPE:
