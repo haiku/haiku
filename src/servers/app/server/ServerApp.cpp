@@ -1198,6 +1198,60 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 */			
 			break;
 		}
+		case AS_GET_STRING_WIDTH:
+		{
+			FTRACE(("ServerApp %s: AS_GET_STRING_WIDTH\n",fSignature.String()));
+			// Attached Data:
+			// 1) string String to measure
+			// 2) int32 string length to measure
+			// 3) uint16 ID of family
+			// 4) uint16 ID of style
+			// 5) float point size of font
+			// 6) uint8 spacing to use
+			// 7) port_id reply port
+			
+			// Returns:
+			// 1) float - width of the string in pixels
+			char *string=NULL;
+			int32 length;
+			uint16 family,style;
+			float size,width=0;
+			uint8 spacing;
+			port_id replyport;
+			DrawData drawdata;
+			
+			msg.ReadString(&string);
+			msg.Read<int32>(&length);
+			msg.Read<uint16>(&family);
+			msg.Read<uint16>(&style);
+			msg.Read<float>(&size);
+			msg.Read<uint8>(&spacing);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+						
+			if(length>0 && drawdata.font.SetFamilyAndStyle(family,style)==B_OK &&
+				size>0 && string)
+			{
+				drawdata.font.SetSize(size);
+				drawdata.font.SetSpacing(spacing);
+				width=desktop->GetDisplayDriver()->StringWidth(string,length,&drawdata);
+				
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<float>(width);
+				replylink.Flush();
+				
+				free(string);
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
+			
+			break;
+		}
 		case AS_GET_FONT_BOUNDING_BOX:
 		{
 			FTRACE(("ServerApp %s: AS_GET_BOUNDING_BOX unimplemented\n",fSignature.String()));
@@ -1321,6 +1375,41 @@ void ServerApp::DispatchMessage(int32 code, LinkMsgReader &msg)
 			}
 			
 			fontserver->Unlock();
+			break;
+		}
+		case AS_SET_FAMILY_AND_STYLE_FROM_ID:
+		{
+			FTRACE(("ServerApp %s: AS_SET_FAMILY_AND_STYLE_FROM_ID\n",fSignature.String()));
+			// Attached Data:
+			// 1) uint16 - ID of font family to use
+			// 2) uint16 - ID of style in family
+			// 3) port_id - reply port
+			
+			// Returns:
+			// 1) uint16 - face of the font
+			
+			port_id replyport;
+			uint16 fam, sty;
+			
+			msg.Read<uint16>(&fam);
+			msg.Read<uint16>(&sty);
+			msg.Read<port_id>(&replyport);
+			
+			replylink.SetSendPort(replyport);
+			
+			ServerFont font;
+			if(font.SetFamilyAndStyle(fam,sty)==B_OK)
+			{
+				replylink.StartMessage(SERVER_TRUE);
+				replylink.Attach<uint16>(font.Face());
+				replylink.Flush();
+			}
+			else
+			{
+				replylink.StartMessage(SERVER_FALSE);
+				replylink.Flush();
+			}
+			
 			break;
 		}
 		case AS_SET_FAMILY_AND_FACE:
