@@ -105,6 +105,7 @@ switch $(TARGET_PLATFORM)
 		BONE_COMPATIBLE = true ;
 		DANO_COMPATIBLE = true ;
 		HAIKU_COMPATIBLE = true ;
+		DEFINES += __HAIKU__ ;
 	}
 }
 if $(BONE_COMPATIBLE) {
