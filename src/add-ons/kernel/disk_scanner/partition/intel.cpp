@@ -85,7 +85,7 @@ PartitionMapParser::~PartitionMapParser()
 status_t
 PartitionMapParser::Parse(const uint8 *block, PartitionMap *map)
 {
-	status_t error = (block && map ? B_OK : B_BAD_VALUE);
+	status_t error = (map ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
 		fMap = map;
 		fMap->Unset();
@@ -277,7 +277,7 @@ std_ops(int32 op, ...)
 
 // read_partition_map
 static
-status_t
+bool
 read_partition_map(int deviceFD, const session_info *sessionInfo,
 				   const uchar *block, PartitionMap *map)
 {
