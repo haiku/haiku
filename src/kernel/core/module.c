@@ -762,7 +762,8 @@ nextModuleImage:
 status_t
 module_init(kernel_args *ka, module_info **sys_module_headers)
 {
-	recursive_lock_create(&gModulesLock);
+	if (recursive_lock_init(&gModulesLock, "modules rlock") < B_OK)
+		return B_ERROR;
 
 	gModulesHash = hash_init(MODULE_HASH_SIZE, 0, module_compare, module_hash);
 	if (gModulesHash == NULL)
