@@ -31,7 +31,7 @@ ssize_t		_user_port_buffer_size_etc(port_id port,
 				uint32 flags,
 				bigtime_t timeout);
 ssize_t		_user_port_count(port_id port);
-status_t	_user_read_port_etc(port_id port,
+ssize_t		_user_read_port_etc(port_id port,
 				int32 *msg_code,
 				void *msg_buffer,
 				size_t buffer_size,
