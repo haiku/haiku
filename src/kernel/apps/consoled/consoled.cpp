@@ -104,11 +104,12 @@ keyboard_reader(void *arg)
 			continue;
 		}
 
-		if (event.what != B_KEY_DOWN) 
+		if ((event.what != B_KEY_DOWN) 
+			|| (event.FindString("bytes", &string) != B_OK))
 			continue;
-		event.FindData("bytes", B_STRING_TYPE, (const void**)&string, &length);
 
-		if (length <= 2)
+		length = strlen(string);
+		if (length == 1)
 			switch (*string) {
 			case B_LEFT_ARROW:
 				write(con->tty_master_fd, LEFT_ARROW_KEY_CODE, sizeof(LEFT_ARROW_KEY_CODE));
