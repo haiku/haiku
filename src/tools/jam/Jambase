@@ -919,7 +919,7 @@ rule LocalClean
 	# Like Clean, but has only effect in a Jamfile in the
 	# directory or any of its subdirectories where jam has been invoked.
 
-	if [ FIsPrefix $(INVOCATION_SUBDIR) : $(SUBDIR_TOKENS) ] {
+	if [ FIsPrefix $(SUBDIR_UP) : $(SUBDIR_DOWN) ] {
 		Clean $(1) : $(2) ;
 	}
 }
@@ -930,7 +930,7 @@ rule LocalDepends
 	# Like Depends, but has only effect in a Jamfile in the
 	# directory or any of its subdirectories where jam has been invoked.
 
-	if [ FIsPrefix $(INVOCATION_SUBDIR) : $(SUBDIR_TOKENS) ] {
+	if [ FIsPrefix $(SUBDIR_UP) : $(SUBDIR_DOWN) ] {
 		Depends $(1) : $(2) ;
 	}
 }
@@ -1230,6 +1230,17 @@ rule SubDir
 	{
 	    $(_top)-SET = true ;
 
+		## LOCAL CHANGE
+		#
+		# Needed below to reset $(_top), so that to the SubDir invoked by the
+		# top jamfile we will include, it will appear, as if the code has
+		# never been executed.
+		#
+		local _originalTop = $($(_top)) ;
+		#
+		## LOCAL CHANGE
+
+
 	    # First time we've seen this TOP.
 	    # We'll initialize a number of internal variables:
 	    #
@@ -1324,6 +1335,33 @@ rule SubDir
 	    SUBDIR_DOWN = ;
 	    SUBDIR_ROOT = $($(_top)-ROOT) ;
 
+		## LOCAL CHANGE
+		#
+		# If we are the first Jamfile, we include the top Jamfile of this
+		# tree and  stop processing.
+		#
+		if ! $(INVOCATION_SUBDIR_SET)
+		{
+			INVOCATION_SUBDIR_SET = true ;
+			INVOCATION_SUBDIR_TOP = $($(_top)) ;
+			INVOCATION_SUBDIR = $(_tokens) ;
+			if $(INVOCATION_SUBDIR)
+			{
+				# Reset $(_top)-SET and $(_top) so that it appears as if the
+				# code till this point has never been executed (let alone the
+				# setting of the INVOCATION_SUBDIR_SET and INVOCATION_SUBDIR
+				# variables).
+				#
+				$(_top)-SET = ;
+				$(_top) = $(_originalTop) ;
+
+				include $(JAMFILE:D=$(INVOCATION_SUBDIR_TOP)) ;
+				jumptoeof ;
+			}
+		}
+		#
+		## LOCAL CHANGE
+
 	    # Include $(TOPRULES) or $(TOP)/Jamrules.
 	    # Include $(TOPRULES) if set.
 	    # Otherwise include $(TOP)/Jamrules if present.
@@ -1334,23 +1372,6 @@ rule SubDir
 		NoCare $(JAMRULES:R=$($(_top)):G=$(_top)) ;
 		include $(JAMRULES:R=$($(_top)):G=$(_top)) ;
 	    }
-
-		## LOCAL CHANGE
-		#
-		# If we are the first Jamfile, we include the top Jamfile of this
-		# tree and  stop processing.
-		#
-		if ! $(INVOCATION_SUBDIR_SET) {
-			INVOCATION_SUBDIR_SET = true ;
-			INVOCATION_SUBDIR_TOP = $(_top) ;
-			INVOCATION_SUBDIR = $(_tokens) ;
-			if $(INVOCATION_SUBDIR) {
-				SubInclude $(_top) ;
-				jumptoeof ;
-			}
-		}
-		#
-		## LOCAL CHANGE
 	}
 
 	# Get path from $(TOP) to named directory.
