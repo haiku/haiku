@@ -306,6 +306,18 @@ i386_handle_trap(struct iframe frame)
 
 	if (thread)
 		i386_pop_iframe(thread);
+
+// ToDo: Somewhere around here (maybe in int_bottom), we need to update some of
+// the debug registers, if the thread is a userland thread.
+// * (t_to->debug_info.flags & B_THREAD_DEBUG_SINGLE_STEP) indicates whether we
+//   shall set the TF flags in EFLAGS. We probably best manipulate the
+//   value on the stack, so that the flag is set by iret and applies to the
+//   next userland instruction first.
+// * Break- and watchpoints are probably best dealt with in
+//   arch_thread_context_switch(). At least DR0-DR3 should be set there.
+//   DR7 (the debug control register) is better updated here.
+// * int_bottom should always disable break- and watchpoints (by setting
+//   DR7 accordingly).
 }
 
 
