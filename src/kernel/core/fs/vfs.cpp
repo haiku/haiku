@@ -98,8 +98,8 @@ struct fs_mount {
 	bool			unmounting;
 };
 
-// RecursiveLockAutoLocking
-class RecursiveLockAutoLocking {
+// RecursiveLockLocking
+class RecursiveLockLocking {
 public:
 	inline bool Lock(recursive_lock *lockable)
 	{
@@ -113,9 +113,8 @@ public:
 	}
 };
 
-// RecursiveLockAutoLocker
-typedef AutoLocker<recursive_lock, RecursiveLockAutoLocking >
-	RecursiveLockAutoLocker;
+// RecursiveLocker
+typedef AutoLocker<recursive_lock, RecursiveLockLocking> RecursiveLocker;
 
 
 static mutex sFileSystemsMutex;
@@ -2056,7 +2055,7 @@ vfs_bootstrap_file_systems(void)
 	status_t status;
 
 	// bootstrap the root filesystem
-	status = _kern_mount("/", NULL, "rootfs", B_MOUNT_READ_ONLY, NULL);
+	status = _kern_mount("/", NULL, "rootfs", 0, NULL);
 	if (status < B_OK)
 		panic("error mounting rootfs!\n");
 
@@ -2064,19 +2063,19 @@ vfs_bootstrap_file_systems(void)
 
 	// bootstrap the devfs
 	_kern_create_dir(-1, "/dev", 0755);
-	status = _kern_mount("/dev", NULL, "devfs", B_MOUNT_READ_ONLY, NULL);
+	status = _kern_mount("/dev", NULL, "devfs", 0, NULL);
 	if (status < B_OK)
 		panic("error mounting devfs\n");
 
 	// bootstrap the pipefs
 	_kern_create_dir(-1, "/pipe", 0755);
-	status = _kern_mount("/pipe", NULL, "pipefs", B_MOUNT_READ_ONLY, NULL);
+	status = _kern_mount("/pipe", NULL, "pipefs", 0, NULL);
 	if (status < B_OK)
 		panic("error mounting pipefs\n");
 
 	// bootstrap the bootfs (if possible)
 	_kern_create_dir(-1, "/boot", 0755);
-	status = _kern_mount("/boot", NULL, "bootfs", B_MOUNT_READ_ONLY, NULL);
+	status = _kern_mount("/boot", NULL, "bootfs", 0, NULL);
 	if (status < B_OK) {
 		// this is no fatal exception at this point, as we may mount
 		// a real on disk file system later
@@ -2121,7 +2120,7 @@ vfs_mount_boot_file_system()
 
 		// ToDo: do this for real!
 		status_t status = _kern_mount("/boot", "/dev/disk/scsi/0/0/0/raw",
-			"bfs", B_MOUNT_READ_ONLY, NULL);
+			"bfs", 0, NULL);
 		if (status < B_OK)
 			panic("could not get boot device: %s!\n", strerror(status));
 	} else
@@ -3651,10 +3650,12 @@ fs_mount(char *path, const char *device, const char *fsName, uint32 flags,
 
 	// The path is always safe, we just have to make sure that fsName is
 	// almost valid - we can't make any assumptions about args, though.
+// TODO: fsName == NULL is OK, if device refers to a partition. Then the DDM
+// will know, what FS to use.
 	if (fsName == NULL || fsName[0] == '\0')
 		return B_BAD_VALUE;
 
-	RecursiveLockAutoLocker mountOpLocker(sMountOpLock);
+	RecursiveLocker mountOpLocker(sMountOpLock);
 
 	// If the file system is not a "virtual" one, the device argument should
 	// point to a real file/device (if given at all).
@@ -3841,7 +3842,7 @@ fs_unmount(char *path, bool kernel)
 	if (err < 0)
 		return ERR_VFS_PATH_NOT_FOUND;
 
-	RecursiveLockAutoLocker mountOpLocker(sMountOpLock);
+	RecursiveLocker mountOpLocker(sMountOpLock);
 
 	mount = find_mount(vnode->device);
 	if (!mount)
