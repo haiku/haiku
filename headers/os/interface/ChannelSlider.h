@@ -122,16 +122,16 @@ virtual	void _Reserved_BChannelSlider_5(void *, ...);
 virtual	void _Reserved_BChannelSlider_6(void *, ...);
 virtual	void _Reserved_BChannelSlider_7(void *, ...);
 
-		float _m_baseline;
-		float _m_linefeed;
-		BBitmap * _m_left_knob;
-		BBitmap * _m_mid_knob;
-		BBitmap * _m_right_knob;
-		BBitmap * _m_backing;
-		BView * _m_backing_view;
-		bool _m_vertical;
-		bool _m_padding_[3];
-		BPoint _m_click_delta;
+		float fBaseLine;
+		float fLineFeed;
+		BBitmap * fLeftKnob;
+		BBitmap * fMidKnob;
+		BBitmap * fRightKnob;
+		BBitmap * fBacking;
+		BView * fBackingView;
+		bool fVertical;
+		bool fPadding[3];
+		BPoint fClickDelta;
 		
 		int32	fCurrentChannel;
 		bool	fAllChannels;

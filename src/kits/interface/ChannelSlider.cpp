@@ -79,7 +79,7 @@ BChannelSlider::Archive(BMessage *into, bool deep) const
 orientation
 BChannelSlider::Orientation() const
 {
-	return _m_vertical ? B_VERTICAL : B_HORIZONTAL;
+	return fVertical ? B_VERTICAL : B_HORIZONTAL;
 }
 
 
@@ -88,7 +88,7 @@ BChannelSlider::SetOrientation(orientation _orientation)
 {
 	bool isVertical = _orientation == B_VERTICAL;
 	if (isVertical != Vertical()) {
-		_m_vertical = isVertical;
+		fVertical = isVertical;
 		Invalidate(Bounds());
 	}	
 }
@@ -331,9 +331,9 @@ BChannelSlider::ThumbFrameFor(int32 channel)
 	if (thumb != NULL) {
 		frame = thumb->Bounds();
 		if (Vertical())
-			frame.OffsetBy(0, _m_linefeed * 2);
+			frame.OffsetBy(0, fLineFeed * 2);
 		else
-			frame.OffsetBy(_m_linefeed, _m_linefeed);
+			frame.OffsetBy(fLineFeed, fLineFeed);
 	}
 	
 	return frame;	
@@ -367,9 +367,9 @@ BChannelSlider::ThumbRangeFor(int32 channel)
 	BRect bounds = Bounds();
 	BRect frame = ThumbFrameFor(channel);
 	if (Vertical())
-		range = bounds.Height() - frame.Height() - _m_linefeed * 4;
+		range = bounds.Height() - frame.Height() - fLineFeed * 4;
 	else
-		range = bounds.Width() - frame.Width() - _m_linefeed * 2;
+		range = bounds.Width() - frame.Width() - fLineFeed * 2;
 	
 	return range; 
 }
@@ -380,13 +380,13 @@ BChannelSlider::InitData()
 {
 	UpdateFontDimens();
 	
-	_m_left_knob = NULL;
-	_m_mid_knob = NULL;
-	_m_right_knob = NULL;
-	_m_backing = NULL;
-	_m_backing_view = NULL;
-	_m_vertical = Bounds().Width() / Bounds().Height() < 1;
-	_m_click_delta = B_ORIGIN;
+	fLeftKnob = NULL;
+	fMidKnob = NULL;
+	fRightKnob = NULL;
+	fBacking = NULL;
+	fBackingView = NULL;
+	fVertical = Bounds().Width() / Bounds().Height() < 1;
+	fClickDelta = B_ORIGIN;
 	
 	fCurrentChannel = -1;
 	fAllChannels = false;
@@ -428,8 +428,8 @@ BChannelSlider::UpdateFontDimens()
 {
 	font_height height;
 	GetFontHeight(&height);
-	_m_baseline = height.ascent + height.leading;
-	_m_linefeed = _m_baseline + height.descent;
+	fBaseLine = height.ascent + height.leading;
+	fLineFeed = fBaseLine + height.descent;
 }
 
 
@@ -448,7 +448,7 @@ BChannelSlider::DrawThumbFrame(BView *where, const BRect &area)
 bool
 BChannelSlider::Vertical()
 {
-	return _m_vertical;
+	return fVertical;
 }
 
 

@@ -180,14 +180,17 @@ protected:
 
 private:
 
-		int32 _m_channel_count;
-		int32 _m_value_channel;
-		int32 * _m_channel_min;
-		int32 * _m_channel_max;
-		int32 * _m_channel_val;
-		BString _m_min_label;
-		BString _m_max_label;
-		void * _m_multi_labels;
+		int32 fChannelCount;
+		int32 fCurrentChannel;
+		int32 * fChannelMin;
+		int32 * fChannelMax;
+		int32 * fChannelValues;
+		
+		BString fMinLabel;
+		BString fMaxLabel;
+		
+		void * fMultiLabels;
+		
 		BMessage * fModificationMsg;
 		
 		uint32 _reserved_[15];
@@ -200,17 +203,17 @@ private:
 
 inline int32 * const & BChannelControl::MinLimitList() const
 {
-	return _m_channel_min;
+	return fChannelMin;
 }
 
 inline int32 * const & BChannelControl::MaxLimitList() const
 {
-	return _m_channel_max;
+	return fChannelMax;
 }
 
 inline int32 * const & BChannelControl::ValueList() const
 {
-	return _m_channel_val;
+	return fChannelValues;
 }
 
 
