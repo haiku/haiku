@@ -256,7 +256,7 @@ void send_probe    (int, int, int, struct sockaddr_in *);
 int packet_ok      (u_char *, int, struct sockaddr_in *, int, int);
 void print         (u_char *, int, struct sockaddr_in *);
 char *inetname     (struct in_addr);
-u_short in_cksum   (uint16 *, int);
+u_short compute_in_cksum   (uint16 *, int);
 void usage         (void);
 
 int s;				/* receive (icmp) socket file descriptor */
@@ -794,7 +794,7 @@ send_probe(seq, ttl, iflag, to)
 
 	if (proto == IPPROTO_ICMP && icmp_type == ICMP_ECHO) {
 		icmpp->icmp_cksum = 0;
-		icmpp->icmp_cksum = in_cksum((u_short *)icmpp,
+		icmpp->icmp_cksum = compute_in_cksum((u_short *)icmpp,
 					datalen - sizeof(struct ip) - lsrrlen);
 		if (icmpp->icmp_cksum == 0) icmpp->icmp_cksum = 0xffff;
 	}
@@ -949,7 +949,7 @@ print(buf, cc, from)
  * Checksum routine for Internet Protocol family headers (C Version)
  */
 u_short
-in_cksum(addr, len)
+compute_in_cksum(addr, len)
 	u_short *addr;
 	int len;
 {
