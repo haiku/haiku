@@ -366,6 +366,8 @@ typedef enum cpu_types {
 	B_CPU_INTEL_CELERON					= 0x1066,
 	B_CPU_INTEL_PENTIUM_III				= 0x1067,
 	B_CPU_INTEL_PENTIUM_III_MODEL_8		= 0x1068,
+	B_CPU_INTEL_PENTIUM_IV				= 0x10f0,
+	B_CPU_INTEL_PENTIUM_IV_MODEL2,
 
 	/* AMD */
 	B_CPU_AMD_X86						= 0x1100,
@@ -379,6 +381,7 @@ typedef enum cpu_types {
 	B_CPU_AMD_K6_2						= 0x1158,
 	B_CPU_AMD_K6_MODEL9					= 0x1159,
 	B_CPU_AMD_K6_III					= 0x1159,
+	B_CPU_AMD_K6_III_MODEL2				= 0x115D,
 
 	B_CPU_AMD_ATHLON_MODEL1				= 0x1161,
 	B_CPU_AMD_ATHLON_MODEL2 			= 0x1162,
@@ -404,7 +407,7 @@ typedef enum cpu_types {
 	B_CPU_RISE_mP6						= 0x1450,
 
 	B_CPU_NATIONAL_X86					= 0x1500,
-	B_CPU_NATIONAL_GEODE_GX1				= 0x1554,
+	B_CPU_NATIONAL_GEODE_GX1			= 0x1554,
 
 	/* For compatibility */
 	B_CPU_AMD_29K						= 14,
