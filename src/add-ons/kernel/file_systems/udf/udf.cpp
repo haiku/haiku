@@ -303,9 +303,9 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 				deviceSize = stat.st_size / 2048;
 			}
 		}
+		// Close the device
+		close(device);
 	}
-
-
 	
 	// Create and mount the volume
 	if (!error) {
@@ -331,6 +331,8 @@ int
 udf_unmount(void *ns)
 {
 	DEBUG_INIT(NULL);
+	Udf::Volume *volume = reinterpret_cast<Udf::Volume*>(ns);
+	delete volume;
 	RETURN(B_OK);	
 }
 
