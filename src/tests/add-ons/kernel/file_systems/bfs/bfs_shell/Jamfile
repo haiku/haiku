@@ -1,32 +1,45 @@
 SubDir OBOS_TOP src tests add-ons kernel file_systems bfs bfs_shell ;
 
+include [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell
+				   FSShellRules ] ;
+
+local bfsSourceDir = [ FDirName $(OBOS_TOP) src tests add-ons kernel
+								file_systems bfs r5 ] ;
+
+local oldSubDirHdrs = $(SUBDIRHDRS) ;
+
+
+# Compile additional_commands.c with the same environment as the fs_shell. That
+# is all BeOS headers, but the platform POSIX and STL headers.
+
 SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ;
-SubDirHdrs $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ;
-
-# Same as SetupIncludes, but doesn't include the posix headers.
-rule SetupFSShellIncludes
-{
-	# XXX add "opengl" later
-	local os_includes = add-ons add-ons/file_system add-ons/graphics add-ons/input_server add-ons/screen_saver add-ons/tracker app device drivers game interface kernel media mail midi midi2 net storage support translation ;
-
-	# Overwrite any exiting content when changing HDRS. This rule may be invoked multiple times.
-
-	# Use headers directory, to allow to do things like include <posix/string.h>
-	HDRS = [ FDirName $(OBOS_TOP) headers ] ;
-
-	# Use public OS header directories
-	HDRS += [ PublicHeaders $(os_includes) ] ;
-
-	# Use the root of the private headers -- not so nice, but simplifies things.
-	HDRS += [ PrivateHeaders $(DOT) ] ;
-
-	# The platform dependent headers.
-	HDRS += $(PLATFORM_HEADERS) ;
-}
+SubDirHdrs $(bfsSourceDir) ;
 
 SetupFSShellIncludes ;
 
+local oldCCFLAGS = $(CCFLAGS) ;
+local oldC++FLAGS = $(C++FLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -nostdinc ] ;
+C++FLAGS = [ Filter $(C++FLAGS) : -nostdinc ] ;
+
+Objects [ FGristFiles additional_commands.c ] ;
+
+ObjectsDefines [ FGristFiles additional_commands.c ] : _NO_INLINE_ASM ;
+
+# Reset CCFLAGS and C++FLAGS to original values.
+CCFLAGS = $(oldCCFLAGS) ;
+C++FLAGS = $(oldC++FLAGS) ;
+
+
+# Reset the environment for the FS add-on sources. We build using all BFS
+# headers, including the POSIX and STL headers.
+
+SUBDIRHDRS = $(oldSubDirHdrs) ;
+
+SubDirHdrs $(bfsSourceDir) ;
 UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
+
+SetupIncludes ;
 
 {
 	# set CHECK_MALLOC to something when doing tests against memory corruption
@@ -42,39 +55,28 @@ UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 		USED_IN_FS_SHELL NO_FILE_UNCACHED_IO
 		UNSAFE_GET_VNODE
 		#BFS_BIG_ENDIAN_ONLY
-		$(malloc_debug_defines) ] ;
-	SubDirCcFlags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
-	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) -include [ FDirName $(SUBDIR) Debug.h ] ;
+		$(malloc_debug_defines)
+		build_platform_fstat=fs_shell_fstat
+	] ;
+	SubDirCcFlags $(defines) $(malloc_debug_flags) ;
+	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags)
+		-include [ FDirName $(SUBDIR) Debug.h ] ;
 }
 
-local fsShellSources = 
-	fsh.cpp rootfs.c initfs.c kernel.c cache.c external_commands.cpp sl.c
-	stub.c tracker.cpp sysdep.c hexdump.c argv.c
-;
-
 BuildPlatformMain bfs_shell :
-	$(fsShellSources)
-
 	Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 	BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
-	Debug.cpp kernel_cpp.cpp
+	Debug.cpp
 
-	additional_commands.c
+	[ FGristFiles additional_commands$(SUFOBJ) ]
 
 	: false # don't reset header search dirs
 ;
+LinkSharedOSLibs bfs_shell : libfs_shell.a $(C++_SUPPORT_LIBS) ;
 
 # Tell Jam where to find these sources
 SEARCH on [ FGristFiles
 		Volume.cpp BPlusTree.cpp Inode.cpp Index.cpp Query.cpp Journal.cpp
 		BlockAllocator.cpp kernel_interface_r5.cpp Utility.cpp BufferPool.cpp
 		Debug.cpp cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems bfs r5 ] ;
-
-SEARCH on [ FGristFiles
-		kernel_cpp.cpp
-	] = [ FDirName $(OBOS_TOP) src kernel core util ] ;
-
-SEARCH on [ FGristFiles
-		$(fsShellSources)
-	] = [ FDirName $(OBOS_TOP) src tests add-ons kernel file_systems fs_shell ] ;
+	] = $(bfsSourceDir) ;
