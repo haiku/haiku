@@ -69,6 +69,7 @@ SharedLibrary storage :
 	Database.cpp
 	InstalledTypes.cpp
 	Supertype.cpp
+	SupportingApps.cpp
 	database_access.cpp
 	database_support.cpp
 ;
