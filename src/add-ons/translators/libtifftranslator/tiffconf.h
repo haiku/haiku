@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiffconf.h,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiffconf.h,v 1.2 2003/07/20 14:34:15 mwilber Exp $ */
 /*
  * Copyright (c) 1988-1997 Sam Leffler
  * Copyright (c) 1991-1997 Silicon Graphics, Inc.
@@ -26,7 +26,7 @@
 #ifndef _TIFFCONF_
 #define	_TIFFCONF_
 
-#include <ByteOrder.h>
+#include <endian.h>
 
 /*
  * Library Configuration Definitions.
@@ -64,7 +64,7 @@
 #define	HOST_FILLORDER	FILLORDER_MSB2LSB
 #endif
 #ifndef	HOST_BIGENDIAN
-#define	HOST_BIGENDIAN	B_HOST_IS_BENDIAN
+#define	HOST_BIGENDIAN	BIG_ENDIAN
 #endif
 
 #ifndef USE_64BIT_API
