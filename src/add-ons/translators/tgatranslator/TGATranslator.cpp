@@ -99,10 +99,15 @@ translation_format gOutputFormats[] = {
 BTranslator *
 make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 {
+	BTranslator *ptranslator = NULL;
+	
 	if (!n)
-		return new TGATranslator();
-	else
-		return NULL;
+		ptranslator = new TGATranslator();
+		
+	printf("n: %d you: %d NULL?: %c\n",
+		n, (int) you, (ptranslator) ? 'Y' : 'N');
+		
+	return ptranslator;
 }
 
 // ---------------------------------------------------------------
@@ -122,6 +127,10 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 TGATranslator::TGATranslator()
 	:	BTranslator()
 {
+	fpsettings = new TGATranslatorSettings;
+	fpsettings->LoadSettings();
+		// load settings from the TGA Translator settings file
+
 	strcpy(fName, "TGA Images");
 	sprintf(fInfo, "TGA image translator v%d.%d.%d %s\n",
 		TGA_TRANSLATOR_VERSION / 100, (TGA_TRANSLATOR_VERSION / 10) % 10,
@@ -141,8 +150,12 @@ TGATranslator::TGATranslator()
 //
 // Returns:
 // ---------------------------------------------------------------
+//
+// NOTE: It may be the case, that under Be's libtranslation.so,
+// that this destructor will never be called
 TGATranslator::~TGATranslator()
 {
+	fpsettings->Release();
 }
 
 // ---------------------------------------------------------------
@@ -621,20 +634,8 @@ TGATranslator::Identify(BPositionIO *inSource,
 		return B_NO_TRANSLATOR;
 		
 	// Read settings from ioExtension
-	bool bheaderonly = false, bdataonly = false;
-	if (ioExtension) {
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
-			// if failed, make sure bool is default value
-			bheaderonly = false;
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
-			// if failed, make sure bool is default value
-			bdataonly = false;
-			
-		if (bheaderonly && bdataonly)
-			// can't both "only write the header" and "only write the data"
-			// at the same time
-			return B_BAD_VALUE;
-	}
+	if (ioExtension && fpsettings->LoadSettings(ioExtension) != B_OK)
+		return B_BAD_VALUE;
 	
 	uint32 n32ch;
 	memcpy(&n32ch, ch, sizeof(uint32));
@@ -643,6 +644,7 @@ TGATranslator::Identify(BPositionIO *inSource,
 		return identify_bits_header(inSource, outInfo, 4, ch);
 	// if NOT B_TRANSLATOR_BITMAP, it could be
 	// an image in the TGA format
+	// (The TGA format does not have a magic number at the head of the file)
 	else
 		return identify_tga_header(inSource, outInfo, 4, ch);
 }
@@ -1062,7 +1064,7 @@ translate_from_bits_to_tgatc(BPositionIO *inSource,
 	uint8 tgaBytesPerPixel = (imagespec.depth / 8) +
 		((imagespec.depth % 8) ? 1 : 0);
 	int32 tgaRowBytes = (imagespec.width * tgaBytesPerPixel) +
-		(imagespec.width / 128) + ((imagespec.width % 128) ? 1 : 0);
+		(imagespec.width / 2);
 	uint32 tgapixrow = 0;
 	uint8 *tgaRowData = new uint8[tgaRowBytes];
 	if (!tgaRowData)
@@ -1139,7 +1141,7 @@ translate_from_bits1_to_tgabw(BPositionIO *inSource,
 {
 	uint8 tgaBytesPerPixel = 1;
 	int32 tgaRowBytes = (imagespec.width * tgaBytesPerPixel) +
-		(imagespec.width / 128) + ((imagespec.width % 128) ? 1 : 0);
+		(imagespec.width / 2);
 	uint32 tgapixrow = 0;
 	uint8 *tgaRowData = new uint8[tgaRowBytes];
 	if (!tgaRowData)
@@ -1355,10 +1357,14 @@ write_tga_footer(BPositionIO *outDestination)
 // ---------------------------------------------------------------
 status_t
 translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
-	bool bheaderonly, bool bdataonly, bool brle, uint32 outType,
+	TGATranslatorSettings &settings, uint32 outType,
 	BPositionIO *outDestination)
 {
 	TranslatorBitmap bitsHeader;
+	bool bheaderonly, bdataonly, brle;
+	bheaderonly = settings.SetGetHeaderOnly();
+	bdataonly = settings.SetGetDataOnly();
+	brle = settings.SetGetRLE();
 		
 	status_t result;
 	result = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
@@ -2206,12 +2212,15 @@ translate_from_tgamrle_to_bits(BPositionIO *inSource,
 // ---------------------------------------------------------------
 status_t
 translate_from_tga(BPositionIO *inSource, ssize_t amtread, uint8 *read,
-	bool bheaderonly, bool bdataonly, bool brle, uint32 outType,
+	TGATranslatorSettings &settings, uint32 outType,
 	BPositionIO *outDestination)
 {
 	TGAFileHeader fileheader;
 	TGAColorMapSpec mapspec;
 	TGAImageSpec imagespec;
+	bool bheaderonly, bdataonly;
+	bheaderonly = settings.SetGetHeaderOnly();
+	bdataonly = settings.SetGetDataOnly();
 
 	status_t result;
 	result = identify_tga_header(inSource, NULL, amtread, read,
@@ -2387,32 +2396,27 @@ TGATranslator::Translate(BPositionIO *inSource,
 		return B_NO_TRANSLATOR;
 		
 	// Read settings from ioExtension
-	bool bheaderonly = false, bdataonly = false, brle = true;
-	if (ioExtension) {
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_HEADER_ONLY, &bheaderonly))
-			// if failed, make sure bool is default value
-			bheaderonly = false;
-		if (ioExtension->FindBool(B_TRANSLATOR_EXT_DATA_ONLY, &bdataonly))
-			// if failed, make sure bool is default value
-			bdataonly = false;
-			
-		if (bheaderonly && bdataonly)
-			// can't both "only write the header" and "only write the data"
-			// at the same time
-			return B_BAD_VALUE;
-	}
+	if (ioExtension && fpsettings->LoadSettings(ioExtension) != B_OK)
+		return B_BAD_VALUE;
 	
 	uint32 n32ch;
 	memcpy(&n32ch, ch, sizeof(uint32));
 	// if B_TRANSLATOR_BITMAP type	
 	if (n32ch == nbits)
-		return translate_from_bits(inSource, 4, ch, bheaderonly, bdataonly,
-			brle, outType, outDestination);
+		return translate_from_bits(inSource, 4, ch, *fpsettings,
+			outType, outDestination);
 	// If NOT B_TRANSLATOR_BITMAP type, 
 	// it could be the TGA format
+	// (The TGA format does not have a magic number at the head of the file)
 	else
-		return translate_from_tga(inSource, 4, ch, bheaderonly, bdataonly,
-			brle, outType, outDestination);
+		return translate_from_tga(inSource, 4, ch, *fpsettings,
+			outType, outDestination);
+}
+
+status_t
+TGATranslator::GetConfigurationMessage(BMessage *ioExtension)
+{
+	return fpsettings->GetConfigurationMessage(ioExtension);
 }
 
 // ---------------------------------------------------------------
@@ -2442,11 +2446,20 @@ TGATranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
 {
 	if (!outView || !outExtent)
 		return B_BAD_VALUE;
+	if (ioExtension && fpsettings->LoadSettings(ioExtension) != B_OK)
+		return B_BAD_VALUE;
 
 	TGAView *view = new TGAView(BRect(0, 0, 225, 175),
-		"TGATranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW);
+		"TGATranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW,
+		AcquireSettings());
 	*outView = view;
 	*outExtent = view->Bounds();
 
 	return B_OK;
+}
+
+TGATranslatorSettings *
+TGATranslator::AcquireSettings()
+{
+	return fpsettings->Acquire();
 }
