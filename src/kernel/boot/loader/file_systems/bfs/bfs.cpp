@@ -10,6 +10,7 @@
 #include <boot/partitions.h>
 #include <boot/platform.h>
 #include <boot/vfs.h>
+#include <util/kernel_cpp.h>
 
 #include <fcntl.h>
 #include <unistd.h>

@@ -6,6 +6,8 @@
 
 #include "File.h"
 
+#include <util/kernel_cpp.h>
+
 
 namespace BFS {
 

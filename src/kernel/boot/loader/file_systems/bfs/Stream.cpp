@@ -9,6 +9,8 @@
 #include "Directory.h"
 #include "File.h"
 
+#include <util/kernel_cpp.h>
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
