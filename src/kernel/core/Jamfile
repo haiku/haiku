@@ -8,7 +8,6 @@ KernelMergeObject kernel_core.o :
 	<$(SOURCE_GRIST)>driver_settings.c
 	<$(SOURCE_GRIST)>elf.c 
 	<$(SOURCE_GRIST)>faults.c
-	<$(SOURCE_GRIST)>fd.c
 	<$(SOURCE_GRIST)>gdb.c 
 	<$(SOURCE_GRIST)>heap.c 
 	<$(SOURCE_GRIST)>image.c 
