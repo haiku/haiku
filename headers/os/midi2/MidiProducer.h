@@ -7,6 +7,8 @@
 
 class BList;
 
+namespace BPrivate { class BMidiRosterLooper; }
+
 class BMidiProducer : public BMidiEndpoint
 {
 public:
@@ -20,7 +22,7 @@ private:
 
 	friend class BMidiLocalProducer;
 	friend class BMidiRoster;
-	friend class BMidiRosterLooper;
+	friend class BPrivate::BMidiRosterLooper;
 	
 	BMidiProducer(const char* name = NULL);	
 	virtual ~BMidiProducer();

@@ -22,6 +22,12 @@ enum BMidiOp
 class BMidiProducer;
 class BMidiConsumer;
 
+namespace BPrivate
+{
+	class BMidiRosterLooper;
+	struct BMidiRosterKiller;
+}
+
 class BMidiRoster
 {
 public:
@@ -49,8 +55,8 @@ private:
 	friend class BMidiLocalProducer;
 	friend class BMidiLocalConsumer;
 	friend class BMidiProducer;
-	friend class BMidiRosterKiller;
-	friend class BMidiRosterLooper;
+	friend class BPrivate::BMidiRosterLooper;
+	friend struct BPrivate::BMidiRosterKiller;
 
 	BMidiRoster();
 	virtual ~BMidiRoster();
@@ -69,7 +75,7 @@ private:
 
 	status_t SendRequest(BMessage*, BMessage*);
 
-	BMidiRosterLooper* looper;
+	BPrivate::BMidiRosterLooper* looper;
 	BMessenger* server;
 
 	uint32 _reserved[16];

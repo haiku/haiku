@@ -4,6 +4,8 @@
 
 #include <MidiEndpoint.h>
 
+namespace BPrivate { class BMidiRosterLooper; }
+
 class BMidiConsumer : public BMidiEndpoint
 {
 public:
@@ -15,7 +17,7 @@ private:
 	friend class BMidiLocalConsumer;
 	friend class BMidiLocalProducer;
 	friend class BMidiRoster;
-	friend class BMidiRosterLooper;
+	friend class BPrivate::BMidiRosterLooper;
 	
 	BMidiConsumer(const char* name = NULL);	
 	virtual ~BMidiConsumer();

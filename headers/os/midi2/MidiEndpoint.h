@@ -10,6 +10,8 @@
 class BMidiProducer;
 class BMidiConsumer;
 
+namespace BPrivate { class BMidiRosterLooper; }
+
 class BMidiEndpoint 
 {
 public:
@@ -42,7 +44,7 @@ private:
 	friend class BMidiLocalProducer;
 	friend class BMidiProducer;
 	friend class BMidiRoster;
-	friend class BMidiRosterLooper;
+	friend class BPrivate::BMidiRosterLooper;
 	
 	BMidiEndpoint(const char* name);
 	virtual	~BMidiEndpoint();
