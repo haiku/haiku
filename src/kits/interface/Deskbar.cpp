@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Deskbar.cpp
-//	Author:			Jeremy Rand (jrand@magma.ca)
+//	Author:			Jeremy Rand (jrand@magma.ca), Jérôme Duval
 //	Description:	BDeskbar allows one to control the deskbar from an
 //                  application.
 //------------------------------------------------------------------------------
@@ -35,6 +35,7 @@
 #include <View.h>
 #include <Rect.h>
 #include <InterfaceDefs.h>
+#include <Node.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -309,6 +310,18 @@ status_t BDeskbar::AddItem(entry_ref *addon, int32 *id)
 		if ((result == B_OK) &&
 		    (id != NULL)) {
 			result = replyMessage.FindInt32("id", id);
+			
+		/* NOTE: I add this because the persistent state of the item
+			is not set by the Deskbar itself and it needs to be done somewhere.
+			In fact, telling the Deskbar about the addon ref is not enough and
+			adding this attribute is mandatory.
+			!! Deskbar seems to remove the attribute in RemoveItem though !!
+		*/
+			if (result == B_OK) {			
+				BNode node(addon);
+				node.WriteAttr("be:deskbar_item_status", 
+					B_STRING_TYPE, 0, "enabled", strlen("enabled"));
+			}
 		}
 	}
 	return(result);
