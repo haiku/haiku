@@ -9,6 +9,7 @@ all: rc librdef.so
 
 parser.cpp: parser.y
 	bison -d -o$@ $^
+	mv parser.cpp.h parser.hpp
 
 lexer.cpp: lexer.l parser.cpp
 	flex -o$@ lexer.l
@@ -22,7 +23,7 @@ rc: rc.cpp librdef.so
 	mimeset -f $@
 
 clean:
-	rm -f *.o rc librdef.so lexer.cpp parser.cpp parser.cpp.h
+	rm -f *.o rc librdef.so lexer.cpp parser.cpp parser.hpp
 
 install:
 	cp rc ~/config/bin
