@@ -27,6 +27,7 @@
 // Private includes
 #include <net_stack_driver.h>
 #include <userland_ipc.h>
+#include <sys/sockio.h>
 
 /* these are missing from KernelExport.h ... */
 #define  B_SELECT_READ       1 
@@ -681,17 +682,13 @@ set_command_areas(net_command *command)
 			get_area_from_address(&command->area[4], args->u.sysctl.newp);
 			break;
 
-/*
-	TODO/FIXME: phoudoin: where are these opcodes defined!?!
 		case OSIOCGIFCONF:
-		case SIOCGIFCONF:
-		{
-			struct ifconf *ifc = data;
+		case SIOCGIFCONF: {
+			struct ifconf *ifc = (void *) args;
 
-			get_area_from_address(&command->area[1],ifc->ifc_buf);
+			get_area_from_address(&command->area[1], ifc->ifc_buf);
 			break;
 		}
-*/
 	}	
 }
 
