@@ -421,6 +421,12 @@ logical_block_address::dump() const
 	PRINT(("partition: %d\n", partition()));
 }
 
+logical_block_address::logical_block_address(uint16 partition, uint32 block)
+{
+	set_partition(partition);
+	set_block(block);
+}
+
 long_address::long_address(uint16 partition, uint32 block, uint32 length,
 	                       uint8 type)
 {
@@ -891,4 +897,82 @@ icb_header::dump() const
 	PRINT(("icb_tag:\n"));
 	DUMP(icb_tag());
 	
+}
+
+void
+file_icb_entry::dump() const
+{
+	DUMP_INIT("file_icb_entry");
+
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("icb_tag:\n"));
+	DUMP(icb_tag());
+	
+	PRINT(("uid:                       %lu, 0x%lx\n", uid(), uid()));
+	PRINT(("gid:                       %lu, 0x%lx\n", gid(), gid()));
+	PRINT(("permissions:               %ld, 0x%lx\n", permissions(), permissions()));
+	PRINT(("file_link_count:           %d\n", file_link_count()));
+	PRINT(("record_format:             %d\n", record_format()));
+	PRINT(("record_display_attributes: %d\n", record_display_attributes()));
+	PRINT(("record_length:             %d\n", record_length()));
+	PRINT(("information_length:        %Ld\n", information_length()));
+	PRINT(("logical_blocks_recorded:   %Ld\n", logical_blocks_recorded()));
+	PRINT(("access_date_and_time:\n"));
+	DUMP(access_date_and_time());
+	PRINT(("modification_date_and_time:\n"));
+	DUMP(modification_date_and_time());
+	PRINT(("attribute_date_and_time:\n"));
+	DUMP(attribute_date_and_time());
+	PRINT(("checkpoint:                %ld\n", checkpoint()));
+	
+	PRINT(("extended_attribute_icb:\n"));
+	DUMP(extended_attribute_icb());
+	PRINT(("implementation_id:\n"));
+	DUMP(implementation_id());
+
+	PRINT(("unique_id: %Ld\n", unique_id()));
+	PRINT(("extended_attributes_length:    %ld\n", extended_attributes_length()));
+	PRINT(("allocation_descriptors_length: %ld\n", allocation_descriptors_length()));
+}
+
+void
+extended_file_icb_entry::dump() const
+{
+	DUMP_INIT("extended_file_icb_entry");
+
+	PRINT(("tag:\n"));
+	DUMP(tag());
+	PRINT(("icb_tag:\n"));
+	DUMP(icb_tag());
+	
+	PRINT(("uid:                       %lu, 0x%lx\n", uid(), uid()));
+	PRINT(("gid:                       %lu, 0x%lx\n", gid(), gid()));
+	PRINT(("permissions:               %ld, 0x%lx\n", permissions(), permissions()));
+	PRINT(("file_link_count:           %d\n", file_link_count()));
+	PRINT(("record_format:             %d\n", record_format()));
+	PRINT(("record_display_attributes: %d\n", record_display_attributes()));
+	PRINT(("record_length:             %d\n", record_length()));
+	PRINT(("information_length:        %Ld\n", information_length()));
+	PRINT(("logical_blocks_recorded:   %Ld\n", logical_blocks_recorded()));
+	PRINT(("access_date_and_time:\n"));
+	DUMP(access_date_and_time());
+	PRINT(("modification_date_and_time:\n"));
+	DUMP(modification_date_and_time());
+	PRINT(("creation_date_and_time:\n"));
+	DUMP(creation_date_and_time());
+	PRINT(("attribute_date_and_time:\n"));
+	DUMP(attribute_date_and_time());
+	PRINT(("checkpoint:                %ld\n", checkpoint()));
+	
+	PRINT(("extended_attribute_icb:\n"));
+	DUMP(extended_attribute_icb());
+	PRINT(("stream_directory_icb:\n"));
+	DUMP(stream_directory_icb());
+	PRINT(("implementation_id:\n"));
+	DUMP(implementation_id());
+
+	PRINT(("unique_id: %Ld\n", unique_id()));
+	PRINT(("extended_attributes_length:    %ld\n", extended_attributes_length()));
+	PRINT(("allocation_descriptors_length: %ld\n", allocation_descriptors_length()));
 }

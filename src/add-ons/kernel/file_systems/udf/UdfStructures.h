@@ -361,6 +361,7 @@ private:
 struct logical_block_address {
 public:
 	void dump() const;
+	logical_block_address(uint16 partition = 0, uint32 block = 0);
 
 	uint32 block() const { return B_LENDIAN_TO_HOST_INT32(_block); }
 	uint16 partition() const { return B_LENDIAN_TO_HOST_INT16(_partition); }
@@ -1627,6 +1628,15 @@ enum icb_descriptor_types {
 	ICB_DESCRIPTOR_TYPE_EMBEDDED,
 };
 
+/*!	\brief idb_entry_tag::strategy_type() values
+
+	See also UDF-2.50 2.3.5.1
+*/
+enum icb_strategy_types {
+	ICB_STRATEGY_SINGLE = 4,
+	ICB_STRATEGY_LINKED_LIST = 4096
+};
+
 /*! \brief ICB entry tag
 
 	Common tag found in all ICB entries (in addition to, and immediately following,
@@ -1635,7 +1645,7 @@ enum icb_descriptor_types {
 	See also: ECMA-167 4/14.6, UDF-2.01 2.3.5
 */
 struct icb_entry_tag {
-private:
+public:
 	union flags_accessor {
 		uint16 all_flags;
 		struct {
@@ -1665,11 +1675,13 @@ public:
 	const array<uint8, 2>& strategy_parameters() const { return _strategy_parameters; }
 
 	uint16 entry_count() const { return B_LENDIAN_TO_HOST_INT16(_entry_count); }
+	uint8& reserved() { return _reserved; }
 	uint8 file_type() const { return _file_type; }
 	logical_block_address& parent_icb_location() { return _parent_icb_location; }
 	const logical_block_address& parent_icb_location() const { return _parent_icb_location; }
 
 	uint16 flags() const { return B_LENDIAN_TO_HOST_INT16(_flags); }
+	flags_accessor& flags_access() { return *reinterpret_cast<flags_accessor*>(&_flags); }
 	
 	// flags accessor functions
 	uint8 descriptor_flags() const {
@@ -1677,6 +1689,12 @@ public:
 		f.all_flags = flags();
 		return f.flags.descriptor_flags;
 	}
+/*	void set_descriptor_flags(uint8 value) {
+		flags_accessor f;
+		f.all_flags = flags();
+		f.flags.descriptor_flags = value;
+		set_flags
+*/		
 	
 	void set_prior_recorded_number_of_direct_entries(uint32 entries) { _prior_recorded_number_of_direct_entries = B_LENDIAN_TO_HOST_INT32(entries); }
 	void set_strategy_type(uint16 type) { _strategy_type = B_HOST_TO_LENDIAN_INT16(type); }
@@ -1734,6 +1752,23 @@ struct terminal_icb_entry {
 	icb_entry_tag icb_tag;
 } __attribute__((packed));
 
+enum permissions {
+	OTHER_EXECUTE	 	= 0x0001,
+	OTHER_WRITE			= 0x0002,
+	OTHER_READ			= 0x0004,
+	OTHER_ATTRIBUTES	= 0x0008,
+	OTHER_DELETE		= 0x0010,
+	GROUP_EXECUTE	 	= 0x0020,
+	GROUP_WRITE			= 0x0040,
+	GROUP_READ			= 0x0080,
+	GROUP_ATTRIBUTES	= 0x0100,
+	GROUP_DELETE		= 0x0200,
+	USER_EXECUTE	 	= 0x0400,
+	USER_WRITE			= 0x0800,
+	USER_READ			= 0x1000,
+	USER_ATTRIBUTES		= 0x2000,
+	USER_DELETE			= 0x4000,
+};
 
 /*! \brief File ICB entry
 
@@ -1742,6 +1777,8 @@ struct terminal_icb_entry {
 	\todo Check pointer math.
 */
 struct file_icb_entry {
+	void dump() const;
+
 	// get functions
 	descriptor_tag & tag() { return _tag; }
 	const descriptor_tag & tag() const { return _tag; }
@@ -1749,15 +1786,15 @@ struct file_icb_entry {
 	icb_entry_tag& icb_tag() { return _icb_tag; }
 	const icb_entry_tag& icb_tag() const { return _icb_tag; }
 	
-	uint32 uid() { return B_LENDIAN_TO_HOST_INT32(_uid); }
-	uint32 gid() { return B_LENDIAN_TO_HOST_INT32(_gid); }
-	uint32 permissions() { return B_LENDIAN_TO_HOST_INT32(_permissions); }
-	uint16 file_link_count() { return B_LENDIAN_TO_HOST_INT16(_file_link_count); }
-	uint8 record_format() { return _record_format; }
-	uint8 record_display_attributes() { return _record_display_attributes; }
-	uint8 record_length() { return _record_length; }
-	uint64 information_length() { return B_LENDIAN_TO_HOST_INT64(_information_length); }
-	uint64 logical_blocks_recorded() { return B_LENDIAN_TO_HOST_INT64(_logical_blocks_recorded); }
+	uint32 uid() const { return B_LENDIAN_TO_HOST_INT32(_uid); }
+	uint32 gid() const { return B_LENDIAN_TO_HOST_INT32(_gid); }
+	uint32 permissions() const { return B_LENDIAN_TO_HOST_INT32(_permissions); }
+	uint16 file_link_count() const { return B_LENDIAN_TO_HOST_INT16(_file_link_count); }
+	uint8 record_format() const { return _record_format; }
+	uint8 record_display_attributes() const { return _record_display_attributes; }
+	uint8 record_length() const { return _record_length; }
+	uint64 information_length() const { return B_LENDIAN_TO_HOST_INT64(_information_length); }
+	uint64 logical_blocks_recorded() const { return B_LENDIAN_TO_HOST_INT64(_logical_blocks_recorded); }
 
 	timestamp& access_date_and_time() { return _access_date_and_time; }
 	const timestamp& access_date_and_time() const { return _access_date_and_time; }
@@ -1768,7 +1805,7 @@ struct file_icb_entry {
 	timestamp& attribute_date_and_time() { return _attribute_date_and_time; }
 	const timestamp& attribute_date_and_time() const { return _attribute_date_and_time; }
 
-	uint32 checkpoint() { return B_LENDIAN_TO_HOST_INT32(_checkpoint); }
+	uint32 checkpoint() const { return B_LENDIAN_TO_HOST_INT32(_checkpoint); }
 
 	long_address& extended_attribute_icb() { return _extended_attribute_icb; }
 	const long_address& extended_attribute_icb() const { return _extended_attribute_icb; }
@@ -1776,9 +1813,9 @@ struct file_icb_entry {
 	entity_id& implementation_id() { return _implementation_id; }
 	const entity_id& implementation_id() const { return _implementation_id; }
 
-	uint64 unique_id() { return B_LENDIAN_TO_HOST_INT64(_unique_id); }
-	uint32 extended_attributes_length() { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
-	uint32 allocation_descriptors_length() { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
+	uint64 unique_id() const { return B_LENDIAN_TO_HOST_INT64(_unique_id); }
+	uint32 extended_attributes_length() const { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
+	uint32 allocation_descriptors_length() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
 
 	uint8* extended_attributes() { return ((uint8*)(this))+sizeof(file_icb_entry); }
 	uint8* allocation_descriptors() { return ((uint8*)(this))+sizeof(file_icb_entry)+extended_attributes_length(); }
@@ -1850,6 +1887,8 @@ private:
 	\todo Check pointer math.
 */
 struct extended_file_icb_entry {
+	void dump() const;
+
 	// get functions
 	descriptor_tag & tag() { return _tag; }
 	const descriptor_tag & tag() const { return _tag; }
@@ -1857,15 +1896,15 @@ struct extended_file_icb_entry {
 	icb_entry_tag& icb_tag() { return _icb_tag; }
 	const icb_entry_tag& icb_tag() const { return _icb_tag; }
 	
-	uint32 uid() { return B_LENDIAN_TO_HOST_INT32(_uid); }
-	uint32 gid() { return B_LENDIAN_TO_HOST_INT32(_gid); }
-	uint32 permissions() { return B_LENDIAN_TO_HOST_INT32(_permissions); }
-	uint16 file_link_count() { return B_LENDIAN_TO_HOST_INT16(_file_link_count); }
-	uint8 record_format() { return _record_format; }
-	uint8 record_display_attributes() { return _record_display_attributes; }
-	uint8 record_length() { return _record_length; }
-	uint64 information_length() { return B_LENDIAN_TO_HOST_INT64(_information_length); }
-	uint64 logical_blocks_recorded() { return B_LENDIAN_TO_HOST_INT64(_logical_blocks_recorded); }
+	uint32 uid() const { return B_LENDIAN_TO_HOST_INT32(_uid); }
+	uint32 gid() const { return B_LENDIAN_TO_HOST_INT32(_gid); }
+	uint32 permissions() const { return B_LENDIAN_TO_HOST_INT32(_permissions); }
+	uint16 file_link_count() const { return B_LENDIAN_TO_HOST_INT16(_file_link_count); }
+	uint8 record_format() const { return _record_format; }
+	uint8 record_display_attributes() const { return _record_display_attributes; }
+	uint8 record_length() const { return _record_length; }
+	uint64 information_length() const { return B_LENDIAN_TO_HOST_INT64(_information_length); }
+	uint64 logical_blocks_recorded() const { return B_LENDIAN_TO_HOST_INT64(_logical_blocks_recorded); }
 
 	timestamp& access_date_and_time() { return _access_date_and_time; }
 	const timestamp& access_date_and_time() const { return _access_date_and_time; }
@@ -1873,20 +1912,26 @@ struct extended_file_icb_entry {
 	timestamp& modification_date_and_time() { return _modification_date_and_time; }
 	const timestamp& modification_date_and_time() const { return _modification_date_and_time; }
 
+	timestamp& creation_date_and_time() { return _creation_date_and_time; }
+	const timestamp& creation_date_and_time() const { return _creation_date_and_time; }
+
 	timestamp& attribute_date_and_time() { return _attribute_date_and_time; }
 	const timestamp& attribute_date_and_time() const { return _attribute_date_and_time; }
 
-	uint32 checkpoint() { return B_LENDIAN_TO_HOST_INT32(_checkpoint); }
+	uint32 checkpoint() const { return B_LENDIAN_TO_HOST_INT32(_checkpoint); }
 
 	long_address& extended_attribute_icb() { return _extended_attribute_icb; }
 	const long_address& extended_attribute_icb() const { return _extended_attribute_icb; }
 
+	long_address& stream_directory_icb() { return _stream_directory_icb; }
+	const long_address& stream_directory_icb() const { return _stream_directory_icb; }
+
 	entity_id& implementation_id() { return _implementation_id; }
 	const entity_id& implementation_id() const { return _implementation_id; }
 
-	uint64 unique_id() { return B_LENDIAN_TO_HOST_INT64(_unique_id); }
-	uint32 extended_attributes_length() { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
-	uint32 allocation_descriptors_length() { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
+	uint64 unique_id() const { return B_LENDIAN_TO_HOST_INT64(_unique_id); }
+	uint32 extended_attributes_length() const { return B_LENDIAN_TO_HOST_INT32(_extended_attributes_length); }
+	uint32 allocation_descriptors_length() const { return B_LENDIAN_TO_HOST_INT32(_allocation_descriptors_length); }
 
 	uint8* extended_attributes() { return (uint8*)(this+sizeof(*this)); }
 	uint8* allocation_descriptors() { return (uint8*)(this+sizeof(*this)+extended_attributes_length()); }
@@ -1905,6 +1950,7 @@ struct extended_file_icb_entry {
 	void set_logical_blocks_recorded(uint64 blocks) { _logical_blocks_recorded = B_HOST_TO_LENDIAN_INT64(blocks); }
 
 	void set_checkpoint(uint32 checkpoint) { _checkpoint = B_HOST_TO_LENDIAN_INT32(checkpoint); }
+	void set_reserved(uint32 reserved) { _reserved = B_HOST_TO_LENDIAN_INT32(reserved); }
 
 	void set_unique_id(uint64 id) { _unique_id = B_HOST_TO_LENDIAN_INT64(id); }
 
