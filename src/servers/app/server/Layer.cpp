@@ -51,7 +51,9 @@ Layer::Layer(BRect frame, const char *name, int32 token, int32 resize,
 	if(frame.IsValid())
 		_frame		= frame;
 	else
-		_frame.Set(0, 0, 5, 5);
+		_frame.Set(0.0f, 0.0f, 5.0f, 5.0f);
+
+	_boundsLeftTop.Set( 0.0f, 0.0f );
 
 	_name			= new BString(name);
 	// Layer does not start out as a part of the tree
@@ -118,7 +120,7 @@ Layer::~Layer(void)
 void Layer::AddChild(Layer *layer, Layer *before, bool rebuild)
 {
 	// TODO: Add before support
-printf("Layer::AddChild lacks before support\n");
+//printf("Layer::AddChild lacks before support\n");
 
 	if(layer->_parent!=NULL)
 	{
@@ -169,13 +171,11 @@ printf("Layer::AddChild lacks before support\n");
 */
 void Layer::RemoveChild(Layer *layer, bool rebuild)
 {
-	if(layer->_parent==NULL)
-	{
+	if(layer->_parent == NULL){
 		printf("ERROR: RemoveChild(): Layer doesn't have a _parent\n");
 		return;
 	}
-	if(layer->_parent!=this)
-	{
+	if(layer->_parent != this){
 		printf("ERROR: RemoveChild(): Layer is not a child of this layer\n");
 		return;
 	}
@@ -184,22 +184,32 @@ void Layer::RemoveChild(Layer *layer, bool rebuild)
 	{
 		BRegion		reg(ConvertToParent(_visible));
 		layer->_parent->_visible->Include(&reg);
+	//TODO: have a REVIEW of this code!!!!!!!!!!! the above 2 line are NOT good!
+	/*
+		* in _visible we should add layer->_visible if layer is not hidden
+		* in _invalid we should add layer->_visible if layer is not hidden
+		
+		* this is OK, Because, for the moment we include only what we need.
+			Later, RebuildRegions will not include layer->_frame into calculations
+			because layer was removed from the tree. (deleted - better said :-)
+	*/
 	}
 
 	// Take care of _parent
-	layer->_parent=NULL;
-	if(_topchild==layer)
-		_topchild=layer->_lowersibling;
-	if(_bottomchild==layer)
-		_bottomchild=layer->_uppersibling;
+	layer->_parent		= NULL;
+	if( _topchild == layer )
+		_topchild		= layer->_lowersibling;
+	if( _bottomchild == layer )
+		_bottomchild	= layer->_uppersibling;
 
 	// Take care of siblings
-	if(layer->_uppersibling!=NULL)
-		layer->_uppersibling->_lowersibling=layer->_lowersibling;
-	if(layer->_lowersibling!=NULL)
-		layer->_lowersibling->_uppersibling=layer->_uppersibling;
-	layer->_uppersibling=NULL;
-	layer->_lowersibling=NULL;
+	if( layer->_uppersibling != NULL )
+		layer->_uppersibling->_lowersibling	= layer->_lowersibling;
+	if( layer->_lowersibling != NULL )
+		layer->_lowersibling->_uppersibling = layer->_uppersibling;
+	layer->_uppersibling	= NULL;
+	layer->_lowersibling	= NULL;
+
 	if(rebuild)
 		RebuildRegions(true);
 }
@@ -271,7 +281,7 @@ Layer *Layer::GetChildAt(BPoint pt, bool recursive)
 */
 BRect Layer::Bounds(void)
 {
-	return _frame.OffsetToCopy(0,0);
+	return _frame.OffsetToCopy( _boundsLeftTop );
 }
 
 /*!
@@ -817,6 +827,49 @@ void Layer::PrintNode(void)
 		printf("Visible Areas: NULL\n");
 }
 
+//! Prints the tree structure starting from this layer
+void Layer::PrintTree(){
+
+	int32		spaces = 2;
+	Layer		*c = _topchild; //c = short for: current
+	printf( "'%s' - token: %ld\n", _name->String(), _view_token );
+	if( c != NULL )
+		while( true ){
+			// action block
+			{
+				for( int i = 0; i < spaces; i++)
+					printf(" ");
+				
+					printf( "'%s' - token: %ld\n", c->_name->String(), c->_view_token );
+			}
+
+				// go deep
+			if(	c->_topchild ){
+				c = c->_topchild;
+				spaces += 2;
+			}
+				// go right or up
+			else
+					// go right
+				if( c->_lowersibling ){
+					c = c->_lowersibling;
+				}
+					// go up
+				else{
+					while( !c->_parent->_lowersibling && c->_parent != this ){
+						c = c->_parent;
+						spaces -= 2;
+					}
+						// that enough! We've reached this view.
+					if( c->_parent == this )
+						break;
+						
+					c = c->_parent->_lowersibling;
+					spaces -= 2;
+				}
+		}
+}
+
 /*!
 	\brief Converts the rectangle to the layer's parent coordinates
 	\param the rectangle to convert
@@ -972,3 +1025,9 @@ void Layer::MakeBottomChild(void)
 	_parent->_bottomchild=this;
 	
 }
+/*
+ @log
+ 	* added initialization in contructor to (0.0, 0.0) for _boundsLeftTop member.
+ 	* modified Bounds() to use that member.
+ 	* some changes into RemoveChild()
+*/
