@@ -21,7 +21,7 @@ LinkSharedOSLibs <userland>bfs : libkernelland_emu.so ;
 # iso9660
 
 Addon <userland>iso9660 : userland disk_scanner fs :
-	iso9660.c
+	iso9660.cpp
 ;
 LinkSharedOSLibs <userland>iso9660 : libkernelland_emu.so ;
 
