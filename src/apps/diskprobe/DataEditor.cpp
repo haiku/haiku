@@ -684,9 +684,9 @@ DataEditor::Save()
 
 		ssize_t bytesWritten;
 		if (IsAttribute())
-			bytesWritten = fFile.WriteAttr(fAttribute, fType, fRealViewOffset, fView, fRealViewSize);
+			bytesWritten = fFile.WriteAttr(fAttribute, fType, fRealViewOffset, fView, size);
 		else
-			bytesWritten = fFile.WriteAt(fRealViewOffset, fView, fRealViewSize);
+			bytesWritten = fFile.WriteAt(fRealViewOffset, fView, size);
 
 		if (bytesWritten < B_OK)
 			return bytesWritten;
