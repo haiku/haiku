@@ -21,15 +21,21 @@
 static void usage(char *prog)
 {
 	printf(
-"usage: %s -d  # dump key map to standard output\n"
-"       %s -l  # load key map from standard input\n"
-"       %s -r  # restore system default key map\n", prog, prog, prog);
+"usage: %s {-o output_file} -[d|l|r|c] \n"
+"	-d  # dump key map to standard output\n"
+"	-l  # load key map from standard input\n"
+"	-r  # restore system default key map\n"
+"	-c  # compile source keymap to binary\n"
+"	-o  # change output file to output_file (default:keymap.out)\n"
+		, prog);
 }
 
 
 int main(int argc, char **argv)
 {
 	char operation = ' ';
+	entry_ref output_ref;
+	get_ref_for_path("keymap.out", &output_ref);
 	int i;
 	for (i = 1; i < argc; i++) {
 		if (strncmp(argv[i], "-", 1) == 0) {
@@ -42,22 +48,28 @@ int main(int argc, char **argv)
 				keymap.LoadCurrent();
 				keymap.Dump();
 				return 0;
-			} 
-			if (operation == 'r') {
+			} else if (operation == 'r') {
 				Keymap keymap;
 				keymap.RestoreSystemDefault();
+				return 0;
+			} else if (operation == 'l') {
+				Keymap keymap;
+				keymap.LoadSource(stdin);
+				
+				keymap.SaveAsCurrent();
 				return 0;
 			}
 			
 		} else {
 			if (operation == 'o') {
-				return 0;
-			} if (operation == 'l') {
+				get_ref_for_path(argv[i], &output_ref);
+			} else if (operation == 'c') {
 				entry_ref ref;
 				get_ref_for_path(argv[i], &ref);
 				Keymap keymap;
-				keymap.LoadSource(ref);
-				keymap.Dump();
+				keymap.LoadSourceFromRef(ref);
+				
+				keymap.Save(output_ref);
 				return 0;
 			} else 
 				break;

@@ -14,7 +14,6 @@
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
 #include "Keymap.h"
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <regex.h>
@@ -23,6 +22,8 @@
 #include <FindDirectory.h>
 #include <Path.h>
 #include <String.h>
+
+#define CHARS_TABLE_MAXSIZE  10000
 
 void 
 Keymap::GetKey( char *chars, int32 offset, char* string) 
@@ -266,6 +267,79 @@ Keymap::Load(entry_ref &ref)
 	return B_OK;
 }
 
+
+void
+Keymap::ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset)
+{
+	char *current = &fChars[offset+1];
+	char hexChars[12];
+	uint32 length = 0;
+	if (strncmp(buffer + regs.start[i], "''", regs.end[i] - regs.start[i]) == 0)
+		length = 0;
+	else if (sscanf(buffer + regs.start[i], "'%s'", current) > 0) {
+		if (current[0] == '\\')
+			current[0] = current[1];
+		else if (current[0] == '\'')
+			current[0] = ' ';
+		length = 1;
+	} else if (sscanf(buffer + regs.start[i], "0x%s", hexChars) > 0) {
+		length = strlen(hexChars) / 2;
+		for (uint32 j=0; j<length; j++)
+			sscanf(hexChars + 2*j, "%02x", (unsigned short *)current + j);
+	}
+	fChars[offset] = length;
+	offset += length + 1;
+}
+
+
+void
+Keymap::ComputeTables(const char *buffer, struct re_registers &regs, uint32 &table)
+{
+	for (int32 i=1; i<=9; i++) {
+		if (regs.end[i] - regs.start[i] <= 0)
+			break;
+		if (strncmp(buffer + regs.start[i], "Normal", regs.end[i] - regs.start[i]) == 0)
+			table |= B_NORMAL_TABLE;
+		else if (strncmp(buffer + regs.start[i], "Shift", regs.end[i] - regs.start[i]) == 0)
+			table |= B_SHIFT_TABLE;
+		else if (strncmp(buffer + regs.start[i], "Control", regs.end[i] - regs.start[i]) == 0)
+			table |= B_CONTROL_TABLE;
+		else if (strncmp(buffer + regs.start[i], "Option", regs.end[i] - regs.start[i]) == 0)
+			table |= B_OPTION_TABLE;
+		else if (strncmp(buffer + regs.start[i], "Option-Shift", regs.end[i] - regs.start[i]) == 0)
+			table |= B_OPTION_SHIFT_TABLE;
+		else if (strncmp(buffer + regs.start[i], "CapsLock", regs.end[i] - regs.start[i]) == 0)
+			table |= B_CAPS_TABLE;
+		else if (strncmp(buffer + regs.start[i], "CapsLock-Shift", regs.end[i] - regs.start[i]) == 0)
+			table |= B_CAPS_SHIFT_TABLE;
+		else if (strncmp(buffer + regs.start[i], "CapsLock-Option", regs.end[i] - regs.start[i]) == 0)
+			table |= B_OPTION_CAPS_TABLE;
+		else if (strncmp(buffer + regs.start[i], "CapsLock-Option-Shift", regs.end[i] - regs.start[i]) == 0)
+			table |= B_OPTION_CAPS_SHIFT_TABLE;
+	}
+}
+
+
+status_t 
+Keymap::LoadSourceFromRef(entry_ref &ref)
+{
+	status_t err;
+	
+	BFile file(&ref, B_READ_ONLY);
+	if ((err = file.InitCheck()) != B_OK) {
+		printf("error %s\n", strerror(err));
+		return err;
+	}
+	
+	int fd = file.Dup();
+	FILE * f = fdopen(fd, "r");
+	
+	return LoadSource(f);
+}
+
+
+// i couldn't put patterns and pattern bufs on the stack without segfaulting
+// regexp patterns
 const char versionPattern[] = "Version[[:space:]]+=[[:space:]]+\\([[:digit:]]+\\)";
 const char capslockPattern[] = "CapsLock[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
 const char scrolllockPattern[] = "ScrollLock[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\)";
@@ -300,64 +374,90 @@ const char gravePattern[] = "Grave[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:
 const char circumflexPattern[] = "Circumflex[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
 const char diaeresisPattern[] = "Diaeresis[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
 const char tildePattern[] = "Tilde[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+=[[:space:]]+\\([[:alnum:]]+\\|'.*'\\)[[:space:]]+";
+const char acutetabPattern[] = "AcuteTab[[:space:]]+="
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
+const char gravetabPattern[] = "GraveTab[[:space:]]+="
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
+const char circumflextabPattern[] = "CircumflexTab[[:space:]]+="
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
+const char diaeresistabPattern[] = "DiaeresisTab[[:space:]]+="
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
+const char tildetabPattern[] = "TildeTab[[:space:]]+="
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]+\\([[:alnum:]-]*\\)"
+						"[[:space:]]*\\([[:alnum:]-]*\\)[[:space:]]*" ;
 
-void
-Keymap::ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset)
-{
-	char *current = &fChars[offset+1];
-	char hexChars[12];
-	uint32 length = 0;
-	if (strncmp(buffer + regs.start[i], "''", regs.end[i] - regs.start[i]) == 0)
-		length = 0;
-	else if (sscanf(buffer + regs.start[i], "'%s'", current) > 0) {
-		if (current[0] == '\\')
-			current[0] = current[1];
-		else if (current[0] == '\'')
-			current[0] = ' ';
-		length = 1;
-	} else if (sscanf(buffer + regs.start[i], "0x%s", hexChars) > 0) {
-		length = strlen(hexChars) / 2;
-		for (uint32 j=0; j<length; j++)
-			sscanf(hexChars + 2*j, "%02x", (uint8*)(current + j));
-	}
-	fChars[offset] = length;
-	offset += length + 1;
-}
 
-status_t 
-Keymap::LoadSource(entry_ref &ref)
+// re_pattern_buffer buffers
+struct re_pattern_buffer versionBuf;
+struct re_pattern_buffer capslockBuf;
+struct re_pattern_buffer scrolllockBuf;
+struct re_pattern_buffer numlockBuf;
+struct re_pattern_buffer lshiftBuf;
+struct re_pattern_buffer rshiftBuf;
+struct re_pattern_buffer lcommandBuf;
+struct re_pattern_buffer rcommandBuf;
+struct re_pattern_buffer lcontrolBuf;
+struct re_pattern_buffer rcontrolBuf;
+struct re_pattern_buffer loptionBuf;
+struct re_pattern_buffer roptionBuf;
+struct re_pattern_buffer menuBuf;
+struct re_pattern_buffer locksettingsBuf;
+struct re_pattern_buffer keyBuf;
+struct re_pattern_buffer acuteBuf;
+struct re_pattern_buffer graveBuf;
+struct re_pattern_buffer circumflexBuf;
+struct re_pattern_buffer diaeresisBuf;
+struct re_pattern_buffer tildeBuf;
+struct re_pattern_buffer acutetabBuf;
+struct re_pattern_buffer gravetabBuf;
+struct re_pattern_buffer circumflextabBuf;
+struct re_pattern_buffer diaeresistabBuf;
+struct re_pattern_buffer tildetabBuf;
+	
+status_t
+Keymap::LoadSource(FILE * f)
 {
-	status_t err;
-	
-	BFile file(&ref, B_READ_ONLY);
-	if ((err = file.InitCheck()) != B_OK) {
-		printf("error %s\n", strerror(err));
-		return err;
-	}
-	
 	reg_syntax_t syntax = RE_CHAR_CLASSES;
 	re_set_syntax(syntax);
-		
-	struct re_pattern_buffer versionBuf;
-	struct re_pattern_buffer capslockBuf;
-	struct re_pattern_buffer scrolllockBuf;
-	struct re_pattern_buffer numlockBuf;
-	struct re_pattern_buffer lshiftBuf;
-	struct re_pattern_buffer rshiftBuf;
-	struct re_pattern_buffer lcommandBuf;
-	struct re_pattern_buffer rcommandBuf;
-	struct re_pattern_buffer lcontrolBuf;
-	struct re_pattern_buffer rcontrolBuf;
-	struct re_pattern_buffer loptionBuf;
-	struct re_pattern_buffer roptionBuf;
-	struct re_pattern_buffer menuBuf;
-	struct re_pattern_buffer locksettingsBuf;
-	struct re_pattern_buffer keyBuf;
-	struct re_pattern_buffer acuteBuf;
-	struct re_pattern_buffer graveBuf;
-	struct re_pattern_buffer circumflexBuf;
-	struct re_pattern_buffer diaeresisBuf;
-	struct re_pattern_buffer tildeBuf;
 	
 	const char* error; 
 	error = re_compile_pattern(versionPattern, strlen(versionPattern), &versionBuf);
@@ -420,15 +520,28 @@ Keymap::LoadSource(entry_ref &ref)
 	error = re_compile_pattern(tildePattern, strlen(tildePattern), &tildeBuf);
 	if (error)
 		fprintf(stderr, error);
+	error = re_compile_pattern(acutetabPattern, strlen(acutetabPattern), &acutetabBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(gravetabPattern, strlen(gravetabPattern), &gravetabBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(circumflextabPattern, strlen(circumflextabPattern), &circumflextabBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(diaeresistabPattern, strlen(diaeresistabPattern), &diaeresistabBuf);
+	if (error)
+		fprintf(stderr, error);
+	error = re_compile_pattern(tildetabPattern, strlen(tildetabPattern), &tildetabBuf);
+	if (error)
+		fprintf(stderr, error);
 	
-	int fd = file.Dup();
-	FILE * f = fdopen(fd, "r");
 	
 	char buffer[1024];
-	BString strings[4];
 	
-	fChars = new char[4096];
-	fCharsSize = 4096;
+	delete [] fChars;
+	fChars = new char[CHARS_TABLE_MAXSIZE];
+	fCharsSize = CHARS_TABLE_MAXSIZE;
 	int offset = 0;
 	int acuteOffset = 0;
 	int graveOffset = 0;
@@ -479,7 +592,10 @@ Keymap::LoadSource(entry_ref &ref)
 		} else if (re_search(&menuBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
 			sscanf(buffer + regs.start[1], "0x%lx", &fKeys.menu_key);
 		} else if (re_search(&locksettingsBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			fKeys.lock_settings = 0;
 			for (int32 i=1; i<=3; i++) {
+				if (regs.end[i] - regs.start[i] <= 0)
+					break;
 				if (strncmp(buffer + regs.start[i], "CapsLock", regs.end[i] - regs.start[i]) == 0)
 					fKeys.lock_settings |= B_CAPS_LOCK;
 				else if (strncmp(buffer + regs.start[i], "NumLock", regs.end[i] - regs.start[i]) == 0)
@@ -521,14 +637,21 @@ Keymap::LoadSource(entry_ref &ref)
 				fKeys.tilde_dead_key[tildeOffset++] = offset;		
 				ComputeChars(buffer, regs, i, offset);
 			}			
+		} else if (re_search(&acutetabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			ComputeTables(buffer, regs, fKeys.acute_tables);
+		} else if (re_search(&gravetabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			ComputeTables(buffer, regs, fKeys.grave_tables);
+		} else if (re_search(&circumflextabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			ComputeTables(buffer, regs, fKeys.circumflex_tables);
+		} else if (re_search(&diaeresistabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			ComputeTables(buffer, regs, fKeys.dieresis_tables);
+		} else if (re_search(&tildetabBuf, buffer, strlen(buffer), 0, strlen(buffer), &regs) >= 0) {
+			ComputeTables(buffer, regs, fKeys.tilde_tables);
 		}
 	}
-	/*
-	for (uint32 i=1; i < 3; i++) {
-				printf("%.*s\n", regs.end[i] - regs.start[i], buffer + regs.start[i]);
-			}
-			*/
-
+	
+	fCharsSize = offset;
+	
 	return B_OK;
 }
 	
@@ -822,4 +945,33 @@ Keymap::RestoreSystemDefault()
 	ref.Remove();	
 	
 	_restore_key_map_();
+}
+
+
+void
+Keymap::SaveAsCurrent()
+{
+	BPath path;
+	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path)!=B_OK)
+		return;
+	
+	path.Append("Key_map");
+
+	entry_ref ref;
+	get_ref_for_path(path.Path(), &ref);
+
+	status_t err;
+	if ((err = Save(ref)) != B_OK) {
+		printf("error when saving : %s", strerror(err));
+		return;
+	}
+	Use();
+}
+
+
+// we make our input server use the map in /boot/home/config/settings/Keymap
+status_t
+Keymap::Use()
+{
+	return _restore_key_map_();
 }

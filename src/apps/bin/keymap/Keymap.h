@@ -18,6 +18,7 @@
 
 #include <InterfaceDefs.h>
 #include <Entry.h>
+#include <stdio.h>
 
 class Keymap 
 {
@@ -25,7 +26,10 @@ public:
 	void LoadCurrent();
 	status_t Load(entry_ref &ref);
 	status_t Save(entry_ref &ref);
-	status_t LoadSource(entry_ref &ref);
+	status_t LoadSource(FILE *f);
+	status_t LoadSourceFromRef(entry_ref &ref);
+	void SaveAsCurrent();
+	status_t Use();
 	void Dump();
 	bool IsModifierKey(uint32 keyCode);
 	uint8 IsDeadKey(uint32 keyCode, uint32 modifiers);
@@ -35,7 +39,7 @@ public:
 	static void GetKey( char *chars, int32 offset, char* string);
 private:
 	void ComputeChars(const char *buffer, struct re_registers &regs, int i, int &offset);
-
+	void ComputeTables(const char *buffer, struct re_registers &regs, uint32 &table);
 	char *fChars;
 	key_map fKeys;
 	uint32 fCharsSize;
