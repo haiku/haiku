@@ -111,7 +111,7 @@ resource(0, "BEOS:M:application/x-vnd.be-kmap") #'MICN' array
 	$"FFFFFFFFFFAE00AEFFAEFFFFFFFFFFFF"
 };
 
-resource(1, "BEOS:FILE_TYPES") message
+resource file_types message
 {
 	"types" = "application/x-vnd.Be-kmap"
 };
