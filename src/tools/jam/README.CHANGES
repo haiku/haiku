@@ -124,3 +124,23 @@ This version of Jam is NOT the original one distributed by Perforce
 	  jam problems or purge old entries.
   </quote>
 
+
+* Jamfile Caching
+
+  As large build systems may consist of a huge number of Jamfiles, the
+  mere reading of these files may take considerable time. This version
+  implements a cache for them. Since the time stamps of the files still
+  need to retrieved to check whether the cached entries are still up to
+  date, the benefits to be expected are not that big though.
+
+  The name of the cache file is controlled by the JCACHEFILE Jam variable.
+  If JCACHEFILE is left unset (the default), reading and writing of a cache
+  file is not performed. Setting the SEARCH and LOCATE variables does work
+  as expected.
+
+
+* Bug Fixes
+
+  - Removed superfluous search() in compile_on() (compile.c), which slowed
+    down on target rule invocations.
+
