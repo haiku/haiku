@@ -480,6 +480,8 @@ BlockAllocator::AllocateBlocks(Transaction *transaction, int32 group, uint16 sta
 	if (maximum == 0)
 		return B_BAD_VALUE;
 
+	FUNCTION_START(("group = %ld, start = %u, maximum = %u, minimum = %u\n", group, start, maximum, minimum));
+
 	AllocationBlock cached(fVolume);
 	Locker lock(fLock);
 
@@ -660,6 +662,8 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 	uint16 start = run.Start();
 	uint16 length = run.Length();
 
+	FUNCTION_START(("group = %ld, start = %u, length = %u\n", group, start, length));
+
 	// doesn't use Volume::IsValidBlockRun() here because it can check better
 	// against the group size (the last group may have a different length)
 	if (group < 0 || group >= fNumGroups
@@ -683,6 +687,11 @@ BlockAllocator::Free(Transaction *transaction, block_run run)
 
 	if (fGroups[group].Free(transaction, start, length) < B_OK)
 		RETURN_ERROR(B_IO_ERROR);
+
+#ifdef DEBUG	
+	if (CheckBlockRun(run) == B_OK)
+		DEBUGGER(("CheckBlockRun() reports allocated blocks (which were just freed)\n"));
+#endif
 
 	fVolume->SuperBlock().used_blocks =
 		HOST_ENDIAN_TO_BFS_INT64(fVolume->UsedBlocks() - run.Length());
