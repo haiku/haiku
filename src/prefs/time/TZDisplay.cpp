@@ -79,7 +79,7 @@ TTZDisplay::Draw(BRect updaterect)
 	drawpt.y += fontheight() +2;
 	DrawString(f_text->String(), drawpt);
 	
-	drawpt.x = bounds.right -be_plain_font->StringWidth(f_time->String()) +2;
+	drawpt.x = bounds.right -be_plain_font->StringWidth(f_time->String()) - 2;
 	DrawString(f_time->String(), drawpt);
 }
 
