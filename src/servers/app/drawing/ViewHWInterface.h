@@ -25,6 +25,9 @@ class ViewHWInterface : public HWInterface {
 								ViewHWInterface();
 	virtual						~ViewHWInterface();
 
+	virtual	status_t			Initialize();
+	virtual	status_t			Shutdown();
+
 	virtual	status_t			SetMode(const display_mode &mode);
 //	virtual	void				GetMode(display_mode *mode);
 
@@ -41,6 +44,10 @@ class ViewHWInterface : public HWInterface {
 											const display_mode *high);
 
 	virtual status_t			WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT);
+
+	virtual status_t			SetDPMSMode(const uint32 &state);
+	virtual uint32				DPMSMode() const;
+	virtual uint32				DPMSCapabilities() const;
 
 	// frame buffer access
 	virtual	RenderingBuffer*	FrontBuffer() const;

@@ -579,41 +579,20 @@ ViewHWInterface::~ViewHWInterface()
 	delete fBackBuffer;
 	delete fFrontBuffer;
 }
-/*
-bool
+
+// Initialize
+status_t
 ViewHWInterface::Initialize()
 {
-	Lock();
-
-	// the screen should start black
-	framebuffer->Lock();
-	rgb_color	c; c.red = 0; c.blue = 0; c.green = 0; c.alpha = 255;
-	drawview->SetHighColor(c);
-	drawview->FillRect(drawview->Bounds());
-	drawview->Sync();
-	framebuffer->Unlock();
-
-	hide_cursor=0;
-	obscure_cursor=false;
-
-	is_initialized=true;
-
-	// We can afford to call the above functions without locking
-	// because the window is locked until Show() is first called
-	screenwin->Show();
-	Unlock();
-
-	return DisplayDriver::Initialize();
+	return B_OK;
 }
 
-void ViewHWInterface::Shutdown()
+// Shutdown
+status_t
+ViewHWInterface::Shutdown()
 {
-	DisplayDriver::Shutdown();
-
-	Lock();
-	is_initialized=false;
-	Unlock();
-}*/
+	return B_OK;
+}
 
 // SetMode
 status_t
@@ -701,33 +680,9 @@ ViewHWInterface::SetMode(const display_mode &mode)
 	return ret;
 }
 
-/*
-status_t ViewHWInterface::SetDPMSMode(const uint32 &state)
-{
-	if(!is_initialized)
-		return B_ERROR;
-		
-	// NOTE: Originally, this was a to-do item to implement software DPMS,
-	// but this driver will not be the official testing driver, so implementing
-	// this stuff the way it was intended -- blanking the server's screen but not
-	// the physical monitor -- is moot, but we will support blanking the
-	// actual monitor if it is supported.
-	return BScreen().SetDPMS(state);
-}
-
-uint32 ViewHWInterface::DPMSMode() const
-{
-	// See note for SetDPMSMode if there are questions
-	return BScreen().DPMSState();
-}
-
-uint32 ViewHWInterface::DPMSCapabilities() const
-{
-	// See note for SetDPMSMode if there are questions
-	return BScreen().DPMSCapabilites();
-}
-*/
-status_t ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
+// GetDeviceInfo
+status_t
+ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 {
 //	if(!info || !is_initialized)
 //		return B_ERROR;
@@ -745,7 +700,9 @@ status_t ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)
 	return B_OK;
 }
 
-status_t ViewHWInterface::GetModeList(display_mode **modes, uint32 *count)
+// GetModeList
+status_t
+ViewHWInterface::GetModeList(display_mode **modes, uint32 *count)
 {
 //	if(!count || !is_initialized)
 //		return B_ERROR;
@@ -814,40 +771,52 @@ status_t ViewHWInterface::GetModeList(display_mode **modes, uint32 *count)
 	return B_OK;
 }
 
-status_t ViewHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
+status_t
+ViewHWInterface::GetPixelClockLimits(display_mode *mode, uint32 *low, uint32 *high)
 {
-//	if(!is_initialized)
-//		return B_ERROR;
-		
 	return B_ERROR;
 }
 
-status_t ViewHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
+status_t
+ViewHWInterface::GetTimingConstraints(display_timing_constraints *dtc)
 {
-//	if(!is_initialized)
-//		return B_ERROR;
-		
 	return B_ERROR;
 }
 
-status_t ViewHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
+status_t
+ViewHWInterface::ProposeMode(display_mode *candidate, const display_mode *low, const display_mode *high)
 {
-//	if(!is_initialized)
-//		return B_ERROR;
-		
 	// We should be able to get away with this because we're not dealing with any
 	// specific hardware. This is a Good Thing(TM) because we can support any hardware
 	// we wish within reasonable expectaions and programmer laziness. :P
 	return B_OK;
 }
 
+// SetDPMSMode
+status_t
+ViewHWInterface::SetDPMSMode(const uint32 &state)
+{
+	return BScreen().SetDPMS(state);
+}
+
+// DPMSMode
+uint32
+ViewHWInterface::DPMSMode() const
+{
+	return BScreen().DPMSState();
+}
+
+// DPMSCapabilities
+uint32
+ViewHWInterface::DPMSCapabilities() const
+{
+	return BScreen().DPMSCapabilites();
+}
+
 // WaitForRetrace
 status_t
 ViewHWInterface::WaitForRetrace(bigtime_t timeout = B_INFINITE_TIMEOUT)
 {
-//	if(!is_initialized)
-//		return B_ERROR;
-		
 	// Locking shouldn't be necessary here - R5 should handle this for us. :)
 	BScreen screen;
 	return screen.WaitForRetrace(timeout);

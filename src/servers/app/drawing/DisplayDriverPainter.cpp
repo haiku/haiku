@@ -695,27 +695,45 @@ DisplayDriverPainter::StrokeLineArray(const int32 &numlines,
 status_t
 DisplayDriverPainter::SetDPMSMode(const uint32 &state)
 {
-	return B_ERROR;
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->SetDPMSMode(state);
+		Unlock();
+	}
+	return ret;
 }
 
 // DPMSMode
 uint32
 DisplayDriverPainter::DPMSMode() const
 {
-	return 0;
+/*	uint32 mode = 0;
+	if (Lock()) {
+		mode = fGraphicsCard->DPMSMode();
+		Unlock();
+	}
+	return mode;*/
+	return fGraphicsCard->DPMSMode();
 }
 
 // DPMSCapabilities
 uint32
 DisplayDriverPainter::DPMSCapabilities() const
 {
-	return 0;
+/*	uint32 caps = 0;
+	if (Lock()) {
+		caps = fGraphicsCard->DPMSMode();
+		Unlock();
+	}
+	return caps;*/
+	return fGraphicsCard->DPMSMode();;
 }
 
 // GetDeviceInfo
 status_t
 DisplayDriverPainter::GetDeviceInfo(accelerant_device_info *info)
 {
+	// TODO: locking?
 	return fGraphicsCard->GetDeviceInfo(info);
 }
 
@@ -723,6 +741,7 @@ DisplayDriverPainter::GetDeviceInfo(accelerant_device_info *info)
 status_t
 DisplayDriverPainter::GetModeList(display_mode **mode_list, uint32 *count)
 {
+	// TODO: locking?
 	return fGraphicsCard->GetModeList(mode_list, count);
 }
 
@@ -731,6 +750,7 @@ status_t DisplayDriverPainter::GetPixelClockLimits(display_mode *mode,
 												   uint32 *low,
 												   uint32 *high)
 {
+	// TODO: locking?
 	return fGraphicsCard->GetPixelClockLimits(mode, low, high);
 }
 
@@ -738,6 +758,7 @@ status_t DisplayDriverPainter::GetPixelClockLimits(display_mode *mode,
 status_t
 DisplayDriverPainter::GetTimingConstraints(display_timing_constraints *dtc)
 {
+	// TODO: locking?
 	return fGraphicsCard->GetTimingConstraints(dtc);
 }
 
@@ -747,6 +768,7 @@ DisplayDriverPainter::ProposeMode(display_mode *candidate,
 								  const display_mode *low,
 								  const display_mode *high)
 {
+	// TODO: locking?
 	return fGraphicsCard->ProposeMode(candidate, low, high);
 }
 
