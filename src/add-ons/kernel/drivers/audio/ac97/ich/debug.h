@@ -53,6 +53,7 @@ void debug_printf(const char *text,...);
 	#define TRACE(a) 		debug_printf a
 	#define LOG(a)			log_printf a
 	#define LOG_CREATE()	log_create()
+	#define DEBUG_ONLY(a)	a
 	#define ASSERT(a)		if (a) {} else LOG(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
 	void log_create(void);
 	void log_printf(const char *text,...);
@@ -62,6 +63,7 @@ void debug_printf(const char *text,...);
 	#define ASSERT(a)	((void)(0))
 	#define LOG(a)		((void)(0))
 	#define LOG_CREATE()
+	#define DEBUG_ONLY(a)
 #endif
 
 #endif
