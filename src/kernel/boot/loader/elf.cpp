@@ -175,26 +175,28 @@ elf_load_image(int fd, preloaded_image *image)
 	image->text_region.size = 0;
 
 	for (int32 i = 0; i < elfHeader.e_phnum; i++) {
-		switch (programHeaders[i].p_type) {
+		Elf32_Phdr &header = programHeaders[i];
+
+		switch (header.p_type) {
 			case PT_LOAD:
 				break;
 			case PT_DYNAMIC:
-				image->dynamic_section.start = programHeaders[i].p_vaddr;
-				image->dynamic_section.size = programHeaders[i].p_memsz;
+				image->dynamic_section.start = header.p_vaddr;
+				image->dynamic_section.size = header.p_memsz;
 				continue;
 			default:
-				dprintf("unhandled pheader type 0x%lx\n", programHeaders[i].p_type);
+				dprintf("unhandled pheader type 0x%lx\n", header.p_type);
 				continue;
 		}
 
 		elf_region *region;
-		if (programHeaders[i].IsReadWrite()) {
+		if (header.IsReadWrite()) {
 			if (image->data_region.size != 0) {
 				dprintf("elf: rw already handled!\n");
 				continue;
 			}
 			region = &image->data_region;
-		} else if (programHeaders[i].IsExecutable()) {
+		} else if (header.IsExecutable()) {
 			if (image->text_region.size != 0) {
 				dprintf("elf: ro already handled!\n");
 				continue;
@@ -203,8 +205,8 @@ elf_load_image(int fd, preloaded_image *image)
 		} else
 			continue;
 
-		region->start = ROUNDOWN(programHeaders[i].p_vaddr, B_PAGE_SIZE);
-		region->size = ROUNDUP(programHeaders[i].p_memsz + (programHeaders[i].p_vaddr % B_PAGE_SIZE), PAGE_SIZE);
+		region->start = ROUNDOWN(header.p_vaddr, B_PAGE_SIZE);
+		region->size = ROUNDUP(header.p_memsz + (header.p_vaddr % B_PAGE_SIZE), PAGE_SIZE);
 		region->delta = -region->start;
 
 		TRACE(("segment %d: start = %p, size = %lu, delta = %lx\n", i,
@@ -230,27 +232,34 @@ elf_load_image(int fd, preloaded_image *image)
 	// load program data
 
 	for (int i = 0; i < elfHeader.e_phnum; i++) {
-		if (programHeaders[i].p_type != PT_LOAD)
+		Elf32_Phdr &header = programHeaders[i];
+
+		if (header.p_type != PT_LOAD)
 			continue;
 
 		elf_region *region;
-		if (programHeaders[i].IsReadWrite())
+		if (header.IsReadWrite())
 			region = &image->data_region;
-		else if (programHeaders[i].IsExecutable())
+		else if (header.IsExecutable())
 			region = &image->text_region;
 		else
 			continue;
 
-		TRACE(("load segment %d (%ld bytes)...\n", i, programHeaders[i].p_filesz));
+		TRACE(("load segment %d (%ld bytes)...\n", i, header.p_filesz));
 
-		length = read_pos(fd, programHeaders[i].p_offset,
-			(void *)(region->start + (programHeaders[i].p_vaddr % B_PAGE_SIZE)),
-			programHeaders[i].p_filesz);
-		if (length < (ssize_t)programHeaders[i].p_filesz) {
+		length = read_pos(fd, header.p_offset,
+			(void *)(region->start + (header.p_vaddr % B_PAGE_SIZE)), header.p_filesz);
+		if (length < (ssize_t)header.p_filesz) {
 			status = B_BAD_DATA;
 			dprintf("error reading in seg %d\n", i);
 			goto error2;
 		}
+
+		// clear anything above the file size (that may also contain the BSS area)
+
+		uint32 offset = (header.p_vaddr % B_PAGE_SIZE) + header.p_filesz;
+		if (offset < region->size)
+			memset((void *)(region->start + offset), 0, region->size - offset);
 	}
 
 	// modify the dynamic section by the delta of the regions
