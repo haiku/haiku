@@ -172,6 +172,7 @@ BShape::~BShape()
 status_t BShape::Archive(BMessage *archive, bool deep) const
 {
 	status_t err = BArchivable::Archive(archive, deep);
+	int32 i;
 
 	if (err != B_OK)
 		return err;
@@ -186,7 +187,7 @@ status_t BShape::Archive(BMessage *archive, bool deep) const
 	archive->AddData("pts", B_POINT_TYPE, data->ptList, sizeof(BPoint), true,
 		data->ptCount);
 
-	for (int32 i = 1; i < data->ptCount; i++)
+	for (i = 1; i < data->ptCount; i++)
 		archive->AddPoint("pts", data->ptList[i]);
 
 	// Avoids allocation for each op
