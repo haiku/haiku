@@ -7,8 +7,12 @@
 #include "bpolygon/PolygonTest.h"
 #include "bregion/RegionTest.h"
 #include "bwidthbuffer/WidthBufferTest.h"
+#include "GraphicsDefsTest.h"
 
-BTestSuite* getTestSuite() {
+
+BTestSuite *
+getTestSuite()
+{
 	BTestSuite *suite = new BTestSuite("Interface");
 
 	// ##### Add test suites here #####
@@ -17,6 +21,7 @@ BTestSuite* getTestSuite() {
 	suite->addTest("BPolygon", PolygonTestSuite());
 	suite->addTest("BRegion", RegionTestSuite());
 	suite->addTest("_BWidthBuffer_", WidthBufferTestSuite());
-	
+	suite->addTest("GraphicsDefs", GraphicsDefsTestSuite());
+
 	return suite;
 }

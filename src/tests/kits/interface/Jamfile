@@ -14,6 +14,8 @@ SEARCH_SOURCE += [ FDirName $(TOP) src kits interface ] ;
 CommonTestLib libinterfacetest.so
 	: InterfaceKitTestAddon.cpp
 
+		GraphicsDefsTest.cpp
+
 		# BBitmap
 		BitmapTest.cpp
 		BBitmapTester.cpp
