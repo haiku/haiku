@@ -1,6 +1,8 @@
 /* ++++++++++
 	play.cpp
 	Copyright (C) 1995 Be Incorporated.  All Rights Reserved.
+	
+	modified on November 03, 2003 by Jerome Duval
 +++++ */
 /*
  * was released as sample code; source:
@@ -8,30 +10,27 @@
  */
 
 #include <errno.h>
-#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <scsi.h>
 #include <unistd.h>
 #include <Directory.h>
-#include <Drivers.h>
 #include <Entry.h>
 #include <Path.h>
-#include <scsiprobe_driver.h>
-#include <ide_calls.h>
 
 	
 /* ----------
 	play requested track 
 ----- */
 
+void
 play(int id, scsi_play_track *track)
 {
 	track->start_index = 1;
 	track->end_track = 99;
 	track->end_index = 1;
-	if (!ioctl(id, SCSI_PLAY_TRACK, track))
+	if (!ioctl(id, B_SCSI_PLAY_TRACK, track))
 		printf("Playing audio...\n");
 	else
 		printf("Play audio failed\n");
@@ -40,69 +39,60 @@ play(int id, scsi_play_track *track)
 
 /* ----------
 	show valid cd-rom id's
+	(from /boot/optional/sample-code/interface_kit/CDButton/CDEngine.cpp)
 ----- */
 
-void try_dir(const char *directory, long *count, bool show)
-{
-	bool				add;
-	const char			*name;
-	int					fd;
-	BPath				path;
-	BDirectory			dir;
-	BEntry				entry;
-	scsiprobe_inquiry	inquiry;
-	ide_ctrl_info		ide_info;
+static void
+try_dir(const char *directory, long *count, bool show)
+{ 
+	bool add = false;
+	BDirectory dir; 
+	dir.SetTo(directory); 
+	if(dir.InitCheck() != B_NO_ERROR) { 
+		return; 
+	} 
+	dir.Rewind(); 
+	BEntry entry; 
+	while(dir.GetNextEntry(&entry) >= 0) { 
+		BPath path; 
+		const char *name; 
+		entry_ref e; 
+		
+		if(entry.GetPath(&path) != B_NO_ERROR) 
+			continue; 
+		name = path.Path(); 
+		
+		if(entry.GetRef(&e) != B_NO_ERROR) 
+			continue; 
 
-	dir.SetTo(directory);
-	if (dir.InitCheck() == B_NO_ERROR) {
-		dir.Rewind();
-		while (dir.GetNextEntry(&entry) >= 0) {
-			entry.GetPath(&path);
-			name = path.Path();
-			if (entry.IsDirectory())
-				try_dir(name, count, show);
-			else if (strstr(name, "/raw")) {
-				add = FALSE;
-				if (strstr(name, "/scsi")) {
-					if ((fd = open("/dev/scsiprobe", 0)) >= 0) {
-						inquiry.path = name[15] - '0';
-						inquiry.id = name[16] - '0';
-						inquiry.lun = name[17] - '0';
-						inquiry.len = 36;
-						if (ioctl(fd, SCSIPROBE_INQUIRY, &inquiry) == B_NO_ERROR)
-							add = ((inquiry.data[0] & 0x1f) == 5);
-						close(fd);
-					}
-				}
-				else if (strstr(name, "/ide")) {
-					if ((fd = open("/dev/disk/ide/rescan", 0)) >= 0) {
-						if (ioctl(fd, IDE_GET_DEVICES_INFO, &ide_info) == B_NO_ERROR) {
-							if (name[14] == '0') {
-								if ((strstr(name, "master")) &&
-									(ide_info.ide_0_master_type == B_CD))
-									add = true;
-								else if ((strstr(name, "slave")) &&
-									(ide_info.ide_0_slave_type == B_CD))
-									add = true;
-							}
-							else {
-								if ((strstr(name, "master")) &&
-									(ide_info.ide_1_master_type == B_CD))
-									add = true;
-								else if ((strstr(name, "slave")) &&
-									(ide_info.ide_1_slave_type == B_CD))
-									add = true;
-							}
-						}
-						close(fd);
-					}
-				}
-				if (add) {
-					*count += 1;
-					if (show)
-						printf("   %s\n", name);
+		if(entry.IsDirectory()) { 
+			if(strcmp(e.name, "floppy") == 0) 
+				continue; // ignore floppy (it is not silent) 
+			try_dir(name, count, show);
+		} 
+		else { 
+			int devfd; 
+			device_geometry g; 
+
+			if(strcmp(e.name, "raw") != 0) 
+				continue; // ignore partitions 
+
+			devfd = open(name, O_RDONLY); 
+			if(devfd < 0) 
+				continue; 
+
+			if(ioctl(devfd, B_GET_GEOMETRY, &g, sizeof(g)) >= 0) {
+				if(g.device_type == B_CD)
+				{ 
+					add = true;
 				}
 			}
+			close(devfd);
+		}
+		if (add) {
+			*count += 1;
+			if (show)
+				printf("   %s\n", name);
 		}
 	}
 }
@@ -180,7 +170,7 @@ main (int argc, char **argv)
 	if ((id = open(argv[1], 0)) >= 0) {
 		switch (command) {
 			case 0:
-				if (!ioctl(id, SCSI_GET_TOC, &toc)) {
+				if (!ioctl(id, B_SCSI_GET_TOC, &toc)) {
 					track.start_track = 0;
 					for (i = toc.toc_data[2]; i <= toc.toc_data[3]; i++) {
 						length = (toc.toc_data[(((i + 1) - toc.toc_data[2]) * 8) + 4 + 5] * 60) + 
@@ -221,22 +211,22 @@ main (int argc, char **argv)
 
 			case 1:
 				printf("Pausing audio\n");
-				ioctl(id, SCSI_PAUSE_AUDIO);
+				ioctl(id, B_SCSI_PAUSE_AUDIO);
 				break;
 
 			case 2:
 				printf("Resuming audio\n");
-				ioctl(id, SCSI_RESUME_AUDIO);
+				ioctl(id, B_SCSI_RESUME_AUDIO);
 				break;
 
 			case 3:
 				printf("Stopping audio\n");
-				ioctl(id, SCSI_STOP_AUDIO);
+				ioctl(id, B_SCSI_STOP_AUDIO);
 				break;
 
 			case 4:
 				printf("Ejecting CD\n");
-				ioctl(id, SCSI_EJECT);
+				ioctl(id, B_SCSI_EJECT);
 				break;
 				
 			case 5:
@@ -247,17 +237,17 @@ main (int argc, char **argv)
 					if ((vol < 0) || (vol > 255))
 						printf("Volume is out of range (0 - 255)\n");
 					else {
-						printf("Setting volume to %d\n", vol);
+						printf("Setting volume to %ld\n", vol);
 						volume.port0_volume = vol;
 						volume.port1_volume = vol;
-						volume.flags = scsi_port0_volume | scsi_port1_volume;
-						ioctl(id, SCSI_SET_VOLUME, &volume);
+						volume.flags = B_SCSI_PORT0_VOLUME | B_SCSI_PORT1_VOLUME;
+						ioctl(id, B_SCSI_SET_VOLUME, &volume);
 					}
 				}
 				break;
 
 			case 6:
-				if (ioctl(id, SCSI_GET_POSITION, &position) == B_ERROR)
+				if (ioctl(id, B_SCSI_GET_POSITION, &position) == B_ERROR)
 					printf("Could not get current position\n");
 				else {
 					switch(position.position[1]) {
@@ -318,9 +308,9 @@ main (int argc, char **argv)
 				}
 
 				req_track = strtol (argv[3], 0, 0);
-				if (!ioctl(id, SCSI_GET_TOC, &toc)) {
+				if (!ioctl(id, B_SCSI_GET_TOC, &toc)) {
 					if (req_track > toc.toc_data[3]) {
-						printf("Track %d is out of range [%d-%d]\n", req_track,
+						printf("Track %ld is out of range [%d-%d]\n", req_track,
 								toc.toc_data[2], toc.toc_data[3]);
 						break;
 					}
@@ -339,7 +329,7 @@ main (int argc, char **argv)
 					frames = min_c(1 * 75, (int) length);
 					read_cd.buffer = (char *)malloc(frames * 2352);
 
-					printf("Saving track %d to %s...\n", req_track, argv[4]);
+					printf("Saving track %ld to %s...\n", req_track, argv[4]);
 					while (length) {
 						index = start;
 						read_cd.start_m = index / (60 * 75);
@@ -360,7 +350,7 @@ main (int argc, char **argv)
 						read_cd.length_f = index;
 
 						for (i = 0; i < 5; i++)
-							if (ioctl(id, SCSI_READ_CD, &read_cd) == B_NO_ERROR)
+							if (ioctl(id, B_SCSI_READ_CD, &read_cd) == B_NO_ERROR)
 								break;
 						if (i == 5) {
 							printf("Error reading CD-DA\n");
@@ -395,7 +385,7 @@ main (int argc, char **argv)
 				else
 					scan.direction = 0;
 				scan.speed = 0;
-				if (ioctl(id, SCSI_SCAN, &scan) == B_ERROR)
+				if (ioctl(id, B_SCSI_SCAN, &scan) == B_ERROR)
 					printf("Error trying to scan\n");
 				else
 					printf("Scanning...\n");
