@@ -47,6 +47,7 @@ public:
 	void *Buffer(void) { return _buffer; }
 	ssize_t BufferSize(void) { return _buffersize; }
 	
+	status_t Read(int64 *data);
 	status_t Read(bool *data);
 	status_t Read(BPoint *data);
 	status_t Read(BRect *data);
