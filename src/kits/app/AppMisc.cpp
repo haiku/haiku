@@ -36,7 +36,7 @@ namespace BPrivate {
 // get_app_path
 /*!	\brief Returns the path to the application's executable.
 	\param buffer A pointer to a pre-allocated character array of at least
-		   size B_PATH_NAME_LENGTH + 1 to be filled in by this function.
+		   size B_PATH_NAME_LENGTH to be filled in by this function.
 	\return
 	- \c B_OK: Everything went fine.
 	- \c B_BAD_VALUE: \c NULL \a buffer.
@@ -56,8 +56,8 @@ get_app_path(char *buffer)
 	if (error == B_OK) {
 		while (!found && get_next_image_info(0, &cookie, &info) == B_OK) {
 			if (info.type == B_APP_IMAGE) {
-				strncpy(buffer, info.name, B_PATH_NAME_LENGTH);
-				buffer[B_PATH_NAME_LENGTH] = 0;
+				strncpy(buffer, info.name, B_PATH_NAME_LENGTH - 1);
+				buffer[B_PATH_NAME_LENGTH - 1] = 0;
 				found = true;
 			}
 		}
@@ -81,7 +81,7 @@ status_t
 get_app_ref(entry_ref *ref, bool traverse)
 {
 	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	char appFilePath[B_PATH_NAME_LENGTH + 1];
+	char appFilePath[B_PATH_NAME_LENGTH];
 	if (error == B_OK)
 		error = get_app_path(appFilePath);
 	if (error == B_OK) {
