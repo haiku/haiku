@@ -203,36 +203,57 @@ kernel_debugger_loop()
 {
 	int argc;
 	struct debugger_command *cmd;
+	cpu_status state;
 
-	disable_interrupts();
+	state = disable_interrupts();
 
 	dprintf("kernel debugger on cpu %d\n", smp_get_current_cpu());
 	debugger_on_cpu = smp_get_current_cpu();
+
+	cmd = NULL;
 
 	for(;;) {
 		dprintf("kdebug> ");
 		debug_read_line(line_buf[cur_line], LINE_BUF_SIZE);
 		debug_parse_line(line_buf[cur_line], args, &argc, MAX_ARGS);
-		if (argc <= 0)
+
+		// We support calling last executed command again if
+		// B_KDEDUG_CONT was returned last time, so cmd != NULL
+		if (argc <= 0 && cmd == NULL)
 			continue;
 
 		debugger_on_cpu = smp_get_current_cpu();
 
-		cmd = commands;
-		while (cmd != NULL) {
-			if (strcmp(args[0], cmd->name) == 0) {
-				cmd->func(argc, args);
-				break;
-			}
-			cmd = cmd->next;
-		}
+		if (argc > 0) {
+			// search command by name
+			cmd = commands;
+			while (cmd != NULL) {
+				if (strcmp(args[0], cmd->name) == 0)
+					break;
+				cmd = cmd->next;
+			};
+		};
+
 		if (cmd == NULL)
 			dprintf("unknown command, enter \"help\" to get a list of all supported commands\n");
+		else {
+			int rc;
+
+			rc = cmd->func(argc, args);
+
+			if (rc == B_KDEBUG_QUIT)
+				break;	// okay, exit now.
+
+			if (rc != B_KDEBUG_CONT)
+				cmd = NULL;		// forget last command executed...
+		};
 
 		cur_line++;
 		if (cur_line >= HISTORY_SIZE)
 			cur_line = 0;
 	}
+
+	restore_interrupts(state);
 }
 
 
@@ -257,7 +278,7 @@ panic(const char *fmt, ...)
 	int ret = 0;
 	va_list args;
 	char temp[128];
-	int state;
+	cpu_status state;
 	
 	// XXX by setting kernel_startup = true, we disable
 	// XXX the interrupt check in semaphore code etc.
@@ -304,11 +325,12 @@ dprintf(const char *fmt, ...)
 }
 
 
+
 char
 dbg_putch(char c)
 {
 	char ret;
-	int flags = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	if (serial_debug_on)
@@ -317,7 +339,7 @@ dbg_putch(char c)
 		ret = c;
 
 	release_spinlock(&dbg_spinlock);
-	restore_interrupts(flags);
+	restore_interrupts(state);
 
 	return ret;
 }
@@ -326,21 +348,21 @@ dbg_putch(char c)
 void
 dbg_puts(const char *s)
 {
-	int flags = disable_interrupts();
+	cpu_status state = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	if (serial_debug_on)
 		arch_dbg_con_puts(s);
 
 	release_spinlock(&dbg_spinlock);
-	restore_interrupts(flags);
+	restore_interrupts(state);
 }
 
 
 int
 add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 {
-	int flags;
+	cpu_status state;
 	struct debugger_command *cmd;
 
 	cmd = (struct debugger_command *)malloc(sizeof(struct debugger_command));
@@ -351,14 +373,14 @@ add_debugger_command(char *name, int (*func)(int, char **), char *desc)
 	cmd->name = name;
 	cmd->description = desc;
 
-	flags = disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	cmd->next = commands;
 	commands = cmd;
 
 	release_spinlock(&dbg_spinlock);
-	restore_interrupts(flags);
+	restore_interrupts(state);
 
 	return B_NO_ERROR;
 }
@@ -369,9 +391,9 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 {
 	struct debugger_command *cmd = commands;
 	struct debugger_command *prev = NULL;
-	int flags;
+	cpu_status state;
 
-	flags = disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	while (cmd) {
@@ -390,7 +412,7 @@ remove_debugger_command(char * name, int (*func)(int, char **))
 	}
 
 	release_spinlock(&dbg_spinlock);
-	restore_interrupts(flags);
+	restore_interrupts(state);
 
 	if (cmd) {
 		free(cmd);
@@ -459,4 +481,13 @@ dbg_get_serial_debug()
 {
 	return serial_debug_on;
 }
+
+// Wrapper(s) for BeOS R5 compatibility:
+
+bool
+set_dprintf_enabled(bool new_state)
+{
+	return dbg_set_serial_debug(new_state);
+}
+
 

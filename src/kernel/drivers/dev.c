@@ -193,3 +193,17 @@ error:
 	return id;
 }
 
+
+int
+load_driver_symbols(const char * driver_name)
+{
+	// phoudoin: currently, elf_load_kspace() keep in memory symbols list with
+	// the image info, and the KDL back trace utility use it.
+	// So we don't have anything more to do here.
+	// TODO: However, in the future, as we may have image symbols list
+	// not loaded anymore in memory, we should do something here then!!! 
+
+	return B_OK;
+}
+
+

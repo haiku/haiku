@@ -1427,6 +1427,16 @@ setrlimit(int resource, const struct rlimit * rlp)
 
 
 
+thread_id
+spawn_kernel_thread (thread_func function, const char *thread_name, long priority, void	*arg)
+{
+	return _create_thread(thread_name, team_get_kernel_team()->id, (addr) function, arg, (int) priority, true);
+
+}
+
+
+
+
 //	#pragma mark -
 //	Calls from within the kernel
 
