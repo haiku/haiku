@@ -10,8 +10,12 @@ StaticLibrary painter :
 	Painter.cpp
 	ShapeConverter.cpp
 	Transformable.cpp
+
 	drawing_modes/DrawingModeFactory.cpp
-	font_support/agg_font_freetype.cpp
+
+	# is contained within libagg.a,
+	# but we might need a modified version later
+	# font_support/agg_font_freetype.cpp
 	font_support/AGGTextRenderer.cpp
 	font_support/FontManager.cpp
 	font_support/TextRenderer.cpp
