@@ -71,7 +71,7 @@ int exec_file(int argc,char *argv[],int *retcode)
 
 	if( !find_file_in_path(argv[0],filename,SCAN_SIZE)) return SHE_FILE_NOT_FOUND;
 
-	pid = sys_proc_create_proc(filename,filename, argv, argc, 5);
+	pid = sys_proc_create_proc(filename,filename, argv, argc, NULL, 0, 5);
 
     if(pid < 0) return SHE_CANT_EXECUTE;
 

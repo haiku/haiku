@@ -65,7 +65,7 @@ int cmd_create_proc(int argc,char *argv[])
 		}
 	}
 
-	pid = sys_proc_create_proc(filename,filename, argv, argc, 5);
+	pid = sys_proc_create_proc(filename,filename, argv, argc, NULL, 0, 5);
 	if(pid >= 0) {
 		int retcode;
 

@@ -143,7 +143,7 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			*call_ret = 0;
 			break;
 		case SYSCALL_PROC_CREATE_PROC:
-			*call_ret = user_proc_create_proc((const char *)arg0, (const char *)arg1, (char **)arg2, (int )arg3, (int)arg4);
+			*call_ret = user_proc_create_proc((const char *)arg0, (const char *)arg1, (char **)arg2, (int)arg3, (char **)arg4, (int)arg5, (int)arg6);
 			break;
 		case SYSCALL_THREAD_WAIT_ON_THREAD:
 			*call_ret = user_thread_wait_on_thread((thread_id)arg0, (int *)arg1);
@@ -300,6 +300,12 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 			// ToDo: the correct way would be to lock the io_context
 			// or just call vfs_getrlimit()
 			*call_ret = (get_current_io_context(false))->table_size;
+			break;
+		case SYSCALL_SETENV:
+			*call_ret = user_setenv((const char *)arg0, (const char *)arg1, (int)arg2);
+			break;
+		case SYSCALL_GETENV:
+			*call_ret = user_getenv((const char *)arg0, (char **)arg1);
 			break;
 		default:
 			*call_ret = -1;

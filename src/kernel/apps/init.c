@@ -33,7 +33,7 @@ int main()
 	if(1) {
 		proc_id pid;
 
-		pid = sys_proc_create_proc("/boot/bin/fortune", "/boot/bin/fortune", NULL, 0, 5);
+		pid = sys_proc_create_proc("/boot/bin/fortune", "/boot/bin/fortune", NULL, 0, NULL, 0, 5);
 		if (pid >= 0) {
 			int retcode;
 			sys_proc_wait_on_proc(pid, &retcode);
@@ -46,7 +46,7 @@ int main()
 	while(1) {
 		proc_id pid;
 
-		pid = sys_proc_create_proc("/boot/bin/shell", "/boot/bin/shell", NULL, 0, 5);
+		pid = sys_proc_create_proc("/boot/bin/shell", "/boot/bin/shell", NULL, 0, NULL, 0, 5);
 		if(pid >= 0) {
 			int retcode;
 			printf("init: spawned shell, pid 0x%x\n", pid);

@@ -65,7 +65,7 @@ int    sys_set_sem_owner(sem_id id, proc_id proc);
 
 int sys_proc_get_table(struct proc_info *pi, size_t len);
 void sys_exit(int retcode);
-proc_id sys_proc_create_proc(const char *path, const char *name, char **args, int argc, int priority);
+proc_id sys_proc_create_proc(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 
 thread_id kern_spawn_thread(int (*func)(void*), const char *, int, void *);
 thread_id kern_get_current_thread_id(void);
@@ -114,6 +114,9 @@ int sys_test_and_set(int *val, int set_to, int test_val);
 int sys_sysctl(int *, uint, void *, size_t *, void *, size_t);
 int sys_socket(int, int, int);
 
+int sys_setenv(const char *, const char *, int);
+int sys_getenv(const char *, char **);
+ 
 /* region prototypes */
 area_id sys_find_region_by_name(const char *);
 

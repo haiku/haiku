@@ -86,7 +86,9 @@ enum {
 	SYSCALL_READ_DIR,
 	SYSCALL_REWIND_DIR,
 	SYSCALL_OPEN_DIR,
-	SYSCALL_CREATE_DIR
+	SYSCALL_CREATE_DIR,
+	SYSCALL_SETENV,
+	SYSCALL_GETENV /* 80 */
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);

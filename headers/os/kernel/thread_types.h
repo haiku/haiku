@@ -96,6 +96,7 @@ struct proc {
 	aspace_id    _aspace_id;
 	vm_address_space *aspace;
 	vm_address_space *kaspace;
+	addr         user_env_base;
 	struct thread *main_thread;
 	struct thread *thread_list;
 	struct arch_proc arch_info;

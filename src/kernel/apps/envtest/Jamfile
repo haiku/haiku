@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src kernel apps envtest ;
+
+KernelObjects <$(SOURCE_GRIST)>main.c : -fpic -Wno-unused ;

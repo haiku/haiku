@@ -312,6 +312,7 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libc!stdlib>assert.o
 	<$(SOURCE_GRIST)!libc!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libc!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libc!stdlib>env.o
 	<$(SOURCE_GRIST)!libc!stdlib>heapsort.o
 	<$(SOURCE_GRIST)!libc!stdlib>merge.o
 	<$(SOURCE_GRIST)!libc!stdlib>multibyte.o
@@ -427,6 +428,7 @@ KernelLd libc.so :
 	<$(SOURCE_GRIST)!libc!stdlib>assert.o
 	<$(SOURCE_GRIST)!libc!stdlib>atoi.o
 	<$(SOURCE_GRIST)!libc!stdlib>bsearch.o
+	<$(SOURCE_GRIST)!libc!stdlib>env.o
 	<$(SOURCE_GRIST)!libc!stdlib>heapsort.o
 	<$(SOURCE_GRIST)!libc!stdlib>merge.o
 	<$(SOURCE_GRIST)!libc!stdlib>multibyte.o
@@ -696,6 +698,19 @@ KernelLd filetest :
 	:
 	:
 	bin/filetest
+	;
+
+KernelLd envtest :
+	libglue2.o
+	<$(SOURCE_GRIST)!apps!envtest>main.o
+	libc.so
+	libm.so
+	:
+	$(SUBDIR)/ldscripts/$(OBOS_ARCH)/app.ld
+	:
+	:
+	:
+	bin/envtest
 	;
 
 KernelLd loop :

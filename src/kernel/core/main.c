@@ -121,7 +121,6 @@ static int main2(void *unused)
 	bus_init(&ka);
 	dev_init(&ka);
 	con_init(&ka);
-	
 	//net_init_postdev(&ka);
 
 #if 0
@@ -147,7 +146,7 @@ static int main2(void *unused)
 	// start the init process
 	{
 		proc_id pid;
-		pid = proc_create_proc("/boot/bin/init", "init", NULL, 0, 5);
+		pid = proc_create_proc("/boot/bin/init", "init", NULL, 0, NULL, 0, 5);
 		if(pid < 0)
 			kprintf("error starting 'init' error = %d \n",pid);
 	}

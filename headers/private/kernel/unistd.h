@@ -39,6 +39,8 @@ extern	 int optind;
 extern	 int optopt;
 extern	 int optreset;
 
+extern   char **environ;
+
 off_t   lseek(int, off_t, int);
 ssize_t read(int, void *, size_t);
 ssize_t pread(int, void *, size_t, off_t);

@@ -36,7 +36,10 @@ extern "C" {
  * Size of the stack given to processes
  */
 #define STACK_SIZE  (PAGE_SIZE*16)
-
+/**
+ * Size of the environmental variables space for a process
+ */
+#define ENV_SIZE    (PAGE_SIZE*8)
 
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))

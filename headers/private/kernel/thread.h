@@ -48,7 +48,7 @@ thread_id thread_create_user_thread(char *name, proc_id pid, addr entry, void *a
 thread_id thread_create_kernel_thread(const char *name, int (*func)(void *args), void *args);
 
 struct proc *proc_get_kernel_proc(void);
-proc_id proc_create_proc(const char *path, const char *name, char **args, int argc, int priority);
+proc_id proc_create_proc(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 int proc_kill_proc(proc_id);
 int proc_wait_on_proc(proc_id id, int *retcode);
 proc_id proc_get_kernel_proc_id(void);
@@ -58,7 +58,7 @@ int user_proc_get_arg_count(void);
 
 // used in syscalls.c
 int user_thread_wait_on_thread(thread_id id, int *uretcode);
-proc_id user_proc_create_proc(const char *path, const char *name, char **args, int argc, int priority);
+proc_id user_proc_create_proc(const char *path, const char *name, char **args, int argc, char **envp, int envc, int priority);
 int user_proc_wait_on_proc(proc_id id, int *uretcode);
 
 thread_id user_thread_create_user_thread(addr, proc_id, const char*, 
@@ -68,6 +68,9 @@ int user_thread_snooze(bigtime_t time);
 int user_proc_get_table(struct proc_info *pi, size_t len);
 int user_getrlimit(int resource, struct rlimit * rlp);
 int user_setrlimit(int resource, const struct rlimit * rlp);
+
+int user_setenv(const char *name, const char *value, int overwrite);
+int user_getenv(const char *name, char **value);
 
 #if 1
 // XXX remove later
