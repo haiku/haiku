@@ -15,8 +15,8 @@ void arch_thread_dump_info(void *info);
 void arch_thread_enter_uspace(addr entry, void *args, addr ustack_top);
 void arch_thread_switch_kstack_and_call(struct thread *t, addr new_kstack, void (*func)(void *), void *arg);
 
-struct thread *arch_thread_get_current_thread(void);
-void arch_thread_set_current_thread(struct thread *t);
+//struct thread *arch_thread_get_current_thread(void);
+//void arch_thread_set_current_thread(struct thread *t);
 
 // for any inline overrides
 #include <arch_thread.h>

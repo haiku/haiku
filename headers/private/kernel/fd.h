@@ -27,16 +27,15 @@ struct io_context {
 };
 
 struct fd_ops {
-	char *fs_name;	// can be removed, it's not used anywhere
 	ssize_t		(*fd_read) (struct file_descriptor *, off_t pos, void *buffer, size_t *length);
 	ssize_t		(*fd_write)(struct file_descriptor *, off_t pos, const void *buffer, size_t *length);
 	off_t		(*fd_seek)(struct file_descriptor *, off_t pos, int seekType);
-	int			(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
+	status_t	(*fd_ioctl)(struct file_descriptor *, ulong op, void *buffer, size_t length);
 //	int			(*fd_poll)(struct file_descriptor *, int);
 	status_t	(*fd_read_dir)(struct file_descriptor *,struct dirent *buffer,size_t bufferSize,uint32 *_count);
 	status_t	(*fd_rewind_dir)(struct file_descriptor *);
-	int			(*fd_stat)(struct file_descriptor *, struct stat *);
-	int			(*fd_close)(struct file_descriptor *);
+	status_t	(*fd_stat)(struct file_descriptor *, struct stat *);
+	status_t	(*fd_close)(struct file_descriptor *);
 	void		(*fd_free)(struct file_descriptor *);
 };
 

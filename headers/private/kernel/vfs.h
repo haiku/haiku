@@ -80,6 +80,12 @@ int sys_rename(const char *oldpath, const char *newpath);
 int sys_access(const char *path, int mode);
 int sys_read_stat(const char *path, bool traverseLink, struct stat *stat);
 int sys_write_stat(int fd, const char *path, bool traverseLink, struct stat *stat, int statMask);
+int sys_open_attr_dir(int fd, const char *path);
+int sys_create_attr(int fd, const char *name, uint32 type, int openMode);
+int sys_open_attr(int fd, const char *name, int openMode);
+int sys_write_attr_stat(int fd, const struct stat *stat, int statMask);
+int sys_remove_attr(int fd, const char *name);
+int sys_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName);
 int sys_getcwd(char *buffer, size_t size);
 int sys_setcwd(int fd, const char *path);
 
@@ -108,6 +114,12 @@ int user_rename(const char *oldpath, const char *newpath);
 int user_access(const char *path, int mode);
 int user_read_stat(const char *path, bool traverseLink, struct stat *stat);
 int user_write_stat(int fd, const char *path, bool traverseLink, struct stat *stat, int statMask);
+int user_open_attr_dir(int fd, const char *path);
+int user_create_attr(int fd, const char *name, uint32 type, int openMode);
+int user_open_attr(int fd, const char *name, int openMode);
+int user_write_attr_stat(int fd, const struct stat *stat, int statMask);
+int user_remove_attr(int fd, const char *name);
+int user_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName);
 int user_getcwd(char *buffer, size_t size);
 int user_setcwd(int fd, const char *path);
 
