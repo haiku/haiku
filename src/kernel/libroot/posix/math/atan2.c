@@ -105,6 +105,7 @@
  * shown.
  */
 
+#include <math.h>
 #include <mathimpl.h>
 
 vc(athfhi, 4.6364760900080611433E-1  ,6338,3fed,da7b,2b0d,  -1, .ED63382B0DDA7B)
@@ -113,7 +114,10 @@ vc(PIo4,   7.8539816339744830676E-1  ,0fda,4049,68c2,a221,   0, .C90FDAA22168C2)
 vc(at1fhi, 9.8279372324732906796E-1  ,985e,407b,b4d9,940f,   0, .FB985E940FB4D9)
 vc(at1flo,-3.5540295636764633916E-18 ,1edc,a383,eaea,34d6, -57,-.831EDC34D6EAEA)
 vc(PIo2,   1.5707963267948966135E0   ,0fda,40c9,68c2,a221,   1, .C90FDAA22168C2)
-vc(PI,     3.1415926535897932270E0   ,0fda,4149,68c2,a221,   2, .C90FDAA22168C2)
+
+// no, we declare PI as a macro in <math.h>
+//vc(PI,     3.1415926535897932270E0   ,0fda,4149,68c2,a221,   2, .C90FDAA22168C2)
+
 vc(a1,     3.3333333333333473730E-1  ,aaaa,3faa,ab75,aaaa,  -1, .AAAAAAAAAAAB75)
 vc(a2,    -2.0000000000017730678E-1  ,cccc,bf4c,946e,cccd,  -2,-.CCCCCCCCCD946E)
 vc(a3,     1.4285714286694640301E-1  ,4924,3f12,4262,9274,  -2, .92492492744262)
@@ -133,7 +137,10 @@ ic(PIo4,   7.8539816339744827900E-1  ,  -1,  1.921FB54442D18)
 ic(at1fhi, 9.8279372324732905408E-1  ,  -1,  1.F730BD281F69B)
 ic(at1flo,-2.4407677060164810007E-17 , -56, -1.C23DFEFEAE6B5)
 ic(PIo2,   1.5707963267948965580E0   ,   0,  1.921FB54442D18)
-ic(PI,     3.1415926535897931160E0   ,   1,  1.921FB54442D18)
+
+// no, we declare PI as a macro in <math.h>
+//ic(PI,     3.1415926535897931160E0   ,   1,  1.921FB54442D18)
+
 ic(a1,     3.3333333333333942106E-1  ,  -2,  1.55555555555C3)
 ic(a2,    -1.9999999999979536924E-1  ,  -3, -1.9999999997CCD)
 ic(a3,     1.4285714278004377209E-1  ,  -3,  1.24924921EC1D7)
@@ -153,7 +160,10 @@ ic(a11,    1.6438029044759730479E-2  ,  -6,  1.0D52174A1BB54)
 #define	at1fhi	vccast(at1fhi)
 #define	at1flo	vccast(at1flo)
 #define	PIo2	vccast(PIo2)
-#define	PI	vccast(PI)
+
+// no, we declare PI as a macro in <math.h>
+//#define	PI	vccast(PI)
+
 #define	a1	vccast(a1)
 #define	a2	vccast(a2)
 #define	a3	vccast(a3)
