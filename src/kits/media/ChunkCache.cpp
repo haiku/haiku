@@ -46,6 +46,8 @@ ChunkCache::MakeEmpty()
 	fLocker->Lock();
 	fEmptyChunkCount = CHUNK_COUNT - 1;
 	fReadyChunkCount = 0;
+	fNextPut = &fChunkInfos[0];
+	fNextGet = &fChunkInfos[0];
 	atomic_or(&fNeedsRefill, 1);
 	fLocker->Unlock();
 }
