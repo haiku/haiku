@@ -19,38 +19,38 @@ StaticLibrary fetish :
 	closeout.c
 	cycle-check.c
 	diacrit.c
-	dirfd.c
+#	dirfd.c
 	dirname.c
 	dup-safer.c
-	dup2.c
+#	dup2.c
 	error.c
 	euidaccess.c
 	exclude.c
 	exitfail.c
-	fchdir-stub.c
-	fchown-stub.c
+#	fchdir-stub.c
+#	fchown-stub.c
 	file-type.c
-	fileblocks.c
+#	fileblocks.c
 	filemode.c
 	fnmatch.c
 	fopen-safer.c
-	fsusage.c
-	ftruncate.c
+#	fsusage.c
+#	ftruncate.c
 	ftw.c
 	full-read.c
 	full-write.c
 	getcwd.c
 	getdate.c
-	getgroups.c
-	gethostname.c
-	getline.c
-	getloadavg.c
+#	getgroups.c
+#	gethostname.c
+#	getline.c
+#	getloadavg.c
 	getopt.c
 	getopt1.c
 	getpass.c
 	getstr.c
 	gettime.c
-	gettimeofday.c
+#	gettimeofday.c
 	getugroups.c
 	getusershell.c
 	group-member.c
@@ -65,27 +65,27 @@ StaticLibrary fetish :
 	linebuffer.c
 	localcharset.c
 	long-options.c
-	lstat-stub.c
-	lstat.c
+#	lstat-stub.c
+#	lstat.c
 	makepath.c
-	malloc.c
+#	malloc.c
 	mbswidth.c
 	md5.c
 	memcasecmp.c
-	memchr.c
-	memcmp.c
+#	memchr.c
+#	memcmp.c
 	memcoll.c
-	memcpy.c
-	memmove.c
+#	memcpy.c
+#	memmove.c
 	memrchr.c
-	memset.c
+#	memset.c
 	mkdir.c
-	mkstemp.c
+#	mkstemp.c
 	mktime.c
 	modechange.c
-	mountlist.c
+#	mountlist.c
 	nanosleep.c
-	obstack.c
+#	obstack.c
 	offtostr.c
 	path-concat.c
 	physmem.c
@@ -94,13 +94,13 @@ StaticLibrary fetish :
 	putenv.c
 	quote.c
 	quotearg.c
-	raise.c
-	readlink-stub.c
+#	raise.c
+#	readlink-stub.c
 	readtokens.c
-	realloc.c
-	regex.c
+#	realloc.c
+#	regex.c
 	rename.c
-	rmdir.c
+#	rmdir.c
 	rpmatch.c
 	safe-read.c
 	safe-write.c
@@ -110,32 +110,32 @@ StaticLibrary fetish :
 	settime.c
 	sha.c
 	sig2str.c
-	stat.c
-	stpcpy.c
-	strcasecmp.c
-	strcspn.c
-	strdup.c
+#	stat.c
+#	stpcpy.c
+#	strcasecmp.c
+#	strcspn.c
+#	strdup.c
 	strftime.c
 	stripslash.c
-	strncasecmp.c
+#	strncasecmp.c
 	strndup.c
 	strnlen.c
-	strpbrk.c
-	strstr.c
-	strtod.c
-	strtoimax.c
-	strtol.c
-	strtoll.c
-	strtoul.c
-	strtoull.c
-	strtoumax.c
+#	strpbrk.c
+#	strstr.c
+#	strtod.c
+#	strtoimax.c
+#	strtol.c
+#	strtoll.c
+#	strtoul.c
+#	strtoull.c
+#	strtoumax.c
 	strverscmp.c
-	tempname.c
+#	tempname.c
 	tsearch.c
 	umaxtostr.c
 	unicodeio.c
 	userspec.c
-	utime.c
+#	utime.c
 	version-etc.c
 	xgetcwd.c
 	xgethostname.c
