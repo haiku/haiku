@@ -41,6 +41,8 @@ status_t get_app_ref(entry_ref *ref, bool traverse = true);
 team_id current_team();
 thread_id main_thread_for(team_id team);
 
+bool is_running_on_haiku();
+
 } // namespace BPrivate
 
 // _get_object_token_

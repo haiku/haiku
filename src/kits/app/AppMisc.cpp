@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 
 #include <string.h>
+#include <sys/utsname.h>
 
 #include <AppMisc.h>
 #include <Entry.h>
@@ -126,6 +127,23 @@ main_thread_for(team_id team)
 			thread = info.thread;
 	}
 	return thread;
+}
+
+// is_running_on_haiku
+/*!	Returns whether we're running under Haiku natively.
+
+	This is a runtime check for components compiled only once for both
+	BeOS and Haiku and nevertheless need to behave differently on the two
+	systems, like the registrar, which uses another MIME database directory
+	under BeOS.
+
+	\return \c true, if we're running under Haiku, \c false otherwise.
+*/
+bool
+is_running_on_haiku()
+{
+	struct utsname info;
+	return (uname(&info) == 0 && strcmp(info.sysname, "Haiku") == 0);
 }
 
 } // namespace BPrivate
