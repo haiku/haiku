@@ -8,15 +8,19 @@ DUNWindow by Sikosis (beos@gravity24hr.com)
 
 #include "app/Application.h"
 #include <Alert.h>
+#include <Be.h>
 #include <Box.h>
 #include <Button.h>
 #include <CheckBox.h>
+#include <Entry.h>
+#include <File.h>
 #include <Font.h>
 #include <ListItem.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
+#include <Path.h>
 #include <OutlineListView.h>
 #include <stdio.h>
 #include <TextControl.h>
@@ -236,6 +240,16 @@ void DUNWindow::InitWindow(void) {
       
    // Add the Drawing View
    AddChild(aDUNview = new DUNView(r));
+   
+	// Load User Settings
+	BPath path;
+  	find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+  	path.Append("DUN/OBOS_DUN_settings",true);
+  	BFile file(path.Path(),B_READ_ONLY);
+	BMessage msg;
+  	msg.Unflatten(&file);
+	LoadSettings (&msg);
+   
 }
 // ------------------------------------------------------------------------------- //
 
@@ -250,12 +264,51 @@ DUNWindow::~DUNWindow() {
 }
 // ------------------------------------------------------------------------------- //
 
-// DUNWindow::QuitRequested -- Post a message to the app to quit
-bool DUNWindow::QuitRequested() {
-   be_app->PostMessage(B_QUIT_REQUESTED);
-   return true;
+
+// DUNWindow::LoadSettings -- Loads your current DUN settings
+void DUNWindow::LoadSettings(BMessage *msg)
+{
+	BRect frame;
+	if (B_OK == msg->FindRect("windowframe",&frame)) {
+		MoveTo(frame.left,frame.top);
+		ResizeTo(frame.right-frame.left,frame.bottom-frame.top);
+	}	
+
 }
 // ------------------------------------------------------------------------------- //
+
+
+// DUNWindow::SaveSettings -- Saves the Users DUN settings
+void DUNWindow::SaveSettings(void)
+{
+	BMessage msg;
+	msg.AddRect("windowframe",Frame());
+	
+	/*int selection=ListView1->CurrentSelection(0);
+	if (selection>=0)
+		msg.AddString("modulename", ((BStringItem *)(ListView1->ItemAt(selection)))->Text()); 
+	msg.what=POPULATE;	*/
+	
+    BPath path;
+    status_t result = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
+    if (result == B_OK)
+    {
+	    path.Append("DUN/OBOS_DUN_settings",true);
+    	BFile file(path.Path(),B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	    msg.Flatten(&file);
+	}    
+}
+// ------------------------------------------------------------------------------- //
+
+
+// DUNWindow::QuitRequested -- Post a message to the app to quit
+bool DUNWindow::QuitRequested() {
+	SaveSettings();
+    be_app->PostMessage(B_QUIT_REQUESTED);
+    return true;
+}
+// ------------------------------------------------------------------------------- //
+
 
 // DUNWindow::MessageReceived -- receives messages
 void DUNWindow::MessageReceived (BMessage *message) {

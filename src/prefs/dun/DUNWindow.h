@@ -19,6 +19,9 @@ public:
    ~DUNWindow();
    virtual bool QuitRequested();
    virtual void MessageReceived(BMessage *message);
+   
+   void LoadSettings(BMessage *msg);
+   void SaveSettings(void);
 private:
 	ModemWindow *modemWindow;
     void InitWindow(void);
