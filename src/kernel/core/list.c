@@ -18,7 +18,7 @@
 void
 list_init_etc(struct list *list, int32 offset)
 {
-	list->link.next = list->link.prev = (list_link *)list;
+	list->link.next = list->link.prev = &list->link;
 	list->offset = offset;
 }
 
@@ -39,11 +39,9 @@ list_add_link_to_head(struct list *list, void *_link)
 	list_link *link = (list_link *)_link;
 
 	link->next = list->link.next;
-	link->prev = (list_link *)list;
-	link->next->prev = link;
+	link->prev = &list->link;
 
-	if (list->link.prev == (list_link *)list)
-		list->link.prev = link;
+	list->link.next->prev = link;
 	list->link.next = link;
 }
 
@@ -56,11 +54,10 @@ list_add_link_to_tail(struct list *list, void *_link)
 {
 	list_link *link = (list_link *)_link;
 
-	link->next = (list_link *)list;
+	link->next = &list->link;
 	link->prev = list->link.prev;
 
-	if (list->link.next == (list_link *)list)
-		list->link.next = link;
+	list->link.prev->next = link;
 	list->link.prev = link;
 }
 
@@ -82,7 +79,7 @@ list_remove_link(void *_link)
 static inline list_link *
 get_next_link(struct list *list, list_link *link)
 {
-	if (link->next == (list_link *)list)
+	if (link->next == &list->link)
 		return NULL;
 
 	return link->next;
@@ -92,7 +89,7 @@ get_next_link(struct list *list, list_link *link)
 static inline list_link *
 get_prev_link(struct list *list, list_link *link)
 {
-	if (link->prev == (list_link *)list)
+	if (link->prev == &list->link)
 		return NULL;
 
 	return link->prev;
