@@ -841,6 +841,7 @@ search_path_for_type(image_type type)
 #else
 		case B_APP_IMAGE:
 			return "/boot/home/config/bin:"
+					"/bin:"
 					"/boot/apps:"
 					"/boot/preferences:"
 					"/boot/beos/apps:"
