@@ -69,7 +69,7 @@ static benaphore sAvailableMemoryLock;
 // function declarations
 static vm_area *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock);
 static status_t map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
-	off_t offset, addr_t size, int addr_type, int wiring, int lock, int mapping, vm_area **_region, const char *region_name);
+	off_t offset, addr_t size, uint32 addressSpec, int wiring, int lock, int mapping, vm_area **_area, const char *area_name);
 static status_t vm_soft_fault(addr_t address, bool is_write, bool is_user);
 static vm_area *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
 static void vm_put_area(vm_area *area);
@@ -253,20 +253,20 @@ find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_area *ar
 // must be called with this address space's virtual_map.sem held
 
 static status_t
-find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, int addr_type, vm_area *area)
+find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr_t end, uint32 addressSpec, vm_area *area)
 {
 	vm_area *last = NULL;
 	vm_area *next;
 	bool foundspot = false;
 
-	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addr_type %d, area %p\n",
-		map, start, size, end, addr_type, area));
+	TRACE(("find_and_insert_region_slot: map %p, start 0x%lx, size %ld, end 0x%lx, addressSpec %ld, area %p\n",
+		map, start, size, end, addressSpec, area));
 
 	// do some sanity checking
 	if (start < map->base || size == 0 || (end - 1) > (map->base + (map->size - 1)) || start + size > end)
 		return B_BAD_ADDRESS;
 
-	if (addr_type == B_EXACT_ADDRESS) {
+	if (addressSpec == B_EXACT_ADDRESS) {
 		// search for a reserved area
 		status_t status = find_reserved_region(map, start, size, area);
 		if (status == B_OK || status == ERR_VM_NO_REGION_SLOT)
@@ -293,7 +293,7 @@ find_and_insert_region_slot(vm_virtual_map *map, addr_t start, addr_t size, addr
 	if(next) dprintf("next->base 0x%x, next->size 0x%x\n", next->base, next->size);
 #endif
 
-	switch (addr_type) {
+	switch (addressSpec) {
 		case B_ANY_ADDRESS:
 		case B_ANY_KERNEL_ADDRESS:
 		case B_ANY_KERNEL_BLOCK_ADDRESS:
@@ -420,8 +420,8 @@ insert_area(vm_address_space *addressSpace, void **_address,
 // a ref to the cache holding this store must be held before entering here
 static status_t
 map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddress,
-	off_t offset, addr_t size, int addressSpec, int wiring, int protection,
-	int mapping, vm_area **_region, const char *areaName)
+	off_t offset, addr_t size, uint32 addressSpec, int wiring, int protection,
+	int mapping, vm_area **_area, const char *areaName)
 {
 	vm_cache *cache;
 	vm_cache_ref *cache_ref;
@@ -432,8 +432,8 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 
 	int err;
 
-	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addr_type %d, wiring %d, protection %d, _region %p, region_name '%s'\n",
-		aspace, store, *_virtualAddress, offset, size, addressSpec, wiring, protection, _region, region_name));
+	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addressSpec %ld, wiring %d, protection %d, _area %p, area_name '%s'\n",
+		aspace, store, *_virtualAddress, offset, size, addressSpec, wiring, protection, _area, areaName));
 
 	area = _vm_create_area_struct(aspace, areaName, wiring, protection);
 	if (area == NULL)
@@ -505,7 +505,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddr
 
 	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
-	*_region = area;
+	*_area = area;
 	return B_OK;
 
 err1b:
@@ -634,7 +634,7 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	vm_page *page = NULL;
 	status_t err;
 
-	TRACE(("create_anonymous_region: %s: size 0x%lx\n", name, size));
+	TRACE(("create_anonymous_area %s: size 0x%lx\n", name, size));
 
 	/* check parameters */
 	switch (addressSpec) {
@@ -682,13 +682,13 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	// create an anonymous store object
 	store = vm_store_create_anonymous_noswap();
 	if (store == NULL)
-		panic("vm_create_anonymous_region: vm_create_store_anonymous_noswap returned NULL");
+		panic("vm_create_anonymous_area: vm_create_store_anonymous_noswap returned NULL");
 	cache = vm_cache_create(store);
 	if (cache == NULL)
-		panic("vm_create_anonymous_region: vm_cache_create returned NULL");
+		panic("vm_create_anonymous_area: vm_cache_create returned NULL");
 	cache_ref = vm_cache_ref_create(cache);
 	if (cache_ref == NULL)
-		panic("vm_create_anonymous_region: vm_cache_ref_create returned NULL");
+		panic("vm_create_anonymous_area: vm_cache_ref_create returned NULL");
 	cache->temporary = 1;
 
 	switch (wiring) {
@@ -704,7 +704,7 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 			break;
 	}
 
-//	dprintf("create_anonymous_region: calling map_backing store\n");
+//	dprintf("create_anonymous_area: calling map_backing store\n");
 
 	vm_cache_acquire_ref(cache_ref, true);
 	err = map_backing_store(aspace, store, address, 0, size, addressSpec, wiring, protection, REGION_NO_PRIVATE_MAP, &area, name);
@@ -727,7 +727,7 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 		return err;
 	}
 
-//	dprintf("create_anonymous_region: done calling map_backing store\n");
+//	dprintf("create_anonymous_area: done calling map_backing store\n");
 
 	cache_ref = store->cache->ref;
 	switch (wiring) {
@@ -767,12 +767,12 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 			for (va = area->base; va < area->base + area->size; va += B_PAGE_SIZE, offset += B_PAGE_SIZE) {
 				err = (*aspace->translation_map.ops->query)(&aspace->translation_map, va, &pa, &flags);
 				if (err < 0) {
-//					dprintf("vm_create_anonymous_region: error looking up mapping for va 0x%x\n", va);
+//					dprintf("vm_create_anonymous_area: error looking up mapping for va 0x%x\n", va);
 					continue;
 				}
 				page = vm_lookup_page(pa / B_PAGE_SIZE);
 				if (page == NULL) {
-//					dprintf("vm_create_anonymous_region: error looking up vm_page structure for pa 0x%x\n", pa);
+//					dprintf("vm_create_anonymous_area: error looking up vm_page structure for pa 0x%x\n", pa);
 					continue;
 				}
 				atomic_add(&page->ref_count, 1);
@@ -819,7 +819,7 @@ vm_create_anonymous_area(aspace_id aid, const char *name, void **address,
 	}
 	vm_put_aspace(aspace);
 
-//	dprintf("create_anonymous_region: done\n");
+//	dprintf("create_anonymous_area: done\n");
 
 	if (area == NULL)
 		return B_NO_MEMORY;
@@ -840,9 +840,9 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	int err;
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 
-	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %d,"
-		" size = %lu, protection = %d, phys = %p)\n",
-		aid, name, _address, addr_type, size, protection, (void *)phys_addr));
+	TRACE(("vm_map_physical_memory(aspace = %ld, \"%s\", virtual = %p, spec = %ld,"
+		" size = %lu, protection = %ld, phys = %p)\n",
+		aid, name, _address, addressSpec, size, protection, (void *)phys_addr));
 
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
@@ -858,13 +858,13 @@ vm_map_physical_memory(aspace_id aid, const char *name, void **_address,
 	// create an device store object
 	store = vm_store_create_device(phys_addr);
 	if (store == NULL)
-		panic("vm_create_null_region: vm_store_create_device returned NULL");
+		panic("vm_map_physical_memory: vm_store_create_device returned NULL");
 	cache = vm_cache_create(store);
 	if (cache == NULL)
-		panic("vm_create_null_region: vm_cache_create returned NULL");
+		panic("vm_map_physical_memory: vm_cache_create returned NULL");
 	cache_ref = vm_cache_ref_create(cache);
 	if (cache_ref == NULL)
-		panic("vm_create_null_region: vm_cache_ref_create returned NULL");
+		panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
 	// tell the page scanner to skip over this area, it's pages are special
 	cache->scan_skip = 1;
 
@@ -976,7 +976,7 @@ _vm_map_file(aspace_id aid, const char *name, void **_address, uint32 addressSpe
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %d)\n", path, offset, size, mapping));
+	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %ld)\n", path, offset, size, mapping));
 
 	offset = ROUNDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
@@ -1097,7 +1097,7 @@ _vm_delete_area(vm_address_space *aspace, area_id id)
 	status_t status = B_OK;
 	vm_area *area;
 
-	TRACE(("vm_delete_region: aspace id 0x%lx, area id 0x%lx\n", aspace->id, id));
+	TRACE(("vm_delete_area: aspace id 0x%lx, area id 0x%lx\n", aspace->id, id));
 
 	area = vm_get_area(id);
 	if (area == NULL)
@@ -1624,7 +1624,7 @@ vm_delete_areas(struct vm_address_space *aspace)
 
 	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
 
-	// delete all the regions in this aspace
+	// delete all the areas in this aspace
 
 	for (area = aspace->virtual_map.areas; area; area = next) {
 		next = area->aspace_next;
@@ -1898,7 +1898,7 @@ vm_init(kernel_args *args)
 	arch_vm_init_post_area(args);
 	vm_page_init_post_area(args);
 
-	// allocate regions to represent stuff that already exists
+	// allocate areas to represent stuff that already exists
 
 	address = (void *)ROUNDOWN(heap_base, B_PAGE_SIZE);
 	create_area("kernel heap", &address, B_EXACT_ADDRESS, HEAP_SIZE,
