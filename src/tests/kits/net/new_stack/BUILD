@@ -9,6 +9,7 @@ But, beware:
   add-ons\
     generic\
       memory_pool -> ../../memory_pool/memory_pool
+      atomizer -> ../../atomizer/atomizer
     network\
       stack -> ../../stack/stack
       layers\
