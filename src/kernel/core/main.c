@@ -158,6 +158,7 @@ main2(void *unused)
 
 	//net_init_postdev(&ka);
 
+	//module_test();
 #if 0
 		// XXX remove
 		vfs_test();

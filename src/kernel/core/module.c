@@ -38,66 +38,57 @@ typedef enum {
 	MODULE_ERROR
 } module_state;
 
-/* This represents the actual loaded module. The module is loaded and
- * may have more than one exported image, i.e. the module foo may actually have
- * module_info structures for foo and bar.
- * To allow for this each module_info structure within the module loaded is
- * represented by a loaded_module_info structure.
- */
-typedef struct loaded_module {
-	struct loaded_module	*next;
-	module_info				**info;		/* the module_info we use */
-	char					*path;		/* the full path for the module */
-	image_id				image;
-	int32					ref_count;	/* how many ref's to this file */
-} loaded_module;
 
-/* This is used to keep a list of module and the file it's found
- * in. It's used when we do searches to record that a module_info for 
- * a particular module is found in a particular file which covers us for
- * the case where we have a single file exporting a number of modules.
+/* Each loaded module image (which can export several modules) is put
+ * in a hash (gModuleImagesHash) to be easily found when you search
+ * for a specific file name.
+ * ToDo: should probably use the VFS to parse the path, and use only the
+ * inode number for hashing. Would probably a little bit slower, but would
+ * lower the memory foot print quite a lot.
  */
+
+typedef struct module_image {
+	struct module_image	*next;
+	module_info			**info;		/* the module_info we use */
+	char				*path;		/* the full path for the module */
+	image_id			image;
+	int32				ref_count;	/* how many ref's to this file */
+	bool				keep_loaded;
+} module_image;
+
+/* Each known module will have this structure which is put in the
+ * gModulesHash, and looked up by name.
+ */
+
 typedef struct module {
-	struct module			*next;
-	struct loaded_module	*loaded_module;
-	char					*name;
-	char					*file;
-	int32					ref_count;
-	module_info				*info;		/* will only be valid if ref_cnt > 0 */
-	int						offset;		/* this is the offset in the headers */
-	module_state			state;		/* state of module */
-	bool					keep_loaded;
+	struct module		*next;
+	module_image		*module_image;
+	char				*name;
+	char				*file;
+	int32				ref_count;
+	module_info			*info;		/* will only be valid if ref_count > 0 */
+	int					offset;		/* this is the offset in the headers */
+	module_state		state;		/* state of module */
+	bool				keep_loaded;
 } module;
 
 
-#define INC_MOD_REF_COUNT(x) \
-	x->ref_count++; \
-	x->loaded_module->ref_count++;
-
-#define DEC_MOD_REF_COUNT(x) \
-	x->ref_count--; \
-	x->loaded_module->ref_count--;
-
-
 typedef struct module_iterator {
-	char						*prefix;
-	int							base_path_id;
-	struct module_dir_iterator	*base_dir;
-	struct module_dir_iterator	*cur_dir;
-	int							err;
-	int							module_pos;	/* This is used to keep track of which module_info
-											 * within a module we're addressing. */
-	module_info					**current_header;
-	char						*current_path;
-} module_iterator;
+	const char			**path_stack;
+	int					stack_size;
+	int					stack_current;
 
-typedef struct module_dir_iterator {
-	struct module_dir_iterator	*parent_dir;
-	struct module_dir_iterator	*sub_dir;
-	char						*name;
-	int							file;
-	int							hdr_prefix;
-} module_dir_iterator;
+	char				*prefix;
+	DIR					*current_dir;
+	int					status;
+	int					module_offset;
+		/* This is used to keep track of which module_info
+		 * within a module we're addressing. */
+	module_image		*module_image;
+	module_info			**current_header;
+	const char			*current_path;
+	const char			*current_module_path;
+} module_iterator;
 
 
 /* locking scheme: there is a global lock only; having several locks
@@ -107,28 +98,24 @@ typedef struct module_dir_iterator {
  */
 static recursive_lock gModulesLock;		
 
-/* These are the standard paths that we look on for mdoules to load.
- * By default we only look on these plus the prefix, though we do search
- * below the prefix.
- * i.e. using media as the prefix will match
- *      /boot/user-addons/media
- *      /boot/addons/media
- *      /boot/addons/media/encoders
- * but will NOT match
- *      /boot/addons/kernel/media
+/* These are the standard base paths where we start to look for modules
+ * to load. Order is important, the last entry here will be searched
+ * first.
+ * ToDo: these are not yet BeOS compatible (because the current bootfs is very limited)
  */
-const char *const gModulePaths[] = {
-	"/boot/user-addons", 
-	"/boot/addons"
+static const char * const gModulePaths[] = {
+	"/boot/addons",
+	"/boot/user-addons",
 };
 
 #define NUM_MODULE_PATHS (sizeof(gModulePaths) / sizeof(gModulePaths[0]))
+#define USER_MODULE_PATHS 1		/* first user path */
 
 /* we store the loaded modules by directory path, and all known modules by module name
  * in a hash table for quick access
  */
-hash_table *gLoadedModulesHash;
-hash_table *gModulesHash;
+static hash_table *gModuleImagesHash;
+static hash_table *gModulesHash;
 
 
 /** calculates hash for a module using its name */
@@ -163,16 +150,16 @@ module_compare(void *_module, const void *_key)
 }
 
 
-/** calculates the hash of a loaded module using its path */
+/** calculates the hash of a module image using its path */
 
 static uint32
-loaded_module_hash(void *_module, const void *_key, uint32 range)
+module_image_hash(void *_module, const void *_key, uint32 range)
 {
-	loaded_module *loadedModule = (loaded_module *)_module;
+	module_image *image = (module_image *)_module;
 	const char *path = (const char *)_key;
 
-	if (loadedModule != NULL)
-		return hash_hash_string(loadedModule->path) % range;
+	if (image != NULL)
+		return hash_hash_string(image->path) % range;
 
 	if (path != NULL)
 		return hash_hash_string(path) % range;
@@ -181,98 +168,144 @@ loaded_module_hash(void *_module, const void *_key, uint32 range)
 }
 
 
-/** compares a loaded module to a path */
+/** compares a module image to a path */
 
 static int
-loaded_module_compare(void *_module, const void *_key)
+module_image_compare(void *_module, const void *_key)
 {
-	loaded_module *loadedModule = (loaded_module *)_module;
+	module_image *image = (module_image *)_module;
 	const char *path = (const char *)_key;
 	if (path == NULL)
 		return -1;
 
-	return strcmp(loadedModule->path, path);
-}
-
-
-/** Try to load the module file we've found into memory.
- *	This may fail if all the symbols can't be resolved.
- *	Returns 0 on success, -1 on failure.
- *
- *	NB hdrs can be passed as a NULL if the modules ** header
- *	pointer isn't required.
- *
- *	Returns
- *		NULL on failure
- *		pointer to modules symbol on success
- */
-
-static module_info **
-load_module_file(const char *path)
-{
-	loaded_module *loadedModule;
-
-	image_id image = elf_load_kspace(path, "");
-	if (image < 0) {
-		dprintf("load_module_file failed: %s\n", strerror(image));
-		return NULL;
-	}
-
-	loadedModule = (loaded_module *)malloc(sizeof(loaded_module));
-	if (!loadedModule) {
-		elf_unload_kspace(path);
-		return NULL;
-	}
-
-	loadedModule->info = (module_info **)elf_lookup_symbol(image, "modules");
-	if (!loadedModule->info) {
-		FATAL(("load_module_file: Failed to load %s due to lack of 'modules' symbol\n", path));
-		elf_unload_kspace(path);
-		free(loadedModule);
-		return NULL;
-	}
-
-	loadedModule->path = strdup(path);
-	if (!loadedModule->path) {
-		elf_unload_kspace(path);
-		free(loadedModule);
-		return NULL;
-	}
-
-	loadedModule->image = image;
-	loadedModule->ref_count = 0;
-
-	recursive_lock_lock(&gModulesLock);
-	hash_insert(gLoadedModulesHash, loadedModule);
-	recursive_lock_unlock(&gModulesLock);
-
-	return loadedModule->info;
+	return strcmp(image->path, path);
 }
 
 
 static inline void
-unload_module_file(const char *path)
+inc_module_ref_count(struct module *module)
 {
-	loaded_module *loadedModule;
+	module->ref_count++;
+}
 
-	TRACE(("unload_mdoule_file: %s\n", path));
 
-	loadedModule = (loaded_module *)hash_lookup(gLoadedModulesHash, path);
-	if (loadedModule == NULL)
-		return;
+static inline void
+dec_module_ref_count(struct module *module)
+{
+	module->ref_count--;
+}
 
-	if (loadedModule->ref_count != 0) {
-		FATAL(("Can't unload %s due to ref_cnt = %ld\n", loadedModule->path, loadedModule->ref_count));
-		return;
+
+/** Try to load the module image at the specified location.
+ *	If it could be loaded, it returns B_OK, and stores a pointer
+ *	to the module_image object in "_moduleImage".
+ */
+
+static status_t
+load_module_image(const char *path, module_image **_moduleImage)
+{
+	module_image *moduleImage;
+	status_t status;
+
+	image_id image = elf_load_kspace(path, "");
+	if (image < 0) {
+		dprintf("load_module_image failed: %s\n", strerror(image));
+		return image;
+	}
+
+	moduleImage = (module_image *)malloc(sizeof(module_image));
+	if (!moduleImage) {
+		status = B_NO_MEMORY;
+		goto err;
+	}
+
+	moduleImage->info = (module_info **)elf_lookup_symbol(image, "modules");
+	if (!moduleImage->info) {
+		FATAL(("load_module_image: Failed to load %s due to lack of 'modules' symbol\n", path));
+		status = B_BAD_TYPE;
+		goto err1;
+	}
+
+	moduleImage->path = strdup(path);
+	if (!moduleImage->path) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
+
+	moduleImage->image = image;
+	moduleImage->ref_count = 0;
+	moduleImage->keep_loaded = false;
+
+	recursive_lock_lock(&gModulesLock);
+	hash_insert(gModuleImagesHash, moduleImage);
+	recursive_lock_unlock(&gModulesLock);
+
+	*_moduleImage = moduleImage;
+	return B_OK;
+
+err1:
+	free(moduleImage);
+err:
+	elf_unload_kspace(path);
+
+	return status;
+}
+
+
+static status_t
+unload_module_image(module_image *moduleImage, const char *path)
+{
+	TRACE(("unload_module_image(image = %p, path = %s)\n", moduleImage, path));
+
+	if (moduleImage == NULL) {
+		// if no image was specified, lookup it up in the hash table
+		moduleImage = (module_image *)hash_lookup(gModuleImagesHash, path);
+		if (moduleImage == NULL)
+			return B_ENTRY_NOT_FOUND;
+	}
+
+	if (moduleImage->ref_count != 0) {
+		FATAL(("Can't unload %s due to ref_cnt = %ld\n", moduleImage->path, moduleImage->ref_count));
+		return B_ERROR;
 	}
 
 	recursive_lock_lock(&gModulesLock);
-	hash_remove(gLoadedModulesHash, loadedModule);
+	hash_remove(gModuleImagesHash, moduleImage);
 	recursive_lock_unlock(&gModulesLock);
 
-	elf_unload_kspace(loadedModule->path);
-	free(loadedModule->path);
-	free(loadedModule);
+	elf_unload_kspace(moduleImage->path);
+	free(moduleImage->path);
+	free(moduleImage);
+
+	return B_OK;
+}
+
+
+static void
+put_module_image(module_image *image)
+{
+	int32 refCount = atomic_add(&image->ref_count, -1);
+	ASSERT(refCount > 0);
+
+	if (refCount == 1 && !image->keep_loaded)
+		unload_module_image(image, NULL);
+}
+
+
+static status_t
+get_module_image(const char *path, module_image **_image)
+{
+	struct module_image *image = (module_image *)hash_lookup(gModuleImagesHash, path);
+	if (image == NULL) {
+		status_t status = load_module_image(path, &image);
+		if (status < B_OK)
+			return status;
+	}
+
+	atomic_add(&image->ref_count, 1);
+	*_image = image;
+
+	return B_OK;
 }
 
 
@@ -280,7 +313,7 @@ unload_module_file(const char *path)
  *	by "info" and create the entries required for access to it's details.
  */
 
-static int
+static status_t
 create_module(module_info *info, const char *file, int offset, module **_module)
 {
 	module *module;
@@ -299,7 +332,7 @@ create_module(module_info *info, const char *file, int offset, module **_module)
 
 	TRACE(("create_module(%s, %s)\n", info->name, file));
 
-	module->loaded_module = NULL;
+	module->module_image = NULL;
 	module->name = strdup(info->name);
 	if (module->name == NULL) {
 		free(module);
@@ -342,17 +375,18 @@ create_module(module_info *info, const char *file, int offset, module **_module)
  */
 
 static status_t
-check_module_file(const char *path, const char *searchedName)
+check_module_image(const char *path, const char *searchedName)
 {
-	module_info **header = NULL, **info;
+	module_image *image;
+	module_info **info;
 	int index = 0, match = B_ENTRY_NOT_FOUND;
 
-	ASSERT(hash_lookup(gLoadedModulesHash, path) == NULL);
+	ASSERT(hash_lookup(gModuleImagesHash, path) == NULL);
 
-	if ((header = load_module_file(path)) == NULL)
-		return -1;
+	if (load_module_image(path, &image) < B_OK)
+		return B_ENTRY_NOT_FOUND;
 
-	for (info = header; *info; info++) {
+	for (info = image->info; *info; info++) {
 		// try to create a module for every module_info, check if the
 		// name matches if it was a new entry
 		if (create_module(*info, path, index++, NULL) == B_OK) {
@@ -365,7 +399,7 @@ check_module_file(const char *path, const char *searchedName)
 	// loaded module at this point
 	if (match != B_OK) {
 		TRACE(("check_module_file: unloading module file %s\n", path));
-		unload_module_file(path);
+		unload_module_image(image, path);
 	}
 
 	return match;
@@ -431,10 +465,10 @@ recurse_directory(const char *path, const char *searchedName)
 			// because then we know it doesn't contain the module we are
 			// searching for (we are here because it couldn't be found in
 			// the first place)
-			if (hash_lookup(gLoadedModulesHash, newPath) != NULL)
+			if (hash_lookup(gModuleImagesHash, newPath) != NULL)
 				continue;
 
-			status = check_module_file(newPath, searchedName);
+			status = check_module_image(newPath, searchedName);
 		} else if (S_ISDIR(st.st_mode))
 			status = recurse_directory(newPath, searchedName);
 		else
@@ -459,15 +493,20 @@ exit:
 static module *
 search_module(const char *name)
 {
-	int i, res = 0;
+	status_t status = B_ENTRY_NOT_FOUND;
+	int i;
+
 	TRACE(("search_module(%s)\n", name));
-	
-	for (i = 0; i < (int)NUM_MODULE_PATHS; ++i) {
-		if ((res = recurse_directory(gModulePaths[i], name)) == 1)
+
+	for (i = 0; i < NUM_MODULE_PATHS; i++) {
+		if (modules_disable_user_addons && i >= USER_MODULE_PATHS)
+			return NULL;
+
+		if ((status = recurse_directory(gModulePaths[i], name)) == B_OK)
 			break;
 	}
 
-	if (res != 1)
+	if (status != B_OK)
 		return NULL;
 
 	return (module *)hash_lookup(gModulesHash, name);
@@ -568,255 +607,147 @@ uninit_module(module *module)
 }
 
 
+static const char *
+iterator_pop_path_from_stack(module_iterator *iterator)
+{
+	if (iterator->stack_current > 0)
+		return iterator->path_stack[--iterator->stack_current];
+
+	return NULL;
+}
+
+
 static status_t
-process_module_info(module_iterator *iterator, char *buffer, size_t *_bufferSize)
+iterator_push_path_on_stack(module_iterator *iterator, const char *path)
 {
-	module *module = NULL;
-	module_info **info = iterator->current_header;
-	status_t status = B_NO_ERROR;
-
-	if (!info || !(*info)) {
-		status = B_BAD_VALUE;
-	} else {
-		status = create_module(*info, iterator->current_path, iterator->module_pos++, &module);
-		if (status == B_OK) {
-			strlcpy(buffer, module->name, *_bufferSize);
-			*_bufferSize = strlen(module->name);
-		}
-	}
-
-	// If we have a valid "info" pointer, traverse to the next, or mark the end
-	if (info && *(++info) != NULL)
-		iterator->current_header++;
-	else
-		iterator->current_header = NULL;
-
-	return status;
-}
-
-
-static inline int
-module_create_dir_iterator(module_iterator *iter, int file, const char *name)
-{
-	module_dir_iterator *dir;
-
-	/* if we're creating a dir_iterator, there is no way that the
-	 * current_header value can be valid, so make sure and reset it
-	 * here.
-	 */
-	iter->current_header = NULL;
-
-	dir = (struct module_dir_iterator *)malloc(sizeof(*dir));
-	if (dir == NULL )
-		return ENOMEM;
-
-	dir->name = strdup(name);
-	if (dir->name == NULL) {
-		free(dir);
-		return ENOMEM;
-	}
-
-	dir->file = file;
-	dir->sub_dir = NULL;		
-	dir->parent_dir = iter->cur_dir;
-
-	if (iter->cur_dir)
-		iter->cur_dir->sub_dir = dir;
-	else
-		iter->base_dir = dir;
+	if (iterator->stack_current + 1 > iterator->stack_size) {
+		// allocate new space on the stack
+		const char **stack = (const char **)malloc((iterator->stack_size + 8) * sizeof(char *));
+		if (stack == NULL)
+			return B_NO_MEMORY;
 		
-	iter->cur_dir = dir;
-
-	TRACE(("created dir iterator for %s\n", name));
-	return B_NO_ERROR;
-}
-
-
-static inline int
-module_enter_dir(module_iterator *iter, const char *path)
-{
-	int dir;
-	int res;
-
-	// ToDo: use opendir() instead
-	dir = sys_open_dir(path);
-	if (dir < 0) {
-		TRACE(("couldn't open directory %s (%s)\n", path, strerror(dir)));
-
-		// there are so many errors for "not found" that we don't bother
-		// and always assume that the directory suddenly disappeared
-		return B_NO_ERROR;
-	}
-
-	res = module_create_dir_iterator(iter, dir, path);
-	if (res != B_NO_ERROR) {
-		sys_close(dir);
-		return ENOMEM;
-	}
-
-	TRACE(("entered directory %s\n", path));
-	return B_NO_ERROR;
-}
-
-
-static inline void
-destroy_dir_iterator(module_iterator *iter)
-{
-	module_dir_iterator *dir = iter->cur_dir;
-
-	TRACE(("destroying directory iterator for sub-dir %s\n", dir->name));
-
-	if (dir->parent_dir)
-		dir->parent_dir->sub_dir = NULL;
-
-	iter->cur_dir = dir->parent_dir;
-
-	free(dir->name);
-	free(dir);
-}
-
-
-static inline void
-module_leave_dir(module_iterator *iter)
-{
-	module_dir_iterator *parent_dir;
-	
-	TRACE(("leaving directory %s\n", iter->cur_dir->name));
-
-	parent_dir = iter->cur_dir->parent_dir;
-	iter->current_header = NULL;	
-	sys_close(iter->cur_dir->file);
-	destroy_dir_iterator(iter);
-
-	iter->cur_dir = parent_dir;
-}
-
-
-static void
-compose_path(char *path, module_iterator *iter, const char *name, bool full_path)
-{
-	module_dir_iterator *dir;
-	
-	if (full_path) {
-		strlcpy(path, iter->base_dir->name, SYS_MAX_PATH_LEN);
-		strlcat(path, "/", SYS_MAX_PATH_LEN);
-	} else {
-		strlcpy(path, iter->prefix, SYS_MAX_PATH_LEN);
-		if (*iter->prefix)
-			strlcat(path, "/", SYS_MAX_PATH_LEN);
-	}
-
-	for (dir = iter->base_dir->sub_dir; dir; dir = dir->sub_dir) {
-		strlcat(path, dir->name, SYS_MAX_PATH_LEN);
-		strlcat(path, "/", SYS_MAX_PATH_LEN);
-	}
-
-	strlcat(path, name, SYS_MAX_PATH_LEN);
-
-	TRACE(("name: %s, %s -> %s\n", name, full_path ? "full path" : "relative path", path));
-}
-
-
-/** Logic as follows...
- *	If we have a headers pointer,
- *	 - check if the next structure is NULL, if not process that module_info structure
- *	 - if it's null, close the file, NULL the headers pointer and fall through
- *
- *	This function tries to find the next module filename and then set the headers
- *	pointer in the cur_dir structure.
- */
-
-static inline int
-module_traverse_dir(module_iterator *iter)
-{
-	struct stat st;
-	char buffer[SYS_MAX_NAME_LEN + sizeof(struct dirent)];
-	struct dirent *dirent = (struct dirent *)buffer;
-	char path[SYS_MAX_PATH_LEN];
-	int res;
-
-	/* If (*iter->current_header) != NULL we have another module within
-	 * the existing file to return, so just return.
-	 * Otherwise, actually find the next file to read.
-	 */ 
-	if (iter->current_header) {
-		if (*iter->current_header != NULL)
-			return B_OK;
-
-		unload_module_file(iter->current_path);
-	}
-
-	TRACE(("scanning %s\n", iter->cur_dir->name));
-	if ((res = sys_read_dir(iter->cur_dir->file, dirent, sizeof(buffer), 1)) <= 0) {
-		TRACE(("got error: %s\n", strerror(res)));
-		module_leave_dir(iter);
-		return B_NO_ERROR;
-	}
-
-	TRACE(("got %s\n", dirent->d_name));
-
-	if (strcmp(dirent->d_name, ".") == 0
-		|| strcmp(dirent->d_name, "..") == 0 )
-		return B_NO_ERROR;
-
-	compose_path(path, iter, dirent->d_name, true);
-
-	/* As we're doing a new file, reset the pointers that might get
-	 * screwed up...
-	 */
-	iter->current_header = NULL;
-	iter->module_pos = 0;
-
-	if ((res = stat(path, &st)) != B_NO_ERROR)
-		return res;
-
-	if (S_ISREG(st.st_mode)) {
-		module_info **hdrs = NULL;
-		if ((hdrs = load_module_file(path)) != NULL) {
-			iter->current_header = hdrs;
-			iter->current_path = strdup(path);			
-			return B_NO_ERROR;
+		if (iterator->path_stack != NULL) {
+			memcpy(stack, iterator->path_stack, iterator->stack_current * sizeof(char *));
+			free(iterator->path_stack);
 		}
-		return EINVAL; /* not sure what we should return here */
+		
+		iterator->path_stack = stack;
+		iterator->stack_size += 8;
 	}
-
-	if (S_ISDIR(st.st_mode))
-		return module_enter_dir(iter, path);
-
-	TRACE(("entry %s not a file nor a directory - ignored\n", dirent->d_name));
-	return B_NO_ERROR;
+	
+	iterator->path_stack[iterator->stack_current++] = path;
+	return B_OK;
 }
 
 
-/** Basically try each of the directories we have listed as module paths,
- *	trying each with the prefix we've been allocated.
- */
-
-static inline int
-module_enter_base_path(module_iterator *iter)
+static status_t
+iterator_get_next_module(module_iterator *iterator, char *buffer, size_t *_bufferSize)
 {
-	char path[SYS_MAX_PATH_LEN];
+	status_t status;
 
-	++iter->base_path_id;
+	TRACE(("iterator_get_next_module() -- start\n"));
 
-	if (iter->base_path_id >= NUM_MODULE_PATHS) {
-		TRACE(("no locations left\n"));
-		return B_ENTRY_NOT_FOUND;
+nextDirectory:
+	if (iterator->current_dir == NULL) {
+		// get next directory path from the stack
+		const char *path = iterator_pop_path_from_stack(iterator);
+		if (path == NULL) {
+			// we are finished, there are no more entries on the stack
+			return B_ENTRY_NOT_FOUND;
+		}
+
+		free((void *)iterator->current_path);
+		iterator->current_path = path;
+		iterator->current_dir = opendir(path);
+		TRACE(("open directory at %s -> %p\n", path, iterator->current_dir));
+
+		if (iterator->current_dir == NULL) {
+			// we don't throw an error here, but silently go to
+			// the next directory on the stack
+			goto nextDirectory;
+		}
 	}
 
-	TRACE(("trying base path (%s)\n", gModulePaths[iter->base_path_id]));
+nextModuleImage:
+	if (iterator->current_header == NULL) {
+		// get next entry from the current directory
+		char path[SYS_MAX_PATH_LEN];
+		struct dirent *dirent;
+		struct stat st;
 
-	if (iter->base_path_id == 0 && modules_disable_user_addons) {
-		TRACE(("ignoring user add-ons (they are disabled)\n"));
-		return B_NO_ERROR;
-	}
-	strcpy(path, gModulePaths[iter->base_path_id]);
-	if (*iter->prefix) {
-		strcat(path, "/");
-		strlcat(path, iter->prefix, sizeof(path));
+		errno = 0;
+
+		if ((dirent = readdir(iterator->current_dir)) == NULL) {
+			closedir(iterator->current_dir);
+			iterator->current_dir = NULL;
+
+			if (errno < B_OK)
+				return errno;
+
+			goto nextDirectory;
+		}
+
+		if (!strcmp(dirent->d_name, ".")
+			|| !strcmp(dirent->d_name, ".."))
+			goto nextModuleImage;
+
+		// build absolute path to current file
+		strlcpy(path, iterator->current_path, sizeof(path));
+		strlcat(path, "/", sizeof(path));
+		strlcat(path, dirent->d_name, sizeof(path));
+
+		// find out if it's a directory or a file
+		if (stat(path, &st) < 0)
+			return errno;
+
+		iterator->current_module_path = strdup(path);
+		if (iterator->current_module_path == NULL)
+			return B_NO_MEMORY;
+
+		if (S_ISDIR(st.st_mode)) {
+			status = iterator_push_path_on_stack(iterator, iterator->current_module_path);
+			if (status < B_OK)
+				return status;
+
+			iterator->current_module_path = NULL;
+			goto nextModuleImage;
+		}
+
+		if (!S_ISREG(st.st_mode))
+			return B_BAD_TYPE;
+
+		TRACE(("open module at %s\n", path));
+
+		status = get_module_image(path, &iterator->module_image);
+		if (status < B_OK) {
+			free((void *)iterator->current_module_path);
+			iterator->current_module_path = NULL;
+			goto nextModuleImage;
+		}
+
+		iterator->current_header = iterator->module_image->info;
+		iterator->module_offset = 0;
 	}
 
-	return module_enter_dir(iter, path);
+	if (*iterator->current_header == NULL) {
+		iterator->current_header = NULL;
+		free((void *)iterator->current_module_path);
+		iterator->current_module_path = NULL;
+
+		put_module_image(iterator->module_image);
+		iterator->module_image = NULL;
+
+		goto nextModuleImage;
+	}
+
+	// ToDo: we might want to create a module here and cache it in the hash table
+
+	*_bufferSize = strlcpy(buffer, (*iterator->current_header)->name, *_bufferSize);
+
+	iterator->current_header++;
+	iterator->module_offset++;
+
+	return B_OK;
 }
 
 
@@ -837,8 +768,8 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 	if (gModulesHash == NULL)
 		return B_NO_MEMORY;
 
-	gLoadedModulesHash = hash_init(MODULE_HASH_SIZE, 0, loaded_module_compare, loaded_module_hash);
-	if (gLoadedModulesHash == NULL)
+	gModuleImagesHash = hash_init(MODULE_HASH_SIZE, 0, module_image_compare, module_image_hash);
+	if (gModuleImagesHash == NULL)
 		return B_NO_MEMORY;
 
 /*
@@ -850,6 +781,32 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 
 	return B_OK;
 }
+
+
+#ifdef DEBUG
+void
+module_test(void)
+{
+	void *cookie;
+
+	dprintf("module_test() - start!\n");
+
+	cookie = open_module_list(NULL);
+	if (cookie == NULL)
+		return;
+
+	while (true) {
+		char name[SYS_MAX_PATH_LEN];
+		size_t size = sizeof(name);
+
+		if (read_next_module_name(cookie, name, &size) < B_OK)
+			break;
+
+		dprintf("module: %s\n", name);
+	}
+	close_module_list(cookie);
+}
+#endif
 
 
 //	#pragma mark -
@@ -868,25 +825,45 @@ module_init(kernel_args *ka, module_info **sys_module_headers)
 void *
 open_module_list(const char *prefix)
 {
+	char path[SYS_MAX_PATH_LEN];
 	module_iterator *iterator;
+	int i;
 
 	TRACE(("open_module_list(prefix = %s)\n", prefix));
 
-	iterator = (module_iterator *)malloc(sizeof( module_iterator));
+	iterator = (module_iterator *)malloc(sizeof(module_iterator));
 	if (!iterator)
 		return NULL;
 
+	memset(iterator, 0, sizeof(module_iterator));
+
 	// ToDo: possibly, the prefix don't have to be copied, just referenced
-	iterator->prefix = strdup(prefix);
+	iterator->prefix = strdup(prefix ? prefix : "");
 	if (iterator->prefix == NULL) {
 		free(iterator);
 		return NULL;
 	}
 
-	iterator->base_path_id = -1;
-	iterator->base_dir = iterator->cur_dir = NULL;
-	iterator->err = B_NO_ERROR;
-	iterator->module_pos = 0;
+	// put all search paths on the stack
+	for (i = 0; i < NUM_MODULE_PATHS; i++) {
+		const char *p;
+
+		if (modules_disable_user_addons && i >= USER_MODULE_PATHS)
+			break;
+
+		strcpy(path, gModulePaths[i]);
+		if (prefix && *prefix) {
+			strcat(path, "/");
+			strlcat(path, prefix, sizeof(path));
+		}
+
+		p = strdup(path);
+		if (p == NULL) {
+			// ToDo: should we abort the whole operation here?
+			continue;
+		}
+		iterator_push_path_on_stack(iterator, p);
+	}
 
 	return (void *)iterator;
 }
@@ -899,14 +876,27 @@ status_t
 close_module_list(void *cookie)
 {
 	module_iterator *iterator = (module_iterator *)cookie;
+	const char *path;
 
 	TRACE(("close_module_list()\n"));
 
 	if (iterator == NULL)
 		return B_BAD_VALUE;
 
-	while (iterator->cur_dir)
-		module_leave_dir(iterator);
+	// free stack
+	while ((path = iterator_pop_path_from_stack(iterator)) != NULL)
+		free((void *)path);
+
+	// close what have been left open
+	if (iterator->module_image != NULL)
+		put_module_image(iterator->module_image);
+
+	if (iterator->current_dir != NULL)
+		closedir(iterator->current_dir);
+
+	free(iterator->path_stack);
+	free((void *)iterator->current_path);
+	free((void *)iterator->current_module_path);
 
 	free(iterator->prefix);
 	free(iterator);
@@ -927,33 +917,23 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 	module_iterator *iterator = (module_iterator *)cookie;
 	status_t status;
 
+	TRACE(("read_next_module_name: looking for next module\n"));
+
 	if (iterator == NULL || buffer == NULL || _bufferSize == NULL)
 		return B_BAD_VALUE;
 
-	TRACE(("read_next_module_name: looking for next module\n"));
-	
-	status = iterator->err;
+	if (iterator->status < B_OK)
+		return iterator->status;
+
+	status = iterator->status;
 	recursive_lock_lock(&gModulesLock);
 
-	while (status == B_OK) {
-		TRACE(("searching for module\n"));
+	status = iterator_get_next_module(iterator, buffer, _bufferSize);
 
-		if (iterator->cur_dir != NULL) {
-			if ((status = module_traverse_dir(iterator)) == B_NO_ERROR) {
-				// By this point we should have a valid pointer to a 
-				// module_info structure in iterator->current_header
-				status = process_module_info(iterator, buffer, _bufferSize);
-				if (status == B_OK)
-					break;
-			}
-		} else
-			status = module_enter_base_path(iterator);
-	}
-
-	iterator->err = status;
+	iterator->status = status;
 	recursive_lock_unlock(&gModulesLock);
 
-	TRACE(("finished with status %s\n", strerror(status)));
+	TRACE(("read_next_module_name: finished with status %s\n", strerror(status)));
 	return status;
 }
 
@@ -961,14 +941,14 @@ read_next_module_name(void *cookie, char *buffer, size_t *_bufferSize)
 /** Iterates through all loaded modules, and stores its path in "buffer".
  *	ToDo: check if the function in BeOS really does that (could also mean:
  *		iterate through all modules that are currently loaded; have a valid
- *		loaded_module pointer, which would be hard to test for)
+ *		module_image pointer, which would be hard to test for)
  */
 
 status_t 
 get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize)
 {
 	hash_iterator *iterator = (hash_iterator *)*cookie;
-	loaded_module *loadedModule;
+	module_image *moduleImage;
 	status_t status;
 
 	TRACE(("get_next_loaded_module_name()\n"));
@@ -977,7 +957,7 @@ get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize)
 		return B_BAD_VALUE;
 
 	if (iterator == NULL) {
-		iterator = hash_open(gLoadedModulesHash, NULL);
+		iterator = hash_open(gModuleImagesHash, NULL);
 		if (iterator == NULL)
 			return B_NO_MEMORY;
 
@@ -986,13 +966,13 @@ get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize)
 
 	recursive_lock_lock(&gModulesLock);
 
-	loadedModule = hash_next(gLoadedModulesHash, iterator);
-	if (loadedModule != NULL) {
-		strlcpy(buffer, loadedModule->path, *_bufferSize);
-		*_bufferSize = strlen(loadedModule->path);
+	moduleImage = hash_next(gModuleImagesHash, iterator);
+	if (moduleImage != NULL) {
+		strlcpy(buffer, moduleImage->path, *_bufferSize);
+		*_bufferSize = strlen(moduleImage->path);
 		status = B_OK;
 	} else {
-		hash_close(gLoadedModulesHash, iterator, true);
+		hash_close(gModuleImagesHash, iterator, true);
 		status = B_ENTRY_NOT_FOUND;
 	}
 
@@ -1005,7 +985,7 @@ get_next_loaded_module_name(uint32 *cookie, char *buffer, size_t *_bufferSize)
 status_t
 get_module(const char *path, module_info **_info)
 {
-	loaded_module *loadedModule;
+	module_image *moduleImage;
 	module *module;
 	status_t status;
 
@@ -1026,27 +1006,25 @@ get_module(const char *path, module_info **_info)
 		}
 	}
 
-	/* We now need to find the loaded_module for the module. This should
+	/* We now need to find the module_image for the module. This should
 	 * be in memory if we have just run search_modules, but may not be
 	 * if we are used cached information.
-	 * We can't use the module->loaded_module pointer, because it is not
-	 * reliable at this point (it won't be set to NULL when the loaded_module
+	 * We can't use the module->module_image pointer, because it is not
+	 * reliable at this point (it won't be set to NULL when the module_image
 	 * is unloaded).
 	 */
-	loadedModule = (loaded_module *)hash_lookup(gLoadedModulesHash, module->file);
-	if (loadedModule == NULL) {
-		if (load_module_file(module->file) == NULL)
-			goto err;
-
-		loadedModule = (loaded_module *)hash_lookup(gLoadedModulesHash, module->file);
-		if (loadedModule == NULL)
-			goto err;
-	}
+	if (get_module_image(module->file, &moduleImage) < B_OK)
+		goto err;
 
 	// (re)set in-memory data for the loaded module
-	module->info = loadedModule->info[module->offset];
-	module->loaded_module = loadedModule;
-	INC_MOD_REF_COUNT(module);
+	module->info = moduleImage->info[module->offset];
+	module->module_image = moduleImage;
+
+	// the module image must not be unloaded anymore
+	if (module->keep_loaded)
+		module->module_image->keep_loaded = true;
+
+	inc_module_ref_count(module);
 
 	// The state will be adjusted by the call to init_module
 	// if we have just loaded the file
@@ -1083,16 +1061,13 @@ put_module(const char *path)
 		recursive_lock_unlock(&gModulesLock);
 		return B_BAD_VALUE;
 	}
-	DEC_MOD_REF_COUNT(module);
+	dec_module_ref_count(module);
 
-	// If there are nomore references to this module - must we keep it loaded?
-	if (module->ref_count == 0 && !module->keep_loaded) {
-		// destruct the module, and check if we can also unload the
-		// loaded module it refers to
+	// ToDo: not sure if this should ever be called for keep_loaded modules...
+	if (module->ref_count == 0)
 		uninit_module(module);
-		if (module->loaded_module->ref_count == 0)
-			unload_module_file(module->file);
-	}
+
+	put_module_image(module->module_image);
 
 	recursive_lock_unlock(&gModulesLock);
 	return B_OK;
