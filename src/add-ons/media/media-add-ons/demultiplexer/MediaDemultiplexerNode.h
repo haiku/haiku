@@ -320,6 +320,11 @@ virtual status_t HandleParameter(
 						bigtime_t lateness,
 						bool realTimeEvent = false);
 
+protected:
+
+void CreateBufferGroup(MediaOutputInfo * output_info);
+void ComputeInternalLatency();
+
 public:
 
 static void GetFlavor(flavor_info * outInfo, int32 id);

@@ -5,6 +5,7 @@ UsePrivateHeaders demultiplexer ;
 Addon demultiplexer.media_addon : media :
 	MediaDemultiplexerNode.cpp
 	MediaDemultiplexerAddOn.cpp
+	MediaOutputInfo.cpp
 	misc.cpp
 ;
 

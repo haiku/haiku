@@ -34,11 +34,6 @@ MediaDemultiplexerNode::~MediaDemultiplexerNode(void)
 	fprintf(stderr,"MediaDemultiplexerNode::~MediaDemultiplexerNode\n");
 	// Stop the BMediaEventLooper thread
 	Quit();
-	if (fBufferGroup != 0) {
-		BBufferGroup * group = fBufferGroup;
-		fBufferGroup = 0;
-		delete group;
-	}	
 }
 
 MediaDemultiplexerNode::MediaDemultiplexerNode(
@@ -48,7 +43,7 @@ MediaDemultiplexerNode::MediaDemultiplexerNode(
 	: BMediaNode("MediaDemultiplexerNode"),
 	  BMediaEventLooper(),
   	  BBufferConsumer(B_MEDIA_MULTISTREAM),
-  	  BBufferProducer(B_MEDIA_UNKNOWN) // no B_MEDIA_ANY
+  	  BBufferProducer(B_MEDIA_UNKNOWN_TYPE) // no B_MEDIA_ANY
 {
 	fprintf(stderr,"MediaDemultiplexerNode::MediaDemultiplexerNode\n");
 	// keep our creator around for AddOn calls later
@@ -550,7 +545,7 @@ status_t MediaDemultiplexerNode::GetNextOutput(	/* cookie starts as 0 */
 {
 	fprintf(stderr,"MediaDemultiplexerNode::GetNextOutput\n");
 	// let's not crash even if they are stupid
-	if ((out_output == 0) || (oookie == 0)) {
+	if ((out_output == 0) || (cookie == 0)) {
 		// no place to write!
 		fprintf(stderr,"<- B_BAD_VALUE\n");
 		return B_BAD_VALUE;
@@ -572,7 +567,7 @@ status_t MediaDemultiplexerNode::GetNextOutput(	/* cookie starts as 0 */
 	// return this output
 	*out_output = itr->output;
 	// so next time they won't get the same output again
-	*cookie = (int32)itr.next();
+	*cookie = (int32)++itr;
 	return B_OK;
 }
 
@@ -592,7 +587,7 @@ status_t MediaDemultiplexerNode::SetBufferGroup(
 	// find the information for this output
 	vector<MediaOutputInfo>::iterator itr;
 	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
-		if (itr->output.source == source) {
+		if (itr->output.source == for_source) {
 			break;
 		}
 	}
@@ -649,7 +644,7 @@ status_t MediaDemultiplexerNode::PrepareToConnect(
 	// find the information for this output
 	vector<MediaOutputInfo>::iterator itr;
 	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
-		if (itr->output.source == source) {
+		if (itr->output.source == what) {
 			break;
 		}
 	}
@@ -658,7 +653,7 @@ status_t MediaDemultiplexerNode::PrepareToConnect(
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
 		return B_MEDIA_BAD_SOURCE;
 	}
-	return itr->PrepareToConnect(destination,format,out_source,out_name);
+	return itr->PrepareToConnect(where,format,out_source,out_name);
 }
 
 void MediaDemultiplexerNode::Connect(
@@ -669,12 +664,6 @@ void MediaDemultiplexerNode::Connect(
 				char * io_name)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::Connect\n");
-	if (error != B_OK) {
-		fprintf(stderr,"<- error already\n");
-		output.destination = media_destination::null;
-		GetFormat(&output.format);
-		return;
-	}
 	// find the information for this output
 	vector<MediaOutputInfo>::iterator itr;
 	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
@@ -687,68 +676,82 @@ void MediaDemultiplexerNode::Connect(
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
 		return;
 	}
-	
+	if (error != B_OK) {
+		fprintf(stderr,"<- error already\n");
+		itr->output.destination = media_destination::null;
+		itr->output.format = itr->generalFormat;
+		return;
+	}
+
+	// calculate the downstream latency
+	// must happen before itr->Connect
+	bigtime_t downstreamLatency;
+	media_node_id id;
+	FindLatencyFor(itr->output.destination, &downstreamLatency, &id);
+
 	// record the agreed upon values
 	status_t status;
-	status = itr->Connect(destination,format,io_name);
+	status = itr->Connect(destination,format,io_name,downstreamLatency);
 	if (status != B_OK) {
 		fprintf(stderr,"  itr->Connect returned an error\n");
 		return;
 	}
 
-//	// compute the buffer period (must be done before setbuffergroup)
-//	fBufferPeriod = bigtime_t(1000 * 8000000 / 1024
-//	                     * output.format.u.multistream.max_chunk_size
-//			             / output.format.u.multistream.max_bit_rate);
-//
-//	fprintf(stderr,"  max chunk size = %i, max bit rate = %f, buffer period = %lld\n",
-//			output.format.u.multistream.max_chunk_size,
-//			output.format.u.multistream.max_bit_rate,fBufferPeriod);
-//
-//	SetBufferDuration(fBufferPeriod);
-	
-	if (GetCurrentFile() != 0) {
-		bigtime_t start, end;
-		uint8 * data = new uint8[output.format.u.multistream.max_chunk_size]; // <- buffer group buffer size
-		BBuffer * buffer = 0;
-		ssize_t bytesRead = 0;
-		{ // timed section
-			start = TimeSource()->RealTime();
-			// first we try to use a real BBuffer
-			buffer = fBufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,fBufferPeriod);
-			if (buffer != 0) {
-				FillFileBuffer(buffer);
-			} else {
-				// didn't get a real BBuffer, try simulation by just a read from the disk
-				bytesRead = GetCurrentFile()->Read(data,output.format.u.multistream.max_chunk_size);
-			}
-			end = TimeSource()->RealTime();
-		}
-		bytesRead = buffer->SizeUsed();
-		delete data;
-		if (buffer != 0) {
-			buffer->Recycle();
-		}
-		GetCurrentFile()->Seek(-bytesRead,SEEK_CUR); // put it back where we found it
-	
-		fInternalLatency = end - start;
-		
-		fprintf(stderr,"  internal latency from disk read = %lld\n",fInternalLatency);
-	} else {
-		fInternalLatency = 100; // just guess
-		fprintf(stderr,"  internal latency guessed = %lld\n",fInternalLatency);
+	// compute the internal latency
+	// must happen after itr->Connect
+	if (fInternalLatency == 0) {
+		fInternalLatency = 100; // temporary until we finish computing it
+		ComputeInternalLatency();
 	}
 
 	// If the downstream latency for this output is larger
 	// than our current downstream latency, we have to increase
 	// our current downstream latency to be the larger value.
-	if (itr->downstreamLatency > fDownstreamLatency) {
-		fDownstreamLatency = itr->downstreamLatency;
+	if (downstreamLatency > fDownstreamLatency) {
 		SetEventLatency(fDownstreamLatency + fInternalLatency);
 	}
+
+	// XXX: what do I set the buffer duration to?
+	//      it depends on which output is sending!!
+	// SetBufferDuration(bufferPeriod);
 	
 	// XXX: do anything else?
-	return B_OK;
+	return;
+}
+
+void MediaDemultiplexerNode::ComputeInternalLatency() {
+	fprintf(stderr,"MediaDemultiplexerNode::ComputeInternalLatency\n");
+//	if (GetCurrentFile() != 0) {
+//		bigtime_t start, end;
+//		uint8 * data = new uint8[output.format.u.multistream.max_chunk_size]; // <- buffer group buffer size
+//		BBuffer * buffer = 0;
+//		ssize_t bytesRead = 0;
+//		{ // timed section
+//			start = TimeSource()->RealTime();
+//			// first we try to use a real BBuffer
+//			buffer = fBufferGroup->RequestBuffer(output.format.u.multistream.max_chunk_size,fBufferPeriod);
+//			if (buffer != 0) {
+//				FillFileBuffer(buffer);
+//			} else {
+//				// didn't get a real BBuffer, try simulation by just a read from the disk
+//				bytesRead = GetCurrentFile()->Read(data,output.format.u.multistream.max_chunk_size);
+//			}
+//			end = TimeSource()->RealTime();
+//		}
+//		bytesRead = buffer->SizeUsed();
+//		delete data;
+//		if (buffer != 0) {
+//			buffer->Recycle();
+//		}
+//		GetCurrentFile()->Seek(-bytesRead,SEEK_CUR); // put it back where we found it
+//	
+//		fInternalLatency = end - start;
+//		
+//		fprintf(stderr,"  internal latency from disk read = %lld\n",fInternalLatency);
+//	} else {
+		fInternalLatency = 100; // just guess
+		fprintf(stderr,"  internal latency guessed = %lld\n",fInternalLatency);
+//	}
 }
 
 void MediaDemultiplexerNode::Disconnect(
@@ -756,10 +759,6 @@ void MediaDemultiplexerNode::Disconnect(
 				const media_destination & where)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::Disconnect\n");
-	if (output.destination != where) {
-		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
-		return;
-	}
 	// find the information for this output
 	vector<MediaOutputInfo>::iterator itr;
 	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
@@ -770,6 +769,10 @@ void MediaDemultiplexerNode::Disconnect(
 	if (itr == outputs.end()) {
 		// we don't have that output
 		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		return;
+	}
+	if (itr->output.destination != where) {
+		fprintf(stderr,"<- B_MEDIA_BAD_DESTINATION\n");
 		return;
 	}
 	// if this output has an equal (or higher!) latency than
@@ -796,29 +799,38 @@ void MediaDemultiplexerNode::LateNoticeReceived(
 				bigtime_t performance_time)
 {
 	fprintf(stderr,"MediaDemultiplexerNode::LateNoticeReceived\n");
-	if (what == output.source) {
-		switch (RunMode()) {
-			case B_OFFLINE:
-			    // nothing to do
-				break;
-			case B_RECORDING:
-			    // nothing to do
-				break;
-			case B_INCREASE_LATENCY:
-				fInternalLatency += how_much;
-				SetEventLatency(fDownstreamLatency + fInternalLatency);
-				break;
-			case B_DECREASE_PRECISION:
-				// what to do?
-				break;
-			case B_DROP_DATA:
-				// what to do?
-				break;
-			default:
-				// huh?? there aren't any more run modes.
-				fprintf(stderr,"MediaDemultiplexerNode::LateNoticeReceived with unexpected run mode.\n");
-				break;
+	vector<MediaOutputInfo>::iterator itr;
+	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
+		if (itr->output.source == what) {
+			break;
 		}
+	}
+	if (itr == outputs.end()) {
+		// we don't have that output
+		fprintf(stderr,"<- B_MEDIA_BAD_SOURCE\n");
+		return;
+	}
+	switch (RunMode()) {
+		case B_OFFLINE:
+		    // nothing to do
+			break;
+		case B_RECORDING:
+		    // nothing to do
+			break;
+		case B_INCREASE_LATENCY:
+			fInternalLatency += how_much;
+			SetEventLatency(fDownstreamLatency + fInternalLatency);
+			break;
+		case B_DECREASE_PRECISION:
+			// XXX: try to catch up by producing buffers faster
+			break;
+		case B_DROP_DATA:
+			// XXX: should we really drop buffers?  just for that output?
+			break;
+		default:
+			// huh?? there aren't any more run modes.
+			fprintf(stderr,"MediaDemultiplexerNode::LateNoticeReceived with unexpected run mode.\n");
+			break;
 	}
 }
 
@@ -865,7 +877,7 @@ void MediaDemultiplexerNode::AdditionalBufferRequested(			//	used to be Reserved
 	// find the information for this output
 	vector<MediaOutputInfo>::iterator itr;
 	for(itr = outputs.begin() ; (itr != outputs.end()) ; itr++) {
-		if (itr->output.source == what) {
+		if (itr->output.source == source) {
 			break;
 		}
 	}
@@ -875,12 +887,11 @@ void MediaDemultiplexerNode::AdditionalBufferRequested(			//	used to be Reserved
 		return;
 	}
 	BBuffer * buffer;
-	status_t status = GetFilledBuffer(*itr,&buffer);
+	status_t status = itr->AdditionalBufferRequested(prev_buffer,prev_time,prev_tag);
 	if (status != B_OK) {
-		fprintf(stderr,"MediaDemultiplexerNode::AdditionalBufferRequested got an error from GetFilledBuffer.\n");
-		return; // don't send the buffer
+		fprintf(stderr,"  itr->AdditionalBufferRequested returned an error.\n");
+		return;
 	}
-	SendBuffer(buffer,itr->output.destination);
 	return;
 }
 
@@ -1067,7 +1078,7 @@ status_t MediaDemultiplexerNode::HandleBuffer(
 //			}
 //		}
 //	}
-	bigtime_t nextEventTime = event->event_time+fBufferPeriod;
+	bigtime_t nextEventTime = event->event_time+10000; // fBufferPeriod; // XXX : should multiply
 	media_timed_event nextBufferEvent(nextEventTime, BTimedEventQueue::B_HANDLE_BUFFER);
 	EventQueue()->AddEvent(nextBufferEvent);
 	return status;
