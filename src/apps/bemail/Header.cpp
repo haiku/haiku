@@ -172,18 +172,18 @@ THeaderView::THeaderView (
 		BString name(charset.GetPrintName());
 		const char * mime = charset.GetMIMEName();
 		if (mime) {
-			name.Append(" (");
-			name.Append(mime);
-			name.Append(")");
+			name << " (" << mime << ")";
 		}
 		msg = new BMessage(kMsgEncoding);
-		if ((mime == 0) || (strcmp(mime, "UTF-8") != 0)) {
-			msg->AddInt32("charset", charset.GetConversionID());
+		int32 convert_id;
+		if ((mime == 0) || (strcasecmp(mime, "UTF-8") != 0)) {
+			convert_id = charset.GetConversionID();
 		} else {
-			msg->AddInt32("charset", B_MAIL_UTF8_CONVERSION);
+			convert_id = B_MAIL_UTF8_CONVERSION;
 		}
+		msg->AddInt32("charset", convert_id);
 		fEncodingMenu->AddItem(item = new BMenuItem(name.String(), msg));
-		if (charset.GetConversionID() == fCharacterSetUserSees && !marked_charset) {
+		if (convert_id == fCharacterSetUserSees && !marked_charset) {
 			item->SetMarked(true);
 			marked_charset = true;
 		}
@@ -205,7 +205,9 @@ THeaderView::THeaderView (
 		msg = new BMessage(kMsgEncoding);
 		msg->AddInt32("charset", B_MAIL_NULL_CONVERSION);
 		fEncodingMenu->AddItem(item = new BMenuItem("Automatic", msg));
-		item->SetMarked(true);
+		if (!marked_charset) {
+			item->SetMarked(true);
+		}
 	}
 
 	// First line of the header, From for reading e-mails (includes the

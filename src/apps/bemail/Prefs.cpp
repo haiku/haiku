@@ -891,18 +891,18 @@ TPrefsWindow::BuildEncodingMenu(uint32 encoding)
 		BString name(charset.GetPrintName());
 		const char * mime = charset.GetMIMEName();
 		if (mime) {
-			name.Append(" (");
-			name.Append(mime);
-			name.Append(")");
+			name << " (" << mime << ")";
 		}
 		msg = new BMessage(P_ENC);
-		if ((mime == 0) || (strcmp(mime, "UTF-8") != 0)) {
-			msg->AddInt32("encoding", charset.GetConversionID());
+		int convert_id;
+		if ((mime == 0) || (strcasecmp(mime, "UTF-8") != 0)) {
+			convert_id = charset.GetConversionID();
 		} else {
-			msg->AddInt32("encoding", B_MAIL_UTF8_CONVERSION);
+			convert_id = B_MAIL_UTF8_CONVERSION;
 		}
+		msg->AddInt32("encoding", convert_id);
 		menu->AddItem(item = new BMenuItem(name.String(), msg));
-		if (charset.GetConversionID() == encoding) {
+		if (convert_id == encoding) {
 			item->SetMarked(true);
 		}
 	}
