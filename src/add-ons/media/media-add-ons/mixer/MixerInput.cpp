@@ -137,7 +137,7 @@ MixerInput::BufferReceived(BBuffer *buffer)
 				//printf("MixerInput::BufferReceived: +1 frame GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
 				offset = expected_frame;
 			} else {
-				printf("MixerInput::BufferReceived: GLITCH! last frame was %ld, expected frame was %d, new frame is %d\n", fLastDataFrameWritten, expected_frame, offset);
+				printf("MixerInput::BufferReceived: GLITCH! last frame was %4ld, expected frame was %4d, new frame is %4d\n", fLastDataFrameWritten, expected_frame, offset);
 
 				if (start > fLastDataAvailableTime) {
 					if ((start - fLastDataAvailableTime) < (buffer_duration / 10)) {
