@@ -1,5 +1,6 @@
 SubDir OBOS_TOP src tests kernel boot heap ;
 
+UsePublicHeaders support ;
 UsePrivateHeaders kernel ;
 
 SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
