@@ -44,5 +44,20 @@ CommonTestLib libinterfacetest.so
 	: app support
 ;
 
+SimpleTest ScrollViewTest_r5 :
+	ScrollViewTest.cpp
+	: be
+	;
+
+SimpleTest ScrollViewTest :
+	ScrollViewTest.cpp
+	ScrollView.cpp
+	: be
+	;
+
+SEARCH on [ FGristFiles
+		ScrollView.cpp
+	] = [ FDirName $(OBOS_TOP) src kits interface ] ;
+
 SubInclude OBOS_TOP src tests kits interface bprintjob ;
 SubInclude OBOS_TOP src tests kits interface picture ;
