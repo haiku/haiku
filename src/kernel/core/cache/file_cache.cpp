@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -462,12 +462,12 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 	}
 
 	int32 pageOffset = offset & (B_PAGE_SIZE - 1);
-	size_t size = *_size + pageOffset;
+	size_t size = *_size;
 	offset -= pageOffset;
 
-	if (offset + size > fileSize) {
+	if (offset + pageOffset + size > fileSize) {
 		// adapt size to be within the file's offsets
-		size = fileSize - offset;
+		size = fileSize - pageOffset - offset;
 		*_size = size;
 	}
 
@@ -492,12 +492,20 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 
 		TRACE(("lookup page from offset %Ld: %p\n", offset, page));
 		if (page != NULL
-			&& vm_get_physical_page(page->ppn * B_PAGE_SIZE, &virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
-			// it is, so let's satisfy in the first part of the request
+			&& vm_get_physical_page(page->ppn * B_PAGE_SIZE,
+					&virtualAddress, PHYSICAL_PAGE_CAN_WAIT) == B_OK) {
+			// it is, so let's satisfy the first part of the request, if we have to
 			if (bufferBase != buffer) {
 				size_t requestSize = buffer - bufferBase;
-				if ((doWrite && write_to_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)
-					|| (!doWrite && read_into_cache(ref, lastOffset + pageOffset, requestSize, bufferBase, requestSize) != B_OK)) {
+				status_t status;
+				if (doWrite) {
+					status = write_to_cache(ref, lastOffset + pageOffset,
+						requestSize, bufferBase, requestSize);
+				} else {
+					status = read_into_cache(ref, lastOffset + pageOffset,
+						requestSize, bufferBase, requestSize);
+				}
+				if (status != B_OK) {
 					vm_put_physical_page(virtualAddress);
 					mutex_unlock(&cache->lock);
 					return B_IO_ERROR;
@@ -506,10 +514,13 @@ cache_io(void *_cacheRef, off_t offset, addr_t bufferBase, size_t *_size, bool d
 			}
 
 			// and copy the contents of the page already in memory
-			if (doWrite)
-				user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer, min_c(B_PAGE_SIZE, bytesLeft) - pageOffset);
-			else
-				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset), min_c(B_PAGE_SIZE, bytesLeft) - pageOffset);
+			if (doWrite) {
+				user_memcpy((void *)(virtualAddress + pageOffset), (void *)buffer,
+					min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft));
+			} else {
+				user_memcpy((void *)buffer, (void *)(virtualAddress + pageOffset),
+					min_c(size_t(B_PAGE_SIZE - pageOffset), bytesLeft));
+			}
 
 			vm_put_physical_page(virtualAddress);
 
