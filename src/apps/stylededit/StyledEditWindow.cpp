@@ -131,6 +131,7 @@ StyledEditWindow::InitWindow(uint32 encoding)
 	menu->AddItem(fSaveItem= new BMenuItem("Save", new BMessage(MENU_SAVE), 'S')); 
 	fSaveItem->SetEnabled(false); 
 	menu->AddItem(menuItem= new BMenuItem("Save As...", new BMessage(MENU_SAVEAS)));
+	menuItem->SetShortcut('S',B_SHIFT_KEY);
 	menuItem->SetEnabled(true);				
 	
 	menu->AddItem(fRevertItem= new BMenuItem("Revert to Saved...", new BMessage(MENU_REVERT))); 
