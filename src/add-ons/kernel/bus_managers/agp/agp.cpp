@@ -350,6 +350,11 @@ static void check_capabilities(uint32 agp_stat, uint32 *command)
 		if (!(agp_stat & AGP_3_8x)) *command &= ~AGP_3_8x;
 		if (!(agp_stat & AGP_3_4x)) *command &= ~AGP_3_4x;
 	}
+	/* if no AGP mode is supported at all, nothing remains:
+	 * devices exist that have the AGP style 
+	 * connector with AGP style registers, but not the features!
+	 * (confirmed Matrox Millenium II AGP for instance) */
+	if (!(agp_stat & AGP_rates)) *command = 0x00000000;
 
 	/* block sideband adressing if not supported */
 	if (!(agp_stat & AGP_SBA)) *command &= ~AGP_SBA;
