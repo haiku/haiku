@@ -1610,6 +1610,8 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 								const rgb_color	*inColor)
 {
 	CALLED();
+	printf("SetFontAndColor(%ld, %ld, %p, mode: 0x%x, %p)\n",
+		startOffset, endOffset, inFont, inMode, inColor);
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (startOffset != endOffset)
@@ -1660,12 +1662,9 @@ BTextView::GetFontAndColor(BFont *outFont, uint32 *outMode,
 								rgb_color *outColor, bool *outEqColor) const
 {
 	CALLED();
-	// TODO fill in outMode and outEqColor
-	fStyles->GetStyle(fSelStart, outFont, outColor);
 	
-	// TODO: This is a hack to make beshare work. 
-	// We should use _BStyleBuffer_::ContinuousGetStyle() here.
-	*outMode = doSize;
+	fStyles->ContinuousGetStyle(outFont, outMode, outColor, outEqColor,
+								fSelStart, fSelEnd);
 }
 
 
@@ -1781,43 +1780,57 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 	BPoint result;
 	int32 textLength = fText->Length();
 	int32 lineNum = LineAt(inOffset);
-	
-	// TODO: This looks broken. line + 1 could go outside the line buffer
 	STELinePtr line = (*fLines)[lineNum];
-	float height = (line + 1)->origin - line->origin;
+	float height = 0;
 	
 	result.x = 0.0;
 	result.y = line->origin + fTextRect.top;
 	
-	// special case: go down one line if inOffset is a newline
-	if (inOffset == textLength && (*fText)[textLength - 1] == '\n') {
-		float ascent, descent;
-		StyledWidth(inOffset, 1, &ascent, &descent);
+	// Handle the case where there is only one line
+	// (no text inserted)
+	// TODO: See if we can do this better
+	if (fStyles->NumRuns() == 0) {
+		const rgb_color *color = NULL;
+		const BFont *font = NULL;
+		fStyles->GetNullStyle(&font, &color);
 		
-		result.y += height;
-		height = ascent + descent;
-
-	} else {
-		int32 offset = line->offset;
-		int32 length = inOffset - line->offset;
-		int32 numChars = length;
-		bool foundTab = false;		
-		do {
-			foundTab = fText->FindChar(B_TAB, offset, &numChars);
+		font_height fontHeight;
+		font->GetHeight(&fontHeight);
+		height = fontHeight.ascent + fontHeight.descent;
 		
-			result.x += StyledWidth(offset, numChars);
+	} else {	
+		height = (line + 1)->origin - line->origin;
 	
-			if (foundTab) {
-				result.x += ActualTabWidth(result.x);
-				numChars++;
-			}
+		// special case: go down one line if inOffset is a newline
+		if (inOffset == textLength && (*fText)[textLength - 1] == '\n') {
+			float ascent, descent;
+			StyledWidth(inOffset, 1, &ascent, &descent);
 			
-			offset += numChars;
-			length -= numChars;
-			numChars = length;
-		} while (foundTab && length > 0);
-	} 		
-
+			result.y += height;
+			height = ascent + descent;
+	
+		} else {
+			int32 offset = line->offset;
+			int32 length = inOffset - line->offset;
+			int32 numChars = length;
+			bool foundTab = false;		
+			do {
+				foundTab = fText->FindChar(B_TAB, offset, &numChars);
+			
+				result.x += StyledWidth(offset, numChars);
+		
+				if (foundTab) {
+					result.x += ActualTabWidth(result.x);
+					numChars++;
+				}
+				
+				offset += numChars;
+				length -= numChars;
+				numChars = length;
+			} while (foundTab && length > 0);
+		} 		
+	}
+	
 	// convert from text rect coordinates
 	result.x += fTextRect.left - 1.0;
 
@@ -1888,7 +1901,7 @@ BTextView::OffsetAt(BPoint point) const
 		foundTab = fText->FindChar(B_TAB, offset, &numChars);
 		
 		delta = numChars / 2;
-		delta = min_c(delta, 1);
+		delta = max_c(delta, 1);
 		
 		if (numChars > 1) {
 			do {
@@ -1908,7 +1921,7 @@ BTextView::OffsetAt(BPoint point) const
 						// still too far to the left, measure some more
 						offset += delta;
 						delta /= 2;
-						delta = min_c(delta, 1);
+						delta = max_c(delta, 1);
 					}
 				} else {
 					// oops, we overshot the point, go back some 
@@ -3038,13 +3051,17 @@ BTextView::HandlePageKey(uint32 inPageKey)
 			
 		case B_PAGE_UP: 
 		case B_PAGE_DOWN:
-			// TODO: Fix this
 		{
-			if (ScrollBar(B_VERTICAL) != NULL) {
-				float delta = Bounds().Height();
-				delta = (inPageKey == B_PAGE_UP) ? -delta : delta;
+			int32 currentOffset = OffsetAt(fClickOffset);
+			float delta = Bounds().Height();
+			delta = (inPageKey == B_PAGE_UP) ? -delta : delta;
+				
+			if (ScrollBar(B_VERTICAL) != NULL)
 				ScrollBar(B_VERTICAL)->SetValue(ScrollBar(B_VERTICAL)->Value() + delta);
-			}
+			
+			// TODO: Selection
+			GoToLine(LineAt(PointAt(currentOffset + delta)));
+			
 			break;
 		}
 	}

@@ -227,90 +227,6 @@ _BStyleBuffer_::GetNullStyle(const BFont **font,
 		*color = &fNullStyle.color;
 }
 //------------------------------------------------------------------------------
-bool
-_BStyleBuffer_::IsContinuousStyle(uint32 *ioMode, STEStylePtr outStyle,
-									   int32 fromOffset, int32 toOffset)
-{	
-	if (fStyleRunDesc.ItemCount() < 1) {
-		SetStyle(*ioMode, &fNullStyle.font, &outStyle->font,
-			&fNullStyle.color, &outStyle->color);
-		return true;
-	}
-		
-	bool result = true;
-	int32 fromIndex = OffsetToRun(fromOffset);
-	int32 toIndex = OffsetToRun(toOffset - 1);
-	
-	if (fromIndex == toIndex) {		
-		int32 styleIndex = fStyleRunDesc[fromIndex]->index;
-		STEStylePtr style = &fStyleRecord[styleIndex]->style;
-		
-		SetStyle(*ioMode, &style->font, &outStyle->font, &style->color,
-			&outStyle->color);
-		result = true;
-	}
-	else {
-		int32 		styleIndex = fStyleRunDesc[toIndex]->index;
-		STEStyle	theStyle = fStyleRecord[styleIndex]->style;
-		//STEStylePtr	style = NULL;
-		
-	/*	for (int32 i = fromIndex; i < toIndex; i++) {
-			styleIndex = fStyleRunDesc[i]->index;
-			style = &fStyleRecord[styleIndex]->style;
-			
-			if (*ioMode & doFont) {
-				if (strcmp(theStyle.font, style->font) != 0) {
-					*ioMode &= ~doFont;
-					result = false;
-				}	
-			}
-				
-			if (*ioMode & doSize) {
-				if (theStyle.size != style->size) {
-					*ioMode &= ~doSize;
-					result = false;
-				}
-			}
-				
-			if (*ioMode & doShear) {
-				if (theStyle.shear != style->shear) {
-					*ioMode &= ~doShear;
-					result = false;
-				}
-			}
-				
-			if (*ioMode & doUnderline) {
-				if (theStyle.underline != style->underline) {
-					*ioMode &= ~doUnderline;
-					result = false;
-				}
-			}
-				
-			if (*ioMode & doColor) {
-				if ( (theStyle.color.red != style->color.red) ||
-					 (theStyle.color.green != style->color.green) ||
-					 (theStyle.color.blue != style->color.blue) ||
-					 (theStyle.color.alpha != style->color.alpha) ) {
-					*ioMode &= ~doColor;
-					result = false;
-				}
-			}
-			
-			if (*ioMode & doExtra) {
-				if (theStyle.extra != style->extra) {
-					*ioMode &= ~doExtra;
-					result = false;
-				}
-			}
-		}*/
-		
-		SetStyle(*ioMode, &theStyle.font, &outStyle->font, &theStyle.color,
-			&outStyle->color);
-	}
-	
-	return result;
-}
-//------------------------------------------------------------------------------
 void
 _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 								   int32 textLen, uint32 inMode,
@@ -484,9 +400,10 @@ _BStyleBuffer_::Iterate(int32 fromOffset, int32 length, _BInlineInput_ *input,
 							 const BFont **outFont, const rgb_color **outColor,
 							 float *outAscent, float *outDescent, uint32 *) const
 {
+	// TODO: Handle the _BInlineInput_ style here in some way
 	int32 numRuns = fStyleRunDesc.ItemCount();
-	if ((length < 1) || (numRuns < 1))
-		return (0);
+	if (length < 1 || numRuns < 1)
+		return 0;
 
 	int32 				result = length;
 	int32 				runIndex = fStyleRunDesc.OffsetToRun(fromOffset);
@@ -505,6 +422,7 @@ _BStyleBuffer_::Iterate(int32 fromOffset, int32 length, _BInlineInput_ *input,
 		int32 nextOffset = (run + 1)->offset - fromOffset;
 		result = (result > nextOffset) ? nextOffset : result;
 	}
+	
 	
 	return result;
 }
@@ -564,11 +482,105 @@ _BStyleBuffer_::operator[](int32 index) const
 	return run;
 }
 //------------------------------------------------------------------------------
-
-/*void _BStyleBuffer_::ContinuousGetStyle(BFont *, uint32 *, rgb_color *, bool *,
-					int32, int32) const
+void
+_BStyleBuffer_::ContinuousGetStyle(BFont *outFont, uint32 *ioMode,
+				rgb_color *outColor, bool *sameColor, int32 fromOffset, int32 toOffset) const
 {
-}*/
+	uint32 mode = doAll;
+	if (fStyleRunDesc.ItemCount() < 1) {
+		if (ioMode)
+			*ioMode = mode;
+		if (outFont)
+			*outFont = fNullStyle.font;
+		if (outColor)
+			*outColor = fNullStyle.color;
+		if (sameColor)
+			*sameColor = true;	
+		return;
+	}
+		
+	int32 fromIndex = OffsetToRun(fromOffset);
+	int32 toIndex = OffsetToRun(toOffset - 1);
+	
+	bool result = true;
+	if (fromIndex == toIndex) {		
+		int32 styleIndex = fStyleRunDesc[fromIndex]->index;
+		STEStylePtr style = &fStyleRecord[styleIndex]->style;
+		
+		if (ioMode)
+			*ioMode = mode;
+		if (outFont)
+			*outFont = style->font;
+		if (outColor)
+			*outColor = style->color;
+		if (sameColor)
+			*sameColor = true;	
+		
+	} else {
+		int32 		styleIndex = fStyleRunDesc[toIndex]->index;
+		STEStyle	theStyle = fStyleRecord[styleIndex]->style;
+		STEStylePtr	style = NULL;
+		
+		for (int32 i = fromIndex; i < toIndex; i++) {
+			styleIndex = fStyleRunDesc[i]->index;
+			style = &fStyleRecord[styleIndex]->style;
+			
+			if (mode & doFont) {
+				if (theStyle.font != style->font) {
+					mode &= ~doFont;
+					result = false;
+				}	
+			}
+				
+			if (mode & doSize) {
+				if (theStyle.font.Size() != style->font.Size()) {
+					mode &= ~doSize;
+					result = false;
+				}
+			}
+				
+			if (mode & doShear) {
+				if (theStyle.font.Shear() != style->font.Shear()) {
+					mode &= ~doShear;
+					result = false;
+				}
+			}
+				
+			if (mode & doUnderline) {
+			//	if (theStyle.underline != style->font.underline) {
+					mode &= ~doUnderline;
+			//		result = false;
+			//	}
+			}
+				
+			if (mode & doColor) {
+				if ( (theStyle.color.red != style->color.red) ||
+					 (theStyle.color.green != style->color.green) ||
+					 (theStyle.color.blue != style->color.blue) ||
+					 (theStyle.color.alpha != style->color.alpha) ) {
+					mode &= ~doColor;
+					result = false;
+				}
+			}
+			
+			if (mode & doExtra) {
+			//	if (theStyle.extra != style->font.extra) {
+					mode &= ~doExtra;
+			//		result = false;
+			//	}
+			}
+		}
+		
+		if (ioMode)
+			*ioMode = mode;
+		if (outFont)
+			*outFont = theStyle.font;
+		if (outColor)
+			*outColor = theStyle.color;
+		if (sameColor)
+			*sameColor = result;	
+	}
+}
 
 /*
  * $Log $

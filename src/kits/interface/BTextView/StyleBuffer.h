@@ -139,13 +139,13 @@ public:
 		void				GetNullStyle(const BFont **font,
 								const rgb_color **color) const;	
 		
-		bool				IsContinuousStyle(uint32 *ioMode, STEStylePtr outStyle,
-								int32 fromOffset, int32 toOffset);
 		void				SetStyleRange(int32 fromOffset, int32 toOffset,
 								int32 textLen, uint32 inMode, 
 								const BFont *inFont, const rgb_color *inColor);
 		void				GetStyle(int32 inOffset, BFont *outFont,
 								rgb_color *outColor) const;
+		void				ContinuousGetStyle(BFont *, uint32 *, rgb_color *,
+								bool *, int32, int32) const;
 		STEStyleRangePtr	GetStyleRange(int32 startOffset, int32 endOffset) const;
 		
 		void				RemoveStyleRange(int32 fromOffset, int32 toOffset);
