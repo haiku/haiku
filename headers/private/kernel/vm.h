@@ -54,12 +54,12 @@ area_id vm_create_anonymous_area(aspace_id aid, const char *name, void **address
 	addr_t size, uint32 wiring, uint32 protection);
 area_id vm_map_physical_memory(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	addr_t size, uint32 protection, addr_t phys_addr);
-area_id vm_map_file(aspace_id aid, char *name, void **address, uint32 addressSpec,
+area_id vm_map_file(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	addr_t size, uint32 protection, uint32 mapping, const char *path, off_t offset);
-area_id vm_create_null_area(aspace_id aid, char *name, void **address, uint32 addressSpec, addr_t size);
+area_id vm_create_null_area(aspace_id aid, const char *name, void **address, uint32 addressSpec, addr_t size);
 area_id vm_copy_area(aspace_id addressSpaceID, const char *name, void **_address, uint32 addressSpec,
 			uint32 protection, area_id sourceID);
-area_id vm_clone_area(aspace_id aid, char *name, void **address, uint32 addressSpec,
+area_id vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpec,
 	uint32 protection, uint32 mapping, area_id sourceArea);
 status_t vm_delete_area(aspace_id aid, area_id id);
 status_t vm_create_vnode_cache(void *vnode, void **_cache);
