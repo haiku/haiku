@@ -23,6 +23,7 @@ StdBinCommands
 	renice.c
 	rescan.c
 	rmattr.cpp
+	safemode.c
 	sleep.cpp
 	sysinfo.c
 	unchop.c
