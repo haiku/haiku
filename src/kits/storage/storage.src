@@ -28,11 +28,14 @@ STORAGE_KIT_SOURCE =
 
 	# storage/mime
 	AssociatedTypes.cpp
+	CreateAppMetaMimeThread.cpp
 	Database.cpp
 	InstalledTypes.cpp
+	MimeUpdateThread.cpp
 	SnifferRules.cpp
 	Supertype.cpp
 	SupportingApps.cpp
+	UpdateMimeInfoThread.cpp
 	database_access.cpp
 	database_support.cpp
 
