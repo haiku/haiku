@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -448,8 +448,7 @@ status_t
 arch_vm_translation_map_init_post_area(kernel_args *args)
 {
 	// create a region to cover the page table
-	sPageTableRegion = vm_create_anonymous_region(vm_get_kernel_aspace_id(), 
-		"page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
+	sPageTableRegion = create_area("page_table", (void **)&sPageTable, B_EXACT_ADDRESS, 
 		sPageTableSize, B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	// ToDo: for now just map 0 - 512MB of physical memory to the iospace region
@@ -492,7 +491,7 @@ arch_vm_translation_map_init_post_area(kernel_args *args)
 
 	// create a region to cover the iospace
 	void *temp = (void *)IOSPACE_BASE;
-	vm_create_null_region(vm_get_kernel_aspace_id(), "iospace", &temp,
+	vm_create_null_area(vm_get_kernel_aspace_id(), "iospace", &temp,
 		B_EXACT_ADDRESS, IOSPACE_SIZE);
 
 	return 0;

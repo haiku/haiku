@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -10,6 +10,8 @@
 #include <kernel.h>
 #include <thread.h>
 #include <boot/stage2.h>
+#include <vm_types.h>
+//#include <arch/vm_translation_map.h>
 
 #include <string.h>
 
@@ -42,7 +44,7 @@ status_t
 arch_thread_init_kthread_stack(struct thread *t, int (*start_func)(void), void (*entry_func)(void), void (*exit_func)(void))
 {
 	addr_t *kstack = (addr_t *)t->kernel_stack_base;
-	size_t kstack_size = KSTACK_SIZE;
+	size_t kstack_size = KERNEL_STACK_SIZE;
 	addr_t *kstack_top = kstack + kstack_size / sizeof(addr_t) - 2 * 4;
 
 	// r13-r31, cr, r2
@@ -88,7 +90,7 @@ arch_thread_context_switch(struct thread *t_from, struct thread *t_to)
     // set the new kernel stack in the EAR register.
 	// this is used in the exception handler code to decide what kernel stack to 
 	// switch to if the exception had happened when the processor was in user mode  
-	asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KSTACK_SIZE - 8));
+	asm("mtear  %0" :: "g"(t_to->kernel_stack_base + KERNEL_STACK_SIZE - 8));
 
     // switch the asids if we need to
 	if (t_to->team->aspace != NULL) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -163,15 +163,15 @@ arch_int_init(kernel_args *args)
 status_t
 arch_int_init_post_vm(kernel_args *args)
 {
-	region_id exception_region;
+	area_id exceptionArea;
 	void *handlers;
 
 	// create a region to map the irq vector code into (physical address 0x0)
 	handlers = (void *)args->arch_args.exception_handlers.start;
-	exception_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "exception_handlers",
+	exceptionArea = create_area("exception_handlers",
 		&handlers, B_EXACT_ADDRESS, args->arch_args.exception_handlers.size, 
 		B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
-	if (exception_region < 0)
+	if (exceptionArea < B_OK)
 		panic("arch_int_init2: could not create exception handler region\n");
 
 	dprintf("exception handlers at %p\n", handlers);
