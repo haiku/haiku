@@ -97,18 +97,19 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
               media_format *format)
 {
 	TRACE("OggStream::GetStreamInfo\n");
-	debugger("OggStream::GetStreamInfo");
 	status_t result = B_OK;
 	ogg_packet packet;
 	if (fHeaderPackets.size() < 1) {
 		result = GetPacket(&packet);
 		if (result != B_OK) {
+			TRACE("OggStream::GetStreamInfo failed to get header packet\n");
 			return result;
 		}
 		SaveHeaderPacket(packet);
 	}
 	packet = fHeaderPackets[0];
 	if (!packet.b_o_s) {
+		TRACE("OggStream::GetStreamInfo failed : not beginning of stream\n");
 		return B_ERROR; // first packet was not beginning of stream
 	}
 
@@ -122,23 +123,18 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	description.u.misc.codec = four_bytes;
 	BMediaFormats formats;
 	result = formats.InitCheck();
-	if (result != B_OK) {
-		return result;
+	if (result == B_OK) {
+		result = formats.GetFormatFor(description, format);
 	}
-	if (!formats.Lock()) {
-		return B_ERROR;
-	}
-	result = formats.GetFormatFor(description, format);
-	formats.Unlock();
 	if (result != B_OK) {
-		return result;
+		// ignore the error, allow the user to use ReadChunk interface
 	}
 
 	// fill out format from header packet
 	format->user_data_type = B_CODEC_TYPE_INFO;
-	strncpy((char*)format->user_data, "vorb", 4);
+	strncpy((char*)format->user_data, (char*)(&packet), 4);
 
-	format->SetMetaData((void*)&fHeaderPackets,sizeof(&fHeaderPackets));
+	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
 	*duration = 80000000;
 	*frameCount = 60000;
 	return B_OK;
@@ -148,7 +144,7 @@ OggStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 status_t
 OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 {
-	TRACE("OggStream::Seek to %lld : %lld\n",*frame,*time);
+	TRACE("OggStream::Seek to %lld : %lld\n", *frame, *time);
 	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
 		*frame = max_c(0, *frame); // clip to zero
 		*frame = min_c(*frame, fOggFrameInfos.size()-1); // clip to max
@@ -159,6 +155,7 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		ogg_stream_init(&seekStreamState, fSerialno);
 		status_t result = fReaderInterface->GetPageAt(position, &seekStreamState);
 		if (result != B_OK) {
+			TRACE("OggStream::GetPageAt %lld failed\n", position);
 			return result; // pageno/fPagePosition corrupted?
 		}
 		// discard earlier packets from this page
@@ -166,6 +163,7 @@ OggStream::Seek(uint32 seekTo, int64 *frame, bigtime_t *time)
 		while (packetno-- > 0) {
 			ogg_packet packet;
 			if (ogg_stream_packetout(&fSeekStreamState, &packet) != 1) {
+				TRACE("OggStream::GetPageAt packetno corrupt?\n");
 				return B_ERROR; // packetno corrupted?
 			}
 		}
@@ -193,6 +191,7 @@ OggStream::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 	static ogg_packet packet;
 	status_t result = GetPacket(&packet);
 	if (result != B_OK) {
+		TRACE("OggStream::GetNextChunk failed: GetPacket failed\n");
 		return result;
 	}
 	*chunkBuffer = &packet;

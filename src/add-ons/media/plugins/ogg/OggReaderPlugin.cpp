@@ -46,7 +46,7 @@ OggReader::Copyright()
 status_t
 OggReader::GetPage(ogg_page * page, int read_size, bool short_page)
 {
-	TRACE("OggReader::GetPage\n");
+//	TRACE("OggReader::GetPage\n");
 retry:
 	static off_t next_position = (fSeekable ? fSeekable->Position() : -1);
 	off_t position = next_position;
@@ -145,6 +145,7 @@ retry:
 status_t
 OggReader::GetPageAt(off_t position, ogg_stream_state * stream, int read_size)
 {
+	TRACE("OggReader::GetPageAt %llu\n", position);
 	if (!fSeekable) {
 		return B_ERROR;
 	}

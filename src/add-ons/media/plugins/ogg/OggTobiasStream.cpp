@@ -136,7 +136,7 @@ OggTobiasStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 		SaveHeaderPacket(packet);
 	}
 
-	format->SetMetaData((void*)&fHeaderPackets,sizeof(&fHeaderPackets));
+	format->SetMetaData((void*)&fHeaderPackets,sizeof(fHeaderPackets));
 	*duration = 80000000;
 	*frameCount = 60000;
 	return B_OK;
