@@ -14,16 +14,6 @@
 #include "SoundPlayNode.h"
 #include "debug.h"
 
-#define DPRINTF 1
-
-#if DPRINTF
-	#undef DPRINTF
-	#define DPRINTF printf
-#else
-	#undef DPRINTF
-	#define DPRINTF if (1) {} else printf
-#endif
-
 #define SEND_NEW_BUFFER_EVENT (BTimedEventQueue::B_USER_EVENT + 1)
 
 _SoundPlayNode::_SoundPlayNode(const char *name, BSoundPlayer *player) : 
@@ -179,9 +169,11 @@ _SoundPlayNode::FormatProposal(const media_source& output, media_format* format)
 		return B_MEDIA_BAD_FORMAT;
 	}
 	
+#if DEBUG >0
 	char buf[100];
 	string_for_format(*format, buf, sizeof(buf));
-	printf("_SoundPlayNode::FormatProposal: format %s\n", buf);
+	TRACE("_SoundPlayNode::FormatProposal: format %s\n", buf);
+#endif
 
 	return B_OK;
 }
@@ -292,9 +284,11 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 	// passed back some wildcards). Finish specializing it now, and return an
 	// error if we don't support the requested format.
 
+#if DEBUG > 0
 	char buf[100];
 	string_for_format(*format, buf, sizeof(buf));
-	printf("_SoundPlayNode::PrepareToConnect: input format %s\n", buf);
+	TRACE("_SoundPlayNode::PrepareToConnect: input format %s\n", buf);
+#endif
 
 	// if not raw audio, we can't support it
 	if (format->type != B_MEDIA_UNKNOWN_TYPE && format->type != B_MEDIA_RAW_AUDIO) {
@@ -314,12 +308,8 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 			&& *(uint32 *)&format->user_data[44] == FORMAT_USER_DATA_MAGIC_2) {
 		channel_count = *(uint32 *)&format->user_data[4];
 		frame_rate = *(float *)&format->user_data[20];
-		printf("_SoundPlayNode::PrepareToConnect: found mixer info: channel_count %ld, frame_rate %.1f\n", channel_count, frame_rate);
+		TRACE("_SoundPlayNode::PrepareToConnect: found mixer info: channel_count %ld, frame_rate %.1f\n", channel_count, frame_rate);
 	}
-	if (channel_count <= 0)
-		channel_count = 2;
-	if (frame_rate <= 0)
-		frame_rate = 44100;
 
 	media_format default_format;
 	default_format.type = B_MEDIA_RAW_AUDIO;
@@ -335,9 +325,11 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 			format->u.raw_audio.channel_count,
 			format->u.raw_audio.format,
 			format->u.raw_audio.frame_rate);
-	
+
+#if DEBUG > 0
 	string_for_format(*format, buf, sizeof(buf));
-	printf("_SoundPlayNode::PrepareToConnect: output format %s\n", buf);
+	TRACE("_SoundPlayNode::PrepareToConnect: output format %s\n", buf);
+#endif
 
 	// Now reserve the connection, and return information about it
 	mOutput.destination = where;
@@ -432,7 +424,7 @@ _SoundPlayNode::LateNoticeReceived(const media_source& what, bigtime_t how_much,
 {
 	CALLED();
 	
-	printf("_SoundPlayNode::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
+	TRACE("_SoundPlayNode::LateNoticeReceived, %Ld too late at %Ld\n", how_much, performance_time);
 	
 	// is this our output?
 	if (what != mOutput.source)
@@ -505,7 +497,7 @@ _SoundPlayNode::LatencyChanged(const media_source& source, const media_destinati
 {
 	CALLED();
 	
-	printf("_SoundPlayNode::LatencyChanged: new_latency %Ld\n", new_latency);
+	TRACE("_SoundPlayNode::LatencyChanged: new_latency %Ld\n", new_latency);
 	
 	// something downstream changed latency, so we need to start producing
 	// buffers earlier (or later) than we were previously.  Make sure that the
@@ -516,7 +508,7 @@ _SoundPlayNode::LatencyChanged(const media_source& source, const media_destinati
 		mLatency = new_latency;
 		SetEventLatency(mLatency + mInternalLatency);
 	} else {
-		printf("_SoundPlayNode::LatencyChanged: ignored\n");
+		TRACE("_SoundPlayNode::LatencyChanged: ignored\n");
 	}
 }
 
@@ -690,7 +682,7 @@ _SoundPlayNode::HandleSeek(
 						bool realTimeEvent = false)
 {
 	CALLED();
-	DPRINTF("_SoundPlayNode::HandleSeek(t=%lld,d=%li,bd=%lld)\n",event->event_time,event->data,event->bigdata);
+	TRACE("_SoundPlayNode::HandleSeek(t=%lld, d=%li, bd=%lld)\n", event->event_time, event->data, event->bigdata);
 	return B_OK;
 }
 						
@@ -736,12 +728,13 @@ _SoundPlayNode::AllocateBuffers()
 	size_t size = mOutput.format.u.raw_audio.buffer_size;
 	int32 count = int32(mLatency / BufferDuration() + 1 + 1);
 
-	DPRINTF("\tlatency = %Ld, buffer duration = %Ld, count %ld\n", mLatency, BufferDuration(), count);
+	TRACE("_SoundPlayNode::AllocateBuffers: latency = %Ld, buffer duration = %Ld, count %ld\n", mLatency, BufferDuration(), count);
 	
 	if (count < 3)
 		count = 3;
 	
-	DPRINTF("\tcreating group of %ld buffers, size = %lu\n", count, size);
+	TRACE("_SoundPlayNode::AllocateBuffers: creating group of %ld buffers, size = %lu\n", count, size);
+	
 	mBufferGroup = new BBufferGroup(size, count);
 }
 
