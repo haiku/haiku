@@ -95,7 +95,7 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 	long found_delta;
 	int i,j,rv;
 
-	PRINT(("looking up %#x\n",address));
+	PRINT(("looking up %p\n",(void *)address));
 
 	mutex_lock(&image_lock);
 
@@ -105,7 +105,7 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 	for(ptr = &kernel_images; *ptr; ptr = &(*ptr)->next) {
 		image = *ptr;
 
-		PRINT((" image %p, base = %#x, size = %#x\n", image, image->regions[0].start, image->regions[0].size));
+		PRINT((" image %p, base = %p, size = %p\n", image, (void *)image->regions[0].start, (void *)image->regions[0].size));
 		if ((address < image->regions[0].start) || (address >= (image->regions[0].start + image->regions[0].size)))
 			continue;
 
@@ -116,8 +116,8 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 				long d;
 				sym = &image->syms[j];
 
-				PRINT(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),sym->st_value));
-				PRINT(("  symbol: %x (%x + %x)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
+				PRINT(("  %p looking at %s, type = %d, bind = %d, addr = %p\n",sym,SYMNAME(image, sym),ELF32_ST_TYPE(sym->st_info),ELF32_ST_BIND(sym->st_info),(void *)sym->st_value));
+				PRINT(("  symbol: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, sym->st_value, image->regions[0].delta));
 
 				if ((ELF32_ST_TYPE(sym->st_info) != STT_FUNC) || (ELF32_ST_BIND(sym->st_info) != STB_GLOBAL))
 					continue;
@@ -138,7 +138,7 @@ get_address_symbol_info(addr address, char *text, int maxtextlen)
 	} else {
 		PRINT(("symbol at %p, in image %p, name = %s\n", found_sym, found_image, found_image->name));
 		PRINT(("name index %d, '%s'\n", found_sym->st_name, SYMNAME(found_image, found_sym)));
-		PRINT(("addr = %#x, offset = %#x\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
+		PRINT(("addr = %#lx, offset = %#lx\n",(found_sym->st_value + found_image->regions[0].delta),found_delta));
 		// XXX should honor maxtextlen here
 		sprintf(text, "<%#lx:%s + %#lx> %s", (found_sym->st_value + found_image->regions[0].delta), SYMNAME(found_image, found_sym), found_delta, found_image->name);
 		rv = 0;
@@ -155,7 +155,7 @@ print_address_info(int argc, char **argv)
 	char text[128];
 	long address;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("not enough arguments\n");
 		return 0;
 	}
@@ -163,7 +163,7 @@ print_address_info(int argc, char **argv)
 	address = atoul(argv[1]);
 	
 	get_address_symbol_info(address, text, sizeof(text));
-	dprintf("%#lx = %s\n",address,text);
+	dprintf("%p = %s\n",(void *)address,text);
 	return 0;
 }
 
@@ -310,17 +310,16 @@ static void dump_symbol(struct elf_image_info *image, struct Elf32_Sym *sym)
 static struct Elf32_Sym *
 elf_find_symbol(struct elf_image_info *image, const char *name)
 {
-	unsigned int hash;
-	unsigned int i;
+	uint32 hash;
+	uint32 i;
 
-        if(!image->dynamic_ptr)
-                return NULL;
+	if (!image->dynamic_ptr)
+		return NULL;
 
 	hash = elf_hash(name) % HASHTABSIZE(image);
-	for(i = HASHBUCKETS(image)[hash]; i != STN_UNDEF; i = HASHCHAINS(image)[i]) {
-		if(!strcmp(SYMNAME(image, &image->syms[i]), name)) {
+	for (i = HASHBUCKETS(image)[hash]; i != STN_UNDEF; i = HASHCHAINS(image)[i]) {
+		if (!strcmp(SYMNAME(image, &image->syms[i]), name))
 			return &image->syms[i];
-		}
 	}
 
 	return NULL;
@@ -346,7 +345,7 @@ elf_lookup_symbol(image_id id, const char *symbol)
 	if (sym->st_shndx == SHN_UNDEF)
 		return 0;
 
-	PRINT(("found: %x (%x + %x)\n", sym->st_value + image->regions[0].delta, 
+	PRINT(("found: %lx (%x + %lx)\n", sym->st_value + image->regions[0].delta, 
 		sym->st_value, image->regions[0].delta));
 
 	return sym->st_value + image->regions[0].delta;
@@ -367,11 +366,11 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	image->strtab = 0;
 
 	d = (struct Elf32_Dyn *)image->dynamic_ptr;
-	if(!d)
+	if (!d)
 		return ERR_GENERAL;
 
-	for(i=0; d[i].d_tag != DT_NULL; i++) {
-		switch(d[i].d_tag) {
+	for (i = 0; d[i].d_tag != DT_NULL; i++) {
+		switch (d[i].d_tag) {
 			case DT_NEEDED:
 				needed_offset = d[i].d_un.d_ptr + image->regions[0].delta;
 				break;
@@ -409,12 +408,12 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	}
 
 	// lets make sure we found all the required sections
-	if(!image->symhash || !image->syms || !image->strtab)
+	if (!image->symhash || !image->syms || !image->strtab)
 		return ERR_GENERAL;
 
 	PRINT(("needed_offset = %d\n", needed_offset));
 
-	if(needed_offset >= 0)
+	if (needed_offset >= 0)
 		image->needed = STRING(image, needed_offset);
 
 	return B_NO_ERROR;
@@ -432,7 +431,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 	struct Elf32_Sym *sym2;
 	char new_symname[512];
 
-	switch(sym->st_shndx) {
+	switch (sym->st_shndx) {
 		case SHN_UNDEF:
 			// patch the symbol name
 			strlcpy(new_symname, sym_prepend, sizeof(new_symname));
@@ -446,12 +445,12 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym, struct e
 			}
 
 			// make sure they're the same type
-			if(ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
+			if (ELF32_ST_TYPE(sym->st_info) != ELF32_ST_TYPE(sym2->st_info)) {
 				dprintf("elf_resolve_symbol: found symbol '%s' in shared image but wrong type\n", new_symname);
 				return ERR_ELF_RESOLVING_SYMBOL;
 			}
 
-			if(ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
+			if (ELF32_ST_BIND(sym2->st_info) != STB_GLOBAL && ELF32_ST_BIND(sym2->st_info) != STB_WEAK) {
 				PRINT(("elf_resolve_symbol: found symbol '%s' but not exported\n", new_symname));
 				return ERR_ELF_RESOLVING_SYMBOL;
 			}
@@ -477,13 +476,13 @@ static int
 elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 	struct Elf32_Rel *rel, int rel_len )
 {
-	int i;
 	struct Elf32_Sym *sym;
 	int vlErr;
 	addr S;
 	addr A;
 	addr P;
 	addr final_val;
+	int i;
 
 	S = A = P = 0;
 	
@@ -491,7 +490,7 @@ elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 		PRINT(("looking at rel type %d, offset 0x%x\n", ELF32_R_TYPE(rel[i].r_info), rel[i].r_offset));
 
 		// calc S
-		switch(ELF32_R_TYPE(rel[i].r_info)) {
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_386_32:
 			case R_386_PC32:
 			case R_386_GLOB_DAT:
@@ -502,10 +501,10 @@ elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 				vlErr = elf_resolve_symbol(image, sym, kernel_image, sym_prepend, &S);
 				if (vlErr < 0)
 					return vlErr;
-				PRINT(("S 0x%x\n", S));
+				PRINT(("S %p\n", (void *)S));
 		}
 		// calc A
-		switch(ELF32_R_TYPE(rel[i].r_info)) {
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_386_32:
 			case R_386_PC32:
 			case R_386_GOT32:
@@ -514,21 +513,21 @@ elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_GOTOFF:
 			case R_386_GOTPC:
 				A = *(addr *)(image->regions[0].delta + rel[i].r_offset);
-				PRINT(("A 0x%x\n", A));
+				PRINT(("A %p\n", (void *)A));
 				break;
 		}
 		// calc P
-		switch(ELF32_R_TYPE(rel[i].r_info)) {
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_386_PC32:
 			case R_386_GOT32:
 			case R_386_PLT32:
 			case R_386_GOTPC:
 				P = image->regions[0].delta + rel[i].r_offset;
-				PRINT(("P 0x%x\n", P));
+				PRINT(("P %p\n", (void *)P));
 				break;
 		}
 
-		switch(ELF32_R_TYPE(rel[i].r_info)) {
+		switch (ELF32_R_TYPE(rel[i].r_info)) {
 			case R_386_NONE:
 				continue;
 			case R_386_32:
@@ -544,11 +543,9 @@ elf_relocate_rel(struct elf_image_info *image, const char *sym_prepend,
 			case R_386_JMP_SLOT:
 			case R_386_GLOB_DAT:
 				final_val = S;
-				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 				break;
 			default:
-				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
-				dprintf("%s: unhandled relocation type %d\n", SYMNAME(image, sym), ELF32_R_TYPE(rel[i].r_info));
+				dprintf("unhandled relocation type %d\n", ELF32_R_TYPE(rel[i].r_info));
 				return EPERM;
 		}
 		*(addr *)(image->regions[0].delta + rel[i].r_offset) = final_val;
@@ -848,7 +845,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		goto error2;
 	}
 
-	PRINT(("reading in program headers at 0x%x, len 0x%x\n", eheader.e_phoff, eheader.e_phnum * eheader.e_phentsize));
+	PRINT(("reading in program headers at 0x%x, len 0x%x\n", eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize));
 	len = sys_read(fd, pheaders, eheader->e_phoff, eheader->e_phnum * eheader->e_phentsize);
 	if (len < 0) {
 		err = len;
@@ -907,6 +904,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 			dprintf("weird program header flags 0x%x\n", pheaders[i].p_flags);
 			continue;
 		}
+
 		image->regions[image_region].size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
 		image->regions[image_region].id = vm_create_anonymous_region(vm_get_kernel_aspace_id(), region_name,
 			(void **)&image->regions[image_region].start, REGION_ADDR_ANY_ADDRESS,
@@ -918,7 +916,7 @@ elf_load_kspace(const char *path, const char *sym_prepend)
 		}
 		image->regions[image_region].delta = image->regions[image_region].start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
 
-		PRINT(("elf_load_kspace: created a region at 0x%x\n", image->regions[image_region].start));
+		PRINT(("elf_load_kspace: created a region at %p\n", (void *)image->regions[image_region].start));
 
 		len = sys_read(fd, (void *)(image->regions[image_region].start + (pheaders[i].p_vaddr % PAGE_SIZE)),
 			pheaders[i].p_offset, pheaders[i].p_filesz);
@@ -961,9 +959,9 @@ done:
 	return image->id;
 
 error4:
-	if(image->regions[1].id >= 0)
+	if (image->regions[1].id >= 0)
 		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[1].id);
-	if(image->regions[0].id >= 0)
+	if (image->regions[0].id >= 0)
 		vm_delete_region(vm_get_kernel_aspace_id(), image->regions[0].id);
 error3:
 	kfree(image);
@@ -974,7 +972,7 @@ error1:
 error:
 	mutex_unlock(&image_load_lock);
 error0:
-	if(vnode)
+	if (vnode)
 		vfs_put_vnode_ptr(vnode);
 	sys_close(fd);
 
