@@ -306,6 +306,9 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 
 				case B_DEBUGGED_THREAD_GET_WHY_STOPPED:
 				{
+					port_id replyPort
+						= commandMessage.get_why_stopped.reply_port;
+
 					// get the team debug info (just in case it has changed)
 					team_debug_info teamDebugInfo;
 					get_team_debug_info(teamDebugInfo);
@@ -322,7 +325,7 @@ thread_hit_debug_event(uint32 event, const void *message, int32 size,
 						teamDebugInfo.nub_port, additionalData);
 
 					// send it
-					error = kill_interruptable_write_port(debuggerPort, event,
+					error = kill_interruptable_write_port(replyPort, event,
 						&stoppedMessage, sizeof(stoppedMessage));
 
 					break;
@@ -973,6 +976,7 @@ debug_nub_thread(void *)
 			{
 				// get the parameters
 				thread_id threadID = message.get_why_stopped.thread;
+				port_id replyPort = message.get_why_stopped.reply_port;
 
 				TRACE(("nub thread %ld: B_DEBUG_MESSAGE_GET_WHY_STOPPED: "
 					"thread: %ld\n", nubThread->id, threadID));
@@ -994,8 +998,11 @@ debug_nub_thread(void *)
 
 				// send a message to the debugged thread
 				if (threadDebugPort >= 0) {
+					debugged_thread_get_why_stopped commandMessage;
+					commandMessage.reply_port = replyPort;
 					write_port(threadDebugPort,
-						B_DEBUGGED_THREAD_GET_WHY_STOPPED, NULL, 0);
+						B_DEBUGGED_THREAD_GET_WHY_STOPPED, &commandMessage,
+						sizeof(commandMessage));
 				}
 
 				break;

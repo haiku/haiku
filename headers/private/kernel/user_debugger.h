@@ -95,11 +95,16 @@ typedef struct {
 } debugged_thread_continue;
 
 typedef struct {
+	port_id	reply_port;
+} debugged_thread_get_why_stopped;
+
+typedef struct {
 	debug_cpu_state	cpu_state;
 } debugged_thread_set_cpu_state;
 
 typedef union {
 	debugged_thread_continue		continue_thread;
+	debugged_thread_get_why_stopped	get_why_stopped;
 	debugged_thread_set_cpu_state	set_cpu_state;
 } debugged_thread_message_data;
 
