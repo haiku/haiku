@@ -25,14 +25,14 @@ class BDataBuffer
 {
 	public:
 		BDataBuffer(size_t len);
-		BDataBuffer(void* data, size_t len);
+		BDataBuffer(void* data, size_t len, bool copy = false);
 		BDataBuffer(const BDataBuffer& rhs);
 		~BDataBuffer();
 
 		BDataBuffer& operator=(const BDataBuffer& rhs);
 
 		size_t		BufferSize() const;
-		const void*	Buffer();
+		const void*	Buffer() const;
 
 	private:
 		class BDataReference
@@ -41,21 +41,22 @@ class BDataBuffer
 				void	Acquire(BDataReference*& ref);
 				void	Release(BDataReference*& ref);
 
-				char*	Data()			{ return data; }
-				size_t	Size() const	{ return size; }
-				int32	Count()			{ return count; }
+				char*	Data()			{ return fData; }
+				size_t	Size() const	{ return fSize; }
+				int32	Count()			{ return fCount; }
 
-				static void	Create(void* data, size_t len, BDataReference*& ref);
+				static void	Create(void* data, size_t len, BDataReference*& ref,
+								   bool copy = false);
 				static void Create(size_t len, BDataReference*& ref);
 
 			private:
-				BDataReference(void* data, size_t len);
+				BDataReference(void* data, size_t len, bool copy = false);
 				BDataReference(size_t len);
 				~BDataReference();
 
-				char*	data;
-				size_t	size;
-				int32	count;
+				char*	fData;
+				size_t	fSize;
+				int32	fCount;
 		};
 
 		BDataBuffer();	// No default construction allowed!

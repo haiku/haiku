@@ -25,9 +25,9 @@ BDataBuffer::BDataBuffer(size_t len)
 	BDataReference::Create(len, fDataRef);
 }
 //------------------------------------------------------------------------------
-BDataBuffer::BDataBuffer(void* data, size_t len)
+BDataBuffer::BDataBuffer(void* data, size_t len, bool copy)
 {
-	BDataReference::Create(data, len, fDataRef);
+	BDataReference::Create(data, len, fDataRef, copy);
 }
 //------------------------------------------------------------------------------
 BDataBuffer::BDataBuffer(const BDataBuffer& rhs)
@@ -58,7 +58,7 @@ size_t BDataBuffer::BufferSize() const
 	return fDataRef->Size();
 }
 //------------------------------------------------------------------------------
-const void* BDataBuffer::Buffer()
+const void* BDataBuffer::Buffer() const
 {
 	return (const void*)fDataRef->Data();
 }
@@ -67,9 +67,9 @@ const void* BDataBuffer::Buffer()
 
 //------------------------------------------------------------------------------
 void BDataBuffer::BDataReference::Create(void* data, size_t len,
-										 BDataReference*& ref)
+										 BDataReference*& ref, bool copy)
 {
-	BDataReference* temp = new BDataReference(data, len);
+	BDataReference* temp = new BDataReference(data, len, copy);
 	temp->Acquire(ref);
 }
 //------------------------------------------------------------------------------
@@ -82,38 +82,45 @@ void BDataBuffer::BDataReference::Create(size_t len, BDataReference*& ref)
 void BDataBuffer::BDataReference::Acquire(BDataReference*& ref)
 {
 	ref = this;
-	++count;
+	++fCount;
 }
 //------------------------------------------------------------------------------
 void BDataBuffer::BDataReference::Release(BDataReference*& ref)
 {
 	ref = NULL;
-	--count;
-	if (count <= 0)
+	--fCount;
+	if (fCount <= 0)
 	{
 		delete this;
 	}
 }
 //------------------------------------------------------------------------------
-BDataBuffer::BDataReference::BDataReference(void* data, size_t len)
-	:	data(NULL), size(len), count(0)
+BDataBuffer::BDataReference::BDataReference(void* data, size_t len, bool copy)
+	:	fData(NULL), fSize(len), fCount(0)
 {
-	data = new char[len];
-	memcpy((void*)data, data, len);
+	if (copy)
+	{
+		fData = new char[fSize];
+		memcpy((void*)fData, data, fSize);
+	}
+	else
+	{
+		fData = (char*)data;
+	}
 }
 //------------------------------------------------------------------------------
 BDataBuffer::BDataReference::BDataReference(size_t len)
-	:	data(NULL), size(len), count(0)
+	:	fData(NULL), fSize(len), fCount(0)
 {
-	data = new char[len];
+	fData = new char[fSize];
 }
 //------------------------------------------------------------------------------
 BDataBuffer::BDataReference::~BDataReference()
 {
-	if (data)
+	if (fData)
 	{
-		delete[] data;
-		data = NULL;
+		delete[] fData;
+		fData = NULL;
 	}
 }
 //------------------------------------------------------------------------------
