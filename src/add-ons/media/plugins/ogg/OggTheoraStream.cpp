@@ -1,3 +1,4 @@
+#include "OggTheoraFormats.h"
 #include "OggTheoraStream.h"
 #include <ogg/ogg.h>
 #include <stdio.h>
@@ -134,7 +135,7 @@ OggTheoraStream::IsValidHeader(const ogg_packet & packet)
 OggTheoraStream::OggTheoraStream(long serialno)
 	: OggStream(serialno)
 {
-
+	TRACE("OggTheoraStream::OggTheoraStream\n");
 }
 
 OggTheoraStream::~OggTheoraStream()
@@ -181,28 +182,18 @@ OggTheoraStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	}
 
 	// get the format for the description
-	media_format_description description;
-	description.family = B_MISC_FORMAT_FAMILY;
-	description.u.misc.file_format = 'OggS';
-	description.u.misc.codec = 'theo';
+	media_format_description description = theora_description();
 	BMediaFormats formats;
 	result = formats.InitCheck();
-	if (result != B_OK) {
-		return result;
+	if (result == B_OK) {
+		result = formats.GetFormatFor(description, format);
 	}
-	if (!formats.Lock()) {
-		return B_ERROR;
-	}
-	result = formats.GetFormatFor(description, format);
-	formats.Unlock();
 	if (result != B_OK) {
-		return result;
+		*format = theora_encoded_media_format();
+		// ignore error, allow user to use ReadChunk interface
 	}
 
 	// fill out format from header packet
-	format->type = B_MEDIA_ENCODED_VIDEO;
-	format->user_data_type = B_CODEC_TYPE_INFO;
-	strncpy((char*)format->user_data, "theo", 4);
 	format->u.encoded_video.frame_size = info.frame_width * info.frame_height ;
 	format->u.encoded_video.output.display.line_width = info.frame_width;
 	format->u.encoded_video.output.display.line_count = info.frame_height;

@@ -93,14 +93,9 @@ OggSpeexStream::GetStreamInfo(int64 *frameCount, bigtime_t *duration,
 	media_format_description description = speex_description();
 	BMediaFormats formats;
 	result = formats.InitCheck();
-	if (result != B_OK) {
-		return result;
+	if (result == B_OK) {
+		result = formats.GetFormatFor(description, format);
 	}
-	if (!formats.Lock()) {
-		return B_ERROR;
-	}
-	result = formats.GetFormatFor(description, format);
-	formats.Unlock();
 	if (result != B_OK) {
 		*format = speex_encoded_media_format();
 		// ignore error, allow user to use ReadChunk interface
