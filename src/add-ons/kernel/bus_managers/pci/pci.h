@@ -3,6 +3,13 @@
 extern "C" {
 #endif
 
+#define TRACE_PCI
+#ifndef TRACE_PCI
+#define	TRACE(x)
+#else
+#define	TRACE(x)	dprintf x
+#endif
+
 void pci_init(void);
 void pci_uninit(void);
 long pci_get_nth_pci_info(long index, pci_info *outInfo);

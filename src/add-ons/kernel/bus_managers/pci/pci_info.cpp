@@ -29,51 +29,51 @@ const char *get_class_info(uint8 class_base, uint8 class_sub, uint8 class_api);
 void
 print_bridge_info(pci_info *info, bool verbose)
 {
-	dprintf("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
-			info->u.h1.primary_bus, info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency);
-	dprintf("PCI:   io_base %04x%02x, io_limit %04x%02x\n",
-			info->u.h1.io_base_upper16, info->u.h1.io_base, info->u.h1.io_limit_upper16, info->u.h1.io_limit);
-	dprintf("PCI:   memory_base %04x, memory_limit %04x\n",
-			info->u.h1.memory_base, info->u.h1.memory_limit);
-	dprintf("PCI:   prefetchable memory base %08lx%04x, limit %08lx%04x\n",
+	TRACE(("PCI:   primary_bus %02x, secondary_bus %02x, subordinate_bus %02x, secondary_latency %02x\n",
+			info->u.h1.primary_bus, info->u.h1.secondary_bus, info->u.h1.subordinate_bus, info->u.h1.secondary_latency));
+	TRACE(("PCI:   io_base %04x%02x, io_limit %04x%02x\n",
+			info->u.h1.io_base_upper16, info->u.h1.io_base, info->u.h1.io_limit_upper16, info->u.h1.io_limit));
+	TRACE(("PCI:   memory_base %04x, memory_limit %04x\n",
+			info->u.h1.memory_base, info->u.h1.memory_limit));
+	TRACE(("PCI:   prefetchable memory base %08lx%04x, limit %08lx%04x\n",
 		info->u.h1.prefetchable_memory_base_upper32, info->u.h1.prefetchable_memory_base,
-		info->u.h1.prefetchable_memory_limit_upper32, info->u.h1.prefetchable_memory_limit);
-	dprintf("PCI:   bridge_control %04x, secondary_status %04x\n",
-			info->u.h1.bridge_control, info->u.h1.secondary_status);
-	dprintf("PCI:   interrupt_line %02x, interrupt_pin %02x\n",
-			info->u.h1.interrupt_line, info->u.h1.interrupt_pin);
-	dprintf("PCI:   ROM base host %08lx, pci %08lx, size ??\n",
-			info->u.h1.rom_base, info->u.h1.rom_base_pci);
+		info->u.h1.prefetchable_memory_limit_upper32, info->u.h1.prefetchable_memory_limit));
+	TRACE(("PCI:   bridge_control %04x, secondary_status %04x\n",
+			info->u.h1.bridge_control, info->u.h1.secondary_status));
+	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x\n",
+			info->u.h1.interrupt_line, info->u.h1.interrupt_pin));
+	TRACE(("PCI:   ROM base host %08lx, pci %08lx, size ??\n",
+			info->u.h1.rom_base, info->u.h1.rom_base_pci));
 	for (int i = 0; i < 2; i++)
-		dprintf("PCI:   base reg %d: host %08lx, pci %08lx, size %08lx, flags %02x\n",
+		TRACE(("PCI:   base reg %d: host %08lx, pci %08lx, size %08lx, flags %02x\n",
 			i, info->u.h1.base_registers[i], info->u.h1.base_registers_pci[i],
-			info->u.h1.base_register_sizes[i], info->u.h1.base_register_flags[i]);
+			info->u.h1.base_register_sizes[i], info->u.h1.base_register_flags[i]));
 }
 
 
 void
 print_generic_info(pci_info *info, bool verbose)
 {
-	dprintf("PCI:   ROM base host %08lx, pci %08lx, size %08lx\n",
-			info->u.h0.rom_base, info->u.h0.rom_base_pci, info->u.h0.rom_size);
-	dprintf("PCI:   cardbus_CIS %08lx, subsystem_id %04x, subsystem_vendor_id %04x\n",
-			info->u.h0.cardbus_cis, info->u.h0.subsystem_id, info->u.h0.subsystem_vendor_id);
-	dprintf("PCI:   interrupt_line %02x, interrupt_pin %02x, min_grant %02x, max_latency %02x\n",
-			info->u.h0.interrupt_line, info->u.h0.interrupt_pin, info->u.h0.min_grant, info->u.h0.max_latency);
+	TRACE(("PCI:   ROM base host %08lx, pci %08lx, size %08lx\n",
+			info->u.h0.rom_base, info->u.h0.rom_base_pci, info->u.h0.rom_size));
+	TRACE(("PCI:   cardbus_CIS %08lx, subsystem_id %04x, subsystem_vendor_id %04x\n",
+			info->u.h0.cardbus_cis, info->u.h0.subsystem_id, info->u.h0.subsystem_vendor_id));
+	TRACE(("PCI:   interrupt_line %02x, interrupt_pin %02x, min_grant %02x, max_latency %02x\n",
+			info->u.h0.interrupt_line, info->u.h0.interrupt_pin, info->u.h0.min_grant, info->u.h0.max_latency));
 	for (int i = 0; i < 6; i++)
-		dprintf("PCI:   base reg %d: host %08lx, pci %08lx, size %08lx, flags %02x\n",
+		TRACE(("PCI:   base reg %d: host %08lx, pci %08lx, size %08lx, flags %02x\n",
 			i, info->u.h0.base_registers[i], info->u.h0.base_registers_pci[i],
-			info->u.h0.base_register_sizes[i], info->u.h0.base_register_flags[i]);
+			info->u.h0.base_register_sizes[i], info->u.h0.base_register_flags[i]));
 }
 
 
 void
 print_info_basic(pci_info *info, bool verbose)
 {
-	dprintf("PCI: bus %2d, device %2d, function %2d: vendor %04x, device %04x, revision %02x\n",
-			info->bus, info->device, info->function, info->vendor_id, info->device_id, info->revision);
-	dprintf("PCI:   class_base %02x, class_function %02x, class_api %02x\n",
-			info->class_base, info->class_sub, info->class_api);
+	TRACE(("PCI: bus %2d, device %2d, function %2d: vendor %04x, device %04x, revision %02x\n",
+			info->bus, info->device, info->function, info->vendor_id, info->device_id, info->revision));
+	TRACE(("PCI:   class_base %02x, class_function %02x, class_api %02x\n",
+			info->class_base, info->class_sub, info->class_api));
 
 	if (verbose) {
 #if USE_PCI_HEADER
@@ -81,27 +81,27 @@ print_info_basic(pci_info *info, bool verbose)
 		const char *venFull;
 		get_vendor_info(info->vendor_id, &venShort, &venFull);
 		if (!venShort && !venFull) {
-			dprintf("PCI:   vendor %04x: Unknown\n", info->vendor_id);
+			TRACE(("PCI:   vendor %04x: Unknown\n", info->vendor_id));
 		} else if (venShort && venFull) {
-			dprintf("PCI:   vendor %04x: %s - %s\n", info->vendor_id, venShort, venFull);
+			TRACE(("PCI:   vendor %04x: %s - %s\n", info->vendor_id, venShort, venFull));
 		} else {
-			dprintf("PCI:   vendor %04x: %s\n", info->vendor_id, venShort ? venShort : venFull);
+			TRACE(("PCI:   vendor %04x: %s\n", info->vendor_id, venShort ? venShort : venFull));
 		}
 		const char *devShort;
 		const char *devFull;
 		get_device_info(info->vendor_id, info->device_id, &devShort, &devFull);
 		if (!devShort && !devFull) {
-			dprintf("PCI:   device %04x: Unknown\n", info->device_id);
+			TRACE(("PCI:   device %04x: Unknown\n", info->device_id));
 		} else if (devShort && devFull) {
-			dprintf("PCI:   device %04x: %s - %s\n", info->device_id, devShort, devFull);
+			TRACE(("PCI:   device %04x: %s - %s\n", info->device_id, devShort, devFull));
 		} else {
-			dprintf("PCI:   device %04x: %s\n", info->device_id, devShort ? devShort : devFull);
+			TRACE(("PCI:   device %04x: %s\n", info->device_id, devShort ? devShort : devFull));
 		}
 #endif
-		dprintf("PCI:   info: %s\n", get_class_info(info->class_base, info->class_sub, info->class_api));
+		TRACE(("PCI:   info: %s\n", get_class_info(info->class_base, info->class_sub, info->class_api)));
 	}
-	dprintf("PCI:   line_size %02x, latency %02x, header_type %02x, BIST %02x\n",
-			info->line_size, info->latency, info->header_type, info->bist);
+	TRACE(("PCI:   line_size %02x, latency %02x, header_type %02x, BIST %02x\n",
+			info->line_size, info->latency, info->header_type, info->bist));
 
 	switch (info->header_type) {
 		case 0:
@@ -111,7 +111,7 @@ print_info_basic(pci_info *info, bool verbose)
 			print_bridge_info(info, verbose);
 			break;
 		default:
-			dprintf("PCI:   unknown header type\n");
+			TRACE(("PCI:   unknown header type\n"));
 	}
 }
 

@@ -16,20 +16,20 @@ status_t	pci_module_rescan(void);
 status_t
 pci_module_init(void)
 {
-	dprintf("PCI: pci_module_init\n");
+	TRACE(("PCI: pci_module_init\n"));
 
 	if (B_OK != pci_io_init()) {
-		dprintf("PCI: pci_io_init failed\n");
+		TRACE(("PCI: pci_io_init failed\n"));
 		return B_ERROR;
 	}
 
 	if (B_OK != pci_config_init()) {
-		dprintf("PCI: pci_config_init failed\n");
+		TRACE(("PCI: pci_config_init failed\n"));
 		return B_ERROR;
 	}
 	
 	if (B_OK != pci_irq_init()) {
-		dprintf("PCI: IRQ router not available\n");
+		TRACE(("PCI: IRQ router not available\n"));
 	} else {
 		gIrqRouterAvailable = true;
 	}
@@ -44,7 +44,7 @@ pci_module_init(void)
 status_t
 pci_module_uninit(void)
 {
-	dprintf("PCI: pci_module_uninit\n");
+	TRACE(("PCI: pci_module_uninit\n"));
 	pci_uninit();
 	return B_OK;
 }

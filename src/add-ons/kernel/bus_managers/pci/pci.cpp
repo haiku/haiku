@@ -72,7 +72,7 @@ PCI::GetNthPciInfo(PCIBus *bus, long *curindex, long wantindex, pci_info *outInf
 void
 PCI::DiscoverBus(PCIBus *bus)
 {
-	dprintf("PCI: DiscoverBus, bus %u\n", bus->bus);
+	TRACE(("PCI: DiscoverBus, bus %u\n", bus->bus));
 
 	for (int dev = 0; dev < gMaxBusDevices; dev++) {
 		uint16 vendor_id = pci_read_config(bus->bus, dev, 0, PCI_vendor_id, 2);
@@ -90,7 +90,7 @@ PCI::DiscoverBus(PCIBus *bus)
 void
 PCI::DiscoverDevice(PCIBus *bus, uint8 dev, uint8 func)
 {
-	dprintf("PCI: DiscoverDevice, bus %u, dev %u, func %u\n", bus->bus, dev, func);
+	TRACE(("PCI: DiscoverDevice, bus %u, dev %u, func %u\n", bus->bus, dev, func));
 
 	uint16 device_id = pci_read_config(bus->bus, dev, func, PCI_device_id, 2);
 	if (device_id == 0xffff)
@@ -126,7 +126,7 @@ PCI::CreateBus(PCIDev *parent, uint8 bus)
 PCIDev *
 PCI::CreateDevice(PCIBus *parent, uint8 dev, uint8 func)
 {
-	dprintf("PCI: CreateDevice, bus %u, dev %u, func %u:\n", parent->bus, dev, func);
+	TRACE(("PCI: CreateDevice, bus %u, dev %u, func %u:\n", parent->bus, dev, func));
 	
 	PCIDev *newdev = new PCIDev;
 	newdev->next = 0;
@@ -138,8 +138,8 @@ PCI::CreateDevice(PCIBus *parent, uint8 dev, uint8 func)
 
 	ReadPciBasicInfo(newdev);
 
-	dprintf("PCI: vendor 0x%04x, device 0x%04x, class_base 0x%02x, class_sub 0x%02x\n",
-		newdev->info.vendor_id, newdev->info.device_id, newdev->info.class_base, newdev->info.class_sub);
+	TRACE(("PCI: vendor 0x%04x, device 0x%04x, class_base 0x%02x, class_sub 0x%02x\n",
+		newdev->info.vendor_id, newdev->info.device_id, newdev->info.class_base, newdev->info.class_sub));
 
 	// append
 	if (parent->child == 0) {
@@ -302,7 +302,7 @@ PCI::ReadPciHeaderInfo(PCIDev *dev)
 		}
 
 		default:
-			dprintf("PCI: Header type unknown (%d)\n", dev->info.header_type);
+			TRACE(("PCI: Header type unknown (%d)\n", dev->info.header_type));
 			break;
 	}
 }
