@@ -1068,6 +1068,12 @@ void thread_snooze(bigtime_t time)
 	acquire_sem_etc(snooze_sem, 1, B_TIMEOUT, time);
 }
 
+status_t snooze(bigtime_t timeout)
+{
+	return acquire_sem_etc(snooze_sem, 1, B_TIMEOUT | B_CAN_INTERRUPT, 
+	                       timeout);
+}
+
 // this function gets run by a new thread before anything else
 static void thread_entry(void)
 {
