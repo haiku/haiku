@@ -23,6 +23,11 @@
 
 #include <mail_util.h>
 
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
+
+using namespace BPrivate;
+
 #define CRLF   "\r\n"
 
 struct CharsetConversionEntry
@@ -35,34 +40,47 @@ extern const CharsetConversionEntry mail_charsets [] =
 {
 	// In order of authority, so when searching for the name for a particular
 	// numbered conversion, start at the beginning of the array.
-	{"iso-8859-1",  B_ISO1_CONVERSION},
-	{"iso-8859-2",  B_ISO2_CONVERSION},
-	{"iso-8859-3",  B_ISO3_CONVERSION},
-	{"iso-8859-4",  B_ISO4_CONVERSION},
-	{"iso-8859-5",  B_ISO5_CONVERSION},
-	{"iso-8859-6",  B_ISO6_CONVERSION},
-	{"iso-8859-7",  B_ISO7_CONVERSION},
-	{"iso-8859-8",  B_ISO8_CONVERSION},
-	{"iso-8859-9",  B_ISO9_CONVERSION},
-	{"iso-8859-10", B_ISO10_CONVERSION},
-	{"iso-8859-13", B_ISO13_CONVERSION},
-	{"iso-8859-14", B_ISO14_CONVERSION},
-	{"iso-8859-15", B_ISO15_CONVERSION},
+	{"iso-8859-1",  B_ISO1_CONVERSION}, // MIME STANDARD
+	{"iso-8859-2",  B_ISO2_CONVERSION}, // MIME STANDARD
+	{"iso-8859-3",  B_ISO3_CONVERSION}, // MIME STANDARD
+	{"iso-8859-4",  B_ISO4_CONVERSION}, // MIME STANDARD
+	{"iso-8859-5",  B_ISO5_CONVERSION}, // MIME STANDARD
+	{"iso-8859-6",  B_ISO6_CONVERSION}, // MIME STANDARD
+	{"iso-8859-7",  B_ISO7_CONVERSION}, // MIME STANDARD
+	{"iso-8859-8",  B_ISO8_CONVERSION}, // MIME STANDARD
+	{"iso-8859-9",  B_ISO9_CONVERSION}, // MIME STANDARD
+	{"iso-8859-10", B_ISO10_CONVERSION}, // MIME STANDARD
+	{"iso-8859-13", B_ISO13_CONVERSION}, // MIME STANDARD
+	{"iso-8859-14", B_ISO14_CONVERSION}, // MIME STANDARD
+	{"iso-8859-15", B_ISO15_CONVERSION}, // MIME STANDARD
+
+	{"shift_jis",	B_SJIS_CONVERSION}, // MIME STANDARD
 	{"shift-jis",	B_SJIS_CONVERSION},
-	{"iso-2022-jp", B_JIS_CONVERSION},
-	{"euc-jp",		B_EUC_CONVERSION},
-	{"euc-kr",      B_EUC_KR_CONVERSION}, // Shift encoding 7 bit and KSC-5601 if bit 8 is on.
-	{"ksc5601",		B_EUC_KR_CONVERSION}, // Not sure if 7 or 8 bit.
-	{"ks_c_5601-1987", B_EUC_KR_CONVERSION}, // Not sure if 7 or 8 bit.
-	{"koi8-r",      B_KOI8R_CONVERSION},
-	{"windows-1251",B_MS_WINDOWS_1251_CONVERSION},
-	{"windows-1252",B_MS_WINDOWS_CONVERSION},
-	{"dos-437",     B_MS_DOS_CONVERSION},
-	{"dos-866",     B_MS_DOS_866_CONVERSION},
-	{"x-mac-roman", B_MAC_ROMAN_CONVERSION},
+	{"iso-2022-jp", B_JIS_CONVERSION}, // MIME STANDARD
+	{"euc-jp",		B_EUC_CONVERSION}, // MIME STANDARD
+
+	{"euc-kr",      B_EUC_KR_CONVERSION}, // Shift encoding 7 bit and KSC-5601 if bit 8 is on. // MIME STANDARD
+	{"ksc5601",		B_EUC_KR_CONVERSION},    // Not sure if 7 or 8 bit. // COMPATIBLE?
+	{"ks_c_5601-1987", B_EUC_KR_CONVERSION}, // Not sure if 7 or 8 bit. // COMPATIBLE with stupid MS software
+
+	{"koi8-r",      B_KOI8R_CONVERSION},           // MIME STANDARD
+	{"windows-1251",B_MS_WINDOWS_1251_CONVERSION}, // MIME STANDARD
+	{"windows-1252",B_MS_WINDOWS_CONVERSION},      // MIME STANDARD
+
+	{"dos-437",     B_MS_DOS_CONVERSION},     // WRONG NAME : MIME STANDARD NAME = NONE ( IBM437? )
+	{"dos-866",     B_MS_DOS_866_CONVERSION}, // WRONG NAME : MIME STANDARD NAME = NONE ( IBM866? )
+	{"x-mac-roman", B_MAC_ROMAN_CONVERSION},  // WRONG NAME : MIME STANDARD NAME = NONE ( macintosh? + x-mac-roman? )
+
+    {"big5",        24}, // MIME STANDARD
+
+    {"gb18030",     25}, // WRONG NAME : MIME STANDARD NAME = NONE ( GB18030? )
+    {"gb2312",      25}, // COMPATIBLE
+    {"gbk",         25}, // COMPATIBLE
+
 	/* {"utf-16",		B_UNICODE_CONVERSION}, Might not work due to NULs in text, needs testing. */
-	{"us-ascii",	B_MAIL_US_ASCII_CONVERSION},
-	{"utf-8",		B_MAIL_UTF8_CONVERSION /* Special code for no conversion */},
+	{"us-ascii",	B_MAIL_US_ASCII_CONVERSION},                                  // MIME STANDARD
+	{"utf-8",		B_MAIL_UTF8_CONVERSION /* Special code for no conversion */}, // MIME STANDARD
+
 	{NULL, (uint32) -1} /* End of list marker, NULL string pointer is the key. */
 };
 
@@ -369,15 +387,22 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 		size_t		cLen = encoding - 1 - charset;
 		bool		base64encoded = toupper(*encoding) == 'B';
 
-		int i;
-		for (i = 0; mail_charsets[i].charset != NULL; i++)
-		{
-			if (strncasecmp(charset, mail_charsets[i].charset, cLen) == 0 &&
-			strlen(mail_charsets[i].charset) == cLen)
-				break;
+		uint32 convert_id = B_MAIL_NULL_CONVERSION;
+		char charset_string[cLen+1];
+		memcpy(charset_string, charset, cLen);
+		charset_string[cLen] = '\0';
+		if (strcasecmp(charset_string, "us-ascii") == 0) {
+			convert_id = B_MAIL_US_ASCII_CONVERSION;
+		} else if (strcasecmp(charset_string, "utf-8") == 0) {
+			convert_id = B_MAIL_UTF8_CONVERSION;
+		} else {
+			const BCharacterSet * cs = BCharacterSetRoster::FindCharacterSetByName(charset_string);
+			if (cs != NULL) {
+				convert_id = cs->GetConversionID();
+			}
 		}
 
-		if (mail_charsets[i].charset == NULL)
+		if (convert_id == B_MAIL_NULL_CONVERSION)
 		{
 			// unidentified charset
 			// what to do? doing nothing skips the encoded text;
@@ -406,7 +431,7 @@ _EXPORT ssize_t rfc2047_to_utf8(char **bufp, size_t *bufLen, size_t strLen)
 		//
 		// do the conversion
 		//
-		ret = mail_convert_to_utf8(mail_charsets[i].flavor, src, &cvLen, dst, &dstLen, &convState);
+		ret = mail_convert_to_utf8(convert_id, src, &cvLen, dst, &dstLen, &convState);
 		if (ret != B_OK)
 		{
 			// what to do? doing nothing skips the encoded text
