@@ -14,6 +14,7 @@ void __init__dlfcn(struct uspace_program_args const *);
 
 static struct rld_export const *gRuntimeLinker;
 static status_t gStatus;
+	// Note, this is not thread-safe
 
 
 void *
