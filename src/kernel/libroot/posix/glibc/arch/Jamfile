@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src kernel libroot posix glibc arch ;
+
+SubInclude OBOS_TOP src kernel libroot posix glibc arch $(OBOS_ARCH) ;
+
