@@ -1,0 +1,49 @@
+<HTML>
+<HEAD><TITLE>OpenBeOS Networking Kit Package</TITLE></HEAD>
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+<H2>OpenBeOS Networking Kit Package</H2>
+
+<H3>About</H3>
+This package was created to allow BeOS users to have the latest version of the OpenBeOS Networking Kit, without having to compile it themselves.  This also lets BeOS users take advantage of bug fixes and new features without having to wait for the next beta release of the Networking Kit.
+<P>
+However, because this package is made from the latest sources, experimental and unstable features may be present.  Such features may cause some programs to behave abnormally.
+<P>
+USE AT YOUR OWN RISK.
+
+<H3>Included Files</H3>
+Currently, this package is intended to contain the OBOS Networking Kit and all of the OBOS Translators.  This may change in the future.
+<P>
+Files:<BR>
+boot/home/config/lib/libnet.so<BR>
+boot/home/config/lib/libnetapi.so<BR>
+boot/home/config/add-ons/kernel/drivers/bin/net_stack_driver<BR>
+boot/home/config/add-ons/kernel/drivers/bin/net_server_driver<BR>
+boot/home/config/add-ons/kernel/drivers/bin/sis900<BR>
+boot/home/config/add-ons/kernel/drivers/bin/rtl8139<BR>
+boot/home/config/add-ons/kernel/drivers/dev/net/net_stack_driver (link)<BR>
+boot/home/config/add-ons/kernel/drivers/dev/net/net_server_driver (link)<BR>
+boot/home/config/add-ons/kernel/drivers/dev/net/sis900 (link)<BR>
+boot/home/config/add-ons/kernel/drivers/dev/net/rtl8139 (link)<BR>
+boot/home/config/add-ons/kernel/obos_network/core<BR>
+boot/home/config/add-ons/kernel/obos_network/interfaces/ether_drivers<BR>
+boot/home/config/add-ons/kernel/obos_network/interfaces/loopback<BR>
+boot/home/config/add-ons/kernel/obos_network/interfaces/dialup<BR>
+boot/home/config/add-ons/kernel/obos_network/ppp/ipcp<BR>
+boot/home/config/add-ons/kernel/obos_network/ppp/modem<BR>
+boot/home/config/add-ons/kernel/obos_network/ppp/pap<BR>
+boot/home/config/add-ons/kernel/obos_network/ppp/pppoe<BR>
+boot/home/config/add-ons/kernel/obos_network/protocols/icmp<BR>
+boot/home/config/add-ons/kernel/obos_network/protocols/ipv4<BR>
+boot/home/config/add-ons/kernel/obos_network/protocols/raw<BR>
+boot/home/config/add-ons/kernel/obos_network/protocols/tcp<BR>
+boot/home/config/add-ons/kernel/obos_network/protocols/udp<BR>
+
+<H3>Installing</H3>
+To install this package, simply double-click on the install.sh script.  The install process WILL NOT change any of the system files.  Because the files are copied to under the home folder, they will be loaded instead of the BeOS system files.  
+
+<H3>Bugs</H3>
+As always, if you find a bug with the Networking Kit, please e-mail me at phoudoin &lt;@t&gt; users | sourceforge | net.  Please include the date of the package in your e-mail so I know which version of the files you are seeing bugs with.
+
+</BODY>
+</HTML>
+

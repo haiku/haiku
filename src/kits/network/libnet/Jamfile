@@ -65,11 +65,10 @@ OBOSInstallRelSymLink install-networking
 	: libnet.so
 	: installed-networking-test ;
 
-
-
 Package openbeos-networkingkit-cvs :
 	README.html ;
 
 Package openbeos-networkingkit-cvs :
 	libnet.so :
-	boot home config lib ;
+#	boot home config lib ;
+	boot home Desktop openbeos-networkingkit lib ;

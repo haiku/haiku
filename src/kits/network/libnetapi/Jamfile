@@ -23,4 +23,5 @@ OBOSInstallRelSymLink install-networking
 
 Package openbeos-networkingkit-cvs :
 	libnetapi.so :
-	boot home config lib ;
+#	boot home config lib ;
+	boot home Desktop openbeos-networkingkit lib ;
