@@ -35,46 +35,47 @@ class ServerFont
 {
 public:
 	ServerFont(void);
-	ServerFont(FontStyle *fstyle, float fsize=12.0, float frotation=0.0, float fshear=90.0,
+	ServerFont(FontStyle *style, float size=12.0, float frotation=0.0, float fshear=90.0,
 			uint16 flags=0, uint8 spacing=B_CHAR_SPACING);
 	ServerFont(const ServerFont &font);
 	~ServerFont(void);
-	font_direction Direction(void) const { return fdirection; }
-	uint32 Encoding(void) const { return fencoding; }
-	edge_info Edges(void) const { return fedges; }
-	uint32 Flags(void) const { return fflags; }
-	uint32 Spacing(void) const { return fspacing; }
+	font_direction Direction(void) const { return fDirection; }
+	uint32 Encoding(void) const { return fEncoding; }
+	edge_info Edges(void) const { return fEdges; }
+	uint32 Flags(void) const { return fFlags; }
+	uint32 Spacing(void) const { return fSpacing; }
 	float Shear(void) const { return fshear; }
 	float Rotation(void) const { return frotation; }
-	float Size(void) const { return fsize; }
-	uint16 Face(void) const { return fface; }
-	uint32 CountGlyphs(void);
+	float Size(void) const { return fSize; }
+	uint16 Face(void) const { return fFace; }
+	uint32 CountGlyphs(void) { return fStyle->GlyphCount(); }
 	int32 CountTuned(void);
 	font_file_format FileFormat(void);
-
-	void SetDirection(const font_direction &dir) { fdirection=dir; }
-	void SetEdges(const edge_info &info) { fedges=info; }
-	void SetEncoding(uint32 encoding) { fencoding=encoding; }
-	void SetFlags(const uint32 &value) { fflags=value; }
-	void SetSpacing(const uint32 &value) { fspacing=value; }
-	void SetShear(const float &value) { fshear=value; }
-	void SetSize(const float &value) { fsize=value; }
-	void SetRotation(const float &value) { frotation=value; }
-	void SetFace(const uint32 &value) { fface=value; }
 	
-	bool IsFixedWidth(void) { return fstyle->IsFixedWidth(); }
-	bool IsScalable(void) { return fstyle->IsScalable(); }
-	bool HasKerning(void) { return fstyle->HasKerning(); }
-	bool HasTuned(void) { return fstyle->HasTuned(); }
-	int32 TunedCount(void) { return fstyle->TunedCount(); }
-	uint16 GlyphCount(void) { return fstyle->GlyphCount(); }
-	uint16 CharMapCount(void) { return fstyle->CharMapCount(); }
+	void SetFamilyAndStyle(const uint32 &fontID);
+	void SetDirection(const font_direction &dir) { fDirection=dir; }
+	void SetEdges(const edge_info &info) { fEdges=info; }
+	void SetEncoding(uint32 encoding) { fEncoding=encoding; }
+	void SetFlags(const uint32 &value) { fFlags=value; }
+	void SetSpacing(const uint32 &value) { fSpacing=value; }
+	void SetShear(const float &value) { fshear=value; }
+	void SetSize(const float &value) { fSize=value; }
+	void SetRotation(const float &value) { frotation=value; }
+	void SetFace(const uint32 &value) { fFace=value; }
+	
+	bool IsFixedWidth(void) { return fStyle->IsFixedWidth(); }
+	bool IsScalable(void) { return fStyle->IsScalable(); }
+	bool HasKerning(void) { return fStyle->HasKerning(); }
+	bool HasTuned(void) { return fStyle->HasTuned(); }
+	int32 TunedCount(void) { return fStyle->TunedCount(); }
+	uint16 GlyphCount(void) { return fStyle->GlyphCount(); }
+	uint16 CharMapCount(void) { return fStyle->CharMapCount(); }
 	
 	const char *GetStyle(void) const;
 	const char *GetFamily(void) const;
-	const char *GetPath(void) const { return fstyle->GetPath(); }
-	uint16 StyleID(void) const { return fstyle->GetID(); }
-	uint16 FamilyID(void) const { return fstyle->Family()->GetID(); }
+	const char *GetPath(void) const { return fStyle->GetPath(); }
+	uint16 StyleID(void) const { return fStyle->GetID(); }
+	uint16 FamilyID(void) const { return fStyle->Family()->GetID(); }
 
 	BRect BoundingBox(void);
 	void Height(font_height *fh);
@@ -83,21 +84,16 @@ public:
 	
 protected:
 	friend class FontStyle;
-	FontStyle *fstyle;
-	font_height fheight;
-	edge_info fedges;
-	float fsize, frotation, fshear;
-	BRect fbounds;
-	uint32 fflags;
-	uint32 fspacing;
-	uint16 fface;
-	font_direction fdirection;
-	uint8 ftruncate;
-	uint32 fencoding;
+	FontStyle *fStyle;
+	edge_info fEdges;
+	float fSize, frotation, fshear;
+	BRect fBounds;
+	uint32 fFlags;
+	uint32 fSpacing;
+	uint16 fFace;
+	font_direction fDirection;
+	uint32 fEncoding;
 };
 
 #endif
-/*
- @log
- 	* added '=' operator
-*/
+
