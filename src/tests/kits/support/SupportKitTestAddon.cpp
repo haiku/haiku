@@ -6,7 +6,7 @@
 #include "bautolock/AutolockTest.h"
 #include "blocker/LockerTest.h"
 #include "bmemoryio/MemoryIOTest.h"
-#include "bmallocio/MallocIOTest.h"
+#include "bmemoryio/MallocIOTest.h"
 
 BTestSuite* getTestSuite() {
 	BTestSuite *suite = new BTestSuite("Support");
