@@ -24,6 +24,7 @@ public:
 	
 	time_t StartTime() const { return fStartTime; }
 	time_t ElapsedTime() const { return real_time_clock() - fStartTime; }
+	std::string ElapsedTimeString() const;
 	
 	void AddDirectory() { fDirectories++; }
 	void AddFile() { fFiles++; }

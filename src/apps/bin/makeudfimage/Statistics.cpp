@@ -84,6 +84,50 @@ Statistics::Reset()
 }
 
 
+/*! \brief Returns a string describing the amount of time
+	elapsed since the object was created..
+*/
+std::string
+Statistics::ElapsedTimeString() const
+{
+	time_t time = ElapsedTime();
+	std::string result;
+	char buffer[256];
+	// seconds
+	uint32 seconds = time % 60;
+	sprintf(buffer, "%ld second%s", seconds, seconds == 1 ? "" : "s");
+	result = buffer;
+	time /= 60;
+	if (time > 0) {
+		// minutes
+		uint32 minutes = time % 60;
+		sprintf(buffer, "%ld minute%s", minutes, minutes == 1 ? "" : "s");
+		result = std::string(buffer) + ", " + result;
+		time /= 60;
+		if (time > 0) {
+			// hours
+			uint32 hours = time % 24;
+			sprintf(buffer, "%ld hour%s", hours, hours == 1 ? "" : "s");
+			result = std::string(buffer) + ", " + result;
+			time /= 24;
+			if (time > 0) {
+				// days
+				uint32 days = time % 365;
+				sprintf(buffer, "%ld day%s", days, days == 1 ? "" : "s");
+				result = std::string(buffer) + ", " + result;
+				time /= 365;
+				if (time > 0) {
+					// years
+					sprintf(buffer, "%ld year%s", time, time == 1 ? "" : "s");
+					result = std::string(buffer) + ", " + result;
+					time /= 60;
+				}
+			}
+		}	
+	}
+	return result;		
+}
+
 /*! \brief Returns a string describing the number of bytes
 	allocated to directory data and metadata, displayed in the
 	appropriate units (i.e. bytes, KB, MB, etc.).
