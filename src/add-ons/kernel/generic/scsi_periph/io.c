@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 /*
@@ -258,7 +258,7 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 
 	if ((request->subsys_status & SCSI_AUTOSNS_VALID) != 0 && cmd->sense_data) {
 		memcpy(cmd->sense_data, request->sense, 
-			min(cmd->sense_data_length, SCSI_MAX_SENSE_SIZE - request->sense_resid));
+			min(cmd->sense_data_length, (size_t)SCSI_MAX_SENSE_SIZE - request->sense_resid));
 	}
 
 	if ((cmd->flags & B_RAW_DEVICE_REPORT_RESIDUAL) != 0) {
@@ -276,31 +276,29 @@ raw_command(scsi_periph_device_info *device, raw_device_command *cmd)
 
 
 status_t
-periph_ioctl(scsi_periph_handle_info *handle, int op, void *buf, size_t len)
+periph_ioctl(scsi_periph_handle_info *handle, int op, void *buffer, size_t length)
 {
 	switch (op) {
 		case B_GET_MEDIA_STATUS: {
-			status_t res;
+			status_t res = B_OK;
 
-			if (!handle->device->removable)
-				return B_BAD_VALUE;
+			if (handle->device->removable)
+				res = periph_get_media_status(handle);
 
-			res = periph_get_media_status(handle);
 			SHOW_FLOW(2, "%s", strerror(res));
 
-			*(status_t *)buf = res;
-
+			*(status_t *)buffer = res;
 			return B_OK;
 		}
 
 		case B_SCSI_INQUIRY:
-			return inquiry(handle->device, (scsi_inquiry *)buf);
+			return inquiry(handle->device, (scsi_inquiry *)buffer);
 
 		case B_SCSI_PREVENT_ALLOW:
-			return prevent_allow(handle->device, *(bool *)buf);
+			return prevent_allow(handle->device, *(bool *)buffer);
 
 		case B_RAW_DEVICE_COMMAND:
-			return raw_command(handle->device, buf);
+			return raw_command(handle->device, buffer);
 
 		default:
 			SHOW_ERROR(4, "Unknown ioctl: %x", op);
