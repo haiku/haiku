@@ -456,7 +456,6 @@ static status_t map_device(device_info *di)
 	/* variables for making copy of ROM */
 	char * rom_temp;
 	area_id rom_area;
-	uint32 rom_size;
 
 	/* Nvidia cards have registers in [0] and framebuffer in [1] */
 	int registers = 0;
@@ -529,14 +528,11 @@ static status_t map_device(device_info *di)
 		return rom_area;
 	}
 
-	/* dump ROM to file if selected in nv.settings */
-	if (current_settings.dumprom) dumprom (rom_temp, di->pcii.u.h0.rom_size);
-	/* we reserved 128Kb for the ROM mirror, but note actual size for reference */
-	si->rom.size = di->pcii.u.h0.rom_size;
-	/* make a copy of ROM for future reference, but truncate our mirror if needed */
-	rom_size = si->rom.size;
-	if (rom_size > (128 * 1024)) rom_size = (128 * 1024);
-	memcpy (si->rom.mirror, rom_temp, rom_size);
+	/* dump ROM to file if selected in nv.settings
+	 * (ROM is always 64Kb: checked TNT1 - FX5950) */
+	if (current_settings.dumprom) dumprom (rom_temp, 65536);
+	/* make a copy of ROM for future reference */
+	memcpy (si->rom_mirror, rom_temp, 65536);
 
 	/* disable ROM decoding - this is defined in the PCI standard, and delete the area */
 	tmpUlong = get_pci(PCI_rom_base, 4);

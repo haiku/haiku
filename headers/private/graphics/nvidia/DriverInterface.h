@@ -31,7 +31,7 @@ typedef struct {
 	int32	ben;
 } benaphore;
 
-#define INIT_BEN(x)		x.sem = create_sem(0, "G400 "#x" benaphore");  x.ben = 0;
+#define INIT_BEN(x)		x.sem = create_sem(0, "NV "#x" benaphore");  x.ben = 0;
 #define AQUIRE_BEN(x)	if((atomic_add(&(x.ben), 1)) >= 1) acquire_sem(x.sem);
 #define RELEASE_BEN(x)	if((atomic_add(&(x.ben), -1)) > 1) release_sem(x.sem);
 #define	DELETE_BEN(x)	delete_sem(x.sem);
@@ -267,11 +267,7 @@ typedef struct {
 	} ps;
 
 	/* mirror of the ROM (copied in driver, because may not be mapped permanently) */
-	struct
-	{
-		uint8 	mirror[128 * 1024];
-		uint32	size;
-	} rom;
+	uint8 rom_mirror[65536];
 
 	/* some configuration settings from ~/config/settings/kernel/drivers/nv.settings if exists */
 	settings settings;
