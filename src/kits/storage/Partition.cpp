@@ -378,8 +378,8 @@ BPartition::Unmount()
 	\param volumeName The volume name set by the user.
 	\param parameters Pointer to a pre-allocated BString to be set to the
 		   parameters the user has specified.
-	\param dialogCenter The point at which to center the dialog. If omitted,
-		   the dialog is displayed centered to the screen.
+	\param dialogCenter The rectangle over which to center the dialog. If
+		   omitted, the dialog is displayed centered to the screen.
 	\param cancelled Pointer to a pre-allocated bool to be set to \c true, if
 		   the dialog has been cancelled by the user, or to \c false
 		   otherwise. May be \c NULL.
@@ -393,7 +393,7 @@ status_t
 BPartition::GetInitializationParameters(const char *fileSystem,
 										BString *volumeName,
 										BString *parameters,
-										BPoint dialogCenter,
+										BRect dialogCenter,
 										bool *cancelled)
 {
 	return B_ERROR;	// not implemented
@@ -428,8 +428,8 @@ BPartition::Initialize(const char *fileSystem, const char *volumeName,
 	latter case \a cancelled is set to \c true, otherwise to \c false.
 
 	\param fileSystem The file system to be used for the initialization.
-	\param dialogCenter The point at which to center the dialog. If omitted,
-		   the dialog is displayed centered to the screen.
+	\param dialogCenter The rectangle over which to center the dialog. If
+		   omitted, the dialog is displayed centered to the screen.
 	\param cancelled Pointer to a pre-allocated bool to be set to \c true, if
 		   the dialog has been cancelled by the user, or to \c false
 		   otherwise. May be \c NULL.
@@ -441,28 +441,8 @@ BPartition::Initialize(const char *fileSystem, const char *volumeName,
 	- another error code
 */
 status_t
-BPartition::Initialize(const char *fileSystem, BPoint dialogCenter,
+BPartition::Initialize(const char *fileSystem, BRect dialogCenter,
 					   bool *cancelled)
-{
-	return B_ERROR;	// not implemented
-}
-
-// GetFileSystemList
-/*!	\brief Returns a list of all file systems that can be used for
-		   initialization.
-
-	The names of the file systems are added as BString objects to the
-	supplied list. The caller takes over ownership of the return BString
-	objects and is responsible for deleteing them.
-
-	Any of returned names can be passed to Initialize().
-
-	\param list Pointer to a pre-allocated BObjectList the names of the
-		   file systems shall be added to.
-	\return \c B_OK, if everything went fine, another error code otherwise.
-*/
-status_t
-BPartition::GetFileSystemList(BObjectList<BString> *list)
 {
 	return B_ERROR;	// not implemented
 }

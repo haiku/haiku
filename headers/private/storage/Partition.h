@@ -9,7 +9,7 @@
 #include <disk_scanner.h>
 #include <Mime.h>
 #include <ObjectList.h>
-#include <Point.h>
+#include <Rect.h>
 #include <String.h>
 
 class BDiskDevice;
@@ -56,17 +56,14 @@ public:
 	status_t GetInitializationParameters(const char *fileSystem,
 										 BString *volumeName,
 										 BString *parameters,
-										 BPoint dialogCenter = BPoint(-1, -1),
+										 BRect dialogCenter = BRect(),
 										 bool *cancelled = NULL);
 	status_t Initialize(const char *fileSystem, const char *volumeName,
 						const char *parameters);
 	status_t Initialize(const char *fileSystem = "bfs",
-						BPoint dialogCenter = BPoint(-1, -1),
+						BRect dialogCenter = BRect(),
 						bool *cancelled = NULL);
 
-// TODO: Return more info, e.g. the long name?
-	static status_t GetFileSystemList(BObjectList<BString> *list);
-	
 private:
 	BPartition();
 	BPartition(const BPartition &);
