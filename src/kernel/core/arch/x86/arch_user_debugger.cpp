@@ -6,9 +6,17 @@
 #include <string.h>
 
 #include <debugger.h>
+#include <driver_settings.h>
 #include <int.h>
 #include <thread.h>
 #include <arch/user_debugger.h>
+
+//#define TRACE_ARCH_USER_DEBUGGER
+#ifdef TRACE_ARCH_USER_DEBUGGER
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
 
 #define B_NO_MORE_BREAKPOINTS				B_ERROR
 #define B_NO_MORE_WATCHPOINTS				B_ERROR
@@ -38,6 +46,10 @@ static const uint32 sDR7L[4] = {
 static const uint32 sDR6B[4] = {
 	X86_DR6_B0, X86_DR6_B1, X86_DR6_B2, X86_DR6_B3
 };
+
+// Enables a hack to make single stepping work under qemu. Set via kernel
+// driver settings.
+static bool sQEmuSingleStepHack = false;
 
 
 void
@@ -344,6 +356,9 @@ i386_init_user_debug_at_kernel_exit(struct iframe *frame)
 		frame->flags |= (1 << X86_EFLAGS_TF);
 	else
 		frame->flags &= ~(1 << X86_EFLAGS_TF);
+		// ToDo: Move into a function called from thread_hit_debug_event().
+		// No need to have that here in the code executed for ever kernel->user
+		// mode switch.
 
 	RELEASE_TEAM_DEBUG_INFO_LOCK(thread->team->debug_info);
 	RELEASE_THREAD_LOCK();
@@ -398,6 +413,8 @@ i386_handle_debug_exception(struct iframe *frame)
 	asm("movl %%dr6, %0" : "=r"(dr6));
 	asm("movl %%dr7, %0" : "=r"(dr7));
 
+	TRACE(("i386_handle_debug_exception(): DR6: %lx, DR7: %lx\n", dr6, dr7));
+
 	// check, which exception condition applies
 	if (dr6 & X86_DR6_BREAKPOINT_MASK) {
 		// breakpoint
@@ -426,7 +443,7 @@ i386_handle_debug_exception(struct iframe *frame)
 		else
 			user_debug_breakpoint_hit(false);
 		
-	} else if (dr6 & X86_DR6_BD) {
+	} else if (dr6 & (1 << X86_DR6_BD)) {
 		// general detect exception
 		// Occurs only, if GD in DR7 is set (which we don't do) and someone
 		// tries to write to the debug registers.
@@ -435,7 +452,7 @@ i386_handle_debug_exception(struct iframe *frame)
 
 		enable_interrupts();
 
-	} else if (dr6 & X86_DR6_BS) {
+	} else if ((dr6 & (1 << X86_DR6_BS)) || sQEmuSingleStepHack) {
 		// single step
 
 		// enable interrupts and notify the debugger
@@ -443,7 +460,7 @@ i386_handle_debug_exception(struct iframe *frame)
 
 		user_debug_single_stepped();
 
-	} else if (dr6 & X86_DR6_BT) {
+	} else if (dr6 & (1 << X86_DR6_BT)) {
 		// task switch
 		// Occurs only, if T in EFLAGS is set (which we don't do).
 		dprintf("i386_handle_debug_exception(): ignoring spurious task switch "
@@ -468,9 +485,25 @@ i386_handle_debug_exception(struct iframe *frame)
 int
 i386_handle_breakpoint_exception(struct iframe *frame)
 {
+	TRACE(("i386_handle_breakpoint_exception()\n"));
+
 	enable_interrupts();
 
 	user_debug_breakpoint_hit(true);
 
 	return B_HANDLED_INTERRUPT;
 }
+
+
+void
+i386_init_user_debug()
+{
+	// get debug settings
+	if (void *handle = load_driver_settings("kernel")) {
+		sQEmuSingleStepHack = get_driver_boolean_parameter(handle,
+			"qemu_single_step_hack", false, false);;
+
+		unload_driver_settings(handle);
+	}
+}
+

@@ -5,6 +5,8 @@
 #ifndef _KERNEL_ARCH_X86_USER_DEBUGGER_H
 #define _KERNEL_ARCH_X86_USER_DEBUGGER_H
 
+#define ARCH_INIT_USER_DEBUG i386_init_user_debug
+
 // number of breakpoints the CPU supports
 // Actually it supports 4, but DR3 is used to hold the struct thread*.
 enum {
@@ -126,6 +128,8 @@ extern void i386_reinit_user_debug_after_context_switch(struct thread *thread);
 
 extern int i386_handle_debug_exception(struct iframe *frame);
 extern int i386_handle_breakpoint_exception(struct iframe *frame);
+
+extern void i386_init_user_debug();
 
 #ifdef __cplusplus
 }
