@@ -142,7 +142,8 @@ extern pid_t	getsid(pid_t pid);
 extern pid_t	getpgid(pid_t pid);
 
 extern pid_t	setsid(void);
-extern int		setpgid(pid_t pid, pid_t pgid);
+extern int	setpgid(pid_t pid, pid_t pgid);
+extern int 	setpgrp(void);
 
 /* access permissions */				
 extern gid_t	getegid(void);
