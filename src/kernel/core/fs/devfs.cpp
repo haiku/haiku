@@ -1,10 +1,11 @@
 /*
-** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
+
 
 #include "IOScheduler.h"
 
@@ -51,7 +52,7 @@ struct devfs_stream {
 			struct devfs_cookie *jar_head;
 		} dir;
 		struct stream_dev {
-			pnp_node_info *node;
+			device_node_info *node;
 			pnp_devfs_driver_info *info;
 			device_hooks *ops;
 			struct devfs_part_map *part_map;
@@ -425,7 +426,7 @@ create_new_driver_info(device_hooks *ops)
 	if (info == NULL)
 		return NULL;
 
-	memset(info, 0, sizeof(pnp_driver_info));
+	memset(info, 0, sizeof(driver_module_info));
 
 	info->open = NULL;
 		// ops->open is used directly for old devices
@@ -564,18 +565,18 @@ out:
 
 
 static status_t
-publish_device(struct devfs *fs, const char *path, pnp_node_info *pnpNode,
+publish_device(struct devfs *fs, const char *path, device_node_info *deviceNode,
 	pnp_devfs_driver_info *info, device_hooks *ops)
 {
 	TRACE(("publish_device(path = \"%s\", node = %p, info = %p, hooks = %p)\n",
-		path, pnpNode, info, ops));
+		path, deviceNode, info, ops));
 
 	if (sDeviceFileSystem == NULL) {
 		panic("publish_device() called before devfs mounted\n");
 		return B_ERROR;
 	}
 
-	if ((ops == NULL && (pnpNode == NULL || info == NULL))
+	if ((ops == NULL && (deviceNode == NULL || info == NULL))
 		|| path == NULL || path[0] == '/')
 		return B_BAD_VALUE;
 
@@ -603,12 +604,12 @@ publish_device(struct devfs *fs, const char *path, pnp_node_info *pnpNode,
 	// all went fine, let's initialize the node
 	node->stream.type = S_IFCHR | 0644;
 
-	if (pnpNode != NULL)
+	if (deviceNode != NULL)
 		node->stream.u.dev.info = info;
 	else
 		node->stream.u.dev.info = create_new_driver_info(ops);
 
-	node->stream.u.dev.node = pnpNode;
+	node->stream.u.dev.node = deviceNode;
 	node->stream.u.dev.ops = ops;
 
 	// every raw disk gets an I/O scheduler object attached
@@ -1489,7 +1490,7 @@ file_system_info gDeviceFileSystem = {
 static device_manager_info *pnp;
 
 
-static const pnp_node_attr pnp_devfs_attrs[] =
+static const device_attr pnp_devfs_attrs[] =
 {
 	{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: PNP_DEVFS_MODULE_NAME }},
 	{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: "devfs_device_notifier" }},
@@ -1502,10 +1503,10 @@ static const pnp_node_attr pnp_devfs_attrs[] =
 /** someone registered a device */
 
 static status_t
-pnp_devfs_probe(pnp_node_handle parent)
+pnp_devfs_probe(device_node_handle parent)
 {
 	char *str = NULL, *filename = NULL;
-	pnp_node_handle node;
+	device_node_handle node;
 	status_t status;
 
 	TRACE(("pnp_devfs_probe()\n"));
@@ -1526,7 +1527,7 @@ pnp_devfs_probe(pnp_node_handle parent)
 	TRACE(("Adding %s\n", filename));
 
 	pnp_devfs_driver_info *info;
-	status = pnp->load_driver(parent, NULL, (pnp_driver_info **)&info, NULL);
+	status = pnp->load_driver(parent, NULL, (driver_module_info **)&info, NULL);
 	if (status != B_OK)
 		goto err1;
 
@@ -1579,11 +1580,11 @@ pnp_devfs_remove_device(device_info *device)
 
 // device got removed
 static void
-pnp_devfs_device_removed(pnp_node_handle node, void *cookie)
+pnp_devfs_device_removed(device_node_handle node, void *cookie)
 {
 #if 0
 	device_info *device;
-	pnp_node_handle parent;
+	device_node_handle parent;
 	status_t res = B_OK;
 #endif
 	TRACE(("pnp_devfs_device_removed()\n"));
@@ -1630,7 +1631,7 @@ pnp_devfs_std_ops(int32 op, ...)
 }
 
 
-pnp_driver_info gDeviceForDriversModule = {
+driver_module_info gDeviceForDriversModule = {
 	{
 		PNP_DEVFS_MODULE_NAME,
 		0 /*B_KEEP_LOADED*/,
