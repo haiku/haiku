@@ -41,12 +41,15 @@
 //------------------------------------------------------------------------------
 BCheckBox::BCheckBox(BRect frame, const char *name, const char *label,
 					 BMessage *message, uint32 resizingMode, uint32 flags)
-	:	BControl(frame, name, label, message, resizingMode, flags)
+	:	BControl(frame, name, label, message, resizingMode, flags),
+		fOutlined(false)
 {
-	fOutlined = false;
-
-	if (Bounds().Height() < 18.0f)
-		ResizeTo(Bounds().Width(), 18.0f);
+	// Resize to minimum height if needed
+	font_height fh;
+	GetFontHeight(&fh);
+	float minHeight = 6.0f + (float)ceil(fh.ascent + fh.descent);
+	if (Bounds().Height() < minHeight)
+		ResizeTo(Bounds().Width(), minHeight);
 }
 //------------------------------------------------------------------------------
 BCheckBox::~BCheckBox()
@@ -55,9 +58,9 @@ BCheckBox::~BCheckBox()
 }
 //------------------------------------------------------------------------------
 BCheckBox::BCheckBox(BMessage *archive)
-	:	BControl(archive)
+	:	BControl(archive),
+		fOutlined(false)
 {
-	fOutlined = false;
 }
 //------------------------------------------------------------------------------
 BArchivable *BCheckBox::Instantiate(BMessage *archive)
@@ -75,6 +78,25 @@ status_t BCheckBox::Archive(BMessage *archive, bool deep) const
 //------------------------------------------------------------------------------
 void BCheckBox::Draw(BRect updateRect)
 {
+	font_height fh;
+	GetFontHeight(&fh);
+
+	// If the focus is changing, just redraw the focus indicator
+	if (IsFocusChanging())
+	{
+		float x = ceil(10.0f + fh.ascent);
+		float y = 5.0f + ceil(fh.ascent);
+
+		if (IsFocus())
+			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+		else
+			SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+		StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
+
+		return;
+	}
+
 	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
 	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
 	lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT),
@@ -84,7 +106,7 @@ void BCheckBox::Draw(BRect updateRect)
 	darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 	darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 
-	BRect rect(1.0, 3.0, 13.0, 15.0);
+	BRect rect(1.0f, 3.0f, ceil(3.0f + fh.ascent), ceil(5.0f + fh.ascent));
 
 	if (IsEnabled())
 	{
@@ -149,21 +171,18 @@ void BCheckBox::Draw(BRect updateRect)
 		}
 
 		// Label
-		BFont font;
-		GetFont(&font);
-		font_height fh;
-		font.GetHeight(&fh);
-
 		SetHighColor(darkenmax);
-		DrawString(Label(), BPoint(20.0f, 8.0f + (float)ceil(fh.ascent / 2.0f)));
+		DrawString(Label(), BPoint(ceil(10.0f + fh.ascent),
+			3.0f + ceil(fh.ascent)));
 
 		// Focus
 		if (IsFocus())
 		{
-			float h = 8.0f + (float)ceil(fh.ascent / 2.0f) + 2.0f;
+			float x = ceil(10.0f + fh.ascent);
+			float y = 5.0f + ceil(fh.ascent);
 
 			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-			StrokeLine(BPoint(20.0f, h), BPoint(20.0f + StringWidth(Label()), h));
+			StrokeLine(BPoint(x, y), BPoint(x + StringWidth(Label()), y));
 		}
 	}
 	else
@@ -207,13 +226,9 @@ void BCheckBox::Draw(BRect updateRect)
 		}
 
 		// Label
-		BFont font;
-		GetFont(&font);
-		font_height fh;
-		font.GetHeight(&fh);
-
 		SetHighColor(tint_color(no_tint, B_DISABLED_LABEL_TINT));
-		DrawString(Label(), BPoint(20.0f, 8.0f + (float)ceil(fh.ascent / 2.0f)));
+		DrawString(Label(), BPoint(ceil(10.0f + fh.ascent),
+			3.0f + ceil(fh.ascent)));
 	}
 }
 //------------------------------------------------------------------------------
@@ -250,13 +265,7 @@ void BCheckBox::WindowActivated(bool active)
 //------------------------------------------------------------------------------
 void BCheckBox::KeyDown(const char *bytes, int32 numBytes)
 {
-//	if (*((int*)bytes) == VK_RETURN || *((int*)bytes) == VK_SPACE)
-//		SetValue(Value() ? 0 : 1);
-//	else
-//	{
-//		SetValue(0);
-		BControl::KeyDown(bytes, numBytes);
-//	}
+	BControl::KeyDown(bytes, numBytes);
 }
 //------------------------------------------------------------------------------
 void BCheckBox::MouseUp(BPoint point)
@@ -313,15 +322,13 @@ void BCheckBox::GetPreferredSize(float *width, float *height)
 	font_height fh;
 	GetFontHeight(&fh);
 
-	*height = (float)ceil(fh.ascent + fh.descent + fh.leading) + 6.0f;
-	*width = 22.0f + (float)ceil(StringWidth(Label()));
+	*height = 6.0f + (float)ceil(fh.ascent + fh.descent);
+	*width = 12.0f + (float)ceil(fh.ascent) + (float)ceil(StringWidth(Label()));
 }
 //------------------------------------------------------------------------------
 void BCheckBox::ResizeToPreferred()
 {
-	float widht, height;
-	GetPreferredSize(&widht, &height);
-	BView::ResizeTo(widht,height);
+	BControl::ResizeToPreferred();
 }
 //------------------------------------------------------------------------------
 status_t BCheckBox::Invoke(BMessage *message)
