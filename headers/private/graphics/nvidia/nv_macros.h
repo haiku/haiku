@@ -423,10 +423,12 @@
 /* bootstrap info registers */
 #define NV32_NV4STRAPINFO	0x00100000
 #define NV32_PFB_CONFIG_0	0x00100200
+#define NV32_PFB_CONFIG_1	0x00100204
 #define NV32_NV10STRAPINFO	0x0010020c
 #define NV32_NVSTRAPINFO2	0x00101000
 
 /* registers needed for 'coldstart' */
+#define NV32_PFB_DEBUG_0	0x00100080
 #define NV32_COREPLL		0x00680500
 #define NV32_MEMPLL			0x00680504
 #define NV32_COREPLL2		0x00680570 /* NV31, NV36 only */
