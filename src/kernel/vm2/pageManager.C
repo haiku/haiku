@@ -22,10 +22,12 @@ pageManager::pageManager(int pages)
 	unusedLock=create_sem (1,"unused_lock");
 	inUseLock=create_sem (1,"inuse_lock");
 	totalPages=pages;
+	/*
 	printf ("pageManager::pageManager: About to dump the clean pages (should be 0):\n\n");
 	clean.dump();
 	printf ("pageManager::pageManager: About to dump the unused pages (should not be 0):\n\n");
 	unused.dump();
+	*/
 	}
 	
 page *pageManager::getPage(void)
@@ -75,16 +77,21 @@ void pageManager::freePage(page *toFree)
 
 void pageManager::cleaner(void)
 	{
-	if (unused.count())
+	while (1)
 		{
-		acquire_sem(unusedLock);
-		page *first=(page *)unused.next();   
-		first->zero();
-		acquire_sem(cleanLock);
-		clean.add(first);
-		release_sem(cleanLock);
-		release_sem(unusedLock);
-		snooze(250000);	
+		if (unused.count())
+			{
+			printf ("pageManager::cleaner: About to vacuum a page\n");
+			acquire_sem(unusedLock);
+			page *first=(page *)unused.next();   
+			first->zero();
+			acquire_sem(cleanLock);
+			clean.add(first);
+			release_sem(cleanLock);
+			release_sem(unusedLock);
+			printf ("pageManager::cleaner: All done with vacuum a page\n");
+			snooze(125000);	
+			}
 		}
 	}
 

@@ -117,7 +117,7 @@ bool area::contains(void *address)
 	{
 	// no need to lock here...
 	unsigned long base=(unsigned long)(address); 
-	printf ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
+//	printf ("area::contains: looking for %d in %d -- %d, value = %d\n",base,start_address,end_address, ((start_address<=base) && (end_address>=base)));
 					
 	return ((start_address<=base) && (end_address>=base));
 	}

@@ -19,7 +19,8 @@ class list {
 			rock=newNode;
 			nodeCount++;
 			}
-		int count(void) {printf ("list::count: About to return %d\n",nodeCount);return nodeCount;}
+		//int count(void) {printf ("list::count: About to return %d\n",nodeCount);return nodeCount;}
+		int count(void) {return nodeCount;}
 		void *next(void) {nodeCount--;node *n=rock;if (rock) rock=rock->next;return n;} 
 		void remove(void *in)
 			{

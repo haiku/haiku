@@ -8,7 +8,7 @@ class vmInterface // This is the class that "owns" all of the managers.
 		int nextAreaID;
 		areaManager *getAM(void); // This is for testing only...
 	public:
-		vmInterface(int pages) {nextAreaID=0;};
+		vmInterface(int pages);
 		int createArea(char *AreaName,int pageCount,void **address,
 							addressSpec addType=ANY,	
 							pageState state=NO_LOCK,protectType protect=writable);

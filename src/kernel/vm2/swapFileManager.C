@@ -1,9 +1,13 @@
 #include "swapFileManager.h"
 #include <stdio.h>
+#include <string.h>
+#include <errno.h>
 
 swapFileManager::swapFileManager(void)
 {
-	swapFile = open("/boot/var/tmp/OBOS_swap",O_RDWR );
+	swapFile = open("/boot/var/tmp/OBOS_swap",O_RDWR|O_CREAT,0x777 );
+	if (swapFile==-1)
+	printf ("swapfileManager::swapFileManger: swapfile not opened, errno  = %ul, %s\n",errno,strerror(errno));
 }
 
 void swapFileManager::write_block(vnode node,void *loc,unsigned long size)
@@ -16,10 +20,10 @@ void swapFileManager::write_block(vnode node,void *loc,unsigned long size)
 
 void swapFileManager::read_block(vnode node,void *loc,unsigned long size)
 	{
-	printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d\n",node.fd, node.offset);
 	lseek(node.fd,SEEK_SET,node.offset);
 	if (node.valid==false)
 		return; // Do nothing. This prevents "garbage" data on disk from being read in...	
+	printf ("swapFileManager::read_block: reading, node.fd = %d, node.offset = %d\n",node.fd, node.offset);
 	read(node.fd,loc,size);
 	}
 

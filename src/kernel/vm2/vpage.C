@@ -76,20 +76,20 @@ bool vpage::fault(void *fault_address, bool writeError) // true = OK, false = pa
 
 char vpage::getByte(unsigned long address)
 	{
-	printf ("vpage::getByte: address = %d\n",address );
+//	printf ("vpage::getByte: address = %d\n",address );
 	if (!physPage)
 		fault((void *)(address),false);
-	printf ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
+//	printf ("vpage::getByte: About to return %d\n", *((char *)(address-start_address+physPage->getAddress())));
 	return *((char *)(address-start_address+physPage->getAddress()));
 	}
 
 void vpage::setByte(unsigned long address,char value)
 	{
-	printf ("vpage::setByte: address = %d, value = %d\n",address, value);
+//	printf ("vpage::setByte: address = %d, value = %d\n",address, value);
 	if (!physPage)
 		fault((void *)(address),true);
 	*((char *)(address-start_address+physPage->getAddress()))=value;
-	printf ("vpage::setByte: physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
+//	printf ("vpage::setByte: physical address = %d, value = %d\n",physPage->getAddress(), *((char *)(physPage->getAddress())));
 	}
 
 int  vpage::getInt(unsigned long address)
