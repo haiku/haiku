@@ -79,11 +79,12 @@ struct devfs_vnode {
 };
 
 struct devfs {
-	mount_id id;
-	mutex lock;
-	int next_vnode_id;
+	mount_id	id;
+	mutex		lock;
+	int32		next_vnode_id;
 	hash_table *vnode_list_hash;
 	struct devfs_vnode *root_vnode;
+	bool		root_scanned;
 };
 
 struct devfs_cookie {
@@ -108,6 +109,9 @@ enum {
 	ITERATION_STATE_OTHERS	= 2,
 	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
+
+// The boot device, if already present
+extern dev_t gBootDevice;
 
 /* the one and only allowed devfs instance */
 static struct devfs *sDeviceFileSystem = NULL;
@@ -684,6 +688,7 @@ devfs_mount(mount_id id, const char *devfs, uint32 flags, const char *args,
 
 	fs->id = id;
 	fs->next_vnode_id = 0;
+	fs->root_scanned = false;
 
 	err = mutex_init(&fs->lock, "devfs_mutex");
 	if (err < B_OK)
@@ -742,7 +747,7 @@ devfs_unmount(fs_volume _fs)
 
 	// delete all of the vnodes
 	hash_open(fs->vnode_list_hash, &i);
-	while((v = (struct devfs_vnode *)hash_next(fs->vnode_list_hash, &i)) != NULL) {
+	while ((v = (struct devfs_vnode *)hash_next(fs->vnode_list_hash, &i)) != NULL) {
 		devfs_delete_vnode(fs, v, true);
 	}
 	hash_close(fs->vnode_list_hash, &i, false);
@@ -779,11 +784,38 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 
 	mutex_lock(&fs->lock);
 
+	if (!fs->root_scanned && gBootDevice >= 0) {
+		fs->root_scanned = true;
+		mutex_unlock(&fs->lock);
+
+		// scan for drivers at root level on first contact
+		probe_for_device_type("");
+
+		mutex_lock(&fs->lock);
+	}
+
 	// look it up
 	vnode = devfs_find_in_dir(dir, name);
-	if (!vnode) {
-		err = B_ENTRY_NOT_FOUND;
-		goto err;
+	if (vnode == NULL) {
+		// scan for drivers in the given directory (that indicates the type of the driver)
+		KPath path;
+		get_device_name(dir, path.LockBuffer(), path.BufferSize());
+		path.UnlockBuffer();
+		path.Append(name);
+		dprintf("lookup: \"%s\"\n", path.Path());
+
+		mutex_unlock(&fs->lock);
+
+		// scan for drivers of this type
+		probe_for_device_type(path.Path());
+
+		mutex_lock(&fs->lock);
+
+		vnode = devfs_find_in_dir(dir, name);
+		if (vnode == NULL) {
+			err = B_ENTRY_NOT_FOUND;
+			goto err;
+		}
 	}
 
 	err = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
@@ -884,7 +916,7 @@ devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int p
 	struct devfs_vnode *vnode, *vdummy;
 	status_t status = B_OK;
 
-	TRACE(("devfs_create: vnode %p, oflags 0x%x, fs_cookie %p \n", vnode, openMode, _cookie));
+	TRACE(("devfs_create: dir %p, name \"%s\", oflags 0x%x, fs_cookie %p \n", dir, name, openMode, _cookie));
 
 	mutex_lock(&fs->lock);
 
@@ -1503,7 +1535,7 @@ static const device_attr pnp_devfs_attrs[] =
 /** someone registered a device */
 
 static status_t
-pnp_devfs_probe(device_node_handle parent)
+pnp_devfs_register_device(device_node_handle parent)
 {
 	char *str = NULL, *filename = NULL;
 	device_node_handle node;
@@ -1640,7 +1672,7 @@ driver_module_info gDeviceForDriversModule = {
 
 	NULL,
 	NULL,
-	pnp_devfs_probe,
+	pnp_devfs_register_device,
 	pnp_devfs_device_removed
 };
 
