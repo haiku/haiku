@@ -43,6 +43,9 @@ static int debugger_on_cpu = -1;
 
 static struct debugger_command *sCommands;
 
+#define OUTPUT_BUFFER_SIZE 1024
+static char sOutputBuffer[OUTPUT_BUFFER_SIZE];
+
 #define LINE_BUF_SIZE 1024
 #define MAX_ARGS 16
 #define HISTORY_SIZE 16
@@ -517,16 +520,27 @@ set_dprintf_enabled(bool newState)
 void
 dprintf(const char *fmt, ...)
 {
+	cpu_status state;
 	va_list args;
-	char temp[512];
 
-	if (sSerialDebugEnabled) {
-		va_start(args, fmt);
-		vsprintf(temp, fmt, args);
-		va_end(args);
+	if (!sSerialDebugEnabled)
+		return;
 
-		dbg_puts(temp);
-	}
+	// ToDo: maybe add a non-interrupt buffer and path that only
+	//	needs to acquire a semaphore instead of needing to disable
+	//	interrupts?
+
+	state = disable_interrupts();
+	acquire_spinlock(&dbg_spinlock);
+
+	va_start(args, fmt);
+	vsnprintf(sOutputBuffer, OUTPUT_BUFFER_SIZE, fmt, args);
+	va_end(args);
+
+	arch_dbg_con_puts(sOutputBuffer);
+
+	release_spinlock(&dbg_spinlock);
+	restore_interrupts(state);
 }
 
 
