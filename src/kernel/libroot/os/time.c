@@ -16,11 +16,7 @@
 
 static struct real_time_data sRealTimeDefaults = {
 	0,
-	100000,
-	0,
-	false,
-	"",
-	true
+	100000
 };
 static struct real_time_data *sRealTimeData;
 
@@ -45,16 +41,14 @@ __init_time(void)
 uint32
 real_time_clock(void)
 {
-	return (sRealTimeData->boot_time + system_time()
-		- (sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset)) / 1000000;
+	return (sRealTimeData->system_time_offset + system_time()) / 1000000;
 }
 
 
 bigtime_t
 real_time_clock_usecs(void)
 {
-	return sRealTimeData->boot_time + system_time()
-		- (sRealTimeData->isGMT ? 0 : sRealTimeData->timezone_offset);
+	return sRealTimeData->system_time_offset + system_time();
 }
 
 
@@ -88,14 +82,4 @@ set_alarm(bigtime_t when, uint32 flags)
 {
 	// ToDo: set_alarm()
 	return B_ERROR;
-}
-
-
-void
-_get_tzfilename(char* filename, size_t length)
-{
-	if (filename == NULL)
-		return;
-
-	strlcpy(filename, sRealTimeData->tzfilename, length);
 }
