@@ -1,0 +1,49 @@
+SubDir OBOS_TOP src kits net libnet ;
+
+UsePosixHeaders ;
+
+SharedLibrary net :
+	socket.c
+	select.c 
+	poll.c
+	compat.c
+	arc4random.c
+	base64.c
+	ethers.c
+	freeaddrinfo.c
+	inet_addr.c
+	inet_ntoa.c
+	inet_neta.c
+	inet_netof.c
+	inet_lnaof.c
+	inet_network.c
+	inet_pton.c
+	inet_ntop.c
+	getaddrinfo.c
+	gethostnamadr.c
+	getnameinfo.c
+	getnetbyaddr.c
+	getnetbyname.c
+	getnetnamadr.c
+	getprotoname.c
+	getnetent.c
+	getproto.c
+	getprotoent.c
+	getservent.c
+	getservbyname.c
+	getservbyport.c
+	linkaddr.c
+	res_comp.c
+	res_data.c
+	res_debug.c
+	res_init.c
+	res_mkquery.c
+	res_query.c
+	res_random.c
+	res_send.c
+	sethostent.c
+;
+
+LinkSharedOSLibs libnet.so :
+	root
+;

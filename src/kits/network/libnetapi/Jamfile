@@ -1,0 +1,14 @@
+SubDir OBOS_TOP src kits net libnetapi ;
+
+UsePosixHeaders ;
+
+SharedLibrary netapi :
+	NetEndpoint.cpp
+	NetAddress.cpp 
+	NetBuffer.cpp
+	NetDebug.cpp
+;
+
+LinkSharedOSLibs libnetapi.so :
+	root
+;
