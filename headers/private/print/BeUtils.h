@@ -91,7 +91,7 @@ public:
 // mimetype from sender
 bool MimeTypeForSender(BMessage* sender, BString& mime);
 // adds fields to message or replaces existing fields
-bool AddFields(BMessage* to, const BMessage* from);
+void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL);
 // load bitmap from application resources
 BBitmap* LoadBitmap(const char* name, uint32 type_code = B_TRANSLATOR_BITMAP);
 // convert bitmap to picture; view must be attached to a window!
