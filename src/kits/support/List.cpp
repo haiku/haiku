@@ -26,11 +26,15 @@
 //					Not thread safe.
 //------------------------------------------------------------------------------
 
-#include "List.h"
 
+// Standard Includes -----------------------------------------------------------
+#include <List.h>
+
+// System Includes -------------------------------------------------------------
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 // helper function
 static inline
@@ -136,7 +140,7 @@ BList::AddList(BList *list, int32 index)
 bool
 BList::AddList(BList *list)
 {
-	bool result = (list);
+	bool result = (list != NULL);
 	if (result && list->fItemCount > 0) {
 		int32 index = fItemCount;
 		int32 count = list->fItemCount;
@@ -381,9 +385,10 @@ BList::DoForEach(bool (*func)(void *))
 
 }
 
+
+//same as above, except this function takes an argument.
 void
 BList::DoForEach(bool (*func)(void *, void*), void * arg)
-//same as above, except this function takes an argument.
 {
 	bool terminate = false; int32 index = 0;
 	if (func != NULL)
