@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <thread.h>
 #include <debug.h>
@@ -17,7 +18,9 @@ bool trimming_cycle;
 static addr free_memory_low_water;
 static addr free_memory_high_water;
 
-static void scan_pages(vm_address_space *aspace, addr free_target)
+
+static void
+scan_pages(vm_address_space *aspace, addr free_target)
 {
 	vm_region *first_region;
 	vm_region *region;
@@ -33,46 +36,52 @@ static void scan_pages(vm_address_space *aspace, addr free_target)
 	acquire_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0, 0);
 
 	first_region = aspace->virtual_map.region_list;
-	while(first_region && (first_region->base + (first_region->size - 1)) < aspace->scan_va)
+	while (first_region && (first_region->base + (first_region->size - 1)) < aspace->scan_va)
 		first_region = first_region->aspace_next;
 
-	if(!first_region)
+	if (!first_region)
 		first_region = aspace->virtual_map.region_list;
 
-	if(!first_region) {
+	if (!first_region) {
 		release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
 		return;
 	}
 
 	region = first_region;
-	for(;;) {
+	for (;;) {
+		// ignore reserved ranges
+		while (region != NULL && region->id == RESERVED_REGION_ID)
+			region = region->aspace_next;
+		if (region == NULL)
+			break;
+
 		// scan the pages in this region
 		mutex_lock(&region->cache_ref->lock);
-		if(!region->cache_ref->cache->scan_skip) {
+		if (!region->cache_ref->cache->scan_skip) {
 			for(va = region->base; va < (region->base + region->size); va += PAGE_SIZE) {
 				aspace->translation_map.ops->lock(&aspace->translation_map);
 				aspace->translation_map.ops->query(&aspace->translation_map, va, &pa, &flags);
-				if((flags & PAGE_PRESENT) == 0) {
+				if ((flags & PAGE_PRESENT) == 0) {
 					aspace->translation_map.ops->unlock(&aspace->translation_map);
 					continue;
 				}
 
 				page = vm_lookup_page(pa / PAGE_SIZE);
-				if(!page) {
+				if (!page) {
 					aspace->translation_map.ops->unlock(&aspace->translation_map);
 					continue;
 				}
 
 				// see if this page is busy, if it is lets forget it and move on
-				if(page->state == PAGE_STATE_BUSY || page->state == PAGE_STATE_WIRED) {
+				if (page->state == PAGE_STATE_BUSY || page->state == PAGE_STATE_WIRED) {
 					aspace->translation_map.ops->unlock(&aspace->translation_map);
 					continue;
 				}
 
 				flags2 = 0;
-				if(free_target > 0) {
+				if (free_target > 0) {
 					// look for a page we can steal
-					if(!(flags & PAGE_ACCESSED) && page->state == PAGE_STATE_ACTIVE) {
+					if (!(flags & PAGE_ACCESSED) && page->state == PAGE_STATE_ACTIVE) {
 						// unmap the page
 						aspace->translation_map.ops->unmap(&aspace->translation_map, va, va + PAGE_SIZE);
 
@@ -87,7 +96,7 @@ static void scan_pages(vm_address_space *aspace, addr free_target)
 
 						// decrement the ref count on the page. If we just unmapped it for the last time,
 						// put the page on the inactive list
-						if(atomic_add(&page->ref_count, -1) == 1) {
+						if (atomic_add(&page->ref_count, -1) == 1) {
 							vm_page_set_state(page, PAGE_STATE_INACTIVE);
 							free_target--;
 						}
@@ -95,23 +104,23 @@ static void scan_pages(vm_address_space *aspace, addr free_target)
 				}
 
 				// if the page is modified, but the state is active or inactive, put it on the modified list
-				if(((flags & PAGE_MODIFIED) || (flags2 & PAGE_MODIFIED))
+				if (((flags & PAGE_MODIFIED) || (flags2 & PAGE_MODIFIED))
 					&& (page->state == PAGE_STATE_ACTIVE || page->state == PAGE_STATE_INACTIVE)) {
 					vm_page_set_state(page, PAGE_STATE_MODIFIED);
 				}
 
 				aspace->translation_map.ops->unlock(&aspace->translation_map);
-				if(--quantum == 0)
+				if (--quantum == 0)
 					break;
 			}
 		}
 		mutex_unlock(&region->cache_ref->lock);
 		// move to the next region, wrapping around and stopping if we get back to the first region
 		region = region->aspace_next ? region->aspace_next : aspace->virtual_map.region_list;
-		if(region == first_region)
+		if (region == first_region)
 			break;
 
-		if(quantum == 0)
+		if (quantum == 0)
 			break;
 	}
 
@@ -120,6 +129,7 @@ static void scan_pages(vm_address_space *aspace, addr free_target)
 
 //	dprintf("exiting scan_pages\n");
 }
+
 
 static int32
 page_daemon(void *unused)
@@ -135,31 +145,31 @@ page_daemon(void *unused)
 	dprintf("page daemon starting\n");
 	(void)unused;
 
-	for(;;) {
+	for (;;) {
 		snooze(PAGE_DAEMON_INTERVAL);
 
 		// scan through all of the address spaces
 		vm_aspace_walk_start(&i);
 		aspace = vm_aspace_walk_next(&i);
-		while(aspace) {
+		while (aspace) {
 			mapped_size = aspace->translation_map.ops->get_mapped_size(&aspace->translation_map);
 
 //			dprintf("page_daemon: looking at aspace 0x%x, id 0x%x, mapped size %d\n", aspace, aspace->id, mapped_size);
 
 			now = system_time();
-			if(now - aspace->last_working_set_adjust > WORKING_SET_ADJUST_INTERVAL) {
+			if (now - aspace->last_working_set_adjust > WORKING_SET_ADJUST_INTERVAL) {
 				faults_per_second = (aspace->fault_count * 1000000) / (now - aspace->last_working_set_adjust);
 //				dprintf("  faults_per_second = %d\n", faults_per_second);
 				aspace->last_working_set_adjust = now;
 				aspace->fault_count = 0;
 
-				if(faults_per_second > MAX_FAULTS_PER_SECOND
+				if (faults_per_second > MAX_FAULTS_PER_SECOND
 					&& mapped_size >= aspace->working_set_size
 					&& aspace->working_set_size < aspace->max_working_set) {
 
 					aspace->working_set_size += WORKING_SET_INCREMENT;
 //					dprintf("  new working set size = %d\n", aspace->working_set_size);
-				} else if(faults_per_second < MIN_FAULTS_PER_SECOND
+				} else if (faults_per_second < MIN_FAULTS_PER_SECOND
 					&& mapped_size <= aspace->working_set_size
 					&& aspace->working_set_size > aspace->min_working_set) {
 
@@ -169,14 +179,14 @@ page_daemon(void *unused)
 			}
 
 			// decide if we need to enter or leave the trimming cycle
-			if(!trimming_cycle && vm_page_num_free_pages() < free_memory_low_water)
+			if (!trimming_cycle && vm_page_num_free_pages() < free_memory_low_water)
 				trimming_cycle = true;
-			else if(trimming_cycle && vm_page_num_free_pages() > free_memory_high_water)
+			else if (trimming_cycle && vm_page_num_free_pages() > free_memory_high_water)
 				trimming_cycle = false;
 
 			// scan some pages, trying to free some if needed
 			free_memory_target = 0;
-			if(trimming_cycle && mapped_size > aspace->working_set_size)
+			if (trimming_cycle && mapped_size > aspace->working_set_size)
 				free_memory_target = mapped_size - aspace->working_set_size;
 
 			scan_pages(aspace, free_memory_target);

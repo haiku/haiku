@@ -82,15 +82,17 @@ static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr_t address);
 //static void vm_region_release_ref(vm_region *region);
 //static void vm_region_release_ref2(vm_region *region);
 
-static int region_compare(void *_r, const void *key)
+
+static int
+region_compare(void *_r, const void *key)
 {
 	vm_region *r = _r;
 	const region_id *id = key;
 
-	if(r->id == *id)
+	if (r->id == *id)
 		return 0;
-	else
-		return -1;
+
+	return -1;
 }
 
 
@@ -100,10 +102,10 @@ region_hash(void *_r, const void *key, uint32 range)
 	vm_region *r = _r;
 	const region_id *id = key;
 
-	if(r != NULL)
-		return (r->id % range);
-	else
-		return (*id % range);
+	if (r != NULL)
+		return r->id % range;
+
+	return *id % range;
 }
 
 
@@ -113,10 +115,10 @@ aspace_compare(void *_a, const void *key)
 	vm_address_space *aspace = _a;
 	const aspace_id *id = key;
 
-	if(aspace->id == *id)
+	if (aspace->id == *id)
 		return 0;
-	else
-		return -1;
+
+	return -1;
 }
 
 
@@ -171,12 +173,15 @@ region_id vm_find_region_by_name(aspace_id aid, const char *name)
 	acquire_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0, 0);
 
 	region = aspace->virtual_map.region_list;
-	while(region != NULL) {
-		if(strcmp(region->name, name) == 0) {
+	for (; region != NULL; region = region->aspace_next) {
+		// ignore reserved space regions
+		if (region->id == RESERVED_REGION_ID)
+			continue;
+
+		if (strcmp(region->name, name) == 0) {
 			id = region->id;
 			break;
 		}
-		region = region->aspace_next;
 	}
 
 	release_sem_etc(aspace->virtual_map.sem, READ_COUNT, 0);
@@ -193,7 +198,7 @@ _vm_create_reserved_region_struct(vm_virtual_map *map)
 		return NULL;
 
 	memset(reserved, 0, sizeof(vm_region));
-	reserved->id = -1;
+	reserved->id = RESERVED_REGION_ID;
 		// this marks it as reserved space
 	reserved->map = map;
 
@@ -251,7 +256,7 @@ find_reserved_region(vm_virtual_map *map, addr_t start, addr_t size, vm_region *
 	while (next) {
 		if (next->base <= start && next->base + next->size >= start + size) {
 			// this region covers the requested range
-			if (next->id != -1) {
+			if (next->id != RESERVED_REGION_ID) {
 				// but it's not reserved space, it's a real region
 				return ERR_VM_NO_REGION_SLOT;
 			}
@@ -648,7 +653,7 @@ vm_unreserve_address_range(aspace_id aid, void *address, addr_t size)
 	area = addressSpace->virtual_map.region_list;
 	while (area) {
 		// the region must be completely part of the reserved range
-		if (area->id == -1 && area->base >= (addr_t)address
+		if (area->id == RESERVED_REGION_ID && area->base >= (addr_t)address
 			&& area->base + area->size <= (addr_t)address + size) {
 			// remove reserved range
 			vm_region *reserved = area;
@@ -1109,7 +1114,7 @@ vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
 	int err;
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
-	if(aspace == NULL)
+	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
 	src_region = vm_get_region_by_id(source_region);
@@ -1128,10 +1133,10 @@ vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
 
 	vm_put_aspace(aspace);
 
-	if(err < 0)
+	if (err < 0)
 		return err;
-	else
-		return new_region->id;
+
+	return new_region->id;
 }
 
 
@@ -1191,25 +1196,29 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 	vm_address_space *aspace;
 	bool removeit = false;
 
+	// we should never get here, but if we do, we can handle it
+	if (region->id == RESERVED_REGION_ID)
+		return;
+
 	acquire_sem_etc(region_hash_sem, WRITE_COUNT, 0, 0);
-	if(atomic_add(&region->ref_count, -1) == 1) {
+	if (atomic_add(&region->ref_count, -1) == 1) {
 		hash_remove(region_table, region);
 		removeit = true;
 	}
 	release_sem_etc(region_hash_sem, WRITE_COUNT, 0);
 
-	if(!removeit)
+	if (!removeit)
 		return;
 
 	aspace = region->aspace;
 
 	// remove the region from the aspace's virtual map
-	if(!aspace_locked)
+	if (!aspace_locked)
 		acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
 	temp = aspace->virtual_map.region_list;
-	while(temp != NULL) {
-		if(region == temp) {
-			if(last != NULL) {
+	while (temp != NULL) {
+		if (region == temp) {
+			if (last != NULL) {
 				last->aspace_next = temp->aspace_next;
 			} else {
 				aspace->virtual_map.region_list = temp->aspace_next;
@@ -1220,12 +1229,12 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 		last = temp;
 		temp = temp->aspace_next;
 	}
-	if(region == aspace->virtual_map.region_hint)
+	if (region == aspace->virtual_map.region_hint)
 		aspace->virtual_map.region_hint = NULL;
-	if(!aspace_locked)
+	if (!aspace_locked)
 		release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
 
-	if(temp == NULL)
+	if (temp == NULL)
 		panic("vm_region_release_ref: region not found in aspace's region_list\n");
 
 	vm_cache_remove_region(region->cache_ref, region);
@@ -1239,8 +1248,7 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 	// now we can give up the last ref to the aspace
 	vm_put_aspace(aspace);
 
-	if(region->name)
-		free(region->name);
+	free(region->name);
 	free(region);
 
 	return;
@@ -1357,11 +1365,11 @@ dump_cache_ref(int argc, char **argv)
 	vm_region *region;
 	vm_cache_ref *cache_ref;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("cache_ref: not enough arguments\n");
 		return 0;
 	}
-	if(strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
+	if (strlen(argv[1]) < 2 || argv[1][0] != '0' || argv[1][1] != 'x') {
 		dprintf("cache_ref: invalid argument, pass address\n");
 		return 0;
 	}
@@ -1374,7 +1382,7 @@ dump_cache_ref(int argc, char **argv)
 	dprintf("lock.holder: %ld\n", cache_ref->lock.holder);
 	dprintf("lock.sem: 0x%lx\n", cache_ref->lock.sem);
 	dprintf("region_list:\n");
-	for(region = cache_ref->region_list; region != NULL; region = region->cache_next) {
+	for (region = cache_ref->region_list; region != NULL; region = region->cache_next) {
 		dprintf(" region 0x%lx: ", region->id);
 		dprintf("base_addr = 0x%lx ", region->base);
 		dprintf("size = 0x%lx ", region->size);
@@ -1512,18 +1520,22 @@ dump_region(int argc, char **argv)
 
 
 region_id
-find_region_by_address(addr_t vaddress)
+find_region_by_address(addr_t address)
 {
 	vm_address_space *aspace;
 	vm_region *region;
-	region_id result=B_ERROR;
+	region_id result = B_ERROR;
 
 	aspace = vm_get_current_user_aspace();
-	for(region = aspace->virtual_map.region_list; region != NULL; region = region->aspace_next) 
-		{
-		if ((vaddress>=region->base) && (vaddress<=(region->base+region->size)))
-			result=region->id;
+	for (region = aspace->virtual_map.region_list; region != NULL; region = region->aspace_next) {
+		if (region->id == RESERVED_REGION_ID)
+			continue;
+
+		if (address >= region->base && address <= region->base + region->size) {
+			result = region->id;
+			break;
 		}
+	}
 	vm_put_aspace(aspace);
 	return result;
 }
@@ -1802,6 +1814,13 @@ vm_delete_aspace(aspace_id aid)
 	region = aspace->virtual_map.region_list;
 	while (region) {
 		next = region->aspace_next;
+		
+		if (region->id == RESERVED_REGION_ID) {
+			// just remove it
+			free(region);
+			region = next;
+			continue;
+		}
 		// decrement the ref on this region, may actually push the ref < 0, but that's okay
 		_vm_put_region(region, true);
 		region = next;
@@ -1889,7 +1908,7 @@ vm_thread_dump_max_commit(void *unused)
 
 	(void)(unused);
 
-	for(;;) {
+	for (;;) {
 		snooze(1000000);
 		if (oldmax != max_commit)
 			TRACE(("max_commit 0x%x\n", max_commit));
@@ -2103,7 +2122,8 @@ forbid_page_faults(void)
 }
 
 
-int vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user, addr_t *newip)
+int
+vm_page_fault(addr_t address, addr_t fault_address, bool is_write, bool is_user, addr_t *newip)
 {
 	int err;
 
@@ -2443,6 +2463,9 @@ vm_virtual_map_lookup(vm_virtual_map *map, addr_t address)
 		return region;
 
 	for (region = map->region_list; region != NULL; region = region->aspace_next) {
+		if (region->id == RESERVED_REGION_ID)
+			continue;
+
 		if (region->base <= address && (region->base + region->size) > address)
 			break;
 	}
@@ -2452,17 +2475,23 @@ vm_virtual_map_lookup(vm_virtual_map *map, addr_t address)
 	return region;
 }
 
-int vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags)
+
+int
+vm_get_physical_page(addr_t paddr, addr_t *vaddr, int flags)
 {
 	return (*kernel_aspace->translation_map.ops->get_physical_page)(paddr, vaddr, flags);
 }
 
-int vm_put_physical_page(addr_t vaddr)
+
+int
+vm_put_physical_page(addr_t vaddr)
 {
 	return (*kernel_aspace->translation_map.ops->put_physical_page)(vaddr);
 }
 
-void vm_increase_max_commit(addr_t delta)
+
+void
+vm_increase_max_commit(addr_t delta)
 {
 	int state;
 
