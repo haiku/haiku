@@ -770,6 +770,7 @@ void BApplication::InitData(const char* signature, status_t* error)
 			}
 			else
 				fInitError=replyerr;
+			delete link;
 		}
 		else
 			fInitError=fServerTo;
