@@ -1534,17 +1534,19 @@ ShowImageView::PasteBitmap(BBitmap *bitmap, BPoint point)
 {
 	if (bitmap && bitmap->IsValid()) {
 		MergeSelection();
-				
+
 		SetHasSelection(true);
 		fSelBitmap = bitmap;
 		fCopyFromRect = BRect();
 		fSelectionRect = bitmap->Bounds();
-	
-		if (fBitmap->Bounds().Contains(point))
-			// Set the selection rectangle to the same location it was
-			// copied from, but only if the background bitmap is large enough
-			// to contain that point
-			fSelectionRect.OffsetBy(point);
+
+		BRect offsetRect = fSelectionRect;
+		offsetRect.OffsetBy(point);
+		if (fBitmap->Bounds().Intersects(offsetRect))
+			// Move the selection rectangle to desired origin,
+			// but only if the resulting selection rectangle
+			// intersects with the background bitmap rectangle
+			fSelectionRect = offsetRect;
 		
 		Invalidate();
 	}
