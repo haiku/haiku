@@ -1,10 +1,11 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "serial.h"
+#include "keyboard.h"
 
 #include <boot/platform.h>
 #include <boot/stdio.h>
@@ -27,9 +28,11 @@ panic(const char *format, ...)
 	vprintf(format, list);
 	va_end(list);
 
-	// ToDo: add "press key to reboot" functionality
-	for (;;)
-		asm("hlt");
+	puts("\nPress key to reboot.");
+
+	clear_key_buffer();
+	wait_for_key();
+	platform_exit();
 }
 
 
