@@ -16,6 +16,9 @@
 const char *kDocumentCount = "/documentCount";
 const char *kDocumentIndex = "/documentIndex";
 
+#define kICOMimeType "image/x-icon"
+	// I'm lazy - structure initializers don't like const variables...
+
 
 // The input formats that this translator supports.
 translation_format sInputFormats[] = {
@@ -24,7 +27,7 @@ translation_format sInputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		ICO_IN_QUALITY,
 		ICO_IN_CAPABILITY,
-		"image/x-icon",
+		kICOMimeType,
 		"Windows Icon image"
 	},
 	{
@@ -44,7 +47,7 @@ translation_format sOutputFormats[] = {
 		B_TRANSLATOR_BITMAP,
 		ICO_OUT_QUALITY,
 		ICO_OUT_CAPABILITY,
-		"image/x-icon",
+		kICOMimeType,
 		"Windows Icon image"
 	},
 	{
@@ -104,7 +107,7 @@ ICOTranslator::DerivedIdentify(BPositionIO *stream,
 	info->quality = ICO_IN_QUALITY;
 	info->capability = ICO_IN_CAPABILITY;
 	snprintf(info->name, sizeof(info->name), "Windows Icon %ld bit image", bitsPerPixel);
-	strcpy(info->MIME, "image/x-ico");
+	strcpy(info->MIME, kICOMimeType);
 
 	return B_OK;
 }
