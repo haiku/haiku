@@ -40,8 +40,8 @@ int dev_init(kernel_args *ka)
 	dprintf("dev_init: entry\n");
 
 	for (ptr = device_paths; (*ptr); ptr++) {	
-		fd = sys_open(*ptr, STREAM_TYPE_DIR, 0);
-		if(fd >= 0) {
+		fd = sys_open_dir(*ptr);
+		if (fd >= 0) {
 			ssize_t len;
 			char buf[SYS_MAX_NAME_LEN + sizeof(struct dirent) + 1];
 			struct dirent *dirent = (struct dirent *)buf;

@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
@@ -421,7 +422,7 @@ int fb_console_dev_init(kernel_args *ka)
 		console.lines = kmalloc(console.rows * sizeof(char *));
 		console.dirty_lines = kmalloc(console.rows);
 		// set up the line pointers
-		for(i=0; i<console.rows; i++) {
+		for (i = 0; i < console.rows; i++) {
 			console.lines[i] = (char *)((addr)console.buf + i*(console.columns+1));
 			console.dirty_lines[i] = 1;
 		}
@@ -431,8 +432,8 @@ int fb_console_dev_init(kernel_args *ka)
 		repaint();
 
 		mutex_init(&console.lock, "console_lock");
-		console.keyboard_fd = sys_open("/dev/keyboard", STREAM_TYPE_DEVICE, 0);
-		if(console.keyboard_fd < 0)
+		console.keyboard_fd = sys_open("/dev/keyboard", 0);
+		if (console.keyboard_fd < 0)
 			panic("fb_console_dev_init: error opening /dev/keyboard\n");
 
 		// create device node

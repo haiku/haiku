@@ -34,7 +34,7 @@ bool combine_path(const char *path1,const char *path2,char *out,unsigned int max
 
 bool exists_file(const char *file_name)
 {
-	int handle = sys_open(file_name,STREAM_TYPE_FILE,0);
+	int handle = sys_open(file_name,0);
 	bool exists;
 	exists =( handle >= 0);
 	if(exists) sys_close(handle);

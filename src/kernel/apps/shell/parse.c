@@ -12,12 +12,12 @@
 
 
 
-struct token_info{
+struct token_info {
 	char *token;
 	int  code;
 };
 
-struct token_info tokens[]={
+struct token_info tokens[] = {
 {"echo",SVO_ECHO},
 {"exec",SVO_EXEC},
 {"exit",SVO_EXIT},
@@ -58,13 +58,12 @@ char *id_to_token(int id)
 {
 	int cnt = 0;
 
-	switch(id){
-
-		case SVO_IDENT			:return "ident";
+	switch (id) {
+		case SVO_IDENT		:return "ident";
 		case SVO_SQ_STRING	:
 		case SVO_DQ_STRING	:return "string";
 		case SVO_NUMBER		:return "number";
-		case SVO_END         :return "end";
+		case SVO_END		:return "end";
 	}
 
 	while((tokens[cnt].token != NULL) && (tokens[cnt].code != id))  cnt++;
@@ -116,7 +115,6 @@ static bool  scan_string(scan_info *info,int max_len)
 }
 
 
-
 int parse_line(const char *buf, char *argv[], int max_args, char *redirect_in, char *redirect_out)
 {
 	const char *scan=buf;
@@ -132,11 +130,10 @@ int parse_line(const char *buf, char *argv[], int max_args, char *redirect_in, c
 	redirect_in[0] = 0;
 	redirect_out[0] = 0;
 
-	while(true){
+	while (true) {
+		while ((*scan != 0) && (isspace(*scan))) scan++;
 
-		while((*scan != 0) && (isspace(*scan))) scan++;
-
-		if(*scan == 0) break;
+		if (*scan == 0) break;
 
 		replace = true;
 		type_char = scan;
@@ -206,7 +203,6 @@ int parse_line(const char *buf, char *argv[], int max_args, char *redirect_in, c
 }
 
 
-
 static void scan_ident(const char **in,char *out,int max_len)
 {
 	char *scan = out;
@@ -222,6 +218,7 @@ static void scan_ident(const char **in,char *out,int max_len)
 	}
 	*scan = 0;
 }
+
 
 static void scan_number(const char **in,char *out,int max_len)
 {
@@ -269,6 +266,7 @@ static void scan_comp(const char **in,char *out,int max_len)
 	*out_scan = 0;
 }
 
+
 bool expect(scan_info *info,int check)
 {
 	if(info->sym_code == check){
@@ -297,6 +295,7 @@ bool scan_info_next_line(scan_info *info)
 	return set_scan_info_line(info);
 }
 
+
 bool scan_info_home(scan_info *info)
 {
 	info->current = info->data.list;
@@ -321,6 +320,7 @@ bool init_scan_info_by_file(const char *file_name,scan_info *info)
 	return err;
 
 }
+
 
 bool set_scan_info_line(scan_info *info)
 {
@@ -352,6 +352,7 @@ void init_scan_info(const char*in,scan_info *info){
 	scan(info);
 
 }
+
 
 bool scan(scan_info *info)
 {
@@ -484,8 +485,6 @@ void parse_vars_in_string(const char *string,char *out,int max_len)
 }
 
 
-
-
 static int launch(int (*cmd)(int, char **), int argc, char **argv, char *r_in, char *r_out)
 {
 	int saved_in;
@@ -493,34 +492,31 @@ static int launch(int (*cmd)(int, char **), int argc, char **argv, char *r_in, c
 	int new_in;
 	int new_out;
 	int retval= 0;
-   int err;
+	int err;
 
-	if(strcmp(r_in, "")!= 0) {
-		new_in = sys_open(r_in, STREAM_TYPE_ANY, 0);
-		if(new_in < 0) {
-			new_in = sys_create(r_in,STREAM_TYPE_FILE);
-		}
+	if (strcmp(r_in, "")!= 0) {
+		new_in = sys_open(r_in, 0);
+		if (new_in < 0)
+			new_in = sys_create(r_in, 0, 0644);
 	} else {
 		new_in = sys_dup(0);
 	}
-	if(new_in < 0) {
+	if (new_in < 0) {
 		err = new_in;
 		goto err_1;
 	}
 
-	if(strcmp(r_out, "")!= 0) {
-		new_out = sys_open(r_out, STREAM_TYPE_ANY, 0);
-		if(new_out < 0){
-			new_out = sys_create(r_out,STREAM_TYPE_FILE);
-		}
+	if (strcmp(r_out, "")!= 0) {
+		new_out = sys_open(r_out, 0);
+		if (new_out < 0)
+			new_out = sys_create(r_out, 0, 0644);
 	} else {
 		new_out = sys_dup(1);
 	}
-	if(new_out < 0) {
+	if (new_out < 0) {
 		err = new_out;
 		goto err_2;
 	}
-
 
 	saved_in = sys_dup(0);
 	saved_out= sys_dup(1);

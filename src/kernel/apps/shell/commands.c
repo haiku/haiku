@@ -84,12 +84,12 @@ int cmd_mkdir(int argc, char *argv[])
 {
 	int rc;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		printf("not enough arguments to mkdir\n");
 		return 0;
 	}
 
-	rc = sys_create(argv[1], STREAM_TYPE_DIR);
+	rc = sys_create_dir(argv[1],0755);
 	if (rc < 0) {
 		printf("sys_mkdir() returned error: %s\n", strerror(rc));
 	} else {
@@ -110,7 +110,7 @@ int cmd_cat(int argc, char *argv[])
 		return 0;
 	}
 
-	fd = sys_open(argv[1], STREAM_TYPE_FILE, 0);
+	fd = sys_open(argv[1], 0);
 	if(fd < 0) {
 		printf("cat: sys_open() returned error: %s!\n", strerror(fd));
 		goto done_cat;

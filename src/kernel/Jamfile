@@ -799,11 +799,11 @@ KernelLd uname :
         bin/uname
         ;
 
-#WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
+WriteKernelConfig $(OBOS_KERNEL_CONFIG) ;
 
-#BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
+BuildKernel $(OBOS_KERNEL) : $(OBOS_KERNEL_CONFIG) ;
 
-#KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
+KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_ARCH)/bootblock.bin ;
 
 SubInclude OBOS_TOP src kernel boot ;
 SubInclude OBOS_TOP src kernel core ;

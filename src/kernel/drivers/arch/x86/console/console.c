@@ -2,6 +2,7 @@
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <kernel.h>
 #include <console.h>
 #include <debug.h>
@@ -279,7 +280,7 @@ device_hooks console_hooks = {
 
 int console_dev_init(kernel_args *ka)
 {
-	if(!ka->fb.enabled) {
+	if (!ka->fb.enabled) {
 		dprintf("con_init: mapping vid mem\n");
 		vm_map_physical_memory(vm_get_kernel_aspace_id(), "vid_mem", (void *)&origin, REGION_ADDR_ANY_ADDRESS,
 			SCREEN_END - SCREEN_START, LOCK_RW|LOCK_KERNEL, SCREEN_START);
@@ -291,8 +292,8 @@ int console_dev_init(kernel_args *ka)
 		update_cursor(x, y);
 
 		mutex_init(&console_lock, "console_lock");
-		keyboard_fd = sys_open("/dev/keyboard", STREAM_TYPE_DEVICE, 0);
-		if(keyboard_fd < 0)
+		keyboard_fd = sys_open("/dev/keyboard", 0);
+		if (keyboard_fd < 0)
 			panic("console_dev_init: error opening /dev/keyboard\n");
 
 		// create device node

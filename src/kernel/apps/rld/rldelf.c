@@ -754,7 +754,7 @@ load_container(char const *path, char const *name, bool fixed)
 		return found;
 	}
 
-	fd= sys_open(path, STREAM_TYPE_FILE, 0);
+	fd= sys_open(path, 0);
 	FATAL((fd< 0), "cannot open file %s\n", path);
 
 	len= sys_read(fd, &eheader, 0, sizeof(eheader));
