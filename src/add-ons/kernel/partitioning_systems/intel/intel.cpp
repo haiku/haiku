@@ -291,6 +291,14 @@ static void pm_free_identify_partition_cookie(partition_data *partition,
 static void pm_free_partition_cookie(partition_data *partition);
 static void pm_free_partition_content_cookie(partition_data *partition);
 
+// querying
+static bool pm_supports_resizing_child(partition_data *partition,
+									   partition_data *child);
+
+static bool pm_validate_resize_child(partition_data *partition,
+									 partition_data *child, off_t *size);
+
+
 static partition_module_info intel_partition_map_module = {
 	{
 		kPartitionMapModuleName,
@@ -310,7 +318,7 @@ static partition_module_info intel_partition_map_module = {
 	// querying
 	NULL,								// supports_repairing
 	NULL,								// supports_resizing
-	NULL,								// supports_resizing_child
+	pm_supports_resizing_child,			// supports_resizing_child
 	NULL,								// supports_moving
 	NULL,								// supports_moving_child
 	NULL,								// supports_setting_name
@@ -325,7 +333,7 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// is_sub_system_for
 
 	NULL,								// validate_resize
-	NULL,								// validate_resize_child
+	pm_validate_resize_child,			// validate_resize_child
 	NULL,								// validate_move
 	NULL,								// validate_move_child
 	NULL,								// validate_set_name
@@ -516,12 +524,11 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	// fill in the partition_data structure
 	partition->status = B_PARTITION_VALID;
 	partition->flags |= B_PARTITION_PARTITIONING_SYSTEM
-						| B_PARTITION_READ_ONLY;
+						| B_PARTITION_READ_ONLY
+						| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD;
 		// TODO: Update when write functionality is implemented.
 	// (no content_name and content_parameters)
-	partition->content_type = strdup(kPartitionTypeIntel);
-	if (!partition->content_type)
-		return B_NO_MEMORY;
+	// (content_type is set by the system)
 	partition->content_cookie = map;
 	// children
 	status_t error = B_OK;
@@ -602,6 +609,54 @@ pm_free_partition_content_cookie(partition_data *partition)
 	}
 }
 
+// pm_supports_resizing_child
+static
+bool
+pm_supports_resizing_child(partition_data *partition, partition_data *child)
+{
+	return (partition && child && partition->content_type
+			&& !strcmp(partition->content_type, kPartitionTypeIntel));
+}
+
+// pm_validate_resize_child
+static
+bool
+pm_validate_resize_child(partition_data *partition, partition_data *child,
+						 off_t *size)
+{
+	if (!partition || !child || !partition->content_type
+		|| strcmp(partition->content_type, kPartitionTypeIntel)
+		|| !size) {
+		return false;
+	}
+	// size remains the same?
+	if (*size == child->size)
+		return true;
+	// shrink partition?
+	if (*size < child->size) {
+		if (*size < 0)
+			*size = 0;
+		// make the size a multiple of the block size
+		*size = *size / partition->block_size * partition->block_size;
+		return true;
+	}
+	// grow partition
+	// child must completely lie within the parent partition
+	if (child->offset + *size > partition->offset + partition->size)
+		*size = partition->offset + partition->size - child->offset;
+	// child must not intersect with sibling partitions
+	for (int32 i = 0; i < partition->child_count; i++) {
+		partition_data *sibling = get_child_partition(partition->id, i);
+		if (sibling && sibling != child && sibling->offset > child->offset) {
+			if (child->offset + *size > sibling->offset)
+				*size = sibling->offset - child->offset;
+		}
+	}
+	// make the size a multiple of the block size
+	*size = *size / partition->block_size * partition->block_size;
+	return true;
+}
+
 
 // intel extended partition module
 
@@ -662,9 +717,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 						| B_PARTITION_READ_ONLY;
 		// TODO: Update when write functionality is implemented.
 	// (no content_name and content_parameters)
-	partition->content_type = strdup(kPartitionTypeIntelExtended);
-	if (!partition->content_type)
-		return B_NO_MEMORY;
+	// (content_type is set by the system)
 	partition->content_cookie = primary;
 	// children
 	status_t error = B_OK;
