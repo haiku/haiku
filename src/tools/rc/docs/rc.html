@@ -334,6 +334,31 @@ also be specified as:</P>
 
 <BLOCKQUOTE><PRE>resource myint 123;</PRE></BLOCKQUOTE>
 
+<P>Most data types have a fixed size; a uint16 is always 2 bytes long, a float
+always comprises 4 bytes, and so on. But the sizes of string and raw data
+resources depend on what you put in them. Sometimes you may want to force
+these kinds of resources to have a fixed size as well. You can do this as
+follows:</P>
+
+<BLOCKQUOTE><PRE>type fixed { string s[64] };</PRE></BLOCKQUOTE>
+
+<P>Any resources with type "fixed" will always contain a 64-byte string, no
+matter how many characters you actually specify. Too much data will be
+truncated; too little data will be padded with zeroes. Note that string
+resources are always terminated with a null character, so string "s" in the
+above type only allows for 63 real characters. The number between the square
+brackets always indicates bytes (unlike C/C++ arrays which use a similar
+notation).</P>
+
+<P>If you have (large) binary files that you want to include in the resources,
+such as pictures of Buffy, you don't need to convert the binary data to text
+form first. You can simply "import" the file:</P>
+
+<BLOCKQUOTE><PRE>resource(22) #'PNG ' import "buffy.png";</PRE></BLOCKQUOTE>
+
+<P>Imported resources are always arrays (raw data), and you can specify the
+import statement everywhere that array data is valid.</P>
+
 <!-- *********************************************************************** -->
 
 <A NAME="app"></A>
@@ -439,8 +464,9 @@ them.</P>
 
 <P>The rc resource compiler and its companion library librdef were written by 
 <A HREF="mailto:mahlzeit@users.sourceforge.net">Matthijs Hollemans</A> for the 
-<A HREF="http://www.openbeos.org">OpenBeOS</A> project. Comments, bug reports, 
-suggestions, and patches are welcome!</P>
+<A HREF="http://www.openbeos.org">OpenBeOS</A> project. Thanks to Ingo Weinhold
+for the Jamfile and the Jam rules. Comments, bug reports, suggestions, and
+patches are welcome!</P>
 
 <!-- *********************************************************************** -->
 

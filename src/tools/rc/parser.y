@@ -67,6 +67,9 @@ static data_t make_bool(bool);
 static data_t make_int(uint64);
 static data_t make_float(double);
 
+static data_t import_data(char*);
+static data_t resize_data(data_t, size_t);
+
 static BMessage* make_msg(list_t);
 static data_t flatten_msg(BMessage*);
 
@@ -102,7 +105,7 @@ static void add_resource(id_t, type_code, data_t);
 	type_t T;
 }
 
-%token ENUM RESOURCE ARCHIVE ARRAY MESSAGE TYPE
+%token ENUM RESOURCE ARCHIVE ARRAY MESSAGE TYPE IMPORT
 
 %token <b> BOOL
 %token <i> INTEGER
@@ -176,15 +179,31 @@ typedeffields
 typedeffield
 	: datatype IDENT
 		{
-			$$.type = $1;
-			$$.name = $2;
-			$$.data = make_default($1);
+			$$.type   = $1;
+			$$.name   = $2;
+			$$.resize = 0;
+			$$.data   = make_default($1);
 		}
 	| datatype IDENT '=' data
 		{ 
-			$$.type = $1;
-			$$.name = $2;
-			$$.data = cast($1, $4);
+			$$.type   = $1;
+			$$.name   = $2;
+			$$.resize = 0;
+			$$.data   = cast($1, $4);
+		}
+	| datatype IDENT '[' INTEGER ']'
+		{
+			$$.type   = $1;
+			$$.name   = $2;
+			$$.resize = (size_t) $4;
+			$$.data   = resize_data(make_default($1), $$.resize);
+		}
+	| datatype IDENT '[' INTEGER ']' '=' data
+		{
+			$$.type   = $1;
+			$$.name   = $2;
+			$$.resize = (size_t) $4;
+			$$.data   = resize_data(cast($1, $7), $$.resize);
 		}
 	;
 
@@ -253,6 +272,8 @@ array
 	: ARRAY '{' arrayfields '}' { $$ = $3; }
 	| ARRAY '{' '}'             { $$ = make_data(0, get_type("raw")); }
 	| ARRAY                     { $$ = make_data(0, get_type("raw")); }
+	| ARRAY IMPORT STRING       { $$ = import_data((char*) $3.ptr); }
+	| IMPORT STRING             { $$ = import_data((char*) $2.ptr); }
 	;
 
 arrayfields
@@ -576,6 +597,67 @@ data_t make_float(double f)
 
 //------------------------------------------------------------------------------
 
+data_t import_data(char* filename)
+{
+	data_t out;
+	out.type = get_type("raw");
+	out.name = NULL;
+
+	char tmpname[B_PATH_NAME_LENGTH];
+	if (open_file_from_include_dir(filename, tmpname))
+	{
+		BFile file(tmpname, B_READ_ONLY);
+		if (file.InitCheck() == B_OK)
+		{
+			off_t size;
+			if (file.GetSize(&size) == B_OK)
+			{
+				out.size = (size_t) size;
+				out.ptr  = alloc_mem(size);
+
+				if (file.Read(out.ptr, out.size) == (ssize_t) out.size)
+				{
+					free_mem(filename);
+					return out;
+				}
+			}
+		}
+	}
+
+	abort_compile(RDEF_COMPILE_ERR, "cannot import %s", filename);
+	return out;
+}
+
+//------------------------------------------------------------------------------
+
+data_t resize_data(data_t data, size_t new_size)
+{
+	if (new_size == 0)
+	{
+		abort_compile(RDEF_COMPILE_ERR, "invalid size %lu", new_size);
+	}
+	else if (data.size != new_size)
+	{
+		void* new_ptr = alloc_mem(new_size);
+
+		memset(new_ptr, 0, new_size);
+		memcpy(new_ptr, data.ptr, min(data.size, new_size));
+
+		if (data.type.code == B_STRING_TYPE)
+		{
+			((char*) new_ptr)[new_size - 1] = '\0';
+		}
+
+		free_mem(data.ptr);
+		data.ptr  = new_ptr;
+		data.size = new_size;
+	}
+
+	return data;
+}
+
+//------------------------------------------------------------------------------
+
 BMessage* make_msg(list_t list)
 {
 	BMessage* msg = new BMessage;
@@ -669,8 +751,13 @@ data_t make_default(type_t type)
 				break;
 		}
 	}
-	else  // user-defined type
+	else
 	{
+		// For user-defined types, we copy the default values of the fields
+		// into a new data_t object. There is no need to call resize_data()
+		// here, because the default values were already resized to their
+		// proper length when we added them to the type.
+
 		size_t size = 0;
 		for (int32 t = 0; t < type.count; ++t)
 		{
@@ -756,9 +843,13 @@ static data_t convert_slots(type_t type, data_t* slots)
 	size_t size = 0;
 	for (int32 k = 0; k < type.count; ++k)
 	{
-		if (slots[k].ptr == NULL)
+		if (slots[k].ptr == NULL)  // default value
 		{
 			size += type.fields[k].data.size;
+		}
+		else if (type.fields[k].resize != 0)
+		{
+			size += type.fields[k].resize;
 		}
 		else
 		{
@@ -771,10 +862,17 @@ static data_t convert_slots(type_t type, data_t* slots)
 
 	for (int32 k = 0; k < type.count; ++k)
 	{
-		if (slots[k].ptr == NULL)
+		if (slots[k].ptr == NULL)  // default value
 		{
 			memcpy(ptr, type.fields[k].data.ptr, type.fields[k].data.size);
 			ptr += type.fields[k].data.size;
+		}
+		else if (type.fields[k].resize != 0)
+		{
+			data_t temp = resize_data(slots[k], type.fields[k].resize);
+			memcpy(ptr, temp.ptr, temp.size);
+			ptr += temp.size;
+			free_mem(temp.ptr);
 		}
 		else
 		{
@@ -1190,13 +1288,15 @@ void add_resource(id_t id, type_code code, data_t data)
 
 static void add_point_type()
 {
-	field_t* fields = (field_t*) alloc_mem(2 * sizeof(field_t));
-	fields[0].type = get_type("float");
-	fields[0].name = "x";
-	fields[0].data = make_default(fields[0].type);
-	fields[1].type = get_type("float");
-	fields[1].name = "y";
-	fields[1].data = make_default(fields[1].type);
+	field_t* fields  = (field_t*) alloc_mem(2 * sizeof(field_t));
+	fields[0].type   = get_type("float");
+	fields[0].name   = "x";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
+	fields[1].type   = get_type("float");
+	fields[1].name   = "y";
+	fields[1].resize = 0;
+	fields[1].data   = make_default(fields[1].type);
 
 	type_t type;
 	type.code     = B_POINT_TYPE;
@@ -1213,19 +1313,23 @@ static void add_point_type()
 
 static void add_rect_type()
 {
-	field_t* fields = (field_t*) alloc_mem(4 * sizeof(field_t));
-	fields[0].type = get_type("float");
-	fields[0].name = "left";
-	fields[0].data = make_default(fields[0].type);
-	fields[1].type = get_type("float");
-	fields[1].name = "top";
-	fields[1].data = make_default(fields[1].type);
-	fields[2].type = get_type("float");
-	fields[2].name = "right";
-	fields[2].data = make_default(fields[2].type);
-	fields[3].type = get_type("float");
-	fields[3].name = "bottom";
-	fields[3].data = make_default(fields[3].type);
+	field_t* fields  = (field_t*) alloc_mem(4 * sizeof(field_t));
+	fields[0].type   = get_type("float");
+	fields[0].name   = "left";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
+	fields[1].type   = get_type("float");
+	fields[1].name   = "top";
+	fields[1].resize = 0;
+	fields[1].data   = make_default(fields[1].type);
+	fields[2].type   = get_type("float");
+	fields[2].name   = "right";
+	fields[2].resize = 0;
+	fields[2].data   = make_default(fields[2].type);
+	fields[3].type   = get_type("float");
+	fields[3].name   = "bottom";
+	fields[3].resize = 0;
+	fields[3].data   = make_default(fields[3].type);
 
 	type_t type;
 	type.code     = B_RECT_TYPE;
@@ -1242,19 +1346,24 @@ static void add_rect_type()
 
 static void add_rgb_color_type()
 {
-	field_t* fields = (field_t*) alloc_mem(4 * sizeof(field_t));
-	fields[0].type = get_type("uint8");
-	fields[0].name = "red";
-	fields[0].data = make_default(fields[0].type);
-	fields[1].type = get_type("uint8");
-	fields[1].name = "green";
-	fields[1].data = make_default(fields[1].type);
-	fields[2].type = get_type("uint8");
-	fields[2].name = "blue";
-	fields[2].data = make_default(fields[2].type);
-	fields[3].type = get_type("uint8");
-	fields[3].name = "alpha";
-	fields[3].data = make_default(fields[3].type);
+	field_t* fields  = (field_t*) alloc_mem(4 * sizeof(field_t));
+	fields[0].type   = get_type("uint8");
+	fields[0].name   = "red";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
+	fields[1].type   = get_type("uint8");
+	fields[1].name   = "green";
+	fields[1].resize = 0;
+	fields[1].data   = make_default(fields[1].type);
+	fields[2].type   = get_type("uint8");
+	fields[2].name   = "blue";
+	fields[2].resize = 0;
+	fields[2].data   = make_default(fields[2].type);
+	fields[3].type   = get_type("uint8");
+	fields[3].name   = "alpha";
+	fields[3].resize = 0;
+	fields[3].data   = make_default(fields[3].type);
+
 	*((uint8*) fields[3].data.ptr) = 255;
 
 	type_t type;
@@ -1272,10 +1381,11 @@ static void add_rgb_color_type()
 
 static void add_app_signature_type()
 {
-	field_t* fields = (field_t*) alloc_mem(1 * sizeof(field_t));
-	fields[0].type = get_type("string");
-	fields[0].name = "signature";
-	fields[0].data = make_default(fields[0].type);
+	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("string");
+	fields[0].name   = "signature";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
 
 	type_t type;
 	type.code     = 'MIMS';
@@ -1292,10 +1402,11 @@ static void add_app_signature_type()
 
 static void add_app_flags()
 {
-	field_t* fields = (field_t*) alloc_mem(1 * sizeof(field_t));
-	fields[0].type = get_type("uint32");
-	fields[0].name = "flags";
-	fields[0].data = make_default(fields[0].type);
+	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("uint32");
+	fields[0].name   = "flags";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
 
 	type_t type;
 	type.code     = 'APPF';
@@ -1312,29 +1423,37 @@ static void add_app_flags()
 
 static void add_app_version()
 {
-	field_t* fields = (field_t*) alloc_mem(7 * sizeof(field_t));
-	fields[0].type = get_type("uint32");
-	fields[0].name = "major";
-	fields[0].data = make_default(fields[0].type);
-	fields[1].type = get_type("uint32");
-	fields[1].name = "middle";
-	fields[1].data = make_default(fields[1].type);
-	fields[2].type = get_type("uint32");
-	fields[2].name = "minor";
-	fields[2].data = make_default(fields[2].type);
-	fields[3].type = get_type("uint32");
-	fields[3].name = "variety";
-	fields[3].data = make_default(fields[3].type);
-	fields[4].type = get_type("uint32");
-	fields[4].name = "internal";
-	fields[4].data = make_default(fields[4].type);
-	fields[5].type = get_type("string");
-	fields[5].name = "short_info";
-	fields[5].data = make_data(64, fields[5].type);
+	field_t* fields  = (field_t*) alloc_mem(7 * sizeof(field_t));
+	fields[0].type   = get_type("uint32");
+	fields[0].name   = "major";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
+	fields[1].type   = get_type("uint32");
+	fields[1].name   = "middle";
+	fields[1].resize = 0;
+	fields[1].data   = make_default(fields[1].type);
+	fields[2].type   = get_type("uint32");
+	fields[2].name   = "minor";
+	fields[2].resize = 0;
+	fields[2].data   = make_default(fields[2].type);
+	fields[3].type   = get_type("uint32");
+	fields[3].name   = "variety";
+	fields[3].resize = 0;
+	fields[3].data   = make_default(fields[3].type);
+	fields[4].type   = get_type("uint32");
+	fields[4].name   = "internal";
+	fields[4].resize = 0;
+	fields[4].data   = make_default(fields[4].type);
+	fields[5].type   = get_type("string");
+	fields[5].name   = "short_info";
+	fields[5].resize = 64;
+	fields[5].data   = make_data(fields[5].resize, fields[5].type);
+	fields[6].type   = get_type("string");
+	fields[6].name   = "long_info";
+	fields[6].resize = 256;
+	fields[6].data   = make_data(fields[6].resize, fields[6].type);
+
 	memset(fields[5].data.ptr, '\0', fields[5].data.size);
-	fields[6].type = get_type("string");
-	fields[6].name = "long_info";
-	fields[6].data = make_data(256, fields[6].type);
 	memset(fields[6].data.ptr, '\0', fields[6].data.size);
 
 	type_t type;
@@ -1352,10 +1471,11 @@ static void add_app_version()
 
 static void add_large_icon()
 {
-	field_t* fields = (field_t*) alloc_mem(1 * sizeof(field_t));
-	fields[0].type = get_type("raw");
-	fields[0].name = "icon";
-	fields[0].data = make_default(fields[0].type);
+	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("raw");
+	fields[0].name   = "icon";
+	fields[0].resize = 1024;
+	fields[0].data   = make_data(fields[0].resize, fields[0].type);
 
 	type_t type;
 	type.code     = 'ICON';
@@ -1372,10 +1492,11 @@ static void add_large_icon()
 
 static void add_mini_icon()
 {
-	field_t* fields = (field_t*) alloc_mem(1 * sizeof(field_t));
-	fields[0].type = get_type("raw");
-	fields[0].name = "icon";
-	fields[0].data = make_default(fields[0].type);
+	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("raw");
+	fields[0].name   = "icon";
+	fields[0].resize = 256;
+	fields[0].data   = make_data(fields[0].resize, fields[0].type);
 
 	type_t type;
 	type.code     = 'MICN';
@@ -1392,10 +1513,11 @@ static void add_mini_icon()
 
 static void add_file_types()
 {
-	field_t* fields = (field_t*) alloc_mem(1 * sizeof(field_t));
-	fields[0].type = get_type("message");
-	fields[0].name = "types";
-	fields[0].data = make_default(fields[0].type);
+	field_t* fields  = (field_t*) alloc_mem(1 * sizeof(field_t));
+	fields[0].type   = get_type("message");
+	fields[0].name   = "types";
+	fields[0].resize = 0;
+	fields[0].data   = make_default(fields[0].type);
 
 	type_t type;
 	type.code     = 'MSGG';

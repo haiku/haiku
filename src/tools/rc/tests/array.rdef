@@ -125,3 +125,28 @@ resource(1) #'MICN' array {
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
 };
+
+resource(350) #'CSTR' import "import.txt";
+resource(351) #'CSTR' array import "import.txt";
+
+resource(352) #'CSTR' array
+{
+	array import "import.txt", array import "import.txt"
+};
+
+resource(353) #'CSTR' array
+{
+	import "import.txt"
+};
+
+type #'CSTR' import_t
+{
+	array field1 = array import "import.txt",
+	array field2
+};
+
+resource(354) import_t;
+resource(355) import_t { field1 = array { "a" }, field2 = array { "b" } };
+resource(356) import_t { field2 = array { "-booh" } };
+
+//resource(359) #'CSTR' array import "does-not-exist.txt";

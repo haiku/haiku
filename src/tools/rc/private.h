@@ -24,6 +24,7 @@
 #define PRIVATE_H
 
 #include <list>
+#include <stdio.h>
 
 typedef std::list<void*> ptr_list_t;
 typedef ptr_list_t::iterator ptr_iter_t;
@@ -42,5 +43,8 @@ void free_ptr_list(ptr_list_t& list);
 
 // Resets the rdef_err_* variables.
 void clear_error();
+
+// Scans all include dirs for the specified file.
+bool open_file_from_include_dir(const char* filename, char* outname);
 
 #endif // PRIVATE_H

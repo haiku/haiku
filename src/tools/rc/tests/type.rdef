@@ -140,6 +140,8 @@ resource(871) ye_olde_raw 64;
 //resource(890) myraw { 123 };                  // invalid cast
 //resource(890) (myrect) { 123 };               // invalid cast
 
+//------------------------------------------------------------------------------
+
 enum {
 	R_Point = 100,
 	R_Rect = 100,
@@ -159,65 +161,83 @@ resource app_signature "application/x-vnd.vendor.appname";
 resource app_flags;
 
 resource app_version;
-
-resource large_icon array
-{
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-};
-
-resource mini_icon array
-{
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-	$"FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF"
-};
+resource large_icon;
+resource mini_icon;
 
 resource file_types message
 {
 	"types" = "text/plain",
 	"types" = "text/x-source-code"
 };
+
+//------------------------------------------------------------------------------
+
+type #'CSTR' notfixed1 { string s };
+resource(901) notfixed1;                    // empty string
+resource(902) notfixed1 "hi";               // "hi"
+resource(903) notfixed1 "hellotherepeeps";  // "hellotherepeeps"
+
+type #'CSTR' notfixed2 { string s = "hello" };
+resource(904) notfixed2;                    // "hello"
+resource(905) notfixed2 "hi";               // "hi"
+resource(906) notfixed2 "hellotherepeeps";  // "hellotherepeeps"
+
+type notfixed3 { array a };
+resource(907) notfixed3;                          // 0 bytes
+resource(908) notfixed3 array {                   // 3 bytes
+	(uint8) 0x01, (uint8) 0x02, (uint8) 0x03 };
+
+type #'CSTR' fixed1 { string s[10] };
+resource(910) fixed1;                      // 10 null bytes
+resource(911) fixed1 "hello";              // 5 chars, 5 nulls
+resource(912) fixed1 "hellotherepeeps";    // 9 chars, 1 null
+
+type #'CSTR' fixed2 { string s[10] = "hello" };
+resource(913) fixed2;                      // 5 chars, 5 nulls
+resource(914) fixed2 "hi";                 // 2 chars, 8 nulls
+resource(915) fixed2 "hellotherepeeps";    // 9 chars, 1 null
+
+type #'CSTR' fixed3 { string s[2] = "hello" };
+resource(916) fixed3;                      // 1 char, 1 null
+resource(917) fixed3 "woot";               // 1 char, 1 null
+
+type #'BYTE' fixed4 { int32 i[1] = 1026 };
+resource(921) fixed4;                      // one byte with value 2
+resource(922) fixed4 1027;                 // one byte with value 3
+
+type #'BYTE' fixed5 { int32 i[1] };
+resource(923) fixed5;                      // one byte with value 0
+resource(924) fixed5 1026;                 // one byte with value 2
+
+type fixed6 { int32 i[8] };
+resource(925) fixed6;                      // eight bytes with value 0
+resource(926) fixed6 0xDEADBEEF;           // EFBEADDE00000000
+
+type fixed7 { int32 i[4] };               // int32 is already 4 bytes,
+resource(927) fixed7;                      // so the [4] is ignored
+resource(928) fixed7 1234;
+
+type fixed8 { array a[3] };
+resource(930) fixed8;                      // 000000
+resource(931) fixed8 array {               // 112200
+	(uint8) 0x11, (uint8) 0x22 };
+resource(932) fixed8 array {               // 112233
+	(uint8) 0x11, (uint8) 0x22, 
+	(uint8) 0x33, (uint8) 0x44 };
+
+type fixed9 { array a[3] = array { 
+	(uint8) 0x11, (uint8) 0x22, (uint8) 0x33 } };
+resource(933) fixed9;                      // 112233
+resource(934) fixed9 array {               // 778800
+	(uint8) 0x77, (uint8) 0x88 };
+resource(935) fixed9 array {               // 667788
+	(uint8) 0x66, (uint8) 0x77, 
+	(uint8) 0x88, (uint8) 0x99 };
+
+type fixed10 { message msg[2] };
+resource(936) fixed10;
+
+type fixed11 { fixed10 f[1] };
+resource(937) fixed11;
+
+//type fixed0 { string s[0] };  // invalid size

@@ -63,9 +63,10 @@ struct data_t
 // Describes a data field in a user-defined type.
 struct field_t
 {
-	type_t type;  // data type
-	char* name;   // name of this field
-	data_t data;  // default value
+	type_t type;    // data type
+	char* name;     // name of this field
+	size_t resize;  // if not 0, data will be resized
+	data_t data;    // default value
 };
 
 // Describes an array of data_t or field_t objects.

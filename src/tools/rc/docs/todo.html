@@ -11,14 +11,7 @@
 <LI><P>Simple integer expressions + - * / | & ~ ()</P></LI>
 
 <LI><P>Make user-defined types more powerful. Some ideas: bitmask fields (for 
-app_flags), choice fields (for app_version), specify boolean fields as "name" 
-(true) or "!name" (false), conditional constructs, fixed-size strings and 
-arrays.</P></LI>
-
-<LI><P>Importing files. Right now, you must specify the resource data in the 
-rdef script, which is messy for (large) binary files. The "import" feature lets 
-you copy the contents of such files (pictures, icons, etc.) straight into your 
-resources.</P></LI>
+app_flags), choice fields (for app_version), conditional constructs.</P></LI>
 
 <LI><P>Attributes, so you can also use rdef scripts to add attributes to your 
 files instead of (or in addition to) resources.</P></LI> 
@@ -30,10 +23,10 @@ statement. This can also happen when multiple input files have conflicting
 resource IDs.</P></LI>
 
 <LI><P>Support for the built-in types point, rect, and rgb_color is hardcoded 
-into the decompiler. The other types, app_flags etc, are not supported at all. 
-It would be better to use the type symbol table for this as well. Then the 
-decompiler can also support user-defined types (although these type definitions 
-must be provided to the decompiler somehow.)</P></LI>
+into the decompiler. The other built-in types--app_flags, mini_icon, etc--are
+not supported at all. It would be better to use the type symbol table for this 
+as well. Then the decompiler can also support user-defined types (although these
+type definitions must be provided to the decompiler somehow.)</P></LI>
 
 <LI><P>Right now, archives are treated as messages. Maybe we should give them 
 their own type, B_ARCHIVED_OBJECT (type code 'ARCV').</P></LI>

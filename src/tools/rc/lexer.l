@@ -90,6 +90,7 @@ array                    return ARRAY;
 message                  return MESSAGE;
 archive                  return ARCHIVE;
 type                     return TYPE;
+import                   return IMPORT;
 
 false                    yylval.b = false; return BOOL;
 true                     yylval.b = true;  return BOOL;
@@ -219,12 +220,9 @@ void open_include()
 {
 	yytext[yyleng - 1] = '\0';  // remove trailing " quote
 
-	for (ptr_iter_t i = include_dirs.begin(); i != include_dirs.end(); ++i)
+	char tmpname[B_PATH_NAME_LENGTH];
+	if (open_file_from_include_dir(yytext, tmpname))
 	{
-		char tmpname[B_PATH_NAME_LENGTH];
-		strcpy(tmpname, (char*) *i);
-		strcat(tmpname, yytext);
-
 		yyin = fopen(tmpname, "r");
 		if (yyin != NULL)
 		{

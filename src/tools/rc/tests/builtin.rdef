@@ -60,26 +60,20 @@ type(1, "BEOS:APP_VERSION") #'APPV' app_version
 
 	uint32 internal,
 
-	string short_info =  // must be exactly 64 bytes (including null)
-		"                                                               ",
-
-	string long_info =   // must be exactly 256 bytes (including null)
-		"                                                                "
-		"                                                                "
-		"                                                                "
-		"                                                               "
+	string short_info[64],
+	string long_info[256]
 };
 
 /* Large (32x32, 8-bit) application icon. */
 type(101, "BEOS:L:STD_ICON") #'ICON' large_icon
 {
-	array icon  // 1024 bytes
+	array icon[1024]
 };
 
 /* Small (16x16, 8-bit) application icon. */
 type(101, "BEOS:M:STD_ICON") #'MICN' mini_icon
 {
-	array icon  // 256 bytes
+	array icon[256]
 };
 
 /* Supported file types. */

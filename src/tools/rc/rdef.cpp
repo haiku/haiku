@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "rdef.h"
 #include "private.h"
@@ -129,6 +130,26 @@ void clear_error()
 	rdef_err_line    = 0;
 	rdef_err_file[0] = '\0';
 	rdef_err_msg[0]  = '\0';
+}
+
+//------------------------------------------------------------------------------
+
+bool open_file_from_include_dir(const char* filename, char* outname)
+{
+	for (ptr_iter_t i = include_dirs.begin(); i != include_dirs.end(); ++i)
+	{
+		char tmpname[B_PATH_NAME_LENGTH];
+		strcpy(tmpname, (char*) *i);
+		strcat(tmpname, filename);
+
+		if (access(tmpname, R_OK) == 0)
+		{
+			strcpy(outname, tmpname);
+			return true;
+		}
+	}
+
+	return false;
 }
 
 //------------------------------------------------------------------------------

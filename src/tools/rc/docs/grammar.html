@@ -61,8 +61,8 @@ number, hex number, or four character code. Examples: #200, #0x00C8,
 
 <P>The following are treated as keywords and special symbols:</P>
 
-<BLOCKQUOTE><CODE>enum resource array message archive type { } ( ) , ; = -
-</CODE></BLOCKQUOTE>
+<BLOCKQUOTE><CODE>enum resource array message archive type import
+{ } ( ) , ; = -</CODE></BLOCKQUOTE>
 
 <P>The lexer also deals with #include statements, which look like: #include 
 "filename"\n. When you #include a file, the lexer expects it to contain valid 
@@ -113,7 +113,7 @@ BNF, so the actual bison source file may look a little different. Legend:</P>
 <TR><TD>typedef</TD><TD>TYPE [id] [TYPECODE] IDENT '{' fielddef {',' fieldef} 
 '}' ';'</TD></TR>
 
-<TR><TD>fielddef</TD><TD>datatype IDENT ['=' data]</TD></TR>
+<TR><TD>fielddef</TD><TD>datatype IDENT ['[' INTEGER ']'] ['=' data]</TD></TR>
 
 <TR><TD>resource</TD><TD>RESOURCE [id] [typecode] data ';'</TD></TR>
 
@@ -132,7 +132,8 @@ BNF, so the actual bison source file may look a little different. Legend:</P>
 
 <TR><TD>float</TD><TD>['-'] FLOAT</TD></TR>
 
-<TR><TD>array</TD><TD>ARRAY ['{' [data {',' data}] '}']</TD></TR>
+<TR><TD>array</TD><TD>ARRAY ['{' [data {',' data}] '}'] | [ARRAY] IMPORT
+STRING</TD></TR>
 
 <TR><TD>message</TD><TD>MESSAGE ['(' integer ')'] ['{' [msgfield {',' 
 msgfield}] '}']</TD></TR>
@@ -371,9 +372,11 @@ resource(1) vector { 1, 3, x = 2 };</PRE></BLOCKQUOTE>
 
 <P>Note: if a user-defined type contains string, raw, or message fields, the 
 size of the type depends on the data that the user puts into it, because these 
-fields have a variable size. In a future version we will add "constraints" that 
-let you force the size of a field to a fixed number of bytes. (And possibly 
-other constraints as well, such as a valid data range.)</P>
+fields have a variable size. However, the user may specify a fixed size for a
+field (number of bytes, enclosed in square brackets following the field name).
+In this case, data that is too long will be truncated and data that is too
+short will be padded with zeroes. You can do this for all types, but it really
+only makes sense for strings and raw data.</P>
 
 <P>A type definition may also contain a default resource ID and name. The 
 default ID of built-in types is usually 1 and the name is empty (NULL). For 
