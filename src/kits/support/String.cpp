@@ -108,8 +108,11 @@ BString::operator=(const BString &string)
 BString&
 BString::operator=(const char *str)
 {
-	if (str) 
+	if (str)
 		_DoAssign(str, strlen(str));	
+	else
+		_GrowBy(-Length()); // Empties the string
+	
 	return *this;
 }
 
@@ -128,7 +131,9 @@ BString::SetTo(const char *str, int32 length)
 	if (str) {
 		int32 len = (int32)strlen(str);
 		_DoAssign(str, min(length, len));
-	}
+	} else 
+		_GrowBy(-Length()); // Empties the string
+	
 	return *this;
 }
 
@@ -249,10 +254,9 @@ BString::Append(const char *str, int32 length)
 BString&
 BString::Append(char c, int32 count)
 {
-	char *tmp = (char*)malloc(count);
-	memset(tmp, c, count);
-	_DoAppend(tmp, count);
-	free(tmp);	
+	_GrowBy(count);
+	memset(_privateData + Length() - count, c, count);
+
 	return *this;
 }
 
@@ -299,10 +303,9 @@ BString::Prepend(const BString &string, int32 len)
 BString&
 BString::Prepend(char c, int32 count)
 {
-	char *tmp = (char*)malloc(count);
-	memset(tmp, c, count);
-	_DoPrepend(tmp, count);
-	free(tmp);	
+	_GrowBy(count);
+	memset(_privateData, c, count);
+	
 	return *this;
 }
 
@@ -375,11 +378,9 @@ BString::Insert(const BString &string, int32 fromOffset, int32 length, int32 pos
 BString&
 BString::Insert(char c, int32 count, int32 pos)
 {
-	char *tmp = (char*)malloc(count);
-	memset(tmp, c, count);
-	_privateData = _OpenAtBy(pos, count);
-	memcpy(_privateData + pos, tmp, count);
-	free(tmp);
+	_OpenAtBy(pos, count);
+	memset(_privateData + pos, c, count);
+	
 	return *this;
 }
 
@@ -442,6 +443,7 @@ BString::RemoveAll(const BString &string)
 	int32 pos = B_ERROR;
 	while ((pos = _FindAfter(string.String(), 0, -1)) >= 0)
 		_privateData = _ShrinkAtBy(pos, string.Length());
+
 	return *this;
 }
 
@@ -517,6 +519,7 @@ BString::MoveInto(char *into, int32 from, int32 length)
 		into[length] = '\0';
 	}		 
 }
+
 
 /*---- Compare functions ---------------------------------------------------*/
 // Implemented inline in the header file
@@ -610,9 +613,8 @@ int32
 BString::FindFirst(char c) const
 {
 	char tmp[2] = { c, '\0' };
-	int32 result = _FindAfter(tmp, 0, -1);
 	
-	return result;	
+	return _FindAfter(tmp, 0, -1);	
 }
 
 
@@ -620,9 +622,8 @@ int32
 BString::FindFirst(char c, int32 fromOffset) const
 {
 	char tmp[2] = { c, '\0' };
-	int32 result = _FindAfter(tmp, fromOffset, -1);
 	
-	return result;	
+	return _FindAfter(tmp, fromOffset, -1);	
 }
 
 
@@ -649,8 +650,10 @@ BString&
 BString::ReplaceAll(char replaceThis, char withThis, int32 fromOffset)
 {
 	int32 pos = B_ERROR;
-	while ((pos = FindFirst(replaceThis, fromOffset)) >= 0)
+	while ((pos = FindFirst(replaceThis, fromOffset)) >= 0) {
 		_privateData[pos] = withThis;
+		fromOffset += pos;
+	}
 	return *this;
 }
 
@@ -807,7 +810,7 @@ BString::UnlockBuffer(int32 length)
 BString&
 BString::ToLower()
 {
-	for (int count = 0; count < Length(); count++)
+	for (int32 count = 0; count < Length(); count++)
 			_privateData[count] = tolower(_privateData[count]);
 	
 	return *this;
@@ -817,7 +820,7 @@ BString::ToLower()
 BString&
 BString::ToUpper()
 {	
-	for (int count = 0; count < Length(); count++)
+	for (int32 count = 0; count < Length(); count++)
 			_privateData[count] = toupper(_privateData[count]);
 	
 	return *this;
@@ -827,12 +830,11 @@ BString::ToUpper()
 BString&
 BString::Capitalize()
 {
+	_privateData[0] = toupper(_privateData[0]);
 	
-	for (int count = 0; count < Length(); count++)
-		if (isalpha(_privateData[count])) {
-			_privateData[count] = toupper(_privateData[count]);
-			break;
-		}
+	for (int32 count = 0; count < Length(); count++)
+			_privateData[count] = tolower(_privateData[count]);
+
 	return *this;
 }
 
@@ -908,55 +910,70 @@ BString::operator<<(char c)
 BString&
 BString::operator<<(int i)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%d", i);
+	
+	return *this << num;
 }
 
 
 BString&
 BString::operator<<(unsigned int i)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%u", i);
+	
+	return *this << num;
 }
 
 
 BString&
 BString::operator<<(uint32 i)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%lu", i);
+	
+	return *this << num;
 }
 
 
 BString&
 BString::operator<<(int32 i)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%ld", i);
+	
+	return *this << num;
 }
 
 
 BString&
 BString::operator<<(uint64 i)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%llu", i);
+	
+	return *this << num;
 }
 
 
 BString&
 BString::operator<<(int64 i)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%lld", i);
+	
+	return *this << num;
 }
+
 
 BString&
 BString::operator<<(float f)
 {
-	//TODO: implement
-	return *this;
+	char num[64];
+	sprintf(num, "%.00f", f);
+	
+	return *this << num;
 }
 
 
@@ -1086,12 +1103,12 @@ BString::_IFindAfter(const char *str, int32 offset, int32 ) const
 	assert(str != NULL);
 	if (offset > Length())
 		return B_ERROR;
-
+#if 0
 	char *ptr = strcasestr(String() + offset, str);
 
 	if (ptr != NULL)
 		return ptr - (String() + offset);
-
+#endif
 	return B_ERROR;
 }
 
