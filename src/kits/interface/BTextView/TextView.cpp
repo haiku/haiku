@@ -1610,8 +1610,6 @@ BTextView::SetFontAndColor(int32 startOffset, int32 endOffset,
 								const rgb_color	*inColor)
 {
 	CALLED();
-	printf("SetFontAndColor(%ld, %ld, %p, mode: 0x%x, %p)\n",
-		startOffset, endOffset, inFont, inMode, inColor);
 	// hide the caret/unhilite the selection
 	if (fActive) {
 		if (startOffset != endOffset)
@@ -3551,7 +3549,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 {
 	// TODO: Draw on the "fOffscreen" BBitmap, then draw it on the view
 
-	CALLED();	
 	// clip the text
 	BRect clipRect = Bounds() & fTextRect;
 	clipRect.InsetBy(-1, -1);
@@ -3635,27 +3632,29 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 						}
 					}
 					
-					// TODO: Revisit this as it isn't working so good, and it looks ugly
+					// TODO: Revisit this as it looks ugly
 					// and add clauses support (red highlighing)
-					if (fInline && fInline->IsActive() && (fInline->Offset() >= offset
-							&& fInline->Offset() + fInline->Length() <= offset + length)) {
-						float height;
-						BPoint leftTop = PointAt(fInline->Offset(), &height);
-						BPoint rightBottom = PointAt(fInline->Offset() + fInline->Length());
-						rightBottom.y += height;
-						BRect rect(leftTop, rightBottom);
-						
-						PushState();
-						
-						rgb_color blue = {152, 203, 255};
-						//rgb_color red = {255, 152, 152};
-						SetHighColor(blue);						
-						SetLowColor(blue);
-						FillRect(rect);
-						
-						PopState();
+					if (fInline && fInline->IsActive()) {
+						int32 inlineOffset = fInline->Offset();
+						int32 inlineLength = fInline->Length();
+						if (inlineOffset >= offset &&
+								inlineOffset + inlineLength <= offset + length) {
+							float height;
+							BPoint rightBottom = PointAt(inlineOffset + inlineLength, &height);
+							rightBottom.y += height;
+							BRect rect(PointAt(inlineOffset), rightBottom);
+							
+							PushState();
+							
+							rgb_color blue = {152, 203, 255};
+							//rgb_color red = {255, 152, 152};
+							SetHighColor(blue);						
+							SetLowColor(blue);
+							FillRect(rect);
+							
+							PopState();
+						}
 					}
-					
 					
 					DrawString(fText->GetString(offset, tabChars), tabChars);
 					
@@ -3693,7 +3692,6 @@ BTextView::DrawLines(int32 startLine, int32 endLine, int32 startOffset,
 	}
 
 	ConstrainClippingRegion(NULL);
-	Flush();
 }
 
 
@@ -4275,17 +4273,37 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	
 	fInline->SetOffset(fSelStart);
 	fInline->SetLength(stringLen);
+	fInline->ResetClauses();
 	
-	// Insert the new text
-	InsertText(string, stringLen, fSelStart, NULL);
-	fSelStart += stringLen;
-	fClickOffset = fSelEnd = fSelStart;
-
+	// Get the clauses, and pass them to the _BInlineInput_ object
+	int32 clauseCount = 0;
+	int32 clauseStart;
+	int32 clauseEnd;
+	while (message->FindInt32("be:clause_start", clauseCount, &clauseStart) == B_OK &&
+			message->FindInt32("be:clause_end", clauseCount, &clauseEnd) == B_OK) {
+		fInline->AddClause(clauseStart, clauseEnd);
+		clauseCount++;	
+	}
+	
+	int32 selCount = 0;
+	int32 selection;
+	while (message->FindInt32("be:selection", selCount, &selection) == B_OK) {
+		// TODO: Do something with the selection
+		selCount++;	
+	}
+	
+	if (clauseCount > 0) {
+		// Insert the new text
+		InsertText(string, stringLen, fSelStart, NULL);
+		fSelStart += stringLen;
+		fClickOffset = fSelEnd = fSelStart;
+	}
+	
 	// If we find the "be:confirmed" boolean (and the boolean is true),
 	// it means it's over for now, so the current _BInlineInput_ object
 	// should become inactive
 	bool confirmed = false;
-	if (message->FindBool("be:confirmed", &confirmed) != B_OK || !confirmed)
+	if (message->FindBool("be:confirmed", &confirmed) < B_OK || !confirmed)
 		fInline->SetActive(true);
 	else
 		fInline->SetActive(false);
