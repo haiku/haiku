@@ -26,6 +26,7 @@ struct block_run
 	inline bool operator==(const block_run &run) const;
 	inline bool operator!=(const block_run &run) const;
 	inline bool IsZero();
+	inline bool MergeableWith(block_run run) const;
 	inline void SetTo(int32 group, uint16 start, uint16 length = 1);
 
 	inline static block_run Run(int32 group, uint16 start, uint16 length = 1);
@@ -33,6 +34,11 @@ struct block_run
 };
 
 typedef block_run inode_addr;
+
+// Since the block_run::length field spans 16 bits, the largest number of
+// blocks covered by a block_run is 65535 (as long as we don't want to
+// break compatibility and take a zero length for 65536).
+#define MAX_BLOCK_RUN_LENGTH	65535
 
 //**************************************
 
@@ -165,6 +171,7 @@ enum inode_flags
 	INODE_NO_CACHE			= 0x00010000,
 	INODE_WAS_WRITTEN		= 0x00020000,
 	INODE_NO_TRANSACTION	= 0x00040000,
+	INODE_DONT_FREE_SPACE	= 0x00080000,	// only used by the "chkbfs" functionality
 };
 
 //**************************************
@@ -239,6 +246,19 @@ inline bool
 block_run::IsZero()
 {
 	return allocation_group == 0 && start == 0 && length == 0;
+}
+
+
+inline bool 
+block_run::MergeableWith(block_run run) const
+{
+	// 65535 is the maximum allowed run size for BFS
+	if (allocation_group == run.allocation_group
+		&& start + length == run.start
+		&& (uint32)length + run.length <= MAX_BLOCK_RUN_LENGTH)
+		return true;
+
+	return false;
 }
 
 
