@@ -3,7 +3,9 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <Errors.h>
+
+#include <OS.h>
+#include <KernelExport.h>
 #include <kerrors.h>
 #include <kernel.h>
 #include <vm.h>
@@ -20,7 +22,6 @@
 #include <console.h>
 #include <int.h>
 #include <smp.h>
-#include <OS.h>
 #include <lock.h>
 #include <khash.h>
 #include <thread.h>
@@ -2262,6 +2263,86 @@ int user_memset(void *s, char c, size_t count)
 //	#pragma mark -
 
 
+long
+lock_memory(void *buffer, ulong numBytes, ulong flags)
+{
+	// The NewOS VM currently doesn't support locking - dunno if we'll
+	// ever change this, but if, we should definitely implement these
+	// functions :-)
+	return B_ERROR;
+}
+
+
+long
+unlock_memory(void *buffer, ulong numBytes, ulong flags)
+{
+	return B_ERROR;
+}
+
+
+long
+get_memory_map(const void *address, ulong numBytes, physical_entry *table, long numEntries)
+{
+	// The BeBook says:
+	// "RETURN CODES
+	// The function always returns
+	//		B_OK."
+	// Well, not anymore :-))
+	//
+	// IOW: ToDo: implement get_memory_map()
+
+	return B_ERROR;
+}
+
+
+area_id
+area_for(void *address)
+{
+	// ToDo: implement area_for()
+	return B_ERROR;
+}
+
+
+area_id
+find_area(const char *name)
+{
+	// ToDo: implement find_area()
+	return B_NAME_NOT_FOUND;
+}
+
+
+status_t
+_get_area_info(area_id area, area_info *info, size_t size)
+{
+	// ToDo: implement get_area_info()
+	return B_ERROR;
+}
+
+
+status_t
+_get_next_area_info(team_id team, int32 *cookie, area_info *info, size_t size)
+{
+	// ToDo: implement get_next_area_info()
+	return B_ERROR;
+}
+
+
+status_t
+set_area_protection(area_id area, uint32 newProtection)
+{
+	// ToDo: implement set_area_protection()
+	return B_ERROR;
+}
+
+
+status_t
+resize_area(area_id area, size_t newSize)
+{
+	// ToDo: implement resize_area()
+	return B_ERROR;
+}
+
+
 static status_t
 convertAddressSpec(uint32 *_spec)
 {
@@ -2327,7 +2408,15 @@ map_physical_memory(const char *name, void *physicalAddress, size_t numBytes,
 		addressSpec, numBytes, protection, (addr)physicalAddress);
 }
 
-	
+
+area_id
+clone_area(const char *name, void **_address, uint32 addressSpec, uint32 protection, 
+	area_id source_area)
+{
+	return B_ERROR;
+}
+
+
 area_id
 create_area_etc(struct team *team, const char *name, void **address, uint32 addressSpec,
 	uint32 size, uint32 lock, uint32 protection)
