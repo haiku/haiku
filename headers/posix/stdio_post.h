@@ -1,5 +1,5 @@
 /* 
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef _STDIO_POST_H_
 #define _STDIO_POST_H_
@@ -8,8 +8,7 @@
 
 // ToDo: this is a work in progress to make our stdio
 //		BeOS' GNU/libio (almost) binary compatible
-//		We are not yet compatible!
-//		Currently only function names are compatible
+//		We may not yet be compatible!
 
 #ifndef _STDIO_H_
 #	error "This file must be included from stdio.h!"
@@ -20,60 +19,9 @@ extern char _single_threaded;
 	// running - as soon as you spawn the first thread, it's set to
 	// false (0)
 
-#ifdef __cplusplus
-#	define __INLINE inline
-#else
-#	define __INLINE extern __inline
-#endif
-
-
-__INLINE int
-feof_unlocked(FILE *stream)
-{
-	return _IO_feof_unlocked(stream);
-}
-
-
-__INLINE int
-ferror_unlocked(FILE *stream)
-{
-	return _IO_ferror_unlocked(stream);
-}
-
-
 #define getc(stream) \
-	(_single_threaded ? _IO_getc_unlocked(stream) : _IO_getc(stream))
+	(_single_threaded ? getc_unlocked(stream) : getc(stream))
 #define putc(c, stream) \
-	(_single_threaded ? _IO_putc_unlocked(c, stream) : _IO_putc(c, stream))
-
-
-__INLINE int
-putc_unlocked(int c, FILE *stream)
-{
-	return _IO_putc_unlocked(c, stream);
-}
-
-
-__INLINE int
-putchar_unlocked(int c)
-{
-	return _IO_putc_unlocked(c, stdout);
-}
-
-
-__INLINE int
-getc_unlocked(FILE *stream)
-{
-	return _IO_getc_unlocked(stream);
-}
-
-
-__INLINE int
-getchar_unlocked(void)
-{
-	return _IO_getc_unlocked(stdin);
-}
-
-#undef __INLINE
+	(_single_threaded ? putc_unlocked(c, stream) : putc(c, stream))
 
 #endif	/* _STDIO_POST_H_ */
