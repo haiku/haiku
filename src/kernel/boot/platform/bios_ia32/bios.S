@@ -19,7 +19,8 @@
 #define SAVED_ESP		0x10000
 #define SAVED_CR3		0x10004
 #define SAVED_EAX		0x10008
-#define SAVED_FLAGS		0x1000c
+#define SAVED_ES		0x1000c
+#define SAVED_FLAGS		0x10010
 	// we're overwriting the start of our boot loader to hold some
 	// temporary values - the first 1024 bytes of it are used at
 	// startup only, and we avoid some linking issues this way
@@ -176,14 +177,16 @@ FUNCTION(call_bios)
 	movl	12(%ebp), %edx
 	movl	16(%ebp), %esi
 	movl	20(%ebp), %edi
-	mov		24(%ebp), %es
+	movw	24(%ebp), %ax
+	movw	%ax, SAVED_ES
 
 	call	switch_to_real_mode
 
 	.code16
 
-	// restore %eax from saved location
+	// restore %eax and %es from saved location
 	movl	(SAVED_EAX - 0x10000), %eax
+	movw	(SAVED_ES - 0x10000), %es
 
 	// call the interrupt (will be dynamically changed above)
 	.byte	0xcd
