@@ -2,6 +2,10 @@ SubDir OBOS_TOP src prefs mouse ;
 
 AddResources Mouse : Mouse.rsrc ;
 
-Preference Mouse : Mouse.cpp MouseSettings.cpp MouseView.cpp MouseWindow.cpp ;
+Preference Mouse : 
+	Mouse.cpp 
+	MouseSettings.cpp 
+	MouseView.cpp 
+	MouseWindow.cpp ;
 
 LinkSharedOSLibs Mouse : translation be root ;

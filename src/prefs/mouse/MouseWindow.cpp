@@ -1,9 +1,18 @@
-/*
- * MouseWindow.cpp
- * Mouse mccall@digitalparadise.co.uk
- *
- */
- 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+//
+//	Copyright (c) 2003, OpenBeOS
+//
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//
+//
+//  File:        MouseWindow.cpp
+//  Author:      Jérôme Duval, Andrew McCall (mccall@digitalparadise.co.uk)
+//  Description: Media Preferences
+//  Created :   December 10, 2003
+// 
+// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+#include <Alert.h>
 #include <Application.h>
 #include <Message.h>
 #include <Screen.h>
@@ -12,74 +21,28 @@
 #include <Menu.h>
 #include <MenuItem.h>
 #include <MenuField.h>
-#include <Beep.h>
+#include <Debug.h>
+#include <string.h>
 
 #include "MouseMessages.h"
 #include "MouseWindow.h"
 #include "MouseView.h"
-#include "Mouse.h"
 
-#define MOUSE_WINDOW_RIGHT		397
-#define MOUSE_WINDOW_BOTTTOM	293
-
-MouseWindow::MouseWindow()
-				: BWindow(BRect(0,0,MOUSE_WINDOW_RIGHT,MOUSE_WINDOW_BOTTTOM), "Mouse", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
+MouseWindow::MouseWindow(BRect rect)
+				: BWindow(rect, "Mouse", B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE )
 {
-	BScreen screen;
-	BSlider *slider=NULL;
-	BMenuField *menufield=NULL;
-
-	MoveTo(dynamic_cast<MouseApplication *>(be_app)->WindowCorner());
-
-	// Code to make sure that the window doesn't get drawn off screen...
-	if (!(screen.Frame().right >= Frame().right && screen.Frame().bottom >= Frame().bottom))
-		MoveTo((screen.Frame().right-Bounds().right)*.5,(screen.Frame().bottom-Bounds().bottom)*.5);
-	
-	BuildView();
-	AddChild(fView);
-
-
-	menufield = (BMenuField *)FindView("mouse_type");
-	if (menufield !=NULL)
-		menufield->Menu()->ItemAt((dynamic_cast<MouseApplication *>(be_app)->MouseType())-1)->SetMarked(true);
-				
-	slider = (BSlider *)FindView("double_click_speed");
-	if (slider !=NULL) slider->SetValue((dynamic_cast<MouseApplication *>(be_app)->ClickSpeed()));
-
-	slider = (BSlider *)FindView("mouse_speed");
-	if (slider !=NULL) slider->SetValue((dynamic_cast<MouseApplication *>(be_app)->MouseSpeed()));
-	Show();
-
+	AddChild(fView = new MouseView(Bounds()));
+	if(fSettings.InitCheck() != B_OK)
+		PostMessage(ERROR_DETECTED);
+	SetPulseRate(100000);
 }
 
-void
-MouseWindow::BuildView()
-{
-	fView = new MouseView(Bounds());	
-}
 
 bool
 MouseWindow::QuitRequested()
 {
-
-	BSlider *slider=NULL;
-	BMenuField *menufield=NULL;
-
-	dynamic_cast<MouseApplication *>(be_app)->SetWindowCorner(BPoint(Frame().left,Frame().top));
-	
-	slider = (BSlider *)FindView("double_click_speed");
-	if (slider !=NULL)
-		dynamic_cast<MouseApplication *>(be_app)->SetClickSpeed(slider->Value());
-	
-
-	
-	menufield = (BMenuField *)FindView("mouse_type");
-	if (menufield !=NULL) {
-		BMenu *menu;
-		menu = menufield->Menu();
-		dynamic_cast<MouseApplication *>(be_app)->SetMouseType((mouse_type)(menu->IndexOf(menu->FindMarked())+1));
-	}
-	
+	fSettings.SetWindowCorner(Frame().LeftTop());
+		
 	be_app->PostMessage(B_QUIT_REQUESTED);	
 	return(true);
 }
@@ -87,30 +50,109 @@ MouseWindow::QuitRequested()
 void
 MouseWindow::MessageReceived(BMessage *message)
 {
-	BSlider *slider=NULL;
-	BButton *button=NULL;
-	BMenuField *menufield=NULL;
-
+	
 	switch(message->what) {
 		case BUTTON_DEFAULTS: {
-			if (set_click_speed(500000)!=B_OK) 
-	   			be_app->PostMessage(ERROR_DETECTED);
-			slider = (BSlider *)FindView("double_click_speed");
-			if (slider !=NULL) slider->SetValue(500000);
+			fView->dcSpeedSlider->SetValue(500);
+			fView->dcSpeedSlider->Invoke();
+			fView->mouseSpeedSlider->SetValue(500);
+			fView->mouseSpeedSlider->Invoke();
+			fView->mouseAccSlider->SetValue(500);
+			fView->mouseAccSlider->Invoke();
+			fView->focusMenu->ItemAt(0)->SetMarked(true);
+			set_mouse_type(3);
+			fView->mouseTypeMenu->ItemAt(2)->SetMarked(true);
+			set_mouse_mode(B_NORMAL_MOUSE);
+			fView->fCurrentMouseMap.button[0] = B_PRIMARY_MOUSE_BUTTON;
+			fView->fCurrentMouseMap.button[1] = B_SECONDARY_MOUSE_BUTTON;
+			fView->fCurrentMouseMap.button[2] = B_TERTIARY_MOUSE_BUTTON;
+			set_mouse_map(&fView->fCurrentMouseMap);
 			
-			button = (BButton *)FindView("mouse_revert");
-	  		if (button !=NULL) button->SetEnabled(true);
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case BUTTON_REVERT: {
+			fView->Init();
+			set_mouse_type(fView->fMouseType);
+			set_mouse_mode(fView->fMouseMode);
+			set_click_speed(fView->fClickSpeed);
+			set_mouse_speed(fView->fMouseSpeed);
+			set_mouse_acceleration(fView->fMouseAcc);
+			set_mouse_map(&fView->fMouseMap);
+			get_mouse_map(&fView->fCurrentMouseMap);
+						
+			fView->revertButton->SetEnabled(false);
 		}
 		break;
 		case POPUP_MOUSE_TYPE: {
-			beep();
-			menufield = (BMenuField *)FindView("mouse_type");
-			if (menufield !=NULL) {
-				BMenu *menu;
-				menu = menufield->Menu();
-				if (set_mouse_type(menu->IndexOf(menu->FindMarked())+1) !=B_OK)
-	   				be_app->PostMessage(ERROR_DETECTED);
+			status_t err = set_mouse_type(fView->mouseTypeMenu->IndexOf(fView->mouseTypeMenu->FindMarked())+1);
+			if(err < B_OK)
+				printf("error while setting mouse type : %s\n", strerror(err));
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case POPUP_MOUSE_FOCUS: {
+			mode_mouse mouse_mode = B_NORMAL_MOUSE;
+			switch (fView->focusMenu->IndexOf(fView->focusMenu->FindMarked())) {
+				case 0: mouse_mode = B_NORMAL_MOUSE; break;
+				case 1: mouse_mode = B_FOCUS_FOLLOWS_MOUSE; break;
+				case 2: mouse_mode = B_WARP_MOUSE; break;
+				case 3: mouse_mode = B_INSTANT_WARP_MOUSE; break;
 			}
+			set_mouse_mode(mouse_mode);
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case SLIDER_DOUBLE_CLICK_SPEED: {
+			int32 value = fView->dcSpeedSlider->Value();
+			int32 click_speed;	// slow = 1000000, fast = 0
+			click_speed = (int32) (1000000 - value * 1000); 
+			status_t err = set_click_speed(click_speed);
+			if(err < B_OK)
+				printf("error while setting click speed : %s\n", strerror(err));
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case SLIDER_MOUSE_SPEED: {
+			int32 value = fView->mouseSpeedSlider->Value();
+			int32 mouse_speed;	// slow = 8192, fast = 524287
+			mouse_speed = (int32) pow(2, value * 6 / 1000) * 8192; 
+			status_t err = set_mouse_speed(mouse_speed);
+			if(err < B_OK)
+				printf("error while setting mouse speed : %s\n", strerror(err));
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case SLIDER_MOUSE_ACC: {
+			int32 value = fView->mouseAccSlider->Value();
+			int32 mouse_acc;	// slow = 0, fast = 262144
+			mouse_acc = (int32) pow(value * 4 / 1000, 2) * 16384;
+			status_t err = set_mouse_acceleration(mouse_acc);
+			if(err < B_OK)
+				printf("error while setting mouse acceleration : %s\n", strerror(err));
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case POPUP_MOUSE_MAP: {
+			int32 index = fView->mouseMapMenu->IndexOf(fView->mouseMapMenu->FindMarked());
+			int32 number = B_PRIMARY_MOUSE_BUTTON;
+			switch (index) {
+				case 0: number = B_PRIMARY_MOUSE_BUTTON; break;
+				case 1: number = B_SECONDARY_MOUSE_BUTTON; break;
+				case 2: number = B_TERTIARY_MOUSE_BUTTON; break;
+			}
+			fView->fCurrentMouseMap.button[fView->fCurrentButton] = number;
+			status_t err = set_mouse_map(&fView->fCurrentMouseMap);
+			fView->fCurrentButton = -1;
+			if(err < B_OK)
+				printf("error while setting mouse map : %s\n", strerror(err));
+			fView->revertButton->SetEnabled(true);
+		}
+		break;
+		case ERROR_DETECTED: {
+				(new BAlert("Error", "Something has gone wrong!","OK",NULL,NULL,
+					B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT))->Go();
+				be_app->PostMessage(B_QUIT_REQUESTED);
 		}
 		break;
 		default:
@@ -118,9 +160,4 @@ MouseWindow::MessageReceived(BMessage *message)
 			break;
 	}
 	
-}
-
-MouseWindow::~MouseWindow()
-{
-
 }
