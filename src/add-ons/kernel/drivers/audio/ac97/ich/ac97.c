@@ -125,6 +125,8 @@ codec_table codecs[] =
 	{ CODEC_ID_ALC201A,	0xffffffff, default_init,	"Avance Logic (Realtek) ALC200/ALC200A, ALC201/ALC201A" }, /* 0x4710 = ALC201A */
 	{ 0x414c4720,		0xffffffff, alc650_init,	"Avance Logic (Realtek) ALC650" }, /* 0x4720 = ALC650 */
 	{ 0x414c4740,		0xffffffff, default_init,	"Avance Logic (Realtek) ALC202/ALC202A" },
+	{ 0x434d4941,		0xffffffff, default_init,	"C-Media CMI9738" },
+	{ 0x434d4961,		0xffffffff, default_init,	"C-Media CMI9739" },
 	{ 0x43525900,		0xffffffff, default_init,	"Cirrus Logic CS4297" },
 	{ 0x43525903,		0xffffffff, default_init,	"Cirrus Logic CS4297" },
 	{ 0x43525913,		0xffffffff, default_init,	"Cirrus Logic CS4297A" },
@@ -162,6 +164,7 @@ codec_table codecs[] =
 	{ 0x41445300,		0xffffff00, default_init,	"Analog Devices" },
 	{ 0x414b4d00,		0xffffff00, default_init,	"Asahi Kasei" },
 	{ 0x414c4700,		0xffffff00, default_init,	"Avance Logic (Realtek)" },
+	{ 0x434d4900,		0xffffff00, default_init,	"C-Media" },
 	{ 0x43525900,		0xffffff00, default_init,	"Cirrus Logic" },
 	{ 0x45838300,		0xffffff00, default_init,	"ESS Technology" },
 	{ 0x49434500,		0xffffff00, default_init,	"ICEnsemble" },
