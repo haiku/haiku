@@ -53,7 +53,7 @@ arch_cpu_init2(kernel_args *ka)
 	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "gdt", (void **)&gdt,
 		REGION_ADDR_EXACT_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED_ALREADY, LOCK_RW|LOCK_KERNEL);
 
-	i386_selector_init( gdt );  // pass the new gdt
+	i386_selector_init(gdt);  // pass the new gdt
 
 	tss = malloc(sizeof(struct tss *) * ka->num_cpus);
 	if (tss == NULL) {
@@ -68,13 +68,13 @@ arch_cpu_init2(kernel_args *ka)
 	}
 	memset(tss_loaded, 0, sizeof(int) * ka->num_cpus);
 
-	for(i=0; i<ka->num_cpus; i++) {
+	for (i = 0; i < ka->num_cpus; i++) {
 		char tss_name[16];
 
 		sprintf(tss_name, "tss%d", i);
 		rid = vm_create_anonymous_region(vm_get_kernel_aspace_id(), tss_name, (void **)&tss[i],
 			REGION_ADDR_ANY_ADDRESS, PAGE_SIZE, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
-		if(rid < 0) {
+		if (rid < 0) {
 			panic("arch_cpu_init2: unable to create region for tss\n");
 			return ENOMEM;
 		}
@@ -124,7 +124,7 @@ void
 arch_cpu_invalidate_TLB_range(addr start, addr end)
 {
 	int num_pages = end/PAGE_SIZE - start/PAGE_SIZE;
-	while ( num_pages-- >= 0 ) {
+	while (num_pages-- >= 0) {
 		invalidate_TLB(start);
 		start += PAGE_SIZE;
 	}
@@ -153,11 +153,11 @@ arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr *fault_handle
 		*tmp++ = *s++;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
@@ -170,11 +170,11 @@ arch_cpu_user_strcpy(char *to, const char *from, addr *fault_handler)
 		;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
@@ -187,11 +187,11 @@ arch_cpu_user_strncpy(char *to, const char *from, size_t size, addr *fault_handl
 		;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
@@ -209,14 +209,14 @@ arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr *faultHandle
 
 error:
 	*faultHandler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
 int
 arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
 {
-	char *xs = (char *) s;
+	char *xs = (char *)s;
 
 	*fault_handler = (addr)&&error;
 
@@ -224,11 +224,11 @@ arch_cpu_user_memset(void *s, char c, size_t count, addr *fault_handler)
 		*xs++ = c;
 
 	*fault_handler = 0;
-
 	return 0;
+
 error:
 	*fault_handler = 0;
-	return ERR_VM_BAD_USER_MEMORY;
+	return B_BAD_ADDRESS;
 }
 
 
