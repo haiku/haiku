@@ -334,6 +334,8 @@ int       suspend_thread(thread_id thread);
 
 thread_id find_thread(const char *);
 
+status_t snooze(bigtime_t);
+
 /** @} */
 #ifdef __cplusplus
 }
