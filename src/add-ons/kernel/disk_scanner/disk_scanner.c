@@ -16,8 +16,8 @@ static const char *kSessionModulePrefix		= "disk_scanner/session";
 static const char *kPartitionModulePrefix	= "disk_scanner/partition";
 static const char *kFSModulePrefix			= "disk_scanner/fs";
 
-//#define TRACE(x)
-#define TRACE(x) dprintf x
+#define TRACE(x)
+//#define TRACE(x) dprintf x
 
 // prototypes
 static status_t read_block(int fd, off_t offset, size_t size, uchar **block);
@@ -55,8 +55,8 @@ disk_scanner_get_session_module(int deviceFD, off_t deviceSize, int32 blockSize,
 	if (error == B_OK && ((list = open_module_list(kSessionModulePrefix)))) {
 		char moduleName[B_PATH_NAME_LENGTH];
 		size_t bufferSize = sizeof(moduleName);
-		while (read_next_module_name(list, moduleName, &bufferSize)
-			   == B_OK) {
+		for (; read_next_module_name(list, moduleName, &bufferSize) == B_OK;
+			 bufferSize = sizeof(moduleName)) {
 			session_module_info *module = NULL;
 			if (get_module(moduleName, (module_info**)&module) == B_OK) {
 				if (module->identify(deviceFD, deviceSize, blockSize)) {
@@ -112,8 +112,8 @@ get_partition_module_block(int deviceFD, off_t sessionOffset,
 	if (error == B_OK && ((list = open_module_list(kPartitionModulePrefix)))) {
 		char moduleName[B_PATH_NAME_LENGTH];
 		size_t bufferSize = sizeof(moduleName);
-		while (read_next_module_name(list, moduleName, &bufferSize)
-			   == B_OK) {
+		for (; read_next_module_name(list, moduleName, &bufferSize) == B_OK;
+			 bufferSize = sizeof(moduleName)) {
 			partition_module_info *module = NULL;
 			TRACE(("disk_scanner: trying partition module: `%s'\n", moduleName));
 			if (get_module(moduleName, (module_info**)&module) == B_OK) {
@@ -281,8 +281,8 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 		char moduleName[B_PATH_NAME_LENGTH];
 		size_t bufferSize = sizeof(moduleName);
 		error = B_ENTRY_NOT_FOUND;
-		while (read_next_module_name(list, moduleName, &bufferSize)
-			   == B_OK) {
+		for (; read_next_module_name(list, moduleName, &bufferSize) == B_OK;
+			 bufferSize = sizeof(moduleName)) {
 			fs_module_info *module = NULL;
 			TRACE(("disk_scanner: trying fs module: `%s'\n", moduleName));
 			if (get_module(moduleName, (module_info**)&module) == B_OK && module) {
