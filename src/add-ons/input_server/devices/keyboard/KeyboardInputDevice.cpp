@@ -270,6 +270,17 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 		if (ioctl(dev->fd, kGetNextKey, &buffer) < B_OK)
 			continue;
 		LOG("kGetNextKey : %lx%lx%lx\n", (uint32*)buffer, (uint32*)buffer+1, (uint32*)buffer+2);
+		
+		// be:key_repeat
+		// be:old_modifiers
+		// when
+		// raw_char
+		// key
+		// modifiers
+		// states
+		// byte
+		// bytes
+		    
 	}
 	
 	return 0;
