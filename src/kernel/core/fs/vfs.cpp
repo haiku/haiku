@@ -118,8 +118,8 @@ static mount_id sNextMountID = 0;
 /* function declarations */
 
 // file descriptor operation prototypes
-static ssize_t file_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
-static ssize_t file_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
+static status_t file_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
+static status_t file_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
 static off_t file_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void file_free_fd(struct file_descriptor *);
 static status_t file_close(struct file_descriptor *);
@@ -131,8 +131,8 @@ static status_t attr_dir_read(struct file_descriptor *, struct dirent *buffer, s
 static status_t attr_dir_rewind(struct file_descriptor *);
 static void attr_dir_free_fd(struct file_descriptor *);
 static status_t attr_dir_close(struct file_descriptor *);
-static ssize_t attr_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
-static ssize_t attr_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
+static status_t attr_read(struct file_descriptor *, off_t pos, void *buffer, size_t *);
+static status_t attr_write(struct file_descriptor *, off_t pos, const void *buffer, size_t *);
 static off_t attr_seek(struct file_descriptor *, off_t pos, int seek_type);
 static void attr_free_fd(struct file_descriptor *);
 static status_t attr_close(struct file_descriptor *);
@@ -1959,7 +1959,7 @@ file_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static ssize_t
+static status_t
 file_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -1969,7 +1969,7 @@ file_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *l
 }
 
 
-static ssize_t
+static status_t
 file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, size_t *length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2665,7 +2665,7 @@ attr_free_fd(struct file_descriptor *descriptor)
 }
 
 
-static ssize_t
+static status_t
 attr_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
@@ -2678,7 +2678,7 @@ attr_read(struct file_descriptor *descriptor, off_t pos, void *buffer, size_t *l
 }
 
 
-static ssize_t
+static status_t
 attr_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, size_t *length)
 {
 	struct vnode *vnode = descriptor->u.vnode;
