@@ -5,9 +5,14 @@
 
 #include <SupportDefs.h>
 
+#include <ktypes.h>
+#include <user_atomic.h>
+
+// The code below does only work on single CPU SH4 systems.
+// Interrupts must be disabled during execution, too.
 
 int32
-user_atomic_add(vint32 *uval, int32 incr)
+_user_atomic_add(vint32 *uval, int32 incr)
 {
 	int32 val;
 	int32 ret;
@@ -18,8 +23,6 @@ user_atomic_add(vint32 *uval, int32 incr)
 	if (user_memcpy(&val, (int32 *)uval, sizeof(val)) < 0) 
 		goto error;
 
-	// XXX broken on non SH4-systems, or when interrupts are enabled
-	// XXX x86 must use the assembly functions directly in userspace and not this ones
 	ret = val;
 	val += incr;
 
@@ -35,7 +38,7 @@ error:
 
 
 int32
-user_atomic_and(vint32 *uval, int32 incr)
+_user_atomic_and(vint32 *uval, int32 incr)
 {
 	int val;
 	int ret;
@@ -46,8 +49,6 @@ user_atomic_and(vint32 *uval, int32 incr)
 	if (user_memcpy(&val, (int32 *)uval, sizeof(val)) < 0) 
 		goto error;
 
-	// XXX broken on non SH4-systems, or when interrupts are enabled
-	// XXX x86 must use the assembly functions directly in userspace and not this ones
 	ret = val;
 	val &= incr;
 
@@ -63,7 +64,7 @@ error:
 
 
 int32
-user_atomic_or(vint32 *uval, int32 incr)
+_user_atomic_or(vint32 *uval, int32 incr)
 {
 	int val;
 	int ret;
@@ -74,8 +75,6 @@ user_atomic_or(vint32 *uval, int32 incr)
 	if (user_memcpy(&val, (int32 *)uval, sizeof(val)) < 0) 
 		goto error;
 
-	// XXX broken on non SH4-systems, or when interrupts are enabled
-	// XXX x86 must use the assembly functions directly in userspace and not this ones
 	ret = val;
 	val |= incr;
 
@@ -91,7 +90,7 @@ error:
 
 
 int32
-user_atomic_set(vint32 *uval, int32 set_to)
+_user_atomic_set(vint32 *uval, int32 set_to)
 {
 	int val;
 	int ret;
@@ -102,8 +101,6 @@ user_atomic_set(vint32 *uval, int32 set_to)
 	if (user_memcpy(&val, (int32 *)uval, sizeof(val)) < 0) 
 		goto error;
 
-	// XXX broken on non SH4-systems, or when interrupts are enabled
-	// XXX x86 must use the assembly functions directly in userspace and not this ones
 	ret = val;
 	val = set_to;
 
@@ -119,7 +116,7 @@ error:
 
 
 int32
-user_atomic_test_and_set(vint32 *uval, int32 set_to, int32 test_val)
+_user_atomic_test_and_set(vint32 *uval, int32 set_to, int32 test_val)
 {
 	int val;
 	int ret;
@@ -130,8 +127,6 @@ user_atomic_test_and_set(vint32 *uval, int32 set_to, int32 test_val)
 	if (user_memcpy(&val, (int32 *)uval, sizeof(val)) < 0) 
 		goto error;
 
-	// XXX broken on non SH4-systems, or when interrupts are enabled
-	// XXX x86 must use the assembly functions directly in userspace and not this ones
 	ret = val;
 	if (val == test_val) {
 		val = set_to;
@@ -145,4 +140,3 @@ error:
 	// XXX kill the app
 	return -1;
 }
-

@@ -441,44 +441,44 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		// 32 bit atomic functions
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
 		case SYSCALL_ATOMIC_SET:
-			*call_ret = user_atomic_set((int32 *)arg0, (int32)arg1);
+			*call_ret = _user_atomic_set((vint32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_ATOMIC_TEST_AND_SET:
-			*call_ret = user_atomic_test_and_set((int32 *)arg0, (int32)arg1, (int32)arg2);
+			*call_ret = _user_atomic_test_and_set((vint32 *)arg0, (int32)arg1, (int32)arg2);
 			break;
 		case SYSCALL_ATOMIC_ADD:
-			*call_ret = user_atomic_add((int32 *)arg0, (int32)arg1);
+			*call_ret = _user_atomic_add((vint32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_ATOMIC_AND:
-			*call_ret = user_atomic_and((int32 *)arg0, (int32)arg1);
+			*call_ret = _user_atomic_and((vint32 *)arg0, (int32)arg1);
 			break;
 		case SYSCALL_ATOMIC_OR:
-			*call_ret = user_atomic_or((int32 *)arg0, (int32)arg1);
+			*call_ret = _user_atomic_or((vint32 *)arg0, (int32)arg1);
 			break;
-		case SYSCALL_ATOMIC_READ:
-			*call_ret = user_atomic_read((int32 *)arg0);
+		case SYSCALL_ATOMIC_GET:
+			*call_ret = _user_atomic_get((vint32 *)arg0);
 			break;
 #endif
 
 		// 64 bit atomic functions
 #ifdef ATOMIC64_FUNCS_ARE_SYSCALLS
 		case SYSCALL_ATOMIC_SET64:
-			*call_ret = user_atomic_set64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			*call_ret = _user_atomic_set64((vint64 *)arg0, INT32TOINT64(arg1, arg2));
 			break;
 		case SYSCALL_ATOMIC_TEST_AND_SET64:
-			*call_ret = user_atomic_test_and_set64((int64 *)arg0, INT32TOINT64(arg1, arg2), INT32TOINT64(arg3, arg4));
+			*call_ret = _user_atomic_test_and_set64((vint64 *)arg0, INT32TOINT64(arg1, arg2), INT32TOINT64(arg3, arg4));
 			break;
 		case SYSCALL_ATOMIC_ADD64:
-			*call_ret = user_atomic_add64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			*call_ret = _user_atomic_add64((vint64 *)arg0, INT32TOINT64(arg1, arg2));
 			break;
 		case SYSCALL_ATOMIC_AND64:
-			*call_ret = user_atomic_and64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			*call_ret = _user_atomic_and64((vint64 *)arg0, INT32TOINT64(arg1, arg2));
 			break;
 		case SYSCALL_ATOMIC_OR64:
-			*call_ret = user_atomic_or64((int64 *)arg0, INT32TOINT64(arg1, arg2));
+			*call_ret = _user_atomic_or64((vint64 *)arg0, INT32TOINT64(arg1, arg2));
 			break;
-		case SYSCALL_ATOMIC_READ64:
-			*call_ret = user_atomic_read64((int64 *)arg0);
+		case SYSCALL_ATOMIC_GET64:
+			*call_ret = _user_atomic_get64((vint64 *)arg0);
 			break;
 #endif
 

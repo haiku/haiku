@@ -40,9 +40,9 @@ atomic_or(vint32 *value, int32 orValue)
 }
 
 int32
-atomic_read(vint32 *value)
+atomic_get(vint32 *value)
 {
-	return _kern_atomic_read(value);
+	return _kern_atomic_get(value);
 }
 #endif
 
@@ -78,8 +78,8 @@ atomic_or64(vint64 *value, int64 orValue)
 }
 
 int64
-atomic_read64(vint64 *value)
+atomic_get64(vint64 *value)
 {
-	return _kern_atomic_read64(value);
+	return _kern_atomic_get64(value);
 }
 #endif

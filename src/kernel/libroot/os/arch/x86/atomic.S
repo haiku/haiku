@@ -59,15 +59,15 @@ _atomic_or1:
 	jnz			_atomic_or1
 	ret
 	
-/* int32	atomic_read(vint32 *value) */
-FUNCTION(atomic_read):
+/* int32	atomic_get(vint32 *value) */
+FUNCTION(atomic_get):
 	movl		4(%esp), %edx
-_atomic_read1:
+_atomic_get1:
 	movl		(%edx), %eax
 	movl		%eax, %ecx
 	lock
 	cmpxchgl	%ecx, (%edx)
-	jnz			_atomic_read1
+	jnz			_atomic_get1
 	ret
 
 /* int64	atomic_set64(vint64 *value, int64 newValue) */
@@ -159,19 +159,19 @@ _atomic_or64_1:
 	pop			%ebp
 	ret
 
-/* int64	atomic_read64(vint64 *value) */
-FUNCTION(atomic_read64):
+/* int64	atomic_get64(vint64 *value) */
+FUNCTION(atomic_get64):
 	push		%ebp
 	push		%ebx
 	movl		12(%esp), %ebp
-_atomic_read64_1:
+_atomic_get64_1:
 	movl		(%ebp), %eax
 	movl		4(%ebp), %edx
 	movl		%eax, %ebx
 	movl		%edx, %ecx
 	lock
 	cmpxchg8b	(%ebp)
-	jnz			_atomic_read64_1
+	jnz			_atomic_get64_1
 	pop			%ebx
 	pop			%ebp
 	ret

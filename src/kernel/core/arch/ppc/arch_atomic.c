@@ -13,8 +13,7 @@
  * Slow, using spinlocks...
  */
 
-static spinlock kernel_lock = 0;
-static spinlock user_lock = 0;
+static spinlock atomic_lock = 0;
 
 int64
 atomic_set64(vint64 *value, int64 newValue)
@@ -22,10 +21,10 @@ atomic_set64(vint64 *value, int64 newValue)
 	cpu_status status;
 	int64 oldValue;
 	status = disable_interrupts();
-	acquire_spinlock(&kernel_lock);
+	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value = newValue;
-	release_spinlock(&kernel_lock);
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
 	return oldValue;
 }
@@ -36,11 +35,11 @@ atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
 	cpu_status status;
 	int64 oldValue;
 	status = disable_interrupts();
-	acquire_spinlock(&kernel_lock);
+	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
-	if (*value == testAgainst)
+	if (oldValue == testAgainst)
 		*value = newValue;
-	release_spinlock(&kernel_lock);
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
 	return oldValue;
 }
@@ -51,10 +50,10 @@ atomic_add64(vint64 *value, int64 addValue)
 	cpu_status status;
 	int64 oldValue;
 	status = disable_interrupts();
-	acquire_spinlock(&kernel_lock);
+	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value += addValue;
-	release_spinlock(&kernel_lock);
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
 	return oldValue;
 }
@@ -65,10 +64,10 @@ atomic_and64(vint64 *value, int64 andValue)
 	cpu_status status;
 	int64 oldValue;
 	status = disable_interrupts();
-	acquire_spinlock(&kernel_lock);
+	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value &= andValue;
-	release_spinlock(&kernel_lock);
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
 	return oldValue;
 }
@@ -79,169 +78,155 @@ atomic_or64(vint64 *value, int64 orValue)
 	cpu_status status;
 	int64 oldValue;
 	status = disable_interrupts();
-	acquire_spinlock(&kernel_lock);
+	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
 	*value |= orValue;
-	release_spinlock(&kernel_lock);
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
 	return oldValue;
 }
 
 int64
-atomic_read64(vint64 *value)
+atomic_get64(vint64 *value)
 {
 	cpu_status status;
 	int64 oldValue;
 	status = disable_interrupts();
-	acquire_spinlock(&kernel_lock);
+	acquire_spinlock(&atomic_lock);
 	oldValue = *value;
-	release_spinlock(&kernel_lock);
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
 	return oldValue;
 }
 
 int64
-user_atomic_set64(vint64 *value, int64 newValue)
+_user_atomic_set64(vint64 *value, int64 newValue)
 {
 	cpu_status status;
 	int64 oldValue;
+	if (!CHECK_USER_ADDRESS(value))
+		goto access_violation;
+	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
+		goto access_violation;
 	status = disable_interrupts();
-	acquire_spinlock(&user_lock);
-	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
-		goto error;
-	if (user_memcpy(&oldValue, value, 8) < 0)
-		goto error;
-	if (user_memcpy(value, &newValue, 8) < 0)
-		goto error;
-	release_spinlock(&user_lock);
+	acquire_spinlock(&atomic_lock);
+	oldValue = *value;
+	*value = newValue;
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
+	unlock_memory(value, 8, B_READ_DEVICE))
 	return oldValue;
-
-error:
-	release_spinlock(&user_lock);
-	restore_interrupts(status);
+access_violation:
 	// XXX kill application
 	return -1;
 }
 
 int64
-user_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
+_user_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst)
 {
 	cpu_status status;
 	int64 oldValue;
+	if (!CHECK_USER_ADDRESS(value))
+		goto access_violation;
+	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
+		goto access_violation;
 	status = disable_interrupts();
-	acquire_spinlock(&user_lock);
-	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
-		goto error;
-	if (user_memcpy(&oldValue, value, 8) < 0)
-		goto error;
+	acquire_spinlock(&atomic_lock);
+	oldValue = *value;
 	if (oldValue == testAgainst)
-		if (user_memcpy(value, &newValue, 8) < 0)
-			goto error;
-	release_spinlock(&user_lock);
+		*value = newValue;
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
+	unlock_memory(value, 8, B_READ_DEVICE))
 	return oldValue;
-
-error:
-	release_spinlock(&user_lock);
-	restore_interrupts(status);
+access_violation:
 	// XXX kill application
 	return -1;
 }
 
 int64
-user_atomic_add64(vint64 *value, int64 addValue)
+_user_atomic_add64(vint64 *value, int64 addValue)
 {
 	cpu_status status;
 	int64 oldValue;
+	if (!CHECK_USER_ADDRESS(value))
+		goto access_violation;
+	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
+		goto access_violation;
 	status = disable_interrupts();
-	acquire_spinlock(&user_lock);
-	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
-		goto error;
-	if (user_memcpy(&oldValue, value, 8) < 0)
-		goto error;
-	addValue += oldValue;
-	if (user_memcpy(value, &addValue, 8) < 0)
-		goto error;
-	release_spinlock(&user_lock);
+	acquire_spinlock(&atomic_lock);
+	oldValue = *value;
+	*value += addValue;
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
+	unlock_memory(value, 8, B_READ_DEVICE))
 	return oldValue;
-
-error:
-	release_spinlock(&user_lock);
-	restore_interrupts(status);
+access_violation:
 	// XXX kill application
 	return -1;
 }
 
 int64
-user_atomic_and64(vint64 *value, int64 andValue)
+_user_atomic_and64(vint64 *value, int64 andValue)
 {
 	cpu_status status;
 	int64 oldValue;
+	if (!CHECK_USER_ADDRESS(value))
+		goto access_violation;
+	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
+		goto access_violation;
 	status = disable_interrupts();
-	acquire_spinlock(&user_lock);
-	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
-		goto error;
-	if (user_memcpy(&oldValue, value, 8) < 0)
-		goto error;
-	andValue &= oldValue;
-	if (user_memcpy(value, &andValue, 8) < 0)
-		goto error;
-	release_spinlock(&user_lock);
+	acquire_spinlock(&atomic_lock);
+	oldValue = *value;
+	*value &= andValue;
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
+	unlock_memory(value, 8, B_READ_DEVICE))
 	return oldValue;
-
-error:
-	release_spinlock(&user_lock);
-	restore_interrupts(status);
+access_violation:
 	// XXX kill application
 	return -1;
 }
 
 int64
-user_atomic_or64(vint64 *value, int64 orValue)
+_user_atomic_or64(vint64 *value, int64 orValue)
 {
 	cpu_status status;
 	int64 oldValue;
+	if (!CHECK_USER_ADDRESS(value))
+		goto access_violation;
+	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
+		goto access_violation;
 	status = disable_interrupts();
-	acquire_spinlock(&user_lock);
-	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
-		goto error;
-	if (user_memcpy(&oldValue, value, 8) < 0)
-		goto error;
-	orValue |= oldValue;
-	if (user_memcpy(value, &orValue, 8) < 0)
-		goto error;
-	release_spinlock(&user_lock);
+	acquire_spinlock(&atomic_lock);
+	oldValue = *value;
+	*value |= orValue;
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
+	unlock_memory(value, 8, B_READ_DEVICE))
 	return oldValue;
-
-error:
-	release_spinlock(&user_lock);
-	restore_interrupts(status);
+access_violation:
 	// XXX kill application
 	return -1;
 }
 
 int64
-user_atomic_read64(vint64 *value)
+_user_atomic_get64(vint64 *value)
 {
 	cpu_status status;
 	int64 oldValue;
+	if (!CHECK_USER_ADDRESS(value))
+		goto access_violation;
+	if (B_OK != lock_memory(value, 8, B_READ_DEVICE))
+		goto access_violation;
 	status = disable_interrupts();
-	acquire_spinlock(&user_lock);
-	if ((addr)value >= KERNEL_BASE && (addr)value <= KERNEL_TOP)
-		goto error;
-	if (user_memcpy(&oldValue, value, 8) < 0)
-		goto error;
-	release_spinlock(&user_lock);
+	acquire_spinlock(&atomic_lock);
+	oldValue = *value;
+	release_spinlock(&atomic_lock);
 	restore_interrupts(status);
+	unlock_memory(value, 8, B_READ_DEVICE))
 	return oldValue;
-
-error:
-	release_spinlock(&user_lock);
-	restore_interrupts(status);
+access_violation:
 	// XXX kill application
 	return -1;
 }
