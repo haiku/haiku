@@ -38,6 +38,6 @@ int i386_double_fault(int errorcode)
 	kprintf("double fault! errorcode = 0x%x\n", errorcode);
 	dprintf("double fault! errorcode = 0x%x\n", errorcode);
 	for(;;);
-	return INT_NO_RESCHEDULE;
+	return B_HANDLED_INTERRUPT;
 }
 

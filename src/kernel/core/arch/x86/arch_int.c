@@ -156,7 +156,7 @@ bool arch_int_is_interrupts_enabled(void)
 void i386_handle_trap(struct int_frame frame); /* keep the compiler happy, this function must be called only from assembly */
 void i386_handle_trap(struct int_frame frame)
 {
-	int ret = INT_NO_RESCHEDULE;
+	int ret = B_HANDLED_INTERRUPT;
 
 //	if(frame.vector != 0x20)
 //		dprintf("i386_handle_trap: vector 0x%x, ip 0x%x, cpu %d\n", frame.vector, frame.eip, smp_get_current_cpu());
@@ -235,12 +235,12 @@ void i386_handle_trap(struct int_frame frame)
 				ret = int_io_interrupt_handler(frame.vector);
 			} else {
 				panic("i386_handle_trap: unhandled cpu trap 0x%x at ip 0x%x!\n", frame.vector, frame.eip);
-				ret = INT_NO_RESCHEDULE;
+				ret = B_HANDLED_INTERRUPT;
 			}
 			break;
 	}
 
-	if(ret == INT_RESCHEDULE) {
+	if (ret == B_INVOKE_SCHEDULER) {
 		int state = int_disable_interrupts();
 		GRAB_THREAD_LOCK();
 		thread_resched();
