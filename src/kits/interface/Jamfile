@@ -9,4 +9,4 @@ StaticLibrary haiku :
 	: STATIC_LIBRARY_DIR
 	;
 
-# SubInclude OBOS_TOP src kits interface BTextView ;
+SubInclude OBOS_TOP src kits interface BTextView ;
