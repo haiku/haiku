@@ -86,6 +86,7 @@ i[34567]86-*-unixware*)	gdb_host=i386v4 ;;
 i[34567]86-*-sysv*)	gdb_host=i386v ;;
 i[34567]86-*-isc*)	gdb_host=i386v ;;
 i[34567]86-*-cygwin*)	gdb_host=cygwin ;;
+i[567]86-*-haiku*)	gdb_host=haiku ;;
 
 ia64-*-aix*)		gdb_host=aix ;;
 ia64-*-linux*)		gdb_host=linux ;;

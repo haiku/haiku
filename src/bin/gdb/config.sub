@@ -1297,6 +1297,9 @@ case $os in
 	-kaos*)
 		os=-kaos
 		;;
+	-haiku*)
+		os=-haiku
+		;;
 	-none)
 		;;
 	*)

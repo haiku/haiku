@@ -98,6 +98,7 @@ i[34567]86-*-netware*)	gdb_target=i386
 			configdirs="${configdirs} nlm" ;;
 i[34567]86-*-cygwin*)	gdb_target=cygwin  ;;
 i[34567]86-*-vxworks*)	gdb_target=vxworks ;;
+i[34567]86-*-haiku*)	gdb_target=haiku ;;
 i[34567]86-*-*)		gdb_target=i386 ;;
 
 ia64-*-aix*)		gdb_target=aix ;;
