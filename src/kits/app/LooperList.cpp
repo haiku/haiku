@@ -241,22 +241,22 @@ BLooperList::LooperData::operator=(const LooperData& rhs)
 //------------------------------------------------------------------------------
 bool BLooperList::FindLooperPred::operator()(BLooperList::LooperData& Data)
 {
-	return looper == Data.looper;
+	return Data.looper && (looper == Data.looper);
 }
 //------------------------------------------------------------------------------
 bool BLooperList::FindThreadPred::operator()(LooperData& Data)
 {
-	return thread == Data.looper->Thread();
+	return Data.looper && (thread == Data.looper->Thread());
 }
 //------------------------------------------------------------------------------
 bool BLooperList::FindNamePred::operator()(LooperData& Data)
 {
-	return strcmp(name, Data.looper->Name()) == 0;
+	return Data.looper && (strcmp(name, Data.looper->Name()) == 0);
 }
 //------------------------------------------------------------------------------
 bool BLooperList::FindPortPred::operator()(LooperData& Data)
 {
-	return port == _get_looper_port_(Data.looper);
+	return Data.looper && (port == _get_looper_port_(Data.looper));
 }
 //------------------------------------------------------------------------------
 

@@ -137,10 +137,35 @@ BLooper::~BLooper()
 
 	Lock();
 
-// TODO: delete fLastMessage;
-// In case the looper thread calls Quit() fLast message is not deleted.
+	// In case the looper thread calls Quit() fLastMessage is not deleted.
+	if (fLastMessage)
+	{
+		delete fLastMessage;
+		fLastMessage = NULL;
+	}
 
-// TODO: Close the message port and read and reply to the remaining messages.
+	// Close the message port and read and reply to the remaining messages.
+	if (fMsgPort > 0)
+	{
+		close_port(fMsgPort);
+	}
+
+	BMessage* msg;
+	// Clear the queue so our call to IsMessageWaiting() below doesn't give
+	// us bogus info
+	while ((msg = fQueue->NextMessage()))
+	{
+		delete msg;			// msg will automagically post generic reply
+	}
+
+	do
+	{
+		msg = ReadMessageFromPort(0);
+		if (msg)
+		{
+			delete msg;		// msg will automagically post generic reply
+		}
+	} while (IsMessageWaiting());
 
 // bonefish: Killing the looper thread doesn't work very well with
 // BApplication. In fact here it doesn't work too well either. When the
@@ -157,6 +182,18 @@ BLooper::~BLooper()
 
 	BObjectLocker<BLooperList> ListLock(gLooperList);
 	RemoveHandler(this);
+
+	// Remove all the "child" handlers
+	BHandler* child;
+	while (CountHandlers())
+	{
+		child = HandlerAt(0);
+		if (child)
+		{
+			RemoveHandler(child);
+		}
+	}
+
 	RemoveLooper(this);
 
 	UnlockFully();
@@ -645,7 +682,7 @@ team_id BLooper::Team() const
 //------------------------------------------------------------------------------
 BLooper* BLooper::LooperForThread(thread_id tid)
 {
-	BObjectLocker<BLooperList> ListLock (gLooperList);
+	BObjectLocker<BLooperList> ListLock(gLooperList);
 	if (ListLock.IsLocked())
 	{
 		return gLooperList.LooperForThread(tid);
@@ -809,13 +846,28 @@ bool BLooper::RemoveCommonFilter(BMessageFilter* filter)
 //------------------------------------------------------------------------------
 void BLooper::SetCommonFilterList(BList* filters)
 {
+	// We have a somewhat serious problem here.  It is entirely possible in R5
+	// to assign a given list of filters to *two* BLoopers simultaneously.  This
+	// becomes problematic when the loopers are destroyed: the last looper
+	// destroyed will have a problem when it tries to delete a filter list that
+	// has already been deleted.  In R5, this results in a general protection
+	// fault; here it ends in a segment violation.
+	if (!IsLocked())
+	{
+		debugger("Owning Looper must be locked before calling "
+				 "SetCommonFilterList");
+		return;
+	}
+
 	if (fCommonFilters)
 	{
 		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
 		{
 			delete fCommonFilters->ItemAt(i);
 		}
-		fCommonFilters->MakeEmpty();
+
+		delete fCommonFilters;
+		fCommonFilters = NULL;
 	}
 
 	// Per the BeBook, we take ownership of the list
@@ -1388,23 +1440,105 @@ bool BLooper::AssertLocked() const
 	return true;
 }
 //------------------------------------------------------------------------------
-BHandler* BLooper::top_level_filter(BMessage* msg, BHandler* t)
+BHandler* BLooper::top_level_filter(BMessage* msg, BHandler* target)
 {
-	// TODO: implement
-	// return the supplied handler for now
-	return t;
+	if (msg)
+	{
+		// Apply the common filters first
+		target = apply_filters(CommonFilterList(), msg, target);
+		if (target)
+		{
+			if (target->Looper() != this)
+			{
+				// TODO: debugger message?
+				target = NULL;
+			}
+			else
+			{
+				// Now apply handler-specific filters
+				target = handler_only_filter(msg, target);
+			}
+		}
+	}
+
+	return target;
 }
 //------------------------------------------------------------------------------
-BHandler* BLooper::handler_only_filter(BMessage* msg, BHandler* t)
+BHandler* BLooper::handler_only_filter(BMessage* msg, BHandler* target)
 {
-	// TODO: implement
-	return NULL;
+	// Keep running filters until our handler is NULL, or until the filtering
+	// handler returns itself as the designated handler
+	BHandler* oldTarget = NULL;
+	while (target && (target != oldTarget))
+	{
+		oldTarget = target;
+		target = apply_filters(oldTarget->FilterList(), msg, oldTarget);
+		if (target && (target->Looper() != this))
+		{
+			// TODO: debugger message?
+			target = NULL;
+		}
+	}
+
+	return target;
 }
 //------------------------------------------------------------------------------
 BHandler* BLooper::apply_filters(BList* list, BMessage* msg, BHandler* target)
 {
-	// TODO: implement
-	return NULL;
+	// This is where the action is!
+	// Check the parameters
+	if (!list || !msg)
+	{
+		return target;
+	}
+
+	// For each filter in the provided list
+	BMessageFilter* filter = NULL;
+	for (int32 i = 0; i < list->CountItems(); ++i)
+	{
+		filter = (BMessageFilter*)list->ItemAt(i);
+
+		// Check command conditions
+		if (filter->FiltersAnyCommand() || (filter->Command() == msg->what))
+		{
+			// Check delivery conditions
+			message_delivery delivery = filter->MessageDelivery();
+			bool dropped = msg->WasDropped();
+			if (delivery == B_ANY_DELIVERY ||
+				((delivery == B_DROPPED_DELIVERY) && dropped) ||
+				((delivery == B_PROGRAMMED_DELIVERY) && !dropped))
+			{
+				// Check source conditions
+				message_source source = filter->MessageSource();
+				bool remote = msg->IsSourceRemote();
+				if (source == B_ANY_SOURCE ||
+					((source == B_REMOTE_SOURCE) && remote) ||
+					((source == B_LOCAL_SOURCE) && !remote))
+				{
+					filter_result result;
+					// Are we using an "external" function?
+					filter_hook func = filter->FilterFunction();
+					if (func)
+					{
+						result = func(msg, &target, filter);
+					}
+					else
+					{
+						result = filter->Filter(msg, &target);
+					}
+
+					// Is further processing allowed?
+					if (result == B_SKIP_MESSAGE)
+					{
+						// No; time to bail out
+						return NULL;
+					}
+				}
+			}
+		}
+	}
+
+	return target;
 }
 //------------------------------------------------------------------------------
 void BLooper::check_lock()

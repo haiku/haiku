@@ -320,7 +320,6 @@ instantiation_func find_instantiation_func(const char* class_name,
 		return NULL;
 	}
 
-	BRoster Roster;
 	instantiation_func theFunc = NULL;
 	BString funcName;
 

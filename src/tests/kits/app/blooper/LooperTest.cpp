@@ -12,6 +12,7 @@
 #include "AddCommonFilterTest.h"
 #include "RemoveCommonFilterTest.h"
 #include "LooperSizeTest.h"
+#include "SetCommonFilterListTest.h"
 
 Test* LooperTestSuite()
 {
@@ -29,6 +30,7 @@ Test* LooperTestSuite()
 	tests->addTest(TAddCommonFilterTest::Suite());
 	tests->addTest(TRemoveCommonFilterTest::Suite());
 	tests->addTest(TLooperSizeTest::Suite());
+	tests->addTest(TSetCommonFilterListTest::Suite());
 
 	return tests;
 }
