@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2003-2004, Haiku, Inc.
+//	Copyright (c) 2003-2005, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -32,7 +32,7 @@
 class BMenu;
 class BMenuWindow : public BWindow {
 public:
-	BMenuWindow(BRect frame, BMenu *menu);
+	BMenuWindow(BMenu *menu);
 	virtual ~BMenuWindow();
 
 	virtual void WindowActivated(bool active);
