@@ -2,7 +2,9 @@ SubDir OBOS_TOP src servers screensaver ;
 
 Server OBOSscreensaver :
 	ScreenSaverApp.cpp
+	ScreenSaverPrefs.cpp
+	ScreenSaverThread.cpp
 	SSAwindow.cpp
 	pwWindow.cpp
 ;
-LinkSharedOSLibs OBOSscreensaver : be game ../../../distro/x86.R1/beos/system/lib/libscreensaver.so  ;
+LinkSharedOSLibs OBOSscreensaver : be game libscreensaver.so  ;
