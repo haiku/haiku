@@ -350,7 +350,7 @@ avCodec::Decode(void *out_buffer, int64 *out_frameCount,
 
 		mh->start_time = fStartTime;
 
-		printf("audio start_time %.6f\n", mh->start_time / 1000000.0);
+//		printf("audio start_time %.6f\n", mh->start_time / 1000000.0);
 
 		char *output_buffer = (char *)out_buffer;
 		*out_frameCount = 0;
