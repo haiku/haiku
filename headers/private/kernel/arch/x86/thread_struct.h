@@ -33,7 +33,10 @@ struct arch_thread {
 };
 
 struct arch_team {
-	// nothing here
+	// gcc treats empty structures as zero-length in C, but as if they contain
+	// a char in C++. So we have to put a dummy in to be able to use the struct
+	// from both in a consistent way.
+	char	dummy;
 };
 
 struct arch_fork_arg {
