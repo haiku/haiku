@@ -234,7 +234,7 @@ dump_chunks(void)
 }
 #endif
 
-int32
+uint32
 heap_available(void)
 {
 	return sAvailable;
