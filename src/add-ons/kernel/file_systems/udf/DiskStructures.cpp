@@ -265,13 +265,13 @@ descriptor_tag ::init_check(uint32 diskBlock)
 
 
 //----------------------------------------------------------------------
-// primary_descriptor
+// primary_volume_descriptor
 //----------------------------------------------------------------------
 
 void
-primary_descriptor::dump() const
+primary_volume_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "primary_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "primary_volume_descriptor");
 	
 	CS0String string;
 	
@@ -313,9 +313,9 @@ primary_descriptor::dump() const
 //----------------------------------------------------------------------
 
 void
-anchor_descriptor::dump() const
+anchor_volume_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "anchor_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "anchor_volume_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("main_vds:\n"));
@@ -372,13 +372,13 @@ partition_descriptor::dump() const
 }
 
 //----------------------------------------------------------------------
-// logical_descriptor
+// logical_volume_descriptor
 //----------------------------------------------------------------------
 
 void
-logical_descriptor::dump() const
+logical_volume_descriptor::dump() const
 {
-	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "logical_descriptor");
+	DUMP_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_DUMP, "logical_volume_descriptor");
 	PRINT(("tag:\n"));
 	DUMP(tag());
 	PRINT(("vds_number:                %ld\n", vds_number()));
@@ -430,8 +430,8 @@ logical_descriptor::dump() const
 }
 
 
-logical_descriptor&
-logical_descriptor::operator=(const logical_descriptor &rhs)
+logical_volume_descriptor&
+logical_volume_descriptor::operator=(const logical_volume_descriptor &rhs)
 {
 	_tag = rhs._tag;
 	_vds_number = rhs._vds_number;

@@ -16,13 +16,13 @@ walk_volume_recognition_sequence(int device, off_t offset,
 static status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
                                         uint32 blockSize, uint32 blockShift,
-                                        logical_descriptor &logicalVolumeDescriptor,
+                                        logical_volume_descriptor &logicalVolumeDescriptor,
 							            partition_descriptor partitionDescriptors[],
 							            uint8 &partitionDescriptorCount);
 static status_t
 walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								int device, uint32 blockSize, uint32 blockShift,
-							    logical_descriptor &logicalVolumeDescriptor,
+							    logical_volume_descriptor &logicalVolumeDescriptor,
 							    partition_descriptor partitionDescriptors[],
 							    uint8 &partitionDescriptorCount);
 
@@ -32,7 +32,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 
 status_t
 Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
-                   uint32 &blockShift, logical_descriptor &logicalVolumeDescriptor,
+                   uint32 &blockShift, logical_volume_descriptor &logicalVolumeDescriptor,
 				   partition_descriptor partitionDescriptors[],
 				   uint8 &partitionDescriptorCount)
 {
@@ -78,7 +78,7 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	DEBUG_INIT_ETC(CF_PRIVATE, NULL, ("device: %d, offset: %Ld, length: %Ld, "
 	               "blockSize: %ld, volumeName: %p", device, offset, length,
 	               blockSize, volumeName));
-	logical_descriptor logicalVolumeDescriptor;
+	logical_volume_descriptor logicalVolumeDescriptor;
 	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
 	uint8 partitionDescriptorCount;
 	uint32 blockShift;
@@ -166,7 +166,7 @@ static
 status_t
 walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
                                         uint32 blockSize, uint32 blockShift,
-                                        logical_descriptor &logicalVolumeDescriptor,
+                                        logical_volume_descriptor &logicalVolumeDescriptor,
 							            partition_descriptor partitionDescriptors[],
 							            uint8 &partitionDescriptorCount)
 {
@@ -183,7 +183,7 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 		off_t block = avds_locations[i];
 		off_t address = (offset + block) << blockShift;
 		MemoryChunk chunk(blockSize);
-		anchor_descriptor *anchor = NULL;
+		anchor_volume_descriptor *anchor = NULL;
 			
 		status_t anchorErr = chunk.InitCheck();
 		if (!anchorErr) {
@@ -195,7 +195,7 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			}
 		}			
 		if (!anchorErr) {
-			anchor = reinterpret_cast<anchor_descriptor*>(chunk.Data());
+			anchor = reinterpret_cast<anchor_volume_descriptor*>(chunk.Data());
 			anchorErr = anchor->tag().init_check(block+offset);
 			if (anchorErr) {
 				PRINT(("block %Ld: invalid anchor\n", block));
@@ -237,7 +237,7 @@ static
 status_t
 walk_volume_descriptor_sequence(extent_address descriptorSequence,
 								int device, uint32 blockSize, uint32 blockShift,
-							    logical_descriptor &logicalVolumeDescriptor,
+							    logical_volume_descriptor &logicalVolumeDescriptor,
 							    partition_descriptor partitionDescriptors[],
 							    uint8 &partitionDescriptorCount)
 {
@@ -279,7 +279,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 					
 				case TAGID_PRIMARY_VOLUME_DESCRIPTOR:
 				{
-					primary_descriptor *primary = reinterpret_cast<primary_descriptor*>(tag);
+					primary_volume_descriptor *primary = reinterpret_cast<primary_volume_descriptor*>(tag);
 					PDUMP(primary);				
 					(void)primary;	// kill the warning		
 					break;
@@ -376,7 +376,7 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 					
 				case TAGID_LOGICAL_VOLUME_DESCRIPTOR:
 				{
-					logical_descriptor *logical = reinterpret_cast<logical_descriptor*>(tag);
+					logical_volume_descriptor *logical = reinterpret_cast<logical_volume_descriptor*>(tag);
 					PDUMP(logical);
 					if (foundLogicalVolumeDescriptor) {
 						// Keep the vd with the highest vds_number

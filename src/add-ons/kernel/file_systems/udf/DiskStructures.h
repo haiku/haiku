@@ -505,7 +505,7 @@ const char *tag_id_to_string(tag_id id);
 
 /*! \brief Primary volume descriptor
 */
-struct primary_descriptor {
+struct primary_volume_descriptor {
 public:
 	void dump() const;	
 
@@ -633,7 +633,7 @@ private:
 	
 	See also: ECMA 167 3/10.2, UDF-2.01 2.2.3
 */
-struct anchor_descriptor {
+struct anchor_volume_descriptor {
 public:
 	void dump() const;
 	
@@ -804,7 +804,7 @@ enum partition_access_type {
 
 	See also: ECMA 167 3/10.6, UDF-2.01 2.2.4
 */
-struct logical_descriptor {
+struct logical_volume_descriptor {
 	void dump() const;
 	
 	// Get functions
@@ -853,7 +853,7 @@ struct logical_descriptor {
 	void set_partition_map_count(uint32 count) { _partition_map_count = B_HOST_TO_LENDIAN_INT32(count); }
 
 	// Other functions
-	logical_descriptor& operator=(const logical_descriptor &rhs);
+	logical_volume_descriptor& operator=(const logical_volume_descriptor &rhs);
 	
 private:
 	descriptor_tag  _tag;
@@ -899,7 +899,7 @@ private:
 		defect management.
 		
 		Note that we actually allocate memory for the partition maps
-		here due to the fact that we allocate logical_descriptor
+		here due to the fact that we allocate logical_volume_descriptor
 		objects on the stack sometimes.
 		
 		See UDF-2.01 2.2.8, 2.2.9

@@ -72,7 +72,7 @@ Volume::Mount(const char *deviceName, off_t offset, off_t length,
 		}
 	}
 
-	logical_descriptor logicalVolumeDescriptor;
+	logical_volume_descriptor logicalVolumeDescriptor;
 	partition_descriptor partitionDescriptors[Udf::kMaxPartitionDescriptors];
 	uint8 partitionDescriptorCount;
 	uint32 blockShift;
