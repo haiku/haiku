@@ -80,7 +80,7 @@ status_t nv_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-1 running.\n"));
+	LOG(1,("POWERUP: nVidia (open)BeOS Accelerant 0.10-2 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -660,7 +660,7 @@ status_t nv_set_cas_latency()
 	switch(si->ps.card_type)
 	{
 	case G550:
-			if (!si->ps.sdram)
+			if (0)//!si->ps.sdram)
 			{
 				LOG(4,("INIT: G100 SGRAM CAS tuning not permitted, aborting.\n"));
 				return B_OK;

@@ -8,6 +8,7 @@
 
 #include "nv_std.h"
 
+static void detect_panels(void);
 static void pinsnv4_fake(void);
 static void pinsnv5_nv5m64_fake(void);
 static void pinsnv6_fake(void);
@@ -165,8 +166,8 @@ static status_t pins5_read(uint8 *pins, uint8 length)
 	else si->ps.f_ref = 27.00000;
 
 	/* make sure SGRAM functions only get enabled if SGRAM mounted */
-	if ((pins[114] & 0x18) == 0x08) si->ps.sdram = false;
-	else si->ps.sdram = true;
+//	if ((pins[114] & 0x18) == 0x08) si->ps.sdram = false;
+//	else si->ps.sdram = true;
 
 	/* various registers */
 	si->ps.secondary_head = (pins[117] & 0x70);
@@ -242,11 +243,21 @@ void fake_pins(void)
 	}
 */
 
-	/* detect if the BIOS enabled a LCD (internal panel or DVI) or TVout */
+	/* find out the BIOS preprogrammed panel use status... */
+	detect_panels();
+}
+
+static void detect_panels()
+{
+	/* detect if the BIOS enabled LCD's (internal panels or DVI) or TVout */
 	{
-		/* both TMDS transmitters (used for LCD/DVI) and TVencoders are slave devices */
-		bool slavedev1_active = false, slavedev2_active = false;
-		bool tvout1_active = false, tvout2_active = false;
+		/* both external TMDS transmitters (used for LCD/DVI) and external TVencoders
+		 * use the CRTC's in slaved mode. */
+		/* Note:
+		 * It looks like GeForceFX cards have on die TMDS encoders that nolonger
+		 * require the CRTC to be slaved. */
+		bool slaved_for_dev1 = false, slaved_for_dev2 = false;
+		bool tvout1 = false, tvout2 = false;
 
 		/* check primary head: */
 		/* enable access to CRTC1 on dualhead cards */
@@ -256,11 +267,11 @@ void fake_pins(void)
 		CRTCW(LOCK, 0x57);
 		CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 		/* detect active slave device (if any) */
-		slavedev1_active = (CRTCR(PIXEL) & 0x80);
-		if (slavedev1_active)
+		slaved_for_dev1 = (CRTCR(PIXEL) & 0x80);
+		if (slaved_for_dev1)
 		{
 			/* if the panel isn't selected, tvout is.. */
-			tvout1_active = !(CRTCR(LCD) & 0x01);
+			tvout1 = !(CRTCR(LCD) & 0x01);
 		}
 
 		if (si->ps.secondary_head)
@@ -272,40 +283,78 @@ void fake_pins(void)
 			CRTCW(LOCK, 0x57);
 			CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 			/* detect active slave device (if any) */
-			slavedev2_active = (CRTCR(PIXEL) & 0x80);
-			if (slavedev2_active)
+			slaved_for_dev2 = (CRTCR(PIXEL) & 0x80);
+			if (slaved_for_dev2)
 			{
 				/* if the panel isn't selected, tvout is.. */
-				tvout2_active = !(CRTCR(LCD) & 0x01);
+				tvout2 = !(CRTCR(LCD) & 0x01);
 			}
 		}
 
-		/* fixme: doing some logging, but (also) use for DVI outputs on non-laptops.. */
-		if (slavedev1_active && ! tvout1_active)
+		/* do some presets */
+		si->ps.panel1_width = 0;
+		si->ps.panel1_height = 0;
+		si->ps.panel2_width = 0;
+		si->ps.panel2_height = 0;
+		si->ps.slaved_tmds1 = false;
+		si->ps.slaved_tmds2 = false;
+		si->ps.master_tmds1 = false;
+		si->ps.master_tmds2 = false;
+		si->ps.tmds1_active = false;
+		si->ps.tmds2_active = false;
+		/* determine the situation we are in... (regarding flatpanels) */
+		/* fixme: add VESA DDC EDID stuff one day... */
+		/* fixme: find out how to program those transmitters one day instead of
+		 * relying on the cards BIOS to do it. This adds TVout options where panels
+		 * are used!
+		 * Currently we'd loose the panel setup while not being able to restore it. */
+		if (slaved_for_dev1 && !tvout1)
 		{
-			LOG(2,("CRTC1 is currently programmed for DFP\n"));
-			LOG(2,("panel size is %d x %d\n",
-				((DACR(FP_HDISPEND) & 0x0000ffff) + 1),
-				((DACR(FP_VDISPEND) & 0x0000ffff) + 1)));
+			uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+			uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+			if ((width >= 640) && (height >= 480))
+			{
+				si->ps.slaved_tmds1 = true;
+				si->ps.tmds1_active = true;
+				si->ps.panel1_width = width;
+				si->ps.panel1_height = height;
+			}
 		}
-		if (slavedev2_active && ! tvout2_active)
+		if (si->ps.secondary_head && slaved_for_dev2 && !tvout2)
 		{
-			LOG(2,("CRTC2 is currently programmed for DFP\n"));
-			LOG(2,("panel size is %d x %d\n",
-				((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1),
-				((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1)));
+			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
+			uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
+			if ((width >= 640) && (height >= 480))
+			{
+				si->ps.slaved_tmds2 = true;
+				si->ps.tmds2_active = true;
+				si->ps.panel2_width = width;
+				si->ps.panel2_height = height;
+			}
 		}
-
-		/* fixme?: assuming laptop panel always on CRTC1 for now... */
-		if (si->ps.laptop)
+		if (!si->ps.slaved_tmds1 && !tvout1)
 		{
-			si->ps.panel_width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
-			si->ps.panel_height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+			uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
+			uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
+			if ((width >= 640) && (height >= 480))
+			{
+				si->ps.master_tmds1 = true;
+				si->ps.tmds1_active = true;
+				si->ps.panel1_width = width;
+				si->ps.panel1_height = height;
+			}
 		}
-		else
+		if (si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
 		{
-			si->ps.panel_width = 0;
-			si->ps.panel_height = 0;
+			uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
+			uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
+			if ((width >= 640) && (height >= 480))
+			{
+				si->ps.master_tmds2 = true;
+				si->ps.tmds2_active = true;
+				si->ps.panel2_width = width;
+				si->ps.panel2_height = height;
+			}
 		}
 	}
 }
@@ -337,10 +386,6 @@ static void pinsnv4_fake(void)
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
-//fixme: is this needed for nv acc?
-//fail-safe mode for now:
-	si->ps.sdram = true;
-
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 90;
 	si->ps.std_memory_clock = 110;
@@ -373,10 +418,6 @@ static void pinsnv5_nv5m64_fake(void)
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
-//fixme: is this needed for nv acc?
-//fail-safe mode for now:
-	si->ps.sdram = true;
-
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 125;
 	si->ps.std_memory_clock = 150;
@@ -409,10 +450,6 @@ static void pinsnv6_fake(void)
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
-//fixme: is this needed for nv acc?
-//fail-safe mode for now:
-	si->ps.sdram = true;
-
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 100;
 	si->ps.std_memory_clock = 125;
@@ -446,10 +483,6 @@ static void pinsnv10_arch_fake(void)
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
-//fixme: is this needed for nv acc?
-//fail-safe mode for now:
-	si->ps.sdram = true;
-
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 120;
 	si->ps.std_memory_clock = 150;
@@ -483,10 +516,6 @@ static void pinsnv20_arch_fake(void)
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
-//fixme: is this needed for nv acc?
-//fail-safe mode for now:
-	si->ps.sdram = true;
-
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 175;
 	si->ps.std_memory_clock = 200;
@@ -520,10 +549,6 @@ static void pinsnv30_arch_fake(void)
 	//fixme: primary & secondary_dvi should be overrule-able via nv.settings
 	si->ps.primary_dvi = false;
 	si->ps.secondary_dvi = false;
-//fixme: is this needed for nv acc?
-//fail-safe mode for now:
-	si->ps.sdram = true;
-
 	/* not used (yet) because no coldstart will be attempted (yet) */
 	si->ps.std_engine_clock = 190;
 	si->ps.std_memory_clock = 190;
@@ -768,20 +793,27 @@ void dump_pins(void)
 		break;
 	}
 	LOG(2, ("%s TVout chip detected\n", msg));
-	LOG(2,("primary_dvi: "));
-	if (si->ps.primary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
-	LOG(2,("secondary_dvi: "));
-	if (si->ps.secondary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
+//	LOG(2,("primary_dvi: "));
+//	if (si->ps.primary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
+//	LOG(2,("secondary_dvi: "));
+//	if (si->ps.secondary_dvi) LOG(2,("present\n")); else LOG(2,("absent\n"));
 	LOG(2,("card memory_size: %dMb\n", si->ps.memory_size));
-	LOG(2,("sdram: "));
-	if (si->ps.sdram) LOG(2,("SDRAM card\n")); else LOG(2,("SGRAM card\n"));
 	LOG(2,("laptop: "));
 	if (si->ps.laptop) LOG(2,("yes\n")); else LOG(2,("no\n"));
-//fixme: testing...
-//	if (si->ps.laptop)
+	if (si->ps.tmds1_active)
 	{
-		LOG(2,("panel width: %d\n", si->ps.panel_width));
-		LOG(2,("panel height: %d\n", si->ps.panel_height));
+		LOG(2,("found DFP (digital flatpanel) on CRTC1; CRTC1 is "));
+		if (si->ps.slaved_tmds1) LOG(2,("slaved\n")); else LOG(2,("master\n"));
+		LOG(2,("panel width: %d\n", si->ps.panel1_width));
+		LOG(2,("panel height: %d\n", si->ps.panel1_height));
+
+	}
+	if (si->ps.tmds2_active)
+	{
+		LOG(2,("found DFP (digital flatpanel) on CRTC2; CRTC2 is "));
+		if (si->ps.slaved_tmds2) LOG(2,("slaved\n")); else LOG(2,("master\n"));
+		LOG(2,("panel width: %d\n", si->ps.panel2_width));
+		LOG(2,("panel height: %d\n", si->ps.panel2_height));
 	}
 	LOG(2,("INFO: end pinsdump.\n"));
 }

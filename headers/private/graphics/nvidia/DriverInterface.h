@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-2/2004.
+	Rudolf Cornelissen 10/2002-3/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -220,11 +220,18 @@ typedef struct {
 		uint32 card_type;           /* see card_type enum above */
 		uint32 card_arch;           /* see card_arch enum above */
 		bool laptop;	            /* mobile chipset or not ('internal' flatpanel!) */
-		uint16 panel_width;			/* native horizontal resolution for laptop panels */
-		uint16 panel_height;		/* navive vertical resolution for laptop panels */
+		bool slaved_tmds1;			/* external TMDS encoder active on CRTC1 */
+		bool slaved_tmds2;			/* external TMDS encoder active on CRTC2 */
+		bool master_tmds1;			/* on die TMDS encoder active on CRTC1 */
+		bool master_tmds2;			/* on die TMDS encoder active on CRTC2 */
+		bool tmds1_active;			/* found panel on CRTC1 that is active */
+		bool tmds2_active;			/* found panel on CRTC2 that is active */
+		uint16 panel1_width;		/* native horizontal resolution for digital panels */
+		uint16 panel1_height;		/* navive vertical resolution for digital panels */
+		uint16 panel2_width;		/* native horizontal resolution for digital panels */
+		uint16 panel2_height;		/* navive vertical resolution for digital panels */
 		uint32 tvout_chip_type;     /* see tvchip_type enum above */
 		status_t pins_status;		/* B_OK if read correctly, B_ERROR if faked */
-		bool sdram;					/* TRUE if SDRAM card: needed info for 2D acceleration */
 
 		/* PINS */
 		float f_ref;				/* PLL reference-oscillator frequency (Mhz) */
