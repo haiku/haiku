@@ -21,20 +21,20 @@ status_t eng_agp_setup(void)
 	/* first try to enable FW support on our card if user requested this
 	 * ('unsupported' tweak!)
 	 * This has no effect on PCI cards. */
-	if (si->settings.unhide_fw)
-	{
-		uint32 reg;
+//	if (si->settings.unhide_fw)
+//	{
+//		uint32 reg;
 
-		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
+//		LOG(4, ("AGP: STRAPINFO2 contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
 
-		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
+//		LOG(4, ("AGP: attempting to enable fastwrite support..\n"));
 		/* 'force' FW support */
-		reg = (ENG_RG32(RG32_NVSTRAPINFO2) & ~0x00000800);
+//		reg = (ENG_RG32(RG32_NVSTRAPINFO2) & ~0x00000800);
 		/* enable strapinfo overwrite */
-		ENG_RG32(RG32_NVSTRAPINFO2) = (reg | 0x80000000);
+//		ENG_RG32(RG32_NVSTRAPINFO2) = (reg | 0x80000000);
 
-		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
-	}
+//		LOG(4, ("AGP: STRAPINFO2 now contains $%08x\n", ENG_RG32(RG32_NVSTRAPINFO2)));
+//	}
 
 	/* set the magic number so the skeleton kerneldriver knows we're for real */
 	nca.magic = nai.magic = SKEL_PRIVATE_DATA_MAGIC;
@@ -97,7 +97,7 @@ status_t eng_agp_setup(void)
 		LOG(4,("AGP: the graphicscard this accelerant controls is PCI type.\n"));
 
 		/* make sure card is set for PCI access */
-		CFGW(AGPCMD, 0x00000000);
+//		CFGW(AGPCMD, 0x00000000);
 
 		return B_ERROR;
 	}
@@ -129,7 +129,7 @@ status_t eng_agp_setup(void)
 	eng_agp_list_active(nca.cmd | (eng_ai.interface.agp_stat & AGP_rate_rev));
 
 	/* extra check */
-	LOG(4,("AGP: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
+//	LOG(4,("AGP: graphics card AGPCMD register readback $%08x\n", CFGR(AGPCMD)));
 	return B_OK;
 }
 
