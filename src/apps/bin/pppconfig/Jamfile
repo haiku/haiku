@@ -5,11 +5,8 @@ UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libppp h
 UseHeaders [ FDirName $(OBOS_TOP) src add-ons kernel network ppp shared libkernelppp headers ] ;
 
 BinCommand pppconfig :
-	driver_settings.c
 	pppconfig.cpp
 ;
-
-SEARCH on [ FGristFiles driver_settings.c ] = [ FDirName $(OBOS_TOP) src kernel libroot os ] ;
 
 LinkSharedOSLibs pppconfig : be libppp.a ;
 

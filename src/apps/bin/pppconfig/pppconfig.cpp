@@ -6,8 +6,6 @@
 //-----------------------------------------------------------------------
 
 #include <cstdio>
-#include <cstdlib>
-#include <cctype>
 #include <String.h>
 #include <driver_settings.h>
 
@@ -15,40 +13,8 @@
 #include <PPPManager.h>
 
 
-static const char sVersion[] = "0.1 pre-alpha";
+static const char sVersion[] = "0.12 pre-alpha";
 static const char sPPPInterfaceModuleName[] = PPP_INTERFACE_MODULE_NAME;
-
-
-// R5 only: strlcat is needed by driver_settings API
-/** Concatenates the source string to the destination, writes
- *	as much as "maxLength" bytes to the dest string.
- *	Always null terminates the string as long as maxLength is
- *	larger than the dest string.
- *	Returns the length of the string that it tried to create
- *	to be able to easily detect string truncation.
- */
-static
-size_t
-strlcat(char *dest, const char *source, size_t maxLength)
-{
-	size_t destLength = strnlen(dest, maxLength);
-
-	// This returns the wrong size, but it's all we can do
-	if (maxLength == destLength)
-		return destLength + strlen(source);
-
-	dest += destLength;
-	maxLength -= destLength;
-
-	size_t i = 0;
-	for (; i < maxLength - 1 && source[i]; i++) {
-		dest[i] = source[i];
-	}
-
-	dest[i] = '\0';
-
-	return destLength + i + strlen(source + i);
-}
 
 
 static
@@ -59,14 +25,13 @@ print_help()
 	fprintf(stderr, "With pppconfig you can create and manage PPP connections.\n");
 	fprintf(stderr, "Usage:\n");
 	fprintf(stderr, "pppconfig show | -a\n");
-	fprintf(stderr, "pppconfig init pppidf\n");
-	fprintf(stderr, "pppconfig create pppidf\n");
-	fprintf(stderr, "pppconfig connect interface\n");
-	fprintf(stderr, "pppconfig disconnect interface\n");
-	fprintf(stderr, "pppconfig delete interface\n");
-	fprintf(stderr, "pppconfig details interface\n");
-	fprintf(stderr, "\tpppidf is the interface description file\n");
-	fprintf(stderr, "\tinterface is either a name or an id\n");
+	fprintf(stderr, "pppconfig init <name>\n");
+	fprintf(stderr, "pppconfig create <name>\n");
+	fprintf(stderr, "pppconfig connect <name|interface|id>\n");
+	fprintf(stderr, "pppconfig disconnect <name|interface|id>\n");
+	fprintf(stderr, "pppconfig delete <name|interface|id>\n");
+	fprintf(stderr, "pppconfig details <name|interface|id>\n");
+	fprintf(stderr, "\t<name> must be an interface description file\n");
 	
 	return -1;
 }
@@ -105,7 +70,7 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 			// type and name (if it has one)
 			if(info.info.if_unit >= 0) {
 				printf("Type: Visible\n");
-				printf("\tName: ppp%ld\n", info.info.if_unit);
+				printf("\tInterface: ppp%ld\n", info.info.if_unit);
 			} else
 				printf("Type: Hidden\n");
 			
@@ -150,7 +115,7 @@ show(ppp_interface_filter filter = PPP_REGISTERED_INTERFACES)
 
 static
 status_t
-create(const char *pppidf, bool bringUp = true)
+create(const char *name, bool bringUp = true)
 {
 	PPPManager manager;
 	if(manager.InitCheck() != B_OK) {
@@ -158,26 +123,9 @@ create(const char *pppidf, bool bringUp = true)
 		return -1;
 	}
 	
-	BString name = "pppidf/";
-	name << pppidf;
-	
-	void *handle = load_driver_settings(name.String());
-	if(!handle) {
-		fprintf(stderr, "Error: Could not load PPP interface description file!\n");
-		return -1;
-	}
-	
-	const driver_settings *settings = get_driver_settings(handle);
-	if(!settings) {
-		fprintf(stderr, "Error: Could not decode PPP interface description file!\n");
-		unload_driver_settings(handle);
-		return -1;
-	}
-	
-	PPPInterface interface(manager.CreateInterface(settings));
+	PPPInterface interface(manager.CreateInterfaceWithName(name));
 	if(interface.InitCheck() != B_OK) {
-		fprintf(stderr, "Error: Could not create interface!\n");
-		unload_driver_settings(handle);
+		fprintf(stderr, "Error: Could not create interface: %s!\n", name);
 		return -1;
 	}
 	
@@ -187,7 +135,7 @@ create(const char *pppidf, bool bringUp = true)
 	interface.GetInterfaceInfo(&info);
 	
 	if(info.info.if_unit >= 0)
-		printf("Name: ppp%ld\n", info.info.if_unit);
+		printf("Interface: ppp%ld\n", info.info.if_unit);
 	else
 		printf("This interface is hidden! You can delete it by typing:\n"
 			"pppconfig delete %ld\n", interface.ID());
@@ -197,8 +145,6 @@ create(const char *pppidf, bool bringUp = true)
 		printf("Connecting in background...\n");
 	}
 	
-	unload_driver_settings(handle);
-	
 	return 0;
 }
 
@@ -207,8 +153,6 @@ static
 status_t
 connect(const char *name)
 {
-	// Name may either be an interface name (ppp0, etc.) or an interface ID.
-	
 	if(!name || strlen(name) == 0)
 		return -1;
 	
@@ -218,15 +162,7 @@ connect(const char *name)
 		return -1;
 	}
 	
-	PPPInterface interface;
-	
-	if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
-		interface = manager.InterfaceWithUnit(atoi(name + 3));
-	else if(isdigit(name[0]))
-		interface = atoi(name);
-	else
-		return print_help();
-	
+	PPPInterface interface(manager.InterfaceWithName(name));
 	if(interface.InitCheck() != B_OK) {
 		fprintf(stderr, "Error: Could not find interface: %s!\n", name);
 		return -1;
@@ -247,8 +183,6 @@ static
 status_t
 disconnect(const char *name)
 {
-	// Name may either be an interface name (ppp0, etc.) or an interface ID.
-	
 	if(!name || strlen(name) == 0)
 		return -1;
 	
@@ -258,15 +192,7 @@ disconnect(const char *name)
 		return -1;
 	}
 	
-	PPPInterface interface;
-	
-	if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
-		interface = manager.InterfaceWithUnit(atoi(name + 3));
-	else if(isdigit(name[0]))
-		interface = atoi(name);
-	else
-		return print_help();
-	
+	PPPInterface interface(manager.InterfaceWithName(name));
 	if(interface.InitCheck() != B_OK) {
 		fprintf(stderr, "Error: Could not find interface: %s!\n", name);
 		return -1;
@@ -285,8 +211,6 @@ static
 status_t
 delete_interface(const char *name)
 {
-	// Name may either be an interface name (ppp0, etc.) or an interface ID.
-	
 	if(!name || strlen(name) == 0)
 		return -1;
 	
@@ -296,16 +220,7 @@ delete_interface(const char *name)
 		return -1;
 	}
 	
-	ppp_interface_id interface;
-	
-	if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
-		interface = manager.InterfaceWithUnit(atoi(name + 3));
-	else if(isdigit(name[0]))
-		interface = atoi(name);
-	else
-		return print_help();
-	
-	if(!manager.DeleteInterface(interface)) {
+	if(!manager.DeleteInterface(manager.InterfaceWithName(name))) {
 		fprintf(stderr, "Error: Could not delete interface!\n");
 		return -1;
 	}
@@ -329,15 +244,7 @@ show_details(const char *name)
 		return -1;
 	}
 	
-	PPPInterface interface;
-	
-	if(!strncmp(name, "ppp", 3) && strlen(name) > 3 && isdigit(name[3]))
-		interface = manager.InterfaceWithUnit(atoi(name + 3));
-	else if(isdigit(name[0]))
-		interface = atoi(name);
-	else
-		return print_help();
-	
+	PPPInterface interface(manager.InterfaceWithName(name));
 	if(interface.InitCheck() != B_OK) {
 		fprintf(stderr, "Error: Could not find interface: %s!\n", name);
 		return -1;
@@ -349,7 +256,7 @@ show_details(const char *name)
 	// type and name (if it has one)
 	if(info.info.if_unit >= 0) {
 		printf("Type: Visible\n");
-		printf("Name: ppp%ld\n", info.info.if_unit);
+		printf("Interface: ppp%ld\n", info.info.if_unit);
 	} else
 		printf("Type: Hidden\n");
 	
