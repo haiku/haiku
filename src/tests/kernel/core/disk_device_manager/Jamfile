@@ -1,20 +1,74 @@
 SubDir OBOS_TOP src tests kernel core disk_device_manager ;
 
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager jobs ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits storage ] ;
+	# DiskDeviceTypes.cpp
+
 #UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
+UsePrivateHeaders [ FDirName kernel arch $(OBOS_ARCH) ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UsePrivateHeaders storage ;
+UsePrivateHeaders kernel ;
 UseHeaders [ FDirName $(OBOS_TOP) src kernel core disk_device_manager ] ;
 
-SimpleTest DiskDeviceManagerTest
-	: DiskDeviceManagerTest.cpp
+# As long as we compile for R5 userland, we define the following macros.
+SubDirCcFlags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
+SubDirC++Flags	[ FDefines USER R5_MEMORY_LAYOUT ] ;
 
-	: <boot!home!config!lib>libdisk_device_manager.so be
+SharedLibrary disk_device_manager :
+	ddm_operation_validation.cpp
+#	ddm_userland_interface.cpp
+	disk_device_manager.cpp
+	KDiskDevice.cpp
+	KDiskDeviceJob.cpp
+	KDiskDeviceJobFactory.cpp
+	KDiskDeviceJobGenerator.cpp
+	KDiskDeviceJobQueue.cpp
+	KDiskDeviceManager.cpp
+	KFileDiskDevice.cpp
+	KDiskSystem.cpp
+	KFileSystem.cpp
+	KPartition.cpp
+	KPartitioningSystem.cpp
+	KPartitionListener.cpp
+	KPartitionVisitor.cpp
+	KPhysicalPartition.cpp
+	KShadowPartition.cpp
+	UserDataWriter.cpp
+
+	# jobs
+	KCreateChildJob.cpp
+	KDefragmentJob.cpp
+	KDeleteChildJob.cpp
+	KInitializeJob.cpp
+	KMoveJob.cpp
+	KRepairJob.cpp
+	KResizeJob.cpp
+	KScanPartitionJob.cpp
+	KSetParametersJob.cpp
+	KUninitializeJob.cpp
+
+	# utilities
+	Locker.cpp
+	RWLocker.cpp
+
+	# disk device types
+	DiskDeviceTypes.cpp
 ;
+
+LinkSharedOSLibs libdisk_device_manager.so
+	: <boot!home!config!lib>libkernelland_emu.so ;
 
 AbsSymLink <boot!home!config!lib>libdisk_device_manager.so
 	: libdisk_device_manager.so : /boot/home/config/lib ;
+
+SimpleTest DiskDeviceManagerTest
+	: DiskDeviceManagerTest.cpp
+	: <boot!home!config!lib>libdisk_device_manager.so be
+;
 
 Depends DiskDeviceManagerTest : <boot!home!config!lib>libkernelland_emu.so ;
 
@@ -32,3 +86,7 @@ Depends userland_disk_system_modules :
 	<partitioning_system>session
 ;
 
+# KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not
+# contaminate the include paths for the other files.
+ObjectHdrs [ FGristFiles KFileDiskDevice$(SUFOBJ) ]
+	: [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
