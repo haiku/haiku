@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <string.h>
+#include <driver_settings.h>
 
 //#define DEBUG
 
@@ -39,6 +40,27 @@ static int32 gOpenMask = 0;
 
 int  em_attach(device_t);
 int  em_detach(device_t);
+
+
+static void
+ipro1000_read_settings(ipro1000_device *device)
+{
+	void *handle;
+	const char *param;
+	int mtu;
+	
+	handle = load_driver_settings("ipro1000");
+	if (!handle)
+		return;
+	
+	param = get_driver_parameter(handle, "mtu", "0", "0");
+	mtu = atoi(param);
+	if (mtu >= 64 && mtu <= 1500)
+		device->mtu = mtu;
+
+	unload_driver_settings(handle);
+}
+
 
 status_t
 ipro1000_open(const char *name, uint32 flags, void** cookie)
@@ -81,6 +103,9 @@ ipro1000_open(const char *name, uint32 flags, void** cookie)
 	device->pciDev	= device->pciInfo->device;
 	device->pciFunc	= device->pciInfo->function;
 	device->adapter = 0;
+	device->mtu		= 1500; // XXX is MAXIMUM_ETHERNET_FRAME_SIZE = 1518 too much?
+	
+	ipro1000_read_settings(device);
 
 	if (em_attach(device) != 0) {
 		TRACE("em_attach failed\n");
@@ -105,7 +130,6 @@ ipro1000_close(void* cookie)
 	
 	device->closed = true;
 	release_sem(ifp->if_rcv_sem);
-//	release_sem(device->txFreeSem);
 
 	return B_OK;
 }
@@ -304,8 +328,8 @@ ipro1000_control(void *cookie, uint32 op, void *arg, size_t len)
 			return B_OK;
 
 		case ETHER_GETFRAMESIZE:
-			TRACE("ipro1000_control() ETHER_GETFRAMESIZE\n");
-			*(uint32*)arg = MAXIMUM_ETHERNET_FRAME_SIZE;
+			TRACE("ipro1000_control() ETHER_GETFRAMESIZE, MTU = %d\n", device->mtu);
+			*(uint32*)arg = device->mtu;
 			return B_OK;
 			
 		default:

@@ -45,7 +45,8 @@ typedef struct device {
 	
 	volatile bool		nonblocking;
 	volatile bool		closed;
-	
+
+	uint32				mtu;	
 	uint8				macaddr[6];
 } ipro1000_device;
 
