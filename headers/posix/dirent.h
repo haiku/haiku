@@ -29,7 +29,7 @@ typedef struct {
 #	endif
 #endif
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -38,7 +38,7 @@ struct dirent	*readdir(DIR *dirp);
 int				 closedir(DIR *dirp);
 void			 rewinddir(DIR *dirp);
 
-#ifdef _cplusplus
+#ifdef __cplusplus
 }
 #endif
 
