@@ -1,14 +1,17 @@
 SubDir OBOS_TOP src tests kits media ;
 
-SimpleTest AreaTest : AreaTest.cpp : be root ;
+SimpleTest AreaTest : AreaTest.cpp : be ;
 
-SimpleTest BufferTest : BufferTest.cpp : libmedia.so be root ;
+SimpleTest BufferTest : BufferTest.cpp : libmedia.so be ;
 
-SimpleTest SizeofTest : SizeofTest.cpp : be root ;
+SimpleTest SizeofTest : SizeofTest.cpp : be ;
 
 SimpleTest TimedEventQueueTest : TimedEventQueueTest.cpp
-	: libmedia.so be root ;
+	: libmedia.so be ;
 
+SimpleTest mediaFormats :
+	mediaFormats.cpp
+	: media ;
 
 SubInclude OBOS_TOP src tests kits media media_decoder ;
 SubInclude OBOS_TOP src tests kits media notificationtest ;
