@@ -59,7 +59,10 @@ main(int argc, char **argv)
 				return 0;
 			} else if (operation == 'l') {
 				Keymap keymap;
-				keymap.LoadSource(stdin);
+				if (keymap.LoadSource(stdin)!=B_OK) {
+					printf("error when loading the keymap\n");
+					return 1;
+				}
 				keymap.SaveAsCurrent();
 				printf("Key map loaded.\n");
 				return 0;
@@ -71,17 +74,22 @@ main(int argc, char **argv)
 				entry_ref ref;
 				get_ref_for_path(argv[i], &ref);
 				Keymap keymap;
-				keymap.LoadSourceFromRef(ref);
-
+				if (keymap.LoadSourceFromRef(ref)!=B_OK) {
+					printf("error when loading the keymap\n");
+					return 1;
+				}
 				keymap.Save(outputRef);
 				return 0;
 			} else if (operation == 'h') {
 		        	entry_ref ref;
 		        	get_ref_for_path(argv[i], &ref);
 		        	Keymap keymap;
-		        	keymap.LoadSourceFromRef(ref);
-
-		        	keymap.SaveAsHeader(outputRef);
+		        	if (keymap.LoadSourceFromRef(ref)!=B_OK) {
+					printf("error when loading the keymap\n");
+					return 1;
+				}
+				keymap.Dump();
+		       	 	keymap.SaveAsHeader(outputRef);
 		        	return 0;
             		} else 
 				break;

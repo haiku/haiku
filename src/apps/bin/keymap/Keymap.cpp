@@ -664,6 +664,9 @@ Keymap::LoadSource(FILE * f)
 	}
 	
 	fCharsSize = offset;
+
+	if (fKeys.version != 3)
+		return B_ERROR;
 	
 	return B_OK;
 }
