@@ -18,9 +18,7 @@
 
 int
 raise(int sig)
-{
-	thread_id tid = sys_get_current_thread_id();
-	
-	return sys_send_signal(tid, sig);
+{	
+	return sys_send_signal(find_thread(NULL), sig);
 }
 
