@@ -511,8 +511,7 @@ team_create_team2(void *args)
 	// create an initial primary stack region
 
 	// ToDo: make ENV_SIZE variable?
-	// ToDo: when B_BASE_ADDRESS is implemented, we could just allocate the stack from
-	//		the bottom of the USER_STACK_REGION.
+	// ToDo: we could reserve the whole USER_STACK_REGION upfront...
 
 	totalSize = PAGE_ALIGN(MAIN_THREAD_STACK_SIZE + TLS_SIZE + ENV_SIZE +
 		get_arguments_data_size(teamArgs->args, teamArgs->argc));
@@ -523,7 +522,7 @@ team_create_team2(void *args)
 	t->user_stack_region_id = create_area_etc(team, ustack_name, (void **)&t->user_stack_base,
 		B_EXACT_ADDRESS, totalSize, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
 	if (t->user_stack_region_id < 0) {
-		panic("team_create_team2: could not create default user stack region\n");
+		dprintf("team_create_team2: could not create default user stack region\n");
 		return t->user_stack_region_id;
 	}
 
@@ -570,15 +569,18 @@ team_create_team2(void *args)
 	path = teamArgs->path;
 	TRACE(("team_create_team2: loading elf binary '%s'\n", path));
 
+	// ToDo: don't use fixed paths!
 	err = elf_load_user_image("/boot/beos/system/lib/rld.so", team, 0, &entry);
-	if (err < 0) {
-		// XXX clean up team
-		return err;
-	}
 
 	// free the args
 	free(teamArgs->path);
 	free(teamArgs);
+
+	if (err < 0) {
+		// Luckily, we don't have to clean up the mess we created - that's
+		// done for us by the normal team deletion process
+		return err;
+	}
 
 	TRACE(("team_create_team2: loaded elf. entry = 0x%lx\n", entry));
 
