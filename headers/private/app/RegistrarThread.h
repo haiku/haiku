@@ -38,7 +38,7 @@ private:
 	static int32 EntryFunction(void *data);
 
 	status_t fStatus;
-	thread_id fId;		// Initially -1, to be set prior to thread execution and neverafter changed
+	thread_id fId;		
 	char fName[B_OS_NAME_LENGTH];
 };
 
