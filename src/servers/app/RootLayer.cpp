@@ -110,7 +110,8 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 		return;
 	
 	// Spawn our working thread
-	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
+//	fThreadID = spawn_thread(WorkingThread, name, B_REAL_TIME_DISPLAY_PRIORITY, this);
+	fThreadID = spawn_thread(WorkingThread, name, B_DISPLAY_PRIORITY, this);
 }
 
 RootLayer::~RootLayer()
