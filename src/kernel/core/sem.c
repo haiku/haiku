@@ -456,6 +456,9 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 			goto err;
 		}
 
+		if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) == 0)
+			timeout = B_INFINITE_TIMEOUT;
+
 		t->next_state = B_THREAD_WAITING;
 		t->sem.flags = flags;
 		t->sem.blocking = id;
@@ -465,7 +468,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		t->sem.acquire_status = B_NO_ERROR;
 		thread_enqueue(t, &sSems[slot].u.used.q);
 
-		if ((flags & (B_RELATIVE_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
+		if (timeout != B_INFINITE_TIMEOUT) {
 			TRACE(("sem_acquire_etc: setting timeout sem for %Ld usecs, semid %d, tid %d\n",
 				timeout, id, t->id));
 
@@ -505,7 +508,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 		scheduler_reschedule();
 		RELEASE_THREAD_LOCK();
 
-		if ((flags & (B_TIMEOUT | B_ABSOLUTE_TIMEOUT)) != 0) {
+		if (timeout != B_INFINITE_TIMEOUT) {
 			if (t->sem.acquire_status != B_TIMED_OUT) {
 				// cancel the timer event, the sem may have been deleted or interrupted
 				// with the timer still active
