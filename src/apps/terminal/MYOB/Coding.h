@@ -34,6 +34,7 @@
 #include <UTF8.h>
 
 enum {
+  M_UTF8,	  /* UTF-8 */
   M_ISO_8859_1,  /* ISO-8859 */
   M_ISO_8859_2,
   M_ISO_8859_3,
@@ -50,7 +51,7 @@ enum {
   M_ISO_2022_JP,
   M_SJIS,	/* Japanese */
   M_EUC_JP,
-  M_EUC_KR,
+  M_EUC_KR
   
   //  M_EUC_TW,	/* Chinese */
   //  M_BIG5,
@@ -59,10 +60,10 @@ enum {
   //  M_EUC_KR,	/* Koeran */
   //  M_ISO_2022_KR,
 
-  M_UTF8	  /* UTF-8 */
 };
 
 const uint32 coding_translation_table[] = {
+  0,
   B_ISO1_CONVERSION,				/* ISO 8859-1 */
   B_ISO2_CONVERSION,				/* ISO 8859-2 */
   B_ISO3_CONVERSION,				/* ISO 8859-3 */
@@ -93,6 +94,7 @@ struct etable
  */
 const etable encoding_table[]=
 {
+  {"UTF-8", "UTF8", 'U', M_UTF8},
   {"ISO-8859-1", "8859-1", '1', M_ISO_8859_1},
   {"ISO-8859-2", "8859-2", '2', M_ISO_8859_2},
   {"ISO-8859-3", "8859-3", '3', M_ISO_8859_3},
@@ -108,7 +110,6 @@ const etable encoding_table[]=
   {"Shift-JIS", "SJIS", 'S', M_SJIS},
   {"EUC-jp", "EUCJ", 'E', M_EUC_JP},
   {"EUC-kr", "EUCK", 'K', M_EUC_KR},
-  {"UTF-8", "UTF8", 'U', M_UTF8},
 
   /* Not Implement.
   {"EUC-tw", "EUCT", "T", M_EUC_TW},

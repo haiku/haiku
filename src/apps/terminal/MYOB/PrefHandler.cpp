@@ -38,7 +38,48 @@
 #include <Entry.h>
 #include <NodeInfo.h>
 
+#include "Coding.h"
 #include "PrefHandler.h"
+#include "TermConst.h"
+
+/*
+ * Startup preference settings.
+   */
+const prefDefaults  termDefaults[] ={
+  { PREF_COLS,			"80" },
+  { PREF_ROWS,			"25" },
+
+  { PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
+  { PREF_HALF_FONT_SIZE,	"12" },
+  { PREF_FULL_FONT_FAMILY,	"Haru Tohaba" },
+  { PREF_FULL_FONT_SIZE,	"12" },
+
+  { PREF_TEXT_FORE_COLOR,	"  0,   0,   0" },
+  { PREF_TEXT_BACK_COLOR,	"255, 255, 255" },
+  { PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
+  { PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
+  { PREF_CURSOR_FORE_COLOR,	"255, 255, 255" },
+  { PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
+
+  { PREF_IM_FORE_COLOR,		"  0,   0,   0" },
+  { PREF_IM_BACK_COLOR,		"152, 203, 255" },
+  { PREF_IM_SELECT_COLOR,	"255, 152, 152" },
+
+  { PREF_SHELL,			"/bin/sh -login" },
+  { PREF_HISTORY_SIZE,		"500" },
+
+  { PREF_TEXT_ENCODING,		"UTF-8" },
+
+  { PREF_SELECT_MBUTTON,	"Button 1"},
+  { PREF_PASTE_MBUTTON,		"Button 2"},
+  { PREF_SUBMENU_MBUTTON,	"Button 3"},
+  { PREF_MOUSE_IMAGE,		"Hand cursor"},
+  { PREF_DRAGN_COPY,		"0"},
+
+  { PREF_GUI_LANGUAGE,		"English"},
+  { PREF_IM_AWARE,		"0"},
+  { NULL, NULL},
+};
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -47,6 +88,7 @@
 PrefHandler::PrefHandler()
 {
   mPrefContainer.what = 'Pref';
+  OpenText(TERM_PREF, termDefaults);
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -155,12 +197,11 @@ PrefHandler::getString(const char *key)
 {
   const char *buf;
 
-  buf = mPrefContainer.FindString(key);
-  if (buf == NULL)
+  if (mPrefContainer.FindString(key, &buf) != B_OK)
     buf = "Error!";
 
+  //printf("%x GET %s: %s\n", this, key, buf);
   return buf;
-  
 }
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -232,6 +273,7 @@ PrefHandler::setBool(const char *key, bool data)
 void
 PrefHandler::setString(const char *key, const char *data)
 {
+  //printf("%x SET %s: %s\n", this, key, data);
   mPrefContainer.RemoveName(key);
   mPrefContainer.AddString(key, data);
 }
@@ -263,9 +305,40 @@ PrefHandler::IsEmpty() const
 status_t
 PrefHandler::loadFromFile(BEntry *ent)
 {
+  // Future: It would be nice if we could simply use a flatened BMessage to
+  // save the settings. (Who cares about compatibility in this case anyway?)
+
   BFile file (ent, B_READ_ONLY);
-  mPrefContainer.MakeEmpty();
-  return mPrefContainer.Unflatten(&file);
+  //mPrefContainer.MakeEmpty();
+  //mPrefContainer.Unflatten(&file);
+  off_t size;
+  if (file.GetSize(&size) != B_OK || size != sizeof(struct termprefs))
+    return B_ERROR;
+
+  struct termprefs prefs;
+  file.Read(&prefs, size);
+  if (prefs.magic != TP_MAGIC || prefs.version != TP_VERSION)
+    return B_ERROR;
+
+  //Valid settings file!
+  setInt32(PREF_COLS, prefs.cols);
+  setInt32(PREF_ROWS, prefs.rows);
+  setInt32(PREF_HALF_FONT_SIZE, prefs.font_size);
+  setInt32(PREF_FULL_FONT_SIZE, prefs.font_size);
+  char *font_family = strtok(prefs.font, "/");
+  char *font_style = strtok(NULL, "");
+  setString(PREF_FULL_FONT_FAMILY, font_family);
+  setString(PREF_FULL_FONT_STYLE, font_style);
+  setString(PREF_HALF_FONT_FAMILY, font_family);
+  setString(PREF_HALF_FONT_STYLE, font_style);
+  setRGB(PREF_TEXT_BACK_COLOR, prefs.bg);
+  setRGB(PREF_TEXT_FORE_COLOR, prefs.fg);
+  setRGB(PREF_CURSOR_BACK_COLOR, prefs.curbg);
+  setRGB(PREF_CURSOR_FORE_COLOR, prefs.curfg);
+  setRGB(PREF_SELECT_BACK_COLOR, prefs.selbg);
+  setRGB(PREF_SELECT_FORE_COLOR, prefs.selfg);
+  setString(PREF_TEXT_ENCODING, encoding_table[prefs.encoding].name);
+  return B_OK;
 }
 /////////////////////////////////////////////////////////////////////////////
 //

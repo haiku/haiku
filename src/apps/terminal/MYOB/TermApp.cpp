@@ -89,7 +89,7 @@ TermApp::TermApp (void)
   fAboutPanel = NULL;
   fTermFrame.Set(k, l, k + 50, k + 50);
 
-  gTermPref = new PrefHandler ();
+  gTermPref = new PrefHandler();
 
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -102,45 +102,7 @@ TermApp::~TermApp (void)
   
 }
 
-/*
- * Startup preference settings.
-   */
-const prefDefaults  termDefaults[] ={
-  { PREF_COLS,			"80" },
-  { PREF_ROWS,			"25" },
 
-  { PREF_HALF_FONT_FAMILY,	"Courier10 BT" },
-  { PREF_HALF_FONT_SIZE,	"12" },
-  { PREF_FULL_FONT_FAMILY,	"Haru Tohaba" },
-  { PREF_FULL_FONT_SIZE,	"12" },
-
-  { PREF_TEXT_FORE_COLOR,	"  0,   0,   0" },
-  { PREF_TEXT_BACK_COLOR,	"255, 255, 255" },
-  { PREF_SELECT_FORE_COLOR,	"255, 255, 255" },
-  { PREF_SELECT_BACK_COLOR,	"  0,   0,   0" },
-  { PREF_CURSOR_FORE_COLOR,	"255, 255, 255" },
-  { PREF_CURSOR_BACK_COLOR,	"  0,   0,   0" },
-
-  { PREF_IM_FORE_COLOR,		"  0,   0,   0" },
-  { PREF_IM_BACK_COLOR,		"152, 203, 255" },
-  { PREF_IM_SELECT_COLOR,	"255, 152, 152" },
-
-  { PREF_SHELL,			"/bin/sh -login" },
-  { PREF_HISTORY_SIZE,		"500" },
-
-  { PREF_TEXT_ENCODING,		"UTF-8" },
-
-  { PREF_SELECT_MBUTTON,	"Button 1"},
-  { PREF_PASTE_MBUTTON,		"Button 2"},
-  { PREF_SUBMENU_MBUTTON,	"Button 3"},
-  { PREF_MOUSE_IMAGE,		"Hand cursor"},
-  { PREF_DRAGN_COPY,		"0"},
-
-  { PREF_GUI_LANGUAGE,		"English"},
-  { PREF_IM_AWARE,		"0"},
-  { NULL, NULL},
-};
- 
 ////////////////////////////////////////////////////////////////////////////
 //
 //
@@ -155,11 +117,6 @@ TermApp::ReadyToRun (void)
   const char *encoding;
   int rows, cols;
 
-  // gTermPref is not empty when App opened by pref file
-  if (gTermPref->IsEmpty()){
-    gTermPref->OpenText(TERM_PREF, termDefaults);
-  }
-  
   encoding = gTermPref->getString (PREF_TEXT_ENCODING);
 
   /* Get encoding name (setenv TTYPE in spawn_shell functions). */
@@ -176,11 +133,6 @@ TermApp::ReadyToRun (void)
     command = CommandLine.String();
   }else{
   command = gTermPref->getString (PREF_SHELL);
-  }
-
-  if (geometry_requested) {
-    gTermPref->setInt32 (PREF_ROWS, fRows);
-    gTermPref->setInt32 (PREF_COLS, fCols);
   }
 
   rows = gTermPref->getInt32 (PREF_ROWS);
@@ -226,7 +178,7 @@ TermApp::MessageReceived (BMessage* msg)
 {
   switch(msg->what) {
   case MENU_NEW_TREM:
-    this->RunNewTerm ();
+    this->RunNewTerm();
     break;
 
   case MENU_SWITCH_TERM:
@@ -303,7 +255,7 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 
     /* Load preference file. */
     if (argmatch (argv, argc, "-p", "--preference", 4, &value, &skip_args)) {
-      gTermPref->OpenText(value);
+      gTermPref->Open(value);
     }
       
 
@@ -325,8 +277,9 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 	usage_requested = true;
 	this->PostMessage (B_QUIT_REQUESTED);
       }
-      fCols = width;
-      fRows = height;
+      gTermPref->setInt32 (PREF_COLS, width);
+      gTermPref->setInt32 (PREF_ROWS, height);
+
       fTermFrame.Set(xpos, ypos, xpos + 50, ypos + 50);
       geometry_requested = true;
     }
@@ -354,15 +307,11 @@ TermApp::ArgvReceived(int32 argc, char **argv)
 		    standard_args[i].longname,
 		    9, &value, &skip_args)) {
 
-	if (text_to_rgb (value, &color, buffer)) {
-	  if (gTermPref->IsEmpty()){
-	    gTermPref->OpenText(TERM_PREF, termDefaults);
-	  }
-	  gTermPref->setRGB (standard_args[i].prefname, color);
-	}
-	else {
-	  fprintf (stderr, "%s: invalid color string -- %s\n", argv[0], value);
-	}
+        if (text_to_rgb (value, &color, buffer)) {
+	      gTermPref->setRGB (standard_args[i].prefname, color);
+	    } else {
+	      fprintf (stderr, "%s: invalid color string -- %s\n", argv[0], value);
+        }
       }
     }
 

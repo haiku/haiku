@@ -35,6 +35,32 @@
 #include <GraphicsDefs.h>
 #include <Message.h>
 
+#define TP_MAGIC 0xf1f2f3f4
+#define TP_VERSION 0x02
+#define TP_FONT_NAME_SZ 128
+
+struct termprefs {
+        uint32 magic;
+        uint32 version;
+        float x;
+        float y;
+        uint32 cols;
+        uint32 rows;
+        uint32 tab_width;
+        uint32 font_size;
+        char font[TP_FONT_NAME_SZ]; // "Family/Style"
+        uint32 cursor_blink_rate; // blinktime in µs = 1000000
+        uint32 refresh_rate; // ??? = 0
+        rgb_color bg;
+        rgb_color fg;
+        rgb_color curbg;
+        rgb_color curfg;
+        rgb_color selbg;
+        rgb_color selfg;
+        char encoding; // index in the menu (0 = UTF-8)
+        char unknown[3];
+};
+
 struct prefDefaults
 {
   const char *key;

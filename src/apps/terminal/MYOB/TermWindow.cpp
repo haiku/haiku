@@ -62,7 +62,7 @@
 #include "ColorWindow.h"
 #include "AboutWindow.h"
 
-// Gloval Preference Handler
+// Global Preference Handler
 extern PrefHandler *gTermPref;
 //
 // help and GPL URL
