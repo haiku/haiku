@@ -302,8 +302,10 @@ Volume::_Unset()
 {
 	DEBUG_INIT("Volume");
 	fId = 0;
-	if (fDevice >= 0)
+	if (fDevice >= 0) {
+		remove_cached_device_blocks(fDevice, NO_WRITES);	
 		close(fDevice);
+	}
 	fDevice = -1;
 	fMounted = false;
 	fOffset = 0;
