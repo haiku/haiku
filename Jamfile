@@ -50,11 +50,12 @@ Depends MediaKit :
 	avi_reader
 	mp3_decoder
 	mp3_reader
+	musepack
 	ogg
-	raw_decoder 
+	raw_decoder
+	speex
 	vorbis
 	wav_reader
-	xvid_decoder
 ;
 
 SubInclude OBOS_TOP src ;
