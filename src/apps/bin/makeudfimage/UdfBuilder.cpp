@@ -215,9 +215,9 @@ UdfBuilder::Build()
 //	Udf::extent_address rootDirentExtent;	
 	
 		
-	_OutputFile().Seek(0, SEEK_SET);		
-	_PrintUpdate(VERBOSITY_LOW, "Output file: `%s'", fOutputFilename.c_str());		
-
+	_OutputFile().Seek(0, SEEK_SET);
+	fListener.OnStart(fRootDirectoryName.c_str(), fOutputFilename.c_str(),
+	                  _UdfVolumeName().Utf8());
 
 	_PrintUpdate(VERBOSITY_LOW, "Initializing volume");
 
