@@ -284,7 +284,11 @@ out:
 	TRACE(("kmalloc: asked to allocate size %d, returning ptr = %p\n", size, address));
 
 #if PARANOID_KMALLOC
-	memset(address,0xCC,size);
+	memset(address, 0xCC, size);
+#endif
+
+#if PARANOID_POINTER_CHECK
+	ptrchecklist_store(address);
 #endif
 
 #if USE_WALL
@@ -302,10 +306,6 @@ out:
 		wall[0] = 0xabadcafe;
 		wall[1] = 0xabadcafe;
 	}
-#endif
-
-#if PARANOID_POINTER_CHECK
-	ptrchecklist_store(address);
 #endif
 
 	return address;
