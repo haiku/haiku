@@ -90,7 +90,7 @@ main(int32 argc, const char **argv)
 
 	// Parse command-line arguments.
 	int32 opt;
-	while ((opt = getopt(argc, argv, "ave:")) != -1) {
+	while ((opt = getopt(argc, argv, "eav:")) != -1) {
 		switch(opt) {
 		case 'a':
 			o_all_volumes = true;
