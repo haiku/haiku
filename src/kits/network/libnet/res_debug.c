@@ -91,6 +91,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#undef h_errno
+	// was defined by netdb.h
+
 extern const char *_res_opcodes[];
 extern const char *_res_resultcodes[];
 

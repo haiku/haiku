@@ -52,6 +52,9 @@
 #include <string.h>
 #include <stddef.h>
 
+#undef h_errno
+	// was defined by netdb.h
+
 static const struct afd {
 	int a_af;
 	int a_addrlen;

@@ -75,7 +75,9 @@
 #endif
 
 const char *hostalias (const char *);
-int h_errno;
+#undef h_errno
+	// was defined by netdb.h
+int h_errno = 0;
 extern int res_opt (int, u_char *, int, int);
 
 /*

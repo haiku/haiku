@@ -64,6 +64,9 @@
 #include <resolv.h>
 #include <string.h>
 
+#undef h_errno
+	// was defined by netdb.h
+
 /*
  * Form all types of queries.
  * Returns the size of the result or -1.
