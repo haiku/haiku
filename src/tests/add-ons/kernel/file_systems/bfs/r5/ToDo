@@ -1,0 +1,84 @@
+BFS - ToDo, May 26th, 2003
+-----
+
+BlockAllocator
+
+ - the BlockAllocator is only slightly optimized and probably slow
+ - the first free and the largest range are currently not correctly maintained (only efficiency suffers - it does work correctly)
+ - the allocation policies will have to stand against some real world tests
+ - the access to the block bitmap is currently managed using a global lock (doesn't matter as long as transactions are serialized)
+
+
+DataStream
+
+ - only files are trimmed back (in bfs_close()), but every inode has a preallocated stream...
+ - Inode::GrowStream(): merging of block_runs doesn't work between range/block boundaries
+ - check the array block size in BFS for different block sizes
+
+
+Queries
+
+ - There shouldn't be any cases where you can speed up a query with reordering the query expression - test it
+ - Check permissions of the parent directories
+ - Add protection against crashing applications which had a query open - at least the original BeOS kernel does not free the cookie (which throws some memory away *and* prevents unmounting the disk), but that won't be needed for OpenBeOS
+ - the query set for "!=" and last_modified/size is not the same as for "="; last_modified/size don't contain directories
+ - check if the query has to be checked for a live update
+ - accept hex values 0x...
+
+
+Journal
+
+ - Check if there are any standard and often-happening cases for a transaction to fail, and if so, start the transaction only when necessary
+ - if the system crashes between bfs_unlink() and bfs_remove_vnode(), the inode can be removed from the tree, but its memory is still allocated - this can happen if the inode is still in use by someone (and that's what the "chkbfs" utility is for, mainly).
+ - add delayed index updating (+ delete actions to solve the issue above)
+ - multiple log files, parallel transactions? (note that parallel transactions would require more locking to be done)
+ - variable sized log file
+ - as long as we have a fixed-sized log file, it should be possible to reserve space for a transaction to be able to decide if batching it is possible
+
+
+BPlusTree
+
+ - BPlusTree::Remove() could trigger CachedNode::Free() to go through the free nodes list and free all pages at the end of the data stream
+ - BPlusTree::Remove() could let the tree shrink (simple kind of reorganization)
+ - updating the TreeIterators doesn't work yet for duplicates (which may be a problem if a duplicate node will go away after a remove)
+ - BPlusTree::RemoveDuplicate() could merge the contents of duplicate node with only a few entries to save some space (right now, only empty nodes are freed)
+
+
+Inode
+
+ - exchange Inode::OldLastModified() with Inode::NewLastModified(), and don't change the last_modified field directly in Inode::WriteAt() for consistency in case of a crash
+ - the size is only updated in bfs_close() - but if the system crashes before, the entry in the size index doesn't match the one in the inode anymore - it would be better to let the data.size not reflect the real file size in this case (since the max_xxx_range entries are always correct)
+ - Inode::FillGapWithZeros() currently disabled; apart from being slow, it really shouldn't be executed while a transaction is running, because that stops all other threads from doing anything (which can be a long time for a 100 MB file)
+ - need better locking mechanism in combination with B+trees etc.!
+
+
+Indices
+
+ - consider Index::UpdateLastModified() writing back the updated inode
+ - clearing up Index::Update() and live query update (seems to be a bit confusing right now)
+ - investigate adding an index cache to improve performance
+
+Attributes
+
+ - Inode::WriteAttribute() doesn't check if the attribute data may fit into the small_data region if there already is that attribute as an attribute file
+ - for indices, we could get the old data from there when doing a query update
+
+
+Volume
+
+
+kernel_interface
+
+ - missing functions, maybe they are not really needed: bfs_rename_attr(), bfs_rename_index(), bfs_initialize(), bfs_link()
+ - bfs_rename() currently doesn't respect any permissions
+
+
+general stuff
+
+ - There are also some comments with a leading "ToDo:" directly in the code which may not be mentioned here.
+ - implement mkbfs (try to do it in OpenBeOS style directly - only write the super block from user space)
+
+
+-----
+Axel Dörfler
+axeld@pinc-software.de
