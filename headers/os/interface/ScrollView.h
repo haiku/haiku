@@ -15,7 +15,7 @@
 class BScrollView : public BView {
 	public:
 		BScrollView(const char *name, BView *target,
-			uint32 resizeMask = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+			uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
 			uint32 flags = 0, bool horizontal = false, bool vertical = false,
 			border_style border = B_FANCY_BORDER);
 		BScrollView(BMessage *archive);
@@ -75,6 +75,7 @@ class BScrollView : public BView {
 		BScrollView			&operator=(const BScrollView &);
 
 		static BRect		CalcFrame(BView *target, bool h, bool v, border_style);
+		static float		BorderSize(border_style border);
 		static int32		ModifyFlags(int32 flags, border_style);
 
 		BView				*fTarget;
