@@ -4,7 +4,7 @@ if $(COMPILE_FOR_R5) {
 	SubDirCcFlags -DCOMPILE_FOR_R5 ;
 }
 
-UsePrivateHeaders input ;
+UsePrivateHeaders input kernel ;
 
 KernelObjects
 	ps2mouse.c
