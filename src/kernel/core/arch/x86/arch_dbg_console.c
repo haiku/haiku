@@ -10,11 +10,13 @@
 #include <arch/cpu.h>
 #include <arch/dbg_console.h>
 
+#include <arch/bochs_hack.h>
+
 #include <stage2.h>
 
 #include <string.h>
 
-#define BOCHS_E9_HACK 0
+//#define BOCHS_E9_HACK 0
 
 // Select between COM1 and COM2 for debug output
 #define USE_COM1 1
