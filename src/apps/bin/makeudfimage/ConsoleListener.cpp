@@ -34,13 +34,17 @@ ConsoleListener::ConsoleListener(VerbosityLevel level)
 
 void
 ConsoleListener::OnStart(const char *sourceDirectory, const char *outputFile,
-	                     const char *udfVolumeName) const
+	                     const char *udfVolumeName, uint16 udfRevision) const
 {
 	if (Level() > VERBOSITY_NONE) {
 		printf("%s\n", kDivider);
 		printf("Source directory: `%s'\n", sourceDirectory);
 		printf("Output file:      `%s'\n", outputFile);
 		printf("UDF Volume Name:  `%s'\n", udfVolumeName);
+		printf("UDF Revision:     %01x.%01x%01x\n",
+		                          (udfRevision & 0x0f00) >> 8,
+		                          (udfRevision & 0x00f0) >> 4,
+		                          (udfRevision & 0x000f));
 		printf("%s\n", kDivider);
 	}
 }
@@ -82,12 +86,20 @@ ConsoleListener::OnCompletion(status_t result, const Statistics &statistics) con
 {
 	if (Level() > VERBOSITY_NONE) {
 		if (result == B_OK) {
+			uint64 directories = statistics.Directories();
+			uint64 files = statistics.Files();
+			uint64 symlinks = statistics.Symlinks();
 			printf("Finished\n");
 			printf("- Build time:  %s\n", statistics.ElapsedTimeString().c_str());
-			printf("- Directories: %Ld directories in %s\n",
-			       statistics.Directories(), statistics.DirectoryBytesString().c_str());
-			printf("- Files:       %Ld files in %s\n",
-			       statistics.Files(), statistics.FileBytesString().c_str());
+			printf("- Directories: %Ld director%s in %s\n",
+			       directories, directories == 1 ? "y" : "ies",
+			       statistics.DirectoryBytesString().c_str());
+			printf("- Files:       %Ld file%s in %s\n",
+			       files, files == 1 ? "" : "s",
+			       statistics.FileBytesString().c_str());
+			if (symlinks > 0)
+				printf("- Symlinks:    No symlink support yet; %Ld symlink%s ommitted\n", symlinks,
+				       symlinks == 1 ? "" : "s");
 			printf("- Image size:  %s\n", statistics.ImageSizeString().c_str());
 		} else {
 			printf("----------------------------------------------------------------------\n");

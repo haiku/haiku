@@ -20,7 +20,7 @@ class ConsoleListener : public ProgressListener {
 public:
 	ConsoleListener(VerbosityLevel level);
 	virtual void OnStart(const char *sourceDirectory, const char *outputFile,
-	                     const char *udfVolumeName) const;
+	                     const char *udfVolumeName, uint16 udfRevision) const;
 	virtual void OnError(const char *message) const;
 	virtual void OnWarning(const char *message) const;
 	virtual void OnUpdate(VerbosityLevel level, const char *message) const;
