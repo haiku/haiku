@@ -12,27 +12,21 @@
 
 PictureData::PictureData(BFile *file)
 {
-	off_t offset;
-	uchar dummy[40];
-
 	DBGMSG(("construct PictureData\n"));
 	DBGMSG(("1: current seek position = 0x%x\n", (int)file->Position()));
 
-	file->Read(&offset, sizeof(offset));
-	file->Read(dummy,   sizeof(dummy));
 	file->Read(&point,  sizeof(BPoint));
 	file->Read(&rect,   sizeof(BRect));
 
 	picture = new BPicture();
 
-	DBGMSG(("next picture position = 0x%x\n", (int)offset));
 	DBGMSG(("picture_data::point = %f, %f\n", point.x, point.y));
 	DBGMSG(("picture_data::rect = %f, %f, %f, %f\n",
 		rect.left, rect.top, rect.right, rect.bottom));
 	DBGMSG(("2: current seek position = 0x%x\n", (int)file->Position()));
 
 	picture->Unflatten(file);
-
+	
 	DBGMSG(("3: current seek position = 0x%x\n", (int)file->Position()));
 }
 
@@ -62,15 +56,17 @@ PageData::PageData(BFile *file, bool reverse)
 		DBGMSG(("picture_count = %d\n", (int)__picture_count));
 		__offset = __file->Position();
 		off_t o = __offset;
-		for (long i = 0; i < __picture_count; i++) {
-			__file->Read(&o, sizeof(o));
-			__file->Seek(o, SEEK_SET);
-		}
+		// seek to start of next page
+		__file->Read(&o, sizeof(o));
+		__file->Seek(o, SEEK_SET);
 	}
 }
 
 bool PageData::startEnum()
 {
+	off_t offset;
+	uchar dummy[40];
+
 	if (__hollow)
 		return false;
 
@@ -81,6 +77,8 @@ bool PageData::startEnum()
 	} else {
 		__file->Seek(__offset, SEEK_SET);
 	}
+	// skip page header
+	__file->Seek(sizeof(offset) + sizeof(dummy), SEEK_CUR);
 
 	__rest = __picture_count;
 	return __picture_count > 0;
