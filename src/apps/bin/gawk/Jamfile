@@ -1,0 +1,23 @@
+SubDir OBOS_TOP src apps bin gawk ;
+
+SubDirCcFlags -DDEFPATH='\".:/share/awk\"' -DHAVE_CONFIG_H -DGAWK -DLOCALEDIR='\"/share/locale\"' ;
+
+SubDirHdrs [ FDirName $(SUBDIR) intl ] ;
+
+BinCommand gawk :
+	array.c awkgram.c builtin.c ext.c field.c
+	gawkmisc.c getopt.c getopt1.c io.c
+	main.c msg.c node.c random.c re.c
+	regex.c replace.c version.c eval.c profile.c
+	:  libintl.a
+	: gawk.rdef ;
+
+BinCommand pgawk :
+	array.c awkgram.c builtin.c ext.c field.c
+	gawkmisc.c getopt.c getopt1.c io.c
+	main.c msg.c node.c random.c re.c
+	regex.c replace.c version.c eval_p.c profile_p.c
+	:  libintl.a
+	: gawk.rdef ;
+
+SubInclude OBOS_TOP src apps bin gawk intl ;
