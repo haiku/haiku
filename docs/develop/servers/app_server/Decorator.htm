@@ -29,10 +29,10 @@
 Member Functions</P>
 <P class="Body" style="margin: 0px"><BR>
 </P>
-<TABLE WIDTH=617 HEIGHT=270 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+<TABLE WIDTH=463 HEIGHT=208 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=203 HEIGHT=32>
-			<P class="Body" style="margin: 0px">Decorator(SRect int32 wlook, int32 wfeel, int32 wflags)</P>
+			<P class="Body" style="margin: 0px">Decorator(BRect int32 wlook, int32 wfeel, int32 wflags)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=32>
 			<P class="Body" style="margin: 0px">~Decorator(void)</P>
@@ -95,10 +95,10 @@ Member Functions</P>
 			</TD>
 	</TR>
 	<TR>
-		<TD WIDTH=203 HEIGHT=17>
+		<TD WIDTH=203 HEIGHT=22>
 			<P class="Body" style="margin: 0px">void SetTitle(const char *string)</P>
 			</TD>
-		<TD WIDTH=260 HEIGHT=17>
+		<TD WIDTH=260 HEIGHT=22>
 			<P class="Body" style="margin: 0px">void SetFont(SFont *sf)</P>
 			</TD>
 	</TR>
@@ -131,7 +131,7 @@ Virtual Functions</P>
 			<P class="Body" style="margin: 0px">void MoveBy(float x, float y)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void MoveBy(SPoint pt)</P>
+			<P class="Body" style="margin: 0px">void MoveBy(BPoint pt)</P>
 			</TD>
 	</TR>
 	<TR>
@@ -139,12 +139,12 @@ Virtual Functions</P>
 			<P class="Body" style="margin: 0px">void ResizeBy(float x, float y)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void ResizeBy(SPoint pt)</P>
+			<P class="Body" style="margin: 0px">void ResizeBy(BPoint pt)</P>
 			</TD>
 	</TR>
 	<TR>
 		<TD WIDTH=203 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void Draw(SRect r)</P>
+			<P class="Body" style="margin: 0px">void Draw(BRect r)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
 			<P class="Body" style="margin: 0px">void Draw(void)</P>
@@ -176,26 +176,26 @@ Virtual Functions</P>
 	</TR>
 	<TR>
 		<TD WIDTH=203 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _DrawClose(SRect r)</P>
+			<P class="Body" style="margin: 0px">void _DrawClose(BRect r)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _DrawFrame(SRect r)</P>
+			<P class="Body" style="margin: 0px">void _DrawFrame(BRect r)</P>
 			</TD>
 	</TR>
 	<TR>
 		<TD WIDTH=203 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _DrawMinimize(SRect r)</P>
+			<P class="Body" style="margin: 0px">void _DrawMinimize(BRect r)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _DrawTab(SRect r)</P>
+			<P class="Body" style="margin: 0px">void _DrawTab(BRect r)</P>
 			</TD>
 	</TR>
 	<TR>
 		<TD WIDTH=203 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _DrawTitle(SRect r)</P>
+			<P class="Body" style="margin: 0px">void _DrawTitle(BRect r)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=17>
-			<P class="Body" style="margin: 0px">void _DrawZoom(SRect r)</P>
+			<P class="Body" style="margin: 0px">void _DrawZoom(BRect r)</P>
 			</TD>
 	</TR>
 	<TR>
@@ -203,7 +203,7 @@ Virtual Functions</P>
 			<P class="Body" style="margin: 0px">SRegion GetFootprint(void)</P>
 			</TD>
 		<TD WIDTH=260 HEIGHT=32>
-			<P class="Body" style="margin: 0px">click_type Clicked(SPoint pt, int32 buttons, int32 modifiers)</P>
+			<P class="Body" style="margin: 0px">click_type Clicked(BPoint pt, int32 buttons, int32 modifiers)</P>
 			</TD>
 	</TR>
 	<TR>
@@ -221,7 +221,7 @@ _ Indicates a protected member function</P>
 <P class="Body" style="margin: 0px"><BR>
 Exported C Functions</P>
 <P class="Body" style="margin: 0px"><BR>
-Decorator *create_decorator(SRect frame, int32 wlook, int32 wfeel, int32 wflags)</P>
+Decorator *create_decorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags)</P>
 <P class="Body" style="margin: 0px">float get_decorator_version(void)</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
@@ -249,7 +249,7 @@ click_type {</P>
 <P class="Body" style="margin: 0px"><BR>
 <HR>
 </P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">Decorator(SRect int32 wlook, int32 wfeel, int32 wflags)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">Decorator(BRect int32 wlook, int32 wfeel, int32 wflags)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Sets up internal variables common to all decorators.</P>
 <P class="Body" style="margin: 0px"><BR>
@@ -306,48 +306,48 @@ Returns the focus state held by the decorator</P>
 Most of these functions have a default behavior which can be overridden, but are implemented to handle the more common implementations.</P>
 <P class="Body" style="margin: 0px"><BR>
 <span class="OBOS-Function-Def">void MoveBy(float x, float y)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void MoveBy(SPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void MoveBy(BPoint pt)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Move all member rectangles of Decorator by the specified amount. </P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">void ResizeBy(float x, float y)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void ResizeBy(SPoint pt)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void ResizeBy(BPoint pt)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Resize the client frame, window frame, and the tab frame (width only) by the specified amount. Button rectangles - close, minimize, and zoom - are not modified.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
-<span class="OBOS-Function-Def">void Draw(SRect r)</span></P>
+<span class="OBOS-Function-Def">void Draw(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void Draw(void)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Main drawing call which checks the intersection of the rectangle passed to it and draws all items which intersect it. Draw(void) simply performs drawing calls to draw the entire decorator's footprint area.</P>
 <P class="Body" style="margin: 0px"><BR>
-1) Check for intersection with SRect which encompasses the decorator's footprint and return if no intersection.</P>
+1) Check for intersection with BRect which encompasses the decorator's footprint and return if no intersection.</P>
 <P class="Body" style="margin: 0px">2) Call _DrawFrame(intersection)</P>
 <P class="Body" style="margin: 0px">3) Call _DrawTab(intersection)</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">void DrawClose(void)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawClose(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawClose(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawMinimize(void)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawMinimize(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawMinimize(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void DrawZoom(void)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawZoom(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawZoom(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Each of these is designed to utilize their respective button rectangles. The public (void) versions simply call the internal protected ones with the button rectangle. These protected versions are, by default, empty. The rectangle passed to them is the invalid area to be drawn, which is not necessarily the entire button's rectangle.</P>
 <P class="Body" style="margin: 0px"><BR>
 <span class="OBOS-Function-Def">void DrawFrame(void)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawFrame(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawFrame(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Draws the frame, if any. The public version amounts to _DrawFrame(framerect). The protected version is expected to not cover up the client frame when drawing. Any drawing within the clientrect member will end up being drawn over by the window's child views.</P>
 <P class="Body" style="margin: 0px"><BR>
 <span class="OBOS-Function-Def">void DrawTab(void)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTab(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTab(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Draws the window's tab, if any. DrawTab() amounts to _DrawTab(tabrect). If window titles are displayed, the _DrawTitle call is expected to be made here. Button-drawing calls, assuming that a window's buttons are in the tab, should be made here, as well.</P>
 <P class="Body" style="margin: 0px"><BR>
 <span class="OBOS-Function-Def">void DrawTitle(void)</span></P>
-<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTitle(SRect r)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">protected: void _DrawTitle(BRect r)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 These cause the window's title to be drawn. DrawTitle() amounts to _DrawTitle(titlerect). _DrawTitle() should check the clip_title flag and call ClipTitle() only if it is true.</P>
 <P class="Body" style="margin: 0px"><BR>
@@ -364,12 +364,12 @@ This hook function is primarily used to change colors used when a window changes
 This returns the "footprint" of the decorator, i.e. the area which is occupied by the window which is is the border surrounding the main client rectangle. It is possible to have oddly-shaped window borders, like ellipses and circles, but the resulting performance hit would reduce the said decorator to a novelty and not something useable. All versions are to construct an SRegion which the border occupies. This footprint is permitted to include the client rectangle area, but this area must not be actually drawn upon by the decorator itself. The default version returns the frame which encompasses all other rectangles - the "frame" member which belongs to its window border.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
-<span class="OBOS-Function-Def">click_type Clicked(SPoint pt, int32 buttons, int32 modifiers)</span></P>
+<span class="OBOS-Function-Def">click_type Clicked(BPoint pt, int32 buttons, int32 modifiers)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Clicked() performs hit testing for the decorator, given input conditions. This function is required by ALL subclasses expecting to do more than display itself. The return type will cause the server to take the appropriate actions, such as close the window, get ready to move it, etc.</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
-<span class="OBOS-Function-Def">extern "C" Decorator *create_decorator(SRect frame, int32 wlook, int32 wfeel, int32 wflags)</span></P>
+<span class="OBOS-Function-Def">extern "C" Decorator *create_decorator(BRect frame, int32 wlook, int32 wfeel, int32 wflags)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Required export function which simply allocates an instance of the decorator and returns it.</P>
 <P class="Body" style="margin: 0px"><BR>

@@ -1,0 +1,101 @@
+<HTML>
+<HEAD>
+<TITLE>FontFamily.htm</TITLE>
+<style type="text/css">
+  <!--
+	.Default {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 12pt}
+	.OBOS-Function-Def {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 16pt}
+	.OBOS-Title {background-color: rgb(255,255,255); color: rgb(0,128,0); font-family: 'Dutch801 Rm BT'; font-size: 24pt}
+	.Text-Background {background-color: rgb(255,255,255)}
+	.GR-Default {}
+	.Body {margin: 0px}
+	.Footer {margin: 0px}
+	.Header {margin: 0px}
+	.WP-Default {text-align: left; text-indent: 0px; margin-left: 0px; margin-right: 0px}
+  -->
+</style>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV class="sheet" id="Sheet 1">
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">FontFamily class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><BR>
+FontFamily objects are used to house all related font styles allocated as FontStyle objects.</P>
+<P class="Body" style="margin: 0px"><BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px">Member Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=617 HEIGHT=68 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">FontFamily(font_family name)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">~FontFamily(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">font_family GetName(void)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void AddStyle(FontStyle *style)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=203 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void RemoveStyle(FontStyle *style)</P>
+			</TD>
+		<TD WIDTH=260 HEIGHT=17>
+			<P class="Body" style="margin: 0px">FontStyle *FindStyle(font_style name)</P>
+			</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">FontFamily(font_family name)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+1) Set internal name to the one passed to the constructor</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">~FontFamily(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+1) Does nothing</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">font_family GetName(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the internal family name</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void AddStyle(FontStyle *style)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Adds the style to the family. Note that the FontFamily object is not responsible for freeing FontStyle objects added in this way.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Add the style object to the internal STL map object for styles</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void RemoveStyle(FontStyle *style)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Removes the style from the FontFamily object.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Find the style in the style list. Return if not found.</P>
+<P class="Body" style="margin: 0px">2) Delete the style list's item</P>
+<P class="Body" style="margin: 0px">3) If the style list is now empty, ask the FontServer to remove it from the family list</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">FontStyle *FindStyle(font_style name)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Looks up a FontStyle object based on its style name. Returns NULL if not found.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Call the style list's find() method.</P>
+<P class="Body" style="margin: 0px">2) Return the appropriate FontStyle object or NULL if not found.</P>
+<DIV class="layer" id="Layer 1">
+	</DIV>
+</DIV>
+</BODY>
+</HTML>

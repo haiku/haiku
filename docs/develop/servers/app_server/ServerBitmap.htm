@@ -32,7 +32,7 @@ Member Functions</P>
 <TABLE WIDTH=621 HEIGHT=150 BORDER=1 CELLPADDING=1 CELLSPACING=2>
 	<TR>
 		<TD WIDTH=253 HEIGHT=47>
-			<P class="Body" style="margin: 0px">ServerBitmap(SRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id screen=B_MAIN_SCREEN_ID)</P>
+			<P class="Body" style="margin: 0px">ServerBitmap(BRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id screen=B_MAIN_SCREEN_ID)</P>
 			</TD>
 		<TD WIDTH=213 HEIGHT=47>
 			<P class="Body" style="margin: 0px">~ServerBitmap(void)</P>
@@ -40,7 +40,7 @@ Member Functions</P>
 	</TR>
 	<TR>
 		<TD WIDTH=253 HEIGHT=17>
-			<P class="Body" style="margin: 0px">uint8 *Buffer(void)</P>
+			<P class="Body" style="margin: 0px">uint8 *Bits(void)</P>
 			</TD>
 		<TD WIDTH=213 HEIGHT=17>
 			<P class="Body" style="margin: 0px">area_id Area(void)</P>
@@ -51,7 +51,7 @@ Member Functions</P>
 			<P class="Body" style="margin: 0px">uint32 BitsLength(void)</P>
 			</TD>
 		<TD WIDTH=213 HEIGHT=17>
-			<P class="Body" style="margin: 0px">SRect Bounds(void)</P>
+			<P class="Body" style="margin: 0px">BRect Bounds(void)</P>
 			</TD>
 	</TR>
 	<TR>
@@ -72,7 +72,7 @@ If there are any global functions associated with the class, they are listed her
 <BR>
 <HR>
 </P>
-<P class="Body" style="margin: 0px">ServerBitmap(SRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id  screen=B_MAIN_SCREEN_ID)</P>
+<P class="Body" style="margin: 0px">ServerBitmap(BRect r, color_space cspace, int32 flags, int32 bytesperrow=-1, screen_id  screen=B_MAIN_SCREEN_ID)</P>
 <P class="Body" style="margin: 0px"><BR>
 1) Call _HandleSpace()</P>
 <P class="Body" style="margin: 0px">2) Call _HandleFlags()</P>
@@ -83,7 +83,7 @@ If there are any global functions associated with the class, they are listed her
 Empty</span></P>
 <P class="Body" style="margin: 0px"><span class="Default"><BR>
 <BR>
-</span><span class="OBOS-Function-Def">uint8 *Buffer(void)</span></P>
+</span><span class="OBOS-Function-Def">uint8 *Bits(void)</span></P>
 <P class="Body" style="margin: 0px"><BR>
 Returns the bitmap's buffer member</P>
 <P class="Body" style="margin: 0px"><BR>
@@ -98,9 +98,9 @@ Returns the bitmap's buffer member.</P>
 Returns bytes_per_row * height</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
-<span class="OBOS-Function-Def">SRect Bounds(void)</span></P>
+<span class="OBOS-Function-Def">BRect Bounds(void)</span></P>
 <P class="Body" style="margin: 0px"><BR>
-returns SRect(width-1,height-1)</P>
+returns BRect(width-1,height-1)</P>
 <P class="Body" style="margin: 0px"><BR>
 <BR>
 <span class="OBOS-Function-Def">int32 BytesPerRow(void)</span></P>

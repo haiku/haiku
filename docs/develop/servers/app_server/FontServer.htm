@@ -1,0 +1,204 @@
+<HTML>
+<HEAD>
+<TITLE>FontServer.htm</TITLE>
+<style type="text/css">
+  <!--
+	.Default {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 12pt}
+	.OBOS-Function-Def {background-color: rgb(255,255,255); color: rgb(0,0,0); font-family: 'Dutch801 Rm BT'; font-size: 16pt}
+	.OBOS-Title {background-color: rgb(255,255,255); color: rgb(0,128,0); font-family: 'Dutch801 Rm BT'; font-size: 24pt}
+	.Text-Background {background-color: rgb(255,255,255)}
+	.GR-Default {}
+	.Body {margin: 0px}
+	.Footer {margin: 0px}
+	.Header {margin: 0px}
+	.WP-Default {text-align: left; text-indent: 0px; margin-left: 0px; margin-right: 0px}
+  -->
+</style>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+<DIV class="sheet" id="Sheet 1">
+<P class="Body" style="margin: 0px"><span class="OBOS-Title">FontServer class</span><span style="color: rgb(0,0,0); font-size: 24pt"></span></P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<P class="Body" style="margin: 0px">The FontServer provides the base functionality for providing font support for the rest of the system and insulates the rest of the server from having to deal too much with FreeType.</P>
+<P class="Body" style="margin: 0px"><BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px">Member Functions</P>
+<P class="Body" style="margin: 0px"><BR>
+</P>
+<TABLE WIDTH=466 HEIGHT=185 BORDER=1 CELLPADDING=1 CELLSPACING=2>
+	<TR>
+		<TD WIDTH=225 HEIGHT=17>
+			<P class="Body" style="margin: 0px">FontServer(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">~FontServer(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=225 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Lock(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void Unlock(void)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=225 HEIGHT=17>
+			<P class="Body" style="margin: 0px">FT_Library GetLibrary(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void ScanDirectory(const char *path)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=225 HEIGHT=47>
+			<P class="Body" style="margin: 0px">FontStyle *GetFont(font_family family, font_style face)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=47>
+			<P class="Body" style="margin: 0px">FontInstance *GetInstance(font_family family, font_style face, int16 size, int16 rotation, int16 shear)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=225 HEIGHT=38>
+			<P class="Body" style="margin: 0px">int32 CountFontFamilies(void)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=38>
+			<P class="Body" style="margin: 0px">status_t GetFamily(int32 index, font_family family)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=225 HEIGHT=32>
+			<P class="Body" style="margin: 0px">int32 CountFontStyles(font_family family)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=32>
+			<P class="Body" style="margin: 0px">status_t GetStyle(font_family family, font_style style, int32 *flags)</P>
+			</TD>
+	</TR>
+	<TR>
+		<TD WIDTH=225 HEIGHT=17>
+			<P class="Body" style="margin: 0px">void RemoveFamily(FontFamily *family)</P>
+			</TD>
+		<TD WIDTH=240 HEIGHT=17>
+			<P class="Body" style="margin: 0px">FontFamily *_FindFamily(const char *name)</P>
+			</TD>
+	</TR>
+</TABLE>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<HR>
+</P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">FontServer(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+1) Create access semaphore</P>
+<P class="Body" style="margin: 0px">2) Call FT_Init_FreeType()</P>
+<P class="Body" style="margin: 0px">3) If no error initializing the FreeType library, set init flag to true</P>
+<P class="Body" style="margin: 0px">4) Call ScanDirectory() on /boot/beos/etc/fonts/psfonts, .../ttfonts, ~/config/fonts/psfonts and .../ttfonts</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">~FontServer(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+1) Call FT_Done_FreeType()</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void Lock(void)</span></P>
+<P class="Body" style="margin: 0px"><span class="OBOS-Function-Def">void Unlock(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+These functions simply acquire and release the internal access semaphore.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">FT_Library GetLibrary(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the internal FT_Library object</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void ScanDirectory(const char *path)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+ScanDirectory is where the brunt of the work of the FontServer is done - scans the directory of all fonts which can be loaded.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Iterate through the font family STL map and set each FontFamily object's Delete flag to true</P>
+<P class="Body" style="margin: 0px">2) Enter a while() loop, iterating through each entry in the given directory, executing as follows:</P>
+<P class="Body" style="margin: 0px">	a) Ensure that the entry is not '.' or '..'</P>
+<P class="Body" style="margin: 0px">	b) Call FT_New_Face on the entry's full path</P>
+<P class="Body" style="margin: 0px">	c) If a valid FT_Face is returned, iterate through to see if there are any supported character mappings in the current entry.</P>
+<P class="Body" style="margin: 0px">	d) If there are no supported character mappings, dump the supported mappings to debug output, call FT_Done_Face(), and continue to the next entry</P>
+<P class="Body" style="margin: 0px">	e) See if the entry's family has been added to the family list. If it hasn't, create one and add it.</P>
+<P class="Body" style="margin: 0px">	f) Check to see if the font's style has been added to its family. If so, call set the family's Delete flag to false, call FT_Done_Face, and continue to the next entry</P>
+<P class="Body" style="margin: 0px">	g) If the style has not been added, create a new SFont for that family and face, increment the font count, and continue to the next entry.</P>
+<P class="Body" style="margin: 0px">3) Iterate through all styles in each family and delete all SFont objects which have a true Delete flag</P>
+<P class="Body" style="margin: 0px"><BR>
+Supported character mappings are Windows and Apple Unicode, Windows symbol, and Apple Roman character mappings, in order of preference from first to last.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">FontStyle *GetFont(font_family family, font_style face)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns an FontStyle object for the specified family and style or NULL if not found.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Call _FindFamily() for the given family</P>
+<P class="Body" style="margin: 0px">2) If non-NULL, call its FindStyle() method</P>
+<P class="Body" style="margin: 0px">3) Return the result</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">FontInstance *GetInstance(font_family family, font_style face, int16 size, int16 rotation, int16 shear)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns a usable instance of a specified font object with specified properties.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Duplicates and performs the code found in GetFont</P>
+<P class="Body" style="margin: 0px">2) Assuming that the FontStyle object is non-NULL, it calls its GetInstance method and returns the result.</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">int32 CountFontFamilies(void)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the number of valid font families available to the system.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Return the number of items in the family list</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">status_t GetFamily(int32 index, font_family family)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Gets the name of the family with the index passed to the function and sets the font_family object to the appropriate value.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) If index &gt; family list count, return B_ERROR</P>
+<P class="Body" style="margin: 0px">2) Look up the string at the index, copy it, and return B_OK</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">int32 CountFontStyles(font_family family)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Returns the number of styles available for a given font family.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Call _FindFamily() to get the appropriate font family</P>
+<P class="Body" style="margin: 0px">2) If non-NULL, call its return the result of its CountStyles method</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">status_t GetStyle(font_family family, font_style style, int32 *flags)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Gets the name of the family with the index passed to the function and sets the font_family object to the appropriate value.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Call _FindFamily() to get the appropriate font family</P>
+<P class="Body" style="margin: 0px">2) If non-NULL, look up the string at the index, and copy it to the passed style object, otherwise, return B_ERROR</P>
+<P class="Body" style="margin: 0px">3) Get the style's FontStyle object and set flags to the flags contained in the FontStyle object</P>
+<P class="Body" style="margin: 0px">4) Return B_OK</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+<span class="OBOS-Function-Def">void RemoveFamily(FontFamily *family)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Removes a font family from the family list</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Look up font family in the family list</P>
+<P class="Body" style="margin: 0px">2) If it exists, delete it</P>
+<P class="Body" style="margin: 0px"><BR>
+<BR>
+protected:</P>
+<P class="Body" style="margin: 0px"><BR>
+<span class="OBOS-Function-Def">FontFamily *_FindFamily(const char *name)</span></P>
+<P class="Body" style="margin: 0px"><BR>
+Looks up a FontFamily object based on its family name. Returns NULL if not found.</P>
+<P class="Body" style="margin: 0px"><BR>
+1) Call the family list's find() method.</P>
+<P class="Body" style="margin: 0px">2) Return the appropriate FontFamily object or NULL if not found.</P>
+<DIV class="layer" id="Layer 1">
+	</DIV>
+</DIV>
+</BODY>
+</HTML>
