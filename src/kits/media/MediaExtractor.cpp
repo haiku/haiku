@@ -27,6 +27,7 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 	for (int32 i = 0; i < fStreamCount; i++) {
 		fStreamInfo[i].status = B_OK;
 		fStreamInfo[i].cookie = 0;
+		fStreamInfo[i].hasCookie = true;
 		fStreamInfo[i].infoBuffer = 0;
 		fStreamInfo[i].infoBufferSize = 0;
 		memset(&fStreamInfo[i].encodedFormat, 0, sizeof(fStreamInfo[i].encodedFormat));
@@ -36,6 +37,7 @@ MediaExtractor::MediaExtractor(BDataIO *source, int32 flags)
 	for (int32 i = 0; i < fStreamCount; i++) {
 		if (B_OK != fReader->AllocateCookie(i, &fStreamInfo[i].cookie)) {
 			fStreamInfo[i].cookie = 0;
+			fStreamInfo[i].hasCookie = false;
 			fStreamInfo[i].status = B_ERROR;
 			printf("MediaExtractor::MediaExtractor: AllocateCookie for stream %ld failed\n", i);
 		}
@@ -63,7 +65,7 @@ MediaExtractor::~MediaExtractor()
 
 	// free all stream cookies
 	for (int32 i = 0; i < fStreamCount; i++) {
-		if (fStreamInfo[i].cookie)
+		if (fStreamInfo[i].hasCookie)
 			fReader->FreeCookie(fStreamInfo[i].cookie);
 	}
 
@@ -189,7 +191,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		return res;
 	}
 	
-	res = _CreateDecoder(decoder, &fStreamInfo[stream].encodedFormat);
+	res = _CreateDecoder(decoder, fStreamInfo[stream].encodedFormat);
 	if (res != B_OK) {
 		printf("MediaExtractor::CreateDecoder failed for stream %ld\n", stream);
 		return res;
