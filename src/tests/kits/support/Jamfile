@@ -62,6 +62,7 @@ CommonTestLib libsupporttest.so
 		StringEscapeTest.cpp
 		StringRemoveTest.cpp
 		StringCompareTest.cpp
+		StringFormatAppendTest.cpp
 
 	: <boot!home!config!lib>libopenbeos.so
 		be stdc++.r4
