@@ -248,6 +248,7 @@ void chan_free_resources(void)
 	}
 }
 
+
 status_t map_io_memory(void)
 {
 	if ((config->type & TYPE_ICH4) == 0)
@@ -258,13 +259,14 @@ status_t map_io_memory(void)
 	ASSERT(config->mmbar != 0);
 	ASSERT(config->mbbar != 0);
 	
-	config->area_mmbar = map_physical_memory("ich_ac97 mmbar io",(void *)config->mmbar, B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &config->log_mmbar);
+	config->area_mmbar = map_mem(&config->log_mmbar, (void *)config->mmbar, ICH4_MMBAR_SIZE, "ich_ac97 mmbar io");
 	if (config->area_mmbar <= B_OK) {
 		LOG(("mapping of mmbar io failed, error = %#x\n",config->area_mmbar));
 		return B_ERROR;
 	}
 	LOG(("mapping of mmbar: area %#x, phys %#x, log %#x\n", config->area_mmbar, config->mmbar, config->log_mmbar));
-	config->area_mbbar = map_physical_memory("ich_ac97 mbbar io",(void *)config->mbbar, B_PAGE_SIZE, B_ANY_KERNEL_BLOCK_ADDRESS, B_READ_AREA | B_WRITE_AREA, &config->log_mbbar);
+
+	config->area_mbbar = map_mem(&config->log_mbbar, (void *)config->mbbar, ICH4_MBBAR_SIZE, "ich_ac97 mbbar io");
 	if (config->area_mbbar <= B_OK) {
 		LOG(("mapping of mbbar io failed, error = %#x\n",config->area_mbbar));
 		delete_area(config->area_mmbar);
@@ -272,6 +274,7 @@ status_t map_io_memory(void)
 		return B_ERROR;
 	}
 	LOG(("mapping of mbbar: area %#x, phys %#x, log %#x\n", config->area_mbbar, config->mbbar, config->log_mbbar));
+
 	return B_OK;
 }
 
@@ -473,17 +476,17 @@ init_driver(void)
 	}
 
 	/* allocate memory for buffer descriptors */
-	chan_po->bd_area = alloc_mem(&chan_po->bd_phy_base, &chan_po->bd_log_base, ICH_BD_COUNT * sizeof(ich_bd), "ich_ac97 po buf desc");
-	chan_pi->bd_area = alloc_mem(&chan_pi->bd_phy_base, &chan_pi->bd_log_base, ICH_BD_COUNT * sizeof(ich_bd), "ich_ac97 pi buf desc");
-	chan_mc->bd_area = alloc_mem(&chan_mc->bd_phy_base, &chan_mc->bd_log_base, ICH_BD_COUNT * sizeof(ich_bd), "ich_ac97 mc buf desc");
+	chan_po->bd_area = alloc_mem(&chan_po->bd_log_base, &chan_po->bd_phy_base, ICH_BD_COUNT * sizeof(ich_bd), "ich_ac97 po buf desc");
+	chan_pi->bd_area = alloc_mem(&chan_pi->bd_log_base, &chan_pi->bd_phy_base, ICH_BD_COUNT * sizeof(ich_bd), "ich_ac97 pi buf desc");
+	chan_mc->bd_area = alloc_mem(&chan_mc->bd_log_base, &chan_mc->bd_phy_base, ICH_BD_COUNT * sizeof(ich_bd), "ich_ac97 mc buf desc");
 	/* allocate memory buffers */
-	chan_po->buffer_area = alloc_mem(&chan_po->buffer_phy_base, &chan_po->buffer_log_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 po buf");
-	chan_pi->buffer_area = alloc_mem(&chan_pi->buffer_phy_base, &chan_pi->buffer_log_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 pi buf");
-	chan_mc->buffer_area = alloc_mem(&chan_mc->buffer_phy_base, &chan_mc->buffer_log_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 mc buf");
+	chan_po->buffer_area = alloc_mem(&chan_po->buffer_log_base, &chan_po->buffer_phy_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 po buf");
+	chan_pi->buffer_area = alloc_mem(&chan_pi->buffer_log_base, &chan_pi->buffer_phy_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 pi buf");
+	chan_mc->buffer_area = alloc_mem(&chan_mc->buffer_log_base, &chan_mc->buffer_phy_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 mc buf");
 	/* allocate memory exported userland buffers */
-	chan_po->userbuffer_area = alloc_mem(NULL, &chan_po->userbuffer_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 po user buf");
-	chan_pi->userbuffer_area = alloc_mem(NULL, &chan_pi->userbuffer_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 pi user buf");
-	chan_mc->userbuffer_area = alloc_mem(NULL, &chan_mc->userbuffer_base, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 mc user buf");
+	chan_po->userbuffer_area = alloc_mem(&chan_po->userbuffer_base, NULL, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 po user buf");
+	chan_pi->userbuffer_area = alloc_mem(&chan_pi->userbuffer_base, NULL, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 pi user buf");
+	chan_mc->userbuffer_area = alloc_mem(&chan_mc->userbuffer_base, NULL, BUFFER_COUNT * BUFFER_SIZE, "ich_ac97 mc user buf");
 
 	if (  chan_po->bd_area < B_OK || chan_po->buffer_area < B_OK || chan_po->userbuffer_area < B_OK ||
 		  chan_pi->bd_area < B_OK || chan_pi->buffer_area < B_OK || chan_pi->userbuffer_area < B_OK ||

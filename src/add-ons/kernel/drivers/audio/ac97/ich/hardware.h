@@ -130,4 +130,7 @@ typedef struct {
 #define PCI_CFG			0x41
 #define PCI_CFG_IOSE	0x01
 
+#define ICH4_MMBAR_SIZE	512
+#define ICH4_MBBAR_SIZE	256
+
 #endif

@@ -147,7 +147,7 @@ codec_table codecs[] =
 	{ 0x41445360, 0xffffffff, &default_ops, "Analog Devices AD1885 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445361, 0xffffffff, &ad1886_ops,  "Analog Devices AD1886 SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445362, 0xffffffff, &default_ops, "Analog Devices AD1887 SoundMAX"B_UTF8_REGISTERED },
-	{ 0x41445363, 0xffffffff, &default_ops, "Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
+	{ 0x41445363, 0xffffffff, &ad1886_ops,  "Analog Devices AD1886A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445371, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x41445372, 0xffffffff, &default_ops, "Analog Devices AD1981A SoundMAX"B_UTF8_REGISTERED },
 	{ 0x414c4320, 0xfffffff0, &default_ops, "Avance Logic (Realtek) ALC100/ALC100P, RL5383/RL5522" },
@@ -247,7 +247,30 @@ void default_init(void)
 void ad1886_init(void)
 {
 	LOG(("ad1886_init\n"));
-	ich_codec_write(config->codecoffset + 0x72, 0x0010);
+
+	LOG(("===\n"));
+	LOG(("codecoffset = %d\n",config->codecoffset));
+	LOG(("0x26 = %#04x\n",ich_codec_read(config->codecoffset + 0x26)));
+	LOG(("0x2A = %#04x\n",ich_codec_read(config->codecoffset + 0x2A)));
+	LOG(("0x3A = %#04x\n",ich_codec_read(config->codecoffset + 0x3A)));
+	LOG(("0x72 = %#04x\n",ich_codec_read(config->codecoffset + 0x72)));
+	LOG(("0x74 = %#04x\n",ich_codec_read(config->codecoffset + 0x74)));
+	LOG(("0x76 = %#04x\n",ich_codec_read(config->codecoffset + 0x76)));
+
+//	ich_codec_write(config->codecoffset + 0x72, 0x0010); // enable software jack sense
+//	ich_codec_write(config->codecoffset + 0x72, 0x0110); // disable hardware line muting
+
+	ich_codec_write(config->codecoffset + 0x72, 0x0230);
+
+	LOG(("===\n"));
+	LOG(("0x26 = %#04x\n",ich_codec_read(config->codecoffset + 0x26)));
+	LOG(("0x2A = %#04x\n",ich_codec_read(config->codecoffset + 0x2A)));
+	LOG(("0x3A = %#04x\n",ich_codec_read(config->codecoffset + 0x3A)));
+	LOG(("0x72 = %#04x\n",ich_codec_read(config->codecoffset + 0x72)));
+	LOG(("0x74 = %#04x\n",ich_codec_read(config->codecoffset + 0x74)));
+	LOG(("0x76 = %#04x\n",ich_codec_read(config->codecoffset + 0x76)));
+
+	LOG(("===\n"));
 }
 
 void default_amp_enable(bool yesno)
