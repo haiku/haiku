@@ -3842,7 +3842,8 @@ BView::attachView(BView *aView)
 	owner->fLink->Attach<uint32>( aView->Flags() );
 	owner->fLink->Attach<bool>( aView->IsHidden(aView) );
 	owner->fLink->Attach<int32>( aView->CountChildren() );
-
+	owner->fLink->Flush();
+	
 	aView->setCachedState();
 
 	// call the hook function:
@@ -4410,7 +4411,7 @@ BView::PrintTree()
 
 ViewAttr::ViewAttr(void)
 {
-	font = *be_plain_font;
+//	font = *be_plain_font;
 	fontFlags = font.Flags();
 
 	penPosition.Set(0, 0);
