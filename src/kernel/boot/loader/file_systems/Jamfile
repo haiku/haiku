@@ -1,4 +1,5 @@
 SubDir OBOS_TOP src kernel boot loader file_systems ;
 
 SubInclude OBOS_TOP src kernel boot loader file_systems bfs ;
+SubInclude OBOS_TOP src kernel boot loader file_systems hfs_plus ;
 SubInclude OBOS_TOP src kernel boot loader file_systems amiga_ffs ;
