@@ -569,9 +569,9 @@ TranslateApp::ListTranslators(uint32 type)
 		}
 
 		printf("name: %s\ninfo: %s\nversion: %ld.%ld.%ld\n", name, info,
-			B_TRANSLATION_MAJOR_VER(version),
-			B_TRANSLATION_MINOR_VER(version),
-			B_TRANSLATION_REVSN_VER(version)); 
+			B_TRANSLATION_MAJOR_VERSION(version),
+			B_TRANSLATION_MINOR_VERSION(version),
+			B_TRANSLATION_REVISION_VERSION(version)); 
 
 		for (int32 j = 0; j < inCount; j++) {
 			printf("  input:\t");
