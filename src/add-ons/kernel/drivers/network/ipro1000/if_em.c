@@ -40,7 +40,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /*********************************************************************
  *  Set this to one to display debug statistics                                                   
  *********************************************************************/
-int             em_display_debug_stats = 1;
+int em_display_debug_stats = DEBUG_TRACE_STATS;
 
 /*********************************************************************
  *  Function prototypes            

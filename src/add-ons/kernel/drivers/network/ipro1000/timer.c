@@ -20,12 +20,11 @@
 #include <OS.h>
 #include <string.h>
 
-#define DEBUG 1
-
 #include "debug.h"
 #include "timer.h"
 
 #define MAX_TIMERS 32
+
 
 struct timer_info
 {
@@ -37,6 +36,7 @@ struct timer_info
 	bool			periodic;
 };
 
+
 static struct timer_info	sTimerData[MAX_TIMERS];
 static int					sTimerCount;
 static timer_id				sTimerNextId;
@@ -44,12 +44,11 @@ static thread_id			sTimerThread;
 static sem_id				sTimerSem;
 static spinlock				sTimerSpinlock;
 
+
 static int32
 timer_thread(void *cookie)
 {
 	status_t status = 0;
-
-	TRACE("timer_thread enter\n");
 
 	do {
 		bigtime_t timeout;
@@ -77,8 +76,6 @@ timer_thread(void *cookie)
 			}
 		}
 		
-		TRACE("timer index %d\n", index);
-
 		if (timeout < now) {
 			// timer is ready for execution, load func and cookie
 			ASSERT(index >= 0 && index < sTimerCount);
@@ -109,8 +106,6 @@ timer_thread(void *cookie)
 		status = acquire_sem_etc(sTimerSem, 1, B_ABSOLUTE_TIMEOUT, timeout);
 	} while (status == B_OK || status == B_TIMED_OUT);
 
-	TRACE("timer_thread leave\n");
-	
 	return 0;
 }
 
@@ -120,8 +115,6 @@ create_timer(timer_function func, void *cookie, bigtime_t interval, uint32 flags
 {
 	cpu_status cpu;
 	timer_id id;
-	
-	TRACE("create_timer enter\n");
 	
 	if (func == 0)
 		return -1;
@@ -151,8 +144,6 @@ create_timer(timer_function func, void *cookie, bigtime_t interval, uint32 flags
 	if (id != -1)
 		release_sem_etc(sTimerSem, 1, B_DO_NOT_RESCHEDULE);
 
-	TRACE("create_timer leave\n");
-
 	return id;
 }
 
@@ -163,8 +154,6 @@ delete_timer(timer_id id)
 	cpu_status cpu;
 	bool deleted;
 	int i;
-
-	TRACE("delete_timer enter\n");
 
 	deleted = false;
 	
@@ -185,8 +174,6 @@ delete_timer(timer_id id)
 	release_spinlock(&sTimerSpinlock);
 	restore_interrupts(cpu);
 
-	TRACE("delete_timer leave\n");
-	
 	if (!deleted)
 		return B_ERROR;
 		

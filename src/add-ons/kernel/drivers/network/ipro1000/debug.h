@@ -30,6 +30,7 @@
 	#define DEBUG_INIT  1
 	#define DEBUG_IOCTL 1
 	#define DEBUG_HW    1
+	#define DEBUG_TRACE_STATS 1
 	#define DBG_STATS	1
 
 #else
@@ -41,6 +42,7 @@
 	#define DEBUG_INIT  0
 	#define DEBUG_IOCTL 0
 	#define DEBUG_HW    0
+	#define DEBUG_TRACE_STATS 0
 	#undef DBG_STATS
 
 #endif
