@@ -518,11 +518,9 @@ BString::UnlockBuffer(int32 length)
 
 	if (len < 0)
 		len = strlen(_privateData);
-	else if (len > Length())
-		len = Length();
 
-	if (len > 0)
-		_privateData = _ShrinkAtBy(len, Length() - len);
+	if (len != Length())
+		_privateData = _GrowBy(len - Length()); // Can be negative
 
 	return *this;
 }
@@ -690,7 +688,7 @@ BString::_OpenAtBy(int32 offset, int32 length)
 char*
 BString::_ShrinkAtBy(int32 offset, int32 length)
 {
-	assert(offset + length < Length());
+	assert(offset + length <= Length());
 	int32 oldLength = Length();
 	
 	memmove(_privateData + offset, _privateData + offset + length,
