@@ -3,11 +3,15 @@
 
 #include "debug.h"
 #include "ByteSwap.h"
+#include "MixerCore.h"
 #include <Buffer.h>
 
-#define MAX_SOURCES 20
-
-class MixerCore;
+/* The data storage for channel sources is optimized
+ * for fast data retrieval by the MixerCore, which
+ * will call GetOutputChannelSourceInfoAt() and
+ * iterate through the first source_count array entries
+ * for source_gain[] and source_type[]
+ */
 
 class MixerOutput
 {
@@ -19,24 +23,31 @@ public:
 	
 	void ChangeFormat(const media_multi_audio_format &format);
 	
-	uint32 GetOutputChannelCount();
-	uint32 GetOutputChannelType(int channel);
-	void SetOutputChannelGain(int channel, float gain);
-	float GetOutputChannelGain(int channel);
+	// The physical output channels
+	uint32	GetOutputChannelCount();
+	uint32	GetOutputChannelType(int channel);
+	void	SetOutputChannelGain(int channel, float gain);
+	float	GetOutputChannelGain(int channel);
 	
-	uint32 GetOutputChannelSourceCount(int channel);
-	void AddOutputChannelSource(int channel, uint32 source_designation, float source_gain);
-	void RemoveOutputChannelSource(int channel, uint32 source_designation);
-	void SetOutputChannelSourceGain(int channel, uint32 source_designation, float source_gain);
-	float GetOutputChannelSourceGain(int channel, uint32 source_designation);
-	void GetOutputChannelSourceAt(int channel, int index, uint32 *source_designation, float *source_gain);
+	// The Sources for each channel
+	void	AddOutputChannelSource(int channel, int source_type, float source_gain);
+	void	RemoveOutputChannelSource(int channel, int source_type);
+	bool	SetOutputChannelSourceGain(int channel, int source_type, float source_gain);
+	float	GetOutputChannelSourceGain(int channel, int source_type);
+	bool	HasOutputChannelSource(int channel, int source_type);
 	
-	void SetMuted(bool yesno);
-	bool IsMuted();
+	// The Output can be muted
+	void	SetMuted(bool yesno);
+	bool	IsMuted();
 
-	// only for use by MixerCore
-	void GetMixerChannelInfo(int channel, int index, int *type, float *gain);
-	void AdjustByteOrder(BBuffer *buffer);
+	// Only for use by MixerCore:
+
+	// For iteration of a channel's sources
+	uint32	GetOutputChannelSourceCount(int channel);
+	void	GetOutputChannelSourceInfoAt(int channel, int source_index, int *source_type, float *source_gain);
+
+	// To swap byteorder in a buffer is that is needed
+	void	AdjustByteOrder(BBuffer *buffer);
 
 private:
 	void UpdateByteOrderSwap();
@@ -44,12 +55,20 @@ private:
 	void AssignDefaultSources();
 	
 private:
+	
+	/* An entry in the source array is not the same as the
+	 * channel type, but the number should be the same
+	 */
+	 enum {
+		MAX_SOURCE_ENTRIES = MAX_CHANNEL_TYPES
+	};
+
 	struct output_chan_info {
-		uint32 designation;	// only one bit set
-		float gain;
-		int source_count;
-		float source_gain[MAX_SOURCES];
-		int source_type[MAX_SOURCES];
+		int		channel_type;
+		float	channel_gain;
+		int		source_count;
+		float	source_gain[MAX_SOURCE_ENTRIES];
+		int		source_type[MAX_SOURCE_ENTRIES];
 	};	
 
 	MixerCore 			*fCore;
@@ -71,7 +90,7 @@ inline float MixerOutput::GetOutputChannelGain(int channel)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return 1.0;
-	return fOutputChannelInfo[channel].gain;
+	return fOutputChannelInfo[channel].channel_gain;
 }
 
 inline uint32 MixerOutput::GetOutputChannelSourceCount(int channel)
@@ -81,12 +100,12 @@ inline uint32 MixerOutput::GetOutputChannelSourceCount(int channel)
 	return fOutputChannelInfo[channel].source_count;
 }
 
-inline void MixerOutput::GetMixerChannelInfo(int channel, int index, int *type, float *gain)
+inline void MixerOutput::GetOutputChannelSourceInfoAt(int channel, int source_index, int *source_type, float *source_gain)
 {
 	ASSERT(channel >= 0 && channel < fOutputChannelCount);
-	ASSERT(index >= 0 && index < fOutputChannelInfo[channel].source_count);
-	*type = fOutputChannelInfo[channel].source_type[index];
-	*gain = fOutputChannelInfo[channel].source_gain[index];
+	ASSERT(index >= 0 && source_index < fOutputChannelInfo[channel].source_count);
+	*source_type = fOutputChannelInfo[channel].source_type[source_index];
+	*source_gain = fOutputChannelInfo[channel].source_gain[source_index];
 }
 
 inline void MixerOutput::AdjustByteOrder(BBuffer *buffer)

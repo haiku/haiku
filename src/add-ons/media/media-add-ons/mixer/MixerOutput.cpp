@@ -70,11 +70,11 @@ MixerOutput::UpdateOutputChannels()
 	fOutputChannelCount = fOutput.format.u.raw_audio.channel_count;
 	fOutputChannelInfo = new output_chan_info[fOutputChannelCount];
 	for (int i = 0; i < fOutputChannelCount; i++) {
-		fOutputChannelInfo[i].designation = GetChannelMask(i, fOutput.format.u.raw_audio.channel_mask);
-		fOutputChannelInfo[i].gain = 1.0;
+		fOutputChannelInfo[i].channel_type = GetChannelType(i, fOutput.format.u.raw_audio.channel_mask);
+		fOutputChannelInfo[i].channel_gain = 1.0;
 		fOutputChannelInfo[i].source_count = 1;
 		fOutputChannelInfo[i].source_gain[0] = 1.0;
-		fOutputChannelInfo[i].source_type[0] = ChannelMaskToChannelType(fOutputChannelInfo[i].designation);
+		fOutputChannelInfo[i].source_type[0] = fOutputChannelInfo[i].channel_type;
 	}
 	AssignDefaultSources();
 	
@@ -82,8 +82,8 @@ MixerOutput::UpdateOutputChannels()
 	if (oldInfo != 0 && oldCount != 0) {
 		for (int i = 0; i < fOutputChannelCount; i++) {
 			for (int j = 0; j < oldCount; j++) {
-				if (fOutputChannelInfo[i].designation == oldInfo[j].designation) {
-					fOutputChannelInfo[i].gain == oldInfo[j].gain;
+				if (fOutputChannelInfo[i].channel_type == oldInfo[j].channel_type) {
+					fOutputChannelInfo[i].channel_gain == oldInfo[j].channel_gain;
 					fOutputChannelInfo[i].source_count == oldInfo[j].source_count;
 					for (int k = 0; k < fOutputChannelInfo[i].source_count; k++) {
 						fOutputChannelInfo[i].source_gain[k] == oldInfo[j].source_gain[k];
@@ -217,7 +217,7 @@ MixerOutput::AssignDefaultSources()
 
 	for (int i = 0; i < fOutputChannelCount; i++) {
 		for (int j = 0; j < fOutputChannelInfo[i].source_count; j++) {
-			TRACE("AssignDefaultSources: output channel %d, source %d: des 0x%08X (type %2d), gain %.3f\n", i, j, ChannelTypeToChannelMask(fOutputChannelInfo[i].source_type[j]), fOutputChannelInfo[i].source_type[j], fOutputChannelInfo[i].source_gain[j]);
+			TRACE("AssignDefaultSources: output channel %d, source index %d: source_type %2d, source_gain %.3f\n", i, j, fOutputChannelInfo[i].source_type[j], fOutputChannelInfo[i].source_gain[j]);
 		}
 	}
 }
@@ -227,7 +227,7 @@ MixerOutput::GetOutputChannelType(int channel)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return 0;
-	return ChannelMaskToChannelType(fOutputChannelInfo[channel].designation);
+	return fOutputChannelInfo[channel].channel_type;
 }
 
 void
@@ -236,17 +236,16 @@ MixerOutput::SetOutputChannelGain(int channel, float gain)
 	TRACE("SetOutputChannelGain chan %d, gain %.5f\n", channel, gain);
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return;
-	fOutputChannelInfo[channel].gain = gain;
+	fOutputChannelInfo[channel].channel_gain = gain;
 }
 
 void
-MixerOutput::AddOutputChannelSource(int channel, uint32 source_designation, float source_gain)
+MixerOutput::AddOutputChannelSource(int channel, int source_type, float source_gain)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return;
-	if (fOutputChannelInfo[channel].source_count == MAX_SOURCES)
+	if (fOutputChannelInfo[channel].source_count == MAX_SOURCE_ENTRIES)
 		return;
-	int source_type = ChannelMaskToChannelType(source_designation);
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type)
 			return;
@@ -257,11 +256,10 @@ MixerOutput::AddOutputChannelSource(int channel, uint32 source_designation, floa
 }
 
 void
-MixerOutput::RemoveOutputChannelSource(int channel, uint32 source_designation)
+MixerOutput::RemoveOutputChannelSource(int channel, int source_type)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
 		return;
-	int source_type = ChannelMaskToChannelType(source_designation);
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
 			fOutputChannelInfo[channel].source_type[i] = fOutputChannelInfo[channel].source_type[fOutputChannelInfo[channel].source_count - 1];
@@ -272,47 +270,44 @@ MixerOutput::RemoveOutputChannelSource(int channel, uint32 source_designation)
 	}
 }
 
-void
-MixerOutput::SetOutputChannelSourceGain(int channel, uint32 source_designation, float source_gain)
+bool
+MixerOutput::SetOutputChannelSourceGain(int channel, int source_type, float source_gain)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
-		return;
-	int source_type = ChannelMaskToChannelType(source_designation);
+		return false;
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
 			fOutputChannelInfo[channel].source_gain[i] = source_gain;
-			return;
+			return true;
 		}
 	}
+	return false;
 }
 
 float
-MixerOutput::GetOutputChannelSourceGain(int channel, uint32 source_designation)
+MixerOutput::GetOutputChannelSourceGain(int channel, int source_type)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
-		return 1.0;
-	int source_type = ChannelMaskToChannelType(source_designation);
+		return 0.0;
 	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
 		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
 			return fOutputChannelInfo[channel].source_gain[i];
 		}
 	}
-	return 1.0;
+	return 0.0;
 }
 
-void
-MixerOutput::GetOutputChannelSourceAt(int channel, int index, uint32 *source_designation, float *source_gain)
+bool
+MixerOutput::HasOutputChannelSource(int channel, int source_type)
 {
 	if (channel < 0 || channel >= fOutputChannelCount)
-		return;
-	if (index >= fOutputChannelInfo[channel].source_count) {
-		// ERROR
-		*source_gain = 1.0;
-		*source_designation = 0;
-		return;
+		return false;
+	for (int i = 0; i < fOutputChannelInfo[channel].source_count; i++) {
+		if (fOutputChannelInfo[channel].source_type[i] == source_type) {
+			return true;
+		}
 	}
-	*source_gain = fOutputChannelInfo[channel].source_gain[index];
-	*source_designation = ChannelTypeToChannelMask(fOutputChannelInfo[channel].source_type[index]);
+	return false;
 }
 
 void

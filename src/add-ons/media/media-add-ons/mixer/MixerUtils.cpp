@@ -158,6 +158,12 @@ uint32 ChannelTypeToChannelMask(int type)
 	return 1 << type;
 }
 
+int
+GetChannelType(int channel, uint32 all_channel_masks)
+{
+	return ChannelMaskToChannelType(GetChannelMask(channel, all_channel_masks));
+}
+
 bool
 HasKawamba()
 {

@@ -843,24 +843,40 @@ AudioMixer::CreateBufferGroup()
 // BControllable methods
 //
 
-#define PARAM_INPUT(a)		(((a) << 16) + 0)
-#define PARAM_FORMAT(a) 	(((a) << 16) + 1)
-#define PARAM_MUTE(a)		(((a) << 16) + 2)
-#define PARAM_GAIN(a)		(((a) << 16) + 3)
-#define PARAM_OUTPUT(a)		(((a) << 16) + 4)
-#define PARAM(a)			((a) >> 16)
-#define PARAM_IS_MUTE(a)	(((a) & 0xffff) == 2)
-#define PARAM_IS_GAIN(a)	(((a) & 0xffff) == 3)
-#define DB_TO_GAIN(_db)		(20.0 * log10(_db))
-#define GAIN_TO_DB(_gain)	(pow(10.0, (_gain) / 20.0))
+#define DB_TO_GAIN(_db)			(20.0 * log10(_db))
+#define GAIN_TO_DB(_gain)		(pow(10.0, (_gain) / 20.0))
+#define PERCENT_TO_GAIN(_db)	((_db) / 100.0)
+#define GAIN_TO_PERCENT(_gain)	((_gain)  * 100.0)
 
-#define PARAM_SRC_ENABLE(id, chan, src)		(((id) << 16) | ((chan) << 14) | ((src) << 8) | 1)
-#define PARAM_SRC_PERCENT(id, chan, src)	(((id) << 16) | ((chan) << 14) | ((src) << 8) | 2)
-#define PARAM_DST_ENABLE(id, chan, dst)		(((id) << 16) | ((chan) << 14) | ((dst) << 8) | 3)
-#define PARAM_DST_PERCENT(id, chan, dst)	(((id) << 16) | ((chan) << 14) | ((dst) << 8) | 4)
-#define PARAM_SRC(id, chan)		(((id) << 16) | ((chan) << 14) | 5)
-#define PARAM_DST(id, chan)		(((id) << 16) | ((chan) << 14) | 6)
-#define PARAM_STR(id)			(((id) << 16) | 7)
+// the id is encoded with 16 bits
+// then chan and src (or dst) are encoded with 6 bits
+// the unique number with 4 bits
+#define PARAM_SRC_ENABLE(id, chan, src)		(((id) << 16) | ((chan) << 10) | ((src) << 4) | 0x1)
+#define PARAM_SRC_GAIN(id, chan, src)		(((id) << 16) | ((chan) << 10) | ((src) << 4) | 0x2)
+#define PARAM_DST_ENABLE(id, chan, dst)		(((id) << 16) | ((chan) << 10) | ((dst) << 4) | 0x3)
+#define PARAM_DST_GAIN(id, chan, dst)		(((id) << 16) | ((chan) << 10) | ((dst) << 4) | 0x4)
+#define PARAM_SRC_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x5)
+#define PARAM_DST_STR(id, chan)				(((id) << 16) | ((chan) << 10) | 0x6)
+#define PARAM_MUTE(id)						(((id) << 16) | 0x7)
+#define PARAM_GAIN(id)						(((id) << 16) | 0x8)
+#define PARAM_STR1(id)						(((id) << 16) | 0x9)
+#define PARAM_STR2(id)						(((id) << 16) | 0xa)
+#define PARAM_STR3(id)						(((id) << 16) | 0xb)
+#define PARAM_STR4(id)						(((id) << 16) | 0xc)
+#define PARAM_STR5(id)						(((id) << 16) | 0xd)
+#define PARAM_STR6(id)						(((id) << 16) | 0xe)
+#define PARAM_STR7(id)						(((id) << 16) | 0xf)
+
+#define PARAM(id)							((id) >> 16)
+#define PARAM_CHAN(id)						(((id) >> 10) & 0x3f)
+#define PARAM_SRC(id)						(((id) >> 4) & 0x3f)
+#define PARAM_DST(id)						(((id) >> 4) & 0x3f)
+#define PARAM_IS_SRC_ENABLE(id)				(((id) & 0xf) == 0x1)
+#define PARAM_IS_SRC_GAIN(id)				(((id) & 0xf) == 0x2)
+#define PARAM_IS_DST_ENABLE(id)				(((id) & 0xf) == 0x3)
+#define PARAM_IS_DST_GAIN(id)				(((id) & 0xf) == 0x4)
+#define PARAM_IS_MUTE(id)					(((id) & 0xf) == 0x7)
+#define PARAM_IS_GAIN(id)					(((id) & 0xf) == 0x8)
 
 
 status_t 
@@ -872,7 +888,7 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 	fCore->Lock();
 	if (param == 0) {
 		MixerOutput *output = fCore->Output();
-		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !output)
+		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// output mute control
@@ -888,6 +904,18 @@ AudioMixer::GetParameterValue(int32 id, bigtime_t *last_change,
 			*ioSize = output->GetOutputChannelCount() * sizeof(float);
 			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
 				static_cast<float *>(value)[chan] = DB_TO_GAIN(output->GetOutputChannelGain(chan));
+		}
+		if (PARAM_IS_SRC_ENABLE(id)) {
+			if (*ioSize < sizeof(int32))
+				goto err;
+			*ioSize = sizeof(int32);
+			static_cast<int32 *>(value)[0] = output->HasOutputChannelSource(PARAM_CHAN(id), PARAM_SRC(id));
+		}
+		if (PARAM_IS_SRC_GAIN(id)) {
+			if (*ioSize < sizeof(float))
+				goto err;
+			*ioSize = sizeof(float);
+			static_cast<float *>(value)[0] = GAIN_TO_PERCENT(output->GetOutputChannelSourceGain(PARAM_CHAN(id), PARAM_SRC(id)));
 		}
 	} else {
 		MixerInput *input;
@@ -929,7 +957,7 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 	fCore->Lock();
 	if (param == 0) {
 		MixerOutput *output = fCore->Output();
-		if ((!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id)) || !output)
+		if (!output || (!PARAM_IS_MUTE(id) && !PARAM_IS_GAIN(id) && !PARAM_IS_SRC_ENABLE(id) && !PARAM_IS_SRC_GAIN(id)))
 			goto err;
 		if (PARAM_IS_MUTE(id)) {
 			// output mute control
@@ -943,6 +971,27 @@ AudioMixer::SetParameterValue(int32 id, bigtime_t when,
 				goto err;
 			for (int chan = 0; chan < output->GetOutputChannelCount(); chan++)
 				output->SetOutputChannelGain(chan, GAIN_TO_DB(static_cast<const float *>(value)[chan]));
+		}
+		if (PARAM_IS_SRC_ENABLE(id)) {
+			if (size != sizeof(int32))
+				goto err;
+			if (static_cast<const int32 *>(value)[0]) {
+				output->AddOutputChannelSource(PARAM_CHAN(id), PARAM_SRC(id), 0.0);
+			} else {
+				output->RemoveOutputChannelSource(PARAM_CHAN(id), PARAM_SRC(id));
+			}
+			// after adding/removing sources, reset gain to 0.0
+			float nullgain = 0.0;
+			BroadcastNewParameterValue(when, PARAM_SRC_GAIN(PARAM(id), PARAM_CHAN(id), PARAM_SRC(id)), &nullgain, sizeof(nullgain));
+		}
+		if (PARAM_IS_SRC_GAIN(id)) {
+			if (size != sizeof(float))
+				goto err;
+			if (!output->SetOutputChannelSourceGain(PARAM_CHAN(id), PARAM_SRC(id), PERCENT_TO_GAIN(static_cast<const float *>(value)[0]))) {
+				// gain setting failed, reset to 0.0
+				float nullgain = 0.0;
+				BroadcastNewParameterValue(when, PARAM_SRC_GAIN(PARAM(id), PARAM_CHAN(id), PARAM_SRC(id)), &nullgain, sizeof(nullgain));
+			}
 		}
 	} else {
 		MixerInput *input;
@@ -990,75 +1039,76 @@ AudioMixer::UpdateParameterWeb()
 
 	out = fCore->Output();
 	group = top->MakeGroup("");
-	group->MakeNullParameter(PARAM_INPUT(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
+	group->MakeNullParameter(PARAM_STR1(0), B_MEDIA_RAW_AUDIO, "Master Output", B_WEB_BUFFER_INPUT); 
 	if (!out) {
-		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
 	} else {
-		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, StringForFormat(buf, out), B_GENERIC);
+		group->MakeNullParameter(PARAM_STR2(0), B_MEDIA_RAW_AUDIO, StringForFormat(buf, out), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(0), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
 		group->MakeContinuousParameter(PARAM_GAIN(0), B_MEDIA_RAW_AUDIO, "Gain", B_MASTER_GAIN, "dB", -60.0, 18.0, 0.5) 
 									   ->SetChannelCount(out->GetOutputChannelCount()); 
-		group->MakeNullParameter(PARAM_OUTPUT(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
+		group->MakeNullParameter(PARAM_STR3(0), B_MEDIA_RAW_AUDIO, "To Output", B_WEB_BUFFER_OUTPUT); 
 	}
 
 	for (int i = 0; (in = fCore->Input(i)); i++) {
 		group = top->MakeGroup("");
-		group->MakeNullParameter(PARAM_INPUT(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_WEB_BUFFER_INPUT); 
-		group->MakeNullParameter(PARAM_FORMAT(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(buf, in), B_GENERIC);
+		group->MakeNullParameter(PARAM_STR1(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_WEB_BUFFER_INPUT); 
+		group->MakeNullParameter(PARAM_STR2(in->ID()), B_MEDIA_RAW_AUDIO, StringForFormat(buf, in), B_GENERIC);
 		group->MakeDiscreteParameter(PARAM_MUTE(in->ID()), B_MEDIA_RAW_AUDIO, "Mute", B_MUTE); 
 		group->MakeContinuousParameter(PARAM_GAIN(in->ID()), B_MEDIA_RAW_AUDIO, "Gain", B_GAIN, "dB", -60.0, 18.0, 0.5) 
 									   ->SetChannelCount(in->GetInputChannelCount()); 
-		group->MakeNullParameter(PARAM_OUTPUT(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
+		group->MakeNullParameter(PARAM_STR3(in->ID()), B_MEDIA_RAW_AUDIO, "To Master", B_WEB_BUFFER_OUTPUT); 
 	}
 
 	top = web->MakeGroup("Output Mapping"); // top level group
 	outputchannels = top->MakeGroup("");
-	outputchannels->MakeNullParameter(10001, B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_GENERIC);
+	outputchannels->MakeNullParameter(PARAM_STR4(0), B_MEDIA_RAW_AUDIO, "Output Channel Sources", B_GENERIC);
 
 	group = outputchannels->MakeGroup("");
-	group->MakeNullParameter(10002, B_MEDIA_RAW_AUDIO, "Master Output", B_GENERIC); 
+	group->MakeNullParameter(PARAM_STR5(0), B_MEDIA_RAW_AUDIO, "Master Output", B_GENERIC); 
 	group = group->MakeGroup("");
 	if (!out) {
-		group->MakeNullParameter(PARAM_FORMAT(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
+		group->MakeNullParameter(PARAM_STR6(0), B_MEDIA_RAW_AUDIO, "not connected", B_GENERIC);
 	} else {
 		for (int chan = 0; chan < out->GetOutputChannelCount(); chan++) {
 			subgroup = group->MakeGroup("");
-			subgroup->MakeNullParameter(PARAM_SRC(0, chan), B_MEDIA_RAW_AUDIO,
+			subgroup->MakeNullParameter(PARAM_SRC_STR(0, chan), B_MEDIA_RAW_AUDIO,
 										StringForChannelType(buf, out->GetOutputChannelType(chan)), B_GENERIC);
 			for (int src = 0; src < MAX_CHANNEL_TYPES; src++) {
 				subsubgroup = subgroup->MakeGroup("");
 				subsubgroup->MakeDiscreteParameter(PARAM_SRC_ENABLE(0, chan, src), B_MEDIA_RAW_AUDIO, "", B_ENABLE); 
-				subsubgroup->MakeContinuousParameter(PARAM_SRC_PERCENT(0, chan, src), B_MEDIA_RAW_AUDIO,
+				subsubgroup->MakeContinuousParameter(PARAM_SRC_GAIN(0, chan, src), B_MEDIA_RAW_AUDIO,
 													 StringForChannelType(buf, src), B_GAIN, "%", 0.0, 100.0, 1.0);
 			}
 				
 		}
 	}
-
+	
+#if 0 
 	top = web->MakeGroup("Input Mapping"); // top level group
 	inputchannels = top->MakeGroup("");
-	inputchannels->MakeNullParameter(10003, B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
+	inputchannels->MakeNullParameter(PARAM_STR7(0), B_MEDIA_RAW_AUDIO, "Input Channel Destinations", B_GENERIC);
 
 //	for (int i = 0; (in = fCore->Input(i)); i++) {
 	if ((in = fCore->Input(1)) || (in = fCore->Input(0))) { // XXX limited to input 1 or 0 to aviod BSlider problems
 		group = inputchannels->MakeGroup("");
-		group->MakeNullParameter(PARAM_STR(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC); 
+		group->MakeNullParameter(PARAM_STR4(in->ID()), B_MEDIA_RAW_AUDIO, in->MediaInput().name, B_GENERIC); 
 		group = group->MakeGroup("");
 
 		for (int chan = 0; chan < in->GetInputChannelCount(); chan++) {
 			subgroup = group->MakeGroup("");
-			subgroup->MakeNullParameter(PARAM_DST(in->ID(), chan), B_MEDIA_RAW_AUDIO,
+			subgroup->MakeNullParameter(PARAM_DST_STR(in->ID(), chan), B_MEDIA_RAW_AUDIO,
 										StringForChannelType(buf, in->GetInputChannelType(chan)), B_GENERIC);
 			for (int dst = 0; dst < MAX_CHANNEL_TYPES; dst++) {
 				subsubgroup = subgroup->MakeGroup("");
 				subsubgroup->MakeDiscreteParameter(PARAM_DST_ENABLE(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO, "", B_ENABLE); 
-				subsubgroup->MakeContinuousParameter(PARAM_DST_PERCENT(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO,
+				subsubgroup->MakeContinuousParameter(PARAM_DST_GAIN(in->ID(), chan, dst), B_MEDIA_RAW_AUDIO,
 													 StringForChannelType(buf, dst), B_GAIN, "%", 0.0, 100.0, 1.0);
 			}
 				
 		}
-		
 	}
+#endif
 
 	fCore->Unlock();
 

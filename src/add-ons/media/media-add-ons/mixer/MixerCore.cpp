@@ -492,7 +492,7 @@ MixerCore::MixThread()
 			for (int i = 0; i < sourcecount; i++) {
 				int type;
 				float gain;
-				fOutput->GetMixerChannelInfo(chan, i, &type, &gain);
+				fOutput->GetOutputChannelSourceInfoAt(chan, i, &type, &gain);
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
 					continue;
 				int count = InputChanInfos[type].CountItems();

@@ -15,6 +15,7 @@ void fix_multiaudio_format(media_multi_audio_format *format);
 int count_nonzero_bits(uint32 value);
 
 uint32 GetChannelMask(int channel, uint32 all_channel_masks);
+int GetChannelType(int channel, uint32 all_channel_masks);
 
 bool HasKawamba();
 
