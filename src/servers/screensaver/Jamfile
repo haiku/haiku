@@ -2,8 +2,6 @@ SubDir OBOS_TOP src servers screensaver ;
 
 Server OBOSscreensaver :
 	ScreenSaverApp.cpp
-	ScreenSaverPrefs.cpp
-	ScreenSaverThread.cpp
 	SSAwindow.cpp
 	pwWindow.cpp
 ;
