@@ -78,7 +78,7 @@ status_t nv_acc_wait_idle_dma()
 status_t nv_acc_init_dma()
 {
 	uint16 cnt;
-	uint32 surf_depth, patt_depth;
+	uint32 surf_depth, patt_depth, bmap_depth;
 	/* reset the engine DMA stalls counter */
 	err = 0;
 
@@ -760,19 +760,19 @@ status_t nv_acc_init_dma()
 	case B_CMAP8:
 		surf_depth = 0x00000001;
 		patt_depth = 0x00000003;
+		bmap_depth = 0x00000003;
 		break;
 	case B_RGB15_LITTLE:
-		surf_depth = 0x00000004;
-		patt_depth = 0x00000001;
-		break;
 	case B_RGB16_LITTLE:
 		surf_depth = 0x00000004;
 		patt_depth = 0x00000001;
+		bmap_depth = 0x00000001;
 		break;
 	case B_RGB32_LITTLE:
 	case B_RGBA32_LITTLE:
 		surf_depth = 0x00000006;
 		patt_depth = 0x00000003;
+		bmap_depth = 0x00000003;
 		break;
 	default:
 		LOG(8,("ACC_DMA: init, invalid bit depth\n"));
@@ -791,9 +791,13 @@ status_t nv_acc_init_dma()
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
 		((uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer); /* OffsetDest */
 
-	/*  set pattern colordepth (writing 2 32bit words) */
+	/* set pattern colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = patt_depth; /* SetColorFormat */
+
+	/* set bitmap colordepth (writing 2 32bit words) */
+	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = bmap_depth; /* SetColorFormat */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
@@ -902,7 +906,7 @@ static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((size << 18) |
 		((si->engine.fifo.ch_ptr[cmd] + offset) & 0x0000fffc));
 
-	/* space left after issuing the current command is the cmd AND it's data */
+	/* space left after issuing the current command is the cmd AND it's data less */
 	si->engine.dma.free -= (size + 1);
 }
 
@@ -1002,7 +1006,6 @@ status_t nv_acc_setup_blit_dma()
 	/* setup solid pattern:
 	 * wait for room in fifo for pattern cmd if needed. */
 	nv_acc_fifofree_dma(7);
-
 	/* now setup pattern (writing 7 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
@@ -1015,7 +1018,7 @@ status_t nv_acc_setup_blit_dma()
 	 * wait for room in fifo for ROP cmd if needed. */
 	nv_acc_fifofree_dma(2);
 
-	/* now setup ROP (writing 2 32bit words) */
+	/* now setup ROP (writing 2 32bit words) for GXcopy */
 	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
 
@@ -1029,7 +1032,6 @@ status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16
 	/* instruct engine what to blit:
 	 * wait for room in fifo for blit cmd if needed. */
 	nv_acc_fifofree_dma(4);
-
 	/* now setup blit (writing 4 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_BLIT, NV_IMAGE_BLIT_SOURCEORG, 3);
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((ys << 16) | xs); /* SourceOrg */
@@ -1048,16 +1050,53 @@ status_t nv_acc_blit_dma(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16
 /* span fill - i.e. (selected) menuitem background color (Dano) */
 status_t nv_acc_setup_rectangle_dma(uint32 color)
 {
-	//fixme: implement.
+	/* setup solid pattern:
+	 * wait for room in fifo for pattern cmd if needed. */
+	nv_acc_fifofree_dma(7);
+	/* now setup pattern (writing 7 32bit words) */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETSHAPE, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0x00000000; /* SetShape: 0 = 8x8, 1 = 64x1, 2 = 1x64 */
+	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLOR0, 4);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor0 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetColor1 */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[0] */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xffffffff; /* SetPattern[1] */
 
-	return B_ERROR;
+	/* ROP registers (Raster OPeration):
+	 * wait for room in fifo for ROP cmd if needed. */
+	nv_acc_fifofree_dma(2);
+	/* now setup ROP (writing 2 32bit words) for GXcopy */
+	nv_acc_cmd_dma(NV_ROP5_SOLID, NV_ROP5_SOLID_SETROP5, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = 0xcc; /* SetRop5 */
+
+	/* setup fill color:
+	 * wait for room in fifo for bitmap cmd if needed. */
+	nv_acc_fifofree_dma(2);
+	/* now setup color (writing 2 32bit words) */
+	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_COLOR1A, 1);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
+
+	return B_OK;
 }
 
 status_t nv_acc_rectangle_dma(uint32 xs,uint32 xe,uint32 ys,uint32 yl)
 {
-	//fixme: implement.
+	/* instruct engine what to fill:
+	 * wait for room in fifo for bitmap cmd if needed. */
+	nv_acc_fifofree_dma(3);
+	/* now setup fill (writing 3 32bit words) */
+	nv_acc_cmd_dma(NV3_GDI_RECTANGLE_TEXT, NV3_GDI_RECTANGLE_TEXT_UCR0_LEFTTOP, 2);
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		((xs << 16) | (ys & 0x0000ffff)); /* Unclipped Rect 0 LeftTop */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] =
+		(((xe - xs) << 16) | (yl & 0x0000ffff)); /* Unclipped Rect 0 WidthHeight */
 
-	return B_ERROR;
+	/* tell the engine to fetch the commands in the DMA buffer that where not
+	 * executed before. At this time the setup done by nv_acc_setup_rectangle_dma() is
+	 * also executed on the first call of nv_acc_rectangle_dma(). */
+	nv_start_dma();
+
+	return B_OK;
 }
 
 /* rectangle invert - i.e. text cursor and text selection */
