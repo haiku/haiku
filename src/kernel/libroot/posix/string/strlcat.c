@@ -7,21 +7,31 @@
 #include <string.h>
 
 
+/** Concatenates the source string to the destination, writes
+ *	as much as "maxLength" bytes to the dest string.
+ *	Always null terminates the string as long as maxLength is
+ *	larger than the dest string.
+ *	Returns the length of the string that 
+ */
+
 size_t
-strlcat(char *dst, char const *src, size_t s)
+strlcat(char *dest, const char *source, size_t maxLength)
 {
-	size_t i, j = strnlen(dst, s);
+	size_t destLength = strnlen(dest, maxLength), i;
 
-	if (!s)
-		return j + strlen(src);
+	// This returns the wrong size, but it's all we can do
+	if (maxLength == destLength)
+		return destLength + strlen(source);
 
-	dst += j;
+	dest += destLength;
+	maxLength -= destLength;
 
-	for (i = 0; ((i < s-1) && src[i]); i++) {
-		dst[i] = src[i];
+	for (i = 0; i < maxLength - 1 && source[i]; i++) {
+		dest[i] = source[i];
 	}
 
-	dst[i] = 0;
+	dest[i] = '\0';
 
-	return j + i + strlen(src + i);
+	return destLength + i + strlen(source + i);
 }
+
