@@ -37,9 +37,14 @@
 #include <Bitmap.h>
 #include <TranslatorRoster.h>
 #include <BitmapStream.h>
+#include <Rect.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageView.h"
+
+#define BORDER_WIDTH 16
+#define BORDER_HEIGHT 16
+#define PEN_SIZE 1.0f
 
 ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	uint32 flags)
@@ -50,6 +55,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fdocumentCount = 1;
 	
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetHighColor(0, 0, 0);
+	SetPenSize(PEN_SIZE);
 }
 
 ShowImageView::~ShowImageView()
@@ -61,6 +68,7 @@ ShowImageView::~ShowImageView()
 void
 ShowImageView::SetImage(const entry_ref *pref)
 {
+	ClearViewBitmap();
 	delete fpbitmap;
 	fpbitmap = NULL;
 	
@@ -104,13 +112,18 @@ ShowImageView::SetImage(const entry_ref *pref)
 		fdocumentCount = 1;
 		
 	// send message to parent about new image
-	BString str = info.name;
-	str << " (page " << fdocumentIndex << " of " << fdocumentCount << ")";
 	BMessage msg(MSG_UPDATE_STATUS);
-	msg.AddString("status", str);
+	msg.AddString("status", info.name);
 	BMessenger msgr(Window());
 	msgr.SendMessage(&msg);
-		
+	
+	SetViewBitmap(fpbitmap, fpbitmap->Bounds(),
+		BRect(BORDER_WIDTH - PEN_SIZE, BORDER_HEIGHT - PEN_SIZE,
+			fpbitmap->Bounds().Width() + BORDER_WIDTH + PEN_SIZE,
+			fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE),
+		B_FOLLOW_TOP | B_FOLLOW_LEFT, 0
+	);
+
 	FixupScrollBars();
 	Invalidate();
 }
@@ -130,8 +143,14 @@ ShowImageView::AttachedToWindow()
 void
 ShowImageView::Draw(BRect updateRect)
 {
-	if (fpbitmap)
-		DrawBitmap(fpbitmap, updateRect, updateRect);
+	if (fpbitmap) {
+		// Draw black rectangle around image
+		StrokeRect(
+			BRect(BORDER_WIDTH - PEN_SIZE,
+				BORDER_HEIGHT - PEN_SIZE,
+				fpbitmap->Bounds().Width() + BORDER_WIDTH + PEN_SIZE,
+				fpbitmap->Bounds().Height() + BORDER_HEIGHT + PEN_SIZE));
+	}
 }
 
 void
@@ -153,28 +172,27 @@ ShowImageView::MessageReceived(BMessage *pmsg)
 void
 ShowImageView::FixupScrollBars()
 {
-	if (!fpbitmap)
-		return;
-
-	BRect vBds = Bounds(), bBds = fpbitmap->Bounds();
-	float prop;
-	float range;
+	BRect rctview = Bounds(), rctbitmap(0, 0, 0, 0);
+	if (fpbitmap)
+		rctbitmap = fpbitmap->Bounds();
 	
+	float prop, range;
 	BScrollBar *psb = ScrollBar(B_HORIZONTAL);
 	if (psb) {
-		range = bBds.Width() - vBds.Width();
+		range = rctbitmap.Width() + (BORDER_WIDTH * 2) - rctview.Width();
 		if (range < 0) range = 0;
-		prop = vBds.Width() / bBds.Width();
+		prop = rctview.Width() / (rctbitmap.Width() + (BORDER_WIDTH * 2));
 		if (prop > 1.0f) prop = 1.0f;
 		psb->SetRange(0, range);
 		psb->SetProportion(prop);
 		psb->SetSteps(10, 100);
 	}
+	
 	psb = ScrollBar(B_VERTICAL);
 	if (psb) {
-		range = bBds.Height() - vBds.Height();
+		range = rctbitmap.Height() + (BORDER_HEIGHT * 2) - rctview.Height();
 		if (range < 0) range = 0;
-		prop = vBds.Height() / bBds.Height();
+		prop = rctview.Height() / (rctbitmap.Height() + (BORDER_HEIGHT * 2));
 		if (prop > 1.0f) prop = 1.0f;
 		psb->SetRange(0, range);
 		psb->SetProportion(prop);

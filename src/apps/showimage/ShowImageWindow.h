@@ -73,6 +73,7 @@ private:
 
 	BFilePanel *fpsavePanel;
 	BMenuBar *fpbar;
+	BMenu *fppageMenu;
 	entry_ref *fpref;
 	ShowImageView *fpimageView;
 	ShowImageStatusView *fpstatusView;

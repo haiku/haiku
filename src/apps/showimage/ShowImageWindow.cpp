@@ -66,7 +66,7 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	
 	// create the image view	
 	fpimageView = new ShowImageView(viewFrame, "image_view", B_FOLLOW_ALL, 
-		B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED);	
+		B_WILL_DRAW | B_FRAME_EVENTS);	
 	// wrap a scroll view around the view
 	BScrollView *pscrollView = new BScrollView("image_scroller", fpimageView,
 		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
@@ -173,7 +173,7 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Select All", MSG_SELECT_ALL, 'A', 0, 'W', false);
 	pbar->AddItem(pmenu);
 
-	pmenu = new BMenu("Page");
+	pmenu = fppageMenu = new BMenu("Page");
 	AddItemMenu(pmenu, "First", MSG_PAGE_FIRST, 'F', 0, 'W', true);
 	AddItemMenu(pmenu, "Last", MSG_PAGE_LAST, 'L', 0, 'W', true);
 	AddItemMenu(pmenu, "Next", MSG_PAGE_NEXT, 'N', 0, 'W', true);
@@ -265,6 +265,12 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			
 		case MSG_UPDATE_STATUS:
 		{
+			bool benable = (fpimageView->PageCount() > 1) ? true : false;
+			if (fppageMenu->IsEnabled() != benable)
+				// Only call this function if the state is changing
+				// to avoid flickering
+				fppageMenu->SetEnabled(benable);
+				
 			BString str;
 			if (pmsg->FindString("status", &str) == B_OK)
 				fpstatusView->SetText(str);
