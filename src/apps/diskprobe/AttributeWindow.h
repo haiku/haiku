@@ -9,6 +9,7 @@
 #include "ProbeWindow.h"
 
 class ProbeView;
+class TypeEditorView;
 
 
 class AttributeWindow : public ProbeWindow {
@@ -22,8 +23,9 @@ class AttributeWindow : public ProbeWindow {
 		virtual bool Contains(const entry_ref &ref, const char *attribute);
 
 	private:
-		ProbeView	*fProbeView;
-		char		*fAttribute;
+		ProbeView		*fProbeView;
+		TypeEditorView	*fTypeEditorView;
+		char			*fAttribute;
 };
 
 #endif	/* ATTRIBUTE_WINDOW_H */

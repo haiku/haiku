@@ -205,9 +205,9 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 
 	view->AddChild(tabView);
 
-	BView *editor = GetTypeEditorFor(rect, fProbeView->Editor());
-	if (editor != NULL)
-		tabView->SetTypeEditorTab(editor);
+	fTypeEditorView = GetTypeEditorFor(rect, fProbeView->Editor());
+	if (fTypeEditorView != NULL)
+		tabView->SetTypeEditorTab(fTypeEditorView);
 	else {
 		// show the raw editor if we don't have a specialised type editor
 		tabView->Select(1);
@@ -261,6 +261,8 @@ AttributeWindow::MessageReceived(BMessage *message)
 bool 
 AttributeWindow::QuitRequested()
 {
+	fTypeEditorView->CommitChanges();
+
 	bool quit = fProbeView->QuitRequested();
 	if (!quit)
 		return false;

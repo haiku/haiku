@@ -6,13 +6,22 @@
 #define ATTRIBUTE_EDITORS_H
 
 
-#include <Rect.h>
+#include <View.h>
 
-class BView;
 class DataEditor;
 
 
-extern BView *GetTypeEditorFor(BRect rect, DataEditor &editor);
+class TypeEditorView : public BView {
+	public:
+		TypeEditorView(BRect rect, const char *name, uint32 resizingMode, uint32 flags)
+			: BView(rect, name, resizingMode, flags)
+		{
+		}
+
+		virtual void CommitChanges() = 0;
+};
+
+extern TypeEditorView *GetTypeEditorFor(BRect rect, DataEditor &editor);
 
 
 #endif	/* ATTRIBUTE_EDITORS_H */
