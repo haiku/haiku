@@ -79,8 +79,8 @@ BEOS_ADD_ONS_INPUT_DEVICES="<input>keyboard"
 
 echo "Building executables and libraries..."
 
-jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
-	ide_isa bfs blkman fast_log ide_adapter locked_pool \
+jam -j$(sysinfo -cpu | head -c 2) -q rc resattr kernel boot_loader config_manager \
+	pci isa ide scsi ide_isa bfs blkman fast_log ide_adapter locked_pool \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
 	$BEOS_BIN $BEOS_SYSTEM_LIB $BEOS_SYSTEM_SERVERS \
