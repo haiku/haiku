@@ -11,6 +11,34 @@
 status_t
 swap_data(type_code type, void *_data, size_t length, swap_action action)
 {
+	if (_data == NULL || length == 0)
+		return B_BAD_VALUE;
+
+	switch (type) {
+		// allowed types
+		case B_INT16_TYPE:
+		case B_UINT16_TYPE:
+		case B_FLOAT_TYPE:
+		case B_INT32_TYPE:
+		case B_UINT32_TYPE:
+		case B_SIZE_T_TYPE:
+		case B_SSIZE_T_TYPE:
+		case B_TIME_TYPE:
+		case B_POINTER_TYPE:
+		case B_RECT_TYPE:
+		case B_POINT_TYPE:
+		case B_DOUBLE_TYPE:
+		case B_INT64_TYPE:
+		case B_UINT64_TYPE:
+		case B_OFF_T_TYPE:
+		case B_MESSENGER_TYPE:
+			break;
+
+		default:
+			// not swappable or recognized type!
+			return B_BAD_VALUE;
+	}
+
 	// is there anything to do?
 #if B_HOST_IS_LENDIAN
 	if (action == B_SWAP_HOST_TO_LENDIAN || action == B_SWAP_LENDIAN_TO_HOST)
@@ -20,23 +48,7 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 		return B_OK;
 #endif
 
-	if (_data == NULL || length == 0)
-		return B_BAD_VALUE;
-
 	switch (type) {
-		// 8 bit types or other non-swappable data
-		case B_BOOL_TYPE:
-		case B_CHAR_TYPE:
-		case B_COLOR_8_BIT_TYPE:
-		case B_INT8_TYPE:
-		case B_UINT8_TYPE:
-		case B_GRAYSCALE_8_BIT_TYPE:
-		case B_MONOCHROME_1_BIT_TYPE:
-		case B_RGB_COLOR_TYPE:
-			// nothing to do here
-			// ToDo: should we return an error here like the original?
-			break;
-
 		// 16 bit types
 		case B_INT16_TYPE:
 		case B_UINT16_TYPE:
@@ -104,10 +116,6 @@ swap_data(type_code type, void *_data, size_t length, swap_action action)
 			}
 			break;
 		}
-
-		default:
-			// not swappable or a recognized type!
-			return B_BAD_VALUE;
 	}
 
 	return B_OK;
