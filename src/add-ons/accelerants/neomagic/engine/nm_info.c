@@ -1,6 +1,6 @@
 /* setup initialisation information for card */
 /* Authors:
-   Rudolf Cornelissen 4/2003-1/2004
+   Rudolf Cornelissen 4/2003-6/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -228,9 +228,8 @@ void set_specs(void)
 	/* check for illegal setting */
 	if (si->ps.outputs == 0)
 	{
-		LOG(4, ("INFO: illegal outputmode detected, defaulting to internal mode!\n"));
+		LOG(4, ("INFO: illegal outputmode detected, assuming internal mode!\n"));
 		si->ps.outputs = 2;
-//fixme: then also activate this mode in the card....
 	}
 }
 

@@ -431,30 +431,9 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 	}
 
 	/* read panelsize and currently active outputs */
-	size_outputs = ISAGRPHR(PANELCTRL1);
+	size_outputs = nm_general_output_read();
 	/* we need to wait a bit or the card will mess-up it's register values.. (NM2160) */
 	snooze(10);
-
-//fixme!: note current DPMS state, if fully on: just copy outputs on, else do this:
-	/* update noted currently active outputs if prudent:
-	 * - tracks active output devices, even if the keyboard shortcut is used because
-	 *   using that key will take the selected output devices out of DPMS sleep mode
-	 *   if programmed via these bits;
-	 * - when the shortcut key is not used, and DPMS was in a sleep mode while
-	 *   programmed via these bits, an output device will still be shut-off. */
-	if (si->ps.card_type < NM2200)
-	{
-		/* both output devices do DPMS via these bits */
-		if (size_outputs & 0x03) si->ps.outputs = (size_outputs & 0x03);
-	}
-	else
-	{
-		/* only the internal panel does DPMS via these bits, so the external setting
-		 * can always be copied */
-		si->ps.outputs &= 0xfe;
-		si->ps.outputs |= (size_outputs & 0x01);
-		if (size_outputs & 0x02) si->ps.outputs |= 0x02;
-	}
 
 	if (si->ps.card_type < NM2200)
 	{
@@ -466,29 +445,25 @@ status_t nm_crtc_dpms(bool display, bool h, bool v)
 		}
 		else
 		{
-		    /* restore previous output device(s) */
-    		ISAGRPHW(PANELCTRL1, ((size_outputs & 0xfc) | (si->ps.outputs & 0x03)));
+		    /* restore 'previous' output device(s) */
+    		ISAGRPHW(PANELCTRL1, size_outputs);
 		}
 	}
 	else
 	{
-		/* if internal panel is active, update it's DPMS state */
-		if (si->ps.outputs & 0x02)
+		if (temp)
 		{
-			if (temp)
-			{
-			    /* Turn panel plus backlight off */
-    			ISAGRPHW(PANELCTRL1, (size_outputs & 0xfd));
-			}
-			else
-			{
-			    /* Turn panel plus backlight on */
-    			ISAGRPHW(PANELCTRL1, (size_outputs | 0x02));
-			}
+		    /* Turn panel plus backlight off */
+   			ISAGRPHW(PANELCTRL1, (size_outputs & 0xfd));
+		}
+		else
+		{
+		    /* restore 'previous' panel situation */
+   			ISAGRPHW(PANELCTRL1, size_outputs);
 		}
 
 		/* if external monitor is active, update it's DPMS state */
-		if (si->ps.outputs & 0x01)
+		if (size_outputs & 0x01)
 		{
 			/* we have full DPMS support for external monitors */
 			//fixme: checkout if so...

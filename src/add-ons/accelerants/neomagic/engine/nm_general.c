@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-4/2004
+   Rudolf Cornelissen 4/2003-6/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-15 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-16 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -281,7 +281,7 @@ static status_t nmxxxx_general_powerup()
 status_t nm_general_output_select()
 {
 	/* log currently selected output */
-	switch (nm_general_output_read())
+	switch (nm_general_output_read() & 0x03)
 	{
 	case 0x01:
 		LOG(2, ("INIT: external CRT only mode active\n"));
@@ -298,18 +298,57 @@ status_t nm_general_output_select()
 
 uint8 nm_general_output_read()
 {
-	uint8 output;
+	uint8 size_outputs;
 
-	output = (ISAGRPHR(PANELCTRL1) & 0x03);
+	/* read panelsize and currently active outputs */
+	size_outputs = ISAGRPHR(PANELCTRL1);
 
-	if (output == 0)
+	/* update noted currently active outputs if prudent:
+	 * - tracks active output devices, even if the keyboard shortcut is used because
+	 *   using that key will take the selected output devices out of DPMS sleep mode
+	 *   if programmed via these bits;
+	 * - when the shortcut key is not used, and DPMS was in a power-saving mode while
+	 *   programmed via these bits, an output device will (still) be shut-off. */
+	if (si->ps.card_type < NM2200)
 	{
-		/* using 'failsafe' mode: the flatpanel needs all the protection it can get... */
-		LOG(4, ("INIT: illegal outputmode detected, reporting internal mode!\n"));
-		output = 2;
+		/* both output devices do DPMS via these bits.
+		 * if one of the bits is on we have a valid setting if no power-saving mode
+		 * is active, or the keyboard shortcut key for selecting output devices has
+		 * been used during power-saving mode. */
+		if (size_outputs & 0x03) si->ps.outputs = (size_outputs & 0x03);
+	}
+	else
+	{
+		/* check if any power-saving mode active */
+		if 	(!(ISASEQR(CLKMODE) & 0x20))
+		{
+			/* screen is on:
+			 * we can 'safely' copy both output devices settings... */
+			if (size_outputs & 0x03)
+			{
+				si->ps.outputs = (size_outputs & 0x03);
+			}
+			else
+			{
+				/* ... unless no output is active, as this is illegal then */
+				si->ps.outputs = 0x02;
+
+				LOG(4, ("INIT: illegal outputmode detected, assuming internal mode!\n"));
+			}
+		}
+		else
+		{
+			/* screen is off:
+			 * only the internal panel does DPMS via these bits, so the external setting
+			 * can always be copied */
+			si->ps.outputs &= 0xfe;
+			si->ps.outputs |= (size_outputs & 0x01);
+			/* if the panel is on, we can note that (the shortcut key has been used) */
+			if (size_outputs & 0x02) si->ps.outputs |= 0x02;
+		}
 	}
 
-	return output;
+	return ((size_outputs & 0xfc) | (si->ps.outputs & 0x03));
 }
 
 /* basic change of card state from VGA to powergraphics -> should work from BIOS init state*/

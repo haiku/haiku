@@ -80,7 +80,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	nm_crtc_dpms_fetch(&display, &h, &v);
 	nm_crtc_dpms(false, false, false);
 
-	/*where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?)*/
+	/* where in framebuffer the screen is (should this be dependant on previous MOVEDISPLAY?) */
 	startadd = (uint8*)si->fbc.frame_buffer - (uint8*)si->framebuffer;
 
 	/* Perform the mode switch */
