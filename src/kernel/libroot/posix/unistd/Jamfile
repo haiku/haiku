@@ -1,0 +1,24 @@
+SubDir OBOS_TOP src kernel libroot posix unistd ;
+
+KernelObjects
+	<$(SOURCE_GRIST)>access.c 
+	<$(SOURCE_GRIST)>chown.c 
+	<$(SOURCE_GRIST)>close.c 
+	<$(SOURCE_GRIST)>dup.c 
+	<$(SOURCE_GRIST)>dup2.c 
+	<$(SOURCE_GRIST)>getopt.c
+	<$(SOURCE_GRIST)>lseek.c 
+	<$(SOURCE_GRIST)>open.c
+	<$(SOURCE_GRIST)>directory.c
+	<$(SOURCE_GRIST)>link.c
+	<$(SOURCE_GRIST)>read.c 
+	<$(SOURCE_GRIST)>sleep.c 
+	<$(SOURCE_GRIST)>usleep.c 
+	<$(SOURCE_GRIST)>truncate.c 
+	<$(SOURCE_GRIST)>write.c
+	<$(SOURCE_GRIST)>ioctl.c
+	<$(SOURCE_GRIST)>mount.c
+	<$(SOURCE_GRIST)>conf.c
+	:
+	-fPIC -DPIC
+	;

@@ -1,0 +1,20 @@
+SubDir OBOS_TOP src kernel libroot posix stdlib ;
+
+KernelObjects 
+	<$(SOURCE_GRIST)>assert.c 
+	<$(SOURCE_GRIST)>atoi.c 
+	<$(SOURCE_GRIST)>bsearch.c
+	<$(SOURCE_GRIST)>env.c
+	<$(SOURCE_GRIST)>heapsort.c 
+	<$(SOURCE_GRIST)>merge.c
+	<$(SOURCE_GRIST)>multibyte.c 
+	<$(SOURCE_GRIST)>qsort.c 
+	<$(SOURCE_GRIST)>radixsort.c 
+	<$(SOURCE_GRIST)>rand.c 
+	<$(SOURCE_GRIST)>random.c
+	<$(SOURCE_GRIST)>realpath.c
+	<$(SOURCE_GRIST)>strtoq.c
+	<$(SOURCE_GRIST)>strtouq.c
+	:
+	-fPIC -DPIC
+	;

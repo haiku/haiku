@@ -1,0 +1,33 @@
+SubDir OBOS_TOP src kernel libroot posix string ;
+
+KernelObjects 
+	<$(SOURCE_GRIST)>memchr.c
+	<$(SOURCE_GRIST)>memcmp.c
+	<$(SOURCE_GRIST)>memcpy.c
+	<$(SOURCE_GRIST)>memmove.c
+	<$(SOURCE_GRIST)>memset.c
+	<$(SOURCE_GRIST)>strcasecmp.c
+	<$(SOURCE_GRIST)>strcasestr.c
+	<$(SOURCE_GRIST)>strcat.c
+	<$(SOURCE_GRIST)>strchr.c
+	<$(SOURCE_GRIST)>strcmp.c
+	<$(SOURCE_GRIST)>strcpy.c
+	<$(SOURCE_GRIST)>strcspn.c
+	<$(SOURCE_GRIST)>strdup.c
+	<$(SOURCE_GRIST)>strerror.c
+	<$(SOURCE_GRIST)>strlcat.c
+	<$(SOURCE_GRIST)>strlcpy.c
+	<$(SOURCE_GRIST)>strlen.c
+	<$(SOURCE_GRIST)>strncat.c
+	<$(SOURCE_GRIST)>strncmp.c
+	<$(SOURCE_GRIST)>strncpy.c
+	<$(SOURCE_GRIST)>strnicmp.c
+	<$(SOURCE_GRIST)>strnlen.c
+	<$(SOURCE_GRIST)>strpbrk.c
+	<$(SOURCE_GRIST)>strrchr.c
+	<$(SOURCE_GRIST)>strspn.c
+	<$(SOURCE_GRIST)>strstr.c
+	<$(SOURCE_GRIST)>strtok.c
+	:
+	-fPIC -DPIC
+	;

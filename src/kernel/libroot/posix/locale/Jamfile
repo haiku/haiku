@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src kernel libroot posix locale ;
+
+KernelObjects
+	<$(SOURCE_GRIST)>ctype.c
+	:
+	-fPIC -DPIC
+	;

@@ -1,0 +1,38 @@
+SubDir OBOS_TOP src kernel libroot posix math ;
+
+KernelObjects 
+	<$(SOURCE_GRIST)>acosh.c
+	<$(SOURCE_GRIST)>asincos.c
+	<$(SOURCE_GRIST)>asinh.c
+	<$(SOURCE_GRIST)>atan.c
+	<$(SOURCE_GRIST)>atan2.c
+	<$(SOURCE_GRIST)>atanh.c
+	<$(SOURCE_GRIST)>cabs.c
+	<$(SOURCE_GRIST)>cbrt.c
+	<$(SOURCE_GRIST)>cosh.c
+	<$(SOURCE_GRIST)>erf.c
+	<$(SOURCE_GRIST)>exp.c
+	<$(SOURCE_GRIST)>exp__E.c
+	<$(SOURCE_GRIST)>expm1.c
+	<$(SOURCE_GRIST)>floor.c
+	<$(SOURCE_GRIST)>fmod.c
+	<$(SOURCE_GRIST)>gamma.c
+	<$(SOURCE_GRIST)>ieee.c
+	<$(SOURCE_GRIST)>j0.c
+	<$(SOURCE_GRIST)>j1.c
+	<$(SOURCE_GRIST)>jn.c
+	<$(SOURCE_GRIST)>lgamma.c
+	<$(SOURCE_GRIST)>log.c
+	<$(SOURCE_GRIST)>log10.c
+	<$(SOURCE_GRIST)>log1p.c
+	<$(SOURCE_GRIST)>log__L.c
+	<$(SOURCE_GRIST)>pow.c
+	<$(SOURCE_GRIST)>sincos.c
+	<$(SOURCE_GRIST)>sinh.c
+	<$(SOURCE_GRIST)>tan.c 
+	<$(SOURCE_GRIST)>tanh.c
+	:
+	-fPIC -DPIC
+	;
+
+SubInclude OBOS_TOP src kernel libroot posix math arch ;  

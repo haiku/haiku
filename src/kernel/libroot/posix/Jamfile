@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src kernel libroot posix ;
+
+KernelObjects 
+ 	<$(SOURCE_GRIST)>errno.c
+ 	<$(SOURCE_GRIST)>dlfcn.c
+ 	<$(SOURCE_GRIST)>rlimit.c
+ 	:
+	-fPIC -DPIC
+	;
+
+SubInclude OBOS_TOP src kernel libroot posix malloc ;
+SubInclude OBOS_TOP src kernel libroot posix locale ;
+SubInclude OBOS_TOP src kernel libroot posix stdio ;
+SubInclude OBOS_TOP src kernel libroot posix string ;
+SubInclude OBOS_TOP src kernel libroot posix stdlib ;
+SubInclude OBOS_TOP src kernel libroot posix unistd ;
+SubInclude OBOS_TOP src kernel libroot posix sys ;
+SubInclude OBOS_TOP src kernel libroot posix math ;

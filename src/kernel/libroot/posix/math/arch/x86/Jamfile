@@ -1,0 +1,3 @@
+SubDir OBOS_TOP src kernel libroot posix math arch x86 ;
+
+KernelObjects fabs.S frexp.c isinf.c ldexp.c ;
