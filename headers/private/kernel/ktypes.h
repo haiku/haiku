@@ -13,13 +13,7 @@ extern "C" {
 
 typedef int32  region_id;
 typedef int32  aspace_id;
-
-#ifndef _IMAGE_H
-	typedef int32  image_id;
-#endif
-
-
-typedef unsigned long			addr;
+typedef uint32 addr;
 
 #ifdef __cplusplus
 }

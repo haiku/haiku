@@ -5,11 +5,10 @@
 #ifndef _KERNEL_DEV_H
 #define _KERNEL_DEV_H
 
-#include <kernel.h>
+#include <image.h>
 #include <stage2.h>
 
 int dev_init(kernel_args *ka);
 image_id dev_load_dev_module(const char *name, const char *directory);
 
-#endif
-
+#endif	/* _KERNEL_DEV_H */
