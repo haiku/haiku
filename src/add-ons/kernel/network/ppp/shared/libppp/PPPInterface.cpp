@@ -158,7 +158,7 @@ PPPInterface::GetSettingsEntry(BEntry *entry) const
 	else if(!entry || strlen(Name()) == 0)
 		return B_BAD_VALUE;
 	
-	BDirectory directory(PPP_INTERFACE_SETTINGS_PATH);
+	BDirectory directory(PTP_INTERFACE_SETTINGS_PATH);
 	return directory.FindEntry(Name(), entry, true);
 }
 

@@ -51,6 +51,7 @@ enum ppp_control_ops {
 	PPPC_SET_AUTO_RECONNECT,
 	PPPC_HAS_INTERFACE_SETTINGS,
 	PPPC_SET_PROFILE,
+	PPPC_GET_STATISTICS,
 	
 	// handler access
 	PPPC_CONTROL_DEVICE = PPP_INTERFACE_OPS_START + 0xFF,
@@ -153,6 +154,8 @@ typedef struct ppp_interface_info {
 	
 	uint32 connectRetry, connectRetriesLimit;
 	uint32 connectRetryDelay, reconnectDelay;
+	bigtime_t connectedSince;
+		// undefined if disconnected
 	uint32 idleSince, disconnectAfterIdleSince;
 	
 	bool doesConnectOnDemand, doesAutoReconnect, hasDevice, isMultilink, hasParent;
@@ -166,6 +169,18 @@ typedef struct ppp_interface_info_t {
 	uint8 _reserved_[_PPP_INFO_T_SIZE_ - sizeof(ppp_interface_info)];
 } ppp_interface_info_t;
 
+
+//!	Structure used by \c PPPC_GET_STATISTICS.
+typedef struct ppp_statistics {
+	uint64 bytesReceived, packetsReceived;
+	uint64 bytesSent, packetsSent;
+	
+	// TODO: currently unused
+	uint64 errorBytesReceived, errorPacketsReceived;
+	
+	// TODO: add compression statistics?
+	uint8 _reserved_[80];
+} ppp_statistics;
 
 //!	Structure used by \c PPPC_GET_DEVICE_INFO.
 typedef struct ppp_device_info {

@@ -82,7 +82,7 @@ KPPPProfile::LoadSettings(const driver_settings *profile,
 		name = Interface().Name();
 	
 	if(name) {
-		sprintf(path, "pppidf/profile/%s", name);
+		sprintf(path, "ptpnet/profile/%s", name);
 		void *handle = load_driver_settings(path);
 		if(handle) {
 			fSettings = dup_driver_settings(get_driver_settings(handle));

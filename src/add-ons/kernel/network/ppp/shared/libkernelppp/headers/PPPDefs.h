@@ -15,13 +15,13 @@ typedef uint32 ppp_interface_id;
 
 
 // settings keys
-#define PPP_ASK_BEFORE_CONNECTING_KEY			"AskBeforeConnecting"
+#define PPP_ASK_BEFORE_CONNECTING_KEY		"AskBeforeConnecting"
 	// userland ppp_up and preflet handle this key
 #define PPP_DISONNECT_AFTER_IDLE_SINCE_KEY	"DisonnectAfterIdleSince"
 #define PPP_MODE_KEY						"Mode"
-#define PPP_CONNECT_RETRIES_LIMIT_KEY			"ConnectRetriesLimit"
+#define PPP_CONNECT_RETRIES_LIMIT_KEY		"ConnectRetriesLimit"
 #define PPP_CONNECT_RETRY_DELAY_KEY			"ConnectRetryDelay"
-#define PPP_AUTO_RECONNECT_KEY					"AutoReconnect"
+#define PPP_AUTO_RECONNECT_KEY				"AutoReconnect"
 #define PPP_RECONNECT_DELAY_KEY				"ReconnectDelay"
 #define PPP_LOAD_MODULE_KEY					"LoadModule"
 #define PPP_PROTOCOL_KEY					"Protocol"
@@ -35,8 +35,12 @@ typedef uint32 ppp_interface_id;
 
 // path defines
 #define PPP_MODULES_PATH					NETWORK_MODULES_ROOT "ppp"
-#define PPP_INTERFACE_SETTINGS_PATH	"/boot/home/config/settings/kernel/drivers/pppidf"
-	// should be: /etc/ppp
+#define PTP_INTERFACE_SETTINGS_PATH	\
+	"/boot/home/config/settings/kernel/drivers/ptpnet"
+		// should be: /etc/ptpnet
+#define PTP_SETTINGS_PATH \
+	"/boot/home/config/settings/kernel/drivers/ptpnet.settings"
+		// should be: /etc/ptpnet.settings
 
 // built-in protocols
 #define PPP_LCP_PROTOCOL					0xC021

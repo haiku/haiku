@@ -95,6 +95,7 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	fConnectRetry(0),
 	fConnectRetriesLimit(0),
 	fManager(NULL),
+	fConnectedSince(0),
 	fIdleSince(0),
 	fMRU(1500),
 	fInterfaceMTU(1498),
@@ -121,8 +122,8 @@ KPPPInterface::KPPPInterface(const char *name, ppp_interface_entry *entry,
 	if(name) {
 		// load settings from description file
 		char path[B_PATH_NAME_LENGTH];
-		sprintf(path, "pppidf/%s", name);
-			// XXX: TODO: change base path to "/etc/ppp" when settings API supports it
+		sprintf(path, "ptpnet/%s", name);
+			// XXX: TODO: change base path to "/etc/ptpnet"
 		
 		void *handle = load_driver_settings(path);
 		if(!handle) {
@@ -487,6 +488,13 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 			fProfile.LoadSettings(profile, fSettings);
 			
 			UpdateProfile();
+		} break;
+		
+		case PPPC_GET_STATISTICS: {
+			if(length < sizeof(ppp_statistics) || !data)
+				return B_ERROR;
+			
+			memcpy(data, &fStatistics, sizeof(ppp_statistics));
 		} break;
 		
 		case PPPC_CONTROL_DEVICE: {
@@ -1373,12 +1381,22 @@ KPPPInterface::Send(struct mbuf *packet, uint16 protocolNumber)
 	// pass to device/children
 	if(!IsMultilink() || Parent()) {
 		// check if packet is too big for device
-		if((packet->m_flags & M_PKTHDR && (uint32) packet->m_pkthdr.len > MRU())
-				|| packet->m_len > MRU()) {
+		uint32 length = packet->m_flags & M_PKTHDR ? (uint32) packet->m_pkthdr.len :
+			packet->m_len;
+		
+		if(length > MRU()) {
 			m_freem(packet);
 			return B_ERROR;
 		}
 		
+		// TODO: always use atomic_add64 when Haiku is finished
+#ifdef __HAIKU__
+		atomic_add64(&fStatistics.bytesSent, length);
+		atomic_add64(&fStatistics.packetsSent, 1);
+#else
+		atomic_add((int32*) &fStatistics.bytesSent, length);
+		atomic_add((int32*) &fStatistics.packetsSent, 1);
+#endif
 		return SendToNext(packet, 0);
 			// this is normally the device, but there can be something inbetween
 	} else {
@@ -1488,6 +1506,9 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 		return B_ERROR;
 	}
 	
+	uint32 length = packet->m_flags & M_PKTHDR ? (uint32) packet->m_pkthdr.len :
+		packet->m_len;
+	
 	// decode ppp frame and recognize PFC
 	uint16 protocolNumber = *mtod(packet, uint8*);
 	if(protocolNumber & 1) {
@@ -1497,6 +1518,14 @@ KPPPInterface::ReceiveFromDevice(struct mbuf *packet)
 		m_adj(packet, 2);
 	}
 	
+	// TODO: always use atomic_add64 when Haiku is finished
+#ifdef __HAIKU__
+	atomic_add64(&fStatistics.bytesReceived, length);
+	atomic_add64(&fStatistics.packetsReceived, 1);
+#else
+	atomic_add((int32*) &fStatistics.bytesReceived, length);
+	atomic_add((int32*) &fStatistics.packetsReceived, 1);
+#endif
 	return Receive(packet, protocolNumber);
 }
 

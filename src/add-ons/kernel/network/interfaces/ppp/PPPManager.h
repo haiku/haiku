@@ -60,6 +60,8 @@ class PPPManager {
 		ppp_interface_entry *EntryFor(const char *name, int32 *saveIndex = NULL) const;
 		ppp_interface_entry *EntryFor(const driver_settings *settings) const;
 		
+		void SettingsChanged();
+		
 		ppp_interface_id NextID()
 			{ return (ppp_interface_id) atomic_add((int32*) &fNextID, 1); }
 		
@@ -74,6 +76,7 @@ class PPPManager {
 
 	private:
 		BLocker fLock, fReportLock;
+		char *fDefaultInterface;
 		KPPPReportManager fReportManager;
 		TemplateList<ppp_interface_entry*> fEntries;
 		ppp_interface_id fNextID;

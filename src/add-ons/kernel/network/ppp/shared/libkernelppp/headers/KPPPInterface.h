@@ -12,6 +12,10 @@
 #include <KPPPDefs.h>
 #endif
 
+#ifndef _PPP_CONTROL__H
+#include <PPPControl.h>
+#endif
+
 #ifndef _K_PPP_LCP__H
 #include <KPPPLCP.h>
 #endif
@@ -262,6 +266,8 @@ class KPPPInterface : public KPPPLayer {
 		
 		ppp_interface_module_info *fManager;
 		
+		ppp_statistics fStatistics;
+		bigtime_t fConnectedSince;
 		uint32 fIdleSince, fDisconnectAfterIdleSince;
 		bool fUpdateIdleSince;
 		uint32 fMRU, fInterfaceMTU, fHeaderLength;

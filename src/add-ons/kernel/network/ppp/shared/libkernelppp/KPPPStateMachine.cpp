@@ -129,6 +129,7 @@ KPPPStateMachine::NewPhase(ppp_phase next)
 		
 		Interface().Report(PPP_CONNECTION_REPORT, PPP_REPORT_UP_SUCCESSFUL,
 			&fInterface.fID, sizeof(ppp_interface_id));
+		Interface().fConnectedSince = system_time();
 	}
 }
 

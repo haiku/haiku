@@ -110,6 +110,7 @@ pulse_timer(void *data)
 PPPManager::PPPManager()
 	: fLock("PPPManager"),
 	fReportLock("PPPManagerReportLock"),
+	fDefaultInterface(NULL),
 	fReportManager(fReportLock),
 	fNextID(1)
 {
@@ -740,6 +741,34 @@ PPPManager::EntryFor(const driver_settings *settings) const
 }
 
 
+void
+PPPManager::SettingsChanged()
+{
+	// get default interface name and update interfaces if it changed
+	void *handle = load_driver_settings("ptpnet.settings");
+	char *name = get_driver_parameter(handle, "default", NULL, NULL);
+	if(name)
+		name = strdup(name);
+	unload_driver_settings(handle);
+	
+	if((!fDefaultInterface && !name) || !strcmp(name, fDefaultInterface))
+		return;
+	
+	ppp_interface_entry *entry = EntryFor(fDefaultInterface);
+	if(entry && entry->interface
+			&& entry->interface->StateMachine().Phase() == PPP_DOWN_PHASE)
+		DeleteInterface(entry->interface->ID());
+	
+	free(fInterfaceName);
+	fInterfaceName = name;
+	
+	ppp_interface_id id = CreateInterfaceWithName(name);
+	entry = EntryFor(id);
+	if(entry && entry->interface)
+		entry->interface->SetConnectOnDemand(true);
+}
+
+
 static
 int
 greater(const void *a, const void *b)
@@ -827,8 +856,7 @@ PPPManager::_CreateInterface(const char *name, const driver_settings *settings,
 			ERROR("KPPPInterface::Up(): Error: could not load ppp_up!\n");
 		resume_thread(app);
 		
-		// XXX: What? BeOS' kernel is so &$$§$%! I cannot send anything to the
-		// team's main thread before the kernel sent something to it. So, we wait...
+		// XXX: Sending to a thread does not work immediately. So, we wait...
 		snooze(150000);
 		
 		if(send_data(app, 0, &id, sizeof(id)) < B_OK)
@@ -895,6 +923,9 @@ PPPManager::DeleterThreadEvent()
 {
 	LockerHelper locker(fLock);
 	
+	SettingsChanged();
+		// TODO: Use Haiku's kernel node monitoring capabilities
+	
 	// delete and remove marked interfaces
 	ppp_interface_entry *entry;
 	for(int32 index = 0; index < fEntries.CountItems(); index++) {
@@ -906,6 +937,11 @@ PPPManager::DeleterThreadEvent()
 		}
 		
 		if(entry->deleting && entry->accessing <= 0) {
+			// XXX: check twice if it is safe to delete the interface
+			// such that it is reused by _CreateInterface()
+			delete entry->interface;
+			entry->interface = NULL;
+			
 			// only remove entries that do not have ppp_up associated with them
 			if(entry->requestThread >= 0) {
 				thread_info info;
@@ -913,8 +949,17 @@ PPPManager::DeleterThreadEvent()
 					continue;
 			}
 			
+			// recreate default interface
+			if(entry->name && fDefaultInterface &&
+					!strcmp(entry->name, fDefaultInterface)) {
+				SettingsChanged();
+				CreateInterfaceWithName(fDefaultInterface);
+				if(entry->interface)
+					entry->interface->SetConnectOnDemand(true);
+				continue;
+			}
+			
 			free(entry->name);
-			delete entry->interface;
 			delete entry;
 			fEntries.RemoveItem(index);
 			--index;

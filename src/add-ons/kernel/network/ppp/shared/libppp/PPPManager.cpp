@@ -133,7 +133,7 @@ PPPManager::CreateInterface(const driver_settings *settings,
 /*!	\brief Creates an interface with the given name and profile.
 	
 	If the interface already exists its ID will be returned.
-	Every PPP interface has a profile. By default it checks if the pppidf/profile
+	Every PPP interface has a profile. By default it checks if the ptpnet/profile
 	folder contains a profile with the interface's name. Otherwise the interface's
 	settings become its profile. This has the advantage that you can put the profile
 	and the settings into the same file which simplifies your PPP configuration if
