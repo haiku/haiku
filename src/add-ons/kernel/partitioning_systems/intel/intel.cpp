@@ -20,26 +20,19 @@
 #include <unistd.h>
 
 #include <ddm_modules.h>
+#include <DiskDeviceTypes.h>
 #include <KernelExport.h>
 
 #include "PartitionMap.h"
 
-//#define TRACE(x) ;
-#define TRACE(x) dprintf x
+#define TRACE(x) ;
+//#define TRACE(x) dprintf x
 
 // module names
-#define INTEL_PARTITION_MAP_MODULE_NAME "partitioning_systems/intel/map/v1"
-#define INTEL_EXTENDED_PARTITION_MODULE_NAME \
-	"partitioning_systems/intel/extended/v1"
-
-// partition module identifier
-static const char *const kPartitionMapPrettyName	= "Intel Partition Map";
-static const char *const kPrimaryPartitionPrettyName
-	= "Intel Primary Partition";
-static const char *const kExtendedPartitionPrettyName
-	= "Intel Extended Partition";
-static const char *const kLogicalPartitionPrettyName
-	= "Intel Logical Partition";
+static const char *kPartitionMapModuleName
+	= "partitioning_systems/intel/map/v1";
+static const char *kExtendedPartitionModuleName
+	= "partitioning_systems/intel/extended/v1";
 
 // Maximal number of logical partitions per extended partition we allow.
 static const int32 kMaxLogicalPartitionCount = 128;
@@ -283,147 +276,6 @@ PartitionMapParser::_ReadPTS(off_t offset, partition_table_sector *pts)
 }
 
 
-/*
-// std_ops
-static
-status_t
-std_ops(int32 op, ...)
-{
-	TRACE(("intel: std_ops(0x%lx)\n", op));
-	switch(op) {
-		case B_MODULE_INIT:
-		case B_MODULE_UNINIT:
-			return B_OK;
-	}
-	return B_ERROR;
-}
-
-// read_partition_map
-static
-bool
-read_partition_map(int deviceFD, const session_info *sessionInfo,
-				   const uchar *block, PartitionMap *map)
-{
-	bool result = true;
-	off_t sessionOffset = sessionInfo->offset;
-	off_t sessionSize = sessionInfo->size;
-	int32 blockSize = sessionInfo->logical_block_size;
-	TRACE(("intel: read_partition_map(%d, %lld, %lld, %p, %ld)\n", deviceFD,
-		   sessionOffset, sessionSize, block, blockSize));
-	// check block size
-	if (result) {
-		result = ((uint32)blockSize >= sizeof(partition_table_sector));
-		if (!result) {
-			TRACE(("intel: read_partition_map: bad block size: %ld, should be "
-				   ">= %ld\n", blockSize, sizeof(partition_table_sector)));
-		}
-	}
-	// read the partition structure
-	if (result) {
-		PartitionMapParser parser(deviceFD, sessionOffset, sessionSize,
-								  blockSize);
-		result = (parser.Parse(block, map) == B_OK);
-	}
-	return result;
-}
-
-// intel_identify
-static
-bool
-intel_identify(int deviceFD, const session_info *sessionInfo,
-			   const uchar *block)
-{
-	TRACE(("intel: identify(%d, %lld, %lld, %p, %ld)\n", deviceFD,
-		   sessionInfo->offset, sessionInfo->size, block,
-		   sessionInfo->logical_block_size));
-	PartitionMap map;
-	return read_partition_map(deviceFD, sessionInfo, block, &map);
-}
-
-// intel_get_nth_info
-static
-status_t
-intel_get_nth_info(int deviceFD, const session_info *sessionInfo,
-				   const uchar *block, int32 index,
-				   extended_partition_info *partitionInfo)
-{
-	status_t error = B_OK;
-	off_t sessionOffset = sessionInfo->offset;
-	TRACE(("intel: get_nth_info(%d, %lld, %lld, %p, %ld, %ld)\n", deviceFD,
-		   sessionOffset, sessionInfo->size, block,
-		   sessionInfo->logical_block_size, index));
-	PartitionMap map;
-	if (read_partition_map(deviceFD, sessionInfo, block, &map)) {
-		if (Partition *partition = map.PartitionAt(index)) {
-			if (partition->IsEmpty()) {
-				// empty partition
-				partitionInfo->info.offset = sessionOffset;
-				partitionInfo->info.size = 0;
-				partitionInfo->flags
-					= B_HIDDEN_PARTITION | B_EMPTY_PARTITION;
-			} else {
-				// non-empty partition
-				partitionInfo->info.offset
-					= partition->Offset() + sessionOffset;
-				partitionInfo->info.size = partition->Size();
-				if (partition->IsExtended())
-					partitionInfo->flags = B_HIDDEN_PARTITION;
-				else
-					partitionInfo->flags = 0;
-			}
-			partitionInfo->partition_name[0] = '\0';
-			partition->GetTypeString(partitionInfo->partition_type);
-		} else
-			error = B_ENTRY_NOT_FOUND;
-	} else	// couldn't read partition map -- we shouldn't be in get_nth_info()
-		error = B_BAD_DATA;
-	return error;
-}
-
-// intel_get_partitioning_params
-static
-status_t
-intel_get_partitioning_params(int deviceFD,
-							  const struct session_info *sessionInfo,
-							  char *buffer, size_t bufferSize,
-							  size_t *actualSize)
-{
-	status_t error = B_OK;
-	PartitionMap map;
-	if (!read_partition_map(deviceFD, sessionInfo, NULL, &map)) {
-		// couldn't read partition map, set up a default one:
-		// four empty primary partitions
-		map.Unset();
-	}
-	// get the parameter length
-	size_t length = 0;
-	if (error == B_OK) {
-		ParameterUnparser unparser;
-		error = unparser.GetParameterLength(&map, &length);
-	}
-	// write the parameters
-	if (error == B_OK && length <= bufferSize) {
-		ParameterUnparser unparser;
-		error = unparser.Unparse(&map, buffer, bufferSize);
-	}
-	// set the results
-	if (error == B_OK)
-		*actualSize = length;
-	return error;
-}
-
-// intel_partition
-static
-status_t
-intel_partition(int deviceFD, const struct session_info *sessionInfo,
-				const char *parameters)
-{
-	// not yet supported
-	return B_UNSUPPORTED;
-}
-*/
-
-
 // intel partition map module
 
 // module
@@ -441,11 +293,11 @@ static void pm_free_partition_content_cookie(partition_data *partition);
 
 static partition_module_info intel_partition_map_module = {
 	{
-		INTEL_PARTITION_MAP_MODULE_NAME,
+		kPartitionMapModuleName,
 		0,
 		pm_std_ops
 	},
-	kPartitionMapPrettyName,			// pretty_name
+	kPartitionTypeIntel,				// pretty_name
 
 	// scanning
 	pm_identify_partition,				// identify_partition
@@ -460,11 +312,12 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// supports_resizing_child_partition
 	NULL,								// supports_moving_partition
 	NULL,								// supports_moving_child_partition
+	NULL,								// supports_creating_child_partition
 	NULL,								// supports_parent_system
 	NULL,								// supports_child_system
 	NULL,								// validate_resize_partition
-	NULL,								// validate_move_partition
 	NULL,								// validate_resize_child_partition
+	NULL,								// validate_move_partition
 	NULL,								// validate_move_child_partition
 	NULL,								// validate_create_child_partition
 	NULL,								// validate_initialize_partition
@@ -504,11 +357,11 @@ static void ep_free_partition_content_cookie(partition_data *partition);
 
 static partition_module_info intel_extended_partition_module = {
 	{
-		INTEL_EXTENDED_PARTITION_MODULE_NAME,
+		kExtendedPartitionModuleName,
 		0,
 		ep_std_ops
 	},
-	kExtendedPartitionPrettyName,		// pretty_name
+	kPartitionTypeIntelExtended,		// pretty_name
 
 	// scanning
 	ep_identify_partition,				// identify_partition
@@ -523,11 +376,12 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// supports_resizing_child_partition
 	NULL,								// supports_moving_partition
 	NULL,								// supports_moving_child_partition
+	NULL,								// supports_creating_child_partition
 	NULL,								// supports_parent_system
 	NULL,								// supports_child_system
 	NULL,								// validate_resize_partition
-	NULL,								// validate_move_partition
 	NULL,								// validate_resize_child_partition
+	NULL,								// validate_move_partition
 	NULL,								// validate_move_child_partition
 	NULL,								// validate_create_child_partition
 	NULL,								// validate_initialize_partition
@@ -586,6 +440,11 @@ pm_identify_partition(int fd, partition_data *partition, void **cookie)
 	TRACE(("intel: pm_identify_partition(%d, %ld: %lld, %lld, %ld)\n", fd,
 		   partition->id, partition->offset, partition->size,
 		   partition->block_size));
+	// reject extended partitions
+	if (partition->type
+		&& !strcmp(partition->type, kPartitionTypeIntelExtended)) {
+		return -1;
+	}
 	// check block size
 	uint32 blockSize = partition->block_size;
 	if (blockSize < sizeof(partition_table_sector)) {
@@ -624,7 +483,7 @@ pm_scan_partition(int fd, partition_data *partition, void *cookie)
 	PartitionMap *map = (PartitionMap*)cookie;
 	// fill in the partition_data structure
 	// (no content_name and content_parameters)
-	partition->content_type = strdup(kPartitionMapPrettyName);
+	partition->content_type = strdup(kPartitionTypeIntel);
 	if (!partition->content_type)
 		return B_NO_MEMORY;
 	partition->content_cookie = map;
@@ -647,11 +506,12 @@ TRACE(("Creating child at index %ld failed\n", index - 1));
 			child->size = primary->Size();
 			child->block_size = partition->block_size;
 			// (no name)
-			child->type = strdup(primary->IsExtended()
-				? kExtendedPartitionPrettyName : kPrimaryPartitionPrettyName);
+			char type[B_FILE_NAME_LENGTH];
+			primary->GetTypeString(type);
+			child->type = strdup(type);
 			// parameters
 			char buffer[128];
-			sprintf(buffer, "type = %u ; active = %d\n", primary->Type(),
+			sprintf(buffer, "type = %u ; active = %d", primary->Type(),
 					primary->Active());
 			child->parameters = strdup(buffer);
 			child->cookie = primary;
@@ -736,12 +596,12 @@ ep_identify_partition(int fd, partition_data *partition, void **cookie)
 	// our parent must be a intel partition map partition and we must have
 	// extended partition type
 	if (!partition->type
-		|| strcmp(partition->type, kExtendedPartitionPrettyName)) {
+		|| strcmp(partition->type, kPartitionTypeIntelExtended)) {
 		return -1;
 	}
 	partition_data *parent = get_parent_partition(partition->id);
 	if (!parent || !parent->content_type
-		|| strcmp(parent->content_type, kPartitionMapPrettyName)) {
+		|| strcmp(parent->content_type, kPartitionTypeIntel)) {
 		return -1;
 	}
 	// things seem to be in order
@@ -762,7 +622,7 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 	PrimaryPartition *primary = (PrimaryPartition*)partition->cookie;
 	// fill in the partition_data structure
 	// (no content_name and content_parameters)
-	partition->content_type = strdup(kExtendedPartitionPrettyName);
+	partition->content_type = strdup(kPartitionTypeIntelExtended);
 	if (!partition->content_type)
 		return B_NO_MEMORY;
 	partition->content_cookie = primary;
@@ -783,11 +643,13 @@ ep_scan_partition(int fd, partition_data *partition, void *cookie)
 		child->size = logical->Size();
 		child->block_size = partition->block_size;
 		// (no name)
-		child->type = strdup(kLogicalPartitionPrettyName);
+		char type[B_FILE_NAME_LENGTH];
+		logical->GetTypeString(type);
+		child->type = strdup(type);
 		// parameters
 		char buffer[128];
-		sprintf(buffer, "type = %u ; active = %d\n", primary->Type(),
-				primary->Active());
+		sprintf(buffer, "type = %u ; active = %d", logical->Type(),
+				logical->Active());
 		child->parameters = strdup(buffer);
 		child->cookie = logical;
 		// check for allocation problems

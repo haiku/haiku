@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <DiskDeviceTypes.h>
 #include <KernelExport.h>
 
 #include "PartitionMap.h"
@@ -23,24 +24,25 @@
 
 // partition_type
 struct partition_type {
-	uint8	type;
-	char	*name;
+	uint8		type;
+	const char	*name;
 };
 
 static const struct partition_type kPartitionTypes[] = {
 	// these entries must be sorted by type (currently not)
+// TODO: Standardize naming.
 	{ 0x00, "empty" },
 	{ 0x01, "FAT 12-bit" },
 	{ 0x02, "Xenix root" },
 	{ 0x03, "Xenix user" },
 	{ 0x04, "FAT 16-bit (dos 3.0)" },
-	{ 0x05, "Extended Partition" },
+	{ 0x05, /*"Extended Partition"*/kPartitionTypeIntelExtended },
 	{ 0x06, "FAT 16-bit (dos 3.31)" },
 	{ 0x07, "OS/2 IFS, Windows NT, Advanced Unix" },
 	{ 0x0b, "FAT 32-bit" },
 	{ 0x0c, "FAT 32-bit, LBA-mapped" },
 	{ 0x0d, "FAT 16-bit, LBA-mapped" },
-	{ 0x0f, "Extended Partition, LBA-mapped" },
+	{ 0x0f, /*"Extended Partition, LBA-mapped"*/kPartitionTypeIntelExtended },
 	{ 0x42, "Windows 2000 marker (switches to a proprietary partition table)" },
 	{ 0x4d, "QNX 4" },
 	{ 0x4e, "QNX 4 2nd part" },
@@ -48,7 +50,7 @@ static const struct partition_type kPartitionTypes[] = {
 	{ 0x78, "XOSL boot loader" },
 	{ 0x82, "Linux swapfile" },
 	{ 0x83, "Linux native" },
-	{ 0x85, "Linux extendend partition" },
+	{ 0x85, /*"Linux extendend partition"*/kPartitionTypeIntelExtended },
 	{ 0xa5, "FreeBSD" },
 	{ 0xa6, "OpenBSD" },
 	{ 0xa7, "NextSTEP" },
@@ -56,7 +58,7 @@ static const struct partition_type kPartitionTypes[] = {
 	{ 0xa9, "NetBSD" },
 	{ 0xab, "MacOS X boot" },
 	{ 0xbe, "Solaris 8 boot" },
-	{ 0xeb, "BeOS" },
+	{ 0xeb, /*"BeOS"*/ kPartitionTypeBFS },
 	{ 0, NULL }
 };
 
