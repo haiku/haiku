@@ -1,24 +1,34 @@
 // LibBeAdapter.cpp
 
-#include <ByteOrder.h>
+#include <Directory.h>
 #include <Entry.h>
-#include <List.h>
 #include <Path.h>
 #include <string.h>
 
-status_t
-entry_ref_to_path_adapter(dev_t device, ino_t directory, const char *name,
-						  char *buffer, size_t size)
+#include <syscalls.h>
+
+
+extern "C" status_t
+_kern_dir_node_ref_to_path(dev_t device, ino_t inode, char *buffer, size_t size)
 {
-	status_t error = (name && buffer ? B_OK : B_BAD_VALUE);
+	if (buffer == NULL)
+		return B_BAD_VALUE;
+
+	node_ref nodeRef;
+	nodeRef.device = device;
+	nodeRef.node = inode;
+
+	BDirectory directory;
+	status_t error = directory.SetTo(&nodeRef);
+
 	BEntry entry;
-	if (error == B_OK) {
-		entry_ref ref(device, directory, name);
-		error = entry.SetTo(&ref);
-	}
+	if (error == B_OK)
+		error = directory.GetEntry(&entry);
+
 	BPath path;
 	if (error == B_OK)
 		error = entry.GetPath(&path);
+
 	if (error == B_OK) {
 		if (size >= strlen(path.Path()) + 1)
 			strcpy(buffer, path.Path());
@@ -26,5 +36,44 @@ entry_ref_to_path_adapter(dev_t device, ino_t directory, const char *name,
 			error = B_BAD_VALUE;
 	}
 	return error;
+}
+
+
+// Syscall mapping between R5 and us
+
+// private libroot.so functions
+
+extern "C" status_t _kstart_watching_vnode_(dev_t device, ino_t node,
+											uint32 flags, port_id port,
+											int32 handlerToken);
+
+extern "C" status_t _kstop_watching_vnode_(dev_t device, ino_t node,
+										   port_id port, int32 handlerToken);
+
+
+extern "C" status_t _kstop_notifying_(port_id port, int32 handlerToken);
+
+
+status_t
+_kern_stop_notifying(port_id port, uint32 token)
+{
+	return _kstop_notifying_(port, token);
+}
+
+
+status_t
+_kern_start_watching(dev_t device, ino_t node, uint32 flags,
+	port_id port, uint32 token)
+{
+	return _kstart_watching_vnode_(device, node, flags, port, token);
+}
+
+			
+status_t
+_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
+	port_id port, uint32 token)
+{
+	(void)flags;
+	return _kstop_watching_vnode_(device, node, port, token);
 }
 

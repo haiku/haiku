@@ -12,19 +12,21 @@
 #include "kernel_interface.h"
 #include "storage_support.h"
 
-#include "LibBeAdapter.h"
-
-#include <algorithm>
-#include <fsproto.h>
-#include <errno.h>		// errno
-#include <new>
+#include <OS.h>
+#include <image.h>		// used by get_app_path()
 #include <fs_info.h>	//  File sytem information functions, structs, defines
 #include <fs_attr.h>	//  BeOS's C-based attribute functions
 #include <fs_query.h>	//  BeOS's C-based query functions
 #include <Entry.h>		// entry_ref
-#include <image.h>		// used by get_app_path()
-#include <utime.h>		// for utime() and struct utimbuf
-#include <OS.h>
+
+#include <fsproto.h>	// this is probably not compatible with our version and should be replaced
+#include <syscalls.h>
+
+#include <algorithm>
+#include <new>
+#include <utime.h>
+#include <errno.h>
+#include <unistd.h>
 
 // This is just for cout while developing; shouldn't need it
 // when all is said and done.
@@ -991,12 +993,20 @@ BPrivate::Storage::entry_ref_to_path( const struct entry_ref *ref, char *result,
 	}
 }
 
+
 status_t
-BPrivate::Storage::entry_ref_to_path( dev_t device, ino_t directory, const char *name,
-							   char *result, size_t size )
+BPrivate::Storage::entry_ref_to_path(dev_t device, ino_t directory, const char *name,
+	char *path, size_t size)
 {
-	return entry_ref_to_path_adapter(device, directory, name, result, size);
+	status_t status = _kern_dir_node_ref_to_path(device, directory, path, size);
+	if (status < B_OK)
+		return status;
+
+	strlcat(path, "/", size);
+	strlcat(path, name, size);
+	return B_OK;
 }
+
 
 status_t
 BPrivate::Storage::dir_to_self_entry_ref( FileDescriptor dir, entry_ref *result )
