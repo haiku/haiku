@@ -33,36 +33,29 @@
  */
 
 status_t
-pnp_notify_probe_by_module(device_node_info *node, const char *consumer_name)
+pnp_notify_probe_by_module(device_node_info *node, const char *consumerName)
 {
 	driver_module_info *consumer;
-	status_t res;
+	status_t status;
 
-	TRACE(("pnp_notify_probe_by_module(node %p, consumer: %s)\n", node, consumer_name));
+	TRACE(("pnp_notify_probe_by_module(node %p, consumer: %s)\n", node, consumerName));
 
-	res = get_module(consumer_name, (module_info **)&consumer);
-	if (res < B_OK) {
-		dprintf("Cannot load driver module %s (%s)\n", consumer_name, strerror(res));
-		goto exit;
+	status = get_module(consumerName, (module_info **)&consumer);
+	if (status < B_OK) {
+		dprintf("Cannot load driver module %s (%s)\n", consumerName, strerror(status));
+		return status;
 	}
 
-	if (consumer->probe == NULL) {
-		dprintf("Driver %s has no probe hook\n", consumer_name);
-		res = B_ERROR;
+	if (consumer->register_device == NULL) {
+		dprintf("Driver %s has no register_device() hook\n", consumerName);
+		status = B_ERROR;
 	} else {
-		res = consumer->probe(node);
-		TRACE(("Driver %s probe returned: %s\n", consumer_name, strerror(res)));
+		status = consumer->register_device(node);
+		TRACE(("Driver %s register_device() returned: %s\n", consumerName, strerror(status)));
 	}
 
-	put_module(consumer_name);
-
-exit:
-#ifdef TRACE_NOTIFICATIONS
-	if (res != B_OK)
-		dprintf("notify_probe_by_module: %s\n", strerror(res));
-#endif
-
-	return res;
+	put_module(consumerName);
+	return status;
 }
 
 
@@ -94,7 +87,7 @@ notify_device_removed(device_node_info *node)
 	// don't take node->loading into account - we want to know
 	// whether driver is loaded, not whether it is about to get loaded	
 	loaded = node->load_count > 0;
-	
+
 	if (loaded) {
 		TRACE(("Already loaded\n"));
 		driver = node->driver;
