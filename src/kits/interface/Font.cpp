@@ -135,10 +135,13 @@ BFont::BFont(const BFont *font)
 	
 }
 
+/* XXX TODO: R5 doesn't have a destructor, so we get linking errors when objects compiled with old headers with the new library
+			 (but now we leak memory here)
 BFont::~BFont(void)
 {
 	delete private_data;
 }
+*/
 
 status_t BFont::SetFamilyAndStyle(const font_family family, const font_style style)
 {
