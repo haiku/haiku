@@ -59,24 +59,37 @@ PrintBitsInfo(const char *filepath)
 		// read in the rest of the header
 		ssize_t size = sizeof(TranslatorBitmap);
 		if (file.Read(reinterpret_cast<uint8 *> (&header), size) != size) {
-			printf("Error reading from file\n");
+			printf("Error: Unable to read the Be bitmap header.\n");
 			return;
 		}
+		file.Unset();
+			// I don't need the file anymore
+
 		// convert to host byte order
 		if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
 			B_SWAP_BENDIAN_TO_HOST) != B_OK) {
-			printf("Unable to swap byte order\n");
+			printf("Error: Unable to swap byte order\n");
 			return;
 		}
 		
-		printf("bits header for: %s\n", filepath);
-		
-		printf("width: %d\n",
-			static_cast<int>(header.bounds.Width() + 1));
-		printf("height: %d\n",
+		printf("Be bitmap (\"bits\") header for: %s\n\n", filepath);
+	
+		const uint32 kbitsmagic = 0x62697473UL;
+			// in ASCII, this number looks like "bits"
+		printf("magic number: 0x%.8lx ", header.magic);
+		if (header.magic == kbitsmagic)
+			printf("(valid)\n");
+		else
+			printf("(INVALID, should be: 0x%.8lx)\n",
+				kbitsmagic);
+		printf("bounds: (%f, %f, %f, %f)\n",
+			header.bounds.left, header.bounds.top,
+			header.bounds.right, header.bounds.bottom);
+		printf("dimensions: %d x %d\n",
+			static_cast<int>(header.bounds.Width() + 1),
 			static_cast<int>(header.bounds.Height() + 1));
 		
-		printf("rowBytes: %u\n",
+		printf("bytes per row: %u\n",
 			static_cast<unsigned int>(header.rowBytes));
 	
 		// print out colorspace if it matches an item in the list
@@ -132,15 +145,15 @@ PrintBitsInfo(const char *filepath)
 		int32 i;
 		for (i = 0; i < kncolorspaces; i++) {
 			if (header.colors == colorspaces[i].id) {
-				printf("colors: %s\n", colorspaces[i].name);
+				printf("color space: %s\n", colorspaces[i].name);
 				break;
 			}
 		}
 		if (i == kncolorspaces)
-			printf("colors: Unknown (0x%.8lx)\n",
+			printf("color space: Unknown (0x%.8lx)\n",
 				static_cast<unsigned long>(header.colors));
 			
-		printf("dataSize: %u\n",
+		printf("data size: %u\n",
 			static_cast<unsigned int>(header.dataSize));
 	} else
 		printf("Error opening %s\n", filepath);
