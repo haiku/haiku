@@ -24,11 +24,11 @@
 #include <Font.h>
 
 #include "moreUTF8.h"
+#include "TextGapBuffer.h"
 #include "WidthBuffer.h"
 
 #include <cstdio>
 
-//#define USE_DANO_WIDTHBUFFER
 
 const uint32 kTableCount = 128;
 
