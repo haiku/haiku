@@ -304,7 +304,7 @@ bool scan_info_home(scan_info *info)
 }
 
 
-bool init_scan_info_by_file(const char *file_name,scan_info *info)
+int init_scan_info_by_file(const char *file_name,scan_info *info)
 {
 	int err = SHE_NO_ERROR;
 

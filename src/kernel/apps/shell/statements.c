@@ -10,7 +10,7 @@
 #include "shell_defs.h"
 #include "file_utils.h"
 
-static bool parse_value(scan_info *info,shell_value **out);
+static int parse_value(scan_info *info,shell_value **out);
 static int handle_exec(scan_info *info,shell_value **out);
 static int parse_rvl_expr(scan_info *info,shell_value **out);
 
