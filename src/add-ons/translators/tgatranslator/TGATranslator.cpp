@@ -104,9 +104,6 @@ make_nth_translator(int32 n, image_id you, uint32 flags, ...)
 	if (!n)
 		ptranslator = new TGATranslator();
 		
-	printf("n: %d you: %d NULL?: %c\n",
-		n, (int) you, (ptranslator) ? 'Y' : 'N');
-		
 	return ptranslator;
 }
 
@@ -309,7 +306,8 @@ identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
 		// copy portion of header already read in
 	// read in the rest of the header
 	ssize_t size = sizeof(TranslatorBitmap) - amtread;
-	if (inSource->Read(((uint8 *) &header) + amtread, size) != size)
+	if (inSource->Read(
+		(reinterpret_cast<uint8 *> (&header)) + amtread, size) != size)
 		return B_NO_TRANSLATOR;
 		
 	// convert to host byte order
@@ -865,8 +863,8 @@ copy_rle_packet(uint8 *ptga, uint32 pixel, uint8 count,
 	memcpy(ptga, &packethead, 1);
 	ptga++;
 
-	return pix_bits_to_tga((uint8 *) &pixel, ptga, fromspace,
-		1, pmap, bitsBytesPerPixel) + 1;
+	return pix_bits_to_tga(reinterpret_cast<uint8 *> &pixel,
+		ptga, fromspace, 1, pmap, bitsBytesPerPixel) + 1;
 }
 
 status_t
@@ -906,7 +904,8 @@ pix_bits_to_tgarle(uint8 *pbits, uint8 *ptga, color_space fromspace,
 	memcpy(&current, pbits, bitsBytesPerPixel);
 	pbits += bitsBytesPerPixel;
 	if (width == 1) {
-		result = copy_raw_packet(ptga, (uint8 *) &current, 1,
+		result = copy_raw_packet(ptga,
+			reinterpret_cast<uint8 *> &current, 1,
 			fromspace, pmap, bitsBytesPerPixel);
 						
 		ptga += result;
@@ -1415,8 +1414,8 @@ translate_from_bits(BPositionIO *inSource, ssize_t amtread, uint8 *read,
 		TGAImageSpec imagespec;
 		imagespec.xorigin = 0;
 		imagespec.yorigin = 0;
-		imagespec.width = (uint16) bitsHeader.bounds.Width() + 1;
-		imagespec.height = (uint16) bitsHeader.bounds.Height() + 1;
+		imagespec.width = static_cast<uint16> (bitsHeader.bounds.Width() + 1);
+		imagespec.height = static_cast<uint16> (bitsHeader.bounds.Height() + 1);
 		imagespec.depth = 0;
 		imagespec.descriptor = TGA_ORIGIN_VERT_BIT;
 		
