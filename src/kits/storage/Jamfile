@@ -43,6 +43,7 @@ SharedLibrary storage :
 	Resources.cpp
 	ResourceStrings.cpp
 	Err.cpp			# Hack-o-rama
+	DisjList.cpp			# Hack-o-rama
 	Pattern.cpp		# Hack-o-rama
 	PatternList.cpp		# Hack-o-rama
 	Parser.cpp		# Hack-o-rama
