@@ -295,10 +295,12 @@ virtual				~BMessage();
 		class Private;
 
 private:
+		class Header;
 
 friend class	BMessageQueue;
 friend class	BMessenger;
 friend class	BApplication;
+friend class	Header;
 friend class	Private;
 
 friend inline	void		_set_message_target_(BMessage *, int32, bool);
@@ -314,8 +316,6 @@ virtual	void		_ReservedMessage2();
 virtual	void		_ReservedMessage3();
 
 		void		init_data();
-		status_t	flatten_hdr(BDataIO *stream) const;
-		status_t	unflatten_hdr(BDataIO *stream, bool& swap);
 		status_t	flatten_target_info(BDataIO *stream,
 										ssize_t size,
 										uchar flags) const;
@@ -331,7 +331,6 @@ virtual	void		_ReservedMessage3();
 
 		ssize_t		calc_size(uchar flags) const;
 		ssize_t		calc_hdr_size(uchar flags) const;
-		ssize_t		min_hdr_size() const;
 		status_t	nfind_data(	const char *name,
 								type_code type,
 								int32 index,

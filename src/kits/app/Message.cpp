@@ -101,6 +101,345 @@ static status_t handle_reply(port_id   reply_port,
 static status_t convert_message(const KMessage *fromMessage,
 	BMessage *toMessage);
 
+static ssize_t min_hdr_size();
+
+
+// #pragma mark -
+
+class BMessage::Header {
+public:
+	Header() {}
+	Header(const BMessage &message) { ReadFrom(message); }
+
+	status_t ReadFrom(BDataIO &stream);
+	void ReadFrom(const BMessage &message);
+	status_t WriteTo(BDataIO &stream);
+	void WriteTo(BMessage &message);
+
+	uint32	CalculateCheckSum() const;
+	uint32	CalculateHeaderSize() const;
+
+	bool IsSwapped() const { return fSwapped; }
+
+	bool HasTarget() const { return (fFlags & MSG_FLAG_INCL_TARGET); }
+	void SetTarget(int32 token, bool preferred);
+
+private:
+	int32	fMagic;
+	int32	fBodySize;
+	uint32	fWhat;
+	uint8	fFlags;
+	int32	fTargetToken;
+	port_id	fReplyPort;
+	int32	fReplyToken;
+	team_id	fReplyTeam;
+	bool	fPreferredTarget;
+	bool	fReplyRequired;
+	bool	fReplyDone;
+	bool	fIsReply;
+	bool	fSwapped;
+};
+
+// ReadFrom
+status_t
+BMessage::Header::ReadFrom(BDataIO &stream)
+{
+	int32 checkSum;
+	uchar csBuffer[MSG_HEADER_MAX_SIZE];
+
+	TReadHelper read_helper(&stream);
+	TChecksumHelper checksum_helper(csBuffer);
+	int32 flattenedSize;
+
+	try {
+		// Get the message version
+		read_helper(fMagic);
+
+		fSwapped = false;
+		if (fMagic == '1BOF') {
+			fSwapped = true;
+		} else if (fMagic == 'FOB1') {
+			fSwapped = false;
+		} else {
+			// This is *not* a message
+			return B_NOT_A_MESSAGE;
+		}
+
+		read_helper.SetSwap(fSwapped);
+
+		// get the checksum
+		read_helper(checkSum);
+		// get the size
+		read_helper(flattenedSize);
+		checksum_helper.Cache(flattenedSize);
+		// Get the what
+		read_helper(fWhat);
+		checksum_helper.Cache(fWhat);
+		// Get the flags
+		read_helper(fFlags);
+		checksum_helper.Cache(fFlags);
+
+		if (fFlags & MSG_FLAG_BIG_ENDIAN) {
+			// TODO: ???
+			// Isn't this already indicated by the byte order of the message version?
+		}
+		if (fFlags & MSG_FLAG_INCL_TARGET) {
+			// Get the target data
+			read_helper(fTargetToken);
+			checksum_helper.Cache(fTargetToken);
+		}
+		if (fFlags & MSG_FLAG_INCL_REPLY) {
+			// Get the reply port
+			read_helper(fReplyPort);
+			read_helper(fReplyToken);
+			read_helper(fReplyTeam);
+			checksum_helper.Cache(fReplyPort);
+			checksum_helper.Cache(fReplyToken);
+			checksum_helper.Cache(fReplyTeam);
+
+			// Get the "big flags"
+			uint8 bigFlags;
+			// Get the preferred flag
+			read_helper(bigFlags);
+			checksum_helper.Cache(bigFlags);
+			fPreferredTarget = bigFlags;
+
+			// Get the reply requirement flag
+			read_helper(bigFlags);
+			checksum_helper.Cache(bigFlags);
+			fReplyRequired = bigFlags;
+
+			// Get the reply done flag
+			read_helper(bigFlags);
+			checksum_helper.Cache(bigFlags);
+			fReplyDone = bigFlags;
+
+			// Get the "is reply" flag
+			read_helper(bigFlags);
+			checksum_helper.Cache(bigFlags);
+			fIsReply = bigFlags;
+		}
+	} catch (status_t& e) {
+		return e;
+	}
+
+	if (checkSum != checksum_helper.CheckSum())
+		return B_NOT_A_MESSAGE;
+
+	fBodySize = flattenedSize - CalculateHeaderSize();
+
+	return B_OK;
+}
+
+// ReadFrom
+void
+BMessage::Header::ReadFrom(const BMessage &message)
+{
+	fMagic = MSG_FIELD_VERSION;
+
+	fBodySize = message.fBody->FlattenedSize();
+	fWhat = message.what;
+	fFlags = 0;
+#ifdef B_HOST_IS_BENDIAN
+	fFlags |= MSG_FLAG_BIG_ENDIAN;
+#endif
+	if (message.HasSpecifiers())
+		fFlags |= MSG_FLAG_SCRIPT_MSG;
+	if (message.fTarget != B_NULL_TOKEN)
+		fFlags |= MSG_FLAG_INCL_TARGET;
+	if (message.fReplyTo.port >= 0 &&
+		message.fReplyTo.target != B_NULL_TOKEN &&
+		message.fReplyTo.team >= 0) {
+		fFlags |= MSG_FLAG_INCL_REPLY;
+	}
+	fTargetToken = message.fTarget;
+	fReplyPort = message.fReplyTo.port;
+	fReplyToken = message.fReplyTo.target;
+	fReplyTeam = message.fReplyTo.team;
+	fPreferredTarget = message.fPreferred;
+	fReplyRequired = message.fReplyRequired;
+	fReplyDone = message.fReplyDone;
+	fIsReply = message.fIsReply;
+}
+
+// WriteTo
+status_t
+BMessage::Header::WriteTo(BDataIO &stream)
+{
+	status_t err = B_OK;
+	int32 data;
+
+	// Write the version of the binary data format
+	data = fMagic;
+	write_helper(&stream, (const void*)&data, sizeof (data), err);
+	if (!err) {
+		// compute checksum
+		data = CalculateCheckSum();
+		write_helper(&stream, (const void*)&data, sizeof (data), err);
+	}
+	if (!err) {
+		// Write the flattened size of the entire message
+		data = CalculateHeaderSize() + fBodySize;
+		write_helper(&stream, (const void*)&data, sizeof (data), err);
+	}
+	if (!err) {
+		// Write the 'what' member
+		write_helper(&stream, (const void*)&fWhat, sizeof (fWhat), err);
+	}
+	if (!err) {
+		// Write the header flags
+		write_helper(&stream, (const void*)&fFlags, sizeof (fFlags), err);
+	}
+
+	// Write targeting info if necessary
+	if (!err && (fFlags & MSG_FLAG_INCL_TARGET)) {
+		data = fPreferredTarget ? B_PREFERRED_TOKEN : fTargetToken;
+		write_helper(&stream, (const void*)&data, sizeof (data), err);
+	}
+
+	// Write reply info if necessary
+	if (!err && (fFlags & MSG_FLAG_INCL_REPLY)) {
+		write_helper(&stream, (const void*)&fReplyPort, sizeof(fReplyPort),
+			err);
+		if (!err) {
+			write_helper(&stream, (const void*)&fReplyToken,
+						 sizeof(fReplyToken), err);
+		}
+		if (!err) {
+			write_helper(&stream, (const void*)&fReplyTeam,
+						 sizeof(fReplyTeam), err);
+		}
+
+		uint8 bigFlags;
+		if (!err) {
+			bigFlags = fPreferredTarget ? 1 : 0;
+			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
+				err);
+		}
+		if (!err)
+		{
+			bigFlags = fReplyRequired ? 1 : 0;
+			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
+				err);
+		}
+		if (!err)
+		{
+			bigFlags = fReplyDone ? 1 : 0;
+			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
+				err);
+		}
+		if (!err)
+		{
+			bigFlags = fIsReply ? 1 : 0;
+			write_helper(&stream, (const void*)&bigFlags, sizeof(bigFlags),
+				err);
+		}
+	}
+
+	return err;
+}
+
+// WriteTo
+void
+BMessage::Header::WriteTo(BMessage &message)
+{
+	// Make way for the new data
+	message.MakeEmpty();
+
+	message.what = fWhat;
+
+	message.fHasSpecifiers = fFlags & MSG_FLAG_SCRIPT_MSG;
+
+	if (fFlags & MSG_FLAG_INCL_TARGET) {
+		// Get the target data
+		message.fTarget = fTargetToken;
+	}
+	if (fFlags & MSG_FLAG_INCL_REPLY) {
+		// Get the reply port
+		message.fReplyTo.port = fReplyPort;
+		message.fReplyTo.target = fReplyToken;
+		message.fReplyTo.team = fReplyTeam;
+
+		message.fWasDelivered = true;
+
+		message.fPreferred = fPreferredTarget;
+		if (fPreferredTarget)
+			message.fTarget = B_PREFERRED_TOKEN;
+
+		message.fReplyRequired = fReplyRequired;
+		message.fReplyDone = fReplyDone;
+		message.fIsReply = fIsReply;
+	}
+}
+
+// CalculateCheckSum
+uint32
+BMessage::Header::CalculateCheckSum() const
+{
+	uchar csBuffer[MSG_HEADER_MAX_SIZE];
+	TChecksumHelper checksum_helper(csBuffer);
+
+	int32 flattenedSize = CalculateHeaderSize() + fBodySize;
+	checksum_helper.Cache(flattenedSize);
+	checksum_helper.Cache(fWhat);
+	checksum_helper.Cache(fFlags);
+	if (fFlags & MSG_FLAG_INCL_TARGET)
+		checksum_helper.Cache(fTargetToken);
+	if (fFlags & MSG_FLAG_INCL_REPLY) {
+		checksum_helper.Cache(fReplyPort);
+		checksum_helper.Cache(fReplyToken);
+		checksum_helper.Cache(fReplyTeam);
+
+		// big flags
+		uint8 bigFlags = (fPreferredTarget ? 1 : 0);
+		checksum_helper.Cache(bigFlags);
+		bigFlags = (fReplyRequired ? 1 : 0);
+		checksum_helper.Cache(bigFlags);
+		bigFlags = (fReplyDone ? 1 : 0);
+		checksum_helper.Cache(bigFlags);
+		bigFlags = (fIsReply ? 1 : 0);
+		checksum_helper.Cache(bigFlags);
+	}
+
+	return checksum_helper.CheckSum();
+}
+
+// CalculateHeaderSize
+uint32
+BMessage::Header::CalculateHeaderSize() const
+{
+	ssize_t size = min_hdr_size();
+
+	if (fTargetToken != B_NULL_TOKEN)
+		size += sizeof (fTargetToken);
+
+	if (fReplyPort >= 0 && fReplyToken != B_NULL_TOKEN && fReplyTeam >= 0) {
+		size += sizeof (fReplyPort);
+		size += sizeof (fReplyToken);
+		size += sizeof (fReplyTeam);
+
+		size += 4;	// For the "big" flags
+	}
+
+	return size;
+}
+
+// SetTarget
+void
+BMessage::Header::SetTarget(int32 token, bool preferred)
+{
+	fTargetToken = token;
+	if (fTargetToken == B_NULL_TOKEN)
+		fFlags &= ~MSG_FLAG_INCL_TARGET;
+	else
+		fFlags |= MSG_FLAG_INCL_TARGET;
+
+	fPreferredTarget = preferred;
+}
+
+
+// #pragma mark -
+
 void BMessage::_ReservedMessage1() {}
 void BMessage::_ReservedMessage2() {}
 void BMessage::_ReservedMessage3() {}
@@ -591,11 +930,14 @@ status_t BMessage::Unflatten(const char* flat_buffer)
 //------------------------------------------------------------------------------
 status_t BMessage::Unflatten(BDataIO* stream)
 {
-	bool swap;
-	status_t err = unflatten_hdr(stream, swap);
+	Header header;
+	status_t err = header.ReadFrom(*stream);
 
 	if (!err)
 	{
+		header.WriteTo(*this);
+		bool swap = header.IsSwapped();
+
 		TReadHelper reader(stream, swap);
 		int8 flags;
 		type_code type;
@@ -1462,242 +1804,24 @@ BPoint BMessage::FindPoint(const char* name, int32 n) const
 	FindPoint(name, n, &p);
 	return p;
 }
-//------------------------------------------------------------------------------
-status_t BMessage::flatten_hdr(BDataIO* stream) const
-{
-	status_t err = B_OK;
-	int32 data = MSG_FIELD_VERSION;
 
-	// Write the version of the binary data format
-	write_helper(stream, (const void*)&data, sizeof (data), err);
-	if (!err)
-	{
-		// faked up checksum; we'll fix it up later
-		write_helper(stream, (const void*)&data, sizeof (data), err);
-	}
-	if (!err)
-	{
-		// Write the flattened size of the entire message
-		data = fBody->FlattenedSize() + calc_hdr_size(0);
-		write_helper(stream, (const void*)&data, sizeof (data), err);
-	}
-	if (!err)
-	{
-		// Write the 'what' member
-		write_helper(stream, (const void*)&what, sizeof (what), err);
-	}
 
-	uint8 flags = 0;
-#ifdef B_HOST_IS_BENDIAN
-	flags |= MSG_FLAG_BIG_ENDIAN;
-#endif
-	if (HasSpecifiers())
-	{
-		flags |= MSG_FLAG_SCRIPT_MSG;
-	}
-
-	if (fTarget != B_NULL_TOKEN)
-	{
-		flags |= MSG_FLAG_INCL_TARGET;
-	}
-
-	if (fReplyTo.port >= 0 &&
-		fReplyTo.target != B_NULL_TOKEN &&
-		fReplyTo.team >= 0)
-	{
-		flags |= MSG_FLAG_INCL_REPLY;
-	}
-
-	if (!err)
-	{
-		// Write the header flags
-		write_helper(stream, (const void*)&flags, sizeof (flags), err);
-	}
-
-	// Write targeting info if necessary
-	if (!err && (flags & MSG_FLAG_INCL_TARGET))
-	{
-		data = fPreferred ? B_PREFERRED_TOKEN : fTarget;
-		write_helper(stream, (const void*)&data, sizeof (data), err);
-	}
-
-	// Write reply info if necessary
-	if (!err && (flags & MSG_FLAG_INCL_REPLY))
-	{
-		write_helper(stream, (const void*)&fReplyTo.port,
-					 sizeof (fReplyTo.port), err);
-		if (!err)
-		{
-			write_helper(stream, (const void*)&fReplyTo.target,
-						 sizeof (fReplyTo.target), err);
-		}
-		if (!err)
-		{
-			write_helper(stream, (const void*)&fReplyTo.team,
-						 sizeof (fReplyTo.team), err);
-		}
-
-		uint8 bigFlags;
-		if (!err)
-		{
-			bigFlags = fPreferred ? 1 : 0;
-			write_helper(stream, (const void*)&bigFlags,
-						 sizeof (bigFlags), err);
-		}
-		if (!err)
-		{
-			bigFlags = fReplyRequired ? 1 : 0;
-			write_helper(stream, (const void*)&bigFlags,
-						 sizeof (bigFlags), err);
-		}
-		if (!err)
-		{
-			bigFlags = fReplyDone ? 1 : 0;
-			write_helper(stream, (const void*)&bigFlags,
-						 sizeof (bigFlags), err);
-		}
-		if (!err)
-		{
-			bigFlags = fIsReply ? 1 : 0;
-			write_helper(stream, (const void*)&bigFlags,
-						 sizeof (bigFlags), err);
-		}
-	}
-
-	return err;
-}
-//------------------------------------------------------------------------------
-status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
-{
-	status_t err = B_OK;
-	int32 data;
-	int32 checksum;
-	uchar csBuffer[MSG_HEADER_MAX_SIZE];
-
-	TReadHelper read_helper(stream);
-	TChecksumHelper checksum_helper(csBuffer);
-
-	try {
-
-	// Get the message version
-	read_helper(data);
-	if (data == '1BOF')
-	{
-		swap = true;
-	}
-	else if (data == 'FOB1')
-	{
-		swap = false;
-	}
-	else
-	{
-		// This is *not* a message
-		return B_NOT_A_MESSAGE;
-	}
-
-	// Make way for the new data
-	MakeEmpty();
-
-	read_helper.SetSwap(swap);
-
-	// get the checksum
-	read_helper(checksum);
-	// get the size
-	read_helper(data);
-	checksum_helper.Cache(data);
-	// Get the what
-	read_helper(what);
-	checksum_helper.Cache(what);
-	// Get the flags
-	uint8 flags = 0;
-	read_helper(flags);
-	checksum_helper.Cache(flags);
-
-	fHasSpecifiers = flags & MSG_FLAG_SCRIPT_MSG;
-
-	if (flags & MSG_FLAG_BIG_ENDIAN)
-	{
-		// TODO: ???
-		// Isn't this already indicated by the byte order of the message version?
-	}
-	if (flags & MSG_FLAG_INCL_TARGET)
-	{
-		// Get the target data
-		read_helper(data);
-		checksum_helper.Cache(data);
-		fTarget = data;
-	}
-	if (flags & MSG_FLAG_INCL_REPLY)
-	{
-		// Get the reply port
-		read_helper(fReplyTo.port);
-		read_helper(fReplyTo.target);
-		read_helper(fReplyTo.team);
-		checksum_helper.Cache(fReplyTo.port);
-		checksum_helper.Cache(fReplyTo.target);
-		checksum_helper.Cache(fReplyTo.team);
-
-		fWasDelivered = true;
-
-		// Get the "big flags"
-		uint8 bigFlags;
-		// Get the preferred flag
-		read_helper(bigFlags);
-		checksum_helper.Cache(bigFlags);
-		fPreferred = bigFlags;
-		if (fPreferred)
-		{
-			fTarget = B_PREFERRED_TOKEN;
-		}
-		// Get the reply requirement flag
-		read_helper(bigFlags);
-		checksum_helper.Cache(bigFlags);
-		fReplyRequired = bigFlags;
-		// Get the reply done flag
-		read_helper(bigFlags);
-		checksum_helper.Cache(bigFlags);
-		fReplyDone = bigFlags;
-		// Get the "is reply" flag
-		read_helper(bigFlags);
-		checksum_helper.Cache(bigFlags);
-		fIsReply = bigFlags;
-	}
-	}
-	catch (status_t& e)
-	{
-		err = e;
-	}
-
-	if (checksum != checksum_helper.CheckSum())
-		err = B_NOT_A_MESSAGE;
-
-	return err;
-}
-//------------------------------------------------------------------------------
-status_t BMessage::real_flatten(char* result, ssize_t size) const
+status_t
+BMessage::real_flatten(char* result, ssize_t size) const
 {
 	BMemoryIO stream((void*)result, size);
-	status_t err = real_flatten(&stream);
+	return real_flatten(&stream);
 
-	if (!err)
-	{
-		// Fixup the checksum; it is calculated on data size, what, flags,
-		// and target info (including big flags if appropriate)
-		((uint32*)result)[1] = _checksum_((uchar*)result + (sizeof (uint32) * 2),
-										  calc_hdr_size(0) - (sizeof (uint32) * 2));
-	}
-
-	return err;
 }
 //------------------------------------------------------------------------------
 status_t BMessage::real_flatten(BDataIO* stream) const
 {
-	status_t err = flatten_hdr(stream);
+	Header header(*this);
+
+	status_t err = header.WriteTo(*stream);
 
 	if (!err)
-	{
 		err = fBody->Flatten(stream);
-	}
 
 	return err;
 }
@@ -1755,19 +1879,6 @@ BMessage::calc_hdr_size(uchar flags) const
 
 		size += 4;	// For the "big" flags
 	}
-
-	return size;
-}
-//------------------------------------------------------------------------------
-ssize_t BMessage::min_hdr_size() const
-{
-	ssize_t size = 0;
-
-	size += 4;	// version
-	size += 4;	// checksum
-	size += 4;	// flattened size
-	size += 4;	// 'what'
-	size += 1;	// flags
 
 	return size;
 }
@@ -1888,6 +1999,10 @@ error:
 }
 
 
+// Note, that in case of a flattened BMessage setting the target token will
+// change the header size, if no token was set when the message was flattened.
+// Hence the message would need to unflattened and flattened again before it
+// can be sent.
 status_t
 BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 	int32 token, bool preferred, bigtime_t timeout)
@@ -1905,24 +2020,35 @@ BMessage::_SendFlattenedMessage(void *data, int32 size, port_id port,
 		header->replyToken = B_NULL_TOKEN;
 
 	} else if (*(int32*)data == '1BOF' || *(int32*)data == 'FOB1') {
-//		bool swap = (*(int32*)data == '1BOF');
-		// TODO: Replace the target token. This is not so simple, since the
-		// position of the target token is not always the same. It can even
-		// happen that no target token is included at all (the one who is
-		// flattening the message must set a dummy token at least).
-
-		// dummy implementation to make it work at least
-
-		// unflatten the message
-		BMessage message;
-		status_t error = message.Unflatten((const char*)data);
+		// get the header
+		BMemoryIO stream(data, size);
+		Header header;
+		status_t error = header.ReadFrom(stream);
 		if (error != B_OK)
 			return error;
 
-		// send the message
-		BMessenger messenger;
-		return message._send_(port, token, preferred, timeout, false,
-			messenger);
+		if (!header.HasTarget()) {
+			// fallback implementation -- the header size would change by
+			// setting the token
+
+			// unflatten the message
+			BMessage message;
+			error = message.Unflatten((const char*)data);
+			if (error != B_OK)
+				return error;
+
+			// send the message
+			BMessenger messenger;
+			return message._send_(port, token, preferred, timeout, false,
+				messenger);
+		}
+
+		// set the target token and replace the header
+		header.SetTarget(token, preferred);
+		stream.Seek(0LL, SEEK_SET);
+		error = header.WriteTo(stream);
+		if (error != B_OK)
+			return error;
 	} else {
 		return B_NOT_A_MESSAGE;
 	}
@@ -2107,3 +2233,17 @@ convert_message(const KMessage *fromMessage, BMessage *toMessage)
 	return B_OK;
 }
 
+static
+ssize_t
+min_hdr_size()
+{
+	ssize_t size = 0;
+
+	size += 4;	// version
+	size += 4;	// checksum
+	size += 4;	// flattened size
+	size += 4;	// 'what'
+	size += 1;	// flags
+
+	return size;
+}
