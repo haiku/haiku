@@ -16,7 +16,10 @@ It supports both the v1 and (undocumented) v2 protocols, although v2 is not
 complete since we don't really know how it works. Unfortunately, almost no
 existing drivers use v1; most of the drivers provided by Be require v2. 
 Currently, the module returns B_ERROR when a MIDI device is opened with
-v2.</P></LI>
+v2.</P>
+
+<P>For an example on how to use the MPU401 module in your own driver, see
+the source code for the "emuxki" driver elsewhere in the source tree.</P></LI>
 
 <LI><P><B>Clients without a BApplication.</B> Sometimes the midi_server's
 debug output shows an "Application -1 not registered" error message. This 
