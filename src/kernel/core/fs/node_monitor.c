@@ -1,5 +1,5 @@
 /* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
 */
 
@@ -349,6 +349,26 @@ node_monitor_init(void)
 //	Exported public kernel API
 
 
+/**	\brief Subscribes a target to node and/or mount watching.
+ *
+ *	Depending on \a flags, different actions are performed. If flags is \c 0,
+ *	mount watching is requested. \a device and \a node must be \c -1 in this
+ *	case. Otherwise node watching is requested. \a device and \a node must
+ *	refer to a valid node, and \a flags must note contain the flag
+ *	\c B_WATCH_MOUNT, but at least one of the other valid flags.
+ *
+ *	\param device The device the node resides on (node_ref::device). \c -1, if
+ *		   only mount watching is requested.
+ *	\param node The node ID of the node (node_ref::device). \c -1, if
+ *		   only mount watching is requested.
+ *	\param flags A bit mask composed of the values specified in
+ *		   <NodeMonitor.h>.
+ *	\param port The port of the target (a looper port).
+ *	\param handlerToken The token of the target handler. \c -2, if the
+ *		   preferred handler of the looper is the target.
+ *	\return \c B_OK, if everything went fine, another error code otherwise.
+ */
+
 status_t
 start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
 {
@@ -358,6 +378,16 @@ start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 toke
 }
 
 
+/**	\brief Unsubscribes a target from watching a node.
+ *	\param device The device the node resides on (node_ref::device).
+ *	\param node The node ID of the node (node_ref::device).
+ *	\param flags Which monitors should be removed (B_STOP_WATCHING for all)
+ *	\param port The port of the target (a looper port).
+ *	\param handlerToken The token of the target handler. \c -2, if the
+ *		   preferred handler of the looper is the target.
+ *	\return \c B_OK, if everything went fine, another error code otherwise.
+ */
+
 status_t
 stop_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
 {
@@ -366,6 +396,13 @@ stop_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token
 	return remove_node_monitor(context, device, node, flags, port, token);
 }
 
+
+/**	\brief Unsubscribes a target from node and mount monitoring.
+ *	\param port The port of the target (a looper port).
+ *	\param handlerToken The token of the target handler. \c -2, if the
+ *		   preferred handler of the looper is the target.
+ *	\return \c B_OK, if everything went fine, another error code otherwise.
+ */
 
 status_t
 stop_notifying(port_id port, uint32 token)
@@ -457,7 +494,7 @@ notify_listener(int op, mount_id device, vnode_id parentNode, vnode_id toParentN
 
 
 status_t
-user_stop_notifying(port_id port, uint32 token)
+_user_stop_notifying(port_id port, uint32 token)
 {
 	io_context *context = get_current_io_context(false);
 
@@ -466,7 +503,7 @@ user_stop_notifying(port_id port, uint32 token)
 
 
 status_t
-user_start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
+_user_start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
 {
 	io_context *context = get_current_io_context(false);
 
@@ -475,7 +512,7 @@ user_start_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32
 
 
 status_t
-user_stop_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
+_user_stop_watching(dev_t device, ino_t node, uint32 flags, port_id port, uint32 token)
 {
 	io_context *context = get_current_io_context(false);
 

@@ -409,13 +409,13 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 
 		// node monitor calls
 		case SYSCALL_START_WATCHING:
-			*call_ret = user_start_watching((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (uint32)arg3, (port_id)arg4, (uint32)arg5);
+			*call_ret = _user_start_watching((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (uint32)arg3, (port_id)arg4, (uint32)arg5);
 			break;
 		case SYSCALL_STOP_WATCHING:
-			*call_ret = user_stop_watching((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (uint32)arg3, (port_id)arg4, (uint32)arg5);
+			*call_ret = _user_stop_watching((dev_t)arg0, (ino_t)INT32TOINT64(arg1, arg2), (uint32)arg3, (port_id)arg4, (uint32)arg5);
 			break;
 		case SYSCALL_STOP_NOTIFYING:
-			*call_ret = user_stop_notifying((port_id)arg0, (uint32)arg1);
+			*call_ret = _user_stop_notifying((port_id)arg0, (uint32)arg1);
 			break;
 
 		case SYSCALL_SYSCTL:
