@@ -1,48 +1,85 @@
-#include <MediaFormats.h>
-#include <Locker.h>
+/*
+** Copyright 2004, the OpenBeOS project. All rights reserved.
+** Distributed under the terms of the OpenBeOS License.
+**
+** Authors: Marcus Overhagen, Axel Dörfler
+*/
+
+
+#include "AddOnManager.h"
+#include "FormatManager.h"
+#include "MetaFormat.h"
+#include "media_server.h"
+#include "debug.h"
+
+#include <FindDirectory.h>
 #include <Path.h>
 #include <Entry.h>
 #include <Directory.h>
+#include <Autolock.h>
 #include <image.h>
+
 #include <stdio.h>
 #include <string.h>
-#include "AddOnManager.h"
-#include "FormatManager.h"
-#include "debug.h"
 
-extern FormatManager *gFormatManager;
-extern AddOnManager *gAddOnManager;
 
-status_t
-_PublishDecoder(DecoderPlugin *decoderplugin,
-				const char *meta_description,
-				const char *short_name,
-				const char *pretty_name,
-				const char *default_mapping /* = 0 */);
+//	#pragma mark ImageLoader
 
-bool operator==(const media_meta_description & a, const media_meta_description & b);
+/** The ImageLoader class is a convenience class to temporarily load
+ *	an image file, and unload it on deconstruction automatically.
+ */
+
+class ImageLoader {
+	public:
+		ImageLoader(BPath &path)
+		{
+			fImage = load_add_on(path.Path());
+		}
+
+		~ImageLoader()
+		{
+			if (fImage >= B_OK)
+				unload_add_on(fImage);
+		}
+
+		status_t InitCheck() const { return fImage; }
+		image_id Image() const { return fImage; }
+
+	private:
+		image_id	fImage;
+};
+
+
+static status_t
+register_decoder(const media_format_description *descriptions,
+	int32 descriptionCount, media_format *format, uint32 flags)
+{
+	return gAddOnManager->MakeDecoderFormats(descriptions, descriptionCount, format, flags);
+}
+
+/* not yet used
+static status_t
+register_encoder(const media_format_description *descriptions,
+	int32 descriptionCount, media_format *format, uint32 flags)
+{
+	return gAddOnManager->MakeEncoderFormats(descriptions, descriptionCount, format, flags);
+}
+*/
+
+//	#pragma mark -
+
 
 AddOnManager::AddOnManager()
- :	fLocker(new BLocker),
- 	fReaderList(new List<reader_info>),
- 	fWriterList(new List<writer_info>),
- 	fDecoderList(new List<decoder_info>),
- 	fEncoderList(new List<encoder_info>),
-	fReaderInfo(0),
-	fWriterInfo(0),
-	fDecoderInfo(0),
-	fEncoderInfo(0)
+	:
+ 	fLock("add-on manager")
 {
 }
+
 
 AddOnManager::~AddOnManager()
 {
-	delete fLocker;
- 	delete fReaderList;
- 	delete fWriterList;
- 	delete fDecoderList;
- 	delete fEncoderList;
 }
+
 
 void
 AddOnManager::LoadState()
@@ -50,211 +87,229 @@ AddOnManager::LoadState()
 	RegisterAddOns();
 }
 
+
 void
 AddOnManager::SaveState()
 {
 }
-	
-status_t
-AddOnManager::GetDecoderForFormat(xfer_entry_ref *out_ref,
-								  const media_format &in_format)
-{
-	media_format_description desc;
-	
-	if (B_OK != gFormatManager->GetDescriptionForFormat(&desc, in_format, B_META_FORMAT_FAMILY)) {
-		printf("AddOnManager::GetDecoderForFormat: Error, meta format description unknown\n");
-		return B_ERROR;	
-	}
 
-	fLocker->Lock();
+
+status_t
+AddOnManager::GetDecoderForFormat(xfer_entry_ref *_decoderRef,
+	const media_format &format)
+{
+	if ((format.type == B_MEDIA_ENCODED_VIDEO
+		|| format.type == B_MEDIA_ENCODED_AUDIO
+		|| format.type == B_MEDIA_MULTISTREAM)
+		&& format.Encoding() == 0)
+		return B_MEDIA_BAD_FORMAT;
+
+	BAutolock locker(fLock);
+
 	decoder_info *info;
-	for (fDecoderList->Rewind(); fDecoderList->GetNext(&info); ) {
-		media_meta_description *meta_desc;
-		for (info->meta_desc.Rewind(); info->meta_desc.GetNext(&meta_desc); ) {
-			if (desc.u.meta == *meta_desc) {
-				printf("AddOnManager::GetDecoderForFormat: found decoder %s for format %s\n", info->ref.name, meta_desc->description);
-				*out_ref = info->ref;
-				fLocker->Unlock();
-				return B_OK;
-			}
+	for (fDecoderList.Rewind(); fDecoderList.GetNext(&info);) {
+		media_format *decoderFormat;
+		for (info->formats.Rewind(); info->formats.GetNext(&decoderFormat);) {
+			// check if the decoder matches the supplied format
+			if (!decoderFormat->Matches(&format))
+				continue;
+
+			printf("AddOnManager::GetDecoderForFormat: found decoder %s for encoding %ld\n",
+				info->ref.name, decoderFormat->Encoding());
+
+			*_decoderRef = info->ref;
+			return B_OK;
 		}
 	}
-	fLocker->Unlock();
-	return B_ERROR;	
+	return B_ENTRY_NOT_FOUND;	
 }
 									
+
 status_t
 AddOnManager::GetReaders(xfer_entry_ref *out_res, int32 *out_count, int32 max_count)
 {
-	fLocker->Lock();
-	
+	BAutolock locker(fLock);
+
 	*out_count = 0;
-	
+
+	fReaderList.Rewind();
 	reader_info *info;
-	for (*out_count = 0, fReaderList->Rewind(); fReaderList->GetNext(&info) && *out_count <= max_count; *out_count += 1)
+	for (*out_count = 0; fReaderList.GetNext(&info) && *out_count <= max_count; *out_count += 1)
 		out_res[*out_count] = info->ref;
 
-	fLocker->Unlock();
 	return B_OK;
 }
+
+
+status_t
+AddOnManager::RegisterAddOn(BEntry &entry)
+{
+	BPath path(&entry);
+
+	entry_ref ref;
+	status_t status = entry.GetRef(&ref);
+	if (status < B_OK)
+		return status;
+
+	printf("AddOnManager::RegisterAddOn(): trying to load \"%s\"\n", path.Path());
+
+	ImageLoader loader(path);
+	if ((status = loader.InitCheck()) < B_OK)
+		return status;
+
+	MediaPlugin *(*instantiate_plugin_func)();
+
+	if (get_image_symbol(loader.Image(), "instantiate_plugin",
+			B_SYMBOL_TYPE_TEXT, (void **)&instantiate_plugin_func) < B_OK) {
+		printf("AddOnManager::RegisterAddOn(): can't find instantiate_plugin in \"%s\"\n",
+			path.Path());
+		return B_BAD_TYPE;
+	}
+
+	MediaPlugin *plugin = (*instantiate_plugin_func)();
+	if (plugin == NULL) {
+		printf("AddOnManager::RegisterAddOn(): instantiate_plugin in \"%s\" returned NULL\n",
+			path.Path());
+		return B_ERROR;
+	}
+
+	// ToDo: remove any old formats describing this add-on!!
+
+	ReaderPlugin *reader = dynamic_cast<ReaderPlugin *>(plugin);
+	if (reader != NULL)
+		RegisterReader(reader, ref);
+
+	DecoderPlugin *decoder = dynamic_cast<DecoderPlugin *>(plugin);
+	if (decoder != NULL)
+		RegisterDecoder(decoder, ref);
+
+	delete plugin;
+}
+
+
+void
+AddOnManager::RegisterAddOnsFor(BPath path)
+{
+	path.Append("media/plugins");
+
+	BDirectory directory(path.Path());
+	if (directory.InitCheck() != B_OK)
+		return;
+
+	BEntry entry;
+	while (directory.GetNextEntry(&entry) == B_OK)
+		RegisterAddOn(entry);
+}
+
 
 void
 AddOnManager::RegisterAddOns()
 {
-	const char *searchdir[] = {
-		 "/boot/home/config/add-ons/media/plugins",
-		 "/boot/beos/system/add-ons/media/plugins",
-		 "/boot/home/develop/openbeos/current/distro/x86.R1/beos/system/add-ons/media/plugins",
-		 NULL
+	BPath path;
+
+	// user add-ons come first, so that they can lay over system
+	// add-ons (add-ons are identified by name for registration)
+
+	const directory_which directories[] = {
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY,
 	};
-	
-	for (int i = 0; searchdir[i]; i++) {
-		BDirectory dir(searchdir[i]);
-		BEntry e;
-		while (B_OK == dir.GetNextEntry(&e)) {
-			BPath p(&e);
-			entry_ref ref;
-			e.GetRef(&ref);
-		
-			printf("AddOnManager: RegisterAddOns trying to load %s\n", p.Path());
 
-			image_id id;
-			id = load_add_on(p.Path());
-			if (id < 0)
-				continue;
-			
-			MediaPlugin *(*instantiate_plugin_func)();
-		
-			if (get_image_symbol(id, "instantiate_plugin", B_SYMBOL_TYPE_TEXT, (void**)&instantiate_plugin_func) < B_OK) {
-				printf("AddOnManager: Error, RegisterAddOns can't find instantiate_plugin in %s\n", p.Path());
-				unload_add_on(id);
-				continue;
-			}
-		
-			MediaPlugin *pl;
-		
-			pl = (*instantiate_plugin_func)();
-			if (pl == 0) {
-				printf("AddOnManager: Error, RegisterAddOns instantiate_plugin in %s returned 0\n", p.Path());
-				unload_add_on(id);
-				continue;
-			}
-
-			ReaderPlugin *rp = dynamic_cast<ReaderPlugin *>(pl);
-			if (rp)
-				RegisterReader(rp, ref);
-
-			DecoderPlugin *dp = dynamic_cast<DecoderPlugin *>(pl);
-			if (dp)
-				RegisterDecoder(dp, ref);
-			
-			delete pl;
-			unload_add_on(id);
-		}
+	for (uint32 i = 0; i < sizeof(directories) / sizeof(directory_which); i++) {
+		if (find_directory(directories[i], &path) == B_OK)
+			RegisterAddOnsFor(path);
 	}
+
+	// ToDo: this is for our own convenience only, and should be removed
+	//	in the final release
+	path.SetTo("/boot/home/develop/openbeos/current/distro/x86.R1/beos/system/add-ons");
+	RegisterAddOnsFor(path);
 }
+
 
 void
 AddOnManager::RegisterReader(ReaderPlugin *reader, const entry_ref &ref)
 {
-	bool already_found;
+	BAutolock locker(fLock);
+
 	reader_info *pinfo;
-	
-	fLocker->Lock();
-	for (already_found = false, fReaderList->Rewind(); fReaderList->GetNext(&pinfo); )
-		if (0 == strcmp(pinfo->ref.name, ref.name)) {
-			already_found = true;
-			break;
+	for (fReaderList.Rewind(); fReaderList.GetNext(&pinfo);) {
+		if (!strcmp(pinfo->ref.name, ref.name)) {
+			// we already know this reader
+			return;
 		}
-	fLocker->Unlock();
-	if (already_found)
-		return;
+	}
 
 	printf("AddOnManager::RegisterReader, name %s\n", ref.name);
 
 	reader_info info;
 	info.ref = ref;
 
-	if (B_OK != reader->RegisterPlugin()) {
-		printf("AddOnManager::RegisterReader(): reader->RegisterPlugin() failed!\n");
-		return;
-	}
-
-	fLocker->Lock();
-	fReaderList->Insert(info);
-	fLocker->Unlock();
+	fReaderList.Insert(info);
 }
+
 
 void
 AddOnManager::RegisterDecoder(DecoderPlugin *decoder, const entry_ref &ref)
 {
-	bool already_found;
+	BAutolock locker(fLock);
+
 	decoder_info *pinfo;
-	
-	fLocker->Lock();
-	for (already_found = false, fDecoderList->Rewind(); fDecoderList->GetNext(&pinfo); )
-		if (0 == strcmp(pinfo->ref.name, ref.name)) {
-			already_found = true;
-			break;
+	for (fDecoderList.Rewind(); fDecoderList.GetNext(&pinfo);) {
+		if (!strcmp(pinfo->ref.name, ref.name)) {
+			// we already know this decoder
+			return;
 		}
-	fLocker->Unlock();
-	if (already_found)
-		return;
+	}
 
 	printf("AddOnManager::RegisterDecoder, name %s\n", ref.name);
-	
-	decoder->Setup((void*)&_PublishDecoder);
-	
+
 	decoder_info info;
 	info.ref = ref;
-	fDecoderInfo = &info;
 
-	if (B_OK != decoder->RegisterPlugin())
+	fCurrentDecoder = &info;
+	BPrivate::media::_gMakeFormatHook = register_decoder;
+
+	if (decoder->RegisterDecoder() != B_OK) {
+		printf("AddOnManager::RegisterDecoder(): decoder->RegisterDecoder() failed!\n");
 		return;
+	}
 
-	fLocker->Lock();
-	fDecoderList->Insert(info);
-	fLocker->Unlock();
-	fDecoderInfo = 0;
+	fDecoderList.Insert(info);
+	fCurrentDecoder = NULL;
+	BPrivate::media::_gMakeFormatHook = NULL;
 }
 
-status_t
-AddOnManager::PublishDecoderCallback(DecoderPlugin *decoderplugin,
-									 const char *meta_description,
-									 const char *short_name,
-									 const char *pretty_name,
-									 const char *default_mapping /* = 0 */)
-{
-												 
-	printf("AddOnManager::PublishDecoderCallback: meta_description \"%s\",  short_name \"%s\", pretty_name \"%s\", default_mapping \"%s\"\n",
-		meta_description, short_name, pretty_name, default_mapping);
-		
-	media_meta_description meta_desc;
-	snprintf(meta_desc.description, sizeof(meta_desc), "%s", meta_description);
-		
-	fDecoderInfo->meta_desc.Insert(meta_desc);
 
+status_t 
+AddOnManager::MakeEncoderFormats(const media_format_description *descriptions,
+	int32 descriptionCount, media_format *format, uint32 flags)
+{
+	//ASSERT(fCurrentEncoder != NULL);
+
+	status_t status = gFormatManager->RegisterEncoder(descriptions,
+							descriptionCount, format, flags);
+	if (status < B_OK)
+		return status;
+
+	//fCurrentEncoder->format = *format;
 	return B_OK;
 }
 
 
-//typedef status_t *(*publish_func)(DecoderPlugin *, const char *, const char *, const char *, const char *);
-status_t
-_PublishDecoder(DecoderPlugin *decoderplugin,
-				const char *meta_description,
-				const char *short_name,
-				const char *pretty_name,
-				const char *default_mapping /* = 0 */)
+status_t 
+AddOnManager::MakeDecoderFormats(const media_format_description *descriptions,
+	int32 descriptionCount, media_format *format, uint32 flags)
 {
-	return gAddOnManager->PublishDecoderCallback(decoderplugin,
-												 meta_description,
-												 short_name,
-												 pretty_name,
-												 default_mapping);
+	ASSERT(fCurrentDecoder != NULL);
+
+	status_t status = gFormatManager->RegisterDecoder(descriptions,
+							descriptionCount, format, flags);
+	if (status < B_OK)
+		return status;
+
+	fCurrentDecoder->formats.Insert(*format);
+	return B_OK;
 }
 
-bool
-operator==(const media_meta_description & a, const media_meta_description & b)
-{
-	return 0 == strcmp(a.description, b.description);
-}
