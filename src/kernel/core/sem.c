@@ -32,7 +32,6 @@
 #	define TRACE_BLOCK(x) ;
 #endif
 
-
 struct sem_entry {
 	sem_id		id;
 	int			count;
@@ -54,9 +53,6 @@ static spinlock sem_spinlock = 0;
 #define RELEASE_SEM_LIST_LOCK()  release_spinlock(&sem_spinlock)
 #define GRAB_SEM_LOCK(s)         acquire_spinlock(&(s).lock)
 #define RELEASE_SEM_LOCK(s)      release_spinlock(&(s).lock)
-
-// used in functions that may put a bunch of threads in the run q at once
-#define READY_THREAD_CACHE_SIZE 16
 
 static int remove_thread_from_sem(struct thread *t, struct sem_entry *sem, struct thread_queue *queue, int sem_errcode);
 
@@ -198,12 +194,16 @@ create_sem_etc(int32 count, const char *name, team_id owner)
 	// find the first empty spot
 	for (i = 0; i < MAX_SEMS; i++) {
 		if (gSems[i].id == -1) {
-			// make the sem id be a multiple of the slot it's in
+			// adjust the sem ID so that: sem ID % MAX_SEMS == slot
 			if (i >= gNextSemID % MAX_SEMS)
 				gNextSemID += i - gNextSemID % MAX_SEMS;
 			else
 				gNextSemID += MAX_SEMS - (gNextSemID % MAX_SEMS - i);
-			gSems[i].id = gNextSemID++;
+			gSems[i].id = gNextSemID;
+
+			// increment next free sem ID, check for overflow
+			if (++gNextSemID < 0)
+				gNextSemID = 0;
 
 			// Set the owner while the sem list lock is hold, or else it
 			// might get lost if we have a sem_delete_owned_sems() running
@@ -394,7 +394,7 @@ acquire_sem_etc(sem_id id, int32 count, uint32 flags, bigtime_t timeout)
 
 	if (gSems[slot].count - count < 0 && (flags & B_TIMEOUT) != 0 && timeout <= 0) {
 		// immediate timeout
-		status = B_TIMED_OUT;
+		status = B_WOULD_BLOCK;
 		goto err;
 	}
 
@@ -663,6 +663,7 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 {
 	int state;
 	int slot;
+	bool found = false;
 
 	if (gSemsActive == false)
 		return B_NO_MORE_SEMS;
@@ -677,10 +678,10 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 		slot = 0;
 	}
 	else {
-		// start at index cookie, but check cookie against MAX_PORTS
+		// start at index cookie, but check cookie against MAX_SEMS
 		slot = *cookie;
 		if (slot >= MAX_SEMS)
-			return B_BAD_SEM_ID;
+			return B_BAD_VALUE;
 	}
 	// spinlock
 	state = disable_interrupts();
@@ -699,6 +700,7 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 
 				RELEASE_SEM_LOCK(gSems[slot]);
 				slot++;
+				found = true;
 				break;
 			}
 			RELEASE_SEM_LOCK(gSems[slot]);
@@ -708,8 +710,8 @@ _get_next_sem_info(team_id team, int32 *cookie, struct sem_info *info, size_t sz
 	RELEASE_SEM_LIST_LOCK();
 	restore_interrupts(state);
 
-	if (slot == MAX_SEMS)
-		return B_BAD_SEM_ID;
+	if (!found)
+		return B_BAD_VALUE;
 	*cookie = slot;
 	return B_NO_ERROR;
 }
