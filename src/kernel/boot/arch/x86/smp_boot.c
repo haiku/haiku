@@ -2,6 +2,8 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
+
 #include <stage2.h>
 #include <arch/x86/stage2_priv.h>
 
@@ -18,13 +20,15 @@ static unsigned int kernel_entry_point = 0;
 
 static int smp_get_current_cpu(kernel_args *ka);
 
-static unsigned int map_page(kernel_args *ka, unsigned int paddr, unsigned int vaddr)
+
+static unsigned int
+map_page(kernel_args *ka, unsigned int paddr, unsigned int vaddr)
 {
 	unsigned int *pentry;
 	unsigned int *pgdir = (unsigned int *)(ka->arch_args.page_hole + (4*1024*1024-PAGE_SIZE));
 
 	// check to see if a page table exists for this range
-	if(pgdir[vaddr / PAGE_SIZE / 1024] == 0) {
+	if (pgdir[vaddr / PAGE_SIZE / 1024] == 0) {
 		unsigned int pgtable;
 		// we need to allocate a pgtable
 		pgtable = ka->phys_alloc_range[0].start + ka->phys_alloc_range[0].size;
@@ -47,28 +51,37 @@ static unsigned int map_page(kernel_args *ka, unsigned int paddr, unsigned int v
 	return 0;
 }
 
-static unsigned int apic_read(unsigned int *addr)
+
+static unsigned int
+apic_read(unsigned int *addr)
 {
 	return *addr;
 }
 
-static void apic_write(unsigned int *addr, unsigned int data)
+
+static void
+apic_write(unsigned int *addr, unsigned int data)
 {
 	*addr = data;
 }
 
 /*
-static void *mp_virt_to_phys(void *ptr)
+static void *
+mp_virt_to_phys(void *ptr)
 {
 	return ((void *)(((unsigned int)ptr - mp_mem_virt) + mp_mem_phys));
 }
 */
-static void *mp_phys_to_virt(void *ptr)
+
+static void *
+mp_phys_to_virt(void *ptr)
 {
 	return ((void *)(((unsigned int)ptr - mp_mem_phys) + mp_mem_virt));
 }
 
-static unsigned int *smp_probe(unsigned int base, unsigned int limit)
+
+static unsigned int *
+smp_probe(unsigned int base, unsigned int limit)
 {
 	unsigned int *ptr;
 
@@ -83,7 +96,9 @@ static unsigned int *smp_probe(unsigned int base, unsigned int limit)
 	return NULL;
 }
 
-static void smp_do_config(kernel_args *ka)
+
+static void
+smp_do_config(kernel_args *ka)
 {
 	char *ptr;
 	int i;
@@ -168,6 +183,7 @@ static void smp_do_config(kernel_args *ka)
 	}
 }
 
+
 struct smp_scan_spots_struct {
 	unsigned int start;
 	unsigned int stop;
@@ -180,21 +196,23 @@ static struct smp_scan_spots_struct smp_scan_spots[] = {
 	{ 0, 0, 0 }
 };
 
-static int smp_find_mp_config(kernel_args *ka)
+
+static int
+smp_find_mp_config(kernel_args *ka)
 {
 	int i;
 
 	// XXX for now, assume the memory is identity mapped by the 1st stage
-	for(i=0; smp_scan_spots[i].len > 0; i++) {
+	for (i = 0; smp_scan_spots[i].len > 0; i++) {
 		mp_flt_ptr = (struct mp_flt_struct *)smp_probe(smp_scan_spots[i].start,
 			smp_scan_spots[i].stop);
 		if(mp_flt_ptr != NULL)
 			break;
 	}
 #if NO_SMP
-	if(0) {
+	if (0) {
 #else
-	if(mp_flt_ptr != NULL) {
+	if (mp_flt_ptr != NULL) {
 #endif
 		mp_mem_phys = smp_scan_spots[i].start;
 		mp_mem_virt = smp_scan_spots[i].start;
@@ -231,7 +249,9 @@ static int smp_find_mp_config(kernel_args *ka)
 	}
 }
 
-static int smp_setup_apic(kernel_args *ka)
+
+static int
+smp_setup_apic(kernel_args *ka)
 {
 	unsigned int config;
 //	dprintf("setting up the apic...");
@@ -278,12 +298,15 @@ static int smp_setup_apic(kernel_args *ka)
 	return 0;
 }
 
+
 // target function of the trampoline code
 // The trampoline code should have the pgdir and a gdt set up for us,
 // along with us being on the final stack for this processor. We need
 // to set up the local APIC and load the global idt and gdt. When we're
 // done, we'll jump into the kernel with the cpu number as an argument.
-static int smp_cpu_ready(void)
+
+static int
+smp_cpu_ready(void)
 {
 	kernel_args *ka = saved_ka;
 	unsigned int curr_cpu = smp_get_current_cpu(ka);
@@ -324,7 +347,9 @@ static int smp_cpu_ready(void)
 	return 0;
 }
 
-static int smp_boot_all_cpus(kernel_args *ka)
+
+static int
+smp_boot_all_cpus(kernel_args *ka)
 {
 	unsigned int trampoline_code;
 	unsigned int trampoline_stack;
@@ -345,7 +370,7 @@ static int smp_boot_all_cpus(kernel_args *ka)
 		(unsigned int)&smp_trampoline_end - (unsigned int)&smp_trampoline);
 
 	// boot the cpus
-	for(i = 1; i < ka->num_cpus; i++) {
+	for (i = 1; i < ka->num_cpus; i++) {
 		unsigned int *final_stack;
 		unsigned int *final_stack_ptr;
 		unsigned int *tramp_stack_ptr;
@@ -387,7 +412,7 @@ static int smp_boot_all_cpus(kernel_args *ka)
 		memcpy(&((unsigned int *)trampoline_stack)[2], (void *)ka->arch_args.vir_gdt, 6*4);
 
 		/* clear apic errors */
-		if(ka->arch_args.cpu_apic_version[i] & 0xf0) {
+		if (ka->arch_args.cpu_apic_version[i] & 0xf0) {
 			apic_write(APIC_ESR, 0);
 			apic_read(APIC_ESR);
 		}
@@ -399,7 +424,7 @@ static int smp_boot_all_cpus(kernel_args *ka)
 		apic_write(APIC_ICR1, config);
 
 		// wait for pending to end
-		while((apic_read(APIC_ICR1) & 0x00001000) == 0x00001000);
+		while ((apic_read(APIC_ICR1) & 0x00001000) == 0x00001000);
 
 		/* deassert INIT */
 		config = (apic_read(APIC_ICR2) & 0x00ffffff) | (ka->arch_args.cpu_apic_id[i] << 24);
@@ -407,7 +432,7 @@ static int smp_boot_all_cpus(kernel_args *ka)
 		config = (apic_read(APIC_ICR1) & 0xfff00000) | 0x00008500;
 
 		// wait for pending to end
-		while((apic_read(APIC_ICR1) & 0x00001000) == 0x00001000);
+		while ((apic_read(APIC_ICR1) & 0x00001000) == 0x00001000);
 //			dprintf("0x%x\n", apic_read(APIC_ICR1));
 
 		/* wait 10ms */
@@ -431,14 +456,16 @@ static int smp_boot_all_cpus(kernel_args *ka)
 			/* wait */
 			sleep(200);
 
-			while((apic_read(APIC_ICR1)& 0x00001000) == 0x00001000);
+			while ((apic_read(APIC_ICR1)& 0x00001000) == 0x00001000);
 		}
 	}
 
 	return 0;
 }
 
-static void calculate_apic_timer_conversion_factor(kernel_args *ka)
+
+static void
+calculate_apic_timer_conversion_factor(kernel_args *ka)
 {
 	long long t1, t2;
 	unsigned int config;
@@ -467,14 +494,16 @@ static void calculate_apic_timer_conversion_factor(kernel_args *ka)
 	dprintf("APIC ticks/sec = %d\n", ka->arch_args.apic_time_cv_factor);
 }
 
-int smp_boot(kernel_args *ka, unsigned int kernel_entry)
+
+int
+smp_boot(kernel_args *ka, unsigned int kernel_entry)
 {
 //	dprintf("smp_boot: entry\n");
 
 	kernel_entry_point = kernel_entry;
 	saved_ka = ka;
 
-	if(smp_find_mp_config(ka) > 1) {
+	if (smp_find_mp_config(ka) > 1) {
 //		dprintf("smp_boot: had found > 1 cpus\n");
 //		dprintf("post config:\n");
 //		dprintf("num_cpus = 0x%p\n", ka->num_cpus);
@@ -509,10 +538,12 @@ int smp_boot(kernel_args *ka, unsigned int kernel_entry)
 	return 0;
 }
 
-static int smp_get_current_cpu(kernel_args *ka)
+
+static int
+smp_get_current_cpu(kernel_args *ka)
 {
-	if(ka->arch_args.apic == NULL)
+	if (ka->arch_args.apic == NULL)
 		return 0;
-	else
-		return ka->arch_args.cpu_os_id[(apic_read(APIC_ID) & 0xffffffff) >> 24];
+
+	return ka->arch_args.cpu_os_id[(apic_read(APIC_ID) & 0xffffffff) >> 24];
 }

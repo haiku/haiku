@@ -6,6 +6,7 @@
 #include <bootdir.h>
 #include <stage2.h>
 #include "arch/x86/stage2_priv.h"
+#include "arch/x86/descriptors.h"
 #include "vesa.h"
 
 #include <string.h>
@@ -69,7 +70,7 @@ void
 _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 {
 	unsigned int *idt;
-	unsigned int *gdt;
+	segment_descriptor *gdt;
 	unsigned int next_vaddr;
 	unsigned int next_paddr;
 	unsigned int i;
@@ -186,24 +187,26 @@ _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		struct gdt_idt_descr gdt_descr;
 
 		// find a new gdt
-		gdt = (unsigned int *)next_paddr;
+		gdt = (segment_descriptor *)next_paddr;
 		ka->arch_args.phys_gdt = (unsigned int)gdt;
 		next_paddr += PAGE_SIZE;
 
 		MESSAGE(("gdt at ", (unsigned int)gdt, "\n"));
 
-		// put segment descriptors in it
-		gdt[0] = 0;
-		gdt[1] = 0;
-		gdt[2] = 0x0000ffff; // seg 0x8  -- kernel 4GB code
-		gdt[3] = 0x00cf9a00;
-		gdt[4] = 0x0000ffff; // seg 0x10 -- kernel 4GB data
-		gdt[5] = 0x00cf9200;
-		gdt[6] = 0x0000ffff; // seg 0x1b -- ring 3 4GB code
-		gdt[7] = 0x00cffa00;
-		gdt[8] = 0x0000ffff; // seg 0x23 -- ring 3 4GB data
-		gdt[9] = 0x00cff200;
-		// gdt[10] & gdt[11] will be filled later by the kernel
+		// put standard segment descriptors in it
+		clear_segment_descriptor(&gdt[0]);
+		set_segment_descriptor(&gdt[1], 0, 0xfffff, DT_CODE_READABLE, DPL_KERNEL);
+			// seg 0x10 - kernel 4GB code
+		set_segment_descriptor(&gdt[2], 0, 0xfffff, DT_DATA_WRITEABLE, DPL_KERNEL);
+			// seg 0x10 - kernel 4GB data
+
+		set_segment_descriptor(&gdt[3], 0, 0xfffff, DT_CODE_READABLE, DPL_USER);
+			// seg 0x1b - ring 3 user 4GB code
+		set_segment_descriptor(&gdt[4], 0, 0xfffff, DT_DATA_WRITEABLE, DPL_USER);
+			// seg 0x23 - ring 3 user 4GB data
+
+		// gdt[5] and above will be filled later by the kernel
+		// to contain the TSS descriptors, and for TLS (one for every CPU)
 
 		// map the gdt into virtual space
 		mmu_map_page(next_vaddr, (unsigned int)gdt);
