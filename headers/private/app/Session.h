@@ -11,60 +11,62 @@
 class BSession {
 
 public:
-		BSession(port_id receivePort, port_id sendPort, bool isPortLink = false);
+		BSession(port_id receivePort, port_id sendPort);
 		BSession(int32, char *);
 		BSession( const BSession &ses );
 		virtual	~BSession();
 		void	SetSendPort( port_id port );
 		void	SetRecvPort( port_id port );
-		port_id GetSendPort(void) const { return fSendPort; }
-		port_id GetRecvPort(void) const { return fReceivePort; }
-		bool	DropInputBuffer();
-		void SetMsgCode(int32 code);
-		char*		ReadString();
-		status_t	ReadBool( bool *b );
-		status_t	ReadInt8( int8 *i );
-		status_t	ReadUInt8( uint8 *i );		
-		status_t	ReadInt16( int16 *i );
-		status_t	ReadUInt16( uint16 *i );		
-		status_t	ReadInt32( int32 *i );
-		status_t	ReadUInt32( uint32 *i );		
-		status_t	ReadInt64( int64 *i );
-		status_t	ReadUInt64( uint64 *i );		
-		status_t	ReadFloat( float *f );
-		status_t	ReadFloatFromInt( float *f );
-		status_t	ReadDouble( double *d );
-		status_t	ReadDoubleFromInt( double *d );
-		status_t	ReadPoint( BPoint *point );
-		status_t	ReadPointFromInts( BPoint *point );
-		status_t	ReadRectCR( clipping_rect *rect );
-		status_t	ReadRect( BRect *rect );
-		status_t	ReadRectFromInts( BRect *rect );
-		status_t	ReadData( void* data, int32 size );
+		port_id	GetSendPort(void) const { return fSendPort; }
+		port_id	GetRecvPort(void) const { return fReceivePort; }
+		void	SetMsgCode(int32 code);
 
-		status_t	WriteString( const char* string );
-		status_t	WriteBool( const bool& b );
-		status_t	WriteInt8( const int8& i );
-		status_t	WriteUInt8( const uint8& i );
-		status_t	WriteInt16( const int16& i );
-		status_t	WriteUInt16( const uint16& i );		
-		status_t	WriteInt32( const int32& i );
-		status_t	WriteUInt32( const uint32& i );		
-		status_t	WriteInt64( const int64& i );
-		status_t	WriteUInt64( const uint64& i );		
-		status_t	WriteFloat(const float& f );
-		status_t	WriteFloatAsInt( const float& f );
-		status_t	WriteDouble( const double& d );
-		status_t	WriteDoubleAsInt( const double& d );
-		status_t	WritePoint(const BPoint& point);
-		status_t	WritePointAsInt(const BPoint& point);
-		status_t	WriteRect(const clipping_rect& rect);
-		status_t	WriteRect(const BRect& rect);
-		status_t	WriteRectAsInt(const BRect& rect);
-		status_t	WriteData(const void* data, int32 size);
+		char*	ReadString();
+		void	ReadBool( bool *b );
+		void	ReadInt8( int8 *i );
+		void	ReadUInt8( uint8 *i );		
+		void	ReadInt16( int16 *i );
+		void	ReadUInt16( uint16 *i );		
+		void	ReadInt32( int32 *i );
+		void	ReadUInt32( uint32 *i );		
+		void	ReadInt64( int64 *i );
+		void	ReadUInt64( uint64 *i );		
+		void	ReadFloat( float *f );
+		void	ReadFloatFromInt32( float *f );
+		void	ReadDouble( double *d );
+		void	ReadDoubleFromInt64( double *d );
+		void	ReadPoint( BPoint *point );
+		void	ReadPointFromInts( BPoint *point );
+		void	ReadRectCR( clipping_rect *rect );
+		void	ReadRect( BRect *rect );
+		void	ReadRectFromInts( BRect *rect );
+		void	ReadData( void* data, int32 size );
 
-		status_t	Sync();
-		void		Close();
+		void	WriteString( const char* string );
+		void	WriteBool( const bool& b );
+		void	WriteInt8( const int8& i );
+		void	WriteUInt8( const uint8& i );
+		void	WriteInt16( const int16& i );
+		void	WriteUInt16( const uint16& i );		
+		void	WriteInt32( const int32& i );
+		void	WriteUInt32( const uint32& i );		
+		void	WriteInt64( const int64& i );
+		void	WriteUInt64( const uint64& i );		
+		void	WriteFloat(const float& f );
+		void	WriteFloatAsInt32( const float& f );
+		void	WriteDouble( const double& d );
+		void	WriteDoubleAsInt64( const double& d );
+		void	WritePoint(const BPoint& point);
+		void	WritePointAsInt32s(const BPoint& point);
+		void	WriteRect(const clipping_rect& rect);
+		void	WriteRect(const BRect& rect);
+		void	WriteRectAsInt32s(const BRect& rect);
+		void	WriteData(const void* data, int32 size);
+
+		void	Sync();
+		void	Close();
+	// if possible - do not use!
+		void	CopyToSendBuffer(void* buffer, int32 count);
 private:
 
 		port_id	fSendPort;
@@ -73,6 +75,7 @@ private:
 		char	*fSendBuffer;
 		int32	fSendPosition;
 		int32	fSendCode;
+		int32	fRecvCode;
 
 		char	*fReceiveBuffer;
 		int32	fReceiveSize;
