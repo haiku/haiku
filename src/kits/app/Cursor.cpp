@@ -34,6 +34,7 @@
 // System Includes -------------------------------------------------------------
 #include <Cursor.h>
 #include <PortLink.h>
+#include <PortMessage.h>
 #include <AppServerLink.h>
 
 // Project Includes ------------------------------------------------------------
@@ -49,31 +50,24 @@
 //------------------------------------------------------------------------------
 BCursor::BCursor(const void *cursorData)
 {
-  int8 *data = (int8 *)cursorData;
-  m_serverToken = 0;
-
-  if ( data[0] != 16 )
-    return;
-  if ( data[1] != 1 )
-    return;
-  if ( (data[2] >= 16) || (data[3] >= 16) )
-    return;
-
-  ssize_t buffersize;
-  status_t status;
-  int32 returncode;
-  int8 *buffer;
-
-  // Send data directly to server
-  BPrivate::BAppServerLink *serverlink = new BPrivate::BAppServerLink;
-  serverlink->SetOpCode(AS_SET_CURSOR_BCURSOR);
-  serverlink->Attach((void *)cursorData,68);
-
-  //Rumor has it that this API will be cleaned up later
-  buffer=serverlink->FlushWithReply(&returncode,&status,&buffersize);
-  m_serverToken=*((int32*)buffer);
-
-  delete serverlink;
+	int8 *data = (int8 *)cursorData;
+	m_serverToken = 0;
+	
+	if ( data[0] != 16 )
+		return;
+	if ( data[1] != 1 )
+		return;
+	if ( (data[2] >= 16) || (data[3] >= 16) )
+		return;
+	
+	// Send data directly to server
+	BPrivate::BAppServerLink serverlink;
+	PortMessage pmsg;
+	
+	serverlink.SetOpCode(AS_CREATE_BCURSOR);
+	serverlink.Attach((void *)cursorData,68);
+	serverlink.FlushWithReply(&pmsg);
+	pmsg.Read(&m_serverToken);
 }
 //------------------------------------------------------------------------------
 // undefined on BeOS
@@ -84,6 +78,11 @@ BCursor::BCursor(BMessage *data)
 //------------------------------------------------------------------------------
 BCursor::~BCursor()
 {
+	// Notify server to deallocate server-side objects for this cursor
+	BPrivate::BAppServerLink serverlink;
+	serverlink.SetOpCode(AS_DELETE_BCURSOR);
+	serverlink.Attach(m_serverToken);
+	serverlink.Flush();
 }
 //------------------------------------------------------------------------------
 // not implemented on BeOS
