@@ -2,6 +2,7 @@
 #include <TestSuiteAddon.h>
 
 // ##### Include headers for your tests here #####
+#include "balert/AlertTest.h"
 #include "bbitmap/BitmapTest.h"
 #include "bdeskbar/DeskbarTest.h"
 #include "bpolygon/PolygonTest.h"
@@ -16,6 +17,7 @@ getTestSuite()
 	BTestSuite *suite = new BTestSuite("Interface");
 
 	// ##### Add test suites here #####
+	suite->addTest("BAlert", AlertTest::Suite());
 	suite->addTest("BBitmap", BitmapTestSuite());
 	suite->addTest("BDeskbar", DeskbarTestSuite());
 	suite->addTest("BPolygon", PolygonTestSuite());
