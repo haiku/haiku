@@ -124,7 +124,6 @@ Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
 		}
 		if (!err) {
 			PRINT(("mapped to block %Ld\n", *mappedBlock));
-			snooze(5000);
 		}
 	}
 	RETURN(err);
