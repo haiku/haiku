@@ -5,6 +5,12 @@
 
 #include <WindowScreen.h>
 
+
+void set_mouse_position(int32 x, int32 y)
+{
+}
+
+
 BWindowScreen::BWindowScreen(const char *title,
 							 uint32 space,
 							 status_t *error,
