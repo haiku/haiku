@@ -45,6 +45,8 @@ class DialUpView : public BView {
 		void AddInterface(const char *name, bool isNew = false);
 		void SelectInterface(int32 index, bool isNew = false);
 		int32 CountInterfaces() const;
+		
+		void UpdateControls();
 
 	private:
 		PPPInterfaceListener fListener;
@@ -53,7 +55,7 @@ class DialUpView : public BView {
 		
 		BMessage fAddons, fSettings, fProfile;
 		driver_settings *fDriverSettings;
-		BMenuItem *fCurrentItem;
+		BMenuItem *fCurrentItem, *fDeleterItem;
 		ppp_interface_id fWatching;
 		
 		bool fKeepLabel;
@@ -61,6 +63,8 @@ class DialUpView : public BView {
 		BButton *fConnectButton;
 		BPopUpMenu *fInterfaceMenu;
 		BMenuField *fMenuField;
+		BStringView *fStringView;
+			// shows "No interfaces found..." notice
 		BTabView *fTabView;
 };
 

@@ -22,6 +22,8 @@
 	// from IPCP addon
 
 
+#define BUTTON_WIDTH				80
+
 #define MSG_CHANGE_SETTINGS			'CHGS'
 #define MSG_RESET_SETTINGS			'RSTS'
 
@@ -38,7 +40,7 @@ IPCPAddon::IPCPAddon(BMessage *addons)
 {
 	float windowHeight = 3 * 20 // text controls
 		+ 35 // buttons
-		+ 5 * 5 + 10 + 20; // space between controls and bottom
+		+ 4 * 5 + 10 + 20; // space between controls and bottom
 	BRect rect(350, 250, 650, 250 + windowHeight);
 	fIPCPWindow = new IPCPWindow(this, rect);
 }
@@ -306,13 +308,12 @@ IPCPWindow::IPCPWindow(IPCPAddon *addon, BRect frame)
 	rect = ipcpBox->Frame();
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 25;
-	float buttonWidth = (rect.Width() - 10) / 2;
-	rect.right = rect.left + buttonWidth;
+	rect.left = rect.right - BUTTON_WIDTH;
+	fOKButton = new BButton(rect, "OKButton", "OK", new BMessage(MSG_CHANGE_SETTINGS));
+	rect.right = rect.left - 10;
+	rect.left = rect.right - BUTTON_WIDTH;
 	fCancelButton = new BButton(rect, "CancelButton", "Cancel",
 		new BMessage(MSG_RESET_SETTINGS));
-	rect.left = rect.right + 10;
-	rect.right = rect.left + buttonWidth;
-	fOKButton = new BButton(rect, "OKButton", "OK", new BMessage(MSG_CHANGE_SETTINGS));
 	
 	ipcpBox->AddChild(fIPAddress);
 	ipcpBox->AddChild(fPrimaryDNS);

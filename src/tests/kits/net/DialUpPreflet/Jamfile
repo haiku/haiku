@@ -18,6 +18,7 @@ SimpleTest DialUpPreflet :
 	TextRequestDialog.cpp
 	
 	# built-in add-ons
+	ExtrasAddon.cpp
 	GeneralAddon.cpp
 	IPCPAddon.cpp
 	PPPoEAddon.cpp

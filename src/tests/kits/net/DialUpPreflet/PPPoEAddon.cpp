@@ -29,6 +29,7 @@
 #include <PPPoE.h>
 	// from PPPoE addon
 
+#define BUTTON_WIDTH				80
 
 #define MSG_SELECT_INTERFACE		'SELI'
 #define MSG_SELECT_OTHER			'SELO'
@@ -289,13 +290,12 @@ PPPoEView::PPPoEView(PPPoEAddon *addon, BRect frame)
 	rect = serviceBox->Frame();
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 25;
-	float buttonWidth = (rect.Width() - 10) / 2;
-	rect.right = rect.left + buttonWidth;
+	rect.left = rect.right - BUTTON_WIDTH;
+	fOKButton = new BButton(rect, "OKButton", "OK", new BMessage(MSG_CHANGE_SERVICE));
+	rect.right = rect.left - 10;
+	rect.left = rect.right - BUTTON_WIDTH;
 	fCancelButton = new BButton(rect, "CancelButton", "Cancel",
 		new BMessage(MSG_RESET_SERVICE));
-	rect.left = rect.right + 10;
-	rect.right = rect.left + buttonWidth;
-	fOKButton = new BButton(rect, "OKButton", "OK", new BMessage(MSG_CHANGE_SERVICE));
 	
 	serviceBox->AddChild(fACName);
 	serviceBox->AddChild(fServiceName);
@@ -453,12 +453,15 @@ PPPoEView::ReloadInterfaces()
 		name += strlen(name) + 1;
 	}
 	
-	delete interfaces;
-	
-	if(!Addon()->InterfaceName())
-		fInterfaceName = "";
-	else
+	// set interface or some default value if nothing was found
+	if(Addon()->InterfaceName())
 		fInterfaceName = Addon()->InterfaceName();
+	else if(count > 0)
+		fInterfaceName = interfaces;
+	else
+		fInterfaceName = "";
+	
+	delete interfaces;
 	
 	item = menu->FindItem(fInterfaceName.String());
 	if(item && menu->IndexOf(item) <= menu->CountItems() - 2)

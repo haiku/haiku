@@ -81,6 +81,7 @@ class ProtocolsView : public BView {
 		bool HasProtocol(const BString& moduleName) const;
 
 	private:
+		int32 RegisterProtocol(const char *technicalName, bool reload = true);
 		int32 RegisterProtocol(const DialUpAddon *protocol, bool reload = true);
 		int32 RegisterProtocol(int32 index, bool reload = true);
 			// moves the protocol from the pop-up menu to the list view

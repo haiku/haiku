@@ -121,7 +121,7 @@ class GeneralView : public BView {
 		DialUpAddon *fDeviceAddon;
 		BBox *fDeviceBox, *fAuthenticationBox;
 		BMenuField *fDeviceField, *fAuthenticatorField;
-		BMenuItem *fAuthenticatorNone;
+		BMenuItem *fAuthenticatorNone, *fAuthenticatorDefault;
 		BTextControl *fUsername, *fPassword;
 		BCheckBox *fSavePassword;
 };

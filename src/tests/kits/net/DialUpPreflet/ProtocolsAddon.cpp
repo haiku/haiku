@@ -34,6 +34,10 @@
 #define PROTOCOLS_TAB_PROTOCOLS		"Protocols"
 
 
+#define DEFAULT_PROTOCOL			"IPCP"
+	// this protocol is added by default when creating a new interface
+
+
 ProtocolsAddon::ProtocolsAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fProtocolsCount(0),
@@ -299,6 +303,10 @@ ProtocolsView::Reload()
 			index, reinterpret_cast<void**>(&protocol)) == B_OK; index++)
 		RegisterProtocol(protocol, false);
 	
+	// add a default protocol for new interfaces
+	if(Addon()->IsNew())
+		RegisterProtocol(DEFAULT_PROTOCOL);
+	
 	fListView->Select(0);
 		// XXX: unfortunately, this does not work when the BListView is detached
 	
@@ -406,6 +414,26 @@ ProtocolsView::HasProtocol(const BString& moduleName) const
 	}
 	
 	return false;
+}
+
+
+int32
+ProtocolsView::RegisterProtocol(const char *technicalName, bool reload = true)
+{
+	if(!technicalName)
+		return -1;
+	
+	DialUpAddon *addon;
+	BMenuItem *item;
+	for(int32 index = 0; index < fProtocolsMenu->CountItems(); index++) {
+		item = fProtocolsMenu->ItemAt(index);
+		if(item && item->Message()->FindPointer("Addon",
+				reinterpret_cast<void**>(&addon)) == B_OK && addon->TechnicalName()
+				&& !strcmp(addon->TechnicalName(), technicalName))
+			return RegisterProtocol(index, reload);
+	}
+	
+	return -1;
 }
 
 

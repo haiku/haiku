@@ -33,6 +33,10 @@
 #define GENERAL_TAB_AUTHENTICATORS	"Authenticators"
 
 
+#define DEFAULT_AUTHENTICATOR		"PAP"
+	// this authenticator is selected by default when creating a new interface
+
+
 GeneralAddon::GeneralAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fHasPassword(false),
@@ -424,15 +428,20 @@ GeneralView::Reload()
 			break;
 	}
 	
-	if(fDeviceAddon && fDeviceAddon == Addon()->DeviceAddon()) {
+	if(fDeviceAddon && fDeviceAddon == Addon()->DeviceAddon())
 		item->SetMarked(true);
-		ReloadDeviceView();
+	else if(Addon()->IsNew() && fDeviceField->Menu()->CountItems() > 0) {
+		item = fDeviceField->Menu()->ItemAt(0);
+		item->SetMarked(true);
+		item->Message()->FindPointer("Addon", reinterpret_cast<void**>(&fDeviceAddon));
 	} else {
 		fDeviceAddon = NULL;
 		item = fDeviceField->Menu()->FindMarked();
 		if(item)
 			item->SetMarked(false);
 	}
+	
+	ReloadDeviceView();
 	
 	if(Addon()->CountAuthenticators() > 0) {
 		BString kernelModule, authenticator;
@@ -450,7 +459,9 @@ GeneralView::Reload()
 				break;
 			}
 		}
-	} else
+	} else if(Addon()->IsNew() && fAuthenticatorDefault)
+		fAuthenticatorDefault->SetMarked(true);
+	else
 		fAuthenticatorNone->SetMarked(true);
 	
 	fUsername->SetText(Addon()->Username());
@@ -604,11 +615,13 @@ GeneralView::AddDevices()
 void
 GeneralView::AddAuthenticators()
 {
+	fAuthenticatorDefault = NULL;
 	fAuthenticatorNone = new BMenuItem("None", new BMessage(MSG_SELECT_AUTHENTICATOR));
 	fAuthenticatorField->Menu()->AddItem(fAuthenticatorNone);
 	fAuthenticatorNone->SetMarked(true);
 	fAuthenticatorField->Menu()->AddSeparatorItem();
 	
+	BMenuItem *item;
 	BMessage addon;
 	for(int32 index = 0;
 			Addon()->Addons()->FindMessage(DUN_AUTHENTICATOR_ADDON_TYPE, index,
@@ -634,7 +647,9 @@ GeneralView::AddAuthenticators()
 		
 		int32 insertAt = FindNextMenuInsertionIndex(fAuthenticatorField->Menu(),
 			name.String(), 2);
-		fAuthenticatorField->Menu()->AddItem(new BMenuItem(name.String(), message),
-			insertAt);
+		item = new BMenuItem(name.String(), message);
+		if(hasTechnicalName && technicalName == DEFAULT_AUTHENTICATOR)
+			fAuthenticatorDefault = item;
+		fAuthenticatorField->Menu()->AddItem(item, insertAt);
 	}
 }

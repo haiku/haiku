@@ -1,9 +1,10 @@
 Short-term TODOs:
-- add "Extras" tab for changing dial-behaviour (auto-redial, dial-on-demand, etc.)
 - add "Revert Changes" button
-- load add-ons
+- load add-ons from /boot/home/config/add-ons/DialUpPreflet
 - move DEVNOTES into a doxygen file and document the rest of the API
 - IPCP: check for incorrect settings (only IP addresses should be entered)
+- PPPoE: refresh interfaces list every second or so
+- Extras: add field for entering number of dial retries and delay between retries
 
 Long-term TODOs:
 - (maybe) allow selecting multiple authenticators (in expert-mode)
