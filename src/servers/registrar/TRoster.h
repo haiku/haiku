@@ -28,11 +28,21 @@
 #ifndef T_ROSTER_H
 #define T_ROSTER_H
 
+#include <map>
+
 #include <SupportDefs.h>
 
 #include "AppInfoList.h"
 
 class BMessage;
+
+struct IAPRRequest {
+	entry_ref	ref;
+	team_id		team;
+	BMessage	*request;
+};
+
+typedef map<team_id, IAPRRequest>	IAPRRequestMap;
 
 // For strategic reasons, as TRoster appears in the BMessenger header.
 namespace BPrivate {
@@ -42,14 +52,26 @@ public:
 	TRoster();
 	virtual ~TRoster();
 
-	void HandleAddApplication(BMessage *message);
-	void HandleCompleteRegistration(BMessage *message);
-	void HandleIsAppPreRegistered(BMessage *message);
-	void HandleRemovePreRegApp(BMessage *message);
-	void HandleRemoveApp(BMessage *message);
+	void HandleAddApplication(BMessage *request);
+	void HandleCompleteRegistration(BMessage *request);
+	void HandleIsAppPreRegistered(BMessage *request);
+	void HandleRemovePreRegApp(BMessage *request);
+	void HandleRemoveApp(BMessage *request);
+	void HandleSetThreadAndTeam(BMessage *request);
+	void HandleGetRunningAppInfo(BMessage *request);
 
 private:
-	AppInfoList	fInfos;
+	static status_t _AddMessageAppInfo(BMessage *message,
+									   const app_info *info);
+	uint32 _NextToken();
+	void _ReplyToIAPRRequest(BMessage *request, const RosterAppInfo *info);
+
+private:
+	AppInfoList		fRegisteredApps;
+	AppInfoList		fEarlyPreRegisteredApps;
+	IAPRRequestMap	fIAPRRequests;
+	team_id			fActiveApp;
+	uint32			fLastToken;
 };
 
 };	// namespace BPrivate
