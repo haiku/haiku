@@ -39,7 +39,9 @@ void TAddCommonFilterTest::AddCommonFilterTest1()
 	@case		Valid filter, looper not locked
 	@param		Valid BMessageFilter pointer
 	@results	Debugger message "Owning Looper must be locked before calling
-				AddCommonFilter"
+				AddCommonFilter".  Also, since internal filter list construction
+				is delayed until a filter is added, CommonFilterList() should
+				return NULL.
  */
 void TAddCommonFilterTest::AddCommonFilterTest2()
 {
@@ -49,26 +51,30 @@ void TAddCommonFilterTest::AddCommonFilterTest2()
 	Looper.Unlock();
 	BMessageFilter* Filter = new BMessageFilter('1234');
 	Looper.AddCommonFilter(Filter);
+	CPPUNIT_ASSERT(Looper.CommonFilterList() == NULL);
 }
 //------------------------------------------------------------------------------
 /**
 	AddCommonFilter(BMessageFilter* filter)
 	@case		Valid filter, looper locked
 	@param		Valid BMessageFilter pointer
-	@results
+	@results	Filter is successfully added to the common filter list
  */
 void TAddCommonFilterTest::AddCommonFilterTest3()
 {
 	BLooper Looper;
 	BMessageFilter* Filter = new BMessageFilter('1234');
 	Looper.AddCommonFilter(Filter);
+	CPPUNIT_ASSERT(Looper.CommonFilterList()->HasItem(Filter));
 }
 //------------------------------------------------------------------------------
 /**
 	AddCommonFilter(BMessageFilter* filter)
 	@case		Valid filter, looper locked, owned by another looper
 	@param		Valid BMessageFilter pointer
-	@results	Debugger message "A MessageFilter can only be used once."
+	@results	Debugger message "A MessageFilter can only be used once."  Also,
+				since internal filter list construction is delayed until a
+				filter is added, Looper2.CommonFilterList() should return NULL.
  */
 void TAddCommonFilterTest::AddCommonFilterTest4()
 {
@@ -78,7 +84,9 @@ void TAddCommonFilterTest::AddCommonFilterTest4()
 	BLooper Looper2;
 	BMessageFilter* Filter = new BMessageFilter('1234');
 	Looper1.AddCommonFilter(Filter);
+	CPPUNIT_ASSERT(Looper1.CommonFilterList()->HasItem(Filter));
 	Looper2.AddCommonFilter(Filter);
+	CPPUNIT_ASSERT(Looper2.CommonFilterList() == NULL);
 }
 //------------------------------------------------------------------------------
 #ifdef ADD_TEST
