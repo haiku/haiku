@@ -13,14 +13,18 @@
 // descriptor or the whole partition table sector.
 
 #include <errno.h>
-#include <new>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
+#include <util/kernel_cpp.h>
 #include <ddm_modules.h>
-#include <DiskDeviceTypes.h>
+#ifndef _BOOT_MODE
+#	include <DiskDeviceTypes.h>
+#else
+#	include <boot/partitions.h>
+#endif
 #include <KernelExport.h>
 
 #include "PartitionMap.h"
@@ -266,9 +270,13 @@ PartitionMapParser::_ReadPTS(off_t offset, partition_table_sector *pts)
 	// read
 	} else if (read_pos(fDeviceFD, fSessionOffset + offset, pts, toRead)
 						!= toRead) {
+#ifndef _BOOT_MODE
 		error = errno;
 		if (error == B_OK)
 			error = B_IO_ERROR;
+#else
+		error = B_IO_ERROR;
+#endif
 		TRACE(("intel: _ReadPTS(): reading the PTS failed: %s\n",
 			   strerror(error)));
 	}
@@ -299,7 +307,11 @@ static bool pm_validate_resize_child(partition_data *partition,
 									 partition_data *child, off_t *size);
 
 
+#ifdef _BOOT_MODE
+partition_module_info gIntelPartitionMapModule = {
+#else
 static partition_module_info intel_partition_map_module = {
+#endif
 	{
 		kPartitionMapModuleName,
 		0,
@@ -315,6 +327,7 @@ static partition_module_info intel_partition_map_module = {
 	pm_free_partition_cookie,			// free_partition_cookie
 	pm_free_partition_content_cookie,	// free_partition_content_cookie
 
+#ifndef _BOOT_MODE
 	// querying
 	NULL,								// supports_repairing
 	NULL,								// supports_resizing
@@ -364,6 +377,9 @@ static partition_module_info intel_partition_map_module = {
 	NULL,								// initialize
 	NULL,								// create_child
 	NULL,								// delete_child
+#else
+	NULL
+#endif	// _BOOT_MODE
 };
 
 
@@ -382,7 +398,11 @@ static void ep_free_identify_partition_cookie(partition_data *partition,
 static void ep_free_partition_cookie(partition_data *partition);
 static void ep_free_partition_content_cookie(partition_data *partition);
 
+#ifdef _BOOT_MODE
+partition_module_info gIntelExtendedPartitionModule = {
+#else
 static partition_module_info intel_extended_partition_module = {
+#endif
 	{
 		kExtendedPartitionModuleName,
 		0,
@@ -398,6 +418,7 @@ static partition_module_info intel_extended_partition_module = {
 	ep_free_partition_cookie,			// free_partition_cookie
 	ep_free_partition_content_cookie,	// free_partition_content_cookie
 
+#ifndef _BOOT_MODE
 	// querying
 	NULL,								// supports_repairing
 	NULL,								// supports_resizing
@@ -447,9 +468,13 @@ static partition_module_info intel_extended_partition_module = {
 	NULL,								// initialize
 	NULL,								// create_child
 	NULL,								// delete_child
+#else
+	NULL
+#endif	// _BOOT_MODE
 };
 
 
+#ifndef _BOOT_MODE
 extern "C" partition_module_info *modules[];
 _EXPORT partition_module_info *modules[] =
 {
@@ -457,6 +482,7 @@ _EXPORT partition_module_info *modules[] =
 	&intel_extended_partition_module,
 	NULL
 };
+#endif
 
 
 // intel partition map module
@@ -616,6 +642,7 @@ pm_free_partition_content_cookie(partition_data *partition)
 	}
 }
 
+#ifndef _BOOT_MODE
 // pm_supports_resizing_child
 static
 bool
@@ -663,6 +690,7 @@ pm_validate_resize_child(partition_data *partition, partition_data *child,
 	*size = *size / partition->block_size * partition->block_size;
 	return true;
 }
+#endif	// _BOOT_MODE
 
 
 // intel extended partition module

@@ -8,12 +8,16 @@
 		   of related classes.
 */
 
-#include <new.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include <DiskDeviceTypes.h>
+#include <util/kernel_cpp.h>
+#ifndef _BOOT_MODE
+#	include <DiskDeviceTypes.h>
+#else
+#	include <boot/partitions.h>
+#endif
 #include <KernelExport.h>
 
 #include "PartitionMap.h"
