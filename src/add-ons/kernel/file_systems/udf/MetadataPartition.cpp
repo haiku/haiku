@@ -30,7 +30,7 @@ MetadataPartition::~MetadataPartition()
 /*! \brief Maps the given logical block to a physical block on disc.
 */
 status_t
-MetadataPartition::MapBlock(uint32 logicalBlock, uint32 &physicalBlock)
+MetadataPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
 	return B_NOT_IMPLEMENTED;
 }

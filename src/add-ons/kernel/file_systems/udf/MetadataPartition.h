@@ -31,7 +31,7 @@ public:
 	                  uint32 allocationUnitSize, uint16 alignmentUnitSize,
 	                  bool metadataIsDuplicated);
 	virtual ~MetadataPartition();
-	virtual status_t MapBlock(uint32 logicalBlock, uint32 &physicalBlock);
+	virtual status_t MapBlock(uint32 logicalBlock, off_t &physicalBlock);
 	
 	status_t InitCheck();
 

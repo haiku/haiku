@@ -12,6 +12,7 @@
 
 #include <kernel_cpp.h>
 
+#include "DiskStructures.h"
 #include "Partition.h"
 #include "UdfDebug.h"
 
@@ -35,7 +36,7 @@ public:
 	SparablePartition(uint16 number, uint32 start, uint32 length, uint16 packetLength,
 	                  uint8 tableCount, uint32 *tableLocations);
 	virtual ~SparablePartition();
-	virtual status_t MapBlock(uint32 logicalBlock, uint32 &physicalBlock);
+	virtual status_t MapBlock(uint32 logicalBlock, off_t &physicalBlock);
 	
 	status_t InitCheck();
 
@@ -46,7 +47,7 @@ public:
 	uint8 TableCount() const { return fTableCount; }
 	
 	//! Maximum number of redundant sparing tables per SparablePartition
-	static const uint8 kMaxSparingTableCount = 4;
+	static const uint8 kMaxSparingTableCount = UDF_MAX_SPARING_TABLE_COUNT;
 private:
 	uint16 fNumber;
 	uint32 fStart;

@@ -34,7 +34,7 @@ class VirtualPartition : public Partition {
 public:
 	VirtualPartition(PhysicalPartition &physicalPartition);
 	virtual ~VirtualPartition();
-	virtual status_t MapBlock(uint32 logicalBlock, uint32 &physicalBlock);
+	virtual status_t MapBlock(uint32 logicalBlock, off_t &physicalBlock);
 	
 	status_t InitCheck();
 private:

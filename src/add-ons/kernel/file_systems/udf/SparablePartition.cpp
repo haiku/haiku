@@ -40,7 +40,7 @@ SparablePartition::~SparablePartition()
 	the	start of the physical partition.
 */
 status_t
-SparablePartition::MapBlock(uint32 logicalBlock, uint32 &physicalBlock)
+SparablePartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
 	status_t error = InitCheck();
 	if (!error) {
@@ -49,10 +49,10 @@ SparablePartition::MapBlock(uint32 logicalBlock, uint32 &physicalBlock)
 		else {
 			// Check for the logical block in the sparing tables. If not
 			// found, map directly to physical space.
-			
+
 			//physicalBlock = fStart + logicalBlock;
 			//return B_OK;
-			error = B_NOT_IMPLEMENTED;
+			error = B_ERROR;
 		}
 	}
 	return error;

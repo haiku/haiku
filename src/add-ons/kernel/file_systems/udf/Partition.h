@@ -19,7 +19,9 @@ namespace Udf {
 class Partition {
 public:
 	virtual ~Partition() {}
-	virtual status_t MapBlock(uint32 logicalBlock, uint32 &physicalBlock) = 0;
+	virtual status_t MapBlock(uint32 logicalBlock, off_t &physicalBlock) = 0;
+//	virtual status_t MapExtent(uint32 logicalBlock, uint32 logicalLength,
+//	                           uint32 &physicalBlock, uint32 &physicalLength) = 0;
 };
 
 };	// namespace Udf

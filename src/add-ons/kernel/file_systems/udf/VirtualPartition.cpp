@@ -30,7 +30,7 @@ VirtualPartition::~VirtualPartition()
 	VirtualPartition object's physical partition.
 */
 status_t
-VirtualPartition::MapBlock(uint32 logicalBlock, uint32 &physicalBlock)
+VirtualPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
 	return B_NOT_IMPLEMENTED;
 }

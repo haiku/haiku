@@ -28,7 +28,7 @@ class PhysicalPartition : public Partition {
 public:
 	PhysicalPartition(uint16 number, uint32 start, uint32 length);
 	virtual ~PhysicalPartition();
-	virtual status_t MapBlock(uint32 logicalBlock, uint32 &physicalBlock);
+	virtual status_t MapBlock(uint32 logicalBlock, off_t &physicalBlock);
 
 	uint16 Number() const { return fNumber; }
 	uint32 Start() const { return fStart; }

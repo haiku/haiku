@@ -25,12 +25,14 @@ PhysicalPartition::~PhysicalPartition()
 	start of the physical partition.
 */
 status_t
-PhysicalPartition::MapBlock(uint32 logicalBlock, uint32 &physicalBlock)
+PhysicalPartition::MapBlock(uint32 logicalBlock, off_t &physicalBlock)
 {
+	DEBUG_INIT_ETC(CF_PUBLIC, "PhysicalPartition", ("%ld", logicalBlock));
 	if (logicalBlock >= fLength)
 		return B_BAD_ADDRESS;
 	else {
 		physicalBlock = fStart + logicalBlock;
+		PRINT(("mapped %ld to %Ld\n", logicalBlock, physicalBlock));
 		return B_OK;
 	}
 }
