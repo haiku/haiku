@@ -4,6 +4,13 @@ UsePrivateHeaders shared ;
 
 AddResources DiskProbe : DiskProbe.rdef ;
 
+if ! $(DANO_COMPATIBLE) {
+	local defines = COMPILE_FOR_R5 ;
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) ;
+}
+
 App DiskProbe :
 	DiskProbe.cpp
 	DataEditor.cpp
