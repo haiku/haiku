@@ -21,6 +21,7 @@ class DataChange {
 
 		virtual void Apply(off_t offset, uint8 *buffer, size_t size) = 0;
 		virtual void Revert(off_t offset, uint8 *buffer, size_t size) = 0;
+		virtual void GetRange(off_t fileSize, off_t &_offset, off_t &_size) = 0;
 };
 
 class ReplaceChange : public DataChange {
@@ -30,6 +31,7 @@ class ReplaceChange : public DataChange {
 
 		virtual void Apply(off_t offset, uint8 *buffer, size_t size);
 		virtual void Revert(off_t offset, uint8 *buffer, size_t size);
+		virtual void GetRange(off_t fileSize, off_t &_offset, off_t &_size);
 
 	private:
 		void Normalize(off_t bufferOffset, size_t bufferSize,
@@ -130,6 +132,14 @@ ReplaceChange::Revert(off_t bufferOffset, uint8 *buffer, size_t bufferSize)
 
 	// now we can safely revert the buffer!
 	memcpy(buffer + offset - bufferOffset, fOldData + dataOffset, size);
+}
+
+
+void 
+ReplaceChange::GetRange(off_t /*fileSize*/, off_t &_offset, off_t &_size)
+{
+	_offset = fOffset;
+	_size = fSize;
 }
 
 
@@ -242,6 +252,7 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 		}
 	}
 
+	fLastChange = fFirstChange = NULL;
 	fView = NULL;
 	fRealViewOffset = 0;
 	fViewOffset = 0;
@@ -283,12 +294,24 @@ DataEditor::AddChange(DataChange *change)
 	if (change == NULL)
 		return;
 
-	RemoveRedos();
+	bool removed = RemoveRedos();
+	bool changed = !CanUndo();
 
 	fChanges.AddItem(change);
 	fLastChange = change;
 
 	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
+
+	// update observers
+
+	SendNotices(fLastChange);
+
+	BMessage update;
+	if (removed)
+		update.AddBool("can_redo", false);
+	if (changed)
+		update.AddBool("can_undo", true);
+	SendNotices(kMsgDataEditorStateChange, &update);
 }
 
 
@@ -356,18 +379,22 @@ DataEditor::ApplyChanges()
  *	come after the current change.
  */
 
-void 
+bool
 DataEditor::RemoveRedos()
 {
 	if (fLastChange == NULL)
-		return;
+		return false;
 
 	int32 start = fChanges.IndexOf(fLastChange) + 1;
+	bool removed = false;
 
 	for (int32 i = fChanges.CountItems(); i-- > start; ) {
 		DataChange *change = fChanges.RemoveItemAt(i);
 		delete change;
+		removed = true;
 	}
+
+	return removed;
 }
 
 
@@ -379,13 +406,26 @@ DataEditor::Undo()
 	if (!CanUndo())
 		return B_ERROR;
 
-	int32 index = fChanges.IndexOf(fLastChange);
-	fLastChange->Revert(fRealViewOffset, fView, fRealViewSize);
+	bool couldRedo = CanRedo();
+	DataChange *undoChange = fLastChange;
+
+	int32 index = fChanges.IndexOf(undoChange);
+	undoChange->Revert(fRealViewOffset, fView, fRealViewSize);
 
 	if (index > 0)
 		fLastChange = fChanges.ItemAt(index - 1);
 	else
 		fLastChange = NULL;
+
+	// update observers
+	SendNotices(undoChange);
+
+	BMessage update;
+	if (!couldRedo)
+		update.AddBool("can_redo", true);
+	if (!CanUndo())
+		update.AddBool("can_undo", false);
+	SendNotices(kMsgDataEditorStateChange, &update);
 
 	return B_OK;
 }
@@ -399,10 +439,22 @@ DataEditor::Redo()
 	if (!CanRedo())
 		return B_ERROR;
 
+	bool couldUndo = CanUndo();
+
 	int32 index = fChanges.IndexOf(fLastChange);
 	fLastChange = fChanges.ItemAt(index + 1);
 
 	fLastChange->Apply(fRealViewOffset, fView, fRealViewSize);
+
+	// update observers
+	SendNotices(fLastChange);
+
+	BMessage update;
+	if (!CanRedo())
+		update.AddBool("can_redo", false);
+	if (!couldUndo)
+		update.AddBool("can_undo", true);
+	SendNotices(kMsgDataEditorStateChange, &update);
 
 	return B_OK;
 }
@@ -458,6 +510,8 @@ DataEditor::SetViewSize(size_t size)
 		fViewSize = size;
 		return B_OK;
 	}
+	if (realSize == 0)
+		return B_BAD_VALUE;
 
 	uint8 *view = (uint8 *)realloc(fView, realSize);
 	if (view == NULL)
@@ -534,6 +588,20 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 
 	*_buffer = fView + fViewOffset - fRealViewOffset;
 	return B_OK;
+}
+
+
+void 
+DataEditor::SendNotices(DataChange *change)
+{
+	off_t offset, size;
+	change->GetRange(FileSize(), offset, size);
+
+	// update observer
+	BMessage update;
+	update.AddInt64("offset", offset);
+	update.AddInt32("size", size);
+	SendNotices(kMsgDataEditorUpdate, &update);
 }
 
 

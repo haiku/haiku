@@ -75,10 +75,11 @@ class DataEditor : public BLocker {
 
 	private:
 		void SendNotices(uint32 what, BMessage *message = NULL);
+		void SendNotices(DataChange *change);
 		status_t Update();
 		void AddChange(DataChange *change);
 		void ApplyChanges();
-		void RemoveRedos();
+		bool RemoveRedos();
 
 		BObjectList<BMessenger> fObservers;
 
