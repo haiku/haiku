@@ -508,14 +508,15 @@ MixerCore::MixThread()
 			}
 			PRINT(4, "send buffer, inframes %ld, outframes %ld\n", fMixBufferFrameCount, frames_per_buffer(fOutput->MediaOutput().format.u.raw_audio));
 			
-			// swap byte order if necessary
-
 			// fill in the buffer header
 			media_header* hdr = buf->Header();
 			hdr->type = B_MEDIA_RAW_AUDIO;
 			hdr->size_used = fOutput->MediaOutput().format.u.raw_audio.buffer_size;
 			hdr->time_source = fTimeSource->ID();
 			hdr->start_time = event_time;
+			
+			// swap byte order if necessary
+			fOutput->AdjustByteOrder(buf);
 		
 			// send the buffer
 			if (B_OK != fNode->SendBuffer(buf, fOutput->MediaOutput().destination)) {

@@ -2,6 +2,8 @@
 #define _MIXER_OUTPUT_H
 
 #include "debug.h"
+#include "ByteSwap.h"
+#include <Buffer.h>
 
 #define MAX_SOURCES 20
 
@@ -31,8 +33,10 @@ public:
 
 	// only for use by MixerCore
 	void GetMixerChannelInfo(int channel, int index, int *type, float *gain);
+	void AdjustByteOrder(BBuffer *buffer);
 
 private:
+	void UpdateByteOrderSwap();
 	void UpdateOutputChannels();
 	void AssignDefaultSources();
 	
@@ -50,6 +54,7 @@ private:
 	
 	uint32				fOutputChannelCount;
 	output_chan_info 	*fOutputChannelInfo; //array
+	ByteSwap			*fOutputByteSwap;
 };
 
 inline uint32 MixerOutput::GetOutputChannelCount()
@@ -77,6 +82,12 @@ inline void MixerOutput::GetMixerChannelInfo(int channel, int index, int *type, 
 	ASSERT(index >= 0 && index < fOutputChannelInfo[channel].source_count);
 	*type = fOutputChannelInfo[channel].source_type[index];
 	*gain = fOutputChannelInfo[channel].source_gain[index];
+}
+
+inline void MixerOutput::AdjustByteOrder(BBuffer *buffer)
+{
+	if (fOutputByteSwap)
+		fOutputByteSwap->Swap(buffer->Data(), buffer->SizeUsed());
 }
 
 #endif

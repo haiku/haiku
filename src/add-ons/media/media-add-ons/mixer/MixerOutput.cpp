@@ -8,18 +8,21 @@ MixerOutput::MixerOutput(MixerCore *core, const media_output &output)
  :	fCore(core),
 	fOutput(output),
 	fOutputChannelCount(0),
-	fOutputChannelInfo(0)
+	fOutputChannelInfo(0),
+	fOutputByteSwap(0)
 {
 	fix_multiaudio_format(&fOutput.format.u.raw_audio);
 	PRINT_OUTPUT("MixerOutput::MixerOutput", fOutput);
 	PRINT_CHANNEL_MASK(fOutput.format);
 
 	UpdateOutputChannels();
+	UpdateByteOrderSwap();
 }
 
 MixerOutput::~MixerOutput()
 {
 	delete fOutputChannelInfo;
+	delete fOutputByteSwap;
 }
 
 media_output &
@@ -38,6 +41,23 @@ MixerOutput::ChangeFormat(const media_multi_audio_format &format)
 	PRINT_CHANNEL_MASK(fOutput.format);
 
 	UpdateOutputChannels();
+	UpdateByteOrderSwap();
+}
+
+void
+MixerOutput::UpdateByteOrderSwap()
+{
+	delete fOutputByteSwap;
+	fOutputByteSwap = 0;
+
+	// perhaps we need byte swapping
+	if (fOutput.format.u.raw_audio.byte_order != B_MEDIA_HOST_ENDIAN) {
+		if (	fOutput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_FLOAT
+			 ||	fOutput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_INT
+			 ||	fOutput.format.u.raw_audio.format == media_raw_audio_format::B_AUDIO_SHORT) {
+			fOutputByteSwap = new ByteSwap(fOutput.format.u.raw_audio.format);
+		}
+	}
 }
 
 void
