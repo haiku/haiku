@@ -83,7 +83,8 @@ BasicTest::dumpStat(struct stat &st)
 
 // createVolume
 void
-BasicTest::createVolume(string imageFile, string mountPoint, int32 megs)
+BasicTest::createVolume(string imageFile, string mountPoint, int32 megs,
+						bool makeMountPoint)
 {
 	char megsString[16];
 	sprintf(megsString, "%ld", megs);
@@ -93,17 +94,18 @@ BasicTest::createVolume(string imageFile, string mountPoint, int32 megs)
 				+ " ; mkbfs " + imageFile
 					+ " > /dev/null"
 				+ " ; sync"
-				+ " ; mkdir " + mountPoint
+				+ (makeMountPoint ? " ; mkdir " + mountPoint : "")
 				+ " ; mount " + imageFile + " " + mountPoint);
 }
 
 // deleteVolume
 void
-BasicTest::deleteVolume(string imageFile, string mountPoint)
+BasicTest::deleteVolume(string imageFile, string mountPoint,
+						bool deleteMountPoint)
 {
 	execCommand(string("sync")
 				+ " ; unmount " + mountPoint
-				+ " ; rmdir " + mountPoint
+				+ (deleteMountPoint ? " ; rmdir " + mountPoint : "")
 				+ " ; rm " + imageFile);
 }
 

@@ -29,8 +29,10 @@ public:
 
 	static void dumpStat(struct stat &st);
 
-	static void createVolume(string imageFile, string mountPoint, int32 megs);
-	static void deleteVolume(string imageFile, string mountPoint);
+	static void createVolume(string imageFile, string mountPoint, int32 megs,
+							 bool makeMountPoint = true);
+	static void deleteVolume(string imageFile, string mountPoint,
+							 bool deleteMountPoint = true);
 
 protected:	
 	int32 fSubTestNumber;
