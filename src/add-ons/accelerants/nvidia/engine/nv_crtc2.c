@@ -1,6 +1,6 @@
 /* second CTRC functionality for GeForce cards */
 /* Author:
-   Rudolf Cornelissen 11/2002-1/2005
+   Rudolf Cornelissen 11/2002-2/2005
 */
 
 #define MODULE_BIT 0x00020000
@@ -682,6 +682,11 @@ status_t nv_crtc2_cursor_show()
 	/* b0 = 1 enables cursor */
 	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) | 0x01));
 
+	/* workaround for hardware bug confirmed existing on NV43:
+	 * Cursor visibility is not updated without a position update if its hardware
+	 * retrace sync is enabled. */
+	if (si->ps.card_arch == NV40A) DAC2W(CURPOS, (DAC2R(CURPOS)));
+
 	return B_OK;
 }
 
@@ -694,6 +699,11 @@ status_t nv_crtc2_cursor_hide()
 
 	/* b0 = 0 disables cursor */
 	CRTC2W(CURCTL0, (CRTC2R(CURCTL0) & 0xfe));
+
+	/* workaround for hardware bug confirmed existing on NV43:
+	 * Cursor visibility is not updated without a position update if its hardware
+	 * retrace sync is enabled. */
+	if (si->ps.card_arch == NV40A) DAC2W(CURPOS, (DAC2R(CURPOS)));
 
 	return B_OK;
 }
