@@ -660,7 +660,7 @@ BTextView::KeyDown(const char *bytes, int32 numBytes)
 {
 	CALLED();
 	// TODO: Remove this and move it to specific key handlers ?
-	// moreover, we should check if ARROW keys works in case the object
+	// moreover, we should check if ARROW keys work in case the object
 	// isn't editable
 	if (!fEditable)
 		return;
@@ -910,6 +910,12 @@ BTextView::MessageReceived(BMessage *message)
 
 			break;
 		}
+
+		// TODO: Find out what these two do
+		case _PING_:
+		case _DISPOSE_DRAG_:
+			break;
+
 		default:
 			BView::MessageReceived(message);
 			break;
@@ -1062,8 +1068,9 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 	
 	CancelInputMethod();
 	
-	// TODO: Should probably call _DoDeleteText() here, as the bebook
-	// says this function doesn't dall DeleteText()
+	if (!inFile)
+		return;
+
 	if (fText->Length() > 0)
 		DeleteText(0, fText->Length());
 
@@ -1085,7 +1092,7 @@ BTextView::SetText(BFile *inFile, int32 inOffset, int32 inLength,
 							  fText->Length(), doAll, NULL, NULL);
 	}
 
-	fSelStart = fSelEnd = 0;	
+	fClickOffset = fSelStart = fSelEnd = 0;	
 
 	// recalc line breaks and draw the text
 	Refresh(0, inLength, true, true);
@@ -1144,7 +1151,7 @@ BTextView::Insert(int32 startOffset, const char *inText, int32 inLength,
 	InsertText(inText, inLength, startOffset, inRuns);
 	
 	// offset the caret/selection
-	long saveStart = fSelStart;
+	int32 saveStart = fSelStart;
 	fSelStart += inLength;
 	fSelEnd += inLength;
 
@@ -1190,7 +1197,7 @@ BTextView::Delete()
 	DeleteText(fSelStart, fSelEnd);
 	
 	// collapse the selection
-	fSelEnd = fSelStart;
+	fClickOffset = fSelEnd = fSelStart;
 	
 	// recalc line breaks and draw what's left
 	Refresh(fSelStart, fSelEnd, true, true);
@@ -1310,6 +1317,9 @@ BTextView::CurrentLine() const
 }
 
 
+/*! \brief Move the caret to the specified line.
+	\param index The index of the line.
+*/
 void
 BTextView::GoToLine(int32 index)
 {
@@ -1412,6 +1422,8 @@ BTextView::Paste(BClipboard *clipboard)
 }
 
 
+/*! \brief Deletes the currently selected text.
+*/
 void
 BTextView::Clear()
 {
@@ -1876,7 +1888,7 @@ BTextView::OffsetAt(BPoint point) const
 		foundTab = fText->FindChar(B_TAB, offset, &numChars);
 		
 		delta = numChars / 2;
-		delta = (delta < 1) ? 1 : delta;
+		delta = min_c(delta, 1);
 		
 		if (numChars > 1) {
 			do {
@@ -1896,7 +1908,7 @@ BTextView::OffsetAt(BPoint point) const
 						// still too far to the left, measure some more
 						offset += delta;
 						delta /= 2;
-						delta = (delta < 1) ? 1 : delta;
+						delta = min_c(delta, 1);
 					}
 				} else {
 					// oops, we overshot the point, go back some 
@@ -1908,7 +1920,7 @@ BTextView::OffsetAt(BPoint point) const
 					}
 						
 					delta /= 2;
-					delta = (delta < 1) ? 1 : delta;
+					delta = min_c(delta, 1);
 	
 				}
 			} while (offset < (numChars + saveOffset));
@@ -2020,9 +2032,12 @@ BTextView::TextHeight(int32 startLine, int32 endLine) const
 {
 	CALLED();
 	int32 numLines = fLines->NumLines();
-	startLine = (startLine < 0) ? 0 : startLine;
-	endLine = (endLine > numLines - 1) ? numLines - 1 : endLine;
+	if (startLine < 0)
+		startLine = 0;
+	if (endLine > numLines - 1)
+		endLine = numLines - 1;
 	
+	// TODO: This looks broken as well. What do we do if there's only one line ?
 	float height = (*fLines)[endLine + 1]->origin - 
 				   (*fLines)[startLine]->origin;
 				
@@ -3985,10 +4000,12 @@ void
 BTextView::NormalizeFont(BFont *font)
 {
 	CALLED();
-	font->SetRotation(0.0f);
-	font->SetFlags(0);
-	font->SetSpacing(B_BITMAP_SPACING);
-	font->SetEncoding(B_UNICODE_UTF8);
+	if (font) {
+		font->SetRotation(0.0f);
+		font->SetFlags(0);
+		font->SetSpacing(B_BITMAP_SPACING);
+		font->SetEncoding(B_UNICODE_UTF8);
+	}
 }
 
 
@@ -4177,7 +4194,7 @@ BTextView::HandleInputMethodChanged(BMessage *message)
 	// TODO: Highlight in blue/red the various clauses
 		
 	const char *string = NULL;
-	if (message->FindString("be:string", &string) != B_OK || string == NULL)
+	if (message->FindString("be:string", &string) < B_OK || string == NULL)
 		return;
 	
 	be_app->ObscureCursor();
