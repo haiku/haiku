@@ -40,6 +40,7 @@ StdBinCommands
 
 StdBinCommands
 	chop.c
+	driveinfo.c
 	echo.c
 	eject.c
 	hd.c
