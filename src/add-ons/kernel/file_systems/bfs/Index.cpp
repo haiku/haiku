@@ -194,11 +194,11 @@ Index::Create(Transaction *transaction, const char *name, uint32 type)
 			return B_BAD_TYPE;
 	}
 
-	status_t status;
 
 	// do we need to create the index directory first?
 	if (fVolume->IndicesNode() == NULL) {
-		if ((status = fVolume->CreateIndicesRoot(transaction)) < B_OK)
+		status_t status = fVolume->CreateIndicesRoot(transaction);
+		if (status < B_OK)
 			RETURN_ERROR(status);
 	}
 
