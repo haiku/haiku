@@ -51,9 +51,9 @@ KernelLd stage2 :
 KernelLd kernel :
 	kernel_core.o
 	kernel_fs.o
+	kernel_vm.o
 
 	libbus.a
-	libvm.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
 	libkernel_util.a
@@ -85,9 +85,9 @@ KernelLd kernel.so :
 	#	linkable against the kernel itself
 	kernel_core.o
 	kernel_fs.o
+	kernel_vm.o
 
 	libbus.a
-	libvm.a
 	lib$(OBOS_ARCH).a
 	libdrivers.a
 	libkernel_util.a
