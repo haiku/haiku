@@ -14,6 +14,7 @@ Server obos_registrar :
 	MessageEvent.cpp
 	MessageRunnerManager.cpp
 	MIMEManager.cpp
+	RecentApps.cpp
 	Registrar.cpp
 	RosterAppInfo.cpp
 	TRoster.cpp
