@@ -20,6 +20,8 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "stat_util.h"
+
 
 // Let the FS think, we are the root user.
 uid_t
@@ -144,7 +146,8 @@ read_pos(int fd, fs_off_t _pos, void *data,  size_t nbytes)
     
     if (lseek(fd, pos, SEEK_SET) < 0) {
         perror("read lseek");
-        return FS_EINVAL;
+        errno = EINVAL;
+		return -1;
     }
     
     ret = read(fd, data, nbytes);
@@ -165,7 +168,8 @@ write_pos(int fd, fs_off_t _pos, const void *data,  size_t nbytes)
     
     if (lseek(fd, pos, SEEK_SET) < 0) {
         perror("read lseek");
-        return FS_EINVAL;
+        errno = EINVAL;
+		return -1;
     }
     
     ret = write(fd, data, nbytes);
@@ -284,7 +288,7 @@ to_platform_open_mode(int myMode)
 	}
 
 	// the flags
-	SET_OPEN_MODE_FLAG(O_CLOEXEC, MY_O_CLOEXEC)
+	//SET_OPEN_MODE_FLAG(O_CLOEXEC, MY_O_CLOEXEC)
 	SET_OPEN_MODE_FLAG(O_NONBLOCK, MY_O_NONBLOCK)
 	SET_OPEN_MODE_FLAG(O_EXCL, MY_O_EXCL)
 	SET_OPEN_MODE_FLAG(O_CREAT, MY_O_CREAT)
@@ -292,13 +296,12 @@ to_platform_open_mode(int myMode)
 	SET_OPEN_MODE_FLAG(O_APPEND, MY_O_APPEND)
 	SET_OPEN_MODE_FLAG(O_NOCTTY, MY_O_NOCTTY)
 	SET_OPEN_MODE_FLAG(O_NOTRAVERSE, MY_O_NOTRAVERSE)
-	SET_OPEN_MODE_FLAG(O_ACCMODE, MY_O_ACCMODE)
-	SET_OPEN_MODE_FLAG(O_TEXT, MY_O_TEXT)
-	SET_OPEN_MODE_FLAG(O_BINARY, MY_O_BINARY)
+	//SET_OPEN_MODE_FLAG(O_TEXT, MY_O_TEXT)
+	//SET_OPEN_MODE_FLAG(O_BINARY, MY_O_BINARY)
 
 	#undef SET_OPEN_MODE_FLAG
 
-	return myFlags;
+	return mode;
 }
 
 
