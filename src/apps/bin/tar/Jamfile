@@ -1,0 +1,5 @@
+SubDir OBOS_TOP src apps bin tar ;
+
+SubInclude OBOS_TOP src apps bin tar lib ;
+SubInclude OBOS_TOP src apps bin tar src ;
+

@@ -1,0 +1,34 @@
+SubDir OBOS_TOP src apps bin tar src ;
+
+SubDirHdrs $(OBOS_TOP) src apps bin tar lib ;
+SubDirHdrs $(OBOS_TOP) src apps bin tar ;
+
+# set some additional defines
+{
+	SubDirCcFlags -DHAVE_CONFIG_H ;
+}
+
+BinCommand tar :
+	buffer.c
+	compare.c
+	create.c
+	delete.c
+	extract.c
+	xheader.c
+	incremen.c
+	list.c
+	mangle.c
+	misc.c
+	names.c
+	rtapelib.c
+	sparse.c
+	system.c
+	tar.c
+	update.c
+	utf8.c
+	: libtar.a  ;
+
+BinCommand rmt :
+	rmt.c
+	: libtar.a
+;
