@@ -36,6 +36,8 @@ public:
 		if (file.SetTo(&(info.ref), B_READ_ONLY) != B_OK) return;
 		resource.SetTo(&file);
 		BPoint *origin = (BPoint*)resource.LoadResource('BPNT', "origin", &len);
+		if (origin == NULL)
+			origin = new BPoint(100.0, 100.0);
 		fWindows = new MidiPlayerWindow(*origin);
 	}
 
