@@ -1132,7 +1132,15 @@ int socket_setsockopt(struct socket *so, int level, int optnum, const void *data
 					so->so_options |= optnum;
 				else
 					so->so_options &= ~optnum;
+					
+				if (optnum == SO_NONBLOCK) {
+					if (so->so_options & SO_NONBLOCK)
+						so->so_state |= SS_NBIO;
+					else
+						so->so_state &= ~SS_NBIO;
+				}
 				break;
+				
 			case SO_SNDBUF:
 			case SO_RCVBUF:
 			case SO_SNDLOWAT:
