@@ -659,6 +659,8 @@ BMediaRoster::Connect(const media_source & from,
 	producer_format_proposal_request request1;
 	producer_format_proposal_reply reply1;
 	
+	PRINT_FORMAT("BMediaRoster::Connect calling BBufferProducer::FormatProposal with format  ", *io_format);
+	
 	// BBufferProducer::FormatProposal
 	request1.output = from;
 	request1.format = *io_format;
@@ -672,6 +674,8 @@ BMediaRoster::Connect(const media_source & from,
 	consumer_accept_format_request request2;
 	consumer_accept_format_reply reply2;
 	
+	PRINT_FORMAT("BMediaRoster::Connect calling BBufferConsumer::AcceptFormat with format    ", reply1.format);
+
 	// BBufferConsumer::AcceptFormat
 	request2.dest = to;
 	request2.format = reply1.format;
@@ -686,6 +690,8 @@ BMediaRoster::Connect(const media_source & from,
 	producer_prepare_to_connect_request request3;
 	producer_prepare_to_connect_reply reply3;
 
+	PRINT_FORMAT("BMediaRoster::Connect calling BBufferProducer::PrepareToConnect with format", reply2.format);
+
 	request3.source = from;
 	request3.destination = to;
 	request3.format = reply2.format;
@@ -699,14 +705,29 @@ BMediaRoster::Connect(const media_source & from,
 	// reply3.out_source the real source to be used for the connection
 	// reply3.name the name BBufferConsumer::Connected will see in the outInput->name argument
 
+
+	// find the output and input nodes
+	// XXX isn't there a easier way?
+	media_node sourcenode;
+	media_node destnode;
+	GetNodeFor(NodeIDFor(from.port), &sourcenode);
+	GetNodeFor(NodeIDFor(to.port), &destnode);
+	ReleaseNode(sourcenode);
+	ReleaseNode(destnode);
+
 	// BBufferConsumer::Connected
 	consumer_connected_request request4;
 	consumer_connected_reply reply4;
 	status_t con_status;
+
+	PRINT_FORMAT("BMediaRoster::Connect calling BBufferConsumer::Connected with format       ", reply3.format);
 	
-	request4.producer = reply3.out_source;
-	request4.where = to;
-	request4.with_format = reply3.format;
+	request4.input.node = destnode;
+	request4.input.source = reply3.out_source;
+	request4.input.destination = to;
+	request4.input.format = reply3.format;
+	strcpy(request4.input.name, reply3.name);
+	
 	con_status = QueryPort(to.port, CONSUMER_CONNECTED, &request4, sizeof(request4), &reply4, sizeof(reply4));
 	if (con_status != B_OK) {
 		FATAL("BMediaRoster::Connect: aborting after BBufferConsumer::Connected, status = %#lx\n",con_status);
@@ -718,11 +739,13 @@ BMediaRoster::Connect(const media_source & from,
 	// BBufferProducer::Connect
 	producer_connect_request request5;
 	producer_connect_reply reply5;
+
+	PRINT_FORMAT("BMediaRoster::Connect calling BBufferProducer::Connect with format         ", reply4.input.format);
 	
 	request5.error = con_status;
 	request5.source = reply3.out_source;
 	request5.destination = reply4.input.destination;
-	request5.format = reply3.format; // XXX reply4.input.format ???
+	request5.format = reply4.input.format;
 	strcpy(request5.name, reply4.input.name);
 	rv = QueryPort(reply4.input.source.port, PRODUCER_CONNECT, &request5, sizeof(request5), &reply5, sizeof(reply5));
 	if (con_status != B_OK) {
@@ -735,14 +758,8 @@ BMediaRoster::Connect(const media_source & from,
 	}
 	// reply5.name contains the name assigned to the connection by the producer
 
-	// find the output node
-	// XXX isn't there a easier way?
-	media_node sourcenode;
-	GetNodeFor(NodeIDFor(from.port), &sourcenode);
-	ReleaseNode(sourcenode);
-
 	// initilize connection info
-	*io_format = reply3.format;
+	*io_format = reply4.input.format;
 	*out_input = reply4.input;
 	out_output->node = sourcenode;
 	out_output->source = reply4.input.source;
@@ -751,8 +768,11 @@ BMediaRoster::Connect(const media_source & from,
 	strcpy(out_output->name, reply5.name);
 
 	// the connection is now made
-	
-	
+	printf("BMediaRoster::Connect connection established!\n");
+	PRINT_FORMAT("   format", *io_format);
+	PRINT_INPUT("   input", *out_input);
+	PRINT_OUTPUT("   output", *out_output);
+
 	// XXX register connection with server
 	// XXX we should just send a notification, instead of republishing all endpoints
 	List<media_output> outlist;
