@@ -29,3 +29,14 @@ panic(const char *format, ...)
 	of_exit();
 }
 
+
+void
+dprintf(const char *format, ...)
+{
+	va_list list;
+
+	va_start(list, format);
+	vprintf(format, list);
+	va_end(list);
+}
+
