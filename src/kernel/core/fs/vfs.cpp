@@ -4,7 +4,7 @@
 
 /* 
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -16,18 +16,13 @@
 #include <fs_interface.h>
 
 #include <disk_device_manager/KDiskDeviceManager.h>
-#include <kernel.h>
+#include <syscalls.h>
 #include <boot/kernel_args.h>
 #include <vfs.h>
 #include <vm.h>
 #include <vm_cache.h>
-#include <debug.h>
 #include <khash.h>
 #include <lock.h>
-#include <thread.h>
-#include <malloc.h>
-#include <arch/cpu.h>
-#include <elf.h>
 #include <kerrors.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
@@ -36,6 +31,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <unistd.h>
 #include <sys/stat.h>
 #include <sys/resource.h>
 #include <fcntl.h>

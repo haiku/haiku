@@ -1,17 +1,15 @@
 /* Operations on file descriptors
 ** 
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
-#include <fd.h>
-
 #include <OS.h>
-#include <Errors.h>
 
+#include <fd.h>
 #include <vfs.h>
-#include <debug.h>
+#include <syscalls.h>
 
 #include <malloc.h>
 #include <string.h>
