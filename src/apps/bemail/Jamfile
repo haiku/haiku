@@ -2,6 +2,7 @@ SubDir OBOS_TOP src apps bemail ;
 
 UsePrivateHeaders mail ;
 UsePrivateHeaders textencoding ;
+UsePrivateHeaders shared ;
 
 AddResources BeMail : versioning.rdef pictures.rdef  ;
 App BeMail : 
