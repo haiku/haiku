@@ -21,6 +21,8 @@ static fork_hook *sPrepareHooks, *sParentHooks, *sChildHooks;
 static fork_hook *sLastParentHook, *sLastChildHook;
 static sem_id sForkLock;
 
+extern thread_id __main_thread_id;
+
 
 /**	Adds a hook to the specified list.
  *	If \a _lastHook is NULL, the hook will be added at the head of the list,
@@ -149,7 +151,9 @@ fork(void)
 	if (thread == 0) {
 		// we are the child
 		// ToDo: initialize child
+		__main_thread_id = find_thread(NULL);
 		__init_fork();
+
 		call_fork_hooks(sChildHooks);
 	} else {
 		// we are the parent
