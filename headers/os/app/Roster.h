@@ -112,8 +112,8 @@ public:
 					team_id *appTeam) const;
 	status_t Launch(const char *mimeType, int argc, char **args,
 					team_id *appTeam) const;
-	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
-					team_id *appTeam) const;
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage = 0,
+					team_id *appTeam = 0) const;
 	status_t Launch(const entry_ref *ref, const BList *messageList,
 					team_id *appTeam) const;
 	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
