@@ -8,8 +8,6 @@
 #ifndef _UDF_ARRAY_H
 #define _UDF_ARRAY_H
 
-#include <stdio.h>
-
 #include "kernel_cpp.h"
 
 #include "SupportDefs.h"
