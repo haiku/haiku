@@ -44,7 +44,7 @@ void vm_test()
 	dprintf("vm_test 2: creating physical region and writing and reading from it\n");
 	{
 		region_id region;
-		vm_region_info info;
+		area_info info;
 		char *ptr;
 		int i;
 
@@ -53,9 +53,9 @@ void vm_test()
 		if(region < 0)
 			panic("vm_test 2: failed to create test region\n");
 
-		vm_get_region_info(region, &info);
-		dprintf("region = 0x%lx, addr = %p, region->base = 0x%lx\n", region, ptr, info.base);
-		if((addr)ptr != info.base)
+		get_area_info(region, &info);
+		dprintf("region = 0x%lx, addr = %p, region->base = %p\n", region, ptr, info.address);
+		if (ptr != info.address)
 			panic("vm_test 2: info returned about region does not match pointer returned\n");
 
 		for(i=0; i<64; i++) {
@@ -97,7 +97,7 @@ void vm_test()
 	dprintf("vm_test 4: cloning vidmem and testing if it compares\n");
 	{
 		region_id region, region2;
-		vm_region_info info;
+		area_info info;
 		void *ptr;
 		int rc;
 
@@ -112,8 +112,8 @@ void vm_test()
 			panic("vm_test 4: error cloning region 'vid_mem'\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
-		vm_get_region_info(region, &info);
-		rc = memcmp(ptr, (void *)info.base, info.size);
+		get_area_info(region, &info);
+		rc = memcmp(ptr, (void *)info.address, info.size);
 		if(rc != 0)
 			panic("vm_test 4: regions are not identical\n");
 		else
@@ -126,7 +126,7 @@ void vm_test()
 	dprintf("vm_test 5: cloning vidmem in RO and testing if it compares\n");
 	{
 		region_id region, region2;
-		vm_region_info info;
+		area_info info;
 		void *ptr;
 		int rc;
 
@@ -141,8 +141,8 @@ void vm_test()
 			panic("vm_test 5: error cloning region 'vid_mem'\n");
 		dprintf("region2 = 0x%lx, ptr = %p\n", region2, ptr);
 
-		vm_get_region_info(region, &info);
-		rc = memcmp(ptr, (void *)info.base, info.size);
+		get_area_info(region, &info);
+		rc = memcmp(ptr, (void *)info.address, info.size);
 		if(rc != 0)
 			panic("vm_test 5: regions are not identical\n");
 		else

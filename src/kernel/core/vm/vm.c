@@ -854,40 +854,9 @@ region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,
 	return rc;
 }
 
-region_id user_vm_clone_region(char *uname, void **uaddress, int addr_type,
-	region_id source_region, int mapping, int lock)
-{
-	char name[SYS_MAX_OS_NAME_LEN];
-	void *address;
-	int rc, rc2;
 
-	if((addr)uname >= KERNEL_BASE && (addr)uname <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	if((addr)uaddress >= KERNEL_BASE && (addr)uaddress <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = user_strncpy(name, uname, SYS_MAX_OS_NAME_LEN-1);
-	if(rc < 0)
-		return rc;
-	name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	rc = user_memcpy(&address, uaddress, sizeof(address));
-	if(rc < 0)
-		return rc;
-
-	rc = vm_clone_region(vm_get_current_user_aspace_id(), name, &address, addr_type, source_region, mapping, lock);
-	if(rc < 0)
-		return rc;
-
-	rc2 = user_memcpy(uaddress, &address, sizeof(address));
-	if(rc2 < 0)
-		return rc2;
-
-	return rc;
-}
-
-region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
+region_id
+vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
 	region_id source_region, int mapping, int lock)
 {
 	vm_region *new_region;
@@ -1032,55 +1001,16 @@ _vm_put_region(vm_region *region, bool aspace_locked)
 	return;
 }
 
-void vm_put_region(vm_region *region)
+
+void
+vm_put_region(vm_region *region)
 {
 	return _vm_put_region(region, false);
 }
 
-int user_vm_get_region_info(region_id id, vm_region_info *uinfo)
-{
-	vm_region_info info;
-	int rc, rc2;
 
-	if((addr)uinfo >= KERNEL_BASE && (addr)uinfo <= KERNEL_TOP)
-		return ERR_VM_BAD_USER_MEMORY;
-
-	rc = vm_get_region_info(id, &info);
-	if(rc < 0)
-		return rc;
-
-	rc2 = user_memcpy(uinfo, &info, sizeof(info));
-	if(rc2 < 0)
-		return rc2;
-
-	return rc;
-}
-
-int vm_get_region_info(region_id id, vm_region_info *info)
-{
-	vm_region *region;
-
-	if(info == NULL)
-		return EINVAL;
-
-	region = vm_get_region_by_id(id);
-	if(region == NULL)
-		return ERR_VM_INVALID_REGION;
-
-	info->id = region->id;
-	info->base = region->base;
-	info->size = region->size;
-	info->lock = region->lock;
-	info->wiring = region->wiring;
-	strncpy(info->name, region->name, SYS_MAX_OS_NAME_LEN-1);
-	info->name[SYS_MAX_OS_NAME_LEN-1] = 0;
-
-	vm_put_region(region);
-
-	return 0;
-}
-
-int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr)
+int
+vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr)
 {
 	vm_address_space *aspace;
 	unsigned int null_flags;
@@ -2306,16 +2236,39 @@ area_for(void *address)
 area_id
 find_area(const char *name)
 {
-	// ToDo: implement find_area()
-	return B_NAME_NOT_FOUND;
+	return vm_find_region_by_name(vm_get_kernel_aspace_id(), name);
+		// ToDo: works only for areas created in the kernel
 }
 
 
 status_t
 _get_area_info(area_id area, area_info *info, size_t size)
 {
-	// ToDo: implement get_area_info()
-	return B_ERROR;
+	vm_region *region;
+
+	if (size != sizeof(area_info) || info == NULL)
+		return B_BAD_VALUE;
+
+	region = vm_get_region_by_id(area);
+	if (region == NULL)
+		return B_BAD_VALUE;
+
+	strlcpy(info->name, region->name, B_OS_NAME_LENGTH);
+	info->area = region->id;
+	info->address = (void *)region->base;
+	info->size = region->size;
+	info->protection = (region->lock & LOCK_RW ? B_WRITE_AREA : 0) | B_READ_AREA;
+	info->lock = B_FULL_LOCK;
+	info->team = 1;
+	info->ram_size = region->size;
+	info->copy_count = 0;
+	info->in_count = 0;
+	info->out_count = 0;
+		// ToDo: retrieve real values here!
+
+	vm_put_region(region);
+
+	return B_OK;
 }
 
 
@@ -2482,6 +2435,95 @@ status_t
 delete_area(area_id area)
 {
 	return vm_delete_region(vm_get_kernel_aspace_id(), area);
+}
+
+
+//	#pragma mark -
+
+
+area_id
+_user_area_for(void *address)
+{
+	return (area_id)find_region_by_address((addr)address);
+}
+
+
+area_id
+_user_find_area(const char *name)
+{
+	return vm_find_region_by_name(vm_get_current_user_aspace_id(), name);
+		// ToDo: works only for areas created in the calling team
+}
+
+
+status_t
+_user_get_area_info(area_id area, area_info *userInfo)
+{
+	area_info info;
+	status_t status;
+
+	if (!CHECK_USER_ADDRESS(userInfo))
+		return B_BAD_ADDRESS;
+
+	status = get_area_info(area, &info);
+	if (status < B_OK)
+		return status;
+
+	if (user_memcpy(userInfo, &info, sizeof(area_info)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	return status;
+}
+
+
+status_t
+_user_get_next_area_info(team_id team, int32 *cookie, area_info *info)
+{
+	// ToDo: implement get_next_area_info()
+	return B_ERROR;
+}
+
+
+status_t
+_user_set_area_protection(area_id area, uint32 newProtection)
+{
+	// ToDo: implement set_area_protection()
+	return B_ERROR;
+}
+
+
+status_t
+_user_resize_area(area_id area, size_t newSize)
+{
+	// ToDo: implement resize_area()
+	return B_ERROR;
+}
+
+
+area_id
+_user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
+	uint32 protection, area_id sourceArea)
+{
+	char name[B_OS_NAME_LENGTH];
+	void *address;
+	area_id clonedArea;
+
+	if (!CHECK_USER_ADDRESS(userName)
+		|| !CHECK_USER_ADDRESS(userAddress)
+		|| user_strlcpy(name, userName, sizeof(name)) < B_OK
+		|| user_memcpy(&address, userAddress, sizeof(address)) < B_OK)
+		return B_BAD_ADDRESS;
+
+	clonedArea = clone_area(name, &address, addressSpec, protection, sourceArea);
+	if (clonedArea < B_OK)
+		return clonedArea;
+
+	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
+		// ToDo: delete cloned area?
+		return B_BAD_ADDRESS;
+	}
+
+	return clonedArea;
 }
 
 
