@@ -5,7 +5,7 @@
 #ifndef _KERNEL_MEMHEAP_H
 #define _KERNEL_MEMHEAP_H
 
-#include <kernel.h>
+#include <OS.h>
 
 struct kernel_args;
 
@@ -13,7 +13,17 @@ struct kernel_args;
 	// 4 MB heap for the kernel
 
 
-int   heap_init(addr new_heap_base);
-int   heap_init_postsem(struct kernel_args *ka);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+void *memalign(size_t alignment, size_t size);
+
+status_t heap_init(addr_t heapBase);
+status_t heap_init_postsem(struct kernel_args *args);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _KERNEL_MEMHEAP_H */
