@@ -8,7 +8,6 @@
 
 /* Team functions */
 
-#include <debugger.h>
 #include <OS.h>
 
 #include <team.h>
@@ -798,13 +797,7 @@ team_delete_team(struct team *team)
 	free(team);
 
 	// notify the debugger, that the team is gone
-	if (debuggerPort >= 0) {
-		debug_team_deleted message;
-		message.team = teamID;
-		write_port_etc(debuggerPort, B_DEBUGGER_MESSAGE_TEAM_DELETED, &message,
-			sizeof(message), B_RELATIVE_TIMEOUT, 0);
-			// ToDo: Would it be OK to wait here?
-	}
+	user_debug_team_deleted(teamID, debuggerPort);
 }
 
 
@@ -1051,6 +1044,9 @@ load_image_etc(int32 argCount, char **args, int32 envCount, char **env, int32 pr
 		goto err4;
 	}
 
+	// notify the debugger
+	user_debug_team_created(team->id);
+
 	return thread;
 
 err4:
@@ -1269,6 +1265,9 @@ fork_team(void)
 		status = threadID;
 		goto err4;
 	}
+
+	// notify the debugger
+	user_debug_team_created(team->id);
 
 	resume_thread(threadID);
 	return threadID;
