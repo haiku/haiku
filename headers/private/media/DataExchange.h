@@ -23,7 +23,6 @@ struct command_data;
 
 // BMessage based data exchange with the media_server
 status_t SendToServer(BMessage *msg);
-//status_t QueryServer(BMessage *request, BMessage *reply);
 
 // Raw data based data exchange with the media_server
 status_t SendToServer(int32 msgcode, command_data *msg, int size);

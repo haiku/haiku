@@ -42,20 +42,21 @@ SharedLibrary media :
 	TimeSource.cpp
 
 	# Internal Functionality
+	BufferIdCache.cpp
 	DataExchange.cpp
-	PortPool.cpp
 	DormantNodeManager.cpp
 	Notifications.cpp
+	PortPool.cpp
 	SystemTimeSource.cpp
-	BufferIdCache.cpp
 	SharedBufferList.cpp
 	TrackReader.cpp
 	TimedEventQueuePrivate.cpp
+	TimeSourceObject.cpp
+	TimeSourceObjectManager.cpp
 	SoundPlayNode.cpp
 	ChannelMixer.cpp
 	SampleConverter.cpp
 	SamplingrateConverter.cpp
-	VolumeControl.cpp
 
 	# Old (R3) Media Kit
 	OldAudioModule.cpp

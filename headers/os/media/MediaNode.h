@@ -111,6 +111,9 @@ struct media_node_attribute
 };
 
 
+namespace BPrivate { namespace media { class TimeSourceObject; } }
+
+
 class BMediaNode
 {
 protected:
@@ -252,6 +255,7 @@ private:
 	friend class _BMediaRosterP;
 	friend class MNodeManager;
 	friend class BBufferProducer;	//	for getting _mNodeID
+	friend class BPrivate::media::TimeSourceObject;
 
 		// Deprecated in 4.1
 		int32 IncrementChangeTag();
@@ -318,7 +322,7 @@ virtual		status_t _Reserved_MediaNode_15(void *);
 		int32 _mChangeCount;			//	deprecated
 		int32 _mChangeCountReserved;	//	deprecated
 		uint64 fKinds;
-		media_node_id fTimeSourceID;
+		media_node_id _unused;
 
 		BBufferProducer * fProducerThis;
 		BBufferConsumer * fConsumerThis;

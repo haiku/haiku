@@ -434,12 +434,20 @@ BMediaRoster::ReleaseNode(const media_node & node)
 	return QueryServer(SERVER_RELEASE_NODE, &request, sizeof(request), &reply, sizeof(reply));
 }
 
-
 BTimeSource *
 BMediaRoster::MakeTimeSourceFor(const media_node & for_node)
 {
 	BROKEN();
-	return new _SysTimeSource(); // XXX fix this
+
+	printf("BMediaRoster::MakeTimeSourceFor enter, node %ld, port %ld, kind %#lx\n", for_node.node, for_node.port, for_node.kind);
+	
+	static BTimeSource *source = 0;
+	if (source == 0)
+		source = new _SysTimeSource();
+
+	printf("BMediaRoster::MakeTimeSourceFor leave, node %ld, port %ld, kind %#lx\n", source->Node().node, source->Node().port, source->Node().kind);
+
+	return dynamic_cast<BTimeSource *>(source->Acquire());
 }
 
 

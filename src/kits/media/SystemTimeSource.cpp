@@ -8,13 +8,16 @@
 // XXX This works only as long a BTimeSource is only supporting realtime
 
 #include <OS.h>
-//#include <MediaRoster.h>
+#include <stdio.h>
+#include <MediaRoster.h>
 #include "SystemTimeSource.h"
 
 _SysTimeSource::_SysTimeSource() :
 	BMediaNode("system time source")
 {
-//	BMediaRoster::Roster()->RegisterNode(this); // XXX
+	printf("_SysTimeSource::_SysTimeSource enter\n");
+	BMediaRoster::Roster()->RegisterNode(this); // XXX
+	printf("_SysTimeSource::_SysTimeSource leave\n");
 }
 
 /* virtual */ status_t
