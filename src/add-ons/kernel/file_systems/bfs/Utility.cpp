@@ -136,3 +136,22 @@ BlockArray::MakeEmpty()
 	fArray->count = 0;
 }
 
+
+//	#pragma mark -
+
+
+extern "C" size_t
+strlcpy(char *dest, char const *source, size_t length)
+{
+	if (length == 0)
+		return strlen(source);
+
+	size_t i = 0;
+	for (; i < length - 1 && source[i]; i++)
+		dest[i] = source[i];
+
+	dest[i] = '\0';
+
+	return i + strlen(source + i);
+}
+

@@ -153,4 +153,8 @@ template<class Node> struct list {
 #	error The macros atomic_set(), and atomic_test_and_set() are not defined for the target processor
 #endif
 
+
+extern "C" size_t strlcpy(char *dest, char const *source, size_t length);
+
+
 #endif	/* UTILITY_H */
