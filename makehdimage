@@ -56,7 +56,8 @@ RUN_WITHOUT_APP_SERVER=1
 BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	true false ls df mount unmount cp mv ps sh mkdir sleep \
 	grep cat less clockconfig du rm date find locate xargs \
-	isvolume shutdown safemode sysinfo kill diff cmp"
+	isvolume shutdown safemode sysinfo kill diff cmp more \
+	renice rmattr addattr listdev pwd chmod chown chgrp dd tee md5sum"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so"
 
@@ -65,7 +66,7 @@ jam -q kernel boot_loader config_manager pci isa ide scsi \
 	scsi_periph intel keyboard scsi_dsk scsi_cd \
 	rld.so kernel_fortune consoled \
 	$BEOS_BIN $BEOS_SYSTEM_LIB \
-	kernel_uname libnet.so null zero random \<driver\>tty \
+	kernel_uname libnet.so null zero random \<driver\>tty "<driver>config" \
 	|| exit 1
 
 
@@ -80,6 +81,8 @@ if [ ! $alreadyMounted ]; then
 fi
 
 cd $targetDir
+# this avoids diskspace leaking with current combination userlandfs/obfs
+rm -Rf *
 mkdir -p beos/system/add-ons/kernel/bus_managers
 mkdir -p beos/system/add-ons/kernel/generic
 mkdir -p beos/system/add-ons/kernel/file_systems
@@ -88,6 +91,7 @@ mkdir -p beos/system/add-ons/kernel/busses/ide
 mkdir -p beos/system/add-ons/kernel/boot
 mkdir -p beos/system/add-ons/kernel/drivers/bin
 mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
+mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
 mkdir -p beos/bin
 mkdir -p beos/system/lib
 mkdir -p beos/system/boot
@@ -123,7 +127,7 @@ for f in drivers/arch/x86/keyboard/keyboard; do
 done
 
 cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel/drivers/dev
-for f in tty random null zero; do
+for f in config tty random null zero; do
 	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
@@ -148,7 +152,6 @@ done
 cd $sourceDir/distro/x86.R1/beos/bin
 cp ../apps/consoled $BEOS_BIN $targetDir/beos/bin/
 cd $targetDir/beos/bin
-ln -s less more
 
 # scripts and data files
 cd $sourceDir
@@ -176,7 +179,7 @@ done
 # driver links
 cd $targetDir/beos/system/add-ons/kernel
 for f in drivers/dev/keyboard drivers/dev/null drivers/dev/tty drivers/dev/zero \
-		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd; do
+		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd drivers/dev/misc/config; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
