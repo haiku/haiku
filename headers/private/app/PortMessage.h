@@ -48,7 +48,23 @@ public:
 	ssize_t BufferSize(void) { return _buffersize; }
 	
 	status_t Read(void *data, ssize_t size);
-	template <class Type> status_t Read(Type *data);
+	template <class Type> status_t Read(Type *data)
+		{
+			int32 size = sizeof(Type);
+
+			if(!data)
+				return B_BAD_VALUE;
+
+			if( !_buffer || 
+				(_buffersize < size) ||
+				(_index+size > _buffer+_buffersize) )
+				return B_NO_MEMORY;
+	
+			*data=*((Type*)_index);
+			_index+=size;
+	
+			return B_OK;
+		}
 
 	void Rewind(void);
 	
