@@ -180,6 +180,12 @@ BTranslatorRoster::~BTranslatorRoster()
 {
 	if (fSem > 0 && acquire_sem(fSem) == B_NO_ERROR) {
 	
+		// If the default BTranslatorRoster is being
+		// deleted, set the pointer to the default
+		// BTranslatorRoster to NULL 
+		if (fspDefaultTranslators == this)
+			fspDefaultTranslators = NULL;
+	
 		// FIRST PASS: release BTranslator objects
 		translator_node *pTranNode = fpTranslators;
 		while (pTranNode) {
