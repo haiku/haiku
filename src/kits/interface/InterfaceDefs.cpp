@@ -89,6 +89,7 @@ get_scroll_bar_info(scroll_bar_info *info)
 	return B_OK;
 }
 
+
 _IMPEXP_BE status_t
 set_scroll_bar_info(scroll_bar_info *info)
 {
@@ -160,6 +161,7 @@ set_mouse_map(mouse_map *map)
 	command.AddData("mousemap", B_ANY_TYPE, map, sizeof(mouse_map));
 	return _control_input_server_(&command, &reply);
 }
+
 
 _IMPEXP_BE status_t
 get_click_speed(bigtime_t *speed)
@@ -567,6 +569,7 @@ ui_color(color_which which)
 	return color;
 }
 
+
 _IMPEXP_BE rgb_color
 tint_color(rgb_color color, float tint)
 {
@@ -575,15 +578,12 @@ tint_color(rgb_color color, float tint)
 	#define LIGHTEN(x) ((uint8)(255.0f - (255.0f - x) * tint))
 	#define DARKEN(x)  ((uint8)(x * (2 - tint)))
 
-	if (tint < 1.0f)
-	{
+	if (tint < 1.0f) {
 		result.red   = LIGHTEN(color.red);
 		result.green = LIGHTEN(color.green);
 		result.blue  = LIGHTEN(color.blue);
 		result.alpha = color.alpha;
-	}
-	else
-	{
+	} else {
 		result.red   = DARKEN(color.red);
 		result.green = DARKEN(color.green);
 		result.blue  = DARKEN(color.blue);
@@ -606,12 +606,12 @@ _init_interface_kit_()
 	BTextView::sWidthSem = widthSem;
 	BTextView::sWidthAtom = 0;
 	BTextView::sWidths = new _BWidthBuffer_;
-		
-	status_t result = get_menu_info(&BMenu::sMenuInfo);
-	if (result != B_OK)  
-		return result;
 	
-	//TODO: fill the other static members
+	// TODO: get_menu_info() copies the BMenu::sMenuInfo struct
+	// to the passed menu_info, so we can't use it here.
+	// We should probably load the ui settings from the disk	
+
+	// TODO: fill the other static members
 		
 	return B_OK;
 }
@@ -643,7 +643,8 @@ _init_global_fonts()
 	- \c 2: Win95
 	- \c 3: MacOS
 */
-void __set_window_decor(int32 theme)
+void
+__set_window_decor(int32 theme)
 {
 	BAppServerLink link;
 	link.StartMessage(AS_R5_SET_DECORATOR);
