@@ -1,13 +1,14 @@
 /*
-** Copyright 2002/03, Thomas Kurschel. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+ * Copyright 2002/03, Thomas Kurschel. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 /*
 	Part of Open SCSI Disk Driver
 
 	Device management.
 */
+
 
 #include "scsi_dsk_int.h"
 
@@ -23,7 +24,7 @@ das_init_device(pnp_node_handle node, void *user_cookie, void **cookie)
 	status_t res;
 	scsi_ccb *request;
 
-	SHOW_FLOW0( 3, "" );
+	SHOW_FLOW0(3, "");
 
 	device = (das_device_info *)malloc(sizeof(*device));
 	if (device == NULL)
@@ -135,12 +136,11 @@ das_device_added(pnp_node_handle node)
 		goto err;
 	}
 
-	SHOW_FLOW(3, "name=%s", name);
+	SHOW_FLOW(3, "name = %s", name);
 
 	// ready to register
 	{
-		pnp_node_attr attrs[] =
-		{
+		pnp_node_attr attrs[] = {
 			{ PNP_DRIVER_DRIVER, B_STRING_TYPE, { string: SCSI_DSK_MODULE_NAME }},
 			{ PNP_DRIVER_TYPE, B_STRING_TYPE, { string: BLKDEV_TYPE_NAME }},
 			// we always want blkdev on top of us
