@@ -12,8 +12,6 @@
  *
  */
 
-#include <MediaDefs.h>
-
 class Resampler
 {
 public:

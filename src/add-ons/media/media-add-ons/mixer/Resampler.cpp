@@ -9,6 +9,7 @@
  *
  */
 
+#include <MediaDefs.h>
 #include "Resampler.h"
 #include "debug.h"
 
@@ -91,7 +92,7 @@ Resampler::float_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -142,7 +143,7 @@ Resampler::int32_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -193,7 +194,7 @@ Resampler::int16_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -244,7 +245,7 @@ Resampler::int8_to_float(const void *_src, int32 src_sample_offset, int32 src_sa
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -295,7 +296,7 @@ Resampler::uint8_to_float(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -352,7 +353,7 @@ Resampler::float_to_int32(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -421,7 +422,7 @@ Resampler::float_to_int16(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -490,7 +491,7 @@ Resampler::float_to_int8(const void *_src, int32 src_sample_offset, int32 src_sa
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
@@ -559,7 +560,7 @@ Resampler::float_to_uint8(const void *_src, int32 src_sample_offset, int32 src_s
 		return;
 	}
 
-	register float delta = float(src_sample_count) / float(dst_sample_offset);
+	register float delta = float(src_sample_count) / float(dst_sample_count);
 	register float current = 0.0f;
 
 	if (delta < 1.0) {
