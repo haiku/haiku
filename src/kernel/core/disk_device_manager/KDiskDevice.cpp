@@ -344,6 +344,7 @@ KDiskDevice::WriteUserData(UserDataWriter &writer, bool shadow)
 	if (data) {
 		data->device_flags = DeviceFlags();
 		data->path = path;
+		writer.AddRelocationEntry(&data->path);
 		partition->WriteUserData(writer, &data->device_partition_data);
 	} else
 		partition->WriteUserData(writer, NULL);

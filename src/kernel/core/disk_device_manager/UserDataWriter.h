@@ -17,6 +17,9 @@ public:
 	UserDataWriter(user_disk_device_data *buffer, size_t bufferSize);
 	~UserDataWriter();
 
+	status_t SetTo(user_disk_device_data *buffer, size_t bufferSize);
+	void Unset();
+
 	void *AllocateData(size_t size, size_t align = 1);
 	user_partition_data *AllocatePartitionData(size_t childCount);
 	user_disk_device_data *AllocateDeviceData(size_t childCount);
@@ -25,10 +28,16 @@ public:
 
 	size_t AllocatedSize() const;
 
+	status_t AddRelocationEntry(void *address);
+	status_t Relocate(void *address);
+
 private:
+	struct RelocationEntryList;
+
 	user_disk_device_data	*fBuffer;
 	size_t					fBufferSize;
 	size_t					fAllocatedSize;
+	RelocationEntryList		*fRelocationEntries;
 };
 
 } // namespace DiskDevice

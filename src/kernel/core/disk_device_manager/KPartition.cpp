@@ -938,13 +938,22 @@ KPartition::WriteUserData(UserDataWriter &writer, user_partition_data *data)
 		data->parameters = parameters;
 		data->content_parameters = contentParameters;
 		data->child_count = CountChildren();
+		// make buffer relocatable
+		writer.AddRelocationEntry(&data->name);
+		writer.AddRelocationEntry(&data->content_name);
+		writer.AddRelocationEntry(&data->type);
+		writer.AddRelocationEntry(&data->content_type);
+		writer.AddRelocationEntry(&data->parameters);
+		writer.AddRelocationEntry(&data->content_parameters);
 	}
 	// children
 	for (int32 i = 0; KPartition *child = ChildAt(i); i++) {
 		user_partition_data *childData
 			= writer.AllocatePartitionData(child->CountChildren());
-		if (data)
+		if (data) {
 			data->children[i] = childData;
+			writer.AddRelocationEntry(&data->children[i]);
+		}
 		child->WriteUserData(writer, childData);
 	}
 }
