@@ -9,25 +9,32 @@
 #ifndef _sk_sniffer_rule_h_
 #define _sk_sniffer_rule_h_
 
+#include <SupportDefs.h>
 #include <vector>
+
+class BPositionIO;
 
 namespace Sniffer {
 
 class Expr;
-typedef std::vector<Expr*> ExprList;
 
 class Rule {
 public:
 	Rule();
 	~Rule();
+	
+	status_t InitCheck() const;
+	
+	double Priority() const;	
+	bool Sniff(BPositionIO *data) const;	
 private:
 	friend class Parser;
 
 	void Unset();
-	void SetTo(double priority, ExprList* list);
+	void SetTo(double priority, std::vector<Expr*>* list);
 
 	double fPriority;
-	ExprList *fExprList;
+	std::vector<Expr*> *fExprList;
 };
 
 }
