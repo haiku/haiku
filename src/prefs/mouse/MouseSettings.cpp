@@ -118,21 +118,18 @@ MouseSettings::SaveSettings()
 	if (status < B_OK)
 		return status;
 
-	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
+	BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE);
 	if (status < B_OK)
 		return status;
 
-	// we have to do this because mouse_map counts 16 buttons in OBOS
 #if R5_COMPATIBLE
-	file.Write(&fSettings.type, sizeof(fSettings.type));
-	file.Write(&fSettings.map, 3*sizeof(int32));
-	file.Write(&fSettings.accel, sizeof(fSettings.accel));
-	file.Write(&fSettings.click_speed, sizeof(fSettings.click_speed));
+	const off_t kOffset = sizeof(mouse_settings) - sizeof(mouse_map) + sizeof(int32) * 3;
+	// we have to do this because mouse_map counts 16 buttons in OBOS
 #else
-	file.Write(fSettings, sizeof(fSettings));
+	const off_t kOffset = sizeof(mouse_settings);
 #endif
 
-	file.Write(&fWindowPosition, sizeof(BPoint));
+	file.WriteAt(kOffset, &fWindowPosition, sizeof(BPoint));
 
 	// who is responsible for saving the mouse mode?
 
