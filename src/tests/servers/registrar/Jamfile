@@ -7,3 +7,9 @@ SimpleTest RegistrarTest1
 	: <boot!home!config!lib>libopenbeos.so be
 ;
 
+SimpleTest RosterShell
+	: RosterShell.cpp
+	: <boot!home!config!lib>libopenbeos.so
+	  be stdc++.r4
+;
+
