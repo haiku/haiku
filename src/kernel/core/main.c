@@ -162,15 +162,6 @@ _start(kernel_args *oldka, int cpu_num)
 }
 
 
-status_t
-shutdown(bool reboot)
-{
-	sync();
-
-	return arch_cpu_shutdown(reboot);
-}
-
-
 static int32
 main2(void *unused)
 {

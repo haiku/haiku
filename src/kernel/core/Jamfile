@@ -32,6 +32,7 @@ KernelMergeObject kernel_core.o :
 	real_time_clock.c
 	scheduler.c
 	sem.c
+	shutdown.c
 	signal.c
 	system_info.c
 	smp.c
