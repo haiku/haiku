@@ -9,6 +9,7 @@ APP_KIT_SOURCE =
 	Invoker.cpp
 	Looper.cpp
 	LooperList.cpp
+	Message.cpp
 	MessageFilter.cpp
 	MessageQueue.cpp
 	MessageRunner.cpp

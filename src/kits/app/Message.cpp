@@ -1,3 +1,32 @@
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		Message.cpp
+//	Author(s):		Erik Jaesler (erik@cgsoftware.com)
+//					DarkWyrm <bpmagic@columbus.rr.com>
+//	Description:	BMessage class creates objects that store data and that
+//					can be processed in a message loop.  BMessage objects
+//					are also used as data containers by the archiving and 
+//					the scripting mechanisms.
+//------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
 
@@ -6,7 +35,9 @@
 #include <Messenger.h>
 #include <Errors.h>
 
-#include <CRTDBG.H>
+#include <stdio.h>
+#include <string.h>
+//#include <CRTDBG.H>
 
 // Project Includes ------------------------------------------------------------
 
@@ -262,9 +293,9 @@ status_t BMessage::SendReply(BMessage *the_reply, BMessage *reply_to_reply,
 	return B_ERROR;
 }
 //------------------------------------------------------------------------------
-size_t BMessage::FlattenedSize() const
+ssize_t BMessage::FlattenedSize() const
 {
-	size_t size = 7 * sizeof(int32);
+	ssize_t size = 7 * sizeof(int32);
 
 	for (entry_hdr *entry = fEntries; entry != NULL; entry = entry->fNext)
 		size += da_total_logical_size(entry);
@@ -272,9 +303,9 @@ size_t BMessage::FlattenedSize() const
 	return size;
 }
 //------------------------------------------------------------------------------
-status_t BMessage::Flatten(char *address, size_t numBytes) const
+status_t BMessage::Flatten(char *address, ssize_t numBytes) const
 {
-	if (numBytes != NULL && numBytes < FlattenedSize())
+	if (address!= NULL && numBytes < FlattenedSize())
 		return B_NO_MEMORY;
 
 	int position = 7 * sizeof(int32);
@@ -298,7 +329,7 @@ status_t BMessage::Flatten(char *address, size_t numBytes) const
 	return B_OK;
 }
 //------------------------------------------------------------------------------
-status_t BMessage::Flatten(BDataIO *object, size_t *numBytes) const
+status_t BMessage::Flatten(BDataIO *object, ssize_t *numBytes) const
 {
 	if (numBytes != NULL && *numBytes < FlattenedSize())
 		return B_NO_MEMORY;
@@ -556,7 +587,7 @@ status_t BMessage::AddFlat(const char *name, BFlattenable *object,
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddData(const char *name, type_code type, const void *data,
-						   size_t numBytes, bool fixedSize, int32 numItems)
+						   ssize_t numBytes, bool fixedSize, int32 numItems)
 {
 	entry_hdr *entry = entry_find(name, type);
 
@@ -930,7 +961,7 @@ status_t BMessage::FindFlat(const char *name, BFlattenable *object) const
 {
 	status_t ret;
 	const void *data;
-	size_t numBytes;
+	ssize_t numBytes;
 
 	ret = FindData(name, object->TypeCode (), &data, &numBytes);
 
@@ -948,7 +979,7 @@ status_t BMessage::FindFlat(const char *name, int32 index,
 {
 	status_t ret;
 	const void *data;
-	size_t numBytes;
+	ssize_t numBytes;
 
 	ret = FindData(name, object->TypeCode(), index, &data, &numBytes);
 
@@ -962,7 +993,7 @@ status_t BMessage::FindFlat(const char *name, int32 index,
 }
 //------------------------------------------------------------------------------
 status_t BMessage::FindData(const char *name, type_code type, const void **data,
-							size_t *numBytes) const
+							ssize_t *numBytes) const
 {
 	entry_hdr *entry = entry_find(name, type);
 
@@ -983,7 +1014,7 @@ status_t BMessage::FindData(const char *name, type_code type, const void **data,
 }
 //------------------------------------------------------------------------------
 status_t BMessage::FindData(const char *name, type_code type, int32 index,
-							const void **data, size_t *numBytes) const
+							const void **data, ssize_t *numBytes) const
 {
 	entry_hdr *entry = entry_find(name, type);
 
@@ -1093,7 +1124,7 @@ status_t BMessage::ReplaceInt64(const char *name, int64 anInt64)
 //							   BFlattenable *object); 
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceData(const char *name, type_code type,
-							   const void *data, size_t numBytes)
+							   const void *data, ssize_t numBytes)
 {
 	entry_hdr *entry = entry_find(name, type);
 
@@ -1154,7 +1185,7 @@ double		FindDouble(const char *, int32 n = 0) const;*/
 //------------------------------------------------------------------------------
 BMessage::BMessage(BMessage *a_message)	
 {
-	BMessage::BMessage(*a_message);
+	*this=*a_message;
 }
 //------------------------------------------------------------------------------
 void BMessage::_ReservedMessage1() {}
@@ -1314,7 +1345,7 @@ void *BMessage::da_create(int32 header_size, int32 chunk_size, bool fixed,
 //------------------------------------------------------------------------------
 status_t BMessage::da_add_data(dyn_array **da, const void *data, int32 size )
 {
-	_ASSERT(_CrtCheckMemory());
+//	_ASSERT(_CrtCheckMemory());
 
 	int32 new_size = (*da)->fLogicalBytes + ((*da)->fChunkSize ? (*da)->fChunkSize :
 		da_pad_8(size + da_chunk_hdr_size()));
@@ -1334,7 +1365,7 @@ status_t BMessage::da_add_data(dyn_array **da, const void *data, int32 size )
 		(*da)->fLogicalBytes += da_chunk_size(da_chunk_ptr(ptr));
 	}
 
-	_ASSERT(_CrtCheckMemory());
+//	_ASSERT(_CrtCheckMemory());
 
 	return B_OK;
 }
