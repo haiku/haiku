@@ -61,7 +61,9 @@ static int port_spinlock = 0;
 #define GRAB_PORT_LOCK(s) acquire_spinlock(&(s).lock)
 #define RELEASE_PORT_LOCK(s) release_spinlock(&(s).lock)
 
-int port_init(kernel_args *ka)
+
+int
+port_init(kernel_args *ka)
 {
 	int i;
 	int sz;
@@ -71,12 +73,12 @@ int port_init(kernel_args *ka)
 	// create and initialize semaphore table
 	port_region = vm_create_anonymous_region(vm_get_kernel_aspace_id(), "port_table", (void **)&ports,
 		REGION_ADDR_ANY_ADDRESS, sz, REGION_WIRING_WIRED, LOCK_RW|LOCK_KERNEL);
-	if(port_region < 0) {
+	if (port_region < 0) {
 		panic("unable to allocate kernel port table!\n");
 	}
 
 	memset(ports, 0, sz);
-	for(i=0; i<MAX_PORTS; i++)
+	for (i = 0; i < MAX_PORTS; i++)
 		ports[i].id = -1;
 
 	// add debugger commands
@@ -88,19 +90,22 @@ int port_init(kernel_args *ka)
 	return 0;
 }
 
-int dump_port_list(int argc, char **argv)
+
+int
+dump_port_list(int argc, char **argv)
 {
 	int i;
 
-	for(i=0; i<MAX_PORTS; i++) {
-		if(ports[i].id >= 0) {
+	for (i = 0; i < MAX_PORTS; i++) {
+		if (ports[i].id >= 0)
 			dprintf("%p\tid: 0x%x\t\tname: '%s'\n", &ports[i], ports[i].id, ports[i].name);
-		}
 	}
 	return 0;
 }
 
-static void _dump_port_info(struct port_entry *port)
+
+static void
+_dump_port_info(struct port_entry *port)
 {
 	int cnt;
 	dprintf("PORT:   %p\n", port);
@@ -115,20 +120,22 @@ static void _dump_port_info(struct port_entry *port)
 	dprintf("write_sem: %d\n", cnt);
 }
 
-static int dump_port_info(int argc, char **argv)
+
+static int
+dump_port_info(int argc, char **argv)
 {
 	int i;
 
-	if(argc < 2) {
+	if (argc < 2) {
 		dprintf("port: not enough arguments\n");
 		return 0;
 	}
 
 	// if the argument looks like a hex number, treat it as such
-	if(strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
+	if (strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
 		unsigned long num = atoul(argv[1]);
 
-		if(num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
+		if (num > KERNEL_BASE && num <= (KERNEL_BASE + (KERNEL_SIZE - 1))) {
 			// XXX semi-hack
 			// one can use either address or a port_id, since KERNEL_BASE > MAX_PORTS assumed
 			_dump_port_info((struct port_entry *)num);
@@ -145,14 +152,16 @@ static int dump_port_info(int argc, char **argv)
 	}
 
 	// walk through the ports list, trying to match name
-	for(i=0; i<MAX_PORTS; i++) {
-		if (ports[i].name != NULL)
-			if(strcmp(argv[1], ports[i].name) == 0) {
-				_dump_port_info(&ports[i]);
-				return 0;
-			}
+	for (i = 0; i < MAX_PORTS; i++) {
+		if (ports[i].name != NULL
+			&& strcmp(argv[1], ports[i].name) == 0) {
+			_dump_port_info(&ports[i]);
+			return 0;
+		}
 	}
+	return 0;
 }
+
 
 port_id		
 create_port(int32 queue_length, const char *name)
@@ -165,11 +174,11 @@ create_port(int32 queue_length, const char *name)
 	void 	*q;
 	team_id	owner;
 	
-	if(ports_active == false)
+	if (ports_active == false)
 		return B_BAD_PORT_ID;
 
 	// check & dup name
-	if(name) {
+	if (name) {
 		int name_len = strlen(name);
 
 		temp_name = (char *)kmalloc(min(name_len + 1, SYS_MAX_OS_NAME_LEN));
