@@ -44,6 +44,7 @@ mp3Decoder::Setup(media_format *ioEncodedFormat, media_format *ioDecodedFormat,
 	ioDecodedFormat->u.raw_audio.buffer_size = OUTPUT_BUFFER_SIZE;
 	ioDecodedFormat->u.raw_audio.channel_mask = B_CHANNEL_LEFT | B_CHANNEL_RIGHT;
 	fFrameSize = 4;
+	fFps = 44100;
 	return B_OK;
 }
 
@@ -67,6 +68,9 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = OUTPUT_BUFFER_SIZE;
 	
+	mediaHeader->start_time = fStartTime;
+	//TRACE("mp3Decoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
+	
 	while (out_bytes_needed > 0) {
 		if (fResidualBytes) {
 			int32 bytes = min_c(fResidualBytes, out_bytes_needed);
@@ -75,32 +79,51 @@ mp3Decoder::Decode(void *buffer, int64 *frameCount,
 			fResidualBytes -= bytes;
 			out_buffer += bytes;
 			out_bytes_needed -= bytes;
+			
+			fStartTime += (1000000LL * (bytes / fFrameSize)) / fFps;
+
+			//TRACE("mp3Decoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 			continue;
 		}
 		
-		void *chunkBuffer;
-		int32 chunkSize;
-		if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, mediaHeader)) {
-			TRACE("mp3Decoder::Decode: GetNextChunk failed\n");
-			return B_ERROR;
-		}
-
-		int outsize;
-		int result;
-		result = decodeMP3(&fMpgLibPrivate, (char *)chunkBuffer, chunkSize, (char *)fDecodeBuffer, DECODE_BUFFER_SIZE, &outsize);
-		if (result == MP3_ERR) {
-			TRACE("mp3Decoder::Decode: decodeMP3 returned MP3_ERR\n");
-			return B_ERROR;
-		}
-		
-		//printf("mp3Decoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
-		
-		fResidualBuffer = fDecodeBuffer;
-		fResidualBytes = outsize;
+		if (B_OK != DecodeNextChunk())
+			break;
 	}
 
-	*frameCount = OUTPUT_BUFFER_SIZE / fFrameSize;
+	*frameCount = (OUTPUT_BUFFER_SIZE - out_bytes_needed) / fFrameSize;
 
+	// XXX this doesn't guarantee that we always return B_LAST_BUFFER_ERROR bofore returning B_ERROR
+	return (out_bytes_needed == 0) ? B_OK : (out_bytes_needed == OUTPUT_BUFFER_SIZE) ? B_ERROR : B_LAST_BUFFER_ERROR;
+}
+
+status_t
+mp3Decoder::DecodeNextChunk()
+{
+	void *chunkBuffer;
+	int32 chunkSize;
+	media_header mh;
+	if (B_OK != GetNextChunk(&chunkBuffer, &chunkSize, &mh)) {
+		TRACE("mp3Decoder::Decode: GetNextChunk failed\n");
+		return B_ERROR;
+	}
+	
+	fStartTime = mh.start_time;
+
+	//TRACE("mp3Decoder: fStartTime reset to %.6f\n", fStartTime / 1000000.0);
+
+	int outsize;
+	int result;
+	result = decodeMP3(&fMpgLibPrivate, (char *)chunkBuffer, chunkSize, (char *)fDecodeBuffer, DECODE_BUFFER_SIZE, &outsize);
+	if (result == MP3_ERR) {
+		TRACE("mp3Decoder::Decode: decodeMP3 returned MP3_ERR\n");
+		return B_ERROR;
+	}
+		
+	//printf("mp3Decoder::Decode: decoded %d bytes into %d bytes\n",chunkSize, outsize);
+		
+	fResidualBuffer = fDecodeBuffer;
+	fResidualBytes = outsize;
+	
 	return B_OK;
 }
 

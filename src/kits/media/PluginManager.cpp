@@ -40,6 +40,8 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 		return B_ERROR;
 	}
 	
+	(*reader)->GetFileFormatInfo(mff);
+	
 	printf("_CreateReader leave\n");
 
 	return B_OK;
@@ -70,6 +72,9 @@ _CreateDecoder(Decoder **decoder, media_codec_info *mci, const media_format *for
 		printf("_CreateDecoder: NewReader failed\n");
 		return B_ERROR;
 	}
+	
+	strcpy(mci->short_name,  " mci short_name");
+	strcpy(mci->pretty_name, " mci pretty_name");
 	
 	printf("_CreateDecoder leave\n");
 	

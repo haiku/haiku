@@ -21,6 +21,8 @@ public:
 	
 	virtual status_t	Sniff(int32 *streamCount) = 0;
 
+	virtual void		GetFileFormatInfo(media_file_format *mff) = 0;
+
 	virtual status_t	AllocateCookie(int32 streamNumber, void **cookie) = 0;
 	virtual	status_t	FreeCookie(void *cookie) = 0;
 	

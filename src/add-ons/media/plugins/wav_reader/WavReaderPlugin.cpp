@@ -98,6 +98,21 @@ WavReader::Sniff(int32 *streamCount)
 }
 
 
+void
+WavReader::GetFileFormatInfo(media_file_format *mff)
+{
+	mff->capabilities =   media_file_format::B_READABLE
+						| media_file_format::B_KNOWS_ENCODED_AUDIO
+						| media_file_format::B_IMPERFECTLY_SEEKABLE;
+	mff->family = B_WAV_FORMAT_FAMILY;
+	mff->version = 100;
+	strcpy(mff->mime_type, "audio/x-wav");
+	strcpy(mff->file_extension, "wav");
+	strcpy(mff->short_name,  "RIFF WAV audio");
+	strcpy(mff->pretty_name, "RIFF WAV audio");
+}
+
+
 status_t
 WavReader::AllocateCookie(int32 streamNumber, void **cookie)
 {

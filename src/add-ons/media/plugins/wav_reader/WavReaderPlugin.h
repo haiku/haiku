@@ -11,6 +11,8 @@ public:
 	
 	status_t	Sniff(int32 *streamCount);
 
+	void		GetFileFormatInfo(media_file_format *mff);
+
 	status_t	AllocateCookie(int32 streamNumber, void **cookie);
 	status_t	FreeCookie(void *cookie);
 	

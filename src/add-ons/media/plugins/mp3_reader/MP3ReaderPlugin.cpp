@@ -69,6 +69,15 @@ static const int frame_rate_table[4][4] =
 	{ 44100, 48000, 32000, 0}	// mpeg version 1
 };
 
+// name_table[mpeg_version_index][layer_index]
+static const char * name_table[4][4] =
+{
+	{ 0, "MPEG 2.5 Audio Layer 3", "MPEG 2.5 Audio Layer 2", "MPEG 2.5 Audio Layer 1" },
+	{ 0, 0, 0, 0 },
+	{ 0, "MPEG 2 Audio Layer 3", "MPEG 2 Audio Layer 2", "MPEG 2 Audio Layer 1" },
+	{ 0, "MPEG 1 Audio Layer 3", "MPEG 1 Audio Layer 2", "MPEG 1 Audio Layer 1" },
+};
+
 // frame_sample_count_table[layer_index]
 static const int frame_sample_count_table[4] = { 0, 1152, 1152, 384 };
 
@@ -106,6 +115,7 @@ struct mp3Reader::fhg_vbr_info
 {
 };
 
+
 mp3Reader::mp3Reader()
  :	fXingVbrInfo(0),
 	fFhgVbrInfo(0)
@@ -113,11 +123,13 @@ mp3Reader::mp3Reader()
 	TRACE("mp3Reader::mp3Reader\n");
 }
 
+
 mp3Reader::~mp3Reader()
 {
 	delete fXingVbrInfo;
 	delete fFhgVbrInfo;
 }
+
       
 const char *
 mp3Reader::Copyright()
@@ -125,7 +137,7 @@ mp3Reader::Copyright()
 	return "mp3 reader, " B_UTF8_COPYRIGHT " by Marcus Overhagen";
 }
 
-	
+
 status_t
 mp3Reader::Sniff(int32 *streamCount)
 {
@@ -158,6 +170,26 @@ mp3Reader::Sniff(int32 *streamCount)
 }
 
 
+void
+mp3Reader::GetFileFormatInfo(media_file_format *mff)
+{
+	mff->capabilities =   media_file_format::B_READABLE
+						| media_file_format::B_KNOWS_ENCODED_AUDIO
+						| media_file_format::B_IMPERFECTLY_SEEKABLE;
+	mff->family = B_MPEG_FORMAT_FAMILY;
+	mff->version = 100;
+	strcpy(mff->mime_type, "audio/mpeg");
+	strcpy(mff->file_extension, "mp3");
+
+	uint8 header[4];
+	Source()->ReadAt(fDataStart, header, sizeof(header));
+	int mpeg_version_index = (header[1] >> 3) & 0x03;
+	int layer_index = (header[1] >> 1) & 0x03;
+	strcpy(mff->short_name,  name_table[mpeg_version_index][layer_index]);
+	strcpy(mff->pretty_name, name_table[mpeg_version_index][layer_index]);
+}
+
+	
 status_t
 mp3Reader::AllocateCookie(int32 streamNumber, void **cookie)
 {
@@ -306,6 +338,8 @@ mp3Reader::Seek(void *cookie,
 	}
 	data->position = pos + ofs;
 
+	data->framePosition = *frame; // this is not exact
+
 	TRACE("mp3Reader::Seek: synchronized at position %Ld\n", data->position);
 	return B_OK;
 }
@@ -322,7 +356,7 @@ mp3Reader::GetNextChunk(void *cookie,
 	if (maxbytes < 4)
 		return B_ERROR;
 
-	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameCount;
+	mediaHeader->start_time = (data->framePosition * 1000000) / data->frameRate;
 	mediaHeader->file_pos = data->position;
 
 	if (4 != Source()->ReadAt(fDataStart + data->position, data->chunkBuffer, 4)) {

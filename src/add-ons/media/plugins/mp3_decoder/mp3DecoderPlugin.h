@@ -18,12 +18,17 @@ public:
 							 
 	status_t	Decode(void *buffer, int64 *frameCount,
 					   media_header *mediaHeader, media_decode_info *info);
+					   
+	status_t	DecodeNextChunk();
+	
 private:
 	struct mpstr	fMpgLibPrivate;
 	int32			fResidualBytes;
 	uint8 *			fResidualBuffer;
 	uint8 *			fDecodeBuffer;
-	int32			fFrameSize;	
+	int32			fFrameSize;
+	int32			fFps;
+	bigtime_t		fStartTime;
 };
 
 

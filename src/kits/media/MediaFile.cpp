@@ -96,7 +96,7 @@ const char *
 BMediaFile::Copyright(void) const
 {
 	UNIMPLEMENTED();
-	return "BMediaFile::Copyright";
+	return "";
 }
 
 int32
