@@ -153,9 +153,11 @@
 #define NMGRPHX_PANELHCENT5	0x38 /* >= NM2200 */
 #define NMGRPHX_CURCTRL		0x82
 #define NMGRPHX_COLDEPTH	0x90
+/* mem or core PLL register??? */
+#define NMGRPHX_SPEED		0x93
 /* (NeoMagic pixelPLL set C registers) */
-#define NMGRPHX_PLLC_NL		0x9b
 #define NMGRPHX_PLLC_NH		0x8f /* >= NM2200 */
+#define NMGRPHX_PLLC_NL		0x9b
 #define NMGRPHX_PLLC_M		0x9f
 /* NeoMagic BES registers: (> NM2070) (accessible via mapped I/O: >= NM2097) */
 #define NMGRPHX_BESCTRL1	0xb0
