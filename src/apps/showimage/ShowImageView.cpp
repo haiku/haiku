@@ -549,7 +549,7 @@ ShowImageView::DrawCaption()
 	BFont font(be_plain_font);
 	BPoint pos;
 	BRect rect;
-	width = font.StringWidth(fCaption.String())+1; // 1 for text shadow
+	width = font.StringWidth(fCaption.String()) + 1; // 1 for text shadow
 	font.GetHeight(&fontHeight);
 	height = fontHeight.ascent + fontHeight.descent;
 	// center text horizontally
@@ -558,14 +558,14 @@ ShowImageView::DrawCaption()
 	pos.y = bounds.bottom - fontHeight.descent - 5;
 	
 	// background rectangle
-	rect.Set(0, 0, (width-1)+4, (height-1)+4+1); // 4 for border and 1 for text shadow
+	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
 	rect.OffsetTo(pos);
-	rect.OffsetBy(-3, -2-fontHeight.ascent); // -2 for border
+	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
 		
 	PushState();
 	// draw background
 	SetDrawingMode(B_OP_ALPHA);
-	SetHighColor(192, 192, 192, 160);
+	SetHighColor(0, 0, 255, 128);
 	FillRect(rect);
 	// draw text
 	SetDrawingMode(B_OP_OVER);
@@ -573,12 +573,12 @@ ShowImageView::DrawCaption()
 	SetLowColor(B_TRANSPARENT_COLOR);
 	// text shadow
 	pos += BPoint(1, 1);
-	SetHighColor(0, 0, 0, 128);
+	SetHighColor(0, 0, 0);
 	SetPenSize(1);
 	DrawString(fCaption.String(), pos);
 	// text
 	pos -= BPoint(1, 1);
-	SetHighColor(255, 255, 255, 255);
+	SetHighColor(255, 255, 0);
 	DrawString(fCaption.String(), pos);
 	PopState();
 }
@@ -592,7 +592,7 @@ ShowImageView::EraseCaption()
 	BFont font(be_plain_font);
 	BPoint pos;
 	BRect rect;
-	width = font.StringWidth(fCaption.String())+1; // 1 for text shadow
+	width = font.StringWidth(fCaption.String()) + 1; // 1 for text shadow
 	font.GetHeight(&fontHeight);
 	height = fontHeight.ascent + fontHeight.descent;
 	// center text horizontally
@@ -601,9 +601,9 @@ ShowImageView::EraseCaption()
 	pos.y = bounds.bottom - fontHeight.descent - 5;
 	
 	// background rectangle
-	rect.Set(0, 0, (width-1)+4, (height-1)+4+1); // 4 for border and 1 for text shadow
+	rect.Set(0, 0, (width-1)+2, (height-1)+2+1); // 2 for border and 1 for text shadow
 	rect.OffsetTo(pos);
-	rect.OffsetBy(-3, -2-fontHeight.ascent); // -2 for border
+	rect.OffsetBy(-1, -1-fontHeight.ascent); // -1 for border
 	
 	// draw over portion of image where caption is located
 	Draw(rect);
