@@ -2,10 +2,10 @@
 <head>
 	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
 	<meta name="GENERATOR" content="The DarkSite">
-	<title>Readme for (open)BeOS Unified Nvidia graphics driver</title>
+	<title>Readme for Haiku Unified Nvidia graphics driver</title>
 </head>
 <body>
-<h2 align="center">Unified Nvidia graphics driver for (open)BeOS</h2></align><br><br>
+<h2 align="center">Unified Nvidia graphics driver for Haiku</h2></align><br><br>
 <hr>
 <h3><strong>NOTE PLEASE:</strong><br>
 You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
@@ -38,7 +38,7 @@ You use this software at your own risk! Although I don't expect it to damage you
 	<li>Dualhead support on GeForce dualhead cards (use Mark Watson's 'Dualhead Setup' from BeBits for now);
 	<li>DVI and laptop panel support;
 	<li>Widescreen mode support (<strong>all</strong> screens must be widescreen type <strong>and</strong> they must all be digitally connected);
-	<li>Basic AGP mode support on AGP cards, using the new (seperate) (open)BeOS AGP busmanager;
+	<li>Basic AGP mode support on AGP cards, using the new (seperate) Haiku AGP busmanager;
 	<li>Coldstart support for analog connected screens on most cards except TNT1, GeForce 6200, 6600 and 6800.
 </ul>
 <strong>Known limitations:</strong> 
@@ -58,7 +58,7 @@ If you encounter bugs, please checkout the driver's <a href="http://web.inter.nl
 OK, now that's all said let's get to it ;-)<br>
 <br>
 In contrary to what I have said before you don't need to de-install official Be drivers for this driver to work correctly. This driver will install in the user part of the BeOS, so not in the system part where the official drivers are.<br>
-BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the (open)BeOS Nvidia TNT/GeForce graphics driver.<br>
+BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku Nvidia TNT/GeForce graphics driver.<br>
 <br>
 <strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the nv.settings file...<br>
 <br><br>
@@ -86,7 +86,7 @@ You have to reboot in order to apply the original configuration.<br>
 <br>
 <hr>
 <a name="settings"></a><h2>Settings:</h2><br>
-Please read this information carefully *before* installing and using the (open)BeOS Nvidia TNT/GeForce graphics driver. It might spare you some trouble afterwards..<br>
+Please read this information carefully *before* installing and using the Haiku Nvidia TNT/GeForce graphics driver. It might spare you some trouble afterwards..<br>
 <p>The driver uses a file named <strong>nv.settings</strong> to determine how to use your card. After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. How you should setup this file depends on what you want to do with the driver. While it has a 'failsave' default configuration, you might be able to do better than that... Anyway, read the nifty details below.<br>
 <br>
 <strong>Note:</strong> The driver only reads this file during it's initialisation. This means that you have to reboot in order to let changes take effect.<br>
