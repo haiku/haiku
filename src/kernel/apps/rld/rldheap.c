@@ -13,8 +13,8 @@
 #define RLD_PROGRAM_BASE 0x00200000	/* keep in sync with app ldscript */
 
 
-static region_id rld_region;
-static region_id rld_region_2;
+static area_id rld_region;
+static area_id rld_region_2;
 static char *rld_base;
 static char *rld_base_2;
 static char *rld_ptr;
