@@ -16,7 +16,8 @@ Usage: $0 <options>
 options:
   --floppy <floppy location>  Specifies the location of the floppy
                               (device or image).
-  --bochs-debug               Activates bochs serial debug emulation.
+  --bochs-debug               Enables bochs serial debug emulation (activated 
+                              via kernel settings file).
   --target=TARGET             Select build target platform. [default=${target}]
                               valid targets=r5,bone,dano,haiku
   --include-gpl-addons        Include GPL licensed add-ons.
@@ -72,7 +73,7 @@ case "$revision" in
   5.1)   target=dano ;;
   5.0.4) target=bone ;;
   5.0*)  target=r5 ;;
-  *)     target="$platform" ;;
+  *)     target=haiku ;;
 esac
 
 # parse parameters
