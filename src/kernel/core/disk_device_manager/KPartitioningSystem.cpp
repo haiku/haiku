@@ -4,10 +4,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#include "ddm_modules.h"
-#include "KDiskDeviceUtils.h"
-#include "KPartition.h"
-#include "KPartitioningSystem.h"
+#include <ddm_modules.h>
+#include <KDiskDevice.h>
+#include <KDiskDeviceJob.h>
+#include <KDiskDeviceManager.h>
+#include <KDiskDeviceUtils.h>
+#include <KPartition.h>
+#include <KPartitioningSystem.h>
 
 // constructor
 KPartitioningSystem::KPartitioningSystem(const char *name)
@@ -489,8 +492,32 @@ status_t
 KPartitioningSystem::Resize(KPartition *partition, off_t size,
 							KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!partition || !job || size < 0)
+		return B_BAD_VALUE;
+	if (!fModule->resize)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->ReadLockPartition(partition->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceReadLocker locker(_partition->Device(), true);
+		if (partition != _partition)
+			return B_ERROR;
+		status_t result = partition->Open(O_RDONLY, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->resize(fd, partition->ID(), size, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // ResizeChild
@@ -498,8 +525,34 @@ status_t
 KPartitioningSystem::ResizeChild(KPartition *child, off_t size,
 								 KDiskDeviceJob *job)
 {
-	// to be implemented
-	return B_ERROR;
+	// check parameters
+	if (!child || !job || size < 0)
+		return B_BAD_VALUE;
+	if (!fModule->resize_child)
+		return B_ENTRY_NOT_FOUND;
+	// lock partition and open (parent) partition device
+	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
+	KPartition *_partition = manager->ReadLockPartition(child->ID());
+	if (!_partition)
+		return B_ERROR;
+	int fd = -1;
+	{
+		PartitionRegistrar registrar(_partition, true);
+		PartitionRegistrar deviceRegistrar(_partition->Device(), true);
+		DeviceReadLocker locker(_partition->Device(), true);
+		if (child != _partition)
+			return B_ERROR;
+		if (!child->Parent())
+			return B_BAD_VALUE;
+		status_t result = child->Parent()->Open(O_RDONLY, &fd);
+		if (result != B_OK)
+			return result;
+	}
+	// let the module do its job
+	status_t result = fModule->resize_child(fd, child->ID(), size, job->ID());
+	// cleanup and return
+	close(fd);
+	return result;
 }
 
 // Move
