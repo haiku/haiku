@@ -196,11 +196,11 @@ thread_id	find_thread(const char *name);
 #define get_team_usage_info(tmid, who, info) _get_team_usage_info((tmid), (who), (info), sizeof(*(info)))
 */
 
-// TO DO
+// OK
 status_t	send_data(thread_id thread, int32 code, const void *buf, size_t buffer_size);
-// TO DO
+// OK
 status_t	receive_data(thread_id *sender, void *buf, size_t buffer_size); 
-// TO DO
+// OK
 bool		has_data(thread_id thread);
 // TO DO
 status_t	snooze(bigtime_t microseconds);

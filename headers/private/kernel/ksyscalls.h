@@ -102,6 +102,9 @@ enum {
 	SYSCALL_GET_NEXT_TEAM_INFO,
 	SYSCALL_CREATE_LINK,
 	SYSCALL_REMOVE_DIR,
+	SYSCALL_SEND_DATA,
+	SYSCALL_RECEIVE_DATA,
+	SYSCALL_HAS_DATA,
 };
 
 int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret);

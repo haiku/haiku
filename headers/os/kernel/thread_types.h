@@ -18,6 +18,7 @@ extern "C" {
 
 #include <stage2.h>
 #include <ktypes.h>
+#include <cbuf.h>
 #include <vm.h>
 #include <smp.h>
 #include <arch/thread_struct.h>
@@ -108,6 +109,14 @@ struct thread {
 	int sem_deleted_retcode;
 	int sem_errcode;
 	int sem_flags;
+	struct {
+		sem_id write_sem;
+		sem_id read_sem;
+		thread_id sender;
+		int32 code;
+		size_t size;
+		cbuf *buffer;
+	} msg;
 	addr fault_handler;
 	addr entry;
 	void *args;

@@ -352,6 +352,10 @@ int       suspend_thread(thread_id thread);
 
 thread_id find_thread(const char *);
 
+status_t send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
+status_t receive_data(thread_id *sender, void *buffer, size_t buffer_size);
+bool has_data(thread_id thread);
+
 status_t snooze(bigtime_t);
 
 status_t _get_thread_info(thread_id id, thread_info *info, size_t size);

@@ -35,6 +35,7 @@
 #include <kerrors.h>
 #include <syscalls.h>
 
+#define THREAD_MAX_MESSAGE_SIZE		65536
 
 struct thread_key {
 	thread_id id;
@@ -214,6 +215,7 @@ static struct thread *create_thread_struct(const char *name)
 {
 	struct thread *t;
 	int state;
+	char temp[64];
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
@@ -247,21 +249,32 @@ static struct thread *create_thread_struct(const char *name)
 	t->in_kernel = true;
 	t->user_time = 0;
 	t->kernel_time = 0;
-	t->last_time = 0;
-	{
-		char temp[64];
+	t->last_time = 0;		
 
-		sprintf(temp, "thread_0x%x_retcode_sem", t->id);
-		t->return_code_sem = create_sem(0, temp);
-		if(t->return_code_sem < 0)
-			goto err1;
-	}
+	sprintf(temp, "thread_0x%x_retcode_sem", t->id);
+	t->return_code_sem = create_sem(0, temp);
+	if(t->return_code_sem < 0)
+		goto err1;
+
+	sprintf(temp, "%s data write sem", t->name);
+	t->msg.write_sem = create_sem(1, temp);
+	if (t->msg.write_sem < 0)
+		goto err2;
+
+	sprintf(temp, "%s data read sem", t->name);
+	t->msg.read_sem = create_sem(0, temp);
+	if (t->msg.read_sem < 0)
+		goto err3;
 
 	if(arch_thread_init_thread_struct(t) < 0)
-		goto err2;
+		goto err4;
 
 	return t;
 
+err4:
+	delete_sem_etc(t->msg.read_sem, -1);
+err3:
+	delete_sem_etc(t->msg.write_sem, -1);
 err2:
 	delete_sem_etc(t->return_code_sem, -1);
 err1:
@@ -272,8 +285,12 @@ err:
 
 static void delete_thread_struct(struct thread *t)
 {
-	if(t->return_code_sem >= 0)
+	if (t->return_code_sem >= 0)
 		delete_sem_etc(t->return_code_sem, -1);
+	if (t->msg.write_sem >= 0)
+		delete_sem_etc(t->msg.write_sem, -1);
+	if (t->msg.read_sem >= 0)
+		delete_sem_etc(t->msg.read_sem, -1);
 	kfree(t);
 }
 
@@ -1306,6 +1323,148 @@ void thread_atkernel_exit(void)
 	t->last_time = now;
 
 	restore_interrupts(state);
+}
+
+
+status_t
+user_send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
+{
+	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
+		return B_BAD_ADDRESS;
+	return send_data(tid, code, buffer, buffer_size);
+}
+
+
+status_t
+send_data(thread_id tid, int32 code, const void *buffer, size_t buffer_size)
+{
+	struct thread *target;
+	sem_id cached_sem;
+	int state;
+	status_t rv;
+	cbuf *data;
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	target = thread_get_thread_struct_locked(tid);
+	if (!target) {
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+		return B_BAD_THREAD_ID;
+	}
+	cached_sem = target->msg.write_sem;
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+	
+	if (buffer_size > THREAD_MAX_MESSAGE_SIZE)
+		return B_NO_MEMORY;
+
+	rv = acquire_sem_etc(cached_sem, 1, B_CAN_INTERRUPT, 0);
+	if (rv == B_INTERRUPTED)
+		// We got interrupted by a signal
+		return rv;
+	if (rv != B_OK)
+		// Any other acquisition problems may be due to thread deletion
+		return B_BAD_THREAD_ID;
+	
+	if (buffer_size > 0) {
+		data = cbuf_get_chain(buffer_size);
+		if (!data)
+			return B_NO_MEMORY;
+		rv = cbuf_user_memcpy_to_chain(data, 0, buffer, buffer_size);
+		if (rv < 0) {
+			cbuf_free_chain(data);
+			return B_NO_MEMORY;
+		}
+	} else
+		data = NULL;
+	
+	state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+	
+	// The target thread could have been deleted at this point
+	target = thread_get_thread_struct_locked(tid);
+	if (!target) {
+		RELEASE_THREAD_LOCK();
+		restore_interrupts(state);
+		cbuf_free_chain(data);
+		return B_BAD_THREAD_ID;
+	}
+	
+	// Save message informations
+	target->msg.sender = thread_get_current_thread()->id;
+	target->msg.code = code;
+	target->msg.size = buffer_size;
+	target->msg.buffer = data;
+	cached_sem = target->msg.read_sem;
+	
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+	
+	release_sem(cached_sem);
+	
+	return B_OK;
+}
+
+
+status_t
+user_receive_data(thread_id *sender, void *buffer, size_t buffer_size)
+{
+	thread_id ksender;
+	status_t code;
+	status_t rv;
+
+	if (((addr)sender >= KERNEL_BASE) && ((addr)sender <= KERNEL_TOP))
+		return B_BAD_ADDRESS;
+	if (((addr)buffer >= KERNEL_BASE) && ((addr)buffer <= KERNEL_TOP))
+		return B_BAD_ADDRESS;
+	
+	code = receive_data(&ksender, buffer, buffer_size);
+	
+	rv = user_memcpy(sender, &ksender, sizeof(thread_id));
+	if (rv < 0)
+		return rv;
+	
+	return code;
+}
+
+
+status_t
+receive_data(thread_id *sender, void *buffer, size_t buffer_size)
+{
+	struct thread *t = thread_get_current_thread();
+	status_t rv;
+	size_t size;
+	int32 code;
+	
+	acquire_sem(t->msg.read_sem);
+	
+	size = min(buffer_size, t->msg.size);
+	rv = cbuf_user_memcpy_from_chain(buffer, t->msg.buffer, 0, size);
+	if (rv < 0) {
+		cbuf_free_chain(t->msg.buffer);
+		release_sem(t->msg.write_sem);
+		return rv;
+	}
+	
+	*sender = t->msg.sender;
+	code = t->msg.code;
+	
+	cbuf_free_chain(t->msg.buffer);
+	release_sem(t->msg.write_sem);
+	
+	return code;
+}
+
+
+bool
+has_data(thread_id thread)
+{
+	int32 count;
+	
+	if (get_sem_count(thread_get_current_thread()->msg.read_sem, &count) != B_OK)
+		return false;
+	return (count == 0 ? false : true);
 }
 
 

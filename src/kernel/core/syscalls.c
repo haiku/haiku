@@ -219,6 +219,15 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_RESUME_THREAD:
 			*call_ret = thread_resume_thread((thread_id)arg0);
 			break;
+		case SYSCALL_SEND_DATA:
+			*call_ret = user_send_data((thread_id)arg0, (int32)arg1, (const void *)arg2, (size_t)arg3);
+			break;
+		case SYSCALL_RECEIVE_DATA:
+			*call_ret = user_receive_data((thread_id *)arg0, (void *)arg1, (size_t)arg2);
+			break;
+		case SYSCALL_HAS_DATA:
+			*call_ret = has_data((thread_id)arg0);
+			break;
 		case SYSCALL_KILL_TEAM:
 			*call_ret = team_kill_team((team_id)arg0);
 			break;

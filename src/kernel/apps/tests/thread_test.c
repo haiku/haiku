@@ -36,9 +36,24 @@ static int priority_test(void *data)
 {
 	int i;
 	
-	for (i=0; i<10; i++) {
+	for (i=0; i<6; i++) {
 		printf("%s: %d\n", (char *)data, i);
 //		sys_snooze(1000);
+	}
+	return 0;
+}
+
+
+static int communication_test(void *data)
+{
+	int times = (int)data;
+	int i, code;
+	char buffer[1024];
+	thread_id sender;
+	
+	for (i=0; i<times; i++) {
+		code = receive_data(&sender, (void *)buffer, sizeof(buffer));
+		printf(" -> received (%d): \"%s\"\n", code, buffer);
 	}
 	return 0;
 }
@@ -50,6 +65,11 @@ int main(int argc, char **argv)
 	sem_id lock;
 	int i;
 	int expected = START_VAL, current_val = START_VAL;
+	char *comm_test[] = {	"This is a test",
+							"of the send_data",
+							"and receive_data",
+							"syscalls implementation",
+							"for OpenBeOS"	};
 		
 	printf("OpenBeOS Thread Test - Simple\n"
 	       "=============================\n");
@@ -75,12 +95,29 @@ int main(int argc, char **argv)
 	
 	delete_sem(lock);
 	
-	t[0] = spawn_thread(priority_test, "thread0", B_DISPLAY_PRIORITY, "thread0");
-	t[1] = spawn_thread(priority_test, "thread1", B_URGENT_DISPLAY_PRIORITY, "thread1");
+	t[0] = spawn_thread(priority_test, "thread0", 11, "thread0");
+	t[1] = spawn_thread(priority_test, "thread1", 12, "thread1");
+	t[2] = spawn_thread(priority_test, "thread2", 13, "thread2");
 	resume_thread(t[0]);
 	resume_thread(t[1]);
+	resume_thread(t[2]);
+	
+	sys_snooze(100000);
+	
 	sys_wait_on_thread(t[0], NULL);
 	sys_wait_on_thread(t[1], NULL);
+	sys_wait_on_thread(t[2], NULL);
+	
+	t[0] = spawn_thread(communication_test, "commthread", B_NORMAL_PRIORITY, (void *)5);
+	resume_thread(t[0]);
+	
+	for (i=0; i<5; i++) {
+		printf("sending");
+		send_data(t[0], i, comm_test[i], strlen(comm_test[i]) + 1);
+		// Give time to the commthread to display info
+		sys_snooze(10000);
+	}
+	sys_wait_on_thread(t[0], NULL);
 	
 	return 0;
 }

@@ -83,6 +83,9 @@ int user_team_wait_on_team(team_id id, int *uretcode);
 thread_id user_thread_create_user_thread(addr, team_id, const char*, 
                                          int, void *);
 
+status_t user_send_data(thread_id thread, int32 code, const void *buffer, size_t buffer_size);
+status_t user_receive_data(thread_id *sender, void *buffer, size_t buffer_size);
+
 status_t user_get_thread_info(thread_id id, thread_info *info);
 status_t user_get_next_thread_info(team_id team, int32 *cookie, thread_info *info);
 status_t user_get_team_info(team_id id, team_info *info);
