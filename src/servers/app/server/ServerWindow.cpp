@@ -661,7 +661,7 @@ STRACE(("ServerWindow(%s)::CreateLayerTree()\n", fTitle.String()));
 	fSession->ReadInt32(&childCount);
 			
 	Layer		*newLayer;
-	newLayer	= new Layer(frame, name, token, resizeMask, flags, desktop->GetDisplayDriver());
+	newLayer	= new Layer(frame.OffsetToCopy(0.0, 0.0), name, token, resizeMask, flags, desktop->GetDisplayDriver());
 	delete name;
 
 	// there is no way of setting this, other than manual. :-)
@@ -1555,6 +1555,14 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_WINDOW_RESIZE:
 		{
+			float		xResizeBy;
+			float		yResizeBy;
+			
+			fSession->ReadFloat(&xResizeBy);
+			fSession->ReadFloat(&yResizeBy);
+			
+			fWinBorder->ResizeBy(xResizeBy, yResizeBy);
+printf("===> ddd = %f %f", xResizeBy, yResizeBy);
 			// TODO: Implement
 			STRACE(("ServerWindow %s: Message Resize unimplemented\n",fTitle.String()));
 			break;
