@@ -1067,7 +1067,11 @@ exec_team(int32 argCount, char **args, int32 envCount, char **env)
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
 
-	// cut the path from the main thread name
+	// rename the team
+
+	strlcpy(team->name, args[0], B_OS_NAME_LENGTH);
+
+	// cut the path from the team name and rename the main thread, too
 	threadName = strrchr(args[0], '/');
 	if (threadName != NULL)
 		threadName++;
