@@ -12,6 +12,7 @@
 
 
 void initialize_before(image_id imageID, struct uspace_program_args const *args);
+void initialize_after(image_id imageID, struct uspace_program_args const *args);
 
 char *__progname = NULL;
 int __libc_argc;
@@ -44,6 +45,14 @@ initialize_before(image_id imageID, struct uspace_program_args const *args)
 	__init_image(args);
 	__init_dlfcn(args);
 	__init_fork();
+}
+
+
+void
+initialize_after(image_id imageID, struct uspace_program_args const *args)
+{
+	// ToDo: can be moved to _before() once malloc() works before
+	__init_env(args);
 }
 
 
