@@ -16,14 +16,12 @@
 #include "DataExchange.h"
 #include "DormantNodeManager.h"
 #include "Notifications.h"
+#include "MediaMisc.h"
+#include "MediaRosterEx.h"
 
 //#define USER_ADDON_PATH "../add-ons/media"
 
 void DumpFlavorInfo(const flavor_info *info);
-
-namespace BPrivate { namespace media {
-	extern team_id team;
-} } // BPrivate::media
 
 class MediaAddonServer : BApplication
 {
@@ -88,7 +86,7 @@ MediaAddonServer::HandleMessage(int32 code, const void *data, size_t size)
 			const addonserver_instantiate_dormant_node_request *request = static_cast<const addonserver_instantiate_dormant_node_request *>(data);
 			addonserver_instantiate_dormant_node_reply reply;
 			status_t rv;
-			rv = mediaroster->InstantiateDormantNode(request->info, &reply.node);
+			rv = MediaRosterEx(mediaroster)->InstantiateDormantNode(request->addonid, request->flavorid, &reply.node);
 			request->SendReply(rv, &reply, sizeof(reply));
 			break;
 		}
