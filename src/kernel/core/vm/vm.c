@@ -733,12 +733,13 @@ region_id
 vm_create_anonymous_region(aspace_id aid, const char *name, void **address, 
 	int addr_type, addr_t size, int wiring, int lock)
 {
-	int err;
 	vm_region *region;
 	vm_cache *cache;
 	vm_store *store;
 	vm_address_space *aspace;
 	vm_cache_ref *cache_ref;
+	vm_page *page = NULL;
+	status_t err;
 
 	TRACE(("create_anonymous_region: %s: size 0x%lx\n", name, size));
 
@@ -776,6 +777,15 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 
 	size = PAGE_ALIGN(size);
 
+	if (wiring == B_CONTIGUOUS) {
+		// we try to allocate the page run here upfront as this may easily fail for obvious reasons
+		page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, size / B_PAGE_SIZE);
+		if (page == NULL) {
+			vm_put_aspace(aspace);
+			return B_NO_MEMORY;
+		}
+	}
+
 	// create an anonymous store object
 	store = vm_store_create_anonymous_noswap();
 	if (store == NULL)
@@ -808,6 +818,19 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 	vm_cache_release_ref(cache_ref);
 	if (err < 0) {
 		vm_put_aspace(aspace);
+
+		if (wiring == B_CONTIGUOUS) {
+			// we had reserved the area space upfront...
+			addr_t pageNumber = page->ppn;
+			int32 i;
+			for (i = size / B_PAGE_SIZE; i-- > 0; pageNumber++) {
+				page = vm_lookup_page(pageNumber);
+				if (page == NULL)
+					panic("couldn't lookup physical page just allocated\n");
+
+				vm_page_set_state(page, PAGE_STATE_FREE);
+			}
+		}	
 		return err;
 	}
 
@@ -818,6 +841,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 		case B_NO_LOCK:
 		case B_LAZY_LOCK:
 			break; // do nothing
+
 		case B_FULL_LOCK:
 		{
 			// pages aren't mapped at this point, but we just simulate a fault on
@@ -830,6 +854,7 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			}
 			break;
 		}
+
 		case B_ALREADY_WIRED:
 		{
 			// the pages should already be mapped. This is only really useful during
@@ -839,7 +864,6 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			addr_t pa;
 			uint32 flags;
 			int err;
-			vm_page *page;
 			off_t offset = 0;
 
 			mutex_lock(&cache_ref->lock);
@@ -863,51 +887,48 @@ vm_create_anonymous_region(aspace_id aid, const char *name, void **address,
 			mutex_unlock(&cache_ref->lock);
 			break;
 		}
-		case B_CONTIGUOUS: {
-			addr_t va;
-			addr_t phys_addr;
-			int err;
-			vm_page *page;
-			off_t offset = 0;
 
-			page = vm_page_allocate_page_run(PAGE_STATE_CLEAR, ROUNDUP(region->size, PAGE_SIZE) / PAGE_SIZE);
-			if(page == NULL) {
-				// XXX back out of this
-				panic("couldn't allocate page run of size %ld\n", region->size);
-			}
-			phys_addr = page->ppn * PAGE_SIZE;
+		case B_CONTIGUOUS:
+		{
+			addr_t physicalAddress = page->ppn * B_PAGE_SIZE;
+			addr_t virtualAddress;
+			off_t offset = 0;
 
 			mutex_lock(&cache_ref->lock);
 			(*aspace->translation_map.ops->lock)(&aspace->translation_map);
-			for(va = region->base; va < region->base + region->size; va += PAGE_SIZE, offset += PAGE_SIZE, phys_addr += PAGE_SIZE) {
-				page = vm_lookup_page(phys_addr / PAGE_SIZE);
-				if(page == NULL) {
+
+			for (virtualAddress = region->base; virtualAddress < region->base + region->size;
+					virtualAddress += B_PAGE_SIZE, offset += B_PAGE_SIZE, physicalAddress += B_PAGE_SIZE) {
+				page = vm_lookup_page(physicalAddress / B_PAGE_SIZE);
+				if (page == NULL)
 					panic("couldn't lookup physical page just allocated\n");
-				}
+
 				atomic_add(&page->ref_count, 1);
-				err = (*aspace->translation_map.ops->map)(&aspace->translation_map, va, phys_addr, lock);
-				if(err < 0) {
+				err = (*aspace->translation_map.ops->map)(&aspace->translation_map,
+							virtualAddress, physicalAddress, lock);
+				if (err < 0)
 					panic("couldn't map physical page in page run\n");
-				}
+
 				vm_page_set_state(page, PAGE_STATE_WIRED);
 				vm_cache_insert_page(cache_ref, page, offset);
 			}
+
 			(*aspace->translation_map.ops->unlock)(&aspace->translation_map);
 			mutex_unlock(&cache_ref->lock);
-
 			break;
 		}
+
 		default:
-			;
+			break;
 	}
 	vm_put_aspace(aspace);
 
 //	dprintf("create_anonymous_region: done\n");
 
-	if(region)
-		return region->id;
-	else
-		return ENOMEM;
+	if (region == NULL)
+		return B_NO_MEMORY;
+
+	return region->id;
 }
 
 
@@ -1059,6 +1080,8 @@ _vm_map_file(aspace_id aid, char *name, void **_address, uint32 addressSpec,
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
+	TRACE(("_vm_map_file(\"%s\", offset = %Ld, size = %lu, mapping %d)\n", path, offset, size, mapping));
+
 	offset = ROUNDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
 
@@ -1165,36 +1188,26 @@ vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,
 }
 
 
-static int
-__vm_delete_region(vm_address_space *aspace, vm_region *region)
-{
-	// ToDo: I am really not sure if it's a good idea not to
-	//	wait until the area has really been freed - code following
-	//	might rely on the address space to available again, and
-	//	there is no other way to wait for the completion of the
-	//	deletion.
-	if (region->aspace == aspace)
-		vm_put_region(region);
-
-	return B_NO_ERROR;
-}
-
-
-static int
+static status_t
 _vm_delete_region(vm_address_space *aspace, region_id rid)
 {
+	status_t status = B_OK;
 	vm_region *region;
 
 	TRACE(("vm_delete_region: aspace id 0x%lx, region id 0x%lx\n", aspace->id, rid));
 
 	region = vm_get_region_by_id(rid);
 	if (region == NULL)
-		return ERR_VM_INVALID_REGION;
+		return B_BAD_VALUE;
 
-	__vm_delete_region(aspace, region);
+	if (region->aspace == aspace) {
+		vm_put_region(region);
+			// next put below will actually delete it
+	} else
+		status = B_NOT_ALLOWED;
+
 	vm_put_region(region);
-
-	return 0;
+	return status;
 }
 
 
@@ -2302,6 +2315,7 @@ vm_soft_fault(addr_t originalAddress, bool isWrite, bool isUser)
 			TRACEPFAULT;
 
 			// page must be busy
+			// ToDo: don't wait forever!
 			mutex_unlock(&cache_ref->lock);
 			snooze(20000);
 			mutex_lock(&cache_ref->lock);
@@ -2926,7 +2940,7 @@ _user_clone_area(const char *userName, void **userAddress, uint32 addressSpec,
 		return clonedArea;
 
 	if (user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
-		// ToDo: delete cloned area?
+		delete_area(clonedArea);
 		return B_BAD_ADDRESS;
 	}
 
@@ -2964,7 +2978,7 @@ _user_create_area(const char *userName, void **userAddress, uint32 addressSpec,
 	area = create_area(name, &address, addressSpec, size, lock, protection);
 
 	if (area >= B_OK && user_memcpy(userAddress, &address, sizeof(address)) < B_OK) {
-		// ToDo: shouldn't I delete the area here?
+		delete_area(area);
 		return B_BAD_ADDRESS;
 	}
 
