@@ -1,3 +1,37 @@
+/*****************************************************************************/
+// OpenBeOS InputServer
+//
+// Version: [0.0.5] [Development Stage]
+//
+// [Description]
+//
+//
+// This application and all source files used in its construction, except 
+// where noted, are licensed under the MIT License, and have been written 
+// and are:
+//
+// Copyright (c) 2002 OpenBeOS Project
+//
+// Permission is hereby granted, free of charge, to any person obtaining a
+// copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation
+// the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+// and/or sell copies of the Software, and to permit persons to whom the 
+// Software is furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included 
+// in all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+// OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+/*****************************************************************************/
+
+
 #include <stdio.h>
 
 #include "InputServer.h"
@@ -5,14 +39,44 @@
 #include "Directory.h"
 #include "FindDirectory.h"
 #include "Entry.h"
+#include "Locker.h"
 
 #include "InputServerDeviceListEntry.h"
+#include "InputServerFilterListEntry.h"
+#include "InputServerMethodListEntry.h"
+#include "Message.h"
+
+// include app_server headers for communication
+
+#include "PortLink.h"
+#include "ServerProtocol.h"
+
+#define SERVER_PORT_NAME "OBappserver"
+#define SERVER_INPUT_PORT "OBinputport"
+#define X_VALUE "x"
+#define Y_VALUE "y"
+
+
+extern "C" void RegisterDevices(input_device_ref** devices)
+{
+	printf("RegisterDevices\n");
+};
+
+
+// Static InputServer member variables.
+//
+BList   InputServer::gInputDeviceList;
+BLocker InputServer::gInputDeviceListLocker;
+
+BList InputServer::mInputServerDeviceList;
+BList InputServer::mInputServerFilterList;
+BList InputServer::mInputServerMethodList;
 
 
 /*
  *
  */
-int main(int argc, char* argv[])
+int main()
 {
 	InputServer	*myInputServer;
 	
@@ -21,29 +85,24 @@ int main(int argc, char* argv[])
 	myInputServer->Run();
 	
 	delete myInputServer;
+}
 
-	return(0);
-}
-/*
-thread_id InputServer::Run()
-{
-	InitDevices();
-	
-	return 0;
-}
-*/
+
 /*
  *  Method: InputServer::InputServer()
  *   Descr: 
  */
-InputServer::InputServer(void) : BApplication("application/x-vnd.OpenBeOS-input_server")
+InputServer::InputServer(void) : BApplication("application/x-vnd.OBOS-input_server")
 {
 	void *pointer;
 	
-	InitDevices();
 	EventLoop(pointer);
-	
 
+	InitTestDevice();
+	
+//	InitDevices();
+	InitFilters();
+	InitMethods();
 }
 
 /*
@@ -59,9 +118,28 @@ InputServer::~InputServer(void)
  *  Method: InputServer::ArgvReceived()
  *   Descr: 
  */
-void InputServer::ArgvReceived(long,
-                          char **)
+void InputServer::ArgvReceived(int32 argc, char** argv)
 {
+	if (2 == argc)
+	{
+		if (0 == strcmp("-q", argv[1]) )
+		{
+			// :TODO: Shutdown and restart the InputServer.
+			printf("InputServer::ArgvReceived - Restarting . . .\n");
+			status_t   quit_status;
+			//BMessenger msgr = BMessenger("application/x-vnd.OpenBeOS-input_server", -1, &quit_status);
+			BMessenger msgr = BMessenger("application/x-vnd.OBOS-input_server", -1, &quit_status);
+			if (B_OK == quit_status)
+			{
+				BMessage   msg  = BMessage(B_QUIT_REQUESTED);
+				msgr.SendMessage(&msg);
+			}
+			else
+			{
+				printf("Unable to send Quit message to running InputServer.");
+			}
+		}
+	}
 }
 
 
@@ -71,8 +149,60 @@ void InputServer::ArgvReceived(long,
  */
 void InputServer::InitKeyboardMouseStates(void)
 {
+	// This is where we read in the preferences data for the mouse and keyboard as well as
+	// determine the screen resolution from the app_server and find the center of the screen
+	// sMousePos is then set to the center of the screen.
+
+	sMousePos.x = 200;
+	sMousePos.y = 200;
+
 }
 
+void InputServer::InitTestDevice()
+{
+	printf("InputServer::InitTestDevice - Enter\n");
+	const char* path = "/boot/home/Projects/InputServer/ISD/nervous/nervous";
+	printf("InputServer::InitTestDevice - Loading add-on . . .\n");
+	image_id addon_image = load_add_on(path);
+	if (B_ERROR != addon_image)
+	{
+		status_t            isd_status = B_NO_INIT;
+		BInputServerDevice* (*func)()  = NULL;
+		printf("InputServer::InitTestDevice - Resolving symbol . . .\n");
+		if (B_OK == get_image_symbol(addon_image, "instantiate_input_device", B_SYMBOL_TYPE_TEXT, (void**)&func) )
+		{
+			printf("Found instantiate_input_device.\n");
+			if (NULL != func)
+			{
+				BInputServerDevice* isd = (*func)();
+				if (NULL != isd)
+				{
+					printf("InputServer::InitTestDevice - Calling InitCheck . . .\n");
+					isd_status = isd->InitCheck();
+					mInputServerDeviceList.AddItem(
+						new InputServerDeviceListEntry(path, isd_status, isd) );
+					if (B_OK == isd_status)
+					{
+						//printf("Starting Nervous . . .\n");
+						//isd->Start("Nervous Device", NULL);
+					}
+					else
+					{
+						printf("InitCheck failed.\n");
+					}
+				}
+			}
+		}
+		if (B_OK != isd_status)
+		{
+			// Free resources associated with ISD's
+			// that failed to initialize.
+			//
+			//unload_add_on(addon_image);
+		}
+	}
+	printf("InputServer::InitTestDevice - Exit\n");
+}
 
 /*
  *  Method: InputServer::InitDevices()
@@ -138,7 +268,7 @@ status_t InputServer::AddInputServerDevice(const char* path)
 				BInputServerDevice* isd = (*func)();
 				if (NULL != isd)
 				{
-					status_t isd_status = isd->InitCheck();
+					isd_status = isd->InitCheck();
 					mInputServerDeviceList.AddItem(
 						new InputServerDeviceListEntry(path, isd_status, isd) );
 				}
@@ -179,7 +309,7 @@ void InputServer::InitFilters(void)
 
 	printf("InputServer::InitFilters - Enter\n");
 	
-	// Find all Input Server Devices in each of the predefined
+	// Find all Input Filters in each of the predefined
 	// addon directories.
 	//
 	for (int i = 0; i < addon_dir_count; i++)
@@ -192,11 +322,55 @@ void InputServer::InitFilters(void)
 			{
 				entry.GetPath(&addon_path);
 				printf("Adding %s . . .\n", addon_path.Path() );
-				AddInputServerDevice(addon_path.Path() );
+				AddInputServerFilter(addon_path.Path() );
 			}
 		}
 	}
-	printf("InputServer::InitDevices - Exit\n");
+	printf("InputServer::InitFilters - Exit\n");
+}
+
+
+/*
+ *  Method: InputServer::AddInputServerFilter()
+ *   Descr: 
+ */
+status_t InputServer::AddInputServerFilter(const char* path)
+{
+	image_id addon_image= load_add_on(path);
+	if (B_ERROR != addon_image)
+	{
+		status_t            isf_status = B_NO_INIT;
+		BInputServerFilter* (*func)()  = NULL;
+		if (B_OK == get_image_symbol(addon_image, "instantiate_input_filter", B_SYMBOL_TYPE_TEXT, (void**)&func) )
+		{
+			if (NULL != func)
+			{
+				/*
+			    // :DANGER: Only reenable this section if this
+			    //          InputServer can start and manage the
+			    //          filters, otherwise the system will hang.
+			    //			    
+				BInputFilter isf = (*func)();
+				if (NULL != isf)
+				{
+					isf_status = isf->InitCheck();
+					mInputServerFilterList.AddItem(
+						new InputServerFilterListEntry(path, isf_status, isf );
+				}
+				*/
+				mInputServerFilterList.AddItem(
+					new InputServerFilterListEntry(path, B_NO_INIT, NULL) );
+			}
+		}
+		if (B_OK != isf_status)
+		{
+			// Free resources associated with InputServerFilters
+			// that failed to initialize.
+			//
+			unload_add_on(addon_image);
+		}
+	}
+	return 0;
 }
 
 
@@ -218,26 +392,70 @@ void InputServer::InitMethods(void)
 	            };
 	const int   addon_dir_count = sizeof(addon_dirs) / sizeof(directory_which);
 
-	printf("InputServer::InitDevices - Enter\n");
+	printf("InputServer::InitMethods - Enter\n");
 	
-	// Find all Input Server Devices in each of the predefined
+	// Find all Input Methods in each of the predefined
 	// addon directories.
 	//
 	for (int i = 0; i < addon_dir_count; i++)
 	{
 		if (B_OK == find_directory(addon_dirs[i], &addon_dir) )
 		{
-			addon_dir.Append("input_server/devices");
+			addon_dir.Append("input_server/methods");
 			dir.SetTo(addon_dir.Path() );
 			while (B_NO_ERROR == dir.GetNextEntry(&entry, false) )
 			{
 				entry.GetPath(&addon_path);
 				printf("Adding %s . . .\n", addon_path.Path() );
-				AddInputServerDevice(addon_path.Path() );
+				AddInputServerMethod(addon_path.Path() );
 			}
 		}
 	}
-	printf("InputServer::InitDevices - Exit\n");
+	printf("InputServer::InitMethods - Exit\n");
+}
+
+
+/*
+ *  Method: InputServer::AddInputServerMethod()
+ *   Descr: 
+ */
+status_t InputServer::AddInputServerMethod(const char* path)
+{
+	image_id addon_image= load_add_on(path);
+	if (B_ERROR != addon_image)
+	{
+		status_t            ism_status = B_NO_INIT;
+		BInputServerMethod* (*func)()  = NULL;
+		if (B_OK == get_image_symbol(addon_image, "instantiate_input_method", B_SYMBOL_TYPE_TEXT, (void**)&func) )
+		{
+			if (NULL != func)
+			{
+				/*
+			    // :DANGER: Only reenable this section if this
+			    //          InputServer can start and manage the
+			    //          methods, otherwise the system will hang.
+			    //			    
+				BInputServerMethod ism = (*func)();
+				if (NULL != ism)
+				{
+					ism_status = ism->InitCheck();
+					mInputServerMethodList.AddItem(
+						new InputServerMethodListEntry(path, ism_status, ism) );
+				}
+				*/
+				mInputServerMethodList.AddItem(
+					new InputServerMethodListEntry(path, B_NO_INIT, NULL) );
+			}
+		}
+		if (B_OK != ism_status)
+		{
+			// Free resources associated with InputServerMethods
+			// that failed to initialize.
+			//
+			unload_add_on(addon_image);
+		}
+	}
+	return 0;
 }
 
 
@@ -276,7 +494,7 @@ void InputServer::ReadyToRun(void)
  */
 void InputServer::MessageReceived(BMessage *message)
 {
-BMessenger *app_server;
+	BMessenger *app_server;
 	switch(message->what)
 	{
 		case SET_METHOD:
@@ -404,13 +622,18 @@ BMessenger *app_server;
 			//HandleFocusUnfocusIMAwareView();
 			break;
 		} 
+		case B_QUIT_REQUESTED:
+		{
+			QuitRequested();
+		}
 		
 		default:
 		{
+		printf("Default message . . .\n");
 		app_server = new BMessenger("application/x-vnd.Be-APPS", -1, NULL);
 		if (app_server->IsValid())
 		{
-			app_server->SendMessage(message);
+			//app_server->SendMessage(message);
 			
 		}
 		delete app_server;
@@ -583,9 +806,10 @@ void InputServer::HandleFocusUnfocusIMAwareView(BMessage *,
  *  Method: InputServer::EnqueueDeviceMessage()
  *   Descr: 
  */
-status_t InputServer::EnqueueDeviceMessage(BMessage *)
+status_t InputServer::EnqueueDeviceMessage(BMessage *message)
 {
-	return 0;
+	//return (write_port(fEventPort, (int32)message, NULL, 0));
+	return (write_port(EventLooperPort, (int32)message, NULL, 0));
 }
 
 
@@ -657,14 +881,13 @@ const BMessenger* InputServer::MethodReplicant(void)
  */
 status_t InputServer::EventLoop(void *)
 {
-
-	EventLooperPort = create_port(29,"is_event_port");
+	printf("Starting event loop . . .\n");
+	EventLooperPort = create_port(100, "obos_is_event_port");
 	if(EventLooperPort < 0) {
 		_sPrintf("OBOS InputServer: create_port error: (0x%x) %s\n",EventLooperPort,strerror(EventLooperPort));
-	}
+	} 
 	ISPortThread = spawn_thread(ISPortWatcher, "_input_server_event_loop_", B_REAL_TIME_DISPLAY_PRIORITY+3, this);
 	resume_thread(ISPortThread);
-
 
 	return 0;
 }
@@ -684,11 +907,55 @@ bool InputServer::EventLoopRunning(void)
  *  Method: InputServer::DispatchEvents()
  *   Descr: 
  */
-bool InputServer::DispatchEvents(BList *)
+bool InputServer::DispatchEvents(BList *eventList)
 {
-	return true;
-}
+BMessage *event;
 
+for ( int32 i = 0; NULL != (event = (BMessage *)eventList->ItemAt(i)); i++ )
+	{
+	// now we must send each event to the app_server
+	DispatchEvent(event);
+	}
+	return true;
+}// end DispatchEvents()
+
+int InputServer::DispatchEvent(BMessage *message)
+{
+	// variables
+	int32 xValue, 
+		  yValue;
+    uint32 buttons = 0;
+    
+    message->FindInt32("x",xValue);
+    printf("[DispatchEvent] x = %lu:\n",xValue);
+	
+	port_id pid = find_port(SERVER_INPUT_PORT);
+   	PortLink *appsvrlink = new PortLink(pid);
+   	switch(message->what){
+   		case B_MOUSE_MOVED:{
+    		// get point and button from msg
+    		if((message->FindInt32(X_VALUE,&xValue) == B_OK) && (message->FindInt32(Y_VALUE,&yValue) == B_OK)){
+    			int64 time=(int64)real_time_clock();
+    			appsvrlink->SetOpCode(B_MOUSE_MOVED);
+    			appsvrlink->Attach(&time,sizeof(int64));
+    			appsvrlink->Attach(&xValue,sizeof(float));
+    			appsvrlink->Attach(&yValue,sizeof(float));
+    			message->FindInt32("buttons",buttons);
+    			appsvrlink->Attach(&buttons,sizeof(int32));
+    			appsvrlink->Flush();
+    			printf("B_MOUSE_MOVED: x = %lu: y = %lu: time = %llu: buttons = %lu\n",xValue,yValue,time,buttons);
+    			}
+    		break;
+    		}
+   				// Should be some Mouse Down and Up code here ..
+   				// Along with some Key Down and up codes ..
+   		default:
+      		break;
+   			
+		}
+	delete appsvrlink;
+    return true;
+}
 
 /*
  *  Method: InputServer::CacheEvents()
@@ -712,11 +979,83 @@ const BList* InputServer::GetNextEvents(BList *)
 
 /*
  *  Method: InputServer::FilterEvents()
- *   Descr: 
+ *  Descr:  This method applies all defined filters to each event in the
+ *          supplied list.  The supplied list is modified to reflect the
+ *          output of the filters.
+ *          The method returns true if the filters were applied to all
+ *          events without error and false otherwise.
  */
-bool InputServer::FilterEvents(BList *)
+bool InputServer::FilterEvents(BList *eventsToFilter)
 {
-	return true;
+	if (NULL != eventsToFilter)
+	{
+		BInputServerFilter* current_filter;
+		BMessage*           current_event;
+		int32               filter_index  = 0;
+		int32               event_index   = 0;
+
+		while (NULL != (current_filter = (BInputServerFilter*)mInputServerFilterList.ItemAt(filter_index) ) )
+		{
+			// Apply the current filter to all available event messages.
+			//		
+			while (NULL != (current_event = (BMessage*)eventsToFilter->ItemAt(event_index) ) )
+			{
+				// Storage for new event messages generated by the filter.
+				//
+				BList out_list;
+				
+				// Apply the current filter to the current event message.
+				//
+				filter_result result = current_filter->Filter(current_event, &out_list);
+				if (B_DISPATCH_MESSAGE == result)
+				{
+					// Use the result in current_message; ignore out_list.
+					//
+					event_index++;
+
+					// Free resources associated with items in out_list.
+					//
+					void* out_item; 
+					for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
+					{
+						delete out_item;
+					}
+				}
+				else if (B_SKIP_MESSAGE == result)
+				{
+					// Use the result in out_list (if any); ignore current message.
+					//
+					eventsToFilter->RemoveItem(event_index);
+					eventsToFilter->AddList(&out_list, event_index);
+					event_index += out_list.CountItems();
+					
+					// NOTE: eventsToFilter now owns out_list's items.
+				}
+				else
+				{
+					// Error - Free resources associated with items in out_list and return.
+					//
+					void* out_item;
+					for (int32 i = 0; NULL != (out_item = out_list.ItemAt(i) ); i++)
+					{
+						delete out_item;
+					}
+					return false;
+				}
+				
+				// NOTE: The BList destructor frees out_lists's resources here.
+				//       It does NOT free the resources associated with out_list's
+				//       member items - those should either already be deleted or
+				//       should be owned by eventsToFilter.
+			}
+
+		} // while()
+		
+		filter_index++;
+		
+	} // while()
+	
+	return true;	
 }
 
 
@@ -745,9 +1084,34 @@ bool InputServer::MethodizeEvents(BList *,
  *  Method: InputServer::StartStopDevices()
  *   Descr: 
  */
-status_t InputServer::StartStopDevices(const char* deviceName, input_device_type deviceType, bool doStart)
+status_t InputServer::StartStopDevices(const char*       deviceName,
+                                       input_device_type deviceType,
+                                       bool              doStart)
 {
-	return 0;
+	printf("StartStopDevice: Enter\n");
+	for (int i = gInputDeviceList.CountItems() - 1; i >= 0; i--)
+	{
+		printf("Device #%d\n", i);
+		InputDeviceListItem* item = (InputDeviceListItem*)gInputDeviceList.ItemAt(i);
+		if (NULL != item)
+		{
+			BInputServerDevice* isd = item->mIsd;
+			input_device_ref*   dev = item->mDev;
+			printf("Hey\n");
+			if ( (NULL != isd) && (NULL != dev) )
+			{
+				printf("  Starting/stopping: %s\n", dev->name);
+				if (deviceType == dev->type)
+				{
+					if (doStart) isd->Start(dev->name, dev->cookie);
+					else          isd->Stop(dev->name, dev->cookie);
+				}
+			}
+		}
+	}
+	printf("StartStopDevice: Exit\n");
+	
+	return B_OK;
 }
 
 
@@ -831,35 +1195,43 @@ int32 InputServer::ISPortWatcher(void *arg)
 
 void InputServer::WatchPort()
 {
-	int32 code;
-	ssize_t length;
-	char *buffer;
-	BMessage *event;
-	status_t err;
+	int32     	code;
+	ssize_t    	length;
+	char		*buffer;
+	status_t  	err;
 
 	while (true) { 
 		// Block until we find the size of the next message
 		length = port_buffer_size(EventLooperPort);
 		buffer = (char*)malloc(length);
-		event = NULL;
-		event = new BMessage();
+		printf("[Event Looper] BMessage Size = %d\n", length);
+		//event = NULL;
+		BMessage *event = new BMessage();
 		err = read_port(EventLooperPort, &code, buffer, length);
 		if(err != length) {
 			if(err >= 0) {
-				_sPrintf("InputServer: failed to read full packet (read %u of %u)\n",err,length);
+				printf("InputServer: failed to read full packet (read %lu of %lu)\n",err,length);
 			} else {
-				_sPrintf("InputServer: read_port error: (0x%x) %s\n",err,strerror(err));
+				printf("InputServer: read_port error: (0x%lx) %s\n",err,strerror(err));
 			}
-		} else if ((err = event->Unflatten(buffer)) < 0) {
-			_sPrintf("InputServer: (0x%x) %s\n",err,strerror(err));
-		} else {
-			// add the event
-			//CacheEvents(event);	
-			event = NULL;
-		}
-		free( buffer);
-		if(event!=NULL) {
+		}else{
+		
+			if ((err = event->Unflatten(buffer)) < 0) {
+				printf("[InputServer] Unflatten() error: (0x%lx) %s\n",err,strerror(err));
+			} else {
+			// This is where the message should be processed.	
+			event->PrintToStream();
+			
+			DispatchEvent(event);
+			
+			//printf("Event writen to port\n");
 			delete(event);
+			}
+			
+		}
+		free(buffer);
+		if(event!=NULL) {
+			//delete(event);
 			event = NULL;  
 		} 
 	}

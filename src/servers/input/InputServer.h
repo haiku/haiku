@@ -32,9 +32,13 @@
 // BeAPI Headers
 #include <Application.h>
 #include "InputServerDevice.h"
+#include "InputServerFilter.h"
+#include "InputServerMethod.h"
+
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <Locker.h>
 
 #include <Debug.h>
 #include <FindDirectory.h>
@@ -43,7 +47,44 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
-#include "InputServerTypes.h"
+class PortLink;
+
+// Constants
+#define SET_METHOD					'stmd'
+#define GET_MOUSE_TYPE				'gtmt'
+#define SET_MOUSE_TYPE 				'stmt'
+#define GET_MOUSE_ACCELERATION 		'gtma'
+#define SET_MOUSE_ACCELERATION 		'stma'
+#define GET_KEY_REPEAT_DELAY 		'gkrd'
+#define SET_KEY_REPEAT_DELAY 		'skrd'
+#define GET_KEY_INFO 				'ktki'
+#define GET_MODIFIERS 				'gtmf'
+#define SET_MODIFIER_KEY 			'smky'
+#define SET_KEYBOARD_LOCKS 			'skbl'
+#define GET_MOUSE_SPEED 			'gtms'
+#define SET_MOUSE_SPEED 			'stms'
+#define SET_MOUSE_POSITION 			'stmp'
+#define GET_MOUSE_MAP 				'gtmm'
+#define SET_MOUSE_MAP 				'stmm'
+#define GET_KEYBOARD_ID 			'gkbi'
+#define GET_CLICK_SPEED 			'gtcs'
+#define SET_CLICK_SPEED 			'stcs'
+#define GET_KEY_REPEAT_RATE 		'gkrr'
+#define SET_KEY_REPEAT_RATE 		'skrr'
+#define GET_KEY_MAP 				'gtkm'
+#define SET_KEY_MAP 				'stkm'
+#define FOCUS_IM_AWARE_VIEW 		'fiav'
+#define UNFOCUS_IM_AWARE_VIEW 		'uiav'
+
+class InputDeviceListItem
+{
+	public:
+	BInputServerDevice* mIsd;    
+	input_device_ref*   mDev;
+
+	InputDeviceListItem(BInputServerDevice* isd, input_device_ref* dev):
+		mIsd(isd), mDev(dev) {};	
+};
 
 /*****************************************************************************/
 // InputServer
@@ -97,16 +138,17 @@ public:
 	const BMessenger* MethodReplicant(void);
 
 	status_t EventLoop(void*);
-	bool     EventLoopRunning(void);
+	static bool     EventLoopRunning(void);
 
 	bool DispatchEvents(BList*);
+	int DispatchEvent(BMessage*);
 	bool CacheEvents(BList*);
 	const BList* GetNextEvents(BList*);
 	bool FilterEvents(BList*);
 	bool SanitizeEvents(BList*);
 	bool MethodizeEvents(BList*, bool);
 
-	status_t StartStopDevices(const char *, input_device_type, bool);
+	static status_t StartStopDevices(const char *, input_device_type, bool);
 	status_t ControlDevices(const char *, input_device_type, unsigned long, BMessage*);
 
 	bool DoMouseAcceleration(long*, long*);
@@ -116,22 +158,39 @@ public:
 
 	bool SafeMode(void);
 
+	static BList   gInputDeviceList;
+	static BLocker gInputDeviceListLocker;
+	
 private:
+	void InitTestDevice();
+	
 	status_t AddInputServerDevice(const char* path);
+	status_t AddInputServerFilter(const char* path);
+	status_t AddInputServerMethod(const char* path);
 	
-	bool sEventLoopRunning;
-	bool sSafeMode;
+	bool 			sEventLoopRunning;
+	bool 			sSafeMode;
+	port_id 		sEventPort;
+	BPoint			sMousePos;
 	
-	BList mInputServerDeviceList;
-	BList mInputMethodList;
-	BList mInputFilterList;
-	port_id ISPort;
-	port_id EventLooperPort;
-	thread_id ISPortThread;
-	static int32 ISPortWatcher(void *arg);
+	port_id			ISPort;
+	port_id      	EventLooperPort;
+	thread_id    	ISPortThread;
+	static int32 	ISPortWatcher(void *arg);
 	void WatchPort();
-
+	
+	static bool doStartStopDevice(void*, void*);
+	
+	static BList mInputServerDeviceList;
+	static BList mInputServerFilterList;
+	static BList mInputServerMethodList;
+	
+	// added this to communicate via portlink
+	
+	PortLink *serverlink;
+	
 	//fMouseState;
 };
+
 
 #endif

@@ -1,27 +1,27 @@
 //
-// Class to encapsulate entries in the InputServer's InputServerDevice list.
+// Class to encapsulate entries in the InputServer's InputServerFilter list.
 //
-class InputServerDeviceListEntry
+class InputServerFilterListEntry
 {
 	public:
 		inline const char*               getPath()              { return mPath;   };		
 		inline status_t                  getStatus()            { return mStatus; };
-		inline BInputServerDevice* getInputServerDevice() { return mIsd;    };
+		inline const BInputServerFilter* getInputServerFilter() { return mIsd;    };
 		
-		InputServerDeviceListEntry(
+		InputServerFilterListEntry(
 			const char*               path,
 			status_t                  status,
-			BInputServerDevice* isd) : mPath  (path),
+			const BInputServerFilter* isd) : mPath  (path),
 			                                 mStatus(status),
 			                                 mIsd   (isd)
 		{ /* Do nothing */ };
 				
-		~InputServerDeviceListEntry()
+		~InputServerFilterListEntry()
 		{ /* Do nothing */ };
 
 	private:	
 		const char*               mPath;
 		status_t                  mStatus;
-		BInputServerDevice* mIsd;
+		const BInputServerFilter* mIsd;
 	
 };
