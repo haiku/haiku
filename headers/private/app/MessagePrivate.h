@@ -9,6 +9,9 @@
 // Standard Includes -----------------------------------------------------------
 
 // System Includes -------------------------------------------------------------
+#include <Message.h>
+#include <Messenger.h>
+#include <MessengerPrivate.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -35,10 +38,11 @@ class BMessage::Private
 		}
 		inline void SetReply(BMessenger messenger)
 		{
-			fMessage->fReplyTo.port = messenger.fPort;
-			fMessage->fReplyTo.target = messenger.fHandlerToken;
-			fMessage->fReplyTo.team = messenger.fTeam;
-			fMessage->fReplyTo.preferred = messenger.fPreferredTarget;
+			BMessenger::Private mp(messenger);
+			fMessage->fReplyTo.port = mp.Port();
+			fMessage->fReplyTo.target = mp.Token();
+			fMessage->fReplyTo.team = mp.Team();
+			fMessage->fReplyTo.preferred = mp.IsPreferredTarget();
 		}
 		inline int32 GetTarget()
 		{
