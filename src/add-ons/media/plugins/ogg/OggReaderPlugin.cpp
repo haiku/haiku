@@ -284,7 +284,7 @@ OggReader::GetFileFormatInfo(media_file_format *mff)
 status_t
 OggReader::AllocateCookie(int32 streamNumber, void **cookie)
 {
-	TRACE("OggReader::AllocateCookie\n");
+	TRACE("OggReader::AllocateCookie %ld\n", streamNumber);
 	if (streamNumber < 0 || streamNumber > (signed)fCookies.size()) {
 		TRACE("OggReader::AllocateCookie: invalid streamNumber: bail\n");
 		return B_ERROR;
@@ -321,7 +321,7 @@ OggReader::Seek(void *cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
-	TRACE("OggReader::Seek\n");
+	TRACE("OggReader::Seek to %lld : %lld\n",*frame,*time);
 	OggStream * stream = static_cast<OggStream*>(cookie);
 	return stream->Seek(seekTo,frame,time);
 }

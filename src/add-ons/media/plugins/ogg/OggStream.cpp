@@ -83,7 +83,7 @@ OggStream::GetSerial() const
 status_t
 OggStream::AddPage(off_t position, ogg_page * page)
 {
-	TRACE("OggStream::AddPage\n");
+	TRACE("OggStream::AddPage %llu\n",position);
 	if (position >= 0) {
 		fPagePositions.push_back(position);
 	}
@@ -210,7 +210,10 @@ OggStream::GetPacket(ogg_packet * packet)
 		uint old_page = fCurrentPage;
 		uint old_packet = fCurrentPacket;
 		while (ogg_stream_packetpeek(&fStreamState, NULL) != 1) {
-			fReaderInterface->GetNextPage();
+			status_t result = fReaderInterface->GetNextPage();
+			if (result != B_OK) {
+				return result;
+			}
 			fCurrentPage++;
 		}
 		if (ogg_stream_packetout(&fStreamState, packet) != 1) {
@@ -228,7 +231,10 @@ OggStream::GetPacket(ogg_packet * packet)
 		uint pageno = fOggFrameInfos[fCurrentFrame].GetPage();
 		while (ogg_stream_packetpeek(&fSeekStreamState, NULL) != 1) {
 			off_t position = fPagePositions[pageno++];
-			fReaderInterface->GetPageAt(position, &fSeekStreamState);
+			status_t result = fReaderInterface->GetPageAt(position, &fSeekStreamState);
+			if (result != B_OK) {
+				return result;
+			}
 		}
 		if (ogg_stream_packetout(&fSeekStreamState, packet) != 1) {
 			return B_ERROR;

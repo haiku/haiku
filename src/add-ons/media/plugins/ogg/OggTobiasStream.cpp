@@ -67,7 +67,7 @@ OggTobiasStream::IsValidHeader(const ogg_packet & packet)
 OggTobiasStream::OggTobiasStream(long serialno)
 	: OggStream(serialno)
 {
-
+	TRACE("OggTobiasStream::OggTobiasStream\n");
 }
 
 OggTobiasStream::~OggTobiasStream()
