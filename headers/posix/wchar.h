@@ -9,6 +9,14 @@
 
 #include <wchar_t.h>
 
+#define _WINT_T
+typedef unsigned int wint_t;
+
+typedef struct {
+        int             __count;
+        wint_t  __value;
+} mbstate_t;
+
 #include <size_t.h>
 
 int		mbsinit(const mbstate_t *);

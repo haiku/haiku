@@ -11,13 +11,5 @@
 typedef unsigned short wchar_t;
 #endif
 
-#define _WINT_T
-typedef unsigned int wint_t;
-
-typedef struct {
-	int		__count;
-	wint_t	__value;
-} mbstate_t;
-
 #endif	/* _WCHAR_T_H */
 

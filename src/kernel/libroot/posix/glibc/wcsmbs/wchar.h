@@ -36,7 +36,7 @@
 # ifdef __USE_UNIX98
 #  define __need_FILE
 # endif
-# include <stdio.h>
+# include <libio/stdio.h>
 /* Get va_list definition.  */
 # define __need___va_list
 # include <stdarg.h>
@@ -89,7 +89,7 @@ typedef struct
 
 __BEGIN_NAMESPACE_C99
 /* Public type.  */
-//typedef __mbstate_t mbstate_t;
+typedef __mbstate_t mbstate_t;
 __END_NAMESPACE_C99
 #ifdef __USE_GNU
 __USING_NAMESPACE_C99(mbstate_t)
