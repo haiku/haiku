@@ -497,7 +497,7 @@ sleep(uint64 time)
 	_v; \
 	})
 
-#define TIMER_CLKNUM_HZ 1193167
+#define TIMER_CLKNUM_HZ (14318180/12)
 
 static void
 calculate_cpu_conversion_factor(void)
@@ -610,7 +610,7 @@ not_so_quick_sample:
 	 * where reminder is:
 	 *
 	 *     floor((1<<k)*decimalPart((C*x0)/p3))
-	 *  
+	 *
 	 * which is approximated as:
 	 *
 	 *     floor((1<<k)*decimalPart(((C*x0)%p3)/p3)) ->
@@ -619,10 +619,13 @@ not_so_quick_sample:
 	 * So the final expression is:
 	 *
 	 *     ((C*x0)/p3)<<k + (((C*x0)%p3)<<k)/p3 + (C*x1)/p3
-	 *
-	 * Just to make things fancier we choose k based on the input
-	 * parameters (we use log2(expired)/3.)
-	 *
+	 */
+	 /*
+	 * To get the highest accuracy with this method
+	 * x0 should have the 12 most significant bits of expired
+	 * to minimize the error upon <<k.
+	 */
+	 /*
 	 * Of course, you are not expected to understand any of this.
 	 */
 	{
@@ -635,11 +638,10 @@ not_so_quick_sample:
 
 		/* first calculate k*/
 		k = 0;
-		for (i = 0; i< 32; i++) {
+		for (i = 12; i < 16; i++) {
 			if (expired & (1<<i))
-				k = i;
+				k = i - 11;
 		}
-		k /= 3;
 
 		C = 1000000ULL << 32;
 		x0 = expired >> k;
