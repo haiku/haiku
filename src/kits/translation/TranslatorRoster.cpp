@@ -632,9 +632,14 @@ BTranslatorRoster::Identify(BPositionIO *inSource,
 //
 // Postconditions:
 //
-// Returns: < 0 if a is less desirable than b, 
-//          0 if a as good as b,
-//          > 0 if a is more desirable than b
+// Returns: 
+//          NOTE: Since qsort sorts lowest to highest, and I want
+//          the highest quality/capability first, I must do things
+//          "backwards."
+//
+//          0   if A and B are equally capable
+//          -1  if A is more capable than B
+//          1   if A is less capable than B
 // ---------------------------------------------------------------
 static int
 compare_data(const void *a, const void *b)
@@ -645,8 +650,15 @@ compare_data(const void *a, const void *b)
 	register const translator_info *bi = 
 		reinterpret_cast<const translator_info *> (b);
 	
-	return static_cast<int> (- ai->quality * ai->capability +
-		bi->quality * bi->capability);
+	float acmp, bcmp;
+	acmp = ai->quality * ai->capability;
+	bcmp = bi->quality * bi->capability;
+	if (acmp == bcmp)
+		return 0;
+	else if (acmp > bcmp)
+		return -1;
+	else
+		return 1;
 }
 
 // ---------------------------------------------------------------
