@@ -20,6 +20,34 @@ FUNCTION(set_sdr1):
 	mtsdr1	%r3
 	blr
 
+/* uint32 get_sr(void *virtualAddress);
+ *				 r3
+ */
+FUNCTION(get_sr):
+	mfsrin	%r3, %r3
+	blr
+
+/* void set_sr(void *virtualAddress, uint32 value);
+ *			   r3					 r4
+ */
+FUNCTION(set_sr):
+	mtsrin	%r4, %r3
+	blr
+
+/* uint32 get_msr(void);
+ */
+FUNCTION(get_msr):
+	mfmsr	%r3
+	blr
+
+/* uint32 set_msr(uint32 value);
+ *				  r3
+ */
+FUNCTION(set_msr):
+	mtmsr	%r3
+	blr
+
+
 #define get_ibat(num) \
 	mfibatu	%r4, num; \
 	stw		%r4, 0(%r3); \

@@ -22,6 +22,13 @@ page_table_entry::SecondaryHash(uint32 virtualSegmentID, uint32 virtualAddress)
 }
 
 
+uint32 
+page_table_entry::SecondaryHash(uint32 primaryHash)
+{
+	return ~primaryHash;
+}
+
+
 void 
 ppc_get_page_table(void **_pageTable, size_t *_size)
 {
