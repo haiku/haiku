@@ -416,6 +416,13 @@ DataView::SetSelection(int32 start, int32 end, view_focus focus)
 		return;
 	}
 
+	// notify our listeners
+	if (fStart != start) {
+		BMessage update;
+		update.AddInt64("position", start);
+		SendNotices(kDataViewCursorPosition, &update);
+	}
+
 	// remove old selection
 	// ToDo: this could be drastically improved if only the changed
 	//	parts are drawn! Of course, this would only work for the

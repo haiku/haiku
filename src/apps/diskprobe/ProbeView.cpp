@@ -530,6 +530,23 @@ void
 HeaderView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
+		case B_OBSERVER_NOTICE_CHANGE: {
+			int32 what;
+			if (message->FindInt32(B_OBSERVE_WHAT_CHANGE, &what) != B_OK)
+				break;
+
+			switch (what) {
+				case kDataViewCursorPosition:
+					off_t offset;
+					if (message->FindInt64("position", &offset) == B_OK) {
+						fOffset = offset;
+						UpdateOffsetViews(fPositionSlider->Position());
+					}
+					break;
+			}
+			break;
+		}
+
 		case kMsgSliderUpdate:
 		{
 			off_t position = fPositionSlider->Position();
@@ -642,6 +659,7 @@ void
 ProbeView::AttachedToWindow()
 {
 	fEditor.StartWatching(this);
+	fDataView->StartWatching(fHeaderView, kDataViewCursorPosition);
 
 	// Add menu to window
 

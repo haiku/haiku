@@ -14,6 +14,7 @@
 class DataEditor;
 
 static const uint32 kMsgBaseType = 'base';
+static const uint32 kDataViewCursorPosition = 'curs';
 
 enum base_type {
 	kHexBase,
