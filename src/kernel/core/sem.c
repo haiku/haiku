@@ -163,9 +163,10 @@ sem_id create_sem_etc(int32 count, const char *name, team_id owner)
 		return B_NO_MORE_SEMS;
 		
 	if (name == NULL)
-		name = "default_sem_name";
+		name = "unnamed semaphore";
 
-	name_len = min(strlen(name) + 1, SYS_MAX_OS_NAME_LEN);
+	name_len = strlen(name) + 1;
+	name_len = min(name_len, SYS_MAX_OS_NAME_LEN);
 	temp_name = (char *)kmalloc(name_len);
 	if (temp_name == NULL)
 		return ENOMEM;
