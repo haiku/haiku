@@ -2,11 +2,13 @@
 #define _WORKSPACE_H_
 
 #include <SupportDefs.h>
+#include <Locker.h>
 
 #include "RGBColor.h"
 
 class WinBorder;
 class RBGColor;
+class RootLayer;
 
 struct ListData{
 	WinBorder	*layerPtr;
@@ -19,14 +21,15 @@ class Workspace
 public:
 								Workspace(const uint32 colorspace,
 											int32 ID,
-											const RGBColor& BGColor);
+											const RGBColor& BGColor,
+											RootLayer* owner);
 								~Workspace();
 
 			bool				AddLayerPtr(WinBorder* layer);
 			bool				RemoveLayerPtr(WinBorder* layer);
-			bool				SetFocusLayer(WinBorder* layer);
+			WinBorder*			SetFocusLayer(WinBorder* layer);
 			WinBorder*			FocusLayer() const;
-			bool				SetFrontLayer(WinBorder* layer);
+			WinBorder*			SetFrontLayer(WinBorder* layer);
 			WinBorder*			FrontLayer() const;
 
 			void				MoveToBack(WinBorder* newLast);
@@ -36,6 +39,8 @@ public:
 			WinBorder*			GoToTopItem();
 			WinBorder*			GoToLowerItem();
 			bool				GoToItem(WinBorder* layer);
+
+			WinBorder*			SearchLayerUnderPoint(BPoint pt);
 
 			void				SetLocalSpace(const uint32 colorspace);
 			uint32				LocalSpace() const;
@@ -49,6 +54,7 @@ public:
 //			uint32				Flags(void) const;
 	// debug methods
 			void				PrintToStream() const;
+			void				PrintItem(ListData *item) const;
 
 private:
 
@@ -65,6 +71,10 @@ private:
 			uint32				fSpace;
 //			uint32				fFlags;
 			RGBColor			fBGColor;
+			
+			BLocker				opLock;
+
+			RootLayer			*fOwner;
 			
 			ListData			*fBottomItem, // first visible onscreen
 								*fTopItem, // the last visible(or covered by other Layers)
