@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons accelerants nvidia ;
 
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics nvidia ] ;
-UseHeaders engine ;
+UseHeaders [ FDirName $(SUBDIR) engine ] ;
 
 
 Addon nv.accelerant : accelerants :
