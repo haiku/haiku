@@ -10,6 +10,7 @@
 #include "debug.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
+#include "DataExchange.h"
 
 /*
  * some little helper function
@@ -543,7 +544,7 @@ BMediaAddOn::NotifyFlavorChange()
 	if (port <= B_OK)
 		return B_ERROR;
 
-	xfer_addonserver_rescan_mediaaddon_flavors msg;
+	addonserver_rescan_mediaaddon_flavors_command msg;
 	msg.addonid = fAddon;
 	return write_port(port, ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS, &msg, sizeof(msg));
 }

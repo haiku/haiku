@@ -180,7 +180,7 @@ BTrackReader::ReadFrames(void *in_buffer, int32 frame_count)
 {
 	CALLED();
 
-	uint8 *buffer = (uint8 *)in_buffer;
+	uint8 *buffer = static_cast<uint8 *>(in_buffer);
 	int32 bytes_to_read = frame_count * fFrameSize;
 
 	status_t last_status = B_OK;

@@ -92,7 +92,7 @@ public:
 00014e1c T _ServerApp::~_ServerApp(void)
 00014ff4 T _ServerApp::MessageReceived(BMessage *);
 00015840 T _ServerApp::QuitRequested(void)
-00015b50 T _ServerApp::_DoNotify(notify_data *)
+00015b50 T _ServerApp::_DoNotify(command_data *)
 00015d18 T _ServerApp::_UnregisterApp(long, bool)
 00018e90 T _ServerApp::AddOnHost(void)
 00019530 T _ServerApp::AboutRequested(void)
@@ -162,8 +162,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 	switch (code) {
 		case SERVER_GET_MEDIAADDON_REF:
 		{
-			xfer_server_get_mediaaddon_ref *msg = (xfer_server_get_mediaaddon_ref *)data;
-			xfer_server_get_mediaaddon_ref_reply reply;
+			server_get_mediaaddon_ref_request *msg = (server_get_mediaaddon_ref_request *)data;
+			server_get_mediaaddon_ref_reply reply;
 			entry_ref tempref;
 			reply.result = gNodeManager->GetAddonRef(&tempref, msg->addonid);
 			reply.ref = tempref;
@@ -349,8 +349,8 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 
 		case SERVER_REGISTER_MEDIAADDON:
 		{
-			xfer_server_register_mediaaddon *msg = (xfer_server_register_mediaaddon *)data;
-			xfer_server_register_mediaaddon_reply reply;
+			server_register_mediaaddon_request *msg = (server_register_mediaaddon_request *)data;
+			server_register_mediaaddon_reply reply;
 			gNodeManager->RegisterAddon(msg->ref, &reply.addonid);
 			write_port(msg->reply_port, 0, &reply, sizeof(reply));
 			break;
@@ -358,7 +358,7 @@ ServerApp::HandleMessage(int32 code, void *data, size_t size)
 		
 		case SERVER_UNREGISTER_MEDIAADDON:
 		{
-			xfer_server_unregister_mediaaddon *msg = (xfer_server_unregister_mediaaddon *)data;
+			server_unregister_mediaaddon_command *msg = (server_unregister_mediaaddon_command *)data;
 			gNodeManager->UnregisterAddon(msg->addonid);
 			break;
 		}

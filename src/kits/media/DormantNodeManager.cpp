@@ -30,6 +30,7 @@
 #include "debug.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
+#include "DataExchange.h"
 #include "DormantNodeManager.h"
 
 static BPrivate::media::DormantNodeManager manager;
@@ -164,8 +165,8 @@ DormantNodeManager::PutAddon(media_addon_id id)
 media_addon_id
 DormantNodeManager::RegisterAddon(const char *path)
 {
-	xfer_server_register_mediaaddon msg;
-	xfer_server_register_mediaaddon_reply reply;
+	server_register_mediaaddon_request msg;
+	server_register_mediaaddon_reply reply;
 	port_id port;
 	status_t rv;
 	int32 code;
@@ -201,7 +202,7 @@ void
 DormantNodeManager::UnregisterAddon(media_addon_id id)
 {
 	ASSERT(id > 0);
-	xfer_server_unregister_mediaaddon msg;
+	server_unregister_mediaaddon_command msg;
 
 	printf("DormantNodeManager::UnregisterAddon id %ld\n",id);
 
@@ -217,8 +218,8 @@ DormantNodeManager::UnregisterAddon(media_addon_id id)
 status_t
 DormantNodeManager::FindAddonPath(BPath *path, media_addon_id id)
 {
-	xfer_server_get_mediaaddon_ref msg;
-	xfer_server_get_mediaaddon_ref_reply reply;
+	server_get_mediaaddon_ref_request msg;
+	server_get_mediaaddon_ref_reply reply;
 	port_id port;
 	entry_ref tempref;
 	status_t rv;

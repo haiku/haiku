@@ -662,7 +662,7 @@ BMediaRoster::StartNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	xfer_node_start msg;
+	node_start_command msg;
 	msg.performance_time = at_performance_time;
 	
 	return write_port(node.port, NODE_START, &msg, sizeof(msg));
@@ -678,7 +678,7 @@ BMediaRoster::StopNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	xfer_node_stop msg;
+	node_stop_command msg;
 	msg.performance_time = at_performance_time;
 	msg.immediate = immediate;
 	
@@ -695,7 +695,7 @@ BMediaRoster::SeekNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	xfer_node_seek msg;
+	node_seek_command msg;
 	msg.media_time = to_media_time;
 	msg.performance_time = at_performance_time;
 	
@@ -778,7 +778,7 @@ BMediaRoster::SetRunModeNode(const media_node & node,
 	if (node.node <= 0)
 		return B_MEDIA_BAD_NODE;
 
-	xfer_node_set_run_mode msg;
+	node_set_run_mode_command msg;
 	msg.mode = mode;
 	
 	return write_port(node.port, NODE_SET_RUN_MODE, &msg, sizeof(msg));
@@ -829,8 +829,8 @@ BMediaRoster::SetProducerRate(const media_node & producer,
 	if ((producer.kind & B_BUFFER_PRODUCER) == 0)
 		return B_MEDIA_BAD_NODE;
 
-	xfer_producer_set_play_rate msg;
-	xfer_producer_set_play_rate_reply reply;
+	producer_set_play_rate_request msg;
+	producer_set_play_rate_reply reply;
 	status_t rv;
 	int32 code;
 

@@ -91,7 +91,7 @@ MediaAddonServer::HandleMessage(int32 code, void *data, size_t size)
 
 		case ADDONSERVER_RESCAN_MEDIAADDON_FLAVORS:
 		{
-			const xfer_addonserver_rescan_mediaaddon_flavors *msg = (const xfer_addonserver_rescan_mediaaddon_flavors *)data;
+			const addonserver_rescan_mediaaddon_flavors_command *msg = (const addonserver_rescan_mediaaddon_flavors_command *)data;
 			BMediaAddOn *addon;
 			addon = _DormantNodeManager->GetAddon(msg->addonid);
 			if (!addon) {

@@ -123,7 +123,7 @@ BTimeSource::BTimeSource() :
 
 status_t
 BTimeSource::HandleMessage(int32 message,
-						   const void *rawdata,
+						   const void *data,
 						   size_t size)
 {
 	TRACE("BTimeSource::HandleMessage %#lx, node %ld\n", message, fNodeID);
@@ -131,7 +131,7 @@ BTimeSource::HandleMessage(int32 message,
 	switch (message) {
 		case TIMESOURCE_OP:
 		{
-			const time_source_op_info *data = (const time_source_op_info *)rawdata;
+			const time_source_op_info *data = static_cast<const time_source_op_info *>(data);
 			status_t result;
 			result = TimeSourceOp(*data, NULL);
 			return B_OK;

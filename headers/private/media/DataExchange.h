@@ -17,21 +17,22 @@ namespace dataexchange {
 
 struct reply_data;
 struct request_data;
+struct command_data;
 
 // BMessage based data exchange with the media_server
 status_t SendToServer(BMessage *msg);
 status_t QueryServer(BMessage *request, BMessage *reply);
 
 // Raw data based data exchange with the media_server
-status_t SendToServer(int32 msgcode, void *msg, int size);
+status_t SendToServer(int32 msgcode, command_data *msg, int size);
 status_t QueryServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
 // Raw data based data exchange with the media_addon_server
-status_t SendToAddonServer(int32 msgcode, void *msg, int size);
+status_t SendToAddonServer(int32 msgcode, command_data *msg, int size);
 status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
 // Raw data based data exchange with the media_server
-status_t SendToPort(port_id sendport, int32 msgcode, void *msg, int size);
+status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size);
 status_t QueryPort(port_id requestport, int32 msgcode, request_data *request, int requestsize, reply_data *reply, int replysize);
 
 // The base struct used for all raw requests
@@ -48,6 +49,11 @@ struct reply_data
 	status_t result;
 };
 
+// The base struct used for all raw commands (asynchronous, no answer)
+struct command_data
+{
+	// yes, it's empty ;)
+};
 
 }; // dataexchange
 }; // media
@@ -139,6 +145,39 @@ enum {
 	
 	TIMESOURECE_MESSAGE_END,
 };
+
+
+/* We can't send an entry_ref through a port to another team,
+ * but we can assign it to an xfer_entry_ref and send this one,
+ * when we receive it we can assign it to a normal entry_ref
+ */
+struct xfer_entry_ref
+{
+public:
+	xfer_entry_ref()
+		{
+			device = -1;
+			directory = -1;
+			name[0] = 0;
+		}
+	operator entry_ref() const
+		{
+			entry_ref ref(device, directory, name);
+			return ref;
+		}
+	void operator=(const entry_ref &ref)
+		{
+			device = ref.device;
+			directory = ref.directory;
+			strcpy(name, ref.name);
+		}
+private:
+	dev_t	device;
+	ino_t	directory;
+	char	name[B_FILE_NAME_LENGTH];
+};
+
+
 
 // used by SERVER_GET_NODE and SERVER_SET_NODE
 enum node_type 
@@ -252,6 +291,165 @@ struct producer_connect_reply : public reply_data
 	char name[B_MEDIA_NAME_LENGTH];
 };
 
+struct producer_disconnect_request : public request_data
+{
+	media_source source;
+	media_destination destination;
+};
+
+struct producer_disconnect_reply : public reply_data
+{
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct producer_format_suggestion_requested_request : public request_data
+{
+	media_type type;
+	int32 quality;
+};
+
+struct producer_format_suggestion_requested_reply : public reply_data
+{
+	media_format format;
+};
+
+struct producer_set_play_rate_request : public request_data
+{
+	int32 numer;
+	int32 denom;
+};
+
+struct producer_set_play_rate_reply : public reply_data
+{
+};
+
+struct producer_get_initial_latency_request : public request_data
+{
+};
+
+struct producer_get_initial_latency_reply : public reply_data
+{
+	bigtime_t initial_latency;
+	uint32 flags;
+};
+
+struct producer_get_latency_request : public request_data
+{
+};
+
+struct producer_get_latency_reply : public reply_data
+{
+	bigtime_t latency;
+};
+
+struct producer_set_buffer_group_command : public command_data
+{
+	media_source source;
+	media_destination destination;
+	void *user_data;
+	int32 change_tag;
+	int32 buffer_count;
+	media_buffer_id buffers[1];
+};
+
+struct producer_format_change_requested_command : public command_data
+{
+	media_source source;
+	media_destination destination;
+	media_format format;
+	void *user_data;
+	int32 change_tag;
+};
+
+struct producer_video_clipping_changed_command : public command_data
+{
+	media_source source;
+	media_destination destination;
+	media_video_display_info display;
+	void *user_data;
+	int32 change_tag;
+	int32 short_count;
+	int16 shorts[1];
+};
+
+struct producer_additional_buffer_requested_command : public command_data
+{
+	media_source source;
+	media_buffer_id prev_buffer;
+	bigtime_t prev_time;
+	bool has_seek_tag;
+	media_seek_tag prev_tag;
+};
+
+struct producer_latency_changed_command : public command_data
+{
+	media_source source;
+	media_destination destination;
+	bigtime_t latency;
+	uint32 flags;
+};
+
+struct producer_enable_output_command : public command_data
+{
+	media_source source;
+	media_destination destination;
+	bool enabled;
+	void *user_data;
+	int32 change_tag;
+};
+
+struct producer_late_notice_received_command : public command_data
+{
+	media_source source;
+	bigtime_t how_much;
+	bigtime_t performance_time;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct consumer_accept_format_request : public request_data
 {
 	media_destination dest;
@@ -353,15 +551,87 @@ struct consumer_disconnected_reply : public reply_data
 {
 };
 
-struct producer_disconnect_request : public request_data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct consumer_buffer_received_command : public command_data
 {
-	media_source source;
-	media_destination destination;
+	media_buffer_id buffer;
+	media_header header;
 };
 
-struct producer_disconnect_reply : public reply_data
+struct consumer_producer_data_status_command : public command_data
+{
+	media_destination for_whom;
+	int32 status;
+	bigtime_t at_performance_time;
+};
+
+struct consumer_get_latency_for_request : public request_data
+{
+	media_destination for_whom;
+};
+
+struct consumer_get_latency_for_reply : public reply_data
+{
+	bigtime_t latency;
+	media_node_id timesource;
+};
+
+struct consumer_format_changed_request : public request_data
+{
+	media_source producer;
+	media_destination consumer;
+	int32 change_tag;
+	media_format format;
+};
+
+struct consumer_format_changed_reply : public reply_data
 {
 };
+
+struct consumer_seek_tag_requested_request : public request_data
+{
+	media_destination destination;
+	bigtime_t target_time;
+	uint32 flags;
+};
+
+struct consumer_seek_tag_requested_reply : public reply_data
+{
+	media_seek_tag seek_tag;
+	bigtime_t tagged_time;
+	uint32 flags;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 struct server_register_node_request : public request_data
 {
@@ -472,6 +742,91 @@ struct server_get_instances_for_reply : public reply_data
 	int32 count;
 	media_node_id node_id[MAX_NODE_ID]; // no area here, MAX_NODE_ID is really large
 };
+
+
+
+
+
+
+
+struct addonserver_rescan_mediaaddon_flavors_command : public command_data
+{
+	media_addon_id addonid;
+};
+
+struct server_register_mediaaddon_request : public request_data
+{
+	xfer_entry_ref	ref; // a ref to the file
+};
+
+struct server_register_mediaaddon_reply : public reply_data
+{
+	media_addon_id addonid;
+};
+
+struct server_unregister_mediaaddon_command : public command_data
+{
+	media_addon_id addonid;
+};
+
+struct server_get_mediaaddon_ref_request : public request_data
+{
+	media_addon_id addonid;
+};
+
+struct server_get_mediaaddon_ref_reply : public reply_data
+{
+	xfer_entry_ref	ref; // a ref to the file
+};
+
+
+
+
+
+
+
+
+
+
+struct node_request_completed_command : public command_data
+{
+	media_request_info info;
+};
+
+struct node_start_command : public command_data
+{
+	bigtime_t performance_time;	
+};
+
+struct node_stop_command : public command_data
+{
+	bigtime_t performance_time;	
+	bool immediate;
+};
+
+struct node_seek_command : public command_data
+{
+	bigtime_t media_time;
+	bigtime_t performance_time;
+};
+
+struct node_set_run_mode_command : public command_data
+{
+	BMediaNode::run_mode mode;
+};
+
+struct node_time_warp_command : public command_data
+{
+	bigtime_t at_real_time;
+	bigtime_t to_performance_time;
+};
+
+struct node_set_timesource_command : public command_data
+{
+	media_node_id timesource_id;
+};
+
+
 
 
 #endif // _DATA_EXCHANGE_H

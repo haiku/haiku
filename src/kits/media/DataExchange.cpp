@@ -49,7 +49,8 @@ status_t
 request_data::SendReply(status_t result, reply_data *reply, int replysize) const
 {
 	reply->result = result;
-	return SendToPort(reply_port, 0, reply, replysize);
+	// we cheat and use the (command_data *) version of SendToPort
+	return SendToPort(reply_port, 0, reinterpret_cast<command_data *>(reply), replysize);
 }
 
 
@@ -75,7 +76,7 @@ status_t QueryServer(BMessage *request, BMessage *reply)
 
 
 // Raw data based data exchange with the media_server
-status_t SendToServer(int32 msgcode, void *msg, int size)
+status_t SendToServer(int32 msgcode, command_data *msg, int size)
 {
 	return SendToPort(MediaServerPort, msgcode, msg, size);
 }
@@ -87,7 +88,7 @@ status_t QueryServer(int32 msgcode, request_data *request, int requestsize, repl
 
 
 // Raw data based data exchange with the media_addon_server
-status_t SendToAddonServer(int32 msgcode, void *msg, int size)
+status_t SendToAddonServer(int32 msgcode, command_data *msg, int size)
 {
 	return SendToPort(MediaAddonServerPort, msgcode, msg, size);
 }
@@ -100,7 +101,7 @@ status_t QueryAddonServer(int32 msgcode, request_data *request, int requestsize,
 
 
 // Raw data based data exchange with the media_server
-status_t SendToPort(port_id sendport, int32 msgcode, void *msg, int size)
+status_t SendToPort(port_id sendport, int32 msgcode, command_data *msg, int size)
 {
 	status_t rv;
 	rv = write_port_etc(sendport, msgcode, msg, size, B_RELATIVE_TIMEOUT, TIMEOUT);

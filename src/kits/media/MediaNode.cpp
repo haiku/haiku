@@ -327,7 +327,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 			return B_OK;
 	}
 
-	if (fControllableThis && message > CONTROLLABLE_MESSAGE_START && message < CONTROLLABLE_MESSAGE_END) {
+	if (message > CONTROLLABLE_MESSAGE_START && message < CONTROLLABLE_MESSAGE_END) {
 		if (!fControllableThis)
 			fControllableThis = dynamic_cast<BControllable *>(this);
 		TRACE("BMediaNode::WaitForMessage calling BControllable %p\n", fControllableThis);
@@ -335,7 +335,7 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil,
 			return B_OK;
 	}
 
-	if (fTimeSourceThis && message > TIMESOURECE_MESSAGE_START && message < TIMESOURECE_MESSAGE_END) {
+	if (message > TIMESOURECE_MESSAGE_START && message < TIMESOURECE_MESSAGE_END) {
 		if (!fTimeSourceThis)
 			fTimeSourceThis = dynamic_cast<BTimeSource *>(this);
 		TRACE("BMediaNode::WaitForMessage calling BTimeSource %p\n", fTimeSourceThis);
@@ -466,37 +466,37 @@ BMediaNode::HandleMessage(int32 message,
 	switch (message) {
 		case NODE_START:
 		{
-			const xfer_node_start *request = (const xfer_node_start *)data;
-			Start(request->performance_time);
+			const node_start_command *command = static_cast<const node_start_command *>(data);
+			Start(command->performance_time);
 			return B_OK;
 		}
 
 		case NODE_STOP:
 		{
-			const xfer_node_stop *request = (const xfer_node_stop *)data;
-			Stop(request->performance_time, request->immediate);
+			const node_stop_command *command = static_cast<const node_stop_command *>(data);
+			Stop(command->performance_time, command->immediate);
 			return B_OK;
 		}
 
 		case NODE_SEEK:
 		{
-			const xfer_node_seek *request = (const xfer_node_seek *)data;
-			Seek(request->media_time, request->performance_time);
+			const node_seek_command *command = static_cast<const node_seek_command *>(data);
+			Seek(command->media_time, command->performance_time);
 			return B_OK;
 		}
 
 		case NODE_SET_RUN_MODE:
 		{
-			const xfer_node_set_run_mode *request = (const xfer_node_set_run_mode *)data;
-			fRunMode = request->mode;
+			const node_set_run_mode_command *command = static_cast<const node_set_run_mode_command *>(data);
+			fRunMode = command->mode;
 			SetRunMode(fRunMode);
 			return B_OK;
 		}
 
 		case NODE_TIME_WARP:
 		{
-			const xfer_node_time_warp *request = (const xfer_node_time_warp *)data;
-			TimeWarp(request->at_real_time,request->to_performance_time);
+			const node_time_warp_command *command = static_cast<const node_time_warp_command *>(data);
+			TimeWarp(command->at_real_time, command->to_performance_time);
 			return B_OK;
 		}
 
@@ -508,11 +508,11 @@ BMediaNode::HandleMessage(int32 message,
 		
 		case NODE_SET_TIMESOURCE:
 		{
-			const xfer_node_set_timesource *request = (const xfer_node_set_timesource *)data;
+			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
 			bool first = (fTimeSourceID == 0);
 			if (fTimeSource)
 				fTimeSource->Release();
-			fTimeSourceID = request->timesource_id;
+			fTimeSourceID = command->timesource_id;
 			fTimeSource = 0; // XXX create timesource object here
 			fTimeSource = new _SysTimeSource;
 			if (!first)
@@ -522,8 +522,8 @@ BMediaNode::HandleMessage(int32 message,
 
 		case NODE_REQUEST_COMPLETED:
 		{
-			const xfer_node_request_completed *request = (const xfer_node_request_completed *)data;
-			RequestCompleted(request->info);
+			const node_request_completed_command *command = static_cast<const node_request_completed_command *>(data);
+			RequestCompleted(command->info);
 			return B_OK;
 		}
 		
