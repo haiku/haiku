@@ -12,8 +12,7 @@
 #include <user_runtime.h>
 
 
-int RLD_STARTUP(void *);
-int rldmain(void *arg);
+int runtime_loader(void *arg);
 
 status_t unload_program(image_id imageID);
 image_id load_program(char const *path, void **entry);

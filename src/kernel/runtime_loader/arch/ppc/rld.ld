@@ -1,7 +1,7 @@
 OUTPUT_FORMAT("elf32-powerpc", "elf32-powerpc", "elf32-powerpc")
 OUTPUT_ARCH(powerpc)
 
-ENTRY(RLD_STARTUP)
+ENTRY(runtime_loader)
 SEARCH_DIR("libgcc");
 SECTIONS
 {

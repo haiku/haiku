@@ -2,7 +2,6 @@ SubDir OBOS_TOP src kernel runtime_loader ;
 
 KernelObjects 
 	rld.c
-	rld0.c
 	rldexport.c
 	rldelf.c
 	rldheap.c
@@ -48,7 +47,6 @@ KernelStaticLibraryObjects librld.a :
 	;
 
 KernelLd rld.so :
-	<$(SOURCE_GRIST)>rld0.o
 	<$(SOURCE_GRIST)>rld.o
 	<$(SOURCE_GRIST)>rldelf.o
 	<$(SOURCE_GRIST)>rldexport.o
