@@ -204,6 +204,33 @@ BApplication::BApplication(const char *signature, status_t *_error)
 }
 
 
+BApplication::BApplication(BMessage *data)
+	// Note: BeOS calls the private BLooper(int32, port_id, const char *)
+	// constructor here, test if it's needed
+	: BLooper(looper_name_for(NULL))
+{
+	const char *signature = NULL;	
+	data->FindString("mime_sig", &signature);
+
+	InitData(signature, NULL);
+
+	bigtime_t pulseRate;
+	if (data->FindInt64("_pulse", &pulseRate) == B_OK)
+		SetPulseRate(pulseRate);
+
+}
+
+
+BApplication::BApplication(uint32 signature)
+{
+}
+
+
+BApplication::BApplication(const BApplication &rhs)
+{
+}
+
+
 BApplication::~BApplication()
 {
 	Lock();
@@ -229,20 +256,196 @@ BApplication::~BApplication()
 }
 
 
-BApplication::BApplication(BMessage *data)
-	// Note: BeOS calls the private BLooper(int32, port_id, const char *)
-	// constructor here, test if it's needed
-	: BLooper(looper_name_for(NULL))
+BApplication &
+BApplication::operator=(const BApplication &rhs)
 {
-	const char *signature = NULL;	
-	data->FindString("mime_sig", &signature);
+	return *this;
+}
 
-	InitData(signature, NULL);
 
-	bigtime_t pulseRate;
-	if (data->FindInt64("_pulse", &pulseRate) == B_OK)
-		SetPulseRate(pulseRate);
+void
+BApplication::InitData(const char *signature, status_t *_error)
+{
+	// check whether there exists already an application
+	if (be_app)
+		debugger("2 BApplication objects were created. Only one is allowed.");
 
+	fServerFrom = fServerTo = -1;
+	fServerHeap = NULL;
+	fInitialWorkspace = 0;
+	fDraggedMessage = NULL;
+	fReadyToRunCalled = false;
+
+	// initially, there is no pulse
+	fPulseRunner = NULL;
+	fPulseRate = 0;
+
+	// check signature
+	fInitError = check_app_signature(signature);
+	fAppName = signature;
+
+#ifndef RUN_WITHOUT_REGISTRAR
+	bool isRegistrar = signature
+		&& !strcasecmp(signature, kRegistrarSignature);
+	// get team and thread
+	team_id team = Team();
+	thread_id thread = BPrivate::main_thread_for(team);
+#endif
+
+	// get app executable ref
+	entry_ref ref;
+	if (fInitError == B_OK)
+		fInitError = BPrivate::get_app_ref(&ref);
+
+	// get the BAppFileInfo and extract the information we need
+	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
+	if (fInitError == B_OK) {
+		BAppFileInfo fileInfo;
+		BFile file(&ref, B_READ_ONLY);
+		fInitError = fileInfo.SetTo(&file);
+		if (fInitError == B_OK) {
+			fileInfo.GetAppFlags(&appFlags);
+			char appFileSignature[B_MIME_TYPE_LENGTH + 1];
+			// compare the file signature and the supplied signature
+			if (fileInfo.GetSignature(appFileSignature) == B_OK
+				&& strcasecmp(appFileSignature, signature) != 0) {
+				printf("Signature in rsrc doesn't match constructor arg. (%s, %s)\n",
+					signature, appFileSignature);
+			}
+		}
+	}
+
+#ifndef RUN_WITHOUT_REGISTRAR
+	// check whether be_roster is valid
+	if (fInitError == B_OK && !isRegistrar
+		&& !BRoster::Private().IsMessengerValid(false)) {
+		printf("FATAL: be_roster is not valid. Is the registrar running?\n");
+		fInitError = B_NO_INIT;
+	}
+
+	// check whether or not we are pre-registered
+	bool preRegistered = false;
+	app_info appInfo;
+	if (fInitError == B_OK && !isRegistrar) {
+		preRegistered = BRoster::Private().IsAppPreRegistered(&ref, team,
+							&appInfo);
+	}
+	if (preRegistered) {
+		// we are pre-registered => the app info has been filled in
+		// Check whether we need to replace the looper port with a port
+		// created by the roster.
+		if (appInfo.port >= 0 && appInfo.port != fMsgPort) {
+			delete_port(fMsgPort);
+			fMsgPort = appInfo.port;
+		} else
+			appInfo.port = fMsgPort;
+		// check the signature and correct it, if necessary
+		if (strcasecmp(appInfo.signature, fAppName))
+			BRoster::Private().SetSignature(team, fAppName);
+		// complete the registration
+		fInitError = BRoster::Private().CompleteRegistration(team, thread,
+						appInfo.port);
+	} else if (fInitError == B_OK) {
+		// not pre-registered -- try to register the application
+		team_id otherTeam = -1;
+		// the registrar must not register
+		if (!isRegistrar) {
+			fInitError = BRoster::Private().AddApplication(signature, &ref,
+				appFlags, team, thread, fMsgPort, true, NULL, &otherTeam);
+		}
+		if (fInitError == B_ALREADY_RUNNING) {
+			// An instance is already running and we asked for
+			// single/exclusive launch. Send our argv to the running app.
+			// Do that only, if the app is NOT B_ARGV_ONLY.
+			if (otherTeam >= 0 && __libc_argc > 1) {
+				app_info otherAppInfo;
+				if (be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo) == B_OK
+					&& !(otherAppInfo.flags & B_ARGV_ONLY)) {
+					// create an B_ARGV_RECEIVED message
+					BMessage argvMessage(B_ARGV_RECEIVED);
+					fill_argv_message(&argvMessage);
+
+					// replace the first argv string with the path of the
+					// other application
+					BPath path;
+					if (path.SetTo(&otherAppInfo.ref) == B_OK)
+						argvMessage.ReplaceString("argv", 0, path.Path());
+
+					// send the message
+					BMessenger(NULL, otherTeam).SendMessage(&argvMessage);
+				}
+			}
+		} else if (fInitError == B_OK) {
+			// the registrations was successful
+			// Create a B_ARGV_RECEIVED message and send it to ourselves.
+			// Do that even, if we are B_ARGV_ONLY.
+			// TODO: When BLooper::AddMessage() is done, use that instead of
+			// PostMessage().
+
+			DBG(OUT("info: BApplication sucessfully registered.\n"));
+
+			if (__libc_argc > 1) {
+				BMessage argvMessage(B_ARGV_RECEIVED);
+				fill_argv_message(&argvMessage);
+				PostMessage(&argvMessage, this);
+			}
+			// send a B_READY_TO_RUN message as well
+			PostMessage(B_READY_TO_RUN, this);
+		} else if (fInitError > B_ERRORS_END) {
+			// Registrar internal errors shouldn't fall into the user's hands.
+			fInitError = B_ERROR;
+		}
+	}
+#endif	// ifdef RUN_WITHOUT_REGISTRAR
+
+	// TODO: Not completely sure about the order, but this should be close.
+
+#ifndef RUN_WITHOUT_APP_SERVER
+	// An app_server connection is necessary for a lot of stuff, so get that first.
+	if (fInitError == B_OK)
+		connect_to_app_server();
+	if (fInitError == B_OK)
+		setup_server_heaps();
+	if (fInitError == B_OK)
+		get_scs();
+#endif	// RUN_WITHOUT_APP_SERVER
+
+	// init be_app and be_app_messenger
+	if (fInitError == B_OK) {
+		be_app = this;
+		be_app_messenger = BMessenger(NULL, this);
+	}
+
+#ifndef RUN_WITHOUT_APP_SERVER
+	// Initialize the IK after we have set be_app because of a construction of a
+	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
+	if (fInitError == B_OK)
+		fInitError = _init_interface_kit_();
+#endif	// RUN_WITHOUT_APP_SERVER
+
+	// set the BHandler's name
+	if (fInitError == B_OK)
+		SetName(ref.name);
+	// create meta MIME
+	if (fInitError == B_OK) {
+		BPath path;
+		if (path.SetTo(&ref) == B_OK)
+			create_app_meta_mime(path.Path(), false, true, false);
+	}
+
+#ifndef RUN_WITHOUT_APP_SERVER
+	// create global system cursors
+	// ToDo: these could have a predefined server token to safe the communication!
+	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
+	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
+#endif	// RUN_WITHOUT_APP_SERVER
+
+	// Return the error or exit, if there was an error and no error variable
+	// has been supplied.
+	if (_error)
+		*_error = fInitError;
+	else if (fInitError != B_OK)
+		exit(0);
 }
 
 
@@ -360,12 +563,14 @@ BApplication::QuitRequested()
 void
 BApplication::Pulse()
 {
+	// supposed to be implemented by subclasses
 }
 
 
 void
 BApplication::ReadyToRun()
 {
+	// supposed to be implemented by subclasses
 }
 
 
@@ -753,23 +958,6 @@ BApplication::Perform(perform_code d, void *arg)
 }
 
 
-BApplication::BApplication(uint32 signature)
-{
-}
-
-
-BApplication::BApplication(const BApplication &rhs)
-{
-}
-
-
-BApplication &
-BApplication::operator=(const BApplication &rhs)
-{
-	return *this;
-}
-
-
 void BApplication::_ReservedApplication1() {}
 void BApplication::_ReservedApplication2() {}
 void BApplication::_ReservedApplication3() {}
@@ -801,192 +989,6 @@ BApplication::run_task()
 {
 	// ToDo: run_task() could be removed completely
 	task_looper();
-}
-
-
-void
-BApplication::InitData(const char *signature, status_t *_error)
-{
-	// check whether there exists already an application
-	if (be_app)
-		debugger("2 BApplication objects were created. Only one is allowed.");
-
-	fServerFrom = fServerTo = -1;
-	fServerHeap = NULL;
-	fInitialWorkspace = 0;
-	fDraggedMessage = NULL;
-	fReadyToRunCalled = false;
-
-	// initially, there is no pulse
-	fPulseRunner = NULL;
-	fPulseRate = 0;
-
-	// check signature
-	fInitError = check_app_signature(signature);
-	fAppName = signature;
-
-#ifndef RUN_WITHOUT_REGISTRAR
-	bool isRegistrar = signature
-		&& !strcasecmp(signature, kRegistrarSignature);
-	// get team and thread
-	team_id team = Team();
-	thread_id thread = BPrivate::main_thread_for(team);
-#endif
-
-	// get app executable ref
-	entry_ref ref;
-	if (fInitError == B_OK)
-		fInitError = BPrivate::get_app_ref(&ref);
-
-	// get the BAppFileInfo and extract the information we need
-	uint32 appFlags = B_REG_DEFAULT_APP_FLAGS;
-	if (fInitError == B_OK) {
-		BAppFileInfo fileInfo;
-		BFile file(&ref, B_READ_ONLY);
-		fInitError = fileInfo.SetTo(&file);
-		if (fInitError == B_OK) {
-			fileInfo.GetAppFlags(&appFlags);
-			char appFileSignature[B_MIME_TYPE_LENGTH + 1];
-			// compare the file signature and the supplied signature
-			if (fileInfo.GetSignature(appFileSignature) == B_OK
-				&& strcasecmp(appFileSignature, signature) != 0) {
-				printf("Signature in rsrc doesn't match constructor arg. (%s, %s)\n",
-					signature, appFileSignature);
-			}
-		}
-	}
-
-#ifndef RUN_WITHOUT_REGISTRAR
-	// check whether be_roster is valid
-	if (fInitError == B_OK && !isRegistrar
-		&& !BRoster::Private().IsMessengerValid(false)) {
-		printf("FATAL: be_roster is not valid. Is the registrar running?\n");
-		fInitError = B_NO_INIT;
-	}
-
-	// check whether or not we are pre-registered
-	bool preRegistered = false;
-	app_info appInfo;
-	if (fInitError == B_OK && !isRegistrar) {
-		preRegistered = BRoster::Private().IsAppPreRegistered(&ref, team,
-							&appInfo);
-	}
-	if (preRegistered) {
-		// we are pre-registered => the app info has been filled in
-		// Check whether we need to replace the looper port with a port
-		// created by the roster.
-		if (appInfo.port >= 0 && appInfo.port != fMsgPort) {
-			delete_port(fMsgPort);
-			fMsgPort = appInfo.port;
-		} else
-			appInfo.port = fMsgPort;
-		// check the signature and correct it, if necessary
-		if (strcasecmp(appInfo.signature, fAppName))
-			BRoster::Private().SetSignature(team, fAppName);
-		// complete the registration
-		fInitError = BRoster::Private().CompleteRegistration(team, thread,
-						appInfo.port);
-	} else if (fInitError == B_OK) {
-		// not pre-registered -- try to register the application
-		team_id otherTeam = -1;
-		// the registrar must not register
-		if (!isRegistrar) {
-			fInitError = BRoster::Private().AddApplication(signature, &ref,
-				appFlags, team, thread, fMsgPort, true, NULL, &otherTeam);
-		}
-		if (fInitError == B_ALREADY_RUNNING) {
-			// An instance is already running and we asked for
-			// single/exclusive launch. Send our argv to the running app.
-			// Do that only, if the app is NOT B_ARGV_ONLY.
-			if (otherTeam >= 0 && __libc_argc > 1) {
-				app_info otherAppInfo;
-				if (be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo) == B_OK
-					&& !(otherAppInfo.flags & B_ARGV_ONLY)) {
-					// create an B_ARGV_RECEIVED message
-					BMessage argvMessage(B_ARGV_RECEIVED);
-					fill_argv_message(&argvMessage);
-
-					// replace the first argv string with the path of the
-					// other application
-					BPath path;
-					if (path.SetTo(&otherAppInfo.ref) == B_OK)
-						argvMessage.ReplaceString("argv", 0, path.Path());
-
-					// send the message
-					BMessenger(NULL, otherTeam).SendMessage(&argvMessage);
-				}
-			}
-		} else if (fInitError == B_OK) {
-			// the registrations was successful
-			// Create a B_ARGV_RECEIVED message and send it to ourselves.
-			// Do that even, if we are B_ARGV_ONLY.
-			// TODO: When BLooper::AddMessage() is done, use that instead of
-			// PostMessage().
-
-			DBG(OUT("info: BApplication sucessfully registered.\n"));
-
-			if (__libc_argc > 1) {
-				BMessage argvMessage(B_ARGV_RECEIVED);
-				fill_argv_message(&argvMessage);
-				PostMessage(&argvMessage, this);
-			}
-			// send a B_READY_TO_RUN message as well
-			PostMessage(B_READY_TO_RUN, this);
-		} else if (fInitError > B_ERRORS_END) {
-			// Registrar internal errors shouldn't fall into the user's hands.
-			fInitError = B_ERROR;
-		}
-	}
-#endif	// ifdef RUN_WITHOUT_REGISTRAR
-
-	// TODO: Not completely sure about the order, but this should be close.
-
-#ifndef RUN_WITHOUT_APP_SERVER
-	// An app_server connection is necessary for a lot of stuff, so get that first.
-	if (fInitError == B_OK)
-		connect_to_app_server();
-	if (fInitError == B_OK)
-		setup_server_heaps();
-	if (fInitError == B_OK)
-		get_scs();
-#endif	// RUN_WITHOUT_APP_SERVER
-
-	// init be_app and be_app_messenger
-	if (fInitError == B_OK) {
-		be_app = this;
-		be_app_messenger = BMessenger(NULL, this);
-	}
-
-#ifndef RUN_WITHOUT_APP_SERVER
-	// Initialize the IK after we have set be_app because of a construction of a
-	// BAppServerLink (which depends on be_app) nested inside the call to get_menu_info.
-	if (fInitError == B_OK)
-		fInitError = _init_interface_kit_();
-#endif	// RUN_WITHOUT_APP_SERVER
-
-	// set the BHandler's name
-	if (fInitError == B_OK)
-		SetName(ref.name);
-	// create meta MIME
-	if (fInitError == B_OK) {
-		BPath path;
-		if (path.SetTo(&ref) == B_OK)
-			create_app_meta_mime(path.Path(), false, true, false);
-	}
-
-#ifndef RUN_WITHOUT_APP_SERVER
-	// create global system cursors
-	// ToDo: these could have a predefined server token to safe the communication!
-	B_CURSOR_SYSTEM_DEFAULT = new BCursor(B_HAND_CURSOR);
-	B_CURSOR_I_BEAM = new BCursor(B_I_BEAM_CURSOR);
-#endif	// RUN_WITHOUT_APP_SERVER
-
-	// Return the error or exit, if there was an error and no error variable
-	// has been supplied.
-	if (_error)
-		*_error = fInitError;
-	else if (fInitError != B_OK)
-		exit(0);
 }
 
 
