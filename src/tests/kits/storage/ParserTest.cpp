@@ -31,10 +31,10 @@ ParserTest::ScannerTest() {
 
 // Define some useful macros for dynamically allocating
 // various Token classes
-#define T(type) (new Token(type))
-#define S(str) (new StringToken(str))
-#define I(val) (new IntToken(val))
-#define F(val) (new FloatToken(val))
+#define T(type) (new Token(type, -1))
+#define S(str) (new StringToken(str, -1))
+#define I(val) (new IntToken(val, -1))
+#define F(val) (new FloatToken(val, -1))
 
 	struct test_case {
 		const char *rule;

@@ -51,6 +51,7 @@ public:
 	void Unset();
 	status_t InitCheck() const;
 	bool IsEmpty() const;
+	size_t Pos() const;
 	
 	char Get();
 	void Unget();
@@ -83,7 +84,7 @@ const char* tokenTypeToString(TokenType type);
 
 class Token {
 public:
-	Token(TokenType type = EmptyToken);
+	Token(TokenType type = EmptyToken, const size_t posInStream = -1);
 	virtual ~Token();
 	TokenType Type() const;
 	virtual const char* String() const;
@@ -92,11 +93,12 @@ public:
 	bool operator==(Token &ref);
 protected:
 	TokenType fType;
+	size_t fPosInStream;
 };
 
 class StringToken : public Token {
 public:
-	StringToken(const char *string);
+	StringToken(const char *string, const size_t posInStream);
 	virtual ~StringToken();
 	virtual const char* String() const;
 protected:
@@ -105,7 +107,7 @@ protected:
 
 class IntToken : public Token {
 public:
-	IntToken(const int32 value);
+	IntToken(const int32 value, const size_t posInStream);
 	virtual int32 Int() const;
 	virtual double Float() const;
 protected:
@@ -114,7 +116,7 @@ protected:
 
 class FloatToken : public Token {
 public:
-	FloatToken(const double value);
+	FloatToken(const double value, const size_t posInStream);
 	virtual double Float() const;
 protected:
 	double fValue;
@@ -135,10 +137,10 @@ public:
 	bool IsEmpty();
 	
 private:
-	void AddToken(TokenType type);
-	void AddString(const char *str);
-	void AddInt(const char *str);
-	void AddFloat(const char *str);
+	void AddToken(TokenType type, size_t posInStream);
+	void AddString(const char *str, size_t posInStream);
+	void AddInt(const char *str, size_t posInStream);
+	void AddFloat(const char *str, size_t posInStream);
 
 	BList fTokenList;
 	status_t fCStatus;

@@ -27,8 +27,8 @@ using namespace Sniffer;
 TokenStream stream;
 
 // Private parsing functions
-/*
 double parsePriority();
+/*
 BList* parseExprList();
 Expr* parseExpr();
 Range parseRange();
@@ -63,7 +63,7 @@ Sniffer::parse(const char *rule, Rule *result, BString *parseError = NULL) {
 		double priority;
 		BList* exprList;
 		
-//		priority = parsePriority();
+		priority = parsePriority();
 		
 	} catch (Err *err) {
 		if (parseError && err) 
@@ -168,6 +168,11 @@ CharStream::IsEmpty() const {
 	return fPos >= fLen;
 }
 
+size_t
+CharStream::Pos() const {
+	return fPos;
+}
+
 char
 CharStream::Get() {
 	if (fCStatus != B_OK)
@@ -194,8 +199,9 @@ CharStream::Unget() {
 // Token
 //------------------------------------------------------------------------------
 
-Token::Token(TokenType type)
+Token::Token(TokenType type, const size_t posInStream)
 	: fType(type)
+	, fPosInStream(posInStream)
 {
 //	if (type != EmptyToken)
 //		cout << "New Token, fType == " << tokenTypeToString(fType) << endl;
@@ -272,8 +278,8 @@ Token::operator==(Token &ref) {
 // StringToken
 //------------------------------------------------------------------------------
 
-StringToken::StringToken(const char *string)
-	: Token(CharacterString)
+StringToken::StringToken(const char *string, const size_t posInStream)
+	: Token(CharacterString, posInStream)
 	, fString(NULL)
 {
 	if (string) {
@@ -296,8 +302,8 @@ StringToken::String() const {
 // IntToken
 //------------------------------------------------------------------------------
 
-IntToken::IntToken(const int32 value)
-	: Token(Integer)
+IntToken::IntToken(const int32 value, const size_t posInStream)
+	: Token(Integer, posInStream)
 	, fValue(value)
 {
 }
@@ -316,8 +322,8 @@ IntToken::Float() const {
 // FloatToken
 //------------------------------------------------------------------------------
 
-FloatToken::FloatToken(const double value)
-	: Token(FloatingPoint)
+FloatToken::FloatToken(const double value, const size_t posInStream)
+	: Token(FloatingPoint, posInStream)
 	, fValue(value)
 {
 }
@@ -381,6 +387,7 @@ TokenStream::SetTo(const char *string) {
 		char lastLastChar;		// For three char lookahead
 		bool keepLooping = true;
 		while (keepLooping) {
+			size_t pos = stream.Pos();
 			char ch = stream.Get();
 			switch (state) {				
 				case tsssStart:
@@ -437,11 +444,11 @@ TokenStream::SetTo(const char *string) {
 							state = tsssIntOrFloat;							
 							break;							
 													
-						case '&':	AddToken(Ampersand);		break;
-						case '(':	AddToken(LeftParen);		break;
-						case ')':	AddToken(RightParen);		break;
-						case ':':	AddToken(Colon);			break;
-						case '[':	AddToken(LeftBracket);		break;
+						case '&':	AddToken(Ampersand, pos);		break;
+						case '(':	AddToken(LeftParen, pos);		break;
+						case ')':	AddToken(RightParen, pos);		break;
+						case ':':	AddToken(Colon, pos);			break;
+						case '[':	AddToken(LeftBracket, pos);		break;
 						
 						case '\\':
 							charStr = "";					// Clear our string
@@ -449,8 +456,8 @@ TokenStream::SetTo(const char *string) {
 							escapedState = tsssUnquoted;	// Unquoted strings begin with an escaped character
 							break;							
 						
-						case ']':	AddToken(RightBracket);		break;
-						case '|':	AddToken(Divider);			break;
+						case ']':	AddToken(RightBracket, pos);		break;
+						case '|':	AddToken(Divider, pos);			break;
 						
 						default:
 							throw new Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
@@ -464,7 +471,7 @@ TokenStream::SetTo(const char *string) {
 							state = tsssEscape;			// Handle the escape sequence
 							break;							
 						case '\'':
-							AddString(charStr.c_str());
+							AddString(charStr.c_str(), pos);
 							state = tsssStart;
 							break;
 						case 0x3:
@@ -486,7 +493,7 @@ TokenStream::SetTo(const char *string) {
 							state = tsssEscape;			// Handle the escape sequence
 							break;							
 						case '"':
-							AddString(charStr.c_str());
+							AddString(charStr.c_str(), pos);
 							state = tsssStart;
 							break;				
 						case 0x3:
@@ -513,11 +520,11 @@ TokenStream::SetTo(const char *string) {
 						state = tsssFloat;
 					} else if (ch == 0x3 && stream.IsEmpty()) {
 						// Terminate the number and then the loop
-						AddInt(charStr.c_str());
+						AddInt(charStr.c_str(), pos);
 						keepLooping = false;
 					} else {
 						// Terminate the number
-						AddInt(charStr.c_str());
+						AddInt(charStr.c_str(), pos);
 						
 						// Push the last char back on and try again
 						stream.Unget();
@@ -550,11 +557,11 @@ TokenStream::SetTo(const char *string) {
 						lastChar = ch;
 						state = tsssOneHex;
 					} else if (isWhiteSpace(ch) || isPunctuation(ch)) {
-						AddString(charStr.c_str());
+						AddString(charStr.c_str(), pos);
 						stream.Unget();		// So punctuation gets handled properly
 						state = tsssStart;
 					} else if (ch == 0x3 && stream.IsEmpty()) {
-						AddString(charStr.c_str());
+						AddString(charStr.c_str(), pos);
 						keepLooping = false;						
 					} else
 						throw Err(std::string("Sniffer scanner error: unexpected character '") + ch + "'");
@@ -568,7 +575,7 @@ TokenStream::SetTo(const char *string) {
 						state = tsssFloat;
 					} else {
 						// Terminate the number
-						AddInt(charStr.c_str());
+						AddInt(charStr.c_str(), pos);
 						
 						// Push the last char back on and try again
 						stream.Unget();
@@ -581,7 +588,7 @@ TokenStream::SetTo(const char *string) {
 						charStr += ch;
 					else {
 						// Terminate the number
-						AddFloat(charStr.c_str());
+						AddFloat(charStr.c_str(), pos);
 						
 						// Push the last char back on and try again
 						stream.Unget();
@@ -616,7 +623,7 @@ TokenStream::SetTo(const char *string) {
 						throw new Err(std::string("Sniffer scanner error: negative floating point numbers are useless and thus signs (both + and -) are disallowed on floating points"));
 					else {
 						// Terminate the number
-						AddInt(charStr.c_str());
+						AddInt(charStr.c_str(), pos);
 						
 						// Push the last char back on and try again
 						stream.Unget();
@@ -629,13 +636,13 @@ TokenStream::SetTo(const char *string) {
 						escapedState = state;		// Save our state
 						state = tsssEscape;			// Handle the escape sequence
 					} else if (isWhiteSpace(ch) || isPunctuation(ch)) {
-						AddString(charStr.c_str());
+						AddString(charStr.c_str(), pos);
 						stream.Unget();				// In case it's punctuation, let tsssStart handle it
 						state = tsssStart;
 					} else if (ch == '\'' || ch == '"') {
 						throw new Err(std::string("Sniffer scanner error: illegal unquoted character '") + ch + "'");
 					} else if (ch == 0x3 && stream.IsEmpty()) {
-						AddString(charStr.c_str());
+						AddString(charStr.c_str(), pos);
 						keepLooping = false;
 					} else {							
 						charStr += ch;
@@ -745,30 +752,30 @@ TokenStream::IsEmpty() {
 }
 
 void
-TokenStream::AddToken(TokenType type) {
-	Token *token = new Token(type);
+TokenStream::AddToken(TokenType type, size_t posInStream) {
+	Token *token = new Token(type, posInStream);
 	fTokenList.AddItem(token);
 }
 
 void
-TokenStream::AddString(const char *str) {
-	Token *token = new StringToken(str);
+TokenStream::AddString(const char *str, size_t posInStream) {
+	Token *token = new StringToken(str, posInStream);
 	fTokenList.AddItem(token);
 }
 
 void
-TokenStream::AddInt(const char *str) {
+TokenStream::AddInt(const char *str, size_t posInStream) {
 	// Convert the string to an int
 	int32 value = atol(str);	
-	Token *token = new IntToken(value);
+	Token *token = new IntToken(value, posInStream);
 	fTokenList.AddItem(token);
 }
 
 void
-TokenStream::AddFloat(const char *str) {
+TokenStream::AddFloat(const char *str, size_t posInStream) {
 	// Convert the string to a float
 	double value = atof(str);
-	Token *token = new FloatToken(value);
+	Token *token = new FloatToken(value, posInStream);
 	fTokenList.AddItem(token);
 }
 
@@ -917,3 +924,11 @@ Sniffer::tokenTypeToString(TokenType type) {
 	}
 }
 
+//------------------------------------------------------------------------------
+// Parsing functions
+//------------------------------------------------------------------------------
+
+double
+parsePriority() {
+//	stream.Read(LeftBracket);	
+}
