@@ -24,12 +24,21 @@
 //	Description:	BShape encapsulates a Postscript-style "path"
 //------------------------------------------------------------------------------
 
+// Standard Includes -----------------------------------------------------------
+#include <stdlib.h>
+
+// System Includes -------------------------------------------------------------
 #include <Shape.h>
 #include <Point.h>
 #include <Rect.h>
 #include <Errors.h>
 #include <Message.h>
 
+// Project Includes ------------------------------------------------------------
+
+// Local Includes --------------------------------------------------------------
+
+// Local Defines ---------------------------------------------------------------
 #define OP_LINETO		0x10000000
 #define OP_BEZIERTO		0x20000000
 #define OP_CLOSE		0x40000000
@@ -45,6 +54,8 @@ struct shape_data {
 	int32	ptSize;
 	int32	ptBlockSize;
 };
+
+// Globals ---------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
 BShapeIterator::BShapeIterator()
@@ -191,12 +202,13 @@ BShape::~BShape()
 	free(data->opList);
 	free(data->ptList);
 
-	delete fPrivateData;
+	delete (shape_data*)fPrivateData;
 }
 //------------------------------------------------------------------------------
 status_t BShape::Archive(BMessage *archive, bool deep) const
 {
 	status_t err = BArchivable::Archive(archive, deep);
+	int32 i;
 
 	if (err != B_OK)
 		return err;
@@ -211,7 +223,7 @@ status_t BShape::Archive(BMessage *archive, bool deep) const
 	archive->AddData("pts", B_POINT_TYPE, data->ptList, sizeof(BPoint), true,
 		data->ptCount);
 
-	for (int32 i = 1; i < data->ptCount; i++)
+	for (i = 1; i < data->ptCount; i++)
 		archive->AddPoint("pts", data->ptList[i]);
 
 	// Avoids allocation for each op

@@ -7,6 +7,7 @@
 #include <String.h>
 #include <Message.h>
 #include <Window.h>
+#include <Bitmap.h>
 
 // Project Includes ------------------------------------------------------------
 
@@ -19,58 +20,100 @@
 //------------------------------------------------------------------------------
 BMenuItem::BMenuItem(const char *label, BMessage *message, char shortcut,
 					 uint32 modifiers)
-	:	BInvoker(message, NULL),
-		fSubmenu(NULL),
-		fWindow(NULL),
-		fSuper(NULL),
-		fModifiers(modifiers),
-		fCachedWidth(0.0f),
-		fTriggerIndex(0),
-		fUserTrigger(0),
-		fSysTrigger(0),
-		fShortcutChar(shortcut),
-		fMark(false),
-		fEnabled(true),
-		fSelected(false)
 {
+	InitData();
 	fLabel = strdup(label);
+	SetMessage(message);
+
+	fShortcutChar = shortcut;
+
+	if (shortcut != 0)
+		fModifiers = modifiers | B_COMMAND_KEY;
+	else
+		fModifiers = 0;
 }
 //------------------------------------------------------------------------------
 BMenuItem::BMenuItem(BMenu *menu, BMessage *message)
-	:	BInvoker(message, NULL),
-		fSubmenu(menu),
-		fWindow(NULL),
-		fSuper(NULL),
-		fModifiers(0),
-		fCachedWidth(0.0f),
-		fTriggerIndex(0),
-		fUserTrigger(0),
-		fSysTrigger(0),
-		fShortcutChar(0),
-		fMark(false),
-		fEnabled(true),
-		fSelected(false)
 {
-	fLabel = strdup(menu->Name());
-
-	fSubmenu->fSuperitem = this;
+	InitData();
+	SetMessage(message);
+	InitMenuData(menu);
 }
 //------------------------------------------------------------------------------
 BMenuItem::BMenuItem(BMessage *data)
 {
+	InitData();
+
+	if (data->HasString("_label"))
+	{
+		const char *string;
+
+		data->FindString("_label", &string);
+		SetLabel(string);
+	}
+
+	bool disable;
+	if (data->FindBool("_disable", &disable) == B_OK)
+		SetEnabled(!disable);
+
+	bool marked;
+	if (data->FindBool("_marked", &marked) == B_OK)
+		SetMarked(marked);
+
+	if (data->HasInt32("_user_trig"))
+	{
+		int32 user_trig;
+
+		data->FindInt32("_user_trig", &user_trig);
+
+		SetTrigger(user_trig);
+	}
+
+	if (data->HasInt32("_shortcut"))
+	{
+		int32 shortcut, mods;
+
+		data->FindInt32("_shortcut", &shortcut);
+		data->FindInt32("_mods", &mods);
+
+		SetShortcut(shortcut, mods);
+	}
+
+	if (data->HasMessage("_msg"))
+	{
+		BMessage *msg = new BMessage;
+
+		data->FindMessage("_msg", msg);
+		SetMessage(msg);
+	}
+
+	BMessage subMessage;
+
+	if (data->FindMessage("_submenu", &subMessage) == B_OK)
+	{
+		BArchivable *object = instantiate_object(&subMessage);
+
+		if (object)
+		{
+			BMenu *menu = dynamic_cast<BMenu*>(object);
+
+			if (menu)
+				InitMenuData(menu);
+		}
+	}
 }
 //------------------------------------------------------------------------------
 BArchivable *BMenuItem::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BMenuItem"))
 		return new BMenuItem(data);
-
-	return NULL;
+	else
+		return NULL;
 }
 //------------------------------------------------------------------------------
 status_t BMenuItem::Archive(BMessage *data, bool deep) const
 {
-	if (Label())
+	if (fLabel)
 		data->AddString("_label", Label());
 
 	if (!IsEnabled())
@@ -82,7 +125,7 @@ status_t BMenuItem::Archive(BMessage *data, bool deep) const
 	if (fUserTrigger)
 		data->AddInt32("_user_trig", fUserTrigger);
 
-	if (fShortcutChar && fModifiers)
+	if (fShortcutChar)
 	{
 		data->AddInt32("_shortcut", fShortcutChar);
 		data->AddInt32("_mods", fModifiers);
@@ -91,11 +134,12 @@ status_t BMenuItem::Archive(BMessage *data, bool deep) const
 	if (Message())
 		data->AddMessage("_msg", Message());
 
-	if (deep && Submenu())
+	if (deep && fSubmenu)
 	{
 		BMessage submenu;
-		Submenu()->Archive(&submenu);
-		data->AddMessage("_submenu", &submenu);
+
+		if (fSubmenu->Archive(&submenu, true) == B_OK)
+			data->AddMessage("_submenu", &submenu);
 	}
 
 	return B_OK;
@@ -115,20 +159,36 @@ void BMenuItem::SetLabel(const char *string)
 	if (fLabel)
 		free(fLabel);
 
-	fLabel = strdup(string);
+	if (string)
+		fLabel = strdup(string);
+	else
+		string = NULL;
 
-	Menu()->InvalidateLayout();
+	if (fSuper)
+	{
+		fSuper->InvalidateLayout();
+
+		if (fSuper->LockLooper())
+		{
+			fSuper->Invalidate();
+			fSuper->UnlockLooper();
+		}
+	}
 }
 //------------------------------------------------------------------------------
 void BMenuItem::SetEnabled(bool state)
 {
-	if (Menu()->IsEnabled() == false)
-		return;
+	if (fSubmenu)
+		fSubmenu->SetEnabled(state);
 
 	fEnabled = state;
+	BMenu *menu = Menu();
 
-	if (Submenu())
-		Submenu()->SetEnabled(state);
+	if (menu && menu->LockLooper())
+	{
+		menu->Invalidate(fBounds);
+		menu->UnlockLooper();
+	}
 }
 //------------------------------------------------------------------------------
 void BMenuItem::SetMarked(bool state)
@@ -142,12 +202,41 @@ void BMenuItem::SetMarked(bool state)
 void BMenuItem::SetTrigger(char ch)
 {
 	fUserTrigger = ch;
+
+	if (strchr(fLabel, ch) != 0)
+		fSysTrigger = ch;
+	else
+		fSysTrigger = -1;
+
+	if (fSuper)
+		fSuper->InvalidateLayout();
 }
 //------------------------------------------------------------------------------
 void BMenuItem::SetShortcut(char ch, uint32 modifiers)
 {
+	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
+		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
+
 	fShortcutChar = ch;
-	fModifiers = modifiers;
+
+	if (ch != 0)
+		fModifiers = modifiers | B_COMMAND_KEY;
+	else
+		fModifiers = 0;
+
+	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
+		fWindow->AddShortcut(fShortcutChar, fModifiers, this);
+
+	if (fSuper)
+	{
+		fSuper->InvalidateLayout();
+
+		if (fSuper->LockLooper())
+		{
+			fSuper->Invalidate();
+			fSuper->UnlockLooper();
+		}
+	}
 }
 //------------------------------------------------------------------------------
 const char *BMenuItem::Label() const
@@ -157,7 +246,13 @@ const char *BMenuItem::Label() const
 //------------------------------------------------------------------------------
 bool BMenuItem::IsEnabled() const
 {
-	return fEnabled;
+	if (fSubmenu)
+		return fSubmenu->IsEnabled();
+
+	if (!fEnabled)
+		return false;
+
+	return fSuper ? fSuper->IsEnabled() : true;
 }
 //------------------------------------------------------------------------------
 bool BMenuItem::IsMarked() const
@@ -167,10 +262,7 @@ bool BMenuItem::IsMarked() const
 //------------------------------------------------------------------------------
 char BMenuItem::Trigger() const
 {
-	if (fUserTrigger)
-		return fUserTrigger;
-	else
-		return fSysTrigger;
+	return fUserTrigger;
 }
 //------------------------------------------------------------------------------
 char BMenuItem::Shortcut(uint32 *modifiers) const
@@ -198,13 +290,12 @@ BRect BMenuItem::Frame() const
 //------------------------------------------------------------------------------
 void BMenuItem::GetContentSize(float *width, float *height)
 {
-	BMenu *menu = Menu();
+	fSuper->CacheFontInfo();
 	
-	if (menu->fFontHeight == -1)
-		menu->CacheFontInfo();
+	fCachedWidth = fSuper->StringWidth(fLabel);
 
-	*width = (float)ceil(menu->StringWidth(fLabel));
-	*height = menu->fFontHeight;
+	*width = (float)ceil(fCachedWidth);
+	*height = fSuper->fFontHeight;
 }
 //------------------------------------------------------------------------------
 void BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
@@ -213,46 +304,53 @@ void BMenuItem::TruncateLabel(float maxWidth, char *newLabel)
 //------------------------------------------------------------------------------
 void BMenuItem::DrawContent()
 {
+	fSuper->MovePenBy(0, fSuper->fAscent);
 	fSuper->DrawString(fLabel);
 }
 //------------------------------------------------------------------------------
 void BMenuItem::Draw()
 {
-	if (IsEnabled() && fSelected)
+	bool enabled = IsEnabled();
+
+	fSuper->CacheFontInfo();
+
+	if (IsSelected() && (enabled || Submenu())/* && fSuper->fRedrawAfterSticky*/)
 	{
 		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_DARKEN_2_TINT));
 		fSuper->SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_DARKEN_2_TINT));
-		fSuper->FillRect(Frame());	
+		fSuper->FillRect(Frame());
 	}
 
-	BPoint pt = ContentLocation();
-
-	fSuper->MovePenTo(pt.x, pt.y + Menu()->fAscent);
 	if (IsEnabled())
 		fSuper->SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+	else if (IsSelected())
+		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
+			B_LIGHTEN_1_TINT));
 	else
 		fSuper->SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_DISABLED_LABEL_TINT));
+
+	fSuper->MovePenTo(ContentLocation());
 	DrawContent();
 
-	if (Menu()->Layout() == B_ITEMS_IN_COLUMN)
+	if (fSuper->Layout() == B_ITEMS_IN_COLUMN)
 	{
 		if (IsMarked())
 			DrawMarkSymbol();
 
+		if (fShortcutChar)
+			DrawShortcutSymbol();
+
 		if (Submenu())
 			DrawSubmenuSymbol();
-		else if (fShortcutChar)
-			DrawShortcutSymbol();
 	}
 }
 //------------------------------------------------------------------------------
 void BMenuItem::Highlight(bool flag)
 {
-	//Menu()->InvertRect(Frame());
-	Menu()->Invalidate(Frame());
+	Menu()->Draw(Frame());
 }
 //------------------------------------------------------------------------------
 bool BMenuItem::IsSelected() const
@@ -260,11 +358,8 @@ bool BMenuItem::IsSelected() const
 	return fSelected;
 }
 //------------------------------------------------------------------------------
-BPoint BMenuItem::ContentLocation () const
-{
-	if (!Menu())
-		return BPoint();
-	
+BPoint BMenuItem::ContentLocation() const
+{	
 	return BPoint(fBounds.left + Menu()->fPad.left,
 		fBounds.top + Menu()->fPad.top);
 }
@@ -285,61 +380,129 @@ BMenuItem &BMenuItem::operator=(const BMenuItem &)
 //------------------------------------------------------------------------------
 void BMenuItem::InitData()
 {
+	fLabel = NULL;
+	fSubmenu = 0;
+	fWindow = NULL;
+	fSuper = NULL;
+	fModifiers = 0;
+	fCachedWidth = 0;
+	fTriggerIndex = -1;
+	fUserTrigger = 0;
+	fSysTrigger = 0;
+	fShortcutChar = 0;
+	fMark = false;
+	fEnabled = true;
+	fSelected = false;
 }
 //------------------------------------------------------------------------------
 void BMenuItem::InitMenuData(BMenu *menu)
 {
+	fSubmenu = menu;
+	fSubmenu->fSuperitem = this;
+
+	BMenuItem *item;
+
+	if (menu->IsRadioMode() && menu->IsLabelFromMarked() &&
+		(item = menu->FindMarked()) != NULL)
+		SetLabel(item->Label());
+	else
+		SetLabel(menu->Name());
 }
 //------------------------------------------------------------------------------
 void BMenuItem::Install(BWindow *window)
 {
-	if (Submenu())
-		Submenu()->Install(window);
+	if (fSubmenu)
+		fSubmenu->Install(window);
 
-	char shortcut;
-	uint32 modifiers;
-	if (shortcut = Shortcut(&modifiers))
-		window->AddShortcut(shortcut, modifiers, this);
+	fWindow = window;
 
-	if (Target() == NULL)
+	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
+		window->AddShortcut(fShortcutChar, fModifiers, this);
+
+	if (!Messenger().IsValid())
 		SetTarget(window);
 }
 //------------------------------------------------------------------------------
 status_t BMenuItem::Invoke(BMessage *message)
 {
-	if (IsEnabled())
+	if (!IsEnabled())
+		return B_ERROR;
+
+	if (fSuper->IsRadioMode())
+		SetMarked(true);
+
+	bool notify = false;
+	uint32 kind = InvokeKind(&notify);
+
+	BMessage clone(kind);
+	status_t err = B_BAD_VALUE;
+
+	if (!message && !notify)
+		message = Message();
+		
+	if (!message)
 	{
-		BMessage msg;
-
-		if (message)
-			msg = *message;
-		else if (Message())
-			msg = *Message();
-		else
-			return B_OK;
-
-		msg.AddInt64("when", system_time()); // TODO
-		msg.AddPointer("source", this);
-		msg.AddInt32("index", Menu()->IndexOf(this));
-
-		return BInvoker::Invoke(&msg);
+		if (!fSuper->IsWatched())
+			return err;
 	}
 	else
-		return B_OK;
+		clone = *message;
+
+	clone.AddInt32("index", Menu()->IndexOf(this));
+	clone.AddInt64("when", (int64)system_time());
+	clone.AddPointer("source", this);
+	clone.AddMessenger("be:sender", BMessenger(fSuper));
+	
+	if (message)
+		err = BInvoker::Invoke(&clone);
+
+//	TODO: assynchronous messaging
+//	SendNotices(kind, &clone);
+
+	return err;
 }
 //------------------------------------------------------------------------------
 void BMenuItem::Uninstall()
 {
+	if (fSubmenu)
+		fSubmenu->Uninstall();
+
+	if (Target() == fWindow)
+		SetTarget(BMessenger());
+
+	if (0x6c != 0 && fModifiers & B_COMMAND_KEY && fWindow)
+		fWindow->RemoveShortcut(fShortcutChar, fModifiers);
+
+	fWindow = NULL;
 }
 //------------------------------------------------------------------------------
 void BMenuItem::SetSuper(BMenu *super)
 {
+	if (fSuper != NULL && super != NULL)
+	{
+		debugger("Error - can't add menu or menu item to more than 1 container (either menu or menubar).");
+		return;
+	}
+		
 	fSuper = super;
+
+	if (fSubmenu)
+		fSubmenu->fSuper = super;
 }
 //------------------------------------------------------------------------------
 void BMenuItem::Select(bool on)
 {
-	fSelected = on;
+	if (Submenu())
+	{
+		fSelected = on;
+		Highlight(on);
+	}
+	else if (IsEnabled())
+	{
+		fSelected = on;
+		Highlight(on);
+	}
+		
 }
 //------------------------------------------------------------------------------
 void BMenuItem::DrawMarkSymbol()
@@ -374,7 +537,7 @@ void BMenuItem::DrawShortcutSymbol()
 	shortcut += fShortcutChar;
 
 	fSuper->DrawString(shortcut.String(), ContentLocation() +
-		BPoint(fBounds.Width() - 14.0f - 22.0f, fBounds.Height() - 4.0f));
+		BPoint(fBounds.Width() - 14.0f - 32.0f, fBounds.Height() - 4.0f));
 }
 //------------------------------------------------------------------------------
 void BMenuItem::DrawSubmenuSymbol()
@@ -440,13 +603,12 @@ BArchivable *BSeparatorItem::Instantiate(BMessage *data)
 {
 	if (validate_instantiation(data, "BSeparatorItem"))
 		return new BSeparatorItem(data);
-
-	return NULL;
+	else
+		return NULL;
 }
 //------------------------------------------------------------------------------
 void BSeparatorItem::SetEnabled(bool state)
 {
-	BMenuItem::SetEnabled(state);
 }
 //------------------------------------------------------------------------------
 void BSeparatorItem::GetContentSize(float *width, float *height)
