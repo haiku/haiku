@@ -32,7 +32,7 @@ extern int		fs_stat_index(dev_t device, const char *name, struct index_info *ind
 extern DIR		*fs_open_index_dir(dev_t device);
 extern int		fs_close_index_dir(DIR *indexDirectory);
 extern struct dirent *fs_read_index_dir(DIR *indexDirectory);
-extern void		fs_rewind_attr_dir(DIR *indexDirectory);
+extern void		fs_rewind_index_dir(DIR *indexDirectory);
 
 #ifdef  __cplusplus
 }

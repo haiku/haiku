@@ -85,6 +85,10 @@ int sys_create_attr(int fd, const char *name, uint32 type, int openMode);
 int sys_open_attr(int fd, const char *name, int openMode);
 int sys_remove_attr(int fd, const char *name);
 int sys_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName);
+int sys_open_index_dir(dev_t device);
+int sys_create_index(dev_t device, const char *name, uint32 type, uint32 flags);
+int sys_read_index_stat(dev_t device, const char *name, struct stat *stat);
+int sys_remove_index(dev_t device, const char *name);
 int sys_getcwd(char *buffer, size_t size);
 int sys_setcwd(int fd, const char *path);
 
@@ -118,6 +122,10 @@ int user_create_attr(int fd, const char *name, uint32 type, int openMode);
 int user_open_attr(int fd, const char *name, int openMode);
 int user_remove_attr(int fd, const char *name);
 int user_rename_attr(int fromFile, const char *fromName, int toFile, const char *toName);
+int user_open_index_dir(dev_t device);
+int user_create_index(dev_t device, const char *name, uint32 type, uint32 flags);
+int user_read_index_stat(dev_t device, const char *name, struct stat *stat);
+int user_remove_index(dev_t device, const char *name);
 int user_getcwd(char *buffer, size_t size);
 int user_setcwd(int fd, const char *path);
 
