@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Button.h
+//	File Name:		Slider.h
 //	Author:			Marc Flerackers (mflerackers@androme.be)
 //	Description:	BSlider creates and displays a sliding thumb control.
 //------------------------------------------------------------------------------
@@ -174,6 +174,8 @@ virtual void				SetOrientation(orientation);
 virtual void				SetBarThickness(float thickness);
 
 virtual void				SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
+
+virtual void				SetLimits(int32 minimum, int32 maximum); // Was _ReservedSlider4()
 /*----- Private or reserved -----------------------------------------*/
 private:
 		void				_DrawBlockThumb();
@@ -188,7 +190,7 @@ private:
 //virtual	void				_ReservedSlider1();
 //virtual	void				_ReservedSlider2();
 //virtual	void				_ReservedSlider3();
-virtual	void				_ReservedSlider4();
+//virtual	void				_ReservedSlider4();
 virtual	void				_ReservedSlider5();
 virtual	void				_ReservedSlider6();
 virtual	void				_ReservedSlider7();

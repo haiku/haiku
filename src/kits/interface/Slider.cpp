@@ -1002,6 +1002,13 @@ void BSlider::SetFont(const BFont *font, uint32 properties)
 	BControl::SetFont(font, properties);
 }
 //------------------------------------------------------------------------------
+void BSlider::SetLimits(int32 minimum, int32 maximum)
+{
+	// TODO: Redraw
+	fMinValue = minimum;
+	fMaxValue = maximum;
+}
+//------------------------------------------------------------------------------
 void BSlider::_DrawBlockThumb()
 {
 	BRect frame = ThumbFrame();
@@ -1167,7 +1174,7 @@ float BSlider::_MaxPosition() const
 		return BarFrame().top + 1.0f;
 }
 //------------------------------------------------------------------------------			
-void BSlider::_ReservedSlider4() {}
+//void BSlider::_ReservedSlider4() {}
 void BSlider::_ReservedSlider5() {}
 void BSlider::_ReservedSlider6() {}
 void BSlider::_ReservedSlider7() {}
