@@ -6,5 +6,7 @@ KernelStaticLibrary libbus :
 	-fno-pic -D_KERNEL_MODE
 	;
 
-SubInclude OBOS_TOP src kernel core addons bus_managers isa ;
+if $(OBOS_ARCH) = x86 {
+	SubInclude OBOS_TOP src kernel core addons bus_managers isa ;
+}
 # SubInclude OBOS_TOP src kernel core addons bus_managers pci ;
