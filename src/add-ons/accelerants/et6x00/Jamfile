@@ -1,0 +1,18 @@
+SubDir OBOS_TOP src add-ons accelerants et6x00 ;
+
+UsePrivateHeaders [ FDirName graphics et6x00 ] ;
+
+Addon et6x00.accelerant : accelerants :
+	Acceleration.c
+	EngineManagment.c
+	GetAccelerantHook.c
+	GetModeInfo.c
+	GlobalData.c
+	InitAccelerant.c
+	ProposeDisplayMode.c
+	SetDisplayMode.c
+	: false
+	:
+;
+
+Depends et6x00.accelerant : et6x00.driver ;

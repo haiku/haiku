@@ -1,0 +1,12 @@
+This graphics driver for BeOS 5 supports Tseng Labs ET6000, ET6100
+and ET6300 chips. Version 0.5 features are:
+ - 640x480, 800x600 and 1024x768 resolutions with 15, 16 and 24 bits
+   per pixel and 60-75 Hz monitor refresh rates;
+ - hardware accelerated screen-to-screen blocks copying;
+ - hardware accelerated rectangular areas filling.
+
+Note that the original Screen preferences program shipped with
+BeOS 5 does not provide the possibily to set 24bpp modes.
+
+To install the driver run install.sh script in Terminal
+from "binaries" directory.

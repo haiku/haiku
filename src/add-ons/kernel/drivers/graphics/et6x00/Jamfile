@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons kernel drivers graphics et6x00 ;
+
+UsePrivateHeaders [ FDirName graphics et6x00 ] ;
+
+R5KernelAddon et6x00.driver : kernel drivers bin :
+	driver.c setmode.c bits.c acl.c
+;
+
+# Link to kernel/drivers/dev/graphics
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
+	local instDriver = <kernel!drivers!dev!graphics>et6x00.driver ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : et6x00.driver ;
+}
