@@ -4,23 +4,32 @@
 ** Distributed under the terms of the NewOS License.
 */
 
+#include <KernelExport.h>
 #include <malloc.h>
 #include <debug.h>
 #include <Errors.h>
 #include <string.h>
 #include <khash.h>
 
-// ToDo: this file apparently contains two different hash implementations
-//		get rid of one of them, and update the external code.
+#define TRACE_HASH 0
+#if TRACE_HASH
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+// ToDo: the hashtable is not expanded when necessary (no load factor, no nothing)
+//		Could try to use pools instead of malloc() for the elements - might be
+//		faster than the current approach.
 
 struct hash_table {
-	struct hash_elem **table;
-	int				next_ptr_offset;
-	unsigned int	table_size;
-	int				num_elems;
-	int				flags;
-	int				(*compare_func)(void *e, const void *key);
-	unsigned int	(*hash_func)(void *e, const void *key, unsigned int range);
+	struct hash_element **table;
+	int		next_ptr_offset;
+	uint32	table_size;
+	int		num_elements;
+	int		flags;
+	int		(*compare_func)(void *e, const void *key);
+	uint32	(*hash_func)(void *e, const void *key, uint32 range);
 };
 
 // XXX gross hack
@@ -29,91 +38,101 @@ struct hash_table {
 #define PUT_IN_NEXT(t, e, val) (*(unsigned long *)NEXT_ADDR(t, e) = (long)(val))
 
 
-void *
-hash_init(unsigned int table_size, int next_ptr_offset,
+static inline void *
+next_element(hash_table *table, void *element)
+{
+	// ToDo: should we use this instead of the NEXT() macro?
+	return (void *)(*(unsigned long *)NEXT_ADDR(table, element));
+}
+
+
+struct hash_table *
+hash_init(uint32 table_size, int next_ptr_offset,
 	int compare_func(void *e, const void *key),
-	unsigned int hash_func(void *e, const void *key, unsigned int range))
+	uint32 hash_func(void *e, const void *key, uint32 range))
 {
 	struct hash_table *t;
 	unsigned int i;
+
+	if (compare_func == NULL || hash_func == NULL) {
+		dprintf("hash_init() called with NULL function pointer\n");
+		return NULL;
+	}
 
 	t = (struct hash_table *)malloc(sizeof(struct hash_table));
 	if (t == NULL)
 		return NULL;
 
-	t->table = (struct hash_elem **)malloc(sizeof(void *) * table_size);
+	t->table = (struct hash_element **)malloc(sizeof(void *) * table_size);
 	if (t->table == NULL) {
 		free(t);
 		return NULL;
 	}
-	
-	for (i = 0; i<table_size; i++)
+
+	for (i = 0; i < table_size; i++)
 		t->table[i] = NULL;
+
 	t->table_size = table_size;
 	t->next_ptr_offset = next_ptr_offset;
 	t->flags = 0;
-	t->num_elems = 0;
+	t->num_elements = 0;
 	t->compare_func = compare_func;
 	t->hash_func = hash_func;
 
-//	dprintf("hash_init: created table 0x%x, next_ptr_offset %d, compare_func 0x%x, hash_func 0x%x\n",
-//		t, next_ptr_offset, compare_func, hash_func);
+	TRACE(("hash_init: created table %p, next_ptr_offset %d, compare_func %p, hash_func %p\n",
+		t, next_ptr_offset, compare_func, hash_func));
 
 	return t;
 }
 
 
 int
-hash_uninit(void *_hash_table)
+hash_uninit(struct hash_table *table)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
+	ASSERT(table->num_elements == 0);
 
-#if 0
-	if(t->num_elems > 0) {
-		return -1;
-	}
-#endif
-
-	free(t->table);
-	free(t);
+	free(table->table);
+	free(table);
 
 	return 0;
 }
 
 
-int
-hash_insert(void *_hash_table, void *e)
+status_t
+hash_insert(struct hash_table *table, void *element)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
-	unsigned int hash;
+	uint32 hash;
 
-//	dprintf("hash_insert: table 0x%x, element 0x%x\n", t, e);
+	ASSERT(table != NULL && element != NULL);
+	TRACE(("hash_insert: table 0x%x, element 0x%x\n", table, element));
 
-	hash = t->hash_func(e, NULL, t->table_size);
-	PUT_IN_NEXT(t, e, t->table[hash]);
-	t->table[hash] = (struct hash_elem *)e;
-	t->num_elems++;
+	hash = table->hash_func(element, NULL, table->table_size);
+	PUT_IN_NEXT(table, element, table->table[hash]);
+	table->table[hash] = (struct hash_element *)element;
+	table->num_elements++;
+
+	// ToDo: resize hash table if it's grown too much!
 
 	return 0;
 }
 
 
-int hash_remove(void *_hash_table, void *e)
+status_t
+hash_remove(struct hash_table *table, void *_element)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
-	void *i, *last_i;
-	unsigned int hash;
+	uint32 hash = table->hash_func(_element, NULL, table->table_size);
+	void *element, *lastElement = NULL;
 
-	hash = t->hash_func(e, NULL, t->table_size);
-	last_i = NULL;
-	for (i = t->table[hash]; i != NULL; last_i = i, i = NEXT(t, i)) {
-		if (i == e) {
-			if (last_i != NULL)
-				PUT_IN_NEXT(t, last_i, NEXT(t, i));
-			else
-				t->table[hash] = (struct hash_elem *)NEXT(t, i);
-			t->num_elems--;
-			return B_NO_ERROR;
+	for (element = table->table[hash]; element != NULL; lastElement = element, element = NEXT(table, element)) {
+		if (element == _element) {
+			if (lastElement != NULL) {
+				// connect the previous entry with the next one
+				PUT_IN_NEXT(table, lastElement, NEXT(table, element));
+			} else
+				table->table[hash] = (struct hash_element *)NEXT(table, element);
+			table->num_elements--;
+
+			return B_OK;
 		}
 	}
 
@@ -122,16 +141,14 @@ int hash_remove(void *_hash_table, void *e)
 
 
 void *
-hash_find(void *_hash_table, void *e)
+hash_find(struct hash_table *table, void *searchedElement)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
-	void *i;
-	unsigned int hash;
+	uint32 hash = table->hash_func(searchedElement, NULL, table->table_size);
+	void *element;
 
-	hash = t->hash_func(e, NULL, t->table_size);
-	for (i = t->table[hash]; i != NULL; i = NEXT(t, i)) {
-		if (i == e)
-			return i;
+	for (element = table->table[hash]; element != NULL; element = NEXT(table, element)) {
+		if (element == searchedElement)
+			return element;
 	}
 
 	return NULL;
@@ -139,19 +156,14 @@ hash_find(void *_hash_table, void *e)
 
 
 void *
-hash_lookup(void *_hash_table, const void *key)
+hash_lookup(struct hash_table *table, const void *key)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
-	void *i;
-	unsigned int hash;
+	uint32 hash = table->hash_func(NULL, key, table->table_size);
+	void *element;
 
-	if (t->compare_func == NULL)
-		return NULL;
-
-	hash = t->hash_func(NULL, key, t->table_size);
-	for (i = t->table[hash]; i != NULL; i = NEXT(t, i)) {
-		if (t->compare_func(i, key) == 0)
-			return i;
+	for (element = table->table[hash]; element != NULL; element = NEXT(table, element)) {
+		if (table->compare_func(element, key) == 0)
+			return element;
 	}
 
 	return NULL;
@@ -159,264 +171,74 @@ hash_lookup(void *_hash_table, const void *key)
 
 
 struct hash_iterator *
-hash_open(void *_hash_table, struct hash_iterator *i)
+hash_open(struct hash_table *table, struct hash_iterator *iterator)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
-
-	if (i == NULL) {
-		i = (struct hash_iterator *)malloc(sizeof(struct hash_iterator));
-		if (i == NULL)
+	if (iterator == NULL) {
+		iterator = (struct hash_iterator *)malloc(sizeof(struct hash_iterator));
+		if (iterator == NULL)
 			return NULL;
 	}
 
-	hash_rewind(t, i);
+	hash_rewind(table, iterator);
 
-	return i;
+	return iterator;
 }
 
 
 void
-hash_close(void *_hash_table, struct hash_iterator *i, bool freeIterator)
+hash_close(struct hash_table *table, struct hash_iterator *iterator, bool freeIterator)
 {
 	if (freeIterator)
-		free(i);
+		free(iterator);
 }
 
 
 void
-hash_rewind(void *_hash_table, struct hash_iterator *i)
+hash_rewind(struct hash_table *table, struct hash_iterator *iterator)
 {
-	i->ptr = NULL;
-	i->bucket = -1;
+	iterator->current = NULL;
+	iterator->bucket = -1;
 }
 
 
 void *
-hash_next(void *_hash_table, struct hash_iterator *i)
+hash_next(struct hash_table *table, struct hash_iterator *iterator)
 {
-	struct hash_table *t = (struct hash_table *)_hash_table;
-	unsigned int index;
+	uint32 index;
 
 restart:
-	if (!i->ptr) {
-		for (index = (unsigned int)(i->bucket + 1); index < t->table_size; index++) {
-			if (t->table[index]) {
-				i->bucket = index;
-				i->ptr = t->table[index];
+	if (iterator->current == NULL) {
+		// get next bucket
+		for (index = (uint32)(iterator->bucket + 1); index < table->table_size; index++) {
+			if (table->table[index]) {
+				iterator->bucket = index;
+				iterator->current = table->table[index];
 				break;
 			}
 		}
 	} else {
-		i->ptr = NEXT(t, i->ptr);
-		if (!i->ptr)
+		iterator->current = NEXT(table, iterator->current);
+		if (!iterator->current)
 			goto restart;
 	}
 
-	return i->ptr;
+	return iterator->current;
 }
 
 
-unsigned int
-hash_hash_str( const char *str )
+uint32
+hash_hash_string(const char *string)
 {
-	char ch;
-	unsigned int hash = 0;
+	uint32 hash = 0;
+	char c;
 
 	// we assume hash to be at least 32 bits
-	while ((ch = *str++) != 0) {
+	while ((c = *string++) != 0) {
 		hash ^= hash >> 28;
 		hash <<= 4;
-		hash ^= ch;
+		hash ^= c;
 	}
 
 	return hash;
 }
 
-
-
-
-#define MAX_INITIAL 15;
-
-/*
-static void nhash_this(hash_table_index *hi, const void **key, ssize_t *klen,
-                       void **val)
-{
-	if (key)	*key = hi->this->key;
-	if (klen)	*klen = hi->this->klen;
-	if (val)	*val = (void*)hi->this->val;
-}
-*/
-
-
-new_hash_table *
-hash_make(void)
-{
-	status_t rv;
-	new_hash_table *nn;
-
-	nn = (new_hash_table *)malloc(sizeof(new_hash_table));
-	if (nn == NULL)
-		return NULL;
-
-	nn->count = 0;
-	nn->max = MAX_INITIAL;
-
-	nn->array = (hash_entry **)malloc(sizeof(hash_entry) * (nn->max + 1));
-	if (nn == NULL) {
-		free(nn);
-		return NULL;
-	}
-	memset(nn->array, 0, sizeof(hash_entry) * (nn->max +1));
-	rv = pool_init(&nn->pool, sizeof(hash_entry));
-	if (rv < B_OK || nn->pool == NULL) {
-		free(nn->array);
-		free(nn);
-		return NULL;
-	}
-	return nn;
-}
-
-
-static hash_index *
-new_hash_next(hash_index *hi)
-{
-	hi->this_idx = hi->next;
-	while (!hi->this_idx) {
-		if (hi->index > hi->nh->max)
-			return NULL;
-		hi->this_idx = hi->nh->array[hi->index++];
-	}
-	hi->next = hi->this_idx->next;
-	return hi;
-}
-
-
-static hash_index *
-new_hash_first(new_hash_table *nh)
-{
-        hash_index *hi = &nh->iterator;
-        hi->nh = nh;
-        hi->index = 0;
-        hi->this_idx = hi->next = NULL;
-        return new_hash_next(hi);
-}
-
-
-static void
-expand_array(new_hash_table *nh)
-{
-	hash_index *hi;
-	hash_entry **new_array;
-	int new_max = (nh->max + 1) * 2 - 1;
-	int i;
-
-	new_array = (hash_entry **)malloc(sizeof(hash_entry) * new_max + 1);
-	if (new_array == NULL)
-		panic("khash, expand_array failed\n"); // XXX stupid, this function should return an error if it failes
-	memset(new_array, 0, sizeof(hash_entry) * new_max + 1);
-	for (hi = new_hash_first(nh); hi; hi = new_hash_next(hi)) {
-		i = hi->this_idx->hash & new_max;
-		hi->this_idx->next = new_array[i];
-		new_array[i] = hi->this_idx;
-	}
-	free(nh->array);
-	nh->array = new_array;
-	nh->max = new_max;
-}
-
-
-static hash_entry **
-find_entry(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
-{
-	hash_entry **hep;
-	hash_entry *he;
-	const unsigned char *p;
-	int hash = 0;
-	ssize_t i;
-
-	ASSERT(nh != NULL);
-
-	for (p = key, i = klen; i; i--, p++) 
-		hash = hash * 33 + *p;
-
-	for (hep = &nh->array[hash & nh->max], he = *hep; he; hep = &he->next, he = *hep) {
-//		dprintf("khash, find_entry looking at hep %p, he %p\n", hep, he);
-		if (he->hash == hash && he->klen == klen && memcmp(he->key, key, klen) == 0) {
-			break;
-		}
-	}
-
-	if (val == 0) /* val == 0 means we only lookup, and don't insert */
-		return he ? hep : NULL;
-
-	/* add a new linked-list entry */
-	he = (hash_entry *)pool_get(nh->pool);
-	if (he == NULL)
-		return NULL;
-	
-	/* copy the key */
-	he->key  = malloc(klen);
-	if (he->key == NULL) {
-		pool_put(nh->pool, he);
-		return NULL;
-	}
-	memcpy(he->key, key, klen);
-
-	he->next = NULL;
-	he->hash = hash;
-	he->klen = klen;
-	he->val = val;
-	*hep = he;
-	nh->count++;
-	return hep;
-}
-
-
-void *
-hash_get(new_hash_table *nh, const void *key, ssize_t klen)
-{
-	hash_entry **hepp;
-	hash_entry *hep;
-
-	ASSERT(nh != NULL);
-	
-	hepp = find_entry(nh, key, klen, NULL);
-//	dprintf("khash, find_entry returned %p\n", hepp);
-	if (hepp == NULL)
-		return NULL;
-
-	hep = *hepp;
-	if (hep == NULL)
-		return NULL;
-	
-	return (void *) hep->val; /* XXX casting away the const */
-}
-
-
-void
-hash_set(new_hash_table *nh, const void *key, ssize_t klen, const void *val)
-{
-	hash_entry **hep;
-	hash_entry *old;
-	
-	ASSERT(nh != NULL);
-	
-	hep = find_entry(nh, key, klen, val);
-	ASSERT(hep != NULL);
-
-	if (*hep) {
-		if (!val) {
-			/* delete it */
-			old = *hep;
-			*hep = (*hep)->next;
-			--nh->count;
-			pool_put(nh->pool, old);
-		} else {
-			/* replace it */
-			(*hep)->val = val;
-			if (nh->count > nh->max) 
-				expand_array(nh);
-		}
-	}
-	else ASSERT(false);
-}
