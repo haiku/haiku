@@ -194,12 +194,10 @@ void ServerWindow::Init(void)
 		resume_thread(fMonitorThreadID);
 }
 //------------------------------------------------------------------------------
-//!Tears down all connections with the user application, kills the monitoring thread.
+//!Tears down all connections the main app_server objects, and deletes some internals.
 ServerWindow::~ServerWindow(void)
 {
 	STRACE(("*ServerWindow (%s):~ServerWindow()\n",fTitle.String()));
-	
-	desktop->fGeneralLock.Lock();
 	
 	desktop->RemoveWinBorder(fWinBorder);
 	STRACE(("SW(%s) Successfully removed from the desktop\n", fTitle.String()));
@@ -220,8 +218,7 @@ ServerWindow::~ServerWindow(void)
 	
 	if (fTopLayer)
 		delete fTopLayer;
-	
-	desktop->fGeneralLock.Unlock();
+
 	STRACE(("#ServerWindow(%s) will exit NOW!!!\n", fTitle.String()));
 }
 //5700 - fara servo , fara cas
@@ -2229,27 +2226,16 @@ int32 ServerWindow::MonitorWin(void *data)
 
 		switch(code)
 		{
+			case AS_DELETE_WINDOW:
 			case AS_CLIENT_DEAD:
 			{
 				// this means the client has been killed
-				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD' message code\n",win->Title()));
+				STRACE(("ServerWindow %s received 'AS_CLIENT_DEAD/AS_DELETE_WINDOW' message code\n",win->Title()));
 				quitting = true;
-				// TODO: this is not that simple. Desktop Class should delete a window.
-				// something like: Desktop::DeleteWindow(thisWindow). 
+				// ServerWindow's destructor takes care of pulling this object off the desktop.
 				delete win;
 				break;
 			}
-			// TODO: This message is never received.... why?
-/*			case AS_QUIT_APP:
-			{
-				// We receive this _only_ when the server is shutting down. The app_server
-				// is not asking the app to quit - it's *telling* it to quit because
-				// in just a short time, the server itself is going to disappear.
-				
-				BMessage msg(_QUIT_);
-				win->SendMessageToClient(&msg);
-			}
-*/
 			case B_QUIT_REQUESTED:
 			{
 				STRACE(("ServerWindow %s received Quit request\n",win->Title()));

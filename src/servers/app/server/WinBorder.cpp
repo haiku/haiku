@@ -134,6 +134,9 @@ void WinBorder::RebuildFullRegion(void)
 
 void WinBorder::MouseDown(PortMessage *msg)
 {
+	if (!(Window()->IsLocked()))
+		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseDown()\n");
+
 	// this is important to determine how much we should resize or move the Layer(WinBorder)(window)
 
 	// user clicked on WinBorder's visible region, which is in fact decorator's.
@@ -245,6 +248,9 @@ void WinBorder::MouseDown(PortMessage *msg)
 
 void WinBorder::MouseMoved(PortMessage *msg)
 {
+	if (!(Window()->IsLocked()))
+		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseMoved()\n");
+
 	BPoint pt;
 	int64 dummy;
 	int32 buttons;
@@ -298,6 +304,9 @@ void WinBorder::MouseMoved(PortMessage *msg)
 
 void WinBorder::MouseUp(PortMessage *msg)
 {
+	if (!(Window()->IsLocked()))
+		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseUp()\n");
+
 	if (fIsMoving)
 	{
 		fIsMoving	= false;
@@ -377,7 +386,7 @@ void WinBorder::MoveBy(float x, float y)
 	STRACE(("WinBorder(%s)::MoveBy()\n", GetName()));
 	if(fDecorator)
 		fDecorator->MoveBy(x,y);
-// TODO: Repair! :-))
+
 	Layer::MoveBy(x,y);
 }
 
@@ -386,7 +395,7 @@ void WinBorder::ResizeBy(float x, float y)
 	STRACE(("WinBorder(%s)::ResizeBy()\n", GetName()));
 	if(fDecorator)
 		fDecorator->ResizeBy(x,y);
-// TODO: Repair! :-))
+
 	Layer::ResizeBy(x,y);
 }
 

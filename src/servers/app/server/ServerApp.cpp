@@ -124,9 +124,10 @@ ServerApp::~ServerApp(void)
 	STRACE(("*ServerApp %s:~ServerApp()\n",fSignature.String()));
 	int32 i;
 	
-	WindowBroadcast(AS_QUIT_APP);
+//	WindowBroadcast(AS_QUIT_APP);
 	
-	// wait for our ServerWindow threads
+// TODO: wait for our ServerWindow threads.
+/*
 	bool ready=true;
 	desktop->fLayerLock.Lock();
 	do{
@@ -154,7 +155,7 @@ ServerApp::~ServerApp(void)
 		}
 	} while(!ready);
 	desktop->fLayerLock.Unlock();
-
+*/
 /*	
 	ServerWindow *tempwin;
 	for(i=0;i<fSWindowList->CountItems();i++)
@@ -267,6 +268,7 @@ void ServerApp::PostMessage(int32 code, size_t size, int8 *buffer)
 	\brief Send a simple message to all of the ServerApp's ServerWindows
 	\param msg The message code to broadcast
 */
+/*
 void ServerApp::WindowBroadcast(int32 code)
 {
 	desktop->fLayerLock.Lock();
@@ -275,11 +277,13 @@ void ServerApp::WindowBroadcast(int32 code)
 	{
 		ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
 		BMessage msg(code);
+		sw->Lock();
 		sw->SendMessageToClient(&msg);
+		sw->Unlock();
 	}
 	desktop->fLayerLock.Unlock();
 }
-
+*/
 /*!
 	\brief Send a message to the ServerApp's BApplication
 	\param msg The message to send
@@ -365,7 +369,13 @@ int32 ServerApp::MonitorApp(void *data)
 				{
 					BMessage pleaseQuit(B_QUIT_REQUESTED);
 					app->SendMessageToClient(&pleaseQuit);
-					app->WindowBroadcast(AS_QUIT_APP);
+// TODO: I do not understand why we nee this? delete.
+//   When BApplications receives B_QUIT_REQUESTED, it asks its BWindow(s) if it can
+// safely quit. If all respond with 'true' then, each one that 'agrees' will send
+// a AS_DELETE_WINDOW message to the server couterpart thread (ServerWindow). Curently,
+// it always quits on this message.
+// DW, I left this text here for you to see it. After you read, please remove it. Thanks.
+//					app->WindowBroadcast(AS_QUIT_APP);
 				}
 				break;
 			}

@@ -251,6 +251,8 @@ DisplayDriver* Desktop::GetDisplayDriver() const
 
 void Desktop::AddWinBorder(WinBorder* winBorder)
 {
+	desktop->fGeneralLock.Lock();
+
 	if(fWinBorderList.HasItem(winBorder))
 		return;
 
@@ -269,14 +271,14 @@ void Desktop::AddWinBorder(WinBorder* winBorder)
 	fLayerLock.Lock();
 	fWinBorderList.AddItem(winBorder);
 	fLayerLock.Unlock();
-	
-// TODO: remove those 2? I vote for: YES! still... have to think...
-//	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
-//	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
+
+	desktop->fGeneralLock.Unlock();
 }
 
 void Desktop::RemoveWinBorder(WinBorder* winBorder)
 {
+	desktop->fGeneralLock.Lock();
+
 	if(winBorder->fLevel == B_SYSTEM_LAST)
 	{
 		for(int32 i=0; i<fRootLayerList.CountItems(); i++)
@@ -285,15 +287,11 @@ void Desktop::RemoveWinBorder(WinBorder* winBorder)
 	else
 		winBorder->GetRootLayer()->RemoveWinBorder(winBorder);
 
-// TODO: remove those 4? I vote for: YES! still... have to think...
-//	if (winBorder == fFrontWinBorder)
-//		SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
-//	if (winBorder == fFocusWinBorder)
-//		SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
-
 	fLayerLock.Lock();
 	fWinBorderList.RemoveItem(winBorder);
 	fLayerLock.Unlock();
+
+	desktop->fGeneralLock.Unlock();
 }
 
 bool Desktop::HasWinBorder(WinBorder* winBorder)
@@ -364,6 +362,7 @@ WinBorder* Desktop::FocusWinBorder(void) const
 //---------------------------------------------------------------------------
 void Desktop::MouseEventHandler(PortMessage *msg)
 {
+// TODO: locking mechanism needs SERIOUS rethought!!!!
 	switch(msg->Code())
 	{
 		case B_MOUSE_DOWN:
@@ -398,13 +397,15 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			{
 				fGeneralLock.Lock();
 				rl->fMainLock.Lock();
+				target->Window()->Lock();
 
 				ws->SearchAndSetNewFront(target);
 				ws->SetFocusLayer(target);
 				
 				fMouseTarget = target;
 				target->MouseDown(msg);
-				
+
+				target->Window()->Unlock();
 				rl->fMainLock.Unlock();
 				fGeneralLock.Unlock();
 			}
@@ -420,7 +421,10 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 
 			if (fMouseTarget)
 			{
+				fMouseTarget->Window()->Lock();
 				fMouseTarget->MouseUp(msg);
+				fMouseTarget->Window()->Unlock();
+
 				fMouseTarget = NULL;				
 			}
 			else
@@ -438,8 +442,11 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 				msg->Rewind();
 
 				WinBorder *target = ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
-				if(target)
+				if(target){
+					target->Window()->Lock();
 					target->MouseUp(msg);
+					target->Window()->Unlock();
+				}
 			}
 			
 			// printf("MOUSE UP: at (%f, %f)\n", pt.x, pt.y);
@@ -469,14 +476,21 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			{
 				fActiveScreen->DDriver()->HideCursor();
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
+
+				fMouseTarget->Window()->Lock();
 				fMouseTarget->MouseMoved(msg);
+				fMouseTarget->Window()->Unlock();
+
 				fActiveScreen->DDriver()->ShowCursor();
 			}
 			else
 			{
 				WinBorder *target = ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(BPoint(x,y));
-				if(target)
+				if(target){
+					target->Window()->Lock();
 					target->MouseMoved(msg);
+					target->Window()->Unlock();
+				}
 
 				fActiveScreen->DDriver()->MoveCursorTo(x,y);
 			}
