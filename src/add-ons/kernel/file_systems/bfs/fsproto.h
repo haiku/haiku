@@ -60,10 +60,10 @@ typedef ino_t		vnode_id;
 #define		IOCTL_MODIFIED_TIME		10003
 
 
-// B_CUR_FS_API_VERSION is 2 for R5, but 3 on Dano, because of the
-// added calls for power management - so it's set to 3 here because
-// that's a requirement to let Dano boot from our fs...
-#if defined(B_BEOS_VERSION_DANO) && !defined(COMPILE_FOR_R5)
+// B_CUR_FS_API_VERSION is 2 for R5, but 3 on Zeta and Dano, because
+// of the added calls for power management - so it's set to 3 here
+// because that's a requirement to let Dano boot from our fs...
+#ifdef COMPILE_FOR_ZETA
 #	define B_CUR_FS_API_VERSION	3
 #else
 #	define B_CUR_FS_API_VERSION 2

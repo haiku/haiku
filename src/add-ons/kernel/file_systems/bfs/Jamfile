@@ -15,6 +15,8 @@ oldOPTIM = $(OPTIM) ;
 	# under Dano/Zeta
 	if $(COMPILE_FOR_R5) {
 		defines += COMPILE_FOR_R5 ;
+	} else if $(COMPILE_FOR_ZETA) {
+		defines += COMPILE_FOR_ZETA ;
 	}
 	
 	# Enable OpenBFS to be compiled as a full BFS replacement. Will
@@ -36,7 +38,7 @@ oldOPTIM = $(OPTIM) ;
 	SubDirC++Flags $(defines) -Wall -Wno-multichar ;
 }
 
-UsePrivateHeaders [ FDirName kernel util ] ;			# For kernel_cpp.cpp
+UsePrivateHeaders [ FDirName kernel ] ;			# For kernel_cpp.cpp
 
 R5KernelAddon $(bfsAddOnName) : [ FDirName kernel file_systems ] :
 	BlockAllocator.cpp
