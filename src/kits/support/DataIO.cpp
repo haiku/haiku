@@ -340,10 +340,17 @@ BMallocIO::WriteAt(off_t pos, const void *buffer, size_t size)
 		return B_BAD_VALUE;
 		
 	size_t newSize = max(pos + size, static_cast<off_t>(fLength));
-	status_t error = SetSize(newSize);	
-	if (error == B_OK)
+	
+	if (newSize > fMallocSize)
+		if (SetSize(newSize) != B_OK)
+			size = 0;
+	
+	if (size > 0) {
 		memcpy(fData + pos, buffer, size);
-	return (error != B_OK ? error : size);
+		if (pos + size > fLength)
+				fLength = pos + size;
+	}
+	return size;
 }
 
 
@@ -396,7 +403,6 @@ BMallocIO::SetSize(off_t size)
 					memset(newData + fMallocSize, 0, newSize - fMallocSize);
 				fData = newData;
 				fMallocSize = newSize;
-				fLength = newSize;
 			} else	// couldn't alloc the memory
 				error = B_NO_MEMORY;
 		}
