@@ -11,7 +11,7 @@ class MediaPlayerApp
 public:
 					MediaPlayerApp();
 	virtual void 	MessageReceived(BMessage *message);
-	virtual	void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
+			void	ArgvReceived(int32 argc, const char *argv[], const char * cwd);
 	virtual void	RefsReceived(BMessage *message);
 	virtual void	ReadyToRun();
 
