@@ -873,9 +873,68 @@ devfs_remove_vnode(fs_volume _fs, fs_vnode _v, bool reenter)
 
 
 static status_t
-devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int omode, int perms, fs_cookie *_cookie, vnode_id *new_vnid)
+devfs_create(fs_volume _fs, fs_vnode _dir, const char *name, int openMode, int perms,
+	fs_cookie *_cookie, vnode_id *_newVnodeID)
 {
-	return EROFS;
+	struct devfs_vnode *dir = (struct devfs_vnode *)_dir;
+	struct devfs *fs = (struct devfs *)_fs;
+	struct devfs_cookie *cookie;
+	struct devfs_vnode *vnode, *vdummy;
+	status_t status = B_OK;
+
+	TRACE(("devfs_create: vnode %p, oflags 0x%x, fs_cookie %p \n", vnode, openMode, _cookie));
+
+	mutex_lock(&fs->lock);
+
+	// look it up
+	vnode = devfs_find_in_dir(dir, name);
+	if (!vnode) {
+		status = EROFS;
+		goto err1;
+	}
+
+	if (openMode & O_EXCL)
+		return B_FILE_EXISTS;
+
+	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	if (status < B_OK)
+		goto err1;
+
+	*_newVnodeID = vnode->id;
+
+	cookie = (struct devfs_cookie *)malloc(sizeof(struct devfs_cookie));
+	if (cookie == NULL) {
+		status = B_NO_MEMORY;
+		goto err2;
+	}
+
+	if (S_ISCHR(vnode->stream.type)) {
+		if (vnode->stream.u.dev.node != NULL) {
+			status = vnode->stream.u.dev.info->open(
+				vnode->stream.u.dev.node->parent->cookie, openMode,
+				&cookie->u.dev.dcookie);
+		} else {
+			char buffer[B_FILE_NAME_LENGTH];
+			get_device_name(vnode, buffer, sizeof(buffer));
+
+			status = vnode->stream.u.dev.ops->open(buffer, openMode,
+				&cookie->u.dev.dcookie);
+		}
+	}
+	if (status < B_OK)
+		goto err3;
+
+	*_cookie = cookie;
+	mutex_unlock(&fs->lock);
+	return B_OK;
+
+err3:
+	free(cookie);
+err2:
+	put_vnode(fs->id, vnode->id);
+err1:
+	mutex_unlock(&fs->lock);
+	return status;
 }
 
 
@@ -905,8 +964,10 @@ devfs_open(fs_volume _fs, fs_vnode _vnode, int openMode, fs_cookie *_cookie)
 				&cookie->u.dev.dcookie);
 		}
 	}
-
-	*_cookie = cookie;
+	if (status < B_OK)
+		free(cookie);
+	else
+		*_cookie = cookie;
 
 	return status;
 }
