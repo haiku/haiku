@@ -15,23 +15,24 @@
 // 
 // ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
 
-#include <View.h>
-#include <Dragger.h>
-#include <Message.h>
 #include <Alert.h>
-#include <Bitmap.h>
-#include <stdio.h>
 #include <Application.h>
-#include <PopUpMenu.h>
-#include <MenuItem.h>
-#include <Roster.h>
-#include <Deskbar.h>
-#include <strings.h>
-#include <List.h>
-#include <String.h>
+#include <Bitmap.h>
 #include <Debug.h>
+#include <Deskbar.h>
+#include <Dragger.h>
 #include <FindDirectory.h>
+#include <File.h>
+#include <List.h>
+#include <MenuItem.h>
+#include <Message.h>
 #include <Path.h>
+#include <PopUpMenu.h>
+#include <Roster.h>
+#include <String.h>
+#include <View.h>
+#include <stdio.h>
+#include <strings.h>
 #include "VolumeSlider.h"
 #include "DeskButton.h"
 #include "iconfile.h"
