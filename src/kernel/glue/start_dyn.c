@@ -22,9 +22,6 @@ extern char **argv_save;
 extern thread_id __main_thread_id;
 extern char **environ;
 
-extern char **__libc_argv;
-extern int __libc_argc;
-
 
 /* The argument list is redundant, but that is for keeping BeOS compatibility.
  * BeOS doesn't have the last pointer, though.
@@ -39,7 +36,7 @@ _start(int argc, char **argv, char **_environ, struct uspace_program_args *args)
 	__main_thread_id = find_thread(NULL);
 	environ = args->envp;
 
-	returnCode = main(__libc_argc, __libc_argv);
+	returnCode = main(args->argc, args->argv);
 
 	exit(returnCode);
 	return 0;
