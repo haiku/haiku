@@ -13,9 +13,14 @@
 
 namespace Sniffer {
 
+class Err;
+
 class Range {
 public:
 	Range(int32 start, int32 end);
+	
+	status_t InitCheck() const;
+	Err* GetErr() const;
 
 	int32 Start() const;
 	int32 End() const;
@@ -24,6 +29,7 @@ public:
 private:
 	int32 fStart;
 	int32 fEnd;
+	status_t fCStatus;
 };
 
 }
