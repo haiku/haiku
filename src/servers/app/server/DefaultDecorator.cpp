@@ -282,6 +282,35 @@ void DefaultDecorator::MoveBy(BPoint pt)
 	bottomborder.OffsetBy(pt);
 }
 
+void DefaultDecorator::ResizeBy(float x, float y)
+{
+	ResizeBy(BPoint(x,y));
+}
+
+void DefaultDecorator::ResizeBy(BPoint pt)
+{
+	STRACE(("DefaultDecorator: Resize By (%.1f, %.1f)\n",pt.x,pt.y));
+	// Move all internal rectangles the appropriate amount
+	_frame.right	+= pt.x;
+	_frame.bottom	+= pt.y;
+
+// TODO: make bigger/smaller
+//	_tabrect.
+
+	_resizerect.OffsetBy(pt);
+	_zoomrect.OffsetBy(pt);
+	_borderrect.right	+= pt.x;
+	_borderrect.bottom	+= pt.y;
+	
+	leftborder.bottom	+= pt.y;
+	topborder.right		+= pt.x;
+	rightborder.OffsetBy(pt.x, 0.0f);
+	rightborder.bottom	+= pt.y;
+	
+	bottomborder.OffsetBy(0.0, pt.y);
+	bottomborder.right	+= pt.x;
+}
+
 void DefaultDecorator::GetFootprint(BRegion *region)
 {
 	STRACE(("DefaultDecorator: Get Footprint\n"));
