@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -83,6 +83,14 @@ platform_start_kernel(void)
 {
 	printf("kernel entry at %p\n", (void *)gKernelArgs.kernel_image.elf_header.e_entry);
 	of_exit();
+}
+
+
+uint32
+platform_boot_options(void)
+{
+	// ToDo: implement me!
+	return 0;
 }
 
 
