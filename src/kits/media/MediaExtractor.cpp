@@ -159,6 +159,21 @@ MediaExtractor::GetNextChunk(int32 stream,
 	return fReader->GetNextChunk(fStreamInfo[stream].cookie, chunkBuffer, chunkSize, mediaHeader);
 }
 
+class MediaExtractorChunkProvider : public ChunkProvider {
+private:
+	MediaExtractor * fExtractor;
+	int32 fStream;
+public:
+	MediaExtractorChunkProvider(MediaExtractor * extractor, int32 stream) {
+		fExtractor = extractor;
+		fStream = stream;
+	}
+	virtual status_t GetNextChunk(void **chunkBuffer, int32 *chunkSize,
+	                              media_header *mediaHeader) {
+		return fExtractor->GetNextChunk(fStream,chunkBuffer,chunkSize,mediaHeader);
+	}
+};
+
 status_t
 MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info *mci)
 {
@@ -177,7 +192,7 @@ MediaExtractor::CreateDecoder(int32 stream, Decoder **decoder, media_codec_info 
 		return res;
 	}
 
-	(*decoder)->Setup(this, stream);
+	(*decoder)->Setup(new MediaExtractorChunkProvider(this,stream));
 	
 	res = (*decoder)->Setup(&fStreamInfo[stream].encodedFormat, fStreamInfo[stream].infoBuffer , fStreamInfo[stream].infoBufferSize);
 	if (res != B_OK) {

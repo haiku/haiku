@@ -6,24 +6,26 @@
 
 Decoder::Decoder()
 {
+	fChunkProvider = 0;
 }
 
 Decoder::~Decoder()
 {
+	delete fChunkProvider;
 }
 	
 status_t
 Decoder::GetNextChunk(void **chunkBuffer, int32 *chunkSize,
 					  media_header *mediaHeader)
 {
-	return fExtractor->GetNextChunk(fStream, chunkBuffer, chunkSize, mediaHeader);
+	return fChunkProvider->GetNextChunk(chunkBuffer, chunkSize, mediaHeader);
 }
 
 void
-Decoder::Setup(MediaExtractor *extractor, int32 stream)
+Decoder::Setup(ChunkProvider *provider)
 {
-	fExtractor = extractor;
-	fStream = stream;
+	delete fChunkProvider;
+	fChunkProvider = provider;
 }
 
 DecoderPlugin::DecoderPlugin()
