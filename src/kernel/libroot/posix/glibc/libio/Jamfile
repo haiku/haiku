@@ -66,6 +66,7 @@ KernelMergeObject posix_gnu_libio.o :
 	<$(SOURCE_GRIST)>iovsprintf.c
 	<$(SOURCE_GRIST)>iovsscanf.c
 #	<$(SOURCE_GRIST)>obprintf.c
+	<$(SOURCE_GRIST)>pclose.c
 	<$(SOURCE_GRIST)>peekc.c
 	<$(SOURCE_GRIST)>putc.c
 	<$(SOURCE_GRIST)>putc_u.c
