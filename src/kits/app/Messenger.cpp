@@ -41,6 +41,7 @@
 #include <Message.h>
 #include <Messenger.h>
 #include <OS.h>
+#include <Roster.h>
 
 // Project Includes ------------------------------------------------------------
 #include "TokenSpace.h"
@@ -574,14 +575,37 @@ BMessenger::BMessenger(team_id team, port_id port, int32 token, bool preferred)
 	\param team The target application's team ID. May be < 0.
 	\param result An optional pointer to a pre-allocated status_t into which
 		   the result of the initialization is written.
-
-	\todo Implement!
 */
 void
 BMessenger::InitData(const char *signature, team_id team, status_t *result)
 {
+	status_t error = B_OK;
+	// if no team ID is given, get one using the signature
+	if (team < 0) {
+		if (signature) {
+			team = be_roster->TeamFor(signature);
+			if (team < 0)
+				error = team;
+		} else
+			error = B_BAD_VALUE;
+	}
+	// get the app_info of the team
+	app_info info;
+	if (error == B_OK)
+		error = be_roster->GetRunningAppInfo(team, &info);
+	// check, whether the signature is correct
+	if (error == B_OK && signature && strcmp(signature, info.signature) != 0)
+		error = B_BAD_VALUE;
+	// init our members
+	if (error == B_OK) {
+		fTeam = team;
+		fPort = info.port;
+		fHandlerToken = 0;
+		fPreferredTarget = true;
+	}
+	// return the error
 	if (result)
-		*result = NOT_IMPLEMENTED;
+		*result = error;
 }
 
 // <
