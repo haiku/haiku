@@ -1820,7 +1820,7 @@ int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user,
 		}
 	}
 
-	return INT_NO_RESCHEDULE;
+	return B_HANDLED_INTERRUPT;
 }
 
 #define TRACE_PFAULT 0
