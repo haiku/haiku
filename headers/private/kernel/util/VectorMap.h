@@ -41,6 +41,10 @@ namespace VectorMapEntryStrategy {
 	// Pair
 	template<typename Key, typename Value,
 			 typename KeyOrder = KernelUtilsOrder::Ascending<Key> > class Pair;
+	// ImplicitKey
+	template<typename Key, typename Value, typename GetKey,
+			 typename KeyOrder = KernelUtilsOrder::Ascending<Key> >
+			 class ImplicitKey;
 }
 
 template<typename Entry, typename Parent, typename EntryIterator>
@@ -72,12 +76,14 @@ class VectorMap {
 private:
 	typedef _VECTOR_MAP_CLASS_NAME							Class;
 	typedef typename EntryStrategy::Entry					_Entry;
+	typedef typename EntryStrategy::KeyReference			KeyReference;
 	typedef Vector<_Entry>									ElementVector;
 
 public:
-	typedef VectorMapEntry<Key, Value, _Entry, Class>		Entry;
-	typedef VectorMapEntry<Key, const Value, const _Entry, const Class>
-															ConstEntry;
+	typedef VectorMapEntry<KeyReference, Value, _Entry, Class>
+															Entry;
+	typedef VectorMapEntry<KeyReference, const Value, const _Entry,
+						   const Class>						ConstEntry;
 	typedef VectorMapIterator<Entry, Class, ElementVector::Iterator>	
 															Iterator;
 	typedef VectorMapIterator<ConstEntry, const Class,
@@ -129,16 +135,17 @@ private:
 
 
 // VectorMapEntry
-template<typename _Key, typename _Value, typename Entry, typename Parent>
+template<typename KeyReference, typename _Value, typename Entry,
+		 typename Parent>
 class VectorMapEntry {
 private:
-	typedef VectorMapEntry<_Key, _Value, Entry, Parent>	Class;
+	typedef VectorMapEntry<KeyReference, _Value, Entry, Parent>	Class;
 
 public:
 	VectorMapEntry()
 		: fParent(NULL), fEntry(NULL) {}
 
-	inline const _Key &Key() const
+	inline KeyReference Key() const
 	{
 		return fParent->fEntryStrategy.GetKey(*fEntry);
 	}
@@ -171,13 +178,13 @@ private:
 	typedef VectorMapIterator<Entry, Parent, EntryIterator>	Iterator;
 
 public:
-	inline VectorMapIterator<Entry, Parent, EntryIterator>()
+	inline VectorMapIterator()
 		: fParent(NULL),
 		  fIterator()
 	{
 	}
 
-	inline VectorMapIterator<Entry, Parent, EntryIterator>(
+	inline VectorMapIterator(
 		const Iterator &other)
 		: fParent(other.fParent),
 		  fIterator(other.fIterator)
@@ -244,8 +251,7 @@ public:
 
 // private
 public:
-	inline VectorMapIterator<Entry, Parent, EntryIterator>(Parent *parent,
-		const EntryIterator &iterator)
+	inline VectorMapIterator(Parent *parent, const EntryIterator &iterator)
 		: fParent(parent),
 		  fIterator(iterator)
 	{
@@ -690,9 +696,12 @@ _VECTOR_MAP_CLASS_NAME::_FindInsertionIndex(const Key &key,
 
 namespace VectorMapEntryStrategy {
 
+// Pair
 template<typename Key, typename Value, typename KeyOrder>
 class Pair {
 public:
+	typedef const Key	&KeyReference;
+
 	class Entry {
 	public:
 		Entry(const Key &key, const Value &value)
@@ -702,7 +711,7 @@ public:
 		Value	value;
 	};
 
-	inline const Key &GetKey(const Entry &entry) const
+	inline KeyReference GetKey(const Entry &entry) const
 	{
 		return entry.key;
 	}
@@ -734,6 +743,48 @@ public:
 
 private:
 	KeyOrder	fCompare;
+};
+
+// ImplicitKey
+template<typename Key, typename Value, typename _GetKey, typename KeyOrder>
+class ImplicitKey {
+public:
+	typedef Key			KeyReference;
+	typedef Value		Entry;
+
+	inline KeyReference GetKey(const Entry &entry) const
+	{
+		return fGetKey(entry);
+	}
+
+	inline const Value &GetValue(const Entry &entry) const
+	{
+		return entry;
+	}
+
+	inline Value &GetValue(Entry &entry) const
+	{
+		return entry;
+	}
+
+	inline Entry MakeEntry(const Key &, const Value &value) const
+	{
+		return value;
+	}
+
+	inline bool AreCompatible(const Key &key, const Value &value) const
+	{
+		return (fGetKey(value) == key);
+	}
+
+	inline int Compare(const Key &a, const Key &b) const
+	{
+		return fCompare(a, b);
+	}
+
+private:
+	KeyOrder	fCompare;
+	_GetKey		fGetKey;
 };
 
 }	// VectorMapEntryStrategy
