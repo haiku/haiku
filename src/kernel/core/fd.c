@@ -5,13 +5,15 @@
 */
 
 
-//#include <ktypes.h>
-#include <OS.h>
 #include <fd.h>
-#include <vfs.h>
+
+#include <OS.h>
 #include <Errors.h>
+
+#include <vfs.h>
 #include <debug.h>
 #include <memheap.h>
+
 #include <string.h>
 
 #define CHECK_USER_ADDR(x) \
@@ -38,8 +40,8 @@ void
 dump_fd(int fd,struct file_descriptor *descriptor)
 {
 	dprintf("fd[%d] = %p: type = %d, ref_count = %d, ops = %p, vnode = %p, cookie = %p, dummy = %x\n",
-		fd,descriptor,descriptor->type,descriptor->ref_count,descriptor->ops,
-		descriptor->vnode,descriptor->cookie,descriptor->dummy);
+		fd, descriptor, descriptor->type, descriptor->ref_count, descriptor->ops,
+		descriptor->vnode, descriptor->cookie, descriptor->dummy);
 }
 #endif
 
@@ -92,13 +94,16 @@ err:
 }
 
 
+/**	Reduces the descriptor's reference counter, and frees all resources
+ *	if necessary.
+ */
+
 void
 put_fd(struct file_descriptor *descriptor)
 {
-	/* Run a cleanup (fd_free) routine if there is one and free structure, but only
-	 * if we've just removed the final reference to it :)
-	 */
+	// free the descriptor if we don't need it anymore
 	if (atomic_add(&descriptor->ref_count, -1) == 1) {
+		// close the underlying object (and free any resources allocated there)=
 		if (descriptor->ops->fd_close)
 			descriptor->ops->fd_close(descriptor);
 		if (descriptor->ops->fd_free)
@@ -131,7 +136,11 @@ get_fd(struct io_context *context, int fd)
 }
 
 
-void
+/**	Removes the file descriptor in the specified slot, and
+ *	reduces its reference counter.
+ */
+
+static void
 remove_fd(struct io_context *context, int fd)
 {
 	struct file_descriptor *descriptor = NULL;
