@@ -7,16 +7,16 @@
 #define __JOBSETUPDLG_H
 
 #include <View.h>
-#include <Window.h>
+#include "DialogWindow.h"
 
 #include "JobData.h"
 #include "Halftone.h"
+#include "JSDSlider.h"
 
 class BTextControl;
 class BRadioButton;
 class BCheckBox;
 class BPopUpMenu;
-class BSlider;
 class JobData;
 class PrinterData;
 class PrinterCap;
@@ -45,8 +45,8 @@ private:
 	const PrinterCap *fPrinterCap;
 	BPopUpMenu       *fColorType;
 	BPopUpMenu       *fDitherType;
-	BSlider          *fGamma;
-	BSlider          *fInkDensity;
+	JSDSlider        *fGamma;
+	JSDSlider        *fInkDensity;
 	HalftoneView     *fHalftone;
 	BRadioButton     *fAll;
 	BCheckBox        *fCollate;
@@ -56,17 +56,13 @@ private:
 	BPopUpMenu       *fNup;
 };
 
-class JobSetupDlg : public BWindow {
+class JobSetupDlg : public DialogWindow {
 public:
 	JobSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
 	~JobSetupDlg();
-	virtual bool QuitRequested();
 	virtual	void MessageReceived(BMessage *message);
-	int Go();
 
 private:
-	int  fResult;
-	long fSemaphore;
 	BMessageFilter *fFilter;
 };
 

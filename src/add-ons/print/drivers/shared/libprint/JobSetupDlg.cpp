@@ -35,6 +35,7 @@
 #include "HalftoneView.h"
 #include "JobSetupDlg.h"
 #include "JobData.h"
+#include "JSDSlider.h"
 #include "PrinterData.h"
 #include "PrinterCap.h"
 #include "DbgMsg.h"
@@ -439,7 +440,8 @@ void JobSetupView::AttachedToWindow()
 	fHalftone->preview(fJobData->getGamma(), fJobData->getInkDensity(), fJobData->getDitherType(), fJobData->getColor() == JobData::kColor);
 	
 	/* gamma */
-	fGamma = new BSlider(gamma_rect, "", "Gamma", new BMessage(kMsgQuality), -300, 300);
+	fGamma = new JSDSlider(gamma_rect, "gamma", "Gamma", new BMessage(kMsgQuality), -300, 300, B_BLOCK_THUMB);
+	
 	fGamma->SetLimitLabels("Brighter", "Darker");
 	fGamma->SetValue(100 * log(fJobData->getGamma()) / log(2.0));
 	fGamma->SetHashMarks(B_HASH_MARKS_BOTH);
@@ -449,7 +451,8 @@ void JobSetupView::AttachedToWindow()
 	fGamma->SetTarget(this);
 
 	/* ink density */
-	fInkDensity = new BSlider(ink_density_rect, "", "Ink Density", new BMessage(kMsgQuality), 0, 127);
+	fInkDensity = new JSDSlider(ink_density_rect, "inkDensity", "Ink Density", new BMessage(kMsgQuality), 0, 127, B_BLOCK_THUMB);
+	
 	fInkDensity->SetLimitLabels("Max", "Min");
 	fInkDensity->SetValue((int32)fJobData->getInkDensity());
 	fInkDensity->SetHashMarks(B_HASH_MARKS_TOP);
@@ -771,70 +774,44 @@ filter_result PrintKeyFilter(BMessage *msg, BHandler **target, BMessageFilter *f
 //====================================================================
 
 JobSetupDlg::JobSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BWindow(BRect(100, 100, 100 + PRINT_WIDTH, 100 + PRINT_HEIGHT),
+	: DialogWindow(BRect(100, 100, 100 + PRINT_WIDTH, 100 + PRINT_HEIGHT),
 		"PrintJob Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
-	fResult = 0;
 /*
 	ostringstream oss;
 	oss << printer_data->get_printer_name() << " Print";
 	SetTitle(oss.str().c_str());
 */
-	Lock();
+	SetResult(B_ERROR);
+	
 	JobSetupView *view = new JobSetupView(Bounds(), job_data, printer_data, printer_cap);
 	AddChild(view);
 	fFilter = new BMessageFilter(B_ANY_DELIVERY, B_ANY_SOURCE, B_KEY_DOWN, &PrintKeyFilter);
 	AddCommonFilter(fFilter);
-	Unlock();
-
-	fSemaphore = create_sem(0, "JobSetupSem");
 }
 
 JobSetupDlg::~JobSetupDlg()
 {
-	Lock();
 	RemoveCommonFilter(fFilter);
-	Unlock();
 	delete fFilter;
-}
-
-bool JobSetupDlg::QuitRequested()
-{
-	fResult = B_ERROR;
-	release_sem(fSemaphore);
-	return true;
 }
 
 void JobSetupDlg::MessageReceived(BMessage *msg)
 {
 	switch (msg->what) {
 	case kMsgOK:
-		Lock();
 		((JobSetupView *)ChildAt(0))->UpdateJobData();
-		Unlock();
-		fResult = B_NO_ERROR;
-		release_sem(fSemaphore);
+		SetResult(B_NO_ERROR);
+		PostMessage(B_QUIT_REQUESTED);
 		break;
 
 	case kMsgCancel:
-		fResult = B_ERROR;
-		release_sem(fSemaphore);
+		PostMessage(B_QUIT_REQUESTED);
 		break;
 	
 	default:
-		BWindow::MessageReceived(msg);
+		DialogWindow::MessageReceived(msg);
 		break;
 	}
-}
-
-int JobSetupDlg::Go()
-{
-	Show();
-	acquire_sem(fSemaphore);
-	delete_sem(fSemaphore);
-	int value = fResult;
-	Lock();
-	Quit();
-	return value;
 }

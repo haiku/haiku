@@ -270,34 +270,20 @@ bool PageSetupView::UpdateJobData()
 //====================================================================
 
 PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
-	: BWindow(BRect(100, 100, 100 + PAGESETUP_WIDTH, 100 + PAGESETUP_HEIGHT),
+	: DialogWindow(BRect(100, 100, 100 + PAGESETUP_WIDTH, 100 + PAGESETUP_HEIGHT),
 		"Page Setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE)
 {
-	fResult = 0;
 /*
 	ostringstream oss;
 	oss << printer_data->get_printer_name() << " Setup";
 	SetTitle(title.str().c_str());
 */
 
-	Lock();
 	PageSetupView *view = new PageSetupView(Bounds(), job_data, printer_data, printer_cap);
 	AddChild(view);
-	Unlock();
-
-	fSemaphore = create_sem(0, "PageSetupSem");
-}
-
-PageSetupDlg::~PageSetupDlg()
-{
-}
-
-bool PageSetupDlg::QuitRequested()
-{
-	fResult = B_ERROR;
-	release_sem(fSemaphore);
-	return true;
+	
+	SetResult(B_ERROR);
 }
 
 void PageSetupDlg::MessageReceived(BMessage *msg)
@@ -307,28 +293,16 @@ void PageSetupDlg::MessageReceived(BMessage *msg)
 		Lock();
 		((PageSetupView *)ChildAt(0))->UpdateJobData();
 		Unlock();
-		fResult = B_NO_ERROR;
-		release_sem(fSemaphore);
+		SetResult(B_NO_ERROR);
+		PostMessage(B_QUIT_REQUESTED);
 		break;
 
 	case kMsgCancel:
-		fResult = B_ERROR;
-		release_sem(fSemaphore);
+		PostMessage(B_QUIT_REQUESTED);
 		break;
 
 	default:
-		BWindow::MessageReceived(msg);
-		break;
+		DialogWindow::MessageReceived(msg);
 	}
 }
 
-int PageSetupDlg::Go()
-{
-	Show();
-	acquire_sem(fSemaphore);
-	delete_sem(fSemaphore);
-	int value = fResult;
-	Lock();
-	Quit();
-	return value;
-}

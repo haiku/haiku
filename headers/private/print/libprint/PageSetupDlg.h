@@ -7,7 +7,7 @@
 #define __PAGESETUPDLG_H
 
 #include <View.h>
-#include <Window.h>
+#include "DialogWindow.h"
 
 class BRadioButton;
 class BPopUpMenu;
@@ -31,17 +31,12 @@ private:
 	BPopUpMenu       *fResolution;
 };
 
-class PageSetupDlg : public BWindow {
+class PageSetupDlg : public DialogWindow {
 public:
 	PageSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap);
-	~PageSetupDlg();
-	virtual bool QuitRequested();
 	virtual void MessageReceived(BMessage *message);
-	int Go();
 
 private:
-	int  fResult;
-	long fSemaphore;
 	BMessageFilter *fFilter;
 };
 
