@@ -88,7 +88,6 @@ struct fs_mount {
 	file_system_info *fs;
 	mount_id		id;
 	void			*cookie;
-	char			*mount_point;
 	char			*device_name;
 	char			*fs_name;
 	recursive_lock	rlock;	// guards the vnodes list
@@ -732,6 +731,36 @@ put_vnode(struct vnode *vnode)
 }
 
 
+/**	\brief Resolves a volume root vnode to the underlying mount point vnode.
+
+	Given an arbitrary vnode, the function checks, whether the node is the
+	root of a volume. If it is (and if it is not "/"), the function obtains
+	a reference to the underlying mount point node and returns it.
+
+	\param vnode The vnode in question.
+	\return The mount point vnode the vnode covers, if it is indeed a volume
+			root and not "/", or \c NULL otherwise.
+*/
+static
+struct vnode*
+resolve_volume_root_to_mount_point(struct vnode *vnode)
+{
+	if (!vnode)
+		return NULL;
+
+	struct vnode *mountPoint = NULL;
+
+	recursive_lock_lock(&sMountOpLock);
+	if (vnode->covered_by) {
+		mountPoint = vnode->covered_by;
+		inc_vnode_ref_count(mountPoint);
+	}
+	recursive_lock_unlock(&sMountOpLock);
+
+	return mountPoint;
+}
+
+
 /**	\brief Gets the directory path and leaf name for a given path.
 
 	The supplied \a path is transformed to refer to the directory part of
@@ -933,14 +962,11 @@ vnode_path_to_vnode(struct vnode *vnode, char *path, bool traverseLeafLink,
 		vnode = nextVnode;
 
 		// see if we hit a mount point
-		recursive_lock_lock(&sMountOpLock);
-		if (vnode->covered_by) {
-			nextVnode = vnode->covered_by;
-			inc_vnode_ref_count(nextVnode);
+		struct vnode *mountPoint = resolve_volume_root_to_mount_point(vnode);
+		if (mountPoint) {
 			put_vnode(vnode);
-			vnode = nextVnode;
+			vnode = mountPoint;
 		}
-		recursive_lock_unlock(&sMountOpLock);
 	}
 
 	*_vnode = vnode;
@@ -1098,10 +1124,11 @@ get_vnode_name(struct vnode *vnode, struct vnode *parent,
  *	It might be a good idea, though, to check if the returned path exists
  *	in the calling function (it's not done here because of efficiency)
  */
-
 static status_t
 dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 {
+FUNCTION(("dir_vnode_to_path(%p, %p, %lu\n)", vnode, buffer, bufferSize));
+
 	/* this implementation is currently bound to SYS_MAX_PATH_LEN */
 	char path[SYS_MAX_PATH_LEN];
 	int32 insert = sizeof(path);
@@ -1115,6 +1142,13 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 	// we don't use get_vnode() here because this call is more
 	// efficient and does all we need from get_vnode()
 	inc_vnode_ref_count(vnode);
+
+	// resolve a volume root to its mount point
+	struct vnode *mountPoint = resolve_volume_root_to_mount_point(vnode);
+	if (mountPoint) {
+		put_vnode(vnode);
+		vnode = mountPoint;
+	}
 
 	path[--insert] = '\0';
 	
@@ -1139,6 +1173,13 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 			panic("dir_vnode_to_path: could not lookup vnode (mountid 0x%lx vnid 0x%Lx)\n", vnode->device, parentID);
 			status = B_ENTRY_NOT_FOUND;
 			goto out;
+		}
+
+		// resolve a volume root to its mount point
+		mountPoint = resolve_volume_root_to_mount_point(parentVnode);
+		if (mountPoint) {
+			put_vnode(parentVnode);
+			parentVnode = mountPoint;
 		}
 
 		// Does the file system support getting the name of a vnode?
@@ -1167,8 +1208,8 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		}
 
 		if (parentID == id) {
-			// we have reached the root level directory of this file system
-			// which means we have constructed the full path
+			// we have reached "/", which means we have constructed the full
+			// path
 			break;
 		}
 
@@ -1211,16 +1252,18 @@ dir_vnode_to_path(struct vnode *vnode, char *buffer, size_t bufferSize)
 		path[--insert] = '/';
 	}
 
-	// add the mountpoint
-	length = strlen(vnode->mount->mount_point);
-	if (bufferSize - (sizeof(path) - insert) < (uint32)length + 1) {
-		status = ENOBUFS;
-		goto out;
-	}
+	// the root dir will result in an empty path: fix it
+	if (path[insert] == '\0')
+		path[--insert] = '/';
 
-	memcpy(buffer, vnode->mount->mount_point, length);
-	if (insert != sizeof(path))
-		memcpy(buffer + length, path + insert, sizeof(path) - insert);
+PRINT(("  path is: %s\n", path + insert));
+
+	// copy the path to the output buffer
+	length = sizeof(path) - insert;
+	if (length <= (int)bufferSize)
+		memcpy(buffer, path + insert, length);
+	else
+		status = ENOBUFS;
 
 out:
 	put_vnode(vnode);
@@ -3541,16 +3584,10 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 
 	list_init_etc(&mount->vnodes, offsetof(struct vnode, mount_link));
 
-	mount->mount_point = strdup(path);
-	if (mount->mount_point == NULL) {
-		err = B_NO_MEMORY;
-		goto err1;
-	}
-
 	mount->fs_name = strdup(fsName);
 	if (mount->fs_name == NULL) {
 		err = B_NO_MEMORY;
-		goto err2;
+		goto err1;
 	}
 
 	mount->device_name = strdup(device);
@@ -3658,8 +3695,6 @@ err4:
 	free(mount->device_name);
 err3:
 	free(mount->fs_name);
-err2:
-	free(mount->mount_point);
 err1:
 	free(mount);
 err:
@@ -3755,7 +3790,6 @@ fs_unmount(char *path, bool kernel)
 
 	free(mount->device_name);
 	free(mount->fs_name);
-	free(mount->mount_point);
 	free(mount);
 
 	return 0;
