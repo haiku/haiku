@@ -31,11 +31,16 @@
  * @brief Headers that are available for applications
  */
  
+#include <ktypes.h>
+// ToDo: has to be included here, but does currently causes compiler errors
+// (redefinitions in ktypes.h (bigtime_t), and arch/x86/types.h (int8, ...))
+//#include <SupportDefs.h>
+// ToDo: is automatically included by SupportDefs.h, so that one can be removed later
+#include <Errors.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include <ktypes.h>
 
 /**
  * @defgroup Sys_Consts Constants
