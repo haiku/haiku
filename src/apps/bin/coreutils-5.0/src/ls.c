@@ -3000,11 +3000,11 @@ print_long_format (const struct fileinfo *f)
   if (print_author)
     p += format_user (p, f->stat.st_author);
 
-/*  if (S_ISCHR (f->stat.st_mode) || S_ISBLK (f->stat.st_mode))
+  if (S_ISCHR (f->stat.st_mode) || S_ISBLK (f->stat.st_mode))
     sprintf (p, "%3lu, %3lu ",
 	     (unsigned long) major (f->stat.st_rdev),
 	     (unsigned long) minor (f->stat.st_rdev));
-  else*/
+  else
     {
       char hbuf[LONGEST_HUMAN_READABLE + 1];
       uintmax_t size = f->stat.st_size;
