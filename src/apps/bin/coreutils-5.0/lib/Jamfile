@@ -10,7 +10,7 @@ acl.c
 addext.c
 alloca.c
 argmatch.c
-atexit.c
+#atexit.c
 backupfile.c
 basename.c
 canon-host.c
