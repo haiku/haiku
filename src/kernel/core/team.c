@@ -45,6 +45,15 @@ struct team_arg {
 	char	**env;
 };
 
+struct fork_arg {
+	area_id	user_stack_area;
+	addr_t	user_stack_base;
+	size_t	user_stack_size;
+	addr_t	user_local_storage;
+
+	struct arch_fork_arg arch_info;
+};
+
 // team list
 static void *team_hash = NULL;
 static team_id next_team_id = 1;
@@ -541,7 +550,7 @@ create_team_arg(const char *path, int32 argc, char **args, int32 envCount, char 
 
 
 static int32
-team_create_team2(void *args)
+team_create_thread_start(void *args)
 {
 	int err;
 	struct thread *t;
@@ -712,7 +721,7 @@ team_create_team(const char *path, const char *name, char **args, int argc, char
 		threadName = name;
 
 	// create a kernel thread, but under the context of the new team
-	tid = spawn_kernel_thread_etc(team_create_team2, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
+	tid = spawn_kernel_thread_etc(team_create_thread_start, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
 	if (tid < 0) {
 		err = tid;
 		goto err4;
@@ -773,6 +782,7 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 
 	// ToDo: remove team resources if there are any left
 	// alarm, signals
+	// thread_atkernel_exit() might not be called at all
 
 	vm_delete_areas(team->aspace);
 	delete_owned_ports(team->id);
@@ -780,7 +790,7 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 	remove_images(team);
 	vfs_exec_io_context(team->io_context);
 
-	status = team_create_team2(teamArgs);
+	status = team_create_thread_start(teamArgs);
 		// this one usually doesn't return...
 
 	// sorry, we have to kill us, there is no way out anymore (without any areas left and all that)
@@ -791,44 +801,80 @@ exec_team(const char *path, int32 argCount, char **args, int32 envCount, char **
 }
 
 
+/** This is the first function to be called from the newly created
+ *	main child thread.
+ *	It will fill in everything what's left to do from fork_arg, and
+ *	return from the parent's fork() syscall to the child.
+ */
+
+static int32
+fork_team_thread_start(void *_args)
+{
+	struct thread *thread = thread_get_current_thread();
+	struct fork_arg *forkArgs = (struct fork_arg *)_args;
+
+	struct arch_fork_arg archArgs = forkArgs->arch_info;
+		// we need a local copy of the arch dependent part
+
+	thread->user_stack_region_id = forkArgs->user_stack_area;
+	thread->user_stack_base = forkArgs->user_stack_base;
+	thread->user_stack_size = forkArgs->user_stack_size;
+	thread->user_local_storage = forkArgs->user_local_storage;
+
+	arch_thread_init_tls(thread);
+
+	free(forkArgs);
+
+	// set frame of the parent thread to this one, too
+
+	arch_restore_fork_frame(&archArgs);
+		// This one won't return here
+
+	return 0;
+}
+
+
 static thread_id
 fork_team(void)
 {
-	struct team *forkedTeam = thread_get_current_thread()->team, *team;
-	struct thread *forkedThread = thread_get_current_thread(), *thread;
+	struct team *parentTeam = thread_get_current_thread()->team, *team;
+	struct thread *parentThread = thread_get_current_thread();
+	struct fork_arg *forkArgs;
 	struct area_info info;
+	thread_id threadID;
 	cpu_status state;
 	status_t status;
 	int32 cookie;
-	team_id pid;
 
 	TRACE(("fork_team()\n"));
 
-	if (forkedTeam == team_get_kernel_team())
+	if (parentTeam == team_get_kernel_team())
 		return B_NOT_ALLOWED;
-
-	dprintf("fork() is not yet implemented!\n");
 
 	// create a new team
 	// ToDo: this is very similar to team_create_team() - maybe we can do something about it :)
 
-	team = create_team_struct(forkedTeam->name, false);
+	team = create_team_struct(parentTeam->name, false);
 	if (team == NULL)
 		return B_NO_MEMORY;
-
-	pid = team->id;
 
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
 	hash_insert(team_hash, team);
-	insert_team_into_parent(forkedTeam, team);
+	insert_team_into_parent(parentTeam, team);
 
 	RELEASE_TEAM_LOCK();
 	restore_interrupts(state);
 
+	forkArgs = (struct fork_arg *)malloc(sizeof(struct fork_arg));
+	if (forkArgs == NULL) {
+		status = B_NO_MEMORY;
+		goto err1;
+	}
+
 	// create a new io_context for this team
-	team->io_context = vfs_new_io_context(forkedTeam->io_context);
+	team->io_context = vfs_new_io_context(parentTeam->io_context);
 	if (!team->io_context) {
 		status = B_NO_MEMORY;
 		goto err2;
@@ -846,46 +892,51 @@ fork_team(void)
 	cookie = 0;
 	while (get_next_area_info(B_CURRENT_TEAM, &cookie, &info) == B_OK) {
 		void *address;
-		status = vm_copy_area(team->aspace->id, info.name, &address, B_CLONE_ADDRESS,
-					info.protection, info.area);
-		if (status < B_OK)
+		area_id area = vm_copy_area(team->aspace->id, info.name, &address, B_CLONE_ADDRESS,
+							info.protection, info.area);
+		if (area < B_OK) {
+			status = area;
 			break;
+		}
+
+		if (info.area == parentThread->user_stack_region_id)
+			forkArgs->user_stack_area = area;
 	}
 
 	if (status < B_OK)
 		goto err4;
 
-/*
-	// cut the path from the main thread name
-	threadName = strrchr(name, '/');
-	if (threadName != NULL)
-		threadName++;
-	else
-		threadName = name;
-*/
-/*
-	// create a kernel thread, but under the context of the new team
-	tid = spawn_kernel_thread_etc(team_create_team2, threadName, B_NORMAL_PRIORITY, teamArgs, team->id);
-	if (tid < 0) {
-		err = tid;
+	forkArgs->user_stack_base = parentThread->user_stack_base;
+	forkArgs->user_stack_size = parentThread->user_stack_size;
+	forkArgs->user_local_storage = parentThread->user_local_storage;
+	arch_store_fork_frame(&forkArgs->arch_info);
+
+	team->user_env_base = parentTeam->user_env_base;
+	// ToDo: copy image list
+
+	// create a kernel thread under the context of the new team
+	threadID = spawn_kernel_thread_etc(fork_team_thread_start, parentThread->name,
+					parentThread->priority, forkArgs, team->id);
+	if (threadID < 0) {
+		status = threadID;
 		goto err4;
 	}
 
-	resume_thread(tid);
-*/
-	return pid;
+	resume_thread(threadID);
+	return threadID;
 
 err4:
-	vm_put_aspace(team->aspace);
+	vm_delete_aspace(team->aspace);
 err3:
 	vfs_free_io_context(team->io_context);
 err2:
-	//free_team_arg(teamArgs);
+	free(forkArgs);
+err1:
 	// remove the team structure from the team hash table and delete the team structure
 	state = disable_interrupts();
 	GRAB_TEAM_LOCK();
 
-	remove_team_from_parent(forkedTeam, team);
+	remove_team_from_parent(parentTeam, team);
 	hash_remove(team_hash, team);
 
 	RELEASE_TEAM_LOCK();
