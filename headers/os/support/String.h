@@ -172,7 +172,7 @@ public:
 	int32 				FindLast(const BString &, int32 beforeOffset) const;
 	int32 				FindLast(const char *, int32 beforeOffset) const;
 	int32				FindLast(char) const;
-	int32				FindLast(char, int32 fromOffset) const;
+	int32				FindLast(char, int32 beforeOffset) const;
 
 	int32 				IFindFirst(const BString &) const;
 	int32 				IFindFirst(const char *) const;
@@ -252,7 +252,8 @@ public:
 						 */
 
 	BString 			&CapitalizeEachWord();
-						/* Converts first character in each white-space-separated
+						/* Converts first character in each 
+						 * non-alphabethycal-character-separated
 						 * word to upper-case, rest to lower-case
 						 */
 /*----- Escaping and Deescaping --------------------------------------------*/
