@@ -179,6 +179,8 @@ status_t delete_buffer(net_buffer *buffer, bool interrupt_safe)
 		// Uh? From where come this net_data!?!
 		return B_ERROR;
 		
+	printf("delete_buffer(%p)\n", buffer);
+		
 	if (interrupt_safe) {
 	  // We're called from a interrupt handler. Don't use any blocking calls (delete_pool_node() is!)
 	  // We flag this net_buffer as to be free by the buffers purgatory thread
@@ -877,7 +879,7 @@ void dump_memory
 			
 		for (j = i; j < len && j < i+16;j++)
 			{
-			if ( byte[j] >= ' ' && byte[j] <= 0x7e )
+			if ( byte[j] >= ' ' && byte[j] < 0x7e )
 				*ptr = byte[j];
 			else
 				*ptr = '.';

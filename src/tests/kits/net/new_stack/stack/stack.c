@@ -11,14 +11,9 @@
 #include "net_stack.h"
 #include "memory_pool.h"
 
-#include "datalink.h"
+#include "layers_manager.h"
 #include "buffer.h"
 #include "timer.h"
-
-/* Defines we need */
-#define NETWORK_INTERFACES	"network/interfaces"
-#define NETWORK_PROTOCOLS	"network/protocols"
-#define PPP_DEVICES "ppp/devices"
 
 struct memory_pool_module_info *g_memory_pool = NULL;
 static bool g_started = false;
@@ -39,7 +34,7 @@ static status_t start(void)
 	start_buffers_service();
 	start_timers_service();
 
-	start_datalink_layer();
+	start_layers_manager();
 
 	puts("stack: started.");
 	g_started = true;
@@ -51,7 +46,7 @@ static status_t stop(void)
 {
 	puts("stack: stopping...");
 
-	stop_datalink_layer();
+	stop_layers_manager();
 
 	stop_timers_service();
 	stop_buffers_service();
@@ -75,9 +70,12 @@ struct net_stack_module_info nsmi = {
 	start,
 	stop,
 	
-	// Data-Link layer
-	register_interface,
-	unregister_interface,
+	// Layers handling
+	register_layer,
+	unregister_layer,
+	
+	push_buffer_up,
+	push_buffer_down,
 	
 	// net_buffer support
 	new_buffer,
