@@ -165,18 +165,23 @@ aspace_hash(void *_a, const void *key, uint32 range)
 }
 
 
+/** When this function is called, all references to this address space
+ *	have been released, so it's safe to remove it.
+ */
+
 static void
 delete_address_space(vm_address_space *aspace)
 {
-	TRACE(("vm_delete_aspace: called on aspace 0x%lx\n", aspace->id));
+	TRACE(("delete_address_space: called on aspace 0x%lx\n", aspace->id));
+
+	if (aspace == kernel_aspace)
+		panic("tried to delete the kernel aspace!\n");
 
 	// put this aspace in the deletion state
 	// this guarantees that no one else will add regions to the list
 	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
 
 	aspace->state = VM_ASPACE_STATE_DELETION;
-
-	vm_delete_areas(aspace);
 
 	(*aspace->translation_map.ops->destroy)(&aspace->translation_map);
 
@@ -244,25 +249,37 @@ vm_get_current_user_aspace_id(void)
 void
 vm_put_aspace(vm_address_space *aspace)
 {
-//	vm_region *region;
-	bool removeit = false;
+	bool remove = false;
 
 	acquire_sem_etc(aspace_hash_sem, WRITE_COUNT, 0, 0);
 	if (atomic_add(&aspace->ref_count, -1) == 1) {
 		hash_remove(aspace_table, aspace);
-		removeit = true;
+		remove = true;
 	}
 	release_sem_etc(aspace_hash_sem, WRITE_COUNT, 0);
 
-	if (!removeit)
-		return;
+	if (remove)
+		delete_address_space(aspace);
+}
 
-	TRACE(("vm_put_aspace: reached zero ref, deleting aspace\n"));
 
-	if (aspace == kernel_aspace)
-		panic("vm_put_aspace: tried to delete the kernel aspace!\n");
+/** Deletes all areas in the specified address space, and the address
+ *	space by decreasing all reference counters. It also marks the
+ *	address space of being in deletion state, so that no more areas
+ *	can be created in it.
+ *	After this, the address space is not operational anymore, but might
+ *	still be in memory until the last reference has been released.
+ */
 
-	delete_address_space(aspace);
+void
+vm_delete_aspace(vm_address_space *aspace)
+{
+	acquire_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0, 0);
+	aspace->state = VM_ASPACE_STATE_DELETION;
+	release_sem_etc(aspace->virtual_map.sem, WRITE_COUNT, 0);
+
+	vm_delete_areas(aspace);
+	vm_put_aspace(aspace);
 }
 
 
