@@ -52,9 +52,9 @@ rtc_print(void)
 	uint32 currentTime;
 
 	currentTime = (sBootTime + system_time()) / 1000000;
-	dprintf("system_time:  %u\n", (unsigned)system_time());
-	dprintf("boot_time:    %u\n", (unsigned)sBootTime);
-	dprintf("current_time: %u\n", (unsigned)currentTime);
+	dprintf("system_time:  %Ld\n", system_time());
+	dprintf("boot_time:    %Ld\n", sBootTime);
+	dprintf("current_time: %u\n", currentTime);
 }
 
 
@@ -67,7 +67,6 @@ rtc_debug(int argc, char **argv)
 	} else {
 		// If there was an argument, reset the system and hw time.
 		set_real_time_clock(strtoul(argv[1], NULL, 10));
-		rtc_system_to_hw();
 	}
 
 	return 0;
@@ -94,6 +93,7 @@ void
 set_real_time_clock(uint32 currentTime)
 {
 	sBootTime = currentTime * 1000000LL - system_time();
+	rtc_system_to_hw();
 }
 
 
