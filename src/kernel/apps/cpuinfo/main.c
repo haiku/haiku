@@ -112,18 +112,18 @@ opt_identify(cpuid_info *info, int vendor_tag)
 
 	// the 'vendorid' field of the info struct is not null terminated,
 	// so it is copied into a properly terminated local string buffer
-	memcpy(vendorID, info->eax_0.vendorid, 12);
+	memcpy(vendorID, info->eax_0.vendor_id, 12);
 	printf("%12s '%s'\n", "Vendor ID:", vendorID);
 	
 	switch (vendor_tag) {
 		case 'uneG':  // "GenuineIntel"
 			Intel_identify(info);
 			break;
-		
+
 		case 'htuA':  // "AuthenticAMD"
 			AMD_identify(info);
 			break;
-		
+
 		case 'iryC':  // "CyrixInstead"
 			Cyrix_identify(info);
 			break;
@@ -138,11 +138,11 @@ opt_features(cpuid_info *info, int vendor_tag)
 		case 'uneG':  // "GenuineIntel"
 			Intel_features(info);
 			break;
-		
+
 		case 'htuA':  // "AuthenticAMD"
 			AMD_features(info);
 			break;
-		
+
 		case 'iryC':  // "CyrixInstead"
 			Cyrix_features(info);
 			break;
@@ -157,11 +157,11 @@ opt_TLB_cache(cpuid_info *info, int vendor_tag)
 		case 'uneG':  // "GenuineIntel"
 			Intel_TLB_cache(info);
 			break;
-		
+
 		case 'htuA':  // "AuthenticAMD"
 			AMD_TLB_cache(info);
 			break;
-		
+
 		case 'iryC':  // "CyrixInstead"
 			Cyrix_TLB_cache(info);
 			break;
@@ -263,8 +263,8 @@ Intel_identify(cpuid_info *info)
 	if (info->regs.eax & 0x80000000) {
 		// extended feature/signature bits supported
 		if (info->regs.eax >= 0x80000004) {
-			int i;
-			
+			uint32 i;
+
 			printf("\nExtended brand string:\n'");
 			for (i = 0x80000002; i <= 0x80000004; ++i) {
 				get_cpuid(info, i, 0);
@@ -388,7 +388,7 @@ Intel_TLB_cache(cpuid_info *info)
 	
 	#define BIT_31_MASK (1 << 31)
 	
-	int    pass, matches;       // counters
+	uint32 pass, matches;       // counters
 	uint32 reg;                 // value of an individual register (eax, ebx, ecx, edx)
 	uint8  db;                  // descriptor byte
 	int    indexOf[256] = {0};  // converts descriptor bytes to table indexes
