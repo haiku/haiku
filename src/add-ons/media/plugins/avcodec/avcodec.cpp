@@ -119,7 +119,7 @@ avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 	media_format_description descr;
 	for (int32 i = 0; gCodecTable[i].id; i++) {
 		ffcodec_index_in_table = i;
-		uint32 cid;
+		uint64 cid;
 		
 		if(BMediaFormats().GetCodeFor(*input_format,gCodecTable[i].family,&descr) == B_OK
 		   && gCodecTable[i].type == input_format->type)
@@ -132,6 +132,9 @@ avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 				case B_WAV_FORMAT_FAMILY:
 					cid = descr.u.wav.codec;
 					break;
+				case B_AIFF_FORMAT_FAMILY:
+					cid = descr.u.aiff.codec;
+					break;
 				case B_AVI_FORMAT_FAMILY:
 					cid = descr.u.avi.codec;
 					break;
@@ -140,6 +143,9 @@ avCodec::Setup(media_format *input_format, const void *in_info, int32 in_size)
 					break;
 				case B_QUICKTIME_FORMAT_FAMILY:
 					cid = descr.u.quicktime.codec;
+					break;
+				case B_MISC_FORMAT_FAMILY:
+					cid = (((uint64)descr.u.misc.file_format) << 32) | descr.u.misc.codec;
 					break;
 				default:
 				puts("ERR family");
@@ -484,6 +490,9 @@ avCodecPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 			case B_WAV_FORMAT_FAMILY:
 				description.u.wav.codec = gCodecTable[i].fourcc;
 				break;
+			case B_AIFF_FORMAT_FAMILY:
+				description.u.aiff.codec = gCodecTable[i].fourcc;
+				break;
 			case B_AVI_FORMAT_FAMILY:
 				description.u.avi.codec = gCodecTable[i].fourcc;
 				break;
@@ -492,6 +501,10 @@ avCodecPlugin::GetSupportedFormats(media_format ** formats, size_t * count)
 				break;
 			case B_QUICKTIME_FORMAT_FAMILY:
 				description.u.quicktime.codec = gCodecTable[i].fourcc;
+				break;
+			case B_MISC_FORMAT_FAMILY:
+				description.u.misc.file_format = (uint32) (gCodecTable[i].fourcc >> 32);
+				description.u.misc.codec = (uint32) gCodecTable[i].fourcc;
 				break;
 			default:
 				break;

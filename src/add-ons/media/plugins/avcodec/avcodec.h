@@ -22,7 +22,7 @@
 
 #include "video_util.h"
 
-struct codec_table { CodecID id; media_type type; media_format_family family; uint32 fourcc; const char *prettyname;};
+struct codec_table { CodecID id; media_type type; media_format_family family; uint64 fourcc; const char *prettyname;};
 
 extern const struct codec_table gCodecTable[];
 extern const int num_codecs;
