@@ -60,12 +60,12 @@ DrawData::DrawData(void)
 
 DrawData::~DrawData(void)
 {
-	if (clipReg)
-		delete clipReg;
+	delete clipReg;
 }
 
 DrawData::DrawData(const DrawData &data)
 {
+	clipReg = NULL;
 	*this=data;
 }
 
@@ -115,16 +115,15 @@ LayerData::LayerData(void)
 
 LayerData::LayerData(const LayerData &data)
 {
+	clipReg = NULL;
 	*this=data;
 }
 
 LayerData::~LayerData(void)
 {
-	if (prevState)
-	{
-		delete prevState;
-		prevState=NULL;
-	}
+	delete prevState;
+	// NOTE: we're in the destructor here. why the assignment?
+	prevState=NULL;
 }
 
 LayerData &LayerData::operator=(const LayerData &from)
