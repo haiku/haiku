@@ -70,6 +70,7 @@ public:
 	
 	void AddWinBorder(WinBorder *winBorder);
 	void RemoveWinBorder(WinBorder *winBorder);
+	WinBorder* WinBorderAt(const BPoint& pt);
 	void ChangeWorkspacesFor(WinBorder *winBorder, uint32 newWorkspaces);
 	bool SetFrontWinBorder(WinBorder *winBorder);
 	

@@ -54,6 +54,7 @@
 #	define STRACESTREAM() ;
 #endif
 
+//----------------------------------------------------------------------------------
 
 Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor, RootLayer *owner)
 {
@@ -85,6 +86,8 @@ Workspace::Workspace(const uint32 colorspace, int32 ID, const RGBColor& BGColor,
 	fDisplayTiming.flags=0;
 }
 
+//----------------------------------------------------------------------------------
+
 Workspace::~Workspace(void)
 {
 	ListData		*toast;
@@ -102,6 +105,7 @@ Workspace::~Workspace(void)
 	fFrontItem		= NULL;
 }
 
+//----------------------------------------------------------------------------------
 /*
 	Adds layer ptr to workspace's list of WinBorders. After the item is added a
 	*smart* search is performed to set the new front WinBorder. Of course,
@@ -144,6 +148,7 @@ bool Workspace::AddLayerPtr(WinBorder *layer)
 	return true;
 }
 
+//----------------------------------------------------------------------------------
 /*
 	Removes a WinBorder from workspace's list. It DOES NOT delete it!
 	If this window was the front/focus one it calls SearchAndSetNew(Front/Focus)
@@ -215,6 +220,8 @@ bool Workspace::RemoveLayerPtr(WinBorder *layer)
 	}
 }
 
+//----------------------------------------------------------------------------------
+
 bool Workspace::HideSubsetWindows(WinBorder *layer)
 {
 	if(!layer)
@@ -263,21 +270,29 @@ bool Workspace::HideSubsetWindows(WinBorder *layer)
 	}
 }
 
+//----------------------------------------------------------------------------------
+
 WinBorder *Workspace::FocusLayer() const
 {
 	return fFocusItem ? fFocusItem->layerPtr : NULL;
 }
+
+//----------------------------------------------------------------------------------
 
 WinBorder *Workspace::FrontLayer() const
 {
 	return fFrontItem? fFrontItem->layerPtr: NULL;
 }
 
+//----------------------------------------------------------------------------------
+
 WinBorder *Workspace::GoToBottomItem(void)
 {
 	fCurrentItem	= fBottomItem;
 	return fCurrentItem ? fCurrentItem->layerPtr : NULL;
 }
+
+//----------------------------------------------------------------------------------
 
 WinBorder *Workspace::GoToUpperItem(void)
 {
@@ -290,11 +305,15 @@ WinBorder *Workspace::GoToUpperItem(void)
 		return NULL;
 }
 
+//----------------------------------------------------------------------------------
+
 WinBorder *Workspace::GoToTopItem(void)
 {
 	fCurrentItem	= fTopItem;
 	return fCurrentItem ? fCurrentItem->layerPtr : NULL;
 }
+
+//----------------------------------------------------------------------------------
 
 WinBorder *Workspace::GoToLowerItem(void)
 {
@@ -306,6 +325,8 @@ WinBorder *Workspace::GoToLowerItem(void)
 	else
 		return NULL;
 }
+
+//----------------------------------------------------------------------------------
 
 bool Workspace::GoToItem(WinBorder *layer)
 {
@@ -326,100 +347,7 @@ bool Workspace::GoToItem(WinBorder *layer)
 	return false;
 }
 
-WinBorder *Workspace::SearchWinBorder(BPoint pt)
-{
-	// TODO: implement correctly once you have clipping code working
-	
-	// For the moment, take windows from front to back and see in which one 'pt' falls
-	WinBorder		*target = NULL;
-	fOpLock.Lock();
-
-	for( WinBorder *wb = GoToBottomItem(); wb; wb = GoToUpperItem())
-	{
-//		wb->PrintToStream();
-		if(!wb->IsHidden() && wb->HasPoint(pt))
-		{
-			STRACE(("%s - SELECTED!\n", wb->GetName()));
-			target	= wb;
-			break;
-		}
-	}
-	fOpLock.Unlock();
-	return target;
-}
-
-void Workspace::Invalidate(void)
-{
-	//TODO: Remove. Testing purposes only!
-	
-/*	fOpLock.Lock();
-	if(fOwner->ActiveWorkspace() == this)
-		fOwner->FullInvalidate(fOwner->Bounds());
-	fOpLock.Unlock();*/
-	
-}
-
-void Workspace::InsertItem(ListData *item, ListData *before)
-{
-	// insert before one other item;
-	if(before)
-	{
-		if(before->upperItem)
-			before->upperItem->lowerItem	= item;
-		item->upperItem		= before->upperItem;
-		before->upperItem	= item;
-		item->lowerItem		= before;
-
-		// if we're inserting at top of the stack, change it accordingly.
-		if(fTopItem == before)
-			fTopItem = item;
-	}
-	else
-	{
-		// insert item at bottom.
-		item->upperItem	= fBottomItem;
-		if(fBottomItem)
-			fBottomItem->lowerItem	= item;
-
-		fBottomItem		= item;
-
-		if(!fTopItem)
-			fTopItem	= item;
-	}
-}
-
-void Workspace::RemoveItem(ListData *item)
-{
-	if(!item)
-		return;
-
-	if(fBottomItem == item)
-		fBottomItem = item->upperItem;
-	else
-		item->lowerItem->upperItem	= item->upperItem;
-	
-	if(fTopItem == item)
-		fTopItem = item->lowerItem;
-	else
-		item->upperItem->lowerItem	= item->lowerItem;
-	
-	// set all these to NULL to avoid confusion later.
-
-	item->upperItem	= NULL;
-	item->lowerItem	= NULL;
-	
-	if(fFocusItem == item)
-	{
-		fFocusItem->layerPtr->HighlightDecorator(false);
-		fFocusItem = NULL;
-	}
-
-	if(fFrontItem == item)
-		fFrontItem = NULL;
-
-	if(fCurrentItem == item)
-		fCurrentItem = NULL;
-}
+//----------------------------------------------------------------------------------
 
 ListData *Workspace::HasItem(ListData *item)
 {
@@ -431,6 +359,8 @@ ListData *Workspace::HasItem(ListData *item)
 	return NULL;
 }
 
+//----------------------------------------------------------------------------------
+
 ListData *Workspace::HasItem(WinBorder *layer)
 {
 	for (ListData *item = fBottomItem; item != NULL; item = item->upperItem)
@@ -440,6 +370,8 @@ ListData *Workspace::HasItem(WinBorder *layer)
 	}
 	return NULL;
 }
+
+//----------------------------------------------------------------------------------
 /*
 	This, also is a "smart" method. Firstly this funtionality was in
 	SearchAndSetNewFront, but I've split it for reasons of clarity. Anyway,
@@ -453,7 +385,6 @@ ListData *Workspace::HasItem(WinBorder *layer)
 	Other windows that need to be placed before it, *WILL* be placed by almost
 	all code found in SearchAndSetNewFront
 */
-
 ListData *Workspace::FindPlace(ListData *pref)
 {
 	// if we received a NULL value, we stil have to give 'front' state to some window...
@@ -608,6 +539,8 @@ ListData *Workspace::FindPlace(ListData *pref)
 	
 	return pref;
 }
+
+//----------------------------------------------------------------------------------
 /*
 	This method is the key to correct window arangement
 	With the help of FindPlace it correctly aranges windows. FindPlace, only
@@ -616,7 +549,6 @@ ListData *Workspace::FindPlace(ListData *pref)
 	about floating and modal windows.
 	It also cleverly selects the new FINAL front window.
  */
-
 void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 {
 	STRACE(("*WS(%ld)::SASNF(%s)\n", ID(), preferred? preferred->GetName(): "NULL"));
@@ -1160,6 +1092,7 @@ void Workspace::SearchAndSetNewFront(WinBorder *preferred)
 	STRACESTREAM();
 }
 
+//----------------------------------------------------------------------------------
 /*
 	This method performs a simple opperation. It searched the new focus window
 	by walking from front to back, cheking for some things, until all variables
@@ -1246,6 +1179,8 @@ void Workspace::SearchAndSetNewFocus(WinBorder *preferred)
 	fOpLock.Unlock();
 }
 
+//----------------------------------------------------------------------------------
+
 void Workspace::BringToFrontANormalWindow(WinBorder *layer)
 {
 	switch (layer->Window()->Feel())
@@ -1284,6 +1219,8 @@ void Workspace::BringToFrontANormalWindow(WinBorder *layer)
 		}
 	}
 }
+
+//----------------------------------------------------------------------------------
 
 // This method moves a window to the back of its subset.
 void Workspace::MoveToBack(WinBorder *newLast)
@@ -1405,26 +1342,35 @@ void Workspace::MoveToBack(WinBorder *newLast)
 		STRACE((" this operation was not needed\n"));
 }
 
+//----------------------------------------------------------------------------------
+
 void Workspace::SetLocalSpace(const uint32 colorspace)
 {
 	fSpace		= colorspace;
 }
+
+//----------------------------------------------------------------------------------
 
 uint32 Workspace::LocalSpace() const
 {
 	return fSpace;
 }
 
+//----------------------------------------------------------------------------------
+
 void Workspace::SetBGColor(const RGBColor &c)
 {
 	fBGColor = c;
 }
+
+//----------------------------------------------------------------------------------
 
 RGBColor Workspace::BGColor(void) const
 {
 	return fBGColor;
 }
 
+//----------------------------------------------------------------------------------
 /*!
 	\brief Retrieves settings from a container message passed to PutSettings
 	\param A BMessage containing data from a PutSettings() call
@@ -1437,12 +1383,14 @@ void Workspace::GetSettings(const BMessage &msg)
 	// TODO: Implement
 }
 
+//----------------------------------------------------------------------------------
 //! Sets workspace settings to defaults
 void Workspace::GetDefaultSettings(void)
 {
 	// TODO: Implement
 }
 
+//----------------------------------------------------------------------------------
 /*!
 	\brief Places the screen settings for the workspace in the passed BMessage
 	\param msg BMessage pointer to receive the settings
@@ -1465,6 +1413,7 @@ void Workspace::PutSettings(BMessage *msg, const int32 &index) const
 	// TODO: Implement
 }
 
+//----------------------------------------------------------------------------------
 /*!
 	\brief Places default settings for the workspace in the passed BMessage
 	\param msg BMessage pointer to receive the settings
@@ -1475,7 +1424,8 @@ void Workspace::PutDefaultSettings(BMessage *msg, const int32 &index)
 	// TODO: Implement
 }
 
-// Debug methods
+//----------------------------------------------------------------------------------
+// Debug method
 void Workspace::PrintToStream() const
 {
 	printf("\nWorkspace %ld hierarchy shown from back to front:\n", fID);
@@ -1509,6 +1459,8 @@ void Workspace::PrintToStream() const
 //	printf("Bottom Layer:\t%s\n", fBottomItem? fBottomItem->layerPtr->GetName(): "NULL");
 }
 
+//----------------------------------------------------------------------------------
+// Debug method
 void Workspace::PrintItem(ListData *item) const
 {
 	printf("ListData members:\n");
@@ -1523,3 +1475,73 @@ void Workspace::PrintItem(ListData *item) const
 		printf("NULL item\n");
 	}
 }
+
+//----------------------------------------------------------------------------------
+// PRIVATE
+//----------------------------------------------------------------------------------
+
+void Workspace::InsertItem(ListData *item, ListData *before)
+{
+	// insert before one other item;
+	if(before)
+	{
+		if(before->upperItem)
+			before->upperItem->lowerItem	= item;
+		item->upperItem		= before->upperItem;
+		before->upperItem	= item;
+		item->lowerItem		= before;
+
+		// if we're inserting at top of the stack, change it accordingly.
+		if(fTopItem == before)
+			fTopItem = item;
+	}
+	else
+	{
+		// insert item at bottom.
+		item->upperItem	= fBottomItem;
+		if(fBottomItem)
+			fBottomItem->lowerItem	= item;
+
+		fBottomItem		= item;
+
+		if(!fTopItem)
+			fTopItem	= item;
+	}
+}
+
+//----------------------------------------------------------------------------------
+
+void Workspace::RemoveItem(ListData *item)
+{
+	if(!item)
+		return;
+
+	if(fBottomItem == item)
+		fBottomItem = item->upperItem;
+	else
+		item->lowerItem->upperItem	= item->upperItem;
+	
+	if(fTopItem == item)
+		fTopItem = item->lowerItem;
+	else
+		item->upperItem->lowerItem	= item->lowerItem;
+	
+	// set all these to NULL to avoid confusion later.
+
+	item->upperItem	= NULL;
+	item->lowerItem	= NULL;
+	
+	if(fFocusItem == item)
+	{
+		fFocusItem->layerPtr->HighlightDecorator(false);
+		fFocusItem = NULL;
+	}
+
+	if(fFrontItem == item)
+		fFrontItem = NULL;
+
+	if(fCurrentItem == item)
+		fCurrentItem = NULL;
+}
+
+//----------------------------------------------------------------------------------

@@ -368,6 +368,21 @@ void RootLayer::RemoveWinBorder(WinBorder* winBorder)
 	desktop->fGeneralLock.Unlock();
 }
 
+WinBorder* RootLayer::WinBorderAt(const BPoint& pt){
+	WinBorder		*target = NULL;
+	WinBorder		*wb = NULL;
+
+	for( wb = fActiveWorkspace->GoToBottomItem(); wb; wb = fActiveWorkspace->GoToUpperItem())
+	{
+		if(!wb->IsHidden() && wb->HasPoint(pt))
+		{
+			target	= wb;
+			break;
+		}
+	}
+	return target;
+}
+
 void RootLayer::ChangeWorkspacesFor(WinBorder* winBorder, uint32 newWorkspaces)
 {
 	// only normal windows are affected by this change

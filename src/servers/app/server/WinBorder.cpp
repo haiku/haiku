@@ -410,7 +410,7 @@ void WinBorder::ResizeBy(float x, float y)
 	Layer::ResizeBy(x,y);
 }
 
-bool WinBorder::HasPoint(BPoint& pt) const
+bool WinBorder::HasPoint(const BPoint& pt) const
 {
 	return fFullVisible.Contains(pt);
 }

@@ -67,7 +67,7 @@ public:
 	void SetLevel();
 	void HighlightDecorator(const bool &active);
 	
-	bool HasPoint(BPoint &pt) const;
+	bool HasPoint(const BPoint &pt) const;
 	
 	void AddToSubsetOf(WinBorder* main);
 	void RemoveFromSubsetOf(WinBorder* main);

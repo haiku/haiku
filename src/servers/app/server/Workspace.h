@@ -66,9 +66,6 @@ public:
 	WinBorder *GoToLowerItem(void);
 	bool GoToItem(WinBorder *layer);
 	
-	WinBorder *SearchWinBorder(BPoint pt);
-	void Invalidate(void);
-	
 	void SetLocalSpace(const uint32 colorspace);
 	uint32 LocalSpace(void) const;
 	
@@ -92,13 +89,13 @@ public:
 	void SearchAndSetNewFocus(WinBorder *preferred);
 	void BringToFrontANormalWindow(WinBorder *layer);
 	
-	ListData *HasItem(ListData *item);
 	ListData *HasItem(WinBorder *layer);
 	
 private:
 	
 	void InsertItem(ListData *item, ListData *before);
 	void RemoveItem(ListData *item);
+	ListData *HasItem(ListData *item);
 	
 	ListData *FindPlace(ListData *pref);
 	

@@ -334,7 +334,7 @@ void Desktop::MouseEventHandler(PortMessage *msg)
 			Workspace	*ws;
 			rl			= ActiveRootLayer();
 			ws			= rl->ActiveWorkspace();
-			target		= ws->SearchWinBorder(pt);
+			target		= rl->WinBorderAt(pt);
 			if (target)
 			{
 				fGeneralLock.Lock();
@@ -437,7 +437,7 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 				// After we read the data, we need to reset it for MouseUp()
 				msg->Rewind();
 
-				WinBorder *target = ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(pt);
+				WinBorder *target = ActiveRootLayer()->WinBorderAt(pt);
 				if(target){
 					target->Window()->Lock();
 					target->MouseUp(msg);
@@ -481,7 +481,7 @@ printf("2Focus: %s\n", ws->FocusLayer()->GetName());
 			}
 			else
 			{
-				WinBorder *target = ActiveRootLayer()->ActiveWorkspace()->SearchWinBorder(BPoint(x,y));
+				WinBorder *target = ActiveRootLayer()->WinBorderAt(BPoint(x,y));
 				if(target){
 					target->Window()->Lock();
 					target->MouseMoved(msg);

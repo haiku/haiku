@@ -357,8 +357,10 @@ void ServerWindow::Hide(void)
 			{
 				if (ws->FocusLayer() == fWinBorder)
 					ws->SearchAndSetNewFocus(fWinBorder);
-				else
-					ws->Invalidate();
+				else{
+// TODO: RootLayer class should take care of this. (or Desktop)
+//					ws->Invalidate();
+				}
 			}
 		}
 		rl->fMainLock.Unlock();
