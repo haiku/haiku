@@ -77,7 +77,7 @@ ClipboardApp::ArgvReceived(int32 argc, char **argv)
 	};
 
 	int c;
-	while ((c = getopt_long(argc, argv, "l:s:o:c:ripd", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "l:s:o:c:ripdh", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 'l':
 				status = Load(optarg);
@@ -143,7 +143,7 @@ ClipboardApp::Usage(void)
 		"  -p, --print\t\tPrint clipboard to standard output\n"
 		"  -d, --debug\t\tPrint clipboard message to stdout\n\n"
 
-		"  --help\t\tDisplay this help and exit\n",
+		"  -h, --help\t\tDisplay this help and exit\n",
 		kProgramName);
 }
 
