@@ -79,7 +79,7 @@ status_t nv_acc_wait_idle_dma()
 status_t nv_acc_init_dma()
 {
 	uint16 cnt;
-	uint32 surf_depth, patt_depth, bitm_depth;
+	uint32 surf_depth, cmd_depth;
 	/* reset the engine DMA stalls counter */
 	err = 0;
 
@@ -241,7 +241,7 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX0_7, 0x00000000); /* extra */
 		ACCW(PR_CTX1_7, 0x00000000); /* extra */
 		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
-		ACCW(PR_CTX0_8, 0x0208004a); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX0_8, 0x0208004a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX1_8, 0x02000000); /* colorspace not set, notify instance is $0200 (b16-31) */
 		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
@@ -298,7 +298,7 @@ status_t nv_acc_init_dma()
 		ACCW(PR_CTX2_6, 0x11401140); /* DMA0 instance is $1140, DMA1 instance invalid */
 		ACCW(PR_CTX3_6, 0x00000000); /* method trap 0 is $1140, trap 1 disabled */
 		/* setup set '5' for cmd NV4_GDI_RECTANGLE_TEXT */
-		ACCW(PR_CTX0_8, 0x0100804b); /* NVclass $04b, patchcfg ROP_AND, nv10+: little endian */
+		ACCW(PR_CTX0_8, 0x0100804a); /* NVclass $04a, patchcfg ROP_AND, nv10+: little endian */
 		ACCW(PR_CTX1_8, 0x00000002); /* colorspace not set, notify instance is $0200 (b16-31) */
 		ACCW(PR_CTX2_8, 0x00000000); /* DMA0 and DMA1 instance invalid */
 		ACCW(PR_CTX3_8, 0x00000000); /* method traps disabled */
@@ -737,28 +737,17 @@ status_t nv_acc_init_dma()
 	{
 	case B_CMAP8:
 		surf_depth = 0x00000001;
-		patt_depth = 0x00000003;
-		//fixme: needed for NV11, checkout the rest!
-		if (si->ps.card_arch < NV40A)
-			bitm_depth = 0x00000001;
-		else
-			bitm_depth = 0x00000003;
+		cmd_depth = 0x00000003;
 		break;
 	case B_RGB15_LITTLE:
 	case B_RGB16_LITTLE:
 		surf_depth = 0x00000004;
-		patt_depth = 0x00000001;
-		//fixme: needed for NV11, checkout the rest!
-		if (si->ps.card_arch < NV40A)
-			bitm_depth = 0x00000003; /* sets bitmap input depth to broken 32-bit.. */
-		else
-			bitm_depth = 0x00000001;
+		cmd_depth = 0x00000001;
 		break;
 	case B_RGB32_LITTLE:
 	case B_RGBA32_LITTLE:
 		surf_depth = 0x00000006;
-		patt_depth = 0x00000003;
-		bitm_depth = 0x00000003;
+		cmd_depth = 0x00000003;
 		break;
 	default:
 		LOG(8,("ACC_DMA: init, invalid bit depth\n"));
@@ -783,13 +772,13 @@ status_t nv_acc_init_dma()
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set pattern colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV_IMAGE_PATTERN, NV_IMAGE_PATTERN_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = patt_depth; /* SetColorFormat */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* wait for room in fifo for bitmap colordepth setup cmd if needed */
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* set bitmap colordepth (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_SETCOLORFORMAT, 1);
-	si->engine.dma.cmdbuffer[si->engine.dma.current++] = bitm_depth; /* SetColorFormat */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = cmd_depth; /* SetColorFormat */
 
 	/* tell the engine to fetch and execute all (new) commands in the DMA buffer */
 	nv_start_dma();
@@ -878,17 +867,17 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 				 * Leave some room between where the engine is fetching and where we
 				 * put new commands. Otherwise the engine will crash on heavy loads.
 				 * A crash can be forced best in 640x480 resolution with BeRoMeter 1.2.6.
-				 * (confirmed on NV11 and NV43 with less than 64 words forced freespace.)
+				 * (confirmed on NV11 and NV43 with less than 128 words forced freespace.)
 				 * Note:
 				 * The engine is DMA triggered for fetching chunks every 128 bytes,
 				 * maybe this is the reason for this behaviour.
 				 * Note also:
 				 * it looks like the space that needs to be kept free is coupled
 				 * with the size of the DMA buffer. */
-				if (si->engine.dma.free < 64)
+				if (si->engine.dma.free < 128)
 					si->engine.dma.free = 0;
 				else
-					si->engine.dma.free -= 64;
+					si->engine.dma.free -= 128;
 			}
 		}
 		else
@@ -902,17 +891,17 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 			 * Leave some room between where the engine is fetching and where we
 			 * put new commands. Otherwise the engine will crash on heavy loads.
 			 * A crash can be forced best in 640x480 resolution with BeRoMeter 1.2.6.
-			 * (confirmed on NV11 and NV43 with less than 64 words forced freespace.)
+			 * (confirmed on NV11 and NV43 with less than 128 words forced freespace.)
 			 * Note:
 			 * The engine is DMA triggered for fetching chunks every 128 bytes,
 			 * maybe this is the reason for this behaviour.
 			 * Note also:
 			 * it looks like the space that needs to be kept free is coupled
 			 * with the size of the DMA buffer. */
-			if (si->engine.dma.free < 64)
+			if (si->engine.dma.free < 128)
 				si->engine.dma.free = 0;
 			else
-				si->engine.dma.free -= 64;
+				si->engine.dma.free -= 128;
 		}
 	}
 
@@ -1105,29 +1094,7 @@ status_t nv_acc_setup_rectangle_dma(uint32 color)
 	if (nv_acc_fifofree_dma(2) != B_OK) return B_ERROR;
 	/* now setup color (writing 2 32bit words) */
 	nv_acc_cmd_dma(NV4_GDI_RECTANGLE_TEXT, NV4_GDI_RECTANGLE_TEXT_COLOR1A, 1);
-	//fixme: needed for NV11, checkout the rest!
-	if (si->ps.card_arch < NV40A)
-		switch(si->dm.space)
-		{
-		case B_RGB15_LITTLE:
-			/* unbelievable, isn't it? */
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-				(((color & 0x00007800) << 8) |	/* (red b1-5: broken hardware) */
-				((color & 0x00000400) << 5) |	/* (red b0: broken hardware) */
-				((color & 0x000003e0) << 5) |	/* (green: broken hardware) */
-				((color & 0x0000001f) << 3)); /* Color1A */
-			break;
-		case B_RGB16_LITTLE:
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] =
-				(((color & 0x0000f800) << 8) | ((color & 0x000007e0) << 5) |
-				((color & 0x0000001f) << 3)); /* Color1A */
-			break;
-		default:
-			si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
-			break;
-		}
-	else
-		si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
+	si->engine.dma.cmdbuffer[si->engine.dma.current++] = color; /* Color1A */
 
 	return B_OK;
 }
