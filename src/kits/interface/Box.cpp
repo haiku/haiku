@@ -328,7 +328,6 @@ void BBox::DrawPlain()
 {
 	BRect rect = fBounds;
 
-	rect.top--;
 	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_MAX_TINT));
 	StrokeLine(BPoint(rect.left, rect.bottom), BPoint(rect.left, rect.top));
 	StrokeLine(BPoint(rect.left+1.0f, rect.top), BPoint(rect.right, rect.top));
