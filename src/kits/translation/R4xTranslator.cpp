@@ -185,7 +185,7 @@ const translation_format *BR4xTranslator::InputFormats(int32 *out_count) const
 {
 	if (!out_count)
 		return NULL;
-	if (fpData) {
+	if (fpData && fpData->inputFormats != NULL) {
 		int32 i;
 		for (i = 0; fpData->inputFormats[i].type; i++);
 	
@@ -217,7 +217,7 @@ const translation_format *BR4xTranslator::OutputFormats(int32 *out_count) const
 {
 	if (!out_count)
 		return NULL;
-	if (fpData) {
+	if (fpData && fpData->outputFormats != NULL) {
 		int32 i;
 		for (i = 0; fpData->outputFormats[i].type; i++);
 	
