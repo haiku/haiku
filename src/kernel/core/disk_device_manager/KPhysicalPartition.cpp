@@ -199,7 +199,7 @@ KPhysicalPartition::DeleteShadowPartition()
 	// delete the thing
 	KDiskDeviceManager *manager = KDiskDeviceManager::Default();
 	if (ManagerLocker locker = manager) {
-		fShadowPartition->SetPhysicalPartition(NULL);
+		fShadowPartition->UnsetPhysicalPartition();
 		PartitionRegistrar _(fShadowPartition);
 		manager->PartitionRemoved(fShadowPartition);
 		fShadowPartition = NULL;
@@ -208,7 +208,7 @@ KPhysicalPartition::DeleteShadowPartition()
 
 // ShadowPartition
 KShadowPartition *
-KPhysicalPartition::ShadowPartition()
+KPhysicalPartition::ShadowPartition() const
 {
 	return fShadowPartition;
 }
@@ -222,9 +222,9 @@ KPhysicalPartition::IsShadowPartition() const
 
 // PhysicalPartition
 KPhysicalPartition *
-KPhysicalPartition::PhysicalPartition()
+KPhysicalPartition::PhysicalPartition() const
 {
-	return this;
+	return NULL;
 }
 
 // Dump

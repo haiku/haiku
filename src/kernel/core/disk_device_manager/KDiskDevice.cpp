@@ -7,8 +7,11 @@
 
 #include <Drivers.h>
 
+#include "ddm_userland_interface.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceUtils.h"
+#include "KShadowPartition.h"
+#include "UserDataWriter.h"
 
 // debugging
 //#define DBG(x)
@@ -262,6 +265,24 @@ KDiskDevice::ShadowOwner() const
 	return fShadowOwner;
 }
 
+// WriteUserData
+void
+KDiskDevice::WriteUserData(UserDataWriter &writer, bool shadow)
+{
+	KPartition *partition = (shadow ? ShadowPartition() : this);
+	if (!partition)
+		partition = this;
+	user_disk_device_data *data
+		= writer.AllocateDeviceData(partition->CountChildren());
+	char *path = writer.PlaceString(Path());
+	if (data) {
+		data->device_flags = DeviceFlags();
+		data->path = path;
+		partition->WriteUserData(writer, &data->device_partition_data);
+	} else
+		partition->WriteUserData(writer, NULL);
+}
+
 // Dump
 void
 KDiskDevice::Dump(bool deep, int32 level)
@@ -302,5 +323,6 @@ KDiskDevice::_InitPartitionData()
 		* fDeviceData.geometry.sectors_per_track
 		* fDeviceData.geometry.cylinder_count
 		* fDeviceData.geometry.head_count;
+	fPartitionData.flags |= B_PARTITION_IS_DEVICE;
 }
 

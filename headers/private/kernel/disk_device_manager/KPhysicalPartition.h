@@ -35,9 +35,9 @@ public:
 
 	virtual status_t CreateShadowPartition();	// creates a complete tree
 	virtual void DeleteShadowPartition();		// deletes ...
-	virtual KShadowPartition *ShadowPartition();
+	virtual KShadowPartition *ShadowPartition() const;
 	virtual bool IsShadowPartition() const;
-	virtual KPhysicalPartition *PhysicalPartition();
+	virtual KPhysicalPartition *PhysicalPartition() const;
 
 	// DiskSystem
 

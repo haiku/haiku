@@ -7,20 +7,12 @@
 
 #include "disk_device_manager.h"
 
-// partition flags
-// TODO: move to another header (must be accessible from userland API impl.)
-enum {
-	B_PARTITION_IS_DEVICE		= 0x01,
-	B_PARTITION_MOUNTABLE		= 0x02,
-	B_PARTITION_PARTITIONABLE	= 0x04,
-	B_PARTITION_READ_ONLY		= 0x08,
-	B_PARTITION_MOUNTED			= 0x10,	// needed?
-	B_PARTITION_BUSY			= 0x20,
-	B_PARTITION_DESCENDANT_BUSY	= 0x40,
-};
+struct user_partition_data;
 
 namespace BPrivate {
 namespace DiskDevice {
+
+class UserDataWriter;
 
 class KDiskDevice;
 class KDiskSystem;
@@ -142,9 +134,9 @@ public:
 
 	virtual status_t CreateShadowPartition();	// creates a complete tree
 	virtual void DeleteShadowPartition();		// deletes ...
-	virtual KShadowPartition *ShadowPartition() = 0;
+	virtual KShadowPartition *ShadowPartition() const = 0;
 	virtual bool IsShadowPartition() const = 0;
-	virtual KPhysicalPartition *PhysicalPartition() = 0;
+	virtual KPhysicalPartition *PhysicalPartition() const = 0;
 
 	// DiskSystem
 
@@ -160,6 +152,8 @@ public:
 
 	void SetContentCookie(void *cookie);
 	void *ContentCookie() const;
+
+	void WriteUserData(UserDataWriter &writer, user_partition_data *data);
 
 	virtual void Dump(bool deep, int32 level);
 

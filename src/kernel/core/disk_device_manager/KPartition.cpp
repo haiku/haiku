@@ -10,11 +10,13 @@
 #include <Drivers.h>
 #include <Errors.h>
 
+#include "ddm_userland_interface.h"
 #include "KDiskDevice.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
 #include "KPartition.h"
+#include "UserDataWriter.h"
 
 using namespace std;
 
@@ -712,6 +714,47 @@ void *
 KPartition::ContentCookie() const
 {
 	return fPartitionData.content_cookie;
+}
+
+// WriteUserData
+void
+KPartition::WriteUserData(UserDataWriter &writer, user_partition_data *data)
+{
+	// allocate
+	char *name = writer.PlaceString(Name());
+	char *contentName = writer.PlaceString(ContentName());
+	char *type = writer.PlaceString(Type());
+	char *contentType = writer.PlaceString(ContentType());
+	char *parameters = writer.PlaceString(Parameters());
+	char *contentParameters = writer.PlaceString(ContentParameters());
+	// fill in data
+	if (data) {
+		data->id = ID();
+		data->offset = Offset();
+		data->size = Size();
+		data->block_size = BlockSize();
+		data->status = Status();
+		data->flags = Flags();
+		data->volume = VolumeID();
+		data->index = Index();
+		data->change_counter = ChangeCounter();
+		data->disk_system = (DiskSystem() ? DiskSystem()->ID() : -1);
+		data->name = name;
+		data->content_name = contentName;
+		data->type = type;
+		data->content_type = contentType;
+		data->parameters = parameters;
+		data->content_parameters = contentParameters;
+		data->child_count = CountChildren();
+	}
+	// children
+	for (int32 i = 0; KPartition *child = ChildAt(i); i++) {
+		user_partition_data *childData
+			= writer.AllocatePartitionData(child->CountChildren());
+		if (data)
+			data->children[i] = childData;
+		child->WriteUserData(writer, childData);
+	}
 }
 
 // Dump

@@ -25,9 +25,9 @@ using namespace std;
 // constructor
 KShadowPartition::KShadowPartition(KPhysicalPartition *partition)
 	: KPartition(),
-	  fPhysicalPartition(NULL)
+	  fPhysicalPartition(partition)
 {
-	SetPhysicalPartition(partition);
+	SyncWithPhysicalPartition();
 }
 
 // destructor
@@ -68,24 +68,43 @@ KShadowPartition::IsShadowPartition() const
 
 // ShadowPartition
 KShadowPartition*
-KShadowPartition::ShadowPartition()
+KShadowPartition::ShadowPartition() const
 {
-	return this;
+	return NULL;
 }
 
-// SetPhysicalPartition
+// UnsetPhysicalPartition
 void
-KShadowPartition::SetPhysicalPartition(KPhysicalPartition *partition)
+KShadowPartition::UnsetPhysicalPartition()
 {
-	fPhysicalPartition = partition;
-// TODO: clone the data of the physical partition.
+	fPhysicalPartition = NULL;
 }
 
 // PhysicalPartition
 KPhysicalPartition*
-KShadowPartition::PhysicalPartition()
+KShadowPartition::PhysicalPartition() const
 {
 	return fPhysicalPartition;
+}
+
+// SyncWithPhysicalPartition
+void
+KShadowPartition::SyncWithPhysicalPartition()
+{
+	if (!fPhysicalPartition)
+		return;
+	SetDevice(fPhysicalPartition->Device());
+	SetDiskSystem(fPhysicalPartition->DiskSystem());
+	SetOffset(fPhysicalPartition->Offset());
+	SetSize(fPhysicalPartition->Size());
+	SetBlockSize(fPhysicalPartition->BlockSize());
+	SetStatus(fPhysicalPartition->Status());
+	SetFlags(fPhysicalPartition->Flags());
+	SetVolumeID(fPhysicalPartition->VolumeID());
+	SetName(fPhysicalPartition->Name());
+	SetContentName(fPhysicalPartition->ContentName());
+	SetParameters(fPhysicalPartition->Parameters());
+	SetContentParameters(fPhysicalPartition->ContentParameters());
 }
 
 // Dump

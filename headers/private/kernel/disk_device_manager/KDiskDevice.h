@@ -8,15 +8,10 @@
 #include "KPhysicalPartition.h"
 #include "RWLocker.h"
 
-// disk device flags
-// TODO: move to another header (must be accessible from userland API impl.)
-enum {
-	B_DISK_DEVICE_REMOVABLE		= 0x01,
-	B_DISK_DEVICE_HAS_MEDIA		= 0x02,
-};
-
 namespace BPrivate {
 namespace DiskDevice {
+
+class UserDataWriter;
 
 class KDiskDevice : public KPhysicalPartition {
 public:
@@ -68,6 +63,8 @@ public:
 
 	void SetShadowOwner(team_id team);
 	team_id ShadowOwner() const;
+
+	void WriteUserData(UserDataWriter &writer, bool shadow);
 
 	virtual void Dump(bool deep = true, int32 level = 0);
 

@@ -22,10 +22,12 @@ public:
 
 	// Shadow Partition
 
-	virtual KShadowPartition *ShadowPartition();
+	virtual KShadowPartition *ShadowPartition() const;
 	virtual bool IsShadowPartition() const;
-	void SetPhysicalPartition(KPhysicalPartition *partition);
-	virtual KPhysicalPartition *PhysicalPartition();
+	void UnsetPhysicalPartition();
+	virtual KPhysicalPartition *PhysicalPartition() const;
+
+	void SyncWithPhysicalPartition();
 
 	virtual void Dump(bool deep, int32 level);
 

@@ -7,19 +7,12 @@
 #ifndef _DISK_DEVICE_MANAGER_H
 #define _DISK_DEVICE_MANAGER_H
 
+#include <DiskDeviceDefs.h>
 #include <Drivers.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// TODO: These don't belong here. partition_id and disk_job_id are
-// public (exposed by the userland API), while disk_system_id is at least
-// known to the userland API, but probably exposed as well, as type of a
-// private member variable of BDiskSystem.
-typedef int32 partition_id;
-typedef int32 disk_system_id;
-typedef int32 disk_job_id;
 
 // C API partition representation
 typedef struct partition_data {
