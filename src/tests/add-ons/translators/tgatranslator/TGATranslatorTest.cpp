@@ -60,25 +60,16 @@ TGATranslatorTest::tearDown()
 void
 CheckBits_Tga(translator_info *pti)
 {
-	CPPUNIT_ASSERT(pti->type == B_TRANSLATOR_BITMAP);
-	CPPUNIT_ASSERT(pti->translator != 0);
-	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_BITMAP);
-	CPPUNIT_ASSERT(pti->quality > 0.59 && pti->quality < 0.61);
-	CPPUNIT_ASSERT(pti->capability > 0.79 && pti->capability < 0.81);
-	CPPUNIT_ASSERT(strcmp(pti->name, "Be Bitmap Format (TGATranslator)") == 0);
-	CPPUNIT_ASSERT(strcmp(pti->MIME, "image/x-be-bitmap") == 0);
+	CheckTranslatorInfo(pti, B_TRANSLATOR_BITMAP, B_TRANSLATOR_BITMAP,
+		0.6f, 0.8f, "Be Bitmap Format (TGATranslator)",
+		"image/x-be-bitmap");
 }
 
 void
 CheckTga(translator_info *pti, const char *imageType)
 {
-	CPPUNIT_ASSERT(pti->type == B_TGA_FORMAT);
-	CPPUNIT_ASSERT(pti->translator != 0);
-	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_BITMAP);
-	CPPUNIT_ASSERT(pti->quality > 0.99 && pti->quality < 1.01);
-	CPPUNIT_ASSERT(pti->capability > 0.59 && pti->capability < 0.61);
-	CPPUNIT_ASSERT(strcmp(pti->name, imageType) == 0);
-	CPPUNIT_ASSERT(strcmp(pti->MIME, "image/x-targa") == 0);
+	CheckTranslatorInfo(pti, B_TGA_FORMAT, B_TRANSLATOR_BITMAP,
+		1.0f, 0.6f, imageType, "image/x-targa");
 }
 
 // coveniently group path of image with
@@ -408,165 +399,55 @@ TGATranslatorTest::TranslateTest()
 	proster = NULL;
 }
 
-// Apply a number of tests to a BTranslator * to a TGATranslator object
-void
-TestBTranslator(TGATranslatorTest *ptest, BTranslator *ptran)
-{	
-	// The translator should only have one reference
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
-	
-	// Make sure Acquire returns a BTranslator even though its
-	// already been Acquired once
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->Acquire() == ptran);
-	
-	// Acquired twice, refcount should be 2
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 2);
-	
-	// Release should return ptran because it is still acquired
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == ptran);
-	
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
-	
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->Acquire() == ptran);
-	
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 2);
-	
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == ptran);
-	
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->ReferenceCount() == 1);
-	
-	// A name would be nice
-	ptest->NextSubTest();
-	const char *tranname = ptran->TranslatorName();
-	CPPUNIT_ASSERT(tranname);
-	printf(" {%s} ", tranname);
-	
-	// More info would be nice
-	ptest->NextSubTest();
-	const char *traninfo = ptran->TranslatorInfo();
-	CPPUNIT_ASSERT(traninfo);
-	printf(" {%s} ", traninfo);
-	
-	// What version are you?
-	// (when ver == 100, that means that version is 1.00)
-	ptest->NextSubTest();
-	int32 ver = ptran->TranslatorVersion();
-	CPPUNIT_ASSERT((ver / 100) > 0);
-	printf(" {%d} ", (int) ver);
-	
-	// Input formats?
-	ptest->NextSubTest();
-	{
-		int32 incount = 0;
-		const translation_format *pins = ptran->InputFormats(&incount);
-		CPPUNIT_ASSERT(incount == 2);
-		CPPUNIT_ASSERT(pins);
-		// must support B_TGA_FORMAT and B_TRANSLATOR_BITMAP formats
-		for (int32 i = 0; i < incount; i++) {
-			CPPUNIT_ASSERT(pins[i].group == B_TRANSLATOR_BITMAP);
-			CPPUNIT_ASSERT(pins[i].MIME);
-			CPPUNIT_ASSERT(pins[i].name);
-
-			if (pins[i].type == B_TRANSLATOR_BITMAP) {
-				CPPUNIT_ASSERT(pins[i].quality > 0.59 && pins[i].quality < 0.61);
-				CPPUNIT_ASSERT(pins[i].capability > 0.79 && pins[i].capability < 0.81);
-				CPPUNIT_ASSERT(strcmp(pins[i].MIME, BBT_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pins[i].name,
-					"Be Bitmap Format (TGATranslator)") == 0);
-			} else if (pins[i].type == B_TGA_FORMAT) {
-				CPPUNIT_ASSERT(pins[i].quality > 0.99 && pins[i].quality < 1.01);
-				CPPUNIT_ASSERT(pins[i].capability > 0.59 && pins[i].capability < 0.61);
-				CPPUNIT_ASSERT(strcmp(pins[i].MIME, TGA_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pins[i].name, "Targa image") == 0);
-			} else
-				CPPUNIT_ASSERT(false);
-		}
-	}
-	
-	// Output formats?
-	ptest->NextSubTest();
-	{
-		int32 outcount = 0;
-		const translation_format *pouts = ptran->OutputFormats(&outcount);
-		CPPUNIT_ASSERT(outcount == 2);
-		CPPUNIT_ASSERT(pouts);
-		// must support B_TGA_FORMAT and B_TRANSLATOR_BITMAP formats
-		for (int32 i = 0; i < outcount; i++) {
-			CPPUNIT_ASSERT(pouts[i].group == B_TRANSLATOR_BITMAP);
-			CPPUNIT_ASSERT(pouts[i].MIME);
-			CPPUNIT_ASSERT(pouts[i].name);
-	
-			if (pouts[i].type == B_TRANSLATOR_BITMAP) {
-				CPPUNIT_ASSERT(pouts[i].quality > 0.59 && pouts[i].quality < 0.61);
-				CPPUNIT_ASSERT(pouts[i].capability > 0.79 && pouts[i].capability < 0.81);
-				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, BBT_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pouts[i].name,
-					"Be Bitmap Format (TGATranslator)") == 0);
-			} else if (pouts[i].type == B_TGA_FORMAT) {
-				CPPUNIT_ASSERT(pouts[i].quality > 0.99 && pouts[i].quality < 1.01);
-				CPPUNIT_ASSERT(pouts[i].capability > 0.69 && pouts[i].capability < 0.71);
-				CPPUNIT_ASSERT(strcmp(pouts[i].MIME, TGA_MIME_STRING) == 0);
-				CPPUNIT_ASSERT(strcmp(pouts[i].name, "Targa image") == 0);
-			} else
-				CPPUNIT_ASSERT(false);
-		}
-	}
-	
-	// Release should return NULL because Release has been called
-	// as many times as it has been acquired
-	ptest->NextSubTest();
-	CPPUNIT_ASSERT(ptran->Release() == NULL);
-	ptran = NULL;
-}
-
 #if !TEST_R5
+
+// The input formats that this translator is supposed to support
+translation_format gTGAInputFormats[] = {
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		0.6f, // quality
+		0.8f, // capability
+		"image/x-be-bitmap",
+		"Be Bitmap Format (TGATranslator)"
+	},
+	{
+		B_TGA_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		1.0f,
+		0.6f,
+		"image/x-targa",
+		"Targa image"
+	}
+};
+
+// The output formats that this translator is supposed to support
+translation_format gTGAOutputFormats[] = {
+	{
+		B_TRANSLATOR_BITMAP,
+		B_TRANSLATOR_BITMAP,
+		0.6f, // quality
+		0.8f, // capability
+		"image/x-be-bitmap",
+		"Be Bitmap Format (TGATranslator)"
+	},
+	{
+		B_TGA_FORMAT,
+		B_TRANSLATOR_BITMAP,
+		1.0f,
+		0.7f,
+		"image/x-targa",
+		"Targa image"
+	}
+};
 
 void
 TGATranslatorTest::LoadAddOnTest()
 {
-	// Make sure the add_on loads
-	NextSubTest();
-	const char *path = "/boot/home/config/add-ons/Translators/TGATranslator";
-	image_id image = load_add_on(path);
-	CPPUNIT_ASSERT(image >= 0);
-	
-	// Load in function to make the object
-	NextSubTest();
-	BTranslator *(*pMakeNthTranslator)(int32 n,image_id you,uint32 flags,...);
-	status_t err = get_image_symbol(image, "make_nth_translator",
-		B_SYMBOL_TYPE_TEXT, (void **)&pMakeNthTranslator);
-	CPPUNIT_ASSERT(!err);
-
-	// Make sure the function returns a pointer to a BTranslator
-	NextSubTest();
-	BTranslator *ptran = pMakeNthTranslator(0, image, 0);
-	CPPUNIT_ASSERT(ptran);
-	
-	// Make sure the function only returns one BTranslator
-	NextSubTest();
-	CPPUNIT_ASSERT(!pMakeNthTranslator(1, image, 0));
-	CPPUNIT_ASSERT(!pMakeNthTranslator(2, image, 0));
-	CPPUNIT_ASSERT(!pMakeNthTranslator(3, image, 0));
-	CPPUNIT_ASSERT(!pMakeNthTranslator(16, image, 0));
-	CPPUNIT_ASSERT(!pMakeNthTranslator(1023, image, 0));
-	
-	// Run a number of tests on the BTranslator object
-	TestBTranslator(this, ptran);
-		// NOTE: this function Release()s ptran
-	ptran = NULL;
-	
-	// Unload Add-on
-	NextSubTest();
-	CPPUNIT_ASSERT(unload_add_on(image) == B_OK); 
+	TranslatorLoadAddOnTest("/boot/home/config/add-ons/Translators/TGATranslator",
+		this,
+		gTGAInputFormats, sizeof(gTGAInputFormats) / sizeof(translation_format),
+		gTGAOutputFormats, sizeof(gTGAOutputFormats) / sizeof(translation_format));
 }
 
 #endif // #if !TEST_R5
