@@ -563,6 +563,10 @@ _console_write(struct console_desc *con, const void *buf, size_t len)
 						con->args[con->arg_ptr] = *c - '0';
 						con->state = CONSOLE_STATE_PARSING_ARG;
 						break;
+					case '?':
+						// private DEC mode parameter follows - we ignore those anyway
+						// ToDo: check if it was really used in combination with a mode command
+						break;
 					default:
 						process_vt100_command(con, *c, true, con->args, con->arg_ptr + 1);
 						con->state = CONSOLE_STATE_NORMAL;
@@ -654,6 +658,20 @@ console_write(void *cookie, off_t pos, const void *buffer, size_t *_length)
 {
 	struct console_desc *con = (struct console_desc *)cookie;
 	ssize_t written;
+
+#if 0
+{
+	const char *input = (const char *)buffer;
+	dprintf("console_write (%lu bytes): \"", *_length);
+	for (int32 i = 0; i < *_length; i++) {
+		if (input[i] < ' ')
+			dprintf("(%d:0x%x)", input[i], input[i]);
+		else
+			dprintf("%c", input[i]);
+	}
+	dprintf("\"\n");
+}
+#endif
 
 	mutex_lock(&con->lock);
 
