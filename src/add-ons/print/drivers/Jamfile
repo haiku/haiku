@@ -3,7 +3,7 @@ SubDir OBOS_TOP src add-ons print drivers ;
 SubInclude OBOS_TOP src add-ons print drivers shared ;
 SubInclude OBOS_TOP src add-ons print drivers canon_lips ;
 SubInclude OBOS_TOP src add-ons print drivers pcl5 ;
-SubInclude OBOS_TOP src add-ons print drivers pcl6 ;
+#SubInclude OBOS_TOP src add-ons print drivers pcl6 ;
 SubInclude OBOS_TOP src add-ons print drivers pdf ;
 SubInclude OBOS_TOP src add-ons print drivers postscript ;
 SubInclude OBOS_TOP src add-ons print drivers preview ;
