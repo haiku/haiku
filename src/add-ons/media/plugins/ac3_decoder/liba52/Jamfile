@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src add-ons media plugins ac3_decoder liba52 ;
+
+StaticLibrary a52 :
+	bit_allocate.c
+	bitstream.c
+	downmix.c
+	imdct.c
+	parse.c
+;
