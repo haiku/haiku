@@ -27,7 +27,7 @@
 #include <string.h>
 
 
-const char *kSignature = "application/x-vnd.OpenBeOS-DiskProbe";
+const char *kSignature = "application/x-vnd.Haiku-DiskProbe";
 
 static const uint32 kMsgDiskProbeSettings = 'DPst';
 static const uint32 kCascadeOffset = 20;
