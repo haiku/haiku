@@ -7,6 +7,7 @@
 #define _DISK_DEVICE_H
 
 #include <DiskDeviceVisitor.h>
+#include <Messenger.h>
 #include <ObjectList.h>
 
 class BPartition;
@@ -28,10 +29,10 @@ public:
 	int32 CountPartitions() const;
 
 	const char *Path() const;
-	void GetName(BString *name, bool includeBusID = true, 
-				 bool includeLUN = false) const;
-	void GetName(char *name, bool includeBusID = true, 
-				 bool includeLUN = false) const;
+	status_t GetName(BString *name, bool includeBusID = true, 
+					 bool includeLUN = false) const;
+	status_t GetName(char *name, bool includeBusID = true, 
+					 bool includeLUN = false) const;
 
 	bool IsReadOnly() const;
 	bool IsRemovable() const;
@@ -41,10 +42,10 @@ public:
 
 	int32 UniqueID() const;
 
-	status_t Eject();
+	status_t Eject(bool update = false);
 	status_t LowLevelFormat();	// TODO: remove?
 
-	status_t Update();
+	status_t Update(bool *updated = NULL);
 
 	BSession *VisitEachSession(BDiskDeviceVisitor *visitor);
 	BPartition *VisitEachPartition(BDiskDeviceVisitor *visitor);
@@ -58,6 +59,7 @@ private:
 	BDiskDevice &operator=(const BDiskDevice &);
 
 	status_t _Unarchive(BMessage *archive);
+	status_t _Update(BMessage *archive);
 
 	bool _AddSession(BSession *session);
 

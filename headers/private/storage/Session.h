@@ -63,6 +63,7 @@ private:
 
 	void _Unset();
 	status_t _Unarchive(BMessage *archive);
+	status_t _Update(BMessage *archive);
 
 	void _SetDevice(BDiskDevice *device);
 

@@ -9,6 +9,8 @@
 #include <DiskDeviceVisitor.h>
 #include <SupportDefs.h>
 
+class BMessenger;
+
 namespace BPrivate {
 
 // PartitionFilter
@@ -45,11 +47,13 @@ private:
 	int32				fID;
 };
 
+status_t get_disk_device_messenger(BMessenger *messenger);
+
 }	// namespace BPrivate
 
 using BPrivate::PartitionFilter;
 using BPrivate::PartitionFilterVisitor;
 using BPrivate::IDFinderVisitor;
-
+using BPrivate::get_disk_device_messenger;
 
 #endif	// _DISK_DEVICE_PRIVATE_H
