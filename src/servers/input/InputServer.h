@@ -36,6 +36,7 @@
 #include <InputServerFilter.h>
 #include <InputServerMethod.h>
 #include "AddOnManager.h"
+#include "BottomlineWindow.h"
 #include "DeviceManager.h"
 #include "MouseSettings.h"
 #include "KeyboardSettings.h"
@@ -224,6 +225,8 @@ private:
 	BInputServerMethod	*fActiveMethod;
 	BList			fMethodQueue;
 	const BMessenger	*fReplicantMessenger;
+	BottomlineWindow 	*fBLWindow;
+	bool			fIMAware;
 
 #ifndef COMPILE_FOR_R5	
 	// added this to communicate via portlink

@@ -53,6 +53,7 @@ Server input_server :
 
 	MethodReplicant.cpp
 	MethodMenuItem.cpp
+	BottomlineWindow.cpp
 
 	# storage
 	AddOnMonitor.cpp

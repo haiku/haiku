@@ -910,11 +910,28 @@ InputServer::HandleGetSetKeyMap(BMessage *message,
  *   Descr: 
  */
 status_t
-InputServer::HandleFocusUnfocusIMAwareView(BMessage *,
-                                           BMessage *)
+InputServer::HandleFocusUnfocusIMAwareView(BMessage *message,
+                                           BMessage *reply)
 {
-	// TODO
-	return B_OK;
+	CALLED();
+
+	BMessenger messenger;
+	status_t status = message->FindMessenger("view", &messenger);
+
+	if (status != B_OK)
+		return status;
+
+	// check if current view is ours
+
+	if (message->what == IS_FOCUS_IM_AWARE_VIEW) {
+		PRINT(("HandleFocusUnfocusIMAwareView : entering\n"));
+		fIMAware = true;
+	} else {
+		PRINT(("HandleFocusUnfocusIMAwareView : leaving\n"));
+		fIMAware = false;
+	}
+
+	return status;
 }
 
 
@@ -1101,8 +1118,15 @@ InputServer::DispatchEvents(BList *eventList)
 		
 		for ( int32 i = 0; NULL != (event = (BMessage *)fEventsCache.ItemAt(i)); i++ ) {
 			// now we must send each event to the app_server
-			DispatchEvent(event);
-			
+			if (event->what == B_INPUT_METHOD_EVENT && !fIMAware) {
+				if (!fBLWindow)
+					fBLWindow = new BottomlineWindow(be_bold_font);
+
+				fBLWindow->HandleInputMethodEvent(event, eventList);
+			} else {
+				DispatchEvent(event);
+			}
+
 			delete event;
 		}
 		
@@ -1483,7 +1507,7 @@ InputServer::MethodizeEvents(BList *events,
 		BList newList;
 		newList.AddList(&fMethodQueue);
 		fMethodQueue.MakeEmpty();
-
+		
 		for (int32 i=0; i<events->CountItems(); i++) {
 			BMessage *item = (BMessage *)events->ItemAt(i);
 			BList filterList;
