@@ -71,11 +71,11 @@ handle_signals(struct thread *thread, cpu_status *state)
 	int i, sig, global_resched = 0;
 	struct sigaction *handler;
 
-	// Check, if the thread shall stop for debugging. It will never stop, if
-	// a SIGKILL[THR] signal is pending.
-	if (!(signalMask & (1 << (SIGKILL - 1)))
-		&& !(signalMask & (1 << (SIGKILLTHR - 1)))
-		&& thread->debug_info.flags & B_THREAD_DEBUG_STOP) {
+	// If SIGKILL[THR] are pending, we ignore other signals.
+	// Otherwise check, if the thread shall stop for debugging.
+	if (signalMask & KILL_SIGNALS) {
+		signalMask &= KILL_SIGNALS;
+	} else if (thread->debug_info.flags & B_THREAD_DEBUG_STOP) {
 		RELEASE_THREAD_LOCK();
 		restore_interrupts(*state);
 
@@ -197,6 +197,24 @@ handle_signals(struct thread *thread, cpu_status *state)
 	arch_check_syscall_restart(thread);
 
 	return global_resched;
+}
+
+
+bool
+is_kill_signal_pending()
+{
+	bool result;
+	struct thread *thread = thread_get_current_thread();
+	
+	cpu_status state = disable_interrupts();
+	GRAB_THREAD_LOCK();
+
+	result = (thread->sig_pending & KILL_SIGNALS);
+
+	RELEASE_THREAD_LOCK();
+	restore_interrupts(state);
+
+	return result;
 }
 
 
