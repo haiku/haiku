@@ -15,6 +15,15 @@
 #include <unistd.h>
 #include <string.h>
 
+using namespace boot;
+
+#define TRACE_PARTITIONS 0
+#if TRACE_PARTITIONS
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 /* supported partition modules */
 
@@ -50,6 +59,30 @@ static const int32 sNumFileSystemModules = sizeof(sFileSystemModules) / sizeof(f
 extern list gPartitions;
 
 
+namespace boot {
+
+class NodeOpener {
+	public:
+		NodeOpener(Node *node, int mode)
+		{
+			fFD = open_node(node, mode);
+		}
+
+		~NodeOpener()
+		{
+			close(fFD);
+		}
+
+		int Descriptor() const { return fFD; }
+
+	private:
+		int		fFD;
+};
+
+
+//	#pragma mark -
+
+
 Partition::Partition(int fd)
 	:
 	fParent(NULL),
@@ -76,7 +109,7 @@ Partition::ReadAt(void *cookie, off_t position, void *buffer, size_t bufferSize)
 	if (position > this->size)
 		return 0;
 	if (position < 0)
-		position = 0;
+		return B_BAD_VALUE;
 
 	if (position + bufferSize > this->size)
 		bufferSize = this->size - position;
@@ -91,12 +124,34 @@ Partition::WriteAt(void *cookie, off_t position, const void *buffer, size_t buff
 	if (position > this->size)
 		return 0;
 	if (position < 0)
-		position = 0;
+		return B_BAD_VALUE;
 
 	if (position + bufferSize > this->size)
 		bufferSize = this->size - position;
 
 	return write_pos(fFD, this->offset + position, buffer, bufferSize);
+}
+
+
+off_t
+Partition::Size() const
+{
+	struct stat stat;
+	if (fstat(fFD, &stat) == B_OK)
+		return stat.st_size;
+
+	return Node::Size();
+}
+
+
+int32 
+Partition::Type() const
+{
+	struct stat stat;
+	if (fstat(fFD, &stat) == B_OK)
+		return stat.st_mode;
+
+	return Node::Type();
 }
 
 
@@ -123,12 +178,14 @@ Partition::Scan()
 	for (int32 i = 0; i < sNumPartitionModules; i++) {
 		partition_module_info *module = sPartitionModules[i];
 		void *cookie;
+		NodeOpener opener(this, O_RDONLY);
 
-		puts(module->pretty_name);
-		if (module->identify_partition(fFD, this, &cookie) <= 0.0)
+		TRACE(("check for partitioning_system: %s\n", module->pretty_name));
+
+		if (module->identify_partition(opener.Descriptor(), this, &cookie) <= 0.0)
 			continue;
 
-		status_t status = module->scan_partition(fFD, this, cookie);
+		status_t status = module->scan_partition(opener.Descriptor(), this, cookie);
 		module->free_identify_partition_cookie(this, cookie);
 
 		if (status == B_OK) {
@@ -138,6 +195,9 @@ Partition::Scan()
 			Partition *child = NULL, *last = NULL;
 
 			while ((child = (Partition *)list_get_next_item(&fChildren, child)) != NULL) {
+				TRACE(("*** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
+					child, child->offset, child->size, child->Parent()));
+
 				child->Scan();
 
 				if (child->IsFileSystem()) {
@@ -166,7 +226,7 @@ Partition::Scan()
 	for (int32 i = 0; i < sNumFileSystemModules; i++) {
 		file_system_module_info *module = sFileSystemModules[i];
 
-		puts(module->pretty_name);
+		TRACE(("check for file_system: %s\n", module->pretty_name));
 
 		Directory *fileSystem;
 		if (module->get_file_system(this, &fileSystem) == B_OK) {
@@ -179,6 +239,8 @@ Partition::Scan()
 
 	return B_ENTRY_NOT_FOUND; 
 }
+
+}	// namespace boot
 
 
 //	#pragma mark -
@@ -209,6 +271,7 @@ create_child_partition(partition_id id, int32 index, partition_id childID)
 
 	// we cannot do anything with the child here, because it was not
 	// yet initialized by the partition module.
+	TRACE(("new child partition!"));
 
 	return child;
 }
