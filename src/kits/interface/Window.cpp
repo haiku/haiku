@@ -67,6 +67,8 @@
 #endif
 
 // Globals ---------------------------------------------------------------------
+using BPrivate::gDefaultTokens;
+
 static property_info windowPropInfo[] =
 {
 	{ "Feel", { B_GET_PROPERTY, 0 },
@@ -2261,111 +2263,126 @@ void BWindow::InitData(	BRect frame, const char* title, window_look look,
 
 //------------------------------------------------------------------------------
 
+// TODO: This here is a nearly full code duplication to BLooper::task_loop
+// but with one little difference: It uses the determine_target function
+// to tell what the later target of a message will be, if no explicit target
+// is supplied. This is important because we need to call the right targets
+// MessageFilter. For B_KEY_DOWN messages for example, not the BWindow but the
+// focus view will be the target of the message. This means that also the
+// focus views MessageFilters have to be checked before DispatchMessage and
+// not the ones of this BWindow.
+
 void BWindow::task_looper()
 {
 	STRACE(("info: BWindow::task_looper() started.\n"));
-	BLooper::task_looper();
-}
-/*	
+	
 	//	Check that looper is locked (should be)
 	AssertLocked();
-
+	//	Unlock the looper
 	Unlock();
-	
-	using namespace BPrivate;
-	bool		dispatchNextMessage = false;
-	BMessage	*msg;
 
 	//	loop: As long as we are not terminating.
 	while (!fTerminating)
 	{
-		STRACE(("info: BWindow::task_looper() waiting for message.\n"));
-		msg		= MessageFromPort();
+		// TODO: timeout determination algo
+		//	Read from message port (how do we determine what the timeout is?)
+		BMessage* msg = MessageFromPort();
 
 		//	Did we get a message?
 		if (msg)
 		{
 			//	Add to queue
 			fQueue->AddMessage(msg);
-			STRACE(("info: BWindow::task_looper() queued a message.\n"));
-		}
-
-		//	Get message count from port
-		STRACE(("info: BWindow::task_looper() getting port_count...\n"));
-		int32 msgCount = port_count(fMsgPort);
-		if (msgCount > 0){
-			fQueue->Lock();
-			for (int32 i = 0; i < msgCount; ++i)
-			{
-				//	Read 'count' messages from port (so we will not block)
-				//	We use zero as our timeout since we know there is stuff there
-				STRACE(("info: BWindow::task_looper() zero-wait pre-fetch messages...\n"));
-				msg = MessageFromPort(0);
-				
-				//	Add messages to queue
-				if (msg)
-					fQueue->AddMessage(msg);
-			}
 		}
 		
-		STRACE(("info: BWindow::task_looper() pre-fetching complete.\n"));
-		// loop as long as there are messages in the queue and
-		// and we are not terminating.
-		dispatchNextMessage		= true;
+		//	Get message count from port
+		int32 msgCount = port_count(fMsgPort);
+		for (int32 i = 0; i < msgCount; ++i)
+		{
+			//	Read 'count' messages from port (so we will not block)
+			//	We use zero as our timeout since we know there is stuff there
+			msg = MessageFromPort(0);
+			//	Add messages to queue
+			if (msg)
+			{
+				fQueue->AddMessage(msg);
+			}
+		}
+
+		//	loop: As long as there are messages in the queue and the port is
+		//		  empty... and we are not terminating, of course.
+		bool dispatchNextMessage = true;
 		while (!fTerminating && dispatchNextMessage)
 		{
-			fQueue->Lock();
-			fLastMessage		= fQueue->NextMessage();
-			fQueue->Unlock();
-			
+			//	Get next message from queue (assign to fLastMessage)
+			fLastMessage = fQueue->NextMessage();
+
+			//	Lock the looper
 			Lock();
-			
-			// TODO: add code for drag & drop
 			if (!fLastMessage)
 			{
 				// No more messages: Unlock the looper and terminate the
 				// dispatch loop.
-				STRACE(("info: BWindow::task_looper() no more pre-fetched messages.\n"));
 				dispatchNextMessage = false;
 			}
 			else
 			{
-				STRACE(("info: BWindow::task_looper() dispatching...\n"));
-				STRACE(("info: BWindow::task_looper() "));
-				
 				//	Get the target handler
+				//	Use BMessage friend functions to determine if we are using the
+				//	preferred handler, or if a target has been specified
 				BHandler* handler;
 				if (_use_preferred_target_(fLastMessage))
+				{
 					handler = fPreferred;
+				}
 				else
-					gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
-					 		B_HANDLER_TOKEN, (void**)&handler);
-				
-				if (!handler)
-					handler = this;
+				{
+					/**
+						@note	Here is where all the token stuff starts to
+								make sense.  How, exactly, do we determine
+								what the target BHandler is?  If we look at
+								BMessage, we see an int32 field, fTarget.
+								Amazingly, we happen to have a global mapping
+								of BHandler pointers to int32s!
+					 */
+					 gDefaultTokens.GetToken(_get_message_target_(fLastMessage),
+					 						 B_HANDLER_TOKEN,
+					 						 (void**)&handler);
+				}
 
-				//	Is this a scripting message?
+				if (!handler)
+				{
+					handler = determine_target(msg, handler, _use_preferred_target_(fLastMessage));
+					if (!handler)
+						handler = this;
+				}
+
+				//	Is this a scripting message? (BMessage::HasSpecifiers())
 				if (fLastMessage->HasSpecifiers())
 				{
 					int32 index = 0;
 					// Make sure the current specifier is kosher
 					if (fLastMessage->GetCurrentSpecifier(&index) == B_OK)
+					{
 						handler = resolve_specifier(handler, fLastMessage);
+					}
 				}
 				else
-					STRACE(("info: BWindow::task_looper() no handler for dispatch.\n"));
+				{
+				}
 				
 				if (handler)
 				{
 					//	Do filtering
 					handler = top_level_filter(fLastMessage, handler);
 					if (handler && handler->Looper() == this)
+					{
 						DispatchMessage(fLastMessage, handler);
+					}
 				}
 			}
-				// empty our message buffer
-			fLink->Flush();
 
+			//	Unlock the looper
 			Unlock();
 
 			//	Delete the current message (fLastMessage)
@@ -2383,9 +2400,8 @@ void BWindow::task_looper()
 			}
 		}
 	}
-
 }
-*/
+
 //------------------------------------------------------------------------------
 
 window_type BWindow::composeType(window_look look,	
@@ -2578,6 +2594,9 @@ void BWindow::setFocus(BView *focusView, bool notifyInputServer)
 	{
 		// what am I suppose to do here??
 	}
+	
+	// TODO: find out why R5 does this
+	SetPreferredHandler(fFocus);
 }
 
 //------------------------------------------------------------------------------
@@ -2612,6 +2631,54 @@ void BWindow::activateView( BView *aView, bool active ){
 			child 		= child->next_sibling; 
 		}
 	}
+}
+
+//------------------------------------------------------------------------------
+
+BHandler *
+BWindow::determine_target(BMessage *msg, BHandler *target, bool pref)
+{
+	// TODO: this is mostly guessed; check for correctness.
+	// I think this function is used to determine if a BView will be
+	// the target of a message. This is used in the BLooper::task_loop
+	// to determine what BHandler will dispatch the message and what filters
+	// should be checked before doing so.
+	
+	printf("determine_target: %x, %x, %s\n", msg, target, pref ? "true" : "false");
+	
+	switch (msg->what) {
+		case B_KEY_DOWN:
+		case B_KEY_UP:
+		case B_UNMAPPED_KEY_DOWN:
+		case B_UNMAPPED_KEY_UP:
+		case B_MODIFIERS_CHANGED:
+		case B_MOUSE_WHEEL_CHANGED:
+			// these messages will be dispatched by the focus view later
+			return fFocus;
+		
+		case B_MOUSE_DOWN:
+		case B_MOUSE_UP:
+		case B_MOUSE_MOVED:
+			// TODO: find out how to determine the target for these
+			break;
+		
+		case B_PULSE:
+		case B_QUIT_REQUESTED:
+			// TODO: test wether R5 will let BView dispatch these messages
+			break;
+		
+		case B_VIEW_RESIZED:
+		case B_VIEW_MOVED: {
+			int32			token = B_NULL_TOKEN;
+			msg->FindInt32("_token", &token);
+			BView *view = findView(top_view, token);
+			if (view)
+				return view;
+		} break;
+		default: break;
+	}
+	
+	return target;
 }
 
 //------------------------------------------------------------------------------
