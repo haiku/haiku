@@ -1704,6 +1704,22 @@ actions KernelLd
 	$(LINK) $(LINKFLAGS) -o "$(1)" "$(2)" $(LINKLIBS) ;
 }
 
+rule KernelAddon
+{
+	# KernelAddon <name> : <relpath> : <sources> ;	
+
+	local sources = $(3) ;
+
+	SetupKernel $(3) ;
+	Addon $(1) : $(2) : $(3) ;
+	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
+	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
+								-fno-exceptions -fno-rtti ;
+	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
+	LinkSharedOSLibs $(1) : $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
+		# ToDo this has to be changed!
+}
+
 rule KernelMergeObject
 {
 	# KernelMergeObject <name> : <sources> : <extra CFLAGS> : <other objects> ;
