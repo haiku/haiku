@@ -661,7 +661,7 @@ void AppServer::Broadcast(int32 code)
 		if(!app)
 			continue;
 		//app->PostMessage(code);
-		app->PostMessage(AS_SESSION_MSG, 2*sizeof(int32), (int8*)&buffer);
+		app->PostMessage(AS_SERVER_SESSION, 2*sizeof(int32), (int8*)&buffer);
 	}
 	release_sem(_applist_lock);
 }

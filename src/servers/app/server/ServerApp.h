@@ -70,7 +70,7 @@ public:
 protected:
 	friend class AppServer;
 	friend class ServerWindow;
-	void _DispatchMessage(int32 code, int8 *buffer);
+	void _DispatchMessage(int32 code);
 	ServerBitmap *_FindBitmap(int32 token);
 
 	port_id _sender,_receiver;
@@ -85,7 +85,6 @@ protected:
 	bool _cursorhidden;
 	bool _isactive;
 	int32 _handlertoken;
-// ADI:
 	BSession		*ses;
 };
 

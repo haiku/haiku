@@ -102,15 +102,15 @@ ServerApp::ServerApp(port_id sendport, port_id rcvport, int32 handlerID, char *s
 	_driver=GetGfxDriver(ActiveScreen());
 	_cursorhidden=false;
 
-STRACE(("ServerApp %s:\n",_signature.String()));
-STRACE(("\tBApp port: %ld\n",_sender));
-STRACE(("\tReceiver port: %ld\n",_receiver));
+	STRACE(("ServerApp %s:\n",_signature.String()));
+	STRACE(("\tBApp port: %ld\n",_sender));
+	STRACE(("\tReceiver port: %ld\n",_receiver));
 }
 
 //! Does all necessary teardown for application
 ServerApp::~ServerApp(void)
 {
-STRACE(("ServerApp %s:~ServerApp()\n",_signature.String()));
+	STRACE(("ServerApp %s:~ServerApp()\n",_signature.String()));
 	int32 i;
 	
 	ServerWindow *tempwin;
@@ -258,7 +258,6 @@ int32 ServerApp::MonitorApp(void *data)
 	for(;;)
 	{
 		if(app->ses->ReadInt32(&msgCode)!= B_BAD_PORT_ID ){
-		printf("Received message %ld\n",msgCode);
 			switch (msgCode){
 				case AS_QUIT_APP:
 				{
@@ -307,7 +306,7 @@ int32 ServerApp::MonitorApp(void *data)
 				default:
 				{
 					STRACE(("ServerApp %s: Got a Message to dispatch\n",app->_signature.String()));
-					app->_DispatchMessage(msgCode, NULL);
+					app->_DispatchMessage(msgCode);
 					break;
 				}
 			} // switch
@@ -327,9 +326,8 @@ int32 ServerApp::MonitorApp(void *data)
 	All attachments are placed in the buffer via a PortLink, so it will be a 
 	matter of casting and incrementing an index variable to access them.
 */
-void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
+void ServerApp::_DispatchMessage(int32 code)
 {
-	int8 *index=buffer;
 	LayerData ld;
 
 	switch(code)
@@ -401,7 +399,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// Attached data:
 			// 1) uint32  ServerWindow ID token
 			ServerWindow *w;
-			uint32 winid=*((uint32*)index);
+			uint32 winid;
+			ses->ReadUInt32(&winid);
 
 			for(int32 i=0;i<_winlist->CountItems();i++)
 			{
@@ -435,14 +434,18 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			//	3) int32 area pointer offset used to calculate fBasePtr
 			
 			// First, let's attempt to allocate the bitmap
-			port_id replyport=*((port_id*)index); index+=sizeof(port_id);
-			BRect r=*((BRect*)index); index+=sizeof(BRect);
-			color_space cs=*((color_space*)index); index+=sizeof(color_space);
-			int32 f=*((int32*)index); index+=sizeof(int32);
-			int32 bpr=*((int32*)index); index+=sizeof(int32);
-
+			port_id replyport;
+			BRect r;
+			color_space cs;
+			int32 f,bpr;
 			screen_id s;
-			s.id=*((int32*)index);
+
+			ses->ReadInt32(&replyport);
+			ses->ReadRect(&r);
+			ses->ReadData(&cs,sizeof(color_space));
+			ses->ReadInt32(&f);
+			ses->ReadInt32(&bpr);
+			ses->ReadData(&s,sizeof(screen_id));
 			
 			ServerBitmap *sbmp=bitmapmanager->CreateBitmap(r,cs,f,bpr,s);
 
@@ -453,12 +456,11 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			{
 				// list for doing faster lookups for a bitmap than what the BitmapManager
 				// can do.
-				_bmplist->AddItem(sbmp);
-				_applink->SetOpCode(SERVER_TRUE);
-				_applink->Attach(sbmp->Token());
-				_applink->Attach(sbmp->Area());
-				_applink->Attach(sbmp->AreaOffset());
-				_applink->Flush();
+				BSession replysession(0,replyport);
+				replysession.WriteInt32(sbmp->Token());
+				replysession.WriteInt32(sbmp->Area());
+				replysession.WriteInt32(sbmp->AreaOffset());
+				replysession.Sync();
 			}
 			else
 			{
@@ -478,12 +480,16 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		
 			// Reply Code: SERVER_TRUE if successful, 
 			//				SERVER_FALSE if the buffer was already deleted or was not found
-			port_id replyport=*((port_id*)index); index+=sizeof(port_id);
+			port_id replyport;
+			int32 bmp_id;
 			
-			ServerBitmap *sbmp=_FindBitmap(*((int32*)index));
+			ses->ReadInt32(&replyport);
+			ses->ReadInt32(&bmp_id);
+			
+			ServerBitmap *sbmp=_FindBitmap(bmp_id);
 			if(sbmp)
 			{
-				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),*((int32*)index)));
+				STRACE(("ServerApp %s: Deleting Bitmap %ld\n",_signature.String(),bmp_id));
 
 				_bmplist->RemoveItem(sbmp);
 				bitmapmanager->DeleteBitmap(sbmp);
@@ -528,10 +534,14 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// 1) int32 workspace #
 			// 2) uint32 screen mode
 			// 3) bool make default
-			int32 workspace=*((int32*)index); index+=sizeof(int32);
-			uint32 mode=*((uint32*)index); index+=sizeof(uint32);
-
-			SetSpace(workspace,mode,ActiveScreen(),*((bool*)index));
+			int32 workspace;
+			uint32 mode;
+			bool stick;
+			ses->ReadInt32(&workspace);
+			ses->ReadUInt32(&mode);
+			ses->ReadBool(&stick);
+			
+			SetSpace(workspace,mode,ActiveScreen(),stick);
 
 			break;
 		}
@@ -541,7 +551,9 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// 1) int32 workspace index
 			
 			// Error-checking is done in ActivateWorkspace, so this is a safe call
-			SetWorkspace(*((int32*)index));
+			int32 workspace;
+			ses->ReadInt32(&workspace);
+			SetWorkspace(workspace);
 			break;
 		}
 		
@@ -568,7 +580,10 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		{
 			// Attached data
 			// 1) int32 port to reply to
-			write_port(*((port_id*)index),(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
+			int32 replyport;
+			ses->ReadInt32(&replyport);
+			
+			write_port(replyport,(_cursorhidden)?SERVER_TRUE:SERVER_FALSE,NULL,0);
 			break;
 		}
 		case AS_SET_CURSOR_DATA:
@@ -576,8 +591,8 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 			// Attached data: 68 bytes of _appcursor data
 			
 			int8 cdata[68];
-			memcpy(cdata, buffer, 68);
-
+			ses->ReadData(cdata,68);
+			
 			// Because we don't want an overaccumulation of these particular
 			// cursors, we will delete them if there is an existing one. It would
 			// otherwise be easy to crash the server by calling SetCursor a
@@ -594,67 +609,84 @@ void ServerApp::_DispatchMessage(int32 code, int8 *buffer)
 		case AS_SET_CURSOR_BCURSOR:
 		{
 			// Attached data:
-			// 1) int32 token ID of the cursor to set
-
-			if(!index)
-				cursormanager->SetCursor(*((int32*)index));
+			// 1) bool flag to send a reply
+			// 2) int32 token ID of the cursor to set
+			// 3) port_id port to receive a reply. Only exists if the sync flag is true.
+			bool sync;
+			int32 ctoken;
+			port_id replyport;
+			
+			ses->ReadBool(&sync);
+			ses->ReadInt32(&ctoken);
+			if(sync)
+				ses->ReadInt32(&replyport);
+			
+			cursormanager->SetCursor(ctoken);
+			
+			if(sync)
+			{
+				// the application is expecting a reply, but plans to do literally nothing
+				// with the data, so we'll just reuse the cursor token variable
+				write_port(replyport,AS_SERVER_SESSION, &ctoken, sizeof(int32));
+			}
 			break;
 		}
 		case AS_CREATE_BCURSOR:
 		{
-printf("Create BCursor\n");
 			// Attached data:
 			// 1) port_id reply port
 			// 2) 68 bytes of _appcursor data
 			
-			port_id replyport=*((port_id*)index);
-			index+=sizeof(port_id);
-			
+			port_id replyport;
 			int8 cdata[68];
-			memcpy(cdata, index, 68);
+
+			ses->ReadInt32(&replyport);
+			ses->ReadData(cdata,68);
 
 			_appcursor=new ServerCursor(cdata);
 			_appcursor->SetAppSignature(_signature.String());
 			cursormanager->AddCursor(_appcursor);
 			
 			// Synchronous message - BApplication is waiting on the cursor's ID
-			PortLink replylink(replyport);
-			replylink.SetOpCode(AS_CREATE_BCURSOR);
-			replylink.Attach(_appcursor->ID());
-			replylink.Flush();
+			BSession replysession(0,replyport);
+			replysession.WriteInt32(_appcursor->ID());
+			replysession.Sync();
 			break;
 		}
 		case AS_DELETE_BCURSOR:
 		{
 			// Attached data:
 			// 1) int32 token ID of the cursor to delete
-			if(_appcursor && _appcursor->ID()==*((int32*)index))
+			int32 ctoken;
+			ses->ReadInt32(&ctoken);
+			
+			if(_appcursor && _appcursor->ID()==ctoken)
 				_appcursor=NULL;
 			
-			if(!index)
-				cursormanager->DeleteCursor(*((int32*)index));
+			cursormanager->DeleteCursor(ctoken);
 			break;
 		}
 		case AS_GET_SCROLLBAR_INFO:
 		{
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-
-			PortLink replylink( *((port_id*)index) );
-
 			scroll_bar_info sbi=GetScrollBarInfo();
+
+			port_id replyport;
+			ses->ReadInt32(&replyport);
 			
-			replylink.SetOpCode(AS_GET_SCROLLBAR_INFO);
-			replylink.Attach(&sbi,sizeof(scroll_bar_info));
-			replylink.Flush();
-			
+			BSession replysession(0,replyport);
+			replysession.WriteData(&sbi,sizeof(scroll_bar_info));
+			replysession.Sync();
 			break;
 		}
 		case AS_SET_SCROLLBAR_INFO:
 		{
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
-			SetScrollBarInfo(*((scroll_bar_info*)index));
+			scroll_bar_info sbi;
+			ses->ReadData(&sbi,sizeof(scroll_bar_info));
+			SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_FOCUS_FOLLOWS_MOUSE:
@@ -662,38 +694,44 @@ printf("Create BCursor\n");
 			// Attached data:
 			// 1) port_id reply port - synchronous message
 
-			PortLink replylink( *((port_id*)index) );
-			
-			replylink.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
-			replylink.Attach(GetFFMouse());
-			replylink.Flush();
+			port_id replyport;
+			ses->ReadInt32(&replyport);
+
+			BSession replysession(0,replyport);
+			replysession.WriteBool(GetFFMouse());
+			replysession.Sync();
 			break;
 		}
 		case AS_SET_FOCUS_FOLLOWS_MOUSE:
 		{
 			// Attached Data:
 			// 1) scroll_bar_info scroll bar info structure
-			SetScrollBarInfo(*((scroll_bar_info*)index));
+			scroll_bar_info sbi;
+			ses->ReadData(&sbi,sizeof(scroll_bar_info));
+			SetScrollBarInfo(sbi);
 			break;
 		}
 		case AS_SET_MOUSE_MODE:
 		{
 			// Attached Data:
 			// 1) enum mode_mouse FFM mouse mode
-			SetFFMouseMode(*((mode_mouse*)index));
+			mode_mouse mmode;
+			ses->ReadData(&mmode,sizeof(mode_mouse));
+			SetFFMouseMode(mmode);
 			break;
 		}
 		case AS_GET_MOUSE_MODE:
 		{
 			// Attached data:
 			// 1) port_id reply port - synchronous message
-
-			PortLink replylink( *((port_id*)index) );
+			mode_mouse mmode=GetFFMouseMode();
 			
-			replylink.SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
-			mode_mouse mode=GetFFMouseMode();
-			replylink.Attach(&mode,sizeof(mode_mouse));
-			replylink.Flush();
+			port_id replyport;
+			ses->ReadInt32(&replyport);
+			
+			BSession replysession(0,replyport);
+			replysession.WriteData(&mmode,sizeof(mode_mouse));
+			replysession.Sync();
 			break;
 		}
 		default:
