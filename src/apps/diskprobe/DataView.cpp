@@ -12,6 +12,7 @@
 #include <Autolock.h>
 #include <Clipboard.h>
 #include <Mime.h>
+#include <Beep.h>
 
 
 typedef uint32 addr_t;
@@ -151,6 +152,7 @@ DataView::MessageReceived(BMessage *message)
 			break;
 
 		case kMsgDataEditorOffsetChange:
+			fOffset = fEditor.ViewOffset();
 			SetSelection(0, 0);
 			break;
 
@@ -169,30 +171,11 @@ DataView::MessageReceived(BMessage *message)
 			break;
 
 		case B_COPY:
-		{
-			if (!be_clipboard->Lock())
-				break;
-
-			be_clipboard->Clear();
-
-			BMessage *clip;
-			if ((clip = be_clipboard->Data()) != NULL) {
-				uint8 *data = fData + fStart;
-				size_t length = fEnd + 1 - fStart;
-
-				clip->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, length);
-
-				if (is_valid_ascii(data, length))
-					clip->AddData("text/plain", B_MIME_TYPE, data, length);
-
-				be_clipboard->Commit();
-			}
-
-			be_clipboard->Unlock();
+			Copy();
 			break;
-		}
 
 		case B_PASTE:
+			Paste();
 			break;
 
 		case B_UNDO:
@@ -206,6 +189,57 @@ DataView::MessageReceived(BMessage *message)
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void 
+DataView::Copy()
+{
+	if (!be_clipboard->Lock())
+		return;
+
+	be_clipboard->Clear();
+
+	BMessage *clip;
+	if ((clip = be_clipboard->Data()) != NULL) {
+		uint8 *data = fData + fStart;
+		size_t length = fEnd + 1 - fStart;
+
+		clip->AddData(B_FILE_MIME_TYPE, B_MIME_TYPE, data, length);
+
+		if (is_valid_ascii(data, length))
+			clip->AddData("text/plain", B_MIME_TYPE, data, length);
+
+		be_clipboard->Commit();
+	}
+
+	be_clipboard->Unlock();
+}
+
+
+void 
+DataView::Paste()
+{
+	if (!be_clipboard->Lock())
+		return;
+
+	const void *data;
+	ssize_t length;
+	BMessage *clip;
+	if ((clip = be_clipboard->Data()) != NULL
+		&& (clip->FindData(B_FILE_MIME_TYPE, B_MIME_TYPE, &data, &length) == B_OK
+			|| clip->FindData("text/plain", B_MIME_TYPE, &data, &length) == B_OK)) {
+		// we have valid data, but it could still be too
+		// large to to fit in the file
+		if (fOffset + fStart + length > fFileSize)
+			length = fFileSize - fOffset;
+
+		if (fEditor.Replace(fOffset + fStart, (const uint8 *)data, length) == B_OK)
+			SetSelection(fStart + length, fStart + length);
+	} else
+		beep();
+
+	be_clipboard->Unlock();
 }
 
 
@@ -918,15 +952,15 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 		case B_BACKSPACE:
 			if (fBitPosition == 0)
 				SetSelection(fStart - 1, fStart - 1);
-			
+
 			if (fFocus == kHexFocus)
 				fBitPosition = (fBitPosition + 4) % 8;
 
 			// supposed to fall through
 		case B_DELETE:
-		{
-			BAutolock locker(fEditor);
-
+			SetSelection(fStart, fStart);
+				// to make sure only the cursor is selected
+			
 			if (fFocus == kHexFocus) {
 				const uint8 *data = DataAt(fStart);
 				if (data == NULL)
@@ -939,12 +973,8 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 			} else
 				fEditor.Replace(fOffset + fStart, (const uint8 *)"", 1);
 			break;
-		}
 
 		default:
-		{
-			BAutolock locker(fEditor);
-			
 			if (fFocus == kHexFocus) {
 				// only hexadecimal characters are allowed to be entered
 				const uint8 *data = DataAt(fStart);
@@ -955,6 +985,9 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 				addr_t number;
 				if (data == NULL || (number = (addr_t)strchr(hexNumbers, c)) == NULL)
 					break;
+
+				SetSelection(fStart, fStart);
+					// to make sure only the cursor is selected
 
 				number -= (addr_t)hexNumbers;
 				fBitPosition = (fBitPosition + 4) % 8;
@@ -969,7 +1002,6 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 					SetSelection(fStart + 1, fStart + 1);
 			}
 			break;
-		}
 	}
 }
 
