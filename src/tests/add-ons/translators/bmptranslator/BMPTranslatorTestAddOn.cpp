@@ -7,7 +7,7 @@
 BTestSuite *
 getTestSuite()
 {
-	BTestSuite *suite = new BTestSuite("BMPTranslator");
+	BTestSuite *suite = new BTestSuite("Translators");
 
 	// ##### Add test suites here #####
 	suite->addTest("BMPTranslator", BMPTranslatorTest::Suite());
