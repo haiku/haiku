@@ -5,7 +5,7 @@ DUN Header - DialUp Networking Header
 Authors: Sikosis (beos@gravity24hr.com)
 		 Misza (misza@ihug.com.au) 
 
-(C) 2002 OpenBeOS under MIT license
+(C) 2002-2003 OpenBeOS under MIT license
 
 */
 

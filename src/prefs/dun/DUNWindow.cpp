@@ -5,7 +5,7 @@ DUNWindow - DialUp Networking BWindow
 Authors: Sikosis (beos@gravity24hr.com)
 		 Misza (misza@ihug.com.au) 
 
-(C) 2002 OpenBeOS under MIT license
+(C) 2002-2003 OpenBeOS under MIT license
 
 */
 /*-----WARNING MESSY CODE AHEAD :-)------*/
@@ -78,10 +78,10 @@ void DUNWindow::InitWindow() {
    //conmenufield = new BPopUpMenu("Click to add");
    conmenufield->AddSeparatorItem();
    conmenufield->AddItem(menuconnew = new BMenuItem("New...", new BMessage(MENU_CON_NEW)));
-   menuconnew->SetTarget(be_app);
+   //menuconnew->SetTarget(be_app);
    conmenufield->AddItem(menucondelete = new BMenuItem("Delete Current", new BMessage(MENU_CON_DELETE_CURRENT)));
    menucondelete->SetEnabled(false);
-   menucondelete->SetTarget(be_app);
+   //menucondelete->SetTarget(be_app);
    
    connectionmenufield = new BMenuField(top_frame_label->Bounds(),"connection_menu","Connect to:",conmenufield,B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
    connectionmenufield->SetDivider(77);	
@@ -102,18 +102,18 @@ void DUNWindow::InitWindow() {
    
    locmenufield = new BPopUpMenu("Home            ");
    locmenufield->AddItem(menulochome = new BMenuItem("Home", new BMessage(MENU_LOC_HOME)));
-   menulochome->SetTarget(be_app);
+   //menulochome->SetTarget(be_app);
    menulochome->SetMarked(true);
 
    locmenufield->AddItem(menulocwork = new BMenuItem("Work", new BMessage(MENU_LOC_WORK)));
-   menulocwork->SetTarget(be_app);
+   //menulocwork->SetTarget(be_app);
    locmenufield->AddSeparatorItem();
    
    locmenufield->AddItem(menulocnew = new BMenuItem("New...", new BMessage(MENU_LOC_NEW)));
-   menulocnew->SetTarget(be_app);
+   //menulocnew->SetTarget(be_app);
    
    locmenufield->AddItem(menulocdelete = new BMenuItem("Delete Current", new BMessage(MENU_LOC_DELETE_CURRENT)));
-   menulocdelete->SetTarget(be_app);
+   //menulocdelete->SetTarget(be_app);
    
    locationmenufield = new BMenuField(middle_frame_label->Bounds(),"location_menu","From location:",locmenufield,B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE);
    locationmenufield->SetDivider(92);	
@@ -267,56 +267,34 @@ void DUNWindow::DUNResizeHandler()
 void DUNWindow::LoadSettings(BMessage *msg)
 {
 	BRect frame;
-	if (B_OK == msg->FindRect("windowframe",&frame)) {
+	int16 LoadedWindowState;
+	int16 LoadedLastWindowState;
+	
+	// Load and Set Window Position and Size
+	if (B_OK == msg->FindRect("windowframe",&frame))
+	{
 		MoveTo(frame.left,frame.top);
 		ResizeTo(frame.right-frame.left,frame.bottom-frame.top);
-	
 	}
-	//load a last mode thingy to prevent cumulative resizing
-	int16   LoadedLastWindowState;
-	if (B_OK == msg->FindInt16("lastwindowstate",&LoadedLastWindowState)) {
+	
+	// Load LastWindowState (to prevent cumulative resizing)
+	if (B_OK == msg->FindInt16("lastwindowstate",&LoadedLastWindowState))
+	{
 		DUNLastWindowState = LoadedLastWindowState;
-		cout << "From Settings: " << DUNLastWindowState << endl; 
-	}
-	else
-	DUNLastWindowState = DUN_WINDOW_STATE_DEFAULT;
+		//cout << "From Settings: " << DUNLastWindowState << endl; 
+	} else {
+		DUNLastWindowState = DUN_WINDOW_STATE_DEFAULT;
+	}	
 	
-	
-	int16   LoadedWindowState;
-	
+	// Load and Set WindowState	
 	if (B_OK == msg->FindInt16("windowstate",&LoadedWindowState)) {
 		DUNWindowState = LoadedWindowState;
-		cout << "From Settings: " << DUNWindowState << endl; 
-		
+		//cout << "From Settings: " << DUNWindowState << endl; 
+		DUNResizeHandler();
+	} else {
+		DUNWindowState = DUN_WINDOW_STATE_DEFAULT;//setup window state as def
 		DUNResizeHandler();
 	}
-	else
-	{
-	DUNWindowState = DUN_WINDOW_STATE_DEFAULT;//setup window state as def
-	DUNResizeHandler();
-	}
-		
-	//**********---SETTINGS CONFUSE ME! :P **********//
-	/*int16 _x,_y;
-	if(B_OK == msg->FindInt16("rx",0,&_x) && B_OK == msg->FindInt16("ry",0,&_y))
-	{
-		SetStatus(_x,_y);
-	//		cout << "cool" << endl;
-	}*/
-	
-	/*int16 stat1,stat2;
-	if(B_OK == msg->FindInt16("status1",0,&stat1) && B_OK == msg->FindInt16("status2",0,&stat2))
-	{
-		if(stat1)
-			TestBox1->SetValue(B_CONTROL_ON);
-		else if(!stat1)
-			TestBox1->SetValue(B_CONTROL_OFF);
-		else if(stat2)
-			TestBox1->SetValue(B_CONTROL_ON);
-		else if(!stat2)
-			TestBox2->SetValue(B_CONTROL_OFF);
-	}*/
-
 }
 // ------------------------------------------------------------------------------- //
 
@@ -324,33 +302,25 @@ void DUNWindow::LoadSettings(BMessage *msg)
 void DUNWindow::SaveSettings()
 {
 	BMessage msg;
+	
+	// Current Window Position
 	msg.AddRect("windowframe",Frame());
 	
+	// Current WindowState
 	msg.AddInt16("windowstate",DUNWindowState);
 	DUNLastWindowState = DUNWindowState;
+	// Last WindowState
 	msg.AddInt16("lastwindowstate",DUNLastWindowState);
 	
-	/*msg.AddInt16("rx",last.x);
-	msg.AddInt16("ry",last.y);
+	// Current Connection - doesnt work :(
+	msg.AddString("currentconnection","");
 	
-
-	if(TestBox1->Value() == B_CONTROL_ON)
-	msg.AddInt16("status1",1);
-	else
-	msg.AddInt16("status1",0);
-	
-	if(TestBox2->Value() == B_CONTROL_ON)
-	msg.AddInt16("status2",1);
-	else
-	msg.AddInt16("status2",0);
-	*/
-	
-	/*int selection=ListView1->CurrentSelection(0);
-	if (selection>=0)
-		msg.AddString("modulename", ((BStringItem *)(ListView1->ItemAt(selection)))->Text()); 
-	msg.what=POPULATE;	*/
-	
-    BPath path;
+	// Current Location - doesnt work :(
+	msg.AddString("currentlocation","");
+    
+    
+    
+	BPath path;
     status_t result = find_directory(B_USER_SETTINGS_DIRECTORY,&path);
     if (result == B_OK)
     {
@@ -378,37 +348,79 @@ void DUNWindow::MessageReceived (BMessage *message)
 	{
 		case BTN_CONNECT:	
 		{
-   	    	//disconnectbutton->SetEnabled(true);
-   	    	//connectbutton->SetEnabled(false);
-			//BAlert *errormsg = new BAlert("errormsg", "Chaos reigns within.\nReflect, repent, and retry.\nConnect shall return.", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
-		    //errormsg->SetShortcut(0, B_ESCAPE);
-    		//errormsg->Go();
-    		//debug
-  	   		ptrNewConnectionWindow = new NewConnectionWindow(BRect(0,0,260,73));
-		}	break;
+   	    	disconnectbutton->SetEnabled(true);
+   	    	connectbutton->SetEnabled(false);
+   	    	//debug
+			BAlert *errormsg = new BAlert("errormsg", "The hidden wispy bush\nOver the green flower\nThe sea and connection have stopped.", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
+		    errormsg->SetShortcut(0, B_ESCAPE);
+    		errormsg->Go();
+		}	
+			break;
+
 		case BTN_DISCONNECT:
 		{
    	    	disconnectbutton->SetEnabled(false);
    	    	connectbutton->SetEnabled(true);
-   	    	BAlert *errormsg = new BAlert("errormsg", "Short little poem\nReally beats the hell out of\nAn error message", "   I Love Poetry   ", NULL , NULL, B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);   	   		
+   	    	BAlert *errormsg = new BAlert("errormsg", "A late long rain\nOver an icy meadow\nBroken connection and dreams.", "   Haiku Error ;)   ", NULL , NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);   	   		
    	    	errormsg->SetShortcut(0, B_ESCAPE);
    	    	errormsg->Go();
-   	    	
-	   	}    break;
+	   	}    
+	   		break;
+	   	
+	   	case MENU_LOC_DELETE_CURRENT:
+	   	{
+	   		// debug
+			BAlert *errormsg = new BAlert("errormsg", "Hark! Something is wrong.\nFor this is not what I asked.\n\nMy life is somewhat ... Incomplete.\n", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
+		    errormsg->SetShortcut(0, B_ESCAPE);
+    		errormsg->Go();
+	   	}
+	   		break;
+	   	
+	   	case MENU_LOC_NEW:
+	   	{
+   			// debug
+			BAlert *errormsg = new BAlert("errormsg", "Lost Clouds.\nDisappear behind the mountains.\n\nFor an eternity must I wait ?\n", "   Haiku Error ;)   " , NULL, NULL, B_WIDTH_FROM_WIDEST, B_IDEA_ALERT);
+		    errormsg->SetShortcut(0, B_ESCAPE);
+    		errormsg->Go();
+	   	}
+	   		break;
+	   	
+		case MENU_LOC_HOME:
+	   	{
+	   		// Set the Text for the Work Profile
+   	    	passmeon4->SetText("Call waiting maybe enabled.");	
+	   	}
+	   		 break;	   	
+
+	   	case MENU_LOC_WORK:
+	   	{
+	   		// Set the Text for the Work Profile
+   	    	passmeon4->SetText("Using dial out prefix of '9,'.");	
+	   	}
+	   		 break;
+
 	   	case MENU_CON_NEW:
 	   	{
-	   		ptrNewConnectionWindow = new NewConnectionWindow(BRect(0,0,250,50));
-	   	}	break;
+	   		ptrNewConnectionWindow = new NewConnectionWindow(BRect(0,0,260,73));
+	   	}
+	   		break;
+
    	    case BTN_MODEM:
   	   	{	
   	   		modemWindow = new ModemWindow(windowRectModem);
-  	   		
-	   	}    break;	
+	   	}
+	   	    break;	
+	   	    
   	    case BTN_SETTINGS:
+  	    {
   	   		settingsWindow = new SettingsWindow(BRect(367.0, 268.0, 657.0, 500.0));
+  	   	}	
  	 	    break;
+ 	 	    
         default:
+        {
 			BWindow::MessageReceived(message);
+		}	
 	        break;
 	}
 }
