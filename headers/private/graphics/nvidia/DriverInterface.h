@@ -73,24 +73,24 @@ enum {
 };
 
 /* handles to pre-defined engine commands */
-#define NV_ROP5_SOLID					0x80000000
-#define NV_IMAGE_BLACK_RECTANGLE		0x80000001
-#define NV_IMAGE_PATTERN				0x80000002
-#define NV3_SURFACE_0					0x80000003
-#define NV3_SURFACE_1					0x80000004
-#define NV3_SURFACE_2					0x80000005
-#define NV3_SURFACE_3					0x80000006
-//#define NV4_CONTEXT_SURFACES_ARGB_ZS	0x80000007
-#define NV10_CONTEXT_SURFACES_ARGB_ZS	0x80000007
-#define NV1_IMAGE_FROM_CPU				0x80000010
-#define NV_IMAGE_BLIT					0x80000011
-#define NV3_GDI_RECTANGLE_TEXT			0x80000012
-#define NV_RENDER_D3D0_TRIANGLE_ZETA	0x80000013
-#define NV4_DX5_TEXTURE_TRIANGLE		0x80000014
-#define NV10_DX5_TEXTURE_TRIANGLE		0x80000014
-#define NV4_DX6_MULTI_TEXTURE_TRIANGLE	0x80000015
-#define NV10_DX6_MULTI_TEXTURE_TRIANGLE	0x80000015
-#define NV1_RENDER_SOLID_LIN			0x80000016
+#define NV_ROP5_SOLID					0x80000000 /* 2D */
+#define NV_IMAGE_BLACK_RECTANGLE		0x80000001 /* 2D/3D */
+#define NV_IMAGE_PATTERN				0x80000002 /* 2D */
+#define NV3_SURFACE_0					0x80000003 /* 3D: old cmd */
+#define NV3_SURFACE_1					0x80000004 /* 3D: old cmd */
+#define NV3_SURFACE_2					0x80000005 /* 3D: old cmd */
+#define NV3_SURFACE_3					0x80000006 /* 3D: old cmd */
+#define NV4_CONTEXT_SURFACES_ARGB_ZS	0x80000007 /* 3D: should replace the old cmd's */
+#define NV10_CONTEXT_SURFACES_ARGB_ZS	0x80000007 /* 3D: should replace the old cmd's */
+#define NV1_IMAGE_FROM_CPU				0x80000010 /* 2D: unused, remove? */
+#define NV_IMAGE_BLIT					0x80000011 /* 2D */
+#define NV3_GDI_RECTANGLE_TEXT			0x80000012 /* 2D */
+#define NV_RENDER_D3D0_TRIANGLE_ZETA	0x80000013 /* unused (yet?) */
+#define NV4_DX5_TEXTURE_TRIANGLE		0x80000014 /* 3D */
+#define NV10_DX5_TEXTURE_TRIANGLE		0x80000014 /* 3D */
+#define NV4_DX6_MULTI_TEXTURE_TRIANGLE	0x80000015 /* unused (yet?) */
+#define NV10_DX6_MULTI_TEXTURE_TRIANGLE	0x80000015 /* unused (yet?) */
+#define NV1_RENDER_SOLID_LIN			0x80000016 /* 2D: unused */
 
 /* max. number of overlay buffers */
 #define MAXBUFFERS 3
