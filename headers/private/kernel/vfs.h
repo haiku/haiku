@@ -74,7 +74,7 @@ extern status_t vfs_remove_vnode(mount_id mountID, vnode_id vnodeID);
 
 /* calls needed by the VM for paging */
 int vfs_get_vnode_from_fd(int fd, bool kernel, void **vnode);
-int vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
+status_t vfs_get_vnode_from_path(const char *path, bool kernel, void **vnode);
 int vfs_put_vnode_ptr(void *vnode);
 void vfs_vnode_acquire_ref(void *vnode);
 void vfs_vnode_release_ref(void *vnode);
