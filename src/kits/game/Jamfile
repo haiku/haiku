@@ -23,5 +23,5 @@ SharedLibrary game :
 PrependObjectHdrs DirectWindow.cpp : /boot/develop/headers/be/interface ;
 
 LinkSharedOSLibs libgame.so :
-	be media
+	be libmedia.so
 ;
