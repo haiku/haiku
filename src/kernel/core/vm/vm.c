@@ -1213,7 +1213,7 @@ static int dump_region(int argc, char **argv)
 
 	// if the argument looks like a hex number, treat it as such
 	if(strlen(argv[1]) > 2 && argv[1][0] == '0' && argv[1][1] == 'x') {
-		unsigned long num = atoul(argv[1]);
+		unsigned long num = strtoul(argv[1], NULL, 16);
 		region_id id = num;
 
 		region = hash_lookup(region_table, &id);
