@@ -1,8 +1,14 @@
 SubDir OBOS_TOP src add-ons print transports parallel_port ;
 
-Addon Parallel\ Port : print transport : 
-	print_transport.cpp
+SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
+
+UsePrivateHeaders interface print ;
+
+Addon Parallel\ Port
+	: print transport
+	: print_transport.cpp
 ;
 
-LinkSharedOSLibs Parallel\ Port : be  ;
+LinkSharedOSLibs Parallel\ Port : be libtransportaddon.a
+ ;
 

@@ -29,77 +29,44 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 
 #include <StorageKit.h>
 #include <SupportKit.h>
+
+#include "TransportAddOn.h"
 
 class ParallelPort : public BDataIO {
 	int fFile;
 	
 public:
-	ParallelPort(BMessage* msg);
+	ParallelPort(BDirectory* printer, BMessage* msg);
 	~ParallelPort();
 
-	bool IsOk() { return fFile > -1; }
+	status_t InitCheck() { return fFile > -1 ? B_OK : B_ERROR; }
 
 	ssize_t Read(void* buffer, size_t size);
 	ssize_t Write(const void* buffer, size_t size);
 };
 
-// Only one connection per add-on permitted!
-static ParallelPort* gPort = NULL;
-
-// Implementation of transport add-on interface
-
-extern "C" _EXPORT BDataIO * init_transport
-	(
-	BMessage *	msg
-	)
-{
-	if (msg != NULL && gPort == NULL) {
-		ParallelPort* port = new ParallelPort(msg);
-		if (port->IsOk()) {
-			gPort = port;
-			return port;
-		}
-		delete port;
-	}
-	return NULL;
-}
-
-extern "C" _EXPORT void exit_transport()
-{
-	if (gPort != NULL) {
-		delete gPort;
-	}
-}
-
-
 // Impelmentation of ParallelPort
-ParallelPort::ParallelPort(BMessage* msg) 
+ParallelPort::ParallelPort(BDirectory* printer, BMessage* msg) 
 	: fFile(-1)
 {
-	const char* printer_name = msg->FindString("printer_file");
 	char address[80];
 	char device[B_PATH_NAME_LENGTH];
 
-	if (printer_name && *printer_name != '\0') {
-		BDirectory printer(printer_name);
-		if (printer.InitCheck() != B_OK) return;
+	int size = printer->ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
+	if (size <= 0 || size >= sizeof(address)) return;
+	address[size] = 0; // make sure string is 0-terminated
 		
-		int size = printer.ReadAttr("transport_address", B_STRING_TYPE, 0, address, sizeof(address));
-		if (size <= 0 || size >= sizeof(address)) return;
-		address[size] = 0; // make sure string is 0-terminated
-		
-		strcat(strcpy(device, "/dev/parallel/"), address);
-		fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
-	}
+	strcat(strcpy(device, "/dev/parallel/"), address);
+	fFile = open(device, O_RDWR | O_EXCL | O_BINARY, 0);
 }
 
 ParallelPort::~ParallelPort() {
-	if (IsOk()) {
+	if (InitCheck() == B_OK) {
 		close(fFile); fFile = -1;
 	}
 }
@@ -112,3 +79,11 @@ ssize_t ParallelPort::Write(const void* buffer, size_t size) {
 	return write(fFile, buffer, size);
 }
 
+BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg) {
+	ParallelPort* transport = new ParallelPort(printer, msg);
+	if (transport->InitCheck() == B_OK) {
+		return transport;
+	} else {
+		delete transport; return NULL;
+	}
+}
