@@ -251,7 +251,7 @@ bool Workspace::GetWinBorderList(void **list, int32 *itemCount ) const
 		}
 	}
 
-	return false;
+	return true;
 }
 	
 //----------------------------------------------------------------------------------
@@ -589,7 +589,7 @@ STRACE(("W(%ld)::HideWinBorder(%s) \n", fID, winBorder? winBorder->GetName(): "N
 		fFocusItem	= NULL;
 		newFront	= findNextFront();
 		if (newFront)
-			MoveToFront(newFront->layerPtr);
+			returnValue = MoveToFront(newFront->layerPtr);
 	}
 
 	// floating windows can have focus state. what if this removed window is

@@ -344,13 +344,7 @@ Layer* RootLayer::VirtualTopChild() const
 	fWinBorderIndex	= fWinBorderCount-1;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
-{
-		WinBorder *wb = fWinBorderList[fWinBorderIndex];
-		fWinBorderIndex--;
-//printf("Adi: VTC: %p.\n", wb);
-//		return fWinBorderList[fWinBorderIndex--];
-		return wb;
-}
+		return fWinBorderList[fWinBorderIndex--];
 
 	return NULL;
 }
@@ -358,13 +352,7 @@ Layer* RootLayer::VirtualTopChild() const
 Layer* RootLayer::VirtualLowerSibling() const
 {
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
-{
-		WinBorder *wb = fWinBorderList[fWinBorderIndex];
-		fWinBorderIndex--;
-//printf("Adi: VLS: %p.\n", wb);
-		return wb;
-//		return fWinBorderList[fWinBorderIndex--];
-}
+		return fWinBorderList[fWinBorderIndex--];
 
 	return NULL;
 }
@@ -372,13 +360,7 @@ Layer* RootLayer::VirtualLowerSibling() const
 Layer* RootLayer::VirtualUpperSibling() const
 {
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex > 0)
-{
-		WinBorder *wb = fWinBorderList[fWinBorderIndex];
-		fWinBorderIndex++;
-//printf("Adi: VUS: %p.\n", wb);
-		return wb;
-//		return fWinBorderList[fWinBorderIndex++];
-}
+		return fWinBorderList[fWinBorderIndex++];
 
 	return NULL;
 }
@@ -388,13 +370,7 @@ Layer* RootLayer::VirtualBottomChild() const
 	fWinBorderIndex	= 0;
 
 	if (fWinBorderIndex < fWinBorderCount && fWinBorderIndex >= 0)
-{
-		WinBorder *wb = fWinBorderList[fWinBorderIndex];
-		fWinBorderIndex++;
-//printf("Adi: VBC: %p.\n", wb);
-		return wb;
-//		return fWinBorderList[fWinBorderIndex++];
-}
+		return fWinBorderList[fWinBorderIndex++];
 
 	return NULL;
 }
@@ -966,8 +942,10 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 				}
 				else
 				{
-					if (exFocus != FocusWinBorder()
-						 && !(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
+					if (target != FocusWinBorder())
+						sendMessage = false;
+					else if (exFocus != FocusWinBorder()
+							 && !(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
 						sendMessage = false;
 
 					target->MouseDown(evt, sendMessage);
@@ -1000,7 +978,8 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			// currently mouse up goes to the same window which received mouse down
 			if (fMouseTarget)
 			{
-				fMouseTarget->MouseUp(evt);
+				if (fMouseTarget == FocusWinBorder())
+					fMouseTarget->MouseUp(evt);
 				fMouseTarget = NULL;
 			}
 
@@ -1562,6 +1541,10 @@ void RootLayer::show_winBorder(WinBorder *winBorder)
 
 		if (fWorkspace[i] &&
 				(fWorkspace[i]->HasWinBorder(winBorder) ||
+				// subset modals are a bit like floating windows, they are being added
+				// and removed from workspace when there's at least a normal window
+				// that uses them.
+				winBorder->Level() == B_MODAL_APP ||
 				// floating windows are inserted/removed on-the-fly so this window,
 				// although needed may not be in workspace's list.
 				winBorder->Level() == B_FLOATING_APP))
@@ -1649,10 +1632,6 @@ void RootLayer::get_workspace_windows()
 
 		if (!present)
 			empty_visible_regions(fWinBorderList2[i]);
-//		{
-//			fWinBorderList2[i]->fVisible.MakeEmpty();
-//			fWinBorderList2[i]->fFullVisible.MakeEmpty();
-//		}
 	}
 
 	// enlarge 2nd buffer also

@@ -198,7 +198,9 @@ ServerWindow::ServerWindow(BRect rect, const char *string, uint32 wlook,
 //------------------------------------------------------------------------------
 void ServerWindow::Init(void)
 {
-	fWinBorder = new WinBorder( fFrame, fTitle.String(), fLook, fFeel, 0UL,
+	char		newName[256];
+	sprintf(newName, "%ld: %s", fClientTeamID, fTitle.String());
+	fWinBorder = new WinBorder( fFrame, newName, fLook, fFeel, 0UL,
 			this, desktop->GetDisplayDriver());
 
 	// Spawn our message-monitoring thread
@@ -1166,7 +1168,10 @@ void ServerWindow::DispatchMessage(int32 code, LinkMsgReader &link)
 		case AS_LAYER_CLIP_TO_PICTURE:
 		{
 			DTRACE(("ServerWindow %s: Message AS_LAYER_CLIP_TO_PICTURE: Layer: %s\n",fTitle.String(), cl->fName->String()));
-			
+
+		// TODO: you are not allowed to use Layer regions here!!!
+		// If there is no other way, then first lock RootLayer object first.
+
 			// TODO: Watch out for the coordinate system in AS_LAYER_CLIP_TO_PICTURE
 			int32 pictureToken;
 			BPoint where;

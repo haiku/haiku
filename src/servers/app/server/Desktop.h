@@ -69,7 +69,6 @@ public:
 	void RemoveWinBorder(WinBorder *winBorder);
 	void AddWinBorderToSubset(WinBorder *winBorder, WinBorder *toWinBorder);
 	void RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWinBorder);
-	bool HasWinBorder(WinBorder *winBorder);
 
 	WinBorder* FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID);
 	// get list of registed windows

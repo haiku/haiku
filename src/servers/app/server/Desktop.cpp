@@ -424,16 +424,6 @@ void Desktop::RemoveWinBorderFromSubset(WinBorder *winBorder, WinBorder *fromWin
 	Unlock();
 }
 
-inline
-bool Desktop::HasWinBorder(WinBorder *winBorder)
-{
-	bool		isIn = false;
-	Lock();
-	isIn		= fWinBorderList.HasItem(winBorder);
-	Unlock();
-	return isIn;
-}
-
 WinBorder* Desktop::FindWinBorderByServerWindowTokenAndTeamID(int32 token, team_id teamID)
 {
 	WinBorder*		wb;
