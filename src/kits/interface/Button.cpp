@@ -93,12 +93,10 @@ void BButton::Draw(BRect updateRect)
 		darken4 = tint_color(no_tint, B_DARKEN_4_TINT),
 		darkenmax = tint_color(no_tint, B_DARKEN_MAX_TINT);
 	
-	if (!IsDefault())
-	{
-		SetHighColor(no_tint);
-		StrokeRect(rect);
+	if (IsDefault())
+		rect = DrawDefault(rect, IsEnabled());
+	else
 		rect.InsetBy(1,1);
-	}
 	
 	if (IsEnabled())
 	{
@@ -351,14 +349,14 @@ void BButton::MakeDefault(bool flag)
 		
 		if (flag)
 		{
-			ResizeBy(8.0f, 8.0f);
-			MoveBy(-4.0f, -4.0f);
+			ResizeBy(6.0f, 6.0f);
+			MoveBy(-3.0f, -3.0f);
 			window->SetDefaultButton((BButton*)this);
 		}
 		else
 		{
-			ResizeBy(-8.0f, -8.0f);
-			MoveBy(4.0f, 4.0f);
+			ResizeBy(-6.0f, -6.0f);
+			MoveBy(3.0f, 3.0f);
 			window->SetDefaultButton(NULL);
 		}
 	}
@@ -439,9 +437,7 @@ void BButton::GetPreferredSize (float *width, float *height)
 //------------------------------------------------------------------------------
 void BButton::ResizeToPreferred()
 {
-	float width, height;
-	GetPreferredSize(&width, &height);
-	ResizeTo(width,height);
+	 BControl::ResizeToPreferred();
 }
 //------------------------------------------------------------------------------
 status_t BButton::Invoke(BMessage *message)
@@ -503,8 +499,63 @@ BButton &BButton::operator=(const BButton &)
 //------------------------------------------------------------------------------
 BRect BButton::DrawDefault(BRect bounds, bool enabled)
 {
-	// TODO:
-	return BRect();
+	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR),
+	lighten1 = tint_color(no_tint, B_LIGHTEN_1_TINT),
+	darken1 = tint_color(no_tint, B_DARKEN_1_TINT),
+	darken4 = tint_color(no_tint, B_DARKEN_4_TINT);
+
+	if (enabled)
+	{
+		// Dark border
+		BeginLineArray(4);
+		AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
+			BPoint(bounds.left, bounds.top + 1.0f), darken4);
+		AddLine(BPoint(bounds.left + 1.0f, bounds.top),
+			BPoint(bounds.right - 1.0f, bounds.top), darken4);
+		AddLine(BPoint(bounds.right, bounds.top + 1.0f),
+			BPoint(bounds.right, bounds.bottom - 1.0f), darken4);
+		AddLine(BPoint(bounds.left + 1.0f, bounds.bottom),
+			BPoint(bounds.right - 1.0f, bounds.bottom), darken4);
+		EndLineArray();
+
+		bounds.InsetBy(1.0f, 1.0f);
+
+		// Bevel
+		SetHighColor(darken1);
+		StrokeRect(bounds);
+
+		bounds.InsetBy(1.0f, 1.0f);
+
+		// Filling
+		SetHighColor(lighten1);
+		FillRect(bounds);
+
+		bounds.InsetBy(2.0f, 2.0f);
+	}
+	else
+	{
+		// Dark border
+		BeginLineArray(4);
+		AddLine(BPoint(bounds.left, bounds.bottom - 1.0f),
+			BPoint(bounds.left, bounds.top + 1.0f), darken1);
+		AddLine(BPoint(bounds.left + 1.0f, bounds.top),
+			BPoint(bounds.right - 1.0f, bounds.top), darken1);
+		AddLine(BPoint(bounds.right, bounds.top + 1.0f),
+			BPoint(bounds.right, bounds.bottom - 1.0f), darken1);
+		AddLine(BPoint(bounds.left + 1.0f, bounds.bottom),
+			BPoint(bounds.right - 1.0f, bounds.bottom), darken1);
+		EndLineArray();
+
+		bounds.InsetBy(1.0f, 1.0f);
+
+		// Filling
+		SetHighColor(lighten1);
+		FillRect(bounds);
+
+		bounds.InsetBy(3.0f, 3.0f);
+	}
+
+	return bounds;
 }
 //------------------------------------------------------------------------------
 status_t Execute()
