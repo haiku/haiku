@@ -49,10 +49,12 @@ int32 loopTest(void *parameters)
 int main(int argc,char **argv)
 {
 	loopTestParameters area1Params={"area1",1000000,2,100000,100000};
-	loopTestParameters area2Params={"area2",1000000,2,100000,100000};
+	loopTestParameters area2Params={"area2",1000000,2,200000,100000};
+	loopTestParameters area3Params={"area3",1000000,2,300000,200000};
 
 	resume_thread(spawn_thread(loopTest,"area test 1",0,&area1Params));
 	resume_thread(spawn_thread(loopTest,"area test 2",0,&area2Params));
+	resume_thread(spawn_thread(loopTest,"area test 3",0,&area3Params));
 
 	snooze(50000000);
 
