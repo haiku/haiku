@@ -46,6 +46,8 @@
 #undef TRACE
 #undef ASSERT
 
+void debug_printf(const char *text,...);
+
 #if DEBUG > 0
 	#define PRINT(a)		log_printf a
 	#define TRACE(a) 		debug_printf a
@@ -54,7 +56,6 @@
 	#define ASSERT(a)		if (a) {} else LOG(("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__))
 	void log_create();
 	void log_printf(const char *text,...);
-	void debug_printf(const char *text,...);
 #else
 	#define PRINT(a)	debug_printf a
 	#define TRACE(a)	((void)(0))

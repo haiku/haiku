@@ -33,13 +33,6 @@
 #include "debug.h"
 #include "ich.h"
 
-static const char * logfile="/boot/home/ich_ac97.log";
-static sem_id loglock;
-
-void debug_printf(const char *text,...);
-void log_printf(const char *text,...);
-void log_create();
-
 void debug_printf(const char *text,...)
 {
 	char buf[1024];
@@ -52,20 +45,22 @@ void debug_printf(const char *text,...)
 	dprintf(DRIVER_NAME ": %s",buf);
 }
 
+#if DEBUG > 0
+
+static const char * logfile="/boot/home/ich_ac97.log";
+static sem_id loglock;
+
 void log_create()
 {
-#if DEBUG > 0
 	int fd = open(logfile, O_WRONLY | O_CREAT | O_TRUNC, 0666);
 	const char *text = DRIVER_NAME ", " VERSION "\n";
 	loglock = create_sem(1,"logfile sem");
 	write(fd,text,strlen(text));
 	close(fd);
-#endif
 }
 
 void log_printf(const char *text,...)
 {
-#if DEBUG > 0
 	int fd;
 	char buf[1024];
 	va_list ap;
@@ -85,6 +80,6 @@ void log_printf(const char *text,...)
 	#if DEBUG > 1
 		snooze(150000);
 	#endif
-#endif
 }
 
+#endif
