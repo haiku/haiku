@@ -1028,9 +1028,12 @@ static status_t nv_general_bios_to_powergraphics()
 	if (si->ps.secondary_head)
 	{
 		/* switch overlay engine to CRTC1 */
-		/* bit 12: overlay engine,
-		 * bit  8: TVout chip (fixme: or bit 4?),
-		 * bit  4: DDC channel (fixme: or bit 8?) */
+		/* bit 17: GPU FP port #2	(confirmed NV25, NV28, confirmed not on NV34),
+		 * bit 16: GPU FP port #1	(confirmed NV25, NV28, confirmed not on NV34),
+		 * bit 12: overlay engine	(all cards),
+		 * bit  9: TVout chip #2	(confirmed on NV18, NV25, NV28),
+		 * bit  8: TVout chip #1	(all cards),
+		 * bit  4: DDC channel		(all cards) */
 		NV_REG32(NV32_2FUNCSEL) &= ~0x00001000;
 		NV_REG32(NV32_FUNCSEL) |= 0x00001000;
 	}

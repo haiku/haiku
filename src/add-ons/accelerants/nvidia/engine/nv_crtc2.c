@@ -430,6 +430,10 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 		{
 			/* powerup both LVDS (laptop panellink) and TMDS (DVI panellink)
 			 * internal transmitters... */
+			/* note:
+			 * the powerbits in this register are hardwired to the DVI connectors,
+			 * instead of to the DACs! (confirmed NV34) */
+			//fixme...
 			DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) & 0xcfffffff));
 			/* ... and powerup external TMDS transmitter if it exists */
 			/* (confirmed OK on NV28 and NV34) */
@@ -446,6 +450,10 @@ status_t nv_crtc2_dpms(bool display, bool h, bool v)
 		{
 			/* powerdown both LVDS (laptop panellink) and TMDS (DVI panellink)
 			 * internal transmitters... */
+			/* note:
+			 * the powerbits in this register are hardwired to the DVI connectors,
+			 * instead of to the DACs! (confirmed NV34) */
+			//fixme...
 			DAC2W(FP_DEBUG0, (DAC2R(FP_DEBUG0) | 0x30000000));
 			/* ... and powerdown external TMDS transmitter if it exists */
 			/* (confirmed OK on NV28 and NV34) */

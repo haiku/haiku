@@ -278,8 +278,18 @@ static void detect_panels()
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 
 	LOG(2,("INFO: Dumping flatpanel related CRTC registers:\n"));
+	/* info LCD register:
+	 * b7: 1 = stereo view (shutter glasses use)				(all cards),
+	 * b5: 1 = power ext. TMDS (or something)/0 = TVout	use	(?)	(confirmed NV28),
+	 * b4: 1 = power ext. TMDS (or something)/0 = TVout use	(?)	(confirmed NV34),
+	 * b3: 1 = ???												(confirmed NV34),
+	 * b0: 1 = panel enabled/0 = TVout enabled					(all cards). */
 	LOG(2,("CRTC1: LCD register: $%02x\n", CRTCR(LCD)));
+	/* info 0x59 register:
+	 * b0: 1 = enable ext. TMDS clock (DPMS)					(confirmed NV28, NV34). */
 	LOG(2,("CRTC1: register $59: $%02x\n", CRTCR(0x59)));
+	/* info 0x9f register:
+	 * b4: 0 = TVout use (?). */
 	LOG(2,("CRTC1: register $9f: $%02x\n", CRTCR(0x9f)));
 
 	/* detect active slave device (if any) */
