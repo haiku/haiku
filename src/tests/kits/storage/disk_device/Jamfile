@@ -1,10 +1,12 @@
 SubDir OBOS_TOP src tests kits storage disk_device ;
 
+UsePrivateHeaders $(DOT) ;
 UsePrivateHeaders app ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
-SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kits app ]
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src kernel libroot os ]
+				 [ FDirName $(OBOS_TOP) src kits app ]
 				 [ FDirName $(OBOS_TOP) src kits storage ] ;
 
 SimpleTest DiskDeviceTest
@@ -13,6 +15,7 @@ SimpleTest DiskDeviceTest
 	  # We compile these classes in. If we would link against libopenbeos
 	  # instead, we couldn't use any GUI. At least not at this time.
 	  #
+	  AddOnImage.cpp
 	  DiskDevice.cpp
 	  DiskDeviceList.cpp
 	  DiskDevicePrivate.cpp
@@ -20,9 +23,16 @@ SimpleTest DiskDeviceTest
 	  DiskDeviceVisitor.cpp
 	  Mime.cpp
 	  Partition.cpp
+	  PartitioningDialog.cpp
 	  RegistrarDefs.cpp
 	  RosterPrivate.cpp
 	  Session.cpp
 
-	: be
+	  # from libroot
+	  #
+	  disk_scanner.cpp
+
+	: <boot!home!config!lib>libkernelland_emu.so be
 ;
+
+Depends DiskDeviceTest : userland_disk_scanner_modules ;
