@@ -175,7 +175,7 @@ virtual void				SetBarThickness(float thickness);
 
 virtual void				SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 
-#ifdef __HAIKU__
+#ifndef __HAIKU__
 virtual	void				_ReservedSlider4();
 #else
 virtual void				SetLimits(int32 minimum, int32 maximum); // Was _ReservedSlider4()
