@@ -54,7 +54,7 @@ C++FLAGS += -nostdinc ;
 # Determine mimetype of executable
 # Cross compiling can come later
 
-TARGET_CPU = $(OSPLAT:L) ;
+TARGET_CPU ?= $(OSPLAT:L) ;
 OBOS_VERSION ?= R1 ;
 
 switch $(TARGET_CPU) {
