@@ -329,9 +329,9 @@ BTranslatorRoster::Version(int32 *outCurVersion, int32 *outMinVersion,
 	static char vDate[] = __DATE__;
 	if (!vString[0]) {
 		sprintf(vString, "Translation Kit v%d.%d.%d %s\n",
-			B_TRANSLATION_CURRENT_VERSION/100,
-			(B_TRANSLATION_CURRENT_VERSION/10)%10,
-			B_TRANSLATION_CURRENT_VERSION%10,
+			static_cast<int>(B_TRANSLATION_CURRENT_VERSION >> 8),
+			static_cast<int>((B_TRANSLATION_CURRENT_VERSION >> 4) & 0xf),
+			static_cast<int>(B_TRANSLATION_CURRENT_VERSION & 0xf),
 			vDate);
 	}
 	*outCurVersion = B_TRANSLATION_CURRENT_VERSION;
@@ -807,14 +807,16 @@ BTranslatorRoster::GetAllTranslators(
 	*outCount = 0;
 
 	if (fSem > 0 && acquire_sem(fSem) == B_OK) {
-		// count handlers
+		// count translators
 		translator_node *pTranNode = NULL;
 		for (pTranNode = fpTranslators; pTranNode; pTranNode = pTranNode->next)
 			(*outCount)++;
+		// because translators are stored in the list backwards,
+		// populate the outList backwards to produce the original order
 		*outList = new translator_id[*outCount];
-		*outCount = 0;
+		int32 i = (*outCount) - 1;
 		for (pTranNode = fpTranslators; pTranNode; pTranNode = pTranNode->next)
-			(*outList)[(*outCount)++] = pTranNode->id;
+			(*outList)[i--] = pTranNode->id;
 			
 		result = B_NO_ERROR;
 		release_sem(fSem);
