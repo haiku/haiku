@@ -303,9 +303,6 @@ TranslatorRosterTest::InstantiateTest()
 	delete proster;
 	proster = NULL;
 	
-	// TODO: Add test where the BMessage is valid, but does not contain
-	// TODO: any translators
-	
 	// BMessage containing a single Translator to load
 	NextSubTest();
 	status_t result;
@@ -335,6 +332,18 @@ TranslatorRosterTest::InstantiateTest()
 	CPPUNIT_ASSERT(strcmp("BMP Images", strName) == 0);
 	delete proster;
 	proster = NULL;
+	
+	// BMessage is valid, but does not contain any translators
+	NextSubTest();
+	result = bmsg.MakeEmpty();
+	CPPUNIT_ASSERT(result == B_OK);
+	result = bmsg.AddString("class", "BTranslatorRoster");
+	CPPUNIT_ASSERT(result == B_OK);
+	proster = dynamic_cast<BTranslatorRoster *>
+		(BTranslatorRoster::Instantiate(&bmsg));
+	CPPUNIT_ASSERT(proster);
+	delete proster;
+	proster = NULL;	
 			
 	// TODO: add a case with a BMessage containing multiple Translators to load
 	
@@ -731,13 +740,44 @@ TranslatorRosterTest::GetTranslatorInfoTest()
 		NextSubTest();
 		CPPUNIT_ASSERT(pDefRoster->GetTranslatorInfo(-1, &outName, &outInfo,
 			&outVersion) == B_NO_TRANSLATOR);
-		// TODO: Add B_BAD_VALUE cases
+			
+		// B_BAD_VALUE cases
+		CPPUNIT_ASSERT(pDefRoster->GetTranslatorInfo(translators[i],
+			NULL, &outInfo, &outVersion) == B_BAD_VALUE);
+		CPPUNIT_ASSERT(outInfo == NULL && outVersion == -1);
+		
+		CPPUNIT_ASSERT(pDefRoster->GetTranslatorInfo(translators[i],
+			&outName, NULL, &outVersion) == B_BAD_VALUE);
+		CPPUNIT_ASSERT(outName == NULL && outVersion == -1);
+		
+		CPPUNIT_ASSERT(pDefRoster->GetTranslatorInfo(translators[i],
+			&outName, &outInfo, NULL) == B_BAD_VALUE);
+		CPPUNIT_ASSERT(outName == NULL && outInfo == NULL);
+		
+		CPPUNIT_ASSERT(pDefRoster->GetTranslatorInfo(translators[i],
+			NULL, NULL, NULL) == B_BAD_VALUE);		
+		
+		// Good values
 		CPPUNIT_ASSERT(pDefRoster->GetTranslatorInfo(translators[i],
 			&outName, &outInfo, &outVersion) == B_OK);
 		CPPUNIT_ASSERT(outName);
 	}	
 	delete[] translators;
 	translators = NULL;
+}
+
+void
+CheckTranslatorInfo(translator_info *pinfo, int32 nitems)
+{
+	for (int32 k = 0; k < nitems; k++) {
+		CPPUNIT_ASSERT(pinfo[k].translator > 0);
+		CPPUNIT_ASSERT(pinfo[k].type);
+		CPPUNIT_ASSERT(pinfo[k].group);
+		CPPUNIT_ASSERT(pinfo[k].quality >= 0 && pinfo[k].quality <= 1);
+		CPPUNIT_ASSERT(pinfo[k].capability >= 0 && pinfo[k].capability <= 1);
+		CPPUNIT_ASSERT(strlen(pinfo[k].MIME) >= 0);
+		CPPUNIT_ASSERT(strlen(pinfo[k].name) > 0);
+	}
 }
 
 /**
@@ -764,7 +804,7 @@ TranslatorRosterTest::GetTranslatorsTest()
 	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 	
 	NextSubTest();
-	translator_info* info = NULL;
+	translator_info* pinfo = NULL;
 	int32 outCount = -1;
 	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
 	CPPUNIT_ASSERT(pDefRoster);
@@ -776,24 +816,35 @@ TranslatorRosterTest::GetTranslatorsTest()
 
 	//get translator, specifying wrong args
 	NextSubTest();
-	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&garbled, NULL, &info,
+	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&garbled, NULL, &pinfo,
 		NULL) == B_BAD_VALUE);
 
 	//get translator for garbled data
 	NextSubTest();
-	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&garbled, NULL, &info,
+	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&garbled, NULL, &pinfo,
 		&outCount) == B_NO_TRANSLATOR);
 		
 	//get translator for image
 	NextSubTest();
-	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&image, NULL, &info,
+	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&image, NULL, &pinfo,
 		&outCount) == B_OK);
 	CPPUNIT_ASSERT(outCount > 0);
+	CheckTranslatorInfo(pinfo, outCount);
+	delete[] pinfo;
+	pinfo = NULL;
+	outCount = -1;
 	
-	// TODO: Add a case where I specify a valid BMessage
-
-	delete[] info;
-	info = NULL;
+	//specify a valid BMessage
+	NextSubTest();
+	BMessage bmsg;
+	CPPUNIT_ASSERT(
+		bmsg.AddBool(B_TRANSLATOR_EXT_DATA_ONLY, true) == B_OK);
+	CPPUNIT_ASSERT(pDefRoster->GetTranslators(&image, &bmsg, &pinfo,
+		&outCount, 0, NULL, B_TRANSLATOR_BITMAP) == B_OK);
+	CPPUNIT_ASSERT(outCount > 0);
+	CheckTranslatorInfo(pinfo, outCount);
+	delete[] pinfo;
+	pinfo = NULL;
 }
 
 /**
@@ -820,8 +871,8 @@ TranslatorRosterTest::IdentifyTest()
 	CPPUNIT_ASSERT(garbled.InitCheck() == B_OK);
 
 	NextSubTest();	
-	translator_info *pinfo = new translator_info;
-	memset(pinfo, 0, sizeof(translator_info));
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
 	BTranslatorRoster *pDefRoster = BTranslatorRoster::Default();
 	CPPUNIT_ASSERT(pDefRoster);
 	
@@ -832,20 +883,23 @@ TranslatorRosterTest::IdentifyTest()
 	//get translator for garbled data
 	NextSubTest();	
 	CPPUNIT_ASSERT(pDefRoster->Identify(&garbled, NULL,
-		pinfo) == B_NO_TRANSLATOR);
+		&info) == B_NO_TRANSLATOR);
 	
 	//get translator for image
 	NextSubTest();
-	delete pinfo;
-	pinfo = new translator_info;
-	memset(pinfo, 0, sizeof(pinfo));
-	CPPUNIT_ASSERT(pDefRoster->Identify(&image, NULL, pinfo) == B_OK);
+	memset(&info, 0, sizeof(translator_info));
+	CPPUNIT_ASSERT(pDefRoster->Identify(&image, NULL, &info) == B_OK);
+	CheckTranslatorInfo(&info, 1);
+	
+	//supply desired output type
+	NextSubTest();
+	memset(&info, 0, sizeof(translator_info));
+	CPPUNIT_ASSERT(pDefRoster->Identify(&image, NULL, &info,
+		0, NULL, B_TRANSLATOR_BITMAP) == B_OK);
+	CheckTranslatorInfo(&info, 1);
 	
 	// TODO: Add a test where I actually use pinfo and a BMessage 
 	// TODO: and check their contents
-	
-	delete pinfo;
-	pinfo = NULL;
 }
 
 /**
