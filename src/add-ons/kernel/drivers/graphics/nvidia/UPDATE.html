@@ -1,0 +1,134 @@
+<html>
+<head>
+<title>Changes</title>
+</head>
+<body>
+<p><h2>Changes done for each driverversion:</h2></p>
+<p><h1>nv_driver 0.07 (Rudolf)</h1></p>
+<a name="features"></a><strong>Current Nvidia driver features:</strong><br><br>
+<ul>
+	<li>Hardware cursor support;
+	<li>Full 2D acceleration;
+	<li>Full BWindowScreen support (used for hardware pageflipping and scrolling/panning);
+	<li>DPMS support;
+	<li>B_YCbCr422 hardware overlay support on all cards (so on both TNT and GeForce series).
+</ul>
+<strong>Supported cards (as far as is known):</strong> 
+<ul>
+	<li>TNT 1/2;
+	<li>TNT 2-M64;
+	<li>Vanta/Aladdin TNT2;
+	<li>GeForce 256;
+	<li>GeForce 2 MX/Ti/GTS/Go (Go only with external monitor);
+	<li>GeForce 2 Integrated GPU (Nforce) (setup RAM amount manually for now);
+	<li>GeForce 3 (Ti);
+	<li>GeForce 4 MX/Ti/Go (Go only with external monitor);
+	<li>GeForce 4 Integrated GPU (Nforce 2) (setup RAM amount manually for now);
+	<li>GeForce FX 5200/5800/5900/Go (5600 still has persistant trouble, Go only with external monitor);
+	<li>Quadro (2/4/FX/Go) (Go only with external monitor).
+</ul>
+<strong>Known limitations:</strong> 
+<ul> 
+	<li>If the driver hangs your system on boot make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
+	<li>If the driver seems to create 'random' trouble make sure you have a fully functional VGA BIOS, or system BIOS for embedded cards (check for updates on the manufacturor's site);
+	<li>256Mb RAM detection is still missing for cards that have that much of it: Please set the amount manually for now via the nv.settings file (driver defaults to 16Mb if you don't);
+	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
+	<li>No DVI support: you have to use a standard VGA cable to connect external flatpanels;
+	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file (driver probably defaults to 1Mb if you don't). If you have overlay trouble, set a slightly smaller amount of RAM than you actually specified in the system BIOS (1Mb less or so);
+	<li>A few cards have hardcursor trouble. If you encounter this use the softcursor: select this via the nv.settings file;
+	<li>GeForce FX 5600 cards seem to have CRTC problems: the monitor shuts off and displays "refresh out of range";
+	<li>GeForce FX 5700 and FX 5950 are not yet supported (mail me if you own such a card!).
+</ul>
+<strong>Fixes for this version:</strong><br><br>
+<ul>
+	<li>Added card recognition for some Nvidia GeForce4 Ti 4600 cards (ID 0x0252);
+	<li>GeForce overlay activation updated: hardware should respond to the first request instead of to the second ('stampTV' update);
+	<li>Included B_YCbCr422 hardware overlay for TNT 1/2 class cards (pre NV10 architecture).
+</ul>
+<hr>
+<p><h1>nv_driver 0.06 (Rudolf)</h1></p>
+<ul>
+	<li>Full 2D acceleration for TNT1 - GeForce FX cards;
+	<li>Added card recognition for GeForce FX Go and some older laptop cards;
+	<li>Implemented retrace synchronisation (INT routine);
+	<li>Geforce overlay updated: turned off ints explicitly, corrected upscaling restriction to be 8x, small speed improvement;
+	<li>Vertical timing updated: missed a register on all GeForce cards, missed another register on older cards;
+	<li>Register unlocking updated: missed a register on all supported cards.
+</ul>
+<strong>Known limitations:</strong>
+<ul>
+	<li>If the driver hangs your system on boot make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
+	<li>256Mb RAM detection is still missing for cards that have that much of it;
+	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
+	<li>no DVI support: you have to use a standard VGA cable to connect external flatpanels;
+	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file.
+</ul>
+<p><h1>nv_driver 0.05 (Rudolf)</h1></p>
+<ul>
+	<li>Update on cursor move routine: pointer will nolonger accept illegal left-top positions. As a result it will nolonger vanish on some cards;
+	<li>Fixed hardware overlay on GeForce4 MX and Go series cards: disabled the embedded MPEG2 decoder engine which exist on these cards only;
+	<li>Fixed driver to adhere to the downscaling limitations of the new overlay engine existing in the GeForceFX series cards.
+</ul>
+<strong>Known limitations:</strong>
+<ul>
+	<li>If the driver hangs your system on boot make sure you enabled 'assign IRQ to VGA card' in your system BIOS;
+	<li>256Mb RAM detection is still missing for cards that have that much of it;
+	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
+	<li>no DVI support: you have to use a standard VGA cable to connect external flatpanels;
+	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file.
+</ul>
+<p><h1>nv_driver 0.04 (Rudolf)</h1></p>
+<ul>
+	<li>New cursor_move sync_to_retrace for all supported cards: now all display distortions should be gone (GeForce4 for example);
+	<li>Added hardware overlay support for the entire GeForce series cards;
+	<li>Now powering up all card function blocks: dualhead cards should now switch to the connected head (by it's BIOS) instead of hanging the system on boot (tested on a dualhead GeForce4 with a DVI and a VGA connector).
+</ul>
+<strong>Known limitations:</strong>
+<ul>
+	<li>256Mb RAM detection is still missing for cards that have that much of it;
+	<li>Flatpanel protection for laptops is not yet in place: be carefull! External only output has been reported functional though.
+	<li>no DVI support: you have to use a standard VGA cable to connect external flatpanels;
+	<li>Embedded GeForce RAM detection is non-functional: please set amount manually for now via the nv.settings file.
+</ul>
+<p><h1>nv_driver 0.03 (Rudolf)</h1></p>
+<ul>
+	<li>Prevent system or video freeze on dragging files or so in tracker windows;
+	<li>Pre NV10 cursor sync_to_retrace: no more distortions in cursor bitmaps on moving it;
+	<li>Cursor bitmapadress setup modification for laptops: The cursor should be visible now also on 'Go' type of cards;
+	<li>BWindowScreen / Sync_to_retrace fix: prevent apps from crashing on endless waiting for retrace. Wait_for_retrace is temporary disabled now until it's actually implemented.
+</ul>
+<strong>Known limitations:</strong>
+<ul>
+	<li>256Mb RAM detection is still missing for cards that have that much of it;
+	<li>Flatpanel protection for laptops is not yet in place: be carefull!
+</ul>
+With the 0.03 release most people should be able to use the driver for day to day use. My advice: use the lowest colordepth you can live with: this increases speed a lot! Meanwhile acceleration and overlay will hopefully be setup. Stay tuned! ;-)<br>
+<p><h1>nv_driver 0.02 (Rudolf)</h1></p>
+<ul>
+	<li>hardcursor support;
+	<li>virtual screens / BWindowScreen support including panning/scrolling;
+	<li>colorspace selection;
+	<li>colorpalette setup;
+	<li>refreshrate selection;
+	<li>85 cards of 4 brands are detected now: These are all TNT1 - GeForce FX5900 Ultra cards as far as I know. Hopefully all those cards will actually work OK with the driver;
+	<li>DPMS support;
+	<li>resolution selection (CRTC setup);
+	<li>switch to 'enhanced mode' included: VESA is gone now!
+	<li>cardspecs are setup (faked PINS);
+	<li>several small fixes done to get the driver working correctly on all four of my cards: PCI TNT1, AGP TNT1, AGP TNT2 and AGP GeForce2MX400.
+</ul>
+<strong>Known limitations:</strong>
+<ul>
+	<li>256Mb RAM detection is still missing for cards that have that much of it;
+	<li>Flatpanel protection for laptops is not yet in place: be carefull!
+</ul>
+<p><h1>Still todo:</h1></p>
+<ul>
+	<li>Dualhead support on some GeForce series cards;
+	<li>TVout support;
+	<li>Add support for internal display panels (laptops);
+	<li>Partial card coldstart: setup RAM and CORE speeds (if possible).
+</ul>
+</p>
+</body>
+</html>

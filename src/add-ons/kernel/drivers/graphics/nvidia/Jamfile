@@ -7,6 +7,18 @@ R5KernelAddon nv.driver : kernel drivers bin :
 	driver.c
 ;
 
+Package openbeos-nvidia-1.0 :
+	README.html UPDATE.html ;
+Package openbeos-nvidia-1.0 :
+	nv.driver : 
+	boot home config add-ons kernel drivers bin ;
+Package openbeos-nvidia-1.0 :
+	<kernel!drivers!dev!graphics>nv.driver :
+	boot home config add-ons kernel drivers dev graphics ;
+Package openbeos-nvidia-1.0 :
+	nv.settings :
+	boot home config settings kernel drivers ;
+
 # Link to kernel/drivers/dev/graphics
 {
 	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev graphics ] ;
