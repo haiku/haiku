@@ -825,11 +825,15 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 	while ((si->engine.dma.free < cmd_size) && (cnt < 10000) && (err < 3))
 	{
 		/* see where the engine is currently fetching from the buffer */
+		/* note:
+		 * read this only once in the code as accessing registers is relatively slow */
 		dmaget = ((NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
 			si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])) >> 2);
 
-		/* snooze a bit so I do not hammer the bus */
-		snooze (100);
+		/* update timeout counter: on NV11 on a Pentium4 2.8Ghz max reached count
+		 * using BeRoMeter 1.2.6 was about 600; so counting 10000 before generating
+		 * a timeout should definately do it. Snooze()-ing cannot be done without a
+		 * serious speed penalty, even if done for only 1 microSecond. */
 		cnt++;
 
 		/* where's the engine fetching viewed from us issuing? */
@@ -857,7 +861,7 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 
 				/* note the updated current free space we have in the DMA buffer */
 				si->engine.dma.free = dmaget - si->engine.dma.current;
-				/* mind this pittfall:
+				/* mind this pittfall (? there might be another reason):
 				 * as the engine is DMA triggered for fetching chunks every 128 bytes,
 				 * we may not touch that much at the end of our free space!
 				 * (confirmed NV11 when it's buffer is full for a longer period of
@@ -875,7 +879,7 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 
 			/* note the updated current free space we have in the DMA buffer */
 			si->engine.dma.free = dmaget - si->engine.dma.current;
-			/* mind this pittfall:
+			/* mind this pittfall (? there might be another reason):
 			 * as the engine is DMA triggered for fetching chunks every 128 bytes,
 			 * we may not touch that much at the end of our free space!
 			 * (confirmed NV11 when it's buffer is full for a longer period of
