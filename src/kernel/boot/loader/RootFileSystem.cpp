@@ -53,8 +53,21 @@ RootFileSystem::Close(void *cookie)
 Node *
 RootFileSystem::Lookup(const char *name, bool /*traverseLinks*/)
 {
-	EntryIterator iterator = fList.Iterator();
-	struct entry *entry = NULL;
+	EntryIterator iterator = fLinks.Iterator();
+	struct entry *entry;
+
+	// first check the links
+
+	while ((entry = iterator.Next()) != NULL) {
+		if (!strcmp(name, entry->name)) {
+			entry->root->Acquire();
+			return entry->root;
+		}
+	}
+
+	// then all mounted file systems
+
+	iterator = fList.Iterator();
 
 	while ((entry = iterator.Next()) != NULL) {
 		char entryName[B_OS_NAME_LENGTH];
@@ -116,18 +129,32 @@ RootFileSystem::IsEmpty()
 
 
 status_t 
-RootFileSystem::AddNode(Node *node)
+RootFileSystem::AddVolume(Directory *volume)
 {
-	// we don't have RTTI
-	if (node->Type() != S_IFDIR)
-		return B_BAD_TYPE;
-
 	struct entry *entry = new RootFileSystem::entry();
 	if (entry == NULL)
 		return B_NO_MEMORY;
 
-	node->Acquire();
-	entry->root = (Directory *)node;
+	volume->Acquire();
+	entry->name = NULL;
+	entry->root = volume;
+
+	fList.Add(entry);
+
+	return B_OK;
+}
+
+
+status_t
+RootFileSystem::AddLink(const char *name, Directory *target)
+{
+	struct entry *entry = new RootFileSystem::entry();
+	if (entry == NULL)
+		return B_NO_MEMORY;
+
+	target->Acquire();
+	entry->name = name;
+	entry->root = target;
 
 	fList.Add(entry);
 

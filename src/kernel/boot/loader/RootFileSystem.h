@@ -24,18 +24,22 @@ class RootFileSystem : public Directory {
 		virtual status_t Rewind(void *cookie);
 		virtual bool IsEmpty();
 
-		virtual status_t AddNode(Node *node);
+		status_t AddVolume(Directory *volume);
+		status_t AddLink(const char *name, Directory *target);
 
 	private:
 		struct entry {
 			DoublyLinked::Link	link;
+			const char	*name;
 			Directory	*root;
 		};
 		typedef DoublyLinked::Iterator<entry, &entry::link> EntryIterator;
 		typedef DoublyLinked::List<entry, &entry::link> EntryList;
 
 		EntryList fList;
+		EntryList fLinks;
 };
 
+extern RootFileSystem *gRoot;
 
 #endif	/* ROOT_FILE_SYSTEM_H */
