@@ -1074,7 +1074,8 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 
 			GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
 
-// TODO: lock here!
+// TODO: lock ServerWindow here! Don't forget, you need to add/remove Layers
+// from within RootLayer's thread!!!
 			Layer		*target = LayerAt(evt.where);
 			if (target == NULL)
 				debugger("RootLayer::MouseEventHandler: 'target' can't be null.\n");
@@ -1175,6 +1176,13 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 						winBorderUnder->fDecorator->MoveBy(pt.x, pt.y);
 
 					winBorderUnder->move_layer(pt.x, pt.y);
+
+					// I know the way we get BWindow's new location it's not nice :-),
+					// but I don't see another way. fTopLayer.Frame().LeftTop() does not change, ever.
+					BPoint		location(winBorderUnder->fTopLayer->fFull.Frame().LeftTop());
+					BMessage	msg(B_WINDOW_MOVED);
+					msg.AddPoint("where", location);
+					winBorderUnder->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 				}
 				else if (fResizingWindow)
 				{
@@ -1182,6 +1190,12 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 						winBorderUnder->fDecorator->ResizeBy(pt.x, pt.y);
 
 					winBorderUnder->resize_layer(pt.x, pt.y);
+
+					BRect		frame(winBorderUnder->fTopLayer->Frame());
+					BMessage	msg(B_WINDOW_RESIZED);
+					msg.AddInt32("width", frame.Width());
+					msg.AddInt32("height", frame.Height());
+					winBorderUnder->Window()->SendMessageToClient(&msg, B_NULL_TOKEN, false);
 				}
 				else
 				{
