@@ -1,0 +1,6 @@
+SubDir OBOS_TOP src add-ons kernel generic mpu401 ;
+
+R5KernelAddon mpu401 : kernel generic :
+	mpu401.c
+;
+
