@@ -1,12 +1,12 @@
-/* Thread definition and structures
-** 
-** Distributed under the terms of the OpenBeOS License.
-*/
+/* Copyright 2004, Haiku Inc.
+ * Distributed under the terms of the MIT License.
+ *
+ * Thread definition and structures
+ */
 #ifndef _KERNEL_THREAD_TYPES_H
 #define _KERNEL_THREAD_TYPES_H
 
 
-#include <ktypes.h>
 #include <cbuf.h>
 #include <vm.h>
 #include <smp.h>
@@ -100,6 +100,8 @@ struct team {
 		struct list	list;
 		uint32		count;
 		int32		wait_for_any;	/* count of wait_for_child() that wait for any child */
+		bigtime_t	kernel_time;
+		bigtime_t	user_time;
 	} dead_children;
 	struct vm_address_space *aspace;
 	struct vm_address_space *kaspace;
@@ -108,6 +110,9 @@ struct team {
 	struct thread	*thread_list;
 	struct list		image_list;
 	struct arch_team arch_info;
+
+	bigtime_t		dead_threads_kernel_time;
+	bigtime_t		dead_threads_user_time;
 };
 
 typedef int32 (*thread_entry_func)(thread_func, void *);
