@@ -32,6 +32,8 @@
 #include <PropertyInfo.h>
 #include <Window.h>
 
+#include <MenuWindow.h>
+
 #include <stdio.h>
 #define CALLED() printf("%s\n", __PRETTY_FUNCTION__);
 
@@ -85,37 +87,6 @@ static property_info sPropList[] =
 		"Directs scripting message to the specified menu, first popping the current "
 		"specifier off the stack." },
 	{}
-};
-
-// TODO: Move this to its own file
-class BMenuWindow : public BWindow
-{
-public:
-	BMenuWindow(BRect frame, BMenu *menu) :
-		BWindow(frame, "Menu", B_NO_BORDER_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
-			B_NOT_ZOOMABLE)
-	{
-		fMenu = menu;
-		AddChild(fMenu);	
-		ResizeTo(fMenu->Bounds().Width() + 1, fMenu->Bounds().Height() + 1);
-		fMenu->MakeFocus(true);
-	}
-
-	virtual ~BMenuWindow() {}
-
-	virtual void WindowActivated(bool active)
-	{
-		if (!active)
-		{
-			RemoveChild(fMenu);
-
-			if (Lock())
-				Quit();
-		}
-	}
-
-private:
-	BMenu *fMenu;
 };
 
 

@@ -18,6 +18,7 @@ INTERFACE_KIT_SOURCE =
 	MenuBar.cpp
 	MenuField.cpp
 	MenuItem.cpp
+	MenuWindow.cpp
 	OptionControl.cpp
 	OptionPopUp.cpp
 	Picture.cpp
