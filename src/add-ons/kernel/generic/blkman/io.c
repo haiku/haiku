@@ -49,11 +49,11 @@ blkman_map_iovecs(iovec *vec, size_t vec_count, size_t vec_offset, size_t len,
 
 	SHOW_FLOW0( 3, "" );
 
-	if ((res = get_iovec_memory_map( vec, vec_count, vec_offset, len,
+	if ((res = get_iovec_memory_map(vec, vec_count, vec_offset, len,
 					map->vec, max_phys_entries, &map->num, &map->total_len)) < B_OK)
 		return res;
 
-	if (dma_boundary == ~0 && max_sg_block_size >= map->total_len) 
+	if (dma_boundary == ~0UL && max_sg_block_size >= map->total_len) 
 		return B_OK;
 
 	SHOW_FLOW(3, "Checking violation of dma boundary 0x%x and entry size 0x%x", 
@@ -276,7 +276,7 @@ blkman_readwrite(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 		goto err;
 	}
 
-	phys_vecs = locked_pool->alloc(handle->device->phys_vecs_pool);
+	phys_vecs = locked_pool->alloc(device->phys_vecs_pool);
 
 	SHOW_FLOW0(3, "got phys_vecs");
 
@@ -358,7 +358,7 @@ blkman_readwrite(blkman_handle_info *handle, off_t pos, struct iovec *vec,
 
 retry:			
 		if (need_buffer) {
-			int tmp_len;
+			size_t tmp_len;
 
 			// argh! - need buffered transfer
 			SHOW_FLOW(1, "buffer required: len=%ld, block_ofs=%ld",
@@ -375,15 +375,15 @@ retry:
 			tmp_len = blkman_iovec_len(vec, vec_count, vec_offset);
 			tmp_len = min(tmp_len, len);
 
-			SHOW_FLOW(3, "tmp_len: %d", tmp_len);
+			SHOW_FLOW(3, "tmp_len: %lu", tmp_len);
 
-			if (write && (block_ofs != 0 || tmp_len < (ssize_t)block_size)) {
+			if (write && (block_ofs != 0 || tmp_len < block_size)) {
 				// partial block write - need to read block first
 				// we always handle one block only to keep things simple
 				cur_blocks = 1;
 
 				SHOW_FLOW0(3, "partial write at beginning: reading content of first block");
-				res = handle->device->interface->read(handle->cookie, 
+				res = device->interface->read(handle->cookie, 
 					&blkman_buffer_phys_vec, block_pos, 
 					cur_blocks, block_size, &bytes_transferred);
 			} else {
@@ -539,10 +539,10 @@ retry:
 			(int)phys_vecs->total_len, block_pos);
 
 		if (write) {
-			res = handle->device->interface->write(handle->cookie,
+			res = device->interface->write(handle->cookie,
 					phys_vecs, block_pos, cur_blocks, block_size, &bytes_transferred);
 		} else {
-			res = handle->device->interface->read(handle->cookie,
+			res = device->interface->read(handle->cookie,
 					phys_vecs, block_pos, cur_blocks, block_size, &bytes_transferred);
 		}
 
@@ -583,7 +583,7 @@ cannot_map:
 		pos += bytes_transferred;
 	}
 
-	locked_pool->free(handle->device->phys_vecs_pool, phys_vecs);
+	locked_pool->free(device->phys_vecs_pool, phys_vecs);
 
 	SHOW_FLOW0(3, "done");
 
@@ -593,7 +593,7 @@ err3:
 	if (need_buffer)
 		release_sem(blkman_buffer_lock);
 err2:
-	locked_pool->free(handle->device->phys_vecs_pool, phys_vecs);
+	locked_pool->free(device->phys_vecs_pool, phys_vecs);
 err:
 	SHOW_FLOW(3, "done with error %s", strerror(res));
 
