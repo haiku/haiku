@@ -136,9 +136,11 @@ public:
 	void AddToRecentFolders(const entry_ref *folder,
 							const char *appSig = 0) const;
 
+	// private/reserved stuff starts here
+	class Private;
+
 private:
 	class ArgVector;
-	class Private;
 	friend class Private;
 
 	status_t AddApplication(const char *mimeSig, const entry_ref *ref,
