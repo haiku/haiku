@@ -3,17 +3,17 @@
 ** Distributed under the terms of the NewOS License.
 */
 
-#include <sys/types.h>
+
 #include <Errors.h>
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 #include <kerrors.h>
 
 
-char *
-strerror(int errnum)
+static char *
+error_description(int error)
 {
-	switch (errnum) {
+	switch (error) {
 		/* General Errors */
 		case B_NO_ERROR:
 			return "No Error";
@@ -79,11 +79,9 @@ strerror(int errnum)
 		case ESPIPE:
 			return "Illegal seek";	// "Seek not allowed on file descriptor"
 
-//		case ERR_UNIMPLEMENTED:
 		case ENOSYS:
 			return "Unimplemented";	// "Function not implemented"
 
-//		case ERR_TOO_BIG:
 		case EDOM:
 			return "Numerical argument out of range";	// "Domain Error"
 
@@ -579,11 +577,34 @@ strerror(int errnum)
 			return "Data is not a message";
 
 		default:
-		{
-			static char unknown[28];
-
-			sprintf(unknown, "Unknown Error (%d)", errnum);
-			return unknown;
-		}
+			return NULL;
 	}
 }
+
+
+char *
+strerror(int error)
+{
+	static char unknown[28];
+
+	char *description = error_description(error);
+	if (description != NULL)
+		return description;
+
+	sprintf(unknown, "Unknown Error (%d)", error);
+	return unknown;
+}
+
+
+int
+strerror_r(int error, char *buffer, size_t bufferSize)
+{
+	char *description = error_description(error);
+	if (description == NULL)
+		return EINVAL;
+
+	strlcpy(buffer, description, bufferSize);
+	return 0;
+		// ToDo: could return ERANGE if buffer is too small
+}
+
