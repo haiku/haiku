@@ -938,8 +938,8 @@ int InputServer::DispatchEvent(BMessage *message)
     			int64 time=(int64)real_time_clock();
     			appsvrlink->SetOpCode(B_MOUSE_MOVED);
     			appsvrlink->Attach(&time,sizeof(int64));
-    			appsvrlink->Attach(&xValue,sizeof(float));
-    			appsvrlink->Attach(&yValue,sizeof(float));
+    			appsvrlink->Attach((float)&xValue,sizeof(float));
+    			appsvrlink->Attach((float)&yValue,sizeof(float));
     			message->FindInt32("buttons",buttons);
     			appsvrlink->Attach(&buttons,sizeof(int32));
     			appsvrlink->Flush();
