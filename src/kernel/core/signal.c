@@ -17,7 +17,35 @@
 #include <syscalls.h>
 
 
-const char * const sys_siglist[NSIG] = {
+const char * const
+sys_siglist[NSIG] = {
+	/*  0              */  "Signal 0",
+	/*  1 - SIGHUP     */  "Hangup",
+	/*  2 - SIGINT     */  "Interrupt",
+	/*  3 - SIGQUIT    */  "Quit",
+	/*  4 - SIGILL     */  "Illegal instruction",
+	/*  5 - SIGCHLD    */  "Child exited",
+	/*  6 - SIGABRT    */  "Abort",
+	/*  7 - SIGPIPE    */  "Broken pipe",
+	/*  8 - SIGFPE     */  "Floating point exception",
+	/*  9 - SIGKILL    */  "Killed (by death)",
+	/* 10 - SIGSTOP    */  "Stopped",
+	/* 11 - SIGSEGV    */  "Segmentation violation",
+	/* 12 - SIGCONT    */  "Continued",
+	/* 13 - SIGTSTP    */  "Stopped (tty output)",
+	/* 14 - SIGALRM    */  "Alarm",
+	/* 15 - SIGTERM    */  "Termination requested",
+	/* 16 - SIGTTIN    */  "Stopped (tty input)",
+	/* 17 - SIGTTOU    */  "Stopped (tty output)",
+	/* 18 - SIGUSR1    */  "User defined signal 1",
+	/* 19 - SIGUSR2    */  "User defined signal 2",
+	/* 20 - SIGWINCH   */  "Window size changed",
+	/* 21 - SIGKILLTHR */  "Kill Thread",
+	/* 22 - SIGTRAP    */  NULL
+};
+
+
+const char * const sigstr[NSIG] = {
 	"NONE", "HUP", "INT", "QUIT", "ILL", "CHLD", "ABRT", "PIPE",
 	"FPE", "KILL", "STOP", "SEGV", "CONT", "TSTP", "ALRM", "TERM",
 	"TTIN", "TTOU", "USR1", "USR2", "WINCH", "KILLTHR", "TRAP"
@@ -41,7 +69,7 @@ handle_signals(struct thread *t, int state)
 				sig_mask >>= 1;
 				t->sig_pending &= ~(1L << i);
 				
-				dprintf("Thread 0x%lx received signal %s\n", t->id, sys_siglist[sig]);
+				dprintf("Thread 0x%lx received signal %s\n", t->id, sigstr[sig]);
 				
 				if (handler->sa_handler == SIG_IGN) {
 					// signal is to be ignored
@@ -107,7 +135,7 @@ send_signal_etc(pid_t tid, uint sig, uint32 flags)
 	int state;
 	struct thread *t, *main_t;
 	
-	if ((sig < 1) || (sig > 32))
+	if ((sig < 1) || (sig > MAX_SIGNO))
 		return B_BAD_VALUE;
 	
 	state = disable_interrupts();
@@ -218,7 +246,7 @@ sys_sigaction(int sig, const struct sigaction *act, struct sigaction *oact)
 	struct thread *t;
 	int state;
 	
-	if ((sig < 1) || (sig > 32))
+	if ((sig < 1) || (sig > MAX_SIGNO))
 		return EINVAL;
 	if ((sig == SIGKILL) || (sig == SIGKILLTHR) || (sig == SIGSTOP))
 		return EINVAL;
