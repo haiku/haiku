@@ -275,6 +275,10 @@ BVolume::SetName(const char *name)
 	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
 		error = BPrivate::Storage::set_volume_name(fDevice, name);
+	
+	// ToDo: change the name of the mount point, too
+	// (or the link to the boot volume, if that name has been changed)
+
 	return error;
 }
 
