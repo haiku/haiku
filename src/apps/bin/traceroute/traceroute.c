@@ -217,12 +217,13 @@
 #include <netinet/ip_icmp.h>
 #include <netinet/ip_var.h>
 #include <netinet/udp.h>
-#include "sys/select.h"
+#include <sys/select.h>
+
+#define howmany(x, y) _howmany(x, y)
 
 #include <arpa/inet.h>
 
 #include <ctype.h>
-//#include <err.h>
 #include <errno.h>
 #include <netdb.h>
 #include <stdio.h>

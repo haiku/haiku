@@ -73,7 +73,9 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include "sys/select.h"
+#include <sys/select.h>
+
+#define howmany(x, y) _howmany(x, y)
 
 #define	DEFDATALEN	(64 - 8)		/* default data length */
 #define	MAXIPLEN	60
