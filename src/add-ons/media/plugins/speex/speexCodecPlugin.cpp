@@ -290,7 +290,7 @@ SpeexDecoder::Decode(void *buffer, int64 *frameCount,
 				break;
 			}
 			if (fHeader->nb_channels == 2) {
-				speex_decode_stereo((float*)out_buffer, fSpeexOutputLength, fStereoState);
+				speex_decode_stereo((float*)out_buffer, fHeader->frame_size, fStereoState);
 			}
 			for (int i = 0 ; i < fSpeexOutputLength/fFrameSize ; i++) {
 				*((float*)out_buffer) /= 32000;
