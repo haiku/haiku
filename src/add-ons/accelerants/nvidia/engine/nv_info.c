@@ -209,7 +209,14 @@ static status_t pins3_5_read(uint8 *rom, uint32 offset)
 		tabs.IOFlagConditionTablePtr = rom[offset + 85] + (rom[offset + 86] * 256);
 		tabs.InitFunctionTablePtr = rom[offset + 87] + (rom[offset + 88] * 256);
 
-		LOG(8,("INFO: PINS 5.16 and later cmdlist pointer: $%04x\n", tabs.InitScriptTablePtr));
+		LOG(8,("INFO: PINS 5.16 and later cmdlist pointers:\n"));
+		LOG(8,("INFO: InitScriptTablePtr: $%04x\n", tabs.InitScriptTablePtr));
+		LOG(8,("INFO: MacroIndexTablePtr: $%04x\n", tabs.MacroIndexTablePtr));
+		LOG(8,("INFO: MacroTablePtr: $%04x\n", tabs.MacroTablePtr));
+		LOG(8,("INFO: ConditionTablePtr: $%04x\n", tabs.ConditionTablePtr));
+		LOG(8,("INFO: IOConditionTablePtr: $%04x\n", tabs.IOConditionTablePtr));
+		LOG(8,("INFO: IOFlagConditionTablePtr: $%04x\n", tabs.IOFlagConditionTablePtr));
+		LOG(8,("INFO: InitFunctionTablePtr: $%04x\n", tabs.InitFunctionTablePtr));
 
 		return coldstart_card_516_up(rom, tabs, ram_tab);
 	}
@@ -1086,13 +1093,18 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			offset32 += tabs.InitFunctionTablePtr;
 			LOG(8,("cmd 'execute fixed VGA BIOS routine #$%02x at adress $%04x'\n",
 				byte, offset32));
-			//fixme: impl. if it turns out this function is used.. (didn't see that yet)
-			LOG(8,("\n\nINFO: WARNING: function not yet implemented, skipping!\n\n"));
+			/* note:
+			 * This command is BIOS/'pins' version specific. Confirmed a NV28 having NO
+			 * entries at all in InitFunctionTable!
+			 * (BIOS version 4.28.20.05.11; 'pins' version 5.21) */
+			//fixme: impl. if it turns out this cmd is used.. (didn't see that yet)
 			if (*exec)
 			{
+				//fixme: add BIOS/'pins' version dependancy...
 				switch(byte)
 				{
 				default:
+					LOG(8,("\n\nINFO: WARNING: function not implemented, skipping!\n\n"));
 					break;
 				}
 			}
@@ -1424,14 +1436,15 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 
 			/* execute */
 			*adress += 1;
-			data = (*((uint8*)(&(rom[*adress]))) << 1);
+			byte = *((uint8*)(&(rom[*adress])));
 			*adress += 1;
-			data += tabs.MacroIndexTablePtr;
+			data = tabs.MacroIndexTablePtr + (byte << 1);
 			offset32 = (*((uint8*)(&(rom[data]))) << 3);
 			size32 = *((uint8*)(&(rom[(data + 1)])));
 			offset32 += tabs.MacroTablePtr;
 			/* note: min 1, max 255 commands can be requested */
-			LOG(8,("cmd 'do $%02x time(s) a 32bit reg WR with 32bit data':\n", size32));
+			LOG(8,("cmd 'do $%02x time(s) a 32bit reg WR with 32bit data' (MacroIndexTable idx = $%02x):\n",
+				size32, byte));
 			safe32 = 0;
 			while (safe32 < size32)
 			{
