@@ -1,7 +1,5 @@
 SubDir OBOS_TOP src tests kits translation ;
 
-#AddResources libtranslationtest.so : test_translation.rsrc ;
-
 CommonTestLib libtranslationtest.so
 	: TranslationKitTestAddon.cpp
 		TranslatorRosterTest.cpp
