@@ -82,8 +82,9 @@ struct vnode {
 	struct fs_mount	*mount;
 	struct vnode	*covered_by;
 	int32			ref_count;
-	bool			delete_me;
-	bool			busy;
+	uint8			remove : 1;
+	uint8			busy : 1;
+	uint8			unpublished : 1;
 };
 
 struct vnode_hash_key {
@@ -589,13 +590,15 @@ free_vnode(struct vnode *vnode, bool reenter)
 	// if the vnode won't be deleted, in which case the changes
 	// will be discarded
 
-	if (vnode->cache && !vnode->delete_me)
+	if (vnode->cache && !vnode->remove)
 		vm_cache_write_modified(vnode->cache);
 
-	if (vnode->delete_me)
-		FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
-	else
-		FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+	if (!vnode->unpublished) {
+		if (vnode->remove)
+			FS_CALL(vnode, remove_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+		else
+			FS_CALL(vnode, put_vnode)(vnode->mount->cookie, vnode->private_node, reenter);
+	}
 
 	// if we have a vm_cache attached, remove it
 	if (vnode->cache)
@@ -641,7 +644,7 @@ dec_vnode_ref_count(struct vnode *vnode, bool reenter)
 
 		// Just insert the vnode into an unused list if we don't need
 		// to delete it
-		if (vnode->delete_me) {
+		if (vnode->remove) {
 			hash_remove(sVnodeTable, vnode);
 			vnode->busy = true;
 			freeNode = true;
@@ -1648,8 +1651,39 @@ new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 		panic("vnode %ld:%Ld already exists (node = %p, vnode->node = %p)!", mountID, vnodeID, privateNode, vnode->private_node);
 
 	status_t status = create_new_vnode(&vnode, mountID, vnodeID);
-	if (status == B_OK)
+	if (status == B_OK) {
 		vnode->private_node = privateNode;
+		vnode->busy = true;
+		vnode->unpublished = true;
+	}
+
+	PRINT(("returns: %s\n", strerror(status)));
+
+	mutex_unlock(&sVnodeMutex);
+	return status;
+}
+
+
+extern "C" status_t
+publish_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+{
+	FUNCTION(("publish_vnode()\n"));
+
+	mutex_lock(&sVnodeMutex);
+
+	struct vnode *vnode = lookup_vnode(mountID, vnodeID);
+	status_t status = B_OK;
+
+	if (vnode != NULL && vnode->busy && vnode->unpublished
+		&& vnode->private_node == privateNode) {
+		vnode->busy = false;
+		vnode->unpublished = false;
+	} else if (vnode == NULL && privateNode != NULL) {
+		status = create_new_vnode(&vnode, mountID, vnodeID);
+		if (status == B_OK)
+			vnode->private_node = privateNode;
+	} else
+		status = B_BAD_VALUE;
 
 	PRINT(("returns: %s\n", strerror(status)));
 
@@ -1696,8 +1730,14 @@ remove_vnode(mount_id mountID, vnode_id vnodeID)
 	mutex_lock(&sVnodeMutex);
 
 	vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode)
-		vnode->delete_me = true;
+	if (vnode != NULL) {
+		vnode->remove = true;
+		if (vnode->unpublished) {
+			// if the vnode hasn't been published yet, we delete it here
+			atomic_add(&vnode->ref_count, -1);
+			free_vnode(vnode, true);
+		}
+	}
 
 	mutex_unlock(&sVnodeMutex);
 	return B_OK;
@@ -1713,7 +1753,7 @@ unremove_vnode(mount_id mountID, vnode_id vnodeID)
 
 	vnode = lookup_vnode(mountID, vnodeID);
 	if (vnode)
-		vnode->delete_me = false;
+		vnode->remove = false;
 
 	mutex_unlock(&sVnodeMutex);
 	return B_OK;

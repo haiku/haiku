@@ -299,7 +299,7 @@ Volume::CreateNode(Inode *parent, const char *name, int32 type)
 		InsertNode(inode);
 
 	hash_insert(fNodeHash, inode);
-	new_vnode(ID(), inode->ID(), inode);
+	publish_vnode(ID(), inode->ID(), inode);
 
 	if (fRootNode != NULL)
 		fRootNode->SetModificationTime(time(NULL));
