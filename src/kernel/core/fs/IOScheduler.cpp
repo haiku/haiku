@@ -104,6 +104,8 @@ int32
 IOScheduler::Scheduler()
 {
 	// main loop
+
+	return 0;
 }
 
 
