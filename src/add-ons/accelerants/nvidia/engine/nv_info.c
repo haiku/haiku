@@ -225,7 +225,6 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 {
 	status_t result = B_OK;
 	int16 size = init_size;
-	uint32 agp_mode;
 
 	LOG(8,("INFO: now executing coldstart...\n"));
 
@@ -263,12 +262,8 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 		nv_crtc2_cursor_hide();
 	}
 
-	/* make sure AGP mode is OFF (confirmed NV28 getting into trouble otherwise!) */
-	/* note:
-	 * this _must_ be done _after_ the screens where shut-off as no
-	 * (memory) transactions may be in progress during this command. */
-	agp_mode = CFGR(AGPCMD);
-	CFGW(AGPCMD, 0x00000000);
+	/* make sure AGP mode is OFF */
+	//fixme: if needed only, and via AGP manager!!
 
 	/* execute BIOS coldstart script(s) */
 	if (init1 || init2)
@@ -277,9 +272,6 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 			if (exec_type1_script(rom, init1, &size, ram_tab) != B_OK) result = B_ERROR;
 		if (init2 && (result == B_OK))
 			if (exec_type1_script(rom, init2, &size, ram_tab) != B_OK) result = B_ERROR;
-
-		/* reset bus mode to wat it was before */
-		CFGW(AGPCMD, agp_mode);
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
@@ -304,12 +296,8 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 {
 	status_t result = B_OK;
 	uint16 adress;
-	uint32 agp_mode;
 
 	LOG(8,("INFO: now executing coldstart...\n"));
-
-//test:
-//NV_REG32(NV32_PWRUPCTRL) = 0x13111111;
 
 	/* select colormode CRTC registers base adresses */
 	NV_REG8(NV8_MISCW) = 0xcb;
@@ -322,7 +310,7 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 	/* unlock head's registers for R/W access */
 	CRTCW(LOCK, 0x57);
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
-	/* disable RMA as it's not used yet */
+	/* disable RMA as it's not used */
 	/* (RMA is the cmd register for the 32bit port in the GPU to access 32bit registers
 	 *  and framebuffer via legacy ISA I/O space.) */
 	CRTCW(RMA, 0x00);
@@ -345,17 +333,8 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 		nv_crtc2_cursor_hide();
 	}
 
-//test:
-//	ACCW(PT_NUMERATOR, 0x00000008);
-	/* set timer denominator to 3 (in b0-15) */
-//	ACCW(PT_DENOMINATR, 0x00000003);
-
-	/* make sure AGP mode is OFF (confirmed NV28 getting into trouble otherwise!) */
-	/* note:
-	 * this _must_ be done _after_ the screens where shut-off as no
-	 * (memory) transactions may be in progress during this command. */
-	agp_mode = CFGR(AGPCMD);
-	CFGW(AGPCMD, 0x00000000);
+	/* make sure AGP mode is OFF */
+	//fixme: if needed only, and via AGP manager!!
 
 	/* execute all BIOS coldstart script(s) */
 	if (tabs.InitScriptTablePtr)
@@ -378,9 +357,6 @@ static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_ta
 			index += 2;
 			adress = *((uint16*)(&(rom[index])));
 		}
-
-		/* reset bus mode to wat it was before */
-		CFGW(AGPCMD, agp_mode);
 
 		/* now enable ROM shadow or the card will remain shut-off! */
 		CFGW(ROMSHADOW, (CFGR(ROMSHADOW) |= 0x00000001));
@@ -410,7 +386,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	bool end = false;
 	bool exec = true;
 	uint8 index, byte;
-	uint32 reg, data, data2, and_out, or_in, safe32;
+	uint32 reg, data, data2, and_out, or_in;//, safe32;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
 	LOG(8,("INFO: ---Executing following command(s):\n"));
@@ -506,11 +482,12 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
-			safe32 = CFGR(AGPCMD);
-			CFGW(AGPCMD, 0x00000000);
+			//remove.. illegal!?
+			//safe32 = CFGR(AGPCMD);
+			//CFGW(AGPCMD, 0x00000000);
 			NV_REG32(reg) = data;
 			NV_REG32(reg) = data2;
-			CFGW(AGPCMD, safe32);
+			//CFGW(AGPCMD, safe32);
 			CFGW(ROMSHADOW, (CFGR(ROMSHADOW) & 0xfffffffe));
 			break;
 		case 0x69:
@@ -1278,11 +1255,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'WR 32bit reg $%08x = $%08x, then = $%08x' (always done)\n",
 				reg, data, data2));
 			/* always done */
-			safe32 = CFGR(AGPCMD);
-			CFGW(AGPCMD, 0x00000000);
+			//remove.. illegal!?
+			//safe32 = CFGR(AGPCMD);
+			//CFGW(AGPCMD, 0x00000000);
 			NV_REG32(reg) = data;
 			NV_REG32(reg) = data2;
-			CFGW(AGPCMD, safe32);
+			//CFGW(AGPCMD, safe32);
 			CFGW(ROMSHADOW, (CFGR(ROMSHADOW) & 0xfffffffe));
 			break;
 		case 0x69: /* identical to type1 */
