@@ -160,10 +160,22 @@ DataView::MessageReceived(BMessage *message)
 			UpdateFromEditor(message);
 			break;
 
-		case kMsgDataEditorOffsetChange:
-			fOffset = fEditor.ViewOffset();
-			SetSelection(0, 0);
+		case kMsgDataEditorParameterChange:
+		{
+			int32 viewSize;
+			off_t offset;
+			if (message->FindInt64("offset", &offset) == B_OK) {
+				fOffset = offset;
+				SetSelection(0, 0);
+				MakeVisible(0);
+			} 
+			if (message->FindInt32("view_size", &viewSize) == B_OK) {
+				fDataSize = viewSize;
+				fData = (uint8 *)realloc(fData, fDataSize);
+				UpdateScroller();
+			}
 			break;
+		}
 
 		case kMsgBaseType:
 		{
@@ -1055,6 +1067,8 @@ DataView::SetFontSize(float point)
 	SetFont(&font);
 	UpdateScroller();
 	Invalidate();
+
+	SendNotices(kDataViewPreferredSize);
 }
 
 

@@ -665,31 +665,35 @@ DataEditor::Redo()
 }
 
 
-bool 
+bool
 DataEditor::CanUndo() const
 {
 	return fLastChange != NULL;
 }
 
 
-bool 
+bool
 DataEditor::CanRedo() const
 {
 	return fChanges.IndexOf(fLastChange) < fChanges.CountItems() - 1;
 }
 
 
-status_t 
+status_t
 DataEditor::SetFileSize(off_t size)
 {
-	fSize = size;
-	return B_OK;
+	// ToDo: implement me!
+	//fSize = size;
+	//return B_OK;
+	return B_ERROR;
 }
 
 
 status_t
 DataEditor::SetViewOffset(off_t offset, bool sendNotices)
 {
+	BAutolock locker(this);
+
 	if (fView == NULL) {
 		status_t status = SetViewSize(fViewSize);
 		if (status < B_OK)
@@ -699,15 +703,19 @@ DataEditor::SetViewOffset(off_t offset, bool sendNotices)
 	if (offset < 0 || offset > fSize)
 		return B_BAD_VALUE;
 
+	offset = (offset / fViewSize) * fViewSize;
 	if (offset == fViewOffset)
 		return B_OK;
 
-	fRealViewOffset = (offset / fBlockSize) * fBlockSize;
 	fViewOffset = offset;
+	fRealViewOffset = (fViewOffset / fBlockSize) * fBlockSize;
 	fNeedsUpdate = true;
 
-	if (sendNotices)
-		SendNotices(kMsgDataEditorOffsetChange);
+	if (sendNotices) {
+		BMessage update;
+		update.AddInt64("offset", fViewOffset);
+		SendNotices(kMsgDataEditorParameterChange, &update);
+	}
 
 	return B_OK;
 }
@@ -721,39 +729,73 @@ DataEditor::SetViewOffset(off_t offset)
 
 
 status_t 
-DataEditor::SetViewSize(size_t size)
+DataEditor::SetViewSize(size_t size, bool sendNotices)
 {
+	BAutolock locker(this);
+
 	size_t realSize = (size + fBlockSize - 1) & ~(fBlockSize - 1);
 		// round to the next multiple of block size
 
-	if (realSize == fRealViewSize && fView != NULL) {
-		fViewSize = size;
+	if (realSize == fRealViewSize && fViewSize == size && fView != NULL)
 		return B_OK;
-	}
+
 	if (realSize == 0)
 		return B_BAD_VALUE;
 
-	uint8 *view = (uint8 *)realloc(fView, realSize);
-	if (view == NULL)
-		return B_NO_MEMORY;
+	if (realSize != fRealViewSize || fView == NULL) {
+		uint8 *view = (uint8 *)realloc(fView, realSize);
+		if (view == NULL)
+			return B_NO_MEMORY;
 
-	fView = view;
-	fRealViewSize = realSize;
+		fView = view;
+		fRealViewSize = realSize;
+	}
+
 	fViewSize = size;
 	fNeedsUpdate = true;
+
+	// let's correct the view offset if necessary
+	if (fViewOffset % size)
+		SetViewOffset(fViewOffset);
+
+	if (sendNotices) {
+		BMessage update;
+		update.AddInt32("view_size", size);
+		SendNotices(kMsgDataEditorParameterChange, &update);
+	}
 
 	return B_OK;
 }
 
 
-void 
-DataEditor::SetBlockSize(size_t size)
+status_t
+DataEditor::SetViewSize(size_t size)
 {
-	fBlockSize = size;
+	return SetViewSize(size, true);
 }
 
 
-status_t 
+status_t
+DataEditor::SetBlockSize(size_t size)
+{
+	BAutolock locker(this);
+
+	fBlockSize = size;
+	status_t status = SetViewOffset(fViewOffset, false);
+		// this will trigger an update of the real view offset
+	if (status == B_OK)
+		status = SetViewSize(fViewSize, false);
+
+	BMessage update;
+	update.AddInt32("block_size", size);
+	update.AddInt64("offset", fViewOffset);
+	SendNotices(kMsgDataEditorParameterChange, &update);
+
+	return status;
+}
+
+
+status_t
 DataEditor::Update()
 {
 	ssize_t bytesRead;
@@ -811,7 +853,7 @@ DataEditor::GetViewBuffer(const uint8 **_buffer)
 }
 
 
-void 
+void
 DataEditor::SendNotices(DataChange *change)
 {
 	off_t offset, size;

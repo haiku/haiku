@@ -48,6 +48,7 @@ static const uint32 kMsgSliderUpdate = 'slup';
 static const uint32 kMsgPositionUpdate = 'poup';
 static const uint32 kMsgLastPosition = 'lpos';
 static const uint32 kMsgFontSize = 'fnts';
+static const uint32 kMsgBlockSize = 'blks';
 static const uint32 kMsgPrint = 'prnt';
 static const uint32 kMsgPageSetup = 'pgsp';
 
@@ -110,6 +111,10 @@ class HeaderView : public BView, public BInvoker {
 
 		base_type Base() const { return fBase; }
 		void SetBase(base_type);
+		
+		off_t Position() const { return fPosition; }
+		uint32 BlockSize() const { return fBlockSize; }
+		void SetTo(off_t position, uint32 blockSize);
 
 	private:
 		void FormatValue(char *buffer, size_t bufferSize, off_t value);
@@ -622,6 +627,20 @@ HeaderView::SetBase(base_type type)
 }
 
 
+void 
+HeaderView::SetTo(off_t position, uint32 blockSize)
+{
+	fPosition = position;
+	fLastPosition = (fLastPosition / fBlockSize) * blockSize;
+	fBlockSize = blockSize;
+
+	fPositionSlider->SetBlockSize(blockSize);
+	UpdatePositionViews();
+	UpdateOffsetViews(false);
+	UpdateFileSizeView();
+}
+
+
 void
 HeaderView::NotifyTarget()
 {
@@ -828,7 +847,7 @@ UpdateLooper::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case kMsgDataEditorOffsetChange:
+		case kMsgDataEditorParameterChange:
 		{
 			bool updated = false;
 
@@ -1127,10 +1146,14 @@ ProbeView::AttachedToWindow()
 	// Block Size
 
 	subMenu = new BMenu("BlockSize");
-	subMenu->AddItem(item = new BMenuItem("512", NULL));
+	subMenu->AddItem(item = new BMenuItem("512", message = new BMessage(kMsgBlockSize)));
+	message->AddInt32("block_size", 512);
 	item->SetMarked(true);
-	subMenu->AddItem(new BMenuItem("1024", NULL));
-	subMenu->AddItem(new BMenuItem("2048", NULL));
+	subMenu->AddItem(new BMenuItem("1024", message = new BMessage(kMsgBlockSize)));
+	message->AddInt32("block_size", 1024);
+	subMenu->AddItem(new BMenuItem("2048", message = new BMessage(kMsgBlockSize)));
+	message->AddInt32("block_size", 2048);
+	subMenu->SetTargetForItems(this);
 	subMenu->SetRadioMode(true);
 	menu->AddItem(new BMenuItem(subMenu));
 	menu->AddSeparatorItem();
@@ -1161,7 +1184,7 @@ ProbeView::AttachedToWindow()
 }
 
 
-void 
+void
 ProbeView::AllAttached()
 {
 	fHeaderView->SetTarget(fUpdateLooper);
@@ -1176,7 +1199,7 @@ ProbeView::WindowActivated(bool active)
 }
 
 
-void 
+void
 ProbeView::UpdateSelectionMenuItems(int64 start, int64 end)
 {
 	int64 position = 0;
@@ -1354,6 +1377,9 @@ ProbeView::MessageReceived(BMessage *message)
 						UpdateSelectionMenuItems(start, end);
 					break;
 				}
+				case kDataViewPreferredSize:
+					UpdateSizeLimits();
+					break;
 			}
 			break;
 		}
@@ -1383,14 +1409,29 @@ ProbeView::MessageReceived(BMessage *message)
 		{
 			float size = 0.0f;
 			message->FindFloat("font_size", &size);
+				// if there is no "font_size" member, the size will
+				// be adapted to fit the window size (0)
 
 			fDataView->SetFontSize(size);
-			UpdateSizeLimits();
 
 			// update the applications settings
 			BMessage update(*message);
 			update.what = kMsgSettingsChanged;
 			be_app_messenger.SendMessage(&update);
+			break;
+		}
+
+		case kMsgBlockSize:
+		{
+			int32 blockSize;
+			if (message->FindInt32("block_size", &blockSize) != B_OK)
+				break;
+
+			BAutolock locker(fEditor);
+
+			if (fEditor.SetViewSize(blockSize) == B_OK
+				&& fEditor.SetBlockSize(blockSize) == B_OK)
+				fHeaderView->SetTo(fEditor.ViewOffset(), blockSize);
 			break;
 		}
 

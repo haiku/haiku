@@ -61,7 +61,7 @@ class DataEditor : public BLocker {
 		status_t SetViewSize(size_t size);
 		size_t ViewSize() const { return fViewSize; }
 
-		void SetBlockSize(size_t size);
+		status_t SetBlockSize(size_t size);
 		size_t BlockSize() const { return fBlockSize; }
 
 		status_t UpdateIfNeeded(bool *_updated = NULL);
@@ -79,6 +79,7 @@ class DataEditor : public BLocker {
 		friend class StateWatcher;
 
 		status_t SetViewOffset(off_t offset, bool sendNotices);
+		status_t SetViewSize(size_t size, bool sendNotices);
 		void SendNotices(uint32 what, BMessage *message = NULL);
 		void SendNotices(DataChange *change);
 		status_t Update();
@@ -110,6 +111,6 @@ class DataEditor : public BLocker {
 
 static const uint32 kMsgDataEditorStateChange = 'deSC';
 static const uint32 kMsgDataEditorUpdate = 'deUp';
-static const uint32 kMsgDataEditorOffsetChange = 'deOC';
+static const uint32 kMsgDataEditorParameterChange = 'dePC';
 
 #endif	/* DATA_EDITOR_H */

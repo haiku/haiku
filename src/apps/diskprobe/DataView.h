@@ -102,5 +102,6 @@ static const uint32 kMsgUpdateData = 'updt';
 // observer notices
 static const uint32 kDataViewCursorPosition = 'curs';
 static const uint32 kDataViewSelection = 'dsel';
+static const uint32 kDataViewPreferredSize = 'dvps';
 
 #endif	/* DATA_VIEW_H */
