@@ -99,6 +99,30 @@ enum {
 	EXID_ID1 	= 0x8000
 };
 
+// some codec_ids
+enum {
+	CODEC_ID_ALC201A	= 0x414c4710,
+	CODEC_ID_AK4540		= 0x414b4d00,
+	CODEC_ID_AK4542		= 0x414b4d01,
+	CODEC_ID_AD1819 	= 0x41445303,
+	CODEC_ID_AD1881		= 0x41445340,
+	CODEC_ID_AD1881A	= 0x41445348,
+	CODEC_ID_AD1885		= 0x41445360,
+	CODEC_ID_AD1886		= 0x41445361,
+	CODEC_ID_AD1886A 	= 0x41445363,
+	CODEC_ID_AD1887		= 0x41445362,
+	CODEC_ID_CS4299A	= 0x43525931,
+	CODEC_ID_CS4299C	= 0x43525933,
+	CODEC_ID_CS4299D	= 0x43525934,
+	CODEC_ID_STAC9700	= 0x83847600, // TODO: verify all SigmaTel IDs and descriptions 
+	CODEC_ID_STAC9704	= 0x83847605,
+	CODEC_ID_STAC9705	= 0x83847604,
+	CODEC_ID_STAC9708	= 0x83847608,
+	CODEC_ID_STAC9721	= 0x83847609,
+	CODEC_ID_STAC9744	= 0x83847644,
+	CODEC_ID_STAC9756	= 0x83847656,
+};
+
 // capabilities
 enum {
 	CAP_PCM_MIC				= 0x0000000000000001ULL, /* dedicated mic PCM channel */
@@ -144,18 +168,9 @@ enum {
 struct ac97_dev;
 typedef struct ac97_dev ac97_dev;
 
-typedef void	(* codec_init)(ac97_dev * /*dev*/);
-typedef void	(* codec_amp_enable)(ac97_dev */*dev*/, bool /*onoff*/);
-typedef bool 	(* codec_reg_is_valid)(ac97_dev */*dev*/, uint8 /*reg*/);
+typedef void	(* codec_init)(ac97_dev * dev);
 typedef	uint16	(* codec_reg_read)(void * /*cookie*/, uint8 /*reg*/);
 typedef	void	(* codec_reg_write)(void * /*cookie*/, uint8 /*reg*/, uint16 /*value*/);
-
-typedef struct
-{
-	codec_init			init;
-	codec_amp_enable 	amp_enable;
-	codec_reg_is_valid	reg_is_valid;
-} codec_ops;
 
 struct ac97_dev {
 	uint16				reg_cache[0x7f];
@@ -167,14 +182,12 @@ struct ac97_dev {
 	const char *		codec_3d_stereo_enhancement;
 	
 	codec_init			init;
-	codec_amp_enable	amp_enable;
-	codec_reg_is_valid	reg_is_valid;
 	codec_reg_read		reg_read;
 	codec_reg_write		reg_write;
 	
 	uint32 				clock;
 	uint64				capabilities;
-	
+	bool				reversed_eamp_polarity;	
 };
 
 
@@ -195,10 +208,5 @@ bool	ac97_set_rate(ac97_dev *dev, uint8 reg, uint32 rate);
 bool	ac97_get_rate(ac97_dev *dev, uint8 reg, uint32 *rate);
 
 void	ac97_set_clock(ac97_dev *dev, uint32 clock);
-
-void	ac97_dump_capabilities(ac97_dev *dev);
-
-void	ac97_detect_capabilities(ac97_dev *dev);
-void	ac97_detect_rates(ac97_dev *dev);
 
 #endif
