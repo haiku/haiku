@@ -121,7 +121,7 @@ struct notify_socket_event_args {	// used by NET_STACK_NOTIFY_SOCKET_EVENT
 #define NET_STACK_SOCKET_EVENT_NOTIFICATION	'sevn'
 
 struct socket_event_data {
-	uint32 event;	// B_SELECT_READ, B_SELECT_WRITE or B_SELECT_EXCEPTION
+	uint32 event;	// B_SELECT_READ, B_SELECT_WRITE or B_SELECT_ERROR
 	void * cookie;	// The cookie as set in notify_socket_event_args for this socket
 };
 

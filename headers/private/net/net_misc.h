@@ -66,11 +66,6 @@ enum {
 
 typedef	uint32	ipv4_addr;
 
-/* These should be in KernelExport.h */
-#define B_SELECT_READ        1
-#define B_SELECT_WRITE       2
-#define B_SELECT_EXCEPTION   3
-
 /* XXX - add some macro's for inserting various types of address
  */
 
