@@ -101,9 +101,9 @@ static void
 set_leds(void)
 {
 	wait_for_output();
-	gISA->write_io_8(0xed, 0x60);
+	gISA->write_io_8(0x60, 0xed);
 	wait_for_output();
-	gISA->write_io_8(leds, 0x60);
+	gISA->write_io_8(0x60, leds);
 }
 
 
