@@ -44,9 +44,24 @@ public:
 	//				LA = B_IDEA_ALERT
 	//				WA = B_WARNING_ALERT
 	//				SA = B_STOP_ALERT
+	
+	////// UW_ES_IA - One Button //////
+	
 	void empty_empty_UW_ES_IA();
 	void OK_X_UW_ES_IA();
 	void OK_60X_UW_ES_IA();
+	void twentyX_60X_UW_ES_IA();
+	void fortyX_60X_UW_ES_IA();
+	
+	////// UW_ES_IA - Two Button //////
+	
+	void OK_Cancel_60X_UW_ES_IA();
+	void twentyX_Cancel_60X_UW_ES_IA();
+	void twentyX_20X_60X_UW_ES_IA();
+	
+	////// UW_ES_IA - Three Button //////
+	
+	void twentyX_20X_20X_60X_UW_ES_IA();
 };
 
 #endif	// ALERT_TEST_H
