@@ -10,4 +10,5 @@ SharedLibrary textencoding :
 	;
 LinkSharedOSLibs libtextencoding.so :
 	be
+	iconv
 	;
