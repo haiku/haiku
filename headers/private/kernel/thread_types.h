@@ -130,6 +130,7 @@ struct thread {
 	addr_t			kernel_stack_base;
 	region_id		user_stack_region_id;
 	addr_t			user_stack_base;
+	size_t			user_stack_size;
 
 	addr_t			user_local_storage;
 		// usually allocated at the safe side of the stack
