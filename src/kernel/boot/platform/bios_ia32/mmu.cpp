@@ -1,7 +1,7 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Based on code written by Travis Geiselbrecht for NewOS.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -32,7 +32,7 @@
  *	on. The kernel is mapped at 0x80000000, all other stuff mapped by the
  *	loader (kernel args, modules, driver settings, ...) comes after
  *	0x81000000 which means that there is currently only 1 MB reserved for
- *	the kernel itself.
+ *	the kernel itself (see kMaxKernelSize).
  */
 
 //#define TRACE_MMU
@@ -55,6 +55,7 @@ struct extended_memory {
 };
 
 static const uint32 kDefaultPageFlags = 0x03;	// present, R/W
+static const size_t kMaxKernelSize = 0x100000;	// 1 MB for the kernel
 
 // working page directory and page table
 static uint32 *sPageDirectory = 0;
@@ -62,7 +63,8 @@ static uint32 *sPageTable = 0;
 	// this points to the most recently added kernel page table
 
 static addr_t sNextPhysicalAddress = 0x110000;
-static addr_t sNextVirtualAddress = KERNEL_BASE + 0x100000;
+static addr_t sNextVirtualAddress = KERNEL_BASE + kMaxKernelSize;
+static addr_t sMaxVirtualAddress = KERNEL_BASE + 0x400000;
 
 
 static addr_t
@@ -268,9 +270,9 @@ mmu_allocate(void *virtualAddress, size_t size)
 		addr_t address = (addr_t)virtualAddress;
 
 		// is the address within the valid range?
-		if (address < KERNEL_BASE || address + size >= KERNEL_BASE + 0x100000)
+		if (address < KERNEL_BASE || address + size >= KERNEL_BASE + kMaxKernelSize)
 			return NULL;
-		
+
 		for (uint32 i = 0; i < size; i++) {
 			map_page(address, get_next_physical_page(), kDefaultPageFlags);
 			address += B_PAGE_SIZE;
@@ -493,9 +495,6 @@ mmu_init(void)
 		gKernelArgs.physical_allocated_range[gKernelArgs.num_physical_allocated_ranges].size = 0x61000;
 		gKernelArgs.num_physical_allocated_ranges++;
 	}
-
-	gKernelArgs.str = NULL;
-		// ToDo: what was this intended for?
 
 	gKernelArgs.arch_args.page_hole = 0xffc00000;
 }
