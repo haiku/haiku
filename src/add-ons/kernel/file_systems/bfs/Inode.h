@@ -97,9 +97,9 @@ class Inode : public CachedBlock {
 		ReadWriteLock &Lock() { return fLock; }
 		SimpleLock &SmallDataLock() { return fSmallDataLock; }
 
-		mode_t Mode() const { return Node()->mode; }
-		uint32 Type() const { return Node()->type; }
-		int32 Flags() const { return Node()->flags; }
+		mode_t Mode() const { return Node()->Mode(); }
+		uint32 Type() const { return Node()->Type(); }
+		int32 Flags() const { return Node()->Flags(); }
 		bool IsContainer() const { return Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR); }
 			// note, that this test will also be true for S_IFBLK (not that it's used in the fs :)
 		bool IsDirectory() const { return (Mode() & (S_DIRECTORY | S_INDEX_DIR | S_ATTR_DIR)) == S_DIRECTORY; }
@@ -114,7 +114,7 @@ class Inode : public CachedBlock {
 		bool HasUserAccessableStream() const { return S_ISREG(Mode()); }
 			// currently only files can be accessed with bfs_read()/bfs_write()
 
-		off_t Size() const { return Node()->data.size; }
+		off_t Size() const { return Node()->data.Size(); }
 		off_t LastModified() const { return Node()->last_modified_time; }
 
 		block_run &BlockRun() const { return Node()->inode_num; }
@@ -173,7 +173,7 @@ class Inode : public CachedBlock {
 
 		// index maintaining helper
 		void UpdateOldSize() { fOldSize = Size(); }
-		void UpdateOldLastModified() { fOldLastModified = Node()->last_modified_time; }
+		void UpdateOldLastModified() { fOldLastModified = Node()->LastModifiedTime(); }
 		off_t OldSize() { return fOldSize; }
 		off_t OldLastModified() { return fOldLastModified; }
 

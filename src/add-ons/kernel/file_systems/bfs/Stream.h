@@ -146,14 +146,14 @@ Uncached::WriteBack(Transaction *transaction)
 status_t
 Uncached::Read(Volume *volume, block_run run, uint8 *buffer)
 {
-	return read_pos(volume->Device(), volume->ToBlock(run) << volume->BlockShift(), buffer, run.length << volume->BlockShift());
+	return read_pos(volume->Device(), volume->ToBlock(run) << volume->BlockShift(), buffer, run.Length() << volume->BlockShift());
 }
 
 
 status_t
 Uncached::Write(Transaction *transaction, Volume *volume, block_run run, const uint8 *buffer)
 {
-	return write_pos(volume->Device(), volume->ToBlock(run) << volume->BlockShift(), buffer, run.length << volume->BlockShift());
+	return write_pos(volume->Device(), volume->ToBlock(run) << volume->BlockShift(), buffer, run.Length() << volume->BlockShift());
 }
 
 
@@ -191,14 +191,14 @@ Cached::WriteBack(Transaction *transaction)
 status_t
 Cached::Read(Volume *volume, block_run run, uint8 *buffer)
 {
-	return cached_read(volume->Device(), volume->ToBlock(run), buffer, run.length, volume->BlockSize());
+	return cached_read(volume->Device(), volume->ToBlock(run), buffer, run.Length(), volume->BlockSize());
 }
 
 
 status_t
 Cached::Write(Transaction *transaction, Volume *volume, block_run run, const uint8 *buffer)
 {
-	return volume->WriteBlocks(volume->ToBlock(run), buffer, run.length);
+	return volume->WriteBlocks(volume->ToBlock(run), buffer, run.Length());
 }
 
 
@@ -226,14 +226,14 @@ Logged::Logged(Volume *volume, block_run run, bool empty = false)
 status_t
 Logged::Read(Volume *volume, block_run run, uint8 *buffer)
 {
-	return cached_read(volume->Device(), volume->ToBlock(run), buffer, run.length, volume->BlockSize());
+	return cached_read(volume->Device(), volume->ToBlock(run), buffer, run.Length(), volume->BlockSize());
 }
 
 
 status_t
 Logged::Write(Transaction *transaction, Volume *volume, block_run run, const uint8 *buffer)
 {
-	return transaction->WriteBlocks(volume->ToBlock(run), buffer, run.length);
+	return transaction->WriteBlocks(volume->ToBlock(run), buffer, run.Length());
 }
 
 };	// namespace Access
@@ -271,13 +271,13 @@ Stream<Cache>::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 
 	// find matching block run
 
-	if (data->max_direct_range > 0 && pos >= data->max_direct_range) {
-		if (data->max_double_indirect_range > 0 && pos >= data->max_indirect_range) {
+	if (data->MaxDirectRange() > 0 && pos >= data->MaxDirectRange()) {
+		if (data->MaxDoubleIndirectRange() > 0 && pos >= data->MaxIndirectRange()) {
 			// access to double indirect blocks
 
 			Cache cached(fVolume);
 
-			off_t start = pos - data->max_indirect_range;
+			off_t start = pos - data->MaxIndirectRange();
 			int32 indirectSize = (1L << (INDIRECT_BLOCKS_SHIFT + cached.BlockShift()))
 				* (fVolume->BlockSize() / sizeof(block_run));
 			int32 directSize = NUM_ARRAY_BLOCKS << cached.BlockShift();
@@ -300,18 +300,18 @@ Stream<Cache>::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 				RETURN_ERROR(B_ERROR);
 
 			run = indirect[current % runsPerBlock];
-			offset = data->max_indirect_range + (index * indirectSize) + (current * directSize);
+			offset = data->MaxIndirectRange() + (index * indirectSize) + (current * directSize);
 			//printf("\tfCurrent = %ld, fRunFileOffset = %Ld, fRunBlockEnd = %Ld, fRun = %ld,%d\n",fCurrent,fRunFileOffset,fRunBlockEnd,fRun.allocation_group,fRun.start);
 		} else {
 			// access to indirect blocks
 
 			int32 runsPerBlock = fVolume->BlockSize() / sizeof(block_run);
-			off_t runBlockEnd = data->max_direct_range;
+			off_t runBlockEnd = data->MaxDirectRange();
 
 			Cache cached(fVolume);
 			off_t block = fVolume->ToBlock(data->indirect);
 
-			for (int32 i = 0;i < data->indirect.length;i++) {
+			for (int32 i = 0; i < data->indirect.Length(); i++) {
 				block_run *indirect = (block_run *)cached.SetTo(block + i);
 				if (indirect == NULL)
 					RETURN_ERROR(B_IO_ERROR);
@@ -321,12 +321,12 @@ Stream<Cache>::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 					if (indirect[current].IsZero())
 						break;
 
-					runBlockEnd += indirect[current].length << cached.BlockShift();
+					runBlockEnd += indirect[current].Length() << cached.BlockShift();
 					if (runBlockEnd > pos) {
 						run = indirect[current];
-						offset = runBlockEnd - (run.length << cached.BlockShift());
+						offset = runBlockEnd - (run.Length() << cached.BlockShift());
 						//printf("reading from indirect block: %ld,%d\n",fRun.allocation_group,fRun.start);
-						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
+						//printf("### indirect-run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.Length(),fRunFileOffset);
 						return fVolume->ValidateBlockRun(run);
 					}
 				}
@@ -343,11 +343,11 @@ Stream<Cache>::FindBlockRun(off_t pos, block_run &run, off_t &offset)
 			if (data->direct[current].IsZero())
 				break;
 
-			runBlockEnd += data->direct[current].length << fVolume->BlockShift();
+			runBlockEnd += data->direct[current].Length() << fVolume->BlockShift();
 			if (runBlockEnd > pos) {
 				run = data->direct[current];
-				offset = runBlockEnd - (run.length << fVolume->BlockShift());
-				//printf("### run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.length,fRunFileOffset);
+				offset = runBlockEnd - (run.Length() << fVolume->BlockShift());
+				//printf("### run[%ld] = (%ld,%d,%d), offset = %Ld\n",fCurrent,fRun.allocation_group,fRun.start,fRun.Length(),fRunFileOffset);
 				return fVolume->ValidateBlockRun(run);
 			}
 		}
@@ -366,15 +366,15 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	if (pos < 0)
 		return B_BAD_VALUE;
-	if (pos >= Node()->data.size) {
+	if (pos >= Node()->data.Size()) {
 		*_length = 0;
 		return B_NO_ERROR;
 	}
 
 	size_t length = *_length;
 
-	if (pos + length > Node()->data.size)
-		length = Node()->data.size - pos;
+	if (pos + length > Node()->data.Size())
+		length = Node()->data.Size() - pos;
 
 	block_run run;
 	off_t offset;
@@ -393,8 +393,8 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	// pos % block_size == (pos - offset) % block_size, offset % block_size == 0
 	if (pos % blockSize != 0) {
-		run.start += (pos - offset) / blockSize;
-		run.length -= (pos - offset) / blockSize;
+		run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + ((pos - offset) >> blockShift));
+		run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - ((pos - offset) >> blockShift));
 
 		Cache cached(fVolume,run);
 		if ((block = cached.Block()) == NULL) {
@@ -429,10 +429,10 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 
 	while (length > 0) {
 		// offset is the offset to the current pos in the block_run
-		run.start += (pos - offset) >> blockShift;
-		run.length -= (pos - offset) >> blockShift;
+		run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + ((pos - offset) >> blockShift));
+		run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - ((pos - offset) >> blockShift));
 
-		if (uint32(run.length << blockShift) > length) {
+		if (uint32(run.Length() << blockShift) > length) {
 			if (length < blockSize) {
 				Cache cached(fVolume, run);
 				if ((block = cached.Block()) == NULL) {
@@ -443,7 +443,7 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 				bytesRead += length;
 				break;
 			}
-			run.length = length >> blockShift;
+			run.length = HOST_ENDIAN_TO_BFS_INT16(length >> blockShift);
 			partial = true;
 		}
 
@@ -452,7 +452,7 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 			RETURN_ERROR(B_BAD_VALUE);
 		}
 
-		int32 bytes = run.length << blockShift;
+		int32 bytes = run.Length() << blockShift;
 #ifdef DEBUG
 		if ((uint32)bytes > length)
 			DEBUGGER(("bytes greater than length"));
@@ -467,8 +467,8 @@ Stream<Cache>::ReadAt(off_t pos, uint8 *buffer, size_t *_length)
 		if (partial) {
 			// if the last block was read only partially, point block_run
 			// to the remaining part
-			run.start += run.length;
-			run.length = 1;
+			run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + run.Length());
+			run.length = HOST_ENDIAN_TO_BFS_INT16(1);
 			offset = pos;
 		} else if (FindBlockRun(pos, run, offset) < B_OK) {
 			*_length = bytesRead;
@@ -490,7 +490,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 	// set/check boundaries for pos/length
 	if (pos < 0)
 		return B_BAD_VALUE;
-	if (pos + length > Node()->data.size) {
+	if (pos + length > Size()) {
 		off_t oldSize = Size();
 
 		// uncached files can't be resized (Inode::SetFileSize() also
@@ -539,8 +539,8 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 
 	// pos % block_size == (pos - offset) % block_size, offset % block_size == 0
 	if (pos % blockSize != 0) {
-		run.start += (pos - offset) / blockSize;
-		run.length -= (pos - offset) / blockSize;
+		run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + ((pos - offset) >> blockShift));
+		run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - ((pos - offset) >> blockShift));
 
 		Cache cached(fVolume, run);
 		if ((block = cached.Block()) == NULL) {
@@ -578,10 +578,10 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 
 	while (length > 0) {
 		// offset is the offset to the current pos in the block_run
-		run.start += (pos - offset) >> blockShift;
-		run.length -= (pos - offset) >> blockShift;
+		run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + ((pos - offset) >> blockShift));
+		run.length = HOST_ENDIAN_TO_BFS_INT16(run.Length() - ((pos - offset) >> blockShift));
 
-		if (uint32(run.length << blockShift) > length) {
+		if (uint32(run.Length() << blockShift) > length) {
 			if (length < blockSize) {
 				Cache cached(fVolume,run);
 				if ((block = cached.Block()) == NULL) {
@@ -595,7 +595,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 				bytesWritten += length;
 				break;
 			}
-			run.length = length >> blockShift;
+			run.length = HOST_ENDIAN_TO_BFS_INT16(length >> blockShift);
 			partial = true;
 		}
 
@@ -604,7 +604,7 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 			RETURN_ERROR(B_BAD_VALUE);
 		}
 
-		int32 bytes = run.length << blockShift;
+		int32 bytes = run.Length() << blockShift;
 		length -= bytes;
 		bytesWritten += bytes;
 		if (length == 0)
@@ -615,8 +615,8 @@ Stream<Cache>::WriteAt(Transaction *transaction, off_t pos, const uint8 *buffer,
 		if (partial) {
 			// if the last block was written only partially, point block_run
 			// to the remaining part
-			run.start += run.length;
-			run.length = 1;
+			run.start = HOST_ENDIAN_TO_BFS_INT16(run.Start() + run.Length());
+			run.length = HOST_ENDIAN_TO_BFS_INT16(1);
 			offset = pos;
 		} else if (FindBlockRun(pos, run, offset) < B_OK) {
 			*_length = bytesWritten;

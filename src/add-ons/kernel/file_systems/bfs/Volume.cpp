@@ -41,17 +41,18 @@ Volume::~Volume()
 bool
 Volume::IsValidSuperBlock()
 {
-	if (fSuperBlock.magic1 != (int32)SUPER_BLOCK_MAGIC1
-		|| fSuperBlock.magic2 != (int32)SUPER_BLOCK_MAGIC2
-		|| fSuperBlock.magic3 != (int32)SUPER_BLOCK_MAGIC3
+	if (fSuperBlock.Magic1() != (int32)SUPER_BLOCK_MAGIC1
+		|| fSuperBlock.Magic2() != (int32)SUPER_BLOCK_MAGIC2
+		|| fSuperBlock.Magic3() != (int32)SUPER_BLOCK_MAGIC3
 		|| (int32)fSuperBlock.block_size != fSuperBlock.inode_size
-		|| fSuperBlock.fs_byte_order != SUPER_BLOCK_FS_LENDIAN
-		|| (1UL << fSuperBlock.block_shift) != fSuperBlock.block_size
-		|| fSuperBlock.num_ags < 1
-		|| fSuperBlock.ag_shift < 1
-		|| fSuperBlock.blocks_per_ag < 1
-		|| fSuperBlock.num_blocks < 10
-		|| fSuperBlock.num_ags != divide_roundup(fSuperBlock.num_blocks,1L << fSuperBlock.ag_shift))
+		|| fSuperBlock.ByteOrder() != SUPER_BLOCK_FS_LENDIAN
+		|| (1UL << fSuperBlock.BlockShift()) != fSuperBlock.BlockSize()
+		|| fSuperBlock.AllocationGroups() < 1
+		|| fSuperBlock.AllocationGroupShift() < 1
+		|| fSuperBlock.BlocksPerAllocationGroup() < 1
+		|| fSuperBlock.NumBlocks() < 10
+		|| fSuperBlock.AllocationGroups() != divide_roundup(fSuperBlock.NumBlocks(),
+			1L << fSuperBlock.AllocationGroupShift()))
 		return false;
 
 	return true;
@@ -77,8 +78,15 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	if (flags & B_MOUNT_READ_ONLY)
 		fFlags |= VOLUME_READ_ONLY;
 
-	fDevice = open(deviceName,flags & B_MOUNT_READ_ONLY ? O_RDONLY : O_RDWR);
-	
+	// ToDo: validate the FS in write mode as well!
+#if (B_HOST_IS_LENDIAN && defined(BFS_BIG_ENDIAN_ONLY)) \
+	|| (B_HOST_IS_BENDIAN && defined(BFS_LITTLE_ENDIAN_ONLY))
+	// in big endian mode, we only mount read-only for now
+	flags |= B_MOUNT_READ_ONLY;
+#endif
+
+	fDevice = open(deviceName, flags & B_MOUNT_READ_ONLY ? O_RDONLY : O_RDWR);
+
 	// if we couldn't open the device, try read-only (don't rely on a specific error code)
 	if (fDevice < B_OK && (flags & B_MOUNT_READ_ONLY) == 0) {
 		fDevice = open(deviceName, O_RDONLY);
@@ -116,11 +124,28 @@ Volume::Mount(const char *deviceName, uint32 flags)
 	// Note: that does work only for x86, for PowerPC, the super block
 	// is located at offset 0!
 	memcpy(&fSuperBlock, buffer + 512, sizeof(disk_super_block));
+	if (!IsValidSuperBlock()) {
+#ifndef BFS_LITTLE_ENDIAN_ONLY
+		memcpy(&fSuperBlock, buffer, sizeof(disk_super_block));
+		if (!IsValidSuperBlock()) {
+			close(fDevice);
+			return B_BAD_VALUE;
+		}
+#else		
+		close(fDevice);
+		return B_BAD_VALUE;
+#endif
+	}
 
 	if (IsValidSuperBlock()) {
 		// set the current log pointers, so that journaling will work correctly
-		fLogStart = fSuperBlock.log_start;
-		fLogEnd = fSuperBlock.log_end;
+		fLogStart = fSuperBlock.LogStart();
+		fLogEnd = fSuperBlock.LogEnd();
+
+		// initialize short hands to the super block (to save byte swapping)
+		fBlockSize = fSuperBlock.BlockSize();
+		fBlockShift = fSuperBlock.BlockShift();
+		fAllocationGroupShift = fSuperBlock.AllocationGroupShift();
 
 		if (init_cache_for_device(fDevice, NumBlocks()) == B_OK) {
 			fJournal = new Journal(this);
@@ -130,7 +155,7 @@ Volume::Mount(const char *deviceName, uint32 flags)
 				fRootNode = new Inode(this, ToVnode(Root()));
 
 				if (fRootNode && fRootNode->InitCheck() == B_OK) {
-					if (new_vnode(fID, ToVnode(Root()),(void *)fRootNode) == B_OK) {
+					if (new_vnode(fID, ToVnode(Root()), (void *)fRootNode) == B_OK) {
 						// try to get indices root dir
 
 						// question: why doesn't get_vnode() work here??
@@ -208,12 +233,12 @@ Volume::Sync()
 status_t
 Volume::ValidateBlockRun(block_run run)
 {
-	if (run.allocation_group < 0 || run.allocation_group > (int32)AllocationGroups()
-		|| run.start > (1UL << AllocationGroupShift())
+	if (run.AllocationGroup() < 0 || run.AllocationGroup() > (int32)AllocationGroups()
+		|| run.Start() > (1UL << AllocationGroupShift())
 		|| run.length == 0
-		|| uint32(run.length + run.start) > (1UL << AllocationGroupShift())) {
+		|| uint32(run.Length() + run.Start()) > (1UL << AllocationGroupShift())) {
 		Panic();
-		FATAL(("*** invalid run(%ld,%d,%d)\n", run.allocation_group, run.start, run.length));
+		FATAL(("*** invalid run(%ld,%d,%d)\n", run.AllocationGroup(), run.Start(), run.Length()));
 		return B_BAD_DATA;
 	}
 	return B_OK;
@@ -224,9 +249,9 @@ block_run
 Volume::ToBlockRun(off_t block) const
 {
 	block_run run;
-	run.allocation_group = block >> fSuperBlock.ag_shift;
-	run.start = block & ~((1LL << fSuperBlock.ag_shift) - 1);
-	run.length = 1;
+	run.allocation_group = HOST_ENDIAN_TO_BFS_INT32(block >> AllocationGroupShift());
+	run.start = HOST_ENDIAN_TO_BFS_INT16(block & ~((1LL << AllocationGroupShift()) - 1));
+	run.length = HOST_ENDIAN_TO_BFS_INT16(1);
 	return run;
 }
 

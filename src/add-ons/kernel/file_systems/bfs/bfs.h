@@ -188,6 +188,8 @@ struct bfs_inode {
 	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
 	int32 Type() const { return BFS_ENDIAN_TO_HOST_INT32(type); }
 	int32 InodeSize() const { return BFS_ENDIAN_TO_HOST_INT32(inode_size); }
+	bigtime_t LastModifiedTime() const { return BFS_ENDIAN_TO_HOST_INT64(last_modified_time); }
+	bigtime_t CreateTime() const { return BFS_ENDIAN_TO_HOST_INT64(create_time); }
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp

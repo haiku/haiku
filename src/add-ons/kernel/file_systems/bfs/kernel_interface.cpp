@@ -539,11 +539,11 @@ bfs_walk(void *_ns, void *_directory, const char *file, char **_resolvedPath, vn
 		// for the path, so we're not going to do that
 
 		if (inode->Flags() & INODE_LONG_SYMLINK) {
-			size_t readBytes = inode->Node()->data.size;
+			size_t readBytes = inode->Size();
 			char *data = (char *)malloc(readBytes);
 			if (data != NULL) {
 				status = inode->ReadAt(0, (uint8 *)data, &readBytes);
-				if (status == B_OK && readBytes == inode->Node()->data.size)
+				if (status == B_OK && readBytes == inode->Size())
 					status = new_path(data, &newPath);
 
 				free(data);
@@ -597,7 +597,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 			// using the cache or allocating memory
 			status_t status = volume->Pool().RequestBuffers(volume->BlockSize());
 			if (status == B_OK)
-				inode->Node()->flags |= INODE_NO_CACHE;
+				inode->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_NO_CACHE);
 			return status;
 		}
 		case IOCTL_CREATE_TIME:
@@ -606,7 +606,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 				return B_BAD_VALUE;
 
 			off_t *creationTime = (off_t *)buffer;
-			*creationTime = inode->Node()->create_time;
+			*creationTime = inode->Node()->CreateTime();
 			return B_OK;
 		}
 		case IOCTL_MODIFIED_TIME:
@@ -633,7 +633,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 
 			status_t status = allocator.StartChecking(control);
 			if (status == B_OK && inode != NULL)
-				inode->Node()->flags |= INODE_CHKBFS_RUNNING;
+				inode->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_CHKBFS_RUNNING);
 
 			return status;
 		}
@@ -645,7 +645,7 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 
 			status_t status = allocator.StopChecking(control);
 			if (status == B_OK && inode != NULL)
-				inode->Node()->flags &= ~INODE_CHKBFS_RUNNING;
+				inode->Node()->flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_CHKBFS_RUNNING);
 
 			return status;
 		}
@@ -758,14 +758,14 @@ bfs_read_stat(void *_ns, void *_node, struct stat *st)
 	st->st_nlink = 1;
 	st->st_blksize = BFS_IO_SIZE;
 
-	st->st_uid = node->uid;
-	st->st_gid = node->gid;
-	st->st_mode = node->mode;
-	st->st_size = node->data.size;
+	st->st_uid = node->UserID();
+	st->st_gid = node->GroupID();
+	st->st_mode = node->Mode();
+	st->st_size = node->data.Size();
 
 	st->st_atime = time(NULL);
-	st->st_mtime = st->st_ctime = (time_t)(node->last_modified_time >> INODE_TIME_SHIFT);
-	st->st_crtime = (time_t)(node->create_time >> INODE_TIME_SHIFT);
+	st->st_mtime = st->st_ctime = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
+	st->st_crtime = (time_t)(node->CreateTime() >> INODE_TIME_SHIFT);
 
 	return B_NO_ERROR;
 }
@@ -931,7 +931,7 @@ bfs_symlink(void *_ns, void *_directory, const char *name, const char *path)
 		strcpy(link->Node()->short_symlink, path);
 		status = link->WriteBack(&transaction);
 	} else {
-		link->Node()->flags |= INODE_LONG_SYMLINK | INODE_LOGGED;
+		link->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_LONG_SYMLINK | INODE_LOGGED);
 		// The following call will have to write the inode back, so
 		// we don't have to do that here...
 		status = link->WriteAt(&transaction, 0, (const uint8 *)path, &length);
@@ -1376,7 +1376,7 @@ bfs_free_cookie(void *_ns, void *_node, void *_cookie)
 
 	if (inode->Flags() & INODE_NO_CACHE) {
 		volume->Pool().ReleaseBuffers();
-		inode->Node()->flags &= ~INODE_NO_CACHE;
+		inode->Node()->flags &= HOST_ENDIAN_TO_BFS_INT32(~INODE_NO_CACHE);
 			// We don't need to save the inode, because INODE_NO_CACHE is a
 			// non-permanent flag which will be removed when the inode is loaded
 			// into memory.
@@ -1758,8 +1758,8 @@ bfs_stat_attr(void *ns, void *_node, const char *name, struct attr_info *attrInf
 	if (inode->SmallDataLock().Lock() == B_OK)
 	{
 		if ((smallData = inode->FindSmallData((const char *)name)) != NULL) {
-			attrInfo->type = smallData->type;
-			attrInfo->size = smallData->data_size;
+			attrInfo->type = smallData->Type();
+			attrInfo->size = smallData->DataSize();
 		}
 		inode->SmallDataLock().Unlock();
 	}
@@ -2004,11 +2004,11 @@ bfs_stat_index(void *_ns, const char *name, struct index_info *indexInfo)
 	bfs_inode *node = index.Node()->Node();
 
 	indexInfo->type = index.Type();
-	indexInfo->size = node->data.size;
-	indexInfo->modification_time = (time_t)(node->last_modified_time >> INODE_TIME_SHIFT);
-	indexInfo->creation_time = (time_t)(node->create_time >> INODE_TIME_SHIFT);
-	indexInfo->uid = node->uid;
-	indexInfo->gid = node->gid;
+	indexInfo->size = node->data.Size();
+	indexInfo->modification_time = (time_t)(node->LastModifiedTime() >> INODE_TIME_SHIFT);
+	indexInfo->creation_time = (time_t)(node->CreateTime() >> INODE_TIME_SHIFT);
+	indexInfo->uid = node->UserID();
+	indexInfo->gid = node->GroupID();
 
 	return B_OK;
 }

@@ -57,19 +57,19 @@ class Volume {
 		nspace_id			ID() const { return fID; }
 		const char			*Name() const { return fSuperBlock.name; }
 
-		off_t				NumBlocks() const { return fSuperBlock.num_blocks; }
-		off_t				UsedBlocks() const { return fSuperBlock.used_blocks; }
-		off_t				FreeBlocks() const { return fSuperBlock.num_blocks - fSuperBlock.used_blocks; }
+		off_t				NumBlocks() const { return fSuperBlock.NumBlocks(); }
+		off_t				UsedBlocks() const { return fSuperBlock.UsedBlocks(); }
+		off_t				FreeBlocks() const { return NumBlocks() - UsedBlocks(); }
 
-		uint32				BlockSize() const { return fSuperBlock.block_size; }
-		uint32				BlockShift() const { return fSuperBlock.block_shift; }
-		uint32				InodeSize() const { return fSuperBlock.inode_size; }
-		uint32				AllocationGroups() const { return fSuperBlock.num_ags; }
-		uint32				AllocationGroupShift() const { return fSuperBlock.ag_shift; }
+		uint32				BlockSize() const { return fBlockSize; }
+		uint32				BlockShift() const { return fBlockShift; }
+		uint32				InodeSize() const { return fSuperBlock.InodeSize(); }
+		uint32				AllocationGroups() const { return fSuperBlock.AllocationGroups(); }
+		uint32				AllocationGroupShift() const { return fAllocationGroupShift; }
 		disk_super_block	&SuperBlock() { return fSuperBlock; }
 
-		off_t				ToOffset(block_run run) const { return ToBlock(run) << fSuperBlock.block_shift; }
-		off_t				ToBlock(block_run run) const { return ((((off_t)run.allocation_group) << fSuperBlock.ag_shift) | (off_t)run.start); }
+		off_t				ToOffset(block_run run) const { return ToBlock(run) << BlockShift(); }
+		off_t				ToBlock(block_run run) const { return ((((off_t)run.AllocationGroup()) << AllocationGroupShift()) | (off_t)run.Start()); }
 		block_run			ToBlockRun(off_t block) const;
 		status_t			ValidateBlockRun(block_run run);
 
@@ -114,6 +114,11 @@ class Volume {
 		nspace_id			fID;
 		int					fDevice;
 		disk_super_block	fSuperBlock;
+
+		uint32				fBlockSize;
+		uint32				fBlockShift;
+		uint32				fAllocationGroupShift;
+
 		BlockAllocator		fBlockAllocator;
 		RecursiveLock		fLock;
 		Journal				*fJournal;
