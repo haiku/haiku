@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT license.
  *
  * Authors:
- *		jonas.sundstrom@kirilla.com
+ *		Jonas Sundström, jonas@kirilla.com
  *		Axel Dörfler, axeld@pinc-software.de.
  */
 
@@ -77,11 +77,12 @@ ClipboardApp::ArgvReceived(int32 argc, char **argv)
 	};
 
 	int c;
-	while ((c = getopt_long(argc, argv, "l:o:c:ripd", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "l:s:o:c:ripd", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 'l':
 				status = Load(optarg);
 				break;
+			case 's':
 			case 'o':
 				status = Save(optarg);
 				break;
@@ -131,10 +132,11 @@ void
 ClipboardApp::Usage(void)
 {
 	printf("usage: %s [-olcirpd]\n"
-		"  -o, --save=file\tSave clipboard to file (flattened BMessage)\n"
+		"  -s, --save=file\tSave clipboard to file (flattened BMessage)\n"
+		"  -o\t\t\tthe same\n" // ToDo: (\"-\" for standard output/input)\n"
 		"  -l, --load=file\tLoad clipboard from file (flattened BMessage)\n"
-		"  -c, --copy=string\tPuts the given string into the clipboard\n"
-		"  -i, --stdin\t\tLoad clipboard from standard input\n\n"
+		"  -c, --copy=string\tPut the given string on the clipboard\n"
+		"  -i, --stdin\t\tLoad clipboard with string from standard input\n\n"
 
 		"  -r, --clear\t\tRemove all contents from clipboard\n\n"
 
