@@ -915,6 +915,15 @@ ShowImageView::PrevPage()
 }
 
 void
+ShowImageView::GoToPage(int32 page)
+{
+	if (page > 0 && page <= fDocumentCount && page != fDocumentIndex) {
+		fDocumentIndex = page;
+		SetImage(NULL);
+	}
+}
+
+void
 ShowImageView::FreeEntries(BList* entries)
 {
 	const int32 n = entries->CountItems();

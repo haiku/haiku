@@ -210,6 +210,8 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddItemMenu(pmenu, "Last Page", MSG_PAGE_LAST, 'L', 0, 'W', true);
 	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, 'N', 0, 'W', true);
 	AddItemMenu(pmenu, "Previous Page", MSG_PAGE_PREV, 'P', 0, 'W', true);
+	fpGoToPageMenu = new BMenu("Go To Page");
+	pmenu->AddItem(fpGoToPageMenu);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Next File", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
 	AddItemMenu(pmenu, "Previous File", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);	
@@ -245,7 +247,7 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	AddDelayItem(pDelay, "Eight Seconds", 8, false);
 	AddDelayItem(pDelay, "Nine Seconds", 9, false);
 	AddDelayItem(pDelay, "Ten Seconds", 10, false);
-	AddDelayItem(pDelay, "Tweenty Seconds", 20, false);
+	AddDelayItem(pDelay, "Twenty Seconds", 20, false);
 	pmenu->AddItem(pDelay);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
@@ -386,11 +388,50 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			
 		case MSG_UPDATE_STATUS:
 		{
-			bool benable = (fpImageView->PageCount() > 1) ? true : false;
+			int32 pages, curPage;
+			pages = fpImageView->PageCount();
+			curPage = fpImageView->CurrentPage();
+			
+			bool benable = (pages > 1) ? true : false;
 			EnableMenuItem(MSG_PAGE_FIRST, benable);
 			EnableMenuItem(MSG_PAGE_LAST, benable);
 			EnableMenuItem(MSG_PAGE_NEXT, benable);
 			EnableMenuItem(MSG_PAGE_PREV, benable);
+			
+			if (fpGoToPageMenu->CountItems() != pages) {
+				// Only rebuild the submenu if the number of
+				// pages is different
+				
+				while (fpGoToPageMenu->CountItems() > 0)
+					// Remove all page numbers
+					delete fpGoToPageMenu->RemoveItem(0L);
+			
+				for (int32 i = 1; i > 0 && i <= pages; i++) {
+					// Fill Go To page submenu with an entry for each page
+					BMessage *pgomsg;
+					pgomsg = new BMessage(MSG_GOTO_PAGE);
+					pgomsg->AddInt32("page", i);
+					BString strCaption;
+					strCaption << i;
+					BMenuItem *pitem;
+					pitem = new BMenuItem(strCaption.String(), pgomsg, 0);
+					if (curPage == i)
+						pitem->SetMarked(true);
+					fpGoToPageMenu->AddItem(pitem);
+				}
+			} else {
+				// Make sure the correct page is marked
+				BMenuItem *pcurItem;
+				pcurItem = fpGoToPageMenu->ItemAt(curPage - 1);
+				if (!pcurItem->IsMarked()) {
+					// If the current page isn't marked, unmark everything
+					// then mark the current page
+					int32 items = fpGoToPageMenu->CountItems();
+					for (int32 i = 0; i < items; i++)
+						fpGoToPageMenu->ItemAt(i)->SetMarked(false);
+					pcurItem->SetMarked(true);
+				}
+			}
 				
 			BString str;
 			if (pmsg->FindString("status", &str) == B_OK)
@@ -430,6 +471,27 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 			
 		case MSG_PAGE_PREV:
 			fpImageView->PrevPage();
+			break;
+			
+		case MSG_GOTO_PAGE:
+			{
+				int32 curPage, newPage, pages;
+				if (pmsg->FindInt32("page", &newPage) == B_OK) {
+					curPage = fpImageView->CurrentPage();
+					pages = fpImageView->PageCount();
+					
+					if (newPage > 0 && newPage <= pages) {
+						BMenuItem *pcurItem, *pnewItem;
+						pcurItem = fpGoToPageMenu->ItemAt(curPage - 1);
+						pnewItem = fpGoToPageMenu->ItemAt(newPage - 1);
+						if (!pcurItem || !pnewItem)
+							break;
+						pcurItem->SetMarked(false);
+						pnewItem->SetMarked(true);
+						fpImageView->GoToPage(newPage);
+					}
+				}
+			}
 			break;
 
 		case MSG_DITHER_IMAGE:

@@ -72,6 +72,7 @@ public:
 	void LastPage();
 	void NextPage();
 	void PrevPage();
+	void GoToPage(int32 page);
 	bool NextFile();
 	bool PrevFile();
 	void SetSlideShowDelay(float seconds);

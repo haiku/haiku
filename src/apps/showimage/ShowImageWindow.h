@@ -82,6 +82,7 @@ private:
 	BMenuBar *fpBar;
 	BMenu *fpOpenMenu;
 	BMenu *fpBrowseMenu;
+	BMenu *fpGoToPageMenu;
 	ShowImageView *fpImageView;
 	ShowImageStatusView *fpStatusView;
 	bool fFullScreen;
