@@ -1,0 +1,16 @@
+SubDir OBOS_TOP src add-ons translators sgitranslator ;
+
+Translator SGITranslator :
+	SGIImage.cpp
+	SGIMain.cpp
+	SGITranslator.cpp
+	SGITranslatorSettings.cpp
+	SGIView.cpp
+	SGIWindow.cpp ;
+
+LinkSharedOSLibs SGITranslator : be translation ;
+
+Package openbeos-translationkit-cvs :
+	SGITranslator :
+	boot home config add-ons Translators ;
+
