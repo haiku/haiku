@@ -130,8 +130,8 @@ enum field_type {
 
 	TYPE_DASH			= 12,
 	TYPE_DOT			= 13,
-	TYPE_COLON			= 14,
-	TYPE_SEMICOLON		= 15,
+	TYPE_COMMA			= 14,
+	TYPE_COLON			= 15,
 	
 	TYPE_PLUS_MINUS		= 16 | TYPE_MODIFIER | TYPE_RELATIVE,
 	TYPE_NEXT_LAST_THIS	= 17 | TYPE_MODIFIER | TYPE_RELATIVE,
@@ -155,62 +155,59 @@ enum value_modifier {
 
 struct known_identifier {
 	const char	*string;
+	const char	*alternate_string;
 	int32		type;
 	int32		value;
 };
 
 static const known_identifier kIdentifiers[] = {
-	{"today",		TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, 0},
-	{"tomorrow",	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, 1},
-	{"yesterday",	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, -1},
-	{"now",			TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_NOW, 0},
+	{"today",		NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, 0},
+	{"tomorrow",	NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, 1},
+	{"yesterday",	NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_DAY_UNIT, -1},
+	{"now",			NULL,	TYPE_RELATIVE | TYPE_NOT_MODIFIABLE | TYPE_NOW, 0},
 
-	{"this",		TYPE_NEXT_LAST_THIS, 0},
-	{"next",		TYPE_NEXT_LAST_THIS, 1},
-	{"last",		TYPE_NEXT_LAST_THIS, -1},
+	{"this",		NULL,	TYPE_NEXT_LAST_THIS, 0},
+	{"next",		NULL,	TYPE_NEXT_LAST_THIS, 1},
+	{"last",		NULL,	TYPE_NEXT_LAST_THIS, -1},
 
-	{"year",		TYPE_UNIT | TYPE_RELATIVE | TYPE_YEAR_UNIT, 1},
-	{"month",		TYPE_UNIT | TYPE_RELATIVE | TYPE_MONTH_UNIT, 1},
-	{"day",			TYPE_UNIT | TYPE_RELATIVE | TYPE_DAY_UNIT, 1},
-	{"days",		TYPE_UNIT | TYPE_RELATIVE | TYPE_DAY_UNIT, 1},
-	{"hour",		TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
-	{"hrs",			TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
-	{"hours",		TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
-	{"sec",			TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
-	{"second",		TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
-	{"seconds",		TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
-	{"min",			TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
-	{"minute",		TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
-	{"minutes",		TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
+	{"years",		"year",	TYPE_UNIT | TYPE_RELATIVE | TYPE_YEAR_UNIT, 1},
+	{"months",		"month",TYPE_UNIT | TYPE_RELATIVE | TYPE_MONTH_UNIT, 1},
+	{"days",		"day",	TYPE_UNIT | TYPE_RELATIVE | TYPE_DAY_UNIT, 1},
+	{"hour",		NULL,	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
+	{"hours",		"hrs",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1 * 60 * 60},
+	{"second",		"sec",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
+	{"seconds",		"secs",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 1},
+	{"minute",		"min",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
+	{"minutes",		"mins",	TYPE_UNIT | TYPE_RELATIVE | TYPE_SECOND_UNIT, 60},
 
-	{"am",			TYPE_MERIDIAN | TYPE_NOT_MODIFIABLE, 0},
-	{"pm",			TYPE_MERIDIAN | TYPE_NOT_MODIFIABLE, 12 * 60 * 60},	// 12 hours
+	{"am",			NULL,	TYPE_MERIDIAN | TYPE_NOT_MODIFIABLE, 0},
+	{"pm",			NULL,	TYPE_MERIDIAN | TYPE_NOT_MODIFIABLE, 12 * 60 * 60},	// 12 hours
 
-	{"sunday",		TYPE_WEEKDAY, 0},
-	{"monday",		TYPE_WEEKDAY, 1},
-	{"tuesday",		TYPE_WEEKDAY, 2},
-	{"wednesday",	TYPE_WEEKDAY, 3},
-	{"thursday",	TYPE_WEEKDAY, 4},
-	{"friday",		TYPE_WEEKDAY, 5},
-	{"saturday",	TYPE_WEEKDAY, 6},
+	{"sunday",		"sun",	TYPE_WEEKDAY, 0},
+	{"monday",		"mon",	TYPE_WEEKDAY, 1},
+	{"tuesday",		"tue",	TYPE_WEEKDAY, 2},
+	{"wednesday",	"wed",	TYPE_WEEKDAY, 3},
+	{"thursday",	"thu",	TYPE_WEEKDAY, 4},
+	{"friday",		"fri",	TYPE_WEEKDAY, 5},
+	{"saturday",	"sat",	TYPE_WEEKDAY, 6},
 
-	{"january",		TYPE_MONTH, 1},
-	{"february",	TYPE_MONTH, 2},
-	{"march",		TYPE_MONTH, 3},
-	{"april",		TYPE_MONTH, 4},
-	{"may",			TYPE_MONTH, 5},
-	{"june",		TYPE_MONTH, 6},
-	{"july",		TYPE_MONTH, 7},
-	{"august",		TYPE_MONTH, 8},
-	{"september",	TYPE_MONTH, 9},
-	{"october",		TYPE_MONTH, 10},
-	{"november",	TYPE_MONTH, 11},
-	{"december",	TYPE_MONTH, 12},
+	{"january",		"jan",	TYPE_MONTH, 1},
+	{"february",	"feb", 	TYPE_MONTH, 2},
+	{"march",		"mar",	TYPE_MONTH, 3},
+	{"april",		"apr",	TYPE_MONTH, 4},
+	{"may",			"may",	TYPE_MONTH, 5},
+	{"june",		"jun",	TYPE_MONTH, 6},
+	{"july",		"jul",	TYPE_MONTH, 7},
+	{"august",		"aug",	TYPE_MONTH, 8},
+	{"september",	"sep",	TYPE_MONTH, 9},
+	{"october",		"oct",	TYPE_MONTH, 10},
+	{"november",	"nov",	TYPE_MONTH, 11},
+	{"december",	"dec",	TYPE_MONTH, 12},
 
-	{"GMT",			TYPE_TIME_ZONE,	0},
+	{"GMT",			NULL,	TYPE_TIME_ZONE,	0},
 		// ToDo: add more time zones
 
-	{NULL,			TYPE_UNKNOWN, 0},
+	{NULL}
 };
 
 #define MAX_ELEMENTS	32
@@ -251,7 +248,7 @@ preparseDate(const char *dateString, parsed_element *elements)
 		memset(&elements[index], 0, sizeof(parsed_element));
 
 		if (c == ',') {
-			elements[index].type = TYPE_COLON;
+			elements[index].type = TYPE_COMMA;
 			elements[index].value_type = VALUE_CHAR;
 		} else if (c == '.') {
 			elements[index].type = TYPE_DOT;
@@ -261,7 +258,7 @@ preparseDate(const char *dateString, parsed_element *elements)
 			elements[index].type = TYPE_DASH;
 			elements[index].value_type = VALUE_CHAR;
 		} else if (c == ':') {
-			elements[index].type = TYPE_SEMICOLON;
+			elements[index].type = TYPE_COLON;
 			elements[index].value_type = VALUE_CHAR;
 		} else if (c == '+') {
 			elements[index].type = TYPE_RELATIVE;
@@ -303,6 +300,11 @@ preparseDate(const char *dateString, parsed_element *elements)
 			for (; identifier->string; identifier++) {
 				if (!strncasecmp(identifier->string, string, length)
 					&& !identifier->string[length])
+					break;
+
+				if (identifier->alternate_string != NULL
+					&& !strncasecmp(identifier->alternate_string, string, length)
+					&& !identifier->alternate_string[length])
 					break;
 			}
 			if (identifier->string == NULL) {
@@ -537,7 +539,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 		return B_ERROR;
 	}
 
-	/*for (int32 index = 0; elements[index].type != TYPE_END; index++) {
+	for (int32 index = 0; elements[index].type != TYPE_END; index++) {
 		parsed_element e = elements[index];
 		char type[32];
 		sprintf(type, "0x%lx", e.type);
@@ -550,7 +552,7 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 			index, e.type & TYPE_MASK, type, e.value,
 			e.value_type == VALUE_NUMERICAL ? "numerical" :
 			(e.value_type == VALUE_STRING ? "string" : "char"));
-	}*/
+	}
 
 	bool optional[MAX_ELEMENTS];
 
@@ -585,12 +587,12 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 							if (format[0] != '/' && format[0] != '-')
 								goto next_format;
 							break;
-						case TYPE_COLON:
+						case TYPE_COMMA:
 							if (format[0] != ',')
 								goto next_format;
 							break;
-						case TYPE_SEMICOLON:
-							if (format[0] != ';')
+						case TYPE_COLON:
+							if (format[0] != ':')
 								goto next_format;
 							break;
 						default:
@@ -631,21 +633,21 @@ parsedate_etc(const char *dateString, time_t now, int *_flags)
 					switch (format[0]) {
 						case 'a':	// weekday
 						case 'A':
-							if ((element->type & TYPE_MASK) != TYPE_WEEKDAY)
+							if (!isType(element->type, TYPE_WEEKDAY))
 								goto next_format;
 							break;
 						case 'b':	// month
 						case 'B':
-							if ((element->type & TYPE_MASK) != TYPE_MONTH)
+							if (!isType(element->type, TYPE_MONTH))
 								goto next_format;
 							break;
 						case 'p':	// meridian
-							if ((element->type & TYPE_MASK) != TYPE_MERIDIAN)
+							if (!isType(element->type, TYPE_MERIDIAN))
 								goto next_format;
 							break;
 						case 'z':	// time zone
 						case 'Z':
-							if ((element->type & TYPE_MASK) != TYPE_TIME_ZONE)
+							if (!isType(element->type, TYPE_TIME_ZONE))
 								goto next_format;
 							break;
 						case 'T':
