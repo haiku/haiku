@@ -1,4 +1,4 @@
-/* Big case statment for dispatching syscalls */
+/* Big case statement for dispatching syscalls */
 /*
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -18,6 +18,7 @@
 #include <port.h>
 #include <cpu.h>
 #include <arch_config.h>
+#include <disk_device_manager/ddm_userland_interface.h>
 #include <sys/resource.h>
 #include <fd.h>
 #include <fs/node_monitor.h>
