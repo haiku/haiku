@@ -1,9 +1,5 @@
 SubDir OBOS_TOP src add-ons kernel drivers arch x86 ps2mouse ;
 
-if $(COMPILE_FOR_R5) {
-	SubDirCcFlags -DCOMPILE_FOR_R5 ;
-}
-
 UsePrivateHeaders input kernel ;
 
 KernelObjects
@@ -23,6 +19,9 @@ KernelLd ps2mouse :
 	:
 	drivers/dev/ps2mouse
 	; 
+
+if $(COMPILE_FOR_R5) {
+SubDirCcFlags -DCOMPILE_FOR_R5 ;
 
 R5KernelAddon <driver>ps2mouse : kernel drivers bin :
 	ps2mouse.c
@@ -48,3 +47,4 @@ R5KernelAddon <driver>ps2mouse : kernel drivers bin :
 #	:
 #	boot home config add-ons kernel drivers dev input ;
 
+}
