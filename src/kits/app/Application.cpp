@@ -57,6 +57,8 @@
 #include <PortLink.h>
 #include <PortMessage.h>
 
+#include "PrivateScreen.h"
+
 // Local Includes --------------------------------------------------------------
 
 // Local Defines ---------------------------------------------------------------
@@ -67,6 +69,8 @@ BMessenger		be_app_messenger;
 
 BResources*	BApplication::_app_resources = NULL;
 BLocker		BApplication::_app_resources_lock("_app_resources_lock");
+
+BPrivateScreen *gPrivateScreen = NULL;
 
 property_info gApplicationPropInfo[] =
 {
@@ -836,7 +840,7 @@ void BApplication::EndRectTracking()
 //------------------------------------------------------------------------------
 void BApplication::get_scs()
 {
-	//gPrivateScreen = new BPrivateScreen();
+	gPrivateScreen = new BPrivateScreen();
 }
 //------------------------------------------------------------------------------
 void BApplication::setup_server_heaps()
