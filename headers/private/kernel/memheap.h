@@ -9,6 +9,8 @@
 #include <stage2.h>
 
 #define HEAP_SIZE	0x00400000
+	// 4 MB heap for the kernel
+
 
 int   heap_init(addr new_heap_base);
 int   heap_init_postsem(kernel_args *ka);
