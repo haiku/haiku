@@ -52,18 +52,18 @@
 // ---------------------------------------------------------------
 StreamBuffer::StreamBuffer(BPositionIO *pstream, size_t nbuffersize)
 {
-	m_pStream = pstream;
-	m_pBuffer = NULL;
-	m_nBufferSize = 0;
-	m_nLen = 0;
-	m_nPos = 0;
+	fpStream = pstream;
+	fpBuffer = NULL;
+	fnBufferSize = 0;
+	fnLen = 0;
+	fnPos = 0;
 	
 	if (!pstream)
 		return;
 
-	m_nBufferSize = max(nbuffersize, MIN_BUFFER_SIZE);
-	m_pBuffer = new uint8[m_nBufferSize];
-	if (m_pBuffer)
+	fnBufferSize = max(nbuffersize, MIN_BUFFER_SIZE);
+	fpBuffer = new uint8[fnBufferSize];
+	if (fpBuffer)
 		ReadStream();
 			// Fill the buffer with data so that
 			// object is prepared for first call to
@@ -85,13 +85,13 @@ StreamBuffer::StreamBuffer(BPositionIO *pstream, size_t nbuffersize)
 // ---------------------------------------------------------------
 StreamBuffer::~StreamBuffer()
 {
-	m_nBufferSize = 0;
-	m_nLen = 0;
-	m_nPos = 0;
-	m_pStream = NULL;
+	fnBufferSize = 0;
+	fnLen = 0;
+	fnPos = 0;
+	fpStream = NULL;
 	
-	delete[] m_pBuffer;
-	m_pBuffer = NULL;
+	delete[] fpBuffer;
+	fpBuffer = NULL;
 }
 
 // ---------------------------------------------------------------
@@ -110,7 +110,7 @@ StreamBuffer::~StreamBuffer()
 // ---------------------------------------------------------------
 status_t StreamBuffer::InitCheck()
 {
-	if (m_pStream && m_pBuffer)
+	if (fpStream && fpBuffer)
 		return B_OK;
 	else
 		return B_ERROR;
@@ -138,17 +138,17 @@ ssize_t StreamBuffer::Read(uint8 *pinto, size_t nbytes)
 	ssize_t result = B_ERROR;
 	size_t rd1 = 0, rd2 = 0;
 	
-	rd1 = min(nbytes, m_nLen - m_nPos);
-	memcpy(pinto, m_pBuffer + m_nPos, rd1);
-	m_nPos += rd1;
+	rd1 = min(nbytes, fnLen - fnPos);
+	memcpy(pinto, fpBuffer + fnPos, rd1);
+	fnPos += rd1;
 	
 	if (rd1 < nbytes) {
 		pinto += rd1;
 		result = ReadStream();
 		if (result > 0) {
-			rd2 = min(nbytes - rd1, m_nLen);
-			memcpy(pinto, m_pBuffer, rd2);
-			m_nPos += rd2;
+			rd2 = min(nbytes - rd1, fnLen);
+			memcpy(pinto, fpBuffer, rd2);
+			fnPos += rd2;
 		} else
 			// return error code or zero
 			return result;
@@ -162,7 +162,7 @@ ssize_t StreamBuffer::Read(uint8 *pinto, size_t nbytes)
 //
 // Fills the stream buffer with data read in from the stream
 //
-// Preconditions: m_pBuffer must be allocated and m_nBufferSize
+// Preconditions: fpBuffer must be allocated and fnBufferSize
 // must be valid
 //
 // Parameters:	
@@ -175,10 +175,10 @@ ssize_t StreamBuffer::Read(uint8 *pinto, size_t nbytes)
 ssize_t StreamBuffer::ReadStream()
 {
 	ssize_t rd;
-	rd = m_pStream->Read(m_pBuffer, m_nBufferSize);
+	rd = fpStream->Read(fpBuffer, fnBufferSize);
 	if (rd >= 0) {
-		m_nLen = rd;
-		m_nPos = 0;
+		fnLen = rd;
+		fnPos = 0;
 	}
 	return rd;
 }
