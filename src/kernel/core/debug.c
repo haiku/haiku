@@ -14,6 +14,7 @@
 #include <gdb.h>
 #include <Errors.h>
 #include <int.h>
+#include <vm.h>
 
 #include <arch/dbg_console.h>
 #include <arch/debug.h>

@@ -423,6 +423,10 @@ syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_ret)
 		case SYSCALL_GETENV:
 			*call_ret = user_getenv((const char *)arg0, (char **)arg1);
 			break;
+		case SYSCALL_DEBUG_OUTPUT:
+			_user_debug_output((const char *)arg0);
+			break;
+
 		case SYSCALL_GET_THREAD_INFO:
 			*call_ret = user_get_thread_info((thread_id)arg0, (thread_info *)arg1);
 			break;
