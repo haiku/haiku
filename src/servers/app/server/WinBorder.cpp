@@ -84,7 +84,6 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	_hidden			= true;
 	_serverwin		= win;
 
-	fWindow			= win;
 	fMouseButtons	= 0;
 	fKeyModifiers	= 0;
 	fMainWinBorder	= NULL;
@@ -94,22 +93,15 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fLastMousePosition.Set(-1,-1);
 	SetLevel();
 
-	if (feel == B_NO_BORDER_WINDOW_LOOK)
-	{
-		fDecFull		= NULL;
-		_full			= fWindow->fTopLayer->_full;
+	if (feel == B_NO_BORDER_WINDOW_LOOK){
 	}
-	else
-	{
+	else{
 		fDecorator		= new_decorator(r, name, look, feel, flags, fDriver);
 		fDecFull		= new BRegion();
-
-		fDecorator->GetFootprint( fDecFull );
-		
-		// our full region is the union between decorator's region and fTopLayer's region
-		_full			= fWindow->fTopLayer->_full;
-		_full.Include( fDecFull );
+		fDecorator->GetFootprint(fDecFull);
 	}
+
+	_full.MakeEmpty();
 
 	STRACE(("WinBorder %s:\n",GetName()));
 	STRACE(("\tFrame: (%.1f,%.1f,%.1f,%.1f)\n",r.left,r.top,r.right,r.bottom));
@@ -125,6 +117,21 @@ STRACE(("WinBorder %s:~WinBorder()\n",GetName()));
 
 		delete fDecFull;
 		fDecFull		= NULL;
+	}
+}
+//---------------------------------------------------------------------------
+void WinBorder::RebuildFullRegion(void){
+	_full.MakeEmpty();
+	if(fDecorator)
+		fDecFull->MakeEmpty();
+
+	_serverwin->fTopLayer->RebuildFullRegion();
+	_full		= _serverwin->fTopLayer->_full;
+
+	if (fDecorator){
+		fDecorator->GetFootprint(fDecFull);
+		_full.Include(fDecFull);
+		_serverwin->fTopLayer->_full.Exclude(fDecFull);		
 	}
 }
 //---------------------------------------------------------------------------
@@ -150,18 +157,45 @@ void WinBorder::HighlightDecorator(const bool &active)
 //---------------------------------------------------------------------------
 void WinBorder::Draw(const BRect &r)
 {
+printf("WinBorder(%s)::Draw()\n", GetName());
+	if(fDecorator){
+		BRegion		reg(r);
+		reg.IntersectWith(fDecFull);
+		if (reg.CountRects() > 0){
+			// restrict Decorator drawing to the update region only.
+			fDriver->ConstrainClippingRegion(&fUpdateReg);
+fUpdateReg.PrintToStream();
+fDriver->FillRect(r, fBackColor);
+snooze(1000000);
+			// NOTE: r is NOT transformed from Screen coordinates
+			fDecorator->Draw(r);
+
+			// remove the additional clipping region.
+			fDriver->ConstrainClippingRegion(NULL);
+		}
+	}
 }
 //---------------------------------------------------------------------------
 void WinBorder::MoveBy(float x, float y)
 {
+	if(fDecorator){
+		fDecorator->MoveBy(x,y);
+	}
+	
+	Layer::MoveBy(x,y);
 }
 //---------------------------------------------------------------------------
 void WinBorder::ResizeBy(float x, float y)
 {
+	if(fDecorator){
+		fDecorator->ResizeBy(x,y);
+	}
+	
+	Layer::ResizeBy(x,y);
 }
 //---------------------------------------------------------------------------
 bool WinBorder::HasPoint(BPoint& pt) const{
-	return _full.Contains(pt);
+	return _fullVisible.Contains(pt);
 }
 //---------------------------------------------------------------------------
 void WinBorder::SetMainWinBorder(WinBorder *newMain){
@@ -173,7 +207,7 @@ WinBorder* WinBorder::MainWinBorder() const{
 }
 //---------------------------------------------------------------------------
 void WinBorder::SetLevel(){
-	switch(fWindow->Feel()){
+	switch(_serverwin->Feel()){
 		case B_NORMAL_WINDOW_FEEL:
 			_level	= B_NORMAL_FEEL;
 			break;
@@ -201,10 +235,10 @@ void WinBorder::SetLevel(){
 //			if(_win->ServerTeamID() != _win->ClientTeamID())
 //				_win->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
 //			else
-				_level	= fWindow->Feel();
+				_level	= _serverwin->Feel();
 			break;
 		default:
-			fWindow->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
+			_serverwin->QuietlySetFeel(B_NORMAL_WINDOW_FEEL);
 			_level	= B_NORMAL_FEEL;
 			break;
 	}
