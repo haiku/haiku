@@ -340,7 +340,7 @@ int q = 0;
 							if (stream.IsEmpty()) 
 								keepLooping = false;
 							else 
-								throw new Err(std::string("Sniffer scanner error: invalid character '") + ch + "'", pos);
+								throw new Err(std::string("Sniffer pattern error: invalid character '") + ch + "'", pos);
 							break;							
 					
 						case '\t':
@@ -404,7 +404,7 @@ int q = 0;
 						case '|':	AddToken(Divider, pos);			break;
 						
 						default:
-							throw new Err(std::string("Sniffer scanner error: invalid character '") + ch + "'", pos);
+							throw new Err(std::string("Sniffer pattern error: invalid character '") + ch + "'", pos);
 					}			
 					break;
 					
@@ -420,7 +420,7 @@ int q = 0;
 							break;
 						case 0x3:
 							if (stream.IsEmpty())
-								throw new Err(std::string("Sniffer scanner error: unterminated single-quoted string"), pos);
+								throw new Err(std::string("Sniffer pattern error: unterminated single-quoted string"), pos);
 							else
 								charStr += ch;
 							break;
@@ -442,7 +442,7 @@ int q = 0;
 							break;				
 						case 0x3:
 							if (stream.IsEmpty())
-								throw new Err(std::string("Sniffer scanner error: unterminated single-quoted string"), pos);
+								throw new Err(std::string("Sniffer pattern error: unterminated single-quoted string"), pos);
 							else
 								charStr += ch;
 							break;
@@ -477,7 +477,7 @@ int q = 0;
 						lastChar = ch;
 						state = tsssOneHex;
 					} else
-						throw new Err(std::string("Sniffer scanner error: incomplete hex code"), pos);
+						throw new Err(std::string("Sniffer pattern error: incomplete hex code"), pos);
 					break;
 					
 				case tsssOneHex:
@@ -539,7 +539,7 @@ int q = 0;
 						charStr += ch;
 						state = tsssFloat;
 					} else
-						throw new Err(std::string("Sniffer scanner error: incomplete floating point number"), pos);
+						throw new Err(std::string("Sniffer pattern error: incomplete floating point number"), pos);
 					break;
 					
 				case tsssLonelyMinusOrPlus:
@@ -550,7 +550,7 @@ int q = 0;
 						charStr += ch;
 						state = tsssLonelyDecimalPoint;					
 					} else
-						throw new Err(std::string("Sniffer scanner error: incomplete signed number"), pos);
+						throw new Err(std::string("Sniffer pattern error: incomplete signed number"), pos);
 					break;
 
 				case tsssLonelyFloatExtension:
@@ -595,7 +595,7 @@ int q = 0;
 						stream.Unget();				// In case it's punctuation, let tsssStart handle it
 						state = tsssStart;
 					} else if (ch == '\'' || ch == '"') {
-						throw new Err(std::string("Sniffer scanner error: illegal unquoted character '") + ch + "'", pos);
+						throw new Err(std::string("Sniffer pattern error: illegal unquoted character '") + ch + "'", pos);
 					} else if (ch == 0x3 && stream.IsEmpty()) {
 						AddString(charStr.c_str(), startPos);
 						keepLooping = false;
@@ -611,7 +611,7 @@ int q = 0;
 					} else {
 						// Check for a true end-of-text marker
 						if (ch == 0x3 && stream.IsEmpty())
-							throw new Err(std::string("Sniffer scanner error: incomplete escape sequence"), pos);
+							throw new Err(std::string("Sniffer pattern error: incomplete escape sequence"), pos);
 						else {
 							charStr += escapeChar(ch);
 							state = escapedState;	// Return to the state we were in before the escape
@@ -624,7 +624,7 @@ int q = 0;
 						lastChar = ch;
 						state = tsssEscapeOneHex;
 					} else 
-						throw new Err(std::string("Sniffer scanner error: incomplete hex code"), pos);
+						throw new Err(std::string("Sniffer pattern error: incomplete hex code"), pos);
 					break;
 					
 				case tsssEscapeOneOctal:
@@ -663,7 +663,7 @@ int q = 0;
 						charStr += hexToChar(lastChar, ch);
 						state = escapedState;
 					} else
-						throw new Err(std::string("Sniffer scanner error: incomplete escaped hex code"), pos);
+						throw new Err(std::string("Sniffer pattern error: incomplete escaped hex code"), pos);
 					break;					
 					
 			}
@@ -825,7 +825,7 @@ hexToChar(char hex) {
 	else if ('a' <= hex && hex <= 'f')
 		return hex-'a'+10;
 	else if ('A' <= hex && hex <= 'F')
-		return hex-'a'+10;
+		return hex-'A'+10;
 	else
 		throw new Err(std::string("Sniffer parser error: invalid hex digit '") + hex + "' passed to hexToChar()", -1);
 }
@@ -843,7 +843,10 @@ octalToChar(char hi, char low) {
 char
 octalToChar(char hi, char mid, char low) {
 	if (isOctalChar(hi) && isOctalChar(mid) && isOctalChar(low)) {
-		return ((hi-'0') << 6) | ((mid-'0') << 3) | (low-'0');
+		if ((hi-'0') <= 3)
+			return ((hi-'0') << 6) | ((mid-'0') << 3) | (low-'0');
+		else
+			throw new Err("Sniffer pattern error: invalid octal literal (octals must be between octal 0 and octal 377 inclusive)", -1);
 	} else
 		throw new Err(std::string("Sniffer parser error: invalid octal digit passed to hexToChar()"), -1);		
 }
@@ -977,19 +980,29 @@ Parser::ErrorMessage(Err *err, const char *rule) {
 
 void
 Parser::ParseRule(Rule *result) {
+	if (!result)
+		throw new Err("Sniffer parser error: NULL Rule object passed to Parser::ParseRule()", -1);
+
 	// Priority
 	double priority = ParsePriority();
 	// Expression List	
-	std::vector<Expr*>* list = ParseExprList();	
+	std::vector<Expr*>* list = ParseExprList();
+	
+	result->SetTo(priority, list);	
 }
 
 double
 Parser::ParsePriority() {
-	double result;
 	const Token *t = stream.Get();
-	if (t->Type() == FloatingPoint || t->Type() == Integer) 
-		result = t->Float();	
-	else
+	if (t->Type() == FloatingPoint || t->Type() == Integer) {
+		double result = t->Float();
+		if (0.0 <= result && result <= 1.0)
+			return result;
+		else {
+			cout << "(priority == " << result << ")" << endl;
+			throw new Err("Sniffer pattern error: invalid priority", t->Pos());
+		}
+	} else
 		throw new Err("Sniffer pattern error: match level expected", t->Pos());	// Same as R5 
 }
 
