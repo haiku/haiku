@@ -382,7 +382,7 @@ BMenuItem::Draw()
 			B_DISABLED_LABEL_TINT));
 
 	fSuper->MovePenTo(ContentLocation());
-	DrawContent();
+	//DrawContent();
 
 	if (fSuper->Layout() == B_ITEMS_IN_COLUMN) {
 		if (IsMarked())

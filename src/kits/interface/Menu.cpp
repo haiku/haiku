@@ -160,8 +160,7 @@ BMenu::BMenu(const char *name, float width, float height)
 
 BMenu::~BMenu()
 {
-	for (int i = 0; i < CountItems(); i++)
-		delete ItemAt(i);
+	RemoveItems(0, CountItems(), true);
 }
 
 
@@ -187,7 +186,7 @@ BMenu::Archive(BMessage *data, bool deep) const
 {
 	status_t err = BView::Archive(data, deep);
 
-	if (err != B_OK)
+	if (err < B_OK)
 		return err;
 
 	if (Layout() != B_ITEMS_IN_ROW) {
@@ -239,7 +238,7 @@ void
 BMenu::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-
+	
 	LayoutItems(0);
 }
 
@@ -287,10 +286,13 @@ BMenu::AddItem(BMenuItem *item, int32 index)
 bool
 BMenu::AddItem(BMenuItem *item, BRect frame)
 {
+	if (fLayout != B_ITEMS_IN_MATRIX)
+		debugger("BMenu::AddItem(BMenuItem *, BRect) this method can only"
+			" be called if the menu layout is B_ITEMS_IN_MATRIX");
+			
 	if (!item)
 		return false;
 	
-	frame.PrintToStream();	
 	item->fBounds = frame;
 	
 	return AddItem(item, CountItems());
@@ -326,6 +328,10 @@ BMenu::AddItem(BMenu *submenu, int32 index)
 bool
 BMenu::AddItem(BMenu *submenu, BRect frame)
 {
+	if (fLayout != B_ITEMS_IN_MATRIX)
+		debugger("BMenu::AddItem(BMenu *, BRect) this method can only"
+			" be called if the menu layout is B_ITEMS_IN_MATRIX");
+	
 	BMenuItem *item = new BMenuItem(submenu);
 	submenu->fSuper = this;
 	item->fBounds = frame;
@@ -1033,12 +1039,12 @@ void
 BMenu::_hide()
 {
 	BWindow *window = Window();
-
 	if (window) {
 		window->RemoveChild(this);
 		window->Lock();
 		window->Quit();
 	}
+	
 }
 
 
@@ -1059,9 +1065,7 @@ BMenu::_track(int *action, long start)
 				break;		
 			}
 				 
-			if (item && fSelected != item) {
-				SelectItem(item);						
-			}
+			SelectItem(item);						
 			
 			Draw(Bounds());
 			UnlockLooper();
@@ -1204,6 +1208,7 @@ BMenu::ComputeLayout(int32 index, bool bestFit, bool moveItems,
 		case B_ITEMS_IN_MATRIX:
 		{
 			printf("BMenu: B_ITEMS_IN_MATRIX not yet implemented\n");
+			frame = Frame();
 			break;
 		}
 		
@@ -1262,9 +1267,9 @@ BMenu::ScrollIntoView(BMenuItem *item)
 void
 BMenu::DrawItems(BRect updateRect)
 {
-	for (int i = 0; i < fItems.CountItems(); i++) {
+	for (int32 i = 0; i < fItems.CountItems(); i++) {
 		if (ItemAt(i)->Frame().Intersects(updateRect)) {
-			ItemAt(i)->Draw();
+			ItemAt(i)->Draw();			
 		}
 	}
 	Sync();
@@ -1395,8 +1400,14 @@ BMenu::Uninstall()
 
 
 void
-BMenu::SelectItem(BMenuItem *m, uint32 showSubmenu,bool selectFirstItem)
+BMenu::SelectItem(BMenuItem *menuItem, uint32 showSubmenu, bool selectFirstItem)
 {
+	if (menuItem != fSelected) {
+		if (fSelected != NULL)
+			fSelected->Select(false);
+		menuItem->Select(true);
+		fSelected = menuItem;
+	}
 }
 
 
