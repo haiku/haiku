@@ -1,0 +1,20 @@
+SubDir OBOS_TOP src add-ons print drivers preview ;
+
+UsePrivateHeaders interface print ;
+
+AddResources Preview : Preview.rsrc ;
+
+Addon Preview : print :
+	Utils.cpp
+	InterfaceUtils.cpp
+	MarginView.cpp
+	PrinterSetupWindow.cpp
+	PageSetupWindow.cpp
+	JobSetupWindow.cpp
+	Driver.cpp
+	PrinterDriver.cpp
+	Preview.cpp
+;
+
+LinkSharedOSLibs Preview : be root libprint.a ;
+
