@@ -1,11 +1,12 @@
-#ifndef CPP_H
-#define CPP_H
+#ifndef KERNEL_CPP_H
+#define KERNEL_CPP_H
 /* cpp - C++ in the kernel
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** This file may be used under the terms of the OpenBeOS License.
 */
 
+#ifdef __cplusplus
 
 #include <new>
 #include <stdlib.h>
@@ -74,5 +75,6 @@ operator delete[](void *ptr) throw ()
 extern "C" void __pure_virtual();
 
 #endif	// #if _KERNEL_MODE
+#endif	// __cplusplus
 
-#endif	/* CPP_H */
+#endif	/* KERNEL_CPP_H */
