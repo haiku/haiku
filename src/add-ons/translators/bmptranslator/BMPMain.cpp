@@ -12,14 +12,16 @@ int main()
 	BApplication app("application/x-vnd.obos-bmp-translator");
 	BMPTranslator *ptranslator = new BMPTranslator;
 	BView *v = NULL;
-	BRect r(0,0,200,100);
+	BRect r(0,0,225,175);
 	if (ptranslator->MakeConfigurationView(NULL, &v, &r)) {
 		BAlert *err = new BAlert("Error", "Something is wrong with the BMPTranslator!", "OK");
 		err->Go();
 		return 1;
 	}
+	// release the translator even though I never really used it anyway
 	ptranslator->Release();
-		// release the translator even though I never really used it anyway
+	ptranslator = NULL;
+		
 	BMPWindow *w = new BMPWindow(r);
 	v->ResizeTo(r.Width(), r.Height());
 	w->AddChild(v);
