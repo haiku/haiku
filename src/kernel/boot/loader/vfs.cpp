@@ -16,6 +16,15 @@
 #include <string.h>
 #include <fcntl.h>
 
+using namespace boot;
+
+#define TRACE_VFS 0
+#if TRACE_VFS
+#	define TRACE(x) printf x
+#else
+#	define TRACE(x) ;
+#endif
+
 
 class Descriptor {
 	public:
@@ -52,7 +61,7 @@ Directory *gRoot;
 
 Node::Node()
 	:
-	fRefCount(0)
+	fRefCount(1)
 {
 	fLink.next = fLink.prev = NULL;
 }
@@ -108,8 +117,11 @@ Node::Acquire()
 status_t 
 Node::Release()
 {
-	if (--fRefCount == 0)
+	if (--fRefCount == 0) {
+		TRACE(("delete node: %p\n", this));
 		delete this;
+		return 1;
+	}
 
 	return B_OK;
 }
@@ -230,7 +242,7 @@ Descriptor::WriteAt(off_t pos, const void *buffer, size_t bufferSize)
 }
 
 
-status_t 
+status_t
 Descriptor::Stat(struct stat &stat)
 {
 	stat.st_mode = fNode->Type();
@@ -256,6 +268,70 @@ Descriptor::Release()
 		if (status != B_OK)
 			return status;
 	}
+
+	return B_OK;
+}
+
+
+//	#pragma mark -
+
+
+status_t
+vfs_init(stage2_args *args)
+{
+	list_init(&gBootDevices);
+	list_init(&gPartitions);
+
+	status_t status = platform_get_boot_devices(args, &gBootDevices);
+	if (status < B_OK)
+		return status;
+
+	return B_OK;
+}
+
+
+status_t
+mount_boot_file_systems()
+{
+	list_init_etc(&gPartitions, Partition::LinkOffset());
+
+	gRoot = new RootFileSystem();
+	if (gRoot == NULL)
+		return B_NO_MEMORY;
+
+	Node *device = NULL, *last = NULL;
+	while ((device = (Node *)list_get_next_item(&gBootDevices, device)) != NULL) {
+		int fd = open_node(device, O_RDONLY);
+		if (fd < B_OK)
+			continue;
+
+//#if TRACE_VFS
+		char name[B_FILE_NAME_LENGTH];
+		if (device->GetName(name, sizeof(name)) == B_OK)
+			printf("add partitions for \"%s\"\n", name);
+//#endif
+
+		status_t status = add_partitions_for(fd);
+		if (status < B_OK)
+			printf("add_partitions_for(%d) failed: %s\n", fd, strerror(status));
+
+		close(fd);
+
+		// ToDo: we can't delete the object here, because it must
+		//	be removed from the list before we know that it was
+		//	deleted.
+
+/*		// if the Release() deletes the object, we need to skip it
+		if (device->Release() > 0) {
+			list_remove_item(&gBootDevices, device);
+			device = last;
+		}
+*/
+		last = device;
+	}
+
+	if (list_is_empty(&gPartitions))
+		return B_ENTRY_NOT_FOUND;
 
 	return B_OK;
 }
@@ -305,7 +381,7 @@ open_node(Node *node, int mode)
 	if (fd == MAX_VFS_DESCRIPTORS)
 		return B_ERROR;
 
-	printf("got descriptor %d\n", fd);
+	TRACE(("got descriptor %d\n", fd));
 
 	// we got a free descriptor entry, now try to open the node
 	
@@ -314,7 +390,7 @@ open_node(Node *node, int mode)
 	if (status < B_OK)
 		return status;
 
-	printf("could open node at %p\n", node);
+	TRACE(("could open node at %p\n", node));
 
 	Descriptor *descriptor = new Descriptor(node, cookie);
 	if (descriptor == NULL)
@@ -323,48 +399,6 @@ open_node(Node *node, int mode)
 	gDescriptors[fd] = descriptor;
 
 	return fd;
-}
-
-
-status_t
-vfs_init(stage2_args *args)
-{
-	list_init(&gBootDevices);
-	list_init(&gPartitions);
-
-	status_t status = platform_get_boot_devices(args, &gBootDevices);
-	if (status < B_OK)
-		return status;
-
-	return B_OK;
-}
-
-
-status_t
-mount_boot_file_systems()
-{
-	list_init_etc(&gPartitions, Partition::LinkOffset());
-
-	gRoot = new RootFileSystem();
-	if (gRoot == NULL)
-		return B_NO_MEMORY;
-
-	Node *device = NULL;
-	while ((device = (Node *)list_get_next_item(&gBootDevices, (void *)device)) != NULL) {
-		int fd = open_node(device, O_RDONLY);
-		if (fd < B_OK)
-			continue;
-
-		puts("add partitions");
-		add_partitions_for(fd);
-
-		close(fd);
-	}
-
-	if (list_is_empty(&gPartitions))
-		return B_ENTRY_NOT_FOUND;
-
-	return B_OK;
 }
 
 
