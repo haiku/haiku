@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2002, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -22,6 +22,7 @@
 //	File Name:		Globals.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
 //					Caz <turok2@currantbun.com>
+//					Axel Dörfler <axeld@pinc-software.de>
 //	Description:	Global functions and variables for the Interface Kit
 //
 //------------------------------------------------------------------------------
@@ -30,6 +31,7 @@
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
 #include <ServerProtocol.h>
+#include <ScrollBar.h>
 #include <Screen.h>
 #include <PortMessage.h>
 #include <Roster.h>
@@ -91,12 +93,28 @@ set_screen_space(int32 index, uint32 res, bool stick)
 }
 
 
+status_t
+get_scroll_bar_info(scroll_bar_info *info)
+{
+	if (info == NULL)
+		return B_BAD_VALUE;
+
+	// ToDo: implement get_scroll_bar_info() for real
+	info->proportional = true;
+	info->double_arrows = false;
+	info->knob = 0;
+	info->min_knob_size = (int32)B_V_SCROLL_BAR_WIDTH;
+
+	return B_ERROR;
+}
+
+
 _IMPEXP_BE status_t
 set_scroll_bar_info(scroll_bar_info *info)
 {
-	if(!info)
-		return B_ERROR;
-	
+	if (info == NULL)
+		return B_BAD_VALUE;
+
 	BAppServerLink link;
 	PortMessage msg;
 	
