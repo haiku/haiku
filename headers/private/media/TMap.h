@@ -18,6 +18,8 @@ public:
 	
 	~Map()
 	{
+		MakeEmpty();
+		free(items);
 	}
 
 	Map(const Map<key, value> &other)

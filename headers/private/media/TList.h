@@ -17,6 +17,8 @@ public:
 	
 	~List()
 	{
+		MakeEmpty();
+		free(items);
 	}
 
 	List(const List<value> &other)
