@@ -1,7 +1,7 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the Haiku License.
-*/
+ * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "video.h"
@@ -16,6 +16,7 @@
 #include <boot/menu.h>
 #include <boot/kernel_args.h>
 #include <util/list.h>
+#include <drivers/driver_settings.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -36,10 +37,12 @@ struct video_mode {
 };
 
 static vbe_info_block sInfo;
-video_mode *sMode;
-bool sVesaCompatible;
+static video_mode *sMode;
+static bool sVesaCompatible;
 struct list sModeList;
 static addr_t sFrameBuffer;
+static bool sModeChosen;
+static bool sSettingsLoaded;
 
 
 static void
@@ -283,6 +286,7 @@ video_mode_hook(Menu *menu, MenuItem *item)
 		sMode = mode;
 	}
 
+	sModeChosen = true;
 	return true;
 }
 
@@ -323,6 +327,60 @@ video_mode_menu()
 }
 
 
+static video_mode *
+find_video_mode(int32 width, int32 height, int32 depth)
+{
+	video_mode *mode = NULL;
+	while ((mode = (video_mode *)list_get_next_item(&sModeList, mode)) != NULL) {
+		if (mode->width == width
+			&& mode->height == height
+			&& mode->bits_per_pixel == depth) {
+			return mode;
+		}
+	}
+
+	return NULL;
+}
+
+
+static void
+get_mode_from_settings(void)
+{
+	if (sSettingsLoaded)
+		return;
+
+	void *handle = load_driver_settings("vesa");
+	if (handle == NULL)
+		return;
+
+	const driver_settings *settings = get_driver_settings(handle);
+	if (settings == NULL)
+		goto out;
+
+	sSettingsLoaded = true;
+
+	for (int32 i = 0; i < settings->parameter_count; i++) {
+		driver_parameter &parameter = settings->parameters[i];
+		
+		if (!strcmp(parameter.name, "mode") && parameter.value_count > 2) {
+			// parameter found, now get its values
+			int32 width = strtol(parameter.values[0], NULL, 0);
+			int32 height = strtol(parameter.values[1], NULL, 0);
+			int32 depth = 8; //strtol(parameter->values[2], NULL, 0);
+
+			// search mode that fits
+
+			video_mode *mode = find_video_mode(width, height, depth);
+			if (mode != NULL)
+				sMode = mode;
+		}
+	}
+
+out:
+	unload_driver_settings(handle);
+}
+
+
 //	#pragma mark -
 
 
@@ -336,6 +394,9 @@ platform_switch_to_logo(void)
 	if (!sVesaCompatible || sMode == NULL)
 		// no logo for now...
 		return;
+
+	if (!sModeChosen)
+		get_mode_from_settings();
 
 	if (vesa_set_mode(sMode->mode) != B_OK)
 		return;
@@ -400,7 +461,6 @@ platform_switch_to_logo(void)
 extern "C" void
 platform_switch_to_text_mode(void)
 {
-
 	if (!gKernelArgs.frame_buffer.enabled) {
 		vga_enable_bright_background_colors();
 		return;
