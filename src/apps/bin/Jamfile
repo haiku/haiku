@@ -11,6 +11,7 @@ StdBinCommands
 	listattr.cpp
 	lsindex.cpp
 	modifiers.cpp
+	open.cpp
 	quit.cpp
 	setversion.cpp
 	shutdown.cpp
