@@ -15,6 +15,8 @@
 struct real_time_data {
 	uint64	boot_time;
 	uint32	system_time_conversion_factor;
+	bigtime_t	timezone_offset;
+	bool	dst_observed;
 };
 
 #endif	/* _KERNEL_REAL_TIME_DATA_H */
