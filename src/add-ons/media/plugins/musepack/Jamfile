@@ -1,0 +1,15 @@
+SubDir OBOS_TOP src add-ons media plugins musepack ;
+
+UsePrivateHeaders media ;
+
+Addon musepack : media plugins :
+	MusePack.cpp
+	MusePackReader.cpp
+	MusePackDecoder.cpp
+	: false
+	: libmusepack.a
+	;
+
+LinkSharedOSLibs musepack : be libmedia.so ;
+
+SubInclude OBOS_TOP src add-ons media plugins musepack mpc ;
