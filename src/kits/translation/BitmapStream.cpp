@@ -63,7 +63,7 @@ BBitmapStream::BBitmapStream(BBitmap *bitmap)
 	fDetached = false;
 	fPosition = 0;
 	fSize = 0;
-	fpBigEndianHeader = NULL;
+	fpBigEndianHeader = new TranslatorBitmap;
 	
 	// Extract header information if bitmap is available
 	if (fBitmap) {
@@ -75,7 +75,10 @@ BBitmapStream::BBitmapStream(BBitmap *bitmap)
 			((fHeader.bounds.Height() + 1) * fHeader.rowBytes);
 		fSize = sizeof(TranslatorBitmap) + fHeader.dataSize;
 		
-		SetBigEndianHeader();
+		if (B_HOST_IS_BENDIAN)
+			memcpy(fpBigEndianHeader, &fHeader, sizeof(TranslatorBitmap));
+		else
+			SwapHeader(&fHeader, fpBigEndianHeader);			
 	}
 }
 
@@ -96,11 +99,10 @@ BBitmapStream::BBitmapStream(BBitmap *bitmap)
 // ---------------------------------------------------------------
 BBitmapStream::~BBitmapStream()
 {
-	if (fBitmap && !fDetached)
+	if (!fDetached)
 		delete fBitmap;
 		
-	if (fpBigEndianHeader)
-		delete fpBigEndianHeader;
+	delete fpBigEndianHeader;
 }
 
 // ---------------------------------------------------------------
@@ -213,11 +215,10 @@ BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 		// If we change the header, the rest needs to be reset
 		if (pos == sizeof(TranslatorBitmap)) {
 			// Setup both host and Big Endian byte order bitmap headers
-			if (ConvertBEndianToHost(&fHeader) != B_OK)
-				return B_ERROR;
-			if (SetBigEndianHeader() != B_OK)
-				return B_ERROR;
-			
+			memcpy(fpBigEndianHeader, &fHeader, sizeof(TranslatorBitmap));
+			if (B_HOST_IS_LENDIAN)
+				SwapHeader(fpBigEndianHeader, &fHeader);
+							
 			if (fBitmap && ((fBitmap->Bounds() != fHeader.bounds) ||
 					(fBitmap->ColorSpace() != fHeader.colors) ||
 					(fBitmap->BytesPerRow() != fHeader.rowBytes))) {
@@ -391,69 +392,30 @@ BBitmapStream::DetachBitmap(BBitmap **outBitmap)
 }
 
 // ---------------------------------------------------------------
-// ConvertBEndianToHost
+// SwapHeader
 //
-// This static function converts a TranslatorBitmap from Big
-// Endian byte order to the host byte order.
+// Swaps the byte order of source, no matter what the
+// byte order, and copies the result to destination
 //
-// Preconditions: Data pointed to by pheader must be in
-//                Big Endian byte order
+// Preconditions: both parameters must not be null
 //
-// Parameters: pheader, the TranslatorBitmap structure to convert
+// Parameters:	source,			data to be swapped
 //
-// Postconditions: 
-//
-// Returns: B_OK, if the byte swap succeeded
-//          B_BAD_VALUE, if pheader is NULL, 
-//                       or the byte swap failed
-// ---------------------------------------------------------------
-status_t
-BBitmapStream::ConvertBEndianToHost(TranslatorBitmap *pheader)
-{
-	if (!pheader)
-		return B_BAD_VALUE;
-		
-	return swap_data(B_UINT32_TYPE, pheader, sizeof(TranslatorBitmap),
-		B_SWAP_BENDIAN_TO_HOST);
-}
-
-// ---------------------------------------------------------------
-// SetBigEndianHeader
-//
-// Assigns fpBigEndianHeader to the Big Endian byte order version
-// of fHeader, the bitmap header information. fpBigEndianHeader is
-// used by ReadAt() to send out the bitmap header in the Big
-// Endian byte order.
-//
-// Preconditions: fHeader must be in the host byte order for
-//                this function to work properly
-//
-// Parameters:
+//				destination,	where the swapped data will
+//								be copied to
 //
 // Postconditions:
 //
-// Returns: B_OK, if the byte swap succeeded
-//			B_ERROR, if failed to allocate memory for
-//			         big endian header
-//          B_BAD_VALUE, if the byte swap failed
+// Returns: 
+//
 // ---------------------------------------------------------------
-status_t
-BBitmapStream::SetBigEndianHeader()
+void
+BBitmapStream::SwapHeader(const TranslatorBitmap *source,
+	TranslatorBitmap *destination)
 {
-	if (!fpBigEndianHeader) {
-		fpBigEndianHeader = new TranslatorBitmap;
-		if (!fpBigEndianHeader)
-			return B_ERROR;
-	}
-		
-	fpBigEndianHeader->magic = fHeader.magic;
-	fpBigEndianHeader->bounds = fHeader.bounds;
-	fpBigEndianHeader->rowBytes = fHeader.rowBytes;
-	fpBigEndianHeader->colors = fHeader.colors;
-	fpBigEndianHeader->dataSize = fHeader.dataSize;
-	
-	return swap_data(B_UINT32_TYPE, fpBigEndianHeader,
-		sizeof(TranslatorBitmap), B_SWAP_HOST_TO_BENDIAN);
+	memcpy(destination, source, sizeof(TranslatorBitmap));
+	swap_data(B_UINT32_TYPE, destination, sizeof(TranslatorBitmap),
+		B_SWAP_ALWAYS);
 }
 
 // ---------------------------------------------------------------
