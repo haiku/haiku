@@ -214,7 +214,7 @@ arch_cpu_idle(void)
 {
 	switch (smp_get_num_cpus()) {
 		case 0:
-			panic("You need at least 1 CPU to run NewOS\n");
+			panic("You need at least 1 CPU to run OpenBeOS\n");
 		case 1:
 			asm("hlt");
 		default:
