@@ -38,19 +38,19 @@ typedef enum {
 } image_type;
 
 typedef struct {
-	image_id	id;					
-	image_type	type;				
-	int32		sequence;			
-	int32		init_order;			
+	image_id	id;
+	image_type	type;
+	int32		sequence;
+	int32		init_order;
 	void		(*init_routine)();
 	void		(*term_routine)();
-	dev_t		device;				
+	dev_t		device;
 	ino_t		node;
-	char        name[MAXPATHLEN];  
-	void		*text;	
+	char		name[MAXPATHLEN];
+	void		*text;
 	void		*data;
-	int32		text_size;	
-	int32		data_size;	
+	int32		text_size;
+	int32		data_size;
 } image_info;
 
 extern _IMPEXP_ROOT thread_id	load_image(int32 argc, const char **argv,
@@ -87,7 +87,7 @@ extern _IMPEXP_ROOT status_t	get_nth_image_symbol(image_id imid, int32 index,
 /*---------------------------------------------------------*/
 /*----- cache manipulation --------------------------------*/
 
-#define B_FLUSH_DCACHE         0x0001  /* dcache = data cache */
+#define B_FLUSH_DCACHE         0x0001	/* dcache = data cache */
 #define B_FLUSH_ICACHE         0x0004	/* icache = instruction cache */
 #define B_INVALIDATE_DCACHE    0x0002	 
 #define B_INVALIDATE_ICACHE    0x0008   
@@ -100,7 +100,4 @@ extern _IMPEXP_ROOT void	clear_caches(void *addr, size_t len, uint32 flags);
 }
 #endif
 
-/*-------------------------------------------------------------*/
-/*-------------------------------------------------------------*/
-
-#endif /* _IMAGE_H */
+#endif	/* _IMAGE_H */
