@@ -213,7 +213,7 @@ i386_handle_trap(struct iframe frame)
 			ret = i386_handle_breakpoint_exception(&frame);
 			break;
 		case 8:		// double fault
-			ret = i386_double_fault(frame.error_code);
+			ret = i386_double_fault(&frame);
 			break;
 		case 13:	// general protection fault
 			ret = i386_general_protection_fault(frame.error_code);

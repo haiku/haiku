@@ -42,7 +42,21 @@ TRAP(trap4, 4)
 TRAP(trap5, 5)
 TRAP(trap6, 6)
 TRAP(trap7, 7)
-TRAP_ERRC(trap8, 8)
+
+.globl double_fault;
+.align 8;
+double_fault:
+	pushl	$-1;	// user-ss
+	pushl	$-1;	// user-esp
+	pushl	$-1;	// flags
+	pushl	$KERNEL_CODE_SEG;	// cs
+	pushl	$-1;	// eip
+	pushl	$0;		// error-code
+	pushl	$8;
+	pushl	$-1;
+	pushl	$-1;
+	jmp		int_bottom
+
 TRAP(trap9, 9)
 TRAP_ERRC(trap10, 10)
 TRAP_ERRC(trap11, 11)

@@ -75,6 +75,8 @@ void i386_fxrstor(const void *fpu_state);
 void i386_fsave_swap(void *old_fpu_state, const void *new_fpu_state);
 void i386_fxsave_swap(void *old_fpu_state, const void *new_fpu_state);
 void x86_set_task_gate(int32 n, int32 segment);
+struct tss *x86_get_main_tss(void);
+
 
 #define read_ebp(value) \
 	__asm__("movl	%%ebp,%0" : "=r" (value))

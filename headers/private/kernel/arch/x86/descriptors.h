@@ -17,8 +17,8 @@
 	// this file can also be included from assembler as well
 	// (and is in arch_interrupts.S)
 
-#define DOUBLE_FAULT_TSS_SEGMENT 5
-#define TSS_BASE_SEGMENT 6
+#define DOUBLE_FAULT_TSS_BASE_SEGMENT 5
+#define TSS_BASE_SEGMENT (DOUBLE_FAULT_TSS_BASE_SEGMENT + smp_get_num_cpus())
 #define TLS_BASE_SEGMENT (TSS_BASE_SEGMENT + smp_get_num_cpus())
 
 
@@ -125,7 +125,7 @@ set_tss_descriptor(struct segment_descriptor *desc, addr_t base, uint32 limit)
 	desc->privilege_level = DPL_KERNEL;
 
 	desc->present = 1;
-	desc->granularity = 1;	// 4 GB size (in page size steps)
+	desc->granularity = 0;	// 1 Byte granularity
 	desc->available = 0;	// system available bit is currently not used
 	desc->d_b = 0;
 

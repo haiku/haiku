@@ -5,8 +5,10 @@
 #ifndef _NEWOS_KERNEL_ARCH_I386_FAULTS
 #define _NEWOS_KERNEL_ARCH_I386_FAULTS
 
+struct iframe;
+
 int i386_general_protection_fault(int errorcode);
-int i386_double_fault(int errorcode);
+int i386_double_fault(struct iframe *frame);
 
 #endif
 

@@ -8,6 +8,7 @@
 #include <faults_priv.h>
 #include <boot/kernel_args.h>
 
+#include <arch/cpu.h>
 #include <arch/faults.h>
 
 // XXX this module is largely outdated. Will probably be removed later.
@@ -22,11 +23,17 @@ int i386_general_protection_fault(int errorcode)
 	return general_protection_fault(errorcode);
 }
 
-int i386_double_fault(int errorcode)
+int i386_double_fault(struct iframe *frame)
 {
-	kprintf("double fault! errorcode = 0x%x\n", errorcode);
-	dprintf("double fault! errorcode = 0x%x\n", errorcode);
-	for(;;);
+	struct tss *tss = x86_get_main_tss();
+	
+	frame->cs = tss->cs;
+	frame->eip = tss->eip;
+	frame->esp = tss->esp;
+	frame->flags = tss->eflags;
+	
+	panic("double fault! errorcode = 0x%x\n", frame->error_code);
+
 	return B_HANDLED_INTERRUPT;
 }
 
