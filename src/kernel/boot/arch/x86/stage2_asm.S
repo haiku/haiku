@@ -2,7 +2,8 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
-/* long long rdtsc() */
+
+/* uint64 rdtsc() */
 .global rdtsc
 rdtsc:
 	rdtsc
@@ -32,17 +33,6 @@ execute_n_instructions:
 	loop	.again
 	ret
 
-.global system_time_setup
-system_time_setup:
-	/* First divide 1M * 2^32 by proc_clock */
-	movl	$0x0F4240, %ecx
-	movl	%ecx, %edx
-	subl	%eax, %eax
-	movl	4(%esp), %ebx
-	divl	%ebx, %eax		/* should be 64 / 32 */
-	movl	%eax, cv_factor
-	ret
-
 .global system_time
 system_time:
    	/* load 64-bit factor into %eax (low), %edx (high) */
@@ -50,7 +40,6 @@ system_time:
 	rdtsc		/* time in %edx,%eax */
 
 	pushl	%ebx
-	pushl	%ecx
 	movl	cv_factor, %ebx
 	movl	%edx, %ecx	/* save high half */
 	mull	%ebx 		/* truncate %eax, but keep %edx */
@@ -61,7 +50,6 @@ system_time:
 	subl	%ebx, %ebx	/* need zero to propagate carry */
 	addl	%ecx, %eax
 	adc		%ebx, %edx
-	popl	%ecx
 	popl	%ebx
 	ret
 

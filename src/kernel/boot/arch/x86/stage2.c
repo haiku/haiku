@@ -2,6 +2,7 @@
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
+
 #include <bootdir.h>
 #include <stage2.h>
 #include "arch/x86/stage2_priv.h"
@@ -14,6 +15,14 @@
 
 const unsigned kBSSSize = 0x9000;
 
+#define STAGE2_TRACE 0
+#if STAGE2_TRACE
+#	define PRINT(x) dprintf x
+#	define MESSAGE(x) dprintf x
+#else
+#	define PRINT(x)
+#	define MESSAGE(x)
+#endif
 
 // we're running out of the first 'file' contained in the bootdir, which is
 // a set of binaries and data packed back to back, described by an array
@@ -29,7 +38,6 @@ static kernel_args *ka = (kernel_args *)0x20000;
 // needed for message
 static unsigned short *kScreenBase = (unsigned short*) 0xb8000;
 static unsigned screenOffset = 0;
-static unsigned int line = 0;
 
 unsigned int cv_factor = 0;
 
@@ -48,13 +56,17 @@ static int mmu_init(kernel_args *ka, unsigned int *next_paddr);
 static void mmu_map_page(unsigned int vaddr, unsigned int paddr);
 static int check_cpu(void);
 
-// called by the stage1 bootloader.
-// State:
-//   32-bit
-//   mmu disabled
-//   stack somewhere below 1 MB
-//   supervisor mode
-void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
+
+/* called by the stage1 bootloader.
+ * State:
+ *   32-bit
+ *   mmu disabled
+ *   stack somewhere below 1 MB
+ *   supervisor mode
+ */
+
+void
+_start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 {
 	unsigned int *idt;
 	unsigned int *gdt;
@@ -67,18 +79,19 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 	asm("fninit");		// initialize floating point unit
 
 	clearscreen();
+
 	dprintf("stage2 bootloader entry.\n");
 	dprintf("memsize = 0x%x, in_vesa %d, vesa_ptr 0x%x\n", mem, in_vesa, vesa_ptr);
 
 	// verify we can run on this cpu
-	if(check_cpu() < 0) {
+	if (check_cpu() < 0) {
 		dprintf("\nSorry, this computer appears to be lacking some of the features\n");
-		dprintf("needed by OpenBeOS. It is currently only able to run on\n");
+		dprintf("needed by NewOS. It is currently only able to run on\n");
 		dprintf("Pentium class cpus and above, with a few exceptions to\n");
 		dprintf("that rule.\n");
 		dprintf("\nPlease reset your computer to continue.");
 
-		for(;;);
+		for (;;);
 	}
 
 	// calculate the conversion factor that translates rdtsc time to real microseconds
@@ -87,14 +100,14 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 	// calculate how big the bootdir is so we know where we can start grabbing pages
 	{
 		int entry;
-		for (entry = 0; entry < 64; entry++) {
+		for (entry = 0; entry < BOOTDIR_MAX_ENTRIES; entry++) {
 			if (bootdir[entry].be_type == BE_TYPE_NONE)
 				break;
 
 			bootdir_pages += bootdir[entry].be_size;
 		}
 
-//		nmessage("bootdir is ", bootdir_pages, " pages long\n");
+		MESSAGE(("bootdir is ", bootdir_pages, " pages long\n"));
 	}
 
 	ka->bootdir_addr.start = (unsigned long)bootdir;
@@ -102,7 +115,7 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 
 	next_paddr = BOOTDIR_ADDR + bootdir_pages * PAGE_SIZE;
 
-	if(in_vesa) {
+	if (in_vesa) {
 		struct VBEModeInfoBlock *mode_info = (struct VBEModeInfoBlock *)(vesa_ptr + 0x200);
 
 		ka->fb.enabled = 1;
@@ -112,9 +125,8 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		ka->fb.mapping.start = mode_info->phys_base_ptr;
 		ka->fb.mapping.size = ka->fb.x_size * ka->fb.y_size * (ka->fb.bit_depth/8);
 		ka->fb.already_mapped = 0;
-	} else {
+	} else
 		ka->fb.enabled = 0;
-	}
 
 	mmu_init(ka, &next_paddr);
 
@@ -122,21 +134,21 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 	load_elf_image((void *)(bootdir[2].be_offset * PAGE_SIZE + BOOTDIR_ADDR), &next_paddr,
 			&ka->kernel_seg0_addr, &ka->kernel_seg1_addr, &kernel_entry, &ka->kernel_dynamic_section_addr);
 
-	if(ka->kernel_seg1_addr.size > 0)
+	if (ka->kernel_seg1_addr.size > 0)
 		next_vaddr = ROUNDUP(ka->kernel_seg1_addr.start + ka->kernel_seg1_addr.size, PAGE_SIZE);
 	else
 		next_vaddr = ROUNDUP(ka->kernel_seg0_addr.start + ka->kernel_seg0_addr.size, PAGE_SIZE);
 
 	// map in a kernel stack
 	ka->cpu_kstack[0].start = next_vaddr;
-	for(i=0; i<STACK_SIZE; i++) {
+	for (i = 0; i < STACK_SIZE; i++) {
 		mmu_map_page(next_vaddr, next_paddr);
 		next_vaddr += PAGE_SIZE;
 		next_paddr += PAGE_SIZE;
 	}
 	ka->cpu_kstack[0].size = next_vaddr - ka->cpu_kstack[0].start;
 
-//	dprintf("new stack at 0x%x to 0x%x\n", ka->cpu_kstack[0].start, ka->cpu_kstack[0].start + ka->cpu_kstack[0].size);
+	PRINT(("new stack at 0x%x to 0x%x\n", ka->cpu_kstack[0].start, ka->cpu_kstack[0].start + ka->cpu_kstack[0].size));
 
 	// set up a new idt
 	{
@@ -147,10 +159,10 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		ka->arch_args.phys_idt = (unsigned int)idt;
 		next_paddr += PAGE_SIZE;
 
-//		nmessage("idt at ", (unsigned int)idt, "\n");
+		MESSAGE(("idt at ", (unsigned int)idt, "\n"));
 
 		// clear it out
-		for(i=0; i<IDT_LIMIT/4; i++) {
+		for (i = 0; i < IDT_LIMIT / 4; i++) {
 			idt[i] = 0;
 		}
 
@@ -166,7 +178,7 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		asm("lidt	%0;"
 			: : "m" (idt_descr));
 
-//		nmessage("idt at virtual address ", next_vpage, "\n");
+		MESSAGE(("idt at virtual address ", next_vpage, "\n"));
 	}
 
 	// set up a new gdt
@@ -178,7 +190,7 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		ka->arch_args.phys_gdt = (unsigned int)gdt;
 		next_paddr += PAGE_SIZE;
 
-//		nmessage("gdt at ", (unsigned int)gdt, "\n");
+		MESSAGE(("gdt at ", (unsigned int)gdt, "\n"));
 
 		// put segment descriptors in it
 		gdt[0] = 0;
@@ -205,7 +217,7 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		asm("lgdt	%0;"
 			: : "m" (gdt_descr));
 
-//		nmessage("gdt at virtual address ", next_vpage, "\n");
+		MESSAGE(("gdt at virtual address ", next_vpage, "\n"));
 	}
 
 	// Map the pg_dir into kernel space at 0xffc00000-0xffffffff
@@ -251,12 +263,12 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 	dprintf("virt_alloc_range_high = 0x%x\n", ka->virt_alloc_range_high);
 	dprintf("page_hole = 0x%x\n", ka->page_hole);
 #endif
-//	dprintf("finding and booting other cpus...\n");
+	PRINT(("finding and booting other cpus...\n"));
 	smp_boot(ka, kernel_entry);
 
 	dprintf("jumping into kernel at 0x%x\n", kernel_entry);
 
-	ka->cons_line = line;
+	ka->cons_line = screenOffset / SCREEN_WIDTH;
 
 	asm("movl	%0, %%eax;	"			// move stack out of way
 		"movl	%%eax, %%esp; "
@@ -269,7 +281,9 @@ void _start(unsigned int mem, int in_vesa, unsigned int vesa_ptr)
 		: : "g" (ka), "g" (kernel_entry));
 }
 
-static void load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0, addr_range *ar1, unsigned int *start_addr, addr_range *dynamic_section)
+
+static void
+load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0, addr_range *ar1, unsigned int *start_addr, addr_range *dynamic_section)
 {
 	struct Elf32_Ehdr *imageHeader = (struct Elf32_Ehdr*) data;
 	struct Elf32_Phdr *segments = (struct Elf32_Phdr*)(imageHeader->e_phoff + (unsigned) imageHeader);
@@ -284,7 +298,7 @@ static void load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0
 		struct Elf32_Phdr *segment = &segments[segmentIndex];
 		unsigned segmentOffset;
 
-		switch(segment->p_type) {
+		switch (segment->p_type) {
 			case PT_LOAD:
 				break;
 			case PT_DYNAMIC:
@@ -294,9 +308,9 @@ static void load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0
 				continue;
 		}
 
-//		dprintf("segment %d\n", segmentIndex);
-//		dprintf("p_vaddr 0x%x p_paddr 0x%x p_filesz 0x%x p_memsz 0x%x\n",
-//			segment->p_vaddr, segment->p_paddr, segment->p_filesz, segment->p_memsz);
+		PRINT(("segment %d\n", segmentIndex));
+		PRINT(("p_vaddr 0x%x p_paddr 0x%x p_filesz 0x%x p_memsz 0x%x\n",
+			segment->p_vaddr, segment->p_paddr, segment->p_filesz, segment->p_memsz));
 
 		/* Map initialized portion */
 		for (segmentOffset = 0;
@@ -310,20 +324,21 @@ static void load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0
 		}
 
 		/* Clean out the leftover part of the last page */
-		if(segment->p_filesz % PAGE_SIZE > 0) {
-//			dprintf("memsetting 0 to va 0x%x, size %d\n", (void*)((unsigned)segment->p_vaddr + segment->p_filesz), PAGE_SIZE  - (segment->p_filesz % PAGE_SIZE));
+		if (segment->p_filesz % PAGE_SIZE > 0) {
+			PRINT(("memsetting 0 to va 0x%x, size %d\n", (void*)((unsigned)segment->p_vaddr + segment->p_filesz), PAGE_SIZE  - (segment->p_filesz % PAGE_SIZE)));
 			memset((void*)((unsigned)segment->p_vaddr + segment->p_filesz), 0, PAGE_SIZE
 				- (segment->p_filesz % PAGE_SIZE));
 		}
 
 		/* Map uninitialized portion */
 		for (; segmentOffset < ROUNDUP(segment->p_memsz, PAGE_SIZE); segmentOffset += PAGE_SIZE) {
-//			dprintf("mapping zero page at va 0x%x\n", segment->p_vaddr + segmentOffset);
+			PRINT(("mapping zero page at va 0x%x\n", segment->p_vaddr + segmentOffset));
 			mmu_map_page(segment->p_vaddr + segmentOffset, *next_paddr);
 			memset((void *)(segment->p_vaddr + segmentOffset), 0, PAGE_SIZE);
 			(*next_paddr) += PAGE_SIZE;
 		}
-		switch(foundSegmentIndex) {
+
+		switch (foundSegmentIndex) {
 			case 0:
 				ar0->start = segment->p_vaddr;
 				ar0->size = segment->p_memsz;
@@ -340,10 +355,14 @@ static void load_elf_image(void *data, unsigned int *next_paddr, addr_range *ar0
 	*start_addr = imageHeader->e_entry;
 }
 
-// allocate a page directory and page table to facilitate mapping
-// pages to the 0x80000000 - 0x80400000 region.
-// also identity maps the first 4MB of memory
-static int mmu_init(kernel_args *ka, unsigned int *next_paddr)
+
+/* allocate a page directory and page table to facilitate mapping
+ * pages to the 0x80000000 - 0x80400000 region.
+ * also identity maps the first 8MB of memory
+ */
+
+static int
+mmu_init(kernel_args *ka, unsigned int *next_paddr)
 {
 	int i;
 
@@ -353,7 +372,7 @@ static int mmu_init(kernel_args *ka, unsigned int *next_paddr)
 	ka->arch_args.phys_pgdir = (unsigned int)pgdir;
 
 	// clear out the pgdir
-	for(i = 0; i < 1024; i++)
+	for (i = 0; i < 1024; i++)
 		pgdir[i] = 0;
 
 	// make a pagetable at this random spot
@@ -361,10 +380,18 @@ static int mmu_init(kernel_args *ka, unsigned int *next_paddr)
 
 	for (i = 0; i < 1024; i++) {
 		pgtable[i] = (i * 0x1000) | DEFAULT_PAGE_FLAGS;
-	}	// pkx: create first 4 MB one-to-one mapping
+	}
 
 	pgdir[0] = (unsigned int)pgtable | DEFAULT_PAGE_FLAGS;
-		// pkx: put the one-to-one mapping into the page dir.
+
+	// make another pagetable at this random spot
+	pgtable = (unsigned int *)0x12000;
+
+	for (i = 0; i < 1024; i++) {
+		pgtable[i] = (i * 0x1000 + 0x400000) | DEFAULT_PAGE_FLAGS;
+	}
+
+	pgdir[1] = (unsigned int)pgtable | DEFAULT_PAGE_FLAGS;
 
 	// Get new page table and clear it out
 	pgtable = (unsigned int *)*next_paddr;
@@ -389,30 +416,37 @@ static int mmu_init(kernel_args *ka, unsigned int *next_paddr)
 	return 0;
 }
 
-// can only map the 4 meg region right after KERNEL_BASE, may fix this later
-// if need arises.
-static void mmu_map_page(unsigned int vaddr, unsigned int paddr)
+
+/* can only map the 4 meg region right after KERNEL_BASE, may fix this later
+ * if need arises.
+ */
+
+static void
+mmu_map_page(unsigned int vaddr, unsigned int paddr)
 {
-//	dprintf("mmu_map_page: vaddr 0x%x, paddr 0x%x\n", vaddr, paddr);
-	if(vaddr < KERNEL_BASE || vaddr >= (KERNEL_BASE + 4096*1024)) {
+	PRINT(("mmu_map_page: vaddr 0x%x, paddr 0x%x\n", vaddr, paddr));
+
+	if (vaddr < KERNEL_BASE || vaddr >= (KERNEL_BASE + 4096*1024)) {
 		dprintf("mmu_map_page: asked to map invalid page!\n");
 		for(;;);
 	}
 	paddr &= ~(PAGE_SIZE-1);
-//	dprintf("paddr 0x%x @ index %d\n", paddr, (vaddr % (PAGE_SIZE * 1024)) / PAGE_SIZE);
+
+	PRINT(("paddr 0x%x @ index %d\n", paddr, (vaddr % (PAGE_SIZE * 1024)) / PAGE_SIZE));
 	pgtable[(vaddr % (PAGE_SIZE * 1024)) / PAGE_SIZE] = paddr | DEFAULT_PAGE_FLAGS;
 }
 
-static int check_cpu(void)
+
+static int
+check_cpu(void)
 {
-//	unsigned int i;
 	unsigned int data[4];
 	char str[17];
 
 	// check the eflags register to see if the cpuid instruction exists
-	if((get_eflags() & 1<<21) == 0) {
-		set_eflags(get_eflags() | 1<<21);
-		if((get_eflags() & 1<<21) == 0) {
+	if ((get_eflags() & (1 << 21)) == 0) {
+		set_eflags(get_eflags() | (1 << 21));
+		if ((get_eflags() & (1 << 21)) == 0) {
 			// we couldn't set the ID bit of the eflags register, this cpu is old
 			return -1;
 		}
@@ -436,18 +470,22 @@ static int check_cpu(void)
 
 	// check for bits we need
 	cpuid(1, data);
-	if(!(data[3] & 1<<4)) return -1; // check for rdtsc
+	if (!(data[3] & (1 << 4)))
+		return -1; // check for rdtsc
 
 	return 0;
 }
 
-void sleep(long long time)
+
+void
+sleep(uint64 time)
 {
-	long long start = system_time();
+	uint64 start = system_time();
 
 	while(system_time() - start <= time)
 		;
 }
+
 
 #define outb(value,port) \
 	asm("outb %%al,%%dx"::"a" (value),"d" (port))
@@ -461,50 +499,186 @@ void sleep(long long time)
 
 #define TIMER_CLKNUM_HZ 1193167
 
-static void calculate_cpu_conversion_factor(void)
+static void
+calculate_cpu_conversion_factor(void)
 {
-	unsigned char	low, high;
-	unsigned long	expired;
-	long long		t1, t2;
-	long long       time_base_ticks;
-	double			timer_usecs;
+	unsigned       s_low, s_high;
+	unsigned       low, high;
+	unsigned long  expired;
+	uint64         t1, t2;
+	uint64         p1, p2, p3;
+	double         r1, r2, r3;
 
-	/* program the timer to count down mode */
-	outb(0x34, 0x43);
-
-	outb(0xff, 0x40);		/* low and then high */
+	outb(0x34, 0x43);	/* program the timer to count down mode */
+	outb(0xff, 0x40);	/* low and then high */
 	outb(0xff, 0x40);
 
+	/* quick sample */
+quick_sample:
+	do {
+		outb(0x00, 0x43); /* latch counter value */
+		s_low = inb(0x40);
+		s_high = inb(0x40);
+	} while(s_high != 255);
 	t1 = rdtsc();
-
-	execute_n_instructions(32*20000);
-
+	do {
+		outb(0x00, 0x43); /* latch counter value */
+		low = inb(0x40);
+		high = inb(0x40);
+	} while (high > 224);
 	t2 = rdtsc();
 
-	outb(0x00, 0x43); /* latch counter value */
-	low = inb(0x40);
-	high = inb(0x40);
+	p1 = t2-t1;
+	r1 = (double)(p1) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
 
-	expired = (unsigned long)0xffff - ((((unsigned long)high) << 8) + low);
+	/* not so quick sample */
+not_so_quick_sample:
+	do {
+		outb(0x00, 0x43); /* latch counter value */
+		s_low = inb(0x40);
+		s_high = inb(0x40);
+	} while (s_high!= 255);
+	t1 = rdtsc();
+	do {
+		outb(0x00, 0x43); /* latch counter value */
+		low = inb(0x40);
+		high = inb(0x40);
+	} while (high> 192);
+	t2 = rdtsc();
+	p2 = t2-t1;
+	r2 = (double)(p2) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
+	if ((r1/r2) > 1.01) {
+		dprintf("Tuning loop(1)\n");
+		goto quick_sample;
+	}
+	if ((r1/r2) < 0.99) {
+		dprintf("Tuning loop(1)\n");
+		goto quick_sample;
+	}
 
-	timer_usecs = (expired * 1.0) / (TIMER_CLKNUM_HZ/1000000.0);
-	time_base_ticks = t2 -t1;
+	/* slow sample */
+	do {
+		outb(0x00, 0x43); /* latch counter value */
+		s_low = inb(0x40);
+		s_high = inb(0x40);
+	} while (s_high!= 255);
+	t1 = rdtsc();
+	do {
+		outb(0x00, 0x43); /* latch counter value */
+		low = inb(0x40);
+		high = inb(0x40);
+	} while (high > 128);
+	t2 = rdtsc();
 
-	dprintf("CPU at %d Hz\n", (int)((time_base_ticks / timer_usecs) * 1000000));
+	p3 = t2-t1;
+	r3 = (double)(p3) / (double)(((s_high << 8) | s_low) - ((high << 8) | low));
+	if ((r2/r3) > 1.01) {
+		dprintf("Tuning loop(2)\n");
+		goto not_so_quick_sample;
+	}
+	if ((r2/r3) < 0.99) {
+		dprintf("Tuning loop(2)\n");
+		goto not_so_quick_sample;
+	}
 
-	system_time_setup((int)((time_base_ticks / timer_usecs) * 1000000));
+	expired = ((s_high << 8) | s_low) - ((high << 8) | low);
+	p3 *= TIMER_CLKNUM_HZ;
+
+	/*
+	 * cv_factor contains time in usecs per CPU cycle * 2^32
+	 *
+	 * The code below is a bit fancy. Originally Michael Noistering
+	 * had it like:
+	 *
+	 *     cv_factor = ((uint64)1000000<<32) * expired / p3;
+	 *
+	 * whic is perfect, but unfortunately 1000000ULL<<32*expired
+	 * may overflow in fast cpus with the long sampling period
+	 * i put there for being as accurate as possible under
+	 * vmware.
+	 *
+	 * The below calculation is based in that we are trying
+	 * to calculate:
+	 *
+	 *     (C*expired)/p3 -> (C*(x0<<k + x1))/p3 ->
+	 *     (C*(x0<<k))/p3 + (C*x1)/p3
+	 *
+	 * Now the term (C*(x0<<k))/p3 is rewritten as:
+	 *
+	 *     (C*(x0<<k))/p3 -> ((C*x0)/p3)<<k + reminder
+	 *
+	 * where reminder is:
+	 *
+	 *     floor((1<<k)*decimalPart((C*x0)/p3))
+	 *  
+	 * which is approximated as:
+	 *
+	 *     floor((1<<k)*decimalPart(((C*x0)%p3)/p3)) ->
+	 *     (((C*x0)%p3)<<k)/p3
+	 *
+	 * So the final expression is:
+	 *
+	 *     ((C*x0)/p3)<<k + (((C*x0)%p3)<<k)/p3 + (C*x1)/p3
+	 *
+	 * Just to make things fancier we choose k based on the input
+	 * parameters (we use log2(expired)/3.)
+	 *
+	 * Of course, you are not expected to understand any of this.
+	 */
+	{
+		unsigned i;
+		unsigned k;
+		uint64 C;
+		uint64 x0;
+		uint64 x1;
+		uint64 a, b, c;
+
+		/* first calculate k*/
+		k = 0;
+		for (i = 0; i< 32; i++) {
+			if (expired & (1<<i))
+				k = i;
+		}
+		k /= 3;
+
+		C = 1000000ULL << 32;
+		x0 = expired >> k;
+		x1 = expired & ((1 << k) - 1);
+
+		a = ((C * x0) / p3) << k;
+		b = (((C * x0) % p3) << k) / p3;
+		c = (C * x1) / p3;
+#if 0
+		dprintf("a=%Ld\n", a);
+		dprintf("b=%Ld\n", b);
+		dprintf("c=%Ld\n", c);
+		dprintf("%d %Ld\n", expired, p3);
+#endif
+		cv_factor = a + b + c;
+#if 0
+		dprintf("cvf=%Ld\n", cv_factor);
+#endif
+	}
+
+	if (p3 / expired / 1000000000LL)
+		dprintf("CPU at %Ld.%03Ld GHz\n", p3/expired/1000000000LL, ((p3/expired)%1000000000LL)/1000000LL);
+	else
+		dprintf("CPU at %Ld.%03Ld MHz\n", p3/expired/1000000LL, ((p3/expired)%1000000LL)/1000LL);
 }
 
-void clearscreen()
+
+void
+clearscreen()
 {
 	int i;
 
-	for(i=0; i< SCREEN_WIDTH*SCREEN_HEIGHT*2; i++) {
+	for (i = 0; i < SCREEN_WIDTH * SCREEN_HEIGHT; i++)
 		kScreenBase[i] = 0xf20;
-	}
 }
 
-static void scrup()
+
+static void
+scrup()
 {
 	int i;
 	memcpy(kScreenBase, kScreenBase + SCREEN_WIDTH,
@@ -512,21 +686,18 @@ static void scrup()
 	screenOffset = (SCREEN_HEIGHT - 1) * SCREEN_WIDTH;
 	for(i=0; i<SCREEN_WIDTH; i++)
 		kScreenBase[screenOffset + i] = 0x0720;
-	line = SCREEN_HEIGHT - 1;
 }
 
-void kputs(const char *str)
+
+void
+kputs(const char *str)
 {
 	while (*str) {
-		if (*str == '\n') {
-			line++;
-			if(line > SCREEN_HEIGHT - 1)
-				scrup();
-			else
-				screenOffset += SCREEN_WIDTH - (screenOffset % 80);
-		} else {
+		if (*str == '\n')
+			screenOffset += SCREEN_WIDTH - (screenOffset % 80);
+		else
 			kScreenBase[screenOffset++] = 0xf00 | *str;
-		}
+
 		if (screenOffset > SCREEN_WIDTH * SCREEN_HEIGHT)
 			scrup();
 
@@ -534,7 +705,9 @@ void kputs(const char *str)
 	}
 }
 
-int dprintf(const char *fmt, ...)
+
+int
+dprintf(const char *fmt, ...)
 {
 	int ret;
 	va_list args;
