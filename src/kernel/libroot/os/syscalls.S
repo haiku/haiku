@@ -26,7 +26,7 @@
 /* ToDo: we should do something about this file; either machine generate it */
 /* or make it more intelligent... it's really boring to maintain this one. */
 
-SYSCALL0(sys_null, 0)
+SYSCALL0(_kern_null, 0)
 
 /* VFS calls */
 SYSCALL4(_kern_mount, 1)
