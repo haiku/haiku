@@ -535,7 +535,8 @@ ShowImageView::AlignBitmap()
 	width = Bounds().Width()-2*PEN_SIZE+1;
 	height = Bounds().Height()-2*PEN_SIZE+1;
 	if (width == 0 || height == 0) return rect;
-	fShrinkOrZoomToBounds = fShrinkToBounds && (rect.Width() >= Bounds().Width() || rect.Height() >= Bounds().Height()) ||
+	fShrinkOrZoomToBounds = fShrinkToBounds && 
+		(rect.Width() >= Bounds().Width() || rect.Height() >= Bounds().Height()) ||
 		fZoomToBounds && rect.Width() < Bounds().Width() && rect.Height() < Bounds().Height();
 	if (fShrinkOrZoomToBounds) {
 		float s;
@@ -554,9 +555,16 @@ ShowImageView::AlignBitmap()
 			rect.OffsetBy(static_cast<int>((width - rect.Width()) / 2), 0);
 		}
 	} else {
+		float zoom;
+		if (fShrinkToBounds || fZoomToBounds) {
+			// ignore user zoom setting in automatic zoom modes
+			zoom = 1.0;
+		} else {
+			zoom = fZoom;
+		}
 		// zoom image
-		rect.right = static_cast<int>((rect.right+1.0)*fZoom)-1; 
-		rect.bottom = static_cast<int>((rect.bottom+1.0)*fZoom)-1;
+		rect.right = static_cast<int>((rect.right+1.0)*zoom)-1; 
+		rect.bottom = static_cast<int>((rect.bottom+1.0)*zoom)-1;
 		// align
 		switch (fHAlignment) {
 			case B_ALIGN_CENTER:
