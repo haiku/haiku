@@ -370,37 +370,43 @@ static int simple_module_info(module_info *mod, const char *file, int offset)
 
 /* recurse_check_file
  * Load the file filepath and check to see if we have a module within it
- * that matches srcfile.
+ * that matches module_wanted.
  *
- * NB srcfile can be NULL if we're just scanning the modules.
+ * NB module_wanted could be NULL if we're just scanning the modules.
  *
  * Return
  *  -1 on error
  *   0 on no match
  *   1 on match
  */
-static int recurse_check_file(const char *filepath, const char *srcfile)
+static int recurse_check_file(const char *filepath, const char *module_wanted)
 {
 	module_info **hdr = NULL, **chk;
-	int res = 0, i = 0;
+	int i = 0, match = 0;
 
-	hdr = load_module_file(filepath);
-	
-	if (!hdr) {
+	if ((hdr = load_module_file(filepath)) == NULL)
 		return -1;
-	}
 	
 	for (chk = hdr; *chk; chk++) {
-		if ((res = simple_module_info(*chk, filepath, i++)) != 0) {
-			if (srcfile && strcmp((*chk)->name, srcfile) == 0)
-				res = 1;
+		/* if simple_module_info returns 0 then we have found a new
+		 * module and added it to the hash table. The question is now
+		 * is this new module the one we're looking for?
+		 * module_wanted may be a NULL, which is why we check for it.
+		 */
+		if (simple_module_info(*chk, filepath, i++) == 0) {
+			if (module_wanted && strcmp((*chk)->name, module_wanted) == 0)
+				match = 1;
 		}
 	}
-	
-	if (res != 1)
+
+	/* If match != 1 then the modules we've found in the file don't match
+	 * the one we're looking for. Unload the module as we're not about to need
+	 * anything from it.
+	 */	
+	if (match != 1)
 		unload_module_file(filepath);
 
-	return res;
+	return match;
 }
 	
 /* recurse_directory
@@ -973,11 +979,15 @@ int	get_module(const char *path, module_info **vec)
 {
 	module *m = (module *)hash_lookup(modules_list, path);
 	loaded_module *lm;
-	int res = B_NO_ERROR, do_init = 0;
+	int res = B_NO_ERROR;
 	*vec = NULL;
 	
-dprintf("*** get_module: %s\n", path);
+	dprintf("*** get_module: %s\n", path);
 	
+	/* If m == NULL we didn't find any record of the module 
+	 * in our hash. We'll now call serach_mdoules which will do
+	 * scan of the possible directories that may contain it.
+	 */
 	if (!m) {
 		m = search_module(path);
 		if (!m) {
@@ -1004,8 +1014,6 @@ dprintf("*** get_module: %s\n", path);
 		lm = (loaded_module*)hash_lookup(module_files, m->file);
 		if (!lm)
 			return ENOENT;
-		/* just been loaded, run the init routine */
-		do_init = 1;
 	}
 
 	/* We have the module file required in memory! */
@@ -1022,8 +1030,10 @@ dprintf("*** get_module: %s\n", path);
 		return res;
 	}
 	
-	/* Only run the init routine after we are loaded. */
-	if (do_init)
+	/* Only run the init routine if we have ref_cnt == 1. This should
+	 * indicate that we have just been loaded.
+	 */
+	if (m->ref_cnt == 1)
 		res = init_module(m);
 
 	return res;
