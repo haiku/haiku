@@ -36,10 +36,11 @@
 #include <string.h>
 
 #include <NetDebug.h>
+#include <SupportDefs.h>
 
 
 // Off by default cuz the BeBook sez so.
-static bool g_IsEnabled = false;
+static bool g_NetDebugEnabled = false;
 
 
 /* Enable
@@ -58,7 +59,7 @@ static bool g_IsEnabled = false;
  */
 void BNetDebug::Enable( bool Enable )
 {
-    g_IsEnabled = Enable;
+    g_NetDebugEnabled = Enable;
 }
 
 
@@ -72,7 +73,7 @@ void BNetDebug::Enable( bool Enable )
  */
 bool BNetDebug::IsEnabled( void )
 {
-    return g_IsEnabled;
+    return g_NetDebugEnabled;
 }
 
 
@@ -94,15 +95,13 @@ bool BNetDebug::IsEnabled( void )
  */
 void BNetDebug::Print( const char* msg )
 {
-    if ( g_IsEnabled )
-    {
-        if ( msg == NULL )
-        {
-            msg = "";
-        }
+	if ( !g_NetDebugEnabled )
+    	return;
 
-        fprintf( stderr, "debug: %s\n", msg );
-    }
+	if (msg == NULL)
+		msg = "(null)";
+
+	fprintf( stderr, "debug: %s\n", msg );
 }
 
 
@@ -138,47 +137,51 @@ void BNetDebug::Print( const char* msg )
  *       reasonably cohesive in appearance.  This might be an expensive
  *       operation so use judiciously.
  */
-void BNetDebug::Dump( const char* data, size_t size, const char* title )
+void BNetDebug::Dump(const char* data, size_t size, const char* title)
 {
-    int     i;
-    char    line[17];
 
-    if ( g_IsEnabled == false )
-    {
+    if ( ! g_NetDebugEnabled)
         return;
-    }
+        
+    fprintf( stderr, "----------\n%s\n(dumping %ld bytes)\n",
+    	title ? title : "(untitled)", size );
+    
+    if (! data)
+    	fprintf(stderr, "NULL data!\n");
+    else {
+		uint32	i,j;
+	  	char text[96];	// only 3*16 + 3 + 16 max by line needed
+		uint8 *byte = (uint8 *) data;
+		char *ptr;
 
-    fprintf( stderr, "----------\n%s\n(dumping %d bytes)\n", title, size );
+		for ( i = 0; i < size; i += 16 )	{
+			ptr = text;
 
-    memset( line, 0, sizeof( line ) );
+	      	for ( j = i; j < i+16 ; j++ ) {
+				if ( j < size )
+					sprintf(ptr, "%02x ", byte[j]);
+				else
+					sprintf(ptr, "   ");
+				ptr += 3;
+			};
+			
+			strcat(ptr, "| ");
+			ptr += 2;
+			
+			for (j = i; j < size && j < i+16;j++) {
+				if ( byte[j] >= 0x20 && byte[j] < 0x7e )
+					*ptr = byte[j];
+				else
+					*ptr = '.';
+				ptr++;
+			};
 
-    while ( i < size )
-    {
-        fprintf( stderr, "%02x ", ( unsigned char )data[i] );
-
-        line[i % 16] = ( isprint( data[i] ) ) ? data[i] : '.';
-
-        if ( ( i + 1 ) % 16 == 0 )
-        {
-            fprintf( stderr, "  |  %s\n", line );
-            memset( line, 0, sizeof( line ) );
-        }
-
-        i++;
-    }
-
-    if ( ( i + 1 ) % 16 != 0 )
-    {
-        while ( i % 16 != 0 )
-        {
-            printf( "   " );
-            i++;
-        }
-
-        fprintf( stderr, "  |  %s", line );
-    }
-
-    fprintf( stderr, "\n----------\n" );
+			ptr[0] = '\n';
+			ptr[1] = '\0';
+			fprintf(stderr, text);
+		};
+	};
+    fprintf( stderr, "----------\n" );
     fflush( stderr );
 }
 
