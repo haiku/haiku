@@ -46,36 +46,131 @@ int main()
 	out("Calling consumer->Node()\n");
 	destinationNode = consumer->Node();
 
+
+	live_node_info live_nodes[100];
+	int32 live_count;
+	media_format liveformat;
+	memset(&liveformat, 0, sizeof(liveformat));
+
+	liveformat.type = B_MEDIA_RAW_AUDIO;
+
+	out("Calling GetLiveNodes(), has_input = B_MEDIA_RAW_AUDIO\n");
+	live_count = 100;
+	rv = roster->GetLiveNodes(live_nodes, &live_count, &liveformat);
+	val(rv);
+	out("Found %ld\n",live_count);
+
+	out("Calling GetLiveNodes(), has_output = B_MEDIA_RAW_AUDIO\n");
+	live_count = 100;
+	rv = roster->GetLiveNodes(live_nodes, &live_count, NULL, &liveformat);
+	val(rv);
+	out("Found %ld\n",live_count);
+
+	out("Calling GetLiveNodes(), has_input = has_output = B_MEDIA_RAW_AUDIO\n");
+	live_count = 100;
+	rv = roster->GetLiveNodes(live_nodes, &live_count, &liveformat, &liveformat);
+	val(rv);
+	out("Found %ld\n",live_count);
+
+	liveformat.type = B_MEDIA_RAW_VIDEO;
+
+	out("Calling GetLiveNodes(), has_input = B_MEDIA_RAW_VIDEO\n");
+	live_count = 100;
+	rv = roster->GetLiveNodes(live_nodes, &live_count, &liveformat);
+	val(rv);
+	out("Found %ld\n",live_count);
+
+	out("Calling GetLiveNodes(), has_output = B_MEDIA_RAW_VIDEO\n");
+	live_count = 100;
+	rv = roster->GetLiveNodes(live_nodes, &live_count, NULL, &liveformat);
+	val(rv);
+	out("Found %ld\n",live_count);
+
+	out("Calling GetLiveNodes(), has_input = has_output = B_MEDIA_RAW_VIDEO\n");
+	live_count = 100;
+	rv = roster->GetLiveNodes(live_nodes, &live_count, &liveformat, &liveformat);
+	val(rv);
+	out("Found %ld\n",live_count);
+
+
 	media_output output;
 	media_input input;
+	media_output outputs[2];
+	media_input inputs[2];
 	int32 count;
 
-#if 1
 	out("Calling GetAllOutputsFor(source)\n");
-	rv = roster->GetAllOutputsFor(sourceNode,&output,1,&count);
+	rv = roster->GetAllOutputsFor(sourceNode,outputs,2,&count);
 	val(rv);
+	out("Found %ld\n",count);
 	rv = (count == 1) ? B_OK : B_ERROR;
 	val(rv);
 
 	out("Calling GetAllInputsFor(destination)\n");
-	rv = roster->GetAllInputsFor(destinationNode,&input,1,&count);
+	rv = roster->GetAllInputsFor(destinationNode,inputs,2,&count);
 	val(rv);
+	out("Found %ld\n",count);
 	rv = (count == 1) ? B_OK : B_ERROR;
 	val(rv);
-#else
+
+	out("Calling GetAllInputsFor(source) (should fail)\n");
+	rv = roster->GetAllInputsFor(sourceNode,inputs,2,&count);
+	val(rv);
+	out("Found %ld\n",count);
+
+	out("Calling GetAllOutputsFor(destination) (should fail)\n");
+	rv = roster->GetAllOutputsFor(destinationNode,outputs,2,&count);
+	val(rv);
+	out("Found %ld\n",count);
+
+	out("Calling GetConnectedOutputsFor(source)\n");
+	rv = roster->GetConnectedOutputsFor(sourceNode,outputs,2,&count);
+	val(rv);
+	out("Found %ld\n",count);
+	rv = (count == 0) ? B_OK : B_ERROR;
+	val(rv);
+
+	out("Calling GetConnectedInputsFor(destination)\n");
+	rv = roster->GetConnectedInputsFor(destinationNode,inputs,2,&count);
+	val(rv);
+	out("Found %ld\n",count);
+	rv = (count == 0) ? B_OK : B_ERROR;
+	val(rv);
+
+	out("Calling GetConnectedInputsFor(source) (should fail)\n");
+	rv = roster->GetConnectedInputsFor(sourceNode,inputs,2,&count);
+	val(rv);
+	out("Found %ld\n",count);
+
+	out("Calling GetConnectedOutputsFor(destination) (should fail)\n");
+	rv = roster->GetConnectedOutputsFor(destinationNode,outputs,2,&count);
+	val(rv);
+	out("Found %ld\n",count);
+
 	out("Calling GetFreeOutputsFor(source)\n");
 	rv = roster->GetFreeOutputsFor(sourceNode,&output,1,&count,B_MEDIA_RAW_AUDIO);
 	val(rv);
+	out("Found %ld\n",count);
 	rv = (count == 1) ? B_OK : B_ERROR;
 	val(rv);
 
 	out("Calling GetFreeInputsFor(destination)\n");
 	rv = roster->GetFreeInputsFor(destinationNode,&input,1,&count,B_MEDIA_RAW_AUDIO);
 	val(rv);
+	out("Found %ld\n",count);
 	rv = (count == 1) ? B_OK : B_ERROR;
 	val(rv);
-#endif
 		
+	out("Calling GetFreeOutputsFor(destination) (should fail)\n");
+	rv = roster->GetFreeOutputsFor(destinationNode,outputs,2,&count,B_MEDIA_RAW_AUDIO);
+	val(rv);
+	out("Found %ld\n",count);
+
+	out("Calling GetFreeInputsFor(source) (should fail)\n");
+	rv = roster->GetFreeInputsFor(sourceNode,inputs,2,&count,B_MEDIA_RAW_AUDIO);
+	val(rv);
+	out("Found %ld\n",count);
+
 	media_format format;
 	format.type = B_MEDIA_RAW_AUDIO; 
 	format.u.raw_audio = media_raw_audio_format::wildcard;
