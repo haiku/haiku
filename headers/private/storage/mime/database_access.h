@@ -1,4 +1,11 @@
-// mime/database_access.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file database_access.h
+	Mime database atomic read function declarations
+*/
 
 #ifndef _MIME_DATABASE_ACCESS_H
 #define _MIME_DATABASE_ACCESS_H

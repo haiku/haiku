@@ -1,4 +1,11 @@
-// mime/Database.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file Database.cpp
+	Database class declarations
+*/
 
 #ifndef _MIME_DATABASE_H
 #define _MIME_DATABASE_H

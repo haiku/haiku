@@ -1,4 +1,11 @@
-// mime/database_support.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file database_support.h
+	Private mime database function and constant declarations
+*/
 
 #ifndef _MIME_DATABASE_SUPPORT_H
 #define _MIME_DATABASE_SUPPORT_H
@@ -48,6 +55,10 @@ extern const int32 kLargeIconType;
 extern const int32 kPreferredAppType;
 extern const int32 kSnifferRuleType;
 extern const int32 kSupportedTypesType;
+
+// Message fields
+extern const char *kTypesField;
+extern const char *kSupertypesField;
 
 std::string type_to_filename(const char *type);
 

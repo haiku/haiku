@@ -1,4 +1,11 @@
-// mime/Database.cpp
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file Database.cpp
+	Database class implementation
+*/
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -103,6 +110,8 @@ Database::Install(const char *type)
 			bool didCreate = false;
 			BNode node;
 			err = open_or_create_type(type, &node, &didCreate);
+			if (didCreate)
+				fInstalledTypes.AddType(type);
 		}
 	}
 	return err;
@@ -124,8 +133,10 @@ Database::Delete(const char *type)
 		err = entry.SetTo(type_to_filename(type).c_str());		 
 	if (!err)
 		err = entry.Remove();
-	if (!err)
+	if (!err) {
+		fInstalledTypes.RemoveType(type);
 		err = SendDeleteNotification(type);
+	}
 	return err;
 }
 
@@ -288,8 +299,8 @@ Database::SetIconForType(const char *type, const char *fileType, const void *dat
 	ssize_t err = (type && data) ? B_OK : B_BAD_VALUE;
 
 	std::string attr;
-	int32 attrType;
-	int32 attrSize;
+	int32 attrType = 0;
+	size_t attrSize = 0;
 	
 	// Figure out what kind of data we *should* have
 	if (!err) {
@@ -329,7 +340,7 @@ Database::SetIconForType(const char *type, const char *fileType, const void *dat
 	if (!err)
 		err = node.WriteAttr(attr.c_str(), attrType, 0, data, attrSize);
 	if (err >= 0)
-		err = err == attrSize ? B_OK : B_FILE_ERROR;
+		err = err == (ssize_t)attrSize ? B_OK : B_FILE_ERROR;
 	return err;			
 
 }
@@ -374,22 +385,19 @@ Database::SetSupportedTypes(const char *type, const BMessage *types)
 status_t
 Database::GetInstalledSupertypes(BMessage *supertypes)
 {
-//	return fInstalledTypes.GetInstalledSupertypes(supertypes);
-	return B_ERROR;
+	return fInstalledTypes.GetInstalledSupertypes(supertypes);
 }
 
 status_t
 Database::GetInstalledTypes(BMessage *types)
 {
-//	return fInstalledTypes.GetInstalledTypes(types);
-	return B_ERROR;
+	return fInstalledTypes.GetInstalledTypes(types);
 }
 
 status_t
 Database::GetInstalledTypes(const char *supertype, BMessage *subtypes)
 {
-//	return fInstalledTypes.GetInstalledTypes(supertype, subtypes);
-	return B_ERROR;
+	return fInstalledTypes.GetInstalledTypes(supertype, subtypes);
 }
 
 status_t

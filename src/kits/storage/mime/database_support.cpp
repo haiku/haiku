@@ -1,4 +1,11 @@
-// database_support.cpp
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file database_support.cpp
+	Private mime database functions and constants
+*/
 
 #include <DataIO.h>
 #include <Directory.h>
@@ -68,6 +75,9 @@ const int32 kPreferredAppType		= 'MSIG';
 const int32 kSnifferRuleType		= B_STRING_TYPE;
 const int32 kSupportedTypesType	= B_MESSAGE_TYPE;
 
+// Message fields
+const char *kTypesField			= "types";
+const char *kSupertypesField	= "super_types";
 
 
 // type_to_filename
@@ -119,7 +129,7 @@ open_or_create_type(const char *type, BNode *result, bool *didCreate)
 		// Figure out what type of node we need to create
 		// + Supertype == directory
 		// + Non-supertype == file
-		int32 pos = typeLower.find_first_of('/');
+		uint32 pos = typeLower.find_first_of('/');
 		if (pos == std::string::npos) {
 			// Supertype == directory				
 			BDirectory parent(kDatabaseDir.c_str());
@@ -237,7 +247,7 @@ write_mime_attr(const char *type, const char *attr, const void *data,
 		if (bytes < B_OK)
 			err = bytes;
 		else
-			err = (bytes != len ? B_FILE_ERROR : B_OK);
+			err = (bytes != (ssize_t)len ? B_FILE_ERROR : B_OK);
 	}
 	return err;
 }
@@ -270,7 +280,7 @@ write_mime_attr_message(const char *type, const char *attr, const BMessage *msg,
 	if (!err) 
 		err = node.WriteAttr(attr, B_MESSAGE_TYPE, 0, data.Buffer(), data.BufferLength());
 	if (err >= 0)
-		err = err == data.BufferLength() ? B_OK : B_FILE_ERROR;
+		err = err == (ssize_t)data.BufferLength() ? B_OK : B_FILE_ERROR;
 	return err;
 }
 

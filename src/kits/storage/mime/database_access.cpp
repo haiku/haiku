@@ -1,4 +1,11 @@
-// mime/Database.cpp
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file database_access.cpp
+	Mime database atomic read functions
+*/
 
 #include <Bitmap.h>
 #include <Entry.h>
@@ -202,10 +209,9 @@ get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 	attr_info info;
 	ssize_t err;
 	BNode node;
-	uint32 attrType;
-	size_t attrSize;
+	uint32 attrType = 0;
+	ssize_t attrSize = 0;
 	BRect bounds;
-	char *buffer;
 
 	err = type && icon ? B_OK : B_BAD_VALUE;
 	
@@ -249,7 +255,6 @@ get_icon_for_type(const char *type, const char *fileType, BBitmap *icon,
 	if (!err) {
 		bool otherColorSpace = (icon->ColorSpace() != B_CMAP8);
 		char *buffer = NULL;
-		ssize_t read;
 		if (otherColorSpace) {
 			// other color space than stored in attribute
 			buffer = new(nothrow) char[attrSize];
@@ -376,7 +381,7 @@ get_icon_data(const BBitmap *icon, icon_size which, void **data, int32 *dataSize
 						// Set each pixel individually, since SetBits() for B_RGB32 takes
 						// 24-bit rgb pixel data...
 						char *bgra = (char*)icon->Bits();
-						for (uint32 i = 0; i*4+3 < icon->BitsLength(); bgra += 4, i++) {
+						for (int32 i = 0; i*4+3 < icon->BitsLength(); bgra += 4, i++) {
 							char rgb[3];
 							rgb[0] = bgra[2];	// red
 							rgb[1] = bgra[1];	// green

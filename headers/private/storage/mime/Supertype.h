@@ -1,4 +1,11 @@
-// mime/Supertype.h
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file Supertype.h
+	Supertype class declarations
+*/
 
 #ifndef _MIME_SUPERTYPE_H
 #define _MIME_SUPERTYPE_H
@@ -16,15 +23,24 @@ namespace Mime {
 
 class Supertype {
 public:
-	Supertype(const char *super);
+	Supertype(const char *super = NULL);
 	~Supertype();
+	
+	status_t GetInstalledSubtypes(BMessage *types);
 		
-	void AddSubtype(const char *sub);
-	void FillMessageWithTypes(BMessage *msg);
+	status_t AddSubtype(const char *sub);
+	status_t RemoveSubtype(const char *sub);
+	
+	void SetName(const char *super);
+	const char* GetName();
+	
+	status_t FillMessageWithTypes(BMessage &msg) const;
 private:
+	status_t CreateMessageWithTypes(BMessage **result) const;
+
 	std::set<std::string> fSubtypes;
 	BMessage *fCachedMessage;
-	std::string fType;
+	std::string fName;
 };
 	
 } // namespace Mime

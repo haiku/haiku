@@ -1,9 +1,22 @@
-// mime/InstalledTypes.cpp
+//----------------------------------------------------------------------
+//  This software is part of the OpenBeOS distribution and is covered 
+//  by the OpenBeOS license.
+//---------------------------------------------------------------------
+/*!
+	\file InstalledTypes.cpp
+	InstalledTypes class implementation
+*/
 
 #include "mime/InstalledTypes.h"
 
+#include <Directory.h>
+#include <Entry.h>
 #include <Message.h>
+#include <MimeType.h>
+#include <mime/database_support.h>
+#include <storage_support.h>
 
+#include <new>
 #include <stdio.h>
 
 #define DBG(x) x
@@ -14,195 +27,350 @@ namespace BPrivate {
 namespace Storage {
 namespace Mime {
 
+/*!
+	\class InstalledTypes
+	\brief Installed types information for the entire database
+*/
+
+// Constructor
+//! Constructs a new InstalledTypes object
 InstalledTypes::InstalledTypes()
 	: fCachedMessage(NULL)
+	, fCachedSupertypesMessage(NULL)
+	, fHaveDoneFullBuild(false)
 {
 }
 
+// Destructor
+//! Destroys the InstalledTypes object
 InstalledTypes::~InstalledTypes()
 {
+	delete fCachedSupertypesMessage;
 	delete fCachedMessage;
 }
 
-/*
-MimeDatabaseBackend::MimeDatabaseBackend()
-	: fCachedInstalledTypesMessage(NULL)
-	, fCachedInstalledSupertypesMessage(NULL)
+// GetInstalledTypes
+/*! \brief Returns a list of all currently installed types in the
+	pre-allocated \c BMessage pointed to by \c types.
+	
+	See \c BMimeType::GetInstalledTypes(BMessage*) for more information.
+*/
+status_t 
+InstalledTypes::GetInstalledTypes(BMessage *types) 
 {
-}
-
-MimeDatabaseBackend::~MimeDatabaseBackend()
-{
-	delete fCachedInstalledTypesMessage;
-	delete fCachedInstalledSupertypesMessage;
-}
-
-status_t
-MimeDatabaseBackend::GetInstalledTypes(BMessage *types)
-{
-	DBG(OUT("MimeDatabaseBackend::GetInstalledTypes(1)\n"));
 	status_t err = types ? B_OK : B_BAD_VALUE;
+	// See if we need to do our initial build still
+	if (!err && !fHaveDoneFullBuild) {
+		err = BuildInstalledTypesList();
+	}
+	// See if we need to fill up a new message
+	if (!err && !fCachedMessage) {
+		err = CreateMessageWithTypes(&fCachedMessage);
+	}
+	// If we get this far, there a cached message waiting
 	if (!err) {
-		if (!fCachedInstalledTypesMessage) {
-			if (fInstalledTypes.begin() == fInstalledTypes.end())
-				err = BuildInstalledTypesList(&fCachedInstalledTypesMessage);
-			else
-				err = BuildInstalledTypesMessage(&fCachedInstalledTypesMessage);
+		*types = *fCachedMessage;
+	}
+	return err;
+}
+
+// GetInstalledTypes
+/*! \brief Returns a list of all currently installed types of the given
+	supertype in the pre-allocated \c BMessage pointed to by \c types.
+	
+	See \c BMimeType::GetInstalledTypes(const char*, BMessage*) for more
+	information.
+*/
+status_t 
+InstalledTypes::GetInstalledTypes(const char *supertype, BMessage *types)
+{
+	status_t err = supertype && types ? B_OK : B_BAD_VALUE;	
+	// Verify the supertype is valid *and* is a supertype
+	BMimeType mime;
+	BMimeType super;
+	// Make sure the supertype is valid
+	if (!err)
+		err = mime.SetTo(supertype);
+	// Make sure it's really a supertype
+	if (!err && !mime.IsSupertypeOnly())
+		err = B_BAD_VALUE;
+	// See if we need to do our initial build still
+	if (!err && !fHaveDoneFullBuild) {
+		err = BuildInstalledTypesList();
+	}
+	// Ask the appropriate supertype for its list
+	if (!err) {
+		std::map<std::string, Supertype>::iterator i = fSupertypes.find(supertype);
+		if (i != fSupertypes.end()) 
+			err = i->second.GetInstalledSubtypes(types);
+		else
+			err = B_NAME_NOT_FOUND;
+	}
+	return err;
+}
+
+// GetInstalledSupertypes
+/*! \brief Returns a list of all currently installed supertypes in the
+	pre-allocated \c BMessage pointed to by \c types.
+	
+	See \c BMimeType::GetInstalledSupertypes() for more information.
+*/
+status_t 
+InstalledTypes::GetInstalledSupertypes(BMessage *types)
+{
+	status_t err = types ? B_OK : B_BAD_VALUE;
+	// See if we need to do our initial build still
+	if (!err && !fHaveDoneFullBuild) {
+		err = BuildInstalledTypesList();
+	}
+	// See if we need to fill up a new message
+	if (!err && !fCachedSupertypesMessage) {
+		err = CreateMessageWithSupertypes(&fCachedSupertypesMessage);
+	}
+	// If we get this far, there's a cached message waiting
+	if (!err) {
+		*types = *fCachedSupertypesMessage;
+	}
+	return err;
+}
+
+// AddType
+/*! \brief Adds the given type to the appropriate lists of installed types.
+	
+	If cached messages exist, the type is simply appended to the end of
+	the current type list.
+*/
+status_t
+InstalledTypes::AddType(const char *type)
+{
+	status_t err;
+	if (fHaveDoneFullBuild) {
+		BMimeType mime(type);
+		BMimeType super;
+		err = type ? mime.InitCheck() : B_BAD_VALUE;
+		if (!err) {
+			// Find the / in the string, if one exists
+			uint i;
+			size_t len = strlen(type);
+			for (i = 0; i < len; i++) {
+				if (type[i] == '/')
+					break;
+			}
+			if (i == len) {
+				// Supertype only
+				std::map<std::string, Supertype>::iterator i;
+				err = AddSupertype(type, i);
+			} else {
+				// Copy the supertype
+				char super[B_PATH_NAME_LENGTH+1];
+				strncpy(super, type, i);
+				super[i] = 0;
+				
+				// Get a pointer to the subtype
+				const char *sub = &(type[i+1]);
+				
+				// Add the subtype (which will add the supertype if necessary)
+				err = AddSubtype(super, sub);
+			}
 		}
-		*types = *fCachedInstalledTypesMessage;	
+	} else {
+		err = B_OK;
 	}
-	DBG(OUT("MimeDatabaseBackend::GetInstalledTypes(1) done\n"));
-	return err;		
+	return err;
 }
 
+// RemoveType
+/*! \brief Removes the given type from the appropriate installed types lists.
+
+	Any corresponding cached messages are invalidated.
+*/
 status_t
-MimeDatabaseBackend::GetInstalledTypes(const char *supertype, BMessage *types)
+InstalledTypes::RemoveType(const char *type)
 {
-	DBG(OUT("MimeDatabaseBackend::GetInstalledTypes(2)\n"));
-	status_t err = supertype && types && BMimeType::IsValid(supertype) ? B_OK : B_BAD_VALUE;
-	
-	// Types are not case sensitive, so we always use lowercase
-	char lowertype[B_PATH_NAME_LENGTH+1];
-	BPrivate::Storage::to_lower(supertype, lowertype);
-	installed_subtypes_info *info;
-	
-	// See if we need to build the main list
-	if (!err && fSupertypesMap.empty())
-		err = BuildInstalledTypesList();
-	// See if the supertype even exists
-	if (!err) {
-		std::map<std::string, installed_subtypes_info>::iterator i = fSupertypesMap.find(supertype);		
-		err =  i != fSupertypesMap.end() ? B_OK : B_BAD_VALUE;
-		if (!err)
-			info = &(i->second);
-	}
-	// Make sure there's a cached message waiting for us
-	if (!err && !info->cached_message) 
-		err = BuildInstalledTypesMessage(info->subtypes, &(info->cached_message));
-	// Copy the message into the result
-	if (!err)		
-		*types = *info->cached_message;
-	DBG(OUT("MimeDatabaseBackend::GetInstalledTypes(2) done\n"));
-	return err;		
-}
-
-status_t
-MimeDatabaseBackend::GetInstalledSupertypes(BMessage *types)
-{
-	DBG(OUT("MimeDatabaseBackend::GetInstalledSupertypes()\n"));
-	status_t err = types ? B_OK : B_BAD_VALUE;
-	
-	// See if we need to build the main list
-	if (!err && fSupertypesMap.empty())
-		err = BuildInstalledTypesList();
-	// Make sure there's a cached message waiting for us
-	if (!err && !fCachedInstalledSupertypesMessage) 
-		err = BuildInstalledSupertypesMessage(fSupertypesMap, &fCachedInstalledSupertypesMessage);
-	// Copy the message into the result
-	if (!err)		
-		*types = *fCachedInstalledSupertypesMessage;
-	DBG(OUT("MimeDatabaseBackend::GetInstalledSupertypes() done\n"));
-	return err;		
-}
-
-status_t
-MimeDatabaseBackend::GetSupportingApps(const char *type, BMessage *signatures)
-{
-	return B_ERROR;	// not implemented
-}
-
-void
-MimeDatabaseBackend::InstallType(const char *type)
-{
-	DBG(OUT("MimeDatabaseBackend::InstallType()\n"));
-	if (fInstalledTypes.empty())
-		return;
-	// Remove any cached messages
-	if (fCachedInstalledTypesMessage) {
-		delete fCachedInstalledTypesMessage;
-		fCachedInstalledTypesMessage = NULL;
-	}
-	if (fCachedInstalledSupertypesMessage) {
-		delete fCachedInstalledSupertypesMessage;
-		fCachedInstalledSupertypesMessage = NULL;
-	}
-	char lowertype[B_PATH_NAME_LENGTH+1];
-	char supertype[B_PATH_NAME_LENGTH+1];
-	Storage::to_lower(type, lowertype);
-	fInstalledTypes.insert(lowertype);
-	BMimeType mime(lowertype);
-	BMimeType super;
-	status_t err = mime.InitCheck();
-	if (!err)
-		err = mime.GetSupertype(&super);
-	if (!err) {
-		Storage::to_lower(super.Type(), supertype);
-		installed_subtypes_info &info = fSupertypesMap[supertype];
-		delete info.cached_message;
-		info.cached_message = NULL;
-		info.subtypes.insert(lowertype);
-	}		
-	DBG(OUT("MimeDatabaseBackend::InstallType() done\n"));
-}
-
-void
-MimeDatabaseBackend::DeleteType(const char *type)
-{
-	if (fInstalledTypes.empty())
-		return;
-	printf("fuCK\n");
-	// Remove any cached messages
-	if (fCachedInstalledTypesMessage) {
-		delete fCachedInstalledTypesMessage;
-		fCachedInstalledTypesMessage = NULL;
-	}
-	printf("fuCK\n");
-	if (fCachedInstalledSupertypesMessage) {
-		delete fCachedInstalledSupertypesMessage;
-		fCachedInstalledSupertypesMessage = NULL;
-	}
-	printf("fuCK\n");
-	char lowertype[B_PATH_NAME_LENGTH+1];
-	char supertype[B_PATH_NAME_LENGTH+1];
-	printf("fuCK\n");
-	Storage::to_lower(type, lowertype);
-	fInstalledTypes.erase(lowertype);
-	printf("fuCK\n");
-	BMimeType mime(lowertype);
-	BMimeType super;
-	printf("fuCK\n");
-	status_t err = mime.InitCheck();
-	printf("fuCK\n");
-	if (!err)
-		err = mime.GetSupertype(&super);
-	printf("fuCK\n");
-	if (!err) {
-		Storage::to_lower(super.Type(), supertype);
-		installed_subtypes_info &info = fSupertypesMap[supertype];
-	printf("fuCK\n");
-		delete info.cached_message;
-	printf("fuCK\n");
-		info.cached_message = NULL;
-	printf("fuCK\n");
-		info.subtypes.erase(lowertype);
-	}		
-	printf("fuCK\n");
-}
-
-// BuildInstalledTypesList()
-//! Builds an initial installed types list and (optionally) an installed types BMessage
-status_t
-MimeDatabaseBackend::BuildInstalledTypesList(BMessage **types)
-{
-	BMessage *msg;
-	if (types) {
-		*types = new BMessage;
-		msg = *types;
+	status_t err;
+	if (fHaveDoneFullBuild) {
+		BMimeType mime(type);
+		BMimeType super;
+		err = type ? mime.InitCheck() : B_BAD_VALUE;
+		if (!err) {
+			// Find the / in the string, if one exists
+			uint i;
+			size_t len = strlen(type);
+			for (i = 0; i < len; i++) {
+				if (type[i] == '/')
+					break;
+			}
+			if (i == len) {
+				// Supertype only
+				err = RemoveSupertype(type);
+			} else {
+				// Copy the supertype
+				char super[B_PATH_NAME_LENGTH+1];
+				strncpy(super, type, i);
+				super[i] = 0;
+				
+				// Get a pointer to the subtype
+				const char *sub = &(type[i+1]);
+				
+				// Remove the subtype 
+				err = RemoveSubtype(super, sub);
+			}
+		}
 	} else
-		msg = NULL;
+		err = B_OK;
+	return err;
+}
 
+// AddSupertype
+/*! \brief Adds the given supertype to the supertype map.
+	\return
+	- B_OK: success, even if the supertype already existed in the map
+	- "error code": failure
+*/
+status_t
+InstalledTypes::AddSupertype(const char *super, std::map<std::string, Supertype>::iterator &i)
+{
+	status_t err = super ? B_OK : B_BAD_VALUE;
+	if (!err) {
+		i = fSupertypes.find(super);
+		if (i == fSupertypes.end()) {
+			Supertype &supertype = fSupertypes[super];
+			supertype.SetName(super);
+			if (fCachedMessage)
+				err = fCachedMessage->AddString(kTypesField, super);
+			if (!err && fCachedSupertypesMessage)
+				err = fCachedSupertypesMessage->AddString(kSupertypesField, super);
+		}
+	}
+	return err;
+}
+
+// AddSubtype
+/*! \brief Adds the given subtype to the given supertype's lists of installed types.
+
+	If the supertype does not yet exist, it is created.
+	
+	\param super The supertype
+	\param sub The subtype (subtype only; no "supertype/subtype" types please)
+	\return
+	- B_OK: success
+	- B_NAME_IN_USE: The subtype already exists in the subtype list
+	- "error code": failure
+*/
+status_t
+InstalledTypes::AddSubtype(const char *super, const char *sub)
+{
+	status_t err = super && sub ? B_OK : B_BAD_VALUE;
+	if (!err) {
+		std::map<std::string, Supertype>::iterator i;
+		err = AddSupertype(super, i);
+		if (!err)
+			err = AddSubtype(i->second, sub);
+	}
+	return err;
+}
+
+// AddSubtype
+/*! \brief Adds the given subtype to the given supertype's lists of installed types.
+
+	\param super The supertype object
+	\param sub The subtype (subtype only; no "supertype/subtype" types please)
+	\return
+	- B_OK: success
+	- B_NAME_IN_USE: The subtype already exists in the subtype list
+	- "error code": failure
+*/
+status_t
+InstalledTypes::AddSubtype(Supertype &super, const char *sub)
+{
+	status_t err = sub ? B_OK : B_BAD_VALUE;
+	if (!err) 
+		err = super.AddSubtype(sub);
+	if (!err && fCachedMessage) {
+		char type[B_PATH_NAME_LENGTH+1];
+		sprintf(type, "%s/%s", super.GetName(), sub);
+		err = fCachedMessage->AddString("types", type);
+	}
+	return err;
+}
+
+// RemoveSupertype
+/*! \brief Removes the given supertype and any corresponding subtypes.
+*/
+status_t
+InstalledTypes::RemoveSupertype(const char *super)
+{
+	status_t err = super ? B_OK : B_BAD_VALUE;
+	if (!err) 
+		err = fSupertypes.erase(super) == 1 ? B_OK : B_NAME_NOT_FOUND;
+	if (!err) 
+		ClearCachedMessages();
+	return err;
+}
+
+// RemoveSubtype
+/*! \brief Removes the given subtype from the given supertype.
+*/
+status_t
+InstalledTypes::RemoveSubtype(const char *super, const char *sub)
+{
+	status_t err = super && sub ? B_OK : B_BAD_VALUE;
+	if (!err) {
+		std::map<std::string, Supertype>::iterator i = fSupertypes.find(super);
+		if (i != fSupertypes.end()) {
+			err = i->second.RemoveSubtype(sub);
+			if (!err)
+				ClearCachedMessages();		
+		} else
+			err = B_NAME_NOT_FOUND;
+	}
+	return err;
+
+}
+
+// Unset
+// Clears any cached messages and empties the supertype map
+void
+InstalledTypes::Unset()
+{
+	ClearCachedMessages();
+	fSupertypes.clear();
+}
+
+// ClearCachedMessages
+//! Frees any cached messages and sets their pointers to NULL
+void
+InstalledTypes::ClearCachedMessages()
+{
+	delete fCachedSupertypesMessage;
+	delete fCachedMessage;
+	fCachedSupertypesMessage = NULL;
+	fCachedMessage = NULL;
+}
+
+// BuildInstalledTypesList
+/*! \brief Reads through the database and builds a complete set of installed types lists.
+
+	An initial set of cached messages are also created.
+*/
+status_t
+InstalledTypes::BuildInstalledTypesList()
+{
+	status_t err = B_OK;	
+	Unset();
+	
+	// Create empty "cached messages" so proper messages
+	// will be built up as we add new types
+	try {
+		fCachedMessage = new BMessage();
+		fCachedSupertypesMessage = new BMessage();
+	} catch (std::bad_alloc) {
+		err = B_NO_MEMORY;
+	}
+	
 	BDirectory root;
-	status_t err = root.SetTo(MimeDatabase::kDatabaseDir.c_str());
+	if (!err)
+		err = root.SetTo(kDatabaseDir.c_str());
 	if (!err) {
 		root.Rewind();
 		while (true) {		
@@ -223,12 +391,12 @@ MimeDatabaseBackend::BuildInstalledTypesList(BMessage **types)
 					// Make sure our string is all lowercase
 					BPrivate::Storage::to_lower(supertype);
 					
-					// Add this supertype 
-					fInstalledTypes.insert(supertype);
-					fSupertypesMap[supertype] = installed_subtypes_info();
-					installed_subtypes_info &info = fSupertypesMap[supertype];
-					if (msg)
-						msg->AddString("types", supertype);
+					// Add this supertype
+					std::map<std::string, Supertype>::iterator i;
+					if (AddSupertype(supertype, i) != B_OK)
+						DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList() -- Error adding supertype '%s': 0x%lx\n",
+							supertype, err));
+					Supertype &supertypeRef = fSupertypes[supertype];
 					
 					// Now iterate through this supertype directory and add
 					// all of its subtypes
@@ -246,167 +414,90 @@ MimeDatabaseBackend::BuildInstalledTypesList(BMessage **types)
 							} else {																	
 								// Get the subtype's name
 								char subtype[B_PATH_NAME_LENGTH+1];
-								char mimetype[B_PATH_NAME_LENGTH+1];
 								if (subEntry.GetName(subtype) == B_OK) {
 									BPrivate::Storage::to_lower(subtype);
-									sprintf(mimetype, "%s/%s", supertype, subtype);
 								
 									// Add the subtype
-									if (BMimeType::IsValid(mimetype)) {
-										fInstalledTypes.insert(mimetype);
-										info.subtypes.insert(mimetype);
-										if (msg)
-											msg->AddString("types", mimetype);
-									}
+									if (AddSubtype(supertypeRef, subtype) != B_OK) {
+										DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList() -- Error adding subtype '%s/%s': 0x%lx\n",
+													supertype, subtype, err));
+									}										
 								}
 							}	
 						}
 					} else {
-						DBG(OUT("MimeDatabaseBackend::BuildInstalledTypesList(): "
+						DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList(): "
 						          "Failed opening supertype directory '%s'\n",
 						            supertype));
 					}					
-				}
+				} 
 			}			
 		}			
 	} else {
-		DBG(OUT("MimeDatabaseBackend::BuildInstalledTypesList(): "
+		DBG(OUT("Mime::InstalledTypes::BuildInstalledTypesList(): "
 		          "Failed opening mime database directory '%s'\n",
-		            MimeDatabase::kDatabaseDir.c_str()));
+		            kDatabaseDir.c_str()));
 	}
+	fHaveDoneFullBuild = true;
 	return err;
+		
 }
 
+// CreateMessageWithTypes
+/*! \brief Allocates a new BMessage into the BMessage pointer pointed to by \c result
+	and fills it with a complete list of installed types.
+*/
 status_t
-MimeDatabaseBackend::BuildInstalledTypesMessage(BMessage **result)
+InstalledTypes::CreateMessageWithTypes(BMessage **result) const
 {
 	status_t err = result ? B_OK : B_BAD_VALUE;
 	// Alloc the message
 	if (!err) {
-		*result = new BMessage;
-		if (!(*result))
+		try {
+			*result = new BMessage();
+		} catch (std::bad_alloc) {
 			err = B_NO_MEMORY;
-	}
-	// Fill with types
-	if (!err) {
-		BMessage &msg = **result;
-		std::set<std::string>::const_iterator i;
-		for (i = fInstalledTypes.begin(); i != fInstalledTypes.end(); i++)
-			msg.AddString("types", (*i).c_str());
-	}
-	return err;		
-}
-
-status_t
-MimeDatabaseBackend::BuildInstalledTypesMessage(const std::set<std::string> &set, BMessage **result)
-{
-	status_t err = result ? B_OK : B_BAD_VALUE;
-	// Alloc the message
-	if (!err) {
-		*result = new BMessage;
-		if (!(*result))
-			err = B_NO_MEMORY;
-	}
-	// Fill with types
-	if (!err) {
-		BMessage &msg = **result;
-		std::set<std::string>::const_iterator i;
-		for (i = set.begin(); i != set.end(); i++)
-			msg.AddString("types", (*i).c_str());
-	}
-	return err;		
-}
-
-status_t
-MimeDatabaseBackend::BuildInstalledSupertypesMessage(const std::map<std::string, installed_subtypes_info> &map, BMessage **result)
-{
-	status_t err = result ? B_OK : B_BAD_VALUE;
-	// Alloc the message
-	if (!err) {
-		*result = new BMessage;
-		if (!(*result))
-			err = B_NO_MEMORY;
-	}
-	// Fill with types
-	if (!err) {
-		BMessage &msg = **result;
-		std::map<std::string, installed_subtypes_info>::const_iterator i;
-		for (i = map.begin(); i != map.end(); i++)
-			msg.AddString("super_types", (i->first).c_str());
-	}
-	return err;		
-}
-
-
-status_t
-MimeDatabaseBackend::BuildInstalledTypesList(const char *supertype, BMessage **types)
-{
-	return B_ERROR;
-	// I'm not going to work on this function anymore until we
-	// get to optimization, as BuildInstalledTypesList(Bmessage**)
-	// handles this already (just not as efficiently if we only
-	// want to build the types for a single supertype). I have
-	// no idea if this function works, as I've never tried it.
-
-	BMessage *msg;
-	if (types) {
-		*types = new BMessage;
-		msg = *types;
-	} else
-		msg = NULL;
-
-	status_t err = supertype && BMimeType::IsValid(supertype) ? B_OK : B_BAD_VALUE;
-
-	// Check that this entry is both a directory and a valid MIME string
-	if (!err)
-	{
-		// Make sure our string is all lowercase
-		BPrivate::Storage::to_lower(supertype);
-					
-		// Clear any previous subtype info struct
-		fSupertypesMap[supertype] = installed_subtypes_info();
-		installed_subtypes_info &info = fSupertypesMap[supertype];
-					
-		// Iterate through the supertype directory and add
-		// all of its subtypes
-		BDirectory super;
-		if (super.SetTo((MimeDatabase::kDatabaseDir + supertype).c_str()) == B_OK) {
-			super.Rewind();
-			while (true) {
-				BEntry entry;						
-				err = super.GetNextEntry(&entry);
-				if (err) {
-					// If we've come to the end of list, it's not an error
-					if (err == B_ENTRY_NOT_FOUND) 
-						err = B_OK;
-					break;
-				} else {																	
-					// Get the subtype's name
-					char subtype[B_PATH_NAME_LENGTH+1];
-					char mimetype[B_PATH_NAME_LENGTH+1];
-					if (entry.GetName(subtype) == B_OK) {
-						BPrivate::Storage::to_lower(subtype);
-						sprintf(mimetype, "%s/%s", supertype, subtype);
-					
-						// Add the subtype
-						if (BMimeType::IsValid(mimetype)) {
-							fInstalledTypes.insert(mimetype);
-							info.subtypes.insert(mimetype);
-							if (msg)
-								msg->AddString("types", mimetype);
-						}
-					}
-				}	
-			}
-		} else {
-			DBG(OUT("MimeDatabaseBackend::BuildInstalledTypesList(): "
-			          "Failed opening supertype directory '%s'\n",
-			            supertype));
 		}
 	}
+	// Fill with types
+	if (!err) {
+		BMessage &msg = **result;
+		std::map<std::string, Supertype>::const_iterator i;
+		for (i = fSupertypes.begin(); i != fSupertypes.end() && !err; i++) {
+			err = msg.AddString(kTypesField, i->first.c_str());
+			if (!err)
+				err = i->second.FillMessageWithTypes(msg);
+		}
+	}
+	return err;		
 }
-*/
 
+// CreateMessageWithSupertypes
+/*! \brief Allocates a new BMessage into the BMessage pointer pointed to by \c result
+	and fills it with a complete list of installed supertypes.
+*/
+status_t
+InstalledTypes::CreateMessageWithSupertypes(BMessage **result) const
+{
+	status_t err = result ? B_OK : B_BAD_VALUE;
+	// Alloc the message
+	if (!err) {
+		try {
+			*result = new BMessage();
+		} catch (std::bad_alloc) {
+			err = B_NO_MEMORY;
+		}
+	}
+	// Fill with types
+	if (!err) {
+		BMessage &msg = **result;
+		std::map<std::string, Supertype>::const_iterator i;
+		for (i = fSupertypes.begin(); i != fSupertypes.end() && !err; i++) {
+			err = msg.AddString(kSupertypesField, i->first.c_str());
+		}
+	}
+	return err;		
+}
 
 } // namespace Mime
 } // namespace Storage
