@@ -254,6 +254,11 @@ extern status_t		_kern_get_system_info(system_info *info, size_t size);
 
 extern void			_kern_debug_output(const char *message);
 
+/* messaging service */
+extern area_id		_kern_register_messaging_service(sem_id lockingSem,
+						sem_id counterSem);
+extern status_t		_kern_unregister_messaging_service();
+
 #ifdef __INTEL__
 // our only x86 only syscall
 extern status_t		_kern_get_cpuid(cpuid_info *info, uint32 eax, uint32 cpu);
