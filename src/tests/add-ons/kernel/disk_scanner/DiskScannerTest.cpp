@@ -55,13 +55,19 @@ get_nth_session_info(int deviceFD, int32 index, session_info *sessionInfo)
 	\param partitionIndex The partition index.
 	\param partitionInfo Pointer to a pre-allocated extended_partition_info
 		   to be filled out by the function.
+	\param partitionMapName Pointer to a pre-allocated char buffer of minimal
+		   size \c B_FILE_NAME_LENGTH, into which the short name of the
+		   partitioning system shall be written. The result is the empty
+		   string (""), if no partitioning system is used (e.g. for floppies).
+		   May be \c NULL.
 	\return
 	- \c B_OK: Everything went fine.
 	- an error code: The contents of \a partitionInfo is undefined.
 */
 status_t
 get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
-					   extended_partition_info *partitionInfo)
+					   extended_partition_info *partitionInfo,
+					   char *partitionMapName)
 {
 	if (partitionInfo == NULL)
 		return B_BAD_VALUE;
@@ -95,7 +101,7 @@ get_nth_partition_info(int deviceFD, int32 sessionIndex, int32 partitionIndex,
 // the its path by recursively searching the /dev/disk directory.
 partitionInfo->info.device[0] = '\0';
 		error = diskScanner->get_nth_partition_info(deviceFD, &sessionInfo,
-			partitionIndex, partitionInfo, NULL);
+			partitionIndex, partitionInfo, partitionMapName, NULL);
 	}
 	// get the FS info
 	if (error == B_OK) {
@@ -112,6 +118,7 @@ partitionInfo->info.device[0] = '\0';
 			partitionInfo->file_system_long_name[0] = '\0';
 			partitionInfo->volume_name[0] = '\0';
 			partitionInfo->mounted_at[0] = '\0';
+			partitionInfo->file_system_flags = 0;
 		}
 // NOTE: Where do we get mounted_at from?
 // Update: Actually, it looks, like it is really hard. We could traverse the
@@ -284,11 +291,11 @@ static
 void
 print_session_info(const char *prefix, const session_info &info)
 {
-	printf("%soffset:     %lld\n", prefix, info.offset);
-	printf("%ssize:       %lld\n", prefix, info.size);
-	printf("%sblock size: %ld\n", prefix, info.logical_block_size);
-	printf("%sindex:      %ld\n", prefix, info.index);
-	printf("%sflags:      %lx\n", prefix, info.flags);
+	printf("%soffset:        %lld\n", prefix, info.offset);
+	printf("%ssize:          %lld\n", prefix, info.size);
+	printf("%sblock size:    %ld\n", prefix, info.logical_block_size);
+	printf("%sindex:         %ld\n", prefix, info.index);
+	printf("%sflags:         %lx\n", prefix, info.flags);
 }
 
 // print_partition_info
@@ -303,13 +310,14 @@ print_partition_info(const char *prefix, const extended_partition_info &info)
 	printf("%spartition ID:   %ld\n", prefix, info.info.partition);
 	printf("%sdevice:         `%s'\n", prefix, info.info.device);
 	printf("%sflags:          %lx\n", prefix, info.flags);
-	printf("%spartition code: 0x%x\n", prefix, info.partition_code);
+	printf("%spartition code: 0x%lx\n", prefix, info.partition_code);
 	printf("%spartition name: `%s'\n", prefix, info.partition_name);
 	printf("%spartition type: `%s'\n", prefix, info.partition_type);
 	printf("%sFS short name:  `%s'\n", prefix, info.file_system_short_name);
 	printf("%sFS long name:   `%s'\n", prefix, info.file_system_long_name);
 	printf("%svolume name:    `%s'\n", prefix, info.volume_name);
 	printf("%smounted at:     `%s'\n", prefix, info.mounted_at);
+	printf("%sFS flags:       0x%lx\n", prefix, info.file_system_flags);
 }
 
 // main
@@ -365,12 +373,17 @@ main(int argc, char **argv)
 
 		for (int32 k = 0; ; k++) {
 			extended_partition_info partitionInfo;
-			status = get_nth_partition_info(device, i, k, &partitionInfo);
+			char partitionMapName[B_FILE_NAME_LENGTH];
+			status = get_nth_partition_info(device, i, k, &partitionInfo,
+											partitionMapName);
 			if (status < B_OK) {
 				if (status != B_ENTRY_NOT_FOUND)
 					fprintf(stderr, "get_nth_partition_info() failed: %s\n", strerror(status));
 				break;
 			}
+
+			if (k == 0)
+				printf("  partition map: `%s'\n", partitionMapName);
 
 			printf("  partition %ld_%ld\n", i, k);
 			print_partition_info("    ", partitionInfo);
