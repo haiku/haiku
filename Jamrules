@@ -1827,7 +1827,6 @@ rule KernelAddon
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) <nogrist>kernel.so ;
-		# ToDo this has to be changed!
 	SetupKernel $(sources) ;
 }
 
