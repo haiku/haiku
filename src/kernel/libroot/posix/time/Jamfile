@@ -1,14 +1,80 @@
 SubDir OBOS_TOP src kernel libroot posix time ;
 
+# for localtime.c strftime.c
+SubDirCcFlags -DNOID -DTZDIR='\"/etc/timezones\"' -DUSG_COMPAT -DTM_GMTOFF=tm_gmtoff -DTM_ZONE=tm_zone -DSTD_INSPIRED=1 -DPCTS=1 ;
+
+UsePrivateHeaders [ FDirName libroot time ] ;
+
 KernelMergeObject posix_time.o :
 	asctime.c
-	ctime.c
 	difftime.c
 	localtime.c
-	mktime.c
 	stime.c
-	strftime.cpp
+	strftime.c
 	time.c
-	tzset.c
 	: -fPIC -DPIC
 	;
+
+# Explanations of flags:
+#
+# If you want to use System V compatibility code, add
+#	-DUSG_COMPAT
+# to the end of the "CFLAGS=" line.  This arrange for "timezone" and "daylight"
+# variables to be kept up-to-date by the time conversion functions.  Neither
+# "timezone" nor "daylight" is described in X3J11's work.
+#
+# If your system has a "GMT offset" field in its "struct tm"s
+# (or if you decide to add such a field in your system's "time.h" file),
+# add the name to a define such as
+#	-DTM_GMTOFF=tm_gmtoff
+# or
+#	-DTM_GMTOFF=_tm_gmtoff
+# to the end of the "CFLAGS=" line.
+# Neither tm_gmtoff nor _tm_gmtoff is described in X3J11's work;
+# in its work, use of "tm_gmtoff" is described as non-conforming.
+# Both Linux and BSD have done the equivalent of defining TM_GMTOFF in
+# their recent releases.
+#
+# If your system has a "zone abbreviation" field in its "struct tm"s
+# (or if you decide to add such a field in your system's "time.h" file),
+# add the name to a define such as
+#	-DTM_ZONE=tm_zone
+# or
+#	-DTM_ZONE=_tm_zone
+# to the end of the "CFLAGS=" line.
+# Neither tm_zone nor _tm_zone is described in X3J11's work;
+# in its work, use of "tm_zone" is described as non-conforming.
+# Both UCB and Sun have done the equivalent of defining TM_ZONE in
+# their recent releases.
+#
+# If you want functions that were inspired by early versions of X3J11's work,
+# add
+#	-DSTD_INSPIRED
+# to the end of the "CFLAGS=" line.  This arranges for the functions
+# "tzsetwall", "offtime", "timelocal", "timegm", "timeoff",
+# "posix2time", and "time2posix" to be added to the time conversion library.
+# "tzsetwall" is like "tzset" except that it arranges for local wall clock
+# time (rather than the time specified in the TZ environment variable)
+# to be used.
+# "offtime" is like "gmtime" except that it accepts a second (long) argument
+# that gives an offset to add to the time_t when converting it.
+# "timelocal" is equivalent to "mktime".
+# "timegm" is like "timelocal" except that it turns a struct tm into
+# a time_t using UTC (rather than local time as "timelocal" does).
+# "timeoff" is like "timegm" except that it accepts a second (long) argument
+# that gives an offset to use when converting to a time_t.
+# "posix2time" and "time2posix" are described in an included manual page.
+# X3J11's work does not describe any of these functions.
+# Sun has provided "tzsetwall", "timelocal", and "timegm" in SunOS 4.0.
+# These functions may well disappear in future releases of the time
+# conversion package.
+#
+# If you want Source Code Control System ID's left out of object modules, add
+#	-DNOID
+# to the end of the "CFLAGS=" line.
+#
+# NIST-PCTS:151-2, Version 1.4, (1993-12-03) is a test suite put
+# out by the National Institute of Standards and Technology
+# which claims to test C and Posix conformance.  If you want to pass PCTS, add
+#	-DPCTS
+# to the end of the "CFLAGS=" line.
