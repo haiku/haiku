@@ -407,7 +407,7 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 		void		sendMessageUsingEventMask( int32 message, BPoint where ); 
 		BView*		sendMessageUsingEventMask2( BView* aView, int32 message, BPoint where );
 		void		sendPulse( BView* );
-		int32		findShortcut(uint32 key, int32 modifiers);
+		int32		findShortcut(uint32 key, uint32 modifiers);
 		bool		findHandler( BView* start, BHandler* handler );
 		BView*		findView(BView* aView, const char* viewName) const;
 		BView*		findView(BView* aView, BPoint point) const;
