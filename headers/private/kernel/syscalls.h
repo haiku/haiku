@@ -183,7 +183,7 @@ extern status_t		_kern_stop_watching(dev_t device, ino_t node, uint32 flags,
 						port_id port, uint32 token);
 
 // time functions
-extern void			_kern_set_real_time_clock(uint32 time);
+extern status_t		_kern_set_real_time_clock(uint32 time);
 
 // area functions
 area_id _kern_create_area(const char *name, void **address, uint32 addressSpec,
