@@ -19,21 +19,69 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		Utils.h
+//	File Name:		GraphicsBuffer.cpp
 //	Author:			DarkWyrm <bpmagic@columbus.rr.com>
-//	Description:	Miscellaneous utility functions
 //
+//	Description:	Convenience class for working with graphics buffers
+//					Based on concepts from the Anti-Grain Geometry vector gfx library
 //------------------------------------------------------------------------------
-#ifndef UTILS_H_
-#define UTILS_H_
+#include "GraphicsBuffer.h"
 
-#include <Message.h>
-#include <OS.h>
-#include <Accelerant.h>
+GraphicsBuffer::GraphicsBuffer(uint8 *buffer, uint32 width, uint32 height, uint32 rowbytes)
+{
+	fBuffer=NULL;
+	fRowList=NULL;
+	fWidth=0;
+	fHeight=0;
+	fBytesPerRow=0;
+	fMaxHeight=0;
+	
+	SetTo(buffer, width, height, rowbytes);
+}
 
-void SendMessage(port_id port, BMessage *message, int32 target=-1);
-const char *MsgCodeToString(int32 code);
-BString MsgCodeToBString(int32 code);
-status_t ConvertModeToDisplayMode(uint32 mode, display_mode *dmode);
+GraphicsBuffer::~GraphicsBuffer()
+{
+	delete [] fRowList;
+}
 
-#endif
+void GraphicsBuffer::SetTo(uint8 *buffer, uint32 width, uint32 height, uint32 rowbytes)
+{
+	fBuffer = buffer;
+	fWidth = width;
+	fHeight = height;
+	fBytesPerRow = rowbytes;
+	
+	if(height > fMaxHeight)
+	{
+		delete [] fRowList;
+		fRowList = new uint8* [fMaxHeight = height];
+	}
+	
+	uint8 *row_ptr = fBuffer;
+	
+	if(rowbytes < 0)
+	{
+		row_ptr = fBuffer - int(height - 1) * rowbytes;
+	}
+	
+	uint8 **rows = fRowList;
+	
+	while(height--)
+	{
+		*rows++ = row_ptr;
+		row_ptr += rowbytes;
+	}
+}
+
+void GraphicsBuffer::Unset(void)
+{
+	delete [] fRowList;
+	fBuffer=NULL;
+	fRowList=NULL;
+	fWidth=0;
+	fHeight=0;
+	fBytesPerRow=0;
+	fMaxHeight=0;
+}
+
+

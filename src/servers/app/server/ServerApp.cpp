@@ -54,7 +54,7 @@
 #include "LayerData.h"
 #include "Utils.h"
 
-#define DEBUG_SERVERAPP
+//#define DEBUG_SERVERAPP
 
 #ifdef DEBUG_SERVERAPP
 #	include <stdio.h>

@@ -54,7 +54,9 @@ extern RGBColor workspace_default_color;	// defined in AppServer.cpp
 */
 BitmapDriver::BitmapDriver(void) : DisplayDriver()
 {
-	_target=NULL;
+	fTarget=NULL;
+	fGraphicsBuffer=NULL;
+	fPixelRenderer=NULL;
 }
 
 /*!
@@ -93,13 +95,58 @@ void BitmapDriver::Shutdown(void)
 void BitmapDriver::SetTarget(ServerBitmap *target)
 {
 	Lock();
-	_target=target;
+	
+	if(fGraphicsBuffer)
+	{
+		delete fGraphicsBuffer;
+		fGraphicsBuffer=NULL;
+	}
+	
+	if(fPixelRenderer)
+	{
+		delete fPixelRenderer;
+		fPixelRenderer=NULL;
+	}
+	
+	fTarget=target;
 	
 	if(target)
 	{
 		_displaymode.virtual_width=target->Width();
 		_displaymode.virtual_height=target->Height();
 		_displaymode.space=target->ColorSpace();
+		
+		fGraphicsBuffer=new GraphicsBuffer((uint8*)fTarget->Bits(),fTarget->Bounds().Width(),
+				fTarget->Bounds().Height(),fTarget->BytesPerRow());
+		
+		switch(fTarget->ColorSpace())
+		{
+			case B_RGB32:
+			case B_RGBA32:
+			{
+				fPixelRenderer=new PixelRendererRGBA32(*fGraphicsBuffer);
+				break;
+			}
+			case B_RGB16:
+			{
+				fPixelRenderer=new PixelRendererRGB16(*fGraphicsBuffer);
+				break;
+			}
+			case B_RGB15:
+			case B_RGBA15:
+			{
+				fPixelRenderer=new PixelRendererRGBA15(*fGraphicsBuffer);
+				break;
+			}
+			case B_CMAP8:
+			case B_GRAY8:
+			{
+				fPixelRenderer=new PixelRendererCMAP8(*fGraphicsBuffer);
+				break;
+			}
+			default:
+				break;
+		}
 		// Setting mode not necessary. Can get color space stuff via ServerBitmap->ColorSpace
 	}
 	
@@ -121,28 +168,28 @@ void BitmapDriver::SetMode(const display_mode &mode)
 void BitmapDriver::InvertRect(const BRect &r)
 {
 	Lock();
-	if(_target)
+	if(fTarget)
 	{
 		if(r.top<0 || r.left<0 || 
-			r.right>_target->Width()-1 || r.bottom>_target->Height()-1)
+			r.right>fTarget->Width()-1 || r.bottom>fTarget->Height()-1)
 		{
 			Unlock();
 			return;
 		}
 		
-		switch(_target->BitsPerPixel())
+		switch(fTarget->BitsPerPixel())
 		{
 			case 32:
 			case 24:
 			{
 				uint16 width=r.IntegerWidth(), height=r.IntegerHeight();
-				uint32 *start=(uint32*)_target->Bits(), *index;
-				start+=int32(r.top)*_target->Width();
+				uint32 *start=(uint32*)fTarget->Bits(), *index;
+				start+=int32(r.top)*fTarget->Width();
 				start+=int32(r.left);
 				
 				for(int32 i=0;i<height;i++)
 				{
-					index=start + (i*_target->Width());
+					index=start + (i*fTarget->Width());
 					for(int32 j=0; j<width; j++)
 						index[j]^=0xFFFFFF00L;
 				}
@@ -279,17 +326,17 @@ rgb_color BitmapDriver::GetBlitColor(rgb_color src, rgb_color dest, DrawData *d,
 void BitmapDriver::SetThickPatternPixel(int x, int y)
 {
 	int left, right, top, bottom;
-	int bytes_per_row = _target->BytesPerRow();
+	int bytes_per_row = fTarget->BytesPerRow();
 	left = x - fLineThickness/2;
 	right = x + fLineThickness/2;
 	top = y - fLineThickness/2;
 	bottom = y + fLineThickness/2;
-	switch(_target->BitsPerPixel())
+	switch(fTarget->BitsPerPixel())
 	{
 		case 8:
 			{
 				int x,y;
-				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				uint8 *fb = (uint8 *)fTarget->Bits() + top*bytes_per_row;
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
@@ -300,7 +347,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 		case 15:
 			{
 				int x,y;
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
@@ -311,7 +358,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 		case 16:
 			{
 				int x,y;
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				for (y=top; y<=bottom; y++)
 				{
 					for (x=left; x<=right; x++)
@@ -323,7 +370,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 		case 32:
 			{
 				int x,y;
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint32 *fb = (uint32 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				rgb_color color;
 				for (y=top; y<=bottom; y++)
 				{
@@ -349,7 +396,7 @@ void BitmapDriver::SetThickPatternPixel(int x, int y)
 void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 {
 	int x, y1, y2;
-	int bytes_per_row = _target->BytesPerRow();
+	int bytes_per_row = fTarget->BytesPerRow();
 
 	if ( x1 > x2 )
 	{
@@ -359,11 +406,11 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 	}
 	y1 = y - fLineThickness/2;
 	y2 = y + fLineThickness/2;
-	switch(_target->BitsPerPixel())
+	switch(fTarget->BitsPerPixel())
 	{
 		case 8:
 			{
-				uint8 *fb = (uint8 *)_target->Bits() + y1*bytes_per_row;
+				uint8 *fb = (uint8 *)fTarget->Bits() + y1*bytes_per_row;
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
@@ -373,7 +420,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 			} break;
 		case 15:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + y1*bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
@@ -383,7 +430,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 			} break;
 		case 16:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + y1*bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
@@ -394,7 +441,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 		case 24:
 		case 32:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				uint32 *fb = (uint32 *)((uint8 *)fTarget->Bits() + y1*bytes_per_row);
 				rgb_color color;
 				for (y=y1; y<=y2; y++)
 				{
@@ -420,7 +467,7 @@ void BitmapDriver::HLinePatternThick(int32 x1, int32 x2, int32 y)
 void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 {
 	int y, x1, x2;
-	int bytes_per_row = _target->BytesPerRow();
+	int bytes_per_row = fTarget->BytesPerRow();
 
 	if ( y1 > y2 )
 	{
@@ -430,11 +477,11 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 	}
 	x1 = x - fLineThickness/2;
 	x2 = x + fLineThickness/2;
-	switch(_target->BitsPerPixel())
+	switch(fTarget->BitsPerPixel())
 	{
 		case 8:
 			{
-				uint8 *fb = (uint8 *)_target->Bits() + y1*bytes_per_row;
+				uint8 *fb = (uint8 *)fTarget->Bits() + y1*bytes_per_row;
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
@@ -444,7 +491,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 			} break;
 		case 15:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + y1*bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
@@ -454,7 +501,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 			} break;
 		case 16:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + y1*bytes_per_row);
 				for (y=y1; y<=y2; y++)
 				{
 					for (x=x1; x<=x2; x++)
@@ -465,7 +512,7 @@ void BitmapDriver::VLinePatternThick(int32 x, int32 y1, int32 y2)
 		case 24:
 		case 32:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + y1*bytes_per_row);
+				uint32 *fb = (uint32 *)((uint8 *)fTarget->Bits() + y1*bytes_per_row);
 				rgb_color color;
 				for (y=y1; y<=y2; y++)
 				{
@@ -491,7 +538,7 @@ void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source,
 	if(!sourcebmp | !d)
 		return;
 
-	if(sourcebmp->BitsPerPixel() != _target->BitsPerPixel())
+	if(sourcebmp->BitsPerPixel() != fTarget->BitsPerPixel())
 		return;
 
 	uint8 colorspace_size=sourcebmp->BitsPerPixel()/8;
@@ -524,7 +571,7 @@ void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source,
 			sourcerect.bottom = work_rect.bottom;
 	}
 
-	work_rect.Set(0,0,_target->Width()-1,_target->Height()-1);
+	work_rect.Set(0,0,fTarget->Width()-1,fTarget->Height()-1);
 
 	// Check to see if we actually need to copy anything
 	if( (destrect.right<work_rect.left) || (destrect.left>work_rect.right) ||
@@ -543,11 +590,11 @@ void BitmapDriver::DrawBitmap(ServerBitmap *sourcebmp, const BRect &source,
 
 	// Set pointers to the actual data
 	uint8 *src_bits  = (uint8*) sourcebmp->Bits();	
-	uint8 *dest_bits = (uint8*) _target->Bits();
+	uint8 *dest_bits = (uint8*) fTarget->Bits();
 
 	// Get row widths for offset looping
 	uint32 src_width  = uint32 (sourcebmp->BytesPerRow());
-	uint32 dest_width = uint32 (_target->BytesPerRow());
+	uint32 dest_width = uint32 (fTarget->BytesPerRow());
 
 	// Offset bitmap pointers to proper spot in each bitmap
 	src_bits += uint32 ( (sourcerect.top  * src_width)  + (sourcerect.left  * colorspace_size) );
@@ -617,7 +664,7 @@ bool BitmapDriver::AcquireBuffer(FBBitmap *fbmp)
 	if(!fbmp)
 		return false;
 	
-	fbmp->ServerBitmap::ShallowCopy(_target);
+	fbmp->ServerBitmap::ShallowCopy(fTarget);
 
 	return true;
 }
@@ -632,18 +679,18 @@ void BitmapDriver::Blit(const BRect &src, const BRect &dest, const DrawData *d)
 
 void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 {
-	int bytes_per_row = _target->BytesPerRow();
+	int bytes_per_row = fTarget->BytesPerRow();
 	int top = (int)rect.top;
 	int left = (int)rect.left;
 	int right = (int)rect.right;
 	int bottom = (int)rect.bottom;
 	RGBColor col(color);	// to avoid GetColor8/15/16() const issues
 
-	switch(_target->BitsPerPixel())
+	switch(fTarget->BitsPerPixel())
 	{
 		case 8:
 			{
-				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				uint8 *fb = (uint8 *)fTarget->Bits() + top*bytes_per_row;
 				uint8 color8 = col.GetColor8();
 				int x,y;
 				for (y=top; y<=bottom; y++)
@@ -655,7 +702,7 @@ void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 			} break;
 		case 15:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				uint16 color15 = col.GetColor15();
 				int x,y;
 				for (y=top; y<=bottom; y++)
@@ -667,7 +714,7 @@ void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 			} break;
 		case 16:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				uint16 color16 = col.GetColor16();
 				int x,y;
 				for (y=top; y<=bottom; y++)
@@ -680,7 +727,7 @@ void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 		case 24:
 		case 32:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint32 *fb = (uint32 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				rgb_color fill_color = color.GetColor32();
 				uint32 color32 = (fill_color.alpha << 24) | (fill_color.red << 16) | (fill_color.green << 8) | (fill_color.blue);
 				int x,y;
@@ -698,17 +745,17 @@ void BitmapDriver::FillSolidRect(const BRect &rect, const RGBColor &color)
 
 void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 {
-	int bytes_per_row = _target->BytesPerRow();
+	int bytes_per_row = fTarget->BytesPerRow();
 	int top = (int)rect.top;
 	int left = (int)rect.left;
 	int right = (int)rect.right;
 	int bottom = (int)rect.bottom;
 	
-	switch(_target->BitsPerPixel())
+	switch(fTarget->BitsPerPixel())
 	{
 		case 8:
 			{
-				uint8 *fb = (uint8 *)_target->Bits() + top*bytes_per_row;
+				uint8 *fb = (uint8 *)fTarget->Bits() + top*bytes_per_row;
 				int x,y;
 				for (y=top; y<=bottom; y++)
 				{
@@ -719,7 +766,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 			} break;
 		case 15:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				int x,y;
 				for (y=top; y<=bottom; y++)
 				{
@@ -730,7 +777,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 			} break;
 		case 16:
 			{
-				uint16 *fb = (uint16 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint16 *fb = (uint16 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				int x,y;
 				for (y=top; y<=bottom; y++)
 				{
@@ -742,7 +789,7 @@ void BitmapDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 		case 24:
 		case 32:
 			{
-				uint32 *fb = (uint32 *)((uint8 *)_target->Bits() + top*bytes_per_row);
+				uint32 *fb = (uint32 *)((uint8 *)fTarget->Bits() + top*bytes_per_row);
 				int x,y;
 				rgb_color color;
 				for (y=top; y<=bottom; y++)
@@ -850,11 +897,11 @@ void BitmapDriver::CopyBitmap(ServerBitmap *bitmap, const BRect &sourcerect, con
 	}
 
 	// Set pointers to the actual data
-	uint8 *dest_bits  = (uint8*) _target->Bits();	
+	uint8 *dest_bits  = (uint8*) fTarget->Bits();	
 	uint8 *src_bits = (uint8*) bitmap->Bits();
 
 	// Get row widths for offset looping
-	uint32 dest_width  = uint32 (_target->BytesPerRow());
+	uint32 dest_width  = uint32 (fTarget->BytesPerRow());
 	uint32 src_width = uint32 (bitmap->BytesPerRow());
 
 	// Offset bitmap pointers to proper spot in each bitmap
@@ -944,11 +991,11 @@ void BitmapDriver::CopyToBitmap(ServerBitmap *destbmp, const BRect &sourcerect)
 
 	// Set pointers to the actual data
 	uint8 *dest_bits  = (uint8*) destbmp->Bits();	
-	uint8 *src_bits = (uint8*) _target->Bits();
+	uint8 *src_bits = (uint8*) fTarget->Bits();
 
 	// Get row widths for offset looping
 	uint32 dest_width  = uint32 (destbmp->BytesPerRow());
-	uint32 src_width = uint32 (_target->BytesPerRow());
+	uint32 src_width = uint32 (fTarget->BytesPerRow());
 
 	// Offset bitmap pointers to proper spot in each bitmap
 	src_bits += uint32 ( (source.top  * src_width)  + (source.left  * colorspace_size) );

@@ -113,3 +113,191 @@ BString MsgCodeToBString(int32 code)
 	BString bstring(string);
 	return bstring;
 }
+
+status_t ConvertModeToDisplayMode(uint32 mode, display_mode *dmode)
+{
+	if(!mode)
+		return B_BAD_VALUE;
+	
+	switch(mode)
+	{
+		case B_8_BIT_640x400:
+		{
+			dmode->virtual_width=640;
+			dmode->virtual_height=400;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_8_BIT_640x480:
+		{
+			dmode->virtual_width=640;
+			dmode->virtual_height=480;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_15_BIT_640x480:
+		{
+			dmode->virtual_width=640;
+			dmode->virtual_height=480;
+			dmode->space=B_RGB15;
+			break;
+		}
+		case B_16_BIT_640x480:
+		{
+			dmode->virtual_width=640;
+			dmode->virtual_height=480;
+			dmode->space=B_RGB16;
+			break;
+		}
+		case B_32_BIT_640x480:
+		{
+			dmode->virtual_width=640;
+			dmode->virtual_height=480;
+			dmode->space=B_RGB32;
+			break;
+		}
+		case B_8_BIT_800x600:
+		{
+			dmode->virtual_width=800;
+			dmode->virtual_height=600;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_15_BIT_800x600:
+		{
+			dmode->virtual_width=800;
+			dmode->virtual_height=600;
+			dmode->space=B_RGB15;
+			break;
+		}
+		case B_16_BIT_800x600:
+		{
+			dmode->virtual_width=800;
+			dmode->virtual_height=600;
+			dmode->space=B_RGB16;
+			break;
+		}
+		case B_32_BIT_800x600:
+		{
+			dmode->virtual_width=800;
+			dmode->virtual_height=600;
+			dmode->space=B_RGB32;
+			break;
+		}
+		case B_8_BIT_1024x768:
+		{
+			dmode->virtual_width=1024;
+			dmode->virtual_height=768;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_15_BIT_1024x768:
+		{
+			dmode->virtual_width=1024;
+			dmode->virtual_height=768;
+			dmode->space=B_RGB15;
+			break;
+		}
+		case B_16_BIT_1024x768:
+		{
+			dmode->virtual_width=1024;
+			dmode->virtual_height=768;
+			dmode->space=B_RGB16;
+			break;
+		}
+		case B_32_BIT_1024x768:
+		{
+			dmode->virtual_width=1024;
+			dmode->virtual_height=768;
+			dmode->space=B_RGB32;
+			break;
+		}
+		case B_8_BIT_1152x900:
+		{
+			dmode->virtual_width=1152;
+			dmode->virtual_height=900;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_15_BIT_1152x900:
+		{
+			dmode->virtual_width=1152;
+			dmode->virtual_height=900;
+			dmode->space=B_RGB15;
+			break;
+		}
+		case B_16_BIT_1152x900:
+		{
+			dmode->virtual_width=1152;
+			dmode->virtual_height=900;
+			dmode->space=B_RGB16;
+			break;
+		}
+		case B_32_BIT_1152x900:
+		{
+			dmode->virtual_width=1152;
+			dmode->virtual_height=900;
+			dmode->space=B_RGB32;
+			break;
+		}
+		case B_8_BIT_1280x1024:
+		{
+			dmode->virtual_width=1280;
+			dmode->virtual_height=1024;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_15_BIT_1280x1024:
+		{
+			dmode->virtual_width=1280;
+			dmode->virtual_height=1024;
+			dmode->space=B_RGB15;
+			break;
+		}
+		case B_16_BIT_1280x1024:
+		{
+			dmode->virtual_width=1280;
+			dmode->virtual_height=1024;
+			dmode->space=B_RGB16;
+			break;
+		}
+		case B_32_BIT_1280x1024:
+		{
+			dmode->virtual_width=1280;
+			dmode->virtual_height=1024;
+			dmode->space=B_RGB32;
+			break;
+		}
+		case B_8_BIT_1600x1200:
+		{
+			dmode->virtual_width=1600;
+			dmode->virtual_height=1200;
+			dmode->space=B_CMAP8;
+			break;
+		}
+		case B_15_BIT_1600x1200:
+		{
+			dmode->virtual_width=1600;
+			dmode->virtual_height=1200;
+			dmode->space=B_RGB15;
+			break;
+		}
+		case B_16_BIT_1600x1200:
+		{
+			dmode->virtual_width=1600;
+			dmode->virtual_height=1200;
+			dmode->space=B_RGB16;
+			break;
+		}
+		case B_32_BIT_1600x1200:
+		{
+			dmode->virtual_width=1600;
+			dmode->virtual_height=1200;
+			dmode->space=B_RGB32;
+			break;
+		}
+		default:
+			return B_ERROR;
+	}
+	return B_OK;
+}

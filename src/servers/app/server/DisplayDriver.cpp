@@ -4041,7 +4041,6 @@ void DisplayDriver::FillPatternRect(const BRect &rect, const DrawData *d)
 /* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */
 void DisplayDriver::StrokeSolidLine(int32 x1, int32 y1, int32 x2, int32 y2, const RGBColor &color)
 {
-debugger("DD:StrokeSolidLine()\n");
 }
 
 /* Draws a line with pensize 1.  Coordinates are guarenteed to be in bounds */

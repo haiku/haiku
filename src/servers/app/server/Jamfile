@@ -17,8 +17,11 @@ SharedLibrary appserver :
 	DisplayDriver.cpp
 	DisplaySupport.cpp
 	FontFamily.cpp
+	GraphicsBuffer.cpp
+	IPoint.cpp
 	LayerData.cpp
 	PatternHandler.cpp
+	PixelRenderer.cpp
 	RectUtils.cpp
 	RGBColor.cpp
 	ServerBitmap.cpp

@@ -39,6 +39,8 @@
 #include <OS.h>
 #include "DisplayDriver.h"
 #include "FontServer.h"
+#include "GraphicsBuffer.h"
+#include "PixelRenderer.h"
 
 class ServerCursor;
 class ServerBitmap;
@@ -68,7 +70,7 @@ public:
 	void Shutdown(void);
 
 	void SetTarget(ServerBitmap *target);
-	ServerBitmap *GetTarget(void) const { return _target; }
+	ServerBitmap *GetTarget(void) const { return fTarget; }
 	
 	// Settings functions
 	virtual void DrawBitmap(ServerBitmap *bmp, const BRect &src, const BRect &dest, DrawData *d);
@@ -96,7 +98,10 @@ protected:
 //	void FillSolidRect(int32 left, int32 top, int32 right, int32 bottom);
 //	void FillPatternRect(int32 left, int32 top, int32 right, int32 bottom);
 	void SetThickPatternPixel(int x, int y);
-	ServerBitmap *_target;
+	
+	ServerBitmap *fTarget;
+	GraphicsBuffer *fGraphicsBuffer;
+	PixelRenderer *fPixelRenderer;
 };
 
 #endif

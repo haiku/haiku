@@ -49,7 +49,7 @@
 #include "Desktop.h"
 
 //#define DEBUG_KEYHANDLING
-#define DEBUG_SERVER
+//#define DEBUG_SERVER
 
 #ifdef DEBUG_KEYHANDLING
 #	include <stdio.h>
