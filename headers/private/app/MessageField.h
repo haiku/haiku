@@ -123,6 +123,7 @@ struct BMessageFieldSizePolicy
 		return sizeof (T) * data.Size();
 	}
 	inline static bool		Fixed() { return true; }
+	inline static size_t	Padding(const T&) { return 0; }
 };
 //------------------------------------------------------------------------------
 template<class T>
@@ -209,18 +210,28 @@ ssize_t
 BMessageFieldImpl<T1, StoragePolicy, SizePolicy, PrintPolicy, FlattenPolicy, GetDataPolicy>::
 FlattenedSize() const
 {
-	ssize_t size = 0;
-
 	// Mandatory stuff
-	size += 1;								// field flags byte
+	ssize_t size = 1;						// field flags byte
 	size += sizeof (type_code);				// field type bytes
 	if (!(fFlags & MSG_FLAG_SINGLE_ITEM))	// item count byte
 		++size;
-	++size;									// data length byte
+	if (fFlags & MSG_FLAG_MINI_DATA)
+		++size;								// data length byte for mini data
+	else
+		size += sizeof (size_t);			// data length bytes for maxi data
 	++size;									// name length byte
 	size += Name().length();				// name length
 
-	size += SizePolicy::Size(fData);		// data length and item size bytes
+	// data length and item size bytes
+	size += SizePolicy::Size(fData);
+	if (!SizePolicy::Fixed())
+	{
+		for (uint32 i = 0; i < fData.Size(); ++i)
+		{
+			size += SizePolicy::Padding(fData[i]);	// pad to 8-byte boundary
+			size += 4;								// item size bytes
+		}
+	}
 
 	return size;
 }
@@ -241,10 +252,20 @@ Flatten(BDataIO& stream) const
 	status_t	err = B_OK;
 	type_code	type = Type();
 	uint8		count = fData.Size();
-	uint8		size = SizePolicy::Size(fData);
 	uint8		nameLen = Name().length();
+	size_t		size = SizePolicy::Size(fData);
+
+	// Calculate any necessary padding
+	if (!SizePolicy::Fixed())
+	{
+		for (uint32 i = 0; i < fData.Size(); ++i)
+		{
+			size += SizePolicy::Padding(fData[i]);	// pad to 8-byte boundary
+			size += 4;								// item size bytes
+		}
+	}
 	
-	err = stream.Write(&fFlags, 1);
+	err = stream.Write(&fFlags, sizeof (fFlags));
 
 	// Field type_code
 	if (err >= 0)
@@ -252,15 +273,25 @@ Flatten(BDataIO& stream) const
 
 	// Item count, if more than one
 	if (err >= 0 && !(fFlags & MSG_FLAG_SINGLE_ITEM))
-		err = stream.Write(&count, 1);
+		err = stream.Write(&count, sizeof (count));
 
 	// Data length
 	if (err >= 0)
-		err = stream.Write(&size, 1);
+	{
+		if (fFlags & MSG_FLAG_MINI_DATA)
+		{
+			uint8 miniSize = size;
+			err = stream.Write(&miniSize, sizeof (miniSize));
+		}
+		else
+		{
+			err = stream.Write(&size, sizeof (size));
+		}
+	}
 
 	// Name length
 	if (err >= 0)
-		err = stream.Write(&nameLen, 1);
+		err = stream.Write(&nameLen, sizeof (nameLen));
 
 	// Name
 	if (err >= 0)
@@ -269,7 +300,20 @@ Flatten(BDataIO& stream) const
 	// Actual data items
 	for (uint32 i = 0; i < fData.Size() && err >= 0; ++i)
 	{
-		err = FlattenPolicy::Flatten(stream, fData[i]);
+		if (!SizePolicy::Fixed())
+		{
+			int32 size = (int32)SizePolicy::Size(fData[i]);
+			err = stream.Write(&size, sizeof (size));
+		}
+		if (err >= 0)
+		{
+			err = FlattenPolicy::Flatten(stream, fData[i]);
+		}
+		if (err >= 0)
+		{
+			err = stream.Write(&BMessageField::sNullData[size],
+							   SizePolicy::Padding(fData[i]));
+		}
 	}
 
 	if (err >= 0)
@@ -465,18 +509,23 @@ template<> struct BMessageFieldSizePolicy<BString>
 	inline static size_t	Size(const Store& data)
 	{
 		size_t size = 0;
-		size_t temp;
 		for (uint32 i = 0; i < data.Size(); ++i)
 		{
-			temp = Size(data[i]) + 4;	// Four extra bytes for size info
-			// Calculate padding
-			temp += 8 - (temp % 8);
-			size += temp;
+			size += Size(data[i]);
 		}
 
 		return size;
 	}
 	inline static bool		Fixed()	{ return false; }
+	inline static size_t	Padding(const BString& s)
+	{
+		size_t temp = (Size(s) + 4) % 8;
+		if (temp)
+		{
+			temp = 8 - temp;
+		}
+		return temp;
+	}
 };
 //------------------------------------------------------------------------------
 template<> struct BMessageFieldSizePolicy<BDataBuffer>
@@ -488,18 +537,23 @@ template<> struct BMessageFieldSizePolicy<BDataBuffer>
 	inline static size_t	Size(const Store& data)
 	{
 		size_t size = 0;
-		size_t temp;
 		for (uint32 i = 0; i < data.Size(); ++i)
 		{
-			temp = Size(data[i]) + 4;	// Four extra bytes for size info
-			// Calculate padding
-			temp += 8 - (temp % 8);
-			size += temp;
+			size += Size(data[i]);
 		}
 
 		return size;
 	}
 	inline static bool		Fixed()	{ return false; }
+	inline static size_t	Padding(const BDataBuffer& db)
+	{
+		size_t temp = (Size(db) + 4) % 8;
+		if (temp)
+		{
+			temp = 8 - temp;
+		}
+		return temp;
+	}
 };
 //------------------------------------------------------------------------------
 template<> struct BMessageFieldSizePolicy<BMessage*>
@@ -511,18 +565,23 @@ template<> struct BMessageFieldSizePolicy<BMessage*>
 	inline static size_t	Size(const Store& data)
 	{
 		size_t size = 0;
-		size_t temp;
 		for (uint32 i = 0; i < data.Size(); ++i)
 		{
-			temp = Size(data[i]) + 4;	// Four extra bytes for size info
-			// Calculate padding
-			temp += 8 - (temp % 8);
-			size += temp;
+			size += Size(data[i]);
 		}
 
 		return size;
 	}
 	inline static bool		Fixed() { return false; }
+	inline static size_t	Padding(const BMessage* msg)
+	{
+		size_t temp = (Size(msg) + 4) % 8;
+		if (temp)
+		{
+			temp = 8 - temp;
+		}
+		return temp;
+	}
 };
 // Flatten policy specializations ----------------------------------------------
 template<>
@@ -533,23 +592,9 @@ struct BMessageFieldFlattenPolicy<BString>
 	static status_t	Flatten(BDataIO& stream, const BString& data)
 	{
 		size_t size = SizePolicy::Size(data);
-		status_t err = stream.Write(&size, 4);
-		
-		if (err >= 0)
-			err = stream.Write((const void*)data.String(), size);
+		status_t err = stream.Write((const void*)data.String(), size);
 
-		if (err >= 0)
-		{
-			// Pad data to 8-byte boundary
-			size += 4;	// Account for the stored size of size
-			size %= 8;
-			if (size)
-			{
-				err = stream.Write(&BMessageField::sNullData[size], 8 - (size));
-			}
-		}
-
-		if (err >= 0)
+		if (err > 0)
 			err = B_OK;
 		return err;
 	}
@@ -562,24 +607,24 @@ struct BMessageFieldFlattenPolicy<BMessage*>
 
 	static status_t Flatten(BDataIO& stream, const BMessage* data)
 	{
-		size_t size = SizePolicy::Size(data);
-		status_t err = stream.Write(&size, 4);
+		status_t err = data->Flatten(&stream);
 
-		if (err >= 0)
-			err = data->Flatten(&stream);
-
-		if (err >= 0)
-		{
-			// Pad data to 8-byte boundary
-			size += 4;	// Account for the stored size of size
-			size %= 8;
-			if (size)
-			{
-				err = stream.Write(&BMessageField::sNullData[size], 8 - (size));
-			}
-		}
-
-		if (err >= 0)
+		if (err > 0)
+			err = B_OK;
+		return err;
+	}
+};
+//------------------------------------------------------------------------------
+template<>
+struct BMessageFieldFlattenPolicy<BDataBuffer>
+{
+	typedef BMessageFieldSizePolicy<BDataBuffer> SizePolicy;
+	
+	static status_t Flatten(BDataIO& stream, const BDataBuffer& db)
+	{
+		size_t size = SizePolicy::Size(db);
+		status_t err = stream.Write(db.Buffer(), size);
+		if (err > 0)
 			err = B_OK;
 		return err;
 	}

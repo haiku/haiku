@@ -179,7 +179,7 @@ bool BMessageBody::IsEmpty() const
 //------------------------------------------------------------------------------
 void BMessageBody::PrintToStream() const
 {
-	// TODO: implement
+	// TODO: test
 	for (TMsgDataMap::const_iterator i = fData.begin(); i != fData.end(); ++i)
 	{
 		i->second->PrintToStream(i->first.c_str());
