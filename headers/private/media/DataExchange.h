@@ -170,6 +170,7 @@ enum {
 	TIMESOURCE_OP, // datablock is a struct time_source_op_info
 	TIMESOURCE_ADD_SLAVE_NODE,
 	TIMESOURCE_REMOVE_SLAVE_NODE,
+	TIMESOURCE_GET_START_LATENCY,
 	
 	TIMESOURCE_MESSAGE_END,
 };
@@ -957,6 +958,15 @@ struct timesource_add_slave_node_command : public command_data
 struct timesource_remove_slave_node_command : public command_data
 {
 	media_node node;
+};
+
+struct timesource_get_start_latency_request : public request_data
+{
+};
+
+struct timesource_get_start_latency_reply : public reply_data
+{
+	bigtime_t start_latency;
 };
 
 struct controllable_get_parameter_web_request : public request_data
