@@ -131,15 +131,12 @@ struct TrackInfo {
   void		  *CodecPrivate;
   unsigned	  CodecPrivateSize;
   unsigned	  CompMethod;
-  struct {
     unsigned int  Enabled:1;
     unsigned int  Default:1;
     unsigned int  Lacing:1;
     unsigned int  DecodeAll:1;
     unsigned int  CompEnabled:1;
-  };
 
-  union {
     struct {
       unsigned char   StereoMode;
       unsigned char   DisplayUnit;
@@ -150,9 +147,7 @@ struct TrackInfo {
       unsigned int    DisplayHeight;
       unsigned int    ColourSpace;
       MKFLOAT	      GammaValue;
-      struct {
 	unsigned int  Interlaced:1;
-      };
     } Video;
     struct {
       MKFLOAT	      SamplingFreq;
@@ -160,7 +155,6 @@ struct TrackInfo {
       unsigned char   Channels;
       unsigned char   BitDepth;
     } Audio;
-  };
 
   /* various strings */
   char			*Name;
@@ -223,14 +217,12 @@ struct Chapter {
   unsigned		nCommands,nCommandsSize;
   struct ChapterCommand	*Commands;
 
-  struct {
     unsigned int	Hidden:1;
     unsigned int	Enabled:1;
 
     // Editions
     unsigned int	Managed:1;
     unsigned int	Default:1;
-  };
 };
 
 typedef struct Chapter	Chapter;
