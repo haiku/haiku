@@ -13,6 +13,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <KernelExport.h>
+
 #include "intel_partition_map.h"
 
 #define TRACE(x) ;
@@ -114,6 +116,7 @@ void
 Partition::SetTo(const partition_descriptor *descriptor, off_t ptsOffset,
 				 off_t baseOffset, int32 blockSize)
 {
+TRACE(("Partition::SetTo(): active: %x\n", descriptor->active));
 	fPTSOffset = ptsOffset;
 	fOffset = baseOffset + (off_t)descriptor->start * blockSize;
 	fSize = (off_t)descriptor->size * blockSize;
