@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src prefs mouse ;
 
-AddResources Mouse : Mouse.rsrc ;
+AddResources Mouse : Mouse.rdef ;
 
 Preference Mouse : 
 	Mouse.cpp 
