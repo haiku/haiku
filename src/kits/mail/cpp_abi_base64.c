@@ -3,11 +3,11 @@
 #if __MWERKS__
 	#define encode_base64__local_abi encode_base64__FPcPcx
 	#define decode_base64__local_abi decode_base64__FPcPcxb
-	#define USETHISFILEATALL=1
+	#define USETHISFILEATALL 1
 #elif __GNUC__ <= 2
 	#define encode_base64__local_abi encode_base64__FPcT0x
 	#define decode_base64__local_abi decode_base64__FPcT0xb
-	#define USETHISFILEATALL=1	
+	#define USETHISFILEATALL 1	
 #endif
 
 #if USETHISFILEATALL /* If we are using GCC >= 3 or something else, we clearly have given up on binary compat anyway */
