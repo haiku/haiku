@@ -66,7 +66,7 @@ unregister_kernel_daemon(void (*function)(void *, int), void *arg)
 	while ((daemon = list_get_next_item(&gDaemons, daemon)) != NULL) {
 		if (daemon->function == function && daemon->arg == arg) {
 			// found it!
-			list_remove_link(daemon);
+			list_remove_item(&gDaemons, daemon);
 			free(daemon);
 			break;
 		}
@@ -113,7 +113,7 @@ register_kernel_daemon(void (*function)(void *, int), void *arg, int frequency)
 	} else
 		daemon->offset = 0;
 
-	list_add_link_to_tail(&gDaemons, daemon);
+	list_add_item(&gDaemons, daemon);
 	mutex_lock(&gDaemonMutex);
 
 	return B_OK;

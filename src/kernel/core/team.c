@@ -356,7 +356,7 @@ create_team_struct(const char *name, bool kernel)
 	team->pending_signals = 0;
 	team->death_sem = -1;
 	team->user_env_base = 0;
-	initque(&team->image_queue);
+	list_init(&team->image_list);
 
 	if (arch_team_init_team_struct(team, kernel) < 0)
 		goto error1;

@@ -49,7 +49,7 @@ register_image(team_id teamID, image_info *_info, size_t size)
 	team = team_get_team_struct_locked(teamID);
 	if (team) {
 		image->info.id = id;
-		insque(image, &team->image_queue);
+		list_add_item(&team->image_list, image);
 	}
 
 	RELEASE_TEAM_LOCK();
@@ -67,7 +67,6 @@ status_t
 unregister_image(team_id teamID, image_id id)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct image *image;
 	struct team *team;
 	cpu_status state;
 
@@ -76,9 +75,11 @@ unregister_image(team_id teamID, image_id id)
 
 	team = team_get_team_struct_locked(teamID);
 	if (team) {
-		kqueue_foreach (&team->image_queue, image) {
+		struct image *image = NULL;
+
+		while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
 			if (image->info.id == id) {
-				remque(image);
+				list_remove_link(image);
 				free(image);
 				status = B_OK;
 				break;
@@ -100,10 +101,10 @@ unregister_image(team_id teamID, image_id id)
 int32
 count_images(struct team *team)
 {
-	struct image *image;
+	struct image *image = NULL;
 	int32 count = 0;
-	
-	kqueue_foreach (&team->image_queue, image) {
+
+	while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
 		count++;
 	}
 
@@ -119,15 +120,11 @@ count_images(struct team *team)
 status_t
 remove_images(struct team *team)
 {
-	struct image *image, *nextImage;
+	struct image *image;
 
 	ASSERT(team != NULL);
 
-	// can't use kqueue_foreach() because "image" gets freed
-	for (image = (struct image *)team->image_queue.next;
-		image != (void *)&team->image_queue; image = nextImage) {
-		nextImage = image->next;
-
+	while ((image = list_remove_head_item(&team->image_list)) != NULL) {
 		free(image);
 	}
 	return B_OK;
@@ -138,7 +135,6 @@ status_t
 _get_image_info(image_id id, image_info *info, size_t size)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct image *image;
 	struct team *team;
 	cpu_status state;
 
@@ -147,7 +143,9 @@ _get_image_info(image_id id, image_info *info, size_t size)
 
 	team = thread_get_current_thread()->team;
 	if (team) {
-		kqueue_foreach (&team->image_queue, image) {
+		struct image *image = NULL;
+
+		while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
 			if (image->info.id == id) {
 				memcpy(info, &image->info, size);
 				status = B_OK;
@@ -167,7 +165,6 @@ status_t
 _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t size)
 {
 	status_t status = B_ENTRY_NOT_FOUND;
-	struct image *image;
 	struct team *team;
 	cpu_status state;
 
@@ -176,8 +173,10 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info, size_t siz
 
 	team = team_get_team_struct_locked(teamID);
 	if (team) {
+		struct image *image = NULL;
 		int32 count = 0;
-		kqueue_foreach (&team->image_queue, image) {
+
+		while ((image = list_get_next_item(&team->image_list, image)) != NULL) {
 			if (count == *cookie) {
 				memcpy(info, &image->info, size);
 				status = B_OK;
