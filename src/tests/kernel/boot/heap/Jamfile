@@ -1,14 +1,18 @@
 SubDir OBOS_TOP src tests kernel boot heap ;
 
-UseHeaders [ PublicHeaders support ] ;
 UsePrivateHeaders kernel ;
+	# this makes the wrong stdio.h header accessible
+	# current work-around to let the test build
+	# under the build platform is to remove the
+	# private/kernel/stdio.h file.
+	# This will be fixed with the move to GNU's stdio header
 
 SubDirHdrs $(OBOS_TOP) headers private kernel arch $(OBOS_ARCH) ;
 SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 
 ObjectDefines heap.cpp : malloc=heap_malloc free=heap_free ;
 
-BuildPlatformMain heapTest :
+BuildPlatformTest heapTest :
 	heapTest.cpp
 
 	heap.cpp
