@@ -1343,6 +1343,16 @@ BRegion Layer::ConvertFromParent(BRegion *reg)
 	return newreg;
 }
 
+BPoint Layer::ConvertToTop(BPoint pt)
+{
+	if (fParent!=NULL)
+	{
+		return(fParent->ConvertToTop(pt+fFrame.LeftTop()));
+	}
+	else
+		return(pt);
+}
+
 //! Converts the passed region to screen coordinates
 BRegion Layer::ConvertToTop(BRegion *reg)
 {
@@ -1359,6 +1369,16 @@ BRect Layer::ConvertToTop(BRect rect)
 		return(fParent->ConvertToTop(rect.OffsetByCopy(fFrame.LeftTop())) );
 	else
 		return(rect);
+}
+
+BPoint Layer::ConvertFromTop(BPoint pt)
+{
+	if (fParent!=NULL)
+	{
+		return(fParent->ConvertFromTop(pt-fFrame.LeftTop()));
+	}
+	else
+		return(pt);
 }
 
 //! Converts the passed region from screen coordinates
@@ -1423,8 +1443,9 @@ void Layer::SendUpdateMsg()
 	{
 		BMessage msg;
 		msg.what = _UPDATE_;
-		msg.AddRect( "_rect", ConvertFromTop(fUpdateReg.Frame()) );
-		msg.AddRect( "debug_rect", fUpdateReg.Frame() );
+		msg.AddRect("_rect", ConvertFromTop(fUpdateReg.Frame()) );
+		msg.AddRect("debug_rect", fUpdateReg.Frame() );
+		msg.AddInt32("_token",fViewToken);
 		
 		fServerWin->SendMessageToClient( &msg );
 	}

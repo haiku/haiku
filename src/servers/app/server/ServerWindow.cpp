@@ -34,6 +34,7 @@
 #include <GraphicsDefs.h>
 #include <PortLink.h>
 #include <Session.h>
+#include "Desktop.h"
 #include "AppServer.h"
 #include "Layer.h"
 #include "RootLayer.h"
@@ -49,7 +50,7 @@
 #include "CursorManager.h"
 #include "Workspace.h"
 
-//#define DEBUG_SERVERWINDOW
+#define DEBUG_SERVERWINDOW
 //#define DEBUG_SERVERWINDOW_MOUSE
 //#define DEBUG_SERVERWINDOW_KEYBOARD
 
@@ -89,6 +90,7 @@ read_from_buffer(int8 **_buffer)
 	return value;
 }
 //------------------------------------------------------------------------------
+/*
 static int8 *read_pattern_from_buffer(int8 **_buffer)
 {
 	int8 *pattern = *_buffer;
@@ -97,6 +99,7 @@ static int8 *read_pattern_from_buffer(int8 **_buffer)
 
 	return pattern;
 }
+*/
 //------------------------------------------------------------------------------
 template<class Type> void
 write_to_buffer(int8 **_buffer, Type value)
@@ -680,7 +683,6 @@ void ServerWindow::DispatchMessage(int32 code)
 		printf("ServerWindow %s received unexpected code - message offset %lx before top_view attached.\n",fTitle.String(), code - SERVER_TRUE);
 		return;
 	}
-
 	switch(code)
 	{
 		//--------- BView Messages -----------------
@@ -1084,7 +1086,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_SET_SCALE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->_name->String()));		
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_SCALE: Layer: %s\n",fTitle.String(), cl->fName->String()));		
 			fSession->Read<float>(&(cl->fLayerData->scale));
 			break;
 		}
@@ -1118,7 +1120,7 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_GET_PEN_LOC:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_LOC: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->StartMessage(SERVER_TRUE);
 			fSession->Attach<BPoint>(cl->fLayerData->penlocation);
 			fSession->Flush();
@@ -1127,14 +1129,14 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_LAYER_SET_PEN_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_SET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->Read<float>(&(cl->fLayerData->pensize));
 		
 			break;
 		}
 		case AS_LAYER_GET_PEN_SIZE:
 		{
-			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->_name->String()));
+			STRACE(("ServerWindow %s: Message AS_LAYER_GET_PEN_SIZE: Layer: %s\n",fTitle.String(), cl->fName->String()));
 			fSession->StartMessage(SERVER_TRUE);
 			fSession->Attach<float>(cl->fLayerData->pensize);
 			fSession->Flush();
@@ -1465,11 +1467,13 @@ void ServerWindow::DispatchMessage(int32 code)
 		}
 		case AS_BEGIN_UPDATE:
 		{
+			STRACE(("ServerWindowo %s: AS_BEGIN_UPDATE\n",fTitle.String()));
 			cl->UpdateStart();
 			break;
 		}
 		case AS_END_UPDATE:
 		{
+			STRACE(("ServerWindowo %s: AS_END_UPDATE\n",fTitle.String()));
 			cl->UpdateEnd();
 			break;
 		}
@@ -1680,6 +1684,30 @@ void ServerWindow::DispatchMessage(int32 code)
 			STRACE(("ServerWindow %s: Message Zoom unimplemented\n",fTitle.String()));
 			break;
 		}
+		
+		// -------------------- Graphics messages ----------------------------------
+		
+		
+		case AS_STROKE_LINE:
+		{
+			// TODO: Add clipping TO AS_STROKE_LINE
+			float x1, y1, x2, y2;
+			
+			fSession->Read<float>(&x1);
+			fSession->Read<float>(&y1);
+			fSession->Read<float>(&x2);
+			fSession->Read<float>(&y2);
+			
+			if (cl && cl->fLayerData)
+			{
+				BPoint p1(x1,y1);
+				BPoint p2(x2,y2);
+				desktop->GetDisplayDriver()->StrokeLine(cl->ConvertToTop(p1),cl->ConvertToTop(p2),
+						cl->fLayerData);
+			}
+			break;
+		}
+
 		default:
 		{
 			printf("ServerWindow %s received unexpected code - message offset %lx\n",fTitle.String(), code - SERVER_TRUE);
@@ -1695,7 +1723,7 @@ void ServerWindow::DispatchMessage(int32 code)
 */
 void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 {
-	Layer *layer;
+/*	Layer *layer;
 	LayerData *layerdata;
 	int32 code;
 	int32 view_token;
@@ -1711,14 +1739,14 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 		return;
 		
 	// TODO: fix sibling-related clipping calculations in DispatchGraphicsMessage
-/*	WindowClipRegion.Set(fWinBorder->Frame());
-	sibling = fWinBorder->UpperSibling();
-	while (sibling)
-	{
-		WindowClipRegion.Exclude(sibling->Frame());
-		sibling = sibling->UpperSibling();
-	}
-*/
+//	WindowClipRegion.Set(fWinBorder->Frame());
+//	sibling = fWinBorder->UpperSibling();
+//	while (sibling)
+//	{
+//		WindowClipRegion.Exclude(sibling->Frame());
+//		sibling = sibling->UpperSibling();
+//	}
+
 
 	if (!WindowClipRegion.Frame().IsValid())
 		return;
@@ -1899,10 +1927,15 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					x2 = read_from_buffer<float>(&msgbuffer);
 					y2 = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					//BPoint p1(x1,y1);
-					//BPoint p2(x2,y2);
-					//if (layerdata)
-						//fServerApp->_driver->StrokeLine(p1,p2,layerdata,pattern);
+//					BPoint p1(x1,y1);
+//					BPoint p2(x2,y2);
+					
+					// TODO: This printf should remain in place to until it actually gets printed
+					// while testing with a test app which calls StrokeLine()
+					printf("AS_STROKE_LINE\n");
+					
+//					if (cl && cl->fLayerData)
+//						desktop->GetDisplayDriver()->StrokeLine(p1,p2,cl->fLayerData);
 					sizeRemaining -= AS_STROKE_LINE_MSG_SIZE;
 				}
 				else
@@ -2103,18 +2136,18 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 					right = read_from_buffer<float>(&msgbuffer);
 					bottom = read_from_buffer<float>(&msgbuffer);
 					pattern = read_pattern_from_buffer(&msgbuffer);
-					/*
-					BRect rect(left,top,right,bottom);
-					if (layerdata && numRects)
-						if (numRects == 1)
-							fServerApp->_driver->FillRect(rect,layerdata,pattern);
-						else
-						{
-							int i;
-							for (i=0; i<numRects; i++)
-								fServerApp->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
-						}
-					*/
+					
+//					BRect rect(left,top,right,bottom);
+//					if (layerdata && numRects)
+//						if (numRects == 1)
+//							fServerApp->_driver->FillRect(rect,layerdata,pattern);
+//						else
+//						{
+//							int i;
+//							for (i=0; i<numRects; i++)
+//								fServerApp->_driver->FillRect(LayerClipRegion.RectAt(i),layerdata,pattern);
+//						}
+					
 					sizeRemaining -= AS_FILL_RECT_MSG_SIZE;
 				}
 				else
@@ -2223,6 +2256,10 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 				// TODO: Implement AS_SET_FONT_SIZE
 				break;
 			}
+			
+			// graphics messages
+			
+			
 			default:
 			{
 				sizeRemaining -= sizeof(int32);
@@ -2231,6 +2268,7 @@ void ServerWindow::DispatchGraphicsMessage(int32 msgsize, int8 *msgbuffer)
 			}
 		}
 	}
+*/
 }
 //------------------------------------------------------------------------------
 /*!

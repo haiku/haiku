@@ -120,8 +120,12 @@ public:
 	BRegion ConvertToParent(BRegion *reg);
 	BRect ConvertFromParent(BRect rect);
 	BRegion ConvertFromParent(BRegion *reg);
+	
+	BPoint ConvertToTop(BPoint pt);
 	BRegion ConvertToTop(BRegion *reg);
 	BRect ConvertToTop(BRect rect);
+
+	BPoint ConvertFromTop(BPoint pt);
 	BRegion ConvertFromTop(BRegion *reg);
 	BRect ConvertFromTop(BRect rect);
 	
