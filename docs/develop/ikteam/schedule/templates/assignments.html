@@ -1,0 +1,83 @@
+<html>
+<head>
+	<title>Interface Kit Team Assignments</title>
+</head>
+<body>
+<h1>
+	Interface Kit Team Assignments and Open Tasks
+	<hr>
+</h1>
+
+<h2>
+	Assignments:
+</h2>
+
+<table>
+<scripting>
+@for_each engineer in $Assignments.engineers
+	<tr>
+		<td>
+			$engineer.name
+		</td>
+	</tr>
+@for_each etask in $engineer.tasks
+	<tr>
+		<td>
+		</td>
+		<td>
+			$etask.str
+		</td>
+	</tr>
+@end
+	<tr>
+		<td height="15" colspan="2"></td>
+	</tr>
+@end
+</scripting>
+</table>
+
+
+<h2>
+	Open Tasks:
+</h2>
+
+<table>
+<scripting>
+@for_each section in $Assignments.sections
+	<tr>
+		<td>
+			$section.name
+		</td>
+	</tr>
+@for_each stask in $section.tasks
+	<tr>
+		<td>
+		</td>
+		<td>
+			$stask.str
+		</td>
+	</tr>
+@end
+	<tr>
+		<td height="15" colspan="2"></td>
+	</tr>
+@end
+</scripting>
+</table>
+<br>
+<hr>
+
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>The OpenBeOS project is hosted by:</small><br><br> 
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002
+<a href="http://www.openbeos.org">OpenBeOS</a> Project</small> 
+</center>
+
+</body>
+</html>

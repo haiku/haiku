@@ -1,0 +1,41 @@
+Variables
+static void *page_cache_table
+
+static spinlock_t page_cache_table_lock
+
+static int page_compare_func(void *_p, const void *_key)
+	Compares a vm_page's cache_ref and offset to those of key. Returns 0 on match, -1 otherwise.
+
+static unsigned int page_hash_func(void *_p, const void *_key, unsigned int range)
+	If p is not null, use it otherwise use key; computes a hash value for offset and reference.
+
+int vm_cache_init(kernel_args *ka)
+	Calls hash_init, sets page_cache_table_lock to unlocked and returns 0.
+
+vm_cache *vm_cache_create(vm_store *store)
+	Allocates a vm_cache structure and populates with 0's and NULLs (except for store).
+
+vm_cache_ref *vm_cache_ref_create(vm_cache *cache)
+	Allocates a vm_cache_ref, setting it to point to the passed in cache. It initalizes the references lock and returns.
+
+void vm_cache_acquire_ref(vm_cache_ref *cache_ref, bool acquire_store_ref)
+	If the cache_ref is null, panic. Otherwise, if we are to aquire a reference and there is an aquire reference function for this cache's store, call that function. Finally, increment this cache references' count.
+
+void vm_cache_release_ref(vm_cache_ref *cache_ref)
+	If this cache_ref is the last reference to its cache, we call destroy on the store, remove all of its pages from the page_cache_table and set the state of them to free, increase max_commit by the size of the now freed storage, remove the reference to the original cache, destroy the reference's mutex and its space.
+	Otherwise, we call the store's release ref and return.
+
+vm_page *vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
+	Lock the page_cache_table_lock and lookup the offset and cache_ref in the page_cache_table, then unlock.
+
+void vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
+	Add this page to the page_cache_table.
+
+void vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
+	Find this page and remove it from the hash list. Clean up the linked lists.
+
+int vm_cache_insert_region(vm_cache_ref *cache_ref, vm_region *region)
+	Add this region to the cache_ref's region list.
+
+int vm_cache_remove_region(vm_cache_ref *cache_ref, vm_region *region)
+	Remove this region from the cache_ref's region list.

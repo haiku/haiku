@@ -1,0 +1,52 @@
+# This is $(TOP)/source/lib/Jamfile
+
+SubDir TOP source lib ;
+
+SharedFromSources $(TOP)/source/lib/libstorage.so :
+	ByteOrder.cpp
+	DataIO.cpp
+	Directory.cpp
+	Entry.cpp
+	EntryList.cpp
+	File.cpp
+	FindDirectory.cpp
+	Flattenable.cpp
+	List.cpp
+	Locker.cpp
+	MallocIO.cpp
+	Mime.cpp
+	MimeType.cpp
+	Node.cpp
+	#NodeInfo.cpp
+	OffsetFile.cpp
+	Path.cpp
+	Query.cpp
+	QueryPredicate.cpp
+	ResourcesContainer.cpp
+	ResourceFile.cpp
+	ResourceItem.cpp
+	Resources.cpp
+	ResourceStrings.cpp
+	Statable.cpp
+	SymLink.cpp
+	Volume.cpp
+	kernel_interface.POSIX.cpp
+	storage_support.cpp ;
+LinkSharedLibs $(TOP)/source/lib/libstorage.so :
+	$(TOP)/source/lib/libbeadapter.so
+;
+LinkSharedOSLibs $(TOP)/source/lib/libstorage.so :
+	/boot/develop/lib/x86/libbe.so
+;
+
+
+# Here come the rules for our adapter library.
+
+HDRS = ;
+
+SharedFromSources $(TOP)/source/lib/libbeadapter.so :
+	LibBeAdapter.cpp
+;
+LinkSharedOSLibs $(TOP)/source/lib/libbeadapter.so :
+	/boot/develop/lib/x86/libbe.so
+;

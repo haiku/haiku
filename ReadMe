@@ -1,0 +1,102 @@
+Building
+--------
+
+The build system uses Jam/MR (http://www.perforce.com/jam/jam.html).
+A BeOS executable of Jam 2.3.1 is available at:
+
+  http://open-beos.sf.net/misc/jam.zip
+
+Unzip the executable and copy it to /boot/home/config/bin.
+
+To build the whole source tree, launch a Terminal, cd into the openbeos root
+directory and just type:
+
+  $ ./configure
+  $ jam
+
+The configure script generates a file named BuildConfig. As long as configure
+is not modified (!), there is no need to call it again. That is for
+re-building you only need to invoke Jam. If you don't update the source tree
+very frequently, you may want to execute configure after each update just to
+be on the safe side.
+
+NOTE: If you have checked out the latest CVS version, it is not unlikely that
+some parts of the tree won't build.
+
+
+Running
+-------
+
+If the build went fine, a file named floppy.x86 had been created in the
+root directory of the source tree. What you want to do now, is to boot from
+this floppy image. Therefore you either write the image onto a real floppy
+disk and restart you computer, or you write it onto a "virtual floppy disk"
+emulated by a x86 PC emulator and just start this emulator.
+
+1. Real Floppy
+
+Put in the disk and type in the source tree's root dir:
+
+  $ dd if=floppy.x86  of=/dev/disk/floppy/raw bs=18k
+
+
+2. Emulated Floppy (Bochs)
+
+Type:
+
+  $ dd if=floppy.x86  of=<floppy image> bs=18k
+
+where <floppy image> has to be replaced with the filename of the floppy
+image Bochs has been told to use (e.g. /tmp/obos.img).
+
+
+Bochs
+-----
+
+Version 1.4 of Bochs for BeOS (BeBochs) can be downloaded from BeBits:
+
+  http://www.bebits.com/app/2902
+
+The package installs to: /boot/apps/BeBochs1.4
+
+You have to set up a configuration for Bochs. A relatively short and
+painless procedure follows:
+
+Lauch a Terminal:
+
+  $ cd /tmp
+  $ /boot/apps/BeBochs1.4/bximage
+
+Answer with "fd", RETURN (for 1.44) and "obos.img", and a floppy image
+/tmp/obos.img will be created.
+Open folder /boot/apps/BeBochs1.4 and backup .bochsrc. Open .bochsrc with
+your favorite text editor, remove the complete contents and paste the
+following instead (you may as well take the original file and insert/replace/
+keep the respective lines):
+
+romimage: file=bios/BIOS-bochs-latest, address=0xf0000
+megs: 32
+vgaromimage: bios/VGABIOS-elpin-2.40
+floppya: 1_44=/tmp/obos.img, status=inserted
+boot: a
+log: /var/log/bochs-obos.log
+panic: action=ask
+error: action=report
+info: action=report
+debug: action=ignore
+vga_update_interval: 300000
+keyboard_serial_delay: 250
+keyboard_paste_delay: 100000
+floppy_command_delay: 500
+ips: 2000000
+
+Now put the OBOS boot image onto you "virtual" floppy and start Bochs:
+
+  $ cd <OBOS sources directory>
+  $ dd if=floppy.x86 of=/tmp/obos.img bs=18k
+  $ cd /boot/apps/BeBochs1.4
+  $ ./bochs
+
+Answer three times with RETURN and with some patience you will see OBOS
+booting.
+

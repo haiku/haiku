@@ -1,0 +1,614 @@
+\documentclass[12pt, a4paper]{article}
+
+\usepackage{amssymb,amsmath,latexsym}
+\usepackage[english]{babel}
+\usepackage{hhline}
+
+\newcommand{\code}[1]{{\tt #1}}
+
+\newenvironment{nitemize}{
+  \newdimen\oldparindent
+  \oldparindent=\parindent
+  \begin{itemize}
+  \itemindent=-\oldparindent
+}{
+  \end{itemize}
+}
+
+%\newcommand{\codeblockspace}{\vspace{12pt}}
+
+% begin/end a code block
+\newcommand{\codeblockbegin}{\begin{flushleft}\begin{minipage}{\textwidth}}
+\newcommand{\codeblockend}{\end{minipage}\end{flushleft}}
+
+
+\begin{document}
+
+\sloppy
+
+\title{The Resources Format}
+%\date{}
+\author{Ingo Weinhold (bonefish@users.sf.net)}
+
+\maketitle
+\tableofcontents
+
+
+\section{Introduction}
+\label{introduction}
+
+Resources provide a means to store structured but flat data in files. Unlike
+attributes resources are part of the file contents and thus do not require a
+special file system handling, but rather a special file format.
+On the one hand there are formats of files that exclusively contain resources
+(resource files), on the other hand these are file formats extended to
+additionally contain resources -- namely the ELF and PEF object formats.
+In either case the format of the chunk of data that frames the resources
+themselves is the same. We call it the resources format.
+
+Section \ref{file-formats} explains how the resources format is embedded in
+different file formats. Section \ref{resources-format} discusses the resources
+format itself. In section \ref{implementations} we focus on robustness of
+resources reading/writing implementations.
+The final section says some words about the status of the information provided
+by this document.
+
+
+
+\section{File Formats}
+\label{file-formats}
+
+In all file formats described in this section the resources are being located
+at the end of the files. They are completely independent of their location.
+
+
+\subsection{x86 Resource Files}
+
+x86 resource files introduce the least overhead. The resources start directly
+after the magic number identifying the file format:
+%
+\codeblockbegin
+\begin{verbatim}
+  const char kX86ResourceFileMagic[4] = { 'R', 'S', 0, 0 };
+  const uint32 kX86ResourcesOffset    = 0x00000004;
+\end{verbatim}
+\codeblockend
+%
+The resources start at \code{kX86ResourcesOffset}.
+
+
+\subsection{PPC Resource Files}
+
+PPC resource files begin with a PEF container header, after which the
+resources start.
+%
+\codeblockbegin
+\begin{verbatim}
+typedef char PefOSType[4];
+
+struct PEFContainerHeader {
+    PefOSType tag1;
+    PefOSType tag2;
+    PefOSType architecture;
+    uint32    formatVersion;
+    uint32    dateTimeStamp;
+    uint32    oldDefVersion;
+    uint32    oldImpVersion;
+    uint32    currentVersion;
+    uint16    sectionCount;
+    uint16    instSectionCount;
+    uint32    reservedA;
+};
+\end{verbatim}
+\codeblockend
+%
+\codeblockbegin
+\begin{verbatim}
+  const char kPEFFileMagic1[4]        = { 'J', 'o', 'y', '!' };
+  const char kPPCResourceFileMagic[4] = { 'r', 'e', 's', 'f' };
+  const uint32 kPPCResourcesOffset    = 0x00000028;
+\end{verbatim}
+\codeblockend
+
+\begin{nitemize}
+\item{\code{tag1}:
+  Must be \code{kPEFFileMagic1}.}
+\item{\code{tag2}:
+  Must be \code{kPPCResourceFileMagic}.}
+\item{All other fields must be set to 0.}
+\end{nitemize}
+
+\noindent
+The resources start at \code{kPPCResourcesOffset}.
+
+
+\subsection{ELF Object Files}
+
+In an ELF file, resources are appended to rather than contained in the
+regular data of the file. That is adding resources to an existing ELF file
+will not cause any modification to its data (i.e. ELF header, program header
+table, section header table or sections), but will enlarge the file by some
+alignment padding and, of course, the resources themselves.
+
+Therefore two values have to be known: The size of the actual ELF file and the
+block size to which the resources must be aligned. As ELF files do not contain
+a size field, it has to be deduced, where the file ends. This end offset is
+supposed to be the maximum of the end offsets of ELF header, program header
+table (if any), section header table (if any), sections and segments.
+
+The block size to which the resources have to be aligned is the maximum of
+\code{kELFMinResourceAlignment} and the alignments of the segments in the file.
+%
+\begin{verbatim}
+  const uint32 kELFMinResourceAlignment = 32;
+\end{verbatim}
+%
+The data used for the padding between the end of the actual ELF data and the
+beginning of the resources may be arbitrary.
+
+
+\subsection{PEF Object Files}
+
+Similar to ELF files the resources are simply appended to the regular data of
+a PEF file, but they are not aligned to any value. That is the resources
+start directly after the last PEF section without any padding.
+As no field exists, that tells about the size of the PEF container (the
+regular data), it has to be deduced by iterating through the PEF section
+headers.
+
+
+
+\section{The Resources Format}
+\label{resources-format}
+
+This section describes the resources format. After a subsection that outlines
+their general layout, it follow subsections discussing the major parts.
+
+A general remark regarding the byte ordering: Resources have no standard
+endianess, that is the resources created by little endian and big endian
+machines differ. Usually it should be possible, to deduce the used endianess
+from the type of the file. x86 resource files contain little endian, PPC
+resource files big endian data. The endianess of an ELF file is encoded in
+its header.
+
+As there is in fact no good reason to have different resource file formats,
+even if they differ only in the format of the header (see section
+\ref{file-formats}), it may be decided to use the x86 resource file format
+also for big endian machines. Therefore the endianess may be deduced by the
+first field of the resources header (\code{rh\_resources\_magic}, see
+subsection \ref{resources-header}).
+
+
+\subsection{Resources Layout}
+
+The layout of the resources in a file is shown in figure
+\ref{fig:resources-layout}.
+
+\begin{figure}[h!tb]
+  \begin{center}
+  \begin{tabular}{|c|c|c|}
+  \hline
+                & \multicolumn{2}{c|}{resources header}\\
+  \hhline{|~==|}
+  admin section &               & index section header \\
+  \hhline{~~|-|}
+                & index section & resource index \\
+  \hhline{~~|-|}
+                &               & padding \\
+  \hhline{:===:}
+  \multicolumn{3}{|c|}{unknown section}\\
+  \hhline{:===:}
+  \multicolumn{3}{|c|}{data section}\\
+  \hhline{|~~~|}
+  \hhline{:===:}
+  \multicolumn{3}{|c|}{info section}\\
+  \hline
+  \end{tabular}
+  \end{center}
+  \caption{The Resources Layout.}
+  \label{fig:resources-layout}
+\end{figure}
+
+\noindent
+There are four sections:
+%
+\begin{itemize}
+\item{An administrative section which comprises the resources header and the
+  resource index subsection. The latter locates all other data in the file.
+}
+\item{An unknown section, whose purpose is (unsurprisingly) unknown, but which
+  seems to be unused, always containing the same data.
+}
+\item{A data section holding the actual resource data.
+}
+\item{An info section, which provides aditional information for each resource,
+  such as type, id and name.
+}
+\end{itemize}
+
+
+\subsection{Resources Header}
+\label{resources-header}
+
+The resources header has the following structure:
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resources_header {
+      uint32 rh_resources_magic;
+      uint32 rh_resource_count;
+      uint32 rh_index_section_offset;
+      uint32 rh_admin_section_size;
+      uint32 rh_pad[13];
+  };
+\end{verbatim}
+\codeblockend
+%
+\codeblockbegin
+\begin{verbatim}
+  const uint32 kResourcesHeaderMagic          = 0x444f1000;
+  const uint32 kResourceIndexSectionOffset    = 0x00000044;
+  const uint32 kResourceIndexSectionAlignment = 0x00000600;
+\end{verbatim}
+\codeblockend
+
+\begin{nitemize}
+\item{\code{rh\_resources\_magic}:
+  Must be \code{kResourcesHeaderMagic}.
+}
+\item{\code{rh\_resource\_count}:
+  Specifies the number of resources stored in this file. May be 0.
+}
+\item{\code{rh\_index\_section\_offset}:
+  Specifies the offset of the resource index section relative to the beginning
+  of the resources. An alternative interpretation may be the size of the
+  resources header.
+  Must be \code{kResourceIndexSectionOffset}.
+}
+\item{\code{rh\_admin\_section\_size}:
+  Specifies the size of the administrative section.
+  Must be \code{kResourceIndexSectionOffset} plus a multiple of
+  \code{kResourceIndexSectionAlignment}.
+}
+\item{\code{rh\_pad}:
+  Padding. \code{0x00000000} words.
+}
+\end{nitemize}
+
+
+\subsection{Resource Index Section}
+\label{resources-index}
+
+The resource index section starts with a header, it follows a table of
+\code{resource\_index\_entry} structures, that locates the data of each
+resource, and the section ends with a special padding.
+
+\noindent
+The resource index header has the following structure:
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resource_index_section_header {
+      uint32 rish_index_section_offset;
+      uint32 rish_index_section_size;
+      uint32 rish_unused_data1;
+      uint32 rish_unknown_section_offset;
+      uint32 rish_unknown_section_size;
+      uint32 rish_unused_data2[25];
+      uint32 rish_info_table_offset;
+      uint32 rish_info_table_size;
+      uint32 rish_unused_data3;
+  };
+\end{verbatim}
+\codeblockend
+
+\begin{verbatim}
+  const uint32 kUnknownResourceSectionSize = 0x00000168;
+\end{verbatim}
+%
+\begin{nitemize}
+\item{\code{rish\_index\_section\_offset}:
+  Specifies the offset of the resource index section relative to the beginning
+  of the resources. An alternative interpretation may be the size of the
+  resources header.
+  Must be \code{kResourceIndexSectionOffset}.
+}
+\item{\code{rish\_index\_section\_size}:
+  Specifies the size of the resource index section.
+  Must be a multiple of \code{kResourceIndexSectionAlignment}.
+}
+\item{\code{rish\_unused\_data1}:
+  Contains special data as described in section \ref{resources-unknown}.
+}
+\item{\code{rish\_unknown\_section\_offset}:
+  Specifies the offset of the unknown section relative to the beginning
+  of the resources.
+  Must be the same value as given in the resources header for
+  \code{rh\_admin\_section\_size}.
+}
+\item{\code{rish\_unknown\_section\_size}:
+  Specifies the offset of the unknown section relative to the beginning
+  of the resources.
+  Must be \code{kUnknownResourceSectionSize};
+}
+\item{\code{rish\_unused\_data2}:
+  Contains special data as described in section \ref{resources-unknown}.
+}
+\item{\code{rish\_info\_table\_offset}:
+  Specifies the offset of the resource info table relative to the beginning
+  of the resources.
+}
+\item{\code{rish\_info\_table\_size}:
+  Specifies the size of the resource info table.
+}
+\item{\code{rish\_unused\_data3}:
+  Contains special data as described in section \ref{resources-unknown}.
+}
+\end{nitemize}
+
+Directly, without padding, it follows a table of \code{resource\_index\_entry}
+structures. The number of entries in the table is the number of resources
+stored in the file, that is the value specified by the
+\code{rh\_resource\_count} member of the resources header. Since the entries
+are stored without padding, the size of the table is exactly the product of
+the size of \code{resource\_index\_entry} and the number of resources.
+If the latter is 0, the table takes no space.
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resource_index_entry {
+      uint32 rie_offset;
+      uint32 rie_size;
+      uint32 rie_pad;
+  };
+\end{verbatim}
+\codeblockend
+%
+\begin{nitemize}
+\item{\code{rie\_offset}:
+  Specifies the offset of the resource data relative to the beginning
+  of the resources.
+}
+\item{\code{rie\_size}:
+  Specifies the size of the resource data.
+}
+\item{\code{rie\_pad}:
+	Padding. Must be \code{0x00000000}.
+}
+\end{nitemize}
+
+Since the size of the resource index section must be a multiple of
+\code{kResourceIndexSectionAlignment}, some padding may be needed at the end
+of this section. How this padding looks like is described in section
+\ref{resources-unknown}.
+
+
+\subsection{Unknown Section}
+\label{resources-unknown}
+
+The meaning of this section is unknown. It does not seem to be used at all.
+It always contains the same data given by \code{kUnusedResourceDataPattern}:
+%
+\codeblockbegin
+\begin{verbatim}
+  const uint32 kUnusedResourceDataPattern[3] = {
+      0xffffffff, 0x000003e9, 0x00000000
+  };
+\end{verbatim}
+\codeblockend
+%
+In section \ref{resources-index} some members where named \code{unused\_data}.
+These fields contain the same kind of data. To understand what the value for a
+certain field of this type is, it may help to imagine, that before the
+resources are written to a file, the space they will take is filled with the
+pattern specified by \code{kUnusedResourceDataPattern}, and that only those
+fields are written that are not unused. Thus the original pattern can be seen
+through at the unused locations.
+
+To be precise: Let \verb|uint32 resources[]| be the resources and
+\code{index} the index of an unused field in \code{resources}, then it holds:
+%
+\begin{verbatim}
+  resources[index] == kUnusedResourceDataPattern[index % 3];
+\end{verbatim}
+%
+
+
+\subsection{Resource Info Table}
+\label{resources-infotable}
+
+The resource info table features exactly one entry for each resource.
+Such an entry (resource info) specifies the ID and name of a
+resource. Subsequent infos for resources of the same type are collected in
+a block that starts with a type field.
+
+The following grammar specifies the layout of the resource info table.
+Nonterminals start with an upper case, terminals with a lower case letter.
+%
+\begin{verbatim}
+  ResourceInfoTable      ::= [ ResourceBlockList ]
+                             ResourceInfoSeparator
+                             ResourceInfoTableEnd
+
+  ResourceBlockList      ::= ResourceBlock
+                             [ ResourceInfoSeparator
+                               ResourceBlockList ]
+
+  ResourceBlock          ::= type ResourceInfoList
+
+  ResourceInfoList       ::= ResourceInfo [ ResourceInfoList ]
+
+  ResourceInfo           ::= id index name_size name
+
+  ResourceInfoSeparator  ::= 0xffffffff 0xffffffff
+
+  ResourceInfoTableEnd   ::= check_sum 0x00000000
+\end{verbatim}
+%
+The relevant structures follow:
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resource_info_block {
+      type_code     rib_type;
+      resource_info rib_info[1];
+  };
+\end{verbatim}
+\codeblockend
+%
+\begin{nitemize}
+\item{\code{rib\_type}:
+  Specifies the type of the resources in the block.
+}
+\item{\code{rib\_info}:
+  Is the first resource info of the block. More infos may follow.
+}
+\end{nitemize}
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resource_info {
+      int32  ri_id;
+      int32  ri_index;
+      uint16 ri_name_size;
+      char   ri_name[1];
+  };
+\end{verbatim}
+\codeblockend
+
+\begin{verbatim}
+  const uint32 kMinResourceInfoSize = 10;
+\end{verbatim}
+%
+\begin{nitemize}
+\item{\code{ri\_id}:
+  Specifies the ID of the resource.
+}
+\item{\code{ri\_index}:
+  Specifies the index of the resource this resource info refers to.
+}
+\item{\code{ri\_name\_size}:
+  Specifies the size of the resource name. May be 0 -- then the resource does
+  not have a name and \code{ri\_name} has a size of 0.
+}
+\item{\code{ri\_name}:
+  Specifies the name of the resource. The name must be null terminated.
+  \code{ri\_name\_size} specifies the size of this field (including the
+  terminating null). If it is 0, the resource does not have a name and
+  \code{ri\_name} is empty, i.e. has size 0.
+}
+\item{\code{kMinResourceInfoSize}:
+  Is the minimal size of a resource info. That is the size it has, if the
+  resource does not have a name.
+}
+\end{nitemize}
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resource_info_separator {
+      uint32 ris_value1;
+      uint32 ris_value2;
+  };
+\end{verbatim}
+\codeblockend
+%
+\begin{nitemize}
+\item{\code{ris\_value1}:
+  Specifies the first word of the separator.
+  Must be \code{0xffffffff}.
+}
+\item{\code{ris\_value2}:
+  Specifies the second word of the separator.
+  Must be \code{0xffffffff}.
+}
+\end{nitemize}
+%
+\codeblockbegin
+\begin{verbatim}
+  struct resource_info_table_end {
+      uint32 rite_check_sum;
+      uint32 rite_terminator;
+  };
+\end{verbatim}
+\codeblockend
+%
+\begin{nitemize}
+\item{\code{rite\_check\_sum}:
+  Contains the check sum for the resource info table. The check sum is
+  calculated from all bytes of the resource info table not including
+  \code{rite\_check\_sum} and \code{rite\_terminator}. The data are grouped
+  into four byte blocks, which are interpreted as big endian unsigned words
+  and summed up, ignoring carry. If the number of bytes to be considered is
+  not dividable by four, the remaining bytes are interpreted as the lower
+  bytes of a big endian unsigned word (the upper byte(s) set to 0).
+}
+\item{\code{rite\_terminator}:
+  Terminates the resource info table.
+  Must be \code{0x00000000}.
+}
+\end{nitemize}
+
+
+
+\section{Implementations}
+\label{implementations}
+
+Code that writes resources should strictly stick to the specification
+presented in the preceding sections to achieve maximal compatibility.
+
+Resources reading implementations may tolerate certain deviations that
+for instance happen to occur in several files of the BeOS R5 distribution
+and that are handled gracefully by xres and QuickRes. It follows a, possibly
+incomplete, list:
+%
+\begin{itemize}
+\item{The third and fourth byte of the x86 resource file magic (the 0 bytes)
+  may be arbitrary bytes.}
+\item{\code{rh\_resource\_count} may be unreliable. The resource index table
+  should be read until its end, which is either marked by the unused data
+  pattern (see section \ref{resources-unknown}) or at the latest by the
+  beginning of the unknown section.}
+\item{The resource info table may contain entries for indices that are out
+  of range, i.e. greater than the number of resources induced by the resource
+  index table. Those entries should be ignored.}
+\item{The resource info table may contain multiple entries for an index.
+  Any such entry after the first one should be ignored.}
+\item{The resource info table may not contain an entry for an index.
+  The respective resource should be ignored.}
+\item{The resource info table may not contain a \code{ResourceInfoTableEnd}
+  (see section \ref{resources-infotable}) and thus no check sum. The table
+  should be accepted nevertheless. Note, that a table containing a wrong check
+  sum is {\em not} to be accepted.}
+\end{itemize}
+
+
+
+\section{Status of this Document}
+\label{status}
+
+The information contained in this document are obtained by analyzing
+resources-containing files created or modified by tools available for BeOS R5,
+namely QuickRes and xres. They are incomplete and may even be partially wrong,
+where being based on incorrect assumptions.
+
+\noindent
+It follows a list of items with a low degree of reliance:
+\begin{itemize}
+\item{Resources alignment in ELF files: Several tests with linker object files
+  have shown, that QuickRes aligns their resources offset to 32 bytes.
+  For executables on the other hand the alignment was always 4096, which is
+  the usual memory page size of current x86 architectures and therefore the
+  preferred program segment alignment. From these two information it has been
+  deduced, that the alignment is, if present, the maximum of
+  the segment alignments to be found in the program header table,
+  but at minimum 32.}
+\item{The resources layout: The general layout of the resources is not very
+  well understood. The layout presented in figure \ref{fig:resources-layout}
+  resulted from the attempt to assign all the fields a reasonable meaning, but
+  in fact not even the exact length and meaning of the fields of the resources
+  header is unclear. The same holds for the resource index section header.}
+\item{The unknown section: The contents of the unknown section and of unknown
+  fields is base on educated guesses.}
+\end{itemize}
+
+\end{document}

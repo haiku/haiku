@@ -1,0 +1,210 @@
+Variables
+
+static vm_address_space *kernel_aspace;
+static region_id next_region_id;
+static void *region_table;
+static sem_id region_hash_sem;
+static aspace_id next_aspace_id;
+static void *aspace_table;
+static sem_id aspace_hash_sem;
+static int max_commit;
+static spinlock_t max_commit_lock;
+
+Functions
+
+static int region_compare(void *_r, const void *key)
+	Compares _r (a vm_region) to key to see if their id's are the same. If so, return 0, else return -1
+
+static unsigned int region_hash(void *_r, const void *key, unsigned int range)
+	If _r is null, return key (a region_id) mod range, else return _r's id mod range.
+
+static int aspace_compare(void *_a, const void *key)
+	Compares _a (an address space) to key to see if their id's are the same. If so, return 0, else return -1
+
+static unsigned int aspace_hash(void *_a, const void *key, unsigned int range)
+	If _a is null, return key (an aspace_id) mod range, else return _a's id mod range.
+
+vm_address_space *vm_get_aspace_by_id(aspace_id aid)
+	Does a hash lookup on aid to find a vm_address_space struct. Increments its reference count and returns it.
+
+vm_region *vm_get_region_by_id(region_id rid)
+	Does a hash lookup on rid to find a vm_region. Increments its reference count and returns it.
+
+region_id vm_find_region_by_name(aspace_id aid, const char *name)
+	Finds this address space's structure. Iterates over the region list, looking for a match for name. vm_put_aspace's the address space.
+
+static vm_region *_vm_create_region_struct(vm_address_space *aspace, const char *name, int wiring, int lock)
+	Allocates space for a region and its name. Populates the name. Gets a new region id and assigns it. Sets map to the address space's virtual map. 
+
+static int find_and_insert_region_slot(vm_virtual_map *map, addr start, addr size, addr end, int addr_type, vm_region *region)
+	Loops over the map's region list until it finds where this region should be inserted. If addr_type is any address, find any spot where it will fit and set the region up to start at the end of the previous one + 1. If we are searching for an exact address, see if that area is free and if so, use it. Increment map's change count.
+
+
+static int map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,off_t offset, addr size, int addr_type, int wiring, int lock, int mapping, vm_region **_region, const char *region_name)  
+	Creates a region structure for this address space, name, wiring and lock. If this is a private map, create a new store, cache and cache_ref for private copies of pages. If the store's commited size is too small, ask the store to attempt to commit more. Aquire a reference to the cache_ref. Ensure that no one is deleting this address space; if they are, exit with an error. Insert this region into the address space. Attaches the cache to the region. Inserts the region into the region hash table. Adds a reference to the address space. Releases the cache_ref reference.
+
+region_id user_vm_create_anonymous_region(char *uname, void **uaddress, int addr_type, addr size, int wiring, int lock) 
+	Does some safety checking, copies the name and address to kernel space, calls vm_create_anonymous_region, then copies the return result to uaddress. 
+
+region_id vm_create_anonymous_region(aspace_id aid, char *name, void **address, int addr_type,    addr size, int wiring, int lock)
+	Gets the address space structure. Creates an anonymous store object, a (temporary) cache and a cache_ref. Acquires a ref to the cache_ref. Calls map_backing_store for this address and size. Releases the cache_ref. If wiring is lazy, do nothing. If wiring is wired, calls soft_fault to simulate a fault and force the mapping to occur. If the wiring is "wired already", i.e. we cheated at boot time to make this happen, then find the pages and call vm_cache_insert_page to insert the pages into the cache. If the wiring is contiguous, allocate the pages and put them into the cache.
+
+
+region_id vm_map_physical_memory(aspace_id aid, char *name, void **address, int addr_type,    addr size, int lock, addr phys_addr)
+	Get the address space structure. Create a device store object, a cache and a cache_ref. Acquire a reference for the cache_ref. map backing store to this space and size. release the reference to the cache_ref.
+
+region_id vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, addr size)
+		Get the address space structure. Create a null store object, a cache and a cache_ref. Acquire a reference for the cache_ref. map backing store to this space and size. release the reference to the cache_ref.
+
+static region_id _vm_map_file(aspace_id aid, char *name, void **address, int addr_type,addr size, int lock, int mapping, const char *path, off_t offset, bool kernel) 
+	Get the address space structure. Get the vnode from the path. If this cache doesn't already exist: 
+			create a vnode store object, a cache and a cache_ref. Acquire a reference for the cache_ref. set the cache_ptr to this cache_ref, and keep retrying until it works. release the reference to the cache_ref. 
+	Acquire a ref to the cache_ref. map backing store, release the ref and put the address space.
+
+region_id vm_map_file(aspace_id aid, char *name, void **address, int addr_type,    addr size, int lock, int mapping, const char *path, off_t offset)
+	Convenience function - calls _vm_map_file with a kernel param of true.
+
+region_id user_vm_map_file(char *uname, void **uaddress, int addr_type,    addr size, int lock, int mapping, const char *upath, off_t offset)
+	Sanity checks the name, address and path. Copies those into kernel space and calls _vm_map_file with a kernel param of false.
+
+region_id user_vm_clone_region(char *uname, void **uaddress, int addr_type,    region_id source_region, int mapping, int lock) 
+	Sanity checks the name and address. Copies those into kernel space and calls vm_clone_region.
+	
+region_id vm_clone_region(aspace_id aid, char *name, void **address, int addr_type,    region_id source_region, int mapping, int lock)
+	Gets the address space and region structures. maps backing store and returns.
+	
+static int __vm_delete_region(vm_address_space *aspace, vm_region *region)
+	If the region's address space matches aspace, put_region it.
+
+static int _vm_delete_region(vm_address_space *aspace, region_id rid)
+	Gets the region, calls __vm_delete_region, then puts the region.
+	
+int vm_delete_region(aspace_id aid, region_id rid)
+	Gets the address space. Calls _vm_delete_region, puts the address space and returns.
+
+static void _vm_put_region(vm_region *region, bool aspace_locked)
+	Check to see if there are still references to this region. If not, remove it from the global list and return. Remove the region from the adress space's region list. Remove the region from the vm_cache. Unmap it from the translation map.
+
+void vm_put_region(vm_region *region)
+	Calls _vm_put_region with locked=false.
+
+int user_vm_get_region_info(region_id id, vm_region_info *uinfo)
+	Calls vm_get_region_info after sanity checking the vm_region_info pointer.
+
+int vm_get_region_info(region_id id, vm_region_info *info)
+	Fills in the vm_region_info structure with id, base, size, lock, wiring and name.
+	
+int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr)
+	Returns a physical address, given a virtual one.
+
+static void display_mem(int argc, char **argv)
+	Displays a value in memory.
+
+static void dump_cache_ref(int argc, char **argv)
+	Dumps a cache ref to debugging terminal
+
+static const char *page_state_to_text(int state)
+	Converts a state enum to a descriptive string.
+
+static void dump_cache(int argc, char **argv)
+	Dumps a particular cache entry.
+
+static void _dump_region(vm_region *region)
+	Dumps a particular region
+
+static void dump_region(int argc, char **argv)
+	Finds region by id and dumps it.
+
+static void dump_region_list(int argc, char **argv)
+	Dumps info about every region.
+
+static void _dump_aspace(vm_address_space *aspace)
+	Dumps data about an address space.
+
+static void dump_aspace(int argc, char **argv)
+	Finds an address space by ID and dumps it.
+
+static void dump_aspace_list(int argc, char **argv)
+	Dumps data about every address space.
+
+vm_address_space *vm_get_kernel_aspace(void)
+	Returns a pointer to the kernel address space structure.
+
+aspace_id vm_get_kernel_aspace_id(void)
+	Returns the kernel's address space id.
+
+vm_address_space *vm_get_current_user_aspace(void)
+	Gets the current user address space, given an id.
+	
+aspace_id vm_get_current_user_aspace_id(void)
+	Uses the thread structure to get the current address space id.
+
+void vm_put_aspace(vm_address_space *aspace)
+	Removes a reference to the adress space. If it is the last one, destory the aspace.
+
+aspace_id vm_create_aspace(const char *name, addr base, addr size, bool kernel)
+	Allocate space for the structure and the name. Set default state. Creates a translation map. Initializes the virtual map and adds the structure to the global address space list.
+
+int vm_delete_aspace(aspace_id aid)
+	Gets the aspace struct from the id. If someone is already deleting, bail out. Put all of the regions, and put the aspace twice to cause it to be deleted.
+
+int vm_aspace_walk_start(struct hash_iterator *i)
+	calls open_hash on the aspace table.
+
+vm_address_space *vm_aspace_walk_next(struct hash_iterator *i)
+	Get the next address space in the hash list.
+	
+static int vm_thread_dump_max_commit(void *unused)
+	Calls the unused function, then loops forever, printing the max_commit changes. Weird.
+
+int vm_init(kernel_args *ka)
+	Calls translation_map_module_init, and arch_vm_init. Initializes its globals, maps in the new heap and initializes it. Initializes the page list and the cache list. Creates the region and address space hash maps. Creates the kernel address space. Calls arch_vm_init2 and vm_page_init2. Allocates vm space for the stuff that the boot loader already had (heap, kernel read only, kernel read write, bootdir and the kstacks. Calls arch_vm_init_endvm. Adds commands to the debugger. 
+
+int vm_init_postsem(kernel_args *ka)
+	Calls vm_translation_map_module_init_post_sem, creates the vm locking semaphores, and calls heap_init_postsem.
+
+int vm_init_postthread(kernel_args *ka)
+	Creates a max_commit_thread, calling vm_thread_dump_max_commit.
+
+int vm_page_fault(addr address, addr fault_address, bool is_write, bool is_user, addr *newip)
+	Calls vm_soft_fault. If that fails then checks to see if there is a fault handler for this case. If so, ensures that it is called. If there is no such case, kernel_panic (is this a good thing?)
+
+static int vm_soft_fault(addr address, bool is_write, bool is_user)
+	Sanity checks the address, determining if it is kernel or user land and getting the appropriate address space. Looks up the region from the aspace's map and the address. On failure, fail. Checks permissions.  Finds the regions's cache ref; if there is a fault function for that cache_ref, invoke it and return with the error that the fault function returns. 
+	Otherwise, iterates over the cache chain:
+		If the page is found in the current cache, set that page as busy and stop iterating.
+		Otherwise, insert a dummy page in this cache (to keep other threads of the same process from chasing us in fault land)
+		See if this cache's store has a "has_page" function. If so, call it.  If it finds the page (meaning that the page is in this cache's storage), allocate a new physical page, read the data into the page and stop iterating.
+	If we didn't find a cache, pick one (if we are in write mode, the top, if not, the deepest cache).
+	If we don't have a page at this point, make a new one and insert it into the cache. Replace the dummy page, if any, with our new page.
+	If this is a writable page and we are not in the topmost cache, we need another physical page for writes.  Find the original page and copy it to the new page. Replace the dummy page, if any, with our new page.
+	Ensure that the address region is still legit. 
+	Map the new page into the address space. 
+	Replace the dummy page, if any, with our new page.
+	Set the page to active. Release all locks.
+
+
+static vm_region *vm_virtual_map_lookup(vm_virtual_map *map, addr address)
+	Walk the region list of this map, looking for a region containing this address and return it.
+
+int vm_get_physical_page(addr paddr, addr *vaddr, int flags)
+	Get the physical page for this virtual address.
+
+int vm_put_physical_page(addr vaddr)
+	Put the physical page for this virtual address. 
+
+void vm_increase_max_commit(addr delta)
+	Lock everything, increase max_commit, then unlock everything.
+
+int user_memcpy(void *to, const void *from, size_t size)
+	Calls the arch_ version.
+
+int user_strcpy(char *to, const char *from)
+	Calls the arch_ version.
+
+int user_strncpy(char *to, const char *from, size_t size)
+	Calls the arch_ version.
+
+int user_memset(void *s, char c, size_t count)
+    	Calls the arch_ version.
+

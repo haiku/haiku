@@ -1,0 +1,100 @@
+<html>
+<head>
+	<title>Interface Kit Team Schedule</title>
+</head>
+<body>
+<h1>Interface Kit Team Schedule<hr></h1>
+<p>
+Here is the schedule for the Interface Kit Team.  To help organize our work,
+tasks have been broken into 4 general areas:
+<ul>
+<scripting>
+@for_each group in $GROUPS
+	<li><a href="$group.short_name/$group.short_name##Milestones.html">$group.name</a>$group.note</li>
+@end
+</scripting>
+</ul>
+</p><p>
+Organizationally, it's best to consider these as separate projects within the
+scope of the IK Team's charter.  As such, core contributors should pick a
+project and stick with it -- it will make things a lot easier to keep track of,
+and losing track of stuff would be a bad thing. =)
+</p><p>
+DarkWyrm is the technical lead for the app_server; he has done an enormous amount
+of research and he is currently in the best position to lead the effort.
+</p><p>
+Erik Jakowatz will continue in his capacity as overall project lead, as well as
+being directly involved in Integration as technical lead.
+</p><p>
+A word of warning:  this schedule is downright huge because of the sheer number of
+items to be completed.  There is a paper available in which the rationale behind the
+schedule is <a href="Discussion.html">discussed</a>.
+</p>
+<hr>
+<h2><a name="CurrentStatus"></a>Current Status</h2>
+Here are some fuzzy indicators of what progress the team has made base on the number of
+outstanding tasks completed.  No warranty is made concerning the accuracy of these
+graphs. =)
+<br><br>
+
+<!-- And here we go into table madness! -->
+<table cellspacing="0">
+	<!-- sub-project header -->
+	<tr>
+		<td colspan="3" align="left"><strong>Overall</strong></td>
+	</tr>
+	<!-- progress graph -->
+	<tr>
+		<table cellspacing="0">
+			<tr>
+				<!-- how much is done -->
+<scripting>
+				<td width="$GROUPS.table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$GROUPS.table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="25" align="center">$GROUPS.complete%</td>
+</scripting>
+			</tr>
+		</table>
+	</tr>
+
+<scripting>
+@for_each group in $GROUPS
+	<!-- sub-project header -->
+	<tr>
+		<td colspan="3" align="left"><strong><br><br>$group.name</strong></td>
+	</tr>
+	<!-- progress graph -->
+	<tr>
+		<table cellspacing="0">
+			<tr>
+				<!-- how much is done -->
+				<td width="$group.table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$group.table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="25" align="center">$group.complete%</td>
+			</tr>
+		</table>
+	</tr>
+@end
+</scripting>
+</table>
+<br>
+<hr>
+
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>The OpenBeOS project is hosted by:</small><br><br> 
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002
+<a href="http://www.openbeos.org">OpenBeOS</a> Project</small> 
+</center>
+
+</body>
+</html>

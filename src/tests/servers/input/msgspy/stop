@@ -1,0 +1,2 @@
+rm -f /boot/home/config/add-ons/input_server/filters/MsgSpy
+/boot/beos/system/servers/input_server -q

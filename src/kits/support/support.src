@@ -1,0 +1,7 @@
+SUPPORT_KIT_SOURCE =
+	Archivable.cpp
+	DataIO.cpp
+	Locker.cpp
+	StopWatch.cpp
+	String.cpp
+;

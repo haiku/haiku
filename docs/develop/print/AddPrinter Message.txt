@@ -1,0 +1,6 @@
+PrintServerApp::MessageReceived(): BMessage: what = selp (0x73656c70, or 1936026736)
+    entry         driver, type='CSTR', c=1, size=17, data[0]: "EPSON C40 Series"
+    entry      transport, type='CSTR', c=1, size=12, data[0]: "Serial Port"
+    entry transport path, type='CSTR', c=1, size=8, data[0]: "serial1"
+    entry   printer name, type='CSTR', c=1, size=8, data[0]: "my_test"
+    entry     connection, type='CSTR', c=1, size=6, data[0]: "Local"

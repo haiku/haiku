@@ -1,0 +1,79 @@
+<HTML>
+<!-- $Id: BAutolockUseCases.html,v 1.1 2002/07/09 12:24:32 ejakowatz Exp $ -->
+<HEAD>
+<TITLE>BAutolock Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BAutolock Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BAutolock interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BAutolock Interface</A></LI>
+<LI><A HREF="#usecases">BAutolock Use Cases</A></LI>
+<LI><A HREF="#implement">BAutolock Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BAutolock Interface:</H2>
+
+<P>The BAutolock class is a simple class for handling synchronization between threads.  The best
+source of information for the BAutolock interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Support%20Kit/Autolock.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BAutolock Use Cases:</H2>
+
+<P>The following use cases cover the BAutolock functionality:</P>
+
+<OL>
+<LI><P><B>Construction 1:</B> A BAutolock can be created by passing a pointer to a BLocker object.
+An attempt will be made to Lock() this BLocker during the construction of the BAutolock object.
+</P></LI>
+
+<LI><P><B>Construction 2:</B> A BAutolock can be created by passing a reference to a BLocker object.
+An attempt will be made to Lock() this BLocker during the construction of the BAutolock object.
+</P></LI>
+
+<LI><P><B>Construction 3:</B> A BAutolock can be created by passing a pointer to a BLooper object.
+An attempt will be made to Lock() this BLooper during the construction of the BAutolock object.
+</P></LI>
+
+<LI><P><B>Is Locked:</B> When the BAutolock is constructed, a lock is attempted on the BLocker or
+BLooper passed in.  The result of that lock attempt is returned by calling IsLocked() on the
+BAutolock.  The result is a boolean.  True is returned if the lock was successfully acquired.
+False is returned if the lock could not be acquired.  See the docs for BLocker and BLooper to
+find out why the lock acquisition may fail.</P></LI>
+
+<LI><P><B>Destruction 1:</B> If the lock acquisition on the BLocker or BLooper was successful at
+construction time, when the BAutolock is destructed, the lock will be released by calling Unlock()
+on the BLocker or BLooper.</P></LI>
+
+<LI><P><B>Destruction 2:</B> If the lock acquisition on the BLocker or BLooper failed at
+construction time, when the BAutolock is destructed, nothing is done to the BLocker or the BLooper.
+An Unlock() is not attempted because the lock at construction time failed.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BAutolock Implementation:</H2>
+
+<P>The entire BAutolock implementation is inline.  Because BAutolock is implemented inline, there
+is no code for BAutolock in libbe.so.  The code is all in Be's Autolock.h header file and compiled
+at build time directly into any object being built.</P>
+
+<P>This has some interesting implications from a backwards compatibility perspective.  Because
+there are no references from existing non-Be executables and libraries to libbe.so expecting
+to find the BAutolock class, the entire definition of BAutolock can be changed almost without risk
+of breaking compatibility.  This gives anyone wishing to expand and build on the current BAutolock
+class a great deal of flexibility.</P>
+
+<P>However, it may be worthwhile when changing BAutolock in the future to try and stay source 
+compatible.  That way, existing source code will continue to compile without having to update
+it.</P>
+
+</BODY>
+</HTML>

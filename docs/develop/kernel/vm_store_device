@@ -1,0 +1,20 @@
+static void device_destroy(struct vm_store *store)
+	Frees the space associated with this store
+
+static off_t device_commit(struct vm_store *store, off_t size)
+	Sets this store's commited size to size.
+
+static int device_has_page(struct vm_store *store, off_t offset)
+	Returns 0
+
+static ssize_t device_read(struct vm_store *store, off_t offset, iovecs *vecs)
+	Returns unimplemented.
+
+static ssize_t device_write(struct vm_store *store, off_t offset, iovecs *vecs)
+	Returns 0
+
+static int device_fault(struct vm_store *store, struct vm_address_space *aspace, off_t offset)
+	Should be called when a page is not mapped in. Locks the translation map, Finds the region in the cache that contains this page and maps it in. Unlocks the cache.
+
+vm_store *vm_store_create_device(addr base_addr)   
+	Allocates memory for the vm_store structure, plus the data_store_device structure. Sets cache to null, and data to the device_store_data. Sets the device_store_data's base address to the base address passed in.

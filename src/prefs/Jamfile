@@ -1,0 +1,3 @@
+SubInclude OBOS_TOP sources os kits interface prefs menu ;
+SubInclude OBOS_TOP sources os kits interface prefs screen ;
+SubInclude OBOS_TOP sources os kits interface prefs workspaces ;

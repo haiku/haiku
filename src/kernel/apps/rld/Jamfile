@@ -1,0 +1,10 @@
+SubDir OBOS_TOP sources os kits kernel apps rld ;
+
+KernelObjects <$(SOURCE_GRIST)>rld.c
+	<$(SOURCE_GRIST)>rld0.c
+	<$(SOURCE_GRIST)>rldaux.c
+	<$(SOURCE_GRIST)>rldbeos.c
+	<$(SOURCE_GRIST)>rldelf.c
+	<$(SOURCE_GRIST)>rldheap.c
+	<$(SOURCE_GRIST)>rldunix.c
+	 : -fpic ;

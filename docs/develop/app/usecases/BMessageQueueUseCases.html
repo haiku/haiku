@@ -1,0 +1,147 @@
+<HTML>
+<!-- $Id: BMessageQueueUseCases.html,v 1.1 2002/07/09 12:24:30 ejakowatz Exp $ -->
+<HEAD>
+<TITLE>BMessageQueue Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BMessageQueue Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BMessageQueue interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BMessageQueue Interface</A></LI>
+<LI><A HREF="#usecases">BMessageQueue Use Cases</A></LI>
+<LI><A HREF="#implement">BMessageQueue Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BMessageQueue Interface:</H2>
+
+<P>The BMessageQueue class is a simple class for managing a queue of BMessages.  The best
+source of information for the BMessageQueue interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/MessageQueue.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BMessageQueue Use Cases:</H2>
+
+<P>The following use cases cover the BMessageQueue functionality:</P>
+
+<OL>
+<LI><P><B>Construction:</B> A BMessageQueue does not take any arguments when it is constructed.
+After construction, the queue is empty.</P></LI>
+
+<LI><P><B>Destruction:</B> When a BMessageQueue is deconstructed, all BMessages on the queue are
+deleted.  This implies that all BMessages added to a BMessageQueue must be allocated on the heap
+with the new operation.  The BMessageQueue is locked before performing the delete to ensure
+that the queue doesn't change while it is being deleted.  The lock is never released from the
+destructor to ensure that any AddMessage() or other members blocking for the lock never
+succeed in getting the lock.  They will fail once the BMessageQueue is completely deleted.</P></LI>
+
+<LI><P><B>Add Message 1:</B> When AddMessage() is used to put a BMessage on the queue, the 
+BMessageQueue takes ownership of the BMessage.  The BMessage should be created on the heap but
+there is no checking to ensure that has happened.  The BMessageQueue records the order in
+which the BMessages are added to the queue.</P></LI>
+
+<LI><P><B>Add Message 2:</B> No check is performed to see if the BMessage is already part of that
+BMessageQueue or any other when AddMessage() is used to put a BMessage on a queue.  An attempt to
+add a BMessage to a BMessageQueue which already has that same BMessage in it (where equality is
+based on the address of the BMessage) will corrupt the queue.  An attempt to add a BMessage to a
+BMessageQueue when that BMessage is already in another BMessageQueue will corrupt the original
+BMessageQueue.  It is up to the caller of AddMessage() to use RemoveMessage() to prevent
+queue corruption.</P></LI>
+
+<LI><P><B>Add Message 3:</B> BMessage's can be added using AddMessage() from multiple threads
+at the same time with no risk of queue corruption.  Similarly, RemoveMessage() or NextMessage()
+can be executing from another thread while an AddMessage() is started without corrupting the queue.
+An AddMessage() attempt will block if another thread has used the Lock() member to lock the
+BMessageQueue.</P></LI>
+
+<LI><P><B>Remove Message 1:</B> The RemoveMessage() member takes a BMessage pointer.  The 
+BMessageQueue is searched for this BMessage pointer.  If that pointer is in the queue, then it
+is removed from the queue.  The BMessage is not deleted (note the BeBook implies it is but in
+fact it is not).  If the BMessage pointer is not on this BMessageQueue, this call has no affect.
+After this call completes successfully, it is as though AddMessage() was never called for
+this BMessage pointer.</P></LI>
+
+<LI><P><B>Remove Message 2:</B> BMessage's can be removed using RemoveMessage() from multiple
+threads at the same time with no risk of queue corruption.  Similarly, AddMessage() or 
+NextMessage() can be executing from another thread while a RemoveMessage() is started without
+corrupting the queue.  A RemoveMessage() attempt will block if another thread has used the Lock()
+member to lock the BMessageQueue.</P></LI>
+
+<LI><P><B>Count Messages:</B> The CountMessages() member function returns the number of BMessage's
+in the BMessageQueue.  If there are no messages on the queue (an example of this situation is just
+after construction), the member returns 0.  Note, it is possible for the count to become corrupted
+if the situation in Add Message 2 occurs.</P></LI>
+
+<LI><P><B>Is Empty:</B> The IsEmpty() member function returns true if there are no BMessages on the
+BMessageQueue.  If there are one or more BMessages on the BMessageQueue, it returns false.</P></LI>
+
+<LI><P><B>Find Message 1:</B> The FindMessage() member function is overloaded.  If the member
+function takes a single int32 argument, it is used to return the BMessage on the queue at a
+particular index as indicated by the argument.  The first message is at index 0, the second
+at index 1 etc.  If no message is at that index, NULL is returned.</P></LI>
+
+<LI><P><B>Find Message 2:</B> The other FindMessage() member function takes a single uint32
+argument and an optional int32 argument.  The first mandatory argument specifies the "what" code
+for the BMessage being searched for.  The second optional argument specifies what occurance of
+that "what" code in a BMessage on the queue should be returned.  If the second argument is not
+provided, it is assumed to be 0.  If the second argument is 0, the first BMessage that has the 
+what code provided is returned.  If the second argument is 1, the second BMessage that has the
+what code provided is returned, etc.  If no match is found, NULL is returned.</P></LI>
+
+<LI><P><B>Lock 1:</B> The Lock() member function blocks until this thread can acquire exclusive
+access to the BMessageQueue.  Only one thread can hold the lock at any one time.  A thread can
+acquire the Lock() multiple times but release it the same number of times.  While a thread holds
+the lock, other threads will not be able to perform AddMessage(), RemoveMessage() or NextMessage().
+Any threads attempting to do so will block until the BMessageQueue is unlocked.</P></LI>
+
+<LI><P><B>Lock 2:</B> The Lock() member function returns true if the lock has successfully been
+acquired.  It will return false if an unrecoverable error has occurred.  An example of such an
+error would be deleting the BMessageQueue.</P></LI>
+
+<LI><P><B>Unlock:</B> The Unlock() member function releases a lock on the BMessageQueue.  If the
+thread no longer holds any locks on the BMessageQueue, other threads are free to acquire the
+BMessageQueue lock or call member functions like AddMessage(), RemoveMessage(), NextMessage() or
+delete the BMessageQueue.</P></LI>
+
+<LI><P><B>Next Message 1:</B> The NextMessage() member function removes the BMessage which is the
+oldest on the queue.  It returns that BMessage to the caller.  After the call completes, the
+BMessage is no longer on the queue and the next oldest BMessage is at the front of the queue
+(ie next to be returned by NextMessage()).</P></LI>
+
+<LI><P><B>Next Message 2:</B> BMessage's can be removed using NextMessage() from multiple
+threads at the same time with no risk of queue corruption.  Similarly, AddMessage() or
+RemoveMessage() can be executing from another thread while a NextMessage() is started without
+corrupting the queue.  A NextMessage() attempt will block if another thread has used the Lock()
+member to lock the BMessageQueue.</P></LI>
+
+</OL>
+
+<A NAME="implement"></A><H2>BMessageQueue Implementation:</H2>
+
+<P>Internally, the BMessageQueue uses a BLocker to ensure that member functions like AddMessage(),
+RemoveMessage() and NextMessage() do not corrupt the queue when used from multiple threads.  The
+same BLocker is used to implemented the Lock() and Unlock() members.</P>
+
+<P>Testing with a debugger shows that the queue is implemented using a "link" pointer in the
+BMessage class itself.  Each BMessage is also a singly linked list which represents the queue.
+All the BMessageQueue needs is a pointer to the BMessage which starts the list.  For performance
+reasons, it is worth maintaining a pointer to the BMessage at the end of the list and the count
+of the number of elements in the list.  If these are not maintained, adding an element to the
+list will get slower as the number of elements grows and the cost to determine the number of
+elements in the list will be high.</P>
+
+<P>Because the BMessageQueue uses the link pointer which is a private part of the BMessage class,
+the BMessageQueue must be a friend class of BMessage.  Checking the headers, this is in fact the
+case in Be's implementation.  Although friendship in classes can cause some pretty serious long
+term headaches if abused (and I am not convinced that this is an abuse), the OpenBeOS 
+implementation will follow the same implementation for now.</P>
+
+
+</BODY>
+</HTML>

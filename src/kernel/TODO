@@ -1,0 +1,42 @@
+
+Implement:
+
+process environment variables
+scheduler updates:
+ better quantum handling
+ priority boost on sem block
+improved kernel debugger support:
+ symbol lookups
+ stack tracing
+kernel slab allocator
+Rewrite VFS
+VM:
+ Allow alteration of region's attributes
+ cache layer
+ better region creation args (range of virtual addresses, etc)
+ reserve regions
+ page out (changes to mmap and swapfile)
+Block Drivers
+Work on Driver system, overall
+POSIX
+New Booting method
+more on the user space libs
+Improved bus managers (BeOS style)
+Fully relocatable kernel, stage2 relocates
+
+signals
+tty layer
+Integrate OBFS
+Integrate Networking
+kernel module loading:
+RLD
+ lazy binding
+ so initialization
+ dl_open() and load_addon()
+Work on PCI
+libRoot
+IDE bus manager
+use fxsave instead of fsave where appropriate
+move more per-cpu stuff to the global cpu[] array
+Places in kernel where page fault with ints off happens
+Random reboot on heavy fibo usage

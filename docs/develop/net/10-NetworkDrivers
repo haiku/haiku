@@ -1,0 +1,13 @@
+Network Drivers - Milestone #1
+
+Having done some work on the Tulip cards, here are some general
+comments.
+
+- we should have both an rx and tx queue and pop/push from the queue
+  in the system rx/tx_thread.  this should provide good performance
+- order of calling is
+	: detect
+	: init
+- the driver is normally in 2 pieces, one for the general calls and
+  one for the device specific stuff.
+

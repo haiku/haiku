@@ -1,0 +1,40 @@
+$ print_server
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+                       PAGE SETUP.........
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+PrintServerApp::MessageReceived(): BMessage: what = pgst (0x70677374, or 1885827956)
+PrintServerApp::MessageReceived(): BMessage: what = BRAW (0x42524157, or 1112686935)
+    entry         active, type='BOOL', c=1, size= 1, data[0]: 1
+PrintServerApp::MessageReceived(): BMessage: what = BRAW (0x42524157, or 1112686935)
+    entry         active, type='BOOL', c=1, size= 1, data[0]: 0
+PrintServerApp::MessageReceived(): BMessage: what = pgcp (0x70676370, or 1885823856)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+                       PRINT.........
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+PrintServerApp::MessageReceived(): BMessage: what = pgcp (0x70676370, or 1885823856)
+PrintServerApp::MessageReceived(): BMessage: what = ppst (0x70707374, or 1886417780)
+    entry    orientation, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry          scale, type='FLOT', c=1, size= 4, data[0]: 100.0000
+    entry           xres, type='LONG', c=1, size= 4, data[0]: 0x12c (300, '')
+    entry           yres, type='LONG', c=1, size= 4, data[0]: 0x12c (300, '')
+    entry     paper_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:612.0, b:792.0)
+    entry printable_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:612.0, b:792.0)
+    entry current_printer, type='CSTR', c=1, size=20, data[0]: "PreviewDriver_BeInc"
+PrintServerApp::MessageReceived(): BMessage: what = BRAW (0x42524157, or 1112686935)
+    entry         active, type='BOOL', c=1, size= 1, data[0]: 1
+PrintServerApp::MessageReceived(): BMessage: what = BRAW (0x42524157, or 1112686935)
+    entry         active, type='BOOL', c=1, size= 1, data[0]: 0
+PrintServerApp::MessageReceived(): BMessage: what = pgcp (0x70676370, or 1885823856)
+
+----------------------------------------------------------------------------------------------------------------------------------------------------
+                       After spooling:
+----------------------------------------------------------------------------------------------------------------------------------------------------
+
+PrintServerApp::MessageReceived(): BMessage: what = pgcp (0x70676370, or 1885823856)
+PrintServerApp::MessageReceived(): BMessage: what = psns (0x70736e73, or 1886613107)
+    entry        JobName, type='CSTR', c=1, size=15, data[0]: "InterestFields"
+    entry     Spool File, type='CSTR', c=1, size=79, data[0]: "/boot/home/config/settings/printers/PreviewDriver_BeInc/InterestFields@8257001" 

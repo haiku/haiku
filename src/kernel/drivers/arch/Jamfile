@@ -1,0 +1,3 @@
+SubDir OBOS_TOP sources os kits kernel drivers arch ;
+
+SubInclude OBOS_TOP sources os kits kernel drivers arch  $(OBOS_ARCH) ;

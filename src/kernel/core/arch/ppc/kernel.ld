@@ -1,0 +1,33 @@
+OUTPUT_FORMAT("elf32-powerpc", "elf32-powerpc", "elf32-powerpc")
+OUTPUT_ARCH(powerpc)
+
+ENTRY(_start)
+SEARCH_DIR("libgcc");
+SECTIONS
+{
+	. = 0x80000000 + SIZEOF_HEADERS;
+
+	/* text/read-only data */
+	.text :	{ *(.text .gnu.linkonce.t.*) }
+
+	__ctor_list = .;
+	.ctors : { *(.ctors) }
+	__ctor_end = .;
+
+	.rodata : { *(.rodata) }
+
+	/* writable data  */
+	. = ALIGN(0x1000);
+	__data_start = .;
+	.data : { *(.data .gnu.linkonce.d.*) }
+
+	/* unintialized data (in same segment as writable data) */
+	__bss_start = .;
+	.bss : { *(.bss) }
+
+	. = ALIGN(0x1000);
+	_end = . ;
+
+	/* Strip unnecessary stuff */
+	/DISCARD/ : { *(.comment .note .eh_frame .dtors) }
+}

@@ -1,0 +1,5 @@
+Information from BeOS R5 implementation:
+
+BPrintJob::ConfigPage()
+BPrintJob::ConfigJob()
+BPrintJob::TakeJob()

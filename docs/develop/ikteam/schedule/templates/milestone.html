@@ -1,0 +1,29 @@
+<html>
+<head>
+<scripting>
+	<title>$GROUP.name Tasks</title>
+</scripting>
+<head>
+<body>
+<scripting>
+<h1>$GROUP.name Tasks<hr></h1>
+@for_each milestone in $GROUP.milestones
+<a href="$milestone.short_name##Tasks.html">$milestone.name</a><br>
+@end
+</scripting>
+<hr>
+
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>The OpenBeOS project is hosted by:</small><br><br> 
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002
+<a href="http://www.openbeos.org">OpenBeOS</a> Project</small> 
+</center>
+
+</body>
+</html>

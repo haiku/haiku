@@ -1,0 +1,167 @@
+<html>
+<head>
+<scripting>
+	<title>$GROUP.name Milestones</title>
+</scripting>
+</head>
+<body>
+<scripting>
+<h1>$GROUP.name Milestones<hr></h1>
+</scripting>
+<ol>
+	<li>
+		Interface specs completed for all classes, functions, structs
+<scripting>
+@if $GROUP.ispec_complete
+		<!-- Copy this table to each item when work begins on it -->
+		<!-- progress graph -->
+		<table cellspacing="0">
+			<tr>
+				<!-- spacer -->
+				<td width=10"></td>
+				<!-- how much is done -->
+				<td width="$GROUP.ispec_table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$GROUP.ispec_table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="25" align="right">$GROUP.ispec_complete%</td>
+			</tr>
+		</table>
+		<br><br>
+		<!-- end progress graph -->
+@end
+</scripting>
+	</li>
+	<li>
+		Use cases completed for all classes, functions, structs
+<scripting>
+@if $GROUP.cases_complete
+		<!-- Copy this table to each item when work begins on it -->
+		<!-- progress graph -->
+		<table cellspacing="0">
+			<tr>
+				<!-- spacer -->
+				<td width=10"></td>
+				<!-- how much is done -->
+				<td width="$GROUP.cases_table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$GROUP.cases_table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="25" align="center">$GROUP.cases_complete%</td>
+			</tr>
+		</table>
+		<br><br>
+		<!-- end progress graph -->
+@end
+</scripting>
+	</li>
+	<li>
+		Unit tests completed for all classes, functions, structs
+<scripting>
+@if $GROUP.tests_complete
+		<!-- Copy this table to each item when work begins on it -->
+		<!-- progress graph -->
+		<table cellspacing="0">
+			<tr>
+				<!-- spacer -->
+				<td width=10"></td>
+				<!-- how much is done -->
+				<td width="$GROUP.tests_table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$GROUP.tests_table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="25" align="center">$GROUP.tests_complete%</td>
+			</tr>
+		</table>
+		<br><br>
+		<!-- end progress graph -->
+@end
+</scripting>
+	</li>
+	<li>
+		Design discussions completed for all classes, functions, structs
+<scripting>
+@if $GROUP.tspec_complete
+		<!-- Copy this table to each item when work begins on it -->
+		<!-- progress graph -->
+		<table cellspacing="0">
+			<tr>
+				<!-- spacer -->
+				<td width=10"></td>
+				<!-- how much is done -->
+				<td width="$GROUP.tspec_table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$GROUP.tspec_table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="25" align="center">$GROUP.tspec_complete%</td>
+			</tr>
+		</table>
+		<br><br>
+		<!-- end progress graph -->
+@end
+</scripting>
+	</li>
+<scripting>
+@for_each milestone in $GROUP.milestones
+	<li>
+		<a href="$milestone.short_name##.html">$milestone.name</a>$milestone.note complete
+@if $milestone.complete
+		<!-- Copy this table to each item when work begins on it -->
+		<!-- progress graph -->
+		<table cellspacing="0">
+			<tr>
+				<!-- spacer -->
+				<td width=10"></td>
+				<!-- how much is done -->
+				<td width="$milestone.table_complete" bgcolor="blue" align="left"></td>
+				<!-- how much is left -->
+				<td width="$milestone.table_incomplete" bgcolor="red" align="right"></td>
+				<!-- the above two translated into a percentage -->
+				<td width="35" align="right">$milestone.complete%</td>
+			</tr>
+		</table>
+		<br><br>
+		<!-- end progress graph -->
+@end
+@end
+	</li>
+</scripting>
+	<li>
+		Alpha
+	</li>
+	<li>
+		Beta 1
+	</li>
+	<li>
+		Beta 2
+	</li>
+	<li>
+		Release Candidate 1
+	</li>
+	<li>
+		1.0!
+	</li>
+</ol>
+<!-- Not implemented yet
+<scripting>
+See the complete list of <a href="$GROUP.short_name##Tasks.html">$GROUP.name tasks</a>.
+</scripting>
+<br>
+-->
+<hr>
+
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>The OpenBeOS project is hosted by:</small><br><br> 
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002
+<a href="http://www.openbeos.org">OpenBeOS</a> Project</small> 
+</center>
+
+</body>
+</html>
+

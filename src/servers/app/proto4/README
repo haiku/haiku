@@ -1,0 +1,9 @@
+OpenBeOS App Server Test Prototype #4
+
+This prototype is an extension of the third one, where the TestApp has become a test bed for graphics functions. The graphics-access object used, ViewDriver, has most of the useful BView calls implemented and tested. Such was necessary to proceed to the next steps. The functions not implemented were not done either because it was way too much work or simply not possible to do with the current test application. They will have to wait until BView is done. In any event, not bad for 2 weeks' work.
+
+This is an example of both a work in progress and a lot of research at the same time. Many of the concepts used in this prototype will be used in the real server. It doesn't do much, but the fact that it exists and does what it does is the result of a *lot* of work.
+
+The code is reasonably (IMHO) well-commented and should be easy to understand at first glance. Also included are some extra files which I didn't feel like throwing out or are in place for future development. ;D Enjoy.
+
+--DarkWyrm

@@ -1,0 +1,735 @@
+# Include BuildConfig
+{
+	local buildConfig = [ GLOB $(OBOS_TOP) : BuildConfig ] ;
+	if ! $(buildConfig)
+	{
+		EXIT "No BuildConfig!"
+			 "Run ./configure in the source tree's root directory first!" ;
+	}
+	include $(buildConfig) ;
+}
+
+# Determine if we're building on PPC or x86
+# Determine mimetype of executable
+# Cross compiling can come later
+
+if $(METROWERKS) {
+	OBOS_TARGET ?= "ppc.R5" ;
+	OBOS_TARGET_TYPE ?= "application/x-be-executable" ;
+	OBOS_ARCH ?= "ppc" ; 
+	OBOS_TARGET_DEFINE ?= "ARCH_ppc" ;
+} else {
+	OBOS_TARGET ?= "x86.R5" ;
+	OBOS_TARGET_TYPE ?= "application/x-vnd.Be-elfexecutable" ;
+	OBOS_ARCH ?= "x86" ;
+	OBOS_TARGET_DEFINE ?= "ARCH_x86" ;
+	OBOS_TARGET_DIR ?= "x86" ;
+}
+
+KERNEL_CCFLAGS ?= "-Wall -Wno-multichar -Wmissing-prototypes -finline -nostdinc" ;
+KERNEL_CCFLAGS += "-fno-builtin -D$(OBOS_TARGET_DEFINE) " ;
+
+AR = ar r ;
+OPTIM = -O2 ;
+
+# If no OBOS_OBJECT_TARGET is not defined yet, use our default directory and
+# include our "OBOS_TARGET" as subdirectory in there (to prevent different
+# builds mixing objects from different targets).
+if ! $(OBOS_OBJECT_TARGET) {
+	OBOS_OBJECT_TARGET ?= [ FDirName $(OBOS_TOP) objects $(OBOS_TARGET) ] ;
+}
+
+# If no OBOS_DISTRO_TARGET is not defined yet, use our default directory and
+# include our "OBOS_TARGET" as subdirectory in there (to prevent different
+# builds mixing executables from different targets).
+if ! $(OBOS_DISTRO_TARGET) {
+	OBOS_DISTRO_TARGET ?= [ FDirName $(OBOS_TOP) distro $(OBOS_TARGET) ] ;
+}
+
+# Set our version number if not already set and mark it as a developer build
+if ! $(OBOS_BUILD_VERSION) {
+	OBOS_BUILD_VERSION ?= "1 0 0 a 1" ;
+	OBOS_BUILD_DESCRIPTION ?= "Developer Build" ;
+}
+
+# If OBOS_BUILD_VERSION is set, but OBOS_BUILD_DESCRIPTION isn't, mark it as
+# an unknown build.
+if ! $(OBOS_BUILD_DESCRIPTION) {
+	OBOS_BUILD_DESCRIPTION ?= "Unknown Build" ;
+}
+
+# Relative subdirs for distro dir (these are for *INTERNAL* use by the following rules only!)
+OBOS_PREFS_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos preferences ] ;
+OBOS_SERVER_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system servers ] ;
+OBOS_ADDON_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system add-ons ] ;
+OBOS_SHLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system lib ] ;
+OBOS_STLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system lib ] ;
+OBOS_KERNEL_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system ] ;
+OBOS_TEST_DIR   ?= [ FDirName $(OBOS_TOP) tests ] ;
+
+OBOS_KERNEL_CONFIG = config.$(OBOS_ARCH).ini ;
+OBOS_KERNEL = kernel.$(OBOS_ARCH) ;
+OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
+
+rule SetupIncludes
+{
+	OBOS_INCLUDES ?= . add-ons app be_apps device drivers game interface kernel mail media midi midi2 net opengl storage support translation ;
+	UsePublicHeaders $(OBOS_INCLUDES) ;
+}
+
+#-------------------------------------------------------------------------------
+# Things Jam needs in order to work :)
+#-------------------------------------------------------------------------------
+
+rule UserObject
+{
+	switch $(2)
+	{
+	case *.S    : assemble $(1) : $(2) ;
+	case *      : ECHO "unknown suffix on" $(2) ;
+	}
+}
+
+# Override the default to give "prettier" command lines.
+actions Cc 
+{
+	$(CC) -c $(2) $(CCFLAGS) $(CCDEFS) $(CCHDRS) -o $(1) ;
+}
+
+actions C++
+{
+	$(C++) -c $(2) $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o $(1) ;
+}
+
+
+#-------------------------------------------------------------------------------
+# General High-level OBOS target rules
+#-------------------------------------------------------------------------------
+
+rule Preference
+{
+	# Preference <name> : <sources> ;
+#	SetupIncludes ;
+	SetupObjectsDir ;
+	Main $(<) : $(>) ;
+	MakeLocate $(<) : $(OBOS_PREFS_DIR) ;
+}
+
+rule Server
+{
+	# Server <name> : <sources> ;
+	
+	SetupIncludes ;
+	SetupObjectsDir ;
+	Main $(<) : $(>) ;
+	MakeLocate $(<) : $(OBOS_SERVER_DIR) ;
+}
+
+# test pseudo targets
+NOTFILE obostests ;
+NOTFILE r5tests ;
+
+rule CommonUnitTest
+{
+	# CommonUnitTest <target> : <sources> : <dest> : <obos libraries> 
+	#	: <r5 libraries> : <public headers>;
+	# Builds a unit test for both OBOS and R5 modules.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <obos libraries> A list of link libraries for the OBOS tests (as passed
+	# to LinkSharedOSLibs).
+	# <r5 libraries> A list of link libraries for the R5 tests (as passed
+	# to LinkSharedOSLibs).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	UnitTest $(1) : $(2) : $(3) : $(4) : $(6) ;
+	R5UnitTest $(1) : $(2) : $(3) : $(5) ;
+}
+
+rule UnitTest
+{
+	# UnitTest <target> : <sources> : <dest> : <libraries> : <public headers>
+	# Builds a unit test for an OBOS module.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkSharedOSLibs).
+	# <public headers> A list of public header dirs (as passed to
+	# UsePublicHeaders).
+
+	local target = $(1) ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local headerDirs = $(5) ;
+
+#	SetupIncludes ;
+	UseCppUnitHeaders ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(sources) ;
+	Main $(target) : $(sources) ;
+	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(dest) ] ;
+	DEPENDS $(target) : libcppunit.so ;
+	DEPENDS obostests : $(target) ;
+	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	UsePublicHeaders $(headerDirs) : $(sources) ;
+	ObjectDefines $(sources) : TEST_OBOS ;
+
+	# Turn debugging on. That is usually desired for test code.
+	ObjectCcFlags $(sources) : "-g" ;
+	ObjectC++Flags $(sources) : "-g" ;
+}
+
+rule R5UnitTest
+{
+	# R5UnitTest <target> : <sources> : <dest> : <libraries>
+	# Builds a unit test for an R5 module. "_r5" is appended to the object
+	# and the target name.
+	# <target> The name of the target.
+	# <sources> The list of sources.
+	# <dest> The directory for the target (as passed to FDirName).
+	# <libraries> A list of link libraries (as passed to LinkSharedOSLibs).
+
+	local target = $(1)_r5 ;
+	local sources = $(2) ;
+	local dest = $(3) ;
+	local libraries = $(4) ;
+	local objects = [ R5ObjectNames $(sources) ] ;
+
+	UseCppUnitHeaders ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(objects) ;
+
+	# Our Main replacement.
+	MainFromObjects $(target) : $(objects) ;
+	local source ;
+	for source in [ FGristFiles $(sources) ]
+	{
+		local object = [ R5ObjectNames $(source) ] ;
+		Object $(object) : $(source) ;
+		Depends obj : $(object) ;
+	}
+
+	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) $(dest) ] ;
+	DEPENDS $(target) : libcppunit.so ;
+	DEPENDS r5tests : $(target) ;
+	LinkSharedOSLibs $(target) : libcppunit.so $(libraries) ;
+	ObjectDefines $(objects) : TEST_R5 ;
+
+	# Turn debugging on. That is usually desired for test code.
+	ObjectCcFlags $(objects) : "-g" ;
+	ObjectC++Flags $(objects) : "-g" ;
+}
+
+rule R5ObjectNames
+{
+	# R5ObjectNames <sources> ;
+	# Returns a list of gristed object names given a list of source file names.
+	# Moreover each object names gets "_r5" inserted before the object suffix.
+	local objects = $(1:S=)_r5 ;
+	return [ FGristFiles $(objects:S=$(SUFOBJ)) ] ;
+}
+
+rule Addon
+{
+	# Addon <name> : <relpath> : <sources> ;	
+	
+	SetupIncludes ;
+	SetupObjectsDir ;
+	Main $(1) : $(3) ;
+
+	# Create output dir path for addon
+	local targetdir;
+	targetdir = [ FDirName $(OBOS_ADDON_DIR) $(2) ] ;
+
+	MakeLocate $(1) : $(targetdir) ;
+	LINKFLAGS on $(1) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(1)\" ;
+}
+
+rule MakeLocateObjects
+{
+	# MakeLocateObjects <gristed_sources_or_objects> ;
+	
+	local _objs = $(1:S=$(SUFOBJ)) ;
+	
+	for o in $(_objs)
+	{
+		local dir = $(o:D) ;
+		if $(dir) {
+			MakeLocate $(o) : [ FDirName $(LOCATE_TARGET) $(dir) ] ;
+		} else {
+			MakeLocate $(o) : $(LOCATE_TARGET) ;
+		}
+	}
+}
+
+rule StaticLibrary
+{
+	# StaticLibrary <name> : <sources> ;
+	
+	SetupIncludes ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(2) ;
+	Library lib$(<).a : $(>) ;
+	MakeLocate lib$(<).a : $(OBOS_STLIB_DIR) ;
+}
+
+rule SharedLibrary
+{
+	# SharedLibrary <name> : <sources> ;
+	local _lib = lib$(1).so ;
+	
+#	SetupIncludes ;
+	SetupObjectsDir ;
+	MakeLocateObjects $(2) ;
+	Main $(_lib) : $(2) ;
+	MakeLocate $(_lib) : $(OBOS_SHLIB_DIR) ;
+	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
+}
+
+rule LinkSharedOSLibs
+{
+	# LinkSharedOSLibs <name> : <libs> ;
+	# Valid elements for <libs> are e.g. "be" or "libopenbeos.so" or
+	# "/boot/.../libfoo.so". If the basename starts with "lib", it is added
+	# to the NEEDLIBS variable (i.e. the file will be bound!), otherwise it is
+	# prefixed "-l" and added to LINKLIBS.
+	
+	for i in $(>)
+	{
+		switch $(i:B)
+		{
+			case lib*	: NEEDLIBS on $(1) += $(i) ; DEPENDS $(1) : $(i) ;
+			case *		: LINKLIBS on $(1) += -l$(i) ;
+		}
+	}
+}
+
+rule LinkStaticOSLibs
+{
+	# LinkStaticOSLibs <name> : <libs> ;
+	
+	for i in $(>)
+	{
+		LINKLIBS on $(<) = $(LINKLIBS) -l $(i) ;
+	}
+}
+
+rule AddResources
+{
+	# AddResources <name> : <resourcefiles> ;
+
+	local dir;
+	
+	dir = [ FDirName $(OBOS_TOP) $(SUBDIR_TOKENS) ] ;
+
+	for i in $(>)
+	{
+	    RESFILES on $(<) = [ FDirName $(dir) $(i) ] ;
+	    DEPENDS $(<) : [ FDirName $(dir) $(i) ] ;
+	}
+}
+
+rule UsePublicHeaders
+{
+	# UsePublicHeaders <group list> [ <sources_or_objects> ] ;
+	#
+	# Adds the public C header dirs given by <group list> to the header search
+	# dirs of the subdirectory or of <sources_or_objects>, if given.
+	# NOTE: Currently the latter doesn't work, since Cc seems to be
+	# buggy: It sets the HDRS variable to $(SUBDIRHDRS) instead of adding it.
+
+	local list = $(1) ;
+	local targets = $(2) ;
+
+	local headers ;
+
+	for i in $(list) {
+		headers += [ FDirName $(OBOS_TOP) headers obos public $(i) ] ;
+	}
+
+	UseHeaders $(headers) : $(targets) ;
+}
+
+rule UsePrivateHeaders
+{
+	# UsePrivateHeaders <group list> [ <sources_or_objects> ] ;
+	#
+	# Adds the private C header dirs given by <group list> to the header search
+	# dirs of the subdirectory or of <sources_or_objects>, if given.
+	# NOTE: Currently the latter doesn't work, since Cc seems to be
+	# buggy: It sets the HDRS variable to $(SUBDIRHDRS) instead of adding it.
+
+	local list = $(1) ;
+	local targets = $(2) ;
+
+	local headers ;
+
+	for i in $(list) {
+		headers += [ FDirName $(OBOS_TOP) headers obos private $(i) ] ;
+	}
+
+	UseHeaders $(headers) : $(targets) ;
+}
+
+rule UseHeaders
+{
+	# UseHeaders <headers> [ <sources_or_objects> ] ;
+	#
+	# Adds the C header dirs <headers> to the header search
+	# dirs of the subdirectory or of <sources_or_objects>, if given.
+	# NOTE: Currently the latter doesn't work, since Cc seems to be
+	# buggy: It sets the HDRS variable to $(SUBDIRHDRS) instead of adding it.
+
+	local headers = $(1) ;
+	local targets = $(2) ;
+
+	if $(targets) {
+		ObjectHdrs $(targets) : $(headers) ;
+	} else {
+		# Note: Unlike ObjectHdrs SubDirHdrs expects only one dir given as
+		# path component list.
+		for header in $(headers) {
+			SubDirHdrs $(header) ;
+		}
+	}
+}
+
+rule UseCppUnitHeaders
+{
+	local opt = -I [ FDirName $(OBOS_TOP) headers tools cppunit ] ;
+
+	SubDirCcFlags $(opt) ;
+	SubDirC++Flags $(opt) ;
+}
+
+rule UseArchHeaders
+{
+	# usage: UseArchHeaders <arch>
+	# <arch> specifies the architecture (e.g. x86).
+	local opt = -D$(OBOS_TARGET_DEFINE) ;
+	SubDirCcFlags $(opt)  ;
+	SubDirC++Flags $(opt)  ;
+	SubDirHdrs [ FDirName $(OBOS_TOP) headers obos private kernel arch $(1) ] ;
+}
+
+#-------------------------------------------------------------------------------
+# Low-level OBOS utility rules
+#-------------------------------------------------------------------------------
+rule SetupObjectsDir
+{
+	local rel_objectsdir;
+	
+	# Copy subdir tokens except the first, as that will be "sources", and we
+	# do not want to include that :)
+	rel_objectsdir = [ FDirName $(SUBDIR_TOKENS[2-]) ] ;
+	LOCATE_TARGET = [ FDirName $(OBOS_OBJECT_TARGET) $(rel_objectsdir) ] ;
+}
+
+#-------------------------------------------------------------------------------
+# Link rule/action are overwritten as they don't handle linking files who's name 
+# contain spaces very well. Also adds resources and version to executable.
+#-------------------------------------------------------------------------------
+rule Link
+{
+	# Note: RESFILES must be set before invocation.
+	MODE on $(<) = $(EXEMODE) ;
+	on $(1) XRes $(1) : $(RESFILES) ;
+	SetVersion $(1) ;
+	Chmod $(<) ;
+	SetType $(1) ;
+	MimeSet $(1) ;
+}
+
+actions Link bind NEEDLIBS
+{
+	$(LINK) $(LINKFLAGS) -o "$(1)" $(UNDEFS) $(2) $(NEEDLIBS) $(LINKLIBS) ;
+}
+
+# BeOS specific rules
+
+rule XRes
+{
+	# XRes <target> : <resource files>
+	if $(2)
+	{
+		DEPENDS $(1) : $(2) ;
+		XRes1 $(1) : $(2) ;
+	}
+}
+
+rule XRes1 { }
+
+rule SetVersion
+{
+	# SetVersion <target>
+}
+
+rule SetType
+{
+	# SetType <target>
+}
+
+rule MimeSet
+{
+	# SetType <target>
+}
+
+
+if $(OS) = BEOS
+{
+
+actions XRes1
+{
+	xres -o "$(1)" $(2) ;
+}
+
+actions SetVersion
+{
+	setversion "$(1)" -system $(OBOS_BUILD_VERSION) -short "$(OBOS_BUILD_DESCRIPTION)" ;
+}
+
+actions SetType
+{
+	settype -t $(OBOS_TARGET_TYPE) "$(1)" ;
+}
+
+actions MimeSet
+{
+	mimeset -f "$(1)" ;
+}
+
+}	# if BEOS
+
+
+rule assemble
+{
+	DEPENDS $(1) : $(2) ;
+	Clean clean : $(1) ;
+}
+
+actions assemble
+{
+$(CC) -c $(2) -O2 $(KERNEL_CCFLAGS) -o $(1) ;
+}
+
+## Kernel stuff!
+
+rule SetupKernel
+{
+	# Usage SetupKernel <sources_or_objects> : <extra_cc_flags>;
+
+	local _objs = $(1:S=$(SUFOBJ)) ;
+
+	UsePublicHeaders kernel ;
+	UsePrivateHeaders kernel ;
+	UseArchHeaders $(OBOS_ARCH) ;
+
+	SetupObjectsDir ;
+	
+	CCFLAGS on $(_objs) = $(KERNEL_CCFLAGS) $(2) ;
+	C++FLAGS on $(_objs) = $(KERNEL_CCFLAGS) $(2) ;
+}
+
+rule KernelObjects
+{
+	SetupKernel $(1) : $(2) ;
+
+	Objects $(1) ;
+}
+
+rule KernelLd
+{
+	# KernelLd <name> : <objs> : <linkerscript> : <args> : <gcc_off> ;
+
+	SetupKernel $(2) ;
+	LINK on $(1) = ld ;
+
+	LINKFLAGS on $(1) = $(4) ;
+	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
+
+	# Remove any preset LINKLIBS
+	LINKLIBS on $(1) =  ;
+
+	# Show that we depend on the libraries we need
+	Clean clean : $(1) ;
+	Depends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	if $(6) {
+		Depends $(OBOS_KERNEL_CONFIG) : $(1) ;
+		for i in $(6) {
+			SECTIONS on $(OBOS_KERNEL_CONFIG) += ":" $(i) elf32 [ FDirName $(LOCATE_TARGET) $(1) ] ;
+		}
+	}
+	
+	MakeLocate $(1) : $(LOCATE_TARGET) ; 
+
+	# Add libgcc.a - NB this should be detected not hard coded!
+	if ! $(5) {
+		LINKLIBS on $(1) += "-L $(GCC_PATH) -lgcc" ;
+	}
+}
+
+actions KernelLd
+{
+$(LINK) $(LINKFLAGS) -o $(1) $(2) $(LINKLIBS) ;
+}
+
+rule KernelStaticLibrary
+{
+	# Usage KernelStaticLibrary <name> : <sources> : <extra cc flags>  ;
+	# This is designed to take a set of sources and libraries and create
+	# a file called lib<name>.a
+
+	SetupKernel $(2) : $(3) ;
+
+	MakeLocateObjects $(2) ;
+	Library $(1) : $(2) ;
+}
+
+rule KernelStaticLibraryObjects
+{
+	# Usage KernelStaticLibrary <name> : <sources> ;
+	# This is designed to take a set of sources and libraries and create
+	# a file called <name>
+
+	SetupKernel $(2) ;
+
+	# Show that we depend on the libraries we need
+	Clean clean : $(1) ;
+	Depends all : $(1) ;
+	Depends $(1) : $(2) ;
+
+	MakeLocate $(1) : $(LOCATE_TARGET) ;
+}
+
+actions KernelStaticLibraryObjects
+{
+ar -r $(1) $(2) ;
+}
+
+rule SystemMain
+{
+	# Usage SystemMain <target> : <sources> : <rqd_by> ;
+	SetupObjectsDir ;
+
+	CCFLAGS on $(1) = $(OPTIM) ;
+	C++FLAGS on $(1) = $(OPTIM) ;
+	LINKLIBS = ;
+
+	# This allows us to preset certain commands we use
+	# for building.
+	if $(3) {
+		for obj in $(3) {
+			BUILD_CMD on $(obj) = [ FDirName $(LOCATE_TARGET) $(1) ] ;
+		}
+	}
+	
+	Main $(1) : $(2) ;
+}
+
+rule KernelConfigSection
+{
+	# KernelConfigSection <section> : <type> : <file>  ;
+	SECTIONS on $(OBOS_KERNEL_CONFIG) += ":" $(1) $(2) $(3) ;
+}
+
+rule WriteKernelConfig
+{
+	# usage: WriteKernelConfig <target> ;
+
+	Depends files : $(1) ;
+	
+	LOCATE on $(1) = $(LOCATE_TARGET) ;
+
+	MakeLocate $(1) : $(LOCATE_TARGET) ;
+	
+	Clean clean : $(1) ;
+}
+
+actions WriteKernelConfig
+{
+	target=$(1)
+	echo "# OpenBeOS Kernel Config File" > $target
+	echo "# Automatically generated - do not edit!" >> $target
+	issection="0"
+	section=
+	for i in "$(SECTIONS)" ; do
+		if [ $issection == 1  ]; then
+			section=$i
+			issection=2
+			echo "["$section"]" >> $target
+		elif [ $issection == 2 ]; then
+			type=$i
+			issection=3
+			echo "type="$type >> $target
+		else
+			if [ $i == ":" ]; then
+				issection=1
+				echo "" >> $target
+			else
+				file=$i
+				case $file in
+					/*) ;;
+					*) file=`pwd`/$file;;
+				esac
+				echo "file="$file >> $target
+			fi
+		fi			
+	done
+}
+
+rule BuildKernel
+{
+	# Usage BuildKernel <target> : <config_file> ;
+	
+	Depends all : $(1) ;
+	Depends $(1) : $(2) ;
+	Clean clean : $(1) ;
+	
+	MakeLocate $(1) : $(LOCATE_TARGET) ;
+}
+
+actions BuildKernel
+{
+	$(BUILD_CMD) --strip-debug --strip-binary strip $(2) -o $(1) ;
+	echo ""
+	echo "Kernel linked!"
+	echo ""
+}
+
+# At present I don't bother moving the final location for
+# the floppy image as it makes copying it onto a floppy easier if it's
+# where you did the build. This is easy enough changed.
+rule KernelFloppyImage
+{
+	# Usage KernelFloppyImage <target> : <kernel> : <bootblock> ;
+
+	Depends all : $(1) ;
+	Depends $(1) : $(2) ;
+	Clean clean : $(1) ;
+
+	BOOT_BLOCK on $(1) = $(3) ;
+}
+
+# This may be a bit verbose, but I think it's useful to show what's
+# going on, at least in this early stage of development.
+actions KernelFloppyImage
+{
+	$(BUILD_CMD) $(BOOT_BLOCK) $(2) $(1) ;
+	echo ""
+	echo "*************************************************"
+	echo "*         Kernel build completed!               *"
+	echo "*    Boot image for a 1.44M floppy created      *"
+	echo "*************************************************"
+	echo ""
+	echo "Floppy image is $(OBOS_FLOPPY)"
+	echo "The following command will write it to a floppy on BeOS"
+	echo "  dd if=$(OBOS_FLOPPY) of=/dev/disk/floppy/raw bs=18k"
+	echo ""
+}
+
+

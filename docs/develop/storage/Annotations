@@ -1,0 +1,444 @@
+# Annotations
+# ===========
+#
+# This file contains a list of miscellaneous annotations.
+# An entry has the following tags:
+# * OS: the concerned "operating system" (BeOS R5, OBOS POSIX)
+# * Module: the concerned class or file
+# * Location: a more precise location, e.g. a function
+# * Description: a description of the item
+
+OS:          BeOS R5
+Module:      BEntry
+Location:    BEntry(const BDirectory*, const char*),
+             SetTo(const BDirectory*, const char*)
+Description: Crash when passing a NULL BDirectory.
+
+
+OS:          BeOS R5
+Module:      BEntry
+Location:    MoveTo()
+Description: Crashs when passing a NULL BDirectory.
+
+
+OS:          BeOS R5
+Module:      BPath
+Location:    BPath(const BDirectory*, const char*, bool),
+             SetTo(const BDirectory*, const char*, bool)
+Description: Crash when passing a NULL BDirectory.
+
+
+OS:          BeOS R5
+Module:      BPath
+Location:    GetParent()
+Description: Crashs when called on an uninitialized object or when passing
+             a NULL BPath.
+
+
+OS:          BeOS R5
+Module:      BPath
+Location:    operator==(), operator!=()
+Description: Uninitialized paths are not equal. An initialized path equals
+             a (const char*)NULL, an uninitialized path does not.
+
+
+OS:          BeOS R5
+Module:      BPath
+Location:    Flatten()
+Description: Crashs when passing a NULL buffer and doesn't check the buffer
+             size.
+
+
+OS:          BeOS R5
+Module:      BStatable
+Location:    destructor
+Description: Is not virtual.
+
+
+OS:          BeOS R5
+Module:      BStatable
+Location:    GetAccessTime(), SetAccessTime()
+Description: Access time unused.
+
+
+OS:          BeOS R5
+Module:      BStatable
+Location:    GetPermissions()
+Description: Doesn't filter the mode flags, thus not only the permissions are
+             returned.
+
+
+OS:          BeOS R5
+Module:      BStatable
+Location:    Get*()
+Description: Crash when passing a NULL pointer.
+
+
+OS:          OBOS POSIX
+Module:      BStatable
+Location:    SetPermissions/ModificationTime/CreationTime()
+Description: Don't work due to set_stat(FileDescriptor, StatMember)
+             limitations.
+
+
+OS:          OBOS POSIX
+Module:      kernel_interface
+Location:    set_stat(FileDescriptor, StatMember)
+Description: WSTAT_MODE, WSTAT_*TIME can't be implemented due to missing
+             fchmod()/FD time setters.
+
+
+OS:          BeOS R5
+Module:      libroot
+Location:    fchown()
+Description: fchown(file, 0xFFFFFFFF, gid) sets the UID to 0xFFFFFFFF, which
+             is a bug.
+
+
+OS:          BeOS R5
+Module:      libroot
+Location:    readdir(), fs_read_attr_dir()
+Description: The d_reclen field of a dirent structure does not contain the
+             length of the whole structure (unlike stated in
+             BeBook::BEntryList), but only the length of the d_name field.
+             If the terminating '\0' is counted or not seems to depend on the
+             file system.
+
+
+OS:          OBOS POSIX
+Module:      kernel_interface
+Location:    read_link(FileDescriptor, char*, size_t)
+Description: Can't be implemented due to the lack of an FD readlink() version.
+
+
+OS:          BeOS R5
+Module:      BSymLink
+Location:    MakeLinkedPath(const char*, BPath*)
+Description: The dirPath seems to be converted into a BDirectory, which
+             causes links to be resolved, i.e. a "/tmp" dirPath expands to
+             "/boot/var/tmp". That does also mean, that the dirPath must
+             exists!
+
+
+OS:          BeOS R5
+Module:      BSymLink
+Location:    MakeLinkedPath()
+Description: Crashs when passing a NULL const char* or BDirectory.
+
+
+OS:          BeOS R5
+Module:      BNode
+Location:    GetNextAttrName()
+Description: Crashs when passing a NULL buffer.
+
+
+OS:          BeOS R5
+Module:      BNode
+Location:    Read/WriteAttrString()
+Description: Crash when passing a NULL BString.
+
+
+OS:          BeOS R5
+Module:      BNode
+Location:    Lock()
+Description: Given two BNode objects initialized to the same node, it is
+             possible to Lock() one of them, although the BeBook says it isn't.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    BDirectory(const node_ref*), SetTo(const node_ref*)
+Description: Crash when passing a NULL node_ref.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    GetEntry()
+Description: Crashs when passing a NULL BEntry.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    FindEntry()
+Description: Crashs when passing a NULL BEntry.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    Contains()
+Description: If the BDirectory is uninitialized, the const char* version
+             returns true for existing entries, whereas the const BEntry*
+             version returns false.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    Contains(const BEntry*, bool)
+Description: Crashs when passing a NULL BEntry.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    Contains(const BEntry*, bool)
+Description: Bug: Tests with a directory, contained file/dir/symlink and
+             the respective node kind (B_FILE_NODE/B_DIRECTORY_NODE/
+             B_SYMLINK_NODE) result false.
+
+
+OS:          BeOS R5
+Module:      BDirectory
+Location:    GetNextDirents()
+Description: Crashs when passing a NULL buffer.
+
+
+OS:          OBOS
+Module:      BQuery
+Location:    Push*()
+Description: Return status_t instead of void. Fail, if Fetch() has already
+             been called.
+
+
+OS:          BeOS R5
+Module:      BQuery
+Location:    PushOp()
+Description: Crashs when pushing B_CONTAINS/B_BEGINS/ENDS_WITH on an empty
+             stack.
+
+
+OS:          BeOS R5
+Module:      BQuery
+Location:    PushUInt64()
+Description: Doesn't work. Predicates constructed using it are invalid.
+
+
+OS:          BeOS R5
+Module:      BQuery
+Location:    Get/SetPredicate()
+Description: Crash when passing a NULL BString/char*.
+
+
+OS:          BeOS R5
+Module:      BQuery
+Location:    SetVolume()
+Description: Crashs when passing a NULL BVolume.
+
+
+OS:          BeOS R5
+Module:      BQuery
+Location:    GetNextEntry/Ref()
+Description: Crash when passing a NULL BEntry/entry_ref.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    {Get,Set}LongDescription()
+Description: Crashes when passed a NULL description
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetLongDescription()
+Description: The contents of the description string are modified even if
+             the function fails.
+             
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    SetShortDescription()
+Description: When passed a NULL description, doesn't crash, but does
+             appear to make the result of following calls to SetShortDescription
+             unreliable (sometimes they work, sometimes they don't).
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    
+Description: The maximal MIME string length, BMimeType accepts is
+             B_MIME_TYPE_LENGTH *not* including terminating null. Note, that
+             app_info reserves only B_MIME_TYPE_LENGTH chars for the
+             signature field.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    SetAppHint()
+Description: The entry_ref passed to SetAppHint() must be valid but is not
+             required to refer to a file that actually exists; furthermore,
+             if it does exist, the MIME type of the file is not required to
+             match the BMimeType object's type.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    SetIcon()
+Description: The BBitmap passed to BMimeType::SetIcon() must be in the B_CMAP8
+             color space, or the application will crash. We should remember
+             to be smarter about this.
+
+             
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetIcon()
+Description: The BBitmap passed to BMimeType::GetIcon() must be in the B_CMAP8
+             color space. If not, the call returns B_OK but doesn't actually
+             modify the bitmap. We should remember to be smarter about this.
+             
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    IsValid(const char*), GetSupertype(), Contains()
+Description: Crash when passing NULL.
+             
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    {Get,Set}IconForType(char*, BBitmap*, icon_size)
+Description: Passing NULL as the first parameter is the same as calling
+             {Get,Set}Icon() with the second two parameters (i.e. {gets,sets}
+             the icon for the type itself).
+
+             
+OS:          BeOS R5
+Module:      BMimeType
+Location:    SetFileExtensions()
+Description: Passing a NULL message does not clear the File Extensions field
+             for the MIME type as indicated by the Be Book; instead, it crashes
+             the application :-)
+
+            
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetFileExtensions()
+Description: A B_STRING_TYPE field of name "type" is *added* to the result
+             containing the MIME type of the BMimeType object. Since the
+             BMessage passed to SetFileExtensions() appears to be simply
+             flattened into the appropriate attribute, the "type" field is
+             appended to any such "type" fields that may already exist in
+             the original BMessage.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    Install()
+Description: From the Be Book: "Currently, Install() may return a random value
+             if the object is already installed." 
+             
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    
+Description: MIME Type strings are converted to lowercase before being used
+             as filenames in the MIME database.
+             
+           
+OS:          BeOS R5
+Module:      BMimeType
+Location:    Start/StopWatching()
+Description: An invalid messenger (BMessenger::Invalid()) is fine as parameter.
+
+
+OS:          BeOS R5
+Module:      Mime.h/cpp
+Location:    get_device_icon()
+Description: KDL when passing a NULL buffer!
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    CheckSnifferRule()
+Description: Crashes when passing a NULL rule.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetSnifferRule()
+Description: Crashes when passing a NULL BString.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    Check/Get/SetSnifferRule()
+Description: The sniffer rules description in the BeBook deviates considerably
+             from the actual implementation:
+             - + masks
+             - + top level ORs: (patterns...) | (patterns...) | ...
+             - - range overriding: [range1] ([range2]pattern)
+             - either no or complete ranges: (pattern1 | pattern2)
+               or ([range1]pattern1 | [range2]pattern2), but not
+               ([range1]pattern1 | pattern2)
+             - CheckSnifferRule() doesn't check some of the values, e.g.
+               ranges (negative values, or begin > end) or 0 <= priority <= 1.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GuessMimeType(const entry_ref *, BMimeType *)
+Description: When passing an uninitialized entry_ref, B_OK and
+             "application/octet-stream" are returned.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    SetAttrInfo
+Description: Crashes when passed a NULL BMessage.
+
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetInstalledTypes(BMessage*)
+Description: The set of types returned by this function is determined as follows:
+             + All *entries* (files, dirs, or symlinks) in the root MIME database
+               directory treated as MIME types, except those that begin with an
+               underscore; only dirs are treated as supertypes (unless the dir's
+               META:TYPE attribute is different than its filename, in which case
+               it's not treated as a supertype).
+             + For each supertype, all *entries* (files, dirs, or symlinks) in the
+               corresponding supertype subdirectory are treated as a MIME type, except
+               those that begin with an underscore.
+             + The MIME type for supertypes is taken from the name of the supertype
+               subdirectory.
+             + The MIME type for non-supertypes is take from the entry's META:TYPE
+               attribute. If the entry has no META:TYPE attribute, the MIME type is
+               derived by concatentating the name of the supertype directory to the
+               name of the entry, separated by a "/" character. Either way, the MIME
+               string returned is not checked to be valid.
+
+             
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetInstalledTypes(char *super, BMessage*)
+Description: The set of types returned by this function is determined as follows:
+             + All *entries* (files, dirs, or symlinks) in the MIME database directory
+               corresponding to the "super" argument are treated as subtypes, *except*
+               those whose filenames begin with an underscore. It does not matter if
+               the supertype directory has a META:TYPE attribute or not.
+             + The MIME type is taken from the entry's META:TYPE attribute. If the entry
+               has no such attribute, the MIME type is derived by concatentating the name
+               of the supertype directory (the directory's META:TYPE attribute is ignored
+               if present) to the name of the entry, separated by a "/" character. Either
+               way, the MIME string returned is not checked to be valid.
+               
+             
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetInstalledSupertypes(BMessage*)
+Description: The set of types returned by this function is determined as follows:
+             + All directories in the root MIME database directory are treated as
+               supertypes (even directories beginning with an underscore).
+             + The MIME type is derived from the directory name, which is not
+               checked to be a valid MIME string.
+             
+
+OS:          BeOS R5
+Module:      BMimeType
+Location:    GetWildcardApps()
+Description: This code:             
+               BMessage msg;  
+               status_t error = BMimeType::GetWildcardApps(&msg);
+             is the same as:
+               BMessage msg;
+               BMimeType mime("application/octet-stream");
+               status_t error = mime.InitCheck();
+               if (!error)
+                 error = mime.GetSupportingApps(&msg);
+

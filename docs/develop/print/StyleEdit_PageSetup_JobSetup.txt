@@ -1,0 +1,18 @@
+$ print_server
+Loaded addon /boot/home/config/add-ons/Print/DemoDriver
+Loaded addon /boot/beos/system/add-ons/Print/transport/Serial Port
+Loaded addon /boot/beos/system/add-ons/Print/EPSON Stylus Driver
+Loaded addon /boot/beos/system/add-ons/Print/transport/Parallel Port
+Loaded addon /boot/beos/system/add-ons/Print/HP PCL3 LaserJet Compatible
+Loaded addon /boot/beos/system/add-ons/Print/transport/USB Port
+Loaded addon /boot/beos/system/add-ons/Print/PostScript
+Loaded addon /boot/beos/system/add-ons/Print/transport/Print To File
+Loaded addon /boot/beos/system/add-ons/Print/Preview
+BMessage: what = pgst (0x70677374, or 1885827956)
+BMessage: what = pgcp (0x70676370, or 1885823856)
+-------------------------------------------------
+BMessage: what = pgcp (0x70676370, or 1885823856)
+BMessage: what = ppst (0x70707374, or 1886417780)
+    entry current_printer, type='CSTR', c=1, size=24, data[0]: "EPSONStylusDriver_BeInc"
+BMessage: what = pdef (0x70646566, or 1885627750)
+BMessage: what = pgcp (0x70676370, or 1885823856)

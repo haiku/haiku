@@ -1,0 +1,23 @@
+static void vnode_destroy(struct vm_store *store)
+	Frees memory associated with this store.
+
+static off_t vnode_commit(struct vm_store *store, off_t size)
+	Sets committed size to size and returns it.
+
+static int vnode_has_page(struct vm_store *store, off_t offset)
+	Returns 1.
+
+static ssize_t vnode_read(struct vm_store *store, off_t offset, iovecs *vecs)
+	Calls vfs_readpage.
+
+static ssize_t vnode_write(struct vm_store *store, off_t offset, iovecs *vecs)
+	calls vfs_writepage
+
+static void vnode_acquire_ref(struct vm_store *store)
+	Calls vfs_vnode_aquire_ref
+
+static void vnode_release_ref(struct vm_store *store)
+	Calls vfs_vnode_release_ref
+
+vm_store *vm_store_create_vnode(void *vnode)
+	Creates space for a vm_store and a vnode_store_data. Sets data = vnode_store_data. Sets the vnode_store_data's vnode to vnode.

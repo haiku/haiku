@@ -1,0 +1,33 @@
+Variables
+
+bool trimming_cycle;
+Do we need free space?
+
+static addr free_memory_low_water;
+
+static addr free_memory_high_water;
+
+static void scan_pages(vm_address_space *aspace, addr free_target)
+	Finds a region in this address space to scan. 
+	Locks the region's cache_ref.
+	For each page, 
+		if the page is present, do nothing with this page
+		Lookup the page structure. If this page doesn't exist, do nothing with this page.
+		If the page is written to or is hard wired (unswapable), do nothing with it.
+		If the page is not accessed and is active and we need space (free_target), unmap it. If this is the last reference to that mapped page, put it on the inactive list.
+		If the page has been modified, but wasn't on the active list, put it there.
+	Move to the next region in this address space, wrap around until we hit the first one.
+
+static int page_daemon()
+	Walk through every address space:
+		Adjust the size of the processes' working set (i.e. memory allocation) to be larger or smaller, to tailor to faults.
+		Set trimming cycle if free pages is below the high water mark.
+		Clear trimming cycle if free pages is above high water mark.
+		Set free memory target to be the processes' mapped size minus the working set
+		Call scan_pages
+	
+	
+int vm_daemon_init()
+	Sets high water to pages/4 and low water to pages/8.
+	Creates the page daemon as a kernel thread.
+		

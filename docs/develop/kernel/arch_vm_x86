@@ -1,0 +1,11 @@
+int arch_vm_init (kernel_args *ka)
+	First round of initialization; does nothing.
+
+int arch_vm_init2 (kernel_args *ka)
+	Marks the bios and dma ranges as "in use".
+
+int arch_vm_init_endvm (kernel_args *ka)
+	Maps the dma region into kernel space
+
+void arch_vm_aspace_swap(vm_address_space *aspace)
+	Calls i386_swap_pgdir

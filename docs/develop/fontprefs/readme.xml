@@ -1,0 +1,112 @@
+<documentation>
+
+	<appName>Fonts</appName>
+	
+	<version>0.8</version>
+	
+	<author>
+	
+		<name>Matt McMinn</name>
+		<email>melfinadev@earthlink.net</email>
+		<homePage>http://home.earthlink.net/~melfina/</homePage>
+		
+	</author>
+	
+	<description>
+	
+		It's just a copy of the fonts preferences app that comes with BeOS.
+	
+	</description>
+	
+	<issues>
+	
+		<issue>
+		
+			<id>1</id>
+			<description>
+			
+				Rescanning fonts causes the bold font to lose its boldness.
+				
+			</description>
+			<relatedInfo />
+		
+		</issue>
+		<issue>
+		
+			<id>2</id>
+			<description>
+			
+				Fixed width font selector should only show fixed width fonts.
+				
+			</description>
+			<relatedInfo>
+			
+				<note>
+				
+					Should be relatively easy - just filter the fonts.
+					
+				</note>
+			
+			</relatedInfo>
+			
+		</issue>
+		
+	</issues>
+	
+	<todoList>
+	
+		<todo>
+		
+			<id>1</id>
+			<forVersion>0.9</forVersion>
+			<description>
+			
+				When a style is selected, the font menu label needs to be
+				updated to reflect this.
+				
+			</description>
+			<relatedInfo />
+			
+		</todo>
+		<todo>
+		
+			<id>2</id>
+			<forVersion>0.9</forVersion>
+			<description>
+			
+				Make a cache panel function that updates the slider labels with
+				an int as a parameter.
+				
+			</description>
+			<relatedInfo />
+			
+		</todo>
+		<todo>
+		
+			<id>3</id>
+			<forVersion>0.9</forVersion>
+			<description>
+			
+				Add the VMSettings code so that the panel uses the settings
+				file for position/size.
+				
+			</description>
+			<relatedInfo />
+			
+		</todo>
+		<todo>
+		
+			<id>4</id>
+			<forVersion>0.9</forVersion>
+			<description>
+			
+				Update the default fonts on close.
+				
+			</description>
+			<relatedInfo />
+			
+		</todo>
+		
+	</todoList>
+		
+</documentation>

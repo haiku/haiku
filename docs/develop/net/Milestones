@@ -1,0 +1,66 @@
+Milestones
+==========
+
+These were agreed 17th january 2002 in an IRC meeting.
+
+IRC log http://www.darkest.org/openbeos/netkit/02.01.17.openbeosnetkit.log
+
+Milestone	Description
+
+1		network drivers
+		It was recognised that until the team members had
+		working NIC's there was little point in trying to
+		develop a network stack.
+
+		STATUS: rtl8139 in repository
+			tulip driver written covering Netgear FA310TX
+			Ne2000 driver started
+
+2		Encapsulation
+		Ethernet packets come in 2 basic forms, 
+			ethernet encapsulation (rfc 894)
+			IEEE 802.2/3/4/5 (rfc1042)
+		We need to be able to handle both. However, we only 
+		MUST be able to send ethernet compatible frames. In pactice
+		we should try to send the frame in the same format that it
+		was received. In fact we may want to store the format used by
+		hosts?
+
+		David says this isn't easy to do with the current newos
+		stack design.
+
+		STATUS: newos has ethernet support, but with the current
+			architecture it's difficult to add fully transparent
+			support for other encapsulations.
+
+3		ARP module
+		Once we can get frames from the network, one of the first
+		things we need to do is start capturing and caching ARP
+		requests.
+		NB david thinks this should be aimed at providing more
+		general purpose caching so it's useful beyond ARP. he
+		suggests we call this a Net Cache module.
+
+		STATUS: newos has an arp module, though cache needs work
+			and is limited to ipv4
+
+4		IPv4 checksums + routing
+		Implement IPv4 checksums and routing
+
+		STATUS: newos has a basic version of thisi
+
+5		IPv4 ICMP
+		Add ICMP support to out IPv4 module
+
+6		IPv4 Fragmentation
+		This will be interesting, adding support for reconstructing
+		and deconstructing packets into suitable frames for transport.
+		NB this needs to be abel to deal with different sizes of 
+		frame.
+
+		STATUS:
+
+7		TCP/UDP
+		
+		STATUS: newos has rudimentary UDP support
+

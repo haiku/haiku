@@ -1,0 +1,339 @@
+<html>
+<head>
+	<title>BStopWatch Tasks</title>
+</head>
+<body>
+<h1>BStopWatch Tasks<hr></h1>
+
+
+<!-- master table -->
+<table border>
+	<!-- table column headers -->
+	<th>
+		<table>
+			<td>
+				<a href="#legend">
+					<img src="../../images/DocumentDraw.gif" width="22" height="22" alt="Functional Spec" border="0">
+				</a>
+			</td>
+			<td>
+				<a href="#legend">
+					<img src="../../images/User.gif" width="22" height="22" alt="Use Cases" border="0">
+				</a>
+			</td>
+			<td>
+				<a href="#legend">
+					<img src="../../images/Help.gif" width="22" height="22" alt="Unit Tests" border="0">
+				</a>
+			</td>
+			<td>
+				<a href="#legend">
+					<img src="../../images/Hammer.gif" width="22" height="22" alt="Technical Spec" border="0">
+				</a>
+			</td>
+			<td>
+				<a href="#legend">
+					<img src="../../images/GoalFlag.gif" width="22" height="22" alt="Implementation" border="0">
+				</a>
+			</td>
+		</table>
+	</th>
+	<th><strong>Task</strong></th>
+	<th><strong>Owner</strong></th>
+
+	<!-- Class header -->
+	<tr>
+		<td colspan="7"><center><strong>Class BStopWatch</strong></center></td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			BStopWatch(const char *name, bool silent = false);
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			virtual ~BStopWatch();
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			void Suspend();
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			void Resume();
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			bigtime_t Lap();
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			bigtime_t ElapsedTime() const;
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			void Reset();
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Functional Spec"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Use Cases"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Unit Tests"></td>
+				<td><img src="
+../../images/blank-20.gif
+" width="22" height="22" alt="Technical Spec"></td>
+				<td><img src="
+../../images/Check.gif
+" width="22" height="22" alt="Implementation"></td>
+			</table>
+		</td>
+		<!-- task -->
+		<td>
+			const char* Name() const;
+		</td>
+		<!-- owner -->
+		<td>
+			
+		</td>
+	</tr>
+
+</table>
+
+<br><br>
+<hr>
+<br><br>
+
+<!-- legend table -->
+<a name="legend">
+<table border>
+	<tr>
+		<td align="center"><strong>Legend</strong></td>
+	</tr>
+	<tr>
+		<td>
+			<table>
+				<tr>
+					<td><img src="../../images/DocumentDraw.gif" width="22" height="22" alt="Functional Spec"></td>
+					<td>Functional Spec</td>
+				</tr>
+				<tr>
+					<td><img src="../../images/User.gif" width="22" height="22" alt="Use Cases"></td>
+					<td>Use Cases</td>
+				</tr>
+				<tr>
+					<td><img src="../../images/Help.gif" width="22" height="22" alt="Unit Tests"></td>
+					<td>Unit Tests</td>
+				</tr>
+				<tr>
+					<td><img src="../../images/Hammer.gif" width="22" height="22" alt="Technical Spec"></td>
+					<td>Technical Spec</td>
+				</tr>
+				<tr>
+					<td><img src="../../images/GoalFlag.gif" width="22" height="22" alt="Implementation"></td>
+					<td>Implementation</td>
+				</tr>
+				<tr>
+					<td><img src="../../images/Check.gif" width="22" height="22" alt="Completed"></td>
+					<td>Completed</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+</table>
+</a>
+<br>
+
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>Hosted by:</small><br> 
+<a href="http://sourceforge.net">
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002 OpenBeOS Project</small> 
+</center>
+
+</body>
+</html>

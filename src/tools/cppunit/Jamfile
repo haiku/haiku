@@ -1,0 +1,49 @@
+SubDir OBOS_TOP sources tools cppunit ;
+
+rule CppUnitLibrary
+{
+	# CppUnitLibrary <sources> ;
+	local _lib = libcppunit.so ;
+	
+	UseCppUnitHeaders ;
+	SetupObjectsDir ;
+	MakeLocateObjects [ FGristFiles $(<) ] ;
+	Main $(_lib) : $(<) ;
+	MakeLocate $(_lib) : /boot/home/config/lib ;
+	LINKFLAGS on $(_lib) = $(LINKFLAGS) -nostart -Xlinker -soname=\"$(_lib)\" ;
+}
+
+CppUnitLibrary
+	CppUnitShell.cpp
+	TestCase.cpp
+	TestResult.cpp
+	TestShell.cpp
+	TestSuite.cpp
+	cppunit/Asserter.cpp
+	cppunit/CompilerOutputter.cpp
+	cppunit/Exception.cpp
+	cppunit/NotEqualException.cpp
+	cppunit/RepeatedTest.cpp
+	cppunit/SourceLine.cpp
+	cppunit/SynchronizedObject.cpp
+	cppunit/TestAssert.cpp
+	cppunit/TestCase.cpp
+	cppunit/TestFactoryRegistry.cpp
+	cppunit/TestFailure.cpp
+	cppunit/TestResult.cpp
+	cppunit/TestResultCollector.cpp
+	cppunit/TestRunner.cpp
+	cppunit/TestSetUp.cpp
+	cppunit/TestSucessListener.cpp
+	cppunit/TestSuite.cpp
+	cppunit/TextOutputter.cpp
+	cppunit/TextTestProgressListener.cpp
+	cppunit/TextTestResult.cpp
+	cppunit/TypeInfoHelper.cpp
+	cppunit/XmlOutputter.cpp
+;
+
+LinkSharedOSLibs libcppunit.so :
+	stdc++.r4
+	/boot/develop/lib/x86/libbe.so
+;

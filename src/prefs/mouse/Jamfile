@@ -1,0 +1,7 @@
+SubDir OBOS_TOP sources os kits input prefs mouse ;
+
+Preference Mouse : Mouse.cpp MouseSettings.cpp MouseView.cpp MouseWindow.cpp ;
+
+LinkSharedOSLibs Mouse : translation be root ;
+
+AddResources Mouse : Mouse.rsrc ;

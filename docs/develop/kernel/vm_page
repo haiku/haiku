@@ -1,0 +1,112 @@
+Variables
+extern bool trimming_cycle;
+	Determines if we are trimming - if we are nearly out of space
+
+static page_queue page_free_queue; 
+	The queue that holds unused (but not cleared) pages
+
+static page_queue page_clear_queue;
+	The queue that holds cleared (0'ed) pages
+
+static page_queue page_modified_queue;
+	The queue that holds altered pages
+
+static page_queue page_active_queue;
+	The queue that holds in use pages that are not altered
+
+static vm_page *all_pages;
+	Every page in the system
+
+static addr physical_page_offset;
+	The first address of real ram
+
+static unsigned int num_pages;
+	Total number of pages in the system
+
+static spinlock_t page_lock;
+	A lock to protect the queues.
+
+static sem_id modified_pages_available;
+	A semaphore to indicate if there are pages that need to be written to disk
+
+static void 		clear_page(addr pa);
+	Sets all values in this page to 0.
+
+static vm_page *	dequeue_page(page_queue *q)
+	Standard queue remove first page; has count; no locking
+
+void 			dump_page_stats(int argc, char **argv);
+	Dumps counts of each state (active, inactive, busy, not used, modified, free, cleared, wired)
+
+void 			dump_free_page_table(int argc, char **argv)
+	Not done.
+
+static void 		enqueue_page(page_queue *q, vm_page *page)
+	Standard queue add a page; has count; no locking; SPECIAL - for page_modified_queue, if there is only one page modified (new one), release semaphore
+
+static bool 		is_page_in_phys_range(kernel_args *ka, addr paddr)
+	Determines if a physical address is in the physical memory that exists.
+
+static void 		move_page_to_queue(page_queue *from_q, page_queue *to_q, vm_page *page)
+	Removes the page from the from_q and adds it to the to_q.
+
+static int 			pageout_daemon()
+	aquires the "modified pages available" semaphore. Gets first page from modified list. Sets it to busy, updates all processes mapping this page that it is no longer a modified page, writes it out to disk, then puts it on the active list (i.e. not modified). Doesn't write out "anonymous" blocks unless we are trimming.
+
+static int 			page_scrubber(void *);
+	Every 1/10 second, takes a page from the free queue, memsets it to 0's, then puts it on the clear queue.
+
+static void 		remove_page_from_queue(page_queue *q, vm_page *page)
+	Removes a given page from the given page queue. No locking.
+
+addr 			vm_alloc_from_ka_struct(kernel_args *ka, unsigned int size, int lock) 
+	Gets virtual space in the ka using  vm_alloc_vspace_from_ka_struct, then uses vm_alloc_ppage_from_kernel_struct to find a physical page to map it to.
+
+static addr 		vm_alloc_ppage_from_kernel_struct(kernel_args *ka)
+	Attempts to extend, by one page, one of the phys_alloc_range blocks in the kernel args.
+
+static addr 		vm_alloc_vspace_from_ka_struct(kernel_args *ka, unsigned int size)
+	Attempts to find an address range that can be extended to hold size bytes.
+
+vm_page *		vm_lookup_page(addr page_num)
+	Does the math to get vm_page pointer from a page number.
+
+int 				vm_mark_page_inuse(addr page)
+	Calls vm_mark_page_range_inuse with len of 1.
+
+int 				vm_mark_page_range_inuse(addr start_page, addr len)
+	Sets state to PAGE_STATE_UNUSED for all pages in this range.
+
+vm_page *		vm_page_allocate_page(int page_state)
+	Gets a single page from the clear or free queue (from page_state), fall back to the other. 
+
+vm_page *		vm_page_allocate_page_run(int page_state, addr len)
+	Attempts to find a run of pages "len" long that are either free or clear. If found, pulls them from their queues and calls vm_page_set_state_nolock on them
+
+vm_page *		vm_page_allocate_specific_page(addr page_num, int page_state)
+	Finds this page, removes it from the clear or free queue, clears it if necessary and returns. Returns NULL for not found or page in use.
+
+int 				vm_page_init(kernel_args *ka)
+	Initializes the free, clear, modified and active queues. Sets up the vm structures.
+
+int 				vm_page_init2(kernel_args *ka)
+	Properly maps the vm structures allocated in vm_page_init.
+
+int 				vm_page_init_postthread(kernel_args *ka)
+	Creates the page scrubber and the pageout daemon.
+
+addr 			vm_page_num_pages()
+	Returns the total number of pages.
+
+addr 			vm_page_num_free_pages()
+	Returns count of pages in free and clear queues.
+
+int 				vm_page_set_state(vm_page *page, int page_state)
+	Locks, then calls vm_page_set_state_nolock, then unlocks.
+
+static int 			vm_page_set_state_nolock(vm_page *page, int page_state);
+	Moves a page from the state that it is in to the state specified, and moves it from the old queue to the new one.
+
+
+
+

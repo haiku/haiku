@@ -1,0 +1,72 @@
+BMessage: what = okok (0x6f6b6f6b, or 1869311851)
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x8003b390 (-2147241072, ೐')
+    entry    page_format, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry    orientation, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry          scale, type='FLOT', c=1, size= 4, data[0]: 100.0000
+    entry           xres, type='LONG', c=1, size= 4, data[0]: 0x12c (300, '')
+    entry           yres, type='LONG', c=1, size= 4, data[0]: 0x12c (300, '')
+    entry     paper_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:612.0, b:792.0)
+    entry printable_rect, type='RECT', c=1, size=16, data[0]: BRect(l:18.0, t:18.0, r:594.0, b:774.0)
+    entry current_printer, type='CSTR', c=1, size=27, data[0]: "HPLaserJetPCL3Driver_BeInc"
+
+BMessage: what = GOOD (0x474f4f44, or 1196379972)
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x800131a8 (-2147405400, ী౨')
+    entry    EPST_copies, type='LONG', c=1, size= 4, data[0]: 0x1 (1, '')
+    entry EPST_dst_idx_page, type='LONG', c=1, size= 4, data[0]: 0x5 (5, '')
+    entry EPST_src_idx_page, type='LONG', c=1, size= 4, data[0]: 0x7 (7, '')
+    entry EPST_orientation, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry EPST_page_order, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry  EPST_centered, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry  EPST_extended, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry EPST_rotate180, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry EPST_page_state, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry EPST_logic_userdef_width, type='FLOT', c=1, size= 4, data[0]: 0.0000
+    entry EPST_logic_userdef_height, type='FLOT', c=1, size= 4, data[0]: 0.0000
+    entry EPST_page_name, type='CSTR', c=1, size=3, data[0]: "A4"
+    entry     EPST_scale, type='FLOT', c=1, size= 4, data[0]: 100.0000
+    entry     paper_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:595.2, b:841.8)
+    entry printable_rect, type='RECT', c=1, size=16, data[0]: BRect(l:8.4, t:8.4, r:586.8, b:802.2)
+    entry EPST_page_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:2976.0, b:4209.0)
+    entry EPST_printer_rect, type='RECT', c=1, size=16, data[0]: BRect(l:42.0, t:42.0, r:2934.0, b:4011.0)
+    entry EPST_page_settings_dpi, type='FLOT', c=1, size= 4, data[0]: 72.0000
+    entry EPST_printer_settings_dpi, type='FLOT', c=1, size= 4, data[0]: 360.0000
+    entry EPST_paper_feed, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry   EPST_quality, type='LONG', c=1, size= 4, data[0]: 0x1 (1, '')
+    entry EPST_resolution, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry EPST_paper_type, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry     EPST_color, type='LONG', c=1, size= 4, data[0]: 0x6 (6, '')
+    entry EPST_microweave, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry EPST_unidirectionnal, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry           xres, type='LONG', c=1, size= 4, data[0]: 0x168 (360, '')
+    entry           yres, type='LONG', c=1, size= 4, data[0]: 0x168 (360, '')
+    entry  EPST_BEATWARE, type='BOOL', c=1, size= 1, data[0]: 0
+    entry     first_page, type='LONG', c=1, size= 4, data[0]: 0x1 (1, '')
+    entry      last_page, type='LONG', c=1, size= 4, data[0]: 0x7fffffff (2147483647, '')
+    entry   EPST_preview, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry current_printer, type='CSTR', c=1, size=24, data[0]: "EPSONStylusDriver_BeInc"
+
+BMessage: what = okok (0x6f6b6f6b, or 1869311851)
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x8003b498 (-2147240808, ഘ')
+    entry         bitmap, type='BOOL', c=1, size= 1, data[0]: 0
+    entry    HighQuality, type='BOOL', c=1, size= 1, data[0]: 0
+    entry       in_color, type='BOOL', c=1, size= 1, data[0]: 0
+    entry    orientation, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry      page size, type='CSTR', c=1, size=7, data[0]: "Letter"
+    entry       ppd_item, type='MSGG', c=1, size= 0,
+    entry           xres, type='LLNG', c=1, size= 8, data[0]: 0x12c (300, '')
+    entry           yres, type='LLNG', c=1, size= 8, data[0]: 0x12c (300, '')
+    entry     paper_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:612.0, b:792.0)
+    entry          units, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry printable_rect, type='RECT', c=1, size=16, data[0]: BRect(l:14.4, t:21.6, r:597.6, b:784.8)
+    entry       first up, type='BOOL', c=1, size= 1, data[0]: 1
+    entry current_printer, type='CSTR', c=1, size=23, data[0]: "PostScriptDriver_BeInc"
+
+BMessage: what = okok (0x6f6b6f6b, or 1869311851)
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x80018af0 (-2147382544, 瀊')
+    entry    orientation, type='LONG', c=1, size= 4, data[0]: 0x0 (0, '')
+    entry          scale, type='FLOT', c=1, size= 4, data[0]: 100.0000
+    entry           xres, type='LONG', c=1, size= 4, data[0]: 0x12c (300, '')
+    entry           yres, type='LONG', c=1, size= 4, data[0]: 0x12c (300, '')
+    entry     paper_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:612.0, b:792.0)
+    entry printable_rect, type='RECT', c=1, size=16, data[0]: BRect(l:0.0, t:0.0, r:612.0, b:792.0)
+    entry current_printer, type='CSTR', c=1, size=20, data[0]: "PreviewDriver_BeInc"

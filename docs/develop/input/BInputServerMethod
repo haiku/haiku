@@ -1,0 +1,11 @@
+BInputServerMethod::_ReservedInputServerMethod4(void)
+BInputServerMethod::_ReservedInputServerMethod3(void)
+BInputServerMethod::_ReservedInputServerMethod2(void)
+BInputServerMethod::_ReservedInputServerMethod1(void)
+BInputServerMethod::SetMenu(BMenu
+BInputServerMethod::SetIcon(unsigned
+BInputServerMethod::SetName(char
+BInputServerMethod::EnqueueMessage(BMessage
+BInputServerMethod::MethodActivated(bool)
+BInputServerMethod::~BInputServerMethod(void)
+BInputServerMethod::BInputServerMethod(char

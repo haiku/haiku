@@ -1,0 +1,115 @@
+BHandler(const char* name)
+case 1:	name is non-NULL; BHandler::Name() should return that name
+case 2: name is NULL; BHandler::Name() should return NULL
+
+BHandler(BMessage* archive)
+case 1: if archive has field "_name", BHandler::Name() should return that name
+case 2: if archive has no field "_name", BHandler::Name() should return NULL
+case 3: archive is NULL
+
+Archive(BMessage *data, bool deep = true)
+case 1: data is NULL, deep is false
+case 2: data is NULL, deep is true
+case 3: data is valid, deep is false
+case 4: data is valid, deep is true
+
+Instantiate(BMessage *data)
+case 1: data is NULL
+case 2: data is valid, has field "_name"; BHandler::Name() should return that name
+case 3: data is valid, has no field "_name"; BHandler::Name() should return NULL
+
+SetName(const char *name)
+Name()
+case 1: name is NULL; BHandler::Name() should return NULL
+case 2: name is valid; BHandler::Name should return that name
+
+Perform(perform_code d, void *arg)
+case 1: feed meaningless data, should return B_ERROR
+
+IsWatched()
+case 1: No added watchers; should return false
+case 2: Add watcher, should return true; remove watcher, should return false
+
+Looper()
+case 1: Not added to a BLooper, should return NULL
+case 2: Added to a BLooper, should return that BLooper;
+		remove from BLooper, should return NULL
+
+SetNextHandler(BHandler *handler)
+NextHandler()
+This BHandler and handler must be part of the same chain (i.e., belong to the
+same BLooper) and the BLooper they belong to must be locked.
+case 1: Handler1 and Handler2 do not belong to a BLooper
+case 2: Handler1 belongs to a BLooper (which is unlocked), Handler2 does not
+case 3: Handler1 belongs to a BLooper (which is locked), Handler2 does not
+case 4: Handler1 does not belong to a BLooper, Handler2 does (which is unlocked)
+case 5: Handler1 does not belong to a BLooper, Handler2 does (which is locked)
+case 6: Handler1 and Handler2 belong to different BLoopers, which are unlocked
+case 7: Handler1 and Handler2 belong to different BLoopers, and Handler1's
+		BLooper is locked; Handler2's is not
+case 8: Handler1 and Handler2 belong to different BLoopers, and Handler1's
+		BLooper is unlocked; Handler2's is locked
+case 9: Handler1 and Handler2 belong to different BLoopers, which are both locked
+case 10: Handler1 and Handler2 belong to the same BLooper, which is unlocked
+case 11: Handler1 and Handler2 belong to the same BLooper, which is locked
+case 12: Default constructed handler
+case 13: Handler belongs to BLooper
+
+AddFilter(BMessageFilter *filter)
+case 1: filter is NULL
+case 2: filter is valid, handler has no looper
+case 3: filter is valid, handler has looper, looper isn't locked
+case 4: filter is valid, handler has looper, looper is locked
+
+RemoveFilter(BMessageFilter *filter)
+case 1: filter is NULL
+case 2: filter is valid, handler has no looper
+case 3: filter is valid, handler has looper, looper isn't locked
+case 4: filter is valid, handler has looper, looper is locked
+case 5: filter is valid, but not owned by handler, handler has no looper
+case 6: filter is valid, but not owned by handler, handler has looper, looper isn't locked
+case 7: filter is valid, but not owned by handler, handler has looper, looper is locked
+
+SetFilterList(BList *filters)
+case 1: filters is NULL
+case 2: filters is valid, handler has no looper
+case 3: filters is valid, handler has looper, looper isn't locked
+case 4: filters is valid, handler has looper, looper is locked
+case 5: filters and handler are valid; then NULL filters is passed
+
+FilterList()
+case 1: default constructed BHandler
+Other cases are handled in SetFilterList() tests
+
+LockLooper()
+case 1: handler has no looper
+case 2: handler has a looper which is initially unlocked
+case 3: handler has a looper which is initially locked
+case 4: handler has a looper which is locked in another thread
+
+LockLooperWithTimeout(bigtime_t timeout)
+case 1: handler has no looper
+case 2: handler has a looper which is initially unlocked
+case 3: handler has a looper which is initially locked
+case 4: handler has a looper which is locked in another thread
+
+UnlockLooper()
+case 1: handler has no looper
+case 2: handler has a looper which is initially unlocked
+case 3: handler has a looper which is initially locked
+case 4: handler has a looper which is locked in another thread
+
+MessageReceived(BMessage *message)
+ResolveSpecifier(BMessage *msg, int32 index, BMessage *specifier,
+				 int32 form, const char *property)
+GetSupportedSuites(BMessage *data)
+StartWatching(BMessenger, uint32 what)
+StartWatchingAll(BMessenger)
+StopWatching(BMessenger, uint32 what)
+StopWatchingAll(BMessenger)
+StartWatching(BHandler *, uint32 what)
+StartWatchingAll(BHandler *)
+StopWatching(BHandler *, uint32 what)
+StopWatchingAll(BHandler *)
+
+SendNotices(uint32 what, const BMessage * = 0)

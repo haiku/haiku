@@ -1,0 +1,48 @@
+<HTML>
+<HEAD>
+<TITLE>PortLink Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>PortLink Use Cases:</H1>
+
+<P>This document describes the PortLink interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">PortLink Interface</A></LI>
+<LI><A HREF="#usecases">PortLink Use Cases</A></LI>
+</OL>
+
+<A NAME="interface"><H2>PortLink Interface:</H2>
+<P>The PortLink class is a lightweight class designed to ease the pain of sending a message to a port. Normal use boils down to creating a PortLink object, setting the message code, attaching any extra data via Attach(), and calling Flush() to send it.
+</P>
+<P>While this class is designed to facilitate port-based messaging, it does not devise any protocols for such. The recipient will need to know if data is included in a message, for example. Likewise, all extra data must be freed by the recipient.
+</P>
+
+<A NAME="usecases"><H2>PortLink Use Cases:</H2>
+<P>The following use cases cover the PortLink functionality:</P>
+
+<OL>
+<LI><P><B>Construction:</B> A PortLink is created by passing it a port ID. Error-checking is not performed on the port itself, so be sure it is a valid port.
+</P></LI>
+
+<LI><P><B>Destruction:</B> When a PortLink is destroyed, any data which is currently attached to a pending message is freed.</P></LI>
+
+<LI><P><B>Creating a message:</B> Creating a message can be as simple as setting the message code (similar to BMessage's <i>what</i> member). Extra data is not required.</P></LI>
+
+<LI><P><B>Attaching Data:</B> Adding extra data is as simple as calling the member function Attach(), which makes a copy of the parameter passed to it.</P></LI>
+
+<LI><P><B>Sending a message:</B> Call Flush(). Whatever opcode has been set will be sent to the target. Optionally, a timeout (in microseconds) of type bigtime_t can be specified. This can be useful in preventing deadlocks if the target has crashed and its port fills up.</P></LI>
+
+<LI><P><B>Synchronous Messaging:</B> This one requires a little more care in order to prevent deadlocks. Attachments may be used as with Flush(), but FlushWithReply() will wait until the target replies unless a timeout value is specified in microseconds of type bigtime_t. A return code of B_ERROR indicates an internal data error and your message is intact. If a reply times out, it will return B_TIMED_OUT. Otherwise, it returns B_OK.
+<P>
+<i>Reply Protocol:</i> The target will receive the message with all attached data with one slight modification to the otherwise chosen message protocol - the first item will be a port_id which is the port to which the sender is to reply. All other attached data (if any) immediately follows this port id.
+</li>
+</OL>
+<h6>HTML Documentation Format by Jeremy Rand</h6>
+</BODY>
+</HTML>

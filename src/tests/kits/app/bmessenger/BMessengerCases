@@ -1,0 +1,61 @@
+BMessenger()
+case 1:	IsValid() should return false.
+		IsTargetLocal() should return false.
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+
+BMessenger(const BHandler *handler, const BLooper *looper, status_t *result)
+case 1:	handler is NULL, looper is NULL, result is NULL =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+case 2:	handler is NULL, looper is NULL, result is not NULL =>
+		IsValid() and IsTargetLocal() should return false.
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		result is set to B_BAD_VALUE.
+case 3:	handler is NULL, looper is not NULL, result is not NULL =>
+		IsValid() and IsTargetLocal() should return true.
+		Target() should return NULL and the correct value for looper.
+		Team() should return this team.
+		result is set to B_OK.
+case 4:	handler is not NULL, looper is NULL, result is not NULL,
+		handler doesn't belong to a looper =>
+		IsValid() and IsTargetLocal() should return false.
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		result is set to B_MISMATCHED_VALUES.
+case 5:	handler is not NULL, looper is NULL, result is not NULL
+		handler does belong to a looper =>
+		IsValid() and IsTargetLocal() should return true.
+		Target() should return the correct handler and handler->Looper()
+		for looper.
+		Team() should return this team.
+		result is set to B_OK.
+case 6:	handler is not NULL, looper is not NULL, result is not NULL
+		handler does belong to the looper =>
+		IsValid() and IsTargetLocal() should return true.
+		Target() should return the correct handler and the correct value
+		for looper.
+		Team() should return this team.
+		result is set to B_OK.
+case 7:	handler is not NULL, looper is not NULL, result is not NULL
+		handler does belong to a different looper =>
+		IsValid() and IsTargetLocal() should return false.
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+		result is set to B_MISMATCHED_VALUES.
+
+BMessenger(const BMessenger &from)
+case 1:	from is uninitialized =>
+		IsValid() and IsTargetLocal() should return false
+		Target() should return NULL and NULL for looper.
+		Team() should return -1.
+case 2:	from is properly initialized to a local target =>
+		IsValid() and IsTargetLocal() should return true
+		Target() should return the same values as for from.
+		Team() should return this team.
+
+BMessenger(const char *signature, team_id team, status_t *result)
+TODO
+

@@ -1,0 +1,19 @@
+
+General:
+	- Fill out headers.
+	- Add copyright information to files.
+
+BMidi:
+	- Put semaphores in the right places if necessary.
+
+BMidiStore:
+	- Implement formats 1 and 2
+	- Implement frame based timing
+	- Implement export functionality.
+	- Cleanup
+
+BMidiText:
+	- Nothing?
+
+midi_server:
+	- Get started.

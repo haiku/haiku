@@ -1,0 +1,4 @@
+SubDir OBOS_TOP sources test kits ;
+
+SubInclude OBOS_TOP sources tests kits app ;
+

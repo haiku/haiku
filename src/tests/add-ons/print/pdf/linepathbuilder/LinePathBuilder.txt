@@ -1,0 +1,14 @@
+          File: LinePathBuilder.zip
+        Author: Michael Pfeiffer
+       Contact: michael.pfeiffer@utanet.at
+       Release: 1.0
+  Release-Date: 4/17/2002
+ Compatibility: R5
+      Location: 
+Copying-policy: BSD/MIT
+   Description: Test application for LinePathBuilder class.
+                Use right mouse button to add points to path and
+                left mouse button to move a point.
+                The black line is a stroked BShape.
+                The red outline is calculated by LinePathBuilder.
+         Notes: 

@@ -1,0 +1,20 @@
+static void null_destroy(struct vm_store *store)
+	Frees this stores space.
+
+static off_t null_commit(struct vm_store *store, off_t size)
+	Sets committed size to size and returns it.
+
+static int null_has_page(struct vm_store *store, off_t offset)
+	returns 1.
+	
+static ssize_t null_read(struct vm_store *store, off_t offset, iovecs *vecs)
+	Returns -1.
+
+static ssize_t null_write(struct vm_store *store, off_t offset, iovecs *vecs)
+	Returns -1.
+
+static int null_fault(struct vm_store *store, struct vm_address_space *aspace, off_t offset)
+	Returns a Fatal page fault error.
+
+vm_store *vm_store_create_null(void)  	
+	Creates an empty vm_store struct.

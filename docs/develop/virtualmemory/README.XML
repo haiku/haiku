@@ -1,0 +1,147 @@
+<documentation>
+
+	<appName>Virtual Memory</appName>
+	
+	<version>0.9</version>
+	
+	<author>
+	
+		<name>Matt McMinn</name>
+		<email>melfinadev@earthlink.net</email>
+		<homePage>http://home.earthlink.net/~melfina/</homePage>
+		
+	</author>
+	
+	<description>
+	
+		It's just a copy of the virtual memory preferences app that comes with BeOS.
+		
+	</description>
+	
+	<issues>
+	
+		<issue>
+		
+			<id>1</id>
+			<from>
+			
+				<name>Matthieu Ferte</name>
+				<email>mferte@club-internet.fr</email>
+				
+			</from>
+			<description>
+			
+				Get the physical memory in a better way.
+				
+			</description>
+			<relatedInfo>
+			
+				<code>
+				
+					#include <OS.h>
+
+					int physMem;
+	
+					system_info info;
+					get_system_info(&info);
+					physMem = (info.max_pages * 4096) / 1048576; 
+				
+				</code>
+			
+			</relatedInfo>
+		
+		</issue>
+		<issue>
+		
+			<id>2</id>
+			<from>
+			
+				<name>Matthieu Ferte</name>
+				<email>mferte@club-internet.fr</email>
+				
+			</from>
+			<description>
+			
+				Get the current memory by reading the file.
+				
+			</description>
+			<relatedInfo>
+			
+				<code>
+				
+					#include <Entry.h>
+
+					int currSwap;
+					
+					const char *swap_file;
+					swap_file = "/boot/var/swap";
+					BEntry swap(swap_file);
+					off_t swapsize;
+					swap.GetSize(&swapsize);
+					currSwap = swapsize / 1048576;
+					
+				</code>
+			
+			</relatedInfo>
+		
+		</issue>
+		<issue>
+		
+			<id>3</id>
+			<from>
+			
+				<name>Matthieu Ferte</name>
+				<email>mferte@club-internet.fr</email>
+				
+			</from>
+			<description>
+			
+				Equation that calculates the minimum swap size is wrong (not linear).
+				
+			</description>
+			<relatedInfo>
+			
+				<note>
+				
+					I got the values on my computer with the original vm app :
+					Ram 256 Mb -> Swap 341 Mb
+					Ram 512 Mb -> Swap 640 Mb
+					Ram 768 Mb -> Swap 886 Mb
+					Ram 1024 Mb -> Swap 1133 Mb
+					
+					With obos app i got :
+					Ram 256 Mb -> Swap 341 Mb
+					Ram 512 Mb -> Swap 683 Mb
+					Ram 768 Mb -> Swap 1024 Mb
+					Ram 1024 Mb -> Swap 1365 Mb
+					
+				</note>
+			
+			</relatedInfo>
+		
+		</issue>
+		
+	</issues>
+
+	<history>
+
+		<earlierVersion version="0.8">
+		
+			<date>10/31/2001</date>
+			<description>Initial release.  Visually complete.</description>
+			
+		</earlierVersion>
+
+	</history>
+	
+	<note>
+	
+		Even tho it wasn't really necessary, I know I've overdocumented this app.
+		My excuse is that I wanted to learn how to use doxygen, and this was a 
+		good app to run it on.  So if you want full documentation, and you have 
+		doxygen installed, available from BeBits, run <code>doxygen .doxygen-conf</code>
+		in the code directory, and it will create docs for you.
+	
+	</note>
+	
+</description>

@@ -1,0 +1,16 @@
+Font Pref App
+
+ISSUES
+
+* Rescanning fonts causes the bold font to lose its boldness.
+* Fixed width font selector should only show fixed width fonts
+
+TODO
+
+* When a style is selected, the font menu label needs to be updated to reflect this
+* make a cache panel function that updates the slider labels with an int as a parameter
+* Add the VMSettings code so that the panel uses the settings file for position/size
+
+Matt McMinn
+melfinadev@earthlink.net
+

@@ -1,0 +1,19 @@
+2x PageSetup
+1x Print
+
+
+config_page((null),0x80013478)
+BMessage: what = pgst (0x70677374, or 1885827956)
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x80013218 (-2147405288, ী2')
+
+
+config_page((null),0x80013478)
+BMessage: what = pgst (0x70677374, or 1885827956)
+    entry current_printer, type='CSTR', c=1, size=12, data[0]: "DemoPrinter"
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x80013218 (-2147405288, ী2')
+
+
+config_job((null),0x80013478)
+BMessage: what = ppst (0x70707374, or 1886417780)
+    entry current_printer, type='CSTR', c=1, size=12, data[0]: "DemoPrinter"
+    entry        printer, type='LONG', c=1, size= 4, data[0]: 0x80013218 (-2147405288, ী2')              

@@ -1,0 +1,10 @@
+APP_KIT_SOURCE =
+	Cursor.cpp
+	Handler.cpp
+	Invoker.cpp
+	Looper.cpp
+	MessageFilter.cpp
+	MessageQueue.cpp
+	Messenger.cpp
+	TokenSpace.cpp
+;

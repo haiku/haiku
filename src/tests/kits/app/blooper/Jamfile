@@ -1,0 +1,13 @@
+SubDir OBOS_TOP sources tests kits app BLooper ;
+
+UsePublicHeaders app support ;
+
+UnitTest BLooperTester : main.cpp
+		IsMessageWaitingTest.cpp
+		RemoveHandlerTest.cpp
+	: kits/app ;
+
+LinkSharedOSLibs BLooperTester :
+	libopenbeos.so
+	be
+	stdc++.r4 ;

@@ -1,0 +1,130 @@
+<HTML>
+<!-- $Id: BLockerUseCases.html,v 1.1 2002/07/09 12:24:32 ejakowatz Exp $ -->
+<HEAD>
+<TITLE>BLocker Use Cases and Implementation Details</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>BLocker Use Cases and Implementation Details:</H1>
+
+<P>This document describes the BLocker interface and some basics of how it is implemented.
+The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#interface">BLocker Interface</A></LI>
+<LI><A HREF="#usecases">BLocker Use Cases</A></LI>
+<LI><A HREF="#implement">BLocker Implementation</A></LI>
+</OL>
+
+<A NAME="interface"></A><H2>BLocker Interface:</H2>
+
+<P>The BLocker class is a simple class for handling synchronization between threads.  The best
+source of information for the BLocker interface can be found
+<A HREF="file:///boot/beos/documentation/Be%20Book/The%20Support%20Kit/Locker.html">here in the Be Book</A>.
+</P>
+
+<A NAME="usecases"></A><H2>BLocker Use Cases:</H2>
+
+<P>The following use cases cover the BLocker functionality:</P>
+
+<OL>
+<LI><P><B>Construction 1:</B> A BLocker can be created by specifying a name for the semaphore used
+internally.  If a name is specified during construction, then that name is given to the internal
+semaphore.  If no name is given at construction, the semaphore is given the name "some BLocker".
+</P></LI>
+
+<LI><P><B>Construction 2:</B> A BLocker can use a semaphore or a "benaphore" internally depending
+on a flag passed when the BLocker is created.  If the flag is false, the BLocker uses a semaphore
+to do synchronization.  If the flag is true, the BLocker uses a benaphore internally to do
+synchronization.  If no flag is specified, the BLocker uses a benaphore internally.</P></LI>
+
+<LI><P><B>Destruction:</B> When a BLocker is destructed, any threads waiting for the lock are
+immediately unblocked.  The threads are notified by the return code of the locking member function
+that the lock was not successfully acquired.  Any threads blocked on Lock() will return with
+a false value.  Any threads blocked on LockWithTimeout() will return with B_BAD_SEM_ID.</P></LI>
+
+<LI><P><B>Locking 1:</B> When a thread acquires the BLocker using the Lock() or LockWithTimeout()
+member functions, no other thread can acquire the lock until this thread releases it.</P></LI>
+
+<LI><P><B>Locking 2:</B> When a thread holds the BLocker and it calls Lock() or LockWithTimeout(),
+the member function returns immediately.  The thread must call Unlock() the same number of times
+it calls Lock...() before the BLocker is released.  At any time, the thread can call CountLocks()
+to get the number of times it must call Unlock() to release the BLocker.</P></LI>
+
+<LI><P><B>Locking 3:</B> When a thread calls Lock(), the thread blocks until it can acquire the
+lock.  Once the lock has been acquired or an unrecoverable error has occurred, the Lock() member
+function completes.  If the lock has been acquired, Lock() returns true.  If the lock has not
+been acquired, Lock() returns false.</P></LI>
+
+<LI><P><B>Locking 4:</B> When a thread calls LockWithTimeout(), the thread blocks until it can
+acquire the lock, the time specified in microseconds expires, or an unrecoverable error occurs.
+If the timeout specified is B_INFINTE_TIMEOUT, there is no timeout and the member function will
+either acquire the lock or fail due to an unrecoverable error.  If the lock is acquired, the
+member function returns B_OK.  If the timeout is reached, B_TIMED_OUT is returned and the lock is
+not acquired.  If a serious error occurs, a non B_OK code is returned.</P></LI>
+
+<LI><P><B>Unlocking:</B> The Unlock() member function takes no arguments and returns no value.
+If the thread currently holds the lock, the lock count is reduced by the call to Unlock().  If
+the lock count reaches zero, then another thread may acquire the lock.  If the thread does not
+hold the lock and it calls Unlock(), the call will have no affect at all on the BLocker.</P></LI>
+
+<LI><P><B>Locking Thread:</B> The LockingThread() member function returns the thread_id of the
+thread that is holding the lock.  If no thread holds the lock, then B_ERROR is returned.</P></LI>
+
+<LI><P><B>Is Locked:</B> The IsLocked() member function returns true if the BLocker is currently
+held by the calling thread.  If the BLocker is not acquired by any thread or it is acquired by a
+different thread, IsLocked() returns false.</P></LI>
+
+<LI><P><B>Count Locks:</B> The CountLocks() member function returns the number of times the lock
+has been acquired by the thread which holds the lock.  If no thread holds the lock, then 0 is
+returned.  If the BLocker is held by any thread, including a thread which is not the thread
+making the CountLocks() request, the number of times the lock has been acquired by the thread which
+holds the lock is returned.</P></LI>
+
+<LI><P><B>Count Lock Requests:</B> The CountLockRequests() member function returns the number of
+threads currently attempting to lock the BLocker.  If no thread holds the lock and no thread is
+waiting for the lock, then 0 is returned.  If one thread holds the lock and no other threads
+are waiting for the lock, then 1 is returned.  If one thread holds the lock and x threads are
+waiting for the lock, then x+1 is returned.  The call to CountLockRequests() can be made by any
+thread including threads which do not have the lock.</P>
+
+<P><B>NOTE:</B> Reading the Be Book, that would seem like what is returned by this member
+function.  In actuality, the value returned is just the "benaphore count" for the BLocker.
+If the BLocker is semaphore style, then the benaphore count is set to 1 at construction time
+to ensure that the semaphore is always tested when a lock is acquired.  The return value is
+just this count.  So, the return value for benaphore style is:</P>
+
+<PRE>
+numThreadsWaitingForTheLock + numThreadsHoldingTheLock + numOfTimeoutsOccuredOnTheLock
+</PRE>
+
+<P>The return value for a semaphore style is:</P>
+
+<PRE>
+numThreadsWaitingForTheLock + numThreadsHoldingTheLock + numOfTimeoutsOccuredOnTheLock + 1
+</PRE>
+
+<P>Again, this is what we are implementing but the above description is what appears in the
+BeBook as far as I understand it.</P>
+</LI>
+
+<LI><P><B>Sem:</B> The Sem() member function returns the sem_id of the semaphore used by the
+BLocker.  If the BLocker is a benaphore, then the sem_id returned is the semaphore used to
+implement the benaphore.  If the BLocker is a not a benaphore, then the sem_id returned is the
+semaphore which the BLocker represents.</P></LI>
+</OL>
+
+<A NAME="implement"></A><H2>BLocker Implementation:</H2>
+
+<P>For more information about how to implement a benaphore, you can reference an implementation
+found on Be's website at
+
+<A HREF="http://www-classic.be.com/aboutbe/benewsletter/Issue26.html">http://www-classic.be.com/aboutbe/benewsletter/Issue26.html</A>.</P>
+
+
+
+</BODY>
+</HTML>

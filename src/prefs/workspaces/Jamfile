@@ -1,0 +1,7 @@
+SubDir OBOS_TOP sources os kits interface prefs workspaces ;
+
+Preference Workspaces : Workspaces.cpp ;
+
+LinkSharedOSLibs Workspaces : be root ;
+
+AddResources Workspaces : Workspaces.rsrc ;

@@ -1,0 +1,72 @@
+static void init_pdentry(pdentry *e)
+	Sets e's value to 0.
+
+static void init_ptentry(ptentry *e)
+	Sets e's value to 0.
+
+static void _update_all_pgdirs(int index, pdentry e)
+	For every entry in the translation map, set the index'th entry to e.
+
+static int lock_tmap(vm_translation_map *map)
+	Locks the map; if we are the only ones, sets invalidated page count to 0.
+
+static int unlock_tmap(vm_translation_map *map)
+	unlocks the map; if no one else has it, call flush_tmap
+
+static void destroy_tmap(vm_translation_map *map)
+	Iterate over the entries in the tmap list, removing map when found. Frees the pages associated with this map.
+
+static void put_pgtable_in_pgdir(pdentry *e, addr pgtable_phys, int attributes)
+	Populates the pdentry with pgtable_phys and attributes
+
+static int map_tmap(vm_translation_map *map, addr va, addr pa, unsigned int attributes)
+	Allocates, if necessary, a page table entry. Gets the page for the page table entry (new or not), populates the page tabel entry with pa and attributes. Puts back the page table entry. Updates the pages to invalidate list.
+
+static int unmap_tmap(vm_translation_map *map, addr start, addr end)
+	Loops over the pagetable, finding the page that is present that holds this address. Gets it, and marks the page as not present. Replaces the page and updates the pages to invalidate list.
+	
+static int query_tmap(vm_translation_map *map, addr va, addr *out_physical, unsigned int *out_flags)
+	Finds the page table's entry for this virtual address. Returns the physical address and flags.
+
+static addr get_mapped_size_tmap(vm_translation_map *map)
+	Returns map_count.
+
+static int protect_tmap(vm_translation_map *map, addr base, addr top, unsigned int attributes)
+	Unimplemented.
+
+static int clear_flags_tmap(vm_translation_map *map, addr va, unsigned int flags)
+	Finds the PTE and clears the requested flags.
+
+static void flush_tmap(vm_translation_map *map)
+	Invalidates the TLBs. If too many are in the list, all of the TLBs are invalidated. If not, a list is invalidated.
+
+static int map_iospace_chunk(addr va, addr pa)
+	Creates 1024 page table entries, for io.
+
+static int get_physical_page_tmap(addr pa, addr *va, int flags)
+	Looks to see if pa is already mapped. If so, return its virtual address in va. If not, find a place to map it and do so.
+
+static int put_physical_page_tmap(addr va)
+	Releases a reference to a "checked out" virtual mapping
+
+int vm_translation_map_create(vm_translation_map *new_map, bool kernel)
+	Sets up new_map, allocating memory and setting its initial state.
+
+int vm_translation_map_module_init(kernel_args *ka)
+	Clears the bottom 2 gig of memory's page mapping. Allocates space for page maps. Initializes data structures. Puts the page tables in the kernel's pagedir.
+
+void vm_translation_map_module_init_post_sem(kernel_args *ka)
+	Initializes this module's semaphores and mutexes.
+
+int vm_translation_map_module_init2(kernel_args *ka)
+	Creates anonymous regions for the kernel pagedir, physical page mappings, iospaces' virtual chunk descriptors  and iospaces' page tables. Creates a null region for iospace.
+
+int vm_translation_map_quick_map(kernel_args *ka, addr va, addr pa, unsigned int attributes, addr (get_free_page)(kernel_args *))
+	Maps a page, ignoring already set up info. 
+
+static int vm_translation_map_quick_query(addr va, addr *out_physical)
+	Gets the physical address for a page.
+
+addr vm_translation_map_get_pgdir(vm_translation_map *map)    
+	Returns the pagedirectory structure.
+

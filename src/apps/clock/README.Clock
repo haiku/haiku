@@ -1,0 +1,22 @@
+Clock Project README
+====================
+
+This project creates the standard clock application, and is a good example
+of using graphics on the BeOS.
+ 
+Files
+=====
+
+The archive should contain the following files:
+
+README.Clock		-- This file
+Clock.proj		-- Metrowerks project file
+Clock.rsrc		-- Application resource file
+makefile		-- project makefile
+
+clock.cpp		-- Source files
+clock.h
+cl_wind.cpp
+cl_wind.h
+cl_view.cpp
+cl_view.h

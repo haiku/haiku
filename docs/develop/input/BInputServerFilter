@@ -1,0 +1,9 @@
+BInputServerFilter::_ReservedInputServerFilter4(void)
+BInputServerFilter::_ReservedInputServerFilter3(void)
+BInputServerFilter::_ReservedInputServerFilter2(void)
+BInputServerFilter::_ReservedInputServerFilter1(void)
+BInputServerFilter::GetScreenRegion(BRegion
+BInputServerFilter::Filter(BMessage
+BInputServerFilter::InitCheck(void)
+BInputServerFilter::~BInputServerFilter(void)
+BInputServerFilter::BInputServerFilter(void)

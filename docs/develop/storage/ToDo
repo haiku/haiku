@@ -1,0 +1,237 @@
+# ToDo
+# ====
+#
+# This file lists items that have to be worked on.
+# An entry for an item has the following tags:
+# * Module: the concerned class or file
+# * Location: a more precise location, e.g. a function
+# * Description: a description of the item
+# * Priority: the priority of the item, may be
+#	deferrable:	of no/little relevance for OBOS R1 (to be future compatible:
+#				the next release)
+#	low:		of relevance for the next release, but not needed in the
+#				near future
+#	medium:		of relevance for the next release, needed in the near future
+#	high:		of relevance for the next release, needed as soon as possible
+#	urgent:		of relevance for the next release, needed yesterday, i.e.
+#				some people depend on it being finished and can't continue
+#				with their tasks otherwise
+#
+# * Requires: a list of prerequisites needed for the item to be worked on,
+#			  omitted, when empty
+# * Responsible: a list of people working on the item, omitted, when empty
+#
+
+Module:      BEntry
+Location:    Entry.cpp
+Description: Definition of SYMLINK_MAX belongs to some header file. Remove it.
+Priority:    low
+
+
+Module:      BEntry
+Location:    SetTo(const BDirectory *, const char *, bool)
+Description: Reimplement! Concatenating dir and leaf to an absolute path
+             prevents the user from accessing entries with longer absolute
+             path. R5 handles this without problems.
+Priority:    medium
+Requires:    - OBOS kernel?
+
+
+Module:      BEntry
+Location:    SetTo(const BDirectory *, const char *, bool)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      EntryTest
+Location:    InitTest1(), InitTest2()
+Description: Enable tests with strlen(dir + leaf) > B_PATH_NAME_LENGTH.
+Priority:    low
+Requires:    - reimpl. of SetTo(const BDirectory *, const char *, bool)
+
+
+Module:      BPath
+Location:    Flatten()
+Description: Reimplement for performance reasons. Don't call FlattenedSize().
+Priority:    low
+
+
+Module:      BVolume
+Location:    operator==()
+Description: Implement.
+Priority:    high
+
+
+Module:      StatableTest
+Location:    GetXYZTest()
+Description: Uncomment GetVolume() test, when BVolume::==() is implemented.
+Priority:    low
+Requires:    - implementation of BVolume::operator==()
+
+
+Module:      kernel_interface
+Location:    set_stat(const char*, StatMember)
+Description: Implement WSTAT_CRTIME.
+Priority:    medium
+
+
+Module:      kernel_interface
+Location:    remove_attr()
+Description: Verify return behavior of fs_remove_attr().
+Priority:    medium
+
+
+Module:      BeOS R5::libroot
+Location:    
+Description: Propose a project wide common handling of the
+             B_FILE/PATH_NAME_LENGTH (+ 1?) issue.
+Priority:    low
+
+
+Module:      BSymLink
+Location:    
+Description: Remove the work-around introduced because of the missing FD
+             version of readlink().
+Priority:    medium
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    SetTo(const entry_ref *)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    SetTo(const BEntry *)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const entry_ref*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    SetTo(const BDirectory*, const char*)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const BEntry*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BNode
+Location:    Lock(), Unlock()
+Description: Implement when kernel support is available.
+Priority:    medium
+Requires:    - OBOS kernel
+
+
+Module:      NodeTest
+Location:    SyncTest()
+Description: Add more thorough tests.
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      NodeTest
+Location:    LockTest()
+Description: Implement when kernel support is available.
+Priority:    medium
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    SetTo(const entry_ref *, uint32)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    SetTo(const BEntry *, uint32)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const entry_ref*, uint32).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    SetTo(const BDirectory*, const char*, uint32)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const BEntry*, uint32).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BFile
+Location:    Read/Write[At]()
+Description: Verify behavior of B_OPEN_AT_END.
+Priority:    medium
+
+
+Module:      FileTest
+Location:    PositionTest()
+Description: Uncomment test, when B_OPEN_AT_END behavior is understood.
+Priority:    medium
+Requires:    - verification of B_OPEN_AT_END behavior
+
+
+Module:      BDirectory
+Location:    SetTo(const entry_ref *)
+Description: Reimplement! Implemented using StorageKit::entry_ref_to_path().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    SetTo(const BEntry *)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const entry_ref*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    SetTo(const BDirectory*, const char*)
+Description: Check if necessary to reimplement! Implemented using
+             SetTo(const BEntry*).
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      BDirectory
+Location:    GetEntry()
+Description: Check if necessary to reimplement! Implemented using
+             StorageKit::dir_to_self_entry_ref().
+Priority:    low
+Requires:    - OBOS kernel
+
+
+Module:      fs_info.h
+Location:    struct fs_info
+Description: Change "char device_name[128]" to "char device_name[B_DEV_NAME_LENGTH]"
+             whenever appropriate, since B_DEV_NAME_LENGTH is now declared in
+             StorageDefs.h.
+Priority:    low
+Requires:    - filesystem support files in the source hierarchy
+
+
+Module:      BQuery
+Location:    SetTarget()
+Description: Used a bad hack to get port and token of the BMessenger. Fix it.
+Priority:    low
+Requires:    - respective function(s) to be provided by the IK team
+
+
+Module:      BMimeType/MimeTypeTest
+Location:    update_mime_info(), create_app_meta_mime()
+Description: Find out, what is the meaning of the force parameter. It does
+             obviously not mean, that calling the function twice, the second
+             time with force, has the same effect as calling it only at the
+             second time. At least the tests indicate, that the second call,
+             though with force, does not have any effect at all.
+Priority:    medium
+Requires:    
+
+

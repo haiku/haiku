@@ -1,0 +1,6 @@
+OBApplication - Prototype 5
+
+App properly falls through if construction failed
+Added a server ping failsafe
+Added REMOVEWINDOW code
+Moved quit-all-windows code to Quit() to fix a crasher

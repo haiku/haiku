@@ -1,0 +1,3 @@
+Get a General OS Error followed by a segfault only when an application is started and the server is running under the debugger.
+
+Cursor display is just a little bit funky (try moving cursor by 1 pixel) when using the ViewDriver

@@ -1,0 +1,21 @@
+static void anonymous_destroy(struct vm_store *store)
+	Free's the memory associated with store
+
+static off_t anonymous_commit(struct vm_store *store, off_t size)
+	Returns 0
+
+static int anonymous_has_page(struct vm_store *store, off_t offset)
+	Returns 0
+
+static ssize_t anonymous_read(struct vm_store *store, off_t offset, iovecs *vecs)
+	Returns unimplemented
+
+static ssize_t anonymous_write(struct vm_store *store, off_t offset, iovecs *vecs)
+	Returns 0
+/*
+static int anonymous_fault(struct vm_store *backing_store, struct vm_address_space *aspace, off_t offset)
+*/
+
+
+vm_store *vm_store_create_anonymous_noswap()  
+	Allocates space for a vm_store. Populates its ops with the above, sets its cache and data to none.

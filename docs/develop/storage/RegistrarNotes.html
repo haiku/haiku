@@ -1,0 +1,102 @@
+<html>
+<head>
+	<title>Registrar Notes</title>
+</head>
+<body bgcolor='#ffffff'>
+<font face='Tahoma,Arial,SansSerif'>
+
+<!-- Tasks -->
+<hr>
+<b>Registrar Tasks:</b>
+<ul>
+	<li> MIME Database chores (note that BMimeType appears to read from the database directly for <code>Get*()</code> calls.)<br>
+		<ul>
+			<li> Writes to the database -- <code>SetLongDescription(), SetPreferredApp(), create_app_meta_mime(), etc</code> 
+			<li> Monitoring of the database -- <code>{Start,Stop}Watching()</code> <br>
+			<li> Sniffer duties -- Sniffer code plus <code>{Get,Set,Check}SnifferRule()</code>
+		</ul>
+		<br>
+		
+	<li> Timing chores
+		<ul>
+			<li> BMessageRunner functionality
+		</ul>
+	<li> System Shutdown chores <br>
+		<ul>
+			<li> Shutdown cycle 
+			<li> System shutdown window
+		</ul>
+	<li> Roster chores
+		<ul>
+			<li> Recent documents, folders, and apps
+			<li> Info about running applications
+			<li> etc...
+		</ul>		
+</ul>
+
+<!-- Internals -->
+<hr>
+<b>Registrar Internals:</b><br>
+<br>
+
+The registrar is a non-standard <code>BApplication</code>. It has a shadow app in the <code>app_server</code>
+like a normal <code>BApplication</code>, but one of its ports is slightly different:
+
+<ul>
+	<li> Standard ports -- snd, rcv, AppLooperPort
+	<li> Registrar ports -- snd, rcv, _roster_port_
+</ul>
+ 
+Since <code>BLooper::port_id</code> is private to <code>BLooper</code> (to whom <code>BApplication</code>
+is a friend), and since you can't rename a port after it's been created,
+it's likely that the only way to rename the <code>AppLooperPort</code> and have the registrar
+still be a <code>BApplication</code> is to have <code>BApplication</code> check if it's the
+registrar when it's created, and use <code>_roster_port_</code> as the name for what would
+otherwise be its <code>AppLooperPort</code>.
+<br>
+<br>
+The rationale behind having a port with a specific name is that the registrar
+implements the roster functionality. Thus one can't address it using the app signature
+constructor of BMessenger, but rather must send the message directly to
+a named port (for example, upon creation, a BApplication object must find and contact
+the registrar to notify it of another running application; if the registrar
+cannot be found, the application putzes out). 
+
+<br>
+<br>
+
+The Registrar has three threads:
+<ul>
+	<li> _roster_thread_
+	<li> timer_thread
+	<li> main_mime
+</ul>
+ 
+<!-- BMimeType Notes -->
+<hr>
+<b>BMimeType Notes:</b>
+<ul>
+	<li> The <code>Get*()</code> methods directly access the MIME database.
+	<li> The <code>Set*()</code> methods send a message to another entity which does the job.
+		The function that does the sending is called <code>_send_to_roster_()</code>, so I
+		suppose the roster is the one. Since the registrar has a thread named
+		<code>_roster_thread_</code>, I assume the roster lives in the registrar.
+	<li> <code>Start/StopWatching()</code> call <code>BRoster::_Start/_StopWatching()</code>.
+	<li>Adding/removing a MIME type file in <code>~/config/settings/beos_mime/*/</code> does
+		not trigger a notification message. So obviously no node monitoring is
+		done and changes to the database are supposed to be done using the API.
+</ul>
+<!-- Links -->
+<hr>
+<b>Links:</b>
+<ul>
+	<li> <a href='http://www.beatjapan.org/mirror/www.be.com/users/iconworld/icon5.html'>Icon World -- The Registrar</a>
+	<li> <a href='http://www.beosbible.com/exc_filetype.html'>The BeOS Bible -- File Typing and The Registrar</a>
+	<li> <a href='http://bang.dhs.org/be/bebook/The%20Application%20Kit/Application.html'>BApplication</a>
+	<li> <a href='http://bang.dhs.org/be/bebook/The%20Storage%20Kit/MimeType.html'>BMimeType</a>
+	<li> <a href='http://bang.dhs.org/be/bebook/Release%20Notes/StorageKit.html'>BMimeType (sniffer docs)</a>
+	<li> <a href='http://bang.dhs.org/be/bebook/The%20Application%20Kit/Roster.html'>BRoster</a>
+ 
+</font>
+</body>
+</html>

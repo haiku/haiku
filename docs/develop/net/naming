@@ -1,0 +1,20 @@
+Document naming.
+
+Well, I've been thinking about this and I've decided that maybe 
+this formatting of the numbers we use will work. Maybe it won't, 
+but until someone else shouts...
+
+First digit is the milestone referred to, with 0 being for
+general design.
+
+Second digit:
+	- layer involved for general design
+	- incremental for milestones
+	- 0 for general design comments
+
+So, 	00 = general design principals
+	01 = general design for layer 1
+	10 = general design comments for milestone 1
+	11 = first document about milestone 1
+
+Does that work for people?

@@ -1,0 +1,51 @@
+Function Specifications
+
+
+Public BInputServerDevice class interface:
+
+			BInputServerDevice();
+virtual		~BInputServerDevice();
+
+virtual status_t	InitCheck();
+virtual status_t	SystemShuttingDown();
+
+virtual status_t	Start(const char *device, void *cookie);
+virtual status_t	Stop(const char *device, void *cookie);
+virtual status_t	Control(const char *device,  void *cookie, uint32 code, BMessage *message);
+
+status_t		RegisterDevices(input_device_ref **devices);
+status_t		UnregisterDevices(input_device_ref **devices);
+
+status_t		EnqueueMessage(BMessage *message);
+
+status_t		StartMonitoringDevice(const char *device);
+status_t		StopMonitoringDevice(const char *device);	
+}
+
+
+Public BInputServerFilter class interface:
+
+				BInputServerFilter();
+virtual			~BInputServerFilter();
+
+virtual status_t		InitCheck();
+
+virtual filter_result	Filter(BMessage *message, BList *outList);
+	
+status_t			GetScreenRegion(BRegion *region) const;
+
+}
+
+Public BInputServerMethod class interface:
+
+				BInputServerMethod(const char *name, const uchar *icon);
+virtual			~BInputServerMethod();
+
+virtual status_t		MethodActivated(bool active);
+
+status_t			EnqueueMessage(BMessage *message);
+
+status_t			SetName(const char *name);
+status_t			SetIcon(const uchar *icon);
+status_t			SetMenu(const BMenu *menu, const BMessenger target);
+}

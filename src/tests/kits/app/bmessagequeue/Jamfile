@@ -1,0 +1,18 @@
+SubDir OBOS_TOP sources tests kits app BMessageQueue ;
+
+UsePublicHeaders app support ;
+
+UnitTest BMessageQueueTester : 
+		AddMessageTest1.cpp
+		AddMessageTest2.cpp
+		ConcurrencyTest1.cpp
+		ConcurrencyTest2.cpp
+		FindMessageTest1.cpp
+		MessageQueueTestAddon.cpp
+		MessageQueueTestCase.cpp
+	: kits/app ;
+
+LinkSharedOSLibs BMessageQueueTester :
+	libopenbeos.so
+	be
+	stdc++.r4 ;

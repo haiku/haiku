@@ -1,0 +1,54 @@
+<HTML>
+<HEAD>
+  <TITLE>Documentation and Resources for writing BeOS File Systems</TITLE>
+</HEAD>
+
+<BODY text="#000000" link="#0000FF" bgcolor="#FFFFFF">
+
+<H1>Hints for BeOS File System Authors</H1>
+
+<P>Besides the example DOS file system that comes with the BeOS developers
+stuff, there's also a CD-ROM file system example.  If you installed the
+optional stuff on the BeOS 5.0 Pro CD-ROM (or the developer's kit from the free
+site), it's at: /boot/optional/sample-code/add-ons/iso9660
+
+<P>On <A HREF="http://www.bebits.com/">BeBits</A> you can get source code
+examples from a few programs, such as AtheOS FS (<A
+HREF="http://www.bebits.com/app/2028">app 2028 on BeBits</A>).  There used to
+be a copy of NTFS too with source (<A HREF="http://www.bebits.com/app/620">app
+620 on BeBits</A>), but the site seems to be down.  There are also other file
+systems there, but source is not included (some have it available on request).
+
+<P>Another useful source of information is the <A
+HREF="http://www.be.com/developers/dev_lib/index.html">BeOS developer library
+web site</A>.  It has some articles on file systems, the most relevant being
+the <A
+HREF="http://www-classic.be.com/aboutbe/benewsletter/volume_III/Issue20.html#Insight">One
+File Network File System</A>, which shows one way of combining a user space
+program with a kernel file system stub.  Another good one is <A
+HREF="http://www-classic.be.com/aboutbe/benewsletter/Issue52.html#Insight">about
+the FSP</A> (file system protocol).  The prior issue describes what <A
+HREF="http://www-classic.be.com/aboutbe/benewsletter/Issue51.html#Insight">features
+the BFS supports</A>.  There are lots of other tangentially related articles,
+such as ones on device drivers, programming in kernel mode, debugging, etc.
+
+<P>There's also the very good <CITE>Practical File System Design</CITE> book
+by Dominic Giampaolo, from <A HREF="http://www.mkp.com/">Morgan Kaufmann
+Publishers</A>, read their <A
+HREF="http://www.mkp.com/books_catalog/catalog.asp?ISBN=1-55860-497-9">catalog
+entry</A> for more info about the book.
+
+<P>Finally, there's <A
+HREF="http://www.google.com/search?q=%22Alexander+G.+M.+Smith%22">Alexander G.
+M. Smith</A>'s ongoing documentation of the file system API, condensed from all
+these sources and from his continuing experiences with trying to write a RAM
+file system.  You can get the StyledEdit text file with the <A
+HREF="http://www.achilles.net/~agmsmith/beos/FileSystemAPINotes20011018.zip">October
+18 2001 version</A> or check the <A
+HREF="http://www.achilles.net/~agmsmith/beos/">BeOS directory</A> on his site
+for newer versions.
+
+<P><FONT SIZE="-1">Last updated November 11, 2001 by AGMS.</FONT>
+
+</BODY>
+</HTML>

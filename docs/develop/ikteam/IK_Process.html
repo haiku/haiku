@@ -1,0 +1,140 @@
+<html>
+<Title>Interface Kit Team Process</Title>
+<body>
+<h1>Interface Kit Team Process</h1>
+<p>
+This paper deals with the set of requirements for reimplementing any portion of the BeOS
+covered by the Interface Kit team's charter; namely, the Interface Kit, the Application
+Kit, the app_server, and related preferences applets. &nbsp; This team's resposibilities
+may broaden later to include more areas of the OS which are related (the input_server
+comes to mind as a possibility). &nbsp; Since the mandate of the group covers such a
+large and public (from a 3rd party developer's perspective) portion of BeOS -- a portion
+that is central to the user and developer experience of BeOS -- it is vital that our work
+be done in a scrupulously documented and tested fashion. &nbsp; This paper lays out the
+process which, when adhered to, aims to ensure this high standard of documentation and
+testability.
+</p><p>
+First, a definition of "module" as it pertains to this paper.
+<p>
+<b>Module:</b>
+A function, class, kit, application or related set of functions, classes, kits or
+applications is refered to as a "module" in this paper, the implication being that
+there can be modules within modules. &nbsp; A module is any specifiable and testable
+entity -- which may or may not rely on other modules to accomplish its functionality.
+</p><p>
+<h2>
+Process Requirements
+<hr align="left" width="25%">
+</h2>
+
+Each module in this project shall have the following items:
+<ul>
+	<li>Complete interface specification. &nbsp; For kits, this will mostly come
+		from the BeBook, but in many cases the specification will have to elaborate
+		on what the BeBook provides or even be created entirely (app_server internals
+		are a good example).</li>
+	<li>Complete use case specification. &nbsp; For those not familiar with use cases,
+		they consist of the following:
+		<ul>
+			<li>A list of ways in which a module is expected to be used</li>
+			<li>Sublists of assumptions/prerequisites for each of those cases. &nbsp;
+				This should include items such as state of an object instance at the
+				time of method invocation, the state of parameters passed to functions,
+				etc.</li>
+			<li>Sublists of error conditions and handling for each case where
+				assumptions/prerequisites are not properly met. &nbsp; This list should
+				not attempt to be all inclusive: &nbsp; circumstances that do not
+				directly bear upon the assumptions/prerequisites do not need to be
+				considered unless clearly necessary.</li>
+		</ul></li>
+	<li>A set of unit tests which verify that the module performs correctly in expected
+		use cases as well as under error conditions as described in the use case
+		specification.</li>
+	<li>A plain-english discussion of how the module implements its functionality: &nbsp;
+		what algorithms are to be used, what other modules are relied upon, the general
+		design rationale, execution flow, etc.</li>
+	<li>The actual reimplementation.</li>
+</ul>
+
+Each of the above items is to be completed roughly in the order listed. &nbsp; In other
+words, a given module should have a complete interface specification, etc., before it is
+reimplemented. &nbsp; Prototyping is encouraged, of course. &nbsp; For existing APIs, the
+recommended course is to write the interface spec, use case spec and unit tests to the
+API. &nbsp; Unit tests, in particular, should perform as expected when run against the
+existing API. &nbsp; When they do not, changes may need to be made to the specifications.
+&nbsp; Our goal is to reimplement the APIs as they are, not necessarily as they're
+documented -- and then ensure that the docs accurately reflect the reimplementation.
+&nbsp; Thorough testing of the existing implementation will show us where the
+documentation is wrong, misleading or absent, thereby helping to ensure that our
+reimplementation is functionaly identical to the existing one.
+<p>
+<a href="http://www.xprogramming.com/ftp/TestingFramework/CppUnit/CppUnit15.zip">
+CppTest</a> 
+is the test framework we will be using. &nbsp; By using this framework for all our unit
+tests, we can easily build large test suites which will verify the codebase in a single
+executed run. &nbsp; An excellent short discussion of the value of unit tests is here:<br>
+
+<a href="http://www.extremeprogramming.org/rules/unittests.html">
+http://www.extremeprogramming.org/rules/unittests.html</a>
+
+<h2>
+A Suggestion
+<hr align="left" width="25%">
+</h2>
+
+Although the interface specification for each module should be completed first, I have a
+suggestion for how to proceed from there which should make the remainder of the process
+less boring. &nbsp; Rather than following the interface specification with a full set of
+use cases followed by a full set of tests, a more productive and enjoyable way to go is
+to take each module in turn, write one of the use cases/error conditions for it and
+immediately write the test for that use case/error condition. &nbsp; This will break up
+the tedious process of specifying all the use cases and error conditions with a bit of
+coding -- not implementation code, but code nonetheless.
+
+<h2>
+Some Final Thoughts
+<hr align="left" width="25%">
+</h2>
+
+This process is a very rigorous approach to take. &nbsp; Given that our goal is to produce
+the most stable, robust and professional desktop operating system available, this sort of
+thoroughness is justifiable and necessary. &nbsp; Our understanding of the system will be
+greatly increased and the task of coming up to speed on the system will be made much
+easier for outsiders and newcomers to the project.
+<p>
+This approach is also not the most "fun": &nbsp; sitting down and hacking out code has the
+attraction of instant gratification that design work does not. &nbsp; It is important to
+understand, however, that proper design work done up front makes the task of
+implementation easier, the chore of integration much less onerous and testing and
+code verification a snap. &nbsp; Provided we do not get locked in "analysis paralysis"
+and attack the design work as vigorously as the coding work, the entire project will
+actually move more quickly -- usually quite a bit more quickly -- than if we had simply
+started coding. &nbsp; Thrown away versions of the codebase should be just that:
+&nbsp; quick prototypes intended to be disposable, rather than full-blown implementation
+attempts which fail or are mysterious blackboxes because we don't really understand the
+module. &nbsp; Following this process makes it far more likely that when we sit down to
+do a module implementation, the first try will be the last (bug fixes not withstanding,
+of course ;).
+</p><p>
+To ensure the process is followed and we produce the highest quality code we can, code
+will not be accepted for release until all of the process items are covered. &nbsp; If
+this seems like a hardline stance to take, remember: &nbsp; every single app which
+utilizes the Application and Interface Kits relies on our code to be rock solid --
+totally predictable and completely reliable. &nbsp; Let's strive to be engineers, not
+h4X0rz.
+</p>
+<hr>
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>The OpenBeOS project is hosted by:</small><br><br> 
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002
+<a href="http://www.openbeos.org">OpenBeOS</a> Project</small> 
+</center>
+
+</body>
+</html>

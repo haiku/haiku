@@ -1,0 +1,11 @@
+SubDir OBOS_TOP sources tests kits app BMessenger ;
+
+CommonUnitTest BMessengerTester
+	: main.cpp
+	  BMessengerTester.cpp
+	  TargetTester.cpp
+	: kits app
+	: libopenbeos.so be stdc++.r4
+	: be stdc++.r4
+	: app support
+;

@@ -1,0 +1,3 @@
+SubDir OBOS_TOP sources os kits kernel drivers arch i386 console ;
+
+KernelObjects console.c : -fnopic ;

@@ -1,0 +1,11 @@
+MessageQueue()
+--------------
+case 1: looper is unlocked and queue is empty
+case 2: looper is unlocked and queue is filled
+case 3: looper is locked and queue is empty
+case 4: looper is locked and queue is filled
+case 5: looper is locked, message is posted, queue is emptied
+
+RemoveHandler(BHandler* handler)
+--------------
+case : handler has filters; FilterList() should be NULL on remove

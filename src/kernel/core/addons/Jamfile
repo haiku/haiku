@@ -1,0 +1,4 @@
+SubDir OBOS_TOP sources os kits kernel core addons ;
+
+SubInclude OBOS_TOP sources os kits kernel core addons bus_managers ;
+SubInclude OBOS_TOP sources os kits kernel core addons fs ;

@@ -1,0 +1,6 @@
+SubDir OBOS_TOP sources test kits app ;
+
+SubInclude OBOS_TOP sources tests kits app BHandler ;
+#SubInclude OBOS_TOP sources tests kits app BLooper ;
+#SubInclude OBOS_TOP sources tests kits app BMessageQueue ;
+SubInclude OBOS_TOP sources tests kits app BMessenger ;

@@ -1,0 +1,3 @@
+SubDir OBOS_TOP sources os kits kernel core addons bus_managers pci ;
+
+KernelStaticLibrary libbuspci : pci.c pci_bus.c ;

@@ -1,0 +1,7 @@
+SubDir OBOS_TOP sources os kits interface prefs menu ;
+
+Preference Menu : BitmapMenuItem.cpp ColorPicker.cpp ColorWindow.cpp FontMenu.cpp FontSizeMenu.cpp MenuApp.cpp MenuBar.cpp MenuWindow.cpp ;
+
+LinkSharedOSLibs Menu : translation be root ;
+
+AddResources Menu : Menu.rsrc ;

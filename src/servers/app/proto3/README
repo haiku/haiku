@@ -1,0 +1,9 @@
+OpenBeOS App Server Test Prototype #3
+
+This is an example of both a work in progress and a lot of research at the same time. Many of the concepts used in this prototype will be used in the real server. It doesn't do much, but the fact that it exists and does what it does is the result of a *lot* of work.
+
+This prototype does everything the second one did PLUS has much of the foundation for graphics in place. Graphics updates are slow and there is a lot of flicker, but this is expected - the driver-access module used also emulates the Input Server and utilizes BeOS' app_server to provide all the drawing. 
+
+The code is reasonably (IMHO) well-commented and should be easy to understand at first glance. Also included are some extra files which I didn't feel like throwing out or are in place for future development. ;D Enjoy.
+
+--DarkWyrm

@@ -1,0 +1,391 @@
+<HTML>
+<!-- $Id: UnitTestingInfo.html,v 1.1 2002/07/09 12:24:30 ejakowatz Exp $ -->
+<HEAD>
+<TITLE>Unit Testing Information</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="white" LINK="#000067" VLINK="#000067" ALINK="#0000FF">
+<FONT FACE="Verdana,Arial,Helvetica,sans-serif" SIZE="-1">
+
+<H1>Unit Testing Information:</H1>
+
+<P>This document describes the "why's" and "how's" of unit testing for the AppKit team of the
+OpenBeOS project.  Although it is intended for the AppKit team, there is no reason other teams
+couldn't use this information to develop a similar unit testing strategy.</P>
+
+<P>The document has the following sections:</P>
+
+<OL>
+<LI><A HREF="#what">What is unit testing?</A></LI>
+<LI><A HREF="#why">Why is unit testing important?</A></LI>
+<LI><A HREF="#when">When should I write my unit tests?</A></LI>
+<LI><A HREF="#whattests">What kinds of tests should be in a unit test?</A></LI>
+<LI><A HREF="#testframework">What framework is being used to do unit testing for the AppKit?</A></LI>
+<LI><A HREF="#frameworkmods">What AppKit specific modifications have been made to this framework?</A></LI>
+<LI><A HREF="#futuremods">What framework modifications might be required in the future?</A></LI>
+<LI><A HREF="#buildingtests">How do I build the framework and current tests for the AppKit?</A></LI>
+<LI><A HREF="#runningtests">How do I run tests?</A></LI>
+<LI><A HREF="#writingtests">How do I write tests for my component?</A></LI>
+<LI><A HREF="#exampletests">Are there example tests to base mine on?</A></LI>
+<LI><A HREF="#threadedtests">How do I write a test with multiple threads?</A></LI>
+</OL>
+
+<A NAME="what"></A><H2>What is unit testing?</H2>
+
+<P>Unit testing is the process of showing that a part of a software system works as far as the
+requirements created for that part of the system.  Unit testing is best if it has the following
+characteristics:</P>
+
+<UL>
+<LI>The software component is tested in isolation with as little interaction with other software
+components as possible.</LI>
+<LI>The software component is tested using automated tools so that unit tests can be run with
+every build of the software if required.</LI>
+<LI>All requirements of the software component are tested as part of the unit tests.</LI>
+</UL>
+
+<P>Unit testing is not the only type of testing but is definitely a very important part of any
+testing strategy.  Following unit testing, software should go through "integration testing" to
+show that the components work as expected when put together.</P>
+
+<A NAME="why"></A><H2>Why is unit testing important?</H2>
+
+<P>A basic concept of software engineering is that the cost of fixing a bug goes up by a factor
+of 2-10x (depending on the source of the information) the later in the development process it is
+found.  Unit testing is critical to finding implementation bugs within a particular component as
+quickly as possible.</P>
+
+<P>Unit testing will also help to find requirements problems also.  If you write the requirements
+(or use cases) for your component from the BeBook, hopefully the BeBook and your use cases will
+match the actual Be implementation.  A good way to confirm that the BeBook documentation matches
+Be's implementation is to write your unit tests and run them against the original Be code.</P>
+
+<P>Unit tests will also continue to be maintained and run in the future also.  As the mailing 
+lists obviously show, many people are looking forward to OpenBeOS post-R1 when new features
+will be introduced above and beyond BeOS R5.  These unit tests will be critical to ensuring that
+any new feature or even just a bug fix doesn't break existing functionality.</P>
+
+<P>Speaking of bug fixes, consider adding unit tests for any bugs you identify that slipped
+through your original unit test suite.  This will ensure that this bug or a similar one is not
+re-introduced in the future.</P>
+
+<P>Finally, unit testing is not the be all, end all of testing.  As mentioned above, integration
+testing must be done to show that software components work together.  If all unit tests cover
+all requirements and have run successfully against all components, then a failure has to be
+due to a bug in the interaction of two or more known working software components.</P>
+
+<A NAME="when"></A><H2>When should I write my unit tests?</H2></LI>
+
+<P>As the AppKit process document describes the recommended order for implementing a component
+is:</P>
+
+<OL>
+<LI>Write an interface specification</LI>
+<LI>Write the use case specifications</LI>
+<LI>Write the unit tests</LI>
+<LI>Write an implementation plan</LI>
+<LI>Write the code</LI>
+</OL>
+
+<P>Please see the AppKit process document for more details about the entire sequence.  The unit
+test are to be written once the use cases are written and before any implementation work is
+done.  The use cases must be done because they determine what the tests will be.  You need to
+write as many tests are required so that all use cases for that component are tested.  The use
+cases should be detailed enough that you can write your unit tests from them.</P>
+
+<P>The unit tests are to be done before implementation for a very good reason.  You should be able
+to run these unit tests against the Be implementation and confirm that they all pass.  If they do
+not pass, then either there is a bug in the unit test itself or you have found a difference
+between your use cases and the actual implementation.  Even if your use cases match the BeBook,
+if that is not how the actual Be implementation works, we must match the current implementation and
+not the BeBook.  You should go back and modify the use case.  Change the use case so that it
+matches Be's implementation and consider adding a note indicating this doesn't match the 
+BeBook.</P>
+
+<P>Imagine if you completed the implementation and then wrote and ran the unit tests.  If you run
+the tests against your implementation and Be's implementation, you will notice the test passes
+for your code but fails on Be's.  At this point, you will have to change the implementation, change
+the unit test and change the use case which is more work that if you write the unit tests before
+the implementation.  Worse, if you only ran the unit tests against your implementation and not
+Be's, you may not notice the problem at all.</P>
+
+<A NAME="whattest"></A><H2>What kinds of tests should be in a unit test?</H2>
+
+<P>The unit tests you write should cover all the functionality of your software module.  That
+means your unit tests should include:</P>
+
+<UL>
+<LI>All standard expected functionality of the software component</LI>
+<LI>All error conditions handled by the software component</LI>
+<LI>Interaction with software components which cannot be decoupled from the target software 
+component</LI>
+<LI>Concurrency tests to show that a software component which is expected to be thread safe (most
+things are under BeOS) is safe and free from deadlocks.</LI>
+</UL>
+
+<A NAME="testframework"></A><H2>What framework is being used to do unit testing for the AppKit?</H2>
+
+<P>The AppKit team has chosen to use CppUnit version 1.5 as the basis of all of our unit tests.
+This framework provides very useful features and ensures that all unit tests for AppKit code
+are consistent and can be executed from a single environment.</P>
+
+<P>There are two key components to the framework.  First, there is a library called libCppUnit.so
+which provides all the C++ classes for defining your own testcases.  Secondly, there is an
+executable called "TestRunner" which is capable of executing a set of testcases.</P>
+
+<P>For more information on CppUnit, please refer to 
+<A HREF="http://cppunit.sourceforge.net/">this website</A>
+
+<A NAME="frameworkmods"></A><H2>What AppKit specific modifications have been made to this framework?</H2>
+
+<P>The following are the modifications that have been introduced into the CppUnit v1.5 
+framework:</P>
+
+<UL>
+<LI>A makefile has been added for the library and the TestRunner.</LI>
+<LI>Some "bugs" in CppUnit v1.5 which lead to it not compiling under BeOS v5.</LI>
+<LI>The TestRunner has been modified to support BeOS based addons.  Each test which you can
+select from the TestRunner is found in the "add-ons" directory at runtime.  The original 
+TestRunner required you to change the TestRunner when new tests were added to it.</LI>
+<LI>Changed the output from TestRunner.  The output includes a name of the test being run and
+a run time for the test in microseconds.</LI>
+<LI>Changed the arguments of the assert functions in the TestCase class from std::string to
+const char *'s due to apparent concurrency problems with std::string under BeOS when testing
+threaded tests.</LI>
+<LI>Added locking to the TestResults class so that multiple threads can safely add result 
+information at the same time for a single test.</LI>
+<LI>The ThreadedTestCaller class was written to allow us to write tests which contain multiple
+threads.  This is an important class because many BeOS components are thread safe and we need
+to confirm that the OpenBeOS implementation is also thread safe.</LI>
+</UL>
+
+<P>This is the list of the important modifications done to CppUnit v1.5 at the time this document
+is being written.  For the latest information about modifications to CppUnit, check the code
+which can be found in the OpenBeOS CVS repository.</P>
+
+<A NAME="futuremods"></A><H2>What framework modifications might be required in the future?</H2>
+
+<P>This framework will have to evolve as our needs grow.  The main issues I think we need to
+solve are:</P>
+
+<UL>
+<LI>The format of the test name is an encoded string representing the class definition of the
+test class from gcc.  It is not a very readable format but given that the test class is often
+a template class and you would like different names for different instances of the template,
+this seemed the best compromise.  Suggestions welcome.</LI>
+
+<LI>The threaded test support added into CppUnit forces you to specify the entry point for each
+thread in your test.  If you are doing a test with a BLooper or a BWindow, these classes start
+a thread of their own.  This thread will not be started through the standard entry point so
+doing "assert's" from one of these threads will not work.  Perhaps we need TestBLooper and
+TestBWindow classes which will work with the assert's.</LI>
+</UL>
+
+<P>If you find you need some other features, feel free to add them to CppUnit.</P>
+
+<A NAME="buildingtests"></A><H2>How do I build the framework and current tests for the AppKit?</H2>
+
+<P>As of writing this document, you can build the framework and all the current AppKit tests
+by performing the following steps:</P>
+
+<OL>
+
+<LI>Checkout the "app_kit" sources or the entire repository from the OpenBeOS CVS repository.
+There is information at the OpenBeOS site about how to access the CVS repository.</LI>
+
+<LI>In a terminal, "cd" into the "app_kit" directory in the CVS files you checked out.</LI>
+
+<LI>Type "make".</LI>
+
+</OL>
+
+<P>Note that the build system for OpenBeOS is moving to jam so these steps may become obsolete.
+When you the make has finished, you should find the following files:</P>
+
+<UL>
+
+<LI><CODE>app_kit/test/CppUnit/TestRunner</CODE> - this is the executable to use to execute
+tests.</LI>
+<LI><CODE>app_kit/test/CppUnit/lib/libCppUnit.so</CODE> - this is CppUnit library which your tests
+must link against.</LI>
+<LI><CODE>app_kit/test/CppUnit/lib/libopenbeos.so</CODE> - this is library which contains OpenBeOS
+implementation of some Be classes (usually found in libbe.so, called libopenbeos.so to avoid a name
+clash at runtime).</LI>
+<LI><CODE>app_kit/test/add-ons/BAutolockTests</CODE> - this is the addon which contains the tests
+which are run against the Be and OpenBeOS implementation of BAutolock.</LI>
+<LI><CODE>app_kit/test/add-ons/BLockerTests</CODE> - this is the addon which contains the tests
+which are run against the Be and OpenBeOS implementation of BLocker.</LI>
+<LI><CODE>app_kit/test/add-ons/BMessageQueueTests</CODE> - this is the addon which contains the tests
+which are run against the Be and OpenBeOS implementation of BMessageQueue.</LI>
+
+</UL>
+
+<P>These are the key files which ensure that the tests can be run.</P>
+
+<A NAME="runningtests"></A><H2>How do I run tests?</H2>
+
+<P>You have a few different options for how you run a test or a series of tests.  Before you start
+however, you must build the code as describe <A HREF="#buildingtests">in this section</A>.  Once
+it is built, you can run tests any of these ways:</P>
+
+<UL>
+<LI>Run "make test" from the app_kit directory.  This will lead to all of the tests defined in
+app_kit/test/add-ons directory to be run.</LI>
+<LI>From the "app_kit/test" directory, execute the command "CppUnit/TestRunner -all".  This will
+lead to all of the tests defined in the app_kit/test/add-ons directory to be run and is the same
+as what happens in the "make" example above.  However, recompile any code that has changed in the
+process.</LI>
+<LI>From the "app_kit/test" directory, execute the command "CppUnit/TestRunner &lt;TestName&gt;"
+where &lt;TestName&gt; is one of the addons found in the "app_kit/test/add-ons" directory.  Only
+the tests defined in that add-on will be run.</LI>
+</UL>
+
+<A NAME="writingtests"></A><H2>How do I write tests for my component?</H2>
+
+<P>The first step to writing your tests is to develop a plan for how you will test the 
+functionality.  For ideas of the kinds of tests you may want to consider, you should reference
+<A HREF="#whattests">this section</A>.</P>
+
+<P>Once you know the kinds of tests you want, you need to:</P>
+
+<UL>
+
+<LI><P>For every test you want, define a class which derives from the "TestCase" class in the 
+CppUnit framework.</P></LI>
+
+<LI><P>Within each test class you define, create a "void setUp(void)" and "void tearDown(void)"
+member function if required.  If before executing your test, you need to perform some actions,
+put those actions in the "setUp()" member.  If you need to cleanup after your test, put those
+actions in the "tearDown()" member.</P></LI>
+
+<LI><P>Within each test class you define, create a member function which takes "void" and
+returns "void".  Within this member function, write the code to execute the test.  Whenever you
+want to ensure that some condition is true during your test, add a line within the member function
+that looks like "assert(condition)".  For example, if the variable "result" must have the value
+B_OK at a particular point in your test, you should add a line which reads
+"assert(result = B_OK)".</P></LI>
+
+<LI><P>Create a constructor for all of your test classes that takes a "std::string name" argument
+and pass that onto the TestCase parent class.  Add whatever actions you need to take in the
+constructor.</P></LI>
+
+<LI><P>Create a destructor for all of your test classes and take whatever actions are 
+appropriate.</P></LI>
+
+<LI><P>Within each test class you define, create a member with the signature 
+"static Test *suite(void)".  For a simple test where only one test needs to be run for this class,
+the contents of this member should look like:</P>
+
+<PRE>
+return(new TestCaller&lt;ClassName&gt;("", &amp;ClassName::MemberName));
+</PRE>
+
+<P>Replace "ClassName" with the name of your test class and "MemberName" with the name
+of the member function you defined your test in.  If you need to define more than one test to run
+from this class, refer to instructions below on how to use the TestSuite class of CppUnit.  If you
+are creating a threaded test, refer to <A HREF="#threadedtests">this section</A>.</P></LI>
+
+<LI><P>Create one ".cpp" file for defining the "addonTestFunc()" function.  This function must
+exist in global scope within your test addon.  The contents of this ".cpp" file will look something
+like:</P>
+
+<PRE>
+#include "TestAddon.h"
+
+Test *addonTestFunc(void)
+{
+	TestSuite *testSuite = new TestSuite("&lt;TestSuiteName&gt;");
+
+	testSuite-&gt;addTest(&lt;ClassName1&gt;::suite());
+	testSuite-&gt;addTest(&lt;ClassName2&gt;::suite());
+	/* etc */
+
+	return(testSuite);
+}
+</PRE>
+
+<P>In the above example, replace &lt;TestSuiteName&gt; with an appropriate name for the group of
+tests and &lt;ClassName1&gt; and &lt;ClassName2&gt; with the names of the test classes you have
+defined.</P></LI>
+
+<LI><P>Create a build system around a BeIDE project, Makefile or preferrably a jam file which
+builds all the necessary code you have written into an addon.</P></LI>
+
+<LI><P>Put this addon into the app_kit/test/add-ons directory and follow the above instructions
+for how to run your tests.</P></LI>
+
+</UL>
+
+<A NAME="exampletests"></A><H2>Are there example tests to base mine on?</H2>
+
+<P>There are example tests which you can find in the following directories:</P>
+
+<UL>
+<LI><CODE>app_kit/test/lib/application/BMessageQueue</CODE></LI>
+<LI><CODE>app_kit/test/lib/support/BAutolock</CODE></LI>
+<LI><CODE>app_kit/test/lib/support/BLocker</CODE></LI>
+</UL>
+
+<P>There are some things done in these tests which make things a bit more complex, but you may
+want to do similar things:</P>
+
+<UL>
+
+<LI>Most tests use a ThreadedTestCaller class even in some situations when there aren't actually
+more than one thread in the test.</LI>
+
+<LI>All tests are defined as a template class.  The test class is a template of the class to test
+(if that makes sense to you).  For example, to test both the Be and OpenBeOS BLocker and not
+end up with a symbol conflict, the OpenBeOS implementation of BLocker is actually in a namespace
+called "OpenBeOS".  So, the tests must be run against the classes "::BLocker" and 
+"OpenBeOS::BLocker".  The easiest way to do this was to make the class to be tested a template
+and define it for both "::BLocker" and "OpenBeOS::BLocker".</LI>
+
+</UL>
+
+<P>Even with the complexity, I think this code provides a pretty good example of how to write
+your tests.</P>
+
+<A NAME="threadedtests"></A><H2>How do I write a test with multiple threads?</H2>
+
+<P>If you have a test which you want to define that requires more than one thread of execution
+(most likely a concurrency test of you code), you need to use the ThreadedTestCaller class.
+The steps which differ from the above description on how to write a test case are:</P>
+
+<UL>
+
+<LI><P>In your test class, define a member function for each thread you will be starting.  All of
+these member functions must take "void" and return "void".  If all the threads in your test
+perform the exact same actions, it is OK to just define one member function.  Usually in the
+tests I have written, I have called these member functions "TestThread1()", "TestThread2()",
+etc.</P></LI>
+
+<LI><P>If your "static Test *suite()" function for your test class, you must return a
+ThreadedTestCaller.  Imagine that the test class name is "MyTestClass" and you want two threads
+which run member functions "TestThread1()" and "TestThread2()".  That code would look like:</P>
+
+<PRE>
+Test *MyTestClass::suite(void)
+{
+	MyTestClass *theTest = new MyTestClass("");
+	ThreadedTestCaller&lt;MyTestClass&gt; *threadedTest = new TreadedTestCaller&lt;MyTestClass&gt;("", theTest);
+
+	threadedTest-&gt;addThread(":Thread1", &amp;MyTestClass::TestThread1);
+	threadedTest-&gt;addThread(":Thread2", &amp;MyTestClass::TestThread2);
+
+	return(threadedTest);
+}
+</PRE>
+
+<P>If you need to, you can put a number of ThreadedTestCaller instances into a TestSuite and return
+them in the suite() member function.  Examples of this can be found in the BLocker and 
+BMessageQueue test examples.</P></LI>
+
+</UL>
+
+<P>Otherwise the steps are the same as for other tests.  The code gets much more complex if you
+define your test classes as templates as the examples do.</P>
+
+</FONT>
+</BODY>
+</HTML>

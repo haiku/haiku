@@ -1,0 +1,12 @@
+          File: BezierBounds.zip
+        Author: Michael Pfeiffer
+       Contact: michael.pfeiffer@utanet.at
+       Release: 1.0
+  Release-Date: 4/18/2002
+ Compatibility: R5
+      Location: 
+Copying-policy: BSD/MIT
+   Description: Test application that displays the bounds of a bezier curve.
+                Use right mouse button to add points to bezier curve and
+                left mouse button to move a point.
+         Notes: 

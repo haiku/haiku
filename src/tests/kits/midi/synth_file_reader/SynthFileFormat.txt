@@ -1,0 +1,36 @@
+Synth File Format
+=================
+
+Currently (*.sy) only!
+
+'IREZ'  | version?[4] | no_of_chunks[4] | chunks[no_of_chungs]
+
+chunks:
+-------
+next[4] | tag[4] 
+
+tag:
+----
+'INST' | instr[4] | nameLen[1] | name[nameLen] | dataSize[4] | data[dataSize] 
+| sndId[2] | ???[10] | size[2] | ???[size*8+21] | rest[dataSize-...] |
+
+'snd ' | sndId[4] | nameLen[1] | name[nameLen] | dataSize[4] | [28] |
+rate[2] | ...
+
+data[dataSize]:
+----------------
+ADSR | [1] | [4] | [4] |
+LINE | [4] | [4] |
+SUST | [4] | [4] |
+LAST | [4] |
+LPGF | [4] | [4] | [4] |
+SINE | [4] | [4] |
+LPFR |
+LPRE | [1] | [4] | [4] |
+PITC | [1] | [4] | [4] |
+LPAM | [1] | [4] | [4] |
+VOLU | [1] | [4] | [4] | 
+SPAN | [1] | [4] | [4] |
+TRIA | [4] | [4] |
+SQU2 | [8] |
+SQUA | [8] |

@@ -1,0 +1,7 @@
+SubDir OBOS_TOP sources os kits input prefs keyboard ;
+
+Preference Keyboard : Keyboard.cpp KeyboardSettings.cpp KeyboardView.cpp KeyboardWindow.cpp ;
+
+LinkSharedOSLibs Keyboard : translation be root ;
+
+AddResources Keyboard : Keyboard.rsrc ;

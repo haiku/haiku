@@ -1,0 +1,3 @@
+SubDir OBOS_TOP sources os kits kernel apps unmount ;
+
+KernelObjects <$(SOURCE_GRIST)>main.c : -fpic ;

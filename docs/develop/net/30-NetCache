@@ -1,0 +1,22 @@
+Net Cache - Milestone #2
+========================
+
+Hmm, a general purpose net cache.
+
+Types of Cache
+==============
+
+What are we likely to need a fast cache for?  Look below.
+
+- ipv4 address to ethernet MAC address (ARP)
+- MAC address to IPv4 (RARP)
+- list of IPv6 neighbours/routers/prefix's
+
+There remain problems in that for many of these needs additional
+information is required, this information being specific to the
+use at the time.
+
+However, all these uses require an ability to quickly find information
+given a key that is a number of variable length, hence the conceptual
+idea of using a hash lookup.
+

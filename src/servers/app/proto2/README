@@ -1,0 +1,31 @@
+Prototype 2: Messaging
+
+This is the second proof-of-concept prototype for the OpenBeOS app_server. This demonstrates the use of the PortLink class to send messages quickly and how the server manages processes under normal circumstances (ie, not killing a team). Listed at the end of this file is the sequence of events for a particular task, utilizing only 3 types of components: the Server class, ServerApp application-monitoring nodes, and the application itself. All 3 have been built for R5. Although not formally documented, the code is relatively clean and mostly commented.
+
+Files Included
+
+OBAppServer:	the actual server
+OBApp:		a skeleton of what's supposed to be an app. Implemented only for testing purposes but some concepts may eventually make their way into the real OBOS BApplication class
+OBHey:		Quick-and-dirty app which sends a message code (in decimal) to a specified port. For the sake of reference, B_QUIT_REQUESTED=1599165009.
+
+Application launch:
+1) App constructor
+2) App->server CREATE_APP
+3) Server spawns ServerApp
+4) ServerApp->App SET_PORT
+5) App reinitializes serverlink to SET_PORT port
+
+Application quit (from app side):
+1) ->App B_QUIT_REQUESTED
+2) App -> ServerApp B_QUIT_REQUESTED and quits
+3) ServerApp -> Server DELETE_APP and quits
+4) Server removes ServerApp from list and deletes object
+
+App Server quit:
+1) Right now: Server->all ServerApps (QUIT_APP)
+	Eventually: Server->Registrar(BROADCAST_QUIT)
+1a) Right now: ServerApps->Apps(B_QUIT_REQUESTED)
+2) Server sets internal flag quitting_server to true
+3) When server receives DELETE_APP, checks to see if any ServerApps are left.
+4) If no ServerApps are left after deleting the sender of the delete_app message, server checks to see if quitting_server is set to true
+5) Server exits

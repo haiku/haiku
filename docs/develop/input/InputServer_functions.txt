@@ -1,0 +1,66 @@
+class InputServer
+{
+	InputServer(void);
+	~InputServer(void);
+
+	ArgvReceived(long, char**);
+
+	InitKeyboardMouseStates(void)
+	InitFilters(void)
+	InitMethods(void)
+
+	QuitRequested(void)
+	ReadyToRun(void)
+	MessageReceived(BMessage*); 
+
+	HandleSetMethod(BMessage*);
+	HandleGetSetMouseType(BMessage*, BMessage*);
+	HandleGetSetMouseAcceleration(BMessage*, BMessage*);
+	HandleGetSetKeyRepeatDelay(BMessage*, BMessage*);
+	HandleGetKeyInfo(BMessage*, BMessage*);
+	HandleGetModifiers(BMessage*, BMessage*);
+	HandleSetModifierKey(BMessage*, BMessage*);
+	HandleSetKeyboardLocks(BMessage*, BMessage*);
+	HandleGetSetMouseSpeed(BMessage*, BMessage*);
+	HandleSetMousePosition(BMessage*, BMessage*);
+	HandleGetSetMouseMap(BMessage*, BMessage*);
+	HandleGetKeyboardID(BMessage*, BMessage*);
+	HandleGetSetClickSpeed(BMessage*, BMessage*);
+	HandleGetSetKeyRepeatRate(BMessage*, BMessage*);
+	HandleGetSetKeyMap(BMessage*, BMessage*);
+	HandleFocusUnfocusIMAwareView(BMessage*, BMessage*);
+
+	EnqueueDeviceMessage(BMessage*);
+	EnqueueMethodMessage(BMessage*);
+	UnlockMethodQueue(void);
+	LockMethodQueue(void);
+	SetNextMethod(bool);
+	SetActiveMethod(_BMethodAddOn_*);
+	MethodReplicant(void);
+
+	EventLoop(void*);
+	EventLoopRunning(void);
+
+	DispatchEvents(BList*);
+	CacheEvents(BList*);
+	GetNextEvents(BList*);
+	FilterEvents(BList*);
+	SanitizeEvents(BList*);
+	MethodizeEvents(BList*, bool);
+
+	StartStopDevices(char const*, input_device_type, bool);  // device's name, type, 0 or 1 for start or stop)
+	ControlDevices(char const*, input_device_type, unsigned long, BMessage*);
+
+	DoMouseAcceleration(long*, long*);
+	SetMousePos(long*, long*, long, long);
+	SetMousePos(long*, long*, BPoint);
+	SetMousePos(long*, long*, float, float);
+
+	SafeMode(void)
+
+private:
+	sEventLoopRunning
+	sSafeMode
+	fMouseState
+
+}

@@ -1,0 +1,260 @@
+<HTML>
+<HEAD>
+
+<TITLE>hey Documentation</TITLE>
+</HEAD>
+<BODY BGCOLOR=#FFFFFF>
+<HR><CENTER><h1>hey version 1.2.6</h1>
+</CENTER>
+<HR>
+<BASEFONT size=4>
+<h2>What is hey?</h2>
+<CODE>hey</CODE> is a small public domain scripting utility which works with standard <FONT COLOR=#0000ff>B</FONT><FONT COLOR=#ff0000>e</FONT>OS scripting. It comes with source which you can modify as you wish. If you want your modification in the standard distribution, just drop me a line.
+Use it at your own risk.
+<p>
+<p>
+<br>
+
+<h2>Installation</h2>
+
+<UL>
+<LI>unzip the archive by doubleclicking on <CODE>hey-YYYYMMDD.zip</CODE> or by dropping it on Expander
+<LI>open the right project file depending on the hardware platform and select 'Make' from the 'Project' menu to compile it 
+<LI>you may want to move the executable (<CODE>hey</CODE>) to <CODE>/boot/home/config/bin</CODE> </p>
+</ul>
+<p>
+<br>
+
+<h2>Usage</h2>
+hey should be used from Terminal. When you start it without parameters it will display the command line syntax it accepts:
+<PRE><CODE>
+hey v1.2.6, written by Attila Mezei (amezei@mail.datanet.hu)
+usage: hey [-s] &lt;app|signature&gt; [let &lt;specifier&gt; do] &lt;verb&gt; &lt;specifier_1&gt; &lt;of &lt;specifier_n&gt;&gt;* 
+           [to &lt;value&gt;] [with name=&ltvalue&gt [and name=&ltvalue&gt]*]
+where  &lt;verb&gt; : DO|GET|SET|COUNT|CREATE|DELETE|GETSUITES|QUIT|SAVE|LOAD|'what'
+  &lt;specifier&gt; : [the] &lt;property_name&gt; [ &lt;index&gt; | name | "name" | '"name"']
+      &lt;index&gt; : index | '['index']' | '['-reverse_index']' | '['fromvalue to tovalue']'
+      &lt;index&gt; : int | -int | '['int']' | '['-int']' | '['startint to end']'
+      &lt;value&gt; : "string" | &lt;integer&gt; | &lt;float&gt; | bool(value) | int8(value) |
+                int16(value) | int32(value) | float(value) | double(value) |
+                BPoint(x,y) | BRect(l,t,r,b) | rgb_color(r,g,b,a) | file(path)   
+options: -s: silent
+
+</CODE></PRE>
+<br>
+
+<h3>The verb</h3>
+The verbs send the following messages:
+<ul>
+<li>DO: B_EXECUTE_PROPERTY
+<li>GET: B_GET_PROPERTY
+<li>SET: B_SET_PROPERTY
+<li>COUNT: B_COUNT_PROPERTIES
+<li>CREATE: B_CREATE_PROPERTY
+<li>DELETE: B_DELETE_PROPERTY
+<li>GETSUITES: B_GET_SUPPORTED_SUITES
+<li>QUIT: B_QUIT_REQUESTED
+<li>SAVE: B_SAVE_REQUESTED
+<li>LOAD: B_REFS_RECEIVED
+</ul>
+You can use your own verbs if you specify the value names and constants in the 'value_info' structure. See <A HREF="file:///boot/beos/documentation/Be%20Book/The%20Application%20Kit/PropertyInfo.html">BPropertyInfo</A> and <A HREF="file:///boot/develop/headers/be/app/PropertyInfo.h">PropertyInfo.h</A> for details.
+<p>
+Note that the verb is not case sensitive but the specifier names (e.g. "Frame", "Label"...) are. You can use 'what' constants
+directly, like
+<PRE><CODE>hey Application '_ABR'
+</CODE></PRE>
+will open the about window of the application.<p>
+LOAD and SAVE are actually not scripting commands, they are standard BeOS messages (B_REFS_RECEIVED and B_SAVE_REQUESTED). I included them for convenience. E.g. open a file in Application (the path can be relative or absolute):
+<PRE><CODE>hey Application load 'file(/boot/home/images/Be.jpg)'
+</CODE></PRE>
+or save it:
+<PRE><CODE>hey Application save Window "Be.jpg"
+</CODE></PRE>
+
+<br>
+
+<h3>The specifier</h3>
+
+<p>The specifier can be direct, index, reverse index, range or named. Reverse range is
+not supported. If you enter an index which consists of only digits, you can omit the square
+brackets:
+<PRE><CODE>hey Application get Window 0
+</CODE></PRE>
+
+<br>
+<h3>The value</h3>
+
+It is easy to use the type names in front of the value but beware that the shell will throw a syntax error if you do this:
+<PRE><CODE>hey Application set .... to BPoint(100,100)
+</CODE></PRE>
+Instead use square brackets or quotes:
+<PRE><CODE>hey Application set .... to BPoint[100,100]
+hey Application set .... to 'BPoint(100,100)'
+</CODE></PRE>
+
+If the value string contains only digits, it will be considered an int32. If it contains digits and a dot,
+a float type is assumed. "true" or "false" can also be used as bools.
+
+<p>
+<br>
+<h2>DEBUG mode</h2>
+You can check the message to be sent to the application by setting the DEBUG_HEY preprocessor symbol to 1, and recompiling.<p>
+<br>
+
+<h2>History</h2>
+v1.2.6
+<ul>
+<li>syntax extended by Sander Stoks <sander@adamation.com> to allow:
+		"hey Application let Specifier do ..."
+		allowing you to send messages directly to other handlers than the app itself.
+		In cooperation with the new Application defined commands (note that some
+		Be classes, e.g. BWindow, publish commands as well) this allows, for example:
+		"hey NetPositive let Window 0 do MoveBy BPoint[10,10]"
+		Note that this is partly redundant, since
+		"hey NetPositive let Window 0 do get Title"
+		duplicates "hey NetPositive get Title of Window 0"
+		But with the old system,
+		"hey NetPositive MoveBy of Window 0 with data=BPoint[10,10]"
+		couldn't work ("MoveBy" is not defined by the Application itself).
+</ul>
+v1.2.5
+<ul>
+<li>'value_info' is supported in BPropertyInfo. This means when you send GETSUITES (B_GET_SUPPORTED_SUITES) the value info is printed after the property infos (name, kind, value, usage).<br>
+You can also use application defined commands (as the verb) with hey:<br>
+		hey MyBackupApp Backup "Maui"<br>
+</ul>
+v1.2.4
+<ul>
+<li>The syntax is extended by <a href="mailto:pfolk@uni.uiuc.edu">Peter Folk</a>
+    to contain:
+      <br><code>do the x of y -3 of z '"1"'</code><br>
+    I.e. "do" =&gt; B_EXECUTE_PROPERTY, optional "the" makes direct specifiers
+    more like english, bare reverse-index-specifiers are now handled, and
+    named specifiers can contain only digits by quoting it (but make sure the
+    shell passes the quotes through).
+      
+<li>Hey(target,const char*,reply) was previously limited to 100 tokens.
+    It now uses a vector<> so it's only limited by available memory.
+
+<li>Also, the archive name is now Y2K compliant =)
+</ul>
+v1.2.3
+<ul>
+<li>new option: -s for silent processing (no reply or errors printed) AM 
+</ul>
+v1.2.2
+<ul>
+<li>Fixes by Marco Nelissen (marcone@xs4all.nl):<br>
+<li>fixed parsing of negative numbers
+<li>fixed "with" syntax, which was broken (after a create, "with" would be taken as a specifier)
+</ul>
+v1.2.1
+<ul>
+<li>compiled for R4 with minor modifications of BPropertyInfo usage 
+</ul>
+v1.2.0
+<ul>
+<li>the syntax is extended by Sander Stoks (sander@adamation.com) to contain<br>
+		with name=<value> [and name=<value> [...]]<br>
+		at the end of the command which will add additional data to the scripting message. E.g:<br>
+		hey Becasso create Canvas with name=MyCanvas and size=BRect(100,100,300,300)<br>
+		Also a small interpreter is included.
+
+<li>		Detailed printout of B_PROPERTY_INFO in BMessages. Better than BPropertyInfo::PrintToStream().
+		Also prints usage info for a property if defined.
+</ul>
+v1.1.1
+<ul>
+<li>minor change from chrish@qnx.com to return -1 if an error is
+		sent back in the reply message; also added B_COUNT_PROPERTIES support
+
+<li>		The range specifier sent to the target was 1 greater than it should've been. Fixed.
+
+<li>		'hey' made the assumption that the first thread in a team will be the 
+		application thread (and therefore have the application's name).  
+		This was not always the case. Fix from Scott Lindsey (wombat@gobe.com).
+</ul>
+v1.1.0
+<ul>
+<li>flattened BPropertyInfo is printed if found in the reply of B_GET_SUPPORTED_SUITES
+<li>1,2,3 and 4 character message constant is supported (e.g. '1', '12', '123', '1234')
+<li>alpha is sent with rgb_color
+</ul>
+v1.0.0
+<ul>
+<li>First public release
+</ul>
+
+<p>
+<br>
+<h2>Examples</h2>
+
+For these examples you need to start the Network preferences application
+(the classic way to demo scripting ;-)
+
+
+<h3>Get the messenger of an application (not useful if you use 'hey'):</h3>
+<PRE><CODE>	hey Network get Messenger
+</CODE></PRE>
+
+<h3>Get the suite of messages which the application can handle:</h3>
+<PRE><CODE>	hey Network getsuites
+</CODE></PRE>
+<ul>		(BApplication & BHandler suites printed)
+</ul>
+<h3>Get the name of the application</h3>
+<PRE><CODE>	hey Network get Name
+</CODE></PRE>
+<h3>Open the about window of the application</h3>
+<PRE><CODE>	hey Network '_ABR'
+</CODE></PRE>
+<h3>Get a window of the application (actually a messenger for the window)</h3>
+<PRE><CODE>	hey Network get Window [0]
+</CODE></PRE><ul>		or you can omit the square brackets when using an index:</ul>
+<PRE><CODE>	hey Network get Window 0
+</CODE></PRE><ul>		or you can specify a window name (with or without quotes):</ul>
+<PRE><CODE>	hey Network get Window "Network"
+</CODE></PRE>
+<h3>Get the suite of messages which the window can handle:</h3>
+<PRE><CODE>	hey Network getsuites of Window "Network"
+</CODE></PRE><ul>		(for the description of suite/vnd.Be-window see the BeBook)</ul>
+
+<h3>Get the title, frame or other properties of the window:</h3>
+<PRE><CODE>	hey Network get Title of Window "Network"
+	hey Network get Frame of Window "Network"
+</CODE></PRE>
+<h3>Set the title, frame or other properties of the window:</h3>
+<PRE><CODE>	hey Network set Title of Window "Network" to "hey is great"
+	hey Network set Frame of Window "Network" to 'BRect(0,0,300,300)'
+</CODE></PRE><ul>		or you can use square brackets to avoid the 's:</ul>
+<PRE><CODE>	hey Network set Frame of Window "Network" to BRect[0,0,300,300]
+</CODE></PRE>
+<h3>Get a view from the window (actually a messenger for the view)</h3>
+<PRE><CODE>	hey Network get View 0 of Window "Network"
+</CODE></PRE>
+<h3>Get the suite of messages which the view can handle:</h3>
+<PRE><CODE>	hey Network getsuites of View 0 of Window "Network"
+</CODE></PRE><ul>		(for a description of suite/vnd.Be-view see the BeBook)</ul>
+
+<h3>Get a view property:</h3>
+<PRE><CODE>	hey Network get Frame of View 0 of Window "Network"
+	hey Network get Hidden of View 0 of View 0 of Window "Network"
+	hey Network get Label of View 5 of View 0 of Window "Network"
+	hey Network get Value of View 0 of View 2 of View 0 of Window "Network"
+	hey Network get Text of View 2 of View 2 of View 0 of Window "Network"
+</CODE></PRE>
+<h3>Set a view property:</h3>
+<PRE><CODE>	hey Network set Frame of View 0 of Window "Network" to 'BRect(0,0,100,400)'
+	hey Network set Hidden of View 0 of View 0 of Window "Network" to true
+	hey Network set Label of View 5 of View 0 of Window "Network" to "Restart Something"
+	hey Network set Value of View 0 of View 2 of View 0 of Window "Network" to 1 
+	hey Network set Text of View 2 of View 2 of View 0 of Window "Network" to "joe"
+</CODE></PRE>
+<h3>Close a window in an application</h3>
+<PRE><CODE>	hey Network quit Window "Network"
+</CODE></PRE>
+<h3>Quit an application</h3>
+<PRE><CODE>	hey Network quit
+</CODE></PRE>
+</BODY>
+</HTML>

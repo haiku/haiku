@@ -1,0 +1,71 @@
+<html>
+<title>Schedule Rationale</title>
+<body>
+<h1>Schedule Rationale</h1>
+Below is an informal discussion of the rationale behind the Interface Kit team's
+behemoth schedule.  Various details may not reflect the current form of the schedule,
+but the basic gist is what's really important here.
+<br>
+<hr>
+<p>
+First, let me head off the suggestion that we formally split into 3 or 4 stand-alone
+projects: &nbsp; the Interface Kit, Application Kit and app_server are completely
+dependent on one another in a way that no other set of system components is.  Each
+without the others can accomplish almost *nothing*; I think the existence of Integration
+highlights this fact.
+</p><p>
+Each milestone listed has a number of tasks associated with it; these need to be listed
+and the time for each estimated.  These tasks should be as fine grained as possible.
+Taking BView as an example, I would expect each method on BView to have its own entry
+under milestones 1, 2, 3, 4 and 8 with entries added as necessary to milestones 18 to
+22.  "Why so detailed?" you say.  I'm glad you asked. ;)
+</p><p>
+First off, the finer the schedule's granularity, the more realistic estimate you have for
+the project as a whole.  Asked to implement BView, one might be tempted to say "Oh, about
+3 weeks," whereas an estimate of the time needed for each method might yield a total of
+two to three times that.  While the more realistic overall estimate may be more depressing
+initially, being able to hit goals on or near the estimated date is much better for
+morale in the long run than constantly being behind because all the estimates were too
+low.  Trust me on this, I've worked on *way* too many projects that went south because of
+scheduling that was too broad -- usually because the project manager doesn't want to
+"distress" the client by making them pay for the time to schedule correctly.  Or design
+correctly, but that's a different rant. =)
+</p><p>
+Second, a fine-grained schedule helps to ensure that nothing gets missed.  You might
+think it would be hard to forget to implement a BView method, but if you don't expressly
+schedule for that method, there will be no interface, use case or technical specifications
+or unit tests to fail because the method isn't doing anything.  In fact, we might not
+notice the missing functionality until some app that uses it dies a horrible death and
+we have to figure out why.
+</p><p>
+Third, it helps us figure out what functionality is dependent on what -- which helps us
+schedule our tasks in a logical sequence.
+</p><p>
+Fourth, it makes it much easier for someone that doesn't have a lot of time available or
+much experience to pick something that they can tackle and know that they will be making
+a meaningful contribution.  It also makes it easier for us to keep track of who is doing
+what on large items like BView:  instead of saying "there's a bunch of stuff on BView
+that needs doing," we can say "BView::StrokeEllipse() needs to be implemented" and know
+that a specific person is responsible for that deliverable.
+</p><p>
+Fifth, as daunting as a detailed schedule looks like out of the gate, tasks are getting
+completed *constantly* and it's very satisfying to see progress get made on a regular
+basis.  Ideally, one would like to be able to check on the progress each week and find
+several items completed since the last time it was checked.
+</p>
+<hr>
+
+<!-- The obligatory SourceForge plug -->
+<center> 
+<small>The OpenBeOS project is hosted by:</small><br><br> 
+<a href="http://sourceforge.net"> 
+<img src="http://sourceforge.net/sflogo.php?group_id=33869&type=1" width="88" height="31" border="0" alt="SourceForge Logo">
+</a> 
+<p> 
+
+<small>Copyright &copy; 2001-2002
+<a href="http://www.openbeos.org">OpenBeOS</a> Project</small> 
+</center>
+
+</body>
+</html>

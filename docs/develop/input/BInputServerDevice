@@ -1,0 +1,16 @@
+BInputServerDevice::_ReservedInputServerDevice4(void)
+BInputServerDevice::_ReservedInputServerDevice3(void)
+BInputServerDevice::_ReservedInputServerDevice2(void)
+BInputServerDevice::_ReservedInputServerDevice1(void)
+BInputServerDevice::StopMonitoringDevice(char
+BInputServerDevice::StartMonitoringDevice(char
+BInputServerDevice::EnqueueMessage(BMessage
+BInputServerDevice::UnregisterDevices(input_device_ref
+BInputServerDevice::RegisterDevices(input_device_ref
+BInputServerDevice::Control(char
+BInputServerDevice::Stop(char
+BInputServerDevice::Start(char
+BInputServerDevice::SystemShuttingDown(void)
+BInputServerDevice::InitCheck(void)
+BInputServerDevice::~BInputServerDevice(void)
+BInputServerDevice::BInputServerDevice(void)

@@ -1,0 +1,71 @@
+# This is $(TOP)/test/Jamfile
+
+SubDir TOP test ;
+
+# Point the compiler to location of the CppUnit headers
+HDRS += "$(TOP)/cppunit/include" ;
+
+SOURCE_FILES =
+	BasicTest.cpp
+	DirectoryTest.cpp
+	EntryTest.cpp
+	FileTest.cpp
+	FindDirectoryTest.cpp
+	MimeTypeTest.cpp
+	NodeTest.cpp
+	PathTest.cpp
+	QueryTest.cpp
+	ResourcesTest.cpp
+	ResourceStringsTest.cpp
+	StatableTest.cpp
+	SymLinkTest.cpp
+	TestApp.cpp
+	TestUtils.cpp
+;
+
+# targets to shorted make time, when only one version should be made
+NOTFILE r5 posix ;
+
+# Version of our test suite that links with Be's R5 libraries
+
+LibraryFromR5Sources $(TOP)/test/libstoragetest.R5.a : $(SOURCE_FILES) ;
+Main Test.StorageKit.R5 : Test.StorageKit.cpp ;
+LinkLibraries Test.StorageKit.R5 : 
+	$(TOP)/test/libstoragetest.R5.a
+	$(TOP)/cppunit/cppunit.a 
+;
+LinkSharedOSLibs Test.StorageKit.R5 :
+	/boot/develop/lib/x86/libstdc++.r4.so
+	/boot/develop/lib/x86/libbe.so
+;
+DEPENDS r5 : Test.StorageKit.R5 ;
+
+
+# Version of our test suite that links with OpenBeOS libraries
+
+HDRS += "$(TOP)/source/lib" ;
+
+# Make a test/lib directory and copy libstorage.so libbeadapter.so into it.
+DEPENDS $(TOP)/test/lib/libbeadapter.so :
+	$(TOP)/source/lib/libbeadapter.so $(TOP)/test/lib ;
+DEPENDS $(TOP)/test/lib/libstorage.so :
+	$(TOP)/source/lib/libstorage.so $(TOP)/test/lib ;
+MkDir $(TOP)/test/lib ;
+Bulk $(TOP)/test/lib : $(TOP)/source/lib/libbeadapter.so ;
+Bulk $(TOP)/test/lib : $(TOP)/source/lib/libstorage.so ;
+
+LibraryFromPOSIXSources $(TOP)/test/libstoragetest.POSIX.a :  $(SOURCE_FILES) ;
+Main Test.StorageKit.OpenBeOS : Test.StorageKit.cpp ;
+LinkLibraries Test.StorageKit.OpenBeOS : 
+	$(TOP)/test/libstoragetest.POSIX.a 
+	$(TOP)/cppunit/cppunit.a 
+;
+LinkSharedLibs Test.StorageKit.OpenBeOS :
+	$(TOP)/test/lib/libbeadapter.so
+	$(TOP)/test/lib/libstorage.so
+;
+LinkSharedOSLibs Test.StorageKit.OpenBeOS :
+	/boot/develop/lib/x86/libstdc++.r4.so
+	/boot/develop/lib/x86/libbe.so
+;
+DEPENDS posix : Test.StorageKit.OpenBeOS ;

@@ -1,0 +1,15 @@
+SubDir OBOS_TOP sources os kits kernel core vm ;
+
+KernelStaticLibrary libvm : 
+	<$(SOURCE_GRIST)>vm.c 
+	<$(SOURCE_GRIST)>vm_cache.c 
+	<$(SOURCE_GRIST)>vm_daemons.c 
+	<$(SOURCE_GRIST)>vm_page.c 
+	<$(SOURCE_GRIST)>vm_store_anonymous_noswap.c 
+	<$(SOURCE_GRIST)>vm_store_device.c 
+	<$(SOURCE_GRIST)>vm_store_null.c 
+	<$(SOURCE_GRIST)>vm_store_vnode.c 
+	<$(SOURCE_GRIST)>vm_tests.c 
+	:
+	-fno-pic -Wno-unused -D_KERNEL_
+	;

@@ -1,0 +1,2 @@
+cp ./obj.x86/MsgSpy /boot/home/config/add-ons/input_server/filters
+/boot/beos/system/servers/input_server -q

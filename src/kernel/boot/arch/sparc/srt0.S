@@ -1,0 +1,180 @@
+/*	$OpenBSD: srt0.S,v 1.1 1997/09/17 10:46:20 downsj Exp $	*/
+/*	$NetBSD: srt0.S,v 1.5.4.2 1996/07/17 01:51:46 jtc Exp $	*/
+
+/*
+ * Copyright (c) 1994 Paul Kranenburg
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by Paul Kranenburg.
+ * 4. The name of the author may not be used to endorse or promote products
+ *    derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+ * NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+ * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#include <machine/param.h>
+#include <machine/psl.h>
+
+	.file	"str0.s"
+
+	.data
+	.global	cputyp, nbpg, pgofset, pgshift
+cputyp:
+	.word	1
+nbpg:
+	.word	1
+pgofset:
+	.word	1
+pgshift:
+	.word	1
+#define STACK_SIZE 2048
+tstack:
+	.fill	STACK_SIZE
+
+	.text	
+	.globl	start
+
+start:
+	/*
+	 * Set up a stack.
+	 */
+	set	tstack, %o1
+	save	%o1, STACK_SIZE-4, %sp
+
+4:
+#ifdef notyet
+	/*
+	 * Enable traps
+	 */
+	wr	%g0, 0, %wim		! make sure we can set psr
+	nop; nop; nop
+	wr	%g0, PSR_S|PSR_PS|PSR_PIL, %psr	! set initial psr
+	nop; nop; nop
+	wr	%g0, 2, %wim		! set initial %wim (w1 invalid)
+
+	rd	%psr, %l0
+	wr	%l0, PSR_ET, %psr
+	nop; nop; nop
+#endif
+
+	/*
+	 * Clear BSS
+	 */
+	set     _edata, %o0             ! bzero(edata, end - edata)
+	set     _end, %o1
+	call    bzero
+	 sub    %o1, %o0, %o1
+
+	/*
+	 * Enable interrupts, but only above level 11. This enables "L1-A",
+	 * but avoids spurious interrupt bites from most other devices.
+	 */
+	rd	%psr, %o0
+	andn	%o0, PSR_PIL, %o0
+	wr	%o0, 0xb00, %psr	! (11 << 8)
+	nop; nop; nop
+
+	/*
+	 * Set CPU type that we are running on.
+	 */
+	sethi	%hi(cputyp), %o0
+	set	0x4000, %g7
+	cmp	%i0, %g7
+	beq	5f
+	 nop
+
+	/*
+	 * Save address of PROM vector (passed in %i0).
+	 */
+	sethi	%hi(promvec), %o1
+	st	%i0, [%o1 + %lo(promvec)]
+
+	mov	CPU_SUN4C, %g4
+	mov	SUN4CM_PGSHIFT, %g5
+	b,a	6f
+
+5:
+	mov	CPU_SUN4, %g4
+	mov	SUN4_PGSHIFT, %g5
+
+6:
+	st	%g4, [%o0 + %lo(cputyp)]
+	sethi	%hi(pgshift), %o0	! pgshift = log2(nbpg)
+	st	%g5, [%o0 + %lo(pgshift)]
+
+	mov	1, %o0			! nbpg = 1 << pgshift
+	sll	%o0, %g5, %g5
+	sethi	%hi(nbpg), %o0		! nbpg = bytes in a page
+	st	%g5, [%o0 + %lo(nbpg)]
+
+	sub	%g5, 1, %g5
+	sethi	%hi(pgofset), %o0	! page offset = bytes in a page - 1
+	st	%g5, [%o0 + %lo(pgofset)]
+
+	call	main
+	 mov	%i0, %o0
+
+	ret
+	 restore
+
+
+#ifdef TIGHT
+
+/*
+ * XXX - Space saving .div & .rem routines (small & non-negative numbres only)
+ */
+	.align	4
+	.global .div, .udiv
+! int n = 0; while (a >= b) { a -= b; n++; }; return n;
+.div:
+.udiv:
+	cmp	%o0, %o1
+	bl	2f
+	 mov	0, %o5
+1:
+	sub	%o0, %o1, %o0
+	cmp	%o0, %o1
+	bge	1b
+	 add	%o5, 1, %o5
+2:
+	retl
+	 mov	%o5, %o0
+
+	.align	4
+	.global .rem, .urem
+! while (a>=b) a -= b; return a;
+.rem:
+.urem:
+	cmp	%o0, %o1
+	bl	2f
+	 nop
+	sub	%o0, %o1, %o0
+1:
+	cmp	%o0, %o1
+	bge,a	1b
+	 sub	%o0, %o1, %o0
+2:
+	retl
+	 nop
+
+#endif /* TIGHT */
+

@@ -1,0 +1,19 @@
+Prototype 4
+
+Serious DisplayDriver API changes
+Support of cursordata-based SetCursor calls by test app (ServerCursor translates them to 32-bit bitmaps)
+TestApp has been modified to test the graphics access module
+Implemented many, many BView graphics calls and appropriate protocols
+BShape, BRegion, and BPolygon graphics calls not implemented.
+BFont-based calls, save DrawString and SetFontSize, are unimplemented.
+Partial foundation laid for BBitmap support
+
+Prototype 3
+
+Added GUI and hardcoded cursor
+
+
+Prototype 2
+
+Adding and removing test applications
+Quitting server causes all test apps to quit also
