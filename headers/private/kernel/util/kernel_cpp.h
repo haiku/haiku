@@ -11,6 +11,9 @@
 #include <stdlib.h>
 
 
+using namespace std;
+
+
 // Oh no! C++ in the kernel! Are you nuts?
 //
 //	- no exceptions
