@@ -172,9 +172,9 @@ free_chunk::SetToAllocated(void *allocated)
 
 
 void
-heap_release(void)
+heap_release(stage2_args *args)
 {
-	platform_release_heap(sHeapBase);
+	platform_release_heap(args, sHeapBase);
 }
 
 
