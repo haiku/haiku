@@ -6,6 +6,7 @@
  * Markus Kuhn -- 2001-09-08 -- public domain
  */
 
+#include <sys/types.h>
 #include <wchar.h>
 
 struct interval {
