@@ -1,6 +1,6 @@
 /* File System Interface Layer Definition
  *
- * Copyright 2004, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2005, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INTERFACE_H
@@ -156,6 +156,7 @@ typedef struct file_system_info {
 
 /* file system add-ons only prototypes */
 extern status_t new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode);
+extern status_t publish_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode);
 extern status_t get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_privateNode);
 extern status_t put_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t remove_vnode(mount_id mountID, vnode_id vnodeID);
