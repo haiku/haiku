@@ -599,7 +599,8 @@ private:
 			bool		attachView( BView *aView );
 			bool		addToList( BView *aView, BView *before = NULL);
 			bool		removeFromList();
-			bool		callDetachHooks( BView *aView );			
+			void		callAttachHooks( BView *aView );
+			void		callDetachHooks( BView *aView );
 
 				// Debugging methods
 			void 		PrintToStream();
