@@ -1,7 +1,8 @@
 SubDir OBOS_TOP src kernel libroot posix locale ;
 
 KernelMergeObject posix_locale.o :
-	<$(SOURCE_GRIST)>ctype.c
-	<$(SOURCE_GRIST)>localeconv.c
+	ctype.c
+	localeconv.c
+	setlocale.c
 	: -fPIC -DPIC
 	;
