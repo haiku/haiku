@@ -11,6 +11,7 @@
 #include <Entry.h>
 #include <Path.h>
 
+#include <cctype>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -23,6 +24,8 @@
 #include <ChainRunner.h>
 #include <crypt.h>
 #include <unistd.h>
+
+#include <map>
 
 #include "smtp.h"
 #ifndef USESSL
@@ -127,10 +130,96 @@ MD5HexHmac(char *hexdigest,
 {
 	unsigned char digest[16];
 	int i;
+	unsigned char c;
 
 	MD5Hmac(digest, text, text_len, key, key_len);
-	for (i = 0; i < 16; i++)
-		sprintf(hexdigest + 2 * i, "%02x", digest[i]);
+  	for (i = 0;  i < 16;  i++) {
+  		c = digest[i];
+		*hexdigest++ = (c > 0x9F ? 'a'-10 : '0')+(c>>4);
+		*hexdigest++ = ((c&0x0F) > 9 ? 'a'-10 : '0')+(c&0x0F);
+  	}
+  	*hexdigest = '\0';
+}
+
+
+/*
+** Function: MD5Sum
+** generates an MD5-sum from the given string
+*/
+void 
+MD5Sum (char* sum, unsigned char *text, int text_len) {
+	MD5_CTX context;
+	MD5_Init(&context);
+	MD5_Update(&context, text, text_len);
+	MD5_Final((unsigned char*)sum, &context);
+	sum[16] = '\0';
+}
+
+/*
+** Function: MD5Digest
+** generates an MD5-digest from the given string
+*/
+void MD5Digest (char* hexdigest, unsigned char *text, int text_len) {
+	int i;
+	unsigned char digest[17];
+	unsigned char c;
+	
+	MD5Sum((char*)digest, text, text_len);
+
+  	for (i = 0;  i < 16;  i++) {
+  		c = digest[i];
+		*hexdigest++ = (c > 0x9F ? 'a'-10 : '0')+(c>>4);
+		*hexdigest++ = ((c&0x0F) > 9 ? 'a'-10 : '0')+(c&0x0F);
+  	}
+  	*hexdigest = '\0';
+}
+
+/*
+** Function: SplitChallengeIntoMap
+** splits a challenge-string into the given map (see RFC-2831)
+*/
+// :
+static bool
+SplitChallengeIntoMap(BString str, map<BString,BString>& m)
+{
+	m.clear();
+	const char* key;
+	const char* val;
+	char* s = (char*)str.String();
+	while(*s != 0) {
+		while(isspace(*s))
+			s++;
+		key = s;
+		while(isalpha(*s))
+			s++;
+		if (*s != '=')
+			return false;
+		*s++ = '\0';
+		while(isspace(*s))
+			s++;
+		if (*s=='"') {
+			val = ++s;
+			while(*s!='"') {
+				if (*s == 0)
+					return false;
+				s++;
+			}			
+			*s++ = '\0';
+		} else {
+			val = s;
+			while(*s!=0 && *s!=',' && !isspace(*s))
+				s++;
+			if (*s != 0)
+				*s++ = '\0';
+		}
+		m[key] = val;
+		while(isspace(*s))
+			s++;
+		if (*s != ',')
+			return false;
+		s++;
+	}
+	return true;
 }
 
 
@@ -372,8 +461,10 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 				fAuthType |= PLAIN;
 			if(::strstr(p, "CRAM-MD5"))
 				fAuthType |= CRAM_MD5;
-			if(::strstr(p, "DIGEST-MD5"))
+			if(::strstr(p, "DIGEST-MD5")) {
 				fAuthType |= DIGEST_MD5;
+				fServerName = address;
+			}
 		}
 	}
 	return B_OK;
@@ -465,16 +556,92 @@ SMTPProtocol::Login(const char *_login, const char *password)
 	int32 loginlen = ::strlen(login);
 	int32 passlen = ::strlen(password);
 
+	if (fAuthType & DIGEST_MD5) {
+		//******* DIGEST-MD5 Authentication ( tested. works fine [with Cyrus SASL] )
+		// this implements only the subpart of DIGEST-MD5 which is 
+		// required for authentication to SMTP-servers. Integrity-
+		// and confidentiality-protection are not implemented, as
+		// they are provided by the use of OpenSSL.
+		SendCommand("AUTH DIGEST-MD5"CRLF);
+		const char *res = fLog.String();
+
+		if (strncmp(res, "334", 3) != 0)
+			return B_ERROR;
+		int32 baselen = ::strlen(&res[4]);
+		char *base = new char[baselen+1];
+		baselen = ::decode_base64(base, &res[4], baselen);
+		base[baselen] = '\0';
+
+		D(bug("base: %s\n", base));
+
+		map<BString,BString> challengeMap;
+		SplitChallengeIntoMap(base, challengeMap);
+
+		BString rawResponse = BString("username=") << '"' << login << '"';
+		rawResponse << ",realm=" << '"' << challengeMap["realm"] << '"';
+		rawResponse << ",nonce=" << '"' << challengeMap["nonce"] << '"';
+		rawResponse << ",nc=00000001";
+		char temp[33];
+		for( int i=0; i<32; ++i)
+			temp[i] = 1+(rand()%254);
+		temp[33] = '\0';
+		BString rawCnonce(temp);
+		BString cnonce;
+		char* cnoncePtr = cnonce.LockBuffer(rawCnonce.Length()*2);
+		baselen = ::encode_base64(cnoncePtr, rawCnonce.String(), rawCnonce.Length(), true /* headerMode */);
+		cnoncePtr[baselen] = '\0';
+		cnonce.UnlockBuffer(baselen);
+		rawResponse << ",cnonce=" << '"' << cnonce << '"';
+		rawResponse << ",qop=auth";
+		BString digestUriValue	= BString("smtp/") << fServerName;
+		rawResponse << ",digest-uri=" << '"' << digestUriValue << '"';
+		char sum[17], hex_digest2[33];
+		BString a1,a2,kd;
+		BString t1 = BString(login) << ":" 
+				<< challengeMap["realm"] << ":" 
+				<< password;
+		MD5Sum(sum, (unsigned char*)t1.String(), t1.Length());
+		a1 << sum << ":" << challengeMap["nonce"] << ":" << cnonce;
+		MD5Digest(hex_digest, (unsigned char*)a1.String(), a1.Length());
+		a2 << "AUTHENTICATE:" << digestUriValue;
+		MD5Digest(hex_digest2, (unsigned char*)a2.String(), a2.Length());
+		kd << hex_digest << ':' << challengeMap["nonce"] 
+		   << ":" << "00000001" << ':' << cnonce << ':' << "auth" 
+		   << ':' << hex_digest2;
+		MD5Digest(hex_digest, (unsigned char*)kd.String(), kd.Length());
+
+		rawResponse << ",response=" << hex_digest;
+		rawResponse << ",charset=utf-8";
+		BString postResponse;
+		char *resp = postResponse.LockBuffer(rawResponse.Length() * 2 + 10);
+		baselen = ::encode_base64(resp, rawResponse.String(), rawResponse.Length(), true /* headerMode */);
+		resp[baselen] = 0;
+		postResponse.UnlockBuffer();
+		postResponse.Append(CRLF);
+
+		SendCommand(postResponse.String());
+
+		res = fLog.String();
+		if (atol(res) >= 500)
+			return B_ERROR;
+		// actually, we are supposed to check the rspauth sent back
+		// by the SMTP-server, but that isn't strictly required,
+		// so we skip that for now.
+		SendCommand(CRLF);	// finish off authentication
+		res = fLog.String();
+		if (atol(res) < 500)
+			return B_OK;
+	}
 	if (fAuthType & CRAM_MD5) {
-		//******* CRAM-MD5 Authentication ( not tested yet.)
+		//******* CRAM-MD5 Authentication ( tested. works fine [with Cyrus SASL] )
 		SendCommand("AUTH CRAM-MD5"CRLF);
 		const char *res = fLog.String();
 
 		if (strncmp(res, "334", 3) != 0)
 			return B_ERROR;
-		char *base = new char[::strlen(&res[4])+1];
-		int32 baselen = ::strlen(base);
-		baselen = ::decode_base64(base, base, baselen);
+		int32 baselen = ::strlen(&res[4]);
+		char *base = new char[baselen+1];
+		baselen = ::decode_base64(base, &res[4], baselen);
 		base[baselen] = '\0';
 
 		D(bug("base: %s\n", base));
@@ -500,10 +667,6 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		res = fLog.String();
 		if (atol(res) < 500)
 			return B_OK;
-	}
-	if (fAuthType & DIGEST_MD5) {
-		//******* DIGEST-MD5 Authentication ( not written yet..)
-		fLog = "DIGEST-MD5 Authentication is not supported";
 	}
 	if (fAuthType & LOGIN) {
 		//******* LOGIN Authentication ( tested. works fine)
@@ -540,13 +703,20 @@ SMTPProtocol::Login(const char *_login, const char *password)
 			return B_OK;
 	}
 	if (fAuthType & PLAIN) {
-		//******* PLAIN Authentication ( not tested yet.)
+		//******* PLAIN Authentication ( tested. works fine [with Cyrus SASL] )
+		// format is:
+		// 	authenticateID + \0 + username + \0 + password
+		// 	(where authenticateID is always empty !?!)
 		BString preResponse, postResponse;
 		char *stringPntr;
 		ssize_t encodedLength;
-		stringPntr = preResponse.LockBuffer(loginlen * 2 + passlen + 3);
-		sprintf (stringPntr, "%s%c%s%c%s", login, 0, login, 0, password);
-		preResponse.UnlockBuffer(loginlen * 2 + passlen + 3);
+		stringPntr = preResponse.LockBuffer(loginlen + passlen + 3);
+			// +3 to make room for the two \0-chars between the tokens and
+			// the final delimiter added by sprintf().
+		sprintf (stringPntr, "%c%s%c%s", 0, login, 0, password);
+		preResponse.UnlockBuffer(loginlen + passlen + 2);
+			// +2 in order to leave out the final delimiter (which is not part
+			// of the string).
 		stringPntr = postResponse.LockBuffer(preResponse.Length() * 3);
 		encodedLength = ::encode_base64(stringPntr, preResponse.String(),
 			preResponse.Length(), true /* headerMode */);

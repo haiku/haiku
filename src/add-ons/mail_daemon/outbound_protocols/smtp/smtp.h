@@ -51,6 +51,7 @@ class SMTPProtocol : public BMailFilter {
 		#endif
 
 		status_t fStatus;
+		BString fServerName;		// required for DIGEST-MD5
 };
 
 #endif	/* ZOIDBERG_SMTP_H */
