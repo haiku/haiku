@@ -170,6 +170,6 @@ void
 __sinit()
 {
 	/* make sure we clean up on exit */
-	__cleanup = _cleanup;		/* conservative */
+	_IO_cleanup = _cleanup;		/* conservative */
 	__sdidinit = 1;
 }

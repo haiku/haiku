@@ -68,7 +68,7 @@ __smakebuf(fp)
 		fp->_bf._size = 1;
 		return;
 	}
-	__cleanup = _cleanup;
+	_IO_cleanup = _cleanup;
 	flags |= __SMBF;
 	fp->_bf._base = fp->_p = p;
 	fp->_bf._size = size;

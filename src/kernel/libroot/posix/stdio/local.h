@@ -48,7 +48,7 @@ fpos_t   __sseek (void *, fpos_t, int);
 int      __sclose (void *);
 void     __sinit (void);
 void     _cleanup (void);
-void     (*__cleanup) (void);
+void     (*_IO_cleanup) (void);
 void     __smakebuf (FILE *);
 int      __swhatbuf (FILE *, size_t *, int *);
 int      _fwalk (int (*)(FILE *));
