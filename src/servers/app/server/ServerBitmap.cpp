@@ -94,6 +94,33 @@ uint32 ServerBitmap::BitsLength(void)
 	return (uint32)(_bytesperrow*_height);
 }
 
+/*! 
+	\brief Internal function used by subclasses
+	
+	Subclasses should call this so the buffer can automagically
+	be allocated on the heap.
+*/
+void ServerBitmap::_AllocateBuffer(void)
+{
+	if(_buffer!=NULL)
+		delete _buffer;
+	_buffer=new uint8[BitsLength()];
+}
+
+/*!
+	\brief Internal function used by subclasses
+	
+	Subclasses should call this to free the internal buffer.
+*/
+void ServerBitmap::_FreeBuffer(void)
+{
+	if(_buffer!=NULL)
+	{
+		delete _buffer;
+		_buffer=NULL;
+	}
+}
+
 /*!
 	\brief Internal function used to translate color space values to appropriate internal
 	values. 

@@ -333,7 +333,8 @@ void DisplayDriver::SetCursor(ServerCursor *cursor)
 
 	Bounds checking must be done in this call because only part of the arc may end up
 	being clipped.
-*/void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+*/
+void DisplayDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
 }
 

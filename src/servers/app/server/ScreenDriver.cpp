@@ -93,11 +93,20 @@ FrameBuffer::FrameBuffer(const char *title, uint32 space, status_t *st,bool debu
 	serverlink=new PortLink(serverport);
 	mousepos.Set(0,0);
 	buttons=0;
+
+#ifdef ENABLE_INPUT_SERVER_EMULATION
+	// View exists to poll for the mouse
+	view=new BView(Bounds(),"view",0,0);
+	AddChild(view);
+	monitor_thread=spawn_thread(MouseMonitor,"mousemonitor",B_NORMAL_PRIORITY,this);
+	resume_thread(monitor_thread);
+#endif
 }
 
 FrameBuffer::~FrameBuffer(void)
 {
 	delete serverlink;
+	kill_thread(monitor_thread);
 }
 
 void FrameBuffer::ScreenConnected(bool connected)
@@ -135,6 +144,7 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					write_port(serverport,B_QUIT_REQUESTED,NULL,0);
 					break;
 				}
+/*
 #ifdef ENABLE_INPUT_SERVER_EMULATION
 				case 0x57:	// up arrow
 				{
@@ -293,15 +303,33 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 					break;
 				}
 #endif	// end server emu code
-				default:
+*/				default:
 					break;
 			}
 		}
-		case B_MODIFIERS_CHANGED:
+
+#ifdef ENABLE_INPUT_SERVER_EMULATION
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float x,y;
+			msg->FindFloat("be:wheel_delta_x",&x);
+			msg->FindFloat("be:wheel_delta_y",&y);
+			int64 time=real_time_clock();
+			serverlink->SetOpCode(B_MOUSE_WHEEL_CHANGED);
+			serverlink->Attach(&time,sizeof(int64));
+			serverlink->Attach(x);
+			serverlink->Attach(y);
+			serverlink->Flush();
+			break;
+		}
+#endif
+
+/*		case B_MODIFIERS_CHANGED:
 		{
 			int32 modifiers;
 			if(msg->FindInt32("modifiers",&modifiers)==B_OK)
 			{
+
 #ifdef ENABLE_INPUT_SERVER_EMULATION
 
 				uint32 clicks=1; // can't get the # of clicks without a *lot* of extra work :(
@@ -362,7 +390,7 @@ void FrameBuffer::MessageReceived(BMessage *msg)
 			}
 			break;
 		}
-		default:
+*/		default:
 			BWindowScreen::MessageReceived(msg);
 	}
 }
@@ -377,6 +405,93 @@ bool FrameBuffer::QuitRequested(void)
 	return true;
 }
 
+int32 FrameBuffer::MouseMonitor(void *data)
+{
+	FrameBuffer *fb=(FrameBuffer*)data;
+	BPoint mousepos(0,0),oldpos(0,0);
+	uint32 buttons=0, oldbuttons=0;
+	uint32 clicks=1;		 // TODO: add multiclick support
+	uint32 mods;
+	int64 time;
+	
+	fb->Lock();
+	PortLink *link=new PortLink(fb->serverlink->GetPort());
+	fb->Unlock();
+
+	while(1)
+	{
+		if(fb->IsConnected())
+		{
+			// Get the mouse position
+			fb->Lock();
+			fb->view->GetMouse(&mousepos,&buttons);
+			fb->Unlock();
+			
+			// Check for changes and post messages as necessary
+			
+			// Mouse button change?
+			if(buttons!=oldbuttons)
+			{
+				time=(int64)real_time_clock();
+				mods=modifiers();
+				if(oldbuttons==0)
+				{
+					// MouseDown
+					link->SetOpCode(B_MOUSE_DOWN);
+					link->Attach(&time, sizeof(int64));
+					link->Attach(&mousepos.x,sizeof(float));
+					link->Attach(&mousepos.y,sizeof(float));
+					link->Attach(&mods, sizeof(uint32));
+					link->Attach(&buttons, sizeof(uint32));
+					link->Attach(&clicks, sizeof(uint32));
+					link->Flush();
+				}
+				else
+				{
+					// MouseUp
+					link->SetOpCode(B_MOUSE_UP);
+					link->Attach(&time, sizeof(int64));
+					link->Attach(&mousepos.x,sizeof(float));
+					link->Attach(&mousepos.y,sizeof(float));
+					link->Attach(&mods, sizeof(uint32));
+					link->Flush();
+				}
+				oldbuttons=buttons;
+			}
+			
+			// Mouse Position change?
+			if( (mousepos.x!=oldpos.x) || (mousepos.y!=oldpos.y))
+			{
+				time=(int64)real_time_clock();
+				mods=modifiers();
+
+				// B_MOUSE_MOVED
+				link->SetOpCode(B_MOUSE_MOVED);
+				link->Attach(&time, sizeof(int64));
+				link->Attach(&mousepos.x,sizeof(float));
+				link->Attach(&mousepos.y,sizeof(float));
+				link->Attach(&mods, sizeof(int32));
+				link->Attach(&buttons, sizeof(uint32));
+				link->Attach(&clicks, sizeof(uint32));
+				link->Flush();
+				oldpos=mousepos;
+			}
+			
+			// Mouse wheel support messages are actually sent to BWindowScreens,
+			// so we handle that in MessageReceived
+		}
+		snooze(150);
+	}
+
+	delete link;
+}
+
+/*!
+	\brief Sets up internal variables needed by all DisplayDriver subclasses
+	
+	Subclasses should follow DisplayDriver's lead and use this function mostly
+	for initializing data members.
+*/
 ScreenDriver::ScreenDriver(void) : DisplayDriver()
 {
 	status_t st;
@@ -392,6 +507,11 @@ ScreenDriver::ScreenDriver(void) : DisplayDriver()
 	_SetBytesPerRow(fbuffer->FrameBufferInfo()->bytes_per_row);
 }
 
+/*!
+	\brief Deletes the locking semaphore
+	
+	Subclasses should use the destructor mostly for freeing allocated heap space.
+*/
 ScreenDriver::~ScreenDriver(void)
 {
 	if(cursor)
@@ -400,6 +520,13 @@ ScreenDriver::~ScreenDriver(void)
 		delete under_cursor;
 }
 
+/*!
+	\brief Initializes the driver object.
+	\return true if successful, false if not
+	
+	Initialize sets up the driver for display, including the initial clearing
+	of the screen. If things do not go as they should, false should be returned.
+*/
 bool ScreenDriver::Initialize(void)
 {
 	fbuffer->Show();
@@ -426,12 +553,40 @@ bool ScreenDriver::Initialize(void)
 	return true;
 }
 
+/*!
+	\brief Shuts down the driver's video subsystem
+	
+	Any work done by Initialize() should be undone here. Note that Shutdown() is
+	called even if Initialize() was unsuccessful.
+*/
 void ScreenDriver::Shutdown(void)
 {
 	fbuffer->Lock();
 	fbuffer->Quit();
 }
 
+/*!
+	\brief Called for all BView::CopyBits calls
+	\param src Source rectangle.
+	\param dest Destination rectangle.
+	
+	Bounds checking must be done in this call. If the destination is not the same size 
+	as the source, the source should be scaled to fit.
+*/
+void ScreenDriver::CopyBits(BRect src, BRect dest)
+{
+}
+
+/*!
+	\brief Called for all BView::DrawBitmap calls
+	\param bmp Bitmap to be drawn. It will always be non-NULL and valid. The color 
+	space is not guaranteed to match.
+	\param src Source rectangle
+	\param dest Destination rectangle. Source will be scaled to fit if not the same size.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	
+	Bounds checking must be done in this call.
+*/
 void ScreenDriver::DrawBitmap(ServerBitmap *bitmap, BRect source, BRect dest, LayerData *d)
 {
 	_Lock();
@@ -471,10 +626,47 @@ void ScreenDriver::DrawBitmap(ServerBitmap *bitmap, BRect source, BRect dest, La
 	_Unlock();
 }
 
-// Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on
-// to support our API
+/*!
+	\brief Called for all BView::FillArc calls
+	\param r Rectangle enclosing the entire arc
+	\param angle Starting angle for the arc in degrees
+	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the arc may end up
+	being clipped.
+*/
+void ScreenDriver::FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
+{
+}
+
+/*!
+	\brief Called for all BView::FillBezier calls.
+	\param pts 4-element array of BPoints in the order of start, end, and then the two control
+	points. 
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call.
+*/
+void ScreenDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
+{
+}
+
+/*!
+	\brief Called for all BView::FillEllipse calls
+	\param r BRect enclosing the ellipse to be drawn.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the ellipse may end up
+	being clipped.
+*/
 void ScreenDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 {
+// Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on
+// to support our API
 	long d, b_sq, b_sq_4, b_sq_6;
 	long a_sq, a_sq_4, a_sq_6;
 	int x, y, switchem;
@@ -559,6 +751,13 @@ void ScreenDriver::FillEllipse(BRect r, LayerData *ldata, int8 *pat)
 	}
 }
 
+/*!
+	\brief Called for all BView::FillRect calls
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+*/
 void ScreenDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 {
 	_Lock();
@@ -572,11 +771,33 @@ void ScreenDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 	_Unlock();
 }
 
+/*!
+	\brief Called for all BView::FillRoundRect calls
+	\param r The rectangle itself
+	\param xrad X radius of the corner arcs
+	\param yrad Y radius of the corner arcs
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the roundrect may end 
+	up being clipped.
+*/
 void ScreenDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
 	FillRect(r,d,pat);
 }
 
+/*!
+	\brief Called for all BView::FillTriangle calls
+	\param pts Array of 3 BPoints. Always non-NULL.
+	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
+	it may not be within the frame buffer's bounds.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the triangle may end 
+	up being clipped.
+*/
 void ScreenDriver::FillTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
 	if(!pts || !d || !pat)
@@ -814,6 +1035,13 @@ void ScreenDriver::SetPixel8(int x, int y, uint8 col)
 
 }
 
+/*!
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param mode constant as defined in GraphicsDefs.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
 void ScreenDriver::SetMode(int32 space)
 {
 	_Lock();
@@ -843,9 +1071,20 @@ void ScreenDriver::SetMode(int32 space)
 }
 
 
-// Currently does not support pattern
+/*!
+	\brief Called for all BView::StrokeArc calls
+	\param r Rectangle enclosing the entire arc
+	\param angle Starting angle for the arc in degrees
+	\param span Span of the arc in degrees. Ending angle = angle+span.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the arc may end up
+	being clipped.
+*/
 void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int8 *pat)
 {
+// TODO: Add pattern support
 	float xc = (r.left+r.right)/2;
 	float yc = (r.top+r.bottom)/2;
 	float rx = r.Width()/2;
@@ -995,9 +1234,18 @@ void ScreenDriver::StrokeArc(BRect r, float angle, float span, LayerData *d, int
 	}
 }
 
-// Currently does not support pattern
+/*!
+	\brief Called for all BView::StrokeBezier calls.
+	\param pts 4-element array of BPoints in the order of start, end, and then the two control
+	points. 
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call.
+*/
 void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
+// TODO: Add pattern support
 	double Ax, Bx, Cx, Dx;
 	double Ay, By, Cy, Dy;
 	int x, y;
@@ -1049,10 +1297,19 @@ void ScreenDriver::StrokeBezier(BPoint *pts, LayerData *d, int8 *pat)
 	}
 }
 
-// Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on
-// to support our API
+/*!
+	\brief Called for all BView::StrokeEllipse calls
+	\param r BRect enclosing the ellipse to be drawn.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the ellipse may end up
+	being clipped.
+*/
 void ScreenDriver::StrokeEllipse(BRect r, LayerData *ldata, int8 *pat)
 {
+// Ellipse code shamelessly stolen from the graphics library gd v2.0.1 and bolted on
+// to support our API
 	long d, b_sq, b_sq_4, b_sq_6;
 	long a_sq, a_sq_4, a_sq_6;
 	int x, y, switchem;
@@ -1144,6 +1401,16 @@ void ScreenDriver::StrokeEllipse(BRect r, LayerData *ldata, int8 *pat)
 
 }
 
+/*!
+	\brief Draws a line. Really.
+	\param start Starting point
+	\param end Ending point
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+	
+	The endpoints themselves are guaranteed to be in bounds, but clipping for lines with
+	a thickness greater than 1 will need to be done.
+*/
 void ScreenDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 {
 	_Lock();
@@ -1190,6 +1457,17 @@ void ScreenDriver::StrokeLine(BPoint start, BPoint end, LayerData *d, int8 *pat)
 	_Unlock();
 }
 
+/*!
+	\brief Called for all BView::StrokePolygon calls
+	\param ptlist Array of BPoints defining the polygon.
+	\param numpts Number of points in the BPoint array.
+	\param rect Rectangle which contains the polygon
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	The points in the array are not guaranteed to be within the framebuffer's 
+	coordinate range.
+*/
 void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat, bool is_closed=true)
 {
 	_Lock();
@@ -1204,6 +1482,13 @@ void ScreenDriver::StrokePolygon(BPoint *ptlist, int32 numpts, BRect rect, Layer
 	_Unlock();
 }
 
+/*!
+	\brief Called for all BView::StrokeRect calls
+	\param r BRect to be filled. Guaranteed to be in the frame buffer's coordinate space
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+*/
 void ScreenDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 {
 	_Lock();
@@ -1217,6 +1502,17 @@ void ScreenDriver::StrokeRect(BRect r, LayerData *d, int8 *pat)
 	_Unlock();
 }
 
+/*!
+	\brief Called for all BView::StrokeRoundRect calls
+	\param r The rect itself
+	\param xrad X radius of the corner arcs
+	\param yrad Y radius of the corner arcs
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the roundrect may end 
+	up being clipped.
+*/
 void ScreenDriver::StrokeRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
 // TODO: Implement
@@ -1225,6 +1521,17 @@ printf("ScreenDriver::StrokeRoundRect( (%f,%f,%f,%f), %llx) ---->Unimplemented<-
 	StrokeRect(r,d,pat);
 }
 
+/*!
+	\brief Called for all BView::StrokeTriangle calls
+	\param pts Array of 3 BPoints. Always non-NULL.
+	\param r BRect enclosing the triangle. While it will definitely enclose the triangle,
+	it may not be within the frame buffer's bounds.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+	\param pat 8-byte array containing the pattern to use. Always non-NULL.
+
+	Bounds checking must be done in this call because only part of the triangle may end 
+	up being clipped.
+*/
 void ScreenDriver::StrokeTriangle(BPoint *pts, BRect r, LayerData *d, int8 *pat)
 {
 	_Lock();
@@ -1337,6 +1644,14 @@ void ScreenDriver::HideCursor(void)
 	_Unlock();
 }
 
+/*!
+	\brief Moves the cursor to the given point.
+
+	The coordinates passed to MoveCursorTo are guaranteed to be within the frame buffer's
+	range, but the cursor data itself will need to be clipped. A check to see if the 
+	cursor is obscured should be made and if so, a call to _SetCursorObscured(false) 
+	should be made the cursor in addition to displaying at the passed coordinates.
+*/
 void ScreenDriver::MoveCursorTo(float x, float y)
 {
 	_Lock();
@@ -1352,6 +1667,14 @@ void ScreenDriver::MoveCursorTo(float x, float y)
 	_Unlock();
 }
 
+/*!
+	\brief Shows the cursor.
+	
+	Show calls are not nestable, unlike that of the BApplication class. Subclasses should
+	call _SetCursorHidden(false) somewhere within this function to ensure that data is
+	maintained accurately. Subclasses must call DisplayDriver::ShowCursor at some point
+	to ensure proper state tracking.
+*/
 void ScreenDriver::ShowCursor(void)
 {
 	_Lock();
@@ -1364,6 +1687,14 @@ void ScreenDriver::ShowCursor(void)
 	_Unlock();
 }
 
+/*!
+	\brief Obscures the cursor.
+	
+	Obscure calls are not nestable. Subclasses should call DisplayDriver::ObscureCursor
+	somewhere within this function to ensure that data is maintained accurately. A check
+	will be made by the system before the next MoveCursorTo call to show the cursor if
+	it is obscured.
+*/
 void ScreenDriver::ObscureCursor(void)
 {
 	_Lock();
@@ -1373,6 +1704,14 @@ void ScreenDriver::ObscureCursor(void)
 	_Unlock();
 }
 
+/*!
+	\brief Changes the cursor.
+	\param cursor The new cursor. Guaranteed to be non-NULL.
+	
+	The driver does not take ownership of the given cursor. Subclasses should make
+	a copy of the cursor passed to it. The default version of this function hides the
+	cursory, replaces it, and shows the cursor if previously visible.
+*/
 void ScreenDriver::SetCursor(ServerCursor *csr)
 {
 	if(!csr)
@@ -1856,6 +2195,17 @@ float ScreenDriver::StringHeight(const char *string, int32 length, LayerData *d)
 	return returnval;
 }
 
+/*!
+	\brief Utilizes the font engine to draw a string to the frame buffer
+	\param string String to be drawn. Always non-NULL.
+	\param length Number of characters in the string to draw. Always greater than 0. If greater
+	than the number of characters in the string, draw the entire string.
+	\param pt Point at which the baseline starts. Characters are to be drawn 1 pixel above
+	this for backwards compatibility. While the point itself is guaranteed to be inside
+	the frame buffers coordinate range, the clipping of each individual glyph must be
+	performed by the driver itself.
+	\param d Data structure containing any other data necessary for the call. Always non-NULL.
+*/
 void ScreenDriver::DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *edelta=NULL)
 {
 	if(!string || !d || !d->font)

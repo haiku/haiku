@@ -55,6 +55,7 @@ public:
 	void MouseDown(BPoint pt);
 	void MouseMoved(BPoint pt, uint32 transit, const BMessage *msg);
 	void MouseUp(BPoint pt);
+	void MessageReceived(BMessage *msg);
 		
 	BBitmap *viewbmp;
 	PortLink *serverlink;

@@ -90,22 +90,9 @@ protected:
 	
 	//! Internal function used by the BitmapManager.
 	void _SetBuffer(void *ptr) { _buffer=(uint8*)ptr; }
+	void _AllocateBuffer(void);
+	void _FreeBuffer(void);
 	
-	/*! 
-		\brief Internal function used by subclasses
-		
-		Subclasses should call this so the buffer can automagically
-		be allocated on the heap.
-	*/
-	void _AllocateBuffer(void) { if(_buffer!=NULL) delete _buffer; _buffer=new uint8[BitsLength()]; }
-
-	/*!
-		\brief Internal function used by subclasses
-		
-		Subclasses should call this to free the internal buffer.
-	*/
-	void _FreeBuffer(void) { if(_buffer!=NULL) { delete _buffer; _buffer=NULL; } }
-
 	void _HandleSpace(color_space space, int32 bytesperline=-1);
 
 	bool _initialized;

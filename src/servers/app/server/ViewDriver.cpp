@@ -202,6 +202,31 @@ void VDView::MouseUp(BPoint pt)
 #endif
 }
 
+void VDView::MessageReceived(BMessage *msg)
+{
+	switch(msg->what)
+	{
+#ifdef ENABLE_INPUT_SERVER_EMULATION
+		case B_MOUSE_WHEEL_CHANGED:
+		{
+			float x,y;
+			msg->FindFloat("be:wheel_delta_x",&x);
+			msg->FindFloat("be:wheel_delta_y",&y);
+			int64 time=real_time_clock();
+			serverlink->SetOpCode(B_MOUSE_WHEEL_CHANGED);
+			serverlink->Attach(&time,sizeof(int64));
+			serverlink->Attach(x);
+			serverlink->Attach(y);
+			serverlink->Flush();
+			break;
+		}
+#endif
+		default:
+			BView::MessageReceived(msg);
+			break;
+	}
+}
+
 VDWindow::VDWindow(void)
 	: BWindow(BRect(100,60,740,540),"OpenBeOS App Server",B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_NOT_RESIZABLE)
@@ -561,11 +586,16 @@ void ViewDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 
 void ViewDriver::FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat)
 {
-#ifdef DEBUG_DRIVER_MODULE
-printf("ViewDriver:: FillPolygon unimplemented\n");
-#endif
-	if(!pat || !ptlist)
+	if(!pat || !d)
 		return;
+	screenwin->Lock();
+	framebuffer->Lock();
+	SetLayerData(d);
+	drawview->FillPolygon(ptlist,numpts,rect,*((pattern*)pat));
+	drawview->Sync();
+	screenwin->view->Invalidate(rect);
+	framebuffer->Unlock();
+	screenwin->Unlock();
 }
 
 void ViewDriver::FillRect(BRect r, LayerData *d, int8 *pat)

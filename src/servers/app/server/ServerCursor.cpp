@@ -25,7 +25,7 @@
 //  
 //------------------------------------------------------------------------------
 #include "ServerCursor.h"
-
+#include <stdio.h>
 /*!
 	\brief Constructor
 	\param r Size of the cursor
@@ -50,7 +50,7 @@ ServerCursor::ServerCursor(BRect r, color_space cspace, int32 flags, BPoint hots
 	\param data pointer to 68-byte cursor data array. See BeBook entry for BCursor for details
 */
 ServerCursor::ServerCursor(int8 *data)
- : ServerBitmap(BRect(0,0,15,15),B_RGBA32,0,64)
+ : ServerBitmap(BRect(0,0,15,15),B_RGBA32,0)
 {
 	// 68-byte array used in R5 for holding cursors.
 	// This API has serious problems and should be deprecated(but supported) in R2
@@ -75,11 +75,12 @@ ServerCursor::ServerCursor(int8 *data)
 		// for each row in the cursor data
 		for(j=0;j<16;j++)
 		{
-			bmppos=(uint32*)(_buffer+ (j*64) );
+			bmppos=(uint32*)(_buffer+ (j*BytesPerRow()) );
 	
 			// On intel, our bytes end up swapped, so we must swap them back
 			cursorflip=(cursorpos[j] & 0xFF) << 8;
 			cursorflip |= (cursorpos[j] & 0xFF00) >> 8;
+			
 			maskflip=(maskpos[j] & 0xFF) << 8;
 			maskflip |= (maskpos[j] & 0xFF00) >> 8;
 	
@@ -87,11 +88,13 @@ ServerCursor::ServerCursor(int8 *data)
 			for(i=0;i<16;i++)
 			{
 				// Get the values and dump them to the bitmap
-				powval=((15-i) * (15-i));
+				powval=1 << (15-i);
 				cursorval=cursorflip & powval;
 				maskval=maskflip & powval;
 				bmppos[i]=((cursorval!=0)?black:white) & ((maskval>0)?0xFFFFFFFF:0x00FFFFFF);
+				printf("%c",((cursorval!=0)?'*':'-'));
 			}
+			printf("\n");
 		}
 	}
 	else

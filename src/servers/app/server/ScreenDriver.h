@@ -37,6 +37,7 @@
 #include <Locker.h>
 #include <Region.h>	// for clipping_rect definition
 #include <Bitmap.h>
+#include <OS.h>
 #include "DisplayDriver.h"
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -58,13 +59,15 @@ public:
 	void MessageReceived(BMessage *msg);
 	bool IsConnected(void) const { return is_connected; }
 	bool QuitRequested(void);
-	
+	static int32 MouseMonitor(void *data);
 	graphics_card_info gcinfo;
 protected:
 	bool is_connected;
 	PortLink *serverlink;
 	BPoint mousepos;
 	uint32 buttons;
+	thread_id monitor_thread;
+	BView *view;
 };
 
 /*
@@ -98,13 +101,13 @@ public:
 	void Shutdown(void);
 	
 	// Settings functions
-//	virtual void CopyBits(BRect src, BRect dest);
+	virtual void CopyBits(BRect src, BRect dest);
 	virtual void DrawBitmap(ServerBitmap *bmp, BRect src, BRect dest, LayerData *d);
 //	virtual void DrawPicture(SPicture *pic, BPoint pt);
 	virtual void DrawString(const char *string, int32 length, BPoint pt, LayerData *d, escapement_delta *delta=NULL);
 
-//	virtual void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
-//	virtual void FillBezier(BPoint *pts, LayerData *d, int8 *pat);
+	virtual void FillArc(BRect r, float angle, float span, LayerData *d, int8 *pat);
+	virtual void FillBezier(BPoint *pts, LayerData *d, int8 *pat);
 	virtual void FillEllipse(BRect r, LayerData *d, int8 *pat);
 //	virtual void FillPolygon(BPoint *ptlist, int32 numpts, BRect rect, LayerData *d, int8 *pat);
 	virtual void FillRect(BRect r, LayerData *d, int8 *pat);

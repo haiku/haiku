@@ -94,10 +94,10 @@ AppServer::AppServer(void)
 	// Default cursor data stored in CursorData.cpp
 	
 	// TODO: fix the cursor display
-//	extern int8 default_cursor_data[];
-//	ServerCursor *sc=new ServerCursor(default_cursor_data);
-	extern int8 cross_cursor[];
-	ServerCursor *sc=new ServerCursor(cross_cursor);
+	extern int8 default_cursor_data[];
+	ServerCursor *sc=new ServerCursor(default_cursor_data);
+//	extern int8 cross_cursor[];
+//	ServerCursor *sc=new ServerCursor(cross_cursor);
 	cursormanager->AddCursor(sc);
 	cursormanager->ChangeCursor(B_CURSOR_DEFAULT, sc->ID());
 	cursormanager->SetCursor(B_CURSOR_DEFAULT);
@@ -199,6 +199,7 @@ int32 AppServer::PollerThread(void *data)
 				// them onto the window which is currently under the cursor.
 				case B_MOUSE_DOWN:
 				case B_MOUSE_UP:
+				case B_MOUSE_WHEEL_CHANGED:
 				{
 					if(!msgbuffer)
 						break;
@@ -214,7 +215,6 @@ int32 AppServer::PollerThread(void *data)
 					// 2) float - x coordinate of mouse click
 					// 3) float - y coordinate of mouse click
 					// 4) int32 - buttons down
-
 					index=msgbuffer;
 					if(!index)
 						break;
