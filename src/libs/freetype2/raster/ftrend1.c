@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType glyph rasterizer interface (body).                      */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2003 by                                     */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -140,10 +140,10 @@
     /* compute the control box, and grid fit it */
     FT_Outline_Get_CBox( outline, &cbox );
 
-    cbox.xMin &= -64;
-    cbox.yMin &= -64;
-    cbox.xMax  = ( cbox.xMax + 63 ) & -64;
-    cbox.yMax  = ( cbox.yMax + 63 ) & -64;
+    cbox.xMin = FT_PIX_FLOOR( cbox.xMin );
+    cbox.yMin = FT_PIX_FLOOR( cbox.yMin );
+    cbox.xMax = FT_PIX_CEIL( cbox.xMax );
+    cbox.yMax = FT_PIX_CEIL( cbox.yMax );
 
     width  = (FT_UInt)( ( cbox.xMax - cbox.xMin ) >> 6 );
     height = (FT_UInt)( ( cbox.yMax - cbox.yMin ) >> 6 );
@@ -151,17 +151,17 @@
     memory = render->root.memory;
 
     /* release old bitmap buffer */
-    if ( slot->flags & FT_GLYPH_OWN_BITMAP )
+    if ( slot->internal->flags & FT_GLYPH_OWN_BITMAP )
     {
       FT_FREE( bitmap->buffer );
-      slot->flags &= ~FT_GLYPH_OWN_BITMAP;
+      slot->internal->flags &= ~FT_GLYPH_OWN_BITMAP;
     }
 
     /* allocate new one, depends on pixel format */
     if ( !( mode & FT_RENDER_MODE_MONO ) )
     {
       /* we pad to 32 bits, only for backwards compatibility with FT 1.x */
-      pitch = ( width + 3 ) & -4;
+      pitch = FT_PAD_CEIL( width, 4 );
       bitmap->pixel_mode = FT_PIXEL_MODE_GRAY;
       bitmap->num_grays  = 256;
     }
@@ -178,7 +178,7 @@
     if ( FT_ALLOC( bitmap->buffer, (FT_ULong)pitch * height ) )
       goto Exit;
 
-    slot->flags |= FT_GLYPH_OWN_BITMAP;
+    slot->internal->flags |= FT_GLYPH_OWN_BITMAP;
 
     /* translate outline to render it into the bitmap */
     FT_Outline_Translate( outline, -cbox.xMin, -cbox.yMin );
@@ -193,9 +193,9 @@
 
     /* render outline into the bitmap */
     error = render->raster_render( render->raster, &params );
-    
+
     FT_Outline_Translate( outline, cbox.xMin, cbox.yMin );
-    
+
     if ( error )
       goto Exit;
 
@@ -212,7 +212,7 @@
   const FT_Renderer_Class  ft_raster1_renderer_class =
   {
     {
-      ft_module_renderer,
+      FT_MODULE_RENDERER,
       sizeof( FT_RendererRec ),
 
       "raster1",
@@ -245,7 +245,7 @@
   const FT_Renderer_Class  ft_raster5_renderer_class =
   {
     {
-      ft_module_renderer,
+      FT_MODULE_RENDERER,
       sizeof( FT_RendererRec ),
 
       "raster5",

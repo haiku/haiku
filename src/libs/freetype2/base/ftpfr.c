@@ -2,9 +2,9 @@
 /*                                                                         */
 /*  ftpfr.c                                                                */
 /*                                                                         */
-/*    FreeType API for accessing PFR-specific data                         */
+/*    FreeType API for accessing PFR-specific data (body).                 */
 /*                                                                         */
-/*  Copyright 2002 by                                                      */
+/*  Copyright 2002, 2003 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -16,48 +16,36 @@
 /***************************************************************************/
 
 #include <ft2build.h>
-#include FT_INTERNAL_PFR_H
 #include FT_INTERNAL_OBJECTS_H
+#include FT_SERVICE_PFR_H
 
 
- /* check the format */
-  static FT_Error
-  ft_pfr_check( FT_Face           face,
-                FT_PFR_Service   *aservice )
+  /* check the format */
+  static FT_Service_PfrMetrics
+  ft_pfr_check( FT_Face  face )
   {
-    FT_Error  error = FT_Err_Bad_Argument;
+    FT_Service_PfrMetrics  service;
 
-    if ( face && face->driver )
-    {
-      FT_Module    module = (FT_Module) face->driver;
-      const char*  name   = module->clazz->module_name;
 
-      if ( name[0] == 'p' &&
-           name[1] == 'f' &&
-           name[2] == 'r' &&
-           name[4] == 0   )
-      {
-        *aservice = (FT_PFR_Service) module->clazz->module_interface;
-        error = 0;
-      }
-    }
-    return error;
+    FT_FACE_LOOKUP_SERVICE( face, service, PFR_METRICS );
+
+    return service;
   }
 
 
-
   FT_EXPORT_DEF( FT_Error )
-  FT_Get_PFR_Metrics( FT_Face     face,
-                      FT_UInt    *aoutline_resolution,
-                      FT_UInt    *ametrics_resolution,
-                      FT_Fixed   *ametrics_x_scale,
-                      FT_Fixed   *ametrics_y_scale )
+  FT_Get_PFR_Metrics( FT_Face    face,
+                      FT_UInt   *aoutline_resolution,
+                      FT_UInt   *ametrics_resolution,
+                      FT_Fixed  *ametrics_x_scale,
+                      FT_Fixed  *ametrics_y_scale )
   {
-    FT_Error        error;
-    FT_PFR_Service  service;
+    FT_Error               error = FT_Err_Ok;
+    FT_Service_PfrMetrics  service;
 
-    error = ft_pfr_check( face, &service );
-    if ( !error )
+
+    service = ft_pfr_check( face );
+    if ( service )
     {
       error = service->get_metrics( face,
                                     aoutline_resolution,
@@ -65,8 +53,30 @@
                                     ametrics_x_scale,
                                     ametrics_y_scale );
     }
+    else if ( face )
+    {
+      FT_Fixed  x_scale, y_scale;
+
+
+      /* this is not a PFR font */
+      *aoutline_resolution = face->units_per_EM;
+      *ametrics_resolution = face->units_per_EM;
+
+      x_scale = y_scale = 0x10000L;
+      if ( face->size )
+      {
+        x_scale = face->size->metrics.x_scale;
+        y_scale = face->size->metrics.y_scale;
+      }
+      *ametrics_x_scale = x_scale;
+      *ametrics_y_scale = y_scale;
+    }
+    else
+      error = FT_Err_Invalid_Argument;
+
     return error;
   }
+
 
   FT_EXPORT_DEF( FT_Error )
   FT_Get_PFR_Kerning( FT_Face     face,
@@ -74,32 +84,43 @@
                       FT_UInt     right,
                       FT_Vector  *avector )
   {
-    FT_Error        error;
-    FT_PFR_Service  service;
+    FT_Error               error;
+    FT_Service_PfrMetrics  service;
 
-    error = ft_pfr_check( face, &service );
-    if ( !error )
-    {
+
+    service = ft_pfr_check( face );
+    if ( service )
       error = service->get_kerning( face, left, right, avector );
-    }
+    else if ( face )
+      error = FT_Get_Kerning( face, left, right,
+                              FT_KERNING_UNSCALED, avector );
+    else
+      error = FT_Err_Invalid_Argument;
+
     return error;
   }
 
 
   FT_EXPORT_DEF( FT_Error )
-  FT_Get_PFR_Advance( FT_Face    face,
-                      FT_UInt    gindex,
-                      FT_Pos    *aadvance )
+  FT_Get_PFR_Advance( FT_Face   face,
+                      FT_UInt   gindex,
+                      FT_Pos   *aadvance )
   {
-    FT_Error        error;
-    FT_PFR_Service  service;
+    FT_Error               error;
+    FT_Service_PfrMetrics  service;
 
-    error = ft_pfr_check( face, &service );
-    if ( !error )
+
+    service = ft_pfr_check( face );
+    if ( service )
     {
       error = service->get_advance( face, gindex, aadvance );
     }
+    else
+      /* XXX: TODO: PROVIDE ADVANCE-LOADING METHOD TO ALL FONT DRIVERS */
+      error = FT_Err_Invalid_Argument;
+
     return error;
   }
+
 
 /* END */

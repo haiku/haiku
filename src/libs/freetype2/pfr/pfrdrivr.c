@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType PFR driver interface (body).                                */
 /*                                                                         */
-/*  Copyright 2002 by                                                      */
+/*  Copyright 2002, 2003 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -19,9 +19,12 @@
 #include <ft2build.h>
 #include FT_INTERNAL_DEBUG_H
 #include FT_INTERNAL_STREAM_H
-#include FT_INTERNAL_PFR_H
+#include FT_SERVICE_PFR_H
+#include FT_SERVICE_XFREE86_NAME_H
 #include "pfrdrivr.h"
 #include "pfrobjs.h"
+
+#include "pfrerror.h"
 
 
   static FT_Error
@@ -30,44 +33,49 @@
                    FT_UInt     right,
                    FT_Vector  *avector )
   {
-    FT_Error  error;
+    PFR_PhyFont  phys = &face->phy_font;
 
-    error = pfr_face_get_kerning( face, left, right, avector );
-    if ( !error )
+
+    pfr_face_get_kerning( face, left, right, avector );
+
+    /* convert from metrics to outline units when necessary */
+    if ( phys->outline_resolution != phys->metrics_resolution )
     {
-      PFR_PhyFont  phys = &face->phy_font;
+      if ( avector->x != 0 )
+        avector->x = FT_MulDiv( avector->x, phys->outline_resolution,
+                                            phys->metrics_resolution );
 
-      /* convert from metrics to outline units when necessary */
-      if ( phys->outline_resolution != phys->metrics_resolution )
-      {
-        if ( avector->x != 0 )
-          avector->x = FT_MulDiv( avector->x, phys->outline_resolution,
-                                              phys->metrics_resolution );
-
-        if ( avector->y != 0 )
-          avector->y = FT_MulDiv( avector->x, phys->outline_resolution,
-                                              phys->metrics_resolution );
-      }
+      if ( avector->y != 0 )
+        avector->y = FT_MulDiv( avector->x, phys->outline_resolution,
+                                            phys->metrics_resolution );
     }
-    return error;
+
+    return PFR_Err_Ok;
   }
 
 
-  static FT_Error
-  pfr_get_advance( PFR_Face   face,
-                   FT_UInt    gindex,
-                   FT_Pos    *aadvance )
-  {
-    FT_Error     error = FT_Err_Bad_Argument;
+ /*
+  *  PFR METRICS SERVICE
+  *
+  */
 
-    *aadvance = 0;
+  static FT_Error
+  pfr_get_advance( PFR_Face  face,
+                   FT_UInt   gindex,
+                   FT_Pos   *anadvance )
+  {
+    FT_Error  error = PFR_Err_Bad_Argument;
+
+
+    *anadvance = 0;
     if ( face )
     {
-      PFR_PhyFont  phys  = &face->phy_font;
+      PFR_PhyFont  phys = &face->phy_font;
+
 
       if ( gindex < phys->num_chars )
       {
-        *aadvance = phys->chars[ gindex ].advance;
+        *anadvance = phys->chars[gindex].advance;
         error = 0;
       }
     }
@@ -78,17 +86,18 @@
 
   static FT_Error
   pfr_get_metrics( PFR_Face   face,
-                   FT_UInt   *aoutline_resolution,
+                   FT_UInt   *anoutline_resolution,
                    FT_UInt   *ametrics_resolution,
                    FT_Fixed  *ametrics_x_scale,
                    FT_Fixed  *ametrics_y_scale )
   {
-    PFR_PhyFont  phys  = &face->phy_font;
+    PFR_PhyFont  phys = &face->phy_font;
     FT_Fixed     x_scale, y_scale;
     FT_Size      size = face->root.size;
 
-    if ( aoutline_resolution )
-      *aoutline_resolution = phys->outline_resolution;
+
+    if ( anoutline_resolution )
+      *anoutline_resolution = phys->outline_resolution;
 
     if ( ametrics_resolution )
       *ametrics_resolution = phys->metrics_resolution;
@@ -111,25 +120,48 @@
     if ( ametrics_y_scale )
       *ametrics_y_scale = y_scale;
 
-    return 0;
+    return PFR_Err_Ok;
   }
 
 
   FT_CALLBACK_TABLE_DEF
-  const FT_PFR_ServiceRec  pfr_service_rec =
+  const FT_Service_PfrMetricsRec  pfr_metrics_service_rec =
   {
-    (FT_PFR_GetMetricsFunc)  pfr_get_metrics,
-    (FT_PFR_GetKerningFunc)  pfr_get_kerning,
-    (FT_PFR_GetAdvanceFunc)  pfr_get_advance
+    (FT_PFR_GetMetricsFunc)pfr_get_metrics,
+    (FT_PFR_GetKerningFunc)pfr_face_get_kerning,
+    (FT_PFR_GetAdvanceFunc)pfr_get_advance
   };
+
+
+ /*
+  *  SERVICE LIST
+  *
+  */
+
+  static const FT_ServiceDescRec  pfr_services[] =
+  {
+    { FT_SERVICE_ID_PFR_METRICS, &pfr_metrics_service_rec },
+    { FT_SERVICE_ID_XF86_NAME,   FT_XF86_FORMAT_PFR },
+    { NULL, NULL }
+  };
+
+
+  static FT_Module_Interface
+  pfr_get_service( FT_Driver         driver,
+                   const FT_String*  service_id )
+  {
+    FT_UNUSED( driver );
+
+    return ft_service_list_lookup( pfr_services, service_id );
+  }
 
 
   FT_CALLBACK_TABLE_DEF
   const FT_Driver_ClassRec  pfr_driver_class =
   {
     {
-      ft_module_font_driver      |
-      ft_module_driver_scalable,
+      FT_MODULE_FONT_DRIVER     |
+      FT_MODULE_DRIVER_SCALABLE,
 
       sizeof( FT_DriverRec ),
 
@@ -137,31 +169,31 @@
       0x10000L,
       0x20000L,
 
-      (FT_PFR_Service)  &pfr_service_rec,   /* format interface */
+      NULL,
 
       (FT_Module_Constructor)NULL,
       (FT_Module_Destructor) NULL,
-      (FT_Module_Requester)  NULL
+      (FT_Module_Requester)  pfr_get_service
     },
 
     sizeof( PFR_FaceRec ),
     sizeof( PFR_SizeRec ),
     sizeof( PFR_SlotRec ),
 
-    (FT_Face_InitFunc)        pfr_face_init,
-    (FT_Face_DoneFunc)        pfr_face_done,
-    (FT_Size_InitFunc)        NULL,
-    (FT_Size_DoneFunc)        NULL,
-    (FT_Slot_InitFunc)        pfr_slot_init,
-    (FT_Slot_DoneFunc)        pfr_slot_done,
+    (FT_Face_InitFunc)       pfr_face_init,
+    (FT_Face_DoneFunc)       pfr_face_done,
+    (FT_Size_InitFunc)       NULL,
+    (FT_Size_DoneFunc)       NULL,
+    (FT_Slot_InitFunc)       pfr_slot_init,
+    (FT_Slot_DoneFunc)       pfr_slot_done,
 
-    (FT_Size_ResetPointsFunc) NULL,
-    (FT_Size_ResetPixelsFunc) NULL,
-    (FT_Slot_LoadFunc)        pfr_slot_load,
+    (FT_Size_ResetPointsFunc)NULL,
+    (FT_Size_ResetPixelsFunc)NULL,
+    (FT_Slot_LoadFunc)       pfr_slot_load,
 
-    (FT_Face_GetKerningFunc)  pfr_get_kerning,
-    (FT_Face_AttachFunc)      0,
-    (FT_Face_GetAdvancesFunc) 0
+    (FT_Face_GetKerningFunc) pfr_get_kerning,
+    (FT_Face_AttachFunc)     0,
+    (FT_Face_GetAdvancesFunc)0
   };
 
 

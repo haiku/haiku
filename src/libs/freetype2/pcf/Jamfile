@@ -10,7 +10,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = pcfdriver pcfread pcfutil ;
+    _sources = pcfdrivr pcfread pcfutil ;
   }
   else
   {
@@ -21,3 +21,4 @@ UseFreeTypeHeaders ;
 }
 
 # end of src/pcf Jamfile
+

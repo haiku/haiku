@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    CFF character mapping table (cmap) support (body).                   */
 /*                                                                         */
-/*  Copyright 2002 by                                                      */
+/*  Copyright 2002, 2003, 2004 by                                          */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -18,6 +18,8 @@
 
 #include "cffcmap.h"
 #include "cffload.h"
+
+#include "cfferrs.h"
 
 
   /*************************************************************************/
@@ -36,9 +38,8 @@
     CFF_Encoding  encoding = &cff->encoding;
 
 
-    cmap->count = encoding->count;
     cmap->gids  = encoding->codes;
-    
+
     return 0;
   }
 
@@ -46,7 +47,6 @@
   FT_CALLBACK_DEF( void )
   cff_cmap_encoding_done( CFF_CMapStd  cmap )
   {
-    cmap->count = 0;
     cmap->gids  = NULL;
   }
 
@@ -58,9 +58,9 @@
     FT_UInt  result = 0;
 
 
-    if ( char_code < cmap->count )
+    if ( char_code < 256 )
       result = cmap->gids[char_code];
-    
+
     return result;
   }
 
@@ -71,27 +71,27 @@
   {
     FT_UInt    result    = 0;
     FT_UInt32  char_code = *pchar_code;
-    
+
 
     *pchar_code = 0;
 
-    if ( char_code < cmap->count )
+    if ( char_code < 255 )
     {
       FT_UInt  code = (FT_UInt)(char_code + 1);
-      
+
 
       for (;;)
       {
-        if ( code >= cmap->count )
+        if ( code >= 256 )
           break;
-          
+
         result = cmap->gids[code];
         if ( result != 0 )
         {
           *pchar_code = code;
           break;
         }
-          
+
         code++;
       }
     }
@@ -125,34 +125,34 @@
   {
     FT_UInt32  u1 = ((CFF_CMapUniPair)pair1)->unicode;
     FT_UInt32  u2 = ((CFF_CMapUniPair)pair2)->unicode;
-    
+
 
     if ( u1 < u2 )
       return -1;
-      
+
     if ( u1 > u2 )
       return +1;
-      
+
     return 0;
-  }                            
+  }
 
 
   FT_CALLBACK_DEF( FT_Error )
   cff_cmap_unicode_init( CFF_CMapUnicode  cmap )
   {
-    FT_Error         error;
-    FT_UInt          count;
-    TT_Face          face    = (TT_Face)FT_CMAP_FACE( cmap );
-    FT_Memory        memory  = FT_FACE_MEMORY( face );
-    CFF_Font         cff     = (CFF_Font)face->extra.data;
-    CFF_Charset      charset = &cff->charset;
-    PSNames_Service  psnames = (PSNames_Service)cff->psnames;
+    FT_Error            error;
+    FT_UInt             count;
+    TT_Face             face    = (TT_Face)FT_CMAP_FACE( cmap );
+    FT_Memory           memory  = FT_FACE_MEMORY( face );
+    CFF_Font            cff     = (CFF_Font)face->extra.data;
+    CFF_Charset         charset = &cff->charset;
+    FT_Service_PsCMaps  psnames = (FT_Service_PsCMaps)cff->psnames;
 
 
     cmap->num_pairs = 0;
     cmap->pairs     = NULL;
 
-    count = (FT_UInt)face->root.num_glyphs;
+    count = cff->num_glyphs;
 
     if ( !FT_NEW_ARRAY( cmap->pairs, count ) )
     {
@@ -164,12 +164,12 @@
       pair = cmap->pairs;
       for ( n = 0; n < count; n++ )
       {
-        FT_UInt      sid   = charset->sids[n];
+        FT_UInt      sid = charset->sids[n];
         const char*  gname;
 
 
         gname = cff_index_get_sid_string( &cff->string_index, sid, psnames );
-         
+
         /* build unsorted pair table by matching glyph names */
         if ( gname )
         {
@@ -181,7 +181,7 @@
             pair->gindex  = n;
             pair++;
           }
-          
+
           FT_FREE( gname );
         }
       }
@@ -191,7 +191,7 @@
       {
         /* there are no unicode characters in here! */
         FT_FREE( cmap->pairs );
-        error = FT_Err_Invalid_Argument;
+        error = CFF_Err_Invalid_Argument;
       }
       else
       {
@@ -200,7 +200,7 @@
         if ( new_count != count && new_count < count / 2 )
         {
           (void)FT_RENEW_ARRAY( cmap->pairs, count, new_count );
-          error = 0;
+          error = CFF_Err_Ok;
         }
 
         /* sort the pairs table to allow efficient binary searches */
@@ -223,7 +223,7 @@
     FT_Face    face   = FT_CMAP_FACE( cmap );
     FT_Memory  memory = FT_FACE_MEMORY( face );
 
- 
+
     FT_FREE( cmap->pairs );
     cmap->num_pairs = 0;
   }

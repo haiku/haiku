@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    TrueType font driver implementation (body).                          */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -21,6 +21,7 @@
 #include FT_INTERNAL_STREAM_H
 #include FT_INTERNAL_SFNT_H
 #include FT_TRUETYPE_IDS_H
+#include FT_SERVICE_XFREE86_NAME_H
 
 #include "ttdriver.h"
 #include "ttgload.h"
@@ -115,7 +116,7 @@
 
       while ( left <= right )
       {
-        FT_Int    middle = left + ( ( right - left ) >> 1 );
+        FT_Long   middle = left + ( ( right - left ) >> 1 );
         FT_ULong  cur_pair;
 
 
@@ -207,8 +208,8 @@
      /* we need to use rounding in the following computations. Otherwise,
       * the resulting hinted outlines will be very slightly distorted
       */
-      dim_x = ( ( char_width  * horz_resolution + (36+32*72) ) / 72 ) & -64;
-      dim_y = ( ( char_height * vert_resolution + (36+32*72) ) / 72 ) & -64;
+      dim_x = ( ( char_width  * horz_resolution + (36+32*72) ) / 72 ) & ~63;
+      dim_y = ( ( char_height * vert_resolution + (36+32*72) ) / 72 ) & ~63;
     }
     else
     {
@@ -226,7 +227,7 @@
 
     size->ttmetrics.valid = FALSE;
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
-    size->strike_index    = 0xFFFF;
+    size->strike_index    = 0xFFFFU;
 #endif
 
     return tt_size_reset( size );
@@ -242,11 +243,6 @@
   /*    A driver method used to reset a size's character sizes (horizontal */
   /*    and vertical) expressed in integer pixels.                         */
   /*                                                                       */
-  /* <Input>                                                               */
-  /*    pixel_width  :: The character width expressed in integer pixels.   */
-  /*                                                                       */
-  /*    pixel_height :: The character height expressed in integer pixels.  */
-  /*                                                                       */
   /* <InOut>                                                               */
   /*    size         :: A handle to the target size object.                */
   /*                                                                       */
@@ -254,19 +250,14 @@
   /*    FreeType error code.  0 means success.                             */
   /*                                                                       */
   static FT_Error
-  Set_Pixel_Sizes( TT_Size  size,
-                   FT_UInt  pixel_width,
-                   FT_UInt  pixel_height )
+  Set_Pixel_Sizes( TT_Size  size )
   {
-    FT_UNUSED( pixel_width );
-    FT_UNUSED( pixel_height );
-
     /* many things have been pre-computed by the base layer */
 
     size->metrics         = size->root.metrics;
     size->ttmetrics.valid = FALSE;
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS
-    size->strike_index    = 0xFFFF;
+    size->strike_index    = 0xFFFFU;
 #endif
 
     return tt_size_reset( size );
@@ -302,7 +293,7 @@
   static FT_Error
   Load_Glyph( TT_GlyphSlot  slot,
               TT_Size       size,
-              FT_UShort     glyph_index,
+              FT_UInt       glyph_index,
               FT_Int32      load_flags )
   {
     FT_Error  error;
@@ -354,17 +345,27 @@
   /*************************************************************************/
   /*************************************************************************/
 
+  static const FT_ServiceDescRec  tt_services[] =
+  {
+    { FT_SERVICE_ID_XF86_NAME, FT_XF86_FORMAT_TRUETYPE },
+    { NULL, NULL }
+  };
 
   static FT_Module_Interface
   tt_get_interface( TT_Driver    driver,
                     const char*  tt_interface )
   {
-    FT_Module     sfntd = FT_Get_Module( driver->root.root.library,
-                                         "sfnt" );
-    SFNT_Service  sfnt;
+    FT_Module_Interface  result;
+    FT_Module            sfntd;
+    SFNT_Service         sfnt;
 
+
+    result = ft_service_list_lookup( tt_services, tt_interface );
+    if ( result != NULL )
+      return result;
 
     /* only return the default interface from the SFNT module */
+    sfntd = FT_Get_Module( driver->root.root.library, "sfnt" );
     if ( sfntd )
     {
       sfnt = (SFNT_Service)( sfntd->clazz->module_interface );
@@ -382,10 +383,10 @@
   const FT_Driver_ClassRec  tt_driver_class =
   {
     {
-      ft_module_font_driver     |
-      ft_module_driver_scalable |
+      FT_MODULE_FONT_DRIVER        |
+      FT_MODULE_DRIVER_SCALABLE    |
 #ifdef TT_CONFIG_OPTION_BYTECODE_INTERPRETER
-      ft_module_driver_has_hinter,
+      FT_MODULE_DRIVER_HAS_HINTER,
 #else
       0,
 #endif
@@ -408,20 +409,20 @@
     sizeof ( FT_GlyphSlotRec ),
 
 
-    (FT_Face_InitFunc)        tt_face_init,
-    (FT_Face_DoneFunc)        tt_face_done,
-    (FT_Size_InitFunc)        tt_size_init,
-    (FT_Size_DoneFunc)        tt_size_done,
-    (FT_Slot_InitFunc)        0,
-    (FT_Slot_DoneFunc)        0,
+    (FT_Face_InitFunc)       tt_face_init,
+    (FT_Face_DoneFunc)       tt_face_done,
+    (FT_Size_InitFunc)       tt_size_init,
+    (FT_Size_DoneFunc)       tt_size_done,
+    (FT_Slot_InitFunc)       0,
+    (FT_Slot_DoneFunc)       0,
 
-    (FT_Size_ResetPointsFunc) Set_Char_Sizes,
-    (FT_Size_ResetPixelsFunc) Set_Pixel_Sizes,
-    (FT_Slot_LoadFunc)        Load_Glyph,
+    (FT_Size_ResetPointsFunc)Set_Char_Sizes,
+    (FT_Size_ResetPixelsFunc)Set_Pixel_Sizes,
+    (FT_Slot_LoadFunc)       Load_Glyph,
 
-    (FT_Face_GetKerningFunc)  Get_Kerning,
-    (FT_Face_AttachFunc)      0,
-    (FT_Face_GetAdvancesFunc) 0
+    (FT_Face_GetKerningFunc) Get_Kerning,
+    (FT_Face_AttachFunc)     0,
+    (FT_Face_GetAdvancesFunc)0
   };
 
 

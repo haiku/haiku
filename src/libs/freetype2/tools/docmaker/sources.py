@@ -130,7 +130,7 @@ re_markup_tags = [ re_markup_tag1, re_markup_tag2 ]
 #
 # used to detect a cross-reference, after markup tags have been stripped
 #
-re_crossref = re.compile( r'@(\w*)' )
+re_crossref = re.compile( r'@(\w*)(.*)' )
 
 #
 # used to detect italic and bold styles in paragraph text
@@ -200,7 +200,7 @@ class SourceBlock:
         self.processor = processor
         self.filename  = filename
         self.lineno    = lineno
-        self.lines     = lines
+        self.lines     = lines[:]
         self.format    = processor.format
         self.content   = []
 
@@ -212,7 +212,7 @@ class SourceBlock:
         # extract comment lines
         lines = []
 
-        for line0 in self.lines[1:]:
+        for line0 in self.lines:
             m = self.format.column.match( line0 )
             if m:
                 lines.append( m.group(1) )
@@ -304,7 +304,7 @@ class SourceProcessor:
                 if self.format.end.match( line ):
                     # that's a normal block end, add it to lines and
                     # create a new block
-                    # self.lines.append( line )
+                    self.lines.append( line )
                     self.add_block_lines()
 
                 elif self.format.column.match( line ):

@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    The FreeType memory management macros (specification).               */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2004 by                                     */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg                       */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -141,7 +141,7 @@ FT_BEGIN_HEADER
   FT_Realloc( FT_Memory  memory,
               FT_Long    current,
               FT_Long    size,
-              void**     P );
+              void*     *P );
 
 
   /*************************************************************************/
@@ -159,17 +159,14 @@ FT_BEGIN_HEADER
   /*    P      :: This is the _address_ of a _pointer_ which points to the */
   /*              allocated block.  It is always set to NULL on exit.      */
   /*                                                                       */
-  /* <Return>                                                              */
-  /*    FreeType error code.  0 means success.                             */
-  /*                                                                       */
   /* <Note>                                                                */
-  /*    If P or *P are NULL, this function should return successfully.     */
+  /*    If P or *P is NULL, this function should return successfully.      */
   /*    This is a strong convention within all of FreeType and its         */
   /*    drivers.                                                           */
   /*                                                                       */
   FT_BASE( void )
   FT_Free( FT_Memory  memory,
-           void**     P );
+           void*     *P );
 
 
 #define FT_MEM_SET( dest, byte, count )     ft_memset( dest, byte, count )
@@ -182,6 +179,12 @@ FT_BEGIN_HEADER
 #define FT_MEM_ZERO( dest, count )  FT_MEM_SET( dest, 0, count )
 
 #define FT_ZERO( p )                FT_MEM_ZERO( p, sizeof ( *(p) ) )
+
+#define FT_ARRAY_COPY( dest, source, count )                       \
+          FT_MEM_COPY( dest, source, (count) * sizeof( *(dest) ) )
+
+#define FT_ARRAY_MOVE( dest, source, count )                       \
+          FT_MEM_MOVE( dest, source, (count) * sizeof( *(dest) ) )
 
 
   /*************************************************************************/

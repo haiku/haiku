@@ -10,7 +10,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = sfobjs sfdriver ttcmap ttcmap0 ttpost ttload ttsbit ;
+    _sources = sfobjs sfdriver ttcmap0 ttpost ttload ttsbit ;
   }
   else
   {

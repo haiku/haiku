@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType API for accessing BDF-specific strings (body).              */
 /*                                                                         */
-/*  Copyright 2002 by                                                      */
+/*  Copyright 2002, 2003 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -17,24 +17,8 @@
 
 
 #include <ft2build.h>
-#include FT_INTERNAL_BDF_TYPES_H
 #include FT_INTERNAL_OBJECTS_H
-
-  static FT_Bool
-  test_font_type( FT_Face face, const char*  name )
-  {
-    if ( face && face->driver )
-    {
-      FT_Module  driver = (FT_Module)face->driver;
-
-      if ( driver->clazz && driver->clazz->module_name )
-      {
-        if ( ft_strcmp( driver->clazz->module_name, name ) == 0 )
-          return 1;
-      }
-    }
-    return 0;
-  }
+#include FT_SERVICE_BDF_H
 
 
   FT_EXPORT_DEF( FT_Error )
@@ -49,14 +33,15 @@
 
     error = FT_Err_Invalid_Argument;
 
-    if ( test_font_type( face, "bdf" ) )
+    if ( face )
     {
-      BDF_Public_Face  bdf_face = (BDF_Public_Face)face;
+      FT_Service_BDF  service;
 
 
-      encoding = (const char*) bdf_face->charset_encoding;
-      registry = (const char*) bdf_face->charset_registry;
-      error    = 0;
+      FT_FACE_FIND_SERVICE( face, service, BDF );
+
+      if ( service && service->get_charset_id )
+        error = service->get_charset_id( face, &encoding, &registry );
     }
 
     if ( acharset_encoding )
@@ -74,23 +59,26 @@
                        const char*       prop_name,
                        BDF_PropertyRec  *aproperty )
   {
-    FT_Error   error;
+    FT_Error  error;
+
 
     error = FT_Err_Invalid_Argument;
 
     aproperty->type = BDF_PROPERTY_TYPE_NONE;
 
-    if ( face != NULL && face->driver != NULL )
+    if ( face )
     {
-      FT_Driver              driver = face->driver;
-      BDF_GetPropertyFunc    func;
+      FT_Service_BDF  service;
 
-      func = (BDF_GetPropertyFunc) driver->root.clazz->get_interface(
-                             FT_MODULE( driver ), "get_bdf_property" );
-      if ( func )
-        error = func( face, prop_name, aproperty );
+
+      FT_FACE_FIND_SERVICE( face, service, BDF );
+
+      if ( service && service->get_property )
+        error = service->get_property( face, prop_name, aproperty );
     }
-    return error;
+
+    return  error;
   }
+
 
 /* END */

@@ -401,11 +401,11 @@ local inflate_huft *fixed_td;
 
 
 local int inflate_trees_fixed( /* bl, bd, tl, td, z) */
-uIntf *bl,               /* literal desired/actual bit depth */
-uIntf *bd,               /* distance desired/actual bit depth */
-inflate_huft * FAR *tl,  /* literal/length tree result */
-inflate_huft * FAR *td,  /* distance tree result */
-z_streamp z              /* for memory allocation */
+uIntf *bl,                      /* literal desired/actual bit depth */
+uIntf *bd,                      /* distance desired/actual bit depth */
+const inflate_huft * FAR *tl,   /* literal/length tree result */
+const inflate_huft * FAR *td,   /* distance tree result */
+z_streamp z                     /* for memory allocation */
 )
 {
 #ifdef BUILDFIXED
@@ -451,6 +451,8 @@ z_streamp z              /* for memory allocation */
     ZFREE(z, c);
     fixed_built = 1;
   }
+#else
+  FT_UNUSED(z);
 #endif
   *bl = fixed_bl;
   *bd = fixed_bd;

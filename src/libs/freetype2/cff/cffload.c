@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    OpenType and CFF data/program tables loader (body).                  */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -20,7 +20,7 @@
 #include FT_INTERNAL_DEBUG_H
 #include FT_INTERNAL_OBJECTS_H
 #include FT_INTERNAL_STREAM_H
-#include FT_INTERNAL_POSTSCRIPT_NAMES_H
+#include FT_SERVICE_POSTSCRIPT_CMAPS_H
 #include FT_TRUETYPE_TAGS_H
 
 #include "cffload.h"
@@ -1172,12 +1172,12 @@
   }
 
 
- /* allocate a table containing pointers to an index's elements */
+  /* allocate a table containing pointers to an index's elements */
   static FT_Error
   cff_index_get_pointers( CFF_Index   idx,
                           FT_Byte***  table )
   {
-    FT_Error   error  = 0;
+    FT_Error   error  = CFF_Err_Ok;
     FT_Memory  memory = idx->stream->memory;
     FT_ULong   n, offset, old_offset;
     FT_Byte**  t;
@@ -1211,7 +1211,7 @@
                             FT_Byte**  pbytes,
                             FT_ULong*  pbyte_len )
   {
-    FT_Error  error = 0;
+    FT_Error  error = CFF_Err_Ok;
 
 
     if ( idx && idx->count > element )
@@ -1312,18 +1312,26 @@
 
 
   FT_LOCAL_DEF( FT_String* )
-  cff_index_get_sid_string( CFF_Index        idx,
-                            FT_UInt          sid,
-                            PSNames_Service  psnames_service )
+  cff_index_get_sid_string( CFF_Index           idx,
+                            FT_UInt             sid,
+                            FT_Service_PsCMaps  psnames )
   {
+    /* value 0xFFFFU indicates a missing dictionary entry */
+    if ( sid == 0xFFFFU )
+      return 0;
+
     /* if it is not a standard string, return it */
     if ( sid > 390 )
       return cff_index_get_name( idx, sid - 391 );
 
+    /* CID-keyed CFF fonts don't have glyph names */
+    if ( !psnames )
+      return 0;
+
     /* that's a standard string, fetch a copy from the PSName module */
     {
       FT_String*   name       = 0;
-      const char*  adobe_name = psnames_service->adobe_std_strings( sid );
+      const char*  adobe_name = psnames->adobe_std_strings( sid );
       FT_UInt      len;
 
 
@@ -1493,6 +1501,7 @@
 
 
     FT_FREE( charset->sids );
+    FT_FREE( charset->cids );
     charset->format = 0;
     charset->offset = 0;
   }
@@ -1503,10 +1512,11 @@
                     FT_UInt      num_glyphs,
                     FT_Stream    stream,
                     FT_ULong     base_offset,
-                    FT_ULong     offset )
+                    FT_ULong     offset,
+                    FT_Bool      invert )
   {
-    FT_Memory  memory     = stream->memory;
-    FT_Error   error      = 0;
+    FT_Memory  memory = stream->memory;
+    FT_Error   error  = CFF_Err_Ok;
     FT_UShort  glyph_sid;
 
 
@@ -1557,7 +1567,6 @@
 
           while ( j < num_glyphs )
           {
-
             /* Read the first glyph sid of the range. */
             if ( FT_READ_USHORT( glyph_sid ) )
               goto Exit;
@@ -1595,7 +1604,7 @@
       /* In order to use a predefined charset, the following must be  */
       /* true: The charset constructed for the glyphs in the font's   */
       /* charstrings dictionary must match the predefined charset in  */
-      /* the first num_glyphs                                         */
+      /* the first num_glyphs.                                        */
 
       charset->offset = offset;  /* record charset type */
 
@@ -1604,8 +1613,8 @@
       case 0:
         if ( num_glyphs > 229 )
         {
-          FT_ERROR(("cff_charset_load: implicit charset larger than\n"
-                    "predefined charset (Adobe ISO-Latin)!\n" ));
+          FT_ERROR(( "cff_charset_load: implicit charset larger than\n"
+                     "predefined charset (Adobe ISO-Latin)!\n" ));
           error = CFF_Err_Invalid_File_Format;
           goto Exit;
         }
@@ -1615,8 +1624,7 @@
           goto Exit;
 
         /* Copy the predefined charset into the allocated memory. */
-        FT_MEM_COPY( charset->sids, cff_isoadobe_charset,
-                     num_glyphs * sizeof ( FT_UShort ) );
+        FT_ARRAY_COPY( charset->sids, cff_isoadobe_charset, num_glyphs );
 
         break;
 
@@ -1634,8 +1642,7 @@
           goto Exit;
 
         /* Copy the predefined charset into the allocated memory.     */
-        FT_MEM_COPY( charset->sids, cff_expert_charset,
-                     num_glyphs * sizeof ( FT_UShort ) );
+        FT_ARRAY_COPY( charset->sids, cff_expert_charset, num_glyphs );
 
         break;
 
@@ -1653,8 +1660,7 @@
           goto Exit;
 
         /* Copy the predefined charset into the allocated memory.     */
-        FT_MEM_COPY( charset->sids, cff_expertsubset_charset,
-                     num_glyphs * sizeof ( FT_UShort ) );
+        FT_ARRAY_COPY( charset->sids, cff_expertsubset_charset, num_glyphs );
 
         break;
 
@@ -1664,21 +1670,39 @@
       }
     }
 
-  Exit:
+    /* we have to invert the `sids' array for subsetted CID-keyed fonts */
+    if ( invert )
+    {
+      FT_UInt    i;
+      FT_UShort  max_cid = 0;
 
+
+      for ( i = 0; i < num_glyphs; i++ )
+        if ( charset->sids[i] > max_cid )
+          max_cid = charset->sids[i];
+      max_cid++;
+
+      if ( FT_NEW_ARRAY( charset->cids, max_cid ) )
+        goto Exit;
+      FT_MEM_ZERO( charset->cids, sizeof ( FT_UShort ) * max_cid );
+
+      for ( i = 0; i < num_glyphs; i++ )
+        charset->cids[charset->sids[i]] = i;
+    }
+
+  Exit:
     /* Clean up if there was an error. */
     if ( error )
-      if ( charset->sids )
-      {
-        FT_FREE( charset->sids );
-        charset->format = 0;
-        charset->offset = 0;
-        charset->sids   = 0;
-      }
+    {
+      FT_FREE( charset->sids );
+      FT_FREE( charset->cids );
+      charset->format = 0;
+      charset->offset = 0;
+      charset->sids   = 0;
+    }
 
     return error;
   }
-
 
 
   static void
@@ -1690,7 +1714,6 @@
   }
 
 
-
   static FT_Error
   cff_encoding_load( CFF_Encoding  encoding,
                      CFF_Charset   charset,
@@ -1699,11 +1722,11 @@
                      FT_ULong      base_offset,
                      FT_ULong      offset )
   {
-    FT_Error    error  = 0;
-    FT_UInt     count;
-    FT_UInt     j;
-    FT_UShort   glyph_sid;
-    FT_UInt     glyph_code;
+    FT_Error   error = CFF_Err_Ok;
+    FT_UInt    count;
+    FT_UInt    j;
+    FT_UShort  glyph_sid;
+    FT_UInt    glyph_code;
 
 
     /* Check for charset->sids.  If we do not have this, we fail. */
@@ -1720,8 +1743,8 @@
       encoding->codes[j] = 0;
     }
 
-    /* Note: The encoding table in a CFF font is indexed by glyph index,  */
-    /* where the first encoded glyph index is 1.  Hence, we read the char */
+    /* Note: The encoding table in a CFF font is indexed by glyph index;  */
+    /* the first encoded glyph index is 1.  Hence, we read the character  */
     /* code (`glyph_code') at index j and make the assignment:            */
     /*                                                                    */
     /*    encoding->codes[glyph_code] = j + 1                             */
@@ -1734,7 +1757,6 @@
 
     if ( offset > 1 )
     {
-
       encoding->offset = base_offset + offset;
 
       /* we need to parse the table to determine its size */
@@ -1749,9 +1771,10 @@
         {
           FT_Byte*  p;
 
-          /* by convention, GID 0 is always ".notdef" and is never */
-          /* coded in the font. Hence, the number of codes found   */
-          /* in the table is 'count+1'                             */
+
+          /* By convention, GID 0 is always ".notdef" and is never */
+          /* coded in the font.  Hence, the number of codes found  */
+          /* in the table is `count+1'.                            */
           /*                                                       */
           encoding->count = count + 1;
 
@@ -1781,7 +1804,7 @@
 
       case 1:
         {
-          FT_Byte  nleft;
+          FT_UInt  nleft;
           FT_UInt  i = 1;
           FT_UInt  k;
 
@@ -1821,7 +1844,7 @@
             }
           }
 
-          /* simple check, one never knows what can be found in a font */
+          /* simple check; one never knows what can be found in a font */
           if ( encoding->count > 256 )
             encoding->count = 256;
         }
@@ -1856,13 +1879,13 @@
           /* Assign code to SID mapping. */
           encoding->sids[glyph_code] = glyph_sid;
 
-          /* First, lookup GID which has been assigned to */
-          /* SID glyph_sid.                               */
+          /* First, look up GID which has been assigned to */
+          /* SID glyph_sid.                                */
           for ( gindex = 0; gindex < num_glyphs; gindex++ )
           {
             if ( charset->sids[gindex] == glyph_sid )
             {
-              encoding->codes[glyph_code] = (FT_UShort) gindex;
+              encoding->codes[glyph_code] = (FT_UShort)gindex;
               break;
             }
           }
@@ -1874,31 +1897,27 @@
       FT_UInt i;
 
 
-      /* We take into account the fact a CFF font can use a predefined  */
-      /* encoding without containing all of the glyphs encoded by this  */
-      /* encoding (see the note at the end of section 12 in the CFF     */
-      /* specification).                                                */
+      /* We take into account the fact a CFF font can use a predefined */
+      /* encoding without containing all of the glyphs encoded by this */
+      /* encoding (see the note at the end of section 12 in the CFF    */
+      /* specification).                                               */
 
       switch ( (FT_UInt)offset )
       {
       case 0:
         /* First, copy the code to SID mapping. */
-        FT_MEM_COPY( encoding->sids, cff_standard_encoding,
-                     256 * sizeof ( FT_UShort ) );
-
+        FT_ARRAY_COPY( encoding->sids, cff_standard_encoding, 256 );
         goto Populate;
 
       case 1:
         /* First, copy the code to SID mapping. */
-        FT_MEM_COPY( encoding->sids, cff_expert_encoding,
-                     256 * sizeof ( FT_UShort ) );
+        FT_ARRAY_COPY( encoding->sids, cff_expert_encoding, 256 );
 
       Populate:
         /* Construct code to GID mapping from code to SID mapping */
         /* and charset.                                           */
 
         encoding->count = 0;
-
 
         for ( j = 0; j < 256; j++ )
         {
@@ -1923,8 +1942,8 @@
               encoding->codes[j] = (FT_UShort)i;
 
               /* update encoding count */
-              if ( encoding->count < j+1 )
-                encoding->count = j+1;
+              if ( encoding->count < j + 1 )
+                encoding->count = j + 1;
             }
           }
         }
@@ -1953,7 +1972,7 @@
   {
     FT_Error         error;
     CFF_ParserRec    parser;
-    FT_Byte*         dict;
+    FT_Byte*         dict = NULL;
     FT_ULong         dict_len;
     CFF_FontRecDict  top  = &font->font_dict;
     CFF_Private      priv = &font->private_dict;
@@ -1964,12 +1983,26 @@
     /* set defaults */
     FT_MEM_ZERO( top, sizeof ( *top ) );
 
-    top->underline_position  = -100;
-    top->underline_thickness = 50;
+    top->underline_position  = -100L << 16;
+    top->underline_thickness = 50L << 16;
     top->charstring_type     = 2;
     top->font_matrix.xx      = 0x10000L;
     top->font_matrix.yy      = 0x10000L;
     top->cid_count           = 8720;
+
+    /* we use the implementation specific SID value 0xFFFF to indicate */
+    /* missing entries                                                 */
+    top->version             = 0xFFFFU;
+    top->notice              = 0xFFFFU;
+    top->copyright           = 0xFFFFU;
+    top->full_name           = 0xFFFFU;
+    top->family_name         = 0xFFFFU;
+    top->weight              = 0xFFFFU;
+    top->embedded_postscript = 0xFFFFU;
+
+    top->cid_registry        = 0xFFFFU;
+    top->cid_ordering        = 0xFFFFU;
+    top->cid_font_name       = 0xFFFFU;
 
     error = cff_index_access_element( idx, font_index, &dict, &dict_len ) ||
             cff_parser_run( &parser, dict, dict + dict_len );
@@ -1980,7 +2013,7 @@
       goto Exit;
 
     /* if it is a CID font, we stop there */
-    if ( top->cid_registry )
+    if ( top->cid_registry != 0xFFFFU )
       goto Exit;
 
     /* parse the private dictionary, if any */
@@ -1992,8 +2025,8 @@
       priv->blue_shift       = 7;
       priv->blue_fuzz        = 1;
       priv->lenIV            = -1;
-      priv->expansion_factor = (FT_Fixed)0.06 * 0x10000L;
-      priv->blue_scale       = (FT_Fixed)0.039625 * 0x10000L;
+      priv->expansion_factor = (FT_Fixed)( 0.06 * 0x10000L );
+      priv->blue_scale       = (FT_Fixed)( 0.039625 * 0x10000L * 1000 );
 
       cff_parser_init( &parser, CFF_CODE_PRIVATE, priv );
 
@@ -2121,8 +2154,15 @@
     if ( error )
       goto Exit;
 
+    if ( FT_STREAM_SEEK( base_offset + dict->charstrings_offset ) )
+      goto Exit;
+
+    error = cff_new_index( &font->charstrings_index, stream, 0 );
+    if ( error )
+      goto Exit;
+
     /* now, check for a CID font */
-    if ( dict->cid_registry )
+    if ( dict->cid_registry != 0xFFFFU )
     {
       CFF_IndexRec  fd_index;
       CFF_SubFont   sub;
@@ -2165,7 +2205,7 @@
 
       /* now load the FD Select array */
       error = CFF_Load_FD_Select( &font->fd_select,
-                                  (FT_UInt)dict->cid_count,
+                                  font->charstrings_index.count,
                                   stream,
                                   base_offset + dict->cid_fd_select_offset );
 
@@ -2186,13 +2226,6 @@
       goto Exit;
     }
 
-    if ( FT_STREAM_SEEK( base_offset + dict->charstrings_offset ) )
-      goto Exit;
-
-    error = cff_new_index( &font->charstrings_index, stream, 0 );
-    if ( error )
-      goto Exit;
-
     /* explicit the global subrs */
     font->num_global_subrs = font->global_subrs_index.count;
     font->num_glyphs       = font->charstrings_index.count;
@@ -2203,25 +2236,38 @@
     if ( error )
       goto Exit;
 
-    /* read the Charset and Encoding tables when available */
+    /* read the Charset and Encoding tables if available */
     if ( font->num_glyphs > 0 )
     {
+      FT_Bool  invert;
+
+
+      invert = dict->cid_registry != 0xFFFFU &&
+               font->charstrings_index.count != dict->cid_count;
       error = cff_charset_load( &font->charset, font->num_glyphs, stream,
-                              base_offset, dict->charset_offset );
+                                base_offset, dict->charset_offset, invert );
       if ( error )
         goto Exit;
 
-      error = cff_encoding_load( &font->encoding,
-                                 &font->charset,
-                                 font->num_glyphs,
-                                 stream,
-                                 base_offset,
-                                 dict->encoding_offset );
-      if ( error )
-        goto Exit;
+      /* CID-keyed CFFs don't have an encoding */
+      if ( dict->cid_registry == 0xFFFFU )
+      {
+        error = cff_encoding_load( &font->encoding,
+                                   &font->charset,
+                                   font->num_glyphs,
+                                   stream,
+                                   base_offset,
+                                   dict->encoding_offset );
+        if ( error )
+          goto Exit;
+      }
+      else
+        /* CID-keyed fonts only need CIDs */
+        FT_FREE( font->charset.sids );
     }
 
-    /* get the font name */
+    /* get the font name (/CIDFontName for CID-keyed fonts, */
+    /* /FontName otherwise)                                 */
     font->font_name = cff_index_get_name( &font->name_index, face_index );
 
   Exit:

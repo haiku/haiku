@@ -10,7 +10,7 @@ UseFreeTypeHeaders ;
 
   if $(FT2_MULTI)
   {
-    _sources = pshrec pshglob pshalgo1 pshalgo2 pshalgo3 pshmod ;
+    _sources = pshrec pshglob pshalgo pshmod ;
   }
   else
   {

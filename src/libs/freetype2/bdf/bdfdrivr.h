@@ -2,7 +2,7 @@
 
     FreeType font driver for bdf fonts
 
-  Copyright (C) 2001, 2002 by
+  Copyright (C) 2001, 2002, 2003 by
   Francesco Zappa Nardelli
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -39,8 +39,8 @@ FT_BEGIN_HEADER
 
   typedef struct  BDF_encoding_el_
   {
-    FT_ULong  enc;
-    FT_Short  glyph;
+    FT_ULong   enc;
+    FT_UShort  glyph;
 
   } BDF_encoding_el;
 

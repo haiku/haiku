@@ -5,7 +5,7 @@
 /*    Auxiliary functions and data structures related to PostScript fonts  */
 /*    (specification).                                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2003 by                                     */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -24,6 +24,7 @@
 #include <ft2build.h>
 #include FT_INTERNAL_OBJECTS_H
 #include FT_INTERNAL_TYPE1_TYPES_H
+#include FT_SERVICE_POSTSCRIPT_CMAPS_H
 
 
 FT_BEGIN_HEADER
@@ -70,10 +71,10 @@ FT_BEGIN_HEADER
     (*done)( PS_Table  table );
 
     FT_Error
-    (*add)( PS_Table   table,
-            FT_Int     index,
-            void*      object,
-            FT_Int     length );
+    (*add)( PS_Table    table,
+            FT_Int      idx,
+            void*       object,
+            FT_PtrDist  length );
 
     void
     (*release)( PS_Table  table );
@@ -123,7 +124,7 @@ FT_BEGIN_HEADER
     FT_Int             max_elems;
     FT_Int             num_elems;
     FT_Byte**          elements;       /* addresses of table elements */
-    FT_Int*            lengths;        /* lengths of table elements   */
+    FT_PtrDist*        lengths;        /* lengths of table elements   */
 
     FT_Memory          memory;
     PS_Table_FuncsRec  funcs;
@@ -177,7 +178,9 @@ FT_BEGIN_HEADER
     T1_FIELD_TYPE_BOOL,
     T1_FIELD_TYPE_INTEGER,
     T1_FIELD_TYPE_FIXED,
+    T1_FIELD_TYPE_FIXED_1000,
     T1_FIELD_TYPE_STRING,
+    T1_FIELD_TYPE_KEY,
     T1_FIELD_TYPE_BBOX,
     T1_FIELD_TYPE_INTEGER_ARRAY,
     T1_FIELD_TYPE_FIXED_ARRAY,
@@ -261,7 +264,7 @@ FT_BEGIN_HEADER
           },
 
 
-#define T1_FIELD_TYPE_BOOL( _ident, _fname )                        \
+#define T1_FIELD_BOOL( _ident, _fname )                             \
           T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BOOL, _fname )
 
 #define T1_FIELD_NUM( _ident, _fname )                                 \
@@ -270,8 +273,14 @@ FT_BEGIN_HEADER
 #define T1_FIELD_FIXED( _ident, _fname )                             \
           T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_FIXED, _fname )
 
+#define T1_FIELD_FIXED_1000( _ident, _fname )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_FIXED_1000, _fname )
+
 #define T1_FIELD_STRING( _ident, _fname )                             \
           T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_STRING, _fname )
+
+#define T1_FIELD_KEY( _ident, _fname )                             \
+          T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_KEY, _fname )
 
 #define T1_FIELD_BBOX( _ident, _fname )                             \
           T1_NEW_SIMPLE_FIELD( _ident, T1_FIELD_TYPE_BBOX, _fname )
@@ -321,13 +330,21 @@ FT_BEGIN_HEADER
     void
     (*skip_spaces)( PS_Parser  parser );
     void
-    (*skip_alpha)( PS_Parser  parser );
+    (*skip_PS_token)( PS_Parser  parser );
 
     FT_Long
     (*to_int)( PS_Parser  parser );
     FT_Fixed
     (*to_fixed)( PS_Parser  parser,
                  FT_Int     power_ten );
+
+    FT_Error
+    (*to_bytes)( PS_Parser  parser,
+                 FT_Byte*   bytes,
+                 FT_Long    max_bytes,
+                 FT_Long*   pnum_bytes,
+                 FT_Bool    delimiters );
+
     FT_Int
     (*to_coord_array)( PS_Parser  parser,
                        FT_Int     max_coords,
@@ -634,14 +651,14 @@ FT_BEGIN_HEADER
     T1_Decoder_ZoneRec   zones[T1_MAX_SUBRS_CALLS + 1];
     T1_Decoder_Zone      zone;
 
-    PSNames_Service      psnames;      /* for seac */
+    FT_Service_PsCMaps   psnames;      /* for seac */
     FT_UInt              num_glyphs;
     FT_Byte**            glyph_names;
 
     FT_Int               lenIV;        /* internal for sub routine calls */
     FT_UInt              num_subrs;
     FT_Byte**            subrs;
-    FT_Int*              subrs_len;    /* array of subrs length (optional) */
+    FT_PtrDist*          subrs_len;    /* array of subrs length (optional) */
 
     FT_Matrix            font_matrix;
     FT_Vector            font_offset;
@@ -652,7 +669,6 @@ FT_BEGIN_HEADER
 
     PS_Blend             blend;       /* for multiple master support */
 
-    FT_UInt32            hint_flags;
     FT_Render_Mode       hint_mode;
 
     T1_Decoder_Callback  parse_callback;

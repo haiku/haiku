@@ -11,7 +11,7 @@ UseFreeTypeHeaders ;
   if $(FT2_MULTI)
   {
     _sources = ftutil ftdbgmem ftstream ftcalc fttrigon ftgloadr ftoutln
-               ftobjs ftnames ;
+               ftobjs ftnames ftrfork ;
   }
   else
   {
@@ -24,9 +24,8 @@ UseFreeTypeHeaders ;
 # Add the optional/replaceable files.
 #
 FT2_Library  $(FT2_LIB) : ftsystem.c   ftinit.c    ftglyph.c  ftmm.c     ftbdf.c
-                      ftbbox.c     ftdebug.c   ftxf86.c   fttype1.c  ftpfr.c
-                      ftstroker.c  ftwinfnt.c
-                      ;
+                      ftbbox.c     ftdebug.c   ftxf86.c  fttype1.c    ftpfr.c
+                      ftstroke.c  ftwinfnt.c   ;
 
 # Add Macintosh-specific file to the library when necessary.
 #
@@ -36,3 +35,4 @@ if $(MAC)
 }
 
 # end of src/base Jamfile
+

@@ -1,0 +1,24 @@
+# FreeType 2 src/autofit Jamfile (c) 2001 David Turner
+#
+
+SubDir  OBOS_TOP src libs freetype2 autofit ;
+
+UseFreeTypeHeaders ;
+
+{
+  local  _sources ;
+
+  if $(FT2_MULTI)
+  {
+    _sources = autofit afmodule afloader aflatin afhints afglobal afdummy afangles ;
+  }
+  else
+  {
+    _sources = autofit ;
+  }
+
+  FT2_Library  $(FT2_LIB) : $(_sources).c ;
+}
+
+# end of src/autofit Jamfile
+

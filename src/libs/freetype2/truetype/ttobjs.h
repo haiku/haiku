@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    Objects manager (specification).                                     */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -82,6 +82,10 @@ FT_BEGIN_HEADER
     FT_UnitVector  dualVector;
     FT_UnitVector  projVector;
     FT_UnitVector  freeVector;
+
+#ifdef TT_CONFIG_OPTION_UNPATENTED_HINTING
+    FT_Bool        both_x_axis;
+#endif
 
     FT_Long        loop;
     FT_F26Dot6     minimum_distance;
@@ -212,7 +216,8 @@ FT_BEGIN_HEADER
 
     TT_Transform     transform;    /* transformation matrix               */
 
-    FT_Vector        pp1, pp2;     /* phantom points                      */
+    FT_Vector        pp1, pp2;     /* phantom points (horizontal)         */
+    FT_Vector        pp3, pp4;     /* phantom points (vertical)           */
 
   } TT_SubGlyphRec, *TT_SubGlyph_Stack;
 
@@ -311,7 +316,7 @@ FT_BEGIN_HEADER
   {
     FT_SizeRec         root;
 
-    FT_Size_Metrics    metrics;    /* slightly different from the root metrics */
+    FT_Size_Metrics    metrics; /* slightly different from the root metrics */
     TT_Size_Metrics    ttmetrics;
 
 #ifdef TT_CONFIG_OPTION_EMBEDDED_BITMAPS

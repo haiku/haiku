@@ -4,7 +4,7 @@
 /*                                                                         */
 /*    FreeType PFR bitmap loader (body).                                   */
 /*                                                                         */
-/*  Copyright 2002 by                                                      */
+/*  Copyright 2002, 2003 by                                                */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -49,7 +49,7 @@
   static void
   pfr_bitwriter_init( PFR_BitWriter  writer,
                       FT_Bitmap*     target,
-                      FT_UInt        decreasing )
+                      FT_Bool        decreasing )
   {
     writer->line   = target->buffer;
     writer->pitch  = target->pitch;
@@ -115,7 +115,7 @@
     }
 
     if ( mask != 0x80 )
-      cur[0] = (FT_Byte) c;
+      cur[0] = (FT_Byte)c;
   }
 
 
@@ -185,7 +185,7 @@
       }
       else if ( mask == 0 )
       {
-        cur[0] = (FT_Byte) c;
+        cur[0] = (FT_Byte)c;
         mask   = 0x80;
         c      = 0;
         cur ++;
@@ -249,7 +249,7 @@
       }
       else if ( mask == 0 )
       {
-        cur[0] = (FT_Byte) c;
+        cur[0] = (FT_Byte)c;
         c      = 0;
         mask   = 0x80;
         cur ++;
@@ -274,8 +274,8 @@
   static void
   pfr_lookup_bitmap_data( FT_Byte*   base,
                           FT_Byte*   limit,
-                          FT_Int     count,
-                          FT_Byte    flags,
+                          FT_UInt    count,
+                          FT_UInt    flags,
                           FT_UInt    char_code,
                           FT_ULong*  found_offset,
                           FT_ULong*  found_size )
@@ -481,7 +481,7 @@
   pfr_load_bitmap_bits( FT_Byte*    p,
                         FT_Byte*    limit,
                         FT_UInt     format,
-                        FT_UInt     decreasing,
+                        FT_Bool     decreasing,
                         FT_Bitmap*  target )
   {
     FT_Error          error = 0;
@@ -508,7 +508,7 @@
 
       default:
         FT_ERROR(( "pfr_read_bitmap_data: invalid image type\n" ));
-        error = FT_Err_Invalid_File_Format;
+        error = PFR_Err_Invalid_File_Format;
       }
     }
 
@@ -560,7 +560,7 @@
       }
 
       /* couldn't find it */
-      return FT_Err_Invalid_Argument;
+      return PFR_Err_Invalid_Argument;
     }
 
   Found_Strike:
@@ -583,7 +583,7 @@
       pfr_lookup_bitmap_data( stream->cursor,
                               stream->limit,
                               strike->num_bitmaps,
-                              (FT_Byte) strike->flags,
+                              strike->flags,
                               character->char_code,
                               &gps_offset,
                               &gps_size );
@@ -593,7 +593,7 @@
       if ( gps_size == 0 )
       {
         /* Could not find a bitmap program string for this glyph */
-        error = FT_Err_Invalid_Argument;
+        error = PFR_Err_Invalid_Argument;
         goto Exit;
       }
     }
@@ -635,7 +635,7 @@
         glyph->root.metrics.height       = (FT_Long)ysize << 6;
         glyph->root.metrics.horiBearingX = xpos << 6;
         glyph->root.metrics.horiBearingY = ypos << 6;
-        glyph->root.metrics.horiAdvance  = ( ( advance >> 2 ) + 32 ) & -64;
+        glyph->root.metrics.horiAdvance  = FT_PIX_ROUND( ( advance >> 2 ) );
         glyph->root.metrics.vertBearingX = - glyph->root.metrics.width >> 1;
         glyph->root.metrics.vertBearingY = 0;
         glyph->root.metrics.vertAdvance  = size->root.metrics.height;
@@ -645,16 +645,18 @@
 
         /* Allocate and read bitmap data */
         {
-          FT_ULong    len    = glyph->root.bitmap.pitch * ysize;
+          FT_ULong  len = glyph->root.bitmap.pitch * ysize;
+
 
           error = ft_glyphslot_alloc_bitmap( &glyph->root, len );
           if ( !error )
           {
-            error = pfr_load_bitmap_bits( p,
-                                          stream->limit,
-                                          format,
-                                          face->header.color_flags & 2,
-                                          &glyph->root.bitmap );
+            error = pfr_load_bitmap_bits(
+                      p,
+                      stream->limit,
+                      format,
+                      FT_BOOL(face->header.color_flags & 2),
+                      &glyph->root.bitmap );
           }
         }
       }

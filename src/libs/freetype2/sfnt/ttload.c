@@ -5,7 +5,7 @@
 /*    Load the basic TrueType tables, i.e., tables that can be either in   */
 /*    TTF or OTF fonts (body).                                             */
 /*                                                                         */
-/*  Copyright 1996-2001, 2002 by                                           */
+/*  Copyright 1996-2001, 2002, 2003, 2004 by                               */
 /*  David Turner, Robert Wilhelm, and Werner Lemberg.                      */
 /*                                                                         */
 /*  This file is part of the FreeType project, and may only be used,       */
@@ -22,7 +22,6 @@
 #include FT_INTERNAL_STREAM_H
 #include FT_TRUETYPE_TAGS_H
 #include "ttload.h"
-#include "ttcmap.h"
 
 #include "sferrors.h"
 
@@ -179,11 +178,8 @@
     /* if 'num_tables' is 0, read the table count from the file */
     if ( num_tables == 0 )
     {
-      FT_ULong  format_tag;
-
-
       if ( FT_STREAM_SEEK( offset )     ||
-           FT_READ_ULONG ( format_tag ) ||
+           FT_STREAM_SKIP( 4 )          ||
            FT_READ_USHORT( num_tables ) ||
            FT_STREAM_SKIP( 6 )          )
         goto Bad_Format;
@@ -213,13 +209,13 @@
 
         has_head = 1;
 
-       /* the table length should be 0x36, but certain font tools
-        * make it 0x38, so we will just check that it is greater.
-        *
-        * note that according to the specification,
-        * the table must be padded to 32-bit lengths, but this doesn't
-        * apply to the value of its "Length" field !!
-        */
+        /* The table length should be 0x36, but certain font tools
+         * make it 0x38, so we will just check that it is greater.
+         *
+         * Note that according to the specification,
+         * the table must be padded to 32-bit lengths, but this doesn't
+         * apply to the value of its "Length" field!
+         */
         if ( table.Length < 0x36                 ||
              FT_STREAM_SEEK( table.Offset + 12 ) ||
              FT_READ_ULONG( magic )              ||
@@ -238,7 +234,7 @@
     return  error;
 
   Bad_Format:
-    error = FT_Err_Unknown_File_Format;
+    error = SFNT_Err_Unknown_File_Format;
     goto Exit;
   }
 
@@ -257,7 +253,7 @@
   /*    stream     :: The input stream.                                    */
   /*                                                                       */
   /*    face_index :: If the font is a collection, the number of the font  */
-  /*                  in the collection, ignored otherwise.                */
+  /*                  in the collection.  Must be zero otherwise.          */
   /*                                                                       */
   /* <Output>                                                              */
   /*    sfnt       :: The SFNT header.                                     */
@@ -280,7 +276,7 @@
                             SFNT_Header  sfnt )
   {
     FT_Error   error;
-    FT_ULong   format_tag, offset;
+    FT_ULong   font_format_tag, format_tag, offset;
     FT_Memory  memory = stream->memory;
 
     static const FT_Frame_Field  sfnt_header_fields[] =
@@ -317,16 +313,17 @@
 
     face->num_tables = 0;
 
-    /* first of all, read the first 4 bytes.  If it is `ttcf', then the */
-    /* file is a TrueType collection, otherwise it can be any other     */
-    /* kind of font.                                                    */
-    /*                                                                  */
+    /* First of all, read the first 4 bytes.  If it is `ttcf', then the   */
+    /* file is a TrueType collection, otherwise it is a single-face font. */
+    /*                                                                    */
     offset = FT_STREAM_POS();
 
-    if ( FT_READ_ULONG( format_tag ) )
+    if ( FT_READ_ULONG( font_format_tag ) )
       goto Exit;
 
-    if ( format_tag == TTAG_ttcf )
+    format_tag = font_format_tag;
+
+    if ( font_format_tag == TTAG_ttcf )
     {
       FT_Int  n;
 
@@ -358,8 +355,8 @@
       /* seek to the appropriate TrueType file, then read tag */
       offset = face->ttc_header.offsets[face_index];
 
-      if ( FT_STREAM_SEEK( offset ) ||
-           FT_READ_LONG( format_tag )                             )
+      if ( FT_STREAM_SEEK( offset )   ||
+           FT_READ_LONG( format_tag ) )
         goto Exit;
     }
 
@@ -376,7 +373,12 @@
     {
       FT_TRACE2(( "tt_face_load_sfnt_header: file is not SFNT!\n" ));
       error = SFNT_Err_Unknown_File_Format;
+      goto Exit;
     }
+
+    /* disallow face index values > 0 for non-TTC files */
+    if ( font_format_tag != TTAG_ttcf && face_index > 0 )
+      error = SFNT_Err_Bad_Argument;
 
   Exit:
     return error;
@@ -744,12 +746,12 @@
       face->root.num_glyphs = maxProfile->numGlyphs;
 
       face->root.internal->max_points =
-        (FT_UShort)MAX( maxProfile->maxCompositePoints,
-                        maxProfile->maxPoints );
+        (FT_UShort)FT_MAX( maxProfile->maxCompositePoints,
+                           maxProfile->maxPoints );
 
       face->root.internal->max_contours =
-        (FT_Short)MAX( maxProfile->maxCompositeContours,
-                       maxProfile->maxContours );
+        (FT_Short)FT_MAX( maxProfile->maxCompositeContours,
+                          maxProfile->maxContours );
 
       face->max_components = (FT_ULong)maxProfile->maxComponentElements +
                              maxProfile->maxComponentDepth;
@@ -840,16 +842,16 @@
       {
 
 #ifdef FT_CONFIG_OPTION_INCREMENTAL
-      /* If this is an incrementally loaded font and there are    */
-      /* overriding metrics tolerate a missing 'hmtx' table.      */
+        /* If this is an incrementally loaded font and there are */
+        /* overriding metrics tolerate a missing 'hmtx' table.   */
         if ( face->root.internal->incremental_interface &&
              face->root.internal->incremental_interface->funcs->
-                 get_glyph_metrics )
+               get_glyph_metrics )
         {
           face->horizontal.number_Of_HMetrics = 0;
           error = SFNT_Err_Ok;
           goto Exit;
-	    }
+        }
 #endif
 
         FT_ERROR(( " no horizontal metrics in file!\n" ));
@@ -900,7 +902,8 @@
     /* do we have an inconsistent number of metric values? */
     {
       TT_ShortMetrics*  cur   = *shorts;
-      TT_ShortMetrics*  limit = cur + MIN( num_shorts, num_shorts_checked );
+      TT_ShortMetrics*  limit = cur +
+                                FT_MIN( num_shorts, num_shorts_checked );
 
 
       for ( ; cur < limit; cur++ )
@@ -1779,6 +1782,7 @@
     FT_Memory  memory = stream->memory;
 
     TT_Hdmx    hdmx = &face->hdmx;
+    FT_Short   num_records;
     FT_Long    num_glyphs;
     FT_Long    record_size;
 
@@ -1796,7 +1800,7 @@
       goto Exit;
 
     hdmx->version     = FT_GET_USHORT();
-    hdmx->num_records = FT_GET_SHORT();
+    num_records       = FT_GET_SHORT();
     record_size       = FT_GET_LONG();
 
     FT_FRAME_EXIT();
@@ -1805,9 +1809,10 @@
     if ( hdmx->version != 0 )
       goto Exit;
 
-    if ( FT_NEW_ARRAY( hdmx->records, hdmx->num_records ) )
+    if ( FT_NEW_ARRAY( hdmx->records, num_records ) )
       goto Exit;
 
+    hdmx->num_records = num_records;
     num_glyphs   = face->root.num_glyphs;
     record_size -= num_glyphs + 2;
 
