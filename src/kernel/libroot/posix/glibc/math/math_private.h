@@ -11,7 +11,7 @@
 
 /*
  * from: @(#)fdlibm.h 5.1 93/09/24
- * $Id: math_private.h,v 1.1 2005/03/10 19:37:35 korli Exp $
+ * $Id$
  */
 
 #ifndef _MATH_PRIVATE_H_
@@ -149,7 +149,7 @@ do {								\
 } while (0)
 
 /* Get long double macros from a separate header.  */
-#include <math_ldbl.h>
+//#include <math_ldbl.h>
 
 /* ieee style elementary functions */
 extern double __ieee754_sqrt (double);
