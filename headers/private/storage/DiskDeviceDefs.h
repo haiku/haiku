@@ -131,14 +131,14 @@ enum {
 };
 
 // disk device job progress info
-struct disk_device_job_progress_info {
+typedef struct disk_device_job_progress_info {
 	uint32	status;
 	uint32	interrupt_properties;
 	int32	task_count;
 	int32	completed_tasks;
 	float	current_task_progress;
 	char	current_task_description[256];
-};
+} disk_device_job_progress_info;
 
 // disk device job interrupt properties
 enum {
