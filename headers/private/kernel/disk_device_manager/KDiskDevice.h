@@ -25,7 +25,7 @@ public:
 
 	status_t SetTo(const char *path);
 	void Unset();
-	status_t InitCheck() const;
+	virtual status_t InitCheck() const;
 		// TODO: probably superfluous
 
 	// A read lock owner can be sure that the device (incl. all of its
@@ -68,6 +68,12 @@ public:
 
 	void SetShadowOwner(team_id team);
 	team_id ShadowOwner() const;
+
+	virtual void Dump(bool deep = true, int32 level = 0);
+
+protected:
+	virtual status_t GetMediaStatus(status_t *mediaStatus);
+	virtual status_t GetGeometry(device_geometry *geometry);
 
 private:
 	void _InitPartitionData();

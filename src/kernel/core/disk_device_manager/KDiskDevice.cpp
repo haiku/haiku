@@ -2,12 +2,18 @@
 
 #include <errno.h>
 #include <fcntl.h>
+#include <stdio.h>
 #include <unistd.h>
 
 #include <Drivers.h>
 
 #include "KDiskDevice.h"
 #include "KDiskDeviceUtils.h"
+
+// debugging
+//#define DBG(x)
+#define DBG(x) x
+#define OUT printf
 
 // constructor
 KDiskDevice::KDiskDevice(partition_id id)
@@ -48,11 +54,13 @@ KDiskDevice::SetTo(const char *path)
 	if (fFD < 0)
 		return errno;
 	// get device geometry and media status
-	// TODO: files need to be handled differently
-	if (ioctl(fFD, B_GET_MEDIA_STATUS, &fMediaStatus) == 0
-		&& ioctl(fFD, B_GET_GEOMETRY, &fDeviceData.geometry) == 0) {
-		_InitPartitionData();
-	}
+	error = GetMediaStatus(&fMediaStatus);
+	if (error != B_OK)
+		return error;
+	error = GetGeometry(&fDeviceData.geometry);
+	if (error != B_OK)
+		return error;
+	_InitPartitionData();
 	return B_OK;
 }
 
@@ -246,6 +254,35 @@ team_id
 KDiskDevice::ShadowOwner() const
 {
 	return fShadowOwner;
+}
+
+// Dump
+void
+KDiskDevice::Dump(bool deep, int32 level)
+{
+	OUT("device %ld: %s\n", ID(), Path());
+	OUT("  media status:      %s\n", strerror(fMediaStatus));
+	OUT("  device flags:      %lx\n", DeviceFlags());
+	if (fMediaStatus == B_OK)
+		KPartition::Dump(deep, 0);
+}
+
+// GetMediaStatus
+status_t
+KDiskDevice::GetMediaStatus(status_t *mediaStatus)
+{
+	if (ioctl(fFD, B_GET_MEDIA_STATUS, mediaStatus) != 0)
+		return errno;
+	return B_OK;
+}
+
+// GetGeometry
+status_t
+KDiskDevice::GetGeometry(device_geometry *geometry)
+{
+	if (ioctl(fFD, B_GET_GEOMETRY, geometry) != 0)
+		return errno;
+	return B_OK;
 }
 
 // _InitPartitionData
