@@ -274,7 +274,7 @@ void ServerApp::WindowBroadcast(int32 code)
 	for(int32 i=0; i<count; i++)
 	{
 		ServerWindow *sw = ((WinBorder*)desktop->fWinBorderList.ItemAt(i))->Window();
-		BMessage		msg(B_QUIT_REQUESTED);
+		BMessage msg(code);
 		sw->SendMessageToClient(&msg);
 	}
 	desktop->fLayerLock.Unlock();
@@ -297,7 +297,7 @@ void ServerApp::SendMessageToClient(const BMessage *msg) const
 	else
 		printf("PANIC: ServerApp: '%s': can't flatten message in 'SendMessageToClient()'\n", fSignature.String());
 
-	delete buffer;
+	delete [] buffer;
 }
 
 /*!
@@ -438,6 +438,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_COLORS:
 		{
+			// Eventually we will have windows which will notify their children of changes in 
+			// system colors
+			
 /*			STRACE(("ServerApp %s: Received global UI color update notification\n",fSignature.String()));
 			ServerWindow *win;
 			BMessage msg(_COLORS_UPDATED);
@@ -454,6 +457,9 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 		}
 		case AS_UPDATE_FONTS:
 		{
+			// Eventually we will have windows which will notify their children of changes in 
+			// system fonts
+			
 /*			STRACE(("ServerApp %s: Received global font update notification\n",fSignature.String()));
 			ServerWindow *win;
 			BMessage msg(_FONTS_UPDATED);
@@ -497,16 +503,16 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			// 8) port_id window's message port
 			// 9) const char * title
 
-			BRect		frame;
-			uint32		look;
-			uint32		feel;
-			uint32		flags;
-			uint32		wkspaces;
-			int32		token;
-			port_id		sendPort;
-			port_id		looperPort;
-			port_id		replyport;
-			char		*title;
+			BRect frame;
+			uint32 look;
+			uint32 feel;
+			uint32 flags;
+			uint32 wkspaces;
+			int32 token;
+			port_id	sendPort;
+			port_id looperPort;
+			port_id replyport;
+			char *title;
 
 			msg->Read<BRect>(&frame);
 			msg->Read<int32>((int32*)&look);
@@ -522,15 +528,15 @@ void ServerApp::_DispatchMessage(PortMessage *msg)
 			STRACE(("ServerApp %s: Got 'New Window' message, trying to do smething...\n",fSignature.String()));
 
 			// ServerWindow constructor will reply with port_id of a newly created port
-			ServerWindow		*sw = NULL;
-			sw		= new ServerWindow(frame, title, look, feel, flags, this,
+			ServerWindow *sw = NULL;
+			sw = new ServerWindow(frame, title, look, feel, flags, this,
 						sendPort, looperPort, replyport, wkspaces, token);
 			sw->Init();
 
 			STRACE(("\nServerApp %s: New Window %s (%.1f,%.1f,%.1f,%.1f)\n",
 					fSignature.String(),title,frame.left,frame.top,frame.right,frame.bottom));
 			
-			delete title;
+			delete [] title;
 
 			break;
 		}
