@@ -119,7 +119,7 @@ read_block(int fd, off_t offset, size_t size, uchar **block)
 			if (read_pos(fd, offset, *block, size) != (ssize_t)size) {
 				error = errno;
 				if (error == B_OK)
-					error = B_ERROR;
+					error = B_IO_ERROR;
 				free(*block);
 				*block = NULL;
 			}
@@ -184,7 +184,7 @@ get_partition_module_for_identifier(const char *identifier,
 			 bufferSize = sizeof(moduleName)) {
 			partition_module_info *module = NULL;
 			if (get_module(moduleName, (module_info**)&module) == B_OK) {
-				if (module->identify_module(identifier)) {
+				if (!strcmp(module->short_name, identifier)) {
 					// found module
 					*partitionModule = module;
 					break;
@@ -237,7 +237,6 @@ disk_scanner_get_nth_session_info(int deviceFD, int32 index,
 	status_t error = B_OK;
 	session_module_info *sessionModule
 		= (_sessionModule ? *_sessionModule : NULL);
-	bool isCD = false;
 	int32 blockSize = 0;
 	off_t deviceSize = 0;
 	device_geometry geometry;
@@ -248,43 +247,39 @@ disk_scanner_get_nth_session_info(int deviceFD, int32 index,
 	TRACE(("disk_scanner: get_nth_session_info(%d, %ld)\n", deviceFD, index));
 	if (error == B_OK) {
 		if (ioctl(deviceFD, B_GET_GEOMETRY, &geometry) == 0) {
-			isCD = (geometry.device_type == B_CD);
 			blockSize = geometry.bytes_per_sector;
 			deviceSize = (off_t)blockSize * geometry.sectors_per_track
 				* geometry.cylinder_count * geometry.head_count;
 		} else
 			error = errno;
 	}
-TRACE(("disk_scanner:   check: %s\n", strerror(error)));
 	// get a session module, if the device is a CD, otherwise return a
 	// virtual session
 	if (error == B_OK) {
-		if (isCD) {
-			// get the session module
-			if (!sessionModule) {
-				error = disk_scanner_get_session_module(deviceFD, deviceSize,
-														blockSize,
-														&sessionModule);
-TRACE(("disk_scanner:     check: %s\n", strerror(error)));
-			}
-			// get the info
+		// get the session module
+		if (!sessionModule) {
+			error = disk_scanner_get_session_module(deviceFD, deviceSize,
+													blockSize,
+													&sessionModule);
 			if (error == B_OK) {
 				error = sessionModule->get_nth_info(deviceFD, index,
 													deviceSize, blockSize,
 													sessionInfo);
-TRACE(("disk_scanner:     check: %s\n", strerror(error)));
+			} else if (error == B_ENTRY_NOT_FOUND) {
+				// no session add-on found -- return a virtual session for
+				// index 0
+				error = B_OK;
+				if (index == 0) {
+					sessionInfo->offset = 0;
+					sessionInfo->size = deviceSize;
+					sessionInfo->logical_block_size = blockSize;
+					sessionInfo->index = 0;
+					sessionInfo->flags = B_VIRTUAL_SESSION;
+				} else
+					error = B_ENTRY_NOT_FOUND;
 			}
-		} else if (index == 0) {
-			// no CD -- virtual session
-			sessionInfo->offset = 0;
-			sessionInfo->size = deviceSize;
-			sessionInfo->logical_block_size = blockSize;
-			sessionInfo->index = 0;
-			sessionInfo->flags = B_VIRTUAL_SESSION;
-		} else	// no CD, fail after the first session
-			error = B_ENTRY_NOT_FOUND;
+		}
 	}
-TRACE(("disk_scanner:   check: %s\n", strerror(error)));
 	// cleanup / set results
 	if (_sessionModule)
 		*_sessionModule = sessionModule;
@@ -302,6 +297,7 @@ disk_scanner_get_nth_partition_info(int deviceFD,
 									const session_info *sessionInfo,
 									int32 partitionIndex,
 									extended_partition_info *partitionInfo,
+									char *partitionMapName,
 									partition_module_info **_partitionModule)
 {
 	partition_module_info *partitionModule
@@ -345,7 +341,14 @@ disk_scanner_get_nth_partition_info(int deviceFD,
 			error = partitionModule->get_nth_info(deviceFD, sessionInfo,
 				block, partitionIndex, partitionInfo);
 		}
-		// cleanup / set results
+		// set results / cleanup
+		if (error == B_OK && partitionMapName) {
+			// return partition module identifier
+			if (partitionModule)
+				strcpy(partitionMapName, partitionModule->short_name);
+			else
+				partitionMapName[0] = '\0';
+		}
 		if (_partitionModule)
 			*_partitionModule = partitionModule;
 		else if (partitionModule)
@@ -377,7 +380,7 @@ disk_scanner_get_partition_fs_info(int deviceFD,
 		cacheInitialized = (error == B_OK);
 	}
 	// Iterate through the list of FS modules and return the result of the
-	// first one that thinks, it is the right one.
+	// one with the highest priority that thinks, it is the right one.
 	if (error == B_OK && ((list = open_module_list(kFSModulePrefix)))) {
 		extended_partition_info bestInfo;
 		float bestPriority = -2;
@@ -562,7 +565,7 @@ get_buffer(struct fs_buffer_cache *cache, off_t offset, size_t size,
 			size_t remainingBytes = size;
 			fs_block *block = NULL;
 			for (block = cache->first_block;
-				 error == B_OK && remainingBytes > 0;
+				 remainingBytes > 0;
 				 block = block->next) {
 				if (!block || block->offset >= blockOffset) {
 					if (!block || block->offset > blockOffset) {
@@ -604,6 +607,9 @@ get_buffer(struct fs_buffer_cache *cache, off_t offset, size_t size,
 						remainingBytes -= toCopy;
 					}
 				}
+				// bail out on failure
+				if (error != B_OK)
+					break;
 			}
 		} else
 			error = B_NO_MEMORY;
