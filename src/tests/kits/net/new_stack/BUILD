@@ -6,16 +6,19 @@ But, beware:
   be setup by hands today: please symlink each module like this:
 
   net_stack_server
-  add-ons\
-    generic\
+  add-ons/
+    generic/
       memory_pool -> ../../memory_pool/memory_pool
       atomizer -> ../../atomizer/atomizer
-    network\
+    network/
       stack -> ../../stack/stack
-      layers\
-        protocols\
+      layers/
+        framings/
+          ethernet_frame -> ../../../../ethernet_frame/ethernet_frame
+        protocols/
           arp -> ../../../../arp/arp
-        interfaces\
-          ethernet -> ../../../../ethernet/ethernet
+          ipv4 -> ../../../../ipv4/ipv4
+        interfaces/
+          ethernet_device -> ../../../../ethernet_device/ethernet_device
           loopback -> ../../../../loopback/loopback
   
