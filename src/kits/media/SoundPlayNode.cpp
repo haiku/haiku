@@ -297,13 +297,7 @@ _SoundPlayNode::PrepareToConnect(const media_source& what, const media_destinati
 		fprintf(stderr, "\tnon-raw-audio format?!\n");
 		return B_MEDIA_BAD_FORMAT;
 	}
-	else if (format->u.raw_audio.format != media_raw_audio_format::B_AUDIO_SHORT)
-	{
-		fprintf(stderr, "\tnon-short-audio format?!\n");
-		return B_MEDIA_BAD_FORMAT;
-	}
-
-	 // !!! validate all other fields except for buffer_size here, because the consumer might have
+	// !!! validate all other fields except for buffer_size here, because the consumer might have
 	// supplied different values from AcceptFormat()?
 
 	// check the buffer size, which may still be wildcarded

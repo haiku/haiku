@@ -486,7 +486,7 @@ BSoundPlayer::Init(
 					void (*Notifier)(void *, sound_player_notification what, ...),
 					void * cookie)
 {
-	BROKEN();
+	CALLED();
 	_m_node = NULL;
 	_m_sounds = NULL;
 	_m_waiting = NULL;
@@ -546,9 +546,9 @@ BSoundPlayer::Init(
 		fmt.buffer_size = 4096;
 		
 	if (fmt.channel_count != 1 && fmt.channel_count != 2)
-		debugger("BSoundPlayer: not a 1 or 2 channel audio format\n");
+		FATAL("BSoundPlayer: not a 1 or 2 channel audio format\n");
 	if (fmt.frame_rate <= 0.0f)
-		debugger("BSoundPlayer: framerate must be > 0\n");
+		FATAL("BSoundPlayer: framerate must be > 0\n");
 
 	_m_bufsize = fmt.buffer_size;
 	_m_buf = new char[_m_bufsize];
@@ -589,6 +589,13 @@ BSoundPlayer::Init(
 		TRACE("BSoundPlayer::Init: Couldn't GetFreeOutputsFor\n");
 		goto the_end;
 	}
+
+	// Set an appropriate run mode for the producer
+	err = roster->SetRunModeNode(_m_node->Node(), BMediaNode::B_INCREASE_LATENCY);
+	if(err != B_OK) {
+		TRACE("BSoundPlayer::Init: Couldn't SetRunModeNode\n");
+		goto the_end;
+	}
 		
 	//tryFormat.type = B_MEDIA_RAW_AUDIO;
 	//tryformat.fileAudioOutput.format;
@@ -599,12 +606,6 @@ BSoundPlayer::Init(
 		goto the_end;
 	}
 	
-	// Set an appropriate run mode for the producer
-	err = roster->SetRunModeNode(_m_node->Node(), BMediaNode::B_INCREASE_LATENCY);
-	if(err != B_OK) {
-		TRACE("BSoundPlayer::Init: Couldn't SetRunModeNode\n");
-		goto the_end;
-	}
 	
 	printf("BSoundPlayer node %ld has timesource %ld\n", _m_node->Node().node, _m_node->TimeSource()->Node().node);
 	
