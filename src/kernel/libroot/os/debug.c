@@ -89,3 +89,26 @@ _debuggerAssert(const char * file, int line, char * message)
 	return 0;
 }
 
+// TODO: Remove. Temporary debug helper.
+
+void
+debug_printf(const char *format, ...)
+{
+	va_list list;
+	va_start(list, format);
+
+	debug_vprintf(format, list);
+
+	va_end(list);
+}
+
+void
+debug_vprintf(const char *format, va_list args)
+{
+	char buffer[1024];
+	vsnprintf(buffer, sizeof(buffer), format, args);
+
+	_kern_debug_output(buffer);
+}
+
+
