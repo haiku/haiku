@@ -14,20 +14,26 @@ class Bookmark {
 	public:
 		int   fLevel;
 		BFont fFont;
-		Definition(int level, BFont* font);
+		bool  fExpanded;
+		
+		Definition(int level, BFont* font, bool expanded);
 		bool  Matches(font_family* family, font_style* style, float size) const;
 	};
 	
 	class Outline {
 	public:
-		BPoint  fStart;
-		BString fText;
-		int     fLevel;
+		BPoint     fStart;
+		float      fHeight;
+		BString    fText;
+		Definition *fDefinition;
 		
-		Outline(BPoint start, const char* text, int level) : fStart(start), fText(text), fLevel(level) { }
-		int         Level() const { return fLevel; }
-		const char* Text() const  { return fText.String(); }
-		BPoint      Start() const { return fStart; }
+		Outline(BPoint start, float height, const char* text, Definition* definition) : fStart(start), fHeight(height), fText(text), fDefinition(definition) { }
+
+		int         Level() const    { return fDefinition->fLevel; }
+		bool        Expanded() const { return fDefinition->fExpanded; }
+		const char* Text() const     { return fText.String(); }
+		BPoint      Start() const    { return fStart; }
+		float       Height() const   { return fHeight; }
 	};
 	
 	PDFWriter*         fWriter;
@@ -37,7 +43,7 @@ class Bookmark {
 	int                fLevels[kMaxBookmarkLevels+1];
 
 	bool Exists(const char* family, const char* style) const;
-	bool Find(BFont* font, int &level) const;
+	Definition* Find(BFont* font) const;
 
 	static int AscendingByStart(const Outline** a, const Outline** b);
 
@@ -46,8 +52,8 @@ public:
 	Bookmark(PDFWriter* writer);
 
 	// level starts with 1	
-	void AddDefinition(int level, BFont* font);
-	void AddBookmark(BPoint start, const char* text, BFont* font);
+	void AddDefinition(int level, BFont* font, bool expanded);
+	void AddBookmark(BPoint start, float height, const char* text, BFont* font);
 	bool Read(const char* name); // adds definitions from file
 	void CreateBookmarks();
 };

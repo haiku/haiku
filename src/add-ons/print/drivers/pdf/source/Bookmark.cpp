@@ -5,9 +5,10 @@
 #include "Report.h"
 
 
-Bookmark::Definition::Definition(int level, BFont* font)
+Bookmark::Definition::Definition(int level, BFont* font, bool expanded)
 	: fLevel(level)
 	, fFont(*font)
+	, fExpanded(expanded)
 {	
 }
 
@@ -35,7 +36,7 @@ Bookmark::Bookmark(PDFWriter* writer)
 }
 
 
-bool Bookmark::Find(BFont* font, int& level) const
+Bookmark::Definition* Bookmark::Find(BFont* font) const
 {
 	font_family family;
 	font_style  style;
@@ -45,30 +46,29 @@ bool Bookmark::Find(BFont* font, int& level) const
 	size = font->Size();
 	
 	for (int i = 0; i < fDefinitions.CountItems(); i++) {
-		Definition* d = fDefinitions.ItemAt(i);
-		if (d->Matches(&family, &style, size)) {
-			level = d->fLevel;
-			return true;
+		Definition* definition = fDefinitions.ItemAt(i);
+		if (definition->Matches(&family, &style, size)) {
+			return definition;
 		}
 	}
-	return false;
+	return NULL;
 }
 
 
-void Bookmark::AddDefinition(int level, BFont* font)
+void Bookmark::AddDefinition(int level, BFont* font, bool expanded)
 {
 	ASSERT(1 <= level && level <= kMaxBookmarkLevels);
-	if (!Find(font, level)) {
-		fDefinitions.AddItem(new Definition(level, font));
+	if (Find(font) == NULL) {
+		fDefinitions.AddItem(new Definition(level, font, expanded));
 	}
 }
 
 
-void Bookmark::AddBookmark(BPoint start, const char* text, BFont* font)
+void Bookmark::AddBookmark(BPoint start, float height, const char* text, BFont* font)
 {
-	int level;
-	if (Find(font, level)) {
-		fOutlines.AddItem(new Outline(start, text, level));
+	Definition* definition = Find(font);
+	if (definition != NULL) {
+		fOutlines.AddItem(new Outline(start, height, text, definition));
 	}
 }
 
@@ -79,6 +79,7 @@ int Bookmark::AscendingByStart(const Outline** a, const Outline** b) {
 
 
 void Bookmark::CreateBookmarks() {
+	char optList[256];
 	fOutlines.SortItems(AscendingByStart);
 
 	for (int i = 0; i < fOutlines.CountItems(); i++) {
@@ -86,10 +87,14 @@ void Bookmark::CreateBookmarks() {
 
 		Outline* o = fOutlines.ItemAt(i);		
 		REPORT(kInfo, fWriter->fPage, "Bookmark '%s' at level %d", o->Text(), o->Level());
+
+		sprintf(optList, "type=fixed left=%f top=%f", o->Start().x, o->Start().y + o->Height());
+		PDF_set_parameter(fWriter->fPdf, "bookmarkdest", optList);
 		
 		fWriter->ToPDFUnicode(o->Text(), ucs2);
 
-		int bookmark = PDF_add_bookmark(fWriter->fPdf, ucs2.String(), fLevels[o->Level()-1], 1);
+		int open = o->Expanded() ? 1 : 0;
+		int bookmark = PDF_add_bookmark(fWriter->fPdf, ucs2.String(), fLevels[o->Level()-1], open);
 		
 		if (bookmark < 0) bookmark = 0;
 		
@@ -97,6 +102,8 @@ void Bookmark::CreateBookmarks() {
 			fLevels[i] = bookmark;
 		} 
 	}
+	// reset to default
+	PDF_set_parameter(fWriter->fPdf, "bookmarkdest", "type=fitwindow");
 
 	fOutlines.MakeEmpty();
 }
@@ -108,12 +115,13 @@ File Format: Definition.
 Line comment starts with '#'.
 
 Definition = Version { Font }.
-Version    = "Bookmarks" "1.0".
-Font       = Level Family Style Size.
+Version    = "Bookmarks" "2.0".
+Font       = Level Family Style Size Expanded.
 Level      = int.
 Family     = String.
 Style      = String.
 Size       = float.
+Expanded   = "expanded" | "collapsed". // new in version 2.0, version 1.0 defaults to collapsed
 String     = '"' string '"'.
 */
 
@@ -143,16 +151,17 @@ bool Bookmark::Exists(const char* f, const char* s) const {
 bool Bookmark::Read(const char* name) {
 	Scanner scnr(name);
 	if (scnr.InitCheck() == B_OK) {
-		BString s; float f; bool ok;
-		ok = scnr.ReadName(&s) && scnr.ReadFloat(&f);
-		if (!ok || strcmp(s.String(), "Bookmarks") != 0 || f != 1.0) {
+		BString s; float version; bool ok;
+		ok = scnr.ReadName(&s) && scnr.ReadFloat(&version);
+		if (!ok || strcmp(s.String(), "Bookmarks") != 0 || (version != 1.0 && version != 2.0) ) {
 			REPORT(kError, 0, "Bookmarks (line %d, column %d): '%s' not a bookmarks file or wrong version!", scnr.Line(), scnr.Column(), name);
 			return false;
 		}
 		
 		while (!scnr.IsEOF()) {
 			float   level, size;
-			BString family, style;
+			bool    expanded = false;
+			BString family, style, expand;
 			if (!(scnr.ReadFloat(&level) && level >= 1.0 && level <= 10.0)) {
 				REPORT(kError, 0, "Bookmarks (line %d, column %d): Invalid level", scnr.Line(), scnr.Column());
 				return false;
@@ -169,13 +178,20 @@ bool Bookmark::Read(const char* name) {
 				REPORT(kError, 0, "Bookmarks (line %d, column %d): Invalid font size", scnr.Line(), scnr.Column());
 				return false;
 			}
+			if (version == 2.0) {
+				if (!scnr.ReadName(&expand) || (strcmp(expand.String(), "expanded") != 0 && strcmp(expand.String(), "collapsed") != 0)) {
+					REPORT(kError, 0, "Bookmarks (line %d, column %d): Invalid expanded value", scnr.Line(), scnr.Column());
+					return false;
+				}
+				expanded = strcmp(expand.String(), "expanded") == 0;
+			}
 			
 			if (Exists(family.String(), style.String())) {
 				BFont font;
 				font.SetFamilyAndStyle(family.String(), style.String());
 				font.SetSize(size);
 			
-				AddDefinition((int)level, &font);
+				AddDefinition((int)level, &font, expanded);
 			} else {
 				REPORT(kWarning, 0, "Bookmarks (line %d, column %d): Font %s-%s not available!", scnr.Line(), scnr.Column(), family.String(), style.String());
 			}
