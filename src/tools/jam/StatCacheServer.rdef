@@ -1,24 +1,8 @@
+resource app_signature "application/x-vnd.haiku.jam-cacheserver";
 
-resource(1, "BEOS:APP_SIG") #'MIMS' "application/x-vnd.haiku.jam-cacheserver";
-
-resource(1, "BEOS:FILE_TYPES") message
+resource file_types message
 {
-	"types" = "application/octet-stream"
+    "types" = "application/octet-stream"
 };
 
-resource app_version
-{
-	major  = 1, 
-	middle = 0,
-	minor  = 0,
-
-	/* 0 = development	1 = alpha			2 = beta
-	   3 = gamma		4 = golden master	5 = final */
-	variety = 5,
-	internal = 1,
-
-	short_info = "StatCacheServer",
-	long_info = "StatCacheServer 1.0.0 for Jam ©2004 Haiku"
-};
-
-resource(1, "BEOS:APP_FLAGS") #'APPF' $"04000000";
+resource app_flags B_BACKGROUND_APP;
