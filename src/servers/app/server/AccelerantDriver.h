@@ -125,7 +125,12 @@ protected:
 	void SetThickPixel32(int x, int y, int thick, rgb_color col);
 	void SetThickPixel16(int x, int y, int thick, uint16 col);
 	void SetThickPixel8(int x, int y, int thick, uint8 col);
-	//FrameBuffer *fbuffer;
+	int OpenGraphicsDevice(int deviceNumber);
+	int GetModeFromResolution(int width, int height, int space);
+	int GetWidthFromMode(int mode);
+	int GetHeightFromMode(int mode);
+	int GetDepthFromMode(int mode);
+	int GetDepthFromColorspace(int space);
 	ServerCursor *cursor, *under_cursor;
 	int32 drawmode;
 	BRect cursorframe;
@@ -133,8 +138,10 @@ protected:
 	image_id accelerant_image;
 	GetAccelerantHook accelerant_hook;
 	frame_buffer_config mFrameBufferConfig;
+	int mode_count;
 	display_mode *mode_list;
 	display_mode mDisplayMode;
+	display_mode R5DisplayMode; // This should go away once we stop running under r5
 };
 
 #endif

@@ -32,6 +32,16 @@
 #include <FindDirectory.h>
 #include <graphic_driver.h>
 #include <malloc.h>
+#include <dirent.h>
+
+#define RUN_UNDER_R5
+
+/* Stuff to investigate:
+   Effect of pensize on fill operations
+   Pattern details - start point, rectangles drawn counter-clockwise?
+                     Maybe the pattern is always relative to (0,0)
+*/
+/* Need to check which functions should move the pen position */
 
 /*!
 	\brief Sets up internal variables needed by AccelerantDriver
@@ -39,17 +49,17 @@
 */
 AccelerantDriver::AccelerantDriver(void) : DisplayDriver()
 {
-  //drawmode = DRAW_COPY;
-  drawmode = 0;
+	/* Why do I even have drawmode stored here? */
+	//drawmode = DRAW_COPY;
+	drawmode = 0;
 
-  cursor=NULL;
-  under_cursor=NULL;
-  cursorframe.Set(0,0,0,0);
+	cursor=NULL;
+	under_cursor=NULL;
+	cursorframe.Set(0,0,0,0);
 
-  card_fd = -1;
-  accelerant_image = -1;
-//  accelerant_hook = NULL;
-  mode_list = NULL;
+	card_fd = -1;
+	accelerant_image = -1;
+	mode_list = NULL;
 }
 
 
@@ -59,12 +69,12 @@ AccelerantDriver::AccelerantDriver(void) : DisplayDriver()
 */
 AccelerantDriver::~AccelerantDriver(void)
 {
-  if (cursor)
-	delete cursor;
-  if (under_cursor)
-	delete under_cursor;
-  if (mode_list)
-	free(mode_list);
+	if (cursor)
+		delete cursor;
+	if (under_cursor)
+		delete under_cursor;
+	if (mode_list)
+		free(mode_list);
 }
 
 /*!
@@ -76,102 +86,96 @@ AccelerantDriver::~AccelerantDriver(void)
 */
 bool AccelerantDriver::Initialize(void)
 {
-  int i;
-  char signature[1024];
-  char path[PATH_MAX];
-  struct stat accelerant_stat;
-  const static directory_which dirs[] =
-  {
-	B_USER_ADDONS_DIRECTORY,
-	B_COMMON_ADDONS_DIRECTORY,
-	B_BEOS_ADDONS_DIRECTORY
-  };
-
-  //card_fd = open("/dev/graphics/1002_4755_000400",B_READ_WRITE);
-  card_fd = open("/dev/graphics/nv10_010000",B_READ_WRITE);
-  //card_fd = open("/dev/graphics/stub",B_READ_WRITE);
-  if ( card_fd < 0 )
-  {
-	printf("Failed to open graphics device\n");
-	return false;
-  }
-
-  if (ioctl(card_fd, B_GET_ACCELERANT_SIGNATURE, &signature, sizeof(signature)) != B_OK)
-  {
-	close(card_fd);
-	return false;
-  }
-//printf("signature %s\n",signature);
-
-  accelerant_image = -1;
-  for (i=0; i<3; i++)
-  {
-	if (find_directory (dirs[i], -1, false, path, PATH_MAX) != B_OK)
-	  continue;
-	strcat(path,"/accelerants/");
-	strcat(path,signature);
-	if (stat(path, &accelerant_stat) != 0)
-	  continue;
-	accelerant_image = load_add_on(path);
-	if (accelerant_image >= 0)
+	int i;
+	char signature[1024];
+	char path[PATH_MAX];
+	struct stat accelerant_stat;
+	const static directory_which dirs[] =
 	{
-	  if ( get_image_symbol(accelerant_image,B_ACCELERANT_ENTRY_POINT,
-			B_SYMBOL_TYPE_ANY,(void**)(&accelerant_hook)) != B_OK )
-		return false;
+		B_USER_ADDONS_DIRECTORY,
+		B_COMMON_ADDONS_DIRECTORY,
+		B_BEOS_ADDONS_DIRECTORY
+	};
 
-	  init_accelerant InitAccelerant;
-	  InitAccelerant = (init_accelerant)accelerant_hook(B_INIT_ACCELERANT,NULL);
-	  if (!InitAccelerant || (InitAccelerant(card_fd) != B_OK))
+	card_fd = OpenGraphicsDevice(1);
+	if ( card_fd < 0 )
+	{
+		printf("Failed to open graphics device\n");
 		return false;
-	  break;
 	}
-  }
-  if (accelerant_image < 0)
-	return false;
 
-  int mode_count;
-  accelerant_mode_count GetModeCount = (accelerant_mode_count)accelerant_hook(B_ACCELERANT_MODE_COUNT, NULL);
-  if ( !GetModeCount )
-	return false;
-  mode_count = GetModeCount();
-  if ( !mode_count )
-	return false;
-  get_mode_list GetModeList = (get_mode_list)accelerant_hook(B_GET_MODE_LIST, NULL);
-  if ( !GetModeList )
-	return false;
-  mode_list = (display_mode *)calloc(sizeof(display_mode), mode_count);
-  if ( !mode_list )
-	return false;
-  if ( GetModeList(mode_list) != B_OK )
-	return false;
+	if (ioctl(card_fd, B_GET_ACCELERANT_SIGNATURE, &signature, sizeof(signature)) != B_OK)
+	{
+		close(card_fd);
+		return false;
+	}
+	//printf("signature %s\n",signature);
 
-#if 0
-  set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
-  if ( !SetDisplayMode )
-	return false;
-  /* Use the first mode in the list */
-  if ( SetDisplayMode(mode_list) != B_OK )
-	return false;
+	accelerant_image = -1;
+	for (i=0; i<3; i++)
+	{
+		if (find_directory (dirs[i], -1, false, path, PATH_MAX) != B_OK)
+			continue;
+		strcat(path,"/accelerants/");
+		strcat(path,signature);
+		if (stat(path, &accelerant_stat) != 0)
+			continue;
+		accelerant_image = load_add_on(path);
+		if (accelerant_image >= 0)
+		{
+			if ( get_image_symbol(accelerant_image,B_ACCELERANT_ENTRY_POINT,
+					B_SYMBOL_TYPE_ANY,(void**)(&accelerant_hook)) != B_OK )
+				return false;
+
+			init_accelerant InitAccelerant;
+			InitAccelerant = (init_accelerant)accelerant_hook(B_INIT_ACCELERANT,NULL);
+			if (!InitAccelerant || (InitAccelerant(card_fd) != B_OK))
+				return false;
+			break;
+		}
+	}
+	if (accelerant_image < 0)
+		return false;
+
+	accelerant_mode_count GetModeCount = (accelerant_mode_count)accelerant_hook(B_ACCELERANT_MODE_COUNT, NULL);
+	if ( !GetModeCount )
+		return false;
+	mode_count = GetModeCount();
+	if ( !mode_count )
+		return false;
+	get_mode_list GetModeList = (get_mode_list)accelerant_hook(B_GET_MODE_LIST, NULL);
+	if ( !GetModeList )
+		return false;
+	mode_list = (display_mode *)calloc(sizeof(display_mode), mode_count);
+	if ( !mode_list )
+		return false;
+	if ( GetModeList(mode_list) != B_OK )
+		return false;
+
+#ifdef RUN_UNDER_R5
+	get_display_mode GetDisplayMode = (get_display_mode)accelerant_hook(B_GET_DISPLAY_MODE,NULL);
+	if ( !GetDisplayMode )
+		return false;
+	if ( GetDisplayMode(&mDisplayMode) != B_OK )
+		return false;
+	_SetDepth(GetDepthFromColorspace(mDisplayMode.space));
+	_SetWidth(mDisplayMode.virtual_width);
+	_SetHeight(mDisplayMode.virtual_height);
+	_SetMode(GetModeFromResolution(mDisplayMode.virtual_width,mDisplayMode.virtual_height,
+		GetDepthFromColorspace(mDisplayMode.space)));
+
+	memcpy(&R5DisplayMode,&mDisplayMode,sizeof(display_mode));
+#else
+	SetMode(B_8_BIT_640x480);
 #endif
 
-  get_display_mode GetDisplayMode = (get_display_mode)accelerant_hook(B_GET_DISPLAY_MODE,NULL);
-  if ( !GetDisplayMode )
-	return false;
-  if ( GetDisplayMode(&mDisplayMode) != B_OK )
-	return FALSE;
-  //_SetDepth(mDisplayMode.space);
-  _SetWidth(mDisplayMode.virtual_width);
-  _SetHeight(mDisplayMode.virtual_height);
-  //_SetMode(mDisplayMode.flags); ???
+	get_frame_buffer_config GetFrameBufferConfig = (get_frame_buffer_config)accelerant_hook(B_GET_FRAME_BUFFER_CONFIG, NULL);
+	if ( !GetFrameBufferConfig )
+		return false;
+	if ( GetFrameBufferConfig(&mFrameBufferConfig) != B_OK )
+		return false;
 
-
-  get_frame_buffer_config GetFrameBufferConfig = (get_frame_buffer_config)accelerant_hook(B_GET_FRAME_BUFFER_CONFIG, NULL);
-  if ( !GetFrameBufferConfig )
-	return false;
-  if ( GetFrameBufferConfig(&mFrameBufferConfig) != B_OK )
-	return false;
-
-  return true;
+	return true;
 }
 
 /*!
@@ -182,13 +186,18 @@ bool AccelerantDriver::Initialize(void)
 */
 void AccelerantDriver::Shutdown(void)
 {
-  uninit_accelerant UninitAccelerant = (uninit_accelerant)accelerant_hook(B_UNINIT_ACCELERANT,NULL);
-  if ( UninitAccelerant )
-    UninitAccelerant();
-  if (accelerant_image >= 0)
-	unload_add_on(accelerant_image);
-  if (card_fd >= 0)
-	close(card_fd);
+#ifdef RUN_UNDER_R5
+	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
+	if ( SetDisplayMode )
+		SetDisplayMode(&R5DisplayMode);
+#endif
+	uninit_accelerant UninitAccelerant = (uninit_accelerant)accelerant_hook(B_UNINIT_ACCELERANT,NULL);
+	if ( UninitAccelerant )
+		UninitAccelerant();
+	if (accelerant_image >= 0)
+		unload_add_on(accelerant_image);
+	if (card_fd >= 0)
+		close(card_fd);
 }
 
 /*!
@@ -259,6 +268,61 @@ void AccelerantDriver::FillArc(BRect r, float angle, float span, LayerData *d, i
 */
 void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 {
+/* Need to add fill code, this is just a copy of StrokeBezier */
+/* Need to add bounds checking code */
+/* Probably should check to make sure that we have at least 4 points */
+	double Ax, Bx, Cx, Dx;
+	double Ay, By, Cy, Dy;
+	int x, y;
+	int lastx=-1, lasty=-1;
+	double t;
+	double dt = .001;
+	double dt2, dt3;
+	double X, Y, dx, ddx, dddx, dy, ddy, dddy;
+
+	_Lock();
+
+	Ax = -pts[0].x + 3*pts[1].x - 3*pts[2].x + pts[3].x;
+	Bx = 3*pts[0].x - 6*pts[1].x + 3*pts[2].x;
+	Cx = -3*pts[0].x + 3*pts[1].x;
+	Dx = pts[0].x;
+
+	Ay = -pts[0].y + 3*pts[1].y - 3*pts[2].y + pts[3].y;
+	By = 3*pts[0].y - 6*pts[1].y + 3*pts[2].y;
+	Cy = -3*pts[0].y + 3*pts[1].y;
+	Dy = pts[0].y;
+	
+	dt2 = dt * dt;
+	dt3 = dt2 * dt;
+	X = Dx;
+	dx = Ax*dt3 + Bx*dt2 + Cx*dt;
+	ddx = 6*Ax*dt3 + 2*Bx*dt2;
+	dddx = 6*Ax*dt3;
+	Y = Dy;
+	dy = Ay*dt3 + By*dt2 + Cy*dt;
+	ddy = 6*Ay*dt3 + 2*By*dt2;
+	dddy = 6*Ay*dt3;
+
+	lastx = -1;
+	lasty = -1;
+
+	for (t=0; t<=1; t+=dt)
+	{
+		x = ROUND(X);
+		y = ROUND(Y);
+		if ( (x!=lastx) || (y!=lasty) )
+			SetThickPixel(x,y,d->pensize,d->highcolor);
+		lastx = x;
+		lasty = y;
+
+		X += dx;
+		dx += ddx;
+		ddx += dddx;
+		Y += dy;
+		dy += ddy;
+		ddy += dddy;
+	}
+	_Unlock();
 }
 
 /*!
@@ -272,6 +336,80 @@ void AccelerantDriver::FillBezier(BPoint *pts, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::FillEllipse(BRect r, LayerData *d, int8 *pat)
 {
+  /* Need to add bounds checking code */
+	float xc = (r.left+r.right)/2;
+	float yc = (r.top+r.bottom)/2;
+	float rx = r.Width()/2;
+	float ry = r.Height()/2;
+	int Rx2 = ROUND(rx*rx);
+	int Ry2 = ROUND(ry*ry);
+	int twoRx2 = 2*Rx2;
+	int twoRy2 = 2*Ry2;
+	int p;
+	int x=0;
+	int y = (int)ry;
+	int px = 0;
+	int py = twoRx2 * y;
+
+	_Lock();
+
+        /*
+	SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+	SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+	SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+	SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+        */
+	SetPixel(xc,yc-y,d->highcolor);
+	SetPixel(xc,yc+y,d->highcolor);
+
+	p = ROUND (Ry2 - (Rx2 * ry) + (.25 * Rx2));
+	while (px < py)
+	{
+		x++;
+		px += twoRy2;
+		if ( p < 0 )
+			p += Ry2 + px;
+		else
+		{
+			y--;
+			py -= twoRx2;
+			p += Ry2 + px - py;
+		}
+
+                /*
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+                */
+                HLine(xc-x,xc+x,yc-y,d->highcolor);
+                HLine(xc-x,xc+x,yc+y,d->highcolor);
+	}
+
+	p = ROUND(Ry2*(x+.5)*(x+.5) + Rx2*(y-1)*(y-1) - Rx2*Ry2);
+	while (y>0)
+	{
+		y--;
+		py -= twoRx2;
+		if (p>0)
+			p += Rx2 - py;
+		else
+		{
+			x++;
+			px += twoRy2;
+			p += Rx2 - py +px;
+		}
+
+                /*
+		SetThickPixel(xc+x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc-y,thick,d->highcolor);
+		SetThickPixel(xc-x,yc+y,thick,d->highcolor);
+		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
+                */
+                HLine(xc-x,xc+x,yc-y,d->highcolor);
+                HLine(xc-x,xc+x,yc+y,d->highcolor);
+	}
+	_Unlock();
 }
 
 /*!
@@ -353,6 +491,23 @@ void AccelerantDriver::FillRect(BRect r, LayerData *d, int8 *pat)
 */
 void AccelerantDriver::FillRoundRect(BRect r, float xrad, float yrad, LayerData *d, int8 *pat)
 {
+	float arc_x;
+	float yrad2 = yrad*yrad;
+	int i;
+
+	_Lock();
+
+	for (i=0; i<ROUND(yrad); i++)
+	{
+		arc_x = xrad*sqrt(1-i*i/yrad2);
+		StrokeLine(BPoint(r.left+xrad-arc_x,r.top+i),
+			BPoint(r.right-xrad+arc_x,r.top+i), d, pat);
+		StrokeLine(BPoint(r.left+xrad-arc_x,r.bottom-i),
+			BPoint(r.right-xrad+arc_x,r.bottom-i), d, pat);
+	}
+	FillRect(BRect(r.left,r.top+yrad,r.right,r.bottom-yrad), d, pat);
+
+	_Unlock();
 }
 
 //void AccelerantDriver::FillShape(SShape *sh, LayerData *d, int8 *pat)
@@ -859,7 +1014,6 @@ void AccelerantDriver::StrokeEllipse(BRect r, LayerData *d, int8 *pat)
 		SetThickPixel(xc+x,yc+y,thick,d->highcolor);
 	}
 	_Unlock();
-
 }
 
 /*!
@@ -1034,6 +1188,39 @@ void AccelerantDriver::StrokeLineArray(BPoint *pts, int32 numlines, RGBColor *co
 */
 void AccelerantDriver::SetMode(int32 mode)
 {
+  /* Still needs some work to fine tune color hassles in picking the mode */
+	set_display_mode SetDisplayMode = (set_display_mode)accelerant_hook(B_SET_DISPLAY_MODE, NULL);
+	int proposed_width, proposed_height, proposed_depth;
+	int i;
+
+	_Lock();
+
+	if ( SetDisplayMode )
+	{
+		proposed_width = GetWidthFromMode(mode);
+		proposed_height = GetHeightFromMode(mode);
+		proposed_depth = GetDepthFromMode(mode);
+		for (i=0; i<mode_count; i++)
+		{
+			if ( (proposed_width == mode_list[i].virtual_width) &&
+				(proposed_height == mode_list[i].virtual_height) &&
+				(proposed_depth == GetDepthFromColorspace(mode_list[i].space)) )
+			{
+				if ( SetDisplayMode(&(mode_list[i])) == B_OK )
+				{
+					memcpy(&mDisplayMode,&(mode_list[i]),sizeof(display_mode));
+					_SetDepth(GetDepthFromColorspace(mDisplayMode.space));
+					_SetWidth(mDisplayMode.virtual_width);
+					_SetHeight(mDisplayMode.virtual_height);
+					_SetMode(GetModeFromResolution(mDisplayMode.virtual_width,mDisplayMode.virtual_height,
+						GetDepthFromColorspace(mDisplayMode.space)));
+				}
+				break;
+			}
+		}
+	}
+
+	_Unlock();
 }
 
 /*!
@@ -1462,4 +1649,336 @@ void AccelerantDriver::ExtractToBitmap(ServerBitmap *destbmp, BRect destrect, BR
    		src_bits += src_width;
    		dest_bits += dest_width;
 	}
+}
+
+/*!
+	\brief Opens a graphics device for read-write access
+	\param deviceNumber Number identifying which graphics card to open (1 for first card)
+	
+	The deviceNumber is relative to the number of graphics devices that can be successfully
+	opened.  One represents the first card that can be successfully opened (not necessarily
+	the first one listed in the directory).
+*/
+int AccelerantDriver::OpenGraphicsDevice(int deviceNumber)
+{
+	int current_card_fd = -1;
+	int count = 0;
+	char path[PATH_MAX];
+	DIR *directory;
+	struct dirent *entry;
+#if 0
+  //card_fd = open("/dev/graphics/1002_4755_000400",B_READ_WRITE);
+  card_fd = open("/dev/graphics/nv10_010000",B_READ_WRITE);
+  //card_fd = open("/dev/graphics/stub",B_READ_WRITE);
+#endif
+	directory = opendir("/dev/graphics");
+	if ( !directory )
+		return -1;
+	while ( (count < deviceNumber) && ((entry = readdir(directory)) != NULL) )
+	{
+		if ( !strcmp(entry->d_name, ".") || !strcmp(entry->d_name, "..") ||
+			!strcmp(entry->d_name, "stub") )
+			continue;
+		if (current_card_fd >= 0)
+		{
+			close(current_card_fd);
+			current_card_fd = -1;
+		}
+		sprintf(path,"/dev/graphics/%s",entry->d_name);
+		current_card_fd = open(path,B_READ_WRITE);
+		if ( current_card_fd >= 0 )
+			count++;
+	}
+	if ( (count < deviceNumber) && (current_card_fd >= 0) )
+	{
+		if ( deviceNumber == 1 )
+		{
+			close(current_card_fd);
+			sprintf(path,"/dev/graphics/stub");
+			current_card_fd = open(path,B_READ_WRITE);
+		}
+		else
+		{
+			close(current_card_fd);
+			current_card_fd = -1;
+		}
+	}
+
+	return current_card_fd;
+}
+
+int AccelerantDriver::GetModeFromResolution(int width, int height, int depth)
+{
+	int mode = 0;
+	switch (depth)
+	{
+		case 8:
+			switch (width)
+			{
+				case 640:
+					if ( height == 400 )
+						mode = B_8_BIT_640x400;
+					else
+						mode = B_8_BIT_640x480;
+					break;
+				case 800:
+					mode = B_8_BIT_800x600;
+					break;
+				case 1024:
+					mode = B_8_BIT_1024x768;
+					break;
+				case 1152:
+					mode = B_8_BIT_1152x900;
+					break;
+				case 1280:
+					mode = B_8_BIT_1280x1024;
+					break;
+				case 1600:
+					mode = B_8_BIT_1600x1200;
+					break;
+			}
+			break;
+		case 15:
+			switch (width)
+			{
+				case 640:
+					mode = B_15_BIT_640x480;
+					break;
+				case 800:
+					mode = B_15_BIT_800x600;
+					break;
+				case 1024:
+					mode = B_15_BIT_1024x768;
+					break;
+				case 1152:
+					mode = B_15_BIT_1152x900;
+					break;
+				case 1280:
+					mode = B_15_BIT_1280x1024;
+					break;
+				case 1600:
+					mode = B_15_BIT_1600x1200;
+					break;
+			}
+			break;
+		case 16:
+			switch (width)
+			{
+				case 640:
+					mode = B_16_BIT_640x480;
+					break;
+				case 800:
+					mode = B_16_BIT_800x600;
+					break;
+				case 1024:
+					mode = B_16_BIT_1024x768;
+					break;
+				case 1152:
+					mode = B_16_BIT_1152x900;
+					break;
+				case 1280:
+					mode = B_16_BIT_1280x1024;
+					break;
+				case 1600:
+					mode = B_16_BIT_1600x1200;
+					break;
+			}
+			break;
+		case 32:
+			switch (width)
+			{
+				case 640:
+					mode = B_32_BIT_640x480;
+					break;
+				case 800:
+					mode = B_32_BIT_800x600;
+					break;
+				case 1024:
+					mode = B_32_BIT_1024x768;
+					break;
+				case 1152:
+					mode = B_32_BIT_1152x900;
+					break;
+				case 1280:
+					mode = B_32_BIT_1280x1024;
+					break;
+				case 1600:
+					mode = B_32_BIT_1600x1200;
+					break;
+			}
+			break;
+	}
+	return mode;
+}
+
+int AccelerantDriver::GetWidthFromMode(int mode)
+{
+	int width=0;
+
+	switch (mode)
+	{
+		case B_8_BIT_640x400:
+		case B_8_BIT_640x480:
+		case B_15_BIT_640x480:
+		case B_16_BIT_640x480:
+		case B_32_BIT_640x480:
+			width = 640;
+			break;
+		case B_8_BIT_800x600:
+		case B_15_BIT_800x600:
+		case B_16_BIT_800x600:
+		case B_32_BIT_800x600:
+			width = 800;
+			break;
+		case B_8_BIT_1024x768:
+		case B_15_BIT_1024x768:
+		case B_16_BIT_1024x768:
+		case B_32_BIT_1024x768:
+			width = 1024;
+			break;
+		case B_8_BIT_1152x900:
+		case B_15_BIT_1152x900:
+		case B_16_BIT_1152x900:
+		case B_32_BIT_1152x900:
+			width = 1152;
+			break;
+		case B_8_BIT_1280x1024:
+		case B_15_BIT_1280x1024:
+		case B_16_BIT_1280x1024:
+		case B_32_BIT_1280x1024:
+			width = 1280;
+			break;
+		case B_8_BIT_1600x1200:
+		case B_15_BIT_1600x1200:
+		case B_16_BIT_1600x1200:
+		case B_32_BIT_1600x1200:
+			width = 1600;
+			break;
+	}
+	return width;
+}
+
+int AccelerantDriver::GetHeightFromMode(int mode)
+{
+	int height=0;
+
+	switch (mode)
+	{
+		case B_8_BIT_640x400:
+			height = 400;
+			break;
+		case B_8_BIT_640x480:
+		case B_15_BIT_640x480:
+		case B_16_BIT_640x480:
+		case B_32_BIT_640x480:
+			height = 480;
+			break;
+		case B_8_BIT_800x600:
+		case B_15_BIT_800x600:
+		case B_16_BIT_800x600:
+		case B_32_BIT_800x600:
+			height = 600;
+			break;
+		case B_8_BIT_1024x768:
+		case B_15_BIT_1024x768:
+		case B_16_BIT_1024x768:
+		case B_32_BIT_1024x768:
+			height = 768;
+			break;
+		case B_8_BIT_1152x900:
+		case B_15_BIT_1152x900:
+		case B_16_BIT_1152x900:
+		case B_32_BIT_1152x900:
+			height = 900;
+			break;
+		case B_8_BIT_1280x1024:
+		case B_15_BIT_1280x1024:
+		case B_16_BIT_1280x1024:
+		case B_32_BIT_1280x1024:
+			height = 1024;
+			break;
+		case B_8_BIT_1600x1200:
+		case B_15_BIT_1600x1200:
+		case B_16_BIT_1600x1200:
+		case B_32_BIT_1600x1200:
+			height = 1200;
+			break;
+	}
+	return height;
+}
+
+int AccelerantDriver::GetDepthFromMode(int mode)
+{
+	int depth=0;
+
+	switch (mode)
+	{
+		case B_8_BIT_640x400:
+		case B_8_BIT_640x480:
+		case B_8_BIT_800x600:
+		case B_8_BIT_1024x768:
+		case B_8_BIT_1152x900:
+		case B_8_BIT_1280x1024:
+		case B_8_BIT_1600x1200:
+			depth = 8;
+			break;
+		case B_15_BIT_640x480:
+		case B_15_BIT_800x600:
+		case B_15_BIT_1024x768:
+		case B_15_BIT_1152x900:
+		case B_15_BIT_1280x1024:
+		case B_15_BIT_1600x1200:
+			depth = 15;
+			break;
+		case B_16_BIT_640x480:
+		case B_16_BIT_800x600:
+		case B_16_BIT_1024x768:
+		case B_16_BIT_1152x900:
+		case B_16_BIT_1280x1024:
+		case B_16_BIT_1600x1200:
+			depth = 16;
+			break;
+		case B_32_BIT_640x480:
+		case B_32_BIT_800x600:
+		case B_32_BIT_1024x768:
+		case B_32_BIT_1152x900:
+		case B_32_BIT_1280x1024:
+		case B_32_BIT_1600x1200:
+			depth = 32;
+			break;
+	}
+	return depth;
+}
+
+int AccelerantDriver::GetDepthFromColorspace(int space)
+{
+	int depth=0;
+
+	switch (space)
+	{
+		case B_GRAY1:
+			depth = 1;
+			break;
+		case B_CMAP8:
+		case B_GRAY8:
+			depth = 8;
+			break;
+		case B_RGB16:
+		case B_RGB15:
+		case B_RGBA15:
+		case B_RGB16_BIG:
+		case B_RGB15_BIG:
+		case B_RGBA15_BIG:
+			depth = 16;
+			break;
+		case B_RGB32:
+		case B_RGBA32:
+		case B_RGB24:
+		case B_RGB32_BIG:
+		case B_RGBA32_BIG:
+		case B_RGB24_BIG:
+			depth = 32;
+			break;
+	}
+	return depth;
 }
