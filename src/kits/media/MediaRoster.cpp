@@ -16,11 +16,15 @@
 #include "debug.h"
 #include "PortPool.h"
 #include "ServerInterface.h"
+#include "DataExchange.h"
 #include "DormantNodeManager.h"
-#include "NotificationManager.h"
+#include "Notifications.h"
 
-static BMessenger *ServerMessenger = 0;
-static team_id team;
+using namespace BPrivate::media;
+
+namespace BPrivate { namespace media {
+	extern team_id team;
+}; };
 
 // the BMediaRoster destructor is private,
 // but _DefaultDeleter is a friend class of
@@ -31,47 +35,14 @@ public:
 	void Delete() { delete BMediaRoster::_sDefault; }
 };
 
+_DefaultDeleter _deleter;
 
 namespace MediaKitPrivate 
 {
 
-class RosterSingleton
-{
-public:
-	RosterSingleton()
-	{
-		thread_info info;
-		get_thread_info(find_thread(NULL), &info);
-		team = info.team;
-		ServerMessenger = new BMessenger(NEW_MEDIA_SERVER_SIGNATURE);
-	}
-	~RosterSingleton()
-	{
-		_DefaultDeleter deleter;
-		deleter.Delete(); // deletes BMediaRoster::_sDefault
-		delete ServerMessenger;
-	}
-};
-
-RosterSingleton singleton;
-
 
 status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id = NULL, BString * out_input_name = NULL);
 status_t SetNode(node_type type, const media_node *node, const dormant_node_info *info = NULL, const media_input *input = NULL);
-
-status_t QueryServer(BMessage *query, BMessage *reply)
-{
-	status_t status;
-	status = ServerMessenger->SendMessage(query,reply);
-	if (status != B_OK || reply->what != B_OK) {
-		TRACE("QueryServer failed! status = 0x%08lx\n",status);
-		TRACE("Query:\n");
-		query->PrintToStream();
-		TRACE("Reply:\n");
-		reply->PrintToStream();
-	}
-	return status;
-}
 
 status_t GetNode(node_type type, media_node * out_node, int32 * out_input_id, BString * out_input_name)
 {
@@ -154,7 +125,7 @@ BMediaRoster::GetVideoInput(media_node * out_node)
 	return MediaKitPrivate::GetNode(VIDEO_INPUT, out_node);
 }
 
-		
+
 status_t 
 BMediaRoster::GetAudioInput(media_node * out_node)
 {
@@ -837,8 +808,7 @@ BMediaRoster::StartWatching(const BMessenger & where)
 		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
-	return _NotificationManager->Register(where, media_node::null,
-				BPrivate::media::NotificationManager::notification_basic);
+	return BPrivate::media::notifications::Register(where, media_node::null, B_MEDIA_WILDCARD);
 }
 
 
@@ -851,12 +821,11 @@ BMediaRoster::StartWatching(const BMessenger & where,
 		TRACE("BMediaRoster::StartWatching: messenger invalid!\n");
 		return B_BAD_VALUE;
 	}
-	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+	if (false == BPrivate::media::notifications::IsValidNotificationRequest(false, notificationType)) {
 		TRACE("BMediaRoster::StartWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
-	return _NotificationManager->Register(where, media_node::null,
-				BPrivate::media::NotificationManager::NotificationType2Mask(notificationType));
+	return BPrivate::media::notifications::Register(where, media_node::null, notificationType);
 }
 
 
@@ -874,12 +843,11 @@ BMediaRoster::StartWatching(const BMessenger & where,
 		TRACE("BMediaRoster::StartWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
-	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+	if (false == BPrivate::media::notifications::IsValidNotificationRequest(true, notificationType)) {
 		TRACE("BMediaRoster::StartWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
-	return _NotificationManager->Register(where, node, 
-				BPrivate::media::NotificationManager::NotificationType2Mask(notificationType));
+	return BPrivate::media::notifications::Register(where, node, notificationType);
 }
 
 							
@@ -888,8 +856,7 @@ BMediaRoster::StopWatching(const BMessenger & where)
 {
 	CALLED();
 	// messenger may already be invalid, so we don't check this
-	return _NotificationManager->Unregister(where, media_node::null,
-				BPrivate::media::NotificationManager::notification_basic);
+	return BPrivate::media::notifications::Unregister(where, media_node::null, B_MEDIA_WILDCARD);
 }
 
 
@@ -899,12 +866,11 @@ BMediaRoster::StopWatching(const BMessenger & where,
 {
 	CALLED();
 	// messenger may already be invalid, so we don't check this
-	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+	if (false == BPrivate::media::notifications::IsValidNotificationRequest(false, notificationType)) {
 		TRACE("BMediaRoster::StopWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
-	return _NotificationManager->Unregister(where, media_node::null,
-				BPrivate::media::NotificationManager::NotificationType2Mask(notificationType));
+	return BPrivate::media::notifications::Unregister(where, media_node::null, notificationType);
 }
 
 						   
@@ -919,12 +885,11 @@ BMediaRoster::StopWatching(const BMessenger & where,
 		TRACE("BMediaRoster::StopWatching: node invalid!\n");
 		return B_MEDIA_BAD_NODE;
 	}
-	if (!BPrivate::media::NotificationManager::IsValidNotificationType(notificationType)) {
+	if (false == BPrivate::media::notifications::IsValidNotificationRequest(true, notificationType)) {
 		TRACE("BMediaRoster::StopWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
-	return _NotificationManager->Unregister(where, node,
-				BPrivate::media::NotificationManager::NotificationType2Mask(notificationType));
+	return BPrivate::media::notifications::Unregister(where, node, notificationType);
 }
 
 
@@ -1106,27 +1071,16 @@ BMediaRoster::InstantiateDormantNode(const dormant_node_info & in_info,
 		// forward this request into the media_addon_server,
 		// which in turn will call InstantiateDormantNode()
 		// to create it there localy
-		xfer_addonserver_instantiate_dormant_node msg;
-		xfer_addonserver_instantiate_dormant_node_reply reply;
-		port_id port;
+		request_addonserver_instantiate_dormant_node request;
+		reply_addonserver_instantiate_dormant_node reply;
 		status_t rv;
-		int32 code;
-		port = find_port("media_addon_server port");
-		if (port <= B_OK)
-			return B_ERROR;
-		msg.info = in_info;
-		msg.reply_port = _PortPool->GetPort();
-		rv = write_port(port, ADDONSERVER_INSTANTIATE_DORMANT_NODE, &msg, sizeof(msg));
-		if (rv != B_OK) {
-			_PortPool->PutPort(msg.reply_port);
-			return rv;
+		
+		request.info = in_info;
+		rv = QueryAddonServer(ADDONSERVER_INSTANTIATE_DORMANT_NODE, &request, sizeof(request), &reply, sizeof(reply));
+		if (rv == B_OK) {
+			*out_node = reply.node;
 		}
-		rv = read_port(msg.reply_port, &code, &reply, sizeof(reply));
-		_PortPool->PutPort(msg.reply_port);
-		if (rv < B_OK)
-			return rv;
-		*out_node = reply.node;
-		return reply.result;
+		return rv;
 	}
 
 // XXX SOMETHING IS VERY WRONG HERE
@@ -1492,7 +1446,7 @@ BMediaRoster::~BMediaRoster()
 	BMessage msg(MEDIA_SERVER_UNREGISTER_APP);
 	BMessage reply;
 	msg.AddInt32("team",team);
-	ServerMessenger->SendMessage(&msg,&reply);
+	QueryServer(&msg, &reply);
 }
 
 
@@ -1529,7 +1483,7 @@ BMediaRoster::BMediaRoster() :
 	BMessage msg(MEDIA_SERVER_REGISTER_APP);
 	BMessage reply;
 	msg.AddInt32("team",team);
-	ServerMessenger->SendMessage(&msg,&reply);
+	QueryServer(&msg,&reply);
 }
 
 /* static */ status_t

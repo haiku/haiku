@@ -177,7 +177,7 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	BMessage request(MEDIA_SERVER_GET_SHARED_BUFFER_AREA);
 	BMessage reply;
 
-	if (MediaKitPrivate::QueryServer(&request, &reply) != B_OK)
+	if (QueryServer(&request, &reply) != B_OK)
 		return;
 
 	id = reply.FindInt32("area");
@@ -204,7 +204,7 @@ BBuffer::BBuffer(const buffer_clone_info & info) :
 	// until the last buffer has been unregistered
 	// the area_id of the cached area is passed back to us, and we clone it.
 
-	if (MediaKitPrivate::QueryServer(&create, &response) != B_OK)
+	if (QueryServer(&create, &response) != B_OK)
 		return;
 
 	// the response from media server contains enough information
@@ -245,7 +245,7 @@ BBuffer::~BBuffer()
 		// when the last clone of this buffer is gone,
 		// media_server will also remove it's cached area
 
-		MediaKitPrivate::QueryServer(&unregister, &response);
+		QueryServer(&unregister, &response);
 		
 		delete_area(fArea);
 	}

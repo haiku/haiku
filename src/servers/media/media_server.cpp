@@ -6,6 +6,7 @@
 #include <Autolock.h>
 #include "NotificationProcessor.h"
 #include "ServerInterface.h"
+#include "DataExchange.h"
 #include "BufferManager.h"
 #include "NodeManager.h"
 #include "AppManager.h"
@@ -547,9 +548,9 @@ void ServerApp::MessageReceived(BMessage *msg)
 		case MEDIA_SERVER_GET_SHARED_BUFFER_AREA: GetSharedBufferArea(msg); break;
 		case MEDIA_SERVER_REGISTER_BUFFER: RegisterBuffer(msg); break;
 		case MEDIA_SERVER_UNREGISTER_BUFFER: UnregisterBuffer(msg); break;
-		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: fNotificationProcessor->RequestNotifications(msg); break;
-		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: fNotificationProcessor->CancelNotifications(msg); break;
-		case MEDIA_SERVER_SEND_NOTIFICATIONS: fNotificationProcessor->SendNotifications(msg); break;
+		case MEDIA_SERVER_REQUEST_NOTIFICATIONS: fNotificationProcessor->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_CANCEL_NOTIFICATIONS: fNotificationProcessor->EnqueueMessage(msg); break;
+		case MEDIA_SERVER_SEND_NOTIFICATIONS: fNotificationProcessor->EnqueueMessage(msg); break;
 	
 	
 		case MEDIA_SERVER_GET_NODE_ID: GetNodeID(msg); break;

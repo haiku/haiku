@@ -18,11 +18,6 @@ enum {
 	MEDIA_SERVER_REGISTER_BUFFER,
 	MEDIA_SERVER_UNREGISTER_BUFFER,
 
-	// BMediaRoster notification service
-	MEDIA_SERVER_REQUEST_NOTIFICATIONS,
-	MEDIA_SERVER_CANCEL_NOTIFICATIONS,
-	MEDIA_SERVER_SEND_NOTIFICATIONS,
-
 	// Something else
 	MEDIA_SERVER_SET_VOLUME,
 	MEDIA_SERVER_GET_VOLUME,
@@ -588,22 +583,10 @@ struct xfer_consumer_seek_tag_requested_reply
 	status_t result;
 };
 
-struct xfer_addonserver_instantiate_dormant_node
-{
-	dormant_node_info info;
-	port_id reply_port;
-};
-
-struct xfer_addonserver_instantiate_dormant_node_reply
-{
-	media_node node;
-	status_t result;
-};
-
-// implementation contained in libmedia.so (MediaRoster.cpp)
-namespace MediaKitPrivate 
-{
+namespace BPrivate { namespace media { namespace dataexchange {
 	status_t QueryServer(BMessage *query, BMessage *reply);
-};
+}; }; };
+
+using namespace BPrivate::media::dataexchange;
 
 #endif

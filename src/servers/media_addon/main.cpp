@@ -15,9 +15,11 @@
 #include "debug.h"
 #include "TMap.h"
 #include "ServerInterface.h"
+#include "DataExchange.h"
 #include "DormantNodeManager.h"
+#include "Notifications.h"
 
-#define USER_ADDON_PATH "/boot/home/Develop/OpenBeOS/current/distro/x86.R1/beos/system/add-ons/media"
+#define USER_ADDON_PATH "../add-ons/media"
 
 void DumpFlavorInfo(const flavor_info *info);
 
@@ -37,7 +39,8 @@ public:
 	
 	void ScanAddOnFlavors(BMediaAddOn *addon);
 
-	Map<ino_t,media_addon_id> *filemap;
+	Map<ino_t, media_addon_id> *filemap;
+	Map<media_addon_id, int32> *flavorcountmap;
 
 	BMediaRoster *mediaroster;
 	ino_t		DirNodeSystem;
@@ -50,7 +53,8 @@ MediaAddonServer::MediaAddonServer(const char *sig) :
 	BApplication(sig)
 {
 	mediaroster = BMediaRoster::Roster();
-	filemap = new Map<ino_t,media_addon_id>;
+	filemap = new Map<ino_t, media_addon_id>;
+	flavorcountmap = new Map<media_addon_id, int32>;
 	control_port = create_port(64,"media_addon_server port");
 	control_thread = spawn_thread(controlthread,"media_addon_server control",12,this);
 	resume_thread(control_thread);
@@ -68,6 +72,7 @@ MediaAddonServer::~MediaAddonServer()
 		_DormantNodeManager->UnregisterAddon(id);
 	
 	delete filemap;
+	delete flavorcountmap;
 }
 
 void 
@@ -76,10 +81,10 @@ MediaAddonServer::HandleMessage(int32 code, void *data, size_t size)
 	switch (code) {
 		case ADDONSERVER_INSTANTIATE_DORMANT_NODE:
 		{
-			const xfer_addonserver_instantiate_dormant_node *msg = (const xfer_addonserver_instantiate_dormant_node *)data;
-			xfer_addonserver_instantiate_dormant_node_reply reply;
+			const request_addonserver_instantiate_dormant_node *msg = (const request_addonserver_instantiate_dormant_node *)data;
+			reply_addonserver_instantiate_dormant_node reply;
 			reply.result = mediaroster->InstantiateDormantNode(msg->info, &reply.node);
-			write_port(msg->reply_port, 0, &reply, sizeof(reply));
+			msg->SendReply(&reply, sizeof(reply));
 			break;
 		}
 
@@ -140,10 +145,13 @@ MediaAddonServer::ReadyToRun()
 void 
 MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 {
-	int flavorcount;
-	media_addon_id purge_id;
+	int32 *flavorcount;
+	int32 oldflavorcount;
+	int32 newflavorcount;
+	media_addon_id addon_id;
 	port_id port;
 	status_t rv;
+	bool b;
 	
 	ASSERT(addon);
 	ASSERT(addon->AddonID() > 0);
@@ -156,13 +164,21 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 		return;
 	}
 	
-	// the server should remove previously registered "dormant_flavor_info"s
-	purge_id = addon->AddonID();
+	// cache the media_addon_id in a local variable to avoid
+	// calling BMediaAddOn::AddonID() too often
+	addon_id = addon->AddonID();
+	
+	// update the cached flavor count, get oldflavorcount and newflavorcount
+	b = flavorcountmap->GetPointer(addon->AddonID(), &flavorcount);
+	ASSERT(b);
+	oldflavorcount = *flavorcount;
+	newflavorcount = addon->CountFlavors();
+	*flavorcount = newflavorcount;
+	
+	printf("%d old flavors, %d new flavors\n", oldflavorcount, newflavorcount);
 
-	flavorcount = addon->CountFlavors();
-	printf("%d flavors:\n",flavorcount);
-
-	for (int i = 0; i < flavorcount; i++) {
+	// during the first update (i == 0), the server removes old dormant_flavor_infos
+	for (int i = 0; i < newflavorcount; i++) {
 		const flavor_info *info;
 		printf("flavor %d:\n",i);
 		if (B_OK != addon->GetFlavorAt(i, &info)) {
@@ -174,7 +190,7 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 		
 		dormant_flavor_info dfi;
 		dfi = *info;
-		dfi.node_info.addon = addon->AddonID();
+		dfi.node_info.addon = addon_id;
 		dfi.node_info.flavor_id = info->internal_id;
 		strncpy(dfi.node_info.name, info->name, B_MEDIA_NAME_LENGTH - 1);
 		dfi.node_info.name[B_MEDIA_NAME_LENGTH - 1] = 0;
@@ -187,7 +203,11 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 		msgsize = flattensize + sizeof(xfer_server_register_dormant_node);
 		msg = (xfer_server_register_dormant_node *) malloc(msgsize);
 		
-		msg->purge_id = purge_id;
+		// the server should remove previously registered "dormant_flavor_info"s
+		// during the first update, but after  the first iteration, we don't want
+		// the server to anymore remove old dormant_flavor_infos;
+		msg->purge_id = (i == 0) ? addon_id : 0;
+
 		msg->dfi_type = dfi.TypeCode();
 		msg->dfi_size = flattensize;
 		dfi.Flatten(&(msg->dfi),flattensize);
@@ -198,11 +218,12 @@ MediaAddonServer::ScanAddOnFlavors(BMediaAddOn *addon)
 		}
 
 		free(msg);
-		
-		// after the first iteration, we don't want the server to anymore remove our dfis;
-		if (purge_id != 0)
-			purge_id = 0;
 	}
+
+	// XXX parameter list is (media_addon_id addonid, int32 newcount, int32 gonecount)
+	// XXX we currently pretend that all old flavors have been removed, this could
+	// XXX probably be done in a smarter way
+	BPrivate::media::notifications::FlavorsChanged(addon_id, newflavorcount, oldflavorcount);
 }
 
 void 
@@ -230,6 +251,7 @@ MediaAddonServer::AddOnAdded(const char *path, ino_t file_node)
 	printf("MediaAddonServer::AddOnAdded: loading finished, id %d\n",(int)id);
 
 	filemap->Insert(file_node, id);
+	flavorcountmap->Insert(id, 0);
 
 	ScanAddOnFlavors(addon);
 	
@@ -293,6 +315,7 @@ MediaAddonServer::AddOnRemoved(ino_t file_node)
 		return;
 	}
 	filemap->Remove(file_node);
+	flavorcountmap->Remove(id);
 	_DormantNodeManager->UnregisterAddon(id);
 }
 

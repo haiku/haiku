@@ -26,6 +26,11 @@ public:
 	status_t LoadState();
 	status_t SaveState();
 
+	/* Add media_node_id of all live nodes to the message
+	 * int32 "media_node_id" (multiple items)
+	 */
+	status_t GetLiveNodes(BMessage *msg);
+	
 	void AddDormantFlavorInfo(const dormant_flavor_info &dfi);	
 	void RemoveDormantFlavorInfo(media_addon_id id);	
 	void RegisterAddon(const entry_ref &ref, media_addon_id *newid);

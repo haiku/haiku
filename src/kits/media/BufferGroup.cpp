@@ -37,7 +37,7 @@ BBufferGroup::InitBufferGroup()
 	BMessage request(MEDIA_SERVER_GET_SHARED_BUFFER_AREA);
 	BMessage reply;
 
-	fInitError = MediaKitPrivate::QueryServer(&request, &reply);
+	fInitError = QueryServer(&request, &reply);
 	if (fInitError != B_OK)
 		return fInitError;
 

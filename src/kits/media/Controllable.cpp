@@ -5,7 +5,7 @@
  ***********************************************************************/
 #include <Controllable.h>
 #include "debug.h"
-#include "NotificationManager.h"
+#include "Notifications.h"
 
 /*************************************************************
  * protected BControllable
@@ -60,6 +60,8 @@ status_t
 BControllable::SetParameterWeb(BParameterWeb *web)
 {
 	UNIMPLEMENTED();
+	
+	BPrivate::media::notifications::WebChanged(Node());
 
 	return B_ERROR;
 }
@@ -80,7 +82,7 @@ status_t
 BControllable::BroadcastChangedParameter(int32 id)
 {
 	CALLED();
-	return _NotificationManager->ParameterChanged(Node(), id);
+	return BPrivate::media::notifications::ParameterChanged(Node(), id);
 }
 
 
@@ -91,7 +93,7 @@ BControllable::BroadcastNewParameterValue(bigtime_t when,
 										  size_t valueSize)
 {
 	CALLED();
-	return _NotificationManager->NewParameterValue(Node(), id, when, newValue, valueSize);
+	return BPrivate::media::notifications::NewParameterValue(Node(), id, when, newValue, valueSize);
 }
 
 

@@ -14,7 +14,7 @@
 #include "SystemTimeSource.h"
 #include "debug.h"
 #include "ServerInterface.h"
-#include "NotificationManager.h"
+#include "Notifications.h"
 
 // don't rename this one, it's used and exported for binary compatibility
 int32 BMediaNode::_m_changeTag = 0;
@@ -214,9 +214,26 @@ BMediaNode::ReportError(node_error what,
 						const BMessage *info)
 {
 	CALLED();
+
+	// sanity check the what value
+	switch (what) {
+		case BMediaNode::B_NODE_FAILED_START:
+		case BMediaNode::B_NODE_FAILED_STOP:
+		case BMediaNode::B_NODE_FAILED_SEEK:
+		case BMediaNode::B_NODE_FAILED_SET_RUN_MODE:
+		case BMediaNode::B_NODE_FAILED_TIME_WARP:
+		case BMediaNode::B_NODE_FAILED_PREROLL:
+		case BMediaNode::B_NODE_FAILED_SET_TIME_SOURCE_FOR:
+		case BMediaNode::B_NODE_IN_DISTRESS:
+			break;
+		default:
+			TRACE("BMediaNode::ReportError: invalid what!\n");
+			return B_BAD_VALUE;
+	}
+	
 	// Transmits the error code specified by what to anyone
 	// that's receiving notifications from this node
-	return _NotificationManager->ReportError(Node(), what, info);
+	return BPrivate::media::notifications::ReportError(Node(), what, info);
 }
 
 
@@ -228,7 +245,7 @@ BMediaNode::NodeStopped(bigtime_t whenPerformance)
 	// finished handling a stop request.
 	
 	// notify anyone who is listening for stop notifications!
-	_NotificationManager->NodeStopped(Node(), whenPerformance);
+	BPrivate::media::notifications::NodeStopped(Node(), whenPerformance);
 	
 	// XXX If your node is a BBufferProducer, downstream consumers 
 	// XXX will be notified that your node stopped (automatically, no less) 

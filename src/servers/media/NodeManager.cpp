@@ -22,6 +22,18 @@ NodeManager::~NodeManager()
 	delete fAddonPathMap;
 }
 
+/* Add media_node_id of all live nodes to the message
+ * int32 "media_node_id" (multiple items)
+ */
+status_t
+NodeManager::GetLiveNodes(BMessage *msg)
+{
+	msg->AddInt32("media_node_id", 1);
+	msg->AddInt32("media_node_id", 2);
+	msg->AddInt32("media_node_id", 3);
+	return B_OK;
+}
+
 void 
 NodeManager::RegisterAddon(const entry_ref &ref, media_addon_id *newid)
 {

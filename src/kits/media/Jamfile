@@ -42,9 +42,10 @@ SharedLibrary media :
 	TimeSource.cpp
 
 	# Internal Functionality
+	DataExchange.cpp
 	PortPool.cpp
 	DormantNodeManager.cpp
-	NotificationManager.cpp
+	Notifications.cpp
 	SystemTimeSource.cpp
 	BufferIdCache.cpp
 	SharedBufferList.cpp
