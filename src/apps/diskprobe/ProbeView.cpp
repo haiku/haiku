@@ -93,11 +93,13 @@ class HeaderView : public BView, public BInvoker {
 	private:
 		void FormatValue(char *buffer, size_t bufferSize, off_t value);
 		void UpdatePositionViews(off_t position);
+		void UpdateOffsetViews(off_t position, bool all = true);
 		void UpdateFileSizeView();
 
 		const char		*fAttribute;
 		off_t			fFileSize;
 		uint32			fBlockSize;
+		off_t			fOffset;
 		base_type		fBase;
 
 		BTextControl	*fPositionControl;
@@ -249,7 +251,7 @@ PositionSlider::DrawBar()
 void
 PositionSlider::Reset()
 {
-	SetKeyIncrementValue(int32(1.0 * kMaxSliderLimit / (fSize / fBlockSize) + 0.5));
+	SetKeyIncrementValue(int32(1.0 * kMaxSliderLimit / ((fSize - 1) / fBlockSize) + 0.5));
 }
 
 
@@ -264,7 +266,7 @@ PositionSlider::Position() const
 	//	For example, with a block size of 512 bytes, it should be good enough for about
 	//	1024 GB - and that's not really that far away these days.
 
-	return (off_t(1.0 * fSize * Value() / kMaxSliderLimit + 0.5) / fBlockSize) * fBlockSize;
+	return (off_t(1.0 * (fSize - 1) * Value() / kMaxSliderLimit + 0.5) / fBlockSize) * fBlockSize;
 }
 
 
@@ -272,7 +274,7 @@ void
 PositionSlider::SetPosition(off_t position)
 {
 	position /= fBlockSize;
-	SetValue(int32(1.0 * kMaxSliderLimit * position / (fSize / fBlockSize) + 0.5));
+	SetValue(int32(1.0 * kMaxSliderLimit * position / ((fSize - 1) / fBlockSize) + 0.5));
 }
 
 
@@ -283,6 +285,9 @@ PositionSlider::SetSize(off_t size)
 		return;
 
 	off_t position = Position();
+	if (position >= size)
+		position = size - 1;
+
 	fSize = size;
 	Reset();
 	SetPosition(position);
@@ -310,6 +315,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 	fAttribute(editor.Attribute()),
 	fFileSize(editor.FileSize()),
 	fBlockSize(editor.BlockSize()),
+	fOffset(0),
 	fBase(kHexBase)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -380,6 +386,7 @@ HeaderView::HeaderView(BRect frame, entry_ref *ref, DataEditor &editor)
 	fOffsetView = new BStringView(rect, B_EMPTY_STRING, "0x0");
 	fOffsetView->SetFont(&plainFont);
 	AddChild(fOffsetView);
+	UpdateOffsetViews(0LL, false);
 
 	rect.left = rect.right + 4;
 	rect.right = frame.right;
@@ -461,8 +468,22 @@ HeaderView::UpdatePositionViews(off_t position)
 	FormatValue(buffer, sizeof(buffer), position / fBlockSize);
 	fPositionControl->SetText(buffer);
 
-	FormatValue(buffer, sizeof(buffer), position);
+	FormatValue(buffer, sizeof(buffer), position + fOffset);
 	fFileOffsetView->SetText(buffer);
+}
+
+
+void 
+HeaderView::UpdateOffsetViews(off_t position, bool all)
+{
+	char buffer[64];
+	FormatValue(buffer, sizeof(buffer), fOffset);
+	fOffsetView->SetText(buffer);
+
+	if (all) {
+		FormatValue(buffer, sizeof(buffer), position + fOffset);
+		fFileOffsetView->SetText(buffer);
+	}
 }
 
 
@@ -483,7 +504,10 @@ HeaderView::SetBase(base_type type)
 		return;
 
 	fBase = type;
-	UpdatePositionViews(fPositionSlider->Position());
+
+	off_t position = fPositionSlider->Position();
+	UpdatePositionViews(position);
+	UpdateOffsetViews(position, false);
 	UpdateFileSizeView();
 }
 
