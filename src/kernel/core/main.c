@@ -14,8 +14,6 @@
 #include <console.h>
 #include <debug.h>
 #include <arch/faults.h>
-#include <arch/int.h>
-#include <arch/cpu.h>
 #include <vm.h>
 #include <timer.h>
 #include <smp.h>
@@ -77,7 +75,7 @@ _start(kernel_args *oldka, int cpu_num)
 		smp_wait_for_ap_cpus(&ka);
 
 		// setup debug output
-		dbg_init(&ka);
+		debug_init(&ka);
 		set_dprintf_enabled(true);
 		dprintf("Welcome to kernel debugger output!\n");
 
@@ -86,18 +84,20 @@ _start(kernel_args *oldka, int cpu_num)
 		int_init(&ka);
 
 		vm_init(&ka);
+			// Before vm_init_post_sem() is called, we have to make sure that
+			// the boot loader allocated region is not used anymore
+
 		TRACE(("vm up\n"));
 
 		// now we can use the heap and create areas
-		dbg_init2(&ka);
-		int_init2(&ka);
+		debug_init_post_vm(&ka);
+		int_init_post_vm(&ka);
+		cpu_init_post_vm(&ka);
 
 		faults_init(&ka);
 		smp_init(&ka);
 		rtc_init(&ka);
 		timer_init(&ka);
-
-		arch_cpu_init2(&ka);
 
 		sem_init(&ka);
 

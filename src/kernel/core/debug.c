@@ -348,15 +348,15 @@ cmd_continue(int argc, char **argv)
 }
 
 
-int
-dbg_init(kernel_args *ka)
+status_t
+debug_init(kernel_args *args)
 {
-	return arch_dbg_con_init(ka);
+	return arch_dbg_con_init(args);
 }
 
 
-int
-dbg_init2(kernel_args *ka)
+status_t
+debug_init_post_vm(kernel_args *args)
 {
 	add_debugger_command("help", &cmd_help, "List all debugger commands");
 	add_debugger_command("reboot", &cmd_reboot, "Reboot the system");
@@ -365,7 +365,7 @@ dbg_init2(kernel_args *ka)
 	add_debugger_command("exit", &cmd_continue, NULL);
 	add_debugger_command("es", &cmd_continue, NULL);
 
-	return arch_dbg_init(ka);
+	return arch_dbg_init(args);
 }
 
 // ToDo: this one is probably not needed

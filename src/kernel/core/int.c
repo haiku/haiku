@@ -45,23 +45,23 @@ restore_interrupts(cpu_status status)
 }
 
 
-int
-int_init(kernel_args *ka)
+status_t
+int_init(kernel_args *args)
 {
 	dprintf("init_int_handlers: entry\n");
 
-	return arch_int_init(ka);
+	return arch_int_init(args);
 }
 
 
-int
-int_init2(kernel_args *ka)
+status_t
+int_init_post_vm(kernel_args *args)
 {
 	int i;
-	
+
 	io_vectors = (struct io_vector *)malloc(sizeof(struct io_vector) * NUM_IO_VECTORS);
 	if (io_vectors == NULL)
-		panic("int_init2: could not create io vector table!\n");
+		panic("int_init_post_vm: could not create io vector table!\n");
 
 	/* initialize the vector list */
 	for (i = 0; i < NUM_IO_VECTORS; i++) {
@@ -69,7 +69,7 @@ int_init2(kernel_args *ka)
 		initque(&io_vectors[i].handler_list);	/* initialize handler queue */
 	}
 
-	return arch_int_init2(ka);
+	return arch_int_init_post_vm(args);
 }
 
 
