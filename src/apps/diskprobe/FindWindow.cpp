@@ -48,6 +48,8 @@ class FindTextView : public BTextView {
 						int32 offset, const text_run_array *runs);
 
 	private:
+		void HexReformat(int32 oldCursor, int32 &newCursor);
+
 		BScrollView	*fScrollView;
 		find_mode	fMode;
 };
@@ -83,32 +85,47 @@ FindTextView::TargetedByScrollView(BScrollView *view)
 }
 
 
-void 
-FindTextView::KeyDown(const char *bytes, int32 numBytes)
+void
+FindTextView::HexReformat(int32 oldCursor, int32 &newCursor)
 {
-	if (fMode == kHexMode) {
-		// filter out invalid characters
-		if (numBytes > 1)
-			return;
-		
-		if (bytes[0] == B_DELETE || bytes[0] == B_BACKSPACE) {
-			// ToDo
-			return;
+	const char *text = Text();
+	int32 textLength = TextLength();
+	char *insert = (char *)malloc(textLength * 2);
+	if (insert == NULL)
+		return;
+
+	newCursor = TextLength();
+	int32 out = 0;
+	for (int32 i = 0; i < textLength; i++) {
+		if (i == oldCursor) {
+			// this is the end of the inserted text
+			newCursor = out;
 		}
 
-		if (!strchr("0123456789abcdefABCDEF", bytes[0]))
-			return;
+		char c = text[i];
+		if (c >= 'A' && c <= 'F')
+			c += 'A' - 'a';
+		if ((c >= 'a' && c <= 'f') || (c >= '0' && c <= '9'))
+			insert[out++] = c;
 
-		// the original KeyDown() has severe cursor setting
-		// problems with our InsertText().
-
-		int32 start, end;
-		GetSelection(&start, &end);
-		InsertText(bytes, 1, start, NULL);
-		Invalidate();
-		return;
+		if ((out % 48) == 47)
+			insert[out++] = '\n';
+		else if ((out % 3) == 2)
+			insert[out++] = ' ';
 	}
-	BTextView::KeyDown(bytes, numBytes);
+	insert[out] = '\0';
+
+	DeleteText(0, textLength);
+
+	// InsertText() does not work here, as we need the text
+	// to be reformatted as well (newlines, breaks, whatever).
+	// IOW the BTextView class is not very nicely done.
+	//	BTextView::InsertText(insert, out, 0, NULL);
+	fMode = kAsciiMode;
+	Insert(0, insert, out);
+	fMode = kHexMode;
+
+	free(insert);
 }
 
 
@@ -124,42 +141,91 @@ FindTextView::InsertText(const char *text, int32 length, int32 offset,
 			// lets add anything, and then start to filter out
 			// (since we have to reformat the whole text)
 
-		const char *text = Text();
-		int32 textLength = TextLength();
-		char *insert = (char *)malloc(textLength * 2);
-		if (insert == NULL)
-			return;
-
-		int32 cursor = TextLength();
-		int32 out = 0;
-		for (int32 i = 0; i < textLength; i++) {
-			char c = text[i];
-			if (c >= 'A' && c <= 'F')
-				c += 'A' - 'a';
-			if ((c >= 'a' && c <= 'f') || (c >= '0' && c <= '9'))
-				insert[out++] = c;
-
-			if (i == offset && length == 1) {
-				// this is the end of the inserted text
-				cursor = out;
-			}
-
-			if ((out % 3) == 2)
-				insert[out++] = ' ';
-		}
-		insert[out] = '\0';
-
-		DeleteText(0, textLength);
-		BTextView::InsertText(insert, out, 0, NULL);
-
 		int32 start, end;
 		GetSelection(&start, &end);
-		if (start == offset)
-			Select(cursor, cursor);
 
-		free(insert);
+		int32 cursor;
+		HexReformat(offset, cursor);
+
+		if (length == 1 && start == offset)
+			Select(cursor + 1, cursor + 1);
 	} else
 		BTextView::InsertText(text, length, offset, runs);
+}
+
+
+void 
+FindTextView::KeyDown(const char *bytes, int32 numBytes)
+{
+	if (fMode == kHexMode) {
+		// filter out invalid (for hex mode) characters
+		if (numBytes > 1)
+			return;
+
+		switch (bytes[0]) {
+			case B_RIGHT_ARROW:
+			case B_LEFT_ARROW:
+			case B_UP_ARROW:
+			case B_DOWN_ARROW:
+			case B_HOME:
+			case B_END:
+			case B_PAGE_UP:
+			case B_PAGE_DOWN:
+				break;
+
+			case B_BACKSPACE:
+			{
+				int32 start, end;
+				GetSelection(&start, &end);
+
+				if (bytes[0] == B_BACKSPACE) {
+					start--;
+					if (start < 0)
+						return;
+				}
+
+				if (Text()[start] == ' ')
+					BTextView::KeyDown(bytes, numBytes);
+
+				BTextView::KeyDown(bytes, numBytes);
+
+				GetSelection(&start, &end);
+				HexReformat(start, start);
+				Select(start, start);
+				return;
+			}
+
+			case B_DELETE:
+			{
+				int32 start, end;
+				GetSelection(&start, &end);
+
+				if (Text()[start] == ' ')
+					BTextView::KeyDown(bytes, numBytes);
+
+				BTextView::KeyDown(bytes, numBytes);
+
+				HexReformat(start, start);
+				Select(start, start);
+				return;
+			}
+
+			default:
+			{
+				if (!strchr("0123456789abcdefABCDEF", bytes[0]))
+					return;
+
+				// the original KeyDown() has severe cursor setting
+				// problems with our InsertText().
+
+				int32 start, end;
+				GetSelection(&start, &end);
+				InsertText(bytes, 1, start, NULL);
+				return;
+			}
+		}
+	}
+	BTextView::KeyDown(bytes, numBytes);
 }
 
 
