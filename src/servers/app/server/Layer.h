@@ -95,6 +95,9 @@ public:
 	BRect Bounds(void);
 	BRect Frame(void);
 
+			void				DoMoveTo(float x, float y);
+			void				DoResizeTo(float newWidth, float newHeight);
+
 	virtual void MoveBy(float x, float y);
 	void ResizeBy(float x, float y);
 
@@ -132,7 +135,7 @@ protected:
 	BString		*_name;	
 	int32		_view_token;
 	int32		_level;
-	int32		_flags;
+	uint32		_flags;
 	bool		_hidden;
 	bool		_is_dirty;
 	bool		_is_updating;
@@ -145,4 +148,5 @@ protected:
 /*
  @log
  	* added a new member, BPoint _boundsLeftTop. Beside other uses, (DW don't forget!)it will be needed in redraw code.
+ 	* _flags is now declared as uint32
 */
