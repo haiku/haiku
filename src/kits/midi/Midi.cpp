@@ -1,465 +1,370 @@
-/**
- * @file Midi.cpp
+/*
+ * Copyright (c) 2002-2003 Matthijs Hollemans
+ * Copyright (c) 2002 Michael Pfeiffer
+ * Copyright (c) 2002 Jerome Leveque
+ * Copyright (c) 2002 Paul Stadler
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a 
+ * copy of this software and associated documentation files (the "Software"), 
+ * to deal in the Software without restriction, including without limitation 
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+ * and/or sell copies of the Software, and to permit persons to whom the 
+ * Software is furnished to do so, subject to the following conditions:
  * 
- * @author Matthijs Hollemans
- * @author Jerome Leveque
- * @author Paul Stadler
+ * The above copyright notice and this permission notice shall be included in 
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * DEALINGS IN THE SOFTWARE.
  */
 
 #include <List.h>
+#include <MidiProducer.h>
 
 #include "Midi.h"
+#include "MidiGlue.h"
 #include "debug.h"
-#include "MidiEvent.h"
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 
-#define MSG_CODE_PROCESS_EVENT 1
-#define MSG_CODE_TERMINATE_THREAD 0
+status_t _run_thread(void* data)
+{
+	BMidi* midi = (BMidi*) data;
+	midi->Run();
+	midi->isRunning = false;
+	return 0;
+}
 
-//-----------------------------------------------
+//------------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
-// Initialization Stuff
 BMidi::BMidi()
 {
-	fConnectionList = new BList();
-	fIsRunning = false;
-	
-	fInflowPort = create_port(1, "Inflow Port");
-	
-	fInflowTask = spawn_thread(
-		_inflow_task_, "BMidi Inflow Thread",
-		B_REAL_TIME_PRIORITY, (void *)this);
-		
-	fInflowAlive = resume_thread(fInflowTask) == B_OK;
+	connections = new BList;
+	threadId    = -1;
+	isRunning   = false;
+
+	producer = new BMidiLocalProducer("MidiGlue(out)");
+	consumer = new BMidiGlue(this, "MidiGlue(in)");
 }
+
+//------------------------------------------------------------------------------
 
 BMidi::~BMidi()
 {
-	write_port(fInflowPort, MSG_CODE_TERMINATE_THREAD, NULL, 0);
+	Stop();
 
-	status_t exit_value;
-	wait_for_thread(fInflowTask, &exit_value);
+	status_t result;
+	wait_for_thread(threadId, &result);
 
-	delete_port(fInflowPort);
-	delete fConnectionList;
-}
+	producer->Release();
+	consumer->Release();
 
-//-----------------------------------------------------------------------------
-// Stubs for midi event hooks.
-void BMidi::NoteOff(uchar chan, uchar note, uchar vel, uint32 time)
-{
-}
-void BMidi::NoteOn(uchar chan, uchar note, uchar vel, uint32 time)
-{
-}
-void BMidi::KeyPressure(uchar chan, uchar note, uchar pres, uint32 time)
-{
-}
-void BMidi::ControlChange(uchar chan, uchar ctrl_num, uchar ctrl_val, uint32 time)
-{
-}
-void BMidi::ProgramChange(uchar chan, uchar prog_num, uint32 time)
-{
-}
-void BMidi::ChannelPressure(uchar chan, uchar pres, uint32 time)
-{
-}
-void BMidi::PitchBend(uchar chan, uchar lsb, uchar msb, uint32 time)
-{
-}
-void BMidi::SystemExclusive(void * data, size_t data_len, uint32 time)
-{
-}
-void BMidi::SystemCommon(uchar stat_byte, uchar data1, uchar data2, uint32 time)
-{
-}
-void BMidi::SystemRealTime(uchar stat_byte, uint32 time)
-{
-}
-void BMidi::TempoChange(int32 bpm, uint32 time)
-{
-}
-void BMidi::AllNotesOff(bool just_chan, uint32 time)
-{
+	delete connections;
 }
 
-//-----------------------------------------------------------------------------
-// Public API Functions
-status_t BMidi::Start()
+//------------------------------------------------------------------------------
+
+void BMidi::NoteOff(uchar channel, uchar note, uchar velocity, uint32 time)
 {
-	fRunTask = spawn_thread(_run_thread_,
-		"BMidi Run Thread", B_REAL_TIME_PRIORITY, (void *)this);
-	fIsRunning = true;
-	status_t ret = resume_thread(fRunTask);
-	if(ret != B_OK)
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::NoteOn(uchar channel, uchar note, uchar velocity, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::KeyPressure(
+	uchar channel, uchar note, uchar pressure, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::ControlChange(
+	uchar channel, uchar controlNumber, uchar controlValue, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::ProgramChange(uchar channel, uchar programNumber, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::ChannelPressure(uchar channel, uchar pressure, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::PitchBend(uchar channel, uchar lsb, uchar msb, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SystemExclusive(void* data, size_t length, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SystemCommon(uchar status, uchar data1, uchar data2, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SystemRealTime(uchar status, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::TempoChange(int32 beatsPerMinute, uint32 time)
+{
+	// do nothing
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::AllNotesOff(bool justChannel, uint32 time)
+{
+	for (uchar channel = 1; channel <= 16; ++channel)
 	{
-		fIsRunning = false;
-	}
-	return B_OK;
-}
+		SprayControlChange(channel, B_ALL_NOTES_OFF, 0, time);
 
-//-----------------------------------------------------------------------------
-
-void BMidi::Stop()
-{
-	status_t exit_value;
-	status_t ret;
-	fIsRunning = false;
-	ret = wait_for_thread(fRunTask, &exit_value);
-}
-    
-bool BMidi::IsRunning() const
-{
-	thread_info info;
-	get_thread_info(fRunTask,&info);
-	if(find_thread("BMidi Run Thread") == fRunTask)
-		return true;
-return false;
-}
-
-void BMidi::Connect(BMidi *to_object)
-{
-	fConnectionList->AddItem((void *)to_object);
-}
-
-void BMidi::Disconnect(BMidi *from_object)
-{
-	fConnectionList->RemoveItem((void *)from_object);
-}
-
-bool BMidi::IsConnected(BMidi * to_object) const
-{
-	return fConnectionList->HasItem((void *)to_object);
-}
-
-BList * BMidi::Connections() const
-{
-	return fConnectionList;
-}
-
-void BMidi::SnoozeUntil(uint32 time) const
-{
-	snooze_until((uint64)time*1000, B_SYSTEM_TIMEBASE);
-}
-
-bool BMidi::KeepRunning()
-{
-	return fIsRunning;
-}
-
-void BMidi::Run()
-{
-	while(KeepRunning())
-		snooze(50000);
-}
-
-//-----------------------------------------------------------------------------
-// Spray Functions
-void BMidi::SprayMidiEvent(BMidiEvent *e) const
-{
-//	TRACE(("Hello"))
-	int32 num_connections = fConnectionList->CountItems();
-	BMidi *m;
-	for(int32 i = 0; i < num_connections; i++)
-	{
-		m = (BMidi *)fConnectionList->ItemAt(i);
-		write_port(m->fInflowPort, MSG_CODE_PROCESS_EVENT, e, sizeof(BMidiEvent));
-	}
-}
-
-//----------------------
-
-void BMidi::SprayNoteOff(
-	uchar channel, uchar note, uchar velocity, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_NOTE_OFF;
-	event.noteOff.channel = channel;
-	event.noteOff.note = note;
-	event.noteOff.velocity = velocity;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayNoteOn(
-	uchar channel, uchar note, uchar velocity, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_NOTE_ON;
-	event.noteOn.channel = channel;
-	event.noteOn.note = note;
-	event.noteOn.velocity = velocity;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayKeyPressure(
-	uchar channel, uchar note, uchar pressure, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_KEY_PRESSURE;
-	event.keyPressure.channel = channel;
-	event.keyPressure.note = note;
-	event.keyPressure.pressure = pressure;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayControlChange(
-	uchar channel, uchar controlNumber, uchar controlValue, 
-	uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_CONTROL_CHANGE;
-	event.controlChange.channel = channel;
-	event.controlChange.controlNumber = controlNumber;
-	event.controlChange.controlValue = controlValue;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayProgramChange(
-	uchar channel, uchar programNumber, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_PROGRAM_CHANGE;
-	event.programChange.channel = channel;
-	event.programChange.programNumber = programNumber;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayChannelPressure(
-	uchar channel, uchar pressure, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_CHANNEL_PRESSURE;
-	event.channelPressure.channel = channel;
-	event.channelPressure.pressure = pressure;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayPitchBend(
-	uchar channel, uchar lsb, uchar msb, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_PITCH_BEND;
-	event.pitchBend.channel = channel;
-	event.pitchBend.lsb = lsb;
-	event.pitchBend.msb = msb;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SpraySystemExclusive(
-	void * data, size_t dataLength, uint32 time) const
-{
-	// Should this data be duplicated!!?? I think Yes.
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_SYSTEM_EXCLUSIVE;
-	event.systemExclusive.data = new uint8[dataLength];
-	memcpy(event.systemExclusive.data, data, dataLength);
-	event.systemExclusive.dataLength = dataLength;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SpraySystemCommon(
-	uchar status, uchar data1, uchar data2, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_SYSTEM_COMMON;
-	event.systemCommon.status = status;
-	event.systemCommon.data1 = data1;
-	event.systemCommon.data2 = data2;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SpraySystemRealTime(uchar status, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_SYSTEM_REAL_TIME;
-	event.systemRealTime.status = status;
-	SprayMidiEvent(&event);
-}
-
-//----------------------
-
-void BMidi::SprayTempoChange(int32 beatsPerMinute, uint32 time) const
-{
-	BMidiEvent event;
-	event.time = time;
-	event.opcode = BMidiEvent::OP_TEMPO_CHANGE;
-	event.tempoChange.beatsPerMinute = beatsPerMinute;
-	SprayMidiEvent(&event);
-}
-
-//-----------------------------------------------------------------------------
-// The Inflow Thread
-void BMidi::InflowTask()
-{
-	BMidiEvent event;
-	int32 code;
-	size_t len;
-	while(true)
-	{
-		len = read_port(fInflowPort, &code, &event, sizeof(BMidiEvent));
-
-		if (code == MSG_CODE_TERMINATE_THREAD) { return; }
-
-		if (len != sizeof(BMidiEvent)) { continue; }  //ignore errors
-
-		switch (event.opcode) 
+		if (!justChannel)
 		{
-			case BMidiEvent::OP_NONE:
-			case BMidiEvent::OP_TRACK_END:
-			case BMidiEvent::OP_ALL_NOTES_OFF:
-				break;
-
-			case BMidiEvent::OP_NOTE_OFF:
-				NoteOff(
-					event.noteOff.channel,
-					event.noteOff.note,
-					event.noteOff.velocity,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_NOTE_ON:
-				NoteOn(
-					event.noteOn.channel,
-					event.noteOn.note,
-					event.noteOn.velocity,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_KEY_PRESSURE:
-				KeyPressure(
-					event.keyPressure.channel,
-					event.keyPressure.note,
-					event.keyPressure.pressure,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_CONTROL_CHANGE:
-				ControlChange(
-					event.controlChange.channel,
-					event.controlChange.controlNumber,
-					event.controlChange.controlValue,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_PROGRAM_CHANGE:
-				ProgramChange(
-					event.programChange.channel,
-					event.programChange.programNumber,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_CHANNEL_PRESSURE:
-				ChannelPressure(
-					event.channelPressure.channel,
-					event.channelPressure.pressure,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_PITCH_BEND:
-				PitchBend(
-					event.pitchBend.channel,
-					event.pitchBend.lsb,
-					event.pitchBend.msb,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_SYSTEM_EXCLUSIVE:
-				SystemExclusive(
-					event.systemExclusive.data,
-					event.systemExclusive.dataLength,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_SYSTEM_COMMON:
-				SystemCommon(
-					event.systemCommon.status,
-					event.systemCommon.data1,
-					event.systemCommon.data2,
-					event.time);
-				break;
-
-			case BMidiEvent::OP_SYSTEM_REAL_TIME:
-				SystemRealTime(
-					event.systemRealTime.status, 
-					event.time);
-				break;
-
-			case BMidiEvent::OP_TEMPO_CHANGE:
-				TempoChange(
-					event.tempoChange.beatsPerMinute, 
-					event.time);
-				break;
-
-			default: break;
+			for (uchar note = 0; note <= 0x7F; ++note)
+			{
+				SprayNoteOff(channel, note, 0, time);
+			}
 		}
 	}
 }
 
-//----------------------
-//----------------------
-//----------------------
-//----------------------
-//----------------------
-//----------------------
-//----------------------
-//----------------------
+//------------------------------------------------------------------------------
+
+status_t BMidi::Start()
+{
+	if (isRunning) { return B_OK; }
+
+	status_t err = spawn_thread(
+		_run_thread, "MidiRunThread", B_URGENT_PRIORITY, this);
+
+	if (err < B_OK) { return err; }
+
+	threadId  = err;
+	isRunning = true;
+
+	err = resume_thread(threadId);
+	if (err != B_OK)
+	{
+		threadId  = -1;
+		isRunning = false;
+	}
+
+	return err;
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::Stop()
+{
+	threadId = -1;
+}
+    
+//------------------------------------------------------------------------------
+
+bool BMidi::IsRunning() const
+{
+	return isRunning;
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::Connect(BMidi* toObject)
+{
+	if (toObject != NULL)
+	{
+		if (producer->Connect(toObject->consumer) == B_OK)
+		{
+			connections->AddItem(toObject);
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::Disconnect(BMidi* fromObject)
+{
+	if (fromObject != NULL)
+	{
+		if (producer->Disconnect(fromObject->consumer) == B_OK)
+		{
+			connections->RemoveItem(fromObject);
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+
+bool BMidi::IsConnected(BMidi* toObject) const
+{
+	if (toObject != NULL)
+	{
+		return producer->IsConnected(toObject->consumer);
+	}
+
+	return false;
+}
+
+//------------------------------------------------------------------------------
+
+BList* BMidi::Connections() const
+{
+	return connections;
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SnoozeUntil(uint32 time) const
+{
+	snooze_until(MAKE_BIGTIME(time), B_SYSTEM_TIMEBASE);
+}
+
+//------------------------------------------------------------------------------
+
+bool BMidi::KeepRunning()
+{
+	return (threadId != -1);
+}
+
+//------------------------------------------------------------------------------
 
 void BMidi::_ReservedMidi1() {}
 void BMidi::_ReservedMidi2() {}
 void BMidi::_ReservedMidi3() {}
 
-//----------------------
+//------------------------------------------------------------------------------
 
-status_t _run_thread_(void *data)
+void BMidi::Run()
 {
-	((BMidi*)data)->Run();
-	return 0;
+	// do nothing
 }
 
-//----------------------
+//------------------------------------------------------------------------------
 
-status_t _inflow_task_(void * data)
+void BMidi::SprayNoteOff(
+	uchar channel, uchar note, uchar velocity, uint32 time) const
 {
-	((BMidi*)data)->InflowTask();
-	return 0;
+	producer->SprayNoteOff(
+		channel - 1, note, velocity, MAKE_BIGTIME(time));
 }
 
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
-//-----------------------------------------------
+//------------------------------------------------------------------------------
+
+void BMidi::SprayNoteOn(
+	uchar channel, uchar note, uchar velocity, uint32 time) const
+{
+	producer->SprayNoteOn(
+		channel - 1, note, velocity, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SprayKeyPressure(
+	uchar channel, uchar note, uchar pressure, uint32 time) const
+{
+	producer->SprayKeyPressure(
+		channel - 1, note, pressure, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SprayControlChange(
+	uchar channel, uchar controlNumber, uchar controlValue, 
+	uint32 time) const
+{
+	producer->SprayControlChange(
+		channel - 1, controlNumber, controlValue, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SprayProgramChange(
+	uchar channel, uchar programNumber, uint32 time) const
+{
+	producer->SprayProgramChange(
+		channel - 1, programNumber, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SprayChannelPressure(
+	uchar channel, uchar pressure, uint32 time) const
+{
+	producer->SprayChannelPressure(
+		channel - 1, pressure, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SprayPitchBend(
+	uchar channel, uchar lsb, uchar msb, uint32 time) const
+{
+	producer->SprayPitchBend(channel - 1, lsb, msb, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SpraySystemExclusive(
+	void* data, size_t length, uint32 time) const
+{
+	producer->SpraySystemExclusive(data, length, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SpraySystemCommon(
+	uchar status, uchar data1, uchar data2, uint32 time) const
+{
+	producer->SpraySystemCommon(status, data1, data2, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SpraySystemRealTime(uchar status, uint32 time) const
+{
+	producer->SpraySystemRealTime(status, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------
+
+void BMidi::SprayTempoChange(int32 beatsPerMinute, uint32 time) const
+{
+	producer->SprayTempoChange(beatsPerMinute, MAKE_BIGTIME(time));
+}
+
+//------------------------------------------------------------------------------

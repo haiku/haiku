@@ -6,19 +6,17 @@ UsePublicHeaders midi ;
 
 SharedLibrary midi :
 	Midi.cpp
+	MidiGlue.cpp
 	MidiPort.cpp
-	MidiPortConsumer.cpp
 	MidiStore.cpp
 	MidiSynth.cpp
 	MidiSynthFile.cpp
 	MidiText.cpp
-	MidiEvent.cpp
 	Samples.cpp
 	Synth.cpp
 ;
 
 LinkSharedOSLibs libmidi.so :
 	be
-	stdc++.r4
 	midi2
 ;
