@@ -228,18 +228,23 @@ ShowImageView::~ShowImageView()
 bool
 ShowImageView::IsImage(const entry_ref *pref)
 {
+	if (!pref)
+		return false;
+
 	BFile file(pref, B_READ_ONLY);
-	translator_info info;
-	memset(&info, 0, sizeof(translator_info));
-	BMessage ioExtension;
+	if (file.InitCheck() != B_OK)
+		return false;
 
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (!proster)
 		return false;
-
+		
+	BMessage ioExtension;
 	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
 		return false;
 
+	translator_info info;
+	memset(&info, 0, sizeof(translator_info));
 	if (proster->Identify(&file, &ioExtension, &info, 0, NULL,
 		B_TRANSLATOR_BITMAP) != B_OK)
 		return false;
@@ -297,14 +302,9 @@ void ShowImageView::DeleteSelBitmap()
 	fSelBitmap = NULL;
 }
 
-void
+status_t
 ShowImageView::SetImage(const entry_ref *pref)
 {
-	fUndo.Clear();
-	DeleteBitmap();
-	SetHasSelection(false);
-	fMakesSelection = false;
-	
 	entry_ref ref;
 	if (!pref)
 		ref = fCurrentRef;
@@ -313,7 +313,7 @@ ShowImageView::SetImage(const entry_ref *pref)
 
 	BTranslatorRoster *proster = BTranslatorRoster::Default();
 	if (!proster)
-		return;
+		return B_ERROR;
 	BFile file(&ref, B_READ_ONLY);
 	translator_info info;
 	memset(&info, 0, sizeof(translator_info));
@@ -322,18 +322,29 @@ ShowImageView::SetImage(const entry_ref *pref)
 		// if new image, reset to first document
 		fDocumentIndex = 1;
 	if (ioExtension.AddInt32("/documentIndex", fDocumentIndex) != B_OK)
-		return;
+		return B_ERROR;
 	if (proster->Identify(&file, &ioExtension, &info, 0, NULL,
 		B_TRANSLATOR_BITMAP) != B_OK)
-		return;
+		return B_ERROR;
 	
 	// Translate image data and create a new ShowImage window
 	BBitmapStream outstream;
 	if (proster->Translate(&file, &info, &ioExtension, &outstream,
 		B_TRANSLATOR_BITMAP) != B_OK)
-		return;
-	if (outstream.DetachBitmap(&fBitmap) != B_OK)
-		return;
+		return B_ERROR;
+	BBitmap *newBitmap = NULL;
+	if (outstream.DetachBitmap(&newBitmap) != B_OK)
+		return B_ERROR;
+		
+	// Now that I've successfully loaded the new bitmap,
+	// I can be sure it is safe to delete the old one, 
+	// and clear everything
+	fUndo.Clear();
+	SetHasSelection(false);
+	fMakesSelection = false;
+	DeleteBitmap();
+	fBitmap = newBitmap;
+	newBitmap = NULL;
 	fCurrentRef = ref;
 	
 	// restore orientation
@@ -392,6 +403,7 @@ ShowImageView::SetImage(const entry_ref *pref)
 	AddToRecentDocuments();
 		
 	Notify(info.name);
+	return B_OK;
 }
 
 void
@@ -1791,10 +1803,10 @@ ShowImageView::FreeEntries(BList* entries)
 }
 
 bool
-ShowImageView::FindNextImage(entry_ref* image, bool next, bool rewind)
+ShowImageView::FindNextImage(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind)
 {
 	ASSERT(next || !rewind);
-	BEntry curImage(&fCurrentRef);
+	BEntry curImage(in_current);
 	entry_ref entry, *ref;
 	BDirectory parent;
 	BList entries;
@@ -1802,24 +1814,24 @@ ShowImageView::FindNextImage(entry_ref* image, bool next, bool rewind)
 	int32 cur;
 	
 	if (curImage.GetParent(&parent) != B_OK)
-		return false;
+		return -1;
 
 	while (parent.GetNextRef(&entry) == B_OK) {
-		if (entry != fCurrentRef) {
+		if (entry != *in_current) {
 			entries.AddItem(new entry_ref(entry));
 		} else {
 			// insert current ref, so we can find it easily after sorting
-			entries.AddItem(&fCurrentRef);
+			entries.AddItem(in_current);
 		}
 	}
 	
 	entries.SortItems(CompareEntries);
 	
-	cur = entries.IndexOf(&fCurrentRef);
+	cur = entries.IndexOf(in_current);
 	ASSERT(cur >= 0);
 
 	// remove it so FreeEntries() does not delete it
-	entries.RemoveItem(&fCurrentRef);
+	entries.RemoveItem(in_current);
 	
 	if (next) {
 		// find the next image in the list
@@ -1827,7 +1839,7 @@ ShowImageView::FindNextImage(entry_ref* image, bool next, bool rewind)
 		for (; (ref = (entry_ref*)entries.ItemAt(cur)) != NULL; cur ++) {
 			if (IsImage(ref)) {
 				found = true;
-				*image = (const entry_ref)*ref;
+				*out_image = (const entry_ref)*ref;
 				break;
 			}
 		}
@@ -1838,7 +1850,7 @@ ShowImageView::FindNextImage(entry_ref* image, bool next, bool rewind)
 			ref = (entry_ref*)entries.ItemAt(cur);
 			if (IsImage(ref)) {
 				found = true;
-				*image = (const entry_ref)*ref;
+				*out_image = (const entry_ref)*ref;
 				break;
 			}
 		}
@@ -1851,10 +1863,23 @@ ShowImageView::FindNextImage(entry_ref* image, bool next, bool rewind)
 bool
 ShowImageView::ShowNextImage(bool next, bool rewind)
 {
-	entry_ref ref;
+	bool found;
+	entry_ref curRef, imgRef;
 	
-	if (FindNextImage(&ref, next, rewind)) {
-		SetImage(&ref);
+	curRef = fCurrentRef;
+	found = FindNextImage(&curRef, &imgRef, next, rewind);
+	if (found) {
+		// Keep trying to load images until:
+		// 1. The image loads successfully
+		// 2. The last file in the directory is found (for find next or find first)
+		// 3. The first file in the directory is found (for find prev)
+		// 4. The call to FindNextImage fails for any other reason
+		while (SetImage(&imgRef) != B_OK) {
+			curRef = imgRef;
+			found = FindNextImage(&curRef, &imgRef, next, false);
+			if (!found)
+				return false;
+		}
 		return true;
 	}
 	return false;

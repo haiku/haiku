@@ -49,7 +49,7 @@ public:
 	
 	void Pulse();
 	
-	void SetImage(const entry_ref *pref);
+	status_t SetImage(const entry_ref *pref);
 	void SetDither(bool dither);
 	bool GetDither() const { return fDither; }
 	void SetShowCaption(bool show);
@@ -156,7 +156,7 @@ private:
 	bool IsImage(const entry_ref* pref);
 	static int CompareEntries(const void* a, const void* b);
 	void FreeEntries(BList* entries);
-	bool FindNextImage(entry_ref* ref, bool next, bool rewind);
+	bool FindNextImage(entry_ref *in_current, entry_ref *out_image, bool next, bool rewind);
 	bool ShowNextImage(bool next, bool rewind);
 	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
