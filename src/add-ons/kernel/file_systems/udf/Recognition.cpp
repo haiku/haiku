@@ -302,8 +302,10 @@ walk_volume_descriptor_sequence(extent_address descriptorSequence,
 				{
 					implementation_use_descriptor *impUse = reinterpret_cast<implementation_use_descriptor*>(tag);
 					PDUMP(impUse);
+					// Check for a matching implementation id string (note that the
+					// revision version is not checked)
 					if (impUse->tag().init_check(block) == B_OK
-					    && impUse->implementation_id().matches(kLogicalVolumeInfoId))
+					    && impUse->implementation_id().matches(kLogicalVolumeInfoId201))
 					{
 							foundUdfImplementationUseDescriptor = true;
 					}
@@ -464,6 +466,7 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 	uint32 count = descriptorSequence.length() >> blockShift;
 		
 	bool lastDescriptorWasClosed = false;
+	uint16 highestMinimumUDFReadRevision = 0x0000;
 	status_t error = count > 0 ? B_OK : B_ENTRY_NOT_FOUND;
 	for (uint32 i = 0; error == B_OK && i < count; i++)
 	{
@@ -496,6 +499,17 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 					reinterpret_cast<logical_volume_integrity_descriptor*>(chunk.Data());
 				PDUMP(descriptor);
 				lastDescriptorWasClosed = descriptor->integrity_type() == INTEGRITY_CLOSED;
+				if (lastDescriptorWasClosed) {
+					uint16 minimumRevision = descriptor->minimum_udf_read_revision();
+					if (minimumRevision > highestMinimumUDFReadRevision) {
+						highestMinimumUDFReadRevision = minimumRevision;
+					} else if (minimumRevision < highestMinimumUDFReadRevision) {
+						INFORM(("WARNING: found decreasing minimum udf read revision in integrity "
+						        "sequence (last highest: 0x%04x, current: 0x%04x); using higher "
+						        "revision.\n", highestMinimumUDFReadRevision, minimumRevision));
+					}
+				}
+						        
 				// Check a continuation extent if necessary. Note that this effectively
 				// ends our search through this extent
 				extent_address &next = descriptor->next_integrity_extent();
@@ -528,6 +542,8 @@ walk_integrity_sequence(int device, uint32 blockSize, uint32 blockShift,
 	}
 	if (!error)
 		error = lastDescriptorWasClosed ? B_OK : B_BAD_DATA;
+	if (!error) 
+		error = highestMinimumUDFReadRevision <= UDF_MAX_READ_REVISION ? B_OK : B_ERROR;
 	RETURN(error);					
 }
 
