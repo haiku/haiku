@@ -1,0 +1,28 @@
+SubDir OBOS_TOP src add-ons media plugins theora libtheora ;
+
+SubDirHdrs [ FDirName $(SUBDIR) .. .. ogg libogg ] ;
+
+SubDirCcFlags -DPACKAGE=\\\"libtheora\\\" -DVERSION=\\\"0.0\\\" ;
+SubDirCcFlags -D_REENTRANT -DPIC -DTRUE=true ;
+
+StaticLibrary theora :
+	blockmap.c
+	comment.c
+	dct.c
+	dct_decode.c
+	dct_encode.c
+	decode.c
+	encode.c
+	frarray.c
+	frinit.c
+	huffman.c
+	idct.c
+	mcomp.c
+	misc_common.c
+	pb.c
+	pp.c
+	quant.c
+	reconstruct.c
+	scan.c
+	toplevel.c
+;
