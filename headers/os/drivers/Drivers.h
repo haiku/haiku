@@ -16,6 +16,14 @@ extern "C" {
 
 struct selectsync;
 typedef struct selectsync selectsync;
+#ifndef B_SELECT_READ
+/* those were lacking for quite some time...
+   yes the select API will get deprecated, but for now that goes here. */
+#define B_SELECT_READ		1
+#define B_SELECT_WRITE		2
+#define B_SELECT_EXCEPTION	3
+extern void notify_select_event(selectsync * sync, uint32 ref);
+#endif
 
 typedef status_t (*device_open_hook) (const char *name, uint32 flags, void **cookie);
 typedef status_t (*device_close_hook) (void *cookie);
@@ -158,7 +166,7 @@ enum {
 	B_TAPE,							/* Tape drives */
 	B_PRINTER,						/* Printers */
 	B_CPU,							/* CPU devices */
-	B_WORM,							/* Write-once, read-many devives */
+	B_WORM,							/* Write-once, read-many devices */
 	B_CD,							/* CD ROMS */
 	B_SCANNER,						/* Scanners */
 	B_OPTICAL,						/* Optical devices */
