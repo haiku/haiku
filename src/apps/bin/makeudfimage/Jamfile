@@ -17,7 +17,9 @@ BinCommand makeudfimage
 	  EmbeddedStream.cpp
 	  ExtentStream.cpp
 	  FileStream.cpp
+	  MemoryStream.cpp
 	  PhysicalPartitionAllocator.cpp
+	  PositionIOStream.cpp
 	  Shell.cpp
 	  SimulatedStream.cpp
 	  Statistics.cpp
