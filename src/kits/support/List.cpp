@@ -21,6 +21,7 @@
 //
 //	File Name:		List.cpp
 //	Author(s):		The Storage kit Team
+//					Isaac Yonemoto
 //	Description:	BList class provides storage for pointers.
 //					Not thread safe.
 //------------------------------------------------------------------------------
@@ -96,6 +97,7 @@ BList::AddItem(void *item, int32 index)
 	return result;
 }
 
+
 // AddItem
 bool
 BList::AddItem(void *item)
@@ -110,6 +112,7 @@ BList::AddItem(void *item)
 	}
 	return result;
 }
+
 
 // AddList
 bool
@@ -127,6 +130,7 @@ BList::AddList(BList *list, int32 index)
 	}
 	return result;
 }
+
 
 // AddList
 bool
@@ -244,11 +248,30 @@ BList::SwapItems(int32 indexA, int32 indexB)
 
 
 //MoveItem
+  //This moves a list item from posititon a to position b, moving the appropriate block of
+  // list elements to make up for the move.  For example, in the array:
+  // A B C D E F G H I J
+  //  Moveing 1(B)->6(G) would result in this:
+  // A C D E F G B H I J
 bool
 BList::MoveItem(int32 fromIndex, int32 toIndex)
 {
-	//TODO: Implement
-	return false;
+	if ((fromIndex >= fItemCount) || (toIndex >= fItemCount) || (fromIndex < 0) || (toIndex < 0))
+		return false;
+	
+	if (fromIndex < toIndex)
+	{
+		void * tmp_mover = fObjectList[fromIndex];
+		memmove(fObjectList + fromIndex + 1, fObjectList + fromIndex, (toIndex - fromIndex) * sizeof(void *));
+		fObjectList[toIndex] = tmp_mover;
+	} 
+	else if (fromIndex > toIndex)
+	{
+		void * tmp_mover = fObjectList[fromIndex];
+		memmove(fObjectList + toIndex + 1, fObjectList + toIndex, (fromIndex - toIndex) * sizeof(void *));
+		fObjectList[toIndex] = tmp_mover;
+	};
+	return true;
 }
 
 
@@ -339,24 +362,37 @@ BList::IsEmpty() const
 }
 
 
-/* Iterating over the list. */	
-// DoForEach
+/* Iterating over the list. */
+//iterate a function over the whole list.  If the function outputs a true
+//value, then the process is terminated.
+	
 void
 BList::DoForEach(bool (*func)(void *))
 {
-	if (func) {
-		for (int32 i = 0; i < fItemCount; i++)
-			(*func)(fObjectList[i]);
+	bool terminate = false; int32 index = 0;		//set terminate condition variables to go.
+	if (func != NULL)
+	{
+		while ((!terminate) && (index < fItemCount))	//check terminate condition.
+		{
+			terminate = func(fItemList[index]);			//reset immediate terminator
+			index++;									//advance along the list.
+		};
 	}
+
 }
 
-// DoForEach
 void
-BList::DoForEach(bool (*func)(void *, void *), void *arg2)
+BList::DoForEach(bool (*func)(void *, void*), void * arg)
+//same as above, except this function takes an argument.
 {
-	if (func) {
-		for (int32 i = 0; i < fItemCount; i++)
-			(*func)(fObjectList[i], arg2);
+	bool terminate = false; int32 index = 0;
+	if (func != NULL)
+	{
+		while ((!terminate) && (index < fItemCount))
+		{	
+			terminate = func(fItemList[index], arg);
+			index++;
+		};
 	}
 }
 
