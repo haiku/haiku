@@ -12,7 +12,7 @@ Depends NetworkingKit :
 	core
 	ethernet loopback ppp
 	pppoe
-	raw	ipv4 icmp udp tcp
+	raw ipv4 icmp udp tcp
 	libnet.so libnetapi.so
 	ping ifconfig route traceroute arp pppconfig
 	sis900 rtl8139
@@ -21,7 +21,24 @@ Depends NetworkingKit :
 # Pseudo-target to build the media stuffs only
 NotFile MediaKit ;
 Depends MediaKit :
-	libmedia.so media_server media_addon_server mixer.media_addon tone_producer_demo.media_addon video_producer_demo.media_addon
+	libmedia.so 
+	media_server media_addon_server 
+
+	# add-ons
+	mixer.media_addon 	
+	tone_producer_demo.media_addon 
+	video_producer_demo.media_addon
+	legacy.media_addon
+	multi_audio.media_addon
+	reader.media_addon
+	writer.media_addon
+	demultiplexer.media_addon 
+
+	# codecs
+	wav_reader
+	raw_decoder 
+	mp3_reader
+	mp3_decoder
 ;
 
 SubInclude OBOS_TOP src ;
