@@ -10,3 +10,5 @@ SimpleTest SyslogTest
 SEARCH on [ FGristFiles
 		syslog.cpp
 	] = [ FDirName $(OBOS_TOP) src kernel libroot posix ] ;
+
+SubInclude OBOS_TOP src tests kernel libroot posix bonnie ;

@@ -1,0 +1,92 @@
+.\"-------
+.\" Man page portability notes
+.\"
+.\" These are some notes on conventions to maintain for greatest
+.\" portability of this man page to various other versions of
+.\" nroff.
+.\"
+.\" When you want a \ to appear in the output, use \e in the man page.
+.\" (NOTE this comes up in the rc grammar, where to print out '\n' the
+.\" man page must contain '\en'.)
+.\"
+.\" Evidently not all versions of nroff allow the omission of the
+.\" terminal " on a macro argument.  Thus what could be written
+.\"
+.\" .Cr "exec >[2] err.out
+.\"
+.\" in true nroffs must be written
+.\"
+.\" .Cr "exec >[2] err.out"
+.\"
+.\" instead.
+.\"
+.\" Use symbolic font names (e.g. R, I, B) instead of the standard
+.\" font positions 1, 2, 3.  Note that for Xf to work the standard
+.\" font names must be single characters.
+.\"
+.\" Note that sentences should end at the end of a line.  nroff and
+.\" troff will supply the correct intersentence spacing, but only if
+.\" the sentences end at the end of a line.  Explicit spaces, if given,
+.\" are apparently honored and the normal intersentence spacing is
+.\" supressed.
+.\"
+.\" DaviD W. Sanderson
+.\"-------
+.\" Dd	distance to space vertically before a "display"
+.\" These are what n/troff use for interparagraph distance
+.\"-------
+.if t .nr Dd .4v
+.if n .nr Dd 1v
+.\"-------
+.\" Sp	space down the interparagraph distance
+.\"-------
+.de Sp
+.sp \\n(Ddu
+..
+.\"-------
+.\" Ds	begin a display, indented .5 inches from the surrounding text.
+.\"
+.\" Note that uses of Ds and De may NOT be nested.
+.\"-------
+.de Ds
+.Sp
+.in +0.5i
+.nf
+..
+.\"-------
+.\" De	end a display (no trailing vertical spacing)
+.\"-------
+.de De
+.fi
+.in
+..
+.TH Bonnie 1 "2.0.6" Textuality
+.SH NAME
+Bonnie - File system benchmark
+.SH "SYNOPSIS"
+.B Bonnie
+.RI "[-d\ scratch-dir]"
+.RI "[-html]"
+.RI "[-m\ machine-label]"
+.RI "[-s\ size-in-Mb]"
+.SH "OPTIONS"
+.PP
+  -d scratch-dir   : Write scratch file in named directory (default: ".")
+  -html            : Generate HTML output
+  -m machine-label : use <machine-label> to label report
+  -s size-in-Mb    : how many Mb to use for testing (default: 100)
+.\"-------
+.SH "DESCRIPTION"
+.\"-------
+.I Bonnie
+measures the performance of UNIX filesystem operations.
+For details, see http://www.textuality.com/bonnie/
+.\"-------
+.SH "AUTHOR"
+.\"-------
+.I Bonnie
+was written by Tim Bray,
+(tbray@textuality.com),
+.I Bonnie
+is copyrighted 1990-1996 by Tim Bray.
+For details, see http://www.textuality.com/bonnie/copyright.html
