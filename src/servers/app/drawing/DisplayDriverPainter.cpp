@@ -871,6 +871,7 @@ DisplayDriverPainter::SetMode(const display_mode &mode)
 {
 	if (Lock() && fGraphicsCard->SetMode(mode) >= B_OK) {
 		fPainter->AttachToBuffer(fGraphicsCard->BackBuffer());
+		DisplayDriver::SetMode(mode);
 		Unlock();
 	} else {
 		fprintf(stderr, "DisplayDriverPainter::SetMode() - unsupported mode!\n");

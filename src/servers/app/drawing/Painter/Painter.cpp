@@ -277,7 +277,7 @@ Painter::SetFont(const ServerFont& font)
 	fFont.SetRotation(font.Rotation());
 	fFont.SetSize(font.Size());
 	
-	_UpdateFont();
+	_UpdateFont(font.GetPath());
 }
 
 // #pragma mark -
@@ -1032,17 +1032,21 @@ Painter::_RebuildClipping()
 
 // _UpdateFont
 void
-Painter::_UpdateFont()
+Painter::_UpdateFont(const char* pathToFontFile)
 {
-	font_family family;
-	font_style style;
-	fFont.GetFamilyAndStyle(&family, &style);
-
-	bool success = fTextRenderer->SetFamilyAndStyle(family, style);
-	if (!success) {
-		fprintf(stderr, "unable to set '%s' + '%s'\n", family, style);
-		fprintf(stderr, "font is still: '%s' + '%s'\n",
-						fTextRenderer->Family(), fTextRenderer->Style());
+	if (pathToFontFile) {
+		fTextRenderer->SetFont(pathToFontFile);
+	} else {
+		font_family family;
+		font_style style;
+		fFont.GetFamilyAndStyle(&family, &style);
+	
+		bool success = fTextRenderer->SetFamilyAndStyle(family, style);
+		if (!success) {
+			fprintf(stderr, "unable to set '%s' + '%s'\n", family, style);
+			fprintf(stderr, "font is still: '%s' + '%s'\n",
+							fTextRenderer->Family(), fTextRenderer->Style());
+		}
 	}
 
 	fTextRenderer->SetPointSize(fFont.Size());

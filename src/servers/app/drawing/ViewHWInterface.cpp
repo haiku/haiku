@@ -448,6 +448,14 @@ ViewHWInterface::SetMode(const display_mode &mode)
 	return ret;
 }
 
+// GetMode
+void
+ViewHWInterface::GetMode(display_mode* mode)
+{
+	if (mode)
+		*mode = fDisplayMode;
+}
+
 // GetDeviceInfo
 status_t
 ViewHWInterface::GetDeviceInfo(accelerant_device_info *info)

@@ -39,6 +39,9 @@
 */
 DisplayDriver::DisplayDriver()
 {
+	fDisplayMode.virtual_width = 640;
+	fDisplayMode.virtual_height = 480;
+	fDisplayMode.space = B_RGBA32;
 }
 
 /*!
@@ -76,4 +79,32 @@ DisplayDriver::Shutdown()
 {
 }
 
+/*
+	\brief Sets the screen mode to specified resolution and color depth.
+	\param mode Data structure as defined in Screen.h
+	
+	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
+	to update the state variables kept internally by the DisplayDriver class.
+*/
+void
+DisplayDriver::SetMode(const display_mode &mode)
+{
+	if (Lock()) {
+		fDisplayMode = mode;
+		Unlock();
+	}
+}
+
+// GetMode
+void
+DisplayDriver::GetMode(display_mode *mode)
+{
+	if (!mode)
+		return;
+	
+	if (Lock()) {
+		*mode = fDisplayMode;
+		Unlock();
+	}
+}
 

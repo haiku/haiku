@@ -365,7 +365,8 @@ AccelerantHWInterface::SetMode(const display_mode &mode)
 void
 AccelerantHWInterface::GetMode(display_mode *mode)
 {
-	*mode = fDisplayMode;
+	if (mode)
+		*mode = fDisplayMode;
 }
 
 status_t

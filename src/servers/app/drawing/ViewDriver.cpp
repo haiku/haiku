@@ -316,6 +316,10 @@ void ViewDriver::SetMode(const display_mode &mode)
 		return;
 	}
 
+	fDisplayMode.virtual_width = mode.virtual_width;
+	fDisplayMode.virtual_height = mode.virtual_height;
+	fDisplayMode.space = mode.space;
+
 	screenwin->Lock();
 	
 	BBitmap *tempbmp=new BBitmap(BRect(0,0,mode.virtual_width-1, mode.virtual_height-1),

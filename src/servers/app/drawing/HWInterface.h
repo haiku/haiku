@@ -29,7 +29,7 @@ class HWInterface : public BLocker {
 
 	// screen mode stuff
 	virtual	status_t			SetMode(const display_mode &mode) = 0;
-//	virtual	void				GetMode(display_mode *mode) = 0;
+	virtual	void				GetMode(display_mode *mode) = 0;
 
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info) = 0;
 	virtual status_t			GetModeList(display_mode **mode_list,

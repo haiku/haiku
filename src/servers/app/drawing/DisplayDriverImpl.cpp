@@ -56,9 +56,6 @@ DisplayDriverImpl::DisplayDriverImpl()
 	  fDPMSState(B_DPMS_ON),
 	  fDPMSCaps(B_DPMS_ON)
 {
-	fDisplayMode.virtual_width = 640;
-	fDisplayMode.virtual_height = 480;
-	fDisplayMode.space = B_RGBA32;
 }
 
 
@@ -2427,41 +2424,6 @@ DisplayDriverImpl::Unlock()
 }
 
 // Protected Internal Functions
-/*
-	\brief Sets the screen mode to specified resolution and color depth.
-	\param mode Data structure as defined in Screen.h
-	
-	Subclasses must include calls to _SetDepth, _SetHeight, _SetWidth, and _SetMode
-	to update the state variables kept internally by the DisplayDriver class.
-*/
-void
-DisplayDriverImpl::SetMode(const display_mode &mode)
-{
-	fDisplayMode = mode;
-}
-
-// GetMode
-void
-DisplayDriverImpl::GetMode(display_mode *mode)
-{
-	if (!mode)
-		return;
-	
-	Lock();
-	*mode = fDisplayMode;
-	Unlock();
-}
-
-// DisplayMode
-const display_mode*
-DisplayDriverImpl::DisplayMode()
-{
-	const display_mode* mode = NULL;
-	Lock();
-	mode = &fDisplayMode;
-	Unlock();
-	return mode;
-}
 
 /*!
 	\brief Sets the driver's Display Power Management System state

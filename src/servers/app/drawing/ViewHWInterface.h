@@ -29,7 +29,7 @@ class ViewHWInterface : public HWInterface {
 	virtual	status_t			Shutdown();
 
 	virtual	status_t			SetMode(const display_mode &mode);
-//	virtual	void				GetMode(display_mode *mode);
+	virtual	void				GetMode(display_mode *mode);
 
 
 	virtual status_t			GetDeviceInfo(accelerant_device_info *info);
