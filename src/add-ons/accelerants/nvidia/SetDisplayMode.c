@@ -314,7 +314,7 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	 * attempting DMA on NV40 and higher because without it I can't get it going ATM.
 	 * Later on this can become a nv.settings switch, and maybe later we can even
 	 * forget about non-DMA completely (depends on 3D acceleration attempts). */
-	if (si->ps.card_arch < NV40)
+	if (si->ps.card_arch < NV40A)
 		nv_acc_init();
 	else
 		nv_acc_init_dma();
