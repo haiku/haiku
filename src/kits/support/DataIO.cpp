@@ -431,7 +431,7 @@ BMallocIO::_Resize(off_t size)
 			size_t newSize = (size + fBlockSize - 1) / fBlockSize * fBlockSize;
 			if (newSize != fMallocSize) {
 				// we need to resize
-				if (char *newData = (char*)(realloc(fData, newSize)) {
+				if (char *newData = (char*)realloc(fData, newSize)) {
 					// set the new area to 0
 					if (fMallocSize < newSize)
 						memset(newData + fMallocSize, 0,
