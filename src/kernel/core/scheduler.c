@@ -162,12 +162,12 @@ scheduler_reschedule(void)
 	struct thread *oldThread = thread_get_current_thread();
 	struct thread *nextThread, *prevThread;
 
-	TRACE(("reschedule(): cpu %d, cur_thread = 0x%x\n", smp_get_current_cpu(), thread_get_current_thread()));
+	TRACE(("reschedule(): cpu %d, cur_thread = 0x%lx\n", smp_get_current_cpu(), thread_get_current_thread()->id));
 
 	switch (oldThread->next_state) {
 		case B_THREAD_RUNNING:
 		case B_THREAD_READY:
-			TRACE(("enqueueing thread 0x%x into run q. pri = %d\n", oldThread, oldThread->priority));
+			TRACE(("enqueueing thread 0x%lx into run q. pri = %d\n", oldThread->id, oldThread->priority));
 			scheduler_enqueue_in_run_queue(oldThread);
 			break;
 		case B_THREAD_SUSPENDED:
@@ -179,7 +179,7 @@ scheduler_reschedule(void)
 			thread_enqueue(oldThread, &dead_q);
 			break;
 		default:
-			TRACE(("not enqueueing thread 0x%x into run q. next_state = %d\n", old_thread, old_thread->next_state));
+			TRACE(("not enqueueing thread 0x%lx into run q. next_state = %d\n", oldThread->id, oldThread->next_state));
 			break;
 	}
 	oldThread->state = oldThread->next_state;
