@@ -6,7 +6,7 @@
 #define _KERNEL_CBUF_H
 
 
-#include <kernel.h>
+#include <OS.h>
 
 
 typedef struct cbuf cbuf;
