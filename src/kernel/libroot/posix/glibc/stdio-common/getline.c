@@ -19,20 +19,13 @@
 #include <stddef.h>
 #include <stdio.h>
 
-#undef __getline
 
-#ifdef USE_IN_LIBIO
-# include "../libio/libioP.h"
-# undef ssize_t
-# define ssize_t _IO_ssize_t
-# define __getdelim _IO_getdelim
-#endif
+/** Like getdelim, but always looks for a newline. */
 
-/* Like getdelim, but always looks for a newline.  */
 ssize_t
-__getline (char **lineptr, size_t *n, FILE *stream)
+__getline(char **lineptr, size_t *n, FILE *stream)
 {
-  return __getdelim (lineptr, n, '\n', stream);
+	return __getdelim(lineptr, n, '\n', stream);
 }
 
-weak_alias (__getline, getline)
+weak_alias(__getline, getline)
