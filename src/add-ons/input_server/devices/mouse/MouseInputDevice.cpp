@@ -326,7 +326,8 @@ MouseInputDevice::DeviceWatcher(void *arg)
 		
 		uint32 buttons = buttons_state ^ movements.buttons;	
 	
-		LOG("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld\n", dev->device_ref.name, movements.buttons, movements.xdelta, movements.ydelta, movements.clicks);
+		LOG("%s: buttons: 0x%lx, x: %ld, y: %ld, clicks:%ld, wheel_x:%ld, wheel_y:%ld\n", dev->device_ref.name, movements.buttons, 
+			movements.xdelta, movements.ydelta, movements.clicks, movements.wheel_xdelta, movements.wheel_ydelta);
 		
 		// TODO: add acceleration computing
 		int32 xdelta = movements.xdelta * dev->settings.accel.speed >> 15;
@@ -405,12 +406,12 @@ MouseInputDevice::RecursiveScan(const char *directory)
 {
         CALLED();
 	bool found_ps2 = false;
-        BEntry entry;
-        BDirectory dir(directory);
-        while (dir.GetNextEntry(&entry) == B_OK) {
-                BPath path;
-                entry.GetPath(&path);
-               
+	BEntry entry;
+	BDirectory dir(directory);
+	while (dir.GetNextEntry(&entry) == B_OK) {
+		BPath path;
+		entry.GetPath(&path);
+
 		char name[B_FILE_NAME_LENGTH];
 		entry.GetName(name);
 		if (strcmp(name, "ps2")==0)
@@ -419,10 +420,10 @@ MouseInputDevice::RecursiveScan(const char *directory)
 			continue;
 
 		if (entry.IsDirectory())
-                        RecursiveScan(path.Path());
-                else
-                        AddDevice(path.Path());
-        }
+			RecursiveScan(path.Path());
+		else
+			AddDevice(path.Path());
+	}
 }
 
 
