@@ -1,13 +1,14 @@
-/* 
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "DataEditor.h"
 
 #include <Autolock.h>
 #include <NodeMonitor.h>
+#include <Directory.h>
 #include <Drivers.h>
 #include <fs_attr.h>
 #include <fs_info.h>
@@ -408,23 +409,27 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 	bool isFileSystem = false;
 
+	fBlockSize = 512;
+
 	if (entry.IsDirectory()) {
-		// we redirect directories to their volumes
-		fs_info info;
-		if (fs_stat_dev(stat.st_dev, &info) != 0)
-			return errno;
+		// we redirect root directories to their volumes
+		BDirectory directory(&entry);
+		if (directory.InitCheck() == B_OK && directory.IsRootDirectory()) {
+			fs_info info;
+			if (fs_stat_dev(stat.st_dev, &info) != 0)
+				return errno;
 
-		status = entry.SetTo(info.device_name);
-		if (status < B_OK)
-			return status;
+			status = entry.SetTo(info.device_name);
+			if (status < B_OK)
+				return status;
 
-		entry.GetStat(&stat);
+			entry.GetStat(&stat);
 
-		fBlockSize = info.block_size;
-		if (fBlockSize > 0 && fBlockSize <= 65536)
-			isFileSystem = true;
-	} else
-		fBlockSize = 512;
+			fBlockSize = info.block_size;
+			if (fBlockSize > 0 && fBlockSize <= 65536)
+				isFileSystem = true;
+		}
+	}
 
 	status = fFile.SetTo(&entry, B_READ_WRITE);
 	if (status < B_OK) {
@@ -472,6 +477,9 @@ DataEditor::SetTo(BEntry &entry, const char *attribute)
 
 		if (!isFileSystem)
 			fBlockSize = geometry.bytes_per_sector;
+	} else if (entry.IsDirectory() || entry.IsSymLink()) {
+		fSize = 0;
+		fIsReadOnly = true;
 	} else {
 		status = fFile.GetSize(&fSize);
 		if (status < B_OK) {
