@@ -10,18 +10,18 @@
 #include "MidiServerApp.h"
 
 //------------------------------------------------------------------------------
-//Constructor
+
 MidiServerApp::MidiServerApp()
-	: BApplication("application/x-vnd.obos-midi-roster")
+	: BApplication(MIDI_SERVER_SIGNATURE)
 {
-	roster = new BMidiRoster();
+	//roster = new BMidiRoster();
 }
 
 //------------------------------------------------------------------------------
-//Destructor
-MidiRosterApp::	~MidiRosterApp(void)
-{//ToTest
-	delete EndPointList;
+
+MidiServerApp::~MidiServerApp(void)
+{
+	//delete endpoints;
 }
 
 //------------------------------------------------------------------------------
@@ -36,28 +36,29 @@ void MidiServerApp::AboutRequested()
 
 //------------------------------------------------------------------------------
 
-void MidiServerApp::MessageReceived(BMessage *msg)
-{//ToDo
+void MidiServerApp::MessageReceived(BMessage* msg)
+{
 	switch (msg->what)
 	{
-		default : BApplication::MessageReceived(msg);
+		default: super::MessageReceived(msg); break;
 	}
 }
 
 //------------------------------------------------------------------------------
 
-int32 MidiServerApp::GetNextFreeID(void)
-{//ToTest
-	return NextFreeID++;
-}
+/*int32 MidiServerApp::GetNextFreeID()
+{
+	return nextFreeID++;
+}*/
 
 //------------------------------------------------------------------------------
 
-BMidiEndpoint *MidiServerApp::NextEndPoint(int32 *id)
-{//ToTest
-int32 item = 0;
-BMidiEndpoint *endpoint;
-	while ((endpoint = (BMidiEndpoint*)EndPointList->ItemAt(item)) != NULL)
+/*BMidiEndpoint* MidiServerApp::NextEndPoint(int32* id)
+{
+	int32 item = 0;
+	BMidiEndpoint *endpoint;
+
+	while ((endpoint = (BMidiEndpoint*) endpoints->ItemAt(item)) != NULL)
 	{
 		if (endpoint->ID() > *id)
 		{
@@ -67,32 +68,16 @@ BMidiEndpoint *endpoint;
 		}
 		item++;
 	}
-return NULL;
-}
+	return NULL;
+}*/
 
 //------------------------------------------------------------------------------
 
-BMidiRoster *MidiServerApp::GetRoster()
+/*BMidiRoster* MidiServerApp::GetRoster()
 {
 	return roster;
-}
+}*/
 
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
-//------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
 int main()
