@@ -701,6 +701,14 @@ UdfBuilder::Build()
 			ssize_t bytes = _OutputFile().Zero(padding);
 			error = check_size_error(bytes, padding);
 		}
+		// Pad with an extra 256 blocks, since burners seem to
+		// sometimes have trouble writing the last few blocks of
+		// an image
+		if (!error) {
+			uint32 size = _BlockSize() * 256;
+			ssize_t bytes = _OutputFile().Zero(size);
+			error = check_size_error(bytes, size);
+		}
 		if (!error)
 			_Stats().SetImageSize(_OutputFile().Position());
 	}
