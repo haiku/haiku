@@ -231,16 +231,6 @@ bfs_mount(nspace_id nsid, const char *device, ulong flags, void *parms,
 {
 	FUNCTION();
 
-#ifndef USER
-	// If you can't build the file system because of this line, you can either
-	// add the prototype:
-	//	extern int load_driver_symbols(const char *driver_name);
-	// to your KernelExport.h include (since it's missing there in some releases
-	// of BeOS R5), or just comment out the line, it won't do any harm and is
-	// used only for debugging purposes.
-	load_driver_symbols(BFS_NAME);
-#endif
-
 	Volume *volume = new Volume(nsid);
 	if (volume == NULL)
 		return B_NO_MEMORY;
@@ -2004,28 +1994,28 @@ bfs_open_query(void *_ns, const char *queryString, ulong flags, port_id port,
 	PRINT(("query = \"%s\", flags = %lu, port_id = %ld, token = %ld\n", queryString, flags, port, token));
 
 	Volume *volume = (Volume *)_ns;
-	
+
 	Expression *expression = new Expression((char *)queryString);
 	if (expression == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
-	
+
 	if (expression->InitCheck() < B_OK) {
 		FATAL(("Could not parse query, stopped at: \"%s\"\n", expression->Position()));
 		delete expression;
 		RETURN_ERROR(B_BAD_VALUE);
 	}
 
-	Query *query = new Query(volume, expression);
+	Query *query = new Query(volume, expression, flags);
 	if (query == NULL) {
 		delete expression;
 		RETURN_ERROR(B_NO_MEMORY);
 	}
-	
+
 	if (flags & B_LIVE_QUERY)
 		query->SetLiveMode(port, token);
 
 	*cookie = (void *)query;
-	
+
 	return B_OK;
 }
 
