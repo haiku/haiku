@@ -1,6 +1,6 @@
 SubDir OBOS_TOP src apps stylededit ;
 
-UsePrivateHeaders support ;
+UsePrivateHeaders textencoding ;
 
 AddResources StyledEdit :
 	StyledEdit.rdef StyledEdit.icons.rdef StyledEdit.version.rdef
@@ -22,9 +22,9 @@ App StyledEdit :
 	string_helper.cpp
 	;
 
-SEARCH on <src!apps!stylededit>CharacterSet.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
-SEARCH on <src!apps!stylededit>CharacterSetRoster.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
-SEARCH on <src!apps!stylededit>character_sets.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
+SEARCH on <src!apps!stylededit>CharacterSet.cpp += [ FDirName $(OBOS_TOP) src kits textencoding ] ;
+SEARCH on <src!apps!stylededit>CharacterSetRoster.cpp += [ FDirName $(OBOS_TOP) src kits textencoding ] ;
+SEARCH on <src!apps!stylededit>character_sets.cpp += [ FDirName $(OBOS_TOP) src kits textencoding ] ;
 SEARCH on <src!apps!stylededit>String.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 SEARCH on <src!apps!stylededit>string_helper.cpp += [ FDirName $(OBOS_TOP) src kits support ] ;
 
