@@ -6,6 +6,8 @@
 
 #include <arch/x86/descriptors.h>
 
+#include "syscall_numbers.h"
+
 #define FUNCTION(x) .global x; .type x,@function; x
 
 .text
@@ -86,7 +88,7 @@ i386_uspace_exit_stub:
 	pushl	%eax
 	movl	$1, %ecx
 	lea	(%esp), %edx
-	movl	$25, %eax;
+	movl	$SYSCALL_EXIT_THREAD, %eax;
 	int	$99
 	.align 4
 i386_uspace_exit_stub_end:

@@ -6,6 +6,8 @@
 
 #include <arch/x86/descriptors.h>
 
+#include "syscall_numbers.h"
+
 #define FUNCTION(x) .global x; .type x,@function; x
 
 .text
@@ -160,7 +162,7 @@ FUNCTION(i386_stack_switch):
 
 FUNCTION(i386_return_from_signal):
 	addl	$12, %esp	// Flushes the 3 arguments to sa_handler
-	movl	$103, %eax	// This syscall will restore the cpu context to the
+	movl	$SYSCALL_RESTORE_SIGNAL_FRAME, %eax	// This syscall will restore the cpu context to the
 	movl	$0, %ecx	// one existing before calling the signal handler
 	lea		4(%esp), %edx
 	int		$99

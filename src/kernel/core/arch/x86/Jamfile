@@ -1,21 +1,28 @@
 SubDir OBOS_TOP src kernel core arch x86 ;
 
+# for syscall_numbers.h
+SubDirHdrs [ FObjectsDir src kernel core ] ;
+
 KernelStaticLibrary libx86 :
-	<$(SOURCE_GRIST)>arch_cpu.c
-	<$(SOURCE_GRIST)>arch_dbg_console.c
-	<$(SOURCE_GRIST)>arch_debug.c
-	<$(SOURCE_GRIST)>arch_elf.c
-	<$(SOURCE_GRIST)>arch_faults.c
-	<$(SOURCE_GRIST)>arch_int.c
-#	<$(SOURCE_GRIST)>arch_selector.c
-	<$(SOURCE_GRIST)>arch_real_time_clock.c
-	<$(SOURCE_GRIST)>arch_smp.c
-	<$(SOURCE_GRIST)>arch_thread.c
-	<$(SOURCE_GRIST)>arch_timer.c
-	<$(SOURCE_GRIST)>arch_vm.c
-	<$(SOURCE_GRIST)>arch_vm_translation_map.c
-	<$(SOURCE_GRIST)>arch_x86.S
-	<$(SOURCE_GRIST)>arch_interrupts.S
+	arch_cpu.c
+	arch_dbg_console.c
+	arch_debug.c
+	arch_elf.c
+	arch_faults.c
+	arch_int.c
+#	arch_selector.c
+	arch_real_time_clock.c
+	arch_smp.c
+	arch_thread.c
+	arch_timer.c
+	arch_vm.c
+	arch_vm_translation_map.c
+	arch_x86.S
+	arch_interrupts.S
 	:
 	-fno-pic -Wno-unused
 	;
+
+# We need to specify the dependency on the generated syscalls file explicitly.
+Includes [ FGristFiles arch_x86.S arch_interrupts.S ]
+	: <syscalls>syscall_numbers.h ;
