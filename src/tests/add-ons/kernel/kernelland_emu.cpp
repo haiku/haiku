@@ -11,8 +11,13 @@
 #include <module.h>
 #include <List.h>
 #include <Locker.h>
+#include <ObjectList.h>
 #include <Path.h>
+#include <String.h>
 
+#ifdef TRACE
+#undef TRACE
+#endif
 #define TRACE(x)
 //#define TRACE(x) printf x
 
@@ -27,74 +32,82 @@ struct module_name_list {
 };
 
 
-// Module
+// ModuleAddOn
 
-class Module {
+class ModuleAddOn {
 public:
-	Module();
-	~Module();
+	ModuleAddOn();
+	~ModuleAddOn();
 
-	status_t Load(const char *name, bool isPath = false, bool init = true);
+	status_t Load(const char *path, const char *dirPath);
 	void Unload();
 
-	status_t Init();
-	status_t Uninit();
+	const char *Name()	{ return fName.String(); }
 
 	void Get();
 	bool Put();
 
-	module_info *Info() const { return fInfo; }
-
-private:
-	bool _Load(const char *path, const char *name, bool isPath, bool init);
+	module_info **ModuleInfos() const { return fInfos; }
+	module_info *FindModuleInfo(const char *name) const;
 
 private:
 	image_id	fAddOn;
-	module_info	*fInfo;
+	module_info	**fInfos;
 	int32		fReferenceCount;
-	bool		fInitialized;
+	BString		fName;
 };
 
 // constructor
-Module::Module()
+ModuleAddOn::ModuleAddOn()
 	: fAddOn(-1),
-	  fInfo(NULL),
-	  fReferenceCount(0),
-	  fInitialized(false)
+	  fInfos(NULL),
+	  fReferenceCount(0)
 {
 }
 
-// constructor
-Module::~Module()
+// destructor
+ModuleAddOn::~ModuleAddOn()
 {
 	Unload();
 }
 
 // Load
 status_t
-Module::Load(const char *name, bool isPath, bool init)
+ModuleAddOn::Load(const char *path, const char *dirPath)
 {
-TRACE(("Module::Load(): searching module `%s'...\n", name));
+TRACE(("ModuleAddOn::Load(): searching module `%s'...\n", path));
 	Unload();
-	status_t error = (name ? B_OK : B_BAD_VALUE);
+	status_t error = (path && dirPath ? B_OK : B_BAD_VALUE);
 	if (error == B_OK) {
+		// get the module dir relative path
+		BPath absPath;
+		BPath absDirPath;
+		if (absPath.SetTo(path, NULL, true) != B_OK
+			|| absDirPath.SetTo(dirPath, NULL, true) != B_OK
+			|| strlen(absPath.Path()) <= strlen(absDirPath.Path())) {
+			return B_ENTRY_NOT_FOUND;
+		}
+		int32 dirPathLen = strlen(absDirPath.Path());
+		if (strncmp(absPath.Path(), absDirPath.Path(), dirPathLen)
+			|| absPath.Path()[dirPathLen] != '/') {
+			return B_ENTRY_NOT_FOUND;
+		}
+		const char *name = absPath.Path() + dirPathLen + 1;
+		// load the file
 		error = B_ENTRY_NOT_FOUND;
-		if (isPath) {
-			// name is a path name: try to load it
-			if (_Load(name, name, isPath, init))
+		BEntry entry;
+		if (entry.SetTo(path) == B_OK && entry.Exists()) {
+			image_id image = load_add_on(path);
+			module_info **infos = NULL;
+			if (image >= 0
+				&& get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
+									(void**)&infos) == B_OK
+				&& infos != NULL) {
+				fAddOn = image;
+				fInfos = infos;
+				fName = name;
+				fReferenceCount = 0;
 				error = B_OK;
-		} else {
-			// name is a relative module name: search in the module dirs
-			for (int32 i = 0; gModuleDirs[i]; i++) {
-TRACE(("Module::Load(): ...in `%s'\n", gModuleDirs[i]));
-				BPath path;
-				if (path.SetTo(gModuleDirs[i]) == B_OK
-					&& path.SetTo(path.Path(), name) == B_OK) {
-					if (_Load(path.Path(), name, isPath, init)) {
-						error = B_OK;
-						break;
-					}
-				}
 			}
 		}
 	}
@@ -103,16 +116,83 @@ TRACE(("Module::Load(): ...in `%s'\n", gModuleDirs[i]));
 
 // Unload
 void
-Module::Unload()
+ModuleAddOn::Unload()
 {
-	if (fAddOn >= 0) {
-		Uninit();
+	if (fAddOn >= 0)
 		unload_add_on(fAddOn);
-	}
 	fAddOn = -1;
-	fInfo = NULL;
+	fInfos = NULL;
 	fReferenceCount = 0;
-	fInitialized = false;
+}
+
+// Get
+void
+ModuleAddOn::Get()
+{
+	if (fAddOn >= 0)
+		fReferenceCount++;
+}
+
+// Put
+bool
+ModuleAddOn::Put()
+{
+	if (fAddOn >= 0)
+		fReferenceCount--;
+	return (fReferenceCount == 0);
+}
+
+// FindModuleInfo
+module_info *
+ModuleAddOn::FindModuleInfo(const char *name) const
+{
+	if (fInfos && name) {
+		for (int32 i = 0; module_info *info = fInfos[i]; i++) {
+			if (!strcmp(info->name, name))
+				return info;
+		}
+	}
+	return NULL;
+}
+
+
+// Module
+
+class Module {
+public:
+	Module(ModuleAddOn *addon, module_info *info);
+	~Module();
+
+	status_t Init();
+	status_t Uninit();
+
+	void Get();
+	bool Put();
+
+	ModuleAddOn *AddOn() const	{ return fAddOn; }
+	module_info *Info() const	{ return fInfo; }
+
+private:
+	ModuleAddOn	*fAddOn;
+	module_info	*fInfo;
+	int32		fReferenceCount;
+	bool		fInitialized;
+};
+
+// constructor
+Module::Module(ModuleAddOn *addon, module_info *info)
+	: fAddOn(addon),
+	  fInfo(info),
+	  fReferenceCount(0),
+	  fInitialized(false)
+{
+	Init();
+}
+
+// destructor
+Module::~Module()
+{
+	Uninit();
 }
 
 // Init
@@ -155,39 +235,6 @@ Module::Put()
 	if (fAddOn >= 0)
 		fReferenceCount--;
 	return (fReferenceCount == 0 && !(fInfo->flags & B_KEEP_LOADED));
-}
-
-// _Load
-bool
-Module::_Load(const char *path, const char *name, bool isPath, bool init)
-{
-	TRACE(("Module::_Load(): trying to load `%s'\n", path));
-	BEntry entry;
-	if (entry.SetTo(path) == B_OK && entry.Exists()) {
-		image_id image = load_add_on(path);
-		module_info **infos = NULL;
-		if (image >= 0
-			&& get_image_symbol(image, "modules", B_SYMBOL_TYPE_DATA,
-								(void**)&infos) == B_OK
-			&& infos != NULL) {
-			for (int32 i = 0; module_info *info = infos[i]; i++) {
-				if ((isPath || !strcmp(name, info->name))
-					&& (!init || info->std_ops(B_MODULE_INIT) == B_OK)) {
-					fAddOn = image;
-					fInfo = info;
-					fReferenceCount = 0;
-					fInitialized = init;
-					return true;
-				}
-			}
-		}
-	} else if (!isPath) {
-		// entry does not exist -- try loading the parent path
-		BPath parentPath;
-		if (BPath(path).GetParent(&parentPath) == B_OK)
-			return _Load(parentPath.Path(), name, isPath, init);
-	}
-	return false;
 }
 
 
@@ -285,11 +332,16 @@ public:
 	status_t CloseModuleList(module_name_list *list);
 
 private:
-	void _FindModules(BDirectory &dir, module_name_list *list);
+	void _FindModules(BDirectory &dir, const char *moduleDir,
+					  module_name_list *list);
+
+	status_t _GetAddOn(const char *path, ModuleAddOn **addon);
+	void _PutAddOn(ModuleAddOn *addon);
 
 private:
-	static ModuleManager	fDefaultManager;
-	ModuleList				fModules;
+	static ModuleManager		fDefaultManager;
+	ModuleList					fModules;
+	BObjectList<ModuleAddOn>	fAddOns;
 };
 
 // constructor
@@ -315,13 +367,18 @@ ModuleManager::GetModule(const char *path, module_info **infop)
 		Module *module = fModules.FindModule(path);
 		if (!module) {
 			// module not yet loaded, try to get it
-			module = new Module;
-			error = module->Load(path);
-			if (error == B_OK && !fModules.AddModule(module))
-				error = B_NO_MEMORY;
-			if (error != B_OK) {
-				delete module;
-				module = NULL;
+			// get the responsible add-on
+			ModuleAddOn *addon = NULL;
+			error = _GetAddOn(path, &addon);
+			if (error == B_OK) {
+				// add-on found, get the module
+				if (module_info *info = addon->FindModuleInfo(path)) {
+					module = new Module(addon, info);
+					fModules.AddModule(module);
+				} else {
+					_PutAddOn(addon);
+					error = B_ENTRY_NOT_FOUND;
+				}
 			}
 		}
 		// "get" the module
@@ -342,8 +399,10 @@ ModuleManager::PutModule(const char *path)
 		BAutolock _lock(fModules);
 		if (Module *module = fModules.FindModule(path)) {
 			if (module->Put()) {
+				ModuleAddOn *addon = module->AddOn();
 				fModules.RemoveModule(module);
 				delete module;
+				_PutAddOn(addon);
 			}
 		} else
 			error = B_BAD_VALUE;
@@ -386,7 +445,7 @@ ModuleManager::OpenModuleList(const char *prefix)
 			BDirectory dir;
 			if (path.SetTo(gModuleDirs[i], prefix) == B_OK
 				&& dir.SetTo(path.Path()) == B_OK) {
-				_FindModules(dir, list);
+				_FindModules(dir, gModuleDirs[i], list);
 			}
 		}
 		list->it = list->names.begin();
@@ -428,21 +487,84 @@ ModuleManager::CloseModuleList(module_name_list *list)
 
 // _FindModules
 void
-ModuleManager::_FindModules(BDirectory &dir, module_name_list *list)
+ModuleManager::_FindModules(BDirectory &dir, const char *moduleDir,
+							module_name_list *list)
 {
 	BEntry entry;
 	while (dir.GetNextEntry(&entry) == B_OK) {
 		if (entry.IsFile()) {
-			Module module;
+			ModuleAddOn addon;
 			BPath path;
 			if (entry.GetPath(&path) == B_OK
-				&& module.Load(path.Path(), true, false) == B_OK) {
-				list->names.insert(module.Info()->name);
+				&& addon.Load(path.Path(), moduleDir) == B_OK) {
+				module_info **infos = addon.ModuleInfos();
+				for (int32 i = 0; infos[i]; i++) {
+					if (infos[i]->name)
+						list->names.insert(infos[i]->name);
+				}
 			}
 		} else if (entry.IsDirectory()) {
 			BDirectory subdir;
 			if (subdir.SetTo(&entry) == B_OK)
-				_FindModules(subdir, list);
+				_FindModules(subdir, moduleDir, list);
+		}
+	}
+}
+
+// _GetAddOn
+status_t
+ModuleManager::_GetAddOn(const char *name, ModuleAddOn **_addon)
+{
+	// search list first
+	for (int32 i = 0; ModuleAddOn *addon = fAddOns.ItemAt(i); i++) {
+		BString addonName(addon->Name());
+		addonName << "/";
+		if (!strcmp(name, addon->Name())
+			|| strncmp(addonName.String(), name, addonName.Length())) {
+			addon->Get();
+			*_addon = addon;
+			return B_OK;
+		}
+	}
+	// not in list yet, load from disk
+	// iterate through module dirs
+	for (int32 i = 0; gModuleDirs[i]; i++) {
+		BPath path;
+		if (path.SetTo(gModuleDirs[i]) == B_OK
+			&& path.SetTo(path.Path(), name) == B_OK) {
+			BEntry entry;
+			for (;;) {
+				if (entry.SetTo(path.Path()) == B_OK && entry.Exists()) {
+					// found an entry: if it is a file, try to load it
+					if (entry.IsFile()) {
+						ModuleAddOn *addon = new ModuleAddOn;
+						if (addon->Load(path.Path(), gModuleDirs[i]) == B_OK) {
+							fAddOns.AddItem(addon);
+							addon->Get();
+							*_addon = addon;
+							return B_OK;
+						}
+						delete addon;
+					}
+					break;
+				}
+				// chop off last path component
+				if (path.GetParent(&path) != B_OK)
+					break;
+			}
+		}
+	}
+	return B_ENTRY_NOT_FOUND;
+}
+
+// _PutAddOn
+void
+ModuleManager::_PutAddOn(ModuleAddOn *addon)
+{
+	if (addon) {
+		if (addon->Put()) {
+			fAddOns.RemoveItem(addon);
+			delete addon;
 		}
 	}
 }
