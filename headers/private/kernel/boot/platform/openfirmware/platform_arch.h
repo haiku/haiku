@@ -13,6 +13,8 @@
 extern "C" {
 #endif
 	
+extern void *arch_mmu_alloc_at(void *address, size_t size, uint8 protection);
+extern void *arch_mmu_alloc(size_t size, uint8 protection);
 extern status_t arch_mmu_init(void);
 
 #ifdef __cplusplus
