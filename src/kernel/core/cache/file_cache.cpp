@@ -135,12 +135,18 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 
 		size = min_c(vecs[i].iov_len - vecOffset, fileVec.length);
 		tempVecs[0].iov_len = size;
-		vecOffset = 0;
+
+		TRACE(("fill vec %ld, offset = %lu, size = %lu\n", i, vecOffset, size));
+
+		if (size >= fileVec.length)
+			vecOffset += size;
+		else
+			vecOffset = 0;
 
 		while (size < fileVec.length && ++i < count) {
 			tempVecs[tempCount].iov_base = vecs[i].iov_base;
 			tempCount++;
-			
+
 			// is this iovec larger than the file_io_vec?
 			if (vecs[i].iov_len + size > fileVec.length) {
 				size += tempVecs[tempCount].iov_len = vecOffset = fileVec.length - size;
@@ -158,13 +164,13 @@ readwrite_pages(file_cache_ref *ref, off_t offset, const iovec *vecs, size_t cou
 		if (status < B_OK)
 			return status;
 
+		totalSize += size;
+
 		if (size != bytes) {
 			// there are no more bytes, let's bail out
-			*_numBytes = size + totalSize;
+			*_numBytes = totalSize;
 			return B_OK;
 		}
-
-		totalSize += size;
 	}
 
 	return B_OK;
