@@ -518,7 +518,7 @@ BTextMailComponent::ParseRaw()
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	ssize_t bytes;
+	int32 bytes;
 	if ((bytes = raw_data->Read(buffer, raw_length)) < 0)
 		return B_IO_ERROR;
 
