@@ -8,3 +8,5 @@ CommonUnitTest SMRemoteTargetApp
 	: be stdc++.r4
 	: app support
 ;
+
+SubInclude OBOS_TOP src tests kits app bmessenger testapps ;
