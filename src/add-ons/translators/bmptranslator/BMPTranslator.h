@@ -42,11 +42,24 @@
 #define BMP_RLE4_COMPRESS 2
 
 #define BMP_TRANSLATOR_VERSION 100
-#define BMP_QUALITY 1.0
-#define BMP_CAPABILITY 1.0
+#define BMP_IN_QUALITY 1.0
+	// high in quality becuase this code supports all BMP features
+#define BMP_IN_CAPABILITY 0.8
+	// high in capability because this code opens basically all BMPs
+#define BMP_OUT_QUALITY 1.0
+	// high out quality because this code outputs fully standard BMPs
+#define BMP_OUT_CAPABILITY 0.5
+	// medium out capability because RLE compression is not an option
 
-#define BBT_QUALITY 1.0
-#define BBT_CAPABILITY 1.0
+#define BBT_IN_QUALITY 0.6
+	// medium in quality because only most common features are supported
+#define BBT_IN_CAPABILITY 0.8
+	// high in capability because most variations are supported
+#define BBT_OUT_QUALITY 0.6
+	// medium out quality because only most common features are supported
+#define BBT_OUT_CAPABILITY 0.8
+	// high out capability because most variations are supported
+
 
 struct BMPFileHeader {
 	// for both MS and OS/2 BMP formats
@@ -62,8 +75,8 @@ struct MSInfoHeader {
 	uint32 height;			// bitmap height
 	uint16 planes;			// number of planes, always 1?
 	uint16 bitsperpixel;	// bits per pixel, (1,4,8,16 or 24)
-	uint32 compression;		// type of compression (0 none, 1 8 bit RLE, 2 4 bit RLE)
-	uint32 imagesize;		// compressed size of image? set to zero if compression == 0?
+	uint32 compression;		// type of compression
+	uint32 imagesize;		// size of image data if compressed
 	uint32 xpixperm;		// horizontal pixels per meter
 	uint32 ypixperm;		// vertical pixels per meter
 	uint32 colorsused;		// number of actually used colors
