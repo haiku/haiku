@@ -1872,9 +1872,6 @@ BTextView::PointAt(int32 inOffset, float *outHeight) const
 int32
 BTextView::OffsetAt(BPoint point) const
 {
-	// TODO: When alignment is different than B_ALIGN_LEFT,
-	// this function is still broken.
-	
 	CALLED();
 	// should we even bother?
 	if (point.y >= fTextRect.bottom)
@@ -1904,10 +1901,32 @@ BTextView::OffsetAt(BPoint point) const
 	
 	point.x -= fTextRect.left;
 	point.x = max_c(point.x, 0.0);
-	
+
+	// TODO: Not exactly clean and performant: fix this.
+#if 1
+	int32 offset = line->offset;
+	int32 limit = (line + 1)->offset;
+	int32 saveOffset;
+	float x = fTextRect.left;
+	do {
+		saveOffset = offset;
+		int32 nextInitial = NextInitialByte(offset);
+		float width = StyledWidth(saveOffset, nextInitial - saveOffset);
+		if (x + width > point.x) {
+			if (abs(x + width - point.x) < abs(x - point.x))
+				offset = nextInitial;
+			break;
+		}
+
+		x += width;
+		offset = nextInitial;
+	} while (offset < limit);
+
+#else
+
 	// do a pseudo-binary search of the character widths on the line
 	// that PixelToLine() gave us
-	// note: the right half of a character returns its offset + 1
+	// note: the right half of a character returns its offset + 1	
 	int32 offset = line->offset;
 	int32 saveOffset = offset;
 	int32 delta = 0;
@@ -1988,7 +2007,8 @@ BTextView::OffsetAt(BPoint point) const
 		length -= numChars;
 		numChars = length;
 	} while (foundTab && length > 0);
-	
+#endif	
+
 	if (offset == (line + 1)->offset) {
 		// special case: newlines aren't visible
 		// return the offset of the character preceding the newline
