@@ -7,3 +7,8 @@ Addon multi_audio.media_addon : media :
 ;
 
 LinkSharedOSLibs multi_audio.media_addon : be libmedia.so ;
+
+Package openbeos-multi_audio-cvs
+	: multi_audio.media_addon
+	: boot home config add-ons media ;
+
