@@ -2,7 +2,7 @@
 /* Authors:
    Mark Watson 2/2000,
    Apsed,
-   Rudolf Cornelissen 11/2002-12/2003
+   Rudolf Cornelissen 11/2002-1/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -31,7 +31,21 @@ status_t gx00_crtc_validate_timing(
 	/* NOTE: keep horizontal timing at multiples of 8! */
 	/* confine to a reasonable width */
 	if (*hd_e < 640) *hd_e = 640;
-	if (*hd_e > 2048) *hd_e = 2048;
+	switch (si->ps.card_type)
+	{
+	case MIL1:
+	case MYST: /* fixme MYST220 has MIL2 range.. */
+		if (*hd_e > 1600) *hd_e = 1600;
+		break;
+	case MIL2:
+	case G100:
+	case G200:
+		if (*hd_e > 1920) *hd_e = 1920;
+		break;
+	default: /* G400 and up */
+		if (*hd_e > 2048) *hd_e = 2048;
+		break;
+	}
 
 	/* if hor. total does not leave room for a sensible sync pulse, increase it! */
 	if (*ht < (*hd_e + 80)) *ht = (*hd_e + 80);
@@ -53,7 +67,21 @@ status_t gx00_crtc_validate_timing(
 
 	/* confine to a reasonable height */
 	if (*vd_e < 480) *vd_e = 480;
-	if (*vd_e > 2047) *vd_e = 2047;
+	switch (si->ps.card_type)
+	{
+	case MIL1:
+	case MYST: /* fixme MYST220 has MIL2 range.. */
+		if (*vd_e > 1200) *vd_e = 1200;
+		break;
+	case MIL2:
+	case G100:
+	case G200:
+		if (*vd_e > 1440) *vd_e = 1440;
+		break;
+	default: /* G400 and up */
+		if (*vd_e > 1536) *vd_e = 1536;
+		break;
+	}
 
 	/*if vertical total does not leave room for a sync pulse, increase it!*/
 	if (*vt < (*vd_e + 3)) *vt = (*vd_e + 3);
