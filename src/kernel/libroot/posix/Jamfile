@@ -8,6 +8,8 @@ KernelMergeObject posix_main.o :
  	errno.c
  	fnmatch.c
  	glob.c
+ 	grp.c
+ 	inttypes.c
  	poll.c
  	pwd.c
  	syslog.cpp
