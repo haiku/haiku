@@ -6,9 +6,9 @@
 #ifndef _FS_INTERFACE_H
 #define _FS_INTERFACE_H
 
-#include <ktypes.h>
-#include <vfs_types.h>
 #include <OS.h>
+#include <module.h>
+#include <vfs_types.h>
 
 struct dirent;
 struct stat;
@@ -36,19 +36,21 @@ enum write_stat_mask {
 /* passed to write_fs_info() */
 #define	FS_WRITE_FSINFO_NAME	0x0001
 
-#define	B_CURRENT_FS_API_VERSION 1
+#define	B_CURRENT_FS_API_VERSION "/v1"
 
 #ifdef __cplusplus
 extern "C" {
 #endif 
 
-typedef struct fs_ops {
+typedef struct file_system_info {
+	struct module_info	module_info;
+
 	/* general operations */
 	status_t (*mount)(mount_id id, const char *device, void *args, fs_volume *_fs, vnode_id *_rootVnodeID);
 	status_t (*unmount)(fs_volume fs);
 
 	status_t (*read_fs_info)(fs_volume fs, struct fs_info *info);
-	status_t (*write_fs_info)(fs_volume fs, const struct fs_info *info, int mask);
+	status_t (*write_fs_info)(fs_volume fs, const struct fs_info *info, uint32 mask);
 	status_t (*sync)(fs_volume fs);
 
 	/* vnode operations */
@@ -78,7 +80,7 @@ typedef struct fs_ops {
 
 	status_t (*access)(fs_volume fs, fs_vnode vnode, int mode);
 	status_t (*read_stat)(fs_volume fs, fs_vnode vnode, struct stat *stat);
-	status_t (*write_stat)(fs_volume fs, fs_vnode vnode, const struct stat *stat, int statMask);
+	status_t (*write_stat)(fs_volume fs, fs_vnode vnode, const struct stat *stat, uint32 statMask);
 
 	/* file operations */
 	status_t (*create)(fs_volume fs, fs_vnode dir, const char *name, int openMode, int perms, fs_cookie *_cookie, vnode_id *_newVnodeID);
@@ -134,18 +136,15 @@ typedef struct fs_ops {
 	status_t (*free_query_cookie)(fs_volume fs, fs_cookie cookie);
 	status_t (*read_query)(fs_volume fs, fs_cookie cookie, struct dirent *buffer, size_t bufferSize, uint32 *_num);
 	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
-} fs_ops;
+} file_system_info;
 
-
-/* variables exported by the file system add-on */
-extern fs_ops	fs_entry;
-extern int32	api_version;
 
 /* file system add-ons only prototypes */
 extern status_t new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode);
 extern status_t get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_privateNode);
 extern status_t put_vnode(mount_id mountID, vnode_id vnodeID);
 extern status_t remove_vnode(mount_id mountID, vnode_id vnodeID);
+extern status_t unremove_vnode(mount_id mountID, vnode_id vnodeID);
 
 extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
 					vnode_id toParentNode, vnode_id node, const char *name);
