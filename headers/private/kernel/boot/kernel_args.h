@@ -1,5 +1,5 @@
 /* 
- * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2005, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -13,6 +13,8 @@
 
 #include <boot/elf.h>
 #include <boot/disk_identifier.h>
+#include <boot/driver_settings.h>
+
 #include <platform_kernel_args.h>
 #include <arch_kernel_args.h>
 
@@ -46,6 +48,8 @@ typedef struct kernel_args {
 		disk_identifier identifier;
 		off_t	partition_offset;
 	} boot_disk;
+
+	struct driver_settings_file *driver_settings;
 
 	struct {
 		bool	enabled;
