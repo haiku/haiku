@@ -788,7 +788,7 @@ for (dummy = 0; dummy < 2; dummy++)
 {
 	LOG(4,("ACC_DMA: get $%08x\n", NV_REG32(NVACC_FIFO + NV_GENERAL_DMAGET +
 		si->engine.fifo.handle[(si->engine.fifo.ch_ptr[NV_ROP5_SOLID])])));
-	LOG(4,("ACC_DMA: put $%08x\n", si->engine.dma.put));
+	LOG(4,("ACC_DMA: put $%08x\n", (si->engine.dma.put << 2)));
 }
 }
 
