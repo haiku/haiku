@@ -41,7 +41,7 @@ struct rootfs_stream {
 	} dir;
 	struct stream_symlink {
 		char *path;
-		int length;
+		size_t length;
 	} symlink;
 };
 
@@ -154,6 +154,8 @@ insert_cookie_in_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
 static void
 remove_cookie_from_jar(struct rootfs_vnode *dir, struct rootfs_cookie *cookie)
 {
+	// ToDo: why is this function not called?
+
 	if (cookie->next)
 		cookie->next->prev = cookie->prev;
 	if (cookie->prev)
@@ -369,7 +371,6 @@ rootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 	struct rootfs *fs = (struct rootfs *)_fs;
 	struct rootfs_vnode *dir = (struct rootfs_vnode *)_dir;
 	struct rootfs_vnode *vnode,*vdummy;
-	struct rootfs_vnode *v1;
 	status_t status;
 
 	TRACE(("rootfs_lookup: entry dir %p, name '%s'\n", dir, name));
@@ -540,13 +541,6 @@ rootfs_write(fs_volume fs, fs_vnode v, fs_cookie cookie, off_t pos, const void *
 	TRACE(("rootfs_write: vnode %p, cookie %p, pos 0x%Lx , len 0x%lx\n", v, cookie, pos, *len));
 
 	return EPERM;
-}
-
-
-static off_t
-rootfs_seek(fs_volume _fs, fs_vnode _v, fs_cookie _cookie, off_t pos, int st)
-{
-	return ESPIPE;
 }
 
 
@@ -725,7 +719,6 @@ rootfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 static status_t
 rootfs_read_link(fs_volume _fs, fs_vnode _link, char *buffer, size_t bufferSize)
 {
-	struct rootfs *fs = _fs;
 	struct rootfs_vnode *link = _link;
 	
 	if (link->stream.type != STREAM_TYPE_SYMLINK)
