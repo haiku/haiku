@@ -33,9 +33,8 @@ public:
 	status_t				SetIcon(const uchar *icon);
 	status_t				SetMenu(const BMenu *menu, const BMessenger target);
 
-private:
 	_BMethodAddOn_*			fOwner;
-	
+private:
 	virtual void			_ReservedInputServerMethod1();
 	virtual void			_ReservedInputServerMethod2();
 	virtual void			_ReservedInputServerMethod3();
