@@ -42,7 +42,7 @@ register_image(struct team *team, image_info *_info, size_t size)
 	image_id id = atomic_add(&sNextImageID, 1);
 	struct image *image;
 
-	image = malloc(sizeof(image_info));
+	image = malloc(sizeof(struct image));
 	if (image == NULL)
 		return B_NO_MEMORY;
 
