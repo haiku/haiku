@@ -42,6 +42,9 @@
 #include <View.h>
 #include <Window.h>
 
+#define PULSE_RATE 50000
+#define PULSE_MODULO 20
+
 //from bdb-ing /bin/shutdown:
 #define B_SYSTEM_SHUTDOWN 0x12d
 #define B_SYSTEM_REBOOT 0x12e
@@ -120,6 +123,32 @@ const char kIconBits[] = {
 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
 };
 
+const char kElectronBits[] = {
+0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+0xff, 0x00, 0x25, 0x24, 0x26, 0x00, 0xff, 0xff,
+0x00, 0x25, 0x21, 0x21, 0x22, 0x26, 0x00, 0xff,
+0x00, 0x21, 0x3f, 0x22, 0x22, 0x25, 0x00, 0xff,
+0x00, 0x25, 0x22, 0x22, 0x24, 0x24, 0x00, 0xff,
+0xff, 0x00, 0x23, 0x23, 0x25, 0x00, 0xff, 0xff,
+0xff, 0xff, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff,
+0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+};
+
+#define EL_POS_COUNT 17
+static const int electron1_table[][2] = { 
+{3, 8}, {7, 8}, {12, 8}, {17, 10}, 
+{22, 12}, {26, 16}, {28, 20}, {28, 24}, 
+{26, 26}, {22, 27}, {18, 26}, {14, 25}, 
+{10, 24}, {5, 22}, {3, 18}, {1, 14}, 
+{1, 10}, {-1, -1} };
+
+static const int electron2_table[][2] = { 
+{23, 18}, {21, 22}, {18, 25}, {14, 27},
+{10, 27}, {5, 26}, {0, 25}, {1, 18}, 
+{4, 15}, {8, 12}, {12, 10}, {16, 8},
+{20, 8}, {24, 9}, {28, 11}, {27, 13},
+{25, 15}, {-1, -1} };
+
 unsigned long time_to_sleep = 0; // -d
 int reboot = 0; // -r
 
@@ -138,6 +167,10 @@ class SView : public BView
 		BStringView			*fTitle;
 
 		BBitmap				*fIcon;
+		BBitmap				*fElectron;
+		int				fElectronPos;
+
+		int				fPulseDivider;
 
 		int32				fWidth;
 		int32				fHeight;
@@ -174,6 +207,9 @@ SView::SView(BRect frame)
 	fTitleStr(NULL),
 	fTitle(NULL),
 	fIcon(NULL),
+	fElectron(NULL),
+	fElectronPos(0),
+	fPulseDivider(PULSE_MODULO+1),
 	fWidth(0),
 	fHeight(0),
 	fLeftMargin(B_LARGE_ICON + 8),
@@ -184,6 +220,8 @@ SView::SView(BRect frame)
 	SetDrawingMode(B_OP_OVER);
 	fIcon = new BBitmap(BRect(0, 0, B_LARGE_ICON-1, B_LARGE_ICON-1), B_CMAP8);
 	fIcon->SetBits(kIconBits, B_LARGE_ICON*B_LARGE_ICON, 0, B_CMAP8);
+	fElectron = new BBitmap(BRect(0, 0, 7, 7), B_CMAP8);
+	fElectron->SetBits(kElectronBits, 8*8, 0, B_CMAP8);
 	fTitleStr = new BString;
 	if (reboot)
 		*fTitleStr << "Rebooting in " << (int32)fTimeLeft << " seconds !";
@@ -211,13 +249,19 @@ SView::~SView()
 void
 SView::Pulse()
 {
-	fTimeLeft--;
-	fTitleStr->SetTo("");
-	if (reboot)
-		*fTitleStr << "Rebooting in " << (int32)fTimeLeft << " seconds !";
-	else
-		*fTitleStr << "Shutting down in " << (int32)fTimeLeft << " seconds !";
-	fTitle->SetText(fTitleStr->String());
+	fPulseDivider--;
+	if (fPulseDivider <= 0) {
+		fPulseDivider = PULSE_MODULO;
+		fTimeLeft--;
+		fTitleStr->SetTo("");
+		if (reboot)
+			*fTitleStr << "Rebooting in " << (int32)fTimeLeft << " seconds !";
+		else
+			*fTitleStr << "Shutting down in " << (int32)fTimeLeft << " seconds !";
+		fTitle->SetText(fTitleStr->String());
+	}
+	fElectronPos += 1;
+	fElectronPos %= EL_POS_COUNT;
 	Invalidate();
 }
 
@@ -232,17 +276,24 @@ SView::Draw(BRect updateRect)
 	
 	if(fIcon != NULL)
 	{
-		DrawBitmap(fIcon, BPoint( (B_LARGE_ICON / 2), fTopMargin));
+		DrawBitmap(fIcon, BPoint((B_LARGE_ICON / 2), fTopMargin));
 	}
+	if(fIcon != NULL)
+	{
+		DrawBitmap(fElectron, BPoint((B_LARGE_ICON / 2) + electron1_table[fElectronPos][0], fTopMargin + electron1_table[fElectronPos][1]));
+		DrawBitmap(fElectron, BPoint((B_LARGE_ICON / 2) + electron2_table[fElectronPos][0], fTopMargin + electron2_table[fElectronPos][1]));
+	}
+	if (Window())
+		Window()->Flush();
 }
 
 ShutdownWindow::ShutdownWindow(thread_id id)
-	:BWindow(BRect( 139, 81, 407, 156), "Shutdown", B_TITLED_WINDOW_LOOK, 
+	:BWindow(BRect( 139, 81, 407, 156), "Shutdown Status", B_TITLED_WINDOW_LOOK, 
 				B_NORMAL_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_ASYNCHRONOUS_CONTROLS),
 	fView(NULL)
 {
 	fShutdownThread = id;
-	SetPulseRate(1000000);
+	SetPulseRate(PULSE_RATE);
 	fView = new SView(Bounds());
 	AddChild(fView);
 }
