@@ -38,28 +38,25 @@ MemoryReader::Read(void *_address, void *_buffer, int32 size, int32 &bytesRead)
 	char *buffer = (char*)_buffer;
 	bytesRead = 0;
 
-	// If the region to be read crosses page boundaries, we split it up into
-	// smaller chunks.
 	while (size > 0) {
 		int32 toRead = size;
 		if (toRead > B_MAX_READ_WRITE_MEMORY_SIZE)
 			toRead = B_MAX_READ_WRITE_MEMORY_SIZE;
-		if ((uint32)address % B_PAGE_SIZE + toRead > B_PAGE_SIZE)
-			toRead = B_PAGE_SIZE - (uint32)address % B_PAGE_SIZE;
 
-		status_t error = _Read(address, buffer, toRead);
+		int32 actuallyRead = 0;
+		status_t error = _Read(address, buffer, toRead, actuallyRead);
 
-		// If reading fails, we only fail, if we haven't read something yet.
+		// If reading fails, we only fail, if we haven't read anything yet.
 		if (error != B_OK) {
 			if (bytesRead > 0)
 				return B_OK;
 			return error;
 		}
 
-		bytesRead += toRead;
-		address += toRead;
-		buffer += toRead;
-		size -= toRead;
+		bytesRead += actuallyRead;
+		address += actuallyRead;
+		buffer += actuallyRead;
+		size -= actuallyRead;
 	}
 
 	return B_OK;
@@ -67,7 +64,7 @@ MemoryReader::Read(void *_address, void *_buffer, int32 size, int32 &bytesRead)
 
 // _Read
 status_t
-MemoryReader::_Read(void *address, void *buffer, int32 size)
+MemoryReader::_Read(void *address, void *buffer, int32 size, int32 &bytesRead)
 {
 	// prepare message
 	debug_nub_read_memory message;
@@ -99,7 +96,8 @@ MemoryReader::_Read(void *address, void *buffer, int32 size)
 	if (reply.error != B_OK)
 		return reply.error;
 
-	memcpy(buffer, reply.data, size);
+	bytesRead = reply.size;
+	memcpy(buffer, reply.data, bytesRead);
 
 	return B_OK;
 }

@@ -15,7 +15,7 @@ public:
 	status_t Read(void *address, void *buffer, int32 size, int32 &bytesRead);
 
 private:
-	status_t _Read(void *address, void *buffer, int32 size);
+	status_t _Read(void *address, void *buffer, int32 size, int32 &bytesRead);
 
 	port_id	fNubPort;
 	port_id	fReplyPort;
