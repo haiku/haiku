@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 	char path[B_PATH_NAME_LENGTH];
 	char link[B_PATH_NAME_LENGTH];
 	FILE *file;
-	bool isGMT = true;
+	bool isGMT = false;
 	struct tm* tm = NULL;
 	time_t t;
 
@@ -42,13 +42,14 @@ int main(int argc, char **argv)
 	if (file != NULL) {
 		char string[10];
 		fscanf(file, "%s", string);
-		if (strncmp(string, "local", 5) == 0)
-			isGMT = false;
+		isGMT = (strncmp(string, "local", 5) != 0);
 		fclose(file);
 	} else {
 		fprintf(stderr, "%s: can't read RTC settings\n", argv[0]);
 		printf("%s: No knowledge about contents of RTC\n", argv[0]);
-		return 0;
+		
+		// we don't care if not RTC settings is found, default is local
+		//return 0;
 	}
 
 	printf("%s: RTC stores %s time.\n", argv[0], isGMT ? "GMT" : "local" );
@@ -71,7 +72,6 @@ int main(int argc, char **argv)
 		time(&t);
 		tm = localtime(&t);
 		_kern_set_tzspecs(tm->tm_gmtoff, tm->tm_isdst);		
-	
 	} else {
 		fprintf(stderr, "%s: can't read link for timezone\n", argv[0]);
 		printf("%s: No timezone setting.\n", argv[0]);
