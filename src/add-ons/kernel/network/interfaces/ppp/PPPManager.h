@@ -10,6 +10,14 @@
 
 #include <KPPPInterface.h>
 #include <KPPPManager.h>
+#include <core_funcs.h>
+
+
+// these functions are defined in ppp.cpp
+extern int ppp_ifnet_stop(ifnet *ifp);
+extern int ppp_ifnet_output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
+	struct rtentry *rt0);
+extern int ppp_ifnet_ioctl(ifnet *ifp, ulong cmd, caddr_t data);
 
 
 typedef struct interface_entry {
@@ -24,8 +32,13 @@ class PPPManager {
 		PPPManager();
 		~PPPManager();
 		
+		int32 Stop(ifnet *ifp);
+		int32 Output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
+			struct rtentry *rt0);
+		int32 Control(ifnet *ifp, ulong cmd, caddr_t data);
+		
 		interface_id CreateInterface(const driver_settings *settings,
-			interface_id parentID);
+			interface_id parentID = PPP_UNDEFINED_INTERFACE_ID);
 		void DeleteInterface(interface_id ID);
 		void RemoveInterface(interface_id ID);
 		
@@ -46,19 +59,25 @@ class PPPManager {
 			{ return ReportManager().Report(type, code, data, length); }
 			// returns false if reply was bad (or an error occured)
 		
-		interface_entry *EntryFor(interface_id ID, int32 *start = NULL) const;
+		interface_entry *EntryFor(interface_id ID, int32 *saveIndex = NULL) const;
+		interface_entry *EntryFor(ifnet *ifp, int32 *saveIndex = NULL) const;
 		
 		interface_id NextID()
 			{ return (interface_id) atomic_add((vint32*) &fNextID, 1); }
+		
+		void DeleterThreadEvent();
+		void Pulse();
 
 	private:
 		int32 FindUnit() const;
 
 	private:
-		BLocker fLock;
+		BLocker fLock, fReportLock;
 		PPPReportManager fReportManager;
 		List<interface_entry*> fEntries;
 		interface_id fNextID;
+		thread_id fDeleterThread;
+		net_timer_id fPulseTimer;
 };
 
 

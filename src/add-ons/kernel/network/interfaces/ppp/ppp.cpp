@@ -21,6 +21,37 @@ struct core_module_info *core = NULL;
 static PPPManager *manager = NULL;
 
 
+int
+ppp_ifnet_stop(ifnet *ifp)
+{
+	if(manager)
+		return manager->Stop(ifp);
+	else
+		return B_ERROR;
+}
+
+
+int
+ppp_ifnet_output(ifnet *ifp, struct mbuf *buf, struct sockaddr *dst,
+	struct rtentry *rt0)
+{
+	if(manager)
+		return manager->Output(ifp, buf, dst, rt0);
+	else
+		return B_ERROR;
+}
+
+
+int
+ppp_ifnet_ioctl(ifnet *ifp, ulong cmd, caddr_t data)
+{
+	if(manager)
+		return manager->Control(ifp, cmd, data);
+	else
+		return B_ERROR;
+}
+
+
 static
 int
 ppp_start(void *cpp)
@@ -39,6 +70,7 @@ int
 ppp_stop()
 {
 	delete manager;
+	manager = NULL;
 	
 	return B_OK;
 }
