@@ -84,7 +84,7 @@ typedef struct file_system_info {
 	status_t (*set_flags)(fs_volume fs, fs_vnode v, fs_cookie cookie, int flags);
 	status_t (*fsync)(fs_volume fs, fs_vnode v);
 
-	ssize_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);
+	status_t (*read_link)(fs_volume fs, fs_vnode link, char *buffer, size_t bufferSize);
 	status_t (*write_link)(fs_volume fs, fs_vnode link, char *toPath);
 	status_t (*create_symlink)(fs_volume fs, fs_vnode dir, const char *name, const char *path, int mode);
 
