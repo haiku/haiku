@@ -86,11 +86,11 @@ install_type(const char *type, const char *preferredApp = NULL,
 // ref_for_path
 static
 entry_ref
-ref_for_path(const char *filename)
+ref_for_path(const char *filename, bool traverse = true)
 {
 	entry_ref ref;
 	BEntry entry;
-	CHK(entry.SetTo(filename, true) == B_OK);
+	CHK(entry.SetTo(filename, traverse) == B_OK);
 	CHK(entry.GetRef(&ref) == B_OK);
 	return ref;
 }
@@ -522,13 +522,64 @@ CommonFindAppTest14(FindAppCaller &caller)
 	CHK(caller(fileType1, &ref) == B_LAUNCH_FAILED_APP_IN_TRASH);
 }
 
+/*
+	@case 15		installed type mimeType, preferred app, app type installed,
+					preferred app type has an app hint pointing to void,
+					no app with this signature exists
+	@results		Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the
+					app type's app hint.
+*/
+static
+void
+CommonFindAppTest15(FindAppCaller &caller)
+{
+	BRoster roster;
+	set_type_app_hint(appType1, appFile1);
+	install_type(fileType1, appType1);
+	entry_ref ref;
+	CHK(caller(fileType1, &ref) == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	entry_ref appHint;
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	@case 16		installed type mimeType, preferred app, app type installed,
+					preferred app type has an app hint pointing to a cyclic
+					link, no app with this signature exists
+	@results		R5: Should return B_OK and set the ref to refer to the
+					link.
+					OBOS: Should return B_LAUNCH_FAILED_APP_NOT_FOUND and
+					unset the app type's app hint.
+*/
+static
+void
+CommonFindAppTest16(FindAppCaller &caller)
+{
+	BRoster roster;
+	set_type_app_hint(appType1, appFile1);
+	install_type(fileType1, appType1);
+	system((string("ln -s ") + appFile1 + " " + appFile1).c_str());
+	entry_ref ref;
+	entry_ref appHint;
+#ifdef TEST_R5
+	CHK(caller(fileType1, &ref) == B_OK);
+	CHK(ref_for_path(appFile1, false) == ref);
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_OK);
+	CHK(appHint == ref);
+#else
+	CHK(caller(fileType1, &ref) == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+#endif
+}
+
 typedef void commonTestFunction(FindAppCaller &caller);
 static commonTestFunction *commonTestFunctions[] = {
 	CommonFindAppTest1, CommonFindAppTest2, CommonFindAppTest3,
 	CommonFindAppTest4, CommonFindAppTest5, CommonFindAppTest6,
 	CommonFindAppTest7, CommonFindAppTest8, CommonFindAppTest9,
 	CommonFindAppTest10, CommonFindAppTest11, CommonFindAppTest12,
-	CommonFindAppTest13, CommonFindAppTest14
+	CommonFindAppTest13, CommonFindAppTest14, CommonFindAppTest15,
+	CommonFindAppTest16
 };
 static int32 commonTestFunctionCount
 	= sizeof(commonTestFunctions) / sizeof(commonTestFunction*);
@@ -735,7 +786,7 @@ void FindAppTester::FindAppTestB8()
 	install_type(fileType1, appType1);
 	create_file(testFile1, fileType1);
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
-	entry_ref linkRef(ref_for_path(testLink1));
+	entry_ref linkRef(ref_for_path(testLink1, false));
 	entry_ref ref;
 	CHK(roster.FindApp(&linkRef, &ref) == B_OK);
 	CHK(ref_for_path(appFile1) == ref);
@@ -802,6 +853,33 @@ void FindAppTester::FindAppTestB10()
 	}
 }
 
+/*
+	status_t FindApp(entry_ref *ref, entry_ref *app) const
+	@case 11		ref is valid and refers to a cyclic link
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void FindAppTester::FindAppTestB11()
+{
+	BRoster roster;
+	system((string("ln -s ") + testLink1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	entry_ref ref;
+	CHK(roster.FindApp(&linkRef, &ref) == B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t FindApp(entry_ref *ref, entry_ref *app) const
+	@case 12		ref is valid and refers to a link to void
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void FindAppTester::FindAppTestB12()
+{
+	BRoster roster;
+	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	entry_ref ref;
+	CHK(roster.FindApp(&linkRef, &ref) == B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
 
 
 Test* FindAppTester::Suite()
@@ -822,6 +900,8 @@ Test* FindAppTester::Suite()
 	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB8);
 	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB9);
 	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB10);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB11);
+	ADD_TEST4(BRoster, SuiteOfTests, FindAppTester, FindAppTestB12);
 
 	return SuiteOfTests;
 }

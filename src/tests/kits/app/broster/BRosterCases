@@ -147,6 +147,17 @@ case 13:mimeType is installed, but has no preferred application,
 case 14:installed type mimeType, preferred app, app type not installed,
 		app has signature, app is trash =>
 		Should return B_LAUNCH_FAILED_APP_IN_TRASH.
+case 15:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint pointing to void,
+		no app with this signature exists =>
+		Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app type's
+		app hint.
+case 16:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint pointing to a cyclic link,
+		no app with this signature exists =>
+		R5: Should return B_OK and set the ref to refer to the link.
+		OBOS: Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app
+		type's app hint.
 
 status_t FindApp(const char *mimeType, entry_ref *app) const
 case 1:	mimeType or app are NULL =>
@@ -193,6 +204,10 @@ case 9:	ref is valid, file has type,
 case 10:ref is valid, file has no type, sniffing results in a type,
 		type is set on file,
 		common cases 2-14
+case 11:ref is valid and refers to a cyclic link =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 12:ref is valid and refers to a link to void =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
 
 status_t Launch() const: common cases
 case 1:	uninstalled type mimeType =>
@@ -315,7 +330,25 @@ case 27:launch two apps with the same signature:
 		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
 					(No second ArgvReceived()!)
 		second app:	Launch() fails with B_ALREADY_RUNNING
-
+case 28:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint pointing to void,
+		no app with this signature exists =>
+		Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app type's
+		app hint.
+case 29:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint pointing to a cyclic link,
+		no app with this signature exists =>
+		Should return
+		OBOS: B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app type's app hint.
+		R5: B_ENTRY_NOT_FOUND or B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 30:installed type mimeType, preferred app, app type installed,
+		preferred app type has an app hint that points to an app without a
+		signature, app will pass a different signature to the
+		BApplication constructor =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable. Should remove the incorrect app hint on
+		the app type. BRoster::GetRunningAppInfo() should return an app_info
+		with the signature passed to the BApplication constructor.
 
 status_t Launch(const char *mimeType, BMessage *initialMsg,
 				team_id *appTeam) const
@@ -404,6 +437,14 @@ case 10:ref is valid, file has no type, but preferred app, app type is not
 		Should return B_OK and set team to the ID of the team running the
 		application's executable. Should install the app type and set the app
 		hint on it.
+case 11:ref is valid and refers to a cyclic link =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 12:ref is valid and refers to a link to void =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 13:ref is valid and refers to an executable without signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable.
+
 
 status_t Launch(const entry_ref *ref, const BList *messageList,
 				team_id *appTeam) const
@@ -452,6 +493,13 @@ case 11:ref is valid, file has no type, but preferred app, app type is not
 		Should return B_OK and set team to the ID of the team running the
 		application's executable. Should install the app type and set the app
 		hint on it.
+case 12:ref is valid and refers to a cyclic link =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 13:ref is valid and refers to a link to void =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 14:ref is valid and refers to an executable without signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable.
 
 status_t Launch(const entry_ref *ref, int argc, const char * const *args,
 				team_id *appTeam) const
@@ -506,4 +554,11 @@ case 11:ref is valid, file has no type, but preferred app, app type is not
 		Should return B_OK and set team to the ID of the team running the
 		application's executable. Should install the app type and set the app
 		hint on it. argv are ignored.
+case 12:ref is valid and refers to a cyclic link =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 13:ref is valid and refers to a link to void =>
+		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+case 14:ref is valid and refers to an executable without signature =>
+		Should return B_OK and set team to the ID of the team running the
+		application's executable.
 

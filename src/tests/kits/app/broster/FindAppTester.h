@@ -43,6 +43,8 @@ class FindAppTester : public BTestCase
 		void FindAppTestB8();
 		void FindAppTestB9();
 		void FindAppTestB10();
+		void FindAppTestB11();
+		void FindAppTestB12();
 
 		static Test* Suite();
 

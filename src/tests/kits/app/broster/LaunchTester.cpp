@@ -116,11 +116,11 @@ install_type(const char *type, const char *preferredApp = NULL,
 // ref_for_path
 static
 entry_ref
-ref_for_path(const char *filename)
+ref_for_path(const char *filename, bool traverse = true)
 {
 	entry_ref ref;
 	BEntry entry;
-	CHK(entry.SetTo(filename, true) == B_OK);
+	CHK(entry.SetTo(filename, traverse) == B_OK);
 	CHK(entry.GetRef(&ref) == B_OK);
 	return ref;
 }
@@ -152,9 +152,10 @@ create_app(const char *filename, const char *signature,
 	CHK(file.SetTo(filename, B_READ_WRITE) == B_OK);
 	BAppFileInfo appFileInfo;
 	CHK(appFileInfo.SetTo(&file) == B_OK);
-	CHK(appFileInfo.SetSignature(signature) == B_OK);
+	if (signature)
+		CHK(appFileInfo.SetSignature(signature) == B_OK);
 	CHK(appFileInfo.SetAppFlags(appFlags) == B_OK);
-	if (install)
+	if (install && signature)
 		CHK(BMimeType(signature).Install() == B_OK);
 	// We write the signature into a separate attribute, just in case we
 	// decide to also test files without BEOS:APP_SIG attribute.
@@ -1314,6 +1315,115 @@ CommonLaunchTest27(LaunchCaller &caller)
 	CHK(context.CheckNextMessage(caller, team1, cookie, MSG_TERMINATED));
 }
 
+/*
+	@case 28		installed type mimeType, preferred app, app type installed,
+					preferred app type has an app hint pointing to void,
+					no app with this signature exists
+	@results		Should return B_LAUNCH_FAILED_APP_NOT_FOUND and unset the
+					app type's app hint.
+*/
+static
+void
+CommonLaunchTest28(LaunchCaller &caller)
+{
+	LaunchContext context;
+	BRoster roster;
+	set_type_app_hint(appType1, appFile1);
+	install_type(fileType1, appType1);
+	team_id team;
+	CHK(context(caller, fileType1, &team) == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	entry_ref appHint;
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+}
+
+/*
+	@case 29		installed type mimeType, preferred app, app type installed,
+					preferred app type has an app hint pointing to a cyclic
+					link, no app with this signature exists
+	@results		Should return
+					OBOS: B_LAUNCH_FAILED_APP_NOT_FOUND and unset the app
+					type's app hint.
+					R5: B_ENTRY_NOT_FOUND or B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+static
+void
+CommonLaunchTest29(LaunchCaller &caller)
+{
+	LaunchContext context;
+	BRoster roster;
+	set_type_app_hint(appType1, appFile1);
+	install_type(fileType1, appType1);
+	system((string("ln -s ") + appFile1 + " " + appFile1).c_str());
+	team_id team;
+	entry_ref appHint;
+#if TEST_R5
+	if (caller.SupportsRefs()) {
+		CHK(context(caller, fileType1, &team)
+			== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+	} else
+		CHK(context(caller, fileType1, &team) == B_ENTRY_NOT_FOUND);
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_OK);
+	CHK(appHint == ref_for_path(appFile1, false));
+#else
+	CHK(context(caller, fileType1, &team) == B_LAUNCH_FAILED_APP_NOT_FOUND);
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+#endif
+}
+
+/*
+	@case 30		installed type mimeType, preferred app, app type installed,
+					preferred app type has an app hint that points to an app
+					without a signature, app will pass a different signature
+					to the BApplication constructor
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable. Should remove the
+					incorrect app hint on the app type.
+					BRoster::GetRunningAppInfo() should return an app_info
+					with the signature passed to the BApplication constructor.
+*/
+static
+void
+CommonLaunchTest30(LaunchCaller &caller)
+{
+	LaunchContext context;
+	BRoster roster;
+	create_app(appFile1, NULL);
+	set_type_app_hint(appType1, appFile1);
+	entry_ref appHint;
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_OK);
+	install_type(fileType1, appType1);
+	team_id team;
+	CHK(context(caller, fileType1, &team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+// OBOS: We unset the app hint for the app type. R5 leaves it untouched.
+#ifdef TEST_R5
+	check_app_type(appType1, appFile1);
+#else
+	CHK(BMimeType(appType1).GetAppHint(&appHint) == B_ENTRY_NOT_FOUND);
+#endif
+	context.WaitForMessage(team, MSG_STARTED, true);
+	app_info appInfo;
+	CHK(roster.GetRunningAppInfo(team, &appInfo) == B_OK);
+// R5 keeps appType1, OBOS updates the signature
+#ifdef TEST_R5
+	CHK(!strcmp(appInfo.signature, appType1));
+#else
+	CHK(!strcmp(appInfo.signature, kDefaultTestAppSignature));
+#endif
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	if (caller.SupportsRefs() && !caller.SupportsArgv())
+		CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
+}
+
 typedef void commonTestFunction(LaunchCaller &caller);
 static commonTestFunction *commonTestFunctions[] = {
 	CommonLaunchTest1, CommonLaunchTest2, CommonLaunchTest3,
@@ -1324,7 +1434,8 @@ static commonTestFunction *commonTestFunctions[] = {
 	CommonLaunchTest16, CommonLaunchTest17, CommonLaunchTest18,
 	CommonLaunchTest19, CommonLaunchTest20, CommonLaunchTest21,
 	CommonLaunchTest22, CommonLaunchTest23, CommonLaunchTest24,
-	CommonLaunchTest25, CommonLaunchTest26, CommonLaunchTest27
+	CommonLaunchTest25, CommonLaunchTest26, CommonLaunchTest27,
+	CommonLaunchTest28, CommonLaunchTest29, CommonLaunchTest30
 };
 static int32 commonTestFunctionCount
 	= sizeof(commonTestFunctions) / sizeof(commonTestFunction*);
@@ -1794,9 +1905,6 @@ void LaunchTester::LaunchTestD4()
 	SimpleFileCaller1 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -1836,9 +1944,6 @@ void LaunchTester::LaunchTestD5()
 	SimpleFileCaller1 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -1899,13 +2004,11 @@ void LaunchTester::LaunchTestD7()
 	install_type(fileType1, appType1);
 	create_file(testFile1, fileType1);
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
-	entry_ref linkRef(ref_for_path(testLink1));
+	entry_ref fileRef(ref_for_path(testFile1, false));
+	entry_ref linkRef(ref_for_path(testLink1, false));
 	SimpleFileCaller1 caller(linkRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -1919,7 +2022,7 @@ void LaunchTester::LaunchTestD7()
 	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
-	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckRefsMessage(caller, team, cookie, &fileRef));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
@@ -1981,9 +2084,6 @@ void LaunchTester::LaunchTestD10()
 	SimpleFileCaller1 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, NULL, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -1997,6 +2097,82 @@ void LaunchTester::LaunchTestD10()
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 11		ref is valid and refers to a cyclic link
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void LaunchTester::LaunchTestD11()
+{
+	BRoster roster;
+	system((string("ln -s ") + testLink1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	BMessage message;
+	team_id team;
+	CHK(roster.Launch(&linkRef, &message, &team)
+		== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 12		ref is valid and refers to a link to void
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void LaunchTester::LaunchTestD12()
+{
+	BRoster roster;
+	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	BMessage message;
+	team_id team;
+	CHK(roster.Launch(&linkRef, &message, &team)
+		== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BMessage *initialMessage,
+					team_id *app_team) const
+	@case 13		ref is valid and refers to an executable without signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable.
+*/
+void LaunchTester::LaunchTestD13()
+{
+	BRoster roster;
+	create_app(appFile1, NULL);
+	entry_ref fileRef(ref_for_path(appFile1));
+	SimpleFileCaller1 caller(fileRef);
+	LaunchContext context;
+	team_id team;
+	CHK(context(caller, appType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	context.WaitForMessage(team, MSG_STARTED, true);
+	app_info appInfo;
+	CHK(roster.GetRunningAppInfo(team, &appInfo) == B_OK);
+	CHK(!strcmp(appInfo.signature, kDefaultTestAppSignature));
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
+	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, NULL,
+								 0, NULL, MSG_MAIN_ARGS));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, NULL,
+//								 LaunchContext::kStandardArgc,
+//								 LaunchContext::kStandardArgv,
+//								 MSG_ARGV_RECEIVED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
@@ -2146,9 +2322,6 @@ void LaunchTester::LaunchTestE4()
 	SimpleFileCaller2 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -2188,9 +2361,6 @@ void LaunchTester::LaunchTestE5()
 	SimpleFileCaller2 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -2250,13 +2420,11 @@ void LaunchTester::LaunchTestE7()
 	install_type(fileType1, appType1);
 	create_file(testFile1, fileType1);
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
-	entry_ref linkRef(ref_for_path(testLink1));
+	entry_ref fileRef(ref_for_path(testFile1, false));
+	entry_ref linkRef(ref_for_path(testLink1, false));
 	SimpleFileCaller2 caller(linkRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -2270,7 +2438,7 @@ void LaunchTester::LaunchTestE7()
 	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
 	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
-	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckRefsMessage(caller, team, cookie, &fileRef));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
@@ -2332,9 +2500,6 @@ void LaunchTester::LaunchTestE10()
 	SimpleFileCaller2 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, NULL, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
@@ -2371,9 +2536,6 @@ void LaunchTester::LaunchTestE11()
 	SimpleFileCaller2 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	BList list;
 	CHK(context(caller, fileType1, &list, LaunchContext::kStandardArgc,
 				LaunchContext::kStandardArgv, &team) == B_OK);
@@ -2388,6 +2550,84 @@ void LaunchTester::LaunchTestE11()
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 12		ref is valid and refers to a cyclic link
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void LaunchTester::LaunchTestE12()
+{
+	BRoster roster;
+	system((string("ln -s ") + testLink1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	BMessage message;
+	team_id team;
+	BList list;
+	CHK(roster.Launch(&linkRef, &list, &team)
+		== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 13		ref is valid and refers to a link to void
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void LaunchTester::LaunchTestE13()
+{
+	BRoster roster;
+	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	BMessage message;
+	team_id team;
+	BList list;
+	CHK(roster.Launch(&linkRef, &list, &team)
+		== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, const BList *messageList,
+					team_id *appTeam) const
+	@case 14		ref is valid and refers to an executable without signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable.
+*/
+void LaunchTester::LaunchTestE14()
+{
+	BRoster roster;
+	create_app(appFile1, NULL);
+	entry_ref fileRef(ref_for_path(appFile1));
+	SimpleFileCaller2 caller(fileRef);
+	LaunchContext context;
+	team_id team;
+	CHK(context(caller, appType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	context.WaitForMessage(team, MSG_STARTED, true);
+	app_info appInfo;
+	CHK(roster.GetRunningAppInfo(team, &appInfo) == B_OK);
+	CHK(!strcmp(appInfo.signature, kDefaultTestAppSignature));
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
+	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, NULL,
+								 0, NULL, MSG_MAIN_ARGS));
+	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, NULL,
+//								 LaunchContext::kStandardArgc,
+//								 LaunchContext::kStandardArgv,
+//								 MSG_ARGV_RECEIVED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
@@ -2537,9 +2777,6 @@ void LaunchTester::LaunchTestF4()
 	SimpleFileCaller3 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -2579,9 +2816,6 @@ void LaunchTester::LaunchTestF5()
 	SimpleFileCaller3 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -2641,13 +2875,11 @@ void LaunchTester::LaunchTestF7()
 	install_type(fileType1, appType1);
 	create_file(testFile1, fileType1);
 	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
-	entry_ref linkRef(ref_for_path(testLink1));
+	entry_ref fileRef(ref_for_path(testFile1, false));
+	entry_ref linkRef(ref_for_path(testLink1, false));
 	SimpleFileCaller3 caller(linkRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, context.StandardMessages(),
 				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
 				&team) == B_OK);
@@ -2658,9 +2890,16 @@ void LaunchTester::LaunchTestF7()
 	context.Terminate();
 	int32 cookie = 0;
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
-	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
+	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, &fileRef,
+								 LaunchContext::kStandardArgc,
+								 LaunchContext::kStandardArgv, MSG_MAIN_ARGS));
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
-	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, &fileRef,
+								 LaunchContext::kStandardArgc,
+								 LaunchContext::kStandardArgv,
+								 MSG_ARGV_RECEIVED));
 //	CHK(context.CheckRefsMessage(caller, team, cookie));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
@@ -2723,9 +2962,6 @@ void LaunchTester::LaunchTestF10()
 	SimpleFileCaller3 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, NULL, 0, NULL, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
@@ -2761,9 +2997,6 @@ void LaunchTester::LaunchTestF11()
 	SimpleFileCaller3 caller(fileRef);
 	LaunchContext context;
 	team_id team;
-	BMessage message(MSG_1);
-	BList messages;
-	messages.AddItem(&message);
 	CHK(context(caller, fileType1, NULL, 1, NULL, &team) == B_OK);
 	entry_ref ref = ref_for_team(team);
 	CHK(ref_for_path(appFile1) == ref);
@@ -2776,6 +3009,86 @@ void LaunchTester::LaunchTestF11()
 //	CHK(context.CheckMessageMessages(caller, team, cookie));
 //	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
 	CHK(context.CheckRefsMessage(caller, team, cookie));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 12		ref is valid and refers to a cyclic link
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void LaunchTester::LaunchTestF12()
+{
+	BRoster roster;
+	system((string("ln -s ") + testLink1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	BMessage message;
+	team_id team;
+	CHK(roster.Launch(&linkRef, LaunchContext::kStandardArgc,
+					  LaunchContext::kStandardArgv, &team)
+		== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 13		ref is valid and refers to a link to void
+	@results		Should return B_LAUNCH_FAILED_NO_RESOLVE_LINK.
+*/
+void LaunchTester::LaunchTestF13()
+{
+	BRoster roster;
+	system((string("ln -s ") + testFile1 + " " + testLink1).c_str());
+	entry_ref linkRef(ref_for_path(testLink1, false));
+	BMessage message;
+	team_id team;
+	CHK(roster.Launch(&linkRef, LaunchContext::kStandardArgc,
+					  LaunchContext::kStandardArgv, &team)
+		== B_LAUNCH_FAILED_NO_RESOLVE_LINK);
+}
+
+/*
+	status_t Launch(const entry_ref *ref, int argc, const char * const *args,
+					team_id *appTeam) const
+	@case 14		ref is valid and refers to an executable without signature
+	@results		Should return B_OK and set team to the ID of the team
+					running the application's executable.
+*/
+void LaunchTester::LaunchTestF14()
+{
+	BRoster roster;
+	create_app(appFile1, NULL);
+	entry_ref fileRef(ref_for_path(appFile1));
+	SimpleFileCaller3 caller(fileRef);
+	LaunchContext context;
+	team_id team;
+	CHK(context(caller, appType1, context.StandardMessages(),
+				LaunchContext::kStandardArgc, LaunchContext::kStandardArgv,
+				&team) == B_OK);
+	entry_ref ref = ref_for_team(team);
+	CHK(ref_for_path(appFile1) == ref);
+	context.WaitForMessage(team, MSG_STARTED, true);
+	app_info appInfo;
+	CHK(roster.GetRunningAppInfo(team, &appInfo) == B_OK);
+	CHK(!strcmp(appInfo.signature, kDefaultTestAppSignature));
+
+	context.Terminate();
+	int32 cookie = 0;
+	CHK(context.CheckNextMessage(caller, team, cookie, MSG_STARTED));
+//	CHK(context.CheckMainArgsMessage(caller, team, cookie, &ref));
+	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, NULL,
+								 LaunchContext::kStandardArgc,
+								 LaunchContext::kStandardArgv,
+								 MSG_MAIN_ARGS));
+//	CHK(context.CheckMessageMessages(caller, team, cookie));
+//	CHK(context.CheckArgvMessage(caller, team, cookie, &ref));
+	CHK(context.CheckArgsMessage(caller, team, cookie, &ref, NULL,
+								 LaunchContext::kStandardArgc,
+								 LaunchContext::kStandardArgv,
+								 MSG_ARGV_RECEIVED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_READY_TO_RUN));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_QUIT_REQUESTED));
 	CHK(context.CheckNextMessage(caller, team, cookie, MSG_TERMINATED));
@@ -2812,6 +3125,9 @@ Test* LaunchTester::Suite()
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD8);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD9);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD10);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD11);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD12);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestD13);
 
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE1);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE2);
@@ -2824,6 +3140,9 @@ Test* LaunchTester::Suite()
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE9);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE10);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE11);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE12);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE13);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestE14);
 
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF1);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF2);
@@ -2836,6 +3155,9 @@ Test* LaunchTester::Suite()
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF9);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF10);
 	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF11);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF12);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF13);
+	ADD_TEST4(BRoster, SuiteOfTests, LaunchTester, LaunchTestF14);
 
 	return SuiteOfTests;
 }

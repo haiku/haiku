@@ -55,6 +55,9 @@ class LaunchTester : public BTestCase
 		void LaunchTestD8();
 		void LaunchTestD9();
 		void LaunchTestD10();
+		void LaunchTestD11();
+		void LaunchTestD12();
+		void LaunchTestD13();
 
 		void LaunchTestE1();
 		void LaunchTestE2();
@@ -67,6 +70,9 @@ class LaunchTester : public BTestCase
 		void LaunchTestE9();
 		void LaunchTestE10();
 		void LaunchTestE11();
+		void LaunchTestE12();
+		void LaunchTestE13();
+		void LaunchTestE14();
 
 		void LaunchTestF1();
 		void LaunchTestF2();
@@ -79,6 +85,9 @@ class LaunchTester : public BTestCase
 		void LaunchTestF9();
 		void LaunchTestF10();
 		void LaunchTestF11();
+		void LaunchTestF12();
+		void LaunchTestF13();
+		void LaunchTestF14();
 
 		static Test* Suite();
 
