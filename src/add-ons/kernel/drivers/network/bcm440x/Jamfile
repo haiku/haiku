@@ -3,6 +3,8 @@ SubDir OBOS_TOP src add-ons kernel drivers network bcm440x ;
 # For ether_driver.h
 UsePrivateHeaders net ;
 
+ObjectCcFlags [ FGristFiles b44lm.o ] : -w ;
+
 R5KernelAddon bcm440x : kernel drivers bin :
 	b44lm.c
 	b44um.c
