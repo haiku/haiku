@@ -35,6 +35,7 @@ KernelAddon bfs : kernel file_systems :
 	BlockAllocator.cpp
 	BPlusTree.cpp
 	kernel_cpp.cpp
+	Attribute.cpp
 	Debug.cpp
 	Index.cpp
 	Inode.cpp
