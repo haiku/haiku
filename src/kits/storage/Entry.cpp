@@ -10,13 +10,16 @@
 #include <Entry.h>
 
 #include <new>
+#include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include <Directory.h>
 #include <Path.h>
 #include <SymLink.h>
-#include "kernel_interface.h"
 #include "storage_support.h"
+
+#include <syscalls.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 using namespace OpenBeOS;
@@ -97,8 +100,7 @@ entry_ref::entry_ref(const entry_ref &ref)
 //! Destroys the object and frees the storage allocated for the leaf name, if necessary. 
 entry_ref::~entry_ref()
 {
-	if (name != NULL)
-		delete [] name;
+	free(name);
 }
 
 /*! \brief Set the entry_ref's leaf name, freeing the storage allocated for any previous
@@ -109,17 +111,14 @@ entry_ref::~entry_ref()
 */
 status_t entry_ref::set_name(const char *name)
 {
-	if (this->name != NULL) {
-		delete [] this->name;
-	}
+	free(this->name);
 	
 	if (name == NULL) {
 		this->name = NULL;
 	} else {
-		this->name = new(nothrow) char[strlen(name)+1];
-		if (this->name == NULL)
+		this->name = strdup(name);
+		if (!this->name)
 			return B_NO_MEMORY;
-		strcpy(this->name, name);
 	}
 	
 	return B_OK;			
@@ -220,7 +219,7 @@ entry_ref::operator=(const entry_ref &ref)
 	- operator=(const BEntry&)
 */
 BEntry::BEntry()
-	  : fDirFd(BPrivate::Storage::NullFd),
+	  : fDirFd(-1),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -237,7 +236,7 @@ BEntry::BEntry()
 
 */
 BEntry::BEntry(const BDirectory *dir, const char *path, bool traverse)
-	  : fDirFd(BPrivate::Storage::NullFd),
+	  : fDirFd(-1),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -255,7 +254,7 @@ BEntry::BEntry(const BDirectory *dir, const char *path, bool traverse)
 */
 
 BEntry::BEntry(const entry_ref *ref, bool traverse)
-	  : fDirFd(BPrivate::Storage::NullFd),
+	  : fDirFd(-1),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -274,7 +273,7 @@ BEntry::BEntry(const entry_ref *ref, bool traverse)
 	
 */
 BEntry::BEntry(const char *path, bool traverse)
-	  : fDirFd(BPrivate::Storage::NullFd),
+	  : fDirFd(-1),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -286,7 +285,7 @@ BEntry::BEntry(const char *path, bool traverse)
 	\see operator=(const BEntry&)
 */
 BEntry::BEntry(const BEntry &entry)
-	  : fDirFd(BPrivate::Storage::NullFd),
+	  : fDirFd(-1),
 		fName(NULL),
 		fCStatus(B_NO_INIT)
 {
@@ -321,12 +320,9 @@ BEntry::InitCheck() const
 bool
 BEntry::Exists() const
 {
-	if (fCStatus != B_OK)
-		return false;
-
-	// Attempt to find the entry in our current directory
-	BPrivate::Storage::LongDirEntry entry;
-	return BPrivate::Storage::find_dir(fDirFd, fName, &entry, sizeof(entry)) == B_OK;
+	// just stat the beast
+	struct stat st;
+	return (GetStat(&st) == B_OK);
 }
 
 /*! \brief Fills in a stat structure for the entry. The information is copied into
@@ -345,13 +341,7 @@ BEntry::GetStat(struct stat *result) const
 {
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-		
- 	entry_ref ref;
-	status_t status = GetRef(&ref);
-	if (status != B_OK)
-		return status;
-		
-	return BPrivate::Storage::get_stat(ref, result);
+	return _kern_read_stat(fDirFd, fName, false, result, sizeof(struct stat));
 }
 
 /*! \brief Reinitializes the BEntry to the path or directory path combination,
@@ -360,45 +350,30 @@ BEntry::GetStat(struct stat *result) const
 	\return
 	- \c B_OK - Success
 	- "error code" - Failure
-		
-	\todo Reimplement! Concatenating dir and leaf to an absolute path prevents
-		  the user from accessing entries with longer absolute path.
-		  R5 handles this without problems.
 */
 status_t
 BEntry::SetTo(const BDirectory *dir, const char *path, bool traverse)
 {
-	Unset();
-	if (dir == NULL)
+	// check params
+	if (!dir)
 		return (fCStatus = B_BAD_VALUE);
+	if (path && path[0] == '\0')	// R5 behaviour
+		path = NULL;
 
-	fCStatus = B_OK;
-	if (BPrivate::Storage::is_absolute_path(path))	{
-		SetTo(path, traverse);
-	} else {
-		if (dir->InitCheck() != B_OK)
-			fCStatus = B_BAD_VALUE;
-		// get the dir's path
-		char rootPath[B_PATH_NAME_LENGTH];
-		if (fCStatus == B_OK) {
-			fCStatus = BPrivate::Storage::dir_to_path(dir->get_fd(), rootPath,
-											   B_PATH_NAME_LENGTH);
-		}
-		// Concatenate our two path strings together
-		if (fCStatus == B_OK && path) {
-			// The concatenated strings must fit into our buffer.
-			if (strlen(rootPath) + strlen(path) + 2 > B_PATH_NAME_LENGTH)
-				fCStatus = B_NAME_TOO_LONG;
-			else {
-				strcat(rootPath, "/");
-				strcat(rootPath, path);
-			}
-		}
-		// set the resulting path
-		if (fCStatus == B_OK)
-			SetTo(rootPath, traverse);
-	}
-	return fCStatus;
+	// if path is absolute, let the path-only SetTo() do the job
+	if (BPrivate::Storage::is_absolute_path(path))
+		return SetTo(path, traverse);
+
+	Unset();
+
+	if (dir->InitCheck() != B_OK)
+		fCStatus = B_BAD_VALUE;
+
+	// dup() the dir's FD and let set() do the rest
+	int dirFD = _kern_dup(dir->get_fd());
+	if (dirFD < 0)
+		return (fCStatus = dirFD);
+	return (fCStatus = set(dirFD, path, traverse));
 }
 				  
 /*! \brief Reinitializes the BEntry to the entry_ref, resolving symlinks if
@@ -407,22 +382,19 @@ BEntry::SetTo(const BDirectory *dir, const char *path, bool traverse)
 	\return
 	- \c B_OK - Success
 	- "error code" - Failure
-		
-	\todo Implemented using entry_ref_to_path(). Reimplement!
 */
 status_t
 BEntry::SetTo(const entry_ref *ref, bool traverse)
 {
 	Unset();
-	if (ref == NULL) {
+	if (ref == NULL)
 		return (fCStatus = B_BAD_VALUE);
-	}
 
-	char path[B_PATH_NAME_LENGTH];
-
-	fCStatus = BPrivate::Storage::entry_ref_to_path(ref, path,
-													B_PATH_NAME_LENGTH);
-	return (fCStatus == B_OK) ? SetTo(path, traverse) : fCStatus ;
+	// open the directory and let set() do the rest
+	int dirFD = _kern_open_dir_entry_ref(ref->device, ref->directory, NULL);
+	if (dirFD < 0)
+		return (fCStatus = dirFD);
+	return (fCStatus = set(dirFD, ref->name, traverse));
 }
 
 /*! \brief Reinitializes the BEntry object to the path, resolving symlinks if
@@ -431,35 +403,15 @@ BEntry::SetTo(const entry_ref *ref, bool traverse)
 	\return
 	- \c B_OK - Success
 	- "error code" - Failure
-		
 */
 status_t
 BEntry::SetTo(const char *path, bool traverse)
 {
 	Unset();
 	// check the argument
-	fCStatus = (path ? B_OK : B_BAD_VALUE);
-	if (fCStatus == B_OK)
-		fCStatus = BPrivate::Storage::check_path_name(path);
-	if (fCStatus == B_OK) {
-		// Get the path and leaf portions of the given path
-		char *pathStr, *leafStr;
-		pathStr = leafStr = NULL;
-		fCStatus = BPrivate::Storage::split_path(path, pathStr, leafStr);
-		if (fCStatus == B_OK) {
-			// Open the directory
-			BPrivate::Storage::FileDescriptor dirFd;
-			fCStatus = BPrivate::Storage::open_dir(pathStr, dirFd);
-			if (fCStatus == B_OK) {
-				fCStatus = set(dirFd, leafStr, traverse);
-				if (fCStatus != B_OK)
-					BPrivate::Storage::close_dir(dirFd);		
-			}
-		}
-		delete [] pathStr;
-		delete [] leafStr;
-	}
-	return fCStatus;
+	if (!path)
+		return (fCStatus = B_BAD_VALUE);
+	return (fCStatus = set(-1, path, traverse));
 }
 
 /*! \brief Reinitializes the BEntry to an uninitialized BEntry object */
@@ -467,16 +419,15 @@ void
 BEntry::Unset()
 {
 	// Close the directory
-	if (fDirFd != BPrivate::Storage::NullFd) {
-		BPrivate::Storage::close_dir(fDirFd);
+	if (fDirFd >= 0) {
+		_kern_close(fDirFd);
+//		BPrivate::Storage::close_dir(fDirFd);
 	}
 	
 	// Free our leaf name
-	if (fName != NULL) {
-		delete [] fName;
-	}
+	free(fName);
 
-	fDirFd = BPrivate::Storage::NullFd;
+	fDirFd = -1;
 	fName = NULL;
 	fCStatus = B_NO_INIT;
 }
@@ -499,7 +450,8 @@ BEntry::GetRef(entry_ref *ref) const
 		return B_BAD_VALUE;
 	
 	struct stat st;
-	status_t error = BPrivate::Storage::get_stat(fDirFd, &st);
+	status_t error = _kern_read_stat(fDirFd, NULL, false, &st,
+		sizeof(struct stat));
 	if (error == B_OK) {
 		ref->device = st.st_dev;
 		ref->directory = st.st_ino;
@@ -563,44 +515,30 @@ BEntry::GetPath(BPath *path) const
 	- \c B_OK - Success
 	- \c B_ENTRY_NOT_FOUND - Attempted to get the parent of the root directory \c "/"
 	- "error code" - Failure
-	
 */
 status_t BEntry::GetParent(BEntry *entry) const
 {
+	// check parameter and initialization
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-	
 	if (entry == NULL)
 		return B_BAD_VALUE;
-		
-	// Convert ourselves to a entry_ref and change the
-	// leaf name to "."
-
-	entry_ref ref;
-	status_t status;
-
-	status = GetRef(&ref);
-	if (status == B_OK) {
-	
-		// Verify we aren't an entry representing "/"
-		status = BPrivate::Storage::entry_ref_is_root_dir(&ref) ? (status_t)B_ENTRY_NOT_FOUND
-														: (status_t)B_OK ;
-		if (status == B_OK) {
-
-			status = ref.set_name(".");
-			if (status == B_OK) {
-			
-				entry->SetTo(&ref);
-				return entry->InitCheck();
-				
-			}
-		}
-	}
-	
-	// If we get this far, an error occured, so we Unset() the
-	// argument as dictated by the BeBook
+	// check whether we are the root directory
+	// It is sufficient to check whether our leaf name is ".".
+	if (strcmp(fName, ".") == 0)
+		return B_ENTRY_NOT_FOUND;
+	// open the parent directory
+	char leafName[B_FILE_NAME_LENGTH];
+	int parentFD = _kern_open_parent_dir(fDirFd, leafName, B_FILE_NAME_LENGTH);
+	if (parentFD < 0)
+		return parentFD;
+	// init the entry
 	entry->Unset();
-	return status;
+	entry->fDirFd = parentFD;
+	entry->fCStatus = entry->set_name(leafName);
+	if (entry->fCStatus != B_OK)
+		entry->Unset();
+	return entry->fCStatus;
 }
 
 /*! \brief Gets the parent of the BEntry as a BDirectory. 
@@ -612,40 +550,32 @@ status_t BEntry::GetParent(BEntry *entry) const
 	- \c B_OK - Success
 	- \c B_ENTRY_NOT_FOUND - Attempted to get the parent of the root directory \c "/"
 	- "error code" - Failure
-	
 */
 status_t
 BEntry::GetParent(BDirectory *dir) const
 {
+	// check initialization and parameter
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-		
 	if (dir == NULL)
 		return B_BAD_VALUE;
-	
-	entry_ref ref;
-	status_t status;
-	
-	status = GetRef(&ref);
-	if (status == B_OK) {
-	
-		// Verify we aren't an entry representing "/"
-		status = BPrivate::Storage::entry_ref_is_root_dir(&ref) ? (status_t)B_ENTRY_NOT_FOUND : (status_t)B_OK ;
-		if (status == B_OK) {
-
-			// Now point the entry_ref to the parent directory (instead of ourselves)
-			status = ref.set_name(".");
-			if (status == B_OK) {
-				dir->SetTo(&ref);
-				return dir->InitCheck();
-			}
-		}
-	}
-	
-	// If we get this far, an error occured, so we Unset() the
-	// argument as dictated by the BeBook
-	dir->Unset();
-	return status;
+	// check whether we are the root directory
+	// It is sufficient to check whether our leaf name is ".".
+	if (strcmp(fName, ".") == 0)
+		return B_ENTRY_NOT_FOUND;
+	// get a node ref for the directory and init it
+	struct stat st;
+	status_t error = _kern_read_stat(fDirFd, NULL, false, &st,
+		sizeof(struct stat));
+	if (error != B_OK)
+		return error;
+	node_ref ref;
+	ref.device = st.st_dev;
+	ref.node = st.st_ino;
+	return dir->SetTo(&ref);
+	// TODO: This can be optimized: We already have a FD for the directory,
+	// so we could dup() it and set it on the directory. We just need a private
+	// API for being able to do that.
 }
 
 /*! \brief Gets the name of the entry's leaf.
@@ -657,7 +587,6 @@ BEntry::GetParent(BDirectory *dir) const
 	\return
 	- \c B_OK - Success
 	- "error code" - Failure
-
 */
 status_t
 BEntry::GetName(char *buffer) const
@@ -696,47 +625,26 @@ BEntry::GetName(char *buffer) const
 status_t
 BEntry::Rename(const char *path, bool clobber)
 {
+	// check parameter and initialization
 	if (path == NULL)
 		return B_BAD_VALUE;
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-		
-	status_t status = B_OK;
-	// Convert the given path to an absolute path, if it isn't already.
-	char fullPath[B_PATH_NAME_LENGTH];
-	if (!BPrivate::Storage::is_absolute_path(path)) {
-		// Convert our directory to an absolute pathname
-		status = BPrivate::Storage::dir_to_path(fDirFd, fullPath,
-												B_PATH_NAME_LENGTH);
-		if (status == B_OK) {
-			// Concatenate our pathname to it
-			strcat(fullPath, "/");
-			strcat(fullPath, path);
-			path = fullPath;
-		}
+	// get an entry representing the target location
+	BEntry target;
+	status_t error;
+	if (BPrivate::Storage::is_absolute_path(path)) {
+		error = target.SetTo(path);
+	} else {
+		int dirFD = _kern_dup(fDirFd);
+		if (dirFD < 0)
+			return dirFD;
+		// init the entry
+		error = target.fCStatus = target.set(dirFD, path, false);
 	}
-	// Check, whether the file does already exist, if clobber is false.
-	if (status == B_OK && !clobber) {
-		// We're not supposed to kill an already-existing file,
-		// so we'll try to figure out if it exists by stat()ing it.
-		BPrivate::Storage::Stat s;
-		status = BPrivate::Storage::get_stat(path, &s);
-		if (status == B_OK)
-			status = B_FILE_EXISTS;
-		else if (status == B_ENTRY_NOT_FOUND)
-			status = B_OK;
-	}
-	// Turn ourselves into a pathname, rename ourselves
-	if (status == B_OK) {
-		BPath oldPath;
-		status = GetPath(&oldPath);
-		if (status == B_OK) {
-			status = BPrivate::Storage::rename(oldPath.Path(), path);
-			if (status == B_OK)
-				status = SetTo(path, false);
-		}
-	}
-	return status;
+	if (error != B_OK)
+		return error;
+	return _Rename(target, clobber);
 }
 
 /*! \brief Moves the BEntry to directory or directory+path combination, replacing an existing entry if clobber is true.
@@ -755,41 +663,26 @@ BEntry::Rename(const char *path, bool clobber)
 	- \c B_ENTRY_EXISTS - The new location is already taken and \c clobber was \c false
 	- \c B_ENTRY_NOT_FOUND - Attempted to move an abstract entry
 	- "error code" - Failure	
-
-
 */
 status_t
 BEntry::MoveTo(BDirectory *dir, const char *path, bool clobber)
 {
+	// check parameters and initialization
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-	else if (dir == NULL)
+	if (dir == NULL)
 		return B_BAD_VALUE;
-	else if (dir->InitCheck() != B_OK)
+	if (dir->InitCheck() != B_OK)
 		return B_BAD_VALUE;
-
 	// NULL path simply means move without renaming
 	if (path == NULL)
 		path = fName;
-
-	status_t status = B_OK;
-	// Determine the absolute path of the target entry.
-	if (!BPrivate::Storage::is_absolute_path(path)) {
-		// Convert our directory to an absolute pathname
-		char fullPath[B_PATH_NAME_LENGTH];
-		status = BPrivate::Storage::dir_to_path(dir->get_fd(), fullPath,
-												B_PATH_NAME_LENGTH);
-		// Concatenate our pathname to it
-		if (status == B_OK) {
-			strcat(fullPath, "/");
-			strcat(fullPath, path);
-			path = fullPath;
-		}
-	}
-	// Now let rename do the dirty work
-	if (status == B_OK)
-		status = Rename(path, clobber);
-	return status;
+	// get an entry representing the target location
+	BEntry target;
+	status_t error = target.SetTo(dir, path);
+	if (error != B_OK)
+		return error;
+	return _Rename(target, clobber);
 }
 
 /*! \brief Removes the entry from the file system.
@@ -802,22 +695,13 @@ BEntry::MoveTo(BDirectory *dir, const char *path, bool clobber)
 	\return
 	- B_OK - Success
 	- "error code" - Failure
-
 */
 status_t
 BEntry::Remove()
 {
 	if (fCStatus != B_OK)
 		return B_NO_INIT;
-		
-	BPath path;
-	status_t status;
-	
-	status = GetPath(&path);
-	if (status != B_OK)
-		return status;
-		
-	return BPrivate::Storage::remove(path.Path());
+	return _kern_unlink(fDirFd, fName);
 }
 
 
@@ -827,7 +711,6 @@ BEntry::Remove()
 	\return
 	- true - Both BEntry objects refer to the same entry or they are both uninitialzed
 	- false - The BEntry objects refer to different entries
-
  */
 bool
 BEntry::operator==(const BEntry &item) const
@@ -858,7 +741,6 @@ BEntry::operator==(const BEntry &item) const
 	\return
 	- true - The BEntry objects refer to different entries
 	- false - Both BEntry objects refer to the same entry or they are both uninitialzed
-
  */
 bool
 BEntry::operator!=(const BEntry &item) const
@@ -870,7 +752,6 @@ BEntry::operator!=(const BEntry &item) const
 
 	\return
 	- A reference to the copy
-
 */
 BEntry&
 BEntry::operator=(const BEntry &item)
@@ -880,10 +761,14 @@ BEntry::operator=(const BEntry &item)
 
 	Unset();
 	if (item.fCStatus == B_OK) {
-		fCStatus = BPrivate::Storage::dup_dir(item.fDirFd, fDirFd);
-		if (fCStatus == B_OK) {
+		fDirFd = _kern_dup(item.fDirFd);
+		if (fDirFd >= 0)
 			fCStatus = set_name(item.fName);
-		}
+		else
+			fCStatus = fDirFd;
+
+		if (fCStatus != B_OK)
+			Unset();
 	}
 	
 	return *this;
@@ -909,121 +794,146 @@ BEntry::set_stat(struct stat &st, uint32 what)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	
-	BPath path;
-	status_t status;
-	
-	status = GetPath(&path);
-	if (status != B_OK)
-		return status;
-	
-	return BPrivate::Storage::set_stat(path.Path(), st, what);
+
+	return _kern_write_stat(fDirFd, fName, false, &st, sizeof(struct stat),
+		what);
 }
 
-/*! Sets the Entry to point to the entry named by \c leaf in the given directory. If \c traverse
-	is \c true and the given entry is a symlink, the object is recursively set to point to the
-	entry pointed to by the symlink.
+/*! Sets the Entry to point to the entry specified by the path \a path relative
+	to the given directory. If \a traverse is \c true and the given entry is a
+	symlink, the object is recursively set to point to the entry pointed to by
+	the symlink.
+
+	If \a path is an absolute path, \a dirFD is ignored.
+	If \a dirFD is -1, path is considered relative to the current directory
+	(unless it is an absolute path, that is).
 	
-	\c leaf <b>must</b> be a leaf-name only (i.e. it must contain no '/' characters),
-	otherwise this function will return \c B_BAD_VALUE. If \c B_OK is returned, 
-	the caller is no longer responsible for closing the directory file descriptor
-	with a call to BPrivate::Storage::close_dir.
-	
-	\param dirFd File descriptor of the directory in which the entry resides
-	\param leaf Pointer to a string containing the entry's leaf name
-	\param traverse If \c true and the given entry is a symlink, the object is recursively
-	                set to point to the entry linked to by the symlink.
+	The ownership of the file descriptor \a dirFD is transferred to the
+	function, regardless of whether it succeeds or fails. The caller must not
+	close the FD afterwards.
+
+	\param dirFD File descriptor of a directory relative to which path is to
+		   be considered. May be -1, when the current directory shall be
+		   considered.
+	\param path Pointer to a path relative to the given directory.
+	\param traverse If \c true and the given entry is a symlink, the object is
+		   recursively set to point to the entry linked to by the symlink.
 	\return
 	- B_OK - Success
 	- "error code" - Failure
-	
 */
 status_t
-BEntry::set(BPrivate::Storage::FileDescriptor dirFd, const char *leaf, bool traverse)
+BEntry::set(int dirFD, const char *path, bool traverse)
 {
-	// Verify that path is valid
-	status_t error = BPrivate::Storage::check_entry_name(leaf);
+	bool requireConcrete = false;
+	FDCloser fdCloser(dirFD);
+	char tmpPath[B_PATH_NAME_LENGTH];
+	char leafName[B_FILE_NAME_LENGTH];
+	int32 linkLimit = B_MAX_SYMLINKS;
+	while (true) {
+		if (!path || strcmp(path, ".") == 0) {
+			// "."
+			// if no dir FD is supplied, we need to open the current directory
+			// first
+			if (dirFD < 0) {
+				dirFD = _kern_open_dir(-1, ".");
+				if (dirFD < 0)
+					return dirFD;
+				fdCloser.SetTo(dirFD);
+			}
+			// get the parent directory
+			int parentFD = _kern_open_parent_dir(dirFD, leafName,
+				B_FILE_NAME_LENGTH);
+			if (parentFD < 0)
+				return parentFD;
+			dirFD = parentFD;
+			fdCloser.SetTo(dirFD);
+			break;
+		} else if (strcmp(path, "..") == 0) {
+			// ".."
+			// open the parent directory
+			int parentFD = _kern_open_dir(dirFD, "..");
+			if (parentFD < 0)
+				return parentFD;
+			dirFD = parentFD;
+			fdCloser.SetTo(dirFD);
+			// get the parent's parent directory
+			parentFD = _kern_open_parent_dir(dirFD, leafName,
+				B_FILE_NAME_LENGTH);
+			if (parentFD < 0)
+				return parentFD;
+			dirFD = parentFD;
+			fdCloser.SetTo(dirFD);
+			break;
+		} else {
+			// an ordinary path; analyze it
+			char dirPath[B_PATH_NAME_LENGTH];
+			status_t error = BPrivate::Storage::parse_path(path, dirPath,
+				leafName);
+			if (error != B_OK)
+				return error;
+			// special case: root directory ("/")
+			if (leafName[0] == '\0' && dirPath[0] == '/')
+				strcpy(leafName, ".");
+			if (leafName[0] == '\0') {
+				// the supplied path is already a leaf
+				error = BPrivate::Storage::check_entry_name(dirPath);
+				if (error != B_OK)
+					return error;
+				strcpy(leafName, dirPath);
+				// if no directory was given, we need to open the current dir
+				// now
+				if (dirFD < 0) {
+					char *cwd = getcwd(tmpPath, B_PATH_NAME_LENGTH);
+					if (!cwd)
+						return B_ERROR;
+					dirFD = _kern_open_dir(-1, cwd);
+					if (dirFD < 0)
+						return dirFD;
+					fdCloser.SetTo(dirFD);
+				}
+			} else {
+				int parentFD = _kern_open_dir(dirFD, dirPath);
+				if (parentFD < 0)
+					return parentFD;
+				dirFD = parentFD;
+				fdCloser.SetTo(dirFD);
+			}
+			// traverse symlinks, if desired
+			if (!traverse)
+				break;
+			struct stat st;
+			error = _kern_read_stat(dirFD, leafName, false, &st,
+				sizeof(struct stat));
+			if (error == B_ENTRY_NOT_FOUND && !requireConcrete) {
+				// that's fine -- the entry is abstract and was not target of
+				// a symlink we resolved
+				break;
+			}
+			if (error != B_OK)
+				return error;
+			// the entry is concrete
+			if (!S_ISLNK(st.st_mode))
+				break;
+			requireConcrete = true;
+			// we need to traverse the symlink
+			if (--linkLimit < 0)
+				return B_LINK_LIMIT;
+			ssize_t readBytes = _kern_read_link(dirFD, leafName, tmpPath,
+				B_PATH_NAME_LENGTH);
+			if (readBytes < 0)
+				return readBytes;
+			path = tmpPath;
+			// next round...
+		}
+	}
+	// set the result
+	status_t error = set_name(leafName);
 	if (error != B_OK)
 		return error;
-	// Check whether the entry is abstract or concrete.
-	// We try traversing concrete entries only.
-	BPrivate::Storage::LongDirEntry dirEntry;
-	bool isConcrete = (BPrivate::Storage::find_dir(dirFd, leaf, &dirEntry,
-											sizeof(dirEntry)) == B_OK);
-	if (traverse && isConcrete) {
-		// Though the link traversing strategy is iterative, we introduce
-		// some recursion, since we are using BSymLink, which may be
-		// (currently is) implemented using BEntry. Nevertheless this is
-		// harmless, because BSymLink does, of course, not want to traverse
-		// the link.
-
-		// convert the dir FD into a BPath
-		entry_ref ref;
-		error = BPrivate::Storage::dir_to_self_entry_ref(dirFd, &ref);
-		char dirPathname[B_PATH_NAME_LENGTH];
-		if (error == B_OK) {
-			error = BPrivate::Storage::entry_ref_to_path(&ref, dirPathname,
-												  sizeof(dirPathname));
-		}
-		BPath dirPath(dirPathname);
-		if (error == B_OK)
-			error = dirPath.InitCheck();
-		BPath linkPath;
-		if (error == B_OK)
-			linkPath.SetTo(dirPath.Path(), leaf);
-		if (error == B_OK) {
-			// Here comes the link traversing loop: A BSymLink is created
-			// from the dir and the leaf name, the link target is determined,
-			// the target's dir and leaf name are got and so on.
-			bool isLink = true;
-			int32 linkLimit = B_MAX_SYMLINKS;
-			while (error == B_OK && isLink && linkLimit > 0) {
-				linkLimit--;
-				// that's OK with any node, even if it's not a symlink
-				BSymLink link(linkPath.Path());
-				error = link.InitCheck();
-				if (error == B_OK) {
-					isLink = link.IsSymLink();
-					if (isLink) {
-						// get the path to the link target
-						ssize_t linkSize = link.MakeLinkedPath(dirPath.Path(),
-															   &linkPath);
-						if (linkSize < 0)
-							error = linkSize;
-						// get the link target's dir path
-						if (error == B_OK)
-							error = linkPath.GetParent(&dirPath);
-					}
-				}
-			}
-			// set the new values
-			if (error == B_OK) {
-				if (isLink)
-					error = B_LINK_LIMIT;
-				else {
-					BPrivate::Storage::FileDescriptor newDirFd = BPrivate::Storage::NullFd;
-					error = BPrivate::Storage::open_dir(dirPath.Path(), newDirFd);
-					if (error == B_OK) {
-						// If we are successful, we are responsible for the
-						// supplied FD. Thus we close it.
-						BPrivate::Storage::close_dir(dirFd);
-						dirFd = BPrivate::Storage::NullFd;
-						fDirFd = newDirFd;
-						// handle "/", which has a "" Leaf()
-						if (linkPath == "/")
-							set_name(".");
-						else
-							set_name(linkPath.Leaf());
-					}
-				}
-			}
-		}	// getting the dir path for the FD
-	} else {
-		// don't traverse: either the flag is not set or the entry is abstract
-		fDirFd = dirFd;
-		set_name(leaf);
-	}
-	return error;
+	fdCloser.Detach();
+	fDirFd = dirFD;
+	return B_OK;
 }
 
 /*! \brief Handles string allocation, deallocation, and copying for the entry's leaf name.
@@ -1038,17 +948,49 @@ BEntry::set_name(const char *name)
 	if (name == NULL)
 		return B_BAD_VALUE;	
 	
-	if (fName != NULL) {
-		delete [] fName;
-	}
+	free(fName);
 	
-	fName = new(nothrow) char[strlen(name)+1];
-	if (fName == NULL)
+	fName = strdup(name);
+	if (!fName)
 		return B_NO_MEMORY;
-		
-	strcpy(fName, name);
 	
 	return B_OK;
+}
+
+// _Rename
+/*!	\brief Renames the entry referred to by this object to the location
+		   specified by \a target.
+
+	If an entry exists at the target location, the method fails, unless
+	\a clobber is \c true, in which case that entry is overwritten (doesn't
+	work for non-empty directories, though).
+
+	If the operation was successful, this entry is made a clone of the
+	supplied one and the supplied one is uninitialized.
+
+	\param target The entry specifying the target location.
+	\param clobber If \c true, the an entry existing at the target location
+		   will be overwritten.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BEntry::_Rename(BEntry& target, bool clobber)
+{
+	// check, if there's an entry in the way
+	if (!clobber && target.Exists())
+		return B_FILE_EXISTS;
+	// rename
+	status_t error = _kern_rename(fDirFd, fName, target.fDirFd, target.fName);
+	if (error == B_OK) {
+		Unset();
+		fCStatus = target.fCStatus;
+		fDirFd = target.fDirFd;
+		fName = target.fName;
+		target.fCStatus = B_NO_INIT;
+		target.fDirFd = -1;
+		target.fName = NULL;
+	}
+	return error;
 }
 
 
@@ -1071,11 +1013,12 @@ BEntry::Dump(const char *name)
 	
 	printf("fCStatus == %ld\n", fCStatus);
 	
-	BPrivate::Storage::LongDirEntry entry;
+	struct stat st;
 	if (fDirFd != -1
-		&& BPrivate::Storage::find_dir(fDirFd, ".", &entry, sizeof(entry)) == B_OK) {
-		printf("dir.device == %ld\n", entry.d_pdev);
-		printf("dir.inode  == %lld\n", entry.d_pino);
+		&& _kern_read_stat(fDirFd, NULL, false, &st,
+				sizeof(struct stat)) == B_OK) {
+		printf("dir.device == %ld\n", st.st_dev);
+		printf("dir.inode  == %lld\n", st.st_ino);
 	} else {
 		printf("dir == NullFd\n");
 	}

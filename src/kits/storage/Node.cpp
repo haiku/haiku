@@ -7,15 +7,20 @@
 	BNode implementation.
 */
 
+#include <errno.h>
 #include <fs_attr.h> // for struct attr_info
 #include <new>
 #include <string.h>
 #include <unistd.h>
 
-#include <Node.h>
+#include <Directory.h>
 #include <Entry.h>
+#include <Node.h>
+#include <String.h>
+#include <TypeConstants.h>
 
-#include "kernel_interface.h"
+#include <syscalls.h>
+
 #include "storage_support.h"
 
 //----------------------------------------------------------------------
@@ -84,8 +89,8 @@ node_ref::operator=(const node_ref &ref)
 /*!	\brief Creates an uninitialized BNode object
 */
 BNode::BNode()
-	 : fFd(BPrivate::Storage::NullFd),
-	   fAttrFd(BPrivate::Storage::NullFd),
+	 : fFd(-1),
+	   fAttrFd(-1),
 	   fCStatus(B_NO_INIT)
 {
 }
@@ -95,8 +100,8 @@ BNode::BNode()
 	\param ref the entry_ref referring to the entry
 */
 BNode::BNode(const entry_ref *ref)
-	 : fFd(BPrivate::Storage::NullFd),
-	   fAttrFd(BPrivate::Storage::NullFd),
+	 : fFd(-1),
+	   fAttrFd(-1),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(ref);
@@ -107,8 +112,8 @@ BNode::BNode(const entry_ref *ref)
 	\param entry the BEntry representing the entry
 */
 BNode::BNode(const BEntry *entry)
-	 : fFd(BPrivate::Storage::NullFd),
-	   fAttrFd(BPrivate::Storage::NullFd),
+	 : fFd(-1),
+	   fAttrFd(-1),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(entry);
@@ -119,8 +124,8 @@ BNode::BNode(const BEntry *entry)
 	\param path the path referring to the entry
 */
 BNode::BNode(const char *path)
-	 : fFd(BPrivate::Storage::NullFd),
-	   fAttrFd(BPrivate::Storage::NullFd),
+	 : fFd(-1),
+	   fAttrFd(-1),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(path);
@@ -133,8 +138,8 @@ BNode::BNode(const char *path)
 	\param path the entry's path name relative to \a dir
 */
 BNode::BNode(const BDirectory *dir, const char *path)
-	 : fFd(BPrivate::Storage::NullFd),
-	   fAttrFd(BPrivate::Storage::NullFd),
+	 : fFd(-1),
+	   fAttrFd(-1),
 	   fCStatus(B_NO_INIT)
 {
 	SetTo(dir, path);
@@ -144,8 +149,8 @@ BNode::BNode(const BDirectory *dir, const char *path)
 	\param node the BNode to be copied
 */
 BNode::BNode(const BNode &node)
-	 : fFd(BPrivate::Storage::NullFd),
-	   fAttrFd(BPrivate::Storage::NullFd),
+	 : fFd(-1),
+	   fAttrFd(-1),
 	   fCStatus(B_NO_INIT)
 {
 	*this = node;
@@ -180,7 +185,9 @@ BNode::InitCheck() const
 status_t
 BNode::GetStat(struct stat *st) const
 {
-	return (fCStatus != B_OK) ? fCStatus : BPrivate::Storage::get_stat(fFd, st) ;
+	return (fCStatus != B_OK)
+		? fCStatus
+		: _kern_read_stat(fFd, NULL, false, st, sizeof(struct stat));
 }
 
 /*! \brief Reinitializes the object to the specified entry_ref.
@@ -190,23 +197,11 @@ BNode::GetStat(struct stat *st) const
 	- \c B_BAD_VALUE: \c NULL \a ref.
 	- \c B_ENTRY_NOT_FOUND: The entry could not be found.
 	- \c B_BUSY: The entry is locked.
-	\todo Currently implemented using BPrivate::Storage::entry_ref_to_path().
-		  Reimplement!
 */
 status_t
 BNode::SetTo(const entry_ref *ref)
 {
-	Unset();
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		error = BPrivate::Storage::entry_ref_to_path(ref, path,
-													 B_PATH_NAME_LENGTH);
-	}
-	if (error == B_OK)
-		error = SetTo(path);
-	fCStatus = error;
-	return error;
+	return _SetTo(ref, false);
 }
 
 /*!	\brief Reinitializes the object to the specified filesystem entry.
@@ -216,23 +211,15 @@ BNode::SetTo(const entry_ref *ref)
 	- \c B_BAD_VALUE: \c NULL \a entry.
 	- \c B_ENTRY_NOT_FOUND: The entry could not be found.
 	- \c B_BUSY: The entry is locked.
-	\todo Implemented using SetTo(entry_ref*). Check, if necessary to
-		  reimplement!
 */
 status_t
 BNode::SetTo(const BEntry *entry)
 {
-	Unset();
-	entry_ref ref;
-	status_t error = (entry ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && entry->InitCheck() != B_OK)
-		error = B_BAD_VALUE;
-	if (error == B_OK)
-		error = entry->GetRef(&ref);
-	if (error == B_OK)
-		error = SetTo(&ref);
-	fCStatus = error;
-	return error;
+	if (!entry) {
+		Unset();
+		return (fCStatus = B_BAD_VALUE);
+	}
+	return _SetTo(entry->fDirFd, entry->fName, false);
 }
 
 /*!	\brief Reinitializes the object to the entry referred to by the specified
@@ -247,12 +234,7 @@ BNode::SetTo(const BEntry *entry)
 status_t
 BNode::SetTo(const char *path)
 {
-	Unset();	
-	if (path != NULL) {
-		fCStatus = BPrivate::Storage::open(path, O_RDWR | O_NOTRAVERSE, fFd,
-										   true);
-	}
-	return fCStatus;
+	return _SetTo(-1, path, false);
 }
 
 /*! \brief Reinitializes the object to the entry referred to by the specified
@@ -265,22 +247,15 @@ BNode::SetTo(const char *path)
 	- \c B_BAD_VALUE: \c NULL \a dir or \a path.
 	- \c B_ENTRY_NOT_FOUND: The entry could not be found.
 	- \c B_BUSY: The entry is locked.
-	\todo Implemented using SetTo(BEntry*). Check, if necessary to reimplement!
 */
 status_t
 BNode::SetTo(const BDirectory *dir, const char *path)
 {
-	Unset();
-	status_t error = (dir && path ? B_OK : B_BAD_VALUE);
-	if (error == B_OK && BPrivate::Storage::is_absolute_path(path))
-		error = B_BAD_VALUE;
-	BEntry entry;
-	if (error == B_OK)
-		error = entry.SetTo(dir, path);
-	if (error == B_OK)
-		error = SetTo(&entry);
-	fCStatus = error;
-	return error;
+	if (!dir || !path || BPrivate::Storage::is_absolute_path(path)) {
+		Unset();
+		return (fCStatus = B_BAD_VALUE);
+	}
+	return _SetTo(dir->fDirFd, path, false);
 }
 
 /*!	\brief Returns the object to an uninitialized state.
@@ -298,21 +273,13 @@ BNode::Unset()
 	- \c B_OK: Everything went fine.
 	- \c B_FILE_ERROR: The object is not initialized.
 	- \c B_BUSY: The node is already locked.
-	\todo Currently unimplemented; requires new kernel.
 */
 status_t
 BNode::Lock()
 {
 	if (fCStatus != B_OK)
 		return fCStatus;
-
-	// This will have to wait for the new kenel
-	return B_FILE_ERROR;
-
-	// We'll need to keep lock around if the kernel function
-	// doesn't just work on file descriptors
-//	BPrivate::Storage::FileLock lock;
-//	return BPrivate::Storage::lock(fFd, BPrivate::Storage::READ_WRITE, &lock);
+	return _kern_lock_node(fFd);
 }
 
 /*!	\brief Unlocks the node.
@@ -320,15 +287,13 @@ BNode::Lock()
 	- \c B_OK: Everything went fine.
 	- \c B_FILE_ERROR: The object is not initialized.
 	- \c B_BAD_VALUE: The node is not locked.
-	\todo Currently unimplemented; requires new kernel.
 */
 status_t
 BNode::Unlock()
 {
 	if (fCStatus != B_OK)
 		return fCStatus;
-	// This will have to wait for the new kenel
-	return B_FILE_ERROR;
+	return _kern_unlock_node(fFd);
 }
 
 /*!	\brief Immediately performs any pending disk actions on the node.
@@ -339,7 +304,7 @@ BNode::Unlock()
 status_t
 BNode::Sync()
 {
-	return (fCStatus != B_OK) ? B_FILE_ERROR : BPrivate::Storage::sync(fFd) ;
+	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_fsync(fFd);
 }
 
 /*!	\brief Writes data from a buffer to an attribute.
@@ -368,11 +333,10 @@ BNode::WriteAttr(const char *attr, type_code type, off_t offset,
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	else {
-		ssize_t result = BPrivate::Storage::write_attr(fFd, attr, type, offset,
-												buffer, len);
-		return result;
-	}
+	if (!attr || !buffer)
+		return B_BAD_VALUE;
+	ssize_t result = fs_write_attr (fFd, attr, type, offset, buffer, len);
+	return (result < 0 ? errno : result);
 }
 
 /*!	\brief Reads data from an attribute into a buffer.
@@ -396,11 +360,10 @@ BNode::ReadAttr(const char *attr, type_code type, off_t offset,
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	else {
-		ssize_t result = BPrivate::Storage::read_attr(fFd, attr, type, offset, buffer,
-											   len);
-		return result;
-	}
+	if (!attr || !buffer)
+		return B_BAD_VALUE;
+	ssize_t result = fs_read_attr(fFd, attr, type, offset, buffer, len );
+	return (result == -1 ? errno : result);
 }
 
 /*!	\brief Deletes the attribute given by \a name.
@@ -415,8 +378,7 @@ BNode::ReadAttr(const char *attr, type_code type, off_t offset,
 status_t
 BNode::RemoveAttr(const char *name)
 {
-	return (fCStatus != B_OK) ? B_FILE_ERROR
-							  : BPrivate::Storage::remove_attr(fFd, name);
+	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_remove_attr(fFd, name);
 }
 
 /*!	\brief Moves the attribute given by \a oldname to \a newname.
@@ -436,7 +398,7 @@ BNode::RenameAttr(const char *oldname, const char *newname)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	return BPrivate::Storage::rename_attr(fFd, oldname, newname);
+	return _kern_rename_attr(fFd, oldname, fFd, newname);
 }
 
 
@@ -453,8 +415,11 @@ BNode::RenameAttr(const char *oldname, const char *newname)
 status_t
 BNode::GetAttrInfo(const char *name, struct attr_info *info) const
 {
-	return (fCStatus != B_OK) ? B_FILE_ERROR
-							  : BPrivate::Storage::stat_attr(fFd, name, info);
+	if (fCStatus != B_OK)
+		return B_FILE_ERROR;
+	if (!name || !info)
+		return B_BAD_VALUE;
+	return (fs_stat_attr(fFd, name, info) < 0) ? errno : B_OK ;
 }
 
 /*!	\brief Returns the next attribute in the node's list of attributes.
@@ -486,12 +451,13 @@ BNode::GetNextAttrName(char *buffer)
 		return B_FILE_ERROR;
 		
 	BPrivate::Storage::LongDirEntry entry;
-	status_t error = BPrivate::Storage::read_attr_dir(fAttrFd, entry);
-	if (error == B_OK) {
-		strncpy(buffer, entry.d_name, B_ATTR_NAME_LENGTH);
-		return B_OK;
-	}
-	return error;
+	ssize_t result = _kern_read_dir(fAttrFd, &entry, sizeof(entry), 1);
+	if (result < 0)
+		return result;
+	if (result == 0)
+		return B_ENTRY_NOT_FOUND;
+	strlcpy(buffer, entry.d_name, B_ATTR_NAME_LENGTH);
+	return B_OK;
 }
 
 /*! \brief Resets the object's attribute pointer to the first attribute in the
@@ -505,8 +471,7 @@ BNode::RewindAttrs()
 {
 	if (InitAttrDir() != B_OK)
 		return B_FILE_ERROR;	
-	BPrivate::Storage::rewind_attr_dir(fAttrFd);
-	return B_OK;
+	return _kern_rewind_dir(fAttrFd);
 }
 
 /*!	Writes the specified string to the specified attribute, clobbering any
@@ -590,8 +555,8 @@ BNode::operator=(const BNode &node)
 	Unset();	
 	// We have to manually dup the node, because R5::BNode::Dup()
 	// is not declared to be const (which IMO is retarded).
-	fFd = BPrivate::Storage::dup(node.fFd);
-	fCStatus = (fFd == BPrivate::Storage::NullFd) ? B_NO_INIT : B_OK ;
+	fFd = _kern_dup(node.fFd);
+	fCStatus = (fFd < 0) ? B_NO_INIT : B_OK ;
 	return *this;
 }
 
@@ -607,13 +572,13 @@ BNode::operator==(const BNode &node) const
 	if (fCStatus == B_NO_INIT && node.InitCheck() == B_NO_INIT)
 		return true;		
 	if (fCStatus == B_OK && node.InitCheck() == B_OK) {
-		// Check if they're identical
-		BPrivate::Storage::Stat s1, s2;
-		if (GetStat(&s1) != B_OK)
+		// compare the node_refs
+		node_ref ref1, ref2;
+		if (GetNodeRef(&ref1) != B_OK)
 			return false;
-		if (node.GetStat(&s2) != B_OK)
+		if (node.GetNodeRef(&ref2) != B_OK)
 			return false;
-		return (s1.st_dev == s2.st_dev && s1.st_ino == s2.st_ino);
+		return (ref1 == ref2);
 	}	
 	return false;	
 }
@@ -638,7 +603,8 @@ BNode::operator!=(const BNode &node) const
 int
 BNode::Dup()
 {
-	return BPrivate::Storage::dup(fFd);
+	int fd = _kern_dup(fFd);
+	return (fd >= 0 ? fd : -1);	// comply with R5 return value
 }
 
 
@@ -662,7 +628,7 @@ void BNode::_RudeNode6() { }
 		  thereafter.
 */
 status_t
-BNode::set_fd(BPrivate::Storage::FileDescriptor fd)
+BNode::set_fd(int fd)
 {
 	if (fFd != -1)
 		close_fd();
@@ -673,20 +639,19 @@ BNode::set_fd(BPrivate::Storage::FileDescriptor fd)
 /*!	\brief Closes the node's file descriptor(s).
 	To be implemented by subclasses to close the file descriptor using the
 	proper system call for the given file-type. This implementation calls
-	BPrivate::Storage::close(fFd) and also BPrivate::Storage::close_attr_dir(fAttrDir)
-	if necessary.
+	_kern_close(fFd) and also _kern_close(fAttrDir) if necessary.
 */
 void
 BNode::close_fd()
 {
-	if (fAttrFd != BPrivate::Storage::NullFd)
+	if (fAttrFd >= 0)
 	{
-		BPrivate::Storage::close_attr_dir(fAttrFd);
-		fAttrFd = BPrivate::Storage::NullFd;
+		_kern_close(fAttrFd);
+		fAttrFd = -1;
 	}	
-	if (fFd != BPrivate::Storage::NullFd) {
-		close(fFd);
-		fFd = BPrivate::Storage::NullFd;
+	if (fFd >= 0) {
+		_kern_close(fFd);
+		fFd = -1;
 	}	
 }
 
@@ -702,6 +667,84 @@ BNode::set_status(status_t newStatus)
 	fCStatus = newStatus;
 }
 
+// _SetTo
+/*!	\brief Initializes the BNode's file descriptor to the node referred to
+		   by the given FD and path combo.
+
+	\a path must either be \c NULL, an absolute or a relative path.
+	In the first case, \a fd must not be \c NULL; the node it refers to will
+	be opened. If absolute, \a fd is ignored. If relative and \a fd is >= 0,
+	it will be reckoned off the directory identified by \a fd, otherwise off
+	the current working directory.
+
+	The method will first try to open the node with read and write permission.
+	If that fails due to a read-only FS or because the user has no write
+	permission for the node, it will re-try opening the node read-only.
+
+	The \a fCStatus member will be set to the return value of this method.
+
+	\param fd Either a directory FD or a value < 0. In the latter case \a path
+		   must be specified.
+	\param path Either \a NULL in which case \a fd must be given, absolute, or
+		   relative to the directory specified by \a fd (if given) or to the
+		   current working directory.
+	\param traverse If the node identified by \a fd and \a path is a symlink
+		   and \a traverse is \c true, the symlink will be resolved recursively.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BNode::_SetTo(int fd, const char *path, bool traverse)
+{
+	Unset();
+	status_t error = (fd >= 0 || path ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
+		fFd = _kern_open(fd, path, O_RDWR | traverseFlag);
+		if (fFd == B_READ_ONLY_DEVICE || fFd == B_PERMISSION_DENIED) {
+			// opening read-write failed, re-try read-only
+			fFd = _kern_open(fd, path, O_RDONLY | traverseFlag);
+		}
+		if (fFd < 0)
+			error = fFd;
+	}
+	return fCStatus = error;
+}
+
+// _SetTo
+/*!	\brief Initializes the BNode's file descriptor to the node referred to
+		   by the given entry_ref.
+
+	The method will first try to open the node with read and write permission.
+	If that fails due to a read-only FS or because the user has no write
+	permission for the node, it will re-try opening the node read-only.
+
+	The \a fCStatus member will be set to the return value of this method.
+
+	\param ref An entry_ref identifying the node to be opened.
+	\param traverse If the node identified by \a ref is a symlink
+		   and \a traverse is \c true, the symlink will be resolved recursively.
+	\return \c B_OK, if everything went fine, another error code otherwise.
+*/
+status_t
+BNode::_SetTo(const entry_ref *ref, bool traverse)
+{
+	Unset();
+	status_t error = (ref ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
+		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
+		fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
+			O_RDWR | traverseFlag);
+		if (fFd == B_READ_ONLY_DEVICE || fFd == B_PERMISSION_DENIED) {
+			// opening read-write failed, re-try read-only
+			fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
+				O_RDONLY | traverseFlag);
+		}
+		if (fFd < 0)
+			error = fFd;
+	}
+	return fCStatus = error;
+}
+
 /*! \brief Modifies a certain setting for this node based on \a what and the
 	corresponding value in \a st.
 	Inherited from and called by BStatable.
@@ -714,7 +757,8 @@ BNode::set_stat(struct stat &st, uint32 what)
 {
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
-	return BPrivate::Storage::set_stat(fFd, st, what);
+	return _kern_write_stat(fFd, NULL, false, &st, sizeof(struct stat),
+		what);
 }
 
 /*! \brief Verifies that the BNode has been properly initialized, and then
@@ -725,8 +769,11 @@ BNode::set_stat(struct stat &st, uint32 what)
 status_t
 BNode::InitAttrDir()
 {
-	if (fCStatus == B_OK && fAttrFd == BPrivate::Storage::NullFd) 
-		return BPrivate::Storage::open_attr_dir(fFd, fAttrFd);
+	if (fCStatus == B_OK && fAttrFd < 0) {
+		fAttrFd = _kern_open_attr_dir(fFd, NULL);
+		if (fAttrFd < 0)
+			return fAttrFd;
+	}
 	return fCStatus;	
 }
 
@@ -735,16 +782,10 @@ BNode::InitAttrDir()
 */
 
 /*!	\var BNode::fAttrFd
-	This appears to be passed to the attribute directory functions
-	like a BPrivate::Storage::Dir would be, but it's actually a file descriptor.
-	Best I can figure, the R5 syscall for reading attributes must've
-	just taken a file descriptor. Depending on what our kernel ends up
-	providing, this may or may not be replaced with an Dir*
+	File descriptor for the attribute directory of the node. Initialized lazily.
 */
 
 /*!	\var BNode::fCStatus
 	The object's initialization status.
 */
-
-
 

@@ -14,7 +14,6 @@
 #include <sys/stat.h>
 
 #include "fsproto.h"
-#include "kernel_interface.h"
 
 /*!	\fn status_t GetStat(struct stat *st) const
 	\brief Returns the stat stucture for the node.

@@ -15,8 +15,6 @@
 #include <OS.h>
 #include <SupportDefs.h>
 
-#include <StorageDefs.Private.h>
-
 class BVolume;
 struct entry_ref;
 
@@ -119,9 +117,7 @@ private:
 	bool		fLive;
 	port_id		fPort;
 	long		fToken;
-	BPrivate::Storage::FileDescriptor fQueryFd;
+	int			fQueryFd;
 };
 
 #endif	// _QUERY_H
-
-

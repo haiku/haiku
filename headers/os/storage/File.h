@@ -71,7 +71,7 @@ private:
 	uint32 _reservedData[8];
 
 private:
-	BPrivate::Storage::FileDescriptor get_fd() const;
+	int get_fd() const;
 
 private:
 	//! The file's open mode.

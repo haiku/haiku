@@ -14,7 +14,6 @@
 #include <SupportDefs.h>
 
 #include <Statable.h>
-#include <StorageDefs.Private.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
@@ -77,6 +76,11 @@ public:
 	BEntry &operator=(const BEntry &item);
 
 private:
+	friend class BDirectory;
+	friend class BFile;
+	friend class BNode;
+	friend class BSymLink;
+
 	virtual	void _PennyEntry1();
 	virtual	void _PennyEntry2();
 	virtual	void _PennyEntry3();
@@ -90,11 +94,10 @@ private:
 	/*! BEntry implementation of BStatable::set_stat() */
 	virtual	status_t set_stat(struct stat &st, uint32 what);
 	
-	status_t set(BPrivate::Storage::FileDescriptor dir, const char *path,
-				 bool traverse);
+	status_t set(int dir, const char *path, bool traverse);
 
 	/*! File descriptor for the entry's parent directory. */
-	BPrivate::Storage::FileDescriptor fDirFd;
+	int fDirFd;
 	
 	/*! Leaf name of the entry. */
 	char *fName;
@@ -103,6 +106,8 @@ private:
 	status_t fCStatus;
 	
 	status_t set_name(const char *name);
+
+	status_t _Rename(BEntry& target, bool clobber);
 
 	void Dump(const char *name = NULL);
 };
@@ -118,7 +123,3 @@ bool operator<(const entry_ref &a, const entry_ref &b);
 #endif
 
 #endif	// _ENTRY_H
-
-
-
-

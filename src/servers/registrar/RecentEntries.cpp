@@ -32,9 +32,9 @@
 #include <AppFileInfo.h>
 #include <Entry.h>
 #include <File.h>
-#include <kernel_interface.h>	// From the Storage Kit
 #include <Message.h>
 #include <Mime.h>
+#include <Path.h>
 #include <Roster.h>
 #include <String.h>
 #include <storage_support.h>
@@ -309,12 +309,11 @@ RecentEntries::Save(FILE* file, const char *description, const char *tag)
 			// We're going to need to properly escape the path name we
 			// get, which will at absolute worst double the length of
 			// the string.
-			char path[B_PATH_NAME_LENGTH];
+			BPath path;
 			char escapedPath[B_PATH_NAME_LENGTH*2];
-			status_t outputError = BPrivate::Storage::entry_ref_to_path(&mapItem->first,
-			                       path, B_PATH_NAME_LENGTH);
+			status_t outputError = path.SetTo(&mapItem->first);
 			if (!outputError) {
-				BPrivate::Storage::escape_path(path, escapedPath);
+				BPrivate::Storage::escape_path(path.Path(), escapedPath);
 				fprintf(file, "%s %s", tag, escapedPath);
 				std::list<recent_entry*> &list = mapItem->second;
 				int32 i = 0;

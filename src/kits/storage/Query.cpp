@@ -6,7 +6,6 @@
 	\file Query.cpp
 	BQuery implementation.
 */
-#include <Query.h>
 
 #include <fs_query.h>
 #include <new>
@@ -14,18 +13,17 @@
 #include <time.h>
 
 #include <Entry.h>
+#include <Query.h>
 #include <Volume.h>
 
-#include "kernel_interface.h"
+#include <MessengerPrivate.h>
+#include <syscalls.h>
+
 #include "QueryPredicate.h"
+#include "storage_support.h"
 
-using namespace BPrivate::Storage;
 using namespace std;
-
-
-enum {
-	NOT_IMPLEMENTED	= B_ERROR,
-};
+using namespace BPrivate::Storage;
 
 // BQuery
 
@@ -40,7 +38,7 @@ BQuery::BQuery()
 		fLive(false),
 		fPort(B_ERROR),
 		fToken(0),
-		fQueryFd(NullFd)
+		fQueryFd(-1)
 {
 }
 
@@ -61,9 +59,9 @@ BQuery::Clear()
 {
 	// close the currently open query
 	status_t error = B_OK;
-	if (fQueryFd != NullFd) {
-		error = close_query(fQueryFd);
-		fQueryFd = NullFd;
+	if (fQueryFd >= 0) {
+		error = _kern_close(fQueryFd);
+		fQueryFd = -1;
 	}
 	// delete the predicate stack and the predicate
 	delete fStack;
@@ -314,10 +312,8 @@ BQuery::PushDate(const char *date)
 		time_t t;
 		time(&t);
 		t = parsedate(date, t);
-		if (t < 0) {
-//			error = t;
+		if (t < 0)
 			error = B_BAD_VALUE;
-		}
 	}
 	if (error == B_OK)
 		error =  _PushNode(new(nothrow) DateNode(date), true);
@@ -391,8 +387,10 @@ BQuery::SetTarget(BMessenger messenger)
 	if (error == B_OK && _HasFetched())
 		error = B_NOT_ALLOWED;
 	if (error == B_OK) {
-		fPort = messenger.fPort;
-		fToken = messenger.fHandlerToken;
+		BMessenger::Private messengerPrivate(messenger);
+		fPort = messengerPrivate.Port();
+		fToken = (messengerPrivate.IsPreferredTarget()
+			? -1 : messengerPrivate.Token());
 		fLive = true;
 	}
 	return error;
@@ -428,7 +426,6 @@ BQuery::GetPredicate(char *buffer, size_t length)
 {
 	status_t error = (buffer ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
-//		error = _EvaluateStack();
 		_EvaluateStack();
 	if (error == B_OK && !fPredicate)
 		error = B_NO_INIT;
@@ -458,7 +455,6 @@ BQuery::GetPredicate(BString *predicate)
 {
 	status_t error = (predicate ? B_OK : B_BAD_VALUE);
 	if (error == B_OK)
-//		error = _EvaluateStack();
 		_EvaluateStack();
 	if (error == B_OK && !fPredicate)
 		error = B_NO_INIT;
@@ -518,20 +514,19 @@ BQuery::TargetDevice() const
 status_t
 BQuery::Fetch()
 {
-	status_t error = (_HasFetched() ? B_NOT_ALLOWED : B_OK);
-	if (error == B_OK)
-//		error = _EvaluateStack();
-		_EvaluateStack();
-	if (error == B_OK && (!fPredicate || fDevice < 0))
-		error = B_NO_INIT;
-	if (error == B_OK) {
-		if (fLive) {
-			error = open_live_query(fDevice, fPredicate, B_LIVE_QUERY, fPort,
-									fToken, fQueryFd);
-		} else
-			error = open_query(fDevice, fPredicate, 0, fQueryFd);
-	}
-	return error;
+	if (_HasFetched())
+		return B_NOT_ALLOWED;
+	_EvaluateStack();
+	if (!fPredicate || fDevice < 0)
+		return B_NO_INIT;
+	if (fLive) {
+		fQueryFd = _kern_open_query(fDevice, fPredicate, B_LIVE_QUERY,
+			fPort, fToken);
+	} else
+		fQueryFd = _kern_open_query(fDevice, fPredicate, 0, -1, -1);
+	if (fQueryFd < 0)
+		return fQueryFd;
+	return B_OK;
 }
 
 
@@ -586,10 +581,20 @@ BQuery::GetNextRef(entry_ref *ref)
 		error = B_FILE_ERROR;
 	if (error == B_OK) {
 		BPrivate::Storage::LongDirEntry entry;
-		if (BPrivate::Storage::read_query(fQueryFd, &entry, sizeof(entry), 1) != 1)
-			error = B_ENTRY_NOT_FOUND;
-		if (error == B_OK)
-			*ref = entry_ref(entry.d_pdev, entry.d_pino, entry.d_name);
+		bool next = true;
+		while (error == B_OK && next) {
+			if (GetNextDirents(&entry, sizeof(entry), 1) != 1) {
+				error = B_ENTRY_NOT_FOUND;
+			} else {
+				next = (!strcmp(entry.d_name, ".")
+						|| !strcmp(entry.d_name, ".."));
+			}
+		}
+		if (error == B_OK) {
+			ref->device = entry.d_pdev;
+			ref->directory = entry.d_pino;
+			error = ref->set_name(entry.d_name);
+		}
 	}
 	return error;
 }
@@ -614,12 +619,11 @@ BQuery::GetNextRef(entry_ref *ref)
 int32
 BQuery::GetNextDirents(struct dirent *buf, size_t length, int32 count)
 {
-	int32 result = (buf ? B_OK : B_BAD_VALUE);
-	if (result == B_OK && !_HasFetched())
-		result = B_FILE_ERROR;
-	if (result == B_OK)
-		result = read_query(fQueryFd, buf, length, count);
-	return result;
+	if (!buf)
+		return B_BAD_VALUE;
+	if (!_HasFetched())
+		return B_FILE_ERROR;
+	return _kern_read_dir(fQueryFd, buf, length, count);
 }
 
 // Rewind
@@ -650,7 +654,7 @@ BQuery::CountEntries()
 bool
 BQuery::_HasFetched() const
 {
-	return (fQueryFd != NullFd);
+	return (fQueryFd >= 0);
 }
 
 // _PushNode
@@ -757,6 +761,4 @@ void BQuery::_QwertyQuery3() {}
 void BQuery::_QwertyQuery4() {}
 void BQuery::_QwertyQuery5() {}
 void BQuery::_QwertyQuery6() {}
-
-
 

@@ -12,14 +12,18 @@
 */
 
 #include <errno.h>
+#include <string.h>
 
 #include <Bitmap.h>
 #include <Directory.h>
 #include <fs_info.h>
-#include <kernel_interface.h>
+#include <fs_interface.h>
 #include <Node.h>
+#include <Path.h>
 #include <Volume.h>
 
+#include <storage_support.h>
+#include <syscalls.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
@@ -272,13 +276,46 @@ status_t
 BVolume::SetName(const char *name)
 {
 	// check initialization
-	status_t error = (InitCheck() == B_OK ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = BPrivate::Storage::set_volume_name(fDevice, name);
-	
-	// ToDo: change the name of the mount point, too
-	// (or the link to the boot volume, if that name has been changed)
-
+	if (!name || InitCheck() != B_OK)
+		return B_BAD_VALUE;
+	if (strlen(name) >= B_FILE_NAME_LENGTH)
+		return B_NAME_TOO_LONG;
+	// get the FS stat (including the old name) first
+	fs_info oldInfo;
+	if (fs_stat_dev(fDevice, &oldInfo) != 0)
+		return errno;
+	if (strcmp(name, oldInfo.volume_name) == 0)
+		return B_OK;
+	// set the volume name
+	fs_info newInfo;
+	strlcpy(newInfo.volume_name, name, sizeof(newInfo.volume_name));
+	status_t error = _kern_write_fs_info(fDevice, &newInfo,
+		FS_WRITE_FSINFO_NAME);
+	if (error != B_OK)
+		return error;
+	// change the name of the mount point
+	// R5 implementation checks, if an entry with the volume's old name
+	// exists in the root directory and renames that entry, if it is indeed
+	// the mount point of the volume (or a link referring to it). In all other
+	// cases, nothing is done (even if the mount point is named like the
+	// volume, but lives in a different directory).
+	// We follow suit for the time being.
+	// create the entry
+	BPath entryPath;
+	BEntry entry;
+	BEntry traversedEntry;
+	node_ref entryNodeRef;
+	if (BPrivate::Storage::check_entry_name(name) == B_OK
+		&& BPrivate::Storage::check_entry_name(oldInfo.volume_name) == B_OK
+		&& entryPath.SetTo("/", oldInfo.volume_name) == B_OK
+		&& entry.SetTo(entryPath.Path(), false) == B_OK
+		&& entry.Exists()
+		&& traversedEntry.SetTo(entryPath.Path(), true) == B_OK
+		&& traversedEntry.GetNodeRef(&entryNodeRef) == B_OK
+		&& entryNodeRef.device == fDevice
+		&& entryNodeRef.node == oldInfo.root) {
+		traversedEntry.Rename(name, false);
+	}
 	return error;
 }
 

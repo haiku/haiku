@@ -17,7 +17,6 @@
 #include <Bitmap.h>
 #include <Directory.h>
 #include <fs_info.h>
-#include <kernel_interface.h>
 #include <Node.h>
 #include <NodeMonitor.h>
 #include <VolumeRoster.h>

@@ -14,7 +14,9 @@
 #include <Entry.h>
 #include <StorageDefs.h>
 #include <String.h>
-#include "kernel_interface.h"
+
+#include <syscalls.h>
+
 #include "storage_support.h"
 
 using namespace std;
@@ -125,15 +127,16 @@ status_t
 BPath::SetTo(const entry_ref *ref)
 {
 	Unset();
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		char path[B_PATH_NAME_LENGTH];
-		error = BPrivate::Storage::entry_ref_to_path(ref, path, sizeof(path));
-		if (error == B_OK)
-			error = set_path(path);	// the path is already normalized
-	}
-	fCStatus = error;
-	return error;
+	if (!ref)
+		return (fCStatus = B_BAD_VALUE);
+
+	char path[B_PATH_NAME_LENGTH];
+	status_t error = _kern_entry_ref_to_path(ref->device, ref->directory,
+		ref->name, path, sizeof(path));
+	if (error != B_OK)
+		return (fCStatus = error);
+	fCStatus = set_path(path);	// the path is already normalized
+	return fCStatus;
 }
 
 /*! \brief Reinitializes the object to the specified filesystem entry.
@@ -214,11 +217,11 @@ BPath::SetTo(const char *path, const char *leaf, bool normalize)
 		// normalize the path, if necessary, otherwise just set it
 		if (error == B_OK) {
 			if (normalize) {
-				char normalizedPath[B_PATH_NAME_LENGTH];
-				error = BPrivate::Storage::get_canonical_path(newPath, normalizedPath,
-													   sizeof(normalizedPath));
+				// create a BEntry and initialize us with this entry
+				BEntry entry;
+				error = entry.SetTo(newPath, false);
 				if (error == B_OK)
-					error = set_path(normalizedPath);
+					return SetTo(&entry);
 			} else
 				error = set_path(newPath);
 		}

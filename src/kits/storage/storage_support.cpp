@@ -13,6 +13,9 @@
 
 #include <StorageDefs.h>
 #include <SupportDefs.h>
+
+#include <syscalls.h>
+
 #include "storage_support.h"
 
 using namespace std;
@@ -30,9 +33,105 @@ is_absolute_path(const char *path)
 }
 
 // parse_path
+/*!	\brief Parses the supplied path and returns the position of the leaf name
+		   part of the path and the length of its directory path part.
+
+	The value returned in \a fullPath is guaranteed to be > 0, i.e. the
+	function always returns a non-empty directory path part. The leaf name
+	part may be empty though (i.e. \code leafStart == leafEnd \endcode), which
+	will happen, if the supplied path consists only of one component.
+
+	\param fullPath The path to be parsed.
+	\param dirEnd Reference to a variable into which the end index of the
+		   directory part shall be written. The index is exclusive.
+	\param leafStart Reference to a variable into which the start index of
+		   the leaf name part shall be written. The index is inclusive.
+	\param leafEnd Reference to a variable into which the end index of
+		   the leaf name part shall be written. The index is exclusive.
+	\return \c B_OK, if everything went fine, B_BAD_VALUE, if the supplied
+		   path is invalid.
+*/
+status_t
+parse_path(const char *fullPath, int &dirEnd, int &leafStart, int &leafEnd)
+{
+	// check path and get length
+	if (!fullPath)
+		return B_BAD_VALUE;
+	int pathLen = strlen(fullPath);
+	if (pathLen == 0)
+		return B_BAD_VALUE;
+	// find then end of the leaf name (skip trailing '/')
+	int i = pathLen - 1;
+	while (i >= 0 && fullPath[i] == '/')
+		i--;
+	leafEnd = i + 1;
+	if (leafEnd == 0) {
+		// fullPath consists of slashes only
+		dirEnd = leafStart = leafEnd = 1;
+		return B_OK;
+	}
+	// find the start of the leaf name
+	while (i >= 0 && fullPath[i] != '/')
+		i--;
+	leafStart = i + 1;
+	if (leafStart == 0) {
+		// fullPath contains only one component
+		dirEnd = leafStart = leafEnd;
+		return B_OK;
+	}
+	// find the end of the dir path
+	while (i >= 0 && fullPath[i] == '/')
+		i--;
+	dirEnd = i + 1;
+	if (dirEnd == 0)	// => fullPath[0] == '/' (an absolute path)
+		dirEnd = 1;
+	return B_OK;
+}
+
+// parse_path
+/*!	\brief Parses the supplied path and returns the leaf name part of the path
+		   and its directory path part.
+
+	The value returned in \a fullPath is guaranteed to be > 0, i.e. the
+	function always returns a non-empty directory path part. The leaf name
+	part may be empty though (i.e. \code leafStart == leafEnd \endcode), which
+	will happen, if the supplied path consists only of one component.
+
+	\param fullPath The path to be parsed.
+	\param dirPath Pointer to a character array of size \c B_PATH_NAME_LENGTH
+		   or greater, into which the directory part shall be written.
+		   May be \c NULL.
+	\param leaf Pointer to a character array of size \c B_FILE_NAME_LENGTH
+		   or greater, into which the leaf name part shall be written.
+		   May be \c NULL.
+	\return \c B_OK, if everything went fine, B_BAD_VALUE, if the supplied
+		   path is invalid.
+*/
+status_t
+parse_path(const char *fullPath, char *dirPath, char *leaf)
+{
+	// parse the path and check the lengths
+	int leafStart, leafEnd, dirEnd;
+	status_t error = parse_path(fullPath, dirEnd, leafStart, leafEnd);
+	if (error != B_OK)
+		return error;
+	if (dirEnd >= B_PATH_NAME_LENGTH
+		|| leafEnd - leafStart >= B_FILE_NAME_LENGTH) {
+		return B_NAME_TOO_LONG;
+	}
+	// copy the result strings
+	if (dirPath)
+		strlcpy(dirPath, fullPath, dirEnd + 1);
+	if (leaf)
+		strlcpy(leaf, fullPath + leafStart, leafEnd - leafStart + 1);
+	return B_OK;
+}
+
+// internal_parse_path
 static
 void
-parse_path(const char *fullPath, int &leafStart, int &leafEnd, int &pathEnd)
+internal_parse_path(const char *fullPath, int &leafStart, int &leafEnd,
+	int &pathEnd)
 {
 	if (fullPath == NULL)
 		return;
@@ -109,7 +208,7 @@ split_path(const char *fullPath, char **path, char **leaf)
 		return B_BAD_VALUE;
 
 	int leafStart, leafEnd, pathEnd, len;
-	parse_path(fullPath, leafStart, leafEnd, pathEnd);
+	internal_parse_path(fullPath, leafStart, leafEnd, pathEnd);
 
 	try {
 		// Tidy up/handle special cases
@@ -385,6 +484,22 @@ void escape_path(char *str)
 		}
 		delete [] copy;
 	}
+}
+
+// device_is_root_device
+bool
+device_is_root_device(dev_t device)
+{
+	return device == 1;
+}
+
+// Close
+void
+FDCloser::Close()
+{
+	if (fFD >= 0)
+		_kern_close(fFD);
+	fFD = -1;
 }
 
 };	// namespace Storage

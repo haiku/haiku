@@ -11,13 +11,21 @@
 #ifndef _STORAGE_SUPPORT_H
 #define _STORAGE_SUPPORT_H
 
+#include <dirent.h>
 #include <string>
 
 namespace BPrivate {
 namespace Storage {
 
+// For convenience:
+struct LongDirEntry : dirent { char _buffer[B_FILE_NAME_LENGTH]; };
+
 //! Returns whether the supplied path is absolute.
 bool is_absolute_path(const char *path);
+
+status_t parse_path(const char *fullPath, int &dirEnd, int &leafStart,
+	int &leafEnd);
+status_t parse_path(const char *fullPath, char *dirPath, char *leaf);
 
 //!	splits a path name into directory path and leaf name
 status_t split_path(const char *fullPath, char *&path, char *&leaf);
@@ -84,8 +92,54 @@ void escape_path(const char *str, char *result);
 */
 void escape_path(char *str);
 
+/*!	\brief Returns whether the supplied device ID refers to the root FS.
+*/
+bool device_is_root_device(dev_t device);
+
+// FDCloser
+class FDCloser {
+public:
+	FDCloser(int fd)
+		: fFD(fd)
+	{
+	}
+
+	~FDCloser()
+	{
+		Close();
+	}
+
+	void SetTo(int fd)
+	{
+		Close();
+		fFD = fd;
+	}
+
+// implemented in the source file to not expose syscalls to the unit tests
+// which include this file too
+	void Close();
+//	void Close()
+//	{
+//		if (fFD >= 0)
+//			_kern_close(fFD);
+//		fFD = -1;
+//	}
+
+	int Detach()
+	{
+		int fd = fFD;
+		fFD = -1;
+		return fd;
+	}
+
+private:
+	int	fFD;
+};
+
 };	// namespace Storage
 };	// namespace BPrivate
+
+using BPrivate::Storage::FDCloser;
 
 #endif	// _STORAGE_SUPPORT_H
 

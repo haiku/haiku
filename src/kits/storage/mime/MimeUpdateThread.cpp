@@ -7,16 +7,16 @@
 	MimeUpdateThread implementation
 */
 
-#include "mime/MimeUpdateThread.h"
+#include <stdio.h>
 
 #include <Directory.h>
-#include <kernel_interface.h>
 #include <Message.h>
 #include <Path.h>
 #include <RegistrarDefs.h>
 #include <Volume.h>
 
-#include <stdio.h>
+#include <storage_support.h>
+#include "mime/MimeUpdateThread.h"
 
 //#define DBG(x) x
 #define DBG(x)

@@ -15,7 +15,6 @@
 #include <MimeType.h>
 #include <Path.h>
 #include <String.h>
-#include <kernel_interface.h>
 #include <mime/database_support.h>
 #include <storage_support.h>
 
@@ -144,11 +143,12 @@ status_t
 AssociatedTypes::GuessMimeType(const entry_ref *ref, BString *result)
 {
 	// Convert the entry_ref to a filename and then do the check
-	/*! \todo If the ref is invalid, */
-	char path[B_PATH_NAME_LENGTH];
-	status_t err = entry_ref_to_path(ref, path, B_PATH_NAME_LENGTH);
+	if (!ref)
+		return B_BAD_VALUE;
+	BPath path;
+	status_t err = path.SetTo(ref);
 	if (!err)
-		err = GuessMimeType(path, result);
+		err = GuessMimeType(path.Path(), result);
 	return err;
 }
 

@@ -427,6 +427,7 @@ BAppFileInfo::GetSupportedTypes(BMessage *types) const
 	- \c B_NO_INIT: The object is not properly initialized.
 	- other error codes
 */
+#include <stdio.h>
 status_t
 BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 {
@@ -434,19 +435,23 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 	status_t error = B_OK;
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
+printf("check\n");
 	BMimeType mimeType;
 	if (error == B_OK)
 		error = GetMetaMime(&mimeType);
+printf("check\n");
 	if (error == B_OK) {
 		if (types) {
 			// check param -- supported types must be valid
 			const char *type;
+printf("check1\n");
 			for (int32 i = 0;
 				 error == B_OK && types->FindString("types", i, &type) == B_OK;
 				 i++) {
 				if (!BMimeType::IsValid(type))
 					error = B_BAD_VALUE;
 			}
+printf("check1\n");
 			// get flattened size
 			ssize_t size = 0;
 			if (error == B_OK) {
@@ -454,6 +459,7 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 				if (size < 0)
 					error = size;
 			}
+printf("check1\n");
 			// allocate a buffer for the flattened data
 			char *buffer = NULL;
 			if (error == B_OK) {
@@ -461,23 +467,28 @@ BAppFileInfo::SetSupportedTypes(const BMessage *types, bool syncAll)
 				if (!buffer)
 					error = B_NO_MEMORY;
 			}
+printf("check1\n");
 			// flatten the message
 			if (error == B_OK)
 				error = types->Flatten(buffer, size);
+printf("check1\n");
 			// write the data
 			if (error == B_OK) {
 				error = _WriteData(kSupportedTypesAttribute,
 								   kSupportedTypesResourceID, B_MESSAGE_TYPE,
 								   buffer, size);
 			}
+printf("check1\n");
 			// clean up
 			if (buffer)
 				delete[] buffer;
 		} else
 			error = _RemoveData(kSupportedTypesAttribute, B_MESSAGE_TYPE);
+printf("check\n");
 		// update the MIME database, if the app signature is installed
 		if (error == B_OK && mimeType.IsInstalled())
 			error = mimeType.SetSupportedTypes(types, syncAll);
+printf("check\n");
 	}
 	return error;
 }

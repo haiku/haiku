@@ -11,7 +11,6 @@
 #define _NODE_H
 
 #include <Statable.h>
-#include <StorageDefs.Private.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
@@ -115,14 +114,17 @@ private:
 	uint32 rudeData[4];
 
 private:
-	status_t set_fd(BPrivate::Storage::FileDescriptor fd);
+	status_t set_fd(int fd);
 	virtual void close_fd();
 	void set_status(status_t newStatus);
 
+	status_t _SetTo(int fd, const char *path, bool traverse);
+	status_t _SetTo(const entry_ref *ref, bool traverse);
+
 	virtual status_t set_stat(struct stat &st, uint32 what);
 
-	BPrivate::Storage::FileDescriptor fFd;
-	BPrivate::Storage::FileDescriptor fAttrFd;
+	int fFd;
+	int fAttrFd;
 	status_t fCStatus;
 
 	status_t InitAttrDir();

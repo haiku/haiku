@@ -9,9 +9,11 @@
 
 #include <fsproto.h>
 
+#include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-#include "kernel_interface.h"
+
+#include <syscalls.h>
 
 #ifdef USE_OPENBEOS_NAMESPACE
 namespace OpenBeOS {
@@ -143,23 +145,22 @@ BFile::~BFile()
 	- \c B_BUSY: A node was busy.
 	- \c B_FILE_ERROR: A general file error.
 	- \c B_NO_MORE_FDS: The application has run out of file descriptors.
-	\todo Currently implemented using BPrivate::Storage::entry_ref_to_path().
-		  Reimplement!
 */
 status_t
 BFile::SetTo(const entry_ref *ref, uint32 openMode)
 {
 	Unset();
-	char path[B_PATH_NAME_LENGTH];
-	status_t error = (ref ? B_OK : B_BAD_VALUE);
-	if (error == B_OK) {
-		error = BPrivate::Storage::entry_ref_to_path(ref, path,
-													 B_PATH_NAME_LENGTH);
-	}
-	if (error == B_OK)
-		error = SetTo(path, openMode);
-	set_status(error);
-	return error;
+	if (!ref)
+		return (fCStatus = B_BAD_VALUE);
+	int fd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
+		openMode);
+	if (fd >= 0) {
+		set_fd(fd);
+		fMode = openMode;
+		fCStatus = B_OK;
+	} else
+		fCStatus = fd;
+	return fCStatus;
 }
 
 // SetTo
@@ -185,14 +186,18 @@ status_t
 BFile::SetTo(const BEntry *entry, uint32 openMode)
 {
 	Unset();
-	entry_ref ref;
-	status_t error = (entry ? B_OK : B_BAD_VALUE);
-	if (error == B_OK)
-		error = entry->GetRef(&ref);
-	if (error == B_OK)
-		error = SetTo(&ref, openMode);
-	set_status(error);
-	return error;
+	if (!entry)
+		return (fCStatus = B_BAD_VALUE);
+	if (entry->InitCheck() != B_OK)
+		return (fCStatus = entry->InitCheck());
+	int fd = _kern_open(entry->fDirFd, entry->fName, openMode);
+	if (fd >= 0) {
+		set_fd(fd);
+		fMode = openMode;
+		fCStatus = B_OK;
+	} else
+		fCStatus = fd;
+	return fCStatus;
 }
 
 // SetTo
@@ -216,54 +221,16 @@ status_t
 BFile::SetTo(const char *path, uint32 openMode)
 {
 	Unset();
-	status_t result = B_OK;
-	BPrivate::Storage::FileDescriptor newFd = BPrivate::Storage::NullFd;
-	if (path) {
-		// analyze openMode
-		// Well, it's a bit schizophrenic to convert the B_* style openMode
-		// to POSIX style openFlags, but to use O_RWMASK to filter openMode.
-		BPrivate::Storage::OpenFlags openFlags = 0;
-		switch (openMode & O_RWMASK) {
-			case B_READ_ONLY:
- 				openFlags = O_RDONLY;
-				break;
-			case B_WRITE_ONLY:
- 				openFlags = O_WRONLY;
-				break;
-			case B_READ_WRITE:
- 				openFlags = O_RDWR;
-				break;
-			default:
-				result = B_BAD_VALUE;
-				break;
-		}
-		if (result == B_OK) {
-			if (openMode & B_ERASE_FILE)
-				openFlags |= O_TRUNC;
-			if (openMode & B_OPEN_AT_END)
-				openFlags |= O_APPEND;
-			if (openMode & B_CREATE_FILE) {
-				openFlags |= O_CREAT;
-				if (openMode & B_FAIL_IF_EXISTS)
-					openFlags |= O_EXCL;
-				result = BPrivate::Storage::open(path, openFlags, S_IREAD | S_IWRITE,
-										  newFd);
-			} else
-				result = BPrivate::Storage::open(path, openFlags, newFd);
-			if (result == B_OK)
-				fMode = openFlags;
-		}
+	if (!path)
+		return (fCStatus = B_BAD_VALUE);
+	int fd = _kern_open(-1, path, openMode);
+	if (fd >= 0) {
+		set_fd(fd);
+		fMode = openMode;
+		fCStatus = B_OK;
 	} else
-		result = B_BAD_VALUE;
-	// set the new file descriptor
-	if (result == B_OK) {
-		result = set_fd(newFd);
-		if (result != B_OK)
-			BPrivate::Storage::close(newFd);
-	}
-	// finally set the BNode status
-	set_status(result);
-	return result;
+		fCStatus = fd;
+	return fCStatus;
 }
 
 // SetTo
@@ -291,14 +258,16 @@ status_t
 BFile::SetTo(const BDirectory *dir, const char *path, uint32 openMode)
 {
 	Unset();
-	status_t error = (dir && path ? B_OK : B_BAD_VALUE);
-	BEntry entry;
-	if (error == B_OK)
-		error = entry.SetTo(dir, path);
-	if (error == B_OK)
-		error = SetTo(&entry, openMode);
-	set_status(error);
-	return error;
+	if (!dir)
+		return (fCStatus = B_BAD_VALUE);
+	int fd = _kern_open(dir->fDirFd, path, openMode);
+	if (fd >= 0) {
+		set_fd(fd);
+		fMode = openMode;
+		fCStatus = B_OK;
+	} else
+		fCStatus = fd;
+	return fCStatus;
 }
 
 // IsReadable
@@ -340,10 +309,9 @@ BFile::IsWritable() const
 ssize_t
 BFile::Read(void *buffer, size_t size)
 {
-	ssize_t result = InitCheck();
-	if (result == B_OK)
-		result = BPrivate::Storage::read(get_fd(), buffer, size);
-	return result;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	return _kern_read(get_fd(), -1, buffer, size);
 }
 
 // ReadAt
@@ -358,10 +326,11 @@ BFile::Read(void *buffer, size_t size)
 ssize_t
 BFile::ReadAt(off_t location, void *buffer, size_t size)
 {
-	ssize_t result = InitCheck();
-	if (result == B_OK)
-		result = BPrivate::Storage::read(get_fd(), buffer, location, size);
-	return result;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (location < 0)
+		return B_BAD_VALUE;
+	return _kern_read(get_fd(), location, buffer, size);
 }
 
 // Write
@@ -373,10 +342,9 @@ BFile::ReadAt(off_t location, void *buffer, size_t size)
 ssize_t
 BFile::Write(const void *buffer, size_t size)
 {
-	ssize_t result = InitCheck();
-	if (result == B_OK)
-		result = BPrivate::Storage::write(get_fd(), buffer, size);
-	return result;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	return _kern_write(get_fd(), -1, buffer, size);
 }
 
 // WriteAt
@@ -391,10 +359,11 @@ BFile::Write(const void *buffer, size_t size)
 ssize_t
 BFile::WriteAt(off_t location, const void *buffer, size_t size)
 {
-	ssize_t result = InitCheck();
-	if (result == B_OK)
-		result = BPrivate::Storage::write(get_fd(), buffer, location, size);
-	return result;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (location < 0)
+		return B_BAD_VALUE;
+	return _kern_write(get_fd(), location, buffer, size);
 }
 
 // Seek
@@ -417,10 +386,9 @@ BFile::WriteAt(off_t location, const void *buffer, size_t size)
 off_t
 BFile::Seek(off_t offset, uint32 seekMode)
 {
-	off_t result = (InitCheck() == B_OK ? (off_t)B_OK : (off_t)B_FILE_ERROR);
-	if (result == B_OK)
-		result = BPrivate::Storage::seek(get_fd(), offset, seekMode);
-	return result;
+	if (InitCheck() != B_OK)
+		return B_FILE_ERROR;
+	return _kern_seek(get_fd(), offset, seekMode);
 }
 
 // Position
@@ -433,10 +401,9 @@ BFile::Seek(off_t offset, uint32 seekMode)
 off_t
 BFile::Position() const
 {
-	off_t result = (InitCheck() == B_OK ? (off_t)B_OK : (off_t)B_FILE_ERROR);
-	if (result == B_OK)
-		result = BPrivate::Storage::get_position(get_fd());
-	return result;
+	if (InitCheck() != B_OK)
+		return B_FILE_ERROR;
+	return _kern_seek(get_fd(), 0, SEEK_CUR);
 }
 
 // SetSize
@@ -456,15 +423,13 @@ BFile::Position() const
 status_t
 BFile::SetSize(off_t size)
 {
-	status_t result = InitCheck();
-	if (result == B_OK && size < 0)
-		result = B_BAD_VALUE;
+	if (InitCheck() != B_OK)
+		return InitCheck();
+	if (size < 0)
+		return B_BAD_VALUE;
 	struct stat statData;
-	if (result == B_OK) {
-		statData.st_size = size;
-		result = set_stat(statData, WSTAT_SIZE);
-	}
-	return result;
+	statData.st_size = size;
+	return set_stat(statData, WSTAT_SIZE);
 }
 
 // =
@@ -481,17 +446,14 @@ BFile::operator=(const BFile &file)
 		Unset();
 		if (file.InitCheck() == B_OK) {
 			// duplicate the file descriptor
-			BPrivate::Storage::FileDescriptor fd = -1;
-			status_t status = BPrivate::Storage::dup(file.get_fd(), fd);
+			int fd = _kern_dup(file.get_fd());
 			// set it
-			if (status == B_OK) {
-				status = set_fd(fd);
-				if (status == B_OK)
-					fMode = file.fMode;
-				else
-					BPrivate::Storage::close(fd);
-			}
-			set_status(status);
+			if (fd >= 0) {
+				fFd = fd;
+				fMode = file.fMode;
+				fCStatus = B_OK;
+			} else
+				fCStatus = fd;
 		}
 	}
 	return *this;
@@ -512,7 +474,7 @@ void BFile::_PhiloFile6() {}
 	To be used instead of accessing the BNode's private \c fFd member directly.
 	\return the file descriptor, or -1, if not properly initialized.
 */
-BPrivate::Storage::FileDescriptor
+int
 BFile::get_fd() const
 {
 	return fFd;
@@ -522,7 +484,4 @@ BFile::get_fd() const
 #ifdef USE_OPENBEOS_NAMESPACE
 };		// namespace OpenBeOS
 #endif
-
-
-
 

@@ -78,6 +78,8 @@ public:
 	BDirectory &operator=(const BDirectory &dir);
 
 private:
+	friend class BNode;
+
 	virtual void _ErectorDirectory1();
 	virtual void _ErectorDirectory2();
 	virtual void _ErectorDirectory3();
@@ -87,13 +89,14 @@ private:
 
 private:
 	virtual void close_fd();
-	BPrivate::Storage::FileDescriptor get_fd() const;
+	int get_fd() const;
 
 private:
 	uint32 _reservedData[7];
-	BPrivate::Storage::FileDescriptor fDirFd;
+	int fDirFd;
 
 	friend class BEntry;
+	friend class BFile;
 };
 
 
