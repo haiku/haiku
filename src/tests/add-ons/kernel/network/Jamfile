@@ -28,8 +28,6 @@ SimpleTest net_stack_tester :
 }
 
 # for convenience: this target builds all userland modules
-Depends net_stack_tester : userland_network_modules :
-
 NotFile userland_network_modules ;
 Depends userland_network_modules :
 	# the stack main module
