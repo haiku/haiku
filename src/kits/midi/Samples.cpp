@@ -28,8 +28,6 @@
 
 BSamples::BSamples()
 {
-	/* not complete yet */
-
 	if (be_synth == NULL)
 	{
 		new BSynth();
@@ -40,7 +38,7 @@ BSamples::BSamples()
 
 BSamples::~BSamples()
 {
-	UNIMPLEMENTED
+	// do nothing
 }
 
 //------------------------------------------------------------------------------
@@ -51,14 +49,14 @@ void BSamples::Start(
 	double sampleVolume, double stereoPosition, int32 hook_arg, 
 	sample_loop_hook pLoopContinueProc, sample_exit_hook pDoneProc)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 bool BSamples::IsPaused(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 	return false;
 }
 
@@ -66,28 +64,28 @@ bool BSamples::IsPaused(void) const
 
 void BSamples::Pause(void)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 void BSamples::Resume(void)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 void BSamples::Stop(void)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 bool BSamples::IsPlaying(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 	return false;
 }
 
@@ -95,14 +93,14 @@ bool BSamples::IsPlaying(void) const
 
 void BSamples::SetVolume(double newVolume)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 double BSamples::Volume(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 	return 0;
 }
 
@@ -110,14 +108,14 @@ double BSamples::Volume(void) const
 
 void BSamples::SetSamplingRate(double newRate)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 double BSamples::SamplingRate(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 	return 0;
 }
 
@@ -125,14 +123,14 @@ double BSamples::SamplingRate(void) const
 
 void BSamples::SetPlacement(double stereoPosition)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 double BSamples::Placement(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 	return 0;
 }
 
@@ -140,7 +138,7 @@ double BSamples::Placement(void) const
 
 void BSamples::EnableReverb(bool useReverb)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] BSamples is not supported\n");
 }
 
 //------------------------------------------------------------------------------

@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2002-2004 Matthijs Hollemans
+ * Copyright (c) 2003 Jerome Leveque
  *
  * Permission is hereby granted, free of charge, to any person obtaining a 
  * copy of this software and associated documentation files (the "Software"), 
@@ -22,35 +23,32 @@
 
 #include "debug.h"
 #include "Synth.h"
+#include "SoftSynth.h"
 
 BSynth* be_synth = NULL;
+
+using namespace BPrivate;
 
 //------------------------------------------------------------------------------
 
 BSynth::BSynth()
 {
-	/* not complete yet */
-
-	delete be_synth;
-	be_synth = this;
+	Init();
 }
 
 //------------------------------------------------------------------------------
 
-BSynth::BSynth(synth_mode synth)
+BSynth::BSynth(synth_mode mode)
 {
-	/* not complete yet */
-
-	delete be_synth;
-	be_synth = this;
+	Init();
+	synthMode = mode;
 }
 
 //------------------------------------------------------------------------------
 
 BSynth::~BSynth()
 {
-	/* not complete yet */
-	
+	delete synth;
 	be_synth = NULL;
 }
 
@@ -58,102 +56,107 @@ BSynth::~BSynth()
 
 status_t BSynth::LoadSynthData(entry_ref* instrumentsFile)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	if (instrumentsFile == NULL)
+	{
+		return B_BAD_VALUE;
+	}
+	
+	return synth->SetInstrumentsFile(instrumentsFile->name);
 }
 
 //------------------------------------------------------------------------------
 
-status_t BSynth::LoadSynthData(synth_mode synth)
+status_t BSynth::LoadSynthData(synth_mode mode)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	// Our softsynth doesn't support multiple modes like Be's synth did.
+	// Therefore, if you use this function, the synth will revert to its
+	// default instruments bank. However, we do keep track of the current
+	// synth_mode here, in order not to confuse old applications.
+
+	synthMode = mode;
+	if (synthMode == B_SAMPLES_ONLY)
+	{
+		fprintf(stderr, "[midi] LoadSynthData: BSamples is not supported\n");
+	}
+
+	return synth->SetDefaultInstrumentsFile();
 }
 
 //------------------------------------------------------------------------------
 
 synth_mode BSynth::SynthMode(void)
 {
-	UNIMPLEMENTED
-	return B_NO_SYNTH;
+	return synthMode;
 }
 
 //------------------------------------------------------------------------------
 
 void BSynth::Unload(void)
 {
-	UNIMPLEMENTED
+	synth->Unload();
 }
 
 //------------------------------------------------------------------------------
 
 bool BSynth::IsLoaded(void) const
 {
-	UNIMPLEMENTED
-	return false;
+	return synth->IsLoaded();
 }
 
 //------------------------------------------------------------------------------
 
 status_t BSynth::SetSamplingRate(int32 sample_rate)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	return synth->SetSamplingRate(sample_rate);
 }
 
 //------------------------------------------------------------------------------
 
 int32 BSynth::SamplingRate() const
 {
-	UNIMPLEMENTED
-	return 0;
+	return synth->SamplingRate();
 }
 
 //------------------------------------------------------------------------------
 
 status_t BSynth::SetInterpolation(interpolation_mode interp_mode)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	return synth->SetInterpolation(interp_mode);
 }
 
 //------------------------------------------------------------------------------
 
 interpolation_mode BSynth::Interpolation() const
 {
-	UNIMPLEMENTED
-	return B_DROP_SAMPLE;
+	return synth->Interpolation();
 }
 
 //------------------------------------------------------------------------------
 
 void BSynth::SetReverb(reverb_mode rev_mode)
 {
-	UNIMPLEMENTED
+	synth->SetReverb(rev_mode);
 }
 
 //------------------------------------------------------------------------------
 
 reverb_mode BSynth::Reverb() const
 {
-	UNIMPLEMENTED
-	return B_REVERB_NONE;
+	return synth->Reverb();
 }
 
 //------------------------------------------------------------------------------
 
 status_t BSynth::EnableReverb(bool reverb_enabled)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	return synth->EnableReverb(reverb_enabled);
 }
 
 //------------------------------------------------------------------------------
 
 bool BSynth::IsReverbEnabled() const
 {
-	UNIMPLEMENTED
-	return false;
+	return synth->IsReverbEnabled();
 }
 
 //------------------------------------------------------------------------------
@@ -161,23 +164,27 @@ bool BSynth::IsReverbEnabled() const
 status_t BSynth::SetVoiceLimits(
 	int16 maxSynthVoices, int16 maxSampleVoices, int16 limiterThreshhold)
 {
-	UNIMPLEMENTED
-	return B_ERROR;
+	status_t err = B_OK;
+	err = synth->SetMaxVoices(maxSynthVoices);
+	if (err == B_OK)
+	{
+		err = synth->SetLimiterThreshold(limiterThreshhold);
+	}
+	return err;
 }
 
 //------------------------------------------------------------------------------
 
 int16 BSynth::MaxSynthVoices(void) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return synth->MaxVoices();
 }
 
 //------------------------------------------------------------------------------
 
 int16 BSynth::MaxSampleVoices(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] MaxSampleVoices: BSamples not supported\n");
 	return 0;
 }
 
@@ -185,37 +192,35 @@ int16 BSynth::MaxSampleVoices(void) const
 
 int16 BSynth::LimiterThreshhold(void) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return synth->LimiterThreshold();
 }
 
 //------------------------------------------------------------------------------
 
 void BSynth::SetSynthVolume(double theVolume)
 {
-	UNIMPLEMENTED
+	synth->SetVolume(theVolume);
 }
 
 //------------------------------------------------------------------------------
 
 double BSynth::SynthVolume(void) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return synth->Volume();
 }
 
 //------------------------------------------------------------------------------
 
 void BSynth::SetSampleVolume(double theVolume)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] SetSampleVolume: BSamples not supported\n");
 }
 
 //------------------------------------------------------------------------------
 
 double BSynth::SampleVolume(void) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] SampleVolume: BSamples not supported\n");
 	return 0;
 }
 
@@ -224,7 +229,7 @@ double BSynth::SampleVolume(void) const
 status_t BSynth::GetAudio(
 	int16* pLeft, int16* pRight, int32 max_samples) const
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] GetAudio is not supported\n");
 	return B_ERROR;
 }
 
@@ -232,29 +237,39 @@ status_t BSynth::GetAudio(
 
 void BSynth::Pause(void)
 {
-	UNIMPLEMENTED
+	synth->Pause();
 }
 
 //------------------------------------------------------------------------------
 
 void BSynth::Resume(void)
 {
-	UNIMPLEMENTED
+	synth->Resume();
 }
 
 //------------------------------------------------------------------------------
 
 void BSynth::SetControllerHook(int16 controller, synth_controller_hook cback)
 {
-	UNIMPLEMENTED
+	fprintf(stderr, "[midi] SetControllerHook is not supported\n");
+}
+
+//------------------------------------------------------------------------------
+
+void BSynth::Init()
+{
+	delete be_synth;
+	be_synth = this;
+	synthMode = B_NO_SYNTH;
+	clientCount = 0;
+	synth = new BSoftSynth();
 }
 
 //------------------------------------------------------------------------------
 
 int32 BSynth::CountClients(void) const
 {
-	UNIMPLEMENTED
-	return 0;
+	return clientCount;
 }
 
 //------------------------------------------------------------------------------

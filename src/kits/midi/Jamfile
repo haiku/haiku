@@ -11,6 +11,7 @@ SharedLibrary midi :
 	MidiSynthFile.cpp
 	MidiText.cpp
 	Samples.cpp
+	SoftSynth.cpp
 	Synth.cpp
 ;
 
