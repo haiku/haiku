@@ -616,9 +616,10 @@ void BHandler::UnlockLooper()
 			re-Lock()ing the original looper just doesn't seem right.
  */
 	// TODO: implement correctly
-	if (fLooper)
+	BLooper* Looper = fLooper;
+	if (Looper)
 	{
-		fLooper->Unlock();
+		Looper->Unlock();
 	}
 }
 //------------------------------------------------------------------------------

@@ -25,6 +25,7 @@
 //------------------------------------------------------------------------------
 #include <stdio.h>
 
+#include <MessagePrivate.h>
 #include <RosterPrivate.h>
 
 // debugging
@@ -39,6 +40,7 @@ initialize_before()
 {
 DBG(OUT("initialize_before()\n"));
 
+	_init_message_();
 	_init_roster_();
 
 DBG(OUT("initialize_before() done\n"));
@@ -52,6 +54,8 @@ terminate_after()
 DBG(OUT("terminate_after()\n"));
 
 	_delete_roster_();
+	_delete_message_();
+	_msg_cache_cleanup_();
 
 DBG(OUT("terminate_after() done\n"));
 }

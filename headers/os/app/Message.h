@@ -292,11 +292,14 @@ virtual				~BMessage();
 		float		FindFloat(const char *, int32 n = 0) const;
 		double		FindDouble(const char *, int32 n = 0) const;
 
+		class Private;
+
 private:
 
 friend class	BMessageQueue;
 friend class	BMessenger;
 friend class	BApplication;
+friend class	Private;
 
 friend			void		_msg_cache_cleanup_();
 friend			BMessage 	*_reconstruct_msg_(uint32,uint32,uint32);
