@@ -58,6 +58,74 @@ TIFFTranslatorTest::tearDown()
 }
 
 void
+CheckBits(translator_info *pti)
+{
+	CPPUNIT_ASSERT(pti->type == B_TRANSLATOR_BITMAP);
+	CPPUNIT_ASSERT(pti->translator != 0);
+	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_BITMAP);
+	CPPUNIT_ASSERT(pti->quality > 0.39 && pti->quality < 0.41);
+	CPPUNIT_ASSERT(pti->capability > 0.59 && pti->capability < 0.61);
+	CPPUNIT_ASSERT(strcmp(pti->name, "Be Bitmap Format (TIFFTranslator)") == 0);
+	CPPUNIT_ASSERT(strcmp(pti->MIME, "image/x-be-bitmap") == 0);
+}
+
+void
+CheckTiff(translator_info *pti)
+{
+	CPPUNIT_ASSERT(pti->type == B_TIFF_FORMAT);
+	CPPUNIT_ASSERT(pti->translator != 0);
+	CPPUNIT_ASSERT(pti->group == B_TRANSLATOR_BITMAP);
+	CPPUNIT_ASSERT(pti->quality > 0.09 && pti->quality < 0.11);
+	CPPUNIT_ASSERT(pti->capability > 0.09 && pti->capability < 0.11);
+	CPPUNIT_ASSERT(strcmp(pti->name, "TIFF Image") == 0);
+	CPPUNIT_ASSERT(strcmp(pti->MIME, "image/tiff") == 0);
+}
+
+void
+IdentifyTests(TIFFTranslatorTest *ptest, BTranslatorRoster *proster,
+	const char **paths, int32 len, bool bbits)
+{
+	translator_info ti;
+	printf(" [%d] ", (int) bbits);
+	
+	for (int32 i = 0; i < len; i++) {
+		ptest->NextSubTest();
+		BFile file;
+		printf(" [%s] ", paths[i]);
+		CPPUNIT_ASSERT(file.SetTo(paths[i], B_READ_ONLY) == B_OK);
+
+		// Identify (output: B_TRANSLATOR_ANY_TYPE)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti) == B_OK);
+		if (bbits)
+			CheckBits(&ti);
+		else
+			CheckTiff(&ti);
+	
+		// Identify (output: B_TRANSLATOR_BITMAP)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
+			B_TRANSLATOR_BITMAP) == B_OK);
+		if (bbits)
+			CheckBits(&ti);
+		else
+			CheckTiff(&ti);
+	
+		// Identify (output: B_TIFF_FORMAT)
+		ptest->NextSubTest();
+		memset(&ti, 0, sizeof(translator_info));
+		CPPUNIT_ASSERT(proster->Identify(&file, NULL, &ti, 0, NULL,
+			B_TIFF_FORMAT) == B_OK);
+		if (bbits)
+			CheckBits(&ti);
+		else
+			CheckTiff(&ti);
+	}
+}
+
+void
 TIFFTranslatorTest::IdentifyTest()
 {
 	// Init
@@ -86,6 +154,18 @@ TIFFTranslatorTest::IdentifyTest()
 	result = proster->Identify(&wronginput, NULL, &ti);
 	CPPUNIT_ASSERT(result == B_NO_TRANSLATOR);
 	CPPUNIT_ASSERT(ti.type == 0 && ti.translator == 0);
+	
+	// Identify (successfully identify the following files)
+	const char *aBitsFiles[] = {
+		"/boot/home/resources/tiff/blocks.bits"
+	};
+	const char *aTiffFiles[] = {
+		"/boot/home/resources/tiff/blocks.tif"
+	};
+	IdentifyTests(this, proster, aBitsFiles,
+		sizeof(aBitsFiles) / sizeof(const char *), true);
+	IdentifyTests(this, proster, aTiffFiles,
+		sizeof(aTiffFiles) / sizeof(const char *), false);
 	
 	delete proster;
 	proster = NULL;
