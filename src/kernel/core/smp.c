@@ -64,7 +64,7 @@ void acquire_spinlock(spinlock_t *lock)
 {
 	if(smp_num_cpus > 1) {
 		int curr_cpu = smp_get_current_cpu();
-		if(int_is_interrupts_enabled())
+		if(are_interrupts_enabled())
 			panic("acquire_spinlock: attempt to acquire lock %p with interrupts enabled\n", lock);
 		while(1) {
 			while(*lock != 0)
@@ -104,14 +104,14 @@ static int find_free_message(struct smp_msg **msg)
 retry:
 	while(free_msg_count <= 0)
 		;
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&free_msg_spinlock);
 
 	if(free_msg_count <= 0) {
 		// someone grabbed one while we were getting the lock,
 		// go back to waiting for it
 		release_spinlock(&free_msg_spinlock);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		goto retry;
 	}
 
@@ -278,7 +278,7 @@ static int smp_process_pending_ici(int curr_cpu)
 	// special case for the halt message
 	// we otherwise wouldn't have gotten the opportunity to clean up
 	if(halt) {
-		int_disable_interrupts();
+		disable_interrupts();
 		for(;;);
 	}
 
@@ -316,7 +316,7 @@ void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long
 		curr_cpu = smp_get_current_cpu();
 		if(target_cpu == curr_cpu) {
 			return_free_message(msg);
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 			return; // nope, cant do that
 		}
 
@@ -349,7 +349,7 @@ void smp_send_ici(int target_cpu, int message, unsigned long data, unsigned long
 			return_free_message(msg);
 		}
 
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 	}
 }
 
@@ -404,7 +404,7 @@ void smp_send_broadcast_ici(int message, unsigned long data, unsigned long data2
 			return_free_message(msg);
 		}
 
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 	}
 //	dprintf("smp_send_broadcast_ici: done\n");
 }

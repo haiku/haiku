@@ -150,13 +150,13 @@ void vm_cache_release_ref(vm_cache_ref *cache_ref)
 			page = page->cache_next;
 
 			// remove it from the hash table
-			state = int_disable_interrupts();
+			state = disable_interrupts();
 			acquire_spinlock(&page_cache_table_lock);
 
 			hash_remove(page_cache_table, old_page);
 
 			release_spinlock(&page_cache_table_lock);
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 
 //			dprintf("vm_cache_release_ref: freeing page 0x%x\n", old_page->ppn);
 			vm_page_set_state(old_page, PAGE_STATE_FREE);
@@ -187,13 +187,13 @@ vm_page *vm_cache_lookup_page(vm_cache_ref *cache_ref, off_t offset)
 	key.offset = offset;
 	key.ref = cache_ref;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
 
 	page = hash_lookup(page_cache_table, &key);
 
 	release_spinlock(&page_cache_table_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return page;
 }
@@ -215,13 +215,13 @@ void vm_cache_insert_page(vm_cache_ref *cache_ref, vm_page *page, off_t offset)
 
 	page->cache_ref = cache_ref;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
 
 	hash_insert(page_cache_table, page);
 
 	release_spinlock(&page_cache_table_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 }
 
@@ -231,13 +231,13 @@ void vm_cache_remove_page(vm_cache_ref *cache_ref, vm_page *page)
 
 //	dprintf("vm_cache_remove_page: cache 0x%x, page 0x%x\n", cache_ref, page);
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_cache_table_lock);
 
 	hash_remove(page_cache_table, page);
 
 	release_spinlock(&page_cache_table_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	if(cache_ref->cache->page_list == page) {
 		if(page->cache_next != NULL)

@@ -82,11 +82,11 @@ long install_interrupt_handler(long vector, interrupt_handler handler,
 	
 	/* Disable the interrupts, get the spinlock for this irq only
 	 * and then insert the handler */
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&io_vectors[vector].vector_lock); 
 	insque(io, &io_vectors[vector].handler_list);
 	release_spinlock(&io_vectors[vector].vector_lock); 
-	int_restore_interrupts(state); 
+	restore_interrupts(state); 
 
 	return 0;
 }
@@ -124,7 +124,7 @@ long remove_interrupt_handler(long vector, interrupt_handler handler,
 	long rv = EINVAL;
 	
 	/* lock the structures down so it is not modified while we search */
-	int state = int_disable_interrupts(); 
+	int state = disable_interrupts(); 
 	acquire_spinlock(&io_vectors[vector].vector_lock); 
 
 	/* loop through the available handlers and try to find a match.
@@ -147,7 +147,7 @@ long remove_interrupt_handler(long vector, interrupt_handler handler,
 	 * the value rv
 	 */
 	release_spinlock(&io_vectors[vector].vector_lock); 
-	int_restore_interrupts(state); 
+	restore_interrupts(state); 
 
 	return rv; 
 } 

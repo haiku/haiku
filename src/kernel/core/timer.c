@@ -132,7 +132,7 @@ status_t add_timer(timer *t, timer_hook hook, bigtime_t period, int32 flags)
 	t->hook = hook;
 	t->flags = flags;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	curr_cpu = smp_get_current_cpu();
 	acquire_spinlock(&timer_spinlock[curr_cpu]);
 
@@ -144,7 +144,7 @@ status_t add_timer(timer *t, timer_hook hook, bigtime_t period, int32 flags)
 		arch_timer_set_hardware_timer(sched_time - curr_time);
 
 	release_spinlock(&timer_spinlock[curr_cpu]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return B_OK;
 }
@@ -201,7 +201,7 @@ bool cancel_timer(timer *event)
 //	if (event->sched_time == 0)
 //		return 0; // it's not scheduled
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	curr_cpu = smp_get_current_cpu();
 
 	// walk through all of the cpu's timer queues
@@ -237,7 +237,7 @@ done:
 
 	if (foundit)
 		release_spinlock(&timer_spinlock[cpu]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	if (foundit && ((bigtime_t)event->entry.key < system_time()))
 		return true;

@@ -155,7 +155,7 @@ void arch_thread_enter_uspace(addr entry, void *args, addr ustack_top)
 	// make sure the fpu is in a good state
 	asm("fninit");
 
-	int_disable_interrupts();
+	disable_interrupts();
 
 	i386_set_kstack(thread_get_current_thread()->kernel_stack_base + KSTACK_SIZE);
 

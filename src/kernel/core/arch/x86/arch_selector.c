@@ -7,6 +7,7 @@
 #include <arch/cpu.h>
 #include <smp.h>
 #include <int.h>
+#include <atomic.h>
 
 #include <arch/x86/selector.h>
 
@@ -37,7 +38,7 @@ selector_id i386_selector_add( selector_type type )
 	selector_id id = 0;
 	unsigned i;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock( &spinlock );
 
 	for ( i = 0; i < ENTRIES; i++ )
@@ -54,7 +55,7 @@ selector_id i386_selector_add( selector_type type )
 		}
 
 	release_spinlock( &spinlock );
-	int_restore_interrupts( state );
+	restore_interrupts( state );
 
 	if ( id ) {
 		asm("lgdt	%0;"

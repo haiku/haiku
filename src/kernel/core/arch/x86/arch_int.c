@@ -178,7 +178,7 @@ void i386_handle_trap(struct int_frame frame)
 			// get the old interrupt enable/disable state and restore to that
 			if(frame.flags & 0x200) {
 //				dprintf("page_fault: enabling interrupts\n");
-				int_enable_interrupts();
+				enable_interrupts();
 			}
 			ret = vm_page_fault(cr2, frame.eip,
 				(frame.error_code & 0x2) != 0,
@@ -243,11 +243,11 @@ void i386_handle_trap(struct int_frame frame)
 	}
 
 	if (ret == B_INVOKE_SCHEDULER) {
-		int state = int_disable_interrupts();
+		int state = disable_interrupts();
 		GRAB_THREAD_LOCK();
 		thread_resched();
 		RELEASE_THREAD_LOCK();
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 	}
 
 	if(frame.cs == USER_CODE_SEG || frame.vector == 99) {

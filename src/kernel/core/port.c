@@ -215,7 +215,7 @@ create_port(int32 queue_length, const char *name)
 	}
 	owner = proc_get_current_proc_id();
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 
 	// find the first empty spot
@@ -262,7 +262,7 @@ create_port(int32 queue_length, const char *name)
 	kfree(q);
 
 out:
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return retval;
 }
@@ -280,12 +280,12 @@ close_port(port_id id)
 	slot = id % MAX_PORTS;
 
 	// walk through the sem list, trying to match name
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if (ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		return B_BAD_PORT_ID;
 	}
 
@@ -293,7 +293,7 @@ close_port(port_id id)
 	ports[slot].closed = true;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return B_NO_ERROR;
 }
@@ -317,12 +317,12 @@ delete_port(port_id id)
 
 	slot = id % MAX_PORTS;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("delete_port: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
@@ -337,7 +337,7 @@ delete_port(port_id id)
 	ports[slot].name = NULL;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	// delete the cbuf's that are left in the queue (if any)
 	for (i=0; i<capacity; i++) {
@@ -369,7 +369,7 @@ find_port(const char *port_name)
 		return B_BAD_PORT_ID;
 
 	// lock list of ports
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 	
 	// loop over list
@@ -385,7 +385,7 @@ find_port(const char *port_name)
 	}
 	
 	RELEASE_PORT_LIST_LOCK();
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return ret_val;
 }
@@ -405,12 +405,12 @@ _get_port_info(port_id id, port_info *info, size_t size)
 
 	slot = id % MAX_PORTS;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("get_port_info: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
@@ -424,7 +424,7 @@ _get_port_info(port_id id, port_info *info, size_t size)
 	info->total_count	= ports[slot].total_count;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 	
 	// from our port_entry
 	return B_NO_ERROR;
@@ -453,7 +453,7 @@ _get_next_port_info(team_id proc, int32 *cookie, struct port_info *info,
 	}
 
 	// spinlock
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 	
 	info->port = -1; // used as found flag
@@ -477,7 +477,7 @@ _get_next_port_info(team_id proc, int32 *cookie, struct port_info *info,
 		slot++;
 	}
 	RELEASE_PORT_LIST_LOCK();
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	if (info->port == -1)
 		return B_BAD_PORT_ID;
@@ -509,17 +509,17 @@ port_buffer_size_etc(port_id id,
 
 	slot = id % MAX_PORTS;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("get_port_info: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	// block if no message, 
 	// if TIMEOUT flag set, block with timeout
@@ -574,12 +574,12 @@ port_count(port_id id)
 
 	slot = id % MAX_PORTS;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("port_count: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
@@ -590,7 +590,7 @@ port_count(port_id id)
 		count = 0;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	// return count of messages (sem_count)
 	return count;
@@ -638,12 +638,12 @@ read_port_etc(port_id id,
 
 	slot = id % MAX_PORTS;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("read_port_etc: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
@@ -652,7 +652,7 @@ read_port_etc(port_id id,
 
 	// unlock port && enable ints/
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	// XXX -> possible race condition if port gets deleted (->sem deleted too), therefore
 	// sem_id is cached in local variable up here
@@ -679,7 +679,7 @@ read_port_etc(port_id id,
 		return res;
 	}
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	t = ports[slot].tail;
@@ -702,7 +702,7 @@ read_port_etc(port_id id,
 	cached_semid = ports[slot].write_sem;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	// copy message
 	*msg_code = code;
@@ -739,12 +739,12 @@ set_port_owner(port_id id, proc_id proc)
 
 	slot = id % MAX_PORTS;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("set_port_owner: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
@@ -754,7 +754,7 @@ set_port_owner(port_id id, proc_id proc)
 
 	// unlock port
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return B_NO_ERROR;
 }
@@ -799,19 +799,19 @@ write_port_etc(port_id id,
 	if (buffer_size > PORT_MAX_MESSAGE_SIZE)
 		return EINVAL;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	if(ports[slot].id != id) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("write_port_etc: invalid port_id %d\n", id);
 		return B_BAD_PORT_ID;
 	}
 
 	if (ports[slot].closed) {
 		RELEASE_PORT_LOCK(ports[slot]);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 		dprintf("write_port_etc: port %d closed\n", id);
 		return B_BAD_PORT_ID;
 	}
@@ -820,7 +820,7 @@ write_port_etc(port_id id,
 	cached_semid = ports[slot].write_sem;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 	
 	// XXX -> possible race condition if port gets deleted (->sem deleted too), 
 	// and queue is full therefore sem_id is cached in local variable up here
@@ -866,7 +866,7 @@ write_port_etc(port_id id,
 	}
 
 	// attach copied message to queue
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LOCK(ports[slot]);
 
 	h = ports[slot].head;
@@ -884,7 +884,7 @@ write_port_etc(port_id id,
 	cached_semid = ports[slot].read_sem;
 
 	RELEASE_PORT_LOCK(ports[slot]);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	get_sem_count(ports[slot].read_sem, &c1);
 	get_sem_count(ports[slot].write_sem, &c2);
@@ -906,7 +906,7 @@ int delete_owned_ports(proc_id owner)
 	if(ports_active == false)
 		return B_BAD_PORT_ID;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	GRAB_PORT_LIST_LOCK();
 
 	for(i=0; i<MAX_PORTS; i++) {
@@ -914,18 +914,18 @@ int delete_owned_ports(proc_id owner)
 			port_id id = ports[i].id;
 
 			RELEASE_PORT_LIST_LOCK();
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 
 			delete_port(id);
 			count++;
 
-			state = int_disable_interrupts();
+			state = disable_interrupts();
 			GRAB_PORT_LIST_LOCK();
 		}
 	}
 
 	RELEASE_PORT_LIST_LOCK();
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return count;
 }

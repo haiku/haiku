@@ -117,25 +117,25 @@ static int pageout_daemon()
 
 		dprintf("here\n");
 
-		state = int_disable_interrupts();
+		state = disable_interrupts();
 		acquire_spinlock(&page_lock);
 		page = dequeue_page(&page_modified_queue);
 		page->state = PAGE_STATE_BUSY;
 		vm_cache_acquire_ref(page->cache_ref, true);
 		release_spinlock(&page_lock);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 
 		dprintf("got page %p\n", page);
 
 		if(page->cache_ref->cache->temporary && !trimming_cycle) {
 			// unless we're in the trimming cycle, dont write out pages
 			// that back anonymous stores
-			state = int_disable_interrupts();
+			state = disable_interrupts();
 			acquire_spinlock(&page_lock);
 			enqueue_page(&page_modified_queue, page);
 			page->state = PAGE_STATE_MODIFIED;
 			release_spinlock(&page_lock);
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 			vm_cache_release_ref(page->cache_ref);
 			continue;
 		}
@@ -163,7 +163,7 @@ static int pageout_daemon()
 
 		vm_put_physical_page((addr)vecs->vec[0].iov_base);
 
-		state = int_disable_interrupts();
+		state = disable_interrupts();
 		acquire_spinlock(&page_lock);
 		if(page->ref_count > 0) {
 			page->state = PAGE_STATE_ACTIVE;
@@ -172,7 +172,7 @@ static int pageout_daemon()
 		}
 		enqueue_page(&page_active_queue, page);
 		release_spinlock(&page_lock);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 
 		vm_cache_release_ref(page->cache_ref);
 	}
@@ -291,7 +291,7 @@ static int page_scrubber(void *unused)
 		thread_snooze(100000); // 100ms
 
 		if(page_free_queue.count > 0) {
-			state = int_disable_interrupts();
+			state = disable_interrupts();
 			acquire_spinlock(&page_lock);
 
 			for(i=0; i<SCRUB_SIZE; i++) {
@@ -301,7 +301,7 @@ static int page_scrubber(void *unused)
 			}
 
 			release_spinlock(&page_lock);
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 
 			scrub_count = i;
 
@@ -309,7 +309,7 @@ static int page_scrubber(void *unused)
 				clear_page(page[i]->ppn * PAGE_SIZE);
 			}
 
-			state = int_disable_interrupts();
+			state = disable_interrupts();
 			acquire_spinlock(&page_lock);
 
 			for(i=0; i<scrub_count; i++) {
@@ -318,7 +318,7 @@ static int page_scrubber(void *unused)
 			}
 
 			release_spinlock(&page_lock);
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 		}
 	}
 
@@ -362,7 +362,7 @@ int vm_mark_page_range_inuse(addr start_page, addr len)
 		return EINVAL;
 	}
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
 	for(i = 0; i < len; i++) {
@@ -386,7 +386,7 @@ int vm_mark_page_range_inuse(addr start_page, addr len)
 	}
 
 	release_spinlock(&page_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return i;
 }
@@ -397,7 +397,7 @@ vm_page *vm_page_allocate_specific_page(addr page_num, int page_state)
 	int old_page_state = PAGE_STATE_BUSY;
 	int state;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
 	p = vm_lookup_page(page_num);
@@ -428,7 +428,7 @@ vm_page *vm_page_allocate_specific_page(addr page_num, int page_state)
 
 out:
 	release_spinlock(&page_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	if(p != NULL && page_state == PAGE_STATE_CLEAR &&
 		(old_page_state == PAGE_STATE_FREE || old_page_state == PAGE_STATE_UNUSED)) {
@@ -460,7 +460,7 @@ vm_page *vm_page_allocate_page(int page_state)
 			return NULL; // invalid
 	}
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
 	p = dequeue_page(q);
@@ -479,7 +479,7 @@ vm_page *vm_page_allocate_page(int page_state)
 	enqueue_page(&page_active_queue, p);
 
 	release_spinlock(&page_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	if(page_state == PAGE_STATE_CLEAR && old_page_state == PAGE_STATE_FREE) {
 		clear_page(p->ppn * PAGE_SIZE);
@@ -497,7 +497,7 @@ vm_page *vm_page_allocate_page_run(int page_state, addr len)
 
 	start = 0;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
 	for(;;) {
@@ -528,7 +528,7 @@ vm_page *vm_page_allocate_page_run(int page_state, addr len)
 		}
 	}
 	release_spinlock(&page_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return first_page;
 }
@@ -599,13 +599,13 @@ static int vm_page_set_state_nolock(vm_page *page, int page_state)
 int vm_page_set_state(vm_page *page, int page_state)
 {
 	int err;
-	int state = int_disable_interrupts();
+	int state = disable_interrupts();
 	acquire_spinlock(&page_lock);
 
 	err = vm_page_set_state_nolock(page, page_state);
 
 	release_spinlock(&page_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return err;
 }

@@ -361,12 +361,12 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 		off_t commitment = (store->ops->commit)(store, offset + size); // Commit through to the new end
 		if(commitment < offset + size) { // Uh oh - didn't work
 			if(cache->temporary) { // If this is a temporary cache, Check to see if we ran out of space and return error.
-				int state = int_disable_interrupts();
+				int state = disable_interrupts();
 				acquire_spinlock(&max_commit_lock);
 
 				if (max_commit - old_store_commitment + commitment < offset + size) {
 					release_spinlock(&max_commit_lock);
-					int_restore_interrupts(state);
+					restore_interrupts(state);
 					mutex_unlock(&cache_ref->lock);
 					err = ERR_VM_WOULD_OVERCOMMIT;
 					goto err1a;
@@ -375,7 +375,7 @@ static int map_backing_store(vm_address_space *aspace, vm_store *store,
 				max_commit += (commitment - old_store_commitment) - (offset + size - cache->virtual_size);
 				cache->virtual_size = offset + size;
 				release_spinlock(&max_commit_lock);
-				int_restore_interrupts(state);
+				restore_interrupts(state);
 			} else {
 				mutex_unlock(&cache_ref->lock);
 				err = ENOMEM;
@@ -2158,11 +2158,11 @@ void vm_increase_max_commit(addr delta)
 
 //	dprintf("vm_increase_max_commit: delta 0x%x\n", delta);
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&max_commit_lock);
 	max_commit += delta;
 	release_spinlock(&max_commit_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 }
 
 int user_memcpy(void *to, const void *from, size_t size)

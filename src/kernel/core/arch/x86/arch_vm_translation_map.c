@@ -93,17 +93,16 @@ static void init_ptentry(ptentry *e)
 
 static void _update_all_pgdirs(int index, pdentry e)
 {
-	unsigned int state;
 	vm_translation_map *entry;
+	unsigned int state = disable_interrupts();
 
-	state = int_disable_interrupts();
 	acquire_spinlock(&tmap_list_lock);
 
 	for(entry = tmap_list; entry != NULL; entry = entry->next)
 		entry->arch_data->pgdir_virt[index] = e;
 
 	release_spinlock(&tmap_list_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 }
 
 static int lock_tmap(vm_translation_map *map)
@@ -141,7 +140,7 @@ static void destroy_tmap(vm_translation_map *map)
 		return;
 
 	// remove it from the tmap list
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&tmap_list_lock);
 
 	entry = tmap_list;
@@ -159,7 +158,7 @@ static void destroy_tmap(vm_translation_map *map)
 	}
 
 	release_spinlock(&tmap_list_lock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 
 	if(map->arch_data->pgdir_virt != NULL) {
@@ -412,7 +411,7 @@ static void flush_tmap(vm_translation_map *map)
 	if(map->arch_data->num_invalidate_pages <= 0)
 		return;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	if(map->arch_data->num_invalidate_pages > PAGE_INVALIDATE_CACHE_SIZE) {
 		// invalidate all pages
 //		dprintf("flush_tmap: %d pages to invalidate, doing global invalidation\n", map->arch_data->num_invalidate_pages);
@@ -425,7 +424,7 @@ static void flush_tmap(vm_translation_map *map)
 			map->arch_data->num_invalidate_pages, 0, NULL, SMP_MSG_FLAG_SYNC);
 	}
 	map->arch_data->num_invalidate_pages = 0;
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 }
 
 static int map_iospace_chunk(addr va, addr pa)
@@ -450,11 +449,11 @@ static int map_iospace_chunk(addr va, addr pa)
 		pt[i].present = 1;
 	}
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	arch_cpu_invalidate_TLB_range(va, va + (IOSPACE_CHUNK_SIZE - PAGE_SIZE));
 	smp_send_broadcast_ici(SMP_MSG_INVL_PAGE_RANGE, va, va + (IOSPACE_CHUNK_SIZE - PAGE_SIZE), 0,
 		NULL, SMP_MSG_FLAG_SYNC);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return 0;
 }
@@ -613,7 +612,7 @@ dprintf("vm_translation_map_create\n");
 
 	// insert this new map into the map list
 	{
-		int state = int_disable_interrupts();
+		int state = disable_interrupts();
 		acquire_spinlock(&tmap_list_lock);
 
 		// copy the top portion of the pgdir from the current one
@@ -624,7 +623,7 @@ dprintf("vm_translation_map_create\n");
 		tmap_list = new_map;
 
 		release_spinlock(&tmap_list_lock);
-		int_restore_interrupts(state);
+		restore_interrupts(state);
 	}
 
 	return 0;

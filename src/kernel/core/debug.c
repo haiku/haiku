@@ -198,7 +198,7 @@ static void kernel_debugger_loop()
 	int argc;
 	struct debugger_command *cmd;
 
-	int_disable_interrupts();
+	disable_interrupts();
 
 	dprintf("kernel debugger on cpu %d\n", smp_get_current_cpu());
 	debugger_on_cpu = smp_get_current_cpu();
@@ -248,7 +248,7 @@ int panic(const char *fmt, ...)
 
 	dbg_set_serial_debug(true);
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 
 	va_start(args, fmt);
 	ret = vsprintf(temp, fmt, args);
@@ -266,7 +266,7 @@ int panic(const char *fmt, ...)
 
 	kernel_debugger(NULL);
 
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 	return ret;
 }
 
@@ -289,7 +289,7 @@ int dprintf(const char *fmt, ...)
 char dbg_putch(char c)
 {
 	char ret;
-	int flags = int_disable_interrupts();
+	int flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	if(serial_debug_on)
@@ -298,21 +298,21 @@ char dbg_putch(char c)
 		ret = c;
 
 	release_spinlock(&dbg_spinlock);
-	int_restore_interrupts(flags);
+	restore_interrupts(flags);
 
 	return ret;
 }
 
 void dbg_puts(const char *s)
 {
-	int flags = int_disable_interrupts();
+	int flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	if(serial_debug_on)
 		arch_dbg_con_puts(s);
 
 	release_spinlock(&dbg_spinlock);
-	int_restore_interrupts(flags);
+	restore_interrupts(flags);
 }
 
 int add_debugger_command(const char * name, int (*func)(int, char **), const char * desc)
@@ -328,14 +328,14 @@ int add_debugger_command(const char * name, int (*func)(int, char **), const cha
 	cmd->name = name;
 	cmd->description = desc;
 
-	flags = int_disable_interrupts();
+	flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	cmd->next = commands;
 	commands = cmd;
 
 	release_spinlock(&dbg_spinlock);
-	int_restore_interrupts(flags);
+	restore_interrupts(flags);
 
 	return B_NO_ERROR;
 }
@@ -346,7 +346,7 @@ int remove_debugger_command(const char * name, int (*func)(int, char **))
 	struct debugger_command *cmd;
 	struct debugger_command *prev;
 
-	flags = int_disable_interrupts();
+	flags = disable_interrupts();
 	acquire_spinlock(&dbg_spinlock);
 
 	prev = NULL;
@@ -367,7 +367,7 @@ int remove_debugger_command(const char * name, int (*func)(int, char **))
 	};  
 
 	release_spinlock(&dbg_spinlock);
-	int_restore_interrupts(flags);
+	restore_interrupts(flags);
 
 	if (cmd) {
 		kfree(cmd);

@@ -53,7 +53,7 @@ static void *_cbuf_alloc(size_t *size)
 
 //	dprintf("cbuf_alloc: asked to allocate size %d\n", *size);
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&cbuf_lowlevel_spinlock);
 
 	// scan through the allocation bitmap, looking for the first free block
@@ -85,7 +85,7 @@ static void *_cbuf_alloc(size_t *size)
 	}
 
 	release_spinlock(&cbuf_lowlevel_spinlock);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	return buf;
 }
@@ -162,14 +162,14 @@ void cbuf_free_chain_noblock(cbuf *buf)
 	head = buf;
 	_clear_chain(head, &last);
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&noblock_spin);
 
 	last->next = cbuf_free_noblock_list;
 	cbuf_free_noblock_list = head;
 
 	release_spinlock(&noblock_spin);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 }
 
 void cbuf_free_chain(cbuf *buf)
@@ -246,14 +246,14 @@ cbuf *cbuf_get_chain_noblock(size_t len)
 	size_t chain_len = 0;
 	int state;
 
-	state = int_disable_interrupts();
+	state = disable_interrupts();
 	acquire_spinlock(&noblock_spin);
 
 	while(chain_len < len) {
 		if(cbuf_free_noblock_list == NULL) {
 			dprintf("cbuf_get_chain_noblock: not enough cbufs\n");
 			release_spinlock(&noblock_spin);
-			int_restore_interrupts(state);
+			restore_interrupts(state);
 
 			if(chain != NULL)
 				cbuf_free_chain_noblock(chain);
@@ -271,7 +271,7 @@ cbuf *cbuf_get_chain_noblock(size_t len)
 		chain_len += chain->len;
 	}
 	release_spinlock(&noblock_spin);
-	int_restore_interrupts(state);
+	restore_interrupts(state);
 
 	// now we have a chain, fixup the first and last entry
 	chain->total_len = len;
