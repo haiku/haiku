@@ -14,31 +14,35 @@
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   02111-1307 USA.
+*/
 
-#include <stdio.h>
+
+#include <stdio_private.h>
 #include <string.h>
 
-/* Generate a unique temporary filename using up to five characters of PFX
-   if it is not NULL.  The directory to put this file in is searched for
-   as follows: First the environment variable "TMPDIR" is checked.
-   If it contains the name of a writable directory, that directory is used.
-   If not and if DIR is not NULL, that value is checked.  If that fails,
-   P_tmpdir is tried and finally "/tmp".  The storage for the filename
-   is allocated by `malloc'.  */
+
+/**	Generate a unique temporary filename using up to five characters of PFX
+ *	if it is not NULL.  The directory to put this file in is searched for
+ *	as follows: First the environment variable "TMPDIR" is checked.
+ *	If it contains the name of a writable directory, that directory is used.
+ *	If not and if DIR is not NULL, that value is checked.  If that fails,
+ *	P_tmpdir is tried and finally "/tmp".  The storage for the filename
+ *	is allocated by `malloc'.
+ */
+
 char *
-tempnam (const char *dir, const char *pfx)
+tempnam(const char *dir, const char *prefix)
 {
-  char buf[FILENAME_MAX];
+	char buffer[NAME_MAX];
 
-  if (__path_search (buf, FILENAME_MAX, dir, pfx, 1))
-    return NULL;
+	if (__path_search(buffer, NAME_MAX, dir, prefix, 1))
+		return NULL;
 
-  if (__gen_tempname (buf, __GT_NOCREATE))
-    return NULL;
+	if (__gen_tempname(buffer, __GT_NOCREATE))
+		return NULL;
 
-  return __strdup (buf);
+	return strdup(buffer);
 }
 
-link_warning (tempnam,
-	      "the use of `tempnam' is dangerous, better use `mkstemp'")
+//link_warning(tempnam, "the use of `tempnam' is dangerous, better use `mkstemp'")

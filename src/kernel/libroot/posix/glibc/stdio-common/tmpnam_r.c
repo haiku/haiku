@@ -14,25 +14,29 @@
    You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, write to the Free
    Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
-   02111-1307 USA.  */
+   02111-1307 USA.
+*/
 
-#include <stdio.h>
 
-/* Generate a unique filename in P_tmpdir.  If S is NULL return NULL.
-   This makes this function thread safe.  */
+#include <stdio_private.h>
+
+
+/** Generate a unique filename in P_tmpdir.  If S is NULL return NULL.
+ *	This makes this function thread safe.
+ */
+
 char *
-tmpnam_r (char *s)
+tmpnam_r(char *s)
 {
-  if (s == NULL)
-    return NULL;
+	if (s == NULL)
+		return NULL;
 
-  if (__path_search (s, L_tmpnam, NULL, NULL, 0))
-    return NULL;
-  if (__gen_tempname (s, __GT_NOCREATE))
-    return NULL;
+	if (__path_search(s, L_tmpnam, NULL, NULL, 0))
+		return NULL;
+	if (__gen_tempname(s, __GT_NOCREATE))
+		return NULL;
 
-  return s;
+	return s;
 }
 
-link_warning (tmpnam_r,
-	      "the use of `tmpnam_r' is dangerous, better use `mkstemp'")
+//link_warning (tmpnam_r, "the use of `tmpnam_r' is dangerous, better use `mkstemp'")
