@@ -56,7 +56,7 @@ typedef struct _echo_stream {
 	struct _echo_dev 	*card;
 	uint8        		use;
 	uint8        		state;
-	uint8        		b16;
+	uint8        		bitsPerSample;
 	uint32       		sample_rate;
 	uint8				channels;
 	uint32 				bufframes;
@@ -121,7 +121,7 @@ extern "C" {
 #endif
 
 status_t echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
-			     uint8 b16, uint32 sample_rate);
+			     uint8 bitsPerSample, uint32 sample_rate);
 status_t echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf, 
 					char** buffer, size_t *stride);
 void echo_stream_start(echo_stream *stream, void (*inth) (void *), void *inthparam);

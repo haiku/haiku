@@ -601,8 +601,8 @@ echo_open(const char *name, uint32 flags, void** cookie)
 		
 	LOG(("stream_setaudio\n"));
 	
-	echo_stream_set_audioparms(card->pstream, 2, true, 48000);
-	echo_stream_set_audioparms(card->rstream, 2, true, 48000);
+	echo_stream_set_audioparms(card->pstream, 2, 16, 48000);
+	echo_stream_set_audioparms(card->rstream, 2, 16, 48000);
 		
 	card->pstream->first_channel = 0;
 	card->rstream->first_channel = 2;

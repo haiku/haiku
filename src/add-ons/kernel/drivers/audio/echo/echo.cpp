@@ -124,7 +124,7 @@ extern char *      pStatusStrs[ECHOSTATUS_LAST];
 
 status_t
 echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
-     uint8 b16, uint32 sample_rate)
+     uint8 bitsPerSample, uint32 sample_rate)
 {
 	int32 			i;
 	uint8 			sample_size, frame_size;
@@ -146,7 +146,8 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	open_params.bIsCyclic = TRUE;
 	open_params.Pipe.nPipe = 0;
 	open_params.Pipe.bIsInput = stream->use == ECHO_USE_RECORD ? TRUE : FALSE;
-	open_params.Pipe.wInterleave = stream->channels;
+	open_params.Pipe.wInterleave = channels;
+	open_params.ProcessId = NULL;
 	
 	status = stream->card->pEG->OpenAudio(&open_params, &stream->pipe);
 	if(status!=ECHOSTATUS_OK) {
@@ -155,6 +156,7 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		return B_ERROR;
 	}
 
+	PRINT(("VerifyAudioOpen\n"));
 	status = stream->card->pEG->VerifyAudioOpen(stream->pipe);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : VerifyAudioOpen failed\n"));
@@ -163,11 +165,11 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	}
 	
 	if ((stream->channels == channels) &&
-		(stream->b16 == b16) && 
+		(stream->bitsPerSample == bitsPerSample) && 
 		(stream->sample_rate == sample_rate))
 		return B_OK;
 
-	format_params.wBitsPerSample = b16 == 0 ? 8 : 16;
+	format_params.wBitsPerSample = bitsPerSample;
 	format_params.byDataAreBigEndian = 0;
 	format_params.byMonoToStereo = 0;
 	format_params.wDataInterleave = channels == 1 ? 1 : 2;
@@ -175,6 +177,13 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	status = stream->card->pEG->QueryAudioFormat(stream->pipe, &format_params);
 	if(status!=ECHOSTATUS_OK) {
 		PRINT(("echo_stream_set_audioparms : bad format when querying\n"));
+		PRINT(("  status: %s \n", pStatusStrs[status]));
+		return B_ERROR;
+	}
+	
+	status = stream->card->pEG->SetAudioFormat(stream->pipe, &format_params);
+	if(status!=ECHOSTATUS_OK) {
+		PRINT(("echo_stream_set_audioparms : bad format when setting\n"));
 		PRINT(("  status: %s \n", pStatusStrs[status]));
 		return B_ERROR;
 	}
@@ -187,13 +196,6 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 		return B_ERROR;
 	}
 		
-	status = stream->card->pEG->SetAudioFormat(stream->pipe, &format_params);
-	if(status!=ECHOSTATUS_OK) {
-		PRINT(("echo_stream_set_audioparms : bad format when setting\n"));
-		PRINT(("  status: %s \n", pStatusStrs[status]));
-		return B_ERROR;
-	}
-	
 	/* XXXX : setting sample rate is global in this driver */
 	status = stream->card->pEG->SetAudioSampleRate(sample_rate);
 	if(status!=ECHOSTATUS_OK) {
@@ -205,11 +207,11 @@ echo_stream_set_audioparms(echo_stream *stream, uint8 channels,
 	if(stream->buffer)
 		echo_mem_free(stream->card, stream->buffer->log_base);
 		
-	stream->b16 = b16;
+	stream->bitsPerSample = bitsPerSample;
 	stream->sample_rate = sample_rate;
 	stream->channels = channels;
 	
-	sample_size = stream->b16 + 1;
+	sample_size = stream->bitsPerSample / 8;
 	frame_size = sample_size * stream->channels;
 	
 	stream->buffer = echo_mem_alloc(stream->card, stream->bufframes * frame_size * stream->bufcount);
@@ -249,7 +251,7 @@ echo_stream_get_nth_buffer(echo_stream *stream, uint8 chan, uint8 buf,
 	uint8 			sample_size, frame_size;
 	LOG(("echo_stream_get_nth_buffer\n"));
 	
-	sample_size = stream->b16 + 1;
+	sample_size = stream->bitsPerSample / 8;
 	frame_size = sample_size * stream->channels;
 	
 	*buffer = (char*)stream->buffer->log_base + (buf * stream->bufframes * frame_size)
@@ -309,7 +311,7 @@ echo_stream_new(echo_dev *card, uint8 use, uint32 bufframes, uint8 bufcount)
 	stream->card = card;
 	stream->use = use;
 	stream->state = !ECHO_STATE_STARTED;
-	stream->b16 = 0;
+	stream->bitsPerSample = 0;
 	stream->sample_rate = 0;
 	stream->channels = 0;
 	stream->bufframes = bufframes;
