@@ -1,0 +1,17 @@
+SubDir OBOS_TOP src add-ons kernel drivers input hid ;
+
+UsePrivateHeaders input ;
+
+R5KernelAddon hid : kernel drivers bin :
+	hid.c
+	hidparse.c
+	devlist.c
+;
+
+# Link to kernel/drivers/dev/input/
+{
+	local dir = [ FDirName $(OBOS_ADDON_DIR) kernel drivers dev input ] ;
+	local instDriver = <kernel!drivers!dev!input>hid ;
+	MakeLocate $(instDriver) : $(dir) ;
+	RelSymLink $(instDriver) : hid ;
+}
