@@ -36,6 +36,7 @@ else
 	imagePath=$1
 fi
 imageSize=40
+#imageSize=80
 # ufs_mount path
 ufsMount=ufs_mount
 
@@ -64,7 +65,8 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	isvolume shutdown safemode sysinfo kill diff cmp more \
 	renice rmattr addattr listdev pwd chmod chown chgrp dd \
 	tee md5sum catattr query lsindex mkindex roster listimage \
-	quit open translate setvolume waitfor uname iroster keymap"
+	quit open translate setvolume waitfor uname iroster keymap \
+	strace"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so"
