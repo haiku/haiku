@@ -42,6 +42,7 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom);
+static void	setup_ram_config_nv28(uint8* rom);
 static status_t translate_ISA_PCI(uint32* reg);
 static status_t	nv_crtc_setup_fifo(void);
 
@@ -882,8 +883,9 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	return exec_type2_script_mode(rom, &adress, size, tabs, ram_tab, &exec);
 }
 
-/* this routine is used for NV10 and later. It's tested on a GeForce2 MX400 (NV11) and
- * a GeForceFX 5200 (NV34). Both cards coldstart perfectly. */
+/* this routine is used for NV10 and later. It's tested on a GeForce2 MX400 (NV11),
+ * GeForce4 MX440 (NV18) and a GeForceFX 5200 (NV34).
+ * These cards coldstart perfectly. */
 static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, PinsTables tabs, uint16 ram_tab, bool* exec)
 {
 	status_t result = B_OK;
@@ -1215,7 +1217,15 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			*adress += 1;
 			LOG(8,("cmd 'setup RAM config' (always done)\n"));
 			/* always done */
-			setup_ram_config_nv10_up(rom);
+			switch (si->ps.card_type)
+			{
+			case NV28:
+				setup_ram_config_nv28(rom);
+				break;
+			default:
+				setup_ram_config_nv10_up(rom);
+				break;
+			}
 			break;
 		case 0x65: /* identical to type1 */
 			*size -= 13;
@@ -1611,7 +1621,6 @@ static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* ex
 	}
 }
 
-//fixme: it looks like NV28 (at least) needs a different setup version!
 static void	setup_ram_config_nv10_up(uint8* rom)
 {
 	uint32 data, dummy;
@@ -1692,6 +1701,49 @@ static void	setup_ram_config_nv10_up(uint8* rom)
 	{
 		LOG(8,("INFO: ---RAM test #2 done: access is OK.\n"));
 	}
+}
+
+/* Note: this routine assumes at least 128Mb was mapped to memory (kerneldriver).
+ * It doesn't matter if the card actually _has_ this amount of RAM or not(!) */
+static void	setup_ram_config_nv28(uint8* rom)
+{
+	uint32 dummy;
+	uint8 cnt = 0;
+	status_t stat = B_ERROR;
+
+	/* set 'refctrl is valid' */
+	NV_REG32(NV32_PFB_REFCTRL) = 0x80000000;
+
+	/* check RAM */
+	while ((cnt < 4) && (stat != B_OK))
+	{
+		/* set bit 11: 'pulse' something into a new setting? */
+		NV_REG32(NV32_PFB_CONFIG_0) |= 0x00000800;
+		/* write testpattern to RAM adress 127Mb */
+		((uint32 *)si->framebuffer)[0x01fc0000] = 0x4e564441;
+		/* reset first RAM adress */
+		((uint32 *)si->framebuffer)[0x00000000] = 0x00000000;
+		/* dummyread first RAM adress four times */
+		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		LOG(8,("INFO: (#%d) dummy1 = $%08x, ", cnt, dummy));
+		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		LOG(8,("dummy2 = $%08x, ", dummy));
+		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		LOG(8,("dummy3 = $%08x, ", dummy));
+		dummy = ((uint32 *)si->framebuffer)[0x00000000];
+		LOG(8,("dummy4 = $%08x\n", dummy));
+		/* check testpattern to have survived */
+		if (((uint32 *)si->framebuffer)[0x01fc0000] == 0x4e564441) stat = B_OK;
+		cnt++;
+	}
+
+	/* clear bit 11: set normal mode */
+	NV_REG32(NV32_PFB_CONFIG_0) &= ~0x00000800;
+
+	if (stat == B_OK)
+		LOG(8,("INFO: ---RAM test done: access was OK within %d iteration(s).\n", cnt));
+	else
+		LOG(8,("INFO: ---RAM test done: access was still not OK after 4 iterations.\n"));
 }
 
 static status_t translate_ISA_PCI(uint32* reg)
