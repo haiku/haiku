@@ -26,6 +26,7 @@ static void usage(char *prog)
 "	-l  # load key map from standard input\n"
 "	-r  # restore system default key map\n"
 "	-c  # compile source keymap to binary\n"
+"	-h  # compile source keymap to header\n"
 "	-o  # change output file to output_file (default:keymap.out)\n"
 		, prog);
 }
@@ -70,7 +71,15 @@ int main(int argc, char **argv)
 				
 				keymap.Save(output_ref);
 				return 0;
-			} else 
+			} else if (operation == 'h') {
+                                entry_ref ref;
+                                get_ref_for_path(argv[i], &ref);
+                                Keymap keymap;
+                                keymap.LoadSourceFromRef(ref);
+
+                                keymap.SaveAsHeader(output_ref);
+                                return 0;
+                        } else 
 				break;
 		}
 	}

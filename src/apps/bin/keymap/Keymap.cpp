@@ -693,6 +693,30 @@ Keymap::Save(entry_ref &ref)
 }
 
 
+const char header_header[] =
+"/*\tHaiku \t*/"
+"/*\n"
+" This file is generated automatically. Don't edit ! \n"
+"*/\n";
+
+
+
+void
+Keymap::SaveAsHeader(entry_ref &ref)
+{
+	status_t err;
+
+	BFile file(&ref, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE );
+        if ((err = file.InitCheck()) != B_OK) {
+                printf("error %s\n", strerror(err));
+                return;
+        }
+
+	file.Write(header_header, strlen(header_header));
+
+}
+
+
 /* we need to know if a key is a modifier key to choose 
 	a valid key when several are pressed together
 */
