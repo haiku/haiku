@@ -44,7 +44,7 @@
 #include <fcntl.h>
 
 #ifndef TRACE_VFS
-#	define TRACE_VFS 1
+#	define TRACE_VFS 0
 #endif
 #if TRACE_VFS
 #	define PRINT(x) dprintf x
