@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H
 #define KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H
@@ -15,10 +15,10 @@
 #define MAX_PHYSICAL_ALLOCATED_RANGE 4
 #define MAX_VIRTUAL_ALLOCATED_RANGE 4
 
+#define MAX_SERIAL_PORTS 4
 
 typedef struct {
-	int32	_dummy;
-		// structure sizes differ if this would be empty (kernel vs. boot loader)
+	uint16	serial_base_ports[MAX_SERIAL_PORTS];
 } platform_kernel_args;
 
 #endif	/* KERNEL_BOOT_PLATFORM_BIOS_IA32_KERNEL_ARGS_H */
