@@ -1,0 +1,89 @@
+<html>
+<head>
+	<meta http-equiv="Content-Type"	content="text/html; charset=iso-8859-1">
+	<meta name="GENERATOR" content="The DarkSite">
+	<title>Readme for the AGP busmanager module</title>
+</head>
+<body>
+<h2 align="center">AGP busmanager module</h2></align><br><br>
+<hr>
+<h3><strong>NOTE PLEASE:</strong><br>
+You use this software at your own risk! Although I don't expect it to damage your PC, videocard or Monitor, I cannot guarantee this!</h3>
+<hr>
+<h2>Supported devices:</h2>
+<ul>
+	<li>all 'PCI-class' host bridges with AGP interface;
+	<li>all 'PCI-class' graphics cards with AGP interface.
+</ul>
+<br>
+<hr>
+<h2>Features:</h2>
+<ul>
+	<li>Can enable AGP transfers including SBA (sideband adressing);
+	<li>Sets up AGP maximum request depth.
+	<li>Can enable PCI FW (fastwrites);
+</ul>
+<strong>Known limitations:</strong> 
+<ul>
+	<li>No GART and AGP aperture support (yet);
+	<li>No AGP3.0 specific feature support (yet), such as 'asynchronous request size', 'calibration cycle' and 'isochronous transfers'. The registers and register-fields for these features are currently programmed to default 'safe' modes or disabled on power-up.
+</ul>
+<br>
+<hr>
+<h2>Installation:</h2>
+This module will install in the user part of the BeOS, so not in the system part where the official modules are.<br>
+BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own add-ons (if any). You can select if this module should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will not load it or other 'user-addons'. If you don't do anything, the system will load the AGP busmanager module if requested by a driver.<br>
+<br>
+<strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the module, or if you are 'tweaking' the agp.settings file...<br>
+<br><br>
+<strong>actual INSTALLATION:</strong><br>
+<br>
+Doubleclick on the install.sh file and follow the instructions. You have to reboot in order to use the AGP busmanager module. Make sure you read the <strong>Settings</strong> information below before you do that...<br>
+<br>
+<br>
+<strong>alternate INSTALLATION method:</strong><br>
+<br>
+Unzip the zip file that contains the module to the root folder. Now reboot and you should be using it if requested by a driver.<br>
+<br>
+<br>
+<strong>DE-INSTALLATION:</strong><br>
+<br>
+Currently there's no uninstall script included. Just do it manually:<br>
+<br>
+Delete the <strong>agp</strong> file in <strong>home/config/add-ons/kernel/bus_managers/</strong><br>
+Delete the <strong>agp.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
+<br>
+You have to reboot in order to apply the original configuration.<br>
+<br>
+<br>
+<hr>
+<a name="settings"></a><h2>Settings:</h2><br>
+Please read this information carefully *before* installing and using the AGP busmanager module. It might spare you some trouble afterwards..<br>
+<p>The module uses a file named <strong>agp.settings</strong> to determine how to setup your AGP bus(es). After installation this file will be located at <strong>home/config/settings/kernel/drivers/</strong>. You shouldn't touch this file unless your system becomes unstable with the AGP mode active. It has a default configuration for maximum effect, but you might have to scale back a little if your system gives trouble... Anyway, read the nifty details below.<br>
+<br>
+<strong>Note:</strong> The module only reads this file during it's initialisation. This means that you have to reboot in order to let changes take effect.<br>
+<strong>Note also:</strong> A graphicsdriver may or may not further reduce the mode that gets setup by the AGP busmanager. See the graphicsdriver documentation for more info on this.<br>
+<br>
+<br>
+<br>
+<strong>agp.settings module configuration:</strong><br>
+<ul>
+	<li><strong>max_speed:</strong> (disabled by default)<br>
+		This option enables you to set a maximum speed that may be setup by the module, instead of the maximum your system reports being capable of. Valid values are 1,2,4 and 8. If a value makes no sense (because the settings file contains an illegal value, or the hardware uses a speed-scheme that's not capable of setting a specific requested max. speed) the module will take the next logical lower one: PCI mode being the lowest speed setting (which is what you were using before you installed this module).<br>
+This option is disabled by default (preceded by a '#').<br>
+<li><strong>block_agp:</strong> (set to 'false' by default)<br>
+		If set to 'true' this option blocks use of AGP transfers entirely including PCI fastwrites: so fallback to standard 'old-fashioned' PCI mode.
+<li><strong>block_sba:</strong> (set to 'false' by default)<br>
+		If set to 'true' this option blocks use of sideband adressing. Sideband adressing speeds up AGP transfers a bit because it's a seperate (low-speed) communications 'channel' that's used alongside the main transfer channel concurrently. So this enables 'full-duplex' communications, while disabling SBA forces the hardware to use 'half-duplex' communications.
+<li><strong>block_fw:</strong> (set to 'false' by default)<br>
+		If set to 'true' this option blocks use of PCI fastwrites. PCI fastwrites work in the same speed AGP transfers work. This means PCI fastwrites are faster in AGP4x mode than they are in AGP2x mode (for instance). PCI fastwrites are used whenever the system initializes transfers to or from the graphicscard, while 'standard PCI' or AGP transfers are used if the graphicscard's acceleration engine initializes transfers to or from the system.<br>
+This means that PCI FW is the only AGP 'feature' that has an effect on the graphics speed on BeOS as it is currently. The use of AGP transfers require graphicsdriver support, and these type of transfers are 'officially' targeted specific for hardware accelerated 3D (which we do not yet have).<br>
+<strong>Note:</strong><br>
+PCI FW support was first introduced with the AGP2.0 specification: that is, devices that support upto and including AGP4X mode are candidates to have this feature.
+</ul>
+<hr>
+<br>
+<a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
+<p>(Page last updated on July 17, 2004)</p>
+</body>
+</html>
