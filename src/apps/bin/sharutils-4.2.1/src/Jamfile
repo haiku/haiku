@@ -5,13 +5,21 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) lib ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 
 BinCommand shar : 
-  	shar.c encode.c : root libsharutils.a ;
+  	shar.c encode.c 
+  	: libsharutils.a
+  	: sharutils.rdef ;
 
 BinCommand unshar : 
-  	unshar.c : root libsharutils.a ;
+  	unshar.c 
+  	: libsharutils.a
+  	: sharutils.rdef ;
 
 BinCommand uuencode : 
-  	uuencode.c : root libsharutils.a ;
+  	uuencode.c 
+  	: libsharutils.a 
+  	: sharutils.rdef ;
 
 BinCommand uudecode : 
-  	uudecode.c : root libsharutils.a ;
+  	uudecode.c 
+  	: libsharutils.a 
+  	: sharutils.rdef ;
