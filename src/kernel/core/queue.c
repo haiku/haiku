@@ -7,7 +7,7 @@
 #include <kernel.h>
 #include <queue.h>
 #include <memheap.h>
-#include <Errors.h>
+#include <errno.h>
 
 typedef struct queue_element {
 	void *next;
@@ -96,17 +96,17 @@ void *queue_peek(queue *q)
 int fixed_queue_init(fixed_queue *q, int size)
 {
 	if(size <= 0)
-		return ERR_INVALID_ARGS;
+		return EINVAL;
 
 	q->table = kmalloc(size * sizeof(void *));
 	if(!q->table)
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 	q->head = 0;
 	q->tail = 0;
 	q->count = 0;
 	q->size = size;
 
-	return B_NO_ERROR;
+	return 0;
 }
 
 void fixed_queue_destroy(fixed_queue *q)
@@ -118,13 +118,13 @@ void fixed_queue_destroy(fixed_queue *q)
 int fixed_queue_enqueue(fixed_queue *q, void *e)
 {
 	if(q->count == q->size)
-		return ERR_NO_MEMORY;
+		return ENOMEM;
 
 	q->table[q->head++] = e;
 	if(q->head >= q->size) q->head = 0;
 	q->count++;
 
-	return B_NO_ERROR;
+	return 0;
 }
 
 void *fixed_queue_dequeue(fixed_queue *q)

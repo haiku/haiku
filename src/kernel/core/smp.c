@@ -455,7 +455,7 @@ int smp_init(kernel_args *ka)
 			msg = (struct smp_msg *)kmalloc(sizeof(struct smp_msg));
 			if(msg == NULL) {
 				panic("error creating smp mailboxes\n");
-				return ERR_GENERAL;
+				return B_ERROR;
 			}
 			memset(msg, 0, sizeof(struct smp_msg));
 			msg->next = free_msgs;
