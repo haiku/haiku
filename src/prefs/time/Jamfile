@@ -1,0 +1,7 @@
+SubDir OBOS_TOP src prefs time ;
+
+AddResources Time : Time.rsrc ;
+
+Preference Time : Time.cpp TimeSettings.cpp TimeView.cpp TimeWindow.cpp ;
+
+LinkSharedOSLibs Time : be root ;
