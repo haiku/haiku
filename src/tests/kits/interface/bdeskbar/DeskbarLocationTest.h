@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarLocationTest.h,v 1.1 2002/09/13 03:51:09 jrand Exp $
+	$Id: DeskbarLocationTest.h,v 1.2 2002/09/28 07:27:00 shatty Exp $
 	
 	This file defines a class for performing a test of BDeskbar
 	functionality.

@@ -1,5 +1,5 @@
 /*
-	$Id: DeskbarGetItemTest.cpp,v 1.3 2002/09/25 03:24:17 jrand Exp $
+	$Id: DeskbarGetItemTest.cpp,v 1.4 2002/09/28 07:27:00 shatty Exp $
 	
 	This file implements tests for the following use cases of BDeskbar:
 	  - Count Items

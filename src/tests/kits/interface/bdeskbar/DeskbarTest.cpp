@@ -13,10 +13,3 @@ Test *DeskbarTestSuite()
 	
 	return(testSuite);
 }
-
-
-
-
-
-
-
