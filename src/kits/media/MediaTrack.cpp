@@ -130,6 +130,8 @@ BMediaTrack::ReadFrames(void *out_buffer,
 	media_header temp_header;
 	if (!mh)
 		mh = &temp_header;
+	else
+		memset(mh, 0, sizeof(*mh)); // clear it first, as the decoder doesn't set all fields
 	
 	result = fDecoder->Decode(out_buffer, out_frameCount, mh, info);
 	if (result == B_OK) {
