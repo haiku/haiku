@@ -19,6 +19,7 @@ KernelMergeObject posix_unistd.o :
 	<$(SOURCE_GRIST)>process.c
 	<$(SOURCE_GRIST)>read.c
 	<$(SOURCE_GRIST)>sleep.c
+	<$(SOURCE_GRIST)>sync.c
 	<$(SOURCE_GRIST)>terminal.c
 	<$(SOURCE_GRIST)>truncate.c
 	<$(SOURCE_GRIST)>ttyname.c
