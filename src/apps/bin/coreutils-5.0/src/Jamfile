@@ -1,0 +1,113 @@
+SubDir OBOS_TOP src apps bin coreutils-5.0 src ;
+
+SubDirCcFlags -DHAVE_CONFIG_H  -DLOCALEDIR=\'\"/share/locale\"\' ;
+
+StdBinCommands
+	basename.c
+	cat.c
+	chmod.c
+	cksum.c
+	comm.c
+	csplit.c
+	cut.c
+	date.c
+	dd.c
+	dircolors.c
+	dirname.c
+	du.c
+	echo.c 
+	env.c
+	expand.c
+	expr.c
+	factor.c
+	false.c
+	fmt.c
+	fold.c
+	head.c
+	hostname.c
+	id.c
+	join.c
+	kill.c
+	link.c
+	ln.c
+	logname.c
+	mkdir.c
+	mkfifo.c
+	mknod.c
+	nl.c
+	od.c
+	paste.c
+	pathchk.c
+	pr.c
+	printenv.c
+	printf.c
+	ptx.c
+	pwd.c
+	readlink.c
+	rmdir.c
+	seq.c
+	shred.c
+	sleep.c
+	sort.c
+	split.c
+	stty.c
+	su.c
+	sum.c
+	sync.c
+	tac.c
+	tail.c
+	tee.c
+	test.c
+	touch.c
+	tr.c
+	true.c
+	tsort.c
+	tty.c
+	uname.c
+	unexpand.c
+	uniq.c
+	unlink.c
+	wc.c
+	whoami.c
+	yes.c
+	: root libfetish.a ;
+
+# stat.c
+# chroot.c
+# df.c
+# hostid.c
+# nice.c
+# pinky.c
+# uptime.c
+# users.c
+# who.c
+
+
+BinCommand ls : 
+	ls.c ls-dir.c : root libfetish.a ;
+
+BinCommand rm : 
+	rm.c remove.c : root libfetish.a ;
+
+BinCommand chgroup : 
+	chgrp.c chown-core.c : root libfetish.a ;
+
+BinCommand chmod : 
+	chmod.c chown-core.c : root libfetish.a ;
+
+BinCommand cp : 
+	cp.c copy.c cp-hash.c : root libfetish.a ;
+
+BinCommand md5sum : 
+	md5sum.c md5.c : root libfetish.a ;
+
+BinCommand mv : 
+	mv.c copy.c cp-hash.c remove.c : root libfetish.a ;
+
+BinCommand sha1sum : 
+	md5sum.c sha1sum.c : root libfetish.a ;
+
+BinCommand vdir : 
+	ls.c ls-vdir.c : root libfetish.a ;
+
+

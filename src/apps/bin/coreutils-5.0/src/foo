@@ -1,0 +1,18991 @@
+# 1 "ls.c"
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+# 1 "../lib/config.h" 1
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+# 43 "ls.c" 2
+
+# 1 "../../../../../headers/posix/sys/types.h" 1
+ 
+
+
+
+
+
+ 
+typedef unsigned long 		u_long;
+typedef unsigned int 		u_int;
+typedef unsigned short 		u_short;
+typedef unsigned char 		u_char;
+
+
+ 
+
+  typedef unsigned long 	ulong;
+  typedef unsigned short 	ushort;
+  typedef unsigned int 		uint;
+
+typedef unsigned char		unchar;
+
+
+typedef long long 			blkcnt_t;
+typedef int 				blksize_t;
+typedef long long 			fsblkcnt_t;
+typedef long long			fsfilcnt_t;
+typedef long long           off_t;
+typedef long long           ino_t;
+typedef int                 cnt_t;
+typedef long                dev_t;
+typedef long		        pid_t;
+
+typedef unsigned int 		uid_t;
+typedef unsigned int 		gid_t;
+typedef unsigned int        mode_t;
+typedef unsigned int 		umode_t;
+typedef int                 nlink_t;
+
+typedef int          		daddr_t;
+typedef char *				caddr_t;
+
+
+# 1 "../../../../../headers/posix/null.h" 1
+ 
+
+
+
+
+
+
+
+
+
+	
+
+
+
+# 43 "../../../../../headers/posix/sys/types.h" 2
+
+# 1 "../../../../../headers/posix/size_t.h" 1
+
+
+
+ 
+
+
+
+
+
+
+
+
+typedef unsigned long       size_t;
+typedef signed long         ssize_t;
+
+
+
+
+
+
+# 44 "../../../../../headers/posix/sys/types.h" 2
+
+# 1 "../../../../../headers/posix/time.h" 1
+
+
+ 
+
+
+
+
+# 1 "../../../../../headers/posix/sys/types.h" 1
+ 
+
+
+# 47 "../../../../../headers/posix/sys/types.h"
+
+# 8 "../../../../../headers/posix/time.h" 2
+
+
+
+typedef long clock_t;
+typedef long time_t;
+typedef long suseconds_t;
+typedef long useconds_t;
+
+
+
+
+
+	 
+
+struct timespec {
+	time_t	tv_sec;		 
+	long	tv_nsec;	 
+};
+
+struct itimerspec {
+	struct timespec it_interval;
+	struct timespec it_value;
+};
+
+struct tm {
+	int	tm_sec;
+	int	tm_min;
+	int	tm_hour;
+	int	tm_mday;	 
+	int	tm_mon;		 
+	int	tm_year;	 
+	int	tm_wday;	 
+	int	tm_yday;	 
+	int	tm_isdst;	 
+	int tm_gmtoff;	 
+	char *tm_zone;	 
+};
+
+
+ 
+extern char *tzname[2];
+extern int 	daylight;
+extern long	timezone;
+
+
+
+
+
+
+extern clock_t		clock(void);
+extern double		difftime(time_t time1, time_t time2);
+extern time_t		rpl_mktime (struct tm *tm);
+extern time_t		time(time_t *timer);
+extern char			*asctime(const struct tm *tm);
+extern char			*asctime_r(const struct tm *timep, char *buffer);
+extern char			*ctime(const time_t *timer);
+extern char			*ctime_r(const time_t *timer, char *buffer);
+extern struct tm	*gmtime(const time_t *timer);
+extern struct tm	*gmtime_r(const time_t *timer, struct tm *tm); 
+extern struct tm	*localtime(const time_t *timer);
+extern struct tm	*localtime_r(const time_t *timer, struct tm *tm);
+extern size_t		strftime(char *buffer, size_t maxSize, const char *format,
+						const struct tm *tm);
+
+ 
+extern void tzset(void);
+extern int	stime(const time_t *t);
+
+
+
+
+
+
+# 45 "../../../../../headers/posix/sys/types.h" 2
+
+
+
+# 44 "ls.c" 2
+
+
+
+# 1 "../../../../../headers/posix/termios.h" 1
+
+
+
+ 
+
+
+
+
+# 1 "../../../../../headers/posix/unistd.h" 1
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+extern int		access(const char *path, int accessMode);
+
+extern int		chdir(const char *path);
+extern int		fchdir(int fd);
+extern char		* rpl_getcwd (char *buffer, size_t size);
+
+extern int		pipe(int fildes[2]);
+extern int		dup(int fd);
+extern int		dup2(int fd1, int fd2);
+extern int		close(int fd);
+extern int		link(const char *name, const char *new_name);
+extern int		unlink(const char *name);
+extern int		rmdir(const char *path);
+
+extern ssize_t  readlink(const char *path, char *buffer, size_t bufferSize);
+extern int      symlink(const char *from, const char *to);
+
+extern int      ftruncate(int fd, off_t newSize);
+extern int      truncate(const char *path, off_t newSize);
+extern int		ioctl(int fd, unsigned long op, ...);
+
+extern ssize_t	read(int fd, void *buffer, size_t count);
+extern ssize_t  read_pos(int fd, off_t pos, void *buffer, size_t count);
+extern ssize_t	pread(int fd, void *buffer, size_t count, off_t pos);
+extern ssize_t	write(int fd, const void *buffer, size_t count);
+extern ssize_t  write_pos(int fd, off_t pos, const void *buffer,size_t count);
+extern ssize_t	pwrite(int fd, const void *buffer, size_t count, off_t pos);
+extern off_t	lseek(int fd, off_t offset, int whence);
+
+extern int		sync(void);
+extern int		fsync(int fd);
+
+extern int		rpl_chown (const char *path, uid_t owner, gid_t group);
+extern int		fchown(int fd, uid_t owner, gid_t group);
+extern int		lchown(const char *path, uid_t owner, gid_t group);
+
+extern int		mknod(const char *name, mode_t mode, dev_t dev);
+
+ 
+
+
+
+extern int		mount(const char *filesystem, const char *where, const char *device,
+					ulong flags, void *parms, int len);
+extern int		unmount(const char *path);
+
+extern int      getdtablesize(void);
+extern long		sysconf(int name);
+extern long		fpathconf(int fd, int name);
+extern long		pathconf(const char *path, int name);
+
+ 
+extern pid_t	fork(void);
+extern int		execve(const char *path, char * const argv[], char * const envp[]);
+extern int		execl(const char *path, const char *arg, ...);
+extern int		execv(const char *path, char *const *argv);
+extern int		execlp(const char *file, const char *arg, ...);
+extern int		execle(const char *path, const char *arg , ...  );
+extern int		exect(const char *path, char *const *argv);
+extern int		execvp(const char *file, char *const *argv);
+
+extern void		_exit(int status);
+
+extern int		system(const char *string);
+extern pid_t	tcgetpgrp(int fd);
+extern int		tcsetpgrp(int fd, pid_t pgrpid);
+extern void		*sbrk(long incr);
+
+extern uint		alarm(unsigned int seconds);
+extern uint		ualarm(unsigned int microSeconds);
+extern uint 	sleep(unsigned int seconds);
+extern int		usleep(unsigned int microSeconds);
+extern clock_t	clock(void);
+extern int 		pause(void);
+
+ 
+extern pid_t	getpgrp(void);
+extern pid_t	getpid(void);
+extern pid_t	getppid(void);
+
+extern pid_t	setsid(void);
+extern int		setpgid(pid_t pid, pid_t pgid);
+
+ 				
+extern gid_t	getegid(void);
+extern uid_t	geteuid(void);
+extern gid_t	getgid(void);
+extern int		getgroups(int groupSize, gid_t groupList[]);
+extern uid_t	getuid(void);
+extern char		*cuserid(char *s);
+
+extern int		setgid(gid_t gid);
+extern int		setuid(uid_t uid);
+
+extern char		*getlogin(void);
+extern int		getlogin_r(char *name, size_t nameSize);
+
+ 
+extern int		sethostname(const char *hostName, size_t nameSize);
+extern int		gethostname(char *hostName, size_t nameSize);
+
+ 
+extern int		isatty(int fd);
+extern char		*ttyname(int fd);
+extern int		ttyname_r(int fd, char *buffer, size_t bufferSize);
+extern char		*ctermid(char *s);
+
+ 
+extern char 	*crypt(const char *key, const char *salt);
+extern int		getopt(int argc, char *const *argv, const char *shortOpts);
+
+ 
+extern char *optarg;
+extern int optind, opterr, optopt;
+
+ 
+extern char **environ;
+
+
+
+
+
+
+# 9 "../../../../../headers/posix/termios.h" 2
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+typedef unsigned long tcflag_t;
+typedef unsigned char speed_t;
+typedef unsigned char cc_t;
+
+struct	termios {
+	tcflag_t	c_iflag;	 
+	tcflag_t	c_oflag;	 
+	tcflag_t	c_cflag;	 
+	tcflag_t	c_lflag;	 
+	char		c_line;		 
+	speed_t		c_ixxxxx;	 
+	speed_t		c_oxxxxx;	 
+	cc_t		c_cc[11 ];	 
+};
+
+
+struct winsize {                     
+    unsigned short ws_row;
+    unsigned short ws_col;
+    unsigned short ws_xpixel;
+    unsigned short ws_ypixel;
+};
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern speed_t	cfgetispeed( const struct termios *);
+extern speed_t	cfgetospeed( const struct termios *);
+extern int		cfsetispeed( struct termios *, speed_t);
+extern int		cfsetospeed( struct termios *, speed_t);
+extern int		tcsetattr( int fd, int opt, const struct termios *tp);
+
+ 
+
+
+
+
+
+
+
+int   tcsendbreak(int fd, int duration);
+int   tcdrain(int fd);
+int   tcflow(int fd, int action);
+
+ 
+
+
+
+
+
+
+
+
+int   tcflush(int fd, int queue_selector);
+
+ 
+
+
+
+
+
+
+int   tcsetpgrp(int fd, pid_t pgrpid);
+pid_t tcgetpgrp(int fd);
+
+
+
+
+
+
+# 47 "ls.c" 2
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "/boot/develop/headers/posix/stdio.h" 1
+
+
+
+# 1 "/boot/develop/headers/posix/be_setup.h" 1
+
+
+
+
+
+
+
+
+
+
+
+# 22 "/boot/develop/headers/posix/be_setup.h"
+
+
+
+
+
+
+
+
+# 1 "../../../../../headers/os/BeBuild.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 30 "../../../../../headers/os/BeBuild.h"
+
+	
+	
+	
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 374 "../../../../../headers/os/BeBuild.h"
+
+
+typedef struct   GLUnurbs GLUnurbs;
+typedef struct   GLUquadric GLUquadric;
+typedef struct   GLUtesselator GLUtesselator;
+
+typedef struct   GLUnurbs GLUnurbsObj;
+typedef struct   GLUquadric GLUquadricObj;
+typedef struct   GLUtesselator GLUtesselatorObj;
+typedef struct   GLUtesselator GLUtriangulatorObj;
+
+
+
+
+# 30 "/boot/develop/headers/posix/be_setup.h" 2
+
+
+
+# 4 "/boot/develop/headers/posix/stdio.h" 2
+
+
+
+
+# 1 "/boot/develop/headers/posix/va_list.h" 1
+
+
+
+
+
+# 1 "../../../../../headers/posix/stdarg.h" 1
+ 
+
+
+
+ 
+
+
+
+
+
+# 1 "/boot/develop/headers/posix/stdarg.h" 1
+ 
+
+
+
+# 1 "/boot/develop/tools/gnupro/lib/gcc-lib/i586-beos/2.9-beos-991026/include/stdarg.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+
+
+
+typedef char *__gnuc_va_list;
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void va_end (__gnuc_va_list);		 
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 208 "/boot/develop/tools/gnupro/lib/gcc-lib/i586-beos/2.9-beos-991026/include/stdarg.h"
+
+
+ 
+
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+typedef __gnuc_va_list va_list;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 5 "/boot/develop/headers/posix/stdarg.h" 2
+
+
+# 24 "/boot/develop/headers/posix/stdarg.h"
+ 
+
+# 11 "../../../../../headers/posix/stdarg.h" 2
+
+
+# 6 "/boot/develop/headers/posix/va_list.h" 2
+
+
+
+
+
+
+
+
+
+# 8 "/boot/develop/headers/posix/stdio.h" 2
+
+# 1 "../../../../../headers/posix/wchar_t.h" 1
+ 
+
+
+
+
+
+
+
+
+typedef unsigned short wchar_t;
+
+
+typedef unsigned int wint_t;
+
+typedef struct {
+	int		__count;
+	wint_t	__value;
+} int ;
+
+
+
+# 9 "/boot/develop/headers/posix/stdio.h" 2
+
+
+typedef long long fpos_t;
+
+
+# 1 "/boot/develop/headers/posix/gnu_stdio.h" 1
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/stddef.h" 1
+
+
+ 
+
+
+
+
+
+
+typedef long ptrdiff_t;
+
+
+
+
+
+# 8 "/boot/develop/headers/posix/gnu_stdio.h" 2
+
+
+
+# 1 "/boot/develop/headers/posix/_G_config.h" 1
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef int _G_int16_t __attribute__ ((__mode__ (__HI__)));
+typedef int _G_int32_t __attribute__ ((__mode__ (__SI__)));
+typedef unsigned int _G_uint16_t __attribute__ ((__mode__ (__HI__)));
+typedef unsigned int _G_uint32_t __attribute__ ((__mode__ (__SI__)));
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+# 11 "/boot/develop/headers/posix/gnu_stdio.h" 2
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "/boot/develop/headers/posix/libio.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 103 "/boot/develop/headers/posix/libio.h"
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct _IO_jump_t;  struct _IO_FILE;
+
+ 
+
+
+
+
+
+
+
+typedef void _IO_lock_t;
+
+
+
+ 
+
+struct _IO_marker {
+  struct _IO_marker *_next;
+  struct _IO_FILE *_sbuf;
+   
+
+   
+  int _pos;
+# 191 "/boot/develop/headers/posix/libio.h"
+
+};
+
+struct _IO_FILE {
+  int _flags;		 
+
+
+   
+   
+  char* _IO_read_ptr;	 
+  char* _IO_read_end;	 
+  char* _IO_read_base;	 
+  char* _IO_write_base;	 
+  char* _IO_write_ptr;	 
+  char* _IO_write_end;	 
+  char* _IO_buf_base;	 
+  char* _IO_buf_end;	 
+   
+  char *_IO_save_base;  
+  char *_IO_backup_base;   
+  char *_IO_save_end;  
+
+  struct _IO_marker *_markers;
+
+  struct _IO_FILE *_chain;
+
+  int _fileno;
+  int _blksize;
+  off_t   _old_offset;  
+
+
+   
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
+
+   
+
+  _IO_lock_t *_lock;
+
+
+
+
+
+
+
+
+  off_t   _offset;
+  char *_IO_save_ptr;
+   
+  char _unused2[16 * sizeof (int) - sizeof (char *)];
+
+};
+
+
+typedef struct _IO_FILE _IO_FILE;
+
+
+struct _IO_FILE_plus;
+extern struct _IO_FILE_plus _IO_2_1_stdin_;
+extern struct _IO_FILE_plus _IO_2_1_stdout_;
+extern struct _IO_FILE_plus _IO_2_1_stderr_;
+
+
+
+
+
+
+
+
+
+
+
+ 
+typedef struct
+{
+  ssize_t   (*read)  (struct _IO_FILE *, void *, ssize_t  )  ;
+  ssize_t   (*write)  (struct _IO_FILE *, const void *, ssize_t  )  ;
+  off_t   (*seek)  (struct _IO_FILE *, off_t  , int)  ;
+  int (*close)  (struct _IO_FILE *)  ;
+} _IO_cookie_io_functions_t;
+
+ 
+struct _IO_cookie_file
+{
+  struct _IO_FILE file;
+  const void *vtable;
+  void *cookie;
+  _IO_cookie_io_functions_t io_functions;
+};
+
+
+
+
+
+
+extern int __underflow  (_IO_FILE *)  ;
+extern int __uflow  (_IO_FILE *)  ;
+extern int __overflow  (_IO_FILE *, int)  ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern int _IO_getc  (_IO_FILE *__fp)  ;
+extern int _IO_putc  (int __c, _IO_FILE *__fp)  ;
+extern int _IO_feof  (_IO_FILE *__fp)  ;
+extern int _IO_ferror  (_IO_FILE *__fp)  ;
+
+extern int _IO_peekc_locked  (_IO_FILE *__fp)  ;
+
+ 
+
+
+
+extern void _IO_flockfile  (_IO_FILE *)  ;
+extern void _IO_funlockfile  (_IO_FILE *)  ;
+extern int _IO_ftrylockfile  (_IO_FILE *)  ;
+
+
+
+
+
+
+
+
+
+
+
+
+extern int _IO_vfscanf  (_IO_FILE *, const char *, __gnuc_va_list , int *)  ;
+extern int _IO_vfprintf  (_IO_FILE *, const char *, __gnuc_va_list )  ;
+extern ssize_t   _IO_padn  (_IO_FILE *, int, ssize_t  )  ;
+extern size_t   _IO_sgetn  (_IO_FILE *, void *, size_t  )  ;
+
+extern off_t   _IO_seekoff  (_IO_FILE *, off_t  , int, int)  ;
+extern off_t   _IO_seekpos  (_IO_FILE *, off_t  , int)  ;
+
+extern void _IO_free_backup_area  (_IO_FILE *)  ;
+
+
+
+
+
+
+# 27 "/boot/develop/headers/posix/gnu_stdio.h" 2
+
+
+typedef struct _IO_FILE FILE;
+
+ 
+
+
+
+
+extern FILE *stdin;		 
+extern FILE *stdout;		 
+extern FILE *stderr;		 
+
+extern char *tmpnam_r(char *__s);
+extern int fflush_unlocked(FILE *__stream);
+extern int vfprintf(FILE *__s, const char * __format, va_list  __arg);
+extern int vprintf(const char *__format, va_list __arg);
+
+extern __inline   int
+vprintf (const char * __fmt, va_list  __arg)
+{
+ 	return vfprintf (stdout, __fmt, __arg);
+}
+
+extern int snprintf(char *   __s, size_t __maxlen, const char *   __format, ...)  
+	__attribute__ ((__format__ (__printf__, 3, 4)));
+extern int vsnprintf(char *   __s, size_t __maxlen, const char *   __format, va_list  __arg)
+	__attribute__ ((__format__ (__printf__, 3, 0)));
+	
+extern char	_single_threaded;
+extern int getchar(void);
+extern int getc(FILE *__stream);
+extern int putchar(int __c);
+	
+
+
+extern __inline  int
+getchar(void) { return (_single_threaded ? ((  stdin  )->_IO_read_ptr >= (  stdin  )->_IO_read_end ? __uflow (  stdin  ) : *(unsigned char *) (  stdin  )->_IO_read_ptr++)  : _IO_getc ( stdin )) ; }
+
+extern int getc_unlocked(FILE *__stream);
+extern int getchar_unlocked(void);
+
+extern __inline   int
+getc_unlocked (FILE *__fp) { return (( __fp )->_IO_read_ptr >= ( __fp )->_IO_read_end ? __uflow ( __fp ) : *(unsigned char *) ( __fp )->_IO_read_ptr++) ; }
+
+extern __inline   int
+getchar_unlocked (void) { return (( stdin )->_IO_read_ptr >= ( stdin )->_IO_read_end ? __uflow ( stdin ) : *(unsigned char *) ( stdin )->_IO_read_ptr++) ; }
+
+extern int fputc(int __c, FILE *__stream);
+extern int putc(int __c, FILE *__stream);
+
+
+
+extern __inline   int
+putchar(int __c) { 	return (_single_threaded ? (((    stdout  )->_IO_write_ptr >= (    stdout  )->_IO_write_end) ? __overflow (    stdout  , (unsigned char) (  __c  )) : (unsigned char) (*(    stdout  )->_IO_write_ptr++ = (  __c  )))  : _IO_putc ( __c ,   stdout )) ; }
+
+extern int fputc_unlocked  (int __c, FILE *__stream)  ;
+extern __inline   int
+fputc_unlocked (int __c, FILE *__stream) { return (((  __stream )->_IO_write_ptr >= (  __stream )->_IO_write_end) ? __overflow (  __stream , (unsigned char) ( __c )) : (unsigned char) (*(  __stream )->_IO_write_ptr++ = ( __c ))) ; }
+
+extern int putc_unlocked  (int __c, FILE *__stream);
+extern int putchar_unlocked  (int __c)  ;
+
+extern __inline   int
+putc_unlocked (int __c, FILE *__stream) {  return (((  __stream )->_IO_write_ptr >= (  __stream )->_IO_write_end) ? __overflow (  __stream , (unsigned char) ( __c )) : (unsigned char) (*(  __stream )->_IO_write_ptr++ = ( __c ))) ; }
+
+extern __inline   int
+putchar_unlocked (int __c) { return (((  stdout )->_IO_write_ptr >= (  stdout )->_IO_write_end) ? __overflow (  stdout , (unsigned char) ( __c )) : (unsigned char) (*(  stdout )->_IO_write_ptr++ = ( __c ))) ; }
+
+extern size_t fread_unlocked(void *__ptr, size_t __size, 
+							 size_t __n, FILE *__stream);
+extern size_t fwrite_unlocked(__const void *__ptr, size_t __size, 
+							  size_t __n, FILE *__stream);
+
+extern int fsetpos  (FILE *__stream, __const fpos_t *__pos);
+extern void clearerr_unlocked  (FILE *__stream);
+extern int feof_unlocked  (FILE *__stream)  ;
+extern int ferror_unlocked  (FILE *__stream)  ;
+
+extern __inline   int
+feof_unlocked (FILE *__stream) {  return ((( __stream )->_flags & 0x10 ) != 0) ; }
+
+extern __inline   int
+ferror_unlocked (FILE *__stream) { return ((( __stream )->_flags & 0x20 ) != 0) ; }
+
+extern int fileno_unlocked(FILE *__stream);
+extern void flockfile(FILE *__stream);
+extern int ftrylockfile(FILE *__stream);
+extern void funlockfile(FILE *__stream);
+
+ 
+
+
+
+
+# 14 "/boot/develop/headers/posix/stdio.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+FILE	*popen(const char *cmd, const char *type);
+int     pclose(FILE *fp);
+
+int 	remove(const char *name);
+int 	rename(const char *old_name, const char *new_name);
+
+char	*tempnam(char *dir, char *pfx);
+char 	*tmpnam(char *name);
+FILE 	*tmpfile(void);
+
+FILE 	*fopen  (const char *name, const char *mode);
+FILE 	*freopen(const char *name, const char *mode, FILE *file);
+
+FILE 	*fdopen(int fd, const char *type);
+int		fileno(FILE *fd);
+
+int 	fclose(FILE *file);
+int 	fflush(FILE *file);
+
+int  	printf(const char *format, ...);
+int  	fprintf(FILE *file, const char *format, ...);
+int 	sprintf(char *s, const char *format, ...);
+int 	vfprintf(FILE *file, const char *format, va_list arg);
+int 	vprintf(const char *format, va_list arg);
+
+int asprintf (char **string_ptr, const char *format, ...);
+
+
+int  	scanf (const char *format, ...);
+int  	fscanf (FILE *file, const char *format, ...);
+int 	sscanf (const char *s, const char *format, ...);
+int 	vsprintf(char *s, const char *format, va_list arg);
+
+int		(getchar)(void);
+int		(getc)(FILE *file);
+
+int		(putchar)(int c);
+int		(putc)(int c, FILE *file);
+
+char 	*gets(char *s);
+char 	*fgets(char *s, int n, FILE *file);
+int 	fgetc(FILE *file);
+
+int 	puts(const char *s);
+int 	(fputc)(int c, FILE *file);
+int 	fputs(const char *s, FILE *file);
+
+int 	(ungetc)(int c, FILE *file);
+
+size_t	fread(void *ptr, size_t memb_size, size_t num_memb, FILE *file);
+size_t	fwrite(const void *ptr, size_t memb_size, size_t num_memb, FILE *file);
+
+int		fgetpos(FILE *file, fpos_t *pos);
+long	ftell(FILE *file);
+fpos_t  _ftell(FILE *);
+
+int		fsetpos(FILE *file, const fpos_t *pos);
+int		fseek(FILE *file, long offset, int mode);
+int     _fseek(FILE *, fpos_t, int);
+
+void 	setbuf (FILE *file, char *buff);
+int  	setvbuf(FILE *file, char *buff, int mode, size_t size);
+int 	setbuffer(FILE *stream, char *buf, size_t size);
+int 	setlinebuf(FILE *stream);
+
+void	rewind(FILE *file);
+void	clearerr(FILE *file);
+
+void	perror(const char *s);
+
+int		(feof)(FILE *file);
+int		(ferror)(FILE *file);
+
+ 
+
+
+# 59 "ls.c" 2
+
+# 1 "/boot/develop/headers/posix/assert.h" 1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+extern void __assert_fail(const char *__assertion,
+						  const char *__file,
+						  unsigned int __line,
+						  const char *__function);
+
+ 
+extern void __assert_perror_fail(int __errnum,
+								 const char *__file,
+								 unsigned int __line,
+								 const char *__function);
+
+ 
+
+
+
+
+
+
+# 47 "/boot/develop/headers/posix/assert.h"
+
+
+
+
+
+# 60 "ls.c" 2
+
+# 1 "/boot/develop/headers/posix/setjmp.h" 1
+
+
+
+
+
+# 20 "/boot/develop/headers/posix/setjmp.h"
+
+
+# 1 "../../../../../headers/posix/signal.h" 1
+
+
+
+ 
+
+
+
+
+
+
+typedef int	 sig_atomic_t;
+typedef long sigset_t;
+
+typedef void (*sig_func_t)(int);
+typedef void (*__signal_func_ptr)(int);   
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+struct sigaction {
+	sig_func_t sa_handler;
+	sigset_t   sa_mask;
+	int        sa_flags;
+	void      *sa_userdata;   
+};
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+typedef struct stack_t {
+	void   *ss_sp;
+	size_t  ss_size;
+	int     ss_flags;
+} stack_t;
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+extern const char * const sys_siglist[(22 +1) ];
+
+
+
+
+
+
+
+sig_func_t signal(int sig, sig_func_t signal_handler);
+int        raise(int sig);
+int        kill(pid_t pid, int sig);
+int        send_signal(pid_t tid, uint sig);
+
+int        sigaction(int sig, const struct sigaction *act, struct sigaction *oact);
+int        sigprocmask(int how, const sigset_t *set, sigset_t *oset);
+int        sigpending(sigset_t *set);
+int        sigsuspend(const sigset_t *mask);
+
+int        sigemptyset(sigset_t *set);
+int        sigfillset(sigset_t *set);
+static int sigaddset(sigset_t *set, int signo);
+static int sigdelset(sigset_t *set, int signo);
+static int sigismember(const sigset_t *set, int signo);
+
+const char *strsignal(int sig);
+
+const void  set_signal_stack(void *ptr, size_t size);
+int         sigaltstack(const stack_t *ss, stack_t *oss);          
+
+static inline int
+sigismember(const sigset_t *set, int sig)
+{
+	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
+	return   (*set & mask) ? 1 : 0 ;	
+}
+
+static inline int
+sigaddset(sigset_t *set, int sig)	
+{
+	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
+	return   ((*set |= mask), 0) ;	
+}
+
+static inline int
+sigdelset(sigset_t *set, int sig)	
+{
+	sigset_t mask = (((sigset_t) 1) << (( sig ) - 1)) ;	
+	return   ((*set &= ~mask), 0) ;	
+}
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+typedef struct vregs vregs;
+
+# 265 "../../../../../headers/posix/signal.h"
+ 
+
+
+
+typedef struct packed_fp_stack {
+	unsigned char	st0[10];
+	unsigned char	st1[10];
+	unsigned char	st2[10];
+	unsigned char	st3[10];
+	unsigned char	st4[10];
+	unsigned char	st5[10];
+	unsigned char	st6[10];
+	unsigned char	st7[10];
+} packed_fp_stack;
+
+typedef struct packed_mmx_regs {
+	unsigned char	mm0[10];
+	unsigned char	mm1[10];
+	unsigned char	mm2[10];
+	unsigned char	mm3[10];
+	unsigned char	mm4[10];
+	unsigned char	mm5[10];
+	unsigned char	mm6[10];
+	unsigned char	mm7[10];
+} packed_mmx_regs;
+
+typedef struct old_extended_regs {
+	unsigned short	fp_control;
+	unsigned short	_reserved1;
+	unsigned short	fp_status;
+	unsigned short	_reserved2;
+	unsigned short	fp_tag;
+	unsigned short	_reserved3;
+	unsigned long	fp_eip;
+	unsigned short	fp_cs;
+	unsigned short	fp_opcode;
+	unsigned long	fp_datap;
+	unsigned short	fp_ds;
+	unsigned short	_reserved4;
+	union {
+		packed_fp_stack	fp;
+		packed_mmx_regs	mmx;
+	} fp_mmx;
+} old_extended_regs;
+
+typedef struct fp_stack {
+	unsigned char	st0[10];
+	unsigned char	_reserved_42_47[6];
+	unsigned char	st1[10];
+	unsigned char	_reserved_58_63[6];
+	unsigned char	st2[10];
+	unsigned char	_reserved_74_79[6];
+	unsigned char	st3[10];
+	unsigned char	_reserved_90_95[6];
+	unsigned char	st4[10];
+	unsigned char	_reserved_106_111[6];
+	unsigned char	st5[10];
+	unsigned char	_reserved_122_127[6];
+	unsigned char	st6[10];
+	unsigned char	_reserved_138_143[6];
+	unsigned char	st7[10];
+	unsigned char	_reserved_154_159[6];
+} fp_stack;
+
+typedef struct mmx_regs {
+	unsigned char	mm0[10];
+	unsigned char	_reserved_42_47[6];
+	unsigned char	mm1[10];
+	unsigned char	_reserved_58_63[6];
+	unsigned char	mm2[10];
+	unsigned char	_reserved_74_79[6];
+	unsigned char	mm3[10];
+	unsigned char	_reserved_90_95[6];
+	unsigned char	mm4[10];
+	unsigned char	_reserved_106_111[6];
+	unsigned char	mm5[10];
+	unsigned char	_reserved_122_127[6];
+	unsigned char	mm6[10];
+	unsigned char	_reserved_138_143[6];
+	unsigned char	mm7[10];
+	unsigned char	_reserved_154_159[6];
+} mmx_regs;
+	
+typedef struct xmmx_regs {
+	unsigned char	xmm0[16];
+	unsigned char	xmm1[16];
+	unsigned char	xmm2[16];
+	unsigned char	xmm3[16];
+	unsigned char	xmm4[16];
+	unsigned char	xmm5[16];
+	unsigned char	xmm6[16];
+	unsigned char	xmm7[16];
+} xmmx_regs;
+
+typedef struct new_extended_regs {
+	unsigned short	fp_control;
+	unsigned short	fp_status;
+	unsigned short	fp_tag;  
+	unsigned short	fp_opcode;
+	unsigned long	fp_eip;
+	unsigned short	fp_cs;
+	unsigned short	res_14_15;
+	unsigned long	fp_datap;
+	unsigned short	fp_ds;
+	unsigned short	_reserved_22_23;
+	unsigned long	mxcsr;
+	unsigned long	_reserved_28_31;
+	union {
+		fp_stack fp;
+		mmx_regs mmx;
+	} fp_mmx;
+	xmmx_regs xmmx;
+	unsigned char	_reserved_288_511[224];
+} new_extended_regs;
+
+typedef struct extended_regs {
+	union {
+		old_extended_regs	old_format;
+		new_extended_regs	new_format;
+	} state;
+	unsigned long	format;  
+} extended_regs;
+
+struct vregs {
+	unsigned long			eip;
+	unsigned long			eflags;
+	unsigned long			eax;
+	unsigned long			ecx;
+	unsigned long			edx;
+	unsigned long			esp;
+	unsigned long			ebp;
+	unsigned long			_reserved_1;
+	extended_regs	xregs;
+	unsigned long			_reserved_2[3];
+};
+ 
+
+
+
+
+# 22 "/boot/develop/headers/posix/setjmp.h" 2
+
+
+typedef int __jmp_buf[6];
+typedef struct __jmp_buf_tag	 
+  {
+     
+
+
+    __jmp_buf __jmpbuf;		 
+    int __mask_was_saved;	 
+    sigset_t __saved_mask;	 
+  } jmp_buf[1];
+
+ 
+
+int __sigsetjmp(jmp_buf env, int savemask);
+
+ 
+
+typedef jmp_buf sigjmp_buf;
+
+
+
+
+
+
+ 
+
+void	longjmp(jmp_buf,int);
+
+void siglongjmp(sigjmp_buf jmp, int val);
+
+ 
+
+
+
+# 61 "ls.c" 2
+
+# 1 "/boot/develop/headers/posix/grp.h" 1
+
+
+
+
+
+
+struct group {
+       char *gr_name;
+       char *gr_passwd;
+       int gr_gid;
+       char **gr_mem;
+};
+
+
+ 
+
+extern struct group *getgrgid(gid_t gid);
+extern struct group *getgrnam(const char *name);
+
+extern struct group *getgrent(void);
+extern void          setgrent(void);
+extern void          endgrent(void);
+
+ 
+
+
+# 62 "ls.c" 2
+
+# 1 "../../../../../headers/posix/pwd.h" 1
+
+
+ 
+
+
+
+
+
+
+
+
+
+struct passwd {
+	char	*pw_name;
+	char	*pw_passwd;
+	uid_t	pw_uid;
+	gid_t	pw_gid;
+	char	*pw_dir;
+	char	*pw_shell;
+	char	*pw_gecos;
+};
+
+ 
+extern struct passwd *getpwent(void);
+extern void setpwent(void);
+extern void endpwent(void);
+
+ 
+extern struct passwd *getpwnam(const char *name);
+extern int getpwnam_r(const char *name, struct passwd *passwd, char *buffer,
+				size_t bufferSize, struct passwd **result);
+extern struct passwd *getpwuid(uid_t uid);
+extern int getpwuid_r(uid_t uid, struct passwd *passwd, char *buffer,
+				size_t bufferSize, struct passwd **result);
+
+
+
+
+
+
+# 63 "ls.c" 2
+
+# 1 "../lib/getopt.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/ctype.h" 1
+
+
+
+
+
+
+
+int isalnum(int);
+int isalpha(int);
+int isascii(int);
+int isblank(int);
+int iscntrl(int);
+int isdigit(int);
+int isgraph(int);
+int islower(int);
+int isprint(int);
+int ispunct(int);
+int isspace(int);
+int isupper(int);
+int isxdigit(int);
+int toascii(int);
+int tolower(int);
+int toupper(int);
+
+
+
+
+
+
+
+
+
+# 33 "../lib/getopt.h" 2
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+extern char *optarg;
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+extern int optind;
+
+ 
+
+
+extern int opterr;
+
+ 
+
+extern int optopt;
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct option
+{
+
+  const char *name;
+
+
+
+   
+
+  int has_arg;
+  int *flag;
+  int val;
+};
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern int getopt ();
+
+
+
+extern int getopt_long (int ___argc, char *const *___argv,
+			const char *__shortopts,
+		        const struct option *__longopts, int *__longind);
+extern int getopt_long_only (int ___argc, char *const *___argv,
+			     const char *__shortopts,
+		             const struct option *__longopts, int *__longind);
+
+ 
+extern int _getopt_internal (int ___argc, char *const *___argv,
+			     const char *__shortopts,
+		             const struct option *__longopts, int *__longind,
+			     int __long_only);
+
+# 171 "../lib/getopt.h"
+
+
+
+
+
+
+ 
+
+
+
+# 64 "ls.c" 2
+
+
+
+ 
+
+# 1 "../../../../../headers/posix/stdlib.h" 1
+
+
+ 
+
+
+
+
+# 1 "../../../../../headers/posix/div_t.h" 1
+
+
+ 
+
+
+
+typedef struct {
+	int	quot;
+	int	rem;
+} div_t;
+
+typedef struct {
+	long quot;
+	long rem;
+} ldiv_t;
+
+typedef struct {
+	long long quot;
+	long long rem;
+} lldiv_t;
+
+
+# 8 "../../../../../headers/posix/stdlib.h" 2
+
+
+
+# 1 "../../../../../headers/posix/limits.h" 1
+
+
+
+# 1 "../../../../../headers/posix/float.h" 1
+ 
+ 
+ 
+
+ 
+
+
+ 
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+    
+
+
+
+
+# 4 "../../../../../headers/posix/limits.h" 2
+
+
+ 
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 11 "../../../../../headers/posix/stdlib.h" 2
+
+# 1 "../../../../../headers/posix/alloca.h" 1
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern void * __alloca (size_t __size);
+extern void * alloca (size_t __size);
+
+
+
+
+
+
+
+
+
+# 12 "../../../../../headers/posix/stdlib.h" 2
+
+
+
+
+
+
+
+
+
+ 
+struct random_data  {
+    int *fptr;		 
+    int *rptr;		 
+    int *state;		 
+    int rand_type;		 
+    int rand_deg;		 
+    int rand_sep;		 
+    int *end_ptr;		 
+};
+
+struct drand48_data  {
+    unsigned short int x[3];	 
+    unsigned short int a[3];	 
+    unsigned short int c;	 
+    unsigned short int old_x[3];  
+    int init;			 
+};
+
+
+
+
+
+
+ 
+extern void		*calloc(size_t nmemb, size_t size);
+extern void		free(void *pointer);
+extern void		*malloc(size_t size);
+extern void		*realloc(void * ptr, size_t size);
+
+ 
+extern void		abort(void);
+extern int		atexit(void (*func)(void));
+extern int		atfork(void (*func)(void));
+extern void		exit(int);
+
+ 
+extern char		*realpath(const char *path, char *resolved);
+
+extern int		daemon(int nochdir, int noclose);
+extern int		system(const char *command);
+
+extern char		*mktemp(char *name);
+extern int		mkstemp(char *templat);
+
+ 
+extern char		**environ;
+extern char		*getenv(const char *name);
+extern int		rpl_putenv (const char *string);
+extern int		setenv(char const *name, char const *value, int rewrite);
+extern int		unsetenv(const char *name);
+
+ 
+extern double			atof(const char *string);
+extern int				atoi(const char *string);
+extern long				atol(const char *string);
+extern long long int	atoll(const char *string);
+extern unsigned int 	atoui(const char *string);
+extern unsigned long	atoul(const char *string);
+
+extern double			strtod(const char *string, char **end);
+extern long				strtol(const char *string, char **end, int base);
+extern unsigned long	strtoul(const char *string, char **end, int base);
+extern long long		strtoll(const char *string, char **end, int base);
+extern unsigned long long strtoull(const char *string, char **end, int base);
+
+ 
+ 
+
+ 
+extern void		srand(unsigned int seed);
+extern int		rand(void);
+extern int		random(void);
+extern void		srandom(unsigned int seed);
+extern int		rand_r(unsigned int *seed);
+extern int		random_r(struct random_data *data, int *result);
+extern int		srandom_r(unsigned int seed, struct random_data *data);
+extern char		*initstate(unsigned int seed, char *state, size_t size);
+extern char		*setstate(char *state);
+extern int		initstate_r(unsigned int seed, void *stateBuffer, 
+					size_t stateLength, struct random_data *data);
+extern int		setstate_r(void *stateBuffer, struct random_data *data);
+
+extern double	drand48(void);
+extern double	erand48(unsigned short int xsubi[3]);
+extern long		lrand48(void);
+extern long		nrand48(unsigned short int xsubi[3]);
+extern long 	mrand48(void);
+extern long		jrand48(unsigned short int xsubi[3]);
+extern void		srand48(long int seed);
+extern unsigned short *seed48(unsigned short int seed16v[3]);
+extern void		lcong48(unsigned short int param[7]);
+
+extern int		drand48_r(struct drand48_data *data, double *result);
+extern int		erand48_r(unsigned short int xsubi[3],
+					struct drand48_data *data, double *result);
+extern int		lrand48_r(struct drand48_data *data, long int *result);
+extern int		nrand48_r(unsigned short int xsubi[3],
+					struct drand48_data *data, long int *result);
+extern int		mrand48_r(struct drand48_data *data, long int *result);
+extern int		jrand48_r(unsigned short int xsubi[3],
+					struct drand48_data *data, long int *result);
+extern int		srand48_r(long int seed, struct drand48_data *data);
+extern int		seed48_r(unsigned short int seed16v[3],
+					struct drand48_data *data);
+extern int		lcong48_r(unsigned short int param[7],
+					struct drand48_data *data);
+
+ 
+typedef int (*_compare_function)(const void *, const void *);
+
+extern void		*bsearch(const void *key, const void *base, size_t numElements,
+					size_t sizeOfElement, _compare_function);
+extern int		heapsort(void *base, size_t numElements, size_t sizeOfElement, _compare_function);
+extern int		mergesort(void *base, size_t numElements, size_t sizeOfElement, _compare_function);
+extern void		qsort(void *base, size_t numElements, size_t sizeOfElement, _compare_function);
+extern int		radixsort(u_char const **base, int numElements, u_char const *table, u_int endByte);
+extern int		sradixsort(u_char const **base, int numElements, u_char const *table, u_int endByte);
+
+ 
+extern int		abs(int number);
+extern long		labs(long number);
+extern long long llabs(long long number);
+
+extern div_t	div(int numerator,  int denominator);
+extern ldiv_t	ldiv(long numerator, long denominator);
+extern lldiv_t	lldiv(long long numerator, long long denominator);
+
+ 
+extern int		mblen(const char *string, size_t maxSize);
+extern int		mbtowc(wchar_t *pwc, const char *string, size_t maxSize);
+extern int		wctomb(char *string, wchar_t wchar);
+extern size_t	mbstowcs(wchar_t *pwcs, const char *string, size_t maxSize);
+extern size_t	wcstombs(char *string, const wchar_t *pwcs, size_t maxSize);
+
+
+
+
+
+
+# 69 "ls.c" 2
+
+
+
+ 
+
+# 1 "../../../../../headers/posix/wchar.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+int		mbsinit(const int  *);
+size_t	wcrtomb(char *, wchar_t, int  *);
+
+
+# 74 "ls.c" 2
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+int wcwidth ();
+
+
+ 
+
+
+
+
+
+
+
+# 1 "system.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/sys/stat.h" 1
+
+
+
+
+
+ 
+
+
+
+struct stat {
+	dev_t			st_dev;			 
+	ino_t			st_ino;			 
+	mode_t			st_mode;		 
+	nlink_t			st_nlink;		 
+	uid_t			st_uid;			 
+	gid_t			st_gid;			 
+	off_t			st_size;		 
+	 
+	 
+	unsigned int	st_type;		 
+	 
+	size_t			st_blksize;		 
+	time_t			st_atime;		 
+	time_t			st_mtime;		 
+	time_t			st_ctime;		 
+	time_t			st_crtime;		 
+};
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+
+
+extern int    chmod(const char *path, mode_t mode);
+extern int 	  fchmod(int fd, mode_t mode);
+extern int    stat(const char *path, struct stat *buf);
+extern int    fstat(int fd, struct stat *buf);
+extern int    lstat(const char *path, struct stat *st);
+extern int    rpl_mkdir (const char *path, mode_t mode);
+extern int    mkfifo(const char *path, mode_t mode);
+extern mode_t umask(mode_t cmask);
+
+
+
+
+
+
+# 26 "system.h" 2
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/sys/param.h" 1
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+ 
+
+  
+
+
+
+# 33 "system.h" 2
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+# 1 "../lib/pathmax.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 61 "system.h" 2
+
+
+
+# 1 "../../../../../headers/posix/sys/time.h" 1
+
+
+ 
+
+
+
+
+
+
+
+struct timeval {
+	time_t		tv_sec;		 
+	suseconds_t	tv_usec;	 
+};
+
+# 1 "../../../../../headers/posix/sys/select.h" 1
+
+
+ 
+
+
+
+
+# 1 "../../../../../headers/posix/sys/time.h" 1
+# 52 "../../../../../headers/posix/sys/time.h"
+
+# 8 "../../../../../headers/posix/sys/select.h" 2
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+typedef unsigned long fd_mask;
+
+
+
+
+
+
+
+typedef struct fd_set {
+	fd_mask bits[((( 1024  ) + ((  (sizeof(fd_mask) * 8)  ) - 1)) / (  (sizeof(fd_mask) * 8)  )) ];
+} fd_set;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern int pselect(int numBits, struct fd_set *readBits, struct fd_set *writeBits,
+			struct fd_set *errorBits, const struct timespec *timeout, const sigset_t *sigMask);
+extern int select(int numBits, struct fd_set *readBits, struct fd_set *writeBits, 
+			struct fd_set *errorBits, struct timeval *timeout);
+
+
+
+
+
+
+# 16 "../../../../../headers/posix/sys/time.h" 2
+
+	 
+
+
+
+
+struct timezone {
+	int tz_minuteswest;
+	int tz_dsttime;
+};
+
+struct itimerval {
+	struct timeval it_interval;
+	struct timeval it_value;
+};
+
+
+
+
+
+
+
+
+
+
+extern int	getitimer(int which, struct itimerval *value);
+extern int	setitimer(int which, const struct itimerval *value, struct itimerval *oldValue);
+extern int	gettimeofday(struct timeval *tv, struct timezone *tz);
+
+extern int	utimes(const char *name, const struct timeval times[2]);
+	 
+
+
+
+
+
+
+# 64 "system.h" 2
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+# 1 "/boot/develop/headers/posix/sys/sysmacros.h" 1
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+
+# 80 "system.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/utime.h" 1
+
+
+ 
+
+
+
+
+
+
+struct utimbuf
+{
+	time_t actime;		 
+	time_t modtime;		 
+};
+
+
+extern
+
+
+
+int utime(const char *path, const struct utimbuf *buffer);
+
+
+# 95 "system.h" 2
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/string.h" 1
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+extern void		*memchr(const void *source, int value, size_t length);
+extern int		memcmp(const void *buffer1, const void *buffer2, size_t length);
+extern void		*memcpy(void *dest, const void *source, size_t length);
+extern void		*memmove(void *dest, const void *source, size_t length);
+extern void		*memset(void *dest, int value, size_t length);
+
+ 
+extern char		*strcpy(char *dest, const char *source);
+extern char		*strncpy(char *dest, const char *source, size_t length);
+extern char		*strcat(char *dest, const char *source);
+extern char		*strncat(char *dest, const char *source, size_t length);
+
+extern size_t	strlen(const char *string);
+extern int		strcmp(const char *string1, const char *string2);
+extern int		strncmp(const char *string1, const char *string2, size_t length);
+
+extern char		*strchr(const char *string, int character);
+extern char		*strrchr(const char *string, int character);
+extern char		*strstr(const char *string, const char *searchString);
+
+extern char		*strchrnul(const char *string, int character);
+	 
+
+extern char		*strpbrk(const char *string, const char *set);
+extern char		*strtok(char *string, const char *set);
+extern char		*strtok_r(char *string, const char *set, char **savePointer);
+extern size_t	strspn(const char *string, const char *set);
+extern size_t	strcspn(const char *string, const char *set);
+
+extern int		strcoll(const char *string1, const char *string2);
+extern size_t	strxfrm(char *string1, const char *string2, size_t length);
+
+extern char		*strerror(int errorCode);
+extern int		strerror_r(int errorCode, char *buffer, size_t bufferSize);
+
+ 
+ 
+ 
+ 
+ 
+
+
+
+ 
+extern int		strcasecmp(const char *string1, const char *string2);
+extern int		strncasecmp(const char *string1, const char *string2, size_t length);
+
+ 
+ 
+extern int		strnicmp(const char *string1, const char *string2, size_t length);
+
+extern char		*strcasestr(const char *string, const char *searchString);
+
+extern char		*strdup(const char *string);
+extern char		*stpcpy(char *dest, const char *source);
+extern const char *strtcopy(char *dest, const char *source);
+
+extern size_t	strlcat(char *dest, const char *source, size_t length);
+extern size_t	strlcpy(char *dest, const char *source, size_t length);
+
+extern size_t	strnlen(const char *string, size_t count);
+
+ 
+ 
+
+ 
+
+extern const char	*strsignal(int signal);
+
+
+
+
+
+
+# 115 "system.h" 2
+
+
+
+
+
+void *memrchr (const void *, int, size_t);
+
+
+# 1 "../../../../../headers/posix/errno.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+# 1 "../../../../../headers/os/support/Errors.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+ 
+enum {
+	B_NO_MEMORY = (-2147483647L-1)  ,
+	B_IO_ERROR,
+	B_PERMISSION_DENIED,
+	B_BAD_INDEX,
+	B_BAD_TYPE,
+	B_BAD_VALUE,
+	B_MISMATCHED_VALUES,
+	B_NAME_NOT_FOUND,
+	B_NAME_IN_USE,
+	B_TIMED_OUT,
+    B_INTERRUPTED,
+	B_WOULD_BLOCK,
+    B_CANCELED,
+	B_NO_INIT,
+	B_BUSY,
+	B_NOT_ALLOWED,
+	B_BAD_DATA,
+
+	B_ERROR = -1,
+	B_OK = 0,
+	B_NO_ERROR = 0
+};
+
+ 
+ 
+enum {
+	B_BAD_SEM_ID = (-2147483647L-1)   + 0x1000 ,
+	B_NO_MORE_SEMS,
+
+	B_BAD_THREAD_ID = (-2147483647L-1)   + 0x1000  + 0x100,
+	B_NO_MORE_THREADS,
+	B_BAD_THREAD_STATE,
+	B_BAD_TEAM_ID,
+	B_NO_MORE_TEAMS,
+
+	B_BAD_PORT_ID = (-2147483647L-1)   + 0x1000  + 0x200,
+	B_NO_MORE_PORTS,
+
+	B_BAD_IMAGE_ID = (-2147483647L-1)   + 0x1000  + 0x300,
+	B_BAD_ADDRESS,
+	B_NOT_AN_EXECUTABLE,
+	B_MISSING_LIBRARY,
+	B_MISSING_SYMBOL,
+
+	B_DEBUGGER_ALREADY_INSTALLED = (-2147483647L-1)   + 0x1000  + 0x400
+};
+
+
+ 
+ 
+enum
+{
+	B_BAD_REPLY = (-2147483647L-1)   + 0x2000 ,
+	B_DUPLICATE_REPLY,
+	B_MESSAGE_TO_SELF,
+	B_BAD_HANDLER,
+	B_ALREADY_RUNNING,
+	B_LAUNCH_FAILED,
+	B_AMBIGUOUS_APP_LAUNCH,
+	B_UNKNOWN_MIME_TYPE,
+	B_BAD_SCRIPT_SYNTAX,
+	B_LAUNCH_FAILED_NO_RESOLVE_LINK,
+	B_LAUNCH_FAILED_EXECUTABLE,
+	B_LAUNCH_FAILED_APP_NOT_FOUND,
+	B_LAUNCH_FAILED_APP_IN_TRASH,
+	B_LAUNCH_FAILED_NO_PREFERRED_APP,
+	B_LAUNCH_FAILED_FILES_APP_NOT_FOUND,
+	B_BAD_MIME_SNIFFER_RULE,
+	B_NOT_A_MESSAGE
+};
+
+
+ 
+ 
+enum {
+	B_FILE_ERROR = (-2147483647L-1)   + 0x6000 ,
+	B_FILE_NOT_FOUND,	 
+	B_FILE_EXISTS,
+	B_ENTRY_NOT_FOUND,
+	B_NAME_TOO_LONG,
+	B_NOT_A_DIRECTORY,
+	B_DIRECTORY_NOT_EMPTY,
+	B_DEVICE_FULL,
+	B_READ_ONLY_DEVICE,
+	B_IS_A_DIRECTORY,
+	B_NO_MORE_FDS,
+	B_CROSS_DEVICE_LINK,
+	B_LINK_LIMIT,
+	B_BUSTED_PIPE,
+	B_UNSUPPORTED,
+	B_PARTITION_TOO_SMALL
+};
+
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+ 
+enum {
+  B_STREAM_NOT_FOUND = (-2147483647L-1)   + 0x4000 ,
+  B_SERVER_NOT_FOUND,
+  B_RESOURCE_NOT_FOUND,
+  B_RESOURCE_UNAVAILABLE,
+  B_BAD_SUBSCRIBER,
+  B_SUBSCRIBER_NOT_ENTERED,
+  B_BUFFER_NOT_AVAILABLE,
+  B_LAST_BUFFER_ERROR
+};
+
+ 
+ 
+enum
+{
+	B_MAIL_NO_DAEMON = (-2147483647L-1)   + 0x8000 ,
+	B_MAIL_UNKNOWN_USER,
+	B_MAIL_WRONG_PASSWORD,
+	B_MAIL_UNKNOWN_HOST,
+	B_MAIL_ACCESS_ERROR,
+	B_MAIL_UNKNOWN_FIELD,
+	B_MAIL_NO_RECIPIENT,
+	B_MAIL_INVALID_MAIL
+};
+
+ 
+ 
+enum
+{
+	B_NO_PRINT_SERVER = (-2147483647L-1)   + 0x9000 
+};
+
+ 
+ 
+enum
+{
+	B_DEV_INVALID_IOCTL = (-2147483647L-1)   + 0xa000 ,
+	B_DEV_NO_MEMORY,
+	B_DEV_BAD_DRIVE_NUM,
+	B_DEV_NO_MEDIA,
+	B_DEV_UNREADABLE,
+	B_DEV_FORMAT_ERROR,
+	B_DEV_TIMEOUT,
+	B_DEV_RECALIBRATE_ERROR,
+	B_DEV_SEEK_ERROR,
+	B_DEV_ID_ERROR,
+	B_DEV_READ_ERROR,
+	B_DEV_WRITE_ERROR,
+	B_DEV_NOT_READY,
+	B_DEV_MEDIA_CHANGED,
+	B_DEV_MEDIA_CHANGE_REQUESTED,
+	B_DEV_RESOURCE_CONFLICT,
+	B_DEV_CONFIGURATION_ERROR,
+	B_DEV_DISABLED_BY_USER,
+	B_DEV_DOOR_OPEN
+};
+
+ 
+ 
+
+
+# 13 "../../../../../headers/posix/errno.h" 2
+
+
+
+
+
+extern int *_errnop(void);
+
+
+
+
+
+
+
+# 123 "system.h" 2
+
+
+
+
+
+
+
+
+
+typedef enum {false = 0, true = 1} bool;
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/fcntl.h" 1
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+	 
+
+
+
+
+
+
+
+
+ 
+
+struct flock {
+	short l_type;
+	short l_whence;
+	off_t l_start;
+	off_t l_len;
+	pid_t l_pid;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern int	creat(const char *path, mode_t mode);
+extern int	open(const char *pathname, int oflags, ...);
+	 
+
+
+extern int	fcntl(int fd, int op, ...);
+
+
+
+
+
+
+# 155 "system.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+   
+
+
+
+
+# 202 "system.h"
+
+
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/dirent.h" 1
+
+
+ 
+
+
+
+
+
+
+typedef struct dirent {
+	dev_t			d_dev;		 
+	dev_t			d_pdev;		 
+	ino_t			d_ino;		 
+	ino_t			d_pino;		 
+	unsigned short	d_reclen;	 
+	char			d_name[1];	 
+} dirent_t;
+
+typedef struct {
+	int				fd;
+	struct dirent	ent;
+} DIR;
+
+
+
+
+
+
+
+
+
+
+
+
+
+DIR			 	*opendir(const char *dirname);
+struct dirent	*readdir(DIR *dirp);
+int				 closedir(DIR *dirp);
+void			 rewinddir(DIR *dirp);
+
+
+
+
+
+
+
+# 211 "system.h" 2
+
+
+# 225 "system.h"
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 288 "system.h"
+
+
+
+
+
+
+
+
+
+
+# 1 "sys2.h" 1
+ 
+
+
+
+
+
+
+
+
+# 23 "sys2.h"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 250 "sys2.h"
+
+
+
+
+
+
+
+
+
+
+# 1 "../../../../../headers/posix/stdint.h" 1
+
+
+ 
+
+
+
+typedef signed char int8_t;
+
+
+typedef unsigned char uint8_t;
+
+
+
+typedef signed short int16_t;
+
+
+typedef unsigned short uint16_t;
+
+
+
+typedef signed long int32_t;
+
+
+typedef unsigned long uint32_t;
+
+
+
+typedef signed long long int64_t;
+
+
+typedef unsigned long long uint64_t;
+
+
+
+typedef signed long long intmax_t;
+
+
+typedef unsigned long long uintmax_t;
+
+
+
+ 
+
+typedef int8_t int_least8_t;
+
+
+typedef uint8_t uint_least8_t;
+
+
+
+typedef int16_t int_least16_t;
+
+
+typedef uint16_t uint_least16_t;
+
+
+
+typedef int32_t int_least32_t;
+
+
+typedef uint32_t uint_least32_t;
+
+
+
+typedef int64_t int_least64_t;
+
+
+typedef uint64_t uint_least64_t;
+
+
+
+
+ 
+
+typedef int32_t int_fast8_t;
+
+
+typedef uint32_t uint_fast8_t;
+
+
+
+typedef int32_t int_fast16_t;
+
+
+typedef uint32_t uint_fast16_t;
+
+
+
+typedef int32_t int_fast32_t;
+
+
+typedef uint32_t uint_fast32_t;
+
+
+
+typedef int64_t int_fast64_t;
+
+
+typedef uint64_t uint_fast64_t;
+
+
+
+ 
+typedef uint8_t u_int8_t;
+typedef uint16_t u_int16_t;
+typedef uint32_t u_int32_t;
+typedef uint64_t u_int64_t;
+
+
+# 260 "sys2.h" 2
+
+
+
+
+# 1 "../../../../../headers/posix/inttypes.h" 1
+
+
+ 
+
+
+
+
+
+
+
+typedef struct {
+	intmax_t	quot;	 
+	intmax_t	rem;	 
+} imaxdiv_t;
+
+
+
+
+
+
+extern intmax_t		imaxabs(intmax_t num);
+extern imaxdiv_t	imaxdiv(intmax_t numer, intmax_t denom);
+
+extern intmax_t		strtoimax(const char *, char **, int);
+extern uintmax_t	strtoumax(const char *, char **, int);
+ 
+ 
+
+
+
+
+
+
+# 264 "sys2.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+# 1 "../../../../../headers/posix/locale.h" 1
+
+
+ 
+
+
+
+
+
+struct lconv {
+	char *decimal_point;
+	char *thousands_sep;
+	char *grouping;
+	char *int_curr_symbol;
+	char *currency_symbol;
+	char *mon_decimal_point;
+	char *mon_thousands_sep;
+	char *mon_grouping;
+	char *positive_sign;
+	char *negative_sign;
+	char int_frac_digits;
+	char frac_digits;
+	char p_cs_precedes;
+	char p_sep_by_space;
+	char n_cs_precedes;
+	char n_sep_by_space;
+	char p_sign_posn;
+	char n_sign_posn;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+extern struct lconv *localeconv(void);
+extern char *setlocale(int category, const char *locale);
+
+
+
+
+
+
+# 356 "sys2.h" 2
+
+
+
+
+
+# 1 "../lib/gettext.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+# 361 "sys2.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+char *strndup ();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "../lib/xalloc.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+extern int xalloc_exit_failure;
+
+ 
+
+extern void (*xalloc_fail_func)  (void)  ;
+
+ 
+
+
+extern char const xalloc_msg_memory_exhausted[];
+
+ 
+
+
+
+extern void xalloc_die  (void)   __attribute__ ((__noreturn__)) ;
+
+void *xmalloc  (size_t n)  ;
+void *xcalloc  (size_t n, size_t s)  ;
+void *xrealloc  (void *p, size_t n)  ;
+char *xstrdup  (const char *str)  ;
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+# 444 "sys2.h" 2
+
+
+
+ 
+
+
+
+ 
+# 1 "../lib/unlocked-io.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 452 "sys2.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+enum
+{
+  GETOPT_HELP_CHAR = ((-127-1)   - 2),
+  GETOPT_VERSION_CHAR = ((-127-1)   - 3)
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 1 "../lib/closeout.h" 1
+
+
+
+
+
+
+
+
+
+
+
+void close_stdout_set_status  (int status)  ;
+void close_stdout_set_file_name  (const char *file)  ;
+void close_stdout  (void)  ;
+void close_stdout_status  (int status)  ;
+
+
+# 496 "sys2.h" 2
+
+# 1 "../lib/version-etc.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+extern char *version_etc_copyright;
+
+void
+version_etc  (FILE *stream,
+		     const char *command_name, const char *package,
+		     const char *version, const char *authors)  ;
+
+
+# 497 "sys2.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 648 "sys2.h"
+
+
+
+
+
+
+
+
+
+
+
+# 298 "system.h" 2
+
+# 100 "ls.c" 2
+
+# 1 "../lib/fnmatch.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+extern int rpl_fnmatch   (const char *__pattern, const char *__name,
+			 int __flags)  ;
+
+
+
+
+
+
+# 101 "ls.c" 2
+
+
+# 1 "../lib/acl.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int file_has_acl (char const *, struct stat const *);
+# 103 "ls.c" 2
+
+# 1 "../lib/argmatch.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+int argmatch (char const *arg, char const *const *arglist,
+	      char const *vallist, size_t valsize);
+
+
+
+
+ 
+
+
+typedef void (*argmatch_exit_fn) (void);
+extern argmatch_exit_fn argmatch_die;
+
+ 
+
+void argmatch_invalid (char const *context, char const *value, int problem);
+
+ 
+
+
+
+
+
+
+ 
+
+void argmatch_valid (char const *const *arglist,
+		     char const *vallist, size_t valsize);
+
+
+
+
+
+
+ 
+
+
+int __xargmatch_internal (char const *context,
+			  char const *arg, char const *const *arglist,
+			  char const *vallist, size_t valsize,
+			  argmatch_exit_fn exit_fn);
+
+ 
+
+
+
+
+
+
+
+ 
+
+char const *argmatch_to_argument (char const *value,
+				  char const *const *arglist,
+				  char const *vallist, size_t valsize);
+
+
+
+
+
+
+# 104 "ls.c" 2
+
+# 1 "../lib/dev-ino.h" 1
+
+
+
+struct dev_ino
+{
+  ino_t st_ino;
+  dev_t st_dev;
+};
+
+
+# 105 "ls.c" 2
+
+# 1 "../lib/dirname.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+char *base_name  (char const *path)  ;
+char *dir_name  (char const *path)  ;
+size_t base_len  (char const *path)  ;
+size_t dir_len  (char const *path)  ;
+
+int strip_trailing_slashes  (char *path)  ;
+
+
+# 106 "ls.c" 2
+
+# 1 "../lib/dirfd.h" 1
+
+# 1 "../lib/config.h" 1
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+# 2 "../lib/dirfd.h" 2
+
+
+
+
+
+
+
+# 20 "../lib/dirfd.h"
+
+
+
+
+
+
+int dirfd (DIR const *);
+
+# 107 "ls.c" 2
+
+# 1 "../lib/error.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+extern void error (int status, int errnum, const char *format, ...)
+     __attribute__ ((__format__ (__printf__, 3, 4)));
+
+extern void error_at_line (int status, int errnum, const char *fname,
+			   unsigned int lineno, const char *format, ...)
+     __attribute__ ((__format__ (__printf__, 5, 6)));
+
+ 
+
+
+extern void (*error_print_progname) (void);
+
+
+
+
+
+
+
+ 
+extern unsigned int error_message_count;
+
+ 
+
+extern int error_one_per_line;
+
+
+
+
+
+
+# 108 "ls.c" 2
+
+# 1 "../lib/full-write.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+extern size_t full_write (int fd, const void *buf, size_t count);
+# 109 "ls.c" 2
+
+# 1 "../lib/hard-locale.h" 1
+
+
+
+
+# 1 "../lib/config.h" 1
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+# 5 "../lib/hard-locale.h" 2
+
+
+
+
+
+
+
+
+
+
+
+int hard_locale  (int)  ;
+
+
+# 110 "ls.c" 2
+
+# 1 "../lib/hash.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+typedef unsigned (*Hash_hasher)  (const void *, unsigned)  ;
+typedef bool (*Hash_comparator)  (const void *, const void *)  ;
+typedef void (*Hash_data_freer)  (void *)  ;
+typedef bool (*Hash_processor)  (void *, void *)  ;
+
+struct hash_entry
+  {
+    void *data;
+    struct hash_entry *next;
+  };
+
+struct hash_tuning
+  {
+     
+
+
+    float shrink_threshold;	 
+    float shrink_factor;	 
+    float growth_threshold;	 
+    float growth_factor;	 
+    bool is_n_buckets;		 
+  };
+
+typedef struct hash_tuning Hash_tuning;
+
+struct hash_table;
+
+typedef struct hash_table Hash_table;
+
+ 
+unsigned hash_get_n_buckets  (const Hash_table *)  ;
+unsigned hash_get_n_buckets_used  (const Hash_table *)  ;
+unsigned hash_get_n_entries  (const Hash_table *)  ;
+unsigned hash_get_max_bucket_length  (const Hash_table *)  ;
+bool hash_table_ok  (const Hash_table *)  ;
+void hash_print_statistics  (const Hash_table *, FILE *)  ;
+void *hash_lookup  (const Hash_table *, const void *)  ;
+
+ 
+void *hash_get_first  (const Hash_table *)  ;
+void *hash_get_next  (const Hash_table *, const void *)  ;
+unsigned hash_get_entries  (const Hash_table *, void **, unsigned)  ;
+unsigned hash_do_for_each  (const Hash_table *, Hash_processor, void *)  ;
+
+ 
+unsigned hash_string  (const char *, unsigned)  ;
+void hash_reset_tuning  (Hash_tuning *)  ;
+Hash_table *hash_initialize  (unsigned, const Hash_tuning *,
+				     Hash_hasher, Hash_comparator,
+				     Hash_data_freer)  ;
+void hash_clear  (Hash_table *)  ;
+void hash_free  (Hash_table *)  ;
+
+ 
+bool hash_rehash  (Hash_table *, unsigned)  ;
+void *hash_insert  (Hash_table *, const void *)  ;
+void *hash_delete  (Hash_table *, const void *)  ;
+
+
+# 111 "ls.c" 2
+
+# 1 "../lib/human.h" 1
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+enum
+{
+   
+
+   
+   
+  human_ceiling = 0,
+   
+  human_round_to_nearest = 1,
+   
+  human_floor = 2,
+
+   
+
+
+  human_group_digits = 4,
+
+   
+  human_suppress_point_zero = 8,
+
+   
+  human_autoscale = 16,
+
+   
+  human_base_1024 = 32,
+
+   
+  human_SI = 64,
+
+   
+  human_B = 128
+};
+
+char *human_readable (uintmax_t, char *, int, uintmax_t, uintmax_t);
+
+int human_options (char const *, bool, uintmax_t *);
+
+
+# 112 "ls.c" 2
+
+# 1 "../lib/filemode.h" 1
+
+
+
+# 1 "../lib/config.h" 1
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+# 4 "../lib/filemode.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+void mode_string  (mode_t mode, char *str)  ;
+
+
+# 113 "ls.c" 2
+
+# 1 "../lib/inttostr.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+# 1 "../lib/config.h" 1
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+# 22 "../lib/inttostr.h" 2
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+char *offtostr  (off_t, char *)  ;
+char *imaxtostr  (intmax_t, char *)  ;
+char *umaxtostr  (uintmax_t, char *)  ;
+# 114 "ls.c" 2
+
+# 1 "ls.h" 1
+ 
+
+
+ 
+
+
+ 
+
+
+extern int ls_mode;
+# 115 "ls.c" 2
+
+# 1 "../lib/mbswidth.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+
+ 
+
+extern int gnu_mbswidth  (const char *string, int flags);
+
+ 
+
+extern int mbsnwidth (const char *buf, size_t nbytes, int flags);
+# 116 "ls.c" 2
+
+# 1 "../lib/obstack.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+struct _obstack_chunk		 
+{
+  char  *limit;			 
+  struct _obstack_chunk *prev;	 
+  char	contents[4];		 
+};
+
+struct obstack		 
+{
+  long	chunk_size;		 
+  struct _obstack_chunk *chunk;	 
+  char	*object_base;		 
+  char	*next_free;		 
+  char	*chunk_limit;		 
+  long int  temp;		 
+  int   alignment_mask;		 
+
+   
+
+
+  struct _obstack_chunk *(*chunkfun) (void *, long);
+  void (*freefun) (void *, struct _obstack_chunk *);
+  void *extra_arg;		 
+
+
+
+
+
+  unsigned use_extra_arg:1;	 
+  unsigned maybe_empty_object:1; 
+
+
+
+  unsigned alloc_failed:1;	 
+
+
+};
+
+ 
+
+
+extern void _obstack_newchunk (struct obstack *, int);
+extern void _obstack_free (struct obstack *, void *);
+extern int _obstack_begin (struct obstack *, int, int,
+			    void *(*) (long), void (*) (void *));
+extern int _obstack_begin_1 (struct obstack *, int, int,
+			     void *(*) (void *, long),
+			     void (*) (void *, void *), void *);
+extern int _obstack_memory_used (struct obstack *);
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+void obstack_init (struct obstack *obstack);
+
+void * obstack_alloc (struct obstack *obstack, int size);
+
+void * obstack_copy (struct obstack *obstack, const void *address, int size);
+void * obstack_copy0 (struct obstack *obstack, const void *address, int size);
+
+void obstack_free (struct obstack *obstack, void *block);
+
+void obstack_blank (struct obstack *obstack, int size);
+
+void obstack_grow (struct obstack *obstack, const void *data, int size);
+void obstack_grow0 (struct obstack *obstack, const void *data, int size);
+
+void obstack_1grow (struct obstack *obstack, int data_char);
+void obstack_ptr_grow (struct obstack *obstack, const void *data);
+void obstack_int_grow (struct obstack *obstack, int data);
+
+void * obstack_finish (struct obstack *obstack);
+
+int obstack_object_size (struct obstack *obstack);
+
+int obstack_room (struct obstack *obstack);
+void obstack_make_room (struct obstack *obstack, int size);
+void obstack_1grow_fast (struct obstack *obstack, int data_char);
+void obstack_ptr_grow_fast (struct obstack *obstack, const void *data);
+void obstack_int_grow_fast (struct obstack *obstack, int data);
+void obstack_blank_fast (struct obstack *obstack, int size);
+
+void * obstack_base (struct obstack *obstack);
+void * obstack_next_free (struct obstack *obstack);
+int obstack_alignment_mask (struct obstack *obstack);
+int obstack_chunk_size (struct obstack *obstack);
+int obstack_memory_used (struct obstack *obstack);
+
+
+
+ 
+
+
+ 
+
+
+
+
+extern void (*obstack_alloc_failed_handler) (void);
+
+
+
+
+ 
+extern int obstack_exit_failure;
+
+ 
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 352 "../lib/obstack.h"
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# 405 "../lib/obstack.h"
+
+
+# 416 "../lib/obstack.h"
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+# 495 "../lib/obstack.h"
+
+
+
+
+
+
+
+
+
+# 607 "../lib/obstack.h"
+
+
+
+
+
+
+
+# 117 "ls.c" 2
+
+# 1 "../lib/path-concat.h" 1
+
+
+
+
+
+
+
+
+
+
+
+char *
+path_concat  (const char *dir, const char *base, char **base_in_result)  ;
+
+
+# 118 "ls.c" 2
+
+# 1 "../lib/quote.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+char const *quote_n  (int n, char const *name)  ;
+char const *quote  (char const *name)  ;
+# 119 "ls.c" 2
+
+# 1 "../lib/quotearg.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+ 
+enum quoting_style
+  {
+    literal_quoting_style,	 
+    shell_quoting_style,	 
+    shell_always_quoting_style,	 
+    c_quoting_style,		 
+    escape_quoting_style,	 
+    locale_quoting_style,	 
+    clocale_quoting_style	 
+  };
+
+ 
+
+
+
+
+ 
+extern char const *const quoting_style_args[];
+extern enum quoting_style const quoting_style_vals[];
+
+struct quoting_options;
+
+ 
+
+
+ 
+
+
+struct quoting_options *clone_quoting_options (struct quoting_options *o);
+
+ 
+enum quoting_style get_quoting_style (struct quoting_options *o);
+
+ 
+
+void set_quoting_style (struct quoting_options *o, enum quoting_style s);
+
+ 
+
+
+
+
+int set_char_quoting (struct quoting_options *o, char c, int i);
+
+ 
+
+
+
+
+
+
+
+size_t quotearg_buffer (char *buffer, size_t buffersize,
+			char const *arg, size_t argsize,
+			struct quoting_options const *o);
+
+ 
+
+
+
+
+char *quotearg_n (int n, char const *arg);
+
+ 
+char *quotearg (char const *arg);
+
+ 
+
+
+char *quotearg_n_style (int n, enum quoting_style s, char const *arg);
+
+ 
+
+
+char *quotearg_n_style_mem (int n, enum quoting_style s,
+			    char const *arg, size_t argsize);
+
+ 
+char *quotearg_style (enum quoting_style s, char const *arg);
+
+ 
+char *quotearg_char (char const *arg, char ch);
+
+ 
+char *quotearg_colon (char const *arg);
+
+
+# 120 "ls.c" 2
+
+# 1 "../lib/same.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+int
+same_name (const char *source, const char *dest);
+
+
+# 121 "ls.c" 2
+
+# 1 "../lib/strftime.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+size_t nstrftime (char *, size_t, char const *, struct tm const *, int, int);
+# 122 "ls.c" 2
+
+# 1 "../lib/strverscmp.h" 1
+ 
+
+
+
+
+
+# 1 "../lib/config.h" 1
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+
+
+
+
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+
+
+
+
+ 
+
+ 
+
+
+
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+ 
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+
+ 
+ 
+
+ 
+
+
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+ 
+
+ 
+
+ 
+# 7 "../lib/strverscmp.h" 2
+
+
+
+
+
+
+
+
+
+
+
+int strverscmp  (const char*, const char*)  ;
+
+
+# 123 "ls.c" 2
+
+# 1 "../lib/xstrtol.h" 1
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+enum strtol_error
+  {
+    LONGINT_OK, LONGINT_INVALID, LONGINT_INVALID_SUFFIX_CHAR, LONGINT_OVERFLOW
+  };
+typedef enum strtol_error strtol_error;
+
+
+
+
+
+
+strtol_error  xstrtol   (const char *s, char **ptr, int base,   long int  *val, const char *valid_suffixes)  ; 
+strtol_error  xstrtoul   (const char *s, char **ptr, int base,   unsigned long int  *val, const char *valid_suffixes)  ; 
+strtol_error  xstrtoimax   (const char *s, char **ptr, int base,   intmax_t  *val, const char *valid_suffixes)  ; 
+strtol_error  xstrtoumax   (const char *s, char **ptr, int base,   uintmax_t  *val, const char *valid_suffixes)  ; 
+
+
+# 75 "../lib/xstrtol.h"
+
+
+
+
+
+
+
+
+# 124 "ls.c" 2
+
+# 1 "../lib/xreadlink.h" 1
+
+
+
+
+
+
+
+
+char *xreadlink  (char const *)  ;
+# 125 "ls.c" 2
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+
+enum filetype
+  {
+    unknown  ,
+    fifo  ,
+    chardev  ,
+    directory  ,
+    blockdev  ,
+    normal  ,
+    symbolic_link  ,
+    sock  ,
+    arg_directory  
+
+  };
+
+struct fileinfo
+  {
+     
+    char *name;
+
+    struct stat stat;
+
+     
+    char *linkname;
+
+     
+
+    mode_t linkmode;
+
+     
+
+    int linkok;
+
+    enum filetype filetype;
+
+
+
+
+
+  };
+
+
+
+
+
+
+
+
+
+ 
+
+
+
+struct bin_str
+  {
+    int len;			 
+    const char *string;		 
+  };
+
+
+
+
+
+char *getgroup ();
+char *getuser ();
+
+static size_t quote_name (FILE *out, const char *name,
+			  struct quoting_options const *options,
+			  size_t *width);
+static char *make_link_path (const char *path, const char *linkname);
+static int decode_switches (int argc, char **argv);
+static int file_interesting (const struct dirent *next);
+static uintmax_t gobble_file (const char *name, enum filetype type,
+			      int explicit_arg, const char *dirname);
+static void print_color_indicator (const char *name, mode_t mode, int linkok);
+static void put_indicator (const struct bin_str *ind);
+static int put_indicator_direct (const struct bin_str *ind);
+static int length_of_file_name_and_frills (const struct fileinfo *f);
+static void add_ignore_pattern (const char *pattern);
+static void attach (char *dest, const char *dirname, const char *name);
+static void clear_files (void);
+static void extract_dirs_from_files (const char *dirname,
+				     int ignore_dot_and_dot_dot);
+static void get_link_name (const char *filename, struct fileinfo *f);
+static void indent (int from, int to);
+static void init_column_info (void);
+static void print_current_files (void);
+static void print_dir (const char *name, const char *realname);
+static void print_file_name_and_frills (const struct fileinfo *f);
+static void print_horizontal (void);
+static void print_long_format (const struct fileinfo *f);
+static void print_many_per_line (void);
+static void print_name_with_quoting (const char *p, mode_t mode,
+				     int linkok,
+				     struct obstack *stack);
+static void prep_non_filename_text (void);
+static void print_type_indicator (mode_t mode);
+static void print_with_commas (void);
+static void queue_directory (const char *name, const char *realname);
+static void sort_files (void);
+static void parse_ls_color (void);
+void usage (int status);
+
+ 
+char *program_name;
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+static Hash_table *active_dir_set;
+
+
+
+ 
+
+
+
+
+
+ 
+static struct fileinfo *files;   
+
+ 
+static int nfiles;   
+
+ 
+static int files_index;   
+
+ 
+
+
+
+
+static int color_symlink_as_referent;
+
+ 
+
+
+
+
+
+ 
+
+struct pending
+  {
+    char *name;
+     
+
+
+    char *realname;
+    struct pending *next;
+  };
+
+static struct pending *pending_dirs;
+
+ 
+
+
+static time_t current_time = (( time_t ) ((! ((  time_t  ) 0 < (  time_t  ) -1))  ? ~ ( time_t ) 0 << (sizeof ( time_t ) * (8)  - 1) : ( time_t ) 0)) ;
+static int current_time_ns = -1;
+
+ 
+
+
+static int block_size_size;
+
+ 
+
+ 
+
+
+
+
+
+
+
+
+enum format
+  {
+    long_format,		 
+    one_per_line,		 
+    many_per_line,		 
+    horizontal,			 
+    with_commas			 
+  };
+
+static enum format format;
+
+ 
+
+
+enum time_style
+  {
+    full_iso_time_style,	 
+    long_iso_time_style,	 
+    iso_time_style,		 
+    locale_time_style		 
+  };
+
+static char const *const time_style_args[] =
+{
+  "full-iso", "long-iso", "iso", "locale", 0
+};
+
+static enum time_style const time_style_types[] =
+{
+  full_iso_time_style, long_iso_time_style, iso_time_style,
+  locale_time_style, 0
+};
+
+ 
+
+enum time_type
+  {
+    time_mtime,			 
+    time_ctime,			 
+    time_atime			 
+  };
+
+static enum time_type time_type;
+
+ 
+
+enum sort_type
+  {
+    sort_none,			 
+    sort_name,			 
+    sort_extension,		 
+    sort_time,			 
+    sort_size,			 
+    sort_version		 
+  };
+
+static enum sort_type sort_type;
+
+ 
+
+
+
+
+
+static int sort_reverse;
+
+ 
+
+static int print_owner = 1;
+
+ 
+
+static bool print_author;
+
+ 
+
+static int print_group = 1;
+
+ 
+
+
+static int numeric_ids;
+
+ 
+
+static int print_block_size;
+
+ 
+static int human_output_opts;
+
+ 
+static uintmax_t output_block_size;
+
+ 
+static uintmax_t file_output_block_size = 1;
+
+ 
+
+
+
+
+static int dired;
+
+ 
+
+
+
+
+
+enum indicator_style
+  {
+    none,	 
+    classify,	 
+    file_type	 
+  };
+
+static enum indicator_style indicator_style;
+
+ 
+static char const *const indicator_style_args[] =
+{
+  "none", "classify", "file-type", 0
+};
+
+static enum indicator_style const indicator_style_types[]=
+{
+  none, classify, file_type
+};
+
+ 
+
+
+
+static int print_with_color;
+
+enum color_type
+  {
+    color_never,		 
+    color_always,		 
+    color_if_tty		 
+  };
+
+enum Dereference_symlink
+  {
+    DEREF_UNDEFINED = 1,
+    DEREF_NEVER,
+    DEREF_COMMAND_LINE_ARGUMENTS,	 
+    DEREF_COMMAND_LINE_SYMLINK_TO_DIR,	 
+    DEREF_ALWAYS			 
+  };
+
+enum indicator_no
+  {
+    C_LEFT, C_RIGHT, C_END, C_NORM, C_FILE, C_DIR, C_LINK, C_FIFO, C_SOCK,
+    C_BLK, C_CHR, C_MISSING, C_ORPHAN, C_EXEC, C_DOOR
+  };
+
+static const char *const indicator_name[]=
+  {
+    "lc", "rc", "ec", "no", "fi", "di", "ln", "pi", "so",
+    "bd", "cd", "mi", "or", "ex", "do", 0 
+  };
+
+struct color_ext_type
+  {
+    struct bin_str ext;		 
+    struct bin_str seq;		 
+    struct color_ext_type *next;	 
+  };
+
+static struct bin_str color_indicator[] =
+  {
+    { sizeof ( "\033[" ) - 1,  "\033["   },		 
+    { sizeof ( "m" ) - 1,  "m"   },		 
+    { 0, 0  },			 
+    { sizeof ( "0" ) - 1,  "0"   },		 
+    { sizeof ( "0" ) - 1,  "0"   },		 
+    { sizeof ( "01;34" ) - 1,  "01;34"   },		 
+    { sizeof ( "01;36" ) - 1,  "01;36"   },		 
+    { sizeof ( "33" ) - 1,  "33"   },		 
+    { sizeof ( "01;35" ) - 1,  "01;35"   },		 
+    { sizeof ( "01;33" ) - 1,  "01;33"   },		 
+    { sizeof ( "01;33" ) - 1,  "01;33"   },		 
+    { 0, 0  },			 
+    { 0, 0  },			 
+    { sizeof ( "01;32" ) - 1,  "01;32"   },		 
+    { sizeof ( "01;35" ) - 1,  "01;35"   }		 
+  };
+
+ 
+static struct color_ext_type *color_ext_list = 0 ;
+
+ 
+static char *color_buf;
+
+ 
+
+
+static int check_symlink_color;
+
+ 
+
+static int print_inode;
+
+ 
+
+
+static enum Dereference_symlink dereference;
+
+ 
+
+
+static int recursive;
+
+ 
+
+
+static int immediate_dirs;
+
+ 
+
+static int all_files;
+
+ 
+
+
+static int really_all_files;
+
+ 
+
+
+
+
+struct ignore_pattern
+  {
+    const char *pattern;
+    struct ignore_pattern *next;
+  };
+
+static struct ignore_pattern *ignore_patterns;
+
+ 
+
+
+
+
+
+
+
+
+static int qmark_funny_chars;
+
+ 
+
+static struct quoting_options *filename_quoting_options;
+static struct quoting_options *dirname_quoting_options;
+
+ 
+
+static int tabsize;
+
+ 
+
+
+static int dir_defaulted;
+
+ 
+
+static int print_dir_name;
+
+ 
+
+
+static int line_length;
+
+ 
+
+
+static int format_needs_stat;
+
+ 
+
+
+static int format_needs_type;
+
+ 
+
+
+static char const *long_time_format[2] =
+  {
+     
+
+
+
+
+
+
+     "%b %e  %Y"  ,
+     
+
+
+
+
+
+
+     "%b %e %H:%M"  
+  };
+
+ 
+
+static int exit_status;
+
+ 
+
+enum
+{
+  AUTHOR_OPTION = (127)   + 1,
+  BLOCK_SIZE_OPTION,
+  COLOR_OPTION,
+  DEREFERENCE_COMMAND_LINE_SYMLINK_TO_DIR_OPTION,
+  FORMAT_OPTION,
+  FULL_TIME_OPTION,
+  INDICATOR_STYLE_OPTION,
+  QUOTING_STYLE_OPTION,
+  SHOW_CONTROL_CHARS_OPTION,
+  SI_OPTION,
+  SORT_OPTION,
+  TIME_OPTION,
+  TIME_STYLE_OPTION
+};
+
+static struct option const long_options[] =
+{
+  {"all", 0 , 0, 'a'},
+  {"escape", 0 , 0, 'b'},
+  {"directory", 0 , 0, 'd'},
+  {"dired", 0 , 0, 'D'},
+  {"full-time", 0 , 0, FULL_TIME_OPTION},
+  {"human-readable", 0 , 0, 'h'},
+  {"inode", 0 , 0, 'i'},
+  {"kilobytes", 0 , 0, 'k'},  
+  {"numeric-uid-gid", 0 , 0, 'n'},
+  {"no-group", 0 , 0, 'G'},
+  {"hide-control-chars", 0 , 0, 'q'},
+  {"reverse", 0 , 0, 'r'},
+  {"size", 0 , 0, 's'},
+  {"width", 1 , 0, 'w'},
+  {"almost-all", 0 , 0, 'A'},
+  {"ignore-backups", 0 , 0, 'B'},
+  {"classify", 0 , 0, 'F'},
+  {"file-type", 0 , 0, 'p'},
+  {"si", 0 , 0, SI_OPTION},
+  {"dereference-command-line", 0 , 0, 'H'},
+  {"dereference-command-line-symlink-to-dir", 0 , 0,
+   DEREFERENCE_COMMAND_LINE_SYMLINK_TO_DIR_OPTION},
+  {"ignore", 1 , 0, 'I'},
+  {"indicator-style", 1 , 0, INDICATOR_STYLE_OPTION},
+  {"dereference", 0 , 0, 'L'},
+  {"literal", 0 , 0, 'N'},
+  {"quote-name", 0 , 0, 'Q'},
+  {"quoting-style", 1 , 0, QUOTING_STYLE_OPTION},
+  {"recursive", 0 , 0, 'R'},
+  {"format", 1 , 0, FORMAT_OPTION},
+  {"show-control-chars", 0 , 0, SHOW_CONTROL_CHARS_OPTION},
+  {"sort", 1 , 0, SORT_OPTION},
+  {"tabsize", 1 , 0, 'T'},
+  {"time", 1 , 0, TIME_OPTION},
+  {"time-style", 1 , 0, TIME_STYLE_OPTION},
+  {"color", 2 , 0, COLOR_OPTION},
+  {"block-size", 1 , 0, BLOCK_SIZE_OPTION},
+  {"author", 0 , 0, AUTHOR_OPTION},
+  {"help", 0 , 0, GETOPT_HELP_CHAR },
+  {"version", 0 , 0, GETOPT_VERSION_CHAR },
+  {0 , 0, 0 , 0}
+};
+
+static char const *const format_args[] =
+{
+  "verbose", "long", "commas", "horizontal", "across",
+  "vertical", "single-column", 0
+};
+
+static enum format const format_types[] =
+{
+  long_format, long_format, with_commas, horizontal, horizontal,
+  many_per_line, one_per_line
+};
+
+static char const *const sort_args[] =
+{
+  "none", "time", "size", "extension", "version", 0
+};
+
+static enum sort_type const sort_types[] =
+{
+  sort_none, sort_time, sort_size, sort_extension, sort_version
+};
+
+static char const *const time_args[] =
+{
+  "atime", "access", "use", "ctime", "status", 0
+};
+
+static enum time_type const time_types[] =
+{
+  time_atime, time_atime, time_atime, time_ctime, time_ctime
+};
+
+static char const *const color_args[] =
+{
+   
+  "always", "yes", "force",
+  "never", "no", "none",
+  "auto", "tty", "if-tty", 0
+};
+
+static enum color_type const color_types[] =
+{
+  color_always, color_always, color_always,
+  color_never, color_never, color_never,
+  color_if_tty, color_if_tty, color_if_tty
+};
+
+ 
+struct column_info
+{
+  int valid_len;
+  int line_len;
+  int *col_arr;
+};
+
+ 
+static struct column_info *column_info;
+
+ 
+static int max_idx;
+
+ 
+
+
+
+
+ 
+
+
+
+
+static size_t dired_pos;
+
+
+
+ 
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+ 
+static struct obstack dired_obstack;
+
+ 
+
+
+
+
+static struct obstack subdired_obstack;
+
+ 
+
+
+
+
+
+
+
+
+ 
+
+
+static struct obstack dev_ino_obstack;
+
+ 
+
+# 878 "ls.c"
+
+ 
+
+static struct dev_ino
+dev_ino_pop (void)
+{
+  ((void) (( sizeof (struct dev_ino) <= __extension__	({ struct obstack const *__o = ( &dev_ino_obstack );	(unsigned) (__o->next_free - __o->object_base); })  ) ? 0 :	(__assert_fail ("sizeof (struct dev_ino) <= obstack_object_size (&dev_ino_obstack)",	"ls.c", 884, __PRETTY_FUNCTION__), 0))) ;
+  __extension__	({ struct obstack *__o = ( &dev_ino_obstack );	int __len = (  -(int) (sizeof (struct dev_ino)) );	if (__o->chunk_limit - __o->next_free < __len)	_obstack_newchunk (__o, __len);	__o->next_free += __len;	(void) 0; }) ;
+  return *(struct dev_ino*) (( &dev_ino_obstack )->next_free) ;
+}
+
+
+# 899 "ls.c"
+
+
+ 
+
+
+static void
+dired_dump_obstack (const char *prefix, struct obstack *os)
+{
+  int n_pos;
+
+  n_pos = __extension__	({ struct obstack const *__o = ( os );	(unsigned) (__o->next_free - __o->object_base); })  / sizeof (dired_pos);
+  if (n_pos > 0)
+    {
+      int i;
+      size_t *pos;
+
+      pos = (size_t *) __extension__	({ struct obstack *__o1 = ( os );	void *value;	value = (void *) __o1->object_base;	if (__o1->next_free == value)	__o1->maybe_empty_object = 1;	__o1->next_free	= ((void *) (( ((( __o1->next_free ) - (char *) 0) +__o1->alignment_mask)	& ~ (__o1->alignment_mask) ) + (char *) 0)) ;	if (__o1->next_free - (char *)__o1->chunk	> __o1->chunk_limit - (char *)__o1->chunk)	__o1->next_free = __o1->chunk_limit;	__o1->object_base = __o1->next_free;	value; }) ;
+      fputs (prefix, stdout);
+      for (i = 0; i < n_pos; i++)
+	printf (" %lu", (unsigned long) pos[i]);
+      putchar_unlocked ( '\n' ) ;
+    }
+}
+
+static unsigned int
+dev_ino_hash (void const *x, unsigned int table_size)
+{
+  struct dev_ino const *p = x;
+  return (uintmax_t) p->st_ino % table_size;
+}
+
+static bool
+dev_ino_compare (void const *x, void const *y)
+{
+  struct dev_ino const *a = x;
+  struct dev_ino const *b = y;
+  return (( *a ).st_ino == (  *b ).st_ino && ( *a ).st_dev == (  *b ).st_dev)  ? true : false;
+}
+
+static void
+dev_ino_free (void *x)
+{
+  free (x);
+}
+
+ 
+
+
+
+static int
+visit_dir (dev_t dev, ino_t ino)
+{
+  struct dev_ino *ent;
+  struct dev_ino *ent_from_table;
+  int found_match;
+
+  ent = (( struct dev_ino  *) xmalloc (sizeof ( struct dev_ino ) * (  1 ))) ;
+  ent->st_ino = ino;
+  ent->st_dev = dev;
+
+   
+  ent_from_table = hash_insert (active_dir_set, ent);
+
+  if (ent_from_table == 0 )
+    {
+       
+      xalloc_die ();
+    }
+
+  found_match = (ent_from_table != ent);
+
+  if (found_match)
+    {
+       
+      free (ent);
+    }
+
+  return found_match;
+}
+
+static void
+free_pending_ent (struct pending *p)
+{
+  if (p->name)
+    free (p->name);
+  if (p->realname)
+    free (p->realname);
+  free (p);
+}
+
+static void
+restore_default_color (void)
+{
+  if (put_indicator_direct (&color_indicator[C_LEFT]) == 0)
+    put_indicator_direct (&color_indicator[C_RIGHT]);
+}
+
+ 
+
+static void
+sighandler (int sig)
+{
+
+
+
+
+  restore_default_color ();
+
+   
+
+
+  if (sig == 13 )
+    {
+      sig = 10 ;
+    }
+  else
+    {
+
+      struct sigaction sigact;
+
+      sigact.sa_handler = ((sig_func_t) 0) ;
+      sigemptyset (&sigact.sa_mask);
+      sigact.sa_flags = 0;
+      sigaction (sig, &sigact, 0 );
+
+
+
+    }
+
+  raise (sig);
+}
+
+int
+main (int argc, char **argv)
+{
+  register int i;
+  register struct pending *thispend;
+  unsigned int n_files;
+
+  program_name = argv[0];
+  setlocale (0 , "");
+  ((const char *) (  "/share/locale"  )) ;
+  ((const char *) ( "coreutils"  )) ;
+
+  atexit (close_stdout);
+
+
+  ((void) (( (sizeof  color_indicator  / sizeof *( color_indicator ))  + 1 == (sizeof  indicator_name  / sizeof *( indicator_name ))  ) ? 0 :	(__assert_fail ("N_ENTRIES (color_indicator) + 1 == N_ENTRIES (indicator_name)",	"ls.c", 1046, __PRETTY_FUNCTION__), 0))) ;
+
+  exit_status = 0;
+  dir_defaulted = 1;
+  print_dir_name = 1;
+  pending_dirs = 0;
+
+  i = decode_switches (argc, argv);
+
+  if (print_with_color)
+    parse_ls_color ();
+
+   
+
+  if (print_with_color)
+    {
+      prep_non_filename_text ();
+       
+      if (color_indicator[C_ORPHAN].string != 0 
+	  || (color_indicator[C_MISSING].string != 0 
+	      && format == long_format))
+	check_symlink_color = 1;
+
+      {
+	unsigned j;
+	static int const sigs[] = { 1 , 2 , 7 ,
+				    3 , 15 , 13  };
+	unsigned nsigs = sizeof sigs / sizeof *sigs;
+
+	struct sigaction oldact, newact;
+	sigset_t caught_signals;
+
+	sigemptyset (&caught_signals);
+	for (j = 0; j < nsigs; j++)
+	  sigaddset (&caught_signals, sigs[j]);
+	newact.sa_handler = sighandler;
+	newact.sa_mask = caught_signals;
+	newact.sa_flags = 0;
+
+
+	for (j = 0; j < nsigs; j++)
+	  {
+	    int sig = sigs[j];
+
+	    sigaction (sig, 0 , &oldact);
+	    if (oldact.sa_handler != ((sig_func_t) 1) )
+	      sigaction (sig, &newact, 0 );
+
+
+
+
+	  }
+      }
+    }
+
+  if (dereference == DEREF_UNDEFINED)
+    dereference = ((immediate_dirs
+		    || indicator_style == classify
+		    || format == long_format)
+		   ? DEREF_NEVER
+		   : DEREF_COMMAND_LINE_SYMLINK_TO_DIR);
+
+   
+
+  if (recursive)
+    {
+      active_dir_set = hash_initialize (30 , 0 ,
+					dev_ino_hash,
+					dev_ino_compare,
+					dev_ino_free);
+      if (active_dir_set == 0 )
+	xalloc_die ();
+
+      _obstack_begin (( &dev_ino_obstack ), 0, 0,	(void *(*) (long)) malloc , (void (*) (void *)) free ) ;
+    }
+
+  format_needs_stat = sort_type == sort_time || sort_type == sort_size
+    || format == long_format
+    || dereference == DEREF_ALWAYS
+    || print_block_size || print_inode;
+  format_needs_type = (format_needs_stat == 0
+		       && (recursive || print_with_color
+			   || indicator_style != none));
+
+  if (dired)
+    {
+      _obstack_begin (( &dired_obstack ), 0, 0,	(void *(*) (long)) malloc , (void (*) (void *)) free ) ;
+      _obstack_begin (( &subdired_obstack ), 0, 0,	(void *(*) (long)) malloc , (void (*) (void *)) free ) ;
+    }
+
+  nfiles = 100;
+  files = (( struct fileinfo  *) xmalloc (sizeof ( struct fileinfo ) * (  nfiles ))) ;
+  files_index = 0;
+
+  clear_files ();
+
+  n_files = argc - i;
+  if (0 < n_files)
+    dir_defaulted = 0;
+
+  for (; i < argc; i++)
+    {
+      gobble_file (argv[i], unknown, 1, "");
+    }
+
+  if (dir_defaulted)
+    {
+      if (immediate_dirs)
+	gobble_file (".", directory, 1, "");
+      else
+	queue_directory (".", 0);
+    }
+
+  if (files_index)
+    {
+      sort_files ();
+      if (!immediate_dirs)
+	extract_dirs_from_files ("", 0);
+       
+    }
+
+   
+
+
+
+  if (files_index)
+    {
+      print_current_files ();
+      if (pending_dirs)
+	do {putchar_unlocked ( ( '\n' ) ) ; ++dired_pos;} while (0) ;
+    }
+  else if (n_files <= 1 && pending_dirs && pending_dirs->next == 0)
+    print_dir_name = 0;
+
+  while (pending_dirs)
+    {
+      thispend = pending_dirs;
+      pending_dirs = pending_dirs->next;
+
+      if ((!!active_dir_set) )
+	{
+	  if (thispend->name == 0 )
+	    {
+	       
+
+
+
+	      struct dev_ino di = dev_ino_pop ();
+	      struct dev_ino *found = hash_delete (active_dir_set, &di);
+	       
+	      ((void) (( found ) ? 0 :	(__assert_fail ("found",	"ls.c", 1196, __PRETTY_FUNCTION__), 0))) ;
+	      dev_ino_free (found);
+	      free_pending_ent (thispend);
+	      continue;
+	    }
+	}
+
+      print_dir (thispend->name, thispend->realname);
+
+      free_pending_ent (thispend);
+      print_dir_name = 1;
+    }
+
+  if (dired)
+    {
+       
+      dired_dump_obstack ("//DIRED//", &dired_obstack);
+      dired_dump_obstack ("//SUBDIRED//", &subdired_obstack);
+      printf ("//DIRED-OPTIONS// --quoting-style=%s\n",
+	      quoting_style_args[get_quoting_style (filename_quoting_options)]);
+    }
+
+   
+  if (print_with_color)
+    {
+      put_indicator (&color_indicator[C_LEFT]);
+      put_indicator (&color_indicator[C_RIGHT]);
+    }
+
+  if ((!!active_dir_set) )
+    {
+      ((void) (( hash_get_n_entries (active_dir_set) == 0 ) ? 0 :	(__assert_fail ("hash_get_n_entries (active_dir_set) == 0",	"ls.c", 1227, __PRETTY_FUNCTION__), 0))) ;
+      hash_free (active_dir_set);
+    }
+
+  exit (exit_status);
+}
+
+ 
+
+
+static int
+decode_switches (int argc, char **argv)
+{
+  int c;
+  char *time_style_option = 0;
+
+   
+  int sort_type_specified = 0;
+
+  qmark_funny_chars = 0;
+
+   
+
+  switch (ls_mode)
+    {
+    case 2 :
+       
+      format = many_per_line;
+      set_quoting_style (0 , escape_quoting_style);
+      break;
+
+    case 3 :
+       
+      format = long_format;
+      set_quoting_style (0 , escape_quoting_style);
+      break;
+
+    case 1 :
+       
+      if (isatty (1 ))
+	{
+	  format = many_per_line;
+	   
+	  qmark_funny_chars = 1;
+	}
+      else
+	{
+	  format = one_per_line;
+	  qmark_funny_chars = 0;
+	}
+      break;
+
+    default:
+      abort ();
+    }
+
+  time_type = time_mtime;
+  sort_type = sort_name;
+  sort_reverse = 0;
+  numeric_ids = 0;
+  print_block_size = 0;
+  indicator_style = none;
+  print_inode = 0;
+  dereference = DEREF_UNDEFINED;
+  recursive = 0;
+  immediate_dirs = 0;
+  all_files = 0;
+  really_all_files = 0;
+  ignore_patterns = 0;
+
+   
+  {
+    char const *q_style = getenv ("QUOTING_STYLE");
+    if (q_style)
+      {
+	int i = argmatch ( q_style ,   quoting_style_args , (char const *) (  quoting_style_vals ), sizeof *(  quoting_style_vals )) ;
+	if (0 <= i)
+	  set_quoting_style (0 , quoting_style_vals[i]);
+	else
+	  error (0, 0,
+	 ((const char *) (  "ignoring invalid value of environment variable QUOTING_STYLE: %s"  ))  ,
+		 quotearg (q_style));
+      }
+  }
+
+  {
+    char const *ls_block_size = getenv ("LS_BLOCK_SIZE");
+    human_output_opts = human_options (ls_block_size, false,
+				       &output_block_size);
+    if (ls_block_size || getenv ("BLOCK_SIZE"))
+      file_output_block_size = output_block_size;
+  }
+
+  line_length = 80;
+  {
+    char const *p = getenv ("COLUMNS");
+    if (p && *p)
+      {
+	long int tmp_long;
+	if (xstrtol (p, 0 , 0, &tmp_long, 0 ) == LONGINT_OK
+	    && 0 < tmp_long && tmp_long <= (2147483647L)  )
+	  {
+	    line_length = (int) tmp_long;
+	  }
+	else
+	  {
+	    error (0, 0,
+	       ((const char *) (  "ignoring invalid width in environment variable COLUMNS: %s"  ))  ,
+		   quotearg (p));
+	  }
+      }
+  }
+
+
+  {
+    struct winsize ws;
+
+    if (ioctl (1 , ((0x8000) +12) , &ws) != -1 && ws.ws_col != 0)
+      line_length = ws.ws_col;
+  }
+
+
+   
+
+  {
+    char const *p;
+    tabsize = 8;
+    if (!getenv ("POSIXLY_CORRECT") && (p = getenv ("TABSIZE")))
+      {
+	long int tmp_long;
+	if (xstrtol (p, 0 , 0, &tmp_long, 0 ) == LONGINT_OK
+	    && 0 <= tmp_long && tmp_long <= (2147483647L)  )
+	  {
+	    tabsize = (int) tmp_long;
+	  }
+	else
+	  {
+	    error (0, 0,
+	     ((const char *) (  "ignoring invalid tab size in environment variable TABSIZE: %s"  ))  ,
+		   quotearg (p));
+	  }
+      }
+  }
+
+  while ((c = getopt_long (argc, argv,
+			   "abcdfghiklmnopqrstuvw:xABCDFGHI:LNQRST:UX1",
+			   long_options, 0 )) != -1)
+    {
+      switch (c)
+	{
+	case 0:
+	  break;
+
+	case 'a':
+	  all_files = 1;
+	  really_all_files = 1;
+	  break;
+
+	case 'b':
+	  set_quoting_style (0 , escape_quoting_style);
+	  break;
+
+	case 'c':
+	  time_type = time_ctime;
+	  break;
+
+	case 'd':
+	  immediate_dirs = 1;
+	  break;
+
+	case 'f':
+	   
+	  all_files = 1;
+	  really_all_files = 1;
+	  sort_type = sort_none;
+	  sort_type_specified = 1;
+	   
+	  if (format == long_format)
+	    format = (isatty (1 ) ? many_per_line : one_per_line);
+	  print_block_size = 0;	 
+	  print_with_color = 0;	 
+	  break;
+
+	case 'g':
+	  format = long_format;
+	  print_owner = 0;
+	  break;
+
+	case 'h':
+	  human_output_opts = human_autoscale | human_SI | human_base_1024;
+	  file_output_block_size = output_block_size = 1;
+	  break;
+
+	case 'i':
+	  print_inode = 1;
+	  break;
+
+	case 'k':
+	  human_output_opts = 0;
+	  file_output_block_size = output_block_size = 1024;
+	  break;
+
+	case 'l':
+	  format = long_format;
+	  break;
+
+	case 'm':
+	  format = with_commas;
+	  break;
+
+	case 'n':
+	  numeric_ids = 1;
+	  format = long_format;
+	  break;
+
+	case 'o':   
+	  format = long_format;
+	  print_group = 0;
+	  break;
+
+	case 'p':
+	  indicator_style = file_type;
+	  break;
+
+	case 'q':
+	  qmark_funny_chars = 1;
+	  break;
+
+	case 'r':
+	  sort_reverse = 1;
+	  break;
+
+	case 's':
+	  print_block_size = 1;
+	  break;
+
+	case 't':
+	  sort_type = sort_time;
+	  sort_type_specified = 1;
+	  break;
+
+	case 'u':
+	  time_type = time_atime;
+	  break;
+
+	case 'v':
+	  sort_type = sort_version;
+	  sort_type_specified = 1;
+	  break;
+
+	case 'w':
+	  {
+	    long int tmp_long;
+	    if (xstrtol (optarg, 0 , 0, &tmp_long, 0 ) != LONGINT_OK
+		|| tmp_long <= 0 || tmp_long > (2147483647L)  )
+	      error (1 , 0, ((const char *) (  "invalid line width: %s"  ))  ,
+		     quotearg (optarg));
+	    line_length = (int) tmp_long;
+	    break;
+	  }
+
+	case 'x':
+	  format = horizontal;
+	  break;
+
+	case 'A':
+	  really_all_files = 0;
+	  all_files = 1;
+	  break;
+
+	case 'B':
+	  add_ignore_pattern ("*~");
+	  add_ignore_pattern (".*~");
+	  break;
+
+	case 'C':
+	  format = many_per_line;
+	  break;
+
+	case 'D':
+	  dired = 1;
+	  break;
+
+	case 'F':
+	  indicator_style = classify;
+	  break;
+
+	case 'G':		 
+	  print_group = 0;
+	  break;
+
+	case 'H':
+	  dereference = DEREF_COMMAND_LINE_ARGUMENTS;
+	  break;
+
+	case DEREFERENCE_COMMAND_LINE_SYMLINK_TO_DIR_OPTION:
+	  dereference = DEREF_COMMAND_LINE_SYMLINK_TO_DIR;
+	  break;
+
+	case 'I':
+	  add_ignore_pattern (optarg);
+	  break;
+
+	case 'L':
+	  dereference = DEREF_ALWAYS;
+	  break;
+
+	case 'N':
+	  set_quoting_style (0 , literal_quoting_style);
+	  break;
+
+	case 'Q':
+	  set_quoting_style (0 , c_quoting_style);
+	  break;
+
+	case 'R':
+	  recursive = 1;
+	  break;
+
+	case 'S':
+	  sort_type = sort_size;
+	  sort_type_specified = 1;
+	  break;
+
+	case 'T':
+	  {
+	    long int tmp_long;
+	    if (xstrtol (optarg, 0 , 0, &tmp_long, 0 ) != LONGINT_OK
+		|| tmp_long < 0 || tmp_long > (2147483647L)  )
+	      error (1 , 0, ((const char *) (  "invalid tab size: %s"  ))  ,
+		     quotearg (optarg));
+	    tabsize = (int) tmp_long;
+	    break;
+	  }
+
+	case 'U':
+	  sort_type = sort_none;
+	  sort_type_specified = 1;
+	  break;
+
+	case 'X':
+	  sort_type = sort_extension;
+	  sort_type_specified = 1;
+	  break;
+
+	case '1':
+	   
+	  if (format != long_format)
+	    format = one_per_line;
+	  break;
+
+        case AUTHOR_OPTION:
+          print_author = true;
+          break;
+
+	case SORT_OPTION:
+	  sort_type = ((  sort_types ) [__xargmatch_internal ( "--sort" ,   optarg ,   sort_args ,	(char const *) (  sort_types ),	sizeof *(  sort_types ),	argmatch_die)]) ;
+	  sort_type_specified = 1;
+	  break;
+
+	case TIME_OPTION:
+	  time_type = ((  time_types ) [__xargmatch_internal ( "--time" ,   optarg ,   time_args ,	(char const *) (  time_types ),	sizeof *(  time_types ),	argmatch_die)]) ;
+	  break;
+
+	case FORMAT_OPTION:
+	  format = ((  format_types ) [__xargmatch_internal ( "--format" ,   optarg ,   format_args ,	(char const *) (  format_types ),	sizeof *(  format_types ),	argmatch_die)]) ;
+	  break;
+
+	case FULL_TIME_OPTION:
+	  format = long_format;
+	  time_style_option = "full-iso";
+	  break;
+
+	case COLOR_OPTION:
+	  {
+	    int i;
+	    if (optarg)
+	      i = ((  color_types ) [__xargmatch_internal ( "--color" ,   optarg ,   color_args ,	(char const *) (  color_types ),	sizeof *(  color_types ),	argmatch_die)]) ;
+	    else
+	       
+
+	      i = color_always;
+
+	    print_with_color = (i == color_always
+				|| (i == color_if_tty
+				    && isatty (1 )));
+
+	    if (print_with_color)
+	      {
+		 
+
+
+		tabsize = 0;
+	      }
+	    break;
+	  }
+
+	case INDICATOR_STYLE_OPTION:
+	  indicator_style = (( 
+				       indicator_style_types ) [__xargmatch_internal ( "--indicator-style" ,   optarg ,  
+				       indicator_style_args ,	(char const *) (  				       indicator_style_types ),	sizeof *(  				       indicator_style_types ),	argmatch_die)]) ;
+	  break;
+
+	case QUOTING_STYLE_OPTION:
+	  set_quoting_style (0 ,
+			     (( 
+					quoting_style_vals ) [__xargmatch_internal ( "--quoting-style" ,   optarg ,  
+					quoting_style_args ,	(char const *) (  					quoting_style_vals ),	sizeof *(  					quoting_style_vals ),	argmatch_die)]) );
+	  break;
+
+	case TIME_STYLE_OPTION:
+	  time_style_option = optarg;
+	  break;
+
+	case SHOW_CONTROL_CHARS_OPTION:
+	  qmark_funny_chars = 0;
+	  break;
+
+	case BLOCK_SIZE_OPTION:
+	  human_output_opts = human_options (optarg, true, &output_block_size);
+	  file_output_block_size = output_block_size;
+	  break;
+
+	case SI_OPTION:
+	  human_output_opts = human_autoscale | human_SI;
+	  file_output_block_size = output_block_size = 1;
+	  break;
+
+	case GETOPT_HELP_CHAR:	usage (0 );	break; ;
+
+	case GETOPT_VERSION_CHAR:	version_etc (stdout,  (ls_mode == 1  ? "ls" : (ls_mode == 2  ? "dir" : "vdir"))  , "coreutils" , "5.0" ,    "Richard Stallman and David MacKenzie"    );	exit (0 );	break; ;
+
+	default:
+	  usage (1 );
+	}
+    }
+
+  filename_quoting_options = clone_quoting_options (0 );
+  if (get_quoting_style (filename_quoting_options) == escape_quoting_style)
+    set_char_quoting (filename_quoting_options, ' ', 1);
+  if (indicator_style != none)
+    {
+      char const *p;
+      for (p = "*=@|" + (int) indicator_style - 1;  *p;  p++)
+	set_char_quoting (filename_quoting_options, *p, 1);
+    }
+
+  dirname_quoting_options = clone_quoting_options (0 );
+  set_char_quoting (dirname_quoting_options, ':', 1);
+
+   
+
+
+  if (dired && format != long_format)
+    dired = 0;
+
+   
+
+
+
+
+
+
+
+  if ((time_type == time_ctime || time_type == time_atime)
+      && !sort_type_specified && format != long_format)
+    {
+      sort_type = sort_time;
+    }
+
+  if (format == long_format)
+    {
+      char *style = time_style_option;
+      static char const posix_prefix[] = "posix-";
+
+      if (! style)
+	if (! (style = getenv ("TIME_STYLE")))
+	  style = "posix-long-iso";
+
+      while (strncmp (style, posix_prefix, sizeof posix_prefix - 1) == 0)
+	{
+	  if (! hard_locale (5 ))
+	    return optind;
+	  style += sizeof posix_prefix - 1;
+	}
+
+      if (*style == '+')
+	{
+	  char *p0 = style + 1;
+	  char *p1 = strchr (p0, '\n');
+	  if (! p1)
+	    p1 = p0;
+	  else
+	    {
+	      if (strchr (p1 + 1, '\n'))
+		error (1 , 0, ((const char *) (  "invalid time style format %s"  ))  ,
+		       quote (p0));
+	      *p1++ = '\0';
+	    }
+	  long_time_format[0] = p0;
+	  long_time_format[1] = p1;
+	}
+      else
+	switch ((( 
+			   time_style_types ) [__xargmatch_internal ( "time style" ,   style ,  
+			   time_style_args ,	(char const *) (  			   time_style_types ),	sizeof *(  			   time_style_types ),	argmatch_die)]) )
+	  {
+	  case full_iso_time_style:
+	    long_time_format[0] = long_time_format[1] =
+	      "%Y-%m-%d %H:%M:%S.%N %z";
+	    break;
+
+	  case long_iso_time_style:
+	    long_time_format[0] = long_time_format[1] = "%Y-%m-%d %H:%M";
+	    break;
+
+	  case iso_time_style:
+	    long_time_format[0] = "%Y-%m-%d ";
+	    long_time_format[1] = "%m-%d %H:%M";
+	    break;
+
+	  case locale_time_style:
+	    if (hard_locale (5 ))
+	      {
+		unsigned int i;
+		for (i = 0; i < 2; i++)
+		  long_time_format[i] =
+		    ((const char *) (  long_time_format[i] )) ;
+	      }
+	  }
+    }
+
+  return optind;
+}
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+static int
+get_funky_string (char **dest, const char **src, int equals_end)
+{
+  int num;			 
+  int count;			 
+  enum {
+    ST_GND, ST_BACKSLASH, ST_OCTAL, ST_HEX, ST_CARET, ST_END, ST_ERROR
+  } state;
+  const char *p;
+  char *q;
+
+  p = *src;			 
+  q = *dest;			 
+
+  count = 0;			 
+  num = 0;
+
+  state = ST_GND;		 
+  while (state < ST_END)
+    {
+      switch (state)
+	{
+	case ST_GND:		 
+	  switch (*p)
+	    {
+	    case ':':
+	    case '\0':
+	      state = ST_END;	 
+	      break;
+	    case '\\':
+	      state = ST_BACKSLASH;  
+	      ++p;
+	      break;
+	    case '^':
+	      state = ST_CARET;  
+	      ++p;
+	      break;
+	    case '=':
+	      if (equals_end)
+		{
+		  state = ST_END;  
+		  break;
+		}
+	       
+	    default:
+	      *(q++) = *(p++);
+	      ++count;
+	      break;
+	    }
+	  break;
+
+	case ST_BACKSLASH:	 
+	  switch (*p)
+	    {
+	    case '0':
+	    case '1':
+	    case '2':
+	    case '3':
+	    case '4':
+	    case '5':
+	    case '6':
+	    case '7':
+	      state = ST_OCTAL;	 
+	      num = *p - '0';
+	      break;
+	    case 'x':
+	    case 'X':
+	      state = ST_HEX;	 
+	      num = 0;
+	      break;
+	    case 'a':		 
+	      num = 7;		 
+	      break;
+	    case 'b':		 
+	      num = '\b';
+	      break;
+	    case 'e':		 
+	      num = 27;
+	      break;
+	    case 'f':		 
+	      num = '\f';
+	      break;
+	    case 'n':		 
+	      num = '\n';
+	      break;
+	    case 'r':		 
+	      num = '\r';
+	      break;
+	    case 't':		 
+	      num = '\t';
+	      break;
+	    case 'v':		 
+	      num = '\v';
+	      break;
+	    case '?':		 
+              num = 127;
+	      break;
+	    case '_':		 
+	      num = ' ';
+	      break;
+	    case '\0':		 
+	      state = ST_ERROR;	 
+	      break;
+	    default:		 
+	      num = *p;
+	      break;
+	    }
+	  if (state == ST_BACKSLASH)
+	    {
+	      *(q++) = num;
+	      ++count;
+	      state = ST_GND;
+	    }
+	  ++p;
+	  break;
+
+	case ST_OCTAL:		 
+	  if (*p < '0' || *p > '7')
+	    {
+	      *(q++) = num;
+	      ++count;
+	      state = ST_GND;
+	    }
+	  else
+	    num = (num << 3) + (*(p++) - '0');
+	  break;
+
+	case ST_HEX:		 
+	  switch (*p)
+	    {
+	    case '0':
+	    case '1':
+	    case '2':
+	    case '3':
+	    case '4':
+	    case '5':
+	    case '6':
+	    case '7':
+	    case '8':
+	    case '9':
+	      num = (num << 4) + (*(p++) - '0');
+	      break;
+	    case 'a':
+	    case 'b':
+	    case 'c':
+	    case 'd':
+	    case 'e':
+	    case 'f':
+	      num = (num << 4) + (*(p++) - 'a') + 10;
+	      break;
+	    case 'A':
+	    case 'B':
+	    case 'C':
+	    case 'D':
+	    case 'E':
+	    case 'F':
+	      num = (num << 4) + (*(p++) - 'A') + 10;
+	      break;
+	    default:
+	      *(q++) = num;
+	      ++count;
+	      state = ST_GND;
+	      break;
+	    }
+	  break;
+
+	case ST_CARET:		 
+	  state = ST_GND;	 
+	  if (*p >= '@' && *p <= '~')
+	    {
+	      *(q++) = *(p++) & 037;
+	      ++count;
+	    }
+	  else if (*p == '?')
+	    {
+	      *(q++) = 127;
+	      ++count;
+	    }
+	  else
+	    state = ST_ERROR;
+	  break;
+
+	default:
+	  abort ();
+	}
+    }
+
+  *dest = q;
+  *src = p;
+
+  return state == ST_ERROR ? -1 : count;
+}
+
+static void
+parse_ls_color (void)
+{
+  const char *p;		 
+  char *buf;			 
+  int state;			 
+  int ind_no;			 
+  char label[3];		 
+  struct color_ext_type *ext;	 
+
+  if ((p = getenv ("LS_COLORS")) == 0  || *p == '\0')
+    return;
+
+  ext = 0 ;
+  strcpy (label, "??");
+
+   
+
+
+
+  buf = color_buf = xstrdup (p);
+
+  state = 1;
+  while (state > 0)
+    {
+      switch (state)
+	{
+	case 1:		 
+	  switch (*p)
+	    {
+	    case ':':
+	      ++p;
+	      break;
+
+	    case '*':
+	       
+
+
+
+
+	      ext = (( struct color_ext_type  *) xmalloc (sizeof ( struct color_ext_type ) * (  1 ))) ;
+	      ext->next = color_ext_list;
+	      color_ext_list = ext;
+
+	      ++p;
+	      ext->ext.string = buf;
+
+	      state = (ext->ext.len =
+		       get_funky_string (&buf, &p, 1)) < 0 ? -1 : 4;
+	      break;
+
+	    case '\0':
+	      state = 0;	 
+	      break;
+
+	    default:	 
+	      label[0] = *(p++);
+	      state = 2;
+	      break;
+	    }
+	  break;
+
+	case 2:		 
+	  if (*p)
+	    {
+	      label[1] = *(p++);
+	      state = 3;
+	    }
+	  else
+	    state = -1;	 
+	  break;
+
+	case 3:		 
+	  state = -1;	 
+	  if (*(p++) == '=') 
+	    {
+	      for (ind_no = 0; indicator_name[ind_no] != 0 ; ++ind_no)
+		{
+		  if ((strcmp (( label ), (  indicator_name[ind_no] )) == 0) )
+		    {
+		      color_indicator[ind_no].string = buf;
+		      state = ((color_indicator[ind_no].len =
+				get_funky_string (&buf, &p, 0)) < 0 ? -1 : 1);
+		      break;
+		    }
+		}
+	      if (state == -1)
+		error (0, 0, ((const char *) (  "unrecognized prefix: %s"  ))  , quotearg (label));
+	    }
+	 break;
+
+	case 4:		 
+	  if (*(p++) == '=')
+	    {
+	      ext->seq.string = buf;
+	      state = (ext->seq.len =
+		       get_funky_string (&buf, &p, 0)) < 0 ? -1 : 1;
+	    }
+	  else
+	    state = -1;
+	  break;
+	}
+    }
+
+  if (state < 0)
+    {
+      struct color_ext_type *e;
+      struct color_ext_type *e2;
+
+      error (0, 0,
+	     ((const char *) (  "unparsable value for LS_COLORS environment variable"  ))  );
+      free (color_buf);
+      for (e = color_ext_list; e != 0 ;  )
+	{
+	  e2 = e;
+	  e = e->next;
+	  free (e2);
+	}
+      print_with_color = 0;
+    }
+
+  if (color_indicator[C_LINK].len == 6
+      && !strncmp (color_indicator[C_LINK].string, "target", 6))
+    color_symlink_as_referent = 1;
+}
+
+ 
+
+
+
+
+
+
+
+
+static void
+queue_directory (const char *name, const char *realname)
+{
+  struct pending *new;
+
+  new = (( struct pending  *) xmalloc (sizeof ( struct pending ) * (  1 ))) ;
+  new->realname = realname ? xstrdup (realname) : 0 ;
+  new->name = name ? xstrdup (name) : 0 ;
+  new->next = pending_dirs;
+  pending_dirs = new;
+}
+
+ 
+
+
+
+static void
+print_dir (const char *name, const char *realname)
+{
+  register DIR *dirp;
+  register struct dirent *next;
+  register uintmax_t total_blocks = 0;
+  static int first = 1;
+
+  (*(_errnop()))  = 0;
+  dirp = opendir (name);
+  if (!dirp)
+    {
+      error (0, (*(_errnop())) , "%s", quotearg_colon (name));
+      exit_status = 1;
+      return;
+    }
+
+  if ((!!active_dir_set) )
+    {
+      struct stat dir_stat;
+      int fd = dirfd (dirp);
+
+       
+      if ((0 <= fd
+	   ? fstat (fd, &dir_stat)
+	   : stat (name, &dir_stat)) < 0)
+	{
+	  error (0, (*(_errnop())) , ((const char *) (  "cannot determine device and inode of %s"  ))  ,
+		 quotearg_colon (name));
+	  exit_status = 1;
+	  return;
+	}
+
+       
+
+      if (visit_dir (dir_stat.st_dev, dir_stat.st_ino))
+	{
+	  error (0, 0, ((const char *) (  "not listing already-listed directory: %s"  ))  ,
+		 quotearg_colon (name));
+	  return;
+	}
+
+      do	{	struct dev_ino *di;	__extension__	({ struct obstack *__o = ( &dev_ino_obstack );	int __len = (  sizeof (struct dev_ino) );	if (__o->chunk_limit - __o->next_free < __len)	_obstack_newchunk (__o, __len);	__o->next_free += __len;	(void) 0; }) ;	di = -1 + (struct dev_ino *) (( &dev_ino_obstack )->next_free) ; di->st_dev = ( dir_stat.st_dev );	di->st_ino = (  dir_stat.st_ino );	}	while (0) ;
+    }
+
+   
+
+
+  clear_files ();
+
+  while (1)
+    {
+       
+
+      (*(_errnop()))  = 0;
+      if ((next = readdir (dirp)) == 0 )
+	{
+	  if ((*(_errnop())) )
+	    {
+	       
+	      int e = (*(_errnop())) ;
+	      closedir (dirp);
+	      (*(_errnop()))  = e;
+
+	       
+	      dirp = 0 ;
+	    }
+	  break;
+	}
+
+      if (file_interesting (next))
+	{
+	  enum filetype type = unknown;
+
+# 2201 "ls.c"
+
+	  total_blocks += gobble_file (next->d_name, type, 0, name);
+	}
+    }
+
+  if (dirp == 0  || closedir ( dirp ) )
+    {
+      error (0, (*(_errnop())) , ((const char *) (  "reading directory %s"  ))  , quotearg_colon (name));
+      exit_status = 1;
+       
+    }
+
+   
+  sort_files ();
+
+   
+
+
+  if (recursive)
+    extract_dirs_from_files (name, 1);
+
+  if (recursive || print_dir_name)
+    {
+      if (!first)
+	do {putchar_unlocked ( ( '\n' ) ) ; ++dired_pos;} while (0) ;
+      first = 0;
+      do	{	if (dired)	do {fputs (( "  " ), (  stdout )); dired_pos += sizeof(( "  " )) - 1;} while (0) ;	}	while (0) ;
+      do	{	if (dired)	__extension__	({ struct obstack *__o = ( ( &subdired_obstack ) );	int __len = (  sizeof (dired_pos) );	if (__o->next_free + __len > __o->chunk_limit)	_obstack_newchunk (__o, __len);	memcpy (( __o->next_free ), (  (  &dired_pos ) ), (  __len )) ;	__o->next_free += __len;	(void) 0; }) ;	}	while (0) ;
+      dired_pos += quote_name (stdout, realname ? realname : name,
+			       dirname_quoting_options, 0 );
+      do	{	if (dired)	__extension__	({ struct obstack *__o = ( ( &subdired_obstack ) );	int __len = (  sizeof (dired_pos) );	if (__o->next_free + __len > __o->chunk_limit)	_obstack_newchunk (__o, __len);	memcpy (( __o->next_free ), (  (  &dired_pos ) ), (  __len )) ;	__o->next_free += __len;	(void) 0; }) ;	}	while (0) ;
+      do {fputs (( ":\n" ), (  stdout )); dired_pos += sizeof(( ":\n" )) - 1;} while (0) ;
+    }
+
+  if (format == long_format || print_block_size)
+    {
+      const char *p;
+      char buf[((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1];
+
+      do	{	if (dired)	do {fputs (( "  " ), (  stdout )); dired_pos += sizeof(( "  " )) - 1;} while (0) ;	}	while (0) ;
+      p = ((const char *) (  "total"  ))  ;
+      do {fputs (( p ), (  stdout )); dired_pos +=   strlen (p) ;} while (0) ;
+      do {putchar_unlocked ( ( ' ' ) ) ; ++dired_pos;} while (0) ;
+      p = human_readable (total_blocks, buf, human_output_opts,
+			  512 , output_block_size);
+      do {fputs (( p ), (  stdout )); dired_pos +=   strlen (p) ;} while (0) ;
+      do {putchar_unlocked ( ( '\n' ) ) ; ++dired_pos;} while (0) ;
+    }
+
+  if (files_index)
+    print_current_files ();
+}
+
+ 
+
+
+static void
+add_ignore_pattern (const char *pattern)
+{
+  register struct ignore_pattern *ignore;
+
+  ignore = (( struct ignore_pattern  *) xmalloc (sizeof ( struct ignore_pattern ) * (  1 ))) ;
+  ignore->pattern = pattern;
+   
+  ignore->next = ignore_patterns;
+  ignore_patterns = ignore;
+}
+
+ 
+
+static int
+file_interesting (const struct dirent *next)
+{
+  register struct ignore_pattern *ignore;
+
+  for (ignore = ignore_patterns; ignore; ignore = ignore->next)
+    if (rpl_fnmatch  (ignore->pattern, next->d_name, (1 << 2) ) == 0)
+      return 0;
+
+  if (really_all_files
+      || next->d_name[0] != '.'
+      || (all_files
+	  && next->d_name[1] != '\0'
+	  && (next->d_name[1] != '.' || next->d_name[2] != '\0')))
+    return 1;
+
+  return 0;
+}
+
+ 
+
+ 
+
+static void
+clear_files (void)
+{
+  register int i;
+
+  for (i = 0; i < files_index; i++)
+    {
+      free (files[i].name);
+      if (files[i].linkname)
+	free (files[i].linkname);
+    }
+
+  files_index = 0;
+  block_size_size = 4;
+}
+
+ 
+
+
+
+static uintmax_t
+gobble_file (const char *name, enum filetype type, int explicit_arg,
+	     const char *dirname)
+{
+  register uintmax_t blocks;
+  register char *path;
+
+  if (files_index == nfiles)
+    {
+      nfiles *= 2;
+      files = ((  struct fileinfo  *) xrealloc ((void *) ( files ), sizeof (  struct fileinfo ) * (  nfiles ))) ;
+    }
+
+  files[files_index].linkname = 0;
+  files[files_index].linkmode = 0;
+  files[files_index].linkok = 0;
+
+  if (explicit_arg
+      || format_needs_stat
+      || (format_needs_type
+	  && (type == unknown
+
+	       
+
+
+	      || type == symbolic_link
+
+	       
+
+
+	      || (type == normal && (indicator_style == classify
+				      
+
+
+
+				     || print_with_color)))))
+
+    {
+       
+      int err;
+
+      if (name[0] == '/' || dirname[0] == 0)
+	path = (char *) name;
+      else
+	{
+	  path = (char *) __builtin_alloca (  strlen (name) + strlen (dirname) + 2  )  ;
+	  attach (path, dirname, name);
+	}
+
+      switch (dereference)
+	{
+	case DEREF_ALWAYS:
+	  err = stat (path, &files[files_index].stat);
+	  break;
+
+	case DEREF_COMMAND_LINE_ARGUMENTS:
+	case DEREF_COMMAND_LINE_SYMLINK_TO_DIR:
+	  if (explicit_arg)
+	    {
+	      int need_lstat;
+	      err = stat (path, &files[files_index].stat);
+
+	      if (dereference == DEREF_COMMAND_LINE_ARGUMENTS)
+		break;
+
+	      need_lstat = (err < 0
+			    ? (*(_errnop()))  == B_ENTRY_NOT_FOUND 
+			    : ! ((( files[files_index].stat.st_mode ) & 00000170000 ) == 00000040000 ) );
+	      if (!need_lstat)
+		break;
+
+	       
+
+
+
+	    }
+
+	default:  
+	  err = lstat (path, &files[files_index].stat);
+	  break;
+	}
+
+      if (err < 0)
+	{
+	  error (0, (*(_errnop())) , "%s", quotearg_colon (path));
+	  exit_status = 1;
+	  return 0;
+	}
+
+# 2411 "ls.c"
+
+
+      if (((( files[files_index].stat.st_mode ) & 00000170000 ) == 00000120000 ) 
+	  && (format == long_format || check_symlink_color))
+	{
+	  char *linkpath;
+	  struct stat linkstats;
+
+	  get_link_name (path, &files[files_index]);
+	  linkpath = make_link_path (path, files[files_index].linkname);
+
+	   
+
+	  if (linkpath
+	      && (indicator_style != none || check_symlink_color)
+	      && stat (linkpath, &linkstats) == 0)
+	    {
+	      files[files_index].linkok = 1;
+
+	       
+
+
+	      if (!explicit_arg || format == long_format
+		  || ! ((( linkstats.st_mode ) & 00000170000 ) == 00000040000 ) )
+		{
+		   
+
+		  files[files_index].linkmode = linkstats.st_mode;
+		  files[files_index].linkok = 1;
+		}
+	    }
+	  if (linkpath)
+	    free (linkpath);
+	}
+
+      if (((( files[files_index].stat.st_mode ) & 00000170000 ) == 00000120000 ) )
+	files[files_index].filetype = symbolic_link;
+      else if (((( files[files_index].stat.st_mode ) & 00000170000 ) == 00000040000 ) )
+	{
+	  if (explicit_arg && !immediate_dirs)
+	    files[files_index].filetype = arg_directory;
+	  else
+	    files[files_index].filetype = directory;
+	}
+      else
+	files[files_index].filetype = normal;
+
+      blocks = (( files[files_index].stat ).st_size / 512  + (( files[files_index].stat ).st_size % 512  != 0)) ;
+      {
+	char buf[((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1];
+	int len = strlen (human_readable (blocks, buf, human_output_opts,
+					  512 , output_block_size));
+	if (block_size_size < len)
+	  block_size_size = len < 7 ? len : 7;
+      }
+    }
+  else
+    {
+      files[files_index].filetype = type;
+
+
+
+      blocks = 0;
+    }
+
+  files[files_index].name = xstrdup (name);
+  files_index++;
+
+  return blocks;
+}
+
+
+
+ 
+
+
+static void
+get_link_name (const char *filename, struct fileinfo *f)
+{
+  f->linkname = xreadlink (filename);
+  if (f->linkname == 0 )
+    {
+      error (0, (*(_errnop())) , ((const char *) (  "cannot read symbolic link %s"  ))  ,
+	     quotearg_colon (filename));
+      exit_status = 1;
+    }
+}
+
+ 
+
+
+
+
+static char *
+make_link_path (const char *path, const char *linkname)
+{
+  char *linkbuf;
+  size_t bufsiz;
+
+  if (linkname == 0)
+    return 0;
+
+  if (*linkname == '/')
+    return xstrdup (linkname);
+
+   
+
+  linkbuf = strrchr (path, '/');
+  if (linkbuf == 0)
+    return xstrdup (linkname);
+
+  bufsiz = linkbuf - path + 1;
+  linkbuf = xmalloc (bufsiz + strlen (linkname) + 1);
+  strncpy (linkbuf, path, bufsiz);
+  strcpy (linkbuf + bufsiz, linkname);
+  return linkbuf;
+}
+
+
+ 
+
+
+static int
+basename_is_dot_or_dotdot (const char *name)
+{
+  char const *base = base_name (name);
+  return ( base [0] == '.' && ( base [1] == '\0' || ( base [1] == '.' &&  base [2] == '\0'))) ;
+}
+
+ 
+
+
+
+
+
+
+static void
+extract_dirs_from_files (const char *dirname, int ignore_dot_and_dot_dot)
+{
+  register int i, j;
+
+  if (*dirname && (!!active_dir_set) )
+    {
+       
+
+
+      queue_directory (0 , dirname);
+    }
+
+   
+
+  for (i = files_index - 1; i >= 0; i--)
+    if ((files[i].filetype == directory || files[i].filetype == arg_directory)
+	&& (!ignore_dot_and_dot_dot
+	    || !basename_is_dot_or_dotdot (files[i].name)))
+      {
+	if (files[i].name[0] == '/' || dirname[0] == 0)
+	  {
+	    queue_directory (files[i].name, files[i].linkname);
+	  }
+	else
+	  {
+	    char *path = path_concat (dirname, files[i].name, 0 );
+	    queue_directory (path, files[i].linkname);
+	    free (path);
+	  }
+	if (files[i].filetype == arg_directory)
+	  free (files[i].name);
+      }
+
+   
+
+
+  for (i = 0, j = 0; i < files_index; i++)
+    if (files[i].filetype != arg_directory)
+      files[j++] = files[i];
+  files_index = j;
+}
+
+ 
+
+
+static jmp_buf failed_strcoll;
+
+static int
+xstrcoll (char const *a, char const *b)
+{
+  int diff;
+  (*(_errnop()))  = 0;
+  diff = strcoll (a, b);
+  if ((*(_errnop())) )
+    {
+      error (0, (*(_errnop())) , ((const char *) (  "cannot compare file names %s and %s"  ))  ,
+	     quote_n (0, a), quote_n (1, b));
+      exit_status = 1;
+      longjmp (failed_strcoll, 1);
+    }
+  return diff;
+}
+
+ 
+
+typedef void const *V;
+
+static inline int
+cmp_ctime (struct fileinfo const *a, struct fileinfo const *b,
+	   int (*cmp) (char const *, char const *))
+{
+  int diff = ((  b->stat  ).  st_ctime  < (    a->stat  ).  st_ctime  ? -1 : (  b->stat  ).  st_ctime  > (    a->stat  ).  st_ctime  ? 1 : 0 )  ;
+  return diff ? diff : cmp (a->name, b->name);
+}
+static int compare_ctime (V a, V b) { return cmp_ctime (a, b, xstrcoll); }
+static int compstr_ctime (V a, V b) { return cmp_ctime (a, b, strcmp); }
+static int rev_cmp_ctime (V a, V b) { return compare_ctime (b, a); }
+static int rev_str_ctime (V a, V b) { return compstr_ctime (b, a); }
+
+static inline int
+cmp_mtime (struct fileinfo const *a, struct fileinfo const *b,
+	   int (*cmp) (char const *, char const *))
+{
+  int diff = ((  b->stat  ).  st_mtime  < (    a->stat  ).  st_mtime  ? -1 : (  b->stat  ).  st_mtime  > (    a->stat  ).  st_mtime  ? 1 : 0 )  ;
+  return diff ? diff : cmp (a->name, b->name);
+}
+static int compare_mtime (V a, V b) { return cmp_mtime (a, b, xstrcoll); }
+static int compstr_mtime (V a, V b) { return cmp_mtime (a, b, strcmp); }
+static int rev_cmp_mtime (V a, V b) { return compare_mtime (b, a); }
+static int rev_str_mtime (V a, V b) { return compstr_mtime (b, a); }
+
+static inline int
+cmp_atime (struct fileinfo const *a, struct fileinfo const *b,
+	   int (*cmp) (char const *, char const *))
+{
+  int diff = ((  b->stat  ).  st_atime  < (    a->stat  ).  st_atime  ? -1 : (  b->stat  ).  st_atime  > (    a->stat  ).  st_atime  ? 1 : 0 )  ;
+  return diff ? diff : cmp (a->name, b->name);
+}
+static int compare_atime (V a, V b) { return cmp_atime (a, b, xstrcoll); }
+static int compstr_atime (V a, V b) { return cmp_atime (a, b, strcmp); }
+static int rev_cmp_atime (V a, V b) { return compare_atime (b, a); }
+static int rev_str_atime (V a, V b) { return compstr_atime (b, a); }
+
+static inline int
+cmp_size (struct fileinfo const *a, struct fileinfo const *b,
+	  int (*cmp) (char const *, char const *))
+{
+  int diff = (( b->stat.st_size ) < (  a->stat.st_size ) ? -1 : ( b->stat.st_size ) > (  a->stat.st_size )) ;
+  return diff ? diff : cmp (a->name, b->name);
+}
+static int compare_size (V a, V b) { return cmp_size (a, b, xstrcoll); }
+static int compstr_size (V a, V b) { return cmp_size (a, b, strcmp); }
+static int rev_cmp_size (V a, V b) { return compare_size (b, a); }
+static int rev_str_size (V a, V b) { return compstr_size (b, a); }
+
+static inline int
+cmp_version (struct fileinfo const *a, struct fileinfo const *b)
+{
+  return strverscmp (a->name, b->name);
+}
+static int compare_version (V a, V b) { return cmp_version (a, b); }
+static int rev_cmp_version (V a, V b) { return compare_version (b, a); }
+
+static inline int
+cmp_name (struct fileinfo const *a, struct fileinfo const *b,
+	  int (*cmp) (char const *, char const *))
+{
+  return cmp (a->name, b->name);
+}
+static int compare_name (V a, V b) { return cmp_name (a, b, xstrcoll); }
+static int compstr_name (V a, V b) { return cmp_name (a, b, strcmp); }
+static int rev_cmp_name (V a, V b) { return compare_name (b, a); }
+static int rev_str_name (V a, V b) { return compstr_name (b, a); }
+
+ 
+
+
+static inline int
+cmp_extension (struct fileinfo const *a, struct fileinfo const *b,
+	       int (*cmp) (char const *, char const *))
+{
+  char const *base1 = strrchr (a->name, '.');
+  char const *base2 = strrchr (b->name, '.');
+  int diff = cmp (base1 ? base1 : "", base2 ? base2 : "");
+  return diff ? diff : cmp (a->name, b->name);
+}
+static int compare_extension (V a, V b) { return cmp_extension (a, b, xstrcoll); }
+static int compstr_extension (V a, V b) { return cmp_extension (a, b, strcmp); }
+static int rev_cmp_extension (V a, V b) { return compare_extension (b, a); }
+static int rev_str_extension (V a, V b) { return compstr_extension (b, a); }
+
+ 
+
+static void
+sort_files (void)
+{
+  int (*func) (V, V);
+
+  switch (sort_type)
+    {
+    case sort_none:
+      return;
+    case sort_time:
+      switch (time_type)
+	{
+	case time_ctime:
+	  func = sort_reverse ? rev_cmp_ctime : compare_ctime;
+	  break;
+	case time_mtime:
+	  func = sort_reverse ? rev_cmp_mtime : compare_mtime;
+	  break;
+	case time_atime:
+	  func = sort_reverse ? rev_cmp_atime : compare_atime;
+	  break;
+	default:
+	  abort ();
+	}
+      break;
+    case sort_name:
+      func = sort_reverse ? rev_cmp_name : compare_name;
+      break;
+    case sort_extension:
+      func = sort_reverse ? rev_cmp_extension : compare_extension;
+      break;
+    case sort_size:
+      func = sort_reverse ? rev_cmp_size : compare_size;
+      break;
+    case sort_version:
+      func = sort_reverse ? rev_cmp_version : compare_version;
+      break;
+    default:
+      abort ();
+    }
+
+   
+
+
+
+
+  if (__sigsetjmp (( failed_strcoll ), 0) )
+    {
+      switch (sort_type)
+	{
+	case sort_time:
+	  switch (time_type)
+	    {
+	    case time_ctime:
+	      func = sort_reverse ? rev_str_ctime : compstr_ctime;
+	      break;
+	    case time_mtime:
+	      func = sort_reverse ? rev_str_mtime : compstr_mtime;
+	      break;
+	    case time_atime:
+	      func = sort_reverse ? rev_str_atime : compstr_atime;
+	      break;
+	    default:
+	      abort ();
+	    }
+	  break;
+	case sort_name:
+	  func = sort_reverse ? rev_str_name : compstr_name;
+	  break;
+	case sort_extension:
+	  func = sort_reverse ? rev_str_extension : compstr_extension;
+	  break;
+	case sort_size:
+	  func = sort_reverse ? rev_str_size : compstr_size;
+	  break;
+	default:
+	  abort ();
+	}
+    }
+
+  qsort (files, files_index, sizeof (struct fileinfo), func);
+}
+
+ 
+
+static void
+print_current_files (void)
+{
+  register int i;
+
+  switch (format)
+    {
+    case one_per_line:
+      for (i = 0; i < files_index; i++)
+	{
+	  print_file_name_and_frills (files + i);
+	  putchar_unlocked ( '\n' ) ;
+	}
+      break;
+
+    case many_per_line:
+      init_column_info ();
+      print_many_per_line ();
+      break;
+
+    case horizontal:
+      init_column_info ();
+      print_horizontal ();
+      break;
+
+    case with_commas:
+      print_with_commas ();
+      break;
+
+    case long_format:
+      for (i = 0; i < files_index; i++)
+	{
+	  print_long_format (files + i);
+	  do {putchar_unlocked ( ( '\n' ) ) ; ++dired_pos;} while (0) ;
+	}
+      break;
+    }
+}
+
+ 
+
+
+static int
+long_time_expected_width (void)
+{
+  static int width = -1;
+
+  if (width < 0)
+    {
+      time_t epoch = 0;
+      struct tm const *tm = localtime (&epoch);
+      char const *fmt = long_time_format[0];
+      char initbuf[100];
+      char *buf = initbuf;
+      size_t bufsize = sizeof initbuf;
+      size_t len;
+
+      for (;;)
+	{
+	  *buf = '\1';
+	  len = nstrftime (buf, bufsize, fmt, tm, 0, 0);
+	  if (len || ! *buf)
+	    break;
+	  buf = __builtin_alloca (  bufsize *= 2  )  ;
+	}
+
+      width = mbsnwidth (buf, len, 0);
+      if (width < 0)
+	width = 0;
+    }
+
+  return width;
+}
+
+ 
+
+static void
+get_current_time (void)
+{
+# 2875 "ls.c"
+
+
+   
+
+
+
+
+
+
+  {
+    struct timeval timeval;
+    if (gettimeofday (&timeval, 0 ) == 0)
+      {
+	current_time = timeval.tv_sec;
+	current_time_ns = timeval.tv_usec * 1000 + 999;
+	return;
+      }
+  }
+
+
+  current_time = time (0 );
+  current_time_ns = 999999999;
+}
+
+ 
+
+
+
+static size_t
+format_user (char *buffer, uid_t u)
+{
+  char const *name = (numeric_ids ? 0  : getuser (u));
+  if (name)
+    sprintf (buffer, "%-8s ", name);
+  else
+    sprintf (buffer, "%-8lu ", (unsigned long) u);
+  return strlen (buffer);
+}
+
+ 
+
+static void
+print_long_format (const struct fileinfo *f)
+{
+  char modebuf[12];
+  char init_bigbuf
+    [((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1		 
+     + ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1	 
+     + sizeof (modebuf) - 1 + 1		 
+     + ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1	 
+     + ((( (32)  - 1 ) > (  ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  )) ? ( (32)  - 1 ) : (  ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  ))   + 1		 
+     + ((( (32)  - 1 ) > (  ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  )) ? ( (32)  - 1 ) : (  ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  ))   + 1		 
+     + ((( (32)  - 1 ) > (  ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  )) ? ( (32)  - 1 ) : (  ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  ))   + 1		 
+     + ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1	 
+     + ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1	 
+     + 35 + 1	 
+     ];
+  char *buf = init_bigbuf;
+  size_t bufsize = sizeof (init_bigbuf);
+  size_t s;
+  char *p;
+  time_t when;
+  int when_ns  ;
+  struct tm *when_local;
+
+   
+
+
+  mode_string ((( f->stat ).st_mode) , modebuf);
+
+  modebuf[10] = (0  ? '+' : ' ');
+  modebuf[11] = '\0';
+
+  switch (time_type)
+    {
+    case time_ctime:
+      when = f->stat.st_ctime;
+      when_ns = 0 ;
+      break;
+    case time_mtime:
+      when = f->stat.st_mtime;
+      when_ns = 0 ;
+      break;
+    case time_atime:
+      when = f->stat.st_atime;
+      when_ns = 0 ;
+      break;
+    }
+
+  p = buf;
+
+  if (print_inode)
+    {
+      char hbuf[((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1];
+      sprintf (p, "%*s ", 7 , umaxtostr (f->stat.st_ino, hbuf));
+      p += strlen (p);
+    }
+
+  if (print_block_size)
+    {
+      char hbuf[((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1];
+      sprintf (p, "%*s ", block_size_size,
+	       human_readable ((( f->stat ).st_size / 512  + (( f->stat ).st_size % 512  != 0)) , hbuf, human_output_opts,
+			       512 , output_block_size));
+      p += strlen (p);
+    }
+
+   
+
+  sprintf (p, "%s %3lu ", modebuf, (unsigned long) f->stat.st_nlink);
+  p += strlen (p);
+
+  if (print_owner)
+    p += format_user (p, f->stat.st_uid);
+
+  if (print_group)
+    {
+      char const *group_name = (numeric_ids ? 0  : getgroup (f->stat.st_gid));
+      if (group_name)
+	sprintf (p, "%-8s ", group_name);
+      else
+	sprintf (p, "%-8lu ", (unsigned long) f->stat.st_gid);
+      p += strlen (p);
+    }
+
+  if (print_author)
+    p += format_user (p, f->stat. st_uid );
+
+  if (((( f->stat.st_mode ) & 00000170000 ) == 00000020000 )  || ((( f->stat.st_mode ) & 00000170000 ) == 00000060000 ) )
+    sprintf (p, "%3lu, %3lu ",
+	     (unsigned long) (int)((unsigned)(( f->stat.st_rdev )>>8)&0x7F) ,
+	     (unsigned long) (int)(( f->stat.st_rdev )&0xFF) );
+  else
+    {
+      char hbuf[((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1];
+      uintmax_t size = f->stat.st_size;
+
+       
+
+
+      size += (f->stat.st_size < 0) * ((uintmax_t) (( off_t ) (~ ( off_t ) 0 - ((  off_t  ) ((! ((   off_t   ) 0 < (   off_t   ) -1))  ? ~ (  off_t  ) 0 << (sizeof (  off_t  ) * (8)  - 1) : (  off_t  ) 0)) ))   - (( off_t ) ((! ((  off_t  ) 0 < (  off_t  ) -1))  ? ~ ( off_t ) 0 << (sizeof ( off_t ) * (8)  - 1) : ( off_t ) 0))   + 1);
+
+      sprintf (p, "%8s ",
+	       human_readable (size, hbuf, human_output_opts,
+			       1, file_output_block_size));
+    }
+
+  p += strlen (p);
+
+  if ((when_local = localtime (&when)))
+    {
+      time_t six_months_ago;
+      int recent;
+      char const *fmt;
+
+       
+
+
+      if (current_time < when
+	  || (current_time == when && current_time_ns < when_ns))
+	{
+	   
+
+
+
+	  get_current_time ();
+	}
+
+       
+
+
+
+      six_months_ago = current_time - 31556952 / 2;
+      recent = (six_months_ago <= when
+		&& (when < current_time
+		    || (when == current_time && when_ns <= current_time_ns)));
+      fmt = long_time_format[recent];
+
+      for (;;)
+	{
+	  char *newbuf;
+	  *p = '\1';
+	  s = nstrftime (p, buf + bufsize - p - 1, fmt,
+			 when_local, 0, when_ns);
+	  if (s || ! *p)
+	    break;
+	  newbuf = __builtin_alloca (  bufsize *= 2  )  ;
+	  memcpy (newbuf, buf, p - buf);
+	  p = newbuf + (p - buf);
+	  buf = newbuf;
+	}
+
+      p += s;
+      *p++ = ' ';
+
+       
+      *p = '\0';
+    }
+  else
+    {
+       
+
+      char hbuf[(((sizeof (  intmax_t  ) * (8)  - 1) * 302 / 1000 + 2)  + 1) ];
+      sprintf (p, "%*s ", long_time_expected_width (),
+	       ((! (( time_t ) 0 < ( time_t ) -1)) 
+		? imaxtostr (when, hbuf)
+		: umaxtostr (when, hbuf)));
+      p += strlen (p);
+    }
+
+  do	{	if (dired)	do {fputs (( "  " ), (  stdout )); dired_pos += sizeof(( "  " )) - 1;} while (0) ;	}	while (0) ;
+  do {fputs (( buf ), (  stdout )); dired_pos +=   p - buf ;} while (0) ;
+  print_name_with_quoting (f->name, ((color_symlink_as_referent && ( f )->linkok) ? ( f )->linkmode : ( f )->stat.st_mode) , f->linkok,
+			   &dired_obstack);
+
+  if (f->filetype == symbolic_link)
+    {
+      if (f->linkname)
+	{
+	  do {fputs (( " -> " ), (  stdout )); dired_pos += sizeof(( " -> " )) - 1;} while (0) ;
+	  print_name_with_quoting (f->linkname, f->linkmode, f->linkok - 1,
+				   0 );
+	  if (indicator_style != none)
+	    print_type_indicator (f->linkmode);
+	}
+    }
+  else if (indicator_style != none)
+    print_type_indicator (f->stat.st_mode);
+}
+
+ 
+
+
+
+
+
+static size_t
+quote_name (FILE *out, const char *name, struct quoting_options const *options,
+	    size_t *width)
+{
+  char smallbuf[8192   ];
+  size_t len = quotearg_buffer (smallbuf, sizeof smallbuf, name, -1, options);
+  char *buf;
+  size_t displayed_width  ;
+
+  if (len < sizeof smallbuf)
+    buf = smallbuf;
+  else
+    {
+      buf = (char *) __builtin_alloca (  len + 1  )  ;
+      quotearg_buffer (buf, len + 1, name, -1, options);
+    }
+
+  if (qmark_funny_chars)
+    {
+# 3234 "ls.c"
+
+	{
+	  char *p = buf;
+	  char const *plimit = buf + len;
+
+	  while (p < plimit)
+	    {
+	      if (! (1  && isprint ( (unsigned char) *p )) )
+		*p = '?';
+	      p++;
+	    }
+	  displayed_width = len;
+	}
+    }
+  else if (width != 0 )
+    {
+
+
+
+
+
+	{
+	  char const *p = buf;
+	  char const *plimit = buf + len;
+
+	  displayed_width = 0;
+	  while (p < plimit)
+	    {
+	      if ((1  && isprint ( (unsigned char) *p )) )
+		displayed_width++;
+	      p++;
+	    }
+	}
+    }
+
+  if (out != 0 )
+    fwrite_unlocked ( buf ,  1 ,  len ,  out ) ;
+  if (width != 0 )
+    *width = displayed_width;
+  return len;
+}
+
+static void
+print_name_with_quoting (const char *p, mode_t mode, int linkok,
+			 struct obstack *stack)
+{
+  if (print_with_color)
+    print_color_indicator (p, mode, linkok);
+
+  if (stack)
+    do	{	if (dired)	__extension__	({ struct obstack *__o = ( ( stack ) );	int __len = (  sizeof (dired_pos) );	if (__o->next_free + __len > __o->chunk_limit)	_obstack_newchunk (__o, __len);	memcpy (( __o->next_free ), (  (  &dired_pos ) ), (  __len )) ;	__o->next_free += __len;	(void) 0; }) ;	}	while (0) ;
+
+  dired_pos += quote_name (stdout, p, filename_quoting_options, 0 );
+
+  if (stack)
+    do	{	if (dired)	__extension__	({ struct obstack *__o = ( ( stack ) );	int __len = (  sizeof (dired_pos) );	if (__o->next_free + __len > __o->chunk_limit)	_obstack_newchunk (__o, __len);	memcpy (( __o->next_free ), (  (  &dired_pos ) ), (  __len )) ;	__o->next_free += __len;	(void) 0; }) ;	}	while (0) ;
+
+  if (print_with_color)
+    prep_non_filename_text ();
+}
+
+static void
+prep_non_filename_text (void)
+{
+  if (color_indicator[C_END].string != 0 )
+    put_indicator (&color_indicator[C_END]);
+  else
+    {
+      put_indicator (&color_indicator[C_LEFT]);
+      put_indicator (&color_indicator[C_NORM]);
+      put_indicator (&color_indicator[C_RIGHT]);
+    }
+}
+
+ 
+
+
+
+static void
+print_file_name_and_frills (const struct fileinfo *f)
+{
+  char buf[((( ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1 ) > (  (((sizeof (  uintmax_t  ) * (8)  - 1) * 302 / 1000 + 2)  + 1)  )) ? ( ((2 * sizeof (uintmax_t) * (8)  * 302 / 1000 + 1) * ((1)  + 1) - (1)  + 3)  + 1 ) : (  (((sizeof (  uintmax_t  ) * (8)  - 1) * 302 / 1000 + 2)  + 1)  )) ];
+
+  if (print_inode)
+    printf ("%*s ", 7 , umaxtostr (f->stat.st_ino, buf));
+
+  if (print_block_size)
+    printf ("%*s ", block_size_size,
+	    human_readable ((( f->stat ).st_size / 512  + (( f->stat ).st_size % 512  != 0)) , buf, human_output_opts,
+			    512 , output_block_size));
+
+  print_name_with_quoting (f->name, ((color_symlink_as_referent && ( f )->linkok) ? ( f )->linkmode : ( f )->stat.st_mode) , f->linkok, 0 );
+
+  if (indicator_style != none)
+    print_type_indicator (f->stat.st_mode);
+}
+
+static void
+print_type_indicator (mode_t mode)
+{
+  int c;
+
+  if (((( mode ) & 00000170000 ) == 00000100000 ) )
+    {
+      if (indicator_style == classify && (mode & (00100  | 00010  | 00001 ) ))
+	c ='*';
+      else
+	c = 0;
+    }
+  else
+    {
+      if (((( mode ) & 00000170000 ) == 00000040000 ) )
+	c = '/';
+      else if (((( mode ) & 00000170000 ) == 00000120000 ) )
+	c = '@';
+      else if (((( mode ) & 00000170000 ) == 00000010000 ) )
+	c = '|';
+      else if (0 )
+	c = '=';
+      else if (0 )
+	c = '>';
+      else
+	c = 0;
+    }
+
+  if (c)
+    do {putchar_unlocked ( ( c ) ) ; ++dired_pos;} while (0) ;
+}
+
+static void
+print_color_indicator (const char *name, mode_t mode, int linkok)
+{
+  int type = C_FILE;
+  struct color_ext_type *ext;	 
+  size_t len;			 
+
+   
+
+  if (linkok == -1 && color_indicator[C_MISSING].string != 0 )
+    {
+      ext = 0 ;
+      type = C_MISSING;
+    }
+  else
+    {
+      if (((( mode ) & 00000170000 ) == 00000040000 ) )
+	type = C_DIR;
+      else if (((( mode ) & 00000170000 ) == 00000120000 ) )
+	type = ((!linkok && color_indicator[C_ORPHAN].string)
+		? C_ORPHAN : C_LINK);
+      else if (((( mode ) & 00000170000 ) == 00000010000 ) )
+	type = C_FIFO;
+      else if (0 )
+	type = C_SOCK;
+      else if (((( mode ) & 00000170000 ) == 00000060000 ) )
+	type = C_BLK;
+      else if (((( mode ) & 00000170000 ) == 00000020000 ) )
+	type = C_CHR;
+      else if (0 )
+	type = C_DOOR;
+
+      if (type == C_FILE && (mode & (00100  | 00010  | 00001 ) ) != 0)
+	type = C_EXEC;
+
+       
+      ext = 0 ;
+      if (type == C_FILE)
+	{
+	   
+
+	  len = strlen (name);
+	  name += len;		 
+	  for (ext = color_ext_list; ext != 0 ; ext = ext->next)
+	    {
+	      if ((size_t) ext->ext.len <= len
+		  && strncmp (name - ext->ext.len, ext->ext.string,
+			      ext->ext.len) == 0)
+		break;
+	    }
+	}
+    }
+
+  put_indicator (&color_indicator[C_LEFT]);
+  put_indicator (ext ? &(ext->seq) : &color_indicator[type]);
+  put_indicator (&color_indicator[C_RIGHT]);
+}
+
+ 
+static void
+put_indicator (const struct bin_str *ind)
+{
+  register int i;
+  register const char *p;
+
+  p = ind->string;
+
+  for (i = ind->len; i > 0; --i)
+    putchar_unlocked ( *(p++) ) ;
+}
+
+ 
+
+
+static int
+put_indicator_direct (const struct bin_str *ind)
+{
+  size_t len;
+  if (ind->len <= 0)
+    return 0;
+
+  len = ind->len;
+  return (full_write (1 , ind->string, len) != len);
+}
+
+static int
+length_of_file_name_and_frills (const struct fileinfo *f)
+{
+  register int len = 0;
+  size_t name_width;
+
+  if (print_inode)
+    len += 7  + 1;
+
+  if (print_block_size)
+    len += 1 + block_size_size;
+
+  quote_name (0 , f->name, filename_quoting_options, &name_width);
+  len += name_width;
+
+  if (indicator_style != none)
+    {
+      mode_t filetype = f->stat.st_mode;
+
+      if (((( filetype ) & 00000170000 ) == 00000100000 ) )
+	{
+	  if (indicator_style == classify
+	      && (f->stat.st_mode & (00100  | 00010  | 00001 ) ))
+	    len += 1;
+	}
+      else if (((( filetype ) & 00000170000 ) == 00000040000 ) 
+	       || ((( filetype ) & 00000170000 ) == 00000120000 ) 
+	       || ((( filetype ) & 00000170000 ) == 00000010000 ) 
+	       || 0 
+	       || 0 
+	       )
+	len += 1;
+    }
+
+  return len;
+}
+
+static void
+print_many_per_line (void)
+{
+  struct column_info *line_fmt;
+  int filesno;			 
+  int row;			 
+  int max_name_length;		 
+  int name_length;		 
+  int pos;			 
+  int cols;			 
+  int rows;			 
+  int max_cols;
+
+   
+
+
+  max_cols = max_idx > files_index ? files_index : max_idx;
+
+   
+  for (filesno = 0; filesno < files_index; ++filesno)
+    {
+      int i;
+
+      name_length = length_of_file_name_and_frills (files + filesno);
+
+      for (i = 0; i < max_cols; ++i)
+	{
+	  if (column_info[i].valid_len)
+	    {
+	      int idx = filesno / ((files_index + i) / (i + 1));
+	      int real_length = name_length + (idx == i ? 0 : 2);
+
+	      if (real_length > column_info[i].col_arr[idx])
+		{
+		  column_info[i].line_len += (real_length
+					   - column_info[i].col_arr[idx]);
+		  column_info[i].col_arr[idx] = real_length;
+		  column_info[i].valid_len = column_info[i].line_len < line_length;
+		}
+	    }
+	}
+    }
+
+   
+  for (cols = max_cols; cols > 1; --cols)
+    {
+      if (column_info[cols - 1].valid_len)
+	break;
+    }
+
+  line_fmt = &column_info[cols - 1];
+
+   
+
+  rows = files_index / cols + (files_index % cols != 0);
+
+  for (row = 0; row < rows; row++)
+    {
+      int col = 0;
+      filesno = row;
+      pos = 0;
+       
+      while (1)
+	{
+	  print_file_name_and_frills (files + filesno);
+	  name_length = length_of_file_name_and_frills (files + filesno);
+	  max_name_length = line_fmt->col_arr[col++];
+
+	  filesno += rows;
+	  if (filesno >= files_index)
+	    break;
+
+	  indent (pos + name_length, pos + max_name_length);
+	  pos += max_name_length;
+	}
+      putchar_unlocked ( '\n' ) ;
+    }
+}
+
+static void
+print_horizontal (void)
+{
+  struct column_info *line_fmt;
+  int filesno;
+  int max_name_length;
+  int name_length;
+  int cols;
+  int pos;
+  int max_cols;
+
+   
+
+
+  max_cols = max_idx > files_index ? files_index : max_idx;
+
+   
+  max_name_length = 0;
+  for (filesno = 0; filesno < files_index; ++filesno)
+    {
+      int i;
+
+      name_length = length_of_file_name_and_frills (files + filesno);
+
+      for (i = 0; i < max_cols; ++i)
+	{
+	  if (column_info[i].valid_len)
+	    {
+	      int idx = filesno % (i + 1);
+	      int real_length = name_length + (idx == i ? 0 : 2);
+
+	      if (real_length > column_info[i].col_arr[idx])
+		{
+		  column_info[i].line_len += (real_length
+					   - column_info[i].col_arr[idx]);
+		  column_info[i].col_arr[idx] = real_length;
+		  column_info[i].valid_len = column_info[i].line_len < line_length;
+		}
+	    }
+	}
+    }
+
+   
+  for (cols = max_cols; cols > 1; --cols)
+    {
+      if (column_info[cols - 1].valid_len)
+	break;
+    }
+
+  line_fmt = &column_info[cols - 1];
+
+  pos = 0;
+
+   
+  print_file_name_and_frills (files);
+  name_length = length_of_file_name_and_frills (files);
+  max_name_length = line_fmt->col_arr[0];
+
+   
+  for (filesno = 1; filesno < files_index; ++filesno)
+    {
+      int col = filesno % cols;
+
+      if (col == 0)
+	{
+	  putchar_unlocked ( '\n' ) ;
+	  pos = 0;
+	}
+      else
+	{
+	  indent (pos + name_length, pos + max_name_length);
+	  pos += max_name_length;
+	}
+
+      print_file_name_and_frills (files + filesno);
+
+      name_length = length_of_file_name_and_frills (files + filesno);
+      max_name_length = line_fmt->col_arr[col];
+    }
+  putchar_unlocked ( '\n' ) ;
+}
+
+static void
+print_with_commas (void)
+{
+  int filesno;
+  int pos, old_pos;
+
+  pos = 0;
+
+  for (filesno = 0; filesno < files_index; filesno++)
+    {
+      old_pos = pos;
+
+      pos += length_of_file_name_and_frills (files + filesno);
+      if (filesno + 1 < files_index)
+	pos += 2;		 
+
+      if (old_pos != 0 && pos >= line_length)
+	{
+	  putchar_unlocked ( '\n' ) ;
+	  pos -= old_pos;
+	}
+
+      print_file_name_and_frills (files + filesno);
+      if (filesno + 1 < files_index)
+	{
+	  putchar_unlocked ( ',' ) ;
+	  putchar_unlocked ( ' ' ) ;
+	}
+    }
+  putchar_unlocked ( '\n' ) ;
+}
+
+ 
+
+
+static void
+indent (int from, int to)
+{
+  while (from < to)
+    {
+      if (tabsize > 0 && to / tabsize > (from + 1) / tabsize)
+	{
+	  putchar_unlocked ( '\t' ) ;
+	  from += tabsize - from % tabsize;
+	}
+      else
+	{
+	  putchar_unlocked ( ' ' ) ;
+	  from++;
+	}
+    }
+}
+
+ 
+ 
+
+
+static void
+attach (char *dest, const char *dirname, const char *name)
+{
+  const char *dirnamep = dirname;
+
+   
+  if (dirname[0] != '.' || dirname[1] != 0)
+    {
+      while (*dirnamep)
+	*dest++ = *dirnamep++;
+       
+      if (dirnamep > dirname && dirnamep[-1] != '/')
+	*dest++ = '/';
+    }
+  while (*name)
+    *dest++ = *name++;
+  *dest = 0;
+}
+
+static void
+init_column_info (void)
+{
+  int i;
+  int allocate = 0;
+
+  max_idx = line_length / 3 ;
+  if (max_idx == 0)
+    max_idx = 1;
+
+  if (column_info == 0 )
+    {
+      column_info = (( struct column_info  *) xmalloc (sizeof ( struct column_info ) * (  max_idx ))) ;
+      allocate = 1;
+    }
+
+  for (i = 0; i < max_idx; ++i)
+    {
+      int j;
+
+      column_info[i].valid_len = 1;
+      column_info[i].line_len = (i + 1) * 3 ;
+
+      if (allocate)
+	column_info[i].col_arr = (( int  *) xmalloc (sizeof ( int ) * (  i + 1 ))) ;
+
+      for (j = 0; j <= i; ++j)
+	column_info[i].col_arr[j] = 3 ;
+    }
+}
+
+void
+usage (int status)
+{
+  if (status != 0)
+    fprintf (stderr, ((const char *) (  "Try `%s --help' for more information.\n"  ))  ,
+	     program_name);
+  else
+    {
+      printf (((const char *) (  "Usage: %s [OPTION]... [FILE]...\n"  ))  , program_name);
+      fputs (((const char *) (  "List information about the FILEs (the current directory by default).\nSort entries alphabetically if none of -cftuSUX nor --sort.\n\n"  ))  , stdout);
+
+
+
+
+      fputs (((const char *) (  "Mandatory arguments to long options are mandatory for short options too.\n"  ))  , stdout);
+
+
+      fputs (((const char *) (  "  -a, --all                  do not hide entries starting with .\n  -A, --almost-all           do not list implied . and ..\n      --author               print the author of each file\n  -b, --escape               print octal escapes for nongraphic characters\n"  ))  , stdout);
+
+
+
+
+
+      fputs (((const char *) (  "      --block-size=SIZE      use SIZE-byte blocks\n  -B, --ignore-backups       do not list implied entries ending with ~\n  -c                         with -lt: sort by, and show, ctime (time of last\n                               modification of file status information)\n                               with -l: show ctime and sort by name\n                               otherwise: sort by ctime\n"  ))  , stdout);
+
+
+
+
+
+
+
+      fputs (((const char *) (  "  -C                         list entries by columns\n      --color[=WHEN]         control whether color is used to distinguish file\n                               types.  WHEN may be `never', `always', or `auto'\n  -d, --directory            list directory entries instead of contents,\n                               and do not dereference symbolic links\n  -D, --dired                generate output designed for Emacs' dired mode\n"  ))  , stdout);
+
+
+
+
+
+
+
+      fputs (((const char *) (  "  -f                         do not sort, enable -aU, disable -lst\n  -F, --classify             append indicator (one of */=@|) to entries\n      --format=WORD          across -x, commas -m, horizontal -x, long -l,\n                               single-column -1, verbose -l, vertical -C\n      --full-time            like -l --time-style=full-iso\n"  ))  , stdout);
+
+
+
+
+
+
+      fputs (((const char *) (  "  -g                         like -l, but do not list owner\n  -G, --no-group             inhibit display of group information\n  -h, --human-readable  print sizes in human readable format (e.g., 1K 234M 2G)\n      --si                   likewise, but use powers of 1000 not 1024\n  -H, --dereference-command-line\n                             follow symbolic links listed on the command line\n      --dereference-command-line-symlink-to-dir\n                             follow each command line symbolic link\n                               that points to a directory\n"  ))  , stdout);
+# 3810 "ls.c"
+      fputs (((const char *) (  "      --indicator-style=WORD append indicator with style WORD to entry names:\n                               none (default), classify (-F), file-type (-p)\n  -i, --inode                print index number of each file\n  -I, --ignore=PATTERN       do not list implied entries matching shell PATTERN\n  -k                         like --block-size=1K\n"  ))  , stdout);
+
+
+
+
+
+
+      fputs (((const char *) (  "  -l                         use a long listing format\n  -L, --dereference          when showing file information for a symbolic\n                               link, show information for the file the link\n                               references rather than for the link itself\n  -m                         fill width with a comma separated list of entries\n"  ))  , stdout);
+
+
+
+
+
+
+      fputs (((const char *) (  "  -n, --numeric-uid-gid      like -l, but list numeric UIDs and GIDs\n  -N, --literal              print raw entry names (don't treat e.g. control\n                               characters specially)\n  -o                         like -l, but do not list group information\n  -p, --file-type            append indicator (one of /=@|) to entries\n"  ))  , stdout);
+
+
+
+
+
+
+      fputs (((const char *) (  "  -q, --hide-control-chars   print ? instead of non graphic characters\n      --show-control-chars   show non graphic characters as-is (default\n                             unless program is `ls' and output is a terminal)\n  -Q, --quote-name           enclose entry names in double quotes\n      --quoting-style=WORD   use quoting style WORD for entry names:\n                               literal, locale, shell, shell-always, c, escape\n"  ))  , stdout);
+
+
+
+
+
+
+
+      fputs (((const char *) (  "  -r, --reverse              reverse order while sorting\n  -R, --recursive            list subdirectories recursively\n  -s, --size                 print size of each file, in blocks\n"  ))  , stdout);
+
+
+
+
+      fputs (((const char *) (  "  -S                         sort by file size\n      --sort=WORD            extension -X, none -U, size -S, time -t,\n                               version -v\n                             status -c, time -t, atime -u, access -u, use -u\n      --time=WORD            show time as WORD instead of modification time:\n                               atime, access, use, ctime or status; use\n                               specified time as sort key if --sort=time\n"  ))  , stdout);
+# 3853 "ls.c"
+      fputs (((const char *) (  "      --time-style=STYLE     show times using style STYLE:\n                               full-iso, long-iso, iso, locale, +FORMAT\n                             FORMAT is interpreted like `date'; if FORMAT is\n                             FORMAT1<newline>FORMAT2, FORMAT1 applies to\n                             non-recent files and FORMAT2 to recent files;\n                             if STYLE is prefixed with `posix-', STYLE\n                             takes effect only outside the POSIX locale\n  -t                         sort by modification time\n  -T, --tabsize=COLS         assume tab stops at each COLS instead of 8\n"  ))  , stdout);
+# 3864 "ls.c"
+      fputs (((const char *) (  "  -u                         with -lt: sort by, and show, access time\n                               with -l: show access time and sort by name\n                               otherwise: sort by access time\n  -U                         do not sort; list entries in directory order\n  -v                         sort by version\n"  ))  , stdout);
+
+
+
+
+
+
+      fputs (((const char *) (  "  -w, --width=COLS           assume screen width instead of current value\n  -x                         list entries by lines instead of by columns\n  -X                         sort alphabetically by entry extension\n  -1                         list one file per line\n"  ))  , stdout);
+
+
+
+
+
+      fputs (((const char *) (  "      --help     display this help and exit\n"  ))   , stdout);
+      fputs (((const char *) (  "      --version  output version information and exit\n"  ))   , stdout);
+      fputs (((const char *) (  "\nSIZE may be (or may be an integer optionally followed by) one of following:\nkB 1000, K 1024, MB 1,000,000, M 1,048,576, and so on for G, T, P, E, Z, Y.\n"  ))  , stdout);
+
+
+
+      fputs (((const char *) (  "\nBy default, color is not used to distinguish types of files.  That is\nequivalent to using --color=none.  Using the --color option without the\noptional WHEN argument is equivalent to using --color=always.  With\n--color=auto, color codes are output only if standard output is connected\nto a terminal (tty).\n"  ))  , stdout);
+
+
+
+
+
+
+
+      printf (((const char *) (  "\nReport bugs to <%s>.\n"  ))  , "bug-coreutils@gnu.org" );
+    }
+  exit (status);
+}
