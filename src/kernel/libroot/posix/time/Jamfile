@@ -12,8 +12,8 @@ KernelMergeObject posix_time.o :
 	localtime.c
 	stime.c
 	strftime.c
-	strptime.c
-	timelocal.c
+#	strptime.c
+#	timelocal.c
 	time.c
 	: -fPIC -DPIC
 	;
