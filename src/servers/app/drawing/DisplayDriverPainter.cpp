@@ -28,7 +28,12 @@
 
 #include "Painter.h"
 #include "RenderingBuffer.h"
-#include "ViewHWInterface.h"
+
+#ifdef __HAIKU__
+  #include "AccelerantHWInterface.h"
+#else
+  #include "ViewHWInterface.h"
+#endif
 
 #include "DisplayDriverPainter.h"
 
@@ -41,7 +46,11 @@
 DisplayDriverPainter::DisplayDriverPainter()
 	: DisplayDriver(),
 	  fPainter(new Painter()),
+#ifdef __HAIKU__
+	  fGraphicsCard(new AccelerantHWInterface())
+#else
 	  fGraphicsCard(new ViewHWInterface())
+#endif
 {
 }
 
@@ -501,7 +510,7 @@ DisplayDriverPainter::StrokeLine(const BPoint &start, const BPoint &end, const R
 		fPainter->SetDrawingMode(B_OP_COPY);
 		fPainter->StrokeLine(start, end, B_SOLID_HIGH);
 
-		BRect r(start, end);
+		BRect r(start, end + BPoint(1.0, 1.0));
 		fGraphicsCard->Invalidate(r);
 
 		Unlock();
@@ -910,42 +919,48 @@ DisplayDriverPainter::SetDPMSMode(const uint32 &state)
 uint32
 DisplayDriverPainter::DPMSMode() const
 {
-/*	uint32 mode = 0;
+	uint32 mode = 0;
 	if (Lock()) {
 		mode = fGraphicsCard->DPMSMode();
 		Unlock();
 	}
-	return mode;*/
-	return fGraphicsCard->DPMSMode();
+	return mode;
 }
 
 // DPMSCapabilities
 uint32
 DisplayDriverPainter::DPMSCapabilities() const
 {
-/*	uint32 caps = 0;
+	uint32 caps = 0;
 	if (Lock()) {
 		caps = fGraphicsCard->DPMSMode();
 		Unlock();
 	}
-	return caps;*/
-	return fGraphicsCard->DPMSMode();;
+	return caps;
 }
 
 // GetDeviceInfo
 status_t
 DisplayDriverPainter::GetDeviceInfo(accelerant_device_info *info)
 {
-	// TODO: locking?
-	return fGraphicsCard->GetDeviceInfo(info);
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->GetDeviceInfo(info);
+		Unlock();
+	}
+	return ret;
 }
 
 // GetModeList
 status_t
 DisplayDriverPainter::GetModeList(display_mode **mode_list, uint32 *count)
 {
-	// TODO: locking?
-	return fGraphicsCard->GetModeList(mode_list, count);
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->GetModeList(mode_list, count);
+		Unlock();
+	}
+	return ret;
 }
 
 // GetPixelClockLimits
@@ -953,16 +968,24 @@ status_t DisplayDriverPainter::GetPixelClockLimits(display_mode *mode,
 												   uint32 *low,
 												   uint32 *high)
 {
-	// TODO: locking?
-	return fGraphicsCard->GetPixelClockLimits(mode, low, high);
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->GetPixelClockLimits(mode, low, high);
+		Unlock();
+	}
+	return ret;
 }
 
 // GetTimingConstraints
 status_t
 DisplayDriverPainter::GetTimingConstraints(display_timing_constraints *dtc)
 {
-	// TODO: locking?
-	return fGraphicsCard->GetTimingConstraints(dtc);
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->GetTimingConstraints(dtc);
+		Unlock();
+	}
+	return ret;
 }
 
 // ProposeMode
@@ -971,15 +994,24 @@ DisplayDriverPainter::ProposeMode(display_mode *candidate,
 								  const display_mode *low,
 								  const display_mode *high)
 {
-	// TODO: locking?
-	return fGraphicsCard->ProposeMode(candidate, low, high);
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->ProposeMode(candidate, low, high);
+		Unlock();
+	}
+	return ret;
 }
 
 // WaitForRetrace
 status_t
 DisplayDriverPainter::WaitForRetrace(bigtime_t timeout)
 {
-	return fGraphicsCard->WaitForRetrace(timeout);
+	status_t ret = B_ERROR;
+	if (Lock()) {
+		ret = fGraphicsCard->WaitForRetrace(timeout);
+		Unlock();
+	}
+	return ret;
 }
 
 // CopyBitmap
@@ -999,12 +1031,7 @@ void DisplayDriverPainter::CopyToBitmap(ServerBitmap *target,
 // Invalidate
 void DisplayDriverPainter::Invalidate(const BRect &r)
 {
-// the CursorHandler uses this, but we don't need right now, and it clutters debug output
-//	if (Lock()) {
-// ?!? Does this implementation need this?
-//		fGraphicsCard->Invalidate(r);
-//		Unlock();
-//	}
+	// nothing to be done here
 }
 
 // ConstrainClippingRegion
