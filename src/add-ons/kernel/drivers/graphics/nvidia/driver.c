@@ -265,8 +265,8 @@ static settings current_settings = { // see comments in nv.settings
 	// for accelerant
 	0x00000000, // logmask
 	0,          // memory
-	false,      // usebios
-	false,      // hardcursor
+	true,       // usebios
+	true,       // hardcursor
 	false,		// switchhead
 	false,		// force_pci
 	false,		// unhide_fw
