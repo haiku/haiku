@@ -102,7 +102,8 @@ main(int argc, const char *const *argv)
 
 	// evaluate result
 	if (reply.error != B_OK) {
-		fprintf(stderr, "Command failed: %lx\n", error);
+		fprintf(stderr, "Command failed: %s\n", strerror(reply.error));
+		fprintf(stderr, "Command was:\n  %s\n", message.command);
 		exit(1);
 	}
 
