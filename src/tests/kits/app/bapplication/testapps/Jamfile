@@ -1,45 +1,83 @@
 SubDir OBOS_TOP src tests kits app bapplication testapps ;
 
-CommonUnitTest BApplicationTestApp1
-	: BApplicationTestApp1.cpp
-	: kits app
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
-	: be stdc++.r4
-	: app support
-;
+rule SimpleBAppTestApp
+{
+	# SimpleBAppTestApp <sources> : <resources> ;
+	local sources = $(1) ;
+	local resources = $(2) ;
+	local name = $(sources[1]) ;
+	name = $(name:B) ;
+	SimpleBAppTestApp2 $(name) : $(sources) : $(resources) ;
+}
 
-CommonUnitTest BApplicationTestApp2
-	: BApplicationTestApp2.cpp
-	: kits app
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
-	: be stdc++.r4
-	: app support
-;
+rule SimpleBAppTestApp2
+{
+	# SimpleBAppTestApp <name> : <sources> : <resources> ;
+	local name = $(1) ;
+	local sources = $(2) ;
+	local resources = $(3) ;
+	local r5name = $(name)_r5 ;
 
-CommonUnitTest BApplicationTestApp3
-	: BApplicationTestApp3.cpp
-	: kits app
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
-	: be stdc++.r4
-	: app support
-;
+	if $(resources) {
+		AddResources $(name) : $(resources) ;
+		AddResources $(r5name) : $(resources) ;
+	}
+	CommonUnitTest $(name)
+		: $(sources)
+		: kits app
+		: <boot!home!config!lib>libopenbeos.so be stdc++.r4
+		: be stdc++.r4
+		: app support
+	;
+}
 
-AddResources BApplicationTestApp4 : BApplicationTestApp4.rsrc ;
-AddResources BApplicationTestApp4_r5 : BApplicationTestApp4.rsrc ;
-CommonUnitTest BApplicationTestApp4
-	: BApplicationTestApp4.cpp
-	: kits app
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
-	: be stdc++.r4
-	: app support
-;
+rule CopyBAppTestApp
+{
+	# CopyBAppTestApp  <target> : <source> ;
+	local target = $(1) ;
+	local source = $(2) ;
+	local r5target = $(target)_r5 ;
+	local r5source = $(source)_r5 ;
+	MakeLocate $(target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
+	MakeLocate $(r5target) : [ FDirName $(OBOS_TEST_DIR) kits app ] ;
+	File $(target) : $(source) ;
+	File $(r5target) : $(r5source) ;
+	local file ;
+	for file in $(target) $(r5target) {
+		MODE on $(file) = $(EXEMODE) ;
+		MimeSet $(file) ;
+	}
+}
 
-AddResources BApplicationTestApp5 : BApplicationTestApp5.rsrc ;
-AddResources BApplicationTestApp5_r5 : BApplicationTestApp5.rsrc ;
-CommonUnitTest BApplicationTestApp5
-	: BApplicationTestApp5.cpp
-	: kits app
-	: <boot!home!config!lib>libopenbeos.so be stdc++.r4
-	: be stdc++.r4
-	: app support
-;
+SimpleBAppTestApp BApplicationTestApp1.cpp ;
+SimpleBAppTestApp BApplicationTestApp1a.cpp ;
+SimpleBAppTestApp BApplicationTestApp1b.cpp ;
+SimpleBAppTestApp BApplicationTestApp2.cpp ;
+SimpleBAppTestApp BApplicationTestApp2a.cpp ;
+SimpleBAppTestApp BApplicationTestApp2b.cpp ;
+SimpleBAppTestApp BApplicationTestApp3.cpp ;
+SimpleBAppTestApp BApplicationTestApp3a.cpp ;
+SimpleBAppTestApp BApplicationTestApp3b.cpp ;
+SimpleBAppTestApp BApplicationTestApp4.cpp : BApplicationTestApp4.rsrc ;
+SimpleBAppTestApp BApplicationTestApp4a.cpp : BApplicationTestApp4.rsrc ;
+SimpleBAppTestApp BApplicationTestApp4b.cpp : BApplicationTestApp4.rsrc ;
+SimpleBAppTestApp BApplicationTestApp5.cpp : BApplicationTestApp5.rsrc ;
+SimpleBAppTestApp BApplicationTestApp5a.cpp : BApplicationTestApp5.rsrc ;
+SimpleBAppTestApp BApplicationTestApp5b.cpp : BApplicationTestApp5.rsrc ;
+
+SimpleBAppTestApp AppRunTestApp1.cpp CommonTestApp.cpp	: AppRunTestApp1.rsrc ;
+SimpleBAppTestApp2 AppRunTestApp2 : AppRunTestApp1.o CommonTestApp.o
+				   : AppRunTestApp2.rsrc ;
+SimpleBAppTestApp2 AppRunTestApp3 : AppRunTestApp1.o CommonTestApp.o
+				   : AppRunTestApp3.rsrc ;
+SimpleBAppTestApp2 AppRunTestApp4 : AppRunTestApp1.o CommonTestApp.o
+				   : AppRunTestApp4.rsrc ;
+SimpleBAppTestApp2 AppRunTestApp5 : AppRunTestApp1.o CommonTestApp.o
+				   : AppRunTestApp5.rsrc ;
+SimpleBAppTestApp2 AppRunTestApp6 : AppRunTestApp1.o CommonTestApp.o
+				   : AppRunTestApp6.rsrc ;
+
+CopyBAppTestApp AppRunTestApp3a : AppRunTestApp3 ;
+CopyBAppTestApp AppRunTestApp4a : AppRunTestApp4 ;
+CopyBAppTestApp AppRunTestApp5a : AppRunTestApp5 ;
+CopyBAppTestApp AppRunTestApp6a : AppRunTestApp6 ;

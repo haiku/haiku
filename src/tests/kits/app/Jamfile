@@ -13,7 +13,9 @@ CommonTestLib libapptest.so
 		# BApplication
 		ApplicationTest.cpp
 		AppRunner.cpp
+		AppRunTester.cpp
 		BApplicationTester.cpp
+		PipedAppRunner.cpp
 
 		# BHandler
 		HandlerTest.cpp

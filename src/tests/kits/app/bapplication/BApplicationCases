@@ -15,8 +15,116 @@ case 5:	signature is a valid MIME string with "application" supertype,
 		Shouldn't print anything at all and continue.
 		InitCheck() should return B_OK.
 
+
 BApplication(const char *signature, status_t *error)
 cases similar to those of BApplication(const char *), if error is NULL,
-otherwise error is set to the same value as returned by InitCheck()
+otherwise the app does not quit and error is set to the same value as
+returned by InitCheck(), which is B_BAD_VALUE on error.
 
+thread_id Run()
+case 1:	launch the app two times: B_MULTIPLE_LAUNCH | B_ARGV_ONLY,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	ReadyToRun(), QuitRequested()
+case 2:	launch the app two times: B_MULTIPLE_LAUNCH | B_ARGV_ONLY,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+case 3:	launch the app two times: B_MULTIPLE_LAUNCH,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	ReadyToRun(), QuitRequested()
+case 4:	launch the app two times: B_MULTIPLE_LAUNCH,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+case 5:	launch the app two times: B_SINGLE_LAUNCH | B_ARGV_ONLY,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	quits
+case 6:	launch the app two times: B_SINGLE_LAUNCH | B_ARGV_ONLY,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), ArgvReceived(),
+					QuitRequested()
+		second app:	quits
+case 7:	launch the app two times: B_SINGLE_LAUNCH,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	quits
+case 8:	launch the app two times: B_SINGLE_LAUNCH,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), ArgvReceived(),
+					QuitRequested()
+		second app:	quits
+case 9:	launch two apps with the same signature: B_SINGLE_LAUNCH | B_ARGV_ONLY,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	ReadyToRun(), QuitRequested()
+case 10:launch two apps with the same signature: B_SINGLE_LAUNCH | B_ARGV_ONLY,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+case 11:launch two apps with the same signature: B_SINGLE_LAUNCH,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	ReadyToRun(), QuitRequested()
+case 12:launch two apps with the same signature: B_SINGLE_LAUNCH,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+case 13:launch the app two times: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	quits
+case 14:launch the app two times: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	quits
+case 15:launch the app two times: B_EXCLUSIVE_LAUNCH,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	quits
+case 16:launch the app two times: B_EXCLUSIVE_LAUNCH,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), ArgvReceived(),
+					QuitRequested()
+		second app:	quits
+case 17:launch two apps with the same signature:
+		B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	quits
+case 18:launch two apps with the same signature:
+		B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	quits
+case 19:launch two apps with the same signature: B_EXCLUSIVE_LAUNCH,
+		no command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ReadyToRun(), QuitRequested()
+		second app:	quits
+case 20:launch two apps with the same signature: B_EXCLUSIVE_LAUNCH,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), ArgvReceived(),
+					QuitRequested()
+		second app:	quits
+case 21:launch the app two times: first: B_EXCLUSIVE_LAUNCH,
+		second: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), ArgvReceived(),
+					QuitRequested()
+		second app:	quits
+
+case 22:launch the app two times: first: B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY,
+		second: B_EXCLUSIVE_LAUNCH,
+		command line args, send B_QUIT_REQUESTED to both of them =>
+		first app:	ArgvReceived(), ReadyToRun(), QuitRequested()
+		second app:	quits
+
+
+void Quit()
+TODO
+
+bool QuitRequested()
+TODO
 

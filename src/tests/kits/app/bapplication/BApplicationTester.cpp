@@ -21,7 +21,7 @@
 #include <cppunit/TestAssert.h>
 
 // Local Includes --------------------------------------------------------------
-#include "AppRunner.h"
+#include "PipedAppRunner.h"
 #include "BApplicationTester.h"
 
 // Local Defines ---------------------------------------------------------------
@@ -35,27 +35,17 @@ static
 void
 test_app(const char *app, const char *expectedResult)
 {
-	// construct an absolute path to the app
-	BString appPath(BTestShell::GlobalTestDir());
-	appPath.CharacterEscape(" \t\n!\"'`$&()?*+{}[]<>|", '\\');
-	appPath += "/kits/app/";
-	appPath += app;
-#ifdef TEST_R5
-	appPath += "_r5";
-#endif
 	// run the app
-	AppRunner runner;
-	CHK(runner.Run(appPath.String()) == B_OK);
-	while (!runner.HasQuitted())
-		snooze(10000);
-	// read the output and compare the result
-	char buffer[1024];
-	ssize_t read = runner.ReadOutput(buffer, sizeof(buffer) - 1);
-	CHK(read >= 0);
-	buffer[read] = '\0';
-if (strcmp(buffer, expectedResult))
-printf("result is `%s', but should be `%s'\n", buffer, expectedResult);
-	CHK(!strcmp(buffer, expectedResult));
+	PipedAppRunner runner;
+	CHK(runner.Run(app) == B_OK);
+	runner.WaitFor();
+	// get the output and compare the result
+	BString buffer;
+	CHK(runner.GetOutput(&buffer) == B_OK);
+if (buffer != expectedResult)
+printf("result is `%s', but should be `%s'\n", buffer.String(),
+expectedResult);
+	CHK(buffer == expectedResult);
 }
 
 
@@ -66,10 +56,19 @@ printf("result is `%s', but should be `%s'\n", buffer, expectedResult);
  */
 void TBApplicationTester::BApplication1()
 {
-	test_app("BApplicationTestApp1",
-			 "bad signature ((null)), must begin with \"application/\" and "
-			 "can't conflict with existing registered mime types inside "
-			 "the \"application\" media type.\n");
+	const char *output1 =
+		"bad signature ((null)), must begin with \"application/\" and "
+		"can't conflict with existing registered mime types inside "
+		"the \"application\" media type.\n";
+	const char *output2 =
+		"bad signature ((null)), must begin with \"application/\" and "
+		"can't conflict with existing registered mime types inside "
+		"the \"application\" media type.\n"
+		"error: 80000005\n"
+		"InitCheck(): 80000005\n";
+	test_app("BApplicationTestApp1", output1);
+	test_app("BApplicationTestApp1a", output1);
+	test_app("BApplicationTestApp1b", output2);
 }
 
 /*
@@ -79,10 +78,19 @@ void TBApplicationTester::BApplication1()
  */
 void TBApplicationTester::BApplication2()
 {
-	test_app("BApplicationTestApp2",
-			 "bad signature (no valid MIME string), must begin with "
-			 "\"application/\" and can't conflict with existing registered "
-			 "mime types inside the \"application\" media type.\n");
+	const char *output1 =
+		"bad signature (no valid MIME string), must begin with "
+		"\"application/\" and can't conflict with existing registered "
+		"mime types inside the \"application\" media type.\n";
+	const char *output2 =
+		"bad signature (no valid MIME string), must begin with "
+		"\"application/\" and can't conflict with existing registered "
+		"mime types inside the \"application\" media type.\n"
+		"error: 80000005\n"
+		"InitCheck(): 80000005\n";
+	test_app("BApplicationTestApp2", output1);
+	test_app("BApplicationTestApp2a", output1);
+	test_app("BApplicationTestApp2b", output2);
 }
 
 /*
@@ -93,10 +101,19 @@ void TBApplicationTester::BApplication2()
  */
 void TBApplicationTester::BApplication3()
 {
-	test_app("BApplicationTestApp3",
-			 "bad signature (image/gif), must begin with \"application/\" and "
-			 "can't conflict with existing registered mime types inside "
-			 "the \"application\" media type.\n");
+	const char *output1 =
+		"bad signature (image/gif), must begin with \"application/\" and "
+		"can't conflict with existing registered mime types inside "
+		"the \"application\" media type.\n";
+	const char *output2 =
+		"bad signature (image/gif), must begin with \"application/\" and "
+		"can't conflict with existing registered mime types inside "
+		"the \"application\" media type.\n"
+		"error: 80000005\n"
+		"InitCheck(): 80000005\n";
+	test_app("BApplicationTestApp3", output1);
+	test_app("BApplicationTestApp3a", output1);
+	test_app("BApplicationTestApp3b", output2);
 }
 
 /*
@@ -109,12 +126,20 @@ void TBApplicationTester::BApplication3()
  */
 void TBApplicationTester::BApplication4()
 {
-	test_app("BApplicationTestApp4",
-			 "Signature in rsrc doesn't match constructor arg. "
-			 "(application/x-vnd.obos-bapplication-testapp4,"
-			 "application/x-vnd.obos-bapplication-testapp4-or-not)\n"
-			 "InitCheck(): 0\n");
-
+	const char *output1 =
+		"Signature in rsrc doesn't match constructor arg. "
+		"(application/x-vnd.obos-bapplication-testapp4,"
+		"application/x-vnd.obos-bapplication-testapp4-or-not)\n"
+		"InitCheck(): 0\n";
+	const char *output2 =
+		"Signature in rsrc doesn't match constructor arg. "
+		"(application/x-vnd.obos-bapplication-testapp4,"
+		"application/x-vnd.obos-bapplication-testapp4-or-not)\n"
+		"error: 0\n"
+		"InitCheck(): 0\n";
+	test_app("BApplicationTestApp4", output1);
+	test_app("BApplicationTestApp4a", output1);
+	test_app("BApplicationTestApp4b", output2);
 }
 
 /*
@@ -126,7 +151,13 @@ void TBApplicationTester::BApplication4()
  */
 void TBApplicationTester::BApplication5()
 {
-	test_app("BApplicationTestApp5", "InitCheck(): 0\n");
+	const char *output1 = "InitCheck(): 0\n";
+	const char *output2 =
+		"error: 0\n"
+		"InitCheck(): 0\n";
+	test_app("BApplicationTestApp5", output1);
+	test_app("BApplicationTestApp5a", output1);
+	test_app("BApplicationTestApp5b", output2);
 }
 
 

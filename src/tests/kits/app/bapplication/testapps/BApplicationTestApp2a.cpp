@@ -1,4 +1,4 @@
-// BApplicationTestApp1.cpp
+// BApplicationTestApp2a.cpp
 
 #include <stdio.h>
 
@@ -7,7 +7,7 @@
 int
 main()
 {
-	BApplication app((const char*)NULL);
+	BApplication app("no valid MIME string", NULL);
 	printf("InitCheck(): %lx\n", app.InitCheck());
 	return 0;
 }

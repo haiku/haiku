@@ -1,4 +1,4 @@
-// BApplicationTestApp1.cpp
+// BApplicationTestApp4a.cpp
 
 #include <stdio.h>
 
@@ -7,7 +7,7 @@
 int
 main()
 {
-	BApplication app((const char*)NULL);
+	BApplication app("application/x-vnd.obos-bapplication-testapp4", NULL);
 	printf("InitCheck(): %lx\n", app.InitCheck());
 	return 0;
 }

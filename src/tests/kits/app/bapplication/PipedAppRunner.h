@@ -1,24 +1,22 @@
-// AppRunner.h
+// PipedAppRunner.h
 
-#ifndef APP_RUNNER_H
-#define APP_RUNNER_H
+#ifndef PIPED_APP_RUNNER_H
+#define PIPED_APP_RUNNER_H
 
 #include <stdio.h>
 
 #include <DataIO.h>
 #include <Locker.h>
 
-class AppRunner {
+class PipedAppRunner {
 public:
-	AppRunner();
-	~AppRunner();
+	PipedAppRunner();
+	~PipedAppRunner();
 
 	status_t Run(const char *command, const char *args = NULL,
 				 bool findCommand = true);
 	bool HasQuitted();
-	void WaitFor(bool requestQuit = false);
-	team_id Team();
-	status_t RequestQuit();
+	void WaitFor();
 
 	status_t GetOutput(BString *buffer);
 	ssize_t ReadOutput(void *buffer, size_t size);
@@ -27,21 +25,13 @@ public:
 private:
 	static int32 _ReaderEntry(void *data);
 	int32 _ReaderLoop();
-
-	static bool _LockTeamPort();
-	static void _UnlockTeamPort();
-	static port_id _ReadPortID(BMessenger &messenger);
+	void _ClosePipe();
 
 private:
 	BLocker		fOutputLock;
-	port_id		fRemotePort;
+	FILE		*fPipe;
 	BMallocIO	fOutput;
 	thread_id	fReader;
-	team_id		fTeam;
-	BMessenger	fMessenger;
-
-	static port_id	fTeamPort;
-	static BLocker	fTeamPortLock;
 };
 
-#endif	// APP_RUNNER_H
+#endif	// PIPED_APP_RUNNER_H
