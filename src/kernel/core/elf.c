@@ -104,10 +104,10 @@ register_elf_image(struct elf_image_info *image)
 	imageInfo.type = B_SYSTEM_IMAGE;
 	strlcpy(imageInfo.name, image->name, sizeof(imageInfo.name));
 	
-	imageInfo.text = (void *)image->regions[0].start;
-	imageInfo.text_size = image->regions[0].size;
-	imageInfo.data = (void *)image->regions[1].start;
-	imageInfo.data_size = image->regions[1].size;
+	imageInfo.text = (void *)image->text_region.start;
+	imageInfo.text_size = image->text_region.size;
+	imageInfo.data = (void *)image->data_region.start;
+	imageInfo.data_size = image->data_region.size;
 
 	hash_insert(sImagesHash, image);
 }
@@ -128,8 +128,8 @@ find_image_at_address(addr_t address)
 	// get image that may contain the address
 
 	while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-		if (address >= image->regions[0].start
-			&& address <= (image->regions[0].start + image->regions[0].size))
+		if (address >= image->text_region.start
+			&& address <= (image->text_region.start + image->text_region.size))
 			break;
 	}
 
@@ -198,8 +198,8 @@ create_image_struct()
 
 	memset(image, 0, sizeof(struct elf_image_info));
 
-	image->regions[0].id = -1;
-	image->regions[1].id = -1;
+	image->text_region.id = -1;
+	image->data_region.id = -1;
 	image->ref_count = 1;
 
 	return image;
@@ -271,8 +271,8 @@ dump_symbols(int argc, char **argv)
 
 				hash_open(sImagesHash, &iterator);
 				while ((image = hash_next(sImagesHash, &iterator)) != NULL) {
-					if (image->regions[0].start <= num
-						&& image->regions[0].start + image->regions[0].size >= num)
+					if (image->text_region.start <= num
+						&& image->text_region.start + image->text_region.size >= num)
 						break;
 				}
 				hash_close(sImagesHash, &iterator, false);
@@ -314,10 +314,10 @@ dump_symbols(int argc, char **argv)
 			struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
 			if (symbol->st_value == 0
-				|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
+				|| symbol->st_size >= image->text_region.size + image->data_region.size)
 				continue;
 
-			dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
+			dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
 				get_symbol_type_string(symbol), get_symbol_bind_string(symbol), symbol->st_size,
 				image->debug_string_table + symbol->st_name);
 		}
@@ -330,10 +330,10 @@ dump_symbols(int argc, char **argv)
 				struct Elf32_Sym *symbol = &image->syms[j];
 
 				if (symbol->st_value == 0
-					|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
+					|| symbol->st_size >= image->text_region.size + image->data_region.size)
 					continue;
 
-				dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
+				dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->text_region.delta,
 					get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
 					symbol->st_size, SYMNAME(image, symbol));
 			}
@@ -345,19 +345,23 @@ dump_symbols(int argc, char **argv)
 
 
 static void
+dump_elf_region(struct elf_region *region, const char *name)
+{
+	dprintf("   %s.id 0x%lx\n", name, region->id);
+	dprintf("   %s.start 0x%lx\n", name, region->start);
+	dprintf("   %s.size 0x%lx\n", name, region->size);
+	dprintf("   %s.delta %ld\n", name, region->delta);
+}
+
+
+static void
 dump_image_info(struct elf_image_info *image)
 {
-	int i;
-
 	dprintf("elf_image_info at %p:\n", image);
 	dprintf(" next %p\n", image->next);
 	dprintf(" id 0x%lx\n", image->id);
-	for (i = 0; i < 2; i++) {
-		dprintf(" regions[%d].id 0x%lx\n", i, image->regions[i].id);
-		dprintf(" regions[%d].start 0x%lx\n", i, image->regions[i].start);
-		dprintf(" regions[%d].size 0x%lx\n", i, image->regions[i].size);
-		dprintf(" regions[%d].delta %ld\n", i, image->regions[i].delta);
-	}
+	dump_elf_region(&image->text_region, "text");
+	dump_elf_region(&image->data_region, "data");
 	dprintf(" dynamic_ptr 0x%lx\n", image->dynamic_ptr);
 	dprintf(" needed %p\n", image->needed);
 	dprintf(" symhash %p\n", image->symhash);
@@ -467,31 +471,31 @@ elf_parse_dynamic_section(struct elf_image_info *image)
 	for (i = 0; d[i].d_tag != DT_NULL; i++) {
 		switch (d[i].d_tag) {
 			case DT_NEEDED:
-				needed_offset = d[i].d_un.d_ptr + image->regions[0].delta;
+				needed_offset = d[i].d_un.d_ptr + image->text_region.delta;
 				break;
 			case DT_HASH:
-				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->symhash = (uint32 *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_STRTAB:
-				image->strtab = (char *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->strtab = (char *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_SYMTAB:
-				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->syms = (struct Elf32_Sym *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_REL:
-				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->rel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_RELSZ:
 				image->rel_len = d[i].d_un.d_val;
 				break;
 			case DT_RELA:
-				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->rela = (struct Elf32_Rela *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_RELASZ:
 				image->rela_len = d[i].d_un.d_val;
 				break;
 			case DT_JMPREL:
-				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->regions[0].delta);
+				image->pltrel = (struct Elf32_Rel *)(d[i].d_un.d_ptr + image->text_region.delta);
 				break;
 			case DT_PLTRELSZ:
 				image->pltrel_len = d[i].d_un.d_val;
@@ -554,7 +558,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
 				return B_MISSING_SYMBOL;
 			}
 
-			*sym_addr = sym2->st_value + shared_image->regions[0].delta;
+			*sym_addr = sym2->st_value + shared_image->text_region.delta;
 			return B_NO_ERROR;
 		case SHN_ABS:
 			*sym_addr = sym->st_value;
@@ -565,7 +569,7 @@ elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
 			return B_ERROR;
 		default:
 			// standard symbol
-			*sym_addr = sym->st_value + image->regions[0].delta;
+			*sym_addr = sym->st_value + image->text_region.delta;
 			return B_NO_ERROR;
 	}
 }
@@ -649,17 +653,14 @@ elf_unlink_relocs(struct elf_image_info *image)
 static status_t
 unload_elf_image(struct elf_image_info *image)
 {
-	int i;
-
 	if (atomic_add(&image->ref_count, -1) > 0)
 		return B_NO_ERROR;
 
 	//elf_unlink_relocs(image);
 		// not yet used
 
-	for (i = 0; i < 2; ++i) {
-		delete_area(image->regions[i].id);
-	}
+	delete_area(image->text_region.id);
+	delete_area(image->data_region.id);
 
 	if (image->vnode)
 		vfs_put_vnode_ptr(image->vnode);
@@ -792,8 +793,8 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 	image->name = strdup(preloadedImage->name);
 	image->dynamic_ptr = preloadedImage->dynamic_section.start;
 
-	image->regions[0] = preloadedImage->text_region;
-	image->regions[1] = preloadedImage->data_region;
+	image->text_region = preloadedImage->text_region;
+	image->data_region = preloadedImage->data_region;
 
 	status = elf_parse_dynamic_section(image);
 	if (status < B_OK)
@@ -857,10 +858,10 @@ get_image_symbol(image_id id, const char *name, int32 sclass, void **_symbol)
 
 	// ToDo: support the "sclass" parameter!
 
-	TRACE(("found: %lx (%lx + %lx)\n", symbol->st_value + image->regions[0].delta, 
-		symbol->st_value, image->regions[0].delta));
+	TRACE(("found: %lx (%lx + %lx)\n", symbol->st_value + image->text_region.delta, 
+		symbol->st_value, image->text_region.delta));
 
-	*_symbol = (void *)(symbol->st_value + image->regions[0].delta);
+	*_symbol = (void *)(symbol->st_value + image->text_region.delta);
 
 done:
 	mutex_unlock(&sImageMutex);
@@ -901,7 +902,7 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 		int32 j;
 
 		TRACE((" image %p, base = %p, size = %p\n", image,
-			(void *)image->regions[0].start, (void *)image->regions[0].size));
+			(void *)image->text_region.start, (void *)image->text_region.size));
 
 		if (image->debug_symbols != NULL) {
 			// search extended debug symbol table (contains static symbols)
@@ -912,10 +913,10 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 				struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
 				if (symbol->st_value == 0
-					|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
+					|| symbol->st_size >= image->text_region.size + image->data_region.size)
 					continue;
 
-				symbolDelta = address - (symbol->st_value + image->regions[0].delta);
+				symbolDelta = address - (symbol->st_value + image->text_region.delta);
 				if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
 					exactMatch = true;
 
@@ -938,10 +939,10 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 					struct Elf32_Sym *symbol = &image->syms[j];
 
 					if (symbol->st_value == 0
-						|| symbol->st_size >= image->regions[0].size + image->regions[1].size)
+						|| symbol->st_size >= image->text_region.size + image->data_region.size)
 						continue;
 
-					symbolDelta = address - (long)(symbol->st_value + image->regions[0].delta);
+					symbolDelta = address - (long)(symbol->st_value + image->text_region.delta);
 					if (symbolDelta >= 0 && symbolDelta < symbol->st_size)
 						exactMatch = true;
 
@@ -965,7 +966,7 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 		if (_imageName)
 			*_imageName = image->name;
 		if (_baseAddress)
-			*_baseAddress = symbolFound->st_value + image->regions[0].delta;
+			*_baseAddress = symbolFound->st_value + image->text_region.delta;
 		if (_exactMatch)
 			*_exactMatch = exactMatch;
 
@@ -978,7 +979,7 @@ elf_lookup_symbol_address(addr_t address, addr_t *_baseAddress, const char **_sy
 		if (_imageName)
 			*_imageName = image->name;
 		if (_baseAddress)
-			*_baseAddress = image->regions[0].start;
+			*_baseAddress = image->text_region.start;
 		if (_exactMatch)
 			*_exactMatch = false;
 
@@ -1267,8 +1268,7 @@ load_kernel_add_on(const char *path)
 
 	for (i = 0; i < eheader->e_phnum; i++) {
 		char regionName[B_OS_NAME_LENGTH];
-		int image_region;
-		int protection;
+		elf_region *region;
 
 		TRACE(("looking at program header %d\n", i));
 
@@ -1291,8 +1291,8 @@ load_kernel_add_on(const char *path)
 				continue;
 			}
 			rw_segment_handled = true;
-			image_region = 1;
-			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
+			region = &image->data_region;
+
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_data", path);
 		} else if ((pheaders[i].p_flags & (PF_PROTECTION_MASK)) == (PF_READ | PF_EXECUTE)) {
 			// this is the non-writable segment
@@ -1301,11 +1301,7 @@ load_kernel_add_on(const char *path)
 				continue;
 			}
 			ro_segment_handled = true;
-			image_region = 0;
-			protection = B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA;
-				// We need to read in the contents of this area later,
-				// so it has to be writeable at this point;
-				// ToDo: we should change the area protection later.
+			region = &image->text_region;
 
 			snprintf(regionName, B_OS_NAME_LENGTH, "%s_text", path);
 		} else {
@@ -1315,23 +1311,22 @@ load_kernel_add_on(const char *path)
 
 		// ToDo: this won't work if the on-disk order of the sections doesn't
 		//		fit the in-memory order...
-		image->regions[image_region].start = start;
-		image->regions[image_region].size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
-		image->regions[image_region].id = create_area(regionName,
-			(void **)&image->regions[image_region].start, B_EXACT_ADDRESS,
-			image->regions[image_region].size, B_FULL_LOCK, protection);
-		if (image->regions[image_region].id < 0) {
+		region->start = start;
+		region->size = ROUNDUP(pheaders[i].p_memsz + (pheaders[i].p_vaddr % PAGE_SIZE), PAGE_SIZE);
+		region->id = create_area(regionName, (void **)&region->start, B_EXACT_ADDRESS,
+			region->size, B_FULL_LOCK, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+		if (region->id < 0) {
 			dprintf("error allocating region!\n");
 			err = B_NOT_AN_EXECUTABLE;
 			goto error4;
 		}
-		image->regions[image_region].delta = image->regions[image_region].start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
-		start += image->regions[image_region].size;
+		region->delta = region->start - ROUNDOWN(pheaders[i].p_vaddr, PAGE_SIZE);
+		start += region->size;
 
-		TRACE(("elf_load_kspace: created a region at %p\n", (void *)image->regions[image_region].start));
+		TRACE(("elf_load_kspace: created a region at %p\n", (void *)region->start));
 
 		len = sys_read(fd, pheaders[i].p_offset,
-			(void *)(image->regions[image_region].start + (pheaders[i].p_vaddr % PAGE_SIZE)),
+			(void *)(region->start + (pheaders[i].p_vaddr % PAGE_SIZE)),
 			pheaders[i].p_filesz);
 		if (len < 0) {
 			err = len;
@@ -1340,8 +1335,8 @@ load_kernel_add_on(const char *path)
 		}
 	}
 
-	if (image->regions[1].start != 0
-		&& image->regions[0].delta != image->regions[1].delta) {
+	if (image->data_region.start != 0
+		&& image->text_region.delta != image->data_region.delta) {
 		dprintf("deltas do not match!\n");
 		dump_image_info(image);
 		err = B_ERROR;
@@ -1349,7 +1344,7 @@ load_kernel_add_on(const char *path)
 	}
 
 	// modify the dynamic ptr by the delta of the regions
-	image->dynamic_ptr += image->regions[0].delta;
+	image->dynamic_ptr += image->text_region.delta;
 
 	err = elf_parse_dynamic_section(image);
 	if (err < 0)
@@ -1359,7 +1354,9 @@ load_kernel_add_on(const char *path)
 	if (err < 0)
 		goto error5;
 
-	err = 0;
+	// We needed to read in the contents of the "text" area, but
+	// now we can protect it read-only
+	set_area_protection(image->text_region.id, B_KERNEL_READ_AREA);
 
 	// ToDo: this should be enabled by kernel settings!
 	if (1)
@@ -1376,10 +1373,8 @@ done:
 	return image->id;
 
 error5:
-	if (image->regions[1].id >= 0)
-		delete_area(image->regions[1].id);
-	if (image->regions[0].id >= 0)
-		delete_area(image->regions[0].id);
+	delete_area(image->data_region.id);
+	delete_area(image->text_region.id);
 error4:
 	vm_unreserve_address_range(vm_get_kernel_aspace_id(), reservedAddress, reservedSize);
 error3:
