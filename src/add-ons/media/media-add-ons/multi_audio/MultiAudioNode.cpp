@@ -96,10 +96,12 @@ node_output::~node_output()
 MultiAudioNode::~MultiAudioNode(void)
 {
 	CALLED();
+	fAddOn->GetConfigurationFor(this, NULL);
+		
 	StopThread();
 	BMediaEventLooper::Quit();
-	
-	fWeb = NULL;
+		
+	fWeb = NULL;	
 }
 
 MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice *device, 
@@ -112,7 +114,8 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 	  fThread(-1),
 	  fDevice(device),
 	  fTimeSourceStarted(false),
-	  fWeb(NULL)
+	  fWeb(NULL),
+	  fConfig(*config)
 {
 	CALLED();
 	fInitCheckStatus = B_NO_INIT;
@@ -138,7 +141,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn *addon, char* name, MultiAudioDevice 
 						* (fPreferredFormat.u.raw_audio.format & media_raw_audio_format::B_AUDIO_SIZE_MASK)
 						* fPreferredFormat.u.raw_audio.channel_count;
 	
-	config->PrintToStream();
+	PRINT_OBJECT(config);
 		
 	fInitCheckStatus = B_OK;
 }
@@ -212,10 +215,10 @@ void MultiAudioNode::NodeRegistered(void)
 					!(fDevice->MD.channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
 			PRINT(("NodeRegistered() : creating an input for %i\n", i));
-			printf("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->MD.channels[i].channel_id,
+			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->MD.channels[i].channel_id,
 											fDevice->MD.channels[i].kind,
 											fDevice->MD.channels[i].designations,
-											fDevice->MD.channels[i].connectors);
+											fDevice->MD.channels[i].connectors));
 			
 			media_input *input = new media_input;
 
@@ -258,10 +261,10 @@ void MultiAudioNode::NodeRegistered(void)
 					!(fDevice->MD.channels[i].designations & B_CHANNEL_SURROUND_BUS)))
 			) {
 			PRINT(("NodeRegistered() : creating an output for %i\n", i));
-			printf("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->MD.channels[i].channel_id,
+			PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",fDevice->MD.channels[i].channel_id,
 											fDevice->MD.channels[i].kind,
 											fDevice->MD.channels[i].designations,
-											fDevice->MD.channels[i].connectors);
+											fDevice->MD.channels[i].connectors));
 			
 			media_output *output = new media_output;
 
@@ -291,6 +294,16 @@ void MultiAudioNode::NodeRegistered(void)
 	fWeb = MakeParameterWeb();
 	SetParameterWeb(fWeb);
 	
+	/* apply configuration */
+	int32 index = 0;
+	int32 parameterID = 0;
+	const void *data;
+	ssize_t size;
+	while(fConfig.FindInt32("parameterID", index, &parameterID) == B_OK) {
+		if(fConfig.FindData("parameterData", B_RAW_TYPE, index, &data, &size) == B_OK)
+			SetParameterValue(parameterID, TimeSource()->Now(), data, size);
+		index++;
+	}
 }
 
 status_t MultiAudioNode::RequestCompleted(const media_request_info &info)
@@ -805,10 +818,10 @@ MultiAudioNode::Connect(status_t error, const media_source& source, const media_
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(channel->fOutput.destination, &fLatency, &id);
-	fprintf(stderr, "\tdownstream latency = %Ld\n", fLatency);
+	PRINT(("\tdownstream latency = %Ld\n", fLatency));
 
 	fInternalLatency = 50LL;
-	fprintf(stderr, "\tbuffer-filling took %Ld usec on this machine\n", fInternalLatency);
+	PRINT(("\tbuffer-filling took %Ld usec on this machine\n", fInternalLatency));
 	//SetEventLatency(fLatency + fInternalLatency);
 
 	// reset our buffer duration, etc. to avoid later calculations
@@ -1338,7 +1351,7 @@ MultiAudioNode::MakeParameterWeb()
 				ProcessGroup(child, i, nb);
 		}
 	}
-	
+		
 	return web;
 }
 
@@ -1857,7 +1870,39 @@ status_t
 MultiAudioNode::GetConfigurationFor(BMessage * into_message)
 {
 	CALLED();
-	into_message->AddString("name", Name());
+	
+	BParameter *parameter = NULL;
+	void *buffer;
+	size_t size = 128;
+	bigtime_t last_change;
+	status_t err;
+	
+	buffer = malloc(size);
+	
+	for(int32 i=0; i<fWeb->CountParameters(); i++) {
+		parameter = fWeb->ParameterAt(i);
+		if(parameter->Type() != BParameter::B_CONTINUOUS_PARAMETER
+			&& parameter->Type() != BParameter::B_DISCRETE_PARAMETER)
+			continue;
+			
+		PRINT(("getting parameter %i\n", parameter->ID()));
+		size = 128;
+		while((err = GetParameterValue(parameter->ID(), &last_change, buffer, &size))==B_NO_MEMORY) {
+			size += 128;
+			free(buffer);
+			buffer = malloc(size);
+		}
+		
+		if(err == B_OK && size > 0) {
+			into_message->AddInt32("parameterID", parameter->ID());
+			into_message->AddData("parameterData", B_RAW_TYPE, buffer, size, false);
+		} else {
+			PRINT(("parameter err : %s\n", strerror(err)));
+		}
+	}
+	
+	PRINT_OBJECT(into_message);
+	
 	return B_OK;
 }
 

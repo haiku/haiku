@@ -34,6 +34,7 @@
 #include <Path.h>
 #include <Directory.h>
 #include <Entry.h>
+#include <FindDirectory.h>
 
 #include "MultiAudioNode.h"
 #include "MultiAudioAddOn.h"
@@ -44,6 +45,8 @@
 #include <string.h>
 
 #include "debug.h"
+
+#define MULTI_SAVE
 
 // instantiation function
 extern "C" _EXPORT BMediaAddOn * make_media_addon(image_id image) {
@@ -62,7 +65,8 @@ MultiAudioAddOn::~MultiAudioAddOn()
 	void *device = NULL;
 	for ( int32 i = 0; (device = fDevices.ItemAt(i)); i++ )
 		delete device;
-	
+		
+	SaveSettings();
 }
 
 MultiAudioAddOn::MultiAudioAddOn(image_id image) :
@@ -74,6 +78,8 @@ MultiAudioAddOn::MultiAudioAddOn(image_id image) :
 	
 	if(RecursiveScan("/dev/audio/multi/")!=B_OK)
 		return;
+		
+	LoadSettings();
 	
 	fInitCheckStatus = B_OK;
 }
@@ -135,6 +141,12 @@ BMediaNode * MultiAudioAddOn::InstantiateNodeFor(
 		return NULL;
 	}
 	
+#ifdef MULTI_SAVE
+	if(fSettings.FindMessage(device->MD.friendly_name, config)==B_OK) {
+		fSettings.RemoveData(device->MD.friendly_name);
+	}
+#endif
+	
 	MultiAudioNode * node
 		= new MultiAudioNode(this,
 						  device->MD.friendly_name,
@@ -154,6 +166,20 @@ status_t
 MultiAudioAddOn::GetConfigurationFor(BMediaNode * your_node, BMessage * into_message)
 {
 	CALLED();
+#ifdef MULTI_SAVE
+	if (into_message == 0) {
+		into_message = new BMessage();
+		MultiAudioNode * node = dynamic_cast<MultiAudioNode*>(your_node);
+		if (node == 0) {
+			fprintf(stderr,"<- B_BAD_TYPE\n");
+			return B_BAD_TYPE;
+		}
+		if(node->GetConfigurationFor(into_message)==B_OK) {
+			fSettings.AddMessage(your_node->Name(), into_message);
+		}		
+		return B_OK;
+	}
+#endif	
 	// currently never called by the media kit. Seems it is not implemented.
 	if (into_message == 0) {
 		fprintf(stderr,"<- B_BAD_VALUE\n");
@@ -215,4 +241,38 @@ MultiAudioAddOn::RecursiveScan(char* rootPath, BEntry *rootEntry = NULL)
 	}
 	
 	return B_OK;
+}
+
+
+void
+MultiAudioAddOn::SaveSettings(void)
+{
+	CALLED();
+	BPath path;
+	if(find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append(SETTINGS_FILE);
+		BFile file(path.Path(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
+		if(file.InitCheck()==B_OK)
+			fSettings.Flatten(&file);
+	}
+}
+
+
+void
+MultiAudioAddOn::LoadSettings(void)
+{
+	CALLED();
+	fSettings.MakeEmpty();
+	
+	BPath path;
+	if(find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
+		path.Append(SETTINGS_FILE);
+		BFile file(path.Path(),B_READ_ONLY);
+		if((file.InitCheck()==B_OK)&&(fSettings.Unflatten(&file)==B_OK))
+		{
+			PRINT_OBJECT(fSettings);
+		} else {
+			PRINT(("Error unflattening settings file %s\n",path.Path()));
+		}	
+	}
 }

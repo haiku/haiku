@@ -387,6 +387,8 @@ private:
 		bool 				fTimeSourceStarted;
 		
 		BParameterWeb		*fWeb;
+		
+		BMessage			fConfig;
 };
 
 #endif /* _MULTIAUDIONODE_H */

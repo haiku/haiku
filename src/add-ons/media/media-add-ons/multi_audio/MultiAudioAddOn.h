@@ -31,6 +31,8 @@
 #include <MediaDefs.h>
 #include <MediaAddOn.h>
 
+#define SETTINGS_FILE					"Media/multi_audio_settings"
+
 class MultiAudioAddOn :
     public BMediaAddOn
 {
@@ -66,9 +68,13 @@ virtual	status_t AutoStart(
 
 private:
 	status_t RecursiveScan(char* path, BEntry *rootEntry = NULL);
+	void SaveSettings();
+	void LoadSettings();
 	
 	status_t 		fInitCheckStatus;
 	BList			fDevices;
+	
+	BMessage fSettings;				// settings loaded from settings directory
 };
 
 extern "C" _EXPORT BMediaAddOn *make_media_addon( image_id you );

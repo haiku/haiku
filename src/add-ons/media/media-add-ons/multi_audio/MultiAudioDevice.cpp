@@ -198,34 +198,34 @@ status_t MultiAudioDevice::InitDriver()
 		return B_ERROR;
 	}
 
-	printf("Friendly name:\t%s\nVendor:\t\t%s\n",
-				MD.friendly_name,MD.vendor_info);
-	printf("%ld outputs\t%ld inputs\n%ld out busses\t%ld in busses\n",
+	PRINT(("Friendly name:\t%s\nVendor:\t\t%s\n",
+				MD.friendly_name,MD.vendor_info));
+	PRINT(("%ld outputs\t%ld inputs\n%ld out busses\t%ld in busses\n",
 				MD.output_channel_count,MD.input_channel_count,
-				MD.output_bus_channel_count,MD.input_bus_channel_count);
-	printf("\nChannels\n"
-			 "ID\tKind\tDesig\tConnectors\n");
+				MD.output_bus_channel_count,MD.input_bus_channel_count));
+	PRINT(("\nChannels\n"
+			 "ID\tKind\tDesig\tConnectors\n"));
 
 	for (i = 0 ; i < (MD.output_channel_count + MD.input_channel_count); i++)
 	{
-		printf("%ld\t%d\t0x%lx\t0x%lx\n",MD.channels[i].channel_id,
+		PRINT(("%ld\t%d\t0x%lx\t0x%lx\n",MD.channels[i].channel_id,
 											MD.channels[i].kind,
 											MD.channels[i].designations,
-											MD.channels[i].connectors);
+											MD.channels[i].connectors));
 	}			 
-	printf("\n");
+	PRINT(("\n"));
 	
-	printf("Output rates\t\t0x%lx\n",MD.output_rates);
-	printf("Input rates\t\t0x%lx\n",MD.input_rates);
-	printf("Max CVSR\t\t%.0f\n",MD.max_cvsr_rate);
-	printf("Min CVSR\t\t%.0f\n",MD.min_cvsr_rate);
-	printf("Output formats\t\t0x%lx\n",MD.output_formats);
-	printf("Input formats\t\t0x%lx\n",MD.input_formats);
-	printf("Lock sources\t\t0x%lx\n",MD.lock_sources);
-	printf("Timecode sources\t0x%lx\n",MD.timecode_sources);
-	printf("Interface flags\t\t0x%lx\n",MD.interface_flags);
-	printf("Control panel string:\t\t%s\n",MD.control_panel);
-	printf("\n");
+	PRINT(("Output rates\t\t0x%lx\n",MD.output_rates));
+	PRINT(("Input rates\t\t0x%lx\n",MD.input_rates));
+	PRINT(("Max CVSR\t\t%.0f\n",MD.max_cvsr_rate));
+	PRINT(("Min CVSR\t\t%.0f\n",MD.min_cvsr_rate));
+	PRINT(("Output formats\t\t0x%lx\n",MD.output_formats));
+	PRINT(("Input formats\t\t0x%lx\n",MD.input_formats));
+	PRINT(("Lock sources\t\t0x%lx\n",MD.lock_sources));
+	PRINT(("Timecode sources\t0x%lx\n",MD.timecode_sources));
+	PRINT(("Interface flags\t\t0x%lx\n",MD.interface_flags));
+	PRINT(("Control panel string:\t\t%s\n",MD.control_panel));
+	PRINT(("\n"));
 	
 	num_outputs = MD.output_channel_count;
 	num_inputs = MD.input_channel_count;
