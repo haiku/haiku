@@ -53,7 +53,7 @@ strtod(const char */*start*/, char **/*end*/)
 
 
 static status_t
-bfs_mount(mount_id mountID, const char *device, void *args, void **data, vnode_id *rootID)
+bfs_mount(mount_id mountID, const char *device, uint32 flags, const char *args, void **data, vnode_id *rootID)
 {
 	FUNCTION();
 
