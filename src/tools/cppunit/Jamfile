@@ -14,11 +14,11 @@ rule CppUnitLibrary
 }
 
 CppUnitLibrary
-	CppUnitShell.cpp
+	SafetyLock.cpp
 	TestCase.cpp
-	TestResult.cpp
+	TestListener.cpp
 	TestShell.cpp
-	TestSuite.cpp
+	ThreadedTestCase.cpp
 	cppunit/Asserter.cpp
 	cppunit/CompilerOutputter.cpp
 	cppunit/Exception.cpp
