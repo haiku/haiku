@@ -44,11 +44,6 @@ extern "C" {
 #define ROUNDUP(a, b) (((a) + ((b)-1)) & ~((b)-1))
 #define ROUNDOWN(a, b) (((a) / (b)) * (b))
 
-//#define min(a, b) ((a) < (b) ? (a) : (b))
-//#define max(a, b) ((a) > (b) ? (a) : (b))
-
-/** return the offset of member 'm' within type 't' */
-#define offsetof(t, m) ((size_t)&(((t *)0)->m)) 
 
 /** Is bit 'b' set in 'a' */
 #define CHECK_BIT(a, b) ((a) & (1 << (b)))
