@@ -6,6 +6,7 @@
 #include <map>
 #include <new>
 
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <DataIO.h>
 #include <MessagePrivate.h>
@@ -341,6 +342,46 @@ MessageDeliverer::DeliverMessage(const void *message, int32 messageSize,
 	target.port = port;
 	target.token = token;
 	return DeliverMessage(message, messageSize, &target, 1, timeout);
+}
+
+// DeliverMessage
+status_t
+MessageDeliverer::DeliverMessage(BMessage *message, const BMessenger *targets,
+	int32 targetCount, bigtime_t timeout)
+{
+	if (!message || targetCount < 0 || !targets)
+		return B_BAD_VALUE;
+
+	// convert the reply targets
+	messaging_target *messagingTargets
+		= new(nothrow) messaging_target[targetCount];
+	if (!messagingTargets)
+		return B_NO_MEMORY;
+	ArrayDeleter<messaging_target> _(messagingTargets);
+
+	for (int i = 0; i < targetCount; i++) {
+		BMessenger messenger(targets[i]);
+		BMessenger::Private messengerPrivate(messenger);
+		messaging_target &target = messagingTargets[i];
+		target.port = messengerPrivate.Port();
+		target.token = messengerPrivate.IsPreferredTarget()
+			? B_PREFERRED_TOKEN : messengerPrivate.Token();
+	}
+	
+	// Set a dummy token now, so that the header contains room for it.
+	// It will be set when sending the message anyway, but if it is not set
+	// before flattening, the header will not contain room for it, and it
+	// will not possible to send the message flattened later.
+	BMessage::Private(message).SetTarget(0, false);
+
+	// flatten the message
+	BMallocIO mallocIO;
+	status_t error = message->Flatten(&mallocIO);
+	if (error != B_OK)
+		return error;
+
+	return DeliverMessage(mallocIO.Buffer(), mallocIO.BufferLength(),
+		messagingTargets, targetCount, timeout);
 }
 
 // DeliverMessage
