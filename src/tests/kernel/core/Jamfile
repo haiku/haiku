@@ -1,5 +1,11 @@
 SubDir OBOS_TOP src tests kernel core ;
 
+UsePrivateHeaders kernel ;
+
+SimpleTest transfer_area_test :
+	transfer_area_test.cpp
+	: libroot.so ;
+
 SubInclude OBOS_TOP src tests kernel core cache ;
 #SubInclude OBOS_TOP src tests kernel core disk_device_manager ;
 SubInclude OBOS_TOP src tests kernel core util ;
