@@ -452,13 +452,17 @@ static status_t net_stack_control(void *cookie, uint32 op, void *data, size_t le
 			case NET_STACK_GETPEERNAME:
 				return core->socket_getpeername(nsc->socket, args->u.sockaddr.addr, &args->u.sockaddr.addrlen);
 				
-			case B_SET_BLOCKING_IO:
+			case B_SET_BLOCKING_IO: {
+				int off = false;
 				nsc->open_flags &= ~O_NONBLOCK;
-				return B_OK;
+				return core->socket_ioctl(nsc->socket, FIONBIO, &off);
+			}
 	
-			case B_SET_NONBLOCKING_IO:
+			case B_SET_NONBLOCKING_IO: {
+				int on = true;
 				nsc->open_flags |= O_NONBLOCK;
-				return B_OK;
+				return core->socket_ioctl(nsc->socket, FIONBIO, &on);
+			}
 	
 			case NET_STACK_SELECT:
 				/* if we get this opcode, we are using the r5 kernel select() call,
