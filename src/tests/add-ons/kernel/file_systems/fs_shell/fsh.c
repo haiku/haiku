@@ -420,7 +420,6 @@ do_dir(int argc, char **argv)
     char              mode_str[16];
     
     dent = (struct my_dirent *)buff;
-
     strcpy(dirname, "/myfs/");
     if (argc > 1)
         strcat(dirname, &argv[1][0]);
@@ -1372,7 +1371,8 @@ do_fsh(void)
             }
         }
         
-        if (strncmp(&argv[0][0], "quit", 4) == 0)
+        if (strncmp(&argv[0][0], "quit", 4) == 0
+            || strncmp(&argv[0][0], "exit", 4) == 0)
             break;
 
         if (cmd->name == NULL && argv[0][0] != '\0')
