@@ -41,6 +41,14 @@ THE SOFTWARE.
 void AddFields(BMessage* to, const BMessage* from, const char* excludeList[] = NULL, const char* includeList[] = NULL);
 void AddString(BMessage* m, const char* name, const char* value);
 
+// set or replace a value in a BMessage
+void SetRect(BMessage* msg, const char* name, BRect rect);
+void SetFloat(BMessage* msg, const char* name, float value);
+void SetInt32(BMessage* msg, const char* name, int32 value);
+
+// scalar multiplication
+BRect ScaleRect(BRect rect, float scale); 
+
 class EscapeMessageFilter : public BMessageFilter 
 {
 private:
@@ -150,6 +158,5 @@ public:
 	inline float ty(float y)    { return fHeight - (fY + fScale * y); }
 	inline float scale(float f) { return fScale * f; }
 };
-
 
 #endif

@@ -56,6 +56,7 @@ class PreviewView : public BView {
 	
 	float ZoomFactor() const;
 	BRect PageRect() const;
+	BRect PrintableRect() const;
 	
 public:
 	PreviewView(BFile* jobFile, BRect rect);

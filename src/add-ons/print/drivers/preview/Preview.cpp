@@ -29,6 +29,7 @@ THE SOFTWARE.
 
 #include <Debug.h>
 #include <String.h>
+#include "Utils.h"
 
 #include "Preview.h"
 
@@ -92,16 +93,25 @@ PreviewView::~PreviewView() {
 float PreviewView::ZoomFactor() const {
 	const int32 b = 4;
 	int32 zoom;
-	if (fZoom > 0) zoom = (1 << b) << fZoom;
-	else zoom = (1 << b) >> -fZoom;
-	return zoom / (float)(1 << b);
+	if (fZoom > 0) {
+		zoom = (1 << b) << fZoom;
+	} else {
+		zoom = (1 << b) >> -fZoom;
+	}
+	float factor = zoom / (float)(1 << b);
+	return factor * fReader.GetScale() / 100.0;
 }
 
 BRect PreviewView::PageRect() const {
 	float f = ZoomFactor();
 	BRect r = fReader.PaperRect();
-	r.left *= f; r.right *= f; r.top *= f; r.bottom *= f;
-	return r;
+	return ScaleRect(r, f);
+}
+
+BRect PreviewView::PrintableRect() const {
+	float f = ZoomFactor();
+	BRect r = fReader.PrintableRect();
+	return ScaleRect(r, f);
 }
 
 BRect PreviewView::ViewRect() const {
@@ -165,9 +175,9 @@ void PreviewView::DrawPageFrame(BRect rect) {
 
 
 void PreviewView::DrawPage(BRect rect) 
-{
-	// constrain clipping region to paper dimensions
-	BRect r(PageRect());
+{		
+	// constrain clipping region to printable rectangle
+	BRect r(PrintableRect());
 	r.OffsetBy(kPreviewLeftMargin, kPreviewTopMargin);
 	BRegion clip(r);
 	ConstrainClippingRegion(&clip);	
@@ -177,11 +187,13 @@ void PreviewView::DrawPage(BRect rect)
 	
 	// print job coordinates are relative to the printable rect
 	BRect printRect = fReader.PrintableRect();
-	SetOrigin(kPreviewLeftMargin + printRect.left*ZoomFactor(), 
-		kPreviewTopMargin + printRect.top*ZoomFactor() );
+	SetOrigin(kPreviewLeftMargin + printRect.left * ZoomFactor(), 
+		kPreviewTopMargin + printRect.top * ZoomFactor());
 	
-	SetScale(ZoomFactor() * fReader.GetScale());
+	SetScale(ZoomFactor());
+	
 	fCachedPage->Draw(this);
+	
 	PopState();
 }
 

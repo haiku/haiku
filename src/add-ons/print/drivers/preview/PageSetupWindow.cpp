@@ -116,10 +116,9 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 
 	// load orientation
 	fSetupMsg->FindInt32("orientation", &orient);
-//	(new BAlert("", "orientation not in msg", "Shit"))->Go(); 
 
 	// load page rect
-	if (fSetupMsg->FindRect("paper_rect", &r) == B_OK) {
+	if (fSetupMsg->FindRect("preview:paper_rect", &r) == B_OK) {
 		width = r.Width();
 		height = r.Height();
 		page = r;
@@ -142,7 +141,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	
 	// re-calculate the margin from the printable rect in points
 	margin = page;
-	if (fSetupMsg->FindRect("printable_rect", &margin) == B_OK) {
+	if (fSetupMsg->FindRect("preview:printable_rect", &margin) == B_OK) {
 		margin.top -= page.top;
 		margin.left -= page.left;
 		margin.right = page.right - margin.right;
@@ -238,7 +237,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	BString scale;
 	float scale0;
 	if (fSetupMsg->FindFloat("scale", &scale0) == B_OK) {
-		scale << (int)(100.0 * scale0);
+		scale << (int)scale0;
 	} else {
 		scale = "100";
 	}
@@ -295,12 +294,17 @@ PageSetupWindow::UpdateSetupMessage()
 	if (item) {
 		BMessage *msg = item->Message();
 		msg->FindInt32("orientation", &orientation);
-		if (fSetupMsg->HasInt32("orientation", orientation)) {
-			fSetupMsg->ReplaceInt32("orientation", orientation);
-		} else {
-			fSetupMsg->AddInt32("orientation", orientation);
-		}
+		SetInt32(fSetupMsg, "orientation", orientation);
 	}
+
+	// Save scaling factor
+	float scale = atoi(fScaleControl->Text());
+	if (scale <= 0.0) { // sanity check
+		scale = 100.0;
+	}
+	SetFloat(fSetupMsg, "scale", scale);
+
+	float scaleR = 100.0 / scale;
 
 	item = fPageSizeMenu->Menu()->FindMarked();
 	if (item) {
@@ -309,15 +313,13 @@ PageSetupWindow::UpdateSetupMessage()
 		msg->FindFloat("width", &w);
 		msg->FindFloat("height", &h);
 		BRect r;
-		if (orientation == 0) 
+		if (orientation == 0) {
 			r.Set(0, 0, w, h);
-		else
-			r.Set(0, 0, h, w);
-		if (fSetupMsg->HasRect("paper_rect")) {
-			fSetupMsg->ReplaceRect("paper_rect", r);
 		} else {
-			fSetupMsg->AddRect("paper_rect", r);
+			r.Set(0, 0, h, w);
 		}
+		SetRect(fSetupMsg, "preview:paper_rect", r);
+		SetRect(fSetupMsg, "paper_rect", ScaleRect(r, scaleR));
 		
 		// Save the printable_rect 
 		BRect margin = fMarginView->GetMargin();
@@ -328,31 +330,13 @@ PageSetupWindow::UpdateSetupMessage()
 			margin.right = h - margin.right;
 			margin.bottom = w - margin.bottom;
 		}
-		if (fSetupMsg->HasRect("printable_rect")) {
-			fSetupMsg->ReplaceRect("printable_rect", margin);
-		} else {
-			fSetupMsg->AddRect("printable_rect", margin);
-		}
+		SetRect(fSetupMsg, "preview:printable_rect", margin);
+		SetRect(fSetupMsg, "printable_rect", ScaleRect(margin, scaleR));
 
 		// save the units used
 		int32 units = fMarginView->GetUnits();
-		if (fSetupMsg->HasInt32("units")) {
-			fSetupMsg->ReplaceInt32("units", units);
-		} else {
-			fSetupMsg->AddInt32("units", units);
-		}	
-	}
-	
-	// scaling factor
-	float scale = atoi(fScaleControl->Text()) / 100.0;
-	if (scale <= 0.0) { // sanity check
-		scale = 1.0;
-	}
-	if (fSetupMsg->HasFloat("scale")) {
-		fSetupMsg->ReplaceFloat("scale", scale);
-	} else {
-		fSetupMsg->AddFloat("scale", scale);
-	}
+		SetInt32(fSetupMsg, "units", units);
+	}	
 }
 
 

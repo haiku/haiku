@@ -104,4 +104,34 @@ void AddString(BMessage* m, const char* name, const char* value) {
 	}
 }
 
+void SetRect(BMessage* msg, const char* name, BRect rect) {
+	if (msg->HasRect(name)) {
+		msg->ReplaceRect(name, rect);
+	} else {
+		msg->AddRect(name, rect);
+	}
+}
 
+void SetFloat(BMessage* msg, const char* name, float value) {
+	if (msg->HasFloat(name)) {
+		msg->ReplaceFloat(name, value);
+	} else {
+		msg->AddFloat(name, value);
+	}
+}
+
+void SetInt32(BMessage* msg, const char* name, int32 value) {
+	if (msg->HasInt32(name)) {
+		msg->ReplaceInt32(name, value);
+	} else {
+		msg->AddInt32(name, value);
+	}
+}
+
+BRect ScaleRect(BRect rect, float scale) {
+	rect.left *= scale;
+	rect.right *= scale;
+	rect.top *= scale;
+	rect.bottom *= scale;
+	return rect;
+}
