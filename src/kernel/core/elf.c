@@ -313,6 +313,9 @@ dump_symbols(int argc, char **argv)
 		for (i = 0; i < image->num_debug_symbols; i++) {
 			struct Elf32_Sym *symbol = &image->debug_symbols[i];
 
+			if (symbol->st_value == 0 || symbol->st_size < 0)
+				continue;
+
 			dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
 				get_symbol_type_string(symbol), get_symbol_bind_string(symbol), symbol->st_size,
 				image->debug_string_table + symbol->st_name);
@@ -324,6 +327,9 @@ dump_symbols(int argc, char **argv)
 		for (i = 0; i < HASHTABSIZE(image); i++) {
 			for (j = HASHBUCKETS(image)[i]; j != STN_UNDEF; j = HASHCHAINS(image)[j]) {
 				struct Elf32_Sym *symbol = &image->syms[j];
+
+				if (symbol->st_value == 0 || symbol->st_size < 0)
+					continue;
 
 				dprintf("%08lx %s/%s %5ld %s\n", symbol->st_value + image->regions[0].delta,
 					get_symbol_type_string(symbol), get_symbol_bind_string(symbol),
@@ -667,29 +673,120 @@ unload_elf_image(struct elf_image_info *image)
 
 
 static status_t
-insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
+load_elf_symbol_table(int fd, struct elf_image_info *image)
 {
-	struct Elf32_Ehdr *elfHeader;
-	struct elf_image_info *image;
+	struct Elf32_Ehdr *elfHeader = image->eheader;
+	struct Elf32_Sym *symbolTable = NULL;
+	struct Elf32_Shdr *stringHeader = NULL;
+	uint32 numSymbols = 0;
+	char *stringTable;
 	status_t status;
+	ssize_t length;
+	int32 i;
 
-	elfHeader = (struct Elf32_Ehdr *)malloc(sizeof(struct Elf32_Ehdr));
-	if (elfHeader == NULL)
+	// get section headers
+
+	ssize_t size = elfHeader->e_shnum * elfHeader->e_shentsize;
+	struct Elf32_Shdr *sectionHeaders = (struct Elf32_Shdr *)malloc(size);
+	if (sectionHeaders == NULL) {
+		dprintf("error allocating space for section headers\n");
 		return B_NO_MEMORY;
+	}
 
-	memcpy(elfHeader, &preloadedImage->elf_header, sizeof(struct Elf32_Ehdr));
-	status = verify_eheader(elfHeader);
-	if (status < B_OK)
-		goto error1;
-
-	image = create_image_struct();
-	if (image == NULL) {
-		status = B_NO_MEMORY;
+	length = read_pos(fd, elfHeader->e_shoff, sectionHeaders, size);
+	if (length < size) {
+		TRACE(("error reading in program headers\n"));
+		status = B_ERROR;
 		goto error1;
 	}
 
-	image->vnode = NULL;
-	image->eheader = elfHeader;
+	// find symbol table in section headers
+
+	for (i = 0; i < elfHeader->e_shnum; i++) {
+		if (sectionHeaders[i].sh_type == SHT_SYMTAB) {
+			stringHeader = &sectionHeaders[sectionHeaders[i].sh_link];
+
+			if (stringHeader->sh_type != SHT_STRTAB) {
+				TRACE(("doesn't link to string table\n"));
+				status = B_BAD_DATA;
+				goto error1;
+			}
+
+			// read in symbol table
+			symbolTable = (struct Elf32_Sym *)malloc(size = sectionHeaders[i].sh_size);
+			if (symbolTable == NULL) {
+				status = B_NO_MEMORY;
+				goto error1;
+			}
+
+			length = read_pos(fd, sectionHeaders[i].sh_offset, symbolTable, size);
+			if (length < size) {
+				TRACE(("error reading in symbol table\n"));
+				status = B_ERROR;
+				goto error1;
+			}
+
+			numSymbols = size / sizeof(struct Elf32_Sym);
+			break;
+		}
+	}
+
+	if (symbolTable == NULL) {
+		TRACE(("no symbol table\n"));
+		status = B_BAD_VALUE;
+		goto error1;
+	}
+
+	// read in string table
+
+	stringTable = (char *)malloc(size = stringHeader->sh_size);
+	if (stringTable == NULL) {
+		status = B_NO_MEMORY;
+		goto error2;
+	}
+
+	length = read_pos(fd, stringHeader->sh_offset, stringTable, size);
+	if (length < size) {
+		TRACE(("error reading in string table\n"));
+		status = B_ERROR;
+		goto error3;
+	}
+
+	TRACE(("loaded debug %ld symbols\n", numSymbols));
+
+	// insert tables into image
+	image->debug_symbols = symbolTable;
+	image->num_debug_symbols = numSymbols;
+	image->debug_string_table = stringTable;
+
+	free(sectionHeaders);
+	return B_OK;
+
+error3:
+	free(stringTable);
+error2:
+	free(symbolTable);
+error1:
+	free(sectionHeaders);
+
+	return status;
+}
+
+
+static status_t
+insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
+{
+	struct elf_image_info *image;
+	status_t status;
+
+	status = verify_eheader(&preloadedImage->elf_header);
+	if (status < B_OK)
+		return status;
+
+	image = create_image_struct();
+	if (image == NULL)
+		return B_NO_MEMORY;
+
 	image->name = strdup(preloadedImage->name);
 	image->dynamic_ptr = preloadedImage->dynamic_section.start;
 
@@ -698,12 +795,12 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 
 	status = elf_parse_dynamic_section(image);
 	if (status < B_OK)
-		goto error2;
+		goto error1;
 
 	if (!kernel) {
 		status = elf_relocate(image, "");
 		if (status < B_OK)
-			goto error2;
+			goto error1;
 	} else
 		sKernelImage = image;
 
@@ -717,10 +814,8 @@ insert_preloaded_image(struct preloaded_image *preloadedImage, bool kernel)
 
 	return B_OK;
 
-error2:
-	free(image);
 error1:
-	free(elfHeader);
+	free(image);
 
 	// clean up preloaded image resources (this image won't be used anymore)
 	delete_area(preloadedImage->text_region.id);
@@ -1234,6 +1329,10 @@ load_kernel_add_on(const char *path)
 		goto error4;
 
 	err = 0;
+
+	// ToDo: this should be enabled by kernel settings!
+	if (1)
+		load_elf_symbol_table(fd, image);
 
 	free(pheaders);
 	sys_close(fd);
