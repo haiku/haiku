@@ -1,6 +1,5 @@
-/* NV registers definitions and macros for access to */
+/* NV registers definitions and macros for access to them */
 
-//new:
 /* PCI_config_space */
 #define NVCFG_DEVID		0x00
 #define NVCFG_DEVCTRL	0x04
@@ -609,8 +608,8 @@
 #define NVBES_NV10_1SRCPTCH	0x0000895c
 /* Nvidia MPEG2 hardware decoder (GeForce4MX only) */
 #define NVBES_DEC_GENCTRL	0x00001588
-//end new.
 
+//old:
 /*MAVEN registers (<= G400) */
 #define NVMAV_PGM            0x3E
 #define NVMAV_PIXPLLM        0x80
@@ -668,8 +667,8 @@
 #define NVMAV_STABLE         0xBF
 #define NVMAV_HDISPLAYTV     0xC2
 #define NVMAV_BREG_0XC6      0xC6
+//end old.
 
-//new:
 /* Macros for convenient accesses to the NV chips */
 #define NV_REG8(r_)  ((vuint8  *)regs)[(r_)]
 #define NV_REG16(r_) ((vuint16 *)regs)[(r_) >> 1]
@@ -718,8 +717,8 @@
 /* read and write from the acceleration engine registers */
 #define ACCR(A)    (NV_REG32(NVACC_##A))
 #define ACCW(A,B)  (NV_REG32(NVACC_##A)=B)
-//end new.
 
+//old:
 /* read and write from maven (<= G400) */
 #define MAVR(A)     (i2c_maven_read (NVMAV_##A ))
 #define MAVW(A,B)   (i2c_maven_write(NVMAV_##A ,B))
