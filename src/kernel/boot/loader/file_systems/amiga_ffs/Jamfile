@@ -11,4 +11,5 @@ KernelStaticLibrary boot_amiga_ffs :
 	Volume.cpp
 	Directory.cpp
 	File.cpp
+	: -fno-pic
 	;

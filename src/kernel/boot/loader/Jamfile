@@ -39,8 +39,8 @@ KernelStaticLibrary boot_loader :
 	# utils
 	list.c
 	kernel_cpp.cpp
-	:
-	-fno-builtin
+
+	: -fno-pic
 	;
 
 # The partition support is built in an extra static library
@@ -51,7 +51,7 @@ KernelStaticLibrary boot_partitions :
 	apple.cpp
 	intel.cpp
 	PartitionMap.cpp
-	:
+	: -fno-pic
 	;
 
 # Tell Jam where to find the utility sources

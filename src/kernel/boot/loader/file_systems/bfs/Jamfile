@@ -13,4 +13,5 @@ KernelStaticLibrary boot_bfs :
 	Link.cpp
 	Stream.cpp
 	BPlusTree.cpp
+	: -fno-pic
 	;
