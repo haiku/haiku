@@ -24,6 +24,9 @@
 #endif
 
 
+kernel_args gKernelArgs;
+
+
 extern "C" int
 main(stage2_args *args)
 {
@@ -95,7 +98,7 @@ main(stage2_args *args)
 	}
 
 out:
-	heap_release();
+	heap_release(args);
 	return 0;
 }
 
