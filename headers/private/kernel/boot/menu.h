@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 #ifndef KERNEL_BOOT_MENU_H
 #define KERNEL_BOOT_MENU_H
@@ -19,6 +19,7 @@ enum menu_item_type {
 	MENU_ITEM_STANDARD = 1,
 	MENU_ITEM_MARKABLE,
 	MENU_ITEM_TITLE,
+	MENU_ITEM_NO_CHOICE,
 	MENU_ITEM_SEPARATOR,
 };
 
