@@ -182,8 +182,10 @@ public:
 						   "message to team %ld\n", team);
 					printf("      %s\n", strerror(error));
 				}
-			} else
-				printf("quit: could create a messenger for team %ld\n", team);
+			} else {
+				printf("quit: failed to create a messenger for team %ld\n",
+					   team);
+			}
 		}
 	}
 
