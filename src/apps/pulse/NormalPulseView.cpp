@@ -189,6 +189,9 @@ void NormalPulseView::DetermineVendorAndProcessor() {
 			strcpy(processor, "Pentium III");
 			break;
 #ifdef OBOS_CPU_TYPES
+		case B_CPU_INTEL_PENTIUM_M:
+			strcpy(processor, "Pentium M");
+			break;
 		case B_CPU_INTEL_PENTIUM_IV:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL1:
 		case B_CPU_INTEL_PENTIUM_IV_MODEL2:
