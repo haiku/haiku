@@ -7,7 +7,7 @@ KernelObjects
 	;
 
 KernelLd cpuinfo :
-	libglue2.so
+	libglue2.o
 	<$(SOURCE_GRIST)>main.o
 	libroot.so
 	:
