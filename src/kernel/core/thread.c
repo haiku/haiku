@@ -149,8 +149,12 @@ thread_struct_hash(void *_t, const void *_key, uint32 range)
 }
 
 
+/**
+ * \param threadID The ID to be assigned to the new thread. If
+ *		  \code < 0 \endcode a fresh one is allocated.
+ */
 static struct thread *
-create_thread_struct(const char *name)
+create_thread_struct(const char *name, thread_id threadID)
 {
 	struct thread *t;
 	cpu_status state;
@@ -170,7 +174,7 @@ create_thread_struct(const char *name)
 
 	strlcpy(t->name, name, B_OS_NAME_LENGTH);
 
-	t->id = atomic_add(&sNextThreadID, 1);
+	t->id = (threadID >= 0 ? threadID : allocate_thread_id());
 	t->team = NULL;
 	t->cpu = NULL;
 	t->sem.blocking = -1;
@@ -305,9 +309,13 @@ _create_kernel_thread_kentry(void)
 }
 
 
+/**
+ * \param threadID The ID to be assigned to the new thread. If
+ *		  \code < 0 \endcode a fresh one is allocated.
+ */
 static thread_id
 create_thread(const char *name, team_id teamID, thread_entry_func entry,
-	void *args1, void *args2, int32 priority, bool kernel)
+	void *args1, void *args2, int32 priority, bool kernel, thread_id threadID)
 {
 	struct thread *t, *currentThread;
 	struct team *team;
@@ -317,7 +325,7 @@ create_thread(const char *name, team_id teamID, thread_entry_func entry,
 	bool abort = false;
 	bool debugNewThread = false;
 
-	t = create_thread_struct(name);
+	t = create_thread_struct(name, threadID);
 	if (t == NULL)
 		return B_NO_MEMORY;
 
@@ -1138,9 +1146,29 @@ thread_dequeue_id(struct thread_queue *q, thread_id thr_id)
 
 
 thread_id
-spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority, void *arg, team_id team)
+allocate_thread_id()
 {
-	return create_thread(name, team, (thread_entry_func)function, arg, NULL, priority, true);
+	return atomic_add(&sNextThreadID, 1);
+}
+
+
+thread_id
+peek_next_thread_id()
+{
+	return atomic_get(&sNextThreadID);
+}
+
+
+/**
+ * \param threadID The ID to be assigned to the new thread. If
+ *		  \code < 0 \endcode a fresh one is allocated.
+ */
+thread_id
+spawn_kernel_thread_etc(thread_func function, const char *name, int32 priority,
+	void *arg, team_id team, thread_id threadID)
+{
+	return create_thread(name, team, (thread_entry_func)function, arg, NULL,
+		priority, true, threadID);
 }
 
 
@@ -1183,6 +1211,9 @@ thread_init(kernel_args *args)
 	if (arch_thread_init(args) < B_OK)
 		panic("arch_thread_init() failed!\n");
 
+	// skip all thread IDs including B_SYSTEM_TEAM, which is reserved
+	while (allocate_thread_id() < B_SYSTEM_TEAM);
+
 	// create an idle thread for each cpu
 
 	for (i = 0; i < args->num_cpus; i++) {
@@ -1190,7 +1221,8 @@ thread_init(kernel_args *args)
 		char temp[64];
 
 		sprintf(temp, "idle thread %d", i);
-		t = create_thread_struct(temp);
+		t = create_thread_struct(temp,
+			(i == 0 ? team_get_kernel_team_id() : -1));
 		if (t == NULL) {
 			panic("error creating idle thread struct\n");
 			return ENOMEM;
@@ -1493,6 +1525,7 @@ _get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t si
 	struct thread *thread = NULL;
 	cpu_status state;
 	int slot;
+	thread_id threadIDEnd;
 
 	if (info == NULL || size != sizeof(thread_info) || team < B_OK)
 		return B_BAD_VALUE;
@@ -1507,10 +1540,11 @@ _get_next_thread_info(team_id team, int32 *_cookie, thread_info *info, size_t si
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	if (slot >= sNextThreadID)
+	threadIDEnd = peek_next_thread_id();
+	if (slot >= threadIDEnd)
 		goto err;
 
-	while (slot < sNextThreadID
+	while (slot < threadIDEnd
 		&& (!(thread = thread_get_thread_struct_locked(slot)) || thread->team->id != team))
 		slot++;
 
@@ -1759,10 +1793,11 @@ resume_thread(thread_id id)
 
 
 thread_id
-spawn_kernel_thread(thread_func function, const char *name, int32 priority, void *arg)
+spawn_kernel_thread(thread_func function, const char *name, int32 priority,
+	void *arg)
 {
-	return create_thread(name, team_get_kernel_team()->id, (thread_entry_func)function,
-				arg, NULL, priority, true);
+	return create_thread(name, team_get_kernel_team()->id,
+		(thread_entry_func)function, arg, NULL, priority, true, -1);
 }
 
 
@@ -1867,7 +1902,7 @@ _user_spawn_thread(int32 (*entry)(thread_func, void *), const char *userName, in
 		return B_BAD_ADDRESS;
 
 	threadID = create_thread(name, thread_get_current_thread()->team->id, entry,
-		data1, data2, priority, false);
+		data1, data2, priority, false, -1);
 
 	user_debug_thread_created(threadID);
 
