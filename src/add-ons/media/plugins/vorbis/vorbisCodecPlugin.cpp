@@ -47,7 +47,6 @@ VorbisDecoder::VorbisDecoder()
 	vorbis_info_init(&fInfo);
 	vorbis_comment_init(&fComment);
 	
-	fStartTime = 0;
 	fFrameSize = 0;
 	fOutputBufferSize = 0;
 }
@@ -170,9 +169,8 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 //	TRACE("VorbisDecoder::Decode\n");
 	uint8 * out_buffer = static_cast<uint8 *>(buffer);
 	int32	out_bytes_needed = fOutputBufferSize;
-	
-	mediaHeader->start_time = fStartTime;
-	//TRACE("VorbisDecoder: Decoding start time %.6f\n", fStartTime / 1000000.0);
+
+	bool start = false;
 	
 	while (out_bytes_needed > 0) {
 		int samples;
@@ -194,7 +192,10 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 				TRACE("VorbisDecoder::Decode: chunk not ogg_packet-sized\n");
 				return B_ERROR;
 			}
-			fStartTime = mh.start_time;
+			if (!start) {
+				mediaHeader->start_time = mh.start_time;
+				start = true;
+			}
 			ogg_packet * packet = static_cast<ogg_packet*>(chunkBuffer);
 			if (vorbis_synthesis(&fBlock,packet)==0) {
 				vorbis_synthesis_blockin(&fDspState,&fBlock);
@@ -227,8 +228,6 @@ VorbisDecoder::Decode(void *buffer, int64 *frameCount,
 		// report back how many samples we consumed
 		vorbis_synthesis_read(&fDspState,samples);
 		
-		//fStartTime += (1000000LL * samples) / fInfo.rate;
-		//TRACE("VorbisDecoder: fStartTime inc'd to %.6f\n", fStartTime / 1000000.0);
 	}
 	
 done:

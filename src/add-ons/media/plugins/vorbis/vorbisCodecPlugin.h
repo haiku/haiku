@@ -30,7 +30,6 @@ private:
 	vorbis_comment		fComment;
 	vorbis_dsp_state	fDspState;
 	vorbis_block		fBlock;
-	bigtime_t		fStartTime;
 	int				fFrameSize;
 	int				fOutputBufferSize;
 };
