@@ -500,9 +500,9 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!math>log.o
 	<$(SOURCE_GRIST)!libroot!posix!math>log10.o 
 	<$(SOURCE_GRIST)!libroot!posix!math>log1p.o
-	<$(SOURCE_GRIST)!libroot!posix!math>log__L.o 
-	<$(SOURCE_GRIST)!libroot!posix!math>pow.o
+	<$(SOURCE_GRIST)!libroot!posix!math>log__L.o
 	<$(SOURCE_GRIST)!libroot!posix!math>math_globals.o 
+	<$(SOURCE_GRIST)!libroot!posix!math>pow.o
 	<$(SOURCE_GRIST)!libroot!posix!math>sinh.o 
 	<$(SOURCE_GRIST)!libroot!posix!math>tanh.o
 	<$(SOURCE_GRIST)!libroot!posix!math>cabs.o
