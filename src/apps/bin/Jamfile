@@ -8,6 +8,7 @@ StdBinCommands
 
 StdBinCommands
 		roster.cpp
+		catattr.cpp
 	: be stdc++.r4 ;
 
 StdBinCommands
