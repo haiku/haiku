@@ -25,6 +25,7 @@
 //
 //------------------------------------------------------------------------------
 #include <PortLink.h>
+#include <PortMessage.h>
 #include <InterfaceDefs.h>
 #include <GraphicsDefs.h>
 #include <ServerProtocol.h>
@@ -55,9 +56,15 @@ _IMPEXP_BE status_t set_screen_space(int32 index, uint32 res, bool stick = true)
 
 _IMPEXP_BE status_t get_scroll_bar_info(scroll_bar_info *info)
 {
-	// Contacts the app_server
-	// TODO: Implement
-//	AS_GET_SCROLLBAR_INFO,
+	PortMessage pmsg;
+
+	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
+	link->SetOpCode(AS_GET_SCROLLBAR_INFO);
+	link->FlushWithReply(&pmsg);
+	delete link;
+	
+	pmsg.Read(info, sizeof(scroll_bar_info));
+	
 }
 
 _IMPEXP_BE status_t set_scroll_bar_info(scroll_bar_info *info)
@@ -289,13 +296,23 @@ _IMPEXP_BE void set_focus_follows_mouse(bool follow)
 
 _IMPEXP_BE bool focus_follows_mouse()
 {
+	PortMessage pmsg;
+	
+	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
+	link->SetOpCode(AS_FOCUS_FOLLOWS_MOUSE);
+	link->FlushWithReply(&pmsg);
+	delete link;
+
+	bool ffm;
+	pmsg.Read(&ffm);
+	return ffm;
 }
 
 _IMPEXP_BE void set_mouse_mode(mode_mouse mode)
 {
 	BPrivate::BAppServerLink *link=new BPrivate::BAppServerLink();
 	link->SetOpCode(AS_SET_MOUSE_MODE);
-	link->Attach((int32)mode);
+	link->Attach(&mode,sizeof(mode_mouse));
 	link->Flush();
 	delete link;
 }
