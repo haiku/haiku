@@ -8,6 +8,7 @@
 
 #include <ktypes.h>
 #include <vfs_types.h>
+#include <OS.h>
 
 struct dirent;
 struct stat;
