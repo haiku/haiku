@@ -43,7 +43,7 @@ ssize_t sys_read_attr(bool kernel, int fd, const char *name, int type, void *buf
 ssize_t sys_write_attr(bool kernel, int fd, const char *name, int type, void *buffer, size_t len, off_t pos);
 ssize_t sys_remove_attr(bool kernel, int fd, const char *name);
 
-int sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, void **cookie);
+int sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie);
 int sys_close_query(bool kernel, int fd, const char *path, void *cookie);
 int sys_read_query(bool kernel, int fd, const char *path, void *cookie,struct dirent *dent,size_t bufferSize,long num);
 

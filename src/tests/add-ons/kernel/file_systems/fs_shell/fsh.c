@@ -1061,26 +1061,66 @@ do_sync(int argc, char **argv)
 }
 
 
-void *gQueryCookie = NULL;
+#define MAX_LIVE_QUERIES	10
+void *gQueryCookie[MAX_LIVE_QUERIES] = {NULL};
+char *gQueryString[MAX_LIVE_QUERIES] = {NULL};
+
+
+static void
+do_listqueries(int argc, char **argv)
+{
+	int min, max;
+
+	if (argc == 2)
+		min = max = atol(argv[1]);
+	else {
+		min = 0;
+		max = MAX_LIVE_QUERIES - 1;
+	}
+
+	// list all queries (or only the one asked for)
+
+	for (; min <= max; min++) {
+		if (gQueryCookie[min] == NULL)
+			continue;
+
+		printf("%ld. (%p) %s\n", min, gQueryCookie[min], gQueryString[min]);
+	}
+}
 
 
 static void
 do_stopquery(int argc, char **argv)
 {
 	int err;
+	int min, max;
 
 	if (gQueryCookie == NULL) {
 		printf("no query running (use the 'startquery' command to start a query).\n");
 		return;
 	}
 
-	err = sys_close_query(true, -1, "/myfs/.", gQueryCookie);
-	if (err < 0) {
-		printf("could not close query: %s\n", strerror(err));
-		return;
+	if (argc == 2)
+		min = max = atol(argv[1]);
+	else {
+		min = 0;
+		max = MAX_LIVE_QUERIES - 1;
 	}
 
-	gQueryCookie = NULL;
+	// close all queries (or only the one asked for)
+
+	for (; min <= max; min++) {
+		if (gQueryCookie[min] == NULL)
+			continue;
+
+		err = sys_close_query(true, -1, "/myfs/.", gQueryCookie[min]);
+		if (err < 0) {
+			printf("could not close query: %s\n", strerror(err));
+			return;
+		}
+		gQueryCookie[min] = NULL;
+		free(gQueryString[min]);
+	}
 }
 
 
@@ -1088,10 +1128,17 @@ static void
 do_startquery(int argc, char **argv)
 {
 	char *query;
+	int freeSlot;
 	int err;
 
-	if (gQueryCookie != NULL)
-		do_stopquery(0, NULL);
+	for (freeSlot = 0; freeSlot < MAX_LIVE_QUERIES; freeSlot++) {
+		if (gQueryCookie[freeSlot] == NULL)
+			break;
+	}
+	if (freeSlot == MAX_LIVE_QUERIES) {
+		printf("All query slots are used, stop some\n");
+		return;
+	}
 
 	if (argc != 2) {
 		printf("query string expected\n");
@@ -1099,12 +1146,14 @@ do_startquery(int argc, char **argv)
 	}
 	query = argv[1];
 
-	err = sys_open_query(true, -1, "/myfs/.", query, B_LIVE_QUERY, &gQueryCookie);
+	err = sys_open_query(true, -1, "/myfs/.", query, B_LIVE_QUERY, freeSlot, freeSlot, &gQueryCookie[freeSlot]);
 	if (err < 0) {
 		printf("could not open query: %s\n", strerror(err));
 		return;
-	} else
-		printf("query started - use the 'stopquery' command to stop it.\n");
+	}
+
+	printf("query number %ld started - use the 'stopquery' command to stop it.\n", freeSlot);
+	gQueryString[freeSlot] = strdup(query);
 }
 
 
@@ -1124,7 +1173,7 @@ do_query(int argc, char **argv)
 	}
 	query = argv[1];
 
-	err = sys_open_query(true, -1, "/myfs/.", query, 0, &cookie);
+	err = sys_open_query(true, -1, "/myfs/.", query, 0, 42, 42, &cookie);
 	if (err < 0) {
 		printf("could not open query: %s\n", strerror(err));
 		return;
@@ -1357,6 +1406,7 @@ cmd_entry fsh_cmds[] =
     { "query",   do_query, "run a query on the file system" },
     { "startquery", do_startquery, "run a live query on the file system" },
     { "stopquery",  do_stopquery, "stops the live query" },
+    { "lsquery",  do_listqueries, "list all live queries" },
     { "ioctl",   do_ioctl, "execute ioctl() without an inode (okay, with the root node)" },
     { "fcntl",   do_fcntl, "execute ioctl() with the active inode" },
     { "cptest",  do_copytest, "copies all files from the given path" },

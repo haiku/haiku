@@ -1827,7 +1827,7 @@ error1:
 
 
 int
-sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, void **cookie)
+sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong flags, port_id port, ulong token, void **cookie)
 {
 	int		err;
 	nspace	*ns;
@@ -1848,7 +1848,7 @@ sys_open_query(bool kernel, int fd, const char *path, const char *query, ulong f
 		dec_vnode(root, FALSE);
 		return EPERM;
 	}
-	err = (*fs->ops.open_query)(ns->data, query, flags, -1, 0, cookie);
+	err = (*fs->ops.open_query)(ns->data, query, flags, port, token, cookie);
 	printf("sys_open_query() -- end: %d\n",err);
 	dec_vnode(root, FALSE);
 
@@ -3203,7 +3203,7 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id
 			text = "unknown operation...";
 			break;
 	}
-	printf("notify_listener: %s\n",text);
+	printf("notify_listener: %s\n", text);
 #endif
 	return 0;
 }
@@ -3211,11 +3211,12 @@ notify_listener(int op, nspace_id nsid, vnode_id vnida,	vnode_id vnidb, vnode_id
 
 int
 send_notification(port_id port, long token, ulong what, long op, nspace_id nsida,
-		nspace_id nsidb, vnode_id vnida,vnode_id vnidb, vnode_id vnidc,
+		nspace_id nsidb, vnode_id vnida, vnode_id vnidb, vnode_id vnidc,
 		const char *name)
 {
 #ifdef DEBUG
-	printf("send_notification... op = %s, name = %s\n",op == B_ENTRY_CREATED ? "B_ENTRY_CREATED" : "B_ENTRY_REMOVED",name);
+	printf("send_notification... op = %s, name = %s, port = %ld, token = %ld\n",
+		op == B_ENTRY_CREATED ? "B_ENTRY_CREATED" : "B_ENTRY_REMOVED", name, port, token);
 #endif
 	return 0;
 }
