@@ -236,10 +236,11 @@
 #define NMCR1_22CURADDRESS		0x1014
 
 /* NeoMagic PCI acceleration registers */
-/* all cards, but some registers only on 2090 and later */
+/* all cards, but some registers only on 2090 and later; and some on 2200 and later */
 #define NMACC_STATUS			0x0000
 #define NMACC_CONTROL			0x0004
 #define NMACC_FGCOLOR			0x000c
+#define NMACC_2200_PITCH		0x0014
 #define NMACC_2090_CLIPLT		0x0018
 #define NMACC_2090_CLIPRB		0x001c
 #define NMACC_SRCSTARTOFF		0x0024
