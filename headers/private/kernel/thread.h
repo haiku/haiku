@@ -21,7 +21,7 @@ void start_scheduler(void);
 
 #define BLOCKABLE_SIGS	(~((1L << (SIGKILL - 1)) | (1L << (SIGSTOP - 1))))
 
-void handle_signals(struct thread *t, int state);
+int handle_signals(struct thread *t, int state);
 
 void thread_enqueue(struct thread *t, struct thread_queue *q);
 struct thread *thread_lookat_queue(struct thread_queue *q);

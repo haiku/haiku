@@ -25,11 +25,11 @@ const char * const sys_siglist[NSIG] = {
 
 
 // Expects interrupts off and thread lock held.
-void
+int
 handle_signals(struct thread *t, int state)
 {
 	uint32 sig_mask = t->sig_pending & (~t->sig_block_mask);
-	int i, sig;
+	int i, sig, global_resched = 0;
 	struct sigaction *handler;
 	
 	if (sig_mask) {
@@ -61,6 +61,7 @@ handle_signals(struct thread *t, int state)
 						
 						case SIGSTOP:
 							t->next_state = B_THREAD_SUSPENDED;
+							global_resched = 1;
 							continue;
 													
 						case SIGQUIT:
@@ -90,12 +91,13 @@ handle_signals(struct thread *t, int state)
 				if (!(handler->sa_flags & SA_NOMASK))
 					t->sig_block_mask |= (handler->sa_mask | (1L << sig)) & BLOCKABLE_SIGS;
 				
-				return;
+				return global_resched;
 			} else
 				sig_mask >>= 1;
 		}
 		arch_check_syscall_restart(t);
 	}
+	return global_resched;
 }
 
 
@@ -184,30 +186,6 @@ has_signals_pending(void *thr)
 	if (!t)
 		t = thread_get_current_thread();
 	return (t->sig_pending & ~t->sig_block_mask);
-}
-
-
-int
-sys_kill(pid_t pid, int sig)
-{
-	struct team *t;
-	int state;
-	thread_id tid = -1;
-	
-	// XXX check for permissions
-	
-	state = disable_interrupts();
-	GRAB_THREAD_LOCK();
-	t = team_get_team_struct_locked(pid);
-	if ((t) && (t->main_thread))
-		tid = t->main_thread->id;
-	RELEASE_THREAD_LOCK();
-	restore_interrupts(state);
-	
-	if (sig)
-		return send_signal_etc(tid, sig, 0);
-	else
-		return 0;
 }
 
 

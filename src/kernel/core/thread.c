@@ -471,12 +471,7 @@ thread_create_kernel_thread_etc(const char *name, int (*func)(void *), void *arg
 int
 thread_suspend_thread(thread_id id)
 {
-	int rv;
-	
-	rv = send_signal_etc(id, SIGSTOP, B_DO_NOT_RESCHEDULE);
-	if (rv == B_OK)
-		smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
-	return rv;
+	return send_signal_etc(id, SIGSTOP, B_DO_NOT_RESCHEDULE);
 }
 
 
@@ -1241,7 +1236,7 @@ thread_atkernel_entry(void)
 void
 thread_atkernel_exit(void)
 {
-	int state;
+	int state, global_resched;
 	struct thread *t;
 	bigtime_t now;
 
@@ -1252,18 +1247,20 @@ thread_atkernel_exit(void)
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
 
-	handle_signals(t, state);
+	global_resched = handle_signals(t, state);
 
 	t->in_kernel = false;
-
-	RELEASE_THREAD_LOCK();
 
 	// track kernel time
 	now = system_time();
 	t->kernel_time += now - t->last_time;
 	t->last_time = now;
 
+	RELEASE_THREAD_LOCK();
 	restore_interrupts(state);
+	
+	if (global_resched)
+		smp_send_broadcast_ici(SMP_MSG_RESCHEDULE, 0, 0, 0, NULL, SMP_MSG_FLAG_SYNC);
 }
 
 

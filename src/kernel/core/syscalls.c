@@ -389,9 +389,6 @@ int syscall_dispatcher(unsigned long call_num, void *arg_buffer, uint64 *call_re
 		case SYSCALL_RETURN_FROM_SIGNAL:
 			*call_ret = arch_restore_signal_frame();
 			break;
-		case SYSCALL_KILL:
-			*call_ret = sys_kill((pid_t)arg0, (int)arg1);
-			break;
 		case SYSCALL_SIGACTION:
 			*call_ret = user_sigaction((int)arg0, (const struct sigaction *)arg1, (struct sigaction *)arg2);
 			break;

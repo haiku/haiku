@@ -83,14 +83,14 @@ set_thread_priority(thread_id thread, int32 priority)
 void
 exit_thread(status_t status)
 {
-	// ToDo: exit_thread not implemented
+	sys_exit(status);
 }
 
 
 status_t
 wait_for_thread(thread_id thread, status_t *thread_return_value)
 {
-	return sys_wait_on_thread(thread,thread_return_value);
+	return sys_wait_on_thread(thread, thread_return_value);
 }
 
 

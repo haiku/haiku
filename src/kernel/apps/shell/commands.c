@@ -195,7 +195,7 @@ int cmd_kill(int argc, char *argv[])
 		printf("not enough arguments to kill\n");
 		return 0;
 	}
-	rc = sys_kill(atoi(argv[2]), atoi(argv[1]));
+	rc = sys_send_signal(atoi(argv[2]), atoi(argv[1]));
 	if (rc)
 		printf("kill failed\n");
 	return 0;
