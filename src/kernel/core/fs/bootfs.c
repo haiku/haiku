@@ -512,7 +512,7 @@ bootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 		goto err;
 	}
 
-	status = vfs_get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
 	if (status < 0)
 		goto err;
 

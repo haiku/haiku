@@ -204,7 +204,7 @@ Volume::~Volume()
 {
 	// put_vnode on the root to release the ref to it
 	if (fRootNode)
-		vfs_put_vnode(ID(), fRootNode->ID());
+		put_vnode(ID(), fRootNode->ID());
 
 	if (fNodeHash != NULL) {
 		// delete all of the inodes
@@ -265,7 +265,7 @@ Volume::CreateNode(const char *name, int32 type)
 		InsertNode(inode);
 
 	hash_insert(fNodeHash, inode);
-	vfs_new_vnode(ID(), inode->ID(), inode);
+	new_vnode(ID(), inode->ID(), inode);
 
 	return inode;
 }
@@ -396,7 +396,7 @@ Volume::RemoveNode(Inode *directory, const char *name)
 	notify_listener(B_ENTRY_REMOVED, ID(), directory->ID(), 0, inode->ID(), name);
 
 	// schedule this vnode to be removed when it's ref goes to zero
-	vfs_remove_vnode(ID(), inode->ID());
+	remove_vnode(ID(), inode->ID());
 
 err:
 	Unlock();
@@ -810,7 +810,7 @@ pipefs_lookup(fs_volume _volume, fs_vnode _dir, const char *name, vnode_id *_id,
 	}
 
 	Inode *dummy;
-	status = vfs_get_vnode(volume->ID(), inode->ID(), (fs_vnode *)&dummy);
+	status = get_vnode(volume->ID(), inode->ID(), (fs_vnode *)&dummy);
 	if (status < B_OK)
 		goto err;
 

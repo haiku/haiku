@@ -267,7 +267,7 @@ rootfs_remove(struct rootfs *fs, struct rootfs_vnode *dir, const char *name, boo
 	notify_listener(B_ENTRY_REMOVED, fs->id, dir->id, 0, vnode->id, name);
 
 	// schedule this vnode to be removed when it's ref goes to zero
-	vfs_remove_vnode(fs->id, vnode->id);
+	remove_vnode(fs->id, vnode->id);
 
 err:
 	mutex_unlock(&fs->lock);
@@ -343,7 +343,7 @@ rootfs_unmount(fs_volume _fs)
 	TRACE(("rootfs_unmount: entry fs = %p\n", fs));
 
 	// put_vnode on the root to release the ref to it
-	vfs_put_vnode(fs->id, fs->root_vnode->id);
+	put_vnode(fs->id, fs->root_vnode->id);
 
 	// delete all of the vnodes
 	hash_open(fs->vnode_list_hash, &i);
@@ -390,7 +390,7 @@ rootfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int
 		goto err;
 	}
 
-	status = vfs_get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	status = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
 	if (status < 0)
 		goto err;
 

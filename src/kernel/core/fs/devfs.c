@@ -169,7 +169,7 @@ devfs_delete_vnode(struct devfs *fs, struct devfs_vnode *v, bool force_delete)
 
 	// TK: for partitions, we have to release the raw device
 	if (v->stream.type == STREAM_TYPE_DEVICE && v->stream.u.dev.part_map)
-		vfs_put_vnode(fs->id, v->stream.u.dev.part_map->raw_vnode->id);
+		put_vnode(fs->id, v->stream.u.dev.part_map->raw_vnode->id);
 
 	if (v->name != NULL)
 		free(v->name);
@@ -362,7 +362,7 @@ devfs_set_partition( struct devfs *fs, struct devfs_vnode *v,
 	// increase reference count of raw device - 
 	// the partition device really needs it 
 	// (at least to resolve its name on GET_PARTITION_INFO)
-	res = vfs_get_vnode(fs->id, v->id, (fs_vnode *)&part_map->raw_vnode);
+	res = get_vnode(fs->id, v->id, (fs_vnode *)&part_map->raw_vnode);
 	if (res < 0)
 		goto err1;
 
@@ -398,7 +398,7 @@ err1:
 err2:
 	mutex_unlock(&gDeviceFileSystem->lock);
 
-	vfs_put_vnode(fs->id, v->id);
+	put_vnode(fs->id, v->id);
 	free(part_map);
 	return res;
 }
@@ -535,7 +535,7 @@ devfs_lookup(fs_volume _fs, fs_vnode _dir, const char *name, vnode_id *_id, int 
 		goto err;
 	}
 
-	err = vfs_get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
+	err = get_vnode(fs->id, vnode->id, (fs_vnode *)&vdummy);
 	if (err < 0)
 		goto err;
 
@@ -989,7 +989,7 @@ devfs_unlink(fs_volume _fs, fs_vnode _dir, const char *name)
 	if (status < 0)
 		goto err;
 
-	status = vfs_remove_vnode(fs->id, vnode->id);
+	status = remove_vnode(fs->id, vnode->id);
 
 err:
 	mutex_unlock(&fs->lock);
