@@ -13,6 +13,7 @@ StdBinCommands
 	driveinfo.c
 #	echo.c
 	eject.c
+	error.c
 	finddir.c
 	hd.c
 	ideinfo.c

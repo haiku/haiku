@@ -1,67 +1,55 @@
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-//
-//  Copyright (c) 2001-2003, OpenBeOS
-//
-//  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
-//
-//
-//  File:        error.c
-//  Author:      Daniel Reinhold (danielre@users.sf.net)
-//  Description: prints error message text for OS error codes
-//
-// ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
 
-#include <OS.h>
+
+#include <SupportDefs.h>
+
 #include <stdio.h>
+#include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
-#include <errno.h>
 
 
-void print_error(char *);
+extern const char *__progname;
+
+
+static void
+usage(void)
+{
+	fprintf(stderr, "usage: %s <error number>\n"
+		"Prints clear text error messages for given error numbers.\n", __progname);
+	exit(-1);
+}
+
+
+static void
+print_error(char *number)
+{
+	char *end;
+	int32 error = (int32)strtoll(number, &end, 0);
+		// strtol() cuts off hex numbers that have the highest bit set
+
+	if (end[0]) {
+		fprintf(stderr, "%s: invalid number (%s)\n", __progname, number);
+		exit(1);
+	}
+
+	printf("0x%lx: %s\n", error, strerror(error));
+}
 
 
 int
 main(int argc, char *argv[])
 {
-	if (argc != 2)
-		printf("Usage: error number\n"
-		       "Prints the message text for OS error codes. "
-		       "The error number can be in decimal, hex or octal.\n");
-	else
-		print_error(argv[1]);
-	
+	int32 i;
+
+	if (argc < 2)
+		usage();
+
+	for (i = 1; i < argc; i++) {
+		print_error(argv[i]);
+	}
+
 	return 0;
-}
-
-
-void
-print_error(char *str)
-{
-	uint32 err;
-	int    base = 10;
-	char  *end;
-	
-	if (str[0] == '0') {
-		if (tolower(str[1]) == 'x')
-			base = 16;
-		else
-			base = 8;
-	}
-	
-	errno = 0;
-	err = strtoul(str, &end, base);
-	
-	if (errno) {
-		fprintf(stderr, "%s: %s\n", str, strerror(errno));
-		exit(1);
-	}
-	
-	if (*end) {
-		fprintf(stderr, "%s: invalid number\n", str);
-		exit(1);
-	}
-	
-	printf("0x%x: %s\n", err, strerror(err));
 }
