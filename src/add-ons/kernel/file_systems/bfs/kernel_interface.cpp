@@ -296,11 +296,10 @@ bfs_read_fs_stat(void *_ns, struct fs_info *info)
 	info->free_blocks = volume->FreeBlocks();
 
 	// Volume name
-	strncpy(info->volume_name, volume->Name(), sizeof(info->volume_name) - 1);
-	info->volume_name[sizeof(info->volume_name) - 1] = '\0';
+	strlcpy(info->volume_name, volume->Name(), sizeof(info->volume_name));
 
 	// File system name
-	strcpy(info->fsh_name, BFS_NAME);
+	strlcpy(info->fsh_name, BFS_NAME, sizeof(info->fsh_name));
 
 	return B_NO_ERROR;
 }
@@ -901,7 +900,7 @@ bfs_symlink(void *_ns, void *_directory, const char *name, const char *path)
 	// ToDo: would be nice if Inode::Create() would let the INODE_NOT_READY
 	//	flag set until here, so that it can be accessed directly
 
-	// Inode::Create() left the inode locked
+	// Inode::Create() left the inode locked in memory
 	put_vnode(volume->ID(), id);
 
 	if (status == B_OK) {
@@ -1228,7 +1227,8 @@ bfs_write(void *_ns, void *_node, void *_cookie, off_t pos, const void *buffer, 
 
 	Transaction transaction;
 		// We are not starting the transaction here, since
-		// it might not be needed at all
+		// it might not be needed at all (the contents of
+		// regular files aren't logged)
 
 	status_t status = inode->WriteAt(&transaction, pos, (const uint8 *)buffer, _length);
 
@@ -1276,6 +1276,8 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 	Inode *inode = (Inode *)_node;
 
 	if (cookie->open_mode & O_RWMASK) {
+		ReadLocked locked(inode->Lock());
+
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
 
@@ -1307,6 +1309,26 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 			notify_listener(B_STAT_CHANGED, volume->ID(), 0, 0, inode->ID(), NULL);
 	}
 
+	return B_OK;
+}
+
+
+static int
+bfs_free_cookie(void *_ns, void *_node, void *_cookie)
+{
+	FUNCTION();
+
+	if (_ns == NULL || _node == NULL || _cookie == NULL)
+		return B_BAD_VALUE;
+
+	file_cookie *cookie = (file_cookie *)_cookie;
+
+	Volume *volume = (Volume *)_ns;
+	Inode *inode = (Inode *)_node;
+
+	if (cookie != NULL)
+		free(cookie);
+
 	if (inode->Flags() & INODE_NO_CACHE) {
 		volume->Pool().ReleaseBuffers();
 		inode->Node()->flags &= ~INODE_NO_CACHE;
@@ -1319,18 +1341,6 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 		FATAL(("check process was aborted!\n"));
 		volume->Allocator().StopChecking(NULL);
 	}
-
-	return B_OK;
-}
-
-
-static int
-bfs_free_cookie(void * /*ns*/, void * /*node*/, void *cookie)
-{
-	FUNCTION();
-
-	if (cookie != NULL)
-		free(cookie);
 
 	return B_OK;
 }
