@@ -35,6 +35,7 @@
 #include <stdio.h>
 
 #include <AppMisc.h>
+#include <TokenSpace.h>
 
 struct menubar_data
 {
@@ -454,7 +455,16 @@ BMenuBar::RestoreFocus()
 {
 	BWindow *window = Window();
 	if (window && window->Lock()) {
-		// TODO: Give focus back to the previous focus BView	
+		BHandler *handler = NULL;
+		if (BPrivate::gDefaultTokens.GetToken(fPrevFocusToken, B_HANDLER_TOKEN,
+				(void **)&handler, NULL) == B_OK) {
+			BView *view = dynamic_cast<BView *>(handler);
+			// TODO: Are there other things to do in case the BHandler
+			// is not a BView ?
+			if (view != NULL)
+				view->MakeFocus();
+		}
+		fPrevFocusToken = NULL;
 		window->Unlock();
 	}
 }
