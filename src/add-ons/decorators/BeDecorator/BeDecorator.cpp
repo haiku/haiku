@@ -424,18 +424,16 @@ void BeDecorator::_DrawTab(BRect r)
 	if(_look == B_NO_BORDER_WINDOW_LOOK || _look == B_BORDERED_WINDOW_LOOK)
 		return;
 	
-	_layerdata.highcolor=(GetFocus())?_colors->window_tab:_colors->inactive_window_tab;
-	_driver->FillRect(_tabrect,_layerdata.highcolor);
+	_driver->FillRect(_tabrect,(GetFocus())?_colors->window_tab:_colors->inactive_window_tab);
 	
-	_layerdata.highcolor=framecolors[2];
-	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),_layerdata.pensize,_layerdata.highcolor);
-	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),_layerdata.pensize,_layerdata.highcolor);
-	_layerdata.highcolor=framecolors[4];
-	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),_layerdata.pensize,_layerdata.highcolor);
-	_layerdata.highcolor=framecolors[1];	
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.LeftBottom(),framecolors[2]);
+	_driver->StrokeLine(_tabrect.LeftTop(),_tabrect.RightTop(),framecolors[2]);
+
+	_driver->StrokeLine(_tabrect.RightTop(),_tabrect.RightBottom(),framecolors[4]);
+
 	_driver->StrokeLine( BPoint( _tabrect.left + 2, _tabrect.bottom ),
 						 BPoint( _tabrect.right - 2, _tabrect.bottom ),
-						 _layerdata.pensize,_layerdata.highcolor);
+						 framecolors[1]);
 	
 	_DrawTitle(_tabrect);
 
@@ -459,7 +457,8 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 
 	// Actually just draws a blended square
 	int32 w=r.IntegerWidth(),  h=r.IntegerHeight();
-
+	
+	RGBColor temprgbcol;
 	rgb_color tmpcol,halfcol, startcol, endcol;
 	float rstep,gstep,bstep,i;
 
@@ -484,27 +483,24 @@ void BeDecorator::DrawBlendedRect(BRect r, bool down)
 
 	for(i=0;i<=steps; i++)
 	{
-		SetRGBColor(&tmpcol, uint8(startcol.red-(i*rstep)),
+		temprgbcol.SetColor(uint8(startcol.red-(i*rstep)),
 			uint8(startcol.green-(i*gstep)),
 			uint8(startcol.blue-(i*bstep)));
-		_layerdata.highcolor=tmpcol;
-
+		
 		_driver->StrokeLine(BPoint(r.left,r.top+i),
-			BPoint(r.left+i,r.top),1.0,_layerdata.highcolor);
+			BPoint(r.left+i,r.top),temprgbcol);
 
-		SetRGBColor(&tmpcol, uint8(halfcol.red-(i*rstep)),
+		temprgbcol.SetColor(uint8(halfcol.red-(i*rstep)),
 			uint8(halfcol.green-(i*gstep)),
 			uint8(halfcol.blue-(i*bstep)));
-		_layerdata.highcolor=tmpcol;
 
 		_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-			BPoint(r.left+i,r.top+steps),1.0,_layerdata.highcolor);
-
+			BPoint(r.left+i,r.top+steps),temprgbcol);
 	}
 
 //	_layerdata.highcolor=startcol;
 //	_driver->FillRect(r,&_layerdata,pat_solidhigh);
-	_driver->StrokeRect(r,1.0,framecolors[3]);
+	_driver->StrokeRect(r,framecolors[3]);
 }
 
 void BeDecorator::_DrawFrame(BRect invalid)
@@ -784,7 +780,7 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		}
 	}
 
-	_driver->StrokeLineArray(points,numlines,1.0,colors);
+	_driver->StrokeLineArray(points,numlines,&_layerdata,colors);
 	
 	delete rightindices;
 	delete leftindices;
@@ -802,12 +798,12 @@ void BeDecorator::_DrawFrame(BRect invalid)
 			r.right-=4;
 			r.bottom-=4;
 
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),1.0,framecolors[2]);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),1.0,framecolors[2]);
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),framecolors[2]);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),framecolors[2]);
 
 			r.OffsetBy(1,1);
-			_driver->StrokeLine(r.LeftTop(),r.RightTop(),1.0,framecolors[0]);
-			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),1.0,framecolors[0]);
+			_driver->StrokeLine(r.LeftTop(),r.RightTop(),framecolors[0]);
+			_driver->StrokeLine(r.LeftTop(),r.LeftBottom(),framecolors[0]);
 			
 			r.OffsetBy(1,1);
 			_driver->FillRect(r,framecolors[1]);
@@ -846,13 +842,13 @@ void BeDecorator::_DrawFrame(BRect invalid)
 					uint8(startcol.blue-(i*bstep)));
 				
 				_driver->StrokeLine(BPoint(r.left,r.top+i),
-					BPoint(r.left+i,r.top),1.0,_layerdata.highcolor);
+					BPoint(r.left+i,r.top),_layerdata.highcolor);
 		
 				_layerdata.highcolor.SetColor(uint8(halfcol.red-(i*rstep)),
 					uint8(halfcol.green-(i*gstep)),
 					uint8(halfcol.blue-(i*bstep)));
 				_driver->StrokeLine(BPoint(r.left+steps,r.top+i),
-					BPoint(r.left+i,r.top+steps),1.0,_layerdata.highcolor);			
+					BPoint(r.left+i,r.top+steps),_layerdata.highcolor);			
 			}
 			_driver->Unlock();
 //			_layerdata.highcolor=framecolors[4];
@@ -862,9 +858,9 @@ void BeDecorator::_DrawFrame(BRect invalid)
 		{
 			_layerdata.highcolor=framecolors[4];
 			_driver->StrokeLine(BPoint(r.right,r.top),BPoint(r.right-3,r.top),
-				1.0,_layerdata.highcolor);
+				_layerdata.highcolor);
 			_driver->StrokeLine(BPoint(r.left,r.bottom),BPoint(r.left,r.bottom-3),
-				1.0,_layerdata.highcolor);
+				_layerdata.highcolor);
 		}
 	}
 }

@@ -228,9 +228,9 @@ void WinDecorator::_DrawZoom(BRect r)
 		rect.OffsetBy(1,1);
 
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,1.0,_layerdata.highcolor);
+	_driver->StrokeRect(rect,_layerdata.highcolor);
 	rect.InsetBy(1,1);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),1.0,_layerdata.highcolor);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),_layerdata.highcolor);
 	
 }
 
@@ -250,11 +250,11 @@ void WinDecorator::_DrawClose(BRect r)
 		rect.OffsetBy(1,1);
 
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),1.0,_layerdata.highcolor);
-	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),1.0,_layerdata.highcolor);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),_layerdata.highcolor);
+	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),_layerdata.highcolor);
 	rect.OffsetBy(1,0);
-	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),1.0,_layerdata.highcolor);
-	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),1.0,_layerdata.highcolor);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightBottom(),_layerdata.highcolor);
+	_driver->StrokeLine(rect.RightTop(),rect.LeftBottom(),_layerdata.highcolor);
 }
 
 void WinDecorator::_DrawMinimize(BRect r)
@@ -268,7 +268,7 @@ void WinDecorator::_DrawMinimize(BRect r)
 		rect.OffsetBy(1,1);
 	
 	_layerdata.highcolor.SetColor(0,0,0);
-	_driver->StrokeRect(rect,1.0,_layerdata.highcolor);
+	_driver->StrokeRect(rect,_layerdata.highcolor);
 }
 
 void WinDecorator::_DrawTab(BRect r)
@@ -278,7 +278,7 @@ void WinDecorator::_DrawTab(BRect r)
 	if(_look==B_NO_BORDER_WINDOW_LOOK)
 		return;
 	
-//	_driver->StrokeRect(_tabrect,1.0,frame_lowcol);
+//	_driver->StrokeRect(_tabrect,frame_lowcol);
 
 //	UpdateTitle(layer->name->String());
 
@@ -317,38 +317,38 @@ void WinDecorator::DrawBeveledRect(BRect r, bool down)
 
 	// Top highlight
 	_layerdata.highcolor=higher;
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),1.0,higher);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),higher);
 
 	// Left highlight
-	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),1.0,higher);
+	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),higher);
 
 	// Right shading
 	pt=rect.RightTop();
 	pt.y++;
-	_driver->StrokeLine(pt,rect.RightBottom(),1.0,lower);
+	_driver->StrokeLine(pt,rect.RightBottom(),lower);
 	
 	// Bottom shading
 	pt=rect.LeftBottom();
 	pt.x++;
-	_driver->StrokeLine(pt,rect.RightBottom(),1.0,lower);
+	_driver->StrokeLine(pt,rect.RightBottom(),lower);
 
 	rect.InsetBy(1,1);
 
 	// Top inside highlight
-	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),1.0,higher);
+	_driver->StrokeLine(rect.LeftTop(),rect.RightTop(),higher);
 
 	// Left inside highlight
-	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),1.0,higher);
+	_driver->StrokeLine(rect.LeftTop(),rect.LeftBottom(),higher);
 
 	// Right inside shading
 	pt=rect.RightTop();
 	pt.y++;
-	_driver->StrokeLine(pt,rect.RightBottom(),1.0,lower);
+	_driver->StrokeLine(pt,rect.RightBottom(),lower);
 	
 	// Bottom inside shading
 	pt=rect.LeftBottom();
 	pt.x++;
-	_driver->StrokeLine(pt,rect.RightBottom(),1.0,lower);
+	_driver->StrokeLine(pt,rect.RightBottom(),lower);
 	
 	rect.InsetBy(1,1);
 
@@ -368,35 +368,35 @@ void WinDecorator::_DrawFrame(BRect rect)
 	BRect r=_borderrect;
 	
 	_layerdata.highcolor.SetColor(255,0,0);
-	_driver->StrokeRect(r,1.0,_layerdata.highcolor);
+	_driver->StrokeRect(r,_layerdata.highcolor);
 	
 	BPoint pt;
 
 	pt=r.RightTop();
 	pt.x--;
-	_driver->StrokeLine(r.LeftTop(),pt,1.0,frame_midcol);
+	_driver->StrokeLine(r.LeftTop(),pt,frame_midcol);
 	pt=r.LeftBottom();
 	pt.y--;
-	_driver->StrokeLine(r.LeftTop(),pt,1.0,frame_midcol);
+	_driver->StrokeLine(r.LeftTop(),pt,frame_midcol);
 
-	_driver->StrokeLine(r.RightTop(),r.RightBottom(),1.0,frame_lowercol);
-	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),1.0,frame_lowercol);
+	_driver->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowercol);
+	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowercol);
 	
 	r.InsetBy(1,1);
 	pt=r.RightTop();
 	pt.x--;
-	_driver->StrokeLine(r.LeftTop(),pt,1.0,frame_highcol);
+	_driver->StrokeLine(r.LeftTop(),pt,frame_highcol);
 	pt=r.LeftBottom();
 	pt.y--;
-	_driver->StrokeLine(r.LeftTop(),pt,1.0,frame_highcol);
+	_driver->StrokeLine(r.LeftTop(),pt,frame_highcol);
 
-	_driver->StrokeLine(r.RightTop(),r.RightBottom(),1.0,frame_lowcol);
-	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),1.0,frame_lowcol);
+	_driver->StrokeLine(r.RightTop(),r.RightBottom(),frame_lowcol);
+	_driver->StrokeLine(r.LeftBottom(),r.RightBottom(),frame_lowcol);
 	
 	r.InsetBy(1,1);
-	_driver->StrokeRect(r,1.0,frame_midcol);
+	_driver->StrokeRect(r,frame_midcol);
 	r.InsetBy(1,1);
-	_driver->StrokeRect(r,1.0,frame_midcol);
+	_driver->StrokeRect(r,frame_midcol);
 }
 
 extern "C" float get_decorator_version(void)
