@@ -40,6 +40,17 @@
 #define DBG(x)	;
 #define PRINT(x)	DBG({ printf("[%6ld] ", find_thread(NULL)); printf x; })
 
+/*
+#include <Autolock.h>
+#include <Locker.h>
+static BLocker sDebugPrintLocker("BLooper debug print");
+#define PRINT(x)	DBG({						\
+	BAutolock _(sDebugPrintLocker);				\
+	debug_printf("[%6ld] ", find_thread(NULL));	\
+	debug_printf x;								\
+})
+*/
+
 // Standard Includes -----------------------------------------------------------
 #include <stdio.h>
 
@@ -1247,13 +1258,12 @@ PRINT(("BLooper::ReadMessageFromPort()\n"));
 	BMessage* bmsg;
 
 	void* msgbuffer = ReadRawFromPort(&msgcode, tout);
+	if (!msgbuffer)
+		return NULL;
 
 	bmsg = ConvertToMessage(msgbuffer, msgcode);
 
-	if (msgbuffer)
-	{
-		delete[] (int8*)msgbuffer;
-	}
+	delete[] (int8*)msgbuffer;
 
 PRINT(("BLooper::ReadMessageFromPort() done: %p\n", bmsg));
 	return bmsg;
