@@ -130,7 +130,8 @@ EOF
 
 # Generate Timezones binaries bindings
 
-for f in src/data/etc/timezones/*; 
+timezones=`echo src/data/etc/timezones/* | sed -e s@src/data/etc/timezones/CVS@@`
+for f in ${timezones}; 
 do 
 
 TZOBJECTS=`gawk '/^(Zone|Link)/ { print $2 } ' $f `
