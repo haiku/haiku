@@ -13,6 +13,7 @@
 # include "hcache.h"
 # include "variable.h"
 # include "search.h"
+# include "pathsys.h"
 
 #ifdef OPT_HEADER_CACHE_EXT
 
