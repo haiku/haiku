@@ -33,11 +33,9 @@
 /*****************************************************************************/
 
 #include <Application.h>
-#include <Screen.h>
-#include <Alert.h>
 #include "PNGTranslator.h"
-#include "PNGWindow.h"
 #include "PNGView.h"
+#include "TranslatorWindow.h"
 
 // ---------------------------------------------------------------
 // main
@@ -55,49 +53,13 @@
 int
 main()
 {
-	BApplication app("application/x-vnd.obos-tiff-translator");
-	PNGTranslator *ptranslator = new PNGTranslator;
-	BView *view = NULL;
-	BRect rect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT);
-	if (ptranslator->MakeConfigurationView(NULL, &view, &rect)) {
-		BAlert *err = new BAlert("Error",
-			"Unable to create the PNGTranslator view.", "OK");
-		err->Go();
+	BApplication app("application/x-vnd.obos-png-translator");
+	status_t result;
+	result = LaunchTranslatorWindow(new PNGTranslator,
+		"PNGTranslator", BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT));
+	if (result == B_OK) {
+		app.Run();
+		return 0;
+	} else
 		return 1;
-	}
-	// release the translator even though I never really used it anyway
-	ptranslator->Release();
-	ptranslator = NULL;
-
-	PNGWindow *wnd = new PNGWindow(rect);
-	view->ResizeTo(rect.Width(), rect.Height());
-	wnd->AddChild(view);
-	BPoint wndpt = B_ORIGIN;
-	{
-		BScreen scrn;
-		BRect frame = scrn.Frame();
-		frame.InsetBy(10, 23);
-		// if the point is outside of the screen frame,
-		// use the mouse location to find a better point
-		if (!frame.Contains(wndpt)) {
-			uint32 dummy;
-			view->GetMouse(&wndpt, &dummy, false);
-			wndpt.x -= rect.Width() / 2;
-			wndpt.y -= rect.Height() / 2;
-			// clamp location to screen
-			if (wndpt.x < frame.left)
-				wndpt.x = frame.left;
-			if (wndpt.y < frame.top)
-				wndpt.y = frame.top;
-			if (wndpt.x > frame.right)
-				wndpt.x = frame.right;
-			if (wndpt.y > frame.bottom)
-				wndpt.y = frame.bottom;
-		}
-	}
-	wnd->MoveTo(wndpt);
-	wnd->Show();
-	app.Run();
-
-	return 0;
 }

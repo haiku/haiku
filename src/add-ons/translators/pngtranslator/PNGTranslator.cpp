@@ -84,6 +84,14 @@ translation_format gOutputFormats[] = {
 	}
 };
 
+// Default settings for the Translator
+TranSetting gDefaultSettings[] = {
+	{B_TRANSLATOR_EXT_HEADER_ONLY, TRAN_SETTING_BOOL, false},
+	{B_TRANSLATOR_EXT_DATA_ONLY, TRAN_SETTING_BOOL, false},
+	{PNG_SETTING_INTERLACE, TRAN_SETTING_INT32, PNG_INTERLACE_NONE}
+		// interlacing is off by default
+};
+
 // ---------------------------------------------------------------
 // make_nth_translator
 //
@@ -173,17 +181,14 @@ pngcb_flush_data(png_structp ppng)
 // Returns:
 // ---------------------------------------------------------------
 PNGTranslator::PNGTranslator()
-	:	BTranslator()
+	: BaseTranslator("PNG Images", "PNG image translator",
+		PNG_TRANSLATOR_VERSION,
+		gInputFormats, sizeof(gInputFormats) / sizeof(translation_format),
+		gOutputFormats, sizeof(gOutputFormats) / sizeof(translation_format),
+		"PNGTranslator_Settings",
+		gDefaultSettings, sizeof(gDefaultSettings) / sizeof(TranSetting),
+		B_TRANSLATOR_BITMAP, B_PNG_FORMAT)
 {
-	fpsettings = new PNGTranslatorSettings;
-	fpsettings->LoadSettings();
-		// load settings from the PNGTranslator settings file
-		
-	strcpy(fName, "PNG Images");
-	sprintf(fInfo, "PNG image translator v%d.%d.%d %s",
-		static_cast<int>(PNG_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((PNG_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(PNG_TRANSLATOR_VERSION & 0xf), __DATE__);
 }
 
 // ---------------------------------------------------------------
@@ -201,226 +206,16 @@ PNGTranslator::PNGTranslator()
 // ---------------------------------------------------------------
 PNGTranslator::~PNGTranslator()
 {
-	fpsettings->Release();
-}
-
-// ---------------------------------------------------------------
-// TranslatorName
-//
-// Returns the short name of the translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the short name of the translator
-// ---------------------------------------------------------------	
-const char *
-PNGTranslator::TranslatorName() const
-{
-	return fName;
-}
-
-// ---------------------------------------------------------------
-// TranslatorInfo
-//
-// Returns a more verbose name for the translator than the one
-// TranslatorName() returns. This usually includes version info.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns: a const char * to the verbose name of the translator
-// ---------------------------------------------------------------
-const char *
-PNGTranslator::TranslatorInfo() const
-{
-	return fInfo;
-}
-
-// ---------------------------------------------------------------
-// TranslatorVersion
-//
-// Returns the integer representation of the current version of
-// this translator.
-//
-// Preconditions:
-//
-// Parameters:
-//
-// Postconditions:
-//
-// Returns:
-// ---------------------------------------------------------------
-int32 
-PNGTranslator::TranslatorVersion() const
-{
-	return PNG_TRANSLATOR_VERSION;
-}
-
-// ---------------------------------------------------------------
-// InputFormats
-//
-// Returns a list of input formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of input formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of input formats and the number of input
-// formats through the out_count parameter, if out_count is NULL,
-// NULL is returned
-// ---------------------------------------------------------------
-const translation_format *
-PNGTranslator::InputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gInputFormats) /
-			sizeof(translation_format);
-		return gInputFormats;
-	} else
-		return NULL;
-}
-
-// ---------------------------------------------------------------
-// OutputFormats
-//
-// Returns a list of output formats supported by this translator.
-//
-// Preconditions:
-//
-// Parameters:	out_count,	The number of output formats
-//							support is returned here.
-//
-// Postconditions:
-//
-// Returns: the list of output formats and the number of output
-// formats through the out_count parameter, if out_count is NULL,
-// NULL is returned
-// ---------------------------------------------------------------	
-const translation_format *
-PNGTranslator::OutputFormats(int32 *out_count) const
-{
-	if (out_count) {
-		*out_count = sizeof(gOutputFormats) /
-			sizeof(translation_format);
-		return gOutputFormats;
-	} else
-		return NULL;
-}
-
-// ---------------------------------------------------------------
-// identify_bits_header
-//
-// Determines if the data in inSource is in the
-// B_TRANSLATOR_BITMAP ('bits') format. If it is, it returns 
-// info about the data in inSource to outInfo and pheader.
-//
-// Preconditions:
-//
-// Parameters:	inSource,	The source of the image data
-//
-//				outInfo,	Information about the translator
-//							is copied here
-//
-//				amtread,	Amount of data read from inSource
-//							before this function was called
-//
-//				read,		Pointer to the data that was read
-// 							in before this function was called
-//
-//				pheader,	The bits header is copied here after
-//							it is read in from inSource
-//
-// Postconditions:
-//
-// Returns: B_NO_TRANSLATOR,	if the data does not look like
-//								bits format data
-//
-// B_ERROR,	if the header data could not be converted to host
-//			format
-//
-// B_OK,	if the data looks like bits data and no errors were
-//			encountered
-// ---------------------------------------------------------------
-status_t 
-identify_bits_header(BPositionIO *inSource, translator_info *outInfo,
-	ssize_t amtread, uint8 *read, TranslatorBitmap *pheader = NULL)
-{
-	TranslatorBitmap header;
-		
-	memcpy(&header, read, amtread);
-		// copy portion of header already read in
-	// read in the rest of the header
-	ssize_t size = sizeof(TranslatorBitmap) - amtread;
-	if (inSource->Read(
-		(reinterpret_cast<uint8 *> (&header)) + amtread, size) != size)
-		return B_NO_TRANSLATOR;
-		
-	// convert to host byte order
-	if (swap_data(B_UINT32_TYPE, &header, sizeof(TranslatorBitmap),
-		B_SWAP_BENDIAN_TO_HOST) != B_OK)
-		return B_ERROR;
-		
-	// check if header values are reasonable
-	if (header.colors != B_RGB32 &&
-		header.colors != B_RGB32_BIG &&
-		header.colors != B_RGBA32 &&
-		header.colors != B_RGBA32_BIG &&
-		header.colors != B_RGB24 &&
-		header.colors != B_RGB24_BIG &&
-		header.colors != B_RGB16 &&
-		header.colors != B_RGB16_BIG &&
-		header.colors != B_RGB15 &&
-		header.colors != B_RGB15_BIG &&
-		header.colors != B_RGBA15 &&
-		header.colors != B_RGBA15_BIG &&
-		header.colors != B_CMAP8 &&
-		header.colors != B_GRAY8 &&
-		header.colors != B_GRAY1 &&
-		header.colors != B_CMYK32 &&
-		header.colors != B_CMY32 &&
-		header.colors != B_CMYA32 &&
-		header.colors != B_CMY24)
-		return B_NO_TRANSLATOR;
-	if (header.rowBytes * (header.bounds.Height() + 1) != header.dataSize)
-		return B_NO_TRANSLATOR;
-			
-	if (outInfo) {
-		outInfo->type = B_TRANSLATOR_BITMAP;
-		outInfo->group = B_TRANSLATOR_BITMAP;
-		outInfo->quality = BBT_IN_QUALITY;
-		outInfo->capability = BBT_IN_CAPABILITY;
-		strcpy(outInfo->name, "Be Bitmap Format (PNGTranslator)");
-		strcpy(outInfo->MIME, "image/x-be-bitmap");
-	}
-	
-	if (pheader) {
-		pheader->magic = header.magic;
-		pheader->bounds = header.bounds;
-		pheader->rowBytes = header.rowBytes;
-		pheader->colors = header.colors;
-		pheader->dataSize = header.dataSize;
-	}
-	
-	return B_OK;
 }
 
 status_t
-identify_png_header(BPositionIO *inSource, BMessage *ioExtension,
-	translator_info *outInfo, uint32 outType, ssize_t amtread, uint8 *read)
+identify_png_header(BPositionIO *inSource, translator_info *outInfo)
 {
-	if (amtread != 8)
-		return B_ERROR;		
-	if (!png_check_sig(read, amtread))
+	const int32 kSigSize = 8;
+	uint8 buf[kSigSize];
+	if (inSource->Read(buf, kSigSize) != kSigSize)
+		return B_NO_TRANSLATOR;		
+	if (!png_check_sig(buf, kSigSize))
 		// if first 8 bytes of stream don't match PNG signature bail
 		return B_NO_TRANSLATOR;
 
@@ -437,7 +232,7 @@ identify_png_header(BPositionIO *inSource, BMessage *ioExtension,
 }
 	
 // ---------------------------------------------------------------
-// Identify
+// DerivedIdentify
 //
 // Examines the data from inSource and determines if it is in a
 // format that this translator knows how to work with.
@@ -476,45 +271,11 @@ identify_png_header(BPositionIO *inSource, BMessage *ioExtension,
 // Other errors if BPositionIO::Read() returned an error value
 // ---------------------------------------------------------------
 status_t
-PNGTranslator::Identify(BPositionIO *inSource,
+PNGTranslator::DerivedIdentify(BPositionIO *inSource,
 	const translation_format *inFormat, BMessage *ioExtension,
 	translator_info *outInfo, uint32 outType)
 {
-	if (!outType)
-		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP && outType != B_PNG_FORMAT)
-		return B_NO_TRANSLATOR;
-	
-	// Convert the magic numbers to the various byte orders so that
-	// I won't have to convert the data read in to see whether or not
-	// it is a supported type
-	uint32 nbits = B_TRANSLATOR_BITMAP;
-	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
-		B_SWAP_HOST_TO_BENDIAN) != B_OK)
-		return B_ERROR;
-	
-	// Read in the magic number and determine if it
-	// is a supported type
-	uint8 ch[8];
-	if (inSource->Read(ch, 4) != 4)
-		return B_NO_TRANSLATOR;
-		
-	// Read settings from ioExtension
-	if (ioExtension && fpsettings->LoadSettings(ioExtension) != B_OK)
-		return B_BAD_VALUE;
-	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	// if B_TRANSLATOR_BITMAP type	
-	if (n32ch == nbits)
-		return identify_bits_header(inSource, outInfo, 4, ch);
-		
-	// Might be PNG image
-	else {
-		if (inSource->Read(ch + 4, 4) != 4)
-			return B_NO_TRANSLATOR;
-		return identify_png_header(inSource, ioExtension, outInfo, outType, 8, ch);
-	}
+	return identify_png_header(inSource, outInfo);
 }
 
 void
@@ -530,8 +291,8 @@ translate_direct_copy(BPositionIO *inSource, BPositionIO *outDestination)
 }
 
 status_t
-translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
-	PNGTranslatorSettings &settings)
+PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
+	BPositionIO *outDestination)
 {
 	status_t result = B_ERROR;
 		// if a libpng errors before this is set
@@ -720,19 +481,13 @@ translate_from_png_to_bits(BPositionIO *inSource, BPositionIO *outDestination,
 }
 
 status_t
-translate_from_png(BPositionIO *inSource, BMessage *ioExtension,
-	uint32 outType, BPositionIO *outDestination, ssize_t amtread, uint8 *read,
-	PNGTranslatorSettings &settings)
+PNGTranslator::translate_from_png(BPositionIO *inSource, uint32 outType,
+	BPositionIO *outDestination)
 {
-	if (amtread != 8)
-		return B_ERROR;
-
 	if (outType == B_TRANSLATOR_BITMAP)
-		return translate_from_png_to_bits(inSource, outDestination,
-			settings);
+		return translate_from_png_to_bits(inSource, outDestination);
 	else {
 		// Translate from PNG to PNG
-		outDestination->Write(read, amtread);
 		translate_direct_copy(inSource, outDestination);
 		
 		return B_OK;
@@ -939,14 +694,14 @@ pix_bits_to_png(uint8 *pbits, uint8 *ppng, color_space fromspace,
 }
 
 status_t
-translate_from_bits_to_png(BPositionIO *inSource, BPositionIO *outDestination,
-	ssize_t amtread, uint8 *read, PNGTranslatorSettings &settings)
+PNGTranslator::translate_from_bits_to_png(BPositionIO *inSource,
+	BPositionIO *outDestination)
 {
 	TranslatorBitmap bitsHeader;
 		
 	status_t result;
 	
-	result = identify_bits_header(inSource, NULL, amtread, read, &bitsHeader);
+	result = identify_bits_header(inSource, NULL, &bitsHeader);
 	if (result != B_OK)
 		return result;
 		
@@ -999,7 +754,7 @@ translate_from_bits_to_png(BPositionIO *inSource, BPositionIO *outDestination,
 		default:
 			return B_NO_TRANSLATOR;
 	}
-	interlace_type = settings.SetGetInterlace();
+	interlace_type = fSettings->SetGetInt32(PNG_SETTING_INTERLACE);
 	
 	int32 bitsBytesPerPixel = 0;
 	switch (bitsHeader.colors) {
@@ -1161,7 +916,7 @@ translate_from_bits_to_png(BPositionIO *inSource, BPositionIO *outDestination,
 }
 
 // ---------------------------------------------------------------
-// Translate
+// DerivedTranslate
 //
 // Translates the data in inSource to the type outType and stores
 // the translated data in outDestination.
@@ -1180,6 +935,10 @@ translate_from_bits_to_png(BPositionIO *inSource, BPositionIO *outDestination,
 //				outDestination,	where the translated data is
 //								put
 //
+//				baseType, indicates whether inSource is in the
+//				          bits format, not in the bits format or
+//				          is unknown
+//
 // Postconditions:
 //
 // Returns: B_BAD_VALUE, if the options in ioExtension are bad
@@ -1192,114 +951,24 @@ translate_from_bits_to_png(BPositionIO *inSource, BPositionIO *outDestination,
 // B_OK, if all went well
 // ---------------------------------------------------------------
 status_t
-PNGTranslator::Translate(BPositionIO *inSource, const translator_info *inInfo,
-	BMessage *ioExtension, uint32 outType, BPositionIO *outDestination)
-{	
-	if (!outType)
-		outType = B_TRANSLATOR_BITMAP;
-	if (outType != B_TRANSLATOR_BITMAP && outType != B_PNG_FORMAT)
+PNGTranslator::DerivedTranslate(BPositionIO *inSource,
+	const translator_info *inInfo, BMessage *ioExtension, uint32 outType,
+	BPositionIO *outDestination, int32 baseType)
+{
+	if (baseType == 1)
+		// if inSource is in bits format
+		return translate_from_bits_to_png(inSource, outDestination);		
+	else if (baseType == 0)
+		// if inSource is NOT in bits format
+		return translate_from_png(inSource, outType, outDestination);
+	else
 		return B_NO_TRANSLATOR;
-	
-	// Convert the magic numbers to the various byte orders so that
-	// I won't have to convert the data read in to see whether or not
-	// it is a supported type
-	uint32 nbits = B_TRANSLATOR_BITMAP;
-	if (swap_data(B_UINT32_TYPE, &nbits, sizeof(uint32),
-		B_SWAP_HOST_TO_BENDIAN) != B_OK)
-		return B_ERROR;
-	
-	// Read in the magic number and determine if it
-	// is a supported type
-	uint8 ch[8];
-	inSource->Seek(0, SEEK_SET);
-	if (inSource->Read(ch, 4) != 4)
-		return B_NO_TRANSLATOR;
-		
-	// Read settings from ioExtension
-	if (ioExtension && fpsettings->LoadSettings(ioExtension) != B_OK)
-		return B_BAD_VALUE;
-	
-	uint32 n32ch;
-	memcpy(&n32ch, ch, sizeof(uint32));
-	if (n32ch == nbits) {
-		// B_TRANSLATOR_BITMAP type
-		if (outType == B_TRANSLATOR_BITMAP) {
-			outDestination->Write(ch, 4);
-			translate_direct_copy(inSource, outDestination);
-		
-			return B_OK;
-		} else
-			// Output to PNG
-			return translate_from_bits_to_png(inSource, outDestination,
-				4, ch, *fpsettings);
-		
-	} else {
-		// Might be PNG image, read in the rest of
-		// the signature and check it
-		if (inSource->Read(ch + 4, 4) != 4)
-			return B_NO_TRANSLATOR;
-		if (!png_check_sig(ch, 8))
-			return B_NO_TRANSLATOR;
-
-		return translate_from_png(inSource, ioExtension, outType,
-			outDestination, 8, ch, *fpsettings);
-	}
 }
 
-// returns the current translator settings into ioExtension
-status_t
-PNGTranslator::GetConfigurationMessage(BMessage *ioExtension)
+BView *
+PNGTranslator::NewConfigView(TranslatorSettings *settings)
 {
-	return fpsettings->GetConfigurationMessage(ioExtension);
-}
-
-// ---------------------------------------------------------------
-// MakeConfigurationView
-//
-// Makes a BView object for configuring / displaying info about
-// this translator. 
-//
-// Preconditions:
-//
-// Parameters:	ioExtension,	configuration options for the
-//								translator
-//
-//				outView,		the view to configure the
-//								translator is stored here
-//
-//				outExtent,		the bounds of the view are
-//								stored here
-//
-// Postconditions:
-//
-// Returns: B_BAD_VALUE if outView or outExtent is NULL,
-//			B_NO_MEMORY if the view couldn't be allocated,
-//			B_OK if no errors
-// ---------------------------------------------------------------
-status_t
-PNGTranslator::MakeConfigurationView(BMessage *ioExtension, BView **outView,
-	BRect *outExtent)
-{
-	if (!outView || !outExtent)
-		return B_BAD_VALUE;
-	if (ioExtension && fpsettings->LoadSettings(ioExtension) != B_OK)
-		return B_BAD_VALUE;
-
-	PNGView *view = new PNGView(BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT),
-		"PNGTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW,
-		AcquireSettings());
-	if (!view)
-		return B_NO_MEMORY;
-
-	*outView = view;
-	*outExtent = view->Bounds();
-
-	return B_OK;
-}
-
-PNGTranslatorSettings *
-PNGTranslator::AcquireSettings()
-{
-	return fpsettings->Acquire();
+	return new PNGView(BRect(0, 0, PNG_VIEW_WIDTH, PNG_VIEW_HEIGHT),
+		"PNGTranslator Settings", B_FOLLOW_ALL, B_WILL_DRAW, settings);
 }
 

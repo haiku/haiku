@@ -57,10 +57,10 @@ interlace_msg(int option)
 // Returns:
 // ---------------------------------------------------------------
 PNGView::PNGView(const BRect &frame, const char *name,
-	uint32 resize, uint32 flags, PNGTranslatorSettings *psettings)
+	uint32 resize, uint32 flags, TranslatorSettings *settings)
 	:	BView(frame, name, resize, flags)
 {
-	fpsettings = psettings;
+	fSettings = settings;
 	
 	SetViewColor(220,220,220,0);
 	
@@ -72,13 +72,13 @@ PNGView::PNGView(const BRect &frame, const char *name,
 	fpmnuInterlace->AddItem(pitmNone);
 	fpmnuInterlace->AddItem(pitmAdam7);
 	
-	fpfldInterlace = new BMenuField(BRect(20, 50, 200, 70), "PNG Interlace Menu",
-		"Interlacing Type", fpmnuInterlace);
+	fpfldInterlace = new BMenuField(BRect(20, 50, 200, 70),
+		"PNG Interlace Menu", "Interlacing Type", fpmnuInterlace);
 	fpfldInterlace->SetViewColor(ViewColor());
 	AddChild(fpfldInterlace);
 	
 	// set Interlace option to show the current configuration
-	if (fpsettings->SetGetInterlace() == PNG_INTERLACE_NONE)
+	if (fSettings->SetGetInt32(PNG_SETTING_INTERLACE) == PNG_INTERLACE_NONE)
 		pitmNone->SetMarked(true);
 	else
 		pitmAdam7->SetMarked(true);
@@ -99,7 +99,7 @@ PNGView::PNGView(const BRect &frame, const char *name,
 // ---------------------------------------------------------------
 PNGView::~PNGView()
 {
-	fpsettings->Release();
+	fSettings->Release();
 }
 
 void
@@ -152,9 +152,10 @@ PNGView::Draw(BRect area)
 	
 	char detail[100];
 	sprintf(detail, "Version %d.%d.%d %s",
-		static_cast<int>(PNG_TRANSLATOR_VERSION >> 8),
-		static_cast<int>((PNG_TRANSLATOR_VERSION >> 4) & 0xf),
-		static_cast<int>(PNG_TRANSLATOR_VERSION & 0xf), __DATE__);
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(PNG_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(PNG_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MAJOR_VER(PNG_TRANSLATOR_VERSION)),
+		__DATE__);
 	DrawString(detail, BPoint(xbold, yplain + ybold));
 	
 	int32 lineno = 6;
@@ -179,8 +180,8 @@ PNGView::MessageReceived(BMessage *pmsg)
 		// change setting for interlace option
 		int32 option;
 		if (pmsg->FindInt32(PNG_SETTING_INTERLACE, &option) == B_OK) {
-			fpsettings->SetGetInterlace(&option);
-			fpsettings->SaveSettings();
+			fSettings->SetGetInt32(PNG_SETTING_INTERLACE, &option);
+			fSettings->SaveSettings();
 		}
 	} else
 		BView::MessageReceived(pmsg);

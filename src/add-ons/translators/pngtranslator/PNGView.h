@@ -35,7 +35,7 @@
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
-#include "PNGTranslatorSettings.h"
+#include "TranslatorSettings.h"
 
 #define PNG_VIEW_WIDTH 300
 #define PNG_VIEW_HEIGHT 250
@@ -47,7 +47,7 @@
 class PNGView : public BView {
 public:
 	PNGView(const BRect &frame, const char *name, uint32 resize,
-		uint32 flags, PNGTranslatorSettings *psettings);
+		uint32 flags, TranslatorSettings *settings);
 		// sets up the view
 		
 	~PNGView();
@@ -62,7 +62,7 @@ private:
 	BPopUpMenu *fpmnuInterlace;
 	BMenuField *fpfldInterlace;
 	
-	PNGTranslatorSettings *fpsettings;
+	TranslatorSettings *fSettings;
 		// the actual settings for the translator,
 		// shared with the translator
 };

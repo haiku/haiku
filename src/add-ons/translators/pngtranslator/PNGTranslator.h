@@ -41,11 +41,12 @@
 #include <File.h>
 #include <ByteOrder.h>
 #include <fs_attr.h>
-#include "PNGTranslatorSettings.h"
+#include "BaseTranslator.h"
 
-// IO Extension Names:
+// PNG Translator Settings
+#define PNG_SETTING_INTERLACE "png /interlace"
 
-#define PNG_TRANSLATOR_VERSION 0x100
+#define PNG_TRANSLATOR_VERSION B_TRANSLATION_MAKE_VER(1,0,0)
 
 #define PNG_IN_QUALITY 0.8
 #define PNG_IN_CAPABILITY 0.8
@@ -58,52 +59,19 @@
 #define BBT_OUT_CAPABILITY 0.4
 
 
-class PNGTranslator : public BTranslator {
+class PNGTranslator : public BaseTranslator {
 public:
 	PNGTranslator();
-	
-	virtual const char *TranslatorName() const;
-		// returns the short name of the translator
-		
-	virtual const char *TranslatorInfo() const;
-		// returns a verbose name/description for the translator
-	
-	virtual int32 TranslatorVersion() const;
-		// returns the version of the translator
 
-	virtual const translation_format *InputFormats(int32 *out_count)
-		const;
-		// returns the input formats and the count of input formats
-		// that this translator supports
-		
-	virtual const translation_format *OutputFormats(int32 *out_count)
-		const;
-		// returns the output formats and the count of output formats
-		// that this translator supports
-
-	virtual status_t Identify(BPositionIO *inSource,
+	virtual status_t DerivedIdentify(BPositionIO *inSource,
 		const translation_format *inFormat, BMessage *ioExtension,
 		translator_info *outInfo, uint32 outType);
-		// determines whether or not this translator can convert the
-		// data in inSource to the type outType
-
-	virtual status_t Translate(BPositionIO *inSource,
+		
+	virtual status_t DerivedTranslate(BPositionIO *inSource,
 		const translator_info *inInfo, BMessage *ioExtension,
-		uint32 outType, BPositionIO *outDestination);
-		// this function is the whole point of the Translation Kit,
-		// it translates the data in inSource to outDestination
-		// using the format outType
+		uint32 outType, BPositionIO *outDestination, int32 baseType);
 		
-	virtual status_t GetConfigurationMessage(BMessage *ioExtension);
-		// write the current state of the translator into
-		// the supplied BMessage object
-		
-	virtual status_t MakeConfigurationView(BMessage *ioExtension,
-		BView **outView, BRect *outExtent);
-		// creates and returns the view for displaying information
-		// about this translator
-		
-	PNGTranslatorSettings *AcquireSettings();
+	virtual BView *NewConfigView(TranslatorSettings *settings);
 
 protected:
 	virtual ~PNGTranslator();
@@ -112,10 +80,14 @@ protected:
 		// the user
 		
 private:
-	PNGTranslatorSettings *fpsettings;
-	
-	char fName[30];
-	char fInfo[100];
+	status_t translate_from_png_to_bits(BPositionIO *inSource,
+		BPositionIO *outDestination);
+		
+	status_t translate_from_png(BPositionIO *inSource, uint32 outType,
+		BPositionIO *outDestination);
+		
+	status_t translate_from_bits_to_png(BPositionIO *inSource,
+		BPositionIO *outDestination);
 };
 
 #endif // #ifndef PNG_TRANSLATOR_H

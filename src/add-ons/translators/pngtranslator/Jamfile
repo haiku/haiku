@@ -3,13 +3,19 @@ SubDir OBOS_TOP src add-ons translators pngtranslator ;
 UseLibraryHeaders zlib ;
 UseLibraryHeaders png ;
 
+# Include BaseTranslator code from shared directory
+SEARCH_SOURCE += [ FDirName $(OBOS_TOP) src add-ons translators shared ] ;
+
 Translator PNGTranslator : 
-	# PNGTranslator
+	# shared classes
+	BaseTranslator.cpp
+	TranslatorSettings.cpp
+	TranslatorWindow.cpp	
+
+	# PNGTranslator classes
 	PNGMain.cpp
 	PNGTranslator.cpp
-	PNGView.cpp
-	PNGWindow.cpp
-	PNGTranslatorSettings.cpp ;
+	PNGView.cpp ;
 
 LinkSharedOSLibs PNGTranslator : be translation libpng.a libz.a ;
 
