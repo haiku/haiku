@@ -202,7 +202,7 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 		default: /* NM2200 and later */
 			/* use ROP GXcopy (b16-19), and use linear adressing system */
 			//fixme? it seems CONTROL nolonger needs direction, and can be pgm'd just once...
-			ACCW(CONTROL, (si->engine.control | 0x800c0000));
+			ACCW(CONTROL, (/*si->engine.control |*/ 0x800c0000));
 			/* send command and exexute (warning: order of programming regs is important!) */
 			ACCW(SRCSTARTOFF, ((ys * si->fbc.bytes_per_row) + (xs * si->engine.depth)));
 			ACCW(2090_DSTSTARTOFF, ((yd * si->fbc.bytes_per_row) + (xd * si->engine.depth)));
@@ -235,7 +235,7 @@ status_t nm_acc_blit(uint16 xs,uint16 ys,uint16 xd,uint16 yd,uint16 w,uint16 h)
 		default: /* NM2200 and later */
 			/* use ROP GXcopy (b16-19), and use linear adressing system */
 			//fixme? it seems CONTROL nolonger needs direction, and can be pgm'd just once...
-			ACCW(CONTROL, (si->engine.control | 0x800c0013));
+			ACCW(CONTROL, (/*si->engine.control |*/ 0x800c0013));
 			/* send command and exexute (warning: order of programming regs is important!) */
 			ACCW(SRCSTARTOFF, (((ys + h) * si->fbc.bytes_per_row) + ((xs + w) * si->engine.depth)));
 			ACCW(2090_DSTSTARTOFF, (((yd + h) * si->fbc.bytes_per_row) + ((xd + w) * si->engine.depth)));
