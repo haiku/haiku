@@ -23,6 +23,8 @@
 
 #ifndef _WCHAR_H
 
+#include <iconv/gconv.h>
+
 #ifndef __need_mbstate_t
 # define _WCHAR_H 1
 # include <features.h>

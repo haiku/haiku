@@ -21,7 +21,7 @@
 #include <errno.h>
 #include <gconv.h>
 #include <wchar.h>
-#include <wcsmbsload.h>
+//#include <wcsmbsload.h>
 
 #include <assert.h>
 
@@ -35,6 +35,19 @@ static mbstate_t state;
 size_t
 __mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
+	// ToDo: this is a dummy implementation to get it going
+	if (s == NULL)
+		n = 1, s = "";
+
+	if (pwc == NULL || n == 0)
+		return 0;
+
+	if (ps == NULL)
+		ps = &state;
+
+	pwc[0] = s[0];
+	return s[0] == 0 ? 0 : 1;
+#if 0
   wchar_t buf[1];
   struct __gconv_step_data data;
   int status;
@@ -104,6 +117,7 @@ __mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
     }
 
   return result;
+#endif
 }
 libc_hidden_def (__mbrtowc)
 weak_alias (__mbrtowc, mbrtowc)
