@@ -52,10 +52,10 @@ typedef bool (*partition_is_sub_system_for)(partition_data *partition);
 
 typedef bool (*partition_validate_resize)(partition_data *partition,
 	off_t *size);
-typedef bool (*partition_validate_move)(partition_data *partition,
-	off_t *start);
 typedef bool (*partition_validate_resize_child)(partition_data *partition,
 	partition_data *child, off_t *size);
+typedef bool (*partition_validate_move)(partition_data *partition,
+	off_t *start);
 typedef bool (*partition_validate_move_child)(partition_data *partition,
 	partition_data *child, off_t *start);
 typedef bool (*partition_validate_set_name)(partition_data *partition,
