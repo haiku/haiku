@@ -210,6 +210,7 @@ cp src/kernel/apps/fortune/fortunes $targetDir/beos/etc/
 cp -R distro/x86.R1/beos/etc $targetDir/beos/
 cp data/settings/kernel/drivers/kernel $targetDir/home/config/settings/kernel/drivers/
 ln -sf /boot/beos/etc/timezones/Europe/Paris $targetDir/home/config/settings/timezone
+cp distro/x86.R1/beos/etc/Keymap/US-International $targetDir/home/config/settings/Key_map
 
 
 # boot loader
