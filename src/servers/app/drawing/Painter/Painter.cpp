@@ -297,13 +297,12 @@ Painter::StrokeLine(BPoint a, BPoint b, const pattern& p)
 	float penSize = _Transform(fPenSize);
 	if (penSize == 1.0 &&
 		(fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER)) {
-// TODO: fix me
-//		pattern p = *fPatternHandler->GetR5Pattern();
-		if (p == B_SOLID_HIGH &&
+		pattern pat = *fPatternHandler->GetR5Pattern();
+		if (pat == B_SOLID_HIGH &&
 			StraightLine(a, b, fPatternHandler->HighColor().GetColor32())) {
 			SetPenLocation(b);
 			return;
-		} else if (p == B_SOLID_LOW &&
+		} else if (pat == B_SOLID_LOW &&
 			StraightLine(a, b, fPatternHandler->LowColor().GetColor32())) {
 			SetPenLocation(b);
 			return;
@@ -550,12 +549,11 @@ Painter::FillRect(const BRect& r, const pattern& p) const
 
 	// first, try an optimized version
 	if (fDrawingMode == B_OP_COPY || fDrawingMode == B_OP_OVER) {
-// TODO: fix me
-//		pattern p = *fPatternHandler->GetR5Pattern();
-		if (p == B_SOLID_HIGH) {
+		pattern pat = *fPatternHandler->GetR5Pattern();
+		if (pat == B_SOLID_HIGH) {
 			FillRect(BRect(a, b), fPatternHandler->HighColor().GetColor32());
 			return;
-		} else if (p == B_SOLID_LOW) {
+		} else if (pat == B_SOLID_LOW) {
 			FillRect(BRect(a, b), fPatternHandler->LowColor().GetColor32());
 			return;
 		}
