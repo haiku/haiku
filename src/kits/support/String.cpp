@@ -36,6 +36,7 @@
 #define DEBUG 1
 #include <Debug.h>
 #include <String.h>
+#include <UTF8.h>
 
 // Temporary Includes
 #include "string_helper.h"
@@ -92,7 +93,9 @@ BString::CountChars() const
 		count++;
 
 		// Jump to next UTF8 character
-		for (; (*ptr & 0xc0) == 0x80; ptr++);
+		// for (; (*ptr & 0xc0) == 0x80; ptr++);
+		// ejaesler: BGA's nifty function
+		ptr += utf8_char_len(*ptr);
 	}
 
 	return count;
