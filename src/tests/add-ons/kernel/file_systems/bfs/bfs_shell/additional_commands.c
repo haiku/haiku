@@ -43,7 +43,7 @@ do_chkbfs(int argc, char **argv)
 	// check all files and report errors
 	while (sys_ioctl(1, fd, BFS_IOCTL_CHECK_NEXT_NODE, &result, sizeof(result)) == B_OK) {
 		if (++counter % 50 == 0)
-			printf("  %7ld nodes processed\x1b[1A\n", counter);
+			printf("  %7d nodes processed\x1b[1A\n", counter);
 
 		if (result.errors) {
 			printf("%s (inode = %Ld)", result.name, result.inode);
@@ -80,7 +80,7 @@ do_chkbfs(int argc, char **argv)
 	    printf("chkbfs: error stopping!\n");
 	}
 
-	printf("checked %ld nodes, %Ld blocks not allocated, %Ld blocks already set, %Ld blocks could be freed\n",
+	printf("checked %d nodes, %Ld blocks not allocated, %Ld blocks already set, %Ld blocks could be freed\n",
 		counter, result.stats.missing, result.stats.already_set, result.stats.freed);
 	printf("\tfiles\t\t%Ld\n\tdirectories\t%Ld\n\tattributes\t%Ld\n\tattr. dirs\t%Ld\n\tindices\t\t%Ld\n",
 		files, directories, attributes, attributeDirectories, indices);
