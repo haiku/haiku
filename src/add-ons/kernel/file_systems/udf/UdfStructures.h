@@ -205,6 +205,35 @@ enum {
 	BEOS_OPENBEOS = 1	// not part of the standard, but perhaps someday. :-)
 };
 
+/*! \brief Domain ID Identify Suffix
+
+	See also: UDF 2.50 2.1.5.3
+*/
+struct domain_id_suffix {
+public:
+	domain_id_suffix(uint16 udfRevision, uint8 domainFlags);
+
+	//! Note that revision 2.50 is denoted by 0x0250.
+	uint16 udf_revision() const { return _udf_revision; }
+	uint8 domain_flags() const { return _domain_flags; }
+
+	void set_udf_revision(uint16 revision) { _udf_revision = B_HOST_TO_LENDIAN_INT16(revision); }
+	void set_domain_flags(uint8 flags) { _domain_flags = flags; }
+private:
+	uint8 _udf_revision;
+	uint8 _domain_flags;
+	array<uint8, 5> _reserved;
+};
+
+/*! \brief Domain flags
+
+	See also: UDF 2.50 2.1.5.3
+*/
+enum {
+	DF_HARD_WRITE_PROTECT = 0x01,
+	DF_SOFT_WRITE_PROTECT = 0x02
+};
+	
 /*! \brief Identifier used to designate the implementation responsible
 	for writing associated data structures on the medium.
 	
@@ -219,6 +248,8 @@ public:
 	          uint8 *identifier_suffix = NULL);
 	entity_id(uint8 flags, char *identifier,
 	          const implementation_id_suffix &suffix);
+	entity_id(uint8 flags, char *identifier,
+	          const domain_id_suffix &suffix);
 	
 	void dump() const;
 	bool matches(const entity_id &id) const;
@@ -243,6 +274,7 @@ extern const entity_id kSparablePartitionMapId;
 extern const entity_id kVirtualPartitionMapId;
 extern const entity_id kImplementationId;
 extern const entity_id kPartitionContentsId;
+extern const entity_id kUdfId;
 
 //----------------------------------------------------------------------
 // ECMA-167 Part 2
@@ -1017,6 +1049,8 @@ private:
 	uint8 _partition_maps[UDF_MAX_PARTITION_MAPS * UDF_MAX_PARTITION_MAP_SIZE];
 } __attribute__((packed));
 
+//! Base size (excluding partition maps) of lvd
+extern const uint32 kLogicalVolumeDescriptorBaseSize;
 
 /*! \brief (Mostly) common portion of various partition maps
 
