@@ -275,6 +275,9 @@ rule SetupIncludes
 	# Use public OS header directories
 	HDRS += [ PublicHeaders $(os_includes) ] ;
 
+	# Use the root of the private headers -- not so nice, but simplifies things.
+	HDRS += [ PrivateHeaders $(DOT) ] ;
+
 	# Used as a fallback, the R5 header directories (we should remove this as soon as possible)
 	HDRS += /boot/develop/headers/posix /boot/develop/headers/cpp ;
 
@@ -1034,10 +1037,16 @@ rule SourceHdrs
 	if $(objects) {
 		for file in $(objects) {
 			ObjectHdrs $(file) : $(headers) ;
+			# also reformat the assembler headers
+			ASHDRS on $(file) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS)
+								  [ on $(file) return $(HDRS) ] ] ;
 		}
 	} else {
 		for file in $(sources) {
 			ObjectHdrs $(file) : $(headers) ;
+			# also reformat the assembler headers
+			ASHDRS on $(file) = [ FIncludes $(SEARCH_SOURCE) $(SUBDIRHDRS)
+								  [ on $(file) return $(HDRS) ] ] ;
 		}
 	}
 
@@ -1704,36 +1713,40 @@ rule SetupKernel
 
 	#Setup Kernel header directories
 	local public_kernel_includes = add-ons/file_system add-ons/graphics app device drivers kernel storage support ;
-	local private_kernel_includes = kernel libroot kernel/boot/platform/$(OBOS_BOOT_PLATFORM) ;
+	local private_kernel_includes = $(DOT) kernel libroot kernel/boot/platform/$(OBOS_BOOT_PLATFORM) ;
 	# Use posix headers directory
-	HDRS = [ FDirName $(OBOS_TOP) headers posix ] ;
+	local headers = [ FDirName $(OBOS_TOP) headers posix ] ;
 	# Use public OS header directories
-	HDRS += [ PublicHeaders $(public_kernel_includes) ] ;
+	headers += [ PublicHeaders $(public_kernel_includes) ] ;
 	# Use private directories
-	HDRS += [ PrivateHeaders $(private_kernel_includes) ] ;
+	headers += [ PrivateHeaders $(private_kernel_includes) ] ;
 	# The platform dependent headers.
-	HDRS += $(PLATFORM_HEADERS) ;
+	headers += $(PLATFORM_HEADERS) ;
 
-	UseArchHeaders $(OBOS_ARCH) ;
+	SourceHdrs $(_objs) : $(headers) ;
+	UseArchObjectHeaders $(_objs) : $(OBOS_ARCH) ;
 
-	SetupObjectsDir ;
-	
-	CCFLAGS on $(_objs) = $(KERNEL_CCFLAGS) $(2) ;
-	C++FLAGS on $(_objs) = $(KERNEL_C++FLAGS) $(2) ;
+	local object ;
+	for object in $(_objs) {
+		ObjectCcFlags $(object) : $(KERNEL_CCFLAGS) $(2) ;
+		ObjectC++Flags $(object) : $(KERNEL_C++FLAGS) $(2) ;
+	}
 }
 
 rule KernelObjects
 {
-	SetupKernel $(1) : $(2) ;
+	SetupObjectsDir ;
 
 	Objects $(1) ;
+
+	SetupKernel $(1) : $(2) ;
 }
 
 rule KernelLd
 {
 	# KernelLd <name> : <objs> : <linkerscript> : <args> : <gcc_off> : <config_section> ;
 
-	SetupKernel $(2) ;
+	SetupObjectsDir ;
 	LINK on $(1) = ld ;
 
 	LINKFLAGS on $(1) = $(4) ;
@@ -1759,6 +1772,8 @@ rule KernelLd
 	if ! $(5) {
 		LINKLIBS on $(1) += $(PLATFORM_LINKLIBS) ;
 	}
+
+	SetupKernel $(2) ;
 }
 
 actions KernelLd
@@ -1772,13 +1787,14 @@ rule KernelAddon
 
 	local sources = $(3) ;
 
-	SetupKernel $(3) ;
+	SetupObjectsDir ;
 	Addon $(1) : $(2) : $(3) ;
 	ObjectCcFlags $(sources) : -D_KERNEL_MODE=1 -no-fpic ;
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic -fno-exceptions ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
 	LinkSharedOSLibs $(1) : $(4) $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
 		# ToDo this has to be changed!
+	SetupKernel $(3) ;
 }
 
 rule KernelMergeObject
@@ -1792,11 +1808,13 @@ rule KernelMergeObject
 	#                  will be added.
 	#
 
-	SetupKernel $(2) : $(3) ;
+	SetupObjectsDir ;
 
 	MakeLocateObjects $(2) ;
 	Objects $(2) ;
 	MergeObjectFromObjects $(1) : $(2:S=$(SUFOBJ)) : $(4) ;
+
+	SetupKernel $(2) : $(3) ;
 }
 
 rule KernelStaticLibrary
@@ -1805,10 +1823,12 @@ rule KernelStaticLibrary
 	# This is designed to take a set of sources and libraries and create
 	# a file called lib<name>.a
 
-	SetupKernel $(2) : $(3) ;
+	SetupObjectsDir ;
 
 	MakeLocateObjects $(2) ;
 	Library $(1) : $(2) ;
+
+	SetupKernel $(2) : $(3) ;
 }
 
 rule KernelStaticLibraryObjects
@@ -1817,7 +1837,7 @@ rule KernelStaticLibraryObjects
 	# This is designed to take a set of sources and libraries and create
 	# a file called <name>
 
-	SetupKernel $(2) ;
+	SetupObjectsDir ;
 
 	# Show that we depend on the libraries we need
 	LocalClean clean : $(1) ;
@@ -1825,6 +1845,8 @@ rule KernelStaticLibraryObjects
 	Depends $(1) : $(2) ;
 
 	MakeLocate $(1) : $(LOCATE_TARGET) ;
+
+	SetupKernel $(2) ;
 }
 
 actions KernelStaticLibraryObjects
