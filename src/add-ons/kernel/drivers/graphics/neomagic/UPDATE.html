@@ -4,13 +4,15 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head 0.09 (Rudolf)</h1></p>
+<p><h1>head 0.10 (Rudolf)</h1></p>
 <ul>
 	<li>Added full 2D acceleration for all remaining cards that did not have that yet with this driver (still largely untested);
 	<li>Fixed a long standing problem with MagicMedia (all NM2200 and later) cards with overlay: buffer width is programmed correctly now. Can't believe I didn't see that before!
 	<li>Updated NM2200 and later cards workspace virtualsize restrictions for accelerated modes: it turns out these cards engines have the same restrictions as most older ones, being 1600x1024 resolution;
 	<li>Updated overlay scaling restrictions: officially the cards support upto and including 8x upscaling;
 	<li>Fixed error regarding calculating overlay engine register value for right-clipping video output: on NM2200 and later this was (probably) responsible for the big-time output distortions even without clipping!
+	<li>Fixed BIOS ROM dump (to file) option;
+	<li>Fixed GET_TIMING_CONSTRAINTS and GET_ACCELERANT_DEVICE_INFO accelerant hooks to return valid data; updated modeline checking and modification code (used by ProposeDisplayMode) to adhere to one more timing constraint.
 </ul>
 <p><h1>nm_driver 0.06 (Rudolf)</h1></p>
 <ul>
@@ -61,7 +63,7 @@ Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>fix for trouble with booting into modes above 800x600 resolution on some cards (please report this behaviour!);
-	<li>MagicMedia series overlay update: still contains errors???.
+	<li>setup workarounds for MagicMedia series overlay engine and 2D acceleration engine hardware faults.
 </ul>
 </p>
 </body>

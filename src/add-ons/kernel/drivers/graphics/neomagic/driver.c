@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 5/2002-8/2004.
+	Rudolf Cornelissen 5/2002-11/2004.
 */
 
 /* standard kernel driver stuff */
@@ -129,15 +129,22 @@ static settings current_settings = { // see comments in nm.settings
 	// for accelerant
 	0x00000000, // logmask
 	0,          // memory
-	false,      // usebios
-	false,      // hardcursor
+	true,      // usebios
+	true,      // hardcursor
 };
 
-static void dumprom (void *rom, size_t size)
+static void dumprom (void *rom, uint32 size)
 {
-	int fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
+	int fd;
+	uint32 cnt;
+	
+	fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
-	write (fd, rom, size);
+
+	/* apparantly max. 32kb may be written at once;
+	 * the ROM size is a multiple of that anyway. */
+	for (cnt = 0; (cnt < size); cnt += 32768)
+		write (fd, ((void *)(((uint8 *)rom) + cnt)), 32768);
 	close (fd);
 }
 
@@ -317,8 +324,8 @@ static status_t map_device(device_info *di)
 	pci_info *pcii = &(di->pcii);
 	system_info sysinfo;
 
-	/*variables for making copy of ROM*/
-	char * rom_temp;
+	/* variables for making copy of ROM */
+	uint8* rom_temp;
 	area_id rom_area;
 
 	int frame_buffer = 0;
@@ -408,19 +415,46 @@ static status_t map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
-	/*place ROM over the fbspace (this is definately safe)*/
-	tmpUlong = di->pcii.u.h0.base_registers[frame_buffer];
-	tmpUlong |= 0x00000001;
-	set_pci(PCI_rom_base, 4, tmpUlong);
+	/* get ROM memory mapped base adress - this is defined in the PCI standard */
+	tmpUlong = get_pci(PCI_rom_base, 4);
+	if (tmpUlong)
+	{
+		/* ROM was assigned an adress, so enable ROM decoding - see PCI standard */
+		tmpUlong |= 0x00000001;
+		set_pci(PCI_rom_base, 4, tmpUlong);
 
-	rom_area = map_physical_memory(
-		buffer,
-		(void *)di->pcii.u.h0.base_registers[frame_buffer],
-		32768,
-		B_ANY_KERNEL_ADDRESS,
-		B_READ_AREA,
-		(void **)&(rom_temp)
-	);
+		rom_area = map_physical_memory(
+			buffer,
+			(void *)di->pcii.u.h0.rom_base_pci,
+			di->pcii.u.h0.rom_size,
+			B_ANY_KERNEL_ADDRESS,
+			B_READ_AREA,
+			(void **)&(rom_temp)
+		);
+
+		/* check if we got the BIOS signature (might fail on laptops..) */
+		if (rom_temp[0]!=0x55 || rom_temp[1]!=0xaa)
+		{
+			/* apparantly no ROM is mapped here */
+			delete_area(rom_area);
+			rom_area = -1;
+			/* force using ISA legacy map as fall-back */
+			tmpUlong = 0x00000000;
+		}
+	}
+
+	if (!tmpUlong)
+	{
+		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
+		rom_area = map_physical_memory(
+			buffer,
+			(void *)0x000c0000,
+			32768,
+			B_ANY_KERNEL_ADDRESS,
+			B_READ_AREA,
+			(void **)&(rom_temp)
+		);
+	}
 
 	/* if mapping ROM to vmem failed then clean up and pass on error */
 	if (rom_area < 0) {
@@ -437,12 +471,16 @@ static status_t map_device(device_info *di)
 		return rom_area;
 	}
 
-	/* make a copy of ROM for future reference*/
-	memcpy (si->rom_mirror, rom_temp, 32768);
+	/* dump ROM to file if selected in nm.settings
+	 * (ROM should always fit in 32Kb) */
 	if (current_settings.dumprom) dumprom (rom_temp, 32768);
+	/* make a copy of ROM for future reference */
+	memcpy (si->rom_mirror, rom_temp, 32768);
 
-	/*disable ROM and delete the area*/
-	set_pci(PCI_rom_base,4,0);
+	/* disable ROM decoding - this is defined in the PCI standard, and delete the area */
+	tmpUlong = get_pci(PCI_rom_base, 4);
+	tmpUlong &= 0xfffffffe;
+	set_pci(PCI_rom_base, 4, tmpUlong);
 	delete_area(rom_area);
 
 	/* work out a name for the framebuffer mapping*/
