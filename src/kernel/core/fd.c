@@ -60,6 +60,7 @@ alloc_fd(void)
 	descriptor->cookie = NULL;
 	descriptor->ref_count = 1;
 	descriptor->open_mode = 0;
+	descriptor->pos = 0;
 
 	return descriptor;
 }

@@ -1060,8 +1060,8 @@ static struct fs_ops devfs_ops = {
 	&devfs_remove_vnode,
 
 	NULL,	// can page (currently commented out for whatever reason...)
-	NULL,	// read page
-	NULL,	// write page
+	NULL,	// read pages
+	NULL,	// write pages
 
 	/* common */
 	&devfs_ioctl,
@@ -1085,7 +1085,6 @@ static struct fs_ops devfs_ops = {
 	&devfs_free_cookie,
 	&devfs_read,
 	&devfs_write,
-	&devfs_seek,
 
 	/* directory */
 	&devfs_create_dir,

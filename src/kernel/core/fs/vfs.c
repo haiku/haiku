@@ -1331,7 +1331,7 @@ vfs_read_page(void *_v, iovecs *vecs, off_t pos)
 
 	FUNCTION(("vfs_readpage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, read_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
+	return FS_CALL(vnode, read_pages)(vnode->mount->cookie, vnode->private_node, vecs, pos);
 }
 
 
@@ -1342,7 +1342,7 @@ vfs_write_page(void *_v, iovecs *vecs, off_t pos)
 
 	FUNCTION(("vfs_writepage: vnode %p, vecs %p, pos %Ld\n", vnode, vecs, pos));
 
-	return FS_CALL(vnode, write_page)(vnode->mount->cookie, vnode->private_node, vecs, pos);
+	return FS_CALL(vnode, write_pages)(vnode->mount->cookie, vnode->private_node, vecs, pos);
 }
 
 
@@ -2014,10 +2014,44 @@ file_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, si
 static off_t
 file_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 {
-	struct vnode *vnode = descriptor->u.vnode;
+	off_t offset;
 
-	FUNCTION(("file_seek: pos 0x%Ld, seek_type %d\n", pos, seekType));
-	return FS_CALL(vnode, seek)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, seekType);
+	switch (seekType) {
+		case SEEK_SET:
+			offset = 0;
+			break;
+		case SEEK_CUR:
+			offset = descriptor->pos;
+			break;
+		case SEEK_END:
+		{
+			struct vnode *vnode = descriptor->u.vnode;
+			struct stat stat;
+			status_t status;
+
+			if (FS_CALL(vnode, read_stat) == NULL)
+				return EOPNOTSUPP;
+
+			status = FS_CALL(vnode, read_stat)(vnode->mount->cookie, vnode->private_node, &stat);
+			if (status < B_OK)
+				return status;
+
+			offset = stat.st_size;
+			break;
+		}
+		default:
+			return B_BAD_VALUE;
+	}
+
+	// assumes off_t is 64 bits wide
+	if (offset > 0 && LONGLONG_MAX - offset < pos)
+		return EOVERFLOW;
+
+	pos += offset;
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	return descriptor->pos = pos;
 }
 
 
@@ -2682,13 +2716,44 @@ attr_write(struct file_descriptor *descriptor, off_t pos, const void *buffer, si
 static off_t
 attr_seek(struct file_descriptor *descriptor, off_t pos, int seekType)
 {
-	struct vnode *vnode = descriptor->u.vnode;
+	off_t offset;
 
-	FUNCTION(("attr_seek: pos 0x%Ld, seek_type %d\n", pos, seekType));
-	if (!FS_CALL(vnode, seek_attr))
-		return EOPNOTSUPP;
+	switch (seekType) {
+		case SEEK_SET:
+			offset = 0;
+			break;
+		case SEEK_CUR:
+			offset = descriptor->pos;
+			break;
+		case SEEK_END:
+		{
+			struct vnode *vnode = descriptor->u.vnode;
+			struct stat stat;
+			status_t status;
 
-	return FS_CALL(vnode, seek_attr)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, pos, seekType);
+			if (FS_CALL(vnode, read_stat) == NULL)
+				return EOPNOTSUPP;
+
+			status = FS_CALL(vnode, read_attr_stat)(vnode->mount->cookie, vnode->private_node, descriptor->cookie, &stat);
+			if (status < B_OK)
+				return status;
+
+			offset = stat.st_size;
+			break;
+		}
+		default:
+			return B_BAD_VALUE;
+	}
+
+	// assumes off_t is 64 bits wide
+	if (offset > 0 && LONGLONG_MAX - offset < pos)
+		return EOVERFLOW;
+
+	pos += offset;
+	if (pos < 0)
+		return B_BAD_VALUE;
+
+	return descriptor->pos = pos;
 }
 
 

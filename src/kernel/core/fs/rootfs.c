@@ -720,14 +720,14 @@ rootfs_can_page(fs_volume _fs, fs_vnode _v)
 
 
 static ssize_t
-rootfs_read_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+rootfs_read_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	return EPERM;
 }
 
 
 static ssize_t
-rootfs_write_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+rootfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	return EPERM;
 }
@@ -938,8 +938,8 @@ static struct fs_ops rootfs_ops = {
 	&rootfs_remove_vnode,
 
 	&rootfs_can_page,
-	&rootfs_read_page,
-	&rootfs_write_page,
+	&rootfs_read_pages,
+	&rootfs_write_pages,
 
 	/* common */
 	&rootfs_ioctl,
@@ -963,7 +963,6 @@ static struct fs_ops rootfs_ops = {
 	&rootfs_free_cookie,
 	&rootfs_read,
 	&rootfs_write,
-	&rootfs_seek,
 
 	/* directory */
 	&rootfs_create_dir,

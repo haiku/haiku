@@ -896,7 +896,7 @@ bootfs_can_page(fs_volume _fs, fs_vnode _v)
 
 
 static ssize_t
-bootfs_read_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+bootfs_read_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -927,7 +927,7 @@ bootfs_read_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 
 
 static ssize_t
-bootfs_write_page(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
+bootfs_write_pages(fs_volume _fs, fs_vnode _v, iovecs *vecs, off_t pos)
 {
 	struct bootfs *fs = _fs;
 	struct bootfs_vnode *v = _v;
@@ -1022,8 +1022,8 @@ static struct fs_ops bootfs_ops = {
 	&bootfs_remove_vnode,
 
 	&bootfs_can_page,
-	&bootfs_read_page,
-	&bootfs_write_page,
+	&bootfs_read_pages,
+	&bootfs_write_pages,
 
 	/* common */
 	&bootfs_ioctl,
@@ -1047,7 +1047,6 @@ static struct fs_ops bootfs_ops = {
 	&bootfs_free_cookie,
 	&bootfs_read,
 	&bootfs_write,
-	&bootfs_seek,
 
 	/* dir */
 	&bootfs_create_dir,
