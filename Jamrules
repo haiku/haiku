@@ -60,6 +60,7 @@ if ! $(OBOS_BUILD_DESCRIPTION) {
 
 # Relative subdirs for distro dir (these are for *INTERNAL* use by the following rules only!)
 OBOS_APPS_DIR   ?= [ FDirName $(OBOS_DISTRO_TARGET) beos apps ] ;
+OBOS_BIN_DIR    ?= [ FDirName $(OBOS_DISTRO_TARGET) beos bin ] ;
 OBOS_PREFS_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos preferences ] ;
 OBOS_SERVER_DIR ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system servers ] ;
 OBOS_ADDON_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) beos system add-ons ] ;
@@ -114,6 +115,27 @@ rule App
 	SetupObjectsDir ;
 	Main $(<) : $(>) ;
 	MakeLocate $(<) : $(OBOS_APPS_DIR) ;
+}
+
+rule BinCommand
+{
+	# BinCommand <name> : <sources> : <libraries> ;
+	SetupObjectsDir ;
+	Main $(1) : $(2) ;
+	MakeLocate $(1) : $(OBOS_BIN_DIR) ;
+	LinkSharedOSLibs $(1) : $(3) ;
+}
+
+rule StdBinCommands
+{
+	# StdBinCommands <sources> : <libs> ;
+	local libs = $(2) ;
+	for source in $(1)
+	{
+		local target = $(source:S=) ;
+		target = [ FGristFiles $(target) ] ;
+		BinCommand $(target) : $(source) : $(libs) ;
+	}
 }
 
 rule Preference
