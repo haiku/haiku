@@ -35,21 +35,19 @@ NotificationManager::~NotificationManager()
 
 
 status_t
-NotificationManager::Register(const BMessenger &notifyHandler, const media_node &node, int32 notificationType)
+NotificationManager::Register(const BMessenger &notifyHandler, const media_node &node, notification_type_mask mask)
 {
 	CALLED();
-	
-
 	BMessage msg(MEDIA_SERVER_REQUEST_NOTIFICATIONS);
+
 	return SendMessageToMediaServer(&msg);
 }
 
 
 status_t
-NotificationManager::Unregister(const BMessenger &notifyHandler, const media_node &node, int32 notificationType)
+NotificationManager::Unregister(const BMessenger &notifyHandler, const media_node &node, notification_type_mask mask)
 {
 	CALLED();
-
 	BMessage msg(MEDIA_SERVER_CANCEL_NOTIFICATIONS);
 
 	return SendMessageToMediaServer(&msg);
@@ -82,8 +80,9 @@ NotificationManager::ReportError(const media_node &node, BMediaNode::node_error 
 	BMessage msg;
 	if (info)
 		msg = *info;
-	msg.what = what;
-	
+	msg.what = MEDIA_SERVER_SEND_NOTIFICATIONS;
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, what);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, notification_error);
 	return SendMessageToMediaServer(&msg);
 }
 
@@ -92,7 +91,9 @@ void
 NotificationManager::NodesCreated(const media_node_id *ids, int32 count)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_NODE_CREATED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_NODE_CREATED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_NODE_CREATED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -102,7 +103,9 @@ void
 NotificationManager::NodesDeleted(const media_node_id *ids, int32 count)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_NODE_DELETED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_NODE_DELETED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_NODE_DELETED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -112,7 +115,9 @@ void
 NotificationManager::ConnectionMade(const media_input &input, const media_output &output, const media_format &format)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_CONNECTION_MADE);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_CONNECTION_MADE);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_CONNECTION_MADE));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -122,7 +127,9 @@ void
 NotificationManager::ConnectionBroken(const media_source &source, const media_destination &destination)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_CONNECTION_BROKEN);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_CONNECTION_BROKEN);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_CONNECTION_BROKEN));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -132,7 +139,9 @@ void
 NotificationManager::BuffersCreated() // XXX fix
 {
 	CALLED();
-	BMessage msg(B_MEDIA_BUFFER_CREATED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_BUFFER_CREATED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_BUFFER_CREATED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -142,7 +151,9 @@ void
 NotificationManager::BuffersDeleted(const media_buffer_id *ids, int32 count)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_BUFFER_DELETED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_BUFFER_DELETED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_BUFFER_DELETED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -152,7 +163,9 @@ void
 NotificationManager::FormatChanged(const media_source &source, const media_destination &destination, const media_format &format)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_FORMAT_CHANGED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_FORMAT_CHANGED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_FORMAT_CHANGED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -162,9 +175,11 @@ status_t
 NotificationManager::ParameterChanged(const media_node &node, int32 parameterid)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_PARAMETER_CHANGED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_PARAMETER_CHANGED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_PARAMETER_CHANGED));
 
-	return B_OK;
+	return SendMessageToMediaServer(&msg);
 }
 
 
@@ -172,8 +187,11 @@ void
 NotificationManager::WebChanged(const media_node &node) // XXX fix
 {
 	CALLED();
-	BMessage msg(B_MEDIA_WEB_CHANGED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_WEB_CHANGED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_WEB_CHANGED));
 
+	SendMessageToMediaServer(&msg);
 }
 
 
@@ -181,7 +199,9 @@ status_t
 NotificationManager::NewParameterValue(const media_node &node, int32 parameterid, bigtime_t when, const void *param, size_t paramsize)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_NEW_PARAMETER_VALUE);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_NEW_PARAMETER_VALUE);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_NEW_PARAMETER_VALUE));
 
 	return SendMessageToMediaServer(&msg);
 }
@@ -191,7 +211,9 @@ void
 NotificationManager::FlavorsChanged(media_addon_id addonis, int32 newcount, int32 gonecount)
 {
 	CALLED();
-	BMessage msg(B_MEDIA_FLAVORS_CHANGED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_FLAVORS_CHANGED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_FLAVORS_CHANGED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -200,7 +222,9 @@ void
 NotificationManager::NodeStopped(const media_node &node, bigtime_t when) // XXX fix
 {
 	CALLED();
-	BMessage msg(B_MEDIA_NODE_STOPPED);
+	BMessage msg(MEDIA_SERVER_SEND_NOTIFICATIONS);
+	msg.AddInt32(NOTIFICATION_PARAM_WHAT, B_MEDIA_NODE_STOPPED);
+	msg.AddInt32(NOTIFICATION_PARAM_MASK, NotificationType2Mask(B_MEDIA_NODE_STOPPED));
 
 	SendMessageToMediaServer(&msg);
 }
@@ -208,7 +232,7 @@ NotificationManager::NodeStopped(const media_node &node, bigtime_t when) // XXX 
 status_t
 NotificationManager::SendMessageToMediaServer(BMessage *msg)
 {
-	#define TIMEOUT	1000000
+	#define TIMEOUT	100000
 	BMessage reply;
 	status_t rv;
 	if (!fMessenger->IsValid()) {
@@ -236,6 +260,8 @@ NotificationManager::IsValidNotificationType(int32 notificationType)
 		case BMediaNode::B_NODE_FAILED_PREROLL:
 		case BMediaNode::B_NODE_FAILED_SET_TIME_SOURCE_FOR:
 		case BMediaNode::B_NODE_IN_DISTRESS:
+			debugger("NotificationManager::IsValidNotificationType, encountered BMediaNode Error otification\n");
+			return false; // XXX we consider registering for this notifications as impossible, you always get them anyway
 		case B_MEDIA_WILDCARD:
 		case B_MEDIA_NODE_CREATED:
 		case B_MEDIA_NODE_DELETED:
@@ -254,6 +280,55 @@ NotificationManager::IsValidNotificationType(int32 notificationType)
 			return true;
 		default:
 			return false;
+	}
+}
+
+
+NotificationManager::notification_type_mask
+NotificationManager::NotificationType2Mask(int32 notificationType)
+{
+	switch (notificationType) {
+		case BMediaNode::B_NODE_FAILED_START:
+		case BMediaNode::B_NODE_FAILED_STOP:
+		case BMediaNode::B_NODE_FAILED_SEEK:
+		case BMediaNode::B_NODE_FAILED_SET_RUN_MODE:
+		case BMediaNode::B_NODE_FAILED_TIME_WARP:
+		case BMediaNode::B_NODE_FAILED_PREROLL:
+		case BMediaNode::B_NODE_FAILED_SET_TIME_SOURCE_FOR:
+		case BMediaNode::B_NODE_IN_DISTRESS:
+			return notification_error;
+		case B_MEDIA_WILDCARD:
+			return notification_wildcard;
+		case B_MEDIA_NODE_CREATED:
+			return notification_node_created;
+		case B_MEDIA_NODE_DELETED:
+			return notification_node_deleted;
+		case B_MEDIA_CONNECTION_MADE:
+			return notification_connection_made;
+		case B_MEDIA_CONNECTION_BROKEN:
+			return notification_connection_broken;
+		case B_MEDIA_BUFFER_CREATED:
+			return notification_buffer_created;
+		case B_MEDIA_BUFFER_DELETED:
+			return notification_buffer_deleted;
+		case B_MEDIA_TRANSPORT_STATE:
+			return notification_transport_state;
+		case B_MEDIA_PARAMETER_CHANGED:
+			return notification_parameter_changed;
+		case B_MEDIA_FORMAT_CHANGED:
+			return notification_format_change;
+		case B_MEDIA_WEB_CHANGED:
+			return notification_web_changed;
+		case B_MEDIA_DEFAULT_CHANGED:
+			return notification_default_changed;
+		case B_MEDIA_NEW_PARAMETER_VALUE:
+			return notification_new_parameter_value;
+		case B_MEDIA_NODE_STOPPED:
+			return notification_node_stopped;
+		case B_MEDIA_FLAVORS_CHANGED:
+			return notification_flavors_changed;
+		default:
+			return notification_no_mask;
 	}
 }
 
