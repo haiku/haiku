@@ -38,6 +38,8 @@ static const int32 kDefaultAccelerationFactor = 65536;
 
 
 MouseSettings::MouseSettings()
+	:
+	fWindowPosition(-1, -1)
 {
 	RetrieveSettings();
 

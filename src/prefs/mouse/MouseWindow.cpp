@@ -62,8 +62,22 @@ MouseWindow::MouseWindow(BRect rect)
 		// we are using the pulse rate to scan pressed mouse
 		// buttons and draw the selected imagery
 
-	ResizeTo(fSettingsView->Frame().right + kBorderSpace, button->Frame().bottom + kBorderSpace - 1);
-	MoveTo(fSettings.WindowPosition());
+	ResizeTo(fSettingsView->Frame().right + kBorderSpace,
+		button->Frame().bottom + kBorderSpace - 1);
+
+	// check if the window is on screen
+
+	rect = BScreen().Frame();
+	rect.right -= 20;
+	rect.bottom -= 20;
+
+	BPoint position = fSettings.WindowPosition();
+	if (!rect.Contains(position)) {
+		// center window on screen as it doesn't fit on the saved position
+		position.x = (rect.Width() - Bounds().Width()) / 2;
+		position.y = (rect.Height() - Bounds().Height()) / 2;
+	}
+	MoveTo(position);
 }
 
 
