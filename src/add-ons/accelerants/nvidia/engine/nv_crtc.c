@@ -294,6 +294,10 @@ status_t nv_crtc_set_timing(display_mode target)
 	/* (interlace is supported on upto and including NV10, NV15, and NV30 and up) */
 	CRTCW(INTERLACE, 0xff);
 
+	/* disable CRTC slaved mode unless a panel is in use */
+	// fixme: this kills TVout when it was in use...
+	if (!si->ps.tmds1_active) CRTCW(PIXEL, (CRTCR(PIXEL) & 0x7f));
+
 	/* setup flatpanel if connected and active */
 	if (si->ps.tmds1_active)
 	{

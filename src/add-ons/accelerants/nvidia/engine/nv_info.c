@@ -1,7 +1,7 @@
 /* Read initialisation information from card */
 /* some bits are hacks, where PINS is not known */
 /* Author:
-   Rudolf Cornelissen 7/2003-5/2004
+   Rudolf Cornelissen 7/2003-6/2004
 */
 
 #define MODULE_BIT 0x00002000
@@ -278,12 +278,16 @@ static void detect_panels()
 	CRTCW(VSYNCE ,(CRTCR(VSYNCE) & 0x7f));
 
 	LOG(2,("INFO: Dumping flatpanel related CRTC registers:\n"));
+	/* related info PIXEL register:
+	 * b7: 1 = slaved mode										(all cards). */
+	LOG(2,("CRTC1: PIXEL register: $%02x\n", CRTCR(PIXEL)));
 	/* info LCD register:
 	 * b7: 1 = stereo view (shutter glasses use)				(all cards),
-	 * b5: 1 = power ext. TMDS (or something)/0 = TVout	use	(?)	(confirmed NV28),
+	 * b5: 1 = power ext. TMDS (or something)/0 = TVout	use	(?)	(confirmed NV17, NV28),
 	 * b4: 1 = power ext. TMDS (or something)/0 = TVout use	(?)	(confirmed NV34),
-	 * b3: 1 = ???												(confirmed NV34),
-	 * b0: 1 = panel enabled/0 = TVout enabled					(all cards). */
+	 * b3: 1 = ??? (not panel related probably!)				(confirmed NV34),
+	 * b1: 1 = power ext. TMDS (or something) (?)				(confirmed NV05?, NV17),
+	 * b0: 1 = select panel encoder / 0 = select TVout encoder	(all cards). */
 	LOG(2,("CRTC1: LCD register: $%02x\n", CRTCR(LCD)));
 	/* info 0x59 register:
 	 * b0: 1 = enable ext. TMDS clock (DPMS)					(confirmed NV28, NV34). */
@@ -309,6 +313,7 @@ static void detect_panels()
 		CRTC2W(LOCK, 0x57);
 		CRTC2W(VSYNCE ,(CRTC2R(VSYNCE) & 0x7f));
 
+		LOG(2,("CRTC2: PIXEL register: $%02x\n", CRTC2R(PIXEL)));
 		LOG(2,("CRTC2: LCD register: $%02x\n", CRTC2R(LCD)));
 		LOG(2,("CRTC2: register $59: $%02x\n", CRTC2R(0x59)));
 		LOG(2,("CRTC2: register $9f: $%02x\n", CRTC2R(0x9f)));
@@ -350,11 +355,14 @@ static void detect_panels()
 	 * -> NV11, NV25 and NV34 DVI cards, so external panels (TMDS) are programmed
 	 *    in only one set of registers;
 	 * -> a register-set's FP_TG_CTRL register, bit 31 tells you if a LVDS panel is
-	 *    connected to the primary head (0), or to the secondary head (1);
+	 *    connected to the primary head (0), or to the secondary head (1) except
+	 *    on some NV11's if this bit is '0' there;
 	 * -> for LVDS panels both registersets are programmed identically by the card's
 	 *    BIOSes;
 	 * -> the programmed set of registers tells you where a TMDS (DVI) panel is
-	 *    connected. */
+	 *    connected;
+	 * -> On all cards a CRTC is used in slaved mode when a panel is connected,
+	 *    except on NV11: here master mode is (might be?) detected. */
 	/* note also:
 	 * external TMDS encoders are only used for logic-level translation: it's 
 	 * modeline registers are not used. Instead the GPU's internal modeline registers
@@ -385,7 +393,8 @@ static void detect_panels()
 		}
 	}
 
-	if (!si->ps.slaved_tmds1 && !tvout1)
+	if ((si->ps.card_type == NV11) &&
+		!si->ps.slaved_tmds1 && !tvout1)
 	{
 		uint16 width = ((DACR(FP_HDISPEND) & 0x0000ffff) + 1);
 		uint16 height = ((DACR(FP_VDISPEND) & 0x0000ffff) + 1);
@@ -398,7 +407,8 @@ static void detect_panels()
 		}
 	}
 
-	if (si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
+	if ((si->ps.card_type == NV11) &&
+		si->ps.secondary_head && !si->ps.slaved_tmds2 && !tvout2)
 	{
 		uint16 width = ((DAC2R(FP_HDISPEND) & 0x0000ffff) + 1);
 		uint16 height = ((DAC2R(FP_VDISPEND) & 0x0000ffff) + 1);
@@ -421,9 +431,9 @@ static void detect_panels()
 	{
 		LOG(2,("INFO: correcting double detection of single panel!\n"));
 
-		if (DACR(FP_TG_CTRL) & 0x80000000)
+		if (si->ps.card_type == NV11)
 		{
-			/* LVDS panel is on CRTC2, so clear false primary detection */
+			/* LVDS panel is _always_ on CRTC2, so clear false primary detection */
 			si->ps.slaved_tmds1 = false;
 			si->ps.master_tmds1 = false;
 			si->ps.tmds1_active = false;
@@ -432,12 +442,24 @@ static void detect_panels()
 		}
 		else
 		{
-			/* LVDS panel is on CRTC1, so clear false secondary detection */
-			si->ps.slaved_tmds2 = false;
-			si->ps.master_tmds2 = false;
-			si->ps.tmds2_active = false;
-			si->ps.p2_timing.h_display = 0;
-			si->ps.p2_timing.v_display = 0;
+			if (DACR(FP_TG_CTRL) & 0x80000000)
+			{
+				/* LVDS panel is on CRTC2, so clear false primary detection */
+				si->ps.slaved_tmds1 = false;
+				si->ps.master_tmds1 = false;
+				si->ps.tmds1_active = false;
+				si->ps.p1_timing.h_display = 0;
+				si->ps.p1_timing.v_display = 0;
+			}
+			else
+			{
+				/* LVDS panel is on CRTC1, so clear false secondary detection */
+				si->ps.slaved_tmds2 = false;
+				si->ps.master_tmds2 = false;
+				si->ps.tmds2_active = false;
+				si->ps.p2_timing.h_display = 0;
+				si->ps.p2_timing.v_display = 0;
+			}
 		}
 	}
 
