@@ -54,8 +54,8 @@ class Descriptor {
 
 #define MAX_VFS_DESCRIPTORS 64
 
-list gBootDevices;
-list gPartitions;
+NodeList gBootDevices;
+NodeList gPartitions;
 Directory *gRoot;
 static Descriptor *sDescriptors[MAX_VFS_DESCRIPTORS];
 static Node *sBootDevice;
@@ -281,9 +281,6 @@ Descriptor::Release()
 status_t
 vfs_init(stage2_args *args)
 {
-	list_init(&gBootDevices);
-	list_init_etc(&gPartitions, Partition::LinkOffset());
-
 	gRoot = new RootFileSystem();
 	if (gRoot == NULL)
 		return B_NO_MEMORY;
@@ -305,7 +302,7 @@ get_boot_file_system(stage2_args *args)
 		return NULL;
 
 	// add the boot device to the list of devices
-	list_add_item(&gBootDevices, device);
+	gBootDevices.Add(device);
 
 	if (add_partitions_for(device, false) < B_OK)
 		return NULL;
@@ -318,8 +315,8 @@ get_boot_file_system(stage2_args *args)
 	if (partition->Mount(&fileSystem) < B_OK) {
 		// let's remove that partition, so that it is not scanned again
 		// in mount_file_systems()
-		
-		list_remove_item(&gPartitions, partition);
+
+		gPartitions.Remove(partition);
 		delete partition;
 		return NULL;
 	}
@@ -337,17 +334,14 @@ status_t
 mount_file_systems(stage2_args *args)
 {
 	// mount other partitions on boot device (if any)
+	NodeIterator iterator = gPartitions.Iterator();
 
 	Partition *partition = NULL;
-	while ((partition = (Partition *)list_get_next_item(&gPartitions, partition)) != NULL) {
+	while ((partition = (Partition *)iterator.Next()) != NULL) {
 		// remove the partition if it doesn't contain a (known) file system
 		if (partition->Scan(true) != B_OK && !partition->IsFileSystem()) {
-			Partition *last = (Partition *)list_get_prev_item(&gPartitions, partition);
-
-			list_remove_item(&gPartitions, partition);
+			gPartitions.Remove(partition);
 			delete partition;
-
-			partition = last;
 		}
 	}
 
@@ -357,8 +351,9 @@ mount_file_systems(stage2_args *args)
 	if (status < B_OK)
 		return status;
 
+	iterator = gBootDevices.Iterator();
 	Node *device = NULL, *last = NULL;
-	while ((device = (Node *)list_get_next_item(&gBootDevices, device)) != NULL) {
+	while ((device = iterator.Next()) != NULL) {
 		// don't scan former boot device again
 		if (device == sBootDevice)
 			continue;
@@ -378,7 +373,7 @@ mount_file_systems(stage2_args *args)
 		last = device;
 	}
 
-	if (list_is_empty(&gPartitions))
+	if (gPartitions.IsEmpty())
 		return B_ENTRY_NOT_FOUND;
 
 	return B_OK;
@@ -481,7 +476,7 @@ open_node(Node *node, int mode)
 	if (fd == MAX_VFS_DESCRIPTORS)
 		return B_ERROR;
 
-	TRACE(("got descriptor %d\n", fd));
+	TRACE(("got descriptor %d for node %p\n", fd, node));
 
 	// we got a free descriptor entry, now try to open the node
 	

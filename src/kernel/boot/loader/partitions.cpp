@@ -54,7 +54,7 @@ static file_system_module_info *sFileSystemModules[] = {
 };
 static const int32 sNumFileSystemModules = sizeof(sFileSystemModules) / sizeof(file_system_module_info *);
 
-extern list gPartitions;
+extern NodeList gPartitions;
 
 
 namespace boot {
@@ -90,12 +90,11 @@ Partition::Partition(int fd)
 	fParent(NULL),
 	fIsFileSystem(false)
 {
-	memset(this, 0, sizeof(partition_data));
+	memset((partition_data *)this, 0, sizeof(partition_data));
 	id = (partition_id)this;
 
 	// it's safe to close the file
 	fFD = dup(fd);
-	list_init_etc(&fChildren, Partition::LinkOffset());
 }
 
 
@@ -166,7 +165,7 @@ Partition::AddChild()
 
 	child->SetParent(this);
 	child_count++;
-	list_add_item(&fChildren, (void *)child);
+	fChildren.Add(child);
 
 	return child;
 }
@@ -199,6 +198,8 @@ status_t
 Partition::Scan(bool mountFileSystems)
 {
 	// scan for partitions first (recursively all eventual children as well)
+	
+	TRACE(("Partition::Scan()\n"));
 
 	for (int32 i = 0; i < sNumPartitionModules; i++) {
 		partition_module_info *module = sPartitionModules[i];
@@ -217,9 +218,10 @@ Partition::Scan(bool mountFileSystems)
 			// now that we've found something, check our children
 			// out as well!
 
-			Partition *child = NULL, *last = NULL;
+			NodeIterator iterator = fChildren.Iterator();
+			Partition *child = NULL;
 
-			while ((child = (Partition *)list_get_next_item(&fChildren, child)) != NULL) {
+			while ((child = (Partition *)iterator.Next()) != NULL) {
 				TRACE(("*** scan child %p (start = %Ld, size = %Ld, parent = %p)!\n",
 					child, child->offset, child->size, child->Parent()));
 
@@ -227,19 +229,14 @@ Partition::Scan(bool mountFileSystems)
 
 				if (!mountFileSystems || child->IsFileSystem()) {
 					// move the partitions containing file systems to the partition list
-					list_remove_item(&fChildren, child);
-					list_add_item(&gPartitions, child);
-
-					child = last;
-						// skip this item
+					fChildren.Remove(child);
+					gPartitions.Add(child);
 				}
-
-				last = child;
 			}
 
 			// remove all unused children (we keep only file systems)
 
-			while ((child = (Partition *)list_remove_head_item(&fChildren)) != NULL)
+			while ((child = (Partition *)fChildren.RemoveHead()) != NULL)
 				delete child;
 
 			return B_OK;
@@ -263,6 +260,8 @@ Partition::Scan(bool mountFileSystems)
 status_t
 add_partitions_for(int fd, bool mountFileSystems)
 {
+	TRACE(("add_partitions_for(fd = %ld, mountFS = %s)\n", fd, mountFileSystems ? "yes" : "no"));
+
 	Partition *partition = new Partition(fd);
 
 	// set some magic/default values
@@ -273,7 +272,7 @@ add_partitions_for(int fd, bool mountFileSystems)
 	// or might contain a file system
 	if ((partition->Scan(mountFileSystems) == B_OK && partition->IsFileSystem())
 		|| (!partition->IsFileSystem() && !mountFileSystems)) {
-		list_add_item(&gPartitions, partition);
+		gPartitions.Add(partition);
 		return B_OK;
 	}
 
@@ -285,6 +284,8 @@ add_partitions_for(int fd, bool mountFileSystems)
 status_t
 add_partitions_for(Node *device, bool mountFileSystems)
 {
+	TRACE(("add_partitions_for(%p, mountFS = %s)\n", device, mountFileSystems ? "yes" : "no"));
+
 	int fd = open_node(device, O_RDONLY);
 	if (fd < B_OK)
 		return fd;
