@@ -128,7 +128,7 @@ BBitmapStream::~BBitmapStream()
 //          B_BAD_VALUE if buffer is NULL or pos is invalid
 //          or the amount read if the result >= 0
 // ---------------------------------------------------------------
-status_t
+ssize_t
 BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 {
 	if (!fBitmap)
@@ -140,7 +140,7 @@ BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 	if (!buffer || pos < 0)
 		return B_BAD_VALUE;
 
-	size_t toRead;
+	ssize_t toRead;
 	void *source;
 
 	if (pos < sizeof(TranslatorBitmap)) {
@@ -181,7 +181,7 @@ BBitmapStream::ReadAt(off_t pos, void *buffer, size_t size)
 //			        big endian header,
 //          or the amount written if the result is >= 0
 // ---------------------------------------------------------------
-status_t
+ssize_t
 BBitmapStream::WriteAt(off_t pos, const void *data, size_t size)
 {
 	if (!size)
