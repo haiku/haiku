@@ -214,6 +214,9 @@ OBOS_STLIB_DIR  ?= [ FDirName $(OBOS_DISTRO_TARGET) develop lib
 							  $(OBOS_ARCH) ] ;
 OBOS_TEST_DIR   ?= [ FDirName $(OBOS_TOP) tests ] ;
 
+OBOS_PACKAGE_DIR ?= [ FDirName $(OBOS_TOP) packages $(OBOS_TARGET) ] ;
+OBOS_PACKAGE_OBJECT_DIR ?= [ FDirName $(OBOS_OBJECT_TARGET) packages ] ;
+
 OBOS_KERNEL_CONFIG = config.$(OBOS_ARCH).ini ;
 OBOS_KERNEL = kernel.$(OBOS_ARCH) ;
 OBOS_FLOPPY = floppy.$(OBOS_ARCH) ;
@@ -256,6 +259,17 @@ rule SetupDefaultIncludes
 #-------------------------------------------------------------------------------
 # Things Jam needs in order to work :)
 #-------------------------------------------------------------------------------
+
+# TODO: back-ported from jam 2.5: remove when not longer needed
+rule MakeLocate
+{
+	if $(>)
+	{
+	    LOCATE on $(<) = $(>) ;
+	    Depends $(<) : $(>[1]:G=dir) ;
+	    MkDir $(>[1]:G=dir) ;
+	}
+}
 
 rule Object
 {
@@ -2029,75 +2043,86 @@ rule Packages
     }
 }
 
-OBOS_PACKAGE_DIR ?= [ FDirName $(OBOS_TOP) packages $(OBOS_TARGET) ] ;
-OBOS_PACKAGE_OBJECT_DIR ?= [ FDirName $(OBOS_OBJECT_TARGET) packages ] ;
-
 rule Package
 {
 	local packagename = $(1) ;
     local packagefiles = $(2) ;
 	local path = $(3) ;
 
-	NotFile $(packagename) ;
-	Depends packages : $(packagename) ;
-
-	local packagezip = $(packagename).zip ;
-	MakeLocate $(packagezip) : $(OBOS_PACKAGE_DIR) ;
-
+	local packagezip = $(packagename:S=.zip:G=_packages) ;
 	local packagedir = [ FDirName $(OBOS_PACKAGE_DIR) $(packagename) ] ;
 
     local installscript = install.sh ;
-	local packageinstallscript = $(installscript:G=$(packagedir)) ;
-	MakeLocate $(packageinstallscript) : $(packagedir) ;
-
+	local packageinstallscript = $(installscript:G=_packages!$(packagename)) ;
     local installzip = install.zip ;
-	local packageinstallzip = $(installzip:G=$(packagedir)) ;
-	MakeLocate $(packageinstallzip) : $(packagedir) ;
+	local packageinstallzip = $(installzip:G=_packages!$(packagename)) ;
 
-    local packageobjectdir = [ FDirName $(OBOS_PACKAGE_OBJECT_DIR) $(packagename) ] ;
+    local packageobjectdir
+    	= [ FDirName $(OBOS_PACKAGE_OBJECT_DIR) $(packagename) ] ;
 	local packagefiledir =  [ FDirName $(packageobjectdir) $(path) ] ;
-    local packagefileinstallzip = $(installzip:G=$(packageobjectdir)) ;
-	MakeLocate $(packagefileinstallzip) : $(packageobjectdir) ;
+    local packagefileinstallzip
+    	= $(installzip:G=_package_objects!$(packagename)) ;
+
+	# add the files to the install.zip
+	local packagefilegrist = [ FGrist _package_files $(packagename) $(path) ] ;
     for file in $(packagefiles) {
 		if $(3[0]) = "boot" {
-			local packagefile = $(file:G=$(packagefiledir)) ;
+			local packagefile = $(file:G=$(packagefilegrist)) ;
 			MakeLocate $(packagefile) : $(packagefiledir) ;
 			Copy $(packagefile) : $(file) ;
 			Clean cleanPackages : $(packagefile) ;
 			PackageInstallZip $(packagefileinstallzip) : $(packagefile) ;
 		} else {
-			local packagefile = $(file:G=$(packagedir)) ;
+			local packagefile = $(file:G=_packages!$(packagename)) ;
 			MakeLocate $(packagefile) : $(packagedir) ;
 			Copy $(packagefile) : $(file) ;
 			Clean cleanPackages : $(packagefile) ;
 			Depends $(packagezip) : $(packagefile) ;
 		}
 	}
-	PackageInstallScript $(packageinstallscript) : $(packagedir) ;
-	LinkInstallZip $(packageinstallzip) : $(packagefileinstallzip) ;
-	Depends $(packagename) : $(packagezip) ;
-	PackageZip $(packagezip) :
-		$(packagedir) $(packageinstallscript) $(packageinstallzip) ;
+
+	# general setup for this packages -- only on first invocation
+	if ! $(_setup_$(packagename)) {
+		_setup_$(packagename) = true ;
+
+		NotFile $(packagename) ;
+		Depends packages : $(packagename) ;
+
+		MakeLocate $(packagezip) : $(OBOS_PACKAGE_DIR) ;
+		MakeLocate $(packageinstallscript) : $(packagedir) ;
+		MakeLocate $(packageinstallzip) : $(packagedir) ;
+		MakeLocate $(packagefileinstallzip) : $(packageobjectdir) ;
+
+		PackageInstallScript $(packageinstallscript) : $(packagedir) ;
+		LinkInstallZip $(packageinstallzip) : $(packagefileinstallzip) ;
+		Depends $(packagename) : $(packagezip) ;
+		PackageZip $(packagezip) : $(packagedir)
+			: $(packageinstallscript) $(packageinstallzip) ;
+	}
+
 }
 
 rule PackageZip
 {
-	Depends $(1) : $(2) ;
+	local dir = $(2:G=dir) ;
+	Depends $(1) : $(dir) $(3) ;
 	Clean cleanPackages : $(1) ;
+	PackageZip1 $(1) : $(dir) ;
 }
 
-actions together PackageZip {
+actions together PackageZip1 {
 	cd $(OBOS_PACKAGE_DIR) ;
-	zip -rq $(1:BS) $(2[1]:BS) ;
+	zip -rq $(1:BS) $(2:BS) ;
 }
 
 rule PackageInstallScript
 {
 	MakeLocate $(1) : $(2) ;
 	Clean cleanPackages : $(1) ;
+	PackageInstallScript1 $(1) : $(2:G=dir) ;
 }
 
-actions together PackageInstallScript
+actions together PackageInstallScript1
 {
 echo '#!/bin/sh
 base=`dirname "$0"`
