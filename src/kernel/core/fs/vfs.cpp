@@ -12,6 +12,7 @@
 #include <StorageDefs.h>
 #include <fs_info.h>
 #include <fs_interface.h>
+#include <fs_volume.h>
 
 #include <disk_device_manager/KDiskDevice.h>
 #include <disk_device_manager/KDiskDeviceManager.h>
@@ -4013,7 +4014,7 @@ fs_unmount(char *path, bool kernel)
 
 	err = path_to_vnode(path, true, &vnode, kernel);
 	if (err < 0)
-		return ERR_VFS_PATH_NOT_FOUND;
+		return B_ENTRY_NOT_FOUND;
 
 	RecursiveLocker mountOpLocker(sMountOpLock);
 
