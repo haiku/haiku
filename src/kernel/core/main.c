@@ -1,12 +1,13 @@
 /*
-** Copyright 2002-2004, The Haiku Team. All rights reserved.
-** Distributed under the terms of the Haiku License.
-**
-** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-*/
+ * Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
+ */
 
 /* This is main - initializes processors and starts init */
+
 
 #include <OS.h>
 
@@ -15,6 +16,7 @@
 #include <debug.h>
 #include <arch/faults.h>
 #include <arch/dbg_console.h>
+#include <ksyscalls.h>
 #include <vm.h>
 #include <timer.h>
 #include <smp.h>
@@ -119,6 +121,8 @@ _start(kernel_args *oldka, int cpu_num)
 		// now we can create and use semaphores
 		TRACE(("init VM semaphores\n"));
 		vm_init_post_sem(&ka);
+		TRACE(("init generic syscall\n"));
+		generic_syscall_init();
 		TRACE(("init cbuf\n"));
 		cbuf_init();
 		TRACE(("init VFS\n"));

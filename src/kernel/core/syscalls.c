@@ -8,6 +8,7 @@
 #include <kernel.h>
 #include <ksyscalls.h>
 #include <syscalls.h>
+#include <generic_syscall.h>
 #include <int.h>
 #include <debug.h>
 #include <vfs.h>
@@ -32,10 +33,110 @@
 #include <user_atomic.h>
 #include <safemode.h>
 #include <arch/system_info.h>
+#include <malloc.h>
 
 
-static inline
-int
+typedef struct generic_syscall generic_syscall;
+
+struct generic_syscall {
+	list_link		link;
+	uint32			subsystem;
+	syscall_hook	hook;
+	uint32			version;
+	uint32			flags;
+	generic_syscall	*previous;
+};
+
+static struct mutex sGenericSyscallLock;
+static struct list sGenericSyscalls;
+
+
+static generic_syscall *
+find_generic_syscall(uint32 subsystem)
+{
+	generic_syscall *syscall = NULL;
+
+	ASSERT_LOCKED_MUTEX(&sGenericSyscallLock);
+
+	while ((syscall = list_get_next_item(&sGenericSyscalls, syscall)) != NULL) {
+		if (syscall->subsystem == subsystem)
+			return syscall;
+	}
+
+	return NULL;
+}
+
+
+/**	Calls the generic syscall subsystem if any.
+ *	Also handles the special generic syscall function \c B_SYSCALL_INFO.
+ *	Returns \c B_NAME_NOT_FOUND if either the subsystem was not found, or
+ *	the subsystem does not support the requested function.
+ *	All other return codes are depending on the generic syscall implementation.
+ */
+
+static inline status_t
+_user_generic_syscall(uint32 subsystem, uint32 function, void *buffer, size_t bufferSize)
+{
+	generic_syscall *syscall;
+	status_t status;
+
+	dprintf("generic_syscall(subsystem = %lu, function = %lu)\n", subsystem, function);
+
+	mutex_lock(&sGenericSyscallLock);
+
+	syscall = find_generic_syscall(subsystem);
+	if (syscall == NULL) {
+		status = B_NAME_NOT_FOUND;
+		goto out;
+	}
+
+	if (function == B_SYSCALL_INFO) {
+		// special info syscall
+		if (bufferSize != sizeof(uint32))
+			status = B_BAD_VALUE;
+		else {
+			uint32 requestedVersion;
+
+			// retrieve old version
+			status = user_memcpy(&requestedVersion, buffer, sizeof(uint32));
+			if (status == B_OK && requestedVersion != 0 && requestedVersion < syscall->version)
+				status = B_BAD_TYPE;
+
+			// return current version
+			if (status == B_OK)
+				status = user_memcpy(buffer, &syscall->version, sizeof(uint32));
+		}
+	} else {
+		while (syscall != NULL) {
+			generic_syscall *next;
+
+			mutex_unlock(&sGenericSyscallLock);
+
+			status = syscall->hook(subsystem, function, buffer, bufferSize);
+
+			mutex_lock(&sGenericSyscallLock);
+			if (status != B_BAD_HANDLER)
+				break;
+
+			// the syscall may have been removed in the mean time
+			next = find_generic_syscall(subsystem);
+			if (next == syscall)
+				syscall = syscall->previous;
+			else
+				syscall = next;
+		}
+
+		if (syscall == NULL)
+			status = B_NAME_NOT_FOUND;
+	}
+
+out:
+	mutex_unlock(&sGenericSyscallLock);
+	return status;
+}
+
+
+static inline int
 _user_null()
 {
 	return 0;
@@ -43,8 +144,8 @@ _user_null()
 
 
 // map to the arch specific call
-static inline
-int64
+
+static inline int64
 _user_restore_signal_frame()
 {
 	return arch_restore_signal_frame();
@@ -52,16 +153,19 @@ _user_restore_signal_frame()
 
 
 // TODO: Replace when networking code is added to the build. 
-static inline
-int
+
+static inline int
 _user_socket(int family, int type, int proto)
 {
 	return 0;
 }
 
 
-int
-syscall_dispatcher(unsigned long call_num, void *args, uint64 *call_ret)
+//	#pragma mark -
+
+
+int32
+syscall_dispatcher(uint32 call_num, void *args, uint64 *call_ret)
 {
 //	dprintf("syscall_dispatcher: thread 0x%x call 0x%x, arg0 0x%x, arg1 0x%x arg2 0x%x arg3 0x%x arg4 0x%x\n",
 //		thread_get_current_thread_id(), call_num, arg0, arg1, arg2, arg3, arg4);
@@ -78,3 +182,91 @@ syscall_dispatcher(unsigned long call_num, void *args, uint64 *call_ret)
 
 	return B_INVOKE_SCHEDULER;
 }
+
+
+status_t
+generic_syscall_init(void)
+{
+	list_init(&sGenericSyscalls);
+	return mutex_init(&sGenericSyscallLock, "generic syscall");
+}
+
+
+//	#pragma mark -
+//	public API
+
+
+status_t
+register_generic_syscall(uint32 subsystem, syscall_hook hook,
+	uint32 version, uint32 flags)
+{
+	struct generic_syscall *previous, *syscall;
+	status_t status;
+
+	if (hook == NULL)
+		return B_BAD_VALUE;
+
+	mutex_lock(&sGenericSyscallLock);
+
+	previous = find_generic_syscall(subsystem);
+	if (previous != NULL) {
+		if ((flags & B_DO_NOT_REPLACE_SYSCALL) != 0
+			|| version < previous->version) {
+			status = B_NAME_IN_USE;
+			goto out;
+		}
+		if (previous->flags & B_SYSCALL_NOT_REPLACEABLE) {
+			status = B_NOT_ALLOWED;
+			goto out;
+		}
+	}
+
+	syscall = (generic_syscall *)malloc(sizeof(struct generic_syscall));
+	if (syscall == NULL) {
+		status = B_NO_MEMORY;
+		goto out;
+	}
+
+	syscall->subsystem = subsystem;
+	syscall->hook = hook;
+	syscall->version = version;
+	syscall->flags = flags;
+	syscall->previous = previous;
+	list_add_item(&sGenericSyscalls, syscall);
+
+	if (previous != NULL)
+		list_remove_link(&previous->link);
+
+	status = B_OK;
+
+out:
+	mutex_unlock(&sGenericSyscallLock);
+	return status;
+}
+
+
+status_t
+unregister_generic_syscall(uint32 subsystem, uint32 version)
+{
+	// ToDo: we should only remove the syscall with the matching version
+	generic_syscall *syscall;
+	status_t status;
+
+	mutex_lock(&sGenericSyscallLock);
+
+	syscall = find_generic_syscall(subsystem);
+	if (syscall != NULL) {
+		if (syscall->previous != NULL) {
+			// reestablish the old syscall
+			list_add_item(&sGenericSyscalls, syscall->previous);
+		}
+		list_remove_link(&syscall->link);
+		free(syscall);
+		status = B_OK;
+	} else
+		status = B_NAME_NOT_FOUND;
+
+	mutex_unlock(&sGenericSyscallLock);
+	return status;
+}
+
