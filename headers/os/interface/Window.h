@@ -421,8 +421,6 @@ virtual BMessage	*ConvertToMessage(void* raw, int32 code);					// HUGE function 
 		void		drawAllViews(BView* aView);
 		void		drawView(BView* aView, BRect area);
 
-		uint8*		ReadRawFromPort(int32* code,
-									bigtime_t tout = B_INFINITE_TIMEOUT);
 		// Debug
 		void		PrintToStream() const;
 // END: OBOS addon functions
