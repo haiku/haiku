@@ -267,7 +267,7 @@ echo_stream_curaddr(echo_stream *stream)
 {
 	uint32 addr = B_LENDIAN_TO_HOST_INT32(*stream->position);
 //	TRACE(("stream_curaddr %p, phy_base %p\n", addr));
-	return addr;
+	return (addr / stream->blksize) % stream->blkmod;
 }
 
 
@@ -377,15 +377,15 @@ int32 echo_int(void *arg)
 			(stream->inth == NULL))
 				continue;
 		
-		TRACE(("echo_int stream %p\n", stream));
-		curblk = echo_stream_curaddr(stream) / stream->blksize;
-		TRACE(("echo_int at trigblk %lu\n", curblk));
-		TRACE(("echo_int at stream->trigblk %lu\n", stream->trigblk));
+		curblk = echo_stream_curaddr(stream);
+		//TRACE(("echo_int stream %p at trigblk %lu at stream->trigblk %lu\n",
+		//	   stream, curblk, stream->trigblk));
 		if (curblk == stream->trigblk) {
 			if(stream->inth)
 				stream->inth(stream->inthparam);
 
 			stream->trigblk++;
+			stream->trigblk %= stream->blkmod;
 		}
 	}
 
