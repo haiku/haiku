@@ -583,8 +583,10 @@ struct pci_module_info {
 
 /** Power Management Control Status Register settings */
 #define PCI_pm_mask             0x03
+#define PCI_pm_ctrl             0x02
 #define PCI_pm_d1supp           0x0200
 #define PCI_pm_d2supp           0x0400
+#define PCI_pm_status           0x04
 #define PCI_pm_state_d0         0x00
 #define PCI_pm_state_d1         0x01
 #define PCI_pm_state_d2         0x02
