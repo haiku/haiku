@@ -55,12 +55,13 @@ DataView::DataView(BRect rect, DataEditor &editor)
 	fFocus(kHexFocus),
 	fBase(kHexBase),
 	fIsActive(true),
+	fMouseSelectionStart(-1),
+	fKeySelectionStart(-1),
 	fBitPosition(0),
 	fFitFontSize(false)
 {
 	fPositionLength = 4;
 	fStart = fEnd = 0;
-	fMouseSelectionStart = -1;
 
 	if (fEditor.Lock()) {
 		fDataSize = fEditor.ViewSize();
@@ -93,6 +94,9 @@ void
 DataView::AttachedToWindow()
 {
 	fEditor.StartWatching(this);
+	MakeFocus(true);
+		// this seems to be necessary - if we don't do this here,
+		// the view is sometimes focus, but IsFocus() returns false...
 }
 
 
@@ -915,7 +919,7 @@ DataView::MouseMoved(BPoint where, uint32 transit, const BMessage */*dragMessage
 void 
 DataView::MouseUp(BPoint where)
 {
-	fMouseSelectionStart = -1;
+	fMouseSelectionStart = fKeySelectionStart = -1;
 }
 
 
@@ -927,41 +931,101 @@ DataView::KeyDown(const char *bytes, int32 numBytes)
 		|| Looper()->CurrentMessage()->FindInt32("modifiers", &modifiers) != B_OK)
 		modifiers = ::modifiers();
 
+	// check if the selection is going to be changed
 	switch (bytes[0]) {
 		case B_LEFT_ARROW:
-			SetSelection(fStart - 1, modifiers & B_SHIFT_KEY ? fEnd : fStart - 1);
-			MakeVisible(fStart);
-			break;
 		case B_RIGHT_ARROW:
-			SetSelection(modifiers & B_SHIFT_KEY ? fStart : fEnd + 1, fEnd + 1);
-			MakeVisible(fEnd);
+		case B_UP_ARROW:
+		case B_DOWN_ARROW:
+			if (modifiers & B_SHIFT_KEY) {
+				if (fKeySelectionStart == -1)
+					fKeySelectionStart = fStart;
+			} else
+				fKeySelectionStart = -1;
 			break;
+	}
+
+	switch (bytes[0]) {
+		case B_LEFT_ARROW:
+		{
+			int32 position = fStart - 1;
+
+			if (modifiers & B_SHIFT_KEY) {
+				if (fKeySelectionStart == fEnd)
+					SetSelection(fStart - 1, fEnd);
+				else {
+					SetSelection(fStart, fEnd - 1);
+					position = fEnd;
+				}
+			} else
+				SetSelection(fStart - 1, fStart - 1);
+
+			MakeVisible(position);
+			break;
+		}
+		case B_RIGHT_ARROW:
+		{
+			int32 position = fEnd + 1;
+
+			if (modifiers & B_SHIFT_KEY) {
+				if (fKeySelectionStart == fStart)
+					SetSelection(fStart, fEnd + 1);
+				else
+					SetSelection(fStart + 1, fEnd);
+			} else
+				SetSelection(fEnd + 1, fEnd + 1);
+
+			MakeVisible(position);
+			break;
+		}
 		case B_UP_ARROW:
 		{
-			int32 start = fStart - int32(kBlockSize);
-			if (start < 0) {
-				if (modifiers & B_SHIFT_KEY)
+			int32 start, end;
+			if (modifiers & B_SHIFT_KEY) {
+				if (fKeySelectionStart == fStart) {
+					start = fEnd - int32(kBlockSize);
+					end = fStart;
+				} else {
+					start = fStart - int32(kBlockSize);
+					end = fEnd;
+				}
+				if (start < 0)
 					start = 0;
-				else
+			} else {
+				start = fStart - int32(kBlockSize);
+				if (start < 0)
 					start = fStart;
+
+				end = start;
 			}
 
-			SetSelection(start, modifiers & B_SHIFT_KEY ? fEnd : start);
-			MakeVisible(fStart);
+			SetSelection(start, end);
+			MakeVisible(start);
 			break;
 		}
 		case B_DOWN_ARROW:
 		{
-			int32 end = fEnd + int32(kBlockSize);
-			if (end >= int32(fSizeInView)) {
-				if (modifiers & B_SHIFT_KEY)
+			int32 start, end;
+			if (modifiers & B_SHIFT_KEY) {
+				if (fKeySelectionStart == fEnd) {
+					start = fEnd;
+					end = fStart + int32(kBlockSize);
+				} else {
+					start = fStart;
+					end = fEnd + int32(kBlockSize);
+				}
+				if (end >= int32(fSizeInView))
 					end = int32(fSizeInView) - 1;
-				else
-					end = fEnd;
+			} else {
+				end = fEnd + int32(kBlockSize);
+				if (end >= int32(fSizeInView))
+					start = fEnd;
+
+				start = end;
 			}
 
-			SetSelection(modifiers & B_SHIFT_KEY ? fStart : end, end);
-			MakeVisible(fEnd);
+			SetSelection(start, end);
+			MakeVisible(end);
 			break;
 		}
 

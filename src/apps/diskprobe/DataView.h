@@ -94,6 +94,7 @@ class DataView : public BView {
 		bool		fIsActive;
 		int32		fStart, fEnd;
 		int32		fMouseSelectionStart;
+		int32		fKeySelectionStart;
 		int32		fBitPosition;
 		bool		fFitFontSize;
 };
