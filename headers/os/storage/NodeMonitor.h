@@ -61,7 +61,7 @@ enum {
 	B_STAT_MODIFICATION_TIME	= 0x20,
 	B_STAT_CREATION_TIME		= 0x40,
 	B_STAT_CHANGE_TIME			= 0x80,
-}};
+};
 
 
 /* C++ callable Prototypes
