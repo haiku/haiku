@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons media plugins ogg ;
 
 UsePrivateHeaders media ;
 
-SubDirHdrs $(SUBDIR) libogg ogg ;
+SubDirHdrs [ FDirName $(SUBDIR) libogg ] ;
 
 Addon ogg : media plugins :
 	OggReaderPlugin.cpp

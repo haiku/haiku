@@ -3,8 +3,11 @@
 
 #include "ReaderPlugin.h"
 #include "ogg/ogg.h"
+#include <map>
 
 namespace BPrivate { namespace media {
+
+typedef std::map<int,ogg_stream_state> ogg_stream_map;
 
 class oggReader : public Reader
 {
@@ -32,12 +35,9 @@ public:
 							 void **chunkBuffer, int32 *chunkSize,
 							 media_header *mediaHeader);
 									 
-	BPositionIO *Source() { return fSeekableSource; }
-
 private:
-	BPositionIO *	fSeekableSource;
-	ogg_stream_state fOggStreamState;
-	ogg_sync_state	fOggSyncState;
+	ogg_sync_state	fSync;
+	ogg_stream_map	fStreams;
 };
 
 
