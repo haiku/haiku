@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageWindow
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageWindow.h
 //
@@ -64,6 +64,8 @@ private:
 		long unsigned int msg, char shortcut, uint32 modifier,
 		char target, bool enabled);
 
+	BMenuItem* AddDelayItem(BMenu *pmenu, char *caption, float value, bool marked);
+
 	bool ToggleMenuItem(uint32 what);
 			
 	void SaveAs(BMessage *pmsg);
@@ -72,6 +74,7 @@ private:
 		// Handle save file panel message		
 	bool CanQuit();
 		// returns true if the window can be closed safely, false if not
+	void ToggleFullScreen();
 
 	BFilePanel *fpSavePanel;
 	BMenuBar *fpBar;
@@ -79,6 +82,8 @@ private:
 	entry_ref *fpRef;
 	ShowImageView *fpImageView;
 	ShowImageStatusView *fpStatusView;
+	bool fFullScreen;
+	BRect fWindowFrame;
 };
 
 #endif /* _ShowImageWindow_h */

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageApp
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageApp.cpp
 //
@@ -54,7 +54,7 @@ void
 ShowImageApp::AboutRequested()
 {
 	BAlert* pAlert = new BAlert("About ShowImage",
-		"OBOS ShowImage\n\nby Fernando F. Oliveira and Michael Wilber", "OK");
+		"OBOS ShowImage\n\nby Fernando F. Oliveira, Michael Wilber and Michael Pfeiffer", "OK");
 	pAlert->Go();
 }
 

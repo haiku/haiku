@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageApp
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageApp.h
 //

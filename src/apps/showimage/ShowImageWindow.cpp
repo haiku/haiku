@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageWindow
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageWindow.cpp
 //
@@ -42,6 +42,7 @@
 #include <TranslatorRoster.h>
 #include <Alert.h>
 #include <SupportDefs.h>
+#include <Screen.h>
 
 #include "ShowImageConstants.h"
 #include "ShowImageWindow.h"
@@ -53,11 +54,8 @@ ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 {
 	fpSavePanel = NULL;
 	fpRef = NULL;
-	
-	// add shortcuts
-	AddShortcut(B_UP_ARROW, B_COMMAND_KEY, new BMessage(MSG_FILE_PREV));
-	AddShortcut(B_DOWN_ARROW, B_COMMAND_KEY, new BMessage(MSG_FILE_NEXT));
-	
+	fFullScreen = false;
+		
 	// create menu bar	
 	fpBar = new BMenuBar(BRect(0, 0, Bounds().right, 20), "menu_bar");
 	LoadMenus(fpBar);
@@ -156,6 +154,29 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	BMenu *pmenu = new BMenu("File");
 	AddItemMenu(pmenu, "Open", MSG_FILE_OPEN, 'O', 0, 'A', true);
 	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Dia Show", MSG_DIA_SHOW, 0, 0, 'W', true);
+	BMenu* pDelay = new BMenu("Delay");
+	pDelay->SetRadioMode(true);
+	// Note: ShowImage loades images in window thread so it becomes unresponsive if
+	// dia show delay is too short! (Especially if loading the image takes as long as
+	// or longer than the dia show delay). Should load in background thread!
+	// AddDelayItem(pDelay, "Half a Second", 0.5, false);
+	// AddDelayItem(pDelay, "One Second", 1, false);
+	// AddDelayItem(pDelay, "Two Second", 2, false);
+	AddDelayItem(pDelay, "Three Seconds", 3, true);
+	AddDelayItem(pDelay, "Four Second", 4, false);
+	AddDelayItem(pDelay, "Five Seconds", 5, false);
+	AddDelayItem(pDelay, "Six Seconds", 6, false);
+	AddDelayItem(pDelay, "Seven Seconds", 7, false);
+	AddDelayItem(pDelay, "Eight Seconds", 8, false);
+	AddDelayItem(pDelay, "Nine Seconds", 9, false);
+	AddDelayItem(pDelay, "Ten Seconds", 10, false);
+	AddDelayItem(pDelay, "Tweenty Seconds", 20, false);
+	pmenu->AddItem(pDelay);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Next", MSG_FILE_NEXT, B_DOWN_ARROW, 0, 'W', true);
+	AddItemMenu(pmenu, "Previous", MSG_FILE_PREV, B_UP_ARROW, 0, 'W', true);
+	pmenu->AddSeparatorItem();
 	BMenu *pmenuSaveAs = new BMenu("Save As...", B_ITEMS_IN_COLUMN);
 	BTranslationUtils::AddTranslationItems(pmenuSaveAs, B_TRANSLATOR_BITMAP);
 		// Fill Save As submenu with all types that can be converted
@@ -188,7 +209,19 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 
 	pmenu = new BMenu("Image");
 	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Rotate Clockwise", MSG_ROTATE_CLOCKWISE, B_RIGHT_ARROW, 0, 'W', true);	
+	AddItemMenu(pmenu, "Rotate Anticlockwise", MSG_ROTATE_ACLKWISE, B_LEFT_ARROW, 0, 'W', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
+	pmenu->AddSeparatorItem();
+	AddItemMenu(pmenu, "Invert", MSG_INVERT, 0, 0, 'W', true);	
+	pbar->AddItem(pmenu);
+
+	pmenu = new BMenu("View");
 	AddItemMenu(pmenu, "Fit To Window Size", MSG_FIT_TO_WINDOW_SIZE, 0, 0, 'W', true);
+	AddItemMenu(pmenu, "Full Screen", MSG_FULL_SCREEN, B_ENTER, 0, 'W', true);
 	pbar->AddItem(pmenu);
 }
 
@@ -203,6 +236,22 @@ ShowImageWindow::AddItemMenu(BMenu *pmenu, char *caption, long unsigned int msg,
 	   pitem->SetTarget(be_app);
 	   
 	pitem->SetEnabled(benabled);	   
+	pmenu->AddItem(pitem);
+	
+	return pitem;
+}
+
+BMenuItem*
+ShowImageWindow::AddDelayItem(BMenu *pmenu, char *caption, float value, bool marked)
+{
+	BMenuItem* pitem;
+	BMessage* pmsg;
+	pmsg = new BMessage(MSG_DIA_SHOW_DELAY);
+	pmsg->AddFloat("value", value);
+	
+	pitem = new BMenuItem(caption, pmsg, 0);
+	
+	if (marked) pitem->SetMarked(true);	   
 	pmenu->AddItem(pitem);
 	
 	return pitem;
@@ -351,6 +400,40 @@ ShowImageWindow::MessageReceived(BMessage *pmsg)
 		case MSG_FILE_NEXT:
 			fpImageView->NextFile();
 			break;
+		
+		case MSG_ROTATE_CLOCKWISE:
+			fpImageView->Rotate(90);
+			break;
+		case MSG_ROTATE_ACLKWISE:
+			fpImageView->Rotate(270);
+			break;
+		case MSG_MIRROR_VERTICAL:
+			fpImageView->Mirror(true);
+			break;
+		case MSG_MIRROR_HORIZONTAL:
+			fpImageView->Mirror(false);
+			break;
+		case MSG_INVERT:
+			fpImageView->Invert();
+			break;
+		case MSG_DIA_SHOW:
+			if (ToggleMenuItem(pmsg->what)) {
+				fpImageView->StartDiaShow();
+			} else {
+				fpImageView->StopDiaShow();
+			}
+		case MSG_DIA_SHOW_DELAY:
+			{
+				float value;
+				if (pmsg->FindFloat("value", &value) == B_OK) {
+					fpImageView->SetDiaShowDelay(value);
+				}
+			}
+			break;
+			
+		case MSG_FULL_SCREEN:
+			ToggleFullScreen();
+			break;
 					
 		default:
 			BWindow::MessageReceived(pmsg);
@@ -437,6 +520,30 @@ ShowImageWindow::CanQuit()
 		return false;
 	else
 		return true;	
+}
+
+void
+ShowImageWindow::ToggleFullScreen()
+{
+	BRect frame;
+	fFullScreen = !fFullScreen;
+	if (fFullScreen) {
+		BScreen screen;
+		fWindowFrame = Frame();
+		frame = screen.Frame();
+		frame.top -= fpBar->Bounds().Height()+1;
+		frame.right += B_V_SCROLL_BAR_WIDTH;
+		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
+		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
+
+		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
+	} else {
+		frame = fWindowFrame;
+
+		SetFlags(Flags() & ~(B_NOT_RESIZABLE | B_NOT_MOVABLE));
+	}
+	MoveTo(frame.left, frame.top);
+	ResizeTo(frame.Width(), frame.Height());
 }
 
 bool

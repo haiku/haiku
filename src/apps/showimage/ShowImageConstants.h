@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageConstants
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageConstants.h
 //
@@ -49,6 +49,14 @@ const uint32 MSG_PAGE_PREV			= 'mPGP';
 const uint32 MSG_FILE_NEXT          = 'mFLN';
 const uint32 MSG_FILE_PREV          = 'mFLP';
 const uint32 MSG_FIT_TO_WINDOW_SIZE = 'mFWS';
+const uint32 MSG_ROTATE_CLOCKWISE   = 'mRCW';
+const uint32 MSG_ROTATE_ACLKWISE    = 'mRAC';
+const uint32 MSG_MIRROR_VERTICAL    = 'mMIV';
+const uint32 MSG_MIRROR_HORIZONTAL  = 'mMIH';
+const uint32 MSG_INVERT             = 'mINV';
+const uint32 MSG_DIA_SHOW           = 'mDIA';
+const uint32 MSG_DIA_SHOW_DELAY     = 'mDSD';
+const uint32 MSG_FULL_SCREEN        = 'mFSC';
 
 extern const char *APP_SIG;
 

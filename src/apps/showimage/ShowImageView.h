@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageView
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageView.h
 //
@@ -63,12 +63,32 @@ public:
 	void LastPage();
 	void NextPage();
 	void PrevPage();
-	void NextFile();
-	void PrevFile();
+	bool NextFile();
+	bool PrevFile();
+	void SetDiaShowDelay(float seconds);
+	void StartDiaShow();
+	void StopDiaShow();
+	
+	// Image manipulation
+	void Rotate(int degree); // 90 and 270 only
+	void Mirror(bool vertical);
+	void Invert();
 	
 private:
+	enum image_operation {
+		kRotateClockwise,
+		kRotateAntiClockwise,
+		kMirrorVertical,
+		kMirrorHorizontal,
+		kInvert
+	};
 	void InitPatterns();
 	void RotatePatterns();
+	void Notify(const char* status);
+	int32 BytesPerPixel(color_space cs) const;
+	inline void CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp);
+	inline void InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp);
+	void DoImageOperation(image_operation op);
 	BRect AlignBitmap() const;
 	void Setup(BRect r);
 	BPoint ImageToView(BPoint p) const;
@@ -76,7 +96,9 @@ private:
 	BRect ImageToView(BRect r) const;
 	bool IsImage(const entry_ref* pref);
 	void FreeEntries(BList* entries);
-	bool FindNextImage(BEntry* entry, bool next);
+	bool FindNextImage(BEntry* entry, bool next, bool rewind);
+	bool ShowNextImage(bool next, bool rewind);
+	bool FirstFile();
 	void ConstrainToImage(BPoint &point);
 	void UpdateSelectionRect(BPoint point, bool final);
 	void DrawBorder(BRect border);
@@ -96,6 +118,10 @@ private:
 	bool fbHasSelection;  // is fSelectionRect valid 
 	BRect fSelectionRect; // the selection in image space
 	pattern fPatternUp, fPatternDown, fPatternLeft, fPatternRight;
+	
+	bool fDiaShow;
+	int fDiaShowDelay;
+	int fDiaShowCountDown;
 };
 
 #endif /* _ShowImageView_h */

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 // ShowImageView
-// Written by Fernando Francisco de Oliveira, Michael Wilber
+// Written by Fernando Francisco de Oliveira, Michael Wilber, Michael Pfeiffer
 //
 // ShowImageView.cpp
 //
@@ -27,6 +27,7 @@
 /*****************************************************************************/
 
 #include <stdio.h>
+#include <Debug.h>
 #include <Message.h>
 #include <ScrollBar.h>
 #include <StopWatch.h>
@@ -116,9 +117,18 @@ ShowImageView::RotatePatterns()
 void
 ShowImageView::Pulse()
 {
-	RotatePatterns();
 	if (fbHasSelection) {
+		RotatePatterns();
 		DrawSelectionBox(fSelectionRect);
+	}
+	if (fDiaShow) {
+		fDiaShowCountDown --;
+		if (fDiaShowCountDown <= 0) {
+			fDiaShowCountDown = fDiaShowDelay;
+			if (!NextFile()) {
+				FirstFile();
+			}
+		}
 	}
 }
 
@@ -133,6 +143,8 @@ ShowImageView::ShowImageView(BRect rect, const char *name, uint32 resizingMode,
 	fDocumentCount = 1;
 	fbHasSelection = false;
 	fResizeToViewBounds = false;
+	fDiaShow = false;
+	SetDiaShowDelay(3); // 3 seconds
 	
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetHighColor(kborderColor);
@@ -166,6 +178,21 @@ ShowImageView::IsImage(const entry_ref *pref)
 		return false;
 		
 	return true;
+}
+
+// send message to parent about new image
+void ShowImageView::Notify(const char* status)
+{
+	BMessage msg(MSG_UPDATE_STATUS);
+	if (status != NULL) {
+		msg.AddString("status", status);
+	}
+	msg.AddRef("ref", &fCurrentRef);
+	BMessenger msgr(Window());
+	msgr.SendMessage(&msg);
+
+	FixupScrollBars();
+	Invalidate();
 }
 
 void
@@ -215,15 +242,7 @@ ShowImageView::SetImage(const entry_ref *pref)
 	else
 		fDocumentCount = 1;
 		
-	// send message to parent about new image
-	BMessage msg(MSG_UPDATE_STATUS);
-	msg.AddString("status", info.name);
-	msg.AddRef("ref", &fCurrentRef);
-	BMessenger msgr(Window());
-	msgr.SendMessage(&msg);
-
-	FixupScrollBars();
-	Invalidate();
+	Notify(info.name);
 }
 
 void
@@ -415,7 +434,11 @@ ShowImageView::UpdateSelectionRect(BPoint point, bool final) {
 		}
 	}
 	if (oldSelection != fSelectionRect || !fbHasSelection) {
-		Invalidate();
+		BRect updateRect;
+		updateRect = oldSelection | fSelectionRect;
+		updateRect = ImageToView(updateRect);
+		updateRect.InsetBy(-PEN_SIZE, -PEN_SIZE);
+		Invalidate(updateRect);
 	}
 }
 
@@ -548,8 +571,9 @@ ShowImageView::FreeEntries(BList* entries)
 // Notes: BDirectory::GetNextEntry() must not necessary
 // return entries sorted by name, thou BFS does. 
 bool
-ShowImageView::FindNextImage(BEntry* image, bool next)
+ShowImageView::FindNextImage(BEntry* image, bool next, bool rewind)
 {
+	ASSERT(next || !rewind);
 	BEntry curImage(&fCurrentRef);
 	BEntry entry;
 	BDirectory parent;
@@ -559,19 +583,23 @@ ShowImageView::FindNextImage(BEntry* image, bool next)
 		return false;
 
 	while (parent.GetNextEntry(&entry) == B_OK) {
-		if (entry == curImage) {
-			// found current image
+		if (rewind || entry == curImage) {
+			// start with first entry or found current image
 			if (next) {
+				// start with next entry
+				if (!rewind && parent.GetNextEntry(&entry) != B_OK) {
+					break;
+				}
 				// find next image in directory
-				while (parent.GetNextEntry(&entry) == B_OK) {
+				do {
 					entry_ref ref;
 					if (entry.GetRef(&ref) == B_OK && IsImage(&ref)) {
 						*image = entry;
 						return true;
 					}
-				}
+				} while (parent.GetNextEntry(&entry) == B_OK);
 			} else {
-				// find privous image in directory
+				// find previous image in directory
 				for (int32 i = entries.CountItems() - 1; i >= 0; i --) {
 					BEntry* entry = (BEntry*)entries.ItemAt(i);
 					entry_ref ref;
@@ -582,6 +610,7 @@ ShowImageView::FindNextImage(BEntry* image, bool next)
 					}
 				}
 			}
+			break;
 		}
 		if (!next) {			
 			// record entries if we search for previous file
@@ -592,24 +621,215 @@ ShowImageView::FindNextImage(BEntry* image, bool next)
 	return false;
 }
 
-void
-ShowImageView::NextFile()
+bool
+ShowImageView::ShowNextImage(bool next, bool rewind)
 {
 	BEntry image;
 	entry_ref ref;
 	
-	if (FindNextImage(&image, true) && image.GetRef(&ref) == B_OK) {
-		SetImage(&ref);
+	if (FindNextImage(&image, next, rewind) && image.GetRef(&ref) == B_OK) {
+		SetImage(&ref); 
+		return true;
+	}
+	return false;
+}
+
+bool
+ShowImageView::NextFile()
+{
+	return ShowNextImage(true, false);
+}
+
+bool
+ShowImageView::PrevFile()
+{
+	return ShowNextImage(false, false);
+}
+
+bool
+ShowImageView::FirstFile()
+{
+	return ShowNextImage(true, true);
+}
+
+void
+ShowImageView::SetDiaShowDelay(float seconds)
+{
+	fDiaShowDelay = (int)(seconds * 10.0);
+}
+
+void
+ShowImageView::StartDiaShow()
+{
+	fDiaShow = true; fDiaShowCountDown = fDiaShowDelay;
+}
+
+void
+ShowImageView::StopDiaShow()
+{
+	fDiaShow = false;
+}
+
+int32 
+ShowImageView::BytesPerPixel(color_space cs) const
+{
+	switch (cs) {
+		case B_RGB32:      // fall through
+		case B_RGB32_BIG:  // fall through
+		case B_RGBA32:     // fall through
+		case B_RGBA32_BIG: return 4;
+
+		case B_RGB24_BIG:  // fall through
+		case B_RGB24:      return 3;
+
+		case B_RGB16:      // fall through
+		case B_RGB16_BIG:  // fall through
+		case B_RGB15:      // fall through
+		case B_RGB15_BIG:  // fall through
+		case B_RGBA15:     // fall through
+		case B_RGBA15_BIG: return 2;
+
+		case B_GRAY8:      // fall through
+		case B_CMAP8:      return 1;
+		case B_GRAY1:      return 0;
+		default: return -1;
 	}
 }
 
 void
-ShowImageView::PrevFile()
+ShowImageView::CopyPixel(uchar* dest, int32 destX, int32 destY, int32 destBPR, uchar* src, int32 x, int32 y, int32 bpr, int32 bpp)
 {
-	BEntry image;
-	entry_ref ref;
+	dest += destBPR * destY + destX * bpp;
+	src += bpr * y + x * bpp;
+	memcpy(dest, src, bpp);
+}
 
-	if (FindNextImage(&image, false) && image.GetRef(&ref) == B_OK) {
-		SetImage(&ref);
+// FIXME: In color space with alpha channel the alpha value should not be inverted!
+// This could be a problem when image is saved and opened in another application.
+// Note: For B_CMAP8 InvertPixel inverts the color index not the color value!
+void
+ShowImageView::InvertPixel(int32 x, int32 y, uchar* dest, int32 destBPR, uchar* src, int32 bpr, int32 bpp)
+{
+	dest += destBPR * y + x * bpp;
+	src += bpr * y + x * bpp;
+	for (; bpp > 0; bpp --, dest ++, src ++) {
+		*dest = ~*src;
+	}	
+}
+
+// DoImageOperation supports only color spaces with bytes per pixel >= 1
+// See above for limitations about kInvert
+void
+ShowImageView::DoImageOperation(image_operation op) 
+{
+	color_space cs;
+	int32 bpp;
+	BBitmap* bm;
+	int32 width, height;
+	uchar* src;
+	uchar* dest;
+	int32 bpr, destBPR;
+	int32 x, y, destX, destY;
+	BRect rect;
+	
+	if (fpBitmap == NULL) return;
+	
+	cs = fpBitmap->ColorSpace();
+	bpp = BytesPerPixel(cs);	
+	if (bpp < 1) return;
+	
+	width = fpBitmap->Bounds().IntegerWidth();
+	height = fpBitmap->Bounds().IntegerHeight();
+	
+	if (op == kRotateClockwise || op == kRotateAntiClockwise) {
+		rect.Set(0, 0, height, width);
+	} else {
+		rect.Set(0, 0, width, height);
 	}
+	
+	bm = new BBitmap(rect, cs);
+	if (bm == NULL) return;
+	
+	src = (uchar*)fpBitmap->Bits();
+	dest = (uchar*)bm->Bits();
+	bpr = fpBitmap->BytesPerRow();
+	destBPR = bm->BytesPerRow();
+	
+	switch (op) {
+		case kRotateClockwise:
+			for (y = 0; y <= height; y ++) {
+				for (x = 0; x <= width; x ++) {
+					destX = height - y;
+					destY = x;
+					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
+				}
+			}
+			break;
+		case kRotateAntiClockwise:
+			for (y = 0; y <= height; y ++) {
+				for (x = 0; x <= width; x ++) {
+					destX = y;
+					destY = width - x;
+					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
+				}
+			}
+			break;
+		case kMirrorHorizontal:
+			for (y = 0; y <= height; y ++) {
+				for (x = 0; x <= width; x ++) {
+					destX = x;
+					destY = height - y;
+					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
+				}
+			}
+			break;
+		case kMirrorVertical:
+			for (y = 0; y <= height; y ++) {
+				for (x = 0; x <= width; x ++) {
+					destX = width - x;
+					destY = y;
+					CopyPixel(dest, destX, destY, destBPR, src, x, y, bpr, bpp);
+				}
+			}
+			break;
+		case kInvert:
+			for (y = 0; y <= height; y ++) {
+				for (x = 0; x <= width; x ++) {
+					InvertPixel(x, y, dest, destBPR, src, bpr, bpp);
+				}
+			}
+			break;
+	}
+
+	// set new bitmap
+	delete fpBitmap; fpBitmap = bm; 
+	// remove selection
+	fbHasSelection = false;
+	Notify(NULL);	
+}
+
+void
+ShowImageView::Rotate(int degree)
+{
+	if (degree == 90) {
+		DoImageOperation(kRotateClockwise);
+	} else if (degree == 270) {
+		DoImageOperation(kRotateAntiClockwise);
+	}
+}
+
+void
+ShowImageView::Mirror(bool vertical) 
+{
+	if (vertical) {
+		DoImageOperation(kMirrorVertical);
+	} else {
+		DoImageOperation(kMirrorHorizontal);
+	}
+}
+
+void
+ShowImageView::Invert()
+{
+	DoImageOperation(kInvert);
 }
