@@ -123,17 +123,16 @@ BBufferIO::ReadAt(off_t pos, void *buffer, size_t size)
 		|| pos > m_buffer_start + m_buffer_used)
 	{
 		// ...cache as much as we can from the stream
-		ssize_t readSize = m_stream->ReadAt(pos, m_buffer, m_buffer_phys);
-		m_buffer_used += readSize;
-				
-		if (readSize > 0)
+		m_buffer_used = m_stream->ReadAt(pos, m_buffer, m_buffer_phys);
+					
+		if (m_buffer_used > 0)
 			m_buffer_start = pos; // The data is buffered starting from this offset
 	}
 	 
 	size = min_c(size, m_buffer_used);	
 	
 	// copy data from the cache to the given buffer
-	memcpy(buffer, m_buffer + pos, size);
+	memcpy(buffer, m_buffer + pos - m_buffer_start, size);
 	
 	return size;
 }
