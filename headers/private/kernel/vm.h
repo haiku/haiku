@@ -61,10 +61,6 @@ int vm_get_page_mapping(aspace_id aid, addr vaddr, addr *paddr);
 int vm_get_physical_page(addr paddr, addr *vaddr, int flags);
 int vm_put_physical_page(addr vaddr);
 
-int user_memcpy(void *to, const void *from, size_t size);
-int user_strlcpy(char *to, const char *from, size_t size);
-int user_memset(void *s, char c, size_t count);
-
 area_id _user_create_area(const char *name, void **address, uint32 addressSpec,
 			size_t size, uint32 lock, uint32 protection);
 status_t _user_delete_area(area_id area);

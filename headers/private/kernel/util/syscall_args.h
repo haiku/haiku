@@ -3,6 +3,7 @@
 #ifndef _SYSCALL_ARGS_H
 #define _SYSCALL_ARGS_H
 
+#include <KernelExport.h>
 #include <vm.h>
 
 // Hack to be able to use the IS_USER_ADDRESS macro when compiling for R5.
