@@ -33,10 +33,12 @@ status_t parse_pins ()
 	/* preset PINS read status to failed */
 	si->ps.pins_status = B_ERROR;
 
+	LOG(2,("INFO: cardROM size: %dKb\n", (si->rom.size / 1024)));
+
 	/* check the validity of PINS */
 	LOG(2,("INFO: Reading PINS info\n"));
-	rom = (uint8 *) si->rom_mirror;
-	/* check BIOS signature */
+	rom = (uint8 *) si->rom.mirror;
+	/* check BIOS signature - this is defined in the PCI standard */
 	if (rom[0]!=0x55 || rom[1]!=0xaa)
 	{
 		LOG(8,("INFO: BIOS signiture not found\n"));

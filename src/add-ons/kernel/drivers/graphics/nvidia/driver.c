@@ -267,11 +267,18 @@ static settings current_settings = { // see comments in nv.settings
 	false,		// force_pci
 };
 
-static void dumprom (void *rom, size_t size)
+static void dumprom (void *rom, uint32 size)
 {
-	int fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
+	int fd;
+	uint32 cnt;
+	
+	fd = open ("/boot/home/" DRIVER_PREFIX ".rom", O_WRONLY | O_CREAT, 0666);
 	if (fd < 0) return;
-	write (fd, rom, size);
+
+	/* apparantly max. 32kb may be written at once;
+	 * the ROM size is a multiple of that anyway. */
+	for (cnt = 0; (cnt < size); cnt += 32768)
+		write (fd, ((void *)(((uint8 *)rom) + cnt)), 32768);
 	close (fd);
 }
 
@@ -446,24 +453,25 @@ static status_t map_device(device_info *di)
 //	physical_entry physical_memory[2];
 //	#define G400_DMA_BUFFER_SIZE 1024*1024
 
-	/*variables for making copy of ROM*/
+	/* variables for making copy of ROM */
 	char * rom_temp;
 	area_id rom_area;
+	uint32 rom_size;
 
 	/* Nvidia cards have registers in [0] and framebuffer in [1] */
 	int registers = 0;
 	int frame_buffer = 1;
 //	int pseudo_dma = 2;
 
-	/* enable memory mapped IO, disable VGA I/O - this is standard*/
-	tmpUlong = get_pci(PCI_command, 4);
+	/* enable memory mapped IO, disable VGA I/O - this is defined in the PCI standard */
+	tmpUlong = get_pci(PCI_command, 2);
 	/* enable PCI access */
 	tmpUlong |= PCI_command_memory;
 	/* enable busmastering */
 	tmpUlong |= PCI_command_master;
 	/* disable ISA I/O access */
 	tmpUlong &= ~PCI_command_io;
-	set_pci(PCI_command, 4, tmpUlong);
+	set_pci(PCI_command, 2, tmpUlong);
 
  	/*work out which version of BeOS is running*/
  	get_system_info(&sysinfo);
@@ -500,15 +508,15 @@ static status_t map_device(device_info *di)
 		di->pcii.vendor_id, di->pcii.device_id,
 		di->pcii.bus, di->pcii.device, di->pcii.function);
 
-	/*place ROM over the fbspace (this is definately safe)*/
-	tmpUlong = di->pcii.u.h0.base_registers[frame_buffer];
+	/* enable ROM decoding - this is defined in the PCI standard */
+	tmpUlong = get_pci(PCI_rom_base, 4);
 	tmpUlong |= 0x00000001;
 	set_pci(PCI_rom_base, 4, tmpUlong);
 
 	rom_area = map_physical_memory(
 		buffer,
-		(void *)di->pcii.u.h0.base_registers[frame_buffer],
-		32768,
+		(void *)di->pcii.u.h0.rom_base_pci,
+		di->pcii.u.h0.rom_size,
 		B_ANY_KERNEL_ADDRESS,
 		B_READ_AREA,
 		(void **)&(rom_temp)
@@ -521,12 +529,19 @@ static status_t map_device(device_info *di)
 		return rom_area;
 	}
 
-	/* make a copy of ROM for future reference*/
-	memcpy (si->rom_mirror, rom_temp, 32768);
-	if (current_settings.dumprom) dumprom (rom_temp, 32768);
+	/* dump ROM to file if selected in nv.settings */
+	if (current_settings.dumprom) dumprom (rom_temp, di->pcii.u.h0.rom_size);
+	/* we reserved 128Kb for the ROM mirror, but note actual size for reference */
+	si->rom.size = di->pcii.u.h0.rom_size;
+	/* make a copy of ROM for future reference, but truncate our mirror if needed */
+	rom_size = si->rom.size;
+	if (rom_size > (128 * 1024)) rom_size = (128 * 1024);
+	memcpy (si->rom.mirror, rom_temp, rom_size);
 
-	/*disable ROM and delete the area*/
-	set_pci(PCI_rom_base,4,0);
+	/* disable ROM decoding - this is defined in the PCI standard, and delete the area */
+	tmpUlong = get_pci(PCI_rom_base, 4);
+	tmpUlong &= 0xfffffffe;
+	set_pci(PCI_rom_base, 4, tmpUlong);
 	delete_area(rom_area);
 
 	/* work out a name for the framebuffer mapping*/

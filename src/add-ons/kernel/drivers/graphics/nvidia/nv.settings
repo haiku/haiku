@@ -14,7 +14,7 @@ hardcursor true			# if true use on-chip cursor capabilities
 #logmask   0x00000000	# nothing logged, is default
 #logmask   0x08000604	# log overlay use in full
 #logmask 	0xffffffff		# log everything
-dumprom    false        		# dump bios rom in ~/nv.rom: probably not functional yet
+dumprom    false        		# dump bios rom in ~/nv.rom
 switchhead false			# switch head assignment (dualhead cards only)
 force_pci	false			# block AGP mode use if true (AGP cards only)
 #--------- that's all.

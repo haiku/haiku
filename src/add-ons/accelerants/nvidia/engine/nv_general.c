@@ -808,7 +808,9 @@ static status_t nvxx_general_powerup()
 
 	/* initialize the shared_info PINS struct */
 	result = parse_pins();
-	if (result != B_OK) fake_pins();
+//	if (result != B_OK) fake_pins();
+//temporary:
+	fake_pins();
 
 	/* log the PINS struct settings */
 	dump_pins();
