@@ -740,7 +740,7 @@ rule Addon
 
 rule R5KernelAddon
 {
-	# R5KernelAddon <name> : <relpath> : <sources> ;	
+	# R5KernelAddon <name> : <relpath> : <sources> : <static-libraries> ;	
 
 	local sources = $(3) ;
 
@@ -749,7 +749,7 @@ rule R5KernelAddon
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
 								-fno-exceptions -fno-rtti ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
-	LinkSharedOSLibs $(1) : /boot/develop/lib/x86/_KERNEL_ ;
+	LinkSharedOSLibs $(1) : $(4) /boot/develop/lib/x86/_KERNEL_ ;
 }
 
 rule Translator
@@ -1709,7 +1709,7 @@ actions KernelLd
 
 rule KernelAddon
 {
-	# KernelAddon <name> : <relpath> : <sources> ;	
+	# KernelAddon <name> : <relpath> : <sources> : <static-libraries> ;	
 
 	local sources = $(3) ;
 
@@ -1719,7 +1719,7 @@ rule KernelAddon
 	ObjectC++Flags $(sources) : -D_KERNEL_MODE=1 -no-fpic
 								-fno-exceptions -fno-rtti ;
 	LINKFLAGS on $(1) = [ on $(1) return $(LINKFLAGS) ] -nostdlib ;
-	LinkSharedOSLibs $(1) : $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
+	LinkSharedOSLibs $(1) : $(4) $(OBOS_TOP)/objects/$(OBOS_ARCH).$(OBOS_VERSION)/kernel/kernel.so ;
 		# ToDo this has to be changed!
 }
 
