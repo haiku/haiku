@@ -1,17 +1,24 @@
-/* 
-** Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2005, Axel Dörfler, axeld@pinc-software.de
+ * Copyright 2003, Jeff Ward, jeff@r2d2.stcloudstate.edu. All rights reserved.
+ *
+ * Distributed under the terms of the MIT License.
+ */
 #ifndef KERNEL_ARCH_REAL_TIME_CLOCK_H
 #define KERNEL_ARCH_REAL_TIME_CLOCK_H
 
 
 #include <kernel.h>
 
+struct kernel_args;
+struct real_time_data;
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+status_t arch_rtc_init(struct kernel_args *args, struct real_time_data *data);
 
 void arch_rtc_set_hw_time(uint32 seconds);
 	// Set HW clock to 'seconds' since 1/1/1970
