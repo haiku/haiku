@@ -1,10 +1,10 @@
 /*
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-**
-** calculate_cpu_conversion_factor() was written by Travis Geiselbrecht and
-** licensed under the NewOS license.
-*/
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * calculate_cpu_conversion_factor() was written by Travis Geiselbrecht and
+ * licensed under the NewOS license.
+ */
 
 
 #include "cpu.h"
@@ -20,7 +20,7 @@
 #include <string.h>
 
 
-#define TRACE_CPU
+//#define TRACE_CPU
 #ifdef TRACE_SMP
 #	define TRACE(x) dprintf x
 #else
@@ -36,7 +36,7 @@ uint32 gTimeConversionFactor;
 #define TIMER_CLKNUM_HZ (14318180/12)
 
 
-static uint32
+static void
 calculate_cpu_conversion_factor()
 {
 	uint32 s_low, s_high;
@@ -206,7 +206,8 @@ not_so_quick_sample:
 		dprintf("CPU at %Ld.%03Ld MHz\n", p3/expired/1000000LL, ((p3/expired)%1000000LL)/1000LL);
 #endif
 
-	return gTimeConversionFactor;
+	gKernelArgs.arch_args.system_time_cv_factor = gTimeConversionFactor;
+	gKernelArgs.arch_args.cpu_clock_speed = p3/expired;
 }
 
 
@@ -244,7 +245,8 @@ cpu_init()
 	if (check_cpu_features() != B_OK)
 		panic("You need a Pentium or higher in order to boot!\n");
 
-	gKernelArgs.arch_args.system_time_cv_factor = calculate_cpu_conversion_factor();
+	calculate_cpu_conversion_factor();
+
 	gKernelArgs.num_cpus = 1;
 		// this will eventually be corrected later on
 }
