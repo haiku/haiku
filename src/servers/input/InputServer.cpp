@@ -1426,7 +1426,7 @@ InputServer::StartStopDevices(const char *name, input_device_type type, bool doS
 		if (!item)
 			continue;
 			
-		if ((name && strcmp(name, item->mDev.name) == 0) || item->mDev.type == type) {
+		if ((name && strcmp(name, item->mDev.name) == 0) || (!name && item->mDev.type == type)) {
 			if (!item->mIsd)
 				return B_ERROR;
 				
