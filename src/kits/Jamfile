@@ -43,6 +43,8 @@ LinkSharedOSLibs libopenbeos.so :
 #
 SharedLibrary beadapter :
 	LibBeAdapter.cpp
+	strlcat.c
+	strlcpy.c
 ;
 LinkSharedOSLibs libbeadapter.so :
 	be
@@ -57,6 +59,10 @@ File <boot!home!config!lib>libopenbeos.so : libopenbeos.so ;
 File <boot!home!config!lib>libbeadapter.so : libbeadapter.so ;
 Includes <boot!home!config!lib>libopenbeos.so
 	: <boot!home!config!lib>libbeadapter.so ;
+
+SEARCH on [ FGristFiles
+		strlcat.c strlcpy.c
+	] = [ FDirName $(OBOS_TOP) src kernel libroot posix string ] ;
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
