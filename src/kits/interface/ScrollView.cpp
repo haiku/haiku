@@ -15,7 +15,7 @@ static const float kPlainBorderSize = 1;
 BScrollView::BScrollView(const char *name, BView *target, uint32 resizeMask,
 	uint32 flags, bool horizontal, bool vertical, border_style border)
 	: BView(CalcFrame(target, horizontal, vertical, border), name,
-		ModFlags(flags, border), resizeMask),
+		ModifyFlags(flags, border), resizeMask),
 	fTarget(target),
 	fHorizontalScrollBar(NULL),
 	fVerticalScrollBar(NULL),
@@ -54,10 +54,25 @@ BScrollView::BScrollView(const char *name, BView *target, uint32 resizeMask,
 }
 
 
-BScrollView::BScrollView(BMessage *data)
-	: BView(data)
+BScrollView::BScrollView(BMessage *archive)
+	: BView(archive),
+	fHighlighted(false)
 {
-	// ToDo
+	int32 border;
+	fBorder = archive->FindInt32("_style", &border) == B_OK ?
+		(border_style)border : B_FANCY_BORDER;
+
+	// In a shallow archive, we may not have a target anymore. We must
+	// be prepared for this case
+
+	// don't confuse our scroll bars with our (eventual) target
+	if (!archive->FindBool("_no_target_"))
+		fTarget = ChildAt(0);
+	else
+		fTarget = NULL;
+
+	fPreviousWidth = uint16(Bounds().Width());
+	fPreviousHeight = uint16(Bounds().Height());
 }
 
 
@@ -67,25 +82,42 @@ BScrollView::~BScrollView()
 
 
 BArchivable *
-BScrollView::Instantiate(BMessage *data)
+BScrollView::Instantiate(BMessage *archive)
 {
-	// ToDo
+	if (validate_instantiation(archive, "BScrollView"))
+		return new BScrollView(archive);
+
 	return NULL;
 }
 
 
 status_t
-BScrollView::Archive(BMessage *data, bool deep) const
+BScrollView::Archive(BMessage *archive, bool deep) const
 {
-	// ToDo
-	return B_ERROR;
+	status_t status = BView::Archive(archive, deep);
+	if (status != B_OK)
+		return status;
+
+	// If this is a deep archive, the BView class will take care
+	// of our children.
+
+	if (status == B_OK && fBorder != B_FANCY_BORDER)
+		status = archive->AddInt32("_style", Border());
+	if (status == B_OK && fTarget == NULL)
+		status = archive->AddBool("_no_target_", true);
+
+	// The highlighted state is not archived, but since it is
+	// usually (or should be) used to indicate focus, this
+	// is probably the right thing to do.
+
+	return status;
 }
 
 
 void
 BScrollView::AttachedToWindow()
 {
-	// ToDo: check for the document knob and if we have two scrollers
+	BView::AttachedToWindow();
 }
 
 
@@ -186,7 +218,22 @@ BScrollView::IsBorderHighlighted() const
 void
 BScrollView::SetTarget(BView *target)
 {
+	if (fTarget != NULL) {
+		fTarget->TargetedByScrollView(NULL);
+		RemoveChild(fTarget);
+
+		// ToDo: investigate if we are supposed to delete it
+		//delete fTarget;
+	}
+
 	fTarget = target;
+	if (target != NULL) {
+		AddChild(target, ChildAt(0));
+			// This way, we are making sure that the target will
+			// be added top most in the list (which is important
+			// for unarchiving)
+		target->TargetedByScrollView(this);
+	}
 }
 
 
@@ -256,12 +303,15 @@ BScrollView::ResizeToPreferred()
 void 
 BScrollView::GetPreferredSize(float *_width, float *_height)
 {
-	float width, height;
-	fTarget->GetPreferredSize(&width, &height);
-
 	BRect frame = CalcFrame(fTarget, fHorizontalScrollBar, fVerticalScrollBar, fBorder);
-	frame.right += width - fTarget->Frame().Width();
-	frame.bottom += height - fTarget->Frame().Height();
+
+	if (fTarget != NULL) {
+		float width, height;
+		fTarget->GetPreferredSize(&width, &height);
+
+		frame.right += width - fTarget->Frame().Width();
+		frame.bottom += height - fTarget->Frame().Height();
+	}
 
 	if (_width)
 		*_width = frame.Width();
@@ -281,7 +331,8 @@ BScrollView::GetPreferredSize(float *_width, float *_height)
 BRect
 BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_style border)
 {
-	BRect frame = target->Frame();
+	BRect frame = target != NULL ? frame = target->Frame() : BRect(0, 0, 80, 80);
+
 	if (vertical)
 		frame.right += B_V_SCROLL_BAR_WIDTH;
 	if (horizontal)
@@ -308,12 +359,10 @@ BScrollView::CalcFrame(BView *target, bool horizontal, bool vertical, border_sty
 
 /** This method changes the "flags" argument as passed on to
  *	the BView constructor.
- *	Don't ask me why it's not as static as CalcFrame() is; so
- *	much for consistency.
  */
 
 int32
-BScrollView::ModFlags(int32 flags, border_style border)
+BScrollView::ModifyFlags(int32 flags, border_style border)
 {
 	if (border != B_NO_BORDER)
 		return flags | B_WILL_DRAW;
