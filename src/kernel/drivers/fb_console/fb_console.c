@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -322,7 +322,7 @@ console_close(void * cookie)
 static status_t
 console_read(void * cookie, off_t pos, void *buffer, size_t *_length)
 {
-	ssize_t bytesRead = _kern_read(console.keyboard_fd, 0, buffer, *_length);
+	ssize_t bytesRead = read_pos(console.keyboard_fd, 0, buffer, *_length);
 	if (bytesRead >= 0) {
 		*_length = bytesRead;
 		return B_OK;
@@ -507,7 +507,7 @@ fb_console_dev_init(kernel_args *ka)
 		repaint();
 
 		mutex_init(&console.lock, "console_lock");
-		console.keyboard_fd = _kern_open("/dev/keyboard", 0);
+		console.keyboard_fd = open("/dev/keyboard", O_RDONLY);
 		if (console.keyboard_fd < 0)
 			panic("fb_console_dev_init: error opening /dev/keyboard\n");
 
