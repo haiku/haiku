@@ -28,6 +28,19 @@ invert rectangle
 blit
 */
 
+static void nv_start_dma(void);
+static void nv_acc_assert_fifo_dma(void);
+
+/* FIFO channel pointers */
+/* note:
+ * every instance of the accelerant needs to have it's own pointers, as the registers
+ * are cloned to different adress ranges for each one */
+static cmd_nv_rop5_solid* nv_rop5_solid_ptr;
+static cmd_nv_image_black_rectangle* nv_image_black_rectangle_ptr;
+static cmd_nv_image_pattern* nv_image_pattern_ptr;
+static cmd_nv_image_blit* nv_image_blit_ptr;
+static cmd_nv3_gdi_rectangle_text* nv3_gdi_rectangle_text_ptr;
+
 status_t nv_acc_wait_idle_dma()
 {
 	/* wait until engine completely idle */
@@ -47,9 +60,6 @@ status_t nv_acc_init_dma()
 {
 	uint16 cnt;
 	//fixme: move to shared info:
-	uint32 *cmdbuffer;
-	uint32 put = 0;
-	uint32 current;
 	uint32 max;
 	uint32 free;
 
@@ -544,63 +554,181 @@ status_t nv_acc_init_dma()
 	/* enable PFIFO caches reassign */
 	ACCW(PF_CACHES, 0x00000001);
 
+	/*** setup acceleration engine command shortcuts (so via fifo) ***/
+	/* set object handles (b31 = 1 selects 'config' function?) */
+	/* note:
+	 * probably depending on some other setup, there are 8 or 32 FIFO channels
+	 * available. Assuming the current setup only has 8 channels because the 'rest'
+	 * isn't setup here... */
+	si->engine.fifo.handle[0] = NV_ROP5_SOLID;
+	si->engine.fifo.handle[1] = NV_IMAGE_BLACK_RECTANGLE;
+	si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
+	si->engine.fifo.handle[3] = NV1_IMAGE_FROM_CPU;
+	si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
+	si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
+	si->engine.fifo.handle[6] = NV1_RENDER_SOLID_LIN;
+	si->engine.fifo.handle[7] = NV4_DX5_TEXTURE_TRIANGLE;
+	/* preset no FIFO channels assigned to cmd's */
+	for (cnt = 0; cnt < 0x20; cnt++)
+	{
+		si->engine.fifo.ch_ptr[cnt] = 0;
+	}
+	/* set handle's pointers to their assigned FIFO channels */
+	for (cnt = 0; cnt < 0x08; cnt++)
+	{
+		si->engine.fifo.ch_ptr[((si->engine.fifo.handle[cnt]) & 0x0000001f)] =
+			(NVACC_FIFO + (cnt * 0x00002000));
+	}
+
 	/* init DMA command buffer pointer */
-	/*si->dma.*/cmdbuffer = (uint32 *)((char *)si->framebuffer +
+	si->engine.dma.cmdbuffer = (uint32 *)((char *)si->framebuffer +
 		((si->ps.memory_size - 1) & 0xffff8000));
-	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n", ((uint32)cmdbuffer)));
+	LOG(4,("ACC_DMA: command buffer is at adress $%08x\n",
+		((uint32)(si->engine.dma.cmdbuffer))));
 
 	/* init FIFO via DMA command buffer: */
 	/* set number of cmd words (b18 - ??) and FIFO offset for first cmd word (b0 - 17) */
 	/* note:
 	 * this system uses auto-increments for the FIFO offset adresses. Make sure
 	 * to set new adresses if jumps are needed. */
-	cmdbuffer[0x00] = (1 << 18) | 0x00000;
+	si->engine.dma.cmdbuffer[0x00] = (1 << 18) | 0x00000;
 	/* send actual cmd word */
-	cmdbuffer[0x01] = NV_ROP5_SOLID;
+	si->engine.dma.cmdbuffer[0x01] = si->engine.fifo.handle[0]; /* Raster OPeration */
 
 	/* etc.. */
-	cmdbuffer[0x02] = (1 << 18) | 0x02000;
-	cmdbuffer[0x03] = NV_IMAGE_BLACK_RECTANGLE;
+	si->engine.dma.cmdbuffer[0x02] = (1 << 18) | 0x02000;
+	si->engine.dma.cmdbuffer[0x03] = si->engine.fifo.handle[1]; /* Clip */
 
-	cmdbuffer[0x04] = (1 << 18) | 0x04000;
-	cmdbuffer[0x05] = NV_IMAGE_PATTERN;
+	si->engine.dma.cmdbuffer[0x04] = (1 << 18) | 0x04000;
+	si->engine.dma.cmdbuffer[0x05] = si->engine.fifo.handle[2]; /* Pattern */
 
-	cmdbuffer[0x06] = (1 << 18) | 0x06000;
-//	cmdbuffer[0x07] = NV1_IMAGE_FROM_CPU;
+	si->engine.dma.cmdbuffer[0x06] = (1 << 18) | 0x06000;
+//	si->engine.dma.cmdbuffer[0x07] = si->engine.fifo.handle[3]; /* Pixmap (not used or 3D only?) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-	cmdbuffer[0x07] = NV_ROP5_SOLID;
+	si->engine.dma.cmdbuffer[0x07] = si->engine.fifo.handle[0];
 
-	cmdbuffer[0x08] = (1 << 18) | 0x08000;
-	cmdbuffer[0x09] = NV_IMAGE_BLIT;
+	si->engine.dma.cmdbuffer[0x08] = (1 << 18) | 0x08000;
+	si->engine.dma.cmdbuffer[0x09] = si->engine.fifo.handle[4]; /* Blit */
 
-	cmdbuffer[0x0a] = (1 << 18) | 0x0a000;
-	cmdbuffer[0x0b] = NV3_GDI_RECTANGLE_TEXT;
+	si->engine.dma.cmdbuffer[0x0a] = (1 << 18) | 0x0a000;
+	si->engine.dma.cmdbuffer[0x0b] = si->engine.fifo.handle[5]; /* Bitmap */
 
-	cmdbuffer[0x0c] = (1 << 18) | 0x0c000;
-//	cmdbuffer[0x0d] = NV1_RENDER_SOLID_LIN;
+	si->engine.dma.cmdbuffer[0x0c] = (1 << 18) | 0x0c000;
+//	si->engine.dma.cmdbuffer[0x0d] = si->engine.fifo.handle[6]; /* Line (not used or 3D only?) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-	cmdbuffer[0x0d] = NV_ROP5_SOLID;
+	si->engine.dma.cmdbuffer[0x0d] = si->engine.fifo.handle[0];
 
-	cmdbuffer[0x0e] = (1 << 18) | 0x0e000;
-//	cmdbuffer[0x0f] = NV4_DX5_TEXTURE_TRIANGLE;
+	si->engine.dma.cmdbuffer[0x0e] = (1 << 18) | 0x0e000;
+//	si->engine.dma.cmdbuffer[0x0f] = si->engine.fifo.handle[7]; /* Textured Triangle (3D only) */
 //fixme: temporary so there's something valid here.. (maybe needed, don't yet know)
-	cmdbuffer[0x0f] = NV_ROP5_SOLID;
+	si->engine.dma.cmdbuffer[0x0f] = si->engine.fifo.handle[0];
+
+	/* initialize our local pointers */
+	nv_acc_assert_fifo_dma();
 
 	/* we have put no cmd's in the DMA buffer yet (the above one's execute instantly) */
-	/*si->dma.*/put = 0;
+	si->engine.dma.put = 0;
 	/* the current first free adress in the DMA buffer is at offset 16 */
-	/*si->dma.*/current = 16;
+	si->engine.dma.current = 16;
 	/* the DMA buffer can hold 8k 32-bit words (it's 32kb in size) */
 	/*si->dma.*/max = 8191;
 	/* note the current free space we have left in the DMA buffer */
-	/*si->dma.*/free = /*si->dma.*/max - /*si->dma.*/current + 1;
+	/*si->dma.*/free = /*si->dma.*/max - si->engine.dma.current + 1;
 
-	//fixme: actually start DMA..
 	//fixme: add colorspace and buffer config cmd's or predefine in the non-DMA way.
 	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
 	//       space in between both functions as errors might hang the engine!
 
+	nv_start_dma();
+
 	return B_OK;
+}
+
+static void nv_start_dma(void)
+{
+	uint8 dummy;
+
+	if (si->engine.dma.current != si->engine.dma.put)
+	{
+		si->engine.dma.put = si->engine.dma.current;
+		/* dummy read the first adress of the framebuffer: flushes MTRR-WC buffers so
+		 * we know for sure the DMA command buffer received all data. */
+		dummy = *((char *)(si->framebuffer));
+		/* actually start DMA to execute all commands now in buffer */
+		/* note:
+		 * the actual FIFO channel that gets activated does not really matter:
+		 * all FIFO fill-level info actually points at the same registers. (?) */
+		nv_rop5_solid_ptr->DMAPut = (si->engine.dma.put << 2);
+	}
+}
+
+/* fixme? (check this out..)
+ * Looks like this stuff can be very much simplified and speed-up, as it seems it's not
+ * nessesary to wait for the engine to become idle before re-assigning channels.
+ * Because the cmd handles are actually programmed _inside_ the fifo channels, it might
+ * well be that the assignment is buffered along with the commands that still have to 
+ * be executed!
+ * (sounds very plausible to me :) */
+static void nv_acc_assert_fifo_dma(void)
+{
+	/* does every engine cmd this accelerant needs have a FIFO channel? */
+	//fixme: can probably be optimized for both speed and channel selection...
+	if (!si->engine.fifo.ch_ptr[(NV_ROP5_SOLID & 0x0000001f)] ||
+		!si->engine.fifo.ch_ptr[(NV_IMAGE_BLACK_RECTANGLE & 0x0000001f)] ||
+		!si->engine.fifo.ch_ptr[(NV_IMAGE_PATTERN & 0x0000001f)] ||
+		!si->engine.fifo.ch_ptr[(NV_IMAGE_BLIT & 0x0000001f)] ||
+		!si->engine.fifo.ch_ptr[(NV3_GDI_RECTANGLE_TEXT & 0x0000001f)])
+	{
+		uint16 cnt;
+
+		/* no, wait until the engine is idle before re-assigning the FIFO */
+		nv_acc_wait_idle_dma();
+
+		/* free the FIFO channels we want from the currently assigned cmd's */
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[0] & 0x0000001f)] = 0;
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[1] & 0x0000001f)] = 0;
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[2] & 0x0000001f)] = 0;
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[4] & 0x0000001f)] = 0;
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[5] & 0x0000001f)] = 0;
+
+		/* set new object handles */
+		si->engine.fifo.handle[0] = NV_ROP5_SOLID;
+		si->engine.fifo.handle[1] = NV_IMAGE_BLACK_RECTANGLE;
+		si->engine.fifo.handle[2] = NV_IMAGE_PATTERN;
+		si->engine.fifo.handle[4] = NV_IMAGE_BLIT;
+		si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
+
+		/* set handle's pointers to their assigned FIFO channels */
+		for (cnt = 0; cnt < 0x08; cnt++)
+		{
+			si->engine.fifo.ch_ptr[((si->engine.fifo.handle[cnt]) & 0x0000001f)] =
+				(NVACC_FIFO + (cnt * 0x00002000));
+		}
+
+		/* program new FIFO assignments */
+		//fixme: should be done via DMA cmd buffer...
+		//ACCW(FIFO_CH0, si->engine.fifo.handle[0]); /* Raster OPeration */
+		//ACCW(FIFO_CH1, si->engine.fifo.handle[1]); /* Clip */
+		//ACCW(FIFO_CH2, si->engine.fifo.handle[2]); /* Pattern */
+		//ACCW(FIFO_CH4, si->engine.fifo.handle[4]); /* Blit */
+		//ACCW(FIFO_CH5, si->engine.fifo.handle[5]); /* Bitmap */
+	}
+
+	/* update our local pointers */
+	nv_rop5_solid_ptr = (cmd_nv_rop5_solid*)
+		&(regs[(si->engine.fifo.ch_ptr[(NV_ROP5_SOLID & 0x0000001f)]) >> 2]);
+
+	nv_image_black_rectangle_ptr = (cmd_nv_image_black_rectangle*)
+		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_BLACK_RECTANGLE & 0x0000001f)]) >> 2]);
+
+	nv_image_pattern_ptr = (cmd_nv_image_pattern*)
+		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_PATTERN & 0x0000001f)]) >> 2]);
+
+	nv_image_blit_ptr = (cmd_nv_image_blit*)
+		&(regs[(si->engine.fifo.ch_ptr[(NV_IMAGE_BLIT & 0x0000001f)]) >> 2]);
+
+	nv3_gdi_rectangle_text_ptr = (cmd_nv3_gdi_rectangle_text*)
+		&(regs[(si->engine.fifo.ch_ptr[(NV3_GDI_RECTANGLE_TEXT & 0x0000001f)]) >> 2]);
 }
 
 /* screen to screen blit - i.e. move windows around and scroll within them. */
