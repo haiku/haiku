@@ -282,9 +282,6 @@ oggReader::Seek(void *cookie,
 	} else {
 		return B_ERROR;
 	}
-	*frame = filePositionToFrame(position);
-	*time = filePositionToTime(position);
-
 	// TODO: use B_MEDIA_SEEK_CLOSEST_BACKWARD, B_MEDIA_SEEK_CLOSEST_FORWARD to find key frame
 	if (ogg_sync_reset(&fSync) != 0) {
 		TRACE("oggReader::Seek: ogg_sync_reset failed?: error\n");
@@ -294,8 +291,48 @@ oggReader::Seek(void *cookie,
 		TRACE("oggReader::Seek: ogg_stream_reset failed?: error\n");
 		return B_ERROR;
 	}
-	fSeekable->Seek(position,SEEK_SET);
-	
+	if (fSeekable->Seek(position,SEEK_SET) < 0) {
+		TRACE("oggReader::Seek: Seek failed: error\n");
+		return B_ERROR;
+	}
+	// align to page boundary
+	ogg_page page;
+	ogg_sync_state sync;
+	ogg_sync_init(&sync);
+	while (true) {
+		char * buffer = ogg_sync_buffer(&sync,4096);
+		ssize_t bytes = fSeekable->Read(buffer,4096);
+		if (bytes == 0) {
+			TRACE("oggReader::Seek: Read: no data\n");
+			goto synced;
+		}
+		if (bytes < 0) {
+			TRACE("oggReader::Seek: Read: error\n");
+			ogg_sync_clear(&sync);
+			return bytes;
+		}
+		if (ogg_sync_wrote(&sync,bytes) != 0) {
+			TRACE("oggReader::Seek: ogg_sync_wrote failed?: error\n");
+			ogg_sync_clear(&sync);
+			return B_ERROR;
+		}
+		int offset;
+		while ((offset = ogg_sync_pageseek(&sync,&page)) != 0) {
+			if (offset > 0) {
+				goto synced;
+			}
+			position += -offset;
+		}
+	}
+synced:
+	ogg_sync_clear(&sync);
+	if (fSeekable->Seek(position,SEEK_SET) < 0) {
+		TRACE("oggReader::Seek: Seek failed: error\n");
+		return B_ERROR;
+	}
+	// output the values from where we regained sync
+	*frame = filePositionToFrame(position);
+	*time = filePositionToTime(position);
 	return B_OK;
 }
 
