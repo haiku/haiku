@@ -40,6 +40,8 @@ static status_t init_common(int the_fd) {
 	// LOG is now available, si !NULL
 	LOG(4,("init_common: logmask 0x%08x, memory %dMB, hardcursor %d, usebios %d, switchhead %d, force_pci %d\n",
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead, si->settings.force_pci));
+	LOG(4,("init_common: dumprom %d, unhide_fw %d, pgm_panel %d\n",
+		si->settings.dumprom, si->settings.unhide_fw, si->settings.pgm_panel));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{
