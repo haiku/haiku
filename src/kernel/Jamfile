@@ -139,6 +139,7 @@ KernelLd libroot.so :
 	posix_malloc.o
 	posix_math.o
 	posix_math_arch_$(OBOS_ARCH).o
+	posix_pthread.o
 	posix_signal.o
 	posix_stdio.o
 	posix_gnu_arch_$(OBOS_ARCH).o
@@ -196,8 +197,6 @@ KernelStaticLibraryObjects librld.a :
 	<$(SOURCE_GRIST)!libroot!posix!glibc!locale>C_name.o
   	<$(SOURCE_GRIST)!libroot>kernel_vsprintf.o
   	<$(SOURCE_GRIST)!libroot!posix!unistd>open.o
-
-  	<$(SOURCE_GRIST)!libroot!posix!stdlib>env.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
