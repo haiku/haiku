@@ -2,11 +2,13 @@ Building
 --------
 
 The build system uses Jam/MR (http://www.perforce.com/jam/jam.html).
-A BeOS executable of Jam 2.3.1 is available at:
+A BeOS executable of Jam 2.4 is available at:
 
   http://open-beos.sf.net/misc/jam.zip
 
 Unzip the executable and copy it to /boot/home/config/bin.
+The Jam source code is also included in the source tree. You can as well cd
+into "src/tools/jam" and run "make" to obtain an executable.
 
 To build the whole source tree, launch a Terminal, cd into the openbeos root
 directory and just type:
@@ -28,26 +30,39 @@ Running
 -------
 
 If the build went fine, a file named floppy.x86 had been created in the
-root directory of the source tree. What you want to do now, is to boot from
-this floppy image. Therefore you either write the image onto a real floppy
-disk and restart you computer, or you write it onto a "virtual floppy disk"
-emulated by a x86 PC emulator and just start this emulator.
+target specific objects directory (objects/x86.R1 for x86 machines).
+What you want to do now, is to boot from this floppy image. Therefore you
+either write the image onto a real floppy disk and restart you computer, or
+you write it onto a "virtual floppy disk" emulated by a x86 PC emulator and
+just start this emulator.
 
 1. Real Floppy
 
 Put in the disk and type in the source tree's root dir:
 
-  $ dd if=floppy.x86  of=/dev/disk/floppy/raw bs=18k
+  $ dd if=objects/x86.R1/floppy.x86  of=/dev/disk/floppy/raw bs=18k
 
 
 2. Emulated Floppy (Bochs)
 
 Type:
 
-  $ dd if=floppy.x86  of=<floppy image> bs=18k
+  $ dd if=objects/x86.R1/floppy.x86  of=<floppy image> bs=18k
 
 where <floppy image> has to be replaced with the filename of the floppy
 image Bochs has been told to use (e.g. /tmp/obos.img).
+
+For both cases there is also an simpler way:
+
+  $ jam installfloppy
+
+This builds the floppy image, if it is not up to date, and writes it to a
+previously specified location. Therefore you must tell configure where this
+location is:
+
+  $ ./configure --floppy /dev/disk/floppy/raw
+
+Ananlogously for the emulated floppy.
 
 
 Bochs
@@ -93,7 +108,7 @@ ips: 2000000
 Now put the OBOS boot image onto you "virtual" floppy and start Bochs:
 
   $ cd <OBOS sources directory>
-  $ dd if=floppy.x86 of=/tmp/obos.img bs=18k
+  $ jam installfloppy
   $ cd /boot/apps/BeBochs1.4
   $ ./bochs
 
