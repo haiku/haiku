@@ -79,13 +79,13 @@ public:
 
 	bool CanResize(bool *canResizeContents = NULL,
 				   bool *whileMounted = NULL) const;
-	status_t ValidateResize(off_t *size, bool resizeContents = true) const;
-	status_t Resize(off_t size, bool resizeContents = true);
+	status_t ValidateResize(off_t *size) const;
+	status_t Resize(off_t size);
 
 	bool CanMove(BObjectList<BPartition> *unmovableDescendants = NULL,
 				 BObjectList<BPartition> *movableOnlyIfUnmounted = NULL) const;
-	status_t ValidateMove(off_t *newOffset, bool force = false) const;
-	status_t Move(off_t newOffset, bool force = false);
+	status_t ValidateMove(off_t *newOffset) const;
+	status_t Move(off_t newOffset);
 
 	bool CanSetName() const;
 	status_t ValidateSetName(char *name) const;

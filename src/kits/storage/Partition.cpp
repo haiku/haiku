@@ -518,22 +518,22 @@ BPartition::CanResize(bool *canResizeContents, bool *whileMounted) const
 
 // ValidateResize
 status_t
-BPartition::ValidateResize(off_t *size, bool resizeContents) const
+BPartition::ValidateResize(off_t *size) const
 {
 	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow() || !size)
 		return B_BAD_VALUE;
-	return _kern_validate_resize_partition(_ShadowID(), _ChangeCounter(), size,
-										   resizeContents);
+	return _kern_validate_resize_partition(_ShadowID(), _ChangeCounter(),
+										   size);
 }
 
 // Resize
 status_t
-BPartition::Resize(off_t size, bool resizeContents)
+BPartition::Resize(off_t size)
 {
 	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow())
 		return B_BAD_VALUE;
 	status_t error = _kern_resize_partition(_ShadowID(), _ChangeCounter(),
-											size, resizeContents);
+											size);
 	if (error == B_OK)
 		error = Device()->Update();
 	return error;
@@ -597,24 +597,24 @@ BPartition::CanMove(BObjectList<BPartition> *unmovableDescendants,
 
 // ValidateMove
 status_t
-BPartition::ValidateMove(off_t *newOffset, bool force) const
+BPartition::ValidateMove(off_t *newOffset) const
 {
 	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow()
 		|| !newOffset) {
 		return B_BAD_VALUE;
 	}
 	return _kern_validate_move_partition(_ShadowID(), _ChangeCounter(),
-										 newOffset, force);
+										 newOffset);
 }
 
 // Move
 status_t
-BPartition::Move(off_t newOffset, bool force)
+BPartition::Move(off_t newOffset)
 {
 	if (!fPartitionData || IsDevice() || !Parent() || !_IsShadow())
 		return B_BAD_VALUE;
 	status_t error = _kern_resize_partition(_ShadowID(), _ChangeCounter(),
-											newOffset, force);
+											newOffset);
 	if (error == B_OK)
 		error = Device()->Update();
 	return error;
