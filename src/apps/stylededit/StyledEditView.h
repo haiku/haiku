@@ -20,7 +20,7 @@ public:
 	virtual void SetEncoding(uint32 encoding);
 	virtual uint32 GetEncoding() const;
 protected:
-	virtual void InsertText(const char *text, int32 length, int32 offset, const text_run_array *runs);
+	virtual void InsertText(const char *text, int32 length, int32 offset, const text_run_array *runs = NULL);
 	virtual void DeleteText(int32 start, int32 finish);
 			
 private:

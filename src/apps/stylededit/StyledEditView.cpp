@@ -105,6 +105,36 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 			SetTextRect(textRect);
 		}
 	}
+	if (fEncoding != 0) {
+		CharacterSetRoster * roster = CharacterSetRoster::Roster(&result);
+		if (result == B_OK) {
+			uint32 id = roster->FindCharacterSetByFontID(fEncoding)->GetConversionID();
+			SetText("");
+			char inBuffer[256];
+			off_t location = 0;
+			int32 textOffset = 0;
+			int32 state = 0;
+			int32 bytesRead;
+			while ((bytesRead = stream->ReadAt(location,inBuffer,256)) > 0) {
+				location += bytesRead;
+				char * inPtr = inBuffer;
+				char textBuffer[256];
+				int32 textLength = 256;
+				int32 bytesConverted = bytesRead;
+				while (textLength > 0) {
+					convert_to_utf8(id,inPtr,&bytesConverted,textBuffer,&textLength,&state);
+					InsertText(textBuffer,textLength,textOffset);
+					textOffset += textLength;
+					inPtr += bytesConverted;
+					bytesRead -= bytesConverted;
+					bytesConverted = bytesRead;
+					if (textLength > 0) {
+						textLength = 256;
+					}
+				}
+			}
+		}
+	}
 	fSuppressChanges = false;
 	return result;
 }
