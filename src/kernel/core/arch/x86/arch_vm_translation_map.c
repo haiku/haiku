@@ -79,9 +79,9 @@ static spinlock tmap_list_lock;
 #define FIRST_KERNEL_PGDIR_ENT  (VADDR_TO_PDENT(KERNEL_BASE))
 #define NUM_KERNEL_PGDIR_ENTS   (VADDR_TO_PDENT(KERNEL_SIZE))
 
-static int vm_translation_map_quick_query(addr_t va, addr_t *out_physical);
-static int get_physical_page_tmap(addr_t pa, addr_t *va, int flags);
-static int put_physical_page_tmap(addr_t va);
+static status_t vm_translation_map_quick_query(addr_t va, addr_t *out_physical);
+static status_t get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags);
+static status_t put_physical_page_tmap(addr_t va);
 
 static void flush_tmap(vm_translation_map *map);
 
@@ -116,7 +116,7 @@ _update_all_pgdirs(int index, pdentry e)
 }
 
 
-static int
+static status_t
 lock_tmap(vm_translation_map *map)
 {
 	TRACE(("lock_tmap: map 0x%x\n", map));
@@ -131,7 +131,7 @@ lock_tmap(vm_translation_map *map)
 }
 
 
-static int
+static status_t
 unlock_tmap(vm_translation_map *map)
 {
 	TRACE(("unlock_tmap: map 0x%x\n", map));
@@ -200,7 +200,7 @@ destroy_tmap(vm_translation_map *map)
 
 
 static void
-put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, int attributes)
+put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, uint32 attributes)
 {
 	// put it in the pgdir
 	init_pdentry(e);
@@ -218,7 +218,7 @@ put_pgtable_in_pgdir(pdentry *e, addr_t pgtable_phys, int attributes)
 
 
 static void
-put_ptentry_in_pgtable(ptentry *e, addr_t pgtable_phys, int attributes)
+put_ptentry_in_pgtable(ptentry *e, addr_t pgtable_phys, uint32 attributes)
 {
 	// put it in the pgtable
 	init_ptentry(e);
@@ -232,8 +232,8 @@ put_ptentry_in_pgtable(ptentry *e, addr_t pgtable_phys, int attributes)
 }
 
 
-static int
-map_tmap(vm_translation_map *map, addr_t va, addr_t pa, unsigned int attributes)
+static status_t
+map_tmap(vm_translation_map *map, addr_t va, addr_t pa, uint32 attributes)
 {
 	pdentry *pd;
 	ptentry *pt;
@@ -300,7 +300,7 @@ map_tmap(vm_translation_map *map, addr_t va, addr_t pa, unsigned int attributes)
 }
 
 
-static int
+static status_t
 unmap_tmap(vm_translation_map *map, addr_t start, addr_t end)
 {
 	ptentry *pt;
@@ -351,8 +351,8 @@ restart:
 }
 
 
-static int
-query_tmap(vm_translation_map *map, addr_t va, addr_t *out_physical, unsigned int *out_flags)
+static status_t
+query_tmap(vm_translation_map *map, addr_t va, addr_t *out_physical, uint32 *out_flags)
 {
 	ptentry *pt;
 	pdentry *pd = map->arch_data->pgdir_virt;
@@ -401,8 +401,8 @@ get_mapped_size_tmap(vm_translation_map *map)
 }
 
 
-static int
-protect_tmap(vm_translation_map *map, addr_t base, addr_t top, unsigned int attributes)
+static status_t
+protect_tmap(vm_translation_map *map, addr_t base, addr_t top, uint32 attributes)
 {
 	// XXX finish
 	panic("protect_tmap called, not implemented\n");
@@ -410,8 +410,8 @@ protect_tmap(vm_translation_map *map, addr_t base, addr_t top, unsigned int attr
 }
 
 
-static int
-clear_flags_tmap(vm_translation_map *map, addr_t va, unsigned int flags)
+static status_t
+clear_flags_tmap(vm_translation_map *map, addr_t va, uint32 flags)
 {
 	ptentry *pt;
 	pdentry *pd = map->arch_data->pgdir_virt;
@@ -451,7 +451,7 @@ clear_flags_tmap(vm_translation_map *map, addr_t va, unsigned int flags)
 
 	TRACE(("query_tmap: returning pa 0x%x for va 0x%x\n", *out_physical, va));
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -480,7 +480,7 @@ flush_tmap(vm_translation_map *map)
 }
 
 
-static int
+static status_t
 map_iospace_chunk(addr_t va, addr_t pa)
 {
 	int i;
@@ -509,12 +509,12 @@ map_iospace_chunk(addr_t va, addr_t pa)
 		NULL, SMP_MSG_FLAG_SYNC);
 	restore_interrupts(state);
 
-	return 0;
+	return B_OK;
 }
 
 
-static int
-get_physical_page_tmap(addr_t pa, addr_t *va, int flags)
+static status_t
+get_physical_page_tmap(addr_t pa, addr_t *va, uint32 flags)
 {
 	int index;
 	paddr_chunk_desc *replaced_pchunk;
@@ -531,7 +531,7 @@ restart:
 		}
 		*va = paddr_desc[index].va + pa % IOSPACE_CHUNK_SIZE;
 		mutex_unlock(&iospace_mutex);
-		return 0;
+		return B_OK;
 	}
 
 	// map it
@@ -551,7 +551,7 @@ restart:
 		map_iospace_chunk(paddr_desc[index].va, index * IOSPACE_CHUNK_SIZE);
 		mutex_unlock(&iospace_mutex);
 
-		return 0;
+		return B_OK;
 	}
 
 	// replace an earlier mapping
@@ -560,7 +560,7 @@ restart:
 		if (flags == PHYSICAL_PAGE_NO_WAIT) {
 			// punt back to the caller and let them handle this
 			mutex_unlock(&iospace_mutex);
-			return ENOMEM;
+			return B_NO_MEMORY;
 		} else {
 			mutex_unlock(&iospace_mutex);
 			acquire_sem(iospace_full_sem);
@@ -577,11 +577,11 @@ restart:
 	map_iospace_chunk(paddr_desc[index].va, index * IOSPACE_CHUNK_SIZE);
 
 	mutex_unlock(&iospace_mutex);
-	return 0;
+	return B_OK;
 }
 
 
-static int
+static status_t
 put_physical_page_tmap(addr_t va)
 {
 	paddr_chunk_desc *desc;
@@ -610,7 +610,7 @@ put_physical_page_tmap(addr_t va)
 
 	mutex_unlock(&iospace_mutex);
 
-	return 0;
+	return B_OK;
 }
 
 
@@ -857,7 +857,7 @@ vm_translation_map_quick_map(kernel_args *ka, addr_t va, addr_t pa,
 
 // XXX currently assumes this translation map is active
 
-static int
+static status_t
 vm_translation_map_quick_query(addr_t va, addr_t *out_physical)
 {
 	ptentry *pentry;
