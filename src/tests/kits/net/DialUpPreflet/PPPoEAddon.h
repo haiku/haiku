@@ -29,8 +29,6 @@ class PPPoEAddon : public DialUpAddon {
 		
 		const char *InterfaceName() const
 			{ return fInterfaceName.String(); }
-		const char *ACName() const
-			{ return fACName.String(); }
 		const char *ServiceName() const
 			{ return fServiceName.String(); }
 		
@@ -57,7 +55,7 @@ class PPPoEAddon : public DialUpAddon {
 
 	private:
 		bool fIsNew;
-		BString fInterfaceName, fACName, fServiceName;
+		BString fInterfaceName, fServiceName;
 		BMessage *fSettings, *fProfile;
 			// saves last settings state
 		PPPoEView *fPPPoEView;
@@ -77,8 +75,6 @@ class PPPoEView : public BView {
 		
 		const char *InterfaceName() const
 			{ return fInterfaceName.String(); }
-		const char *ACName() const
-			{ return fACName->Text(); }
 		const char *ServiceName() const
 			{ return fServiceName->Text(); }
 		
@@ -90,14 +86,10 @@ class PPPoEView : public BView {
 
 	private:
 		PPPoEAddon *fAddon;
-		BButton *fServiceButton, *fCancelButton, *fOKButton;
 		BMenuField *fInterface;
 		BMenuItem *fOtherInterface;
 		BString fInterfaceName;
-		BTextControl *fACName, *fServiceName;
-		BWindow *fServiceWindow;
-		BString fPreviousACName, fPreviousServiceName;
-			// for the case that the user presses "Cancel" in the service window
+		BTextControl *fServiceName;
 };
 
 

@@ -7,12 +7,16 @@
 
 #include "MessageDriverSettingsUtils.h"
 
-#include <driver_settings.h>
+#include <PPPDefs.h>
+#include <settings_tools.h>
 #include <File.h>
 #include <Message.h>
 #include <String.h>
 
 #include <cstdio>
+
+
+static bool AddParameters(const BMessage& message, driver_settings *to);
 
 
 bool
@@ -32,6 +36,68 @@ FindMessageParameter(const char *name, const BMessage& message, BMessage *save,
 	}
 	
 	return false;
+}
+
+
+static
+bool
+AddValues(const BMessage& message, driver_parameter *parameter)
+{
+	const char *value;
+	for(int32 index = 0; message.FindString(MDSU_VALUES, index, &value) == B_OK;
+			index++)
+		if(!add_driver_parameter_value(value, parameter))
+			return false;
+	
+	return true;
+}
+
+
+inline
+bool
+AddParameters(const BMessage& message, driver_parameter *to)
+{
+	if(!to)
+		return false;
+	
+	return AddParameters(message,
+		reinterpret_cast<driver_settings*>(&to->parameter_count));
+}
+
+
+static
+bool
+AddParameters(const BMessage& message, driver_settings *to)
+{
+	const char *name;
+	BMessage current;
+	driver_parameter *parameter;
+	for(int32 index = 0; message.FindMessage(MDSU_PARAMETERS, index,
+			&current) == B_OK; index++) {
+		name = current.FindString(MDSU_NAME);
+		parameter = new_driver_parameter(name);
+		if(!AddValues(current, parameter))
+			return false;
+		
+		AddParameters(current, parameter);
+		add_driver_parameter(parameter, to);
+	}
+	
+	return true;
+}
+
+
+driver_settings*
+MessageToDriverSettings(const BMessage& message)
+{
+	driver_settings *settings = new_driver_settings();
+	
+	if(!AddParameters(message, settings)) {
+		free_driver_settings(settings);
+		return NULL;
+	}
+	
+	return settings;
 }
 
 

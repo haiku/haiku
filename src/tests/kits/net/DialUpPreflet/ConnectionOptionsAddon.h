@@ -4,25 +4,25 @@
 //
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
-// ExtrasAddon saves the loaded settings.
-// ExtrasView saves the current settings.
+// ConnectionOptionsAddon saves the loaded settings.
+// ConnectionOptionsView saves the current settings.
 //-----------------------------------------------------------------------
 
-#ifndef _EXTRAS_ADDON__H
-#define _EXTRAS_ADDON__H
+#ifndef _CONNECTION_OPTIONS_ADDON__H
+#define _CONNECTION_OPTIONS_ADDON__H
 
 #include <DialUpAddon.h>
 
 #include <CheckBox.h>
 #include <RadioButton.h>
 
-class ExtrasView;
+class ConnectionOptionsView;
 
 
-class ExtrasAddon : public DialUpAddon {
+class ConnectionOptionsAddon : public DialUpAddon {
 	public:
-		ExtrasAddon(BMessage *addons);
-		virtual ~ExtrasAddon();
+		ConnectionOptionsAddon(BMessage *addons);
+		virtual ~ConnectionOptionsAddon();
 		
 		bool IsNew() const
 			{ return fIsNew; }
@@ -53,15 +53,15 @@ class ExtrasAddon : public DialUpAddon {
 		bool fDoesDialOnDemand, fAskBeforeDialing, fDoesAutoRedial;
 		BMessage *fSettings, *fProfile;
 			// saves last settings state
-		ExtrasView *fExtrasView;
+		ConnectionOptionsView *fConnectionOptionsView;
 };
 
 
-class ExtrasView : public BView {
+class ConnectionOptionsView : public BView {
 	public:
-		ExtrasView(ExtrasAddon *addon, BRect frame);
+		ConnectionOptionsView(ConnectionOptionsAddon *addon, BRect frame);
 		
-		ExtrasAddon *Addon() const
+		ConnectionOptionsAddon *Addon() const
 			{ return fAddon; }
 		void Reload();
 		
@@ -79,9 +79,8 @@ class ExtrasView : public BView {
 		void UpdateControls();
 
 	private:
-		ExtrasAddon *fAddon;
-		BCheckBox *fAskBeforeDialing, *fAutoRedial;
-		BRadioButton *fDialOnDemand, *fDialManually;
+		ConnectionOptionsAddon *fAddon;
+		BCheckBox *fDialOnDemand, *fAskBeforeDialing, *fAutoRedial;
 };
 
 

@@ -14,14 +14,13 @@
 #include "TextRequestDialog.h"
 
 // built-in add-ons
-#include "ExtrasAddon.h"
+#include "ConnectionOptionsAddon.h"
 #include "GeneralAddon.h"
 #include "IPCPAddon.h"
 #include "PPPoEAddon.h"
-#include "ProtocolsAddon.h"
-
 
 #include <PPPInterface.h>
+#include <settings_tools.h>
 #include <TemplateList.h>
 
 #include <Application.h>
@@ -41,35 +40,74 @@
 #include <Path.h>
 
 
-#define MSG_CREATE_NEW				'NEWI'
-#define MSG_FINISH_CREATE_NEW		'FNEW'
-#define MSG_DELETE_CURRENT			'DELI'
-#define MSG_SELECT_INTERFACE		'SELI'
-#define MSG_CONNECT_BUTTON			'CONI'
+// message constants
+static const uint32 kMsgCreateNew = 'NEWI';
+static const uint32 kMsgFinishCreateNew = 'FNEW';
+static const uint32 kMsgDeleteCurrent = 'DELI';
+static const uint32 kMsgSelectInterface = 'SELI';
+static const uint32 kMsgConnectButton = 'CONI';
 
-#define LABEL_CREATE_NEW			"Create New..."
-#define LABEL_DELETE_CURRENT		"Delete Current"
+// labels
+#ifdef LANG_GERMAN
+static const char *kLabelInterface = "Verbindung: ";
+static const char *kLabelInterfaceName = "Verbindungs-Name: ";
+static const char *kLabelNewInterface = "Neue Verbindung";
+static const char *kLabelCreateNew = "Neu...";
+static const char *kLabelDeleteCurrent = "Auswahl Löschen";
+static const char *kLabelConnect = "Verbinden";
+static const char *kLabelDisconnect = "Trennen";
+static const char *kLabelOK = "OK";
+#else
+static const char *kLabelInterface = "Interface: ";
+static const char *kLabelInterfaceName = "Interface Name: ";
+static const char *kLabelNewInterface = "New Interface";
+static const char *kLabelCreateNew = "Create New...";
+static const char *kLabelDeleteCurrent = "Delete Current";
+static const char *kLabelConnect = "Connect";
+static const char *kLabelDisconnect = "Disconnect";
+static const char *kLabelOK = "OK";
+#endif
 
-#define LABEL_CONNECT				"Connect"
-#define LABEL_DISCONNECT			"Disconnect"
+// connection status strings
+#ifdef LANG_GERMAN
+static const char *kTextConnecting = "Verbinde...";
+static const char *kTextConnectionEstablished = "Verbindung hergestellt.";
+static const char *kTextNotConnected = "Nicht verbunden.";
+static const char *kTextAuthenticating = "Authentifizierung...";
+static const char *kTextAuthenticationFailed = "Authentifizierung fehlgeschlagen!";
+static const char *kTextConnectionLost = "Verbindung verloren!";
+static const char *kTextCreationError = "Fehler beim Initialisieren!";
+static const char *kTextNoInterfacesFound = "Kein Verbindungen gefunden...";
+#else
+static const char *kTextConnecting = "Connecting...";
+static const char *kTextConnectionEstablished = "Connection established.";
+static const char *kTextNotConnected = "Not connected.";
+static const char *kTextAuthenticating = "Authenticating...";
+static const char *kTextAuthenticationFailed = "Authentication failed!";
+static const char *kTextConnectionLost = "Connection lost!";
+static const char *kTextCreationError = "Error creating interface!";
+static const char *kTextNoInterfacesFound = "No interfaces found...";
+#endif
 
-#define TEXT_CONNECTING				"Connecting..."
-#define TEXT_CONNECTION_ESTABLISHED	"Connection established."
-#define TEXT_NOT_CONNECTED			"Not connected."
-#define TEXT_DEVICE_ERROR			"Device error!"
-#define TEXT_AUTHENTICATING			"Authenticating..."
-#define TEXT_AUTHENTICATION_FAILED	"Authentication failed!"
-#define TEXT_CONNECTION_LOST		"Connection lost!"
-#define TEXT_CREATION_ERROR			"Error creating interface!"
-#define TEXT_NO_INTERFACES_FOUND	"No interfaces found..."
-#define TEXT_OK						"OK"
-#define ERROR_TITLE					"Error"
-#define ERROR_NO_PPP_STACK			"Error: Could not find the PPP stack!"
-#define ERROR_INTERFACE_EXISTS		"Error: An interface with this name already " \
-										"exists!"
-#define ERROR_LOADING_FAILED		"Error: Failed loading interface! The current " \
-										"settings will be deleted."
-#define ERROR_SAVING_FAILED			"Error: Failed saving interface settings!"
+// error strings for alerts
+#ifdef LANG_GERMAN
+static const char *kErrorTitle = "Fehler";
+static const char *kErrorNoPPPStack = "Fehler: Kein Zugriff auf den PPP Stack!";
+static const char *kErrorInterfaceExists = "Fehler: Eine Verbindung mit diesem Namen "
+										"existiert bereits!";
+static const char *kErrorLoadingFailed = "Fehler: Konfiguration ist fehlerhaft! Die "
+										"Einstellungen werden zurückgesetzt.";
+static const char *kErrorSavingFailed = "Fehler: Speichern der Einstellungen ist "
+										"fehlgeschlagen!";
+#else
+static const char *kErrorTitle = "Error";
+static const char *kErrorNoPPPStack = "Error: Could not access the PPP stack!";
+static const char *kErrorInterfaceExists = "Error: An interface with this name "
+										"already exists!";
+static const char *kErrorLoadingFailed = "Error: Failed loading interface! The "
+										"current settings will be deleted.";
+static const char *kErrorSavingFailed = "Error: Failed saving interface settings!";
+#endif
 
 
 static
@@ -99,12 +137,12 @@ DialUpView::DialUpView(BRect frame)
 	fAddons.AddMessenger(DUN_MESSENGER, messenger);
 	
 	// create pop-up with all interfaces and "New..."/"Delete current" items
-	fInterfaceMenu = new BPopUpMenu(LABEL_CREATE_NEW);
+	fInterfaceMenu = new BPopUpMenu(kLabelCreateNew);
 	BRect rect = bounds;
 	rect.InsetBy(5, 5);
 	rect.bottom = rect.top + 20;
-	fMenuField = new BMenuField(rect, "Interfaces", "Interface:", fInterfaceMenu);
-	fMenuField->SetDivider(StringWidth(fMenuField->Label()) + 10);
+	fMenuField = new BMenuField(rect, "Interfaces", kLabelInterface, fInterfaceMenu);
+	fMenuField->SetDivider(StringWidth(fMenuField->Label()) + 5);
 	
 	rect.top = rect.bottom + 10;
 	rect.bottom = bounds.bottom
@@ -119,20 +157,20 @@ DialUpView::DialUpView(BRect frame)
 	stringRect.top += (stringRect.Height() - 15) / 2;
 	stringRect.bottom = stringRect.top + 15;
 	fStringView = new BStringView(stringRect, "NoInterfacesFound",
-		TEXT_NO_INTERFACES_FOUND);
+		kTextNoInterfacesFound);
 	fStringView->SetAlignment(B_ALIGN_CENTER);
 	fStringView->Hide();
 	
 	rect.top = rect.bottom + 15;
 	rect.bottom = rect.top + 15;
 	rect.right = rect.left + 200;
-	fStatusView = new BStringView(rect, "StatusView", TEXT_NOT_CONNECTED);
+	fStatusView = new BStringView(rect, "StatusView", kTextNotConnected);
 	
 	rect.InsetBy(0, -5);
 	rect.left = rect.right + 5;
 	rect.right = bounds.right - 5;
-	fConnectButton = new BButton(rect, "ConnectButton", LABEL_CONNECT,
-		new BMessage(MSG_CONNECT_BUTTON));
+	fConnectButton = new BButton(rect, "ConnectButton", kLabelConnect,
+		new BMessage(kMsgConnectButton));
 	
 	AddChild(fMenuField);
 	AddChild(fTabView);
@@ -174,8 +212,11 @@ DialUpView::AttachedToWindow()
 	fInterfaceMenu->SetTargetForItems(this);
 	fConnectButton->SetTarget(this);
 	
-	if(fListener.InitCheck() != B_OK)
-		(new BAlert(ERROR_TITLE, ERROR_NO_PPP_STACK, TEXT_OK))->Go(NULL);
+	if(fListener.InitCheck() != B_OK) {
+		(new BAlert(kErrorTitle, kErrorNoPPPStack, kLabelOK,
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
+		fConnectButton->Hide();
+	}
 }
 
 
@@ -188,12 +229,12 @@ DialUpView::MessageReceived(BMessage *message)
 		break;
 		
 		// -------------------------------------------------
-		case MSG_CREATE_NEW: {
-			(new TextRequestDialog("New Interface", "Interface Name: "))->Go(
-				new BInvoker(new BMessage(MSG_FINISH_CREATE_NEW), this));
+		case kMsgCreateNew: {
+			(new TextRequestDialog(kLabelNewInterface, kLabelInterfaceName))->Go(
+				new BInvoker(new BMessage(kMsgFinishCreateNew), this));
 		} break;
 		
-		case MSG_FINISH_CREATE_NEW: {
+		case kMsgFinishCreateNew: {
 			int32 which;
 			message->FindInt32("which", &which);
 			const char *name = message->FindString("text");
@@ -205,7 +246,7 @@ DialUpView::MessageReceived(BMessage *message)
 		} break;
 		// -------------------------------------------------
 		
-		case MSG_DELETE_CURRENT: {
+		case kMsgDeleteCurrent: {
 			if(!fCurrentItem)
 				return;
 			
@@ -229,13 +270,13 @@ DialUpView::MessageReceived(BMessage *message)
 				// this stops watching the deleted interface
 		} break;
 		
-		case MSG_SELECT_INTERFACE: {
+		case kMsgSelectInterface: {
 			int32 index;
 			message->FindInt32("index", &index);
 			SelectInterface(index);
 		} break;
 		
-		case MSG_CONNECT_BUTTON: {
+		case kMsgConnectButton: {
 			if(!fCurrentItem || fUpDownThread != -1)
 				return;
 			
@@ -247,6 +288,42 @@ DialUpView::MessageReceived(BMessage *message)
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+bool
+DialUpView::SelectInterfaceNamed(const char *name)
+{
+	BMenuItem *item = fInterfaceMenu->FindItem(name);
+	
+	int32 index = fInterfaceMenu->IndexOf(item);
+	if(!item || index >= CountInterfaces())
+		return false;
+	
+	SelectInterface(index);
+	
+	return true;
+}
+
+
+BView*
+DialUpView::AuthenticationView() const
+{
+	return fGeneralAddon ? fGeneralAddon->AuthenticationView() : NULL;
+}
+
+
+BView*
+DialUpView::StatusView() const
+{
+	return fStatusView;
+}
+
+
+BView*
+DialUpView::ConnectButton() const
+{
+	return fConnectButton;
 }
 
 
@@ -377,18 +454,28 @@ DialUpView::SaveSettingsToFile()
 void
 DialUpView::UpDownThread()
 {
+	SaveSettingsToFile();
+	BMessage settings, profile;
+	SaveSettings(&settings, &profile, true);
+		// save temporary profile
+	driver_settings *temporaryProfile = MessageToDriverSettings(profile);
+	
 	PPPInterface interface;
 	if(fWatching == PPP_UNDEFINED_INTERFACE_ID) {
 		interface = fListener.Manager().InterfaceWithName(fCurrentItem->Label());
 		if(interface.InitCheck() != B_OK)
 			interface = fListener.Manager().CreateInterfaceWithName(
-				fCurrentItem->Label());
-	} else
+				fCurrentItem->Label(), temporaryProfile);
+	} else {
 		interface = fWatching;
+		interface.SetProfile(temporaryProfile);
+	}
+	
+	free_driver_settings(temporaryProfile);
 	
 	if(interface.InitCheck() != B_OK) {
 		Window()->Lock();
-		fStatusView->SetText(TEXT_CREATION_ERROR);
+		fStatusView->SetText(kTextCreationError);
 		Window()->Unlock();
 		return;
 	}
@@ -505,7 +592,7 @@ DialUpView::CreateTabs()
 		if(!addon->GetPreferredSize(&width, &height))
 			continue;
 		
-		target = addon->CreateView(BPoint(0,0));
+		target = addon->CreateView(BPoint(0, 0));
 		if(!target)
 			continue;
 		
@@ -521,47 +608,52 @@ DialUpView::UpdateStatus(int32 code)
 		case PPP_REPORT_UP_ABORTED:
 		case PPP_REPORT_DOWN_SUCCESSFUL:
 		case PPP_REPORT_CONNECTION_LOST: {
-			fConnectButton->SetLabel(LABEL_CONNECT);
+			fConnectButton->SetLabel(kLabelConnect);
 		} break;
 		
 		default:
-			fConnectButton->SetLabel(LABEL_DISCONNECT);
+			fConnectButton->SetLabel(kLabelDisconnect);
 	}
 	
 	// maybe the information string must stay
 	if(fKeepLabel && code != PPP_REPORT_GOING_UP && code != PPP_REPORT_UP_SUCCESSFUL)
 		return;
 	
+	if(fListener.InitCheck() != B_OK) {
+		fStatusView->SetText(kErrorNoPPPStack);
+		return;
+	}
+	
 	switch(code) {
 		case PPP_REPORT_GOING_UP:
 			fKeepLabel = false;
-			fStatusView->SetText(TEXT_CONNECTING);
+			fStatusView->SetText(kTextConnecting);
 		break;
 		
 		case PPP_REPORT_UP_SUCCESSFUL:
 			fKeepLabel = false;
-			fStatusView->SetText(TEXT_CONNECTION_ESTABLISHED);
+			fStatusView->SetText(kTextConnectionEstablished);
 		break;
 		
 		case PPP_REPORT_UP_ABORTED:
 		case PPP_REPORT_DOWN_SUCCESSFUL:
-			fStatusView->SetText(TEXT_NOT_CONNECTED);
+			fStatusView->SetText(kTextNotConnected);
 		break;
 		
 		case PPP_REPORT_LOCAL_AUTHENTICATION_REQUESTED:
 		case PPP_REPORT_PEER_AUTHENTICATION_REQUESTED:
-			fStatusView->SetText(TEXT_AUTHENTICATING);
+			fStatusView->SetText(kTextAuthenticating);
 		break;
 		
 		case PPP_REPORT_LOCAL_AUTHENTICATION_FAILED:
 		case PPP_REPORT_PEER_AUTHENTICATION_FAILED:
 			fKeepLabel = true;
-			fStatusView->SetText(TEXT_AUTHENTICATION_FAILED);
+			fStatusView->SetText(kTextAuthenticationFailed);
 		break;
 		
 		case PPP_REPORT_CONNECTION_LOST:
 			fKeepLabel = true;
-			fStatusView->SetText(TEXT_CONNECTION_LOST);
+			fStatusView->SetText(kTextConnectionLost);
 		break;
 	}
 }
@@ -612,10 +704,10 @@ void
 DialUpView::LoadInterfaces()
 {
 	fInterfaceMenu->AddSeparatorItem();
-	fInterfaceMenu->AddItem(new BMenuItem(LABEL_CREATE_NEW,
-		new BMessage(MSG_CREATE_NEW)));
-	fDeleterItem = new BMenuItem(LABEL_DELETE_CURRENT,
-		new BMessage(MSG_DELETE_CURRENT));
+	fInterfaceMenu->AddItem(new BMenuItem(kLabelCreateNew,
+		new BMessage(kMsgCreateNew)));
+	fDeleterItem = new BMenuItem(kLabelDeleteCurrent,
+		new BMessage(kMsgDeleteCurrent));
 	fInterfaceMenu->AddItem(fDeleterItem);
 	
 	BDirectory settingsDirectory;
@@ -635,32 +727,33 @@ void
 DialUpView::LoadAddons()
 {
 	// Load integrated add-ons:
-	// "Extras" tab
-	ExtrasAddon *extrasAddon = new ExtrasAddon(&fAddons);
-	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, extrasAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, extrasAddon);
+	// "Connection Options" tab
+	ConnectionOptionsAddon *connectionOptionsAddon =
+		new ConnectionOptionsAddon(&fAddons);
+	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, connectionOptionsAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, connectionOptionsAddon);
 	// "General" tab
-	GeneralAddon *generalAddon = new GeneralAddon(&fAddons);
-	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, generalAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, generalAddon);
+	GeneralAddon *fGeneralAddon = new GeneralAddon(&fAddons);
+	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, fGeneralAddon);
+	fAddons.AddPointer(DUN_DELETE_ON_QUIT, fGeneralAddon);
 	// "IPCP" protocol
 	IPCPAddon *ipcpAddon = new IPCPAddon(&fAddons);
-	fAddons.AddPointer(DUN_PROTOCOL_ADDON_TYPE, ipcpAddon);
+	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, ipcpAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, ipcpAddon);
 	// "PPPoE" device
 	PPPoEAddon *pppoeAddon = new PPPoEAddon(&fAddons);
 	fAddons.AddPointer(DUN_DEVICE_ADDON_TYPE, pppoeAddon);
 	fAddons.AddPointer(DUN_DELETE_ON_QUIT, pppoeAddon);
-	// "Protocols" tab
-	ProtocolsAddon *protocolsAddon = new ProtocolsAddon(&fAddons);
-	fAddons.AddPointer(DUN_TAB_ADDON_TYPE, protocolsAddon);
-	fAddons.AddPointer(DUN_DELETE_ON_QUIT, protocolsAddon);
 	
 	// "PAP" authenticator
 	BMessage addon;
-	addon.AddString("KernelModuleName", "pap");
+#ifdef LANG_GERMAN
+	addon.AddString("FriendlyName", "Unverschlüsselt");
+#else
 	addon.AddString("FriendlyName", "Plain-text Authentication");
+#endif
 	addon.AddString("TechnicalName", "PAP");
+	addon.AddString("KernelModuleName", "pap");
 	fAddons.AddMessage(DUN_AUTHENTICATOR_ADDON_TYPE, &addon);
 	// addon.MakeEmpty(); // for next authenticator
 	
@@ -673,11 +766,12 @@ void
 DialUpView::AddInterface(const char *name, bool isNew = false)
 {
 	if(fInterfaceMenu->FindItem(name)) {
-		(new BAlert(ERROR_TITLE, ERROR_INTERFACE_EXISTS, TEXT_OK))->Go(NULL);
+		(new BAlert(kErrorTitle, kErrorInterfaceExists, kLabelOK,
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		return;
 	}
 	
-	BMenuItem *item = new BMenuItem(name, new BMessage(MSG_SELECT_INTERFACE));
+	BMenuItem *item = new BMenuItem(name, new BMessage(kMsgSelectInterface));
 	item->SetTarget(this);
 	int32 index = FindNextMenuInsertionIndex(fInterfaceMenu, name);
 	if(index > CountInterfaces())
@@ -698,7 +792,8 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 		return;
 	
 	if(fCurrentItem && !SaveSettingsToFile())
-		(new BAlert(ERROR_TITLE, ERROR_SAVING_FAILED, TEXT_OK))->Go(NULL);
+		(new BAlert(kErrorTitle, kErrorSavingFailed, kLabelOK,
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 	
 	if(index >= CountInterfaces() || index < 0) {
 		if(CountInterfaces() > 0)
@@ -723,10 +818,12 @@ DialUpView::SelectInterface(int32 index, bool isNew = false)
 		LoadSettings(false);
 			// tell modules to unload all settings
 	else if(!isNew && !LoadSettings(false)) {
-		(new BAlert(ERROR_TITLE, ERROR_LOADING_FAILED, TEXT_OK))->Go(NULL);
+		(new BAlert(kErrorTitle, kErrorLoadingFailed, kLabelOK,
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 		LoadSettings(true);
 	} else if(isNew && !LoadSettings(true))
-		(new BAlert(ERROR_TITLE, ERROR_LOADING_FAILED, TEXT_OK))->Go(NULL);
+		(new BAlert(kErrorTitle, kErrorLoadingFailed, kLabelOK,
+			NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT))->Go(NULL);
 }
 
 
@@ -748,7 +845,7 @@ DialUpView::UpdateControls()
 	} else if(!fTabView->IsHidden() && CountInterfaces() == 0) {
 		fDeleterItem->SetEnabled(false);
 		fInterfaceMenu->SetRadioMode(false);
-		fInterfaceMenu->Superitem()->SetLabel(LABEL_CREATE_NEW);
+		fInterfaceMenu->Superitem()->SetLabel(kLabelCreateNew);
 		fTabView->Hide();
 		fStringView->Show();
 		fConnectButton->SetEnabled(false);

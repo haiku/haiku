@@ -13,11 +13,11 @@
 
 #include <DialUpAddon.h>
 
+#include <CheckBox.h>
 #include <String.h>
 #include <TextControl.h>
-#include <Window.h>
 
-class IPCPWindow;
+class IPCPView;
 
 
 class IPCPAddon : public DialUpAddon {
@@ -28,6 +28,8 @@ class IPCPAddon : public DialUpAddon {
 		bool IsNew() const
 			{ return fIsNew; }
 		
+		bool IsEnabled() const
+			{ return fIsEnabled; }
 		const char *IPAddress() const
 			{ return fIPAddress.String(); }
 		const char *PrimaryDNS() const
@@ -40,9 +42,8 @@ class IPCPAddon : public DialUpAddon {
 		BMessage *Profile() const
 			{ return fProfile; }
 		
-		virtual const char *FriendlyName() const;
-		virtual const char *TechnicalName() const;
-		virtual const char *KernelModuleName() const;
+		virtual int32 Position() const
+			{ return 10; }
 		
 		virtual bool LoadSettings(BMessage *settings, BMessage *profile, bool isNew);
 		virtual void IsModified(bool *settings, bool *profile) const;
@@ -55,22 +56,24 @@ class IPCPAddon : public DialUpAddon {
 		int32 FindIPCPProtocol(const BMessage& message, BMessage *protocol) const;
 
 	private:
-		bool fIsNew;
+		bool fIsNew, fIsEnabled;
 		BString fIPAddress, fPrimaryDNS, fSecondaryDNS;
 		BMessage *fSettings, *fProfile;
 			// saves last settings state
-		IPCPWindow *fIPCPWindow;
+		IPCPView *fIPCPView;
 };
 
 
-class IPCPWindow : public BWindow {
+class IPCPView : public BView {
 	public:
-		IPCPWindow(IPCPAddon *addon, BRect frame);
+		IPCPView(IPCPAddon *addon, BRect frame);
 		
 		IPCPAddon *Addon() const
 			{ return fAddon; }
 		void Reload();
 		
+		bool IsEnabled() const
+			{ return fIsEnabled->Value(); }
 		const char *IPAddress() const
 			{ return fIPAddress->Text(); }
 		const char *PrimaryDNS() const
@@ -78,13 +81,17 @@ class IPCPWindow : public BWindow {
 		const char *SecondaryDNS() const
 			{ return fSecondaryDNS->Text(); }
 		
+		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
 
 	private:
+		void UpdateControls();
+
+	private:
 		IPCPAddon *fAddon;
+		BCheckBox *fIsEnabled;
 		BButton *fCancelButton, *fOKButton;
 		BTextControl *fIPAddress, *fPrimaryDNS, *fSecondaryDNS;
-		BString fPreviousIPAddress, fPreviousPrimaryDNS, fPreviousSecondaryDNS;
 };
 
 

@@ -18,11 +18,10 @@ SimpleTest DialUpPreflet :
 	TextRequestDialog.cpp
 	
 	# built-in add-ons
-	ExtrasAddon.cpp
+	ConnectionOptionsAddon.cpp
 	GeneralAddon.cpp
 	IPCPAddon.cpp
 	PPPoEAddon.cpp
-	ProtocolsAddon.cpp
 ;
 
 LinkSharedOSLibs DialUpPreflet : libppp.a be ;

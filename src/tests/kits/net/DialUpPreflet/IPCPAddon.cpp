@@ -5,7 +5,7 @@
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
 // IPCPAddon saves the loaded settings.
-// IPCPWindow saves the current settings.
+// IPCPView saves the current settings.
 //-----------------------------------------------------------------------
 
 #include "IPCPAddon.h"
@@ -14,23 +14,38 @@
 #include <stl_algobase.h>
 	// for max()
 
-#include <Box.h>
-#include <Button.h>
+#include <StringView.h>
 
 #include <PPPDefs.h>
 #include <IPCP.h>
 	// from IPCP addon
 
 
-#define BUTTON_WIDTH				80
+// GUI constants
+static const uint32 kDefaultButtonWidth = 80;
 
-#define MSG_CHANGE_SETTINGS			'CHGS'
-#define MSG_RESET_SETTINGS			'RSTS'
+// message constants
+static const uint32 kMsgUpdateControls = 'UCTL';
 
+// labels
+#ifdef LANG_GERMAN
+static const char *kLabelIPCP = "TCP/IP";
+static const char *kLabelEnabled = "Verwenden";
+static const char *kLabelIPAddress = "IP Adresse: ";
+static const char *kLabelPrimaryDNS = "Primärer DNS: ";
+static const char *kLabelSecondaryDNS = "Sekundärer DNS: ";
+static const char *kLabelOptional = "(Optional)";
+#else
+static const char *kLabelIPCP = "TCP/IP";
+static const char *kLabelEnabled = "Enabled";
+static const char *kLabelIPAddress = "IP Address: ";
+static const char *kLabelPrimaryDNS = "Primary DNS: ";
+static const char *kLabelSecondaryDNS = "Secondary DNS: ";
+static const char *kLabelOptional = "(Optional)";
+#endif
 
-static const char kFriendlyName[] = "IPv4 (TCP/IP): Internet Protocol";
-static const char kTechnicalName[] = "IPCP";
-static const char kKernelModuleName[] = "ipcp";
+// add-on descriptions
+static const char *kKernelModuleName = "ipcp";
 
 
 IPCPAddon::IPCPAddon(BMessage *addons)
@@ -38,11 +53,6 @@ IPCPAddon::IPCPAddon(BMessage *addons)
 	fSettings(NULL),
 	fProfile(NULL)
 {
-	float windowHeight = 3 * 20 // text controls
-		+ 35 // buttons
-		+ 4 * 5 + 10 + 20; // space between controls and bottom
-	BRect rect(350, 250, 650, 250 + windowHeight);
-	fIPCPWindow = new IPCPWindow(this, rect);
 }
 
 
@@ -51,46 +61,28 @@ IPCPAddon::~IPCPAddon()
 }
 
 
-const char*
-IPCPAddon::FriendlyName() const
-{
-	return kFriendlyName;
-}
-
-
-const char*
-IPCPAddon::TechnicalName() const
-{
-	return kTechnicalName;
-}
-
-
-const char*
-IPCPAddon::KernelModuleName() const
-{
-	return kKernelModuleName;
-}
-
-
 bool
 IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 {
 	fIsNew = isNew;
+	fIsEnabled = false;
 	fIPAddress = fPrimaryDNS = fSecondaryDNS = "";
 	fSettings = settings;
 	fProfile = profile;
-	if(!settings || !profile || isNew) {
-		fIPCPWindow->Reload();
-			// reset all views
+	
+	if(fIPCPView)
+		fIPCPView->Reload();
+			// reset all views (empty settings)
+	
+	if(!settings || !profile || isNew)
 		return true;
-	}
 	
 	BMessage protocol;
 	
 	// settings
 	int32 protocolIndex = FindIPCPProtocol(*fSettings, &protocol);
 	if(protocolIndex < 0)
-		return false;
+		return true;
 	
 	protocol.AddBool(MDSU_VALID, true);
 	fSettings->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
@@ -98,7 +90,9 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	// profile
 	protocolIndex = FindIPCPProtocol(*fProfile, &protocol);
 	if(protocolIndex < 0)
-		return false;
+		return true;
+	
+	fIsEnabled = true;
 	
 	// the "Local" side parameter
 	BMessage local;
@@ -151,7 +145,8 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 	protocol.AddBool(MDSU_VALID, true);
 	fProfile->ReplaceMessage(MDSU_PARAMETERS, protocolIndex, &protocol);
 	
-	fIPCPWindow->Reload();
+	if(fIPCPView)
+		fIPCPView->Reload();
 	
 	return true;
 }
@@ -160,18 +155,15 @@ IPCPAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 void
 IPCPAddon::IsModified(bool *settings, bool *profile) const
 {
-	// some part of this work is done by the "Protocols" tab, thus we do not need to
-	// check whether we are a new protocol or not
-	*settings = false;
-	
 	if(!fSettings) {
-		*profile = false;
+		*settings = *profile = false;
 		return;
 	}
 	
-	*profile = (fIPAddress != fIPCPWindow->IPAddress()
-		|| fPrimaryDNS != fIPCPWindow->PrimaryDNS()
-		|| fSecondaryDNS != fIPCPWindow->SecondaryDNS());
+	*settings = fIsEnabled != fIPCPView->IsEnabled();
+	*profile = (*settings || fIPAddress != fIPCPView->IPAddress()
+		|| fPrimaryDNS != fIPCPView->PrimaryDNS()
+		|| fSecondaryDNS != fIPCPView->SecondaryDNS());
 }
 
 
@@ -180,6 +172,9 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 {
 	if(!fSettings || !settings)
 		return false;
+	
+	if(!fIPCPView->IsEnabled())
+		return true;
 	
 	BMessage protocol, local;
 	protocol.AddString(MDSU_NAME, PPP_PROTOCOL_KEY);
@@ -191,30 +186,30 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 	local.AddString(MDSU_NAME, IPCP_LOCAL_SIDE_KEY);
 	bool needsLocal = false;
 	
-	if(fIPCPWindow->IPAddress() && strlen(fIPCPWindow->IPAddress()) > 0) {
+	if(fIPCPView->IPAddress() && strlen(fIPCPView->IPAddress()) > 0) {
 		// save IP address, too
 		needsLocal = true;
 		BMessage ip;
 		ip.AddString(MDSU_NAME, IPCP_IP_ADDRESS_KEY);
-		ip.AddString(MDSU_VALUES, fIPCPWindow->IPAddress());
+		ip.AddString(MDSU_VALUES, fIPCPView->IPAddress());
 		local.AddMessage(MDSU_PARAMETERS, &ip);
 	}
 	
-	if(fIPCPWindow->PrimaryDNS() && strlen(fIPCPWindow->PrimaryDNS()) > 0) {
+	if(fIPCPView->PrimaryDNS() && strlen(fIPCPView->PrimaryDNS()) > 0) {
 		// save service name, too
 		needsLocal = true;
 		BMessage dns;
 		dns.AddString(MDSU_NAME, IPCP_PRIMARY_DNS_KEY);
-		dns.AddString(MDSU_VALUES, fIPCPWindow->PrimaryDNS());
+		dns.AddString(MDSU_VALUES, fIPCPView->PrimaryDNS());
 		local.AddMessage(MDSU_PARAMETERS, &dns);
 	}
 	
-	if(fIPCPWindow->SecondaryDNS() && strlen(fIPCPWindow->SecondaryDNS()) > 0) {
+	if(fIPCPView->SecondaryDNS() && strlen(fIPCPView->SecondaryDNS()) > 0) {
 		// save service name, too
 		needsLocal = true;
 		BMessage dns;
 		dns.AddString(MDSU_NAME, IPCP_SECONDARY_DNS_KEY);
-		dns.AddString(MDSU_VALUES, fIPCPWindow->SecondaryDNS());
+		dns.AddString(MDSU_VALUES, fIPCPView->SecondaryDNS());
 		local.AddMessage(MDSU_PARAMETERS, &dns);
 	}
 	
@@ -230,10 +225,15 @@ IPCPAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporar
 bool
 IPCPAddon::GetPreferredSize(float *width, float *height) const
 {
+	BRect rect;
+	if(Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect) != B_OK)
+		rect.Set(0, 0, 200, 300);
+			// set default values
+	
 	if(width)
-		*width = fIPCPWindow->Bounds().Width();
+		*width = rect.Width();
 	if(height)
-		*height = fIPCPWindow->Bounds().Height();
+		*height = rect.Height();
 	
 	return true;
 }
@@ -242,9 +242,15 @@ IPCPAddon::GetPreferredSize(float *width, float *height) const
 BView*
 IPCPAddon::CreateView(BPoint leftTop)
 {
-	fIPCPWindow->MoveTo(leftTop);
-	fIPCPWindow->Show();
-	return NULL;
+	if(!fIPCPView) {
+		BRect rect;
+		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
+		fIPCPView = new IPCPView(this, rect);
+		fIPCPView->Reload();
+	}
+	
+	fIPCPView->MoveTo(leftTop);
+	return fIPCPView;
 }
 
 
@@ -265,103 +271,92 @@ IPCPAddon::FindIPCPProtocol(const BMessage& message, BMessage *protocol) const
 }
 
 
-IPCPWindow::IPCPWindow(IPCPAddon *addon, BRect frame)
-	: BWindow(frame, "IPCP Settings", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_CLOSABLE),
+IPCPView::IPCPView(IPCPAddon *addon, BRect frame)
+	: BView(frame, kLabelIPCP, B_FOLLOW_NONE, 0),
 	fAddon(addon)
 {
 	BRect rect = Bounds();
-	BView *backgroundView = new BView(rect, "backgroundView", B_FOLLOW_NONE, 0);
-	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	rect.InsetBy(5, 5);
-	
-	float boxHeight = 20 // space at top
-		+ 3 * 20 // size of controls
-		+ 4 * 5; // space between controls and bottom
-	rect.bottom = rect.top + boxHeight;
-	BBox *ipcpBox = new BBox(rect, "IPCP");
-	ipcpBox->SetLabel("IPCP");
-	rect = ipcpBox->Bounds();
-	rect.InsetBy(10, 0);
-	rect.top = 20;
-	rect.bottom = rect.top + 20;
-	fIPAddress = new BTextControl(rect, "ip", "IP Address: ", NULL, NULL);
+	rect.InsetBy(10, 10);
+	rect.bottom = rect.top + 15;
+	fIsEnabled = new BCheckBox(rect, "isEnabled", kLabelEnabled,
+		new BMessage(kMsgUpdateControls));
+	rect.left += 15;
+		// indent the other controls to indicate that they depend on this control
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
-	fPrimaryDNS = new BTextControl(rect, "primaryDNS", "Primary DNS: ", NULL, NULL);
+	BRect optionalRect(rect);
+	rect.right -= 75;
+	fIPAddress = new BTextControl(rect, "ip", kLabelIPAddress, NULL, NULL);
+	optionalRect.left = rect.right + 5;
+	optionalRect.bottom = optionalRect.top + 15;
+	AddChild(new BStringView(optionalRect, "optional_1", kLabelOptional));
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
-	fSecondaryDNS = new BTextControl(rect, "secondaryDNS", "Secondary DNS: ", NULL,
+	fPrimaryDNS = new BTextControl(rect, "primaryDNS", kLabelPrimaryDNS, NULL, NULL);
+	optionalRect.top = rect.top;
+	optionalRect.bottom = optionalRect.top + 15;
+	AddChild(new BStringView(optionalRect, "optional_2", kLabelOptional));
+	rect.top = rect.bottom + 5;
+	rect.bottom = rect.top + 20;
+	fSecondaryDNS = new BTextControl(rect, "secondaryDNS", kLabelSecondaryDNS, NULL,
 		NULL);
+	optionalRect.top = rect.top;
+	optionalRect.bottom = optionalRect.top + 15;
+	AddChild(new BStringView(optionalRect, "optional_3", kLabelOptional));
 	
 	// set divider of text controls
-	float ipAddressWidth = backgroundView->StringWidth(fIPAddress->Label()) + 5;
-	float primaryDNSWidth = backgroundView->StringWidth(fPrimaryDNS->Label()) + 5;
-	float secondaryDNSWidth = backgroundView->StringWidth(fSecondaryDNS->Label()) + 5;
-	float controlWidth = max(max(ipAddressWidth, primaryDNSWidth), secondaryDNSWidth);
+	float controlWidth = max(max(StringWidth(fIPAddress->Label()),
+		StringWidth(fPrimaryDNS->Label())), StringWidth(fSecondaryDNS->Label()));
+	fIPAddress->SetDivider(controlWidth + 5);
+	fPrimaryDNS->SetDivider(controlWidth + 5);
+	fSecondaryDNS->SetDivider(controlWidth + 5);
 	
-	fIPAddress->SetDivider(controlWidth);
-	fPrimaryDNS->SetDivider(controlWidth);
-	fSecondaryDNS->SetDivider(controlWidth);
-	
-	// add buttons to service window
-	rect = ipcpBox->Frame();
-	rect.top = rect.bottom + 10;
-	rect.bottom = rect.top + 25;
-	rect.left = rect.right - BUTTON_WIDTH;
-	fOKButton = new BButton(rect, "OKButton", "OK", new BMessage(MSG_CHANGE_SETTINGS));
-	rect.right = rect.left - 10;
-	rect.left = rect.right - BUTTON_WIDTH;
-	fCancelButton = new BButton(rect, "CancelButton", "Cancel",
-		new BMessage(MSG_RESET_SETTINGS));
-	
-	ipcpBox->AddChild(fIPAddress);
-	ipcpBox->AddChild(fPrimaryDNS);
-	ipcpBox->AddChild(fSecondaryDNS);
-	backgroundView->AddChild(ipcpBox);
-	backgroundView->AddChild(fCancelButton);
-	backgroundView->AddChild(fOKButton);
-	AddChild(backgroundView);
-	SetDefaultButton(fOKButton);
-	Run();
-		// this must be called in order for Reload() to work properly
+	AddChild(fIsEnabled);
+	AddChild(fIPAddress);
+	AddChild(fPrimaryDNS);
+	AddChild(fSecondaryDNS);
 }
 
 
 void
-IPCPWindow::Reload()
+IPCPView::Reload()
 {
-	Lock();
-	fIPAddress->MakeFocus(true);
+	fIsEnabled->SetValue(Addon()->IsEnabled() || Addon()->IsNew());
+		// enable TCP/IP by default
 	fIPAddress->SetText(Addon()->IPAddress());
-	fPreviousIPAddress = Addon()->IPAddress();
 	fPrimaryDNS->SetText(Addon()->PrimaryDNS());
-	fPreviousPrimaryDNS = Addon()->PrimaryDNS();
 	fSecondaryDNS->SetText(Addon()->SecondaryDNS());
-	fPreviousSecondaryDNS = Addon()->SecondaryDNS();
-	Unlock();
+	
+	UpdateControls();
 }
 
 
 void
-IPCPWindow::MessageReceived(BMessage *message)
+IPCPView::AttachedToWindow()
+{
+	SetViewColor(Parent()->ViewColor());
+	fIsEnabled->SetTarget(this);
+}
+
+
+void
+IPCPView::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
-		case MSG_CHANGE_SETTINGS:
-			Hide();
-			fPreviousIPAddress = fIPAddress->Text();
-			fPreviousPrimaryDNS = fPrimaryDNS->Text();
-			fPreviousSecondaryDNS = fSecondaryDNS->Text();
-		break;
-		
-		case MSG_RESET_SETTINGS:
-			Hide();
-			fIPAddress->SetText(fPreviousIPAddress.String());
-			fPrimaryDNS->SetText(fPreviousPrimaryDNS.String());
-			fPrimaryDNS->SetText(fPreviousPrimaryDNS.String());
+		case kMsgUpdateControls:
+			UpdateControls();
 		break;
 		
 		default:
-			BWindow::MessageReceived(message);
+			BView::MessageReceived(message);
 	}
+}
+
+
+void
+IPCPView::UpdateControls()
+{
+	fIPAddress->SetEnabled(IsEnabled());
+	fPrimaryDNS->SetEnabled(IsEnabled());
+	fSecondaryDNS->SetEnabled(IsEnabled());
 }

@@ -8,10 +8,12 @@
 #ifndef _DIAL_UP_VIEW__H
 #define _DIAL_UP_VIEW__H
 
-#include <View.h>
 #include <Message.h>
+#include <View.h>
 
 #include <PPPInterfaceListener.h>
+
+class GeneralAddon;
 
 
 class DialUpView : public BView {
@@ -23,6 +25,12 @@ class DialUpView : public BView {
 		virtual void MessageReceived(BMessage *message);
 		
 		void UpDownThread();
+		
+		// used by ppp_server
+		bool SelectInterfaceNamed(const char *name);
+		BView *AuthenticationView() const;
+		BView *StatusView() const;
+		BView *ConnectButton() const;
 
 	private:
 		void GetPPPDirectories(BDirectory *settingsDirectory,
@@ -58,6 +66,7 @@ class DialUpView : public BView {
 		BMenuItem *fCurrentItem, *fDeleterItem;
 		ppp_interface_id fWatching;
 		
+		GeneralAddon *fGeneralAddon;
 		bool fKeepLabel;
 		BStringView *fStatusView;
 		BButton *fConnectButton;

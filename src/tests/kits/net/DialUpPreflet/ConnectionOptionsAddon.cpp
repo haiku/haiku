@@ -4,11 +4,11 @@
 //
 //  Copyright (c) 2003-2004 Waldemar Kornewald, Waldemar.Kornewald@web.de
 //-----------------------------------------------------------------------
-// ExtrasAddon saves the loaded settings.
-// ExtrasView saves the current settings.
+// ConnectionOptionsAddon saves the loaded settings.
+// ConnectionOptionsView saves the current settings.
 //-----------------------------------------------------------------------
 
-#include "ExtrasAddon.h"
+#include "ConnectionOptionsAddon.h"
 
 #include "MessageDriverSettingsUtils.h"
 
@@ -16,33 +16,47 @@
 #include <settings_tools.h>
 
 
-#define MSG_UPDATE_CONTROLS		'UPDC'
+// message constants
+static const uint32 kMsgUpdateControls = 'UPDC';
+
+// labels
+#ifdef LANG_GERMAN
+static const char *kLabelConnectionOptions = "Verbindungs-Optionen";
+static const char *kLabelDialOnDemand = "Bei Bedarf Automatisch Verbinden";
+static const char *kLabelAskBeforeDialing = "Vor Dem Verbinden Fragen";
+static const char *kLabelAutoRedial = "Verbindung Automatisch Wiederherstellen";
+#else
+static const char *kLabelConnectionOptions = "Connection Options";
+static const char *kLabelDialOnDemand = "Connect Automatically When Needed";
+static const char *kLabelAskBeforeDialing = "Ask Before Dialing";
+static const char *kLabelAutoRedial = "Redial Automatically";
+#endif
 
 
-ExtrasAddon::ExtrasAddon(BMessage *addons)
+ConnectionOptionsAddon::ConnectionOptionsAddon(BMessage *addons)
 	: DialUpAddon(addons),
 	fSettings(NULL),
 	fProfile(NULL),
-	fExtrasView(NULL)
+	fConnectionOptionsView(NULL)
 {
 }
 
 
-ExtrasAddon::~ExtrasAddon()
+ConnectionOptionsAddon::~ConnectionOptionsAddon()
 {
 }
 
 
 bool
-ExtrasAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
+ConnectionOptionsAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 {
 	fIsNew = isNew;
 	fDoesDialOnDemand = fAskBeforeDialing = fDoesAutoRedial = false;
 	fSettings = settings;
 	fProfile = profile;
 	
-	if(fExtrasView)
-		fExtrasView->Reload();
+	if(fConnectionOptionsView)
+		fConnectionOptionsView->Reload();
 			// reset all views (empty settings)
 	
 	if(!settings || !profile || isNew)
@@ -80,8 +94,8 @@ ExtrasAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 		fSettings->ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
 	}
 	
-	if(fExtrasView)
-		fExtrasView->Reload();
+	if(fConnectionOptionsView)
+		fConnectionOptionsView->Reload();
 			// reload new settings
 	
 	return true;
@@ -89,33 +103,33 @@ ExtrasAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 
 
 void
-ExtrasAddon::IsModified(bool *settings, bool *profile) const
+ConnectionOptionsAddon::IsModified(bool *settings, bool *profile) const
 {
 	*settings = *profile = false;
 	
-	if(!fSettings || !fExtrasView)
+	if(!fSettings || !fConnectionOptionsView)
 		return;
 	
-	*settings = DoesDialOnDemand() != fExtrasView->DoesDialOnDemand()
-		|| AskBeforeDialing() != fExtrasView->AskBeforeDialing()
-		|| DoesAutoRedial() != fExtrasView->DoesAutoRedial();
+	*settings = DoesDialOnDemand() != fConnectionOptionsView->DoesDialOnDemand()
+		|| AskBeforeDialing() != fConnectionOptionsView->AskBeforeDialing()
+		|| DoesAutoRedial() != fConnectionOptionsView->DoesAutoRedial();
 }
 
 
 bool
-ExtrasAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
+ConnectionOptionsAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTemporary)
 {
 	if(!fSettings || !settings)
 		return false;
 	
 	BMessage parameter;
-	if(fExtrasView->DoesDialOnDemand()) {
+	if(fConnectionOptionsView->DoesDialOnDemand()) {
 		parameter.MakeEmpty();
 		parameter.AddString(MDSU_NAME, PPP_DIAL_ON_DEMAND_KEY);
 		parameter.AddString(MDSU_VALUES, "enabled");
 		settings->AddMessage(MDSU_PARAMETERS, &parameter);
 		
-		if(fExtrasView->AskBeforeDialing()) {
+		if(fConnectionOptionsView->AskBeforeDialing()) {
 			parameter.MakeEmpty();
 			parameter.AddString(MDSU_NAME, PPP_ASK_BEFORE_DIALING_KEY);
 			parameter.AddString(MDSU_VALUES, "enabled");
@@ -123,7 +137,7 @@ ExtrasAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempor
 		}
 	}
 	
-	if(fExtrasView->DoesAutoRedial()) {
+	if(fConnectionOptionsView->DoesAutoRedial()) {
 		parameter.MakeEmpty();
 		parameter.AddString(MDSU_NAME, PPP_AUTO_REDIAL_KEY);
 		parameter.AddString(MDSU_VALUES, "enabled");
@@ -135,7 +149,7 @@ ExtrasAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempor
 
 
 bool
-ExtrasAddon::GetPreferredSize(float *width, float *height) const
+ConnectionOptionsAddon::GetPreferredSize(float *width, float *height) const
 {
 	BRect rect;
 	if(Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect) != B_OK)
@@ -152,58 +166,50 @@ ExtrasAddon::GetPreferredSize(float *width, float *height) const
 
 
 BView*
-ExtrasAddon::CreateView(BPoint leftTop)
+ConnectionOptionsAddon::CreateView(BPoint leftTop)
 {
-	if(!fExtrasView) {
+	if(!fConnectionOptionsView) {
 		BRect rect;
 		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
-		fExtrasView = new ExtrasView(this, rect);
-		fExtrasView->Reload();
+		fConnectionOptionsView = new ConnectionOptionsView(this, rect);
+		fConnectionOptionsView->Reload();
 	}
 	
-	fExtrasView->MoveTo(leftTop);
-	return fExtrasView;
+	fConnectionOptionsView->MoveTo(leftTop);
+	return fConnectionOptionsView;
 }
 
 
-ExtrasView::ExtrasView(ExtrasAddon *addon, BRect frame)
-	: BView(frame, "Extras", B_FOLLOW_NONE, 0),
+ConnectionOptionsView::ConnectionOptionsView(ConnectionOptionsAddon *addon, BRect frame)
+	: BView(frame, kLabelConnectionOptions, B_FOLLOW_NONE, 0),
 	fAddon(addon)
 {
 	BRect rect = Bounds();
 	rect.InsetBy(10, 10);
 	rect.bottom = rect.top + 15;
-	fDialOnDemand = new BRadioButton(rect, "DialOnDemand", "Dial On Demand",
-		new BMessage(MSG_UPDATE_CONTROLS));
+	fDialOnDemand = new BCheckBox(rect, "DialOnDemand", kLabelDialOnDemand,
+		new BMessage(kMsgUpdateControls));
 	rect.top = rect.bottom + 3;
 	rect.bottom = rect.top + 15;
-	rect.left += 15;
-	fAskBeforeDialing = new BCheckBox(rect, "AskBeforeDialing", "Ask Before Dialing",
+	rect.left += 20;
+	fAskBeforeDialing = new BCheckBox(rect, "AskBeforeDialing", kLabelAskBeforeDialing,
 		NULL);
-	rect.left -= 15;
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 15;
-	fDialManually = new BRadioButton(rect, "DialManually", "Dial Manually",
-		new BMessage(MSG_UPDATE_CONTROLS));
+	rect.left -= 20;
 	rect.top = rect.bottom + 20;
 	rect.bottom = rect.top + 15;
-	fAutoRedial = new BCheckBox(rect, "AutoRedial", "Auto-Redial", NULL);
+	fAutoRedial = new BCheckBox(rect, "AutoRedial", kLabelAutoRedial, NULL);
 	
 	AddChild(fDialOnDemand);
 	AddChild(fAskBeforeDialing);
-	AddChild(fDialManually);
 	AddChild(fAutoRedial);
 }
 
 
 void
-ExtrasView::Reload()
+ConnectionOptionsView::Reload()
 {
-	if(Addon()->DoesDialOnDemand() || Addon()->IsNew())
-		fDialOnDemand->SetValue(1);
-	else
-		fDialManually->SetValue(1);
-	
+	fDialOnDemand->SetValue(Addon()->DoesDialOnDemand() || Addon()->IsNew());
+		// this is enabled by default
 	fAskBeforeDialing->SetValue(Addon()->AskBeforeDialing());
 	fAutoRedial->SetValue(Addon()->DoesAutoRedial());
 	
@@ -215,19 +221,18 @@ ExtrasView::Reload()
 
 
 void
-ExtrasView::AttachedToWindow()
+ConnectionOptionsView::AttachedToWindow()
 {
 	SetViewColor(Parent()->ViewColor());
 	fDialOnDemand->SetTarget(this);
-	fDialManually->SetTarget(this);
 }
 
 
 void
-ExtrasView::MessageReceived(BMessage *message)
+ConnectionOptionsView::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
-		case MSG_UPDATE_CONTROLS:
+		case kMsgUpdateControls:
 			UpdateControls();
 		break;
 		
@@ -238,13 +243,12 @@ ExtrasView::MessageReceived(BMessage *message)
 
 
 void
-ExtrasView::UpdateControls()
+ConnectionOptionsView::UpdateControls()
 {
-	if(fDialManually->Value())
-		fAskBeforeDialing->SetEnabled(false);
-	else
+	if(fDialOnDemand->Value())
 		fAskBeforeDialing->SetEnabled(true);
+	else
+		fAskBeforeDialing->SetEnabled(false);
 	
-	fAskBeforeDialing->SetValue(1);
-		// this should be enabled by default
+	fAskBeforeDialing->SetValue(fDialOnDemand->Value());
 }

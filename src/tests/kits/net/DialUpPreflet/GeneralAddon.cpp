@@ -25,12 +25,36 @@
 #include <PPPDefs.h>
 
 
-#define MSG_SELECT_DEVICE			'SELD'
-#define MSG_SELECT_AUTHENTICATOR	'SELA'
+// message constants
+static const uint32 kMsgSelectDevice = 'SELD';
+static const uint32 kMsgSelectAuthenticator = 'SELA';
 
+// labels
+#ifdef LANG_GERMAN
+static const char *kLabelGeneral = "Allgemein";
+static const char *kLabelDevice = "Gerät: ";
+static const char *kLabelNoDevicesFound = "Keine Geräte Gefunden!";
+static const char *kLabelAuthenticator = "Login: ";
+static const char *kLabelNoAuthenticatorsFound = "Keine Login-Methoden gefunden!";
+static const char *kLabelName = "Name: ";
+static const char *kLabelPassword = "Password: ";
+static const char *kLabelSavePassword = "Password Speichern";
+static const char *kLabelNone = "Ohne";
+#else
+static const char *kLabelGeneral = "General";
+static const char *kLabelDevice = "Device: ";
+static const char *kLabelNoDevicesFound = "No Devices Found!";
+static const char *kLabelAuthenticator = "Login: ";
+static const char *kLabelNoAuthenticatorsFound = "No Authenticators Found!";
+static const char *kLabelName = "Name: ";
+static const char *kLabelPassword = "Password: ";
+static const char *kLabelSavePassword = "Save Password";
+static const char *kLabelNone = "None";
+#endif
 
-#define GENERAL_TAB_AUTHENTICATION	"Authentication"
-#define GENERAL_TAB_AUTHENTICATORS	"Authenticators"
+// string constants for information saved in the settings message
+static const char *kGeneralTabAuthentication = "Authentication";
+static const char *kGeneralTabAuthenticators = "Authenticators";
 
 
 #define DEFAULT_AUTHENTICATOR		"PAP"
@@ -141,11 +165,11 @@ GeneralAddon::LoadAuthenticationSettings()
 				// fatal error: we do not know how to handle this authenticator
 		
 		MarkAuthenticatorAsValid(name);
-		authentication.AddString(GENERAL_TAB_AUTHENTICATORS, name);
+		authentication.AddString(kGeneralTabAuthenticators, name);
 		++fAuthenticatorsCount;
 	}
 	
-	fSettings->AddMessage(GENERAL_TAB_AUTHENTICATION, &authentication);
+	fSettings->AddMessage(kGeneralTabAuthentication, &authentication);
 	
 	bool hasUsername = false;
 		// a username must be present
@@ -218,14 +242,14 @@ GeneralAddon::IsAuthenticationModified(bool *settings, bool *profile) const
 		*settings = fGeneralView->AuthenticatorName();
 	else {
 		BMessage authentication;
-		if(fSettings->FindMessage(GENERAL_TAB_AUTHENTICATION, &authentication) != B_OK) {
+		if(fSettings->FindMessage(kGeneralTabAuthentication, &authentication) != B_OK) {
 			*settings = *profile = false;
 			return;
 				// error!
 		}
 		
 		BString authenticator;
-		if(authentication.FindString(GENERAL_TAB_AUTHENTICATORS,
+		if(authentication.FindString(kGeneralTabAuthenticators,
 				&authenticator) != B_OK) {
 			*settings = *profile = false;
 			return;
@@ -303,11 +327,18 @@ GeneralAddon::CreateView(BPoint leftTop)
 		BRect rect;
 		Addons()->FindRect(DUN_TAB_VIEW_RECT, &rect);
 		fGeneralView = new GeneralView(this, rect);
+		fGeneralView->Reload();
 	}
 	
 	fGeneralView->MoveTo(leftTop);
-	fGeneralView->Reload();
 	return fGeneralView;
+}
+
+
+BView*
+GeneralAddon::AuthenticationView() const
+{
+	return fGeneralView ? fGeneralView->AuthenticationView() : NULL;
 }
 
 
@@ -351,7 +382,7 @@ GeneralAddon::MarkAuthenticatorAsValid(const BString& moduleName)
 
 
 GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
-	: BView(frame, "General", B_FOLLOW_NONE, 0),
+	: BView(frame, kLabelGeneral, B_FOLLOW_NONE, 0),
 	fAddon(addon)
 {
 	BRect rect = Bounds();
@@ -368,41 +399,49 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 	fAuthenticationBox = new BBox(rect, "Authentication");
 	
 	fDeviceField = new BMenuField(BRect(5, 0, 250, 20), "Device",
-		"Device:", new BPopUpMenu("No Devices Found!"));
-	fDeviceField->SetDivider(StringWidth(fDeviceField->Label()) + 10);
+		kLabelDevice, new BPopUpMenu(kLabelNoDevicesFound));
+	fDeviceField->SetDivider(StringWidth(fDeviceField->Label()) + 5);
 	fDeviceField->Menu()->SetRadioMode(true);
 	AddDevices();
 	fDeviceBox->SetLabel(fDeviceField);
 	
 	fAuthenticatorField = new BMenuField(BRect(5, 0, 250, 20), "Authenticator",
-		"Authenticator:", new BPopUpMenu("No Authenticators Found!"));
-	fAuthenticatorField->SetDivider(StringWidth(fAuthenticatorField->Label()) + 10);
+		kLabelAuthenticator, new BPopUpMenu(kLabelNoAuthenticatorsFound));
+	fAuthenticatorField->SetDivider(StringWidth(fAuthenticatorField->Label()) + 5);
 	fAuthenticatorField->Menu()->SetRadioMode(true);
 	AddAuthenticators();
 	fAuthenticationBox->SetLabel(fAuthenticatorField);
 	
 	rect = fAuthenticationBox->Bounds();
-	rect.InsetBy(10, 0);
+	rect.InsetBy(10, 5);
 	rect.top = 25;
+//	fAuthenticationView = new BControl(rect, "authenticationView", NULL, NULL,
+//		B_FOLLOW_NONE, 0);
+		// BControl automatically sets the view color when attached (we want that)
+	fAuthenticationView = new BView(rect, "authenticationView", B_FOLLOW_NONE, 0);
+	fAuthenticationView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	rect = fAuthenticationView->Bounds();
 	rect.bottom = rect.top + 20;
-	fUsername = new BTextControl(rect, "username", "Name: ", NULL, NULL);
+	fUsername = new BTextControl(rect, "username", kLabelName, NULL, NULL);
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
-	fPassword = new BTextControl(rect, "password", "Password: ", NULL, NULL);
+	fPassword = new BTextControl(rect, "password", kLabelPassword, NULL, NULL);
 	fPassword->TextView()->HideTyping(true);
-	float usernameWidth = StringWidth(fUsername->Label()) + 5;
-	float passwordWidth = StringWidth(fPassword->Label()) + 5;
-	float width = max(usernameWidth, passwordWidth);
-	fUsername->SetDivider(width);
-	fPassword->SetDivider(width);
+	
+	// set dividers
+	float width = max(StringWidth(fUsername->Label()),
+		StringWidth(fPassword->Label()));
+	fUsername->SetDivider(width + 5);
+	fPassword->SetDivider(width + 5);
 	
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
-	fSavePassword = new BCheckBox(rect, "SavePassword", "Save Password", NULL);
+	fSavePassword = new BCheckBox(rect, "SavePassword", kLabelSavePassword, NULL);
 	
-	fAuthenticationBox->AddChild(fUsername);
-	fAuthenticationBox->AddChild(fPassword);
-	fAuthenticationBox->AddChild(fSavePassword);
+	fAuthenticationView->AddChild(fUsername);
+	fAuthenticationView->AddChild(fPassword);
+	fAuthenticationView->AddChild(fSavePassword);
+	fAuthenticationBox->AddChild(fAuthenticationView);
 	
 	AddChild(fDeviceBox);
 	AddChild(fAuthenticationBox);
@@ -446,9 +485,9 @@ GeneralView::Reload()
 	if(Addon()->CountAuthenticators() > 0) {
 		BString kernelModule, authenticator;
 		BMessage authentication;
-		if(Addon()->Settings()->FindMessage(GENERAL_TAB_AUTHENTICATION,
+		if(Addon()->Settings()->FindMessage(kGeneralTabAuthentication,
 				&authentication) == B_OK)
-			authentication.FindString(GENERAL_TAB_AUTHENTICATORS, &authenticator);
+			authentication.FindString(kGeneralTabAuthenticators, &authenticator);
 		BMenu *menu = fAuthenticatorField->Menu();
 		for(int32 index = 0; index < menu->CountItems(); index++) {
 			item = menu->ItemAt(index);
@@ -521,7 +560,7 @@ void
 GeneralView::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
-		case MSG_SELECT_DEVICE:
+		case kMsgSelectDevice:
 			if(message->FindPointer("Addon", reinterpret_cast<void**>(&fDeviceAddon))
 					!= B_OK)
 				fDeviceAddon = NULL;
@@ -534,7 +573,7 @@ GeneralView::MessageReceived(BMessage *message)
 			}
 		break;
 		
-		case MSG_SELECT_AUTHENTICATOR:
+		case kMsgSelectAuthenticator:
 			UpdateControls();
 		break;
 		
@@ -608,7 +647,7 @@ void
 GeneralView::AddDevices()
 {
 	AddAddonsToMenu(Addon()->Addons(), fDeviceField->Menu(), DUN_DEVICE_ADDON_TYPE,
-		MSG_SELECT_DEVICE);
+		kMsgSelectDevice);
 }
 
 
@@ -616,7 +655,8 @@ void
 GeneralView::AddAuthenticators()
 {
 	fAuthenticatorDefault = NULL;
-	fAuthenticatorNone = new BMenuItem("None", new BMessage(MSG_SELECT_AUTHENTICATOR));
+	fAuthenticatorNone = new BMenuItem(kLabelNone,
+		new BMessage(kMsgSelectAuthenticator));
 	fAuthenticatorField->Menu()->AddItem(fAuthenticatorNone);
 	fAuthenticatorNone->SetMarked(true);
 	fAuthenticatorField->Menu()->AddSeparatorItem();
@@ -626,7 +666,7 @@ GeneralView::AddAuthenticators()
 	for(int32 index = 0;
 			Addon()->Addons()->FindMessage(DUN_AUTHENTICATOR_ADDON_TYPE, index,
 			&addon) == B_OK; index++) {
-		BMessage *message = new BMessage(MSG_SELECT_AUTHENTICATOR);
+		BMessage *message = new BMessage(kMsgSelectAuthenticator);
 		message->AddString("KernelModuleName", addon.FindString("KernelModuleName"));
 		
 		BString name, technicalName, friendlyName;

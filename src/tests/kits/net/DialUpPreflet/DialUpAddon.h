@@ -18,6 +18,11 @@
 #include <Point.h>
 
 
+// -------------------------------------------
+// uncomment the language (English by default)
+// #define LANG_GERMAN
+// -------------------------------------------
+
 #define DUN_MAXIMUM_PRIORITY			50
 
 // add-on types

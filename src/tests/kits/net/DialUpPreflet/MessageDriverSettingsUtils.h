@@ -10,6 +10,7 @@
 
 #include <SupportDefs.h>
 
+struct driver_settings;
 class BMessage;
 class BFile;
 
@@ -22,7 +23,10 @@ class BFile;
 extern bool FindMessageParameter(const char *name, const BMessage& message,
 	BMessage *save, int32 *startIndex = NULL);
 
+extern driver_settings *MessageToDriverSettings(const BMessage& message);
+
 extern bool ReadMessageDriverSettings(const char *name, BMessage *message);
 extern bool WriteMessageDriverSettings(BFile& file, const BMessage& message);
+
 
 #endif

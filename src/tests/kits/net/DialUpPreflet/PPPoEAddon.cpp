@@ -17,30 +17,57 @@
 	// for max()
 
 #include <Box.h>
-#include <Button.h>
 #include <MenuField.h>
 #include <MenuItem.h>
-#include <Messenger.h>
 #include <PopUpMenu.h>
 #include <StringView.h>
-#include <Window.h>
 
 #include <PPPManager.h>
 #include <PPPoE.h>
 	// from PPPoE addon
 
-#define BUTTON_WIDTH				80
 
-#define MSG_SELECT_INTERFACE		'SELI'
-#define MSG_SELECT_OTHER			'SELO'
-#define MSG_FINISH_SELECT_OTHER		'FISO'
-#define MSG_SHOW_SERVICE_WINDOW		'SHSW'
-#define MSG_CHANGE_SERVICE			'CHGS'
-#define MSG_RESET_SERVICE			'RESS'
+// GUI constants
+static const uint32 kDefaultButtonWidth = 80;
 
-static const char kFriendlyName[] = "DSL, Cable, etc.";
-static const char kTechnicalName[] = "PPPoE";
-static const char kKernelModuleName[] = "pppoe";
+// message constants
+static const uint32 kMsgSelectInterface = 'SELI';
+static const uint32 kMsgSelectOther = 'SELO';
+static const uint32 kMsgFinishSelectOther = 'FISO';
+static const uint32 kMsgShowServiceWindow = 'SHSW';
+static const uint32 kMsgChangeService = 'CHGS';
+static const uint32 kMsgResetService = 'RESS';
+
+// labels
+#ifdef LANG_GERMAN
+static const char *kLabelInterfaceName = "Netzwerk-Adapter: ";
+static const char *kLabelOptional = "(Optional)";
+static const char *kLabelOtherInterface = "Anderer:";
+static const char *kLabelSelectInterface = "Adapter Auswählen...";
+static const char *kLabelServiceName = "Service: ";
+#else
+static const char *kLabelInterfaceName = "Network Interface: ";
+static const char *kLabelOptional = "(Optional)";
+static const char *kLabelOtherInterface = "Other:";
+static const char *kLabelSelectInterface = "Select Interface...";
+static const char *kLabelServiceName = "Service: ";
+#endif
+
+// requests
+#ifdef LANG_GERMAN
+static const char *kRequestInterfaceName = "Name Des Adapters: ";
+#else
+static const char *kRequestInterfaceName = "Network Interface Name: ";
+#endif
+
+// add-on descriptions
+#ifdef LANG_GERMAN
+static const char *kFriendlyName = "Breitband: DSL, Kabel, etc.";
+#else
+static const char *kFriendlyName = "Broadband: DSL, Cable, etc.";
+#endif
+static const char *kTechnicalName = "PPPoE";
+static const char *kKernelModuleName = "pppoe";
 
 
 PPPoEAddon::PPPoEAddon(BMessage *addons)
@@ -50,8 +77,8 @@ PPPoEAddon::PPPoEAddon(BMessage *addons)
 	fPPPoEView(NULL)
 {
 	fHeight = 20 // interface name control
-		+ 25 // service button
-		+ 5; // space between controls
+		+ 20 // service control
+		+ 5 + 2; // space between controls and bottom
 }
 
 
@@ -87,7 +114,7 @@ bool
 PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 {
 	fIsNew = isNew;
-	fInterfaceName = fACName = fServiceName = "";
+	fInterfaceName = fServiceName = "";
 	fSettings = settings;
 	fProfile = profile;
 	if(!settings || !profile || isNew) {
@@ -113,15 +140,6 @@ PPPoEAddon::LoadSettings(BMessage *settings, BMessage *profile, bool isNew)
 			|| parameter.FindString(MDSU_VALUES, &fInterfaceName) != B_OK)
 		return false;
 			// error: no interface
-	else {
-		parameter.AddBool(MDSU_VALID, true);
-		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
-	}
-	
-	index = 0;
-	if(!FindMessageParameter(PPPoE_AC_NAME_KEY, device, &parameter, &index)
-			|| parameter.FindString(MDSU_VALUES, &fACName) != B_OK)
-		fACName = "";
 	else {
 		parameter.AddBool(MDSU_VALID, true);
 		device.ReplaceMessage(MDSU_PARAMETERS, index, &parameter);
@@ -154,7 +172,6 @@ PPPoEAddon::IsModified(bool *settings, bool *profile) const
 	}
 	
 	*settings = (fInterfaceName != fPPPoEView->InterfaceName()
-		|| fACName != fPPPoEView->ACName()
 		|| fServiceName != fPPPoEView->ServiceName());
 }
 
@@ -174,14 +191,6 @@ PPPoEAddon::SaveSettings(BMessage *settings, BMessage *profile, bool saveTempora
 	interface.AddString(MDSU_NAME, PPPoE_INTERFACE_KEY);
 	interface.AddString(MDSU_VALUES, fPPPoEView->InterfaceName());
 	device.AddMessage(MDSU_PARAMETERS, &interface);
-	
-	if(fPPPoEView->ACName() && strlen(fPPPoEView->ACName()) > 0) {
-		// save access concentrator, too
-		BMessage ac;
-		ac.AddString(MDSU_NAME, PPPoE_AC_NAME_KEY);
-		ac.AddString(MDSU_VALUES, fPPPoEView->ACName());
-		device.AddMessage(MDSU_PARAMETERS, &ac);
-	}
 	
 	if(fPPPoEView->ServiceName() && strlen(fPPPoEView->ServiceName()) > 0) {
 		// save service name, too
@@ -225,10 +234,10 @@ PPPoEAddon::CreateView(BPoint leftTop)
 		
 		BRect rect(0, 0, width, fHeight);
 		fPPPoEView = new PPPoEView(this, rect);
+		fPPPoEView->Reload();
 	}
 	
 	fPPPoEView->MoveTo(leftTop);
-	fPPPoEView->Reload();
 	return fPPPoEView;
 }
 
@@ -240,75 +249,25 @@ PPPoEView::PPPoEView(PPPoEAddon *addon, BRect frame)
 	BRect rect = Bounds();
 	rect.InsetBy(5, 0);
 	rect.bottom = 20;
-	fInterface = new BMenuField(rect, "interface", "Interface: ",
-		new BPopUpMenu("Select Interface..."));
+	fInterface = new BMenuField(rect, "interface", kLabelInterfaceName,
+		new BPopUpMenu(kLabelSelectInterface));
 	fInterface->SetDivider(StringWidth(fInterface->Label()) + 5);
 	fInterface->Menu()->AddSeparatorItem();
-	fOtherInterface = new BMenuItem("Other:", new BMessage(MSG_SELECT_OTHER));
+	fOtherInterface = new BMenuItem(kLabelOtherInterface,
+		new BMessage(kMsgSelectOther));
 	fInterface->Menu()->AddItem(fOtherInterface);
-	
-	rect.top = rect.bottom + 5;
-	rect.bottom = rect.top + 45;
-	fServiceButton = new BButton(rect, "ServiceButton", "Service",
-		new BMessage(MSG_SHOW_SERVICE_WINDOW));
-	fServiceButton->ResizeToPreferred();
-	
-	// create service window
-	float boxHeight = 20 // space at top
-		+ 2 * 20 // size of controls
-		+ 2 * 5; // space between controls and bottom
-	float windowHeight = boxHeight
-		+ 35 // buttons
-		+ 2 * 5; // space between controls and bottom
-	rect.Set(350, 250, 650, 250 + windowHeight);
-	fServiceWindow = new BWindow(rect, "Service", B_MODAL_WINDOW,
-		B_NOT_RESIZABLE | B_NOT_CLOSABLE);
-	rect = fServiceWindow->Bounds();
-	BView *serviceView = new BView(rect, "serviceView", B_FOLLOW_NONE, 0);
-	serviceView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	rect.InsetBy(5, 5);
-	rect.bottom = rect.top + boxHeight;
-	BBox *serviceBox = new BBox(rect, "Service");
-	serviceBox->SetLabel("Service");
-	rect = serviceBox->Bounds();
-	rect.InsetBy(10, 0);
-	rect.top = 20;
-	rect.bottom = rect.top + 20;
-	fACName = new BTextControl(rect, "ac", "AC: ", NULL, NULL);
 	rect.top = rect.bottom + 5;
 	rect.bottom = rect.top + 20;
-	fServiceName = new BTextControl(rect, "service", "Service: ", NULL, NULL);
-	
-	// set divider of text controls
-	float acNameWidth = StringWidth(fACName->Label()) + 5;
-	float serviceNameWidth = StringWidth(fServiceName->Label()) + 5;
-	float width = max(acNameWidth, serviceNameWidth);
-	fACName->SetDivider(width);
-	fServiceName->SetDivider(width);
-	
-	// add buttons to service window
-	rect = serviceBox->Frame();
-	rect.top = rect.bottom + 10;
-	rect.bottom = rect.top + 25;
-	rect.left = rect.right - BUTTON_WIDTH;
-	fOKButton = new BButton(rect, "OKButton", "OK", new BMessage(MSG_CHANGE_SERVICE));
-	rect.right = rect.left - 10;
-	rect.left = rect.right - BUTTON_WIDTH;
-	fCancelButton = new BButton(rect, "CancelButton", "Cancel",
-		new BMessage(MSG_RESET_SERVICE));
-	
-	serviceBox->AddChild(fACName);
-	serviceBox->AddChild(fServiceName);
-	serviceView->AddChild(serviceBox);
-	serviceView->AddChild(fCancelButton);
-	serviceView->AddChild(fOKButton);
-	fServiceWindow->AddChild(serviceView);
-	fServiceWindow->SetDefaultButton(fOKButton);
-	fServiceWindow->Run();
-		// this must be called in order for Reload() to work properly
+	rect.right -= 75;
+	fServiceName = new BTextControl(rect, "service", kLabelServiceName, NULL, NULL);
+	fServiceName->SetDivider(StringWidth(fServiceName->Label()) + 5);
+	rect.left = rect.right + 5;
+	rect.right += 75;
+	rect.bottom = rect.top + 15;
+	AddChild(new BStringView(rect, "optional", kLabelOptional));
 	
 	AddChild(fInterface);
-	AddChild(fServiceButton);
+	AddChild(fServiceName);
 }
 
 
@@ -321,17 +280,8 @@ PPPoEView::~PPPoEView()
 void
 PPPoEView::Reload()
 {
-	// update interface settings
 	ReloadInterfaces();
-	
-	// update service settings (in service window => must be locked)
-	fServiceWindow->Lock();
-	fACName->SetText(Addon()->ACName());
-	fPreviousACName = Addon()->ACName();
-	fServiceName->MakeFocus(true);
 	fServiceName->SetText(Addon()->ServiceName());
-	fPreviousServiceName = Addon()->ServiceName();
-	fServiceWindow->Unlock();
 }
 
 
@@ -340,11 +290,7 @@ PPPoEView::AttachedToWindow()
 {
 	SetViewColor(Parent()->ViewColor());
 	fInterface->Menu()->SetTargetForItems(this);
-	fServiceButton->SetTarget(this);
-	fACName->SetTarget(this);
 	fServiceName->SetTarget(this);
-	fCancelButton->SetTarget(this);
-	fOKButton->SetTarget(this);
 }
 
 
@@ -352,19 +298,19 @@ void
 PPPoEView::MessageReceived(BMessage *message)
 {
 	switch(message->what) {
-		case MSG_SELECT_INTERFACE: {
+		case kMsgSelectInterface: {
 			BMenuItem *item = fInterface->Menu()->FindMarked();
 			if(item)
 				fInterfaceName = item->Label();
 		} break;
 		
-		case MSG_SELECT_OTHER:
-			(new TextRequestDialog("InterfaceName", "Interface Name: ",
+		case kMsgSelectOther:
+			(new TextRequestDialog("InterfaceName", kRequestInterfaceName,
 				fInterfaceName.String()))->Go(new BInvoker(
-				new BMessage(MSG_FINISH_SELECT_OTHER), this));
+				new BMessage(kMsgFinishSelectOther), this));
 		break;
 		
-		case MSG_FINISH_SELECT_OTHER: {
+		case kMsgFinishSelectOther: {
 			int32 which;
 			message->FindInt32("which", &which);
 			
@@ -389,34 +335,12 @@ PPPoEView::MessageReceived(BMessage *message)
 				return;
 			}
 			
-			BString label("Other: ");
-			label << name;
+			BString label(kLabelOtherInterface);
+			label << " " << name;
 			fOtherInterface->SetLabel(label.String());
 			fOtherInterface->SetMarked(true);
 				// XXX: this is needed to tell the owning menu to update its label
 		} break;
-		
-		case MSG_SHOW_SERVICE_WINDOW:
-			fServiceWindow->MoveTo(center_on_screen(fServiceWindow->Bounds(),
-				Window()));
-			fServiceWindow->Show();
-		break;
-		
-		case MSG_CHANGE_SERVICE:
-			fServiceWindow->Hide();
-			fServiceWindow->Lock();
-			fPreviousACName = fACName->Text();
-			fPreviousServiceName = fServiceName->Text();
-			fServiceWindow->Unlock();
-		break;
-		
-		case MSG_RESET_SERVICE:
-			fServiceWindow->Hide();
-			fServiceWindow->Lock();
-			fACName->SetText(fPreviousACName.String());
-			fServiceName->SetText(fPreviousServiceName.String());
-			fServiceWindow->Unlock();
-		break;
 		
 		default:
 			BView::MessageReceived(message);
@@ -431,7 +355,7 @@ PPPoEView::ReloadInterfaces()
 	BMenu *menu = fInterface->Menu();
 	while(menu->CountItems() > 2)
 		delete menu->RemoveItem((int32) 0);
-	fOtherInterface->SetLabel("Other:");
+	fOtherInterface->SetLabel(kLabelOtherInterface);
 	
 	PPPManager manager;
 	char *interfaces = new char[8192];
@@ -443,7 +367,7 @@ PPPoEView::ReloadInterfaces()
 	char *name = interfaces;
 	int32 insertAt;
 	for(int32 index = 0; index < count; index++) {
-		item = new BMenuItem(name, new BMessage(MSG_SELECT_INTERFACE));
+		item = new BMenuItem(name, new BMessage(kMsgSelectInterface));
 		insertAt = FindNextMenuInsertionIndex(menu, name);
 		if(insertAt > menu->CountItems() - 2)
 			insertAt = menu->CountItems() - 2;
@@ -467,8 +391,8 @@ PPPoEView::ReloadInterfaces()
 	if(item && menu->IndexOf(item) <= menu->CountItems() - 2)
 		item->SetMarked(true);
 	else if(Addon()->InterfaceName()) {
-		BString label("Other: ");
-		label << fInterfaceName;
+		BString label(kLabelOtherInterface);
+		label << " " << fInterfaceName;
 		fOtherInterface->SetLabel(label.String());
 		fOtherInterface->SetMarked(true);
 	}

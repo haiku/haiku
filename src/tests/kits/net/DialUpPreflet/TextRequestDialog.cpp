@@ -12,17 +12,23 @@
 #include <TextControl.h>
 
 
-#define WINDOW_WIDTH	250
-#define WINDOW_HEIGHT	5 + 20 + 10 + 25 + 5
-#define WINDOW_RECT		BRect(0, 0, WINDOW_WIDTH, WINDOW_HEIGHT)
-#define BUTTON_WIDTH	80
+// GUI constants
+static const uint32 kWindowWidth = 250;
+static const uint32 kWindowHeight = 5 + 20 + 10 + 25 + 5;
+static const BRect kWindowRect(0, 0, kWindowWidth, kWindowHeight);
+static const uint32 kDefaultButtonWidth = 80;
 
-const int32 kMsgButton = 'MBTN';
+// message constants
+static const int32 kMsgButton = 'MBTN';
+
+// labels
+static const char *kLabelOK = "OK";
+static const char *kLabelCancel = "Cancel";
 
 
 TextRequestDialog::TextRequestDialog(const char *title, const char *request,
 		const char *text = NULL)
-	: BWindow(WINDOW_RECT, title, B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE, 0),
+	: BWindow(kWindowRect, title, B_MODAL_WINDOW, B_NOT_RESIZABLE | B_NOT_CLOSABLE, 0),
 	fInvoker(NULL)
 {
 	BRect rect = Bounds();
@@ -37,14 +43,14 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *request,
 	
 	rect.top = rect.bottom + 10;
 	rect.bottom = rect.top + 25;
-	rect.left = rect.right - BUTTON_WIDTH;
+	rect.left = rect.right - kDefaultButtonWidth;
 	BMessage message(kMsgButton);
 	message.AddInt32("which", 1);
-	BButton *okButton = new BButton(rect, "okButton", "OK", new BMessage(message));
+	BButton *okButton = new BButton(rect, "okButton", kLabelOK, new BMessage(message));
 	rect.right = rect.left - 10;
-	rect.left = rect.right - BUTTON_WIDTH;
+	rect.left = rect.right - kDefaultButtonWidth;
 	message.ReplaceInt32("which", 0);
-	BButton *cancelButton = new BButton(rect, "cancelButton", "Cancel",
+	BButton *cancelButton = new BButton(rect, "cancelButton", kLabelCancel,
 		new BMessage(message));
 	backgroundView->AddChild(okButton);
 	backgroundView->AddChild(cancelButton);

@@ -13,7 +13,7 @@
 #include "DialUpView.h"
 
 
-#define DIAL_UP_SIGNATURE "application/x-obos.dial-up-preflet"
+static const char *kSignature = "application/x-obos.dial-up-preflet";
 
 
 class DialUpApplication : public BApplication {
@@ -33,16 +33,18 @@ class DialUpWindow : public BWindow {
 
 int main()
 {
-	DialUpApplication *app = new DialUpApplication();
+	new DialUpApplication();
 	
-	app->Run();
+	be_app->Run();
+	
+	delete be_app;
 	
 	return 0;
 }
 
 
 DialUpApplication::DialUpApplication()
-	: BApplication(DIAL_UP_SIGNATURE)
+	: BApplication(kSignature)
 {
 	BRect rect(150, 50, 450, 435);
 	DialUpWindow *window = new DialUpWindow(rect);

@@ -6,7 +6,7 @@ All add-ons must add a "Valid" boolean value to every recognized parameter. The 
 --------------------------------------------------------------------------------------
 Add-on registration:
 --------------------------------------------------------------------------------------
-Tabs:
+Tabs and Protocols (protocols are tabs):
 DUN_TAB_ADDON_TYPE : pointer to DialUpAddon object
 
 Authenticators:
@@ -20,10 +20,6 @@ DUN_AUTHENTICATOR_ADDON_TYPE : BMessage with the following entries:
 
 Devices:
 DUN_DEVICE_ADDON_TYPE : pointer to DialUpAddon object
-
-Protocols:
-Note: CreateView() should NOT return a view, but open a preferences window (B_MODAL_WINDOW)!
-DUN_PROTOCOL_ADDON_TYPE : pointer to DialUpAddon object
 
 Addons that must be deleted:
 DUN_DELETE_ON_QUIT : pointer to DialUpAddon object - this will be deleted when the preflet quits

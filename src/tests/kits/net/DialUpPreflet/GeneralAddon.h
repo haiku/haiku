@@ -64,6 +64,9 @@ class GeneralAddon : public DialUpAddon {
 			bool saveTemporary);
 		virtual bool GetPreferredSize(float *width, float *height) const;
 		virtual BView *CreateView(BPoint leftTop);
+		
+		// used by ppp_server
+		BView *AuthenticationView() const;
 
 	private:
 		bool GetAuthenticator(const BString& moduleName, BMessage *entry) const;
@@ -108,6 +111,10 @@ class GeneralView : public BView {
 		
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *message);
+		
+		// used by ppp_server
+		BView *AuthenticationView() const
+			{ return fAuthenticationView; }
 
 	private:
 		void ReloadDeviceView();
@@ -120,6 +127,7 @@ class GeneralView : public BView {
 		GeneralAddon *fAddon;
 		DialUpAddon *fDeviceAddon;
 		BBox *fDeviceBox, *fAuthenticationBox;
+		BView *fAuthenticationView;
 		BMenuField *fDeviceField, *fAuthenticatorField;
 		BMenuItem *fAuthenticatorNone, *fAuthenticatorDefault;
 		BTextControl *fUsername, *fPassword;
