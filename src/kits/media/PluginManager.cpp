@@ -13,6 +13,13 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 {
 	printf("_CreateReader enter\n");
 	
+	BPositionIO *seekable_source = dynamic_cast<BPositionIO *>(source);
+	
+	if (seekable_source == 0) {
+		printf("_CreateReader: non-seekable sources not supported yet\n");
+		return B_ERROR;
+	}
+	
 	// get list of available readers from, the server
 	server_get_readers_request request;
 	server_get_readers_reply reply;
@@ -42,7 +49,8 @@ _CreateReader(Reader **reader, int32 *streamCount, media_file_format *mff, BData
 			return B_ERROR;
 		}
 	
-		(*reader)->Setup(source);
+		seekable_source->Seek(0, SEEK_SET);
+		(*reader)->Setup(seekable_source);
 	
 		if (B_OK == (*reader)->Sniff(streamCount)) {
 			printf("_CreateReader: Sniff success\n");
