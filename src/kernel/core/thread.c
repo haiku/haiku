@@ -1061,7 +1061,7 @@ thread_at_kernel_exit(void)
 	cpu_status state;
 	bigtime_t now;
 
-	TRACE(("thread_atkernel_exit: entry\n"));
+	TRACE(("thread_atkernel_exit: exit thread 0x%lx\n", thread->id));
 
 	state = disable_interrupts();
 	GRAB_THREAD_LOCK();
