@@ -101,10 +101,10 @@ _BStyleRecordBuffer_::InsertRecord(const BFont *inFont,
 										 const rgb_color *inColor)
 {
 	int32 index = 0;
-
+	
 	// look for style in buffer
 	if (MatchRecord(inFont, inColor, &index))
-		return (index);
+		return index;
 
 	// style not found, add it
 	font_height fh;
@@ -157,9 +157,7 @@ _BStyleRecordBuffer_::MatchRecord(const BFont *inFont,
 									   const rgb_color *inColor, int32 *outIndex)
 {
 	for (int32 i = 0; i < fItemCount; i++) {
-		if ( (inFont->Size() == fBuffer[i].style.font.Size()) &&
-			 (inFont->Shear() == fBuffer[i].style.font.Shear()) &&
-			 (inFont->Face() == fBuffer[i].style.font.Face()) &&
+		if ( (*inFont == fBuffer[i].style.font) &&
 			 (inColor->red == fBuffer[i].style.color.red) &&
 			 (inColor->green == fBuffer[i].style.color.green) &&
 			 (inColor->blue == fBuffer[i].style.color.blue) &&
@@ -272,7 +270,7 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 		
 		STEStyle style = fStyleRecord[runDesc.index]->style;
 		SetStyle(inMode, inFont, &style.font, inColor, &style.color);
-
+	
 		styleIndex = fStyleRecord.InsertRecord(&style.font, &style.color);
 		
 		if ( (runDesc.offset == offset) && (runIndex > 0) && 
@@ -288,9 +286,8 @@ _BStyleBuffer_::SetStyleRange(int32 fromOffset, int32 toOffset,
 				newDesc.index = styleIndex;
 				fStyleRunDesc.InsertDesc(&newDesc, runIndex + 1);
 				fStyleRecord.CommitRecord(newDesc.index);
-				runIndex++;
-			}
-			else {
+				runIndex++;		
+			} else {
 				fStyleRunDesc[runIndex]->index = styleIndex;
 				fStyleRecord.CommitRecord(styleIndex);
 			}
@@ -348,6 +345,9 @@ _BStyleBuffer_::GetStyleRange(int32 startOffset, int32 endOffset) const
 	result = (STEStyleRangePtr)malloc(sizeof(int32) +
 									  (sizeof(STEStyleRun) * numStyles));
 
+	if (!result)
+		return NULL;
+		
 	result->count = numStyles;
 	STEStyleRunPtr run = &result->runs[0];
 	for (int32 index = 0; index < numStyles; index++) {
@@ -458,9 +458,9 @@ _BStyleBuffer_::SetStyle(uint32 mode, const BFont *fromFont,
 							  BFont *toFont, const rgb_color *fromColor,
 							  rgb_color *toColor)
 {	
-	if (mode & B_FONT_FAMILY_AND_STYLE) 
+	if (mode & B_FONT_FAMILY_AND_STYLE)
 		toFont->SetFamilyAndStyle(fromFont->FamilyAndStyle());
-		
+
 	if (mode & B_FONT_SIZE)
 		toFont->SetSize(fromFont->Size());
 		
