@@ -24,42 +24,45 @@
 //	Description:	Class for low-overhead port-based messaging
 //  
 //------------------------------------------------------------------------------
+#include <malloc.h>
+
 #include <ServerProtocol.h>
 #include "PortLink.h"
 #include "PortMessage.h"
+#include "Session.h"
 
 PortLink::PortLink(port_id port)
 {
 	port_info pi;
-	port_ok	= (get_port_info(port, &pi)==B_OK)? true: false;
+	port_ok			= (get_port_info(port, &pi)==B_OK)? true: false;
 
-	fSendPort=port;
-	fReceivePort=create_port(30,"PortLink reply port");	
+	fSendPort		= port;
+	fReceivePort	= create_port(30,"PortLink reply port");	
 
-	fSendCode=0;
-	fSendBuffer=new char[4096];
-	fSendPosition=8;
-	fDataSize=(int32*)(fSendBuffer+sizeof(int32));
-	*fDataSize=0;
+	fSendCode		= 0;
+	fSendBuffer		= (char*)malloc(4096);//new char[4096];
+	fSendPosition	= 8;
+	fDataSize		= (int32*)(fSendBuffer+sizeof(int32));
+	*fDataSize		= 0;
 }
 
 PortLink::PortLink( const PortLink &link )
 {
-	port_ok=link.port_ok;
+	port_ok			= link.port_ok;
 
-	fSendPort=link.fSendPort;
-	fReceivePort=create_port(30,"PortLink reply port");
+	fSendPort		= link.fSendPort;
+	fReceivePort	= create_port(30,"PortLink reply port");
 	
-	fSendCode			= 0;
-	fSendBuffer=new char[4096];
-	fSendPosition		= 8;
-	fDataSize=(int32*)(fSendBuffer+sizeof(int32));
-	*fDataSize=0;
+	fSendCode		= 0;
+	fSendBuffer		= (char*)malloc(4096);//new char[4096];
+	fSendPosition	= 8;
+	fDataSize		= (int32*)(fSendBuffer+sizeof(int32));
+	*fDataSize		= 0;
 }
 
 PortLink::~PortLink(void)
 {
-	delete [] fSendBuffer;
+	free(fSendBuffer);//delete [] fSendBuffer;
 }
 
 void PortLink::SetOpCode( int32 code )
@@ -118,6 +121,16 @@ status_t PortLink::FlushWithReply( PortMessage *msg,bigtime_t timeout )
 	msg->ReadFromPort(fReceivePort,timeout);
 	
 	return B_OK;
+}
+
+status_t PortLink::FlushToSession(){
+	BSession	ses(0, fSendPort);
+// !!!!!!!!!!!!!!!!!!!
+// DW, if you modify PortLink, DON'T forget to modify
+//		BSession::CopyToSendBuffer() as well!!!
+// !!!!!!!!!!!!!!!!!!!
+	ses.CopyToSendBuffer(fSendBuffer, fSendPosition - 8);
+	ses.Sync();
 }
 
 status_t PortLink::Attach(const void *data, size_t size)
