@@ -69,9 +69,10 @@
 //# endif
 #endif
 
-DEF_STDFILE(_IO_2_1_stdin_, 0, 0, _IO_NO_WRITES);
-DEF_STDFILE(_IO_2_1_stdout_, 1, &_IO_2_1_stdin_, _IO_NO_READS);
-DEF_STDFILE(_IO_2_1_stderr_, 2, &_IO_2_1_stdout_, _IO_NO_READS+_IO_UNBUFFERED);
+// ToDo: stdin/stdout were originally buffered
+DEF_STDFILE(_IO_2_1_stdin_, 0, 0, _IO_NO_WRITES | _IO_UNBUFFERED);
+DEF_STDFILE(_IO_2_1_stdout_, 1, &_IO_2_1_stdin_, _IO_NO_READS | _IO_UNBUFFERED);
+DEF_STDFILE(_IO_2_1_stderr_, 2, &_IO_2_1_stdout_, _IO_NO_READS |_IO_UNBUFFERED);
 
 struct _IO_FILE_plus *_IO_list_all = &_IO_2_1_stderr_;
 INTVARDEF(_IO_list_all)
