@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (0.06-15, Rudolf)</h1></p>
+<p><h1>head (0.06-16, Rudolf)</h1></p>
 <ul>
 	<li>Updated modelist to include one more suggested mode for 800x600 resolution: Done by Andrew Bachmann;
 	<li>CRTC timing restriction checking updated: Modelists exported adhere to every cards max. CRTC capability now: the oldest cards support upto and including 1024x1000, while the newest cards support upto and including 1280x1024 resolution;
@@ -22,7 +22,8 @@
 	<li>Added fixed sync polarity programming if flatpanel in use: needed to make sure centering actually works;
 	<li>Disabling centering if external only monitor mode is active: fixes some trouble on NM2070 and maybe others;
 	<li>Added panel modeline programming for NM2070 cards: fixes hardcursor trouble on panel;
-	<li>Added pixelprecise panning for virtualscreens in all modes.
+	<li>Added pixelprecise panning for virtualscreens in all modes;
+	<li>Added full DPMS support.
 </ul>
 Note:<br>
 Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
@@ -52,9 +53,8 @@ Acceleration engine benchmarked and tested for errors with BeRoMeter V1.2.6.
 <p><h1>Still todo:</h1></p>
 <ul>
 	<li>fix for trouble with booting into modes above 800x600 resolution on some cards (please report this behaviour!);
-	<li>BIOSmode register programming needed for 'full' KB switch BIOS support(?);
 	<li>2D acceleration (in progress);
-	<li>MagicMedia series overlay update: still contains errors apparantly.
+	<li>MagicMedia series overlay update: still contains errors.
 </ul>
 </p>
 </body>
