@@ -726,7 +726,7 @@ execute_command(net_server_cookie *nsc, uint32 op, void *data, uint32 length)
 
 	while (true) {
 		// wait until we get the results back from our command
-		if ((status = acquire_sem(nsc->command_sem)) == B_OK) {
+		if ((status = acquire_sem_etc(nsc->command_sem, 1, B_CAN_INTERRUPT, 0)) == B_OK) {
 			if (command->op != 0) {
 				if (--max_tries <= 0) {
 					FATAL(("command is not freed after 200 tries!\n"));
