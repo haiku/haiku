@@ -154,7 +154,8 @@ ExpanderRules::MatchingRule(BString &fileName, const char *filetype)
 ExpanderRule *
 ExpanderRules::MatchingRule(const entry_ref *ref)
 {
-	BNode node(ref);
+	BEntry entry(ref, true);
+	BNode node(&entry);
 	BNodeInfo nodeInfo(&node);
 	char type[B_MIME_TYPE_LENGTH];
 	nodeInfo.GetType(type);
