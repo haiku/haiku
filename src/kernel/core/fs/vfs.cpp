@@ -5,9 +5,7 @@
 /* 
 ** Copyright 2002-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the OpenBeOS License.
-*/
-
-/*
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -1818,8 +1816,8 @@ vfs_test(void)
 #endif
 
 
-int
-vfs_bootstrap_all_filesystems(void)
+status_t
+vfs_bootstrap_file_systems(void)
 {
 	status_t status;
 
@@ -1831,15 +1829,6 @@ vfs_bootstrap_all_filesystems(void)
 		panic("error mounting rootfs!\n");
 
 	sys_setcwd(-1, "/");
-
-	// bootstrap the bootfs
-	bootstrap_bootfs();
-
-	sys_create_dir("/boot", 0755);
-	dev_t bootDevice = sNextMountID;
-	status = sys_mount("/boot", NULL, "bootfs", NULL);
-	if (status < B_OK)
-		panic("error mounting bootfs\n");
 
 	// bootstrap the devfs
 	bootstrap_devfs();
@@ -1864,6 +1853,23 @@ vfs_bootstrap_all_filesystems(void)
 			// we don't care if it will succeed or not
 	}
 
+	return B_OK;
+}
+
+
+status_t
+vfs_mount_boot_file_system()
+{
+	// bootstrap the bootfs
+
+	bootstrap_bootfs();
+
+	sys_create_dir("/boot", 0755);
+	dev_t bootDevice = sNextMountID;
+	status_t status = sys_mount("/boot", NULL, "bootfs", NULL);
+	if (status < B_OK)
+		panic("error mounting bootfs\n");
+
 	// create link for the name of the boot device
 
 	fs_info info;
@@ -1878,8 +1884,8 @@ vfs_bootstrap_all_filesystems(void)
 }
 
 
-int
-vfs_register_filesystem(const char *name, struct fs_ops *ops)
+status_t
+vfs_register_file_system(const char *name, struct fs_ops *ops)
 {
 	status_t status = B_OK;
 	file_system *fs;
@@ -1898,7 +1904,7 @@ vfs_register_filesystem(const char *name, struct fs_ops *ops)
 }
 
 
-int
+status_t
 vfs_init(kernel_args *ka)
 {
 	{
