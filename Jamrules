@@ -106,6 +106,7 @@ rule UserObject
 	switch $(2)
 	{
 	case *.S    : assemble $(1) : $(2) ;
+	case *.o    : return ;
 	case *      : ECHO "unknown suffix on" $(2) ;
 	}
 }
@@ -332,7 +333,7 @@ rule StaticLibrary
 {
 	# StaticLibrary <name> : <sources> ;
 	
-	SetupIncludes ;
+#	SetupIncludes ;
 	SetupObjectsDir ;
 	MakeLocateObjects $(2) ;
 	Library lib$(<).a : $(>) ;
@@ -714,6 +715,34 @@ actions assemble
 actions Chmod1
 {
 	$(CHMOD) "$(MODE)" "$(1)"
+}
+
+rule ObjectReference
+{
+	# ObjectReference <reference object> : <source object>
+	# Makes <reference object> refer to the same file as <source object>.
+	# The filenames must of course be identical.
+	# <source object> must have already been LOCATEd.
+
+	local ref = $(1) ;
+	local source = $(2) ;
+	if $(ref) != $(source) {
+		DEPENDS $(ref) : $(source) ;
+		on $(ref) LOCATE = [ on $(source) return $(LOCATE) ] ;
+	}
+}
+
+rule ObjectReferences
+{
+	# ObjectReferences <source objects>
+	# Creates local references to <source objects>, i.e. identifiers with the
+	# current grist referring to the same files. <source objects> must have
+	# already been LOCATEd.
+
+	local source ;
+	for source in $(1) {
+		ObjectReference [ FGristFiles $(source) ] : $(source) ;
+	}
 }
 
 
