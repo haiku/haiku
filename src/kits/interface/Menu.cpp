@@ -41,8 +41,8 @@
 menu_info BMenu::sMenuInfo;
 #endif
 
-static property_info sPropList[] =
-{
+static property_info
+sPropList[] = {
 	{ "Enabled", { B_GET_PROPERTY, 0 },
 		{ B_DIRECT_SPECIFIER, 0 }, "Returns true if menu or menu item is enabled; false "
 		"otherwise." },
@@ -426,44 +426,44 @@ BMenu::IndexOf(BMenu *submenu) const
 BMenuItem *
 BMenu::FindItem(const char *label) const
 {
-	BMenuItem *item;
+	BMenuItem *item = NULL;
 
 	for (int32 i = 0; i < CountItems(); i++) {
 		item = ItemAt(i);
 
 		if (item->Label() && strcmp(item->Label(), label) == 0)
-			return item;
+			break;
 
 		if (item->Submenu()) {
 			item = item->Submenu()->FindItem(label);
 			if (item)
-				return item;
+				break;
 		}
 	}
 
-	return NULL;
+	return item;
 }
 
 
 BMenuItem *
 BMenu::FindItem(uint32 command) const
 {
-	BMenuItem *item;
+	BMenuItem *item = NULL;
 
 	for (int32 i = 0; i < CountItems(); i++) {
 		item = ItemAt(i);
 
 		if (item->Command() == command)
-			return item;
+			break;
 
 		if (item->Submenu()) {
 			item = item->Submenu()->FindItem(command);
 			if (item)
-				return item;
+				break;
 		}
 	}
 
-	return NULL;
+	return item;
 }
 
 
@@ -674,7 +674,6 @@ BMenu::KeyDown(const char *bytes, int32 numBytes)
 void
 BMenu::Draw(BRect updateRect)
 {
-	CALLED();
 	DrawBackground(updateRect);
 	DrawItems(Bounds());
 }
@@ -683,7 +682,6 @@ BMenu::Draw(BRect updateRect)
 void
 BMenu::GetPreferredSize(float *width, float *height)
 {
-	CALLED();
 	ComputeLayout(0, true, false, width, height);
 }
 
@@ -715,7 +713,6 @@ BMenu::FrameResized(float new_width, float new_height)
 void
 BMenu::InvalidateLayout()
 {
-	CALLED();
 	CacheFontInfo();
 	LayoutItems(0);
 }
@@ -861,17 +858,14 @@ BPoint
 BMenu::ScreenLocation()
 {
 	BMenu *superMenu = Supermenu();
-	
-	if (superMenu == NULL)
-		return BPoint();
-
 	BMenuItem *superItem = Superitem();
 
-	if (superItem == NULL)
-		return BPoint();
-
-	BPoint point;
+	if (superMenu == NULL && superItem == NULL) {
+		debugger("BMenu can't determine where to draw."
+			"Override BMenu::ScreenLocation() to determine location.");
+	}
 	
+	BPoint point;
 	if (superMenu->Layout() == B_ITEMS_IN_COLUMN)
 		point = superItem->Frame().RightTop();
 	else
@@ -1073,6 +1067,11 @@ BMenu::_track(int *action, long start)
 	do {
 		if (LockLooper()) {
 			GetMouse(&location, &buttons);
+			if (OverSuper(location)) {
+				UnlockLooper();
+				break;
+			}
+			
 			item = HitTestItems(location);
 			 
 			if (item && fSelected != item) {
@@ -1090,6 +1089,13 @@ BMenu::_track(int *action, long start)
 		}
 		snooze(50000);
 	} while (buttons != 0);
+	
+	if (action != NULL) {
+		if (item != NULL) 
+			*action = 5;
+		else
+			*action = 0;
+	}
 	
 	return item;
 }
@@ -1236,7 +1242,6 @@ BMenu::ScrollIntoView(BMenuItem *item)
 void
 BMenu::DrawItems(BRect updateRect)
 {
-	CALLED();
 	for (int i = 0; i < fItems.CountItems(); i++) {
 		if (ItemAt(i)->Frame().Intersects(updateRect)) {
 			ItemAt(i)->Draw();
@@ -1271,11 +1276,13 @@ bool
 BMenu::OverSuper(BPoint loc)
 {
 	CALLED();
-	// TODO: we assume that loc is in screen coords
+	
+	ConvertToScreen(&loc);
+	
 	if (!Supermenu())
 		return false;
 	
-	return Supermenu()->Window()->Frame().Contains(loc);
+	return Supermenu()->Frame().Contains(loc);
 }
 
 
@@ -1311,7 +1318,6 @@ BMenu::DeleteMenuWindow()
 BMenuItem *
 BMenu::HitTestItems(BPoint where, BPoint slop) const
 {
-	CALLED();
 	for (int i = 0; i < CountItems(); i++)
 		if (ItemAt(i)->fBounds.Contains(where))
 			return ItemAt(i);

@@ -145,6 +145,8 @@ BMenuBar::Draw(BRect updateRect)
 	} else {
 		BRect bounds(Bounds());
 	
+		PushState();
+		
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
 		StrokeLine(BPoint(0.0f, bounds.bottom - 2.0f), BPoint(0.0f, 0.0f));
 		StrokeLine(BPoint(bounds.right, 0.0f));
@@ -156,8 +158,10 @@ BMenuBar::Draw(BRect updateRect)
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR), B_DARKEN_2_TINT));
 		StrokeLine(BPoint(0.0f, bounds.bottom), BPoint(bounds.right, bounds.bottom));
 		StrokeLine(BPoint(bounds.right, 0.0f), BPoint(bounds.right, bounds.bottom));
-
-		DrawItems(updateRect);
+		
+		PopState();
+		
+		DrawItems(updateRect);	
 	}
 }	
 
