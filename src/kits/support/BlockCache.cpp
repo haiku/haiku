@@ -19,7 +19,7 @@
 //	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 //	DEALINGS IN THE SOFTWARE.
 //
-//	File Name:		String.cpp
+//	File Name:		BlockCache.cpp
 //	Author(s):		Massimiliano Origgi
 //
 //	Description:	Handles a cache of memory blocks of the same size  
