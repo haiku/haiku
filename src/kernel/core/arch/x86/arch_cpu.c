@@ -1,6 +1,6 @@
 /*
-** Copyright 2002-2004, The OpenBeOS Team. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
 **
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
@@ -214,7 +214,7 @@ arch_cpu_idle(void)
 {
 	switch (smp_get_num_cpus()) {
 		case 0:
-			panic("You need at least 1 CPU to run OpenBeOS\n");
+			panic("You need at least 1 CPU to run Haiku\n");
 		case 1:
 			asm("hlt");
 		default:
