@@ -148,6 +148,8 @@ bfs_inode::InitCheck(Volume *volume)
 		// the other fields may not yet contain valid values
 		return B_BUSY;
 	}
+	if (Flags() & INODE_DELETED)
+		return B_NOT_ALLOWED;
 
 	if (Magic1() != INODE_MAGIC1
 		|| !(Flags() & INODE_IN_USE)
@@ -1681,6 +1683,8 @@ Inode::Trim(Transaction *transaction)
 status_t
 Inode::Free(Transaction *transaction)
 {
+	FUNCTION();
+
 	// Perhaps there should be an implementation of Inode::ShrinkStream() that
 	// just frees the data_stream, but doesn't change the inode (since it is
 	// freed anyway) - that would make an undelete command possible
@@ -1850,8 +1854,15 @@ Inode::Remove(Transaction *transaction, const char *name, off_t *_id, bool isDir
 		RETURN_ERROR(B_ERROR);
 	}
 
+#ifdef DEBUG
+	if (tree->Find((uint8 *)name, (uint16)strlen(name), &id) == B_OK) {
+		DIE(("deleted entry still there"));
+	}
+#endif
+
 	// update the inode, so that no one will ever doubt it's deleted :-)
 	inode->Node()->flags |= HOST_ENDIAN_TO_BFS_INT32(INODE_DELETED);
+	inode->Node()->flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 
 	// In balance to the Inode::Create() method, the main indices
 	// are updated here (name, size, & last_modified)
@@ -1893,6 +1904,8 @@ status_t
 Inode::Create(Transaction *transaction, Inode *parent, const char *name, int32 mode,
 	int omode, uint32 type, off_t *_id, Inode **_inode)
 {
+	FUNCTION();
+
 	block_run parentRun = parent ? parent->BlockRun() : block_run::Run(0, 0, 0);
 	Volume *volume = transaction->GetVolume();
 	BPlusTree *tree = NULL;
