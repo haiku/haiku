@@ -19,5 +19,6 @@ R5KernelAddon obfs : [ FDirName kernel file_systems bfs ] :
 	Query.cpp
 	Utility.cpp
 	Volume.cpp
+	BufferPool.cpp
 ;
 

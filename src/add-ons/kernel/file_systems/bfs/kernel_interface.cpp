@@ -524,9 +524,27 @@ bfs_ioctl(void *_ns, void *_node, void *_cookie, int cmd, void *buffer, size_t b
 
 	switch (cmd) {
 		case IOCTL_FILE_UNCACHED_IO:
+		{
+			// if the inode is already set up for uncached access, bail out
+			if (inode->Flags() & INODE_NO_CACHE) {
+				FATAL(("File %Ld is already uncached\n", inode->ID()));
+				return B_ERROR;
+			}
 			if (inode != NULL)
-				PRINT(("trying to make access to inode %lx uncached. Not yet implemented!\n",inode->ID()));
+				PRINT(("trying to make access to inode %Ld uncached. Not yet implemented!\n",inode->ID()));
+
+			// ToDo: sync the cache for this file!
+			// Unfortunately, we can't remove any blocks from the cache in BeOS,
+			// that means we can't guarantee consistency for the file contents
+			// spanning over both access modes.
+
+			// request buffers for being able to access the file without
+			// using the cache or allocating memory
+			status_t status = volume->Pool().RequestBuffers(volume->BlockSize());
+			if (status == B_OK)
+				inode->Node()->flags |= INODE_NO_CACHE;
 			return B_ERROR;
+		}
 #ifdef DEBUG
 		case 56742:
 		{
@@ -1015,6 +1033,10 @@ bfs_open(void *_ns, void *_node, int omode, void **_cookie)
 	Volume *volume = (Volume *)_ns;
 	Inode *inode = (Inode *)_node;
 
+	// we can't open a file which uses uncached access twice
+	if (inode->Flags() & INODE_NO_CACHE)
+		return B_BUSY;
+
 	// opening a directory read-only is allowed, although you can't read
 	// any data from it.
 	if (inode->IsDirectory() && omode & O_RWMASK) {
@@ -1151,11 +1173,12 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 
 	file_cookie *cookie = (file_cookie *)_cookie;
 
+	Volume *volume = (Volume *)_ns;
+	Inode *inode = (Inode *)_node;
+
 	if (cookie->open_mode & O_RWMASK) {
 		// trim the preallocated blocks and update the size,
 		// and last_modified indices if needed
-		Volume *volume = (Volume *)_ns;
-		Inode *inode = (Inode *)_node;
 
 		Transaction transaction(volume,inode->BlockNumber());
 
@@ -1171,6 +1194,11 @@ bfs_close(void *_ns, void *_node, void *_cookie)
 			transaction.Done();
 
 		notify_listener(B_STAT_CHANGED,volume->ID(),0,0,inode->ID(),NULL);
+	}
+
+	if (inode->Flags() & INODE_NO_CACHE) {
+		volume->Pool().ReleaseBuffers();
+		inode->Node().flags &= ~INODE_NO_CACHE;
 	}
 
 	return B_OK;

@@ -20,6 +20,7 @@ extern "C" {
 
 #include "bfs.h"
 #include "BlockAllocator.h"
+#include "BufferPool.h"
 #include "Chain.h"
 
 class Journal;
@@ -86,6 +87,7 @@ class Volume {
 #ifdef DEBUG
 		BlockAllocator		&Allocator() { return fBlockAllocator; }
 #endif
+		BufferPool			&Pool() { return fBufferPool; }
 
 		status_t			Sync();
 		Journal				*GetJournal(off_t /*refBlock*/) const { return fJournal; }
@@ -121,6 +123,8 @@ class Volume {
 
 		int32				fUniqueID;
 		uint32				fFlags;
+
+		BufferPool			fBufferPool;
 };
 
 // inline functions
