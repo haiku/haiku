@@ -352,7 +352,7 @@ delete_image(image_t *image)
 {
 	size_t size = sizeof(image_t) + (image->num_regions - 1) * sizeof(elf_region_t);
 
-	sys_unregister_image(image->id);
+	_kern_unregister_image(image->id);
 		// registered in load_container()
 
 	memset(image->needed, 0xa5, sizeof(image->needed[0]) * image->num_needed);
@@ -785,7 +785,7 @@ register_image(image_t *image, const char *path)
 	info.text_size = 0;
 	info.data = NULL;
 	info.data_size = 0;
-	image->id = sys_register_image(&info, sizeof(image_info));
+	image->id = _kern_register_image(&info, sizeof(image_info));
 }
 
 
