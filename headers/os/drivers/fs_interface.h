@@ -135,9 +135,6 @@ typedef struct fs_ops {
 	status_t (*rewind_query)(fs_volume fs, fs_cookie cookie);
 } fs_ops;
 
-#ifdef __cplusplus
-}
-#endif
 
 /* variables exported by the file system add-on */
 extern fs_ops	fs_entry;
@@ -149,5 +146,9 @@ extern status_t notify_listener(int op, mount_id device, vnode_id parentNode,
 extern status_t send_notification(port_id port, long token, ulong what, long op,
 					mount_id device, mount_id toDevice, vnode_id parentNode,
 					vnode_id toParentNode, vnode_id node, const char *name);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif	/* _FS_INTERFACE_H */
