@@ -13,7 +13,6 @@
 #include <devfs.h>
 #include <khash.h>
 #include <Errors.h>
-#include <smp.h> /* for spinlocks */
 #include <arch/cpu.h>
 #include <arch/int.h>
 #include <OS.h>
@@ -84,7 +83,6 @@ static void write_pci_config (uchar, uchar, uchar, uchar, uchar, uint32);
 #define PCI_PRODUCT_INTEL_82443BX        0x7190
 #define PCI_PRODUCT_INTEL_82443BX_AGP    0x7191
 #define PCI_PRODUCT_INTEL_82443BX_NOAGP  0x7192
-#define PCI_PRODUCT_INTEL_82845_AGP      0x1a31
 
 /* Config space locking!
  * We need to make sure we only have one access at a time into the config space,
@@ -598,20 +596,6 @@ fixup_bridge(uint8 bus, uint8 dev, uint8 func)
 						write_pci_config(bus, dev, func, 0x76, 2, bcreg);
 					}
 					break;
-				}
-				case PCI_PRODUCT_INTEL_82845_AGP: {
-					/* Foward accesses to VGA memory onto the AGP card
-					 *
-					 * This is very experimental! Added to see if this will
-					 * fix Marcus's problem with this device.
-					 */
-					uint8 ctrl = read_pci_config(bus, dev, func, 0x3e, 1);
-					
-					if ((ctrl & 0x04) != 0x04) {
-						dprintf("Enabling VGA_EN1 for Intel 82845 AGP Bridge\n");
-						ctrl |= 0x04;
-						write_pci_config(bus, dev, func, 0x3e, 1, ctrl);
-					}
 				}
 			}
 	}
@@ -1260,7 +1244,7 @@ get_nth_pci_info(long index, pci_info *copyto)
 	 * 2) The found_device_structure has a NULL pointer for
 	 *    info, which would cause a segfault when we try to memcpy!
 	 */
-	if (iter > 0 || !pd->info)
+	if (iter > 0 || !pd || !pd->info)
 		return B_DEV_ID_ERROR;
 
 	memcpy(copyto, pd->info, sizeof(pci_info));
