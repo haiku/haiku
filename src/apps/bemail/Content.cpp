@@ -251,7 +251,7 @@ FilterHTMLTag(int32 *first, char **t, char *end)
 			break;
 		}
 	}
-	
+
 	// oh, it's not, so skip it!
 
 	if (!strncasecmp(a, "head", 4)) {	// skip "head" completely
@@ -266,14 +266,14 @@ FilterHTMLTag(int32 *first, char **t, char *end)
 
 	// skip until tag end
 	while (a[0] && a[0] != '>' && a < end) a++;
-	
+
 	t[0] = a;
 
 	if (newline) {
 		first[0] = '\n';
 		return false;
 	}
-	
+
 	return true;
 }
 
@@ -424,6 +424,13 @@ CopyQuotes(const char *text, size_t length, char *outText, size_t &outLength)
 }
 
 
+bool
+is_quote_char(char c)
+{
+	return c == '>' || c == '|';
+}
+
+
 /** Fills the specified text_run_array with the correct values for the
  *	specified text.
  *	If "view" is NULL, it will assume that "line" lies on a line break,
@@ -440,7 +447,6 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 	bool begin; 
 	int32 pos = 0;
 	int32 level = 0;
-	const char *quote = QUOTE;
 
 	// get index to the beginning of the current line
 
@@ -471,7 +477,7 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 			begin = true;	// if there was no text in this line, there may come more nested quotes
 
 			for (int32 i = start; i < end; i++) {
-				if (text[i] == quote[0])
+				if (is_quote_char(text[i]))
 					level++;
 				else if (text[i] != ' ' && text[i] != '\t') {
 					begin = false;
@@ -489,13 +495,13 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 
 	for (int32 pos = 0; pos < length;) {
 		int32 next;
-		if (begin && line[pos] == quote[0]) {
+		if (begin && is_quote_char(line[pos])) {
 			while (pos < length && line[pos] != '\n') {
 				level++;
 
 				bool search = true;
 				for (next = pos + 1; next < length; next++) {
-					if (search && line[next] == quote[0]
+					if (search && is_quote_char(line[next])
 						|| line[next] == '\n')
 						break;
 					else if (line[next] != ' ' && line[next] != '\t')
@@ -505,7 +511,7 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 				runs[index].offset = pos;
 				runs[index].font = font;
 				runs[index].color = level > 0 ? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
-				
+
 				pos = next;
 				if (++index >= maxStyles)
 					break;
@@ -515,7 +521,7 @@ FillInQuoteTextRuns(BTextView *view, const char *line, int32 length, const BFont
 			runs[index].font = font;
 			runs[index].color = level > 0 ? kQuoteColors[level % kNumQuoteColors] : kNormalTextColor;
 			index++;
-			
+
 			for (next = pos; next < length; next++) {
 				if (line[next] == '\n')
 					break;
