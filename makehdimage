@@ -66,7 +66,7 @@ BEOS_BIN="touch sync ln listarea listattr listsem listport \
 	renice rmattr addattr listdev pwd chmod chown chgrp dd \
 	tee md5sum catattr query lsindex mkindex roster listimage \
 	quit open translate setvolume waitfor uname iroster keymap \
-	strace"
+	strace rmdir"
 
 BEOS_SYSTEM_LIB="libbe.so libstdc++.r4.so libnet.so libmedia.so \
 	libtranslation.so libbind.so libnetapi.so libsocket.so"
@@ -85,8 +85,8 @@ jam -q rc resattr kernel boot_loader config_manager pci isa ide scsi \
 	rld.so kernel_fortune consoled \
 	$BEOS_BIN $BEOS_SYSTEM_LIB $BEOS_SYSTEM_SERVERS \
 	$BEOS_ADD_ONS_TRANSLATORS $BEOS_ADD_ONS_MEDIA $BEOS_ADD_ONS_INPUT_DEVICES\
-	libnet.so dprintf null zero random ps2_hid \<driver\>tty \
-	\<driver\>config timezone_files keymap_files \
+	libnet.so dprintf null zero random ps2_hid \<driver\>tty console \
+	\<driver\>config vga_text timezone_files keymap_files \
 	|| { echo "*** Build failed!" 1>&2 ; exit 1; }
 
 # create the image and the directory structure
@@ -116,6 +116,7 @@ mkdir -p beos/system/add-ons/kernel/drivers/dev/disk/scsi
 mkdir -p beos/system/add-ons/kernel/drivers/dev/input
 mkdir -p beos/system/add-ons/kernel/drivers/dev/misc
 mkdir -p beos/system/add-ons/kernel/file_systems
+mkdir -p beos/system/add-ons/kernel/console
 mkdir -p beos/system/add-ons/kernel/generic
 mkdir -p beos/system/add-ons/kernel/partitioning_systems
 mkdir -p beos/system/add-ons/Translators
@@ -136,7 +137,8 @@ cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel
 
 for f in bus_managers/isa bus_managers/ide bus_managers/scsi busses/ide/ide_isa \
 		file_systems/bfs generic/blkman generic/fast_log generic/ide_adapter \
-		generic/locked_pool generic/scsi_periph partitioning_systems/intel; do
+		generic/locked_pool generic/scsi_periph partitioning_systems/intel \
+		console/vga_text; do
 	cp $f $targetDir/beos/system/add-ons/kernel/$f
 done
 
@@ -164,7 +166,7 @@ for f in ps2_hid; do
 done
 
 cd $sourceDir/distro/x86.R1/beos/system/add-ons/kernel/drivers/dev
-for f in misc/config tty random dprintf null zero; do
+for f in misc/config console tty random dprintf null zero; do
 	cp $f $targetDir/beos/system/add-ons/kernel/drivers/bin
 done
 
@@ -236,7 +238,7 @@ cd $targetDir/beos/system/add-ons/kernel
 for f in drivers/dev/dprintf drivers/dev/keyboard drivers/dev/null \
 		drivers/dev/misc/config drivers/dev/tty drivers/dev/zero \
 		drivers/dev/disk/scsi/scsi_dsk drivers/dev/disk/scsi/scsi_cd \
-		drivers/dev/misc/config drivers/dev/input/ps2_hid; do
+		drivers/dev/misc/config drivers/dev/input/ps2_hid drivers/dev/console; do
 	relName=$(echo $f | sed -e s@drivers/dev/@@)
 	linkName=bin/$(basename $f)
 	while [ $relName != . ]; do
