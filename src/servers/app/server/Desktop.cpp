@@ -27,26 +27,37 @@
 #include "DisplayDriver.h"
 #include "Desktop.h"
 
-#ifdef VIEWDRIVER
 #include "ViewDriver.h"
-#endif
-#ifdef SCREENDRIVER
+
+#if DISPLAYDRIVER == SCREENDRIVER
 #include "ScreenDriver.h"
 #endif
-#ifdef HWDRIVER
+
+#if DISPLAYDRIVER == HWDRIVER
 #include "AccelerantDriver.h"
 #endif
 
-//#include "ServerWindow.h"
+#include "ServerWindow.h"
 
+//! This namespace encapsulates all globals specifically for the desktop
 namespace desktop_private {
 	int8 *dragmessage;
 	int32 dragmessagesize;
-	sem_id draglock;
+	sem_id draglock,
+			layerlock,
+			workspacelock;
+	BList *screenlist;
 }
 
+/*!
+	\brief Initializes the desktop for use.
+	
+	InitDesktop creates all workspaces, starts up the appropriate DisplayDriver, and 
+	generally gets everything ready for the server to use.
+*/
 void InitDesktop(void)
 {
+	
 }
 
 void ShutdownDesktop(void)

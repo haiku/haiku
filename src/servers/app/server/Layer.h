@@ -38,6 +38,7 @@
 
 class ServerWindow;
 class PortLink;
+class RootLayer;
 
 /*!
 	\class Layer Layer.h
@@ -93,6 +94,8 @@ public:
 	void PruneTree(void);
 
 protected:
+	friend RootLayer;
+	
 	BRect _frame;
 
 	Layer	*_parent,
@@ -118,7 +121,4 @@ protected:
 	PortLink *_portlink;
 };
 
-extern BLocker *layerlock;
-extern BList *layerlist;
-extern Layer *rootlayer;
 #endif

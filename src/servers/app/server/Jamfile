@@ -31,8 +31,10 @@ Server app_server :
 	# Display Classes
 	AccelerantDriver.cpp
 	Decorator.cpp
+	DesktopClasses.cpp
 	DisplayDriver.cpp
 	Layer.cpp
+	RootLayer.cpp
 	ScreenDriver.cpp
 	ServerBitmap.cpp
 	ServerCursor.cpp
