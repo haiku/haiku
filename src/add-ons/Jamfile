@@ -28,19 +28,19 @@ KernelLd
 	addons/drivers/dev/null
 	; 
 
-KernelLd
-	digit
-	:
-	<$(SOURCE_GRIST)!kernel!drivers!common>digit.o
-	kernel.so
-	:
-	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
-	:
-	-Bdynamic -shared
-	:
-	:
-	addons/drivers/dev/digit
-	; 
+#KernelLd
+#	digit
+#	:
+#	<$(SOURCE_GRIST)!kernel!drivers!common>digit.o
+#	kernel.so
+#	:
+#	$(OBOS_TOP)/src/kernel/core/addons/ldscripts/$(OBOS_ARCH)/addon.ld
+#	:
+#	-Bdynamic -shared
+#	:
+#	:
+#	addons/drivers/dev/digit
+#	; 
 
 KernelLd
 	random
