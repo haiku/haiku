@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-4/2004.
+	Rudolf Cornelissen 10/2002-5/2004.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -280,6 +280,13 @@ typedef struct {
 		overlay_token myToken;				/* scaler is free/in use */
 		benaphore lock;						/* for creating buffers and aquiring overlay unit routines */
 		bool crtc;							/* location of overlay unit */
+		/* variables needed for virtualscreens (move_overlay()): */
+		bool active;						/* true is overlay currently in use */
+		overlay_window ow;					/* current position of overlay output window */
+		overlay_buffer ob;					/* current inputbuffer in use */
+		overlay_view my_ov;					/* current corrected view in inputbuffer */
+		uint32 h_ifactor;					/* current 'unclipped' horizontal inverse scaling factor */
+		uint32 v_ifactor;					/* current 'unclipped' vertical inverse scaling factor */
 	} overlay;
 
 } shared_info;
