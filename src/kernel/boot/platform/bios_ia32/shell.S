@@ -1,6 +1,6 @@
 /*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the Haiku License.
 */
 
 
@@ -53,6 +53,7 @@ bfs_start:
 	.byte	0x67
 	movb	%dl, gBootDriveID - 0x10000
 	.byte	0x67
+	.byte	0x66
 	movl	%eax, gBootPartitionOffset - 0x10000
 	.code16
 
