@@ -26,7 +26,6 @@
 // DEALINGS IN THE SOFTWARE.
 /*****************************************************************************/
 
-#include <algobase.h>
 #include <stdio.h>
 #include <Application.h>
 #include <Bitmap.h>
@@ -52,6 +51,7 @@
 #include "ShowImageWindow.h"
 #include "ShowImageView.h"
 #include "ShowImageStatusView.h"
+#include "EntryMenuItem.h"
 
 ShowImageWindow::ShowImageWindow(const entry_ref *pref)
 	: BWindow(BRect(50, 50, 350, 250), "", B_DOCUMENT_WINDOW, 0)
@@ -180,10 +180,10 @@ ShowImageWindow::UpdateRecentDocumentsMenu()
 	be_roster->GetRecentDocuments(&list, 20, NULL, APP_SIG);
 	for (int i = 0; list.FindRef("refs", i, &ref) == B_OK; i++) {
 		BEntry entry(&ref);
-		if (entry.GetName(name) == B_OK) {
+		if (entry.Exists() && entry.GetName(name) == B_OK) {
 			msg = new BMessage(B_REFS_RECEIVED);
 			msg->AddRef("refs", &ref);
-			item =  new BMenuItem(name, msg, 0, 0);
+			item =  new EntryMenuItem(&ref, name, msg, 0, 0);
 			fOpenMenu->AddItem(item);
 			item->SetTarget(be_app, NULL);
 		}
