@@ -10,6 +10,9 @@
 #include <iovec.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/socket.h>
+#include <net_settings.h>
+#include <netdb.h>
 
 #include <TLS.h>
 
@@ -18,31 +21,36 @@ extern int h_errno;
 	// was defined by netdb.h
 static int32 h_errno_tls;
 
+void initialize_before(void);
+void terminate_after(void);
+
+const char * hstrerror(int error);
+
+int _socket_interrupt(void);
+int _netconfig_find(void);
+
+
 /* These should probably be moved to a seperate file as they
  * are unique to the library as a whole...
  */
 /*
-void _init()
+_EXPORT void _init()
 {
 	h_errno_tls = tls_allocate();
 }
 
-void _fini()
+_EXPORT void _fini()
 {
 }
 */
-void initialize_before()
+_EXPORT void initialize_before(void)
 {
 	h_errno_tls = tls_allocate();
 }
 
-void terminate_after()
+_EXPORT void terminate_after(void)
 {
 }
-
-struct net_settings {
-	int dummy;
-};
 
 _EXPORT int closesocket(int sock)
 {
@@ -57,10 +65,9 @@ _EXPORT const char * hstrerror(int error)
 }
 
 
-_EXPORT int herror()
+_EXPORT void herror(const char *error)
 {
 	printf("herror() not yet supported.");
-	return 0;
 }
 
 _EXPORT int *_h_errnop()
@@ -69,13 +76,13 @@ _EXPORT int *_h_errnop()
 }
 
 
-_EXPORT int _socket_interrupt()
+_EXPORT int _socket_interrupt(void)
 {
 	printf("_socket_interrupt\n");
 	return 0;
 }
 
-_EXPORT int _netconfig_find()
+_EXPORT int _netconfig_find(void)
 {
 	printf("_netconfig_find\n");
 	return 0;
@@ -86,7 +93,7 @@ _EXPORT int _netconfig_find()
  * will make both R5 and BONE compatible
  */
 
-_EXPORT char * find_net_setting(struct net_settings * ncw, const char * heading, const char * name, char * value, unsigned nbytes)
+_EXPORT char * find_net_setting(net_settings * ncw, const char * heading, const char * name, char * value, unsigned nbytes)
 {
 	  
 	printf("find_net_setting\n");
@@ -107,7 +114,7 @@ _EXPORT char * find_net_setting(struct net_settings * ncw, const char * heading,
 }
 
 
-_EXPORT status_t set_net_setting(struct net_settings * ncw, const char * heading, const char * name, const char * value)
+_EXPORT status_t set_net_setting(net_settings * ncw, const char * heading, const char * name, const char * value)
 {
 	printf("set_net_setting\n");
 	return B_UNSUPPORTED;
@@ -124,7 +131,7 @@ _EXPORT int gethostname(char * name, size_t length)
 }
 
 
-_EXPORT int getusername(char * name, uint length)
+_EXPORT int getusername(char * name, size_t length)
 {
 	printf("getusername\n");
 	if (find_net_setting(NULL, "GLOBAL", "USERNAME", name, length) == NULL)
@@ -134,7 +141,7 @@ _EXPORT int getusername(char * name, uint length)
 }
 
 
-_EXPORT int getpassword(char * pwd, uint length)
+_EXPORT int getpassword(char * pwd, size_t length)
 {
 	printf("getpassword\n");
 	if (find_net_setting(NULL, "GLOBAL", "PASSWORD", pwd, length) == NULL)

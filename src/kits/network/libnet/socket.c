@@ -17,6 +17,9 @@
 
 #include "net_stack_driver.h"
 
+// Forward declaration of sysctl.h, because it's currently declared under headers/private/kernel/sysctl.h
+int sysctl(int *, uint, void *, size_t *, void *, size_t);
+
 static bool g_beos_r5_compatibility = false;
 
 struct beosr5_sockaddr_in {
@@ -26,10 +29,11 @@ struct beosr5_sockaddr_in {
 	char sin_zero[4];
 };
 
-static char *	get_stack_driver_path();
+static char *	get_stack_driver_path(void);
 static void 	convert_from_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
 static void 	convert_to_beos_r5_sockaddr(struct sockaddr *to, const struct sockaddr *from);
 static void		convert_from_beos_r5_sockopt(int *level, int *optnum);
+
 
 _EXPORT int socket(int family, int type, int protocol)
 {
@@ -424,7 +428,7 @@ _EXPORT int sysctl (int *name, uint namelen, void *oldp, size_t *oldlenp,
  * ----------------
  */
 
-static char * get_stack_driver_path() {
+static char * get_stack_driver_path(void) {
   char * path;
 
   // user-defined stack driver path?

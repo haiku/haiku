@@ -10,7 +10,7 @@ int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 	fd_set		read_set;
 	fd_set		write_set;
 	fd_set		exception_set;
-	int			i;
+	nfds_t		i;
 	int			n;
 	int			rc;
 
@@ -48,10 +48,10 @@ int poll(struct pollfd *fds, nfds_t numfds, int timeout)
 	if (rc < 0)
 		return rc;
 
-	for(i = 0; i < n; i++) { 
+	for(i = 0; i < (nfds_t) n; i++) { 
 		fds[i].revents = 0;
 
-		if (FD_ISSET(fds[i].fd, &read_set))		fds[i].revents |= POLLIN;
+		if (FD_ISSET(fds[i].fd, &read_set))			fds[i].revents |= POLLIN;
 		if (FD_ISSET(fds[i].fd, &write_set))		fds[i].revents |= POLLOUT;
 		if (FD_ISSET(fds[i].fd, &exception_set))	fds[i].revents |= POLLERR;
 	};
