@@ -8,6 +8,8 @@ R5KernelAddon nm.driver : kernel drivers bin :
 ;
 
 Package openbeos-neomagic-cvs :
+	README.html UPDATE.html ;
+Package openbeos-neomagic-cvs :
 	nm.driver : 
 	boot home config add-ons kernel drivers bin ;
 Package openbeos-neomagic-cvs :
