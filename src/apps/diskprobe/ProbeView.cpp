@@ -921,13 +921,16 @@ ProbeView::UpdateSizeLimits()
 	if (Window() == NULL)
 		return;
 
-	float width, height;
-	fDataView->GetPreferredSize(&width, &height);
+	if (!fDataView->FontSizeFitsBounds()) {
+		float width, height;
+		fDataView->GetPreferredSize(&width, &height);
 
-	BRect frame = Window()->ConvertFromScreen(ConvertToScreen(fHeaderView->Frame()));
+		BRect frame = Window()->ConvertFromScreen(ConvertToScreen(fHeaderView->Frame()));
 
-	Window()->SetSizeLimits(200, width + B_V_SCROLL_BAR_WIDTH,
-		200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
+		Window()->SetSizeLimits(200, width + B_V_SCROLL_BAR_WIDTH,
+			200, height + frame.bottom + 4 + B_H_SCROLL_BAR_HEIGHT);
+	} else
+		Window()->SetSizeLimits(200, 32768, 200, 32768);
 }
 
 
@@ -941,6 +944,7 @@ ProbeView::DetachedFromWindow()
 	fEditor.StopWatching(this);
 	fDataView->StopWatching(fHeaderView, kDataViewCursorPosition);
 	fDataView->StopWatching(this, kDataViewSelection);
+	fDataView->StopWatching(this, kDataViewPreferredSize);
 	be_clipboard->StopWatching(this);
 }
 
@@ -1031,6 +1035,7 @@ ProbeView::AttachedToWindow()
 	fEditor.StartWatching(this);
 	fDataView->StartWatching(fHeaderView, kDataViewCursorPosition);
 	fDataView->StartWatching(this, kDataViewSelection);
+	fDataView->StartWatching(this, kDataViewPreferredSize);
 	be_clipboard->StartWatching(this);
 
 	// Add menu to window
@@ -1161,8 +1166,11 @@ ProbeView::AttachedToWindow()
 	// Font Size
 
 	subMenu = new BMenu("Font Size");
+	subMenu->SetRadioMode(true);
 	const int32 fontSizes[] = {9, 10, 12, 14, 18, 24, 36, 48};
 	int32 fontSize = int32(fDataView->FontSize() + 0.5);
+	if (fDataView->FontSizeFitsBounds())
+		fontSize = 0;
 	for (uint32 i = 0; i < sizeof(fontSizes) / sizeof(fontSizes[0]); i++) {
 		char buffer[16];
 		snprintf(buffer, sizeof(buffer), "%ld", fontSizes[i]);
@@ -1172,12 +1180,12 @@ ProbeView::AttachedToWindow()
 			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(item = new BMenuItem("Fit", new BMessage(kMsgFontSize)));
+	subMenu->AddItem(item = new BMenuItem("Fit", message = new BMessage(kMsgFontSize)));
+	message->AddFloat("font_size", 0.0f);
 	if (fontSize == 0)
 		item->SetMarked(true);
 
 	subMenu->SetTargetForItems(this);
-	subMenu->SetRadioMode(true);
 	menu->AddItem(new BMenuItem(subMenu));
 
 	bar->AddItem(menu);
@@ -1407,10 +1415,9 @@ ProbeView::MessageReceived(BMessage *message)
 
 		case kMsgFontSize:
 		{
-			float size = 0.0f;
-			message->FindFloat("font_size", &size);
-				// if there is no "font_size" member, the size will
-				// be adapted to fit the window size (0)
+			float size;
+			if (message->FindFloat("font_size", &size) != B_OK)
+				break;
 
 			fDataView->SetFontSize(size);
 

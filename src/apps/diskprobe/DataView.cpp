@@ -57,7 +57,8 @@ DataView::DataView(BRect rect, DataEditor &editor)
 	fEditor(editor),
 	fFocus(kHexFocus),
 	fBase(kHexBase),
-	fIsActive(true)
+	fIsActive(true),
+	fFitFontSize(false)
 {
 	fPositionLength = 4;
 	fStart = fEnd = 0;
@@ -816,6 +817,31 @@ DataView::UpdateScroller()
 void
 DataView::FrameResized(float width, float height)
 {
+	if (fFitFontSize) {
+		// adapt the font size to fit in the view's bounds
+		float oldSize = FontSize();
+		BFont font = be_fixed_font;
+		float steps = 0.5f;
+
+		float size;
+		for (size = 1.f; size < 100; size += steps) {
+			font.SetSize(size);
+			float charWidth = font.StringWidth("w");
+			if (charWidth * (kBlockSize * 4 + fPositionLength + 6) + 2 * kHorizontalSpace > width)
+				break;
+
+			if (size > 6)
+				steps = 1.0f;
+		}
+		size -= steps;
+		font.SetSize(size);
+
+		if (oldSize != size) {
+			SetFont(&font);
+			Invalidate();
+		}
+	}
+
 	UpdateScroller();
 }
 
@@ -1034,7 +1060,7 @@ DataView::SetFont(const BFont *font, uint32 properties)
 		return;
 
 	BView::SetFont(font, properties);
-	
+
 	font_height fontHeight;
 	font->GetHeight(&fontHeight);
 
@@ -1057,9 +1083,17 @@ DataView::FontSize() const
 void 
 DataView::SetFontSize(float point)
 {
-	// ToDo: "fit" is not yet supported
-	if (point == 0.0f)
-		point = 12.0f;
+	bool fit = (point == 0.0f);
+	if (fit) {
+		if (!fFitFontSize)
+			SendNotices(kDataViewPreferredSize);
+		fFitFontSize = fit;
+
+		FrameResized(Bounds().Width(), Bounds().Height());
+		return;
+	}
+
+	fFitFontSize = false;
 
 	BFont font = be_fixed_font;
 	font.SetSize(point);

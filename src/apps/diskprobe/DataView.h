@@ -46,6 +46,7 @@ class DataView : public BView {
 		virtual void SetFont(const BFont *font, uint32 properties = B_FONT_ALL);
 		virtual void GetPreferredSize(float *_width, float *_height);
 
+		bool FontSizeFitsBounds() const { return fFitFontSize; }
 		float FontSize() const;
 		void SetFontSize(float point);
 
@@ -94,6 +95,7 @@ class DataView : public BView {
 		int32		fStart, fEnd;
 		int32		fMouseSelectionStart;
 		int32		fBitPosition;
+		bool		fFitFontSize;
 };
 
 static const uint32 kMsgBaseType = 'base';
