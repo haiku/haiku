@@ -1,12 +1,45 @@
-// List.cpp
-// Just here to be able to compile and test BResources.
-// To be replaced by the OpenBeOS version to be provided by the IK Team.
+//------------------------------------------------------------------------------
+//	Copyright (c) 2001-2002, OpenBeOS
+//
+//	Permission is hereby granted, free of charge, to any person obtaining a
+//	copy of this software and associated documentation files (the "Software"),
+//	to deal in the Software without restriction, including without limitation
+//	the rights to use, copy, modify, merge, publish, distribute, sublicense,
+//	and/or sell copies of the Software, and to permit persons to whom the
+//	Software is furnished to do so, subject to the following conditions:
+//
+//	The above copyright notice and this permission notice shall be included in
+//	all copies or substantial portions of the Software.
+//
+//	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+//	FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+//	DEALINGS IN THE SOFTWARE.
+//
+//	File Name:		List.cpp
+//	Author(s):		The Storage kit Team
+//	Description:	BList class provides storage for pointers.
+//					Not thread safe.
+//------------------------------------------------------------------------------
 
 #include "List.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+// helper function
+static inline
+void
+move_items(void** items, int32 offset, int32 count)
+{
+	if (count > 0 && offset != 0)
+		memmove(items + offset, items, count * sizeof(void*));
+}
+
 
 // constructor
 BList::BList(int32 count)
@@ -20,6 +53,7 @@ BList::BList(int32 count)
 	Resize(fItemCount);
 }
 
+
 // copy constructor
 BList::BList(const BList& anotherList)
 	  :		 fObjectList(NULL),
@@ -30,20 +64,24 @@ BList::BList(const BList& anotherList)
 	*this = anotherList;
 }
 
+
 // destructor
 BList::~BList()
 {
 	free(fObjectList);
 }
 
-// helper function
-static inline
-void
-move_items(void** items, int32 offset, int32 count)
+
+// =
+BList&
+BList::operator =(const BList &list)
 {
-	if (count > 0 && offset != 0)
-		memmove(items + offset, items, count * sizeof(void*));
+	fBlockSize = list.fBlockSize;
+	Resize(list.fItemCount);
+	memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
+	return *this;
 }
+
 
 // AddItem
 bool
@@ -107,6 +145,184 @@ BList::AddList(BList *list)
 	return result;
 }
 
+
+// RemoveItem
+bool
+BList::RemoveItem(void *item)
+{
+	int32 index = IndexOf(item);
+	bool result = (index >= 0);
+	if (result)
+		RemoveItem(index);
+	return result;
+}
+
+
+// RemoveItem
+void *
+BList::RemoveItem(int32 index)
+{
+	void *item = NULL;
+	if (index >= 0 && index < fItemCount) {
+		item = fObjectList[index];
+		move_items(fObjectList + index + 1, -1, fItemCount - index - 1);
+		Resize(fItemCount - 1);
+	}
+	return item;
+}
+
+
+// RemoveItems
+bool
+BList::RemoveItems(int32 index, int32 count)
+{
+	bool result = (index >= 0 && index <= fItemCount);
+	if (result) {
+		if (index + count > fItemCount)
+			count = fItemCount - index;
+		if (count > 0) {
+			move_items(fObjectList + index + count, -count,
+					   fItemCount - index - count);
+			Resize(fItemCount - count);
+		} else
+			result = false;
+	}
+	return result;
+}
+
+
+//ReplaceItem
+bool
+BList::ReplaceItem(int32 index, void *newItem)
+{
+	bool result = false;
+	
+	if (index >= 0 && index < fItemCount) {
+		fObjectList[index] = newItem;
+		result = true;
+	}
+	return result;
+}
+
+
+// MakeEmpty
+void
+BList::MakeEmpty()
+{
+	Resize(0);
+}
+
+
+/* Reordering items. */
+// SortItems
+void
+BList::SortItems(int (*compareFunc)(const void *, const void *))
+{
+	if (compareFunc)
+		qsort(fObjectList, fItemCount, sizeof(void *), compareFunc);
+}
+
+
+//SwapItems
+bool
+BList::SwapItems(int32 indexA, int32 indexB)
+{
+	bool result = false;
+	
+	if (indexA >= 0 && indexA < fItemCount
+		&& indexB >= 0 && indexB < fItemCount) {
+		
+		void *tmpItem = fObjectList[indexA];
+		fObjectList[indexA] = fObjectList[indexB];
+		fObjectList[indexB] = tmpItem;
+		
+		result = true;
+	}	
+		 
+	return result;
+}
+
+
+//MoveItem
+bool
+BList::MoveItem(int32 fromIndex, int32 toIndex)
+{
+	//TODO: Implement
+	return false;
+}
+
+
+/* Retrieving items. */
+// ItemAt
+void *
+BList::ItemAt(int32 index) const
+{
+	void *item = NULL;
+	if (index >= 0 && index < fItemCount)
+		item = fObjectList[index];
+	return item;
+}
+
+
+// FirstItem
+void *
+BList::FirstItem() const
+{
+	void *item = NULL;
+	if (fItemCount > 0)
+		item = fObjectList[0];
+	return item;
+}
+
+
+// ItemAtFast
+void *
+BList::ItemAtFast(int32 index) const
+{
+	return fObjectList[index];
+}
+
+
+// Items
+void *
+BList::Items() const
+{
+	return fObjectList;
+}
+
+
+// LastItem
+void *
+BList::LastItem() const
+{
+	void *item = NULL;
+	if (fItemCount > 0)
+		item = fObjectList[fItemCount - 1];
+	return item;
+}
+
+
+/* Querying the list. */
+// HasItem
+bool
+BList::HasItem(void *item) const
+{
+	return (IndexOf(item) >= 0);
+}
+
+
+// IndexOf
+int32
+BList::IndexOf(void *item) const
+{
+	for (int32 i = 0; i < fItemCount; i++) {
+		if (fObjectList[i] == item)
+			return i;
+	}
+	return -1;
+}
+
+
 // CountItems
 int32
 BList::CountItems() const
@@ -114,6 +330,16 @@ BList::CountItems() const
 	return fItemCount;
 }
 
+
+// IsEmpty
+bool
+BList::IsEmpty() const
+{
+	return (fItemCount == 0);
+}
+
+
+/* Iterating over the list. */	
 // DoForEach
 void
 BList::DoForEach(bool (*func)(void *))
@@ -134,146 +360,11 @@ BList::DoForEach(bool (*func)(void *, void *), void *arg2)
 	}
 }
 
-// FirstItem
-void *
-BList::FirstItem() const
-{
-	void *item = NULL;
-	if (fItemCount > 0)
-		item = fObjectList[0];
-	return item;
-}
 
-// HasItem
-bool
-BList::HasItem(void *item) const
-{
-	return (IndexOf(item) >= 0);
-}
+// FBC
+void BList::_ReservedList1() {}
+void BList::_ReservedList2() {}
 
-// IndexOf
-int32
-BList::IndexOf(void *item) const
-{
-	for (int32 i = 0; i < fItemCount; i++) {
-		if (fObjectList[i] == item)
-			return i;
-	}
-	return -1;
-}
-
-// IsEmpty
-bool
-BList::IsEmpty() const
-{
-	return (fItemCount == 0);
-}
-
-// ItemAt
-void *
-BList::ItemAt(int32 index) const
-{
-	void *item = NULL;
-	if (index >= 0 && index < fItemCount)
-		item = fObjectList[index];
-	return item;
-}
-
-// Items
-void *
-BList::Items() const
-{
-	return fObjectList;
-}
-
-// LastItem
-void *
-BList::LastItem() const
-{
-	void *item = NULL;
-	if (fItemCount > 0)
-		item = fObjectList[fItemCount - 1];
-	return item;
-}
-
-// MakeEmpty
-void
-BList::MakeEmpty()
-{
-	Resize(0);
-}
-
-// RemoveItem
-bool
-BList::RemoveItem(void *item)
-{
-	int32 index = IndexOf(item);
-	bool result = (index >= 0);
-	if (result)
-		RemoveItem(index);
-	return result;
-}
-
-// RemoveItem
-void *
-BList::RemoveItem(int32 index)
-{
-	void *item = NULL;
-	if (index >= 0 && index < fItemCount) {
-		item = fObjectList[index];
-		move_items(fObjectList + index + 1, -1, fItemCount - index - 1);
-		Resize(fItemCount - 1);
-	}
-	return item;
-}
-
-// RemoveItems
-bool
-BList::RemoveItems(int32 index, int32 count)
-{
-	bool result = (index >= 0 && index <= fItemCount);
-	if (result) {
-		if (index + count > fItemCount)
-			count = fItemCount - index;
-		if (count > 0) {
-			move_items(fObjectList + index + count, -count,
-					   fItemCount - index - count);
-			Resize(fItemCount - count);
-		} else
-			result = false;
-	}
-	return result;
-}
-
-// SortItems
-void
-BList::SortItems(int (*compareFunc)(const void *, const void *))
-{
-	if (compareFunc)
-		qsort(fObjectList, fItemCount, sizeof(void *), compareFunc);
-}
-
-// =
-BList&
-BList::operator =(const BList &list)
-{
-	fBlockSize = list.fBlockSize;
-	Resize(list.fItemCount);
-	memcpy(fObjectList, list.fObjectList, fItemCount * sizeof(void*));
-	return *this;
-}
-
-// reserved
-void
-BList::_ReservedList1()
-{
-}
-
-// reserved
-void
-BList::_ReservedList2()
-{
-}
 
 // Resize
 //
