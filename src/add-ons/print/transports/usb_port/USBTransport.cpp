@@ -65,7 +65,7 @@ private:
 // Implementation of transport add-on interface
 
 BDataIO * 
-instanciate_transport(BDirectory *printer, BMessage *msg) 
+instantiate_transport(BDirectory *printer, BMessage *msg) 
 {
 	USBTransport * transport = new USBTransport(printer, msg);
 	if (transport->InitCheck() == B_OK)

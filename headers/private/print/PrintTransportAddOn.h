@@ -36,6 +36,6 @@ THE SOFTWARE.
 #include <Message.h>
 
 // to be implemented by the transport add-on
-extern "C" BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg);
+extern "C" BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg);
 
 #endif PRINT_TRANSPORT_ADD_ON_H

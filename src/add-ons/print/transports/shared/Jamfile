@@ -2,7 +2,7 @@ SubDir OBOS_TOP src add-ons print transports shared ;
 
 SetupObjectsDir ;
 
-ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET ;
+ObjectC++Flags Socket.cpp : -DHAVE_ARPA_INET -Dclosesocket=close ;
 
 Objects
 	DbgMsg.cpp

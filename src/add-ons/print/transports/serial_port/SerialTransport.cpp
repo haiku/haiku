@@ -100,7 +100,7 @@ ssize_t SerialTransport::Write(const void* buffer, size_t size)
 	return write(fFile, buffer, size);
 }
 
-BDataIO* instanciate_transport(BDirectory* printer, BMessage* msg)
+BDataIO* instantiate_transport(BDirectory* printer, BMessage* msg)
 {
 	SerialTransport* transport = new SerialTransport(printer, msg);
 	if (transport->InitCheck() == B_OK)

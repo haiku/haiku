@@ -14,7 +14,7 @@ extern "C" _EXPORT BDataIO *init_transport(BMessage *msg)
 		BDirectory printer(spool_path);
 
 		if (printer.InitCheck() == B_OK) {
-			gTransport = instanciate_transport(&printer, msg);
+			gTransport = instantiate_transport(&printer, msg);
 			return gTransport;
 		};
 	};
