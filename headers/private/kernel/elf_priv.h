@@ -10,12 +10,12 @@
 #include <image.h>
 
 
-struct elf_region {
+typedef struct elf_region {
 	area_id		id;
 	addr_t		start;
 	addr_t		size;
 	long		delta;
-};
+} elf_region;
 
 struct elf_image_info {
 	struct elf_image_info *next;
@@ -23,7 +23,7 @@ struct elf_image_info {
 	image_id	id;
 	int32		ref_count;
 	void		*vnode;
-	struct elf_region regions[2]; // describes the text and data regions
+	elf_region	regions[2]; // describes the text and data regions
 	addr_t		dynamic_ptr; // pointer to the dynamic section
 	struct elf_linked_image *linked_images;
 
@@ -51,7 +51,11 @@ struct elf_image_info {
 #define HASHBUCKETS(image) ((unsigned int *)&(image)->symhash[2])
 #define HASHCHAINS(image) ((unsigned int *)&(image)->symhash[2+HASHTABSIZE(image)])
 
-extern int elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
-	struct elf_image_info *shared_image, const char *sym_prepend, addr_t *sym_addr);
+extern
+#ifdef __cplusplus
+"C"
+#endif
+status_t elf_resolve_symbol(struct elf_image_info *image, struct Elf32_Sym *sym,
+			struct elf_image_info *shared_image, const char *sym_prepend, addr_t *sym_addr);
 
 #endif	/* _KERNEL_ELF_PRIV_H */
