@@ -24,7 +24,7 @@
 //					DarkWyrm <bpmagic@columbus.rr.com>
 //	Description:	BMessage class creates objects that store data and that
 //					can be processed in a message loop.  BMessage objects
-//					are also used as data containers by the archiving and 
+//					are also used as data containers by the archiving and
 //					the scripting mechanisms.
 //------------------------------------------------------------------------------
 
@@ -180,7 +180,7 @@ BMessage& BMessage::operator=(const BMessage& msg)
 	what = msg.what;
 
 	link = msg.link;
-	fTarget = msg.fTarget;	
+	fTarget = msg.fTarget;
 	fOriginal = msg.fOriginal;
 	fChangeCount = msg.fChangeCount;
 	fCurSpecifier = msg.fCurSpecifier;
@@ -210,7 +210,7 @@ void BMessage::init_data()
 	what = 0;
 
 	link = NULL;
-	fTarget = B_NULL_TOKEN;	
+	fTarget = B_NULL_TOKEN;
 	fOriginal = NULL;
 	fChangeCount = 0;
 	fCurSpecifier = -1;
@@ -500,10 +500,10 @@ struct Sender2
 	BMessage* reply_to_reply;
 	bigtime_t send_timeout;
 	bigtime_t reply_timeout;
-	
+
 	Sender2(BMessage* m, bigtime_t t1, bigtime_t t2)
 		:	reply_to_reply(m), send_timeout(t1), reply_timeout(t2) {;}
-	
+
 	status_t Send(BMessenger& messenger, BMessage* the_reply)
 	{
 		return messenger.SendMessage(the_reply, reply_to_reply,
@@ -513,7 +513,7 @@ struct Sender2
 status_t BMessage::SendReply(BMessage* the_reply, BMessage* reply_to_reply,
 							 bigtime_t send_timeout, bigtime_t reply_timeout)
 {
-	Sender2 mySender(reply_to_reply, send_timeout, reply_timeout);	
+	Sender2 mySender(reply_to_reply, send_timeout, reply_timeout);
 	return SendReplyHelper(this, the_reply, mySender);
 }
 #endif
@@ -602,7 +602,7 @@ status_t BMessage::Flatten(BDataIO* stream, ssize_t* size) const
 status_t BMessage::Unflatten(const char* flat_buffer)
 {
 	uint32 size = ((uint32*)flat_buffer)[2];
-	
+
 	BMemoryIO MemIO(flat_buffer, size);
 	return Unflatten(&MemIO);
 }
@@ -611,7 +611,7 @@ status_t BMessage::Unflatten(BDataIO* stream)
 {
 	bool swap;
 	status_t err = unflatten_hdr(stream, swap);
-	
+
 	if (!err)
 	{
 		TReadHelper reader(stream, swap);
@@ -653,7 +653,7 @@ status_t BMessage::Unflatten(BDataIO* stream)
 						uint8 littleCount;
 						reader(littleCount);
 						count = littleCount;
-						
+
 						// Get data length (1 byte)
 						uint8 littleLen;
 						reader(littleLen);
@@ -701,7 +701,7 @@ status_t BMessage::Unflatten(BDataIO* stream)
 				}
 
 				// Add each data field to the message
-				uint32 itemSize=0;
+				uint32 itemSize = 0;
 				if (flags & MSG_FLAG_FIXED_SIZE)
 				{
 					itemSize = dataLen / count;
@@ -718,10 +718,10 @@ status_t BMessage::Unflatten(BDataIO* stream)
 						}
 						else
 						{
-// ToDo: gcc is right, itemSize is used uninitialized here!!
-//		Since I don't know how to fix it properly, I leave this warning in
 							// Have to account for 8-byte boundary padding
-							dataPtr += itemSize + (8 - (itemSize % 8));
+							// We add 4 because padding as calculated during
+							// flattening includes the four-byte size header
+							dataPtr += itemSize + calc_padding(itemSize + 4, 8);
 						}
 					}
 
@@ -778,7 +778,7 @@ status_t BMessage::AddSpecifier(const char* property, int32 index, int32 range)
 	if (range < 0)
 		return B_BAD_VALUE;
 
-	BMessage message(B_RANGE_SPECIFIER);	
+	BMessage message(B_RANGE_SPECIFIER);
 	status_t err = message.AddString(B_PROPERTY_ENTRY, property);
 	if (err)
 		return err;
@@ -831,7 +831,7 @@ status_t BMessage::SetCurrentSpecifier(int32 index)
 		return B_BAD_INDEX;
 
 	fCurSpecifier = index;
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -1028,9 +1028,9 @@ status_t BMessage::AddData(const char* name, type_code type, const void* data,
 						   ssize_t numBytes, bool is_fixed_size, int32 /*count*/)
 {
 /**
-	@note	Because we're using vectors for our item storage, the count param 
-			is no longer useful to us:  dynamically adding more items is not 
-			really a performance issue, so pre-allocating space for objects 
+	@note	Because we're using vectors for our item storage, the count param
+			is no longer useful to us:  dynamically adding more items is not
+			really a performance issue, so pre-allocating space for objects
 			gives us no real advantage.
  */
 
@@ -1609,7 +1609,7 @@ status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
 	MakeEmpty();
 
 	read_helper.SetSwap(swap);
-	
+
 	// get the checksum
 	read_helper(checksum);
 	// get the size
@@ -1629,7 +1629,7 @@ status_t BMessage::unflatten_hdr(BDataIO* stream, bool& swap)
 	{
 		// TODO: ???
 		// Isn't this already indicated by the byte order of the message version?
-	}		
+	}
 	if (flags & MSG_FLAG_INCL_TARGET)
 	{
 		// Get the target data
@@ -1981,7 +1981,7 @@ BMessage &BMessage::operator=(const BMessage &message)
 	what = message.what;
 
 	link = message.link;
-	fTarget = message.fTarget;	
+	fTarget = message.fTarget;
 	fOriginal = message.fOriginal;
 	fChangeCount = message.fChangeCount;
 	fCurSpecifier = message.fCurSpecifier;
@@ -1990,18 +1990,18 @@ BMessage &BMessage::operator=(const BMessage &message)
 	fEntries = NULL;
 
     entry_hdr *src_entry;
-    
+
     for ( src_entry = message.fEntries; src_entry != NULL; src_entry = src_entry->fNext )
 	{
 		entry_hdr* new_entry = (entry_hdr*)new char[da_total_logical_size ( src_entry )];
-		
+
 		if ( new_entry != NULL )
 		{
 			memcpy ( new_entry, src_entry, da_total_logical_size ( src_entry ) );
 
 			new_entry->fNext = fEntries;
 			new_entry->fPhysicalBytes = src_entry->fLogicalBytes;
-			
+
 			fEntries = new_entry;
 		}
     }
@@ -2048,7 +2048,7 @@ status_t BMessage::GetInfo(const char *name, type_code *typeFound, bool *fixedSi
 	return B_ERROR;
 }
 //------------------------------------------------------------------------------
-status_t BMessage::GetInfo(type_code type, int32 index, char **nameFound, type_code *typeFound, 
+status_t BMessage::GetInfo(type_code type, int32 index, char **nameFound, type_code *typeFound,
 	int32 *countFound) const
 {
 	return B_ERROR;
@@ -2124,7 +2124,7 @@ BPoint BMessage::DropPoint(BPoint *offset) const
 
 	if (offset)
 		FindPoint("_drop_offset_", offset);
-	
+
 	return point;
 }
 //------------------------------------------------------------------------------
@@ -2189,7 +2189,7 @@ status_t BMessage::Flatten(char *address, ssize_t numBytes) const
     }
 
     ((size_t*)address)[0] = position;
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2213,7 +2213,7 @@ status_t BMessage::Flatten(BDataIO *object, ssize_t *numBytes) const
 status_t BMessage::Unflatten(const char *address)
 {
 	size_t size;
-  
+
     MakeEmpty();
 
     size = ((size_t*)address)[0];
@@ -2235,7 +2235,7 @@ status_t BMessage::Unflatten(const char *address)
 			new_entry->fNext = fEntries;
 			new_entry->fPhysicalBytes = src_entry->fLogicalBytes;
 			position += da_total_logical_size(src_entry);
-			
+
 			fEntries = new_entry;
 		}
 		else
@@ -2277,7 +2277,7 @@ status_t BMessage::AddSpecifier(const char *property)
 
 	fCurSpecifier ++;
 	fHasSpecifiers = true;
-	
+
 	return AddMessage("specifiers", &message);
 }
 //------------------------------------------------------------------------------
@@ -2289,20 +2289,20 @@ status_t BMessage::AddSpecifier(const char *property, int32 index)
 
 	fCurSpecifier++;
 	fHasSpecifiers = true;
-	
+
 	return AddMessage("specifiers", &message);
 }
 //------------------------------------------------------------------------------
 status_t BMessage::AddSpecifier(const char *property, int32 index, int32 range)
 {
-	BMessage message(B_RANGE_SPECIFIER);	
+	BMessage message(B_RANGE_SPECIFIER);
 	message.AddString("property", property);
 	message.AddInt32("index", index);
 	message.AddInt32("range", range);
 
 	fCurSpecifier ++;
 	fHasSpecifiers = true;
-	
+
 	return AddMessage("specifiers", &message);
 }
 //------------------------------------------------------------------------------
@@ -2496,9 +2496,9 @@ status_t BMessage::FindRect(const char *name, BRect *rect) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*rect = *(BRect*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2508,7 +2508,7 @@ status_t BMessage::FindRect(const char *name, int32 index, BRect *rect) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		BRect* data = (BRect*)da_first_chunk(entry);
@@ -2516,7 +2516,7 @@ status_t BMessage::FindRect(const char *name, int32 index, BRect *rect) const
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2526,9 +2526,9 @@ status_t BMessage::FindPoint(const char *name, BPoint *point) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*point = *(BPoint*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2538,7 +2538,7 @@ status_t BMessage::FindPoint(const char *name, int32 index, BPoint *point) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		BPoint* data = (BPoint*)da_first_chunk(entry);
@@ -2546,7 +2546,7 @@ status_t BMessage::FindPoint(const char *name, int32 index, BPoint *point) const
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2572,9 +2572,9 @@ status_t BMessage::FindInt8(const char *name, int8 *anInt8) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*anInt8 = *(int8*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2584,7 +2584,7 @@ status_t BMessage::FindInt8(const char *name, int32 index, int8 *anInt8) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		int8* data = (int8*)da_first_chunk(entry);
@@ -2592,7 +2592,7 @@ status_t BMessage::FindInt8(const char *name, int32 index, int8 *anInt8) const
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2602,9 +2602,9 @@ status_t BMessage::FindInt16(const char *name, int16 *anInt16) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*anInt16 = *(int16*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2614,7 +2614,7 @@ status_t BMessage::FindInt16(const char *name, int32 index, int16 *anInt16) cons
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		int16* data = (int16*)da_first_chunk(entry);
@@ -2622,7 +2622,7 @@ status_t BMessage::FindInt16(const char *name, int32 index, int16 *anInt16) cons
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2632,9 +2632,9 @@ status_t BMessage::FindInt32(const char *name, int32 *anInt32) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*anInt32 = *(int32*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2645,7 +2645,7 @@ status_t BMessage::FindInt32(const char *name, int32 index,
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		int32* data = (int32*)da_first_chunk(entry);
@@ -2653,7 +2653,7 @@ status_t BMessage::FindInt32(const char *name, int32 index,
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2668,9 +2668,9 @@ status_t BMessage::FindBool(const char *name, bool *aBool) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*aBool = *(bool*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2680,7 +2680,7 @@ status_t BMessage::FindBool(const char *name, int32 index, bool *aBool) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		bool* data = (bool*)da_first_chunk(entry);
@@ -2688,7 +2688,7 @@ status_t BMessage::FindBool(const char *name, int32 index, bool *aBool) const
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2698,9 +2698,9 @@ status_t BMessage::FindFloat(const char *name, float *aFloat) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*aFloat = *(float*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2710,7 +2710,7 @@ status_t BMessage::FindFloat(const char *name, int32 index, float *aFloat) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		float* data = (float*)da_first_chunk(entry);
@@ -2718,7 +2718,7 @@ status_t BMessage::FindFloat(const char *name, int32 index, float *aFloat) const
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2728,9 +2728,9 @@ status_t BMessage::FindDouble(const char *name, double *aDouble) const
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	*aDouble = *(double*)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2741,7 +2741,7 @@ status_t BMessage::FindDouble(const char *name, int32 index,
 
 	if (entry == NULL)
 		return B_NAME_NOT_FOUND;
-  
+
 	if (index < entry->fCount)
 	{
 		double* data = (double*)da_first_chunk(entry);
@@ -2749,7 +2749,7 @@ status_t BMessage::FindDouble(const char *name, int32 index,
 
 		return B_OK;
 	}
-	
+
 	return B_BAD_INDEX;
 }
 //------------------------------------------------------------------------------
@@ -2762,9 +2762,9 @@ status_t BMessage::FindPointer(const char *name, void **pointer) const
 		*pointer = NULL;
 		return B_NAME_NOT_FOUND;
 	}
-  
+
 	*pointer = *(void**)da_first_chunk(entry);
-	
+
 	return B_OK;
 }
 //------------------------------------------------------------------------------
@@ -2778,7 +2778,7 @@ status_t BMessage::FindPointer(const char *name, int32 index,
 		*pointer = NULL;
 		return B_NAME_NOT_FOUND;
 	}
-  
+
 	if (index >= entry->fCount)
 	{
 		*pointer = NULL;
@@ -2802,7 +2802,7 @@ status_t BMessage::FindPointer(const char *name, int32 index,
 status_t BMessage::FindMessage(const char *name, BMessage *message) const
 {
 	const char *data;
-  
+
 	if ( FindData(name, B_MESSAGE_TYPE, (const void**)&data, NULL) != B_OK)
 		return B_NAME_NOT_FOUND;
 
@@ -2813,7 +2813,7 @@ status_t BMessage::FindMessage(const char *name, int32 index,
 							   BMessage *message) const
 {
 	const char *data;
-  
+
 	if ( FindData(name, B_MESSAGE_TYPE, index, (const void**)&data,
 		NULL) != B_OK)
 		return B_NAME_NOT_FOUND;
@@ -2868,9 +2868,9 @@ status_t BMessage::FindData(const char *name, type_code type, const void **data,
 	}
 
 	int32 size;
-	
+
 	*data = da_find_data(entry, 0, &size);
-	
+
 	if (numBytes)
 		*numBytes = size;
 
@@ -2895,13 +2895,13 @@ status_t BMessage::FindData(const char *name, type_code type, int32 index,
 	}
 
 	int32 size;
-		
+
 	*data = da_find_data(entry, index, &size);
 
 	if (numBytes)
 		*numBytes = size;
 
-	return B_OK;	
+	return B_OK;
 }
 //------------------------------------------------------------------------------
 //status_t BMessage::ReplaceRect(const char *name, BRect rect);
@@ -2913,7 +2913,7 @@ status_t BMessage::ReplacePoint(const char *name, BPoint point)
 	return ReplaceData(name, B_POINT_TYPE, &point, sizeof(BPoint));
 }
 //------------------------------------------------------------------------------
-//status_t BMessage::ReplacePoint(const char *name, int32 index, BPoint point); 
+//status_t BMessage::ReplacePoint(const char *name, int32 index, BPoint point);
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceString(const char *name, const char *string)
 {
@@ -2950,7 +2950,7 @@ status_t BMessage::ReplaceInt64(const char *name, int64 anInt64)
 	return ReplaceData(name, B_INT64_TYPE, &anInt64, sizeof(int64));
 }
 //------------------------------------------------------------------------------
-//status_t BMessage::ReplaceInt64(const char *name, int32 index, int64 anInt64); 
+//status_t BMessage::ReplaceInt64(const char *name, int32 index, int64 anInt64);
 //------------------------------------------------------------------------------
 //status_t BMessage::ReplaceBool(const char *name, bool aBool);
 //------------------------------------------------------------------------------
@@ -2962,7 +2962,7 @@ status_t BMessage::ReplaceInt64(const char *name, int64 anInt64)
 //------------------------------------------------------------------------------
 //status_t BMessage::ReplaceDouble(const char *name, double aDouble);
 //------------------------------------------------------------------------------
-//status_t BMessage::ReplaceDouble(const char *name, int32 index, double aDouble); 
+//status_t BMessage::ReplaceDouble(const char *name, int32 index, double aDouble);
 //------------------------------------------------------------------------------
 //status_t BMessage::ReplacePointer(const char *name, const void *pointer);
 //------------------------------------------------------------------------------
@@ -2985,7 +2985,7 @@ status_t BMessage::ReplaceInt64(const char *name, int64 anInt64)
 //status_t BMessage::ReplaceFlat(const char *name, BFlattenable *object);
 //------------------------------------------------------------------------------
 //status_t BMessage::ReplaceFlat(const char *name, int32 index,
-//							   BFlattenable *object); 
+//							   BFlattenable *object);
 //------------------------------------------------------------------------------
 status_t BMessage::ReplaceData(const char *name, type_code type,
 							   const void *data, ssize_t numBytes)
@@ -3047,7 +3047,7 @@ bool		FindBool(const char *, int32 n = 0) const;
 float		FindFloat(const char *, int32 n = 0) const;
 double		FindDouble(const char *, int32 n = 0) const;*/
 //------------------------------------------------------------------------------
-BMessage::BMessage(BMessage *a_message)	
+BMessage::BMessage(BMessage *a_message)
 {
 	*this=*a_message;
 }
@@ -3061,7 +3061,7 @@ void BMessage::init_data()
 	what = 0;
 
 	link = NULL;
-	fTarget = -1;	
+	fTarget = -1;
 	fOriginal = NULL;
 	fChangeCount = 0;
 	fCurSpecifier = -1;
@@ -3199,12 +3199,12 @@ void *BMessage::da_create(int32 header_size, int32 chunk_size, bool fixed,
 
 	da->fLogicalBytes = 0;
 	da->fPhysicalBytes = size - sizeof(dyn_array) - header_size;
-	
+
 	if ( fixed )
 		da->fChunkSize = chunk_size;
 	else
 		da->fChunkSize = 0;
-	
+
 	da->fCount = 0;
 	da->fEntryHdrSize = header_size;
 
