@@ -32,6 +32,7 @@ public:
 	BPositionIO *Source() { return fSeekableSource; }
 
 private:
+	ssize_t		ID3Size(uint8 *buffer, size_t len);
 	bool 		IsMp3File();
 	int			GetFrameLength(void *header);
 	

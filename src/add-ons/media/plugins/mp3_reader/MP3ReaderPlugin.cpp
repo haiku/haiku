@@ -13,6 +13,16 @@
   #define TRACE ((void)0)
 #endif
 
+/* see
+ * http://www.multiweb.cz/twoinches/MP3inside.htm
+ * 
+ */
+
+/* minimal ID3 stuff
+ * see http://www.id3.org/id3v2.3.0.txt
+ */
+#define ID3_HEADER_SIZE 10
+
 // bit_rate_table[mpeg_version_index][layer_index][bitrate_index]
 static const int bit_rate_table[4][4][16] =
 {
@@ -241,10 +251,28 @@ mp3Reader::GetNextChunk(void *cookie,
 	return result;
 }
 
+ssize_t
+mp3Reader::ID3Size(uint8 *buffer, size_t len)
+{
+	if (len < ID3_HEADER_SIZE)
+		return B_BAD_VALUE;
+	if ((buffer[0] == 'I') && /* magic */
+	    (buffer[1] == 'D') &&
+	    (buffer[2] == '3') &&
+	    (buffer[3] != 0xff) && (buffer[4] != 0xff) && /* version */
+	    /* flags */
+	    (!(buffer[6] & 0x80)) && (!(buffer[7] & 0x80)) && /* the MSB in each byte in size is 0, to avoid */
+	    (!(buffer[8] & 0x80)) && (!(buffer[9] & 0x80))) { /* making a buggy mpeg header */
+		return ((buffer[6] << 21)|(buffer[7] << 14)|(buffer[8] << 7)|(buffer[9])) + 10;
+	}
+	return B_ENTRY_NOT_FOUND;
+}
+
 bool
 mp3Reader::IsMp3File()
 {
-	// To detect an mp3 file, we seek into the middle,
+	// //! To detect an mp3 file, we seek into the middle,
+	// To detect an mp3 file, we first check for an ID3,
 	// and search for a valid sequence of 3 frame headers.
 	// A mp3 frame has a maximum length of 2881 bytes, we
 	// load a block of 16kB and use it to search.
@@ -253,7 +281,29 @@ mp3Reader::IsMp3File()
 	int64	offset;
 	int32	size;
 	uint8	buf[search_size];
+	ssize_t id3size;
 
+	offset = 0;
+	size = (search_size > fFileSize)?fFileSize:search_size;
+	TRACE("searching for mp3 frame headers or ID3 at %Ld in %ld bytes\n", offset, size);
+
+	if (size != Source()->ReadAt(offset, buf, size)) {
+		TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
+		return false;
+	}
+	id3size = ID3Size(buf, size);
+	if (id3size > 0) {
+		TRACE("found ID3, size %ld, skipping...\n", id3size);
+		offset += id3size;
+		size = (search_size+offset > fFileSize)?(fFileSize-offset):(search_size);
+		TRACE("searching for mp3 frame headers or ID3 at %Ld in %ld bytes\n", offset, size);
+
+		if (size != Source()->ReadAt(offset, buf, size)) {
+			TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
+			return false;
+		}
+	}
+#if 0
 	size = search_size;
 	offset = fFileSize / 2 - search_size / 2;
 	if (size > fFileSize) {
@@ -267,9 +317,12 @@ mp3Reader::IsMp3File()
 		TRACE("mp3ReaderPlugin::IsMp3File reading %ld bytes at offset %Ld failed\n", size, offset);
 		return false;
 	}
+#endif
 	
 	for (int32 pos = 0; pos < (size - 8); pos++) {
 		int length1, length2, length3;
+		
+		//TRACE("---- checking for frame at %Ld\n", offset + pos);
 		length1 = GetFrameLength(&buf[pos]);
 		if (length1 < 0 || (pos + length1 + 4) > size)
 			continue;
@@ -290,20 +343,27 @@ mp3Reader::IsMp3File()
 int
 mp3Reader::GetFrameLength(void *header)
 {
-	if (((uint8 *)header)[0] != 0xff)
+	uint8 *h = (uint8 *)header;
+
+	if (h[0] != 0xff)
 		return -1;
-	if (((uint8 *)header)[1] & 0xe0 != 0xe)
+	if ((h[1] & 0xe0) != 0xe0)
 		return -1;
 	
-	int mpeg_version_index = (((uint8 *)header)[1] >> 3) & 0x03;
-	int layer_index = (((uint8 *)header)[1] >> 1) & 0x03;
-	int bitrate_index = (((uint8 *)header)[2] >> 4) & 0x0f;
-	int sampling_rate_index = (((uint8 *)header)[2] >> 2) & 0x03;
-	int padding = (((uint8 *)header)[2] >> 1) & 0x01;
+	int mpeg_version_index = (h[1] >> 3) & 0x03;
+	int layer_index = (h[1] >> 1) & 0x03;
+	int no_crc = (h[1] & 0x01);
+	/* VBR files seem to use CRC in info frames, probably to make the
+	 * decoder discard them with a wrong CRC...
+	 */
+	int bitrate_index = (h[2] >> 4) & 0x0f;
+	int sampling_rate_index = (h[2] >> 2) & 0x03;
+	int padding = (h[2] >> 1) & 0x01;
+	/* no interested in the other bits */
 	
 	int bitrate = bit_rate_table[mpeg_version_index][layer_index][bitrate_index];
 	int samplingrate = sampling_rate_table[mpeg_version_index][sampling_rate_index];
-
+	
 	if (!bitrate || !samplingrate)
 		return -1;	
 
@@ -313,9 +373,10 @@ mp3Reader::GetFrameLength(void *header)
 	else // layer 2 & 3
 		length = ((144 * 1000 * bitrate) / samplingrate) + padding;
 	
-	TRACE("%s %s, bit rate %d, sampling rate %d, padding %d, frame length %d\n",
+	TRACE("%s %s, %s crc, bit rate %d, sampling rate %d, padding %d, frame length %d\n",
 		mpeg_version_index == 0 ? "mpeg 2.5" : (mpeg_version_index == 2 ? "mpeg 2" : "mpeg 1"),
 		layer_index == 3 ? "layer 1" : (layer_index == 2 ? "layer 2" : "layer 3"),
+		no_crc?"no":"has",
 		bitrate, samplingrate, padding, length);
 	
 	return length;
