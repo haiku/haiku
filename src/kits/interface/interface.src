@@ -37,8 +37,10 @@ INTERFACE_KIT_SOURCE =
 	SeparatorItem.cpp
 	Shape.cpp
 	Shelf.cpp
+	Slider.cpp
 	StatusBar.cpp
 	StringView.cpp
+	TabView.cpp
 	TextControl.cpp
 	TextInput.cpp
 	TPicture.cpp
