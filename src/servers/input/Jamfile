@@ -27,7 +27,7 @@ actions MkKeymapHeader1
 MkKeymapHeader [ FGristFiles SystemKeymap.cpp ] : US-International.keymap ;
 
 SEARCH on US-International.keymap
-	  += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) apps bin keymap ] ;
+	  += [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) data etc keymaps ] ;
 
 AddResources input_server : input_server.rdef ;
 
