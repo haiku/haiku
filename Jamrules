@@ -34,16 +34,28 @@ HCACHEFILE = header_cache ;
 JCACHEFILE = jamfile_cache ;
 LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(OBOS_BUILD_DIR) ;
 
-# Include BuildConfig
+# Include BuildConfig/Timezones/libgccObjects
 {
 	local buildConfig = [ GLOB $(OBOS_BUILD_DIR) : BuildConfig ] ;
-	if ! $(buildConfig)
-	{
-		ECHO "No BuildConfig found in $(OBOS_BUILD_DIR)!" ;
+	local timezones = [ GLOB $(OBOS_BUILD_DIR) : Timezones ] ;
+	local libgccObjects = [ GLOB $(OBOS_BUILD_DIR) : libgccObjects ] ;
+
+	if ! $(buildConfig) {
+		ECHO "No `BuildConfig' found in $(OBOS_BUILD_DIR)!" ;
 		EXIT "Run ./configure in the source tree's root directory first!" ;
 	}
+	if ! ( $(timezones) && $(libgccObjects) ) {
+		ECHO "No `Timezones' or `libgccObjects' found in $(OBOS_BUILD_DIR)!" ;
+		EXIT "Please run ./configure in the source tree's root directory again!" ;
+	}
+
 	LOCATE on BuildConfig = $(OBOS_BUILD_DIR) ;
+	LOCATE on Timezones = $(OBOS_BUILD_DIR) ;
+	LOCATE on libgccObjects = $(OBOS_BUILD_DIR) ;
+
 	include BuildConfig ;
+	include Timezones ;
+	include libgccObjects ;
 }
 
 # analyze GCC version
