@@ -201,8 +201,6 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 	rect = tabView->ContainerView()->Bounds();
 	rect.top += 3;
 	fProbeView = new ProbeView(rect, ref, attribute, settings);
-	fProbeView->AddSaveMenuItems(menu, 0);
-	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 2);
 	tabView->AddRawEditorTab(fProbeView);
 
 	view->AddChild(tabView);
@@ -214,6 +212,9 @@ AttributeWindow::AttributeWindow(BRect rect, entry_ref *ref, const char *attribu
 		// show the raw editor if we don't have a specialised type editor
 		tabView->Select(1);
 	}
+
+	fProbeView->AddSaveMenuItems(menu, 0);
+	fProbeView->AddPrintMenuItems(menu, menu->CountItems() - 2);
 
 	fProbeView->UpdateSizeLimits();
 }

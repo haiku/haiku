@@ -66,9 +66,10 @@ FileWindow::FileWindow(BRect rect, entry_ref *ref, const BMessage *settings)
 	BRect rect = Bounds();
 	rect.top = menuBar->Bounds().Height() + 1;
 	ProbeView *probeView = new ProbeView(rect, ref, NULL, settings);
+	AddChild(probeView);
+
 	probeView->AddSaveMenuItems(menu, 4);
 	probeView->AddPrintMenuItems(menu, menu->CountItems() - 4);
-	AddChild(probeView);
 
 	probeView->UpdateSizeLimits();
 }
