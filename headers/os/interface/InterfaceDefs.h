@@ -61,6 +61,7 @@ struct key_info {
 #define B_UTF8_TRADEMARK	"\xE2\x84\xA2"
 #define B_UTF8_SMILING_FACE	"\xE2\x98\xBB"
 #define B_UTF8_HIROSHI		"\xE5\xBC\x98"
+#define B_MAX_MOUSE_BUTTONS 16
 
 /*----------------------------------------------------------------*/
 
@@ -139,9 +140,7 @@ struct key_map {
 };
 
 struct mouse_map {
-	uint32	left;
-	uint32	right;
-	uint32	middle;
+		uint32	button[B_MAX_MOUSE_BUTTONS];
 };
 
 /*----------------------------------------------------------------*/
