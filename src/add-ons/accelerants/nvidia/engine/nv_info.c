@@ -35,6 +35,7 @@ static status_t coldstart_card(uint8* rom, uint16 init1, uint16 init2, uint16 in
 static status_t coldstart_card_516_up(uint8* rom, PinsTables tabs, uint16 ram_tab);
 static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16 ram_tab);
 static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTables tabs, uint16 ram_tab);
+static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* exec);
 static void log_pll(uint32 reg);
 static void	setup_ram_config(uint8* rom, uint16 ram_tab);
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab);
@@ -970,13 +971,25 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			data = (byte >> shift);
 			data <<= 1;
 			data2 = *((uint16*)(&(rom[(adress + data)])));
+			LOG(8,("checking if cmd $39 should first be executed... "));
 			if (offset32 < 0x80)
 			{
-//				exec_cmd_39(adress, offset32, exec);
+				LOG(8,("table index is positive: YES\n"));
+				LOG(8,("INFO: Do subcmd ($39); "));
+				exec_cmd_39_type2(rom, offset32, tabs, &exec);
+				LOG(8,("INFO: ---Doubling PLL frequency to be set for cmd $34.\n"));
 				data2 <<= 1;
 			}
-//add real logline here..
-			LOG(8,("blabla...\n"));
+			else
+				LOG(8,("table index is negative: NO\n"));
+			LOG(8,("INFO: (exec $34) cmd 'RD idx ISA reg $%02x via $%04x, AND-out = $%02x, shift-right = $%02x,\n",
+				index, reg, and_out, shift));
+			LOG(8,("INFO: (cont.) RD 16bit PLL frequency to pgm from subtable with size $%04x, at offset (result << 1),\n",
+				size32));
+			LOG(8,("INFO: (cont.) RD table-index ($%02x) to use for cmd $39 NOW if appropriate (see above),\n",
+				offset32));
+			LOG(8,("INFO: (cont.) then calc and set PLL 32bit reg $%08x for %.3fMHz if exec still on'\n",
+				reg2, (data2 / 100.0)));
 			if (exec && reg2)
 			{
 				//fixme: setup core and RAM PLL calc routine(s), now (mis)using DAC's...
@@ -992,7 +1005,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 //				if ((si->ps.card_type == NV31) || (si->ps.card_type == NV36))
 //					DACW(PIXPLLC2, 0x80000401);
 			}
-			log_pll(reg);
+			log_pll(reg2);
 			adress += size32;
 			break;
 		case 0x37: /* new */
@@ -1077,38 +1090,7 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 			adress += 1;
 			data = *((uint8*)(&(rom[adress])));
 			adress += 1;
-			data *= 9;
-			data += tabs.IOFlagConditionTablePtr;
-			reg = *((uint16*)(&(rom[data])));
-			index = *((uint8*)(&(rom[(data + 2)])));
-			and_out = *((uint8*)(&(rom[(data + 3)])));
-			shift = *((uint8*)(&(rom[(data + 4)])));
-			offset32 = *((uint16*)(&(rom[data + 5])));
-			and_out2 = *((uint8*)(&(rom[(data + 7)])));
-			byte2 = *((uint8*)(&(rom[(data + 8)])));
-			safe = ISARB(reg);
-			ISAWB(reg, index);
-			byte = ISARB(reg + 1);
-			ISAWB(reg, safe);
-			byte &= (uint8)and_out;
-			offset32 += (byte >> shift);
-			safe = byte = *((uint8*)(&(rom[offset32])));
-			byte &= (uint8)and_out2;
-			LOG(8,("cmd 'AND-out bits $%02x idx ISA reg $%02x via $%04x, shift-right = $%02x,\n",
-				and_out, index, reg, shift));
-			LOG(8,("INFO: (cont.) use result as index in table to get data $%02x,\n",
-				safe));
-			LOG(8,("INFO: (cont.) then chk bits AND-out $%02x for $%02x'\n",
-				and_out2, byte2));
-			if (byte != byte2)
-			{
-				LOG(8,("INFO: ---No match: not executing following command(s):\n"));
-				exec = false;
-			}
-			else
-			{
-				LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
-			}
+			exec_cmd_39_type2(rom, data, tabs, &exec);
 			break;
 		case 0x62: /* new */
 			*size -= 5;
@@ -1490,6 +1472,45 @@ static status_t exec_type2_script(uint8* rom, uint16 adress, int16* size, PinsTa
 	}
 
 	return result;
+}
+
+static void	exec_cmd_39_type2(uint8* rom, uint32 data, PinsTables tabs, bool* exec)
+{
+	uint8 index, byte, byte2, safe, shift;
+	uint32 reg, and_out, and_out2, offset32;
+
+	data *= 9;
+	data += tabs.IOFlagConditionTablePtr;
+	reg = *((uint16*)(&(rom[data])));
+	index = *((uint8*)(&(rom[(data + 2)])));
+	and_out = *((uint8*)(&(rom[(data + 3)])));
+	shift = *((uint8*)(&(rom[(data + 4)])));
+	offset32 = *((uint16*)(&(rom[data + 5])));
+	and_out2 = *((uint8*)(&(rom[(data + 7)])));
+	byte2 = *((uint8*)(&(rom[(data + 8)])));
+	safe = ISARB(reg);
+	ISAWB(reg, index);
+	byte = ISARB(reg + 1);
+	ISAWB(reg, safe);
+	byte &= (uint8)and_out;
+	offset32 += (byte >> shift);
+	safe = byte = *((uint8*)(&(rom[offset32])));
+	byte &= (uint8)and_out2;
+	LOG(8,("cmd 'AND-out bits $%02x idx ISA reg $%02x via $%04x, shift-right = $%02x,\n",
+		and_out, index, reg, shift));
+	LOG(8,("INFO: (cont.) use result as index in table to get data $%02x,\n",
+		safe));
+	LOG(8,("INFO: (cont.) then chk bits AND-out $%02x of data for $%02x'\n",
+		and_out2, byte2));
+	if (byte != byte2)
+	{
+		LOG(8,("INFO: ---No match: not executing following command(s):\n"));
+		*exec = false;
+	}
+	else
+	{
+		LOG(8,("INFO: ---Match, so this cmd has no effect.\n"));
+	}
 }
 
 static void	setup_ram_config_nv10_up(uint8* rom, uint16 ram_tab)
