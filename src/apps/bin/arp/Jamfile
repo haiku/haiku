@@ -10,3 +10,8 @@ BinCommand arp :
 OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
 	: arp ;
+
+Package openbeos-networkingkit-cvs :
+	arp :
+#	boot home config bin ;
+	boot home Desktop openbeos-networkingkit ;

@@ -12,3 +12,8 @@ BinCommand route :
 OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
 	: route ;
+
+Package openbeos-networkingkit-cvs :
+	route :
+#	boot home config bin ;
+	boot home Desktop openbeos-networkingkit ;

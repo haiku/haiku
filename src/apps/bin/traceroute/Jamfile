@@ -10,3 +10,8 @@ BinCommand traceroute :
 OBOSInstall install-networking
 	: [ FDirName $(OBOS_TEST_DIR) kits net ]
 	: traceroute ;
+
+Package openbeos-networkingkit-cvs :
+	traceroute :
+#	boot home config bin ;
+	boot home Desktop openbeos-networkingkit ;
