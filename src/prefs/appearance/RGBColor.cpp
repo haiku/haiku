@@ -3,6 +3,7 @@
 		Color encapsulation class for app_server.
 */
 
+#include <stdio.h>
 #include "RGBColor.h"
 
 RGBColor::RGBColor(uint8 r, uint8 g, uint8 b, uint8 a=255)
@@ -154,4 +155,9 @@ printf("MakeBlendColor( {%u,%u,%u,%u}, {%u,%u,%u,%u}, %f) : {%u,%u,%u,%u}\n",
 #endif
 
 	return RGBColor(newcol);
+}
+
+void RGBColor::PrintToStream(void)
+{
+	printf("RGBColor (%u,%u,%u,%u)\n", color.red,color.green,color.blue,color.alpha);
 }

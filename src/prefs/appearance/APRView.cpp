@@ -149,7 +149,7 @@ APRView::~APRView(void)
 	delete colorset_name;
 }
 
-void APRView::AttachedToWindow(void)
+void APRView::AllAttached(void)
 {
 	picker->SetTarget(this);
 	attrlist->Select(0);
@@ -271,6 +271,8 @@ printf("MSG: Save Request - couldn't find file name\n");
 			&col,sizeof(rgb_color));
 
 			SetColorSetName("<untitled>");
+			if(Window())
+				Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case ATTRIBUTE_CHOSEN:
@@ -284,7 +286,9 @@ printf("MSG: Save Request - couldn't find file name\n");
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
 
-			SetColorSetName("<untitled>");
+//			SetColorSetName("<untitled>");
+//			if(Window())
+//				Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case APPLY_SETTINGS:
@@ -308,6 +312,8 @@ printf("MSG: Save Request - couldn't find file name\n");
 			picker->SetValue(col);
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
+			if(Window())
+				Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		case DEFAULT_SETTINGS:
@@ -317,6 +323,8 @@ printf("MSG: Save Request - couldn't find file name\n");
 			picker->SetValue(col);
 			colorwell->SetColor(col);
 			colorwell->Invalidate();
+			if(Window())
+				Window()->PostMessage(SET_UI_COLORS);
 			break;
 		}
 		default:
@@ -519,13 +527,6 @@ printf("SaveColorSet: Error in adding item to menu\n");
 	SetColorSetName(name.String());
 }
 
-void APRView::DeleteColorSet(const BString &name)
-{
-	// Moves the current color set to the trash if it has been saved to disk
-	// Note that it also makes the name <untitled> once more.
-	
-}
-
 color_which APRView::SelectionToAttribute(int32 index)
 {
 	// This simply converts the selected index to the appropriate color_which
@@ -578,7 +579,9 @@ void APRView::SaveSettings(void)
 	
 	BString path(SETTINGS_DIR);
 	path+=COLOR_SETTINGS_NAME;
-	printf("%s\n",path.String());
+#ifdef DEBUG_COLORSET
+printf("SaveSettings: %s\n",path.String());
+#endif
 	BFile file(path.String(),B_READ_WRITE|B_CREATE_FILE|B_ERASE_FILE);
 	
 	settings.Flatten(&file);
@@ -717,12 +720,19 @@ void APRView::NotifyServer(void)
 	// Set desktop color
 	BScreen screen;
 	col=GetColorFromMessage(&settings,"DESKTOP");
+
+#ifdef DEBUG_COLORSET
+printf("NotifyServer: Setting Desktop color to "); PrintRGBColor(col);
+#endif
 	if(col.alpha==0 && col.red==0 && col.green==0 && col.blue==0)
 	{
 		// do nothing
 	}
 	else
 		screen.SetDesktopColor(col);
+
+	if(Window())
+		Window()->PostMessage(SET_UI_COLORS);
 	
 /*	// Name taken from ServerProtocol.h
 	port_id serverport=find_port("OBappserver");

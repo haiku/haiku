@@ -12,6 +12,7 @@ public:
 	RGBColor(uint8 col);
 	RGBColor(const RGBColor &col);
 	RGBColor(void);
+	void PrintToStream(void);
 	uint8 GetColor8(void);
 	uint16 GetColor16(void);
 	rgb_color GetColor32(void);
