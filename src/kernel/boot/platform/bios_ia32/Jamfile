@@ -3,10 +3,12 @@ SubDir OBOS_TOP src kernel boot platform bios_ia32 ;
 SubDirHdrs $(OBOS_TOP) headers private kernel boot platform $(OBOS_BOOT_PLATFORM) ;
 
 KernelMergeObject boot_platform_bios_ia32.o :
+	<$(SOURCE_GRIST)>shell.S
 	<$(SOURCE_GRIST)>start.c
+	<$(SOURCE_GRIST)>debug.c
+	<$(SOURCE_GRIST)>bios.S
+	<$(SOURCE_GRIST)>console.cpp
 	<$(SOURCE_GRIST)>devices.cpp
+	<$(SOURCE_GRIST)>mmu.cpp
 	:
 	;
-
-SEARCH on [ FGristFiles crt0.S ]
-    = [ FDirName $(OBOS_TOP) src kernel boot arch $(OBOS_ARCH) ] ;
