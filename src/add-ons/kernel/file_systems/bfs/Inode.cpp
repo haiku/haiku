@@ -44,12 +44,15 @@ InodeAllocator::InodeAllocator(Transaction &transaction)
 InodeAllocator::~InodeAllocator()
 {
 	if (fTransaction != NULL) {
+		Volume *volume = fTransaction->GetVolume();
+
 		if (fInode != NULL) {
-			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE | INODE_NOT_READY);
+			fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 				// this unblocks any pending bfs_read_vnode() calls
-			fInode->Free(*fTransaction);			
+			fInode->Free(*fTransaction);
+			remove_vnode(volume->ID(), fInode->ID());
 		} else
-			fTransaction->GetVolume()->Free(*fTransaction, fRun);
+			volume->Free(*fTransaction, fRun);
 	}
 
 	delete fInode;
@@ -73,6 +76,13 @@ InodeAllocator::New(block_run *parentRun, mode_t mode, block_run &run, Inode **_
 	fInode = new Inode(volume, *fTransaction, volume->ToVnode(run), mode, run);
 	if (fInode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
+
+	status = new_vnode(volume->ID(), fInode->ID(), fInode);
+	if (status < B_OK) {
+		delete fInode;
+		fInode = NULL;
+		RETURN_ERROR(status);
+	}
 
 	*_inode = fInode;
 	return B_OK;
@@ -105,9 +115,15 @@ status_t
 InodeAllocator::Keep()
 {
 	ASSERT(fInode != NULL && fTransaction != NULL);
+	Volume *volume = fTransaction->GetVolume();
 
-	fInode->Node().flags &= ~HOST_ENDIAN_TO_BFS_INT32(INODE_NOT_READY);
 	status_t status = fInode->WriteBack(*fTransaction);
+	if (status < B_OK) {
+		FATAL(("writing new inode %Ld failed!\n", fInode->ID()));
+		return status;
+	}
+
+	status = publish_vnode(volume->ID(), fInode->ID(), fInode);
 
 	fTransaction = NULL;
 	fInode = NULL;
@@ -122,13 +138,6 @@ InodeAllocator::Keep()
 status_t 
 bfs_inode::InitCheck(Volume *volume)
 {
-	if (Flags() & INODE_NOT_READY) {
-		// the other fields may not yet contain valid values
-		return B_BUSY;
-	}
-	if (Flags() & INODE_DELETED)
-		return B_NOT_ALLOWED;
-
 	if (Magic1() != INODE_MAGIC1
 		|| !(Flags() & INODE_IN_USE)
 		|| inode_num.Length() != 1
@@ -144,6 +153,9 @@ bfs_inode::InitCheck(Volume *volume)
 		|| attributes.AllocationGroup() < 0
 		|| attributes.Start() > (1L << volume->AllocationGroupShift()))
 		RETURN_ERROR(B_BAD_DATA);
+
+	if (Flags() & INODE_DELETED)
+		return B_NOT_ALLOWED;
 
 	// ToDo: Add some tests to check the integrity of the other stuff here,
 	// especially for the data_stream!
@@ -205,12 +217,7 @@ Inode::Inode(Volume *volume, Transaction &transaction, vnode_id id, mode_t mode,
 	Node().magic1 = HOST_ENDIAN_TO_BFS_INT32(INODE_MAGIC1);
 	Node().inode_num = run;
 	Node().mode = HOST_ENDIAN_TO_BFS_INT32(mode);
-	Node().flags = HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE | INODE_NOT_READY);
-		// INODE_NOT_READY prevents the inode from being opened - it is
-		// cleared in InodeAllocator::Keep()
-	Node().etc = (uint32)this;
-		// this is temporarily set along INODE_NOT_READY and lets bfs_read_vnode()
-		// find the associated Inode object
+	Node().flags = HOST_ENDIAN_TO_BFS_INT32(INODE_IN_USE);
 
 	Node().create_time = HOST_ENDIAN_TO_BFS_INT64((bigtime_t)time(NULL) << INODE_TIME_SHIFT);
 	Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64(Node().create_time
@@ -2087,15 +2094,16 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 	Volume *volume = transaction.GetVolume();
 	BPlusTree *tree = NULL;
 
-	RecursiveLocker locker(volume->Lock());
-		// ToDo: it would be nicer to only lock the parent directory, if possible
-		//	(but that lock will already be held during any B+tree action)
-
 	if (parent && (mode & S_ATTR_DIR) == 0 && parent->IsContainer()) {
 		// check if the file already exists in the directory
 		if (parent->GetTree(&tree) != B_OK)
 			RETURN_ERROR(B_BAD_VALUE);
+	}
 
+	WriteLocked locker(tree != NULL ? &parent->Lock() : NULL);
+		// the parent directory is locked during the whole inode creation
+
+	if (tree != NULL) {
 		// does the file already exist?
 		off_t offset;
 		if (tree->Find((uint8 *)name, (uint16)strlen(name), &offset) == B_OK) {
@@ -2193,7 +2201,7 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 	}
 
 	// Add a link to the inode from the parent, depending on its type
-	// (the INODE_NOT_READY flag is set, so it is safe to make the inode
+	// (the vnode is not published yet, so it is safe to make the inode
 	// accessable to the file system here)
 	if (tree) {
 		status = tree->Insert(transaction, name, inode->ID());
@@ -2244,16 +2252,6 @@ Inode::Create(Transaction &transaction, Inode *parent, const char *name, int32 m
 	// Everything worked well until this point, we have a fully
 	// initialized inode, and we want to keep it
 	allocator.Keep();
-
-	// We hold the volume lock to make sure that bfs_read_vnode()
-	// won't succeed in the meantime (between the call right
-	// above and below)!
-
-	if ((status = new_vnode(volume->ID(), inode->ID(), inode)) != B_OK) {
-		// this is a really fatal error, and we can't recover from that
-		FATAL(("new_vnode() failed with: %s\n", strerror(status)));
-		DIE(("new_vnode() failed for inode!"));
-	}
 
 	if (inode->IsFile() || inode->IsAttribute())
 		inode->SetFileCache(file_cache_create(volume->ID(), inode->ID(), inode->Size(), volume->Device()));
