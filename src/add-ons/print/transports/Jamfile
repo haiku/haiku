@@ -5,4 +5,5 @@ SubDir OBOS_TOP src add-ons print transports ;
 # SubInclude OBOS_TOP src add-ons print transports ipp ;
 # SubInclude OBOS_TOP src add-ons print transports lpr ;
 SubInclude OBOS_TOP src add-ons print transports print_to_file ;
+SubInclude OBOS_TOP src add-ons print transports parallel_port ;
 
