@@ -128,6 +128,7 @@ StyledEditView::WriteStyledEditFile(BFile * file, uint32 charSet)
 			}
 			file->Write(buffer,written);
 			sourceLength -= length;
+			outText += length;
 		}
 		file->WriteAttr("be:encoding",B_INT32_TYPE,0,&id,sizeof(id));
 	} 
