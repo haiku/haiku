@@ -139,10 +139,15 @@ private:
 	status_t _SetTo(BDiskDevice *device, BPartition *parent,
 					user_partition_data *data);
 	void _Unset();
+	status_t _RemoveObsoleteDescendants(user_partition_data *data,
+										bool *updated);
+	status_t _Update(user_partition_data *data, bool *updated);
+	void _RemoveChild(int32 index);
 
 	bool _IsShadow() const;
 	partition_id _ShadowID() const;
 	disk_system_id _DiskSystem() const;
+	int32 _ChangeCounter() const;
 
 	int32 _CountDescendants() const;
 	int32 _Level() const;
