@@ -35,7 +35,10 @@ PrintMountPoint(dev_t device, bool verbose)
 	BDirectory root;
 	if (volume.GetRootDirectory(&root) == B_OK) {
 		BPath path(&root, NULL);
-		strlcpy(mount, path.Path(), sizeof(mount));
+		if (path.InitCheck() == B_OK)
+			strlcpy(mount, path.Path(), sizeof(mount));
+		else
+			strlcpy(mount, "?", sizeof(mount));
 	}
 
 	if (verbose)
