@@ -7,5 +7,6 @@ SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) h ] ;
 
 BinCommand dc :
 	dc.c misc.c eval.c stack.c array.c numeric.c string.c
-	: libbc.a ;
+	: libbc.a 
+	: dc.rdef ;
 
