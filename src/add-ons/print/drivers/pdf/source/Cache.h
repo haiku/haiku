@@ -33,7 +33,6 @@ THE SOFTWARE.
 #include "Utils.h"
 
 class CacheItem;
-class CacheItemReference;
 
 // CacheItemDescription
 class CIDescription {
