@@ -4,12 +4,12 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head 0.27, (Rudolf)</h1></p>
+<p><h1>head 0.28, (Rudolf)</h1></p>
 <ul>
 	<li>Overlay fix for GeForce2 and GeForce4 MX Integrated GPU boards: updated RAM amount detection. The last 64Kb RAM is used for the card's BIOS or something so it's not available to the graphicsdriver;
 	<li>Enabled coldstart switch setting (called 'usebios' in nv.settings) in drivercode. Changed the setting to keep the driver working as always;
 	<li>Added recognition for 25 new cards including the first PCI-express (PCX) cards: FX/PCX 6800, FX 6600, PCX 5300/5750/5900, PCX Quadro. New 'old style' cards: Quadro FX 700, Quadro FX 1000 Go, FX 5100 and FX 5700 Go;
-	<li>Card coldstarts should now be fully operational (if enabled in nv.settings) on pre-NV10 cards with BIOS 'pins' struct V2 and later. Tested successfully on a TNT2. (Still in progress for newer cards).
+	<li>Card coldstarts should now be fully operational (if enabled in nv.settings) on pre-NV10 cards with BIOS 'pins' struct V2 and later. Also some GeForce cards might startup now. Tested successfully on TNT2, TNT2M64, and GeForce FX 5200. (Still not finished for all cards).
 </ul>
 <p><h1>nv_driver 0.22, (Rudolf)</h1></p>
 <ul>
