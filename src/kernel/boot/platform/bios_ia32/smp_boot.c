@@ -1,18 +1,21 @@
 /*
-** Copyright 2001, Travis Geiselbrecht. All rights reserved.
-** Distributed under the terms of the NewOS License.
-**
-** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ *
+ * Copyright 2001, Travis Geiselbrecht. All rights reserved.
+ * Distributed under the terms of the NewOS License.
 */
 
 
 // ToDo: this should be integrated better with the rest of the loader!
 
+#include "mmu.h"
+
 #include <KernelExport.h>
 
 #include <boot/stage2.h>
 #include <arch/x86/smp_apic.h>
+#include <kernel.h>
 
 #include <string.h>
 
@@ -28,7 +31,6 @@
 
 #define ADDR_MASK 0xfffff000
 #define DEFAULT_PAGE_FLAGS (1 | 2) // present/rw
-#define STACK_SIZE 2
 
 struct gdt_idt_descr {
 	uint16 a;
@@ -357,27 +359,20 @@ smp_boot_all_cpus(void)
 		uint32 j;
 
 		// create a final stack the trampoline code will put the ap processor on
-		gKernelArgs.cpu_kstack[i].start = gKernelArgs.virtual_allocated_range[0].start + gKernelArgs.virtual_allocated_range[0].size;
-		gKernelArgs.cpu_kstack[i].size = STACK_SIZE * B_PAGE_SIZE;
-		for (j = 0; j < gKernelArgs.cpu_kstack[i].size / B_PAGE_SIZE; j++) {
-			// map the pages in
-			map_page(gKernelArgs.physical_allocated_range[0].start + gKernelArgs.physical_allocated_range[0].size,
-				gKernelArgs.virtual_allocated_range[0].start + gKernelArgs.virtual_allocated_range[0].size);
-			gKernelArgs.physical_allocated_range[0].size += B_PAGE_SIZE;
-			gKernelArgs.virtual_allocated_range[0].size += B_PAGE_SIZE;
-		}
+		gKernelArgs.cpu_kstack[i].start = (addr_t)mmu_allocate(NULL, KERNEL_STACK_SIZE);
+		gKernelArgs.cpu_kstack[i].size = KERNEL_STACK_SIZE;
 
 		// set this stack up
 		final_stack = (uint32 *)gKernelArgs.cpu_kstack[i].start;
-		memset(final_stack, 0, STACK_SIZE * B_PAGE_SIZE);
-		final_stack_ptr = (final_stack + (STACK_SIZE * B_PAGE_SIZE) / sizeof(uint32)) - 1;
+		memset(final_stack, 0, KERNEL_STACK_SIZE);
+		final_stack_ptr = (final_stack + KERNEL_STACK_SIZE / sizeof(uint32)) - 1;
 		*final_stack_ptr = (uint32)&smp_cpu_ready;
 		final_stack_ptr--;
 
 		// set the trampoline stack up
 		tramp_stack_ptr = (uint32 *)(trampoline_stack + B_PAGE_SIZE - 4);
 		// final location of the stack
-		*tramp_stack_ptr = ((uint32)final_stack) + STACK_SIZE * B_PAGE_SIZE - sizeof(uint32);
+		*tramp_stack_ptr = ((uint32)final_stack) + KERNEL_STACK_SIZE - sizeof(uint32);
 		tramp_stack_ptr--;
 		// page dir
 		*tramp_stack_ptr = gKernelArgs.arch_args.phys_pgdir;
