@@ -4,6 +4,8 @@
 */
 
 
+#include "RootFileSystem.h"
+
 #include <boot/partitions.h>
 #include <boot/vfs.h>
 #include <boot/stdio.h>
@@ -181,7 +183,7 @@ Partition::Mount(Directory **_fileSystem)
 
 		Directory *fileSystem;
 		if (module->get_file_system(this, &fileSystem) == B_OK) {
-			gRoot->AddNode(fileSystem);
+			gRoot->AddVolume(fileSystem);
 			if (_fileSystem)
 				*_fileSystem = fileSystem;
 
