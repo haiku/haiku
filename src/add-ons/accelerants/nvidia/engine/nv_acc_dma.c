@@ -577,8 +577,13 @@ status_t nv_acc_init_dma()
 		si->engine.fifo.ch_ptr[cnt] = 0;
 	}
 	/* set handle's pointers to their assigned FIFO channels */
+	/* note:
+	 * b0-1 aren't used as adressbits. Using b0 to indicate a valid pointer. */
 	for (cnt = 0; cnt < 0x08; cnt++)
-		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] = (cnt * 0x00002000);
+	{
+		si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] =
+												(0x00000001 + (cnt * 0x00002000));
+	}
 
 	/* init DMA command buffer pointer */
 	si->engine.dma.cmdbuffer = (uint32 *)((char *)si->framebuffer +
@@ -639,9 +644,6 @@ status_t nv_acc_init_dma()
 	si->engine.dma.cmdbuffer[0x0f] =
 		(0x80000000 | si->engine.fifo.handle[0]);
 
-	/* initialize our local pointers */
-	nv_acc_assert_fifo_dma();
-
 	/* we have issued no DMA cmd's to the engine yet: the above ones are still
 	 * awaiting execution start. */
 	si->engine.dma.put = 0;
@@ -655,6 +657,9 @@ status_t nv_acc_init_dma()
 	/*si->dma.*/max = 8191;
 	/* note the current free space we have left in the DMA buffer */
 	si->engine.dma.free = /*si->dma.*/max - si->engine.dma.current /*+ 1*/;
+
+	/* initialize our local pointers */
+	nv_acc_assert_fifo_dma();
 
 	//fixme: add colorspace and buffer config cmd's or predefine in the non-DMA way.
 	//fixme: overlay should stay outside the DMA buffer, also add a failsafe
@@ -712,7 +717,7 @@ static status_t nv_acc_fifofree_dma(uint16 cmd_size)
 static void nv_acc_cmd_dma(uint32 cmd, uint16 offset, uint16 size)
 {
 	si->engine.dma.cmdbuffer[si->engine.dma.current++] = ((size << 18) |
-		(si->engine.fifo.ch_ptr[cmd] + offset));
+		((si->engine.fifo.ch_ptr[cmd] & 0x0000fffc) + offset));
 }
 
 /* fixme? (check this out..)
@@ -755,10 +760,12 @@ static void nv_acc_assert_fifo_dma(void)
 		si->engine.fifo.handle[5] = NV3_GDI_RECTANGLE_TEXT;
 
 		/* set handle's pointers to their assigned FIFO channels */
+		/* note:
+		 * b0-1 aren't used as adressbits. Using b0 to indicate a valid pointer. */
 		for (cnt = 0; cnt < 0x08; cnt++)
 		{
 			si->engine.fifo.ch_ptr[(si->engine.fifo.handle[cnt])] =
-				(cnt * 0x00002000);
+				(0x00000001 + (cnt * 0x00002000));
 		}
 
 		/* program new FIFO assignments */
