@@ -497,8 +497,8 @@ insert_area(vm_address_space *addressSpace, void **_address,
 
 // a ref to the cache holding this store must be held before entering here
 static int
-map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
-	off_t offset, addr_t size, int addr_type, int wiring, int lock,
+map_backing_store(vm_address_space *aspace, vm_store *store, void **_virtualAddress,
+	off_t offset, addr_t size, int addressSpec, int wiring, int lock,
 	int mapping, vm_region **_region, const char *region_name)
 {
 	vm_cache *cache;
@@ -511,7 +511,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
 	int err;
 
 	TRACE(("map_backing_store: aspace %p, store %p, *vaddr %p, offset 0x%Lx, size %lu, addr_type %d, wiring %d, lock %d, _region %p, region_name '%s'\n",
-		aspace, store, *vaddr, offset, size, addr_type, wiring, lock, _region, region_name));
+		aspace, store, *_virtualAddress, offset, size, addressSpec, wiring, lock, _region, region_name));
 
 	region = _vm_create_region_struct(aspace, region_name, wiring, lock);
 	if (!region)
@@ -591,7 +591,7 @@ map_backing_store(vm_address_space *aspace, vm_store *store, void **vaddr,
 		goto err1b;
 	}
 
-	err = insert_area(aspace, vaddr, addr_type, size, region);
+	err = insert_area(aspace, _virtualAddress, addressSpec, size, region);
 	if (err < B_OK)
 		goto err1b;
 
@@ -1006,79 +1006,90 @@ vm_create_null_region(aspace_id aid, char *name, void **address, int addr_type, 
 }
 
 
-static region_id
-_vm_map_file(aspace_id aid, char *name, void **address, int addr_type,
-	addr_t size, int lock, int mapping, const char *path, off_t offset, bool kernel)
+status_t
+vm_create_vnode_cache(void *vnode, void **_cache)
 {
-	vm_region *region;
-	vm_cache *cache;
 	vm_cache_ref *cache_ref;
+	vm_cache *cache;
 	vm_store *store;
-	void *v;
-//	addr_t map_offset;
-	int err;
+
+	// create a vnode store object
+	store = vm_store_create_vnode(vnode);
+	if (store == NULL) {
+		dprintf("vm_create_vnode_cache: couldn't create vnode store\n");
+		return B_NO_MEMORY;
+	}
+
+	cache = vm_cache_create(store);
+	if (cache == NULL) {
+		dprintf("vm_create_vnode_cache: vm_cache_create returned NULL\n");
+		return B_NO_MEMORY;
+	}
+
+	cache_ref = vm_cache_ref_create(cache);
+	if (cache_ref == NULL) {
+		dprintf("vm_create_vnode_cache: vm_cache_ref_create returned NULL\n");
+		return B_NO_MEMORY;
+	}
+
+	// acquire the cache ref once to represent the ref that the vnode will have
+	// this is one of the only places where we dont want to ref to ripple down to the store
+	vm_cache_acquire_ref(cache_ref, false);
+
+	*_cache = cache_ref;
+	return B_OK;
+}
+
+
+/** Will map the file at the path specified by \a name to an area in memory.
+ *	The file will be mirrored beginning at the specified \a offset. The \a offset
+ *	and \a size arguments have to be page aligned.
+ */
+
+static region_id
+_vm_map_file(aspace_id aid, char *name, void **_address, uint32 addressSpec,
+	size_t size, int lock, int mapping, const char *path, off_t offset, bool kernel)
+{
+	vm_cache_ref *cache_ref;
+	vm_region *area;
+	void *vnode;
+	status_t status;
 
 	vm_address_space *aspace = vm_get_aspace_by_id(aid);
 	if (aspace == NULL)
 		return ERR_VM_INVALID_ASPACE;
 
-	offset = ROUNDOWN(offset, PAGE_SIZE);
+	offset = ROUNDOWN(offset, B_PAGE_SIZE);
 	size = PAGE_ALIGN(size);
 
-restart:
 	// get the vnode for the object, this also grabs a ref to it
-	err = vfs_get_vnode_from_path(path, kernel, &v);
-	if (err < 0) {
-		vm_put_aspace(aspace);
-		return err;
-	}
+	status = vfs_get_vnode_from_path(path, kernel, &vnode);
+	if (status < B_OK)
+		goto err1;
 
-	cache_ref = vfs_get_cache_ptr(v);
-	if (!cache_ref) {
-		// create a vnode store object
-		store = vm_store_create_vnode(v);
-		if (store == NULL)
-			panic("vm_map_file: couldn't create vnode store");
-		cache = vm_cache_create(store);
-		if (cache == NULL)
-			panic("vm_map_physical_memory: vm_cache_create returned NULL");
-		cache_ref = vm_cache_ref_create(cache);
-		if (cache_ref == NULL)
-			panic("vm_map_physical_memory: vm_cache_ref_create returned NULL");
-
-		// acquire the cache ref once to represent the ref that the vnode will have
-		// this is one of the only places where we dont want to ref to ripple down to the store
-		vm_cache_acquire_ref(cache_ref, false);
-
-		// try to set the cache ptr in the vnode
-		if (vfs_set_cache_ptr(v, cache_ref) < 0) {
-			// the cache pointer was set between here and then
-			// this can only happen if someone else tries to map it
-			// at the same time. Rare enough to not worry about the
-			// performance impact of undoing what we just did and retrying
-
-			// this will delete the cache object and release the ref to the vnode we have
-			vm_cache_release_ref(cache_ref);
-			goto restart;
-		}
-	} else {
-		cache = cache_ref->cache;
-		store = cache->store;
-	}
+	status = vfs_get_vnode_cache(vnode, (void **)&cache_ref);
+	if (status < B_OK)
+		goto err2;
 
 	// acquire a ref to the cache before we do work on it. Dont ripple the ref acquision to the vnode
 	// below because we'll have to release it later anyway, since we grabbed a ref to the vnode at
 	// vfs_get_vnode_from_path(). This puts the ref counts in sync.
 	vm_cache_acquire_ref(cache_ref, false);
-	err = map_backing_store(aspace, store, address, offset, size, addr_type, 0, lock, mapping, &region, name);
+	status = map_backing_store(aspace, cache_ref->cache->store, _address, offset, size,
+					addressSpec, 0, lock, mapping, &area, name);
 	vm_cache_release_ref(cache_ref);
 	vm_put_aspace(aspace);
-	if (err < 0)
-		return err;
 
-	// modify the pointer returned to be offset back into the new region
-	// the same way the physical address in was offset
-	return region->id;
+	if (status < 0)
+		return status;
+
+	return area->id;
+
+err2:
+	vfs_vnode_release_ref(vnode);
+err1:
+	vm_put_aspace(aspace);
+	return status;
 }
 
 
