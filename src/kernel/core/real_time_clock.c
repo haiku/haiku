@@ -144,16 +144,6 @@ real_time_clock_usecs(void)
 		sRealTimeData->timezone_offset;
 }
 
-
-status_t
-set_tzspecs(int32 timezone_offset, bool dst_observed)
-{
-	sRealTimeData->timezone_offset = timezone_offset * 1000000LL;
-	sRealTimeData->dst_observed = dst_observed;
-	return B_OK;
-}
-
-
 //	#pragma mark -
 //	public userland API
 
@@ -175,6 +165,24 @@ _user_set_tzspecs(int32 timezone_offset, bool dst_observed)
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 	
-	set_tzspecs(timezone_offset, dst_observed);
+	sRealTimeData->timezone_offset = timezone_offset * 1000000LL;
+	sRealTimeData->dst_observed = dst_observed;
 	return B_OK;
 }
+
+
+status_t
+_user_set_tzfilename(const char *filename, size_t length, bool isGMT)
+{
+	if (geteuid() != 0)
+		return B_NOT_ALLOWED;
+	if (!IS_USER_ADDRESS(filename)
+		|| filename == NULL
+		|| user_strlcpy(sRealTimeData->tzfilename, filename, B_PATH_NAME_LENGTH) < B_OK)
+		return B_BAD_ADDRESS;
+
+	sRealTimeData->isGMT = isGMT;
+	
+	return B_OK;
+}
+
