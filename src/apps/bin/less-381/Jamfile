@@ -1,14 +1,20 @@
 SubDir OBOS_TOP src apps bin less-381 ;
 
-SubDirCcFlags -DSYSDIR=\'\"/etc\"\' ;
+# filter warnings we don't want here
+local originalCCFlags = $(CCFLAGS) ;
+CCFLAGS = [ Filter $(CCFLAGS) : -Wall -Wmissing-prototypes ] ;
+
+SubDirCcFlags -DBINDIR='\"/bin\"' -DSYSDIR='\"/etc\"' ;
 
 BinCommand less : 
 	main.c screen.c brac.c ch.c charset.c cmdbuf.c command.c decode.c edit.c filename.c forwback.c 
 	help.c ifile.c input.c jump.c line.c linenum.c lsystem.c mark.c optfunc.c option.c opttbl.c os.c 
 	output.c position.c prompt.c search.c signal.c tags.c ttyin.c version.c  :
-	libtermcap.so ;
+	libtermcap.a : less.rdef ;
 
-BinCommand lesskey : lesskey.c version.c : ;
+BinCommand lesskey : lesskey.c version.c : : less.rdef ;
 
-BinCommand lessecho : lessecho.c version.c : ;
+BinCommand lessecho : lessecho.c version.c : : less.rdef ;
 
+# restore CCFLAGS
+CCFLAGS = $(originalCCFlags) ;
