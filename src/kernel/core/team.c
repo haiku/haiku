@@ -392,6 +392,7 @@ insert_team_into_group(struct process_group *group, struct team *team)
 	team->group = group;
 	team->group_id = group->id;
 	team->session_id = group->session->id;
+	atomic_add(&team->dead_children.wait_for_any, group->wait_for_any);
 
 	team->group_next = group->teams;
 	group->teams = team;
@@ -477,6 +478,9 @@ remove_team_from_group(struct team *team, struct process_group **_freeGroup)
 		last = current;
 	}
 
+	// all wait_for_child() that wait on the group don't wait for us anymore
+	atomic_add(&team->dead_children.wait_for_any, -group->wait_for_any);
+
 	team->group = NULL;
 	team->group_next = NULL;
 
@@ -506,6 +510,7 @@ create_process_group(pid_t id)
 	group->id = id;
 	group->session = NULL;
 	group->teams = NULL;
+	group->wait_for_any = 0;
 
 	return group;
 }
@@ -1158,13 +1163,78 @@ err1:
 }
 
 
+/** This searches the session of the team for the specified group ID.
+ *	You must hold the team lock when you call this function.
+ */
+
+static struct process_group *
+get_process_group_locked(struct team *team, pid_t id)
+{
+	struct list *groups = &team->group->session->groups;
+	struct process_group *group = NULL;
+
+	// a short cut when the current team's group is asked for
+	if (team->group->id == id)
+		return team->group;
+
+	while ((group = list_get_next_item(groups, group)) != NULL) {
+		if (group->id == id)
+			return group;
+	}
+
+	return NULL;
+}
+
+
 static status_t
-get_death_entry(struct team *team, thread_id child, struct death_entry *death)
+register_wait_for_any(struct team *team, thread_id child)
+{
+	struct process_group *group;
+	cpu_status state;
+
+	if (child > 0)
+		return B_OK;
+
+	if (child == -1) {
+		// we only wait for children of the current team
+		atomic_add(&team->dead_children.wait_for_any, 1);
+		return B_OK;
+	}
+
+	state = disable_interrupts();
+	GRAB_TEAM_LOCK();
+
+	if (child < 0) {
+		// we wait for all children of the specified process group
+		group = get_process_group_locked(team, -child);
+	} else {
+		// we wait for any children of the current team's group
+		group = team->group;
+	}
+
+	if (group != NULL) {
+		for (team = group->teams; team; team = team->group_next) {
+			atomic_add(&team->dead_children.wait_for_any, 1);
+		}
+
+		atomic_add(&group->wait_for_any, 1);
+	}
+
+	RELEASE_TEAM_LOCK();
+	restore_interrupts(state);
+
+	return group != NULL ? B_OK : B_BAD_THREAD_ID;
+}
+
+
+static status_t
+get_team_death_entry(struct team *team, thread_id child, struct death_entry *death,
+	struct death_entry **_freeDeath)
 {
 	struct death_entry *entry = NULL;
 
 	// find matching death entry structure
-	
+
 	while ((entry = list_get_next_item(&team->dead_children.list, entry)) != NULL) {
 		if (child != -1 && entry->thread != child)
 			continue;
@@ -1178,13 +1248,45 @@ get_death_entry(struct team *team, thread_id child, struct death_entry *death)
 			|| (child != -1 && team->dead_children.wait_for_any == 0)) {
 			list_remove_link(entry);
 			team->dead_children.count--;
-			free(entry);
+			*_freeDeath = entry;
 		}
 
 		return B_OK;
 	}
 
 	return child > 0 ? B_BAD_THREAD_ID : B_WOULD_BLOCK;
+}
+
+
+static status_t
+get_death_entry(struct team *team, pid_t child, struct death_entry *death,
+	struct death_entry **_freeDeath)
+{
+	struct process_group *group;
+	status_t status;
+
+	if (child == -1 || child > 0) {
+		// wait for any children or a specific child of this team to die
+		return get_team_death_entry(team, child, death, _freeDeath);
+	} else if (child < 0) {
+		// we wait for all children of the specified process group
+		group = get_process_group_locked(team, -child);
+		if (group == NULL)
+			return B_BAD_THREAD_ID;
+	} else {
+		// we wait for any children of the current team's group
+		group = team->group;
+	}
+
+	for (team = group->teams; team; team = team->group_next) {
+		status = get_team_death_entry(team, -1, death, _freeDeath);
+		if (status == B_OK) {
+			atomic_add(&group->wait_for_any, -1);
+			return B_OK;
+		}
+	}
+
+	return B_WOULD_BLOCK;
 }
 
 
@@ -1197,7 +1299,7 @@ static thread_id
 wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnCode)
 {
 	struct team *team = thread_get_current_thread()->team;
-	struct death_entry death;
+	struct death_entry death, *freeDeath = NULL;
 	status_t status = B_OK;
 	cpu_status state;
 
@@ -1208,9 +1310,11 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		return EOPNOTSUPP;
 	}
 
-	if (child == -1) {
+	if (child <= 0) {
 		// we need to make sure the death entries won't get deleted too soon
-		atomic_add(&team->dead_children.wait_for_any, 1);
+		status = register_wait_for_any(team, child);
+		if (status != B_OK)
+			return status;
 	}
 
 	while (true) {
@@ -1221,12 +1325,6 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 				// team is still running, so we would need to block
 				return B_WOULD_BLOCK;
 			}
-		} else if (child == -1) {
-			// wait for any children of this team to die
-		} else if (child == 0) {
-			// wait for any children of this process group to die
-		} else {
-			// wait for any children with progress group of the absolute value of "child"
 		}
 
 		// see if there is any death entry for us already
@@ -1234,11 +1332,16 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		state = disable_interrupts();
 		GRAB_TEAM_LOCK();
 
-		status = get_death_entry(team, child, &death);
+		status = get_death_entry(team, child, &death, &freeDeath);
 
 		RELEASE_TEAM_LOCK();
 		restore_interrupts(state);
 
+		// we got our death entry and can return to our caller
+		if (status == B_OK)
+			break;
+
+		// there was no matching group/child we could wait for
 		if (status == B_BAD_THREAD_ID)
 			return B_BAD_THREAD_ID;
 
@@ -1249,6 +1352,8 @@ wait_for_child(thread_id child, uint32 flags, int32 *_reason, status_t *_returnC
 		if (status == B_INTERRUPTED)
 			return B_INTERRUPTED;
 	}
+
+	free(freeDeath);
 
 	// when we got here, we have a valid death entry
 	*_returnCode = death.status;
