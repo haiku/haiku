@@ -571,7 +571,7 @@ KPPPInterface::Control(uint32 op, void *data, size_t length)
 	
 	\param device The device object.
 	
-	\return \c true if successful or \false otherwise.
+	\return \c true if successful or \c false otherwise.
 	
 	\sa KPPPDevice
 	\sa kppp_module_info
@@ -620,7 +620,7 @@ KPPPInterface::SetDevice(KPPPDevice *device)
 	
 	\param protocol The protocol object.
 	
-	\return \c true if successful or \false otherwise.
+	\return \c true if successful or \c false otherwise.
 	
 	\sa KPPPProtocol
 	\sa kppp_module_info
@@ -696,7 +696,7 @@ KPPPInterface::AddProtocol(KPPPProtocol *protocol)
 	
 	\param protocol The protocol object.
 	
-	\return \c true if successful or \false otherwise.
+	\return \c true if successful or \c false otherwise.
 */
 bool
 KPPPInterface::RemoveProtocol(KPPPProtocol *protocol)
