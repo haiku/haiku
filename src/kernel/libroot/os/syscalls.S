@@ -64,6 +64,8 @@ SYSCALL2(sys_getcwd, 41)
 SYSCALL2(sys_setcwd, 42)
 SYSCALL1(sys_dup, 61)
 SYSCALL2(sys_dup2, 62)
+SYSCALL7(sys_select, 112)
+SYSCALL4(sys_poll, 113)
 
 /* VFS attribute calls */
 SYSCALL2(sys_open_attr_dir, 97)
