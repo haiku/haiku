@@ -20,8 +20,7 @@ UsePrivateHeaders [ FDirName kernel util ] ;
 	SubDirC++Flags $(defines) -fno-exceptions -fno-rtti $(malloc_debug_flags) ;
 }
 
-SimpleTest mkbfs
-	:
+SimpleTest mkbfs :
 	mkbfs.cpp
 
 	cache.c
@@ -34,6 +33,10 @@ SimpleTest mkbfs
 	BlockAllocator.cpp kernel_interface.cpp Utility.cpp BufferPool.cpp
 	Debug.cpp
 	:
+	;
+
+SimpleTest allocationGroups :
+	allocationGroups.cpp
 	;
 
 # Tell Jam where to find these sources
