@@ -85,12 +85,12 @@ _protected_code_segment:
  */
 
 enable_a20:
-	movw	$0x2402, %ax		// first, query the a20 status
+	movw	$2402, %ax		// first, query the a20 status
 	int		$0x15
 	jc		_a20_old_method		// if that fails, use the old AT method
 	test	$0x1, %al
 	jnz		_a20_done			// Is a20 gate already enabled?
-	movw	$0x2401, %ax
+	movw	$2401, %ax
 	int		$0x15
 	jnc		_a20_done
 _a20_old_method:
@@ -128,14 +128,17 @@ gdt:
 	.long	0x00cf9200		// type: 32 bit, data read/write, privilege 0
 
 	// real mode 16 bit code segment
-	.long	0x0000ffff		// base: 0, limit: 4 GB
-	.long	0x00009e00
+	.long	0x0000ffff		// base: 0x10000, limit: 64 kB
+	.long	0x00009e01
 	// real mode 16 bit data and stack segment
-	.long	0x0000ffff		// base: 0, limit: 4 GB
+	.long	0x0000ffff		// base: 0x10000, limit: 64 kB
+	.long	0x00009201
+	// real mode 16 bit stack segment
+	.long	0x0000ffff		// base: 0, limit: 64 kB
 	.long	0x00009200
 
 gdt_descriptor:
-	.word	0x27			// 5 entries in the GDT (8 bytes each)
+	.word	0x2f			// 6 entries in the GDT (8 bytes each)
 	.long	gdt
 
 .org 1024
