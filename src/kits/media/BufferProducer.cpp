@@ -8,7 +8,7 @@
 #include <Buffer.h>
 #include "PortPool.h"
 #include "debug.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 /*************************************************************
  * protected BBufferProducer

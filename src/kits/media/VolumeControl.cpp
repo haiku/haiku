@@ -8,7 +8,7 @@
 #include <Messenger.h>
 #include "debug.h"
 #include "VolumeControl.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 namespace MediaKitPrivate {
 

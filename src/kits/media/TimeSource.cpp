@@ -5,7 +5,7 @@
  ***********************************************************************/
 #include <TimeSource.h>
 #include "debug.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 // XXX This BTimeSource only works for realtime, nothing else is implemented
 

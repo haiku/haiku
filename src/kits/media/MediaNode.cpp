@@ -12,7 +12,7 @@
 #include <string.h>
 #include "SystemTimeSource.h"
 #include "debug.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 // don't rename this one, it's used and exported for binary compatibility
 int32 BMediaNode::_m_changeTag = 0;

@@ -8,7 +8,7 @@
 #include <Message.h>
 #include "SharedBufferList.h"
 #include "debug.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 static team_id CurrentTeam();
 team_id CurrentTeam()

@@ -15,7 +15,7 @@
 #define	DEBUG 3
 #include "debug.h"
 #include "PortPool.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 static BMessenger *ServerMessenger = 0;
 static team_id team;

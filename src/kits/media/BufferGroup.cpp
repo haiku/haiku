@@ -8,7 +8,7 @@
 #include <Message.h>
 #include "debug.h"
 #include "SharedBufferList.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 /*************************************************************
  * private BBufferGroup

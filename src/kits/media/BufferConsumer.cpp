@@ -9,7 +9,7 @@
 #include <Buffer.h>
 #include <malloc.h>
 #include "debug.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 #include "BufferIdCache.h"
 
 /*************************************************************

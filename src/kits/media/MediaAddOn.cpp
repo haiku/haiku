@@ -8,7 +8,7 @@
 #include <malloc.h>
 #include "debug.h"
 #include "PortPool.h"
-#include "../server/headers/ServerInterface.h"
+#include "ServerInterface.h"
 
 /*
  * some little helper function
