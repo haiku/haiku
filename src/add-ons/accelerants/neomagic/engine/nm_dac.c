@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 4/2003-5/2003
+   Rudolf Cornelissen 4/2003-4/2004
 */
 
 #define MODULE_BIT 0x00010000
@@ -203,22 +203,33 @@ status_t nm_dac_set_pix_pll(display_mode target)
 status_t nm_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result)
 {
-	int m = 0, n = 0, p = 0, n_max;
+	int m = 0, n = 0, p = 0, n_max, m_max;
 	float error, error_best = 999999999;
 	int best[2]; 
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
-	/* determine the max. VCO oscillator postscaler setting for the current card */
-	if (si->ps.card_type < NM2200)
+	/* determine the max. scaler settings for the current card */
+	switch (si->ps.card_type)
 	{
-		LOG(4,("DAC: NM20xx/NM21xx restrictions apply\n"));
+	case NM2070:
+		LOG(4,("DAC: NM2070 restrictions apply\n"));
+		m_max = 32;
 		n_max = 128;
-	}
-	else
-	{
+		break;
+	case NM2090:
+	case NM2093:
+	case NM2097:
+	case NM2160:
+		LOG(4,("DAC: NM2090/93/97/NM2160 restrictions apply\n"));
+		m_max = 64;
+		n_max = 128;
+		break;
+	default:
 		LOG(4,("DAC: NM22xx/NM23xx restrictions apply\n"));
+		m_max = 64;
 		n_max = 2048;
+		break;
 	}
 
 	/* determine the max. pixelclock for the current videomode */
@@ -261,10 +272,10 @@ status_t nm_dac_pix_pll_find
 	f_vco = req_pclk;
 
 	/* iterate trough all valid reference-frequency postscaler settings */
-	for (m = 1; m <= 64; m++)
+	for (m = 1; m <= m_max; m++)
 	{
-		/* only even reference postscaler settings are supported beyond 32 */
-		if ((m > 32) && ((m / 2.0) != 0.0)) continue;
+		/* only even reference postscaler settings are supported beyond half the range */
+		if ((m > (m_max / 2)) && ((m / 2.0) != 0.0)) continue;
 		/* calculate VCO postscaler setting for current setup.. */
 		n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
 		/* ..and check for validity */
@@ -285,8 +296,8 @@ status_t nm_dac_pix_pll_find
 	/* setup the scalers programming values for found optimum setting */
 	n = best[1] - 1;
 	/* the reference frequency postscaler are actually two postscalers:
-	 * p can divide by 1 or 2, and m can divide by 1-32. */
-	if (best[0] <= 32)
+	 * p can divide by 1 or 2, and m can divide by 1-32 (1-16 for NM2070). */
+	if (best[0] <= (m_max / 2))
 	{
 		m = best[0] - 1;
 		p = (0 << 7);
