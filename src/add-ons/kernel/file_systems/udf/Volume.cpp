@@ -27,14 +27,37 @@ Volume::Volume(nspace_id id)
 	, fBlockSize(0)
 	, fBlockShift(0)
 	, fInitStatus(B_UNINITIALIZED)
+#if (!DRIVE_SETUP_ADDON)
 	, fRootIcb(NULL)
+#endif
 {
 }
 
 status_t
-Volume::Identify(int device, off_t base)
+Volume::Identify(int device, off_t offset, off_t length, uint32 blockSize, char *volumeName)
 {
-	return B_ERROR;	
+	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "static Volume",
+		("device: %d, offset: %lld, volumeName: %p", device, offset, volumeName));
+	if (!volumeName)
+		RETURN(B_BAD_VALUE);
+		
+//	FILE *file = fopen("/boot/home/Desktop/outputIdentify.txt", "w+");
+
+	Volume volume(0);
+	status_t err = volume._Init(device, offset, length, blockSize);
+//	fprintf(file, "error = 0x%lx, `%s'\n", err, strerror(err));
+//	fflush(file);
+	if (!err)
+		err = volume._Identify();
+//	fprintf(file, "error = 0x%lx, `%s'\n", err, strerror(err));
+//	fflush(file);
+	if (!err) 
+		strcpy(volumeName, volume.Name());
+//	fprintf(file, "error = 0x%lx, `%s'\n", err, strerror(err));
+//	fflush(file);
+
+//	fclose(file);		
+	RETURN(err);	
 }
 
 /*! \brief Attempts to mount the given device.
@@ -49,76 +72,24 @@ Volume::Mount(const char *deviceName, off_t volumeStart, off_t volumeLength,
 	DEBUG_INIT_ETC(CF_PUBLIC | CF_VOLUME_OPS, "Volume",
 		("devName = `%s'", deviceName));
 	if (!deviceName)
-		RETURN_ERROR(B_BAD_VALUE);
+		RETURN(B_BAD_VALUE);
 	if (_InitStatus() == B_INITIALIZED)
-		RETURN_ERROR(B_BUSY);
+		RETURN(B_BUSY);
 			// Already mounted, thank you for asking
 
-	// Check the block size
-	uint32 bitCount = 0;
-	for (int i = 0; i < 32; i++) {
-		// Zero out all bits except bit i
-		uint32 block = blockSize & (uint32(1) << i);
-		if (block) {
-			if (++bitCount > 1) {
-				PRINT(("Block size must be a power of two! (blockSize = %ld)\n", blockSize));
-				RETURN(B_BAD_VALUE);
-			} else {
-				fBlockShift = i;
-				PRINT(("BlockShift() = %ld\n", BlockShift()));
-			}			
-		}
-	}
-	
-	fReadOnly = flags & B_READ_ONLY;
-	fStart = volumeStart;
-	fLength = volumeLength;	
-	fBlockSize = blockSize;
-	
-	// Open the device, trying read only if readwrite fails
-	fDevice = open(deviceName, fReadOnly ? O_RDONLY : O_RDWR);
-	if (fDevice < B_OK && !fReadOnly) {
-		fReadOnly = true;
-		fDevice = open(deviceName, O_RDONLY);
-	}		
-	if (fDevice < B_OK)
-		RETURN_ERROR(fDevice);
-		
-	// If the device is actually a normal file, try to disable the cache
-	// for the file in the parent filesystem
-	struct stat stat;
-	status_t err = fstat(fDevice, &stat) < 0 ? B_ERROR : B_OK;
-	if (!err) {
-		if (stat.st_mode & S_IFREG && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
-			// Apparently it's a bad thing if you can't disable the file
-			// cache for a non-device disk image you're trying to mount...
-			DIE(("Unable to disable cache of underlying file system. "
-			     "I hear that's bad. :-(\n"));
-		}
-		// So far so good. The device is ready to be accessed now.
-		fInitStatus = B_DEVICE_INITIALIZED;
-	}
-	
-	err = init_cache_for_device(Device(), Length());
-	if (!err) {
-		// Now identify the volume
-		err = _Identify();
-		if (!err) {
-			// Success, create a vnode for the root
-			err = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
-			if (err) {
-				PRINT(("Error create vnode for root icb! error = 0x%lx, `%s'\n",
-				       err, strerror(err)));
-			}
-		} else {
-			PRINT(("Error identifying a valid Udf volume! error = 0x%lx, `%s'\n",
-				   err, strerror(err)));
-		}	
-	} else {
-		PRINT(("Error initializing buffer cache! error = 0x%lx, `%s'\n",
-		       err, strerror(err)));
-	}
+	// Open the device read only
+	int device = open(deviceName, O_RDONLY);
+	if (device < B_OK)
+		RETURN(device);
 
+	status_t err = _Init(device, volumeStart, volumeLength, blockSize);
+	if (!err) 
+		err = _Identify();
+	if (!err)
+		err = _Mount();
+
+	if (err)
+		fInitStatus = B_UNINITIALIZED;
 	
 	RETURN(err);
 }
@@ -144,7 +115,7 @@ Volume::MapBlock(udf_long_address address, off_t *mappedBlock)
 		address.block(), address.partition(), mappedBlock));
 	status_t err = mappedBlock ? B_OK : B_BAD_VALUE;
 	if (!err)
-		err = _InitStatus() >= B_LOGICAL_VOLUME_INITIALIZED ? B_OK : B_NO_INIT;
+		err = _InitStatus() >= B_IDENTIFIED ? B_OK : B_NO_INIT;
 	if (!err) {
 		udf_partition_descriptor* partition = fPartitionMap.Find(address.partition());
 		err = partition ? B_OK : B_BAD_ADDRESS;
@@ -218,6 +189,57 @@ Volume::_Read(AddressType address, ssize_t length, void *data)
 	RETURN(err);
 }
 */
+status_t
+Volume::_Init(int device, off_t offset, off_t length, int blockSize)
+{
+	DEBUG_INIT(CF_PRIVATE | CF_HIGH_VOLUME, "Volume");
+	if (_InitStatus() == B_INITIALIZED)
+		RETURN_ERROR(B_BUSY);
+
+	// Check the block size
+	uint32 bitCount = 0;
+	for (int i = 0; i < 32; i++) {
+		// Zero out all bits except bit i
+		uint32 block = blockSize & (uint32(1) << i);
+		if (block) {
+			if (++bitCount > 1) {
+				PRINT(("Block size must be a power of two! (blockSize = %ld)\n", blockSize));
+				RETURN(B_BAD_VALUE);
+			} else {
+				fBlockShift = i;
+				PRINT(("BlockShift() = %ld\n", BlockShift()));
+			}			
+		}
+	}
+
+	fDevice = device;	
+	fReadOnly = true;
+	fStart = offset;
+	fLength = length;	
+	fBlockSize = blockSize;
+	
+	status_t err = B_OK;
+	
+#if (!DRIVE_SETUP_ADDON)
+	// If the device is actually a normal file, try to disable the cache
+	// for the file in the parent filesystem
+	struct stat stat;
+	err = fstat(fDevice, &stat) < 0 ? B_ERROR : B_OK;
+	if (!err) {
+		if (stat.st_mode & S_IFREG && ioctl(fDevice, IOCTL_FILE_UNCACHED_IO, NULL) < 0) {
+			// Apparently it's a bad thing if you can't disable the file
+			// cache for a non-device disk image you're trying to mount...
+			DIE(("Unable to disable cache of underlying file system. "
+			     "I hear that's bad. :-(\n"));
+		}
+	}
+#endif
+	
+	fInitStatus = err < B_OK ? B_UNINITIALIZED : B_DEVICE_INITIALIZED;
+	
+	RETURN(err);
+}
+
 /*!	\brief Walks through the volume recognition and descriptor sequences,
 	gathering volume description info as it goes.
 
@@ -242,15 +264,48 @@ Volume::_Identify()
 	if (!err)
 		err = _WalkAnchorVolumeDescriptorSequences();
 		
+	// Set the volume name
+	if (!err) {
+//		FILE *file = fopen("/boot/home/Desktop/vdoutput.txt", "w+");
+//		fprint
+
+		fName.SetTo(fLogicalVD.logical_volume_identifier()); 
+	}
+		
+	fInitStatus = err < B_OK ? B_UNINITIALIZED : B_IDENTIFIED;
+
+	RETURN(err);
+}
+
+status_t
+Volume::_Mount()
+{
+	DEBUG_INIT(CF_PRIVATE | CF_VOLUME_OPS, "Volume");
+	
+	status_t err = _InitStatus() == B_IDENTIFIED ? B_OK : B_BAD_VALUE;
+
+#if (!DRIVE_SETUP_ADDON)
+	if (!err)
+		err = init_cache_for_device(Device(), Length());
+
 	// At this point we've found a valid set of volume descriptors. We
 	// now need to investigate the file set descriptor pointed to by
 	// the logical volume descriptor
-	if (!err) {
-		fInitStatus = B_LOGICAL_VOLUME_INITIALIZED;
-		fName.SetTo(fLogicalVD.logical_volume_identifier());
+	if (!err) 
 		err = _InitFileSetDescriptor();
+	
+	if (!err) {
+		// Success, create a vnode for the root
+		err = new_vnode(Id(), RootIcb()->Id(), (void*)RootIcb());
+		if (err) {
+			PRINT(("Error create vnode for root icb! error = 0x%lx, `%s'\n",
+			       err, strerror(err)));
+		}
 	}
 	
+	fInitStatus = err < B_OK ? B_UNINITIALIZED : B_LOGICAL_VOLUME_INITIALIZED;
+#endif
+
 	RETURN(err);
 }
 
@@ -514,6 +569,8 @@ Volume::_InitFileSetDescriptor()
 	MemoryChunk chunk(fLogicalVD.file_set_address().length());
 	
 	status_t err = chunk.InitCheck();
+
+#if (!DRIVE_SETUP_ADDON)
 	if (!err) {
 //		err = Read(ad, fLogicalVD.file_set_address().length(), chunk.Data());
 		err = Read(fLogicalVD.file_set_address(), fLogicalVD.file_set_address().length(), chunk.Data());
@@ -525,6 +582,7 @@ Volume::_InitFileSetDescriptor()
 			err = fRootIcb ? fRootIcb->InitCheck() : B_NO_MEMORY;
 		}
 	}
+#endif
 	
 	RETURN(err);
 }

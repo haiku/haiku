@@ -34,9 +34,9 @@ class Icb;
 
 class Volume {
 public:
-	static status_t Identify(int device, off_t base = 0);
+	static status_t Identify(int device, off_t offset, off_t length, uint32 blockSize, char *volumeName);
 
-	Volume(nspace_id id);
+	Volume(nspace_id id);		
 		
 	status_t Mount(const char *deviceName, off_t volumeStart, off_t volumeLength, uint32 flags, 
 	               uint32 blockSize = 2048);
@@ -62,7 +62,9 @@ public:
 	template <class AddressType>
 		ssize_t Read(AddressType address, ssize_t length, void *data);
 		
+#if (!DRIVE_SETUP_ADDON)
 	Icb* RootIcb() { return fRootIcb; }
+#endif
 
 	status_t MapAddress(udf_long_address address, off_t *mappedAddress);
 	off_t MapAddress(udf_extent_address address);
@@ -78,6 +80,7 @@ private:
 	enum {
 		B_UNINITIALIZED = B_ERRORS_END+1,	//!< Completely uninitialized
 		B_DEVICE_INITIALIZED,				//!< Initialized enough to access underlying device safely
+		B_IDENTIFIED,						//!< Verified to be a UDF volume on disc
 		B_LOGICAL_VOLUME_INITIALIZED,		//!< Initialized enough to map addresses
 		
 		B_INITIALIZED = B_OK,
@@ -85,7 +88,9 @@ private:
 	
 	
 	// Called by Mount(), either directly or indirectly
+	status_t _Init(int device, off_t offset, off_t length, int blockSize);
 	status_t _Identify();
+	status_t _Mount();
 	status_t _WalkVolumeRecognitionSequence();
 	status_t _WalkAnchorVolumeDescriptorSequences();
 	status_t _WalkVolumeDescriptorSequence(udf_extent_address extent);
@@ -105,7 +110,9 @@ private:
 	
 	udf_logical_descriptor fLogicalVD;
 	PartitionMap fPartitionMap;
+#if (!DRIVE_SETUP_ADDON)
 	Icb *fRootIcb;	// Destroyed by vfs via callback to udf_release_node()
+#endif
 	CS0String fName;
 };
 
