@@ -34,6 +34,15 @@ main(int argc, char **argv)
     int        seed;
     char      *disk_name = "big_file";
     myfs_info  *myfs;
+    
+    if (argv[1] && strcmp(argv[1], "--help") == 0) {
+    	printf("----------------------------------------------------------------------\n");
+    	printf("Ultra neat-o userland filesystem testing shell thingy\n");
+    	printf("----------------------------------------------------------------------\n");
+    	printf("usage: %s [%%s:DISK_IMAGE=big_file|%%d:RANDOM_SEED]\n", argv[0]);
+    	printf("\n");
+    	exit(0);
+    }
 
     if (argv[1] != NULL && !isdigit(argv[1][0]))
         disk_name = argv[1];
