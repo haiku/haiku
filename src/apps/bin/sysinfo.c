@@ -231,7 +231,7 @@ static void dump_cpu(system_info *info)
 		info->id[0], info->id[1]);
 
 	for (i = 0; i < info->cpu_count; i++) {
-		/* note: the R5 cpuid_info() doesn't failed when asked for a cpu > cpu_count */
+		/* note: the R5 cpuid_info() doesn't fail when asked for a cpu > cpu_count */
 		/* indeed it should return EINVAL */
 		/* references:
 		 * http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html

@@ -43,6 +43,7 @@ StdBinCommands
 	beep.cpp
 	clipboard.cpp
 	df.cpp
+	draggers.cpp
 #	factor.cpp
 	ffm.cpp
 	iroster.cpp
