@@ -258,9 +258,6 @@ int sys_sysctl(int *name, uint namlen, void *oldp, size_t *oldlen,
 		void *newp, size_t newlen);
 int sys_socket(int family, int type, int proto);
 
-int sys_setenv(const char *userName, const char *userValue, int overwrite);
-int sys_getenv(const char *name, char **value);
-
 /* System informations */
 extern status_t		_kern_get_system_info(system_info *info, size_t size);
 

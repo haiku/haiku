@@ -1,5 +1,5 @@
 /*
- * Copyright 2004, Haiku Inc.
+ * Copyright 2004-2005, Haiku Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TEAM_H
@@ -48,10 +48,6 @@ pid_t _user_setsid(void);
 status_t _user_get_team_info(team_id id, team_info *info);
 status_t _user_get_next_team_info(int32 *cookie, team_info *info);
 status_t _user_get_team_usage_info(team_id team, int32 who, team_usage_info *info, size_t size);
-
-// ToDo: please move the "env" setter/getter out of the kernel!
-int _user_setenv(const char *name, const char *value, int overwrite);
-int _user_getenv(const char *name, char **value);
 
 #ifdef __cplusplus
 }
