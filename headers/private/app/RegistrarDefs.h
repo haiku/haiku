@@ -68,6 +68,8 @@ enum {
 	B_REG_CLEAR_RECENT_DOCUMENTS			= 'rgxd',
 	B_REG_CLEAR_RECENT_FOLDERS				= 'rgxf',
 	B_REG_CLEAR_RECENT_APPS					= 'rgxa',
+	B_REG_LOAD_RECENT_LISTS					= 'rglr',
+	B_REG_SAVE_RECENT_LISTS					= 'rgsr',
 	// MIME requests
 	B_REG_MIME_SET_PARAM					= 'rgsp',
 	B_REG_MIME_DELETE_PARAM					= 'rgdp',
