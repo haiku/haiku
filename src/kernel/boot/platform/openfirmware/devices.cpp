@@ -85,7 +85,9 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 {
 	// print out the boot path (to be removed later?)
 
-	of_getprop(gChosen, "bootpath", sBootPath, sizeof(sBootPath));
+	int length = of_getprop(gChosen, "bootpath", sBootPath, sizeof(sBootPath));
+	if (length <= 1)
+		return B_ENTRY_NOT_FOUND;
 	printf("boot path = \"%s\"\n", sBootPath);
 
 	int node = of_finddevice(sBootPath);
@@ -112,11 +114,12 @@ platform_get_boot_device(struct stage2_args *args, Node **_device)
 
 
 status_t
-platform_get_boot_partition(struct stage2_args *args, struct list *list,
+platform_get_boot_partition(struct stage2_args *args, NodeList *list,
 	boot::Partition **_partition)
 {
+	NodeIterator iterator = list->Iterator();
 	boot::Partition *partition = NULL;
-	while ((partition = (boot::Partition *)list_get_next_item(list, partition)) != NULL) {
+	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
 		// ToDo: just take the first partition for now
 		*_partition = partition;
 		return B_OK;
@@ -127,7 +130,7 @@ platform_get_boot_partition(struct stage2_args *args, struct list *list,
 
 
 status_t
-platform_add_block_devices(stage2_args *args, list *devicesList)
+platform_add_block_devices(stage2_args *args, NodeList *devicesList)
 {
 	// add all block devices to the list of possible boot devices
 
@@ -147,10 +150,10 @@ platform_add_block_devices(stage2_args *args, list *devicesList)
 			continue;
 		}
 
-		printf("\t\t(could open device, handle = %p)\n", (void *)handle);
 		Handle *device = new Handle(handle);
+		printf("\t\t(could open device, handle = %p, node = %p)\n", (void *)handle, device);
 
-		list_add_item(devicesList, device);
+		devicesList->Add(device);
 	}
 	printf("\t(loop ended with %ld)\n", status);
 
