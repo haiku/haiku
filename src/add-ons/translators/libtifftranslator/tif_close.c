@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_close.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_close.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -39,6 +39,9 @@ TIFFClose(TIFF* tif)
         TIFFFlush(tif);
     (*tif->tif_cleanup)(tif);
     TIFFFreeDirectory(tif);
+
+    if (tif->tif_dirlist)
+        _TIFFfree(tif->tif_dirlist);
         
     /* Clean up client info links */
     while( tif->tif_clientinfo )

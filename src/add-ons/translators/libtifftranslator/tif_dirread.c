@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_dirread.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_dirread.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -97,6 +97,27 @@ TIFFReadDirectory(TIFF* tif)
 	tif->tif_diroff = tif->tif_nextdiroff;
 	if (tif->tif_diroff == 0)		/* no more directories */
 		return (0);
+
+	/*
+	 * XXX: Trick to prevent IFD looping. The one can create TIFF file
+	 * with looped directory pointers. We will maintain a list of already
+	 * seen directories and check every IFD offset against this list.
+	 */
+	for (n = 0; n < tif->tif_dirnumber; n++) {
+		if (tif->tif_dirlist[n] == tif->tif_diroff)
+			return (0);
+	}
+	tif->tif_dirnumber++;
+	tif->tif_dirlist = _TIFFrealloc(tif->tif_dirlist,
+					tif->tif_dirnumber * sizeof(toff_t));
+	if (!tif->tif_dirlist) {
+		TIFFError(module,
+			  "%.1000s: Failed to allocate space for IFD list",
+			  tif->tif_name);
+		return (0);
+	}
+	tif->tif_dirlist[tif->tif_dirnumber - 1] = tif->tif_diroff;
+
 	/*
 	 * Cleanup any previous compression state.
 	 */
@@ -227,9 +248,9 @@ TIFFReadDirectory(TIFF* tif)
 		if( TIFFReassignTagToIgnore(TIS_EXTRACT, dp->tdir_tag) )
                     dp->tdir_tag = IGNORE;
 
-		if (dp->tdir_tag == IGNORE)
-                    continue;
-                
+		if (fix >= tif->tif_nfields || dp->tdir_tag == IGNORE)
+			continue;
+               
 		/*
 		 * Silicon Beach (at least) writes unordered
 		 * directory tags (violating the spec).  Handle
@@ -238,32 +259,31 @@ TIFFReadDirectory(TIFF* tif)
 		if (dp->tdir_tag < tif->tif_fieldinfo[fix]->field_tag) {
 			if (!diroutoforderwarning) {
 				TIFFWarning(module,
-	                                    "%.1000s: invalid TIFF directory; "
-                                            "tags are not sorted in ascending order",
+"%.1000s: invalid TIFF directory; tags are not sorted in ascending order",
                                             tif->tif_name);
 				diroutoforderwarning = 1;
 			}
 			fix = 0;			/* O(n^2) */
 		}
 		while (fix < tif->tif_nfields &&
-		    tif->tif_fieldinfo[fix]->field_tag < dp->tdir_tag)
+		       tif->tif_fieldinfo[fix]->field_tag < dp->tdir_tag)
 			fix++;
-		if (fix == tif->tif_nfields ||
+		if (fix >= tif->tif_nfields ||
 		    tif->tif_fieldinfo[fix]->field_tag != dp->tdir_tag) {
 
                     TIFFWarning(module,
-                                "%.1000s: unknown field with tag %d (0x%x) encountered",
+			"%.1000s: unknown field with tag %d (0x%x) encountered",
                                 tif->tif_name, dp->tdir_tag,  dp->tdir_tag);
 
                     TIFFMergeFieldInfo( tif,
                                         _TIFFCreateAnonFieldInfo( tif,
-                                              dp->tdir_tag, dp->tdir_type ),
+                                              dp->tdir_tag,
+					      (TIFFDataType) dp->tdir_type ),
                                         1 );
                     fix = 0;
                     while (fix < tif->tif_nfields &&
                            tif->tif_fieldinfo[fix]->field_tag < dp->tdir_tag)
 			fix++;
-		    dp->tdir_tag = IGNORE;
 		}
 		/*
 		 * Null out old tags that we ignore.
@@ -284,8 +304,9 @@ TIFFReadDirectory(TIFF* tif)
 			if (fix == tif->tif_nfields ||
 			    fip->field_tag != dp->tdir_tag) {
 				TIFFWarning(module,
-				   "%.1000s: wrong data type %d for \"%s\"; tag ignored",
-				    tif->tif_name, dp->tdir_type, fip[-1].field_name);
+			"%.1000s: wrong data type %d for \"%s\"; tag ignored",
+					    tif->tif_name, dp->tdir_type,
+					    fip[-1].field_name);
 				goto ignore;
 			}
 		}
@@ -521,10 +542,10 @@ TIFFReadDirectory(TIFF* tif)
 		    goto bad;
 		}
 		TIFFWarning(module,
-                            "%.1000s: TIFF directory is missing required "
-                            "\"%s\" field, calculating from imagelength",
-                            tif->tif_name,
-		            _TIFFFieldWithTag(tif,TIFFTAG_STRIPBYTECOUNTS)->field_name);
+			"%.1000s: TIFF directory is missing required "
+			"\"%s\" field, calculating from imagelength",
+			tif->tif_name,
+		        _TIFFFieldWithTag(tif,TIFFTAG_STRIPBYTECOUNTS)->field_name);
 		if (EstimateStripByteCounts(tif, dir, dircount) < 0)
 		    goto bad;
 /* 
@@ -546,8 +567,7 @@ TIFFReadDirectory(TIFF* tif)
 		 * strip image.
 		 */
 		TIFFWarning(module,
-	                    "%.1000s: Bogus \"%s\" field, ignoring "
-                            "and calculating from imagelength",
+	"%.1000s: Bogus \"%s\" field, ignoring and calculating from imagelength",
                             tif->tif_name,
 		            _TIFFFieldWithTag(tif,TIFFTAG_STRIPBYTECOUNTS)->field_name);
 		if(EstimateStripByteCounts(tif, dir, dircount) < 0)
@@ -593,6 +613,8 @@ bad:
 static int
 EstimateStripByteCounts(TIFF* tif, TIFFDirEntry* dir, uint16 dircount)
 {
+	static const char module[] = "EstimateStripByteCounts";
+
 	register TIFFDirEntry *dp;
 	register TIFFDirectory *td = &tif->tif_dir;
 	uint16 i;
@@ -613,16 +635,16 @@ EstimateStripByteCounts(TIFF* tif, TIFFDirEntry* dir, uint16 dircount)
 		/* calculate amount of space used by indirect values */
 		for (dp = dir, n = dircount; n > 0; n--, dp++)
 		{
-		    uint32 cc;
-		    if(dp->tdir_tag == IGNORE)
-		    {
-		        TIFFError(tif->tif_name,
-		        "Cannot determine StripByteCounts values, because of tags with unknown sizes");
-			return -1;
-		    }
-		    cc = dp->tdir_count*TIFFDataWidth(dp->tdir_type);
-		    if (cc > sizeof (uint32))
-			space += cc;
+			uint32 cc = TIFFDataWidth((TIFFDataType) dp->tdir_type);
+			if (cc == 0) {
+				TIFFError(module,
+			"%.1000s: Cannot determine size of unknown tag type %d",
+					  tif->tif_name, dp->tdir_type);
+				return -1;
+			}
+			cc = cc * dp->tdir_count;
+			if (cc > sizeof (uint32))
+				space += cc;
 		}
 		space = filesize - space;
 		if (td->td_planarconfig == PLANARCONFIG_SEPARATE)
@@ -656,8 +678,11 @@ EstimateStripByteCounts(TIFF* tif, TIFFDirEntry* dir, uint16 dircount)
 static void
 MissingRequired(TIFF* tif, const char* tagname)
 {
-	TIFFError(tif->tif_name,
-	    "TIFF directory is missing required \"%s\" field", tagname);
+	static const char module[] = "MissingRequired";
+
+	TIFFError(module,
+		  "%.1000s: TIFF directory is missing required \"%s\" field",
+		  tif->tif_name, tagname);
 }
 
 /*
@@ -685,7 +710,7 @@ CheckDirCount(TIFF* tif, TIFFDirEntry* dir, uint32 count)
 static tsize_t
 TIFFFetchData(TIFF* tif, TIFFDirEntry* dir, char* cp)
 {
-	int w = TIFFDataWidth(dir->tdir_type);
+	int w = TIFFDataWidth((TIFFDataType) dir->tdir_type);
 	tsize_t cc = dir->tdir_count * w;
 
 	if (!isMapped(tif)) {
@@ -906,7 +931,7 @@ TIFFFetchRationalArray(TIFF* tif, TIFFDirEntry* dir, float* v)
 	uint32* l;
 
 	l = (uint32*)CheckMalloc(tif,
-	    dir->tdir_count*TIFFDataWidth(dir->tdir_type),
+	    dir->tdir_count*TIFFDataWidth((TIFFDataType) dir->tdir_type),
 	    "to fetch array of rationals");
 	if (l) {
 		if (TIFFFetchData(tif, dir, (char *)l)) {
@@ -1292,14 +1317,14 @@ TIFFFetchStripThing(TIFF* tif, TIFFDirEntry* dir, long nstrips, uint32** lpp)
 		if( (status = TIFFFetchShortArray(tif, dir, dp)) != 0 ) {
                     int i;
                     
-                    for( i = 0; i < nstrips && i < dir->tdir_count; i++ )
+                    for( i = 0; i < nstrips && i < (int) dir->tdir_count; i++ )
                     {
                         lp[i] = dp[i];
                     }
 		}
 		_TIFFfree((char*) dp);
 
-        } else if( nstrips != dir->tdir_count ) {
+        } else if( nstrips != (int) dir->tdir_count ) {
             /* Special case to correct length */
 
             uint32* dp = (uint32*) CheckMalloc(tif,
@@ -1311,7 +1336,7 @@ TIFFFetchStripThing(TIFF* tif, TIFFDirEntry* dir, long nstrips, uint32** lpp)
             if( status != 0 ) {
                 int i;
 
-                for( i = 0; i < nstrips && i < dir->tdir_count; i++ )
+                for( i = 0; i < nstrips && i < (int) dir->tdir_count; i++ )
                 {
                     lp[i] = dp[i];
                 }

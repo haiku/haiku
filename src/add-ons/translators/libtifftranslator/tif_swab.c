@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_swab.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_swab.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -36,7 +36,7 @@ void
 TIFFSwabShort(uint16* wp)
 {
 	register u_char* cp = (u_char*) wp;
-	int t;
+	u_char t;
 
 	t = cp[1]; cp[1] = cp[0]; cp[0] = t;
 }
@@ -47,7 +47,7 @@ void
 TIFFSwabLong(uint32* lp)
 {
 	register u_char* cp = (u_char*) lp;
-	int t;
+	u_char t;
 
 	t = cp[3]; cp[3] = cp[0]; cp[0] = t;
 	t = cp[2]; cp[2] = cp[1]; cp[1] = t;
@@ -59,7 +59,7 @@ void
 TIFFSwabArrayOfShort(uint16* wp, register u_long n)
 {
 	register u_char* cp;
-	register int t;
+	register u_char t;
 
 	/* XXX unroll loop some */
 	while (n-- > 0) {
@@ -75,7 +75,7 @@ void
 TIFFSwabArrayOfLong(register uint32* lp, register u_long n)
 {
 	register unsigned char *cp;
-	register int t;
+	register unsigned char t;
 
 	/* XXX unroll loop some */
 	while (n-- > 0) {

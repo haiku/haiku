@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_next.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_next.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -34,7 +34,7 @@
 
 #define SETPIXEL(op, v) {			\
 	switch (npixels++ & 3) {		\
-	case 0:	op[0]  = (v) << 6; break;	\
+	case 0:	op[0]  = (u_char) ((v) << 6); break;	\
 	case 1:	op[0] |= (v) << 4; break;	\
 	case 2:	op[0] |= (v) << 2; break;	\
 	case 3:	*op++ |= (v);	   break;	\

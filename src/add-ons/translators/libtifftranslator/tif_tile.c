@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_tile.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_tile.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1991-1997 Sam Leffler
@@ -62,7 +62,7 @@ TIFFComputeTile(TIFF* tif, uint32 x, uint32 y, uint32 z, tsample_t s)
 			     xpt*(y/dy) +
 			     x/dx;
 		else
-			tile = (xpt*ypt)*(z/dz) + xpt*(y/dy) + x/dx + s;
+			tile = (xpt*ypt)*(z/dz) + xpt*(y/dy) + x/dx;
 	}
 	return (tile);
 }

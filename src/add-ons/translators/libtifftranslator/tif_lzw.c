@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_lzw.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_lzw.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -108,6 +108,15 @@ typedef	struct {
 #define	lzw_nextbits	base.nextbits
 
 /*
+ * Encoding-specific state.
+ */
+typedef uint16 hcode_t;			/* codes fit in 16 bits */
+typedef struct {
+	long	hash;
+	hcode_t	code;
+} hash_t;
+
+/*
  * Decoding-specific state.
  */
 typedef struct code_ent {
@@ -121,6 +130,8 @@ typedef	int (*decodeFunc)(TIFF*, tidata_t, tsize_t, tsample_t);
 
 typedef struct {
 	LZWBaseState base;
+
+	/* Decoding specific data */
 	long	dec_nbitsmask;		/* lzw_nbits 1 bits, right adjusted */
 	long	dec_restart;		/* restart count */
 #ifdef LZW_CHECKEOS
@@ -132,19 +143,8 @@ typedef struct {
 	code_t*	dec_free_entp;		/* next free entry */
 	code_t*	dec_maxcodep;		/* max available entry */
 	code_t*	dec_codetab;		/* kept separate for small machines */
-} LZWDecodeState;
 
-/*
- * Encoding-specific state.
- */
-typedef uint16 hcode_t;			/* codes fit in 16 bits */
-typedef struct {
-	long	hash;
-	hcode_t	code;
-} hash_t;
-
-typedef struct {
-	LZWBaseState base;
+	/* Encoding specific data */
 	int	enc_oldcode;		/* last code encountered */
 	long	enc_checkpoint;		/* point at which to clear table */
 #define CHECK_GAP	10000		/* enc_ratio check interval */
@@ -153,17 +153,17 @@ typedef struct {
 	long	enc_outcount;		/* encoded (output) bytes */
 	tidata_t enc_rawlimit;		/* bound on tif_rawdata buffer */
 	hash_t*	enc_hashtab;		/* kept separate for small machines */
-} LZWEncodeState;
+} LZWCodecState;
 
 #define	LZWState(tif)		((LZWBaseState*) (tif)->tif_data)
-#define	DecoderState(tif)	((LZWDecodeState*) LZWState(tif))
-#define	EncoderState(tif)	((LZWEncodeState*) LZWState(tif))
+#define	DecoderState(tif)	((LZWCodecState*) LZWState(tif))
+#define	EncoderState(tif)	((LZWCodecState*) LZWState(tif))
 
 static	int LZWDecode(TIFF*, tidata_t, tsize_t, tsample_t);
 #ifdef LZW_COMPAT
 static	int LZWDecodeCompat(TIFF*, tidata_t, tsize_t, tsample_t);
 #endif
-static  void cl_hash(LZWEncodeState*);
+static  void cl_hash(LZWCodecState*);
 
 /*
  * LZW Decoder.
@@ -192,7 +192,7 @@ static  void cl_hash(LZWEncodeState*);
 static int
 LZWSetupDecode(TIFF* tif)
 {
-	LZWDecodeState* sp = DecoderState(tif);
+	LZWCodecState* sp = DecoderState(tif);
 	static const char module[] = " LZWSetupDecode";
 	int code;
 
@@ -202,7 +202,7 @@ LZWSetupDecode(TIFF* tif)
              * Allocate state block so tag methods have storage to record 
              * values.
              */
-            tif->tif_data = (tidata_t) _TIFFmalloc(sizeof(LZWDecodeState));
+            tif->tif_data = (tidata_t) _TIFFmalloc(sizeof(LZWCodecState));
             if (tif->tif_data == NULL)
             {
                 TIFFError("LZWPreDecode", "No space for LZW state block");
@@ -248,7 +248,7 @@ LZWSetupDecode(TIFF* tif)
 static int
 LZWPreDecode(TIFF* tif, tsample_t s)
 {
-	LZWDecodeState *sp = DecoderState(tif);
+	LZWCodecState *sp = DecoderState(tif);
 
 	(void) s;
 	assert(sp != NULL);
@@ -339,7 +339,7 @@ codeLoop(TIFF* tif)
 static int
 LZWDecode(TIFF* tif, tidata_t op0, tsize_t occ0, tsample_t s)
 {
-	LZWDecodeState *sp = DecoderState(tif);
+	LZWCodecState *sp = DecoderState(tif);
 	char *op = (char*) op0;
 	long occ = (long) occ0;
 	char *tp;
@@ -541,7 +541,7 @@ LZWDecode(TIFF* tif, tidata_t op0, tsize_t occ0, tsample_t s)
 static int
 LZWDecodeCompat(TIFF* tif, tidata_t op0, tsize_t occ0, tsample_t s)
 {
-	LZWDecodeState *sp = DecoderState(tif);
+	LZWCodecState *sp = DecoderState(tif);
 	char *op = (char*) op0;
 	long occ = (long) occ0;
 	char *tp;
@@ -713,7 +713,7 @@ LZWDecodeCompat(TIFF* tif, tidata_t op0, tsize_t occ0, tsample_t s)
 static int
 LZWSetupEncode(TIFF* tif)
 {
-	LZWEncodeState* sp = EncoderState(tif);
+	LZWCodecState* sp = EncoderState(tif);
 	static const char module[] = "LZWSetupEncode";
 
 	assert(sp != NULL);
@@ -731,7 +731,7 @@ LZWSetupEncode(TIFF* tif)
 static int
 LZWPreEncode(TIFF* tif, tsample_t s)
 {
-	LZWEncodeState *sp = EncoderState(tif);
+	LZWCodecState *sp = EncoderState(tif);
 
 	(void) s;
 	assert(sp != NULL);
@@ -790,7 +790,7 @@ LZWPreEncode(TIFF* tif, tsample_t s)
 static int
 LZWEncode(TIFF* tif, tidata_t bp, tsize_t cc, tsample_t s)
 {
-	register LZWEncodeState *sp = EncoderState(tif);
+	register LZWCodecState *sp = EncoderState(tif);
 	register long fcode;
 	register hash_t *hp;
 	register int h, c;
@@ -952,7 +952,7 @@ LZWEncode(TIFF* tif, tidata_t bp, tsize_t cc, tsample_t s)
 static int
 LZWPostEncode(TIFF* tif)
 {
-	register LZWEncodeState *sp = EncoderState(tif);
+	register LZWCodecState *sp = EncoderState(tif);
 	tidata_t op = tif->tif_rawcp;
 	long nextbits = sp->lzw_nextbits;
 	long nextdata = sp->lzw_nextdata;
@@ -979,7 +979,7 @@ LZWPostEncode(TIFF* tif)
  * Reset encoding hash table.
  */
 static void
-cl_hash(LZWEncodeState* sp)
+cl_hash(LZWCodecState* sp)
 {
 	register hash_t *hp = &sp->enc_hashtab[HSIZE-1];
 	register long i = HSIZE-8;
@@ -1004,13 +1004,12 @@ static void
 LZWCleanup(TIFF* tif)
 {
 	if (tif->tif_data) {
-		if (LZWState(tif)->rw_mode == O_RDONLY) {
-			if (DecoderState(tif)->dec_codetab)
-				_TIFFfree(DecoderState(tif)->dec_codetab);
-		} else {
-			if (EncoderState(tif)->enc_hashtab)
-				_TIFFfree(EncoderState(tif)->enc_hashtab);
-		}
+		if (DecoderState(tif)->dec_codetab)
+			_TIFFfree(DecoderState(tif)->dec_codetab);
+
+		if (EncoderState(tif)->enc_hashtab)
+			_TIFFfree(EncoderState(tif)->enc_hashtab);
+
 		_TIFFfree(tif->tif_data);
 		tif->tif_data = NULL;
 	}
@@ -1023,19 +1022,12 @@ TIFFInitLZW(TIFF* tif, int scheme)
 	/*
 	 * Allocate state block so tag methods have storage to record values.
 	 */
-	if (tif->tif_mode == O_RDONLY) {
-		tif->tif_data = (tidata_t) _TIFFmalloc(sizeof (LZWDecodeState));
-		if (tif->tif_data == NULL)
-			goto bad;
-		DecoderState(tif)->dec_codetab = NULL;
-		DecoderState(tif)->dec_decode = NULL;
-	} else {
-		tif->tif_data = (tidata_t) _TIFFmalloc(sizeof (LZWEncodeState));
-		if (tif->tif_data == NULL)
-			goto bad;
-		EncoderState(tif)->enc_hashtab = NULL;
-	}
-
+	tif->tif_data = (tidata_t) _TIFFmalloc(sizeof (LZWCodecState));
+	if (tif->tif_data == NULL)
+		goto bad;
+	DecoderState(tif)->dec_codetab = NULL;
+	DecoderState(tif)->dec_decode = NULL;
+	EncoderState(tif)->enc_hashtab = NULL;
         LZWState(tif)->rw_mode = tif->tif_mode;
 
 	/*

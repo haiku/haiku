@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_dir.h,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_dir.h,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -251,8 +251,9 @@ extern "C" {
 extern	void _TIFFSetupFieldInfo(TIFF*);
 extern	void _TIFFPrintFieldInfo(TIFF*, FILE*);
 extern	TIFFDataType _TIFFSampleToTagType(TIFF*);
-extern  const TIFFFieldInfo* _TIFFFindOrRegisterInfo( TIFF *tif, ttag_t tag,
-                                                      TIFFDataType dt );
+extern  const TIFFFieldInfo* _TIFFFindOrRegisterFieldInfo( TIFF *tif,
+							   ttag_t tag,
+							   TIFFDataType dt );
 extern  TIFFFieldInfo* _TIFFCreateAnonFieldInfo( TIFF *tif, ttag_t tag,
                                                  TIFFDataType dt );
 

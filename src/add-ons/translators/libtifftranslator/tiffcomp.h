@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiffcomp.h,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiffcomp.h,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1990-1997 Sam Leffler
@@ -119,11 +119,17 @@
  * then define BSDTYPES in your Makefile.
  */
 #if defined(BSDTYPES)
+# ifndef _BSDTYPES_DEFINED
+#  ifndef __u_char_defined
 typedef	unsigned char u_char;
 typedef	unsigned short u_short;
 typedef	unsigned int u_int;
 typedef	unsigned long u_long;
-#endif
+#   define __u_char_defined
+#  endif /* __u_char_defined */
+#  define _BSDTYPES_DEFINED
+# endif /* _BSDTYPES_DEFINED */
+#endif /* BSDTYPES */
 
 /*
  * dblparam_t is the type that a double precision

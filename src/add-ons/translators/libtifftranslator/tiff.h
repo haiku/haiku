@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiff.h,v 1.2 2003/07/31 23:09:27 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tiff.h,v 1.3 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -76,10 +76,10 @@ typedef	struct {
  * offset field.
  */
 typedef	struct {
-	uint16	tdir_tag;	/* see below */
-	uint16	tdir_type;	/* data type; see below */
-	uint32  tdir_count;	/* number of items; length in spec */
-	uint32  tdir_offset;	/* byte offset to field data */
+	uint16		tdir_tag;	/* see below */
+	uint16		tdir_type;	/* data type; see below */
+	uint32		tdir_count;	/* number of items; length in spec */
+	uint32		tdir_offset;	/* byte offset to field data */
 } TIFFDirEntry;
 
 /*
@@ -108,7 +108,8 @@ typedef	enum {
 	TIFF_SLONG	= 9,	/* !32-bit signed integer */
 	TIFF_SRATIONAL	= 10,	/* !64-bit signed fraction */
 	TIFF_FLOAT	= 11,	/* !32-bit IEEE floating point */
-	TIFF_DOUBLE	= 12	/* !64-bit IEEE floating point */
+	TIFF_DOUBLE	= 12,	/* !64-bit IEEE floating point */
+	TIFF_IFD	= 13	/* %32-bit unsigned integer (offset) */
 } TIFFDataType;
 
 /*

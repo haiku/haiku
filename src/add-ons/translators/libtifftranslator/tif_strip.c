@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_strip.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_strip.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1991-1997 Sam Leffler
@@ -109,6 +109,26 @@ TIFFVStripSize(TIFF* tif, uint32 nrows)
 	} else
 #endif
 		return ((tsize_t)(nrows * TIFFScanlineSize(tif)));
+}
+
+
+/*
+ * Compute the # bytes in a raw strip.
+ */
+tsize_t
+TIFFRawStripSize(TIFF* tif, tstrip_t strip)
+{
+	TIFFDirectory* td = &tif->tif_dir;
+	tsize_t bytecount = td->td_stripbytecount[strip];
+
+	if (bytecount <= 0) {
+		TIFFError(tif->tif_name,
+			  "%lu: Invalid strip byte count, strip %lu",
+			  (u_long) bytecount, (u_long) strip);
+		bytecount = (tsize_t) -1;
+	}
+
+	return bytecount;
 }
 
 /*

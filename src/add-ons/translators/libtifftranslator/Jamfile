@@ -4,6 +4,7 @@ Translator TIFFTranslator :
 	tif_aux.c
 	tif_close.c
 	tif_codec.c
+	tif_color.c
 	tif_compress.c
 	tif_dir.c
 	tif_dirinfo.c

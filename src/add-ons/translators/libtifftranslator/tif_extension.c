@@ -1,4 +1,4 @@
-/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_extension.c,v 1.1 2003/07/19 16:40:33 mwilber Exp $ */
+/* $Header: /tmp/bonefish/open-beos/current/src/add-ons/translators/libtifftranslator/tif_extension.c,v 1.2 2004/01/03 15:22:08 mwilber Exp $ */
 
 /*
  * Copyright (c) 1988-1997 Sam Leffler
@@ -47,7 +47,7 @@ ttag_t TIFFGetTagListEntry( TIFF *tif, int tag_index )
     TIFFDirectory* td = &tif->tif_dir;
 
     if( tag_index < 0 || tag_index >= td->td_customValueCount )
-        return -1;
+        return (ttag_t) -1;
     else
         return td->td_customValues[tag_index].info->field_tag;
 }
@@ -99,10 +99,10 @@ void TIFFSetClientInfo( TIFF *tif, void *data, const char *name )
     ** Create a new link.
     */
 
-    link = _TIFFmalloc(sizeof(TIFFClientInfoLink));
+    link = (TIFFClientInfoLink *) _TIFFmalloc(sizeof(TIFFClientInfoLink));
     link->next = tif->tif_clientinfo;
-    link->name = _TIFFmalloc(strlen(name)+1);
-    strcpy( link->name, name );
+    link->name = (char *) _TIFFmalloc(strlen(name)+1);
+    strcpy(link->name, name);
     link->data = data;
 
     tif->tif_clientinfo = link;
