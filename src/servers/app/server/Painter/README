@@ -1,0 +1,33 @@
+About:
+
+Painter is a class implementing the BView drawing functions with the Anti-Grain Geometry 2D engine. It should be usable by the Haiku app_server as the complete drawing backend. It can be attached to a frame buffer and used just like a BView that is attached to a BBitmap. Full anti-aliased drawing is available as a compile time option (defines.h). I hope it will be possible to integrate this into the existing Haiku app_server framework without too much hassle.
+
+
+
+Status:
+
+1) Most of the drawing modes are unimplemented.
+
+I want to work out the effects of the drawing_mode together with the source_alpha and alpha_func. Currently, Painter supports B_OP_COPY, B_OP_OVER and B_OP_INVERT with patterns. It is kind of ignorant towards the orginal app_servers treatment of alpha in the high and low color. I think it acts for the most part as if the BView was SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE), especially for drawing bitmaps, which will of course be fixed, but should be no obstacle in integrating Painter right now.
+
+2) Only 32 bit frame buffers are support yet.
+
+Most of the work in supporting other color spaces is only in the drawing_mode classes. It makes no sense to start work on these before I have even nailed the details once on the 32 bit case.
+
+3) Only 32 bit Bitmaps are supported for drawing yet.
+
+There is some work involved when trying to make this fast. The conversion should probably take place in the interpolator class that AGG uses for up/downscaling a bitmap.
+
+4) Most of the BView behaviour for DrawString() is missing.
+
+There is a lot of inconsistency in the BView implementation concerning the "current pen position", but all versions of DrawString() do put the pen at the position of the virtual next character. I will see to that when I implement all this escapment_delta stuff.
+
+5) Font handling is somewhat weird.
+
+There is a FontManager class that is supposed to be an interface between font family/style names and font files on disk loadable by Freetype. There is a TextRenderer interface class and AGGTextRenderer implementation that can be used to get the job done, but this is of course very open for discussion. I didn't really look at what was already available in the Haiku repository, but just took from WonderBrush what I already had. The biggest problem when testing Painter on R5 is the sometimes slightly different naming of font families in Freetype and R5. Sometimes, FontManager is not able to match up the correct file for the given family and style. For the "default" "Swiss911 BT", it works. If the be_plain_font can not be "loaded" by FontManager, it might look like font rendering is not working at all, you might have to tweak this, or maybe hardcode a font that works. Of course, on a "true Haiku system", once such a thing exists, this problem will be non-existent. Fonts will just be named as Freetype suggests, and everything will match up fine.
+
+6) The framework is still developing.
+
+I'm still working on many ends of Painter and I might refactor things. The basic idea will of course stay for the most part, and is of course open for discussion by the rest of the team. I felt I wanted to get some results first, then see how it can all be improved. So, keep the comments comming.
+
+
