@@ -34,9 +34,7 @@
 #include <StorageDefs.h>
 #include <fs_info.h>
 
-#include <devfs.h>
-#include "rootfs.h"
-#include "bootfs.h"
+#include "builtin_fs.h"
 
 #include <string.h>
 #include <stdio.h>
@@ -1737,7 +1735,7 @@ vfs_bootstrap_all_filesystems(void)
 	// bootstrap the bootfs
 	bootstrap_bootfs();
 
-	sys_create_dir("/boot",0755);
+	sys_create_dir("/boot", 0755);
 	err = sys_mount("/boot", NULL, "bootfs", NULL);
 	if (err < 0)
 		panic("error mounting bootfs\n");
@@ -1745,10 +1743,18 @@ vfs_bootstrap_all_filesystems(void)
 	// bootstrap the devfs
 	bootstrap_devfs();
 
-	sys_create_dir("/dev",0755);
+	sys_create_dir("/dev", 0755);
 	err = sys_mount("/dev", NULL, "devfs", NULL);
 	if (err < 0)
 		panic("error mounting devfs\n");
+
+	// bootstrap the pipefs
+	bootstrap_pipefs();
+
+	sys_create_dir("/pipe", 0755);
+	err = sys_mount("/pipe", NULL, "pipefs", NULL);
+	if (err < 0)
+		panic("error mounting pipefs\n");
 
 	return B_NO_ERROR;
 }
@@ -3166,7 +3172,7 @@ fs_mount(char *path, const char *device, const char *fsName, void *args, bool ke
 		goto err2;
 	}
 
-	recursive_lock_create(&mount->rlock);
+	recursive_lock_init(&mount->rlock, "mount rlock");
 	mount->id = gNextMountID++;
 	mount->unmounting = false;
 
