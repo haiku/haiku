@@ -8,7 +8,6 @@ class FindWindow : public BWindow {
 	virtual void MessageReceived(BMessage* message);
 	virtual void DispatchMessage(BMessage* message, BHandler* handler);
 			
-			
 	private:
 	void	ExtractToMsg(BMessage *message);
 			

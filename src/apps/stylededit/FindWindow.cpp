@@ -80,7 +80,7 @@ FindWindow::FindWindow(BRect frame, BHandler *_handler, BString *searchString, b
 void FindWindow::MessageReceived(BMessage *msg){
 	switch(msg->what){
 		case B_QUIT_REQUESTED:
-			QuitRequested();
+			Quit();
 		break;
 		case MSG_SEARCH:
 			ExtractToMsg(new BMessage(MSG_SEARCH));
@@ -151,7 +151,5 @@ void FindWindow::ExtractToMsg(BMessage *message){
 	delete(message);
 	PostMessage(B_QUIT_REQUESTED);
 }
-
-	
 
 
