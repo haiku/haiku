@@ -63,21 +63,13 @@ struct mkv_cookie
 	int64		frame_count;
 	bigtime_t 	duration;
 	media_format format;
+	
+	MatroskaFile *file;
 
-/*
 	bool		audio;
 
-	// audio only:	
-	int64		byte_pos;
-	uint32		bytes_per_sec_rate;
-	uint32		bytes_per_sec_scale;
-
 	// video only:
-	uint32		frame_pos;
-	uint32		frames_per_sec_rate;
-	uint32		frames_per_sec_scale;
 	uint32		line_count;
-*/
 };
 
 
@@ -161,6 +153,7 @@ mkvReader::AllocateCookie(int32 streamNumber, void **_cookie)
 	cookie->buffer = 0;
 	cookie->buffer_size = 0;
 	cookie->track_info = mkv_GetTrackInfo(fFile, streamNumber);
+	cookie->file = 0;
 	
 //	TRACE("Number: %d\n", cookie->track_info->Number); 
 //	TRACE("Type: %d\n", cookie->track_info->Type); 
@@ -201,6 +194,16 @@ mkvReader::AllocateCookie(int32 streamNumber, void **_cookie)
 status_t
 mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 {
+	char err_msg[100];
+	cookie->file = mkv_Open(fFileCache, err_msg, sizeof(err_msg));
+	if (!cookie->file) {
+		TRACE("mkvReader::SetupVideoCookie: open failed, error: %s\n", err_msg);
+		return B_ERROR;
+	}
+	mkv_SetTrackMask(cookie->file, ~(1 << cookie->stream));
+	
+	cookie->audio = false;
+
 	TRACE("video StereoMode: %d\n", cookie->track_info->Video.StereoMode); 
 	TRACE("video DisplayUnit: %d\n", cookie->track_info->Video.DisplayUnit); 
 	TRACE("video AspectRatioType: %d\n", cookie->track_info->Video.AspectRatioType); 
@@ -217,6 +220,8 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	cookie->duration = get_duration_in_us(fFileInfo->Duration);
 	cookie->frame_count = get_frame_count_by_default_duration(fFileInfo->Duration, cookie->track_info->DefaultDuration);
 
+	cookie->line_count = cookie->track_info->Video.PixelHeight;
+
 	TRACE("mkvReader::Sniff: TimecodeScale %Ld\n", fFileInfo->TimecodeScale);
 	TRACE("mkvReader::Sniff: Duration %Ld\n", fFileInfo->Duration);
 
@@ -224,12 +229,47 @@ mkvReader::SetupVideoCookie(mkv_cookie *cookie)
 	TRACE("duration: %Ld (%.6f)\n", cookie->duration, cookie->duration / 1E6); 
 	TRACE("frame_count: %Ld\n", cookie->frame_count); 
 
+	status_t res;
+	res = GetVideoFormat(&cookie->format, cookie->track_info->CodecID, cookie->track_info->CodecPrivate, cookie->track_info->CodecPrivateSize);
+	if (res != B_OK) {
+		TRACE("mkvReader::SetupVideoCookie: codec not recognized\n");
+		return B_ERROR;
+	}
+
+//	cookie->format.u.encoded_video.max_bit_rate = 
+//	cookie->format.u.encoded_video.avg_bit_rate = 
+	cookie->format.u.encoded_video.output.field_rate = cookie->frame_rate;
+	cookie->format.u.encoded_video.output.interlace = 1; // 1: progressive
+	cookie->format.u.encoded_video.output.first_active = 0;
+	cookie->format.u.encoded_video.output.last_active = cookie->line_count - 1;
+	cookie->format.u.encoded_video.output.orientation = B_VIDEO_TOP_LEFT_RIGHT;
+	cookie->format.u.encoded_video.output.pixel_width_aspect = get_pixel_width_aspect(cookie->track_info->Video.PixelWidth, cookie->track_info->Video.DisplayWidth);
+	cookie->format.u.encoded_video.output.pixel_height_aspect = get_pixel_height_aspect(cookie->track_info->Video.PixelHeight, cookie->track_info->Video.DisplayHeight);
+	// cookie->format.u.encoded_video.output.display.format = 0;
+	cookie->format.u.encoded_video.output.display.line_width = cookie->track_info->Video.PixelWidth;
+	cookie->format.u.encoded_video.output.display.line_count = cookie->track_info->Video.PixelHeight;
+	cookie->format.u.encoded_video.output.display.bytes_per_row = 0;
+	cookie->format.u.encoded_video.output.display.pixel_offset = 0;
+	cookie->format.u.encoded_video.output.display.line_offset = 0;
+	cookie->format.u.encoded_video.output.display.flags = 0;
+	
+	return B_OK;
 }
 
 
 status_t
 mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 {
+	char err_msg[100];
+	cookie->file = mkv_Open(fFileCache, err_msg, sizeof(err_msg));
+	if (!cookie->file) {
+		TRACE("mkvReader::SetupVideoCookie: open failed, error: %s\n", err_msg);
+		return B_ERROR;
+	}
+	mkv_SetTrackMask(cookie->file, ~(1 << cookie->stream));
+
+	cookie->audio = true;
+
 	TRACE("audio SamplingFreq: %.3f\n", cookie->track_info->Audio.SamplingFreq); 
 	TRACE("audio OutputSamplingFreq: %.3f\n", cookie->track_info->Audio.OutputSamplingFreq); 
 	TRACE("audio Channels: %d\n", cookie->track_info->Audio.Channels); 
@@ -243,7 +283,20 @@ mkvReader::SetupAudioCookie(mkv_cookie *cookie)
 
 	TRACE("frame_rate: %.6f\n", cookie->frame_rate); 
 	TRACE("duration: %Ld (%.6f)\n", cookie->duration, cookie->duration / 1E6); 
-	TRACE("frame_count: %Ld\n", cookie->frame_count); 
+	TRACE("frame_count: %Ld\n", cookie->frame_count);
+	
+	status_t res;
+	res = GetAudioFormat(&cookie->format, cookie->track_info->CodecID, cookie->track_info->CodecPrivate, cookie->track_info->CodecPrivateSize);
+	if (res != B_OK) {
+		TRACE("mkvReader::SetupAudioCookie: codec not recognized\n");
+		return B_ERROR;
+	}
+
+	cookie->format.u.encoded_audio.bit_rate = cookie->track_info->Audio.BitDepth * cookie->track_info->Audio.Channels * cookie->track_info->Audio.SamplingFreq;
+	cookie->format.u.encoded_audio.output.frame_rate = cookie->track_info->Audio.SamplingFreq;
+	cookie->format.u.encoded_audio.output.channel_count = cookie->track_info->Audio.Channels;
+
+	return B_OK;
 }
 
 
@@ -259,6 +312,8 @@ status_t
 mkvReader::FreeCookie(void *_cookie)
 {
 	mkv_cookie *cookie = (mkv_cookie *)_cookie;
+	
+	mkv_Close(cookie->file);
 
 	delete [] cookie->buffer;
 
@@ -282,10 +337,12 @@ mkvReader::GetStreamInfo(void *_cookie, int64 *frameCount, bigtime_t *duration,
 
 
 status_t
-mkvReader::Seek(void *cookie,
+mkvReader::Seek(void *_cookie,
 				uint32 seekTo,
 				int64 *frame, bigtime_t *time)
 {
+	mkv_cookie *cookie = (mkv_cookie *)_cookie;
+
 	TRACE("mkvReader::Seek: seekTo%s%s%s%s, time %Ld, frame %Ld\n",
 		(seekTo & B_MEDIA_SEEK_TO_TIME) ? " B_MEDIA_SEEK_TO_TIME" : "",
 		(seekTo & B_MEDIA_SEEK_TO_FRAME) ? " B_MEDIA_SEEK_TO_FRAME" : "",
@@ -293,7 +350,24 @@ mkvReader::Seek(void *cookie,
 		(seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) ? " B_MEDIA_SEEK_CLOSEST_BACKWARD" : "",
 		*time, *frame);
 
-	return B_ERROR;
+	if (seekTo & B_MEDIA_SEEK_TO_FRAME) {
+		*time = bigtime_t(*frame * (1000000.0 / cookie->frame_rate));
+	}
+	
+	if (seekTo & B_MEDIA_SEEK_CLOSEST_BACKWARD) {
+		mkv_Seek(cookie->file, *time * 1000, MKVF_SEEK_TO_PREV_KEYFRAME);
+	} else if (seekTo & B_MEDIA_SEEK_CLOSEST_FORWARD) {
+		mkv_Seek(cookie->file, *time * 1000, 0);
+		mkv_SkipToKeyframe(cookie->file);
+	} else {
+		mkv_Seek(cookie->file, *time * 1000, 0);
+	}
+
+	int64 timecode;
+	timecode = mkv_GetLowestQTimecode(cookie->file);
+	TRACE("timecode %Ld\n", timecode);
+
+	return B_OK;
 }
 
 
@@ -303,8 +377,49 @@ mkvReader::GetNextChunk(void *_cookie,
 						media_header *mediaHeader)
 {
 	mkv_cookie *cookie = (mkv_cookie *)_cookie;
+	
+	int res;
+	unsigned int track;
+	ulonglong StartTime; /* in ns */
+	ulonglong EndTime; /* in ns */
+	ulonglong FilePos; /* in bytes from start of file */
+	unsigned int FrameSize; /* in bytes */
+	unsigned int FrameFlags;
+	
+	if (!cookie->file)
+		return B_MEDIA_NO_HANDLER;
 
-	return B_LAST_BUFFER_ERROR;
+	res = mkv_ReadFrame(cookie->file, 0, &track, &StartTime, &EndTime, &FilePos, &FrameSize, &FrameFlags);
+	if (res < 0)
+		return B_ERROR;
+	
+	if (cookie->buffer_size < FrameSize) {
+		cookie->buffer = (char *)realloc(cookie->buffer, FrameSize);
+		cookie->buffer_size = FrameSize;
+	}
+	
+	res = mkv_ReadData(cookie->file, FilePos, cookie->buffer, FrameSize);
+	if (res < 0)
+		return B_ERROR;
+		
+	*chunkBuffer = cookie->buffer;
+	*chunkSize = FrameSize;
+	
+	bool keyframe = false;	
+	
+	if (cookie->audio) {
+		mediaHeader->start_time = StartTime / 1000;
+		mediaHeader->type = B_MEDIA_ENCODED_AUDIO;
+		mediaHeader->u.encoded_audio.buffer_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
+	} else {
+		mediaHeader->start_time = StartTime / 1000;
+		mediaHeader->type = B_MEDIA_ENCODED_VIDEO;
+		mediaHeader->u.encoded_video.field_flags = keyframe ? B_MEDIA_KEY_FRAME : 0;
+		mediaHeader->u.encoded_video.first_active_line = 0;
+		mediaHeader->u.encoded_video.line_count = cookie->line_count;
+	}
+	
+	return B_OK;
 }
 
 

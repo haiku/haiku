@@ -62,3 +62,18 @@ get_frame_count_by_default_duration(uint64 duration, uint64 default_duration)
 		return (duration * 2997) / 100000000000ull;
 	return 12 * 60 * 60 * 2997 / 100;
 }
+
+
+uint16
+get_pixel_width_aspect(unsigned int pixel_width, unsigned int display_width)
+{
+	return 1;
+}
+
+
+uint16
+get_pixel_height_aspect(unsigned int pixel_height, unsigned int display_height)
+{
+	return 1;
+}
+

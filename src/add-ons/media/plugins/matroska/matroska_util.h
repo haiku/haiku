@@ -32,5 +32,8 @@ float		get_frame_rate(uint64 default_duration);
 uint64		get_frame_count_by_frame_rate(uint64 duration, float frame_rate);
 uint64		get_frame_count_by_default_duration(uint64 duration, uint64 default_duration);
 
+uint16		get_pixel_width_aspect(unsigned int pixel_width, unsigned int display_width);
+uint16		get_pixel_height_aspect(unsigned int pixel_height, unsigned int display_height);
+
 #endif
 
