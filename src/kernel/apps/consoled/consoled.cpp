@@ -212,6 +212,7 @@ start_console(struct console *con)
 
 	resume_thread(con->keyboard_reader);
 	resume_thread(con->console_writer);
+	setenv("TERM", "beterm", true);
 
 	return 0;
 }
