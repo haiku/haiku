@@ -1,9 +1,11 @@
 SubDir OBOS_TOP src kernel libroot posix glibc ;
 
+SubInclude OBOS_TOP src kernel libroot posix glibc arch ;
+SubInclude OBOS_TOP src kernel libroot posix glibc ctype ;
 SubInclude OBOS_TOP src kernel libroot posix glibc extensions ;
-#SubInclude OBOS_TOP src kernel libroot posix glibc locale ;
+SubInclude OBOS_TOP src kernel libroot posix glibc locale ;
 SubInclude OBOS_TOP src kernel libroot posix glibc libio ;
 SubInclude OBOS_TOP src kernel libroot posix glibc regex ;
 SubInclude OBOS_TOP src kernel libroot posix glibc stdio-common ;
-#SubInclude OBOS_TOP src kernel libroot posix glibc stdlib ;
+SubInclude OBOS_TOP src kernel libroot posix glibc stdlib ;
 SubInclude OBOS_TOP src kernel libroot posix glibc wcsmbs ;
