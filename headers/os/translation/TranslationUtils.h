@@ -79,6 +79,7 @@ static BBitmap *GetBitmap(const entry_ref *kRef,
 static BBitmap *GetBitmap(BPositionIO *stream,
 	BTranslatorRoster *roster = NULL);
 	// Get bitmap - from open file or IO type object
+	// This function does the real work for the other GetBitmap functions
 
 static status_t GetStyledText(BPositionIO *fromStream, BTextView *intoView,
 	BTranslatorRoster *roster = NULL);
@@ -119,18 +120,6 @@ static status_t AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 	const char *kTranslatorIdName = NULL, // default "be:translator"
 	const char *kTranslatorTypeName = NULL, // default "be:type"
 	BTranslatorRoster *roster = NULL);
-				
-// BEGIN: Added by Michael Wilber
-private:
-
-static BBitmap * TranslateToBitmap(BPositionIO *pio,
-	BTranslatorRoster *roster = NULL);
-	// Translates the image data from pio to the type type using the
-	// supplied BTranslatorRoster. If BTranslatorRoster is not supplied
-	// the default BTranslatorRoster is used.
-	
-// END: Added by Michael Wilber
-				
 };
 
 #endif /* _TRANSLATION_UTILS_H */
