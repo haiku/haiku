@@ -1127,8 +1127,10 @@ vm_clone_area(aspace_id aid, const char *name, void **address, uint32 addressSpe
 		return ERR_VM_INVALID_REGION;
 	}
 
-	if (sourceArea->aspace == kernel_aspace && aspace != kernel_aspace) {
-		// kernel areas must not be cloned in userland
+	if (sourceArea->aspace == kernel_aspace && aspace != kernel_aspace
+		&& !(sourceArea->protection & B_USER_CLONEABLE_AREA)) {
+		// kernel areas must not be cloned in userland, unless explicitly
+		// declared user-cloneable upon construction
 		status = B_NOT_ALLOWED;
 	} else {
 		vm_cache_acquire_ref(sourceArea->cache_ref, true);
