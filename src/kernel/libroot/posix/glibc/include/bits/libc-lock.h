@@ -164,7 +164,9 @@ typedef struct {
 			}									      \
 		} while (err == B_INTERRUPTED); \
 	__result; })
+#endif
 
+#if 0
 /* Try to lock the recursive named lock variable.  */
 #define __libc_lock_trylock_recursive(NAME) \
 	({									      \
@@ -277,4 +279,3 @@ typedef struct {
   0
 
 #endif	/* bits/libc-lock.h */
-
