@@ -15,14 +15,14 @@ export_load_add_on(char const *name, uint32 flags)
 {
 	// ToDo: use load_add_on() here when it's implemented, or better, unify
 	//		load_library() and load_add_on().
-	return load_library(name, flags);
+	return load_library(name, flags, true);
 }
 
 
 static status_t
 export_unload_add_on(image_id id)
 {
-	return unload_library(id);
+	return unload_library(id, true);
 }
 
 
