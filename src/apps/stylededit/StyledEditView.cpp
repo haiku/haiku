@@ -116,18 +116,18 @@ StyledEditView::GetStyledText(BPositionIO * stream)
 			int32 state = 0;
 			int32 bytesRead;
 			while ((bytesRead = stream->ReadAt(location,inBuffer,256)) > 0) {
-				location += bytesRead;
 				char * inPtr = inBuffer;
 				char textBuffer[256];
 				int32 textLength = 256;
-				int32 bytesConverted = bytesRead;
+				int32 bytes = bytesRead;
 				while (textLength > 0) {
-					convert_to_utf8(id,inPtr,&bytesConverted,textBuffer,&textLength,&state);
+					convert_to_utf8(id,inPtr,&bytes,textBuffer,&textLength,&state);
 					InsertText(textBuffer,textLength,textOffset);
 					textOffset += textLength;
-					inPtr += bytesConverted;
-					bytesRead -= bytesConverted;
-					bytesConverted = bytesRead;
+					inPtr += bytes;
+					location += bytes;
+					bytesRead -= bytes;
+					bytes = bytesRead;
 					if (textLength > 0) {
 						textLength = 256;
 					}
