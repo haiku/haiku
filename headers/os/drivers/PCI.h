@@ -170,6 +170,7 @@ struct pci_module_info {
 #define PCI_subsystem_vendor_id	0x2c		/* (2 bytes) subsystem (add-in card) vendor id */
 #define PCI_subsystem_id		0x2e		/* (2 bytes) subsystem (add-in card) id */
 #define PCI_rom_base			0x30		/* (4 bytes) expansion rom base address */
+#define PCI_capabilities_ptr    0x34        /* (1 byte) pointer to the start of the capabilities list */
 #define PCI_min_grant			0x3e		/* (1 byte) burst period @ 33 Mhz */
 #define PCI_max_latency			0x3f		/* (1 byte) how often PCI access needed */
 
@@ -200,8 +201,8 @@ struct pci_module_info {
 
 
 /* PCI type 2 header offsets */
-
-#define PCI_secondary_status_2                      0x16
+#define PCI_capabilities_ptr_2                      0x14 /* (1 byte) */
+#define PCI_secondary_status_2                      0x16 /* (2 bytes) */
 #define PCI_primary_bus_2							0x18 /* (1 byte) */
 #define PCI_secondary_bus_2							0x19 /* (1 byte) */
 #define PCI_subordinate_bus_2						0x1A /* (1 byte) */
@@ -477,10 +478,11 @@ struct pci_module_info {
 	masks for status register bits
 --- */
 
+#define PCI_status_capabilities             0x0010  /* capabilities list */
 #define PCI_status_66_MHz_capable			0x0020	/* 66 Mhz capable */
 #define PCI_status_udf_supported			0x0040	/* user-definable-features (udf) supported */
 #define PCI_status_fastback					0x0080	/* fast back-to-back capable */
-#define PCI_status_parity_signalled		0x0100	/* parity error signalled */
+#define PCI_status_parity_signalled		    0x0100	/* parity error signalled */
 #define PCI_status_devsel					0x0600	/* devsel timing (see below) */
 #define PCI_status_target_abort_signalled	0x0800	/* signaled a target abort */
 #define PCI_status_target_abort_received	0x1000	/* received a target abort */
@@ -506,9 +508,7 @@ struct pci_module_info {
 #define PCI_multifunction		0x80		/* multifunction device flag */
 
 
-/* ---
-	defines for header type register
---- */
+/** types of PCI header */
 
 #define PCI_header_type_generic				0x00		
 #define PCI_header_type_PCI_to_PCI_bridge	0x01		
@@ -524,9 +524,7 @@ struct pci_module_info {
 #define PCI_bist_capable		0x80		/* 1 = self-test capable */
 
 
-/* ---
-	masks for flags in the various base address registers
---- */
+/** masks for flags in the various base address registers */
 
 #define PCI_address_space		0x01		/* 0 = memory space, 1 = i/o space */
 #define PCI_register_start      0x10
@@ -534,16 +532,13 @@ struct pci_module_info {
 #define PCI_register_ppb_end    0x18
 #define PCI_register_pcb_end    0x14
 
-/* ---
-	masks for flags in memory space base address registers
---- */
-
-#define PCI_address_type			0x06	/* type (see below) */
-#define PCI_address_prefetchable	0x08	/* 1 if prefetchable (see PCI spec) */
+/** masks for flags in memory space base address registers */
 
 #define PCI_address_type_32			0x00	/* locate anywhere in 32 bit space */
 #define PCI_address_type_32_low		0x02	/* locate below 1 Meg */
 #define PCI_address_type_64			0x04	/* locate anywhere in 64 bit space */
+#define PCI_address_type			0x06	/* type (see below) */
+#define PCI_address_prefetchable	0x08	/* 1 if prefetchable (see PCI spec) */
 
 #define PCI_address_memory_32_mask	0xFFFFFFF0	/* mask to get 32bit memory space base address */
 
@@ -562,7 +557,7 @@ struct pci_module_info {
 #define PCI_rom_enable			0x00000001	/* 1 = expansion rom decode enabled */
 #define PCI_rom_address_mask	0xFFFFF800	/* mask to get expansion rom addr */
 
-/* PCI interrupt pin values */
+/** PCI interrupt pin values */
 #define PCI_pin_mask            0x07
 #define PCI_pin_none            0x00
 #define PCI_pin_a               0x01
@@ -571,6 +566,29 @@ struct pci_module_info {
 #define PCI_pin_d               0x04
 #define PCI_pin_max             0x04
 
+/** PCI Capability Codes */
+#define PCI_cap_id_reserved     0x00
+#define PCI_cap_id_pm           0x01      /* Power management */
+#define PCI_cap_id_agp          0x02      /* AGP */
+#define PCI_cap_id_vpd          0x03      /* Vital product data */
+#define PCI_cap_id_slotid       0x04      /* Slot ID */
+#define PCI_cap_id_mbi          0x05      /* Message signalled interrupt ??? */
+#define PCI_cap_id_chswp        0x06      /* Compact PCI HotSwap */
+#define PCI_cap_id_pcix         0x07
+#define PCI_cap_id_ldt          0x08
+#define PCI_cap_id_vendspec     0x09
+#define PCI_cap_id_debugport    0x0a
+#define PCI_cap_id_cpci_rsrcctl 0x0b
+#define PCI_cap_id_hotplug      0x0c
+
+/** Power Management Control Status Register settings */
+#define PCI_pm_mask             0x03
+#define PCI_pm_d1supp           0x0200
+#define PCI_pm_d2supp           0x0400
+#define PCI_pm_state_d0         0x00
+#define PCI_pm_state_d1         0x01
+#define PCI_pm_state_d2         0x02
+#define PCI_pm_state_d3         0x03
 
 #ifdef __cplusplus
 }
