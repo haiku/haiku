@@ -990,6 +990,7 @@ static status_t nv_general_bios_to_powergraphics()
 {
 	uint32 agp_ident, agp_stat, agp_cmd;
 	bool agp_1x, agp_2x, agp_4x, agp3_4x, agp3_8x;
+	uint8 agp_speed;
 
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
@@ -1138,42 +1139,38 @@ static status_t nv_general_bios_to_powergraphics()
 
 		/*  ... list them... */
 		agp_1x = agp_2x = agp_4x = agp3_4x = agp3_8x = false;
-		/* try to select AGP 2.0 setup */
-		CFGW(AGPSTAT, (CFGR(AGPSTAT) & 0xfffffff7));
 		agp_stat = CFGR(AGPSTAT);
+		/* the mainboard and graphicscard determine AGP version used on power-up/reset */
 		if (!(agp_stat & 0x00000008))
 		{
 			/* AGP 2.0 scheme applies */
 			if (agp_stat & 0x00000001)
 			{
-				LOG(4,("INIT: AGP 2.0 1x mode is supported\n"));
+				LOG(4,("INIT: AGP 2.0 1x mode is available\n"));
 				agp_1x = true;
 			}
 			if (agp_stat & 0x00000002)
 			{
-				LOG(4,("INIT: AGP 2.0 2x mode is supported\n"));
+				LOG(4,("INIT: AGP 2.0 2x mode is available\n"));
 				agp_2x = true;
 			}
 			if (agp_stat & 0x00000004)
 			{
-				LOG(4,("INIT: AGP 2.0 4x mode is supported\n"));
+				LOG(4,("INIT: AGP 2.0 4x mode is available\n"));
 				agp_4x = true;
 			}
 		}
-		/* try to select AGP 3.0 setup */
-		CFGW(AGPSTAT, (CFGR(AGPSTAT) | 0x00000008));
-		agp_stat = CFGR(AGPSTAT);
-		if (agp_stat & 0x00000008)
+		else
 		{
 			/* AGP 3.0 scheme applies */
 			if (agp_stat & 0x00000001)
 			{
-				LOG(4,("INIT: AGP 3.0 4x mode is supported\n"));
+				LOG(4,("INIT: AGP 3.0 4x mode is available\n"));
 				agp3_4x = true;
 			}
 			if (agp_stat & 0x00000002)
 			{
-				LOG(4,("INIT: AGP 3.0 8x mode is supported\n"));
+				LOG(4,("INIT: AGP 3.0 8x mode is available\n"));
 				agp3_8x = true;
 			}
 		}
@@ -1189,57 +1186,58 @@ static status_t nv_general_bios_to_powergraphics()
 			LOG(4,("INIT: enabling AGP\n"));
 
 			/* select highest AGP mode */
-			//fixme: from nv.settings !?! for now: testing 2x
-			switch (2)
+			//fixme: from nv.settings !?! for now: testing 4x
+			agp_speed = 4;
+			if (!(agp_stat & 0x00000008))
 			{
-			case 8:
-				if (agp3_8x)
+				/* AGP 2.0 scheme applies */
+				switch (agp_speed)
 				{
-					LOG(4,("INIT: using AGP 3.0 8x mode\n"));
-					/* select AGP 3.0 */
-					agp_stat |= 0x00000008;
-					/* select 8x mode */
-					agp_cmd = 0x00000002;
+				case 4:
+					if (agp_4x)
+					{
+						LOG(4,("INIT: using AGP 2.0 4x mode\n"));
+						/* select 4x mode */
+						agp_cmd = 0x00000004;
+						break;
+					}
+				case 2:
+					if (agp_2x)
+					{
+						LOG(4,("INIT: using AGP 2.0 2x mode\n"));
+						/* select 2x mode */
+						agp_cmd = 0x00000002;
+						break;
+					}
+				case 1:
+				default:
+					LOG(4,("INIT: using AGP 2.0 1x mode\n"));
+					/* select 1x mode */
+					agp_cmd = 0x00000001;
 					break;
 				}
-			case 4:
-				if (agp3_4x)
+			}
+			else
+			{
+				/* AGP 3.0 scheme applies */
+				switch (agp_speed)
 				{
+				case 8:
+					if (agp3_8x)
+					{
+						LOG(4,("INIT: using AGP 3.0 8x mode\n"));
+						/* select 8x mode */
+						agp_cmd = 0x00000002;
+						break;
+					}
+				case 4:
+				default:
 					LOG(4,("INIT: using AGP 3.0 4x mode\n"));
-					/* select AGP 3.0 */
-					agp_stat |= 0x00000008;
 					/* select 4x mode */
 					agp_cmd = 0x00000001;
 					break;
 				}
-				if (agp_4x)
-				{
-					LOG(4,("INIT: using AGP 2.0 4x mode\n"));
-					/* select AGP 2.0 */
-					agp_stat &= 0xfffffff7;
-					/* select 4x mode */
-					agp_cmd = 0x00000004;
-					break;
-				}
-			case 2:
-				if (agp_2x)
-				{
-					LOG(4,("INIT: using AGP 2.0 2x mode\n"));
-					/* select AGP 2.0 */
-					agp_stat &= 0xfffffff7;
-					/* select 2x mode */
-					agp_cmd = 0x00000002;
-					break;
-				}
-			case 1:
-				LOG(4,("INIT: using AGP 2.0 1x mode\n"));
-				/* select AGP 2.0 */
-				agp_stat &= 0xfffffff7;
-				/* select 1x mode */
-				agp_cmd = 0x00000001;
-				break;
 			}
-			CFGW(AGPSTAT, agp_stat);
 
 			/* activate sideband adressing if supported */
 			if (agp_stat & 0x00000200) agp_cmd |= 0x00000200;
