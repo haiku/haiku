@@ -3,6 +3,9 @@
  * settings related to the add-on, but not the server.
  *
  * $Log: SpamFilterConfig.cpp,v $
+ * Revision 1.3  2004/11/21 08:38:07  shatty
+ * remove unused variables
+ *
  * Revision 1.2  2004/11/12 02:55:05  nwhitehorn
  * Added AGMS's excellent spam detection software. Still some weirdness with the configuration interface from E-mail prefs.
  *
@@ -154,8 +157,6 @@ AGMSBayesianSpamFilterConfig::AGMSBayesianSpamFilterConfig (BMessage *settings)
 
 void AGMSBayesianSpamFilterConfig::AttachedToWindow ()
 {
-	float		 deltaX;
-	BStringView	*labelViewPntr;
 	char		 numberString [30];
 	BRect		 tempRect;
 	char		*tempStringPntr;
@@ -361,7 +362,6 @@ AGMSBayesianSpamFilterConfig::ShowSpamServerConfigurationWindow () {
 	BMessage    maximizeCommand;
 	BMessenger	messengerToServer;
 	BMessage    replyMessage;
-	team_id		serverTeam;
 
 	// Make sure the server is running.
 	if (!be_roster->IsRunning (kServerSignature)) {
