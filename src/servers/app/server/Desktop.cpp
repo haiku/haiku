@@ -58,8 +58,6 @@ Desktop::Desktop(void)
 {
 	fDragMessage		= NULL;
 	fActiveRootLayer	= NULL;
-	fFrontWinBorder		= NULL;
-	fFocusWinBorder		= NULL;
 	fMouseTarget		= NULL;
 	fActiveScreen		= NULL;
 	fScreenShotIndex	= 1;
@@ -198,14 +196,8 @@ void Desktop::SetActiveRootLayer(RootLayer* rl)
 		return;
 
 	fActiveRootLayer	= rl;
-
-// TODO: fix... or not?
-// also set the new front and focus
-//	SetFrontWinBorder(fActiveRootLayer->ActiveWorkspace()->FrontLayer());
-//	SetFocusWinBorder(fActiveRootLayer->ActiveWorkspace()->FocusLayer());
 	
-// TODO: other tasks required when this happens. I don't know them now.
-// Rebuild & Invalidate
+// TODO:
 // hide the mouse in the old ActiveRootLayer
 // show the mouse in new ActiveRootLayer
 	fActiveRootLayer->FullInvalidate(fActiveRootLayer->Bounds());
@@ -297,64 +289,6 @@ void Desktop::RemoveWinBorder(WinBorder* winBorder)
 bool Desktop::HasWinBorder(WinBorder* winBorder)
 {
 	return fWinBorderList.HasItem(winBorder);
-}
-
-void Desktop::SetFrontWinBorder(WinBorder* winBorder)
-{
-	fFrontWinBorder		= winBorder;
-	STRACE(("Desktop::SetFrontWinBorder() unimplemented!\n"));
-	// TODO: implement
-}
-
-// TODO: remove shortly?
-void Desktop::SetFocusWinBorder(WinBorder* winBorder)
-{
-	if (FocusWinBorder() == winBorder && (winBorder && !winBorder->IsHidden()))
-		return;
-
-	fFocusWinBorder		= FocusWinBorder();
-
-	// NOTE: we assume both, the old and new focus layer are in the active workspace
-	WinBorder	*newFocus = NULL;
-
-	if(fFocusWinBorder)
-		fFocusWinBorder->HighlightDecorator(false);
-	
-	if(winBorder)
-	{
-		// TODO: NO! this call is to determine the correct order! NOT to rebuild/redraw anything!
-		// TODO: WinBorder::SetFront... will do that - both!
-		// TODO: modify later
-		// TODO: same applies for the focus state - RootLayer::SetFocus also does redraw
-		//	Workspace::SetFocus - Only determines the focus! Just like above!
-
-//		newFocus	= winBorder->GetRootLayer()->ActiveWorkspace()->SetFocusLayer(winBorder);
-//		newFocus->SetFocus(true);
-
-		Workspace *aws;
-
-		aws = winBorder->GetRootLayer()->ActiveWorkspace();
-		aws->SearchAndSetNewFocus(winBorder);
-		
-		//why do put this line? Eh... I will remove it later...
-		newFocus = aws->FocusLayer();
-
-		aws->FocusLayer()->HighlightDecorator(true);
-		
-		aws->Invalidate();
-	}
-
-	fFocusWinBorder	= newFocus;
-}
-
-WinBorder* Desktop::FrontWinBorder(void) const
-{
-	return fActiveRootLayer->ActiveWorkspace()->FrontLayer();
-}
-
-WinBorder* Desktop::FocusWinBorder(void) const
-{
-	return fActiveRootLayer->ActiveWorkspace()->FocusLayer();
 }
 
 //---------------------------------------------------------------------------

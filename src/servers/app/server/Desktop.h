@@ -20,7 +20,7 @@
 //	DEALINGS IN THE SOFTWARE.
 //
 //	File Name:		Desktop.cpp
-//	Author:			Adi Oanca <adioanca@myrealbox.com>
+//	Author:			Adi Oanca <adioanca@mymail.ro>
 //	Description:	Class used to encapsulate desktop management
 //
 //------------------------------------------------------------------------------
@@ -68,11 +68,7 @@ public:
 	void AddWinBorder(WinBorder *winBorder);
 	void RemoveWinBorder(WinBorder *winBorder);
 	bool HasWinBorder(WinBorder *winBorder);
-	void SetFrontWinBorder(WinBorder *winBorder);
-	void SetFocusWinBorder(WinBorder *winBorder);
-	WinBorder *FrontWinBorder(void) const;
-	WinBorder *FocusWinBorder(void) const;
-	
+
 	// Input related methods
 	void MouseEventHandler(PortMessage *msg);
 	void KeyboardEventHandler(PortMessage *msg);
@@ -110,14 +106,10 @@ private:
 	
 	BList fRootLayerList;
 	RootLayer *fActiveRootLayer;
-	WinBorder *fFrontWinBorder;
-	WinBorder *fFocusWinBorder;
+
 	WinBorder *fMouseTarget;
 	
 	BList fScreenList;
-
-	// '1' or 'n' Screen(s). Not sure it's needed though.
-	int32 fScreenMode;
 	Screen *fActiveScreen;
 	
 	scroll_bar_info fScrollBarInfo;
