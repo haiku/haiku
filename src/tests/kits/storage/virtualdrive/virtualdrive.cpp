@@ -245,6 +245,14 @@ init_device_info(int32 index, virtual_drive_info *initInfo)
 		// Disable caching for underlying file! (else this driver will deadlock)
 		// We probably cannot resize the file once the cache has been disabled!
 
+		// This applies to BeOS only:
+		// Work around a bug in BFS: the file is not synced before the cache is
+		// turned off, and thus causing possible inconsistencies.
+		// Unfortunately, this only solves one half of the issue; there is
+		// no way to remove the blocks in the cache, so changes made to the
+		// image have the chance to get lost.
+		fsync(fd);
+
 		// This is a special reserved ioctl() opcode not defined anywhere in
 		// the Be headers.
 		if (ioctl(fd, 10000) != 0) {
