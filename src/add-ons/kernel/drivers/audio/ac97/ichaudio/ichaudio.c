@@ -1,5 +1,6 @@
 #include "lala/lala.h"
 #include "ichaudio.h"
+#include "io.h"
 
 status_t ichaudio_attach(audio_drv_t *drv);
 status_t ichaudio_powerctl(audio_drv_t *drv);
@@ -28,12 +29,12 @@ id_table_t ichaudio_id_table[] = {
 
 
 driver_info_t driver_info = {
-	ichaudio_id_table,
-	"audio/lala/ichaudio",
-	sizeof(ichaudio_cookie),
-	ichaudio_attach,
-	ichaudio_detach,
-	ichaudio_powerctl,
+	.table			= ichaudio_id_table,
+	.basename		= "audio/lala/ichaudio",
+	.cookie_size	= sizeof(ichaudio_cookie),
+	.attach			= ichaudio_attach,
+	.detach			= ichaudio_detach,
+	.powerctl		= ichaudio_powerctl,
 };
 
 
@@ -42,6 +43,9 @@ ichaudio_attach(audio_drv_t *drv)
 {
 	ichaudio_cookie *cookie = (ichaudio_cookie *)drv->cookie;
 	uint32 value;
+	int i;
+	bigtime_t start;
+	bool s0cr, s1cr, s2cr;
 	
 	dprintf("ichaudio_attach\n");
 
@@ -76,8 +80,123 @@ ichaudio_attach(audio_drv_t *drv)
 		cookie->nambar = PCI_address_io_mask & drv->pci->read_pci_config(drv->bus, drv->device, drv->function, 0x10, 4);
 		cookie->nabmbar = PCI_address_io_mask & drv->pci->read_pci_config(drv->bus, drv->device, drv->function, 0x14, 4);
 		if (!cookie->nambar || !cookie->nabmbar) {
-			dprintf("ichaudio_attach: io unconfiugured\n");
+			dprintf("ichaudio_attach: io unconfigured\n");
 			goto err;			
+		}
+	}
+	
+	/* We don't do a cold reset here, because this would reset general purpose
+	 * IO pins of the controller. These pins can be used by the machine vendor
+	 * to control external amplifiers, and resetting them prevents audio output
+	 * on some notebooks, like "Compaq Presario 2700".
+	 * If a cold reset is still in progress, we need to finish it by writing
+	 * a 1 to the cold reset bit (CNT_COLD). We do not preserve others bits,
+	 * since this can have strange effects (at least on my system, playback
+	 * speed is 320% in this case).
+	 * Doing a warm reset it required to leave certain power down modes. Warm
+	 * reset does also reset GPIO pins, but the ICH hardware does only execute
+	 * the reset request if BIT_CLOCK is not running and if it's really required.
+	 */
+	LOG(("reset starting, ICH_REG_GLOB_CNT = 0x%08x\n", ich_reg_read_32(drv, ICH_REG_GLOB_CNT)));
+	DEBUG_ONLY(start = system_time());
+	// finish cold reset by writing a 1 and clear all other bits to 0
+	ich_reg_write_32(drv, ICH_REG_GLOB_CNT, CNT_COLD);
+	ich_reg_read_32(drv, ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
+	snooze(20000);
+	// request warm reset by setting the bit, it will clear when reset is done
+	ich_reg_write_32(drv, ICH_REG_GLOB_CNT, ich_reg_read_32(drv, ICH_REG_GLOB_CNT) | CNT_WARM);
+	ich_reg_read_32(drv, ICH_REG_GLOB_CNT); // force PCI-to-PCI bridge cache flush
+	snooze(20000);
+	// wait up to 1 second for warm reset to be finished
+	for (i = 0; i < 20; i++) {
+		value = ich_reg_read_32(drv, ICH_REG_GLOB_CNT);
+		if ((value & CNT_WARM) == 0 && (value & CNT_COLD) != 0)
+			break;
+		snooze(50000);
+	}
+	if (i == 20) {
+		LOG(("reset failed, ICH_REG_GLOB_CNT = 0x%08x\n", value));
+		goto err;
+	}
+	LOG(("reset finished after %Ld, ICH_REG_GLOB_CNT = 0x%08x\n", system_time() - start, value));
+
+	/* detect which codecs are ready */
+	s0cr = s1cr = s2cr = false;
+	start = system_time();
+	do {
+		value = ich_reg_read_32(drv, ICH_REG_GLOB_STA);
+		if (!s0cr && (value & STA_S0CR)) {
+			s0cr = true;
+			LOG(("AC_SDIN0 codec ready after %Ld us\n", system_time() - start));
+		}
+		if (!s1cr && (value & STA_S1CR)) {
+			s1cr = true;
+			LOG(("AC_SDIN1 codec ready after %Ld us\n", system_time() - start));
+		}
+		if (!s2cr && (value & STA_S2CR)) {
+			s2cr = true;
+			LOG(("AC_SDIN2 codec ready after %Ld us\n", system_time() - start));
+		}
+		snooze(50000);
+	} while ((system_time() - start) < 1000000);
+
+	if (!s0cr) {
+		LOG(("AC_SDIN0 codec not ready\n"));
+	}
+	if (!s1cr) {
+		LOG(("AC_SDIN1 codec not ready\n"));
+	}
+	if (!s2cr) {
+		LOG(("AC_SDIN2 codec not ready\n"));
+	}
+
+	if (!s0cr && !s1cr && !s2cr) {
+		PRINT(("compatible chipset found, but no codec ready!\n"));
+		goto err;
+	}
+	
+	if (drv->flags & TYPE_ICH4) {
+		/* we are using a ICH4 chipset, and assume that the codec beeing ready
+		 * is the primary one.
+		 */
+		uint8 sdin;
+		uint16 reset;
+		uint8 id;
+		reset = ich_codec_read(drv, 0x00);	/* access the primary codec */
+		if (reset == 0 || reset == 0xFFFF) {
+			LOG(("primary codec not present\n"));
+		} else {
+			sdin = 0x02 & ich_reg_read_8(drv, ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(drv, 0x00 + 0x28) >> 14);
+			LOG(("primary codec id %d is connected to AC_SDIN%d\n", id, sdin));
+		}
+		reset = ich_codec_read(drv, 0x80);	/* access the secondary codec */
+		if (reset == 0 || reset == 0xFFFF) {
+			LOG(("secondary codec not present\n"));
+		} else {
+			sdin = 0x02 & ich_reg_read_8(drv, ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(drv, 0x80 + 0x28) >> 14);
+			LOG(("secondary codec id %d is connected to AC_SDIN%d\n", id, sdin));
+		}
+		reset = ich_codec_read(drv, 0x100);	/* access the tertiary codec */
+		if (reset == 0 || reset == 0xFFFF) {
+			LOG(("tertiary codec not present\n"));
+		} else {
+			sdin = 0x02 & ich_reg_read_8(drv, ICH_REG_SDM);
+			id = 0x02 & (ich_codec_read(drv, 0x100 + 0x28) >> 14);
+			LOG(("tertiary codec id %d is connected to AC_SDIN%d\n", id, sdin));
+		}
+		
+		/* XXX this may be wrong */
+		ich_reg_write_8(drv, ICH_REG_SDM, (ich_reg_read_8(drv, ICH_REG_SDM) & 0x0F) | 0x08 | 0x90);
+	} else {
+		/* we are using a pre-ICH4 chipset, that has a fixed mapping of
+		 * AC_SDIN0 = primary, AC_SDIN1 = secondary codec.
+		 */
+		if (!s0cr && s2cr) {
+			// is is unknown if this really works, perhaps we should better abort here
+			LOG(("primary codec doesn't seem to be available, using secondary!\n"));
+			cookie->codecoffset = 0x80;
 		}
 	}
 
