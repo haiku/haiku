@@ -13,7 +13,6 @@ KernelObjects
 	<$(SOURCE_GRIST)>heap.c 
 	<$(SOURCE_GRIST)>int.c 
 	<$(SOURCE_GRIST)>khash.c 
-	<$(SOURCE_GRIST)>linkhack.c 
 	<$(SOURCE_GRIST)>lock.c 
 	<$(SOURCE_GRIST)>main.c 
 	<$(SOURCE_GRIST)>misc.c 
@@ -34,12 +33,6 @@ KernelObjects
 	-fno-pic -D_KERNEL_MODE
 	;
 
-KernelLd linkhack.so :
-	<$(SOURCE_GRIST)>linkhack.o
-	:
-	:
-	-shared -Bdynamic
-	;
 
 SubInclude OBOS_TOP src kernel core addons ;
 SubInclude OBOS_TOP src kernel core arch ;

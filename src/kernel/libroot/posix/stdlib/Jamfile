@@ -16,8 +16,6 @@ KernelObjects
 	<$(SOURCE_GRIST)>rand.c 
 	<$(SOURCE_GRIST)>random.c
 	<$(SOURCE_GRIST)>realpath.c
-	<$(SOURCE_GRIST)>strtoq.c
-	<$(SOURCE_GRIST)>strtouq.c
 	:
 	-fPIC -DPIC
 	;

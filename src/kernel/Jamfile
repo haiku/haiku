@@ -121,8 +121,6 @@ KernelLd kernel
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
 
-	linkhack.so
-
 	libbus.a
 	libfs.a
 	libvm.a
@@ -167,8 +165,6 @@ KernelLd kernel.so
 	<$(SOURCE_GRIST)!core>team.o 
 	<$(SOURCE_GRIST)!core>thread.o 
 	<$(SOURCE_GRIST)!core>timer.o
-
-	linkhack.so
 
 	libbus.a
 	libfs.a
@@ -268,8 +264,6 @@ KernelStaticLibraryObjects libc.a :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>realpath.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoq.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtouq.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
@@ -415,8 +409,6 @@ KernelLd libroot.so :
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>rand.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>random.o
 	<$(SOURCE_GRIST)!libroot!posix!stdlib>realpath.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtoq.o
-	<$(SOURCE_GRIST)!libroot!posix!stdlib>strtouq.o
 
 	<$(SOURCE_GRIST)!libroot!posix!string>memchr.o
 	<$(SOURCE_GRIST)!libroot!posix!string>memcmp.o
