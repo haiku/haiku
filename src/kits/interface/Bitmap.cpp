@@ -26,7 +26,7 @@
 //					contain bitmap data.
 //------------------------------------------------------------------------------
 
-#include <algobase.h>
+#include <algorithm>
 #include <limits.h>
 #include <new>
 #include <stdlib.h>
@@ -349,6 +349,7 @@ private:
 }	// namespace BPrivate
 
 using BPrivate::PaletteConverter;
+using namespace std;
 
 // constructor
 /*!	\brief Creates an uninitialized PaletteConverter.
@@ -1046,6 +1047,7 @@ struct BaseReader {
 template<typename _PixelType>
 struct RGB24Reader : public BaseReader<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB24Reader(const void *data) : BaseReader<_PixelType>(data) {}
 
@@ -1070,6 +1072,7 @@ struct RGB24Reader : public BaseReader<_PixelType> {
 template<typename _PixelType>
 struct RGB16Reader : public BaseReader<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB16Reader(const void *data) : BaseReader<_PixelType>(data) {}
 
@@ -1099,6 +1102,7 @@ struct RGB16Reader : public BaseReader<_PixelType> {
 template<typename _PixelType>
 struct RGB15Reader : public BaseReader<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB15Reader(const void *data) : BaseReader<_PixelType>(data) {}
 
@@ -1238,6 +1242,7 @@ struct BaseWriter {
 template<typename _PixelType>
 struct RGB32Writer : public BaseWriter<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB32Writer(void *data) : BaseWriter<_PixelType>(data) {}
 
@@ -1266,6 +1271,7 @@ struct RGB32Writer : public BaseWriter<_PixelType> {
 template<typename _PixelType>
 struct RGB24Writer : public BaseWriter<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB24Writer(void *data) : BaseWriter<_PixelType>(data) {}
 
@@ -1292,6 +1298,7 @@ struct RGB24Writer : public BaseWriter<_PixelType> {
 template<typename _PixelType>
 struct RGB16Writer : public BaseWriter<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB16Writer(void *data) : BaseWriter<_PixelType>(data) {}
 
@@ -1318,6 +1325,7 @@ struct RGB16Writer : public BaseWriter<_PixelType> {
 template<typename _PixelType>
 struct RGB15Writer : public BaseWriter<_PixelType> {
 	typedef rgb_color_value	preferred_color_value_t;
+	typedef _PixelType		pixel_t;
 
 	RGB15Writer(void *data) : BaseWriter<_PixelType>(data) {}
 
