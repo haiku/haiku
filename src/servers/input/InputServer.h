@@ -187,12 +187,13 @@ private:
 	bool 			sEventLoopRunning;
 	bool 			sSafeMode;
 	port_id 		sEventPort;
-	BPoint			sMousePos;
+	
 	uint16			sKeyboardID;
 	
 	KeyboardSettings	fKeyboardSettings;
 	MouseSettings		fMouseSettings;
 
+	BPoint			fMousePos;		// current mouse position
 	key_info		fKey_info;		// current key info
 	key_map			fKeys;			// current key_map
 	char			*fChars;		// current keymap chars

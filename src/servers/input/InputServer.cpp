@@ -161,8 +161,8 @@ InputServer::InitKeyboardMouseStates(void)
 	// This is where we determine the screen resolution from the app_server and find the center of the screen
 	// sMousePos is then set to the center of the screen.
 
-	sMousePos.x = 200;
-	sMousePos.y = 200;
+	fMousePos.x = 200;
+	fMousePos.y = 200;
 
 	if (LoadKeymap()!=B_OK)
 		LoadSystemKeymap();
@@ -630,28 +630,31 @@ InputServer::HandleSetMousePosition(BMessage *message, BMessage *outbound)
 	
 	ASSERT(outbound == message);
 		
-	sMousePos.x = 200;
-	sMousePos.y = 200;
+	fMousePos.x = 200;
+	fMousePos.y = 200;
 
-	int32 xValue, 
-		  yValue;
+	int32 xValue, yValue;
     
     message->FindInt32("x",xValue);
     PRINT(("[HandleSetMousePosition] x = %lu:\n",xValue));
 	
    	switch(message->what){
-   		case B_MOUSE_MOVED:{
-    		// get point and button from msg
-    		if((outbound->FindInt32(X_VALUE,&xValue) == B_OK) && (outbound->FindInt32(Y_VALUE,&yValue) == B_OK)){
-				sMousePos.x += xValue;
-				sMousePos.y += yValue;
-				outbound->ReplaceInt32(X_VALUE,sMousePos.x); 
-				outbound->ReplaceInt32(Y_VALUE,sMousePos.y);
-	   			}
+   		case B_MOUSE_MOVED:
+   		case B_MOUSE_DOWN:
+   		case B_MOUSE_UP:
+   			// get point and button from msg
+    		if((outbound->FindInt32(X_VALUE, &xValue) == B_OK) 
+    			&& (outbound->FindInt32(Y_VALUE, &yValue) == B_OK)) {
+				fMousePos.x += xValue;
+				fMousePos.y += yValue;
+				outbound->RemoveName(X_VALUE); 
+				outbound->RemoveName(Y_VALUE);
+				outbound->AddPoint("where", fMousePos);
+				outbound->AddInt32("modifiers", fKey_info.modifiers);
+	   		}
     		break;
-    		}
-   				// Should be some Mouse Down and Up code here ..
-   				// Along with some Key Down and up codes ..
+    	
+    	// some Key Down and up codes ..
    		default:
       		break;
    			
