@@ -9,8 +9,7 @@
 #define _KERNEL_ARCH_CPU_H
 
 
-#include <kernel.h>
-#include <ktypes.h>
+#include <OS.h>
 #include <boot/kernel_args.h>
 
 
@@ -20,18 +19,18 @@
 extern "C" {
 #endif 
 
-int arch_cpu_preboot_init(kernel_args *ka);
-int arch_cpu_init(kernel_args *ka);
-int arch_cpu_init2(kernel_args *ka);
+status_t arch_cpu_preboot_init(kernel_args *args);
+status_t arch_cpu_init(kernel_args *args);
+status_t arch_cpu_init_post_vm(kernel_args *args);
 void reboot(void);
 
 void arch_cpu_invalidate_TLB_range(addr_t start, addr_t end);
 void arch_cpu_invalidate_TLB_list(addr_t pages[], int num_pages);
 void arch_cpu_global_TLB_invalidate(void);
 
-int arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler);
-int arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler);
-int arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler);
+status_t arch_cpu_user_memcpy(void *to, const void *from, size_t size, addr_t *faultHandler);
+ssize_t arch_cpu_user_strlcpy(char *to, const char *from, size_t size, addr_t *faultHandler);
+status_t arch_cpu_user_memset(void *s, char c, size_t count, addr_t *faultHandler);
 
 void arch_cpu_idle(void);
 void arch_cpu_sync_icache(void *address, size_t length);

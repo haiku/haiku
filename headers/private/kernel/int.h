@@ -22,9 +22,9 @@ extern bool kernel_startup;
 extern "C" {
 #endif
 
-int  int_init(struct kernel_args *ka);
-int  int_init2(struct kernel_args *ka);
-int  int_io_interrupt_handler(int vector);
+status_t int_init(struct kernel_args *args);
+status_t int_init_post_vm(struct kernel_args *args);
+int int_io_interrupt_handler(int vector);
 long install_interrupt_handler(long, interrupt_handler,	void *);
 long remove_interrupt_handler (long, interrupt_handler,	void *);
 

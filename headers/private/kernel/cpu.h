@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -29,12 +32,15 @@ typedef union cpu_ent {
  */
 extern cpu_ent cpu[MAX_BOOT_CPUS];
 
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int cpu_preboot_init(struct kernel_args *ka);
-int cpu_init(struct kernel_args *ka);
+status_t cpu_preboot_init(struct kernel_args *args);
+status_t cpu_init(struct kernel_args *args);
+status_t cpu_init_post_vm(struct kernel_args *args);
+
 cpu_ent *get_cpu_struct(void);
 
 extern inline cpu_ent *get_cpu_struct(void) { return &cpu[smp_get_current_cpu()]; }

@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -13,8 +16,8 @@
 extern "C" {
 #endif
 
-int arch_int_init(kernel_args *ka);
-int arch_int_init2(kernel_args *ka);
+status_t arch_int_init(kernel_args *args);
+status_t arch_int_init_post_vm(kernel_args *args);
 
 void arch_int_enable_interrupts(void);
 int arch_int_disable_interrupts(void);

@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -25,10 +28,10 @@ extern int dbg_register_file[B_MAX_CPU_COUNT][14];
 extern "C" {
 #endif
 
-extern int	dbg_init(struct kernel_args *ka);
-extern int	dbg_init2(struct kernel_args *ka);
-extern char	dbg_putch(char c);
-extern void	dbg_puts(const char *s);
+extern status_t debug_init(struct kernel_args *args);
+extern status_t	debug_init_post_vm(struct kernel_args *args);
+extern char dbg_putch(char c);
+extern void dbg_puts(const char *s);
 
 extern void _user_debug_output(const char *userString);
 
