@@ -916,7 +916,7 @@ open_container(char *name, image_type type)
 
 	if (strchr(name, '/')) {
 		// the name already contains a path, we don't have to search for it
-		return _kern_open(-1, name, O_RDONLY);
+		return _kern_open(-1, name, O_RDONLY, 0);
 	}
 
 	// let's evaluate the system path variables to find the container
@@ -960,7 +960,7 @@ open_container(char *name, image_type type)
 
 		TRACE(("rld.so: open_container(%s): trying %s\n", name, buffer));
 
-		fd = _kern_open(-1, buffer, O_RDONLY);
+		fd = _kern_open(-1, buffer, O_RDONLY, 0);
 		if (fd >= B_OK) {
 			// we found it, copy path!
 			TRACE(("rld.so: open_container(%s): found at %s\n", name, buffer));
