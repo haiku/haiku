@@ -358,7 +358,7 @@ void Printer::CloseJob() {
 	fJob->Release();
 }
 
-status_t Printer::PrintSpooledJob(BFile* spoolFile, const BMessage& settings)
+status_t Printer::PrintSpooledJob(BFile* spoolFile)
 {
 	take_job_func_t func;
 	image_id id;
@@ -367,8 +367,13 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile, const BMessage& settings)
 	if ((rc=LoadPrinterAddon(id)) == B_OK) {
 			// Addon was loaded, so try and get the take_job symbol
 		if ((rc=get_image_symbol(id, "take_job", B_SYMBOL_TYPE_TEXT, (void**)&func)) == B_OK) {
+				// This seems to be required for legacy?
+				// HP PCL3 add-on crashes without it!
+			BMessage params('_RRC');
+			params.AddInt32("file", (int32)spoolFile);
+			params.AddInt32("printer", (int32)&fNode);
 				// call the function and check its result
-			BMessage* result = (*func)(spoolFile, &fNode, &settings);
+			BMessage* result = (*func)(spoolFile, &fNode, &params);
 			if (result == NULL || result->what == 'baad')
 				rc = B_ERROR;
 		}
@@ -382,19 +387,10 @@ status_t Printer::PrintSpooledJob(BFile* spoolFile, const BMessage& settings)
 void Printer::PrintThread(Job* job) {
 	fResource->Lock();
 	if (!fAbort) {				
-		BFile jobFile(&job->EntryRef(), B_READ_ONLY);
+		BFile jobFile(&job->EntryRef(), B_READ_WRITE);
 		print_file_header header;
-		BMessage settings;
-		
-			// Read header from filestream
-		jobFile.Seek(0, SEEK_SET);
-		jobFile.Read(&header, sizeof(header));
-		
-			// Get the printer settings
-		settings.Unflatten(&jobFile);
-		
-			// and tell the printer to print the spooled job
-		if (PrintSpooledJob(&jobFile, settings) == B_OK) {
+				// Tell the printer to print the spooled job
+		if (PrintSpooledJob(&jobFile) == B_OK) {
 				// Remove spool file if printing was successfull.
 			job->Remove();
 		} else {

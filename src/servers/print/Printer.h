@@ -105,7 +105,7 @@ private:
 
 	bool FindSpooledJob();
 	void CloseJob();
-	status_t PrintSpooledJob(BFile* spoolFile, const BMessage& settings);
+	status_t PrintSpooledJob(BFile* spoolFile);
 	void PrintThread(Job* job);
 	static status_t print_thread(void* data);
 	status_t StartPrintThread();
