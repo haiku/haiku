@@ -314,6 +314,17 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	/* set up overlay unit for this mode */
 	nv_bes_init();
 
+	/* note freemem range */
+	/* first free adress follows hardcursor and workspace */
+	si->mem_low = si->fbc.bytes_per_row * si->dm.virtual_height;
+	if (si->settings.hardcursor) si->mem_low += 2048;
+	/* last free adress is end-of-ram minus max space needed for overlay bitmaps */
+	//fixme possible:
+	//if overlay buffers are allocated subtract buffersize from mem_high;
+	//only allocate overlay buffers if 3D is not in use. (block overlay during 3D)
+	si->mem_high = si->ps.memory_size - 1;
+	si->mem_high -= (MAXBUFFERS * 1024 * 1024 * 2); /* see overlay.c file */
+
 	LOG(1,("SETMODE: booted since %f mS\n", system_time()/1000.0));
 
 	/* enable interrupts using the kernel driver */

@@ -781,22 +781,23 @@ status_t nv_acc_init()
 	 * probably depending on some other setup, there are 8 or 32 FIFO channels
 	 * available. Assuming the current setup only has 8 channels because the 'rest'
 	 * isn't setup here... */
-	/* CH0: cmd NV_ROP5_SOLID */
-	ACCW(FIFO_00800000, 0x80000000); /* Raster OPeration */
-	/* CH1: cmd NV_IMAGE_BLACK_RECTANGLE */
-	ACCW(FIFO_00802000, 0x80000001); /* Clip */
-	/* CH2: cmd NV_IMAGE_PATTERN */
-	ACCW(FIFO_00804000, 0x80000002); /* Pattern */
-	/* CH3: cmd NV1_IMAGE_FROM_CPU */
-	ACCW(FIFO_00806000, 0x80000010); /* Pixmap (not used or 3D only?) */
-	/* CH4: cmd NV_IMAGE_BLIT */
-	ACCW(FIFO_00808000, 0x80000011); /* Blit */
-	/* CH5: cmd NV3_GDI_RECTANGLE_TEXT */
-	ACCW(FIFO_0080a000, 0x80000012); /* Bitmap */
-	/* CH6: cmd NV1_RENDER_SOLID_LIN */
-	ACCW(FIFO_0080c000, 0x80000016); /* Line (not used or 3D only?) */
-	/* CH7: cmd NV4_ or NV10_DX5_TEXTURE_TRIANGLE (should be identical) */
-	ACCW(FIFO_0080e000, 0x80000014); /* Textured Triangle (3D only) */
+	si->engine.fifo.ch0 = NV_ROP5_SOLID;
+	si->engine.fifo.ch1 = NV_IMAGE_BLACK_RECTANGLE;
+	si->engine.fifo.ch2 = NV_IMAGE_PATTERN;
+	si->engine.fifo.ch3 = NV1_IMAGE_FROM_CPU;
+	si->engine.fifo.ch4 = NV_IMAGE_BLIT;
+	si->engine.fifo.ch5 = NV3_GDI_RECTANGLE_TEXT;
+	si->engine.fifo.ch6 = NV1_RENDER_SOLID_LIN;
+	si->engine.fifo.ch7 = NV4_DX5_TEXTURE_TRIANGLE;
+
+	ACCW(FIFO_00800000, si->engine.fifo.ch0); /* Raster OPeration */
+	ACCW(FIFO_00802000, si->engine.fifo.ch1); /* Clip */
+	ACCW(FIFO_00804000, si->engine.fifo.ch2); /* Pattern */
+	ACCW(FIFO_00806000, si->engine.fifo.ch3); /* Pixmap (not used or 3D only?) */
+	ACCW(FIFO_00808000, si->engine.fifo.ch4); /* Blit */
+	ACCW(FIFO_0080a000, si->engine.fifo.ch5); /* Bitmap */
+	ACCW(FIFO_0080c000, si->engine.fifo.ch6); /* Line (not used or 3D only?) */
+	ACCW(FIFO_0080e000, si->engine.fifo.ch7); /* Textured Triangle (3D only) */
 
 	/* do first actual acceleration engine command:
 	 * setup clipping region (workspace size) to 32768 x 32768 pixels:
