@@ -576,7 +576,7 @@ void BShape::InitData()
 
 #if __GNUC__ < 3
 
-BRect
+extern "C" BRect
 Bounds__6BShape(BShape *self)
 {
 	return self->Bounds();
