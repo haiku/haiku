@@ -14,7 +14,7 @@
 #include "debug.h"
 #include "TList.h"
 
-#define DOUBLE_RATE_MIXING 	1
+#define DOUBLE_RATE_MIXING 	0
 
 #define ASSERT_LOCKED()		if (fLocker->IsLocked()) {} else debugger("core not locked, meltdown occurred")
 
