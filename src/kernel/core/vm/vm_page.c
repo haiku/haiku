@@ -645,6 +645,32 @@ vm_page_allocate_page(int page_state)
 }
 
 
+/**	Allocates a number of pages and puts their pointers into the provided
+ *	array. All pages are marked busy.
+ *	Returns B_OK on success, and B_NO_MEMORY when there aren't any free
+ *	pages left to allocate.
+ */
+
+status_t
+vm_page_allocate_pages(int pageState, vm_page **pages, uint32 numPages)
+{
+	uint32 i;
+	
+	for (i = 0; i < numPages; i++) {
+		pages[i] = vm_page_allocate_page(pageState);
+		if (pages[i] == NULL) {
+			// allocation failed, we need to free what we already have
+			while (i-- > 0)
+				vm_page_set_state(pages[i], pageState);
+
+			return B_NO_MEMORY;
+		}
+	}
+
+	return B_OK;
+}
+
+
 vm_page *
 vm_page_allocate_page_run(int page_state, addr_t len)
 {
