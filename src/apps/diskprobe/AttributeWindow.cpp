@@ -150,10 +150,16 @@ EditorTabView::SetTypeEditorTab(BView *view)
 		tab->SetView(view);
 
 	FrameResized(0, 0);
+
 #ifdef COMPILE_FOR_R5
-	if (Parent() != NULL)
-#endif
+	if (Window() != NULL) {
+		// With R5's BTabView, calling select without being
+		// attached to a window crashes...
+		Select(0);
+	}
+#else
 	Select(0);
+#endif
 }
 
 
