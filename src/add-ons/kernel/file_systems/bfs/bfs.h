@@ -37,7 +37,7 @@ struct block_run {
 
 	inline static block_run Run(int32 group, uint16 start, uint16 length = 1);
 		// can't have a constructor because it's used in a union
-};
+} _PACKED;
 
 typedef block_run inode_addr;
 
@@ -88,7 +88,7 @@ struct disk_super_block {
 	int32 Flags() const { return BFS_ENDIAN_TO_HOST_INT32(flags); }
 	off_t LogStart() const { return BFS_ENDIAN_TO_HOST_INT64(log_start); }
 	off_t LogEnd() const { return BFS_ENDIAN_TO_HOST_INT64(log_end); }
-};
+} _PACKED;
 
 #define SUPER_BLOCK_FS_LENDIAN		'BIGE'		/* BIGE */
 
@@ -116,7 +116,7 @@ struct data_stream {
 	off_t MaxIndirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_indirect_range); }
 	off_t MaxDoubleIndirectRange() const { return BFS_ENDIAN_TO_HOST_INT64(max_double_indirect_range); }
 	off_t Size() const { return BFS_ENDIAN_TO_HOST_INT64(size); }
-};
+} _PACKED;
 
 // This defines the size of the indirect and double indirect
 // blocks. Note: the code may not work correctly at some places
@@ -147,7 +147,7 @@ struct small_data {
 	inline uint32	Size() const;
 	inline small_data *Next() const;
 	inline bool		IsLast(const bfs_inode *inode) const;
-};
+} _PACKED;
 
 // the file name is part of the small_data structure
 #define FILE_NAME_TYPE			'CSTR'
@@ -201,7 +201,7 @@ struct bfs_inode {
 
 	status_t InitCheck(Volume *volume);
 		// defined in Inode.cpp
-};	
+} _PACKED;	
 
 #define INODE_MAGIC1			0x3bbe0ad9
 #define INODE_TIME_SHIFT		16
