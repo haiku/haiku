@@ -14,6 +14,194 @@
 #include <stdlib.h>
 #include <kernel/OS.h>
 
+static const int cache_desc_values[] = {
+0x01, 0x02, 0x03, 0x04, 0x06, 0x08, 0x0A, 0x0C, 
+0x10, 0x15, 0x1A, 0x22, 0x23, 0x25, 0x29, 0x39, 
+0x3B, 0x3C, 0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 
+0x50, 0x51, 0x52, 0x5B, 0x5C, 0x5D, 0x66, 0x67, 
+0x68, 0x70, 0x71, 0x72, 0x77, 0x79, 0x7A, 0x7B, 
+0x7C, 0x7E, 0x81, 0x82, 0x83, 0x84, 0x85, 0x88, 
+0x89, 0x8A, 0x8D, 0x90, 0x96, 0x9B, 0x70, 0x74, 
+0x77, 0x80, 0x82, 0x84, 0
+};
+
+static const char *cache_desc_strings[] = {
+"code TLB, 4K pages, 4-way set associative, 32 entries",
+"code TLB, 4M pages, fully associative, 2 entries",
+"data TLB, 4K pages, 4-way set associative, 64 entries",
+"data TLB, 4M pages, 4-way set associative, 8 entries",
+"code L1 cache, 8 KB, 4-way set associative, 32 byte lines",
+"code L1 cache, 16 KB, 4-way set associative, 32 byte lines",
+"data L1 cache, 8 KB, 2-way set associative, 32 byte lines",
+"data L1 cache, 16 KB, 4-way set associative, 32 byte lines",
+"data L1 cache, 16 KB, 4-way set associative, 32 byte lines (IA-64)",
+"code L1 cache, 16 KB, 4-way set associative, 32 byte lines (IA-64)",
+"code and data L2 cache, 96 KB, 6-way set associative, 64 byte lines (IA-64)",
+"code and data L3 cache, 512 KB, 4-way set associative (!), 64 byte lines, dual-sectored",
+"code and data L3 cache, 1024 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L3 cache, 2048 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L3 cache, 4096 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L2 cache, 128 KB, 4-way set associative, 64 byte lines, sectored",
+"code and data L2 cache, 128 KB, 2-way set associative, 64 byte lines, sectored",
+"code and data L2 cache, 256 KB, 4-way set associative, 64 byte lines, sectored",
+"no integrated L2 cache (P6 core) or L3 cache (P4 core)",
+"code and data L2 cache, 128 KB, 4-way set associative, 32 byte lines",
+"code and data L2 cache, 256 KB, 4-way set associative, 32 byte lines",
+"code and data L2 cache, 512 KB, 4-way set associative, 32 byte lines",
+"code and data L2 cache, 1024 KB, 4-way set associative, 32 byte lines",
+"code and data L2 cache, 2048 KB, 4-way set associative, 32 byte lines",
+"code TLB, 4K/4M/2M pages, fully associative, 64 entries",
+"code TLB, 4K/4M/2M pages, fully associative, 128 entries",
+"code TLB, 4K/4M/2M pages, fully associative, 256 entries",
+"data TLB, 4K/4M pages, fully associative, 64 entries",
+"data TLB, 4K/4M pages, fully associative, 128 entries",
+"data TLB, 4K/4M pages, fully associative, 256 entries",
+"data L1 cache, 8 KB, 4-way set associative, 64 byte lines, sectored",
+"data L1 cache, 16 KB, 4-way set associative, 64 byte lines, sectored",
+"data L1 cache, 32 KB, 4-way set associative, 64 byte lines, sectored",
+"trace L1 cache, 12 KµOPs, 8-way set associative",
+"trace L1 cache, 16 KµOPs, 8-way set associative",
+"trace L1 cache, 32 KµOPs, 8-way set associative",
+"code L1 cache, 16 KB, 4-way set associative, 64 byte lines, sectored (IA-64)",
+"code and data L2 cache, 128 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L2 cache, 256 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L2 cache, 512 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L2 cache, 1024 KB, 8-way set associative, 64 byte lines, dual-sectored",
+"code and data L2 cache, 256 KB, 8-way set associative, 128 byte lines, sect. (IA-64)",
+"code and data L2 cache, 128 KB, 8-way set associative, 32 byte lines",
+"code and data L2 cache, 256 KB, 8-way set associative, 32 byte lines",
+"code and data L2 cache, 512 KB, 8-way set associative, 32 byte lines",
+"code and data L2 cache, 1024 KB, 8-way set associative, 32 byte lines",
+"code and data L2 cache, 2048 KB, 8-way set associative, 32 byte lines",
+"code and data L3 cache, 2048 KB, 4-way set associative, 64 byte lines (IA-64)",
+"code and data L3 cache, 4096 KB, 4-way set associative, 64 byte lines (IA-64)",
+"code and data L3 cache, 8192 KB, 4-way set associative, 64 byte lines (IA-64)",
+"code and data L3 cache, 3096 KB, 12-way set associative, 128 byte lines (IA-64)",
+"code TLB, 4K...256M pages, fully associative, 64 entries (IA-64)",
+"data L1 TLB, 4K...256M pages, fully associative, 32 entries (IA-64)",
+"data L2 TLB, 4K...256M pages, fully associative, 96 entries (IA-64)",
+"Cyrix specific: code and data TLB, 4K pages, 4-way set associative, 32 entries",
+"Cyrix specific: ???",
+"Cyrix specific: ???",
+"Cyrix specific: code and data L1 cache, 16 KB, 4-way set associative, 16 byte lines",
+"Cyrix specific: ???",
+"Cyrix specific: ???",
+NULL
+};
+
+static void print_cache_descriptors(cpuid_info *cpuii)
+{
+	int i, j;
+	for (i = 0; i < 15; i++) {
+		printf("cache desc %ld: 0x%02x\n", cpuii->eax_2.cache_descriptors);
+		
+		for (j = 0; cache_desc_values[j]; j++) {
+			if (cpuii->eax_2.cache_descriptors[i] == cache_desc_values[j]) {
+				printf("\t%s\n", cpuii->eax_2.cache_descriptors[i]);
+				break;
+			}
+		}
+		if (cache_desc_values[j] == 0)
+			printf("\tUnknown cache descriptor 0x%02x\n", cpuii->eax_2.cache_descriptors[i]);
+	}
+}
+
+static void print_amd_TLB(uint32 reg)
+{
+	int num;
+	int entries[2];
+	int ways[2];
+	char *name[2] = { "instruction TLB:", "data TLB       :" };
+
+	entries[0] = (reg & 0xff);
+	ways[0] = ((reg >> 8) & 0xff);
+	entries[1] = ((reg >> 16) & 0xff);
+	ways[1] = ((reg >> 24) & 0xff);
+	for (num=0; num < 2; num++) {
+		printf("\t%s %u entries, ", name[num], entries[num]);
+		if (ways[num] == 0xff)
+			printf("fully associative\n");
+		else
+			printf("%u-way set associative\n", ways[num]);
+	}
+}
+
+static void print_amd_cache(uint32 reg, int code)
+{
+	int size;
+	int ways;
+	int lines_per_tag;
+	int linesize;
+	char *name[2] = { "L1I cache:", "L1D cache:" };
+
+	size = ((reg >> 24) & 0xff);
+	ways = ((reg >> 16) & 0xff);
+	lines_per_tag = ((reg >> 8) & 0xff);
+	linesize = (reg & 0xff);
+	printf("\t%s %u kbytes,", name[code?1:0], size);
+	if (ways == 0xff)
+		printf("fully associative, ");
+	else
+		printf("%u-way set associative, ", ways);
+	printf("%u lines/tag, %u bytes/line\n", lines_per_tag, linesize);
+}
+
+static void print_cache_descriptors_newway(cpuid_info *cpuii)
+{
+	if (cpuii->regs.eax)
+		print_amd_TLB(cpuii->regs.eax);
+	if (cpuii->regs.ebx)
+		print_amd_TLB(cpuii->regs.ebx);
+	print_amd_cache(cpuii->regs.ecx, 0);
+	print_amd_cache(cpuii->regs.edx, 1);
+}
+
+static char *get_cpu_type_string(uint32 cpu_type, char *buffer)
+{
+	char *cpuname = NULL;
+
+	cpuname = cpu_type == B_CPU_INTEL_PENTIUM ? "Pentium" :
+		cpu_type == B_CPU_INTEL_PENTIUM75 ? "Pentium" :
+		cpu_type == B_CPU_INTEL_PENTIUM_486_OVERDRIVE ? "Pentium 486 Overdrive" :
+		cpu_type == B_CPU_INTEL_PENTIUM_MMX ? "Pentium MMX" :
+		cpu_type == B_CPU_INTEL_PENTIUM_MMX_MODEL_4 ? "Pentium MMX" :
+		cpu_type == B_CPU_INTEL_PENTIUM_MMX_MODEL_8 ? "Pentium MMX" :
+		cpu_type == B_CPU_INTEL_PENTIUM75_486_OVERDRIVE ? "Pentium MMX" :
+		cpu_type == B_CPU_INTEL_PENTIUM_PRO ? "Pentium Pro" :
+		cpu_type == B_CPU_INTEL_PENTIUM_II ? "Pentium II" :
+		cpu_type == B_CPU_INTEL_PENTIUM_II_MODEL_3 ? "Pentium II model 3" :
+		cpu_type == B_CPU_INTEL_PENTIUM_II_MODEL_5 ? "Pentium II model 5" :
+		cpu_type == B_CPU_INTEL_CELERON ? "Celeron" :
+		cpu_type == B_CPU_INTEL_PENTIUM_III ? "Pentium III" :
+		cpu_type == B_CPU_INTEL_PENTIUM_III_MODEL_8 ? "Pentium III" :
+		(cpu_type >= B_CPU_AMD_K5_MODEL0 && cpu_type <= B_CPU_AMD_K5_MODEL3) ? "K5" :
+		(cpu_type >= B_CPU_AMD_K6_MODEL6 && cpu_type <= B_CPU_AMD_K6_MODEL7) ? "K6" :
+		cpu_type == B_CPU_AMD_K6_2 ? "K6-2" :
+		cpu_type == B_CPU_AMD_K6_III ? "K6-III" :
+		cpu_type == B_CPU_AMD_ATHLON_MODEL1 ? "Athlon" :
+		cpu_type == B_CPU_CYRIX_GXm ? "GXm" :
+		cpu_type == B_CPU_CYRIX_6x86MX ? "6x86MX" :
+		cpu_type == B_CPU_IDT_WINCHIP_C6 ? "WinChip C6" :
+		cpu_type == B_CPU_IDT_WINCHIP_2 ? "WinChip 2" :
+		cpu_type == B_CPU_RISE_mP6 ? "mP6" :
+#ifdef B_CPU_AMD_ATHLON_THUNDERBIRD /* R5 doesn't have those defines */
+		cpu_type == B_CPU_AMD_ATHLON_THUNDERBIRD ? "Athlon TBird" :
+		cpu_type == B_CPU_NATIONAL_GEODE_GX1 ? "Geode GX1" :
+#endif
+		NULL;
+	if (cpuname)
+		return cpuname;
+	if (cpuname == NULL && cpu_type > B_CPU_INTEL_X86 && cpu_type < B_CPU_AMD_X86)
+		sprintf((cpuname = buffer), "(unknown Intel x86: 0x%08ld)", cpu_type);
+	if (cpuname == NULL && cpu_type > B_CPU_AMD_X86 && cpu_type < B_CPU_CYRIX_X86)
+		sprintf((cpuname = buffer), "(unknown AMD x86: 0x%08ld)", cpu_type);
+	if (cpuname == NULL && cpu_type & B_CPU_X86_VENDOR_MASK)
+		sprintf((cpuname = buffer), "(unknown x86: 0x%08ld)", cpu_type);
+	if (cpuname == NULL)
+		sprintf((cpuname = buffer), "(unknown: 0x%08ld)", cpu_type);
+	return cpuname;
+}
+
 static void dump_platform(system_info *info)
 {
 	printf("%s\n",
@@ -25,50 +213,11 @@ static void dump_platform(system_info *info)
 static void dump_cpu(system_info *info)
 {
 	int i;
-	char buff_unknown[40];
-	char *cpuname = NULL;
+	char buff[40];
 
-	cpuname = info->cpu_type == B_CPU_INTEL_PENTIUM ? "Pentium" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM75 ? "Pentium" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_486_OVERDRIVE ? "Pentium 486 Overdrive" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_MMX ? "Pentium MMX" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_MMX_MODEL_4 ? "Pentium MMX" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_MMX_MODEL_8 ? "Pentium MMX" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM75_486_OVERDRIVE ? "Pentium MMX" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_PRO ? "Pentium Pro" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_II ? "Pentium II" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_II_MODEL_3 ? "Pentium II model 3" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_II_MODEL_5 ? "Pentium II model 5" :
-		info->cpu_type == B_CPU_INTEL_CELERON ? "Celeron" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_III ? "Pentium III" :
-		info->cpu_type == B_CPU_INTEL_PENTIUM_III_MODEL_8 ? "Pentium III" :
-		(info->cpu_type >= B_CPU_AMD_K5_MODEL0 && info->cpu_type <= B_CPU_AMD_K5_MODEL3) ? "K5" :
-		(info->cpu_type >= B_CPU_AMD_K6_MODEL6 && info->cpu_type <= B_CPU_AMD_K6_MODEL7) ? "K6" :
-		info->cpu_type == B_CPU_AMD_K6_2 ? "K6-2" :
-		info->cpu_type == B_CPU_AMD_K6_III ? "K6-III" :
-		info->cpu_type == B_CPU_AMD_ATHLON_MODEL1 ? "Athlon" :
-		info->cpu_type == B_CPU_CYRIX_GXm ? "GXm" :
-		info->cpu_type == B_CPU_CYRIX_6x86MX ? "6x86MX" :
-		info->cpu_type == B_CPU_IDT_WINCHIP_C6 ? "WinChip C6" :
-		info->cpu_type == B_CPU_IDT_WINCHIP_2 ? "WinChip 2" :
-		info->cpu_type == B_CPU_RISE_mP6 ? "mP6" :
-#ifdef B_CPU_AMD_ATHLON_THUNDERBIRD /* R5 doesn't have those defines */
-		info->cpu_type == B_CPU_AMD_ATHLON_THUNDERBIRD ? "Athlon TBird" :
-		info->cpu_type == B_CPU_NATIONAL_GEODE_GX1 ? "Geode GX1" :
-#endif
-		NULL;
-	
-	if (cpuname == NULL && info->cpu_type > B_CPU_INTEL_X86 && info->cpu_type < B_CPU_AMD_X86)
-		sprintf((cpuname = buff_unknown), "(unknown Intel x86: 0x%08ld)", info->cpu_type);
-	if (cpuname == NULL && info->cpu_type > B_CPU_AMD_X86 && info->cpu_type < B_CPU_CYRIX_X86)
-		sprintf((cpuname = buff_unknown), "(unknown AMD x86: 0x%08ld)", info->cpu_type);
-	if (cpuname == NULL && info->cpu_type & B_CPU_X86_VENDOR_MASK)
-		sprintf((cpuname = buff_unknown), "(unknown x86: 0x%08ld)", info->cpu_type);
-	if (cpuname == NULL)
-		sprintf((cpuname = buff_unknown), "(unknown: 0x%08ld)", info->cpu_type);
 	printf("%ld %s revision %04lx running at %LdMHz (ID: 0x%08lx 0x%08lx)\n",
 		info->cpu_count,
-		cpuname,
+		get_cpu_type_string(info->cpu_type,  buff),
 		info->cpu_revision,
 		info->cpu_clock_speed / 1000000,
 		info->id[0], info->id[1]);
@@ -78,12 +227,16 @@ static void dump_cpu(system_info *info)
 		/* indeed it should return EINVAL */
 		/* references:
 		 * http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
+		 * http://www.sandpile.org/ia32/cpuid.htm
+		 * 
+		 * http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/TN13.pdf (Duron erratum)
 		 */
 		cpuid_info cpuii[5];
-		cpuid_info cpuiie[5]; /* Extended CPUID */
+		cpuid_info cpuiie[9]; /* Extended CPUID */
 		int max_eax, max_eeax = 0;
 		status_t ret;
 		int j;
+		int check_extended = 0;
 
 
 		ret = get_cpuid(&cpuii[0], 0, i);
@@ -101,17 +254,23 @@ static void dump_cpu(system_info *info)
 				break;
 			}
 		}
-		/* Extended CPUID: add more checks */
+
+		/* Extended CPUID - XXX: add more checks -- are they really needed ? */
+
 		if ((!strncmp(cpuii[0].eax_0.vendorid, "AuthenticAMD", 12) 
-					&& cpuii[1].eax_1.family >= 5, cpuii[1].eax_1.model >= 1)) {
+					&& cpuii[1].eax_1.family >= 5, cpuii[1].eax_1.model >= 1))
+			check_extended = 1;
+		check_extended = 1; // until we get into problems :)
+
+		if (check_extended) {
 			ret = get_cpuid(&cpuiie[0], 0x80000000, i);
 			if (ret != B_OK) {
-				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0, i, ret);
+				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0x80000000, i, ret);
 				break;
 			}
 			max_eeax = cpuiie[0].eax_0.max_eax & 0x0ff;
 		}
-		for (j = 1; j <= max_eeax && j < 5; j++) {
+		for (j = 1; j <= max_eeax && j < 9; j++) {
 			ret = get_cpuid(&cpuiie[j], 0x80000000+j, i);
 			if (ret != B_OK) {
 				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 0x80000000+j, i, ret);
@@ -158,8 +317,29 @@ static void dump_cpu(system_info *info)
 			
 			printf("\tName: %s\n", cpuname);
 		}
+
+
+		/* Cache/TLB descriptors */
+		if (max_eeax >= 5) {
+			if (!strncmp(cpuii[0].eax_0.vendorid, "CyrixInstead", 12))
+				print_cache_descriptors(&cpuiie[5]);
+			else
+				print_cache_descriptors_newway(&cpuiie[5]);
+		}
+
 		if (max_eax == 1)
 			break;
+		while (cpuii[2].eax_2.call_num > 0) {
+			print_cache_descriptors(&cpuii[2]);
+			if (cpuii[2].eax_2.call_num == 1)
+				break;
+			ret = get_cpuid(&cpuii[2], 2, i);
+			if (ret != B_OK) {
+				fprintf(stderr, "cpuid_info(, %ld, %ld): error 0x%08lx\n", 2, i, ret);
+				break;
+			}
+			
+		}
 		if (max_eax == 2)
 			break;
 //Serial number: %04X-%04X-%04X-%04X-%04X-%04X
