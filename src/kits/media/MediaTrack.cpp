@@ -79,7 +79,7 @@ BMediaTrack::GetCodecInfo(media_codec_info *mci) const
 		return B_NO_INIT;
 
 	*mci = fMCI;
-	snprintf(mci->pretty_name, sizeof(mci->pretty_name), "OpenBeOS Media Kit:\n%s", fMCI.pretty_name);
+	snprintf(mci->pretty_name, sizeof(mci->pretty_name), "Haiku Media Kit:\n%s", fMCI.pretty_name);
 
 	return B_OK;
 }
