@@ -30,7 +30,7 @@ typedef int32 timer_id;
 typedef void (*timer_function)(void *cookie);
 
 // create_timer() can be called from interrupt context.
-// Only up to 32 concurrent timers are supported.
+// Only up to 4 concurrent timers are supported.
 // Flags can be one of B_ONE_SHOT_ABSOLUTE_TIMER,
 // B_ONE_SHOT_RELATIVE_TIMER or B_PERIODIC_TIMER.
 

@@ -23,7 +23,7 @@
 #include "debug.h"
 #include "timer.h"
 
-#define MAX_TIMERS 32
+#define MAX_TIMERS 4
 
 
 struct timer_info
