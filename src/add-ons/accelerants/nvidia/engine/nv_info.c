@@ -383,7 +383,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 	uint32 reg, data, data2, and_out, or_in, safe32;
 
 	LOG(8,("\nINFO: executing type1 script at adress $%04x...\n", adress));
-	LOG(8,("INFO: ---Executing following command(s):'\n"));
+	LOG(8,("INFO: ---Executing following command(s):\n"));
 
 	while (!end)
 	{
@@ -595,7 +595,7 @@ static status_t exec_type1_script(uint8* rom, uint16 adress, int16* size, uint16
 			/* execute */
 			adress += 1;
 			LOG(8,("cmd 'PGM commands'\n"));
-			LOG(8,("INFO: ---Executing following command(s):'\n"));
+			LOG(8,("INFO: ---Executing following command(s):\n"));
 			exec = true;
 			break;
 		case 0x73:
@@ -972,11 +972,11 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			{
 				LOG(8,("\nINFO: (#$%02x) executing part of type2 script at adress $%04x...\n",
 					offset32, *adress));
-				LOG(8,("INFO: ---Not touching 'execution' mode at this time:'\n"));
+				LOG(8,("INFO: ---Not touching 'execution' mode at this time:\n"));
 				*adress = safe32;
 				result = exec_type2_script_mode(rom, adress, size, tabs, ram_tab, exec);
 			}
-			LOG(8,("INFO: ---Continuing script:'\n"));
+			LOG(8,("INFO: ---Continuing script:\n"));
 			break;
 		case 0x34: /* new */
 			*size -= (12 + ((*((uint8*)(&(rom[(*adress + 7)])))) << 1));
@@ -1115,9 +1115,9 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			LOG(8,("cmd 'invert current mode'\n"));
 			*exec = !(*exec);
 			if (*exec)
-				LOG(8,("INFO: ---Executing following command(s):'\n"));
+				LOG(8,("INFO: ---Executing following command(s):\n"));
 			else
-				LOG(8,("INFO: ---Not executing following command(s):'\n"));
+				LOG(8,("INFO: ---Not executing following command(s):\n"));
 			break;
 		case 0x39: /* new */
 			*size -= 2;
@@ -1161,14 +1161,12 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			if (!size32) size32 = 256;
 			*adress += 1;
 			LOG(8,("cmd 'do following cmd structure $%03x time(s)':\n", size32));
-			for (index = 0; index < size32; index++)
+			for (offset32 = 0; offset32 < size32; offset32++)
 			{
-				or_in2 = *((uint8*)(&(rom[*adress])));
-				*adress += 1;
-				data2 = *((uint8*)(&(rom[*adress])));
-				*adress += 1;
+				or_in2 = *((uint8*)(&(rom[(*adress + (offset32 << 1))])));
+				data2 = *((uint8*)(&(rom[(*adress + (offset32 << 1) + 1)])));
 				LOG(8,("INFO (cont.) (#$%02x) cmd 'WR 32bit reg $%08x = $%08x, RD 32bit reg $%08x,\n",
-					index, reg2, data2, reg));
+					offset32, reg2, data2, reg));
 				LOG(8,("INFO (cont.) AND-out $%08x, OR-in $%08x, OR-in $%08x, WR-bk'\n",
 					and_out, or_in, or_in2));
 			}
@@ -1413,7 +1411,7 @@ static status_t exec_type2_script_mode(uint8* rom, uint16* adress, int16* size, 
 			/* execute */
 			*adress += 1;
 			LOG(8,("cmd 'PGM commands'\n"));
-			LOG(8,("INFO: ---Executing following command(s):'\n"));
+			LOG(8,("INFO: ---Executing following command(s):\n"));
 			*exec = true;
 			break;
 		case 0x74: /* identical to type1 */
