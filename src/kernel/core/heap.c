@@ -1,4 +1,7 @@
 /*
+** Copyright 2002-2004, The Haiku Team. All rights reserved.
+** Distributed under the terms of the Haiku License.
+**
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.
 */
@@ -30,10 +33,19 @@
 /* check if freed pointers are already freed, and fill freed memory with 0xdeadbeef */  
 #define PARANOID_KFREE 1
 /* use a back and front wall around each allocation */
-/* does currently not work correctly, because the VM malloc()s a PAGE_SIZE and
- * later checks if the returned address is aligned...
- */
-#define USE_WALL 0
+#define USE_WALL 1
+#define USE_CHECKING_WALL 0
+
+#define WALL_SIZE 8
+	/* must be a multiple of 4 */
+
+#if USE_CHECKING_WALL
+	/* Change to allow (struct list_link) + 2 * uint32 + WALL_SIZE */
+#	define WALL_MIN_ALIGN 32
+#	define WALL_CHECK_FREQUENCY	1 /* every tenth second */
+#else
+#	define WALL_MIN_ALIGN 16
+#endif
 
 
 // heap stuff
@@ -47,9 +59,9 @@ struct heap_page {
 } PACKED;
 
 static struct heap_page *heap_alloc_table;
-static addr heap_base_ptr;
-static addr heap_base;
-static addr heap_size;
+static addr_t heap_base_ptr;
+static addr_t heap_base;
+static addr_t heap_size;
 
 struct heap_bin {
 	unsigned int element_size;
@@ -62,14 +74,14 @@ struct heap_bin {
 };
 
 static struct heap_bin bins[] = {
-	{16, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{32, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{64, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{128, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{256, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{512, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{1024, PAGE_SIZE, 0, 0, 0, 0, 0},
-	{2048, PAGE_SIZE, 0, 0, 0, 0, 0},
+	{16, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{32, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{64, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{128, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{256, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{512, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{1024, B_PAGE_SIZE, 0, 0, 0, 0, 0},
+	{2048, B_PAGE_SIZE, 0, 0, 0, 0, 0},
 	{0x1000, 0x1000, 0, 0, 0, 0, 0},
 	{0x2000, 0x2000, 0, 0, 0, 0, 0},
 	{0x3000, 0x3000, 0, 0, 0, 0, 0},
@@ -130,6 +142,47 @@ ptrchecklist_remove(void *ptr)
 
 #endif /* PARANOID_POINTER_CHECK */
 
+#if USE_WALL
+
+static void
+check_wall(void *address)
+{
+	uint32 *wall = (uint32 *)((uint8 *)address - WALL_SIZE - 8);
+	uint32 size = wall[1];
+
+	if (wall[2] != 0xabadcafe || wall[3] != 0xabadcafe)
+		panic("free: front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[1], wall[2]);
+
+	wall = (uint32 *)((uint8 *)address + size);
+	if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
+		panic("free: back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[0], wall[1]);
+}
+
+#endif	/* USE_WALL */
+
+#if USE_CHECKING_WALL
+
+sem_id sWallCheckLock = -1;
+struct list sWalls;
+
+static void
+check_wall_daemon(void *arg, int iteration)
+{
+	struct list_link *link = NULL;
+	uint32 *wall;
+
+dprintf("checking walls...\n");
+	acquire_sem(sWallCheckLock);
+
+	while ((link = list_get_next_item(&sWalls, link)) != NULL) {
+		wall = (uint32 *)((addr_t)link + WALL_SIZE + 8);
+		check_wall(wall);
+	}
+
+	release_sem(sWallCheckLock);
+}
+
+#endif	/* USE_CHECKING_WALL */
 
 static void dump_bin(int bin_index)
 {
@@ -164,19 +217,20 @@ dump_bin_list(int argc, char **argv)
  * do a little housekeeping to set up the data structure.
  */
 
-int
-heap_init(addr new_heap_base)
+status_t
+heap_init(addr_t heapBase)
 {
-	const unsigned int page_entries = PAGE_SIZE / sizeof(struct heap_page);
+	const unsigned int page_entries = B_PAGE_SIZE / sizeof(struct heap_page);
 	// set some global pointers
-	heap_alloc_table = (struct heap_page *)new_heap_base;
-	heap_size = ((uint64)HEAP_SIZE * page_entries / (page_entries + 1)) & ~(PAGE_SIZE-1);
+	heap_alloc_table = (struct heap_page *)heapBase;
+	heap_size = ((uint64)HEAP_SIZE * page_entries / (page_entries + 1)) & ~(B_PAGE_SIZE-1);
 	heap_base = (unsigned int)heap_alloc_table + PAGE_ALIGN(heap_size / page_entries);
 	heap_base_ptr = heap_base;
-	dprintf("heap_alloc_table = %p, heap_base = 0x%lx, heap_size = 0x%lx\n", heap_alloc_table, heap_base, heap_size);
+	TRACE(("heap_alloc_table = %p, heap_base = 0x%lx, heap_size = 0x%lx\n",
+		heap_alloc_table, heap_base, heap_size));
 
 	// zero out the heap alloc table at the base of the heap
-	memset((void *)heap_alloc_table, 0, (heap_size / PAGE_SIZE) * sizeof(struct heap_page));
+	memset((void *)heap_alloc_table, 0, (heap_size / B_PAGE_SIZE) * sizeof(struct heap_page));
 
 	// pre-init the mutex to at least fall through any semaphore calls
 	heap_lock.sem = -1;
@@ -185,17 +239,24 @@ heap_init(addr new_heap_base)
 	// set up some debug commands
 	add_debugger_command("heap_bindump", &dump_bin_list, "dump stats about bin usage");
 
-	return 0;
+	return B_OK;
 }
 
 
-int
+status_t
 heap_init_postsem(kernel_args *ka)
 {
 	if (mutex_init(&heap_lock, "heap_mutex") < 0)
 		panic("error creating heap mutex\n");
 
-	return 0;
+#if USE_CHECKING_WALL
+	sWallCheckLock = create_sem(1, "check wall");
+if (sWallCheckLock == 0)
+	panic("AAAaaaaargl.\n");
+	list_init(&sWalls);
+	register_kernel_daemon(check_wall_daemon, NULL, WALL_CHECK_FREQUENCY);
+#endif
+	return B_OK;
 }
 
 
@@ -205,19 +266,19 @@ raw_alloc(unsigned int size, int bin_index)
 	unsigned int new_heap_ptr;
 	char *retval;
 	struct heap_page *page;
-	unsigned int addr;
+	addr_t addr;
 
 	new_heap_ptr = heap_base_ptr + PAGE_ALIGN(size);
 	if (new_heap_ptr > heap_base + heap_size)
 		panic("heap overgrew itself!\n");
 
-	for (addr = heap_base_ptr; addr < new_heap_ptr; addr += PAGE_SIZE) {
-		page = &heap_alloc_table[(addr - heap_base) / PAGE_SIZE];
+	for (addr = heap_base_ptr; addr < new_heap_ptr; addr += B_PAGE_SIZE) {
+		page = &heap_alloc_table[(addr - heap_base) / B_PAGE_SIZE];
 		page->in_use = 1;
 		page->cleaning = 0;
 		page->bin_index = bin_index;
-		if (bin_index < bin_count && bins[bin_index].element_size < PAGE_SIZE)
-			page->free_count = PAGE_SIZE / bins[bin_index].element_size;
+		if (bin_index < bin_count && bins[bin_index].element_size < B_PAGE_SIZE)
+			page->free_count = B_PAGE_SIZE / bins[bin_index].element_size;
 		else
 			page->free_count = 1;
 	}
@@ -228,19 +289,34 @@ raw_alloc(unsigned int size, int bin_index)
 }
 
 
+#if DEBUG
+static bool
+is_valid_alignment(size_t number)
+{
+	// this cryptic line accepts zero and all powers of two
+	return ((~number + 1) | ((number << 1) - 1)) == ~0UL;
+}
+#endif
+
+
 //	#pragma mark -
 
 
 void *
-malloc(size_t size)
+memalign(size_t alignment, size_t size)
 {
 	void *address = NULL;
 	int bin_index;
 	unsigned int i;
 	struct heap_page *page;
 
-	TRACE(("kmalloc: asked to allocate size %d\n", size));
-	
+	TRACE(("memalign(alignment = %lu, size = %lu\n", alignment, size));
+
+#if DEBUG
+	if (!is_valid_alignment(alignment))
+		panic("memalign() with an alignment which is not a power of 2\n");
+#endif
+
 	if (!kernel_startup && !are_interrupts_enabled())
 		panic("malloc: called with interrupts disabled\n");
 
@@ -248,8 +324,20 @@ malloc(size_t size)
 
 #if USE_WALL
 	// The wall uses 4 bytes to store the actual length of the requested
-	// block, 8 bytes for the front wall, and 8 bytes for the back wall
-	size += 20;
+	// block, 4 bytes for the alignment offset, WALL_SIZE, and eventually
+	// a list_link in case USE_CHECKING_WALL is defined
+	if (alignment < WALL_MIN_ALIGN)
+		alignment = WALL_MIN_ALIGN;
+
+#if USE_CHECKING_WALL
+	size += sizeof(struct list_link);
+#endif
+	size += 2*WALL_SIZE + 8 + 2*alignment;
+#else
+	// ToDo: that code "aligns" the buffer because the bins are always
+	//	aligned on their bin size
+	if (size < alignment)
+		size = alignment;
 #endif
 
 	for (bin_index = 0; bin_index < bin_count; bin_index++)
@@ -259,7 +347,7 @@ malloc(size_t size)
 	if (bin_index == bin_count) {
 		// XXX fix the raw alloc later.
 		//address = raw_alloc(size, bin_index);
-		panic("malloc: asked to allocate too much for now!\n");
+		panic("malloc: asked to allocate too much for now (%lu bytes)!\n", size);
 		goto out;
 	} else {
 		if (bins[bin_index].free_list != NULL) {
@@ -278,12 +366,12 @@ malloc(size_t size)
 		}
 
 		bins[bin_index].alloc_count++;
-		page = &heap_alloc_table[((unsigned int)address - heap_base) / PAGE_SIZE];
+		page = &heap_alloc_table[((unsigned int)address - heap_base) / B_PAGE_SIZE];
 		page[0].free_count--;
 
 		TRACE(("kmalloc0: page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
-		for(i = 1; i < bins[bin_index].element_size / PAGE_SIZE; i++) {
+		for(i = 1; i < bins[bin_index].element_size / B_PAGE_SIZE; i++) {
 			page[i].free_count--;
 			TRACE(("kmalloc1: page 0x%x: bin_index %d, free_count %d\n", page[i], page[i].bin_index, page[i].free_count));
 		}
@@ -295,7 +383,7 @@ out:
 	TRACE(("kmalloc: asked to allocate size %d, returning ptr = %p\n", size, address));
 
 #if PARANOID_KMALLOC
-	memset(address, 0xCC, size);
+	memset(address, 0xcc, size);
 #endif
 
 #if PARANOID_POINTER_CHECK
@@ -304,14 +392,24 @@ out:
 
 #if USE_WALL
 	{
-		uint32 *wall = address;
-		size -= 20;
+		uint32 *wall = (uint32 *)((addr_t)address + alignment - WALL_SIZE - 8);
+#if USE_CECKING_WALL
+		struct list_link *link = (struct list_link)wall - 1;
+		
+		acquire_sem(sCheckWallLock);
+		list_add_link_to_tail(&sWalls, link);
+		list_remove_link(link);
+		release_sem(sCheckWallLock);
+		size -= sizeof(struct list_link);
+#endif
+		size -= 8 + 2*WALL_SIZE + 2*alignment;
 
-		wall[0] = size;
-		wall[1] = 0xabadcafe;
+		wall[0] = alignment;
+		wall[1] = size;
 		wall[2] = 0xabadcafe;
+		wall[3] = 0xabadcafe;
 
-		address = (uint8 *)address + 12;
+		address = (uint8 *)wall + 16;
 
 		wall = (uint32 *)((uint8 *)address + size);
 		wall[0] = 0xabadcafe;
@@ -320,6 +418,13 @@ out:
 #endif
 
 	return address;
+}
+
+
+void *
+malloc(size_t size)
+{
+	return memalign(0, size);
 }
 
 
@@ -336,21 +441,23 @@ free(void *address)
 	if (address == NULL)
 		return;
 
-	if ((addr)address < heap_base || (addr)address >= (heap_base + heap_size))
+	if ((addr_t)address < heap_base || (addr_t)address >= (heap_base + heap_size))
 		panic("free: asked to free invalid address %p\n", address);
 
 #if USE_WALL
 	{
-		uint32 *wall = (uint32 *)((uint8 *)address - 12);
-		uint32 size = wall[0];
-		if (wall[1] != 0xabadcafe || wall[2] != 0xabadcafe)
-			panic("free: front wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[1], wall[2]);
+		uint32 *wall = (uint32 *)((uint8 *)address - WALL_SIZE - 8);
+		uint32 alignOffset = wall[0];
 
-		wall = (uint32 *)((uint8 *)address + size);
-		if (wall[0] != 0xabadcafe || wall[1] != 0xabadcafe)
-			panic("free: back wall was overwritten (allocation at %p, %lu bytes): %08lx %08lx\n", address, size, wall[0], wall[1]);
+#if USE_CECKING_WALL
+		struct list_link *link = (struct list_link)wall - 1;
 
-		address = (uint8 *)address - 12;
+		acquire_sem(sCheckWallLock);
+		list_remove_link(link);
+		release_sem(sCheckWallLock);
+#endif
+		check_wall(address);
+		address = (uint8 *)address - alignOffset;
 	}
 #endif
 
@@ -363,7 +470,7 @@ free(void *address)
 
 	TRACE(("free(): asked to free at ptr = %p\n", address));
 
-	page = &heap_alloc_table[((unsigned)address - heap_base) / PAGE_SIZE];
+	page = &heap_alloc_table[((unsigned)address - heap_base) / B_PAGE_SIZE];
 
 	TRACE(("free(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 
@@ -372,7 +479,7 @@ free(void *address)
 
 	bin = &bins[page[0].bin_index];
 
-	if (bin->element_size <= PAGE_SIZE && (addr)address % bin->element_size != 0)
+	if (bin->element_size <= B_PAGE_SIZE && (addr_t)address % bin->element_size != 0)
 		panic("kfree: passed invalid pointer %p! Supposed to be in bin for esize 0x%x\n", address, bin->element_size);
 
 #if PARANOID_KFREE
@@ -388,7 +495,7 @@ free(void *address)
 	}
 #endif
 
-	for (i = 0; i < bin->element_size / PAGE_SIZE; i++) {
+	for (i = 0; i < bin->element_size / B_PAGE_SIZE; i++) {
 		if (page[i].bin_index != page[0].bin_index)
 			panic("free(): not all pages in allocation match bin_index\n");
 		page[i].free_count++;
@@ -431,7 +538,7 @@ realloc(void *address, size_t newSize)
 	if (!kernel_startup && !are_interrupts_enabled())
 		panic("realloc(): called with interrupts disabled\n");
 
-	if (address != NULL && ((addr)address < heap_base || (addr)address >= (heap_base + heap_size)))
+	if (address != NULL && ((addr_t)address < heap_base || (addr_t)address >= (heap_base + heap_size)))
 		panic("realloc(): asked to realloc invalid address %p\n", address);
 
 	if (newSize == 0) {
@@ -445,7 +552,7 @@ realloc(void *address, size_t newSize)
 		struct heap_page *page;
 
 		mutex_lock(&heap_lock);
-		page = &heap_alloc_table[((unsigned)address - heap_base) / PAGE_SIZE];
+		page = &heap_alloc_table[((unsigned)address - heap_base) / B_PAGE_SIZE];
 	
 		TRACE(("realloc(): page %p: bin_index %d, free_count %d\n", page, page->bin_index, page->free_count));
 	
@@ -488,14 +595,3 @@ calloc(size_t numElements, size_t size)
 	return address;
 }
 
-/*
-char *
-kstrdup(const char *text)
-{
-	char *buf = (char *)kmalloc(strlen(text) + 1);
-
-	if (buf != NULL)
-		strcpy(buf, text);
-	return buf;
-}
-*/
