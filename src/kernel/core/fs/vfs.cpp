@@ -1237,11 +1237,11 @@ get_new_fd(int type, struct vnode *vnode, fs_cookie cookie, int openMode, bool k
 
 
 //	#pragma mark -
-//	Functions the VFS exports for other parts of the kernel
+//	Public VFS API
 
 
-status_t
-vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
+extern "C" status_t
+new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 {
 	if (privateNode == NULL)
 		return B_BAD_VALUE;
@@ -1267,8 +1267,8 @@ vfs_new_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode privateNode)
 }
 
 
-status_t
-vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
+extern "C" status_t
+get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
 {
 	struct vnode *vnode;
 
@@ -1281,8 +1281,8 @@ vfs_get_vnode(mount_id mountID, vnode_id vnodeID, fs_vnode *_fsNode)
 }
 
 
-status_t
-vfs_put_vnode(mount_id mountID, vnode_id vnodeID)
+extern "C" status_t
+put_vnode(mount_id mountID, vnode_id vnodeID)
 {
 	struct vnode *vnode;
 
@@ -1295,6 +1295,26 @@ vfs_put_vnode(mount_id mountID, vnode_id vnodeID)
 
 	return B_OK;
 }
+
+
+extern "C" status_t
+remove_vnode(mount_id mountID, vnode_id vnodeID)
+{
+	struct vnode *vnode;
+
+	mutex_lock(&sVnodeMutex);
+
+	vnode = lookup_vnode(mountID, vnodeID);
+	if (vnode)
+		vnode->delete_me = true;
+
+	mutex_unlock(&sVnodeMutex);
+	return 0;
+}
+
+
+//	#pragma mark -
+//	Functions the VFS exports for other parts of the kernel
 
 
 void
@@ -1310,22 +1330,6 @@ vfs_vnode_release_ref(void *vnode)
 {
 	FUNCTION(("vfs_vnode_release_ref: vnode 0x%p\n", vnode));
 	dec_vnode_ref_count((struct vnode *)vnode, false);
-}
-
-
-status_t
-vfs_remove_vnode(mount_id mountID, vnode_id vnodeID)
-{
-	struct vnode *vnode;
-
-	mutex_lock(&sVnodeMutex);
-
-	vnode = lookup_vnode(mountID, vnodeID);
-	if (vnode)
-		vnode->delete_me = true;
-
-	mutex_unlock(&sVnodeMutex);
-	return 0;
 }
 
 
