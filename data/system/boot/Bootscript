@@ -65,6 +65,7 @@ runprog beos/bin/clockconfig
 # Launch servers
 
 # We must wait for the app_server and registrar to be ready
+launch $SERVERS/fake_app_server picasso
 #launch $SERVERS/app_server picasso			# launch app_server
 launch $SERVERS/registrar _roster_thread_	# launch registrar
 launch $SERVERS/debug_server				# launch debug_server
