@@ -42,6 +42,7 @@ class Painter {
 												alpha_function alphaFncMode);
 			void				SetPenLocation(const BPoint& location);
 			void				SetFont(const BFont& font);
+			void				SetFont(const ServerFont& font);
 
 								// BView API compatibility (for easier testing)
 			void				Sync() {}
@@ -142,6 +143,20 @@ class Painter {
 												const pattern& p = B_SOLID_HIGH) const;
 
 								// strings
+			void				DrawChar(		char aChar);
+
+			void				DrawChar(		char aChar,
+												BPoint baseLine);
+
+			void				DrawString(		const char* utf8String,
+												uint32 length,
+												const escapement_delta* delta = NULL);
+
+			void				DrawString(		const char* utf8String,
+												uint32 length,
+												BPoint baseLine,
+												const escapement_delta* delta = NULL);
+
 			void				DrawString(		const char* utf8String,
 												const escapement_delta* delta = NULL);
 
@@ -164,28 +179,13 @@ class Painter {
 
 			void				InvertRect(		const BRect& r) const;
 
-			// MISSING:
+			// MISSING (?):
 /*
 
 
 								// "screen blits"
 			void				CopyBits(		BRect src, BRect dst);
-
-
-								// more string support
-			void				DrawChar(		char aChar);
-
-			void				DrawChar(		char aChar,
-												BPoint location);
-
-			void				DrawString(		const char* string,
-												int32 length,
-												const escapement_delta* delta = NULL);
-
-			void				DrawString(		const char* string,
-												int32 length,
-												BPoint location,
-												const escapement_delta* delta = 0L);*/
+*/
 
 
  private:
