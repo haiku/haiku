@@ -11,7 +11,6 @@
 
 
 extern int main(int argc, char **argv);
-extern void _thread_do_exit_notification(void);
 
 int _start(int argc, char **argv, char **, struct uspace_program_args *);
 
@@ -33,9 +32,6 @@ _start(int argc, char **argv, char **_environ, struct uspace_program_args *args)
 	environ = args->envp;
 
 	retcode = main(args->argc, args->argv);
-
-	_thread_do_exit_notification();
-		// ToDo: must also (only) be called in exit()!
 
 	exit(retcode);
 	return 0;
