@@ -1,7 +1,7 @@
 #ifndef _mpp_dec_h_
 #define _mpp_dec_h_
 
-#include <sys/types.h>
+#include <DataIO.h>
 
 #ifndef _in_mpc_h_
 class StreamInfo;
@@ -56,11 +56,11 @@ public:
 
 class MPC_decoder {
 private:
-  Reader *m_reader;
+  BPositionIO *m_reader;
 
 public:
-  MPC_decoder ( Reader *r );
-  ~MPC_decoder ();
+  MPC_decoder(BPositionIO *r);
+  ~MPC_decoder();
 
   void SetStreamInfo ( StreamInfo *si );
   int FileInit ();
@@ -231,8 +231,8 @@ private: // functions
   void Resort_HuffTables ( const unsigned int elements, HuffmanTyp* Table, const int offset );
 
 private:
-  _inline int f_read ( void *ptr, size_t size) { return m_reader->read (ptr, size); };
-  _inline int f_seek ( int offset, int origin) { return m_reader->seek (offset, origin); };
+  _inline int f_read(void *ptr, size_t size) { return m_reader->Read(ptr, size); };
+  _inline int f_seek(int offset, int origin) { return m_reader->Seek(offset, origin); };
 };
 
 #endif

@@ -899,9 +899,9 @@ MPC_decoder::~MPC_decoder ()
 	// ^^ breaks wa3
 }
 
-MPC_decoder::MPC_decoder ( Reader *r )
+MPC_decoder::MPC_decoder(BPositionIO *file)
 {
-  m_reader = r;
+  m_reader = file;
 
   HuffQ[0][0] = 0;
   HuffQ[1][0] = 0;
