@@ -265,7 +265,8 @@ MIMEManager::MessageReceived(BMessage *message)
 		}
 		
 		default:
-			printf("MIMEMan: msg->what == %.4s\n", (char*)&(message->what));
+			printf("MIMEMan: msg->what == %lx (%.4s)\n", message->what,
+				(char*)&(message->what));
 			BLooper::MessageReceived(message);
 			break;
 	}
