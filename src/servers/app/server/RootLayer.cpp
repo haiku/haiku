@@ -48,6 +48,7 @@
 #include "FMWList.h"
 #include "DisplayDriver.h"
 #include "ServerProtocol.h"
+#include "Decorator.h"
 
 //#define DEBUG_ROOTLAYER
 
@@ -74,6 +75,8 @@ RootLayer::RootLayer(const char *name, int32 workspaceCount,
 	SetWorkspaceCount(workspaceCount);
 	SetActiveWorkspace(0L);
 
+	fMovingWindow		= false;
+	fResizingWindow		= false;
 	fMouseTarget		= NULL;
 	fDragMessage		= NULL;
 	fScreenShotIndex	= 1;
@@ -881,19 +884,52 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<int32>(&evt.buttons);
 			msg.Read<int32>(&evt.clicks);
 			
-			// We'll need this so that GetMouse can query for which buttons
-			// are down.
-			fButtons=evt.buttons;
-			
-			// printf("MOUSE DOWN: at (%f, %f)\n", evt.where.x, evt.where.y);
 			WinBorder	*target = WinBorderAt(evt.where);
 			if (target)
 			{
-				target->Window()->Lock();
-				target->MouseDown(evt, true);
-				target->Window()->Unlock();
+				click_type		action;
+				bool			invalidate;
+				bool			sendMessage = true;
+
+				action			= target->TellWhat(evt);
+
+				if (action == DEC_MOVETOBACK)
+					invalidate		= ActiveWorkspace()->MoveToBack(target);
+				else
+					invalidate		= ActiveWorkspace()->MoveToFront(target);
+				
+				if (invalidate)
+				{
+					BRegion		reg(target->fFull);
+					reg.Include(&target->fTopLayer->fFull);
+					invalidate_layer(this, reg);
+
+					if (!(target->Window()->Flags() & B_WILL_ACCEPT_FIRST_CLICK))
+						sendMessage = false;
+				}
+
+				if (action == DEC_DRAG)
+				{
+					fMovingWindow = true;
+				}
+				else if (action == DEC_RESIZE)
+				{
+					fResizingWindow = true;
+				}
+				else
+				{
+					target->Window()->Lock();
+					target->MouseDown(evt, sendMessage);
+					target->Window()->Unlock();
+				}
+
 				fMouseTarget = target;
 			}
+
+			// We'll need this so that GetMouse can query for which buttons
+			// are down.
+			fButtons=evt.buttons;
+
 			break;
 		}
 		case B_MOUSE_UP:
@@ -911,14 +947,18 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 			msg.Read<float>(&evt.where.y);
 			msg.Read<int32>(&evt.modifiers);
 
-			fMouseTarget = NULL;
-			WinBorder	*target = WinBorderAt(evt.where);
-			if (target)
+			// currently mouse up goes to the same window which received mouse down
+			if (fMouseTarget)
 			{
-				target->Window()->Lock();
-				target->MouseUp(evt);
-				target->Window()->Unlock();
+				fMouseTarget->Window()->Lock();
+				fMouseTarget->MouseUp(evt);
+				fMouseTarget->Window()->Unlock();
+				fMouseTarget = NULL;
 			}
+
+			fMovingWindow	= false;
+			fResizingWindow	= false;
+
 			STRACE(("MOUSE UP: at (%f, %f)\n", evt.where.x, evt.where.y));
 
 			break;
@@ -940,13 +980,44 @@ void RootLayer::MouseEventHandler(int32 code, BPortLink& msg)
 
 			GetDisplayDriver()->MoveCursorTo(evt.where.x, evt.where.y);
 
-			WinBorder	*target = WinBorderAt(evt.where);
-			if (target)
+			if (fMouseTarget)
 			{
-				target->Window()->Lock();
-				target->MouseMoved(evt);
-				target->Window()->Unlock();
+				BPoint		pt = evt.where;
+				pt			-= fLastMousePossition;
+
+				if (fMovingWindow)
+				{
+					if(fMouseTarget->fDecorator)
+						fMouseTarget->fDecorator->MoveBy(pt.x, pt.y);
+
+					fMouseTarget->move_layer(pt.x, pt.y);
+				}
+				else if (fResizingWindow)
+				{
+					if(fMouseTarget->fDecorator)
+						fMouseTarget->fDecorator->ResizeBy(pt.x, pt.y);
+
+					fMouseTarget->resize_layer(pt.x, pt.y);
+				}
+				else
+				{
+					fMouseTarget->Window()->Lock();
+					fMouseTarget->MouseMoved(evt);
+					fMouseTarget->Window()->Unlock();
+				}
 			}
+			else
+			{
+				WinBorder	*target = WinBorderAt(evt.where);
+				if (target)
+				{
+					target->Window()->Lock();
+					target->MouseMoved(evt);
+					target->Window()->Unlock();
+				}
+			}
+
+			fLastMousePossition = evt.where;
 
 			break;
 		}

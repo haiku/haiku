@@ -155,6 +155,9 @@ friend class Desktop;
 	int32 fScreenYResolution;
 	uint32 fColorSpace;
 	int32 fButtons;
+	BPoint			fLastMousePossition;
+	bool			fMovingWindow;
+	bool			fResizingWindow;
 	
 	int32			fActiveWksIndex;
 	int32			fWsCount;

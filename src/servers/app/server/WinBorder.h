@@ -32,6 +32,7 @@
 #include <String.h>
 #include "Layer.h"
 #include "FMWList.h"
+#include "Decorator.h"
 
 // these are used by window manager to properly place window.
 enum {
@@ -80,6 +81,7 @@ public:
 
 	void SetSizeLimits(float minwidth, float maxwidth, float minheight, float maxheight);
 
+	click_type TellWhat(PointerEvent& evt) const;
 	void MouseDown(PointerEvent& evt, bool sendMessage);
 	void MouseMoved(PointerEvent& evt);
 	void MouseUp(PointerEvent& evt);
@@ -114,8 +116,6 @@ protected:
 	int32 fKeyModifiers;
 	BPoint fLastMousePosition;
 
-	bool fIsMoving;
-	bool fIsResizing;
 	bool fIsClosing;
 	bool fIsMinimizing;
 	bool fIsZooming;

@@ -93,8 +93,6 @@ WinBorder::WinBorder(const BRect &r, const char *name, const int32 look, const i
 	fAdFlags		= fAdFlags | B_LAYER_CHILDREN_DEPENDANT;
 	fFlags			= B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE;
 
-	fIsMoving		= false;
-	fIsResizing		= false;
 	fIsClosing		= false;
 	fIsMinimizing	= false;
 	fIsZooming		= false;
@@ -142,6 +140,16 @@ void WinBorder::RebuildFullRegion(void)
 	// Winborder holds Decorator's full regions. if any...
 	if (fDecorator)
 		fDecorator->GetFootprint(&fFull);
+}
+
+click_type WinBorder::TellWhat(PointerEvent& evt) const
+{
+	if (fTopLayer->fFullVisible.Contains(evt.where))
+		return DEC_NONE;
+	else if (fDecorator)
+		return fDecorator->Clicked(evt.where, evt.buttons, evt.modifiers);
+	else
+		return DEC_NONE;
 }
 
 /*!
@@ -197,20 +205,10 @@ void WinBorder::MouseDown(PointerEvent& evt, bool sendMessage)
 				break;
 			}
 			case DEC_RESIZE:
-			{
-				fIsResizing = true;
-				STRACE_CLICK(("===> DEC_RESIZE\n"));
-				break;
-			}
 			case DEC_DRAG:
-			{
-				fIsMoving = true;
-				STRACE_CLICK(("===> DEC_DRAG\n"));
-				break;
-			}
 			case DEC_MOVETOBACK:
 			{
-				GetRootLayer()->ActiveWorkspace()->MoveToBack(this);
+				// do nothing - RootLayer takes care of that
 				break;
 			}
 			case DEC_NONE:
@@ -254,43 +252,25 @@ void WinBorder::MouseMoved(PointerEvent& evt)
 	if (!(Window()->IsLocked()))
 		debugger("you must lock the attached ServerWindow object\n\t before calling WinBorder::MouseMoved()\n");
 
-	if (fIsMoving)
-	{
-		STRACE_CLICK(("===> Moving...\n"));
-		BPoint		offset = evt.where;
-		offset		-= fLastMousePosition;
-		MoveBy(offset.x, offset.y);
-	}
-	else
-	if (fIsResizing)
-	{
-		STRACE_CLICK(("===> Resizing...\n"));
-		BPoint		offset = evt.where;
-		offset		-= fLastMousePosition;
-		ResizeBy(offset.x, offset.y);
-	}
-	else
-	{
-		// Do a click test only if we have to, which would be now. :)
-		click_type location=fDecorator->Clicked(evt.where, evt.buttons,fKeyModifiers);
+	// Do a click test only if we have to, which would be now. :)
+	click_type location=fDecorator->Clicked(evt.where, evt.buttons,fKeyModifiers);
 		
-		if (fIsZooming && location!=DEC_ZOOM)
-		{
-			fDecorator->SetZoom(false);
-			fDecorator->DrawZoom();
-		}
-		else
-		if (fIsClosing && location!=DEC_CLOSE)
-		{
-			fDecorator->SetClose(false);
-			fDecorator->DrawClose();
-		}
-		else
-		if(fIsMinimizing && location!=DEC_MINIMIZE)
-		{
-			fDecorator->SetMinimize(false);
-			fDecorator->DrawMinimize();
-		}
+	if (fIsZooming && location!=DEC_ZOOM)
+	{
+		fDecorator->SetZoom(false);
+		fDecorator->DrawZoom();
+	}
+	else
+	if (fIsClosing && location!=DEC_CLOSE)
+	{
+		fDecorator->SetClose(false);
+		fDecorator->DrawClose();
+	}
+	else
+	if(fIsMinimizing && location!=DEC_MINIMIZE)
+	{
+		fDecorator->SetMinimize(false);
+		fDecorator->DrawMinimize();
 	}
 
 	if (fTopLayer->fFullVisible.Contains(evt.where))
@@ -323,18 +303,6 @@ void WinBorder::MouseUp(PointerEvent& evt)
 
 	// find out where user clicked in Decorator
 	action = fDecorator->Clicked(evt.where, evt.buttons, evt.modifiers);
-	
-	if(fIsMoving)
-	{
-		fIsMoving	= false;
-		return;
-	}
-	
-	if (fIsResizing)
-	{
-		fIsResizing	= false;
-		return;
-	}
 	
 	if (fIsZooming)
 	{
