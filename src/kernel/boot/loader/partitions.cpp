@@ -227,7 +227,7 @@ Partition::Scan(bool mountFileSystems)
 			// now that we've found something, check our children
 			// out as well!
 
-			NodeIterator iterator = fChildren.Iterator();
+			NodeIterator iterator = fChildren.GetIterator();
 			Partition *child = NULL;
 
 			while ((child = (Partition *)iterator.Next()) != NULL) {
@@ -245,8 +245,10 @@ Partition::Scan(bool mountFileSystems)
 
 			// remove all unused children (we keep only file systems)
 
-			while ((child = (Partition *)fChildren.RemoveHead()) != NULL)
+			while ((child = (Partition *)fChildren.Head()) != NULL) {
+				fChildren.Remove(child);
 				delete child;
+			}
 
 			// remember the module name that identified us
 			fModuleName = module->module.name;
@@ -290,7 +292,7 @@ add_partitions_for(int fd, bool mountFileSystems)
 
 	// if not, we'll need to tell the children that their parent is gone
 
-	NodeIterator iterator = gPartitions.Iterator();
+	NodeIterator iterator = gPartitions.GetIterator();
 	Partition *child = NULL;
 
 	while ((child = (Partition *)iterator.Next()) != NULL) {

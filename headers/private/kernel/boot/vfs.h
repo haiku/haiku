@@ -16,7 +16,7 @@
 
 /** This is the base class for all VFS nodes */
 
-class Node {
+class Node : public DoublyLinkedListLinkImpl<Node> {
 	public:
 		Node();
 		virtual ~Node();
@@ -35,14 +35,12 @@ class Node {
 		status_t Acquire();
 		status_t Release();
 
-		DoublyLinked::Link	fLink;
-
 	protected:
 		int32		fRefCount;
 };
 
-typedef DoublyLinked::List<Node> NodeList;
-typedef DoublyLinked::Iterator<Node> NodeIterator;
+typedef DoublyLinkedList<Node> NodeList;
+typedef NodeList::Iterator NodeIterator;
 
 
 class Directory : public Node {

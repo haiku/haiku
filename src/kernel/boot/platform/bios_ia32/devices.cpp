@@ -442,7 +442,7 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 
 	dprintf("boot partition offset: %Ld\n", offset);
 
-	NodeIterator iterator = list->Iterator();
+	NodeIterator iterator = list->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
 		dprintf("partition offset = %Ld, size = %Ld\n", partition->offset, partition->size);

@@ -68,7 +68,6 @@ Node::Node()
 	:
 	fRefCount(1)
 {
-	fLink.next = fLink.prev = NULL;
 }
 
 
@@ -366,7 +365,7 @@ status_t
 mount_file_systems(stage2_args *args)
 {
 	// mount other partitions on boot device (if any)
-	NodeIterator iterator = gPartitions.Iterator();
+	NodeIterator iterator = gPartitions.GetIterator();
 
 	Partition *partition = NULL;
 	while ((partition = (Partition *)iterator.Next()) != NULL) {
@@ -387,7 +386,7 @@ mount_file_systems(stage2_args *args)
 	if (status < B_OK)
 		return status;
 
-	iterator = gBootDevices.Iterator();
+	iterator = gBootDevices.GetIterator();
 	Node *device = NULL, *last = NULL;
 	while ((device = iterator.Next()) != NULL) {
 		// don't scan former boot device again
