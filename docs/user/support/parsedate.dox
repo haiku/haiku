@@ -1,4 +1,6 @@
 /** \file parsedate.h
+\brief date parsing functions
+
 This is a set a functions for parsing date strings in various formats.
 It's mostly tailored for parsing user given data, although originally,
 it was developed to parse the date strings found in usenet messages.
@@ -101,21 +103,23 @@ For example, this may happen if there are some unknown words in that string.
 */
 
 /** \fn time_t parsedate(const char *dateString, time_t relativeTo)
-\brief Parses \p dateString relative to \p relativeTo
+\brief Parses <span class="var">dateString</span> relative to <span class="var">relativeTo</span>
 
-Parses the given \p dateString relative to the time specified by \p relativeTo 
-using the internal formats table.
+Parses the given <span class="var">dateString</span> relative to the time 
+specified by <span class="var">relativeTo</span> using the internal formats 
+table.
 
 \param dateString the date that should be parsed, i.e. "next thursday"
 \param relativeTo all relative dates will be relative to this time, if -1 is passed, the current time will be used
-\return the parsed time value or -1 if the \p dateString could not be parsed.
+\return the parsed time value or -1 if the <span class="var">dateString</span> 
+could not be parsed.
 */
 
 /** \fn time_t parsedate_etc(const char *dateString, time_t relativeTo, int *_storedFlags) 
-\brief Parses \p dateString relative to \p relativeTo
+\brief Parses <span class="var">dateString</span> relative to <span class="var">relativeTo</span>
 
 This does basically the same as parsedate(), but will set the following 
-flags in \p _storedFlags:
+flags in <span class="var">_storedFlags</span>:
 \htmlonly
 	<table border=1>
 <!-- ToDo: this certainly is a hack -->
@@ -142,7 +146,7 @@ flags in \p _storedFlags:
 \brief sets the internal format table for parsedate()
 
 This function let you set the format table which is used by parsedate().
-When \c formatTable is NULL, the standard built-in format table will be set again.
+When <span class="var">formatTable</span> is NULL, the standard built-in format table will be set again.
 \param formatTable the NULL terminated formats list. This list must stay
 	valid when using parsedate() - it is not copied, but directly used.
 \see 
