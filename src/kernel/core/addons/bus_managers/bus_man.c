@@ -10,7 +10,7 @@
 #include <vfs.h>
 #include <bus.h>
 #include <string.h>
-#include <Errors.h>
+#include <errno.h>
 #include <fd.h>
 #include <sys/stat.h>
 
@@ -56,13 +56,13 @@ int bus_register_bus(const char *path)
 	if(!find_bus(path)) {
 		b = (bus *)kmalloc(sizeof(bus));
 		if(b == NULL) {
-			err = ERR_NO_MEMORY;
+			err = ENOMEM;
 			goto err;
 		}
 
 		b->path = kmalloc(strlen(path)+1);
 		if(b->path == NULL) {
-			err = ERR_NO_MEMORY;
+			err = ENOMEM;
 			kfree(b);
 			goto err;
 		}
@@ -71,7 +71,7 @@ int bus_register_bus(const char *path)
 		b->next = bus_list;
 		bus_list = b;
 	} else {
-		err = ERR_NOT_FOUND;
+		err = ENODEV;
 	}
 
 	err = 0;
@@ -134,7 +134,7 @@ static int bus_find_device_recurse(int *n, char *base_path, int base_fd, id_list
 			sys_close(fd);
 		}
 	}
-	return ERR_NOT_FOUND;
+	return ENODEV;
 }
 
 int bus_find_device(int n, id_list *vendor_ids, id_list *device_ids, device *dev)
