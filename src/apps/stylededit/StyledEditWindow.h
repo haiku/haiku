@@ -22,8 +22,10 @@ public:
 	virtual void	Quit();
 	virtual bool 	QuitRequested();
 	virtual void 	MessageReceived(BMessage *message);
+	virtual void	MenusBeginning();
 	
 	status_t 		Save(BMessage *message);
+	status_t		SaveAs();
 	void			OpenFile(entry_ref *ref); 
 	status_t		PageSetup(const char *documentname);
 	void			Print(const char *documentname);
@@ -43,6 +45,7 @@ private:
 	BMenuBar		*fMenuBar;
 	BMessage		*fPrintSettings;
 	BMessage		*fSaveMessage; 
+	BMenu			*fRecentMenu;
 	BMenuItem		*fSaveItem;
 	BMenuItem		*fRevertItem;
 	BMenuItem		*fUndoItem;

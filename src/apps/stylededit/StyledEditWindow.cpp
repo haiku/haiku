@@ -8,6 +8,7 @@
 #include <Menu.h>
 #include <MenuItem.h>
 #include <PrintJob.h>
+#include <Roster.h>
 #include <ScrollView.h>
 #include <stdlib.h>
 #include <String.h>
@@ -120,7 +121,7 @@ StyledEditWindow::InitWindow()
 	menu->AddItem(menuItem= new BMenuItem("New", new BMessage(MENU_NEW), 'N'));
 	menuItem->SetTarget(be_app);
 	
-	menu->AddItem(menuItem= new BMenuItem(new BMenu("Open..."), new BMessage(MENU_OPEN)));
+	menu->AddItem(menuItem= new BMenuItem(fRecentMenu= new BMenu("Open..."), new BMessage(MENU_OPEN)));
 	menuItem->SetShortcut('O',0);
 	menuItem->SetTarget(be_app);
 	menu->AddSeparatorItem(); 
@@ -281,16 +282,15 @@ StyledEditWindow::MessageReceived(BMessage *message)
 {
 	switch(message->what){
 /************file menu:***************/
-		case MENU_SAVE:
-			{
+		case MENU_SAVE: {
 			if(!fSaveMessage)
-				fSavePanel->Show();
+				SaveAs();
 			else
 				Save(fSaveMessage);
-			}
+		}
 		break;		
 		case MENU_SAVEAS:
-			fSavePanel->Show();
+			SaveAs();
 		break;
 		case B_SAVE_REQUESTED:
 			Save(message);
@@ -298,7 +298,7 @@ StyledEditWindow::MessageReceived(BMessage *message)
 		case MENU_REVERT:
 			RevertToSaved();
 		break;
-		case MENU_CLOSE:{
+		case MENU_CLOSE: {
 			if(this->QuitRequested()) {
 				BAutolock lock(this);
 				Quit();
@@ -531,6 +531,31 @@ StyledEditWindow::MessageReceived(BMessage *message)
 	}
 }/***StyledEditWindow::MessageReceived() ***/
 
+void
+StyledEditWindow::MenusBeginning()
+{
+	BMessage documents;
+	be_roster->GetRecentDocuments(&documents,9,NULL,APP_SIGNATURE);
+	// delete old items.. 
+	//    shatty: it would be preferable to keep the old
+	//            menu around instead of continuously thrashing
+	//            the menu, but unfortunately there does not
+	//            seem to be a straightforward way to update it
+	// going backwards may simplify memory management
+	for (int i = fRecentMenu->CountItems()-1 ; (i >= 0) ; i--) {
+		delete fRecentMenu->RemoveItem(i);
+	}
+	// add new items
+	int count = 0;
+	entry_ref ref;
+	while (documents.FindRef("refs",count++,&ref) == B_OK) {
+		BMessage * openRecent = new BMessage(B_REFS_RECEIVED);
+		openRecent->AddRef("refs",&ref);
+		BMenuItem * item = new BMenuItem(ref.name,openRecent);
+		item->SetTarget(be_app);
+		fRecentMenu->AddItem(item);
+	}
+}
 
 void
 StyledEditWindow::Quit()
@@ -573,8 +598,6 @@ StyledEditWindow::QuitRequested()
 status_t
 StyledEditWindow::Save(BMessage *message)
 {
-	entry_ref ref;
-	const char *name;
 	status_t err;
 	
 	if(!message){
@@ -583,37 +606,46 @@ StyledEditWindow::Save(BMessage *message)
 			return B_ERROR;
 	}
 	
-	err= message->FindRef("directory", &ref); 
+	entry_ref dirref;
+	err= message->FindRef("directory", &dirref); 
 	if(err!= B_OK)
 		return err;
 	
+	const char *name;
 	err=message->FindString("name", &name); 
 	if (err!= B_OK)
 		return err;
 		
-	BDirectory dir(&ref);
+	BDirectory dir(&dirref);
 	err= dir.InitCheck();
 	if(err!= B_OK)
 		return err;
+		
+	BEntry entry(&dir, name);
+	err= entry.InitCheck();
+	if(err!= B_OK)
+		return err;
 	
-	BFile file(&dir, name, B_READ_WRITE | B_CREATE_FILE);
-	
+	BFile file(&entry, B_READ_WRITE | B_CREATE_FILE);
 	err= file.InitCheck();
 	if(err!= B_OK)
 		return err;
 	
 	err= BTranslationUtils::WriteStyledEditFile(fTextView, &file);
-	
-	if(err>= 0)
+	if(err != B_OK)
+		return err;
+
+	SetTitle(name);
+	if(fSaveMessage!= message)
 	{
-		SetTitle(name);
-		fSaveItem->SetEnabled(true);
-		if(fSaveMessage!= message)
-		{
-			delete fSaveMessage;
-			fSaveMessage= new BMessage(*message);
-		}
+		delete fSaveMessage;
+		fSaveMessage= new BMessage(*message);
 	}
+
+	entry_ref ref;
+	if (entry.GetRef(&ref) == B_OK) {
+		be_roster->AddToRecentDocuments(&ref,APP_SIGNATURE);
+	}	
 	
 	// clear clean modes
 	fSaveItem->SetEnabled(false); 
@@ -624,6 +656,22 @@ StyledEditWindow::Save(BMessage *message)
 	return err;						
 } /***Save()***/
 
+#include <TextControl.h>
+#include <Autolock.h>
+
+status_t
+StyledEditWindow::SaveAs()
+{
+	BWindow * saveWindow = fSavePanel->Window();
+	BTextControl * textView = 
+	   dynamic_cast<BTextControl*>(saveWindow->FindView("text view"));
+	if (textView) {
+		BAutolock lock(saveWindow);
+		textView->SetText(Title());
+	}
+	fSavePanel->Show();
+}
+
 void
 StyledEditWindow::OpenFile(entry_ref *ref)
 {
@@ -632,11 +680,12 @@ StyledEditWindow::OpenFile(entry_ref *ref)
 	
 	fileinit= file.SetTo(ref, B_READ_ONLY);
 	
-	if(fileinit== B_OK){
+	if (fileinit == B_OK){
 		status_t result;
 		result = fTextView->GetStyledText(&file); //he he he :)
 		
-		if(result==B_OK){
+		if (result == B_OK) {
+			be_roster->AddToRecentDocuments(ref,APP_SIGNATURE);
 			fSaveMessage= new BMessage(B_SAVE_REQUESTED);
 			if(fSaveMessage){
 				BEntry entry(ref, true);
@@ -667,12 +716,12 @@ StyledEditWindow::RevertToSaved()
 	alertText.SetTo("Revert to the last version of \"");
 	alertText<< Title();
 	alertText<<"\"? ";
-	revertAlert= new BAlert("revertAlert",alertText.String(), "Cancel", "Ok", 0,
+	revertAlert= new BAlert("revertAlert",alertText.String(), "Cancel", "OK", 0,
 		B_WIDTH_AS_USUAL, B_EVEN_SPACING, B_WARNING_ALERT);
 	revertAlert->SetShortcut(0, B_ESCAPE);
 	buttonIndex= revertAlert->Go();
 	
-	if (buttonIndex!=2) { 		// some sort of cancel, don't revert
+	if (buttonIndex!=1) { 		// some sort of cancel, don't revert
 		return;
 	} 
 				
