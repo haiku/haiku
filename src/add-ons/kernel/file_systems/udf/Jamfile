@@ -29,9 +29,11 @@ R5KernelAddon udf : [ FDirName kernel file_systems udf ] :
 	cpp.cpp
 	vfs_interface.cpp
 
-	UdfDebug.cpp
+	CS0String.cpp
 	DiskStructures.cpp
+	Icb.cpp
 	PartitionMap.cpp
+	UdfDebug.cpp
 	Volume.cpp
 ;
 
