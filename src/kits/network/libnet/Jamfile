@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits net libnet ;
+SubDir OBOS_TOP src kits network libnet ;
 
 UsePrivateHeaders net ;
 

@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers net sis900 ;
+SubDir OBOS_TOP src add-ons kernel drivers network sis900 ;
 
 # set some additional defines
 {
@@ -12,7 +12,7 @@ SubDir OBOS_TOP src add-ons kernel drivers net sis900 ;
 	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
 }
 
-R5KernelAddon sis900 : [ FDirName kernel drivers net ] :
+R5KernelAddon sis900 : [ FDirName kernel drivers network ] :
 	driver.c
 	device.c
 	interface.c

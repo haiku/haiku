@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src kits net libnetapi ;
+SubDir OBOS_TOP src kits network libnetapi ;
 
 UsePrivateHeaders net ;
 

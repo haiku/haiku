@@ -431,10 +431,9 @@ KernelFloppyImage $(OBOS_FLOPPY) : $(OBOS_KERNEL) : $(SUBDIR)/boot/arch/$(OBOS_A
 Depends floppy : $(OBOS_FLOPPY) ;
 NotFile floppy ;
 
+SubInclude OBOS_TOP src kernel apps ;
 SubInclude OBOS_TOP src kernel boot ;
 SubInclude OBOS_TOP src kernel core ;
 SubInclude OBOS_TOP src kernel drivers ;
-SubInclude OBOS_TOP src kernel global ;
 SubInclude OBOS_TOP src kernel glue ;
-SubInclude OBOS_TOP src kernel apps ;
 SubInclude OBOS_TOP src kernel libroot ;

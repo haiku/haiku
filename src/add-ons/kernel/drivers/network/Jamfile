@@ -1,4 +1,4 @@
-SubDir OBOS_TOP src add-ons kernel drivers net ;
+SubDir OBOS_TOP src add-ons kernel drivers network ;
 
-SubInclude OBOS_TOP src add-ons kernel drivers net stack ;
-SubInclude OBOS_TOP src add-ons kernel drivers net sis900 ;
+SubInclude OBOS_TOP src add-ons kernel drivers network sis900 ;
+SubInclude OBOS_TOP src add-ons kernel drivers network stack ;
