@@ -28,6 +28,8 @@
 #	define TRACE(x) ;
 #endif
 
+#define SCRUB_SIZE 16
+	// this many pages will be cleared at once in the page scrubber thread
 
 typedef struct page_queue {
 	vm_page *head;
@@ -272,11 +274,12 @@ vm_page_init(kernel_args *ka)
 status_t
 vm_page_init_post_area(kernel_args *args)
 {
-	void *null;
+	void *dummy;
 
-	null = all_pages;
-	vm_create_anonymous_region(vm_get_kernel_aspace_id(), "page_structures", &null, B_EXACT_ADDRESS,
-		PAGE_ALIGN(num_pages * sizeof(vm_page)), B_ALREADY_WIRED, B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
+	dummy = all_pages;
+	create_area("page structures", &dummy, B_EXACT_ADDRESS,
+		PAGE_ALIGN(num_pages * sizeof(vm_page)), B_ALREADY_WIRED,
+		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 
 	add_debugger_command("page_stats", &dump_page_stats, "Dump statistics about page usage");
 	add_debugger_command("free_pages", &dump_free_page_table, "Dump list of free pages");
@@ -294,7 +297,7 @@ vm_page_init_post_thread(kernel_args *args)
 
 	// create a kernel thread to clear out pages
 	thread = spawn_kernel_thread(&page_scrubber, "page scrubber", B_LOWEST_ACTIVE_PRIORITY, NULL);
-	resume_thread(thread);
+	send_signal_etc(thread, SIGCONT, B_DO_NOT_RESCHEDULE);
 
 	modified_pages_available = create_sem(0, "modified_pages_avail_sem");
 #if 0
@@ -306,15 +309,15 @@ vm_page_init_post_thread(kernel_args *args)
 }
 
 
+/**	This is a background thread that wakes up every now and then (every 100ms)
+ *	and moves some pages from the free queue over to the clear queue.
+ *	Given enough time, it will clear out all pages from the free queue - we
+ *	could probably slow it down after having reached a certain threshold.
+ */
+
 static int32
 page_scrubber(void *unused)
 {
-#define SCRUB_SIZE 16
-	int state;
-	vm_page *page[SCRUB_SIZE];
-	int i;
-	int scrub_count;
-
 	(void)(unused);
 
 	TRACE(("page_scrubber starting...\n"));
@@ -323,6 +326,12 @@ page_scrubber(void *unused)
 		snooze(100000); // 100ms
 
 		if (page_free_queue.count > 0) {
+			cpu_status state;
+			vm_page *page[SCRUB_SIZE];
+			int32 i, scrubCount;
+
+			// get some pages from the free queue
+
 			state = disable_interrupts();
 			acquire_spinlock(&page_lock);
 
@@ -335,16 +344,20 @@ page_scrubber(void *unused)
 			release_spinlock(&page_lock);
 			restore_interrupts(state);
 
-			scrub_count = i;
+			// clear them
 
-			for (i = 0; i < scrub_count; i++) {
+			scrubCount = i;
+
+			for (i = 0; i < scrubCount; i++) {
 				clear_page(page[i]->ppn * B_PAGE_SIZE);
 			}
 
 			state = disable_interrupts();
 			acquire_spinlock(&page_lock);
 
-			for (i = 0; i < scrub_count; i++) {
+			// and put them into the clear queue
+
+			for (i = 0; i < scrubCount; i++) {
 				page[i]->state = PAGE_STATE_CLEAR;
 				enqueue_page(&page_clear_queue, page[i]);
 			}
@@ -504,10 +517,20 @@ vm_page_allocate_page(int page_state)
 
 	p = dequeue_page(q);
 	if (p == NULL) {
+#ifdef DEBUG
+		if (q->count != 0)
+			panic("queue %p corrupted, count = %ld\n", q, q->count);
+#endif
+
 		// if the primary queue was empty, grap the page from the
 		// secondary queue
 		p = dequeue_page(q_other);
 		if (p == NULL) {
+#ifdef DEBUG
+			if (q_other->count != 0)
+				panic("other queue %p corrupted, count = %ld\n", q_other, q_other->count);
+#endif
+
 			// ToDo: issue "someone" to free up some pages for us, and go into wait state until that's done
 			panic("vm_allocate_page: out of memory! page state = %d\n", page_state);
 		}
@@ -708,15 +731,25 @@ dump_page_queue(int argc, char **argv)
 {
 	struct page_queue *queue;
 
-	if (argc < 2
-		|| strlen(argv[1]) <= 2
-		|| argv[1][0] != '0'
-		|| argv[1][1] != 'x') {
-		dprintf("usage: page_queue <address> [list]\n");
+	if (argc < 2) {
+		dprintf("usage: page_queue <address/name> [list]\n");
 		return 0;
 	}
 
-	queue = (struct page_queue *)(atoul(argv[1]));
+	if (strlen(argv[1]) >= 2 && argv[1][0] == '0' && argv[1][1] == 'x')
+		queue = (struct page_queue *)strtoul(argv[1], NULL, 16);
+	if (!strcmp(argv[1], "free"))
+		queue = &page_free_queue;
+	else if (!strcmp(argv[1], "clear"))
+		queue = &page_clear_queue;
+	else if (!strcmp(argv[1], "modified"))
+		queue = &page_modified_queue;
+	else if (!strcmp(argv[1], "active"))
+		queue = &page_active_queue;
+	else {
+		dprintf("page_queue: unknown queue \"%s\".\n", argv[1]);
+		return 0;
+	}
 
 	dprintf("queue->head = %p, queue->tail = %p, queue->count = %d\n", queue->head, queue->tail, queue->count);
 
@@ -735,20 +768,24 @@ dump_page_queue(int argc, char **argv)
 static int
 dump_page_stats(int argc, char **argv)
 {
-	unsigned int page_types[8];
+	uint32 counter[8];
+	int32 totalActive;
 	addr_t i;
 
-	memset(page_types, 0, sizeof(page_types));
+	memset(counter, 0, sizeof(counter));
 
 	for (i = 0; i < num_pages; i++) {
-		page_types[all_pages[i].state]++;
+		if (all_pages[i].state > 7)
+			panic("page %i at %p has invalid state!\n", i, &all_pages[i]);
+
+		counter[all_pages[i].state]++;
 	}
 
 	dprintf("page stats:\n");
-	dprintf("active: %d\ninactive: %d\nbusy: %d\nunused: %d\n",
-		page_types[PAGE_STATE_ACTIVE], page_types[PAGE_STATE_INACTIVE], page_types[PAGE_STATE_BUSY], page_types[PAGE_STATE_UNUSED]);
-	dprintf("modified: %d\nfree: %d\nclear: %d\nwired: %d\n",
-		page_types[PAGE_STATE_MODIFIED], page_types[PAGE_STATE_FREE], page_types[PAGE_STATE_CLEAR], page_types[PAGE_STATE_WIRED]);
+	dprintf("active: %lu\ninactive: %lu\nbusy: %lu\nunused: %lu\n",
+		counter[PAGE_STATE_ACTIVE], counter[PAGE_STATE_INACTIVE], counter[PAGE_STATE_BUSY], counter[PAGE_STATE_UNUSED]);
+	dprintf("wired: %lu\nmodified: %lu\nfree: %lu\nclear: %lu\n",
+		counter[PAGE_STATE_WIRED], counter[PAGE_STATE_MODIFIED], counter[PAGE_STATE_FREE], counter[PAGE_STATE_CLEAR]);
 
 	dprintf("\nfree_queue: %p, count = %d\n", &page_free_queue, page_free_queue.count);
 	dprintf("clear_queue: %p, count = %d\n", &page_clear_queue, page_clear_queue.count);
