@@ -63,7 +63,7 @@ virtual				~_BTextGapBuffer_();
 
 		
 //		char 	*RealText();
-//		void	GetString(int32 offset, int32 length, char *buffer);
+		void	GetString(int32 offset, int32 length, char *buffer);
 //		void	GetString(int32, int32 *);
 		
 		char	RealCharAt(int32 offset) const;

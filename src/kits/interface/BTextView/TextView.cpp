@@ -1230,7 +1230,8 @@ BTextView::TextLength() const
 	CALLED();
 	return fText->Length();
 }
-//------------------------------------------------------------------------------
+
+
 void
 BTextView::GetText(int32 offset, int32 length, char *buffer) const
 {
@@ -1238,16 +1239,7 @@ BTextView::GetText(int32 offset, int32 length, char *buffer) const
 	if (buffer == NULL)
 		return;
 
-	int32 textLen = fText->Length();
-	if (offset < 0 || offset > (textLen - 1)) {
-		buffer[0] = '\0';
-		return;
-	}
-		
-	length = ((offset + length) > textLen) ? textLen - offset : length;
-	for (int32 i = 0; i < length; i++)
-		buffer[i] = (*fText)[i + offset];
-	buffer[length] = '\0';
+	fText->GetString(offset, length, buffer);
 }
 
 

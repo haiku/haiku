@@ -1,5 +1,5 @@
 //------------------------------------------------------------------------------
-//	Copyright (c) 2001-2004, OpenBeOS
+//	Copyright (c) 2001-2004, Haiku, Inc.
 //
 //	Permission is hereby granted, free of charge, to any person obtaining a
 //	copy of this software and associated documentation files (the "Software"),
@@ -53,7 +53,7 @@ _BTextGapBuffer_::_BTextGapBuffer_()
 		fPasswordMode(false)
 {
 	fBuffer = (char *)malloc(fExtraCount + fItemCount);
-	fScratchBuffer = (char*)malloc(0);
+	fScratchBuffer = NULL;
 }
 //------------------------------------------------------------------------------
 _BTextGapBuffer_::~_BTextGapBuffer_()
@@ -246,10 +246,50 @@ _BTextGapBuffer_::Text()
 	return fText;
 }*/
 //------------------------------------------------------------------------------
+void
+_BTextGapBuffer_::GetString(int32 offset, int32 length, char *buffer)
+{
+	if (buffer == NULL)
+		return;
+
+	int32 textLen = Length();
+	
+	if (offset < 0 || offset > (textLen - 1) || length < 1) {
+		buffer[0] = '\0';
+		return;
+	}
+	
+	length = ((offset + length) > textLen) ? textLen - offset : length;
+
+	bool isStartBeforeGap = (offset < fGapIndex);
+	bool isEndBeforeGap = ((offset + length - 1) < fGapIndex);
+
+	if (isStartBeforeGap == isEndBeforeGap) {
+		char *source = fBuffer + offset;
+		if (!isStartBeforeGap)
+			source += fGapCount;
+	
+		memcpy(buffer, source, length);
+	
+	} else {		
+		// if we are here, it can only be that start is before gap,
+		// and the end is after gap.
+
+		int32 beforeLen = fGapIndex - offset;
+		int32 afterLen = length - beforeLen;
+
+		memcpy(buffer, fBuffer + offset, beforeLen);
+		memcpy(buffer + beforeLen, fBuffer + fGapIndex, afterLen);
+			
+	}
+	
+	buffer[length] = '\0';
+}
+//------------------------------------------------------------------------------
 char 
 _BTextGapBuffer_::RealCharAt(int32 offset) const
 {
-	return *(fBuffer + offset);
+	return (offset < fGapIndex) ? fBuffer[offset] : fBuffer[offset + fGapCount];
 }
 //------------------------------------------------------------------------------
 bool
