@@ -77,7 +77,7 @@ init_driver(void)
 					PCI_command, 2));
 
 			pciInfo[found++] = info;
-			dprintf(DEVICE_NAME ": revision = %lx\n", info->revision);
+			dprintf(DEVICE_NAME ": revision = %x\n", info->revision);
 
 			info = malloc(sizeof(pci_info));
 		}

@@ -1,0 +1,32 @@
+SubDir OBOS_TOP src add-ons kernel drivers net sis900 ;
+
+# set some additional defines
+{
+	local defines ;
+
+	if $(DEBUG) {
+		defines += DEBUG ;
+	}
+
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) -Wall -Wno-multichar ;
+}
+
+R5KernelAddon sis900 : [ FDirName kernel drivers net ] :
+	driver.c
+	device.c
+	interface.c
+	sis900.c
+	;
+
+rule InstallSiS900
+{
+	Depends $(<) : $(>) ;
+}
+
+actions ignore InstallSiS900
+{
+	cp $(>) /boot/home/config/add-ons/kernel/drivers/bin/
+}
+
+#InstallSiS900 install : sis900 ;

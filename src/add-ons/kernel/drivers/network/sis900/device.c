@@ -372,8 +372,6 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 	status_t status;
 	size_t size;
 	int32 blockFlag;
-	thread_id threadID = find_thread(NULL);
-	int32 rxp, rxd;
 	uint32 check;
 	int16 current;
 
@@ -393,7 +391,7 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 		return B_ERROR;
 	}
 
-	//TRACE(("current rx descr: %08x (last = %ld)\n", rxp = read32((uint32)info->registers + SiS900_MAC_Rx_DESCR),(info->rxLast+1) % NUM_Rx_DESCR));
+	//TRACE(("current rx descr: %08x (last = %ld)\n", rxp = read32((uint32)info->registers + SiS900_MAC_Rx_DESCR), (info->rxLast+1) % NUM_Rx_DESCR));
 
 	// block until data is available (if blocking is allowed)
 	if ((status = acquire_sem_etc(info->rxSem, 1, B_CAN_INTERRUPT | blockFlag, 0)) != B_NO_ERROR) {
@@ -411,7 +409,7 @@ device_read(void *data, off_t pos, void *buffer, size_t *_length)
 		TRACE(("ERROR: read: buffer %d still in use: %x\n", current, status));
 		atomic_and(&info->rxLock, 0);
 		*_length = 0;
-		return;
+		return B_BUSY;
 	}
 
 	if (check & (SiS900_DESCR_Rx_ABORT | SiS900_DESCR_Rx_OVERRUN |
@@ -457,7 +455,6 @@ device_write(void *data, off_t pos, const void *buffer, size_t *_length)
 	status_t status;
 	uint16 frameSize;
 	int16 current;
-	thread_id threadID = find_thread(NULL);
 	uint32 check;
 
 	if (checkDeviceInfo(info = data) != B_OK)

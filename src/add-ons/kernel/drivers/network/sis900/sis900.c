@@ -163,7 +163,7 @@ sis900_txInterrupt(struct sis_info *info)
 //dprintf("tx %d!\n",info->txInterruptIndex);
 		if (status & (SiS900_DESCR_Tx_ABORT | SiS900_DESCR_Tx_UNDERRUN |
 					  SiS900_DESCR_Tx_OOW_COLLISION))
-			dprintf("tx error: %x\n", status);
+			dprintf("tx error: %lx\n", status);
 		else
 			info->txDescriptor[info->txInterruptIndex].status = 0;
 
@@ -196,7 +196,6 @@ sis900_interrupt(void *data)
 	int32 handled = B_UNHANDLED_INTERRUPT;
 	int16 worklimit = 20;
 	uint32 intr;
-	uint32 i, j;
 	cpu_status former;
 
 	former = disable_interrupts();
@@ -336,7 +335,6 @@ status_t
 sis900_initPHYs(struct sis_info *info)
 {
 	uint16 phy;
-	uint8 revision;
 
 	// search for total of 32 possible MII PHY addresses
 	for (phy = 0; phy < 32; phy++) {
@@ -471,7 +469,7 @@ sis900_readMode(struct sis_info *info)
 
 	uint16 status = mdio_status(info);
 	if (!(status & MII_STATUS_LINK)) {
-		dprintf(DEVICE_NAME ": no link detected (status = %lx)\n", status);
+		dprintf(DEVICE_NAME ": no link detected (status = %x)\n", status);
 		return 0;
 	}
 
@@ -520,8 +518,6 @@ void
 sis900_autoNegotiate(struct sis_info *info)
 {
 	uint16 status = mdio_status(info);
-	int32 revision;
-	int32 mode;
 
 	if ((status & MII_STATUS_LINK) == 0)
 	{
@@ -655,12 +651,11 @@ sis900_reset(struct sis_info *info)
 {
 	uint32 address = (uint32)info->registers + SiS900_MAC_COMMAND;
 	int16 tries = 1000;
-	status_t status;
 
 	TRACE(("sis900 reset\n"));
 
-	//write32((uint32)info->registers + SiS900_MAC_INTR_MASK,0);
-	//write32((uint32)info->registers + SiS900_MAC_INTR_ENABLE,0);
+	//write32((uint32)info->registers + SiS900_MAC_INTR_MASK, 0);
+	//write32((uint32)info->registers + SiS900_MAC_INTR_ENABLE, 0);
 
 	write32(address, SiS900_MAC_CMD_RESET);
 
