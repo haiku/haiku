@@ -3,7 +3,7 @@ Author:	Jerome LEVEQUE
 Email:	jerl1@caramail.com
 */
 #include "MidiPlayerView.h"
-#include "Scope.h"
+//#include "Scope.h"
 #include "Activity.h"
 
 #include <StringView.h>
@@ -154,12 +154,12 @@ Activity *view = NULL;
 				RemoveAll(fViewBox);
 				break;
 //--------------
-		case VIEW_CHANGE_TO_SCOPE :
+/*		case VIEW_CHANGE_TO_SCOPE :
 				RemoveAll(fViewBox);
 				fViewBox->AddChild(new Scope(BRect(10, 25, 340, 340)));
 				break;
 //--------------
-		case VIEW_CHANGE_TO_ACTIVITY :
+*/		case VIEW_CHANGE_TO_ACTIVITY :
 				RemoveAll(fViewBox);
 				msg->FindPointer("View", (void**)&view);
 				fViewBox->AddChild(view);
@@ -229,7 +229,7 @@ BMessage *msg = NULL;
 BMenuItem *item = NULL;
 int32 temp = 0;
 
-	Menu = new BPopUpMenu("Sample Rate");
+/*	Menu = new BPopUpMenu("Sample Rate");
 	temp = be_synth->SamplingRate();
 	msg = new BMessage(CHANGE_SAMPLE_RATE_SYNTH);
 	Menu->AddItem(item = new BMenuItem("11025 Hz", msg));
@@ -303,7 +303,7 @@ BSlider *slider = new BSlider(BRect(5, 100, 275, 130), NULL, "Volume",
 	slider->SetValue(temp);
 	slider->SetLimitLabels("Min", "Max");
 	aView->AddChild(slider);
-}
+*/}
 
 //----------------------------------------------------------
 //----------------------------------------------------------

@@ -67,11 +67,12 @@ private:
 	virtual void Run();
 	friend class BMidiPortConsumer;
 
-	void Dispatch(
-		const unsigned char* buffer, size_t size, bigtime_t when);
+//Can I do that?
+//	void Dispatch(
+//		const unsigned char* buffer, size_t size, bigtime_t when);
 
-	ssize_t Read(void* buffer, size_t numBytes) const;
-	ssize_t Write(void* buffer, size_t numBytes, uint32 time) const;
+//	ssize_t Read(void* buffer, size_t numBytes) const;
+//	ssize_t Write(void* buffer, size_t numBytes, uint32 time) const;
 
 	void ScanDevices();
 
@@ -84,9 +85,10 @@ private:
 	char* fName;
 	status_t fCStatus;
 	BList* _fDevices;
-	uint8 _m_prev_cmd;
-	bool _m_enhanced;
-	uint8 _m_reserved[2];
+//	uint8 _m_prev_cmd;
+//	bool _m_enhanced;
+//	uint8 _m_reserved[2];
+	uint8 _reserved[4];
 };
 
 #endif // _MIDI_PORT_H
