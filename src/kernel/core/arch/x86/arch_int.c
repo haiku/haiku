@@ -158,7 +158,9 @@ arch_int_is_interrupts_enabled(void)
 }
 
 
-void i386_handle_trap(struct iframe frame); /* keep the compiler happy, this function must be called only from assembly */
+/* keep the compiler happy, this function must be called only from assembly */
+void i386_handle_trap(struct iframe frame);
+
 void
 i386_handle_trap(struct iframe frame)
 {
@@ -188,8 +190,10 @@ i386_handle_trap(struct iframe frame)
 			// if the interrupts were disabled, and we are not running the kernel startup
 			// the page fault was not allowed to happen and we must panic
 			if (0 == (frame.flags & 0x200) && !kernel_startup) {
-				panic("page_fault, but interrupts were disabled. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
-			}
+				panic("page fault, but interrupts were disabled. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
+			} else if (thread != NULL && thread->page_faults_allowed < 1)
+				panic("page fault not allowed at this place. Touching address %p from eip %p\n", (void *)cr2, (void *)frame.eip);
+
 			enable_interrupts();
 
 			ret = vm_page_fault(cr2, frame.eip,
@@ -225,12 +229,12 @@ i386_handle_trap(struct iframe frame)
 			** edx has pointer to buffer containing args from first to last
 			** each is verified to make sure someone doesn't try to clobber it
 			*/
-			if(frame.ecx <= MAX_ARGS) {
-				if((addr)frame.edx >= KERNEL_BASE && (addr)frame.edx <= KERNEL_TOP) {
+			if (frame.ecx <= MAX_ARGS) {
+				if ((addr)frame.edx >= KERNEL_BASE && (addr)frame.edx <= KERNEL_TOP) {
 					retcode =  ERR_VM_BAD_USER_MEMORY;
 				} else {
 					rc = user_memcpy(args, (void *)frame.edx, frame.ecx * sizeof(unsigned int));
-					if(rc < 0)
+					if (rc < 0)
 						retcode = ERR_VM_BAD_USER_MEMORY;
 					else
 						ret = syscall_dispatcher(frame.eax, (void *)args, &retcode);
@@ -244,7 +248,7 @@ i386_handle_trap(struct iframe frame)
 			break;
 		}
 		default:
-			if(frame.vector >= 0x20) {
+			if (frame.vector >= 0x20) {
 				interrupt_ack(frame.vector); // ack the 8239 (if applicable)
 				ret = int_io_interrupt_handler(frame.vector);
 			} else {
@@ -262,10 +266,9 @@ i386_handle_trap(struct iframe frame)
 		restore_interrupts(state);
 	}
 
-	if (frame.cs == USER_CODE_SEG || frame.vector == 99) {
+	if (frame.cs == USER_CODE_SEG || frame.vector == 99)
 		thread_atkernel_exit();
-	}
-	
+
 //	dprintf("0x%x cpu %d!\n", thread_get_current_thread_id(), smp_get_current_cpu());
 
 	if (thread)
