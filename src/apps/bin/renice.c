@@ -60,10 +60,26 @@ int32 prio_unix_to_be(int32 prio)
 	return (prio > 0)?(10 - (prio/2)):(10 + 110 * (-prio) / 20);
 }
 
+status_t renice_thread(int32 prio, int32 increment, bool use_be_prio, thread_id th)
+{
+	thread_info thinfo;
+
+	if(increment != 0) {
+		get_thread_info(th, &thinfo);
+		prio = thinfo.priority;
+		if(!use_be_prio)
+			prio = prio_be_to_unix(prio);
+		prio += increment;
+		if(!use_be_prio)
+			prio = prio_unix_to_be(prio);
+	}
+	return set_thread_priority(th, prio);
+}
+
 int main(int argc, char **argv)
 {
 	thread_id th = -1;
-	int32 prio, increment;
+	int32 prio, increment = 0;
 	thread_info thinfo;
 	bool use_be_prio = false;
 	bool next_is_prio = true;
@@ -71,6 +87,11 @@ int main(int argc, char **argv)
 	bool use_increment = false;
 	bool find_by_name = false;
 	int i = 0;
+	int32 teamcookie = 0;
+	team_info teaminfo;
+	int32 thcookie = 0;
+	int err = 1;
+	char *thname;
 
 	prio = 9; // default UNIX priority for nice
 	// convert it to beos
@@ -96,20 +117,22 @@ int main(int argc, char **argv)
 			if (!use_be_prio)
 				prio = prio_unix_to_be(prio);
 		} else {
-			if (find_by_name)
-				th = find_thread(argv[i]);
-			else
-				sscanf(argv[i], "%ld", (long *)&th);
-			if (use_increment) {
-				get_thread_info(th, &thinfo);
-				prio = thinfo.priority;
-				if (!use_be_prio)
-					prio = prio_be_to_unix(prio);
-				prio += increment;
-				if (!use_be_prio)
-					prio = prio_unix_to_be(prio);
+			if (!find_by_name) {
+			sscanf(argv[i], "%ld", (long *)&th);
+				return (renice_thread(prio, increment, use_be_prio, th) == B_OK)?0:1;
 			}
-			set_thread_priority(th, prio);
+			thname = argv[i];
+			while (get_next_team_info(&teamcookie, &teaminfo) == B_OK) {
+				thcookie = 0;
+				while (get_next_thread_info(teaminfo.team, &thcookie, &thinfo) == B_OK) {
+					if (!strncmp(thname, thinfo.name, B_OS_NAME_LENGTH)) {
+						th = thinfo.thread;
+						renice_thread(prio, increment, use_be_prio, th);
+						err = 0;
+					}
+				}
+			}
+			return err;
 		}
 	}
 	if (th == -1) {
