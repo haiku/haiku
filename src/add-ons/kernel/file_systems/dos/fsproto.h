@@ -226,7 +226,6 @@ extern _IMPEXP_KERNEL void	free_path(char *p);
 extern _IMPEXP_KERNEL int	notify_listener(int op, nspace_id nsid,
 									vnode_id vnida,	vnode_id vnidb,
 									vnode_id vnidc, const char *name);
-extern _IMPEXP_KERNEL void	notify_select_event(selectsync *sync, uint32 ref);
 extern _IMPEXP_KERNEL int	send_notification(port_id port, long token,
 									ulong what, long op, nspace_id nsida,
 									nspace_id nsidb, vnode_id vnida,
