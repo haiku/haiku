@@ -636,9 +636,9 @@ KeyboardInputDevice::DeviceWatcher(void *arg)
 				newDeadKey = keymap->IsDeadKey(keycode, currentModifiers);				
 			}
 		
-			/*
+			
 			// new behaviour
-			if (newDeadKey != 0) {
+			/*if (newDeadKey == 0) {
 				keymap->GetChars(keycode, currentModifiers, activeDeadKey, &str, &numBytes);
 				keymap->GetChars(keycode, 0, 0, &str2, &numBytes2);
 			}
