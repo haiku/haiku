@@ -3,7 +3,7 @@
 	This file may be used under the terms of the Be Sample Code License.
 
 	Other authors:
-	Rudolf Cornelissen 4/2003-3/2004
+	Rudolf Cornelissen 4/2003-4/2004
 */
 
 #define MODULE_BIT 0x00200000
@@ -72,6 +72,9 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 
 	/* disable interrupts using the kernel driver */
 	interrupt_enable(false);
+
+	/* make sure the card's registers are unlocked (KB output select may lock!) */
+	nm_unlock();
 
 	/* find current DPMS state, then turn off screen(s) */
 	nm_crtc_dpms_fetch(&display, &h, &v);

@@ -1,6 +1,7 @@
 /*general card functions*/
 status_t nm_general_powerup(void);
 status_t nm_set_cas_latency(void);
+void nm_unlock(void);
 status_t nm_general_output_select(void);
 uint8 nm_general_output_read(void);
 status_t nm_general_dac_select(int);

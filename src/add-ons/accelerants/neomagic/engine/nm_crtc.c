@@ -1,6 +1,6 @@
 /* CTRC functionality */
 /* Author:
-   Rudolf Cornelissen 4/2003-3/2004
+   Rudolf Cornelissen 4/2003-4/2004
 */
 
 #define MODULE_BIT 0x00040000
@@ -179,7 +179,7 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		ISACRTCW(VDISPE, (vdisp_e & 0xff));
 		ISACRTCW(VBLANKS, (vblnk_s & 0xff));
 		ISACRTCW(VBLANKE, (vblnk_e & 0xff));
-//linux:
+//linux: (BIOSmode)
 //	regp->CRTC[23] = 0xC3;
 		ISACRTCW(LINECOMP, (linecomp & 0xff));
 
@@ -262,7 +262,7 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 		ISACRTCW(MAXSCLIN, (temp | ((linecomp & 0x200) >> (9 - 6))));
 
 		ISACRTCW(VDISPE, (vdisp_e & 0xff));
-//linux:
+//linux:(BIOSmode)
 //	regp->CRTC[23] = 0xC3;
 		ISACRTCW(LINECOMP, (linecomp & 0xff));
 
@@ -283,6 +283,48 @@ status_t nm_crtc_set_timing(display_mode target, bool crt_only)
 				((vdisp_e & 0x400) >> (10 - 1))/*|
 				((linecomp&0x400)>>3)*/
 			));
+		}
+	}
+
+	/* program 'fixed' mode if needed */
+	if (si->ps.card_type != NM2070)
+	{
+		uint8 width;
+
+		temp = ISAGRPHR(PANELCTRL1);
+		/* we need to wait a bit or the card will mess-up it's register values.. */
+		snooze(10);
+
+		switch (target.timing.h_display)
+		{
+		case 1280:
+			width = (3 << 5);
+			break;
+		case 1024:
+			width = (2 << 5);
+			break;
+		case 800:
+			width = (1 << 5);
+			break;
+		case 640:
+		default: //fixme: non-std modes should be in between above modes?!?
+			width = (0 << 5);
+			break;
+		}
+
+		switch (si->ps.card_type)
+		{
+		case NM2090:
+		case NM2093:
+		case NM2097:
+		case NM2160:
+			//fixme: checkout b6????
+			ISAGRPHW(PANELCTRL1, ((temp & ~0x20) | (width & 0x20)));
+			break;
+		default:
+			/* NM2200 and later */
+			ISAGRPHW(PANELCTRL1, ((temp & ~0x60) | (width & 0x60)));
+			break;
 		}
 	}
 
@@ -409,7 +451,8 @@ status_t nm_crtc_set_display_pitch()
 	//fixme: test for max supported pitch if possible,
 	//not all bits below will be implemented.
 	//NM2160: confirmed b0 and b1 in register below to exist and work.
-	ISAGRPHW(CRTC_PITCHE, ((offset & 0xff00) >> 8));
+	if (si->ps.card_type != NM2070)
+		ISAGRPHW(CRTC_PITCHE, ((offset & 0xff00) >> 8));
 
 	return B_OK;
 }
@@ -460,6 +503,9 @@ status_t nm_crtc_set_display_start(uint32 startadd,uint8 bpp)
 /* setup centering mode for current internal or simultaneous flatpanel mode */
 status_t nm_crtc_center(display_mode target)
 {
+	/* note:
+	 * NM2070 apparantly doesn't support horizontal centering this way... */
+
 	uint8 vcent1, vcent2, vcent3, vcent4, vcent5;
 	uint8 hcent1, hcent2, hcent3, hcent4, hcent5;
 	uint8 ctrl2, ctrl3;
@@ -478,7 +524,6 @@ status_t nm_crtc_center(display_mode target)
 		/* adjust for register contraints:
 		 * horizontal center granularity is 16 pixels */
 		hoffset = ((hoffset >> 4) - 1);
-//fixme: what does this do?
 		/* turn on horizontal centering? */
 		ctrl3 = 0x10;
 	}
@@ -489,7 +534,6 @@ status_t nm_crtc_center(display_mode target)
 		/* adjust for register contraints:
 		 * vertical center granularity is 2 pixels */
 		voffset = ((voffset >> 1) - 2);
-//fixme: what does this do?
 		/* turn on vertical centering? */
 		ctrl2 = 0x01;
 	}

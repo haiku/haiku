@@ -1,5 +1,5 @@
 /* Author:
-   Rudolf Cornelissen 4/2003-3/2004
+   Rudolf Cornelissen 4/2003-4/2004
 */
 
 #define MODULE_BIT 0x00008000
@@ -47,7 +47,7 @@ status_t nm_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-7 running.\n"));
+	LOG(1,("POWERUP: Neomagic (open)BeOS Accelerant 0.06-8 running.\n"));
 
 	/* detect card type and power it up */
 	switch(CFGR(DEVID))
@@ -151,6 +151,12 @@ status_t nm_set_cas_latency()
 	return B_ERROR;
 }
 
+void nm_unlock()
+{
+	/* unlock cards GRAPHICS registers (any other value than 0x26 should lock it again) */
+    ISAGRPHW(GRPHXLOCK, 0x26);
+}
+
 static status_t nmxxxx_general_powerup()
 {
 	uint8 temp;
@@ -178,7 +184,7 @@ static status_t nmxxxx_general_powerup()
 	dump_specs();
 
 	/* activate PCI access: b7 = framebuffer, b6 = registers */
-	ISAGRPHW(IFACECTRL, 0xc0);
+	ISAGRPHW(IFACECTRL2, 0xc0);
 
 	/* disable VGA-mode cursor (just to be sure) */
 	ISACRTCW(VGACURCTRL, 0x00);
@@ -310,6 +316,8 @@ uint8 nm_general_output_read()
 static 
 status_t nm_general_bios_to_powergraphics()
 {
+	uint8 temp;
+
 	LOG(2, ("INIT: Skipping card coldstart!\n"));
 
 	/* turn off display */
@@ -322,7 +330,9 @@ status_t nm_general_bios_to_powergraphics()
 	 * switch to graphics mode ... */
 	ISASEQW(MEMMODE, 0x0e);
 	/* ... disable bitplane tweaking ... */
-	ISAGRPHW(ENSETRESET, 0x00);
+	/* note:
+	 * NeoMagic cards have custom b4-b7 use in this register! */
+	ISAGRPHW(ENSETRESET, 0x80);
 	/* ... no logical function tweaking with display data, no data rotation ... */
 	ISAGRPHW(DATAROTATE, 0x00);
 	/* ... reset read map select to plane 0 ... */
@@ -342,14 +352,30 @@ status_t nm_general_bios_to_powergraphics()
 	ISAATBW(COLPLANE_EN, 0x0f);
 	/* ... reset horizontal pixelpanning ... */
 	ISAATBW(HORPIXPAN, 0x00);
-	/* ...  and reset colorpalette groupselect bits. */
+	/* ...  reset colorpalette groupselect bits ... */
 	ISAATBW(COLSEL, 0x00);
+	/* ... do unknown standard VGA register ... */
+	/* note:
+	 * NeoMagic cards have custom b6 use in this register! */
+	ISAATBW(0x16, 0x01);
+	/* ... and enable all four byteplanes. */
+	ISASEQW(MAPMASK, 0x0f);
 
 	/* setup sequencer clocking mode */
 	ISASEQW(CLKMODE, 0x21);
 
 	/* enable memory above 256Kb: set b4 (disables adress wraparound at 256Kb boundary) */
 	ISAGRPHW(FBSTADDE, 0x10);
+
+	/* this register has influence on the CRTC framebuffer offset, so reset! */
+	//fixme: investigate further...
+	ISAGRPHW(0x15, 0x00);
+
+	/* enable fast PCI write bursts (b4-5) */
+	temp = ((ISAGRPHR(IFACECTRL1) & 0x0f) | 0x30);
+	/* we need to wait a bit or the card will mess-up it's register values.. */
+	snooze(10);
+	ISAGRPHW(IFACECTRL1, temp);
 
 	/* this speeds up RAM writes according to XFree driver */
 //	fixme: don't touch until more is known: part of RAM or CORE PLL???
