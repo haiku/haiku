@@ -1,0 +1,4 @@
+SubDir OBOS_TOP src add-ons kernel drivers disk scsi ;
+
+SubInclude OBOS_TOP src add-ons kernel drivers disk scsi scsi_cd ;
+SubInclude OBOS_TOP src add-ons kernel drivers disk scsi scsi_dsk ;

@@ -1,0 +1,9 @@
+SubDir OBOS_TOP src add-ons kernel drivers disk scsi scsi_cd ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon scsi_cd : kernel drivers bin :
+	device.c
+	handle.c
+	scsi_cd.c
+	;
