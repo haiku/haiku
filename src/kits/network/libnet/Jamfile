@@ -82,3 +82,8 @@ Package haiku-networkingkit-cvs :
 	libnet.so :
 #	boot home config lib ;
 	boot home Desktop haiku-networkingkit lib ;
+
+Package haiku-networkingkit-cvs :
+	resolv.conf services protocols networks :
+#	boot beos etc ;
+	boot home Desktop haiku-networkingkit etc ;
