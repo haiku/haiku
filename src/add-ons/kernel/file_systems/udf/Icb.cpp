@@ -20,17 +20,17 @@ Icb::Icb(Volume *volume, udf_long_address address)
 	DEBUG_INIT_ETC(CF_PUBLIC, "Icb", ("volume: %p, address(block: %ld, "
 	               "partition: %d, length: %ld)", volume, address.block(),
 	               address.partition(), address.length()));  
-	status_t err = volume ? B_OK : B_BAD_VALUE;
-	if (!err) {
+	status_t error = volume ? B_OK : B_BAD_VALUE;
+	if (!error) {
 		off_t block;
-		err = fVolume->MapBlock(address, &block);
-		if (!err) {
+		error = fVolume->MapBlock(address, &block);
+		if (!error) {
 			udf_icb_header *header = reinterpret_cast<udf_icb_header*>(fData.SetTo(block));
 			PDUMP(header);
-			err = header->tag().init_check(address.block());
+			error = header->tag().init_check(address.block());
 		}
 	}		
-	fInitStatus = err;
+	fInitStatus = error;
 }
 	
 status_t
@@ -104,18 +104,18 @@ Icb::Read(off_t pos, void *buffer, size_t *length, uint32 *block)
 status_t
 Icb::GetDirectoryIterator(DirectoryIterator **iterator)
 {
-	status_t err = iterator ? B_OK : B_BAD_VALUE;
+	status_t error = iterator ? B_OK : B_BAD_VALUE;
 
-	if (!err) {
+	if (!error) {
 		*iterator = new DirectoryIterator(this);
 		if (*iterator) {
-			err = fIteratorList.PushBack(*iterator);
+			error = fIteratorList.PushBack(*iterator);
 		} else {
-			err = B_NO_MEMORY;
+			error = B_NO_MEMORY;
 		}
 	}
 	
-	return err;
+	return error;
 }
 
 status_t
@@ -128,8 +128,8 @@ Icb::Find(const char *filename, vnode_id *id)
 		RETURN(B_BAD_VALUE);
 		
 	DirectoryIterator *i;
-	status_t err = GetDirectoryIterator(&i);
-	if (!err) {
+	status_t error = GetDirectoryIterator(&i);
+	if (!error) {
 		vnode_id entryId;
 		uint32 length = B_FILE_NAME_LENGTH;
 		char name[B_FILE_NAME_LENGTH];
@@ -146,9 +146,9 @@ Icb::Find(const char *filename, vnode_id *id)
 		if (foundIt) {
 			*id = entryId;
 		} else {
-			err = B_ENTRY_NOT_FOUND;
+			error = B_ENTRY_NOT_FOUND;
 		}
 	}
 	
-	RETURN(err);
+	RETURN(error);
 }

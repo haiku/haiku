@@ -22,7 +22,7 @@
 #endif
 #include <unistd.h>
 
-#define DEBUG_TO_FILE 1
+#define DEBUG_TO_FILE 0
 
 #if DEBUG_TO_FILE
 #	include <stdio.h>
@@ -238,19 +238,19 @@ private:
 			(objectPointer)->dump();								\
 		}		
 	
-	#define REPORT_ERROR(err) {											\
-		LPRINT(("returning error 0x%lx, `%s'\n", err, strerror(err)));	\
+	#define REPORT_ERROR(error) {											\
+		LPRINT(("returning error 0x%lx, `%s'\n", error, strerror(error)));	\
 	}
 
-	#define RETURN_ERROR(err) { 		\
-		status_t _status = err; 		\
+	#define RETURN_ERROR(error) { 		\
+		status_t _status = error; 		\
 		if (_status < (status_t)B_OK)	\
 			REPORT_ERROR(_status);		\
 		return _status;					\
 	}
 
-	#define RETURN(err) { 											\
-		status_t _status = err; 									\
+	#define RETURN(error) { 											\
+		status_t _status = error; 									\
 		if (_status < (status_t)B_OK) {								\
 			REPORT_ERROR(_status); 									\
 		} else if (_status == (status_t)B_OK) {						\

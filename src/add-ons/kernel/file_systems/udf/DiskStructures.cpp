@@ -248,18 +248,18 @@ udf_tag::init_check(uint32 diskBlock)
 	DEBUG_INIT(CF_PUBLIC | CF_VOLUME_OPS | CF_HIGH_VOLUME, "udf_descriptor_tag");
 	PRINT(("location (paramater)    == %ld\n", diskBlock));
 	PRINT(("location (in structure) == %ld\n", location()));
-	status_t err = (diskBlock == location()) ? B_OK : B_NO_INIT;
+	status_t error = (diskBlock == location()) ? B_OK : B_NO_INIT;
 	// checksum
-	if (!err) {
+	if (!error) {
 		uint32 sum = 0;
 		for (int i = 0; i <= 3; i++)
 			sum += ((uint8*)this)[i];
 		for (int i = 5; i <= 15; i++)
 			sum += ((uint8*)this)[i];
-		err = sum % 256 == checksum() ? B_OK : B_NO_INIT;
+		error = sum % 256 == checksum() ? B_OK : B_NO_INIT;
 	}
 	
-	RETURN(err);
+	RETURN(error);
 	
 }
 

@@ -57,18 +57,18 @@ Udf::udf_recognize(int device, off_t offset, off_t length, uint32 blockSize,
 	}
 	
 	// Check for a valid volume recognition sequence
-	status_t err = walk_volume_recognition_sequence(device, offset, blockSize, blockShift);
+	status_t error = walk_volume_recognition_sequence(device, offset, blockSize, blockShift);
 	
 	// Now hunt down a volume descriptor sequence from one of
 	// the anchor volume pointers (if there are any).
-	if (!err) {
-		err = walk_anchor_volume_descriptor_sequences(device, offset, length,
+	if (!error) {
+		error = walk_anchor_volume_descriptor_sequences(device, offset, length,
 		                                              blockSize, blockShift,
 		                                              logicalVolumeDescriptor,
 		                                              partitionDescriptors,
 		                                              partitionDescriptorCount);
 	}
-	RETURN(err);
+	RETURN(error);
 }
 
 status_t
@@ -105,8 +105,8 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize, uin
 	// should be one block long. We're expecting to find 0 or more iso9660
 	// vsd's followed by some ECMA-167 vsd's.
 	MemoryChunk chunk(blockSize);
-	status_t err = chunk.InitCheck();
-	if (!err) {
+	status_t error = chunk.InitCheck();
+	if (!error) {
 		bool foundISO = false;
 		bool foundExtended = false;
 		bool foundECMA167 = false;
@@ -156,10 +156,10 @@ walk_volume_recognition_sequence(int device, off_t offset, uint32 blockSize, uin
 		// or terminating extended area descriptor with NO ECMA-168
 		// descriptors, we return B_OK to signal that we should go
 		// looking for valid anchors.
-		err = foundECMA167 || (foundExtended && !foundECMA168) ? B_OK : B_ERROR;	
+		error = foundECMA167 || (foundExtended && !foundECMA168) ? B_OK : B_ERROR;	
 	}
 	
-	RETURN(err);
+	RETURN(error);
 }
 
 static
@@ -229,8 +229,8 @@ walk_anchor_volume_descriptor_sequences(int device, off_t offset, off_t length,
 			PRINT(("block %Ld: vds search failed\n", avds_locations[i]));
 		}
 	}
-	status_t err = found_vds ? B_OK : B_ERROR;
-	RETURN(err);
+	status_t error = found_vds ? B_OK : B_ERROR;
+	RETURN(error);
 }
 
 static
@@ -247,7 +247,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 		
 	bool foundLogicalVolumeDescriptor = false;
 	uint8 uniquePartitions = 0;
-	status_t err = B_OK;
+	status_t error = B_OK;
 	
 	for (uint32 i = 0; i < count; i++)
 	{
@@ -365,7 +365,7 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 									PRINT(("Found more than kMaxPartitionDescriptors == %d "
 									       "unique partition descriptors!\n",
 									       kMaxPartitionDescriptors));
-									err = B_BAD_VALUE;
+									error = B_BAD_VALUE;
 									break;
 								}
 							}									
@@ -420,13 +420,13 @@ walk_volume_descriptor_sequence(udf_extent_address descriptorSequence,
 	PRINT(("found %d unique partition%s\n", uniquePartitions,
 	       (uniquePartitions == 1 ? "" : "s")));
 	
-	if (!err) 
-		err = foundLogicalVolumeDescriptor ? B_OK : B_ERROR;
-	if (!err) 
-		err = uniquePartitions >= 1 ? B_OK : B_ERROR;
-	if (!err) 
+	if (!error) 
+		error = foundLogicalVolumeDescriptor ? B_OK : B_ERROR;
+	if (!error) 
+		error = uniquePartitions >= 1 ? B_OK : B_ERROR;
+	if (!error) 
 		partitionDescriptorCount = uniquePartitions;	
 			
-	RETURN(err);
+	RETURN(error);
 }
 

@@ -72,7 +72,7 @@ public:
 		if (startBlock < _BlockIndex())
 			_Rewind();
 	
-		status_t err = B_OK;
+		status_t error = B_OK;
 		while (true) {
 			Descriptor *descriptor = _CurrentDescriptor();
 			if (descriptor) {
@@ -92,11 +92,11 @@ public:
 				}			
 			} else {
 				PRINT(("Descriptor #%ld found NULL\n", _DescriptorNumber()));
-				err = B_ERROR;
+				error = B_ERROR;
 				break;
 			}
 		}
-		RETURN(err);
+		RETURN(error);
 	}
 
 private:

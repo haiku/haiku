@@ -29,7 +29,7 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 	if (!id || !name || !length)
 		return B_BAD_VALUE;
 
-	status_t err = B_OK;
+	status_t error = B_OK;
 	if (fAtBeginning) {
 		sprintf(name, ".");
 		*length = 2;
@@ -50,8 +50,8 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 	// First read in the static portion of the file id descriptor,
 	// then, based on the information therein, read in the variable
 	// length tail portion as well.
-	err = Parent()->Read(offset, entry, &entryLength, &block);
-	if (!err && entryLength >= sizeof(udf_file_id_descriptor) && entry->tag().init_check(block) == B_OK) {
+	error = Parent()->Read(offset, entry, &entryLength, &block);
+	if (!error && entryLength >= sizeof(udf_file_id_descriptor) && entry->tag().init_check(block) == B_OK) {
 		PDUMP(entry);
 		offset += entry->total_length();
 		
@@ -68,11 +68,11 @@ DirectoryIterator::GetNextEntry(char *name, uint32 *length, vnode_id *id)
 		*id = to_vnode_id(entry->icb());
 	}	
 
-	if (!err)
+	if (!error)
 		fPosition = offset;
 	}
  
- 	RETURN(err);
+ 	RETURN(error);
 }
 
 /*	\brief Rewinds the iterator to point to the first

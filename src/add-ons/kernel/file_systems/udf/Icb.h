@@ -138,19 +138,19 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 	size_t bytesRead = 0;
 	
 	Volume *volume = GetVolume();		
-	status_t err = B_OK;		
+	status_t error = B_OK;		
 	uint8 *buffer = reinterpret_cast<uint8*>(_buffer);
 	bool isFirstBlock = true;
 	
-	while (bytesLeft > 0 && !err) {
+	while (bytesLeft > 0 && !error) {
 		
 		PRINT(("pos: %Ld\n", pos));
 		PRINT(("bytesLeft: %ld\n", bytesLeft));
 		
 		udf_long_address extent;
 		bool isEmpty = false;
-		err = list.FindExtent(pos, &extent, &isEmpty);
-		if (!err) {
+		error = list.FindExtent(pos, &extent, &isEmpty);
+		if (!error) {
 			PRINT(("found extent for offset %Ld: (block: %ld, partition: %d, length: %ld, type: %d)\n",
 			       pos, extent.block(), extent.partition(), extent.length(), extent.type()));
 			       
@@ -166,11 +166,11 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 				
 				default:
 					PRINT(("Invalid extent type found: %d\n", extent.type()));
-					err = B_ERROR;
+					error = B_ERROR;
 					break;			
 			}
 			
-			if (!err) {
+			if (!error) {
 				// Note the unmapped first block of the total read in
 				// the block output parameter if provided
 				if (isFirstBlock) {
@@ -187,8 +187,8 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 					// Block aligned and at least one full block left. Read in using
 					// cached_read() calls.
 					off_t diskBlock;
-					err = volume->MapBlock(extent, &diskBlock);
-					if (!err) {
+					error = volume->MapBlock(extent, &diskBlock);
+					if (!error) {
 						size_t fullBlockBytesLeft = fullBlocksLeft << volume->BlockShift();
 						size_t readLength = fullBlockBytesLeft < extent.length()
 						                      ? fullBlockBytesLeft
@@ -199,17 +199,17 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 							memset(buffer, 0, readLength);
 						} else {
 							off_t diskBlock;
-							err = volume->MapBlock(extent, &diskBlock);
-							if (!err) {							
+							error = volume->MapBlock(extent, &diskBlock);
+							if (!error) {							
 								PRINT(("reading %ld bytes from disk block %Ld using cached_read()\n",
 								       readLength, diskBlock));
-								err = cached_read(volume->Device(), diskBlock, buffer,
+								error = cached_read(volume->Device(), diskBlock, buffer,
 								                  readLength >> volume->BlockShift(),
 								                  volume->BlockSize());
 							} 
 						}
 						
-						if (!err) {
+						if (!error) {
 							bytesLeft -= readLength;
 							bytesRead += readLength;
 							pos += readLength;
@@ -242,20 +242,20 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 						memset(buffer, 0, partialLength);						
 					} else {
 						off_t diskBlock;
-						err = volume->MapBlock(extent, &diskBlock);
-						if (!err) {
+						error = volume->MapBlock(extent, &diskBlock);
+						if (!error) {
 							PRINT(("reading %ld bytes from disk block %Ld using get_block()\n",
 							       partialLength, diskBlock));
 							uint8 *data = (uint8*)get_block(volume->Device(), diskBlock, volume->BlockSize());
-							err = data ? B_OK : B_BAD_DATA;
-							if (!err) {
+							error = data ? B_OK : B_BAD_DATA;
+							if (!error) {
 								memcpy(buffer, data+partialOffset, partialLength);
 								release_block(volume->Device(), diskBlock);
 							}
 						}
 					}
 					
-					if (!err) {
+					if (!error) {
 						bytesLeft -= partialLength;
 						bytesRead += partialLength;
 						pos += partialLength;
@@ -265,14 +265,14 @@ Icb::_Read(DescriptorList &list, off_t pos, void *_buffer, size_t *length, uint3
 			}
 		} else {
 			PRINT(("error finding extent for offset %Ld: 0x%lx, `%s'", pos,
-			       err, strerror(err)));
+			       error, strerror(error)));
 			break;
 		}
 	}
 	
 	*length = bytesRead;
 	
-	RETURN(err);
+	RETURN(error);
 }
 
 template <class Descriptor>

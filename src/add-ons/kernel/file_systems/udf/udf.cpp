@@ -240,7 +240,7 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 	INITIALIZE_DEBUGGING_OUTPUT_FILE("/boot/home/Desktop/udf_debug.txt");
 	DEBUG_INIT_ETC(CF_ENTRY | CF_VOLUME_OPS, NULL, ("name: `%s'", name));
 
-	status_t err = B_OK;
+	status_t error = B_OK;
 	char *deviceName = (char*)name;
 	off_t deviceOffset = 0;
 	off_t deviceSize = 0;	// in blocks
@@ -256,8 +256,8 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 	// the data in their own partition, as well as the data in any partitions
 	// that precede them physically on the disc. 
 	int device = open(name, O_RDONLY);
-	err = device < B_OK ? device : B_OK;
-	if (!err) {
+	error = device < B_OK ? device : B_OK;
+	if (!error) {
 	
 		// First try to treat the device like a special partition device. If that's
 		// what we have, then we can use the partition_info data to figure out the
@@ -295,8 +295,8 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 				* geometry.cylinder_count * geometry.head_count;
 		} else {
 			struct stat stat;
-			err = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
-			if (!err) {
+			error = fstat(device, &stat) < 0 ? B_ERROR : B_OK;
+			if (!error) {
 				PRINT(("stat_info:\n"));
 				PRINT(("  st_size: %Ld\n", stat.st_size));
 				deviceOffset = 0;
@@ -308,22 +308,22 @@ udf_mount(nspace_id nsid, const char *name, ulong flags, void *parms,
 
 	
 	// Create and mount the volume
-	if (!err) {
+	if (!error) {
 		volume = new Udf::Volume(nsid);
-		err = volume ? B_OK : B_NO_MEMORY;
+		error = volume ? B_OK : B_NO_MEMORY;
 	}
-	if (!err) {
-		err = volume->Mount(deviceName, deviceOffset, deviceSize, 2048, flags);
+	if (!error) {
+		error = volume->Mount(deviceName, deviceOffset, deviceSize, 2048, flags);
 	}
 		
-	if (!err) {
+	if (!error) {
 		if (rootID)
 			*rootID = volume->RootIcb()->Id();
 		if (volumeCookie)
 			*volumeCookie = volume;
 	}
 
-	RETURN(err);	
+	RETURN(error);	
 }
 
 
@@ -403,10 +403,10 @@ udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 	// Convert the given vnode id to an address, and create
 	// and return a corresponding Icb object for it.
 	Udf::Icb *icb = new Udf::Icb(volume, Udf::to_long_address(id, volume->BlockSize()));
-	status_t err = icb ? B_OK : B_NO_MEMORY;
-	if (!err) {
-		err = icb->InitCheck();
-		if (!err) {
+	status_t error = icb ? B_OK : B_NO_MEMORY;
+	if (!error) {
+		error = icb->InitCheck();
+		if (!error) {
 			if (node)
 				*node = reinterpret_cast<void*>(icb);
 		} else {
@@ -414,7 +414,7 @@ udf_read_vnode(void *ns, vnode_id id, char reenter, void **node)
 		}
 	}
 		
-	RETURN(err);
+	RETURN(error);
 }
 
 
@@ -465,22 +465,22 @@ udf_walk(void *ns, void *_dir, const char *filename, char **resolvedPath, vnode_
 	Udf::Icb *dir = reinterpret_cast<Udf::Icb*>(_dir);
 	Udf::Icb *node = NULL;
 		
-	status_t err = B_OK;
+	status_t error = B_OK;
 		
 	if (strcmp(filename, ".") == 0) {
 		*vnodeId = dir->Id();
-		err = get_vnode(volume->Id(), *vnodeId, reinterpret_cast<void**>(&node)) == B_OK ? B_OK : B_BAD_VALUE;
+		error = get_vnode(volume->Id(), *vnodeId, reinterpret_cast<void**>(&node)) == B_OK ? B_OK : B_BAD_VALUE;
 	} else {
-		err = dir->Find(filename, vnodeId);
-		if (!err) {
+		error = dir->Find(filename, vnodeId);
+		if (!error) {
 			Udf::Icb *icb;
-			err = get_vnode(volume->Id(), *vnodeId, reinterpret_cast<void**>(&icb));
+			error = get_vnode(volume->Id(), *vnodeId, reinterpret_cast<void**>(&icb));
 		}
 	}
 	PRINT(("vnodeId: %Ld\n", *vnodeId));
 
 	
-	RETURN(err);		
+	RETURN(error);		
 }
 
 
@@ -714,22 +714,22 @@ udf_open_dir(void *ns, void *node, void **cookie)
 	
 	Udf::Icb *dir = reinterpret_cast<Udf::Icb*>(node);
 	
-	status_t err = B_OK;
+	status_t error = B_OK;
 	
 	if (dir->IsDirectory()) {
 		Udf::DirectoryIterator *iterator = NULL;
-		err = dir->GetDirectoryIterator(&iterator);
-		if (!err) {
+		error = dir->GetDirectoryIterator(&iterator);
+		if (!error) {
 			*cookie = reinterpret_cast<void*>(iterator);	
 		} else {
-			PRINT(("Error getting directory iterator: 0x%lx, `%s'\n", err, strerror(err)));
+			PRINT(("Error getting directory iterator: 0x%lx, `%s'\n", error, strerror(error)));
 		}	
 	} else {
 		PRINT(("Given icb is not a directory (type: %d)\n", dir->Type()));
-		err = B_BAD_VALUE;
+		error = B_BAD_VALUE;
 	}
 	
-	RETURN(err);
+	RETURN(error);
 }
 
 
@@ -755,19 +755,19 @@ udf_read_dir(void *ns, void *node, void *cookie, long *num,
 	
 	uint32 nameLength = bufferSize - sizeof(dirent) + 1;
 	
-	status_t err = iterator->GetNextEntry(dirent->d_name, &nameLength, &(dirent->d_ino));
-	if (!err) {
+	status_t error = iterator->GetNextEntry(dirent->d_name, &nameLength, &(dirent->d_ino));
+	if (!error) {
 		*num = 1;
 		dirent->d_dev = volume->Id();
 		dirent->d_reclen = sizeof(dirent) + nameLength - 1;
 	} else {
 		*num = 0;
 		// Clear the error for end of directory
-		if (err == B_ENTRY_NOT_FOUND)
-			err = B_OK;
+		if (error == B_ENTRY_NOT_FOUND)
+			error = B_OK;
 	}
 	
-	RETURN(err);
+	RETURN(error);
 }
 
 

@@ -89,15 +89,15 @@
 	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
-/*! \def REPORT_ERROR(err)
+/*! \def REPORT_ERROR(error)
 	\brief Calls \c LPRINT(x) with a format string listing the error
-	code in \c err (assumed to be a \c status_t value) and the
+	code in \c error (assumed to be a \c status_t value) and the
 	corresponding text error code returned by a call to \c strerror().
 	
 	This function is called by the \c RETURN* macros, and isn't really
 	intended for general consumption, but you might find it useful.
 	
-	\param err A \c status_t error code to report.
+	\param error A \c status_t error code to report.
 	
 	If DEBUG is undefined, does nothing.
 
@@ -105,27 +105,27 @@
 	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
-/*! \def RETURN_ERROR(err)
-	\brief Calls \c REPORT_ERROR(err) if err is a an error code (i.e.
+/*! \def RETURN_ERROR(error)
+	\brief Calls \c REPORT_ERROR(error) if error is a an error code (i.e.
 	negative), otherwise remains silent. In either case, the enclosing
-	function is then exited with a call to \c "return err;".
+	function is then exited with a call to \c "return error;".
 		
-	\param err A \c status_t error code to report (if negative) and return.
+	\param error A \c status_t error code to report (if negative) and return.
 	
-	If DEBUG is undefined, silently returns the value in \c err.
+	If DEBUG is undefined, silently returns the value in \c error.
 
 	\note If the enclosing function's category flags are not part of the currently
 	defined CATEGORY_FILTER, printing will be suppressed.
 */
 //----------------------------------------------------------------------
-/*! \def RETURN(err)
+/*! \def RETURN(error)
 	\brief Prints out a description of the error code being returned
 	(which, in this case, may be either "erroneous" or "successful")
-	and then exits the enclosing function with a call to \c "return err;".
+	and then exits the enclosing function with a call to \c "return error;".
 		
-	\param err A \c status_t error code to report and return.
+	\param error A \c status_t error code to report and return.
 	
-	If DEBUG is undefined, silently returns the value in \c err.
+	If DEBUG is undefined, silently returns the value in \c error.
 
 	\note If the enclosing function's category flags are not part of the currently
 	defined CATEGORY_FILTER, printing will be suppressed.
