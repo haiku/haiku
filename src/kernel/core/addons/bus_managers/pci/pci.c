@@ -782,7 +782,7 @@ static void print_pir_table(struct pir_table *tbl)
 static void pci_bridge(uint8 bus, uint8 dev, uint8 func)
 {
 	uint16 command = 0;
-	uint8 mybus = pci_max_bus;
+	uint8 mybus = pci_max_bus + 1;
 	struct pci_device *pcid;
 	struct pci_bus *pcib;
 	pci_info *pcii;
