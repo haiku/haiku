@@ -5,6 +5,7 @@ KernelObjects
 	fibo_main.c
 	init.c
 	monitor_test.c
+	pipe_test.c
 	true_main.c
 	sig_test.c
 	select_test.c
