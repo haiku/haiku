@@ -258,7 +258,7 @@ AudioMixer::FillMixBuffer(void *outbuffer, size_t ioSize)
 										{
 											int sample = frameStart + chan;
 					
-											int inputValue = (32767 * indata[inputSample] * channel->fGainScale[chan]) + outdata[sample];
+											int inputValue = int((32767 * indata[inputSample] * channel->fGainScale[chan]) + outdata[sample]);
 																							
 											if (inputValue > 32767)
 												clipoffset[sample] = clipoffset[sample] + 1;
@@ -311,7 +311,7 @@ AudioMixer::FillMixBuffer(void *outbuffer, size_t ioSize)
 										{
 											int sample = frameStart + chan;
 					
-											int clipTest = (outdata[sample] + (indata[inputSample] * channel->fGainScale[chan]));
+											int clipTest = int(outdata[sample] + (indata[inputSample] * channel->fGainScale[chan]));
 																						
 											if (clipTest > 32767)
 												clipoffset[sample] = clipoffset[sample] + 1;
@@ -430,7 +430,7 @@ AudioMixer::FillMixBuffer(void *outbuffer, size_t ioSize)
 				{
 					int sample = frameStart + channel;
 					
-					int scaledSample = (outdata[sample] + (65536 * clipoffset[sample])) * fMasterGainScale[channel];
+					int scaledSample = int((outdata[sample] + (65536 * clipoffset[sample])) * fMasterGainScale[channel]);
 					
 					if (scaledSample < -32768)
 						outdata[sample] = -32768;

@@ -1246,7 +1246,7 @@ AudioMixer::HandleEvent( const media_timed_event *event, bigtime_t lateness,
 					
 				// calculate the start time for the next event
 					
-				fNextEventTime = fStartTime + (double(fFramesSent / fOutput.format.u.raw_audio.frame_rate) * 1000000.0);
+				fNextEventTime = bigtime_t(fStartTime + double(fFramesSent / fOutput.format.u.raw_audio.frame_rate) * 1000000.0);
 					
 				media_timed_event nextBufferEvent(fNextEventTime, BTimedEventQueue::B_HANDLE_BUFFER);
 				EventQueue()->AddEvent(nextBufferEvent);
