@@ -3,7 +3,7 @@ SubDir OBOS_TOP src add-ons print transports ipp ;
 SubDirHdrs [ FDirName $(OBOS_TOP) src add-ons print transports shared ] ;
 
 Addon ipp
-	: Print
+	: print transport
 	: Ipp.cpp
 	  IppSetupDlg.cpp
 	  IppTransport.cpp
