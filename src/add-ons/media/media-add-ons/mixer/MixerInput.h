@@ -63,7 +63,7 @@ private:
 
 	float 			*fMixBuffer;
 	
-	float 			fMixBufferFrameRate;
+	int32 			fMixBufferFrameRate;
 	uint32			fMixBufferFrameCount;
 	
 	Resampler		**fResampler; // array
