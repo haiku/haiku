@@ -46,6 +46,27 @@ LOCATE on $(HCACHEFILE) $(JCACHEFILE) = $(OBOS_BUILD_DIR) ;
 	include BuildConfig ;
 }
 
+# analyze GCC version
+if ! $(GCC_RAW_VERSION) {
+	ECHO "Variable GCC_RAW_VERSION not set. Please run ./configure or" ;
+	EXIT "specify it manually." ;
+}
+GCC_VERSION = ;
+{
+	# split the raw version string at `.' and `-' characters
+	local version = $(GCC_RAW_VERSION) ;
+	while $(version) {
+		local split = [ Match "([^.-]*)[.-](.*)" : $(version) ] ;
+		if $(split) {
+			GCC_VERSION += $(split[1]) ;
+			version = $(split[2]) ;
+		} else {
+			GCC_VERSION += $(version) ;
+			version = ;
+		}
+	}
+}
+
 # Save the platform default headers.
 PLATFORM_DEFAULT_HEADERS = $(HDRS) ;
 
