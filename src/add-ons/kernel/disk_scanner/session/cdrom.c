@@ -22,7 +22,7 @@
 #include <unistd.h>
 
 #include <ByteOrder.h>
-#include <fs_device.h>
+#include <disk_scanner.h>
 #include <KernelExport.h>
 #include <scsi.h>
 #include <disk_scanner/session.h>

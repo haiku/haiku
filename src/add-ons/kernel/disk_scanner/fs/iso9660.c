@@ -16,7 +16,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include <fs_device.h>
+#include <disk_scanner.h>
 #include <fs_info.h>
 #include <KernelExport.h>
 #include <disk_scanner/fs.h>
