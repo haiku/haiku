@@ -43,7 +43,9 @@ DisplayDriver::DisplayDriver()
 	  fDPMSState(B_DPMS_ON),
 	  fDPMSCaps(B_DPMS_ON)
 {
-	// TODO: somehow init fDisplayMode
+	fDisplayMode.virtual_width = 640;
+	fDisplayMode.virtual_height = 480;
+	fDisplayMode.space = B_RGBA32;
 }
 
 
