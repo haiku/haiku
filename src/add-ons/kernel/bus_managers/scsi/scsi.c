@@ -16,16 +16,10 @@ locked_pool_interface *locked_pool;
 device_manager_info *pnp;
 fast_log_info *fast_log;
 
-// Link to SCSI bus.
-// SCSI device driver must have SCSI bus loaded, but it calls its functions
-// directly instead via official interface, so this pointer is never read.
-static module_info *scsi_bus_dummy;
-
 module_dependency module_dependencies[] = {
 	{ DEVICE_MANAGER_MODULE_NAME, (module_info **)&pnp },
 	{ LOCKED_POOL_MODULE_NAME, (module_info **)&locked_pool },
 	{ FAST_LOG_MODULE_NAME, (module_info **)&fast_log },
-	{ SCSI_BUS_MODULE_NAME, &scsi_bus_dummy },
 	{}
 };
 

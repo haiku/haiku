@@ -502,15 +502,23 @@ static uchar scsi_reset_device( scsi_device_info *device )
 }
 
 
-static status_t std_ops( int32 op, ... )
+static status_t
+std_ops(int32 op, ...)
 {
-	switch( op ) {
-	case B_MODULE_INIT:
-	case B_MODULE_UNINIT:
-		return B_OK;
-		
-	default:
-		return B_ERROR;
+	switch (op) {
+		case B_MODULE_INIT:
+		{
+			// Link to SCSI bus.
+			// SCSI device driver must have SCSI bus loaded, but it calls its functions
+			// directly instead via official interface, so this pointer is never read.
+			module_info *dummy;
+			return get_module(SCSI_BUS_MODULE_NAME, &dummy);
+		}
+		case B_MODULE_UNINIT:
+			return put_module(SCSI_BUS_MODULE_NAME);
+
+		default:
+			return B_ERROR;
 	}
 }
 
