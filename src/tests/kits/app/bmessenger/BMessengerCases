@@ -188,21 +188,13 @@ case 1:	this is uninitialized, replyTo is NULL =>
 		should return B_BAD_PORT_ID.
 case 2:	this is uninitialized, replyTo points to a valid handler  =>
 		should return B_BAD_PORT_ID.
-case 3:	this is initialized to a local target with preferred handler,
-		replyTo is NULL =>
+case 3:	this is initialized to a local/remote target with preferred/specific
+		handler, replyTo is NULL =>
 		should deliver the message and return B_OK.
-case 4:	this is initialized to a local target with preferred handler,
-		replyTo points to a valid handler =>
+case 4:	this is initialized to a local/remote target with preferred/specific
+		handler, replyTo points to a valid handler =>
 		should deliver the message and return B_OK, a reply should be posted
 		to the reply handler.
-case 5:	this is initialized to a local target with specific handler,
-		replyTo is NULL =>
-		should deliver the message and return B_OK.
-case 6:	this is initialized to a local target with specific handler,
-		replyTo points to a valid handler =>
-		should deliver the message and return B_OK, a reply should be posted
-		to the reply handler.
-TODO: remote targets...
 
 status_t SendMessage(BMessage *message, BHandler *replyTo,
 					 bigtime_t timeout) const
@@ -222,11 +214,11 @@ case 1:	this is uninitialized, reply is NULL =>
 		should return B_BAD_PORT_ID or B_BAD_VALUE.
 case 2:	this is uninitialized, replyTo points to a valid message  =>
 		should return B_BAD_PORT_ID.
-case 3:	this is initialized to a local target with preferred handler,
-		reply is NULL =>
+case 3:	this is initialized to a local/remote target with preferred/specific
+		handler, reply is NULL =>
 		should return B_BAD_VALUE.
-case 4:	this is initialized to a local target with preferred handler,
-		reply points to a valid message =>
+case 4:	this is initialized to a local/remote target with preferred/specific
+		handler, reply points to a valid message =>
 		should deliver the message, wait for a reply and return B_OK,
 		reply should contain the reply.
 
