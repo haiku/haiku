@@ -30,7 +30,7 @@ File <boot!home!config!lib>/boot/home/config/lib/libopenbeos.so
 
 SubInclude OBOS_TOP src kits app ;
 SubInclude OBOS_TOP src kits interface ;
-#SubInclude OBOS_TOP src kits media ;
+SubInclude OBOS_TOP src kits media ;
 #SubInclude OBOS_TOP src kits midi ;
 #SubInclude OBOS_TOP src kits screensaver ;
 SubInclude OBOS_TOP src kits storage ;

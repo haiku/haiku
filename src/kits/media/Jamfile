@@ -1,0 +1,71 @@
+SubDir OBOS_TOP src kits media ;
+
+UsePrivateHeaders media ;
+
+UsePublicHeaders media ;
+
+# That's ugly. The header (ServerInterface.h) should reside in
+# headers/private/media.
+SubDirHdrs [ FDirName $(OBOS_TOP) src servers media ] ;
+
+SharedLibrary media :
+	# Private Media Kit
+	!missing_symbols.cpp
+
+	# Public Media Kit
+	Buffer.cpp
+	BufferConsumer.cpp
+	BufferGroup.cpp
+	BufferProducer.cpp
+	Controllable.cpp
+	FileInterface.cpp
+	MediaAddOn.cpp
+	MediaDecoder.cpp
+	MediaDefs.cpp
+	MediaEncoder.cpp
+	MediaEventLooper.cpp
+	MediaFile.cpp
+	MediaFiles.cpp
+	MediaFormats.cpp
+	MediaNode.cpp
+	MediaRoster.cpp
+	MediaTheme.cpp
+	MediaTrack.cpp
+	ParameterWeb.cpp
+	PlaySound.cpp
+	RealtimeAlloc.cpp
+	Sound.cpp
+	SoundFile.cpp
+	SoundPlayer.cpp
+	TimeCode.cpp
+	TimedEventQueue.cpp
+	TimeSource.cpp
+
+	# Internal Functionality
+	PortPool.cpp
+	DormantNodeManager.cpp
+	SystemTimeSource.cpp
+	BufferIdCache.cpp
+	SharedBufferList.cpp
+	TrackReader.cpp
+	TimedEventQueuePrivate.cpp
+	SoundPlayNode.cpp
+	ChannelMixer.cpp
+	SampleConverter.cpp
+	SamplingrateConverter.cpp
+	VolumeControl.cpp
+
+	# Old (R3) Media Kit
+	OldAudioModule.cpp
+	OldAudioStream.cpp
+	OldBufferStream.cpp
+	OldBufferStreamManager.cpp
+	OldMediaModule.cpp
+	OldSoundFile.cpp
+	OldSubscriber.cpp
+;
+
+LinkSharedOSLibs libmedia.so :
+	be
+;
+
