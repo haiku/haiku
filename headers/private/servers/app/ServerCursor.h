@@ -28,6 +28,7 @@
 #define SERVERCURSOR_H_
 
 #include <Point.h>
+#include <String.h>
 #include "ServerBitmap.h"
 
 class ServerApp;
@@ -53,7 +54,7 @@ public:
 	//! Returns the cursor's hot spot
 	BPoint GetHotSpot(void) { return _hotspot; }
 	void SetHotSpot(BPoint pt);
-	const char *GetAppSignature(void) { return _app_signature; }
+	const char *GetAppSignature(void) { return _app_signature.String(); }
 	void SetAppSignature(const char *signature);
 	
 	//! Returns the cursor's ID
@@ -62,7 +63,7 @@ private:
 	friend class CursorManager;
 	
 	BPoint _hotspot;
-	char *_app_signature;
+	BString _app_signature;
 	int32 _token;
 };
 
