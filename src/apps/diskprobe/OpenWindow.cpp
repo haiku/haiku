@@ -24,7 +24,8 @@ static const uint32 kMsgCancel = 'Canc';
 
 
 OpenWindow::OpenWindow()
-	: BWindow(BRect(0, 0, 350, 100), "DiskProbe", B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
+	: BWindow(BRect(0, 0, 350, 100), "DiskProbe", B_TITLED_WINDOW,
+			B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView *view = new BView(Bounds(), B_EMPTY_STRING, B_FOLLOW_ALL, B_WILL_DRAW);
 	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
