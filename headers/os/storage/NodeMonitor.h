@@ -42,6 +42,28 @@ enum {
 #define	B_DEVICE_UNMOUNTED	7
 
 
+// More specific info in the "cause" field of B_ATTR_CHANGED notification
+// messages. (Haiku only)
+#define	B_ATTR_CREATED		1
+#define	B_ATTR_REMOVED		2
+//		B_ATTR_CHANGED is reused
+
+
+// More specific info in the "fields" field of B_STAT_CHANGED notification
+// messages, specifying what parts of the stat data have actually been
+// changed. (Haiku only)
+enum {
+	B_STAT_MODE					= 0x01,
+	B_STAT_UID					= 0x02,
+	B_STAT_GID					= 0x04,
+	B_STAT_SIZE					= 0x08,
+	B_STAT_ACCESS_TIME			= 0x10,
+	B_STAT_MODIFICATION_TIME	= 0x20,
+	B_STAT_CREATION_TIME		= 0x40,
+	B_STAT_CHANGE_TIME			= 0x80,
+}};
+
+
 /* C++ callable Prototypes
  *
  * Since you are not able to parse BMessages from plain C, there is no
