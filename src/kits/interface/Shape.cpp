@@ -271,8 +271,10 @@ void BShape::Clear()
 	fState = 0;
 	fBuildingOp = 0;
 }
-//------------------------------------------------------------------------------
-BRect BShape::Bounds() const
+
+
+BRect
+BShape::Bounds() const
 {
 	shape_data *data = (shape_data*)fPrivateData;
 	BRect bounds;
@@ -299,8 +301,10 @@ BRect BShape::Bounds() const
 
 	return bounds;
 }
-//------------------------------------------------------------------------------
-status_t BShape::AddShape(const BShape *otherShape)
+
+
+status_t
+BShape::AddShape(const BShape *otherShape)
 {
 	shape_data *data = (shape_data*)fPrivateData;
 	shape_data *otherData = (shape_data*)otherShape->fPrivateData;
@@ -333,8 +337,10 @@ status_t BShape::AddShape(const BShape *otherShape)
 
 	return B_OK;
 }
-//------------------------------------------------------------------------------
-status_t BShape::MoveTo(BPoint point)
+
+
+status_t
+BShape::MoveTo(BPoint point)
 {
 	shape_data *data = (shape_data*)fPrivateData;
 
@@ -562,4 +568,22 @@ void BShape::InitData()
 	data->ptSize = 0;
 	data->ptBlockSize = 255;
 }
-//------------------------------------------------------------------------------
+
+
+//	#pragma mark -
+//	R4.5 compatibility
+
+
+#if __GNUC__ < 3
+
+BRect
+Bounds__6BShape(BShape *self)
+{
+	return self->Bounds();
+}
+
+// ToDo: Add those:
+//		BShape(BShape &copyFrom);
+//		status_t AddShape(BShape *other);
+
+#endif	// __GNUC__ < 3
