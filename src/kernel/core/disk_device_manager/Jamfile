@@ -11,7 +11,7 @@ UsePrivateHeaders storage ;
 UseHeaders [ FDirName $(OBOS_TOP) src tests kits storage virtualdrive ] ;
 
 SharedLibrary disk_device_manager :
-	ddm_user_interface.cpp
+	ddm_userland_interface.cpp
 	disk_device_manager.cpp
 	KDiskDevice.cpp
 	KDiskDeviceJob.cpp

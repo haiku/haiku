@@ -5,6 +5,8 @@
 
 #include "disk_device_manager.h"
 
+struct user_disk_system_info;
+
 namespace BPrivate {
 namespace DiskDevice {
 
@@ -25,6 +27,8 @@ public:
 
 	virtual bool IsFileSystem() const;
 	bool IsPartitioningSystem() const;
+
+	void GetInfo(user_disk_system_info *info);
 
 	// manager will be locked
 	status_t Load();		// load/unload -- can be nested

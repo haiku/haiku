@@ -76,8 +76,8 @@ public:
 	// Disk Systems
 
 	// manager must be locked
-	KDiskSystem *DiskSystemWithName(const char *name);
-	KDiskSystem *DiskSystemWithID(disk_system_id id);
+	KDiskSystem *FindDiskSystem(const char *name);
+	KDiskSystem *FindDiskSystem(disk_system_id id);
 	int32 CountDiskSystems();
 	KDiskSystem *NextDiskSystem(int32 *cookie);
 

@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "ddm_userland_interface.h"
 #include "KDiskDeviceManager.h"
 #include "KDiskDeviceUtils.h"
 #include "KDiskSystem.h"
@@ -76,6 +77,18 @@ bool
 KDiskSystem::IsPartitioningSystem() const
 {
 	return !IsFileSystem();
+}
+
+// GetInfo
+void
+KDiskSystem::GetInfo(user_disk_system_info *info)
+{
+	if (!info)
+		return;
+	info->id = ID();
+	strcpy(info->name, Name());
+	strcpy(info->pretty_name, PrettyName());
+	info->file_system = IsFileSystem();
 }
 
 // Load
