@@ -21,7 +21,7 @@ int
 mount(const char *filesystem, const char *where, const char *device, ulong flags, void *parms, int len)
 {
 	// ToDo: consider parsing "parms" string in userland
-	int status = _kern_mount(where, device, filesystem/*, flags*/, parms);
+	int status = _kern_mount(where, device, filesystem, flags, parms);
 
 	(void)len;
 
