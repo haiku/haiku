@@ -2028,6 +2028,7 @@ void BWindow::InitData(	BRect frame,
 	link.FlushWithReply(&pmsg);
 
 	pmsg.Read<port_id>(&send_port);
+
 /*
 	session->WriteInt32( AS_CREATE_WINDOW );
 	session->WriteRect( fFrame );
@@ -2274,31 +2275,22 @@ void BWindow::BuildTopView(){
 	top_view		= new BView( fFrame.OffsetToCopy(0,0), "top_view",
 								 B_FOLLOW_ALL, B_WILL_DRAW);
 	top_view->top_level_view	= true;
-	//top_view->fShowLevel		= 1;
+	top_view->fShowLevel		= 1;
 
 		// set top_view's owner, add it to window's eligible handler list
-		// and also set its next handler to be this window.
+		// and also set its next handler to this window.
 	top_view->setOwner( this );	
 
-	PortLink		link(send_port);
-	link.SetOpCode(AS_LAYER_CREATE_ROOT);
-	link.Attach<int32>(_get_object_token_( top_view ));
-	link.Attach<BRect>(top_view->Frame());
-	link.Attach<int32>(top_view->ResizingMode());
-	link.Attach<int32>(top_view->Flags());
-	link.AttachString(top_view->Name());
-	link.Flush();
-/*
 		// send top_view's information to app_server
 	session->WriteInt32( AS_LAYER_CREATE_ROOT );
 	session->WriteInt32( _get_object_token_( top_view ) );
-	session->WriteRect( top_view->Frame() );
+	session->WriteRect( fFrame );//top_view->Frame() );
 	session->WriteInt32( top_view->ResizingMode() );
 	session->WriteInt32( top_view->Flags() );
 	session->WriteString( top_view->Name() );
 		// we DO NOT send our current state; the server knows the default values!
 	session->Sync();
-*/
+
 	fLastViewToken		= _get_object_token_( top_view );
 STRACE(("BuildTopView ended\n"));
 }
