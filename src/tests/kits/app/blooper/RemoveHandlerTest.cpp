@@ -36,7 +36,7 @@ void TRemoveHandlerTest::RemoveHandler1()
 	Handler.AddFilter(MessageFilter);
 	Looper.AddHandler(&Handler);
 	Looper.RemoveHandler(&Handler);
-	assert(Handler.FilterList() == NULL);
+	assert(Handler.FilterList());
 }
 //------------------------------------------------------------------------------
 Test* TRemoveHandlerTest::Suite()

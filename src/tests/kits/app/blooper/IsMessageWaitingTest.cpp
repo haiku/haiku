@@ -4,6 +4,7 @@
 //------------------------------------------------------------------------------
 
 // Standard Includes -----------------------------------------------------------
+#include <iostream>
 
 // System Includes -------------------------------------------------------------
 #include <Looper.h>
@@ -17,13 +18,18 @@
 // Local Defines ---------------------------------------------------------------
 
 // Globals ---------------------------------------------------------------------
+port_id _get_looper_port_(const BLooper* looper);
 
 //------------------------------------------------------------------------------
 //case 1: looper is unlocked and queue is empty
 void TIsMessageWaitingTest::IsMessageWaiting1()
 {
 	BLooper Looper;
+#ifndef TEST_R5
 	assert(!Looper.IsMessageWaiting());
+#else
+	assert(Looper.IsMessageWaiting());
+#endif
 }
 //------------------------------------------------------------------------------
 //case 2: looper is unlocked and queue is filled
@@ -39,7 +45,11 @@ void TIsMessageWaitingTest::IsMessageWaiting3()
 {
 	BLooper Looper;
 	Looper.Lock();
+#ifndef TEST_R5
 	assert(!Looper.IsMessageWaiting());
+#else
+	assert(Looper.IsMessageWaiting());
+#endif
 }
 //------------------------------------------------------------------------------
 //case 4: looper is locked and queue is filled

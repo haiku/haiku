@@ -97,7 +97,7 @@ struct _loop_data_
 
 //------------------------------------------------------------------------------
 BLooper::BLooper(const char* name, int32 priority, int32 port_capacity)
-	:	BHandler(name), fMsgPort(-1)
+	:	BHandler(name)
 {
 	InitData(name, priority, port_capacity);
 }
@@ -275,7 +275,7 @@ bool BLooper::IsMessageWaiting() const
 	do
 	{
 		count = port_buffer_size_etc(fMsgPort, B_TIMEOUT, 0);
-	} while (count == B_WOULD_BLOCK);
+	} while (count == B_INTERRUPTED);
 
 	return count > 0;
 }
@@ -302,7 +302,9 @@ void BLooper::AddHandler(BHandler* handler)
 //------------------------------------------------------------------------------
 bool BLooper::RemoveHandler(BHandler* handler)
 {
-	AssertLocked();
+// BeBook says looper must be locked for calls to this, but testing shows that
+// just ain't so.
+//	AssertLocked();
 
 	// TODO: test
 	// Need to ensure this algo reflects what actually happens
@@ -633,7 +635,6 @@ bool BLooper::RemoveCommonFilter(BMessageFilter* filter)
 //------------------------------------------------------------------------------
 void BLooper::SetCommonFilterList(BList* filters)
 {
-	AssertLocked();
 	if (fCommonFilters)
 	{
 		for (int32 i = 0; i < fCommonFilters->CountItems(); ++i)
@@ -885,6 +886,7 @@ void BLooper::InitData()
 	fPreferred = NULL;
 	fTaskID = B_ERROR;
 	fTerminating = false;
+	fMsgPort = -1;
 
 	if (sTeamID == -1)
 	{
@@ -893,22 +895,26 @@ void BLooper::InitData()
 		sTeamID = info.team;
 	}
 
-	BAutolock ListLock(sLooperListLock);
-	AddLooper(this);
-	Lock();
-	AddHandler(this);
 }
 //------------------------------------------------------------------------------
 void BLooper::InitData(const char* name, int32 priority, int32 port_capacity)
 {
+	InitData();
+
 	fLockSem = create_sem(1, name);
 
-	if (fMsgPort <= 0)
+	if (port_capacity <= 0)
 	{
-		fMsgPort = create_port(port_capacity, name ? name : "LooperPort");
+		port_capacity = B_LOOPER_PORT_DEFAULT_CAPACITY;
 	}
 
-	InitData();
+	fMsgPort = create_port(port_capacity, name ? name : "LooperPort");
+
+	fInitPriority = priority;
+	
+	BAutolock ListLock(sLooperListLock);
+	AddLooper(this);
+	AddHandler(this);
 }
 //------------------------------------------------------------------------------
 void BLooper::AddMessage(BMessage* msg)
@@ -1275,7 +1281,17 @@ DBG(OUT("BLooper::AddLooper(): looper added at %ld\n", looperCount));
 			result->looper = loop;
 			result->thread = loop->fTaskID;
 			++looperCount;
+
+			// Moved this here from InitData() because it occured to me that the
+			// looper could potentially get removed from the list between now
+			// and when we locked it in InitData().  By doing it here, while the
+			// the looper list is locked, we can be certain this won't happen.
+			loop->Lock();
 		}
+	}
+	else
+	{
+		debugger("sLooperList is not locked!");
 	}
 }
 //------------------------------------------------------------------------------
