@@ -131,7 +131,8 @@ private:
 	media_file_format		fMFI;
 
 	bool					fFileClosed;
-	bool					_reserved_was_fUnused[3];
+	bool					fDeleteSource;
+	bool					_reserved_was_fUnused[2];
 	BMediaTrack				**fTrackList;
 
 	void					Init();

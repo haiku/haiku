@@ -97,7 +97,8 @@ mp3Decoder::Setup(media_format *ioEncodedFormat,
 	
 	// put some more useful info into the media_format describing our input format
 	ioEncodedFormat->u.encoded_audio.bit_rate = fBitRate;
-	
+	ioEncodedFormat->u.encoded_audio.output.frame_rate = fFrameRate;
+	ioEncodedFormat->u.encoded_audio.output.channel_count = fChannelCount;
 	return B_OK;
 }
 

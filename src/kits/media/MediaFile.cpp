@@ -19,6 +19,7 @@ BMediaFile::BMediaFile(const entry_ref *ref)
 {
 	CALLED();
 	Init();
+	fDeleteSource = true;
 	InitReader(new BFile(ref, O_RDONLY));
 }
 
@@ -34,6 +35,7 @@ BMediaFile::BMediaFile(const entry_ref * ref,
 {
 	CALLED();
 	Init();
+	fDeleteSource = true;
 	InitReader(new BFile(ref, O_RDONLY), flags);
 }
 
@@ -51,6 +53,7 @@ BMediaFile::BMediaFile(const entry_ref *ref,
 {
 	CALLED();
 	Init();
+	fDeleteSource = true;
 	InitWriter(new BFile(ref, O_WRONLY), mfi, flags);
 }
 					   
@@ -71,7 +74,8 @@ BMediaFile::~BMediaFile()
 	ReleaseAllTracks();
 	delete fTrackList;
 	delete fExtractor;
-	delete fSource;
+	if (fDeleteSource)
+		delete fSource;
 }
 
 status_t 
@@ -266,6 +270,7 @@ BMediaFile::Init()
 	fTrackList = 0;
 	fExtractor = 0;
 	fErr = B_OK;
+	fDeleteSource = false;
 
 	// not used so far:
 	fEncoderMgr = 0;
@@ -306,7 +311,7 @@ BMediaFile::InitWriter(BDataIO *source, const media_file_format * mfi,  int32 fl
 //unimplemented
 BMediaFile::BMediaFile();
 BMediaFile::BMediaFile(const BMediaFile&);
-BMediaFile::BMediaFile& operator=(const BMediaFile&);
+ BMediaFile::BMediaFile& operator=(const BMediaFile&);
 */
 
 status_t BMediaFile::_Reserved_BMediaFile_0(int32 arg, ...) { return B_ERROR; }
