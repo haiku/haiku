@@ -26,6 +26,7 @@
 
 // Standard Includes -----------------------------------------------------------
 #include <string.h>
+#include <malloc.h>
 
 // System Includes -------------------------------------------------------------
 #include <StatusBar.h>
@@ -43,7 +44,7 @@
 //------------------------------------------------------------------------------
 BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 					   const char *trailingLabel)
-	:	BView ( frame, name, 0, B_WILL_DRAW ),
+	:	BView(frame, name, B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW),
 		fText(NULL),
 		fTrailingText(NULL),
 		fMax(100.0f),
@@ -118,16 +119,16 @@ BStatusBar::BStatusBar(BMessage *archive)
 BStatusBar::~BStatusBar()
 {
 	if (fLabel)
-		delete fLabel;
+		free(fLabel);
 
 	if (fTrailingLabel)
-		delete fTrailingLabel;
+		free(fTrailingLabel);
 
 	if (fText)
-		delete fText;
+		free(fText);
 
 	if (fTrailingText)
-		delete fTrailingText;
+		free(fTrailingText);
 }
 //------------------------------------------------------------------------------
 BArchivable *BStatusBar::Instantiate(BMessage *archive)
@@ -140,57 +141,33 @@ BArchivable *BStatusBar::Instantiate(BMessage *archive)
 //------------------------------------------------------------------------------
 status_t BStatusBar::Archive(BMessage *archive, bool deep) const
 {
-	status_t err = BView::Archive(archive, deep);
-	
-	if (err != B_OK)
-		return err;
+	BView::Archive(archive, deep);
 
 	if (fBarHeight != 16.0f)
-		err = archive->AddFloat("_high", fBarHeight);
-		
-	if (err != B_OK)
-		return err;
+		archive->AddFloat("_high", fBarHeight);
 
 	// TODO: Should we compare the color with (50, 150, 255) ?
-	err = archive->AddData("_bcolor", B_INT32_TYPE, &fBarColor, sizeof( int32 ));
-	
-	if (err != B_OK)
-		return err;
+	archive->AddData("_bcolor", B_INT32_TYPE, &fBarColor, sizeof( int32 ));
 	
 	if (fCurrent != 0.0f)
-		err = archive->AddFloat("_val", fCurrent);
-		
-	if (err != B_OK)
-		return err;
+		archive->AddFloat("_val", fCurrent);
 
 	if (fMax != 100.0f )
-		err = archive->AddFloat("_max", fMax); 
-		
-	if (err != B_OK)
-		return err;
+		archive->AddFloat("_max", fMax); 
 	
 	if (fText )
-		err = archive->AddString("_text", fText);
-		
-	if (err != B_OK)
-		return err;
+		archive->AddString("_text", fText);
 	
 	if (fTrailingText)
-		err = archive->AddString("_ttext", fTrailingText);
-		
-	if (err != B_OK)
-		return err;
+		archive->AddString("_ttext", fTrailingText);
 
 	if (fLabel)
-		err = archive->AddString("_label", fLabel);
-		
-	if (err != B_OK)
-		return err;
+		archive->AddString("_label", fLabel);
 
 	if (fTrailingLabel)
-		err = archive->AddString ("_tlabel", fTrailingLabel);
+		archive->AddString ("_tlabel", fTrailingLabel);
 
-	return err;
+	return B_OK;
 }
 //------------------------------------------------------------------------------
 void BStatusBar::AttachedToWindow()
@@ -214,7 +191,7 @@ void BStatusBar::MessageReceived(BMessage *message)
 
 			message->FindFloat("delta", &delta);
 			message->FindString("text", &text);
-			message->FindString("trailing_text", &trailing_text);
+			message->FindString("trailing text", &trailing_text);
 
 			Update(delta, text, trailing_text);
 
@@ -225,7 +202,7 @@ void BStatusBar::MessageReceived(BMessage *message)
 			const char *label = NULL, *trailing_label = NULL;
 
 			message->FindString("label", &label);
-			message->FindString("trailing_label", &trailing_label);
+			message->FindString("trailing label", &trailing_label);
 
 			Reset(label, trailing_label);
 
@@ -247,10 +224,10 @@ void BStatusBar::Draw(BRect updateRect)
 		GetFontHeight(&fh);
 		
 		SetHighColor(0, 0, 0);
-		DrawString(fLabel, BPoint(0.0f, (float)ceil(fh.ascent) + 1.0f));
+		DrawString(fLabel, BPoint(0.0f, (float)ceil(fh.ascent + fh.leading)));
 	}
 
-	BRect rect(0.0f, 14.0f, width, 14.0f + fBarHeight);
+	BRect rect(0.0f, 16.0f, width, 16.0f + fBarHeight);
 
 	// First bevel
 	SetHighColor(tint_color(ui_color ( B_PANEL_BACKGROUND_COLOR ), B_DARKEN_1_TINT));
@@ -318,7 +295,7 @@ void BStatusBar::SetBarHeight(float height)
 void BStatusBar::SetText ( const char *string )
 {
 	if (fText)
-		delete fText;
+		free(fText);
 
 	fText = strdup(string);
 
@@ -328,7 +305,7 @@ void BStatusBar::SetText ( const char *string )
 void BStatusBar::SetTrailingText(const char *string)
 {
 	if (fTrailingText)
-		delete fTrailingText;
+		free(fTrailingText);
 
 	fTrailingText = strdup(string);
 
@@ -347,12 +324,12 @@ void BStatusBar::Update(float delta, const char *text, const char *trailingText)
 	fCurrent += delta;
 
 	if (fText)
-		delete fText;
+		free(fText);
 
 	fText = strdup(text);
 
 	if (fTrailingText)
-		delete fTrailingText;
+		free(fTrailingText);
 
 	fTrailingText = strdup(trailingText);
 
@@ -362,12 +339,12 @@ void BStatusBar::Update(float delta, const char *text, const char *trailingText)
 void BStatusBar::Reset(const char *label, const char *trailingLabel)
 {
 	if (fLabel)
-		delete fLabel;
+		free(fLabel);
 
 	fLabel = strdup(label);
 
 	if (fTrailingLabel)
-		delete fTrailingLabel;
+		free(fTrailingLabel);
 
 	fTrailingLabel = strdup(trailingLabel);
 
@@ -475,17 +452,9 @@ void BStatusBar::GetPreferredSize(float *width, float *height)
 	font_height fh;
 	GetFontHeight(&fh);
 	
-	*width = 0.0f;
-	if (Label() && TrailingLabel())
-		*width += 3.0f;
-	if (Label())
-		*width += (float)ceil(StringWidth(Label())) + 2.0f;
-	if (TrailingLabel())
-		*width += (float)ceil(StringWidth(TrailingLabel())) + 2.0f;
-	if (Text())
-		*width += 3.0f;
-	if (TrailingText())
-		*width += 3.0f;
+	*width = (fLabel ? (float)ceil(StringWidth(fLabel)) : 0.0f) +
+		(fTrailingLabel ? (float)ceil(StringWidth(fTrailingLabel)) : 0.0f) +
+		7.0f;
 	*height = fh.ascent + fh.descent + 5.0f + BarHeight();
 }
 //------------------------------------------------------------------------------
