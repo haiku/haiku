@@ -37,12 +37,7 @@
 #include <AppServerLink.h>
 
 // Project Includes ------------------------------------------------------------
-// Needed from app server
-#if 0
 #include <ServerProtocol.h>
-#else
-#define SET_CURSOR_BCURSOR 'sscb'
-#endif
 
 // Local Includes --------------------------------------------------------------
 
