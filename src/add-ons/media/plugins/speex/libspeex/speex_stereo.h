@@ -37,6 +37,10 @@
 
 #include "speex_bits.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** State used for decoding (intensity) stereo information */
 typedef struct SpeexStereoState {
    float balance;      /**< Left/right balance info */
@@ -58,5 +62,9 @@ void speex_decode_stereo(float *data, int frame_size, SpeexStereoState *stereo);
 
 /** Callback handler for intensity stereo info */
 int speex_std_stereo_request_handler(SpeexBits *bits, void *state, void *data);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
