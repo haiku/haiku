@@ -940,7 +940,7 @@ KPartition::Dump(bool deep, int32 level)
 	if (level > 0)
 		OUT("%spartition %ld: %s\n", prefix, ID(), path);
 	OUT("%s  offset:            %lld\n", prefix, Offset());
-	OUT("%s  size:              %lld\n", prefix, Size());
+	OUT("%s  size:              %lld (%.2f MB)\n", prefix, Size(), Size() / (1024.0*1024));
 	OUT("%s  content size:      %lld\n", prefix, ContentSize());
 	OUT("%s  block size:        %lu\n", prefix, BlockSize());
 	OUT("%s  child count:       %ld\n", prefix, CountChildren());
