@@ -267,10 +267,10 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pbar->AddItem(pmenu);
 
 	pmenu = fpBrowseMenu = new BMenu("Browse");
-	AddItemMenu(pmenu, "First Page", MSG_PAGE_FIRST, 'F', 0, 'W', true);
-	AddItemMenu(pmenu, "Last Page", MSG_PAGE_LAST, 'L', 0, 'W', true);
-	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, 'N', 0, 'W', true);
-	AddItemMenu(pmenu, "Previous Page", MSG_PAGE_PREV, 'P', 0, 'W', true);
+	AddItemMenu(pmenu, "First Page", MSG_PAGE_FIRST, B_LEFT_ARROW, B_SHIFT_KEY, 'W', true);
+	AddItemMenu(pmenu, "Last Page", MSG_PAGE_LAST, B_RIGHT_ARROW, B_SHIFT_KEY, 'W', true);
+	AddItemMenu(pmenu, "Next Page", MSG_PAGE_NEXT, B_RIGHT_ARROW, 0, 'W', true);
+	AddItemMenu(pmenu, "Previous Page", MSG_PAGE_PREV, B_LEFT_ARROW, 0, 'W', true);
 	fpGoToPageMenu = new BMenu("Go To Page");
 	pmenu->AddItem(fpGoToPageMenu);
 	pmenu->AddSeparatorItem();
@@ -281,8 +281,8 @@ ShowImageWindow::LoadMenus(BMenuBar *pbar)
 	pmenu = new BMenu("Image");
 	AddItemMenu(pmenu, "Dither Image", MSG_DITHER_IMAGE, 0, 0, 'W', true);
 	pmenu->AddSeparatorItem();
-	AddItemMenu(pmenu, "Rotate Clockwise", MSG_ROTATE_CLOCKWISE, B_RIGHT_ARROW, 0, 'W', true);	
-	AddItemMenu(pmenu, "Rotate Anticlockwise", MSG_ROTATE_ACLKWISE, B_LEFT_ARROW, 0, 'W', true);
+	AddItemMenu(pmenu, "Rotate Clockwise", MSG_ROTATE_CLOCKWISE, ']', 0, 'W', true);	
+	AddItemMenu(pmenu, "Rotate Anticlockwise", MSG_ROTATE_ACLKWISE, '[', 0, 'W', true);
 	pmenu->AddSeparatorItem();
 	AddItemMenu(pmenu, "Mirror Vertical", MSG_MIRROR_VERTICAL, 0, 0, 'W', true);
 	AddItemMenu(pmenu, "Mirror Horizontal", MSG_MIRROR_HORIZONTAL, 0, 0, 'W', true);
@@ -302,7 +302,7 @@ ShowImageWindow::AddItemMenu(BMenu *pmenu, char *caption, long unsigned int msg,
 	char shortcut, uint32 modifier, char target, bool benabled)
 {
 	BMenuItem* pitem;
-	pitem = new BMenuItem(caption, new BMessage(msg), shortcut);
+	pitem = new BMenuItem(caption, new BMessage(msg), shortcut, modifier);
 	
 	if (target == 'A')
 		pitem->SetTarget(be_app);
