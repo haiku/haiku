@@ -596,10 +596,3 @@ status_t BBufferConsumer::_Reserved_BufferConsumer_13(void *) { return B_ERROR; 
 status_t BBufferConsumer::_Reserved_BufferConsumer_14(void *) { return B_ERROR; }
 status_t BBufferConsumer::_Reserved_BufferConsumer_15(void *) { return B_ERROR; }
 
-
-extern "C" status_t Connected__15BBufferConsumerRC12media_sourceRC17media_destinationRC12media_formatP11media_input(void *);
-
-status_t Connected__15BBufferConsumerRC12media_sourceRC17media_destinationRC12media_formatP11media_input(void *)
-{
-	return B_OK;
-}

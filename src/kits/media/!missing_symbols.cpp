@@ -7,6 +7,24 @@
 #include <MediaTrack.h>
 #include "debug.h"
 
+/* According to the normal headers, these symbols should neither be
+ * included in libmedia.so, nor used by anything.
+ * But BeOS R5 has them, and they are required to load the BeOS R5
+ * emu10k.media_addon, that might have been compiled with strange headers.
+ * They should be removed once the emu10k.media_addon is no longer used.
+ */
+extern "C" void Connect__15BBufferProducerlRC12media_sourceRC17media_destinationRC12media_formatPc(void *);
+extern "C" status_t Connected__15BBufferConsumerRC12media_sourceRC17media_destinationRC12media_formatP11media_input(void *);
+
+void Connect__15BBufferProducerlRC12media_sourceRC17media_destinationRC12media_formatPc(void *)
+{
+}
+
+status_t Connected__15BBufferConsumerRC12media_sourceRC17media_destinationRC12media_formatP11media_input(void *)
+{
+	return B_OK;
+}
+
 /*
 
 used by libgame.so
