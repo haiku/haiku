@@ -24,7 +24,7 @@ typedef struct vm_page {
 	struct vm_page *cache_prev;
 	struct vm_page *cache_next;
 
-	unsigned int ref_count;
+	int32 ref_count;
 
 	unsigned int type : 2;
 	unsigned int state : 3;
@@ -54,7 +54,7 @@ typedef struct vm_cache_ref {
 
 	struct vm_region *region_list;
 
-	int ref_count;
+	int32 ref_count;
 } vm_cache_ref;
 
 // vm_cache
@@ -87,7 +87,7 @@ typedef struct vm_region {
 	addr size;
 	int lock;
 	int wiring;
-	int ref_count;
+	int32 ref_count;
 
 	struct vm_cache_ref *cache_ref;
 	off_t cache_offset;
@@ -122,8 +122,8 @@ typedef struct vm_address_space {
 	vm_translation_map translation_map;
 	char *name;
 	aspace_id id;
-	int ref_count;
-	int fault_count;
+	int32 ref_count;
+	int32 fault_count;
 	int state;
 	addr scan_va;
 	addr working_set_size;
